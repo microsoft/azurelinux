@@ -1,0 +1,15 @@
+--- bitmaps-2.1.0/Cargo.toml	2020-03-26T13:33:13+00:00
++++ bitmaps-2.1.0/Cargo.toml	2025-09-25T11:20:47.586802+00:00
+@@ -25,10 +25,10 @@
+ [dependencies.typenum]
+ version = "1.10.0"
+ [dev-dependencies.proptest]
+-version = "0.9.1"
++version = "1.0.0"
+ 
+ [dev-dependencies.proptest-derive]
+-version = "0.1.0"
++version = ">=0.5.0, <0.7.0"
+ 
+ [features]
+ default = ["std"]

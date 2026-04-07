@@ -1,0 +1,51 @@
+From 963eb5233dd7743b1b566e4f20c428b12726e65a Mon Sep 17 00:00:00 2001
+From: Fushan Wen <qydwhotmail@gmail.com>
+Date: Fri, 21 Apr 2023 23:38:04 +0800
+Subject: [PATCH 19/22] Revert "QQuickItem: Fix effective visibility for items
+ without parent"
+
+This breaks applications that use QQmlPropertyList to store QQuickItem
+and don't set a parentItem for them.
+
+Ref: https://github.com/musescore/MuseScore/issues/17276
+
+This reverts commit 45c22a0221937682f4496801a495458a00f76d3a.
+---
+ src/quick/items/qquickitem.cpp                 | 6 ++++--
+ tests/auto/quick/qquickitem/tst_qquickitem.cpp | 2 --
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/quick/items/qquickitem.cpp b/src/quick/items/qquickitem.cpp
+index a5e91b2b61..8b139cb539 100644
+--- a/src/quick/items/qquickitem.cpp
++++ b/src/quick/items/qquickitem.cpp
+@@ -6082,8 +6082,10 @@ void QQuickItem::setEnabled(bool e)
+ 
+ bool QQuickItemPrivate::calcEffectiveVisible() const
+ {
+-    // An item is visible if it is a child of a visible parent, and not explicitly hidden.
+-    return explicitVisible && parentItem && QQuickItemPrivate::get(parentItem)->effectiveVisible;
++    // XXX todo - Should the effective visible of an element with no parent just be the current
++    // effective visible?  This would prevent pointless re-processing in the case of an element
++    // moving to/from a no-parent situation, but it is different from what graphics view does.
++    return explicitVisible && (!parentItem || QQuickItemPrivate::get(parentItem)->effectiveVisible);
+ }
+ 
+ bool QQuickItemPrivate::setEffectiveVisibleRecur(bool newEffectiveVisible)
+diff --git a/tests/auto/quick/qquickitem/tst_qquickitem.cpp b/tests/auto/quick/qquickitem/tst_qquickitem.cpp
+index 34eefd85e6..42348d8dd1 100644
+--- a/tests/auto/quick/qquickitem/tst_qquickitem.cpp
++++ b/tests/auto/quick/qquickitem/tst_qquickitem.cpp
+@@ -989,9 +989,7 @@ void tst_qquickitem::setParentItem()
+ 
+ void tst_qquickitem::visible()
+ {
+-    QQuickWindow window;
+     QQuickItem *root = new QQuickItem;
+-    root->setParentItem(window.contentItem());
+ 
+     QQuickItem *child1 = new QQuickItem;
+     child1->setParentItem(root);
+-- 
+2.51.1
+

@@ -1,0 +1,198 @@
+From fab13daeaf23cc4a26b10cfe0c3d7ac469a9da76 Mon Sep 17 00:00:00 2001
+From: Sumit Bose <sbose@redhat.com>
+Date: Tue, 5 Nov 2024 14:22:47 +0100
+Subject: [PATCH 16/17] Various fixes for issues found by static code scanners
+
+---
+ library/adconn.c   | 17 ++++++++++++-----
+ library/adenroll.c |  4 ++--
+ library/adutil.c   |  2 +-
+ library/seq.c      | 13 +++++++++----
+ library/seq.h      |  3 ++-
+ tools/tools.c      | 24 +++++++++++++++++-------
+ 6 files changed, 43 insertions(+), 20 deletions(-)
+
+diff --git a/library/adconn.c b/library/adconn.c
+index 087225d..e668b8d 100644
+--- a/library/adconn.c
++++ b/library/adconn.c
+@@ -402,9 +402,9 @@ clear_krb5_conf_snippet (adcli_conn *conn)
+ static adcli_result
+ setup_krb5_conf_snippet (adcli_conn *conn)
+ {
+-	char *filename;
+-	char *snippet;
+-	char *controller;
++	char *filename = NULL;
++	char *snippet = NULL;
++	char *controller = NULL;
+ 	int errn;
+ 	int ret;
+ 	int fd;
+@@ -429,7 +429,10 @@ setup_krb5_conf_snippet (adcli_conn *conn)
+ 		controller = strdup (conn->domain_controller);
+ 	}
+ 
+-	return_unexpected_if_fail (controller != NULL);
++	if (controller == NULL) {
++		free (filename);
++		return_unexpected_if_reached ();
++	}
+ 
+ 	if (asprintf (&snippet, "[realms]\n"
+ 	                        "  %s = {\n"
+@@ -442,8 +445,11 @@ setup_krb5_conf_snippet (adcli_conn *conn)
+ 	                        "  %s = %s\n",
+ 	              conn->domain_realm, controller, controller, controller,
+ 	              conn->canonical_host, conn->domain_realm,
+-	              conn->domain_controller, conn->domain_realm) < 0)
++	              conn->domain_controller, conn->domain_realm) < 0) {
++		free (controller);
++		free (filename);
+ 		return_unexpected_if_reached ();
++	}
+ 
+ 	old_mask = umask (0177);
+ 	fd = mkstemp (filename);
+@@ -451,6 +457,7 @@ setup_krb5_conf_snippet (adcli_conn *conn)
+ 	if (fd < 0) {
+ 		_adcli_warn ("Couldn't create krb5.conf snippet file in: %s: %s",
+ 		             conn->krb5_conf_dir, strerror (errno));
++		free (filename);
+ 
+ 	} else {
+ 		conn->krb5_conf_snippet = filename;
+diff --git a/library/adenroll.c b/library/adenroll.c
+index b6558ed..e978f46 100644
+--- a/library/adenroll.c
++++ b/library/adenroll.c
+@@ -2340,9 +2340,9 @@ update_keytab_for_principals (adcli_enroll *enroll,
+ 
+ 	for (i = 0; enroll->keytab_principals[i] != 0; i++) {
+ 		if (krb5_unparse_name (k5, enroll->keytab_principals[i], &name) != 0)
+-			name = "";
++			name = NULL;
+ 		res = add_principal_to_keytab (enroll, k5, enroll->keytab_principals[i],
+-		                               name, &which_salt, flags);
++		                               name != NULL ? name : "", &which_salt, flags);
+ 		krb5_free_unparsed_name (k5, name);
+ 
+ 		if (res != ADCLI_SUCCESS)
+diff --git a/library/adutil.c b/library/adutil.c
+index 36822e2..a112ad8 100644
+--- a/library/adutil.c
++++ b/library/adutil.c
+@@ -169,7 +169,7 @@ _adcli_strv_dup (char **strv)
+ 		return NULL;
+ 
+ 	count = seq_count (strv);
+-	return seq_dup (strv, &count, (seq_copy)strdup);
++	return seq_dup (strv, &count, (seq_copy)strdup, (seq_destroy)free);
+ }
+ 
+ char *
+diff --git a/library/seq.c b/library/seq.c
+index 8e7475d..5410918 100644
+--- a/library/seq.c
++++ b/library/seq.c
+@@ -299,7 +299,8 @@ seq_lookup (seq_voidp sequence,
+ void *
+ seq_dup (seq_voidp sequence,
+          int *length,
+-         seq_copy copy)
++         seq_copy copy,
++         seq_destroy destroy)
+ {
+ 	void **seq = sequence;
+ 	void **copied;
+@@ -308,6 +309,7 @@ seq_dup (seq_voidp sequence,
+ 	int at;
+ 
+ 	assert (length != NULL);
++	assert ( (copy != NULL && destroy != NULL) || (copy == NULL && destroy == NULL) );
+ 
+ 	len = *length;
+ 	alloc = alloc_size (len + 1);
+@@ -321,7 +323,10 @@ seq_dup (seq_voidp sequence,
+ 			copied[at] = seq[at];
+ 		} else {
+ 			copied[at] = copy (seq[at]);
+-			bail_on_null (copied[at]);
++			if (copied[at] == NULL) {
++				destroy (copied);
++				return NULL;
++			}
+ 		}
+ 	}
+ 
+@@ -707,7 +712,7 @@ test_dup (void)
+ 	seq = seq_insert (seq, &len, "3", (seq_compar)strcmp, NULL);
+ 	seq = seq_insert (seq, &len, "1", (seq_compar)strcmp, NULL);
+ 
+-	dup = seq_dup (seq, &len, NULL);
++	dup = seq_dup (seq, &len, NULL, NULL);
+ 	assert (dup != NULL);
+ 
+ 	assert_str_eq (dup[0], "1");
+@@ -734,7 +739,7 @@ test_dup_deep (void)
+ 	seq = seq_insert (seq, &len, "3", (seq_compar)strcmp, NULL);
+ 	seq = seq_insert (seq, &len, "1", (seq_compar)strcmp, NULL);
+ 
+-	dup = seq_dup (seq, &len, (seq_copy)strdup);
++	dup = seq_dup (seq, &len, (seq_copy)strdup, (seq_destroy)free);
+ 	assert (dup != NULL);
+ 
+ 	assert_str_eq (dup[0], "1");
+diff --git a/library/seq.h b/library/seq.h
+index 5d48848..3fec747 100644
+--- a/library/seq.h
++++ b/library/seq.h
+@@ -89,7 +89,8 @@ int                seq_count                  (seq_voidp seq);
+ 
+ seq_voidp          seq_dup                    (seq_voidp seq,
+                                                int *length,
+-                                               seq_copy copy);
++                                               seq_copy copy,
++                                               seq_destroy destroy);
+ 
+ void               seq_free                   (seq_voidp seq,
+                                                seq_destroy destroy);
+diff --git a/tools/tools.c b/tools/tools.c
+index 7e382ae..444485c 100644
+--- a/tools/tools.c
++++ b/tools/tools.c
+@@ -399,14 +399,24 @@ setup_krb5_conf_directory (adcli_conn *conn)
+ 			warnx ("couldn't create temporary directory in: %s: %s",
+ 			       parent, strerror (errn));
+ 		} else {
+-			if (asprintf (&filename, "%s/krb5.conf", directory) < 0 ||
+-			    asprintf (&snippets, "%s/krb5.d", directory) < 0 ||
+-			    asprintf (&contents, "includedir %s\n%s%s\n", snippets,
+-			              krb5_conf ? "include " : "",
+-			              krb5_conf ? krb5_conf : "") < 0) {
++			if (asprintf (&filename, "%s/krb5.conf", directory) < 0) {
++				warnx ("unexpected: out of memory");
++				failed = 1;
++			}
++			if (!failed && asprintf (&snippets, "%s/krb5.d", directory) < 0) {
++				free (filename);
++				filename = NULL;
++				warnx ("unexpected: out of memory");
++				failed = 1;
++			}
++			if (!failed && asprintf (&contents, "includedir %s\n%s%s\n", snippets,
++			                         krb5_conf ? "include " : "",
++			                         krb5_conf ? krb5_conf : "") < 0) {
++				free (snippets);
++				snippets = NULL;
++				free (filename);
++				filename = NULL;
+ 				warnx ("unexpected: out of memory");
+-				filename = NULL; /* content is undefined */
+-				snippets = NULL; /* content is undefined */
+ 				contents = NULL; /* content is undefined */
+ 				failed = 1;
+ 			}
+-- 
+2.47.0
+

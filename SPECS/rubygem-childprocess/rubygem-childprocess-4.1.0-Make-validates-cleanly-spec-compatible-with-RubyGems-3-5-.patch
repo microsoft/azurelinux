@@ -1,0 +1,53 @@
+From 9742a0cfa4e7c6c236299d21625dfdad7b7b6b60 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Wed, 20 Dec 2023 12:50:13 +0100
+Subject: [PATCH] Make `validates cleanly` spec compatible with RubyGems 3.5+
+
+`rubygems/mock_gem_ui` was removed in RubyGems 3.5+:
+
+https://github.com/rubygems/rubygems/pull/6623
+
+Luckily, other PR allowed to use standard RSpec methods for `$stdout`
+testing:
+
+https://github.com/rubygems/rubygems/pull/7203
+
+Fixes #190
+---
+ spec/childprocess_spec.rb | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/spec/childprocess_spec.rb b/spec/childprocess_spec.rb
+index ffd7240..48200e0 100644
+--- a/spec/childprocess_spec.rb
++++ b/spec/childprocess_spec.rb
+@@ -1,7 +1,6 @@
+ # encoding: utf-8
+ 
+ require File.expand_path('../spec_helper', __FILE__)
+-require 'rubygems/mock_gem_ui'
+ 
+ 
+ describe ChildProcess do
+@@ -11,12 +10,17 @@
+   let(:gemspec) { eval(File.read "#{here}/../childprocess.gemspec") }
+ 
+   it 'validates cleanly' do
+-    mock_ui = Gem::MockGemUi.new
+-    Gem::DefaultUserInteraction.use_ui(mock_ui) { gemspec.validate }
++    if Gem::VERSION >= "3.5.0"
++      expect { gemspec.validate }.not_to output(/warn/i).to_stderr
++    else
++      require 'rubygems/mock_gem_ui'
+ 
+-    expect(mock_ui.error).to_not match(/warn/i)
+-  end
++      mock_ui = Gem::MockGemUi.new
++      Gem::DefaultUserInteraction.use_ui(mock_ui) { gemspec.validate }
+ 
++      expect(mock_ui.error).to_not match(/warn/i)
++    end
++  end
+ 
+   it "returns self when started" do
+     process = sleeping_ruby

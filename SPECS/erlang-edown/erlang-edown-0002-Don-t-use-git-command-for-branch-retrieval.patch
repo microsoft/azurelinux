@@ -1,0 +1,47 @@
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Fri, 30 Jun 2017 19:06:44 +0300
+Subject: [PATCH] Don't use git command for branch retrieval
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+
+diff --git a/src/edown_doclet.erl b/src/edown_doclet.erl
+index cfd8cba..1e84fc2 100644
+--- a/src/edown_doclet.erl
++++ b/src/edown_doclet.erl
+@@ -235,15 +235,30 @@ get_branch(Options) ->
+     end.
+ 
+ get_git_branch() ->
+-    case os:cmd("git rev-parse --abbrev-ref HEAD") of
+-	"fatal:" ++ _ -> "master";  % sensible default
+-	Git ->
+-	    case string:tokens(Git, " \n") of
+-		[Branch]	-> Branch;
+-		Other		-> erlang:error({cannot_get_git_branch, Other})
++    {ok, CWD} = file:get_cwd(),
++    case get_git_head_file(CWD) of
++        false -> "unknown"; % not a Git branch
++        GitHeadFile ->
++	    {ok, Device} = file:open(GitHeadFile, [read, binary]),
++	    Data = io:get_line(Device, ""),
++	    file:close(Device),
++	    StrSize = size(Data) -1, % w/o '\n' size)
++	    <<GitHeadData:StrSize/binary, _>> = Data,
++	    case GitHeadData of
++                <<"ref: refs/heads/", Master/binary>> -> binary_to_list(Master);
++                _ -> "unknown"
+ 	    end
+     end.
+ 
++get_git_head_file("/") ->
++    filelib:is_regular("/.git/HEAD") andalso "/.git/HEAD";
++get_git_head_file(Dir) ->
++    case filelib:is_regular(Dir ++ "/.git/HEAD") of
++        true -> Dir ++ "/.git/HEAD";
++        false -> get_git_head_file(filename:dirname(Dir))
++    end.
++
++
+ %% Tried to display logo in a table on top of page, but not working.
+ %% Presumably, this hits some limitation of Markdown
+ %%

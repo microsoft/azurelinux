@@ -1,0 +1,54 @@
+From 5f0215694664fe0dc78ef59a7c8ca0af83896187 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Thu, 30 Oct 2014 13:19:16 +0100
+Subject: [PATCH] Attemp to create site library directories on first time
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Some vendors configures site library directories into /usr/local, but
+they do not provide the directory on their systems because an
+administrator can have a read-only network-mounted file system there.
+
+When running CPAN for the first time, CPAN cannot find the site
+directories and falls back to local::lib. To restore the user
+expectations with writable /usr/local, this patch tries to create the
+missing directories before checking for their presents.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ lib/CPAN/FirstTime.pm | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/lib/CPAN/FirstTime.pm b/lib/CPAN/FirstTime.pm
+index 531c115..8d82795 100644
+--- a/lib/CPAN/FirstTime.pm
++++ b/lib/CPAN/FirstTime.pm
+@@ -2068,6 +2068,24 @@ sub _print_urllist {
+ }
+ 
+ sub _can_write_to_libdirs {
++    for ($Config{installsitelib}, $Config{installsitearch}) {
++        if (!-d $_) {
++            $CPAN::Frontend->mywarn(sprintf(
++                    qq{Perl site library directory "%s" does not exist.\n},
++                $_));
++            File::Path::make_path($_, { error => \my $failure, chmod => 0755 });
++            if (@$failure) {
++                $CPAN::Frontend->mywarn(sprintf(
++                        qq{Perl site library directory "%s" } .
++                        qq{could not been created: %s.\n},
++                    $_, ${$$failure[0]}{$_}));
++            } else {
++                $CPAN::Frontend->mywarn(sprintf(
++                        qq{Perl site library directory "%s" created.\n},
++                    $_));
++            }
++        }
++    }
+     return -w $Config{installprivlib}
+         && -w $Config{installarchlib}
+         && -w $Config{installsitelib}
+-- 
+2.13.6
+

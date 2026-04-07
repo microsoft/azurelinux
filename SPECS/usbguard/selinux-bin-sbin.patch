@@ -1,0 +1,14 @@
+diff --git a/usbguard.fc b/usbguard.fc
+index d8cfa45..3904962 100644
+--- a/usbguard.fc
++++ b/usbguard.fc
+@@ -18,7 +18,9 @@
+ /etc/usbguard/rules\.conf                  -- gen_context(system_u:object_r:usbguard_rules_t,s0)
+ /etc/usbguard(/.*)?                          gen_context(system_u:object_r:usbguard_conf_t,s0)
+ /usr/lib/systemd/system/usbguard.*        -- gen_context(system_u:object_r:usbguard_unit_file_t,s0)
++/usr/bin/usbguard-daemon                 -- gen_context(system_u:object_r:usbguard_exec_t,s0)
+ /usr/sbin/usbguard-daemon                 -- gen_context(system_u:object_r:usbguard_exec_t,s0)
++/usr/bin/usbguard-dbus                   -- gen_context(system_u:object_r:usbguard_exec_t,s0)
+ /usr/sbin/usbguard-dbus                   -- gen_context(system_u:object_r:usbguard_exec_t,s0)
+ /var/log/usbguard(/.*)?                      gen_context(system_u:object_r:usbguard_log_t,s0)
+ /run/usbguard.*                       -- gen_context(system_u:object_r:usbguard_var_run_t,s0)

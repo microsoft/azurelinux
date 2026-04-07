@@ -1,0 +1,9 @@
+[Unit]
+Description=Synchronous Ethernet (SyncE) service
+
+[Service]
+Type=simple
+ExecStart=/usr/sbin/synce4l -f /etc/synce4l.conf
+
+[Install]
+WantedBy=multi-user.target

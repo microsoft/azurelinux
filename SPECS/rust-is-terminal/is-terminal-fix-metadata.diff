@@ -1,0 +1,12 @@
+--- is-terminal-0.4.17/Cargo.toml	1970-01-01T00:00:01+00:00
++++ is-terminal-0.4.17/Cargo.toml	2026-02-14T17:38:58.748982+00:00
+@@ -48,9 +48,6 @@
+ name = "is_terminal"
+ path = "src/lib.rs"
+ 
+-[dev-dependencies.atty]
+-version = "0.2.14"
+-
+ [target.'cfg(any(unix, target_os = "wasi"))'.dependencies.libc]
+ version = "0.2"
+ 

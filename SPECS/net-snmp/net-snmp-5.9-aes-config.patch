@@ -1,0 +1,18 @@
+diff --git a/net-snmp-create-v3-user.in b/net-snmp-create-v3-user.in
+index afd6fa4..07c26fe 100644
+--- a/net-snmp-create-v3-user.in
++++ b/net-snmp-create-v3-user.in
+@@ -58,11 +58,11 @@ case $1 in
+ 	    exit 1
+ 	fi
+         case $1 in
+-            DES|AES|AES128)
++            DES|AES|AES128|AES192|AES256)
+ 	    Xalgorithm=$1
+ 	    shift
+ 	    ;;
+-            des|aes|aes128)
++            des|aes|aes128|aes192|aes256)
+ 	    Xalgorithm=$(echo "$1" | tr a-z A-Z)
+ 	    shift
+ 	    ;;

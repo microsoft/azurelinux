@@ -1,0 +1,15 @@
+# Users that are not allowed to login via ftp
+root
+bin
+daemon
+adm
+lp
+sync
+shutdown
+halt
+mail
+news
+uucp
+operator
+games
+nobody

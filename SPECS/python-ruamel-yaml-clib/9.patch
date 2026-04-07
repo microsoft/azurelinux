@@ -1,0 +1,63 @@
+# HG changeset patch
+# User Miro Hrončok <miro@hroncok.cz>
+# Date 1733146158 -3600
+#      Mon Dec 02 14:29:18 2024 +0100
+# Branch python3.14
+# Node ID 677f1d63658f35e43446776e637248d0729405f3
+# Parent  0bef9fa8b3c43637cd90ce3f2e299e81c2122128
+Adjust setup.py for the removal of deprecated ast classes
+
+Those were deprecated since Python 3.8 and are removed in 3.14+.
+
+diff -r 0bef9fa8b3c4 -r 677f1d63658f setup.py
+--- a/setup.py	Thu Mar 14 10:13:16 2024 +0100
++++ b/setup.py	Mon Dec 02 14:29:18 2024 +0100
+@@ -76,7 +76,7 @@
+             print(*args, **kw1)
+ 
+ if sys.version_info >= (3, 8):
+-    from ast import Str, Num, Bytes, NameConstant  # NOQA
++    from ast import Constant  # NOQA
+ 
+ 
+ def literal_eval(node_or_string):
+@@ -98,15 +98,21 @@
+         raise TypeError('only string or AST nodes supported')
+ 
+     def _convert(node):
+-        if isinstance(node, Str):
+-            if sys.version_info < (3,) and not isinstance(node.s, unicode):
+-                return node.s.decode('utf-8')
+-            return node.s
+-        elif isinstance(node, Bytes):
+-            return node.s
+-        elif isinstance(node, Num):
+-            return node.n
+-        elif isinstance(node, Tuple):
++        if sys.version_info >= (3, 8):
++            if isinstance(node, Constant):
++                return node.value
++        else:
++            if isinstance(node, Str):
++                if sys.version_info < (3,) and not isinstance(node.s, unicode):
++                    return node.s.decode('utf-8')
++                return node.s
++            elif isinstance(node, Bytes):
++                return node.s
++            elif isinstance(node, Num):
++                return node.n
++            elif isinstance(node, NameConstant):
++                return node.value
++        if isinstance(node, Tuple):
+             return tuple(map(_convert, node.elts))
+         elif isinstance(node, List):
+             return list(map(_convert, node.elts))
+@@ -114,8 +120,6 @@
+             return set(map(_convert, node.elts))
+         elif isinstance(node, Dict):
+             return {_convert(k): _convert(v) for k, v in zip(node.keys, node.values)}
+-        elif isinstance(node, NameConstant):
+-            return node.value
+         elif sys.version_info < (3, 4) and isinstance(node, Name):
+             if node.id in _safe_names:
+                 return _safe_names[node.id]

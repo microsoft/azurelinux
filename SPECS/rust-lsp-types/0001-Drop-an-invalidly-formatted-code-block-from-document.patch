@@ -1,0 +1,27 @@
+From 702841752512166ca98cf9edfe71f7e28e235bbe Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Thu, 8 Aug 2024 21:42:30 +0200
+Subject: [PATCH] Drop an invalidly formatted code block from documentation
+
+---
+ src/lib.rs | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index e38fae2..838f1ff 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -2564,10 +2564,6 @@ pub enum Documentation {
+ /// identifier in fenced code blocks in GitHub issues.
+ ///
+ /// The pair of a language and a value is an equivalent to markdown:
+-///
+-/// ```${language}
+-/// ${value}
+-/// ```
+ #[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+ #[serde(untagged)]
+ pub enum MarkedString {
+-- 
+2.46.0
+

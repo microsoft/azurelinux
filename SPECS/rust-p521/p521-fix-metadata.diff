@@ -1,0 +1,20 @@
+--- p521-0.13.3/Cargo.toml	1970-01-01T00:00:01+00:00
++++ p521-0.13.3/Cargo.toml	2025-12-03T21:55:05.435014+00:00
+@@ -60,7 +60,7 @@
+ default-features = false
+ 
+ [dependencies.hex-literal]
+-version = "0.4"
++version = ">=0.4, <2.0"
+ optional = true
+ 
+ [dependencies.primeorder]
+@@ -92,7 +92,7 @@
+ package = "ecdsa"
+ 
+ [dev-dependencies.hex-literal]
+-version = "0.4"
++version = ">=0.4, <2.0"
+ 
+ [dev-dependencies.primeorder]
+ version = "0.13.3"

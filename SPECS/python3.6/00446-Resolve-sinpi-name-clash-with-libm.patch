@@ -1,0 +1,61 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dima Pasechnik <dimpase@gmail.com>
+Date: Wed, 18 Dec 2024 14:31:08 +0100
+Subject: 00446: Resolve sinpi name clash with libm
+
+bpo-36106: Resolve sinpi name clash with libm (IEEE-754 violation). (GH-12027)
+
+The standard math library (libm) may follow IEEE-754 recommendation to
+include an implementation of sinPi(), i.e. sinPi(x):=sin(pi*x).
+And this triggers a name clash, found by FreeBSD developer
+Steve Kargl, who worken on putting sinpi into libm used on FreeBSD
+(it has to be named "sinpi", not "sinPi", cf. e.g.
+https://en.cppreference.com/w/c/experimental/fpext4).
+
+(cherry picked from commit f57cd8288dbe6aba99c057f37ad6d58f8db75350)
+
+Co-authored-by: Victor Stinner <vstinner@python.org>
+---
+ Modules/mathmodule.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/Modules/mathmodule.c b/Modules/mathmodule.c
+index 95ea4f7fef..670f1a04ad 100644
+--- a/Modules/mathmodule.c
++++ b/Modules/mathmodule.c
+@@ -67,7 +67,7 @@ static const double sqrtpi = 1.772453850905516027298167483341145182798;
+ static const double logpi = 1.144729885849400174143427351353058711647;
+ 
+ static double
+-sinpi(double x)
++m_sinpi(double x)
+ {
+     double y, r;
+     int n;
+@@ -296,7 +296,7 @@ m_tgamma(double x)
+        integer. */
+     if (absx > 200.0) {
+         if (x < 0.0) {
+-            return 0.0/sinpi(x);
++            return 0.0/m_sinpi(x);
+         }
+         else {
+             errno = ERANGE;
+@@ -320,7 +320,7 @@ m_tgamma(double x)
+     }
+     z = z * lanczos_g / y;
+     if (x < 0.0) {
+-        r = -pi / sinpi(absx) / absx * exp(y) / lanczos_sum(absx);
++        r = -pi / m_sinpi(absx) / absx * exp(y) / lanczos_sum(absx);
+         r -= z * r;
+         if (absx < 140.0) {
+             r /= pow(y, absx - 0.5);
+@@ -390,7 +390,7 @@ m_lgamma(double x)
+     r += (absx - 0.5) * (log(absx + lanczos_g - 0.5) - 1);
+     if (x < 0.0)
+         /* Use reflection formula to get value for negative x. */
+-        r = logpi - log(fabs(sinpi(absx))) - log(absx) - r;
++        r = logpi - log(fabs(m_sinpi(absx))) - log(absx) - r;
+     if (Py_IS_INFINITY(r))
+         errno = ERANGE;
+     return r;

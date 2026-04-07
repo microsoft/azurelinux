@@ -1,0 +1,17 @@
+Index: os-prober/common.sh
+===================================================================
+--- os-prober.orig/common.sh
++++ os-prober/common.sh
+@@ -336,3 +336,12 @@ linux_mount_boot () {
+ 
+ 	mountboot="$bootpart $mounted"
+ }
++
++umount() {
++	if ! command umount $@ 2> /dev/null; then
++		error "umount error, retrying after 1 sec"
++		sleep 1
++		command umount $@
++	fi
++}
++

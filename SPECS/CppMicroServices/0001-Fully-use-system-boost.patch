@@ -1,0 +1,70 @@
+From 7fedde2fc973582e31664fa36e980579ae9eae2c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Mon, 15 Jan 2024 18:34:35 +0000
+Subject: [PATCH 01/12] Fully use system boost
+
+---
+ CMakeLists.txt                | 4 +++-
+ tools/rc/CMakeLists.txt       | 9 +++++++--
+ tools/rc/ResourceCompiler.cpp | 6 ++++--
+ 3 files changed, 14 insertions(+), 5 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7b71083d..1821adcf 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -694,7 +694,9 @@ endif()
+ #-----------------------------------------------------------------------------
+ add_subdirectory(third_party/absl)
+ set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries" FORCE)
+-add_subdirectory(third_party/boost/nowide)
++if(NOT US_USE_SYSTEM_BOOST)
++  add_subdirectory(third_party/boost/nowide)
++endif()
+ set(BUILD_SHARED_LIBS ${_us_build_shared} CACHE BOOL "Build shared libraries" FORCE)
+ #-----------------------------------------------------------------------------
+ 
+diff --git a/tools/rc/CMakeLists.txt b/tools/rc/CMakeLists.txt
+index c4a36f8d..ff9dbe0e 100755
+--- a/tools/rc/CMakeLists.txt
++++ b/tools/rc/CMakeLists.txt
+@@ -20,8 +20,13 @@ if(WIN32)
+     target_link_libraries(${US_RCC_EXECUTABLE_TARGET} Shlwapi)
+ endif()
+ 
+-target_link_libraries(${US_RCC_EXECUTABLE_TARGET} nowide::nowide)
+-target_include_directories(${US_RCC_EXECUTABLE_TARGET} PRIVATE ${CppMicroServices_SOURCE_DIR}/third_party/boost/nowide/include)
++if(NOT US_USE_SYSTEM_BOOST)
++    target_link_libraries(${US_RCC_EXECUTABLE_TARGET} nowide::nowide)
++    target_include_directories(${US_RCC_EXECUTABLE_TARGET} PRIVATE ${CppMicroServices_SOURCE_DIR}/third_party/boost/nowide/include)
++else()
++    target_link_libraries(${US_RCC_EXECUTABLE_TARGET} ${Boost_LIBS})
++    target_include_directories(${US_RCC_EXECUTABLE_TARGET} PRIVATE ${Boost_INCLUDE_DIRS})
++endif()
+ 
+ set_property(TARGET ${US_RCC_EXECUTABLE_TARGET} APPEND PROPERTY
+              COMPILE_DEFINITIONS "MINIZ_NO_ARCHIVE_READING_API;MINIZ_NO_ZLIB_COMPATIBLE_NAMES")
+diff --git a/tools/rc/ResourceCompiler.cpp b/tools/rc/ResourceCompiler.cpp
+index a5b81d35..0e52e8e1 100755
+--- a/tools/rc/ResourceCompiler.cpp
++++ b/tools/rc/ResourceCompiler.cpp
+@@ -37,12 +37,14 @@
+ #include <utility>
+ #include <vector>
+ 
+-#include <nowide/args.hpp>
+-#include <nowide/fstream.hpp>
++#include <boost/nowide/args.hpp>
++#include <boost/nowide/fstream.hpp>
+ 
+ #include "optionparser.h"
+ #include "json/json.h"
+ 
++using namespace boost;
++
+ // ---------------------------------------------------------------------------------
+ // --------------------------    PLATFORM SPECIFIC CODE    -------------------------
+ // ---------------------------------------------------------------------------------
+-- 
+2.48.1
+

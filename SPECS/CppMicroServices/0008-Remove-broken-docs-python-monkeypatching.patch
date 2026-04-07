@@ -1,0 +1,54 @@
+From 2912d46f2c35e1fa7a77ff24fa0c77ae23867920 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Tue, 16 Jan 2024 09:44:52 +0000
+Subject: [PATCH 08/12] Remove broken docs python monkeypatching
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ doc/cmake.py | 27 ---------------------------
+ 1 file changed, 27 deletions(-)
+
+diff --git a/doc/cmake.py b/doc/cmake.py
+index 06280efb..d89662d3 100644
+--- a/doc/cmake.py
++++ b/doc/cmake.py
+@@ -4,33 +4,6 @@
+ import os
+ import re
+ 
+-# Monkey patch for pygments reporting an error when generator expressions are
+-# used.
+-# https://bitbucket.org/birkenfeld/pygments-main/issue/942/cmake-generator-expressions-not-handled
+-from pygments.lexers import CMakeLexer
+-from pygments.token import Name, Operator
+-from pygments.lexer import bygroups
+-CMakeLexer.tokens["args"].append(('(\\$<)(.+?)(>)',
+-                                  bygroups(Operator, Name.Variable, Operator)))
+-
+-# Monkey patch for sphinx generating invalid content for qcollectiongenerator
+-# https://bitbucket.org/birkenfeld/sphinx/issue/1435/qthelp-builder-should-htmlescape-keywords
+-from html import escape as htmlescape
+-from sphinx.builders.qthelp import QtHelpBuilder
+-old_build_keywords = QtHelpBuilder.build_keywords
+-def new_build_keywords(self, title, refs, subitems):
+-  old_items = old_build_keywords(self, title, refs, subitems)
+-  new_items = []
+-  for item in old_items:
+-    before, rest = item.split("ref=\"", 1)
+-    ref, after = rest.split("\"")
+-    if ("<" in ref and ">" in ref):
+-      new_items.append(before + "ref=\"" + htmlescape(ref) + "\"" + after)
+-    else:
+-      new_items.append(item)
+-  return new_items
+-QtHelpBuilder.build_keywords = new_build_keywords
+-
+ 
+ from docutils.parsers.rst import Directive, directives
+ from docutils.transforms import Transform
+-- 
+2.48.1
+

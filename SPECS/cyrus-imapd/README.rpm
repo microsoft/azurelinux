@@ -1,0 +1,34 @@
+---------------
+Cyrus IMAPd RPM
+---------------
+
+This is a _very_ 'quick and dirty' install howto.
+
+The following steps should lead you to a running Cyrus IMAP server:
+
+1)  Install on a distribution which is supported by this RPM. Don't install
+    on a dirty system, where you have previously installed from source.
+2)  Don't install if you have a previous Cyrus IMAPd installation <=2.1.x on
+    your box. Upgrading any Invoca rpm based installation should be fine.
+3)  Make sure you understand that this RPM installs in FHS compliant
+    directories, like /var/lib/imap and /var/spool/imap
+4)  Make sure cyrus-sasl is installed.
+5)  Make sure saslauthd is running. If not, edit /etc/sysconfig/saslauthd as
+    needed and do 'chkconfig saslauthd on ; service saslauthd start'
+6)  Install the cyrus-imapd RPMs.
+7)  If it's your first install of Cyrus IMAPd, then set a password for the
+    cyrus user in whatever database you are using to authenticate. When
+    using a local account, this should be 'passwd cyrus'.
+8)  Make sure your MTA delivers to Cyrus IMAPd, I recommend LMTP for this.
+9)  Start Cyrus IMAPd with 'service cyrus-imapd start'
+10) Run cyradm and create a user. Usually it's something like this:
+    'cyradm --user=cyrus --auth=login localhost'
+11) If you're using sendmail, be aware that cyrusv2.m4 included in standard
+    sendmail distribution uses socket /var/imap/socket/lmtp while this rpm
+    uses /var/lib/imap/socket/lmtp.
+12) Check your syslog configuration. This RPM uses the mail facility to log
+    messages. On busy sites you may want to limit the mail facility to the
+    info priority with something like 'mail.info    /var/log/maillog' in
+    /etc/syslog.conf.
+
+Enjoy!

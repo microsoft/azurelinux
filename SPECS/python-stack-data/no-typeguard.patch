@@ -1,0 +1,47 @@
+From c3da1cd193bd4b752a6bcf14ef5954d9e6888f71 Mon Sep 17 00:00:00 2001
+From: Lumir Balhar <lbalhar@redhat.com>
+Date: Mon, 2 Oct 2023 10:12:48 +0200
+Subject: [PATCH] no typeguard
+
+---
+ setup.cfg         | 4 ++--
+ tests/__init__.py | 6 ------
+ 2 files changed, 2 insertions(+), 8 deletions(-)
+
+diff --git a/setup.cfg b/setup.cfg
+index 45d436e..5753c66 100644
+--- a/setup.cfg
++++ b/setup.cfg
+@@ -29,10 +29,10 @@ install_requires =
+ 	pure_eval
+ setup_requires = setuptools>=44; setuptools_scm[toml]>=3.4.3
+ include_package_data = True
+-tests_require = pytest; typeguard; pygments; littleutils
++tests_require = pytest; pygments; littleutils
+ 
+ [options.extras_require]
+-tests = pytest; typeguard; pygments; littleutils; cython
++tests = pytest; pygments; littleutils; cython
+ 
+ [coverage:run]
+ relative_files = True
+diff --git a/tests/__init__.py b/tests/__init__.py
+index e61d09f..8c5a14c 100644
+--- a/tests/__init__.py
++++ b/tests/__init__.py
+@@ -1,12 +1,6 @@
+ import os
+ 
+ import pyximport
+-try:
+-    from typeguard import install_import_hook
+-except ImportError:
+-    from typeguard.importhook import install_import_hook
+ 
+ pyximport.install(language_level=3)
+ 
+-if not os.environ.get("STACK_DATA_SLOW_TESTS"):
+-    install_import_hook(["stack_data"])
+-- 
+2.41.0
+

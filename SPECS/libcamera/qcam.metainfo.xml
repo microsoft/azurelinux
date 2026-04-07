@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2021 Javier Martinez Canillas <javier@dowhile0.org> -->
+<component type="desktop">
+  <id>qcam.desktop</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPLv-2.0</project_license>
+  <name>QCam</name>
+  <summary>Take photos with cameras exposed by libcamera</summary>
+  <description>
+    <p>
+      The QCam UI is a demo application that allows to take photos
+      for any camera that is exposed by the libcamera framework.
+    </p>
+  </description>
+  <screenshots>
+    <screenshot type="default" height="732" width="634">
+      <image>https://libcamera.org/_images/libcamera_hero.png</image>
+    </screenshot>
+  </screenshots>
+  <url type="homepage">https://libcamera.org/</url>
+  <url type="bugtracker">https://bugs.libcamera.org/</url>
+  <url type="help">https://libcamera.org/docs.html/</url>
+  <update_contact>javier@dowhile0.org</update_contact>
+  <translation/>
+</component>

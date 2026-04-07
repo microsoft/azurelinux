@@ -1,0 +1,12 @@
+--- crc32fast-1.5.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ crc32fast-1.5.0/Cargo.toml	2025-07-17T13:36:55.240471+00:00
+@@ -57,9 +57,6 @@
+ [dependencies.cfg-if]
+ version = "1.0"
+ 
+-[dev-dependencies.bencher]
+-version = "0.1"
+-
+ [dev-dependencies.quickcheck]
+ version = "1.0"
+ default-features = false

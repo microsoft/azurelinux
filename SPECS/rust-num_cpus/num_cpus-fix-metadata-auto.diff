@@ -1,0 +1,8 @@
+--- num_cpus-1.17.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ num_cpus-1.17.0/Cargo.toml	2025-06-20T14:59:28.346925+00:00
+@@ -42,5 +42,3 @@
+ [target."cfg(not(windows))".dependencies.libc]
+ version = "0.2.26"
+ 
+-[target.'cfg(target_os = "hermit")'.dependencies.hermit-abi]
+-version = "0.5.0"

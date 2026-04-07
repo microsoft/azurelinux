@@ -1,0 +1,30 @@
+From 079a03ed03f0a29ba5a6cc02ee8c904058be16c1 Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Sat, 8 Apr 2023 21:01:58 -0400
+Subject: [PATCH 5/7] Skip doc test when not running from a git checkout
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ distributed/http/tests/test_core.py | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/distributed/http/tests/test_core.py b/distributed/http/tests/test_core.py
+index 3bccaf11..f6bd13c7 100644
+--- a/distributed/http/tests/test_core.py
++++ b/distributed/http/tests/test_core.py
+@@ -29,8 +29,11 @@ async def test_prometheus_api_doc(c, s, a, _):
+     """
+     pytest.importorskip("prometheus_client")
+ 
+-    documented = set()
+     root_dir = pathlib.Path(__file__).parent.parent.parent.parent
++    if not (root_dir / ".git").exists():
++        pytest.skip("Not running in a git checkout")
++
++    documented = set()
+     with open(root_dir / "docs" / "source" / "prometheus.rst") as fh:
+         for row in fh:
+             row = row.strip()
+-- 
+2.50.0
+

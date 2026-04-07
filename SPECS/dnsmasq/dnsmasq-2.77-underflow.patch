@@ -1,0 +1,26 @@
+From be455a46e0c545d72b3a6277246423a9566f2d04 Mon Sep 17 00:00:00 2001
+From: Doran Moppert <dmoppert@redhat.com>
+Date: Tue, 26 Sep 2017 14:48:20 +0930
+Subject: [PATCH] google patch hand-applied
+
+---
+ src/rfc1035.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/rfc1035.c b/src/rfc1035.c
+index f0e1082..88bd70e 100644
+--- a/src/rfc1035.c
++++ b/src/rfc1035.c
+@@ -1624,6 +1624,9 @@ size_t answer_request(struct dns_header *header, char *limit, size_t qlen,
+   int rd_bit = (header->hb3 & HB3_RD);
+   int count = 255; /* catch loops */
+ 
++  // Make sure we do not underflow here too.
++  if ((ssize_t)qlen > (limit - ((char *)header))) return 0;
++
+   /* Suppress cached answers if no_cache set. */
+   if (no_cache)
+     rd_bit = 0;
+-- 
+2.52.0
+

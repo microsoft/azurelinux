@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Name=Bluetooth OBEX Recipient
+Name[de]=Bluetooth OBEX Empfänger
+GenericName=Bluetooth Recipient
+GenericName[de]=Bluetooth Empfänger
+Comment=Send selected files via Bluetooth
+Comment[de]=Ausgewählte Dateien per Bluetooth senden
+Exec=bluetooth-sendto %F
+TryExec=bluetooth-sendto
+Icon=bluetooth
+Terminal=false
+Type=Application

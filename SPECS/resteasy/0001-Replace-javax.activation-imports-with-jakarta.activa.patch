@@ -1,0 +1,194 @@
+From fdb522bdf915566fc01fc4502404da5a4d73d247 Mon Sep 17 00:00:00 2001
+From: Chris Kelley <ckelley@redhat.com>
+Date: Fri, 3 Feb 2023 11:37:13 +0000
+Subject: [PATCH] Replace javax.activation imports with jakarta.activation
+
+---
+ .../plugins/providers/multipart/MimeMultipartProvider.java    | 2 +-
+ .../multipart/XopWithMultipartRelatedJAXBProvider.java        | 4 ++--
+ .../jboss/resteasy/plugins/providers/DataSourceProvider.java  | 2 +-
+ .../test/client/resource/EntityBufferingInFileResource.java   | 2 +-
+ .../datasource/DataSourceProviderInputStreamTest.java         | 2 +-
+ .../datasource/resource/BigSmallDataSourceResource.java       | 2 +-
+ .../resource/CleanFilesDataSourceProviderResource.java        | 2 +-
+ .../providers/datasource/resource/ReadDataSourceResource.java | 2 +-
+ .../resource/ReadDataSourceTwiceCountTempFileResource.java    | 2 +-
+ .../test/providers/multipart/MimeMultipartProviderTest.java   | 2 +-
+ .../multipart/resource/MimeMultipartProviderResource.java     | 2 +-
+ .../resource/basic/resource/DefaultMediaTypeResource.java     | 2 +-
+ .../resteasy/test/client/NoContentStreamingCloseTest.java     | 2 +-
+ 13 files changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/providers/multipart/src/main/java/org/jboss/resteasy/plugins/providers/multipart/MimeMultipartProvider.java b/providers/multipart/src/main/java/org/jboss/resteasy/plugins/providers/multipart/MimeMultipartProvider.java
+index adc0d7c21..6c6425fbd 100644
+--- a/providers/multipart/src/main/java/org/jboss/resteasy/plugins/providers/multipart/MimeMultipartProvider.java
++++ b/providers/multipart/src/main/java/org/jboss/resteasy/plugins/providers/multipart/MimeMultipartProvider.java
+@@ -5,7 +5,7 @@ import org.jboss.resteasy.spi.ReaderException;
+ import org.jboss.resteasy.spi.WriterException;
+ import org.jboss.resteasy.resteasy_jaxrs.i18n.*;
+ 
+-import javax.activation.DataSource;
++import jakarta.activation.DataSource;
+ import javax.mail.MessagingException;
+ import javax.mail.internet.MimeMultipart;
+ import javax.mail.util.ByteArrayDataSource;
+diff --git a/providers/multipart/src/main/java/org/jboss/resteasy/plugins/providers/multipart/XopWithMultipartRelatedJAXBProvider.java b/providers/multipart/src/main/java/org/jboss/resteasy/plugins/providers/multipart/XopWithMultipartRelatedJAXBProvider.java
+index 52486bcc2..919f6f0a9 100755
+--- a/providers/multipart/src/main/java/org/jboss/resteasy/plugins/providers/multipart/XopWithMultipartRelatedJAXBProvider.java
++++ b/providers/multipart/src/main/java/org/jboss/resteasy/plugins/providers/multipart/XopWithMultipartRelatedJAXBProvider.java
+@@ -3,8 +3,8 @@ package org.jboss.resteasy.plugins.providers.multipart;
+ import org.jboss.resteasy.plugins.providers.jaxb.AbstractJAXBProvider;
+ import org.jboss.resteasy.plugins.providers.multipart.i18n.*;
+ 
+-import javax.activation.DataHandler;
+-import javax.activation.DataSource;
++import jakarta.activation.DataHandler;
++import jakarta.activation.DataSource;
+ import javax.ws.rs.WebApplicationException;
+ import javax.ws.rs.core.MediaType;
+ import javax.ws.rs.core.MultivaluedMap;
+diff --git a/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/providers/DataSourceProvider.java b/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/providers/DataSourceProvider.java
+index c57bf4587..dc9040a55 100644
+--- a/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/providers/DataSourceProvider.java
++++ b/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/providers/DataSourceProvider.java
+@@ -20,7 +20,7 @@ import java.io.SequenceInputStream;
+ import java.lang.annotation.Annotation;
+ import java.lang.reflect.Type;
+ 
+-import javax.activation.DataSource;
++import jakarta.activation.DataSource;
+ import javax.ws.rs.Consumes;
+ import javax.ws.rs.Produces;
+ import javax.ws.rs.WebApplicationException;
+diff --git a/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/client/resource/EntityBufferingInFileResource.java b/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/client/resource/EntityBufferingInFileResource.java
+index 2cc429db1..ad5597f22 100644
+--- a/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/client/resource/EntityBufferingInFileResource.java
++++ b/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/client/resource/EntityBufferingInFileResource.java
+@@ -2,7 +2,7 @@ package org.jboss.resteasy.test.client.resource;
+ 
+ import org.jboss.logging.Logger;
+ 
+-import javax.activation.DataSource;
++import jakarta.activation.DataSource;
+ import javax.ws.rs.POST;
+ import javax.ws.rs.Path;
+ import javax.ws.rs.Produces;
+diff --git a/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/providers/datasource/DataSourceProviderInputStreamTest.java b/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/providers/datasource/DataSourceProviderInputStreamTest.java
+index 01f3a0926..c4a352890 100644
+--- a/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/providers/datasource/DataSourceProviderInputStreamTest.java
++++ b/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/providers/datasource/DataSourceProviderInputStreamTest.java
+@@ -22,7 +22,7 @@ import org.junit.Assert;
+ import org.junit.Test;
+ import org.junit.runner.RunWith;
+ 
+-import javax.activation.DataSource;
++import jakarta.activation.DataSource;
+ import javax.ws.rs.client.Client;
+ import javax.ws.rs.client.WebTarget;
+ import javax.ws.rs.core.MediaType;
+diff --git a/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/providers/datasource/resource/BigSmallDataSourceResource.java b/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/providers/datasource/resource/BigSmallDataSourceResource.java
+index 58ead73bd..59678be32 100644
+--- a/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/providers/datasource/resource/BigSmallDataSourceResource.java
++++ b/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/providers/datasource/resource/BigSmallDataSourceResource.java
+@@ -1,7 +1,7 @@
+ package org.jboss.resteasy.test.providers.datasource.resource;
+ 
+ 
+-import javax.activation.DataSource;
++import jakarta.activation.DataSource;
+ import javax.ws.rs.Consumes;
+ import javax.ws.rs.GET;
+ import javax.ws.rs.POST;
+diff --git a/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/providers/datasource/resource/CleanFilesDataSourceProviderResource.java b/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/providers/datasource/resource/CleanFilesDataSourceProviderResource.java
+index 9dafd8707..7beb84596 100644
+--- a/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/providers/datasource/resource/CleanFilesDataSourceProviderResource.java
++++ b/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/providers/datasource/resource/CleanFilesDataSourceProviderResource.java
+@@ -1,6 +1,6 @@
+ package org.jboss.resteasy.test.providers.datasource.resource;
+ 
+-import javax.activation.DataSource;
++import jakarta.activation.DataSource;
+ import javax.ws.rs.GET;
+ import javax.ws.rs.POST;
+ import javax.ws.rs.Path;
+diff --git a/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/providers/datasource/resource/ReadDataSourceResource.java b/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/providers/datasource/resource/ReadDataSourceResource.java
+index 84cda755a..8cb767347 100644
+--- a/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/providers/datasource/resource/ReadDataSourceResource.java
++++ b/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/providers/datasource/resource/ReadDataSourceResource.java
+@@ -4,7 +4,7 @@ import java.io.BufferedReader;
+ import java.io.IOException;
+ import java.io.InputStreamReader;
+ 
+-import javax.activation.DataSource;
++import jakarta.activation.DataSource;
+ import javax.ws.rs.POST;
+ import javax.ws.rs.Path;
+ import javax.ws.rs.Produces;
+diff --git a/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/providers/datasource/resource/ReadDataSourceTwiceCountTempFileResource.java b/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/providers/datasource/resource/ReadDataSourceTwiceCountTempFileResource.java
+index ce7ea7b4c..bb7f49570 100644
+--- a/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/providers/datasource/resource/ReadDataSourceTwiceCountTempFileResource.java
++++ b/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/providers/datasource/resource/ReadDataSourceTwiceCountTempFileResource.java
+@@ -2,7 +2,7 @@ package org.jboss.resteasy.test.providers.datasource.resource;
+ 
+ import org.jboss.logging.Logger;
+ 
+-import javax.activation.DataSource;
++import jakarta.activation.DataSource;
+ import javax.ws.rs.Consumes;
+ import javax.ws.rs.POST;
+ import javax.ws.rs.Path;
+diff --git a/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/providers/multipart/MimeMultipartProviderTest.java b/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/providers/multipart/MimeMultipartProviderTest.java
+index b8c402833..b06dc04e6 100644
+--- a/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/providers/multipart/MimeMultipartProviderTest.java
++++ b/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/providers/multipart/MimeMultipartProviderTest.java
+@@ -22,7 +22,7 @@ import org.junit.AfterClass;
+ import org.junit.Test;
+ import org.junit.runner.RunWith;
+ 
+-import javax.activation.DataHandler;
++import jakarta.activation.DataHandler;
+ import javax.mail.internet.MimeMultipart;
+ import javax.mail.util.ByteArrayDataSource;
+ import javax.servlet.http.HttpServletResponse;
+diff --git a/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/providers/multipart/resource/MimeMultipartProviderResource.java b/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/providers/multipart/resource/MimeMultipartProviderResource.java
+index 38757425d..435812a84 100644
+--- a/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/providers/multipart/resource/MimeMultipartProviderResource.java
++++ b/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/providers/multipart/resource/MimeMultipartProviderResource.java
+@@ -11,7 +11,7 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+ import org.jboss.resteasy.plugins.providers.multipart.MultipartRelatedInput;
+ import org.junit.Assert;
+ 
+-import javax.activation.DataHandler;
++import jakarta.activation.DataHandler;
+ import javax.mail.MessagingException;
+ import javax.mail.internet.MimeBodyPart;
+ import javax.mail.internet.MimeMultipart;
+diff --git a/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/resource/basic/resource/DefaultMediaTypeResource.java b/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/resource/basic/resource/DefaultMediaTypeResource.java
+index ba7ce813c..841fdf4cc 100644
+--- a/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/resource/basic/resource/DefaultMediaTypeResource.java
++++ b/testsuite/integration-tests/src/test/java/org/jboss/resteasy/test/resource/basic/resource/DefaultMediaTypeResource.java
+@@ -2,7 +2,7 @@ package org.jboss.resteasy.test.resource.basic.resource;
+ 
+ import org.jboss.logging.Logger;
+ 
+-import javax.activation.DataSource;
++import jakarta.activation.DataSource;
+ import javax.ws.rs.Consumes;
+ import javax.ws.rs.POST;
+ import javax.ws.rs.Path;
+diff --git a/testsuite/unit-tests/src/test/java/org/jboss/resteasy/test/client/NoContentStreamingCloseTest.java b/testsuite/unit-tests/src/test/java/org/jboss/resteasy/test/client/NoContentStreamingCloseTest.java
+index be60dee77..459223c2b 100644
+--- a/testsuite/unit-tests/src/test/java/org/jboss/resteasy/test/client/NoContentStreamingCloseTest.java
++++ b/testsuite/unit-tests/src/test/java/org/jboss/resteasy/test/client/NoContentStreamingCloseTest.java
+@@ -9,7 +9,7 @@ import org.jboss.resteasy.test.client.resource.NoContentStreamingCloseTestRespon
+ import org.junit.Assert;
+ import org.junit.Test;
+ 
+-import javax.activation.DataSource;
++import jakarta.activation.DataSource;
+ import javax.xml.transform.Source;
+ import javax.xml.transform.stream.StreamSource;
+ import java.io.InputStream;
+-- 
+2.39.0
+

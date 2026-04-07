@@ -1,0 +1,63 @@
+From 8d04efe2f0402cc2c86fb28f17d9d58351d43ef4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 13 Aug 2024 11:55:47 +0200
+Subject: [PATCH] Only initialize existing Net::SSLeay methods
+
+Recent OpenSSL can be built without engine support and then Net-SSLeay
+is missing ENGINE_load_builtin_engines() and
+ENGINE_register_all_complete() subroutines. In that case
+t/Port_Configuration.t failed like this:
+
+    $ prove -l -v  t/Port_Configuration.t
+    t/Port_Configuration.t ..
+    1..51
+    [...]
+    ok 34 - run ( ipv => '*', port => 'foo/bar/unix' )  ==>  [ '*|foo/bar|UNIX|*' ]
+    # Unable to load module for proto "Net::Server::Proto::SSLEAY": Can't use an undefined value as a subroutine reference at /home/test/fedora/perl-Net-Server/perl-Net-Server-2.014-build/Net-Server-2.014/lib/Net/Server/Proto/SSLEAY.pm line 31.
+    BEGIN failed--compilation aborted at /home/test/fedora/perl-Net-Server/perl-Net-Server-2.014-build/Net-Server-2.014/lib/Net/Server/Proto/SSLEAY.pm line 34.
+    Compilation failed in require at /home/test/fedora/perl-Net-Server/perl-Net-Server-2.014-build/Net-Server-2.014/lib/Net/Server/Proto.pm line 195.
+     at line 318
+    # Failed at line 318
+    not ok 35 - run ( proto => 'ssleay' )  ==>  [ '' ]
+    #   failed at t/Port_Configuration.t line 73
+    #        got: {
+      bind => undef
+    }
+    #   expected: {
+      bind => [{
+      host => '*',
+      ipv => 4,
+      port => 20203,
+      proto => 'ssleay'
+    }],
+      sock => [{
+      NS_host => '*',
+      NS_ipv => 4,
+      NS_listen => 4096,
+      NS_port => 20203,
+      NS_proto => 'SSLEAY',
+      SSL_cert_file => 'somecert'
+    }]
+    }
+    # number of tests ran 35 did not match number of specified tests 51
+    Failed 17/51 subtests
+
+This patch calls the Net::SSLeay initialization routines only if they are defined.
+---
+ lib/Net/Server/Proto/SSLEAY.pm | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/lib/Net/Server/Proto/SSLEAY.pm b/lib/Net/Server/Proto/SSLEAY.pm
+index 61631c10..d978a7f7 100644
+--- a/lib/Net/Server/Proto/SSLEAY.pm
++++ b/lib/Net/Server/Proto/SSLEAY.pm
+@@ -28,7 +28,8 @@ BEGIN {
+     eval { require Net::SSLeay; 1 }
+         or warn "Module Net::SSLeay is required for SSLeay.";
+     for my $sub (qw(load_error_strings SSLeay_add_ssl_algorithms ENGINE_load_builtin_engines ENGINE_register_all_complete randomize)) {
+-        Net::SSLeay->can($sub)->();
++        my $subref = Net::SSLeay->can($sub);
++        $subref->() if defined $subref;
+     }
+     eval { [Fcntl::F_GETFL(), Fcntl::F_SETFL(), Fcntl::O_NONBLOCK()] } || die "Could not access Fcntl constant while loading ".__PACKAGE__.": $@";
+ }

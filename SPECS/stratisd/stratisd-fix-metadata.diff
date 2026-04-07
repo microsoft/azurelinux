@@ -1,0 +1,12 @@
+diff -Naur stratisd-stratisd-v3.8.6-original/Cargo.toml stratisd-stratisd-v3.8.6/Cargo.toml
+--- stratisd-stratisd-v3.8.6-original/Cargo.toml	2025-11-03 01:33:11.000000000 +0000
++++ stratisd-stratisd-v3.8.6/Cargo.toml	2026-01-03 15:15:11.983879069 +0000
+@@ -171,7 +171,7 @@
+ optional = true
+ 
+ [dependencies.procfs]
+-version = "0.17.0"
++version = ">=0.17.0, <0.19.0"
+ optional = true
+ 
+ [dependencies.rand]

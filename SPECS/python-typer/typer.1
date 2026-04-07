@@ -1,0 +1,47 @@
+.TH TYPER "1" "December 2024" "" "User Commands"
+.SH NAME
+.B typer
+\(en run Typer scripts with completion, without having to create a package
+.SH SYNOPSIS
+.B typer
+.RI [ OPTIONS ]
+.RI [ PATH_OR_MODULE ]
+.I COMMAND
+.RI [ ARGS ]...
+.SH OPTIONS
+.SS ARGUMENTS
+.TP
+path_or_module
+.RI [ PATH_OR_MODULE ]
+[default: None]
+.SS OPTIONS
+.TP
+.B \-\-app\ \fITEXT
+The typer app object/variable to use.
+[default: None]
+.TP
+.B \-\-func\ \fITEXT
+The function to convert to Typer.
+[default: None]
+.TP
+.B \-\-version
+Print version and exit.
+.TP
+.B \-\-install\-completion
+Install completion for the current shell.
+.TP
+.B \-\-show\-completion
+Show completion for the current shell,
+to copy it or customize the installation.
+.TP
+.B \-\-help
+Show a help message and exit.
+.SS COMMANDS
+.TP
+.B utils
+Extra utility commands for Typer apps.
+.IP
+See
+.BR typer\-utils (1).
+.SH "SEE ALSO"
+.BR typer\-utils (1)

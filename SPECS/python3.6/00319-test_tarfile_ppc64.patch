@@ -1,0 +1,72 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Miss Islington (bot)"
+ <31488909+miss-islington@users.noreply.github.com>
+Date: Mon, 21 Jan 2019 01:44:30 -0800
+Subject: 00319: test_tarfile_ppc64
+
+Fix sparse file tests of test_tarfile on ppc64le with the tmpfs
+filesystem.
+
+Upstream: https://bugs.python.org/issue35772
+
+Co-authored-by: Victor Stinner <vstinner@redhat.com>
+---
+ Lib/test/pythoninfo.py                                   | 2 ++
+ Lib/test/test_tarfile.py                                 | 9 +++++++--
+ .../next/Tests/2019-01-18-12-19-19.bpo-35772.sGBbsn.rst  | 6 ++++++
+ 3 files changed, 15 insertions(+), 2 deletions(-)
+ create mode 100644 Misc/NEWS.d/next/Tests/2019-01-18-12-19-19.bpo-35772.sGBbsn.rst
+
+diff --git a/Lib/test/pythoninfo.py b/Lib/test/pythoninfo.py
+index c5586b45a5..96b6db1cb7 100644
+--- a/Lib/test/pythoninfo.py
++++ b/Lib/test/pythoninfo.py
+@@ -515,6 +515,8 @@ def collect_resource(info_add):
+         value = resource.getrlimit(key)
+         info_add('resource.%s' % name, value)
+ 
++    call_func(info_add, 'resource.pagesize', resource, 'getpagesize')
++
+ 
+ def collect_test_socket(info_add):
+     try:
+diff --git a/Lib/test/test_tarfile.py b/Lib/test/test_tarfile.py
+index 573be812ea..8e0b275972 100644
+--- a/Lib/test/test_tarfile.py
++++ b/Lib/test/test_tarfile.py
+@@ -980,16 +980,21 @@ class GNUReadTest(LongnameTest, ReadTest, unittest.TestCase):
+     def _fs_supports_holes():
+         # Return True if the platform knows the st_blocks stat attribute and
+         # uses st_blocks units of 512 bytes, and if the filesystem is able to
+-        # store holes in files.
++        # store holes of 4 KiB in files.
++        #
++        # The function returns False if page size is larger than 4 KiB.
++        # For example, ppc64 uses pages of 64 KiB.
+         if sys.platform.startswith("linux"):
+             # Linux evidentially has 512 byte st_blocks units.
+             name = os.path.join(TEMPDIR, "sparse-test")
+             with open(name, "wb") as fobj:
++                # Seek to "punch a hole" of 4 KiB
+                 fobj.seek(4096)
++                fobj.write(b'x' * 4096)
+                 fobj.truncate()
+             s = os.stat(name)
+             support.unlink(name)
+-            return s.st_blocks == 0
++            return (s.st_blocks * 512 < s.st_size)
+         else:
+             return False
+ 
+diff --git a/Misc/NEWS.d/next/Tests/2019-01-18-12-19-19.bpo-35772.sGBbsn.rst b/Misc/NEWS.d/next/Tests/2019-01-18-12-19-19.bpo-35772.sGBbsn.rst
+new file mode 100644
+index 0000000000..cfd282f1d0
+--- /dev/null
++++ b/Misc/NEWS.d/next/Tests/2019-01-18-12-19-19.bpo-35772.sGBbsn.rst
+@@ -0,0 +1,6 @@
++Fix sparse file tests of test_tarfile on ppc64 with the tmpfs filesystem. Fix
++the function testing if the filesystem supports sparse files: create a file
++which contains data and "holes", instead of creating a file which contains no
++data. tmpfs effective block size is a page size (tmpfs lives in the page cache).
++RHEL uses 64 KiB pages on aarch64, ppc64, ppc64le, only s390x and x86_64 use 4
++KiB pages, whereas the test punch holes of 4 KiB.

@@ -1,0 +1,22 @@
+From da92ada8ebffce70121681c6076ee22b2a65b3d7 Mon Sep 17 00:00:00 2001
+From: Zsolt Kozaroczy <kiskoza@gmail.com>
+Date: Fri, 19 Sep 2025 16:19:56 +0200
+Subject: [PATCH] Handle new "No root element" error from REXML #84
+
+---
+ lib/crack/xml.rb | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/lib/crack/xml.rb b/lib/crack/xml.rb
+index 6985689..985ba80 100644
+--- a/lib/crack/xml.rb
++++ b/lib/crack/xml.rb
+@@ -232,6 +232,8 @@ def self.parser=(parser)
+     end
+ 
+     def self.parse(xml)
++      return {} if xml.strip == ''
++
+       parser.parse(xml)
+     end
+   end

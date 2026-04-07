@@ -1,0 +1,83 @@
+diff -urNp a/agent/mibgroup/host/data_access/swinst_rpm.c b/agent/mibgroup/host/data_access/swinst_rpm.c
+--- a/agent/mibgroup/host/data_access/swinst_rpm.c	2018-07-18 16:12:19.583503903 +0200
++++ b/agent/mibgroup/host/data_access/swinst_rpm.c	2018-07-18 16:50:38.599703588 +0200
+@@ -102,7 +102,6 @@ netsnmp_swinst_arch_load( netsnmp_contai
+     rpmtd                 td_name, td_version, td_release, td_group, td_time;
+ #else
+     char                 *n, *v, *r, *g;
+-    int32_t              *t;
+ #endif
+     time_t                install_time;
+     size_t                date_len;
+@@ -146,14 +145,13 @@ netsnmp_swinst_arch_load( netsnmp_contai
+         install_time = rpmtdGetNumber(td_time);
+         g = rpmtdGetString(td_group);
+ #else
+-        headerGetEntry( h, RPMTAG_NAME,        NULL, (void**)&n, NULL);
+-        headerGetEntry( h, RPMTAG_VERSION,     NULL, (void**)&v, NULL);
+-        headerGetEntry( h, RPMTAG_RELEASE,     NULL, (void**)&r, NULL);
+-        headerGetEntry( h, RPMTAG_GROUP,       NULL, (void**)&g, NULL);
+-        headerGetEntry( h, RPMTAG_INSTALLTIME, NULL, (void**)&t, NULL);
++        n = headerGetString( h, RPMTAG_NAME);
++        v = headerGetString( h, RPMTAG_VERSION);
++        r = headerGetString( h, RPMTAG_RELEASE);
++        g = headerGetString( h, RPMTAG_GROUP);
++        install_time = headerGetNumber( h, RPMTAG_INSTALLTIME);
+         entry->swName_len = snprintf( entry->swName, sizeof(entry->swName),
+                                       "%s-%s-%s", n, v, r);
+-        install_time = *t;
+ #endif
+         entry->swType = (g && NULL != strstr( g, "System Environment"))
+                         ? 2      /* operatingSystem */
+diff -urNp a/agent/mibgroup/host/hr_swinst.c b/agent/mibgroup/host/hr_swinst.c
+--- a/agent/mibgroup/host/hr_swinst.c	2018-07-18 16:12:19.582503907 +0200
++++ b/agent/mibgroup/host/hr_swinst.c	2018-07-18 17:09:29.716564197 +0200
+@@ -479,9 +479,9 @@ var_hrswinst(struct variable * vp,
+             }
+ #else
+ # ifdef HAVE_LIBRPM
+-            char *rpm_groups;
+-            if ( headerGetEntry(swi->swi_h, RPMTAG_GROUP, NULL, (void **) &rpm_groups, NULL) ) {
+-                if ( strstr(rpm_groups, "System Environment") != NULL )
++            const char *rpm_group = headerGetString(swi->swi_h, RPMTAG_GROUP);	
++            if ( NULL != rpm_group ) {
++                if ( strstr(rpm_group, "System Environment") != NULL )
+                     long_return = 2;	/* operatingSystem */
+                 else
+                     long_return = 4;	/* applcation */
+@@ -498,9 +498,8 @@ var_hrswinst(struct variable * vp,
+     case HRSWINST_DATE:
+         {
+ #ifdef HAVE_LIBRPM
+-            int32_t         *rpm_data;
+-            if ( headerGetEntry(swi->swi_h, RPMTAG_INSTALLTIME, NULL, (void **) &rpm_data, NULL) ) {
+-                time_t          installTime = *rpm_data;
++            time_t installTime = headerGetNumber(swi->swi_h, RPMTAG_INSTALLTIME);
++            if ( 0 != installTime ) {
+                 ret = date_n_time(&installTime, var_len);
+             } else {
+                 ret = date_n_time(NULL, var_len);
+@@ -660,7 +659,7 @@ Save_HR_SW_info(int ix)
+     if (1 <= ix && ix <= swi->swi_nrec && ix != swi->swi_prevx) {
+         int             offset;
+         Header          h;
+-        char           *n, *v, *r;
++        const char     *n, *v, *r;
+ 
+         offset = swi->swi_recs[ix - 1];
+ 
+@@ -685,11 +684,9 @@ Save_HR_SW_info(int ix)
+         swi->swi_h = h;
+         swi->swi_prevx = ix;
+ 
+-        headerGetEntry(swi->swi_h, RPMTAG_NAME, NULL, (void **) &n, NULL);
+-        headerGetEntry(swi->swi_h, RPMTAG_VERSION, NULL, (void **) &v,
+-                       NULL);
+-        headerGetEntry(swi->swi_h, RPMTAG_RELEASE, NULL, (void **) &r,
+-                       NULL);
++        n = headerGetString(swi->swi_h, RPMTAG_NAME);
++        v = headerGetString(swi->swi_h, RPMTAG_VERSION);
++        r = headerGetString(swi->swi_h, RPMTAG_RELEASE);
+         snprintf(swi->swi_name, sizeof(swi->swi_name), "%s-%s-%s", n, v, r);
+         swi->swi_name[ sizeof(swi->swi_name)-1 ] = 0;
+     }

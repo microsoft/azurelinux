@@ -1,0 +1,26 @@
+From b082c7082046743f2ff5999584764d14d16235f3 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Tue, 22 Aug 2023 16:32:34 +0200
+Subject: [PATCH] Use Minitest::Test as a test runner
+
+The Minitest::Unit is depracated since Minitest 5.0 and it was recenlty
+put behind environment variable:
+
+https://github.com/minitest/minitest/commit/a2c6c18570f6f0a1bf6af70fe3b6d9599a13fdd6
+---
+ test/test_declarative_test.rb | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/test_declarative_test.rb b/test/test_declarative_test.rb
+index 6ef4220..a3ab0ae 100644
+--- a/test/test_declarative_test.rb
++++ b/test/test_declarative_test.rb
+@@ -13,7 +13,7 @@ when 'Gemfile'
+   # Minitest >= 5
+   require 'minitest/autorun'
+   TEST_CASE = Minitest::Test
+-  RUNNER = Minitest::Unit
++  RUNNER = Minitest::Test
+ when 'Gemfile.minitest4'
+   # Minitest < 5
+   require 'minitest/autorun'

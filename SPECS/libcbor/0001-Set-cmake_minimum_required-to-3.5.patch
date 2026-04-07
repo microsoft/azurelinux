@@ -1,0 +1,23 @@
+From 1183292d4695300785b272532c1e02d68840e4b8 Mon Sep 17 00:00:00 2001
+From: PJK <me@pavelkalvoda.com>
+Date: Fri, 4 Apr 2025 23:19:13 +0200
+Subject: [PATCH] Set cmake_minimum_required to 3.5
+
+Fixed https://github.com/PJK/libcbor/issues/351
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 815675e..a9f9bd5 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 3.0)
++cmake_minimum_required(VERSION 3.5)
+ 
+ project(libcbor)
+ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
+-- 
+2.49.0
+

@@ -1,0 +1,13 @@
+--- netkit-ftp-0.17/ftp/ftp.c.runique_mget	2004-12-07 12:05:49.360133092 +0100
++++ netkit-ftp-0.17/ftp/ftp.c	2004-12-07 12:06:48.480883902 +0100
+@@ -923,7 +923,9 @@
+ 				return;
+ 			}
+ 		}
+-		else if (runique && (local = gunique(local)) == NULL) {
++		else if (runique && (strcmp(cmd, "NLST") != 0) && 
++			 (local = gunique(local)) == NULL)
++		{
+ 			(void) signal(SIGINT, oldintr);
+ 			code = -1;
+ 			return;

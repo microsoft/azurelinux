@@ -1,0 +1,76 @@
+--- firefox-111.0.1/build/moz.configure/rust.configure	2023-03-21 06:16:03.000000000 -0700
++++ firefox-111.0.1/build/moz.configure/rust.configure.new	2023-04-05 08:57:29.403219120 -0700
+@@ -593,7 +593,7 @@
+ 
+ # ==============================================================
+ 
+-option(env="RUSTFLAGS", nargs=1, help="Rust compiler flags")
++option(env="RUSTFLAGS", nargs=1, help="Rust compiler flags", comma_split=False)
+ set_config("RUSTFLAGS", depends("RUSTFLAGS")(lambda flags: flags))
+ 
+ 
+--- firefox-111.0.1/python/mozbuild/mozbuild/configure/options.py	2023-03-21 06:16:09.000000000 -0700
++++ firefox-111.0.1/python/mozbuild/mozbuild/configure/options.py.new	2023-04-05 08:57:31.270193468 -0700
+@@ -191,6 +191,10 @@
+       to instantiate an option indirectly. Set this to a positive integer to
+       force the script to look into a deeper stack frame when inferring the
+       `category`.
++    - `comma_split` specifies whether the value string should be split on
++      commas. The default is True. Setting it False is necessary for things
++      like compiler flags which should be a single string that may contain
++      commas.
+     """
+ 
+     __slots__ = (
+@@ -205,6 +209,7 @@
+         "possible_origins",
+         "category",
+         "define_depth",
++        "comma_split",
+     )
+ 
+     def __init__(
+@@ -218,6 +223,7 @@
+         category=None,
+         help=None,
+         define_depth=0,
++        comma_split=True,
+     ):
+         if not name and not env:
+             raise InvalidOptionError(
+@@ -335,9 +341,10 @@
+         self.choices = choices
+         self.help = help
+         self.category = category or _infer_option_category(define_depth)
++        self.comma_split = comma_split
+ 
+     @staticmethod
+-    def split_option(option):
++    def split_option(option, comma_split=True):
+         """Split a flag or variable into a prefix, a name and values
+ 
+         Variables come in the form NAME=values (no prefix).
+@@ -350,7 +357,13 @@
+ 
+         elements = option.split("=", 1)
+         name = elements[0]
+-        values = tuple(elements[1].split(",")) if len(elements) == 2 else ()
++        if len(elements) == 2:
++            if comma_split:
++                values = tuple(elements[1].split(","))
++            else:
++                values = (elements[1],)
++        else:
++            values = ()
+         if name.startswith("--"):
+             name = name[2:]
+             if not name.islower():
+@@ -426,7 +439,7 @@
+                 % (option, origin, ", ".join(self.possible_origins))
+             )
+ 
+-        prefix, name, values = self.split_option(option)
++        prefix, name, values = self.split_option(option, self.comma_split)
+         option = self._join_option(prefix, name)
+ 
+         assert name in (self.name, self.env)

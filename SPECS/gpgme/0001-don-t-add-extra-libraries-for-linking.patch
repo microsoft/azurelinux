@@ -1,0 +1,47 @@
+From 07a8ac908cbadb22c344895ebf9cc00c6a8fd3f7 Mon Sep 17 00:00:00 2001
+From: Igor Gnatenko <ignatenkobrain@fedoraproject.org>
+Date: Wed, 29 Mar 2017 07:05:41 +0200
+Subject: [PATCH] don't add extra libraries for linking
+
+Signed-off-by: Igor Gnatenko <ignatenkobrain@fedoraproject.org>
+---
+ lang/cpp/src/GpgmeppConfig.cmake.in.in | 2 +-
+ src/gpgme-config.in                    | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/lang/cpp/src/GpgmeppConfig.cmake.in.in b/lang/cpp/src/GpgmeppConfig.cmake.in.in
+index 73f5eaad..3104d715 100644
+--- a/lang/cpp/src/GpgmeppConfig.cmake.in.in
++++ b/lang/cpp/src/GpgmeppConfig.cmake.in.in
+@@ -63,7 +63,7 @@ add_library(Gpgmepp SHARED IMPORTED)
+ 
+ set_target_properties(Gpgmepp PROPERTIES
+   INTERFACE_INCLUDE_DIRECTORIES "@resolved_includedir@/gpgme++;@resolved_includedir@"
+-  INTERFACE_LINK_LIBRARIES "pthread;@resolved_libdir@/libgpgme@libsuffix@;@LIBASSUAN_LIBS@"
++  INTERFACE_LINK_LIBRARIES "pthread;@resolved_libdir@/libgpgme@libsuffix@"
+   IMPORTED_LOCATION "@resolved_libdir@/libgpgmepp@libsuffix@"
+ )
+ 
+diff --git a/src/gpgme-config.in b/src/gpgme-config.in
+index a4d152e1..6a854e4a 100644
+--- a/src/gpgme-config.in
++++ b/src/gpgme-config.in
+@@ -22,12 +22,12 @@ cflags="-I@includedir@"
+ libs="-L@libdir@"
+ 
+ # Network libraries.
+-assuan_cflags="@LIBASSUAN_CFLAGS@"
+-assuan_libs="@LIBASSUAN_LIBS@"
++#assuan_cflags="@LIBASSUAN_CFLAGS@"
++#assuan_libs="@LIBASSUAN_LIBS@"
+ 
+ # Configure libgpg-error.
+ gpg_error_cflags="@GPG_ERROR_CFLAGS@"
+-gpg_error_libs="@GPG_ERROR_LIBS@"
++#gpg_error_libs="@GPG_ERROR_LIBS@"
+ 
+ # Configure thread packages.
+ thread_modules=""
+-- 
+2.15.1
+

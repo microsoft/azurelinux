@@ -1,0 +1,263 @@
+From d10ce49953e1bb8cdfe3b0eb47add0caead53ebc Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Mon, 26 Feb 2024 12:19:51 +0000
+Subject: [PATCH 102/131] Support build time setting of enclave load directory
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The current code for loading enclaves (pce, id_enclave, qe3, tdqe, qve)
+tries to find the enclave file in the directory of the currently
+loaded library (as reported by dladdr), or in the directory of the
+current executable (as reported by /proc/self/exe).
+
+Neither of these approaches is sufficiently flexible to work with
+all Linux distro filesystem layout policies. In particular distros
+may desire to have a specific directory location exclusively for
+the shipping of enclaves, separate from any native libraries or
+executables.
+
+This introduces support for an "SGX_ENCLAVE_PATH" variable in the
+makefiles, which is used to define an SGX_ENCLAVE_PATH symbol in
+code.
+
+By default SGX_ENCLAVE_PATH path will get defined to an empty
+string at the C level and so current code behaviour will not
+be changed.
+
+If this is set though, then it will be used to locate the enclaves,
+with no fallback to searching relative to the library or binary.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ QuoteGeneration/pce_wrapper/linux/Makefile           |  2 +-
+ QuoteGeneration/pce_wrapper/pce_wrapper.cpp          |  9 +++++++++
+ QuoteGeneration/quote_wrapper/quote/linux/Makefile   |  2 +-
+ QuoteGeneration/quote_wrapper/quote/qe_logic.cpp     |  9 +++++++++
+ .../quote_wrapper/tdx_quote/linux/Makefile           |  2 +-
+ .../quote_wrapper/tdx_quote/td_ql_logic.cpp          |  8 ++++++++
+ QuoteVerification/appraisal/qal/Makefile             |  2 +-
+ QuoteVerification/appraisal/qal/qae_wrapper.cpp      | 10 +++++++++-
+ QuoteVerification/dcap_quoteverify/linux/Makefile    |  2 +-
+ .../dcap_quoteverify/linux/qve_parser.cpp            |  8 ++++++++
+ tools/PCKRetrievalTool/App/utility.cpp               | 12 +++++++++++-
+ tools/PCKRetrievalTool/Makefile                      |  2 +-
+ 12 files changed, 60 insertions(+), 8 deletions(-)
+
+diff --git a/QuoteGeneration/pce_wrapper/linux/Makefile b/QuoteGeneration/pce_wrapper/linux/Makefile
+index debcb41d..7ceaaea8 100644
+--- a/QuoteGeneration/pce_wrapper/linux/Makefile
++++ b/QuoteGeneration/pce_wrapper/linux/Makefile
+@@ -40,7 +40,7 @@ INCLUDE += -I$(ROOT_DIR)/ae/common \
+            -I$(ROOT_DIR)/ae/inc    \
+            -I$(ROOT_DIR)/ae/inc/internal
+ 
+-CXXFLAGS += -fPIC -Werror -g
++CXXFLAGS += -fPIC -Werror -g -DSGX_ENCLAVE_PATH="\"$(SGX_ENCLAVE_PATH)\""
+ 
+ CFLAGS += -fPIC -Werror -g
+ Link_Flags := $(SGX_COMMON_CFLAGS) -L$(ROOT_DIR)/build/linux -L$(SGX_SDK)/lib64 -lsgx_urts -lpthread -ldl
+diff --git a/QuoteGeneration/pce_wrapper/pce_wrapper.cpp b/QuoteGeneration/pce_wrapper/pce_wrapper.cpp
+index 7f103bdd..8384d57f 100644
+--- a/QuoteGeneration/pce_wrapper/pce_wrapper.cpp
++++ b/QuoteGeneration/pce_wrapper/pce_wrapper.cpp
+@@ -88,6 +88,15 @@ bool get_pce_path(
+         p_file_path[buf_size - 1] = '\0';  //null terminate the string
+         return true;
+     }
++    else if (*SGX_ENCLAVE_PATH)
++    {
++        if ((strlen(SGX_ENCLAVE_PATH) + 1 + strlen(PCE_ENCLAVE_NAME) + 1) > buf_size) {
++            return false;
++        }
++        strcpy(p_file_path, SGX_ENCLAVE_PATH);
++        strcat(p_file_path, "/");
++        strcat(p_file_path, PCE_ENCLAVE_NAME);
++    }
+     else if(0 != dladdr(__builtin_return_address(0), &dl_info) &&
+         NULL != dl_info.dli_fname)
+     {
+diff --git a/QuoteGeneration/quote_wrapper/quote/linux/Makefile b/QuoteGeneration/quote_wrapper/quote/linux/Makefile
+index c50fdb32..7d0b398f 100644
+--- a/QuoteGeneration/quote_wrapper/quote/linux/Makefile
++++ b/QuoteGeneration/quote_wrapper/quote/linux/Makefile
+@@ -51,7 +51,7 @@ Quote_Include_Paths := -I$(SGX_SDK)/include -I../inc -I../../common/inc -I./ -I.
+ 
+ Quote_C_Flags := $(COMMON_FLAGS) -g -fPIC -Wno-attributes $(Quote_Include_Paths)
+ 
+-Quote_Cpp_Flags := $(Quote_C_Flags) -std=c++11
++Quote_Cpp_Flags := $(Quote_C_Flags) -std=c++11 -DSGX_ENCLAVE_PATH="\"$(SGX_ENCLAVE_PATH)\""
+ Quote_Link_Flags := $(COMMON_FLAGS) -g -L$(ROOT_DIR)/build/linux -L$(SGX_SDK)/lib64 -lsgx_urts -lpthread -ldl
+ 
+ ifndef DEBUG
+diff --git a/QuoteGeneration/quote_wrapper/quote/qe_logic.cpp b/QuoteGeneration/quote_wrapper/quote/qe_logic.cpp
+index 0b486a78..5d39177e 100644
+--- a/QuoteGeneration/quote_wrapper/quote/qe_logic.cpp
++++ b/QuoteGeneration/quote_wrapper/quote/qe_logic.cpp
+@@ -549,6 +549,15 @@ get_qe_path(const TCHAR *p_file_name,
+         p_file_path[buf_size - 1] = '\0';  //null terminate the string
+         return true;
+     }
++    else if (*SGX_ENCLAVE_PATH)
++    {
++        if ((strlen(SGX_ENCLAVE_PATH) + 1 + strlen(p_file_name) + 1) > buf_size) {
++            return false;
++        }
++        strcpy(p_file_path, SGX_ENCLAVE_PATH);
++        strcat(p_file_path, "/");
++        strcat(p_file_path, p_file_name);
++    }
+     else if(0 != dladdr(__builtin_return_address(0), &dl_info) &&
+         NULL != dl_info.dli_fname)
+     {
+diff --git a/QuoteGeneration/quote_wrapper/tdx_quote/linux/Makefile b/QuoteGeneration/quote_wrapper/tdx_quote/linux/Makefile
+index 61ad7f3c..fc5bd208 100644
+--- a/QuoteGeneration/quote_wrapper/tdx_quote/linux/Makefile
++++ b/QuoteGeneration/quote_wrapper/tdx_quote/linux/Makefile
+@@ -56,7 +56,7 @@ Quote_Include_Paths := -I$(SGX_SDK)/include -I../inc -I../../common/inc -I./ \
+ 
+ Quote_C_Flags := $(CFLAGS) -g -MMD -fPIC -Wno-attributes $(Quote_Include_Paths)
+ 
+-Quote_Cpp_Flags := $(CXXFLAGS) -g -MMD -fPIC -Wno-attributes $(Quote_Include_Paths)
++Quote_Cpp_Flags := $(CXXFLAGS) -g -MMD -fPIC -Wno-attributes $(Quote_Include_Paths) -DSGX_ENCLAVE_PATH="\"$(SGX_ENCLAVE_PATH)\""
+ Quote_Link_Flags := $(COMMON_LDFLAGS) -g -L$(ROOT_DIR)/build/linux \
+                     -L$(PCE_Library_Dir) -lsgx_pce_logic -L$(SGX_SDK)/lib64 \
+ 					-lsgx_urts -lpthread -ldl
+diff --git a/QuoteGeneration/quote_wrapper/tdx_quote/td_ql_logic.cpp b/QuoteGeneration/quote_wrapper/tdx_quote/td_ql_logic.cpp
+index 7296d5b3..e20fa701 100644
+--- a/QuoteGeneration/quote_wrapper/tdx_quote/td_ql_logic.cpp
++++ b/QuoteGeneration/quote_wrapper/tdx_quote/td_ql_logic.cpp
+@@ -378,6 +378,14 @@ bool tee_att_config_t::get_qe_path(tee_att_ae_type_t type,
+         p_file_path[len] = '\0';  //null terminate the string
+         return true;
+     }
++    else if (*SGX_ENCLAVE_PATH) {
++        if ((strlen(SGX_ENCLAVE_PATH) + 1 + strlen(p_file_name) + 1) > buf_size) {
++            return false;
++        }
++        strcpy(p_file_path, SGX_ENCLAVE_PATH);
++        strcat(p_file_path, "/");
++        strcat(p_file_path, p_file_name);
++    }
+     else if(0 != dladdr(__builtin_return_address(0), &dl_info) &&
+         NULL != dl_info.dli_fname)
+     {
+diff --git a/QuoteVerification/appraisal/qal/Makefile b/QuoteVerification/appraisal/qal/Makefile
+index 94469dda..10ca0572 100644
+--- a/QuoteVerification/appraisal/qal/Makefile
++++ b/QuoteVerification/appraisal/qal/Makefile
+@@ -23,7 +23,7 @@ QAL_Include_Path := -I./ \
+                 -I../common/ \
+                 -I$(RAPIDJSON_DIR)/
+ 
+-QAL_Cpp_Flags := $(CXXFLAGS) -g -fPIC $(QAL_Include_Path)
++QAL_Cpp_Flags := $(CXXFLAGS) -g -fPIC $(QAL_Include_Path) -DSGX_ENCLAVE_PATH="\"$(SGX_ENCLAVE_PATH)\""
+ QAL_C_Flags := $(CFLAGS) -g -fPIC $(QAL_Include_Path)
+ 
+ QAL_Link_Flags := $(COMMON_LDFLAGS) -L$(WARM_Lib_Path) -liwasm  -ldl -lm -lpthread \
+diff --git a/QuoteVerification/appraisal/qal/qae_wrapper.cpp b/QuoteVerification/appraisal/qal/qae_wrapper.cpp
+index 5659808f..35d0623a 100644
+--- a/QuoteVerification/appraisal/qal/qae_wrapper.cpp
++++ b/QuoteVerification/appraisal/qal/qae_wrapper.cpp
+@@ -103,6 +103,14 @@ static bool get_qae_path(
+         p_file_path[buf_size - 1] = '\0'; // null terminate the string
+         return true;
+     }
++    else if (*SGX_ENCLAVE_PATH)
++    {
++        if ((strlen(SGX_ENCLAVE_PATH) + 1 + 1) > buf_size) {
++            return false;
++        }
++        (void)strcpy(p_file_path, SGX_ENCLAVE_PATH);
++        (void)strcat(p_file_path, "/");
++    }
+     else if (0 != dladdr(__builtin_return_address(0), &dl_info) &&
+              NULL != dl_info.dli_fname)
+     {
+@@ -362,4 +370,4 @@ quote3_error_t ecall_authenticate_policy_owner(sgx_enclave_id_t eid,
+             retval = SGX_QL_ERROR_UNEXPECTED;
+     }
+     return retval;
+-}
+\ No newline at end of file
++}
+diff --git a/QuoteVerification/dcap_quoteverify/linux/Makefile b/QuoteVerification/dcap_quoteverify/linux/Makefile
+index 49d74948..e92cc2aa 100644
+--- a/QuoteVerification/dcap_quoteverify/linux/Makefile
++++ b/QuoteVerification/dcap_quoteverify/linux/Makefile
+@@ -28,7 +28,7 @@ QVL_VERIFY_INC	:= -I$(QVE_SRC_PATH)/Include \
+ QPL_BASE64_CPP_DEP	:= $(DCAP_QPL_DIR)/sgx_base64.d
+ 
+ SGX_COMMON_CFLAGS	+= -g -fPIC -Wno-attributes -USGX_TRUSTED
+-SGX_COMMON_CXXFLAGS	+= -g -fPIC -USGX_TRUSTED
++SGX_COMMON_CXXFLAGS	+= -g -fPIC -USGX_TRUSTED -DSGX_ENCLAVE_PATH="\"$(SGX_ENCLAVE_PATH)\""
+ 
+ QVL_LIB_OBJS := $(QVL_LIB_FILES:.cpp=_untrusted.o)
+ QVL_PARSER_OBJS := $(QVL_PARSER_FILES:.cpp=_untrusted.o)
+diff --git a/QuoteVerification/dcap_quoteverify/linux/qve_parser.cpp b/QuoteVerification/dcap_quoteverify/linux/qve_parser.cpp
+index e50fab0b..856de23f 100644
+--- a/QuoteVerification/dcap_quoteverify/linux/qve_parser.cpp
++++ b/QuoteVerification/dcap_quoteverify/linux/qve_parser.cpp
+@@ -65,6 +65,14 @@ bool get_qve_path(
+         p_file_path[buf_size - 1] = '\0';  //null terminate the string
+         return true;
+     }
++    else if (*SGX_ENCLAVE_PATH)
++    {
++        if ((strlen(SGX_ENCLAVE_PATH) + 1 + 1) > buf_size) {
++            return false;
++        }
++        (void)strcpy(p_file_path, SGX_ENCLAVE_PATH);
++        (void)strcat(p_file_path, "/");
++    }
+     else if(0 != dladdr(__builtin_return_address(0), &dl_info) &&
+         NULL != dl_info.dli_fname)
+     {
+diff --git a/tools/PCKRetrievalTool/App/utility.cpp b/tools/PCKRetrievalTool/App/utility.cpp
+index ec19122d..634ad27b 100644
+--- a/tools/PCKRetrievalTool/App/utility.cpp
++++ b/tools/PCKRetrievalTool/App/utility.cpp
+@@ -214,9 +214,9 @@ bool load_enclave(const char* enclave_name, sgx_enclave_id_t* p_eid)
+     char enclave_path[ProgPathBufferSize] = "";
+ #endif
+ 
++#if defined(_MSC_VER)    
+     if (!get_program_path(enclave_path, ProgPathBufferSize))
+         return false;
+-#if defined(_MSC_VER)    
+     if (_tcsnlen(enclave_path, ProgPathBufferSize) + _tcsnlen(enclave_name, ProgPathBufferSize) + sizeof(char) > ProgPathBufferSize)
+         return false;
+     (void)_tcscat_s(enclave_path, ProgPathBufferSize, enclave_name);
+@@ -227,6 +227,16 @@ bool load_enclave(const char* enclave_name, sgx_enclave_id_t* p_eid)
+     sgx_create_enclave_func_t p_sgx_create_enclave = (sgx_create_enclave_func_t)FINDFUNCTIONSYM(sgx_urts_handle, "sgx_create_enclavea");
+ #endif
+ #else
++    if (*SGX_ENCLAVE_PATH) {
++        if ((strlen(SGX_ENCLAVE_PATH) + 1 + 1) > ProgPathBufferSize) {
++            return false;
++        }
++        (void)strcpy(enclave_path, SGX_ENCLAVE_PATH);
++        (void)strcat(enclave_path, "/");
++    } else {
++        if (!get_program_path(enclave_path, ProgPathBufferSize))
++            return false;
++    }
+     if (strnlen(enclave_path, ProgPathBufferSize) + strnlen(enclave_name, ProgPathBufferSize) + sizeof(char) > ProgPathBufferSize)
+         return false;
+     (void)strncat(enclave_path, enclave_name, strnlen(enclave_name, ProgPathBufferSize));
+diff --git a/tools/PCKRetrievalTool/Makefile b/tools/PCKRetrievalTool/Makefile
+index 93165755..d804ce9d 100644
+--- a/tools/PCKRetrievalTool/Makefile
++++ b/tools/PCKRetrievalTool/Makefile
+@@ -83,7 +83,7 @@ App_Include_Paths += -I ../../QuoteGeneration/ae/inc/internal -I ../SGXPlatformR
+ 
+ App_C_Flags := $(COMMON_FLAGS) -fPIC -Wno-attributes $(App_Include_Paths)
+ 
+-App_Cpp_Flags := $(App_C_Flags) -std=c++11
++App_Cpp_Flags := $(App_C_Flags) -std=c++11 -DSGX_ENCLAVE_PATH="\"$(SGX_ENCLAVE_PATH)\""
+ App_Link_Flags := $(SGX_COMMON_CFLAGS) -Wl,-z,relro,-z,now,-z,noexecstack
+ App_Link_Flags +=  -lcurl -ldl -lpthread
+ ifeq ($(STANDALONE), 1)
+-- 
+2.53.0
+

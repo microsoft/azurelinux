@@ -1,0 +1,143 @@
+#!/usr/bin/python3
+
+"""Symlink a node module's dependencies into the node_modules directory so users
+can `npm link` RPM-installed modules into their personal projects."""
+
+# Copyright 2012, 2013 T.C. Hollingsworth <tchollingsworth@gmail.com>
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to
+# deal in the Software without restriction, including without limitation the
+# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+# sell copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+# IN THE SOFTWARE.
+
+import json
+import os
+import re
+import shutil
+import sys
+
+def symlink(source, dest):
+    if os.path.sep in dest:
+        os.makedirs(os.path.dirname(dest), exist_ok=True)
+    try:
+        os.symlink(source, dest)
+    except OSError:
+        if os.path.islink(dest) and os.path.realpath(dest) == os.path.normpath(source):
+            sys.stderr.write("""
+WARNING: the symlink for dependency "{0}" already exists
+
+This could mean that the dependency exists in both devDependencies and 
+dependencies, which may cause trouble for people using this module with npm.
+
+Please report this to upstream. For more information, see:
+    <https://github.com/tchollingsworth/nodejs-packaging/pull/1>
+""".format(dest))
+            
+        elif '--force' in sys.argv:
+            if os.path.isdir(dest):
+                shutil.rmtree(dest)
+            else:
+                os.unlink(dest)
+                
+            os.symlink(source, dest)
+            
+        else:
+            sys.stderr.write("""
+ERROR: the path for dependency "{0}" already exists
+
+This could mean that bundled modules are being installed.  Bundled libraries are
+forbidden in Fedora. For more information, see:
+    <https://fedoraproject.org/wiki/Packaging:No_Bundled_Libraries>
+    
+It is generally reccomended to remove the entire "node_modules" directory in
+%prep when it exists. For more information, see:
+    <https://fedoraproject.org/wiki/Packaging:Node.js#Removing_bundled_modules>
+    
+If you have obtained permission from the Fedora Packaging Committee to bundle
+libraries, please use `%nodejs_fixdep -r` in %prep to remove the dependency on
+the bundled module. This will prevent an unnecessary dependency on the system
+version of the module and eliminate this error.
+""".format(dest))
+            sys.exit(1)
+        
+
+def symlink_deps(deps, check):
+    if isinstance(deps, dict):
+        #read in the list of mutiple-versioned packages
+        mvpkgs = open('/usr/share/node/multiver_modules').read().split('\n')
+            
+        for dep, ver in deps.items():
+            if dep in mvpkgs and ver != '' and ver != '*' and ver != 'latest':
+                depver = re.sub('^ *(~|\^|=|>=|<=) *', '', ver).split('.')[0]
+                target = os.path.join(sitelib, '{0}@{1}'.format(dep, depver))
+            else:
+                target = os.path.join(sitelib, dep)
+                
+            if not check or os.path.exists(target):
+                symlink(target, dep)
+                
+    elif isinstance(deps, list):
+        for dep in deps:
+            target = os.path.join(sitelib, dep)
+            if not check or os.path.exists(target):
+                symlink(target, dep)
+    
+    elif isinstance(deps, str):
+        target = os.path.join(sitelib, deps)
+        if not check or os.path.exists(target):
+            symlink(target, deps)
+            
+    else:
+        raise TypeError("Invalid package.json: dependencies weren't a recognized type")
+
+
+#the %nodejs_symlink_deps macro passes %nodejs_sitelib as the first argument
+sitelib = sys.argv[1]
+
+if '--check' in sys.argv or '--build' in sys.argv:
+    check = True
+    modules = [os.getcwd()]
+else:
+    check = False
+    br_sitelib = os.path.join(os.environ['RPM_BUILD_ROOT'], sitelib.lstrip('/'))
+    modules = [os.path.join(br_sitelib, module) for module in os.listdir(br_sitelib)]
+
+if '--optional' in sys.argv:
+    optional = True
+else:
+    optional = False
+
+for path in modules:
+    os.chdir(path)
+    md = json.load(open('package.json'))
+    
+    if 'dependencies' in md or (check and 'devDependencies' in md) or (optional and 'optionalDependencies' in md):
+        try:
+            os.mkdir('node_modules')
+        except OSError:
+            sys.stderr.write('WARNING: node_modules already exists. Make sure you have ' +
+                                'no bundled dependencies.\n')
+
+        os.chdir('node_modules')
+
+        if 'dependencies' in md:
+            symlink_deps(md['dependencies'], check)
+
+        if check and '--no-devdeps' not in sys.argv and 'devDependencies' in md:
+            symlink_deps(md['devDependencies'], check)
+
+        if optional and 'optionalDependencies' in md:
+            symlink_deps(md['optionalDependencies'], check)

@@ -1,0 +1,103 @@
+diff -up ./esc/src/lib/coolkey/CoolKey.cpp.fix2 ./esc/src/lib/coolkey/CoolKey.cpp
+--- ./esc/src/lib/coolkey/CoolKey.cpp.fix2	2018-10-11 18:34:34.622987227 -0700
++++ ./esc/src/lib/coolkey/CoolKey.cpp	2018-10-11 18:36:11.918476971 -0700
+@@ -492,13 +492,11 @@ HRESULT CoolKeyGetCUIDDirectly(char *aBu
+     }
+ 
+     cardCtxt = CKYCardContext_Create(SCARD_SCOPE_USER);
+-    assert(cardCtxt);
+     if (!cardCtxt) {
+          goto done;
+     }
+ 
+     conn = CKYCardConnection_Create(cardCtxt);
+-    assert(conn);
+     if (!conn) {
+         goto done;
+     }
+@@ -559,13 +557,11 @@ HRESULT CoolKeyGetATRDirectly(char *aBuf
+     }
+ 
+     cardCtxt = CKYCardContext_Create(SCARD_SCOPE_USER);
+-    assert(cardCtxt);
+     if (!cardCtxt) {
+          goto done;
+     }
+ 
+     conn = CKYCardConnection_Create(cardCtxt);
+-    assert(conn);
+     if (!conn) {
+         goto done;
+     }
+@@ -629,13 +625,11 @@ HRESULT CoolKeyGetLifeCycleDirectly(CKYB
+     }
+ 
+     cardCtxt = CKYCardContext_Create(SCARD_SCOPE_USER);
+-    assert(cardCtxt);
+     if (!cardCtxt) {
+          goto done;
+     }
+ 
+     conn = CKYCardConnection_Create(cardCtxt);
+-    assert(conn);
+     if (!conn) {
+         goto done;
+     }
+@@ -691,13 +685,11 @@ HRESULT CoolKeyGetCPLCDataDirectly(CKYAp
+     }
+ 
+     cardCtxt = CKYCardContext_Create(SCARD_SCOPE_USER);
+-    assert(cardCtxt);
+     if (!cardCtxt) {
+          goto done;
+     }
+ 
+     conn = CKYCardConnection_Create(cardCtxt);
+-    assert(conn);
+     if (!conn) {
+         goto done;
+     }
+@@ -752,19 +744,16 @@ static void PR_CALLBACK BlinkTimer(void
+         const char *readerName = NULL;
+   
+         CKYCardContext *cardCtxt = CKYCardContext_Create(SCARD_SCOPE_USER);
+-        assert(cardCtxt);
+         if (!cardCtxt) {
+             goto done;
+         }
+   
+         conn = CKYCardConnection_Create(cardCtxt);
+-        assert(conn);
+         if (!conn) {
+             goto done;
+         }
+ 
+         readerName = GetReaderNameForKeyID(&params->mKey);
+-        assert(readerName);
+         if (!readerName) {
+             goto done;
+         }
+@@ -1336,7 +1325,6 @@ HRESULT CoolKeyGetIssuerInfo(const CoolK
+ 
+     CKYCardContext *cardCtxt = CKYCardContext_Create(SCARD_SCOPE_USER);
+ 
+-    assert(cardCtxt);
+     if (!cardCtxt) {
+         CoolKeyLogMsg( PR_LOG_ERROR, "%s Attempting to get key issuer info. Can't create Card Context !.\n",GetTStamp(tBuff,56));
+         result = E_FAIL;
+@@ -1344,7 +1332,6 @@ HRESULT CoolKeyGetIssuerInfo(const CoolK
+     }
+ 
+     conn = CKYCardConnection_Create(cardCtxt);
+-    assert(conn);
+     if (!conn) {
+         CoolKeyLogMsg( PR_LOG_ERROR, "%s Attempting to get key issuer info.  Can't create Card Connection!\n",GetTStamp(tBuff,56));
+         result = E_FAIL;
+@@ -1352,7 +1339,6 @@ HRESULT CoolKeyGetIssuerInfo(const CoolK
+     }
+ 
+     readerName = GetReaderNameForKeyID(aKey);
+-    assert(readerName);
+     if (!readerName) {
+         CoolKeyLogMsg( PR_LOG_ERROR, "%s Attempting to get key issuer info.  Can't get reader name!\n",GetTStamp(tBuff,56));
+         result = E_FAIL;

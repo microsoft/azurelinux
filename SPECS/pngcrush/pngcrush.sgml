@@ -1,0 +1,549 @@
+<!doctype refentry PUBLIC "-//Davenport//DTD DocBook V3.0//EN" [
+
+  <!-- Fill in your name for FIRSTNAME and SURNAME. -->
+  <!ENTITY dhfirstname "<firstname>David</firstname>">
+  <!ENTITY dhsurname   "<surname>Whedon</surname>">
+  <!-- Please adjust the date whenever revising the manpage. -->
+  <!ENTITY dhdate      "<date>Mon Apr 30, 2001</date>">
+  <!-- SECTION should be 1-8, maybe w/ subsection other parameters are
+       allowed: see man(7), man(1). -->
+  <!ENTITY dhsection   "<manvolnum>1</manvolnum>">
+  <!ENTITY dhemail     "<email>dwhedon@gordian.com</email>">
+  <!ENTITY dhusername  "David Whedon">
+  <!ENTITY dhucpackage "<refentrytitle>pngcrush</refentrytitle>">
+  <!ENTITY pngc   "<command>pngcrush</command>">
+
+  <!ENTITY debian      "<productname>Debian GNU/Linux</productname>">
+  <!ENTITY gnu         "<acronym>GNU</acronym>">
+]>
+
+<refentry>
+  <docinfo>
+    <address>
+      &dhemail;
+    </address>
+    <author>
+      &dhfirstname;
+      &dhsurname;
+    </author>
+    <copyright>
+      <year>2000</year>
+      <holder>&dhusername;</holder>
+    </copyright>
+    &dhdate;
+  </docinfo>
+  <refmeta>
+    &dhucpackage;
+
+    &dhsection;
+  </refmeta>
+  <refnamediv>
+    <refname>pngcrush</refname>
+
+    <refpurpose>optimizes (or modifies) PNG (Portable Network Graphics) files.</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>pngcrush</command>
+    <!-- This looks a bit like gibberish  <arg><option>-already|-brute|-c <replaceable>n</replaceable>|-d <replaceable>dir</replaceable>|-double_gamma|-e <replaceable>ext</replaceable>|-f <replaceable>n</replaceable>|-fix|-force|-g <replaceable>n</replaceable>|-l <replaceable>n</replaceable>|-m <replaceable>n</replaceable>|-max <replaceable>size</replaceable>|-no_cc|-n|-plte_len <replaceable>n</replaceable>|-q|-rem <replaceable>chunk</replaceable>|-replace_gamma <replaceable>n</replaceable>|-res <replaceable>dpi</replaceable>|-srgb <replaceable>n</replaceable>|-t [b|a] <replaceable>keyword</replaceable> <replaceable>text</replaceable>|-trns <replaceable>i</replaceable> <replaceable>r</replaceable> <replaceable>g</replaceable> <replaceable>b</replaceable> <replaceable>g</replaceable>|-v|-version|-w <replaceable>n</replaceable>|-z <replaceable>n</replaceable>|-ztxt [b|a] <replaceable>keyword</replaceable> <replaceable>text</replaceable>|-h|-p</option></arg> -->
+      <arg><option><replaceable>options</replaceable></option></arg>
+      <arg>infile.png</arg>
+      <arg>outfile.png</arg>
+    </cmdsynopsis>
+    <cmdsynopsis>
+      <command>pngcrush -e <replaceable>ext</replaceable></command>
+      <arg><option><replaceable>options</replaceable></option></arg>
+      <arg>file1.png</arg>
+      <arg>file2.png</arg>
+      	<command>...</command>
+    </cmdsynopsis>
+    <cmdsynopsis>
+      <command>pngcrush -d <replaceable>dir</replaceable></command>
+      <arg><option><replaceable>options</replaceable></option></arg>
+      <arg>file1.png</arg>
+      <arg>file2.png</arg>
+      	<command>...</command>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+  <refsect1>
+    <title>DESCRIPTION</title>
+<para> &pngc; is an optimizer for <acronym>PNG</acronym> (Portable Network Graphics) files.  Its
+main purpose is to reduce the size of the file's <acronym>IDAT</acronym> chunk (or stream).  &pngc; can also be used to modify a PNG's ancillary chunks (example: transparency information or textual comments). Some familiarity with the PNG (pronounced 'ping') format may be helpful to users of &pngc;. &pngc; has reasonable defaults so running with no options may produce smaller files.  This document briefly describes the PNG format where necessary to understand &pngc;.  For complete documentation, see :</para>
+<simplelist>
+<member>http://www.libpng.org/pub/png/. </>
+</simplelist>
+ <para>The actual pixel data of a PNG is contained in one or many IDAT chunks. To make an IDAT chunk PNG encoders take the raw pixel data, filter it with one of 5 different filters (See Section <xref linkend="filtertypes">) then compress it.  &pngc; reduces the size of <acronym>PNG</acronym> files by choosing a different filter or compression methods from those used in the input file.  &pngc; tries multiple filter/compression methods and compares the size of the resulting IDAT chunk.  The filter/compression method with the smallest IDAT chunk is chosen for the output file.  The filter and compression levels &pngc; tries are controlled by command line options.  All of the filter methods and compression levels are lossless; they will not reduce image quality.</para>
+ <para>In addition to reducing the size of a PNG file, &pngc; can modify ancillary chunks.   Ancillary chunks are optional information including transparency (tRNS), gamma (gAMMA), standard RGB color space conformance (sRGB) or textual information (iTXt, tEXt or zTXt).  See the associated command line options for details on manipulating these chunks.</para>
+  </refsect1>
+  <refsect1>
+    <title>OPTIONS</title>
+    <variablelist>
+      <varlistentry>
+        <term><option>-already <replaceable>size</replaceable></option>
+        </term>
+        <listitem>
+          <para>If file has an IDAT chunk greater than the integer <replaceable>size</replaceable>, it will be considered to be already crushed and will not be processed further.</para>
+        </listitem>
+      </varlistentry>
+<varlistentry>
+<term><option>-bit_depth <replaceable>n</replaceable></option></term>
+<listitem>
+<para>
+Force output bit depth to <replaceable>n</replaceable>. See Section <xref linkend="colortypes">for bit depth restrictions.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-bkgd <replaceable>r</replaceable> <replaceable>g</replaceable> <replaceable>b</replaceable></option></term>
+<listitem>
+<para>
+Specify the default background color for the image.  Some PNG viewers will use this background when displaying the image. Background is specified by <replaceable>r</replaceable>, <replaceable>g</replaceable> and <replaceable>b</replaceable> integers between 0 and (2&caret;bitdepth)-1. For output color type 0 and 4 (gray, see section <xref linkend="colortypes">) the green index is used as the gray level of the background.  
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-brute</option></term>
+<listitem>
+<para>
+Use brute force, try 114 different filter/compression methods [11-124]. This option is very time-consuming and generally not worthwhile. You can restrict this option to certain filter types, compression levels, or strategies by following it with <option>-f <replaceable>filter</replaceable></option>,  <option>-l <replaceable>level</replaceable></option>, or <option>-z <replaceable>strategy</replaceable></option>. For example:</para>
+<simplelist>
+    <member>&pngc; -brute -f 0 infile.png</>
+</simplelist>
+<para>
+Will try only methods that use filter type 0.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-c type</option></term>
+<listitem>
+<para>
+Set the output image color type to <replaceable>type</replaceable>, one of [0, 2, 4, or 6] (see section <xref linkend="colortypes">).  Future versions of &pngc; will also allow color type 3, if there are 256 or fewer colors present in the input file.  Color types 4 and 6 are padded with an opaque alpha channel if the input file does not have alpha information. You can use 0 or 4 to convert color to grayscale. Use 0 or 2 to delete an unwanted alpha channel. Default is to use same color type as the input file.
+</para>
+</listitem>
+</varlistentry>
+<!-- Currently disabled
+<varlistentry>
+<term><option>-cc</option></term>
+<listitem>
+<para>
+Color counting. This option is currently disabled. This option allows &pngc; to perform further optimizations on the image based on the number of colors and the format of the input image.  With this option &pngc; will remove an alpha channel from an opaque image and/or will reduce a true color image that is completely gray to grayscale representation.
+</para>
+</listitem>
+</varlistentry>
+-->
+<varlistentry>
+<term><option>-d <replaceable>dir</replaceable></option></term>
+<listitem>
+<para>
+Specify a directory for all output files. All output files will have the same name as their respective input files.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-dou</option></term>
+<listitem>
+<para>
+Double the images gamma.  This is used for fixing gamma in PhotoShop 5.0c5.02 files. It has been claimed that the PS5 bug is actually more complex than that, in some unspecified way.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-e <replaceable>ext</replaceable></option></term>
+<listitem>
+<para>
+Specify a new extension <replaceable>ext</replaceable> for all output files.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-exit</option></term>
+<listitem>
+<para>
+Forces &pngc; to call exit() rather than return() when it is finished. It is unclear to this writer why this option exists.
+</para>
+</listitem>
+</varlistentry>
+<!-- What is this?<varlistentry>
+<term><option>-fast</option></term>
+<listitem>
+<para>
+Try two fast filters.
+</para>
+</listitem>
+</varlistentry>-->
+<varlistentry>
+<term><option>-f <replaceable>filter</replaceable></option></term>
+<listitem>
+<para>
+Specify <replaceable>filter</replaceable> (see section <xref linkend="filtertypes">) to use with the method specified in the preceding <option>-m</option> or <option>-brute</option> option.  Valid filter types are [0-4] : use specified filter, [5]: use adaptive filtering. 
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-fix</option></term>
+<listitem>
+<para>
+Fix otherwise fatal conditions such as bad CRCs. The CRC (Cyclic Redundancy Check) is present in every chunk and can alert the decoder of corrupt data. 
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-force</option></term>
+<listitem>
+<para>
+Write a new output file even if larger than input. Otherwise the input file will be copied to output if it is smaller than any generated file and no chunk additions, removals, or changes were requested.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-g <replaceable>gamma</replaceable></option></term>
+<listitem>
+<para>
+Value to insert in gAMA chunk, only if the input file has no gAMA chunk.  To replace an existing gAMA chunk, use the <option>-replace_gamma</option> option.  Some decoders will use the gAMA chunk to more accurately display the image. <replaceable>gamma</replaceable> relates the output intensity to the input samples (input_sample = light_out^GAMMA).  <replaceable>gamma</replaceable> can be any integer between 0 and 2^32 and is interpreted as GAMMA*100000. For example, if you wanted a GAMMA of 1/2.2, you would enter 45455 for <replaceable>gamma</replaceable>.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-h</option></term>
+<listitem>
+<para>
+Display help and legal notices.
+</para>
+</listitem>
+</varlistentry>
+<!-- What is this? <varlistentry>
+<term><option>-huffman</option></term>
+<listitem>
+<para>
+Try all filters with huffman.
+</para>
+</listitem>
+</varlistentry> -->
+<varlistentry>
+<term><option>-itxt b|a <replaceable>keyword</replaceable> <replaceable>text</replaceable></option></term> 
+<listitem>
+<para>
+Insert an (uncompressed) iTXt chunk. <option>b|a</option> indicates whether chunk should be inserted <emphasis>b</emphasis>efore or <emphasis>a</emphasis>fter the IDAT chunk, (see Section <xref linkend="textchunks">). 
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-keep <replaceable>chunk_name</replaceable></option></term>
+<listitem>
+<para>
+keep named chunk <replaceable>chunk_name</replaceable> even if the PNG datastream becomes invalid. Currently only <replaceable>dSIG</replaceable> is recognized as an acceptable value.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-l <replaceable>level</replaceable></option></term>
+<listitem>
+<para>
+zlib compression <replaceable>level</replaceable> to use on the filtered IDAT chunk with the method specified by the preceding <option>-m</option> or <option>-brute</option> option. zlib compression levels are integers between 0 and 9.  0 = no compression, 1 = fastest compression, and 9 = best compression. 
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-loco</option></term>
+<listitem>
+<para>
+Make the file more compressible by performing a lossless, reversible, color transformation. The resulting file is a MNG format file, not a PNG, and should be given the <replaceable>.mng</replaceable> file extension. The <option>loco</option> option has no effect on grayscale or indexed-color PNG files.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-m <replaceable>method</replaceable></option></term>
+<listitem>
+<para>
+&pngc; <replaceable>method</replaceable> [0-200] to try (0 means try all of 1-10). Can be repeated as in <option>-m 1 -m 4 -m 7</option>. This can be useful if you run out of memory when &pngc; tries methods 2, 3, 5, 6, 8, 9, or 10 which use filtering and are memory intensive.  Method 1, 4, and 7 use no filtering; methods 11 and up use specified filter, compression level, and strategy.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-max <replaceable>maximum_IDAT_size</replaceable></option></term>
+<listitem>
+<para>
+Set the maximum idat size to be used when creating the compression buffer.[1 through 524288]
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-mng</option></term>
+<listitem>
+<para>
+write a new MNG, do not crush embedded PNGs.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-n</option></term>
+<listitem>
+<para>
+Do not do compression or write output file. This is useful in conjunction with the <option>-v</option> option to get info, or to test decode speed.
+</para>
+</listitem>
+</varlistentry>
+<!-- Colour counting currently disabled
+<varlistentry>
+<term><option>-no_cc</option></term>
+<listitem>
+<para>
+No color counting, see the <option>-cc</option> option.
+</para>
+</listitem>
+</varlistentry>
+-->
+<varlistentry>
+<term><option>-p</option></term>
+<listitem>
+<para>
+This option tells &pngc; to pause and wait for [enter] key whenever the screen fills.
+    </para>  
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-plte_len <replaceable>n</replaceable></option></term>
+<listitem>
+<para>
+Truncates the PLTE. The PLTE chunk contains from 1 to 256 palette entries. Be sure not to truncate it to less than the greatest index present in IDAT.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-q</option></term>
+<listitem>
+<para>
+quiet, the opposite of verbose.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-rem <replaceable>chunkname</replaceable></option></term>
+<listitem>
+<para>
+Name of an ancillary chunk or optional <acronym>PLTE</acronym> to be removed. Be careful with
+this.  Please don't use this feature to remove transparency, gamma, copyright,
+or other valuable information.  To remove several different chunks, repeat:
+<option>-rem tEXt -rem pHYs</option>.  Known chunks (those in the PNG spec or extensions document) can be named with all lower-case letters, so <option>-rem bkgd</option> is
+equivalent to <option>-rem bKGD</option>.  But note: <option>-rem text</option> removes all forms of text
+chunks; Exact case is required to remove unknown chunks.  To do surgery with a
+chain-saw, <option>-rem alla</option> removes all known ancillary chunks except for tRNS, and
+<option>-rem allb</option> removes all but tRNS and gAMA.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-replace_gamma <replaceable>gamma</replaceable></option></term>
+<listitem>
+<para>
+Force a specified <replaceable>gamma</replaceable> in the output file even if gAMA is present in the input. See the <option>-g</option> for more information.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-res <replaceable>dpi</replaceable></option></term>
+<listitem>
+<para>
+Write a pHYs chunk with a resolution of <replaceable>dpi</replaceable>.  The pHYs chunk indicates the desired pixel size. 
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-save</option></term>
+<listitem>
+<para>
+Force writing of unknown chunks.  If the input image has chunks that are not part of the PNG specification, they should not be discarded.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-srgb <replaceable>n</replaceable></option></term>
+<listitem>
+<para>
+Set value of rendering intent for sRGB chunk to <replaceable>n</replaceable> where <replaceable>n</replaceable> is between 0 and 3. The appropriate rendering intent depends on how the image will be used: 
+<simplelist>
+<member>0 - Perceptual: when good adaptation to the output device gamut at the expense of colorimetric accuracy is desired, example: photographs. </>
+<member>1 - Relative colorimetric: images requiring color appearance matching (relative to the output device white point), example: logos. </>
+<member>2: Saturation: preservation of saturation at the expense of hue and lightness is preferred, example: charts and graphs. </>
+<member>3: Absolute colorimetric: images requiring preservation of absolute colorimetry, example: proofs (previews of images destined for a different output device). </>
+</simplelist>
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-text [b|a] <replaceable>keyword</replaceable> <replaceable>text</replaceable></option></term>
+<listitem>
+<para>
+Insert a tEXt chunk. <option>[b|a]</option> indicates whether chunk should be inserted <emphasis>b</emphasis>efore or <emphasis>a</emphasis>fter the IDAT chunk, (see Section <xref linkend="textchunks">). 
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-newtimestamp</option></term>
+<listitem>
+<para>
+Reset file modification time to newer time stamp. This is the default.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-oldtimestamp</option></term>
+<listitem>
+<para>
+Retain input file modification time stamp. The default is <option>-newtimestamp</option> which is the opposite of this option.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-trns <replaceable>index</replaceable> <replaceable>red</replaceable> <replaceable>green</replaceable> <replaceable>blue</replaceable> <replaceable>gray</replaceable></option></term>
+<listitem>
+<para>
+Insert a tRNS (transparency) chunk, if no tRNS chunk found in file.  You must give all five parameters regardless of the color type, scaled to the output bit depth. See the PNG documentation for details.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-trns_array <replaceable>n</replaceable> <replaceable>trns[0]</replaceable> <replaceable>trns[1]</replaceable> <command>...</command> <replaceable>trns[n-1]</replaceable> </option></term>
+<listitem>
+<para>
+Insert a tRNS (transparency) chunk, if no tRNS chunk found in file. See the PNG documentation for details.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-v</option></term>
+<listitem>
+<para>
+Display more detailed information. Repeat the option (use "-v -v") for even more.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-w <replaceable>size</replaceable></option></term>
+<listitem>
+<para>
+Specify <replaceable>size</replaceable> in kbytes (or bytes in the case of 512) of the sliding
+compression window where size is one of [32, 16, 8, 4, 2, 1, or 512]. It's best to
+use the default (32) unless you run out of memory.  The program will use a
+smaller window anyway when the uncompressed file is smaller than 16k.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-z <replaceable>strategy</replaceable></option></term>
+<listitem>
+<para>
+Specify the zlib compression <replaceable>strategy</replaceable> [0, 1, or 2] to be used on the filtered IDAT chunk for the method of the preceding <option>-m</option>.  The zlib strategy parameter tunes the compression algorithm and is one of:   
+<itemizedlist>
+<listitem><para>0 : default, most compression is aimed towards string matching</></>
+<listitem><para>1 : some string matching, some Huffman coding</></>
+<listitem><para>2 : use only Huffman coding</></>
+</itemizedlist>
+</para>
+</listitem>
+</varlistentry>
+<!--<varlistentry>
+<term><option>-version</option></term>
+<listitem>
+<para>
+Display the &pngc; version.
+</para>
+</listitem>
+</varlistentry>-->
+<varlistentry>
+<term><option>-zitxt [b|a] <replaceable>keyword</> <replaceable>text</></option></term>
+<listitem>
+<para>
+Insert a zTXt chunk. <option>[b|a]</option> indicates whether chunk should be inserted <emphasis>b</emphasis>efore or <emphasis>a</emphasis>fter the IDAT chunk, (see Section <xref linkend="textchunks">). 
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-ztxt [b|a] <replaceable>keyword</> <replaceable>text</></option></term>
+<listitem>
+<para>
+zTXt chunk to insert (see -text).
+</para>
+</listitem>
+</varlistentry>
+    </variablelist>
+  </refsect1>
+<refsect1 id="colortypes">
+<title>Color Types</title>
+
+<para>The PNG specification provides for five color types.  The color type determines how the IDAT chunk will be interpreted by the decoder.  Choosing a color type appropriate for the color information in an image can in principle reduce the size. However, certain combinations of <option>-c</option> and <option>-bit_depth</option> require color counting which is currently disabled. In such cases no reduction will take place. Following are the PNG color types followed by their supported bit depths (Note &pngc; does not support changing a file to color type 3 from another color type.):</para>
+<itemizedlist>
+<listitem><para>0 : grayscale without alpha channel (1,2,4,8,16)</></>
+<listitem><para>2 : true color without alpha channel (8,16)</></>
+<listitem><para>3 : indexed color (1,2,4,8)</></>
+<listitem><para>4 : grayscale with alpha channel (8,16)</></>
+<listitem><para>6 : true color with alpha channel (8,16)</></>
+</itemizedlist>
+<para>
+An alpha channel represents transparency on a per pixel basis. An alpha value of zero is completely transparent. An alpha channel of 2^bitdepth-1 is completely opaque. 
+	</para>
+</refsect1>
+<refsect1 id="filtertypes">
+<title>Filter Types</title>
+<para>
+The IDAT chunk can optionally be filtered before compression.  These filters can make the IDAT chunk more compressible without losing any data and result in a smaller PNG file.  These filters are applied to the bytes of the IDAT chunk, not the pixels. Following is a brief description of the filters, see the PNG specification for details:
+</para>
+<itemizedlist>
+<listitem><para>0 : no filter</></>
+<listitem><para>1 : 'sub' transmits the difference between each byte and the value of the corresponding byte of the prior pixel. </></>
+<listitem><para>2 : 'up' transmits the difference between each byte and the value of the corresponding byte of the pixel above this pixel</></>
+<listitem><para>3 : 'average' transmits the difference between each byte and the average of the bytes described in filters 1 and 2</></>
+<listitem><para>4 : 'paeth' computes a simple linear function of the corresponding byte in three neighboring pixels (paeth_predictor = left + above - upper left), then transmits the difference between the byte in question and the neighboring byte closest to the value of paeth_predictor.</></>
+</itemizedlist>
+</refsect1>
+<refsect1 id="textchunks">
+<title>Text Chunks</title>
+<para>Textual information pertaining to an image can be conveyed with the tEXt, iTXt and zTXt chunks. All text chunks consist of a keyword followed by a string.  The following keywords are defined in the PNG specification: (you may invent keywords for other purposes):</para>
+<simplelist>
+<member><emphasis>Title</>: Short title or caption for image</>
+<member><emphasis>Author</>: Name of image's creator</>
+<member><emphasis>Description</>: Longer description of image</>
+<member><emphasis>Copyright</>: Copyright notice</>
+<member><emphasis>Creation Time</>: Time of original image creation</>
+<member><emphasis>Software</>: Software used to create the image</>
+<member><emphasis>Disclaimer</>: Legal disclaimer</>
+<member><emphasis>Warning</>: Warning of nature of content</>
+<member><emphasis>Source</>: Device used to create the image</>
+<member><emphasis>Comment</>: Miscellaneous comment.</>
+</simplelist>
+<para>A tEXt chunk stores text in the ISO/IEC 8859-1 (Latin-1) character set.  zTXt chunks also use the Latin-1 character set, but the text is compressed.  This can be useful for large text chunks.  iTXt chunks consist of text in the UTF-8 of the Unicode character set.</para>
+<para>
+<replaceable>keyword</replaceable> must be at least 1 character and less than 80 characters.  <replaceable>text</replaceable> must be less than 2048  characters when using &pngc;  For  now,  you can only add ten tEXt, iTXt, or zTXt chunks per &pngc; run.
+</para>
+</refsect1>
+<refsect1>
+    <title>SEE ALSO</title>
+    <para>png(5), libpng(3), zlib(3).</para>
+  </refsect1>
+  <refsect1>
+    <title>AUTHOR</title>
+
+    <para>This manual page was written by &dhusername; &dhemail; for
+      the &debian; system (but may be used by others).  Much of the 
+      	information was gleaned from "PNG (Portable Network Graphics) Specification, Version 1.2"</para>
+
+  </refsect1>
+</refentry>
+
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: sgml
+sgml-omittag:t
+sgml-shorttag:t
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:2
+sgml-indent-data:t
+sgml-parent-document:nil
+sgml-default-dtd-file:nil
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->

@@ -1,0 +1,8 @@
+--- termcolor-1.4.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ termcolor-1.4.1/Cargo.toml	2024-01-10T15:57:15.677677+00:00
+@@ -36,5 +36,3 @@
+ 
+ [dev-dependencies]
+ 
+-[target."cfg(windows)".dependencies.winapi-util]
+-version = "0.1.3"

@@ -1,0 +1,49 @@
+From 6ee1c8b32582d78397acb00e20c92af1cfbe9249 Mon Sep 17 00:00:00 2001
+From: Andreas Metzler <ametzler@debian.org>
+Date: Thu, 9 May 2024 13:57:27 +0200
+Subject: Do not use OCB mode even if AEAD: OCB key preference is set.
+
+Origin: vendor
+Forwarded: not-needed
+Last-Update: 2024-05-09
+
+(overrideable with --force-ocb)
+---
+ g10/encrypt.c             | 6 ++++++
+ tests/openpgp/encrypt.scm | 2 +-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/g10/encrypt.c b/g10/encrypt.c
+index b335b9797..1ca89d946 100644
+--- a/g10/encrypt.c
++++ b/g10/encrypt.c
+@@ -358,6 +358,12 @@ use_aead (pk_list_t pk_list, int algo)
+         }
+       return AEAD_ALGO_OCB;
+     }
++  else
++    {
++    /* Ignore AEAD: OCB key preference unless --force-ocb is set. It is
++     * a LibrePGP feature.  */
++      return 0;
++    }
+ 
+   /* AEAD does only work with 128 bit cipher blocklength.  */
+   if (!can_use)
+diff --git a/tests/openpgp/encrypt.scm b/tests/openpgp/encrypt.scm
+index ef2f7b0bc..a44f5cad1 100755
+--- a/tests/openpgp/encrypt.scm
++++ b/tests/openpgp/encrypt.scm
+@@ -88,7 +88,7 @@
+  (lambda (source)
+    (tr:do
+     (tr:open source)
+-    (tr:gpgstatus "" `(--yes -e
++    (tr:gpgstatus "" `(--yes -e --force-ocb
+                        -r ,"patrice.lumumba"
+                        -r ,"mahsa.amini"))
+     (tr:call-with-content
+-- 
+2.43.0
+
+

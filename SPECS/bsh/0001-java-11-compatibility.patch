@@ -1,0 +1,27 @@
+From 9b83372c64f30f44bd56696ae6adcbe6a83e1e2f Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Mon, 20 Jul 2020 21:28:13 +0200
+Subject: [PATCH 1/1] java 11 compatibility
+
+---
+ src/bsh/util/AWTConsole.java | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/bsh/util/AWTConsole.java b/src/bsh/util/AWTConsole.java
+index e88fbff..fbb237b 100644
+--- a/src/bsh/util/AWTConsole.java
++++ b/src/bsh/util/AWTConsole.java
+@@ -214,8 +214,8 @@ public class AWTConsole extends TextArea
+ 		Great.  What a piece of crap.
+ 	*/
+ 	public void setCaretPosition( int pos ) {
+-		((java.awt.peer.TextComponentPeer)getPeer()).setCaretPosition( 
+-			pos + countNLs() );
++		//((java.awt.peer.TextComponentPeer)getPeer()).setCaretPosition( 
++		//	pos + countNLs() );
+ 	}
+ 
+ 	/*
+-- 
+2.26.2
+

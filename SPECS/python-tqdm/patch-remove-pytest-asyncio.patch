@@ -1,0 +1,193 @@
+From 7d16722e6bf4bc5315dfa6256e38d88c0eb6e4ec Mon Sep 17 00:00:00 2001
+From: Neel Chauhan <neel@neelc.org>
+Date: Sun, 7 Sep 2025 15:47:02 -0400
+Subject: [PATCH] Remove pytest-asyncio
+
+---
+ environment.yml        |   1 -
+ pyproject.toml         |   7 +--
+ tests/tests_asyncio.py | 133 -----------------------------------------
+ 3 files changed, 3 insertions(+), 138 deletions(-)
+ delete mode 100644 tests/tests_asyncio.py
+
+diff --git a/environment.yml b/environment.yml
+index 89e0406..2a851cf 100644
+--- a/environment.yml
++++ b/environment.yml
+@@ -20,7 +20,6 @@ dependencies:
+ - pytest
+ - pytest-cov
+ - pytest-timeout
+-- pytest-asyncio>=0.24
+ - coverage
+ # extras
+ - dask               # dask
+diff --git a/pyproject.toml b/pyproject.toml
+index c31f86a..730947a 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -84,7 +84,7 @@ classifiers = [
+ dependencies = ['colorama; platform_system == "Windows"']
+ 
+ [project.optional-dependencies]
+-dev = ["pytest>=6", "pytest-cov", "pytest-timeout", "pytest-asyncio>=0.24", "nbval"]
++dev = ["pytest>=6", "pytest-cov", "pytest-timeout", "nbval"]
+ discord = ["requests"]
+ slack = ["slack-sdk"]
+ telegram = ["requests"]
+@@ -118,11 +118,10 @@ known_first_party = ["tqdm", "tests"]
+ minversion = "6.0"
+ timeout = 30
+ log_level = "INFO"
+-markers = ["asyncio", "slow"]
++markers = ["slow"]
+ python_files = ["tests_*.py", "tests_*.ipynb"]
+ testpaths = ["tests"]
+-addopts = "-v --tb=short -rxs -W=error --durations=0 --durations-min=0.1 --asyncio-mode=strict"
+-asyncio_default_fixture_loop_scope = "function"
++addopts = "-v --tb=short -rxs -W=error --durations=0 --durations-min=0.1"
+ 
+ [tool.coverage.run]
+ branch = true
+diff --git a/tests/tests_asyncio.py b/tests/tests_asyncio.py
+deleted file mode 100644
+index 250e658..0000000
+--- a/tests/tests_asyncio.py
++++ /dev/null
+@@ -1,133 +0,0 @@
+-"""Tests `tqdm.asyncio`."""
+-import asyncio
+-from functools import partial
+-from sys import platform
+-from time import time
+-
+-from tqdm.asyncio import tarange, tqdm_asyncio
+-
+-from .tests_tqdm import StringIO, closing, mark
+-
+-tqdm = partial(tqdm_asyncio, miniters=0, mininterval=0)
+-trange = partial(tarange, miniters=0, mininterval=0)
+-as_completed = partial(tqdm_asyncio.as_completed, miniters=0, mininterval=0)
+-gather = partial(tqdm_asyncio.gather, miniters=0, mininterval=0)
+-
+-
+-def count(start=0, step=1):
+-    i = start
+-    while True:
+-        new_start = yield i
+-        if new_start is None:
+-            i += step
+-        else:
+-            i = new_start
+-
+-
+-async def acount(*args, **kwargs):
+-    for i in count(*args, **kwargs):
+-        yield i
+-
+-
+-@mark.asyncio
+-async def test_break():
+-    """Test asyncio break"""
+-    pbar = tqdm(count())
+-    async for _ in pbar:
+-        break
+-    pbar.close()
+-
+-
+-@mark.asyncio
+-async def test_generators(capsys):
+-    """Test asyncio generators"""
+-    with tqdm(count(), desc="counter") as pbar:
+-        async for i in pbar:
+-            if i >= 8:
+-                break
+-    _, err = capsys.readouterr()
+-    assert '9it' in err
+-
+-    acounter = acount()
+-    try:
+-        with tqdm(acounter, desc="async_counter") as pbar:
+-            async for i in pbar:
+-                if i >= 8:
+-                    break
+-    finally:
+-        await acounter.aclose()
+-    _, err = capsys.readouterr()
+-    assert '9it' in err
+-
+-
+-@mark.asyncio
+-async def test_range():
+-    """Test asyncio range"""
+-    with closing(StringIO()) as our_file:
+-        async for _ in tqdm(range(9), desc="range", file=our_file):
+-            pass
+-        assert '9/9' in our_file.getvalue()
+-        our_file.seek(0)
+-        our_file.truncate()
+-
+-        async for _ in trange(9, desc="trange", file=our_file):
+-            pass
+-        assert '9/9' in our_file.getvalue()
+-
+-
+-@mark.asyncio
+-async def test_nested():
+-    """Test asyncio nested"""
+-    with closing(StringIO()) as our_file:
+-        async for _ in tqdm(trange(9, desc="inner", file=our_file),
+-                            desc="outer", file=our_file):
+-            pass
+-        assert 'inner: 100%' in our_file.getvalue()
+-        assert 'outer: 100%' in our_file.getvalue()
+-
+-
+-@mark.asyncio
+-async def test_coroutines():
+-    """Test asyncio coroutine.send"""
+-    with closing(StringIO()) as our_file:
+-        with tqdm(count(), file=our_file) as pbar:
+-            async for i in pbar:
+-                if i == 9:
+-                    pbar.send(-10)
+-                elif i < 0:
+-                    assert i == -9
+-                    break
+-        assert '10it' in our_file.getvalue()
+-
+-
+-@mark.slow
+-@mark.asyncio
+-@mark.parametrize("tol", [0.2 if platform.startswith("darwin") else 0.1])
+-async def test_as_completed(capsys, tol):
+-    """Test asyncio as_completed"""
+-    for retry in range(3):
+-        t = time()
+-        skew = time() - t
+-        for i in as_completed([asyncio.sleep(0.01 * i) for i in range(30, 0, -1)]):
+-            await i
+-        t = time() - t - 2 * skew
+-        try:
+-            assert 0.3 * (1 - tol) < t < 0.3 * (1 + tol), t
+-            _, err = capsys.readouterr()
+-            assert '30/30' in err
+-        except AssertionError:
+-            if retry == 2:
+-                raise
+-
+-
+-async def double(i):
+-    return i * 2
+-
+-
+-@mark.asyncio
+-async def test_gather(capsys):
+-    """Test asyncio gather"""
+-    res = await gather(*map(double, range(30)))
+-    _, err = capsys.readouterr()
+-    assert '30/30' in err
+-    assert res == list(range(0, 30 * 2, 2))
+-- 
+2.51.0
+

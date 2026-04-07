@@ -1,0 +1,216 @@
+From 694d19ff14017926454771cbb63a22355b72f1bf Mon Sep 17 00:00:00 2001
+From: Faraz Shahbazker <faraz.shahbazker@imgtec.com>
+Date: Tue, 3 Feb 2015 13:07:55 -0800
+Subject: [PATCH] Fix missing includes and return statements in test sources
+
+Fix warnings while compiling test cases by adding missing #includes and
+return statements. Missing arguments provided for functions wait()/wcswidth()
+---
+ testsuite/ltrace.main/filters.exp            | 1 +
+ testsuite/ltrace.main/main-internal.exp      | 4 +++-
+ testsuite/ltrace.main/main-threaded.c        | 1 +
+ testsuite/ltrace.main/parameters.c           | 1 +
+ testsuite/ltrace.main/parameters2.exp        | 2 +-
+ testsuite/ltrace.main/parameters3.exp        | 2 ++
+ testsuite/ltrace.main/system_call_params.exp | 4 ++++
+ testsuite/ltrace.minor/attach-process.exp    | 1 +
+ testsuite/ltrace.minor/libdl-simple.c        | 2 ++
+ testsuite/ltrace.minor/time-record.c         | 1 +
+ testsuite/ltrace.minor/trace-clone.c         | 2 ++
+ testsuite/ltrace.minor/trace-fork.c          | 4 +++-
+ testsuite/ltrace.minor/wchar.exp             | 3 ++-
+ testsuite/ltrace.torture/vfork-thread.c      | 1 +
+ 14 files changed, 25 insertions(+), 4 deletions(-)
+
+diff --git a/testsuite/ltrace.main/filters.exp b/testsuite/ltrace.main/filters.exp
+index 988346f..f7f4140 100644
+--- a/testsuite/ltrace.main/filters.exp
++++ b/testsuite/ltrace.main/filters.exp
+@@ -22,6 +22,7 @@ set libfilt1 [ltraceCompile libfilt1.so [ltraceSource c {
+ }]]
+ 
+ set libfilt2 [ltraceCompile libfilt2.so [ltraceSource c {
++    #include <stdio.h>
+     void func2(void) { puts("func2"); }
+ }]]
+ 
+diff --git a/testsuite/ltrace.main/main-internal.exp b/testsuite/ltrace.main/main-internal.exp
+index 0ca5e14..112c69b 100644
+--- a/testsuite/ltrace.main/main-internal.exp
++++ b/testsuite/ltrace.main/main-internal.exp
+@@ -19,11 +19,13 @@
+ set bin [ltraceCompile {} [ltraceSource c {
+     __attribute__((noinline)) void this(void) {}
+     __attribute__((noinline)) void that(void) {}
+-    int main(int i) {
++    int main() {
++	int i;
+ 	for (i = 0; i < 12; ++i) {
+ 	    this();
+ 	    that();
+ 	}
++	return 0;
+     }
+ }]]
+ 
+diff --git a/testsuite/ltrace.main/parameters.c b/testsuite/ltrace.main/parameters.c
+index a3d8bb5..aa862b9 100644
+--- a/testsuite/ltrace.main/parameters.c
++++ b/testsuite/ltrace.main/parameters.c
+@@ -17,6 +17,7 @@ void func_intptr_ret(int *i);
+ int func_strlen(char*);
+ void func_strfixed(char*);
+ void func_ppp(int***);
++void func_string(char*);
+ void func_stringp(char**);
+ void func_short(short, short);
+ void func_ushort(unsigned short, unsigned short);
+diff --git a/testsuite/ltrace.main/parameters2.exp b/testsuite/ltrace.main/parameters2.exp
+index 9850079..1c7b3b4 100644
+--- a/testsuite/ltrace.main/parameters2.exp
++++ b/testsuite/ltrace.main/parameters2.exp
+@@ -17,7 +17,7 @@
+ # 02110-1301 USA
+ 
+ set trivial [ltraceCompile {} [ltraceSource c {
+-    int main(void) {}
++    int main(void) {return 0;}
+ }]]
+ 
+ ltraceMatch1 [ltraceRun -L -F [ltraceSource conf {
+diff --git a/testsuite/ltrace.main/parameters3.exp b/testsuite/ltrace.main/parameters3.exp
+index 693c219..f6d9116 100644
+--- a/testsuite/ltrace.main/parameters3.exp
++++ b/testsuite/ltrace.main/parameters3.exp
+@@ -29,8 +29,10 @@ set liba [ltraceCompile liba.so [ltraceSource c {
+ }]]
+ 
+ set bin [ltraceCompile {} $liba [ltraceSource c {
++    extern void fun(void);
+     int main(void) {
+ 	fun();
++	return 0;
+     }
+ }]]
+ 
+diff --git a/testsuite/ltrace.main/system_call_params.exp b/testsuite/ltrace.main/system_call_params.exp
+index 2ccf840..f3a55d2 100644
+--- a/testsuite/ltrace.main/system_call_params.exp
++++ b/testsuite/ltrace.main/system_call_params.exp
+@@ -17,12 +17,15 @@
+ # 02110-1301 USA
+ 
+ set bin [ltraceCompile {} [ltraceSource c {
++    #ifndef _GNU_SOURCE
+     #define _GNU_SOURCE
++    #endif
+     #include <sys/types.h>
+     #include <sys/stat.h>
+     #include <fcntl.h>
+     #include <unistd.h>
+     #include <sys/syscall.h>   /* For SYS_xxx definitions */
++    #include <sys/mount.h>
+ 
+     #ifndef SYS_open
+     # if defined(__aarch64__)
+@@ -38,6 +41,7 @@ set bin [ltraceCompile {} [ltraceSource c {
+ 	syscall(SYS_open, "/some/path", O_RDONLY);
+ 	write(1, "something", 10);
+ 	mount("source", "target", "filesystemtype", 0, 0);
++	return 0;
+     }
+ }]]
+ 
+diff --git a/testsuite/ltrace.minor/attach-process.exp b/testsuite/ltrace.minor/attach-process.exp
+index 2c7d20c..c050f21 100644
+--- a/testsuite/ltrace.minor/attach-process.exp
++++ b/testsuite/ltrace.minor/attach-process.exp
+@@ -21,6 +21,7 @@ set bin [ltraceCompile {} [ltraceSource c {
+     int main(void) {
+ 	sleep(5);
+ 	sleep(1);
++	return 0;
+     }
+ }]]
+ 
+diff --git a/testsuite/ltrace.minor/libdl-simple.c b/testsuite/ltrace.minor/libdl-simple.c
+index 0bef5cf..b1be002 100644
+--- a/testsuite/ltrace.minor/libdl-simple.c
++++ b/testsuite/ltrace.minor/libdl-simple.c
+@@ -1,6 +1,7 @@
+ #include <stdlib.h>
+ #include <stdio.h>
+ #include <dlfcn.h>
++#include <string.h>
+ 
+ int main(int argc, char **argv) {
+ 	void *handle;
+@@ -21,4 +22,5 @@ int main(int argc, char **argv) {
+ 
+ 	printf("%d\n", test(5));
+ 	dlclose(handle);
++	return 0;
+ }
+diff --git a/testsuite/ltrace.minor/time-record.c b/testsuite/ltrace.minor/time-record.c
+index a66b838..7d5e5e3 100644
+--- a/testsuite/ltrace.minor/time-record.c
++++ b/testsuite/ltrace.minor/time-record.c
+@@ -5,6 +5,7 @@
+    This file was written by Yao Qi <qiyao@cn.ibm.com>.  */
+ #include <stdio.h>
+ #include <time.h>
++#include <unistd.h>
+ 
+ #define SLEEP_COUNT 2
+ #define NANOSLEEP_COUNT 50
+diff --git a/testsuite/ltrace.minor/trace-clone.c b/testsuite/ltrace.minor/trace-clone.c
+index ded930c..6aab235 100644
+--- a/testsuite/ltrace.minor/trace-clone.c
++++ b/testsuite/ltrace.minor/trace-clone.c
+@@ -3,7 +3,9 @@
+    clone called.
+ 
+    This file was written by Yao Qi <qiyao@cn.ibm.com>.  */
++#ifndef _GNU_SOURCE
+ #define _GNU_SOURCE
++#endif
+ #include <stdio.h>
+ #include <sys/types.h>
+ #include <stdlib.h>
+diff --git a/testsuite/ltrace.minor/trace-fork.c b/testsuite/ltrace.minor/trace-fork.c
+index c5f0c71..9611184 100644
+--- a/testsuite/ltrace.minor/trace-fork.c
++++ b/testsuite/ltrace.minor/trace-fork.c
+@@ -6,6 +6,8 @@
+ 
+ #include <stdio.h>
+ #include <sys/types.h>
++#include <unistd.h>
++#include <sys/wait.h>
+ 
+ void 
+ child ()
+@@ -27,7 +29,7 @@ main ()
+   else
+     {
+       printf("My child pid is %d\n",pid);
+-      wait(); 
++      wait(NULL);
+     }
+   return 0;
+ }
+diff --git a/testsuite/ltrace.torture/vfork-thread.c b/testsuite/ltrace.torture/vfork-thread.c
+index f909bd3..4c118a6 100644
+--- a/testsuite/ltrace.torture/vfork-thread.c
++++ b/testsuite/ltrace.torture/vfork-thread.c
+@@ -13,6 +13,7 @@ routine (void *data)
+       puts ("bleble");
+       sleep (1);
+     }
++  return NULL;
+ }
+ 
+ 
+-- 
+2.1.0
+

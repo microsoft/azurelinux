@@ -1,0 +1,98 @@
+From fcc50604359a05e24003f3ff51c3812d8f307814 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20Men=C5=A1=C3=ADk?= <pemensik@redhat.com>
+Date: Wed, 6 Nov 2024 21:29:47 +0100
+Subject: [PATCH] Allow always IDN input in dig
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Even when stdout is non-interactive terminal, allow unicode characters
+to be encoded into ACE form. Still disable IDN output, but unless
++noidnin or IDN_DISABLE=1 env is detected, consider input as locale
+defined name.
+
+Provides more isolated change, which issue #3527 introduced similar
+behavior into 9.19 with more changes.
+
+Ignore input IDN errors when stdout is not terminal
+
+Attempt to prevent visible regressions when enabling IDN on input
+always. Instead of new hard failures preventing IDN decoding of input
+name just use original input.
+
+Should make the change backward compatible. When on interactive terminal
+behave the same way as before and emit hard errors. Become more
+forgiving in scripts where stdout leads to script. Decoding output is
+not enabled there and if input decoding fails, just use input as it was.
+
+Change dig manual +idnin
+
+Note in manual IDN input is always enabled. But it silently ignores
+errors when stdout is not a terminal to prevent regressions.
+
+Signed-off-by: Petr Menšík <pemensik@redhat.com>
+---
+ bin/dig/dig.rst   |  5 ++---
+ bin/dig/dighost.c | 16 ++++++++++++----
+ 2 files changed, 14 insertions(+), 7 deletions(-)
+
+diff --git a/bin/dig/dig.rst b/bin/dig/dig.rst
+index 88b0a40307..e2bf3764d3 100644
+--- a/bin/dig/dig.rst
++++ b/bin/dig/dig.rst
+@@ -453,9 +453,8 @@ abbreviation is unambiguous; for example, :option:`+cd` is equivalent to
+    This option processes [or does not process] IDN domain names on input. This requires
+    ``IDN SUPPORT`` to have been enabled at compile time.
+ 
+-   The default is to process IDN input when standard output is a tty.
+-   The IDN processing on input is disabled when :program:`dig` output is redirected
+-   to files, pipes, and other non-tty file descriptors.
++   The default is to process IDN input. The input IDN processing errors are ignored
++   when :program:`dig` output is redirected to files, pipes, and other non-tty file descriptors.
+ 
+ .. option:: +idnout, +noidnout
+ 
+diff --git a/bin/dig/dighost.c b/bin/dig/dighost.c
+index 0f8ac1335c..1307346192 100644
+--- a/bin/dig/dighost.c
++++ b/bin/dig/dighost.c
+@@ -604,7 +604,7 @@ dig_lookup_t *
+ make_empty_lookup(void) {
+ 	dig_lookup_t *looknew;
+ #ifdef HAVE_LIBIDN2
+-	bool idn_allowed = isatty(1) ? (getenv("IDN_DISABLE") == NULL) : false;
++	bool idn_allowed = (getenv("IDN_DISABLE") == NULL);
+ #endif /* HAVE_LIBIDN2 */
+ 
+ 	debug("make_empty_lookup()");
+@@ -623,7 +623,7 @@ make_empty_lookup(void) {
+ 		.badcookie = true,
+ #ifdef HAVE_LIBIDN2
+ 		.idnin = idn_allowed,
+-		.idnout = idn_allowed,
++		.idnout = isatty(1) && idn_allowed,
+ #endif /* HAVE_LIBIDN2 */
+ 		.udpsize = -1,
+ 		.edns = -1,
+@@ -4871,8 +4871,16 @@ idn_locale_to_ace(const char *src, char *dst, size_t dstlen) {
+ 		res = idn2_to_ascii_lz(src, &ascii_src, IDN2_TRANSITIONAL);
+ 	}
+ 	if (res != IDN2_OK) {
+-		fatal("'%s' is not a legal IDNA2008 name (%s), use +noidnin",
+-		      src, idn2_strerror(res));
++		if (isatty(1)) {
++			fatal("'%s' is not a legal IDNA2008 name (%s), use +noidnin",
++			      src, idn2_strerror(res));
++		} else {
++			/* In case of non-terminal output silently ignore errors
++			 * in IDN input decoding. */
++			(void)strlcpy(dst, src, dstlen);
++			resetlocale(LC_ALL);
++			return;
++		}
+ 	}
+ 
+ 	/*
+-- 
+2.50.1
+

@@ -1,0 +1,145 @@
+From 2f18ccbffee237845c0b3c2d745d20ac66748f8a Mon Sep 17 00:00:00 2001
+From: Olivier Fourdan <ofourdan@redhat.com>
+Date: Fri, 27 Jun 2025 12:11:41 +0200
+Subject: [PATCH 2/2] Xm/Screen: Add _GTK_WORKAREAS support for multi-monitor
+
+Add support for the GTK property _GTK_WORKAREAS to prevent Motif from
+placing its widgets outside of the geometry advertised by the window
+manager on a multi-monitor setup.
+
+Unlike the extended window manager hint _NET_WORKAREA which defines a
+single rectangle for the whole screen spanning across all the monitors,
+_GTK_WORKAREAS provides an area per monitor, making that property more
+adequate on a multi-monitor setup.
+
+However, if _GTK_WORKAREAS is not supported, we fallback to the standard
+_NET_WORKAREA property.
+
+Support for _GTK_WORKAREAS depends on the Xinerama patches as it shares
+the same logic.
+
+Signed-off-by: Olivier Fourdan <ofourdan@redhat.com>
+---
+ lib/Xm/Screen.c | 92 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 91 insertions(+), 1 deletion(-)
+
+diff --git a/lib/Xm/Screen.c b/lib/Xm/Screen.c
+index 6269ffb3..d8d24e9a 100644
+--- a/lib/Xm/Screen.c
++++ b/lib/Xm/Screen.c
+@@ -1554,6 +1554,91 @@ _XmScreenGetCurrentDesktop(Screen *screen)
+   return desktop;
+ }
+ 
++static Boolean
++_XmCheckGtkWorkareas(
++        Screen *screen,
++	Position pt_x,
++	Position pt_y,
++	Position *ret_x,
++	Position *ret_y,
++	Position *ret_max_x,
++	Position *ret_max_y )
++{
++    Atom          XmA_GTK_WORKAREAS;
++    Atom          type;
++    Display       *dpy;
++    Window        rootwindow;
++    int           result = False;
++    int           desktop = 0;
++    int           format;
++    unsigned long lengthRtn;
++    unsigned long bytesAfter;
++    unsigned char *data;
++    long          *gtk_workareas;
++    char          atom_name[32];
++    int           monitor, n_monitors;
++    Position      tmp_x, tmp_y;
++    Position      tmp_max_x, tmp_max_y;
++    Boolean       ret = False;
++
++    dpy = DisplayOfScreen(screen);
++    rootwindow = RootWindowOfScreen(screen);
++    desktop = _XmScreenGetCurrentDesktop(screen);
++
++    snprintf(atom_name, sizeof(atom_name), "_GTK_WORKAREAS_D%d", desktop);
++    XmA_GTK_WORKAREAS = XInternAtom(dpy, atom_name, False);
++
++    result = XGetWindowProperty(dpy, rootwindow,
++                                XmA_GTK_WORKAREAS,
++                                0L, 100000L, False, XA_CARDINAL,
++                                &type, &format, &lengthRtn, &bytesAfter,
++                                &data);
++
++    if (result != Success || type != XA_CARDINAL || format != 32 ||
++      bytesAfter != 0 || lengthRtn % 4 != 0) {
++      goto done;
++    }
++
++    gtk_workareas = (long *) data;
++    n_monitors = lengthRtn / 4;
++
++#define GTK_WORKAREA_X (monitor * 4)
++#define GTK_WORKAREA_Y (monitor * 4 + 1)
++#define GTK_WORKAREA_WIDTH (monitor * 4 + 2)
++#define GTK_WORKAREA_HEIGHT (monitor * 4 + 3)
++
++    for (monitor = 0; monitor < n_monitors; ++monitor) {
++      tmp_x = gtk_workareas[GTK_WORKAREA_X];
++      tmp_y = gtk_workareas[GTK_WORKAREA_Y];
++      tmp_max_x = tmp_x + gtk_workareas[GTK_WORKAREA_WIDTH];
++      tmp_max_y = tmp_y + gtk_workareas[GTK_WORKAREA_HEIGHT];
++
++      if (pt_x >= tmp_x && pt_x < tmp_max_x && pt_y >= tmp_y && pt_y < tmp_max_y) {
++        *ret_x = tmp_x;
++        *ret_y = tmp_y;
++        *ret_max_x = tmp_max_x;
++        *ret_max_y = tmp_max_y;
++        ret = True;
++        break; /* We have a match */
++      }
++    }
++
++#undef GTK_WORKAREA_X
++#undef GTK_WORKAREA_Y
++#undef GTK_WORKAREA_WIDTH
++#undef GTK_WORKAREA_HEIGHT
++
++#ifdef DEBUG_XINERAMA
++    printf("Point (%i,%i) constrained by _GTK_WORKAREAS_D%d within (%i,%i) and (%i,%i)\n",
++           pt_x, pt_y, desktop, *ret_x, *ret_y, *ret_max_x, *ret_max_y);
++#endif /* DEBUG_XINERAMA */
++
++done:
++    if (data)
++        XFree(data);
++    return ret;
++}
++
+ static void
+ _XmCheckNetWorkarea(
+         Screen *screen,
+@@ -1637,6 +1722,7 @@ _XmScreenGetBoundariesAtpoint(
+     XmDisplay	xmDisplay;
+     Position screen_x, screen_y;
+     Position screen_max_x, screen_max_y;
++    Boolean check_gtk_workarea;
+ #ifdef HAVE_LIBXINERAMA
+     Position tmp_x, tmp_y;
+     Position tmp_max_x, tmp_max_y;
+@@ -1668,7 +1754,11 @@ _XmScreenGetBoundariesAtpoint(
+       }
+     }
+ #endif /* HAVE_LIBXINERAMA */
+-    _XmCheckNetWorkarea(screen, &screen_x, &screen_y, &screen_max_x, &screen_max_y);
++    check_gtk_workarea = _XmCheckGtkWorkareas(screen, pt_x, pt_y,
++                                              &screen_x, &screen_y,
++                                              &screen_max_x, &screen_max_y);
++    if (!check_gtk_workarea)
++      _XmCheckNetWorkarea(screen, &screen_x, &screen_y, &screen_max_x, &screen_max_y);
+ out:
+ #ifdef DEBUG_XINERAMA
+     printf("Point (%i,%i) constrained within (%i,%i) and (%i,%i)\n",
+-- 
+2.50.0
+

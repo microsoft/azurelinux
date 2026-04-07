@@ -1,0 +1,2122 @@
+From 984e245fd21ff6e0058403f620f760013a744a3a Mon Sep 17 00:00:00 2001
+From: Jakub Jelen <jjelen@redhat.com>
+Date: Fri, 7 Jun 2024 14:42:33 +0200
+Subject: [PATCH 1/7] rsa: Do not accept invalid PKCS#1.5 padding when
+ deciphering
+
+The current code can accept 0-length padding when deciphering
+PKCS#1.5 ciphertext. This is against the specification and hopefully
+nobody depends on this.
+
+--
+* cipher/rsa-common.c (_gcry_rsa_pkcs1_decode_for_enc): Fail for too
+  short padding.
+* src/const-time.h (ct_lt_s): New.
+
+Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+---
+ cipher/rsa-common.c | 2 ++
+ src/const-time.h    | 6 ++++++
+ 2 files changed, 8 insertions(+)
+
+diff --git a/cipher/rsa-common.c b/cipher/rsa-common.c
+index 1920eedd..e45cb30d 100644
+--- a/cipher/rsa-common.c
++++ b/cipher/rsa-common.c
+@@ -247,6 +247,8 @@ _gcry_rsa_pkcs1_decode_for_enc (unsigned char **r_result, size_t *r_resultlen,
+ 
+   failed |= not_found;
+   n0 += ct_is_zero (not_found); /* Skip the zero byte.  */
++  /* the valid padding is at least 8 bytes -- the plaintext needs to start at index 11 or later */
++  failed |= ct_lt_s (n0, 11);
+ 
+   /* To avoid an extra allocation we reuse the frame buffer.  The only
+      caller of this function will anyway free the result soon.  */
+diff --git a/src/const-time.h b/src/const-time.h
+index 46eb187d..245967eb 100644
+--- a/src/const-time.h
++++ b/src/const-time.h
+@@ -34,6 +34,12 @@ extern volatile unsigned int _gcry_ct_vone;
+ #endif
+ 
+ 
++static inline size_t
++ct_lt_s (size_t a, size_t b)
++{
++  return ((a ^ ((a ^ b) | ((a - b) ^ b))) >> (sizeof(size_t) * 8 - 1));
++}
++
+ /*
+  * Return 0 if A is 0 and return 1 otherwise.
+  */
+-- 
+2.46.0
+
+
+From aca5bd25e819b2596754fdc6ecb1844462a5b4f0 Mon Sep 17 00:00:00 2001
+From: Jakub Jelen <jjelen@redhat.com>
+Date: Wed, 10 Apr 2024 15:18:39 +0200
+Subject: [PATCH 2/7] rsa: Constant time blinding removal
+
+* cipher/rsa.c (secret_blinded): Use constant time mulm implementation
+* configure.ac: New configure option --enable-marvin-workaround
+* mpi/Makefile.am: Build constant time multiplication
+* mpi/mpi-internal.h: Add constant time function prototypes
+* mpi/mpi-mul-cs.c: New file with constant time multiplication and
+  modulo.
+* mpi/mpi-mul.c (_gcry_mpi_mul_sec): New function.
+  (_gcry_mpi_mod_sec): New function.
+  (_gcry_mpi_mod_sec): New function.
+  (_gcry_mpi_reverse_sec): New function.
+  (_gcry_mpi_mulm_sec): New function.
+* src/gcrypt-int.h: Add new functions.
+
+--
+
+The current MPI code is not constant time, potentially leaking plaintext
+when the attacker can observe enough decipher operations using RSA
+PKCS#1.5. This is described as a Marvin Attack:
+
+https://eprint.iacr.org/2023/1442
+
+Note, that this code is tested to be constant time only with the -O3
+optimization level.
+
+Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+---
+ cipher/rsa.c       |   4 +
+ configure.ac       |  16 +++
+ mpi/Makefile.am    |   4 +
+ mpi/mpi-internal.h |   6 ++
+ mpi/mpi-mul-cs.c   | 263 +++++++++++++++++++++++++++++++++++++++++++++
+ mpi/mpi-mul.c      | 169 +++++++++++++++++++++++++++++
+ src/gcrypt-int.h   |   6 ++
+ 7 files changed, 468 insertions(+)
+ create mode 100644 mpi/mpi-mul-cs.c
+
+diff --git a/cipher/rsa.c b/cipher/rsa.c
+index c7a809f4..2f735f9c 100644
+--- a/cipher/rsa.c
++++ b/cipher/rsa.c
+@@ -1197,7 +1197,11 @@ secret_blinded (gcry_mpi_t output, gcry_mpi_t input,
+   /* Undo blinding.  Here we calculate: y = (x * r^-1) mod n, where x
+    * is the blinded decrypted data, ri is the modular multiplicative
+    * inverse of r and n is the RSA modulus.  */
++#ifdef WITH_MARVIN_WORKAROUND
++  mpi_mulm_sec (output, output, ri, sk->n);
++#else
+   mpi_mulm (output, output, ri, sk->n);
++#endif /* WITH_MARVIN_WORKAROUND */
+ 
+   _gcry_mpi_release (r);
+   _gcry_mpi_release (ri);
+diff --git a/configure.ac b/configure.ac
+index 4c45de22..3f63b88e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -603,6 +603,22 @@ AC_ARG_ENABLE(jent-support,
+ 	      jentsupport=$enableval,jentsupport=yes)
+ AC_MSG_RESULT($jentsupport)
+ 
++AC_MSG_CHECKING([whether a Marvin workaround is requested])
++AC_ARG_ENABLE(marvin-workaround,
++              AS_HELP_STRING([--enable-marvin-workaround],
++                             [Enable Marvin workaround for constant time PKCS1.5 depadding]),
++              [with_marvin_workaround="$enableval"],
++              [with_marvin_workaround=no])
++AC_MSG_RESULT($with_marvin_workaround)
++if test "$with_marvin_workaround" = no ; then
++    WITH_MARVIN_WORKAROUND=''
++else
++    AC_DEFINE(WITH_MARVIN_WORKAROUND,1,
++              [Define to provide constant time PKCS1.5 depadding])
++fi
++AM_CONDITIONAL(WITH_MARVIN_WORKAROUND, test "x$with_marvin_workaround" != xno)
++AC_SUBST(WITH_MARVIN_WORKAROUND)
++
+ # Implementation of the --disable-padlock-support switch.
+ AC_MSG_CHECKING([whether padlock support is requested])
+ AC_ARG_ENABLE(padlock-support,
+diff --git a/mpi/Makefile.am b/mpi/Makefile.am
+index 6fe63fce..85679e08 100644
+--- a/mpi/Makefile.am
++++ b/mpi/Makefile.am
+@@ -181,3 +181,7 @@ EXTRA_libmpi_la_SOURCES = \
+               asm-common-aarch64.h \
+               asm-common-amd64.h \
+               asm-common-i386.h
++
++if WITH_MARVIN_WORKAROUND
++libmpi_la_SOURCES += mpi-mul-cs.c
++endif
+diff --git a/mpi/mpi-internal.h b/mpi/mpi-internal.h
+index 935bf3e1..39de5161 100644
+--- a/mpi/mpi-internal.h
++++ b/mpi/mpi-internal.h
+@@ -239,6 +239,12 @@ void _gcry_mpih_mul_karatsuba_case( mpi_ptr_t prodp,
+ 				 mpi_ptr_t vp, mpi_size_t vsize,
+ 				 struct karatsuba_ctx *ctx );
+ 
++#ifdef WITH_MARVIN_WORKAROUND
++/*-- mpih-mul-cs.c --*/
++void mul_cs(mpi_limb_t *ret, mpi_limb_t *a, mpi_limb_t *b, size_t n, mpi_limb_t *tmp);
++void mod_cs(mpi_limb_t *ret, mpi_limb_t *a, size_t anum, mpi_limb_t *mod, size_t modnum, mpi_limb_t *tmp);
++size_t mod_limb_numb(size_t anum, size_t modnum);
++#endif /* WITH_MARVIN_WORKAROUND */
+ 
+ /*-- mpih-mul_1.c (or xxx/cpu/ *.S) --*/
+ mpi_limb_t _gcry_mpih_mul_1( mpi_ptr_t res_ptr, mpi_ptr_t s1_ptr,
+diff --git a/mpi/mpi-mul-cs.c b/mpi/mpi-mul-cs.c
+new file mode 100644
+index 00000000..3f77ac94
+--- /dev/null
++++ b/mpi/mpi-mul-cs.c
+@@ -0,0 +1,263 @@
++/* Copyright (c) 2024, Hubert Kario, Red Hat
++ * Released under BSD 2-Clause License, see LICENSE for details
++ */
++#include <config.h>
++#include <stdint.h>
++#include <stddef.h>
++#include <sys/types.h>
++#include <string.h>
++#include "mpi-internal.h"
++#include "longlong.h"
++
++/* For multiplication we're using schoolbook multiplication,
++ * so if we have two numbers, each with 6 "digits" (words)
++ * the multiplication is calculated as follows:
++ *                        A B C D E F
++ *                     x  I J K L M N
++ *                     --------------
++ *                                N*F
++ *                              N*E
++ *                            N*D
++ *                          N*C
++ *                        N*B
++ *                      N*A
++ *                              M*F
++ *                            M*E
++ *                          M*D
++ *                        M*C
++ *                      M*B
++ *                    M*A
++ *                            L*F
++ *                          L*E
++ *                        L*D
++ *                      L*C
++ *                    L*B
++ *                  L*A
++ *                          K*F
++ *                        K*E
++ *                      K*D
++ *                    K*C
++ *                  K*B
++ *                K*A
++ *                        J*F
++ *                      J*E
++ *                    J*D
++ *                  J*C
++ *                J*B
++ *              J*A
++ *                      I*F
++ *                    I*E
++ *                  I*D
++ *                I*C
++ *              I*B
++ *         +  I*A
++ *         ==========================
++ *                        N*B N*D N*F
++ *                    + N*A N*C N*E
++ *                    + M*B M*D M*F
++ *                  + M*A M*C M*E
++ *                  + L*B L*D L*F
++ *                + L*A L*C L*E
++ *                + K*B K*D K*F
++ *              + K*A K*C K*E
++ *              + J*B J*D J*F
++ *            + J*A J*C J*E
++ *            + I*B I*D I*F
++ *          + I*A I*C I*E
++ *
++ *                1+1 1+3 1+5
++ *              1+0 1+2 1+4
++ *              0+1 0+3 0+5
++ *            0+0 0+2 0+4
++ *
++ *            0 1 2 3 4 5 6
++ * which requires n^2 multiplications and 2n full length additions
++ * as we can keep every other result of limb multiplication in two separate
++ * limbs
++ */
++
++typedef mpi_limb_t limb_t;
++#if BYTES_PER_MPI_LIMB == SIZEOF_UNSIGNED_LONG_LONG
++#define LIMB_BIT_SIZE 64
++#define LIMB_BYTE_SIZE 8
++#elif BYTES_PER_MPI_LIMB == SIZEOF_UNSIGNED_LONG
++#define LIMB_BIT_SIZE 32
++#define LIMB_BYTE_SIZE 4
++/* if we're on a 32 bit platform */
++#else
++#define LIMB_BIT_SIZE 16
++#define LIMB_BYTE_SIZE 2
++/*
++ * if the compiler doesn't have either a 128bit data type nor a "return
++ * high 64 bits of multiplication"
++ */
++#endif
++
++/* add two limbs with carry in, return carry out */
++static limb_t
++_add_limb (limb_t *ret, limb_t a, limb_t b, limb_t carry)
++{
++  limb_t carry1, carry2, t;
++  add_ssaaaa (carry1, t, 0, a, 0, carry);
++  add_ssaaaa (carry2, t, 0, b, 0, t);
++  *ret = t;
++  return carry1 + carry2;
++}
++
++/* add two numbers of the same size, return overflow
++ *
++ * add a to b, place result in ret; all arrays need to be n limbs long
++ * return overflow from addition (0 or 1)
++ */
++static limb_t
++add (limb_t *ret, limb_t *a, limb_t *b, size_t n)
++{
++  limb_t c = 0;
++  for (ssize_t i = n - 1; i > -1; i--)
++    {
++      c = _add_limb (&ret[i], a[i], b[i], c);
++    }
++  return c;
++}
++
++/* multiply two numbers of the same size
++ *
++ * multiply a by b, place result in ret; a and b need to be n limbs long
++ * ret needs to be 2*n limbs long, tmp needs to be 2 * n 2 limbs
++ * long
++ */
++void
++mul_cs (limb_t *ret, limb_t *a, limb_t *b, size_t n, limb_t *tmp)
++{
++  limb_t *r_odd, *r_even;
++  r_odd = tmp;
++  r_even = &tmp[2 * n];
++
++  for (size_t i = 0; i < 2 * n; i++)
++    {
++      ret[i] = 0;
++    }
++
++  for (size_t i=0; i<n; i++)
++    {
++      for (size_t k=0; k<i+n+1; k++)
++        {
++          r_even[k] = 0;
++          r_odd[k] = 0;
++        }
++      for (size_t j=0; j<n; j++)
++        {
++          /* place results from even and odd limbs in separate arrays so that
++           * we don't have to calculate overflow every time we get individual
++           * limb multiplication result */
++          if (j % 2 == 0)
++            {
++              umul_ppmm (r_even[i+j], r_even[i+j+1], a[i], b[j]);
++            }
++          else
++            {
++              umul_ppmm (r_odd[i+j], r_odd[i+j+1], a[i], b[j]);
++            }
++        }
++      /* skip the least significant limbs when adding multiples of
++       * more significant limbs (they're zero anyway) */
++      add (ret, ret, r_even, n+i+1);
++      add (ret, ret, r_odd, n+i+1);
++    }
++}
++
++/* modifies the value in place by performing a right shift by one bit */
++static void
++rshift1 (limb_t *val, size_t n)
++{
++  limb_t shift_in = 0, shift_out = 0;
++  for (size_t i = 0; i < n; i++)
++    {
++      shift_out = val[i] & 1;
++      val[i] = shift_in << (LIMB_BIT_SIZE-1) | (val[i] >> 1);
++      shift_in = shift_out;
++    }
++}
++
++/* copy from either a or b to ret based on flag
++ * when flag == 0, then copies from b
++ * when flag == 1, then copies from a
++ */
++static void
++cselect (limb_t flag, limb_t *ret, limb_t *a, limb_t *b, size_t n)
++{
++  /* would be more efficient with non volatile mask, but then gcc
++   * generates code with jumps */
++  limb_t mask1 = ct_limb_gen_mask (flag);
++  limb_t mask2 = ct_limb_gen_inv_mask (flag);
++  for (size_t i = 0; i < n; i++)
++    {
++      ret[i] = (mask1 & a[i]) | (mask2 & b[i]);
++    }
++}
++
++static limb_t
++_sub_limb (limb_t *ret, limb_t a, limb_t b, limb_t borrow)
++{
++  limb_t borrow1, borrow2, t;
++  sub_ddmmss (borrow1, t, 0, a, 0, borrow);
++  sub_ddmmss (borrow2, t, 0, t, 0, b);
++  *ret = t;
++  return -(borrow1 + borrow2);
++}
++
++/* place the result of a - b into ret, return the borrow bit.
++ * All arrays need to be n limbs long
++ */
++static limb_t
++sub (limb_t *ret, limb_t *a, limb_t *b, size_t n)
++{
++  limb_t borrow = 0;
++  for (ssize_t i=n-1; i>-1; i--)
++    {
++      borrow = _sub_limb (&ret[i], a[i], b[i], borrow);
++    }
++  return borrow;
++}
++
++/* return the number of limbs necessary to allocate for the mod() tmp operand */
++size_t
++mod_limb_numb (size_t anum, size_t modnum)
++{
++    return (anum + modnum) * 3;
++}
++
++/* calculate a % mod, place the result in ret
++ * size of a is defined by anum, size of ret and mod is modnum,
++ * size of tmp is returned by mod_limb_numb()
++ */
++void
++mod_cs (limb_t *ret, limb_t *a, size_t anum, limb_t *mod, size_t modnum, limb_t *tmp)
++{
++  limb_t *atmp, *modtmp, *rettmp;
++  limb_t res;
++
++  memset (tmp, 0, mod_limb_numb(anum, modnum) * LIMB_BYTE_SIZE);
++
++  atmp = tmp;
++  modtmp = &tmp[anum+modnum];
++  rettmp = &tmp[(anum+modnum)*2];
++
++  for (size_t i=modnum; i<modnum+anum; i++)
++    {
++      atmp[i] = a[i-modnum];
++    }
++  for (size_t i=0; i<modnum; i++)
++    {
++      modtmp[i] = mod[i];
++    }
++
++  for (size_t i=0; i<anum*LIMB_BIT_SIZE; i++)
++    {
++      rshift1 (modtmp, anum+modnum);
++      res = sub (rettmp, atmp, modtmp, anum+modnum);
++      cselect (res, atmp, atmp, rettmp, anum+modnum);
++    }
++
++  memcpy (ret, &atmp[anum], sizeof(limb_t)*modnum);
++}
+diff --git a/mpi/mpi-mul.c b/mpi/mpi-mul.c
+index e8e57475..e318f7da 100644
+--- a/mpi/mpi-mul.c
++++ b/mpi/mpi-mul.c
+@@ -203,6 +203,133 @@ _gcry_mpi_mul (gcry_mpi_t w, gcry_mpi_t u, gcry_mpi_t v)
+ 	_gcry_mpi_free_limb_space (tmp_limb, tmp_limb_nlimbs);
+ }
+ 
++#ifdef WITH_MARVIN_WORKAROUND
++static void
++_gcry_mpi_mul_sec (gcry_mpi_t w, gcry_mpi_t u, gcry_mpi_t v)
++{
++  mpi_size_t usize, vsize, wsize;
++  mpi_ptr_t up, vp, wp;
++  int usign, vsign, usecure, vsecure, sign_product;
++  int assign_wp = 0;
++  int clean_vp = 0;
++  mpi_ptr_t tmp_limb = NULL;
++  unsigned int tmp_limb_nlimbs = 0;
++
++  if (u->nlimbs < v->nlimbs)
++    { /* Swap U and V. */
++      usize = v->nlimbs;
++      usign = v->sign;
++      usecure = mpi_is_secure (v);
++      up    = v->d;
++      vsize = u->nlimbs;
++      vsign = u->sign;
++      vsecure = mpi_is_secure (u);
++      vp    = u->d;
++    }
++  else
++    {
++      usize = u->nlimbs;
++      usign = u->sign;
++      usecure = mpi_is_secure (u);
++      up    = u->d;
++      vsize = v->nlimbs;
++      vsign = v->sign;
++      vsecure = mpi_is_secure (v);
++      vp    = v->d;
++    }
++  sign_product = usign ^ vsign;
++  wp = w->d;
++
++  /* make sure u and v have the same length by extending the limbs to the larger one, now u */
++  if (usize != vsize)
++    {
++      mpi_limb_t *tmp_vp = mpi_alloc_limb_space (usize, vsecure);
++      clean_vp = 1;
++      MPN_ZERO (tmp_vp, (usize - vsize));
++      MPN_COPY (tmp_vp + (usize - vsize), vp, vsize);
++      vsize = usize;
++      vp = tmp_vp;
++    }
++
++  /* w == u */
++  /* Ensure W has space enough to store the result.  */
++  wsize = usize + vsize;
++  if (!mpi_is_secure (w) && (mpi_is_secure (u) || mpi_is_secure (v)))
++    {
++      /* w is not allocated in secure space but u or v is.  To make sure
++       * that no temporary results are stored in w, we temporary use
++       * a newly allocated limb space for w */
++      wp = mpi_alloc_limb_space( wsize, 1 );
++      assign_wp = 2; /* mark it as 2 so that we can later copy it back to
++                      * normal memory */
++    }
++  else if (w->alloced < wsize )
++    {
++      if (wp == up || wp == vp)
++        {
++          wp = mpi_alloc_limb_space (wsize, mpi_is_secure (w));
++          assign_wp = 1;
++        }
++      else
++        {
++          mpi_resize(w, wsize );
++          wp = w->d;
++        }
++    }
++  else
++    { /* Make U and V not overlap with W.        */
++      if (wp == up)
++        {
++          /* W and U are identical.  Allocate temporary space for U. */
++          tmp_limb_nlimbs = usize;
++          up = tmp_limb = mpi_alloc_limb_space (usize, usecure);
++          /* Is V identical too?  Keep it identical with U.  */
++          if (wp == vp)
++              vp = up;
++          /* Copy to the temporary space.  */
++          MPN_COPY (up, wp, usize);
++        }
++      else if (wp == vp)
++        {
++          /* W and V are identical.  Allocate temporary space for V. */
++          tmp_limb_nlimbs = vsize;
++          vp = tmp_limb = mpi_alloc_limb_space (vsize, vsecure);
++          /* Copy to the temporary space.  */
++          MPN_COPY (vp, wp, vsize);
++        }
++    }
++
++  if (!vsize)
++    wsize = 0;
++  else
++    {
++      mpi_limb_t *tmp = mpi_alloc_limb_space (wsize * 2, mpi_is_secure (w));
++      mul_cs (wp, up, vp, vsize, tmp);
++      _gcry_mpi_free_limb_space (tmp, wsize * 2);
++    }
++
++  if (clean_vp)
++    {
++      _gcry_mpi_free_limb_space (vp, vsize);
++    }
++  if (assign_wp)
++    {
++      if (assign_wp == 2)
++        {
++          /* copy the temp wp from secure memory back to normal memory */
++          mpi_ptr_t tmp_wp = mpi_alloc_limb_space (wsize, 0);
++          MPN_COPY (tmp_wp, wp, wsize);
++          _gcry_mpi_free_limb_space (wp, 0);
++          wp = tmp_wp;
++        }
++      _gcry_mpi_assign_limb_space (w, wp, wsize);
++    }
++  w->nlimbs = wsize;
++  w->sign = sign_product;
++  if (tmp_limb)
++      _gcry_mpi_free_limb_space (tmp_limb, tmp_limb_nlimbs);
++}
++#endif /* WITH_MARVIN_WORKAROUND */
+ 
+ void
+ _gcry_mpi_mulm (gcry_mpi_t w, gcry_mpi_t u, gcry_mpi_t v, gcry_mpi_t m)
+@@ -221,3 +348,45 @@ _gcry_mpi_mulm (gcry_mpi_t w, gcry_mpi_t u, gcry_mpi_t v, gcry_mpi_t m)
+   if (temp_m)
+     mpi_free(temp_m);
+ }
++
++#ifdef WITH_MARVIN_WORKAROUND
++static void
++_gcry_mpi_mod_sec (gcry_mpi_t ret, gcry_mpi_t a, gcry_mpi_t mod)
++{
++  size_t asize = a->nlimbs;
++  size_t modsize = mod->nlimbs;
++  size_t tmp_size = mod_limb_numb (asize, modsize);
++  mpi_limb_t *tmp_limb = mpi_alloc_limb_space (tmp_size, mpi_is_secure(a));
++  mod_cs (ret->d, a->d, asize, mod->d, modsize, tmp_limb);
++  /* cut the length to the mod size */
++  ret->nlimbs = mod->nlimbs;
++  _gcry_mpi_free_limb_space (tmp_limb, tmp_size);
++}
++
++/* The constant time code uses different order of the limbs ... */
++static void
++_gcry_mpi_reverse_sec (gcry_mpi_t w)
++{
++  for (size_t i = 0; i < w->nlimbs/2; i++)
++    {
++      mpi_limb_t t = w->d[i];
++      w->d[i] = w->d[w->nlimbs - i - 1];
++      w->d[w->nlimbs - i - 1] = t;
++    }
++}
++
++void
++_gcry_mpi_mulm_sec (gcry_mpi_t w, gcry_mpi_t u, gcry_mpi_t v, gcry_mpi_t m)
++{
++  /* w == u */
++  _gcry_mpi_reverse_sec (u);
++  _gcry_mpi_reverse_sec (v);
++  _gcry_mpi_reverse_sec (m);
++  _gcry_mpi_mul_sec (w, u, v);
++  _gcry_mpi_mod_sec (w, w, m);
++
++  /* get them back to the order the rest of the code expects */
++  _gcry_mpi_reverse_sec (w); /* -- this is the result */
++  _gcry_mpi_reverse_sec (m); /* -- this might be still used by the calling function */
++}
++#endif /* WITH_MARVIN_WORKAROUND */
+diff --git a/src/gcrypt-int.h b/src/gcrypt-int.h
+index 1b449281..7e9e9894 100644
+--- a/src/gcrypt-int.h
++++ b/src/gcrypt-int.h
+@@ -453,6 +453,9 @@ void _gcry_mpi_subm (gcry_mpi_t w, gcry_mpi_t u, gcry_mpi_t v, gcry_mpi_t m);
+ void _gcry_mpi_mul (gcry_mpi_t w, gcry_mpi_t u, gcry_mpi_t v);
+ void _gcry_mpi_mul_ui (gcry_mpi_t w, gcry_mpi_t u, unsigned long v );
+ void _gcry_mpi_mulm (gcry_mpi_t w, gcry_mpi_t u, gcry_mpi_t v, gcry_mpi_t m);
++#ifdef WITH_MARVIN_WORKAROUND
++void _gcry_mpi_mulm_sec (gcry_mpi_t w, gcry_mpi_t u, gcry_mpi_t v, gcry_mpi_t m);
++#endif /* WITH_MARVIN_WORKAROUND */
+ void _gcry_mpi_mul_2exp (gcry_mpi_t w, gcry_mpi_t u, unsigned long cnt);
+ void _gcry_mpi_div (gcry_mpi_t q, gcry_mpi_t r,
+                    gcry_mpi_t dividend, gcry_mpi_t divisor, int round);
+@@ -548,6 +551,9 @@ int _gcry_mpi_get_flag (gcry_mpi_t a, enum gcry_mpi_flag flag);
+ #define mpi_mul_2exp(w,u,v)    _gcry_mpi_mul_2exp ((w),(u),(v))
+ #define mpi_mul(w,u,v)         _gcry_mpi_mul ((w),(u),(v))
+ #define mpi_mulm(w,u,v,m)      _gcry_mpi_mulm ((w),(u),(v),(m))
++#ifdef WITH_MARVIN_WORKAROUND
++#define mpi_mulm_sec(w,u,v,m)  _gcry_mpi_mulm_sec ((w),(u),(v),(m))
++#endif /* WITH_MARVIN_WORKAROUND */
+ #define mpi_powm(w,b,e,m)      _gcry_mpi_powm ( (w), (b), (e), (m) )
+ #define mpi_tdiv(q,r,a,m)      _gcry_mpi_div ( (q), (r), (a), (m), 0)
+ #define mpi_fdiv(q,r,a,m)      _gcry_mpi_div ( (q), (r), (a), (m), -1)
+-- 
+2.46.0
+
+
+From 1b7b995c5f4cd48a3b98915826431efb41a927ce Mon Sep 17 00:00:00 2001
+From: Jakub Jelen <jjelen@redhat.com>
+Date: Fri, 26 Apr 2024 16:39:18 +0200
+Subject: [PATCH 3/7] Constant time conversion of the message to the SEXP
+
+* cipher/rsa.c (rsa_decrypt): Use constant time conversion to SEXP after
+  decryption.
+* src/const-time.c (_gcry_ct_memcpy): Constant time memcpy. New.
+* src/const-time.h (ct_lt): New.
+  (ct_char_gen{,_inv}_mask): New.
+* src/sexp.c (do_vsexp_sscan): Introduce constant time version of %b
+--
+
+The current conversion of the message back to the SEXP buffer leaks the
+length of the decrypted message. This introduces a constant-time variant
+that should run for the same time for any input length.
+
+Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+---
+ cipher/rsa.c     |  4 ++++
+ src/const-time.c | 28 ++++++++++++++++++++++++++--
+ src/const-time.h | 12 ++++++++++++
+ src/sexp.c       | 39 +++++++++++++++++++++++++++++++++------
+ 4 files changed, 75 insertions(+), 8 deletions(-)
+
+diff --git a/cipher/rsa.c b/cipher/rsa.c
+index 2f735f9c..52f2aa89 100644
+--- a/cipher/rsa.c
++++ b/cipher/rsa.c
+@@ -1519,7 +1519,11 @@ rsa_decrypt (gcry_sexp_t *r_plain, gcry_sexp_t s_data, gcry_sexp_t keyparms)
+       rc = _gcry_rsa_pkcs1_decode_for_enc (&unpad, &unpadlen, nbits, plain);
+       mpi_free (plain);
+       plain = NULL;
++#ifdef WITH_MARVIN_WORKAROUND
++      rc_sexp = sexp_build (&result, NULL, "(value %c)", (int)unpadlen, unpad, (nbits + 7) / 8);
++#else
+       rc_sexp = sexp_build (&result, NULL, "(value %b)", (int)unpadlen, unpad);
++#endif /* WITH_MARVIN_WORKAROUND */
+       *r_plain = sexp_null_cond (result, ct_is_not_zero (rc));
+       dummy = sexp_null_cond (result, ct_is_zero (rc));
+       sexp_release (dummy);
+diff --git a/src/const-time.c b/src/const-time.c
+index 0fb53a07..cecb1937 100644
+--- a/src/const-time.c
++++ b/src/const-time.c
+@@ -77,8 +77,8 @@ _gcry_ct_memmov_cond (void *dst, const void *src, size_t len,
+ 		      unsigned long op_enable)
+ {
+   /* Note: dual mask with AND/OR used for EM leakage mitigation */
+-  unsigned char mask1 = ct_ulong_gen_mask(op_enable);
+-  unsigned char mask2 = ct_ulong_gen_inv_mask(op_enable);
++  volatile unsigned char mask1 = ct_ulong_gen_mask(op_enable);
++  volatile unsigned char mask2 = ct_ulong_gen_inv_mask(op_enable);
+   unsigned char *b_dst = dst;
+   const unsigned char *b_src = src;
+   size_t i;
+@@ -86,3 +86,27 @@ _gcry_ct_memmov_cond (void *dst, const void *src, size_t len,
+   for (i = 0; i < len; i++)
+     b_dst[i] = (b_dst[i] & mask2) | (b_src[i] & mask1);
+ }
++
++/*
++ * Copy LEN bytes from memory area SRC to memory area DST. The
++ * bytes are read up to the BUFFER_LEN size to keep the operation
++ * not dependent on the message length (both SRC and DST buffers
++ * need to have this size!).
++ */
++void
++_gcry_ct_memcpy (void *dst, const void *src, size_t len, size_t buffer_len)
++{
++  unsigned char mask_a, mask_b;
++  unsigned char *b_dst = dst;
++  const unsigned char *b_src = src;
++  unsigned int writing;
++  size_t i;
++
++  for (i = 0; i < buffer_len; i++)
++    {
++      writing = ct_lt (i, len);
++      mask_b = ct_uchar_gen_inv_mask (writing);
++      mask_a = ct_uchar_gen_mask (writing);
++      b_dst[i] = (b_src[i] & mask_a) | (b_dst[i] & mask_b);
++    }
++}
+diff --git a/src/const-time.h b/src/const-time.h
+index 245967eb..74055a4b 100644
+--- a/src/const-time.h
++++ b/src/const-time.h
+@@ -26,6 +26,7 @@
+ #define ct_not_memequal _gcry_ct_not_memequal
+ #define ct_memequal _gcry_ct_memequal
+ #define ct_memmov_cond _gcry_ct_memmov_cond
++#define ct_memcpy _gcry_ct_memcpy
+ 
+ 
+ #ifndef HAVE_GCC_ASM_VOLATILE_MEMORY
+@@ -33,6 +34,14 @@ extern volatile unsigned int _gcry_ct_vzero;
+ extern volatile unsigned int _gcry_ct_vone;
+ #endif
+ 
++/*
++ * Return 1 if A < B and return 0 otherwise.
++ */
++static inline int
++ct_lt (unsigned int a, unsigned int b)
++{
++  return (a ^ ((a ^ b) | ((a - b) ^ b))) >> (sizeof(unsigned int)*8 - 1);
++}
+ 
+ static inline size_t
+ ct_lt_s (size_t a, size_t b)
+@@ -112,6 +121,7 @@ unsigned int _gcry_ct_memequal (const void *b1, const void *b2, size_t len);
+ DEFINE_CT_TYPE_GEN_MASK(uintptr, uintptr_t)
+ DEFINE_CT_TYPE_GEN_MASK(ulong, unsigned long)
+ DEFINE_CT_TYPE_GEN_MASK(int16, int16_t)
++DEFINE_CT_TYPE_GEN_MASK(uchar, unsigned char)
+ 
+ /*
+  * Return all bits set if A is 0 and return 1 otherwise.
+@@ -137,6 +147,7 @@ DEFINE_CT_TYPE_GEN_MASK(int16, int16_t)
+ DEFINE_CT_TYPE_GEN_INV_MASK(uintptr, uintptr_t)
+ DEFINE_CT_TYPE_GEN_INV_MASK(ulong, unsigned long)
+ DEFINE_CT_TYPE_GEN_INV_MASK(int16, int16_t)
++DEFINE_CT_TYPE_GEN_INV_MASK(uchar, unsigned char)
+ 
+ /*
+  *  Return A when OP_ENABLED=1
+@@ -172,5 +183,6 @@ sexp_null_cond (gcry_sexp_t w, unsigned long op_enable)
+  */
+ void _gcry_ct_memmov_cond (void *dst, const void *src, size_t len,
+ 			   unsigned long op_enable);
++void _gcry_ct_memcpy (void *dst, const void *src, size_t len, size_t buffer_len);
+ 
+ #endif /*GCRY_CONST_TIME_H*/
+diff --git a/src/sexp.c b/src/sexp.c
+index c77d0212..8e6c847f 100644
+--- a/src/sexp.c
++++ b/src/sexp.c
+@@ -31,6 +31,7 @@
+ 
+ #define GCRYPT_NO_MPI_MACROS 1
+ #include "g10lib.h"
++#include "const-time.h"
+ 
+ 
+ /* Notes on the internal memory layout.
+@@ -1079,6 +1080,10 @@ unquote_string (const char *string, size_t length, unsigned char *buf)
+  *	%d - integer stored as string (no autoswitch to secure allocation)
+  *      %b - memory buffer; this takes _two_ arguments: an integer with the
+  *           length of the buffer and a pointer to the buffer.
++ *      %c - memory buffer same as %b, but written in constant time; this
++ *           takes _three_ arguments: an integer with the length of the buffer,
++ *           a pointer to the buffer and the maximum length of the buffer
++ *           to avoid potential side channel leaking the buffer length.
+  *      %S - Copy an gcry_sexp_t here.  The S-expression needs to be a
+  *           regular one, starting with a parenthesis.
+  *           (no autoswitch to secure allocation)
+@@ -1204,7 +1209,7 @@ do_vsexp_sscan (gcry_sexp_t *retsexp, size_t *erroff,
+ 	    {
+ 	      switch (*p)
+ 		{
+-		case 'b': case 't': case 'v': case 'n': case 'f':
++		case 'b': case 'c': case 't': case 'v': case 'n': case 'f':
+ 		case 'r': case '"': case '\'': case '\\':
+ 		  quoted_esc = 0;
+ 		  break;
+@@ -1538,14 +1543,27 @@ do_vsexp_sscan (gcry_sexp_t *retsexp, size_t *erroff,
+ 	      memcpy (c.pos, astr, alen);
+ 	      c.pos += alen;
+ 	    }
+-	  else if (*p == 'b')
++	  else if (*p == 'b' || *p == 'c')
+ 	    {
+ 	      /* Insert a memory buffer.  */
+ 	      const char *astr;
+-	      int alen;
++	      int alen, buflen = 0, reallen = 0;
+ 
+ 	      ARG_NEXT (alen, int);
+ 	      ARG_NEXT (astr, const char *);
++	      if (*p == 'c')
++	        {
++	          ARG_NEXT (buflen, int);
++	          if (buflen < alen)
++	            {
++	              *erroff = p - buffer;
++	              err = GPG_ERR_INV_ARG;
++	              goto leave;
++	            }
++	           /* Do all the calculations with the buflen */
++	           reallen = alen;
++	           alen = buflen;
++	         }
+ 
+               if (alen < 0)
+                 {
+@@ -1578,9 +1596,18 @@ do_vsexp_sscan (gcry_sexp_t *retsexp, size_t *erroff,
+ 		}
+ 
+ 	      *c.pos++ = ST_DATA;
+-	      STORE_LEN (c.pos, alen);
+-	      memcpy (c.pos, astr, alen);
+-	      c.pos += alen;
++	      if (*p == 'c')
++	        {
++	          STORE_LEN (c.pos, reallen);
++	          ct_memcpy (c.pos, astr, reallen, buflen);
++	          c.pos += reallen;
++	        }
++	      else
++	        {
++	          STORE_LEN (c.pos, alen);
++	          memcpy (c.pos, astr, alen);
++	          c.pos += alen;
++	        }
+ 	    }
+ 	  else if (*p == 'd')
+ 	    {
+-- 
+2.46.0
+
+
+From 14008d6f9f3985461ea50a6760391086c9bbe72b Mon Sep 17 00:00:00 2001
+From: Jakub Jelen <jjelen@redhat.com>
+Date: Thu, 30 May 2024 17:50:36 +0200
+Subject: [PATCH 5/7] rsa: Implement constant-time conversion of MPI to string
+
+--
+* cipher/rsa-common.c (_gcry_rsa_pkcs1_decode_for_enc): Replace
+  _gcry_mpi_print() with constant time operation.
+
+The _gcry_mpi_print() does a lot of housekeeping on the provided MPI
+including skipping all the leading zeroes. If the ciphertext decrypted
+to many leading zeroes, the output from this function is much shorter
+(could be even all zeroes), which would immediately fail.
+
+This implements the dummy conversion of the MPI with the knowledge that
+the encrypted data will always have the fixed length, providing constant
+time operation.
+
+Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+---
+ cipher/rsa-common.c | 35 ++++++++++++++++++++++++++++++++++-
+ 1 file changed, 34 insertions(+), 1 deletion(-)
+
+diff --git a/cipher/rsa-common.c b/cipher/rsa-common.c
+index e45cb30d..a61d82e3 100644
+--- a/cipher/rsa-common.c
++++ b/cipher/rsa-common.c
+@@ -28,6 +28,7 @@
+ #include "cipher.h"
+ #include "pubkey-internal.h"
+ #include "const-time.h"
++#include "bufhelp.h"
+ 
+ 
+ /* Turn VALUE into an octet string and store it in an allocated buffer
+@@ -199,7 +200,6 @@ gpg_err_code_t
+ _gcry_rsa_pkcs1_decode_for_enc (unsigned char **r_result, size_t *r_resultlen,
+                                 unsigned int nbits, gcry_mpi_t value)
+ {
+-  gcry_error_t err;
+   unsigned char *frame = NULL;
+   size_t nframe = (nbits+7) / 8;
+   size_t n, n0;
+@@ -208,6 +208,36 @@ _gcry_rsa_pkcs1_decode_for_enc (unsigned char **r_result, size_t *r_resultlen,
+ 
+   *r_result = NULL;
+ 
++  {
++#ifdef WITH_MARVIN_WORKAROUND
++  /* Allocate more to fit the whole MPI and allow moving it later to the right place */
++  size_t alloc_len = value->nlimbs * BYTES_PER_MPI_LIMB;
++  if ( !(frame = xtrymalloc_secure (alloc_len)))
++    return gpg_err_code_from_syserror ();
++
++  /* shovel the MPI content to the buffer as it is */
++  unsigned char *p = frame;
++  for (int i = value->nlimbs - 1; i >= 0; i--)
++    {
++      mpi_limb_t *alimb = &value->d[i];
++#if BYTES_PER_MPI_LIMB == 4
++      buf_put_be32 (p, *alimb);
++      p += 4;
++#elif BYTES_PER_MPI_LIMB == 8
++      buf_put_be64 (p, *alimb);
++      p += 8;
++#else
++#     error please implement for this limb size.
++#endif
++    }
++  /* Remove leading zeroes, but not all! Keep the buffer to the nframe length!
++   * -- valid PKCS#1.5 padding will never have different lengths, than modulus */
++  memmov_independently (frame, frame + (alloc_len - nframe), nframe, alloc_len);
++  n = 0;
++  failed |= ct_not_equal_byte (frame[n++], 0x00);
++#else
++  gcry_error_t err;
++
+   if ( !(frame = xtrymalloc_secure (nframe)))
+     return gpg_err_code_from_syserror ();
+ 
+@@ -235,6 +265,9 @@ _gcry_rsa_pkcs1_decode_for_enc (unsigned char **r_result, size_t *r_resultlen,
+   n = 0;
+   if (!frame[0])
+     n++;
++#endif
++  }
++
+   failed |= ct_not_equal_byte (frame[n++], 0x02);
+ 
+   /* Find the terminating zero byte.  */
+-- 
+2.46.0
+
+
+From 5c0b1707e48d21fa4d860b0bafdeaeb438885707 Mon Sep 17 00:00:00 2001
+From: Jakub Jelen <jjelen@redhat.com>
+Date: Fri, 31 May 2024 15:03:29 +0200
+Subject: [PATCH 6/7] cipher: Use the constant time conversion also for OAEP
+
+--
+* cipher/rsa-common.c (mpi_to_string): New function
+  (_gcry_rsa_pkcs1_decode_for_enc): Use new function for MPI to string
+  conversion.
+  (_gcry_rsa_oaep_decode): Use the new function for MPI to string
+  conversion.
+* cipher/rsa.c (rsa_decrypt): Use constant time conversion to S-exp for
+  OAEP padding.
+
+Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+---
+ cipher/rsa-common.c | 75 +++++++++++++++++++++++++++++++--------------
+ cipher/rsa.c        |  4 +++
+ 2 files changed, 56 insertions(+), 23 deletions(-)
+
+diff --git a/cipher/rsa-common.c b/cipher/rsa-common.c
+index a61d82e3..82a9e083 100644
+--- a/cipher/rsa-common.c
++++ b/cipher/rsa-common.c
+@@ -192,31 +192,26 @@ memmov_independently (void *dst, const void *src, size_t len, size_t buflen)
+ }
+ 
+ 
+-/* Decode a plaintext in VALUE assuming pkcs#1 block type 2 padding.
+-   NBITS is the size of the secret key.  On success the result is
+-   stored as a newly allocated buffer at R_RESULT and its valid length at
+-   R_RESULTLEN.  On error NULL is stored at R_RESULT.  */
+-gpg_err_code_t
+-_gcry_rsa_pkcs1_decode_for_enc (unsigned char **r_result, size_t *r_resultlen,
+-                                unsigned int nbits, gcry_mpi_t value)
++static unsigned char *
++mpi_to_string(gcry_mpi_t value, size_t nframe)
+ {
+   unsigned char *frame = NULL;
+-  size_t nframe = (nbits+7) / 8;
+-  size_t n, n0;
+-  unsigned int failed = 0;
+-  unsigned int not_found = 1;
++  unsigned char *p;
++  size_t noff;
++  /* Allocate memory to fit the whole MPI limbs and allow moving it later to the right place */
++  size_t alloc_len = value->nlimbs * BYTES_PER_MPI_LIMB;
+ 
+-  *r_result = NULL;
++  /* for too short input, we need to allocate at least modulus length (which might still be valid in case of OAEP) */
++  noff = (alloc_len < nframe) ? nframe - alloc_len : 0;
++  alloc_len = alloc_len + noff;
+ 
+-  {
+-#ifdef WITH_MARVIN_WORKAROUND
+-  /* Allocate more to fit the whole MPI and allow moving it later to the right place */
+-  size_t alloc_len = value->nlimbs * BYTES_PER_MPI_LIMB;
+   if ( !(frame = xtrymalloc_secure (alloc_len)))
+-    return gpg_err_code_from_syserror ();
++    return NULL;
+ 
++  if (noff)
++    memset (frame, 0, noff);
++  p = frame + noff;
+   /* shovel the MPI content to the buffer as it is */
+-  unsigned char *p = frame;
+   for (int i = value->nlimbs - 1; i >= 0; i--)
+     {
+       mpi_limb_t *alimb = &value->d[i];
+@@ -230,9 +225,34 @@ _gcry_rsa_pkcs1_decode_for_enc (unsigned char **r_result, size_t *r_resultlen,
+ #     error please implement for this limb size.
+ #endif
+     }
+-  /* Remove leading zeroes, but not all! Keep the buffer to the nframe length!
+-   * -- valid PKCS#1.5 padding will never have different lengths, than modulus */
++  /* Move the MPI to the right place -- with the least significant bytes aligned to the modulus length
++   * -- this might keep some leading zeroes at the beginning of the buffer, but this might be valid for OAEP */
+   memmov_independently (frame, frame + (alloc_len - nframe), nframe, alloc_len);
++  return frame;
++}
++
++/* Decode a plaintext in VALUE assuming pkcs#1 block type 2 padding.
++   NBITS is the size of the secret key.  On success the result is
++   stored as a newly allocated buffer at R_RESULT and its valid length at
++   R_RESULTLEN.  On error NULL is stored at R_RESULT.  */
++gpg_err_code_t
++_gcry_rsa_pkcs1_decode_for_enc (unsigned char **r_result, size_t *r_resultlen,
++                                unsigned int nbits, gcry_mpi_t value)
++{
++  unsigned char *frame = NULL;
++  size_t nframe = (nbits+7) / 8;
++  size_t n, n0;
++  unsigned int failed = 0;
++  unsigned int not_found = 1;
++
++  *r_result = NULL;
++
++  {
++#ifdef WITH_MARVIN_WORKAROUND
++  frame = mpi_to_string(value, nframe);
++  if (frame == NULL)
++    return gpg_err_code_from_syserror ();
++
+   n = 0;
+   failed |= ct_not_equal_byte (frame[n++], 0x00);
+ #else
+@@ -265,7 +285,7 @@ _gcry_rsa_pkcs1_decode_for_enc (unsigned char **r_result, size_t *r_resultlen,
+   n = 0;
+   if (!frame[0])
+     n++;
+-#endif
++#endif /* WITH_MARVIN_WORKAROUND */
+   }
+ 
+   failed |= ct_not_equal_byte (frame[n++], 0x02);
+@@ -709,14 +729,23 @@ _gcry_rsa_oaep_decode (unsigned char **r_result, size_t *r_resultlen,
+      happen due to the leading zero in OAEP frames and due to the
+      following random octets (seed^mask) which may have leading zero
+      bytes.  This all is needed to cope with our leading zeroes
+-     suppressing MPI implementation.  The code implictly implements
++     suppressing MPI implementation.  The code implicitly implements
+      Step 1b (bail out if NFRAME != N).  */
++#ifdef WITH_MARVIN_WORKAROUND
++  frame = mpi_to_string(value, nkey);
++  if (frame == NULL)
++    {
++      xfree (lhash);
++      return gpg_err_code_from_syserror ();
++    }
++#else
+   rc = octet_string_from_mpi (&frame, NULL, value, nkey);
+   if (rc)
+     {
+       xfree (lhash);
+       return GPG_ERR_ENCODING_PROBLEM;
+     }
++#endif /* WITH_MARVIN_WORKAROUND */
+   nframe = nkey;
+ 
+   /* Step 1c: Check that the key is long enough.  */
+@@ -731,7 +760,7 @@ _gcry_rsa_oaep_decode (unsigned char **r_result, size_t *r_resultlen,
+      gcry_mpi_aprint above.  */
+ 
+   /* Allocate space for SEED and DB.  */
+-  seed = xtrymalloc_secure (nframe - 1);
++  seed = xtrymalloc_secure (nframe);
+   if (!seed)
+     {
+       rc = gpg_err_code_from_syserror ();
+diff --git a/cipher/rsa.c b/cipher/rsa.c
+index 52f2aa89..c196724c 100644
+--- a/cipher/rsa.c
++++ b/cipher/rsa.c
+@@ -1537,7 +1537,11 @@ rsa_decrypt (gcry_sexp_t *r_plain, gcry_sexp_t s_data, gcry_sexp_t keyparms)
+                                   plain, ctx.label, ctx.labellen);
+       mpi_free (plain);
+       plain = NULL;
++#ifdef WITH_MARVIN_WORKAROUND
++      rc_sexp = sexp_build (&result, NULL, "(value %c)", (int)unpadlen, unpad, (nbits + 7) / 8);
++#else
+       rc_sexp = sexp_build (&result, NULL, "(value %b)", (int)unpadlen, unpad);
++#endif /* WITH_MARVIN_WORKAROUND */
+       *r_plain = sexp_null_cond (result, ct_is_not_zero (rc));
+       dummy = sexp_null_cond (result, ct_is_zero (rc));
+       sexp_release (dummy);
+-- 
+2.46.0
+
+
+From 4dffeaeadf792931aee61e6f51f59cf911c0c1f5 Mon Sep 17 00:00:00 2001
+From: Jakub Jelen <jjelen@redhat.com>
+Date: Mon, 29 Apr 2024 19:06:17 +0200
+Subject: [PATCH 7/7] Implement implicit rejection for PKCS#1.5 decipher
+
+--
+* cipher/pubkey-internal.h
+  (_gcry_rsa_pkcs1_decode_for_enc_implicit_rejection): New.
+* pubkey-util.c (_gcry_pk_util_parse_flaglist): Parse the new flag
+  no-implicit-rejection.
+* cipher/rsa-common.c (rsa_prf): New function.
+  (_gcry_rsa_pkcs1_decode_for_enc_implicit_rejection): New function.
+* cipher/rsa.c (rsa_decrypt): Handle implicit rejection.
+* src/cipher.h (pk_encoding): New flag.
+* tests/pkcs1v2.c (extract_cmp_data): Allow quiet test.
+  (check_v15crypt): Add support for implicit rejection.
+* tests/pkcs1v2-v15c.h: Add test vectors for implicit rejection.
+
+Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+---
+ cipher/pubkey-internal.h |   8 ++
+ cipher/pubkey-util.c     |   9 ++
+ cipher/rsa-common.c      | 181 +++++++++++++++++++++++
+ cipher/rsa.c             |  81 +++++++++++
+ src/cipher.h             |  37 ++---
+ src/const-time.c         |   2 +-
+ src/const-time.h         |   3 +-
+ tests/pkcs1v2-v15c.h     | 304 +++++++++++++++++++++++++++++++++++++++
+ tests/pkcs1v2.c          | 124 +++++++++++-----
+ 9 files changed, 692 insertions(+), 57 deletions(-)
+
+diff --git a/cipher/pubkey-internal.h b/cipher/pubkey-internal.h
+index acf45105..f66574fa 100644
+--- a/cipher/pubkey-internal.h
++++ b/cipher/pubkey-internal.h
+@@ -55,6 +55,14 @@ _gcry_rsa_pkcs1_encode_for_enc (gcry_mpi_t *r_result, unsigned int nbits,
+ gpg_err_code_t
+ _gcry_rsa_pkcs1_decode_for_enc (unsigned char **r_result, size_t *r_resultlen,
+                                 unsigned int nbits, gcry_mpi_t value);
++#ifdef WITH_MARVIN_WORKAROUND
++gpg_err_code_t
++_gcry_rsa_pkcs1_decode_for_enc_implicit_rejection (unsigned char **r_result,
++                                                   size_t *r_resultlen,
++                                                   unsigned int nbits,
++                                                   gcry_mpi_t value,
++                                                   unsigned char *kdk);
++#endif /* WITH_MARVIN_WORKAROUND */
+ gpg_err_code_t
+ _gcry_rsa_pkcs1_encode_raw_for_sig (gcry_mpi_t *r_result, unsigned int nbits,
+                                 const unsigned char *value, size_t valuelen);
+diff --git a/cipher/pubkey-util.c b/cipher/pubkey-util.c
+index 68defea6..e760dd4c 100644
+--- a/cipher/pubkey-util.c
++++ b/cipher/pubkey-util.c
+@@ -193,6 +193,15 @@ _gcry_pk_util_parse_flaglist (gcry_sexp_t list,
+             rc = GPG_ERR_INV_FLAG;
+           break;
+ 
++#ifdef WITH_MARVIN_WORKAROUND
++        case 21:
++          if (!memcmp (s, "no-implicit-rejection", 21))
++            flags |= PUBKEY_FLAG_NO_IMPLICIT_REJECTION;
++          else if (!igninvflag)
++            rc = GPG_ERR_INV_FLAG;
++          break;
++#endif /* WITH_MARVIN_WORKAROUND */
++
+         default:
+           if (!igninvflag)
+             rc = GPG_ERR_INV_FLAG;
+diff --git a/cipher/rsa-common.c b/cipher/rsa-common.c
+index 82a9e083..e776a309 100644
+--- a/cipher/rsa-common.c
++++ b/cipher/rsa-common.c
+@@ -318,6 +318,187 @@ _gcry_rsa_pkcs1_decode_for_enc (unsigned char **r_result, size_t *r_resultlen,
+ }
+ 
+ 
++#ifdef WITH_MARVIN_WORKAROUND
++#define SHA256_LEN 32
++static gcry_err_code_t
++rsa_prf(unsigned char *out, size_t out_len, const char *label, size_t label_len, unsigned char *kdk, size_t nbits)
++{
++  gcry_err_code_t rc = GPG_ERR_NO_ERROR;
++  size_t pos;
++  uint16_t iter = 0;
++  unsigned char be_iter[2];
++  unsigned char be_bitlen[2];
++  gcry_md_hd_t hd;
++  gcry_error_t err;
++
++  be_bitlen[0] = (nbits >> 8) & 0xff;
++  be_bitlen[1] = nbits & 0xff;
++
++  err = _gcry_md_open (&hd, GCRY_MD_SHA256, GCRY_MD_FLAG_HMAC);
++  if (err)
++    {
++      return GPG_ERR_INTERNAL;
++    }
++  err = _gcry_md_setkey (hd, kdk, SHA256_LEN);
++  if (err)
++    {
++      _gcry_md_close (hd);
++      return GPG_ERR_INTERNAL;
++    }
++  for (pos = 0; pos < out_len; pos += SHA256_LEN, iter++)
++    {
++      unsigned char *tmp;
++
++      _gcry_md_reset(hd);
++
++      be_iter[0] = (iter >> 8) & 0xff;
++      be_iter[1] = iter & 0xff;
++      _gcry_md_write (hd, be_iter, sizeof (be_iter));
++      _gcry_md_write (hd, label, label_len);
++      _gcry_md_write (hd, be_bitlen, sizeof (be_bitlen));
++
++      tmp = _gcry_md_read(hd, 0);
++      if (pos + SHA256_LEN > out_len)
++        {
++          memcpy(out + pos, tmp, out_len - pos);
++        }
++      else
++        {
++          memcpy(out + pos, tmp, SHA256_LEN);
++        }
++    }
++  _gcry_md_close (hd);
++  return rc;
++}
++
++
++/* Decode a plaintext in VALUE assuming pkcs#1 block type 2 padding.
++   NBITS is the size of the secret key.  On success the result is
++   stored as a newly allocated buffer at R_RESULT and its valid length at
++   R_RESULTLEN.  On error R_RESULT contains bogus value of random length.
++   For more information, see description of Implicit Rejection in Marvin paper
++   https://people.redhat.com/~hkario/marvin/marvin-attack-paper.pdf */
++#define MAX_LEN_GEN_TRIES 128
++gpg_err_code_t
++_gcry_rsa_pkcs1_decode_for_enc_implicit_rejection (unsigned char **r_result,
++                                                   size_t *r_resultlen,
++                                                   unsigned int nbits,
++                                                   gcry_mpi_t value,
++                                                   unsigned char *kdk)
++{
++  unsigned char *frame = NULL;
++  size_t nframe = (nbits+7) / 8;
++  size_t n, n0;
++  unsigned int failed = 0;
++  unsigned int not_found = 1;
++  int i, j;
++  uint16_t len_mask;
++  uint16_t max_sep_offset;
++  unsigned char *synthetic = NULL;
++  unsigned long synthethic_length;
++  uint16_t len_candidate;
++  unsigned char candidate_lengths[MAX_LEN_GEN_TRIES * sizeof(len_candidate)];
++  int synth_msg_index = 0, msg_index;
++
++  *r_result = NULL;
++
++  synthetic = xtrymalloc(nframe);
++  if (synthetic == NULL)
++    {
++      free (synthetic);
++      return gpg_err_code_from_syserror ();
++    }
++
++  if (rsa_prf(synthetic, nframe, "message", 7, kdk, nframe * 8) < 0)
++    {
++      xfree (synthetic);
++      return GPG_ERR_INTERNAL;
++    }
++
++  /* decide how long the random message should be */
++  if (rsa_prf(candidate_lengths, sizeof(candidate_lengths),
++              "length", 6, kdk, MAX_LEN_GEN_TRIES * sizeof(len_candidate) * 8) < 0)
++    {
++      xfree (synthetic);
++      return GPG_ERR_INTERNAL;
++    }
++
++  len_mask = max_sep_offset = nframe - 2 - 8;
++  len_mask |= len_mask >> 1;
++  len_mask |= len_mask >> 2;
++  len_mask |= len_mask >> 4;
++  len_mask |= len_mask >> 8;
++
++  synthethic_length = 0;
++  for (i = 0; i < MAX_LEN_GEN_TRIES * (int)sizeof(len_candidate);
++        i += sizeof(len_candidate))
++    {
++      len_candidate = (candidate_lengths[i] << 8) | candidate_lengths[i + 1];
++      len_candidate &= len_mask;
++
++      synthethic_length = ct_ulong_select(
++          len_candidate, synthethic_length,
++          ct_lt(len_candidate, max_sep_offset));
++    }
++
++  synth_msg_index = nframe - synthethic_length;
++
++  /* we have alternative message ready, check the real one */
++  /* mostly copy from _gcry_rsa_pkcs1_decode_for_enc */
++  frame = mpi_to_string(value, nframe);
++  if (frame == NULL)
++    {
++      xfree (synthetic);
++      return gpg_err_code_from_syserror ();
++    }
++
++  /* FRAME = 0x00 || 0x02 || PS || 0x00 || M */
++  n = 0;
++  failed |= ct_not_equal_byte (frame[n++], 0x00);
++  failed |= ct_not_equal_byte (frame[n++], 0x02);
++
++  /* Find the terminating zero byte.  */
++  n0 = n;
++  for (; n < nframe; n++)
++    {
++      not_found &= ct_not_equal_byte (frame[n], 0x00);
++      n0 += not_found;
++    }
++
++  failed |= not_found;
++  n0 += ct_is_zero (not_found); /* Skip the zero byte.  */
++  /* the valid padding is at least 8 bytes -- the plaintext needs to start at index 11 or later */
++  failed |= ct_lt_s (n0, 11);
++
++  msg_index = ct_ulong_select (synth_msg_index, n0, failed);
++
++  /* To avoid the need memmove (O(N*log(N))), we use separate buffer where we move either
++   * of the messages. We can now also use the msg_index safely as its timing is not
++   * possible to distinguish valid and invalid padding */
++  for (i = msg_index, j = 0; i < nframe && j < nframe; i++, j++)
++    {
++      frame[j] = ct_uchar_select (synthetic[i], frame[i], failed);
++    }
++
++  *r_resultlen = j;
++  *r_result = frame;
++
++  if (DBG_CIPHER)
++    {
++      if (!failed)
++        log_printhex ("value extracted from PKCS#1 block type 2 encoded data",
++                    frame, nframe - n0);
++      else
++        log_printhex ("Synthetic value from implicit rejection",
++                    synthetic, synthethic_length);
++    }
++
++  xfree (synthetic);
++  return 0;
++}
++#endif /* WITH_MARVIN_WORKAROUND */
++
++
+ /* Encode {VALUE,VALUELEN} for an NBITS keys and hash algorithm ALGO
+    using the pkcs#1 block type 1 padding.  On success the result is
+    stored as a new MPI at R_RESULT.  On error the value at R_RESULT is
+diff --git a/cipher/rsa.c b/cipher/rsa.c
+index c196724c..9c1ef1f7 100644
+--- a/cipher/rsa.c
++++ b/cipher/rsa.c
+@@ -1436,6 +1436,7 @@ rsa_encrypt (gcry_sexp_t *r_ciph, gcry_sexp_t s_data, gcry_sexp_t keyparms)
+ }
+ 
+ 
++#define SHA256_LEN 32
+ static gcry_err_code_t
+ rsa_decrypt (gcry_sexp_t *r_plain, gcry_sexp_t s_data, gcry_sexp_t keyparms)
+ 
+@@ -1451,6 +1452,9 @@ rsa_decrypt (gcry_sexp_t *r_plain, gcry_sexp_t s_data, gcry_sexp_t keyparms)
+   unsigned int nbits = rsa_get_nbits (keyparms);
+   gcry_sexp_t result = NULL;
+   gcry_sexp_t dummy = NULL;
++#ifdef WITH_MARVIN_WORKAROUND
++  unsigned char kdk[SHA256_LEN];
++#endif /* WITH_MARVIN_WORKAROUND */
+ 
+   rc = rsa_check_keysize (nbits);
+   if (rc)
+@@ -1498,6 +1502,71 @@ rsa_decrypt (gcry_sexp_t *r_plain, gcry_sexp_t s_data, gcry_sexp_t keyparms)
+   mpi_normalize (data);
+   mpi_fdiv_r (data, data, sk.n);
+ 
++#ifdef WITH_MARVIN_WORKAROUND
++  /* Implicit rejection: Derive KDK */
++  if (ctx.encoding == PUBKEY_ENC_PKCS1)
++    {
++      unsigned char *buf, *tmp;
++      unsigned int nbytes = (mpi_get_nbits (sk.n)+7)/8;
++      unsigned char key[SHA256_LEN];
++      gcry_md_hd_t hd;
++
++      /* (a) Convert `d` to big endian representation, left padded to the length of `n` */
++      rc = _gcry_mpi_to_octet_string (&buf, NULL, sk.d, nbytes);
++      if (rc)
++        {
++          rc = GPG_ERR_INTERNAL;
++          goto leave;
++        }
++
++      /* (b) Hash it using SHA-256 */
++      rc = _gcry_md_open (&hd, GCRY_MD_SHA256, 0);
++      if (rc)
++        {
++          xfree (buf);
++          rc = GPG_ERR_INTERNAL;
++          goto leave;
++        }
++      _gcry_md_write (hd, buf, nbytes);
++      /* keep the buffer around -- it will be needed for the ciphertext */
++      tmp = _gcry_md_read (hd, GCRY_MD_SHA256);
++      memcpy(key, tmp, SHA256_LEN);
++      _gcry_md_close (hd);
++
++      /* (c) Use the hash as a SHA-256 HMAC key and ciphertext as a message */
++      rc = _gcry_md_open (&hd, GCRY_MD_SHA256, GCRY_MD_FLAG_HMAC);
++      if (rc)
++        {
++          xfree (buf);
++          rc = GPG_ERR_INTERNAL;
++          goto leave;
++        }
++      rc = _gcry_md_setkey (hd, key, sizeof (key));
++      if (rc)
++        {
++          xfree (buf);
++          _gcry_md_close (hd);
++          rc = GPG_ERR_INTERNAL;
++          goto leave;
++        }
++
++      /* We need to convert the ciphertext to string, padded to the length of modulus */
++      rc = _gcry_mpi_to_octet_string (NULL, buf, data, nbytes);
++      if (rc)
++        {
++          xfree (buf);
++          _gcry_md_close (hd);
++          rc = GPG_ERR_INTERNAL;
++          goto leave;
++        }
++      _gcry_md_write (hd, buf, nbytes);
++      xfree (buf);
++      buf = _gcry_md_read (hd, 0);
++      memcpy(kdk, buf, SHA256_LEN);
++      _gcry_md_close (hd);
++    }
++#endif /* WITH_MARVIN_WORKAROUND */
++
+   /* Allocate MPI for the plaintext.  */
+   plain = mpi_snew (nbits);
+ 
+@@ -1516,6 +1585,18 @@ rsa_decrypt (gcry_sexp_t *r_plain, gcry_sexp_t s_data, gcry_sexp_t keyparms)
+   switch (ctx.encoding)
+     {
+     case PUBKEY_ENC_PKCS1:
++#ifdef WITH_MARVIN_WORKAROUND
++      if (!(ctx.flags & PUBKEY_FLAG_NO_IMPLICIT_REJECTION))
++        {
++          rc = _gcry_rsa_pkcs1_decode_for_enc_implicit_rejection (&unpad, &unpadlen, nbits, plain, kdk);
++          mpi_free (plain);
++          plain = NULL;
++          rc_sexp = sexp_build (&result, NULL, "(value %c)", (int)unpadlen, unpad, (nbits + 7) / 8);
++          *r_plain = result;
++          rc = ct_ulong_select (rc_sexp, rc, ct_is_zero (rc) & ct_is_not_zero (rc_sexp));
++          break;
++        }
++#endif /* WITH_MARVIN_WORKAROUND */
+       rc = _gcry_rsa_pkcs1_decode_for_enc (&unpad, &unpadlen, nbits, plain);
+       mpi_free (plain);
+       plain = NULL;
+diff --git a/src/cipher.h b/src/cipher.h
+index 0a2551fe..e522f39b 100644
+--- a/src/cipher.h
++++ b/src/cipher.h
+@@ -26,24 +26,25 @@
+ 
+ #include "../random/random.h"
+ 
+-#define PUBKEY_FLAG_NO_BLINDING    (1 << 0)
+-#define PUBKEY_FLAG_RFC6979        (1 << 1)
+-#define PUBKEY_FLAG_FIXEDLEN       (1 << 2)
+-#define PUBKEY_FLAG_LEGACYRESULT   (1 << 3)
+-#define PUBKEY_FLAG_RAW_FLAG       (1 << 4)
+-#define PUBKEY_FLAG_TRANSIENT_KEY  (1 << 5)
+-#define PUBKEY_FLAG_USE_X931       (1 << 6)
+-#define PUBKEY_FLAG_USE_FIPS186    (1 << 7)
+-#define PUBKEY_FLAG_USE_FIPS186_2  (1 << 8)
+-#define PUBKEY_FLAG_PARAM          (1 << 9)
+-#define PUBKEY_FLAG_COMP           (1 << 10)
+-#define PUBKEY_FLAG_NOCOMP         (1 << 11)
+-#define PUBKEY_FLAG_EDDSA          (1 << 12)
+-#define PUBKEY_FLAG_GOST           (1 << 13)
+-#define PUBKEY_FLAG_NO_KEYTEST     (1 << 14)
+-#define PUBKEY_FLAG_DJB_TWEAK      (1 << 15)
+-#define PUBKEY_FLAG_SM2            (1 << 16)
+-#define PUBKEY_FLAG_PREHASH        (1 << 17)
++#define PUBKEY_FLAG_NO_BLINDING           (1 << 0)
++#define PUBKEY_FLAG_RFC6979               (1 << 1)
++#define PUBKEY_FLAG_FIXEDLEN              (1 << 2)
++#define PUBKEY_FLAG_LEGACYRESULT          (1 << 3)
++#define PUBKEY_FLAG_RAW_FLAG              (1 << 4)
++#define PUBKEY_FLAG_TRANSIENT_KEY         (1 << 5)
++#define PUBKEY_FLAG_USE_X931              (1 << 6)
++#define PUBKEY_FLAG_USE_FIPS186           (1 << 7)
++#define PUBKEY_FLAG_USE_FIPS186_2         (1 << 8)
++#define PUBKEY_FLAG_PARAM                 (1 << 9)
++#define PUBKEY_FLAG_COMP                  (1 << 10)
++#define PUBKEY_FLAG_NOCOMP                (1 << 11)
++#define PUBKEY_FLAG_EDDSA                 (1 << 12)
++#define PUBKEY_FLAG_GOST                  (1 << 13)
++#define PUBKEY_FLAG_NO_KEYTEST            (1 << 14)
++#define PUBKEY_FLAG_DJB_TWEAK             (1 << 15)
++#define PUBKEY_FLAG_SM2                   (1 << 16)
++#define PUBKEY_FLAG_PREHASH               (1 << 17)
++#define PUBKEY_FLAG_NO_IMPLICIT_REJECTION (1 << 18)
+ 
+ 
+ enum pk_operation
+diff --git a/src/const-time.c b/src/const-time.c
+index cecb1937..2b6a4b4e 100644
+--- a/src/const-time.c
++++ b/src/const-time.c
+@@ -96,7 +96,7 @@ _gcry_ct_memmov_cond (void *dst, const void *src, size_t len,
+ void
+ _gcry_ct_memcpy (void *dst, const void *src, size_t len, size_t buffer_len)
+ {
+-  unsigned char mask_a, mask_b;
++  volatile unsigned char mask_a, mask_b;
+   unsigned char *b_dst = dst;
+   const unsigned char *b_src = src;
+   unsigned int writing;
+diff --git a/src/const-time.h b/src/const-time.h
+index 74055a4b..5e656e15 100644
+--- a/src/const-time.h
++++ b/src/const-time.h
+@@ -40,7 +40,7 @@ extern volatile unsigned int _gcry_ct_vone;
+ static inline int
+ ct_lt (unsigned int a, unsigned int b)
+ {
+-  return (a ^ ((a ^ b) | ((a - b) ^ b))) >> (sizeof(unsigned int)*8 - 1);
++  return (a ^ ((a ^ b) | ((a - b) ^ b))) >> (sizeof(unsigned int) * 8 - 1);
+ }
+ 
+ static inline size_t
+@@ -164,6 +164,7 @@ DEFINE_CT_TYPE_GEN_INV_MASK(uchar, unsigned char)
+ DEFINE_CT_TYPE_SELECT_FUNC(uintptr, uintptr_t)
+ DEFINE_CT_TYPE_SELECT_FUNC(ulong, unsigned long)
+ DEFINE_CT_TYPE_SELECT_FUNC(int16, int16_t)
++DEFINE_CT_TYPE_SELECT_FUNC(uchar, unsigned char)
+ 
+ /*
+  *  Return NULL when OP_ENABLED=1
+diff --git a/tests/pkcs1v2-v15c.h b/tests/pkcs1v2-v15c.h
+index 26c7b238..cb750d4f 100644
+--- a/tests/pkcs1v2-v15c.h
++++ b/tests/pkcs1v2-v15c.h
+@@ -21,6 +21,7 @@
+       const char *mesg;
+       const char *seed;
+       const char *encr;
++      const char *synt;
+     } m[20];
+   } tbl[] =
+   {
+@@ -3915,5 +3916,308 @@
+           "25db1dd892b71bb74a5cf68263d8fd58f1a48e6c2fcb8c0b71a251cfc1a20157"
+         }
+       }
++    },
++    {
++      "A 2048-bit RSA Test vectors for the Bleichenbacher workaround",
++      "c8cc839714098da56caa23640f93dc8997c16372968fc1b0c6df5113c1c94e8b21e48ad2297e65419011b4e6d8f5e73b1b78b257400321d1ef6b602d4ec8ce8d141c94905eb4ad306639a49206534b6e7f2607423e97dffd133c88d721399defbc7e96ccdcbd7f3aae1fe892712bfb4929817d511666440a1facb7a208f5ea165910add8a3f2d497202360ccb632024f0d07169c1918f316f794b143aef54ec87522a4c02978f9689980bffbf649c307e81819bff88409638d48bd94be152b59ff649fa0bd629d0ffa1813c3abf4b56bd3c2ea5465dffa14589292a9d8a24ad26be7ee0510741b6382d43c83d5bfa40a46613d062be445517dbcaf0cb4e1a769",
++      "010001",
++      "1455010e0f2d587663a666a6ff1ccdbbf0edd8100646d02a023922908992c4ad39e5565929726ef6508c3a71158ef0b6ff751d39d07580bb2d2f063210442d0603ff50dbbd7b35fe2c9bb19a47a1af85a4c24901e02ca8b58b7919b20edf32aacfbf51adb4bc4b61b9b7e968caa4d570f70ef18d8063228893e47d439efca793259bcf2cd108a3d8688cdf078e7ac799969f2339d2c1f522b969684629a933baaec2681625eab84f4e56f4447e9d88fb9a199cf71023e0e257b14441b33c84d3bc67ca8031d2612618103a7a0a40844262f75d8890cd616e51f9035488fd6e099de8ff6d65a4ff118254807c9f58d2fbba8ba151dc8c68be349c977a204e04c1",
++      {
++        {
++          "1. a random positive test case",
++          NULL,
++          "",
++          "8bfe264e85d3bdeaa6b8851b8e3b956ee3d226fd3f69063a86880173a273d9f283b2eebdd1ed35f7e02d91c571981b6737d5320bd8396b0f3ad5b019daec1b0aab3cbbc026395f4fd14f13673f2dfc81f9b660ec26ac381e6db3299b4e460b43fab9955df2b3cfaa20e900e19c856238fd371899c2bf2ce8c868b76754e5db3b036533fd603746be13c10d4e3e6022ebc905d20c2a7f32b215a4cd53b3f44ca1c327d2c2b651145821c08396c89071f665349c25e44d2733cd9305985ceef6430c3cf57af5fa224089221218fa34737c79c446d28a94c41c96e4e92ac53fbcf384dea8419ea089f8784445a492c812eb0d409467f75afd7d4d1078886205a066",
++          "6c6f72656d20697073756d20646f6c6f722073697420616d6574"
++        },{
++          "2. a random negative test case decrypting to empty",
++          NULL,
++          "",
++          "20aaa8adbbc593a924ba1c5c7990b5c2242ae4b99d0fe636a19a4cf754edbcee774e472fe028160ed42634f8864900cb514006da642cae6ae8c7d087caebcfa6dad1551301e130344989a1d462d4164505f6393933450c67bc6d39d8f5160907cabc251b737925a1cf21e5c6aa5781b7769f6a2a583d97cce008c0f8b6add5f0b2bd80bee60237aa39bb20719fe75749f4bc4e42466ef5a861ae3a92395c7d858d430bfe38040f445ea93fa2958b503539800ffa5ce5f8cf51fa8171a91f36cb4f4575e8de6b4d3f096ee140b938fd2f50ee13f0d050222e2a72b0a3069ff3a6738e82c87090caa5aed4fcbe882c49646aa250b98f12f83c8d528113614a29e7",
++          ""
++        },{
++          "3. invalid decrypting to max length message",
++          NULL,
++          "",
++          "48cceab10f39a4db32f60074feea473cbcdb7accf92e150417f76b44756b190e843e79ec12aa85083a21f5437e7bad0a60482e601198f9d86923239c8786ee728285afd0937f7dde12717f28389843d7375912b07b991f4fdb0190fced8ba665314367e8c5f9d2981d0f5128feeb46cb50fc237e64438a86df198dd0209364ae3a842d77532b66b7ef263b83b1541ed671b120dfd660462e2107a4ee7b964e734a7bd68d90dda61770658a3c242948532da32648687e0318286473f675b412d6468f013f14d760a358dfcad3cda2afeec5e268a37d250c37f722f468a70dfd92d7294c3c1ee1e7f8843b7d16f9f37ef35748c3ae93aa155cdcdfeb4e78567303",
++          "22d850137b9eebe092b24f602dc5bb7918c16bd89ddbf20467b119d205f9c2e4bd7d2592cf1e532106e0f33557565923c73a02d4f09c0c22bea89148183e60317f7028b3aa1f261f91c979393101d7e15f4067e63979b32751658ef769610fe97cf9cef3278b3117d384051c3b1d82c251c2305418c8f6840530e631aad63e70e20e025bcd8efb54c92ec6d3b106a2f8e64eeff7d38495b0fc50c97138af4b1c0a67a1c4e27b077b8439332edfa8608dfeae653cd6a628ac550395f7e74390e42c11682234870925eeaa1fa71b76cf1f2ee3bda69f6717033ff8b7c95c9799e7a3bea5e7e4a1c359772fb6b1c6e6c516661dfe30c3"
++        },{
++          "4. invalid decrypting to message with length specified by second to last value from PRF",
++          NULL,
++          "",
++          "1439e08c3f84c1a7fec74ce07614b20e01f6fa4e8c2a6cffdc3520d8889e5d9a950c6425798f85d4be38d300ea5695f13ecd4cb389d1ff5b82484b494d6280ab7fa78e645933981cb934cce8bfcd114cc0e6811eefa47aae20af638a1cd163d2d3366186d0a07df0c81f6c9f3171cf3561472e98a6006bf75ddb457bed036dcce199369de7d94ef2c68e8467ee0604eea2b3009479162a7891ba5c40cab17f49e1c438cb6eaea4f76ce23cce0e483ff0e96fa790ea15be67671814342d0a23f4a20262b6182e72f3a67cd289711503c85516a9ed225422f98b116f1ab080a80abd6f0216df88d8cfd67c139243be8dd78502a7aaf6bc99d7da71bcdf627e7354",
++          "0f9b"
++        },{
++          "5. invalid decrypting to message with length specified by third to last value from PRF",
++          NULL,
++          "",
++          "1690ebcceece2ce024f382e467cf8510e74514120937978576caf684d4a02ad569e8d76cbe365a060e00779de2f0865ccf0d923de3b4783a4e2c74f422e2f326086c390b658ba47f31ab013aa80f468c71256e5fa5679b24e83cd82c3d1e05e398208155de2212993cd2b8bab6987cf4cc1293f19909219439d74127545e9ed8a706961b8ee2119f6bfacafbef91b75a789ba65b8b833bc6149cf49b5c4d2c6359f62808659ba6541e1cd24bf7f7410486b5103f6c0ea29334ea6f4975b17387474fe920710ea61568d7b7c0a7916acf21665ad5a31c4eabcde44f8fb6120d8457afa1f3c85d517cda364af620113ae5a3c52a048821731922737307f77a1081",
++          "4f02"
++        },{
++          "6. positive test with 11 byte long value",
++          NULL,
++          "",
++          "6213634593332c485cef783ea2846e3d6e8b0e005cd8293eaebbaa5079712fd681579bdfbbda138ae4d9d952917a03c92398ec0cb2bb0c6b5a8d55061fed0d0d8d72473563152648cfe640b335dc95331c21cb133a91790fa93ae44497c128708970d2beeb77e8721b061b1c44034143734a77be8220877415a6dba073c3871605380542a9f25252a4babe8331cdd53cf828423f3cc70b560624d0581fb126b2ed4f4ed358f0eb8065cf176399ac1a846a31055f9ae8c9c24a1ba050bc20842125bc1753158f8065f3adb9cc16bfdf83816bdf38b624f12022c5a6fbfe29bc91542be8c0208a770bcd677dc597f5557dc2ce28a11bf3e3857f158717a33f6592",
++          "6c6f72656d20697073756d"
++        },{
++          "7. positive test with 11 byte long value and zero padded ciphertext",
++          NULL,
++          "",
++          "00a2e8f114ea8d05d12dc843e3cc3b2edc8229ff2a028bda29ba9d55e3cd02911902fef1f42a075bf05e8016e8567213d6f260fa49e360779dd81aeea3e04c2cb567e0d72b98bf754014561b7511e083d20e0bfb9cd23f8a0d3c88900c49d2fcd5843ff0765607b2026f28202a87aa94678aed22a0c20724541394cd8f44e373eba1d2bae98f516c1e2ba3d86852d064f856b1daf24795e767a2b90396e50743e3150664afab131fe40ea405dcf572dd1079af1d3f0392ccadcca0a12740dbb213b925ca2a06b1bc1383e83a658c82ba2e7427342379084d5f66b544579f07664cb26edd4f10fd913fdbc0de05ef887d4d1ec1ac95652397ea7fd4e4759fda8b",
++          "6c6f72656d20697073756d"
++        },{
++          "8. positive test with 11 byte long value and zero truncated ciphertext",
++          NULL,
++          "",
++          "a2e8f114ea8d05d12dc843e3cc3b2edc8229ff2a028bda29ba9d55e3cd02911902fef1f42a075bf05e8016e8567213d6f260fa49e360779dd81aeea3e04c2cb567e0d72b98bf754014561b7511e083d20e0bfb9cd23f8a0d3c88900c49d2fcd5843ff0765607b2026f28202a87aa94678aed22a0c20724541394cd8f44e373eba1d2bae98f516c1e2ba3d86852d064f856b1daf24795e767a2b90396e50743e3150664afab131fe40ea405dcf572dd1079af1d3f0392ccadcca0a12740dbb213b925ca2a06b1bc1383e83a658c82ba2e7427342379084d5f66b544579f07664cb26edd4f10fd913fdbc0de05ef887d4d1ec1ac95652397ea7fd4e4759fda8b",
++          "6c6f72656d20697073756d"
++        },{
++          "9. positive test with 11 byte long value and double zero padded ciphertext",
++          NULL,
++          "",
++          "00001f71879b426127f7dead621f7380a7098cf7d22173aa27991b143c46d53383c209bd0c9c00d84078037e715f6b98c65005a77120070522ede51d472c87ef94b94ead4c5428ee108a345561658301911ec5a8f7dd43ed4a3957fd29fb02a3529bf63f8040d3953490939bd8f78b2a3404b6fb5ff70a4bfdaac5c541d6bcce49c9778cc390be24cbef1d1eca7e870457241d3ff72ca44f9f56bdf31a890fa5eb3a9107b603ccc9d06a5dd911a664c82b6abd4fe036f8db8d5a070c2d86386ae18d97adc1847640c211d91ff5c3387574a26f8ef27ca7f48d2dd1f0c7f14b81cc9d33ee6853031d3ecf10a914ffd90947909c8011fd30249219348ebff76bfc",
++          "6c6f72656d20697073756d"
++        },{
++          "10. a random negative test that generates an 11 byte long message",
++          NULL,
++          "",
++          "5f02f4b1f46935c742ebe62b6f05aa0a3286aab91a49b34780adde6410ab46f7386e05748331864ac98e1da63686e4babe3a19ed40a7f5ceefb89179596aab07ab1015e03b8f825084dab028b6731288f2e511a4b314b6ea3997d2e8fe2825cef8897cbbdfb6c939d441d6e04948414bb69e682927ef8576c9a7090d4aad0e74c520d6d5ce63a154720f00b76de8cc550b1aa14f016d63a7b6d6eaa1f7dbe9e50200d3159b3d099c900116bf4eba3b94204f18b1317b07529751abf64a26b0a0bf1c8ce757333b3d673211b67cc0653f2fe2620d57c8b6ee574a0323a167eab1106d9bc7fd90d415be5f1e9891a0e6c709f4fc0404e8226f8477b4e939b36eb2",
++          "af9ac70191c92413cb9f2d"
++        },{
++          "11. an otherwise correct plaintext, but with wrong first byte (0x01 instead of 0x00), generates a random 11 byte long plaintext",
++          NULL,
++          "",
++          "9b2ec9c0c917c98f1ad3d0119aec6be51ae3106e9af1914d48600ab6a2c0c0c8ae02a2dc3039906ff3aac904af32ec798fd65f3ad1afa2e69400e7c1de81f5728f3b3291f38263bc7a90a0563e43ce7a0d4ee9c0d8a716621ca5d3d081188769ce1b131af7d35b13dea99153579c86db31fe07d5a2c14d621b77854e48a8df41b5798563af489a291e417b6a334c63222627376118c02c53b6e86310f728734ffc86ef9d7c8bf56c0c841b24b82b59f51aee4526ba1c4268506d301e4ebc498c6aebb6fd5258c876bf900bac8ca4d309dd522f6a6343599a8bc3760f422c10c72d0ad527ce4af1874124ace3d99bb74db8d69d2528db22c3a37644640f95c05f",
++          "a1f8c9255c35cfba403ccc"
++        },{
++          "12. an otherwise correct plaintext, but with wrong second byte (0x01 instead of 0x02), generates a random 11 byte long plaintext",
++          NULL,
++          "",
++          "782c2b59a21a511243820acedd567c136f6d3090c115232a82a5efb0b178285f55b5ec2d2bac96bf00d6592ea7cdc3341610c8fb07e527e5e2d20cfaf2c7f23e375431f45e998929a02f25fd95354c33838090bca838502259e92d86d568bc2cdb132fab2a399593ca60a015dc2bb1afcd64fef8a3834e17e5358d822980dc446e845b3ab4702b1ee41fe5db716d92348d5091c15d35a110555a35deb4650a5a1d2c98025d42d4544f8b32aa6a5e02dc02deaed9a7313b73b49b0d4772a3768b0ea0db5846ace6569cae677bf67fb0acf3c255dc01ec8400c963b6e49b1067728b4e563d7e1e1515664347b92ee64db7efb5452357a02fff7fcb7437abc2e579",
++          "e6d700309ca0ed62452254"
++        },{
++          "13. an invalid ciphertext, with a zero byte in first byte of ciphertext, decrypts to a random 11 byte long synthethic plaintext",
++          NULL,
++          "",
++          "0096136621faf36d5290b16bd26295de27f895d1faa51c800dafce73d001d60796cd4e2ac3fa2162131d859cd9da5a0c8a42281d9a63e5f353971b72e36b5722e4ac444d77f892a5443deb3dca49fa732fe855727196e23c26eeac55eeced8267a209ebc0f92f4656d64a6c13f7f7ce544ebeb0f668fe3a6c0f189e4bcd5ea12b73cf63e0c8350ee130dd62f01e5c97a1e13f52fde96a9a1bc9936ce734fdd61f27b18216f1d6de87f49cf4f2ea821fb8efd1f92cdad529baf7e31aff9bff4074f2cad2b4243dd15a711adcf7de900851fbd6bcb53dac399d7c880531d06f25f7002e1aaf1722765865d2c2b902c7736acd27bc6cbd3e38b560e2eecf7d4b576",
++          "ba27b1842e7c21c0e7ef6a"
++        },{
++          "14. an invalid ciphertext, with a zero byte removed from first byte of ciphertext, decrypts to a random 11 byte long synthethic plaintext",
++          NULL,
++          "",
++          "96136621faf36d5290b16bd26295de27f895d1faa51c800dafce73d001d60796cd4e2ac3fa2162131d859cd9da5a0c8a42281d9a63e5f353971b72e36b5722e4ac444d77f892a5443deb3dca49fa732fe855727196e23c26eeac55eeced8267a209ebc0f92f4656d64a6c13f7f7ce544ebeb0f668fe3a6c0f189e4bcd5ea12b73cf63e0c8350ee130dd62f01e5c97a1e13f52fde96a9a1bc9936ce734fdd61f27b18216f1d6de87f49cf4f2ea821fb8efd1f92cdad529baf7e31aff9bff4074f2cad2b4243dd15a711adcf7de900851fbd6bcb53dac399d7c880531d06f25f7002e1aaf1722765865d2c2b902c7736acd27bc6cbd3e38b560e2eecf7d4b576",
++          "ba27b1842e7c21c0e7ef6a"
++        },{
++          "15. an invalid ciphertext, with two zero bytes in first bytes of ciphertext, decrypts to a random 11 byte long synthethic plaintext",
++          NULL,
++          "",
++          "0000587cccc6b264bdfe0dc2149a988047fa921801f3502ea64624c510c6033d2f427e3f136c26e88ea9f6519e86a542cec96aad1e5e9013c3cc203b6de15a69183050813af5c9ad79703136d4b92f50ce171eefc6aa7988ecf02f319ffc5eafd6ee7a137f8fce64b255bb1b8dd19cfe767d64fdb468b9b2e9e7a0c24dae03239c8c714d3f40b7ee9c4e59ac15b17e4d328f1100756bce17133e8e7493b54e5006c3cbcdacd134130c5132a1edebdbd01a0c41452d16ed7a0788003c34730d0808e7e14c797a21f2b45a8aa1644357fd5e988f99b017d9df37563a354c788dc0e2f9466045622fa3f3e17db63414d27761f57392623a2bef6467501c63e8d645",
++          "d5cf555b1d6151029a429a"
++        },{
++          "16. an invalid ciphertext, with two zero bytes removed from first bytes of ciphertext, decrypts to a random 11 byte long synthethic plaintext",
++          NULL,
++          "",
++          "587cccc6b264bdfe0dc2149a988047fa921801f3502ea64624c510c6033d2f427e3f136c26e88ea9f6519e86a542cec96aad1e5e9013c3cc203b6de15a69183050813af5c9ad79703136d4b92f50ce171eefc6aa7988ecf02f319ffc5eafd6ee7a137f8fce64b255bb1b8dd19cfe767d64fdb468b9b2e9e7a0c24dae03239c8c714d3f40b7ee9c4e59ac15b17e4d328f1100756bce17133e8e7493b54e5006c3cbcdacd134130c5132a1edebdbd01a0c41452d16ed7a0788003c34730d0808e7e14c797a21f2b45a8aa1644357fd5e988f99b017d9df37563a354c788dc0e2f9466045622fa3f3e17db63414d27761f57392623a2bef6467501c63e8d645",
++          "d5cf555b1d6151029a429a"
++        },{
++          "17. and invalid ciphertext, otherwise valid but starting with 000002, decrypts to random 11 byte long synthethic plaintext",
++          NULL,
++          "",
++          "1786550ce8d8433052e01ecba8b76d3019f1355b212ac9d0f5191b023325a7e7714b7802f8e9a17c4cb3cd3a84041891471b10ca1fcfb5d041d34c82e6d0011cf4dc76b90e9c2e0743590579d55bcd7857057152c4a8040361343d1d22ba677d62b011407c652e234b1d663af25e2386251d7409190f19fc8ec3f9374fdf1254633874ce2ec2bff40ad0cb473f9761ec7b68da45a4bd5e33f5d7dac9b9a20821df9406b653f78a95a6c0ea0a4d57f867e4db22c17bf9a12c150f809a7b72b6db86c22a8732241ebf3c6a4f2cf82671d917aba8bc61052b40ccddd743a94ea9b538175106201971cca9d136d25081739aaf6cd18b2aecf9ad320ea3f89502f955",
++          "3d4a054d9358209e9cbbb9"
++        },{
++          "18. negative test with otherwise valid padding but a zero byte in first byte of padding",
++          NULL,
++          "",
++          "179598823812d2c58a7eb50521150a48bcca8b4eb53414018b6bca19f4801456c5e36a940037ac516b0d6412ba44ec6b4f268a55ef1c5ffbf18a2f4e3522bb7b6ed89774b79bffa22f7d3102165565642de0d43a955e96a1f2e80e5430671d7266eb4f905dc8ff5e106dc5588e5b0289e49a4913940e392a97062616d2bda38155471b7d360cfb94681c702f60ed2d4de614ea72bf1c53160e63179f6c5b897b59492bee219108309f0b7b8cb2b136c346a5e98b8b4b8415fb1d713bae067911e3057f1c335b4b7e39101eafd5d28f0189037e4334f4fdb9038427b1d119a6702aa8233319cc97d496cc289ae8c956ddc84042659a2d43d6aa22f12b81ab884e",
++          "1f037dd717b07d3e7f7359"
++        },{
++          "19. negative test with otherwise valid padding but a zero byte at the eigth byte of padding",
++          NULL,
++          "",
++          "a7a340675a82c30e22219a55bc07cdf36d47d01834c1834f917f18b517419ce9de2a96460e745024436470ed85e94297b283537d52189c406a3f533cb405cc6a9dba46b482ce98b6e3dd52d8fce2237425617e38c11fbc46b61897ef200d01e4f25f5f6c4c5b38cd0de38ba11908b86595a8036a08a42a3d05b79600a97ac18ba368a08d6cf6ccb624f6e8002afc75599fba4de3d4f3ba7d208391ebe8d21f8282b18e2c10869eb2702e68f9176b42b0ddc9d763f0c86ba0ff92c957aaeab76d9ab8da52ea297ec11d92d770146faa1b300e0f91ef969b53e7d2907ffc984e9a9c9d11fb7d6cba91972059b46506b035efec6575c46d7114a6b935864858445f",
++          "63cb0bf65fc8255dd29e17"
++        },{
++          "20. negative test with an otherwise valid plaintext but with missing separator byte",
++          NULL,
++          "",
++          "3d1b97e7aa34eaf1f4fc171ceb11dcfffd9a46a5b6961205b10b302818c1fcc9f4ec78bf18ea0cee7e9fa5b16fb4c611463b368b3312ac11cf9c06b7cf72b54e284848a508d3f02328c62c2999d0fb60929f81783c7a256891bc2ff4d91df2af96a24fc5701a1823af939ce6dbdc510608e3d41eec172ad2d51b9fc61b4217c923cadcf5bac321355ef8be5e5f090cdc2bd0c697d9058247db3ad613fdce87d2955a6d1c948a5160f93da21f731d74137f5d1f53a1923adb513d2e6e1589d44cc079f4c6ddd471d38ac82d20d8b1d21f8d65f3b6907086809f4123e08d86fb38729585de026a485d8f0e703fd4772f6668febf67df947b82195fa3867e3a3065",
++          "6f09a0b62699337c497b0b"
++        }
++      }
++    },
++    {
++      "A 2049-bit RSA Test vectors for the Bleichenbacher workaround",
++      "0155f889556a1775f1c7a7786a50b18bc28c9e986ede5667cab39b84124e90eba75c1db083ac3e443bba94dc23560f75e3a81693a2a43bdc7426d8c4eafe68c85de0fe757f6e49bb9ed447e602430800dbb04ceb22e7fa57a18d338fb66026cdb467e70cc040e7d367ef403c7bf1e3df624650094631f21eafd2fb5bc915ff04379acd1112f732c0b46607c178d38a20f52eda509f2f9c0405d51069e80ccf941554d0470467505c3cf541ea0897dfc9f400cecb298ffc753372d9f6933af174cc40ed96d467031733b97f8cddd3f92bc3a03ea8576c417f24007b5e4f7501105b544de9fadcdffadf98dfb4bb05b8199f3f85acfd91f7a9a094b9a383f5049097",
++      "010001",
++      "0119c2b3f50a7ad6152679d7ff510958ac2d8ca6f0028592f332d55a16736178a8e67f17e705ce300e3e87547251006013f974d0a3db49ef344ca5a26a34c0450704d0e422e0ce23a69425c15fefb6f26e106eeff64cc8b9d7442e4da4e8c85008eaeb365859a2294fa3937bc26be56332e7d81e2c160ef635cc528aa7be55e633a723dbc1e16ba29e52b29aef2f9e5654fdc0666bb0fc254acbe80e63874f0f5f020782e3c9dcfc2520d0c9c4a7b634e4503fbb493e1aafeeb3f88bd7a13398725dae6fe399e775cd5d4cf09fc838347c4c98dab1a4883cce620513615afaa10a63368e6d7b79df4166ab162739ef515a4402ee1e0601c5a55bc71df0e30edf81",
++      {
++        {
++          "1. malformed that generates length specified by 3rd last value from PRF",
++          NULL,
++          "",
++          "00b26f6404b82649629f2704494282443776929122e279a9cf30b0c6fe8122a0a9042870d97cc8ef65490fe58f031eb2442352191f5fbc311026b5147d32df914599f38b825ebb824af0d63f2d541a245c5775d1c4b78630e4996cc5fe413d38455a776cf4edcc0aa7fccb31c584d60502ed2b77398f536e137ff7ba6430e9258e21c2db5b82f5380f566876110ac4c759178900fbad7ab70ea07b1daf7a1639cbb4196543a6cbe8271f35dddb8120304f6eef83059e1c5c5678710f904a6d760c4d1d8ad076be17904b9e69910040b47914a0176fb7eea0c06444a6c4b86d674d19a556a1de5490373cb01ce31bbd15a5633362d3d2cd7d4af1b4c5121288b894",
++          "42"
++        },{
++          "2. simple positive test case",
++          NULL,
++          "",
++          "013300edbf0bb3571e59889f7ed76970bf6d57e1c89bbb6d1c3991d9df8e65ed54b556d928da7d768facb395bbcc81e9f8573b45cf8195dbd85d83a59281cddf4163aec11b53b4140053e3bd109f787a7c3cec31d535af1f50e0598d85d96d91ea01913d07097d25af99c67464ebf2bb396fb28a9233e56f31f7e105d71a23e9ef3b736d1e80e713d1691713df97334779552fc94b40dd733c7251bc522b673d3ec9354af3dd4ad44fa71c0662213a57ada1d75149697d0eb55c053aaed5ffd0b815832f454179519d3736fb4faf808416071db0d0f801aca8548311ee708c131f4be658b15f6b54256872c2903ac708bd43b017b073b5707bc84c2cd9da70e967",
++          "6c6f72656d20697073756d"
++        },{
++          "3. positive test case with null padded ciphertext",
++          NULL,
++          "",
++          "0002aadf846a329fadc6760980303dbd87bfadfa78c2015ce4d6c5782fd9d3f1078bd3c0a2c5bfbdd1c024552e5054d98b5bcdc94e476dd280e64d650089326542ce7c61d4f1ab40004c2e6a88a883613568556a10f3f9edeab67ae8dddc1e6b0831c2793d2715de943f7ce34c5c05d1b09f14431fde566d17e76c9feee90d86a2c158616ec81dda0c642f58c0ba8fa4495843124a7235d46fb4069715a51bf710fd024259131ba94da73597ace494856c94e7a3ec261545793b0990279b15fa91c7fd13dbfb1df2f221dab9fa9f7c1d21e48aa49f6aaecbabf5ee76dc6c2af2317ffb4e303115386a97f8729afc3d0c89419669235f1a3a69570e0836c79fc162",
++          "6c6f72656d20697073756d"
++        },{
++          "4. positive test case with null truncated ciphertext",
++          NULL,
++          "",
++          "02aadf846a329fadc6760980303dbd87bfadfa78c2015ce4d6c5782fd9d3f1078bd3c0a2c5bfbdd1c024552e5054d98b5bcdc94e476dd280e64d650089326542ce7c61d4f1ab40004c2e6a88a883613568556a10f3f9edeab67ae8dddc1e6b0831c2793d2715de943f7ce34c5c05d1b09f14431fde566d17e76c9feee90d86a2c158616ec81dda0c642f58c0ba8fa4495843124a7235d46fb4069715a51bf710fd024259131ba94da73597ace494856c94e7a3ec261545793b0990279b15fa91c7fd13dbfb1df2f221dab9fa9f7c1d21e48aa49f6aaecbabf5ee76dc6c2af2317ffb4e303115386a97f8729afc3d0c89419669235f1a3a69570e0836c79fc162",
++          "6c6f72656d20697073756d"
++        },{
++          "5. positive test case with double null padded ciphertext",
++          NULL,
++          "",
++          "0000f36da3b72d8ff6ded74e7efd08c01908f3f5f0de7b55eab92b5f875190809c39d4162e1e6649618f854fd84aeab03970d16bb814e999852c06de38d82b95c0f32e2a7b5714021fe303389be9c0eac24c90a6b7210f929d390fabf903d44e04110bb7a7fd6c383c275804721efa6d7c93aa64c0bb2b18d97c5220a846c66a4895ae52adddbe2a9996825e013585adcec4b32ba61d782737bd343e5fabd68e8a95b8b1340318559860792dd70dffbe05a1052b54cbfb48cfa7bb3c19cea52076bddac5c25ee276f153a610f6d06ed696d192d8ae4507ffae4e5bdda10a625d6b67f32f7cffcd48dee2431fe66f6105f9d17e611cdcc674868e81692a360f4052",
++          "6c6f72656d20697073756d"
++        },{
++          "6. positive test case with double null truncated ciphertext",
++          NULL,
++          "",
++          "f36da3b72d8ff6ded74e7efd08c01908f3f5f0de7b55eab92b5f875190809c39d4162e1e6649618f854fd84aeab03970d16bb814e999852c06de38d82b95c0f32e2a7b5714021fe303389be9c0eac24c90a6b7210f929d390fabf903d44e04110bb7a7fd6c383c275804721efa6d7c93aa64c0bb2b18d97c5220a846c66a4895ae52adddbe2a9996825e013585adcec4b32ba61d782737bd343e5fabd68e8a95b8b1340318559860792dd70dffbe05a1052b54cbfb48cfa7bb3c19cea52076bddac5c25ee276f153a610f6d06ed696d192d8ae4507ffae4e5bdda10a625d6b67f32f7cffcd48dee2431fe66f6105f9d17e611cdcc674868e81692a360f4052",
++          "6c6f72656d20697073756d"
++        },{
++          "7. a random negative test case that generates an 11 byte long message",
++          NULL,
++          "",
++          "00f910200830fc8fff478e99e145f1474b312e2512d0f90b8cef77f8001d09861688c156d1cbaf8a8957f7ebf35f724466952d0524cad48aad4fba1e45ce8ea27e8f3ba44131b7831b62d60c0762661f4c1d1a88cd06263a259abf1ba9e6b0b172069afb86a7e88387726f8ab3adb30bfd6b3f6be6d85d5dfd044e7ef052395474a9cbb1c3667a92780b43a22693015af6c513041bdaf87d43b24ddd244e791eeaea1066e1f4917117b3a468e22e0f7358852bb981248de4d720add2d15dccba6280355935b67c96f9dcb6c419cc38ab9f6fba2d649ef2066e0c34c9f788ae49babd9025fa85b21113e56ce4f43aa134c512b030dd7ac7ce82e76f0be9ce09ebca",
++          "1189b6f5498fd6df532b00"
++        },{
++          "8. otherwise correct plaintext, but with wrong first byte (0x01 instead of 0x00)",
++          NULL,
++          "",
++          "002c9ddc36ba4cf0038692b2d3a1c61a4bb3786a97ce2e46a3ba74d03158aeef456ce0f4db04dda3fe062268a1711250a18c69778a6280d88e133a16254e1f0e30ce8dac9b57d2e39a2f7d7be3ee4e08aec2fdbe8dadad7fdbf442a29a8fb40857407bf6be35596b8eefb5c2b3f58b894452c2dc54a6123a1a38d642e23751746597e08d71ac92704adc17803b19e131b4d1927881f43b0200e6f95658f559f912c889b4cd51862784364896cd6e8618f485a992f82997ad6a0917e32ae5872eaf850092b2d6c782ad35f487b79682333c1750c685d7d32ab3e1538f31dcaa5e7d5d2825875242c83947308dcf63ba4bfff20334c9c140c837dbdbae7a8dee72ff",
++          "f6d0f5b78082fe61c04674"
++        },{
++          "9. otherwise correct plaintext, but with wrong second byte (0x01 instead of 0x02)",
++          NULL,
++          "",
++          "00c5d77826c1ab7a34d6390f9d342d5dbe848942e2618287952ba0350d7de6726112e9cebc391a0fae1839e2bf168229e3e0d71d4161801509f1f28f6e1487ca52df05c466b6b0a6fbbe57a3268a970610ec0beac39ec0fa67babce1ef2a86bf77466dc127d7d0d2962c20e66593126f276863cd38dc6351428f884c1384f67cad0a0ffdbc2af16711fb68dc559b96b37b4f04cd133ffc7d79c43c42ca4948fa895b9daeb853150c8a5169849b730cc77d68b0217d6c0e3dbf38d751a1998186633418367e7576530566c23d6d4e0da9b038d0bb5169ce40133ea076472d055001f0135645940fd08ea44269af2604c8b1ba225053d6db9ab43577689401bdc0f3",
++          "1ab287fcef3ff17067914d"
++        },{
++          NULL,
++          NULL,
++          NULL,
++          NULL,
++          NULL,
++        }
++      }
++    },
++    {
++      "RSA decrypt with 3072 bit keys",
++      "afd71caad5e9f5b8c6c367070a47f19d7e66aede18a5b2741fb3c4d33434560692a2d909ef6888ec602ff6b93af258ee74303c301afcd4edbec43311ddc8ddbf00ddbbe386d33b8d0e22b1b44936dc489871b85237b34ce747ad8fdb0c4e4d1daa7aadf07385c5c8732ccb7d5a49e2e50c883c7d7ac10ed6a74d9ac90df9129905a17d4a087210fc78b6d04b1eb969482c11a6eeb79c50e5b16f3f254f7571528b2f1716ab816d6eca0727bdea98059329730eb8c33ce71d61dd4ac393b6256e07ac1d124f0200d1c3e05a4c1bc7f1ed2fc83e57199cfe5908b10087e27fbd97d2c24214619c7147c8fbefca39bc256762a6823531f7e234d68eae7a0d9faf10dd15e9523780c7d5ae58094ad525a9063b4c33f95e1006da2eb12d3743689495c1f2023e407353c5eb3e4ca1c48cff81a10900d14820eb801af4f1a596c4b9ce9a531fcf8a54d9ffd724258b6eec20108df6fdfd76d4ae03ba7ea598dcb0e4a280849587286f4d7f256ce85e5eb5679b1dacc1f9095649b72e5fa072aeb00379",
++      "010001",
++      "2517eacb3afef4bffae60398df9957a5d2a154a83368d8e15842b2f59ee09f79197bd2ef1e9addaf8786f6b4127447405e3042b21f2f50b7aa73771680c3bbcb6c225a5d5ff6b56c471c1882a0a33b0af165a3ed6c249dc7783e6bc758ac37e6572d33fe325078ed952650f2eb9604902ef99a511a1119d13c4fc9a43a175dcdfbfb1a1400fe17093b69cd3cdb895f65432ea2195f90511c7336b58a685dacff2daf4c5e92e565b1665ae60e512baa9965b808d5ff119ceb7cd692cbf920067afacd809f66be706da26810ac790db156c948e6fe581bc9849157f4da493f3a64b0c6e119e031b107f8436ce29160b458b8f9f1095fdeb19263384ff5387557bc4f10b4034de841703bad2c1e769c23853eb630a36d1061dd46e2a6bbaf743a97f0b32c36f50c1a3722def3a394d91c2e078bf09d795ecde5e56b8202f974026f75fc56e9a0dd6a88f2e7cb78ef1298cc6c65207ca45bd37188807b4fcdb1e60dd8e5b85648fb7efa8b6fdd448f39741a8d9809fe163af3de45bac24a5a841c81",
++      {
++        {
++          "1. a random invalid ciphertext that generates an empty synthethic one",
++          NULL,
++          "",
++          "5e956cd9652f4a2ece902931013e09662b6a9257ad1e987fb75f73a0606df2a4b04789770820c2e02322c4e826f767bd895734a01e20609c3be4517a7a2a589ea1cdc137beb73eb38dac781b52e863de9620f79f9b90fd5b953651fcbfef4a9f1cc07421d511a87dd6942caab6a5a0f4df473e62defb529a7de1509ab99c596e1dff1320402298d8be73a896cc86c38ae3f2f576e9ea70cc28ad575cb0f854f0be43186baa9c18e29c47c6ca77135db79c811231b7c1730955887d321fdc06568382b86643cf089b10e35ab23e827d2e5aa7b4e99ff2e914f302351819eb4d1693243b35f8bf1d42d08f8ec4acafa35f747a4a975a28643ec630d8e4fa5be59d81995660a14bb64c1fea5146d6b11f92da6a3956dd5cb5e0d747cf2ea23f81617769185336263d46ef4c144b754de62a6337342d6c85a95f19f015724546ee3fc4823eca603dbc1dc01c2d5ed50bd72d8e96df2dc048edde0081284068283fc5e73a6139851abf2f29977d0b3d160c883a42a37efba1be05c1a0b1741d7ddf59",
++          ""
++        },{
++          "2. a random invalid that has PRF output with a length one byte too long",
++          NULL,
++          "",
++          "7db0390d75fcf9d4c59cf27b264190d856da9abd11e92334d0e5f71005cfed865a711dfa28b791188374b61916dbc11339bf14b06f5f3f68c206c5607380e13da3129bfb744157e1527dd6fdf6651248b028a496ae1b97702d44706043cdaa7a59c0f41367303f21f268968bf3bd2904db3ae5239b55f8b438d93d7db9d1666c071c0857e2ec37757463769c54e51f052b2a71b04c2869e9e7049a1037b8429206c99726f07289bac18363e7eb2a5b417f47c37a55090cda676517b3549c873f2fe95da9681752ec9864b069089a2ed2f340c8b04ee00079055a817a3355b46ac7dc00d17f4504ccfbcfcadb0c04cb6b22069e179385ae1eafabad5521bac2b8a8ee1dfff59a22eb3fdacfc87175d10d7894cfd869d056057dd9944b869c1784fcc27f731bc46171d39570fbffbadf082d33f6352ecf44aca8d9478e53f5a5b7c852b401e8f5f74da49da91e65bdc97765a9523b7a0885a6f8afe5759d58009fbfa837472a968e6ae92026a5e0202a395483095302d6c3985b5f5831c521a271",
++          "56a3bea054e01338be9b7d7957539c"
++        },{
++          "3. a random invalid that generates a synthethic of maximum size",
++          NULL,
++          "",
++          "1715065322522dff85049800f6a29ab5f98c465020467414b2a44127fe9446da47fa18047900f99afe67c2df6f50160bb8e90bff296610fde632b3859d4d0d2e644f23835028c46cca01b84b88231d7e03154edec6627bcba23de76740d839851fa12d74c8f92e540c73fe837b91b7d699b311997d5f0f7864c486d499c3a79c111faaacbe4799597a25066c6200215c3d158f3817c1aa57f18bdaad0be1658da9da93f5cc6c3c4dd72788af57adbb6a0c26f42d32d95b8a4f95e8c6feb2f8a5d53b19a50a0b7cbc25e055ad03e5ace8f3f7db13e57759f67b65d143f08cca15992c6b2aae643390483de111c2988d4e76b42596266005103c8de6044fb7398eb3c28a864fa672de5fd8774510ff45e05969a11a4c7d3f343e331190d2dcf24fb9154ba904dc94af98afc5774a9617d0418fe6d13f8245c7d7626c176138dd698a23547c25f27c2b98ea4d8a45c7842b81888e4cc14e5b72e9cf91f56956c93dbf2e5f44a8282a7813157fc481ff1371a0f66b31797e81ebdb09a673d4db96d6",
++          "7b036fcd6243900e4236c894e2462c17738acc87e01a76f4d95cb9a328d9acde81650283b8e8f60a217e3bdee835c7b222ad4c85d0acdb9a309bd2a754609a65dec50f3aa04c6d5891034566b9563d42668ede1f8992b17753a2132e28970584e255efc8b45a41c5dbd7567f014acec5fe6fdb6d484790360a913ebb9defcd74ff377f2a8ba46d2ed85f733c9a3da08eb57ecedfafda806778f03c66b2c5d2874cec1c291b2d49eb194c7b5d0dd2908ae90f4843268a2c45563092ade08acb6ab481a08176102fc803fbb2f8ad11b0e1531bd37df543498daf180b12017f4d4d426ca29b4161075534bfb914968088a9d13785d0adc0e2580d3548494b2a9e91605f2b27e6cc701c796f0de7c6f471f6ab6cb9272a1ed637ca32a60d117505d82af3c1336104afb537d01a8f70b510e1eebf4869cb976c419473795a66c7f5e6e20a8094b1bb603a74330c537c5c0698c31538bd2e138c1275a1bdf24c5fa8ab3b7b526324e7918a382d1363b3d463764222150e04"
++        },{
++          "4. a positive test case that decrypts to 9 byte long value",
++          NULL,
++          "",
++          "6c60845a854b4571f678941ae35a2ac03f67c21e21146f9db1f2306be9f136453b86ad55647d4f7b5c9e62197aaff0c0e40a3b54c4cde14e774b1c5959b6c2a2302896ffae1f73b00b862a20ff4304fe06cea7ff30ecb3773ca9af27a0b54547350d7c07dfb0a39629c7e71e83fc5af9b2adbaf898e037f1de696a3f328cf45af7ec9aff7173854087fb8fbf34be981efbd8493f9438d1b2ba2a86af082662aa46ae9adfbec51e5f3d9550a4dd1dcb7c8969c9587a6edc82a8cabbc785c40d9fbd12064559fb769450ac3e47e87bc046148130d7eaa843e4b3ccef3675d0630500803cb7ffee3882378c1a404e850c3e20707bb745e42b13c18786c4976076ed9fa8fd0ff15e571bef02cbbe2f90c908ac3734a433b73e778d4d17fcc28f49185ebc6e8536a06d293202d94496453bfdf1c2c7833a3f99fa38ca8a81f42eaa529d603b890308a319c0ab63a35ff8ebac965f6278f5a7e5d622be5d5fe55f0ca3ec993d55430d2bf59c5d3e860e90c16d91a04596f6fdf60d89ed95d88c036dde",
++          "666f7274792074776f"
++        },{
++          "5. a positive test case with null padded ciphertext",
++          NULL,
++          "",
++          "00f4d565a3286784dbb85327db8807ae557ead229f92aba945cecda5225f606a7d6130edeeb6f26724d1eff1110f9eb18dc3248140ee3837e6688391e78796c526791384f045e21b6b853fb6342a11f309eb77962f37ce23925af600847fbd30e6e07e57de50b606e6b7f288cc777c1a6834f27e6edace508452128916eef7788c8bb227e3548c6a761cc4e9dd1a3584176dc053ba3500adb1d5e1611291654f12dfc5722832f635db3002d73f9defc310ace62c63868d341619c7ee15b20243b3371e05078e11219770c701d9f341af35df1bc729de294825ff2e416aa11526612852777eb131f9c45151eb144980d70608d2fc4043477368369aa0fe487a48bd57e66b00c3c58f941549f5ec050fca64449debe7a0c4ac51e55cb71620a70312aa4bd85fac1410c9c7f9d6ec610b7d11bf8faeffa20255d1a1bead9297d0aa8765cd2805847d639bc439f4a6c896e2008f746f9590ff4596de5ddde000ed666c452c978043ff4298461eb5a26d5e63d821438627f91201924bf7f2aeee1727",
++          "666f7274792074776f"
++        },{
++          "6. a positive test case with double null padded ciphertext",
++          NULL,
++          "",
++          "00001ec97ac981dfd9dcc7a7389fdfa9d361141dac80c23a060410d472c16094e6cdffc0c3684d84aa402d7051dfccb2f6da33f66985d2a259f5b7fbf39ac537e95c5b7050eb18844a0513abef812cc8e74a3c5240009e6e805dcadf532bc1a2702d5acc9e585fad5b89d461fcc1397351cdce35171523758b171dc041f412e42966de7f94856477356d06f2a6b40e3ff0547562a4d91bbf1338e9e049facbee8b20171164505468cd308997447d3dc4b0acb49e7d368fedd8c734251f30a83491d2506f3f87318cc118823244a393dc7c5c739a2733d93e1b13db6840a9429947357f47b23fbe39b7d2d61e5ee26f9946c4632f6c4699e452f412a26641d4751135400713cd56ec66f0370423d55d2af70f5e7ad0adea8e4a0d904a01e4ac272eba4af1a029dd53eb71f115bf31f7a6c8b19a6523adeecc0d4c3c107575e38572a8f8474ccad163e46e2e8b08111132aa97a16fb588c9b7e37b3b3d7490381f3c55d1a9869a0fd42cd86fed59ecec78cb6b2dfd06a497f5afe3419691314ba0",
++          "666f7274792074776f"
++        },{
++          "7. a positive test case with double null truncated ciphertext",
++          NULL,
++          "",
++          "1ec97ac981dfd9dcc7a7389fdfa9d361141dac80c23a060410d472c16094e6cdffc0c3684d84aa402d7051dfccb2f6da33f66985d2a259f5b7fbf39ac537e95c5b7050eb18844a0513abef812cc8e74a3c5240009e6e805dcadf532bc1a2702d5acc9e585fad5b89d461fcc1397351cdce35171523758b171dc041f412e42966de7f94856477356d06f2a6b40e3ff0547562a4d91bbf1338e9e049facbee8b20171164505468cd308997447d3dc4b0acb49e7d368fedd8c734251f30a83491d2506f3f87318cc118823244a393dc7c5c739a2733d93e1b13db6840a9429947357f47b23fbe39b7d2d61e5ee26f9946c4632f6c4699e452f412a26641d4751135400713cd56ec66f0370423d55d2af70f5e7ad0adea8e4a0d904a01e4ac272eba4af1a029dd53eb71f115bf31f7a6c8b19a6523adeecc0d4c3c107575e38572a8f8474ccad163e46e2e8b08111132aa97a16fb588c9b7e37b3b3d7490381f3c55d1a9869a0fd42cd86fed59ecec78cb6b2dfd06a497f5afe3419691314ba0",
++          "666f7274792074776f"
++        },{
++          "8. a random negative test case that generates a 9 byte long message",
++          NULL,
++          "",
++          "5c8555f5cef627c15d37f85c7f5fd6e499264ea4b8e3f9112023aeb722eb38d8eac2be3751fd5a3785ab7f2d59fa3728e5be8c3de78a67464e30b21ee23b5484bb3cd06d0e1c6ad25649c8518165653eb80488bfb491b20c04897a6772f69292222fc5ef50b5cf9efc6d60426a449b6c489569d48c83488df629d695653d409ce49a795447fcec2c58a1a672e4a391401d428baaf781516e11e323d302fcf20f6eab2b2dbe53a48c987e407c4d7e1cb41131329138313d330204173a4f3ff06c6fadf970f0ed1005d0b27e35c3d11693e0429e272d583e57b2c58d24315c397856b34485dcb077665592b747f889d34febf2be8fce66c265fd9fc3575a6286a5ce88b4b413a08efc57a07a8f57a999605a837b0542695c0d189e678b53662ecf7c3d37d9dbeea585eebfaf79141118e06762c2381fe27ca6288edddc19fd67cd64f16b46e06d8a59ac530f22cd83cc0bc4e37feb52015cbb2283043ccf5e78a4eb7146827d7a466b66c8a4a4826c1bad68123a7f2d00fc1736525ff90c058f56",
++          "257906ca6de8307728"
++        },{
++          "9. a random negative test case that generates a 9 byte long message based on second to last value from PRF",
++          NULL,
++          "",
++          "758c215aa6acd61248062b88284bf43c13cb3b3d02410be4238607442f1c0216706e21a03a2c10eb624a63322d854da195c017b76fea83e274fa371834dcd2f3b7accf433fc212ad76c0bac366e1ed32e25b279f94129be7c64d6e162adc08ccebc0cfe8e926f01c33ab9c065f0e0ac83ae5137a4cb66702615ad68a35707d8676d2740d7c1a954680c83980e19778ed11eed3a7c2dbdfc461a9bbef671c1bc00c882d361d29d5f80c42bdf5efec886c34138f83369c6933b2ac4e93e764265351b4a0083f040e14f511f09b22f96566138864e4e6ff24da4810095da98e0585410951538ced2f757a277ff8e17172f06572c9024eeae503f176fd46eb6c5cd9ba07af11cde31dccac12eb3a4249a7bfd3b19797ad1656984bfcbf6f74e8f99d8f1ac420811f3d166d87f935ef15ae858cf9e72c8e2b547bf16c3fb09a8c9bf88fd2e5d38bf24ed610896131a84df76b9f920fe76d71fff938e9199f3b8cd0c11fd0201f9139d7673a871a9e7d4adc3bbe360c8813617cd60a90128fbe34c9d5",
++          "043383c929060374ed"
++        },{
++          "10. a random negative test that generates message based on 3rd last value from PRF",
++          NULL,
++          "",
++          "7b22d5e62d287968c6622171a1f75db4b0fd15cdf3134a1895d235d56f8d8fe619f2bf4868174a91d7601a82975d2255190d28b869141d7c395f0b8c4e2be2b2c1b4ffc12ce749a6f6803d4cfe7fba0a8d6949c04151f981c0d84592aa2ff25d1bd3ce5d10cb03daca6b496c6ad40d30bfa8acdfd02cdb9326c4bdd93b949c9dc46caa8f0e5f429785bce64136a429a3695ee674b647452bea1b0c6de9c5f1e8760d5ef6d5a9cfff40457b023d3c233c1dcb323e7808103e73963b2eafc928c9eeb0ee3294955415c1ddd9a1bb7e138fecd79a3cb89c57bd2305524624814aaf0fd1acbf379f7f5b39421f12f115ba488d380586095bb53f174fae424fa4c8e3b299709cd344b9f949b1ab57f1c645d7ed3c8f81d5594197355029fee8960970ff59710dc0e5eb50ea6f4c3938e3f89ed7933023a2c2ddffaba07be147f686828bd7d520f300507ed6e71bdaee05570b27bc92741108ac2eb433f028e138dd6d63067bc206ea2d826a7f41c0d613daed020f0f30f4e272e9618e0a8c39018a83",
++          "70263fa6050534b9e0"
++        },{
++          "11. an otherwise valid plaintext, but with wrong first byte (0x01 instead of 0x00)",
++          NULL,
++          "",
++          "6db80adb5ff0a768caf1378ecc382a694e7d1bde2eff4ba12c48aaf794ded7a994a5b2b57acec20dbec4ae385c9dd531945c0f197a5496908725fc99d88601a17d3bb0b2d38d2c1c3100f39955a4cb3dbed5a38bf900f23d91e173640e4ec655c84fdfe71fcdb12a386108fcf718c9b7af37d39703e882436224c877a2235e8344fba6c951eb7e2a4d1d1de81fb463ac1b880f6cc0e59ade05c8ce35179ecd09546731fc07b141d3d6b342a97ae747e61a9130f72d37ac5a2c30215b6cbd66c7db893810df58b4c457b4b54f34428247d584e0fa71062446210db08254fb9ead1ba1a393c724bd291f0cf1a7143f32df849051dc896d7d176fef3b57ab6dffd626d0c3044e9edb2e3d012ace202d2581df01bec7e9aa0727a6650dd373d374f0bc0f4a611f8139dfe97d63e70c6188f4df5b672e47c51d8aa567097293fbff127c75ec690b43407578b73c85451710a0cece58fd497d7f7bd36a8a92783ef7dc6265dff52aac8b70340b996508d39217f2783ce6fc91a1cc94bb2ac487b84f62",
++          "6d8d3a094ff3afff4c"
++        },{
++          "12. an otherwise valid plaintext, but with wrong second byte (0x01 instead of 0x02)",
++          NULL,
++          "",
++          "417328c034458563079a4024817d0150340c34e25ae16dcad690623f702e5c748a6ebb3419ff48f486f83ba9df35c05efbd7f40613f0fc996c53706c30df6bba6dcd4a40825f96133f3c21638a342bd4663dffbd0073980dac47f8c1dd8e97ce1412e4f91f2a8adb1ac2b1071066efe8d718bbb88ca4a59bd61500e826f2365255a409bece0f972df97c3a55e09289ef5fa815a2353ef393fd1aecfc888d611c16aec532e5148be15ef1bf2834b8f75bb26db08b66d2baad6464f8439d1986b533813321dbb180080910f233bcc4dd784fb21871aef41be08b7bfad4ecc3b68f228cb5317ac6ec1227bc7d0e452037ba918ee1da9fdb8393ae93b1e937a8d4691a17871d5092d2384b6190a53df888f65b951b05ed4ad57fe4b0c6a47b5b22f32a7f23c1a234c9feb5d8713d949686760680da4db454f4acad972470033472b9864d63e8d23eefc87ebcf464ecf33f67fbcdd48eab38c5292586b36aef5981ed2fa07b2f9e23fc57d9eb71bfff4111c857e9fff23ceb31e72592e70c874b4936",
++          "c6ae80ffa80bc184b0"
++        },{
++          "13. an otherwise valid plaintext, but with zero byte in first byte of padding",
++          NULL,
++          "",
++          "8542c626fe533467acffcd4e617692244c9b5a3bf0a215c5d64891ced4bf4f9591b4b2aedff9843057986d81631b0acb3704ec2180e5696e8bd15b217a0ec36d2061b0e2182faa3d1c59bd3f9086a10077a3337a3f5da503ec3753535ffd25b837a12f2541afefd0cffb0224b8f874e4bed13949e105c075ed44e287c5ae03b155e06b90ed247d2c07f1ef3323e3508cce4e4074606c54172ad74d12f8c3a47f654ad671104bf7681e5b061862747d9afd37e07d8e0e2291e01f14a95a1bb4cbb47c304ef067595a3947ee2d722067e38a0f046f43ec29cac6a8801c6e3e9a2331b1d45a7aa2c6af3205be382dd026e389614ee095665a611ab2e8dced2ee1c9d08ac9de11aef5b3803fc9a9ce8231ec87b5fed386fb92ee3db995a89307bcba844bd0a691c29ae51216e949dfc813133cb06a07265fd807bcb3377f6adb0a481d9b7f442003115895939773e6b95371c4febef29edae946fa245e7c50729e2e558cfaad773d1fd5f67b457a6d9d17a847c6fcbdb103a86f35f228cefc06cea0",
++          "a8a9301daa01bb25c7"
++        },{
++          "14. an otherwise valid plaintext, but with zero byte in eight byte of padding",
++          NULL,
++          "",
++          "449dfa237a70a99cb0351793ec8677882021c2aa743580bf6a0ea672055cffe8303ac42855b1d1f3373aae6af09cb9074180fc963e9d1478a4f98b3b4861d3e7f0aa8560cf603711f139db77667ca14ba3a1acdedfca9ef4603d6d7eb0645bfc805304f9ad9d77d34762ce5cd84bd3ec9d35c30e3be72a1e8d355d5674a141b5530659ad64ebb6082e6f73a80832ab6388912538914654d34602f4b3b1c78589b4a5d964b2efcca1dc7004c41f6cafcb5a7159a7fc7c0398604d0edbd4c8f4f04067da6a153a05e7cbeea13b5ee412400ef7d4f3106f4798da707ec37a11286df2b7a204856d5ff773613fd1e453a7114b78e347d3e8078e1cb3276b3562486ba630bf719697e0073a123c3e60ebb5c7a1ccff4279faffa2402bc1109f8d559d6766e73591943dfcf25ba10c3762f02af85187799b8b4b135c3990793a6fd32642f1557405ba55cc7cf7336a0e967073c5fa50743f9cc5e3017c172d9898d2af83345e71b3e0c22ab791eacb6484a32ec60ebc226ec9deaee91b1a0560c2b571",
++          "6c716fe01d44398018"
++        },{
++          "15. an otherwise valid plaintext, but with null separator missing",
++          NULL,
++          "",
++          "a7a5c99e50da48769ecb779d9abe86ef9ec8c38c6f43f17c7f2d7af608a4a1bd6cf695b47e97c191c61fb5a27318d02f495a176b9fae5a55b5d3fabd1d8aae4957e3879cb0c60f037724e11be5f30f08fc51c033731f14b44b414d11278cd3dba7e1c8bfe208d2b2bb7ec36366dacb6c88b24cd79ab394adf19dbbc21dfa5788bacbadc6a62f79cf54fd8cf585c615b5c0eb94c35aa9de25321c8ffefb8916bbaa2697cb2dd82ee98939df9b6704cee77793edd2b4947d82e00e5749664970736c59a84197bd72b5c71e36aae29cd39af6ac73a368edbc1ca792e1309f442aafcd77c992c88f8e4863149f221695cb7b0236e75b2339a02c4ea114854372c306b9412d8eedb600a31532002f2cea07b4df963a093185e4607732e46d753b540974fb5a5c3f9432df22e85bb17611370966c5522fd23f2ad3484341ba7fd8885fc8e6d379a611d13a2aca784fba2073208faad2137bf1979a0fa146c1880d4337db3274269493bab44a1bcd0681f7227ffdf589c2e925ed9d36302509d1109ba4",
++          "aa2de6cde4e2442884"
++        },{
++          NULL,
++          NULL,
++          NULL,
++          NULL,
++          NULL,
++        }
++      }
+     }
+   };
+diff --git a/tests/pkcs1v2.c b/tests/pkcs1v2.c
+index ab070a94..a2153728 100644
+--- a/tests/pkcs1v2.c
++++ b/tests/pkcs1v2.c
+@@ -82,7 +82,7 @@ data_from_hex (const char *string, size_t *r_length)
+ 
+ static int
+ extract_cmp_data (gcry_sexp_t sexp, const char *name, const char *expected,
+-                  const char *description)
++                  const char *description, int quiet)
+ {
+   gcry_sexp_t l1;
+   const void *a;
+@@ -96,13 +96,15 @@ extract_cmp_data (gcry_sexp_t sexp, const char *name, const char *expected,
+   b = data_from_hex (expected, &blen);
+   if (!a)
+     {
+-      info ("%s: parameter \"%s\" missing in key\n", description, name);
++      if (!quiet)
++        info ("%s: parameter \"%s\" missing in key\n", description, name);
+       rc = 1;
+     }
+   else if ( alen != blen || memcmp (a, b, alen) )
+     {
+-      info ("%s: parameter \"%s\" does not match expected value\n",
+-            description, name);
++      if (!quiet)
++        info ("%s: parameter \"%s\" does not match expected value\n",
++              description, name);
+       rc = 1;
+     }
+   gcry_free (b);
+@@ -192,7 +194,7 @@ check_oaep (void)
+           else
+             {
+               if (extract_cmp_data (ciph, "a", tbl[tno].m[mno].encr,
+-                                    tbl[tno].m[mno].desc))
++                                    tbl[tno].m[mno].desc, 0))
+                 {
+                   show_sexp ("encrypt result:\n", ciph);
+                   fail ("mismatch in gcry_pk_encrypt\n");
+@@ -223,7 +225,7 @@ check_oaep (void)
+           else
+             {
+               if (extract_cmp_data (plain, "value", tbl[tno].m[mno].mesg,
+-                                    tbl[tno].m[mno].desc))
++                                    tbl[tno].m[mno].desc, 0))
+                 {
+                   show_sexp ("decrypt result:\n", plain);
+                   fail ("mismatch in gcry_pk_decrypt\n");
+@@ -326,7 +328,7 @@ check_pss (void)
+           else
+             {
+               if (extract_cmp_data (sig, "s", tbl[tno].m[mno].sign,
+-                                    tbl[tno].m[mno].desc))
++                                    tbl[tno].m[mno].desc, 0))
+                 {
+                   show_sexp ("sign result:\n", sig);
+                   fail ("mismatch in gcry_pk_sign\n");
+@@ -429,44 +431,89 @@ check_v15crypt (void)
+           size_t mesg_len, seed_len, encr_len;
+           gcry_sexp_t plain, ciph;
+ 
++          if (tbl[tno].m[mno].desc == NULL)
++            break;
++
+           if (verbose)
+             info ("running test: %s\n", tbl[tno].m[mno].desc);
+ 
+-          mesg = data_from_hex (tbl[tno].m[mno].mesg, &mesg_len);
+-          seed = data_from_hex (tbl[tno].m[mno].seed, &seed_len);
++          if (tbl[tno].m[mno].mesg)
++            {
++              mesg = data_from_hex (tbl[tno].m[mno].mesg, &mesg_len);
++              seed = data_from_hex (tbl[tno].m[mno].seed, &seed_len);
++
++              err = gcry_sexp_build (&plain, NULL,
++                                     "(data (flags pkcs1)"
++                                     "(value %b)(random-override %b))",
++                                     (int)mesg_len, mesg,
++                                     (int)seed_len, seed);
++              if (err)
++                die ("constructing plain data failed: %s\n", gpg_strerror (err));
++              gcry_free (mesg);
++              gcry_free (seed);
++
++              err = gcry_pk_encrypt (&ciph, plain, pub_key);
++              if (err)
++                {
++                  show_sexp ("plain:\n", ciph);
++                  fail ("gcry_pk_encrypt failed: %s\n", gpg_strerror (err));
++                }
++              else
++                {
++                  if (extract_cmp_data (ciph, "a", tbl[tno].m[mno].encr,
++                                        tbl[tno].m[mno].desc, 0))
++                    {
++                      show_sexp ("encrypt result:\n", ciph);
++                      fail ("mismatch in gcry_pk_encrypt\n");
++                    }
++                  gcry_sexp_release (ciph);
++                  ciph = NULL;
++                }
++              gcry_sexp_release (plain);
++              plain = NULL;
++            }
+ 
+-          err = gcry_sexp_build (&plain, NULL,
+-                                 "(data (flags pkcs1)"
+-                                 "(value %b)(random-override %b))",
+-                                 (int)mesg_len, mesg,
+-                                 (int)seed_len, seed);
++          /* Now test the decryption.  */
++          encr = data_from_hex (tbl[tno].m[mno].encr, &encr_len);
++          seed = data_from_hex (tbl[tno].m[mno].seed, &seed_len);
++
++#ifdef WITH_MARVIN_WORKAROUND
++          /* First try without implicit rejection -- this should fail for invalid inputs */
++          err = gcry_sexp_build (&ciph, NULL,
++                                 "(enc-val (flags pkcs1 no-implicit-rejection)"
++                                 "(rsa (a %b)))",
++                                 (int)encr_len, encr);
+           if (err)
+-            die ("constructing plain data failed: %s\n", gpg_strerror (err));
+-          gcry_free (mesg);
+-          gcry_free (seed);
++            die ("constructing cipher data failed: %s\n", gpg_strerror (err));
+ 
+-          err = gcry_pk_encrypt (&ciph, plain, pub_key);
++          err = gcry_pk_decrypt (&plain, ciph, sec_key);
+           if (err)
+             {
+-              show_sexp ("plain:\n", ciph);
+-              fail ("gcry_pk_encrypt failed: %s\n", gpg_strerror (err));
++              /* If the message is not set, the padding is invalid and failure is expected */
++              if (tbl[tno].m[mno].mesg != NULL)
++                {
++                  show_sexp ("ciph:\n", ciph);
++                  fail ("gcry_pk_decrypt failed: %s\n", gpg_strerror (err));
++                }
+             }
+           else
+             {
+-              if (extract_cmp_data (ciph, "a", tbl[tno].m[mno].encr,
+-                                    tbl[tno].m[mno].desc))
++              /* If the message is not set, it is in the synthetic field */
++              const char *msg = tbl[tno].m[mno].mesg;
++              if (msg == NULL)
++                msg = tbl[tno].m[mno].synt;
++              if (extract_cmp_data (plain, "value", msg,
++                                    tbl[tno].m[mno].desc, 0))
+                 {
+-                  show_sexp ("encrypt result:\n", ciph);
+-                  fail ("mismatch in gcry_pk_encrypt\n");
++                  show_sexp ("decrypt result:\n", plain);
++                  fail ("mismatch in gcry_pk_decrypt.\n");
+                 }
+-              gcry_sexp_release (ciph);
+-              ciph = NULL;
++              gcry_sexp_release (plain);
++              plain = NULL;
+             }
+-          gcry_sexp_release (plain);
+-          plain = NULL;
+-
+-          /* Now test the decryption.  */
+-          encr = data_from_hex (tbl[tno].m[mno].encr, &encr_len);
++          gcry_sexp_release (ciph);
++          ciph = NULL;
++#endif /* WITH_MARVIN_WORKAROUND */
+ 
+           err = gcry_sexp_build (&ciph, NULL,
+                                  "(enc-val (flags pkcs1)"
+@@ -484,15 +530,19 @@ check_v15crypt (void)
+             }
+           else
+             {
+-              if (extract_cmp_data (plain, "value", tbl[tno].m[mno].mesg,
+-                                    tbl[tno].m[mno].desc))
++              /* If the message is not set, expect the synthetic message here */
++              const char *msg = tbl[tno].m[mno].mesg;
++              if (msg == NULL)
++                msg = tbl[tno].m[mno].synt;
++              if (extract_cmp_data (plain, "value", msg,
++                                    tbl[tno].m[mno].desc, 0))
+                 {
+                   show_sexp ("decrypt result:\n", plain);
+-                  fail ("mismatch in gcry_pk_decrypt\n");
++                  fail ("mismatch in gcry_pk_decrypt. Expected %s\n", msg);
+                 }
+-              gcry_sexp_release (plain);
+-              plain = NULL;
+             }
++          gcry_sexp_release (plain);
++          plain = NULL;
+           gcry_sexp_release (ciph);
+           ciph = NULL;
+         }
+@@ -584,7 +634,7 @@ check_v15sign (void)
+           else
+             {
+               if (extract_cmp_data (sig, "s", tbl[tno].m[mno].sign,
+-                                    tbl[tno].m[mno].desc))
++                                    tbl[tno].m[mno].desc, 0))
+                 {
+                   show_sexp ("sign result:\n", sig);
+                   fail ("mismatch in gcry_pk_sign\n");
+-- 
+2.46.0
+

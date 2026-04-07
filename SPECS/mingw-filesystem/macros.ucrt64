@@ -1,0 +1,195 @@
+# RPM macros for Fedora MinGW UCRT64.
+
+%ucrt64_pkg_name        %(echo %{name} | sed 's/^mingw-/ucrt64-/')
+%ucrt64_target          x86_64-w64-mingw32ucrt
+
+# Paths.
+%ucrt64_sysroot         %{_prefix}/%{ucrt64_target}/sys-root
+%ucrt64_prefix          %{ucrt64_sysroot}/mingw
+%ucrt64_exec_prefix     %{ucrt64_prefix}
+%ucrt64_bindir          %{ucrt64_exec_prefix}/bin
+%ucrt64_sbindir         %{ucrt64_exec_prefix}/sbin
+%ucrt64_libexecdir      %{ucrt64_exec_prefix}/libexec
+%ucrt64_libdir          %{ucrt64_exec_prefix}/lib
+%ucrt64_datadir         %{ucrt64_prefix}/share
+%ucrt64_docdir          %{ucrt64_prefix}/share/doc
+%ucrt64_infodir         %{ucrt64_prefix}/share/info
+%ucrt64_mandir          %{ucrt64_prefix}/share/man
+%ucrt64_sysconfdir      %{ucrt64_prefix}/etc
+%ucrt64_sharedstatedir  %{ucrt64_prefix}/com
+%ucrt64_localstatedir   %{ucrt64_prefix}/var
+%ucrt64_includedir      %{ucrt64_prefix}/include
+
+# Build macros.
+%ucrt64_host            %{ucrt64_target}
+
+%ucrt64_cflags          %{ucrt64_cppflags} -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4
+%ucrt64_cppflags        %{nil}
+%ucrt64_ldflags         -fstack-protector -lssp
+
+%ucrt64_cc              %{ucrt64_target}-gcc
+%ucrt64_cxx             %{ucrt64_target}-g++
+%ucrt64_cpp             %{ucrt64_target}-gcc -E
+%ucrt64_addr2line       %{ucrt64_target}-addr2line
+%ucrt64_ar              %{ucrt64_target}-ar
+%ucrt64_as              %{ucrt64_target}-as
+%ucrt64_dlltool         %{ucrt64_target}-dlltool
+%ucrt64_dllwrap         %{ucrt64_target}-dllwrap
+%ucrt64_gcov            %{ucrt64_target}-gcov
+%ucrt64_gprof           %{ucrt64_target}-gprof
+%ucrt64_ld              %{ucrt64_target}-ld
+%ucrt64_nm              %{ucrt64_target}-nm
+%ucrt64_objcopy         %{ucrt64_target}-objcopy
+%ucrt64_objdump         %{ucrt64_target}-objdump
+%ucrt64_ranlib          %{ucrt64_target}-ranlib
+%ucrt64_readelf         %{ucrt64_target}-readelf
+%ucrt64_size            %{ucrt64_target}-size
+%ucrt64_strings         %{ucrt64_target}-strings
+%ucrt64_strip           %{ucrt64_target}-strip
+%ucrt64_windmc          %{ucrt64_target}-windmc
+%ucrt64_windres         %{ucrt64_target}-windres
+
+%ucrt64_env unset $(/usr/bin/env | grep -E '^(\w+)=(.*)$' | grep -Evw 'PWD|USER|LANG' | /usr/bin/cut -d= -f1); \
+  if test -z "$PATH_ORIG" ; then \
+    PATH_ORIG="$PATH"; export PATH_ORIG; \
+  fi; \
+  PATH="%{ucrt64_bindir}:$PATH_ORIG"; export PATH; \
+  HOST_CC=gcc; export HOST_CC; \
+  unset PKG_CONFIG_PATH; \
+  _PREFIX="%{_bindir}/%{ucrt64_target}-"; \
+  for i in `ls -1 ${_PREFIX}* | grep -v 'gcc-'`; do \
+    x=`echo $i|sed "s,${_PREFIX},,"|tr "a-z+-." "A-ZX__"`; \
+    declare -x $x="$i" ; export $x; \
+  done; \
+  unset _PREFIX; \
+  CC="${UCRT64_CC:-%ucrt64_cc}"; export CC; \
+  CFLAGS="${UCRT64_CFLAGS-%ucrt64_cflags}"; export CFLAGS; \
+  CPPFLAGS="${UCRT64_CPPFLAGS-%ucrt64_cppflags}"; export CPPFLAGS; \
+  if [ -x "%{_bindir}/%{ucrt64_cxx}" ]; then \
+    CXX="${UCRT64_CXX:-%ucrt64_cxx}"; export CXX; \
+    CXXFLAGS="${UCRT64_CXXFLAGS-%ucrt64_cflags}"; export CXXFLAGS; \
+  else \
+    CXX=; export CXX; \
+    ac_cv_prog_CXX=no; export ac_cv_prog_CXX; \
+    CXXFLAGS=; export CXXFLAGS; \
+  fi; \
+  LDFLAGS="${UCRT64_LDFLAGS:-%ucrt64_ldflags}"; export LDFLAGS; \
+  for i in `ls %{ucrt64_bindir}/*|grep -- "-config\$"` ; do \
+    x=`basename $i|tr "a-z+-." "A-ZX_"`; \
+    declare -x $x="$i" ; export $x; \
+  done; \
+  unset x i
+
+%ucrt64_pkg_config %{ucrt64_target}-pkg-config "$@"
+%ucrt64_pkgconfig_personalitydir %{mingw32_datadir}/pkgconfig/personality.d
+
+%ucrt64_configure %{ucrt64_env} ; \
+  __ucrt64_topdir=.; if ! test -x configure; then __ucrt64_topdir=..; fi; \\\
+  $__ucrt64_topdir/configure \\\
+	--host=%{ucrt64_host} \\\
+	--build=%_build \\\
+	--target=%{ucrt64_target} \\\
+	--prefix=%{ucrt64_prefix} \\\
+	--exec-prefix=%{ucrt64_exec_prefix} \\\
+	--bindir=%{ucrt64_bindir} \\\
+	--sbindir=%{ucrt64_sbindir} \\\
+	--sysconfdir=%{ucrt64_sysconfdir} \\\
+	--datadir=%{ucrt64_datadir} \\\
+	--includedir=%{ucrt64_includedir} \\\
+	--libdir=%{ucrt64_libdir} \\\
+	--libexecdir=%{ucrt64_libexecdir} \\\
+	--localstatedir=%{ucrt64_localstatedir} \\\
+	--sharedstatedir=%{ucrt64_sharedstatedir} \\\
+	--mandir=%{ucrt64_mandir} \\\
+	--infodir=%{ucrt64_infodir} \\\
+	${MINGW_CONFIGURE_ARGS} \\\
+	${UCRT64_CONFIGURE_ARGS} "$@"
+
+%ucrt64_make %{ucrt64_env} ; \
+  make \\\
+	prefix=%{ucrt64_prefix} \\\
+	exec_prefix=%{ucrt64_exec_prefix} \\\
+	bindir=%{ucrt64_bindir} \\\
+	sbindir=%{ucrt64_sbindir} \\\
+	sysconfdir=%{ucrt64_sysconfdir} \\\
+	datadir=%{ucrt64_datadir} \\\
+	includedir=%{ucrt64_includedir} \\\
+	libdir=%{ucrt64_libdir} \\\
+	libexecdir=%{ucrt64_libexecdir} \\\
+	localstatedir=%{ucrt64_localstatedir} \\\
+	sharedstatedir=%{ucrt64_sharedstatedir} \\\
+	mandir=%{ucrt64_mandir} \\\
+	infodir=%{ucrt64_infodir} "$@"
+
+%ucrt64_cmake_generic %{ucrt64_env} ; \
+  PKG_CONFIG_LIBDIR="%{ucrt64_libdir}/pkgconfig:%{ucrt64_datadir}/pkgconfig"; export PKG_CONFIG_LIBDIR; \
+  if test -f CMakeLists.txt; then __ucrt64_topdir=.; \\\
+  elif test -f ../CMakeLists.txt; then __ucrt64_topdir=..; \\\
+  else __ucrt64_topdir=""; fi; \\\
+  if test "${MINGW_CMAKE_NO_VERBOSE}" == "" ; then \
+    UCRT64_CMAKE_ARGS="${UCRT64_CMAKE_ARGS} -DCMAKE_VERBOSE_MAKEFILE=ON" \
+  fi \
+  PATH=%{_prefix}/%{ucrt64_target}/bin:$PATH %__cmake \\\
+        -DCMAKE_TOOLCHAIN_FILE=/usr/share/mingw/toolchain-ucrt64.cmake \\\
+        -DBUILD_SHARED_LIBS:BOOL=ON \\\
+        -DSYSCONF_INSTALL_DIR:PATH=%{ucrt64_sysconfdir} \\\
+        -DSHARE_INSTALL_PREFIX:PATH=%{ucrt64_datadir} \\\
+        -DCMAKE_INSTALL_PREFIX:PATH=%{ucrt64_prefix} \\\
+        -DCMAKE_INSTALL_LIBDIR:PATH=%{ucrt64_libdir} \\\
+        ${MINGW_CMAKE_ARGS} \\\
+        ${UCRT64_CMAKE_ARGS} \\\
+        "$@" $__ucrt64_topdir
+
+%ucrt64_cmake \
+  UCRT64_CMAKE_ARGS="-DINCLUDE_INSTALL_DIR:PATH=%{ucrt64_includedir} ${UCRT64_CMAKE_ARGS}" \
+  %ucrt64_cmake_generic
+
+%ucrt64_cmake_kde4 \
+  UCRT64_CMAKE_ARGS="-DINCLUDE_INSTALL_DIR:PATH=%{ucrt64_includedir}/kde4 ${UCRT64_CMAKE_ARGS}" \
+  %ucrt64_cmake_generic
+
+%ucrt64_qmake_qt5 /usr/bin/ucrt64-qmake-qt5
+
+%ucrt64_meson %{ucrt64_env} ; \
+  unset CC CFLAGS CPPFLAGS CXX CXXFLAGS LD LDFLAGS; \\\
+  CFLAGS="${UCRT64_CFLAGS-%ucrt64_cflags}"; export CFLAGS; \\\
+  CPPFLAGS="${UCRT64_CPPFLAGS-%ucrt64_cppflags}"; export CPPFLAGS; \\\
+  LDFLAGS="${UCRT64_LDFLAGS:-%ucrt64_ldflags}"; export LDFLAGS; \\\
+  if test -f meson.build; then __ucrt64_topdir=.; \\\
+  elif test -f ../meson.build; then __ucrt64_topdir=..; \\\
+  else __ucrt64_topdir=""; fi; \\\
+  %__meson setup \\\
+        --cross-file /usr/share/mingw/toolchain-ucrt64.meson \\\
+        --default-library shared \\\
+        --prefix %{ucrt64_prefix} \\\
+        --bindir %{ucrt64_bindir} \\\
+        --sbindir %{ucrt64_sbindir} \\\
+        --sysconfdir %{ucrt64_sysconfdir} \\\
+        --datadir %{ucrt64_datadir} \\\
+        --includedir %{ucrt64_includedir} \\\
+        --libdir %{ucrt64_libdir} \\\
+        --libexecdir %{ucrt64_libexecdir} \\\
+        --localstatedir %{ucrt64_localstatedir} \\\
+        --sharedstatedir %{ucrt64_sharedstatedir} \\\
+        --mandir %{ucrt64_mandir} \\\
+        --infodir %{ucrt64_infodir} \\\
+        ${MINGW_MESON_ARGS} \\\
+        ${UCRT64_MESON_ARGS} \\\
+        "$@" $__ucrt64_topdir
+
+%ucrt64_description This is the cross-compiled version of this library / tool.\
+You should only install this package if you want to cross-compile programs for \
+Win64 (64 bit Windows).
+
+%ucrt64_debug_package                                                   \
+%package -n %{ucrt64_pkg_name}-debuginfo                                \
+Summary: Debug information for package %{ucrt64_pkg_name}               \
+Group: Development/Debug                                                 \
+BuildArch: noarch                                                        \
+%description -n %{ucrt64_pkg_name}-debuginfo                            \
+This package provides debug information for package %{ucrt64_pkg_name}. \
+Debug information is useful when developing applications that use this   \
+package or when debugging this package.                                  \
+%files -n %{ucrt64_pkg_name}-debuginfo -f ucrt64-debugfiles.list       \
+%defattr(-,root,root,-)                                                  \
+%{nil}

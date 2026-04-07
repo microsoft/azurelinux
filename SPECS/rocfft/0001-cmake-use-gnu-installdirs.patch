@@ -1,0 +1,13 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 14bb20b..a5b1ee4 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -49,6 +49,8 @@ set( ROCFFT_BUILD_SCOPE ON )
+ 
+ project( rocfft LANGUAGES CXX C )
+ 
++include(GNUInstallDirs)
++
+ # This finds the rocm-cmake project, and installs it if not found
+ # rocm-cmake contains common cmake code for rocm projects to help setup and install
+ set( PROJECT_EXTERN_DIR ${CMAKE_CURRENT_BINARY_DIR}/extern )

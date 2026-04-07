@@ -1,0 +1,40 @@
+From 5a58c6c7d97f003aa4a34ae130697dc81cc8fdf8 Mon Sep 17 00:00:00 2001
+From: Oliver Wolff <oliver.wolff@qt.io>
+Date: Wed, 22 Aug 2018 15:17:52 +0200
+Subject: [PATCH 8/8] ANGLE: winrt: Do full screen update if the the window
+ size is reduced
+
+We cannot do partial updates if the window size is reduced as this will
+result in a "pDstBox is not a valid box for the destination subresource."
+error.
+
+Change-Id: I9a8d91bca961f52e1aab1bec5321922cfc842fb3
+---
+ .../src/libANGLE/renderer/d3d/d3d11/TextureStorage11.cpp      | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/TextureStorage11.cpp b/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/TextureStorage11.cpp
+index 8f76d16c30..b702450ded 100644
+--- a/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/TextureStorage11.cpp
++++ b/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/TextureStorage11.cpp
+@@ -664,9 +664,14 @@ gl::Error TextureStorage11::setData(const gl::Context *context,
+     // with compressed formats in the calling logic.
+     ASSERT(!internalFormatInfo.compressed);
+ 
+-    const int width    = destBox ? destBox->width : static_cast<int>(image->getWidth());
+-    const int height   = destBox ? destBox->height : static_cast<int>(image->getHeight());
+-    const int depth    = destBox ? destBox->depth : static_cast<int>(image->getDepth());
++    const int imageWidth = static_cast<int>(image->getWidth());
++    const int width    = destBox ? destBox->width : imageWidth;
++    const int imageHeight = static_cast<int>(image->getHeight());
++    const int height   = destBox ? destBox->height : imageHeight;
++    const int imageDepth = static_cast<int>(image->getDepth());
++    const int depth    = destBox ? destBox->depth : imageDepth;
++    if (imageWidth < width || imageHeight < height || imageDepth < depth)
++        fullUpdate = true;
+     GLuint srcRowPitch = 0;
+     ANGLE_TRY_RESULT(
+         internalFormatInfo.computeRowPitch(type, width, unpack.alignment, unpack.rowLength),
+-- 
+2.15.0.windows.1
+

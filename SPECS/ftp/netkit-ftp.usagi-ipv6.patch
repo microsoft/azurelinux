@@ -1,0 +1,928 @@
+diff -uNr netkit-ftp-0.17/CVS/Entries netkit-ftp/CVS/Entries
+diff -uNr netkit-ftp-0.17/ChangeLog netkit-ftp/ChangeLog
+--- netkit-ftp-0.17/ChangeLog	Sun Jul 23 04:38:08 2000
++++ netkit-ftp/ChangeLog	Tue Nov 28 03:50:10 2000
+@@ -1,3 +1,6 @@
++28-Nov-2000:
++	IPv6 support. (Hiroyuki YAMAMORI <h-yamamo@db3.so-net.ne.jp>)
++
+ 8-Jul-2000:
+ 	Fix misused printf-function call (not %n-exploitable though).
+ 
+diff -uNr netkit-ftp-0.17/configure netkit-ftp/configure
+--- netkit-ftp-0.17/configure	Sat Jul 29 21:00:28 2000
++++ netkit-ftp/configure	Sat Jan 27 06:14:54 2001
+@@ -24,6 +24,7 @@
+     --binmode=mode        Mode for binaries [755]
+     --manmode=mode        Mode for manual pages [644]
+     --with-c-compiler=cc  Program for compiling C source [guessed]
++    --enable-ipv6         Enable IPv6 support
+ EOF
+ 	exit 0;;
+ 	--verbose) ;;
+@@ -39,6 +40,11 @@
+ 	--manmode=*) MANMODE=`echo $1 | sed 's/^[^=]*=//'` ;;
+ 	--with-c-compiler=*) CC=`echo $1 | sed 's/^[^=]*=//'` ;;
+ 	--without-readline|--disable-readline) WITHOUT_READLINE=1;;
++
++	--disable-ipv6) ENABLE_IPV6=no;;
++	--enable-ipv6=*) ENABLE_IPV6=`echo $1 | sed 's/^[^=]*=//'`;;
++	--enable-ipv6) ENABLE_IPV6=yes;;
++
+ 	*) echo "Unrecognized option: $1"; exit 1;;
+ esac 
+ shift
+@@ -142,6 +148,42 @@
+ 
+ LDFLAGS=
+ LIBS=
++
++rm -f __conftest*
++
++##################################################
++## Enable IPv6
++echo -n "Whether to enable IPv6 support... "
++if [ x"$ENABLE_IPV6" = x"yes" ]; then
++    echo yes
++    CFLAGS="$CFLAGS -DINET6"
++else
++    echo no
++fi
++
++rm -f __conftest*
++
++## Search IPv6 Library / Headers
++if [ x"$ENABLE_IPV6" = x"yes" ]; then
++    echo -n "Search for IPv6 library... "
++    inet6libdirs="/usr/local/v6/lib /usr/local/lib /usr /usr/inet6/lib"
++    inet6libs="inet6"
++    inet6found=no
++    for inet6libdir in $inet6libdirs; do
++        for inet6lib in $inet6libs; do
++            if [ -d $inet6libdir ] && [ -f $inet6libdir/lib$inet6lib.a ]; then
++                inet6found=yes
++                break 2
++            fi
++        done
++    done
++    if [ x"$inet6found" = x"yes" ]; then
++        echo "$inet6libdir/lib$inet6lib.a"
++        LIBS="$LIBS -L$inet6libdir -l$inet6lib"
++    else
++        echo "not found"
++    fi
++fi
+ 
+ rm -f __conftest*
+ 
+diff -uNr netkit-ftp-0.17/ftp/CVS/Entries netkit-ftp/ftp/CVS/Entries
+--- netkit-ftp-0.17/ftp/CVS/Entries	Thu Jan  1 02:00:00 1970
++++ netkit-ftp/ftp/CVS/Entries	Mon Feb 19 06:50:49 2001
+@@ -0,0 +1,16 @@
++/.cvsignore/1.1.1.1/Fri Nov  3 19:18:15 2000//
++/Makefile/1.4/Sat Jan 27 05:57:08 2001//
++/cmds.c/1.3/Fri Jan 12 21:36:27 2001//
++/cmds.h/1.1.1.1/Fri Nov  3 19:18:15 2000//
++/cmdtab.c/1.1.1.1/Fri Nov  3 19:18:15 2000//
++/domacro.c/1.1.1.1/Fri Nov  3 19:18:15 2000//
++/ftp.1/1.1.1.1/Fri Nov  3 19:18:15 2000//
++/ftp.c/1.11/Sun Feb 11 12:26:59 2001//
++/ftp_var.h/1.3/Fri Jan 12 21:36:27 2001//
++/glob.c/1.1.1.1/Fri Nov  3 19:18:15 2000//
++/glob.h/1.1.1.1/Fri Nov  3 19:18:15 2000//
++/main.c/1.1.1.1/Fri Nov  3 19:18:15 2000//
++/netrc.5/1.1.1.1/Fri Nov  3 19:18:15 2000//
++/pathnames.h/1.1.1.1/Fri Nov  3 19:18:15 2000//
++/ruserpass.c/1.1.1.1/Fri Nov  3 19:18:15 2000//
++D
+diff -uNr netkit-ftp-0.17/ftp/CVS/Repository netkit-ftp/ftp/CVS/Repository
+--- netkit-ftp-0.17/ftp/CVS/Repository	Thu Jan  1 02:00:00 1970
++++ netkit-ftp/ftp/CVS/Repository	Mon Feb 19 06:50:49 2001
+@@ -0,0 +1 @@
++usagi/src/netkit-ftp/ftp
+diff -uNr netkit-ftp-0.17/ftp/CVS/Root netkit-ftp/ftp/CVS/Root
+--- netkit-ftp-0.17/ftp/CVS/Root	Thu Jan  1 02:00:00 1970
++++ netkit-ftp/ftp/CVS/Root	Mon Feb 19 06:50:49 2001
+@@ -0,0 +1 @@
++:pserver:anoncvs@anoncvs.linux-ipv6.org:/cvsroot/usagi
+diff -uNr netkit-ftp-0.17/ftp/Makefile netkit-ftp/ftp/Makefile
+--- netkit-ftp-0.17/ftp/Makefile	Sun Aug  1 09:00:12 1999
++++ netkit-ftp/ftp/Makefile	Sat Jan 27 07:57:08 2001
+@@ -16,10 +16,13 @@
+ cmds.o glob.o: glob.h
+ 
+ install: ftp
++	install -d $(INSTALLROOT)$(BINDIR)
+ 	install -s -m$(BINMODE) ftp $(INSTALLROOT)$(BINDIR)
+ 	ln -sf ftp $(INSTALLROOT)$(BINDIR)/pftp
++	install -d $(INSTALLROOT)$(MANDIR)/man1
+ 	install -m$(MANMODE) ftp.1 $(INSTALLROOT)$(MANDIR)/man1
+ 	ln -sf ftp.1 $(INSTALLROOT)$(MANDIR)/man1/pftp.1
++	install -d $(INSTALLROOT)$(MANDIR)/man5
+ 	install -m$(MANMODE) netrc.5 $(INSTALLROOT)$(MANDIR)/man5
+ 
+ clean:
+diff -uNr netkit-ftp-0.17/ftp/cmds.c netkit-ftp/ftp/cmds.c
+--- netkit-ftp-0.17/ftp/cmds.c	Sun Jul 23 04:36:59 2000
++++ netkit-ftp/ftp/cmds.c	Fri Jan 12 23:36:27 2001
+@@ -1,3 +1,5 @@
++/* $USAGI$ */
++
+ /*
+  * Copyright (c) 1985, 1989 Regents of the University of California.
+  * All rights reserved.
+@@ -35,7 +37,7 @@
+  * from: @(#)cmds.c	5.26 (Berkeley) 3/5/91
+  */
+ char cmds_rcsid[] = 
+-   "$Id: cmds.c,v 1.33 2000/07/23 01:36:59 dholland Exp $";
++   "$Id: cmds.c,v 1.3 2001/01/12 21:36:27 sekiya Exp $";
+ 
+ /*
+  * FTP User Program -- Command Routines.
+@@ -190,7 +192,7 @@
+ setpeer(int argc, char *argv[])
+ {
+ 	char *host;
+-	unsigned short port;
++	char *port;
+ 
+ 	if (connected) {
+ 		printf("Already connected to %s, use close first.\n",
+@@ -205,22 +207,17 @@
+ 		code = -1;
+ 		return;
+ 	}
+-	port = ftp_port;
++	port = NULL;
+ 	if (argc > 2) {
+-		port = atoi(argv[2]);
+-		if (port < 1) {
+-			printf("%s: bad port number-- %s\n", argv[1], argv[2]);
+-			printf ("usage: %s host-name [port]\n", argv[0]);
+-			code = -1;
+-			return;
+-		}
+-		port = htons(port);
++		port = argv[2];
+ 	}
+ 	host = hookup(argv[1], port);
+ 	if (host) {
+ 		int overbose;
+ 
+ 		connected = 1;
++		try_epsv = 1;
++		try_eprt = 1;
+ 		/*
+ 		 * Set up defaults for FTP.
+ 		 */
+diff -uNr netkit-ftp-0.17/ftp/cmdtab.c netkit-ftp/ftp/cmdtab.c
+--- netkit-ftp-0.17/ftp/cmdtab.c	Tue Sep 28 18:36:05 1999
++++ netkit-ftp/ftp/cmdtab.c	Fri Nov  3 21:18:15 2000
+@@ -35,7 +35,7 @@
+  * from: @(#)cmdtab.c	5.10 (Berkeley) 6/1/90
+  */
+ char cmdtab_rcsid[] = 
+-  "$Id: cmdtab.c,v 1.8 1999/09/28 15:36:05 dholland Exp $";
++  "$Id: cmdtab.c,v 1.1.1.1 2000/11/03 19:18:15 mk Exp $";
+ 
+ #include <string.h>   /* for NULL */
+ #include "ftp_var.h"
+diff -uNr netkit-ftp-0.17/ftp/domacro.c netkit-ftp/ftp/domacro.c
+--- netkit-ftp-0.17/ftp/domacro.c	Thu Aug 15 02:27:28 1996
++++ netkit-ftp/ftp/domacro.c	Fri Nov  3 21:18:15 2000
+@@ -35,7 +35,7 @@
+  * from: @(#)domacro.c	1.8 (Berkeley) 9/28/90
+  */
+ char domacro_rcsid[] = 
+-  "$Id: domacro.c,v 1.4 1996/08/14 23:27:28 dholland Exp $";
++  "$Id: domacro.c,v 1.1.1.1 2000/11/03 19:18:15 mk Exp $";
+ 
+ #include <errno.h>
+ #include <ctype.h>
+diff -uNr netkit-ftp-0.17/ftp/ftp.1 netkit-ftp/ftp/ftp.1
+--- netkit-ftp-0.17/ftp/ftp.1	Mon Jul 31 02:56:59 2000
++++ netkit-ftp/ftp/ftp.1	Fri Nov  3 21:18:15 2000
+@@ -30,7 +30,7 @@
+ .\" SUCH DAMAGE.
+ .\"
+ .\"	from: @(#)ftp.1	6.18 (Berkeley) 7/30/91
+-.\"	$Id: ftp.1,v 1.14 2000/07/30 23:56:59 dholland Exp $
++.\"	$Id: ftp.1,v 1.1.1.1 2000/11/03 19:18:15 mk Exp $
+ .\"
+ .Dd August 15, 1999
+ .Dt FTP 1
+diff -uNr netkit-ftp-0.17/ftp/ftp.c netkit-ftp/ftp/ftp.c
+--- netkit-ftp-0.17/ftp/ftp.c	Mon Dec 13 22:33:20 1999
++++ netkit-ftp/ftp/ftp.c	Sun Feb 11 14:26:59 2001
+@@ -1,3 +1,34 @@
++/* $USAGI$ */
++
++/*
++ * Copyright (C) 1997 and 1998 WIDE Project.
++ * All rights reserved.
++ * 
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ * 3. Neither the name of the project nor the names of its contributors
++ *    may be used to endorse or promote products derived from this software
++ *    without specific prior written permission.
++ * 
++ * THIS SOFTWARE IS PROVIDED BY THE PROJECT AND CONTRIBUTORS ``AS IS'' AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++ * ARE DISCLAIMED.  IN NO EVENT SHALL THE PROJECT OR CONTRIBUTORS BE LIABLE
++ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ */
++
+ /*
+  * Copyright (c) 1985, 1989 Regents of the University of California.
+  * All rights reserved.
+@@ -35,7 +66,7 @@
+  * From: @(#)ftp.c	5.38 (Berkeley) 4/22/91
+  */
+ char ftp_rcsid[] = 
+-  "$Id: ftp.c,v 1.25 1999/12/13 20:33:20 dholland Exp $";
++  "$Id: ftp.c,v 1.11 2001/02/11 12:26:59 yoshfuji Exp $";
+ 
+ #include <sys/param.h>
+ #include <sys/stat.h>
+@@ -63,14 +94,38 @@
+ #include "ftp_var.h"
+ #include "cmds.h"
+ 
++#ifdef _USAGI
++#include "version.h"
++#else
+ #include "../version.h"
++#endif
++
++union sockunion {
++	struct sockinet {
++		u_short	si_family;
++		u_short	si_port;
++	} su_si;
++	struct	sockaddr		su_sa;
++	struct	sockaddr_in  		su_sin;
++#ifdef INET6
++	struct	sockaddr_in6 		su_sin6;
++#endif
++};
++#define	su_family	su_sa.sa_family
++#define	su_port		su_si.si_port
++
++#ifdef INET6
++#define ex_af2prot(a) (a == AF_INET ? 1 : (a == AF_INET6 ? 2 : 0))
++#else
++#define ex_af2prot(a) (a == AF_INET ? 1 : 0)
++#endif
+ 
+ int data = -1;
+ off_t restart_point = 0;
+ 
+-static struct sockaddr_in hisctladdr;
+-static struct sockaddr_in data_addr;
+-static struct sockaddr_in myctladdr;
++static union sockunion hisctladdr;
++static union sockunion data_addr;
++static union sockunion myctladdr;
+ static int ptflag = 0;
+ static sigjmp_buf recvabort;
+ static sigjmp_buf sendabort;
+@@ -96,79 +151,119 @@
+ static FILE *dataconn(const char *);
+ 
+ char *
+-hookup(char *host, int port)
++hookup(const char *host, const char *port)
+ {
+-	register struct hostent *hp = 0;
+-	int s, tos;
++	int s, tos, error;
+ 	socklen_t len;
+ 	static char hostnamebuf[256];
+-
++	struct addrinfo hints, *res, *res0;
++	char hbuf[MAXHOSTNAMELEN], pbuf[NI_MAXSERV];
++	char *cause = "ftp: unknown";
++
++	if (port) {
++		strncpy(pbuf, port, sizeof(pbuf) - 1);
++		pbuf[sizeof(pbuf) - 1] = '\0';
++	} else {
++		sprintf(pbuf, "%d", ntohs(ftp_port));
++	}
+ 	memset(&hisctladdr, 0, sizeof(hisctladdr));
+-	if (inet_aton(host, &hisctladdr.sin_addr)) {
+-		hisctladdr.sin_family = AF_INET;
+-		strncpy(hostnamebuf, host, sizeof(hostnamebuf));
+-		hostnamebuf[sizeof(hostnamebuf)-1]=0;
+-	} 
+-	else {
+-		hp = gethostbyname(host);
+-		if (hp == NULL) {
+-			fprintf(stderr, "ftp: %s: ", host);
+-			herror((char *)NULL);
+-			code = -1;
+-			return((char *) 0);
++	memset(&hints, 0, sizeof(hints));
++	hints.ai_flags = AI_CANONNAME;
++	hints.ai_socktype = SOCK_STREAM;
++	error = getaddrinfo(host, pbuf, &hints, &res0);
++	if (error) {
++		if (port) {
++			strcpy(hbuf, " ");
++		} else {
++			hbuf[0] = '\0';
++			pbuf[0] = '\0';
+ 		}
+-		hisctladdr.sin_family = hp->h_addrtype;
+-		if (hp->h_length > (int)sizeof(hisctladdr.sin_addr)) {
+-			hp->h_length = sizeof(hisctladdr.sin_addr);
+-		}
+-		memcpy(&hisctladdr.sin_addr, hp->h_addr_list[0], hp->h_length);
+-		(void) strncpy(hostnamebuf, hp->h_name, sizeof(hostnamebuf));
+-		hostnamebuf[sizeof(hostnamebuf)-1] = 0;
+-	}
+-	hostname = hostnamebuf;
+-	s = socket(hisctladdr.sin_family, SOCK_STREAM, 0);
+-	if (s < 0) {
+-		perror("ftp: socket");
++		fprintf(stderr, "ftp: %s%s%s: %s\n", host, hbuf, pbuf,
++						gai_strerror(error));
+ 		code = -1;
+ 		return (0);
+ 	}
+-	hisctladdr.sin_port = port;
+-	while (connect(s, (struct sockaddr *)&hisctladdr, sizeof (hisctladdr)) < 0) {
+-		if (hp && hp->h_addr_list[1]) {
+-			int oerrno = errno;
+-
+-			fprintf(stderr, "ftp: connect to address %s: ",
+-				inet_ntoa(hisctladdr.sin_addr));
+-			errno = oerrno;
+-			perror((char *) 0);
+-			hp->h_addr_list++;
+-			memcpy(&hisctladdr.sin_addr, hp->h_addr_list[0], 
+-			       hp->h_length);
+-			fprintf(stdout, "Trying %s...\n",
+-				inet_ntoa(hisctladdr.sin_addr));
+-			(void) close(s);
+-			s = socket(hisctladdr.sin_family, SOCK_STREAM, 0);
+-			if (s < 0) {
+-				perror("ftp: socket");
+-				code = -1;
+-				return (0);
++
++	if (res0->ai_canonname) {
++		struct addrinfo h, *a;
++		memset(&h, 0, sizeof(h));
++		h.ai_family = PF_UNSPEC;
++		h.ai_socktype = SOCK_STREAM;
++		h.ai_flags = AI_NUMERICHOST;
++		if (!getaddrinfo(res0->ai_canonname, NULL, &h, &a)) {
++			strncpy(hostnamebuf, res0->ai_canonname, sizeof(hostnamebuf));
++			freeaddrinfo(a);
++		} else
++			strncpy(hostnamebuf, host, sizeof(hostnamebuf));
++	}
++	else
++		strncpy(hostnamebuf, host, sizeof(hostnamebuf));
++	hostnamebuf[sizeof(hostnamebuf) - 1] = '\0';
++	hostname = hostnamebuf;
++	
++	s = -1;
++	for (res = res0; res; res = res->ai_next) {
++		if (!ex_af2prot(res->ai_family)) {
++			cause = "ftp: mismatch address family";
++			errno = EPROTONOSUPPORT;
++			continue;
++		}
++		if ((size_t)res->ai_addrlen > sizeof(hisctladdr)) {
++			cause = "ftp: mismatch struct sockaddr size";
++			errno = EPROTO;
++			continue;
++		}
++		if (getnameinfo(res->ai_addr, res->ai_addrlen,
++				hbuf, sizeof(hbuf), NULL, 0,
++				NI_NUMERICHOST))
++			strcpy(hbuf, "???");
++		if (res0->ai_next)	/* if we have multiple possibilities */
++			fprintf(stdout, "Trying %s...\n", hbuf);
++		s = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
++		if (s < 0) {
++			cause = "ftp: socket";
++			continue;
++		}
++		while ((error = connect(s, res->ai_addr, res->ai_addrlen)) < 0
++				&& errno == EINTR) {
++			;
++		}
++		if (error) {
++			/* this "if" clause is to prevent print warning twice */
++			if (res->ai_next) {
++				fprintf(stderr,
++					"ftp: connect to address %s", hbuf);
++				perror("");
+ 			}
++			cause = "ftp: connect";
++			close(s);
++			s = -1;
+ 			continue;
+ 		}
+-		perror("ftp: connect");
++		/* finally we got one */
++		break;
++	}
++	if (s < 0) {
++		perror(cause);
+ 		code = -1;
+-		goto bad;
++		freeaddrinfo(res0);
++		return NULL;
+ 	}
+-	len = sizeof (myctladdr);
++	len = res->ai_addrlen;
++	memcpy(&hisctladdr, res->ai_addr, len);
++	freeaddrinfo(res0);
+ 	if (getsockname(s, (struct sockaddr *)&myctladdr, &len) < 0) {
+ 		perror("ftp: getsockname");
+ 		code = -1;
+ 		goto bad;
+ 	}
+ #ifdef IP_TOS
++	if (hisctladdr.su_family == AF_INET)
++	{
+ 	tos = IPTOS_LOWDELAY;
+ 	if (setsockopt(s, IPPROTO_IP, IP_TOS, (char *)&tos, sizeof(int)) < 0)
+ 		perror("ftp: setsockopt TOS (ignored)");
++	}
+ #endif
+ 	cin = fdopen(s, "r");
+ 	cout = fdopen(s, "w");
+@@ -182,7 +277,7 @@
+ 		goto bad;
+ 	}
+ 	if (verbose)
+-		printf("Connected to %s.\n", hostname);
++		printf("Connected to %s (%s).\n", hostname, hbuf);
+ 	if (getreply(0) > 2) { 	/* read startup message from server */
+ 		if (cin)
+ 			(void) fclose(cin);
+@@ -392,8 +487,10 @@
+ 			}
+ 			if (dig < 4 && isdigit(c))
+ 				code = code * 10 + (c - '0');
+-			if (!pflag && code == 227)
++			if (!pflag && (code == 227 || code == 228))
+ 				pflag = 1;
++			else if (!pflag && code == 229)
++				pflag = 100;
+ 			if (dig > 4 && pflag == 1 && isdigit(c))
+ 				pflag = 2;
+ 			if (pflag == 2) {
+@@ -405,6 +502,8 @@
+ 					pflag = 3;
+ 				}
+ 			}
++			if (pflag == 100 && c == '(')
++				pflag = 2;
+ 			if (dig == 4 && c == '-') {
+ 				if (continuation)
+ 					code = 0;
+@@ -1083,15 +1182,25 @@
+ static int
+ initconn(void)
+ {
+-	register char *p, *a;
++	u_char *p, *a;
+ 	int result, tmpno = 0;
+ 	socklen_t len;
+ 	int on = 1;
+-	int tos;
+-	u_long a1,a2,a3,a4,p1,p2;
+-
++	int tos, error = 0;
++	u_int ad[16], po[2], af, alen, plen;
++	char *pasvcmd = NULL;
++	char hbuf[MAXHOSTNAMELEN], pbuf[NI_MAXSERV];
++
++#ifdef INET6
++	if (myctladdr.su_family == AF_INET6
++	 && (IN6_IS_ADDR_LINKLOCAL(&myctladdr.su_sin6.sin6_addr)
++	  || IN6_IS_ADDR_SITELOCAL(&myctladdr.su_sin6.sin6_addr))) {
++		fprintf(stderr, "use of scoped address can be troublesome\n");
++	}
++#endif
+ 	if (passivemode) {
+-		data = socket(AF_INET, SOCK_STREAM, 0);
++		data_addr = hisctladdr;
++		data = socket(data_addr.su_family, SOCK_STREAM, 0);
+ 		if (data < 0) {
+ 			perror("ftp: socket");
+ 			return(1);
+@@ -1100,52 +1209,203 @@
+ 		    setsockopt(data, SOL_SOCKET, SO_DEBUG, (char *)&on,
+ 			       sizeof (on)) < 0)
+ 			perror("ftp: setsockopt (ignored)");
+-		if (command("PASV") != COMPLETE) {
++		switch (data_addr.su_family) {
++		case AF_INET:
++#if 0
++			if (try_epsv) {
++				result = command(pasvcmd = "EPSV 1");
++				if (code / 10 == 22 && code != 229) {
++					fprintf(stderr,
++				  "wrong server: return code must be 229\n");
++					result = COMPLETE + 1;
++				}
++			} else {
++#endif
++			result = COMPLETE + 1;
++
++			if (result != COMPLETE) {
++				try_epsv = 0;
++				result = command(pasvcmd = "PASV");
++			}
++			break;
++#ifdef INET6
++		case AF_INET6:
++			if (try_epsv) {
++				result = command(pasvcmd = "EPSV 2");
++				if (code / 10 == 22 && code != 229) {
++					fprintf(stderr,
++				  "wrong server: return code must be 229\n");
++					result = COMPLETE + 1;
++				}
++			} else {
++				result = COMPLETE + 1;
++			}
++			if (result != COMPLETE) {
++				try_epsv = 0;
++				result = command(pasvcmd = "LPSV");
++			}
++			break;
++#endif
++		default:
++			result = COMPLETE + 1;
++			break;
++		}
++		if (result != COMPLETE) {
+ 			printf("Passive mode refused.\n");
+-			return(1);
++			goto bad;
+ 		}
+ 
++#define pack2(var) \
++	(((var[0] & 0xff) << 8) | ((var[1] & 0xff) << 0))
++#define pack4(var) \
++	((((var)[0] & 0xff) << 24) | (((var)[1] & 0xff) << 16) | \
++	 (((var)[2] & 0xff) << 8) | (((var)[3] & 0xff) << 0))
++
+ 		/*
+ 		 * What we've got at this point is a string of comma separated
+ 		 * one-byte unsigned integer values, separated by commas.
+-		 * The first four are the an IP address. The fifth is the MSB
+-		 * of the port number, the sixth is the LSB. From that we'll
+-		 * prepare a sockaddr_in.
+ 		 */
+-
+-		if (sscanf(pasv,"%ld,%ld,%ld,%ld,%ld,%ld",
+-			   &a1,&a2,&a3,&a4,&p1,&p2)
+-		    != 6) 
+-		{
+-			printf("Passive mode address scan failure. Shouldn't happen!\n");
+-			return(1);
++		error = 0;
++		if (strcmp(pasvcmd, "PASV") == 0) {
++			if (data_addr.su_family != AF_INET) {
++				error = 2;
++				goto psv_done;
++			}
++			if (code / 10 == 22 && code != 227) {
++				error = 227;
++				goto psv_done;
++			}
++			if (sscanf(pasv, "%u,%u,%u,%u,%u,%u",
++					&ad[0], &ad[1], &ad[2], &ad[3],
++					&po[0], &po[1]) != 6) {
++				error = 1;
++				goto psv_done;
++			}
++			data_addr.su_sin.sin_addr.s_addr = htonl(pack4(ad));
++			data_addr.su_port = htons(pack2(po));
++		} else
++		    if (strcmp(pasvcmd, "LPSV") == 0) {
++			if (code / 10 == 22 && code != 228) {
++				error = 228;
++				goto psv_done;
++			}
++			switch (data_addr.su_family) {
++			case AF_INET:
++				if (sscanf(pasv, "%u,%u,%u,%u,%u,%u,%u,%u,%u",
++						&af, &alen,
++						&ad[0], &ad[1], &ad[2], &ad[3],
++						&plen, &po[0], &po[1]) != 9) {
++					error = 1;
++					goto psv_done;
++				}
++				if (af != 4 || alen != 4 || plen != 2) {
++					error = 2;
++					goto psv_done;
++				}
++				data_addr.su_sin.sin_addr.s_addr =
++							htonl(pack4(ad));
++				data_addr.su_port = htons(pack2(po));
++				break;
++#ifdef INET6
++			case AF_INET6:
++				if (sscanf(pasv,
++	"%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u",
++				  &af, &alen,
++				  &ad[0], &ad[1], &ad[2], &ad[3],
++				  &ad[4], &ad[5], &ad[6], &ad[7],
++				  &ad[8], &ad[9], &ad[10], &ad[11],
++				  &ad[12], &ad[13], &ad[14], &ad[15],
++				  &plen, &po[0], &po[1]) != 21) {
++					error = 1;
++					goto psv_done;
++				}
++				if (af != 6 || alen != 16 || plen != 2) {
++					error = 2;
++					goto psv_done;
++				}
++				data_addr.su_sin6.sin6_addr.s6_addr32[0] =
++							htonl(pack4(ad));
++				data_addr.su_sin6.sin6_addr.s6_addr32[1] =
++							htonl(pack4(ad+4));
++				data_addr.su_sin6.sin6_addr.s6_addr32[2] =
++							htonl(pack4(ad+8));
++				data_addr.su_sin6.sin6_addr.s6_addr32[3] =
++							htonl(pack4(ad+12));
++				data_addr.su_port = htons(pack2(po));
++				break;
++#endif
++			default:
++				error = 1;
++			}
++		} else if (strncmp(pasvcmd, "EPSV", 4) == 0) {
++			char delim[4];
++			u_int epsvpo;
++
++			if (code / 10 == 22 && code != 229) {
++				error = 229;
++				goto psv_done;
++			}
++			if (sscanf(pasv, "%c%c%c%u%c", &delim[0], &delim[1],
++					&delim[2], &epsvpo, &delim[3]) != 5) {
++				error = 1;
++				goto psv_done;
++			}
++			if (delim[0] != delim[1] || delim[0] != delim[2]
++			 || delim[0] != delim[3]) {
++				error = 1;
++				goto psv_done;
++			}
++			data_addr.su_port = htons(epsvpo);
++		} else {
++			error = 1;
++		}
++psv_done:
++		switch (error) {
++		case 0:
++			break;
++		case 1:
++			fprintf(stderr,
++		  "Passive mode address scan failure. Shouldn't happen!\n");
++			goto bad;
++		case 2:
++			fprintf(stderr,
++			  "Passive mode AF mismatch. Shouldn't happen!\n");
++			goto bad;
++		case 227:
++		case 228:
++		case 229:
++			fprintf(stderr,
++			  "wrong server: return code must be %d\n", error);
++			goto bad;
++		default:
++			fprintf(stderr, "Bug\n");
+ 		}
+ 
+-		data_addr.sin_family = AF_INET;
+-		data_addr.sin_addr.s_addr = htonl((a1 << 24) | (a2 << 16) |
+-						  (a3 << 8) | a4);
+-		data_addr.sin_port = htons((p1 << 8) | p2);
+-
+ 		if (connect(data, (struct sockaddr *) &data_addr,
+-		    sizeof(data_addr))<0) {
++			    (data_addr.su_family == AF_INET ?
++			     sizeof(data_addr.su_sin) :
++			     sizeof(data_addr.su_sin6)))<0) {
+ 			perror("ftp: connect");
+ 			return(1);
+ 		}
+ #ifdef IP_TOS
++		if (data_addr.su_family == AF_INET)
++		{
+ 		tos = IPTOS_THROUGHPUT;
+ 		if (setsockopt(data, IPPROTO_IP, IP_TOS, (char *)&tos,
+ 		    sizeof(tos)) < 0)
+ 			perror("ftp: setsockopt TOS (ignored)");
++		}
+ #endif
+ 		return(0);
+ 	}
+ noport:
+ 	data_addr = myctladdr;
+ 	if (sendport)
+-		data_addr.sin_port = 0;	/* let system pick one */ 
++		data_addr.su_port = 0;	/* let system pick one */ 
+ 	if (data != -1)
+ 		(void) close(data);
+-	data = socket(AF_INET, SOCK_STREAM, 0);
++	data = socket(data_addr.su_family, SOCK_STREAM, 0);
+ 	if (data < 0) {
+ 		perror("ftp: socket");
+ 		if (tmpno)
+@@ -1172,13 +1432,47 @@
+ 	if (listen(data, 1) < 0)
+ 		perror("ftp: listen");
+ 	if (sendport) {
+-		a = (char *)&data_addr.sin_addr;
+-		p = (char *)&data_addr.sin_port;
+-#define	UC(b)	(((int)b)&0xff)
+-		result =
+-		    command("PORT %d,%d,%d,%d,%d,%d",
+-		      UC(a[0]), UC(a[1]), UC(a[2]), UC(a[3]),
+-		      UC(p[0]), UC(p[1]));
++		af = ex_af2prot(data_addr.su_family);
++		if (try_eprt && af > 1) {      /* only IPv6 */
++			if (getnameinfo((struct sockaddr *)&data_addr, len,
++					hbuf, sizeof(hbuf), pbuf, sizeof(pbuf),
++					NI_NUMERICHOST | NI_NUMERICSERV) == 0) {
++				result = command("EPRT |%d|%s|%s|",
++							af, hbuf, pbuf);
++				if (result != COMPLETE) {
++					try_eprt = 0;
++				}
++			} else {
++				result = ERROR;
++			}
++		} else {
++			result = COMPLETE + 1;
++		}
++		if (result == COMPLETE)
++			goto prt_done;
++
++		p = (u_char *)&data_addr.su_port;
++		switch (data_addr.su_family) {
++		case AF_INET:
++			a = (u_char *)&data_addr.su_sin.sin_addr;
++			result = command("PORT %u,%u,%u,%u,%u,%u",
++				a[0], a[1], a[2], a[3], p[0], p[1]);
++			break;
++#ifdef INET6
++		case AF_INET6:
++			a = (u_char *)&data_addr.su_sin6.sin6_addr;
++			result = command(
++	"LPRT 6,16,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,2,%d,%d",
++				a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7],
++				a[8], a[9],a[10],a[11],a[12],a[13],a[14],a[15],
++				p[0], p[1]);
++			break;
++#endif
++		default:
++			result = COMPLETE + 1; /* xxx */
++		}
++
++	prt_done:
+ 		if (result == ERROR && sendport == -1) {
+ 			sendport = 0;
+ 			tmpno = 1;
+@@ -1189,9 +1483,12 @@
+ 	if (tmpno)
+ 		sendport = 1;
+ #ifdef IP_TOS
++	if (data_addr.su_family == AF_INET)
++	{
+ 	on = IPTOS_THROUGHPUT;
+ 	if (setsockopt(data, IPPROTO_IP, IP_TOS, (char *)&on, sizeof(int)) < 0)
+ 		perror("ftp: setsockopt TOS (ignored)");
++	}
+ #endif
+ 	return (0);
+ bad:
+@@ -1204,7 +1501,7 @@
+ static FILE *
+ dataconn(const char *lmode)
+ {
+-	struct sockaddr_in from;
++	union sockunion from;
+ 	int s, tos;
+ 	socklen_t fromlen = sizeof(from);
+ 
+@@ -1220,9 +1517,12 @@
+ 	(void) close(data);
+ 	data = s;
+ #ifdef IP_TOS
++	if (from.su_family == AF_INET)
++	{
+ 	tos = IPTOS_THROUGHPUT;
+ 	if (setsockopt(s, IPPROTO_IP, IP_TOS, (char *)&tos, sizeof(int)) < 0)
+ 		perror("ftp: setsockopt TOS (ignored)");
++	}
+ #endif
+ 	return (fdopen(data, lmode));
+ }
+@@ -1284,8 +1584,8 @@
+ 	static struct comvars {
+ 		int connect;
+ 		char name[MAXHOSTNAMELEN];
+-		struct sockaddr_in mctl;
+-		struct sockaddr_in hctl;
++		union sockunion mctl;
++		union sockunion hctl;
+ 		FILE *in;
+ 		FILE *out;
+ 		int tpe;
+@@ -1323,7 +1623,7 @@
+ 	connected = op->connect;
+ 	if (hostname) {
+ 		(void) strncpy(ip->name, hostname, sizeof(ip->name) - 1);
+-		ip->name[strlen(ip->name)] = '\0';
++		ip->name[sizeof(ip->name) - 1] = '\0';
+ 	} 
+ 	else {
+ 		ip->name[0] = 0;
+@@ -1352,18 +1652,18 @@
+ 	ip->ntflg = ntflag;
+ 	ntflag = op->ntflg;
+ 	(void) strncpy(ip->nti, ntin, 16);
+-	(ip->nti)[strlen(ip->nti)] = '\0';
++	(ip->nti)[16] = '\0';		/* shouldn't use strlen */
+ 	(void) strcpy(ntin, op->nti);
+ 	(void) strncpy(ip->nto, ntout, 16);
+-	(ip->nto)[strlen(ip->nto)] = '\0';
++	(ip->nto)[16] = '\0';
+ 	(void) strcpy(ntout, op->nto);
+ 	ip->mapflg = mapflag;
+ 	mapflag = op->mapflg;
+ 	(void) strncpy(ip->mi, mapin, MAXPATHLEN - 1);
+-	(ip->mi)[strlen(ip->mi)] = '\0';
++	(ip->mi)[MAXPATHLEN - 1] = '\0';
+ 	(void) strcpy(mapin, op->mi);
+ 	(void) strncpy(ip->mo, mapout, MAXPATHLEN - 1);
+-	(ip->mo)[strlen(ip->mo)] = '\0';
++	(ip->mo)[MAXPATHLEN - 1] = '\0';
+ 	(void) strcpy(mapout, op->mo);
+ 	(void) signal(SIGINT, oldintr);
+ 	if (abrtflag) {
+diff -uNr netkit-ftp-0.17/ftp/ftp_var.h netkit-ftp/ftp/ftp_var.h
+--- netkit-ftp-0.17/ftp/ftp_var.h	Sat Oct  2 21:39:17 1999
++++ netkit-ftp/ftp/ftp_var.h	Fri Jan 12 23:36:27 2001
+@@ -1,3 +1,5 @@
++/* $USAGI$ */
++
+ /*
+  * Copyright (c) 1985, 1989 Regents of the University of California.
+  * All rights reserved.
+@@ -31,7 +33,7 @@
+  * SUCH DAMAGE.
+  *
+  *	from: @(#)ftp_var.h	5.9 (Berkeley) 6/1/90
+- *	$Id: ftp_var.h,v 1.12 1999/10/02 18:39:17 dholland Exp $
++ *	$Id: ftp_var.h,v 1.3 2001/01/12 21:36:27 sekiya Exp $
+  */
+ 
+ /*
+@@ -112,6 +114,8 @@
+ Extern int	mflag;		/* flag: if != 0, then active multi command */
+ 
+ Extern int	options;	/* used during socket creation */
++Extern int	try_epsv;	/* try EPSV for this session */
++Extern int	try_eprt;	/* try EPRT for this session */
+ 
+ /*
+  * Format of command table.
+@@ -140,7 +144,7 @@
+ Extern char macbuf[4096];
+ #define MACBUF_SIZE 4096
+ 
+-char *hookup(char *host, int port);
++char *hookup(const char *host, const char *port);
+ struct cmd *getcmd(const char *);
+ char **makeargv(int *pargc, char **parg);
+ int dologin(const char *host);

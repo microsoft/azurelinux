@@ -1,0 +1,13 @@
+diff --git a/doc/bash.1 b/doc/bash.1
+--- a/doc/bash.1
++++ b/doc/bash.1
+@@ -10726,6 +10726,9 @@ If set, the shell automatically closes file descriptors assigned using the
+ .el above)
+ instead of leaving them open when the command completes.
+ .TP 8
++.B syslog_history
++If set, command history is logged to syslog.
++.TP 8
+ .B xpg_echo
+ If set, the \fBecho\fP builtin expands backslash-escape sequences
+ by default.

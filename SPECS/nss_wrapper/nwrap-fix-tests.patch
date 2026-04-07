@@ -1,0 +1,111 @@
+From 59468d514326009616e166f484b4b2ec7163b91b Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Thu, 17 Jul 2025 15:17:52 +0200
+Subject: [PATCH] tests: Add missing include for stdint.h
+
+Signed-off-by: Andreas Schneider <asn@samba.org>
+---
+ tests/test_getaddrinfo.c         | 1 +
+ tests/test_gethostby_name_addr.c | 1 +
+ tests/test_gethostent.c          | 3 ++-
+ tests/test_getpwuid_module.c     | 1 +
+ tests/test_initgroups.c          | 1 +
+ tests/test_nwrap_disabled.c      | 1 +
+ tests/testsuite.c                | 1 +
+ 7 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/tests/test_getaddrinfo.c b/tests/test_getaddrinfo.c
+index 6de0323..63dc21f 100644
+--- a/tests/test_getaddrinfo.c
++++ b/tests/test_getaddrinfo.c
+@@ -2,6 +2,7 @@
+ 
+ #include <stdarg.h>
+ #include <stddef.h>
++#include <stdint.h>
+ #include <setjmp.h>
+ #include <cmocka.h>
+ 
+diff --git a/tests/test_gethostby_name_addr.c b/tests/test_gethostby_name_addr.c
+index e8939f6..9aae9ae 100644
+--- a/tests/test_gethostby_name_addr.c
++++ b/tests/test_gethostby_name_addr.c
+@@ -4,6 +4,7 @@
+ 
+ #include <stdarg.h>
+ #include <stddef.h>
++#include <stdint.h>
+ #include <setjmp.h>
+ #include <cmocka.h>
+ 
+diff --git a/tests/test_gethostent.c b/tests/test_gethostent.c
+index aa61696..ad8a89c 100644
+--- a/tests/test_gethostent.c
++++ b/tests/test_gethostent.c
+@@ -2,6 +2,7 @@
+ 
+ #include <stdarg.h>
+ #include <stddef.h>
++#include <stdint.h>
+ #include <setjmp.h>
+ #include <cmocka.h>
+ 
+@@ -31,7 +32,7 @@ static void test_nwrap_gethostent(void **state)
+ 			char buf[INET6_ADDRSTRLEN];
+ 			uint32_t j;
+ 			const char *ip;
+-			
++
+ 			ip = inet_ntop(he->h_addrtype,
+ 				       he->h_addr_list[i],
+ 				       buf,
+diff --git a/tests/test_getpwuid_module.c b/tests/test_getpwuid_module.c
+index a06a49d..3718ebb 100644
+--- a/tests/test_getpwuid_module.c
++++ b/tests/test_getpwuid_module.c
+@@ -2,6 +2,7 @@
+ 
+ #include <stdarg.h>
+ #include <stddef.h>
++#include <stdint.h>
+ #include <setjmp.h>
+ #include <cmocka.h>
+ #include <unistd.h>
+diff --git a/tests/test_initgroups.c b/tests/test_initgroups.c
+index 1ec2220..f5ccba7 100644
+--- a/tests/test_initgroups.c
++++ b/tests/test_initgroups.c
+@@ -1,5 +1,6 @@
+ #include <stdarg.h>
+ #include <stddef.h>
++#include <stdint.h>
+ #include <setjmp.h>
+ #include <cmocka.h>
+ #include <unistd.h>
+diff --git a/tests/test_nwrap_disabled.c b/tests/test_nwrap_disabled.c
+index f00294b..090377d 100644
+--- a/tests/test_nwrap_disabled.c
++++ b/tests/test_nwrap_disabled.c
+@@ -2,6 +2,7 @@
+ 
+ #include <stdarg.h>
+ #include <stddef.h>
++#include <stdint.h>
+ #include <setjmp.h>
+ #include <cmocka.h>
+ 
+diff --git a/tests/testsuite.c b/tests/testsuite.c
+index bf678fd..41082f9 100644
+--- a/tests/testsuite.c
++++ b/tests/testsuite.c
+@@ -2,6 +2,7 @@
+ 
+ #include <stdarg.h>
+ #include <stddef.h>
++#include <stdint.h>
+ #include <setjmp.h>
+ #include <cmocka.h>
+ 
+-- 
+GitLab
+

@@ -1,0 +1,307 @@
+diff --git a/builtins.h b/builtins.h
+--- a/builtins.h
++++ b/builtins.h
+@@ -46,6 +46,7 @@
+ #define POSIX_BUILTIN	0x20	/* This builtins is special in the Posix command search order. */
+ #define LOCALVAR_BUILTIN   0x40	/* This builtin creates local variables */
+ #define ARRAYREF_BUILTIN 0x80	/* This builtin takes array references as arguments */
++#define REQUIRES_BUILTIN 0x100  /* This builtin requires other files. */
+ 
+ #define BASE_INDENT	4
+ 
+diff --git a/builtins/mkbuiltins.c b/builtins/mkbuiltins.c
+--- a/builtins/mkbuiltins.c
++++ b/builtins/mkbuiltins.c
+@@ -62,11 +62,16 @@ static void *xrealloc (void *, size_t);
+ #define whitespace(c) (((c) == ' ') || ((c) == '\t'))
+ 
+ /* Flag values that builtins can have. */
++/*  These flags are for the C code generator,
++    the C which is produced (./builtin.c)
++    includes the flags definitions found
++    in ../builtins.h */
+ #define BUILTIN_FLAG_SPECIAL	0x01
+ #define BUILTIN_FLAG_ASSIGNMENT 0x02
+ #define BUILTIN_FLAG_LOCALVAR	0x04
+ #define BUILTIN_FLAG_POSIX_BUILTIN	0x08
+ #define BUILTIN_FLAG_ARRAYREF_ARG	0x10
++#define BUILTIN_FLAG_REQUIRES  0x20
+ 
+ #define BASE_INDENT	4
+ 
+@@ -183,13 +188,21 @@ char *arrayvar_builtins[] =
+   "typeset", "unset", "wait",		/*]*/
+   (char *)NULL
+ };
+-	
++
++/* The builtin commands that cause requirements on other files. */
++static char *requires_builtins[] =
++{
++  ".", "command", "exec", "source", "inlib",
++  (char *)NULL
++};
++
+ /* Forward declarations. */
+ static int is_special_builtin (char *);
+ static int is_assignment_builtin (char *);
+ static int is_localvar_builtin (char *);
+ static int is_posix_builtin (char *);
+ static int is_arrayvar_builtin (char *);
++static int is_requires_builtin ();
+ 
+ #if !defined (HAVE_RENAME)
+ static int rename (char *, char *);
+@@ -826,6 +839,8 @@ builtin_handler (char *self, DEF_FILE *defs, char *arg)
+     new->flags |= BUILTIN_FLAG_POSIX_BUILTIN;
+   if (is_arrayvar_builtin (name))
+     new->flags |= BUILTIN_FLAG_ARRAYREF_ARG;
++  if (is_requires_builtin (name))
++    new->flags |= BUILTIN_FLAG_REQUIRES;
+ 
+   array_add ((char *)new, defs->builtins);
+   building_builtin = 1;
+@@ -1212,13 +1227,14 @@ write_builtins (DEF_FILE *defs, FILE *structfile, FILE *externfile)
+ 		  else
+ 		    fprintf (structfile, "(sh_builtin_func_t *)0x0, ");
+ 
+-		  fprintf (structfile, "%s%s%s%s%s%s, %s_doc,\n",
++		  fprintf (structfile, "%s%s%s%s%s%s%s, %s_doc,\n",
+ 		    "BUILTIN_ENABLED | STATIC_BUILTIN",
+ 		    (builtin->flags & BUILTIN_FLAG_SPECIAL) ? " | SPECIAL_BUILTIN" : "",
+ 		    (builtin->flags & BUILTIN_FLAG_ASSIGNMENT) ? " | ASSIGNMENT_BUILTIN" : "",
+ 		    (builtin->flags & BUILTIN_FLAG_LOCALVAR) ? " | LOCALVAR_BUILTIN" : "",
+ 		    (builtin->flags & BUILTIN_FLAG_POSIX_BUILTIN) ? " | POSIX_BUILTIN" : "",
+ 		    (builtin->flags & BUILTIN_FLAG_ARRAYREF_ARG) ? " | ARRAYREF_BUILTIN" : "",
++		    (builtin->flags & BUILTIN_FLAG_REQUIRES) ? " | REQUIRES_BUILTIN" : "",
+ 		    document_name (builtin));
+ 
+ 		  /* Don't translate short document summaries that are identical
+@@ -1597,6 +1613,13 @@ is_arrayvar_builtin (char *name)
+   return (_find_in_table (name, arrayvar_builtins));
+ }
+ 
++static int
++is_requires_builtin (name)
++     char *name;
++{
++  return (_find_in_table (name, requires_builtins));
++}
++
+ #if !defined (HAVE_RENAME)
+ static int
+ rename (char *from, char *to)
+diff --git a/doc/bash.1 b/doc/bash.1
+--- a/doc/bash.1
++++ b/doc/bash.1
+@@ -276,6 +276,14 @@ The shell becomes restricted (see
+ .B "RESTRICTED SHELL"
+ below).
+ .TP
++.B \-\-rpm-requires
++Produce the list of files that are required for the
++shell script to run.  This implies '-n' and is subject
++to the same limitations as compile time error checking checking;
++Command substitutions, Conditional expressions and
++.BR eval
++builtin are not parsed so some dependencies may be missed.
++.TP
+ .B \-\-verbose
+ Equivalent to \fB\-v\fP.
+ .TP
+diff --git a/doc/bashref.texi b/doc/bashref.texi
+--- a/doc/bashref.texi
++++ b/doc/bashref.texi
+@@ -7812,6 +7812,13 @@ standard.
+ Equivalent to @option{-r}.
+ Make the shell a restricted shell (@pxref{The Restricted Shell}).
+ 
++@item --rpm-requires
++Produce the list of files that are required for the
++shell script to run.  This implies '-n' and is subject
++to the same limitations as compile time error checking checking;
++Command substitutions, Conditional expressions and @command{eval}
++are not parsed so some dependencies may be missed.
++
+ @item --verbose
+ Equivalent to @option{-v}.
+ Print shell input lines as they're read.
+diff --git a/eval.c b/eval.c
+--- a/eval.c
++++ b/eval.c
+@@ -146,7 +146,8 @@ reader_loop (void)
+ 
+       if (read_command () == 0)
+ 	{
+-	  if (interactive_shell == 0 && read_but_dont_execute)
++
++	  if (interactive_shell == 0 && (read_but_dont_execute && !rpm_requires))
+ 	    {
+ 	      set_exit_status (last_command_exit_value);
+ 	      dispose_command (global_command);
+diff --git a/execute_cmd.c b/execute_cmd.c
+--- a/execute_cmd.c
++++ b/execute_cmd.c
+@@ -612,6 +612,8 @@ async_redirect_stdin (void)
+ 
+ #define DESCRIBE_PID(pid) do { if (interactive) describe_pid (pid); } while (0)
+ 
++extern int rpm_requires;
++
+ /* Execute the command passed in COMMAND, perhaps doing it asynchronously.
+    COMMAND is exactly what read_command () places into GLOBAL_COMMAND.
+    ASYNCHRONOUS, if non-zero, says to do this command in the background.
+@@ -638,7 +640,13 @@ execute_command_internal (COMMAND *command, int asynchronous, int pipe_in, int p
+ 
+   if (breaking || continuing)
+     return (last_command_exit_value);
+-  if (read_but_dont_execute)
++  if (command == 0 || (read_but_dont_execute && !rpm_requires))
++    return (EXECUTION_SUCCESS);
++  if (rpm_requires && command->type == cm_function_def)
++    return last_command_exit_value =
++      execute_intern_function (command->value.Function_def->name,
++                              command->value.Function_def);
++ if (read_but_dont_execute)
+     return (last_command_exit_value);
+   if (command == 0)
+     return (EXECUTION_SUCCESS);
+@@ -3505,7 +3513,7 @@ execute_select_command (SELECT_COM *select_command)
+ 
+   if (check_identifier (select_command->name, 1) == 0)
+     {
+-      if (posixly_correct && interactive_shell == 0)
++      if (posixly_correct && interactive_shell == 0 && rpm_requires == 0)
+ 	{
+ 	  last_command_exit_value = EX_BADUSAGE;
+ 	  jump_to_top_level (ERREXIT);
+diff --git a/execute_cmd.h b/execute_cmd.h
+--- a/execute_cmd.h
++++ b/execute_cmd.h
+@@ -22,6 +22,9 @@
+ #define _EXECUTE_CMD_H_
+ 
+ #include "stdc.h"
++#include "variables.h"
++#include "command.h"
++
+ 
+ #if defined (ARRAY_VARS)
+ struct func_array_state
+diff --git a/make_cmd.c b/make_cmd.c
+--- a/make_cmd.c
++++ b/make_cmd.c
+@@ -35,6 +35,8 @@
+ #include "bashintl.h"
+ 
+ #include "shell.h"
++#include "builtins.h"
++#include "builtins/common.h"
+ #include "execute_cmd.h"
+ #include "parser.h"
+ #include "flags.h"
+@@ -797,6 +799,30 @@ make_coproc_command (char *name, COMMAND *command)
+   return (make_command (cm_coproc, (SIMPLE_COM *)temp));
+ }
+ 
++static void
++output_requirement (deptype, filename)
++const char *deptype;
++char *filename;
++{
++  static char *alphabet_set = "abcdefghijklmnopqrstuvwxyz"
++                    "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
++
++  if (strchr(filename, '$') || (filename[0] != '/' && strchr(filename, '/')))
++    return;
++
++  /*
++      if the executable is called via variable substitution we can
++      not dermine what it is at compile time.
++
++      if the executable consists only of characters not in the
++      alphabet we do not consider it a dependency just an artifact
++      of shell parsing (ex "exec < ${infile}").
++  */
++
++  if (strpbrk(filename, alphabet_set))
++    printf ("%s(%s)\n", deptype, filename);
++}
++
+ /* Reverse the word list and redirection list in the simple command
+    has just been parsed.  It seems simpler to do this here the one
+    time then by any other method that I can think of. */
+@@ -813,6 +839,28 @@ clean_simple_command (COMMAND *command)
+ 	REVERSE_LIST (command->value.Simple->redirects, REDIRECT *);
+     }
+ 
++  if (rpm_requires && command->value.Simple->words)
++    {
++      char *cmd0;
++      char *cmd1;
++      struct builtin *b;
++
++      cmd0 = command->value.Simple->words->word->word;
++      b = builtin_address_internal (cmd0, 0);
++      cmd1 = 0;
++      if (command->value.Simple->words->next)
++        cmd1 = command->value.Simple->words->next->word->word;
++
++      if (b) {
++        if ( (b->flags & REQUIRES_BUILTIN) && cmd1)
++          output_requirement ("executable", cmd1);
++      } else {
++        if (!assignment(cmd0, 0))
++          output_requirement (find_function(cmd0) ? "function" : "executable", cmd0);
++      }
++    } /*rpm_requires*/
++
++
+   parser_state &= ~PST_REDIRLIST;
+   return (command);
+ }
+diff --git a/shell.c b/shell.c
+--- a/shell.c
++++ b/shell.c
+@@ -205,6 +205,9 @@ int have_devfd = 0;
+ /* The name of the .(shell)rc file, DEFAULT_BASHRC is sourced by default */
+ static char *bashrc_file;
+ 
++/* Non-zero if we are finding the scripts requirements. */
++int rpm_requires;
++
+ /* Non-zero means to act more like the Bourne shell on startup. */
+ static int act_like_sh;
+ 
+@@ -272,6 +275,7 @@ static const struct {
+   { "protected", Int, &protected_mode, (char **)0x0 },
+ #endif
+   { "rcfile", Charp, (int *)0x0, &bashrc_file },
++  { "rpm-requires", Int, &rpm_requires, (char **)0x0 },
+ #if defined (RESTRICTED_SHELL)
+   { "restricted", Int, &restricted, (char **)0x0 },
+ #endif
+@@ -510,6 +514,12 @@ main (int argc, char **argv, char **env)
+     read_but_dont_execute = 1;
+ #endif
+ 
++  if (rpm_requires)
++    {
++      read_but_dont_execute = 1;
++      initialize_shell_builtins ();
++    }
++
+   if (running_setuid && privileged_mode == 0)
+     disable_priv_mode ();
+ 
+diff --git a/shell.h b/shell.h
+--- a/shell.h
++++ b/shell.h
+@@ -105,6 +105,7 @@ extern int startup_state;
+ extern int reading_shell_script;
+ extern int ssh_reading_startup_files;
+ extern int shell_initialized;
++extern int rpm_requires;
+ extern int bash_argv_initialized;
+ extern int subshell_environment;
+ extern int current_command_number;

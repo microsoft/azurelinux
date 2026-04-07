@@ -1,0 +1,313 @@
+From b7ca2adc43db1be935101d6eb5dbf06566ea43ed Mon Sep 17 00:00:00 2001
+From: Viktor Ashirov <vashirov@redhat.com>
+Date: Thu, 5 Feb 2026 12:17:06 +0100
+Subject: [PATCH] Issue 7223 - Add upgrade function to remove ancestorid index
+ config entry
+
+Description:
+Add `upgrade_remove_ancestorid_index_config()` function that removes:
+* ancestorid from `cn=default indexes`
+* ancestorid index config entries from each backend's `cn=index`
+
+Also remove ancestorid index configuration from template-dse.ldif.
+
+Relates: https://github.com/389ds/389-ds-base/issues/7223
+
+Reviewed by: @progier389, @tbordaz, @droideck (Thanks!)
+---
+ .../healthcheck/health_system_indexes_test.py |  85 +++++++++++
+ ldap/ldif/template-dse.ldif.in                |   8 --
+ ldap/servers/slapd/upgrade.c                  | 133 +++++++++++++++++-
+ 3 files changed, 214 insertions(+), 12 deletions(-)
+
+diff --git a/dirsrvtests/tests/suites/healthcheck/health_system_indexes_test.py b/dirsrvtests/tests/suites/healthcheck/health_system_indexes_test.py
+index aea88e0e2..eb727b902 100644
+--- a/dirsrvtests/tests/suites/healthcheck/health_system_indexes_test.py
++++ b/dirsrvtests/tests/suites/healthcheck/health_system_indexes_test.py
+@@ -504,6 +504,91 @@ def test_upgrade_removes_parentid_scanlimit(topology_st):
+ 
+     log.info("Upgrade successfully removed nsIndexIDListScanLimit from parentid index")
+ 
++    # Verify idempotency - restart again and ensure no errors
++    log.info("Restart server again to verify idempotency (no errors on second run)")
++    standalone.restart()
++    # Verify the attribute is still absent
++    scanlimit_after_second = parentid_index.get_attr_vals_utf8("nsIndexIDListScanLimit")
++    assert not scanlimit_after_second, \
++        f"nsIndexIDListScanLimit should still be absent after second restart but found: {scanlimit_after_second}"
++    log.info("Idempotency verified - no issues on second restart")
++
++
++def test_upgrade_removes_ancestorid_index_config(topology_st):
++    """Check if upgrade function removes ancestorid index config entry
++
++    :id: 3f3d6e9b-75ac-4f0d-b2ce-7204e6eacd0a
++    :setup: Standalone instance
++    :steps:
++        1. Create DS instance
++        2. Stop the server
++        3. Use DSEldif to add an ancestorid index config entry
++        4. Start the server (triggers upgrade)
++        5. Verify ancestorid index config entry is removed
++    :expectedresults:
++        1. Success
++        2. Success
++        3. Success
++        4. Success
++        5. ancestorid index config entry is no longer present
++    """
++    from lib389.dseldif import DSEldif
++
++    standalone = topology_st.standalone
++    ANCESTORID_DN = "cn=ancestorid,cn=index,cn=userroot,cn=ldbm database,cn=plugins,cn=config"
++
++    log.info("Stop the server")
++    standalone.stop()
++
++    log.info("Add ancestorid index config entry using DSEldif")
++    dse_ldif = DSEldif(standalone)
++
++    # Create a fake ancestorid index entry
++    ancestorid_entry = [
++        "dn: {}\n".format(ANCESTORID_DN),
++        "objectClass: top\n",
++        "objectClass: nsIndex\n",
++        "cn: ancestorid\n",
++        "nsSystemIndex: true\n",
++        "nsIndexType: eq\n",
++        "nsMatchingRule: integerOrderingMatch\n",
++        "\n"
++    ]
++    dse_ldif.add_entry(ancestorid_entry)
++
++    # Verify it was added by re-reading dse.ldif
++    dse_ldif2 = DSEldif(standalone)
++    cn_value = dse_ldif2.get(ANCESTORID_DN, "cn")
++    assert cn_value is not None, "Failed to add ancestorid index config entry"
++    log.info(f"Added ancestorid index entry with cn: {cn_value}")
++
++    log.info("Start the server (triggers upgrade)")
++    standalone.start()
++
++    log.info("Verify ancestorid index config entry was removed by upgrade")
++    # Check via LDAP - the upgrade should have removed the entry
++    try:
++        ancestorid_index = Index(standalone, ANCESTORID_DN)
++        # If we can get the entry, it wasn't removed - this is a failure
++        cn_after = ancestorid_index.get_attr_vals_utf8("cn")
++        assert False, f"ancestorid index config entry should have been removed but still exists: {cn_after}"
++    except Exception as e:
++        # Entry should not exist - this is expected
++        log.info(f"ancestorid index config entry correctly removed (got exception: {e})")
++
++    log.info("Upgrade successfully removed ancestorid index config entry")
++
++    # Verify idempotency - restart again and ensure no errors
++    log.info("Restart server again to verify idempotency (no errors on second run)")
++    standalone.restart()
++    # Verify the entry is still absent
++    try:
++        ancestorid_index = Index(standalone, ANCESTORID_DN)
++        cn_after_second = ancestorid_index.get_attr_vals_utf8("cn")
++        assert False, f"ancestorid index config entry should still be absent after second restart but found: {cn_after_second}"
++    except Exception as e:
++        log.info(f"Idempotency verified - ancestorid still absent after second restart (got exception: {e})")
++
+ 
+ if __name__ == "__main__":
+     # Run isolated
+diff --git a/ldap/ldif/template-dse.ldif.in b/ldap/ldif/template-dse.ldif.in
+index bb8c71cd9..b6ab6f6c6 100644
+--- a/ldap/ldif/template-dse.ldif.in
++++ b/ldap/ldif/template-dse.ldif.in
+@@ -998,14 +998,6 @@ cn: aci
+ nssystemindex: true
+ nsindextype: pres
+ 
+-dn: cn=ancestorid,cn=default indexes, cn=config,cn=ldbm database,cn=plugins,cn=config
+-objectclass: top
+-objectclass: nsIndex
+-cn: ancestorid
+-nssystemindex: true
+-nsindextype: eq
+-nsmatchingrule: integerOrderingMatch
+-
+ dn: cn=cn,cn=default indexes, cn=config,cn=ldbm database,cn=plugins,cn=config
+ objectclass: top
+ objectclass: nsIndex
+diff --git a/ldap/servers/slapd/upgrade.c b/ldap/servers/slapd/upgrade.c
+index dcd16940b..6b1b012da 100644
+--- a/ldap/servers/slapd/upgrade.c
++++ b/ldap/servers/slapd/upgrade.c
+@@ -431,6 +431,126 @@ upgrade_remove_index_scanlimit(void)
+     return uresult;
+ }
+ 
++/*
++ * Remove ancestorid index configuration entry if present.
++ *
++ * The ancestorid index is special - it has no corresponding attribute type
++ * and should not have a DSE config entry. If an entry exists, remove it.
++ *
++ * This function removes:
++ * 1. The ancestorid entry from cn=default indexes (to prevent re-creation on startup)
++ * 2. The ancestorid entry from each backend's cn=index (if it exists)
++ */
++static upgrade_status
++upgrade_remove_ancestorid_index_config(void)
++{
++    struct slapi_pblock *pb = slapi_pblock_new();
++    Slapi_Entry **backends = NULL;
++    const char *be_base_dn = "cn=ldbm database,cn=plugins,cn=config";
++    const char *be_filter = "(objectclass=nsBackendInstance)";
++    upgrade_status uresult = UPGRADE_SUCCESS;
++    int rc;
++
++    /*
++     * First, remove ancestorid from cn=default indexes to prevent
++     * ldbm_instance_create_default_user_indexes() from re-creating it.
++     */
++    {
++        Slapi_PBlock *def_pb = slapi_pblock_new();
++        char *def_idx_dn = slapi_create_dn_string(
++                "cn=ancestorid,cn=default indexes,cn=config,%s", be_base_dn);
++
++        if (def_idx_dn) {
++            slapi_delete_internal_set_pb(
++                    def_pb, def_idx_dn, NULL, NULL,
++                    plugin_get_default_component_id(), 0);
++            slapi_delete_internal_pb(def_pb);
++            slapi_pblock_get(def_pb, SLAPI_PLUGIN_INTOP_RESULT, &rc);
++
++            if (rc == LDAP_SUCCESS) {
++                slapi_log_err(SLAPI_LOG_NOTICE, "upgrade_remove_ancestorid_index_config",
++                        "Removed 'ancestorid' from default indexes.\n");
++            } else if (rc != LDAP_NO_SUCH_OBJECT) {
++                slapi_log_err(SLAPI_LOG_ERR, "upgrade_remove_ancestorid_index_config",
++                        "Failed to remove 'ancestorid' from default indexes: error %d\n", rc);
++            }
++
++            slapi_ch_free_string(&def_idx_dn);
++        }
++        slapi_pblock_destroy(def_pb);
++    }
++
++    /* Search for all backend instances */
++    slapi_search_internal_set_pb(
++            pb, be_base_dn,
++            LDAP_SCOPE_ONELEVEL,
++            be_filter, NULL, 0, NULL, NULL,
++            plugin_get_default_component_id(), 0);
++    slapi_search_internal_pb(pb);
++    slapi_pblock_get(pb, SLAPI_PLUGIN_INTOP_SEARCH_ENTRIES, &backends);
++
++    if (backends) {
++        for (size_t be_idx = 0; backends[be_idx] != NULL; be_idx++) {
++            const char *be_dn = slapi_entry_get_dn_const(backends[be_idx]);
++            const char *be_name = slapi_entry_attr_get_ref(backends[be_idx], "cn");
++            if (!be_dn || !be_name) {
++                continue;
++            }
++
++            struct slapi_pblock *idx_pb = slapi_pblock_new();
++            Slapi_Entry **idx_entries = NULL;
++            char *idx_dn = slapi_create_dn_string("cn=ancestorid,cn=index,%s",
++                                                   be_dn);
++            char *idx_filter = "(objectclass=nsIndex)";
++
++            if (!idx_dn) {
++                slapi_pblock_destroy(idx_pb);
++                continue;
++            }
++
++            slapi_search_internal_set_pb(
++                    idx_pb, idx_dn,
++                    LDAP_SCOPE_BASE,
++                    idx_filter, NULL, 0, NULL, NULL,
++                    plugin_get_default_component_id(), 0);
++            slapi_search_internal_pb(idx_pb);
++            slapi_pblock_get(idx_pb, SLAPI_PLUGIN_INTOP_SEARCH_ENTRIES, &idx_entries);
++
++            if (idx_entries && idx_entries[0]) {
++                /* ancestorid index entry exists - delete it */
++                Slapi_PBlock *del_pb = slapi_pblock_new();
++
++                slapi_delete_internal_set_pb(
++                        del_pb, idx_dn, NULL, NULL,
++                        plugin_get_default_component_id(), 0);
++                slapi_delete_internal_pb(del_pb);
++                slapi_pblock_get(del_pb, SLAPI_PLUGIN_INTOP_RESULT, &rc);
++
++                if (rc == LDAP_SUCCESS) {
++                    slapi_log_err(SLAPI_LOG_NOTICE, "upgrade_remove_ancestorid_index_config",
++                            "Removed 'ancestorid' index config entry in backend '%s'.\n",
++                            be_name);
++                } else if (rc != LDAP_NO_SUCH_OBJECT) {
++                    slapi_log_err(SLAPI_LOG_ERR, "upgrade_remove_ancestorid_index_config",
++                            "Failed to remove 'ancestorid' index config entry in backend '%s': error %d\n",
++                            be_name, rc);
++                }
++
++                slapi_pblock_destroy(del_pb);
++            }
++
++            slapi_ch_free_string(&idx_dn);
++            slapi_free_search_results_internal(idx_pb);
++            slapi_pblock_destroy(idx_pb);
++        }
++    }
++
++    slapi_free_search_results_internal(pb);
++    slapi_pblock_destroy(pb);
++
++    return uresult;
++}
++
+ /*
+  * Check if parentid/ancestorid indexes are missing the integerOrderingMatch
+  * matching rule.
+@@ -445,7 +565,7 @@ upgrade_check_id_index_matching_rule(void)
+     Slapi_Entry **backends = NULL;
+     const char *be_base_dn = "cn=ldbm database,cn=plugins,cn=config";
+     const char *be_filter = "(objectclass=nsBackendInstance)";
+-    const char *attrs_to_check[] = {"parentid", "ancestorid", NULL};
++    const char *attrs_to_check[] = {"parentid", NULL};
+     upgrade_status uresult = UPGRADE_SUCCESS;
+ 
+     /* Search for all backend instances */
+@@ -459,8 +579,9 @@ upgrade_check_id_index_matching_rule(void)
+ 
+     if (backends) {
+         for (size_t be_idx = 0; backends[be_idx] != NULL; be_idx++) {
++            const char *be_dn = slapi_entry_get_dn_const(backends[be_idx]);
+             const char *be_name = slapi_entry_attr_get_ref(backends[be_idx], "cn");
+-            if (!be_name) {
++            if (!be_dn || !be_name) {
+                 continue;
+             }
+ 
+@@ -469,8 +590,8 @@ upgrade_check_id_index_matching_rule(void)
+                 const char *attr_name = attrs_to_check[attr_idx];
+                 struct slapi_pblock *idx_pb = slapi_pblock_new();
+                 Slapi_Entry **idx_entries = NULL;
+-                char *idx_dn = slapi_create_dn_string("cn=%s,cn=index,cn=%s,%s",
+-                                                       attr_name, be_name, be_base_dn);
++                char *idx_dn = slapi_create_dn_string("cn=%s,cn=index,%s",
++                                                       attr_name, be_dn);
+                 char *idx_filter = "(objectclass=nsIndex)";
+                 PRBool has_matching_rule = PR_FALSE;
+ 
+@@ -754,6 +875,10 @@ upgrade_server(void)
+         return UPGRADE_FAILURE;
+     }
+ 
++    if (upgrade_remove_ancestorid_index_config() != UPGRADE_SUCCESS) {
++        return UPGRADE_FAILURE;
++    }
++
+     if (upgrade_check_id_index_matching_rule() != UPGRADE_SUCCESS) {
+         return UPGRADE_FAILURE;
+     }
+-- 
+2.52.0
+

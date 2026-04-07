@@ -1,0 +1,22 @@
+From 7c42d101853126ff0ec1c9e7b544bdfb55820817 Mon Sep 17 00:00:00 2001
+From: Daniel Mendler <mail@daniel-mendler.de>
+Date: Sun, 30 Jul 2023 18:13:50 +0200
+Subject: [PATCH] Literate test: Update name of Minitest module
+
+---
+ test/literate/helper.rb | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/literate/helper.rb b/test/literate/helper.rb
+index 13a04abd..71452d58 100644
+--- a/test/literate/helper.rb
++++ b/test/literate/helper.rb
+@@ -8,7 +8,7 @@
+ Slim::Engine.before :Pretty, Temple::Filters::Validator
+ Slim::Engine.set_options tr: false, logic_less: false
+ 
+-class MiniTest::Spec
++class Minitest::Spec
+   def render(source, options = {}, &block)
+     Slim::Template.new(options) { source }.render(self, &block)
+   end

@@ -1,0 +1,15 @@
+--- convert_case-0.4.0/Cargo.toml	2020-05-18T02:16:34+00:00
++++ convert_case-0.4.0/Cargo.toml	2024-08-08T14:34:32.920781+00:00
+@@ -29,10 +29,10 @@
+ version = "^0.7"
+ optional = true
+ [dev-dependencies.strum]
+-version = "0.18.0"
++version = "0.21.0"
+ 
+ [dev-dependencies.strum_macros]
+-version = "0.18.0"
++version = "0.21.0"
+ 
+ [features]
+ random = ["rand"]

@@ -1,0 +1,43 @@
+From 7905dba8cf136574b87c972cf1f91a8f95b9df8c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Lyson=C4=9Bk?= <olysonek@redhat.com>
+Date: Tue, 29 Sep 2020 17:37:18 +0200
+Subject: [PATCH] Revert "Fix checking return value of the
+ evdns_base_resolv_conf_parse()"
+
+This reverts commit fc51bf2c5b686f623c9a2906ddad4042d5c3b39a.
+---
+ evdns.c              | 2 +-
+ sample/dns-example.c | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/evdns.c b/evdns.c
+index a5b31a3c..4aef28ec 100644
+--- a/evdns.c
++++ b/evdns.c
+@@ -4035,7 +4035,7 @@ evdns_base_new(struct event_base *event_base, int flags)
+ #else
+ 		r = evdns_base_resolv_conf_parse(base, opts, "/etc/resolv.conf");
+ #endif
+-		if (r) {
++		if (r == -1) {
+ 			evdns_base_free_and_unlock(base, 0);
+ 			return NULL;
+ 		}
+diff --git a/sample/dns-example.c b/sample/dns-example.c
+index 2d07c387..21a75de8 100644
+--- a/sample/dns-example.c
++++ b/sample/dns-example.c
+@@ -225,8 +225,8 @@ main(int c, char **v) {
+ 			res = evdns_base_resolv_conf_parse(evdns_base,
+ 			    DNS_OPTION_NAMESERVERS, o.resolv_conf);
+ 
+-		if (res) {
+-			fprintf(stderr, "Couldn't configure nameservers\n");
++		if (res < 0) {
++			fprintf(stderr, "Couldn't configure nameservers");
+ 			return 1;
+ 		}
+ 	}
+-- 
+2.25.4
+

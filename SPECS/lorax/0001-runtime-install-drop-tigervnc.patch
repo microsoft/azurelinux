@@ -1,0 +1,31 @@
+From 2892e1edcea0d92ce09a573822b4d42799eedd8f Mon Sep 17 00:00:00 2001
+From: Adam Williamson <awilliam@redhat.com>
+Date: Thu, 2 Oct 2025 12:07:50 -0700
+Subject: [PATCH] runtime-install: drop tigervnc
+
+anaconda dropped VNC support in
+https://github.com/rhinstaller/anaconda/pull/5829 . There is no
+point to having these any more, and they pull Xorg and its deps
+into the image unnecessarily.
+
+Signed-off-by: Adam Williamson <awilliam@redhat.com>
+---
+ share/templates.d/99-generic/runtime-install.tmpl | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/share/templates.d/99-generic/runtime-install.tmpl b/share/templates.d/99-generic/runtime-install.tmpl
+index 6ed14fdc..49545065 100644
+--- a/share/templates.d/99-generic/runtime-install.tmpl
++++ b/share/templates.d/99-generic/runtime-install.tmpl
+@@ -122,8 +122,6 @@ installpkg selinux-policy-targeted audit
+ 
+ ## network tools/servers
+ installpkg ethtool openssh-server nfs-utils openssh-clients
+-installpkg tigervnc-server-minimal
+-installpkg tigervnc-server-module
+ installpkg net-tools
+ installpkg bridge-utils
+ installpkg nmap-ncat
+-- 
+2.51.0
+

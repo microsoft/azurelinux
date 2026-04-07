@@ -1,0 +1,19 @@
+# default: off
+# description: The CVS service can record the history of your source \
+#              files. CVS stores all the versions of a file in a single \
+#              file in a clever way that only stores the differences \
+#              between versions.
+service cvspserver
+{
+	disable			= yes
+	port			= 2401
+	socket_type		= stream
+	protocol		= tcp
+	wait			= no
+	user			= root
+	passenv			= PATH
+	server			= /usr/bin/cvs
+	env			= HOME=/var/cvs
+	server_args		= -f --allow-root=/var/cvs pserver
+#	bind			= 127.0.0.1
+}

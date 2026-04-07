@@ -1,0 +1,19 @@
+diff -rup binutils.orig/gold/layout.cc binutils-2.32/gold/layout.cc
+--- binutils.orig/gold/layout.cc	2019-06-24 14:37:36.013086899 +0100
++++ binutils-2.32/gold/layout.cc	2019-06-24 14:41:40.054517479 +0100
+@@ -868,6 +868,7 @@ Layout::get_output_section(const char* n
+ 		  && (same_name->flags() & elfcpp::SHF_TLS) == 0)
+ 		os = same_name;
+ 	    }
++#if 0 /* BZ 1722715, PR 17556.  */
+ 	  else if ((flags & elfcpp::SHF_TLS) == 0)
+ 	    {
+ 	      elfcpp::Elf_Xword zero_flags = 0;
+@@ -878,6 +879,7 @@ Layout::get_output_section(const char* n
+ 	      if (p != this->section_name_map_.end())
+ 		os = p->second;
+ 	    }
++#endif
+ 	}
+ 
+       if (os == NULL)

@@ -1,0 +1,67 @@
+reverted:
+--- /usr/share/myspell/cs_CZ.aff	2014-06-08 00:05:35.000000000 +0200
++++ /home/tompecina/tex/cs_CZ.aff	2014-12-05 00:28:50.981671654 +0100
+@@ -271,8 +271,8 @@
+ SFX D   os          ové        os
+ SFX D   os          ù          os
+ SFX D   os          ùm         os
++SFX D   os          ech        [^ighk]os
++SFX D   os          y          [^i]os
+-SFX D   us          ech        [^ighk]os
+-SFX D   us          y          [^i]os
+ SFX D   os          ích        ios
+ SFX D   os          ách        kos
+ SFX D   os          i          ios
+@@ -596,7 +596,7 @@
+ SFX Q   es          y          es
+ SFX Q   es          ù          es
+ SFX Q   es          ùm         es
++SFX Q   es          ech        [^ghk]es
+-SFX Q   os          ech        [^ghk]es
+ SFX Q   ges         zích       ges
+ SFX Q   ches        ¹ích       ches
+ SFX Q   hes         zích       [^c]hes
+@@ -898,7 +898,7 @@
+ SFX M   o           i          [¾¹èøjeiy]o
+ SFX M   a           ùm         a
+ SFX M   a           ách        [ghk]a
++SFX M   a           ech        [^ghkei]a
+-SFX M   o           ech        [^ghkei]a
+ SFX M   a           y          [^¾¹èøcji]a
+ SFX M   on          a          on
+ SFX M   on          u          on
+@@ -1306,9 +1306,9 @@
+ SFX J   ám          aje        ám
+ SFX J   ám          ajíc       ám
+ SFX J   ám          ajíce      ám
++SFX J   ám          ej         ám
++SFX J   ám          ejme       ám
++SFX J   ám          ejte       ám
+-SFX J   ém          ej         ám
+-SFX J   ém          ejme       ám
+-SFX J   ém          ejte       ám
+ SFX J   m           ¹          ím
+ SFX J   m           0          ím
+ SFX J   0           e          ím
+@@ -1756,9 +1756,9 @@
+ SFX A   ounit       ouni       ounit
+ SFX A   ounit       ounìme     ounit
+ SFX A   ounit       ounìte     ounit
++SFX A   oupit       up         oupit
++SFX A   oupit       upme       oupit
++SFX A   oupit       upte       oupit
+-SFX A   ou¾it       up         oupit
+-SFX A   ou¾it       upme       oupit
+-SFX A   ou¾it       upte       oupit
+ SFX A   ouøit       uø         ouøit
+ SFX A   ouøit       uøme       ouøit
+ SFX A   ouøit       uøte       ouøit
+@@ -2116,7 +2116,7 @@
+ SFX A   nout        lo         [aeiouyáéíóúıùì]rnout
+ SFX A   nout        li         [aeiouyáéíóúıùì]rnout
+ SFX A   nout        ly         [aeiouyáéíóúıùì]rnout
++SFX A   nout        l          [aeiouyáéíóúıùìr][^aeiouyáéíóúıùìrl]nout
+-SFX A   nout        l          [aeiouyáéíóúıùìr][^aeiouyáéíóúıùìrl][^aeiouy
+ SFX A   nout        l          [aeiouyáéíóúıùìr][^aeiouyáéíóúıùìrl]nout
+ SFX A   out         ul         [^aeiouyáéíóúıùì]l[^aeiouyáéíóúıùìrl]nout
+ SFX A   nout        l          l[^aeiouyáéíóúıùìrl]nout

@@ -1,0 +1,33 @@
+Changes to avoid implicit function declarations: <arpa/inet.h>
+provides a declaration of noths.  -D_BSD_SOURCE enables declarations
+of random, srandom.
+
+diff -ur dietlibc-0.34.orig/test/getservbyname.c dietlibc-0.34/test/getservbyname.c
+--- dietlibc-0.34.orig/test/getservbyname.c	2003-12-15 14:07:42.000000000 +0100
++++ dietlibc-0.34/test/getservbyname.c	2022-12-23 18:17:26.645479365 +0100
+@@ -1,5 +1,6 @@
+ #include <stdio.h>
+ #include <netdb.h>
++#include <arpa/inet.h>
+ 
+ int main(int argc,char *argv[]) {
+   struct servent* se;
+diff -ur dietlibc-0.34.orig/test/stdlib/testsort.c dietlibc-0.34/test/stdlib/testsort.c
+--- dietlibc-0.34.orig/test/stdlib/testsort.c	2003-12-15 14:07:42.000000000 +0100
++++ dietlibc-0.34/test/stdlib/testsort.c	2022-12-23 18:16:33.758018509 +0100
+@@ -1,3 +1,4 @@
++#define _BSD_SOURCE
+ #include <stdlib.h>
+ #include <string.h>
+ #include <stdio.h>
+diff -ur dietlibc-0.34.orig/test/stdlib/tst-calloc.c dietlibc-0.34/test/stdlib/tst-calloc.c
+--- dietlibc-0.34.orig/test/stdlib/tst-calloc.c	2003-12-15 14:07:42.000000000 +0100
++++ dietlibc-0.34/test/stdlib/tst-calloc.c	2022-12-23 18:16:49.272860349 +0100
+@@ -17,6 +17,7 @@
+    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+    02111-1307 USA.  */
+ 
++#define _BSD_SOURCE
+ #include <errno.h>
+ #include <limits.h>
+ #include <malloc.h>

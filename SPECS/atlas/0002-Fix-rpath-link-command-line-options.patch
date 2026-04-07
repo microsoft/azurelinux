@@ -1,0 +1,38 @@
+From a8611f5dc19e2c31b810fd2baa31b9cb5fd30d2a Mon Sep 17 00:00:00 2001
+From: Andreas Arnez <arnez@linux.ibm.com>
+Date: Tue, 19 Feb 2019 19:20:19 +0100
+Subject: [PATCH 2/8] Fix -rpath-link command line options
+
+The "-rpath-link" command line options were written in the wrong syntax,
+causing errors in the build.  This is fixed.
+---
+ makes/Make.lib | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/makes/Make.lib b/makes/Make.lib
+index 4ceff02..b322a32 100644
+--- a/makes/Make.lib
++++ b/makes/Make.lib
+@@ -47,11 +47,11 @@ cshared : fat_cshared
+ #
+ LDTRY_WIN:
+ 	$(LD) $(LDFLAGS) -shared -soname $(LIBINSTdir)/$(outso) -o $(outso) \
+-           -rpath-link $(LIBINSTdir) --output-def=$(outdef) \
++           -rpath-link=$(LIBINSTdir) --output-def=$(outdef) \
+            --whole-archive $(libas) --no-whole-archive $(LIBS)
+ GCCTRY_WIN:
+ 	$(GOODGCC) -shared -o $(outso) -Wl,--output-def=$(outdef) \
+-           -Wl,"-rpath-link $(LIBINSTdir)" \
++           -Wl,"-rpath-link=$(LIBINSTdir)" \
+            -Wl,--whole-archive $(libas) -Wl,--no-whole-archive $(LIBS)
+ GCCTRY_norp_WIN:
+ 	$(GOODGCC) -shared -o $(outso) -Wl,--output-def=$(outdef) \
+@@ -113,7 +113,7 @@ TRYALL_WIN :
+ #
+ LDTRY:
+ 	$(LD) $(LDFLAGS) -shared -soname $(LIBINSTdir)/$(outso) -o $(outso) \
+-           -rpath-link $(LIBINSTdir)  \
++           -rpath-link=$(LIBINSTdir)  \
+            --whole-archive $(libas) --no-whole-archive $(LIBS)
+ GCCTRY:
+ 	$(GOODGCC) -shared -o $(outso).$(so_ver)  \

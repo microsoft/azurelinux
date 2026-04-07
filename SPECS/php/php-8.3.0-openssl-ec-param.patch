@@ -1,0 +1,47 @@
+From 21f9d16e130b412b6839494dcf30a2f1d7dcee0f Mon Sep 17 00:00:00 2001
+From: Remi Collet <remi@remirepo.net>
+Date: Mon, 24 Jul 2023 10:54:49 +0200
+Subject: [PATCH] Always warn about missing curve_name
+
+Both Fedora and RHEL do not support arbitrary EC parameters
+See https://bugzilla.redhat.com/2223953
+---
+ ext/openssl/openssl.c | 13 ++-----------
+ 1 file changed, 2 insertions(+), 11 deletions(-)
+
+diff --git a/ext/openssl/openssl.c b/ext/openssl/openssl.c
+index 33f51bfa4d..340b0467d3 100644
+--- a/ext/openssl/openssl.c
++++ b/ext/openssl/openssl.c
+@@ -4299,13 +4299,8 @@ static bool php_openssl_pkey_init_legacy_ec(EC_KEY *eckey, zval *data, bool *is_
+ 		OPENSSL_PKEY_SET_BN(data, b);
+ 		OPENSSL_PKEY_SET_BN(data, order);
+ 
++		php_error_docref(NULL, E_WARNING, "Missing params: curve_name (params only is not supported by OpenSSL)");
+ 		if (!(p && a && b && order)) {
+-			if (!p && !a && !b && !order) {
+-				php_error_docref(NULL, E_WARNING, "Missing params: curve_name");
+-			} else {
+-				php_error_docref(
+-					NULL, E_WARNING, "Missing params: curve_name or p, a, b, order");
+-			}
+ 			goto clean_exit;
+ 		}
+ 
+@@ -4455,12 +4450,8 @@ static EVP_PKEY *php_openssl_pkey_init_ec(zval *data, bool *is_private) {
+ 		OPENSSL_PKEY_SET_BN(data, b);
+ 		OPENSSL_PKEY_SET_BN(data, order);
+ 
++		php_error_docref(NULL, E_WARNING, "Missing params: curve_name");
+ 		if (!(p && a && b && order)) {
+-			if (!p && !a && !b && !order) {
+-				php_error_docref(NULL, E_WARNING, "Missing params: curve_name");
+-			} else {
+-				php_error_docref(NULL, E_WARNING, "Missing params: curve_name or p, a, b, order");
+-			}
+ 			goto cleanup;
+ 		}
+ 
+-- 
+2.41.0
+

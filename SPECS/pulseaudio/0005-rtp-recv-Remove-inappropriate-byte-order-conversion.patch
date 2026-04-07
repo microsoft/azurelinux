@@ -1,0 +1,30 @@
+From 932b0638983d9a22646c2e6902d2d841330299b9 Mon Sep 17 00:00:00 2001
+From: bert <evan_bertrand@hotmail.com>
+Date: Wed, 7 Aug 2024 20:18:51 -0400
+Subject: [PATCH 5/6] rtp-recv: Remove inappropriate byte order conversion
+
+Conversion of the `service` argument of `getaddrinfo()` to big-endian
+byte order causes module-rtp-recv to bind to an incorrect port (37670)
+for SAP announcements on little-endian architectures
+
+Part-of: <https://gitlab.freedesktop.org/pulseaudio/pulseaudio/-/merge_requests/828>
+---
+ src/modules/rtp/module-rtp-recv.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/modules/rtp/module-rtp-recv.c b/src/modules/rtp/module-rtp-recv.c
+index 9babf00cb..8eea17b04 100644
+--- a/src/modules/rtp/module-rtp-recv.c
++++ b/src/modules/rtp/module-rtp-recv.c
+@@ -710,7 +710,7 @@ int pa__init(pa_module*m) {
+ 
+         pa_zero(hints);
+ 
+-        service = pa_sprintf_malloc("%d", htons(SAP_PORT));
++        service = pa_sprintf_malloc("%d", SAP_PORT);
+ 
+         hints.ai_flags = AI_NUMERICHOST;
+         if (getaddrinfo(sap_address, service, &hints, &sap_addrinfo) != 0) {
+-- 
+2.52.0
+

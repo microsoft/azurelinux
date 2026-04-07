@@ -1,0 +1,30 @@
+From f40baecd3d09b1018185bcefde35464a79dbd68d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Wed, 5 Jun 2013 08:38:11 +0200
+Subject: [PATCH] doc: Add mandatory argument to @sp
+
+Texinfo-5.1 fails if @sp macro is not followed by a number. The
+numeric argument is mandatory according to Texinfo documentation.
+---
+ doc/cvs.texinfo | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/doc/cvs.texinfo b/doc/cvs.texinfo
+index ad3a414..14bc79a 100644
+--- a/doc/cvs.texinfo
++++ b/doc/cvs.texinfo
+@@ -111,9 +111,9 @@ approved by the Free Software Foundation.
+ @sp 4
+ @comment The title is printed in a large font.
+ @center @titlefont{Version Management}
+-@sp
++@sp 1
+ @center @titlefont{with}
+-@sp
++@sp 1
+ @center @titlefont{CVS}
+ @sp 2
+ @center for @sc{cvs} @value{VERSION}
+-- 
+1.8.1.4
+

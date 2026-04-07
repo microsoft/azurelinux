@@ -1,0 +1,117 @@
+From e24c25db2f1ce824965d0460c692e6ad46e29363 Mon Sep 17 00:00:00 2001
+From: Marco Martin <notmart@gmail.com>
+Date: Fri, 24 Feb 2023 17:40:48 +0100
+Subject: [PATCH 45/55] client: Force a roundtrip when an XdgOutput is not
+ ready yet
+
+Is possible that the server sends a surface_enter before
+all the information of the XdgOutput have been processed by the client.
+in this case the associated QScreen doesn't exist yet, causing a
+QWindow::SetScreen(nullptr), which will fall back to
+QGuiApplication::primaryScreen(), having the QWindow being assigned the
+wrong screen
+
+Change-Id: I923d5d3a35484deafa6f0572f79c16c27b1f87f0
+Reviewed-by: David Edmundson <davidedmundson@kde.org>
+---
+ src/client/qwaylandwindow.cpp                 |  2 ++
+ tests/auto/client/shared/coreprotocol.cpp     |  2 ++
+ tests/auto/client/shared/coreprotocol.h       |  3 ++
+ tests/auto/client/xdgoutput/tst_xdgoutput.cpp | 35 +++++++++++++++++++
+ 4 files changed, 42 insertions(+)
+
+diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
+index 96de798b..5280a9f7 100644
+--- a/src/client/qwaylandwindow.cpp
++++ b/src/client/qwaylandwindow.cpp
+@@ -1042,6 +1042,8 @@ void QWaylandWindow::handleScreensChanged()
+     if (newScreen == mLastReportedScreen)
+         return;
+ 
++    if (!newScreen->isPlaceholder() && !newScreen->QPlatformScreen::screen())
++        mDisplay->forceRoundTrip();
+     QWindowSystemInterface::handleWindowScreenChanged(window(), newScreen->QPlatformScreen::screen());
+     mLastReportedScreen = newScreen;
+     if (fixedToplevelPositions && !QPlatformWindow::parent() && window()->type() != Qt::Popup
+diff --git a/tests/auto/client/shared/coreprotocol.cpp b/tests/auto/client/shared/coreprotocol.cpp
+index d1a2e7cb..53e12291 100644
+--- a/tests/auto/client/shared/coreprotocol.cpp
++++ b/tests/auto/client/shared/coreprotocol.cpp
+@@ -185,6 +185,8 @@ void Output::output_bind_resource(QtWaylandServer::wl_output::Resource *resource
+ 
+     if (m_version >= WL_OUTPUT_DONE_SINCE_VERSION)
+         wl_output::send_done(resource->handle);
++
++    Q_EMIT outputBound(resource);
+ }
+ 
+ // Seat stuff
+diff --git a/tests/auto/client/shared/coreprotocol.h b/tests/auto/client/shared/coreprotocol.h
+index 210d8ddb..00c439e1 100644
+--- a/tests/auto/client/shared/coreprotocol.h
++++ b/tests/auto/client/shared/coreprotocol.h
+@@ -273,6 +273,9 @@ public:
+     OutputData m_data;
+     int m_version = 1; // TODO: remove on libwayland upgrade
+ 
++Q_SIGNALS:
++    void outputBound(Resource *resource);
++
+ protected:
+     void output_bind_resource(Resource *resource) override;
+ };
+diff --git a/tests/auto/client/xdgoutput/tst_xdgoutput.cpp b/tests/auto/client/xdgoutput/tst_xdgoutput.cpp
+index 20f762e0..2a0cad1d 100644
+--- a/tests/auto/client/xdgoutput/tst_xdgoutput.cpp
++++ b/tests/auto/client/xdgoutput/tst_xdgoutput.cpp
+@@ -55,6 +55,7 @@ private slots:
+     void primaryScreen();
+     void overrideGeometry();
+     void changeGeometry();
++    void outputCreateEnterRace();
+ };
+ 
+ void tst_xdgoutput::cleanup()
+@@ -134,5 +135,39 @@ void tst_xdgoutput::changeGeometry()
+     exec([&] { remove(output(1)); });
+ }
+ 
++void tst_xdgoutput::outputCreateEnterRace()
++{
++    m_config.autoConfigure = true;
++    m_config.autoEnter = false;
++    QRasterWindow window;
++    QSignalSpy screenChanged(&window, &QWindow::screenChanged);
++    window.resize(400, 320);
++    window.show();
++    QCOMPOSITOR_TRY_VERIFY(xdgSurface() && xdgSurface()->m_committedConfigureSerial);
++    exec([=] { xdgToplevel()->surface()->sendEnter(output(0));});
++
++    QTRY_COMPARE(QGuiApplication::screens().size(), 1);
++    QScreen *primaryScreen = QGuiApplication::screens().first();
++    QCOMPARE(window.screen(), primaryScreen);
++
++     auto *out = exec([=] {
++        return add<Output>();
++     });
++
++     // In Compositor Thread
++     connect(out, &Output::outputBound, this, [this](QtWaylandServer::wl_output::Resource *resource){
++        auto surface = xdgToplevel()->surface();
++        surface->sendLeave(output(0));
++        surface->QtWaylandServer::wl_surface::send_enter(surface->resource()->handle, resource->handle);
++     }, Qt::DirectConnection);
++
++    QTRY_COMPARE(QGuiApplication::screens().size(), 2);
++    QTRY_COMPARE(window.screen(), QGuiApplication::screens()[1]);
++
++    exec([=] { remove(out); });
++    m_config.autoConfigure = false;
++    m_config.autoEnter = true;
++}
++
+ QCOMPOSITOR_TEST_MAIN(tst_xdgoutput)
+ #include "tst_xdgoutput.moc"
+-- 
+2.51.1
+

@@ -1,0 +1,38 @@
+From bbc84e264b9305feb3ef1993daca58a87af711de Mon Sep 17 00:00:00 2001
+From: Alexander Neundorf <neundorf@kde.org>
+Date: Sat, 18 Apr 2009 16:31:32 +0000
+Subject: [PATCH 05/33] -add a ctest config file (see
+ http://my.cdash.org/index.php?project=automoc4 )
+
+Alex
+
+
+
+svn path=/trunk/kdesupport/automoc/; revision=955846
+---
+ CTestConfig.cmake | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+ create mode 100644 CTestConfig.cmake
+
+diff --git a/CTestConfig.cmake b/CTestConfig.cmake
+new file mode 100644
+index 0000000..92f9d2f
+--- /dev/null
++++ b/CTestConfig.cmake
+@@ -0,0 +1,13 @@
++## This file should be placed in the root directory of your project.
++## Then modify the CMakeLists.txt file in the root directory of your
++## project to incorporate the testing dashboard.
++## # The following are required to uses Dart and the Cdash dashboard
++##   ENABLE_TESTING()
++##   INCLUDE(Dart)
++set(CTEST_PROJECT_NAME "automoc4")
++set(CTEST_NIGHTLY_START_TIME "16:00:00 CET")
++
++set(CTEST_DROP_METHOD "http")
++set(CTEST_DROP_SITE "my.cdash.org")
++set(CTEST_DROP_LOCATION "/submit.php?project=automoc4")
++set(CTEST_DROP_SITE_CDASH TRUE)
+-- 
+2.4.3
+

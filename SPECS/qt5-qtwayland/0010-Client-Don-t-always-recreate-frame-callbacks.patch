@@ -1,0 +1,77 @@
+From c2b4de718762a3c1bb9971353a583001fceeec7a Mon Sep 17 00:00:00 2001
+From: Georges Basile Stavracas Neto <gbsneto@gnome.org>
+Date: Thu, 27 May 2021 19:55:04 -0300
+Subject: [PATCH 10/55] Client: Don't always recreate frame callbacks
+
+The main QWaylandWindow method that is executed when handling updates is
+QWaylandWindow::handleUpdate(). This method always, unconditionally queues
+a frame callback, regardless of whether any other one is already queued.
+
+On some circumstances, e.g. when a window is hidden or completely obscured
+by other windows, it stops receiving frame callbacks from the compositor.
+However, QWaylandWindow would continue to request for them, which eventually
+fills up the Wayland socket, and causes the application to crash.
+
+This can be avoided by checking if the platform window is already waiting
+for a frame callback, before queueing another one.
+
+In QWaylandWindow::handleUpdate(), check if mWaitingForFrameCallback is true
+before queueing frame callbacks, and early return if that's the case.
+
+The XDG-shell test needed to be updated for this: The mock compositor is
+not responding to any frame callbacks, so the window will be unexposed,
+no longer get paint events and therefore not trigger any commit. This
+worked by accident before because we were issuing updates quickly enough
+to reset the timer before it had a chance to unexpose the window. The
+easiest fix is just to disable the dependency on frame callbacks in
+this test, since that is clearly not what it's testing.
+
+Task-number: QTBUG-81504
+Change-Id: Ieacb05c7d5a5fcf662243d9177ebcc308cb9ca84
+Reviewed-by: Qt CI Bot <qt_ci_bot@qt-project.org>
+Reviewed-by: Georges Basile Stavracas Neto <gbsneto@gnome.org>
+Reviewed-by: Eskil Abrahamsen Blomfeldt <eskil.abrahamsen-blomfeldt@qt.io>
+(cherry picked from commit cbc74ba6d7186457d8d07183272e952dee5f34f9)
+---
+ src/client/qwaylandwindow.cpp               | 4 ++++
+ tests/auto/client/xdgshell/tst_xdgshell.cpp | 2 ++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
+index d57094a7..9de284de 100644
+--- a/src/client/qwaylandwindow.cpp
++++ b/src/client/qwaylandwindow.cpp
+@@ -1199,6 +1199,10 @@ void QWaylandWindow::requestUpdate()
+ void QWaylandWindow::handleUpdate()
+ {
+     qCDebug(lcWaylandBackingstore) << "handleUpdate" << QThread::currentThread();
++
++    if (mWaitingForFrameCallback)
++        return;
++
+     // TODO: Should sync subsurfaces avoid requesting frame callbacks?
+     QReadLocker lock(&mSurfaceLock);
+     if (!mSurface)
+diff --git a/tests/auto/client/xdgshell/tst_xdgshell.cpp b/tests/auto/client/xdgshell/tst_xdgshell.cpp
+index 1423d647..46f07c0a 100644
+--- a/tests/auto/client/xdgshell/tst_xdgshell.cpp
++++ b/tests/auto/client/xdgshell/tst_xdgshell.cpp
+@@ -138,6 +138,7 @@ void tst_xdgshell::configureSize()
+ 
+ void tst_xdgshell::configureStates()
+ {
++    QVERIFY(qputenv("QT_WAYLAND_FRAME_CALLBACK_TIMEOUT", "0"));
+     QRasterWindow window;
+     window.resize(64, 48);
+     window.show();
+@@ -186,6 +187,7 @@ void tst_xdgshell::configureStates()
+     QCOMPARE(window.windowStates(), Qt::WindowNoState);
+     QCOMPARE(window.frameGeometry().size(), windowedSize);
+ //    QCOMPARE(window.frameGeometry().topLeft(), QPoint()); // TODO: this doesn't currently work when window decorations are enabled
++    QVERIFY(qunsetenv("QT_WAYLAND_FRAME_CALLBACK_TIMEOUT"));
+ }
+ 
+ void tst_xdgshell::popup()
+-- 
+2.51.1
+

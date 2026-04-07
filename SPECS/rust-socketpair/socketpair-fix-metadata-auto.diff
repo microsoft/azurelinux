@@ -1,0 +1,28 @@
+--- socketpair-0.19.8/Cargo.toml	1970-01-01T00:00:01+00:00
++++ socketpair-0.19.8/Cargo.toml	2025-07-08T22:31:26.780858+00:00
+@@ -74,20 +74,6 @@
+ version = "1.0.0"
+ features = ["net"]
+ 
+-[target."cfg(windows)".dependencies.uuid]
+-version = "1.0.0"
+-features = ["v4"]
+-
+-[target."cfg(windows)".dependencies.windows-sys]
+-version = "0.59.0"
+-features = [
+-    "Win32_Foundation",
+-    "Win32_Networking_WinSock",
+-    "Win32_Security",
+-    "Win32_Storage_FileSystem",
+-    "Win32_System_Pipes",
+-]
+-
+ [lints.rust.unexpected_cfgs]
+ level = "warn"
+ priority = 0
+@@ -107,3 +93,4 @@
+     "cfg(write_all_vectored)",
+     "cfg(windows_file_type_ext)",
+ ]
++

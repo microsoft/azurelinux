@@ -1,0 +1,39 @@
+From ee5ab7e537a922855e5e5f5905071adb1fc2eb25 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Renaud=20M=C3=A9trich?= <rmetrich@redhat.com>
+Date: Wed, 3 Dec 2025 16:36:54 +0100
+Subject: [PATCH] Fix binary path of rpm-loader
+Content-type: text/plain
+
+---
+ src/Makefile.am           | 1 +
+ src/library/rpm-backend.c | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index cab58ee130bd..8a356805b5ab 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -84,6 +84,7 @@ bin_PROGRAMS = fapolicyd-rpm-loader
+ fapolicyd_rpm_loader_SOURCES = \
+ 	handler/fapolicyd-rpm-loader.c
+ 
++fapolicyd_CFLAGS += -DBINARYDIR='"$(bindir)"'
+ fapolicyd_rpm_loader_CFLAGS = $(fapolicyd_CFLAGS)
+ fapolicyd_rpm_loader_LDFLAGS = $(fapolicyd_LDFLAGS)
+ fapolicyd_rpm_loader_LDADD = libfapolicyd.la
+diff --git a/src/library/rpm-backend.c b/src/library/rpm-backend.c
+index fab8e5345d40..5b24c9589040 100644
+--- a/src/library/rpm-backend.c
++++ b/src/library/rpm-backend.c
+@@ -238,7 +238,7 @@ static int rpm_load_list(const conf_t *conf)
+ 	char *custom_env[] = { "FAPO_SOCK_FD=3", NULL };
+ 
+ 	pid_t pid = -1;
+-	int status = posix_spawn(&pid, "/usr/bin/fapolicyd-rpm-loader",
++	int status = posix_spawn(&pid, BINARYDIR "/fapolicyd-rpm-loader",
+ 					 &actions, NULL, argv, custom_env);
+ 	close(sv[1]);  // Parent doesn't write
+ 
+-- 
+2.52.0
+

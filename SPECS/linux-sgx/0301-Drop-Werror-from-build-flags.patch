@@ -1,0 +1,71 @@
+From b073f869a15483ef1d843c9dfaa5d8dcdc0d7836 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Tue, 3 Sep 2024 10:14:31 +0100
+Subject: [PATCH 301/301] Drop -Werror from build flags
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ sources/cmake/linux/Clang9.0.0.cmake        | 2 +-
+ sources/cmake/linux/GNU8.2.0.cmake          | 2 +-
+ sources/cmake/linux/Intel19.0.0.cmake       | 2 +-
+ sources/cmake/linux/IntelLLVM2023.1.0.cmake | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/sources/cmake/linux/Clang9.0.0.cmake b/sources/cmake/linux/Clang9.0.0.cmake
+index 18e5182a..fa9ee20a 100644
+--- a/sources/cmake/linux/Clang9.0.0.cmake
++++ b/sources/cmake/linux/Clang9.0.0.cmake
+@@ -106,7 +106,7 @@ if(SANITIZERS)
+ endif(SANITIZERS)
+ 
+ # Optimization level = 3, no-debug definition (turns off asserts), warnings=errors
+-set (CMAKE_C_FLAGS_RELEASE " -O3 -DNDEBUG -Werror")
++set (CMAKE_C_FLAGS_RELEASE " -O3 -DNDEBUG")
+ 
+ # DEBUG flags - optimization level = 0, generation GDB information (-g)
+ set (CMAKE_C_FLAGS_DEBUG " -O0 -g")
+diff --git a/sources/cmake/linux/GNU8.2.0.cmake b/sources/cmake/linux/GNU8.2.0.cmake
+index 96658a8d..93cd079a 100644
+--- a/sources/cmake/linux/GNU8.2.0.cmake
++++ b/sources/cmake/linux/GNU8.2.0.cmake
+@@ -96,7 +96,7 @@ if(${ARCH} MATCHES "ia32")
+ endif(${ARCH} MATCHES "ia32")
+ 
+ # Optimization level = 3, no-debug definition (turns off asserts), warnings=errors
+-set (CMAKE_C_FLAGS_RELEASE " -O3 -DNDEBUG -Werror")
++set (CMAKE_C_FLAGS_RELEASE " -O3 -DNDEBUG")
+ 
+ set(w7_opt "${w7_opt} -march=pentium4 -msse2")
+ set(s8_opt "${s8_opt} -march=core2 -mssse3")
+diff --git a/sources/cmake/linux/Intel19.0.0.cmake b/sources/cmake/linux/Intel19.0.0.cmake
+index c1d48508..133a7e18 100644
+--- a/sources/cmake/linux/Intel19.0.0.cmake
++++ b/sources/cmake/linux/Intel19.0.0.cmake
+@@ -99,7 +99,7 @@ if(CODE_COVERAGE)
+ endif()
+ 
+ # Optimization level = 3, no-debug definition (turns off asserts), warning level = 3, treat warnings as errors
+-set (CMAKE_C_FLAGS_RELEASE " -O3 -DNDEBUG -w3 -Werror")
++set (CMAKE_C_FLAGS_RELEASE " -O3 -DNDEBUG -w3")
+ # DEBUG flags Optimization level = 0, generation maximum GDB information (-g3)
+ set (CMAKE_C_FLAGS_DEBUG " -O0 -g3")
+ 
+diff --git a/sources/cmake/linux/IntelLLVM2023.1.0.cmake b/sources/cmake/linux/IntelLLVM2023.1.0.cmake
+index babc289a..59a74d10 100644
+--- a/sources/cmake/linux/IntelLLVM2023.1.0.cmake
++++ b/sources/cmake/linux/IntelLLVM2023.1.0.cmake
+@@ -95,7 +95,7 @@ if(CODE_COVERAGE)
+ endif()
+ 
+ # Optimization level = 3, no-debug definition (turns off asserts), warning level = 3, treat warnings as errors
+-set (CMAKE_C_FLAGS_RELEASE " -Ofast -DNDEBUG -Wall -Wno-unused-function -Wno-missing-braces -Werror")
++set (CMAKE_C_FLAGS_RELEASE " -Ofast -DNDEBUG -Wall -Wno-unused-function -Wno-missing-braces")
+ 
+ # Alignment for structures on byte boundaries (= 16)
+ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Zp16")
+-- 
+2.46.0
+

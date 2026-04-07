@@ -1,0 +1,35 @@
+From 5ff4b2c16269714d76a68a1202e828128e25bf4a Mon Sep 17 00:00:00 2001
+From: Sandro <devel@penguinpee.nl>
+Date: Thu, 23 Oct 2025 17:17:21 +0200
+Subject: [PATCH 5/7] Use zoneinfo instead of pytz
+
+Since pytz is an optional dependency, tests should not depend on it.
+---
+ pandas/tests/arrays/test_array.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/pandas/tests/arrays/test_array.py b/pandas/tests/arrays/test_array.py
+index 158a963845..e74a0f0b2e 100644
+--- a/pandas/tests/arrays/test_array.py
++++ b/pandas/tests/arrays/test_array.py
+@@ -4,7 +4,7 @@ import re
+ 
+ import numpy as np
+ import pytest
+-import pytz
++import zoneinfo
+ 
+ from pandas._config import using_string_dtype
+ 
+@@ -306,7 +306,7 @@ def test_array_copy():
+     assert tm.shares_memory(a, b)
+ 
+ 
+-cet = pytz.timezone("CET")
++cet = zoneinfo.ZoneInfo('CET')
+ 
+ 
+ @pytest.mark.parametrize(
+-- 
+2.51.0
+

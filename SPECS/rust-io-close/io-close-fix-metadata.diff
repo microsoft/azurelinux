@@ -1,0 +1,12 @@
+--- io-close-0.3.7/Cargo.toml	1970-01-01T00:00:00+00:00
++++ io-close-0.3.7/Cargo.toml	2024-02-05T11:54:41.977246+00:00
+@@ -21,9 +21,6 @@
+ [package.metadata.docs.rs]
+ all-features = true
+ rustdoc-args = ["--cfg", "docsrs"]
+-[dependencies.os_pipe]
+-version = "0.9.2"
+-optional = true
+ [dev-dependencies.tempfile]
+ version = "3.1.0"
+ [target."cfg(unix)".dependencies.libc]

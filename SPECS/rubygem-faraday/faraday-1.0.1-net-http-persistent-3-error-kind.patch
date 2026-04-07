@@ -1,0 +1,24 @@
+From 687108bb4ddc2511aeaae7449dd401fe62dd5ceb Mon Sep 17 00:00:00 2001
+From: Matt <iMacTia@users.noreply.github.com>
+Date: Thu, 31 Dec 2020 10:51:03 +0000
+Subject: [PATCH] Adds Ruby 3.0 to CI Matrix (#1226)
+
+---
+ .github/workflows/ci.yml                   | 6 +-----
+ Gemfile                                    | 2 +-
+ lib/faraday/adapter/net_http_persistent.rb | 2 +-
+ 3 files changed, 3 insertions(+), 7 deletions(-)
+
+diff --git a/lib/faraday/adapter/net_http_persistent.rb b/lib/faraday/adapter/net_http_persistent.rb
+index ff20c256..26bcc2ce 100644
+--- a/lib/faraday/adapter/net_http_persistent.rb
++++ b/lib/faraday/adapter/net_http_persistent.rb
+@@ -51,7 +51,7 @@ def proxy_uri(env)
+ 
+       def perform_request(http, env)
+         http.request env[:url], create_request(env)
+-      rescue Errno::ETIMEDOUT => e
++      rescue Errno::ETIMEDOUT, Net::OpenTimeout => e
+         raise Faraday::TimeoutError, e
+       rescue Net::HTTP::Persistent::Error => e
+         raise Faraday::TimeoutError, e if e.message.include? 'Timeout'

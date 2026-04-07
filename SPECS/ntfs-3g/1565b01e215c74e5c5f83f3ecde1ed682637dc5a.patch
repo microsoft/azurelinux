@@ -1,0 +1,66 @@
+From 1565b01e215c74e5c5f83f3ecde1ed682637dc5a Mon Sep 17 00:00:00 2001
+From: Erik Larsson <erik@tuxera.com>
+Date: Tue, 9 May 2023 11:25:10 +0300
+Subject: [PATCH] mft.c: Fix broken free MFT records accounting during bitmap
+ extension.
+
+When the bitmap needs extending, 'vol->free_mft_records' is incremented
+by 8*8=64 records. This is due to the bitmap's initialized area being
+extended 8 bytes at a time.
+However the way 'vol->free_mft_records' is being initialized is that all
+the bits that are currently allocated to the MFT bitmap are already
+taken into account at initialization time. This leads to a value for
+'vol->free_mft_records' that is larger than the actual available number
+of MFT records.
+
+For example if there are 20 used MFT records and the bitmap has a 4096
+byte allocation where 16 bytes are initialized, the number of free MFT
+records are ((8 * 16) - 20) + (8 * (4096 - 16)) = 32748 records
+available.
+If we now expand the bitmap by 8 initialized bytes, we'd be adding 64
+MFT entries according to the logic in the function
+'ntfs_mft_bitmap_extend_initialized'.
+However we are expanding it within the bounds of the existing allocation
+where there is (4096 - 16) bytes free, so they shouldn't be added at all
+at this stage.
+
+The result is that our internal accounting is that we have 32748 + 64 =
+32812 available MFT records, but in reality we will have 32748 records
+available all the time until we expand the allocation beyond 4096 bytes.
+
+Fixed by incrementing 'vol->free_mft_records' when the allocation is
+expanded, not when the initialized size is.
+---
+ libntfs-3g/mft.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/libntfs-3g/mft.c b/libntfs-3g/mft.c
+index aefbb5f1..cd2b4157 100644
+--- a/libntfs-3g/mft.c
++++ b/libntfs-3g/mft.c
+@@ -978,7 +978,6 @@ static int ntfs_mft_bitmap_extend_initialized(ntfs_volume *vol)
+ 	ll = ntfs_attr_pwrite(mftbmp_na, old_initialized_size, 8, &ll);
+ 	if (ll == 8) {
+ 		ntfs_log_debug("Wrote eight initialized bytes to mft bitmap.\n");
+-		vol->free_mft_records += (8 * 8); 
+ 		ret = 0;
+ 		goto out;
+ 	}
+@@ -1776,6 +1775,7 @@ ntfs_inode *ntfs_mft_record_alloc(ntfs_volume *vol, ntfs_inode *base_ni)
+ 			(long long)mftbmp_na->initialized_size);
+ 	if (mftbmp_na->initialized_size + 8 > mftbmp_na->allocated_size) {
+ 
++		const s64 old_allocated_size = mftbmp_na->allocated_size;
+ 		int ret = ntfs_mft_bitmap_extend_allocation(vol);
+ 
+ 		if (ret == STATUS_ERROR)
+@@ -1792,6 +1792,9 @@ ntfs_inode *ntfs_mft_record_alloc(ntfs_volume *vol, ntfs_inode *base_ni)
+ 				(long long)mftbmp_na->allocated_size,
+ 				(long long)mftbmp_na->data_size,
+ 				(long long)mftbmp_na->initialized_size);
++
++		vol->free_mft_records +=
++			(mftbmp_na->allocated_size - old_allocated_size) << 3;
+ 	}
+ 	/*
+ 	 * We now have sufficient allocated space, extend the initialized_size

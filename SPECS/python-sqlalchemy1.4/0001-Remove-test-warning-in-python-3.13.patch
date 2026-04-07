@@ -1,0 +1,54 @@
+From f620e2aa3db6d520b11471fbf5df8d7740e0e7e7 Mon Sep 17 00:00:00 2001
+From: Federico Caselli <cfederico87@gmail.com>
+Date: Tue, 17 Sep 2024 20:22:11 +0200
+Subject: [PATCH] Remove test warning in python 3.13
+
+Change-Id: Ib098754ef6d157e8dd1eac32b3cb114a9ca66e4a
+(cherry picked from commit 0cca754f2101cf0e63f0c67b0220e7a4eb3a0f9c)
+---
+ lib/sqlalchemy/util/__init__.py | 1 +
+ lib/sqlalchemy/util/compat.py   | 1 +
+ test/ext/test_extendedattr.py   | 3 ++-
+ 3 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/lib/sqlalchemy/util/__init__.py b/lib/sqlalchemy/util/__init__.py
+index 544f4c06f..289e191cf 100644
+--- a/lib/sqlalchemy/util/__init__.py
++++ b/lib/sqlalchemy/util/__init__.py
+@@ -81,6 +81,7 @@ from .compat import py2k
+ from .compat import py310
+ from .compat import py311
+ from .compat import py312
++from .compat import py313
+ from .compat import py37
+ from .compat import py38
+ from .compat import py39
+diff --git a/lib/sqlalchemy/util/compat.py b/lib/sqlalchemy/util/compat.py
+index 81e8dbf47..d70cc82ff 100644
+--- a/lib/sqlalchemy/util/compat.py
++++ b/lib/sqlalchemy/util/compat.py
+@@ -14,6 +14,7 @@ import operator
+ import platform
+ import sys
+ 
++py313 = sys.version_info >= (3, 13)
+ py312 = sys.version_info >= (3, 12)
+ py311 = sys.version_info >= (3, 11)
+ py310 = sys.version_info >= (3, 10)
+diff --git a/test/ext/test_extendedattr.py b/test/ext/test_extendedattr.py
+index c762754bc..d895f74a9 100644
+--- a/test/ext/test_extendedattr.py
++++ b/test/ext/test_extendedattr.py
+@@ -156,7 +156,8 @@ class UserDefinedExtensionTest(_ExtBase, fixtures.ORMTest):
+             )
+ 
+             # This proves SA can handle a class with non-string dict keys
+-            if util.cpython:
++            # Since python 3.13 non-string key raise a runtime warning.
++            if util.cpython and not util.py313:
+                 locals()[42] = 99  # Don't remove this line!
+ 
+             def __init__(self, **kwargs):
+-- 
+2.49.0
+

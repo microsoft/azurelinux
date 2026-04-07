@@ -1,0 +1,1 @@
+SUBSYSTEM=="dma_heap", GROUP="video", MODE="0660"

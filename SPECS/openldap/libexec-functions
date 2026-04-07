@@ -1,0 +1,120 @@
+# Author: Jan Vcelak <jvcelak@redhat.com>
+
+SLAPD_USER=
+SLAPD_CONFIG_FILE=
+SLAPD_CONFIG_DIR=
+SLAPD_CONFIG_CUSTOM=
+SLAPD_GLOBAL_OPTIONS=
+SLAPD_SYSCONFIG_FILE=
+
+function default_config()
+{
+	SLAPD_USER=ldap
+	SLAPD_CONFIG_FILE=/etc/openldap/slapd.conf
+	SLAPD_CONFIG_DIR=/etc/openldap/slapd.d
+	SLAPD_CONFIG_CUSTOM=
+	SLAPD_GLOBAL_OPTIONS=
+	SLAPD_SYSCONFIG_FILE=/etc/sysconfig/slapd
+}
+
+function parse_config_options()
+{
+	user=
+	config_file=
+	config_dir=
+	while getopts :u:f:F: opt; do
+		case "$opt" in
+		u)
+			user="$OPTARG"
+			;;
+		f)
+			config_file="$OPTARG"
+			;;
+		F)
+			config_dir="$OPTARG"
+			;;
+		esac
+	done
+
+	if [ -n "$user" ]; then
+		SLAPD_USER="$user"
+	fi
+
+	if [ -n "$config_dir" ]; then
+		SLAPD_CONFIG_DIR="$config_dir"
+		SLAPD_CONFIG_FILE=
+		SLAPD_CONFIG_CUSTOM=1
+		SLAPD_GLOBAL_OPTIONS="-F '$config_dir'"
+	elif [ -n "$config_file" ]; then
+		SLAPD_CONFIG_DIR=
+		SLAPD_CONFIG_FILE="$config_file"
+		SLAPD_CONFIG_CUSTOM=1
+		SLAPD_GLOBAL_OPTIONS="-f '$config_file'"
+	fi
+}
+
+function uses_new_config()
+{
+	[ -n "$SLAPD_CONFIG_DIR" ]
+	return $?
+}
+
+function run_as_ldap()
+{
+	/sbin/runuser --shell /bin/sh --session-command "$1" "$SLAPD_USER"
+	return $?
+}
+
+function ldif_unbreak()
+{
+	sed ':a;N;s/\n //;ta;P;D'
+}
+
+function ldif_value()
+{
+	sed 's/^[^:]*: //'
+}
+
+function databases_new()
+{
+	slapcat $SLAPD_GLOBAL_OPTIONS -c \
+	-H 'ldap:///cn=config???(|(objectClass=olcBdbConfig)(objectClass=olcHdbConfig))' 2>/dev/null | \
+		ldif_unbreak | \
+		grep '^olcDbDirectory: ' | \
+		ldif_value
+}
+
+function certificates_new()
+{
+	slapcat $SLAPD_GLOBAL_OPTIONS -c -H 'ldap:///cn=config???(cn=config)' 2>/dev/null | \
+		ldif_unbreak | \
+		grep '^olcTLS\(CACertificateFile\|CACertificatePath\|CertificateFile\|CertificateKeyFile\): ' | \
+		ldif_value
+}
+
+function certificates()
+{
+	uses_new_config && certificates_new
+}
+
+function databases()
+{
+	uses_new_config && databases_new
+}
+
+
+function error()
+{
+	format="$1\n"; shift
+	printf "$format" $@ >&2
+}
+
+function load_sysconfig()
+{
+	[ -r "$SLAPD_SYSCONFIG_FILE" ] || return
+
+	. "$SLAPD_SYSCONFIG_FILE"
+	[ -n "$SLAPD_OPTIONS" ] && parse_config_options $SLAPD_OPTIONS
+}
+
+default_config

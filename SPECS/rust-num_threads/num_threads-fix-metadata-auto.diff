@@ -1,0 +1,8 @@
+--- num_threads-0.1.7/Cargo.toml	1970-01-01T00:00:01+00:00
++++ num_threads-0.1.7/Cargo.toml	2024-02-18T15:38:45.889737+00:00
+@@ -37,5 +37,3 @@
+ 
+ [dependencies]
+ 
+-[target."cfg(any(target_os = \"macos\", target_os = \"ios\", target_os = \"freebsd\"))".dependencies.libc]
+-version = "0.2.107"

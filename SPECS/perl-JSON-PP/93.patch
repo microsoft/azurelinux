@@ -1,0 +1,25 @@
+From 7052740e158491666e4f27d75241617a16170102 Mon Sep 17 00:00:00 2001
+From: Heiko Jansen <heikojansen@users.noreply.github.com>
+Date: Wed, 20 Nov 2024 09:51:00 +0100
+Subject: [PATCH] Silence Getopt::Long warning
+
+Getopt::Long >= 2.55 produces the warning
+'Duplicate specification "V" for option "v"
+See issue #88 for prior report.
+---
+ bin/json_pp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/bin/json_pp b/bin/json_pp
+index 72b9db7..85dd348 100644
+--- a/bin/json_pp
++++ b/bin/json_pp
+@@ -2,7 +2,7 @@
+ 
+ BEGIN { pop @INC if $INC[-1] eq '.' }
+ use strict;
+-use Getopt::Long;
++use Getopt::Long qw( :config no_ignore_case );
+ use Encode ();
+ 
+ use JSON::PP ();

@@ -1,0 +1,12 @@
+--- colored-2.2.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ colored-2.2.0/Cargo.toml	2025-01-26T12:38:26.485610+00:00
+@@ -81,9 +81,3 @@
+ [features]
+ no-color = []
+ 
+-[target."cfg(windows)".dependencies.windows-sys]
+-version = ">=0.48,<=0.59"
+-features = [
+-    "Win32_Foundation",
+-    "Win32_System_Console",
+-]

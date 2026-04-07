@@ -1,0 +1,22 @@
+Include <unistd.h> for the proper access function prototype.
+
+diff --git a/tool/lemon.c b/tool/lemon.c
+index 10fd217daf964d7e..57e9d53507bda49a 100644
+--- a/tool/lemon.c
++++ b/tool/lemon.c
+@@ -11,6 +11,7 @@
+ #include <string.h>
+ #include <ctype.h>
+ #include <stdlib.h>
++#include <unistd.h>
+ 
+ #ifndef __WIN32__
+ #   if defined(_WIN32) || defined(WIN32)
+@@ -2710,7 +2711,6 @@ int modemask;
+   char *pathlist;
+   char *path,*cp;
+   char c;
+-  extern int access();
+ 
+ #ifdef __WIN32__
+   cp = strrchr(argv0,'\\');

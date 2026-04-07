@@ -1,0 +1,41 @@
+From 415b0ca76d1071bc2bb89f8860f4ce831d6a090a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Robert-Andr=C3=A9=20Mauchin?= <zebob.m@gmail.com>
+Date: Mon, 3 Feb 2020 23:09:36 +0100
+Subject: [PATCH] DocumentationEnumerator.cs: Declare iface and ifaceMethod
+ correctly to fix NRE
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Using TypeReference and MethodReference instead of var to declare them.
+
+Fix #462
+
+Signed-off-by: Robert-André Mauchin <zebob.m@gmail.com>
+---
+ mdoc/Mono.Documentation/Updater/DocumentationEnumerator.cs | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/mdoc/Mono.Documentation/Updater/DocumentationEnumerator.cs b/mdoc/Mono.Documentation/Updater/DocumentationEnumerator.cs
+index be22bf0..1917b59 100644
+--- a/mdoc/Mono.Documentation/Updater/DocumentationEnumerator.cs
++++ b/mdoc/Mono.Documentation/Updater/DocumentationEnumerator.cs
+@@ -341,7 +341,7 @@ namespace Mono.Documentation.Updater
+                             var method = ((PropertyDefinition) mr).GetMethod ?? ((PropertyDefinition) mr).SetMethod;
+                             if (method?.Overrides != null && method.Overrides.Any())
+                             {
+-                                DocUtils.GetInfoForExplicitlyImplementedMethod(method, out var iface, out var ifaceMethod);
++                                DocUtils.GetInfoForExplicitlyImplementedMethod(method, out TypeReference iface, out MethodReference ifaceMethod);
+                                 var newName = DocUtils.GetMemberForProperty(ifaceMethod.Name);
+                                 if (newName == memberName && verifyInterface(mr) && docName.Contains (iface.Name))
+                                     yield return mr;
+@@ -428,4 +428,4 @@ namespace Mono.Documentation.Updater
+             return count;
+         }
+     }
+-}
+\ No newline at end of file
++}
+-- 
+2.24.1
+

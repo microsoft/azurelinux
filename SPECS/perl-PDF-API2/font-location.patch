@@ -1,0 +1,13 @@
+diff -up PDF-API2-2.042/lib/PDF/API2.pm.orig PDF-API2-2.042/lib/PDF/API2.pm
+--- PDF-API2-2.042/lib/PDF/API2.pm.orig	2021-09-20 09:32:47.647671637 +0200
++++ PDF-API2-2.042/lib/PDF/API2.pm	2021-09-20 09:33:42.814990255 +0200
+@@ -29,8 +29,7 @@ use List::Util qw(max);
+ use Scalar::Util qw(weaken);
+ 
+ my @font_path = __PACKAGE__->set_font_path('/usr/share/fonts',
+-                                           '/usr/local/share/fonts',
+-                                           'c:/windows/fonts');
++                                           'usr/share/fonts/dejavu');
+ 
+ =head1 NAME
+ 

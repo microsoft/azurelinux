@@ -1,0 +1,69 @@
+From 59cd2d52e92e983f1149a77b1f444d754a11b31c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Tue, 27 Jan 2026 11:49:50 +0000
+Subject: [PATCH 402/404] pccsadmin: make 'keyring' module optional
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This is not available in some distros, and since it is merely a
+convenience to avoid repeated password entry, it can be made
+optional.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ PccsAdminTool/lib/intelsgx/credential.py | 29 ++++++++++++++----------
+ 1 file changed, 17 insertions(+), 12 deletions(-)
+
+diff --git a/PccsAdminTool/lib/intelsgx/credential.py b/PccsAdminTool/lib/intelsgx/credential.py
+index ca1b23b..d23ec20 100644
+--- a/PccsAdminTool/lib/intelsgx/credential.py
++++ b/PccsAdminTool/lib/intelsgx/credential.py
+@@ -1,4 +1,7 @@
+-import keyring
++try:
++    import keyring
++except:
++    keyring = None
+ import getpass
+ 
+ class Credentials:
+@@ -7,11 +10,12 @@ class Credentials:
+ 
+     def get_admin_token(self):
+         admin_token = ""
+-        try:
+-            print("Please note: A prompt may appear asking for your keyring password to access stored credentials.")
+-            admin_token = keyring.get_password(self.APPNAME, self.KEY_ADMINTOKEN)
+-        except keyring.errors.KeyringError as ke:
+-            admin_token = ""
++        if keyring is not None:
++            try:
++                print("Please note: A prompt may appear asking for your keyring password to access stored credentials.")
++                admin_token = keyring.get_password(self.APPNAME, self.KEY_ADMINTOKEN)
++            except keyring.errors.KeyringError as ke:
++                admin_token = ""
+         
+         while admin_token is None or admin_token == '':
+             admin_token = getpass.getpass(prompt="Please input your administrator password for PCCS service:")
+@@ -24,10 +28,11 @@ class Credentials:
+         return admin_token
+ 
+     def set_admin_token(self, token):
+-        try:
+-            print("Please note: A prompt may appear asking for your keyring password to access stored credentials.")
+-            keyring.set_password(self.APPNAME, self.KEY_ADMINTOKEN, token)
+-        except keyring.errors.PasswordSetError as ke:
+-            print("Failed to store admin token.")
+-            return False
++        if keyring is not None:
++            try:
++                print("Please note: A prompt may appear asking for your keyring password to access stored credentials.")
++                keyring.set_password(self.APPNAME, self.KEY_ADMINTOKEN, token)
++            except keyring.errors.PasswordSetError as ke:
++                print("Failed to store admin token.")
++                return False
+         return True
+-- 
+2.52.0
+

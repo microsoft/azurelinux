@@ -1,0 +1,43 @@
+From 7e6c5fb46ae9d0f135cdcdb4f8d0376cf25320fd Mon Sep 17 00:00:00 2001
+From: Azat Khuzhin <azat@libevent.org>
+Date: Thu, 6 Aug 2020 10:24:55 +0300
+Subject: [PATCH] build: do not try install doxygen man pages if they were not
+ requested
+
+Fixes: #1075
+---
+ doxygen.am            | 2 ++
+ m4/ax_prog_doxygen.m4 | 1 +
+ 2 files changed, 3 insertions(+)
+
+diff --git a/doxygen.am b/doxygen.am
+index 916d7c40..53da8d24 100644
+--- a/doxygen.am
++++ b/doxygen.am
+@@ -17,9 +17,11 @@ if ENABLE_DOXYGEN
+ clean-local:
+ 	-rm -rf $(DX_CLEANFILES)
+ 
++if ENABLE_DOXYGEN_MAN
+ # integrate doxygen with automake targets
+ man3_MANS = @DX_DOCDIR@/man/man3/*
+ $(man3_MANS): doxygen-doc
++endif ENABLE_DOXYGEN_MAN
+ 
+ # Docs will be installed. It may be one or more docs supported
+ # by doxygen, but does not include 'man'.
+diff --git a/m4/ax_prog_doxygen.m4 b/m4/ax_prog_doxygen.m4
+index e5bdeb59..338e4646 100644
+--- a/m4/ax_prog_doxygen.m4
++++ b/m4/ax_prog_doxygen.m4
+@@ -574,6 +574,7 @@ DX_INSTALL_DOCS = \\
+ 	\$(DX_CLEAN_HTML) \\
+ 	\$(DX_CLEAN_CHM) \\
+ 	\$(DX_CLEAN_CHI) \\
++	\$(DX_CLEAN_MAN) \\
+ 	\$(DX_CLEAN_RTF) \\
+ 	\$(DX_CLEAN_XML) \\
+ 	\$(DX_CLEAN_PS) \\
+-- 
+2.25.4
+

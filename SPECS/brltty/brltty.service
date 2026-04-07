@@ -1,0 +1,10 @@
+[Unit]
+Description=Braille display driver for Linux/Unix
+Before=getty.target display-manager.service
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/brltty
+
+[Install]
+WantedBy=default.target emergency.target rescue.target

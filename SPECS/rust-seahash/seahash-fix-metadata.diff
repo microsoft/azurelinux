@@ -1,0 +1,15 @@
+--- seahash-4.1.0/Cargo.toml	2021-01-16T05:41:29+00:00
++++ seahash-4.1.0/Cargo.toml	2022-10-05T20:28:20.913429+00:00
+@@ -21,12 +21,6 @@
+ license = "MIT"
+ repository = "https://gitlab.redox-os.org/redox-os/seahash"
+ 
+-[[bench]]
+-name = "bench"
+-harness = false
+-[dev-dependencies.criterion]
+-version = "0.3"
+-
+ [dev-dependencies.quickcheck]
+ version = "0.9.2"
+ 

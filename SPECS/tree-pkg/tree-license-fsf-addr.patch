@@ -1,0 +1,34 @@
+From cbfbad2607e99dc856ff82394a19ef489b135351 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Mon, 20 Sep 2021 09:36:04 +0200
+Subject: [PATCH] tree: use correct FSF address in LICENSE
+
+---
+ LICENSE | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/LICENSE b/LICENSE
+index 5b6e7c6..3c9f912 100644
+--- a/LICENSE
++++ b/LICENSE
+@@ -2,7 +2,7 @@
+ 		       Version 2, June 1991
+ 
+  Copyright (C) 1989, 1991 Free Software Foundation, Inc.
+-                       59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+  Everyone is permitted to copy and distribute verbatim copies
+  of this license document, but changing it is not allowed.
+ 
+@@ -305,7 +305,7 @@ the "copyright" line and a pointer to where the full notice is found.
+ 
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+ 
+ 
+ Also add information on how to contact you by electronic and paper mail.
+-- 
+2.31.1
+

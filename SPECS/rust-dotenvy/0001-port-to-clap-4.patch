@@ -1,0 +1,41 @@
+From 9c253ccd5336d72bbf3e1150a6ac73302c4d3167 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Sat, 21 Dec 2024 14:14:31 +0100
+Subject: [PATCH] port to clap 4
+
+---
+ src/bin/dotenvy.rs | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/src/bin/dotenvy.rs b/src/bin/dotenvy.rs
+index 5f0dfb9..3023edc 100644
+--- a/src/bin/dotenvy.rs
++++ b/src/bin/dotenvy.rs
+@@ -33,12 +33,11 @@ fn main() {
+             Arg::new("FILE")
+                 .short('f')
+                 .long("file")
+-                .takes_value(true)
+                 .help("Use a specific .env file (defaults to .env)"),
+         )
+         .get_matches();
+ 
+-    match matches.value_of("FILE") {
++    match matches.get_one::<String>("FILE") {
+         None => dotenvy::dotenv(),
+         Some(file) => dotenvy::from_filename(file),
+     }
+@@ -47,8 +46,8 @@ fn main() {
+     let mut command = match matches.subcommand() {
+         Some((name, matches)) => {
+             let args = matches
+-                .values_of("")
+-                .map(|v| v.collect())
++                .get_many("")
++                .map(|v| v.copied().collect())
+                 .unwrap_or(Vec::new());
+ 
+             make_command(name, args)
+-- 
+2.47.1
+

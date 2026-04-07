@@ -1,0 +1,188 @@
+From 41c5f2f6139e4d3693c2483ee4281202a80ae451 Mon Sep 17 00:00:00 2001
+From: zdohnal <zdohnal@redhat.com>
+Date: Tue, 22 Jul 2025 15:12:19 +0200
+Subject: [PATCH] Introduce foomatic-hash and reject unauthorized values in
+ foomatic-rip (#648)
+
+The change provides a way for users to have control over what values are
+allowed for the foomatic-rip-related PPD keywords FoomaticRIPCommandLine,
+FoomaticRIPCommandLinePDF, and FoomaticRIPOptionSetting. Since the
+values can be later used when constructing a shell command, the filter
+foomatic-rip was a target of several exploits (caused by issues at
+different places in CUPS or in different projects of the printing stack) to
+do arbitrary code execution when the filter is used.
+
+By default the filter is run by user lp, so the issue is mitigated, but
+this PR gives admin complete control over what can be run in
+foomatic-rip and reject anything injected into system via different
+ways.
+
+First, the new tool - foomatic-hash - can be called on a PPD file or
+directory with drivers/PPDs, with scan output and file with hexadecimal
+representation of hashed values. Once the scan output is reviewed by
+admin, admin can decide to put the resulting hashes into
+/etc/foomatic/hashes.d and allow them for the filter.
+---
+ Makefile.am                           |  44 ++-
+ README.md                             |  23 ++
+ configure.ac                          |   2 +-
+ filter/foomatic-rip/foomatic-hash.1   |  66 ++++
+ filter/foomatic-rip/foomatic-hash.c   | 549 ++++++++++++++++++++++++++
+ filter/foomatic-rip/foomatic-rip.1.in |  16 +
+ filter/foomatic-rip/foomaticrip.c     |  75 ----
+ filter/foomatic-rip/foomaticrip.h     |  40 --
+ filter/foomatic-rip/options.c         |  67 ++++
+ filter/foomatic-rip/process.c         |   9 +
+ filter/foomatic-rip/process.h         |   3 +
+ filter/foomatic-rip/util.c            | 341 +++++++++++++++-
+ filter/foomatic-rip/util.h            |  67 ++++
+ 13 files changed, 1178 insertions(+), 124 deletions(-)
+ create mode 100644 filter/foomatic-rip/foomatic-hash.1
+ create mode 100644 filter/foomatic-rip/foomatic-hash.c
+
+diff --git a/filter/foomatic-rip/foomatic-rip.1.in b/filter/foomatic-rip/foomatic-rip.1.in
+index 9685a95f5..3dff5215f 100644
+--- a/filter/foomatic-rip/foomatic-rip.1.in
++++ b/filter/foomatic-rip/foomatic-rip.1.in
+@@ -193,6 +193,15 @@ friends. Several PPD files use shell constructs that require a more
+ modern shell like \fBbash\fR, \fBzsh\fR, or \fBksh\fR.
+ 
+ 
++.SH PPD OPTION VALUE RESTRICTIONS AND EXCEPTIONS
++
++The values of PPD options \fBFoomaticRIPCommandLine\fR, \fBFoomaticRIPCommandLinePDF\fR and \fBFoomaticRIPOptionSetting\fR
++are rejected in the default configuration because of security implications. Users can use the tool \fBfoomatic-hash(1)\fR, which provides
++values of affected PPD options from found drivers and hashes of those values in hexadecimal format. User is expected to review the found values,
++and if there is nothing suspicious in the output, copy the file with hashes into into the directory \fB@sysconfdir@/foomatic/hashes.d\fR
++to allow the exceptions for found values.
++
++
+ .SH FILES
+ .PD 0
+ .TP 0
+@@ -209,6 +218,13 @@ The PPD files of the currently defined printers
+ 
+ Configuration file for foomatic-rip
+ 
++.TP 0
++@sysconfdir@/foomatic/hashes.d
++.TP 0
++@datadir@/foomatic/hashes.d
++
++Directories with hashes of allowed values
++
+ .PD 0
+ 
+ .\".SH SEE ALSO
+diff --git a/filter/foomatic-rip/options.c b/filter/foomatic-rip/options.c
+index bad833bc1..032fe9ec3 100644
+--- a/filter/foomatic-rip/options.c
++++ b/filter/foomatic-rip/options.c
+@@ -102,6 +102,42 @@ get_icc_profile_for_qualifier(const char **qualifier)
+ }
+ 
+ 
++//
++// 'is_allowed_value' - Check if the option value is allowed.
++//
++
++int					 // O - Boolean value - true 1 / false 0
++is_allowed_value(cups_array_t *ar,       // I - Array of already known hashes from system
++		 char	      *value,    // I - Scanned value from PPD file
++		 size_t       value_len) // I - Value length
++{
++  char hash_string[65];			 // Help array to store hexadecimal hashed string
++
++  //
++  // Empty string is allowed...
++  //
++
++  if (!value_len)
++    return (1);
++
++  //
++  // Hash the value and get hexadecimal string for it...
++  //
++
++  if (hash_data((unsigned char*)value, value_len, hash_string, sizeof(hash_string)))
++    return (0);
++
++  //
++  // Check if the found hexadecimal hashed string is in the array -> allowed on the system...
++  //
++
++  if (cupsArrayFind(ar, hash_string))
++    return (1);
++
++  return (0);
++}
++
++
+ // a selector is a general tri-dotted specification.
+ // The 2nd and 3rd elements of the qualifier are optionally modified by
+ // cupsICCQualifier2 and cupsICCQualifier3:
+@@ -1866,12 +1902,19 @@ read_ppd_file(const char *filename)
+   option_t *opt, *current_opt = NULL;
+   param_t *param;
+   icc_mapping_entry_t *entry;
++  cups_array_t *known_hashes = NULL;
+ 
+   fh = fopen(filename, "r");
+   if (!fh)
+     rip_die(EXIT_PRNERR_NORETRY_BAD_SETTINGS, "Unable to open PPD file %s\n", filename);
+   _log("Parsing PPD file ...\n");
+ 
++  if (load_system_hashes(&known_hashes))
++  {
++    fclose(fh);
++    rip_die(EXIT_PRNERR_NORETRY, "Not enough memory for array allocation\n.");
++  }
++
+   dstrassure(value, 256);
+ 
+   qualifier_data = list_create();
+@@ -1955,10 +1998,26 @@ read_ppd_file(const char *filename)
+     }
+     else if (strcmp(key, "FoomaticRIPCommandLine") == 0)
+     {
++      if (!is_allowed_value(known_hashes, value->data, strlen(value->data)))
++      {
++        cupsArrayDelete(known_hashes);
++        fclose(fh);
++
++        rip_die(EXIT_PRNERR_NOTALLOWED, "ERROR: The value of the key %s is not among the allowed values - see foomatic-rip man page for more instructions.\n", key);
++      }
++
+       unhtmlify(cmd, 4096, value->data);
+     }
+     else if (strcmp(key, "FoomaticRIPCommandLinePDF") == 0)
+     {
++      if (!is_allowed_value(known_hashes, value->data, strlen(value->data)))
++      {
++        cupsArrayDelete(known_hashes);
++        fclose(fh);
++
++        rip_die(EXIT_PRNERR_NOTALLOWED, "ERROR: The value of the key %s is not among the allowed values - see foomatic-rip man page for more instructions.\n", key);
++      }
++
+       unhtmlify(cmd_pdf, 4096, value->data);
+     }
+     else if (!strcmp(key, "cupsFilter"))
+@@ -2097,6 +2156,14 @@ read_ppd_file(const char *filename)
+     }
+     else if (!strcmp(key, "FoomaticRIPOptionSetting"))
+     {
++      if (!is_allowed_value(known_hashes, value->data, strlen(value->data)))
++      {
++        cupsArrayDelete(known_hashes);
++        fclose(fh);
++
++        rip_die(EXIT_PRNERR_NOTALLOWED, "ERROR: The value of the key %s is not among the allowed values - see foomatic-rip man page for more instructions.\n", key);
++      }
++
+       // "*FoomaticRIPOptionSetting <option>[=<choice>]: <code>
+       // For boolean options <choice> is not given
+       option_set_choice(assure_option(name),
+-- 
+2.50.1
+

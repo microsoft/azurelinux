@@ -1,0 +1,26 @@
+From 0fd437f74d834a6ac97024b2edb1fa6088813499 Mon Sep 17 00:00:00 2001
+From: Antoine Prouvost <antoine.prouvost@gmail.com>
+Date: Thu, 31 Oct 2025 11:29:42 +0100
+Subject: [PATCH] Fix static_assert on i8mm<neon64>
+
+Change std::is_same to std::is_base_of to handle derived arch types
+like i8mm<neon64> on ARM64 systems with SVE support.
+---
+ test/test_arch.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/test_arch.cpp b/test/test_arch.cpp
+index 7e3f5d9f..8aa01e87 100644
+--- a/test/test_arch.cpp
++++ b/test/test_arch.cpp
+@@ -26,7 +26,7 @@ static_assert(xsimd::all_architectures::contains<xsimd::default_arch>(), "defaul
+ #endif
+ 
+ #if !XSIMD_WITH_SVE
+-static_assert((std::is_same<xsimd::default_arch, xsimd::neon64>::value || !xsimd::neon64::supported()), "on arm, without sve, the best we can do is neon64");
++static_assert((std::is_base_of<xsimd::neon64, xsimd::default_arch>::value || !xsimd::neon64::supported()), "on arm, without sve, the best we can do is neon64");
+ #endif
+ 
+ struct check_supported
+--
+2.47.1

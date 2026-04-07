@@ -1,0 +1,82 @@
+From e6341716d3f08e35d32a77903250028496aa09cc Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Zbigniew=20J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>
+Date: Sun, 23 Jan 2022 12:53:04 +0100
+Subject: [PATCH] tests: update to "scientic notation"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+With rust-1.58.0-1.fc35.x86_64 it seems that the debug format
+has changed. I also considered adding a custom Debug derivation…
+---
+ tests/parse.rs | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/tests/parse.rs b/tests/parse.rs
+index 0be8532658..e73c809a92 100644
+--- a/tests/parse.rs
++++ b/tests/parse.rs
+@@ -79,51 +79,51 @@ fn consts() {
+ 
+     Parser::new().parse("12.34u", &mut slab.ps).unwrap();
+     assert_eq!(format!("{:?}",&slab),
+-"Slab{ exprs:{ 0:Expression { first: EConstant(0.00001234), pairs: [] } }, vals:{}, instrs:{} }");
++"Slab{ exprs:{ 0:Expression { first: EConstant(1.234e-5), pairs: [] } }, vals:{}, instrs:{} }");
+ 
+     Parser::new().parse("12.34µ", &mut slab.ps).unwrap();
+     assert_eq!(format!("{:?}",&slab),
+-"Slab{ exprs:{ 0:Expression { first: EConstant(0.00001234), pairs: [] } }, vals:{}, instrs:{} }");
++"Slab{ exprs:{ 0:Expression { first: EConstant(1.234e-5), pairs: [] } }, vals:{}, instrs:{} }");
+ 
+     Parser::new().parse("12.34n", &mut slab.ps).unwrap();
+     assert_eq!(format!("{:?}",&slab),
+-"Slab{ exprs:{ 0:Expression { first: EConstant(0.00000001234), pairs: [] } }, vals:{}, instrs:{} }");
++"Slab{ exprs:{ 0:Expression { first: EConstant(1.234e-8), pairs: [] } }, vals:{}, instrs:{} }");
+ 
+     Parser::new().parse("12.34p", &mut slab.ps).unwrap();
+     assert_eq!(format!("{:?}",&slab),
+-"Slab{ exprs:{ 0:Expression { first: EConstant(0.00000000001234), pairs: [] } }, vals:{}, instrs:{} }");
++"Slab{ exprs:{ 0:Expression { first: EConstant(1.234e-11), pairs: [] } }, vals:{}, instrs:{} }");
+ 
+     Parser::new().parse("12.34e56", &mut slab.ps).unwrap();
+     assert_eq!(format!("{:?}",&slab),
+-"Slab{ exprs:{ 0:Expression { first: EConstant(1234000000000000000000000000000000000000000000000000000000.0), pairs: [] } }, vals:{}, instrs:{} }");
++"Slab{ exprs:{ 0:Expression { first: EConstant(1.234e57), pairs: [] } }, vals:{}, instrs:{} }");
+ 
+     Parser::new().parse("12.34e+56", &mut slab.ps).unwrap();
+     assert_eq!(format!("{:?}",&slab),
+-"Slab{ exprs:{ 0:Expression { first: EConstant(1234000000000000000000000000000000000000000000000000000000.0), pairs: [] } }, vals:{}, instrs:{} }");
++"Slab{ exprs:{ 0:Expression { first: EConstant(1.234e57), pairs: [] } }, vals:{}, instrs:{} }");
+ 
+     Parser::new().parse("12.34E56", &mut slab.ps).unwrap();
+     assert_eq!(format!("{:?}",&slab),
+-"Slab{ exprs:{ 0:Expression { first: EConstant(1234000000000000000000000000000000000000000000000000000000.0), pairs: [] } }, vals:{}, instrs:{} }");
++"Slab{ exprs:{ 0:Expression { first: EConstant(1.234e57), pairs: [] } }, vals:{}, instrs:{} }");
+ 
+     Parser::new().parse("12.34E+56", &mut slab.ps).unwrap();
+     assert_eq!(format!("{:?}",&slab),
+-"Slab{ exprs:{ 0:Expression { first: EConstant(1234000000000000000000000000000000000000000000000000000000.0), pairs: [] } }, vals:{}, instrs:{} }");
++"Slab{ exprs:{ 0:Expression { first: EConstant(1.234e57), pairs: [] } }, vals:{}, instrs:{} }");
+ 
+     Parser::new().parse("12.34e-56", &mut slab.ps).unwrap();
+     assert_eq!(format!("{:?}",&slab),
+-"Slab{ exprs:{ 0:Expression { first: EConstant(0.0000000000000000000000000000000000000000000000000000001234), pairs: [] } }, vals:{}, instrs:{} }");
++"Slab{ exprs:{ 0:Expression { first: EConstant(1.234e-55), pairs: [] } }, vals:{}, instrs:{} }");
+ 
+     Parser::new().parse("12.34E-56", &mut slab.ps).unwrap();
+     assert_eq!(format!("{:?}",&slab),
+-"Slab{ exprs:{ 0:Expression { first: EConstant(0.0000000000000000000000000000000000000000000000000000001234), pairs: [] } }, vals:{}, instrs:{} }");
++"Slab{ exprs:{ 0:Expression { first: EConstant(1.234e-55), pairs: [] } }, vals:{}, instrs:{} }");
+ 
+     Parser::new().parse("+12.34E-56", &mut slab.ps).unwrap();
+     assert_eq!(format!("{:?}",&slab),
+-"Slab{ exprs:{ 0:Expression { first: EConstant(0.0000000000000000000000000000000000000000000000000000001234), pairs: [] } }, vals:{}, instrs:{} }");
++"Slab{ exprs:{ 0:Expression { first: EConstant(1.234e-55), pairs: [] } }, vals:{}, instrs:{} }");
+ 
+     Parser::new().parse("-12.34E-56", &mut slab.ps).unwrap();
+     assert_eq!(format!("{:?}",&slab),
+-"Slab{ exprs:{ 0:Expression { first: EConstant(-0.0000000000000000000000000000000000000000000000000000001234), pairs: [] } }, vals:{}, instrs:{} }");
++"Slab{ exprs:{ 0:Expression { first: EConstant(-1.234e-55), pairs: [] } }, vals:{}, instrs:{} }");
+ 
+     Parser::new().parse("-x", &mut slab.ps).unwrap();
+     assert_eq!(format!("{:?}",&slab),

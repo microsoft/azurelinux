@@ -1,0 +1,90 @@
+diff --git a/extract.c b/extract.c
+index eeb2f57..a0a4929 100644
+--- a/extract.c
++++ b/extract.c
+@@ -472,8 +472,8 @@ int extract_or_test_files(__G)    /* return PK-type error code */
+                      */
+                     Info(slide, 0x401, ((char *)slide,
+                       LoadFarString(CentSigMsg), j + blknum*DIR_BLKSIZ + 1));
+-                    Info(slide, 0x401, ((char *)slide,
+-                      LoadFarString(ReportMsg)));
++                    Info(slide, 0x401,
++                         ((char *)slide,"%s", LoadFarString(ReportMsg)));
+                     error_in_archive = PK_BADERR;
+                 }
+                 reached_end = TRUE;     /* ...so no more left to do */
+@@ -752,8 +752,8 @@ int extract_or_test_files(__G)    /* return PK-type error code */
+ 
+ #ifndef SFX
+     if (no_endsig_found) {                      /* just to make sure */
+-        Info(slide, 0x401, ((char *)slide, LoadFarString(EndSigMsg)));
+-        Info(slide, 0x401, ((char *)slide, LoadFarString(ReportMsg)));
++        Info(slide, 0x401, ((char *)slide,"%s", LoadFarString(EndSigMsg)));
++        Info(slide, 0x401, ((char *)slide,"%s", LoadFarString(ReportMsg)));
+         if (!error_in_archive)       /* don't overwrite stronger error */
+             error_in_archive = PK_WARN;
+     }
+diff --git a/list.c b/list.c
+index 15e0011..f7359c3 100644
+--- a/list.c
++++ b/list.c
+@@ -181,7 +181,7 @@ int list_files(__G)    /* return PK-type error code */
+                 Info(slide, 0x401,
+                      ((char *)slide, LoadFarString(CentSigMsg), j));
+                 Info(slide, 0x401,
+-                     ((char *)slide, LoadFarString(ReportMsg)));
++                     ((char *)slide,"%s", LoadFarString(ReportMsg)));
+                 return PK_BADERR;   /* sig not found */
+             }
+         }
+@@ -507,7 +507,8 @@ int list_files(__G)    /* return PK-type error code */
+             && (!G.ecrec.is_zip64_archive)
+             && (memcmp(G.sig, end_central_sig, 4) != 0)
+            ) {          /* just to make sure again */
+-            Info(slide, 0x401, ((char *)slide, LoadFarString(EndSigMsg)));
++            Info(slide, 0x401, 
++                 ((char *)slide,"%s", LoadFarString(EndSigMsg)));
+             error_in_archive = PK_WARN;   /* didn't find sig */
+         }
+ 
+@@ -591,7 +592,7 @@ int get_time_stamp(__G__ last_modtime, nmember)  /* return PK-type error code */
+                 Info(slide, 0x401,
+                      ((char *)slide, LoadFarString(CentSigMsg), j));
+                 Info(slide, 0x401,
+-                     ((char *)slide, LoadFarString(ReportMsg)));
++                     ((char *)slide,"%s", LoadFarString(ReportMsg)));
+                 return PK_BADERR;   /* sig not found */
+             }
+         }
+@@ -674,7 +675,7 @@ int get_time_stamp(__G__ last_modtime, nmember)  /* return PK-type error code */
+   ---------------------------------------------------------------------------*/
+ 
+     if (memcmp(G.sig, end_central_sig, 4)) {    /* just to make sure again */
+-        Info(slide, 0x401, ((char *)slide, LoadFarString(EndSigMsg)));
++        Info(slide, 0x401, ((char *)slide,"%s", LoadFarString(EndSigMsg)));
+         error_in_archive = PK_WARN;
+     }
+     if (*nmember == 0L && error_in_archive <= PK_WARN)
+diff --git a/zipinfo.c b/zipinfo.c
+index 6e22cc8..ac5c61b 100644
+--- a/zipinfo.c
++++ b/zipinfo.c
+@@ -771,7 +771,7 @@ int zipinfo(__G)   /* return PK-type error code */
+                 Info(slide, 0x401,
+                      ((char *)slide, LoadFarString(CentSigMsg), j));
+                 Info(slide, 0x401,
+-                     ((char *)slide, LoadFarString(ReportMsg)));
++                     ((char *)slide,"%s", LoadFarString(ReportMsg)));
+                 error_in_archive = PK_BADERR;   /* sig not found */
+                 break;
+             }
+@@ -960,7 +960,8 @@ int zipinfo(__G)   /* return PK-type error code */
+             && (!G.ecrec.is_zip64_archive)
+             && (memcmp(G.sig, end_central_sig, 4) != 0)
+            ) {          /* just to make sure again */
+-            Info(slide, 0x401, ((char *)slide, LoadFarString(EndSigMsg)));
++            Info(slide, 0x401, 
++                 ((char *)slide,"%s", LoadFarString(EndSigMsg)));
+             error_in_archive = PK_WARN;   /* didn't find sig */
+         }
+ 

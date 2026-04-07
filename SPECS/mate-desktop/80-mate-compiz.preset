@@ -1,0 +1,7 @@
+# Fedora MATE-Compiz Spin specific configuration
+
+# better default for Mate, fixing https://bugzilla.redhat.com/show_bug.cgi?id=2068699
+# until MATE supports cgroups
+# disable systemd-oomd.service
+enable earlyoom.service
+

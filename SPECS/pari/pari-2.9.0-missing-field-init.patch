@@ -1,0 +1,36 @@
+This patch fixes missing field initializer warnings in gcc.
+The fixes are almost entirely in generated code, so it would of
+course be much better to fix the generator scripts to create
+complete definitions and render this patch redundant.
+
+--- src/basemath/FpE.c
++++ src/basemath/FpE.c
+@@ -1647,7 +1647,7 @@ _FpXQE_rand(void *E)
+   return random_FpXQE(e->a4, e->a6, e->T, e->p);
+ }
+ 
+-static const struct bb_group FpXQE_group={_FpXQE_add,_FpXQE_mul,_FpXQE_rand,hash_GEN,ZXV_equal,ell_is_inf};
++static const struct bb_group FpXQE_group={_FpXQE_add,_FpXQE_mul,_FpXQE_rand,hash_GEN,ZXV_equal,ell_is_inf,NULL};
+ 
+ const struct bb_group *
+ get_FpXQE_group(void ** pt_E, GEN a4, GEN a6, GEN T, GEN p)
+--- src/desc/gen_proto
++++ src/desc/gen_proto
+@@ -65,14 +65,14 @@ foreach my $name (sort keys %funcs)
+       if (defined($cname))
+       {
+         $proto =~ s/"/\\"/g;
+-        print "{\"$gpname\",0,(void*)$cname,$sec,\"$proto\",$help},\n";
++        print "{\"$gpname\",0,(void*)$cname,$sec,\"$proto\",$help,NULL,0,0,NULL},\n";
+       }
+       else
+       {
+-        print "{\"$gpname\",0,NULL,$sec,NULL,$help},\n";
++        print "{\"$gpname\",0,NULL,$sec,NULL,$help,NULL,0,0,NULL},\n";
+       }
+ }
+ print <<'EOF';
+-{NULL,0,NULL,0,NULL,NULL} /* sentinel */
++{NULL,0,NULL,0,NULL,NULL,NULL,0,0,NULL} /* sentinel */
+ };
+ EOF

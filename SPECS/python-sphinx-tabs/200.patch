@@ -1,0 +1,207 @@
+From b5528ac02f472ecf1ef8c45eb4cc7249d3329b3d Mon Sep 17 00:00:00 2001
+From: Dmitry Shachnev <mitya57@gmail.com>
+Date: Sun, 24 Nov 2024 20:55:02 +0300
+Subject: [PATCH] Update the tests for Sphinx 8.1
+
+Fixes #199.
+---
+ tests/conftest.py                                             | 4 ++++
+ tests/test_build/test_basic.html                              | 2 ++
+ .../test_conditional_assets_html_assets_policy_index_.html    | 2 ++
+ .../test_conditional_assets_html_assets_policy_no_tabs1_.html | 2 ++
+ .../test_conditional_assets_html_assets_policy_no_tabs2_.html | 2 ++
+ tests/test_build/test_conditional_assets_index_.html          | 2 ++
+ tests/test_build/test_conditional_assets_no_tabs1_.html       | 2 ++
+ tests/test_build/test_conditional_assets_no_tabs2_.html       | 2 ++
+ tests/test_build/test_custom_lexer.html                       | 2 ++
+ tests/test_build/test_disable_closing.html                    | 2 ++
+ tests/test_build/test_disable_css_loading.html                | 2 ++
+ tests/test_build/test_nested_markup.html                      | 2 ++
+ tests/test_build/test_no_tabs.html                            | 2 ++
+ tests/test_build/test_other_with_assets.html                  | 2 ++
+ 14 files changed, 30 insertions(+)
+
+diff --git a/tests/conftest.py b/tests/conftest.py
+index 1dbf0ad..c4452df 100644
+--- a/tests/conftest.py
++++ b/tests/conftest.py
+@@ -91,6 +91,10 @@ def read(app, buildername="html", filename="index.html", encoding="utf-8"):
+             for div in soup.find_all("div", {"class": "highlight"}):
+                 div.decompose()
+ 
++            if sphinx.version_info < (8, 1):
++                body = soup.select("div.body")[0]
++                body.append(soup.new_tag("div", **{"class": "clearer"}))
++
+             doc_div = soup.findAll("div", {"class": "documentwrapper"})[0]
+             doc = doc_div.prettify()
+ 
+diff --git a/tests/test_build/test_basic.html b/tests/test_build/test_basic.html
+index af63887..a5cc924 100644
+--- a/tests/test_build/test_basic.html
++++ b/tests/test_build/test_basic.html
+@@ -37,6 +37,8 @@
+      </p>
+     </div>
+    </div>
++   <div class="clearer">
++   </div>
+   </div>
+  </div>
+ </div>
+diff --git a/tests/test_build/test_conditional_assets_html_assets_policy_index_.html b/tests/test_build/test_conditional_assets_html_assets_policy_index_.html
+index b87a329..6e1cbc8 100644
+--- a/tests/test_build/test_conditional_assets_html_assets_policy_index_.html
++++ b/tests/test_build/test_conditional_assets_html_assets_policy_index_.html
+@@ -243,6 +243,8 @@ <h1>
+      </div>
+     </div>
+    </section>
++   <div class="clearer">
++   </div>
+   </div>
+  </div>
+ </div>
+diff --git a/tests/test_build/test_conditional_assets_html_assets_policy_no_tabs1_.html b/tests/test_build/test_conditional_assets_html_assets_policy_no_tabs1_.html
+index b87a329..6e1cbc8 100644
+--- a/tests/test_build/test_conditional_assets_html_assets_policy_no_tabs1_.html
++++ b/tests/test_build/test_conditional_assets_html_assets_policy_no_tabs1_.html
+@@ -243,6 +243,8 @@ <h1>
+      </div>
+     </div>
+    </section>
++   <div class="clearer">
++   </div>
+   </div>
+  </div>
+ </div>
+diff --git a/tests/test_build/test_conditional_assets_html_assets_policy_no_tabs2_.html b/tests/test_build/test_conditional_assets_html_assets_policy_no_tabs2_.html
+index b87a329..6e1cbc8 100644
+--- a/tests/test_build/test_conditional_assets_html_assets_policy_no_tabs2_.html
++++ b/tests/test_build/test_conditional_assets_html_assets_policy_no_tabs2_.html
+@@ -243,6 +243,8 @@ <h1>
+      </div>
+     </div>
+    </section>
++   <div class="clearer">
++   </div>
+   </div>
+  </div>
+ </div>
+diff --git a/tests/test_build/test_conditional_assets_index_.html b/tests/test_build/test_conditional_assets_index_.html
+index b87a329..6e1cbc8 100644
+--- a/tests/test_build/test_conditional_assets_index_.html
++++ b/tests/test_build/test_conditional_assets_index_.html
+@@ -243,6 +243,8 @@ <h1>
+      </div>
+     </div>
+    </section>
++   <div class="clearer">
++   </div>
+   </div>
+  </div>
+ </div>
+diff --git a/tests/test_build/test_conditional_assets_no_tabs1_.html b/tests/test_build/test_conditional_assets_no_tabs1_.html
+index b87a329..6e1cbc8 100644
+--- a/tests/test_build/test_conditional_assets_no_tabs1_.html
++++ b/tests/test_build/test_conditional_assets_no_tabs1_.html
+@@ -243,6 +243,8 @@ <h1>
+      </div>
+     </div>
+    </section>
++   <div class="clearer">
++   </div>
+   </div>
+  </div>
+ </div>
+diff --git a/tests/test_build/test_conditional_assets_no_tabs2_.html b/tests/test_build/test_conditional_assets_no_tabs2_.html
+index b87a329..6e1cbc8 100644
+--- a/tests/test_build/test_conditional_assets_no_tabs2_.html
++++ b/tests/test_build/test_conditional_assets_no_tabs2_.html
+@@ -243,6 +243,8 @@ <h1>
+      </div>
+     </div>
+    </section>
++   <div class="clearer">
++   </div>
+   </div>
+  </div>
+ </div>
+diff --git a/tests/test_build/test_custom_lexer.html b/tests/test_build/test_custom_lexer.html
+index 954a10a..a0af59a 100644
+--- a/tests/test_build/test_custom_lexer.html
++++ b/tests/test_build/test_custom_lexer.html
+@@ -19,6 +19,8 @@
+      </div>
+     </div>
+    </div>
++   <div class="clearer">
++   </div>
+   </div>
+  </div>
+ </div>
+diff --git a/tests/test_build/test_disable_closing.html b/tests/test_build/test_disable_closing.html
+index e245915..98ba6ef 100644
+--- a/tests/test_build/test_disable_closing.html
++++ b/tests/test_build/test_disable_closing.html
+@@ -37,6 +37,8 @@
+      </p>
+     </div>
+    </div>
++   <div class="clearer">
++   </div>
+   </div>
+  </div>
+ </div>
+diff --git a/tests/test_build/test_disable_css_loading.html b/tests/test_build/test_disable_css_loading.html
+index af63887..a5cc924 100644
+--- a/tests/test_build/test_disable_css_loading.html
++++ b/tests/test_build/test_disable_css_loading.html
+@@ -37,6 +37,8 @@
+      </p>
+     </div>
+    </div>
++   <div class="clearer">
++   </div>
+   </div>
+  </div>
+ </div>
+diff --git a/tests/test_build/test_nested_markup.html b/tests/test_build/test_nested_markup.html
+index 22588a9..b15d43e 100644
+--- a/tests/test_build/test_nested_markup.html
++++ b/tests/test_build/test_nested_markup.html
+@@ -207,6 +207,8 @@ <h1>
+      </div>
+     </div>
+    </section>
++   <div class="clearer">
++   </div>
+   </div>
+  </div>
+ </div>
+diff --git a/tests/test_build/test_no_tabs.html b/tests/test_build/test_no_tabs.html
+index 6a0af85..26e2d70 100644
+--- a/tests/test_build/test_no_tabs.html
++++ b/tests/test_build/test_no_tabs.html
+@@ -4,6 +4,8 @@
+    <p>
+     There are no tabs here
+    </p>
++   <div class="clearer">
++   </div>
+   </div>
+  </div>
+ </div>
+diff --git a/tests/test_build/test_other_with_assets.html b/tests/test_build/test_other_with_assets.html
+index 85b55c4..c8ee530 100644
+--- a/tests/test_build/test_other_with_assets.html
++++ b/tests/test_build/test_other_with_assets.html
+@@ -19,6 +19,8 @@
+      </div>
+     </div>
+    </div>
++   <div class="clearer">
++   </div>
+   </div>
+  </div>
+ </div>

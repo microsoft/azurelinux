@@ -1,0 +1,163 @@
+From d9ad1ff80c45333922fb51e454ee6036b389faa4 Mon Sep 17 00:00:00 2001
+From: "Endi S. Dewata" <edewata@redhat.com>
+Date: Wed, 2 Jun 2021 19:34:16 -0500
+Subject: [PATCH] Remove Log4jLogger
+
+---
+ .../resteasy/logging/impl/Log4jLogger.java    | 144 ------------------
+ 1 file changed, 144 deletions(-)
+ delete mode 100644 resteasy-jaxrs/src/main/java/org/jboss/resteasy/logging/impl/Log4jLogger.java
+
+diff --git a/resteasy-jaxrs/src/main/java/org/jboss/resteasy/logging/impl/Log4jLogger.java b/resteasy-jaxrs/src/main/java/org/jboss/resteasy/logging/impl/Log4jLogger.java
+deleted file mode 100644
+index 6cf43d251..000000000
+--- a/resteasy-jaxrs/src/main/java/org/jboss/resteasy/logging/impl/Log4jLogger.java
++++ /dev/null
+@@ -1,144 +0,0 @@
+-package org.jboss.resteasy.logging.impl;
+-
+-import org.apache.log4j.Logger;
+-
+-import java.text.MessageFormat;
+-
+-/**
+- * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
+- * @version $Revision: 1 $
+- */
+-public class Log4jLogger extends org.jboss.resteasy.logging.Logger
+-{
+-   private transient Logger delegate;
+-   private String classname;
+-
+-   public Log4jLogger(String classname)
+-   {
+-      this.classname = classname;
+-      delegate = Logger.getLogger(classname);
+-   }
+-
+-   @Override
+-   public boolean isTraceEnabled()
+-   {
+-      return delegate.isTraceEnabled();
+-   }
+-
+-   @Override
+-   public void trace(String message)
+-   {
+-      if (!delegate.isTraceEnabled()) return;
+-      delegate.trace(message);
+-   }
+-
+-   @Override
+-   public void trace(String message, Object... params)
+-   {
+-      if (!delegate.isTraceEnabled()) return;
+-      String msg = MessageFormat.format(message, params);
+-      delegate.trace(msg);
+-   }
+-
+-   @Override
+-   public void trace(String message, Throwable error)
+-   {
+-      if (!delegate.isTraceEnabled()) return;
+-      delegate.trace(message, error);
+-   }
+-
+-   @Override
+-   public boolean isDebugEnabled()
+-   {
+-      return delegate.isDebugEnabled();
+-   }
+-
+-   @Override
+-   public void debug(String message)
+-   {
+-      if (!delegate.isDebugEnabled()) return;
+-      delegate.debug(message);
+-   }
+-
+-   @Override
+-   public void debug(String message, Object... params)
+-   {
+-      if (!delegate.isDebugEnabled()) return;
+-      String msg = MessageFormat.format(message, params);
+-      delegate.debug(msg);
+-   }
+-
+-   @Override
+-   public void debug(String message, Throwable error)
+-   {
+-      if (!isDebugEnabled()) return;
+-      delegate.debug(message, error);
+-   }
+-
+-   @Override
+-   public void info(String message)
+-   {
+-      if (!(delegate.isInfoEnabled())) return;
+-      delegate.info(message);
+-   }
+-
+-   @Override
+-   public void info(String message, Object... params)
+-   {
+-      if (!delegate.isInfoEnabled()) return;
+-      String msg = MessageFormat.format(message, params);
+-      delegate.info(msg);
+-   }
+-
+-   @Override
+-   public void info(String message, Throwable error)
+-   {
+-      if (!delegate.isInfoEnabled()) return;
+-      delegate.info(message, error);
+-   }
+-
+-   @Override
+-   public void warn(String message)
+-   {
+-      delegate.warn(message);
+-   }
+-
+-   @Override
+-   public void warn(String message, Object... params)
+-   {
+-      String msg = MessageFormat.format(message, params);
+-      delegate.warn(msg);
+-   }
+-
+-   @Override
+-   public void warn(String message, Throwable error)
+-   {
+-      delegate.warn(message, error);
+-   }
+-
+-   @Override
+-   public void error(String message)
+-   {
+-      delegate.warn(message);
+-   }
+-
+-   @Override
+-   public void error(String message, Object... params)
+-   {
+-      String msg = MessageFormat.format(message, params);
+-      delegate.error(msg);
+-   }
+-
+-   @Override
+-   public void error(String message, Throwable error)
+-   {
+-      delegate.warn(message, error);
+-   }
+-
+-   @Override
+-   public boolean isWarnEnabled()
+-   {
+-      return true;
+-   }
+-
+-}
+-- 
+2.31.1
+

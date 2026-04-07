@@ -1,0 +1,66 @@
+From 32bb2ba2eba90ad2fc574e28eacf76895c685015 Mon Sep 17 00:00:00 2001
+From: Chris Kelley <ckelley@redhat.com>
+Date: Fri, 3 Feb 2023 10:57:18 +0000
+Subject: [PATCH] Replace javax.activation imports with jakarta.activation
+
+---
+ .../jackson/module/jaxb/JaxbAnnotationIntrospector.java     | 6 +++---
+ .../module/jaxb/deser/DataHandlerJsonDeserializer.java      | 4 ++--
+ .../jackson/module/jaxb/ser/DataHandlerJsonSerializer.java  | 2 +-
+ 3 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/jaxb/src/main/java/com/fasterxml/jackson/module/jaxb/JaxbAnnotationIntrospector.java b/jaxb/src/main/java/com/fasterxml/jackson/module/jaxb/JaxbAnnotationIntrospector.java
+index bf20bb95..908b89e0 100644
+--- a/jaxb/src/main/java/com/fasterxml/jackson/module/jaxb/JaxbAnnotationIntrospector.java
++++ b/jaxb/src/main/java/com/fasterxml/jackson/module/jaxb/JaxbAnnotationIntrospector.java
+@@ -728,16 +728,16 @@ public class JaxbAnnotationIntrospector
+     }
+ 
+     /**
+-     * Determines whether the type is assignable to class javax.activation.DataHandler without requiring that class
++     * Determines whether the type is assignable to class jakarta.activation.DataHandler without requiring that class
+      * to be on the classpath.
+      *
+      * @param type The type.
+-     * @return Whether the type is assignable to class javax.activation.DataHandler
++     * @return Whether the type is assignable to class jakarta.activation.DataHandler
+      */
+     private boolean isDataHandler(Class<?> type)
+     {
+         return type != null && (Object.class != type)
+-               && (("javax.activation.DataHandler".equals(type.getName()) || isDataHandler(type.getSuperclass())));
++               && (("jakarta.activation.DataHandler".equals(type.getName()) || isDataHandler(type.getSuperclass())));
+     }
+ 
+     @Override
+diff --git a/jaxb/src/main/java/com/fasterxml/jackson/module/jaxb/deser/DataHandlerJsonDeserializer.java b/jaxb/src/main/java/com/fasterxml/jackson/module/jaxb/deser/DataHandlerJsonDeserializer.java
+index cf09f51e..22fe4641 100644
+--- a/jaxb/src/main/java/com/fasterxml/jackson/module/jaxb/deser/DataHandlerJsonDeserializer.java
++++ b/jaxb/src/main/java/com/fasterxml/jackson/module/jaxb/deser/DataHandlerJsonDeserializer.java
+@@ -5,8 +5,8 @@ import java.io.InputStream;
+ import java.io.OutputStream;
+ import java.io.ByteArrayInputStream;
+ 
+-import javax.activation.DataHandler;
+-import javax.activation.DataSource;
++import jakarta.activation.DataHandler;
++import jakarta.activation.DataSource;
+ 
+ import com.fasterxml.jackson.core.JsonParser;
+ import com.fasterxml.jackson.core.JsonProcessingException;
+diff --git a/jaxb/src/main/java/com/fasterxml/jackson/module/jaxb/ser/DataHandlerJsonSerializer.java b/jaxb/src/main/java/com/fasterxml/jackson/module/jaxb/ser/DataHandlerJsonSerializer.java
+index 077a5981..db84231c 100644
+--- a/jaxb/src/main/java/com/fasterxml/jackson/module/jaxb/ser/DataHandlerJsonSerializer.java
++++ b/jaxb/src/main/java/com/fasterxml/jackson/module/jaxb/ser/DataHandlerJsonSerializer.java
+@@ -5,7 +5,7 @@ import java.io.IOException;
+ import java.io.InputStream;
+ import java.lang.reflect.Type;
+ 
+-import javax.activation.DataHandler;
++import jakarta.activation.DataHandler;
+ 
+ import com.fasterxml.jackson.core.*;
+ import com.fasterxml.jackson.databind.JavaType;
+-- 
+2.39.0
+

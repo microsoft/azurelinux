@@ -1,0 +1,22 @@
+--- reqsign-aws-v4-2.0.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ reqsign-aws-v4-2.0.1/Cargo.toml	2025-11-05T11:50:02.897785+00:00
+@@ -95,19 +95,6 @@
+ [dependencies.sha1]
+ version = "0.10"
+ 
+-[dev-dependencies.aws-credential-types]
+-version = "1.1.8"
+-
+-[dev-dependencies.aws-sigv4]
+-version = "1.2.0"
+-
+-[dev-dependencies.criterion]
+-version = "0.7.0"
+-features = [
+-    "async_tokio",
+-    "html_reports",
+-]
+-
+ [dev-dependencies.dotenv]
+ version = "0.15"
+ 

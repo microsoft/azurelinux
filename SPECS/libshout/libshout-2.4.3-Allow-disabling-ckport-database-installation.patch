@@ -1,0 +1,50 @@
+From 010bd3df9de5837728e61a672e90e25b12f07440 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 11 Feb 2020 08:44:22 +0100
+Subject: [PATCH] Allow disabling ckport database installation
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Passing --disable-ckport to ./configure prevents from installing
+libshout.ckport.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ Makefile.am  | 2 ++
+ configure.ac | 4 ++++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/Makefile.am b/Makefile.am
+index 8312d2d..e4c12ad 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -18,8 +18,10 @@ doc_DATA = COPYING NEWS README examples/example.c examples/nonblocking.c
+ m4datadir = $(datadir)/aclocal
+ m4data_DATA = m4/shout.m4
+ 
++if HAVE_CKPORT
+ ckportdir = $(libdir)/ckport/db
+ ckport_DATA = libshout.ckport
++endif
+ 
+ if HAVE_PKGCONFIG
+   pkgconfigdir = $(libdir)/pkgconfig
+diff --git a/configure.ac b/configure.ac
+index d6db90f..2e58c0f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -206,6 +206,10 @@ XIPH_PATH_OPENSSL([
+ AC_SUBST([SHOUT_TLS])
+ AM_CONDITIONAL([HAVE_TLS], [test -n "$OPENSSL_LIBS"])
+ 
++AC_ARG_ENABLE([ckport],
++  AC_HELP_STRING([--disable-ckport],[do not install a ckport database]))
++AM_CONDITIONAL([HAVE_CKPORT], [test "$enable_ckport" != "no"])
++
+ SHOUT_VERSION="$VERSION"
+ SHOUT_CPPFLAGS="-I$shout_includedir $VORBIS_CFLAGS $PTHREAD_CPPFLAGS"
+ SHOUT_CFLAGS="$PTHREAD_CFLAGS"
+-- 
+2.21.1
+

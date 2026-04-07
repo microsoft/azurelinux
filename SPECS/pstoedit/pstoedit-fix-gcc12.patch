@@ -1,0 +1,10 @@
+--- a/src/drvpptx.orig.cpp	2021-08-29 16:25:45.000000000 +0200
++++ b/src/drvpptx.cpp	2022-01-28 11:57:44.765756339 +0100
+@@ -65,6 +65,7 @@
+ #define ZIP_EXTERN extern
+ 
+ #include <zip.h>
++#include <memory>
+ 
+ #ifdef _MSC_VER
+ // MS VC++ Windows

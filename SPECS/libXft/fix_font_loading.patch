@@ -1,0 +1,33 @@
+From be61145144f61674d1c3e6130fabf3a63d9c6529 Mon Sep 17 00:00:00 2001
+From: "Thomas E. Dickey" <dickey@invisible-island.net>
+Date: Sun, 30 Apr 2023 20:19:04 -0400
+Subject: [PATCH] issue 19: Problem loading "SourceCodePro-Regular" font in
+ Fedora
+
+Ignore face flag FT_FACE_FLAG_COLOR if FT_FACE_FLAG_SVG is set,
+allowing adobe-source-code-pro font to work.
+
+This bug was introduced by a change in freetype2 #1151,
+	62bc04f4c5b4369cc493ff24b1de27aabd79e0c6
+
+Signed-off-by: Thomas E. Dickey <dickey@invisible-island.net>
+---
+ src/xftfreetype.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/xftfreetype.c b/src/xftfreetype.c
+index b91f8f4..9fa91db 100644
+--- a/src/xftfreetype.c
++++ b/src/xftfreetype.c
+@@ -849,7 +849,7 @@ XftFontOpenInfo (Display	*dpy,
+     if (!(face->face_flags & FT_FACE_FLAG_SCALABLE))
+ 	antialias = FcFalse;
+ 
+-    color = FT_HAS_COLOR(face) ? FcTrue : FcFalse;
++    color = (FT_HAS_COLOR(face) && !FT_HAS_SVG(face)) ? FcTrue : FcFalse;
+ 
+     /*
+      * Find the appropriate picture format
+-- 
+GitLab
+

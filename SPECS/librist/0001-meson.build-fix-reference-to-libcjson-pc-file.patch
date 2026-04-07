@@ -1,0 +1,28 @@
+From 809390b3b75a259a704079d0fb4d8f1b5f7fa956 Mon Sep 17 00:00:00 2001
+From: Alexandre Janniaux <ajanni@videolabs.io>
+Date: Fri, 8 Apr 2022 11:08:39 +0200
+Subject: [PATCH] meson.build: fix reference to libcjson pc file
+
+Debian is using cJSON from github.com/DaveGamble/cJSON, as well as
+archlinux and homebrew, which is shipping a libcjson.pc file. Only
+ubuntu is using a different version not including the .pc file.
+---
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index a777806..0ed8201 100755
+--- a/meson.build
++++ b/meson.build
+@@ -156,7 +156,7 @@ endif
+ 
+ #On ubuntu cjson does not come with pkgconfig files, hence the extended checking.
+ if not builtin_cjson
+-	cjson_lib = dependency('cJSON', required: false)
++	cjson_lib = dependency('libcjson', required: false)
+ 	if not cjson_lib.found()
+ 		cjson_lib = cc.find_library('cjson', required: required_library, has_headers: ['cjson/cJSON.h'])
+ 		if not cjson_lib.found()
+-- 
+2.38.1
+

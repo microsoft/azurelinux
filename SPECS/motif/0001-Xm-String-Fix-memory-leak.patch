@@ -1,0 +1,28 @@
+From 30ff6e00e9a5edc15ff438b6cfd8a5a4169630a1 Mon Sep 17 00:00:00 2001
+From: Olivier Fourdan <ofourdan@redhat.com>
+Date: Mon, 16 Jun 2025 14:49:55 +0200
+Subject: [PATCH] Xm/String: Fix memory leak
+
+ComputeMetrics() would leak the string created by _XmUtf8ToUcs2(), make
+sure to free the string once done with it.
+
+Signed-off-by: Olivier Fourdan <ofourdan@redhat.com>
+---
+ lib/Xm/XmString.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lib/Xm/XmString.c b/lib/Xm/XmString.c
+index 2c54ef57..6ee1c40e 100644
+--- a/lib/Xm/XmString.c
++++ b/lib/Xm/XmString.c
+@@ -6272,6 +6272,7 @@ ComputeMetrics(XmRendition rend,
+ 
+ 		  XTextExtents16(font_struct, str, str_len,
+ 			     &dir, &asc, &desc, &char_ret);
++                  XFree(str);
+ 		} else
+ 	      XTextExtents16(font_struct, 
+ 			     (XChar2b *)text, Half(byte_count),
+-- 
+2.50.0
+

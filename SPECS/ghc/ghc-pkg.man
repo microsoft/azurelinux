@@ -1,0 +1,228 @@
+.TH ghc-pkg 1 "2010-01-27"
+.SH NAME
+ghc-pkg \- GHC Haskell Cabal package manager
+.SH SYNOPSIS
+.B ghc-pkg
+.I action
+.RI [ OPTION ]...
+.SH DESCRIPTION
+A package is a library of Haskell modules known to the compiler.  The
+.B ghc-pkg
+tool allows adding or removing them from a package database. By
+default, the system-wide package database is modified, but
+alternatively the user's local package database or another specified
+file can be used.
+.PP
+To make a package available for
+.BR ghc ,
+.B ghc-pkg
+can be used to register it.  Unregistering it removes it from the
+database.  Also, packages can be hidden, to make
+.B ghc
+ignore the package by default, without uninstalling it.  Exposing a
+package makes a hidden package available.  Additionally,
+.B ghc-pkg
+has various commands to query the package database.
+.PP
+Where a package name is required, the package can be named in full
+including the version number (e.g.
+.BR network-1.0 ),
+or without the version number. Naming a package without the version
+number matches all versions of the package; the specified action will
+be applied to all the matching packages. A package specifier that
+matches all version of the package can also be written
+.BR pkg-* ,
+to make it clearer that multiple packages are being matched.
+.SH ACTIONS
+.TP
+\fBregister\fP \fIfilename\fP|\fB-\fP
+Register the package using the specified installed package
+description.
+.TP
+\fBupdate\fP \fIfilename\fP|\fB-\fP
+Register the package, overwriting any other package with the same
+name.
+.TP
+\fBunregister\fP \fIpkg-id\fP
+Unregister the specified package.
+.TP
+\fBexpose\fP \fIpkg-id\fP
+Expose the specified package.
+.TP
+\fBhide\fP \fIpkg-id\fP
+Hide the specified package
+.TP
+\fBlist\fP \fR[\fIpkg\fR]...\fP
+List registered packages in the global database, and also the user
+database if
+.B --user
+is given. If a package name is given all the registered versions will
+be listed in ascending order.  Accepts the
+.B --simple-output
+flag.
+.TP
+.B dot
+Generate a graph of the package dependencies in a form suitable for
+input for the graphviz tools.  For example, to generate a PDF of the
+dependency graph:
+.br
+\fB    dot \| tred \| dot -Tpdf >pkgs.pdf\fP
+.TP
+\fBfind-module\fP \fImodule\fP
+List registered packages exposing module
+.I module
+in the global database, and also the user database if
+.B --user
+is given. All the registered versions will be listed in ascending
+order.  Accepts the
+.B --simple-output
+flag.
+.TP
+\fBlatest\fP \fIpkg-id\fP
+Prints the highest registered version of a package.
+.TP
+.B check
+Check the consistency of package dependencies and list broken
+packages.  Accepts the
+.B --simple-output
+flag.
+.TP
+\fBdescribe\fP \fIpkg\fP
+Give the registered description for the
+specified package. The description is returned in precisely the syntax
+required by ghc-pkg register.
+.TP
+\fBfield\fP \fIpkg field\fP
+Extract the specified field of the package description for the
+specified package.  Accepts comma-separated multiple fields.
+.TP
+.B dump
+Dump the registered description for every package. This is like
+.BR ghc-pkg\ describe\ '*' ,
+expect that it is intended to be used by tools that parse the results,
+rather than humans.
+.TP
+.B recache
+Regenerate the package database cache.  This command should only be
+necessary if you added a package to the database by dropping a file
+into the database directory manyally.  By default, the global DB is
+recached; to recache a different DB use
+.B --user
+or
+.B --package-conf
+as appropriate.
+.SH OPTIONS
+When asked to modify a database
+.RB ( register ,\  unregister ,\  update ,\  hide ,\  expose ,\ and\ also\  check ),
+.B ghc-pkg
+modifies the global database by
+default.  Specifying
+.B --user
+causes it to act on the user database,
+or
+.B --package-conf
+can be used to act on another database
+entirely. When multiple of these options are given, the rightmost
+one is used as the database to act upon.
+.PP
+Commands that query the package database
+.RB ( list ,\  latest ,\  describe ,\  field )
+operate on the list of databases specified by the flags
+.BR --user ,\  --global ,
+and
+.BR --package-conf .
+If none of these flags are
+given, the default is
+.BR --global\ --user .
+.TP
+.B --user
+Use the current user's package database.
+.TP
+.B --global
+Use the global package database.
+.TP
+\fB-f\fP \fIFILE\fP, \fB--package-conf=\fIFILE\fP
+Use the specified package config file.
+.TP
+.BI --global-conf= FILE
+Location of the global package config.
+.TP
+.B --force
+Ignore missing dependencies, directories, and libraries.
+.TP
+.B --force-files
+Ignore missing directories and libraries only.
+.TP
+.BR -g ,\  --auto-ghc-libs
+Automatically build libs for GHCi (with register).
+.TP
+.BR -? ,\  --help
+Display a help message and exit.
+.TP
+.BR -V ,\  --version
+Output version information and exit.
+.TP
+.B --simple-output
+Print output in easy-to-parse format for some commands.
+.TP
+.B --names-only
+Only print package names, not versions; can only be used with
+.BR list\ --simple-output .
+.TP
+.B --ignore-case
+Ignore case for substring matching.
+.SH ENVIRONMENT VARIABLES
+.TP
+.B GHC_PACKAGE_PATH
+The
+.B GHC_PACKAGE_PATH
+environment variable may be set to a
+.BR : -separated
+list of files containing package databases. This list of package
+databases is used by
+.B ghc
+and
+.BR ghc-pkg ,
+with earlier databases in the list overriding later ones. This order
+was chosen to match the behaviour of the
+.B PATH
+environment variable; think of it as a list of package databases that
+are searched left-to-right for packages.
+
+If
+.B GHC_PACKAGE_PATH
+ends in a separator, then the default user and system package
+databases are appended, in that order. e.g. to augment the usual set
+of packages with a database of your own, you could say:
+
+.br
+\fB     export GHC_PACKAGE_PATH=$HOME/.my-ghc-packages.conf:\fP
+.br
+
+To check whether your
+.B GHC_PACKAGE_PATH
+setting is doing the right thing,
+.B ghc-pkg list
+will list all the databases in use, in the reverse order they are
+searched.
+.SH FILES
+Both of these locations are changed for Debian.  Upstream still keeps
+these under
+.IR /usr .
+Some programs may refer to that, but look in
+.I /var
+instead.
+.TP
+.I /var/lib/ghc/package.conf
+Global package.conf file.
+.TP
+.I /var/lib/ghc/package.conf.d/
+Directory for library specific package.conf files.  These are added to
+the global registry.
+.SH "SEE ALSO"
+.BR ghc (1),
+.BR runghc (1),
+.BR hugs (1).
+.SH AUTHOR
+This manual page was written by Kari Pahula <kaol@debian.org>, for the
+Debian project (and may be used by others).

@@ -1,0 +1,11 @@
+--- nix-0.31.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ nix-0.31.1/Cargo.toml	2026-02-11T17:20:38.214369+00:00
+@@ -122,7 +122,7 @@
+ version = "1.0"
+ 
+ [dependencies.libc]
+-version = "=0.2.180"
++version = "0.2.180"
+ features = ["extra_traits"]
+ 
+ [dependencies.memoffset]

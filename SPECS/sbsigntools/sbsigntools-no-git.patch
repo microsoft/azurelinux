@@ -1,0 +1,35 @@
+diff -up sbsigntools-0.8/autogen.sh.nogit sbsigntools-0.8/autogen.sh
+--- sbsigntools-0.8/autogen.sh.nogit	2017-09-04 18:22:49.244640635 +0200
++++ sbsigntools-0.8/autogen.sh	2017-09-04 18:31:49.136838666 +0200
+@@ -1,31 +1,5 @@
+ #!/bin/bash
+ 
+-ccan_modules="talloc read_write_all build_assert array_size endian"
+-
+-# Add ccan upstream sources
+-if [ ! -e lib/ccan.git/Makefile ]
+-then
+-	git submodule init
+-	git submodule update
+-fi
+-
+-# create ccan build tree
+-if [ ! -e lib/ccan ]
+-then
+-	lib/ccan.git/tools/create-ccan-tree \
+-		--build-type=automake lib/ccan $ccan_modules
+-fi
+-
+-# Create generatable docs from git
+-(
+-	echo "Authors of sbsigntool:"
+-	echo
+-	git log --format='%an' | sort -u | sed 's,^,\t,'
+-) > AUTHORS
+-
+-# Generate simple ChangeLog
+-git log --date=short --format='%ad %t %an <%ae>%n%n  * %s%n' > ChangeLog
+-
+ # automagic
+ aclocal
+ autoheader

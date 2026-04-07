@@ -1,0 +1,59 @@
+From e0ce6c20989a205489df47f8abaff5369ed588ca Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tom=C3=A1=C5=A1=20Hrn=C4=8Diar?= <thrnciar@redhat.com>
+Date: Thu, 30 May 2024 11:10:29 +0200
+Subject: [PATCH] system certs
+
+Co-authored-by: Lumir Balhar <lbalhar@redhat.com>
+---
+ setup.cfg             | 1 -
+ setup.py              | 1 -
+ src/requests/certs.py | 8 +++++++-
+ 3 files changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/setup.cfg b/setup.cfg
+index 8d44e0e..fa10a53 100644
+--- a/setup.cfg
++++ b/setup.cfg
+@@ -4,7 +4,6 @@ provides-extra =
+     socks
+     use_chardet_on_py3
+ requires-dist =
+-    certifi>=2017.4.17
+     charset_normalizer>=2,<4
+     idna>=2.5,<4
+     urllib3>=1.21.1,<3
+diff --git a/setup.py b/setup.py
+index 7d9b52b..17da826 100755
+--- a/setup.py
++++ b/setup.py
+@@ -37,7 +37,6 @@ requires = [
+     "charset_normalizer>=2,<4",
+     "idna>=2.5,<4",
+     "urllib3>=1.21.1,<3",
+-    "certifi>=2017.4.17",
+ ]
+ test_requirements = [
+     "pytest-httpbin==2.1.0",
+diff --git a/src/requests/certs.py b/src/requests/certs.py
+index be422c3..9aee713 100644
+--- a/src/requests/certs.py
++++ b/src/requests/certs.py
+@@ -10,8 +10,14 @@ only one — the one from the certifi package.
+ If you are packaging Requests, e.g., for a Linux distribution or a managed
+ environment, you can change the definition of where() to return a separately
+ packaged CA bundle.
++
++This Fedora-patched package returns "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem" provided
++by the ca-certificates RPM package.
+ """
+-from certifi import where
++
++def where():
++    """Return the absolute path to the system CA bundle."""
++    return '/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem'
+ 
+ if __name__ == "__main__":
+     print(where())
+-- 
+2.50.0
+

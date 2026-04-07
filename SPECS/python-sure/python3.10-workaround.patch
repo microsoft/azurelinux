@@ -1,0 +1,19 @@
+diff --git a/tests/test_old_api.py b/tests/test_old_api.py
+index d63d8fe..2f93bc5 100644
+--- a/tests/test_old_api.py
++++ b/tests/test_old_api.py
+@@ -57,10 +57,10 @@ def test_context_is_not_optional():
+         assert True
+ 
+     assert that(it_crashes).raises(
+-        TypeError, (
+-        "the function it_crashes defined at test_old_api.py line 56, is being "
+-        "decorated by either @that_with_context or @scenario, so it should "
+-        "take at least 1 parameter, which is the test context"),
++        TypeError,
++        # intentionally empty line 1
++        # intentionally empty line 2
++        # intentionally empty line 3
+     )
+ 
+ 

@@ -1,0 +1,24 @@
+diff -rupN --no-dereference qtbase-everywhere-src-6.10.1/bin/qmake-and-qtpaths-wrapper.in qtbase-everywhere-src-6.10.1-new/bin/qmake-and-qtpaths-wrapper.in
+--- qtbase-everywhere-src-6.10.1/bin/qmake-and-qtpaths-wrapper.in	2025-08-11 06:54:51.000000000 +0200
++++ qtbase-everywhere-src-6.10.1-new/bin/qmake-and-qtpaths-wrapper.in	2025-09-02 15:30:05.570262073 +0200
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ 
+ # The directory of this script is the expanded absolute path of the "$qt_prefix/bin" directory.
+-script_dir_path=`dirname $0`
++script_dir_path=$(dirname $(readlink -f $0))
+ script_dir_path=`(cd "$script_dir_path"; pwd)`
+ 
+ @host_qt_bindir@/@tool_name@@tool_version@ -qtconf "$script_dir_path/target_qt.conf" $*
+diff -rupN --no-dereference qtbase-everywhere-src-6.10.1/bin/qt-cmake.in qtbase-everywhere-src-6.10.1-new/bin/qt-cmake.in
+--- qtbase-everywhere-src-6.10.1/bin/qt-cmake.in	2025-08-11 06:54:51.000000000 +0200
++++ qtbase-everywhere-src-6.10.1-new/bin/qt-cmake.in	2025-09-02 15:30:05.570639403 +0200
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ 
+ # The directory of this script is the expanded absolute path of the "$qt_prefix/bin" directory.
+-script_dir_path=`dirname $0`
++script_dir_path=$(dirname $(readlink -f $0))
+ script_dir_path=`(cd "$script_dir_path"; pwd)`
+ 
+ # Try to use original cmake, otherwise to make it relocatable, use any cmake found in PATH.

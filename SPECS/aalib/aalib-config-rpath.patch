@@ -1,0 +1,17 @@
+--- aalib-config.in~	2001-04-26 17:37:31.000000000 +0300
++++ aalib-config.in	2004-07-16 01:33:03.740515009 +0300
+@@ -48,12 +48,12 @@
+       echo -I@includedir@ @AALIB_CFLAGS@
+       ;;
+ @ENABLE_SHARED_TRUE@    --libs)
+-@ENABLE_SHARED_TRUE@      libdirs="-L@libdir@ @AALIB_RLD_FLAGS@"
++@ENABLE_SHARED_TRUE@      libdirs=""
+ @ENABLE_SHARED_TRUE@      echo $libdirs @AALIB_LIBS@
+ @ENABLE_SHARED_TRUE@      ;;
+ @ENABLE_STATIC_TRUE@@ENABLE_SHARED_TRUE@    --static-libs)
+ @ENABLE_STATIC_TRUE@@ENABLE_SHARED_FALSE@    --libs|--static-libs)
+-@ENABLE_STATIC_TRUE@      libdirs="-L@libdir@ @AALIB_RLD_FLAGS@"
++@ENABLE_STATIC_TRUE@      libdirs=""
+ @ENABLE_STATIC_TRUE@      echo $libdirs @AALIB_LIBS@ 
+ @ENABLE_STATIC_TRUE@      ;;
+     *)

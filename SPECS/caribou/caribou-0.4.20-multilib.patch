@@ -1,0 +1,68 @@
+diff -urN caribou-0.4.20.old/bin/antler-keyboard.in caribou-0.4.20/bin/antler-keyboard.in
+--- caribou-0.4.20.old/bin/antler-keyboard.in	2016-06-27 19:40:02.959436627 +0530
++++ caribou-0.4.20/bin/antler-keyboard.in	2016-06-27 19:47:32.697767930 +0530
+@@ -18,6 +18,19 @@
+ # along with this program; if not, write to the Free Software Foundation,
+ # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ 
++ARCH=$(uname -m)
++
++case $ARCH in
++x86_64 | sparc64 | s390x | ppc64)
++LIB_DIR=/usr/lib64
++SECONDARY_LIB_DIR=/usr/lib
++;;
++* )
++LIB_DIR=/usr/lib
++SECONDARY_LIB_DIR=/usr/lib64
++;;
++esac
++
+ script_dir="$(dirname "$(readlink -f ${0})")"
+ 
+ prefix=@prefix@
+@@ -28,8 +41,8 @@
+ then
+   datadir="$(@PYTHON@ -c "from gi.repository import GLib; print(':'.join(GLib.get_system_data_dirs()))")"
+   export PYTHONPATH="${prefix}/lib/python@PYTHON_VERSION@/site-packages:${prefix}/lib64/python@PYTHON_VERSION@/site-packages${PYTHONPATH:+:$PYTHONPATH}"
+-  export GI_TYPELIB_PATH="@libdir@/girepository-1.0${GI_TYPELIB_PATH:+:$GI_TYPELIB_PATH}"
+-  export LD_LIBRARY_PATH="@libdir@${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
++  export GI_TYPELIB_PATH="$LIB_DIR/girepository-1.0${GI_TYPELIB_PATH:+:$GI_TYPELIB_PATH}"
++  export LD_LIBRARY_PATH="$LIB_DIR${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+   export XDG_DATA_DIRS="@datadir@${datadir:+:$datadir}"
+ else
+   export PYTHONPATH="$(dirname $script_dir)${PYTHONPATH:+:$PYTHONPATH}"
+diff -urN caribou-0.4.20.old/bin/caribou-preferences.in caribou-0.4.20/bin/caribou-preferences.in
+--- caribou-0.4.20.old/bin/caribou-preferences.in	2016-06-27 19:40:02.959436627 +0530
++++ caribou-0.4.20/bin/caribou-preferences.in	2016-06-27 19:48:58.525983390 +0530
+@@ -18,6 +18,19 @@
+ # along with this program; if not, write to the Free Software Foundation,
+ # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ 
++ARCH=$(uname -m)
++
++case $ARCH in
++x86_64 | sparc64 | s390x | ppc64)
++LIB_DIR=/usr/lib64
++SECONDARY_LIB_DIR=/usr/lib
++;;
++* )
++LIB_DIR=/usr/lib
++SECONDARY_LIB_DIR=/usr/lib64
++;;
++esac
++
+ script_dir="$(dirname "$(readlink -f ${0})")"
+ 
+ prefix=@prefix@
+@@ -28,8 +41,8 @@
+ then
+   datadir="$(@PYTHON@ -c "from gi.repository import GLib; print(':'.join(GLib.get_system_data_dirs()))")"
+   export PYTHONPATH="@prefix@/lib/python@PYTHON_VERSION@/site-packages${PYTHONPATH:+:$PYTHONPATH}"
+-  export GI_TYPELIB_PATH="@libdir@/girepository-1.0${GI_TYPELIB_PATH:+:$GI_TYPELIB_PATH}"
+-  export LD_LIBRARY_PATH="@libdir@${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
++  export GI_TYPELIB_PATH="$LIB_DIR/girepository-1.0${GI_TYPELIB_PATH:+:$GI_TYPELIB_PATH}"
++  export LD_LIBRARY_PATH="$LIB_DIR${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+   export XDG_DATA_DIRS="@datadir@${datadir:+:$datadir}"
+ else
+   export PYTHONPATH="$(dirname $script_dir)${PYTHONPATH:+:$PYTHONPATH}"

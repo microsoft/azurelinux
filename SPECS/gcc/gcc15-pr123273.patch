@@ -1,0 +1,54 @@
+2026-01-06  Jakub Jelinek  <jakub@redhat.com>
+
+	PR preprocessor/123273
+	* lex.cc (cpp_directive_only_process): Only go to done_comment
+	for '/' if star is true and esc is false.  When seeing '\\' with
+	esc set to true, clear esc as well as star instead of keeping esc
+	set.
+
+	* c-c++-common/cpp/dir-only-10.c: New test.
+	* c-c++-common/cpp/dir-only-11.c: New test.
+
+--- libcpp/lex.cc.jj	2026-01-02 09:56:10.417332292 +0100
++++ libcpp/lex.cc	2026-01-05 16:40:26.413766032 +0100
+@@ -5461,7 +5461,13 @@ cpp_directive_only_process (cpp_reader *
+ 		    switch (c)
+ 		      {
+ 		      case '\\':
+-			esc = true;
++			if (esc)
++			  {
++			    star = false;
++			    esc = false;
++			  }
++			else
++			  esc = true;
+ 			break;
+ 
+ 		      case '\r':
+@@ -5492,7 +5498,7 @@ cpp_directive_only_process (cpp_reader *
+ 			break;
+ 
+ 		      case '/':
+-			if (star)
++			if (star && !esc)
+ 			  goto done_comment;
+ 			/* FALLTHROUGH  */
+ 
+--- gcc/testsuite/c-c++-common/cpp/dir-only-10.c.jj	2026-01-05 17:04:26.144566116 +0100
++++ gcc/testsuite/c-c++-common/cpp/dir-only-10.c	2026-01-05 17:05:02.226946201 +0100
+@@ -0,0 +1,5 @@
++/* PR preprocessor/123273 */
++/* { dg-do preprocess } */
++/* { dg-options -fdirectives-only } */
++
++/* *\/""" */
+--- gcc/testsuite/c-c++-common/cpp/dir-only-11.c.jj	2026-01-05 17:05:18.498666647 +0100
++++ gcc/testsuite/c-c++-common/cpp/dir-only-11.c	2026-01-05 17:06:17.574651691 +0100
+@@ -0,0 +1,6 @@
++/* PR preprocessor/123273 */
++/* { dg-do preprocess } */
++/* { dg-options -fdirectives-only } */
++
++/* *\\
++/""" */

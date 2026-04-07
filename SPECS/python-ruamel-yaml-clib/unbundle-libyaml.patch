@@ -1,0 +1,31 @@
+diff -r df8c53ddf0d3 __init__.py
+--- a/__init__.py	Sun Oct 20 11:56:33 2024 +0200
++++ b/__init__.py	Wed Nov 27 11:36:51 2024 +0100
+@@ -23,16 +23,8 @@
+             name='_ruamel_yaml',
+             src=[
+                 '_ruamel_yaml.c',
+-                'api.c',
+-                'writer.c',
+-                'dumper.c',
+-                'loader.c',
+-                'reader.c',
+-                'scanner.c',
+-                'parser.c',
+-                'emitter.c',
+             ],
+-            lib=[],
++            lib=['yaml'],
+             test="""
+             int main(int argc, char* argv[])
+             {
+diff -r df8c53ddf0d3 _ruamel_yaml.h
+--- a/_ruamel_yaml.h	Sun Oct 20 11:56:33 2024 +0200
++++ b/_ruamel_yaml.h	Wed Nov 27 11:36:51 2024 +0100
+@@ -1,5 +1,5 @@
+ 
+-#include "yaml.h"
++#include <yaml.h>
+ 
+ #if PY_MAJOR_VERSION < 3
+ 

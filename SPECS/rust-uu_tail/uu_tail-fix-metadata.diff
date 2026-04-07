@@ -1,0 +1,19 @@
+--- uu_tail-0.0.27/Cargo.toml	1970-01-01T00:00:01+00:00
++++ uu_tail-0.0.27/Cargo.toml	2025-08-05T01:49:02.193547+00:00
+@@ -52,8 +52,7 @@
+ version = "2.7.2"
+ 
+ [dependencies.notify]
+-version = "=6.0.1"
+-features = ["macos_kqueue"]
++version = "6.0.1"
+ 
+ [dependencies.same-file]
+ version = "1.0.6"
+@@ -63,5 +62,5 @@
+ package = "uucore"
+ 
+ [dev-dependencies.rstest]
+-version = "0.21.0"
++version = "0.26.0"
+ 

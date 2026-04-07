@@ -1,0 +1,40 @@
+[Unit]
+Description=Synchronize system clock to NTP and PTP time sources
+After=chronyd.service ntpd.service ntpdate.service sntp.service network-online.target
+Conflicts=chronyd.service ntpd.service phc2sys.service ptp4l.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/sbin/timemaster -f /etc/timemaster.conf
+RuntimeDirectory=timemaster
+
+CapabilityBoundingSet=~CAP_AUDIT_CONTROL CAP_AUDIT_READ CAP_AUDIT_WRITE
+CapabilityBoundingSet=~CAP_BLOCK_SUSPEND CAP_KILL CAP_LEASE CAP_LINUX_IMMUTABLE
+CapabilityBoundingSet=~CAP_MAC_ADMIN CAP_MAC_OVERRIDE CAP_MKNOD
+CapabilityBoundingSet=~CAP_SYS_BOOT CAP_SYS_CHROOT CAP_SYS_MODULE CAP_SYS_PACCT
+CapabilityBoundingSet=~CAP_SYS_PTRACE CAP_SYS_RAWIO CAP_SYS_TTY_CONFIG CAP_WAKE_ALARM
+DeviceAllow=char-pps rw
+DeviceAllow=char-ptp rw
+DeviceAllow=char-rtc rw
+DevicePolicy=closed
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+PrivateTmp=yes
+ProtectControlGroups=yes
+ProtectHome=yes
+ProtectHostname=yes
+ProtectKernelLogs=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+ProtectProc=invisible
+ProtectSystem=strict
+ReadWritePaths=/run/timemaster /var/lib/chrony -/var/log -/var/spool
+RestrictAddressFamilies=AF_INET AF_INET6 AF_NETLINK AF_PACKET AF_UNIX
+RestrictNamespaces=yes
+RestrictSUIDSGID=yes
+SystemCallArchitectures=native
+SystemCallFilter=~@cpu-emulation @debug @module @mount @obsolete @raw-io @reboot @swap
+
+[Install]
+WantedBy=multi-user.target

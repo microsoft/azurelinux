@@ -1,0 +1,20 @@
+--- jsonwebkey-0.3.5/Cargo.toml	1970-01-01T00:00:01+00:00
++++ jsonwebkey-0.3.5/Cargo.toml	2024-12-02T13:18:29.938081+00:00
+@@ -60,16 +60,13 @@
+ version = "1.0"
+ 
+ [dependencies.yasna]
+-version = "0.4"
++version = "0.5"
+ features = ["num-bigint"]
+ optional = true
+ 
+ [dependencies.zeroize]
+ version = "1.4"
+ features = ["zeroize_derive"]
+-
+-[dev-dependencies.jsonwebtoken]
+-version = "8.0"
+ 
+ [features]
+ generate = [

@@ -1,0 +1,11 @@
+--- rand_distr-0.5.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ rand_distr-0.5.1/Cargo.toml	2026-02-15T12:35:12.195862+00:00
+@@ -84,7 +84,7 @@
+ optional = true
+ 
+ [dependencies.serde_with]
+-version = ">= 3.0, <= 3.11"
++version = "3"
+ optional = true
+ 
+ [dev-dependencies.average]

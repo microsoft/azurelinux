@@ -1,0 +1,34 @@
+From b3580bc3d44436de9280fc26a12ad51a324aa8ac Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Tue, 8 Oct 2024 10:13:02 +0100
+Subject: [PATCH 110/131] pcsclient: remove leftover debugging 'print(args)'
+ statement
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Dumping the python "Namespace" object to stdout after parsing argv
+serves no user purpose. Remove what is presumably a leftover
+debugging statement.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ tools/PcsClientTool/pcsclient.py | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/tools/PcsClientTool/pcsclient.py b/tools/PcsClientTool/pcsclient.py
+index f8432cab..1759833f 100755
+--- a/tools/PcsClientTool/pcsclient.py
++++ b/tools/PcsClientTool/pcsclient.py
+@@ -63,8 +63,6 @@ def main():
+         parser.print_help()
+         parser.exit()
+ 
+-    print(args)
+-
+     args.func(args)
+ 
+ class Utils:
+-- 
+2.53.0
+

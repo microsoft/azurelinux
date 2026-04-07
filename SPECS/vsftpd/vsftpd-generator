@@ -1,0 +1,15 @@
+#!/bin/bash
+
+confdir=/etc/vsftpd
+unitdir=/usr/lib/systemd/system
+targetdir=$1/vsftpd.target.wants
+
+mkdir -p ${targetdir}
+
+for f in $(ls -1 ${confdir}/*.conf | awk -F "." '{print $1}' | awk -F "/" '{print $4}')
+do
+  echo "Generating systemd units for $f"
+  ln -s ${unitdir}/vsftpd\@.service ${targetdir}/vsftpd\@$f.service > /dev/null 2>&1
+done
+
+exit 0

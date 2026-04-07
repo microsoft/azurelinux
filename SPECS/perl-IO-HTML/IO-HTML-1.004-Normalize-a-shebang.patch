@@ -1,0 +1,26 @@
+From f149109f7f5d8e6b9362553115e021011b69acd2 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 29 Sep 2020 10:45:50 +0200
+Subject: [PATCH] Normalize a shebang
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ examples/detect-encoding.pl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/examples/detect-encoding.pl b/examples/detect-encoding.pl
+index 8442cfa..2850019 100755
+--- a/examples/detect-encoding.pl
++++ b/examples/detect-encoding.pl
+@@ -1,4 +1,4 @@
+-#! /usr/bin/env perl
++#!/usr/bin/perl
+ #---------------------------------------------------------------------
+ # This example is hereby placed in the public domain.
+ # You may copy from it freely.
+-- 
+2.25.4
+

@@ -1,0 +1,11 @@
+# Service-specific configuration file for tomcat. This will be sourced by
+# systemd for the default service (tomcat.service)
+# If you want to customize named instance, make a similar file
+# and name it tomcat@instancename.
+
+# You will not need to set this, usually. For default service it equals
+# CATALINA_HOME. For named service, it equals ${TOMCATS_BASE}${NAME}
+#CATALINA_BASE="@@@TCHOME@@@"
+
+# Please take a look at /etc/tomcat/tomcat.conf to have an idea what you
+# can override.

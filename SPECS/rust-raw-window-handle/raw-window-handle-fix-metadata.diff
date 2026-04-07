@@ -1,0 +1,10 @@
+--- raw-window-handle-0.6.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ raw-window-handle-0.6.2/Cargo.toml	2024-06-11T14:04:27.234942+00:00
+@@ -44,7 +44,3 @@
+ [features]
+ alloc = []
+ std = ["alloc"]
+-wasm-bindgen-0-2 = [
+-    "std",
+-]
+-

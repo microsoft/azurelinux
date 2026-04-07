@@ -1,0 +1,44 @@
+From 02d9de3db6a4a90987dbb7027f15383c02eb01cc Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Micha=C5=82=20G=C3=B3rny?= <mgorny@gentoo.org>
+Date: Tue, 27 Aug 2024 15:54:45 +0200
+Subject: [PATCH] Fix test_sub_command_multiple on Python 3.12.5+
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Update the expectations in test_sub_command_multiple for different
+argparse error handling in Python 3.12.5 and newer.  Previously,
+the 'cannot have multiple subparser arguments' error would be output
+to stderr and cause the parser to exit; now it raises an ArgumentError
+instead.
+
+Closes-Bug: 2074130
+Change-Id: I83de6b6943b14f1f6df86a55603e6867dce680d3
+Signed-off-by: Michał Górny <mgorny@gentoo.org>
+(cherry picked from commit 972d304bb23baef538ce759004410a20d8109ccb)
+---
+ oslo_config/tests/test_cfg.py | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/oslo_config/tests/test_cfg.py b/oslo_config/tests/test_cfg.py
+index 1759ae7..383b70f 100644
+--- a/oslo_config/tests/test_cfg.py
++++ b/oslo_config/tests/test_cfg.py
+@@ -4385,8 +4385,12 @@ class SubCommandTestCase(BaseTestCase):
+         self.conf.register_cli_opt(cfg.SubCommandOpt('cmd1'))
+         self.conf.register_cli_opt(cfg.SubCommandOpt('cmd2'))
+         self.useFixture(fixtures.MonkeyPatch('sys.stderr', io.StringIO()))
+-        self.assertRaises(SystemExit, self.conf, [])
+-        self.assertIn('multiple', sys.stderr.getvalue())
++        if sys.version_info >= (3, 12, 5):
++            self.assertRaisesRegex(argparse.ArgumentError, 'multiple',
++                                   self.conf, [])
++        else:
++            self.assertRaises(SystemExit, self.conf, [])
++            self.assertIn('multiple', sys.stderr.getvalue())
+ 
+ 
+ class SetDefaultsTestCase(BaseTestCase):
+-- 
+2.46.1
+

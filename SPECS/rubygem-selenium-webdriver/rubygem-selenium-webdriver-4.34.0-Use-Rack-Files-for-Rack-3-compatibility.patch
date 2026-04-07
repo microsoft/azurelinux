@@ -1,0 +1,79 @@
+From 027eb7a4c8b9d093db6088ee76cc1afd4f2bdcaf Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Fri, 8 Aug 2025 12:46:16 +0200
+Subject: [PATCH 1/2] Use `Rack::Files` for Rack 3+ compatibility
+
+Rack has renamed `Rack::File` to `Rack::Files` starting with Rack 2.1.0
+[[1]]. Rack 3+ drops the old `Rack::File` class and therefore there are
+bunch of errors such as:
+
+~~~
+  334) Selenium::WebDriver::VirtualAuthenticator#user_verified= can not obtain credential requiring verification when set to false
+       Failure/Error: @static = Rack::File.new(file_root)
+
+       NameError:
+         uninitialized constant Rack::File
+       # ./spec/integration/selenium/webdriver/spec_support/rack_server.rb:103:in 'Selenium::WebDriver::SpecSupport::RackServer::TestApp#initialize'
+       # ./spec/integration/selenium/webdriver/spec_support/rack_server.rb:30:in 'Class#new'
+       # ./spec/integration/selenium/webdriver/spec_support/rack_server.rb:30:in 'Selenium::WebDriver::SpecSupport::RackServer#initialize'
+       # ./spec/integration/selenium/webdriver/spec_support/test_environment.rb:87:in 'Class#new'
+       # ./spec/integration/selenium/webdriver/spec_support/test_environment.rb:87:in 'Selenium::WebDriver::SpecSupport::TestEnvironment#app_server'
+       # ./spec/integration/selenium/webdriver/spec_support/test_environment.rb:162:in 'Selenium::WebDriver::SpecSupport::TestEnvironment#url_for'
+       # ./spec/integration/selenium/webdriver/spec_support/helpers.rb:41:in 'Selenium::WebDriver::SpecSupport::Helpers#url_for'
+       # ./spec/integration/selenium/webdriver/virtual_authenticator_spec.rb:55:in 'block (2 levels) in <module:WebDriver>'
+~~~
+
+[1]: https://github.com/rack/rack/commit/626272b2bc6b270bbd3d2aa6aaa64722350f42be
+---
+ .../integration/selenium/webdriver/spec_support/rack_server.rb  | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/rb/spec/integration/selenium/webdriver/spec_support/rack_server.rb b/rb/spec/integration/selenium/webdriver/spec_support/rack_server.rb
+index d141d536b9c37..62fad9a963121 100644
+--- a/rb/spec/integration/selenium/webdriver/spec_support/rack_server.rb
++++ b/rb/spec/integration/selenium/webdriver/spec_support/rack_server.rb
+@@ -100,7 +100,7 @@ class TestApp
+           BASIC_AUTH_CREDENTIALS = %w[test test].freeze
+ 
+           def initialize(file_root)
+-            @static = Rack::File.new(file_root)
++            @static = Rack::Files.new(file_root)
+           end
+ 
+           def call(env)
+
+From f470b1c1d2da5d9c7f220c850462ff9538bb271a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Fri, 8 Aug 2025 12:57:30 +0200
+Subject: [PATCH 2/2] Use `Rackup::Handler` when available
+
+The `Rack::Handler` was extracted from Rack 3+ into separate `rackup`
+package.
+---
+ .../selenium/webdriver/spec_support/rack_server.rb          | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/rb/spec/integration/selenium/webdriver/spec_support/rack_server.rb b/rb/spec/integration/selenium/webdriver/spec_support/rack_server.rb
+index 62fad9a963121..18c3be6b827b2 100644
+--- a/rb/spec/integration/selenium/webdriver/spec_support/rack_server.rb
++++ b/rb/spec/integration/selenium/webdriver/spec_support/rack_server.rb
+@@ -18,6 +18,10 @@
+ # under the License.
+ 
+ require 'rack'
++begin
++  require 'rackup'
++rescue LoadError
++end
+ 
+ module Selenium
+   module WebDriver
+@@ -76,7 +80,7 @@ def handler
+ 
+           handler = handlers.find { |h| load_handler h }
+           constant = handler == 'webrick' ? 'WEBrick' : handler.capitalize
+-          Rack::Handler.const_get constant
++          (defined?(Rackup) ? Rackup : Rack)::Handler.const_get(constant)
+         end
+ 
+         def load_handler(handler)

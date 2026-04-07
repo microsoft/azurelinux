@@ -1,0 +1,120 @@
+From 606349836109cfb201bc5b5b424dffb749150a68 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Kuzn=C3=ADk?= <ondra@mistotebe.net>
+Date: Mon, 28 Apr 2025 14:36:24 +0100
+Subject: [PATCH] ITS#10297 Defer hostname resolution til first use
+
+---
+ libraries/libldap/init.c     | 33 +++++++++++++++++++--------------
+ libraries/libldap/ldap-int.h |  1 +
+ libraries/libldap/os-ip.c    |  2 ++
+ libraries/libldap/tls_g.c    |  3 +++
+ libraries/libldap/tls_o.c    |  3 +++
+ 6 files changed, 28 insertions(+), 14 deletions(-)
+
+diff --git a/libraries/libldap/init.c b/libraries/libldap/init.c
+index 213276b4b5..90fc34c5a6 100644
+--- a/libraries/libldap/init.c
++++ b/libraries/libldap/init.c
+@@ -631,6 +631,25 @@ void ldap_int_initialize_global_options( struct ldapoptions *gopts, int *dbglvl
+ 
+ #if defined(HAVE_TLS) || defined(HAVE_CYRUS_SASL)
+ char * ldap_int_hostname = NULL;
++
++void
++ldap_int_resolve_hostname(void)
++{
++	static int resolved = 0;
++
++	LDAP_MUTEX_LOCK( &ldap_int_hostname_mutex );
++	if ( !resolved ) {
++		char	*name = ldap_int_hostname;
++
++		ldap_int_hostname = ldap_pvt_get_fqdn( name );
++
++		if ( name != NULL && name != ldap_int_hostname ) {
++			LDAP_FREE( name );
++		}
++		resolved = 1;
++	}
++	LDAP_MUTEX_UNLOCK( &ldap_int_hostname_mutex );
++}
+ #endif
+ 
+ #ifdef LDAP_R_COMPILE
+@@ -688,20 +707,6 @@ void ldap_int_initialize( struct ldapoptions *gopts, int *dbglvl )
+ }
+ #endif
+ 
+-#if defined(HAVE_TLS) || defined(HAVE_CYRUS_SASL)
+-	LDAP_MUTEX_LOCK( &ldap_int_hostname_mutex );
+-	{
+-		char	*name = ldap_int_hostname;
+-
+-		ldap_int_hostname = ldap_pvt_get_fqdn( name );
+-
+-		if ( name != NULL && name != ldap_int_hostname ) {
+-			LDAP_FREE( name );
+-		}
+-	}
+-	LDAP_MUTEX_UNLOCK( &ldap_int_hostname_mutex );
+-#endif
+-
+ #ifndef HAVE_POLL
+ 	if ( ldap_int_tblsize == 0 ) ldap_int_ip_init();
+ #endif
+diff --git a/libraries/libldap/ldap-int.h b/libraries/libldap/ldap-int.h
+index 7e754775e8..435b859066 100644
+--- a/libraries/libldap/ldap-int.h
++++ b/libraries/libldap/ldap-int.h
+@@ -743,6 +743,7 @@ LDAP_F (int) ldap_int_poll( LDAP *ld, ber_socket_t s,
+ 
+ #if defined(HAVE_TLS) || defined(HAVE_CYRUS_SASL)
+ LDAP_V (char *) ldap_int_hostname;
++LDAP_F (void) ldap_int_resolve_hostname(void);
+ LDAP_F (char *) ldap_host_connected_to( Sockbuf *sb,
+ 	const char *host );
+ #endif
+diff --git a/libraries/libldap/os-ip.c b/libraries/libldap/os-ip.c
+index 6c86edd055..629b540352 100644
+--- a/libraries/libldap/os-ip.c
++++ b/libraries/libldap/os-ip.c
+@@ -890,6 +890,8 @@ ldap_host_connected_to( Sockbuf *sb, const char *host )
+ 	 * this is necessary for kerberos to work right, since the official
+ 	 * hostname is used as the kerberos instance.
+ 	 */
++	if ( !ldap_int_hostname )
++		ldap_int_resolve_hostname();
+ 
+ 	switch (sa->sa_family) {
+ #ifdef LDAP_PF_LOCAL
+diff --git a/libraries/libldap/tls_g.c b/libraries/libldap/tls_g.c
+index de5b7f7c84..d4e7ee0bf7 100644
+--- a/libraries/libldap/tls_g.c
++++ b/libraries/libldap/tls_g.c
+@@ -597,6 +597,9 @@ tlsg_session_chkhost( LDAP *ld, tls_session *session, const char *name_in )
+ 	int len1 = 0, len2 = 0;
+ 	int ntype = IS_DNS;
+ 
++	if ( !ldap_int_hostname )
++		ldap_int_resolve_hostname();
++
+ 	if( ldap_int_hostname &&
+ 		( !name_in || !strcasecmp( name_in, "localhost" ) ) )
+ 	{
+diff --git a/libraries/libldap/tls_o.c b/libraries/libldap/tls_o.c
+index 71677847a9..155f685c99 100644
+--- a/libraries/libldap/tls_o.c
++++ b/libraries/libldap/tls_o.c
+@@ -830,6 +830,9 @@ tlso_session_chkhost( LDAP *ld, tls_session *sess, const char *name_in )
+ 	struct in_addr addr;
+ #endif
+ 
++	if ( !ldap_int_hostname )
++		ldap_int_resolve_hostname();
++
+ 	if( ldap_int_hostname &&
+ 		( !name_in || !strcasecmp( name_in, "localhost" ) ) )
+ 	{
+-- 
+GitLab
+

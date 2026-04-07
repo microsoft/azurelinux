@@ -1,0 +1,22 @@
+--- xxhash-c-sys-0.8.7/Cargo.toml	1970-01-01T00:00:01+00:00
++++ xxhash-c-sys-0.8.7/Cargo.toml	2025-01-04T19:58:23.824222+00:00
+@@ -17,8 +17,6 @@
+ build = "build.rs"
+ include = [
+     "**/*.rs",
+-    "**/*.c",
+-    "**/*.h",
+     "Cargo.toml",
+     "README.md",
+     "LICENSE",
+@@ -51,8 +49,8 @@
+ version = "0.2"
+ default-features = false
+ 
+-[build-dependencies.cc]
+-version = "1"
++[build-dependencies.pkg-config]
++version = "0.3"
+ 
+ [features]
+ no_std = []

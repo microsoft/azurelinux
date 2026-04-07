@@ -1,0 +1,9 @@
+/var/named/data/named.run {
+    missingok
+    su named named
+    create 0644 named named
+    notifempty
+    postrotate
+        /usr/bin/rndc closelogs > /dev/null 2>&1 || true
+    endscript
+}

@@ -1,0 +1,52 @@
+From 0912f6869b1b8f3116b3540958a395b96d8909d0 Mon Sep 17 00:00:00 2001
+From: Dylan Thacker-Smith <Dylan.Smith@shopify.com>
+Date: Thu, 16 Sep 2021 18:46:07 -0400
+Subject: [PATCH] Fix some internal errors in filters from invalid input.
+
+These fixes came from improving the corresponding test, so these might not
+actually be causing problems in practice.
+---
+ History.md                               |  6 +++
+ lib/liquid/standardfilters.rb            | 48 ++++++++++++++++--------
+ test/integration/standard_filter_test.rb | 23 +++++-------
+ 3 files changed, 48 insertions(+), 29 deletions(-)
+
+diff --git a/lib/liquid/standardfilters.rb b/lib/liquid/standardfilters.rb
+index e7cb5c382..98e38f5f4 100644
+--- a/lib/liquid/standardfilters.rb
++++ b/lib/liquid/standardfilters.rb
+@@ -486,10 +498,16 @@ def apply_operation(input, operand, operation)
+     end
+ 
+     def nil_safe_compare(a, b)
+-      if !a.nil? && !b.nil?
+-        a <=> b
++      result = a <=> b
++
++      if result
++        result
++      elsif a.nil?
++        1
++      elsif b.nil?
++        -1
+       else
+-        a.nil? ? 1 : -1
++        raise Liquid::ArgumentError, "cannot sort values of incompatible types"
+       end
+     end
+ 
+diff --git a/test/integration/standard_filter_test.rb b/test/integration/standard_filter_test.rb
+index f80d7ad0b..e7b34c164 100644
+--- a/test/integration/standard_filter_test.rb
++++ b/test/integration/standard_filter_test.rb
+@@ -259,8 +259,8 @@ def test_sort_when_property_is_sometimes_missing_puts_nils_last
+       { "price" => 1, "handle" => "gamma" },
+       { "price" => 2, "handle" => "epsilon" },
+       { "price" => 4, "handle" => "alpha" },
+-      { "handle" => "delta" },
+-      { "handle" => "beta" }
++      { "handle" => "beta" },
++      { "handle" => "delta" }
+     ]
+     assert_equal expectation, @filters.sort(input, "price")
+   end

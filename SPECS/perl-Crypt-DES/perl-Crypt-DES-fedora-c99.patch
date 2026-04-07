@@ -1,0 +1,31 @@
+diff -rup a/DES.xs b/DES.xs
+--- a/DES.xs	2013-07-23 11:23:00.000000000 -0400
++++ b/DES.xs	2023-03-15 15:50:47.568400586 -0400
+@@ -36,7 +36,7 @@ _des_expand_key(key)
+ 		if (key_len != sizeof(des_user_key))
+ 			croak("Invalid key");
+ 
+-		perl_des_expand_key((i8 *)key, ks);
++		perl_des_expand_key((unsigned char *)key, ks);
+ 
+ 		ST(0) = sv_2mortal(newSVpv((char *)ks, sizeof(ks)));
+ 	}
+@@ -66,7 +66,8 @@ _des_crypt(input, output, ks, enc_flag)
+ 
+ 		(SvUPGRADE(output, SVt_PV));
+ 
+-		perl_des_crypt(input, SvGROW(output, output_len), (i32 *)ks, enc_flag);
++		perl_des_crypt((unsigned char *)input, (unsigned char *)SvGROW(output, output_len),
++			       (unsigned long *)ks, enc_flag);
+ 
+ 		SvCUR_set(output, output_len);
+ 		*SvEND(output) = '\0';
+diff -rup a/_des.h b/_des.h
+--- a/_des.h	2005-12-08 10:53:47.000000000 -0500
++++ b/_des.h	2023-03-13 21:37:53.334642006 -0400
+@@ -5,3 +5,5 @@ typedef unsigned long des_ks[32];
+ void _des_crypt( des_cblock in, des_cblock out, des_ks key, int encrypt );
+ void _des_expand_key( des_user_key userKey, des_ks key );
+ 
++void perl_des_expand_key(des_user_key userKey, des_ks ks);
++void perl_des_crypt( des_cblock input, des_cblock output, des_ks ks, int encrypt );

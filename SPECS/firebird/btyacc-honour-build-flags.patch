@@ -1,0 +1,12 @@
+--- a/extern/btyacc/Makefile	2022-08-12 15:24:40.846774310 +0200
++++ a/extern/btyacc/Makefile	2022-08-12 15:26:20.954809720 +0200
+@@ -12,7 +12,7 @@
+ # across all of our supported compilers/platforms.
+ 
+ # Vanilla CFLAGS
+-CFLAGS=
++CFLAGS=-fPIC -pie
+ 
+ # No LDFLAGS
+ #LDFLAGS=
+

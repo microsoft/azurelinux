@@ -1,0 +1,13 @@
+--- yoke-derive-0.8.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ yoke-derive-0.8.1/Cargo.toml	2025-10-28T23:36:26.629502+00:00
+@@ -46,10 +46,6 @@
+ path = "src/lib.rs"
+ proc-macro = true
+ 
+-[[example]]
+-name = "yoke_derive"
+-path = "examples/yoke_derive.rs"
+-
+ [dependencies.proc-macro2]
+ version = "1.0.61"
+ 

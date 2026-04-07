@@ -1,0 +1,73 @@
+From 954a0bd085ae9e62fc33405d190484f88cc18a93 Mon Sep 17 00:00:00 2001
+From: Sumit Bose <sbose@redhat.com>
+Date: Tue, 5 Nov 2024 11:42:20 +0100
+Subject: [PATCH 15/17] doc: improve some Samba related doc items
+
+---
+ doc/adcli-devel.xml |  9 +++++++--
+ doc/adcli.xml       | 10 ++++++----
+ 2 files changed, 13 insertions(+), 6 deletions(-)
+
+diff --git a/doc/adcli-devel.xml b/doc/adcli-devel.xml
+index 0f1f4ad..ef51ba0 100644
+--- a/doc/adcli-devel.xml
++++ b/doc/adcli-devel.xml
+@@ -43,12 +43,17 @@
+ 				<listitem><para>MIT Kerberos libraries</para></listitem>
+ 			</itemizedlist>
+ 
++			<para>If Samba's offline join feature should be used the
++			<literal>libnetapi</literal> development package should be install as well
++			so that <literal>configure</literal> can detect if the used Samba version
++			already supports offline joins.</para>
++
+ 			<para>On <emphasis role="strong">Debian</emphasis> or <emphasis role="strong">Ubuntu</emphasis> you can use the following command to
+ 			install the dependencies:</para>
+ 
+ <programlisting>
+ $ sudo apt-get install build-essential autoconf automake xmlto xsltproc \
+-         libkrb5-dev libldap2-dev libsasl2-dev
++         libkrb5-dev libldap2-dev libsasl2-dev samba-dev
+ </programlisting>
+ 
+ 			<para>On <emphasis role="strong">Fedora</emphasis> you can use the following command to install the
+@@ -57,7 +62,7 @@ $ sudo apt-get install build-essential autoconf automake xmlto xsltproc \
+ <programlisting>
+ $ sudo yum groupinstall "Development Tools"
+ $ sudo yum install automake autoconf xmlto xsltproc krb5-devel openldap-devel \
+-    cyrus-sasl-devel
++    cyrus-sasl-devel libnetapi-devel
+ </programlisting>
+ 
+ 		</section>
+diff --git a/doc/adcli.xml b/doc/adcli.xml
+index 93e1520..7f65f06 100644
+--- a/doc/adcli.xml
++++ b/doc/adcli.xml
+@@ -413,8 +413,9 @@ Password for Administrator:
+ 			<para>Please note that Samba's <command>net</command>
+ 			requires some settings in <filename>smb.conf</filename>
+ 			to create the database entries correctly. Most
+-			important here is currently the
+-			<option>workgroup</option> option, see
++			important here are currently the
++			<option>workgroup</option>, <option>realm</option> and
++			<option>security</option> options, see
+ 			<citerefentry><refentrytitle>smb.conf</refentrytitle><manvolnum>5</manvolnum></citerefentry>
+ 			for details.</para></listitem>
+ 		</varlistentry>
+@@ -615,8 +616,9 @@ $ adcli update --login-ccache=/tmp/krbcc_123
+ 			<para>Please note that Samba's <command>net</command>
+ 			requires some settings in <filename>smb.conf</filename>
+ 			to create the database entries correctly. Most
+-			important here is currently the
+-			<option>workgroup</option> option, see
++			important here are currently the
++			<option>workgroup</option>, <option>realm</option> and
++			<option>security</option> options, see
+ 			<citerefentry><refentrytitle>smb.conf</refentrytitle><manvolnum>5</manvolnum></citerefentry>
+ 			for details.</para>
+ 			<para>Note that if the machine account password is not
+-- 
+2.47.0
+

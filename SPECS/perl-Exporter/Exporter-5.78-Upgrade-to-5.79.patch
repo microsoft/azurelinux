@@ -1,0 +1,109 @@
+From acbbe952bc2d541dfe360e5fff1ee35182ca7cae Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Wed, 30 Apr 2025 15:17:45 +0200
+Subject: [PATCH] Upgrade to 5.79
+
+---
+ lib/Exporter.pm       |  2 +-
+ lib/Exporter/Heavy.pm | 11 ++++-------
+ t/Exporter.t          |  2 +-
+ t/pod.t               |  7 -------
+ t/use.t               |  8 --------
+ 5 files changed, 6 insertions(+), 24 deletions(-)
+ delete mode 100644 t/pod.t
+ delete mode 100644 t/use.t
+
+diff --git a/lib/Exporter.pm b/lib/Exporter.pm
+index 15d7d4a..b3f6cb5 100644
+--- a/lib/Exporter.pm
++++ b/lib/Exporter.pm
+@@ -6,7 +6,7 @@ no strict 'refs';
+ our $Debug = 0;
+ our $ExportLevel = 0;
+ our $Verbose ||= 0;
+-our $VERSION = '5.78';
++our $VERSION = '5.79';
+ our %Cache;
+ 
+ sub as_heavy {
+diff --git a/lib/Exporter/Heavy.pm b/lib/Exporter/Heavy.pm
+index 6155aa5..8c70abe 100644
+--- a/lib/Exporter/Heavy.pm
++++ b/lib/Exporter/Heavy.pm
+@@ -3,8 +3,7 @@ package Exporter::Heavy;
+ use strict;
+ no strict 'refs';
+ 
+-# On one line so MakeMaker will see it.
+-our $VERSION = '5.78';
++our $VERSION = '5.79';
+ 
+ =head1 NAME
+ 
+@@ -39,20 +38,18 @@ sub _rebuild_cache {
+ sub heavy_export {
+ 
+     # Save the old __WARN__ handler in case it was defined
+-    my $oldwarn = $SIG{__WARN__};
++    my $oldwarn = $SIG{__WARN__} || sub { warn $_[0] };
+ 
+     # First make import warnings look like they're coming from the "use".
+     local $SIG{__WARN__} = sub {
+-	# restore it back so proper stacking occurs
+-	local $SIG{__WARN__} = $oldwarn;
+ 	my $text = shift;
+ 	if ($text =~ s/ at \S*Exporter\S*.pm line \d+.*\n//) {
+ 	    require Carp;
+ 	    local $Carp::CarpLevel = 1;	# ignore package calling us too.
+-	    Carp::carp($text);
++	    $oldwarn->(Carp::shortmess($text));
+ 	}
+ 	else {
+-	    warn $text;
++	    $oldwarn->($text);
+ 	}
+     };
+     local $SIG{__DIE__} = sub {
+diff --git a/t/Exporter.t b/t/Exporter.t
+index 2fcd003..6127e40 100644
+--- a/t/Exporter.t
++++ b/t/Exporter.t
+@@ -248,7 +248,7 @@ sub TIESCALAR{bless[]}
+ {
+  tie my $t, __PACKAGE__;
+  for($t) { # $_ is now tied
+-  import Exporter::for::Tied::_;
++  Exporter::for::Tied::_->import;
+  }
+ }
+ ::ok(1, 'import with tied $_');
+diff --git a/t/pod.t b/t/pod.t
+deleted file mode 100644
+index 9cc6f96..0000000
+--- a/t/pod.t
++++ /dev/null
+@@ -1,7 +0,0 @@
+-
+-use strict;
+-use Test::More;
+-eval "use Test::Pod 1.18";
+-plan skip_all => "Test::Pod 1.18 required for testing POD" if $@;
+-
+-all_pod_files_ok(all_pod_files("."));
+diff --git a/t/use.t b/t/use.t
+deleted file mode 100644
+index 00d1ae7..0000000
+--- a/t/use.t
++++ /dev/null
+@@ -1,8 +0,0 @@
+-
+-print "1..1\n";
+-
+-my $ok;
+-BEGIN { eval "use Exporter;"; $ok = !$@; }
+-print( ($ok ? '' : 'not '), "ok - use Exporter;\n" );
+-
+-print( "# Testing Exporter $Exporter::VERSION, Perl $], $^X\n" );
+-- 
+2.49.0
+

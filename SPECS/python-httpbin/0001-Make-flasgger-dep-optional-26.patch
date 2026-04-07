@@ -1,0 +1,223 @@
+From 87ad6da574184608157e1a6abc8a66cdade8aef9 Mon Sep 17 00:00:00 2001
+From: Adam Williamson <awilliam@redhat.com>
+Date: Tue, 17 Oct 2023 17:17:16 -0700
+Subject: [PATCH] Make flasgger dep optional (#26)
+
+As discussed in the ticket, the flasgger dep is a pretty heavy
+one which is not needed when using httpbin as a library. It's
+only really needed to produce the fancy homepage and API docs
+for httpbin.org.
+
+This makes the dependency optional, and falls back to the old
+static HTML page for / if flasgger is not available. The flasgger
+dependency is moved from the main set of dependencies to the
+'mainapp' extras (to ensure we *do* get the shiny new homepage
+when we want it).
+
+Signed-off-by: Adam Williamson <awilliam@redhat.com>
+---
+ httpbin/core.py | 150 +++++++++++++++++++++++++-----------------------
+ pyproject.toml  |   2 +-
+ 2 files changed, 80 insertions(+), 72 deletions(-)
+
+diff --git a/httpbin/core.py b/httpbin/core.py
+index a82c1b8..ca4a845 100644
+--- a/httpbin/core.py
++++ b/httpbin/core.py
+@@ -33,7 +33,10 @@ try:
+ except ImportError:  # werkzeug < 2.1
+     from werkzeug.wrappers import BaseResponse as Response
+ 
+-from flasgger import Swagger, NO_SANITIZER
++try:
++    from flasgger import Swagger, NO_SANITIZER
++except ImportError:
++    Swagger = False
+ 
+ from . import filters
+ from .helpers import (
+@@ -95,77 +98,78 @@ app.add_template_global("HTTPBIN_TRACKING" in os.environ, name="tracking_enabled
+ 
+ app.config["SWAGGER"] = {"title": "httpbin.org", "uiversion": 3}
+ 
+-template = {
+-    "swagger": "2.0",
+-    "info": {
+-        "title": "httpbin.org",
+-        "description": (
+-            "A simple HTTP Request & Response Service."
+-            "<br/> A <a href='http://kennethreitz.com/'>Kenneth Reitz</a> project."
+-            "<br/> <br/> <b>Run locally: </b> <br/> "
+-            "<code>$ docker pull ghcr.io/psf/httpbin</code> <br/>"
+-            "<code>$ docker run -p 80:8080 ghcr.io/psf/httpbin</code>"
+-        ),
+-        "contact": {
+-            "responsibleOrganization": "Python Software Foundation",
+-            "responsibleDeveloper": "Kenneth Reitz",
+-            "url": "https://github.com/psf/httpbin/",
+-        },
+-        # "termsOfService": "http://me.com/terms",
+-        "version": version,
+-    },
+-    "host": "httpbin.org",  # overrides localhost:5000
+-    "basePath": "/",  # base bash for blueprint registration
+-    "schemes": ["https"],
+-    "protocol": "https",
+-    "tags": [
+-        {
+-            "name": "HTTP Methods",
+-            "description": "Testing different HTTP verbs",
+-            # 'externalDocs': {'description': 'Learn more', 'url': 'https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html'}
+-        },
+-        {"name": "Auth", "description": "Auth methods"},
+-        {
+-            "name": "Status codes",
+-            "description": "Generates responses with given status code",
+-        },
+-        {"name": "Request inspection", "description": "Inspect the request data"},
+-        {
+-            "name": "Response inspection",
+-            "description": "Inspect the response data like caching and headers",
+-        },
+-        {
+-            "name": "Response formats",
+-            "description": "Returns responses in different data formats",
++if Swagger:
++    template = {
++        "swagger": "2.0",
++        "info": {
++            "title": "httpbin.org",
++            "description": (
++                "A simple HTTP Request & Response Service."
++                "<br/> A <a href='http://kennethreitz.com/'>Kenneth Reitz</a> project."
++                "<br/> <br/> <b>Run locally: </b> <br/> "
++                "<code>$ docker pull ghcr.io/psf/httpbin</code> <br/>"
++                "<code>$ docker run -p 80:8080 ghcr.io/psf/httpbin</code>"
++            ),
++            "contact": {
++                "responsibleOrganization": "Python Software Foundation",
++                "responsibleDeveloper": "Kenneth Reitz",
++                "url": "https://github.com/psf/httpbin/",
++            },
++            # "termsOfService": "http://me.com/terms",
++            "version": version,
+         },
+-        {"name": "Dynamic data", "description": "Generates random and dynamic data"},
+-        {"name": "Cookies", "description": "Creates, reads and deletes Cookies"},
+-        {"name": "Images", "description": "Returns different image formats"},
+-        {"name": "Redirects", "description": "Returns different redirect responses"},
+-        {
+-            "name": "Anything",
+-            "description": "Returns anything that is passed to request",
+-        },
+-    ],
+-}
+-
+-swagger_config = {
+-    "headers": [],
+-    "specs": [
+-        {
+-            "endpoint": "spec",
+-            "route": "/spec.json",
+-            "rule_filter": lambda rule: True,  # all in
+-            "model_filter": lambda tag: True,  # all in
+-        }
+-    ],
+-    "static_url_path": "/flasgger_static",
+-    # "static_folder": "static",  # must be set by user
+-    "swagger_ui": True,
+-    "specs_route": "/",
+-}
++        "host": "httpbin.org",  # overrides localhost:5000
++        "basePath": "/",  # base bash for blueprint registration
++        "schemes": ["https"],
++        "protocol": "https",
++        "tags": [
++            {
++                "name": "HTTP Methods",
++                "description": "Testing different HTTP verbs",
++                # 'externalDocs': {'description': 'Learn more', 'url': 'https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html'}
++            },
++            {"name": "Auth", "description": "Auth methods"},
++            {
++                "name": "Status codes",
++                "description": "Generates responses with given status code",
++            },
++            {"name": "Request inspection", "description": "Inspect the request data"},
++            {
++                "name": "Response inspection",
++                "description": "Inspect the response data like caching and headers",
++            },
++            {
++                "name": "Response formats",
++                "description": "Returns responses in different data formats",
++            },
++            {"name": "Dynamic data", "description": "Generates random and dynamic data"},
++            {"name": "Cookies", "description": "Creates, reads and deletes Cookies"},
++            {"name": "Images", "description": "Returns different image formats"},
++            {"name": "Redirects", "description": "Returns different redirect responses"},
++            {
++                "name": "Anything",
++                "description": "Returns anything that is passed to request",
++            },
++        ],
++    }
++
++    swagger_config = {
++        "headers": [],
++        "specs": [
++            {
++                "endpoint": "spec",
++                "route": "/spec.json",
++                "rule_filter": lambda rule: True,  # all in
++                "model_filter": lambda tag: True,  # all in
++            }
++        ],
++        "static_url_path": "/flasgger_static",
++        # "static_folder": "static",  # must be set by user
++        "swagger_ui": True,
++        "specs_route": "/",
++    }
+ 
+-swagger = Swagger(app, sanitizer=NO_SANITIZER, template=template, config=swagger_config)
++    swagger = Swagger(app, sanitizer=NO_SANITIZER, template=template, config=swagger_config)
+ 
+ # Set up Bugsnag exception tracking, if desired. To use Bugsnag, install the
+ # Bugsnag Python client with the command "pip install bugsnag", and set the
+@@ -243,8 +247,12 @@ def set_cors_headers(response):
+ # Routes
+ # ------
+ 
++if Swagger:
++    staticroute = "/legacy"
++else:
++    staticroute = "/"
+ 
+-@app.route("/legacy")
++@app.route(staticroute)
+ def view_landing_page():
+     """Generates Landing Page in legacy layout."""
+     return render_template("index.html")
+diff --git a/pyproject.toml b/pyproject.toml
+index 43b6bfa..192fdab 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -33,7 +33,6 @@ classifiers = [
+ dependencies = [
+     "brotlicffi",
+     "decorator",
+-    "flasgger",
+     "flask >= 2.2.4",
+     'greenlet < 3.0; python_version<"3.12"',
+     'greenlet >= 3.0.0a1; python_version>="3.12.0rc0"',
+@@ -45,6 +44,7 @@ dependencies = [
+ [project.optional-dependencies]
+ test = ["pytest", "tox"]
+ mainapp = [
++    "flasgger",
+     "gunicorn",
+     "gevent",
+ ]
+-- 
+2.44.0
+

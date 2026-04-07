@@ -1,0 +1,67 @@
+From 33fc4214bcb2f813cf762fda99ef7f1f1755749b Mon Sep 17 00:00:00 2001
+From: Benjamin Berg <bberg@redhat.com>
+Date: Wed, 28 Apr 2021 16:50:03 +0200
+Subject: [PATCH] gdm: Work around failing fingerprint auth
+
+On Fedora we have the problem that fingerprint auth fails immediately if
+the PAM configuration has not been updated and no prints are enrolled.
+
+So, consider a verification failure within one second to be a service
+failure instead.
+---
+ js/gdm/util.js | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/js/gdm/util.js b/js/gdm/util.js
+index c45579a22b2b..387a468b64b6 100644
+--- a/js/gdm/util.js
++++ b/js/gdm/util.js
+@@ -110,6 +110,7 @@ export class ShellUserVerifier extends Signals.EventEmitter {
+         this._defaultService = null;
+         this._preemptingService = null;
+         this._fingerprintReaderType = FingerprintReaderType.NONE;
++        this._fprintStartTime = -1;
+ 
+         this._messageQueue = [];
+         this._messageQueueTimeoutId = 0;
+@@ -670,6 +671,10 @@ export class ShellUserVerifier extends Signals.EventEmitter {
+         this._hold.acquire();
+         try {
+             this._activeServices.add(serviceName);
++
++            if (serviceName == FINGERPRINT_SERVICE_NAME)
++                this._fprintStartTime = GLib.get_monotonic_time();
++
+             if (this._userName) {
+                 await this._userVerifier.call_begin_verification_for_user(
+                     serviceName, this._userName, this._cancellable);
+@@ -764,6 +769,7 @@ export class ShellUserVerifier extends Signals.EventEmitter {
+                 const cancellable = this._cancellable;
+                 this._fingerprintFailedId = GLib.timeout_add(GLib.PRIORITY_DEFAULT,
+                     FINGERPRINT_ERROR_TIMEOUT_WAIT, () => {
++                        log("Generating _verificationFailed!");
+                         this._fingerprintFailedId = 0;
+                         if (!cancellable.is_cancelled())
+                             this._verificationFailed(serviceName, false);
+@@ -837,6 +843,18 @@ export class ShellUserVerifier extends Signals.EventEmitter {
+         if (serviceName === FINGERPRINT_SERVICE_NAME) {
+             if (this._fingerprintFailedId)
+                 GLib.source_remove(this._fingerprintFailedId);
++
++            // On Fedora we have the problem that fingerprint auth fails
++            // immediately if the PAM configuration has not been updated and no
++            // prints are enrolled.
++            // So, consider a verification failure within one second to be a service
++            // failure instead.
++            if (this._fprintStartTime > GLib.get_monotonic_time() - GLib.USEC_PER_SEC) {
++                log("Fingerprint service failed almost immediately, considering it unavailable.");
++                log("Please fix your configuration by running: authselect select --force sssd with-fingerprint with-silent-lastlog");
++                this._onServiceUnavailable(this._client, serviceName, null);
++                return;
++            }
+         }
+ 
+         // For Not Listed / enterprise logins, immediately reset
+-- 
+2.51.1
+

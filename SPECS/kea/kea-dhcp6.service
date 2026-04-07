@@ -1,0 +1,31 @@
+[Unit]
+Description=Kea DHCPv6 Server
+Documentation=man:kea-dhcp6(8)
+Wants=network-online.target
+After=network-online.target
+After=time-sync.target
+
+[Service]
+Type=notify
+User=kea
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+Environment="KEA_PIDFILE_DIR=/run/kea"
+Environment="KEA_LOCKFILE_DIR=/run/kea"
+#Environment="KEA_LOGGER_DESTINATION=/var/log/kea/early-startup.log"
+Environment="KEA_DHCP_DATA_DIR=/var/lib/kea"
+Environment="KEA_LOG_FILE_DIR=/var/log/kea"
+Environment="KEA_CONTROL_SOCKET_DIR=/run/kea"
+ConfigurationDirectory=kea
+ConfigurationDirectoryMode=0750
+RuntimeDirectory=kea
+RuntimeDirectoryPreserve=yes
+RuntimeDirectoryMode=0750
+LogsDirectory=kea
+LogsDirectoryMode=0750
+StateDirectory=kea
+StateDirectoryMode=0750
+ExecStart=/usr/sbin/kea-dhcp6 -c /etc/kea/kea-dhcp6.conf
+ExecReload=/usr/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target

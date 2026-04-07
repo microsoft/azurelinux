@@ -1,0 +1,18 @@
+diff -up mtools-4.0.9/mtools.conf.conf mtools-4.0.9/mtools.conf
+--- mtools-4.0.9/mtools.conf.conf	2009-03-01 00:01:03.000000000 +0100
++++ mtools-4.0.9/mtools.conf	2009-03-09 18:21:40.000000000 +0100
+@@ -16,11 +16,10 @@
+ 
+ # Example mtools.conf files.  Uncomment the lines which correspond to
+ # your architecture and comment out the "SAMPLE FILE" line below
+-SAMPLE FILE
+ 
+-# # Linux floppy drives
+-# drive a: file="/dev/fd0" exclusive
+-# drive b: file="/dev/fd1" exclusive
++# Linux floppy drives
++drive a: file="/dev/fd0" exclusive mformat_only
++drive b: file="/dev/fd1" exclusive mformat_only
+ 
+ # # First SCSI hard disk partition
+ # drive c: file="/dev/sda1"

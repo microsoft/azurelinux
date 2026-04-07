@@ -1,0 +1,31 @@
+From 6a8ff06728b64a1121a6179d891ab0baf3b9290b Mon Sep 17 00:00:00 2001
+From: Patrick Palka <ppalka@redhat.com>
+Date: Mon, 4 Dec 2023 09:27:13 -0500
+Subject: [PATCH] Adjust options to remove RPATH for Fedora package builds
+
+---
+ tools/build/src/tools/gcc.jam | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tools/build/src/tools/gcc.jam b/tools/build/src/tools/gcc.jam
+index c753afc23..e0b627726 100644
+--- a/tools/build/src/tools/gcc.jam
++++ b/tools/build/src/tools/gcc.jam
+@@ -1035,12 +1035,12 @@ rule link.dll ( targets * : sources * : properties * )
+ 
+ actions link bind LIBRARIES
+ {
+-    "$(CONFIG_COMMAND)" @($(<[1]:T).rsp:O=FC:<=@":>=":E=-L"$(LINKPATH)" -Wl,$(RPATH_OPTION:E=-R)$(SPACE)-Wl,$(RPATH) -Wl,-rpath-link$(SPACE)-Wl,"$(RPATH_LINK)" -o "$(<)" $(START-GROUP) "$(>:T)" "$(LIBRARIES)" $(FINDLIBS-ST-PFX) -l$(FINDLIBS-ST) $(FINDLIBS-SA-PFX) -l$(FINDLIBS-SA) $(END-GROUP) $(OPTIONS) $(USER_OPTIONS))
++    "$(CONFIG_COMMAND)" @($(<[1]:T).rsp:O=FC:<=@":>=":E=-L"$(LINKPATH)" -o "$(<)" $(START-GROUP) "$(>:T)" "$(LIBRARIES)" $(FINDLIBS-ST-PFX) -l$(FINDLIBS-ST) $(FINDLIBS-SA-PFX) -l$(FINDLIBS-SA) $(END-GROUP) $(OPTIONS) $(USER_OPTIONS))
+ }
+ 
+ actions link.dll bind LIBRARIES
+ {
+-    "$(CONFIG_COMMAND)" @($(<[1]:T).rsp:O=FC:<=@":>=":E=-L"$(LINKPATH)" -Wl,$(RPATH_OPTION:E=-R)$(SPACE)-Wl,$(RPATH) -Wl,$(IMPLIB_OPTION:E=--out-implib),"$(<[2])" -o "$(<[1])" $(HAVE_SONAME)-Wl,$(SONAME_OPTION)$(SPACE)-Wl,"$(SONAME_PREFIX:E=)$(<[1]:D=)" $(SHARED_OPTION:E=-shared) $(START-GROUP) "$(>:T)" "$(LIBRARIES)" $(FINDLIBS-ST-PFX) -l$(FINDLIBS-ST) $(FINDLIBS-SA-PFX) -l$(FINDLIBS-SA) $(END-GROUP) $(OPTIONS) $(USER_OPTIONS))
++    "$(CONFIG_COMMAND)" @($(<[1]:T).rsp:O=FC:<=@":>=":E=-L"$(LINKPATH)" -Wl,$(IMPLIB_OPTION:E=--out-implib),"$(<[2])" -o "$(<[1])" $(HAVE_SONAME)-Wl,$(SONAME_OPTION)$(SPACE)-Wl,"$(SONAME_PREFIX:E=)$(<[1]:D=)" $(SHARED_OPTION:E=-shared) $(START-GROUP) "$(>:T)" "$(LIBRARIES)" $(FINDLIBS-ST-PFX) -l$(FINDLIBS-ST) $(FINDLIBS-SA-PFX) -l$(FINDLIBS-SA) $(END-GROUP) $(OPTIONS) $(USER_OPTIONS))
+ }
+ 
+ ###
+-- 
+2.43.0
+

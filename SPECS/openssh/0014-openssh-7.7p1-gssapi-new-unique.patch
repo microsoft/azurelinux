@@ -1,0 +1,665 @@
+From 5fca5946aa97dce23c6824c52b070a92532752a9 Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:28 +0200
+Subject: [PATCH 14/50] openssh-7.7p1-gssapi-new-unique
+
+---
+ auth-krb5.c     | 262 ++++++++++++++++++++++++++++++++++++++++++------
+ auth.h          |   3 +-
+ gss-serv-krb5.c |  42 +++-----
+ gss-serv.c      |  10 +-
+ servconf.c      |  12 ++-
+ servconf.h      |   2 +
+ session.c       |   5 +-
+ ssh-gss.h       |   4 +-
+ sshd-session.c  |   2 +-
+ sshd_config.5   |   8 ++
+ 10 files changed, 279 insertions(+), 71 deletions(-)
+
+diff --git a/auth-krb5.c b/auth-krb5.c
+index c99e4e43..77714e3d 100644
+--- a/auth-krb5.c
++++ b/auth-krb5.c
+@@ -51,6 +51,7 @@
+ #include <unistd.h>
+ #include <string.h>
+ #include <krb5.h>
++#include <profile.h>
+ 
+ extern ServerOptions	 options;
+ 
+@@ -77,7 +78,7 @@ auth_krb5_password(Authctxt *authctxt, const char *password)
+ #endif
+ 	krb5_error_code problem;
+ 	krb5_ccache ccache = NULL;
+-	int len;
++	char *ticket_name = NULL;
+ 	char *client, *platform_client;
+ 	const char *errmsg;
+ 
+@@ -163,8 +164,8 @@ auth_krb5_password(Authctxt *authctxt, const char *password)
+ 		goto out;
+ 	}
+ 
+-	problem = ssh_krb5_cc_gen(authctxt->krb5_ctx,
+-	    &authctxt->krb5_fwd_ccache);
++	problem = ssh_krb5_cc_new_unique(authctxt->krb5_ctx,
++	     &authctxt->krb5_fwd_ccache, &authctxt->krb5_set_env);
+ 	if (problem)
+ 		goto out;
+ 
+@@ -179,15 +180,14 @@ auth_krb5_password(Authctxt *authctxt, const char *password)
+ 		goto out;
+ #endif
+ 
+-	authctxt->krb5_ticket_file = (char *)krb5_cc_get_name(authctxt->krb5_ctx, authctxt->krb5_fwd_ccache);
++	problem = krb5_cc_get_full_name(authctxt->krb5_ctx,
++	    authctxt->krb5_fwd_ccache, &ticket_name);
+ 
+-	len = strlen(authctxt->krb5_ticket_file) + 6;
+-	authctxt->krb5_ccname = xmalloc(len);
+-	snprintf(authctxt->krb5_ccname, len, "FILE:%s",
+-	    authctxt->krb5_ticket_file);
++	authctxt->krb5_ccname = xstrdup(ticket_name);
++	krb5_free_string(authctxt->krb5_ctx, ticket_name);
+ 
+ #ifdef USE_PAM
+-	if (options.use_pam)
++	if (options.use_pam && authctxt->krb5_set_env)
+ 		do_pam_putenv("KRB5CCNAME", authctxt->krb5_ccname);
+ #endif
+ 
+@@ -223,11 +223,54 @@ auth_krb5_password(Authctxt *authctxt, const char *password)
+ void
+ krb5_cleanup_proc(Authctxt *authctxt)
+ {
++	struct stat krb5_ccname_stat;
++	char krb5_ccname[128], *krb5_ccname_dir_start, *krb5_ccname_dir_end;
++
+ 	debug("krb5_cleanup_proc called");
+ 	if (authctxt->krb5_fwd_ccache) {
+-		krb5_cc_destroy(authctxt->krb5_ctx, authctxt->krb5_fwd_ccache);
++		krb5_context ctx = authctxt->krb5_ctx;
++		krb5_cccol_cursor cursor;
++		krb5_ccache ccache;
++		int ret;
++
++		krb5_cc_destroy(ctx, authctxt->krb5_fwd_ccache);
+ 		authctxt->krb5_fwd_ccache = NULL;
++
++		ret = krb5_cccol_cursor_new(ctx, &cursor);
++		if (ret)
++			goto out;
++
++		ret = krb5_cccol_cursor_next(ctx, cursor, &ccache);
++		if (ret == 0 && ccache != NULL) {
++			/* There is at least one other ccache in collection
++			 * we can switch to */
++			krb5_cc_switch(ctx, ccache);
++		} else if (authctxt->krb5_ccname != NULL) {
++			/* Clean up the collection too */
++			strncpy(krb5_ccname, authctxt->krb5_ccname, sizeof(krb5_ccname) - 10);
++			krb5_ccname_dir_start = strchr(krb5_ccname, ':') + 1;
++			*krb5_ccname_dir_start++ = '\0';
++			if (strcmp(krb5_ccname, "DIR") == 0) {
++
++				strcat(krb5_ccname_dir_start, "/primary");
++
++				if (stat(krb5_ccname_dir_start, &krb5_ccname_stat) == 0) {
++					if (unlink(krb5_ccname_dir_start) == 0) {
++						krb5_ccname_dir_end = strrchr(krb5_ccname_dir_start, '/');
++						*krb5_ccname_dir_end = '\0';
++						if (rmdir(krb5_ccname_dir_start) == -1)
++							debug("cache dir '%s' remove failed: %s",
++							    krb5_ccname_dir_start, strerror(errno));
++					}
++					else
++						debug("cache primary file '%s', remove failed: %s",
++						    krb5_ccname_dir_start, strerror(errno));
++				}
++			}
++		}
++		krb5_cccol_cursor_free(ctx, &cursor);
+ 	}
++out:
+ 	if (authctxt->krb5_user) {
+ 		krb5_free_principal(authctxt->krb5_ctx, authctxt->krb5_user);
+ 		authctxt->krb5_user = NULL;
+@@ -238,36 +281,189 @@ krb5_cleanup_proc(Authctxt *authctxt)
+ 	}
+ }
+ 
+-#ifndef HEIMDAL
+-krb5_error_code
+-ssh_krb5_cc_gen(krb5_context ctx, krb5_ccache *ccache) {
+-	int tmpfd, ret, oerrno;
+-	char ccname[40];
+-	mode_t old_umask;
+ 
+-	ret = snprintf(ccname, sizeof(ccname),
+-	    "FILE:/tmp/krb5cc_%d_XXXXXXXXXX", geteuid());
+-	if (ret < 0 || (size_t)ret >= sizeof(ccname))
+-		return ENOMEM;
+-
+-	old_umask = umask(0177);
+-	tmpfd = mkstemp(ccname + strlen("FILE:"));
+-	oerrno = errno;
+-	umask(old_umask);
+-	if (tmpfd == -1) {
+-		logit("mkstemp(): %.100s", strerror(oerrno));
+-		return oerrno;
++#if !defined(HEIMDAL)
++int
++ssh_asprintf_append(char **dsc, const char *fmt, ...) {
++	char *src, *old;
++	va_list ap;
++	int i;
++
++	va_start(ap, fmt);
++	i = vasprintf(&src, fmt, ap);
++	va_end(ap);
++
++	if (i == -1 || src == NULL)
++		return -1;
++
++	old = *dsc;
++
++	i = asprintf(dsc, "%s%s", *dsc, src);
++	if (i == -1) {
++		*dsc = old;
++		free(src);
++		return -1;
++	}
++
++	free(old);
++	free(src);
++
++	return i;
++}
++
++int
++ssh_krb5_expand_template(char **result, const char *template) {
++	char *p_n, *p_o, *r, *tmp_template;
++
++	debug3_f("called, template = %s", template);
++	if (template == NULL)
++		return -1;
++
++	tmp_template = p_n = p_o = xstrdup(template);
++	r = xstrdup("");
++
++	while ((p_n = strstr(p_o, "%{")) != NULL) {
++
++		*p_n++ = '\0';
++		if (ssh_asprintf_append(&r, "%s", p_o) == -1)
++			goto cleanup;
++
++		if (strncmp(p_n, "{uid}", 5) == 0 || strncmp(p_n, "{euid}", 6) == 0 ||
++			strncmp(p_n, "{USERID}", 8) == 0) {
++			p_o = strchr(p_n, '}') + 1;
++			if (ssh_asprintf_append(&r, "%d", geteuid()) == -1)
++				goto cleanup;
++			continue;
++		}
++		else if (strncmp(p_n, "{TEMP}", 6) == 0) {
++			p_o = strchr(p_n, '}') + 1;
++			if (ssh_asprintf_append(&r, "/tmp") == -1)
++				goto cleanup;
++			continue;
++		} else {
++			p_o = strchr(p_n, '}') + 1;
++			*p_o = '\0';
++			debug_f("unsupported token %s in %s", p_n, template);
++			/* unknown token, fallback to the default */
++			goto cleanup;
++		}
+ 	}
+ 
+-	if (fchmod(tmpfd,S_IRUSR | S_IWUSR) == -1) {
++	if (ssh_asprintf_append(&r, "%s", p_o) == -1)
++		goto cleanup;
++
++	*result = r;
++	free(tmp_template);
++	return 0;
++
++cleanup:
++	free(r);
++	free(tmp_template);
++	return -1;
++}
++
++krb5_error_code
++ssh_krb5_get_cctemplate(krb5_context ctx, char **ccname) {
++	profile_t p;
++	int ret = 0;
++	char *value = NULL;
++
++	debug3_f("called");
++	ret = krb5_get_profile(ctx, &p);
++	if (ret)
++		return ret;
++
++	ret = profile_get_string(p, "libdefaults", "default_ccache_name", NULL, NULL, &value);
++	if (ret || !value)
++		return ret;
++
++	ret = ssh_krb5_expand_template(ccname, value);
++
++	debug3_f("returning with ccname = %s", *ccname);
++	return ret;
++}
++
++krb5_error_code
++ssh_krb5_cc_new_unique(krb5_context ctx, krb5_ccache *ccache, int *need_environment) {
++	int tmpfd, ret, oerrno, type_len;
++	char *ccname = NULL;
++	mode_t old_umask;
++	char *type = NULL, *colon = NULL;
++
++	debug3_f("called");
++	if (need_environment)
++		*need_environment = 0;
++	ret = ssh_krb5_get_cctemplate(ctx, &ccname);
++	if (ret || !ccname || options.kerberos_unique_ccache) {
++		/* Otherwise, go with the old method */
++		if (ccname)
++			free(ccname);
++		ccname = NULL;
++
++		ret = asprintf(&ccname,
++		    "FILE:/tmp/krb5cc_%d_XXXXXXXXXX", geteuid());
++		if (ret < 0)
++			return ENOMEM;
++
++		old_umask = umask(0177);
++		tmpfd = mkstemp(ccname + strlen("FILE:"));
+ 		oerrno = errno;
+-		logit("fchmod(): %.100s", strerror(oerrno));
++		umask(old_umask);
++		if (tmpfd == -1) {
++			logit("mkstemp(): %.100s", strerror(oerrno));
++			return oerrno;
++		}
++
++		if (fchmod(tmpfd,S_IRUSR | S_IWUSR) == -1) {
++			oerrno = errno;
++			logit("fchmod(): %.100s", strerror(oerrno));
++			close(tmpfd);
++			return oerrno;
++		}
++		/* make sure the KRB5CCNAME is set for non-standard location */
++		if (need_environment)
++			*need_environment = 1;
+ 		close(tmpfd);
+-		return oerrno;
+ 	}
+-	close(tmpfd);
+ 
+-	return (krb5_cc_resolve(ctx, ccname, ccache));
++	debug3_f("setting default ccname to %s", ccname);
++	/* set the default with already expanded user IDs */
++	ret = krb5_cc_set_default_name(ctx, ccname);
++	if (ret)
++		return ret;
++
++	if ((colon = strstr(ccname, ":")) != NULL) {
++		type_len = colon - ccname;
++		type = malloc((type_len + 1) * sizeof(char));
++		if (type == NULL)
++			return ENOMEM;
++		strncpy(type, ccname, type_len);
++		type[type_len] = 0;
++	} else {
++		type = strdup(ccname);
++	}
++
++	/* If we have a credential cache from krb5.conf, we need to switch
++	 * a primary cache for this collection, if it supports that (non-FILE)
++	 */
++	if (krb5_cc_support_switch(ctx, type)) {
++		debug3_f("calling cc_new_unique(%s)", ccname);
++		ret = krb5_cc_new_unique(ctx, type, NULL, ccache);
++		free(type);
++		if (ret)
++			return ret;
++
++		debug3_f("calling cc_switch()");
++		return krb5_cc_switch(ctx, *ccache);
++	} else {
++		/* Otherwise, we can not create a unique ccname here (either
++		 * it is already unique from above or the type does not support
++		 * collections
++		 */
++		free(type);
++		debug3_f("calling cc_resolve(%s)", ccname);
++		return (krb5_cc_resolve(ctx, ccname, ccache));
++	}
+ }
+ #endif /* !HEIMDAL */
+ #endif /* KRB5 */
+diff --git a/auth.h b/auth.h
+index 83d07ae8..10e88e11 100644
+--- a/auth.h
++++ b/auth.h
+@@ -85,6 +85,7 @@ struct Authctxt {
+ 	krb5_principal	 krb5_user;
+ 	char		*krb5_ticket_file;
+ 	char		*krb5_ccname;
++	int		 krb5_set_env;
+ #endif
+ 	struct sshbuf	*loginmsg;
+ 
+@@ -245,7 +246,7 @@ FILE	*auth_openprincipals(const char *, struct passwd *, int);
+ int	 sys_auth_passwd(struct ssh *, const char *);
+ 
+ #if defined(KRB5) && !defined(HEIMDAL)
+-krb5_error_code ssh_krb5_cc_gen(krb5_context, krb5_ccache *);
++krb5_error_code ssh_krb5_cc_new_unique(krb5_context, krb5_ccache *, int *);
+ #endif
+ 
+ #endif /* AUTH_H */
+diff --git a/gss-serv-krb5.c b/gss-serv-krb5.c
+index 14502c5a..df55512d 100644
+--- a/gss-serv-krb5.c
++++ b/gss-serv-krb5.c
+@@ -267,7 +267,7 @@ ssh_gssapi_krb5_cmdok(krb5_principal principal, const char *name,
+ /* This writes out any forwarded credentials from the structure populated
+  * during userauth. Called after we have setuid to the user */
+ 
+-static void
++static int
+ ssh_gssapi_krb5_storecreds(ssh_gssapi_client *client)
+ {
+ 	krb5_ccache ccache;
+@@ -276,14 +276,15 @@ ssh_gssapi_krb5_storecreds(ssh_gssapi_client *client)
+ 	OM_uint32 maj_status, min_status;
+ 	const char *new_ccname, *new_cctype;
+ 	const char *errmsg;
++	int set_env = 0;
+ 
+ 	if (client->creds == NULL) {
+ 		debug("No credentials stored");
+-		return;
++		return 0;
+ 	}
+ 
+ 	if (ssh_gssapi_krb5_init() == 0)
+-		return;
++		return 0;
+ 
+ #ifdef HEIMDAL
+ # ifdef HAVE_KRB5_CC_NEW_UNIQUE
+@@ -297,14 +298,14 @@ ssh_gssapi_krb5_storecreds(ssh_gssapi_client *client)
+ 		krb5_get_err_text(krb_context, problem));
+ # endif
+ 		krb5_free_error_message(krb_context, errmsg);
+-		return;
++		return 0;
+ 	}
+ #else
+-	if ((problem = ssh_krb5_cc_gen(krb_context, &ccache))) {
++	if ((problem = ssh_krb5_cc_new_unique(krb_context, &ccache, &set_env)) != 0) {
+ 		errmsg = krb5_get_error_message(krb_context, problem);
+-		logit("ssh_krb5_cc_gen(): %.100s", errmsg);
++		logit("ssh_krb5_cc_new_unique(): %.100s", errmsg);
+ 		krb5_free_error_message(krb_context, errmsg);
+-		return;
++		return 0;
+ 	}
+ #endif	/* #ifdef HEIMDAL */
+ 
+@@ -313,7 +314,7 @@ ssh_gssapi_krb5_storecreds(ssh_gssapi_client *client)
+ 		errmsg = krb5_get_error_message(krb_context, problem);
+ 		logit("krb5_parse_name(): %.100s", errmsg);
+ 		krb5_free_error_message(krb_context, errmsg);
+-		return;
++		return 0;
+ 	}
+ 
+ 	if ((problem = krb5_cc_initialize(krb_context, ccache, princ))) {
+@@ -322,7 +323,7 @@ ssh_gssapi_krb5_storecreds(ssh_gssapi_client *client)
+ 		krb5_free_error_message(krb_context, errmsg);
+ 		krb5_free_principal(krb_context, princ);
+ 		krb5_cc_destroy(krb_context, ccache);
+-		return;
++		return 0;
+ 	}
+ 
+ 	krb5_free_principal(krb_context, princ);
+@@ -331,32 +332,21 @@ ssh_gssapi_krb5_storecreds(ssh_gssapi_client *client)
+ 	    client->creds, ccache))) {
+ 		logit("gss_krb5_copy_ccache() failed");
+ 		krb5_cc_destroy(krb_context, ccache);
+-		return;
++		return 0;
+ 	}
+ 
+ 	new_cctype = krb5_cc_get_type(krb_context, ccache);
+ 	new_ccname = krb5_cc_get_name(krb_context, ccache);
+-
+-	client->store.envvar = "KRB5CCNAME";
+-#ifdef USE_CCAPI
+-	xasprintf(&client->store.envval, "API:%s", new_ccname);
+-	client->store.filename = NULL;
+-#else
+-	if (new_ccname[0] == ':')
+-		new_ccname++;
+ 	xasprintf(&client->store.envval, "%s:%s", new_cctype, new_ccname);
+-	if (strcmp(new_cctype, "DIR") == 0) {
+-		char *p;
+-		p = strrchr(client->store.envval, '/');
+-		if (p)
+-			*p = '\0';
++
++	if (set_env) {
++		client->store.envvar = "KRB5CCNAME";
+ 	}
+ 	if ((strcmp(new_cctype, "FILE") == 0) || (strcmp(new_cctype, "DIR") == 0))
+ 		client->store.filename = xstrdup(new_ccname);
+-#endif
+ 
+ #ifdef USE_PAM
+-	if (options.use_pam)
++	if (options.use_pam && set_env)
+ 		do_pam_putenv(client->store.envvar, client->store.envval);
+ #endif
+ 
+@@ -364,7 +354,7 @@ ssh_gssapi_krb5_storecreds(ssh_gssapi_client *client)
+ 
+ 	client->store.data = krb_context;
+ 
+-	return;
++	return set_env;
+ }
+ 
+ int
+diff --git a/gss-serv.c b/gss-serv.c
+index a5cca797..9d5435ed 100644
+--- a/gss-serv.c
++++ b/gss-serv.c
+@@ -414,13 +414,15 @@ ssh_gssapi_cleanup_creds(void)
+ }
+ 
+ /* As user */
+-void
++int
+ ssh_gssapi_storecreds(void)
+ {
+ 	if (gssapi_client.mech && gssapi_client.mech->storecreds) {
+-		(*gssapi_client.mech->storecreds)(&gssapi_client);
++		return (*gssapi_client.mech->storecreds)(&gssapi_client);
+ 	} else
+ 		debug("ssh_gssapi_storecreds: Not a GSSAPI mechanism");
++
++	return 0;
+ }
+ 
+ /* This allows GSSAPI methods to do things to the child's environment based
+@@ -500,9 +502,7 @@ ssh_gssapi_rekey_creds(void) {
+ 	char *envstr;
+ #endif
+ 
+-	if (gssapi_client.store.filename == NULL &&
+-	    gssapi_client.store.envval == NULL &&
+-	    gssapi_client.store.envvar == NULL)
++	if (gssapi_client.store.envval == NULL)
+ 		return;
+ 
+ 	ok = mm_ssh_gssapi_update_creds(&gssapi_client.store);
+diff --git a/servconf.c b/servconf.c
+index d4f7fd66..55aa5bf0 100644
+--- a/servconf.c
++++ b/servconf.c
+@@ -138,6 +138,7 @@ initialize_server_options(ServerOptions *options)
+ 	options->kerberos_or_local_passwd = -1;
+ 	options->kerberos_ticket_cleanup = -1;
+ 	options->kerberos_get_afs_token = -1;
++	options->kerberos_unique_ccache = -1;
+ 	options->gss_authentication=-1;
+ 	options->gss_keyex = -1;
+ 	options->gss_cleanup_creds = -1;
+@@ -382,6 +383,8 @@ fill_default_server_options(ServerOptions *options)
+ 		options->kerberos_ticket_cleanup = 1;
+ 	if (options->kerberos_get_afs_token == -1)
+ 		options->kerberos_get_afs_token = 0;
++	if (options->kerberos_unique_ccache == -1)
++		options->kerberos_unique_ccache = 0;
+ 	if (options->gss_authentication == -1)
+ 		options->gss_authentication = 0;
+ 	if (options->gss_keyex == -1)
+@@ -564,7 +567,7 @@ typedef enum {
+ 	sPort, sHostKeyFile, sLoginGraceTime,
+ 	sPermitRootLogin, sLogFacility, sLogLevel, sLogVerbose,
+ 	sKerberosAuthentication, sKerberosOrLocalPasswd, sKerberosTicketCleanup,
+-	sKerberosGetAFSToken, sPasswordAuthentication,
++	sKerberosGetAFSToken, sKerberosUniqueCCache, sPasswordAuthentication,
+ 	sKbdInteractiveAuthentication, sListenAddress, sAddressFamily,
+ 	sPrintMotd, sPrintLastLog, sIgnoreRhosts,
+ 	sX11Forwarding, sX11DisplayOffset, sX11UseLocalhost,
+@@ -655,11 +658,13 @@ static struct {
+ #else
+ 	{ "kerberosgetafstoken", sUnsupported, SSHCFG_GLOBAL },
+ #endif
++	{ "kerberosuniqueccache", sKerberosUniqueCCache, SSHCFG_GLOBAL },
+ #else
+ 	{ "kerberosauthentication", sUnsupported, SSHCFG_ALL },
+ 	{ "kerberosorlocalpasswd", sUnsupported, SSHCFG_GLOBAL },
+ 	{ "kerberosticketcleanup", sUnsupported, SSHCFG_GLOBAL },
+ 	{ "kerberosgetafstoken", sUnsupported, SSHCFG_GLOBAL },
++	{ "kerberosuniqueccache", sUnsupported, SSHCFG_GLOBAL },
+ #endif
+ 	{ "kerberostgtpassing", sUnsupported, SSHCFG_GLOBAL },
+ 	{ "afstokenpassing", sUnsupported, SSHCFG_GLOBAL },
+@@ -1668,6 +1673,10 @@ process_server_config_line_depth(ServerOptions *options, char *line,
+ 		intptr = &options->kerberos_get_afs_token;
+ 		goto parse_flag;
+ 
++	case sKerberosUniqueCCache:
++		intptr = &options->kerberos_unique_ccache;
++		goto parse_flag;
++
+ 	case sGssAuthentication:
+ 		intptr = &options->gss_authentication;
+ 		goto parse_flag;
+@@ -3293,6 +3302,7 @@ dump_config(ServerOptions *o)
+ # ifdef USE_AFS
+ 	dump_cfg_fmtint(sKerberosGetAFSToken, o->kerberos_get_afs_token);
+ # endif
++	dump_cfg_fmtint(sKerberosUniqueCCache, o->kerberos_unique_ccache);
+ #endif
+ #ifdef GSSAPI
+ 	dump_cfg_fmtint(sGssAuthentication, o->gss_authentication);
+diff --git a/servconf.h b/servconf.h
+index c3f50140..a4a38d6d 100644
+--- a/servconf.h
++++ b/servconf.h
+@@ -149,6 +149,8 @@ typedef struct {
+ 						 * file on logout. */
+ 	int     kerberos_get_afs_token;		/* If true, try to get AFS token if
+ 						 * authenticated with Kerberos. */
++	int     kerberos_unique_ccache;		/* If true, the acquired ticket will
++						 * be stored in per-session ccache */
+ 	int     gss_authentication;	/* If true, permit GSSAPI authentication */
+ 	int     gss_keyex;		/* If true, permit GSSAPI key exchange */
+ 	int     gss_cleanup_creds;	/* If true, destroy cred cache on logout */
+diff --git a/session.c b/session.c
+index 89b3a9cf..2620dd11 100644
+--- a/session.c
++++ b/session.c
+@@ -1025,7 +1025,8 @@ do_setup_env(struct ssh *ssh, Session *s, const char *shell)
+ 	/* Allow any GSSAPI methods that we've used to alter
+ 	 * the child's environment as they see fit
+ 	 */
+-	ssh_gssapi_do_child(&env, &envsize);
++	if (s->authctxt->krb5_set_env)
++		ssh_gssapi_do_child(&env, &envsize);
+ #endif
+ 
+ 	/* Set basic environment. */
+@@ -1101,7 +1102,7 @@ do_setup_env(struct ssh *ssh, Session *s, const char *shell)
+ 	}
+ #endif
+ #ifdef KRB5
+-	if (s->authctxt->krb5_ccname)
++	if (s->authctxt->krb5_ccname && s->authctxt->krb5_set_env)
+ 		child_set_env(&env, &envsize, "KRB5CCNAME",
+ 		    s->authctxt->krb5_ccname);
+ #endif
+diff --git a/ssh-gss.h b/ssh-gss.h
+index db34d77f..a894e23c 100644
+--- a/ssh-gss.h
++++ b/ssh-gss.h
+@@ -116,7 +116,7 @@ typedef struct ssh_gssapi_mech_struct {
+ 	int (*dochild) (ssh_gssapi_client *);
+ 	int (*userok) (ssh_gssapi_client *, char *);
+ 	int (*localname) (ssh_gssapi_client *, char **);
+-	void (*storecreds) (ssh_gssapi_client *);
++	int (*storecreds) (ssh_gssapi_client *);
+ 	int (*updatecreds) (ssh_gssapi_ccache *, ssh_gssapi_client *);
+ } ssh_gssapi_mech;
+ 
+@@ -186,7 +186,7 @@ int ssh_gssapi_userok(char *name, struct passwd *, int kex);
+ OM_uint32 ssh_gssapi_checkmic(Gssctxt *, gss_buffer_t, gss_buffer_t);
+ void ssh_gssapi_do_child(char ***, u_int *);
+ void ssh_gssapi_cleanup_creds(void);
+-void ssh_gssapi_storecreds(void);
++int ssh_gssapi_storecreds(void);
+ const char *ssh_gssapi_displayname(void);
+ 
+ char *ssh_gssapi_server_mechanisms(void);
+diff --git a/sshd-session.c b/sshd-session.c
+index f8c8a797..478381db 100644
+--- a/sshd-session.c
++++ b/sshd-session.c
+@@ -1349,7 +1349,7 @@ main(int ac, char **av)
+ #ifdef GSSAPI
+ 	if (options.gss_authentication) {
+ 		temporarily_use_uid(authctxt->pw);
+-		ssh_gssapi_storecreds();
++		authctxt->krb5_set_env = ssh_gssapi_storecreds();
+ 		restore_uid();
+ 	}
+ #endif
+diff --git a/sshd_config.5 b/sshd_config.5
+index 8bc6586e..1251d4d5 100644
+--- a/sshd_config.5
++++ b/sshd_config.5
+@@ -1033,6 +1033,14 @@ Specifies whether to automatically destroy the user's ticket cache
+ file on logout.
+ The default is
+ .Cm yes .
++.It Cm KerberosUniqueCCache
++Specifies whether to store the acquired tickets in the per-session credential
++cache under /tmp/ or whether to use per-user credential cache as configured in
++.Pa /etc/krb5.conf .
++The default value
++.Cm no
++can lead to overwriting previous tickets by subseqent connections to the same
++user account.
+ .It Cm KexAlgorithms
+ Specifies the permitted KEX (Key Exchange) algorithms that the server will
+ offer to clients.
+-- 
+2.49.0
+

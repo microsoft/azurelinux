@@ -1,0 +1,8 @@
+--- astral-version-ranges-0.1.4/Cargo.toml	1970-01-01T00:00:01+00:00
++++ astral-version-ranges-0.1.4/Cargo.toml	2025-12-03T07:14:41.837034+00:00
+@@ -64,4 +64,4 @@
+ version = "1.6.0"
+ 
+ [dev-dependencies.ron]
+-version = "0.12.0"
++version = ">=0.10.0, <0.13.0"

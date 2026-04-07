@@ -1,0 +1,37 @@
+From 6ea0e48ac56fc2c5e8600b5313f6c49b553c946b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 14 Mar 2017 09:45:12 +0100
+Subject: [PATCH] Remove shell bangs
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ examples/analyze_tests.pl  | 2 --
+ examples/silent-harness.pl | 2 --
+ 2 files changed, 4 deletions(-)
+
+diff --git a/examples/analyze_tests.pl b/examples/analyze_tests.pl
+index c821f98..4076d9b 100644
+--- a/examples/analyze_tests.pl
++++ b/examples/analyze_tests.pl
+@@ -1,5 +1,3 @@
+-#!/usr/bin/env perl
+-
+ use strict;
+ use warnings;
+ 
+diff --git a/examples/silent-harness.pl b/examples/silent-harness.pl
+index ae0e50e..6e477ed 100644
+--- a/examples/silent-harness.pl
++++ b/examples/silent-harness.pl
+@@ -1,5 +1,3 @@
+-#!/usr/bin/perl
+-#
+ # Run some tests and get back a data structure describing them.
+ 
+ use strict;
+-- 
+2.7.4
+

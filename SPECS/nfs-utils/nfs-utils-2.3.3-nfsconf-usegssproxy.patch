@@ -1,0 +1,21 @@
+diff -up nfs-utils-2.6.4/nfs.conf.orig nfs-utils-2.6.4/nfs.conf
+--- nfs-utils-2.6.4/nfs.conf.orig	2024-03-15 06:59:12.618366203 -0400
++++ nfs-utils-2.6.4/nfs.conf	2024-03-15 07:00:26.279684870 -0400
+@@ -20,7 +20,7 @@
+ # rpc-verbosity=0
+ # use-memcache=0
+ # use-machine-creds=1
+-# use-gss-proxy=0
++use-gss-proxy=1
+ # avoid-dns=1
+ # limit-to-legacy-enctypes=0
+ # allowed-enctypes=aes256-cts-hmac-sha384-192,aes128-cts-hmac-sha256-128,camellia256-cts-cmac,camellia128-cts-cmac,aes256-cts-hmac-sha1-96,aes128-cts-hmac-sha1-96
+@@ -97,6 +97,5 @@ rdma-port=20049
+ # outgoing-port=
+ # outgoing-addr=
+ # lift-grace=y
+-#
+-[svcgssd]
+-# principal=
++
++#tag1234 - Used for install purposes only 

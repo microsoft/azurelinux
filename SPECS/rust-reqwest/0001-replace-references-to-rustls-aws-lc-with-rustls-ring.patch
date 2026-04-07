@@ -1,0 +1,31 @@
+From 8e5b600a5dd198b73bd02890eb5174cd6ec51604 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Fri, 9 Jan 2026 12:48:45 +0100
+Subject: [PATCH] replace references to rustls/aws-lc with rustls/ring
+
+---
+ src/async_impl/client.rs | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/async_impl/client.rs b/src/async_impl/client.rs
+index 9b46bed..8214263 100644
+--- a/src/async_impl/client.rs
++++ b/src/async_impl/client.rs
+@@ -2446,11 +2446,11 @@ impl Default for Client {
+ 
+ #[cfg(feature = "__rustls")]
+ fn default_rustls_crypto_provider() -> Arc<rustls::crypto::CryptoProvider> {
+-    #[cfg(not(feature = "__rustls-aws-lc-rs"))]
++    #[cfg(not(feature = "__rustls-ring"))]
+     panic!("No provider set");
+ 
+-    #[cfg(feature = "__rustls-aws-lc-rs")]
+-    Arc::new(rustls::crypto::aws_lc_rs::default_provider())
++    #[cfg(feature = "__rustls-ring")]
++    Arc::new(rustls::crypto::ring::default_provider())
+ }
+ 
+ impl Client {
+-- 
+2.52.0
+

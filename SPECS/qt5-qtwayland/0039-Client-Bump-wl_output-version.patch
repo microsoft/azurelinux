@@ -1,0 +1,30 @@
+From 9e9c9e8aa7a490960e65067e21587df95d9a690f Mon Sep 17 00:00:00 2001
+From: Vlad Zahorodnii <vlad.zahorodnii@kde.org>
+Date: Tue, 22 Nov 2022 12:33:41 +0200
+Subject: [PATCH 39/55] Client: Bump wl_output version
+
+wl_output_release is available starting with wl_output v3.
+
+Change-Id: I21822b26728ffb9318f1f8b4bd82ef7329682838
+Reviewed-by: David Edmundson <davidedmundson@kde.org>
+(cherry picked from commit c14916f5fd84f6b5483024b3df77592661a0f04e)
+---
+ src/client/qwaylandscreen.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/client/qwaylandscreen.cpp b/src/client/qwaylandscreen.cpp
+index 64ae4fe7..5537dafd 100644
+--- a/src/client/qwaylandscreen.cpp
++++ b/src/client/qwaylandscreen.cpp
+@@ -60,7 +60,7 @@ QWaylandXdgOutputManagerV1::QWaylandXdgOutputManagerV1(QWaylandDisplay* display,
+ }
+ 
+ QWaylandScreen::QWaylandScreen(QWaylandDisplay *waylandDisplay, int version, uint32_t id)
+-    : QtWayland::wl_output(waylandDisplay->wl_registry(), id, qMin(version, 2))
++    : QtWayland::wl_output(waylandDisplay->wl_registry(), id, qMin(version, 3))
+     , m_outputId(id)
+     , mWaylandDisplay(waylandDisplay)
+     , mOutputName(QStringLiteral("Screen%1").arg(id))
+-- 
+2.51.1
+

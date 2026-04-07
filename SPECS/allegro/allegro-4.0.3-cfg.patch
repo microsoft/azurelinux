@@ -1,0 +1,50 @@
+--- allegro-4.2.0/allegro.cfg.config	2005-05-13 20:37:56.000000000 +0200
++++ allegro-4.2.0/allegro.cfg	2006-01-25 10:49:42.000000000 +0100
+@@ -548,7 +548,7 @@
+ 
+ 
+ # patch set for the DIGMID software wavetable driver
+-patches = 
++patches = /etc/timidity.cfg
+ 
+ 
+ 
+@@ -647,22 +647,21 @@
+ 
+ 
+ # edit these shell commands to whatever helper programs you want to use...
+-data = start /w notepad
+-bmp = start /w "c:\program files\accessories\mspaint.exe"
+-rle = start /w "c:\program files\accessories\mspaint.exe"
+-cmp = start /w "c:\program files\accessories\mspaint.exe"
+-xcmp = start /w "c:\program files\accessories\mspaint.exe"
+-pal = start /w "c:\program files\accessories\mspaint.exe"
+-font = start /w "c:\program files\accessories\mspaint.exe"
+-samp = start /w "c:\program files\cooledit\cool.exe"
+-midi = start /w "c:\program files\cakewalk\wincake.exe"
++# data = start /w notepad
++# bmp = start /w "c:\program files\accessories\mspaint.exe"
++# rle = start /w "c:\program files\accessories\mspaint.exe"
++# cmp = start /w "c:\program files\accessories\mspaint.exe"
++# xcmp = start /w "c:\program files\accessories\mspaint.exe"
++# pal = start /w "c:\program files\accessories\mspaint.exe"
++# font = start /w "c:\program files\accessories\mspaint.exe"
++# samp = start /w "c:\program files\cooledit\cool.exe"
++# midi = start /w "c:\program files\cakewalk\wincake.exe"
+ 
+ # or if you are using Linux you might prefer something more like:
+-#
+-# data = xterm -e fed -b
+-# bmp = gimp
+-# rle = gimp
+-# cmp = gimp
+-# xcmp = gimp
+-# pal = gimp
+-# font = gimp
++data = xterm -e vim -b
++bmp = gimp
++rle = gimp
++cmp = gimp
++xcmp = gimp
++pal = gimp
++font = gimp

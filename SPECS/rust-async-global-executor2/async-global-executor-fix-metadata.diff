@@ -1,0 +1,31 @@
+--- async-global-executor-2.4.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ async-global-executor-2.4.1/Cargo.toml	2024-01-05T20:49:33.007689+00:00
+@@ -64,28 +64,9 @@
+ default-features = false
+ package = "tokio"
+ 
+-[dependencies.tokio02-crate]
+-version = "^0.2"
+-features = ["rt-core"]
+-optional = true
+-default-features = false
+-package = "tokio"
+-
+-[dependencies.tokio03-crate]
+-version = "^0.3.4"
+-features = [
+-    "rt",
+-    "rt-multi-thread",
+-]
+-optional = true
+-default-features = false
+-package = "tokio"
+-
+ [dev-dependencies.doc-comment]
+ version = "^0.3"
+ 
+ [features]
+ default = ["async-io"]
+ tokio = ["tokio-crate"]
+-tokio02 = ["tokio02-crate"]
+-tokio03 = ["tokio03-crate"]

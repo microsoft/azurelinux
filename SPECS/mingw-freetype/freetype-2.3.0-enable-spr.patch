@@ -1,0 +1,12 @@
+diff -rupN --no-dereference freetype-2.13.3/include/freetype/config/ftoption.h freetype-2.13.3-new/include/freetype/config/ftoption.h
+--- freetype-2.13.3/include/freetype/config/ftoption.h	2024-07-18 09:14:58.000000000 +0200
++++ freetype-2.13.3-new/include/freetype/config/ftoption.h	2024-10-10 09:57:06.583345661 +0200
+@@ -123,7 +123,7 @@ FT_BEGIN_HEADER
+    * When this macro is not defined, FreeType offers alternative LCD
+    * rendering technology that produces excellent output.
+    */
+-/* #define FT_CONFIG_OPTION_SUBPIXEL_RENDERING */
++#define FT_CONFIG_OPTION_SUBPIXEL_RENDERING
+ 
+ 
+   /**************************************************************************

@@ -1,0 +1,43 @@
+From 3a3502cf4661f225e1c19fcf9d160de2be431cc4 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Wed, 11 Jun 2025 06:31:10 -0400
+Subject: [PATCH] In tests, adapt a couple of expected messages for Python 3.14
+
+---
+ skimage/_shared/tests/test_utils.py | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
+
+diff --git a/skimage/_shared/tests/test_utils.py b/skimage/_shared/tests/test_utils.py
+index a1e21e3b9cd..9b976a09657 100644
+--- a/skimage/_shared/tests/test_utils.py
++++ b/skimage/_shared/tests/test_utils.py
+@@ -470,13 +470,27 @@ def test_wrong_call_signature(self):
+                 _func_deprecated_params(1, 2, old0=2)
+ 
+     def test_wrong_param_name(self):
+-        with pytest.raises(ValueError, match="'old' is not in list"):
++        with pytest.raises(
++            ValueError,
++            match=(
++                r"list.index\(x\): x not in list"
++                if sys.version_info >= (3, 14)
++                else "'old' is not in list"
++            ),
++        ):
+ 
+             @deprecate_parameter("old", start_version="0.10", stop_version="0.12")
+             def foo(arg0):
+                 pass
+ 
+-        with pytest.raises(ValueError, match="'new' is not in list"):
++        with pytest.raises(
++            ValueError,
++            match=(
++                r"list.index\(x\): x not in list"
++                if sys.version_info >= (3, 14)
++                else "'new' is not in list"
++            ),
++        ):
+ 
+             @deprecate_parameter(
+                 "old", new_name="new", start_version="0.10", stop_version="0.12"

@@ -1,0 +1,32 @@
+--- cookie-factory-0.3.3/Cargo.toml	1970-01-01T00:00:01+00:00
++++ cookie-factory-0.3.3/Cargo.toml	2024-11-21T00:12:47.014123+00:00
+@@ -43,29 +43,6 @@
+ codegen-units = 1
+ debug = 2
+ 
+-[[example]]
+-name = "http"
+-path = "examples/http.rs"
+-required-features = ["std"]
+-
+-[[example]]
+-name = "async_http"
+-path = "examples/async_http.rs"
+-required-features = [
+-    "std",
+-    "async",
+-]
+-
+-[[example]]
+-name = "cursor"
+-path = "examples/cursor.rs"
+-required-features = ["std"]
+-
+-[[test]]
+-name = "http"
+-path = "tests/http.rs"
+-required-features = ["std"]
+-
+ [dependencies.futures]
+ version = "0.3.16"
+ optional = true

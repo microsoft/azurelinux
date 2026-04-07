@@ -1,0 +1,17 @@
+[Unit]
+Description=Intel MPA Registration
+After=auditd.service
+ConditionPathExists=/dev/sgx_enclave
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/mpa_registration
+
+InaccessibleDirectories=/home
+DevicePolicy=closed
+DeviceAllow=/dev/sgx_enclave rw
+DeviceAllow=/dev/sgx_provision rw
+
+[Install]
+WantedBy=multi-user.target

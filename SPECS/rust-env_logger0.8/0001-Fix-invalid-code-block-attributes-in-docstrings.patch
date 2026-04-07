@@ -1,0 +1,65 @@
+From 9a0a0449e55ac9beb274c4a5a6452dcf9eda4c6c Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Thu, 8 Aug 2024 17:28:23 +0200
+Subject: [PATCH] Fix invalid code block attributes in docstrings
+
+---
+ src/lib.rs | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index 6a77266..bed2641 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -36,18 +36,18 @@
+ //!
+ //! Assumes the binary is `main`:
+ //!
+-//! ```{.bash}
++//! ```console
+ //! $ RUST_LOG=error ./main
+ //! [2017-11-09T02:12:24Z ERROR main] this is printed by default
+ //! ```
+ //!
+-//! ```{.bash}
++//! ```console
+ //! $ RUST_LOG=info ./main
+ //! [2017-11-09T02:12:24Z ERROR main] this is printed by default
+ //! [2017-11-09T02:12:24Z INFO main] the answer was: 12
+ //! ```
+ //!
+-//! ```{.bash}
++//! ```console
+ //! $ RUST_LOG=debug ./main
+ //! [2017-11-09T02:12:24Z DEBUG main] this is a debug message
+ //! [2017-11-09T02:12:24Z ERROR main] this is printed by default
+@@ -56,7 +56,7 @@
+ //!
+ //! You can also set the log level on a per module basis:
+ //!
+-//! ```{.bash}
++//! ```console
+ //! $ RUST_LOG=main=info ./main
+ //! [2017-11-09T02:12:24Z ERROR main] this is printed by default
+ //! [2017-11-09T02:12:24Z INFO main] the answer was: 12
+@@ -64,7 +64,7 @@
+ //!
+ //! And enable all logging:
+ //!
+-//! ```{.bash}
++//! ```console
+ //! $ RUST_LOG=main ./main
+ //! [2017-11-09T02:12:24Z DEBUG main] this is a debug message
+ //! [2017-11-09T02:12:24Z ERROR main] this is printed by default
+@@ -74,7 +74,7 @@
+ //! If the binary name contains hyphens, you will need to replace
+ //! them with underscores:
+ //!
+-//! ```{.bash}
++//! ```console
+ //! $ RUST_LOG=my_app ./my-app
+ //! [2017-11-09T02:12:24Z DEBUG my_app] this is a debug message
+ //! [2017-11-09T02:12:24Z ERROR my_app] this is printed by default
+-- 
+2.46.0
+

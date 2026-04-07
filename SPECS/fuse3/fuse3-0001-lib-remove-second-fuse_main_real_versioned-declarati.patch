@@ -1,0 +1,33 @@
+From: Ben Dooks <ben.dooks@codethink.co.uk>
+Date: Wed, 9 Apr 2025 07:38:45 +0100
+Subject: [PATCH] lib: remove second fuse_main_real_versioned declaration
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Newer gccs now use -Werror=redundant-decls which means that anyone
+including fuse.h is getting an error of:
+
+/usr/include/fuse3/fuse.h:959:5: error: redundant redeclaration of ‘fuse_main_real_versioned’ [-Werror=redundant-decls]
+  959 | int fuse_main_real_versioned(int argc, char *argv[],
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/fuse3/fuse.h:885:5: note: previous declaration of ‘fuse_main_real_versioned’ with type ‘int(int,  char **, const struct fuse_operations *, size_t,  struct libfuse_version *, void *)’ {aka ‘int(int,  char **, const struct fuse_operations *, long unsigned int,  struct libfuse_version *, void *)’}
+  885 | int fuse_main_real_versioned(int argc, char *argv[],
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~
+
+Signed-off-by: Ben Dooks <ben.dooks@codethink.co.uk>
+
+diff --git a/include/fuse.h b/include/fuse.h
+index c94b628..4582cc7 100644
+--- a/include/fuse.h
++++ b/include/fuse.h
+@@ -956,9 +956,6 @@ static inline int fuse_main_real(int argc, char *argv[],
+  *
+  * Example usage, see hello.c
+  */
+-int fuse_main_real_versioned(int argc, char *argv[],
+-			     const struct fuse_operations *op, size_t op_size,
+-			     struct libfuse_version *version, void *user_data);
+ static inline int fuse_main_fn(int argc, char *argv[],
+ 			       const struct fuse_operations *op,
+ 			       void *user_data)

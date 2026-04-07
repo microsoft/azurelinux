@@ -1,0 +1,84 @@
+diff --git a/include/pecoff.h b/include/pecoff.h
+index 537d134..6ac57d1 100644
+--- a/include/pecoff.h
++++ b/include/pecoff.h
+@@ -1,7 +1,8 @@
+ #include <PeImage.h>
+ 
+ EFI_STATUS
+-pecoff_read_header(PE_COFF_LOADER_IMAGE_CONTEXT *context, void *data);
++pecoff_read_header(PE_COFF_LOADER_IMAGE_CONTEXT *context, void *data,
++		   UINTN size);
+ EFI_STATUS
+ pecoff_relocate(PE_COFF_LOADER_IMAGE_CONTEXT *context, void **data);
+ EFI_STATUS
+diff --git a/lib/pecoff.c b/lib/pecoff.c
+index 26d9dcf..96878b9 100644
+--- a/lib/pecoff.c
++++ b/lib/pecoff.c
+@@ -69,7 +69,7 @@
+ #include <buildefi.h>
+ 
+ EFI_STATUS
+-pecoff_read_header(PE_COFF_LOADER_IMAGE_CONTEXT *context, void *data)
++pecoff_read_header(PE_COFF_LOADER_IMAGE_CONTEXT *context, void *data, UINTN size)
+ {
+ 	EFI_IMAGE_DOS_HEADER *DosHdr = data;
+ 	EFI_IMAGE_OPTIONAL_HEADER_UNION *PEHdr = data;
+@@ -116,7 +116,7 @@ pecoff_read_header(PE_COFF_LOADER_IMAGE_CONTEXT *context, void *data)
+ 	context->NumberOfSections = PEHdr->Pe32.FileHeader.NumberOfSections;
+ 	context->FirstSection = (EFI_IMAGE_SECTION_HEADER *)((char *)PEHdr + PEHdr->Pe32.FileHeader.SizeOfOptionalHeader + sizeof(UINT32) + sizeof(EFI_IMAGE_FILE_HEADER));
+ 
+-	if (context->SecDir->VirtualAddress >= context->ImageSize) {
++	if (context->SecDir->VirtualAddress >= size) {
+ 		Print(L"Malformed security header\n");
+ 		return EFI_INVALID_PARAMETER;
+ 	}
+@@ -404,7 +404,7 @@ pecoff_execute_image(EFI_FILE *file, CHAR16 *name, EFI_HANDLE image,
+ 	}
+ 
+ 	Print(L"Read %d bytes from %s\n", DataSize, name);
+-	efi_status = pecoff_read_header(&context, buffer);
++	efi_status = pecoff_read_header(&context, buffer, DataSize);
+ 	if (efi_status != EFI_SUCCESS) {
+ 		Print(L"Failed to read header\n");
+ 		goto out;
+diff --git a/lib/pkcs7verify.c b/lib/pkcs7verify.c
+index 06701fd..2bdadbe 100644
+--- a/lib/pkcs7verify.c
++++ b/lib/pkcs7verify.c
+@@ -172,7 +172,7 @@ pkcs7verify_allow(VOID *data, UINTN len)
+ 	EFI_STATUS status;
+ 	int i;
+ 
+-	status = pecoff_read_header(&context, data);
++	status = pecoff_read_header(&context, data, len);
+ 	if (status != EFI_SUCCESS)
+ 		goto out;
+ 
+diff --git a/lib/sha256.c b/lib/sha256.c
+index 180fa16..9ca1c21 100644
+--- a/lib/sha256.c
++++ b/lib/sha256.c
+@@ -290,7 +290,7 @@ sha256_get_pecoff_digest_mem(void *buffer, UINTN DataSize,
+ 	 * filled to the end of the page */
+ 	DataSize = ALIGN_VALUE(DataSize, 8);
+ 
+-	efi_status = pecoff_read_header(&context, buffer);
++	efi_status = pecoff_read_header(&context, buffer, DataSize);
+ 	if (efi_status != EFI_SUCCESS) {
+ 		Print(L"Failed to read header\n");
+ 		return efi_status;
+diff --git a/lib/shim_protocol.c b/lib/shim_protocol.c
+index a735aa1..9ef4a20 100644
+--- a/lib/shim_protocol.c
++++ b/lib/shim_protocol.c
+@@ -13,7 +13,7 @@
+ static EFI_STATUS shimprotocol_context(void *data, unsigned int size,
+ 				       PE_COFF_LOADER_IMAGE_CONTEXT *context)
+ {
+-	return pecoff_read_header(context, data);
++	return pecoff_read_header(context, data, size);
+ }
+ 
+ static EFI_STATUS shimprotocol_verify(void *buffer, UINT32 size)

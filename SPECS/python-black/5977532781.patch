@@ -1,0 +1,38 @@
+From 59775327810403b7324c68cd74eef370ef570381 Mon Sep 17 00:00:00 2001
+From: GiGaGon <107241144+MeGaGiGaGon@users.noreply.github.com>
+Date: Wed, 11 Jun 2025 12:05:27 -0700
+Subject: [PATCH] Fix f-string format spec CI failure (#4690)
+
+Update pep_701.py
+---
+ tests/data/cases/pep_701.py | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/tests/data/cases/pep_701.py b/tests/data/cases/pep_701.py
+index 9acee951e71..6f86988f0fb 100644
+--- a/tests/data/cases/pep_701.py
++++ b/tests/data/cases/pep_701.py
+@@ -74,9 +74,9 @@
+ x = f"a{2+2:=^{foo(x+y**2):something else}one more}b"
+ f'{(abc:=10)}'
+ 
+-f"This is a really long string, but just make sure that you reflow fstrings {
++f"""This is a really long string, but just make sure that you reflow fstrings {
+     2+2:d
+-}"
++}"""
+ f"This is a really long string, but just make sure that you reflow fstrings correctly {2+2:d}"
+ 
+ f"{2+2=}"
+@@ -213,9 +213,9 @@
+ x = f"a{2+2:=^{foo(x+y**2):something else}one more}b"
+ f"{(abc:=10)}"
+ 
+-f"This is a really long string, but just make sure that you reflow fstrings {
++f"""This is a really long string, but just make sure that you reflow fstrings {
+     2+2:d
+-}"
++}"""
+ f"This is a really long string, but just make sure that you reflow fstrings correctly {2+2:d}"
+ 
+ f"{2+2=}"

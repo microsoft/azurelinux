@@ -1,0 +1,151 @@
+commit eae798d4e5f938cb85758571dbab9afbbea7b5d2 (HEAD -> v13.0.0)
+Author: Frank Ch. Eigler <fche@redhat.com>
+Date:   Thu Feb 6 08:35:33 2025 -0500
+
+    MachRegister: fix initialization order bug (#1731)
+    
+    Backported upstream commit to 13.0.0 base.
+    
+    commit a29f32ac87c4483b97a2c5cb9beed5642124ae8f
+    Author: Tim Haines <thaines.astro@gmail.com>
+    Date:   Mon Apr 22 15:32:12 2024 -0500
+    
+        MachRegister: fix initialization order bug (#1731)
+    
+        This fixes the static initialization ordering issue reported in https://github.com/dyninst/dyninst/issues/1730.
+
+diff --git a/common/CMakeLists.txt b/common/CMakeLists.txt
+index 669659e44c76..b6507772858c 100644
+--- a/common/CMakeLists.txt
++++ b/common/CMakeLists.txt
+@@ -39,7 +39,6 @@ set(_public_headers
+     h/registers/AMDGPU/amdgpu_gfx90a_regs.h
+     h/registers/AMDGPU/amdgpu_gfx940_regs.h
+     h/registers/cuda_regs.h
+-    h/registers/MachRegister.h
+     h/registers/ppc32_regs.h
+     h/registers/ppc64_regs.h
+     h/registers/reg_def.h
+@@ -72,12 +71,12 @@ set(_private_headers
+     src/lprintf.h
+     src/lru_cache.h
+     src/MappedFile.h
++    src/registers/MachRegisterCache.h
+     src/NodeIterator.h
+     src/ntHeaders.h
+     src/parseauxv.h
+     src/pathName.h
+     src/pool_allocators.h
+-    src/registers/MachRegister.C
+     src/sha1.h
+     src/singleton_object_pool.h
+     src/stats.h
+@@ -111,6 +110,7 @@ set(_sources
+     src/debug_common.C
+     src/VariableLocation.C
+     src/Buffer.C
++    src/registers/MachRegister.C
+     src/MachSyscall.C)
+ 
+ if(DYNINST_OS_UNIX)
+diff --git a/common/src/dyn_regs.C b/common/src/dyn_regs.C
+index 3fcd194a71dd..7951dbe753bc 100644
+--- a/common/src/dyn_regs.C
++++ b/common/src/dyn_regs.C
+@@ -28,8 +28,16 @@
+  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+  */
+ 
++#include "registers/MachRegisterCache.h"
++
++namespace Dyninst { namespace registers {
++    // These are used in MachRegister.C
++    name_cache names;
++}}
++
+ //clang-format: off
+ #define DYN_DEFINE_REGS
+ #include "dyn_regs.h"
+ #undef DYN_DEFINE_REGS
+ //clang-format: on
++
+diff --git a/common/src/registers/MachRegister.C b/common/src/registers/MachRegister.C
+index ccd01abc1811..93c020c04415 100644
+--- a/common/src/registers/MachRegister.C
++++ b/common/src/registers/MachRegister.C
+@@ -1,4 +1,5 @@
+ #include "common/h/registers/MachRegister.h"
++#include "registers/MachRegisterCache.h"
+ #include "debug_common.h"
+ #include "dyn_regs.h"
+ #include "external/rose/amdgpuInstructionEnum.h"
+@@ -10,17 +11,24 @@
+ #include <unordered_map>
+ 
+ namespace {
+-  std::unordered_map<signed int, std::string> names;
+   const std::string invalid_reg_name{"<INVALID_REG>"};
+ }
+ 
++namespace Dyninst { namespace registers {
++    // These are defined in dyn_regs.C to ensure global constructor initialization ordering
++    extern name_cache names;
++  }
++}
++
++
+ namespace Dyninst {
+ 
+   MachRegister::MachRegister() : reg(0) {}
+ 
+   MachRegister::MachRegister(signed int r) : reg(r) {}
+ 
+-  MachRegister::MachRegister(signed int r, std::string n) : reg(r) { names.emplace(r, std::move(n)); }
++  MachRegister::MachRegister(signed int r, std::string n) : reg(r) {
++    registers::names.emplace(r, std::move(n)); }
+ 
+   unsigned int MachRegister::regClass() const { return reg & 0x00ff0000; }
+ 
+@@ -106,8 +114,8 @@ namespace Dyninst {
+   bool MachRegister::isValid() const { return (reg != InvalidReg.reg); }
+ 
+   std::string const& MachRegister::name() const {
+-    auto iter = names.find(reg);
+-    if(iter != names.end()) {
++    auto iter = registers::names.find(reg);
++    if(iter != registers::names.end()) {
+ 	return iter->second;
+     }
+     common_parsing_printf("No MachRegister found with value %x\n", static_cast<unsigned int>(reg));
+diff --git a/common/src/dyn_regs.C b/common/src/registers/MachRegisterCache.h
+similarity index 80%
+copy from common/src/dyn_regs.C
+copy to common/src/registers/MachRegisterCache.h
+index 3fcd194a71dd..2a74bbde821a 100644
+--- a/common/src/dyn_regs.C
++++ b/common/src/registers/MachRegisterCache.h
+@@ -28,8 +28,19 @@
+  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+  */
+ 
+-//clang-format: off
+-#define DYN_DEFINE_REGS
+-#include "dyn_regs.h"
+-#undef DYN_DEFINE_REGS
+-//clang-format: on
++#ifndef DYNINST_COMMON_REGISTERS_MACHREGISTERCACHE_H
++#define DYNINST_COMMON_REGISTERS_MACHREGISTERCACHE_H
++
++#include "registers/MachRegister.h"
++
++#include <unordered_map>
++#include <map>
++#include <vector>
++#include <string>
++
++namespace Dyninst { namespace registers {
++    typedef std::unordered_map<signed int, std::string> name_cache;
++}}
++
++
++#endif

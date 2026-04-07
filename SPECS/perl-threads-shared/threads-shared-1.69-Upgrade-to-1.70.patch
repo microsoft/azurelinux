@@ -1,0 +1,1037 @@
+From 0ec253d851947b7b8727fbbad8709ff661d01f3a Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Mon, 12 May 2025 17:38:28 +0200
+Subject: [PATCH] Upgrade to 1.70
+
+---
+ lib/threads/shared.pm |   4 +-
+ shared.xs             |  21 ++
+ t/test.pl             | 546 ++++++++++++++++++++++++++++++++----------
+ 3 files changed, 449 insertions(+), 122 deletions(-)
+
+diff --git a/lib/threads/shared.pm b/lib/threads/shared.pm
+index fef27ab..03b7f94 100644
+--- a/lib/threads/shared.pm
++++ b/lib/threads/shared.pm
+@@ -8,7 +8,7 @@ use Config;
+ 
+ use Scalar::Util qw(reftype refaddr blessed);
+ 
+-our $VERSION = '1.69'; # Please update the pod, too.
++our $VERSION = '1.70'; # Please update the pod, too.
+ my $XS_VERSION = $VERSION;
+ $VERSION = eval $VERSION;
+ 
+@@ -196,7 +196,7 @@ threads::shared - Perl extension for sharing data structures between threads
+ 
+ =head1 VERSION
+ 
+-This document describes threads::shared version 1.68
++This document describes threads::shared version 1.70
+ 
+ =head1 SYNOPSIS
+ 
+diff --git a/shared.xs b/shared.xs
+index 938f963..5c8345c 100644
+--- a/shared.xs
++++ b/shared.xs
+@@ -1284,6 +1284,21 @@ S_shared_signal_hook(pTHX) {
+ }
+ #endif
+ 
++#ifdef noshutdownhook
++
++static shutdown_proc_t old_shutdownhook;
++
++static void
++shared_shutdown() {
++    PerlInterpreter* my_perl;
++    SHARED_CONTEXT;
++    perl_destruct(PL_sharedsv_space);
++    perl_free(PL_sharedsv_space);
++    PL_sharedsv_space = NULL;
++    old_shutdownhook();
++}
++#endif
++
+ /* Saves a space for keeping SVs wider than an interpreter. */
+ 
+ static void
+@@ -1299,6 +1314,12 @@ Perl_sharedsv_init(pTHX)
+         LEAVE; /* This balances the ENTER at the end of perl_construct.  */
+         PERL_SET_CONTEXT((aTHX = caller_perl));
+         recursive_lock_init(aTHX_ &PL_sharedsv_lock);
++#ifdef noshutdownhook
++		OP_CHECK_MUTEX_LOCK;
++        old_shutdownhook = PL_shutdownhook;
++        PL_shutdownhook = &shared_shutdown;
++		OP_CHECK_MUTEX_UNLOCK;
++#endif
+     }
+     PL_lockhook = &Perl_sharedsv_locksv;
+     PL_sharehook = &Perl_sharedsv_share;
+diff --git a/t/test.pl b/t/test.pl
+index 406864d..c4a6fa3 100644
+--- a/t/test.pl
++++ b/t/test.pl
+@@ -20,7 +20,7 @@
+ # will be worked over by t/op/inc.t
+ 
+ $| = 1;
+-$Level = 1;
++our $Level = 1;
+ my $test = 1;
+ my $planned;
+ my $noplan;
+@@ -30,9 +30,11 @@ my $Perl;       # Safer version of $^X set by which_perl()
+ $::IS_ASCII  = ord 'A' ==  65;
+ $::IS_EBCDIC = ord 'A' == 193;
+ 
+-$TODO = 0;
+-$NO_ENDING = 0;
+-$Tests_Are_Passing = 1;
++# This is 'our' to enable harness to account for TODO-ed tests in
++# overall grade of PASS or FAIL
++our $TODO = 0;
++our $NO_ENDING = 0;
++our $Tests_Are_Passing = 1;
+ 
+ # Use this instead of print to avoid interference while testing globals.
+ sub _print {
+@@ -169,17 +171,26 @@ sub skip_all_without_config {
+ sub skip_all_without_unicode_tables { # (but only under miniperl)
+     if (is_miniperl()) {
+         skip_all_if_miniperl("Unicode tables not built yet")
+-            unless eval 'require "unicore/Heavy.pl"';
++            unless eval 'require "unicore/UCD.pl"';
+     }
+ }
+ 
+ sub find_git_or_skip {
+     my ($source_dir, $reason);
++
++    if ( $ENV{CONTINUOUS_INTEGRATION} && $ENV{WORKSPACE} ) {
++        $source_dir = $ENV{WORKSPACE};
++        if ( -d "${source_dir}/.git" ) {
++            $ENV{GIT_DIR} = "${source_dir}/.git";
++            return $source_dir;
++        }
++    }
++
+     if (-d '.git') {
+ 	$source_dir = '.';
+     } elsif (-l 'MANIFEST' && -l 'AUTHORS') {
+ 	my $where = readlink 'MANIFEST';
+-	die "Can't readling MANIFEST: $!" unless defined $where;
++	die "Can't readlink MANIFEST: $!" unless defined $where;
+ 	die "Confusing symlink target for MANIFEST, '$where'"
+ 	    unless $where =~ s!/MANIFEST\z!!;
+ 	if (-d "$where/.git") {
+@@ -192,7 +203,7 @@ sub find_git_or_skip {
+ 	    }
+ 	    $source_dir = $where;
+ 	}
+-    } elsif (exists $ENV{GIT_DIR}) {
++    } elsif (exists $ENV{GIT_DIR} || -f '.git') {
+ 	my $commit = '8d063cd8450e59ea1c611a2f4f5a21059a2804f1';
+ 	my $out = `git rev-parse --verify --quiet '$commit^{commit}'`;
+ 	chomp $out;
+@@ -200,7 +211,9 @@ sub find_git_or_skip {
+ 	    $source_dir = '.'
+ 	}
+     }
+-    if ($source_dir) {
++    if ($ENV{'PERL_BUILD_PACKAGING'}) {
++	$reason = 'PERL_BUILD_PACKAGING is set';
++    } elsif ($source_dir) {
+ 	my $version_string = `git --version`;
+ 	if (defined $version_string
+ 	      && $version_string =~ /\Agit version (\d+\.\d+\.\d+)(.*)/) {
+@@ -213,9 +226,6 @@ sub find_git_or_skip {
+     } else {
+ 	$reason = 'not being run from a git checkout';
+     }
+-    if ($ENV{'PERL_BUILD_PACKAGING'}) {
+-	$reason = 'PERL_BUILD_PACKAGING is set';
+-    }
+     skip_all($reason) if $_[0] && $_[0] eq 'all';
+     skip($reason, @_);
+ }
+@@ -236,7 +246,7 @@ sub _ok {
+         $name =~ s/#/\\#/g;
+ 	$out = $pass ? "ok $test - $name" : "not ok $test - $name";
+     } else {
+-	$out = $pass ? "ok $test" : "not ok $test";
++	$out = $pass ? "ok $test - [$where]" : "not ok $test - [$where]";
+     }
+ 
+     if ($TODO) {
+@@ -264,8 +274,8 @@ sub _ok {
+ }
+ 
+ sub _where {
+-    my @caller = caller($Level);
+-    return "at $caller[1] line $caller[2]";
++    my (undef, $filename, $lineno) = caller($Level);
++    return "at $filename line $lineno";
+ }
+ 
+ # DON'T use this for matches. Use like() instead.
+@@ -296,14 +306,15 @@ eval 'sub re::is_regexp { ref($_[0]) eq "Regexp" }'
+ 
+ # keys are the codes \n etc map to, values are 2 char strings such as \n
+ my %backslash_escape;
+-foreach my $x (split //, 'nrtfa\\\'"') {
++foreach my $x (split //, 'enrtfa\\\'"') {
+     $backslash_escape{ord eval "\"\\$x\""} = "\\$x";
+ }
+ # A way to display scalars containing control characters and Unicode.
+ # Trying to avoid setting $_, or relying on local $_ to work.
+ sub display {
+     my @result;
+-    foreach my $x (@_) {
++    foreach my $element (@_) {
++        my $x = $element; # Make a copy in case @_ contains unmodifiable elements
+         if (defined $x and not ref $x) {
+             my $y = '';
+             foreach my $c (unpack($chars_template, $x)) {
+@@ -311,27 +322,17 @@ sub display {
+                     $y = $y . sprintf "\\x{%x}", $c;
+                 } elsif ($backslash_escape{$c}) {
+                     $y = $y . $backslash_escape{$c};
+-                } else {
+-                    my $z = chr $c; # Maybe we can get away with a literal...
+-
+-                    if ($z !~ /[^[:^print:][:^ascii:]]/) {
+-                        # The pattern above is equivalent (by de Morgan's
+-                        # laws) to:
+-                        #     $z !~ /(?[ [:print:] & [:ascii:] ])/
+-                        # or, $z is not an ascii printable character
+-
+-                        # Use octal for characters with small ordinals that
+-                        # are traditionally expressed as octal: the controls
+-                        # below space, which on EBCDIC are almost all the
+-                        # controls, but on ASCII don't include DEL nor the C1
+-                        # controls.
+-                        if ($c < ord " ") {
+-                            $z = sprintf "\\%03o", $c;
+-                        } else {
+-                            $z = sprintf "\\x{%x}", $c;
+-                        }
+-                    }
+-                    $y = $y . $z;
++                } elsif ($c < ord " ") {
++                    # Use octal for characters with small ordinals that are
++                    # traditionally expressed as octal: the controls below
++                    # space, which on EBCDIC are almost all the controls, but
++                    # on ASCII don't include DEL nor the C1 controls.
++                    $y = $y . sprintf "\\%03o", $c;
++                } elsif (chr $c =~ /[[:print:]]/a) {
++                    $y = $y . chr $c;
++                }
++                else {
++                    $y = $y . sprintf "\\x%02X", $c;
+                 }
+             }
+             $x = $y;
+@@ -342,6 +343,50 @@ sub display {
+     return @result;
+ }
+ 
++
++# Escape a string in a similar (but not identical) fashion to how the
++# regex debugger does, using "x" style escapes in the form
++# "%x{01+bc+02+cd}" to show the codepoint of the escaped values.  Like
++# the regex debugger we use percentage instead of backslash so that it
++# is trivial to distinguish backslash based sequences that are commonly
++# found in regex patterns from escaped octets that are in the pattern.
++# To reduce the output length and improve clarity if there are multiple
++# escaped codepoints in a row we bundle them together into one "%x{...}"
++# structure.
++#
++# Implementation note: This code should work fine on all platforms as we
++# use utf8::native_to_unicode() to map native codepoints to unicode
++# (thanks Karl!) and back again, also we deliberately avoid using the
++# regex engine to do the escaping as this function is intended for cases
++# where we are testing the regex engine.
++#
++# WARNING: This function should only be used for diagnostic purposes, it
++# does not output valid code!
++
++sub display_rx {
++    my ($str) = @_;
++    my $escaped = "";
++    my @cp; # codepoints
++    for my $i (0 .. length($str)-1) {
++        my $char = substr($str,$i,1);
++        push @cp, utf8::native_to_unicode(ord($char));
++    }
++    while (@cp) {
++        my $ord = shift @cp;
++        if (32 <= $ord <= 126 and $ord != 37) {
++            $escaped .= chr(utf8::unicode_to_native($ord));
++        }
++        else {
++            my @cp_hex = sprintf "%02x", $ord;
++            while (@cp and $cp[0] != 37 and ($cp[0]<32 or $cp[0]>126)) {
++                push @cp_hex, sprintf "%02x", shift @cp;
++            }
++            $escaped .= sprintf "%%x{%s}", join "+", @cp_hex;
++        }
++    }
++    return $escaped;
++}
++
+ sub is ($$@) {
+     my ($got, $expected, $name, @mess) = @_;
+ 
+@@ -357,6 +402,17 @@ sub is ($$@) {
+     unless ($pass) {
+ 	unshift(@mess, "#      got "._qq($got)."\n",
+ 		       "# expected "._qq($expected)."\n");
++        if (defined $got and defined $expected and
++            (length($got)>20 or length($expected)>20))
++        {
++            my $p = 0;
++            $p++ while substr($got,$p,1) eq substr($expected,$p,1);
++            push @mess,"#  diff at $p\n";
++            push @mess,"#    after "._qq(substr($got,$p < 40 ? 0  : $p - 40,
++                                                     $p < 40 ? $p : 40)) . "\n";
++            push @mess,"#     have "._qq(substr($got,$p,40))."\n";
++            push @mess,"#     want "._qq(substr($expected,$p,40))."\n";
++        }
+     }
+     _ok($pass, _where(), $name, @mess);
+ }
+@@ -456,26 +512,35 @@ sub like_yn ($$$@) {
+     # definitely not like(..., '/.../') like
+     # Test::Builder::maybe_regex() does.
+     unless (re::is_regexp($expected)) {
+-	die "PANIC: The value '$expected' isn't a regexp. The like() function needs a qr// pattern, not a string";
++        die "PANIC: The value '$expected' isn't a regexp. The like() function needs a qr// pattern, not a string";
+     }
+ 
+-    my $pass;
+-    $pass = $_[1] =~ /$expected/ if !$flip;
+-    $pass = $_[1] !~ /$expected/ if $flip;
+-    my $display_got = $_[1];
+-    $display_got = display($display_got);
+-    my $display_expected = $expected;
+-    $display_expected = display($display_expected);
++    my $pass = ($flip) ? $_[1] !~ /$expected/ : $_[1] =~ /$expected/;
+     unless ($pass) {
+-	unshift(@mess, "#      got '$display_got'\n",
+-		$flip
+-		? "# expected !~ /$display_expected/\n"
+-                : "# expected /$display_expected/\n");
++        my $display_got = display($_[1]);
++        my $display_expected = display($expected);
++        unshift(@mess, "#      got '$display_got'\n",
++            $flip
++            ? "# expected !~ /$display_expected/\n"
++            : "# expected /$display_expected/\n");
+     }
+     local $Level = $Level + 1;
+     _ok($pass, _where(), $name, @mess);
+ }
+ 
++sub refcount_is {
++    # Don't unpack first arg; access it directly via $_[0] to avoid creating
++    # another reference and upsetting the refcount
++    my (undef, $expected, $name, @mess) = @_;
++    my $got = &Internals::SvREFCNT($_[0]) + 1; # +1 to account for the & calling style
++    my $pass = $got == $expected;
++    unless ($pass) {
++        unshift @mess, "#      got $got references\n" .
++                       "# expected $expected\n";
++    }
++    _ok($pass, _where(), $name, @mess);
++}
++
+ sub pass {
+     _ok(1, '', @_);
+ }
+@@ -614,7 +679,7 @@ USE_OK
+     }
+ }
+ 
+-# runperl - Runs a separate perl interpreter and returns its output.
++# runperl, run_perl - Runs a separate perl interpreter and returns its output.
+ # Arguments :
+ #   switches => [ command-line switches ]
+ #   nolib    => 1 # don't use -I../lib (included by default)
+@@ -629,7 +694,6 @@ USE_OK
+ #   verbose  => print the command line
+ 
+ my $is_mswin    = $^O eq 'MSWin32';
+-my $is_netware  = $^O eq 'NetWare';
+ my $is_vms      = $^O eq 'VMS';
+ my $is_cygwin   = $^O eq 'cygwin';
+ 
+@@ -684,7 +748,7 @@ sub _create_runperl { # Create the string to qx in runperl().
+ 		    warn "Trailing & in prog >>$prog<< is not portable";
+ 		}
+ 	    }
+-            if ($is_mswin || $is_netware || $is_vms) {
++            if ($is_mswin || $is_vms) {
+                 $runperl = $runperl . qq ( -e "$prog" );
+             }
+             else {
+@@ -706,7 +770,7 @@ sub _create_runperl { # Create the string to qx in runperl().
+ 	$args{stdin} =~ s/\n/\\n/g;
+ 	$args{stdin} =~ s/\r/\\r/g;
+ 
+-	if ($is_mswin || $is_netware || $is_vms) {
++	if ($is_mswin || $is_vms) {
+ 	    $runperl = qq{$Perl -e "print qq(} .
+ 		$args{stdin} . q{)" | } . $runperl;
+ 	}
+@@ -754,7 +818,42 @@ sub _create_runperl { # Create the string to qx in runperl().
+     return $runperl;
+ }
+ 
++# usage:
++#  $ENV{PATH} =~ /(.*)/s;
++#  local $ENV{PATH} = untaint_path($1);
++sub untaint_path {
++    my $path = shift;
++    my $sep;
++
++    if (! eval {require Config; 1}) {
++        warn "test.pl had problems loading Config: $@";
++        $sep = ':';
++    } else {
++        $sep = $Config::Config{path_sep};
++    }
++
++    $path =
++        join $sep, grep { $_ ne "" and $_ ne "." and -d $_ and
++              ($is_mswin or $is_vms or !(stat && (stat _)[2]&0022)) }
++        split quotemeta ($sep), $1;
++    if ($is_cygwin) {   # Must have /bin under Cygwin
++        if (length $path) {
++            $path = $path . $sep;
++        }
++        $path = $path . '/bin';
++    } elsif (!$is_vms and !length $path) {
++        # empty PATH is the same as a path of "." on *nix so to prevent
++        # tests from dieing under taint we need to return something
++        # absolute. Perhaps "/" would be better? Anything absolute will do.
++        $path = "/usr/bin";
++    }
++
++    $path;
++}
++
+ # sub run_perl {} is alias to below
++# Since this uses backticks to run, it is subject to the rules of the shell.
++# Locale settings may pose a problem, depending on the program being run.
+ sub runperl {
+     die "test.pl:runperl() does not take a hashref"
+ 	if ref $_[0] and ref $_[0] eq 'HASH';
+@@ -768,30 +867,12 @@ sub runperl {
+     if ($tainted) {
+ 	# We will assume that if you're running under -T, you really mean to
+ 	# run a fresh perl, so we'll brute force launder everything for you
+-	my $sep;
+-
+-	if (! eval {require Config; 1}) {
+-	    warn "test.pl had problems loading Config: $@";
+-	    $sep = ':';
+-	} else {
+-	    $sep = $Config::Config{path_sep};
+-	}
+-
+ 	my @keys = grep {exists $ENV{$_}} qw(CDPATH IFS ENV BASH_ENV);
+ 	local @ENV{@keys} = ();
+ 	# Untaint, plus take out . and empty string:
+ 	local $ENV{'DCL$PATH'} = $1 if $is_vms && exists($ENV{'DCL$PATH'}) && ($ENV{'DCL$PATH'} =~ /(.*)/s);
+-	$ENV{PATH} =~ /(.*)/s;
+-	local $ENV{PATH} =
+-	    join $sep, grep { $_ ne "" and $_ ne "." and -d $_ and
+-		($is_mswin or $is_vms or !(stat && (stat _)[2]&0022)) }
+-		    split quotemeta ($sep), $1;
+-	if ($is_cygwin) {   # Must have /bin under Cygwin
+-	    if (length $ENV{PATH}) {
+-		$ENV{PATH} = $ENV{PATH} . $sep;
+-	    }
+-	    $ENV{PATH} = $ENV{PATH} . '/bin';
+-	}
++        $ENV{PATH} =~ /(.*)/s;
++        local $ENV{PATH} = untaint_path($1);
+ 	$runperl =~ /(.*)/s;
+ 	$runperl = $1;
+ 
+@@ -806,6 +887,73 @@ sub runperl {
+ # Nice alias
+ *run_perl = *run_perl = \&runperl; # shut up "used only once" warning
+ 
++# Run perl with specified environment and arguments, return (STDOUT, STDERR)
++# set DEBUG_RUNENV=1 in the environment to debug.
++sub runperl_and_capture {
++  my ($env, $args) = @_;
++
++  my $STDOUT = tempfile();
++  my $STDERR = tempfile();
++  my $PERL   = $^X;
++  my $FAILURE_CODE = 119;
++
++  local %ENV = %ENV;
++  delete $ENV{PERLLIB};
++  delete $ENV{PERL5LIB};
++  delete $ENV{PERL5OPT};
++  delete $ENV{PERL_USE_UNSAFE_INC};
++  my $pid = fork;
++  return (0, "Couldn't fork: $!") unless defined $pid;   # failure
++  if ($pid) {                   # parent
++    waitpid $pid,0;
++    my $exit_code = $? ? $? >> 8 : 0;
++    my ($out, $err)= ("", "");
++    local $/;
++    if (open my $stdout, '<', $STDOUT) {
++        $out .= <$stdout>;
++    } else {
++        $err .= "Could not read STDOUT '$STDOUT' file: $!\n";
++    }
++    if (open my $stderr, '<', $STDERR) {
++        $err .= <$stderr>;
++    } else {
++        $err .= "Could not read STDERR '$STDERR' file: $!\n";
++    }
++    if ($exit_code == $FAILURE_CODE) {
++        $err .= "Something went wrong. Received FAILURE_CODE as exit code.\n";
++    }
++    if ($ENV{DEBUG_RUNENV}) {
++        print "OUT: $out\n";
++        print "ERR: $err\n";
++    }
++    return ($out, $err);
++  } elsif (defined $pid) {                      # child
++    # Just in case the order we update the environment changes how
++    # the environment is set up we sort the keys here for consistency.
++    for my $k (sort keys %$env) {
++      $ENV{$k} = $env->{$k};
++    }
++    if ($ENV{DEBUG_RUNENV}) {
++        print "Child Process $$ Executing:\n$PERL @$args\n";
++    }
++    open STDOUT, '>', $STDOUT
++        or do {
++            print "Failed to dup STDOUT to '$STDOUT': $!";
++            exit $FAILURE_CODE;
++        };
++    open STDERR, '>', $STDERR
++        or do {
++            print "Failed to dup STDERR to '$STDERR': $!";
++            exit $FAILURE_CODE;
++        };
++    exec $PERL, @$args
++        or print STDERR "Failed to exec: ",
++                  join(" ",map { "'$_'" } $^X, @$args),
++                  ": $!\n";
++    exit $FAILURE_CODE;
++  }
++}
++
+ sub DIE {
+     _print_stderr "# @_\n";
+     exit 1;
+@@ -887,16 +1035,16 @@ sub unlink_all {
+ my @letters = qw(A B C D E F G H I J K L M N O P Q R S T U V W X Y Z);
+ 
+ # Avoid ++ -- ranges split negative numbers
+-sub _num_to_alpha{
++sub _num_to_alpha {
+     my($num,$max_char) = @_;
+     return unless $num >= 0;
+     my $alpha = '';
+     my $char_count = 0;
+-    $max_char = 0 if $max_char < 0;
++    $max_char = 0 if !defined($max_char) or $max_char < 0;
+ 
+     while( 1 ){
+-        $alpha = $letters[ $num % 26 ] . $alpha;
+-        $num = int( $num / 26 );
++        $alpha = $letters[ $num % @letters ] . $alpha;
++        $num = int( $num / @letters );
+         last if $num == 0;
+         $num = $num - 1;
+ 
+@@ -909,30 +1057,49 @@ sub _num_to_alpha{
+ }
+ 
+ my %tmpfiles;
+-END { unlink_all keys %tmpfiles }
++sub unlink_tempfiles {
++    unlink_all keys %tmpfiles;
++    %tmpfiles = ();
++}
++
++END { unlink_tempfiles(); }
++
++
++# NOTE: tempfile() may be used as a module names in our tests
++# so the result must be restricted to only legal characters for a module
++# name.
+ 
+ # A regexp that matches the tempfile names
+-$::tempfile_regexp = 'tmp\d+[A-Z][A-Z]?';
++$::tempfile_regexp = 'tmp_[A-Z]+_[A-Z]+';
+ 
+ # Avoid ++, avoid ranges, avoid split //
+ my $tempfile_count = 0;
++my $max_file_chars = 3;
++# Note that the max number of is NOT 26**3, it is 26**3 + 26**2 + 26,
++# as 3 character files are distinct from 2 character files, from 1 characters
++# files, etc.
+ sub tempfile {
+-    while(1){
+-	my $try = (-d "t" ? "t/" : "")."tmp$$";
+-        my $alpha = _num_to_alpha($tempfile_count,2);
++    # if you change the format returned by tempfile() you MUST change
++    # the $::tempfile_regex define above.
++    my $try_prefix = (-d "t" ? "t/" : "")."tmp_"._num_to_alpha($$);
++    while (1) {
++        my $alpha = _num_to_alpha($tempfile_count,$max_file_chars);
+         last unless defined $alpha;
+-        $try = $try . $alpha;
++        my $try = $try_prefix . "_" . $alpha;
+         $tempfile_count = $tempfile_count + 1;
+ 
+-	# Need to note all the file names we allocated, as a second request may
+-	# come before the first is created.
++        # Need to note all the file names we allocated, as a second request
++        # may come before the first is created. Also we are avoiding ++ here
++        # so we aren't using the normal idiom for this kind of test.
+ 	if (!$tmpfiles{$try} && !-e $try) {
+ 	    # We have a winner
+ 	    $tmpfiles{$try} = 1;
+ 	    return $try;
+ 	}
+     }
+-    die "Can't find temporary file name starting \"tmp$$\"";
++    die sprintf
++        'panic: Too many tempfile()s with prefix "%s", limit of %d reached',
++        $try_prefix, 26 ** $max_file_chars;
+ }
+ 
+ # register_tempfile - Adds a list of files to be removed at the end of the current test file
+@@ -967,8 +1134,10 @@ sub fresh_perl {
+     # arguments in the hash referred to by '$runperl_args'.  The results are
+     # returned, with $? set to the exit code.  Unless overridden, stderr is
+     # redirected to stdout.
++    #
++    # Placing the program in a file bypasses various sh vagaries
+ 
+-    die sprintf "Third argument to fresh_perl_.* must be hashref of args to fresh_perl (or {})"
++    die sprintf "Second argument to fresh_perl_.* must be hashref of args to fresh_perl (or {})"
+         unless !(defined $runperl_args) || ref($runperl_args) eq 'HASH';
+ 
+     # Given the choice of the mis-parsable {}
+@@ -979,6 +1148,7 @@ sub fresh_perl {
+     # it feels like the least-worse thing is to assume that auto-vivification
+     # works. At least, this is only going to be a run-time failure, so won't
+     # affect tests using this file but not this function.
++    my $trim= delete $runperl_args->{rtrim_result}; # hide from runperl
+     $runperl_args->{progfile} ||= $tmpfile;
+     $runperl_args->{stderr}     = 1 unless exists $runperl_args->{stderr};
+ 
+@@ -990,7 +1160,7 @@ sub fresh_perl {
+     my $results = runperl(%$runperl_args);
+     my $status = $?;    # Not necessary to save this, but it makes it clear to
+                         # future maintainers.
+-
++    $results=~s/[ \t]+\n/\n/g if $trim;
+     # Clean up the results into something a bit more predictable.
+     $results  =~ s/\n+$//;
+     $results =~ s/at\s+$::tempfile_regexp\s+line/at - line/g;
+@@ -1016,12 +1186,17 @@ sub fresh_perl {
+ sub _fresh_perl {
+     my($prog, $action, $expect, $runperl_args, $name) = @_;
+ 
++    local $Level = $Level + 1;
++
++    # strip trailing whitespace if requested - makes some tests easier
++    $expect=~s/[[:blank:]]+\n/\n/g if $runperl_args->{rtrim_result};
++
+     my $results = fresh_perl($prog, $runperl_args);
+     my $status = $?;
+ 
+     # Use the first line of the program as a name if none was given
+     unless( $name ) {
+-        ($first_line, $name) = $prog =~ /^((.{1,50}).*)/;
++        (my $first_line, $name) = $prog =~ /^((.{1,50}).*)/;
+         $name = $name . '...' if length $first_line > length $name;
+     }
+ 
+@@ -1059,7 +1234,7 @@ sub fresh_perl_is {
+     # This will make it so the test author doesn't have to know that.
+     $expected =~ s/\n+$//;
+ 
+-    local $Level = 2;
++    local $Level = $Level + 1;
+     _fresh_perl($prog, 'eq', $expected, $runperl_args, $name);
+ }
+ 
+@@ -1071,7 +1246,7 @@ sub fresh_perl_is {
+ 
+ sub fresh_perl_like {
+     my($prog, $expected, $runperl_args, $name) = @_;
+-    local $Level = 2;
++    local $Level = $Level + 1;
+     _fresh_perl($prog, '=~', $expected, $runperl_args, $name);
+ }
+ 
+@@ -1099,6 +1274,7 @@ sub fresh_perl_like {
+ #   regex - the expected output is a regular expression
+ #   random - all lines match but in any order
+ #   fatal - the code will fail fatally (croak, die)
++#   nonfatal - the code is not expected to fail fatally
+ #
+ # If the actual output contains a line "SKIPPED" the test will be
+ # skipped.
+@@ -1109,6 +1285,7 @@ sub fresh_perl_like {
+ # If the global variable $FATAL is true then OPTION fatal is the
+ # default.
+ 
++our $FATAL;
+ sub _setup_one_file {
+     my $fh = shift;
+     # Store the filename as a program that started at line 0.
+@@ -1192,9 +1369,17 @@ sub run_multiple_progs {
+         my $dummy;
+         ($dummy, @prgs) = _setup_one_file(shift);
+     }
++    my $taint_disabled;
++    if (! eval {require Config; 1}) {
++        warn "test.pl had problems loading Config: $@";
++        $taint_disabled = '';
++    } else {
++        $taint_disabled = $Config::Config{taint_disabled};
++    }
+ 
+     my $tmpfile = tempfile();
+ 
++    my $count_failures = 0;
+     my ($file, $line);
+   PROGRAM:
+     while (defined ($line = shift @prgs)) {
+@@ -1212,6 +1397,14 @@ sub run_multiple_progs {
+ 	if (s/^(\s*-\w+)//) {
+ 	    $switch = $1;
+ 	}
++
++        s/^# NOTE.*\n//mg; # remove any NOTE comments in the content
++
++        # unhide conflict markers - we hide them so that naive
++        # conflict marker detection logic doesn't get upset with our
++        # tests.
++        s/([<=>])CONFLICT\1/$1 x 7/ge;
++
+ 	my ($prog, $expected) = split(/\nEXPECT(?:\n|$)/, $_, 2);
+ 
+ 	my %reason;
+@@ -1228,10 +1421,16 @@ sub run_multiple_progs {
+ 	    }
+ 	}
+ 
+-	my $name = '';
+-	if ($prog =~ s/^#\s*NAME\s+(.+)\n//m) {
+-	    $name = $1;
+-	}
++    my $name = '';
++    if ($prog =~ s/^#\s*NAME\s+(.+)\n//m) {
++        $name = $1;
++    } elsif (defined $file) {
++        $name = "test from $file at line $line";
++    }
++
++        if ($switch=~/[Tt]/ and $taint_disabled eq "define") {
++            $reason{skip} ||= "This perl does not support taint";
++        }
+ 
+ 	if ($reason{skip}) {
+ 	SKIP:
+@@ -1303,7 +1502,7 @@ sub run_multiple_progs {
+ 	my $option_regex = 0;
+ 	my $option_random = 0;
+ 	my $fatal = $FATAL;
+-	if ($expected =~ s/^OPTIONS? (.+)\n//) {
++	if ($expected =~ s/^OPTIONS? (.+)(?:\n|\Z)//) {
+ 	    foreach my $option (split(' ', $1)) {
+ 		if ($option eq 'regex') { # allow regular expressions
+ 		    $option_regex = 1;
+@@ -1314,6 +1513,10 @@ sub run_multiple_progs {
+ 		elsif ($option eq 'fatal') { # perl should fail
+ 		    $fatal = 1;
+ 		}
++                elsif ($option eq 'nonfatal') {
++                    # used to turn off default fatal
++                    $fatal = 0;
++                }
+ 		else {
+ 		    die "$0: Unknown OPTION '$option'\n";
+ 		}
+@@ -1351,19 +1554,24 @@ sub run_multiple_progs {
+ 	local $::TODO = $reason{todo};
+ 
+ 	unless ($ok) {
+-	    my $err_line = "PROG: $switch\n$prog\n" .
+-			   "EXPECTED:\n$expected\n";
+-	    $err_line   .= "EXIT STATUS: != 0\n" if $fatal;
+-	    $err_line   .= "GOT:\n$results\n";
+-	    $err_line   .= "EXIT STATUS: " . ($status >> 8) . "\n" if $fatal;
+-	    if ($::TODO) {
+-		$err_line =~ s/^/# /mg;
+-		print $err_line;  # Harness can't filter it out from STDERR.
+-	    }
+-	    else {
+-		print STDERR $err_line;
+-	    }
+-	}
++        my $err_line = '';
++        $err_line   .= "FILE: $file ; line $line\n" if defined $file;
++        $err_line   .= "PROG: $switch\n$prog\n" .
++			           "EXPECTED:\n$expected\n";
++        $err_line   .= "EXIT STATUS: != 0\n" if $fatal;
++        $err_line   .= "GOT:\n$results\n";
++        $err_line   .= "EXIT STATUS: " . ($status >> 8) . "\n" if $fatal;
++        if ($::TODO) {
++            $err_line =~ s/^/# /mg;
++            print $err_line;  # Harness can't filter it out from STDERR.
++        }
++        else {
++            print STDERR $err_line;
++            ++$count_failures;
++            die "PERL_TEST_ABORT_FIRST_FAILURE set Test Failure"
++                if $ENV{PERL_TEST_ABORT_FIRST_FAILURE};
++        }
++    }
+ 
+         if (defined $file) {
+             _ok($ok, "at $file line $line", $name);
+@@ -1381,6 +1589,20 @@ sub run_multiple_progs {
+ 	    File::Path::rmtree $_ if -d $_;
+ 	}
+     }
++
++    if ( $count_failures ) {
++        print STDERR <<'EOS';
++#
++# Note: 'run_multiple_progs' run has one or more failures
++#        you can consider setting the environment variable
++#        PERL_TEST_ABORT_FIRST_FAILURE=1 before running the test
++#        to stop on the first error.
++#
++EOS
++    }
++
++
++    return;
+ }
+ 
+ sub can_ok ($@) {
+@@ -1411,7 +1633,7 @@ sub can_ok ($@) {
+ sub new_ok {
+     my($class, $args, $obj_name) = @_;
+     $args ||= [];
+-    $object_name = "The object" unless defined $obj_name;
++    $obj_name = "The object" unless defined $obj_name;
+ 
+     local $Level = $Level + 1;
+ 
+@@ -1420,7 +1642,7 @@ sub new_ok {
+     my $error = $@;
+ 
+     if($ok) {
+-        object_ok($obj, $class, $object_name);
++        object_ok($obj, $class, $obj_name);
+     }
+     else {
+         ok( 0, "new() died" );
+@@ -1582,17 +1804,75 @@ sub warning_like {
+     }
+ }
+ 
+-# Set a watchdog to timeout the entire test file
++# Set or clear a watchdog timer.  The input seconds is:
++#   zero      to clear;
++#   non-zero  to set
++# and is multiplied by $ENV{PERL_TEST_TIME_OUT_FACTOR} (default 1; minimum 1).
++# Set this variable in your profile for slow boxes, or use it to override the
++# timeout temporarily for debugging.
++#
++# This will figure out a suitable method to implement the timer, but you can
++# force it to use an alarm by setting the optional second parameter to
++# 'alarm', or to use a separate process (if available on this platform) by
++# setting that parameter to 'process'.
++#
++# It is good practice to CLEAR EVERY WATCHDOG timer.  Otherwise the timer
++# applies to the entire rest of the file.  Even if that works now, new tests
++# tend to get added to the end of the file, and people may not notice that
++# they are being timed.  Those tests may all complete before the timer kills
++# them, but then more new tests get added, even further away from the timer
++# setting code, with less likelihood of noticing that.  Those tests may also
++# generally work, but flap on heavily loaded smokers, leading to debugging
++# effort that wouldn't have had to be expended if the timer had been cancelled
++# in the first place
++#
+ # NOTE:  If the test file uses 'threads', then call the watchdog() function
+ #        _AFTER_ the 'threads' module is loaded.
++{ # Closure
++    my $watchdog;
++    my $watchdog_thread;
++
+ sub watchdog ($;$)
+ {
+     my $timeout = shift;
+-    my $method  = shift || "";
++
++    # If cancelling, use the state variables to know which method was used to
++    # create the watchdog.
++    if ($timeout == 0) {
++        if ($watchdog_thread) {
++            $watchdog_thread->kill('KILL');
++            undef $watchdog_thread;
++        }
++        elsif ($watchdog) {
++            kill('KILL', $watchdog);
++            undef $watchdog;
++        }
++        else {
++            alarm(0);
++        }
++
++        return;
++    }
++
++    # Make sure these aren't defined.
++    undef $watchdog;
++    undef $watchdog_thread;
++
++    my $method = shift || "";
++
+     my $timeout_msg = 'Test process timed out - terminating';
+ 
++    # Accept either spelling
++    my $timeout_factor = $ENV{PERL_TEST_TIME_OUT_FACTOR}
++                      || $ENV{PERL_TEST_TIMEOUT_FACTOR}
++                      || 1;
++    $timeout_factor = 1 if $timeout_factor < 1;
++    $timeout_factor = $1 if $timeout_factor =~ /^(\d+)$/;
++
+     # Valgrind slows perl way down so give it more time before dying.
+-    $timeout *= 10 if $ENV{PERL_VALGRIND};
++    $timeout_factor = 10 if $timeout_factor < 10 && $ENV{PERL_VALGRIND};
++
++    $timeout *= $timeout_factor;
+ 
+     my $pid_to_kill = $$;   # PID for this process
+ 
+@@ -1608,7 +1888,9 @@ sub watchdog ($;$)
+     if (!$threads_on || $method eq "process") {
+ 
+         # On Windows and VMS, try launching a watchdog process
+-        #   using system(1, ...) (see perlport.pod)
++        #   using system(1, ...) (see perlport.pod).  system() returns
++        #   immediately on these platforms with effectively a pid of the new
++        #   process
+         if ($is_mswin || $is_vms) {
+             # On Windows, try to get the 'real' PID
+             if ($is_mswin) {
+@@ -1622,7 +1904,7 @@ sub watchdog ($;$)
+             return if ($pid_to_kill <= 0);
+ 
+             # Launch watchdog process
+-            my $watchdog;
++            undef $watchdog;
+             eval {
+                 local $SIG{'__WARN__'} = sub {
+                     _diag("Watchdog warning: $_[0]");
+@@ -1632,6 +1914,10 @@ sub watchdog ($;$)
+                            "warn qq/# $timeout_msg" . '\n/;' .
+                            "kill(q/$sig/, $pid_to_kill);";
+ 
++                # If we're in taint mode PATH will be tainted
++                $ENV{PATH} =~ /(.*)/s;
++                local $ENV{PATH} = untaint_path($1);
++
+                 # On Windows use the indirect object plus LIST form to guarantee
+                 # that perl is launched directly rather than via the shell (see
+                 # perlfunc.pod), and ensure that the LIST has multiple elements
+@@ -1640,6 +1926,8 @@ sub watchdog ($;$)
+                 # support the LIST form at all.
+                 if ($is_mswin) {
+                     my $runperl = which_perl();
++                    $runperl =~ /(.*)/;
++                    $runperl = $1;
+                     if ($runperl =~ m/\s/) {
+                         $runperl = qq{"$runperl"};
+                     }
+@@ -1665,7 +1953,7 @@ sub watchdog ($;$)
+         }
+ 
+         # Try using fork() to generate a watchdog process
+-        my $watchdog;
++        undef $watchdog;
+         eval { $watchdog = fork() };
+         if (defined($watchdog)) {
+             if ($watchdog) {   # Parent process
+@@ -1692,7 +1980,7 @@ sub watchdog ($;$)
+ 		if ($is_cygwin) {
+ 		    # sometimes the above isn't enough on cygwin
+ 		    sleep 1; # wait a little, it might have worked after all
+-		    system("/bin/kill -f $pid_to_kill");
++		    system("/bin/kill -f $pid_to_kill") if kill(0, $pid_to_kill);
+ 		}
+             }
+ 
+@@ -1710,10 +1998,16 @@ sub watchdog ($;$)
+     # Use a watchdog thread because either 'threads' is loaded,
+     #   or fork() failed
+     if (eval {require threads; 1}) {
+-        'threads'->create(sub {
++        $watchdog_thread = 'threads'->create(sub {
+                 # Load POSIX if available
+                 eval { require POSIX; };
+ 
++                $SIG{'KILL'} = sub { threads->exit(); };
++
++                # Detach after the signal handler is set up; the parent knows
++                # not to signal until detached.
++                'threads'->detach();
++
+                 # Execute the timeout
+                 my $time_left = $timeout;
+                 do {
+@@ -1726,7 +2020,18 @@ sub watchdog ($;$)
+                 POSIX::_exit(1) if (defined(&POSIX::_exit));
+                 my $sig = $is_vms ? 'TERM' : 'KILL';
+                 kill($sig, $pid_to_kill);
+-            })->detach();
++        });
++
++        # Don't proceed until the watchdog has set up its signal handler.
++        # (Otherwise there is a possibility that we will exit with threads
++        # running.)  The watchdog tells us that the handler is set by
++        # detaching itself.  (The 'is_running()' is a fail-safe.)
++        while (     $watchdog_thread->is_running()
++               && ! $watchdog_thread->is_detached())
++        {
++            'threads'->yield();
++        }
++
+         return;
+     }
+ 
+@@ -1746,6 +2051,7 @@ WATCHDOG_VIA_ALARM:
+         };
+     }
+ }
++} # End closure
+ 
+ # Orphaned Docker or Linux containers do not necessarily attach to PID 1. They might attach to 0 instead.
+ sub is_linux_container {
+-- 
+2.49.0
+

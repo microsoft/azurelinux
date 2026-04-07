@@ -1,0 +1,24 @@
+diff -up wrk/doc/bc.1.wrk wrk/doc/bc.1
+--- wrk/doc/bc.1.wrk	2013-10-02 13:36:52.066295450 +0200
++++ wrk/doc/bc.1	2013-10-02 13:35:22.738553712 +0200
+@@ -174,6 +174,8 @@ The result of the expression is the sum
+ The result of the expression is the difference of the two expressions.
+ .IP "expr * expr"
+ The result of the expression is the product of the two expressions.
++If a and b are the scales of the two expressions, then the scale of the result is:
++min(a+b,max(scale,a,b))
+ .IP "expr / expr"
+ The result of the expression is the quotient of the two expressions.
+ The scale of the result is the value of the variable \fBscale\fR.
+diff -up wrk/doc/bc.texi.wrk wrk/doc/bc.texi
+--- wrk/doc/bc.texi.wrk	2013-10-02 13:17:01.743765518 +0200
++++ wrk/doc/bc.texi	2013-10-02 13:21:04.479870656 +0200
+@@ -290,6 +290,8 @@ The result of the expression is the diff
+ 
+ @item expr * expr
+ The result of the expression is the product of the two expressions.
++If a and b are the scales of the two expressions, then the scale of the result is:
++min(a+b,max(@var{scale},a,b))
+ 
+ @item expr / expr
+ The result of the expression is the quotient of the two expressions.

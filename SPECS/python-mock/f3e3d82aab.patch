@@ -1,0 +1,73 @@
+From f3e3d82aab0ede7e25273806dc0505574d85eae2 Mon Sep 17 00:00:00 2001
+From: Chris Withers <chris@simplistix.co.uk>
+Date: Thu, 15 Apr 2021 08:27:25 +0100
+Subject: [PATCH] fix tests that should test mock but were testing
+ unittest.mock
+
+---
+ mock/tests/testmock.py | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/mock/tests/testmock.py b/mock/tests/testmock.py
+index 5702b6d..1a70909 100644
+--- a/mock/tests/testmock.py
++++ b/mock/tests/testmock.py
+@@ -13,6 +13,7 @@
+     create_autospec, mock
+ )
+ from mock.mock import _Call, _CallList
++import mock.mock as mock_module
+ 
+ 
+ class Iter(object):
+@@ -47,7 +48,7 @@ def test_all(self):
+         # if __all__ is badly defined then import * will raise an error
+         # We have to exec it because you can't import * inside a method
+         # in Python 3
+-        exec("from unittest.mock import *")
++        exec("from mock.mock import *")
+ 
+ 
+     def test_constructor(self):
+@@ -2137,16 +2138,16 @@ def test_isinstance_under_settrace(self):
+         # test_patch_dict_test_prefix and test_patch_test_prefix not restoring
+         # causes the objects patched to go out of sync
+ 
+-        old_patch = unittest.mock.patch
++        old_patch = mock_module.patch
+ 
+         # Directly using __setattr__ on unittest.mock causes current imported
+         # reference to be updated. Use a lambda so that during cleanup the
+         # re-imported new reference is updated.
+-        self.addCleanup(lambda patch: setattr(unittest.mock, 'patch', patch),
++        self.addCleanup(lambda patch: setattr(mock_module, 'patch', patch),
+                         old_patch)
+ 
+         with patch.dict('sys.modules'):
+-            del sys.modules['unittest.mock']
++            del sys.modules['mock']
+ 
+             # This trace will stop coverage being measured ;-)
+             def trace(frame, event, arg):  # pragma: no cover
+@@ -2155,7 +2156,7 @@ def trace(frame, event, arg):  # pragma: no cover
+             self.addCleanup(sys.settrace, sys.gettrace())
+             sys.settrace(trace)
+ 
+-            from unittest.mock import (
++            from mock.mock import (
+                 Mock, MagicMock, NonCallableMock, NonCallableMagicMock
+             )
+ 
+@@ -2170,10 +2171,10 @@ def trace(frame, event, arg):  # pragma: no cover
+     def test_bool_not_called_when_passing_spec_arg(self):
+         class Something:
+             def __init__(self):
+-                self.obj_with_bool_func = unittest.mock.MagicMock()
++                self.obj_with_bool_func = mock_module.MagicMock()
+ 
+         obj = Something()
+-        with unittest.mock.patch.object(obj, 'obj_with_bool_func', autospec=True): pass
++        with mock_module.patch.object(obj, 'obj_with_bool_func', autospec=True): pass
+ 
+         self.assertEqual(obj.obj_with_bool_func.__bool__.call_count, 0)
+ 

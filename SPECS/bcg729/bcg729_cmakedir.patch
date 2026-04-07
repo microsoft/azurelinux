@@ -1,0 +1,12 @@
+diff -rupN --no-dereference bcg729-1.1.1/CMakeLists.txt bcg729-1.1.1-new/CMakeLists.txt
+--- bcg729-1.1.1/CMakeLists.txt	2020-11-22 21:44:04.000000000 +0100
++++ bcg729-1.1.1-new/CMakeLists.txt	2025-07-16 19:44:04.316812730 +0200
+@@ -87,7 +87,7 @@ endif()
+ 
+ 
+ include(CMakePackageConfigHelpers)
+-set(CONFIG_PACKAGE_LOCATION "${CMAKE_INSTALL_DATADIR}/Bcg729/cmake")
++set(CONFIG_PACKAGE_LOCATION "${CMAKE_INSTALL_LIBDIR}/cmake/Bcg729")
+ write_basic_package_version_file(
+ 	"${CMAKE_CURRENT_BINARY_DIR}/Bcg729ConfigVersion.cmake"
+ 	VERSION ${PACKAGE_VERSION}

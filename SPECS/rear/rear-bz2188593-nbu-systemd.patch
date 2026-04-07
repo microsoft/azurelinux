@@ -1,0 +1,55 @@
+diff --git a/usr/share/rear/rescue/NBU/default/460_prepare_netbackup_systemd.sh b/usr/share/rear/rescue/NBU/default/460_prepare_netbackup_systemd.sh
+new file mode 100644
+index 00000000..f7423e0a
+--- /dev/null
++++ b/usr/share/rear/rescue/NBU/default/460_prepare_netbackup_systemd.sh
+@@ -0,0 +1,41 @@
++# 460_prepare_netbackup_systemd.sh
++# prepare systemd units for NBU (only if NBU version >=7.x)
++
++# set in 450_prepare_netbackup.sh
++[[ $NBU_version -lt 7 ]] && return	# NBU is using xinetd when version <7.x
++
++# Skip if systemd is not used.
++has_binary systemctl || return 0
++
++# Local functions that are 'unset' at the end of this script:
++
++function get_unit_path () {
++    systemctl show -P FragmentPath $1
++}
++
++function get_unit_dropin_paths () {
++    systemctl show -P DropInPaths $1
++}
++
++local unit_file_path
++local i
++local unit
++
++for unit in vxpbx_exchanged.service netbackup.service ; do
++    unit_file_path="$( get_unit_path $unit )"
++    if [ -n "$unit_file_path" ]; then
++        cp $v "$unit_file_path" $ROOTFS_DIR/etc/systemd/system
++        ln -s ../$unit $ROOTFS_DIR/etc/systemd/system/default.target.wants || Error "Failed to enable Netbackup service $unit in the rescue system"
++        Log "Enabled Netbackup service $unit in the rescue system"
++        for i in $( get_unit_dropin_paths $unit ) ; do
++            mkdir -p $ROOTFS_DIR/etc/systemd/system/$unit.d
++            cp $v $i $ROOTFS_DIR/etc/systemd/system/$unit.d
++        done
++    fi
++done
++
++# Local functions must be 'unset' because bash does not support 'local function ...'
++# cf. https://unix.stackexchange.com/questions/104755/how-can-i-create-a-local-function-in-my-bashrc
++unset -f get_unit_path
++unset -f get_unit_dropin_paths
++unset -f unit_is_enabled
+diff --git a/usr/share/rear/skel/default/etc/systemd/system/default.target.wants/.gitignore b/usr/share/rear/skel/default/etc/systemd/system/default.target.wants/.gitignore
+new file mode 100644
+index 00000000..d6b7ef32
+--- /dev/null
++++ b/usr/share/rear/skel/default/etc/systemd/system/default.target.wants/.gitignore
+@@ -0,0 +1,2 @@
++*
++!.gitignore

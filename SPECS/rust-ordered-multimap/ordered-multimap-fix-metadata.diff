@@ -1,0 +1,12 @@
+--- ordered-multimap-0.7.3/Cargo.toml	1970-01-01T00:00:01+00:00
++++ ordered-multimap-0.7.3/Cargo.toml	2025-04-14T08:53:32.442855+00:00
+@@ -34,9 +34,6 @@
+ optional = true
+ default-features = false
+ 
+-[dev-dependencies.coverage-helper]
+-version = "0.2.0"
+-
+ [dev-dependencies.serde_test]
+ version = "1.0.144"
+ 

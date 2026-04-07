@@ -1,0 +1,82 @@
+From 41e2ce08dda92bb6ad79dc567c708f2d435f3467 Mon Sep 17 00:00:00 2001
+From: David Edmundson <davidedmundson@kde.org>
+Date: Wed, 9 Feb 2022 17:20:48 +0000
+Subject: [PATCH 21/55] client: Simplify round trip behavior
+
+The custom event queue was removed in
+302d4ffb8549214eb4028dc3e47ec4ee4e12ffbd (2015) so the comment about not
+being able to use the inbuilt round trip method no longer applies.
+
+This fixes a real world problem. Use of a blocking round trip should not
+process non wayland events. Doing so can lead to misbehaviour client
+side as things happen out of order. The move to the event thread created
+several regressions as we now get events before the QGuiApplication is
+fully constructed.
+
+Change-Id: I650481f49a47ed1a9778c7e1bc3c48db6e8f0031
+Reviewed-by: Vlad Zahorodnii <vlad.zahorodnii@kde.org>
+Reviewed-by: Eskil Abrahamsen Blomfeldt <eskil.abrahamsen-blomfeldt@qt.io>
+(cherry picked from commit 62646d9122845d7bd9104b610478cebde3e769c7)
+---
+ src/client/qwaylanddisplay.cpp | 43 +---------------------------------
+ 1 file changed, 1 insertion(+), 42 deletions(-)
+
+diff --git a/src/client/qwaylanddisplay.cpp b/src/client/qwaylanddisplay.cpp
+index c38f6f82..b8da02b3 100644
+--- a/src/client/qwaylanddisplay.cpp
++++ b/src/client/qwaylanddisplay.cpp
+@@ -615,50 +615,9 @@ uint32_t QWaylandDisplay::currentTimeMillisec()
+     return 0;
+ }
+ 
+-static void
+-sync_callback(void *data, struct wl_callback *callback, uint32_t serial)
+-{
+-    Q_UNUSED(serial)
+-    bool *done = static_cast<bool *>(data);
+-
+-    *done = true;
+-
+-    // If the wl_callback done event is received after the condition check in the while loop in
+-    // forceRoundTrip(), but before the call to processEvents, the call to processEvents may block
+-    // forever if no more events are posted (eventhough the callback is handled in response to the
+-    // aboutToBlock signal). Hence, we wake up the event dispatcher so forceRoundTrip may return.
+-    // (QTBUG-64696)
+-    if (auto *dispatcher = QThread::currentThread()->eventDispatcher())
+-        dispatcher->wakeUp();
+-
+-    wl_callback_destroy(callback);
+-}
+-
+-static const struct wl_callback_listener sync_listener = {
+-    sync_callback
+-};
+-
+ void QWaylandDisplay::forceRoundTrip()
+ {
+-    // wl_display_roundtrip() works on the main queue only,
+-    // but we use a separate one, so basically reimplement it here
+-    int ret = 0;
+-    bool done = false;
+-    wl_callback *callback = wl_display_sync(mDisplay);
+-    wl_callback_add_listener(callback, &sync_listener, &done);
+-    flushRequests();
+-    if (QThread::currentThread()->eventDispatcher()) {
+-        while (!done && ret >= 0) {
+-            QThread::currentThread()->eventDispatcher()->processEvents(QEventLoop::WaitForMoreEvents);
+-            ret = wl_display_dispatch_pending(mDisplay);
+-        }
+-    } else {
+-        while (!done && ret >= 0)
+-            ret = wl_display_dispatch(mDisplay);
+-    }
+-
+-    if (ret == -1 && !done)
+-        wl_callback_destroy(callback);
++     wl_display_roundtrip(mDisplay);
+ }
+ 
+ bool QWaylandDisplay::supportsWindowDecoration() const
+-- 
+2.51.1
+

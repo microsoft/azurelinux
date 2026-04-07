@@ -1,0 +1,23 @@
+From b0f36f5b4233ef4cf613daca0adc3896d5424159 Mon Sep 17 00:00:00 2001
+From: danigm <daniel.garcia@suse.com>
+Date: Thu, 15 May 2025 14:04:00 +0200
+Subject: [PATCH] Update test_code_option_safe to work with click 8.2.0 (#4666)
+
+---
+ tests/test_black.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/tests/test_black.py b/tests/test_black.py
+index acafb521619..f5c950244ef 100644
+--- a/tests/test_black.py
++++ b/tests/test_black.py
+@@ -1907,7 +1907,8 @@ def test_code_option_safe(self) -> None:
+             args = ["--safe", "--code", code]
+             result = CliRunner().invoke(black.main, args)
+ 
+-            self.compare_results(result, error_msg, 123)
++            assert error_msg == result.output
++            assert result.exit_code == 123
+ 
+     def test_code_option_fast(self) -> None:
+         """Test that the code option ignores errors when the sanity checks fail."""

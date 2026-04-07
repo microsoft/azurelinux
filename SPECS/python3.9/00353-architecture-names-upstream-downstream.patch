@@ -1,0 +1,97 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Lumir Balhar <lbalhar@redhat.com>
+Date: Tue, 4 Aug 2020 12:04:03 +0200
+Subject: 00353: Original names for architectures with different names
+ downstream
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+https://fedoraproject.org/wiki/Changes/Python_Upstream_Architecture_Names
+
+Pythons in RHEL/Fedora used different names for some architectures
+than upstream and other distros (for example ppc64 vs. powerpc64).
+This was patched in patch 274, now it is sedded if %with legacy_archnames.
+
+That meant that an extension built with the default upstream settings
+(on other distro or as an manylinux wheel) could not been found by Python
+on RHEL/Fedora because it had a different suffix.
+This patch adds the legacy names to importlib so Python is able
+to import extensions with a legacy architecture name in its
+file name.
+It work both ways, so it support both %with and %without legacy_archnames.
+
+WARNING: This patch has no effect on Python built with bootstrap
+enabled because Python/importlib_external.h is not regenerated
+and therefore Python during bootstrap contains importlib from
+upstream without this feature. It's possible to include
+Python/importlib_external.h to this patch but it'd make rebasing
+a nightmare because it's basically a binary file.
+
+Co-authored-by: Miro Hrončok <miro@hroncok.cz>
+---
+ Lib/importlib/_bootstrap_external.py | 40 ++++++++++++++++++++++++++--
+ 1 file changed, 38 insertions(+), 2 deletions(-)
+
+diff --git a/Lib/importlib/_bootstrap_external.py b/Lib/importlib/_bootstrap_external.py
+index f3828b10e1..f0c9f8e383 100644
+--- a/Lib/importlib/_bootstrap_external.py
++++ b/Lib/importlib/_bootstrap_external.py
+@@ -1645,7 +1645,7 @@ def _get_supported_file_loaders():
+ 
+     Each item is a tuple (loader, suffixes).
+     """
+-    extensions = ExtensionFileLoader, _imp.extension_suffixes()
++    extensions = ExtensionFileLoader, _alternative_architectures(_imp.extension_suffixes())
+     source = SourceFileLoader, SOURCE_SUFFIXES
+     bytecode = SourcelessFileLoader, BYTECODE_SUFFIXES
+     return [extensions, source, bytecode]
+@@ -1701,7 +1701,7 @@ def _setup(_bootstrap_module):
+ 
+     # Constants
+     setattr(self_module, '_relax_case', _make_relax_case())
+-    EXTENSION_SUFFIXES.extend(_imp.extension_suffixes())
++    EXTENSION_SUFFIXES.extend(_alternative_architectures(_imp.extension_suffixes()))
+     if builtin_os == 'nt':
+         SOURCE_SUFFIXES.append('.pyw')
+         if '_d.pyd' in EXTENSION_SUFFIXES:
+@@ -1714,3 +1714,39 @@ def _install(_bootstrap_module):
+     supported_loaders = _get_supported_file_loaders()
+     sys.path_hooks.extend([FileFinder.path_hook(*supported_loaders)])
+     sys.meta_path.append(PathFinder)
++
++
++_ARCH_MAP = {
++    "-arm-linux-gnueabi.": "-arm-linux-gnueabihf.",
++    "-armeb-linux-gnueabi.": "-armeb-linux-gnueabihf.",
++    "-mips64-linux-gnu.": "-mips64-linux-gnuabi64.",
++    "-mips64el-linux-gnu.": "-mips64el-linux-gnuabi64.",
++    "-ppc-linux-gnu.": "-powerpc-linux-gnu.",
++    "-ppc-linux-gnuspe.": "-powerpc-linux-gnuspe.",
++    "-ppc64-linux-gnu.": "-powerpc64-linux-gnu.",
++    "-ppc64le-linux-gnu.": "-powerpc64le-linux-gnu.",
++    # The above, but the other way around:
++    "-arm-linux-gnueabihf.": "-arm-linux-gnueabi.",
++    "-armeb-linux-gnueabihf.": "-armeb-linux-gnueabi.",
++    "-mips64-linux-gnuabi64.": "-mips64-linux-gnu.",
++    "-mips64el-linux-gnuabi64.": "-mips64el-linux-gnu.",
++    "-powerpc-linux-gnu.": "-ppc-linux-gnu.",
++    "-powerpc-linux-gnuspe.": "-ppc-linux-gnuspe.",
++    "-powerpc64-linux-gnu.": "-ppc64-linux-gnu.",
++    "-powerpc64le-linux-gnu.": "-ppc64le-linux-gnu.",
++}
++
++
++def _alternative_architectures(suffixes):
++    """Add a suffix with an alternative architecture name
++    to the list of suffixes so an extension built with
++    the default (upstream) setting is loadable with our Pythons
++    """
++
++    for suffix in suffixes:
++        for original, alternative in _ARCH_MAP.items():
++            if original in suffix:
++                suffixes.append(suffix.replace(original, alternative))
++                return suffixes
++
++    return suffixes

@@ -1,0 +1,15 @@
+--- nu-ansi-term-0.50.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ nu-ansi-term-0.50.1/Cargo.toml	2024-07-29T20:39:46.993492+00:00
+@@ -43,12 +43,3 @@
+ derive_serde_style = ["serde"]
+ gnu_legacy = []
+ 
+-[target."cfg(windows)".dependencies.windows]
+-version = "0.52.0"
+-features = [
+-    "Win32_Foundation",
+-    "Win32_System_Console",
+-    "Win32_Storage_FileSystem",
+-    "Win32_Security",
+-]
+-package = "windows-sys"

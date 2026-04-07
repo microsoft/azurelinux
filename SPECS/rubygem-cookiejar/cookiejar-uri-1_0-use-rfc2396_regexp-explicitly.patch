@@ -1,0 +1,20 @@
+diff -urp '--exclude=*~' cookiejar-0.3.3.orig/lib/cookiejar/cookie_validation.rb cookiejar-0.3.3/lib/cookiejar/cookie_validation.rb
+--- cookiejar-0.3.3.orig/lib/cookiejar/cookie_validation.rb	2024-11-13 22:43:27.127058968 +0900
++++ cookiejar-0.3.3/lib/cookiejar/cookie_validation.rb	2024-11-13 23:19:58.077837263 +0900
+@@ -24,8 +24,15 @@ module CookieJar
+   # Contains logic to parse and validate cookie headers
+   module CookieValidation
+     # REGEX cookie matching
++
+     module PATTERN
+-      include URI::REGEXP::PATTERN
++
++      parser_pattern = URI::RFC2396_Parser.new.pattern
++      IPV4ADDR = parser_pattern[:IPV4ADDR]
++      IPV6ADDR = parser_pattern[:IPV6ADDR]
++      DOMLABEL = parser_pattern[:DOMLABEL]
++      TOPLABEL = parser_pattern[:TOPLABEL]
++      HOSTNAME = parser_pattern[:HOSTNAME]
+ 
+       TOKEN = '[^(),\/<>@;:\\\"\[\]?={}\s]+'.freeze
+       VALUE1 = '([^;]*)'.freeze

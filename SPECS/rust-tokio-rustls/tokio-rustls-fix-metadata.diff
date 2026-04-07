@@ -1,0 +1,20 @@
+--- tokio-rustls-0.26.4/Cargo.toml	1970-01-01T00:00:01+00:00
++++ tokio-rustls-0.26.4/Cargo.toml	2025-11-30T08:34:38.326236+00:00
+@@ -38,16 +38,13 @@
+ repository = "https://github.com/rustls/tokio-rustls"
+ 
+ [features]
+-aws-lc-rs = ["aws_lc_rs"]
+-aws_lc_rs = ["rustls/aws_lc_rs"]
+ brotli = ["rustls/brotli"]
+ default = [
+     "logging",
+     "tls12",
+-    "aws_lc_rs",
++    "ring",
+ ]
+ early-data = []
+-fips = ["rustls/fips"]
+ logging = ["rustls/logging"]
+ ring = ["rustls/ring"]
+ tls12 = ["rustls/tls12"]

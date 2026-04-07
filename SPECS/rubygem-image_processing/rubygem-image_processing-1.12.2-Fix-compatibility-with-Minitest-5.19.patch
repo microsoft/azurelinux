@@ -1,0 +1,46 @@
+From 4b5581abcc9c8f1404dd4982bffc43bd5df410b8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Thu, 31 Aug 2023 13:39:11 +0200
+Subject: [PATCH] Fix compatibility with Minitest 5.19+
+
+The `MiniTest` was renamed to `Minitest`:
+
+https://github.com/minitest/minitest/commit/9a57c520ceac76abfe6105866f8548a94eb357b6
+
+And the `MiniTest` constant is now loaded just when `MT_COMPAT` environment variable is set:
+
+https://github.com/minitest/minitest/commit/a2c6c18570f6f0a1bf6af70fe3b6d9599a13fdd6
+
+This fixes following issue:
+
+~~~
+$ ruby -Ilib:test -e 'Dir.glob "./test/**/*_test.rb", &method(:require)'
+/builddir/build/BUILD/test/test_helper.rb:17:in `<top (required)>': uninitialized constant MiniTest (NameError)
+class MiniTest::Test
+      ^^^^^^^^
+Did you mean?  Minitest
+	from <internal:/usr/share/rubygems/rubygems/core_ext/kernel_require.rb>:85:in `require'
+	from <internal:/usr/share/rubygems/rubygems/core_ext/kernel_require.rb>:85:in `require'
+	from /builddir/build/BUILD/image_processing-1.12.2/usr/share/gems/gems/image_processing-1.12.2/test/builder_test.rb:1:in `<top (required)>'
+	from <internal:/usr/share/rubygems/rubygems/core_ext/kernel_require.rb>:85:in `require'
+	from <internal:/usr/share/rubygems/rubygems/core_ext/kernel_require.rb>:85:in `require'
+	from <internal:dir>:220:in `glob'
+	from -e:1:in `<main>'
+~~~
+---
+ test/test_helper.rb | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/test_helper.rb b/test/test_helper.rb
+index 2756434..1b91c1b 100644
+--- a/test/test_helper.rb
++++ b/test/test_helper.rb
+@@ -14,7 +14,7 @@ require "dhash-vips"
+ require "vips"
+ require "mini_magick"
+ 
+-class MiniTest::Test
++class Minitest::Test
+   def fixture_image(name)
+     File.open("test/fixtures/#{name}", "rb")
+   end

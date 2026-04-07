@@ -1,0 +1,38 @@
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index 223088f..315ced7 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -195,7 +195,6 @@ TESTS =						\
+   word-delim-multibyte				\
+   word-multi-file				\
+   word-multibyte				\
+-  write-error-msg				\
+   y2038-vs-32-bit				\
+   yesno						\
+   z-anchor-newline
+diff --git a/tests/Makefile.in b/tests/Makefile.in
+index 3270d30..33dcd8a 100644
+--- a/tests/Makefile.in
++++ b/tests/Makefile.in
+@@ -2729,7 +2729,6 @@ TESTS = \
+   word-delim-multibyte				\
+   word-multi-file				\
+   word-multibyte				\
+-  write-error-msg				\
+   y2038-vs-32-bit				\
+   yesno						\
+   z-anchor-newline
+@@ -3970,13 +3969,6 @@ word-multibyte.log: word-multibyte
+ 	--log-file $$b.log --trs-file $$b.trs \
+ 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+ 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+-write-error-msg.log: write-error-msg
+-	@p='write-error-msg'; \
+-	b='write-error-msg'; \
+-	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+-	--log-file $$b.log --trs-file $$b.trs \
+-	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+-	"$$tst" $(AM_TESTS_FD_REDIRECT)
+ y2038-vs-32-bit.log: y2038-vs-32-bit
+ 	@p='y2038-vs-32-bit'; \
+ 	b='y2038-vs-32-bit'; \

@@ -1,0 +1,646 @@
+From 57c6a07549ec316069e7d5f7ab57258894914623 Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Tue, 13 Jun 2023 12:20:30 +0200
+Subject: [PATCH] Upgrade to 1.9775
+
+---
+ Changes       |  16 ++++
+ HiRes.pm      |   2 +-
+ HiRes.xs      | 225 ++++----------------------------------------------
+ Makefile.PL   |  44 +++++++---
+ t/Watchdog.pm |  12 +--
+ t/stat.t      |  66 +++++++++------
+ t/utime.t     |   6 ++
+ 7 files changed, 119 insertions(+), 252 deletions(-)
+
+diff --git a/Changes b/Changes
+index a9b91a0..2b681e9 100644
+--- a/Changes
++++ b/Changes
+@@ -2,6 +2,22 @@ Revision history for the Perl extension Time::HiRes.
+ 
+ {{NEXT}}
+ 
++ - Remove obsolete vms code
++ - Use core version compare
++ - Use GIMME_V instead of the deprecated GIMME
++ - t/utime.t: dragonflybsd has only microsecond precision
++ - t/utime.t: dragonflybsd is noatime by default
++ - t/stat.t: skip testing access times on HaikuOS, it doesn't support
++   atime
++ - darwin: make sure the compiler can find the system perl headers
++   https://github.com/Perl/perl5/issues/20362
++ - darwin: make sure PERL_DARWIN is defined on darwin.
++ - don't compare stat and lstat atime if PERL_FILE_ATIME_CHANGES is set in
++   the environment.
++   https://github.com/Perl/perl5/issues/19321
++ - don't use C++ guards around the perl header files, it caused C++
++   build failures with MSVC.
++
+ 1.9764 [2020-08-10]
+  - Fix a bunch of repeated-word typos
+  - Fix compilation with Visual C++ 2013 and older
+diff --git a/HiRes.pm b/HiRes.pm
+index 433ca31..b8cd263 100644
+--- a/HiRes.pm
++++ b/HiRes.pm
+@@ -50,7 +50,7 @@ our @EXPORT_OK = qw (usleep sleep ualarm alarm gettimeofday time tv_interval
+                  stat lstat utime
+                 );
+ 
+-our $VERSION = '1.9764';
++our $VERSION = '1.9775';
+ our $XS_VERSION = $VERSION;
+ $VERSION = eval $VERSION;
+ 
+diff --git a/HiRes.xs b/HiRes.xs
+index 8002472..7320cb8 100644
+--- a/HiRes.xs
++++ b/HiRes.xs
+@@ -11,16 +11,15 @@
+  * it under the same terms as Perl itself.
+  */
+ 
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
+ #define PERL_NO_GET_CONTEXT
+ #include "EXTERN.h"
+ #include "perl.h"
+ #include "XSUB.h"
+-#ifdef USE_PPPORT_H
+-#  include "ppport.h"
++#include "reentr.h"
++#if !defined(IS_SAFE_PATHNAME) && defined(TIME_HIRES_UTIME) && defined(HAS_UTIMENSAT)
++#define NEED_ck_warner
+ #endif
++#include "ppport.h"
+ #if defined(__CYGWIN__) && defined(HAS_W32API_WINDOWS_H)
+ #  include <w32api/windows.h>
+ #  define CYGWIN_WITH_W32API
+@@ -38,15 +37,6 @@ extern "C" {
+ #if defined(TIME_HIRES_CLOCK_GETTIME_SYSCALL) || defined(TIME_HIRES_CLOCK_GETRES_SYSCALL)
+ #  include <syscall.h>
+ #endif
+-#ifdef __cplusplus
+-}
+-#endif
+-
+-#define PERL_VERSION_DECIMAL(r,v,s) (r*1000000 + v*1000 + s)
+-#define PERL_DECIMAL_VERSION \
+-        PERL_VERSION_DECIMAL(PERL_REVISION,PERL_VERSION,PERL_SUBVERSION)
+-#define PERL_VERSION_GE(r,v,s) \
+-        (PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
+ 
+ #ifndef GCC_DIAG_IGNORE
+ #  define GCC_DIAG_IGNORE(x)
+@@ -139,8 +129,12 @@ typedef struct {
+     unsigned __int64 reset_time;
+ } my_cxt_t;
+ 
+-/* Visual C++ 2013 and older don't have the timespec structure */
+-#  if defined(_MSC_VER) && _MSC_VER < 1900
++/* Visual C++ 2013 and older don't have the timespec structure.
++ * Neither do mingw.org compilers with MinGW runtimes older than 3.22. */
++#  if((defined(_MSC_VER) && _MSC_VER < 1900) || \
++      (defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR) && \
++      defined(__MINGW32_MAJOR_VERSION) && (__MINGW32_MAJOR_VERSION < 3 || \
++      (__MINGW32_MAJOR_VERSION == 3 && __MINGW32_MINOR_VERSION < 22))))
+ struct timespec {
+     time_t tv_sec;
+     long   tv_nsec;
+@@ -263,8 +257,6 @@ _gettimeofday(pTHX_ struct timeval *tp, void *not_used)
+ static int
+ _clock_gettime(pTHX_ clockid_t clock_id, struct timespec *tp)
+ {
+-    FT_t ft;
+-
+     switch (clock_id) {
+     case CLOCK_REALTIME: {
+         FT_t ft;
+@@ -323,193 +315,6 @@ _clock_getres(clockid_t clock_id, struct timespec *tp)
+ 
+ #endif /* #if defined(WIN32) || defined(CYGWIN_WITH_W32API) */
+ 
+-#if !defined(HAS_GETTIMEOFDAY) && defined(VMS)
+-#  define HAS_GETTIMEOFDAY
+-
+-#  include <lnmdef.h>
+-#  include <time.h> /* gettimeofday */
+-#  include <stdlib.h> /* qdiv */
+-#  include <starlet.h> /* sys$gettim */
+-#  include <descrip.h>
+-#  ifdef __VAX
+-#    include <lib$routines.h> /* lib$ediv() */
+-#  endif
+-
+-/*
+-        VMS binary time is expressed in 100 nano-seconds since
+-        system base time which is 17-NOV-1858 00:00:00.00
+-*/
+-
+-#  define DIV_100NS_TO_SECS  10000000L
+-#  define DIV_100NS_TO_USECS 10L
+-
+-/*
+-        gettimeofday is supposed to return times since the epoch
+-        so need to determine this in terms of VMS base time
+-*/
+-static $DESCRIPTOR(dscepoch,"01-JAN-1970 00:00:00.00");
+-
+-#  ifdef __VAX
+-static long base_adjust[2]={0L,0L};
+-#  else
+-static __int64 base_adjust=0;
+-#  endif
+-
+-/*
+-
+-   If we don't have gettimeofday, then likely we are on a VMS machine that
+-   operates on local time rather than UTC...so we have to zone-adjust.
+-   This code gleefully swiped from VMS.C
+-
+-*/
+-/* method used to handle UTC conversions:
+- *   1 == CRTL gmtime();  2 == SYS$TIMEZONE_DIFFERENTIAL;  3 == no correction
+- */
+-static int gmtime_emulation_type;
+-/* number of secs to add to UTC POSIX-style time to get local time */
+-static long int utc_offset_secs;
+-static struct dsc$descriptor_s fildevdsc =
+-    { 12, DSC$K_DTYPE_T, DSC$K_CLASS_S, "LNM$FILE_DEV" };
+-static struct dsc$descriptor_s *fildev[] = { &fildevdsc, NULL };
+-
+-static time_t toutc_dst(time_t loc) {
+-    struct tm *rsltmp;
+-
+-    if ((rsltmp = localtime(&loc)) == NULL) return -1;
+-    loc -= utc_offset_secs;
+-    if (rsltmp->tm_isdst) loc -= 3600;
+-    return loc;
+-}
+-
+-static time_t toloc_dst(time_t utc) {
+-    struct tm *rsltmp;
+-
+-    utc += utc_offset_secs;
+-    if ((rsltmp = localtime(&utc)) == NULL) return -1;
+-    if (rsltmp->tm_isdst) utc += 3600;
+-    return utc;
+-}
+-
+-#  define _toutc(secs)  ((secs) == (time_t) -1 ? (time_t) -1 : \
+-          ((gmtime_emulation_type || timezone_setup()), \
+-          (gmtime_emulation_type == 1 ? toutc_dst(secs) : \
+-          ((secs) - utc_offset_secs))))
+-
+-#  define _toloc(secs)  ((secs) == (time_t) -1 ? (time_t) -1 : \
+-          ((gmtime_emulation_type || timezone_setup()), \
+-          (gmtime_emulation_type == 1 ? toloc_dst(secs) : \
+-          ((secs) + utc_offset_secs))))
+-
+-static int
+-timezone_setup(void)
+-{
+-    struct tm *tm_p;
+-
+-    if (gmtime_emulation_type == 0) {
+-        int dstnow;
+-        time_t base = 15 * 86400; /* 15jan71; to avoid month/year ends between    */
+-                                  /* results of calls to gmtime() and localtime() */
+-                                  /* for same &base */
+-
+-        gmtime_emulation_type++;
+-        if ((tm_p = gmtime(&base)) == NULL) { /* CRTL gmtime() is a fake */
+-            char off[LNM$C_NAMLENGTH+1];;
+-
+-            gmtime_emulation_type++;
+-            if (!Perl_vmstrnenv("SYS$TIMEZONE_DIFFERENTIAL",off,0,fildev,0)) {
+-                gmtime_emulation_type++;
+-                utc_offset_secs = 0;
+-                Perl_warn(aTHX_ "no UTC offset information; assuming local time is UTC");
+-            }
+-            else { utc_offset_secs = atol(off); }
+-        }
+-        else { /* We've got a working gmtime() */
+-            struct tm gmt, local;
+-
+-            gmt = *tm_p;
+-            tm_p = localtime(&base);
+-            local = *tm_p;
+-            utc_offset_secs  = (local.tm_mday - gmt.tm_mday) * 86400;
+-            utc_offset_secs += (local.tm_hour - gmt.tm_hour) * 3600;
+-            utc_offset_secs += (local.tm_min  - gmt.tm_min)  * 60;
+-            utc_offset_secs += (local.tm_sec  - gmt.tm_sec);
+-        }
+-    }
+-    return 1;
+-}
+-
+-
+-int
+-gettimeofday (struct timeval *tp, void *tpz)
+-{
+-    long ret;
+-#  ifdef __VAX
+-    long quad[2];
+-    long quad1[2];
+-    long div_100ns_to_secs;
+-    long div_100ns_to_usecs;
+-    long quo,rem;
+-    long quo1,rem1;
+-#  else
+-    __int64 quad;
+-    __qdiv_t ans1,ans2;
+-#  endif
+-    /*
+-        In case of error, tv_usec = 0 and tv_sec = VMS condition code.
+-        The return from function is also set to -1.
+-        This is not exactly as per the manual page.
+-    */
+-
+-    tp->tv_usec = 0;
+-
+-#  ifdef __VAX
+-    if (base_adjust[0]==0 && base_adjust[1]==0) {
+-#  else
+-    if (base_adjust==0) { /* Need to determine epoch adjustment */
+-#  endif
+-        ret=sys$bintim(&dscepoch,&base_adjust);
+-        if (1 != (ret &&1)) {
+-            tp->tv_sec = ret;
+-            return -1;
+-        }
+-    }
+-
+-    ret=sys$gettim(&quad); /* Get VMS system time */
+-    if ((1 && ret) == 1) {
+-#  ifdef __VAX
+-        quad[0] -= base_adjust[0]; /* convert to epoch offset */
+-        quad[1] -= base_adjust[1]; /* convert 2nd half of quadword */
+-        div_100ns_to_secs = DIV_100NS_TO_SECS;
+-        div_100ns_to_usecs = DIV_100NS_TO_USECS;
+-        lib$ediv(&div_100ns_to_secs,&quad,&quo,&rem);
+-        quad1[0] = rem;
+-        quad1[1] = 0L;
+-        lib$ediv(&div_100ns_to_usecs,&quad1,&quo1,&rem1);
+-        tp->tv_sec = quo; /* Whole seconds */
+-        tp->tv_usec = quo1; /* Micro-seconds */
+-#  else
+-        quad -= base_adjust; /* convert to epoch offset */
+-        ans1=qdiv(quad,DIV_100NS_TO_SECS);
+-        ans2=qdiv(ans1.rem,DIV_100NS_TO_USECS);
+-        tp->tv_sec = ans1.quot; /* Whole seconds */
+-        tp->tv_usec = ans2.quot; /* Micro-seconds */
+-#  endif
+-    } else {
+-        tp->tv_sec = ret;
+-        return -1;
+-    }
+-#  ifdef VMSISH_TIME
+-#    ifdef RTL_USES_UTC
+-    if (VMSISH_TIME) tp->tv_sec = _toloc(tp->tv_sec);
+-#    else
+-    if (!VMSISH_TIME) tp->tv_sec = _toutc(tp->tv_sec);
+-#    endif
+-#  endif
+-    return 0;
+-}
+-#endif /* #if !defined(HAS_GETTIMEOFDAY) && defined(VMS) */
+-
+-
+  /* Do not use H A S _ N A N O S L E E P
+   * so that Perl Configure doesn't scan for it (and pull in -lrt and
+   * the like which are not usually good ideas for the default Perl).
+@@ -1086,7 +891,7 @@ nsec_without_unslept(struct timespec *sleepfor,
+ /* In case Perl and/or Devel::PPPort are too old, minimally emulate
+  * IS_SAFE_PATHNAME() (which looks for zero bytes in the pathname). */
+ #ifndef IS_SAFE_PATHNAME
+-#  if PERL_VERSION >= 12 /* Perl_ck_warner is 5.10.0 -> */
++#  if PERL_VERSION_GE(5,12,0) /* Perl_ck_warner is 5.10.0 -> */
+ #    ifdef WARN_SYSCALLS
+ #      define WARNEMUCAT WARN_SYSCALLS /* 5.22.0 -> */
+ #    else
+@@ -1380,7 +1185,7 @@ gettimeofday()
+         int status;
+         status = gettimeofday (&Tp, NULL);
+         if (status == 0) {
+-            if (GIMME == G_ARRAY) {
++            if (GIMME_V == G_LIST) {
+                 EXTEND(sp, 2);
+                 PUSHs(sv_2mortal(newSViv(Tp.tv_sec)));
+                 PUSHs(sv_2mortal(newSViv(Tp.tv_usec)));
+@@ -1437,7 +1242,7 @@ setitimer(which, seconds, interval = 0)
+         if (setitimer(which, &newit, &oldit) == 0) {
+             EXTEND(sp, 1);
+             PUSHs(sv_2mortal(newSVnv(TV2NV(oldit.it_value))));
+-            if (GIMME == G_ARRAY) {
++            if (GIMME_V == G_LIST) {
+                 EXTEND(sp, 1);
+                 PUSHs(sv_2mortal(newSVnv(TV2NV(oldit.it_interval))));
+             }
+@@ -1457,7 +1262,7 @@ getitimer(which)
+         if (getitimer(which, &nowit) == 0) {
+             EXTEND(sp, 1);
+             PUSHs(sv_2mortal(newSVnv(TV2NV(nowit.it_value))));
+-            if (GIMME == G_ARRAY) {
++            if (GIMME_V == G_LIST) {
+                 EXTEND(sp, 1);
+                 PUSHs(sv_2mortal(newSVnv(TV2NV(nowit.it_interval))));
+             }
+@@ -1710,7 +1515,7 @@ PROTOTYPE: ;$
+         Zero(&fakeop, 1, OP);
+         fakeop.op_type = ix ? OP_LSTAT : OP_STAT;
+         fakeop.op_ppaddr = PL_ppaddr[fakeop.op_type];
+-        fakeop.op_flags = GIMME_V == G_ARRAY ? OPf_WANT_LIST :
++        fakeop.op_flags = GIMME_V == G_LIST ? OPf_WANT_LIST :
+             GIMME_V == G_SCALAR ? OPf_WANT_SCALAR : OPf_WANT_VOID;
+         PL_op = &fakeop;
+         (void)fakeop.op_ppaddr(aTHX);
+diff --git a/Makefile.PL b/Makefile.PL
+index c918cd1..ac56d8d 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -68,11 +68,20 @@ __EOD__
+             }
+         }
+ 
+-        my $ccflags = $Config{'ccflags'} . ' ' . "-I$COREincdir"
+-         . ' -DPERL_NO_INLINE_FUNCTIONS';
++        my $ccflags = $Config{'ccflags'} . ' ';
++        my @osvers = split /\./, $Config{osvers};
++        if ($^O eq "darwin"
++            && $^X eq "/usr/bin/perl"
++            && $osvers[0] >= 18) {
++            $ccflags .= qq(-iwithsysroot "$COREincdir");
++        }
++        else {
++            $ccflags .= "-I$COREincdir"
++        }
++        $ccflags .= ' -DPERL_NO_INLINE_FUNCTIONS';
+ 
+         if ($^O eq 'VMS') {
+-            $cccmd = "$Config{'cc'} /include=($COREincdir) $tmp.c";
++            $cccmd = "$Config{'cc'} $Config{'ccflags'} /include=($COREincdir) $tmp.c";
+         }
+ 
+         if ($args{silent} || !$VERBOSE) {
+@@ -562,7 +571,10 @@ EOD
+     my $has_clock_gettime;
+     my $has_clock_gettime_emulation;
+     if (exists $Config{d_clock_gettime}) {
+-        $has_clock_gettime++ if $Config{d_clock_gettime}; # Unlikely...
++        if ($Config{d_clock_gettime}) { # possibly set for cross-compilation
++            $has_clock_gettime++;
++            $DEFINE .= ' -DTIME_HIRES_CLOCK_GETTIME';
++        }
+     } elsif (has_clock_xxx('gettime')) {
+         $has_clock_gettime++;
+         $DEFINE .= ' -DTIME_HIRES_CLOCK_GETTIME';
+@@ -591,7 +603,10 @@ EOD
+     my $has_clock_getres;
+     my $has_clock_getres_emulation;
+     if (exists $Config{d_clock_getres}) {
+-        $has_clock_getres++ if $Config{d_clock_getres}; # Unlikely...
++        if ($Config{d_clock_getres}) { # possibly set for cross-compilation
++            $has_clock_getres++;
++            $DEFINE .= ' -DTIME_HIRES_CLOCK_GETRES';
++        }
+     } elsif (has_clock_xxx('getres')) {
+         $has_clock_getres++;
+         $DEFINE .= ' -DTIME_HIRES_CLOCK_GETRES';
+@@ -620,7 +635,10 @@ EOD
+     my $has_clock_nanosleep;
+     my $has_clock_nanosleep_emulation;
+     if (exists $Config{d_clock_nanosleep}) {
+-        $has_clock_nanosleep++ if $Config{d_clock_nanosleep}; # Unlikely...
++        if ($Config{d_clock_nanosleep}) { # possibly set for cross-compilation
++            $has_clock_nanosleep++;
++            $DEFINE .= ' -DTIME_HIRES_CLOCK_NANOSLEEP';
++        }
+     } elsif (has_clock_nanosleep()) {
+         $has_clock_nanosleep++;
+         $DEFINE .= ' -DTIME_HIRES_CLOCK_NANOSLEEP';
+@@ -643,7 +661,10 @@ EOD
+     print "Looking for clock()... ";
+     my $has_clock;
+     if (exists $Config{d_clock}) {
+-        $has_clock++ if $Config{d_clock}; # Unlikely...
++        if ($Config{d_clock}) { # possibly set for cross-compilation
++            $has_clock++;
++            $DEFINE .= ' -DTIME_HIRES_CLOCK';
++        }
+     } elsif (has_clock()) {
+         $has_clock++;
+         $DEFINE .= ' -DTIME_HIRES_CLOCK';
+@@ -829,6 +850,11 @@ EOM
+             print "NOT found.\n";
+         }
+     }
++    if ($^O eq "darwin") {
++        # the system perl on darwin doesn't seem to include -DPERL_DARWIN
++        # which breaks setting up emulation
++        DEFINE("PERL_DARWIN");
++    }
+ 
+     if ($DEFINE) {
+         $DEFINE =~ s/^\s+//;
+@@ -842,8 +868,6 @@ EOM
+ sub doMakefile {
+     my @makefileopts = ();
+ 
+-    DEFINE('USE_PPPORT_H') unless $ENV{PERL_CORE};
+-
+     push (@makefileopts,
+         'NAME'  => 'Time::HiRes',
+         'AUTHOR'    => 'Jarkko Hietaniemi <jhi@iki.fi>',
+@@ -861,7 +885,7 @@ sub doMakefile {
+             'Config' => 0,
+             'Exporter' => 0,
+             'ExtUtils::MakeMaker' => 0,
+-            'Test::More' => 0,
++            'Test::More' => 0.84,
+             'XSLoader' => 0,
+             'strict' => 0,
+             'File::Spec' => 0,
+diff --git a/t/Watchdog.pm b/t/Watchdog.pm
+index a93ab4f..5f78a17 100644
+--- a/t/Watchdog.pm
++++ b/t/Watchdog.pm
+@@ -10,30 +10,30 @@ my $watchdog_pid;
+ my $TheEnd;
+ 
+ if ($Config{d_fork}) {
+-    print("# I am the main process $$, starting the watchdog process...\n");
++    note ("I am the main process $$, starting the watchdog process...");
+     $watchdog_pid = fork();
+     if (defined $watchdog_pid) {
+         if ($watchdog_pid == 0) { # We are the kid, set up the watchdog.
+             my $ppid = getppid();
+-            print("# I am the watchdog process $$, sleeping for $waitfor seconds...\n");
++            note ("I am the watchdog process $$, sleeping for $waitfor seconds...");
+             sleep($waitfor - 2);    # Workaround for perlbug #49073
+             sleep(2);               # Wait for parent to exit
+             if (kill(0, $ppid)) {   # Check if parent still exists
+                 warn "\n$0: overall time allowed for tests (${waitfor}s) exceeded!\n";
+                 print("Terminating main process $ppid...\n");
+                 kill('KILL', $ppid);
+-                print("# This is the watchdog process $$, over and out.\n");
++                note ("This is the watchdog process $$, over and out.");
+             }
+             exit(0);
+         } else {
+-            print("# The watchdog process $watchdog_pid launched, continuing testing...\n");
++            note ("The watchdog process $watchdog_pid launched, continuing testing...");
+             $TheEnd = time() + $waitfor;
+         }
+     } else {
+         warn "$0: fork failed: $!\n";
+     }
+ } else {
+-    print("# No watchdog process (need fork)\n");
++    note ("No watchdog process (need fork)");
+ }
+ 
+ END {
+@@ -47,7 +47,7 @@ END {
+             printf("# kill KILL $watchdog_pid = %d\n", $kill);
+         }
+         unlink("ktrace.out"); # Used in BSD system call tracing.
+-        print("# All done.\n");
++        note ("All done.");
+     }
+ }
+ 
+diff --git a/t/stat.t b/t/stat.t
+index f2f8e87..2f72fdc 100644
+--- a/t/stat.t
++++ b/t/stat.t
+@@ -20,31 +20,41 @@ use t::Watchdog;
+ my @atime;
+ my @mtime;
+ for (1..5) {
++    note "cycle $_";
+     Time::HiRes::sleep(rand(0.1) + 0.1);
+     open(X, '>', $$);
+     print X $$;
+     close(X);
+     my($a, $stat, $b) = ("a", [Time::HiRes::stat($$)], "b");
+-    is $a, "a";
+-    is $b, "b";
+-    is ref($stat), "ARRAY";
++    is $a, "a", "stat stack discipline";
++    is $b, "b", "stat stack discipline";
++    is ref($stat), "ARRAY", "stat returned array";
+     push @mtime, $stat->[9];
+     ($a, my $lstat, $b) = ("a", [Time::HiRes::lstat($$)], "b");
+-    is $a, "a";
+-    is $b, "b";
+-    is_deeply $lstat, $stat;
+-    Time::HiRes::sleep(rand(0.1) + 0.1);
+-    open(X, '<', $$);
+-    <X>;
+-    close(X);
+-    $stat = [Time::HiRes::stat($$)];
+-    push @atime, $stat->[8];
+-    $lstat = [Time::HiRes::lstat($$)];
+-    is_deeply $lstat, $stat;
++    is $a, "a", "lstat stack discipline";
++    is $b, "b", "lstat stack discipline";
++    SKIP: {
++        if($^O eq "haiku") {
++            skip "testing stat access time on Haiku", 2;
++        }
++        if ($ENV{PERL_FILE_ATIME_CHANGES}) {
++            # something else might access the file, changing atime
++            $lstat->[8] = $stat->[8];
++        }
++        is_deeply $lstat, $stat, "write: stat and lstat returned same values";
++        Time::HiRes::sleep(rand(0.1) + 0.1);
++        open(X, '<', $$);
++        <X>;
++        close(X);
++        $stat = [Time::HiRes::stat($$)];
++        push @atime, $stat->[8];
++        $lstat = [Time::HiRes::lstat($$)];
++        is_deeply $lstat, $stat, "read:  stat and lstat returned same values";
++    }
+ }
+ 1 while unlink $$;
+-print("# mtime = @mtime\n");
+-print("# atime = @atime\n");
++note ("mtime = @mtime");
++note ("atime = @atime");
+ my $ai = 0;
+ my $mi = 0;
+ my $ss = 0;
+@@ -64,13 +74,15 @@ for (my $i = 1; $i < @mtime; $i++) {
+         $ss++;
+     }
+ }
+-print("# ai = $ai, mi = $mi, ss = $ss\n");
++note ("ai = $ai, mi = $mi, ss = $ss");
+ # Need at least 75% of monotonical increase and
+ # 20% of subsecond results. Yes, this is guessing.
+ SKIP: {
+     skip "no subsecond timestamps detected", 1 if $ss == 0;
++    skip "testing stat access on Haiku", 1 if $^O eq "haiku";
+     ok $mi/(@mtime-1) >= 0.75 && $ai/(@atime-1) >= 0.75 &&
+-             $ss/(@mtime+@atime) >= 0.2;
++             $ss/(@mtime+@atime) >= 0.2,
++        "monotonical increase and subsecond results within expected parameters";
+ }
+ 
+ my $targetname = "tgt$$";
+@@ -81,17 +93,21 @@ SKIP: {
+     close(X);
+     eval { symlink $targetname, $linkname or die "can't symlink: $!"; };
+     skip "can't symlink", 7 if $@ ne "";
++    note "compare Time::HiRes::stat with ::lstat";
+     my @tgt_stat = Time::HiRes::stat($targetname);
+     my @tgt_lstat = Time::HiRes::lstat($targetname);
+     my @lnk_stat = Time::HiRes::stat($linkname);
+     my @lnk_lstat = Time::HiRes::lstat($linkname);
+-    is scalar(@tgt_stat), 13;
+-    is scalar(@tgt_lstat), 13;
+-    is scalar(@lnk_stat), 13;
+-    is scalar(@lnk_lstat), 13;
+-    is_deeply \@tgt_stat, \@tgt_lstat;
+-    is_deeply \@tgt_stat, \@lnk_stat;
+-    isnt $lnk_lstat[2], $tgt_stat[2];
++    my $exp = 13;
++    is scalar(@tgt_stat), $exp,  "stat on target";
++    is scalar(@tgt_lstat), $exp, "lstat on target";
++    is scalar(@lnk_stat), $exp,  "stat on link";
++    is scalar(@lnk_lstat), $exp, "lstat on link";
++    skip "testing stat access on Haiku", 3 if $^O eq "haiku";
++    is_deeply \@tgt_stat, \@tgt_lstat, "stat and lstat return same values on target";
++    is_deeply \@tgt_stat, \@lnk_stat,  "stat and lstat return same values on link";
++    isnt $lnk_lstat[2], $tgt_stat[2],
++        "target stat mode value differs from link lstat mode value";
+ }
+ 1 while unlink $linkname;
+ 1 while unlink $targetname;
+diff --git a/t/utime.t b/t/utime.t
+index e2399b8..8a4f071 100644
+--- a/t/utime.t
++++ b/t/utime.t
+@@ -132,9 +132,15 @@ if ($^O eq 'cygwin') {
+     $atime = 1.1111111;
+     $mtime = 2.2222222;
+ }
++if ($^O eq 'dragonfly') {
++    # Dragonfly (hammer2?) timestamps have less precision.
++    $atime = 1.111111;
++    $mtime = 2.222222;
++}
+ print "# \$^O = $^O, atime = $atime, mtime = $mtime\n";
+ 
+ my $skip_atime = $^O eq 'netbsd' && tempfile_has_noatime_mount();
++$skip_atime = 1 if $^O eq 'dragonfly'; # noatime by default
+ 
+ if ($skip_atime) {
+     printf("# Skipping atime tests because tempfiles seem to be in a filesystem mounted with 'noatime' ($^O)\n'");
+-- 
+2.40.1
+

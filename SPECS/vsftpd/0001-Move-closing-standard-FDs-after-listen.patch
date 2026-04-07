@@ -1,0 +1,46 @@
+From 40fea4552377504ce69935149e64e39a595f4600 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Lyson=C4=9Bk?= <olysonek@redhat.com>
+Date: Sat, 3 Aug 2019 17:50:14 +0200
+Subject: [PATCH 1/2] Move closing standard FDs after listen()
+
+The vsf_sysutil_close() calls need to be moved a bit further so that
+die() works properly in case listen() fails.
+
+I see no reason the calls should be placed before listen()
+specifically, as they are now. My guess is that the author who added
+the calls thought that listen() is a blocking call, which is not the
+case. The only thing we need to satisfy is that close() is called
+before accept, because that is a blocking call. That's all that is
+needed to fix the bug that was fixed by adding the close() calls.
+
+Resolves: rhbz#1666380
+---
+ standalone.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/standalone.c b/standalone.c
+index 3f35e9e..b358ca1 100644
+--- a/standalone.c
++++ b/standalone.c
+@@ -152,15 +152,15 @@ vsf_standalone_main(void)
+       vsf_sysutil_kill(vsf_sysutil_getppid(), kVSFSysUtilSigUSR1);
+     }
+   }
+-  vsf_sysutil_close(0);
+-  vsf_sysutil_close(1);
+-  vsf_sysutil_close(2);
+   retval = vsf_sysutil_listen(listen_sock, VSFTP_LISTEN_BACKLOG);
+   if (vsf_sysutil_retval_is_error(retval))
+   {
+     die("could not listen");
+   }
+   vsf_sysutil_sockaddr_alloc(&p_accept_addr);
++  vsf_sysutil_close(0);
++  vsf_sysutil_close(1);
++  vsf_sysutil_close(2);
+   while (1)
+   {
+     struct vsf_client_launch child_info;
+-- 
+2.20.1
+

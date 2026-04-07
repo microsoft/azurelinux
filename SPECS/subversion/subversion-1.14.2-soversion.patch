@@ -1,0 +1,23 @@
+
+Subversion libraries don't get properly versioned so the library
+names are always "libsvn_foo-1.so.0.0.0". Provide proper 
+versioning information to libtool *without* changing the soname
+for compatibility with upstream, so on-disk filenames are
+unique across different releases.
+
+--- subversion-1.14.2/configure.ac.soversion
++++ subversion-1.14.2/configure.ac
+@@ -112,7 +112,12 @@
+   SVN_APR_MAJOR_VERSION=1
+ fi
+ AC_SUBST(SVN_APR_MAJOR_VERSION)
+-SVN_LT_SOVERSION="-version-info $svn_lib_ver"
++
++m4_define([svn_ver_minor], m4_bpatsubst(AC_PACKAGE_VERSION, [[0-9]*\.\([0-9]*\)\.[0-9]*], [\1]))
++m4_define([svn_ver_patch], m4_bpatsubst(AC_PACKAGE_VERSION, [[0-9]*\.[0-9]*\.\([0-9]*\)], [\1]))
++svn_ver_current="`expr $svn_lib_ver + svn_ver_minor`"
++
++SVN_LT_SOVERSION="-version-info $svn_ver_current:svn_ver_patch:svn_ver_minor"
+ AC_SUBST(SVN_LT_SOVERSION)
+ AC_DEFINE_UNQUOTED(SVN_SOVERSION, $svn_lib_ver,
+                    [Subversion library major verson])

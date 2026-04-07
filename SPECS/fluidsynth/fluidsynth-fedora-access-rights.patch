@@ -1,0 +1,5 @@
+--- fluidsynth-2.4.8.org/fluidsynth.tmpfiles.in 2025-10-16 18:09:16.882557435 +0200
++++ fluidsynth-2.4.8/fluidsynth.tmpfiles.in     2025-10-16 18:11:17.811693039 +0200
+@@ -1 +1 @@
+-d /run/lock/fluidsynth 0777 root root
++d /run/lock/fluidsynth 0755 root root

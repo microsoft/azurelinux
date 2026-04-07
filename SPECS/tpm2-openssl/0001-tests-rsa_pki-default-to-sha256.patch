@@ -1,0 +1,96 @@
+From c0a9076035513521fea11ee1f99eae6b80e49e6d Mon Sep 17 00:00:00 2001
+From: Adrian Freihofer <adrian.freihofer@gmail.com>
+Date: Fri, 9 Aug 2024 15:58:01 +0200
+Subject: [PATCH 1/2] tests: rsa_pki default to sha256
+
+Some distributions (Fedora 41) are starting to block sha1 hashes. This
+prevents this test case. Let's use sha256, which is more future-proof
+and should currently be supported by all distributions.
+
+Removing the following 2 lines from
+/etc/crypto-policies/back-ends/opensslcnf.config
+  [evp_properties]
+  rh-allow-sha1-signatures = no
+allows to run the tests successfully also with sha1.
+
+Signed-off-by: Adrian Freihofer <adrian.freihofer@gmail.com>
+---
+ test/rsa_pki/etc/email.conf      | 2 +-
+ test/rsa_pki/etc/root-ca.conf    | 4 ++--
+ test/rsa_pki/etc/server.conf     | 2 +-
+ test/rsa_pki/etc/signing-ca.conf | 4 ++--
+ 4 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/test/rsa_pki/etc/email.conf b/test/rsa_pki/etc/email.conf
+index 8d59829..7606c38 100644
+--- a/test/rsa_pki/etc/email.conf
++++ b/test/rsa_pki/etc/email.conf
+@@ -6,7 +6,7 @@
+ [ req ]
+ default_bits            = 2048                  # RSA key size
+ encrypt_key             = no
+-default_md              = sha1                  # MD to use
++default_md              = sha256                # MD to use
+ utf8                    = yes                   # Input is UTF-8
+ string_mask             = utf8only              # Emit UTF-8 strings
+ prompt                  = no                    # Don't prompt for DN
+diff --git a/test/rsa_pki/etc/root-ca.conf b/test/rsa_pki/etc/root-ca.conf
+index 69d284e..2f72eb4 100644
+--- a/test/rsa_pki/etc/root-ca.conf
++++ b/test/rsa_pki/etc/root-ca.conf
+@@ -15,7 +15,7 @@ dir                     = testdb                # Top dir
+ [ req ]
+ default_bits            = 2048                  # RSA key size
+ encrypt_key             = no
+-default_md              = sha1                  # MD to use
++default_md              = sha256                # MD to use
+ utf8                    = yes                   # Input is UTF-8
+ string_mask             = utf8only              # Emit UTF-8 strings
+ prompt                  = no                    # Don't prompt for DN
+@@ -50,7 +50,7 @@ crlnumber               = $dir/ca/$ca/db/$ca.crl.srl # CRL number file
+ database                = $dir/ca/$ca/db/$ca.db # Index file
+ unique_subject          = no                    # Require unique subject
+ default_days            = 3652                  # How long to certify for
+-default_md              = sha1                  # MD to use
++default_md              = sha256                # MD to use
+ policy                  = match_pol             # Default naming policy
+ email_in_dn             = no                    # Add email to cert DN
+ preserve                = no                    # Keep passed DN ordering
+diff --git a/test/rsa_pki/etc/server.conf b/test/rsa_pki/etc/server.conf
+index 8f7b620..737fe55 100644
+--- a/test/rsa_pki/etc/server.conf
++++ b/test/rsa_pki/etc/server.conf
+@@ -9,7 +9,7 @@ SAN                     = DNS:yourdomain.tld    # Default value
+ [ req ]
+ default_bits            = 2048                  # RSA key size
+ encrypt_key             = no
+-default_md              = sha1                  # MD to use
++default_md              = sha256                # MD to use
+ utf8                    = yes                   # Input is UTF-8
+ string_mask             = utf8only              # Emit UTF-8 strings
+ prompt                  = no                    # Don't prompt for DN
+diff --git a/test/rsa_pki/etc/signing-ca.conf b/test/rsa_pki/etc/signing-ca.conf
+index 912d7c3..3f9795d 100644
+--- a/test/rsa_pki/etc/signing-ca.conf
++++ b/test/rsa_pki/etc/signing-ca.conf
+@@ -15,7 +15,7 @@ dir                     = testdb                # Top dir
+ [ req ]
+ default_bits            = 2048                  # RSA key size
+ encrypt_key             = no
+-default_md              = sha1                  # MD to use
++default_md              = sha256                # MD to use
+ utf8                    = yes                   # Input is UTF-8
+ string_mask             = utf8only              # Emit UTF-8 strings
+ prompt                  = no                    # Don't prompt for DN
+@@ -50,7 +50,7 @@ crlnumber               = $dir/ca/$ca/db/$ca.crl.srl # CRL number file
+ database                = $dir/ca/$ca/db/$ca.db # Index file
+ unique_subject          = no                    # Require unique subject
+ default_days            = 730                   # How long to certify for
+-default_md              = sha1                  # MD to use
++default_md              = sha256                # MD to use
+ policy                  = match_pol             # Default naming policy
+ email_in_dn             = no                    # Add email to cert DN
+ preserve                = no                    # Keep passed DN ordering
+-- 
+2.47.0
+

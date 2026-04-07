@@ -1,0 +1,505 @@
+From: Aron Xu <aron@debian.org>
+Date: Mon, 13 Feb 2012 15:59:31 +0800
+Subject: Port to linux with libbsd
+
+Forwarded: not-needed
+---
+ Makefile |  16 +++++++-
+ nc.1     |   3 +-
+ netcat.c | 135 ++++++++++++++++++++++++++++++++++++++++++++++-----------------
+ socks.c  |  48 +++++++++++------------
+ 4 files changed, 139 insertions(+), 63 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 5f20c40..2c92548 100644
+--- a/Makefile
++++ b/Makefile
+@@ -5,4 +5,18 @@ SRCS=	netcat.c atomicio.c socks.c
+ LDADD+= -ltls -lssl -lcrypto
+ DPADD+=  ${LIBTLS} ${LIBSSL} ${LIBCRYPTO}
+ 
+-.include <bsd.prog.mk>
++PKG_CONFIG ?= pkg-config
++LIBS ?= `$(PKG_CONFIG) --libs libbsd` -lresolv
++OBJS=  $(SRCS:.c=.o)
++CFLAGS=  -g -O2
++LDFLAGS=  -Wl,--no-add-needed
++
++all: nc
++nc: $(OBJS)
++	$(CC) $(CFLAGS) $(LDFLAGS) $^ $(LIBS) -o $@
++
++$(OBJS): %.o: %.c
++	$(CC) $(CFLAGS) -c $< -o $@
++
++clean:
++	rm -f $(OBJS) nc
+diff --git a/nc.1 b/nc.1
+index 2ffdcd1..75ac68b 100644
+--- a/nc.1
++++ b/nc.1
+@@ -213,8 +213,6 @@ Proxy authentication is only supported for HTTP CONNECT proxies at present.
+ Specify the source port
+ .Nm
+ should use, subject to privilege restrictions and availability.
+-Cannot be used together with
+-.Fl l .
+ .It Fl R Ar CAfile
+ Load the root CA bundle for TLS certificate verification from
+ .Ar CAfile ,
+@@ -277,6 +275,7 @@ For the IPv4 TOS/IPv6 traffic class value,
+ may be one of
+ .Cm critical ,
+ .Cm inetcontrol ,
++.Cm lowcost ,
+ .Cm lowdelay ,
+ .Cm netcontrol ,
+ .Cm throughput ,
+diff --git a/netcat.c b/netcat.c
+index e3c9c93..d235c55 100644
+--- a/netcat.c
++++ b/netcat.c
+@@ -32,6 +32,8 @@
+  * *Hobbit* <hobbit@avian.org>.
+  */
+ 
++#define _GNU_SOURCE
++
+ #include <sys/types.h>
+ #include <sys/socket.h>
+ #include <sys/uio.h>
+@@ -41,6 +43,49 @@
+ #include <netinet/tcp.h>
+ #include <netinet/ip.h>
+ #include <arpa/telnet.h>
++#ifdef __linux__
++# include <linux/in6.h>
++#endif
++
++#ifndef IPTOS_LOWDELAY
++# define IPTOS_LOWDELAY 0x10
++# define IPTOS_THROUGHPUT 0x08
++# define IPTOS_RELIABILITY 0x04
++# define IPTOS_LOWCOST 0x02
++# define IPTOS_MINCOST IPTOS_LOWCOST
++#endif /* IPTOS_LOWDELAY */
++
++# ifndef IPTOS_DSCP_AF11
++# define	IPTOS_DSCP_AF11		0x28
++# define	IPTOS_DSCP_AF12		0x30
++# define	IPTOS_DSCP_AF13		0x38
++# define	IPTOS_DSCP_AF21		0x48
++# define	IPTOS_DSCP_AF22		0x50
++# define	IPTOS_DSCP_AF23		0x58
++# define	IPTOS_DSCP_AF31		0x68
++# define	IPTOS_DSCP_AF32		0x70
++# define	IPTOS_DSCP_AF33		0x78
++# define	IPTOS_DSCP_AF41		0x88
++# define	IPTOS_DSCP_AF42		0x90
++# define	IPTOS_DSCP_AF43		0x98
++# define	IPTOS_DSCP_EF		0xb8
++#endif /* IPTOS_DSCP_AF11 */
++
++#ifndef IPTOS_DSCP_CS0
++# define	IPTOS_DSCP_CS0		0x00
++# define	IPTOS_DSCP_CS1		0x20
++# define	IPTOS_DSCP_CS2		0x40
++# define	IPTOS_DSCP_CS3		0x60
++# define	IPTOS_DSCP_CS4		0x80
++# define	IPTOS_DSCP_CS5		0xa0
++# define	IPTOS_DSCP_CS6		0xc0
++# define	IPTOS_DSCP_CS7		0xe0
++#endif /* IPTOS_DSCP_CS0 */
++
++#ifndef IPTOS_DSCP_EF
++# define	IPTOS_DSCP_EF		0xb8
++#endif /* IPTOS_DSCP_EF */
++
+ 
+ #include <ctype.h>
+ #include <err.h>
+@@ -56,6 +101,8 @@
+ #include <time.h>
+ #include <tls.h>
+ #include <unistd.h>
++#include <bsd/stdlib.h>
++#include <bsd/string.h>
+ 
+ #include "atomicio.h"
+ 
+@@ -272,10 +319,14 @@ main(int argc, char *argv[])
+ 			uflag = 1;
+ 			break;
+ 		case 'V':
++#ifdef RT_TABLEID_MAX
+ 			rtableid = (int)strtonum(optarg, 0,
+ 			    RT_TABLEID_MAX, &errstr);
+ 			if (errstr)
+ 				errx(1, "rtable %s: %s", errstr, optarg);
++#else
++			errx(1, "no alternate routing table support available");
++#endif
+ 			break;
+ 		case 'v':
+ 			vflag = 1;
+@@ -324,7 +375,11 @@ main(int argc, char *argv[])
+ 			oflag = optarg;
+ 			break;
+ 		case 'S':
++#ifdef TCP_MD5SIG
+ 			Sflag = 1;
++#else
++			errx(1, "no TCP MD5 signature support available");
++#endif
+ 			break;
+ 		case 'T':
+ 			errstr = NULL;
+@@ -349,13 +404,22 @@ main(int argc, char *argv[])
+ 	argc -= optind;
+ 	argv += optind;
+ 
++#ifdef RT_TABLEID_MAX
+ 	if (rtableid >= 0)
+ 		if (setrtable(rtableid) == -1)
+ 			err(1, "setrtable");
++#endif
+ 
+ 	/* Cruft to make sure options are clean, and used properly. */
+ 	if (argc == 1 && family == AF_UNIX) {
+ 		host = argv[0];
++	} else if (argc == 0 && lflag) {
++		if (sflag)
++			errx(1, "cannot use -s and -l");
++		if (pflag)
++			errx(1, "cannot use -p and -l");
++		if (zflag)
++			errx(1, "cannot use -z and -l");
+ 	} else if (argc == 1 && lflag) {
+ 		uport = argv[0];
+ 	} else if (argc == 2) {
+@@ -399,33 +463,6 @@ main(int argc, char *argv[])
+ 		}
+ 	}
+ 
+-	if (family == AF_UNIX) {
+-		if (pledge("stdio rpath wpath cpath tmppath unix", NULL) == -1)
+-			err(1, "pledge");
+-	} else if (Fflag && Pflag) {
+-		if (pledge("stdio inet dns sendfd tty", NULL) == -1)
+-			err(1, "pledge");
+-	} else if (Fflag) {
+-		if (pledge("stdio inet dns sendfd", NULL) == -1)
+-			err(1, "pledge");
+-	} else if (Pflag && usetls) {
+-		if (pledge("stdio rpath inet dns tty", NULL) == -1)
+-			err(1, "pledge");
+-	} else if (Pflag) {
+-		if (pledge("stdio inet dns tty", NULL) == -1)
+-			err(1, "pledge");
+-	} else if (usetls) {
+-		if (pledge("stdio rpath inet dns", NULL) == -1)
+-			err(1, "pledge");
+-	} else if (pledge("stdio inet dns", NULL) == -1)
+-		err(1, "pledge");
+-
+-	if (lflag && sflag)
+-		errx(1, "cannot use -s and -l");
+-	if (lflag && pflag)
+-		errx(1, "cannot use -p and -l");
+-	if (lflag && zflag)
+-		errx(1, "cannot use -z and -l");
+ 	if (!lflag && kflag)
+ 		errx(1, "must use -l with -k");
+ 	if (uflag && usetls)
+@@ -584,10 +621,6 @@ main(int argc, char *argv[])
+ 			if (s == -1)
+ 				err(1, NULL);
+ 			if (uflag && kflag) {
+-				if (family == AF_UNIX) {
+-					if (pledge("stdio unix", NULL) == -1)
+-						err(1, "pledge");
+-				}
+ 				/*
+ 				 * For UDP and -k, don't connect the socket,
+ 				 * let it receive datagrams from multiple
+@@ -614,10 +647,6 @@ main(int argc, char *argv[])
+ 				if (rv == -1)
+ 					err(1, "connect");
+ 
+-				if (family == AF_UNIX) {
+-					if (pledge("stdio unix", NULL) == -1)
+-						err(1, "pledge");
+-				}
+ 				if (vflag)
+ 					report_sock("Connection received",
+ 					    (struct sockaddr *)&z, len,
+@@ -943,8 +972,10 @@ remote_connect(const char *host, const char *port, struct addrinfo hints,
+ 		if (sflag || pflag) {
+ 			struct addrinfo ahints, *ares;
+ 
++#ifdef SO_BINDANY
+ 			/* try SO_BINDANY, but don't insist */
+ 			setsockopt(s, SOL_SOCKET, SO_BINDANY, &on, sizeof(on));
++#endif
+ 			memset(&ahints, 0, sizeof(struct addrinfo));
+ 			ahints.ai_family = res->ai_family;
+ 			ahints.ai_socktype = uflag ? SOCK_DGRAM : SOCK_STREAM;
+@@ -1057,9 +1088,15 @@ local_listen(const char *host, const char *port, struct addrinfo hints)
+ 		    res->ai_protocol)) == -1)
+ 			continue;
+ 
++		ret = setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &x, sizeof(x));
++		if (ret == -1)
++			err(1, NULL);
++
++#ifdef SO_REUSEPORT
+ 		ret = setsockopt(s, SOL_SOCKET, SO_REUSEPORT, &x, sizeof(x));
+ 		if (ret == -1)
+ 			err(1, NULL);
++#endif
+ 
+ 		set_common_sockopts(s, res->ai_family);
+ 
+@@ -1564,11 +1601,13 @@ set_common_sockopts(int s, int af)
+ {
+ 	int x = 1;
+ 
++#ifdef TCP_MD5SIG
+ 	if (Sflag) {
+ 		if (setsockopt(s, IPPROTO_TCP, TCP_MD5SIG,
+ 		    &x, sizeof(x)) == -1)
+ 			err(1, NULL);
+ 	}
++#endif
+ 	if (Dflag) {
+ 		if (setsockopt(s, SOL_SOCKET, SO_DEBUG,
+ 		    &x, sizeof(x)) == -1)
+@@ -1579,9 +1618,14 @@ set_common_sockopts(int s, int af)
+ 		    IP_TOS, &Tflag, sizeof(Tflag)) == -1)
+ 			err(1, "set IP ToS");
+ 
++#ifdef IPV6_TCLASS
+ 		else if (af == AF_INET6 && setsockopt(s, IPPROTO_IPV6,
+ 		    IPV6_TCLASS, &Tflag, sizeof(Tflag)) == -1)
+ 			err(1, "set IPv6 traffic class");
++#else
++		else if (af == AF_INET6)
++			errx(1, "can't set IPv6 traffic class (unavailable)");
++#endif
+ 	}
+ 	if (Iflag) {
+ 		if (setsockopt(s, SOL_SOCKET, SO_RCVBUF,
+@@ -1599,19 +1643,34 @@ set_common_sockopts(int s, int af)
+ 		    IP_TTL, &ttl, sizeof(ttl)))
+ 			err(1, "set IP TTL");
+ 
++#ifdef IPV6_UNICAST_HOPS
+ 		else if (af == AF_INET6 && setsockopt(s, IPPROTO_IPV6,
+ 		    IPV6_UNICAST_HOPS, &ttl, sizeof(ttl)))
+ 			err(1, "set IPv6 unicast hops");
++#else
++		else if (af == AF_INET6)
++			errx(1, "can't set IPv6 unicast hops (unavailable)");
++#endif
+ 	}
+ 
+ 	if (minttl != -1) {
++#ifdef IP_MINTTL
+ 		if (af == AF_INET && setsockopt(s, IPPROTO_IP,
+ 		    IP_MINTTL, &minttl, sizeof(minttl)))
+ 			err(1, "set IP min TTL");
++#else
++		if (af == AF_INET)
++			errx(1, "can't set IP min TTL (unavailable)");
++#endif
+ 
++#ifdef IPV6_MINHOPCOUNT
+ 		else if (af == AF_INET6 && setsockopt(s, IPPROTO_IPV6,
+ 		    IPV6_MINHOPCOUNT, &minttl, sizeof(minttl)))
+ 			err(1, "set IPv6 min hop count");
++#else
++		else if (af == AF_INET6)
++			errx(1, "can't set IPv6 min hop count (unavailable)");
++#endif
+ 	}
+ }
+ 
+@@ -1646,6 +1705,7 @@ process_tos_opt(char *s, int *val)
+ 		{ "cs7",		IPTOS_DSCP_CS7 },
+ 		{ "ef",			IPTOS_DSCP_EF },
+ 		{ "inetcontrol",	IPTOS_PREC_INTERNETCONTROL },
++		{ "lowcost",		IPTOS_LOWCOST },
+ 		{ "lowdelay",		IPTOS_LOWDELAY },
+ 		{ "netcontrol",		IPTOS_PREC_NETCONTROL },
+ 		{ "reliability",	IPTOS_RELIABILITY },
+@@ -1815,6 +1875,9 @@ report_sock(const char *msg, const struct sockaddr *sa, socklen_t salen,
+ void
+ help(void)
+ {
++#ifdef DEBIAN_VERSION
++	fprintf(stderr, "OpenBSD netcat (Debian patchlevel " DEBIAN_VERSION ")\n");
++#endif
+ 	usage(0);
+ 	fprintf(stderr, "\tCommand Summary:\n\
+ 	\t-4		Use IPv4\n\
+@@ -1857,7 +1920,7 @@ help(void)
+ 	\t-Z		Peer certificate file\n\
+ 	\t-z		Zero-I/O mode [used for scanning]\n\
+ 	Port numbers can be individual or ranges: lo-hi [inclusive]\n");
+-	exit(1);
++	exit(0);
+ }
+ 
+ void
+diff --git a/socks.c b/socks.c
+index 1f1fb96..d2bcfda 100644
+--- a/socks.c
++++ b/socks.c
+@@ -38,7 +38,7 @@
+ #include <string.h>
+ #include <unistd.h>
+ #include <resolv.h>
+-#include <readpassphrase.h>
++#include <bsd/readpassphrase.h>
+ #include "atomicio.h"
+ 
+ #define SOCKS_PORT	"1080"
+@@ -217,11 +217,11 @@ socks_connect(const char *host, const char *port,
+ 		buf[2] = SOCKS_NOAUTH;
+ 		cnt = atomicio(vwrite, proxyfd, buf, 3);
+ 		if (cnt != 3)
+-			err(1, "write failed (%zu/3)", cnt);
++			err(1, "write failed (%zu/3)", (size_t)cnt);
+ 
+ 		cnt = atomicio(read, proxyfd, buf, 2);
+ 		if (cnt != 2)
+-			err(1, "read failed (%zu/3)", cnt);
++			err(1, "read failed (%zu/3)", (size_t)cnt);
+ 
+ 		if (buf[1] == SOCKS_NOMETHOD)
+ 			errx(1, "authentication method negotiation failed");
+@@ -270,11 +270,11 @@ socks_connect(const char *host, const char *port,
+ 
+ 		cnt = atomicio(vwrite, proxyfd, buf, wlen);
+ 		if (cnt != wlen)
+-			err(1, "write failed (%zu/%zu)", cnt, wlen);
++			err(1, "write failed (%zu/%zu)", (size_t)cnt, (size_t)wlen);
+ 
+ 		cnt = atomicio(read, proxyfd, buf, 4);
+ 		if (cnt != 4)
+-			err(1, "read failed (%zu/4)", cnt);
++			err(1, "read failed (%zu/4)", (size_t)cnt);
+ 		if (buf[1] != 0) {
+ 			errx(1, "connection failed, SOCKSv5 error: %s",
+ 			    socks5_strerror(buf[1]));
+@@ -283,12 +283,12 @@ socks_connect(const char *host, const char *port,
+ 		case SOCKS_IPV4:
+ 			cnt = atomicio(read, proxyfd, buf + 4, 6);
+ 			if (cnt != 6)
+-				err(1, "read failed (%zu/6)", cnt);
++				err(1, "read failed (%zu/6)", (size_t)cnt);
+ 			break;
+ 		case SOCKS_IPV6:
+ 			cnt = atomicio(read, proxyfd, buf + 4, 18);
+ 			if (cnt != 18)
+-				err(1, "read failed (%zu/18)", cnt);
++				err(1, "read failed (%zu/18)", (size_t)cnt);
+ 			break;
+ 		default:
+ 			errx(1, "connection failed, unsupported address type");
+@@ -322,11 +322,11 @@ socks_connect(const char *host, const char *port,
+ 		}
+ 		cnt = atomicio(vwrite, proxyfd, buf, wlen);
+ 		if (cnt != wlen)
+-			err(1, "write failed (%zu/%zu)", cnt, wlen);
++			err(1, "write failed (%zu/%zu)", (size_t)cnt, (size_t)wlen);
+ 
+ 		cnt = atomicio(read, proxyfd, buf, 8);
+ 		if (cnt != 8)
+-			err(1, "read failed (%zu/8)", cnt);
++			err(1, "read failed (%zu/8)", (size_t)cnt);
+ 		if (buf[1] != 90) {
+ 			errx(1, "connection failed, SOCKSv4 error: %s",
+ 			    socks4_strerror(buf[1]));
+@@ -340,21 +340,21 @@ socks_connect(const char *host, const char *port,
+ 
+ 		/* Try to be sane about numeric IPv6 addresses */
+ 		if (strchr(host, ':') != NULL) {
+-			r = snprintf(buf, sizeof(buf),
++			r = snprintf((char*)buf, sizeof(buf),
+ 			    "CONNECT [%s]:%d HTTP/1.0\r\n",
+ 			    host, ntohs(serverport));
+ 		} else {
+-			r = snprintf(buf, sizeof(buf),
++			r = snprintf((char*)buf, sizeof(buf),
+ 			    "CONNECT %s:%d HTTP/1.0\r\n",
+ 			    host, ntohs(serverport));
+ 		}
+ 		if (r < 0 || (size_t)r >= sizeof(buf))
+ 			errx(1, "hostname too long");
+-		r = strlen(buf);
++		r = strlen((char*)buf);
+ 
+ 		cnt = atomicio(vwrite, proxyfd, buf, r);
+ 		if (cnt != r)
+-			err(1, "write failed (%zu/%d)", cnt, r);
++			err(1, "write failed (%zu/%d)", (size_t)cnt, (int)r);
+ 
+ 		if (authretry > 1) {
+ 			char proxypass[256];
+@@ -362,20 +362,20 @@ socks_connect(const char *host, const char *port,
+ 
+ 			getproxypass(proxyuser, proxyhost,
+ 			    proxypass, sizeof proxypass);
+-			r = snprintf(buf, sizeof(buf), "%s:%s",
++			r = snprintf((char*)buf, sizeof(buf), "%s:%s",
+ 			    proxyuser, proxypass);
+ 			explicit_bzero(proxypass, sizeof proxypass);
+ 			if (r == -1 || (size_t)r >= sizeof(buf) ||
+-			    b64_ntop(buf, strlen(buf), resp,
++			    b64_ntop(buf, strlen((char*)buf), resp,
+ 			    sizeof(resp)) == -1)
+ 				errx(1, "Proxy username/password too long");
+-			r = snprintf(buf, sizeof(buf), "Proxy-Authorization: "
++			r = snprintf((char*)buf, sizeof(buf), "Proxy-Authorization: "
+ 			    "Basic %s\r\n", resp);
+ 			if (r < 0 || (size_t)r >= sizeof(buf))
+ 				errx(1, "Proxy auth response too long");
+-			r = strlen(buf);
++			r = strlen((char*)buf);
+ 			if ((cnt = atomicio(vwrite, proxyfd, buf, r)) != r)
+-				err(1, "write failed (%zu/%d)", cnt, r);
++				err(1, "write failed (%zu/%d)", (size_t)cnt, r);
+ 			explicit_bzero(proxypass, sizeof proxypass);
+ 			explicit_bzero(buf, sizeof buf);
+ 		}
+@@ -385,23 +385,23 @@ socks_connect(const char *host, const char *port,
+ 			err(1, "write failed (%zu/2)", cnt);
+ 
+ 		/* Read status reply */
+-		proxy_read_line(proxyfd, buf, sizeof(buf));
++		proxy_read_line(proxyfd, (char*)buf, sizeof(buf));
+ 		if (proxyuser != NULL &&
+-		    (strncmp(buf, "HTTP/1.0 407 ", 13) == 0 ||
+-		    strncmp(buf, "HTTP/1.1 407 ", 13) == 0)) {
++		    (strncmp((char*)buf, "HTTP/1.0 407 ", 13) == 0 ||
++		    strncmp((char*)buf, "HTTP/1.1 407 ", 13) == 0)) {
+ 			if (authretry > 1) {
+ 				fprintf(stderr, "Proxy authentication "
+ 				    "failed\n");
+ 			}
+ 			close(proxyfd);
+ 			goto again;
+-		} else if (strncmp(buf, "HTTP/1.0 200 ", 13) != 0 &&
+-		    strncmp(buf, "HTTP/1.1 200 ", 13) != 0)
++		} else if (strncmp((char*)buf, "HTTP/1.0 200 ", 13) != 0 &&
++		    strncmp((char*)buf, "HTTP/1.1 200 ", 13) != 0)
+ 			errx(1, "Proxy error: \"%s\"", buf);
+ 
+ 		/* Headers continue until we hit an empty line */
+ 		for (r = 0; r < HTTP_MAXHDRS; r++) {
+-			proxy_read_line(proxyfd, buf, sizeof(buf));
++			proxy_read_line(proxyfd, (char*)buf, sizeof(buf));
+ 			if (*buf == '\0')
+ 				break;
+ 		}

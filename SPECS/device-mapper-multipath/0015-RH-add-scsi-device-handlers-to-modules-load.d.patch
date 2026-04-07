@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Fri, 25 Mar 2022 18:12:06 -0500
+Subject: [PATCH] RH: add scsi device handlers to modules-load.d
+
+Make scsi_dh_alua scsi_dh_emc and scsi_dh_rdac get loaded in early boot.
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ Makefile.inc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.inc b/Makefile.inc
+index 7774f1f4..0e836f0a 100644
+--- a/Makefile.inc
++++ b/Makefile.inc
+@@ -16,7 +16,7 @@ READLINE :=
+ 
+ # List of scsi device handler modules to load on boot, e.g.
+ # SCSI_DH_MODULES_PRELOAD := scsi_dh_alua scsi_dh_rdac
+-SCSI_DH_MODULES_PRELOAD :=
++SCSI_DH_MODULES_PRELOAD := scsi_dh_alua scsi_dh_emc scsi_dh_rdac
+ 
+ EXTRAVERSION := $(shell rev=$$(git rev-parse --short=7 HEAD 2>/dev/null); echo $${rev:+-g$$rev})
+ 

@@ -1,0 +1,27 @@
+From 3f993e8510ab5763c961e3f92b603f78904f3540 Mon Sep 17 00:00:00 2001
+From: Patrick Spendrin <ps_ml@gmx.de>
+Date: Thu, 20 May 2010 15:33:31 +0000
+Subject: [PATCH 20/33] Hack the hack.
+
+svn path=/trunk/kdesupport/automoc/; revision=1128891
+---
+ Automoc4Config.cmake | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/Automoc4Config.cmake b/Automoc4Config.cmake
+index 12e00f7..d52c59c 100644
+--- a/Automoc4Config.cmake
++++ b/Automoc4Config.cmake
+@@ -62,6 +62,9 @@ if(EXISTS ${_AUTOMOC4_CURRENT_DIR}/kde4automoc.cpp)
+ else(EXISTS ${_AUTOMOC4_CURRENT_DIR}/kde4automoc.cpp)
+    get_filename_component(_AUTOMOC4_BIN_DIR  "${_AUTOMOC4_CURRENT_DIR}" PATH)
+    get_filename_component(_AUTOMOC4_BIN_DIR  "${_AUTOMOC4_BIN_DIR}" PATH)
++   if(WIN32)
++      get_filename_component(_AUTOMOC4_BIN_DIR  "${_AUTOMOC4_BIN_DIR} REALPATH")
++   endif(WIN32)
+    find_program(AUTOMOC4_EXECUTABLE automoc4 PATHS  "${_AUTOMOC4_BIN_DIR}/bin" NO_DEFAULT_PATH)
+    set(_AUTOMOC4_EXECUTABLE_DEP)
+    mark_as_advanced(AUTOMOC4_EXECUTABLE)
+-- 
+2.4.3
+

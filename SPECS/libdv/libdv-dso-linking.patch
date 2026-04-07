@@ -1,0 +1,20 @@
+diff -Naur libdv-1.0.0.old/Makefile.am libdv-1.0.0/Makefile.am
+--- libdv-1.0.0.old/Makefile.am	2022-03-24 20:11:25.269668921 +0100
++++ libdv-1.0.0/Makefile.am	2022-03-24 20:14:29.849878099 +0100
+@@ -5,6 +5,7 @@
+ endif
+ 
+ SUBDIRS                   = libdv encodedv $(gtk_subdirs)
++ACLOCAL_AMFLAGS           = -I m4
+ 
+ AUX_DIST                  = $(ac_aux_dir)/config.guess \
+                                    $(ac_aux_dir)/config.sub \
+diff -Naur libdv-1.0.0.old/playdv/Makefile.am libdv-1.0.0/playdv/Makefile.am
+--- libdv-1.0.0.old/playdv/Makefile.am	2022-03-24 20:11:25.274669008 +0100
++++ libdv-1.0.0/playdv/Makefile.am	2022-03-24 20:14:29.815877508 +0100
+@@ -15,4 +15,4 @@
+ noinst_HEADERS=  display.h oss.h
+ 
+ playdv_SOURCES= playdv.c display.c display.h oss.c
+-playdv_LDADD= $(SDL_LIBS) $(GTK_LIBS) $(XV_LIB) ../libdv/libdv.la $(POPT_LIB)
++playdv_LDADD= $(SDL_LIBS) $(GTK_LIBS) $(XV_LIB) ../libdv/libdv.la $(POPT_LIB) -lX11 -lXext

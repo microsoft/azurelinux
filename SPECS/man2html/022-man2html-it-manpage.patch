@@ -1,0 +1,22 @@
+From: Robert Luberda <robert@debian.org>
+Date: Thu, 1 Feb 2007 22:36:29 +0100
+Subject: 022 man2html it manpage
+
+Fix syntax error in the Italian man2html(1) page.
+---
+ man2html/locales/it/man2html.1 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/man2html/locales/it/man2html.1 b/man2html/locales/it/man2html.1
+index 45feef0..41638a7 100644
+--- a/man2html/locales/it/man2html.1
++++ b/man2html/locales/it/man2html.1
+@@ -62,7 +62,7 @@ manuale grandi come
+ 
+ .SH OPZIONI
+ Quando si legge da stdin non è sempre chiaro come effettuare l'espansione
+-.so . L'opzione \-D permette a uno script di definire la
++\&.so . L'opzione \-D permette a uno script di definire la
+ directory di lavoro.
+ .LP
+ .TP

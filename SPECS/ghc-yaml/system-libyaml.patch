@@ -1,0 +1,13 @@
+--- libyaml-0.1.1.0/libyaml.cabal~	2019-02-12 09:55:57.000000000 +0100
++++ libyaml-0.1.1.0/libyaml.cabal 	2019-08-08 22:15:56.350202056 +0200
+@@ -38,8 +38,8 @@
+ 
+ flag system-libyaml
+   description: Use the system-wide libyaml instead of the bundled copy
+-  manual: False
+-  default: False
++  manual: True
++  default: True
+ 
+ library
+   exposed-modules:

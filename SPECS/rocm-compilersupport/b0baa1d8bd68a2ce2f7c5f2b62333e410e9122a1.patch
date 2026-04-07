@@ -1,0 +1,28 @@
+From b0baa1d8bd68a2ce2f7c5f2b62333e410e9122a1 Mon Sep 17 00:00:00 2001
+From: Vitaly Buka <vitalybuka@google.com>
+Date: Fri, 7 Mar 2025 12:06:03 -0800
+Subject: [PATCH] [gold] Fix compilation (#130334)
+
+After #115331.
+---
+ llvm/tools/gold/gold-plugin.cpp | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/llvm/tools/gold/gold-plugin.cpp b/llvm/tools/gold/gold-plugin.cpp
+index b42bfbed3b873..256933d3f53f9 100644
+--- a/llvm/tools/gold/gold-plugin.cpp
++++ b/llvm/tools/gold/gold-plugin.cpp
+@@ -1117,10 +1117,10 @@ static std::vector<std::pair<SmallString<128>, bool>> runLTO() {
+         std::make_unique<llvm::raw_fd_ostream>(FD, true));
+   };
+ 
+-  auto AddBuffer = [&](size_t Task, const Twine &moduleName,
++  auto AddBuffer = [&](size_t Task, const Twine &ModuleName,
+                        std::unique_ptr<MemoryBuffer> MB) {
+-    auto Stream = *AddStream(Task, ModuleName);
+-    Stream->OS << MB->getBuffer();
++    auto Stream = AddStream(Task, ModuleName);
++    *Stream->OS << MB->getBuffer();
+     check(Stream->commit(), "Failed to commit cache");
+   };
+ 

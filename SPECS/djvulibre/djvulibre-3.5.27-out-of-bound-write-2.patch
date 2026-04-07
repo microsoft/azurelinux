@@ -1,0 +1,14 @@
+diff --git a/libdjvu/DjVuText.cpp b/libdjvu/DjVuText.cpp
+index 60a4f39..b11df7b 100644
+--- a/libdjvu/DjVuText.cpp
++++ b/libdjvu/DjVuText.cpp
+@@ -345,7 +345,8 @@ DjVuTXT::decode(const GP<ByteStream> &gbs)
+   int textsize = bs.read24();
+   char *buffer = textUTF8.getbuf(textsize);
+   int readsize = bs.read(buffer,textsize);
+-  buffer[readsize] = 0;
++  if (buffer)
++    buffer[readsize] = 0;
+   if (readsize < textsize)
+     G_THROW( ERR_MSG("DjVuText.corrupt_chunk") );
+   // Try reading zones

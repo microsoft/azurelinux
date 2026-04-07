@@ -1,0 +1,12 @@
+#!@PYTHON3@
+
+import sys
+
+try:
+    from rpmautospec import cli
+except ImportError:
+    sys.path.insert(0, "@DATADIR@/rpmautospec-fallback")
+    sys.dont_write_bytecode = True
+    from rpmautospec import cli
+
+sys.exit(cli.cli())

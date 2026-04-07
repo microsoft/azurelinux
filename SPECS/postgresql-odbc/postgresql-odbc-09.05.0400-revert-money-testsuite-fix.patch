@@ -1,0 +1,30 @@
+Revert "Fix regression test failures in param-convesrions-test."
+
+As we have applied a downstream patch for reverting the money type patch,
+we need to also revert upstream test cases that are not supposed to be passing
+in the first place.
+This reverts commit eb480e19ee71b19de7f61013bdb4d5abd1cd98e4.
+
+Related discussion:
+http://www.postgresql.org/message-id/3259874.lgiBp3an9Y@nb.usersys.redhat.com
+---
+
+diff --git a/test/expected/param-conversions.out b/test/expected/param-conversions.out
+index 777cc94..449a398 100644
+--- a/test/expected/param-conversions.out
++++ b/test/expected/param-conversions.out
+@@ -72,12 +72,12 @@ Error while executing the query
+ 
+ Testing "SELECT 1.3 > ?" with SQL_C_CHAR -> SQL_FLOAT param "3', 'injected, BAD!', '1"...
+ SQLExecDirect failed
+-22P02=ERROR: invalid input syntax for type numeric: "3', 'injected, BAD!', '1";
++22P02=ERROR: invalid input syntax for type double precision: "3', 'injected, BAD!', '1";
+ Error while executing the query
+ 
+ Testing "SELECT 1.4 > ?" with SQL_C_CHAR -> SQL_FLOAT param "4 \'bad', '1"...
+ SQLExecDirect failed
+-22P02=ERROR: invalid input syntax for type numeric: "4 \'bad', '1";
++22P02=ERROR: invalid input syntax for type double precision: "4 \'bad', '1";
+ Error while executing the query
+ 
+ Testing "SELECT 1-?" with SQL_C_CHAR -> SQL_INTEGER param "-1"...

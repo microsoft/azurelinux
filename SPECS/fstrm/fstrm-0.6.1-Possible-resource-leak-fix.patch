@@ -1,0 +1,40 @@
+From 1499d3e2715bad67588b5c0b6c02865eeb65aa16 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20Men=C5=A1=C3=ADk?= <pemensik@redhat.com>
+Date: Fri, 8 Jan 2021 17:43:03 +0100
+Subject: [PATCH 3/3] Possible resource leak fix
+
+34. fstrm-0.6.0/libmy/argv.c:2238: alloc_fn: Storage is returned from allocation function "realloc".
+35. fstrm-0.6.0/libmy/argv.c:2238: var_assign: Assigning: "argv" = storage returned from "realloc(argv, 8UL * max)".
+37. fstrm-0.6.0/libmy/argv.c:2254: var_assign: Assigning: "argv_p" = "argv".
+47. fstrm-0.6.0/libmy/argv.c:2229: leaked_storage: Variable "argv_p" going out of scope leaks the storage it points to.
+48. fstrm-0.6.0/libmy/argv.c:2229: leaked_storage: Variable "argv" going out of scope leaks the storage it points to.
+---
+ libmy/argv.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/libmy/argv.c b/libmy/argv.c
+index 16dca73..0b28026 100644
+--- a/libmy/argv.c
++++ b/libmy/argv.c
+@@ -2226,7 +2226,7 @@ static	void	file_args(const char *path, argv_t *grid,
+     *argv_p = string_copy(line);
+     if (*argv_p == NULL) {
+       *okay_bp = ARGV_FALSE;
+-      return;
++      goto cleanup;
+     }
+     
+     argv_p++;
+@@ -2257,7 +2257,8 @@ static	void	file_args(const char *path, argv_t *grid,
+   
+   /* now do the list */
+   do_list(grid, arg_c, argv, queue_list, queue_head_p, queue_tail_p, okay_bp);
+-  
++
++cleanup:
+   /* now free up the list */
+   for (argv_p = argv; argv_p < argv + arg_c; argv_p++) {
+     free(*argv_p);
+-- 
+2.26.3
+

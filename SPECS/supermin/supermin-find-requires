@@ -1,0 +1,26 @@
+#!/bin/bash -
+
+# Generate RPM requires automatically for supermin appliances.
+# Copyright (C) 2009-2015 Red Hat Inc.
+
+# This script is called with a list of supermin.d/*packages* files
+# (either passed on the command line, or if that is empty, then passed
+# through stdin).  Each file is a simple list of packages, so we
+# simply have to `cat' the contents in order to get the list of
+# requires - it could hardly be simpler.
+
+function process_file
+{
+    cat "$1"
+}
+
+if [ "$#" -ge 1 ]; then
+    for f in "$@"; do
+        process_file "$f"
+    done
+else
+    # Get the list of files from stdin.  One filename per line?
+    while read line; do
+        process_file "$line"
+    done
+fi

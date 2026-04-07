@@ -1,0 +1,29 @@
+diff -up expect5.45/example/passmass.orig expect5.45/example/passmass
+--- expect5.45/example/passmass.orig	2011-07-27 16:09:31.013843393 +0200
++++ expect5.45/example/passmass	2011-07-27 16:10:55.667843578 +0200
+@@ -107,6 +107,10 @@ for {set i 0} {$i<$argc} {incr i} {
+ 	set login "ssh"
+ 	continue
+     } "-telnet" {
++	if {[file executable /usr/bin/telnet] == 0} {
++		send_user "It seems that telnet is not installed. Please install telnet in order to use the script with this option.\n"
++		exit 1
++	}
+ 	set login "telnet"
+ 	continue
+     } "-program" {
+diff -up expect5.45/example/weather.orig expect5.45/example/weather
+--- expect5.45/example/weather.orig	2011-07-27 15:49:57.878843862 +0200
++++ expect5.45/example/weather	2011-07-27 16:08:48.067843491 +0200
+@@ -33,6 +33,11 @@ set timeout 60
+ 
+ set env(TERM) vt100	;# actual value doesn't matter, just has to be set
+ 
++if {[file executable /usr/bin/telnet] == 0} {
++	send_user "It seems that telnet is not installed. Please install telnet in order to use this script.\n"
++	exit 1
++}
++
+ spawn telnet rainmaker.wunderground.com 3000
+ while {1} {
+ 	expect timeout {

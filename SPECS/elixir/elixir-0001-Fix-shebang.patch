@@ -1,0 +1,16 @@
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Mon, 20 Oct 2025 22:17:26 +0200
+Subject: [PATCH] Fix shebang
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+
+diff --git a/lib/elixir/scripts/cover.exs b/lib/elixir/scripts/cover.exs
+index a00973dd8..292fc0ee1 100755
+--- a/lib/elixir/scripts/cover.exs
++++ b/lib/elixir/scripts/cover.exs
+@@ -1,4 +1,4 @@
+-#!bin/elixir
++#!/bin/elixir
+ 
+ # SPDX-License-Identifier: Apache-2.0
+ # SPDX-FileCopyrightText: 2021 The Elixir Team

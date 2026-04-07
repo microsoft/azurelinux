@@ -1,0 +1,16 @@
+%autorelease(e:s:pb:n) %{?-p:0.}%{lua:
+    release_number = tonumber(rpm.expand("%{?_rpmautospec_release_number}%{!?_rpmautospec_release_number:1}"));
+    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
+    print(release_number + base_release_number - 1);
+}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
+%autochangelog %{lua:
+    locale = os.setlocale(nil)
+    os.setlocale("C.utf8")
+    date = os.date("%a %b %d %Y")
+    os.setlocale(locale)
+    packager = rpm.expand("%{?packager}%{!?packager:John Doe <packager@example.com>}")
+    evr = rpm.expand("%{?epoch:%{epoch}:}%{version}-%{release}")
+    print("* " .. date .. " " .. packager .. " - " .. evr .. "\\n")
+    print("- local build")
+}
+

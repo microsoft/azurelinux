@@ -1,0 +1,53 @@
+commit 3d801f1c2a2495a8aa20157ba71c033d00703c4b
+Author: Stefan Liebler <stli@linux.ibm.com>
+Date:   Thu Aug 3 16:18:17 2023 +0200
+
+    Revert "Move popcount and hamdist back from z14 to z13 after needed edits."
+
+diff --git a/mpn/s390_64/z13/hamdist.asm b/mpn/s390_64/z14/hamdist.asm
+similarity index 97%
+rename from mpn/s390_64/z13/hamdist.asm
+rename to mpn/s390_64/z14/hamdist.asm
+index 81c5174b4..be134ff4d 100644
+--- a/mpn/s390_64/z13/hamdist.asm
++++ b/mpn/s390_64/z14/hamdist.asm
+@@ -55,7 +55,7 @@ PROLOGUE(mpn_hamdist)
+ L(odd):	vllezg	%v16, 0(ap)
+ 	vllezg	%v17, 0(bp)
+ 	vx	%v16, %v16, %v17
+-	vpopct	%v30, %v16, 3
++	vpopctg	%v30, %v16
+ 	la	ap, 8(ap)
+ 	la	bp, 8(bp)
+ 	clgije	n, 0, L(end)
+@@ -63,7 +63,7 @@ L(odd):	vllezg	%v16, 0(ap)
+ L(top):	vl	%v16, 0(ap), 3
+ 	vl	%v17, 0(bp), 3
+ 	vx	%v16, %v16, %v17
+-	vpopct	%v20, %v16, 3
++	vpopctg	%v20, %v16
+ 	vag	%v30, %v30, %v20
+ 	la	ap, 16(ap)
+ 	la	bp, 16(bp)
+diff --git a/mpn/s390_64/z13/popcount.asm b/mpn/s390_64/z14/popcount.asm
+similarity index 97%
+rename from mpn/s390_64/z13/popcount.asm
+rename to mpn/s390_64/z14/popcount.asm
+index 35b1fc4da..38b24479a 100644
+--- a/mpn/s390_64/z13/popcount.asm
++++ b/mpn/s390_64/z14/popcount.asm
+@@ -52,12 +52,12 @@ PROLOGUE(mpn_popcount)
+ 	je	L(top)
+ 
+ L(odd):	vllezg	%v16, 0(ap)
+-	vpopct	%v30, %v16, 3
++	vpopctg	%v30, %v16
+ 	la	ap, 8(ap)
+ 	clgije	n, 0, L(end)
+ 
+ L(top):	vl	%v16, 0(ap), 3
+-	vpopct	%v20, %v16, 3
++	vpopctg	%v20, %v16
+ 	vag	%v30, %v30, %v20
+ 	la	ap, 16(ap)
+ 	brctg	n, L(top)

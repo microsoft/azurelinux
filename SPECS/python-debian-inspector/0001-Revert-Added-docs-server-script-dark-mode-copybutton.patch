@@ -1,0 +1,125 @@
+From 9af32a45075226b87b6d744b44d7c804f0b04691 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Robert-Andr=C3=A9=20Mauchin?= <zebob.m@gmail.com>
+Date: Wed, 22 May 2024 20:39:46 +0200
+Subject: [PATCH] Revert "Added docs server script, dark mode & copybutton for
+ docs"
+
+This reverts commit 5ab9b3a15e0095a8186ca3870cb9f9eade83833d.
+---
+ .github/workflows/docs-ci.yml    |  3 +++
+ docs/Makefile                    |  8 --------
+ docs/make.bat                    | 12 ------------
+ docs/scripts/doc8_style_check.sh |  0
+ docs/source/conf.py              |  4 ----
+ setup.cfg                        |  3 ---
+ 6 files changed, 3 insertions(+), 27 deletions(-)
+ mode change 100755 => 100644 docs/scripts/doc8_style_check.sh
+
+diff --git a/.github/workflows/docs-ci.yml b/.github/workflows/docs-ci.yml
+index ada779b..511b7c2 100644
+--- a/.github/workflows/docs-ci.yml
++++ b/.github/workflows/docs-ci.yml
+@@ -20,6 +20,9 @@ jobs:
+         with:
+           python-version: ${{ matrix.python-version }}
+ 
++      - name: Give permission to run scripts
++        run: chmod +x ./docs/scripts/doc8_style_check.sh
++
+       - name: Install Dependencies
+         run:  pip install -e .[docs]
+ 
+diff --git a/docs/Makefile b/docs/Makefile
+index 788b039..d0c3cbf 100644
+--- a/docs/Makefile
++++ b/docs/Makefile
+@@ -5,7 +5,6 @@
+ # from the environment for the first two.
+ SPHINXOPTS    ?=
+ SPHINXBUILD   ?= sphinx-build
+-SPHINXAUTOBUILD = sphinx-autobuild
+ SOURCEDIR     = source
+ BUILDDIR      = build
+ 
+@@ -15,13 +14,6 @@ help:
+ 
+ .PHONY: help Makefile
+ 
+-# Run the development server using sphinx-autobuild
+-docs:
+-	@echo
+-	@echo "Starting up the docs server..."
+-	@echo
+-	$(SPHINXAUTOBUILD) --port 8000 --watch ${SOURCEDIR} $(SOURCEDIR) "$(BUILDDIR)/html" $(SPHINXOPTS) $(O)
+-
+ # Catch-all target: route all unknown targets to Sphinx using the new
+ # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
+ %: Makefile
+diff --git a/docs/make.bat b/docs/make.bat
+index 4a3c1a4..6247f7e 100644
+--- a/docs/make.bat
++++ b/docs/make.bat
+@@ -7,16 +7,11 @@ REM Command file for Sphinx documentation
+ if "%SPHINXBUILD%" == "" (
+ 	set SPHINXBUILD=sphinx-build
+ )
+-if "%SPHINXAUTOBUILD%" == "" (
+-	set SPHINXAUTOBUILD=sphinx-autobuild
+-)
+ set SOURCEDIR=source
+ set BUILDDIR=build
+ 
+ if "%1" == "" goto help
+ 
+-if "%1" == "docs" goto docs
+-
+ %SPHINXBUILD% >NUL 2>NUL
+ if errorlevel 9009 (
+ 	echo.
+@@ -33,13 +28,6 @@ if errorlevel 9009 (
+ %SPHINXBUILD% -M %1 %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
+ goto end
+ 
+-:docs
+-@echo
+-@echo Starting up the docs server...
+-@echo
+-%SPHINXAUTOBUILD% --port 8000 --watch %SOURCEDIR% %SOURCEDIR% %BUILDDIR%\html %SPHINXOPTS% %O%
+-goto end
+-
+ :help
+ %SPHINXBUILD% -M help %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
+ 
+diff --git a/docs/scripts/doc8_style_check.sh b/docs/scripts/doc8_style_check.sh
+old mode 100755
+new mode 100644
+diff --git a/docs/source/conf.py b/docs/source/conf.py
+index 4494b80..6730ab1 100644
+--- a/docs/source/conf.py
++++ b/docs/source/conf.py
+@@ -33,10 +33,6 @@ extensions = [
+     "sphinx.ext.intersphinx",
+     "sphinxcontrib.apidoc",
+     "sphinx_reredirects",
+-    "sphinx_rtd_theme",
+-    "sphinx_rtd_dark_mode",
+-    "sphinx.ext.extlinks",
+-    "sphinx_copybutton"
+ ]
+ 
+ 
+diff --git a/setup.cfg b/setup.cfg
+index 520ace8..7733be4 100644
+--- a/setup.cfg
++++ b/setup.cfg
+@@ -85,7 +85,4 @@ docs =
+     sphinx-reredirects >= 0.1.2
+     sphinxcontrib-apidoc >= 0.3.0
+     doc8>=0.11.2
+-    sphinx-autobuild
+-    sphinx-rtd-dark-mode>=1.3.0
+-    sphinx-copybutton
+ 
+-- 
+2.45.1
+

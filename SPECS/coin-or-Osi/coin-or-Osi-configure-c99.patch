@@ -1,0 +1,31 @@
+Avoid implicit function declarations.  This is required to avoid
+changing test outcomes for future compilers which do not accept them
+by default.
+
+There is no need to upstream this change because it comes out of
+autoconf, which has already been fixed.  Upstream re-running autoconf
+as part of a new release would apply this change automatically.
+
+diff -ur Osi-releases-0.108.6.orig/configure Osi-releases-0.108.6/configure
+--- Osi-releases-0.108.6.orig/configure	2020-01-31 11:49:01.000000000 +0100
++++ Osi-releases-0.108.6/configure	2023-01-26 18:33:11.780065740 +0100
+@@ -2522,7 +2522,7 @@
+   echo "$as_me:$LINENO: \$? = $ac_status" >&5
+   (exit $ac_status); }; }; then
+   for ac_declaration in \
+-   '' \
++   '#include <stdlib.h>' \
+    'extern "C" void std::exit (int) throw (); using std::exit;' \
+    'extern "C" void std::exit (int); using std::exit;' \
+    'extern "C" void exit (int) throw ();' \
+@@ -6914,8 +6914,8 @@
+   for (i = 0; i < 256; i++)
+     if (XOR (islower (i), ISLOWER (i))
+ 	|| toupper (i) != TOUPPER (i))
+-      exit(2);
+-  exit (0);
++      return 2;
++  return 0;
+ }
+ _ACEOF
+ rm -f conftest$ac_exeext

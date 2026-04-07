@@ -1,0 +1,1407 @@
+diff -up libXp-1.0.3/configure.ac.jx libXp-1.0.3/configure.ac
+--- libXp-1.0.3/configure.ac.jx	2015-02-21 17:04:36.000000000 -0500
++++ libXp-1.0.3/configure.ac	2018-07-05 12:11:30.955684590 -0400
+@@ -42,11 +42,12 @@ XORG_DEFAULT_OPTIONS
+ AC_PROG_LIBTOOL
+ 
+ # Check for X and print proto
+-PKG_CHECK_MODULES(XPRINT, [x11 >= 1.6] xext xextproto xau printproto)
++PKG_CHECK_MODULES(XPRINT, [x11 >= 1.6] xext xextproto xau)
+ 
+ AC_CONFIG_FILES([Makefile
+ 		 src/Makefile
+ 		 man/Makefile
++	   printproto.pc
+ 		 xp.pc])
+ AC_OUTPUT
+ 
+diff -up libXp-1.0.3/include/X11/extensions/Print.h.jx libXp-1.0.3/include/X11/extensions/Print.h
+--- libXp-1.0.3/include/X11/extensions/Print.h.jx	2018-07-05 12:11:12.281385412 -0400
++++ libXp-1.0.3/include/X11/extensions/Print.h	2018-07-05 12:11:12.281385412 -0400
+@@ -0,0 +1,552 @@
++/* $Xorg: Print.h,v 1.3 2000/08/18 04:05:44 coskrey Exp $ */
++/******************************************************************************
++ ******************************************************************************
++ **
++ ** File:         Print.h
++ **
++ ** Description:  Definitions needed by the server, library, and
++ **               clients.  Subportion restricted to library and
++ **               clients.
++ **
++ **               Server, Library, Client portion has:
++ **                  o All sz_* defines
++ **                  o Revision and Name defines
++ **                  o Common defines and constants (e.g. Keywords, Masks)
++ **                  o Extension version structure
++ **
++ **               Library and client subportion has:
++ **                  o Convience Marcos
++ **                  o Client side data structures
++ **                  o Client side event structures (non wire)
++ **                  o Library function prototypes
++ **                  o some private stuff denoted with _whatever
++ **
++ **               Printstr.h for server and library, but NOT clients.
++ **
++ ******************************************************************************
++ **
++ ** (c) Copyright 1996 Hewlett-Packard Company
++ ** (c) Copyright 1996 International Business Machines Corp.
++ ** (c) Copyright 1996 Sun Microsystems, Inc.
++ ** (c) Copyright 1996 Novell, Inc.
++ ** (c) Copyright 1996 Digital Equipment Corp.
++ ** (c) Copyright 1996 Fujitsu Limited
++ ** (c) Copyright 1996 Hitachi, Ltd.
++ **
++ ** Permission is hereby granted, free of charge, to any person obtaining a copy
++ ** of this software and associated documentation files (the "Software"), to deal
++ ** in the Software without restriction, including without limitation the rights
++ ** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ ** copies of the Software, and to permit persons to whom the Software is
++ ** furnished to do so, subject to the following conditions:
++ **
++ ** The above copyright notice and this permission notice shall be included in
++ ** all copies or substantial portions of the Software.
++ **
++ ** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ ** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ ** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
++ ** COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
++ ** IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
++ ** CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
++ **
++ ** Except as contained in this notice, the names of the copyright holders shall
++ ** not be used in advertising or otherwise to promote the sale, use or other
++ ** dealings in this Software without prior written authorization from said
++ ** copyright holders.
++ **
++ ******************************************************************************
++ *****************************************************************************/
++/* $XFree86: xc/include/extensions/Print.h,v 1.4 2000/01/25 18:37:31 dawes Exp $ */
++
++#ifndef _XpPrint_H_
++#define _XpPrint_H_
++
++#ifndef _XP_PRINT_SERVER_
++#include <X11/Xlib.h>
++#include <X11/Xresource.h>
++#include <X11/Xauth.h>
++#endif /* _XP_PRINT_SERVER_ */
++
++#include <X11/Xfuncproto.h>
++
++_XFUNCPROTOBEGIN
++
++/******************************************************************************
++ *
++ * Definitions used by the server, library and client.
++ */
++
++/********************************************************************
++ *
++ * Naming and versioning information.
++ */
++#define XP_PRINTNAME  "XpExtension"
++
++/*
++ * Add a define below for each major extension release.
++ */
++#define XP_DONT_CHECK		0
++#define XP_INITIAL_RELEASE	1
++
++/*
++ * For each single entry above, create one major/minor pair.
++ */
++#define XP_PROTO_MAJOR		1
++#define XP_PROTO_MINOR		0
++
++/*
++ * Identify current version.
++ */
++#define XP_MAJOR_VERSION	XP_PROTO_MAJOR
++#define XP_MINOR_VERSION	XP_PROTO_MINOR
++
++/*
++ * Misc version defines.
++ */
++#define XP_ABSENT		0	/* Prior to XP Print support */
++#define XP_PRESENT		1	/* With XP Print support */
++
++/********************************************************************
++ *
++ * Xp Print Error codes.
++ */
++#define XP_ERRORS		3	/* number of error types */
++
++#define XPBadContext		0	/* Print Context invalid or missing */
++#define XPBadSequence		1	/* Illegal sequence of XP operations */
++#define XPBadResourceID		2	/* X-resource not valid */
++
++/********************************************************************
++ *
++ * Xp Print Event masks and codes.
++ *
++ */
++#define XP_EVENTS		2	/* number of event types */
++
++#define XPNoEventMask		0	/* not an event - just a null mask */
++#define XPPrintMask		(1L<<0)
++#define XPAttributeMask		(1L<<1)
++
++#define XPPrintNotify		0	/* contains "detail" - see below */
++#define XPAttributeNotify	1	/* contains "detail" - see below */
++
++#define XPStartJobNotify	0	/* value for "detail" in XPPrintNotify*/
++#define XPEndJobNotify		1
++#define XPStartDocNotify	2
++#define XPEndDocNotify		3
++#define XPStartPageNotify	4
++#define XPEndPageNotify		5
++
++/********************************************************************
++ *
++ * Xp Print Attribute Object codes (subset of ISO DPA 10175).  The
++ * Xp Server can get and set any of the values, while the Xp Library
++ * may only be able to set a subset of the attribute objects.
++ *
++ * note: the codes are also used as "detail" for XPAttributeNotify
++ *
++ * note: XPPageAttr is not defined in ISO DPA 10175.  It is unique
++ * to Xp, and its attributes are a proper subset of XPDocAttr.
++ */
++typedef unsigned char XPAttributes;	/* type of Xp*Attr codes */
++
++#define XP_ATTRIBUTES		5	/* those attrs currently supported */
++
++#define XPJobAttr		1	/* get/set */
++#define XPDocAttr		2	/* get/set */
++#define XPPageAttr		3	/* get/set - subset of XPDocAttr */
++#define XPPrinterAttr		4	/* get only (library) */
++#define XPServerAttr		5	/* get only (library), no
++					   context needed */
++
++/*
++ * note: ISO DPA 10175 defines a number of "attribute objects", of
++ *       which POSIX 1387.4 and the SI Xp will only support a
++ *       subset.
++ */
++#define XPMediumAttr		6	/* DPA-Object Medium */
++#define XPFontAttr		7	/* DPA-Object Font */
++#define XPResAttr		8	/* DPA-Object Resource */
++#define XPTransAttr		9	/* DPA-Object Transfer method */
++#define XPDelAttr		10	/* DPA-Object Delivery method */
++#define XPAuxSPkg		11	/* DPA-Object Auxiliary sheet package */
++#define XPAuxS			12	/* DPA-Object Auxiliary sheet */
++#define XPFinishAttr		13	/* DPA-Object Finishing */
++#define XPOutputAttr		14	/* DPA-Object Output method */
++#define XPImpAttr		15	/* DPA-Object Imposition */
++#define XPSchedAttr		16	/* DPA-Object Scheduler */
++#define XPIntJobAttr		17	/* DPA-Object Initial value job */
++#define XPIntDocAttr		18	/* DPA-Object Initial value document */
++#define XPResConAttr		19	/* DPA-Object Resource context */
++
++
++/*
++ * Replacement rules for XpSetAttributes
++ */
++typedef unsigned char XPAttrReplacement;
++#define	XPAttrReplace		1
++#define XPAttrMerge		2
++
++
++/*
++ * Return codes for XpGetDocumentData
++ */
++typedef unsigned char XPGetDocStatus;
++#define XPGetDocFinished	0	/* normal termination */
++#define XPGetDocSecondConsumer	1	/* setup error */
++#define XPGetDocError		2	/* runtime error, see generated error */
++
++
++/*
++ * Save data types for XpStartJob.
++ */
++typedef unsigned char XPSaveData;
++#define XPSpool			1	/* Job data sent to spooler */
++#define XPGetData		2	/* Job data via XpGetDocumentData */
++
++
++/*
++ * Document types for XpStartDoc.
++ */
++typedef unsigned char XPDocumentType;
++#define	XPDocNormal		1	/* Doc data handled by Xserver */
++#define	XPDocRaw		2	/* Doc data passed through Xserver */
++
++
++/********************************************************************
++ *
++ * Xp Print Property Names
++ */
++
++
++#ifndef _XP_PRINT_SERVER_
++
++/******************************************************************************
++ *
++ * Definitions used by the library and clients only.
++ */
++
++/*******************************************************************
++ *
++ * General API defines and such.
++ */
++
++/*
++ * Print Context for XpInitContext and related calls.
++ */
++typedef XID XPContext;
++
++/*
++ * Struct for XpGetPrinterList.
++ */
++typedef struct {
++    char	*name;		/* name */
++    char	*desc;		/* localized description */
++} XPPrinterRec, *XPPrinterList;
++
++/*
++ * Typedefs for XpGetDocumentData
++ */
++typedef void (*XPSaveProc)( Display *display,
++                            XPContext context,
++                            unsigned char *data,
++                            unsigned int data_len,
++                            XPointer client_data);
++
++typedef void (*XPFinishProc)( Display *display,
++                              XPContext context,
++                              XPGetDocStatus status,
++                              XPointer client_data);
++
++/*
++ * Typedefs for XpSetLocaleHinter and XpGetLocaleHinter
++ */
++typedef char * (*XPHinterProc)(void);
++
++#if 0
++/*******************************************************************
++ *
++ * Extension version structures.
++ *
++ **** this structure is now defined localy in the one file that uses it
++ **** in order to avoid clashes with its definition in XI.h
++ */
++typedef struct {
++        int     present;
++        short   major_version;
++        short   minor_version;
++} XExtensionVersion;
++#endif
++
++/********************************************************************
++ *
++ * Event structs for clients.
++ *
++ * note: these events are relative to a print context, and
++ * not to a window as in core X.
++ */
++typedef struct {
++    int            type;       /* base + XPPrintNotify */
++    unsigned long  serial;     /* # of last request processed by server */
++    Bool           send_event; /* true if from a SendEvent request */
++    Display        *display;   /* Display the event was read from */
++    XPContext      context;    /* print context where operation was requested */
++    Bool           cancel;     /* was detailed event canceled */
++    int            detail;     /* XPStartJobNotify, XPEndJobNotify,
++                                  XPStartDocNotify, XPEndDocNotify,
++                                  XPStartPageNotify, XPEndPageNotify */
++} XPPrintEvent;
++
++typedef struct {
++    int            type;       /* base + XPAttributeNotify */
++    unsigned long  serial;     /* # of last request processed by server */
++    Bool           send_event; /* true if from a SendEvent request */
++    Display        *display;   /* Display the event was read from */
++    XPContext      context;    /* print context where operation was requested */
++    int            detail;     /* XPJobAttr, XPDocAttr, XPPageAttr,
++                                  XPPrinterAttr, XPSpoolerAttr,
++                                  XPMediumAttr, XPServerAttr */
++} XPAttributeEvent;
++
++typedef struct {
++    int            type;       /* base + XPDataReadyNotify */
++    unsigned long  serial;     /* # of last request processed by server */
++    Bool           send_event; /* true if from a SendEvent request */
++    Display        *display;   /* Display the event was read from */
++    XPContext      context;    /* print context where operation was requested */
++    unsigned long  available;  /* bytes available for retrieval */
++} XPDataReadyEvent;
++
++
++/**********************************************************
++ *
++ * Function prototypes for library side.
++ */
++
++extern XPContext XpCreateContext (
++    Display		*display,
++    char		*printer_name
++);
++
++extern void XpSetContext (
++    Display		*display,
++    XPContext     	print_context
++);
++
++extern XPContext XpGetContext (
++    Display		*display
++);
++
++extern void XpDestroyContext (
++    Display		*display,
++    XPContext     	print_context
++);
++
++extern Screen *XpGetScreenOfContext (
++    Display		*display,
++    XPContext     	print_context
++);
++
++extern Status XpGetPageDimensions (
++    Display		*display,
++    XPContext     	print_context,
++    unsigned short	*width,			/* return value */
++    unsigned short	*height,		/* return value */
++    XRectangle		*reproducible_area	/* return value */
++);
++
++extern void XpStartJob (
++    Display		*display,
++    XPSaveData		save_data
++);
++
++extern void XpEndJob (
++    Display		*display
++);
++
++extern void XpCancelJob (
++    Display		*display,
++    Bool		discard
++);
++
++extern void XpStartDoc (
++    Display		*display,
++    XPDocumentType	type
++);
++
++extern void XpEndDoc (
++    Display		*display
++);
++
++extern void XpCancelDoc (
++    Display		*display,
++    Bool		discard
++);
++
++extern void XpPutDocumentData (
++    Display		*display,
++    Drawable		drawable,
++    unsigned char	*data,
++    int			data_len,
++    char		*doc_fmt,
++    char		*options
++);
++
++extern Status XpGetDocumentData (
++    Display		*display,
++    XPContext		context,
++    XPSaveProc		save_proc,
++    XPFinishProc	finish_proc,
++    XPointer		client_data
++);
++
++extern void XpStartPage (
++    Display		*display,
++    Window		window
++);
++
++extern void XpEndPage (
++    Display		*display
++);
++
++extern void XpCancelPage (
++    Display		*display,
++    Bool		discard
++);
++
++extern void XpSelectInput (
++    Display		*display,
++    XPContext     	print_context,
++    unsigned long	event_mask
++);
++
++extern unsigned long XpInputSelected (
++    Display		*display,
++    XPContext     	print_context,
++    unsigned long	*all_events_mask
++);
++
++extern Bool XpSetImageResolution (
++    Display		*display,
++    XPContext     	print_context,
++    int			image_res,
++    int			*prev_res
++);
++
++extern int XpGetImageResolution (
++    Display		*display,
++    XPContext     	print_context
++);
++
++extern char *XpGetAttributes (
++    Display		*display,
++    XPContext     	print_context,
++    XPAttributes	type
++);
++
++extern void XpSetAttributes (
++    Display		*display,
++    XPContext     	print_context,
++    XPAttributes	type,
++    char		*pool,
++    XPAttrReplacement	replacement_rule
++);
++
++extern char *XpGetOneAttribute (
++    Display		*display,
++    XPContext     	print_context,
++    XPAttributes	type,
++    char		*attribute_name
++);
++
++extern XPPrinterList XpGetPrinterList (
++    Display		*display,
++    char		*printer_name,
++    int			*list_count		/* return value */
++);
++
++extern void XpFreePrinterList (
++    XPPrinterList	printer_list
++);
++
++extern void XpRehashPrinterList (
++    Display		*display
++);
++
++extern Status XpQueryVersion (
++    Display		*display,
++    short		*major_version,		/* return value */
++    short		*minor_version		/* return value */
++);
++
++extern Bool XpQueryExtension (
++    Display		*display,
++    int			*event_base_return,	/* return value */
++    int			*error_base_return	/* return value */
++);
++
++extern Screen **XpQueryScreens (
++    Display		*display,
++    int			*list_count		/* return value */
++);
++
++extern Status XpGetPdmStartParams (
++    Display		*print_display,
++    Window		print_window,
++    XPContext		print_context,
++    Display		*video_display,
++    Window		video_window,
++    Display		**selection_display,	/* return value */
++    Atom		*selection,		/* return value */
++    Atom		*type,			/* return value */
++    int			*format,		/* return value */
++    unsigned char	**data,			/* return value */
++    int			*nelements		/* return value */
++);
++
++extern Status XpGetAuthParams (
++    Display		*print_display,
++    Display		*video_display,
++    Display		**selection_display,	/* return value */
++    Atom		*selection,		/* return value */
++    Atom		*target			/* return value */
++);
++
++extern Status XpSendAuth (
++    Display		*display,
++    Window		window
++);
++
++extern Status XpSendOneTicket (
++    Display		*display,
++    Window		window,
++    Xauth		*ticket,
++    Bool		more
++);
++
++extern void XpSetLocaleHinter (
++    XPHinterProc hinter_proc,
++    char         *hinter_desc
++);
++
++extern char *XpGetLocaleHinter (
++    XPHinterProc *hinter_proc
++);
++
++extern char *XpGetLocaleNetString(void);
++
++extern char *XpNotifyPdm (
++    Display		*print_display,
++    Window		print_window,
++    XPContext     	print_context,
++    Display		*video_display,
++    Window		video_window,
++    Bool		auth_flag
++);
++
++#endif /* _XP_PRINT_SERVER_ */
++
++_XFUNCPROTOEND
++
++#endif /* _XpPrint_H_ */
+diff -up libXp-1.0.3/include/X11/extensions/Printstr.h.jx libXp-1.0.3/include/X11/extensions/Printstr.h
+--- libXp-1.0.3/include/X11/extensions/Printstr.h.jx	2018-07-05 12:11:12.282385427 -0400
++++ libXp-1.0.3/include/X11/extensions/Printstr.h	2018-07-05 12:11:12.282385427 -0400
+@@ -0,0 +1,783 @@
++/* $Xorg: Printstr.h,v 1.3 2000/08/18 04:05:44 coskrey Exp $ */
++/******************************************************************************
++ ******************************************************************************
++ **
++ ** File:         Printstr.h
++ **
++ ** Description: Definitions needed by the server and library, but
++ **              not clients.
++ **
++ **              Print.h for server, library and clients.
++ **
++ ******************************************************************************
++ **
++ ** (c) Copyright 1996 Hewlett-Packard Company
++ ** (c) Copyright 1996 International Business Machines Corp.
++ ** (c) Copyright 1996 Sun Microsystems, Inc.
++ ** (c) Copyright 1996 Novell, Inc.
++ ** (c) Copyright 1996 Digital Equipment Corp.
++ ** (c) Copyright 1996 Fujitsu Limited
++ ** (c) Copyright 1996 Hitachi, Ltd.
++ **
++ ** Permission is hereby granted, free of charge, to any person obtaining a copy
++ ** of this software and associated documentation files (the "Software"), to deal
++ ** in the Software without restriction, including without limitation the rights
++ ** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ ** copies of the Software, and to permit persons to whom the Software is
++ ** furnished to do so, subject to the following conditions:
++ **
++ ** The above copyright notice and this permission notice shall be included in
++ ** all copies or substantial portions of the Software.
++ **
++ ** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ ** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ ** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
++ ** COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
++ ** IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
++ ** CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
++ **
++ ** Except as contained in this notice, the names of the copyright holders shall
++ ** not be used in advertising or otherwise to promote the sale, use or other
++ ** dealings in this Software without prior written authorization from said
++ ** copyright holders.
++ **
++ ******************************************************************************
++ *****************************************************************************/
++/* $XFree86: xc/include/extensions/Printstr.h,v 1.5 2001/08/01 00:44:35 tsi Exp $ */
++
++
++#ifndef _XpPrintstr_H_
++#define _XpPrintstr_H_
++
++/*
++ * NEED_EVENTS and NEED_REPLIES are hacks to limit the linker symbol-table
++ * size.   When function prototypes are needed from Print.h, this sets up
++ * a cascading dependency on Printstr.h and eventually Xproto.h to provide
++ * the event and reply struct definitions.
++ */
++#ifndef NEED_EVENTS
++#define NEED_EVENTS
++#endif /* NEED_EVENTS */
++
++#define NEED_REPLIES
++
++#include <X11/Xproto.h>
++#ifndef _XP_PRINT_SERVER_
++#include <X11/Xlib.h>
++#endif /* _XP_PRINT_SERVER_ */
++
++/*
++ * Pull in other definitions.  Print.h will hide some things if we're
++ * doing server side work.
++ */
++#include <X11/extensions/Print.h>
++
++#include <X11/Xfuncproto.h>
++
++_XFUNCPROTOBEGIN
++
++/******************************************************************************
++ *
++ * Protocol requests constants and alignment values
++ *
++ * Note: Xlib macro's expect X_ABC where ABC is the name of the
++ * protocol request.
++ */
++#define X_PrintQueryVersion		0
++#define X_PrintGetPrinterList		1
++#define X_PrintCreateContext		2
++#define X_PrintSetContext		3
++#define X_PrintGetContext		4
++#define X_PrintDestroyContext		5
++#define X_PrintGetContextScreen		6
++#define X_PrintStartJob			7
++#define X_PrintEndJob			8
++#define X_PrintStartDoc			9
++#define X_PrintEndDoc			10
++#define X_PrintPutDocumentData		11
++#define X_PrintGetDocumentData		12
++#define X_PrintStartPage		13
++#define X_PrintEndPage			14
++#define X_PrintSelectInput		15
++#define X_PrintInputSelected		16
++#define X_PrintGetAttributes		17
++#define X_PrintSetAttributes		18
++#define X_PrintGetOneAttribute		19
++#define X_PrintRehashPrinterList	20
++#define X_PrintGetPageDimensions	21
++#define X_PrintQueryScreens		22
++#define X_PrintSetImageResolution	23
++#define X_PrintGetImageResolution	24
++
++/********************************************************************
++ *
++ * Protocol data types
++ */
++#define PCONTEXT CARD32
++#define WINDOW   CARD32
++#define DRAWABLE CARD32
++#define BITMASK  CARD32
++
++/******************************************************************************
++ *
++ * Event wire struct definitions
++ *
++ * Note: Xlib macro's expect xABC struct names and sz_xABC size
++ * constants where ABC is the name of the protocol request.
++ */
++
++
++/*********************************************************************
++ *
++ * Events.
++ *
++ * See Print.h for the protocol "type" values.
++ */
++typedef struct _xPrintPrintEvent {
++	BYTE type;		/* XPPrintNotify + extEntry->eventBase */
++	BYTE detail;		/* XPStartJobNotify, XPEndJobNotify,
++				   XPStartDocNotify, XPEndDocNotify,
++				   XPStartPageNotify, XPEndPageNotify */
++	CARD16 sequenceNumber B16;
++	PCONTEXT printContext B32; /* print context */
++	BOOL   cancel;		/* canceled flag */
++	CARD8  pad1;		/* rest is unused */
++	CARD16 pad2 B16;
++	CARD32 pad3 B32;
++	CARD32 pad4 B32;
++	CARD32 pad5 B32;
++	CARD32 pad6 B32;
++	CARD32 pad7 B32;
++} xPrintPrintEvent;
++#define sz_xPrintPrintEvent 32;
++
++typedef struct _xPrintAttributeEvent {
++	BYTE   type;		/* XPAttributeNotify + extEntry->eventBase */
++	BYTE   detail;		/* XPJobAttr, XPDocAttr, XPPageAttr,
++				   XPPrinterAttr, XPSpoolerAttr,
++				   XPMediumAttr, XPServerAttr */
++	CARD16 sequenceNumber B16;
++	PCONTEXT printContext B32; /* print context */
++	CARD32 pad1 B32;
++	CARD32 pad2 B32;
++	CARD32 pad3 B32;
++	CARD32 pad4 B32;
++	CARD32 pad5 B32;
++	CARD32 pad6 B32;
++} xPrintAttributeEvent;
++#define sz_xPrintAttributeEvent 32;
++
++
++/*********************************************************************
++ *
++ * Requests
++ */
++typedef struct _PrintQueryVersion {
++	CARD8	reqType;		/* always PrintReqCode */
++	CARD8	printReqType;		/* always X_PrintQueryVersion */
++	CARD16	length B16;
++} xPrintQueryVersionReq;
++#define sz_xPrintQueryVersionReq	4
++
++typedef struct {
++	BYTE	type;			/* X_Reply */
++	CARD8	unused;			/* not used */
++	CARD16	sequenceNumber B16;
++	CARD32	length B32;
++	CARD16	majorVersion B16;	/* major version of Xp protocol */
++	CARD16	minorVersion B16;	/* minor version of Xp protocol */
++	CARD32	pad1 B32;
++	CARD32	pad2 B32;
++	CARD32	pad3 B32;
++	CARD32	pad4 B32;
++	CARD32	pad5 B32;
++} xPrintQueryVersionReply;
++#define sz_xPrintQueryVersionReply	32
++
++
++typedef struct _PrintGetPrinterList {
++	CARD8	reqType;		/* always PrintReqCode */
++	CARD8	printReqType;		/* always X_PrintGetPrinterList */
++	CARD16	length B16;
++	CARD32	printerNameLen B32;	/* length of printer name */
++	CARD32	localeLen B32;		/* length of locale string */
++
++	/* variable portion *****************************************
++	STRING8	printerName;		 * printer name *
++	BYTE	pad(printerNameLen)	 * unused *
++	STRING8	locale;			 * locale *
++	BYTE	pad(localeLen)		 * unused *
++	************************************************************/
++} xPrintGetPrinterListReq;
++#define sz_xPrintGetPrinterListReq	12
++
++typedef struct {
++	BYTE	type;			/* X_Reply */
++	CARD8	unused;			/* not used */
++	CARD16	sequenceNumber B16;
++	CARD32	length B32;
++	CARD32	listCount B32;		/* of PRINTER recs below */
++	CARD32	pad1 B32;
++	CARD32	pad2 B32;
++	CARD32	pad3 B32;
++	CARD32	pad4 B32;
++	CARD32	pad5 B32;
++
++	/* variable portion *****************************************
++	CARD32	nameLen B32;		* length of name in bytes *
++	STRING8	name;			* name *
++	BYTE	pad(nameLen)		* unused *
++
++	CARD32	descLen B32;		* length of desc in bytes *
++	STRING8	desc;			* localized description *
++	BYTE	pad(descLen)		* unused *
++	************************************************************/
++} xPrintGetPrinterListReply;
++#define sz_xPrintGetPrinterListReply	32
++
++
++typedef struct _PrintRehashPrinterList {
++	CARD8	reqType;		/* always PrintReqCode */
++	CARD8	printReqType;		/* always X_PrintRehashPrinterList */
++	CARD16	length B16;
++} xPrintRehashPrinterListReq;
++#define sz_xPrintRehashPrinterListReq	4
++
++
++typedef struct _PrintCreateContext {
++	CARD8	reqType;		/* always PrintReqCode */
++	CARD8	printReqType;		/* always X_PrintInitSetContext */
++	CARD16	length B16;
++	CARD32	contextID B32;		/* ID for context */
++	CARD32	printerNameLen B32;	/* length of printerName in bytes */
++	CARD32	localeLen B32;		/* length of locale in bytes */
++
++	/* variable portion *****************************************
++	STRING8	printerName		 * printer name *
++	BYTE	pad(printerNameLen)	 * unused *
++	STRING8	locale			 * locale *
++	BYTE	pad(locale)		 * unused *
++	************************************************************/
++} xPrintCreateContextReq;
++#define sz_xPrintCreateContextReq	16
++
++
++typedef struct _PrintSetContext {
++	CARD8	reqType;		/* always PrintReqCode */
++	CARD8	printReqType;		/* always X_PrintSetContext */
++	CARD16	length B16;
++	PCONTEXT printContext B32;	/* print context */
++} xPrintSetContextReq;
++#define sz_xPrintSetContextReq		8
++
++
++typedef struct _PrintGetContext {
++	CARD8	reqType;		/* always PrintReqCode */
++	CARD8	printReqType;		/* always X_PrintGetContext */
++	CARD16	length B16;
++} xPrintGetContextReq;
++#define sz_xPrintGetContextReq		4
++
++typedef struct {
++	BYTE	type;			/* X_Reply */
++	CARD8	unused;			/* not used */
++	CARD16	sequenceNumber B16;
++	CARD32	length B32;
++	PCONTEXT printContext B32;	/* print context */
++	CARD32	pad1 B32;
++	CARD32	pad2 B32;
++	CARD32	pad3 B32;
++	CARD32	pad4 B32;
++	CARD32	pad5 B32;
++} xPrintGetContextReply;
++#define sz_xPrintGetContextReply	32
++
++
++typedef struct _PrintDestroyContext {
++	CARD8	reqType;		/* always PrintReqCode */
++	CARD8	printReqType;		/* always X_PrintDestroyContext */
++	CARD16	length B16;
++	PCONTEXT printContext B32;	/* print context */
++} xPrintDestroyContextReq;
++#define sz_xPrintDestroyContextReq	8
++
++
++typedef struct _PrintGetContextScreen {
++	CARD8	reqType;		/* always PrintReqCode */
++	CARD8	printReqType;		/* always X_PrintGetContextScreen */
++	CARD16	length B16;
++	PCONTEXT printContext B32;	/* print context */
++} xPrintGetContextScreenReq;
++#define sz_xPrintGetContextScreenReq	8
++
++typedef struct {
++	BYTE	type;			/* X_Reply */
++	CARD8	unused;			/* not used */
++	CARD16	sequenceNumber B16;
++	CARD32	length B32;
++	WINDOW  rootWindow;		/* screenPtr represented as rootWin */
++	CARD32	pad1 B32;
++	CARD32	pad2 B32;
++	CARD32	pad3 B32;
++	CARD32	pad4 B32;
++	CARD32	pad5 B32;
++} xPrintGetContextScreenReply;
++#define sz_xPrintGetContextScreenReply	32
++
++
++typedef struct _PrintStartJob {
++	CARD8	reqType;		/* always PrintReqCode */
++	CARD8	printReqType;		/* always X_PrintStartJob */
++	CARD16	length B16;
++	CARD8	saveData;		/* save data boolean */
++	CARD8	pad1;
++	CARD16	pad2 B16;
++} xPrintStartJobReq;
++#define sz_xPrintStartJobReq		8
++
++typedef struct _PrintEndJob {
++	CARD8	reqType;		/* always PrintReqCode */
++	CARD8	printReqType;		/* always X_PrintEndJob */
++	CARD16	length B16;
++	BOOL	cancel;			/* cancel boolean */
++	CARD8	pad1;
++	CARD16	pad2 B16;
++} xPrintEndJobReq;
++#define sz_xPrintEndJobReq		8
++
++
++typedef struct _PrintStartDoc {
++	CARD8	reqType;		/* always PrintReqCode */
++	CARD8	printReqType;		/* always X_PrintStartDoc */
++	CARD16	length B16;
++	CARD8	type;			/* type for document */
++	CARD8	pad1;
++	CARD16	pad2 B16;
++} xPrintStartDocReq;
++#define sz_xPrintStartDocReq		8
++
++typedef struct _PrintEndDoc {
++	CARD8	reqType;		/* always PrintReqCode */
++	CARD8	printReqType;		/* always X_PrintEndDoc */
++	CARD16	length B16;
++	BOOL	cancel;			/* cancel boolean */
++	CARD8	pad1;
++	CARD16	pad2 B16;
++} xPrintEndDocReq;
++#define sz_xPrintEndDocReq		8
++
++
++typedef struct _PrintPutDocumentData {
++	CARD8	reqType;		/* always PrintReqCode */
++	CARD8	printReqType;		/* always X_PrintPutDocumentData */
++	CARD16	length B16;
++	DRAWABLE drawable B32;		/* target drawable */
++	CARD32	len_data B32;		/* big len in bytes */
++	CARD16	len_fmt;		/* len in bytes */
++	CARD16	len_options;		/* len in bytes */
++
++	/* variable portion *****************************************
++	LISTofBYTE	data;		 * data *
++	BYTE		pad(len_data)	 * unused *
++	STRING8		doc_fmt;	 * ISO compliant desc of data type *
++	BYTE		pad(len_fmt)	 * unused *
++	STRING8		options;	 * additional device-dependent desc *
++	BYTE		pad(len_options) * unused *
++	************************************************************/
++} xPrintPutDocumentDataReq;
++#define sz_xPrintPutDocumentDataReq	16
++
++
++typedef struct _PrintGetDocumentData {
++	CARD8	reqType;		/* always PrintReqCode */
++	CARD8	printReqType;		/* always X_PrintGetDocumentData */
++	CARD16	length B16;
++	PCONTEXT printContext B32;	/* print context */
++	CARD32	maxBufferSize B32;	/* maximum buffer size requested */
++} xPrintGetDocumentDataReq;
++#define sz_xPrintGetDocumentDataReq	12
++
++typedef struct {
++	BYTE	type;			/* X_Reply */
++	CARD8	unused;			/* not used */
++	CARD16	sequenceNumber B16;
++	CARD32	length B32;
++	CARD32	statusCode B32;		/* status code for reply */
++	CARD32	finishedFlag B32;	/* is this the last reply */
++	CARD32	dataLen B32;		/* data length */
++	CARD32	pad1 B32;
++	CARD32	pad2 B32;
++	CARD32	pad3 B32;
++
++	/* variable portion *****************************************
++	LISTofBYTE	data;		 * data *
++	BYTE		pad(count)	 * unused *
++	************************************************************/
++} xPrintGetDocumentDataReply;
++#define sz_xPrintGetDocumentDataReply	32
++
++
++typedef struct _PrintStartPage {
++	CARD8	reqType;		/* always PrintReqCode */
++	CARD8	printReqType;		/* always X_PrintStartPage */
++	CARD16	length B16;
++	WINDOW	window B32;		/* window */
++} xPrintStartPageReq;
++#define sz_xPrintStartPageReq		8
++
++typedef struct _PrintEndPage {
++	CARD8	reqType;		/* always PrintReqCode */
++	CARD8	printReqType;		/* always X_PrintEndPage */
++	CARD16	length B16;
++	BOOL	cancel;			/* cancel boolean */
++	CARD8	pad1;
++	CARD16	pad2 B16;
++} xPrintEndPageReq;
++#define sz_xPrintEndPageReq		8
++
++
++typedef struct _PrintSelectInput {
++        CARD8   reqType;        	/* always PrintReqCode */
++	CARD8   printReqType;		/* always X_PrintSelectInput */
++	CARD16	length B16;
++	PCONTEXT printContext B32;	/* print context */
++	BITMASK	eventMask B32;
++} xPrintSelectInputReq;
++#define sz_xPrintSelectInputReq		12
++
++
++typedef struct _PrintInputSelected {
++        CARD8   reqType;        	/* always PrintReqCode */
++	CARD8   printReqType;		/* always X_PrintInputSelected */
++	CARD16	length B16;
++	PCONTEXT printContext B32;	/* print context */
++} xPrintInputSelectedReq;
++#define sz_xPrintInputSelectedReq	8
++
++typedef struct {
++	BYTE	type;			/* X_Reply */
++	CARD8	unused;			/* not used */
++	CARD16	sequenceNumber B16;
++	CARD32	length B32;
++	BITMASK	eventMask B32;		/* your event mask */
++	BITMASK	allEventsMask B32;	/* all event mask */
++	CARD32	pad1 B32;
++	CARD32	pad2 B32;
++	CARD32	pad3 B32;
++	CARD32	pad4 B32;
++} xPrintInputSelectedReply;
++#define sz_xPrintInputSelectedReply	32
++
++typedef struct _PrintGetAttributes {
++        CARD8   reqType;        	/* always PrintReqCode */
++	CARD8   printReqType;		/* always X_PrintGetAttributes */
++	CARD16	length B16;
++	PCONTEXT printContext B32;	/* print context */
++        CARD8   type;			/* type */
++        CARD8   pad1;			/* unused */
++        CARD16  pad2 B16;		/* unused */
++} xPrintGetAttributesReq;
++#define sz_xPrintGetAttributesReq	12
++
++typedef struct {
++	BYTE	type;			/* X_Reply */
++	CARD8	unused;			/* not used */
++	CARD16	sequenceNumber B16;
++	CARD32	length B32;
++	CARD32	stringLen B32;		/* length of xrm db string */
++	CARD32	pad1 B32;
++	CARD32	pad2 B32;
++	CARD32	pad3 B32;
++	CARD32	pad4 B32;
++	CARD32	pad5 B32;
++
++        /* variable portion *****************************************
++	STRING8	string;                  * xrm db as a string *
++	BYTE	pad(stringLen)           * unused *
++        ************************************************************/
++} xPrintGetAttributesReply;
++#define sz_xPrintGetAttributesReply	32
++
++
++typedef struct _PrintSetAttributes {
++        CARD8   reqType;        	/* always PrintReqCode */
++	CARD8   printReqType;		/* always X_PrintSetAttributes */
++	CARD16	length B16;
++	PCONTEXT printContext B32;	/* print context */
++	CARD32	stringLen B32;		/* length of xrm db string */
++        CARD8   type;                   /* type */
++	CARD8   rule;			/* replacement rule */
++	CARD16  pad1 B16;		/* unused */
++
++        /* variable portion *****************************************
++	STRING8	string;                  * xrm db as a string *
++	BYTE	pad(stringLen)           * unused *
++        ************************************************************/
++} xPrintSetAttributesReq;
++#define sz_xPrintSetAttributesReq	16
++
++
++typedef struct _PrintGetOneAttribute {
++        CARD8   reqType;        	/* always PrintReqCode */
++	CARD8   printReqType;		/* always X_PrintGetOneAttribute */
++	CARD16	length B16;
++	PCONTEXT printContext B32;	/* print context */
++	CARD32	nameLen;		/* length of name string */
++        CARD8   type;			/* type */
++        CARD8   pad1;			/* unused */
++        CARD16  pad2 B16;		/* unused */
++
++        /* variable portion *****************************************
++	STRING8	name;			 * name as a string *
++	BYTE	pad(name)		 * unused *
++        ************************************************************/
++} xPrintGetOneAttributeReq;
++#define sz_xPrintGetOneAttributeReq	16
++
++typedef struct {
++	BYTE	type;			/* X_Reply */
++	CARD8	unused;			/* not used */
++	CARD16	sequenceNumber B16;
++	CARD32	length B32;
++	CARD32	valueLen B32;		/* length of value string */
++	CARD32	pad1 B32;
++	CARD32	pad2 B32;
++	CARD32	pad3 B32;
++	CARD32	pad4 B32;
++	CARD32	pad5 B32;
++
++        /* variable portion *****************************************
++	STRING8	value;			 * value as a string *
++	BYTE	pad(value)		 * unused *
++        ************************************************************/
++} xPrintGetOneAttributeReply;
++#define sz_xPrintGetOneAttributeReply	32
++
++
++typedef struct _PrintGetPageDimensions {
++	CARD8	reqType;		/* always PrintReqCode */
++	CARD8	printReqType;		/* always X_PrintGetPageDimensions */
++	CARD16	length B16;
++	PCONTEXT printContext B32;	/* print context */
++} xPrintGetPageDimensionsReq;
++#define sz_xPrintGetPageDimensionsReq	8
++
++typedef struct {
++	BYTE	type;			/* X_Reply */
++	CARD8	unused;			/* not used */
++	CARD16	sequenceNumber B16;
++	CARD32	length B32;
++	CARD16	width;			/* total pixel width */
++	CARD16	height;			/* total pixel height */
++	CARD16	rx;			/* reproducable x pixel offset */
++	CARD16	ry;			/* reproducable y pixel offset */
++	CARD16	rwidth;			/* reproducable x pixel width */
++	CARD16	rheight;		/* reproducable y pixel width */
++	CARD32	pad1 B32;
++	CARD32	pad2 B32;
++	CARD32	pad3 B32;
++} xPrintGetPageDimensionsReply;
++#define sz_xPrintGetPageDimensionsReply	32
++
++
++typedef struct _PrintQueryScreens {
++	CARD8	reqType;		/* always PrintReqCode */
++	CARD8	printReqType;		/* always X_PrintQueryScreens */
++	CARD16	length B16;
++} xPrintQueryScreensReq;
++#define sz_xPrintQueryScreensReq	4
++
++typedef struct {
++	BYTE	type;			/* X_Reply */
++	CARD8	unused;			/* not used */
++	CARD16	sequenceNumber B16;
++	CARD32	length B32;
++	CARD32	listCount;		/* number of screens following */
++	CARD32	pad1 B32;
++	CARD32	pad2 B32;
++	CARD32	pad3 B32;
++	CARD32	pad4 B32;
++	CARD32	pad5 B32;
++
++        /* variable portion *****************************************
++	WINDOW	rootWindow;		 * root window of screen *
++        ************************************************************/
++} xPrintQueryScreensReply;
++#define sz_xPrintQueryScreensReply	32
++
++typedef struct _PrintSetImageResolution {
++	CARD8	reqType;		/* always PrintReqCode */
++	CARD8	printReqType;		/* always X_PrintSetImageResolution */
++	CARD16	length B16;
++	PCONTEXT printContext B32;	/* print context */
++	CARD16 imageRes B16;		/* image resolution */
++	CARD16 pad1 B16;
++} xPrintSetImageResolutionReq;
++#define sz_xPrintSetImageResolutionReq	12
++
++typedef struct {
++	BYTE	type;			/* X_Reply */
++	BOOL	status;			/* accepted or not */
++	CARD16	sequenceNumber B16;
++	CARD32	length B32;
++	CARD16	prevRes B16;		/* previous resolution */
++	CARD16	pad1 B32;
++	CARD32	pad2 B32;
++	CARD32	pad3 B32;
++	CARD32	pad4 B32;
++	CARD32	pad5 B32;
++	CARD32	pad6 B32;
++} xPrintSetImageResolutionReply;
++#define sz_xPrintSetImageResolutionReply 32
++
++typedef struct _PrintGetImageResolution {
++	CARD8	reqType;		/* always PrintReqCode */
++	CARD8	printReqType;		/* always X_PrintGetImageResolution */
++	CARD16	length B16;
++	PCONTEXT printContext B32;	/* print context */
++} xPrintGetImageResolutionReq;
++#define sz_xPrintGetImageResolutionReq	8
++
++typedef struct {
++	BYTE	type;			/* X_Reply */
++	CARD8	unused;
++	CARD16	sequenceNumber B16;
++	CARD32	length B32;
++	CARD16	imageRes B16;		/* image resolution */
++	CARD16	pad1 B32;
++	CARD32	pad2 B32;
++	CARD32	pad3 B32;
++	CARD32	pad4 B32;
++	CARD32	pad5 B32;
++	CARD32	pad6 B32;
++} xPrintGetImageResolutionReply;
++#define sz_xPrintGetImageResolutionReply 32
++
++#ifndef _XP_PRINT_SERVER_
++/***********************************************************************
++ *
++ * Library-only definitions.
++ */
++extern XPHinterProc  _xp_hinter_proc;
++extern char         *_xp_hinter_desc;
++extern int           _xp_hinter_init;
++
++#else /* _XP_PRINT_SERVER_ */
++
++/***********************************************************************
++ *
++ * Server-only definitions shared between the extension and DDX layers.
++ *
++ */
++
++/*
++ * Internal return code used to indicate that the requesting
++ * client has been suspended.
++ */
++#define Suspended 84
++
++struct _XpContext;
++
++extern void XpRegisterPrinterScreen(
++    ScreenPtr pScreen,
++    int (*CreateContext)(struct _XpContext *));
++
++typedef struct _xpprintFuncs {
++    int (*StartJob)(
++	struct _XpContext *	/* pContext */,
++	Bool			/* sendClientData */,
++	ClientPtr		/* client */);
++    int (*EndJob)(struct _XpContext *, int);
++    int (*StartDoc)(
++	struct _XpContext *	/* pContext */,
++	XPDocumentType		/* type */);
++    int (*EndDoc)(struct _XpContext *, int);
++    int (*StartPage)(
++	struct _XpContext *	/* pContext */,
++	WindowPtr		/* pWin */);
++    int (*EndPage)(
++	struct _XpContext *	/* pContext */,
++	WindowPtr		/* pWin */);
++    int (*PutDocumentData)(
++	struct _XpContext *	/* pContext */,
++	DrawablePtr		/* pDraw */,
++	char *			/* pData */,
++	int			/* len_data */,
++	char *			/* pDoc_fmt */,
++	int			/* len_fmt */,
++	char *			/* pOptions */,
++	int			/* len_options */,
++	ClientPtr		/* client */);
++    int (*GetDocumentData)(
++	struct _XpContext *	/* pContext */,
++	ClientPtr		/* client */,
++	int			/* maxBufferSize */);
++    int (*DestroyContext)(
++	struct _XpContext *);	/* pContext */
++    char *(*GetAttributes)(
++	struct _XpContext *,
++	XPAttributes 		/* pool */);
++    char *(*GetOneAttribute)(
++	struct _XpContext *	/* pContext */,
++	XPAttributes 		/* pool */,
++	char *			/* attrs */);
++    int (*SetAttributes)(
++	struct _XpContext *	/* pContext */,
++	XPAttributes 		/* pool */,
++	char *			/* attrs */);
++    int (*AugmentAttributes)(
++	struct _XpContext *	/* pContext */,
++	XPAttributes 		/* pool */,
++	char *			/* attrs */);
++    int (*GetMediumDimensions)(
++	struct _XpContext *	/* pPrintContext */,
++	CARD16 *		/* pWidth */,
++	CARD16 *		/* pHeight */);
++    int (*GetReproducibleArea)(
++	struct _XpContext *	/* pPrintContext */,
++	xRectangle *		/* pRect */);
++    int (*SetImageResolution)(
++	struct _XpContext *	/* pPrintContext */,
++	int			/* imageRes */,
++	Bool *			/* pStatus */);
++} XpDriverFuncs, *XpDriverFuncsPtr;
++
++/*
++ * Each print context is represented by one of the following structs
++ * associated with a resource ID of type RTcontext .  A pointer to
++ * the context is placed in the Xp extension's devPrivates
++ * element in each client * which establishes a context via
++ * either initContext or setContext.
++ * The context pointer is also placed in the struct indicated by the
++ * RTpage resource associated with each StartPage'd window.
++ */
++typedef struct _XpContext {
++        XID contextID;
++        char *printerName;
++        int screenNum;          /* screen containing the printer */
++        struct _XpClient *clientHead; /* list of clients */
++        CARD32 state;
++        VisualID pageWin;
++        DevUnion *devPrivates;
++        XpDriverFuncs funcs;
++	ClientPtr clientSlept;
++	int imageRes;
++} XpContextRec, *XpContextPtr;
++
++#include <X11/fonts/fontstruct.h>	/* FontResolutionPtr */
++
++extern Bool XpAllocateContextPrivate(int, unsigned);
++extern FontResolutionPtr XpGetClientResolutions(ClientPtr, int *);
++extern XpContextPtr XpContextOfClient(ClientPtr);
++extern XpContextPtr XpGetPrintContext(ClientPtr);
++extern int XpAllocateContextPrivateIndex(void);
++extern int XpRehashPrinterList(void);
++extern void XpSetFontResFunc(ClientPtr);
++extern void XpUnsetFontResFunc(ClientPtr);
++extern void XpRegisterInitFunc(ScreenPtr, char *, int (*)(struct _XpContext *));
++
++#endif /* _XP_PRINT_SERVER_ */
++
++_XFUNCPROTOEND
++
++#endif /* _XpPrintstr_H_ */
+diff -up libXp-1.0.3/Makefile.am.jx libXp-1.0.3/Makefile.am
+--- libXp-1.0.3/Makefile.am.jx	2015-02-21 17:02:53.000000000 -0500
++++ libXp-1.0.3/Makefile.am	2018-07-05 12:11:12.279385380 -0400
+@@ -23,10 +23,15 @@ AM_CFLAGS = $(XPRINT_CFLAGS)
+ 
+ SUBDIRS = src man
+ 
++printdir = $(includedir)/X11/extensions
++print_HEADERS = \
++        $(top_srcdir)/include/X11/extensions/Print.h \
++        $(top_srcdir)/include/X11/extensions/Printstr.h
++
+ pkgconfigdir = $(libdir)/pkgconfig
+-pkgconfig_DATA = xp.pc
++pkgconfig_DATA = xp.pc printproto.pc
+ 
+-EXTRA_DIST = xp.pc.in ChangeLog README.md
++EXTRA_DIST = xp.pc.in printproto.pc.in ChangeLog README.md
+ MAINTAINERCLEANFILES = ChangeLog
+ 
+ .PHONY: ChangeLog
+diff -up libXp-1.0.3/printproto.pc.in.jx libXp-1.0.3/printproto.pc.in
+--- libXp-1.0.3/printproto.pc.in.jx	2018-07-05 12:11:12.283385443 -0400
++++ libXp-1.0.3/printproto.pc.in	2018-07-05 12:11:12.282385427 -0400
+@@ -0,0 +1,10 @@
++prefix=@prefix@
++exec_prefix=@exec_prefix@
++libdir=@libdir@
++includedir=@includedir@
++
++Name: PrintProto
++Description: Print extension headers
++Version: @PACKAGE_VERSION@
++Requires: xau
++Cflags: -I${includedir}
+diff -up libXp-1.0.3/src/Makefile.am.jx libXp-1.0.3/src/Makefile.am
+--- libXp-1.0.3/src/Makefile.am.jx	2015-02-21 17:02:53.000000000 -0500
++++ libXp-1.0.3/src/Makefile.am	2018-07-05 12:11:12.283385443 -0400
+@@ -24,7 +24,7 @@ libXp_la_LIBADD = $(XPRINT_LIBS)
+ 
+ AM_CFLAGS = $(CWARNFLAGS) $(XPRINT_CFLAGS) $(MALLOC_ZERO_CFLAGS)
+ 
+-AM_CPPFLAGS = -I$(top_srcdir)/include/X11/extensions
++AM_CPPFLAGS = -I$(top_srcdir)/include/
+ 
+ #
+ # Library version number. This must match old versions on

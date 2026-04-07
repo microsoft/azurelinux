@@ -1,0 +1,12 @@
+diff --git a/src/qtdiag/qtdiag.pro b/src/qtdiag/qtdiag.pro
+index 40e8418..71662e8 100644
+--- a/src/qtdiag/qtdiag.pro
++++ b/src/qtdiag/qtdiag.pro
+@@ -4,6 +4,7 @@ requires(qtConfig(qtdiag))
+ 
+ CONFIG += console
+ QT += core-private gui-private
++LIBS += -latomic
+ qtConfig(opengl): QT += opengl
+ 
+ qtHaveModule(widgets): QT += widgets

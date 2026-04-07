@@ -1,0 +1,45 @@
+diff -up linux-atm-2.5.1/src/led/zeppelin.8.fixman linux-atm-2.5.1/src/led/zeppelin.8
+--- linux-atm-2.5.1/src/led/zeppelin.8.fixman	2003-05-02 19:35:04.000000000 +0200
++++ linux-atm-2.5.1/src/led/zeppelin.8	2010-10-13 12:58:18.000000000 +0200
+@@ -99,7 +99,7 @@ Ring and ATM parts of the ELAN, so using
+ recommended. Token Ring support has received less testing than its
+ Ethernet counterpart.
+ .SH FILES
+-.IP \fI/var/run/lec[interface number].pid\fP
++\fI/var/run/lec[interface number].pid\fP
+ The file containing the process id of zeppelin.
+ .SH BUGS
+ John Bonham died 1980 and Led Zeppelin broke.
+diff -up linux-atm-2.5.1/src/mpoad/mpcd.8.fixman linux-atm-2.5.1/src/mpoad/mpcd.8
+--- linux-atm-2.5.1/src/mpoad/mpcd.8.fixman	2001-10-10 00:33:07.000000000 +0200
++++ linux-atm-2.5.1/src/mpoad/mpcd.8	2010-10-13 12:59:14.000000000 +0200
+@@ -28,7 +28,7 @@ mpcd \- ATM MPOA (Multi\-Protocol Over A
+ .B ]]
+ .SH DESCRIPTION
+ MPOA client
+-.SM(MPC) is responsible for creating and receiving
++.SM (MPC) is responsible for creating and receiving
+ internetwork layer shortcuts. Using these shortcuts MPCs forward
+ unicast internetwork layer packets effectively over ATM without need
+ for routing protocols.
+@@ -43,7 +43,7 @@ accepts shortcuts and packets arriving o
+ shortcuts is done with the help of
+ .SM MPOA
+ server
+-.SM(MPS).
++.SM (MPS).
+ .PP
+ Just as the Linux
+ .SM LAN
+diff -up linux-atm-2.5.1/src/sigd/atmsigd.conf.4.fixman linux-atm-2.5.1/src/sigd/atmsigd.conf.4
+--- linux-atm-2.5.1/src/sigd/atmsigd.conf.4.fixman	2001-10-10 00:33:07.000000000 +0200
++++ linux-atm-2.5.1/src/sigd/atmsigd.conf.4	2010-10-13 12:58:49.000000000 +0200
+@@ -125,7 +125,7 @@ a comment. The `#' character cannot be e
+ .P
+ If an option is specified in \fBatmsigd.conf\fP and on the command
+ line, the command line has priority.
+-.COMPATIBILITY
++.SH COMPATIBILITY
+ Certain options used by past versions of \fBatmsigd\fP but no longer documented
+ on the man page are still recognized and supported, but they also yield a
+ warning message. Future versions of \fBatmsigd\fP will not recognize those

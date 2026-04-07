@@ -1,0 +1,10 @@
+--- xen-4.9.0/tools/hotplug/Linux/systemd/xendomains.service.in.orig	2017-08-22 21:53:54.706306958 +0100
++++ xen-4.9.0/tools/hotplug/Linux/systemd/xendomains.service.in	2017-08-22 22:04:55.864754640 +0100
+@@ -5,7 +5,6 @@
+ After=network-online.target
+ After=remote-fs.target
+ ConditionPathExists=/proc/xen/capabilities
+-Conflicts=libvirtd.service
+ 
+ [Service]
+ Type=oneshot

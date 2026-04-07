@@ -1,0 +1,483 @@
+From fff93602a4b252be8d674e27083dde68a7acf038 Mon Sep 17 00:00:00 2001
+From: Martin Sehnoutka <msehnout@redhat.com>
+Date: Tue, 6 Sep 2016 13:46:03 +0200
+Subject: [PATCH 04/59] Use /etc/vsftpd/ dir for config files instead of /etc.
+
+---
+ EXAMPLE/INTERNET_SITE/README         |  6 +++---
+ EXAMPLE/INTERNET_SITE_NOINETD/README |  4 ++--
+ EXAMPLE/PER_IP_CONFIG/README         |  4 ++--
+ EXAMPLE/VIRTUAL_USERS/README         | 14 +++++++-------
+ FAQ                                  |  8 ++++----
+ INSTALL                              | 10 +++++-----
+ README                               |  5 +++++
+ defs.h                               |  2 +-
+ tunables.c                           | 10 +++++-----
+ vsftpd.8                             | 10 +++++-----
+ vsftpd.conf                          | 20 +++++++++++++-------
+ vsftpd.conf.5                        | 22 +++++++++++-----------
+ 12 files changed, 63 insertions(+), 52 deletions(-)
+
+diff --git a/EXAMPLE/INTERNET_SITE/README b/EXAMPLE/INTERNET_SITE/README
+index 12b10a5..fe3d7ca 100644
+--- a/EXAMPLE/INTERNET_SITE/README
++++ b/EXAMPLE/INTERNET_SITE/README
+@@ -41,13 +41,13 @@ no_access               = 192.168.1.3
+ As an example of how to ban certain sites from connecting, 192.168.1.3 will
+ be denied access.
+ 
+-banner_fail             = /etc/vsftpd.busy_banner
++banner_fail             = /etc/vsftpd/busy_banner
+ 
+ This is the file to display to users if the connection is refused for whatever
+ reason (too many users, IP banned).
+ 
+ Example of how to populate it:
+-echo "421 Server busy, please try later." > /etc/vsftpd.busy_banner
++echo "421 Server busy, please try later." > /etc/vsftpd/busy_banner
+ 
+ log_on_success          += PID HOST DURATION
+ log_on_failure          += HOST
+@@ -62,7 +62,7 @@ Step 2) Set up your vsftpd configuration file.
+ 
+ An example file is supplied. Install it like this:
+ 
+-cp vsftpd.conf /etc
++cp vsftpd.conf /etc/vsftpd
+ 
+ Let's example the contents of the file:
+ 
+diff --git a/EXAMPLE/INTERNET_SITE_NOINETD/README b/EXAMPLE/INTERNET_SITE_NOINETD/README
+index ce17af2..9198c5f 100644
+--- a/EXAMPLE/INTERNET_SITE_NOINETD/README
++++ b/EXAMPLE/INTERNET_SITE_NOINETD/README
+@@ -17,7 +17,7 @@ even per-connect-IP configurability.
+ 
+ To use this example config:
+ 
+-1) Copy the vsftpd.conf file in this directory to /etc/vsftpd.conf.
++1) Copy the vsftpd.conf file in this directory to /etc/vsftpd/vsftpd.conf.
+ 
+ 2) Start up vsftpd, e.g.
+ vsftpd &
+@@ -51,5 +51,5 @@ in the vsftpd.conf:
+ listen_address=192.168.1.2
+ 
+ And launch vsftpd with a specific config file like this:
+-vsftpd /etc/vsftpd.conf.site1 &
++vsftpd /etc/vsftpd/vsftpd.conf.site1 &
+ 
+diff --git a/EXAMPLE/PER_IP_CONFIG/README b/EXAMPLE/PER_IP_CONFIG/README
+index a9ef352..34924d5 100644
+--- a/EXAMPLE/PER_IP_CONFIG/README
++++ b/EXAMPLE/PER_IP_CONFIG/README
+@@ -20,12 +20,12 @@ directory: hosts.allow. It lives at /etc/hosts.allow.
+ 
+ Let's have a look at the example:
+ 
+-vsftpd: 192.168.1.3: setenv VSFTPD_LOAD_CONF /etc/vsftpd_tcp_wrap.conf
++vsftpd: 192.168.1.3: setenv VSFTPD_LOAD_CONF /etc/vsftpd/tcp_wrap.conf
+ vsftpd: 192.168.1.4: DENY
+ 
+ The first line:
+ If a client connects from 192.168.1.3, then vsftpd will apply the vsftpd
+-config file /etc/vsftpd_tcp_wrap.conf to the session! These settings are
++config file /etc/vsftpd/tcp_wrap.conf to the session! These settings are
+ applied ON TOP of the default vsftpd.conf.
+ This is obviously very powerful. You might use this to apply different
+ access restrictions for some IPs (e.g. the ability to upload).
+diff --git a/EXAMPLE/VIRTUAL_USERS/README b/EXAMPLE/VIRTUAL_USERS/README
+index b48995d..72972fa 100644
+--- a/EXAMPLE/VIRTUAL_USERS/README
++++ b/EXAMPLE/VIRTUAL_USERS/README
+@@ -15,7 +15,7 @@ See example file "logins.txt" - this specifies "tom" with password "foo" and
+ "fred" with password "bar".
+ Whilst logged in as root, create the actual database file like this:
+ 
+-db_load -T -t hash -f logins.txt /etc/vsftpd_login.db
++db_load -T -t hash -f logins.txt /etc/vsftpd/login.db
+ (Requires the Berkeley db program installed).
+ NOTE: Many systems have multiple versions of "db" installed, so you may
+ need to use e.g. db3_load for correct operation. This is known to affect
+@@ -23,10 +23,10 @@ some Debian systems. The core issue is that pam_userdb expects its login
+ database to be a specific db version (often db3, whereas db4 may be installed
+ on your system).
+ 
+-This will create /etc/vsftpd_login.db. Obviously, you may want to make sure
++This will create /etc/vsftpd/login.db. Obviously, you may want to make sure
+ the permissions are restricted:
+ 
+-chmod 600 /etc/vsftpd_login.db
++chmod 600 /etc/vsftpd/login.db
+ 
+ For more information on maintaing your login database, look around for
+ documentation on "Berkeley DB", e.g.
+@@ -37,8 +37,8 @@ Step 2) Create a PAM file which uses your new database.
+ 
+ See the example file vsftpd.pam. It contains two lines:
+ 
+-auth required /lib/security/pam_userdb.so db=/etc/vsftpd_login
+-account required /lib/security/pam_userdb.so db=/etc/vsftpd_login
++auth required /lib/security/pam_userdb.so db=/etc/vsftpd/login
++account required /lib/security/pam_userdb.so db=/etc/vsftpd/login
+ 
+ This tells PAM to authenticate users using our new database. Copy this PAM
+ file to the PAM directory - typically /etc/pam.d/
+@@ -108,9 +108,9 @@ pasv_max_port=30999
+ These put a port range on passive FTP incoming requests - very useful if
+ you are configuring a firewall.
+ 
+-Copy the example vsftpd.conf file to /etc:
++Copy the example vsftpd.conf file to /etc/vsftpd:
+ 
+-cp vsftpd.conf /etc/
++cp vsftpd.conf /etc/vsftpd/
+ 
+ 
+ Step 5) Start up vsftpd.
+diff --git a/FAQ b/FAQ
+index 59fe56b..0142a0d 100644
+--- a/FAQ
++++ b/FAQ
+@@ -35,7 +35,7 @@ needs this user to run bits of itself with no privilege.
+ Q) Help! Local users cannot log in.
+ A) There are various possible problems.
+ A1) By default, vsftpd disables any logins other than anonymous logins. Put
+-local_enable=YES in your /etc/vsftpd.conf to allow local users to log in.
++local_enable=YES in your /etc/vsftpd/vsftpd.conf to allow local users to log in.
+ A2) vsftpd tries to link with PAM. (Run "ldd vsftpd" and look for libpam to
+ find out whether this has happened or not). If vsftpd links with PAM, then
+ you will need to have a PAM file installed for the vsftpd service. There is
+@@ -47,12 +47,12 @@ system have a "shadow.h" file in the include path?
+ A4) If you are not using PAM, then vsftpd will do its own check for a valid
+ user shell in /etc/shells. You may need to disable this if you use an invalid
+ shell to disable logins other than FTP logins. Put check_shell=NO in your
+-/etc/vsftpd.conf.
++/etc/vsftpd/vsftpd.conf.
+ 
+ Q) Help! Uploads or other write commands give me "500 Unknown command.".
+ A) By default, write commands, including uploads and new directories, are
+ disabled. This is a security measure. To enable writes, put write_enable=YES
+-in your /etc/vsftpd.conf.
++in your /etc/vsftpd/vsftpd.conf.
+ 
+ Q) Help! What are the security implications referred to in the
+ "chroot_local_user" option?
+@@ -88,7 +88,7 @@ A2) Alternatively, run as many copies as vsftpd as necessary, in standalone
+ mode. Use "listen_address=x.x.x.x" to set the virtual IP.
+ 
+ Q) Help! Does vsftpd support virtual users?
+-A) Yes, via PAM integration. Set "guest_enable=YES" in /etc/vsftpd.conf. This
++A) Yes, via PAM integration. Set "guest_enable=YES" in /etc/vsftpd/vsftpd.conf. This
+ has the effect of mapping every non-anonymous successful login to the local
+ username specified in "guest_username". Then, use PAM and (e.g.) its pam_userdb
+ module to provide authentication against an external (i.e. non-/etc/passwd)
+diff --git a/INSTALL b/INSTALL
+index 4f811aa..93a8a81 100644
+--- a/INSTALL
++++ b/INSTALL
+@@ -56,14 +56,14 @@ cp vsftpd.8 /usr/local/man/man8
+ 
+ "make install" doesn't copy the sample config file. It is recommended you
+ do this:
+-cp vsftpd.conf /etc
++cp vsftpd.conf /etc/vsftpd
+ 
+ Step 4) Smoke test (without an inetd).
+ 
+ vsftpd can run standalone or via an inetd (such as inetd or xinetd). You will
+ typically get more control running vsftpd from an inetd. But first we will run
+ it without, so we can check things are going well so far.
+-Edit /etc/vsftpd.conf, and add this line at the bottom:
++Edit /etc/vsftpd/vsftpd.conf, and add this line at the bottom:
+ 
+ listen=YES
+ 
+@@ -135,11 +135,11 @@ cp RedHat/vsftpd.pam /etc/pam.d/ftp
+ Step 7) Customize your configuration
+ 
+ As well as the above three pre-requisites, you are recommended to install a
+-config file. The default location for the config file is /etc/vsftpd.conf.
++config file. The default location for the config file is /etc/vsftpd/vsftpd.conf.
+ There is a sample vsftpd.conf in the distribution tarball. You probably want
+-to copy that to /etc/vsftpd.conf as a basis for modification, i.e.:
++to copy that to /etc/vsftpd/vsftpd.conf as a basis for modification, i.e.:
+ 
+-cp vsftpd.conf /etc
++cp vsftpd.conf /etc/vsftpd
+ 
+ The default configuration allows neither local user logins nor anonymous
+ uploads. You may wish to change these defaults.
+diff --git a/README b/README
+index 86643c1..adc7f42 100644
+--- a/README
++++ b/README
+@@ -37,3 +37,8 @@ All configuration options are documented in the manual page vsftpd.conf.5.
+ Various example configurations are discussed in the EXAMPLE directory.
+ Frequently asked questions are tackled in the FAQ file.
+ 
++Important Note
++==============
++The location of configuration files was changed to /etc/vsftpd/. If you want
++to migrate your old conf files from /etc (files vsftpd.xxxx.rpmsave) use
++/etc/vsfptd/vsftpd_conf_migrate.sh
+diff --git a/defs.h b/defs.h
+index 0ff5864..ca11eac 100644
+--- a/defs.h
++++ b/defs.h
+@@ -1,7 +1,7 @@
+ #ifndef VSF_DEFS_H
+ #define VSF_DEFS_H
+ 
+-#define VSFTP_DEFAULT_CONFIG    "/etc/vsftpd.conf"
++#define VSFTP_DEFAULT_CONFIG    "/etc/vsftpd/vsftpd.conf"
+ 
+ #define VSFTP_COMMAND_FD        0
+ 
+diff --git a/tunables.c b/tunables.c
+index 284a10d..0ac4c34 100644
+--- a/tunables.c
++++ b/tunables.c
+@@ -190,7 +190,7 @@ tunables_load_defaults()
+   tunable_listen_ipv6 = 0;
+   tunable_dual_log_enable = 0;
+   tunable_syslog_enable = 0;
+-  tunable_background = 0;
++  tunable_background = 1;
+   tunable_virtual_use_local_privs = 0;
+   tunable_session_support = 0;
+   tunable_download_enable = 1;
+@@ -262,11 +262,11 @@ tunables_load_defaults()
+   install_str_setting(".message", &tunable_message_file);
+   install_str_setting("nobody", &tunable_nopriv_user);
+   install_str_setting(0, &tunable_ftpd_banner);
+-  install_str_setting("/etc/vsftpd.banned_emails", &tunable_banned_email_file);
+-  install_str_setting("/etc/vsftpd.chroot_list", &tunable_chroot_list_file);
++  install_str_setting("/etc/vsftpd/banned_emails", &tunable_banned_email_file);
++  install_str_setting("/etc/vsftpd/chroot_list", &tunable_chroot_list_file);
+   install_str_setting("ftp", &tunable_pam_service_name);
+   install_str_setting("ftp", &tunable_guest_username);
+-  install_str_setting("/etc/vsftpd.user_list", &tunable_userlist_file);
++  install_str_setting("/etc/vsftpd/user_list", &tunable_userlist_file);
+   install_str_setting(0, &tunable_anon_root);
+   install_str_setting(0, &tunable_local_root);
+   install_str_setting(0, &tunable_banner_file);
+@@ -279,7 +279,7 @@ tunables_load_defaults()
+   install_str_setting(0, &tunable_hide_file);
+   install_str_setting(0, &tunable_deny_file);
+   install_str_setting(0, &tunable_user_sub_token);
+-  install_str_setting("/etc/vsftpd.email_passwords",
++  install_str_setting("/etc/vsftpd/email_passwords",
+                       &tunable_email_password_file);
+   install_str_setting("/usr/share/ssl/certs/vsftpd.pem",
+                       &tunable_rsa_cert_file);
+diff --git a/vsftpd.8 b/vsftpd.8
+index 6640b57..c920e7d 100644
+--- a/vsftpd.8
++++ b/vsftpd.8
+@@ -21,7 +21,7 @@ itself will listen on the network. This latter mode is easier to use, and
+ recommended. It is activated by setting
+ .Pa listen=YES
+ in
+-.Pa /etc/vsftpd.conf .
++.Pa /etc/vsftpd/vsftpd.conf .
+ Direct execution of the
+ .Nm vsftpd
+ binary will then launch the FTP service ready for immediate client connections.
+@@ -33,7 +33,7 @@ as root. Any command line option not starting with a "-" character is treated
+ as a config file that will be loaded. Note that config files are loaded in the
+ strict order that they are encountered on the command line.
+ If no config files are specified, the default configuration file of
+-.Pa /etc/vsftpd.conf
++.Pa /etc/vsftpd/vsftpd.conf
+ will be loaded, after all other command line options are processed.
+ .Pp
+ Supported options are:
+@@ -47,14 +47,14 @@ their appearance on the command line, including intermingling with loading of
+ config files.
+ .El
+ .Sh EXAMPLES
+-vsftpd -olisten=NO /etc/vsftpd.conf -oftpd_banner=blah
++vsftpd -olisten=NO /etc/vsftpd/vsftpd.conf -oftpd_banner=blah
+ .Pp
+ That example overrides vsftpd's built-in default for the "listen" option to be
+-NO, but then loads /etc/vsftpd.conf which may override that setting. Finally,
++NO, but then loads /etc/vsftpd/vsftpd.conf which may override that setting. Finally,
+ the "ftpd_banner" setting is set to "blah", which overrides any default vsftpd
+ setting and any identical setting that was in the config file.
+ .Sh FILES
+-.Pa /etc/vsftpd.conf
++.Pa /etc/vsftpd/vsftpd.conf
+ .Sh SEE ALSO
+ .Xr vsftpd.conf 5
+ .end
+diff --git a/vsftpd.conf b/vsftpd.conf
+index cc1c607..db44170 100644
+--- a/vsftpd.conf
++++ b/vsftpd.conf
+@@ -1,4 +1,4 @@
+-# Example config file /etc/vsftpd.conf
++# Example config file /etc/vsftpd/vsftpd.conf
+ #
+ # The default compiled in settings are fairly paranoid. This sample file
+ # loosens things up a bit, to make the ftp daemon more usable.
+@@ -12,18 +12,20 @@
+ anonymous_enable=YES
+ #
+ # Uncomment this to allow local users to log in.
+-#local_enable=YES
++# When SELinux is enforcing check for SE bool ftp_home_dir
++local_enable=YES
+ #
+ # Uncomment this to enable any form of FTP write command.
+-#write_enable=YES
++write_enable=YES
+ #
+ # Default umask for local users is 077. You may wish to change this to 022,
+ # if your users expect that (022 is used by most other ftpd's)
+-#local_umask=022
++local_umask=022
+ #
+ # Uncomment this to allow the anonymous FTP user to upload files. This only
+ # has an effect if the above global write enable is activated. Also, you will
+ # obviously need to create a directory writable by the FTP user.
++# When SELinux is enforcing check for SE bool allow_ftpd_anon_write, allow_ftpd_full_access
+ #anon_upload_enable=YES
+ #
+ # Uncomment this if you want the anonymous FTP user to be able to create
+@@ -52,7 +54,7 @@ connect_from_port_20=YES
+ #
+ # If you want, you can have your log file in standard ftpd xferlog format.
+ # Note that the default log file location is /var/log/xferlog in this case.
+-#xferlog_std_format=YES
++xferlog_std_format=YES
+ #
+ # You may change the default value for timing out an idle session.
+ #idle_session_timeout=600
+@@ -87,7 +89,7 @@ connect_from_port_20=YES
+ # useful for combatting certain DoS attacks.
+ #deny_email_enable=YES
+ # (default follows)
+-#banned_email_file=/etc/vsftpd.banned_emails
++#banned_email_file=/etc/vsftpd/banned_emails
+ #
+ # You may specify an explicit list of local users to chroot() to their home
+ # directory. If chroot_local_user is YES, then this list becomes a list of
+@@ -98,7 +100,7 @@ connect_from_port_20=YES
+ #chroot_local_user=YES
+ #chroot_list_enable=YES
+ # (default follows)
+-#chroot_list_file=/etc/vsftpd.chroot_list
++#chroot_list_file=/etc/vsftpd/chroot_list
+ #
+ # You may activate the "-R" option to the builtin ls. This is disabled by
+ # default to avoid remote users being able to cause excessive I/O on large
+@@ -115,3 +117,7 @@ listen=YES
+ # sockets, you must run two copies of vsftpd with two configuration files.
+ # Make sure, that one of the listen options is commented !!
+ #listen_ipv6=YES
++
++pam_service_name=vsftpd
++userlist_enable=YES
++tcp_wrappers=YES
+diff --git a/vsftpd.conf.5 b/vsftpd.conf.5
+index fcc6022..5e46a2f 100644
+--- a/vsftpd.conf.5
++++ b/vsftpd.conf.5
+@@ -4,7 +4,7 @@ vsftpd.conf \- config file for vsftpd
+ .SH DESCRIPTION
+ vsftpd.conf may be used to control various aspects of vsftpd's behaviour. By
+ default, vsftpd looks for this file at the location
+-.BR /etc/vsftpd.conf .
++.BR /etc/vsftpd/vsftpd.conf .
+ However, you may override this by specifying a command line argument to
+ vsftpd. The command line argument is the pathname of the configuration file
+ for vsftpd. This behaviour is useful because you may wish to use an advanced
+@@ -110,7 +110,7 @@ When enabled, and vsftpd is started in "listen" mode, vsftpd will background
+ the listener process. i.e. control will immediately be returned to the shell
+ which launched vsftpd.
+ 
+-Default: NO
++Default: YES
+ .TP
+ .B check_shell
+ Note! This option only has an effect for non-PAM builds of vsftpd. If disabled,
+@@ -138,7 +138,7 @@ chroot() jail in their home directory upon login. The meaning is slightly
+ different if chroot_local_user is set to YES. In this case, the list becomes
+ a list of users which are NOT to be placed in a chroot() jail.
+ By default, the file containing this list is
+-/etc/vsftpd.chroot_list, but you may override this with the
++/etc/vsftpd/chroot_list, but you may override this with the
+ .BR chroot_list_file
+ setting.
+ 
+@@ -177,7 +177,7 @@ Default: NO
+ .B deny_email_enable
+ If activated, you may provide a list of anonymous password e-mail responses
+ which cause login to be denied. By default, the file containing this list is
+-/etc/vsftpd.banned_emails, but you may override this with the
++/etc/vsftpd/banned_emails, but you may override this with the
+ .BR banned_email_file
+ setting.
+ 
+@@ -433,7 +433,7 @@ anonymous logins are prevented unless the password provided is listed in the
+ file specified by the
+ .BR email_password_file
+ setting. The file format is one password per line, no extra whitespace. The
+-default filename is /etc/vsftpd.email_passwords.
++default filename is /etc/vsftpd/email_passwords.
+ 
+ Default: NO
+ .TP
+@@ -764,7 +764,7 @@ passwords which are not permitted. This file is consulted if the option
+ .BR deny_email_enable
+ is enabled.
+ 
+-Default: /etc/vsftpd.banned_emails
++Default: /etc/vsftpd/banned_emails
+ .TP
+ .B banner_file
+ This option is the name of a file containing text to display when someone
+@@ -803,7 +803,7 @@ is enabled. If the option
+ is enabled, then the list file becomes a list of users to NOT place in a
+ chroot() jail.
+ 
+-Default: /etc/vsftpd.chroot_list
++Default: /etvsftpd.confc/vsftpd.chroot_list
+ .TP
+ .B cmds_allowed
+ This options specifies a comma separated list of allowed FTP commands (post
+@@ -864,7 +864,7 @@ This option can be used to provide an alternate file for usage by the
+ .BR secure_email_list_enable
+ setting.
+ 
+-Default: /etc/vsftpd.email_passwords
++Default: /etc/vsftpd/email_passwords
+ .TP
+ .B ftp_username
+ This is the name of the user we use for handling anonymous FTP. The home
+@@ -987,10 +987,10 @@ the manual page, on a per-user basis. Usage is simple, and is best illustrated
+ with an example. If you set
+ .BR user_config_dir
+ to be
+-.BR /etc/vsftpd_user_conf
++.BR /etc/vsftpd/user_conf
+ and then log on as the user "chris", then vsftpd will apply the settings in
+ the file
+-.BR /etc/vsftpd_user_conf/chris
++.BR /etc/vsftpd/user_conf/chris
+ for the duration of the session. The format of this file is as detailed in
+ this manual page! PLEASE NOTE that not all settings are effective on a
+ per-user basis. For example, many settings only prior to the user's session
+@@ -1026,7 +1026,7 @@ This option is the name of the file loaded when the
+ .BR userlist_enable
+ option is active.
+ 
+-Default: /etc/vsftpd.user_list
++Default: /etc/vsftpd/user_list
+ .TP
+ .B vsftpd_log_file
+ This option is the name of the file to which we write the vsftpd style
+-- 
+2.14.4
+

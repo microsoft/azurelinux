@@ -1,0 +1,12 @@
+--- matrixcompare-mock-0.1.0/Cargo.toml	2020-06-29T16:14:29+00:00
++++ matrixcompare-mock-0.1.0/Cargo.toml	2025-06-26T06:54:09.019090+00:00
+@@ -22,7 +22,7 @@
+ version = "0.1"
+ 
+ [dependencies.num]
+-version = "0.3"
++version = "0.4"
+ 
+ [dependencies.proptest]
+-version = "0.10"
++version = "1.0"

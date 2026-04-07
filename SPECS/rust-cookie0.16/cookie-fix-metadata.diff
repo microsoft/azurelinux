@@ -1,0 +1,11 @@
+--- cookie-0.16.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ cookie-0.16.2/Cargo.toml	2024-10-23T13:39:37.716330+00:00
+@@ -35,7 +35,7 @@
+ optional = true
+ 
+ [dependencies.base64]
+-version = "0.20"
++version = "0.22"
+ optional = true
+ 
+ [dependencies.hkdf]

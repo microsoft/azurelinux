@@ -1,0 +1,12 @@
+diff -rupN mongo-python-driver-4.13.1/pyproject.toml mongo-python-driver-4.13.1-new/pyproject.toml
+--- mongo-python-driver-4.13.1/pyproject.toml	2025-06-11 20:24:12.000000000 +0200
++++ mongo-python-driver-4.13.1-new/pyproject.toml	2025-06-14 22:58:15.287849423 +0200
+@@ -102,7 +102,7 @@ faulthandler_timeout = 1500
+ asyncio_default_fixture_loop_scope = "session"
+ xfail_strict = true
+ filterwarnings = [
+-    "error",
++    # "error",
+     # Internal warnings raised during tests.
+     "module:use an explicit session with no_cursor_timeout=True:UserWarning",
+     "module:serverselectiontimeoutms must be:UserWarning",

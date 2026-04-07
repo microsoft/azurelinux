@@ -1,0 +1,68 @@
+# The SSL test are failing correctly. Fro more explanation, see:
+# https://jira.mariadb.org/browse/MDEV-8404?focusedCommentId=84275&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-84275
+main.ssl_crl                                 : #1399847
+
+# ------------------------------
+# Expected to fail, the plugin is not build with server, but 'mariadb-connector-c' instead
+plugins.auth_ed25519                         :
+plugins.multiauth                            :
+
+# ------------------------------
+perfschema.nesting                           : #1399847
+perfschema.socket_summary_by_instance_func   : #1399847
+perfschema.socket_summary_by_event_name_func :
+
+# ------------------------------
+# Fails since 10.1.12
+innodb.innodb_defrag_binlog                  :
+
+# Fails everywhere since 10.4.11
+sys_vars.tcp_nodelay                         :
+
+# Fails since 10.5.3
+main.mysqld--help-aria                       :
+
+# Fails on all architectures since 10.5.18
+main.loadxml                                 :
+main.lock_kill                               :
+
+# Fails since 10.5.20
+rpl.rpl_err_ignoredtable                    :
+
+# Fails on 10.11.6
+main.plugin_auth                            :
+main.userstat                               :
+main.information_schema                     :
+
+binlog_encryption.rpl_gtid_basic            :
+perfschema.threads_mysql                    :
+rpl.rpl_gtid_basic                          :
+rpl.rpl_semi_sync_wait_point                :
+
+# Fails since 10.11.7
+main.mdev375                                :
+perfschema.show_aggregate                   :
+
+# Fails since 10.11.8
+rpl.rpl_get_lock                            :
+
+# Fails since 10.11.9
+plugins.feedback_plugin_load                :
+main.init_connect                           : # unstable
+
+# Fails since 10.11.10
+main.connect                                :
+
+# Fails since 10.11.11
+main.ssl_cipher                             :
+
+# Fails since 10.11.14
+mariabackup.full_backup                     :
+mariabackup.innodb_force_recovery           :
+mariabackup.slave_provision_nolock          :
+rpl.rpl_mixed_mixing_engines                :
+rpl.rpl_non_direct_mixed_mixing_engines     :
+
+# Fails since 10.11.16
+main.chained_ssl_certificates               :
+plugins.mdev38431                           :

@@ -1,0 +1,46 @@
+diff -up hamming-0.1.3/src/distance_.rs.quickcheck hamming-0.1.3/src/distance_.rs
+--- hamming-0.1.3/src/distance_.rs.quickcheck	2015-05-31 19:54:16.000000000 -0600
++++ hamming-0.1.3/src/distance_.rs	2022-08-06 14:07:13.400273466 -0600
+@@ -244,7 +244,7 @@ mod tests {
+             qc::TestResult::from_bool(super::distance_fast(x, y).unwrap() == super::naive(x, y))
+         }
+         qc::QuickCheck::new()
+-            .gen(qc::StdGen::new(rand::thread_rng(), 10_000))
++            .gen(qc::Gen::new(10_000))
+             .quickcheck(prop as fn(Vec<u8>,Vec<u8>,u8) -> qc::TestResult)
+     }
+     #[test]
+diff -up hamming-0.1.3/src/weight_.rs.quickcheck hamming-0.1.3/src/weight_.rs
+--- hamming-0.1.3/src/weight_.rs.quickcheck	2015-05-31 19:53:19.000000000 -0600
++++ hamming-0.1.3/src/weight_.rs	2022-08-06 14:06:34.759757567 -0600
+@@ -119,7 +119,7 @@ mod tests {
+             qc::TestResult::from_bool(super::weight(data) == super::naive(data))
+         }
+         qc::QuickCheck::new()
+-            .gen(qc::StdGen::new(rand::thread_rng(), 10_000))
++            .gen(qc::Gen::new(10_000))
+             .quickcheck(prop as fn(Vec<u8>,u8) -> qc::TestResult)
+     }
+     #[test]
+diff -up hamming-0.1.3/src/distance_.rs.quickcheck hamming-0.1.3/src/distance_.rs
+--- hamming-0.1.3/src/distance_.rs.quickcheck	2022-08-06 15:27:28.330309590 -0600
++++ hamming-0.1.3/src/distance_.rs	2022-08-06 15:28:03.081628573 -0600
+@@ -213,7 +213,6 @@ fn distance_(x: &[u8], y: &[u8]) -> u64
+ #[cfg(test)]
+ mod tests {
+     use quickcheck as qc;
+-    use rand;
+     #[test]
+     fn naive_smoke() {
+         let tests: &[(&[u8], &[u8], u64)] = &[
+diff -up hamming-0.1.3/src/weight_.rs.quickcheck hamming-0.1.3/src/weight_.rs
+--- hamming-0.1.3/src/weight_.rs.quickcheck	2022-08-06 15:27:28.330309590 -0600
++++ hamming-0.1.3/src/weight_.rs	2022-08-06 15:27:58.192583696 -0600
+@@ -96,7 +96,6 @@ pub fn weight(x: &[u8]) -> u64 {
+ #[cfg(test)]
+ mod tests {
+     use quickcheck as qc;
+-    use rand;
+     #[test]
+     fn naive_smoke() {
+         let tests = [(&[0u8] as &[u8], 0),

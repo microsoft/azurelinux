@@ -1,0 +1,13 @@
+--- arcstr-1.2.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ arcstr-1.2.0/Cargo.toml	2025-10-06T13:39:12.094609+00:00
+@@ -61,10 +61,6 @@
+ optional = true
+ default-features = false
+ 
+-[dev-dependencies.serde_test]
+-version = "1"
+-default-features = false
+-
+ [features]
+ default = ["substr"]
+ std = []

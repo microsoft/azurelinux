@@ -1,0 +1,35 @@
+From 0fc7d228b97654c4422c4d3a2534f6af43c4a530 Mon Sep 17 00:00:00 2001
+From: Michael Jansen <kde@michael-jansen.biz>
+Date: Wed, 16 Feb 2011 23:48:53 +0100
+Subject: [PATCH 28/33] AutoMoc::lazyInit() expects the app to get 6 parameter
+ but run() only checks for 5.
+
+Fix that so i do not get a qt assertion here.
+---
+ kde4automoc.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/kde4automoc.cpp b/kde4automoc.cpp
+index d5a00d7..2e219f3 100644
+--- a/kde4automoc.cpp
++++ b/kde4automoc.cpp
+@@ -164,6 +164,7 @@ void AutoMoc::lazyInitMocDefinitions()
+ void AutoMoc::lazyInit()
+ {
+     const QStringList &args = QCoreApplication::arguments();
++
+     mocExe = args[4];
+     cmakeExecutable = args[5];
+ 
+@@ -246,7 +247,7 @@ bool AutoMoc::run()
+        ::exit(EXIT_FAILURE);
+         }
+     }
+-    else if (args.size() < 5) {
++    else if (args.size() < 6) {
+         printUsage(args[0]);
+        ::exit(EXIT_FAILURE);
+     }
+-- 
+2.4.3
+

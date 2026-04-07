@@ -1,0 +1,41 @@
+diff -ruN scapy-2.7.0/pyproject.toml /home/mambroz/rpmbuild/BUILD/scapy-2.7.0/pyproject.toml
+--- scapy-2.7.0/pyproject.toml	2025-12-25 12:31:39.000000000 +0000
++++ /home/mambroz/rpmbuild/BUILD/scapy-2.7.0/pyproject.toml	2026-01-05 12:38:06.679524673 +0000
+@@ -1,5 +1,5 @@
+ [build-system]
+-requires = [ "setuptools>=62.0.0" ]
++requires = [ "setuptools>=53.0.0" ]
+ build-backend = "setuptools.build_meta"
+ 
+ [project]
+diff -ruN scapy-2.7.0/setup.cfg /home/mambroz/rpmbuild/BUILD/scapy-2.7.0/setup.cfg
+--- scapy-2.7.0/setup.cfg	1970-01-01 00:00:00.000000000 +0000
++++ /home/mambroz/rpmbuild/BUILD/scapy-2.7.0/setup.cfg	2026-01-05 12:38:06.682524715 +0000
+@@ -0,0 +1,16 @@
++[metadata]
++name = scapy
++version = attr: scapy.VERSION
++
++[options]
++packages = find:
++python_requires = >=3.6
++
++[options.entry_points]
++console_scripts =
++    scapy = scapy.main:interact
++
++[options.packages.find]
++exclude =
++    test
++    test.*
+diff -ruN scapy-2.7.0/setup.py /home/mambroz/rpmbuild/BUILD/scapy-2.7.0/setup.py
+--- scapy-2.7.0/setup.py	2025-12-25 12:31:39.000000000 +0000
++++ /home/mambroz/rpmbuild/BUILD/scapy-2.7.0/setup.py	2026-01-05 12:38:06.681524701 +0000
+@@ -82,6 +82,7 @@
+         _build_version(self.build_lib)
+ 
+ setup(
++    name="scapy",
+     cmdclass={'sdist': SDist, 'build_py': BuildPy},
+     data_files=[('share/man/man1', ["doc/scapy.1"])],
+     long_description=get_long_description(),

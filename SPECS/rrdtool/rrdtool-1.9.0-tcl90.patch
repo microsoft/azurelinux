@@ -1,0 +1,29 @@
+From 44d2375911593d38c3c56126dcaf9af7b56d4b10 Mon Sep 17 00:00:00 2001
+From: Yaakov Selkowitz <yselkowi@redhat.com>
+Date: Thu, 20 Mar 2025 18:49:10 -0400
+Subject: [PATCH] Fix compatibility with Tcl 9.0
+
+The deprecated CONST84 was removed in 9.0.
+
+Signed-off-by: Yaakov Selkowitz <yselkowi@redhat.com>
+---
+ bindings/tcl/tclrrd.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/bindings/tcl/tclrrd.c b/bindings/tcl/tclrrd.c
+index f1803a36..4d84f6c9 100644
+--- a/bindings/tcl/tclrrd.c
++++ b/bindings/tcl/tclrrd.c
+@@ -26,6 +26,9 @@
+ 
+ /* support pre-8.4 tcl */
+ 
++#if TCL_MAJOR_VERSION > 8
++#   define CONST84 const
++#endif
+ #ifndef CONST84
+ #   define CONST84
+ #endif
+-- 
+2.48.1
+

@@ -1,0 +1,34 @@
+From bdaef8a39fe780cf9ae8af7c13128b9b908210d7 Mon Sep 17 00:00:00 2001
+From: Karolina Surma <ksurma@redhat.com>
+Date: Thu, 2 May 2024 11:39:09 +0200
+Subject: [PATCH] Remove optional or unpackaged test deps
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Co-authored-by: Karolina Surma <ksurma@redhat.com>
+Co-authored-by: Miro Hrončok <miro@hroncok.cz>
+Co-authored-by: Charalampos Stratakis <cstratak@redhat.com>
+Co-authored-by: Lumir Balhar <lbalhar@redhat.com>
+Co-authored-by: Tomas Hrnciar <thrnciar@redhat.com>
+---
+ pyproject.toml | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index cee3b55..eed354e 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -50,9 +50,6 @@ test = [
+ 	"ini2toml[lite]>=0.14",
+ 	"tomli-w>=1.0.0",
+ 	"pytest-timeout",
+-	'pytest-perf; sys_platform != "cygwin"', # workaround for jaraco/inflect#195, pydantic/pydantic-core#773 (see #3986)
+-	# for tools/finalize.py
+-	'jaraco.develop >= 7.21; python_version >= "3.9" and sys_platform != "cygwin"',
+ 	"pytest-home >= 0.5",
+ 	"pytest-subprocess",
+ 
+-- 
+2.46.0
+

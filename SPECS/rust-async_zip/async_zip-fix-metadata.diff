@@ -1,0 +1,47 @@
+--- async_zip-0.0.18/Cargo.toml	1970-01-01T00:00:01+00:00
++++ async_zip-0.0.18/Cargo.toml	2025-08-10T11:07:26.050160+00:00
+@@ -58,11 +58,6 @@
+     "xz",
+     "deflate64",
+ ]
+-full-wasm = [
+-    "chrono",
+-    "deflate",
+-    "zstd",
+-]
+ lzma = ["async-compression/lzma"]
+ tokio = [
+     "dep:tokio",
+@@ -76,10 +71,6 @@
+ [lib]
+ name = "async_zip"
+ path = "src/lib.rs"
+-
+-[[example]]
+-name = "actix_multipart"
+-path = "examples/actix_multipart.rs"
+ 
+ [[example]]
+ name = "cli_compress"
+@@ -133,21 +124,8 @@
+ features = ["compat"]
+ optional = true
+ 
+-[dev-dependencies.actix-multipart]
+-version = "0.7"
+-
+-[dev-dependencies.actix-web]
+-version = "4"
+-
+ [dev-dependencies.anyhow]
+ version = "1"
+-
+-[dev-dependencies.derive_more]
+-version = "1.0"
+-features = [
+-    "display",
+-    "error",
+-]
+ 
+ [dev-dependencies.env_logger]
+ version = "0.11.2"

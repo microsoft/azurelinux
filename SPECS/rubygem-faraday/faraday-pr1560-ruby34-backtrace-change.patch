@@ -1,0 +1,24 @@
+From 8cdc483218d4612d53239f48785567b6b6d056cd Mon Sep 17 00:00:00 2001
+From: m-nakamura145 <masato.nakamura145@gmail.com>
+Date: Fri, 24 May 2024 23:23:24 +0900
+Subject: [PATCH] Fix compatibility with Ruby 3.4.0-preview1
+
+---
+ spec/faraday_spec.rb | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/spec/faraday_spec.rb b/spec/faraday_spec.rb
+index 30be29cf8..c3583f184 100644
+--- a/spec/faraday_spec.rb
++++ b/spec/faraday_spec.rb
+@@ -18,7 +18,9 @@
+     end
+ 
+     it 'uses method_missing on Faraday if there is no proxyable method' do
+-      expected_message = if RUBY_VERSION >= '3.3'
++      expected_message = if RUBY_VERSION >= '3.4'
++                           "undefined method 'this_method_does_not_exist' for module Faraday"
++                         elsif RUBY_VERSION >= '3.3'
+                            "undefined method `this_method_does_not_exist' for module Faraday"
+                          else
+                            "undefined method `this_method_does_not_exist' for Faraday:Module"

@@ -1,0 +1,64 @@
+From 25a11d9a34fcf3c70f7f32680bdbe910a84d85d5 Mon Sep 17 00:00:00 2001
+From: peterhillman <peterh@wetafx.co.nz>
+Date: Sat, 6 Feb 2021 14:11:49 +1300
+Subject: [PATCH] use NO_COMPRESSION in OpenEXTest/testBackwardCompatibility
+ (#916)
+
+Signed-off-by: Peter Hillman <peterh@wetafx.co.nz>
+---
+ .../OpenEXRTest/testBackwardCompatibility.cpp |   7 +++++--
+ .../OpenEXRTest/v1.7.test.interleaved.exr     | Bin 27843 -> 169107 bytes
+ src/test/OpenEXRTest/v1.7.test.planar.exr     | Bin 30203 -> 279503 bytes
+ src/test/OpenEXRTest/v1.7.test.tiled.exr      | Bin 174523 -> 261605 bytes
+ 4 files changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/OpenEXR/IlmImfTest/testBackwardCompatibility.cpp b/OpenEXR/IlmImfTest/testBackwardCompatibility.cpp
+index 69100f7b..93e715db 100644
+--- a/OpenEXR/IlmImfTest/testBackwardCompatibility.cpp
++++ b/OpenEXR/IlmImfTest/testBackwardCompatibility.cpp
+@@ -215,6 +215,7 @@ generateScanlinePlanarImage (const char * fn)
+     header.channels().insert("R", Channel(IMF::HALF));
+     header.channels().insert("G", Channel(IMF::HALF));
+     header.channels().insert("B", Channel(IMF::HALF));
++    header.compression()=NO_COMPRESSION;
+     addUserAttributesToHeader (header);
+ 
+     FrameBuffer fb;
+@@ -243,7 +244,7 @@ generateScanlinePlanarImage (const char * fn)
+ 
+     OutputFile file (fn, header);
+     file.setFrameBuffer (fb);
+-    file.writePixels (H-40);
++    file.writePixels (dod.max.y-dod.min.y+1);
+ }
+ 
+ struct RZ
+@@ -271,6 +272,7 @@ generateScanlineInterleavedImage (const char * fn)
+     OPENEXR_IMF_NAMESPACE::Header header = Header (W, H, dod);
+     header.channels().insert("Z", Channel(IMF::FLOAT));
+     header.channels().insert("R", Channel(IMF::HALF));
++    header.compression() = NO_COMPRESSION;
+     addUserAttributesToHeader (header);
+ 
+     FrameBuffer fb;
+@@ -289,7 +291,7 @@ generateScanlineInterleavedImage (const char * fn)
+ 
+     OutputFile file (fn, header);
+     file.setFrameBuffer (fb);
+-    file.writePixels (H-40);
++    file.writePixels (dod.max.y-dod.min.y+1);
+ }
+ 
+ void
+@@ -325,6 +327,7 @@ generateTiledImage (const char * fn)
+     Header header (W, H);
+     header.channels().insert ("G", Channel (IMF::HALF));
+     header.channels().insert ("Z", Channel (IMF::FLOAT));
++    header.compression() = NO_COMPRESSION;
+ 
+     int tileW = 12;
+     int tileH = 24;
+
+-- 
+2.43.0
+

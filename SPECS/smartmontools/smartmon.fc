@@ -1,0 +1,11 @@
+/etc/rc\.d/init\.d/(smartd|smartmontools)	--	gen_context(system_u:object_r:fsdaemon_initrc_exec_t,s0)
+
+/usr/sbin/smartd	--	gen_context(system_u:object_r:fsdaemon_exec_t,s0)
+
+/var/run/smartd\.pid	--	gen_context(system_u:object_r:fsdaemon_var_run_t,s0)
+
+/var/lib/smartmontools(/.*)?	gen_context(system_u:object_r:fsdaemon_var_lib_t,s0)
+
+/etc/smartmontools/smartd_warning.(sh|d/.*)	gen_context(system_u:object_r:smartdwarn_script_t,s0)
+/usr/libexec/smartmontools/smartdnotify    --   gen_context(system_u:object_r:smartdwarn_script_t,s0)
+

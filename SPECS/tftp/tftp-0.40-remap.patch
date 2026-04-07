@@ -1,0 +1,19 @@
+diff -up tftp-hpa-0.49/tftpd/remap.c.zero tftp-hpa-0.49/tftpd/remap.c
+--- tftp-hpa-0.49/tftpd/remap.c.zero	2008-10-20 18:08:31.000000000 -0400
++++ tftp-hpa-0.49/tftpd/remap.c	2008-11-25 11:41:09.000000000 -0500
+@@ -286,6 +286,7 @@ struct rule *parserulefile(FILE * f)
+     int lineno = 0;
+     int err = 0;
+ 
++    memset(this_rule, '\0', sizeof(struct rule));
+     while (lineno++, fgets(line, MAXLINE, f)) {
+         rv = parseline(line, this_rule, lineno);
+         if (rv < 0)
+@@ -294,6 +295,7 @@ struct rule *parserulefile(FILE * f)
+             *last_rule = this_rule;
+             last_rule = &this_rule->next;
+             this_rule = tfmalloc(sizeof(struct rule));
++            memset(this_rule, '\0', sizeof(struct rule));
+         }
+     }
+ 

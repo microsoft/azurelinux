@@ -1,0 +1,17 @@
+diff -pruN a/bfd/elfnn-aarch64.c b/bfd/elfnn-aarch64.c
+--- a/bfd/elfnn-aarch64.c	2025-02-06 10:39:49.722259921 -0500
++++ b/bfd/elfnn-aarch64.c	2025-02-06 10:47:28.604658973 -0500
+@@ -5051,11 +5051,10 @@ bfd_elfNN_aarch64_set_options (struct bf
+      libraries.  If a user also wants to error GCS issues in the shared
+      libraries, '-z gcs-report-dynamic=error' will have to be specified
+      explicitly.  */
++  /* XXX Fedora override: default to NONE.  */
+   if (sw_protections->gcs_report_dynamic == MARKING_UNSET)
+     elf_aarch64_tdata (output_bfd)->sw_protections.gcs_report_dynamic
+-      = (sw_protections->gcs_report == MARKING_ERROR)
+-      ? MARKING_WARN
+-      : sw_protections->gcs_report;
++      =  MARKING_NONE;
+ 
+   elf_aarch64_tdata (output_bfd)->n_bti_issues = 0;
+   elf_aarch64_tdata (output_bfd)->n_gcs_issues = 0;

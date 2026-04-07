@@ -1,0 +1,21 @@
+--- async-broadcast-0.7.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ async-broadcast-0.7.2/Cargo.toml	2025-08-19T19:58:22.914200+00:00
+@@ -58,9 +58,6 @@
+ [dependencies.pin-project-lite]
+ version = "0.2.13"
+ 
+-[dev-dependencies.criterion]
+-version = "0.3.5"
+-
+ [dev-dependencies.doc-comment]
+ version = "0.3.3"
+ 
+@@ -68,7 +65,7 @@
+ version = "3.2.0"
+ 
+ [dev-dependencies.futures-lite]
+-version = "1.11.3"
++version = "2.6.0"
+ 
+ [dev-dependencies.futures-util]
+ version = "0.3.21"

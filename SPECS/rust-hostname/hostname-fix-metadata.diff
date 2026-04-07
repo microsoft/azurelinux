@@ -1,0 +1,16 @@
+--- hostname-0.3.1/Cargo.toml	2020-02-28T16:58:01+00:00
++++ hostname-0.3.1/Cargo.toml	2024-09-21T23:41:28.498611+00:00
+@@ -23,10 +23,10 @@
+ [package.metadata.docs.rs]
+ features = ["set"]
+ rustdoc-args = ["--cfg", "docsrs"]
+-[dependencies.match_cfg]
+-version = "^0.1"
++[dependencies.cfg-if]
++version = "^1.0"
+ [dev-dependencies.version-sync]
+-version = "0.8"
++version = "0.9"
+ 
+ [features]
+ default = []

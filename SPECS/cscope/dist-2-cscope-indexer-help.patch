@@ -1,0 +1,52 @@
+diff -up ./contrib/xcscope/cscope-indexer.help ./contrib/xcscope/cscope-indexer
+--- ./contrib/xcscope/cscope-indexer.help	2017-12-07 10:45:07.000000000 -0500
++++ ./contrib/xcscope/cscope-indexer	2019-06-24 15:46:31.484852474 -0400
+@@ -80,6 +80,37 @@ RECURSE=
+ VERBOSE=
+ export DIR RECURSE			# Need to pass these to subprocesses
+ 
++show_usage() {
++
++cat << EOF
++
++     cscope-indexer [ -v ] [-f database_file ] [-i list_file ] [ -l ] [ -r ]
++
++ where:
++
++     -f database_file
++          Specifies the cscope database file (default: cscope.out).
++
++     -i list_file
++          Specifies the name of the file into which the list of files
++          to index is placed (default: cscope.files).
++
++     -l
++          Suppress the generation/updating of the cscope database
++          file.  Only a list of files is generated.
++
++     -r
++          Recurse into subdirectories to locate files to index.
++          Without this option, only the current directory is
++          searched.
++
++     -v
++          Be verbose.  Output simple progress messages.
++
++EOF
++
++}
++
+ while [ -n "$1" ]
+ do
+     case "$1" in
+@@ -110,6 +141,10 @@ do
+     -v)
+ 	VERBOSE=1
+ 	;;
++    -h|--help)
++	show_usage
++	exit 0
++	;;
+     *)
+ 	DIR="$1"
+ 	;;

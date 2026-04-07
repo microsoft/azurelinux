@@ -1,0 +1,116 @@
+configure: Add fake prototypes for C99 compatibility
+
+The xxmc-related configure probes assume that the compiler
+supports implicit function declarations because it tries to
+call the functions without including the appropriate headers,
+for link testing.
+
+As the headers are not determined yet at this point, use
+a fake prototype (the same that autoconf uses) to avoid
+the implicit function declarations.
+
+This avoids altering the outcome of these checks with future
+compilers which do not support implicit function declarations.
+
+Submitted upstream:
+
+  <https://sourceforge.net/p/xine/xine-lib-1.2/merge-requests/2/>
+
+diff --git a/configure b/configure
+index a4009e857777b5cf..3a83b40efda8fd5d 100755
+--- a/configure
++++ b/configure
+@@ -28563,7 +28563,7 @@ $as_echo "" >&6; }
+             LIBS="$XXMC_LIBS $X_LIBS $XV_LIBS $LIBS"
+             cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+-
++char XvMCPutSlice(void);
+ int
+ main ()
+ {
+@@ -28578,7 +28578,7 @@ else
+   LIBS="$XXMC_LIBS -lXvMC $X_LIBS $XV_LIBS $LIBS $DYNAMIC_LD_LIBS"
+                             cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+-
++char XvMCPutSlice(void);
+ int
+ main ()
+ {
+@@ -28616,7 +28616,7 @@ done
+             else
+                 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+-
++char XvMCCreateContext(void);
+ int
+ main ()
+ {
+@@ -28631,7 +28631,7 @@ else
+   LIBS="$XXMC_LIBS -lXvMC $X_LIBS $XV_LIBS $LIBS"
+                                 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+-
++char XvMCCreateContext(void);
+ int
+ main ()
+ {
+@@ -28675,7 +28675,7 @@ $as_echo "" >&6; }
+             LIBS="$XVMC_LIBS $X_LIBS $XV_LIBS $LIBS"
+             cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+-
++char XvMCCreateContext(void);
+ int
+ main ()
+ {
+@@ -28690,7 +28690,7 @@ else
+   LIBS="$XVMC_LIBS -lXvMC $X_LIBS $XV_LIBS $LIBS $DYNAMIC_LD_LIBS"
+                             cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+-
++char XvMCCreateContext(void);
+ int
+ main ()
+ {
+diff --git a/m4/video_out.m4 b/m4/video_out.m4
+index 150b477697297c03..8aa1f4a3b9267ff9 100644
+--- a/m4/video_out.m4
++++ b/m4/video_out.m4
+@@ -496,9 +496,9 @@ AC_DEFUN([XINE_VIDEO_OUT_PLUGINS], [
+             AC_MSG_CHECKING([whether to enable the xxmc plugin with VLD extensions])
+             AC_MSG_RESULT([])
+             LIBS="$XXMC_LIBS $X_LIBS $XV_LIBS $LIBS"
+-            AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[XvMCPutSlice()]])], [have_xxmc=yes],
++            AC_LINK_IFELSE([AC_LANG_PROGRAM([[char XvMCPutSlice(void);]], [[XvMCPutSlice()]])], [have_xxmc=yes],
+                            [LIBS="$XXMC_LIBS -lXvMC $X_LIBS $XV_LIBS $LIBS $DYNAMIC_LD_LIBS"
+-                            AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[XvMCPutSlice()]])],
++                            AC_LINK_IFELSE([AC_LANG_PROGRAM([[char XvMCPutSlice(void);]], [[XvMCPutSlice()]])],
+                                            [have_xxmc=yes XXMC_LIBS="$XXMC_LIBS -lXvMC"])])
+             if test x"$have_xxmc" = x"yes"; then
+                 AC_CHECK_HEADERS([X11/extensions/vldXvMC.h],
+@@ -506,9 +506,9 @@ AC_DEFUN([XINE_VIDEO_OUT_PLUGINS], [
+                                   AC_DEFINE([HAVE_VLDXVMC], 1, [Define if you have vldXvMC.h])],
+                                   [have_vldexts=no])
+             else
+-                AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[XvMCCreateContext()]])], [have_xxmc=yes],
++                AC_LINK_IFELSE([AC_LANG_PROGRAM([[char XvMCCreateContext(void);]], [[XvMCCreateContext()]])], [have_xxmc=yes],
+                                [LIBS="$XXMC_LIBS -lXvMC $X_LIBS $XV_LIBS $LIBS"
+-                                AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[XvMCCreateContext()]])],
++                                AC_LINK_IFELSE([AC_LANG_PROGRAM([[char XvMCCreateContext(void);]], [[XvMCCreateContext()]])],
+                                                [have_xxmc=yes XXMC_LIBS="$XXMC_LIBS -lXvMC"])])
+             fi
+             if test x"$have_xxmc" = x"yes"; then
+@@ -521,9 +521,9 @@ AC_DEFUN([XINE_VIDEO_OUT_PLUGINS], [
+             AC_MSG_CHECKING([whether to enable the xvmc plugin])
+             AC_MSG_RESULT([])
+             LIBS="$XVMC_LIBS $X_LIBS $XV_LIBS $LIBS"
+-            AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[XvMCCreateContext()]])], [have_xvmc=yes],
++            AC_LINK_IFELSE([AC_LANG_PROGRAM([[char XvMCCreateContext(void);]], [[XvMCCreateContext()]])], [have_xvmc=yes],
+                            [LIBS="$XVMC_LIBS -lXvMC $X_LIBS $XV_LIBS $LIBS $DYNAMIC_LD_LIBS"
+-                            AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[XvMCCreateContext()]])],
++                            AC_LINK_IFELSE([AC_LANG_PROGRAM([[char XvMCCreateContext(void);]], [[XvMCCreateContext()]])],
+                                            [have_xvmc=yes XVMC_LIBS="$XVMC_LIBS -lXvMC"])])
+             if test x"$have_xvmc" = x"yes"; then
+                 AC_CHECK_HEADERS([X11/extensions/XvMC.h], [], [have_xvmc=no])

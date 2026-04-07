@@ -1,0 +1,56 @@
+From a6d18806b5b65aba5c0e0b686619de782e420d65 Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Wed, 21 Jan 2026 19:58:46 -0800
+Subject: [PATCH] Bump lodash from 4.17.21 to 4.17.23 in
+ /src/cockpit/389-console (#7203)
+
+Bumps [lodash](https://github.com/lodash/lodash) from 4.17.21 to 4.17.23.
+- [Release notes](https://github.com/lodash/lodash/releases)
+- [Commits](https://github.com/lodash/lodash/compare/4.17.21...4.17.23)
+
+---
+updated-dependencies:
+- dependency-name: lodash
+  dependency-version: 4.17.23
+  dependency-type: indirect
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+---
+ src/cockpit/389-console/package-lock.json | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/src/cockpit/389-console/package-lock.json b/src/cockpit/389-console/package-lock.json
+index 0aa5bbbb9..23faef62f 100644
+--- a/src/cockpit/389-console/package-lock.json
++++ b/src/cockpit/389-console/package-lock.json
+@@ -4833,9 +4833,9 @@
+       }
+     },
+     "node_modules/lodash": {
+-      "version": "4.17.21",
+-      "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.17.21.tgz",
+-      "integrity": "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg=="
++      "version": "4.17.23",
++      "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.17.23.tgz",
++      "integrity": "sha512-LgVTMpQtIopCi79SJeDiP0TfWi5CNEc/L/aRdTh3yIvmZXTnheWpKjSZhnvMl8iXbC1tFg9gdHHDMLoV7CnG+w=="
+     },
+     "node_modules/lodash.merge": {
+       "version": "4.6.2",
+@@ -11087,9 +11087,9 @@
+       }
+     },
+     "lodash": {
+-      "version": "4.17.21",
+-      "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.17.21.tgz",
+-      "integrity": "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg=="
++      "version": "4.17.23",
++      "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.17.23.tgz",
++      "integrity": "sha512-LgVTMpQtIopCi79SJeDiP0TfWi5CNEc/L/aRdTh3yIvmZXTnheWpKjSZhnvMl8iXbC1tFg9gdHHDMLoV7CnG+w=="
+     },
+     "lodash.merge": {
+       "version": "4.6.2",
+-- 
+2.52.0
+

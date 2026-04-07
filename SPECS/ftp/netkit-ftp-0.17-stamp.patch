@@ -1,0 +1,23 @@
+--- netkit-ftp-0.17/ftp/Makefile.stamp	2007-02-07 05:21:13.000000000 -0500
++++ netkit-ftp-0.17/ftp/Makefile	2007-02-07 05:26:13.453244000 -0500
+@@ -16,14 +16,14 @@
+ cmds.o glob.o: glob.h
+ 
+ install: ftp
+-	install -d $(INSTALLROOT)$(BINDIR)
+-	install -m$(BINMODE) ftp $(INSTALLROOT)$(BINDIR)
++	install -p -d $(INSTALLROOT)$(BINDIR)
++	install -p -m$(BINMODE) ftp $(INSTALLROOT)$(BINDIR)
+ 	ln -sf ftp $(INSTALLROOT)$(BINDIR)/pftp
+-	install -d $(INSTALLROOT)$(MANDIR)/man1
+-	install -m$(MANMODE) ftp.1 $(INSTALLROOT)$(MANDIR)/man1
++	install -p -d $(INSTALLROOT)$(MANDIR)/man1
++	install -p -m$(MANMODE) ftp.1 $(INSTALLROOT)$(MANDIR)/man1
+ 	ln -sf ftp.1 $(INSTALLROOT)$(MANDIR)/man1/pftp.1
+-	install -d $(INSTALLROOT)$(MANDIR)/man5
+-	install -m$(MANMODE) netrc.5 $(INSTALLROOT)$(MANDIR)/man5
++	install -p -d $(INSTALLROOT)$(MANDIR)/man5
++	install -p -m$(MANMODE) netrc.5 $(INSTALLROOT)$(MANDIR)/man5
+ 
+ clean:
+ 	rm -f *.o ftp

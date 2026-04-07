@@ -1,0 +1,41 @@
+Remove the contents of libjasper_compat.c.  The assignment
+
+        *errorP  = errorP;
+
+is bogus because it creates a non-null value in *errorP even on
+success, and the caller expects a null pointer int his case.
+
+The source file is compiled, but not actually linked in, so this is
+only a problem because of the type error that fails the build.
+
+diff --git a/converter/other/jpeg2000/libjasper_compat.c b/converter/other/jpeg2000/libjasper_compat.c
+index 101820a321212dc6..e69de29bb2d1d643 100644
+--- a/converter/other/jpeg2000/libjasper_compat.c
++++ b/converter/other/jpeg2000/libjasper_compat.c
+@@ -1,26 +0,0 @@
+-#include "netpbm/nstring.h"
+-
+-#include "jasper/jasper.h"
+-#include "jasper/jas_image.h"
+-
+-#ifndef JAS_HAVE_PMJAS_IMAGE_DECODE
+-
+-void
+-pmjas_image_decode(jas_stream_t * const in,
+-                   int            const fmtArg,
+-                   const char *   const optstr,
+-                   jas_image_t ** const imagePP,
+-                   const char **  const errorP) {
+-
+-    jas_image_t * const jasperP = jas_image_decode(in, fmtArg, optstr);
+-
+-    if (jasperP) {
+-        *imagePP = jasperP;
+-        *errorP  = errorP;
+-    } else {
+-        pm_asprintf(errorP, "Failed.  Details may have been written to "
+-                    "Standard Error");
+-    }
+-}
+-
+-#endif

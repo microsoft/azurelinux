@@ -1,0 +1,89 @@
+From: Daniel Kahn Gillmor <dkg@fifthhorseman.net>
+Date: Tue, 11 Aug 2015 20:28:26 -0400
+Subject: Avoid simple memory dumps via ptrace
+
+This avoids needing to setgid gpg-agent.  It probably doesn't defend
+against all possible attacks, but it defends against one specific (and
+easy) one.  If there are other protections we should do them too.
+
+This will make it slightly harder to debug the agent because the
+normal user won't be able to attach gdb to it directly while it runs.
+
+The remaining options for debugging are:
+
+ * launch the agent from gdb directly
+ * connect gdb to a running agent as the superuser
+
+Upstream bug: https://dev.gnupg.org/T1211
+---
+ agent/gpg-agent.c | 8 ++++++++
+ configure.ac      | 2 +-
+ scd/scdaemon.c    | 9 +++++++++
+ 3 files changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/agent/gpg-agent.c b/agent/gpg-agent.c
+index c57fafb..cbe45f0 100644
+--- a/agent/gpg-agent.c
++++ b/agent/gpg-agent.c
+@@ -48,6 +48,9 @@
+ # include <signal.h>
+ #endif
+ #include <npth.h>
++#ifdef HAVE_PRCTL
++# include <sys/prctl.h>
++#endif
+ 
+ #define INCLUDED_BY_MAIN_MODULE 1
+ #define GNUPG_COMMON_NEED_AFLOCAL
+@@ -1088,6 +1091,11 @@ main (int argc, char **argv)
+ 
+   early_system_init ();
+ 
++#if defined(HAVE_PRCTL) && defined(PR_SET_DUMPABLE)
++  /* Disable ptrace on Linux without sgid bit */
++  prctl(PR_SET_DUMPABLE, 0);
++#endif
++
+   /* Before we do anything else we save the list of currently open
+      file descriptors and the signal mask.  This info is required to
+      do the exec call properly.  We don't need it on Windows.  */
+diff --git a/configure.ac b/configure.ac
+index ac4f08c..c80bce1 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1406,7 +1406,7 @@ AC_CHECK_FUNCS([atexit canonicalize_file_name clock_gettime ctermid  \
+                 ftruncate funlockfile getaddrinfo getenv getpagesize \
+                 getpwnam getpwuid getrlimit getrusage gettimeofday   \
+                 gmtime_r inet_ntop inet_pton isascii lstat memicmp   \
+-                memmove memrchr mmap nl_langinfo pipe raise rand     \
++                memmove memrchr mmap nl_langinfo pipe prctl raise rand \
+                 setenv setlocale setrlimit sigaction sigprocmask     \
+                 stat stpcpy strcasecmp strerror strftime stricmp     \
+                 strlwr strncasecmp strpbrk strsep strtol strtoul     \
+diff --git a/scd/scdaemon.c b/scd/scdaemon.c
+index 1a8705b..a3af4bd 100644
+--- a/scd/scdaemon.c
++++ b/scd/scdaemon.c
+@@ -37,6 +37,9 @@
+ #include <unistd.h>
+ #include <signal.h>
+ #include <npth.h>
++#ifdef HAVE_PRCTL
++# include <sys/prctl.h>
++#endif
+ 
+ #define INCLUDED_BY_MAIN_MODULE 1
+ #define GNUPG_COMMON_NEED_AFLOCAL
+@@ -474,6 +477,12 @@ main (int argc, char **argv )
+   const char *application_priority = NULL;
+ 
+   early_system_init ();
++
++#if defined(HAVE_PRCTL) && defined(PR_SET_DUMPABLE)
++  /* Disable ptrace on Linux without sgid bit */
++  prctl(PR_SET_DUMPABLE, 0);
++#endif
++
+   gpgrt_set_strusage (my_strusage);
+   gcry_control (GCRYCTL_SUSPEND_SECMEM_WARN);
+   /* Please note that we may running SUID(ROOT), so be very CAREFUL

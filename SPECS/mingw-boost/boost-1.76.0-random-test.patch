@@ -1,0 +1,34 @@
+From c3ada7a1b2b54f4b27585f72308a76984f8489b4 Mon Sep 17 00:00:00 2001
+From: jzmaddock <john@johnmaddock.co.uk>
+Date: Tue, 16 Mar 2021 10:47:16 +0000
+Subject: [PATCH] Add missing #includes.
+
+---
+ test/multiprecision_float_test.cpp | 1 +
+ test/multiprecision_int_test.cpp   | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/test/multiprecision_float_test.cpp b/test/multiprecision_float_test.cpp
+index 904c59d8f..bc2a9364d 100644
+--- boost_1_76_0/libs/random/test/multiprecision_float_test.cpp
++++ boost_1_76_0/libs/random/test/multiprecision_float_test.cpp
+@@ -20,6 +20,7 @@
+ #include <boost/multiprecision/debug_adaptor.hpp>
+ #include <boost/scoped_ptr.hpp>
+ #include <boost/random.hpp>
++#include <boost/mpl/list.hpp>
+ #include <sstream>
+ 
+ 
+diff --git a/test/multiprecision_int_test.cpp b/test/multiprecision_int_test.cpp
+index 577e52aff..41ec229b5 100644
+--- boost_1_76_0/libs/random/test/multiprecision_int_test.cpp
++++ boost_1_76_0/libs/random/test/multiprecision_int_test.cpp
+@@ -32,6 +32,7 @@
+ #include <boost/random/uniform_int.hpp>
+ #include <boost/random/uniform_smallint.hpp>
+ #include <boost/random/discrete_distribution.hpp>
++#include <boost/mpl/list.hpp>
+ #include <sstream>
+ 
+ typedef boost::mpl::list <

@@ -1,0 +1,21 @@
+# configuration for harware sensors monitoring daemon
+# use suffix "m" for minutes, "s" for seconds, "h" for hours
+# 0 turns the facility off
+
+# interval between scanning alarms
+INTERVAL=1m
+
+# interval between logging
+LOG_INTERVAL=20m
+
+# interval between RRD logging
+# RRD_INTERVAL=1m
+
+# RRD db location
+# RRD_LOGFILE=/var/log/sensors.rrd
+
+# Switch RRD in non-average mode ... 1 - enabled, 0 - disabled (default)
+# RRD_NO_AVG=1
+
+# Include load average in RRD ... 1 - enabled, 0 - disabled (default)
+# LOAD_AVG=1

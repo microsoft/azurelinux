@@ -1,0 +1,39 @@
+--- a/tools/CMakeLists.txt	2025-01-16 17:58:59.494990444 +0200
++++ b/tools/CMakeLists.txt	2025-01-16 18:00:00.830824004 +0200
+@@ -19,7 +19,7 @@
+     add_subdirectory(utils)
+     set(TEMP_CMAKE_CXX_CLANG_TIDY ${CMAKE_CXX_CLANG_TIDY})
+     set(CMAKE_CXX_CLANG_TIDY "")
+-    add_subdirectory(third-party/google-test EXCLUDE_FROM_ALL)
++    # add_subdirectory(third-party/google-test EXCLUDE_FROM_ALL)
+     set(CMAKE_CXX_CLANG_TIDY ${TEMP_CMAKE_CXX_CLANG_TIDY})
+     add_subdirectory(tests)
+     if (UNIX)
+@@ -27,9 +27,9 @@
+         SET(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+         set(TEMP_CMAKE_CXX_CLANG_TIDY ${CMAKE_CXX_CLANG_TIDY})
+         set(CMAKE_CXX_CLANG_TIDY "")
+-        add_subdirectory(third-party/benchmark EXCLUDE_FROM_ALL)
++	# add_subdirectory(third-party/benchmark EXCLUDE_FROM_ALL)
+         set(CMAKE_CXX_CLANG_TIDY ${TEMP_CMAKE_CXX_CLANG_TIDY})
+-        add_subdirectory(benchmarks)
++	# add_subdirectory(benchmarks)
+     endif ()
+ endif ()
+ 
+--- a/tools/tests/functional/CMakeLists.txt	2025-01-16 18:01:25.577593962 +0200
++++ b/tools/tests/functional/CMakeLists.txt	2025-01-16 18:01:36.612564010 +0200
+@@ -44,4 +44,4 @@
+         PRIVATE $<TARGET_PROPERTY:tests_common,COMPILE_OPTIONS>)
+ 
+ # Install rules
+-install(TARGETS tests RUNTIME DESTINATION bin)
++# install(TARGETS tests RUNTIME DESTINATION bin)
+--- a/tools/tests/cross_tests/CMakeLists.txt	2025-01-16 18:00:13.885788565 +0200
++++ b/tools/tests/cross_tests/CMakeLists.txt	2025-01-16 18:00:27.842750679 +0200
+@@ -32,4 +32,4 @@
+ target_compile_definitions(cross_tests PRIVATE $<TARGET_PROPERTY:tests_common,COMPILE_DEFINITIONS>)
+ target_compile_options(cross_tests PRIVATE $<TARGET_PROPERTY:tests_common,COMPILE_OPTIONS>)
+ 
+-install(TARGETS cross_tests RUNTIME DESTINATION bin)
++# install(TARGETS cross_tests RUNTIME DESTINATION bin)

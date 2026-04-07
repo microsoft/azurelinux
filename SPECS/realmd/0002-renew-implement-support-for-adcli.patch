@@ -1,0 +1,516 @@
+From aab58393b1f5255d905d5872c697522b3a52a64c Mon Sep 17 00:00:00 2001
+From: Sumit Bose <sbose@redhat.com>
+Date: Tue, 7 Jan 2025 15:11:53 +0100
+Subject: [PATCH 2/3] renew: implement support for adcli
+
+With this patch realmd can call adcli to renew the machine account
+credentials in a given keytab.
+
+Resolves: https://issues.redhat.com/browse/SSSD-8347
+---
+ dbus/realm-dbus-constants.h         |   4 +
+ service/realm-adcli-enroll.c        | 103 ++++++++++++++++++++++++
+ service/realm-adcli-enroll.h        |   6 ++
+ service/realm-kerberos-membership.h |  10 +++
+ service/realm-kerberos.c            |  49 +++++++++++-
+ service/realm-options.c             |  36 +++++++++
+ service/realm-options.h             |   3 +
+ service/realm-sssd-ad.c             | 120 ++++++++++++++++++++++++++++
+ tools/realm-renew.c                 |  18 ++++-
+ 9 files changed, 344 insertions(+), 5 deletions(-)
+
+diff --git a/dbus/realm-dbus-constants.h b/dbus/realm-dbus-constants.h
+index e49034b..1608901 100644
+--- a/dbus/realm-dbus-constants.h
++++ b/dbus/realm-dbus-constants.h
+@@ -72,6 +72,10 @@ G_BEGIN_DECLS
+ #define   REALM_DBUS_OPTION_LEGACY_SMB_CONF        "legacy-samba-config"
+ #define   REALM_DBUS_OPTION_USE_LDAPS              "use-ldaps"
+ #define   REALM_DBUS_OPTION_DO_NOT_TOUCH_CONFIG    "do-not-touch-config"
++#define   REALM_DBUS_OPTION_ADD_SAMBA_DATA         "add-samba-data"
++#define   REALM_DBUS_OPTION_COMPUTER_PWD_LIFETIME  "computer-password-lifetime"
++#define   REALM_DBUS_OPTION_HOST_KEYTAB            "host-keytab"
++#define   REALM_DBUS_OPTION_HOST_FQDN              "host-fqdn"
+ 
+ #define   REALM_DBUS_IDENTIFIER_ACTIVE_DIRECTORY   "active-directory"
+ #define   REALM_DBUS_IDENTIFIER_WINBIND            "winbind"
+diff --git a/service/realm-adcli-enroll.c b/service/realm-adcli-enroll.c
+index c58175e..c428f70 100644
+--- a/service/realm-adcli-enroll.c
++++ b/service/realm-adcli-enroll.c
+@@ -23,6 +23,7 @@
+ #include "realm-ini-config.h"
+ #include "realm-options.h"
+ #include "realm-settings.h"
++#include "realm-dbus-constants.h"
+ 
+ static void
+ on_join_leave_process (GObject *source,
+@@ -84,6 +85,14 @@ on_leave_process (GObject *source,
+ 	on_join_leave_process (source, result, user_data, FALSE);
+ }
+ 
++static void
++on_renew_process (GObject *source,
++                  GAsyncResult *result,
++                  gpointer user_data)
++{
++	on_join_leave_process (source, result, user_data, FALSE);
++}
++
+ void
+ realm_adcli_enroll_join_async (RealmDisco *disco,
+                                RealmCredential *cred,
+@@ -330,3 +339,97 @@ realm_adcli_enroll_delete_finish (GAsyncResult *result,
+ 	g_return_val_if_fail (g_task_is_valid (result, NULL), FALSE);
+ 	return g_task_propagate_boolean (G_TASK (result), error);
+ }
++
++void
++realm_adcli_enroll_renew_async (RealmDisco *disco,
++                                GVariant *options,
++                                gboolean use_ldaps,
++                                GDBusMethodInvocation *invocation,
++                                GAsyncReadyCallback callback,
++                                gpointer user_data)
++{
++	gchar *environ[] = { "LANG=C", NULL };
++	GInetAddress *address;
++	GTask *task;
++	GPtrArray *args;
++	gchar *ccache_arg = NULL;
++	gchar *server_arg = NULL;
++	gboolean add_samba_data = FALSE;
++	const gchar *computer_password_lifetime = NULL;
++	gchar *lifetime_arg = NULL;
++	const gchar *host_keytab = NULL;
++	gchar *keytab_arg = NULL;
++	const gchar *host_fqdn = NULL;
++	gchar *fqdn_arg = NULL;
++
++	g_return_if_fail (disco != NULL);
++	g_return_if_fail (invocation != NULL);
++
++	task = g_task_new (NULL, NULL, callback, user_data);
++	args = g_ptr_array_new ();
++
++	add_samba_data = realm_option_add_samba_data (options);
++	computer_password_lifetime = realm_option_computer_pwd_lifetime (options);
++	host_keytab = realm_options_ad_specific (options,
++	                                         REALM_DBUS_OPTION_HOST_KEYTAB);
++	host_fqdn = realm_options_ad_specific (options,
++	                                       REALM_DBUS_OPTION_HOST_FQDN);
++
++	g_ptr_array_add (args, (gpointer)realm_settings_path ("adcli"));
++	g_ptr_array_add (args, "update");
++	g_ptr_array_add (args, "--verbose");
++	g_ptr_array_add (args, "--domain");
++	g_ptr_array_add (args, (gpointer)disco->domain_name);
++
++	if (use_ldaps) {
++		g_ptr_array_add (args, "--use-ldaps");
++	}
++
++	if (add_samba_data) {
++		g_ptr_array_add (args, "--add-samba-data");
++	}
++
++	if (computer_password_lifetime != NULL) {
++		lifetime_arg = g_strdup_printf ("--computer-password-lifetime=%s",
++		                                computer_password_lifetime);
++		g_ptr_array_add (args, lifetime_arg);
++	}
++
++	if (host_keytab != NULL) {
++		keytab_arg = g_strdup_printf ("--host-keytab=%s", host_keytab);
++		g_ptr_array_add (args, keytab_arg);
++	}
++
++	if (host_fqdn != NULL) {
++		fqdn_arg = g_strdup_printf ("--host-fqdn=%s", host_fqdn);
++		g_ptr_array_add (args, fqdn_arg);
++	}
++
++	if (G_IS_INET_SOCKET_ADDRESS (disco->server_address)) {
++		address = g_inet_socket_address_get_address (G_INET_SOCKET_ADDRESS (disco->server_address));
++		server_arg = g_inet_address_to_string (address);
++		if (server_arg) {
++			g_ptr_array_add (args, "--domain-controller");
++			g_ptr_array_add (args, server_arg);
++		}
++
++	} else if (disco->explicit_server) {
++		g_ptr_array_add (args, "--domain-controller");
++		g_ptr_array_add (args, (gpointer)disco->explicit_server);
++	}
++
++	g_ptr_array_add (args, NULL);
++
++	realm_command_runv_async ((gchar **)args->pdata, environ, NULL,
++	                          invocation, on_renew_process,
++	                          g_object_ref (task));
++
++	g_ptr_array_free (args, TRUE);
++	g_object_unref (task);
++
++	g_free (fqdn_arg);
++	g_free (keytab_arg);
++	g_free (lifetime_arg);
++	g_free (ccache_arg);
++	g_free (server_arg);
++}
+diff --git a/service/realm-adcli-enroll.h b/service/realm-adcli-enroll.h
+index 3f535d0..e03f3f0 100644
+--- a/service/realm-adcli-enroll.h
++++ b/service/realm-adcli-enroll.h
+@@ -48,6 +48,12 @@ void         realm_adcli_enroll_delete_async  (RealmDisco *disco,
+ gboolean     realm_adcli_enroll_delete_finish (GAsyncResult *result,
+                                                GError **error);
+ 
++void         realm_adcli_enroll_renew_async   (RealmDisco *disco,
++                                               GVariant *options,
++                                               gboolean use_ldaps,
++                                               GDBusMethodInvocation *invocation,
++                                               GAsyncReadyCallback callback,
++                                               gpointer user_data);
+ G_END_DECLS
+ 
+ #endif /* __REALM_ADCLI_ENROLL_H__ */
+diff --git a/service/realm-kerberos-membership.h b/service/realm-kerberos-membership.h
+index 50eea53..90337b7 100644
+--- a/service/realm-kerberos-membership.h
++++ b/service/realm-kerberos-membership.h
+@@ -62,6 +62,16 @@ struct _RealmKerberosMembershipIface {
+ 	                                         GError **error);
+ 
+ 	const RealmCredential * (* leave_creds) (RealmKerberosMembership *realm);
++
++	void       (* renew_async)              (RealmKerberosMembership *realm,
++	                                         GVariant *options,
++	                                         GDBusMethodInvocation *invocation,
++	                                         GAsyncReadyCallback callback,
++	                                         gpointer user_data);
++
++	gboolean   (* renew_finish)             (RealmKerberosMembership *realm,
++	                                         GAsyncResult *result,
++	                                         GError **error);
+ };
+ 
+ GType               realm_kerberos_membership_get_type        (void) G_GNUC_CONST;
+diff --git a/service/realm-kerberos.c b/service/realm-kerberos.c
+index 3c9c71c..0cf2da0 100644
+--- a/service/realm-kerberos.c
++++ b/service/realm-kerberos.c
+@@ -407,16 +407,57 @@ handle_leave (RealmDbusKerberosMembership *membership,
+ 	return TRUE;
+ }
+ 
++static void
++on_renew_complete (GObject *source,
++                   GAsyncResult *result,
++                   gpointer user_data)
++{
++	MethodClosure *closure = user_data;
++	RealmKerberosMembershipIface *iface;
++	GCancellable *cancellable;
++	GError *error = NULL;
++
++	iface = REALM_KERBEROS_MEMBERSHIP_GET_IFACE (closure->self);
++	g_return_if_fail (iface->renew_finish != NULL);
++
++	cancellable = realm_invocation_get_cancellable (closure->invocation);
++	if (!g_cancellable_set_error_if_cancelled (cancellable, &error))
++		(iface->leave_finish) (REALM_KERBEROS_MEMBERSHIP (closure->self), result, &error);
++
++	unenroll_method_reply (closure->invocation, error);
++
++	g_clear_error (&error);
++	method_closure_free (closure);
++}
++
+ static gboolean
+-handle_renew (RealmDbusKerberosMembership *membership,
++handle_renew (RealmDbusKerberosMembership *dbus_membership,
+                GDBusMethodInvocation *invocation,
+                GVariant *options,
+                gpointer user_data)
+ {
+-	//RealmKerberos *self = REALM_KERBEROS (user_data);
++	MethodClosure *method;
++	RealmKerberos *self = REALM_KERBEROS (user_data);
++	RealmKerberosMembershipIface *iface = REALM_KERBEROS_MEMBERSHIP_GET_IFACE (self);
++	RealmKerberosMembership *membership = REALM_KERBEROS_MEMBERSHIP (self);
++
++	if (!realm_invocation_lock_daemon (invocation)) {
++		g_dbus_method_invocation_return_error (invocation, REALM_ERROR, REALM_ERROR_BUSY,
++		                                       _("Already running another action"));
++		return TRUE;
++	}
++
++	method = method_closure_new (self, invocation);
++
++	if (iface->renew_async == NULL || iface->renew_finish == NULL) {
++		g_dbus_method_invocation_return_error (invocation, G_DBUS_ERROR,
++		                                       G_DBUS_ERROR_UNKNOWN_METHOD,
++		                                       "Renew is currently not impemented.");
++		return TRUE;
++	}
++
++	(iface->renew_async) (membership, options, invocation, on_renew_complete, method);
+ 
+-	g_dbus_method_invocation_return_error (invocation, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD,
+-	                                       "Renew is currently not impemented.");
+ 	return TRUE;
+ }
+ 
+diff --git a/service/realm-options.c b/service/realm-options.c
+index e1abe3a..919461f 100644
+--- a/service/realm-options.c
++++ b/service/realm-options.c
+@@ -215,6 +215,42 @@ gboolean realm_option_use_ldaps (GVariant *options)
+ 	return FALSE;
+ }
+ 
++gboolean realm_option_add_samba_data (GVariant *options)
++{
++	const gchar *add_samba_data_str;
++
++	add_samba_data_str = realm_options_ad_specific (options,
++	                                                REALM_DBUS_OPTION_ADD_SAMBA_DATA);
++	if (add_samba_data_str != NULL
++	            && ( g_ascii_strcasecmp (add_samba_data_str, "True") == 0
++	                || g_ascii_strcasecmp (add_samba_data_str, "Yes") == 0)) {
++		return TRUE;
++	}
++
++	return FALSE;
++}
++
++const gchar *realm_option_computer_pwd_lifetime (GVariant *options)
++{
++	const gchar *computer_password_lifetime;
++	gint64 tmp64;
++	gchar *endptr;
++
++	computer_password_lifetime = realm_options_ad_specific (options,
++	                                                        REALM_DBUS_OPTION_COMPUTER_PWD_LIFETIME);
++	if (computer_password_lifetime != NULL && *computer_password_lifetime != '\0') {
++		errno = 0;
++		tmp64 = g_ascii_strtoll (computer_password_lifetime, &endptr, 10);
++		if (tmp64 < 0 || errno != 0 || *endptr != '\0') {
++			/* Illegal input, ignored, should be checked earlier
++			 * to return an error */
++			computer_password_lifetime = NULL;
++		}
++	}
++
++	return computer_password_lifetime;
++}
++
+ gboolean realm_option_do_not_touch_config (GVariant *options)
+ {
+ 	const gchar *str;
+diff --git a/service/realm-options.h b/service/realm-options.h
+index 569ef42..a6b5c41 100644
+--- a/service/realm-options.h
++++ b/service/realm-options.h
+@@ -52,6 +52,9 @@ gboolean       realm_option_use_ldaps                 (GVariant *options);
+ 
+ gboolean       realm_option_do_not_touch_config       (GVariant *options);
+ 
++gboolean       realm_option_add_samba_data            (GVariant *options);
++
++const gchar *  realm_option_computer_pwd_lifetime     (GVariant *options);
+ G_END_DECLS
+ 
+ #endif /* __REALM_OPTIONS_H__ */
+diff --git a/service/realm-sssd-ad.c b/service/realm-sssd-ad.c
+index 64bb488..c04557b 100644
+--- a/service/realm-sssd-ad.c
++++ b/service/realm-sssd-ad.c
+@@ -644,6 +644,123 @@ realm_sssd_ad_leave_creds (RealmKerberosMembership *membership)
+ 	return creds;
+ }
+ 
++typedef struct {
++	GDBusMethodInvocation *invocation;
++	gchar *realm_name;
++} RenewClosure;
++
++static void
++renew_closure_free (gpointer data)
++{
++	RenewClosure *renew = data;
++	g_free (renew->realm_name);
++	g_object_unref (renew->invocation);
++	g_free (renew);
++}
++
++static void
++on_renew_done (GObject *source,
++               GAsyncResult *result,
++               gpointer user_data)
++{
++	GTask *task = G_TASK (user_data);
++	RenewClosure *renew = g_task_get_task_data (task);
++	GError *error = NULL;
++
++	if (!g_task_is_valid (result, NULL)) {
++		realm_diagnostics_info (renew->invocation, "Task not valid.");
++	}
++
++	g_task_propagate_boolean (G_TASK (result), &error);
++	if (error != NULL) {
++		realm_diagnostics_error (renew->invocation, error,
++		                         "Task failed with: ");
++		g_error_free (error);
++		g_task_return_error (task, error);
++	} else {
++		g_task_return_boolean (task, TRUE);
++	}
++
++	g_object_unref (task);
++}
++
++static void
++realm_sssd_ad_renew_async (RealmKerberosMembership *membership,
++                           GVariant *options,
++                           GDBusMethodInvocation *invocation,
++                           GAsyncReadyCallback callback,
++                           gpointer user_data)
++{
++	RealmSssdAd *self = REALM_SSSD_AD (membership);
++	RealmKerberos *realm = REALM_KERBEROS (self);
++	RealmSssd *sssd = REALM_SSSD (self);
++	RealmDisco *disco;
++	const gchar *section;
++	GTask *task;
++	RenewClosure *renew;
++	gboolean use_ldaps = FALSE;
++
++	task = g_task_new (self, NULL, callback, user_data);
++
++	/* Check that enrolled in this realm */
++	section = realm_sssd_get_config_section (sssd);
++	if (!section) {
++		g_task_return_new_error (task, REALM_ERROR, REALM_ERROR_NOT_CONFIGURED,
++		                         _("Not currently joined to this domain"));
++		g_object_unref (task);
++		return;
++	}
++
++
++	/* This also has the side-effect of populating the disco info if necessary */
++	disco = realm_kerberos_get_disco (realm);
++
++	renew = g_new0 (RenewClosure, 1);
++	renew->realm_name = g_strdup (realm_kerberos_get_realm_name (realm));
++	renew->invocation = g_object_ref (invocation);
++	g_task_set_task_data (task, renew, renew_closure_free);
++
++	realm_adcli_enroll_renew_async (disco, options, use_ldaps, invocation, on_renew_done,
++	                                g_object_ref (task));
++
++	g_object_unref (task);
++#if 0
++	switch (cred->type) {
++	case REALM_CREDENTIAL_AUTOMATIC:
++		realm_sssd_deconfigure_domain_tail (REALM_SSSD (self), task, invocation);
++		break;
++	case REALM_CREDENTIAL_CCACHE:
++	case REALM_CREDENTIAL_PASSWORD:
++		leave = g_new0 (LeaveClosure, 1);
++		leave->realm_name = g_strdup (realm_kerberos_get_realm_name (realm));
++		leave->invocation = g_object_ref (invocation);
++		leave->use_adcli = strstr (tags ? tags : "", "joined-with-adcli") ? TRUE : FALSE;
++		g_task_set_task_data (task, leave, leave_closure_free);
++
++		use_ldaps = realm_option_use_ldaps (options);
++		if (leave->use_adcli) {
++			realm_adcli_enroll_delete_async (disco, cred, options,
++			                                 use_ldaps,  invocation,
++			                                 on_leave_do_deconfigure, g_object_ref (task));
++		} else {
++			if (use_ldaps) {
++				realm_diagnostics_info (leave->invocation,
++				                        "Membership software does "
++				                        "not support ldaps, trying "
++				                        "without.");
++			}
++			realm_samba_enroll_leave_async (disco, cred, options, invocation,
++			                                on_leave_do_deconfigure, g_object_ref (task));
++		}
++		break;
++	default:
++		g_return_if_reached ();
++	}
++
++	g_object_unref (task);
++#endif
++}
++
+ static gboolean
+ realm_sssd_ad_generic_finish (RealmKerberosMembership *realm,
+                               GAsyncResult *result,
+@@ -752,4 +869,7 @@ realm_sssd_ad_kerberos_membership_iface (RealmKerberosMembershipIface *iface)
+ 	iface->leave_async = realm_sssd_ad_leave_async;
+ 	iface->leave_finish = realm_sssd_ad_generic_finish;
+ 	iface->leave_creds = realm_sssd_ad_leave_creds;
++
++	iface->renew_async = realm_sssd_ad_renew_async;
++	iface->renew_finish = realm_sssd_ad_generic_finish;
+ }
+diff --git a/tools/realm-renew.c b/tools/realm-renew.c
+index 7b28e48..c17febc 100644
+--- a/tools/realm-renew.c
++++ b/tools/realm-renew.c
+@@ -70,6 +70,10 @@ call_renew (RealmDbusKerberosMembership *membership,
+ typedef struct {
+ 	gchar *membership_software;
+ 	gboolean use_ldaps;
++	gboolean add_samba_data;
++	gchar *computer_password_lifetime;
++	gchar *host_keytab;
++	gchar *host_fqdn;
+ } RealmRenewArgs;
+ 
+ static void
+@@ -116,7 +120,11 @@ perform_renew (RealmClient *client,
+ 	}
+ 
+ 	options = realm_build_options (REALM_DBUS_OPTION_MEMBERSHIP_SOFTWARE, args->membership_software,
++	                               REALM_DBUS_OPTION_COMPUTER_PWD_LIFETIME, args->computer_password_lifetime,
++	                               REALM_DBUS_OPTION_HOST_KEYTAB, args->host_keytab,
++	                               REALM_DBUS_OPTION_HOST_FQDN, args->host_fqdn,
+ 	                               REALM_DBUS_OPTION_USE_LDAPS, args->use_ldaps ? "True" : "False",
++	                               REALM_DBUS_OPTION_ADD_SAMBA_DATA, args->add_samba_data ? "True" : "False",
+ 	                               NULL);
+ 	g_variant_ref_sink (options);
+ 
+@@ -138,7 +146,7 @@ realm_renew (RealmClient *client,
+ 	GOptionContext *context;
+ 	GError *error = NULL;
+ 	const gchar *realm_name;
+-	RealmRenewArgs args;
++	RealmRenewArgs args = { 0 };
+ 	GOptionGroup *group;
+ 	gint ret = 0;
+ 
+@@ -147,6 +155,14 @@ realm_renew (RealmClient *client,
+ 		  N_("Use specific membership software"), NULL },
+ 		{ "use-ldaps", 0, 0, G_OPTION_ARG_NONE, &args.use_ldaps,
+ 		  N_("Use ldaps to connect to LDAP"), NULL },
++		{ "host-keytab", 0, 0, G_OPTION_ARG_STRING, &args.host_keytab,
++		  N_("Path to the keytab"), NULL },
++		{ "host-fqdn", 0, 0, G_OPTION_ARG_STRING, &args.host_fqdn,
++		  N_("Fully-qualified name of the host"), NULL },
++		{ "computer-password-lifetime", 0, 0, G_OPTION_ARG_STRING, &args.computer_password_lifetime,
++		  N_("lifetime of the host accounts password in days"), NULL },
++		{ "add-samba-data", 0, 0, G_OPTION_ARG_NONE, &args.add_samba_data,
++		  N_("Try to update Samba's internal machine account password as well"), NULL },
+ 		{ NULL, }
+ 	};
+ 
+-- 
+2.49.0
+

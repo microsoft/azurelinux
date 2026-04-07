@@ -1,0 +1,21 @@
+diff -up mutt-2.2.14/init.h.system_certs mutt-2.2.14/init.h
+--- mutt-2.2.14/init.h.system_certs	2025-02-20 06:31:10.000000000 +0100
++++ mutt-2.2.14/init.h	2025-07-22 23:31:06.259171517 +0200
+@@ -4315,7 +4315,7 @@ struct option_t MuttVars[] = {
+   */
+ #if defined(USE_SSL)
+ # ifdef USE_SSL_GNUTLS
+-  { "ssl_ca_certificates_file", DT_PATH, R_NONE, {.p=&SslCACertFile}, {.p=0} },
++  { "ssl_ca_certificates_file", DT_PATH, R_NONE, {.p=&SslCACertFile}, {.p="/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem"} },
+   /*
+   ** .pp
+   ** This variable specifies a file containing trusted CA certificates.
+@@ -4324,7 +4324,7 @@ struct option_t MuttVars[] = {
+   ** .pp
+   ** Example:
+   ** .ts
+-  ** set ssl_ca_certificates_file=/etc/ssl/certs/ca-certificates.crt
++  ** set ssl_ca_certificates_file=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
+   ** .te
+   */
+ # endif /* USE_SSL_GNUTLS */

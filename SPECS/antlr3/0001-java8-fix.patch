@@ -1,0 +1,63 @@
+From 33f662c60e6e7b703e197854d2478a8747f044f0 Mon Sep 17 00:00:00 2001
+From: Michael Simacek <msimacek@redhat.com>
+Date: Tue, 17 Jun 2014 19:36:24 +0200
+Subject: [PATCH] java8 fix
+
+Signed-off-by: Michael Simacek <msimacek@redhat.com>
+---
+ tool/src/main/java/org/antlr/codegen/CodeGenerator.java | 2 +-
+ tool/src/main/java/org/antlr/tool/Grammar.java          | 4 ++--
+ tool/src/main/java/org/antlr/tool/Strip.java            | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/tool/src/main/java/org/antlr/codegen/CodeGenerator.java b/tool/src/main/java/org/antlr/codegen/CodeGenerator.java
+index b279bd5..566e33c 100644
+--- a/tool/src/main/java/org/antlr/codegen/CodeGenerator.java
++++ b/tool/src/main/java/org/antlr/codegen/CodeGenerator.java
+@@ -1087,7 +1087,7 @@ public class CodeGenerator {
+ 		catch (Exception tse) {
+ 			ErrorManager.internalError("can't parse template action",tse);
+ 		}
+-		GrammarAST rewriteTree = parseResult.getTree();
++		GrammarAST rewriteTree = (GrammarAST)parseResult.getTree();
+ 
+ 		// then translate via codegen.g
+ 		CodeGenTreeWalker gen = new CodeGenTreeWalker(new CommonTreeNodeStream(rewriteTree));
+diff --git a/tool/src/main/java/org/antlr/tool/Grammar.java b/tool/src/main/java/org/antlr/tool/Grammar.java
+index 667ebb2..4ca4328 100644
+--- a/tool/src/main/java/org/antlr/tool/Grammar.java
++++ b/tool/src/main/java/org/antlr/tool/Grammar.java
+@@ -706,7 +706,7 @@ public class Grammar {
+ 			}
+ 		}
+ 
+-		setGrammarTree(result.getTree());
++		setGrammarTree((GrammarAST)result.getTree());
+ 
+ 		//if ( grammarTree!=null ) System.out.println("grammar tree: "+grammarTree.toStringTree());
+ 
+@@ -927,7 +927,7 @@ public class Grammar {
+ 		parser.setGrammarType(this.type);
+ 		try {
+ 			ANTLRParser.rule_return result = parser.rule();
+-			return result.getTree();
++			return (GrammarAST)result.getTree();
+ 		}
+ 		catch (Exception e) {
+ 			ErrorManager.error(ErrorManager.MSG_ERROR_CREATING_ARTIFICIAL_RULE,
+diff --git a/tool/src/main/java/org/antlr/tool/Strip.java b/tool/src/main/java/org/antlr/tool/Strip.java
+index f411090..ddda4ed 100644
+--- a/tool/src/main/java/org/antlr/tool/Strip.java
++++ b/tool/src/main/java/org/antlr/tool/Strip.java
+@@ -64,7 +64,7 @@ public class Strip {
+         tokens = new TokenRewriteStream(lex);
+         ANTLRv3Parser g = new ANTLRv3Parser(tokens);
+         ANTLRv3Parser.grammarDef_return r = g.grammarDef();
+-        CommonTree t = r.getTree();
++        CommonTree t = (CommonTree)r.getTree();
+         if (tree_option) System.out.println(t.toStringTree());
+         rewrite(g.getTreeAdaptor(),t,g.getTokenNames());
+     }
+-- 
+2.7.4
+

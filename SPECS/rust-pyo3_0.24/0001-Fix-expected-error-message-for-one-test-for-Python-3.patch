@@ -1,0 +1,28 @@
+From 01100dc9eba6d956b48f1de8b463adf2234ac249 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Mon, 21 Jul 2025 19:38:17 +0200
+Subject: [PATCH] Fix expected error message for one test for Python 3.14
+
+---
+ src/types/dict.rs | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/types/dict.rs b/src/types/dict.rs
+index 3f5118a..74a2d1b 100644
+--- a/src/types/dict.rs
++++ b/src/types/dict.rs
+@@ -989,7 +989,10 @@ mod tests {
+                 }
+                 Err(err) => {
+                     assert!(err.is_instance_of::<PyTypeError>(py));
+-                    assert_eq!(err.value(py).to_string(), "Error from __hash__")
++                    #[cfg(not(Py_3_14))]
++                    assert_eq!(err.value_bound(py).to_string(), "Error from __hash__");
++                    #[cfg(Py_3_14)]
++                    assert_eq!(err.value_bound(py).to_string(), "cannot use 'HashErrors' as a dict key (Error from __hash__)");
+                 }
+             }
+         })
+-- 
+2.50.1
+

@@ -1,0 +1,37 @@
+--- sonnet-6.15.0.orig/src/core/settings.cpp	2025-06-06 15:33:52.000000000 +0200
++++ sonnet-6.15.0/src/core/settings.cpp	2025-06-11 09:17:43.357821259 +0200
+@@ -279,20 +279,20 @@ bool Settings::modified() const
+ QStringList Settings::defaultIgnoreList()
+ {
+     QStringList l;
+-    l.append(QStringLiteral("KMail"));
+-    l.append(QStringLiteral("KOrganizer"));
+-    l.append(QStringLiteral("KAddressBook"));
+-    l.append(QStringLiteral("KHTML"));
+-    l.append(QStringLiteral("KIO"));
+-    l.append(QStringLiteral("KJS"));
+-    l.append(QStringLiteral("Konqueror"));
+-    l.append(QStringLiteral("Sonnet"));
+-    l.append(QStringLiteral("Kontact"));
+-    l.append(QStringLiteral("Qt"));
+-    l.append(QStringLiteral("Okular"));
+-    l.append(QStringLiteral("KMix"));
+-    l.append(QStringLiteral("Amarok"));
+-    l.append(QStringLiteral("KDevelop"));
++//    l.append(QStringLiteral("KMail"));
++//    l.append(QStringLiteral("KOrganizer"));
++//    l.append(QStringLiteral("KAddressBook"));
++//    l.append(QStringLiteral("KHTML"));
++//    l.append(QStringLiteral("KIO"));
++//    l.append(QStringLiteral("KJS"));
++//    l.append(QStringLiteral("Konqueror"));
++//    l.append(QStringLiteral("Sonnet"));
++//    l.append(QStringLiteral("Kontact"));
++//    l.append(QStringLiteral("Qt"));
++//    l.append(QStringLiteral("Okular"));
++//    l.append(QStringLiteral("KMix"));
++//    l.append(QStringLiteral("Amarok"));
++//    l.append(QStringLiteral("KDevelop"));
+     return l;
+ }
+ 

@@ -1,0 +1,30 @@
+From 4c88f2c0e61daa89f584a8a9a3eba210221c6920 Mon Sep 17 00:00:00 2001
+From: Janusz Chorko <janusz.chorko@apdu.pl>
+Date: Fri, 26 Aug 2016 21:26:50 +0200
+Subject: [PATCH 103/104] Explicitly disable copy assignment operator
+
+See also:
+https://github.com/Tencent/rapidjson/pull/719
+
+Signed-off-by: Andreas Sturmlechner <asturm@gentoo.org>
+(cherry-picked from rapidjson upstream commit 862c39be371278a45a88d4d1d75164be57bb7e2d)
+---
+ deps/rapidjson/1.1.0/include/rapidjson/document.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/3rdparty/mapbox-gl-native/deps/rapidjson/1.1.0/include/rapidjson/document.h b/src/3rdparty/mapbox-gl-native/deps/rapidjson/1.1.0/include/rapidjson/document.h
+index b0f1f70be..19f5a6a5f 100644
+--- a/src/3rdparty/mapbox-gl-native/deps/rapidjson/1.1.0/include/rapidjson/document.h
++++ b/src/3rdparty/mapbox-gl-native/deps/rapidjson/1.1.0/include/rapidjson/document.h
+@@ -326,6 +326,8 @@ private:
+     //! Disallow construction from non-const array
+     template<SizeType N>
+     GenericStringRef(CharType (&str)[N]) /* = delete */;
++    //! Copy assignment operator not permitted - immutable type
++    GenericStringRef& operator=(const GenericStringRef& rhs) /* = delete */;
+ };
+ 
+ //! Mark a character pointer as constant string
+-- 
+2.47.1
+

@@ -1,0 +1,38 @@
+From 91a0efcf09a95c0a3e74ca4e1d6225a860e010d6 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Wed, 22 Oct 2014 09:43:25 +0200
+Subject: [PATCH] Do not install Unicode-EastAsianWidth if external is used
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Configuration --with-external-Unicode-EastAsianWidth=yes should not
+install the bundled Unicode-EastAsianWidth code. This patch fixes it.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ Makefile.am | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 3447463..bc3257b 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -267,9 +267,11 @@ install-data-local: i18n
+ 	  $(DESTDIR)$(pkgdatadir)/lib/libintl-perl/lib/Locale/Recode
+ 	$(INSTALL_DATA) $(srcdir)/lib/libintl-perl/lib/Locale/RecodeData/*.pm \
+ 	  $(DESTDIR)$(pkgdatadir)/lib/libintl-perl/lib/Locale/RecodeData
+-	$(MKDIR_P) $(DESTDIR)$(pkgdatadir)/lib/Unicode-EastAsianWidth/lib/Unicode
+-	$(INSTALL_DATA) $(srcdir)/lib/Unicode-EastAsianWidth/lib/Unicode/EastAsianWidth.pm \
+-	 $(DESTDIR)$(pkgdatadir)/lib/Unicode-EastAsianWidth/lib/Unicode
++	if test '$(USE_EXTERNAL_EASTASIANWIDTH)' != 'yes'; then \
++	  $(MKDIR_P) $(DESTDIR)$(pkgdatadir)/lib/Unicode-EastAsianWidth/lib/Unicode ; \
++	  $(INSTALL_DATA) $(srcdir)/lib/Unicode-EastAsianWidth/lib/Unicode/EastAsianWidth.pm \
++	    $(DESTDIR)$(pkgdatadir)/lib/Unicode-EastAsianWidth/lib/Unicode ; \
++	fi
+ 
+ uninstall-local:
+ 	rm -rf $(DESTDIR)$(pkgdatadir)/lib/ $(DESTDIR)$(pkgdatadir)/i18n
+-- 
+1.9.3
+

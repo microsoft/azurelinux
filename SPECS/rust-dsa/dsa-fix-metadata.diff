@@ -1,0 +1,11 @@
+--- dsa-0.6.3/Cargo.toml	1970-01-01T00:00:01+00:00
++++ dsa-0.6.3/Cargo.toml	2024-05-01T14:43:45.873644+00:00
+@@ -62,7 +62,7 @@
+ default-features = false
+ 
+ [dependencies.signature]
+-version = "2.0, <2.3"
++version = "2.0"
+ features = [
+     "alloc",
+     "digest",

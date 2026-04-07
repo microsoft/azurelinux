@@ -1,0 +1,84 @@
+From 2632e284dfc30599981bc824ecc7ff79991d9b3a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Augustin=20=C5=BD=C3=ADdek?= <augustin@zidek.eu>
+Date: Fri, 9 Jan 2026 09:36:40 +0000
+Subject: [PATCH 1/2] Fix Numpy 2.4 compatibility in PDB/vectors.py
+
+Addresses this expired deprecation: https://numpy.org/devdocs/release/2.4.0-notes.html#raise-typeerror-on-attempt-to-convert-array-with-ndim-0-to-scalar
+---
+ Bio/PDB/vectors.py | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
+
+diff --git a/Bio/PDB/vectors.py b/Bio/PDB/vectors.py
+index 68b85326129..0f72a327b50 100644
+--- a/Bio/PDB/vectors.py
++++ b/Bio/PDB/vectors.py
+@@ -431,20 +431,22 @@ def homog_rot_mtx(angle_rads: float, axis: str) -> np.ndarray:
+ 
+ def set_Z_homog_rot_mtx(angle_rads: float, mtx: np.ndarray):
+     """Update existing Z rotation matrix to new angle."""
+-    cosang = np.cos(angle_rads)
+-    sinang = np.sin(angle_rads)
++    cosang = np.cos(angle_rads).item()
++    sinang = np.sin(angle_rads).item()
+ 
+-    mtx[0][0] = mtx[1][1] = cosang
++    mtx[0][0] = cosang
++    mtx[1][1] = cosang
+     mtx[1][0] = sinang
+     mtx[0][1] = -sinang
+ 
+ 
+ def set_Y_homog_rot_mtx(angle_rads: float, mtx: np.ndarray):
+     """Update existing Y rotation matrix to new angle."""
+-    cosang = np.cos(angle_rads)
+-    sinang = np.sin(angle_rads)
++    cosang = np.cos(angle_rads).item()
++    sinang = np.sin(angle_rads).item()
+ 
+-    mtx[0][0] = mtx[2][2] = cosang
++    mtx[0][0] = cosang
++    mtx[2][2] = cosang
+     mtx[0][2] = sinang
+     mtx[2][0] = -sinang
+ 
+@@ -556,7 +558,7 @@ def coord_space(
+ 
+     # tx acs[1] to origin
+     # tm = homog_trans_mtx(-a1[0][0], -a1[1][0], -a1[2][0])
+-    set_homog_trans_mtx(-a1[0], -a1[1], -a1[2], tm)
++    set_homog_trans_mtx(-a1[0].item(), -a1[1].item(), -a1[2].item(), tm)
+ 
+     # directly translate a2 using a1
+     p = a2 - a1
+@@ -622,7 +624,7 @@ def coord_space(
+     set_Z_homog_rot_mtx(sc[1], mrz)
+     # translation matrix origin to a1
+     # tm = homog_trans_mtx(a1[0][0], a1[1][0], a1[2][0])
+-    set_homog_trans_mtx(a1[0], a1[1], a1[2], tm)
++    set_homog_trans_mtx(a1[0].item(), a1[1].item(), a1[2].item(), tm)
+ 
+     # mr = tm @ mrz @ mry @ mrz2
+     mr = gtm.dot(gmrz.dot(gmry.dot(gmrz2)))
+
+From 9aa958889f1a2923c4bcfc6aa7ce4b01064500f7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Augustin=20=C5=BD=C3=ADdek?= <augustin@zidek.eu>
+Date: Fri, 9 Jan 2026 09:41:41 +0000
+Subject: [PATCH 2/2] Update news and contributors list.
+
+---
+ CONTRIB.rst | 1 +
+ NEWS.rst    | 2 ++
+ 2 files changed, 3 insertions(+)
+
+diff --git a/CONTRIB.rst b/CONTRIB.rst
+index e0f2fc83092..60cff5539bf 100644
+--- a/CONTRIB.rst
++++ b/CONTRIB.rst
+@@ -50,6 +50,7 @@ please open an issue on GitHub or mention it on the mailing list.
+ - Artemi Bendandi <https://github.com/artbendandi>
+ - Arup Ghosh <https://github.com/arupgsh>
+ - Austin Varela <https://github.com/austinv11>
++- Augustin Žídek <https://github.com/augustin-zidek>
+ - Aziz Khan <https://github.com/asntech>
+ - Barbara Mühlemann <https://github.com/bamueh>
+ - Bart de Koning <bratdaking gmail>

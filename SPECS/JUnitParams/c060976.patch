@@ -1,0 +1,56 @@
+From c06097656225bf3e348dab590de619590cc9245a Mon Sep 17 00:00:00 2001
+From: Marcin Armatys <marcin.armatys@pragmatists.pl>
+Date: Fri, 3 Nov 2017 16:38:52 +0100
+Subject: [PATCH] Release notes and Readme updated
+
+---
+ README.md   | 6 +++---
+ RELEASES.md | 8 ++++++++
+ 2 files changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/README.md b/README.md
+index 7f790b1..360adc3 100644
+--- a/README.md
++++ b/README.md
+@@ -24,7 +24,7 @@ See more [examples](https://github.com/Pragmatists/JUnitParams/blob/master/src/t
+ 
+ ## Latest News
+ 
+-* 2017-04-17 JUnitParams 1.1.0 released. Check [release info](RELEASES.md).
++* 2017-11-03 JUnitParams 1.1.1 released. Check [release info](RELEASES.md).
+ 
+ [more news here](https://github.com/Pragmatists/JUnitParams/wiki)
+ 
+@@ -48,14 +48,14 @@ JUnitParams is available as Maven artifact:
+ <dependency>
+   <groupId>pl.pragmatists</groupId>
+   <artifactId>JUnitParams</artifactId>
+-  <version>1.1.0</version>
++  <version>1.1.1</version>
+   <scope>test</scope>
+ </dependency>
+ ```
+ To use JUnitParams in a Gradle build add this to your dependencies:
+ 
+ ```
+-testCompile 'pl.pragmatists:JUnitParams:1.1.0'
++testCompile 'pl.pragmatists:JUnitParams:1.1.1'
+ ```
+ 
+ 
+diff --git a/RELEASES.md b/RELEASES.md
+index fc25551..0fe04e4 100644
+--- a/RELEASES.md
++++ b/RELEASES.md
+@@ -1,3 +1,11 @@
++## JUnitParams 1.1.1 release. Release date : 2017-11-03
++
++### Regexp bugfix
++
++New version works well for Instrumented Unit Test for Android 19 and below.
++
++Thanks [mattmook](https://github.com/mattmook) and [aaalaniz](https://github.com/aaalaniz) for contribution.
++
+ ## JUnitParams 1.1.0 release. Release date : 2017-04-17
+ 
+ ### [Breaking change] Enhance ParametersProvider with FrameworkMethod

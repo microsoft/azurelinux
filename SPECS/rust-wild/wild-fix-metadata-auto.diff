@@ -1,0 +1,17 @@
+--- wild-2.2.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ wild-2.2.1/Cargo.toml	2024-01-30T12:08:56.652349+00:00
+@@ -53,9 +53,6 @@
+ [features]
+ glob-quoted-on-windows = []
+ 
+-[target."cfg(windows)".dependencies.glob]
+-version = "0.3.1"
+-
+ [badges.appveyor]
+ repository = "pornel/wild"
+ 
+@@ -64,3 +61,4 @@
+ 
+ [badges.maintenance]
+ status = "passively-maintained"
++

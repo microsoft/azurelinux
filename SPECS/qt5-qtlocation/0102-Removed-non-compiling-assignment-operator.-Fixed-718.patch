@@ -1,0 +1,32 @@
+From 0d9987b43e695f5202c5d69a5e42ab70a678b04f Mon Sep 17 00:00:00 2001
+From: Janusz Chorko <janusz.chorko@apdu.pl>
+Date: Fri, 26 Aug 2016 21:17:38 +0200
+Subject: [PATCH 102/104] Removed non-compiling assignment operator. Fixed #718
+
+Downstream report: https://bugs.gentoo.org/914581
+
+See also:
+https://github.com/Tencent/rapidjson/issues/718
+
+Signed-off-by: Andreas Sturmlechner <asturm@gentoo.org>
+(cherry-picked from rapidjson upstream commit 3b2441b87f99ab65f37b141a7b548ebadb607b96)
+---
+ deps/rapidjson/1.1.0/include/rapidjson/document.h | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/src/3rdparty/mapbox-gl-native/deps/rapidjson/1.1.0/include/rapidjson/document.h b/src/3rdparty/mapbox-gl-native/deps/rapidjson/1.1.0/include/rapidjson/document.h
+index e3e20dfbd..b0f1f70be 100644
+--- a/src/3rdparty/mapbox-gl-native/deps/rapidjson/1.1.0/include/rapidjson/document.h
++++ b/src/3rdparty/mapbox-gl-native/deps/rapidjson/1.1.0/include/rapidjson/document.h
+@@ -316,8 +316,6 @@ struct GenericStringRef {
+ 
+     GenericStringRef(const GenericStringRef& rhs) : s(rhs.s), length(rhs.length) {}
+ 
+-    GenericStringRef& operator=(const GenericStringRef& rhs) { s = rhs.s; length = rhs.length; }
+-
+     //! implicit conversion to plain CharType pointer
+     operator const Ch *() const { return s; }
+ 
+-- 
+2.47.1
+

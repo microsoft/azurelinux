@@ -1,0 +1,16 @@
+diff --git a/src/plugins/canbus/socketcan/socketcanbackend.cpp b/src/plugins/canbus/socketcan/socketcanbackend.cpp
+index 572fef8..68e8b3f 100644
+--- a/src/plugins/canbus/socketcan/socketcanbackend.cpp
++++ b/src/plugins/canbus/socketcan/socketcanbackend.cpp
+@@ -56,6 +56,11 @@
+ #include <sys/ioctl.h>
+ #include <sys/time.h>
+ 
++// Seems that kernel 5.2.0 renames this define to SIOCGSTAMP_OLD
++#ifndef SIOCGSTAMP
++#define SIOCGSTAMP        0x8906          /* Get stamp (timeval) */
++#endif
++
+ #ifndef CANFD_BRS
+ #   define CANFD_BRS 0x01 /* bit rate switch (second bitrate for payload data) */
+ #endif

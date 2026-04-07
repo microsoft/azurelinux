@@ -1,0 +1,27 @@
+From ead47a1fec085674352be50b943830e2001ae086 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Wed, 24 Jan 2024 19:32:02 +0100
+Subject: [PATCH] set PROFILE=SYSTEM as default cipher list
+
+---
+ src/ssl/connector.rs | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/src/ssl/connector.rs b/src/ssl/connector.rs
+index 66d1bd8..6386411 100644
+--- a/src/ssl/connector.rs
++++ b/src/ssl/connector.rs
+@@ -74,9 +74,7 @@ impl SslConnector {
+     pub fn builder(method: SslMethod) -> Result<SslConnectorBuilder, ErrorStack> {
+         let mut ctx = ctx(method)?;
+         ctx.set_default_verify_paths()?;
+-        ctx.set_cipher_list(
+-            "DEFAULT:!aNULL:!eNULL:!MD5:!3DES:!DES:!RC4:!IDEA:!SEED:!aDSS:!SRP:!PSK",
+-        )?;
++        ctx.set_cipher_list("PROFILE=SYSTEM")?;
+         setup_verify(&mut ctx);
+ 
+         Ok(SslConnectorBuilder(ctx))
+-- 
+2.43.0
+

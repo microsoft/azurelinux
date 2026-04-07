@@ -1,0 +1,19 @@
+--- bc-java-r1rv77/ant/bc+-build.xml
++++ bc-java-r1rv77/ant/bc+-build.xml
+@@ -652,13 +652,13 @@
+              </fileset>
+         </copy>
+ 
+-        <replaceregexp match="javax.activation." replace="jakarta.activation." flags="g" byline="true">
++        <replaceregexp match="jakarta.activation." replace="javax.activation." flags="g" byline="true">
+             <fileset dir="${jmail.target.src.dir}">
+                 <include name="**/*.java"/>
+             </fileset>
+         </replaceregexp>
+ 
+-        <replaceregexp match="javax.mail." replace="jakarta.mail." flags="g" byline="true">
++        <replaceregexp match="jakarta.mail." replace="javax.mail." flags="g" byline="true">
+             <fileset dir="${jmail.target.src.dir}">
+                 <include name="**/*.java"/>
+             </fileset>
+

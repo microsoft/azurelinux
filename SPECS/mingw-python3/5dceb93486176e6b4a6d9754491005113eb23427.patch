@@ -1,0 +1,333 @@
+diff -rupN --no-dereference Python-3.11.14/Lib/ntpath.py Python-3.11.14-new/Lib/ntpath.py
+--- Python-3.11.14/Lib/ntpath.py	2025-10-09 18:16:55.000000000 +0200
++++ Python-3.11.14-new/Lib/ntpath.py	2025-11-23 10:16:46.886934560 +0100
+@@ -378,17 +378,23 @@ def expanduser(path):
+ # XXX With COMMAND.COM you can use any characters in a variable name,
+ # XXX except '^|<>='.
+ 
++_varpattern = r"'[^']*'?|%(%|[^%]*%?)|\$(\$|[-\w]+|\{[^}]*\}?)"
++_varsub = None
++_varsubb = None
++
+ def expandvars(path):
+     """Expand shell variables of the forms $var, ${var} and %var%.
+ 
+     Unknown variables are left unchanged."""
+     path = os.fspath(path)
++    global _varsub, _varsubb
+     if isinstance(path, bytes):
+         if b'$' not in path and b'%' not in path:
+             return path
+-        import string
+-        varchars = bytes(string.ascii_letters + string.digits + '_-', 'ascii')
+-        quote = b'\''
++        if not _varsubb:
++            import re
++            _varsubb = re.compile(_varpattern.encode(), re.ASCII).sub
++        sub = _varsubb
+         percent = b'%'
+         brace = b'{'
+         rbrace = b'}'
+@@ -397,94 +403,44 @@ def expandvars(path):
+     else:
+         if '$' not in path and '%' not in path:
+             return path
+-        import string
+-        varchars = string.ascii_letters + string.digits + '_-'
+-        quote = '\''
++        if not _varsub:
++            import re
++            _varsub = re.compile(_varpattern, re.ASCII).sub
++        sub = _varsub
+         percent = '%'
+         brace = '{'
+         rbrace = '}'
+         dollar = '$'
+         environ = os.environ
+-    res = path[:0]
+-    index = 0
+-    pathlen = len(path)
+-    while index < pathlen:
+-        c = path[index:index+1]
+-        if c == quote:   # no expansion within single quotes
+-            path = path[index + 1:]
+-            pathlen = len(path)
+-            try:
+-                index = path.index(c)
+-                res += c + path[:index + 1]
+-            except ValueError:
+-                res += c + path
+-                index = pathlen - 1
+-        elif c == percent:  # variable or '%'
+-            if path[index + 1:index + 2] == percent:
+-                res += c
+-                index += 1
+-            else:
+-                path = path[index+1:]
+-                pathlen = len(path)
+-                try:
+-                    index = path.index(percent)
+-                except ValueError:
+-                    res += percent + path
+-                    index = pathlen - 1
+-                else:
+-                    var = path[:index]
+-                    try:
+-                        if environ is None:
+-                            value = os.fsencode(os.environ[os.fsdecode(var)])
+-                        else:
+-                            value = environ[var]
+-                    except KeyError:
+-                        value = percent + var + percent
+-                    res += value
+-        elif c == dollar:  # variable or '$$'
+-            if path[index + 1:index + 2] == dollar:
+-                res += c
+-                index += 1
+-            elif path[index + 1:index + 2] == brace:
+-                path = path[index+2:]
+-                pathlen = len(path)
+-                try:
+-                    index = path.index(rbrace)
+-                except ValueError:
+-                    res += dollar + brace + path
+-                    index = pathlen - 1
+-                else:
+-                    var = path[:index]
+-                    try:
+-                        if environ is None:
+-                            value = os.fsencode(os.environ[os.fsdecode(var)])
+-                        else:
+-                            value = environ[var]
+-                    except KeyError:
+-                        value = dollar + brace + var + rbrace
+-                    res += value
+-            else:
+-                var = path[:0]
+-                index += 1
+-                c = path[index:index + 1]
+-                while c and c in varchars:
+-                    var += c
+-                    index += 1
+-                    c = path[index:index + 1]
+-                try:
+-                    if environ is None:
+-                        value = os.fsencode(os.environ[os.fsdecode(var)])
+-                    else:
+-                        value = environ[var]
+-                except KeyError:
+-                    value = dollar + var
+-                res += value
+-                if c:
+-                    index -= 1
++
++    def repl(m):
++        lastindex = m.lastindex
++        if lastindex is None:
++            return m[0]
++        name = m[lastindex]
++        if lastindex == 1:
++            if name == percent:
++                return name
++            if not name.endswith(percent):
++                return m[0]
++            name = name[:-1]
+         else:
+-            res += c
+-        index += 1
+-    return res
++            if name == dollar:
++                return name
++            if name.startswith(brace):
++                if not name.endswith(rbrace):
++                    return m[0]
++                name = name[1:-1]
++
++        try:
++            if environ is None:
++                return os.fsencode(os.environ[os.fsdecode(name)])
++            else:
++                return environ[name]
++        except KeyError:
++            return m[0]
++
++    return sub(repl, path)
+ 
+ 
+ # Normalize a path, e.g. A//B, A/./B and A/foo/../B all become A\B.
+diff -rupN --no-dereference Python-3.11.14/Lib/posixpath.py Python-3.11.14-new/Lib/posixpath.py
+--- Python-3.11.14/Lib/posixpath.py	2025-10-09 18:16:55.000000000 +0200
++++ Python-3.11.14-new/Lib/posixpath.py	2025-11-23 10:16:46.887232679 +0100
+@@ -287,42 +287,41 @@ def expanduser(path):
+ # This expands the forms $variable and ${variable} only.
+ # Non-existent variables are left unchanged.
+ 
+-_varprog = None
+-_varprogb = None
++_varpattern = r'\$(\w+|\{[^}]*\}?)'
++_varsub = None
++_varsubb = None
+ 
+ def expandvars(path):
+     """Expand shell variables of form $var and ${var}.  Unknown variables
+     are left unchanged."""
+     path = os.fspath(path)
+-    global _varprog, _varprogb
++    global _varsub, _varsubb
+     if isinstance(path, bytes):
+         if b'$' not in path:
+             return path
+-        if not _varprogb:
++        if not _varsubb:
+             import re
+-            _varprogb = re.compile(br'\$(\w+|\{[^}]*\})', re.ASCII)
+-        search = _varprogb.search
++            _varsubb = re.compile(_varpattern.encode(), re.ASCII).sub
++        sub = _varsubb
+         start = b'{'
+         end = b'}'
+         environ = getattr(os, 'environb', None)
+     else:
+         if '$' not in path:
+             return path
+-        if not _varprog:
++        if not _varsub:
+             import re
+-            _varprog = re.compile(r'\$(\w+|\{[^}]*\})', re.ASCII)
+-        search = _varprog.search
++            _varsub = re.compile(_varpattern, re.ASCII).sub
++        sub = _varsub
+         start = '{'
+         end = '}'
+         environ = os.environ
+-    i = 0
+-    while True:
+-        m = search(path, i)
+-        if not m:
+-            break
+-        i, j = m.span(0)
+-        name = m.group(1)
+-        if name.startswith(start) and name.endswith(end):
++
++    def repl(m):
++        name = m[1]
++        if name.startswith(start):
++            if not name.endswith(end):
++                return m[0]
+             name = name[1:-1]
+         try:
+             if environ is None:
+@@ -330,13 +329,11 @@ def expandvars(path):
+             else:
+                 value = environ[name]
+         except KeyError:
+-            i = j
++            return m[0]
+         else:
+-            tail = path[j:]
+-            path = path[:i] + value
+-            i = len(path)
+-            path += tail
+-    return path
++            return value
++
++    return sub(repl, path)
+ 
+ 
+ # Normalize a path, e.g. A//B, A/./B and A/foo/../B all become A/B.
+diff -rupN --no-dereference Python-3.11.14/Lib/test/test_genericpath.py Python-3.11.14-new/Lib/test/test_genericpath.py
+--- Python-3.11.14/Lib/test/test_genericpath.py	2025-10-09 18:16:55.000000000 +0200
++++ Python-3.11.14-new/Lib/test/test_genericpath.py	2025-11-23 10:16:46.887435435 +0100
+@@ -7,6 +7,7 @@ import os
+ import sys
+ import unittest
+ import warnings
++from test import support
+ from test.support import is_emscripten
+ from test.support import os_helper
+ from test.support import warnings_helper
+@@ -434,6 +435,19 @@ class CommonTest(GenericTest):
+                   os.fsencode('$bar%s bar' % nonascii))
+             check(b'$spam}bar', os.fsencode('%s}bar' % nonascii))
+ 
++    @support.requires_resource('cpu')
++    def test_expandvars_large(self):
++        expandvars = self.pathmodule.expandvars
++        with os_helper.EnvironmentVarGuard() as env:
++            env.clear()
++            env["A"] = "B"
++            n = 100_000
++            self.assertEqual(expandvars('$A'*n), 'B'*n)
++            self.assertEqual(expandvars('${A}'*n), 'B'*n)
++            self.assertEqual(expandvars('$A!'*n), 'B!'*n)
++            self.assertEqual(expandvars('${A}A'*n), 'BA'*n)
++            self.assertEqual(expandvars('${'*10*n), '${'*10*n)
++
+     def test_abspath(self):
+         self.assertIn("foo", self.pathmodule.abspath("foo"))
+         with warnings.catch_warnings():
+diff -rupN --no-dereference Python-3.11.14/Lib/test/test_ntpath.py Python-3.11.14-new/Lib/test/test_ntpath.py
+--- Python-3.11.14/Lib/test/test_ntpath.py	2025-10-09 18:16:55.000000000 +0200
++++ Python-3.11.14-new/Lib/test/test_ntpath.py	2025-11-23 10:16:46.887728365 +0100
+@@ -6,8 +6,8 @@ import sys
+ import unittest
+ import warnings
+ from ntpath import ALLOW_MISSING
+-from test.support import os_helper
+-from test.support import TestFailed, is_emscripten
++from test import support
++from test.support import os_helper, is_emscripten
+ from test.support.os_helper import FakePath
+ from test import test_genericpath
+ from tempfile import TemporaryFile
+@@ -57,7 +57,7 @@ def tester(fn, wantResult):
+     fn = fn.replace("\\", "\\\\")
+     gotResult = eval(fn)
+     if wantResult != gotResult and _norm(wantResult) != _norm(gotResult):
+-        raise TestFailed("%s should return: %s but returned: %s" \
++        raise support.TestFailed("%s should return: %s but returned: %s" \
+               %(str(fn), str(wantResult), str(gotResult)))
+ 
+     # then with bytes
+@@ -73,7 +73,7 @@ def tester(fn, wantResult):
+         warnings.simplefilter("ignore", DeprecationWarning)
+         gotResult = eval(fn)
+     if _norm(wantResult) != _norm(gotResult):
+-        raise TestFailed("%s should return: %s but returned: %s" \
++        raise support.TestFailed("%s should return: %s but returned: %s" \
+               %(str(fn), str(wantResult), repr(gotResult)))
+ 
+ 
+@@ -820,6 +820,19 @@ class TestNtpath(NtpathTestCase):
+             check('%spam%bar', '%sbar' % nonascii)
+             check('%{}%bar'.format(nonascii), 'ham%sbar' % nonascii)
+ 
++    @support.requires_resource('cpu')
++    def test_expandvars_large(self):
++        expandvars = ntpath.expandvars
++        with os_helper.EnvironmentVarGuard() as env:
++            env.clear()
++            env["A"] = "B"
++            n = 100_000
++            self.assertEqual(expandvars('%A%'*n), 'B'*n)
++            self.assertEqual(expandvars('%A%A'*n), 'BA'*n)
++            self.assertEqual(expandvars("''"*n + '%%'), "''"*n + '%')
++            self.assertEqual(expandvars("%%"*n), "%"*n)
++            self.assertEqual(expandvars("$$"*n), "$"*n)
++
+     def test_expanduser(self):
+         tester('ntpath.expanduser("test")', 'test')
+ 
+@@ -1090,6 +1103,7 @@ class TestNtpath(NtpathTestCase):
+             self.assertIsInstance(b_final_path, bytes)
+             self.assertGreater(len(b_final_path), 0)
+ 
++
+ class NtCommonTest(test_genericpath.CommonTest, unittest.TestCase):
+     pathmodule = ntpath
+     attributes = ['relpath']
+diff -rupN --no-dereference Python-3.11.14/Misc/NEWS.d/next/Security/2025-05-30-22-33-27.gh-issue-136065.bu337o.rst Python-3.11.14-new/Misc/NEWS.d/next/Security/2025-05-30-22-33-27.gh-issue-136065.bu337o.rst
+--- Python-3.11.14/Misc/NEWS.d/next/Security/2025-05-30-22-33-27.gh-issue-136065.bu337o.rst	1970-01-01 01:00:00.000000000 +0100
++++ Python-3.11.14-new/Misc/NEWS.d/next/Security/2025-05-30-22-33-27.gh-issue-136065.bu337o.rst	2025-11-23 10:16:46.888012599 +0100
+@@ -0,0 +1 @@
++Fix quadratic complexity in :func:`os.path.expandvars`.

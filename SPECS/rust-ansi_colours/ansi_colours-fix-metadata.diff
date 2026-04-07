@@ -1,0 +1,11 @@
+--- ansi_colours-1.2.3/Cargo.toml	1970-01-01T00:00:01+00:00
++++ ansi_colours-1.2.3/Cargo.toml	2024-07-29T21:53:24.032085+00:00
+@@ -52,7 +52,7 @@
+ optional = true
+ 
+ [dependencies.termcolor]
+-version = ">= 1.0, <= 1.2"
++version = "1"
+ optional = true
+ 
+ [dev-dependencies.crc64]

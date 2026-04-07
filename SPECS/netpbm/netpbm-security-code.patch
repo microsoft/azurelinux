@@ -1,0 +1,920 @@
+diff -urNp a/analyzer/pgmtexture.c b/analyzer/pgmtexture.c
+--- a/analyzer/pgmtexture.c	2025-02-03 09:24:28.362500390 +0100
++++ b/analyzer/pgmtexture.c	2025-02-03 09:27:57.991369817 +0100
+@@ -97,6 +97,8 @@ vector(unsigned int const nl,
+ 
+     assert(nh >= nl); assert(nh <= UINT_MAX-1);
+ 
++    overflow_add(nh - nl, 1);
++
+     MALLOCARRAY(v, (unsigned) (nh - nl + 1));
+ 
+     if (v == NULL)
+@@ -133,6 +135,8 @@ matrix (unsigned int const nrl,
+ 
+     assert(nrh >= nrl); assert(nrh <= UINT_MAX-1);
+ 
++    overflow_add(nrh - nrl, 1);
++
+     /* allocate pointers to rows */
+     MALLOCARRAY(matrix, (unsigned) (nrh - nrl + 1));
+     if (matrix == NULL)
+@@ -142,6 +146,8 @@ matrix (unsigned int const nrl,
+ 
+     assert (nch >= ncl); assert(nch <= UINT_MAX-1);
+ 
++    overflow_add(nch - ncl, 1);
++
+     /* allocate rows and set pointers to them */
+     for (i = nrl; i <= nrh; ++i) {
+         MALLOCARRAY(matrix[i], (unsigned) (nch - ncl + 1));
+diff -urNp a/converter/other/gemtopnm.c b/converter/other/gemtopnm.c
+--- a/converter/other/gemtopnm.c	2025-02-03 09:24:28.345500482 +0100
++++ b/converter/other/gemtopnm.c	2025-02-03 09:28:49.455092222 +0100
+@@ -153,6 +153,8 @@ main(int argc, const char ** argv) {
+ 
+     pnm_writepnminit(stdout, cols, rows, MAXVAL, type, 0);
+ 
++    overflow_add(cols, padright);
++
+     {
+         /* allocate input row data structure */
+         unsigned int plane;
+diff -urNp a/converter/other/jpegtopnm.c b/converter/other/jpegtopnm.c
+--- a/converter/other/jpegtopnm.c	2025-02-03 09:24:28.346500477 +0100
++++ b/converter/other/jpegtopnm.c	2025-02-03 09:29:57.845723398 +0100
+@@ -894,6 +894,8 @@ convertImage(FILE *
+     /* Calculate output image dimensions so we can allocate space */
+     jpeg_calc_output_dimensions(cinfoP);
+ 
++    overflow2(cinfoP->output_width, cinfoP->output_components);
++
+     /* Start decompressor */
+     jpeg_start_decompress(cinfoP);
+ 
+diff -urNp a/converter/other/pbmtopgm.c b/converter/other/pbmtopgm.c
+--- a/converter/other/pbmtopgm.c	2025-02-03 09:24:28.346500477 +0100
++++ b/converter/other/pbmtopgm.c	2025-02-03 09:32:07.478024266 +0100
+@@ -88,6 +88,7 @@ main(int argc, const char ** argv) {
+     up   = cmdline.convRows / 2;  down  = cmdline.convRows - up;
+ 
+     outrow = pgm_allocrow(cols) ;
++    overflow2(cmdline.convCols, cmdline.convRows);
+     maxval = MIN(PGM_OVERALLMAXVAL, cmdline.convCols * cmdline.convRows);
+     pgm_writepgminit(stdout, cols, rows, maxval, 0) ;
+ 
+diff -urNp a/converter/other/pnmtoddif.c b/converter/other/pnmtoddif.c
+--- a/converter/other/pnmtoddif.c	2025-02-03 09:24:28.346500477 +0100
++++ b/converter/other/pnmtoddif.c	2025-02-03 09:33:21.228626549 +0100
+@@ -627,6 +627,7 @@ main(int argc, char *argv[]) {
+     switch (PNM_FORMAT_TYPE(format)) {
+     case PBM_TYPE:
+         ip.bits_per_pixel = 1;
++        overflow_add(cols, 7);
+         ip.bytes_per_line = (cols + 7) / 8;
+         ip.spectral = 2;
+         ip.components = 1;
+@@ -642,6 +643,7 @@ main(int argc, char *argv[]) {
+         ip.polarity = 2;
+         break;
+     case PPM_TYPE:
++        overflow2(cols, 3);
+         ip.bytes_per_line = 3 * cols;
+         ip.bits_per_pixel = 24;
+         ip.spectral = 5;
+diff -urNp a/converter/other/pnmtops.c b/converter/other/pnmtops.c
+--- a/converter/other/pnmtops.c	2025-02-03 09:24:28.345500482 +0100
++++ b/converter/other/pnmtops.c	2025-02-03 09:42:01.586878661 +0100
+@@ -298,17 +298,21 @@ parseCommandLine(int argc, const char **
+     validateCompDimension(width,  psScaleFactor, "-width value");
+     validateCompDimension(height, psScaleFactor, "-height value");
+ 
++    overflow2(width, psScaleFactor);
+     cmdlineP->width  = width  * psScaleFactor;
++    overflow2(height, psScaleFactor);
+     cmdlineP->height = height * psScaleFactor;
+ 
+     if (imagewidthSpec) {
+         validateCompDimension(imagewidth, psScaleFactor, "-imagewidth value");
++        overflow2(imagewidth, psScaleFactor);
+         cmdlineP->imagewidth = imagewidth * psScaleFactor;
+     }
+     else
+         cmdlineP->imagewidth = 0;
+     if (imageheightSpec) {
+-        validateCompDimension(imagewidth, psScaleFactor, "-imageheight value");
++        validateCompDimension(imageheight, psScaleFactor, "-imageheight value");
++        overflow2(imageheight, psScaleFactor);
+         cmdlineP->imageheight = imageheight * psScaleFactor;
+     }
+     else
+diff -urNp a/converter/other/sirtopnm.c b/converter/other/sirtopnm.c
+--- a/converter/other/sirtopnm.c	2025-02-03 09:24:28.347500471 +0100
++++ b/converter/other/sirtopnm.c	2025-02-03 09:44:25.547151413 +0100
+@@ -84,6 +84,7 @@ convertPpm(FILE *       const ifP,
+            unsigned int const cols,
+            xel *        const xelrow) {
+ 
++    overflow3(cols, rows, 3);
+     unsigned int const picsize = cols * rows * 3;
+     unsigned int const planesize = cols * rows;
+ 
+diff -urNp a/converter/other/tifftopnm.c b/converter/other/tifftopnm.c
+--- a/converter/other/tifftopnm.c	2025-02-03 09:24:28.345500482 +0100
++++ b/converter/other/tifftopnm.c	2025-02-03 09:46:55.210395347 +0100
+@@ -1358,7 +1358,8 @@ convertRasterByRows(pnmOut *       const
+     if (UINT_MAX/cols < spp)
+         pm_error("Image is too wide/deep (%u x %u) for computations",
+                  cols, spp);
+-    MALLOCARRAY(samplebuf, cols * spp);
++    /* samplebuf is unsigned int * !!! */
++    samplebuf = (unsigned int *) malloc3(cols, sizeof(unsigned int), spp);
+     if (samplebuf == NULL)
+         pm_error("can't allocate memory for row buffer");
+ 
+diff -urNp a/converter/other/xwdtopnm.c b/converter/other/xwdtopnm.c
+--- a/converter/other/xwdtopnm.c	2025-02-03 09:24:28.345500482 +0100
++++ b/converter/other/xwdtopnm.c	2025-02-03 09:55:18.695851996 +0100
+@@ -243,6 +243,10 @@ processX10Header(X10WDFileHeader *  cons
+         *colorsP = pnm_allocrow(*maxvalP + 1);
+         for (i = 0; i <= *maxvalP; ++i)
+             PNM_ASSIGN1((*colorsP)[i], i);
++        overflow_add(h10P->pixmap_width, 15);
++        if(h10P->pixmap_width < 0)
++            pm_error("assert: negative width");
++        overflow2((((h10P->pixmap_width + 15) / 16) * 16 - h10P->pixmap_width), 8);
+         *padrightP =
+             (((h10P->pixmap_width + 15) / 16) * 16 - h10P->pixmap_width) * 8;
+         *bitsPerItemP = 16;
+@@ -671,6 +675,7 @@ processX11Header(const X11WDFileHeader *
+                  "%u bits per pixel, which is too many for this program "
+                  "to compute",
+                  h11FixedP->pixmap_width, h11FixedP->bits_per_pixel);
++    overflow2(h11FixedP->bytes_per_line, 8);
+     *padrightP =
+         h11FixedP->bytes_per_line * 8 -
+         h11FixedP->pixmap_width * h11FixedP->bits_per_pixel;
+diff -urNp a/converter/pbm/mdatopbm.c b/converter/pbm/mdatopbm.c
+--- a/converter/pbm/mdatopbm.c	2025-02-03 09:24:28.358500411 +0100
++++ b/converter/pbm/mdatopbm.c	2025-02-03 09:57:03.495422912 +0100
+@@ -283,11 +283,13 @@ main(int argc, const char **argv) {
+         pm_readlittleshort(ifP, &yy); nInCols = yy;
+     }
+ 
++    overflow2(nOutCols, 8);
+     nOutCols = 8 * nInCols;
+     nOutRows = nInRows;
+-    if (bScale)
++    if (bScale) {
++        overflow2(nOutRows, 2);
+         nOutRows *= 2;
+-
++    }
+     data = pbm_allocarray(nOutCols, nOutRows);
+ 
+     MALLOCARRAY_NOFAIL(mdrow, nInCols);
+diff -urNp a/converter/pbm/mgrtopbm.c b/converter/pbm/mgrtopbm.c
+--- a/converter/pbm/mgrtopbm.c	2025-02-03 09:24:28.358500411 +0100
++++ b/converter/pbm/mgrtopbm.c	2025-02-03 09:58:19.232265999 +0100
+@@ -105,6 +105,8 @@ readMgrHeader(FILE *          const ifP,
+     interpHdrWidth (head, colsP);
+     interpHdrHeight(head, rowsP);
+ 
++    overflow_add(*colsP, pad);
++
+     *padrightP = ((*colsP + pad - 1) / pad) * pad - *colsP;
+ }
+ 
+diff -urNp a/converter/pbm/pbmtogem.c b/converter/pbm/pbmtogem.c
+--- a/converter/pbm/pbmtogem.c	2025-02-03 09:24:28.358500411 +0100
++++ b/converter/pbm/pbmtogem.c	2025-02-03 10:25:34.259707343 +0100
+@@ -79,6 +79,7 @@ putinit (int const rows, int const cols)
+   bitsperitem = 0;
+   bitshift = 7;
+   outcol = 0;
++  overflow_add(cols, 7);
+   outmax = (cols + 7) / 8;
+   outrow = (unsigned char *) pm_allocrow (outmax, sizeof (unsigned char));
+   lastrow = (unsigned char *) pm_allocrow (outmax, sizeof (unsigned char));
+diff -urNp a/converter/pbm/pbmtogo.c b/converter/pbm/pbmtogo.c
+--- a/converter/pbm/pbmtogo.c	2025-02-03 09:24:28.359500407 +0100
++++ b/converter/pbm/pbmtogo.c	2025-02-03 10:26:22.723447123 +0100
+@@ -158,6 +158,7 @@ main(int           argc,
+     bitrow = pbm_allocrow(cols);
+ 
+     /* Round cols up to the nearest multiple of 8. */
++    overflow_add(cols, 7);
+     rucols = ( cols + 7 ) / 8;
+     bytesperrow = rucols;       /* GraphOn uses bytes */
+     rucols = rucols * 8;
+diff -urNp a/converter/pbm/pbmtolj.c b/converter/pbm/pbmtolj.c
+--- a/converter/pbm/pbmtolj.c	2025-02-03 09:24:28.357500417 +0100
++++ b/converter/pbm/pbmtolj.c	2025-02-03 10:29:37.442401385 +0100
+@@ -120,7 +120,11 @@ parseCommandLine(int argc, const char **
+ static void
+ allocateBuffers(unsigned int const cols) {
+ 
++    overflow_add(cols, 7);
+     rowBufferSize = (cols + 7) / 8;
++    overflow_add(rowBufferSize, 128);
++    overflow_add(rowBufferSize, rowBufferSize+128);
++    overflow_add(rowBufferSize+10, rowBufferSize/8);
+     packBufferSize = rowBufferSize + (rowBufferSize + 127) / 128 + 1;
+     deltaBufferSize = rowBufferSize + rowBufferSize / 8 + 10;
+ 
+diff -urNp a/converter/pbm/pbmtomda.c b/converter/pbm/pbmtomda.c
+--- a/converter/pbm/pbmtomda.c	2025-02-03 09:24:28.357500417 +0100
++++ b/converter/pbm/pbmtomda.c	2025-02-03 10:31:40.714199457 +0100
+@@ -204,6 +204,7 @@ main(int argc, const char ** argv) {
+ 
+     nOutRowsUnrounded = cmdline.dscale ? nInRows/2 : nInRows;
+ 
++    overflow_add(nOutRowsUnrounded, 3);
+     nOutRows = ((nOutRowsUnrounded + 3) / 4) * 4;
+         /* MDA wants rows a multiple of 4 */
+     nOutCols = nInCols / 8;
+diff -urNp a/converter/pbm/pbmtoppa/pbm.c b/converter/pbm/pbmtoppa/pbm.c
+--- a/converter/pbm/pbmtoppa/pbm.c	2025-02-03 09:24:28.356500423 +0100
++++ b/converter/pbm/pbmtoppa/pbm.c	2025-02-03 10:48:49.928347495 +0100
+@@ -157,6 +157,7 @@ pbm_readline(pbm_stat *      const pbmSt
+                 break;
+             case P4: {
+                 int tmp, tmp2;
++                overflow_add(pbmStatP->width, 7);
+                 tmp = (pbmStatP->width+7)/8;
+                 tmp2 = fread(data,1,tmp,pbmStatP->fptr);
+                 if (tmp2 == tmp) {
+@@ -189,6 +190,7 @@ pbm_unreadline(pbm_stat * const pbmStatP
+ 
+     if (!pbmStatP->unread) {
+         pbmStatP->unread = 1;
++        overflow_add(pbmStatP->width, 7);
+         pbmStatP->revdata = malloc ((pbmStatP->width+7)/8);
+         memcpy(pbmStatP->revdata, data, (pbmStatP->width+7)/8);
+         --pbmStatP->current_line;
+diff -urNp a/converter/pbm/pbmtoppa/pbmtoppa.c b/converter/pbm/pbmtoppa/pbmtoppa.c
+--- a/converter/pbm/pbmtoppa/pbmtoppa.c	2025-02-03 09:24:28.356500423 +0100
++++ b/converter/pbm/pbmtoppa/pbmtoppa.c	2025-02-03 10:49:30.440158354 +0100
+@@ -456,6 +456,7 @@ main(int argc, char *argv[]) {
+             pm_error("main(): unrecognized parameter '%s'", argv[argn]);
+     }
+ 
++    overflow_add(Width, 7);
+     Pwidth = (Width+7)/8;
+     printer.fptr = ofP;
+ 
+diff -urNp a/converter/pbm/pbmtoxbm.c b/converter/pbm/pbmtoxbm.c
+--- a/converter/pbm/pbmtoxbm.c	2025-02-03 09:24:28.357500417 +0100
++++ b/converter/pbm/pbmtoxbm.c	2025-02-03 10:50:31.351873866 +0100
+@@ -370,6 +370,7 @@ convertRaster(FILE *          const ifP,
+ 
+     putinit(xbmVersion);
+ 
++    overflow_add(cols, padright);
+     bitrow = pbm_allocrow_packed(cols + padright);
+ 
+     for (row = 0; row < rows; ++row) {
+diff -urNp a/converter/pbm/pktopbm.c b/converter/pbm/pktopbm.c
+--- a/converter/pbm/pktopbm.c	2025-02-03 09:24:28.357500417 +0100
++++ b/converter/pbm/pktopbm.c	2025-02-03 17:09:21.430572232 +0100
+@@ -454,6 +454,7 @@ readCharacterHeader(int *          const
+     if (packetLength > UINT_MAX - pkLoc)
+         pm_error("Invalid character header - excessive packet length");
+ 
++    overflow_add(packetLength, pkLoc);
+     *endOfPacketP = packetLength + pkLoc;
+ 
+     *cheightP = cheight;
+diff -urNp a/converter/pbm/thinkjettopbm.l b/converter/pbm/thinkjettopbm.l
+--- a/converter/pbm/thinkjettopbm.l	2025-02-03 09:24:28.359500407 +0100
++++ b/converter/pbm/thinkjettopbm.l	2025-02-03 17:11:07.302725005 +0100
+@@ -117,6 +117,7 @@ DIG             [0-9]
+                             if (rowCount >= rowCapacity) {
+                                 if (rowCapacity > INT_MAX-100)
+                                     pm_error("Too many rows to count");
++                                overflow_add(rowCapacity, 100);
+                                 rowCapacity += 100;
+                                 REALLOCARRAY(rows, rowCapacity);
+                                 if (rows == NULL)
+@@ -232,6 +233,7 @@ yywrap (void)
+     /*
+      * Quite simple since ThinkJet bit arrangement matches PBM
+      */
++    overflow2(maxRowLength, 8);
+     pbm_writepbminit(stdout, maxRowLength*8, rowCount, 0);
+ 
+     packed_bitrow = malloc(maxRowLength);
+diff -urNp a/converter/pbm/ybmtopbm.c b/converter/pbm/ybmtopbm.c
+--- a/converter/pbm/ybmtopbm.c	2025-02-03 09:24:28.359500407 +0100
++++ b/converter/pbm/ybmtopbm.c	2025-02-03 17:17:57.638369880 +0100
+@@ -88,8 +88,12 @@ main(int argc, const char * argv[]) {
+ 
+     pbm_writepbminit(stdout, cols, rows, 0);
+ 
++    overflow_add(cols, 8);
++
+     bitrow = pbm_allocrow_packed(cols + 8);
+ 
++    overflow_add(cols, 15);
++
+     for (row = 0; row < rows; ++row) {
+         uint16_t *   const itemrow = (uint16_t *) bitrow;
+         unsigned int const itemCt  = (cols + 15) / 16;
+diff -urNp a/converter/ppm/ilbmtoppm.c b/converter/ppm/ilbmtoppm.c
+--- a/converter/ppm/ilbmtoppm.c	2025-02-03 09:24:28.330500563 +0100
++++ b/converter/ppm/ilbmtoppm.c	2025-02-03 18:06:05.606638402 +0100
+@@ -1385,6 +1385,9 @@ dcol_to_ppm(FILE *         const ifP,
+     if (redmaxval != maxval || greenmaxval != maxval || bluemaxval != maxval)
+         pm_message("scaling colors to %u bits", pm_maxvaltobits(maxval));
+ 
++    overflow_add(redmaxval, 1);
++    overflow_add(greenmaxval, 1);
++    overflow_add(bluemaxval, 1);
+     MALLOCARRAY_NOFAIL(redtable,   redmaxval   + 1);
+     MALLOCARRAY_NOFAIL(greentable, greenmaxval + 1);
+     MALLOCARRAY_NOFAIL(bluetable,  bluemaxval  + 1);
+@@ -1875,12 +1878,14 @@ PCHG_ConvertSmall(PCHGHeader *    const
+             else {
+                 unsigned int const changeCt16 = *dataCursor++;
+                 unsigned int const changeCt32 = *dataCursor++;
++                overflow_add(changeCt16, changeCt32);
+                 unsigned int const changeCt = changeCt16 + changeCt32;
+ 
+                 unsigned int i;
+ 
+                 remDataSize -= 2;
+ 
++                overflow_add(changeCt, 1);
+                 MALLOCARRAY_NOFAIL(cmapP->mp_change[row], changeCt + 1);
+                 for (i = 0; i < changeCt; ++i) {
+                     if (totalChangeCt >= pchgP->TotalChanges) goto fail;
+@@ -2122,6 +2127,7 @@ read_pchg(FILE *     const ifP,
+                          "is less than minreg (%u)",
+                          PCHG.MaxReg, PCHG.MinReg);
+             else {
++                overflow_add(PCHG.MaxReg-PCHG.MinReg, 2);
+                 unsigned int const nch = PCHG.MaxReg - PCHG.MinReg + 1;
+ 
+                 unsigned int i;
+diff -urNp a/converter/ppm/imgtoppm.c b/converter/ppm/imgtoppm.c
+--- a/converter/ppm/imgtoppm.c	2025-02-03 09:24:28.330500563 +0100
++++ b/converter/ppm/imgtoppm.c	2025-02-03 18:10:34.478961449 +0100
+@@ -85,6 +85,7 @@ main(int argc, const char ** argv) {
+             len = atoi((char*) buf);
+             if (fread(buf, len, 1, ifP) != 1)
+                 pm_error("bad colormap buf");
++            overflow2(cmaplen, 3);
+             if (len != cmaplen * 3) {
+                 pm_message(
+                     "cmaplen (%u) and colormap buf length (%u) do not match",
+@@ -105,6 +106,7 @@ main(int argc, const char ** argv) {
+                 pm_error("bad pixel data header");
+             buf[8] = '\0';
+             len = atoi((char*) buf);
++            overflow2(cols, rows);
+             if (len != cols * rows)
+                 pm_message(
+                     "pixel data length (%u) does not match image size (%u)",
+diff -urNp a/converter/ppm/Makefile b/converter/ppm/Makefile
+--- a/converter/ppm/Makefile	2025-02-03 09:24:28.331500558 +0100
++++ b/converter/ppm/Makefile	2025-02-03 17:39:13.338685028 +0100
+@@ -11,7 +11,7 @@ SUBDIRS = hpcdtoppm ppmtompeg
+ 
+ PORTBINARIES =	411toppm eyuvtoppm gouldtoppm ilbmtoppm imgtoppm \
+ 		leaftoppm mtvtoppm neotoppm \
+-		pcxtoppm pc1toppm pi1toppm picttoppm pjtoppm \
++		pcxtoppm pc1toppm pi1toppm pjtoppm \
+ 		ppmtoacad ppmtoapplevol ppmtoarbtxt ppmtoascii \
+ 		ppmtobmp ppmtoeyuv ppmtogif ppmtoicr ppmtoilbm \
+ 		ppmtoleaf ppmtolj ppmtomitsu ppmtoneo \
+diff -urNp a/converter/ppm/pcxtoppm.c b/converter/ppm/pcxtoppm.c
+--- a/converter/ppm/pcxtoppm.c	2025-02-03 09:24:28.329500569 +0100
++++ b/converter/ppm/pcxtoppm.c	2025-02-03 18:12:34.245400166 +0100
+@@ -378,6 +378,7 @@ pcxPlanesToPixels(unsigned char * const
+    to conceive how this subroutine should work with other numbers of bits per
+    sample, but it doesn't.
+ -----------------------------------------------------------------------------*/
++    overflow2(bytesPerLine, 8);
+     unsigned int const pixelCt = bytesPerLine * 8;
+ 
+     unsigned int bitPlanesIdx;
+diff -urNp a/converter/ppm/pjtoppm.c b/converter/ppm/pjtoppm.c
+--- a/converter/ppm/pjtoppm.c	2025-02-03 09:24:28.329500569 +0100
++++ b/converter/ppm/pjtoppm.c	2025-02-03 18:21:28.636228030 +0100
+@@ -77,6 +77,7 @@ modifyImageMode1(unsigned int     const
+                              val = image[plane + row * planes][col+1];
+                          cmd >= 0 && i < newcols; --cmd, ++i)
+                         buf[i] = val;
++                        overflow_add(i, 1);
+                 }
+                 cols = MAX(cols, i);
+                 free(image[row * planes + plane]);
+@@ -90,6 +91,7 @@ modifyImageMode1(unsigned int     const
+             }
+         }
+     }
++    overflow2(cols, 8);
+     *colsP = cols * 8;  assert(cols < UINT_MAX/8);
+ }
+ 
+@@ -265,8 +267,10 @@ main(int argc, const char ** argv) {
+                 case 'V':   /* send plane */
+                 case 'W':   /* send last plane */
+                     if (row >= rowsX || image == NULL) {
+-                        if (row >= rowsX)
++                        if (row >= rowsX) {
++                            overflow_add(rows, 100);
+                             rowsX += 100;
++                        }
+                         REALLOCARRAY(image, uintProduct(rowsX, planes));
+                         REALLOCARRAY(imlen, uintProduct(rowsX, planes));
+                     }
+@@ -277,6 +281,8 @@ main(int argc, const char ** argv) {
+                     if (!colsIsSet)
+                         pm_error("missing width value");
+ 
++                    overflow2(rows,planes);
++                    overflow_add(rows * planes, plane);
+                     cols = MAX(cols, val);
+                     imlen[row * planes + plane] = val;
+                     MALLOCARRAY(image[row * planes + plane], val);
+diff -urNp a/converter/ppm/ppmtoeyuv.c b/converter/ppm/ppmtoeyuv.c
+--- a/converter/ppm/ppmtoeyuv.c	2025-02-03 09:24:28.330500563 +0100
++++ b/converter/ppm/ppmtoeyuv.c	2025-02-03 18:22:08.012087384 +0100
+@@ -117,6 +117,7 @@ chrominanceBlue(pixel const p) {
+ static void
+ createMultiplicationTables(pixval const maxval) {
+ 
++    overflow_add(maxval, 1);
+     MALLOCARRAY_NOFAIL(mult299   , maxval+1);
+     MALLOCARRAY_NOFAIL(mult587   , maxval+1);
+     MALLOCARRAY_NOFAIL(mult114   , maxval+1);
+diff -urNp a/converter/ppm/ppmtolj.c b/converter/ppm/ppmtolj.c
+--- a/converter/ppm/ppmtolj.c	2025-02-03 09:24:28.330500563 +0100
++++ b/converter/ppm/ppmtolj.c	2025-02-03 18:24:55.523489226 +0100
+@@ -212,6 +212,8 @@ printRaster(FILE *       const ifP,
+         pm_error("Image is uncomputably wide (%u columns)", cols);
+     }
+ 
++    overflow2(cols, 6);
++
+     obuf = (unsigned char *) pm_allocrow(cols * 3, sizeof(unsigned char));
+     cbuf = (unsigned char *) pm_allocrow(cols * 6, sizeof(unsigned char));
+ 
+diff -urNp a/converter/ppm/ppmtomitsu.c b/converter/ppm/ppmtomitsu.c
+--- a/converter/ppm/ppmtomitsu.c	2025-02-03 09:24:28.331500558 +0100
++++ b/converter/ppm/ppmtomitsu.c	2025-02-03 18:27:10.691006400 +0100
+@@ -68,6 +68,8 @@ mediaSize(const char * const media,
+         medias = MSize_User;
+ 
+     if (dpi300) {
++        overflow2(medias.maxcols, 2);
++        overflow2(medias.maxrows, 2);
+         medias.maxcols *= 2;
+         medias.maxrows *= 2;
+     }
+diff -urNp a/converter/ppm/ppmtopcx.c b/converter/ppm/ppmtopcx.c
+--- a/converter/ppm/ppmtopcx.c	2025-02-03 09:24:28.330500563 +0100
++++ b/converter/ppm/ppmtopcx.c	2025-02-03 18:31:08.699156362 +0100
+@@ -314,6 +314,8 @@ writeHeader(FILE *              const of
+     putbyte(0, ofP);                /* reserved byte                */
+     putbyte(planes, ofP);           /* number of color planes       */
+ 
++    overflow2(bitsPerPixel, cols);
++    overflow_add(bitsPerPixel * cols, 7);
+     bytesPerLine = ((cols * bitsPerPixel) + 7) / 8;
+     putword(bytesPerLine, ofP);    /* number of bytes per scanline */
+ 
+diff -urNp a/converter/ppm/ppmtopict.c b/converter/ppm/ppmtopict.c
+--- a/converter/ppm/ppmtopict.c	2025-02-03 09:24:28.330500563 +0100
++++ b/converter/ppm/ppmtopict.c	2025-02-03 18:41:02.377096627 +0100
+@@ -394,6 +394,9 @@ writeRaster(FILE *          const ofP,
+         pm_error("Image is too wide (%u columns) for computation", cols);
+     }
+ 
++    overflow_add(cols/MAX_COUNT, 1);
++    overflow_add(cols, cols/MAX_COUNT+1);
++
+     MALLOCARRAY(outBuf, cols + cols/MAX_COUNT + 1);
+     if (!outBuf)
+         pm_error("Unable to allocate %u-byte row buffer",
+diff -urNp a/converter/ppm/ppmtopjxl.c b/converter/ppm/ppmtopjxl.c
+--- a/converter/ppm/ppmtopjxl.c	2025-02-03 09:24:28.331500558 +0100
++++ b/converter/ppm/ppmtopjxl.c	2025-02-03 18:48:46.550503012 +0100
+@@ -535,6 +535,8 @@ main(int argc, const char * argv[]) {
+         pm_error("image too large; reduce with ppmscale");
+     if (maxval > PCL_MAXVAL)
+         pm_error("color range too large; reduce with ppmcscale");
++    if (cols < 0 || rows < 0)
++        pm_error("negative size is not possible");
+ 
+     computeColormap(pixels, cols, rows, MAXCOLORS, &chv, &cht, &colorCt);
+ 
+diff -urNp a/converter/ppm/ppmtowinicon.c b/converter/ppm/ppmtowinicon.c
+--- a/converter/ppm/ppmtowinicon.c	2025-02-03 09:24:28.330500563 +0100
++++ b/converter/ppm/ppmtowinicon.c	2025-02-03 18:56:25.509890831 +0100
+@@ -14,6 +14,7 @@
+ #include <assert.h>
+ #include <math.h>
+ #include <string.h>
++#include <stdlib.h>
+ 
+ #include "pm_c_util.h"
+ #include "winico.h"
+@@ -207,6 +208,7 @@ newAndBitmap(gray **      const ba,
+     MALLOCARRAY_NOFAIL(rowData, rows);
+     icBitmapP->xBytes = xByteCt;
+     icBitmapP->data   = rowData;
++    overflow2(xByteCt, rows);
+     icBitmapP->size   = xByteCt * rows;
+     for (row = 0; row < rows; ++row) {
+         u1 * thisRow;  /* malloc'ed */
+@@ -706,6 +708,11 @@ addEntryToIcon(MS_Ico *     const MSIcon
+     /* all the icons I looked at ignored this value */
+     entryP->ih            = newInfoHeader(*entryP);
+     entryP->colors        = paletteP->colors;
++    overflow2(4, entryCols);
++    overflow_add(xorBitmapP->size, andBitmapP->size);
++    overflow_add(xorBitmapP->size + andBitmapP->size, 40);
++    overflow_add(xorBitmapP->size + andBitmapP->size + 40, 4 * entryCols);
++
+     entryP->size_in_bytes =
+         xorBitmapP->size + andBitmapP->size + 40 + (4 * entryCols);
+     if (verbose)
+diff -urNp a/converter/ppm/ppmtoxpm.c b/converter/ppm/ppmtoxpm.c
+--- a/converter/ppm/ppmtoxpm.c	2025-02-03 09:24:28.329500569 +0100
++++ b/converter/ppm/ppmtoxpm.c	2025-02-03 18:59:21.646266347 +0100
+@@ -193,6 +193,7 @@ numstr(unsigned int const input,
+     unsigned int i;
+ 
+     /* Allocate memory for printed number.  Abort if error. */
++    overflow_add(digitCt, 1);
+     MALLOCARRAY_NOFAIL(str, digitCt + 1);
+ 
+     i = input; /* initial value */
+@@ -296,6 +297,7 @@ genCmap(colorhist_vector const chv,
+    Return as *charsPerPixel the number of characters, or digits, that
+    will be needed in the XPM raster to form an index into this color map.
+ -----------------------------------------------------------------------------*/
++    if (includeTransparent) overflow_add(ncolors, 1);
+     unsigned int const cmapSize = ncolors + (includeTransparent ? 1 : 0);
+ 
+     CixelMap * cmap;  /* malloc'ed */
+diff -urNp a/converter/ppm/qrttoppm.c b/converter/ppm/qrttoppm.c
+--- a/converter/ppm/qrttoppm.c	2025-02-03 09:24:28.331500558 +0100
++++ b/converter/ppm/qrttoppm.c	2025-02-03 19:00:16.846070585 +0100
+@@ -51,6 +51,7 @@ main(int argc, const char ** argv) {
+ 
+     pixelrow = ppm_allocrow(cols);
+ 
++    overflow2(cols, 3);
+     MALLOCARRAY(buf, 3 * cols);
+ 
+     if (!buf)
+diff -urNp a/converter/ppm/sldtoppm.c b/converter/ppm/sldtoppm.c
+--- a/converter/ppm/sldtoppm.c	2025-02-03 09:24:28.330500563 +0100
++++ b/converter/ppm/sldtoppm.c	2025-02-03 19:02:13.580656717 +0100
+@@ -542,6 +542,8 @@ slider(slvecfn         slvec,
+ 
+     /* Allocate image buffer and clear it to black. */
+ 
++    overflow_add(ixdots, 1);
++    overflow_add(iydots, 1);
+     pixcols = ixdots + 1;
+     pixrows = iydots + 1;
+     pixels = ppm_allocarray(pixcols, pixrows);
+diff -urNp a/converter/ppm/ximtoppm.c b/converter/ppm/ximtoppm.c
+--- a/converter/ppm/ximtoppm.c	2025-02-03 09:24:28.330500563 +0100
++++ b/converter/ppm/ximtoppm.c	2025-02-03 19:06:57.979648387 +0100
+@@ -204,8 +204,7 @@ readImageChannel(FILE *         const if
+             }
+             /* return to the beginning of the next image's buffer */
+             if (fseek(ifP, marker, 0) == -1) {
+-                pm_message("ReadImageChannel: can't fseek to location "
+-                           "in image buffer");
++                pm_message("ReadImageChannel: can't fseek to location in image buffer");
+                 return 0;
+             }
+             free(line);
+diff -urNp a/editor/pamcut.c b/editor/pamcut.c
+--- a/editor/pamcut.c	2025-02-03 09:24:28.296500747 +0100
++++ b/editor/pamcut.c	2025-02-04 09:20:22.743237833 +0100
+@@ -833,6 +833,8 @@ cutOneImage(FILE *             const ifP
+     } else {
+         outpam = inpam;    /* Initial value -- most fields should be same */
+         outpam.file   = ofP;
++        overflow_add(rightcol, 1);
++        overflow_add(bottomrow, 1);
+         outpam.width  = rightcol - leftcol + 1;
+         outpam.height = bottomrow - toprow + 1;
+ 
+diff -urNp a/editor/pnmgamma.c b/editor/pnmgamma.c
+--- a/editor/pnmgamma.c	2025-02-03 09:24:28.296500747 +0100
++++ b/editor/pnmgamma.c	2025-02-04 09:21:03.587045507 +0100
+@@ -596,6 +596,7 @@ createGammaTables(enum transferFunction
+                   xelval **             const btableP) {
+ 
+     /* Allocate space for the tables. */
++    overflow_add(maxval, 1);
+     MALLOCARRAY(*rtableP, maxval+1);
+     MALLOCARRAY(*gtableP, maxval+1);
+     MALLOCARRAY(*btableP, maxval+1);
+diff -urNp a/editor/pnmhisteq.c b/editor/pnmhisteq.c
+--- a/editor/pnmhisteq.c	2025-02-03 09:24:28.296500747 +0100
++++ b/editor/pnmhisteq.c	2025-02-04 09:21:41.957864812 +0100
+@@ -106,6 +106,7 @@ computeLuminosityHistogram(xel * const *
+     unsigned int pixelCount;
+     unsigned int * lumahist;
+ 
++    overflow_add(maxval, 1);
+     MALLOCARRAY(lumahist, maxval + 1);
+     if (lumahist == NULL)
+         pm_error("Out of storage allocating array for %u histogram elements",
+diff -urNp a/editor/pnmpad.c b/editor/pnmpad.c
+--- a/editor/pnmpad.c	2025-02-03 09:24:28.299500730 +0100
++++ b/editor/pnmpad.c	2025-02-04 09:22:39.237595043 +0100
+@@ -1127,6 +1127,8 @@ main(int argc, const char ** argv) {
+ 
+     computePadSizes(cmdline, cols, rows, &lpad, &rpad, &tpad, &bpad);
+ 
++    overflow_add(cols, lpad);
++    overflow_add(cols + lpad, rpad);
+     newcols = cols + lpad + rpad;
+ 
+     if (cmdline.reportonly)
+diff -urNp a/editor/pnmremap.c b/editor/pnmremap.c
+--- a/editor/pnmremap.c	2025-02-03 09:24:28.296500747 +0100
++++ b/editor/pnmremap.c	2025-02-04 09:42:44.340919042 +0100
+@@ -468,6 +468,7 @@ fserr_init(struct pam *   const pamP,
+ -----------------------------------------------------------------------------*/
+     unsigned int plane;
+ 
++    overflow_add(pamP->width, 2);
+     unsigned int const fserrSz = pamP->width + 2;
+ 
+     fserrP->width = pamP->width;
+@@ -508,6 +509,7 @@ floydInitRow(struct pam *   const pamP,
+ 
+     unsigned int col;
+ 
++    overflow_add(pamP->width, 2);
+     for (col = 0; col < pamP->width + 2; ++col) {
+         unsigned int plane;
+         for (plane = 0; plane < pamP->depth; ++plane)
+diff -urNp a/editor/pnmscalefixed.c b/editor/pnmscalefixed.c
+--- a/editor/pnmscalefixed.c	2025-02-03 09:24:28.299500730 +0100
++++ b/editor/pnmscalefixed.c	2025-02-04 09:49:53.152275133 +0100
+@@ -215,6 +215,7 @@ compute_output_dimensions(const struct c
+                           const int rows, const int cols,
+                           int * newrowsP, int * newcolsP) {
+ 
++    overflow2(rows, cols);
+     if (cmdline.pixels) {
+         if (rows <= cmdline.pixels / cols) {
+             *newrowsP = rows;
+@@ -222,6 +223,8 @@ compute_output_dimensions(const struct c
+         } else {
+             const double scale =
+                 sqrt( (float) cmdline.pixels / ((float) cols * (float) rows));
++            overflow2(rows, scale);
++            overflow2(scale, cols);
+             *newrowsP = rows * scale;
+             *newcolsP = cols * scale;
+         }
+@@ -455,6 +458,9 @@ main(int argc, char **argv ) {
+         pm_error("New image width (%d) is uncomputably large", newcols);
+     if (newrows > INT_MAX / SCALE)
+         pm_error("New image height (%d) is uncomputably large", newrows);
++
++    overflow2(newcols, SCALE);
++    overflow2(newrows, SCALE);
+     sxscale = SCALE * newcols / cols;
+     syscale = SCALE * newrows / rows;
+ 
+diff -urNp a/editor/specialty/pamoil.c b/editor/specialty/pamoil.c
+--- a/editor/specialty/pamoil.c	2025-02-03 09:24:28.301500720 +0100
++++ b/editor/specialty/pamoil.c	2025-02-04 09:56:21.543650456 +0100
+@@ -185,6 +185,7 @@ main(int argc, const char ** argv) {
+ 
+     tuples = pnm_readpam(ifP, &inpam, PAM_STRUCT_SIZE(tuple_type));
+ 
++    overflow_add(inpam.maxval, 1);
+     MALLOCARRAY(hist, inpam.maxval + 1);
+     if (hist == NULL)
+         pm_error("Unable to allocate memory for histogram.");
+diff -urNp a/lib/libpam.c b/lib/libpam.c
+--- a/lib/libpam.c	2025-02-03 09:24:28.326500585 +0100
++++ b/lib/libpam.c	2025-02-04 10:04:33.126859799 +0100
+@@ -258,6 +258,7 @@ allocPamRow(const struct pam * const pam
+     unsigned int const bytesPerTuple = allocationDepth(pamP) * sizeof(sample);
+     tuple * tuplerow;
+ 
++    overflow_add(sizeof(tuple *), bytesPerTuple);
+     tuplerow = malloc(pamP->width * (sizeof(tuple *) + bytesPerTuple));
+ 
+     if (tuplerow != NULL) {
+diff -urNp a/lib/libpammap.c b/lib/libpammap.c
+--- a/lib/libpammap.c	2025-02-03 09:24:28.325500590 +0100
++++ b/lib/libpammap.c	2025-02-04 10:05:45.382614292 +0100
+@@ -111,6 +111,9 @@ allocTupleIntListItem(struct pam * const
+     if (pamP->depth > (UINT_MAX - sizeof(*retval)) / sizeof(sample))
+         pm_error("Depth %u is too large for computation", pamP->depth);
+ 
++    overflow2(pamP->depth, sizeof(sample));
++    overflow_add(sizeof(*retval)-sizeof(retval->tupleint.tuple), pamP->depth*sizeof(sample));
++
+     unsigned int const size =
+         sizeof(*retval) - sizeof(retval->tupleint.tuple)
+         + pamP->depth * sizeof(sample);
+diff -urNp a/lib/libpm.c b/lib/libpm.c
+--- a/lib/libpm.c	2025-02-03 09:24:28.324500595 +0100
++++ b/lib/libpm.c	2025-02-04 10:27:02.795619696 +0100
+@@ -926,4 +926,52 @@ pm_parse_maxval(const char * const arg)
+     return maxval;
+ }
+ 
++/*
++ * Maths wrapping
++ */
++
++void __overflow2(int a, int b)
++{
++        if(a < 0 || b < 0)
++                pm_error("object too large");
++        if(b == 0)
++                return;
++        if(a > INT_MAX / b)
++                pm_error("object too large");
++}
++
++void overflow3(int a, int b, int c)
++{
++        overflow2(a,b);
++        overflow2(a*b, c);
++}
++
++void overflow_add(int a, int b)
++{
++        if( a > INT_MAX - b)
++                pm_error("object too large");
++}
++
++void *malloc2(int a, int b)
++{
++        overflow2(a, b);
++        if(a*b == 0)
++                pm_error("Zero byte allocation");
++        return malloc(a*b);
++}
++
++void *malloc3(int a, int b, int c)
++{
++        overflow3(a, b, c);
++        if(a*b*c == 0)
++                pm_error("Zero byte allocation");
++        return malloc(a*b*c);
++}
++void *realloc2(void * a, int b, int c)
++{
++       overflow2(b, c);
++       if(b*c == 0)
++                pm_error("Zero byte allocation");
++        return realloc(a, b*c);
++}
+ 
+diff -urNp a/lib/pm.h b/lib/pm.h
+--- a/lib/pm.h	2025-02-03 09:24:28.327500579 +0100
++++ b/lib/pm.h	2025-02-04 10:28:10.427411309 +0100
+@@ -439,6 +439,13 @@ pm_parse_height(const char * const arg);
+ unsigned int
+ pm_parse_maxval(const char * const arg);
+ 
++void *malloc2(int, int);
++void *malloc3(int, int, int);
++#define overflow2(a,b) __overflow2(a,b)
++void __overflow2(int, int);
++void overflow3(int, int, int);
++void overflow_add(int, int);
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff -urNp a/other/pnmcolormap.c b/other/pnmcolormap.c
+--- a/other/pnmcolormap.c	2025-02-03 09:24:28.303500709 +0100
++++ b/other/pnmcolormap.c	2025-02-04 10:29:08.620231936 +0100
+@@ -1130,8 +1130,10 @@ colormapToSquare(struct pam * const pamP
+         unsigned int const intsqrt = (int)sqrt((float)colormap.size);
+         if (SQR(intsqrt) == colormap.size)
+             pamP->width = intsqrt;
+-        else
++        else {
++            overflow_add(intsqrt, 1);
+             pamP->width = intsqrt + 1;
++        }
+     }
+     {
+         unsigned int const intQuotient = colormap.size / pamP->width;
+diff -urNp a/urt/rle_addhist.c b/urt/rle_addhist.c
+--- a/urt/rle_addhist.c	2025-02-03 09:24:28.360500401 +0100
++++ b/urt/rle_addhist.c	2025-02-04 10:37:56.010607217 +0100
+@@ -52,6 +52,8 @@ newCommentLen(const char *  const histoi
+     for (i = 0; argv[i]; ++i) {
+         size_t const thisArgLen = strlen(argv[i]);
+         if (thisArgLen < UINT_MAX - length - 100) {
++            overflow_add(length, thisArgLen);
++            overflow_add(length+thisArgLen, 1);
+             length += thisArgLen;
+             length += 1;  /* For the space */
+         }
+@@ -61,10 +63,16 @@ newCommentLen(const char *  const histoi
+     length += strlen(timedate);
+ 
+     /* Add length of padding, "on ", and length of history name plus "="*/
++    overflow_add(strlen(padding), 4);
++    overflow_add(strlen(histoire), strlen(padding) + 4);
++    overflow_add(length, strlen(histoire) + strlen(padding) + 4);
+     length += strlen(padding) + 3 + strlen(histoire) + 1;
+ 
+-    if (old && *old)
++    overflow_add(length, 1);
++    if (old && *old) {
++        overflow_add(length, strlen(old));
+         length += strlen(old);       /* add length if there. */
++    }
+ 
+     ++length;     /* Add size of terminating NUL. */
+ 
+diff -urNp a/urt/rle.h b/urt/rle.h
+--- a/urt/rle.h	2025-02-03 09:24:28.360500401 +0100
++++ b/urt/rle.h	2025-02-04 10:33:12.842479585 +0100
+@@ -153,6 +153,17 @@ rle_hdr             /* End of typedef. *
+  */
+ extern rle_hdr rle_dflt_hdr;
+ 
++/*
++ * Provided by pm library
++ */
++
++extern void overflow_add(int, int);
++#define overflow2(a,b) __overflow2(a,b)
++extern void __overflow2(int, int);
++extern void overflow3(int, int, int);
++extern void *malloc2(int, int);
++extern void *malloc3(int, int, int);
++extern void *realloc2(void *, int, int);
+ 
+ /* Declare RLE library routines. */
+ 
+diff -urNp a/urt/rle_hdr.c b/urt/rle_hdr.c
+--- a/urt/rle_hdr.c	2025-02-03 09:24:28.360500401 +0100
++++ b/urt/rle_hdr.c	2025-02-04 10:42:11.745682618 +0100
+@@ -148,7 +148,7 @@ rle_hdr_cp(rle_hdr * const fromHdrP,
+     if (toHdrP->cmap) {
+         size_t const size =
+             toHdrP->ncmap * (1 << toHdrP->cmaplen) * sizeof(rle_map);
+-        toHdrP->cmap = malloc(size);
++        toHdrP->cmap = malloc3(toHdrP->ncmap, 1<<toHdrP->cmaplen, sizeof(rle_map));
+         if (!toHdrP->cmap)
+             pm_error("Failed to allocate memory for %u color maps "
+                      "of length %u", toHdrP->ncmap, 1 << toHdrP->cmaplen);
+@@ -163,12 +163,16 @@ rle_hdr_cp(rle_hdr * const fromHdrP,
+         const char ** cp;
+ 
+         /* Count the comments. */
+-        for (cp = toHdrP->comments, size = 0; *cp; ++cp)
++        for (cp = toHdrP->comments, size = 0; *cp; ++cp) {
++            overflow_add(size,1);
+             ++size;
++        }
+ 
+         /* Check if there are really any comments. */
+         if (size > 0) {
++            overflow_add(size,1);
+             ++size;     /* Copy the NULL pointer, too. */
++            overflow2(size, sizeof(char *));
+             size *= sizeof(char *);
+             toHdrP->comments = malloc(size);
+             if (!toHdrP->comments)
+diff -urNp a/urt/rle_putcom.c b/urt/rle_putcom.c
+--- a/urt/rle_putcom.c	2025-02-03 09:24:28.360500401 +0100
++++ b/urt/rle_putcom.c	2025-02-04 10:43:04.472477242 +0100
+@@ -101,6 +101,7 @@ rle_putcom(const char * const value,
+         for (i = 2, cp = hdrP->comments;
+              *cp != NULL && i < UINT_MAX;
+              ++i, ++cp) {
++            overflow_add(i, 1);
+             if (match(value, *cp) != NULL) {
+                 v = *cp;
+                 *cp = value;
+diff -urNp a/urt/Runput.c b/urt/Runput.c
+--- a/urt/Runput.c	2025-02-03 09:24:28.360500401 +0100
++++ b/urt/Runput.c	2025-02-04 10:30:24.683997548 +0100
+@@ -236,7 +236,7 @@ RunSetup(rle_hdr * const hdrP) {
+         int * bg_color;
+ 
+         assert(hdrP->ncolors < UINT_MAX);
+-
++        overflow_add(hdrP->ncolors, 1);
+         MALLOCARRAY_NOFAIL(background, hdrP->ncolors + 1);
+ 
+         /* If even number of bg color bytes, put out one more to get to

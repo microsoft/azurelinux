@@ -1,0 +1,25 @@
+From 687722bb07677758ca463eba433e9fecc32038ee Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Fri, 5 Apr 2024 11:40:43 +0200
+Subject: [PATCH] drop deny(warnings) from doctests
+
+---
+ src/lib.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index 1234a56..de7a009 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -34,7 +34,7 @@
+ )]
+ #![deny(missing_docs)]
+ #![deny(missing_debug_implementations)]
+-#![doc(test(attr(allow(unused_variables), deny(warnings))))]
++#![doc(test(attr(allow(unused_variables))))]
+ #![cfg_attr(doc_cfg, feature(doc_cfg))]
+ #![no_std]
+ 
+-- 
+2.44.0
+

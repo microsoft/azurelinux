@@ -1,0 +1,33 @@
+From db6229c1325d6ba762e628a3ba9b44759b36fba5 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Fri, 6 Dec 2024 18:49:42 +0100
+Subject: [PATCH] Support single quote instead of backtick for Ruby 3.4
+
+Use a single quote instead of a backtick as an opening quote.
+[[Feature #16495](https://bugs.ruby-lang.org/]issues/16495)]
+---
+ test/integration/shared_tests.rb | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/test/integration/shared_tests.rb b/test/integration/shared_tests.rb
+index 5107c3b8..0d4d972f 100644
+--- a/test/integration/shared_tests.rb
++++ b/test/integration/shared_tests.rb
+@@ -156,6 +156,8 @@ module SharedTests
+   end
+ 
+   def test_real_object_expectation_does_not_leak_into_subsequent_test
++    opening_quote = Mocha::RUBY_V34_PLUS ? "'" : '`'
++
+     execution_point = nil
+     klass = Class.new
+     test_result = run_as_tests(
+@@ -170,7 +172,7 @@ module SharedTests
+     assert_errored(test_result)
+     exception = test_result.errors.first.exception
+     assert_equal execution_point, ExecutionPoint.new(exception.backtrace)
+-    assert_match(/undefined method `foo'/, exception.message)
++    assert_match(/undefined method #{opening_quote}foo'/, exception.message)
+   end
+ 
+   def test_leaky_mock

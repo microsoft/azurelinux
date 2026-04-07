@@ -1,0 +1,416 @@
+From 98961a83f07573eeeb0dab636d4f65782708746e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Collonval?= <fcollonval@gmail.com>
+Date: Mon, 30 Dec 2024 12:00:27 +0100
+Subject: [PATCH 01/13] Add support for mistune 3.1.0
+
+---
+ nbconvert/filters/markdown_mistune.py | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/nbconvert/filters/markdown_mistune.py b/nbconvert/filters/markdown_mistune.py
+index 02ab346e0..79151ecc6 100644
+--- a/nbconvert/filters/markdown_mistune.py
++++ b/nbconvert/filters/markdown_mistune.py
+@@ -32,6 +32,7 @@
+     )
+ 
+     MISTUNE_V3 = True
++    MISTUNE_V3_ATX = "atx_heading" in BlockParser.SPECIFICATIONS
+ 
+ except ImportError:  # for Mistune >= 2.0
+     import re
+@@ -45,6 +46,7 @@
+     )
+ 
+     MISTUNE_V3 = False
++    MISTUNE_V3_ATX = False
+ 
+     def import_plugin(name: str) -> "MarkdownPlugin":  # type: ignore[misc]
+         """Simple implementation of Mistune V3's import_plugin for V2."""
+@@ -75,8 +77,9 @@ class MathBlockParser(BlockParser):
+         is ignored here.
+         """
+ 
+-        AXT_HEADING_WITHOUT_LEADING_SPACES = (
+-            r"^ {0,3}(?P<axt_1>#{1,6})(?!#+)(?P<axt_2>[ \t]*(.*?)?)$"
++        ATX_HEADING_WITHOUT_LEADING_SPACES = (
++            r"^ {0,3}(?P<atx_1>#{1,6})(?!#+)(?P<atx_2>[ \t]*(.*?)?)$"
++            if MISTUNE_V2_ATX else r"^ {0,3}(?P<axt_1>#{1,6})(?!#+)(?P<axt_2>[ \t]*(.*?)?)$"
+         )
+ 
+         MULTILINE_MATH = _dotall(
+@@ -92,7 +95,7 @@ class MathBlockParser(BlockParser):
+ 
+         SPECIFICATION = {
+             **BlockParser.SPECIFICATION,
+-            "axt_heading": AXT_HEADING_WITHOUT_LEADING_SPACES,
++            ("atx_heading" if MISTUNE_V3_ATX else "axt_heading"): ATX_HEADING_WITHOUT_LEADING_SPACES,
+             "multiline_math": MULTILINE_MATH,
+         }
+ 
+
+From d3e57502d7dc648be261d1271576e3fe4485f6be Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Collonval?= <fcollonval@gmail.com>
+Date: Mon, 30 Dec 2024 12:01:27 +0100
+Subject: [PATCH 02/13] Fix constant name
+
+---
+ nbconvert/filters/markdown_mistune.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/nbconvert/filters/markdown_mistune.py b/nbconvert/filters/markdown_mistune.py
+index 79151ecc6..213737913 100644
+--- a/nbconvert/filters/markdown_mistune.py
++++ b/nbconvert/filters/markdown_mistune.py
+@@ -79,7 +79,7 @@ class MathBlockParser(BlockParser):
+ 
+         ATX_HEADING_WITHOUT_LEADING_SPACES = (
+             r"^ {0,3}(?P<atx_1>#{1,6})(?!#+)(?P<atx_2>[ \t]*(.*?)?)$"
+-            if MISTUNE_V2_ATX else r"^ {0,3}(?P<axt_1>#{1,6})(?!#+)(?P<axt_2>[ \t]*(.*?)?)$"
++            if MISTUNE_V3_ATX else r"^ {0,3}(?P<axt_1>#{1,6})(?!#+)(?P<axt_2>[ \t]*(.*?)?)$"
+         )
+ 
+         MULTILINE_MATH = _dotall(
+
+From eeff5163f2298af7b7b5f1e6088e16b6c88075a4 Mon Sep 17 00:00:00 2001
+From: "pre-commit-ci[bot]"
+ <66853113+pre-commit-ci[bot]@users.noreply.github.com>
+Date: Mon, 30 Dec 2024 11:01:47 +0000
+Subject: [PATCH 03/13] [pre-commit.ci] auto fixes from pre-commit.com hooks
+
+for more information, see https://pre-commit.ci
+---
+ nbconvert/filters/markdown_mistune.py | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/nbconvert/filters/markdown_mistune.py b/nbconvert/filters/markdown_mistune.py
+index 213737913..b4a204ce9 100644
+--- a/nbconvert/filters/markdown_mistune.py
++++ b/nbconvert/filters/markdown_mistune.py
+@@ -79,7 +79,8 @@ class MathBlockParser(BlockParser):
+ 
+         ATX_HEADING_WITHOUT_LEADING_SPACES = (
+             r"^ {0,3}(?P<atx_1>#{1,6})(?!#+)(?P<atx_2>[ \t]*(.*?)?)$"
+-            if MISTUNE_V3_ATX else r"^ {0,3}(?P<axt_1>#{1,6})(?!#+)(?P<axt_2>[ \t]*(.*?)?)$"
++            if MISTUNE_V3_ATX
++            else r"^ {0,3}(?P<axt_1>#{1,6})(?!#+)(?P<axt_2>[ \t]*(.*?)?)$"
+         )
+ 
+         MULTILINE_MATH = _dotall(
+@@ -95,7 +96,9 @@ class MathBlockParser(BlockParser):
+ 
+         SPECIFICATION = {
+             **BlockParser.SPECIFICATION,
+-            ("atx_heading" if MISTUNE_V3_ATX else "axt_heading"): ATX_HEADING_WITHOUT_LEADING_SPACES,
++            (
++                "atx_heading" if MISTUNE_V3_ATX else "axt_heading"
++            ): ATX_HEADING_WITHOUT_LEADING_SPACES,
+             "multiline_math": MULTILINE_MATH,
+         }
+ 
+
+From d0b336df3ffe5284d3190c5f45fc19835ad89789 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Collonval?= <fcollonval@gmail.com>
+Date: Mon, 30 Dec 2024 12:04:16 +0100
+Subject: [PATCH 04/13] Fix class attribute name
+
+---
+ nbconvert/filters/markdown_mistune.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/nbconvert/filters/markdown_mistune.py b/nbconvert/filters/markdown_mistune.py
+index b4a204ce9..f198e5788 100644
+--- a/nbconvert/filters/markdown_mistune.py
++++ b/nbconvert/filters/markdown_mistune.py
+@@ -32,7 +32,7 @@
+     )
+ 
+     MISTUNE_V3 = True
+-    MISTUNE_V3_ATX = "atx_heading" in BlockParser.SPECIFICATIONS
++    MISTUNE_V3_ATX = "atx_heading" in BlockParser.SPECIFICATION
+ 
+ except ImportError:  # for Mistune >= 2.0
+     import re
+
+From 7976a4a5f5a728ab70a88ff57f2067cb5a88e898 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Collonval?= <fcollonval@gmail.com>
+Date: Tue, 31 Dec 2024 10:44:17 +0100
+Subject: [PATCH 05/13] Fix mypy errors
+
+---
+ nbconvert/filters/markdown_mistune.py | 20 ++++++++++++--------
+ 1 file changed, 12 insertions(+), 8 deletions(-)
+
+diff --git a/nbconvert/filters/markdown_mistune.py b/nbconvert/filters/markdown_mistune.py
+index f198e5788..414583d27 100644
+--- a/nbconvert/filters/markdown_mistune.py
++++ b/nbconvert/filters/markdown_mistune.py
+@@ -9,7 +9,7 @@
+ import mimetypes
+ import os
+ from html import escape
+-from typing import Any, Callable, Dict, Iterable, Match, Optional, Tuple
++from typing import TYPE_CHECKING, Any, Callable, Dict, Iterable, Match, Optional, Tuple
+ 
+ import bs4
+ from pygments import highlight
+@@ -53,6 +53,14 @@ def import_plugin(name: str) -> "MarkdownPlugin":  # type: ignore[misc]
+         return PLUGINS[name]  # type: ignore[no-any-return]
+ 
+ 
++if TYPE_CHECKING:
++    try:
++        from mistune.plugins import Plugin
++    except ImportError:
++        class Plugin(Protocol):
++            def __call__(self, markdown: "Markdown") -> None: ...
++
++
+ class InvalidNotebook(Exception):
+     """An invalid notebook model."""
+ 
+@@ -103,7 +111,7 @@ class MathBlockParser(BlockParser):
+         }
+ 
+         # Multiline math must be searched before other rules
+-        DEFAULT_RULES: Tuple[str, ...] = ("multiline_math", *BlockParser.DEFAULT_RULES)  # type: ignore[assignment]
++        DEFAULT_RULES: ClassVar[Iterable[str]] = ("multiline_math", *BlockParser.DEFAULT_RULES)  # type: ignore[assignment]
+ 
+         def parse_multiline_math(self, m: Match[str], state: BlockState) -> int:
+             """Send mutiline math as a single paragraph to MathInlineParser."""
+@@ -145,7 +153,7 @@ class MathInlineParser(InlineParser):
+         }
+ 
+         # Block math must be matched first, and all math must come before text
+-        DEFAULT_RULES: Tuple[str, ...] = (
++        DEFAULT_RULES: ClassVar[Iterable[str]] = (
+             "block_math_tex",
+             "block_math_latex",
+             "inline_math_tex",
+@@ -448,10 +456,6 @@ def _html_embed_images(self, html: str) -> str:
+         return str(parsed_html)
+ 
+ 
+-# Represents an already imported plugin for Mistune
+-MarkdownPlugin = Callable[[Markdown], None]
+-
+-
+ class MarkdownWithMath(Markdown):
+     """Markdown text with math enabled."""
+ 
+@@ -470,7 +474,7 @@ def __init__(
+         renderer: HTMLRenderer,
+         block: Optional[BlockParser] = None,
+         inline: Optional[InlineParser] = None,
+-        plugins: Optional[Iterable[MarkdownPlugin]] = None,
++        plugins: Optional[Iterable["Plugin"]] = None,
+     ):
+         """Initialize the parser."""
+         if block is None:
+
+From b11cbdb41a121df4602d63dffecf30a18a3d0c22 Mon Sep 17 00:00:00 2001
+From: "pre-commit-ci[bot]"
+ <66853113+pre-commit-ci[bot]@users.noreply.github.com>
+Date: Tue, 31 Dec 2024 09:44:31 +0000
+Subject: [PATCH 06/13] [pre-commit.ci] auto fixes from pre-commit.com hooks
+
+for more information, see https://pre-commit.ci
+---
+ nbconvert/filters/markdown_mistune.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/nbconvert/filters/markdown_mistune.py b/nbconvert/filters/markdown_mistune.py
+index 414583d27..9a750d13b 100644
+--- a/nbconvert/filters/markdown_mistune.py
++++ b/nbconvert/filters/markdown_mistune.py
+@@ -57,6 +57,7 @@ def import_plugin(name: str) -> "MarkdownPlugin":  # type: ignore[misc]
+     try:
+         from mistune.plugins import Plugin
+     except ImportError:
++
+         class Plugin(Protocol):
+             def __call__(self, markdown: "Markdown") -> None: ...
+ 
+
+From c4e9769ad1f06808055ca627cccd26d161a1c8f4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Collonval?= <fcollonval@gmail.com>
+Date: Tue, 31 Dec 2024 10:50:06 +0100
+Subject: [PATCH 07/13] Fix typing import
+
+---
+ nbconvert/filters/markdown_mistune.py | 23 ++++++++++++-----------
+ 1 file changed, 12 insertions(+), 11 deletions(-)
+
+diff --git a/nbconvert/filters/markdown_mistune.py b/nbconvert/filters/markdown_mistune.py
+index 9a750d13b..15857ba98 100644
+--- a/nbconvert/filters/markdown_mistune.py
++++ b/nbconvert/filters/markdown_mistune.py
+@@ -9,7 +9,7 @@
+ import mimetypes
+ import os
+ from html import escape
+-from typing import TYPE_CHECKING, Any, Callable, Dict, Iterable, Match, Optional, Tuple
++from typing import TYPE_CHECKING, Any, ClassVar, Dict, Iterable, Match, Optional, Protocol, Tuple
+ 
+ import bs4
+ from pygments import highlight
+@@ -20,6 +20,16 @@
+ 
+ from nbconvert.filters.strings import add_anchor
+ 
++
++if TYPE_CHECKING:
++    try:
++        from mistune.plugins import Plugin
++    except ImportError:
++
++        class Plugin(Protocol):
++            def __call__(self, markdown: "Markdown") -> None: ...
++
++
+ try:  # for Mistune >= 3.0
+     from mistune import (  # type:ignore[attr-defined]
+         BlockParser,
+@@ -48,20 +58,11 @@
+     MISTUNE_V3 = False
+     MISTUNE_V3_ATX = False
+ 
+-    def import_plugin(name: str) -> "MarkdownPlugin":  # type: ignore[misc]
++    def import_plugin(name: str) -> "Plugin":  # type: ignore[misc]
+         """Simple implementation of Mistune V3's import_plugin for V2."""
+         return PLUGINS[name]  # type: ignore[no-any-return]
+ 
+ 
+-if TYPE_CHECKING:
+-    try:
+-        from mistune.plugins import Plugin
+-    except ImportError:
+-
+-        class Plugin(Protocol):
+-            def __call__(self, markdown: "Markdown") -> None: ...
+-
+-
+ class InvalidNotebook(Exception):
+     """An invalid notebook model."""
+ 
+
+From 6eb411df68f60c678b49627f9717cc68366c3f81 Mon Sep 17 00:00:00 2001
+From: "pre-commit-ci[bot]"
+ <66853113+pre-commit-ci[bot]@users.noreply.github.com>
+Date: Tue, 31 Dec 2024 09:50:18 +0000
+Subject: [PATCH 08/13] [pre-commit.ci] auto fixes from pre-commit.com hooks
+
+for more information, see https://pre-commit.ci
+---
+ nbconvert/filters/markdown_mistune.py | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/nbconvert/filters/markdown_mistune.py b/nbconvert/filters/markdown_mistune.py
+index 15857ba98..033b6e4c4 100644
+--- a/nbconvert/filters/markdown_mistune.py
++++ b/nbconvert/filters/markdown_mistune.py
+@@ -20,7 +20,6 @@
+ 
+ from nbconvert.filters.strings import add_anchor
+ 
+-
+ if TYPE_CHECKING:
+     try:
+         from mistune.plugins import Plugin
+
+From 003681153dc2c96be018fae5e9475cd966dcfeaf Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Collonval?= <fcollonval@gmail.com>
+Date: Tue, 31 Dec 2024 11:00:42 +0100
+Subject: [PATCH 09/13] Fix mypy complain
+
+---
+ nbconvert/filters/markdown_mistune.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/nbconvert/filters/markdown_mistune.py b/nbconvert/filters/markdown_mistune.py
+index 033b6e4c4..9968adbbb 100644
+--- a/nbconvert/filters/markdown_mistune.py
++++ b/nbconvert/filters/markdown_mistune.py
+@@ -25,7 +25,7 @@
+         from mistune.plugins import Plugin
+     except ImportError:
+ 
+-        class Plugin(Protocol):
++        class Plugin(Protocol):  # type: ignore[no-redef]
+             def __call__(self, markdown: "Markdown") -> None: ...
+ 
+ 
+
+From 483b7e1fb95ac57dc7e6e8638b61a887094f6d68 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Collonval?= <fcollonval@gmail.com>
+Date: Tue, 31 Dec 2024 11:06:15 +0100
+Subject: [PATCH 10/13] Fix interrogate check
+
+---
+ nbconvert/filters/markdown_mistune.py | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/nbconvert/filters/markdown_mistune.py b/nbconvert/filters/markdown_mistune.py
+index 9968adbbb..744bcba84 100644
+--- a/nbconvert/filters/markdown_mistune.py
++++ b/nbconvert/filters/markdown_mistune.py
+@@ -26,7 +26,10 @@
+     except ImportError:
+ 
+         class Plugin(Protocol):  # type: ignore[no-redef]
+-            def __call__(self, markdown: "Markdown") -> None: ...
++            """Mistune plugin interface."""
++            def __call__(self, markdown: "Markdown") -> None:
++                """Apply the plugin on the markdown document."""
++                ...
+ 
+ 
+ try:  # for Mistune >= 3.0
+
+From 188cd3ba81dc582015e6450ec404ec87eabf03e1 Mon Sep 17 00:00:00 2001
+From: "pre-commit-ci[bot]"
+ <66853113+pre-commit-ci[bot]@users.noreply.github.com>
+Date: Tue, 31 Dec 2024 10:06:27 +0000
+Subject: [PATCH 11/13] [pre-commit.ci] auto fixes from pre-commit.com hooks
+
+for more information, see https://pre-commit.ci
+---
+ nbconvert/filters/markdown_mistune.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/nbconvert/filters/markdown_mistune.py b/nbconvert/filters/markdown_mistune.py
+index 744bcba84..fb8828167 100644
+--- a/nbconvert/filters/markdown_mistune.py
++++ b/nbconvert/filters/markdown_mistune.py
+@@ -27,6 +27,7 @@
+ 
+         class Plugin(Protocol):  # type: ignore[no-redef]
+             """Mistune plugin interface."""
++
+             def __call__(self, markdown: "Markdown") -> None:
+                 """Apply the plugin on the markdown document."""
+                 ...
+
+From dc5dc068867ccfbca0ddf16f3024f21e99ab1bc1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Micha=C5=82=20Krassowski?=
+ <5832902+krassowski@users.noreply.github.com>
+Date: Thu, 2 Jan 2025 10:10:23 +0000
+Subject: [PATCH 12/13] Fix failing link check
+
+---
+ docs/source/nbconvert_library.ipynb | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/docs/source/nbconvert_library.ipynb b/docs/source/nbconvert_library.ipynb
+index dc9ea0e1e..7757235ad 100644
+--- a/docs/source/nbconvert_library.ipynb
++++ b/docs/source/nbconvert_library.ipynb
+@@ -486,7 +486,7 @@
+    "cell_type": "markdown",
+    "metadata": {},
+    "source": [
+-    "@damianavila wrote the Nikola Plugin to [write blog post as Notebooks](http://damianavila.github.io/blog/posts/one-line-deployment-of-your-site-to-gh-pages.html) and is developing a js-extension to publish notebooks via one click from the web app."
++    "@damianavila wrote the Nikola Plugin to [write blog post as Notebooks](https://damianavila.github.io/blog/posts/one-line-deployment-of-your-site-to-gh-pages) and is developing a js-extension to publish notebooks via one click from the web app."
+    ]
+   }
+  ],

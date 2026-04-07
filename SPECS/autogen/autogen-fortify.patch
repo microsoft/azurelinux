@@ -1,0 +1,95 @@
+commit 772b282a4e858a27af610bcdcc8b66925cbf1a83
+Author: Tomas Korbar <tkorbar@redhat.com>
+Date:   Tue Feb 28 16:08:13 2023 +0100
+
+    avoid GCC code analysis bug
+
+diff --git a/agen5/defLoad.c b/agen5/defLoad.c
+index 0215857..b687263 100644
+--- a/agen5/defLoad.c
++++ b/agen5/defLoad.c
+@@ -448,17 +448,28 @@ read_defs(void)
+     FILE *        fp;
+     def_input_mode_t in_mode = ready_def_input(&def_fname, &data_sz);
+ 
++    /*
++     * "ready_def_input" has a lot of side effects. It's possible that
++     * there are no definitions, so "in_mode" is set to DONE and there's
++     * nothing to do.
++     */
+     if (in_mode == INPUT_DONE)
+         return;
+ 
+     /*
+      *  Allocate the space we need for our definitions.
++     * "data_sz" was set by read_def_input to the size of the
++     * definitions file (or 4096 if we're reading from a fifo file).
++     * In that alternate case, we'll start the input size at 4096 bytes.
++     * The allocation includes space for context and a NUL byte or two
+      */
+-    rem_sz = data_sz+4+sizeof(*base_ctx);
+-    base_ctx = (scan_ctx_t *)AGALOC(rem_sz, "file buf");
+-    memset(VOIDP(base_ctx), 0, rem_sz);
++    {
++        size_t sz = data_sz + sizeof(long) + sizeof(*base_ctx);
++        base_ctx = (scan_ctx_t *)AGALOC(sz, "file buf");
++        memset(VOIDP(base_ctx), 0, sz);
++    }
+     base_ctx->scx_line = 1;
+-    rem_sz = data_sz;
++    rem_sz = data_sz; // size available for storing def text
+ 
+     /*
+      *  Our base context will have its currency pointer set to this
+@@ -482,6 +493,9 @@ read_defs(void)
+         if (fp == NULL)
+             AG_CANT(READ_DEF_OPEN, def_fname);
+ 
++        /*
++         * If we're emitting dependency information, then do so.
++         */
+         if (dep_fp != NULL)
+             add_source_file(def_fname);
+     }
+@@ -516,8 +530,7 @@ read_defs(void)
+          *  See if there is any space left
+          */
+         if (rem_sz == 0) {
+-            scan_ctx_t * p;
+-            off_t dataOff;
++            off_t scan_off;
+ 
+             /*
+              *  IF it is a regular file, then we are done
+@@ -527,24 +540,16 @@ read_defs(void)
+ 
+             /*
+              *  We have more data and we are out of space.
+-             *  Try to reallocate our input buffer.
++             *  AGREALOC will succeed or not return.
+              */
+             data_sz += (rem_sz = 0x1000);
+-            dataOff = data - base_ctx->scx_data;
+-            p = AGREALOC(VOIDP(base_ctx), data_sz + 4 + sizeof(*base_ctx),
+-                         "expand f buf");
++            scan_off = data - base_ctx->scx_data;
++            base_ctx = AGREALOC(VOIDP(base_ctx), data_sz + 4 + sizeof(*base_ctx),
++                                "expand f buf");
+ 
+-            /*
+-             *  The buffer may have moved.  Set the data pointer at an
+-             *  offset within the new buffer and make sure our base pointer
+-             *  has been corrected as well.
+-             */
+-            if (p != base_ctx) {
+-                p->scx_scan = \
+-                    p->scx_data = (char *)(p + 1);
+-                data = p->scx_data + dataOff;
+-                base_ctx = p;
+-            }
++            base_ctx->scx_scan = \
++                base_ctx->scx_data = (char *)(base_ctx + 1);
++            data = base_ctx->scx_data + scan_off;
+         }
+     }
+ 

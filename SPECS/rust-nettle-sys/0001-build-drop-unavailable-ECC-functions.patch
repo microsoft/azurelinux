@@ -1,0 +1,25 @@
+From b0ece22e52e83d23080b90d09d184d6cd9a2329c Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Wed, 16 Mar 2022 12:40:35 +0100
+Subject: [PATCH] build: drop unavailable ECC functions
+
+---
+ build.rs | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/build.rs b/build.rs
+index 7a7c524..3831fed 100644
+--- a/build.rs
++++ b/build.rs
+@@ -184,6 +184,8 @@ fn real_main() -> Result<()> {
+         .blocklist_function("qgcvt")
+         .blocklist_function("qecvt_r")
+         .blocklist_function("qfcvt_r")
++        .blocklist_function("nettle_get_secp_192r1")
++        .blocklist_function("nettle_get_secp_224r1")
+         .size_t_is_usize(true);
+ 
+     if config.have_cv448 {
+-- 
+2.35.1
+

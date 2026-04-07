@@ -1,0 +1,23 @@
+diff --git a/lib/glob/smatch.c b/lib/glob/smatch.c
+--- a/lib/glob/smatch.c
++++ b/lib/glob/smatch.c
+@@ -390,7 +390,7 @@ charcmp_wc (wint_t c1, wint_t c2, int forcecoll)
+   if (c1 == c2)
+     return 0;
+ 
+-  if (forcecoll == 0 && glob_asciirange && c1 <= UCHAR_MAX && c2 <= UCHAR_MAX)
++  if (forcecoll == 0 && glob_asciirange)
+     return ((int)(c1 - c2));
+ 
+   s1[0] = c1;
+diff --git a/patchlevel.h b/patchlevel.h
+--- a/patchlevel.h
++++ b/patchlevel.h
+@@ -25,6 +25,6 @@
+    regexp `^#define[ 	]*PATCHLEVEL', since that's what support/mkversion.sh
+    looks for to find the patch level (for the sccs version string). */
+ 
+-#define PATCHLEVEL 5
++#define PATCHLEVEL 6
+ 
+ #endif /* _PATCHLEVEL_H_ */

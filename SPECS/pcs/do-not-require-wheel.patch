@@ -1,0 +1,63 @@
+From 72588f150e89b6f06810321245a13157b7e00b09 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Tue, 29 Jul 2025 23:42:00 +0200
+Subject: [PATCH] Do not require wheel when setuptools is new enough
+
+Current version of setuptools creates wheels on its own.
+---
+ README.md       | 2 +-
+ configure.ac    | 7 +++++--
+ rpm/pcs.spec.in | 2 +-
+ 3 files changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/README.md b/README.md
+index a06143eba..636485be6 100644
+--- a/README.md
++++ b/README.md
+@@ -47,7 +47,7 @@ Apart from the dependencies listed above, these are also required for
+ installation:
+ 
+ * python development files (packages python3-devel, python3-setuptools 66.1+,
+-  python3-pip, python3-wheel)
++  python3-pip, python3-wheel if python3-setuptools < 71)
+ * ruby development files (package ruby-devel)
+ * rubygems
+ * rubygem bundler (package rubygem-bundler or ruby-bundler or bundler)
+diff --git a/configure.ac b/configure.ac
+index 4e7d36599..0a782bfa7 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -347,12 +347,15 @@ AC_SUBST([PYAGENTX_VERSION])
+ 
+ # pip 19.0 required for PEP517 support
+ PCS_CHECK_PYMOD([pip], [>= 23.0])
+-# pip builds a wheel first
+-PCS_CHECK_PYMOD([wheel])
+ 
+ if test "x$tests_only" != "xyes"; then
+ 	# setuptools 61.0.0 required for PEP621 support
+ 	PCS_CHECK_PYMOD([setuptools], [>= 66.1])
++	# wheel is required if setuptools < 71
++	AC_PIP_MODULE([setuptools], [>= 71], [], [], [need_wheel=yes])
++	if test "x$need_wheel" = "xyes"; then
++		PCS_CHECK_PYMOD([wheel])
++	fi
+ 	PCS_CHECK_PYMOD([cryptography])
+ 	PCS_CHECK_PYMOD([lxml])
+ 	PCS_CHECK_PYMOD([pyparsing], [>= 3.0.0])
+diff --git a/rpm/pcs.spec.in b/rpm/pcs.spec.in
+index 55881a398..639a3e974 100644
+--- a/rpm/pcs.spec.in
++++ b/rpm/pcs.spec.in
+@@ -86,7 +86,7 @@ BuildRequires: python%{python3_version}-pip >= 23
+ BuildRequires: python%{python3_version}-setuptools >= 66.1
+ 
+ # for building wheel during make install
+-BuildRequires: python%{python3_version}-wheel
++BuildRequires: (python%{python3_version}-wheel if python%{python3_version}-setuptools < 71)
+ 
+ # for bundling dateutil
+ %if "@cirpmworkarounds@" != "yes"
+-- 
+2.50.1
+

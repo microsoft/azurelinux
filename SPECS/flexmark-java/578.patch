@@ -1,0 +1,54 @@
+From 1148f93980a9986b3cf4ef8fb13e0d5dbfa44246 Mon Sep 17 00:00:00 2001
+From: palexdev <alessandro.parisi406@gmail.com>
+Date: Mon, 12 Jun 2023 17:57:06 +0200
+Subject: [PATCH] Fix for issue #577, avoid using reflection
+
+Signed-off-by: palexdev <alessandro.parisi406@gmail.com>
+---
+ .../flexmark/util/misc/BitFieldSet.java        | 18 +++++-------------
+ 1 file changed, 5 insertions(+), 13 deletions(-)
+
+diff --git a/flexmark-util-misc/src/main/java/com/vladsch/flexmark/util/misc/BitFieldSet.java b/flexmark-util-misc/src/main/java/com/vladsch/flexmark/util/misc/BitFieldSet.java
+index f1b86a63a..62fb72ca3 100644
+--- a/flexmark-util-misc/src/main/java/com/vladsch/flexmark/util/misc/BitFieldSet.java
++++ b/flexmark-util-misc/src/main/java/com/vladsch/flexmark/util/misc/BitFieldSet.java
+@@ -3,7 +3,6 @@
+ import org.jetbrains.annotations.NotNull;
+ 
+ import java.io.Serializable;
+-import java.lang.reflect.Field;
+ import java.util.AbstractSet;
+ import java.util.Collection;
+ import java.util.Iterator;
+@@ -36,26 +35,19 @@ static class UniverseLoader {
+ 
+         @SuppressWarnings("rawtypes")
+         @NotNull
+-        public static Enum[] getUniverseSlow(Class elementType) {
++        public static <E extends Enum<E>> Enum[] getUniverseSlow(Class<E> elementType) {
+             assert (elementType.isEnum());
+             Enum[] cachedUniverse = enumUniverseMap.get(elementType);
+             if (cachedUniverse != null) return cachedUniverse;
+ 
+-            Field[] fields = elementType.getFields();
+-            int enums = 0;
+-            for (Field field : fields) {
+-                if (field.getType().isEnum()) enums++;
+-            }
+-
++            E[] constants = elementType.getEnumConstants();
++            int enums = constants.length;
+             if (enums > 0) {
+                 cachedUniverse = new Enum[enums];
+ 
+                 enums = 0;
+-                for (Field field : fields) {
+-                    if (field.getType().isEnum()) {
+-                        //noinspection unchecked
+-                        cachedUniverse[enums++] = Enum.valueOf((Class<Enum>) field.getType(), field.getName());
+-                    }
++                for (E constant : constants) {
++                    cachedUniverse[enums++] = constant;
+                 }
+             } else {
+                 cachedUniverse = ZERO_LENGTH_ENUM_ARRAY;

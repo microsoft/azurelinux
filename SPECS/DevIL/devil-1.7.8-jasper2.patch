@@ -1,0 +1,49 @@
+diff -up devil-1.7.8/src-IL/src/il_jp2.c~ devil-1.7.8/src-IL/src/il_jp2.c
+--- devil-1.7.8/src-IL/src/il_jp2.c~	2009-03-08 08:10:09.000000000 +0100
++++ devil-1.7.8/src-IL/src/il_jp2.c	2016-12-04 14:03:14.853568085 +0100
+@@ -314,22 +314,18 @@ ILboolean iLoadJp2Internal(jas_stream_t
+ 
+ 
+ 
+-static int iJp2_file_read(jas_stream_obj_t *obj, char *buf, int cnt)
++static ssize_t iJp2_file_read(void *obj, char *buf, size_t cnt)
+ {
+-	obj;
+ 	return iread(buf, 1, cnt);
+ }
+ 
+-static int iJp2_file_write(jas_stream_obj_t *obj, char *buf, int cnt)
++static ssize_t iJp2_file_write(void *obj, const char *buf, size_t cnt)
+ {
+-	obj;
+ 	return iwrite(buf, 1, cnt);
+ }
+ 
+-static long iJp2_file_seek(jas_stream_obj_t *obj, long offset, int origin)
++static long iJp2_file_seek(void *obj, long offset, int origin)
+ {
+-	obj;
+-
+ 	// We could just pass origin to iseek, but this is probably more portable.
+ 	switch (origin)
+ 	{
+@@ -343,9 +339,8 @@ static long iJp2_file_seek(jas_stream_ob
+ 	return 0;  // Failed
+ }
+ 
+-static int iJp2_file_close(jas_stream_obj_t *obj)
++static int iJp2_file_close(void *obj)
+ {
+-	obj;
+ 	return 0;  // We choose when we want to close the file.
+ }
+ 
+@@ -459,7 +459,7 @@ static void jas_stream_initbuf(jas_strea
+ 			/* The buffer must be large enough to accommodate maximum
+ 			  putback. */
+ 			assert(bufsize > JAS_STREAM_MAXPUTBACK);
+-			stream->bufbase_ = JAS_CAST(uchar *, buf);
++			stream->bufbase_ = JAS_CAST(unsigned char *, buf);
+ 			stream->bufsize_ = bufsize - JAS_STREAM_MAXPUTBACK;
+ 		}
+ 	} else {

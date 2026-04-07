@@ -1,0 +1,36 @@
+diff --git a/gsmclient.c b/gsmclient.c
+index fb93a5c..93e9a64 100644
+--- a/gsmclient.c
++++ b/gsmclient.c
+@@ -182,6 +182,7 @@ gsm_client_init (GsmClient *client, gpointer data)
+   char pid_str[64];
+   int   empty_vector_len = 0;
+   char *empty_vector[] = { NULL };
++  gchar *curdir;
+ 
+   (void)data;
+   client->priv = g_new (GsmClientPrivate, 1);
+@@ -197,8 +198,10 @@ gsm_client_init (GsmClient *client, gpointer data)
+   /* Default property values (this code assumes we start
+    * with an empty proplist)
+    */
++  curdir = g_get_current_dir ();
+   push_prop (client, smprop_new_string (GSM_CLIENT_PROPERTY_CURRENT_DIRECTORY,
+-                                        g_get_current_dir (), -1));
++                                        curdir, -1));
++  g_free(curdir);
+ 
+   g_snprintf (pid_str, sizeof (pid_str), "%d", (int) getpid ());
+   push_prop (client, smprop_new_string (GSM_CLIENT_PROPERTY_PROCESS_ID,
+diff --git a/shvar.c b/shvar.c
+index 0e199c6..62723db 100644
+--- a/shvar.c
++++ b/shvar.c
+@@ -348,6 +348,7 @@ svSetValue(shvarFile *s, const char *key, const char *value)
+ 	    s->modified = 1;
+ 	    goto bail; /* do not need keyValue */
+ 	}
++	else goto bail;
+ 	goto end;
+     }
+ 

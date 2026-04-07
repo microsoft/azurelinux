@@ -1,0 +1,11 @@
+diff -up efl-1.27.0/src/lib/ecore_sdl/meson.build.sdl-version-build ./src/lib/ecore_sdl/meson.build
+--- efl-1.27.0/src/lib/ecore_sdl/meson.build.sdl-version-build	2024-01-02 23:47:25.166780475 +1000
++++ efl-1.27.0/src/lib/ecore_sdl/meson.build	2024-01-02 23:48:41.360082957 +1000
+@@ -19,6 +19,7 @@ ecore_sdl_lib = library('ecore_sdl',
+     include_directories : config_dir + [include_directories(join_paths('..','..'))],
+     install: true,
+     c_args : package_c_args,
++    version : meson.project_version()
+ )
+ 
+ ecore_sdl = declare_dependency(

@@ -1,0 +1,86 @@
+From ad6411ff95bbaf0180a5001ff269047622bc1ae6 Mon Sep 17 00:00:00 2001
+From: Sherry Li <xsli@lbl.gov>
+Date: Sun, 12 Nov 2023 09:56:48 -0800
+Subject: [PATCH] Forgot to push the updates of the version number to 8.2.0
+
+---
+ CMakeLists.txt     | 4 ++--
+ README.md          | 8 +++++---
+ SRC/superlu_defs.h | 7 ++++---
+ 3 files changed, 11 insertions(+), 8 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 723932b9..13ac5f48 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -11,8 +11,8 @@ cmake_minimum_required(VERSION 3.18.1 FATAL_ERROR)
+ #project(SuperLU_DIST C CXX CUDA)
+ project(SuperLU_DIST C CXX)
+ set(VERSION_MAJOR "8")
+-set(VERSION_MINOR "1")
+-set(VERSION_BugFix "2")
++set(VERSION_MINOR "2")
++set(VERSION_BugFix "0")
+ set(PROJECT_VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_BugFix})
+ 
+ list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
+diff --git a/README.md b/README.md
+index 2553989a..fe1b6285 100644
+--- a/README.md
++++ b/README.md
+@@ -1,4 +1,4 @@
+-# SuperLU_DIST (version 8.1.1)   <img align=center width="55" alt="superlu" src="https://user-images.githubusercontent.com/11741943/103982988-5a9a9d00-5139-11eb-9ac4-a55e80a79f8d.png">
++# SuperLU_DIST (version 8.2.0)   <img align=center width="55" alt="superlu" src="https://user-images.githubusercontent.com/11741943/103982988-5a9a9d00-5139-11eb-9ac4-a55e80a79f8d.png">
+ 
+ [![Build Status](https://travis-ci.org/xiaoyeli/superlu_dist.svg?branch=master)](https://travis-ci.org/xiaoyeli/superlu_dist) 
+ [Nightly tests](http://my.cdash.org/index.php?project=superlu_dist)
+@@ -24,7 +24,7 @@ acceleration capabilities.
+ Table of Contents
+ =================
+ 
+-* [SuperLU_DIST (version 8.1.1)   <a href="https://user-images.githubusercontent.com/11741943/103982988-5a9a9d00-5139-11eb-9ac4-a55e80a79f8d.png" target="_blank" rel="nofollow"><img align="center" width="55" alt="superlu" src="https://user-images.githubusercontent.com/11741943/103982988-5a9a9d00-5139-11eb-9ac4-a55e80a79f8d.png" style="max-width:100%;"></a>](#superlu_dist-version-81---)
++* [SuperLU_DIST (version 8.2.0)   <a href="https://user-images.githubusercontent.com/11741943/103982988-5a9a9d00-5139-11eb-9ac4-a55e80a79f8d.png" target="_blank" rel="nofollow"><img align="center" width="55" alt="superlu" src="https://user-images.githubusercontent.com/11741943/103982988-5a9a9d00-5139-11eb-9ac4-a55e80a79f8d.png" style="max-width:100%;"></a>](#superlu_dist-version-82---)
+ * [Directory structure of the source code](#directory-structure-of-the-source-code)
+ * [Installation](#installation)
+    * [Installation option 1: Using CMake build system.](#installation-option-1-using-cmake-build-system)
+@@ -49,7 +49,7 @@ Table of Contents
+ 
+ Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
+ 
+-# SuperLU_DIST (version 8.1)   <img align=center width="55" alt="superlu" src="https://user-images.githubusercontent.com/11741943/103982988-5a9a9d00-5139-11eb-9ac4-a55e80a79f8d.png">
++# SuperLU_DIST (version 8.2)   <img align=center width="55" alt="superlu" src="https://user-images.githubusercontent.com/11741943/103982988-5a9a9d00-5139-11eb-9ac4-a55e80a79f8d.png">
+ 
+ [![Build Status](https://travis-ci.org/xiaoyeli/superlu_dist.svg?branch=master)](https://travis-ci.org/xiaoyeli/superlu_dist) 
+ [Nightly tests](http://my.cdash.org/index.php?project=superlu_dist)
+@@ -541,4 +541,6 @@ December 12, 2021   Version 7.2.0
+ May 22, 2022        Version 8.0.0
+ July 5, 2022        Version 8.1.0
+ October 1, 2022     Version 8.1.1
++November 12, 2022   Version 8.1.2
++November 9, 2023    Version 8.2.0
+ ```
+diff --git a/SRC/superlu_defs.h b/SRC/superlu_defs.h
+index aad12430..e7b8825a 100644
+--- a/SRC/superlu_defs.h
++++ b/SRC/superlu_defs.h
+@@ -31,6 +31,7 @@ at the top-level directory.
+  *     July 5, 2022        version 8.1.0
+  *     October 1, 2022     version 8.1.1
+  *     November 12, 2022   version 8.1.2
++ *     November 9, 2022    version 8.2.0
+  * </pre>
+  */
+ 
+@@ -83,9 +84,9 @@ at the top-level directory.
+  * Versions 4.x and earlier do not include a #define'd version numbers.
+  */
+ #define SUPERLU_DIST_MAJOR_VERSION     8
+-#define SUPERLU_DIST_MINOR_VERSION     1
+-#define SUPERLU_DIST_PATCH_VERSION     2
+-#define SUPERLU_DIST_RELEASE_DATE      "November 12, 2022"
++#define SUPERLU_DIST_MINOR_VERSION     2
++#define SUPERLU_DIST_PATCH_VERSION     0
++#define SUPERLU_DIST_RELEASE_DATE      "November 9, 2023"
+ 
+ #include "superlu_dist_config.h"
+ 

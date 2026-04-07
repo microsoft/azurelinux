@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leo Sandoval <lsandova@redhat.com>
+Date: Thu, 27 Jun 2024 11:31:38 -0600
+Subject: [PATCH] common.sh: do not resolve symbolic link on mapped device
+ filesystems
+
+/dev/dm-* devices may change from boot to boot so better to use the
+symlink instead of the resolved file name
+
+Signed-off-by: Leo Sandoval <lsandova@redhat.com>
+---
+ common.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/common.sh b/common.sh
+index f70f17f..658c5c7 100644
+--- a/common.sh
++++ b/common.sh
+@@ -92,7 +92,7 @@ export fd_result  # so subshells inherit current value by default
+ # shim to make it easier to use os-prober outside d-i
+ if ! type mapdevfs >/dev/null 2>&1; then
+   mapdevfs () {
+-    readlink -f "$1"
++    echo "$1"
+   }
+ fi
+ 

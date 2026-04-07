@@ -1,0 +1,69 @@
+From 6c821fbce7dc41a7020740ea05cb664009d70fdc Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Wed, 2 Apr 2025 17:11:25 +0100
+Subject: [PATCH 13/17] Add wrapper for nasm to fix cmake compat
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+cmake needs to detect nasm by running with the '-v' arg, but it
+cannot cope with the nasm command being anything other than a
+single binary name - it won't accept & pass on args during the
+detection phase. Thus a further wrapper is needed.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ build-scripts/sgx-nasm.sh        | 12 ++++++++++++
+ external/ippcp_internal/Makefile |  8 +++++---
+ 2 files changed, 17 insertions(+), 3 deletions(-)
+ create mode 100755 build-scripts/sgx-nasm.sh
+
+diff --git a/build-scripts/sgx-nasm.sh b/build-scripts/sgx-nasm.sh
+new file mode 100755
+index 00000000..4ad75f73
+--- /dev/null
++++ b/build-scripts/sgx-nasm.sh
+@@ -0,0 +1,12 @@
++#!/bin/sh
++
++set -e
++
++if test "$1" == "-v"
++then
++    exec nasm -v
++else
++    here=$(dirname $0)
++    echo python ${here}/sgx-asm-pp.py --assembler=nasm --MITIGATION-CVE-2020-0551=${MITIGATION} "$@"
++    exec python ${here}/sgx-asm-pp.py --assembler=nasm --MITIGATION-CVE-2020-0551=${MITIGATION} "$@"
++fi
+diff --git a/external/ippcp_internal/Makefile b/external/ippcp_internal/Makefile
+index d78ba90e..71a40247 100644
+--- a/external/ippcp_internal/Makefile
++++ b/external/ippcp_internal/Makefile
+@@ -58,10 +58,12 @@ IPP_CONFIG += -DIPPCP_FIPS_MODE=on  -DFIPS_CUSTOM_IPPCP_API_HEADER=$(CURDIR)/inc
+ SUB_DIR = no_mitigation
+ ifeq ($(MITIGATION-CVE-2020-0551), LOAD)
+ 	SUB_DIR = cve_2020_0551_load
+-	PRE_CONFIG= ASM_NASM="python $(DIR)/../../build-scripts/sgx-asm-pp.py --assembler=nasm --MITIGATION-CVE-2020-0551=LOAD"
++	PRE_CONFIG = ASM_NASM="$(DIR)/../../build-scripts/sgx-nasm.sh"
++        POST_CONFIG = MITIGATION=LOAD
+ else ifeq ($(MITIGATION-CVE-2020-0551), CF)
+ 	SUB_DIR = cve_2020_0551_cf
+-	PRE_CONFIG= ASM_NASM="python $(DIR)/../../build-scripts/sgx-asm-pp.py --assembler=nasm --MITIGATION-CVE-2020-0551=CF"
++	PRE_CONFIG = ASM_NASM="$(DIR)/../../build-scripts/sgx-nasm.sh"
++	POST_CONFIG = MITIGATION=CF
+ endif
+ OUT_DIR = lib/linux/$(ARCH)/$(SUB_DIR)/
+ 
+@@ -84,7 +86,7 @@ all: build_ipp
+ 	$(CP) ipp-crypto/LICENSE ./license/
+ 
+ build_ipp: $(CHECK_SOURCE)
+-	cd $(IPP_SOURCE) && $(PRE_CONFIG) cmake CMakeLists.txt $(IPP_CONFIG) && cd build && make ippcp_s
++	cd $(IPP_SOURCE) && $(PRE_CONFIG) cmake CMakeLists.txt $(IPP_CONFIG) && cd build && $(POST_CONFIG) make ippcp_s
+ 
+ $(IPP_SOURCE)/build:
+ ifeq ($(IPP_USE_GIT), 1)
+-- 
+2.52.0
+

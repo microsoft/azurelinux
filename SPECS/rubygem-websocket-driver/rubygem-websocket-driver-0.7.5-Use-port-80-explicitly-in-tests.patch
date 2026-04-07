@@ -1,0 +1,80 @@
+From 29ee3d684ed0a8bebd9a6024e32f05727305f9b7 Mon Sep 17 00:00:00 2001
+From: Pavel Valena <pvalena@redhat.com>
+Date: Sun, 6 Feb 2022 19:54:41 +0100
+Subject: [PATCH] Use port 80 explicitly, in tests
+
+for compatibility with Ruby 3.1
+---
+ spec/websocket/driver/client_spec.rb | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/spec/websocket/driver/client_spec.rb b/spec/websocket/driver/client_spec.rb
+index e19e595..445875b 100644
+--- a/spec/websocket/driver/client_spec.rb
++++ b/spec/websocket/driver/client_spec.rb
+@@ -66,7 +66,7 @@ describe WebSocket::Driver::Client do
+       it "writes the handshake request to the socket" do
+         expect(socket).to receive(:write).with(
+             "GET /socket HTTP/1.1\r\n" +
+-            "Host: www.example.com\r\n" +
++            "Host: www.example.com:80\r\n" +
+             "Upgrade: websocket\r\n" +
+             "Connection: Upgrade\r\n" +
+             "Sec-WebSocket-Key: 2vBVWg4Qyk3ZoM/5d3QD9Q==\r\n" +
+@@ -85,7 +85,7 @@ describe WebSocket::Driver::Client do
+         it "writes the handshake with Sec-WebSocket-Protocol" do
+           expect(socket).to receive(:write).with(
+               "GET /socket HTTP/1.1\r\n" +
+-              "Host: www.example.com\r\n" +
++              "Host: www.example.com:80\r\n" +
+               "Upgrade: websocket\r\n" +
+               "Connection: Upgrade\r\n" +
+               "Sec-WebSocket-Key: 2vBVWg4Qyk3ZoM/5d3QD9Q==\r\n" +
+@@ -102,7 +102,7 @@ describe WebSocket::Driver::Client do
+         it "writes the handshake with Sec-WebSocket-Protocol" do
+           expect(socket).to receive(:write).with(
+               "GET /socket HTTP/1.1\r\n" +
+-              "Host: www.example.com\r\n" +
++              "Host: www.example.com:80\r\n" +
+               "Upgrade: websocket\r\n" +
+               "Connection: Upgrade\r\n" +
+               "Sec-WebSocket-Key: 2vBVWg4Qyk3ZoM/5d3QD9Q==\r\n" +
+@@ -129,7 +129,7 @@ describe WebSocket::Driver::Client do
+         it "writes the handshake with custom headers" do
+           expect(socket).to receive(:write).with(
+               "GET /socket HTTP/1.1\r\n" +
+-              "Host: www.example.com\r\n" +
++              "Host: www.example.com:80\r\n" +
+               "Upgrade: websocket\r\n" +
+               "Connection: Upgrade\r\n" +
+               "Sec-WebSocket-Key: 2vBVWg4Qyk3ZoM/5d3QD9Q==\r\n" +
+@@ -152,7 +152,7 @@ describe WebSocket::Driver::Client do
+       proxy = driver.proxy("http://proxy.example.com")
+       expect(socket).to receive(:write).with(
+           "CONNECT www.example.com:80 HTTP/1.1\r\n" +
+-          "Host: www.example.com\r\n" +
++          "Host: www.example.com:80\r\n" +
+           "Connection: keep-alive\r\n" +
+           "Proxy-Connection: keep-alive\r\n" +
+           "\r\n")
+@@ -163,7 +163,7 @@ describe WebSocket::Driver::Client do
+       proxy = driver.proxy("http://user:pass@proxy.example.com")
+       expect(socket).to receive(:write).with(
+           "CONNECT www.example.com:80 HTTP/1.1\r\n" +
+-          "Host: www.example.com\r\n" +
++          "Host: www.example.com:80\r\n" +
+           "Connection: keep-alive\r\n" +
+           "Proxy-Connection: keep-alive\r\n" +
+           "Proxy-Authorization: Basic dXNlcjpwYXNz\r\n" +
+@@ -176,7 +176,7 @@ describe WebSocket::Driver::Client do
+       proxy.set_header("User-Agent", "Chrome")
+       expect(socket).to receive(:write).with(
+           "CONNECT www.example.com:80 HTTP/1.1\r\n" +
+-          "Host: www.example.com\r\n" +
++          "Host: www.example.com:80\r\n" +
+           "Connection: keep-alive\r\n" +
+           "Proxy-Connection: keep-alive\r\n" +
+           "User-Agent: Chrome\r\n" +
+-- 
+2.26.2
+

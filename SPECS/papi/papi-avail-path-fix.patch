@@ -1,0 +1,34 @@
+From fd36e088d4fc883a2ab8979fcbeb8c669553f1d2 Mon Sep 17 00:00:00 2001
+From: Aaron Merey <amerey@redhat.com>
+Date: Tue, 8 Jul 2025 15:45:09 -0400
+Subject: [PATCH] Avoid using srcdir path for papi_component_avail
+
+---
+ src/run_tests.sh | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/run_tests.sh b/src/run_tests.sh
+index 1b11e82..16b44e9 100755
+--- a/src/run_tests.sh
++++ b/src/run_tests.sh
+@@ -48,7 +48,7 @@ if [ "x$VALGRIND" != "x" ]; then
+ fi
+ 
+ # Check for active 'perf_event' component
+-PERF_EVENT_ACTIVE=$(utils/papi_component_avail | awk '/Active components:/{flag=1; next} flag' | grep -q "perf_event" && echo "true" || echo "false")
++PERF_EVENT_ACTIVE=$(papi_component_avail | awk '/Active components:/{flag=1; next} flag' | grep -q "perf_event" && echo "true" || echo "false")
+ 
+ if [ "$PERF_EVENT_ACTIVE" = "true" ]; then
+     VTESTS=`find validation_tests/* -prune -perm -u+x -type f ! -name "*.[c|h]"`;
+@@ -60,7 +60,7 @@ else
+ fi
+ 
+ # List of active components
+-ACTIVE_COMPONENTS_PATTERN=$(utils/papi_component_avail | awk '/Active components:/{flag=1; next} flag' | grep "Name:" | sed 's/Name: //' | awk '{print $1}' | paste -sd'|' -)
++ACTIVE_COMPONENTS_PATTERN=$(papi_component_avail | awk '/Active components:/{flag=1; next} flag' | grep "Name:" | sed 's/Name: //' | awk '{print $1}' | paste -sd'|' -)
+ 
+ # Find the test files, filtering for only the active components
+ COMPTESTS=$(find components/*/tests -perm -u+x -type f ! \( -name "*.[c|h]" -o -name "*.cu" -o -name "*.so" \) | grep -E "components/($ACTIVE_COMPONENTS_PATTERN)/")
+-- 
+2.50.0
+

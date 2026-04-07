@@ -1,0 +1,186 @@
+From f4b3ede69824dd84456f252f0da2fe595874cb88 Mon Sep 17 00:00:00 2001
+From: Samuel Cabrero <scabrero@suse.de>
+Date: Wed, 6 Sep 2023 11:49:19 +0200
+Subject: [PATCH 08/17] util: Allow to append variables to external program
+ environment
+
+Signed-off-by: Samuel Cabrero <scabrero@suse.de>
+---
+ library/adenroll.c  |  4 +--
+ library/adprivate.h |  1 +
+ library/adutil.c    | 69 +++++++++++++++++++++++++++++++++++++++------
+ 3 files changed, 64 insertions(+), 10 deletions(-)
+
+diff --git a/library/adenroll.c b/library/adenroll.c
+index 5ae1215..72f1b6f 100644
+--- a/library/adenroll.c
++++ b/library/adenroll.c
+@@ -2384,14 +2384,14 @@ update_samba_data (adcli_enroll *enroll)
+ 		_adcli_info ("Trying to set domain SID %s for Samba.",
+ 		             argv_sid[2]);
+ 		ret = _adcli_call_external_program (argv_sid[0], argv_sid,
+-		                                    NULL, NULL, NULL);
++		                                    NULL, NULL, NULL, NULL);
+ 		if (ret != ADCLI_SUCCESS) {
+ 			_adcli_err ("Failed to set Samba domain SID.");
+ 		}
+ 	}
+ 
+ 	_adcli_info ("Trying to set Samba secret.");
+-	ret = _adcli_call_external_program (argv_pw[0], argv_pw,
++	ret = _adcli_call_external_program (argv_pw[0], argv_pw, NULL,
+ 	                                    enroll->computer_password, NULL, NULL);
+ 	if (ret != ADCLI_SUCCESS) {
+ 		_adcli_err ("Failed to set Samba computer account password.");
+diff --git a/library/adprivate.h b/library/adprivate.h
+index 822f919..bf0381c 100644
+--- a/library/adprivate.h
++++ b/library/adprivate.h
+@@ -318,6 +318,7 @@ bool             _adcli_check_nt_time_string_lifetime (const char *nt_time_strin
+ 
+ adcli_result     _adcli_call_external_program     (const char *binary,
+                                                    char * const *argv,
++						   char * const *envp,
+                                                    const char *stdin_data,
+                                                    uint8_t **stdout_data,
+                                                    size_t *stdout_data_len);
+diff --git a/library/adutil.c b/library/adutil.c
+index 4bb06a3..6a8e612 100644
+--- a/library/adutil.c
++++ b/library/adutil.c
+@@ -551,7 +551,7 @@ _adcli_check_nt_time_string_lifetime (const char *nt_time_string,
+ 
+ adcli_result
+ _adcli_call_external_program (const char *binary, char * const *argv,
+-                              const char *stdin_data,
++			      char * const *envp, const char *stdin_data,
+                               uint8_t **stdout_data, size_t *stdout_data_len)
+ {
+ 	int ret;
+@@ -565,6 +565,48 @@ _adcli_call_external_program (const char *binary, char * const *argv,
+ 	int status;
+ 	uint8_t read_buf[4096];
+ 	uint8_t *out;
++	char **child_env = NULL;
++	size_t child_env_size = 0;
++
++	/* prepare child environment, append envp to environ */
++	if (envp != NULL) {
++		size_t environ_size = 0;
++		size_t envp_size = 0;
++		int i, j;
++
++		for (i = 0; environ[i] != NULL; i++) {
++			environ_size++;
++		}
++
++		for (i = 0; envp[i] != NULL; i++) {
++			envp_size++;
++		}
++
++		child_env_size = environ_size + envp_size + 1;
++		child_env = calloc(child_env_size, sizeof(char *));
++		if (child_env == NULL) {
++			_adcli_err("Failed to allocate memory.");
++			return ADCLI_ERR_FAIL;
++		}
++
++		memset(child_env, 0, child_env_size);
++
++		for (i = 0, j = 0; environ[i] != NULL; i++, j++) {
++			child_env[j] = strdup(environ[i]);
++			if (child_env[j] == NULL) {
++				_adcli_err("Failed to allocate memory.");
++				return ADCLI_ERR_FAIL;
++			}
++		}
++
++		for (i = 0; envp[i] != NULL; i++, j++) {
++			child_env[j] = strdup(envp[i]);
++			if (child_env[j] == NULL) {
++				_adcli_err("Failed to allocate memory.");
++				return ADCLI_ERR_FAIL;
++			}
++		}
++	}
+ 
+ 	errno = 0;
+ 	ret = access (binary, X_OK);
+@@ -613,7 +655,11 @@ _adcli_call_external_program (const char *binary, char * const *argv,
+ 			exit (EXIT_FAILURE);
+ 		}
+ 
+-		execv (binary, argv);
++                if (child_env != NULL) {
++                        execve(binary, argv, child_env);
++                } else {
++                        execv(binary, argv);
++                }
+ 		_adcli_err ("Failed to run %s.", binary);
+ 		ret = ADCLI_ERR_FAIL;
+ 		goto done;
+@@ -672,6 +718,13 @@ _adcli_call_external_program (const char *binary, char * const *argv,
+ 		goto done;
+ 	}
+ 
++	if (child_env != NULL) {
++                for (int i = 0; i < child_env_size; i++) {
++                        free(child_env[i]);
++                }
++                free(child_env);
++	}
++
+ 	ret = ADCLI_SUCCESS;
+ 
+ done:
+@@ -853,25 +906,25 @@ test_call_external_program (void)
+ 	size_t stdout_data_len;
+ 
+ 	argv[0] = "/does/not/exists";
+-	res = _adcli_call_external_program (argv[0], argv, NULL, NULL, NULL);
++	res = _adcli_call_external_program (argv[0], argv, NULL, NULL, NULL, NULL);
+ 	assert (res == ADCLI_ERR_FAIL);
+ 
+ #ifdef BIN_CAT
+ 	argv[0] = BIN_CAT;
+-	res = _adcli_call_external_program (argv[0], argv, "Hello",
++	res = _adcli_call_external_program (argv[0], argv, NULL, "Hello",
+ 	                                    &stdout_data, &stdout_data_len);
+ 	assert (res == ADCLI_SUCCESS);
+ 	assert (strncmp ("Hello", (char *) stdout_data, stdout_data_len) == 0);
+ 	free (stdout_data);
+ 
+-	res = _adcli_call_external_program (argv[0], argv, "Hello",
++	res = _adcli_call_external_program (argv[0], argv, NULL, "Hello",
+ 	                                    NULL, NULL);
+ 	assert (res == ADCLI_SUCCESS);
+ #endif
+ 
+ #ifdef BIN_REV
+ 	argv[0] = BIN_REV;
+-	res = _adcli_call_external_program (argv[0], argv, "Hello\n",
++	res = _adcli_call_external_program (argv[0], argv, NULL, "Hello\n",
+ 	                                    &stdout_data, &stdout_data_len);
+ 	assert (res == ADCLI_SUCCESS);
+ 	assert (strncmp ("olleH\n", (char *) stdout_data, stdout_data_len) == 0);
+@@ -880,7 +933,7 @@ test_call_external_program (void)
+ 
+ #ifdef BIN_TAC
+ 	argv[0] = BIN_TAC;
+-	res = _adcli_call_external_program (argv[0], argv, "Hello\nWorld\n",
++	res = _adcli_call_external_program (argv[0], argv, NULL, "Hello\nWorld\n",
+ 	                                    &stdout_data, &stdout_data_len);
+ 	assert (res == ADCLI_SUCCESS);
+ 	assert (strncmp ("World\nHello\n", (char *) stdout_data, stdout_data_len) == 0);
+@@ -890,7 +943,7 @@ test_call_external_program (void)
+ #ifdef BIN_ECHO
+ 	argv[0] = BIN_ECHO;
+ 	argv[1] = "Hello";
+-	res = _adcli_call_external_program (argv[0], argv, NULL,
++	res = _adcli_call_external_program (argv[0], argv, NULL, NULL,
+ 	                                    &stdout_data, &stdout_data_len);
+ 	assert (res == ADCLI_SUCCESS);
+ 	assert (strncmp ("Hello\n", (char *) stdout_data, stdout_data_len) == 0);
+-- 
+2.47.0
+

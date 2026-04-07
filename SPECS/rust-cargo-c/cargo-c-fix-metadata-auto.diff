@@ -1,0 +1,16 @@
+--- cargo-c-0.10.19+cargo-0.93.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ cargo-c-0.10.19+cargo-0.93.0/Cargo.toml	2026-02-16T13:57:26.644017+00:00
+@@ -13,7 +13,7 @@
+ edition = "2021"
+ rust-version = "1.90"
+ name = "cargo-c"
+-version = "0.10.19+cargo-0.93.0"
++version = "0.10.19"
+ authors = ["Luca Barbato <lu_zero@gentoo.org>"]
+ build = false
+ autolib = false
+@@ -138,3 +138,4 @@
+ codegen-units = 1
+ inherits = "release"
+ strip = "symbols"
++

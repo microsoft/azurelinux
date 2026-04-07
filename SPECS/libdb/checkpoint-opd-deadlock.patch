@@ -1,0 +1,14 @@
+--- db-5.3.21/src/db/db_cam.c.opd_deadlock	2017-10-31 12:20:54.118979690 +0100
++++ db-5.3.21/src/db/db_cam.c	2017-10-31 12:21:06.828739341 +0100
+@@ -868,6 +868,11 @@
+ 	    flags == DB_PREV || flags == DB_PREV_DUP)) {
+ 		if (tmp_rmw && (ret = dbc->am_writelock(dbc)) != 0)
+ 			goto err;
++        /* Latch the primary tree page here in order to not deadlock later. */
++		if (cp->page == NULL &&
++		    (ret = __memp_fget(mpf, &cp->pgno,
++			 dbc->thread_info, dbc->txn, 0, &cp->page)) != 0)
++			goto err;
+ 		if (F_ISSET(dbc, DBC_TRANSIENT))
+ 			opd = cp->opd;
+ 		else if ((ret = __dbc_idup(cp->opd, &opd, DB_POSITION)) != 0)

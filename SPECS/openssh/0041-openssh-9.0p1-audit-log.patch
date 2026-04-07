@@ -1,0 +1,265 @@
+From 80d967a18261156573e7385f8e534a89d2767d67 Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:29 +0200
+Subject: [PATCH 41/50] openssh-9.0p1-audit-log
+
+---
+ audit-bsm.c   |  2 +-
+ audit-linux.c | 76 +++++++++++++++++++++++++++++++++++++++++++--------
+ audit.c       | 18 +++++++++---
+ audit.h       |  2 +-
+ 4 files changed, 81 insertions(+), 17 deletions(-)
+
+diff --git a/audit-bsm.c b/audit-bsm.c
+index a49abb92..c6f56553 100644
+--- a/audit-bsm.c
++++ b/audit-bsm.c
+@@ -405,7 +405,7 @@ audit_session_close(struct logininfo *li)
+ }
+ 
+ int
+-audit_keyusage(struct ssh *ssh, int host_user, char *fp, int rv)
++audit_keyusage(struct ssh *ssh, int host_user, char *key_fp, const struct sshkey_cert *cert, const char *issuer_fp, int rv)
+ {
+ 	/* not implemented */
+ }
+diff --git a/audit-linux.c b/audit-linux.c
+index d484b82b..dcfde3a9 100644
+--- a/audit-linux.c
++++ b/audit-linux.c
+@@ -52,7 +52,7 @@ extern u_int utmp_len;
+ const char *audit_username(void);
+ 
+ static void
+-linux_audit_user_logxxx(int uid, const char *username,
++linux_audit_user_logxxx(int uid, const char *username, const char *hostname,
+     const char *ip, const char *ttyn, int success, int event)
+ {
+ 	int audit_fd, rc, saved_errno;
+@@ -66,7 +66,7 @@ linux_audit_user_logxxx(int uid, const char *username,
+ 	}
+ 	rc = audit_log_acct_message(audit_fd, event,
+ 	    NULL, "login", username ? username : "(unknown)",
+-	    username == NULL ? uid : -1, NULL, ip, ttyn, success);
++	    username == NULL ? uid : -1, hostname, ip, ttyn, success);
+ 	saved_errno = errno;
+ 	close(audit_fd);
+ 
+@@ -137,10 +137,12 @@ fatal_report:
+ }
+ 
+ int
+-audit_keyusage(struct ssh *ssh, int host_user, char *fp, int rv)
++audit_keyusage(struct ssh *ssh, int host_user, const char *key_fp, const struct sshkey_cert *cert, const char *issuer_fp, int rv)
+ {
+ 	char buf[AUDIT_LOG_SIZE];
+ 	int audit_fd, rc, saved_errno;
++	const char *rip;
++	u_int i;
+ 
+ 	audit_fd = audit_open();
+ 	if (audit_fd < 0) {
+@@ -150,14 +152,44 @@ audit_keyusage(struct ssh *ssh, int host_user, char *fp, int rv)
+ 		else
+ 			return 0; /* Must prevent login */
+ 	}
++	rip = ssh_remote_ipaddr(ssh);
+ 	snprintf(buf, sizeof(buf), "%s_auth grantors=auth-key", host_user ? "pubkey" : "hostbased");
+ 	rc = audit_log_acct_message(audit_fd, AUDIT_USER_AUTH, NULL,
+-		buf, audit_username(), -1, NULL, ssh_remote_ipaddr(ssh), NULL, rv);
++		buf, audit_username(), -1, NULL, rip, NULL, rv);
+ 	if ((rc < 0) && ((rc != -1) || (getuid() == 0)))
+ 		goto out;
+-	snprintf(buf, sizeof(buf), "op=negotiate kind=auth-key fp=%s", fp);
++	snprintf(buf, sizeof(buf), "op=negotiate kind=auth-key fp=%s", key_fp);
+ 	rc = audit_log_user_message(audit_fd, AUDIT_CRYPTO_KEY_USER, buf, NULL,
+-		ssh_remote_ipaddr(ssh), NULL, rv);
++		rip, NULL, rv);
++	if ((rc < 0) && ((rc != -1) || (getuid() == 0)))
++		goto out;
++
++	if (cert) {
++		char *pbuf;
++
++		pbuf = audit_encode_nv_string("key_id", cert->key_id, 0);
++		if (pbuf == NULL)
++			goto out;
++		snprintf(buf, sizeof(buf), "cert %s cert_serial=%llu cert_issuer_alg=\"%s\" cert_issuer_fp=\"%s\"",
++			pbuf, (unsigned long long)cert->serial, sshkey_type(cert->signature_key), issuer_fp);
++		free(pbuf);
++		rc = audit_log_acct_message(audit_fd, AUDIT_USER_AUTH, NULL,
++			buf, audit_username(), -1, NULL, rip, NULL, rv);
++		if ((rc < 0) && ((rc != -1) || (getuid() == 0)))
++			goto out;
++
++		for (i = 0; cert->principals != NULL && i < cert->nprincipals; i++) {
++			pbuf = audit_encode_nv_string("cert_principal", cert->principals[i], 0);
++			if (pbuf == NULL)
++				goto out;
++			snprintf(buf, sizeof(buf), "principal %s", pbuf);
++			free(pbuf);
++			rc = audit_log_acct_message(audit_fd, AUDIT_USER_AUTH, NULL,
++				buf, audit_username(), -1, NULL, rip, NULL, rv);
++			if ((rc < 0) && ((rc != -1) || (getuid() == 0)))
++				goto out;
++		}
++	}
+ out:
+ 	saved_errno = errno;
+ 	audit_close(audit_fd);
+@@ -179,26 +211,34 @@ audit_connection_from(const char *host, int port)
+ int
+ audit_run_command(struct ssh *ssh, const char *command)
+ {
++	char * audit_hostname = options.use_dns ? remote_hostname(ssh) : NULL;
+ 	if (!user_login_count++)
+ 		linux_audit_user_logxxx(the_authctxt->pw->pw_uid, NULL,
++		    audit_hostname,
+ 		    ssh_remote_ipaddr(ssh),
+ 		    "ssh", 1, AUDIT_USER_LOGIN);
+ 	linux_audit_user_logxxx(the_authctxt->pw->pw_uid, NULL,
++	    audit_hostname,
+ 	    ssh_remote_ipaddr(ssh),
+ 	    "ssh", 1, AUDIT_USER_START);
++	free(audit_hostname);
+ 	return 0;
+ }
+ 
+ void
+ audit_end_command(struct ssh *ssh, int handle, const char *command)
+ {
++	char * audit_hostname = options.use_dns ? remote_hostname(ssh) : NULL;
+ 	linux_audit_user_logxxx(the_authctxt->pw->pw_uid, NULL,
++	    audit_hostname,
+ 	    ssh_remote_ipaddr(ssh),
+ 	    "ssh", 1, AUDIT_USER_END);
+ 	if (user_login_count && !--user_login_count)
+ 		linux_audit_user_logxxx(the_authctxt->pw->pw_uid, NULL,
++		    audit_hostname,
+ 		    ssh_remote_ipaddr(ssh),
+ 		    "ssh", 1, AUDIT_USER_LOGOUT);
++	free(audit_hostname);
+ }
+ 
+ void
+@@ -211,31 +251,41 @@ void
+ audit_session_open(struct logininfo *li)
+ {
+ 	if (!user_login_count++)
+-		linux_audit_user_logxxx(li->uid, NULL, li->hostname,
++		linux_audit_user_logxxx(li->uid, NULL,
++		    options.use_dns ? li->hostname : NULL,
++		    options.use_dns ? NULL : li->hostname,
+ 		    li->line, 1, AUDIT_USER_LOGIN);
+-	linux_audit_user_logxxx(li->uid, NULL, li->hostname,
++	linux_audit_user_logxxx(li->uid, NULL,
++	    options.use_dns ? li->hostname : NULL,
++	    options.use_dns ? NULL : li->hostname,
+ 	    li->line, 1, AUDIT_USER_START);
+ }
+ 
+ void
+ audit_session_close(struct logininfo *li)
+ {
+-	linux_audit_user_logxxx(li->uid, NULL, li->hostname,
++	linux_audit_user_logxxx(li->uid, NULL,
++	    options.use_dns ? li->hostname : NULL,
++	    options.use_dns ? NULL : li->hostname,
+ 	    li->line, 1, AUDIT_USER_END);
+ 	if (user_login_count && !--user_login_count)
+-		linux_audit_user_logxxx(li->uid, NULL, li->hostname,
++		linux_audit_user_logxxx(li->uid, NULL,
++		    options.use_dns ? li->hostname : NULL,
++		    options.use_dns ? NULL : li->hostname,
+ 		    li->line, 1, AUDIT_USER_LOGOUT);
+ }
+ 
+ void
+ audit_event(struct ssh *ssh, ssh_audit_event_t event)
+ {
++	char * audit_hostname = options.use_dns ? remote_hostname(ssh) : NULL;
++
+ 	switch(event) {
+ 	case SSH_NOLOGIN:
+ 	case SSH_LOGIN_ROOT_DENIED:
+ 		linux_audit_user_auth(-1, audit_username(),
+ 			ssh_remote_ipaddr(ssh), "ssh", 0, event);
+-		linux_audit_user_logxxx(-1, audit_username(),
++		linux_audit_user_logxxx(-1, audit_username(), audit_hostname,
+ 			ssh_remote_ipaddr(ssh), "ssh", 0, AUDIT_USER_LOGIN);
+ 		break;
+ 	case SSH_AUTH_FAIL_PASSWD:
+@@ -255,9 +305,11 @@ audit_event(struct ssh *ssh, ssh_audit_event_t event)
+ 		if (user_login_count) {
+ 			while (user_login_count--)
+ 				linux_audit_user_logxxx(the_authctxt->pw->pw_uid, NULL,
++				    audit_hostname,
+ 				    ssh_remote_ipaddr(ssh),
+ 				    "ssh", 1, AUDIT_USER_END);
+ 			linux_audit_user_logxxx(the_authctxt->pw->pw_uid, NULL,
++			    audit_hostname,
+ 			    ssh_remote_ipaddr(ssh),
+ 			    "ssh", 1, AUDIT_USER_LOGOUT);
+ 		}
+@@ -266,12 +318,14 @@ audit_event(struct ssh *ssh, ssh_audit_event_t event)
+ 	case SSH_CONNECTION_ABANDON:
+ 	case SSH_INVALID_USER:
+ 		linux_audit_user_logxxx(-1, audit_username(),
++			audit_hostname,
+ 			ssh_remote_ipaddr(ssh), "ssh", 0, AUDIT_USER_LOGIN);
+ 		break;
+ 	default:
+ 		debug("%s: unhandled event %d", __func__, event);
+ 		break;
+ 	}
++	free(audit_hostname);
+ }
+ 
+ void
+diff --git a/audit.c b/audit.c
+index d0433c3a..28d51a14 100644
+--- a/audit.c
++++ b/audit.c
+@@ -116,12 +116,22 @@ audit_event_lookup(ssh_audit_event_t ev)
+ void
+ audit_key(struct ssh *ssh, int host_user, int *rv, const struct sshkey *key)
+ {
+-	char *fp;
++	char *key_fp = NULL;
++	char *issuer_fp = NULL;
++	struct sshkey_cert *cert = NULL;
+ 
+-	fp = sshkey_fingerprint(key, options.fingerprint_hash, SSH_FP_HEX);
+-	if (audit_keyusage(ssh, host_user, fp, (*rv == 0)) == 0)
++	key_fp = sshkey_fingerprint(key, options.fingerprint_hash, SSH_FP_HEX);
++	if (sshkey_is_cert(key) && key->cert != NULL && key->cert->signature_key != NULL) {
++		cert = key->cert;
++		issuer_fp = sshkey_fingerprint(cert->signature_key,
++										options.fingerprint_hash, SSH_FP_DEFAULT);
++	}
++	if (audit_keyusage(ssh, host_user, key_fp, cert, issuer_fp, (*rv == 0)) == 0)
+ 		*rv = -SSH_ERR_INTERNAL_ERROR;
+-	free(fp);
++	if (key_fp)
++		free(key_fp);
++	if (issuer_fp)
++		free(issuer_fp);
+ }
+ 
+ void
+diff --git a/audit.h b/audit.h
+index 45d66ccf..05ac132c 100644
+--- a/audit.h
++++ b/audit.h
+@@ -64,7 +64,7 @@ void	audit_session_close(struct logininfo *);
+ int	audit_run_command(struct ssh *, const char *);
+ void 	audit_end_command(struct ssh *, int, const char *);
+ ssh_audit_event_t audit_classify_auth(const char *);
+-int	audit_keyusage(struct ssh *, int, char *, int);
++int	audit_keyusage(struct ssh *, int, const char *, const struct sshkey_cert *, const char *, int);
+ void	audit_key(struct ssh *, int, int *, const struct sshkey *);
+ void	audit_unsupported(struct ssh *, int);
+ void	audit_kex(struct ssh *, int, char *, char *, char *, char *);
+-- 
+2.49.0
+

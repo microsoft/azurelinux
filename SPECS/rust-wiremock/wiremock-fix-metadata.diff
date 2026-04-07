@@ -1,0 +1,25 @@
+--- wiremock-0.6.5/Cargo.toml	1970-01-01T00:00:01+00:00
++++ wiremock-0.6.5/Cargo.toml	2026-02-18T10:56:47.178720+00:00
+@@ -68,7 +68,7 @@
+ version = "0.22"
+ 
+ [dependencies.deadpool]
+-version = "0.12.2"
++version = "0.13.0"
+ 
+ [dependencies.futures]
+ version = "0.3.31"
+@@ -121,13 +121,6 @@
+ [dev-dependencies.actix-rt]
+ version = "2.10.0"
+ 
+-[dev-dependencies.async-std]
+-version = "1.13.2"
+-features = [
+-    "attributes",
+-    "tokio1",
+-]
+-
+ [dev-dependencies.reqwest]
+ version = "0.12.23"
+ features = ["json"]

@@ -1,0 +1,25 @@
+From 73cae5cfd20e5458ed22de629c0c7dcbfae3a0cc Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Sun, 24 Aug 2025 15:58:07 +0200
+Subject: [PATCH] Fix dangerous_implicit_autorefs error in crate_authors macro
+
+---
+ src/macros.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/macros.rs b/src/macros.rs
+index 01cbca8..36f25a0 100644
+--- a/src/macros.rs
++++ b/src/macros.rs
+@@ -490,7 +490,7 @@ macro_rules! crate_authors {
+                         VALUE = Box::into_raw(Box::new(s));
+                     });
+ 
+-                    &(*VALUE)[..]
++                    &(&(*VALUE))[..]
+                 }
+             }
+         }
+-- 
+2.51.0
+

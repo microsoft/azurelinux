@@ -1,0 +1,22 @@
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Thu, 17 Feb 2022 09:55:50 +0100
+Subject: [PATCH] WIP: ignore deps on demand
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+
+diff --git a/apps/rebar/src/rebar_prv_install_deps.erl b/apps/rebar/src/rebar_prv_install_deps.erl
+index 5331c4cb..448825c0 100644
+--- a/apps/rebar/src/rebar_prv_install_deps.erl
++++ b/apps/rebar/src/rebar_prv_install_deps.erl
+@@ -71,7 +71,10 @@ init(State) ->
+ -spec do(rebar_state:t()) -> {ok, rebar_state:t()} | {error, string()}.
+ do(State) ->
+     ?INFO("Verifying dependencies...", []),
+-    do_(State).
++    case os:getenv("IGNORE_MISSING_DEPS") of
++        false -> do_(State);
++        _ -> {ok, State}
++    end.
+ 
+ do_(State) ->
+     try

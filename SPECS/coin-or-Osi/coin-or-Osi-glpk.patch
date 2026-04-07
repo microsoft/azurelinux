@@ -1,0 +1,1625 @@
+diff -up Osi-releases-0.108.9/Osi/src/OsiGlpk/OsiGlpkSolverInterface.cpp.orig Osi-releases-0.108.9/Osi/src/OsiGlpk/OsiGlpkSolverInterface.cpp
+--- Osi-releases-0.108.9/Osi/src/OsiGlpk/OsiGlpkSolverInterface.cpp.orig	2023-10-25 08:08:56.000000000 -0600
++++ Osi-releases-0.108.9/Osi/src/OsiGlpk/OsiGlpkSolverInterface.cpp	2023-11-21 11:06:32.681276655 -0700
+@@ -21,7 +21,7 @@
+ //    In (much) earlier versions of GLPK, if an LPX_MIP problem was
+ // changed back into a LPX_LP problem, then the MIP data was lost,
+ // including which columns are integer.  However, LPX_MIP problems
+-// still had access to LP information (like lpx_get_status).
++// still had access to LP information (like glp_get_status).
+ //
+ //    It appears that this behavior is no longer true in version 4.7.
+ // Therefore it may be worthwhile to adjust the interface to change
+@@ -72,13 +72,6 @@
+ #include <string>
+ #include <iostream>
+ 
+-extern "C" {
+-#include "glpk.h"
+-}
+-#ifndef GLP_PROB_DEFINED
+-#define GLP_PROB_DEFINED
+-#endif
+-
+ #include "CoinError.hpp"
+ #include "CoinPragma.hpp"
+ 
+@@ -94,7 +87,7 @@ extern "C" {
+   Grab the COIN standard finite infinity from CoinFinite.hpp. Also set a
+   zero tolerance, so we can set clean zeros in computed reduced costs and
+   row activities. The value 1.0e-9 is lifted from glpk --- this is the value
+-  that it uses when the LPX_K_ROUND parameter is active.
++  that it uses when the round parameter is active.
+ */
+ #include "CoinFinite.hpp"
+ namespace {
+@@ -169,26 +162,21 @@ void OGSI::initialSolve()
+   /*
+   Solve the lp.
+ */
+-  int err = lpx_simplex(model);
++  int err = glp_simplex(model, &simplex_params_);
+ 
+   // for Glpk, a solve fails if the initial basis is invalid or singular
+   // thus, we construct a (advanced) basis first and try again
+-#ifdef LPX_E_BADB
+-  if (err == LPX_E_BADB) {
+-    lpx_adv_basis(model);
+-    err = lpx_simplex(model);
+-  } else
+-#endif
+-    if (err == LPX_E_SING || err == LPX_E_FAULT) {
+-    lpx_adv_basis(model);
+-    err = lpx_simplex(model);
++  if (err == GLP_EBADB || err == GLP_ESING || err == GLP_ECOND ||
++      err == GLP_EBOUND || err == GLP_EFAIL) {
++    glp_adv_basis(model, 0);
++    err = glp_simplex(model, &simplex_params_);
+   }
+ 
+-  iter_used_ = lpx_get_int_parm(model, LPX_K_ITCNT);
++  iter_used_ = glp_get_it_cnt(model);
+   /*
+   Sort out the various state indications.
+ 
+-  When the presolver is turned on, lpx_simplex() will not be able to tell
++  When the presolver is turned on, glp_simplex() will not be able to tell
+   whether the objective function has hit it's upper or lower limit, and does
+   not return OBJLL or OBJUL. The code for these cases should be beefed up to
+   check the objective against the limit.
+@@ -207,38 +195,38 @@ void OGSI::initialSolve()
+   isObjUpperLimitReached_ = false;
+ 
+   switch (err) {
+-  case LPX_E_OK: {
++  case 0: {
+     break;
+   }
+-  case LPX_E_ITLIM: {
++  case GLP_EITLIM: {
+     isIterationLimitReached_ = true;
+     break;
+   }
+-  case LPX_E_OBJLL: {
++  case GLP_EOBJLL: {
+     isObjLowerLimitReached_ = true;
+     break;
+   }
+-  case LPX_E_OBJUL: {
++  case GLP_EOBJUL: {
+     isObjUpperLimitReached_ = true;
+     break;
+   }
+-  case LPX_E_TMLIM: {
++  case GLP_ETMLIM: {
+     isTimeLimitReached_ = true;
+   } // no break here, so we still report abandoned
+-  case LPX_E_FAULT:
+-  case LPX_E_SING:
+-#ifdef LPX_E_BADB
+-  case LPX_E_BADB:
+-#endif
++  case GLP_ECOND:
++  case GLP_EBOUND:
++  case GLP_EFAIL:
++  case GLP_ESING:
++  case GLP_EBADB:
+   {
+     isAbandoned_ = true;
+     break;
+   }
+-  case LPX_E_NOPFS: {
++  case GLP_ENOPFS: {
+     isPrimInfeasible_ = true;
+     break;
+   }
+-  case LPX_E_NODFS: {
++  case GLP_ENODFS: {
+     isDualInfeasible_ = true;
+     break;
+   }
+@@ -247,9 +235,9 @@ void OGSI::initialSolve()
+   }
+   }
+ 
+-  switch (lpx_get_status(model)) {
+-  case LPX_OPT:
+-  case LPX_FEAS: {
++  switch (glp_get_status(model)) {
++  case GLP_OPT:
++  case GLP_FEAS: {
+     isFeasible_ = true;
+     break;
+   }
+@@ -276,23 +264,18 @@ void OGSI::resolve()
+   LPX *model = getMutableModelPtr();
+   freeCachedData(OGSI::FREECACHED_RESULTS);
+ 
+-  // lpx_simplex will use the current basis if possible
+-  int err = lpx_simplex(model);
++  // glp_simplex will use the current basis if possible
++  int err = glp_simplex(model, &simplex_params_);
+ 
+   // for Glpk, a solve fails if the initial basis is invalid or singular
+   // thus, we construct a (advanced) basis first and try again
+-#ifdef LPX_E_BADB
+-  if (err == LPX_E_BADB) {
+-    lpx_adv_basis(model);
+-    err = lpx_simplex(model);
+-  } else
+-#endif
+-    if (err == LPX_E_SING || err == LPX_E_FAULT) {
+-    lpx_adv_basis(model);
+-    err = lpx_simplex(model);
++  if (err == GLP_EBADB || err == GLP_ESING || err == GLP_ECOND ||
++      err == GLP_EBOUND || err == GLP_EFAIL) {
++    glp_adv_basis(model, 0);
++    err = glp_simplex(model, &simplex_params_);
+   }
+ 
+-  iter_used_ = lpx_get_int_parm(model, LPX_K_ITCNT);
++  iter_used_ = glp_get_it_cnt(model);
+ 
+   isIterationLimitReached_ = false;
+   isTimeLimitReached_ = false;
+@@ -304,38 +287,38 @@ void OGSI::resolve()
+   isFeasible_ = false;
+ 
+   switch (err) {
+-  case LPX_E_OK: {
++  case 0: {
+     break;
+   }
+-  case LPX_E_ITLIM: {
++  case GLP_EITLIM: {
+     isIterationLimitReached_ = true;
+     break;
+   }
+-  case LPX_E_OBJLL: {
++  case GLP_EOBJLL: {
+     isObjLowerLimitReached_ = true;
+     break;
+   }
+-  case LPX_E_OBJUL: {
++  case GLP_EOBJUL: {
+     isObjUpperLimitReached_ = true;
+     break;
+   }
+-  case LPX_E_TMLIM: {
++  case GLP_ETMLIM: {
+     isTimeLimitReached_ = true;
+   } // no break here, so we still report abandoned
+-  case LPX_E_FAULT:
+-  case LPX_E_SING:
+-#ifdef LPX_E_BADB
+-  case LPX_E_BADB:
+-#endif
++  case GLP_ECOND:
++  case GLP_EBOUND:
++  case GLP_EFAIL:
++  case GLP_ESING:
++  case GLP_EBADB:
+   {
+     isAbandoned_ = true;
+     break;
+   }
+-  case LPX_E_NOPFS: {
++  case GLP_ENOPFS: {
+     isPrimInfeasible_ = true;
+     break;
+   }
+-  case LPX_E_NODFS: {
++  case GLP_ENODFS: {
+     isDualInfeasible_ = true;
+     break;
+   }
+@@ -344,9 +327,9 @@ void OGSI::resolve()
+   }
+   }
+ 
+-  switch (lpx_get_status(model)) {
+-  case LPX_OPT:
+-  case LPX_FEAS: {
++  switch (glp_get_status(model)) {
++  case GLP_OPT:
++  case GLP_FEAS: {
+     isFeasible_ = true;
+     break;
+   }
+@@ -364,7 +347,7 @@ void OGSI::resolve()
+ 
+ /*
+   Call glpk's built-in MIP solver. Any halfway recent version (from glpk 4.4,
+-  at least) will have lpx_intopt, a branch-and-cut solver. The presence of cut
++  at least) will have glp_intopt, a branch-and-cut solver. The presence of cut
+   generators is more recent.
+ */
+ void OGSI::branchAndBound()
+@@ -379,22 +362,11 @@ void OGSI::branchAndBound()
+   Assuming we have integer variables in the model, call the best MIP solver
+   we can manage.
+ 
+-  lpx_intopt does not require an optimal LP solution as a starting point, so
++  glp_intopt does not require an optimal LP solution as a starting point, so
+   we can call it directly.
+-
+-  lpx_integer needs an initial optimal solution to the relaxation.
+ */
+-  if (lpx_get_num_int(model)) {
+-    int err = LPX_E_FAULT;
+-
+-#ifdef GLPK_HAS_INTOPT
+-    err = lpx_intopt(model);
+-#else
+-    if (lpx_get_status(model) != LPX_OPT) {
+-      initialSolve();
+-    }
+-    err = lpx_integer(model);
+-#endif
++  if (glp_get_num_int(model)) {
++    int err = glp_intopt(model, &integer_params_);
+     /*
+   We have a result. What is it? Start with a positive attitude and revise as
+   needed. The various LPX_E_* and LPX_I_* defines are stable back as far as
+@@ -425,7 +397,7 @@ void OGSI::branchAndBound()
+   Previous comments expressed uncertainty about the iteration count. This
+   should be checked at some point. -- lh, 070709 --
+ */
+-    iter_used_ = lpx_get_int_parm(model, LPX_K_ITCNT);
++    iter_used_ = glp_get_it_cnt(model);
+     isIterationLimitReached_ = false;
+     isTimeLimitReached_ = false;
+     isAbandoned_ = false;
+@@ -436,33 +408,34 @@ void OGSI::branchAndBound()
+     isObjUpperLimitReached_ = false;
+ 
+     switch (err) {
+-    case LPX_E_OK:
+-#ifdef LPX_E_MIPGAP
+-    case LPX_E_MIPGAP:
+-#endif
++    case 0:
++    case GLP_EMIPGAP:
+     {
+       break;
+     }
+-    case LPX_E_NOPFS: {
++    case GLP_ENOPFS: {
+       isPrimInfeasible_ = true;
+       break;
+     }
+-    case LPX_E_NODFS: {
++    case GLP_ENODFS: {
+       isDualInfeasible_ = true;
+       break;
+     }
+-    case LPX_E_TMLIM: {
++    case GLP_ETMLIM: {
+       isTimeLimitReached_ = true;
+     } // no break
+-    case LPX_E_ITLIM: {
++    case GLP_EITLIM: {
+       isIterationLimitReached_ = true;
+       break;
+     }
+-    case LPX_E_SING: {
++    case GLP_ESING: {
+       isAbandoned_ = true;
+       break;
+     }
+-    case LPX_E_FAULT: {
++    case GLP_EBADB:
++    case GLP_ECOND:
++    case GLP_EBOUND:
++    case GLP_EFAIL: {
+       assert(false);
+       break;
+     }
+@@ -473,20 +446,20 @@ void OGSI::branchAndBound()
+     }
+ 
+     //check this also if err!=LPX_E_OPT, so we know about feasibility in case time/resource limit is reached
+-    int mip_status = lpx_mip_status(model);
++    int mip_status = glp_mip_status(model);
+     switch (mip_status) {
+-    case LPX_I_OPT: {
++    case GLP_OPT: {
+       isFeasible_ = true;
+       break;
+     }
+-    case LPX_I_NOFEAS: {
++    case GLP_NOFEAS: {
+       isPrimInfeasible_ = true;
+       break;
+     }
+-    case LPX_I_UNDEF: {
++    case GLP_UNDEF: {
+       break;
+     }
+-    case LPX_I_FEAS: {
++    case GLP_FEAS: {
+       isFeasible_ = true;
+       break;
+     }
+@@ -503,7 +476,7 @@ void OGSI::branchAndBound()
+   /*
+   Not a MIP (no integer variables). Call the LP solver. Since we can call
+   branchAndBound with no initial LP solution, initialSolve is appropriate here.
+-  (But for glpk, it actually makes no difference --- lpx_simplex makes the
++  (But for glpk, it actually makes no difference --- glp_simplex makes the
+   decision on how to proceed.)
+ */
+   else {
+@@ -538,7 +511,7 @@ bool OGSI::setIntParam(OsiIntParam key,
+   case OsiMaxNumIteration: {
+     if (value >= 0) {
+       maxIteration_ = value;
+-      lpx_set_int_parm(lp_, LPX_K_ITLIM, value);
++      simplex_params_.it_lim = value;
+       retval = true;
+     } else {
+       retval = false;
+@@ -591,10 +564,10 @@ bool OGSI::setDblParam(OsiDblParam key,
+       dualObjectiveLimit_ = value;
+       if (getObjSense() == 1) // minimization
+       {
+-        lpx_set_real_parm(lp_, LPX_K_OBJUL, value);
++        simplex_params_.obj_ul = value;
+       } else // maximization
+       {
+-        lpx_set_real_parm(lp_, LPX_K_OBJLL, value);
++        simplex_params_.obj_ll = value;
+       }
+       retval = true;
+       break;
+@@ -604,9 +577,9 @@ bool OGSI::setDblParam(OsiDblParam key,
+     {
+       primalObjectiveLimit_ = value;
+       if (getObjSense() == 1) {
+-        lpx_set_real_parm(lp_, LPX_K_OBJLL, value);
++        simplex_params_.obj_ll = value;
+       } else {
+-        lpx_set_real_parm(lp_, LPX_K_OBJUL, value);
++        simplex_params_.obj_ul = value;
+       }
+       retval = true;
+       break;
+@@ -614,7 +587,7 @@ bool OGSI::setDblParam(OsiDblParam key,
+   case OsiDualTolerance: {
+     if (value >= 0 && value <= .001) {
+       dualTolerance_ = value;
+-      lpx_set_real_parm(lp_, LPX_K_TOLDJ, value);
++      simplex_params_.tol_dj = value;
+       retval = true;
+     } else {
+       retval = false;
+@@ -624,7 +597,7 @@ bool OGSI::setDblParam(OsiDblParam key,
+   case OsiPrimalTolerance: {
+     if (value >= 0 && value <= .001) {
+       primalTolerance_ = value;
+-      lpx_set_real_parm(lp_, LPX_K_TOLBND, value);
++      simplex_params_.tol_bnd = value;
+       retval = true;
+     } else {
+       retval = false;
+@@ -633,7 +606,7 @@ bool OGSI::setDblParam(OsiDblParam key,
+   }
+   case OsiObjOffset: {
+     objOffset_ = value;
+-    lpx_set_obj_coef(lp_, 0, value);
++    glp_set_obj_coef(lp_, 0, value);
+     retval = true;
+     break;
+   }
+@@ -658,7 +631,7 @@ bool OGSI::setStrParam(OsiStrParam key,
+     probName_ = value;
+     if (probName_.length() == 0)
+       probName_ = "Pb";
+-    lpx_set_prob_name(lp_, const_cast< char * >(value.c_str()));
++    glp_set_prob_name(lp_, const_cast< char * >(value.c_str()));
+     retval = true;
+     break;
+   }
+@@ -754,10 +727,13 @@ bool OGSI::setHintParam(OsiHintParam key
+   case OsiDoPresolveInInitial:
+   case OsiDoPresolveInResolve: {
+     if (sense == false) {
+-      if (strength >= OsiHintTry)
+-        lpx_set_int_parm(lp_, LPX_K_PRESOL, 0);
++      if (strength >= OsiHintTry) {
++        simplex_params_.presolve = GLP_OFF;
++        integer_params_.presolve = GLP_OFF;
++      }
+     } else {
+-      lpx_set_int_parm(lp_, LPX_K_PRESOL, 1);
++      simplex_params_.presolve = GLP_ON;
++      integer_params_.presolve = GLP_ON;
+     }
+     retval = true;
+     break;
+@@ -767,9 +743,9 @@ bool OGSI::setHintParam(OsiHintParam key
+     unimp_hint(msgHdl, false, sense, strength, "exclusive use of dual simplex");
+     if (sense == false) {
+       if (strength >= OsiHintDo)
+-        lpx_set_int_parm(lp_, LPX_K_DUAL, 0);
++        simplex_params_.meth = GLP_PRIMAL;
+     } else {
+-      lpx_set_int_parm(lp_, LPX_K_DUAL, 1);
++      simplex_params_.meth = GLP_DUAL;
+     }
+     retval = true;
+     break;
+@@ -785,14 +761,17 @@ bool OGSI::setHintParam(OsiHintParam key
+     break;
+   }
+     /*
+-  0 is no scaling, 3 is geometric mean followed by equilibration.
++  0 is no scaling.
+ */
+   case OsiDoScale: {
+     if (sense == false) {
+-      if (strength >= OsiHintTry)
+-        lpx_set_int_parm(lp_, LPX_K_SCALE, 0);
++      if (strength >= OsiHintTry) {
++        scale_ = 0;
++        glp_scale_prob(lp_, scale_);
++      }
+     } else {
+-      lpx_set_int_parm(lp_, LPX_K_SCALE, 3);
++      scale_ = GLP_SF_AUTO;
++      glp_scale_prob(lp_, scale_);
+     }
+     retval = true;
+     break;
+@@ -804,18 +783,22 @@ bool OGSI::setHintParam(OsiHintParam key
+   case OsiDoReducePrint: {
+     if (sense == true) {
+       if (strength <= OsiHintTry) {
+-        lpx_set_int_parm(lp_, LPX_K_MSGLEV, 1);
++        simplex_params_.msg_lev = GLP_MSG_ERR;
++        integer_params_.msg_lev = GLP_MSG_ERR;
+       } else {
+-        lpx_set_int_parm(lp_, LPX_K_MSGLEV, 0);
++        simplex_params_.msg_lev = GLP_MSG_OFF;
++        integer_params_.msg_lev = GLP_MSG_OFF;
+       }
+     } else {
+       if (strength <= OsiHintTry) {
+-        lpx_set_int_parm(lp_, LPX_K_MSGLEV, 2);
++        simplex_params_.msg_lev = GLP_MSG_ON;
++        integer_params_.msg_lev = GLP_MSG_ON;
+       } else {
+-        lpx_set_int_parm(lp_, LPX_K_MSGLEV, 3);
++        simplex_params_.msg_lev = GLP_MSG_ALL;
++        integer_params_.msg_lev = GLP_MSG_ALL;
+       }
+     }
+-    int logLevel = lpx_get_int_parm(lp_, LPX_K_MSGLEV);
++    int logLevel = simplex_params_.msg_lev;
+     messageHandler()->setLogLevel(logLevel);
+     retval = true;
+     break;
+@@ -890,7 +873,7 @@ bool OGSI::getDblParam(OsiDblParam key,
+     break;
+ 
+   case OsiObjOffset:
+-    value = lpx_get_obj_coef(getMutableModelPtr(), 0);
++    value = glp_get_obj_coef(getMutableModelPtr(), 0);
+     retval = true;
+     break;
+ 
+@@ -906,7 +889,7 @@ bool OGSI::getStrParam(OsiStrParam key,
+   //	bool retval = false;
+   switch (key) {
+   case OsiProbName:
+-    value = lpx_get_prob_name(getMutableModelPtr());
++    value = glp_get_prob_name(getMutableModelPtr());
+     break;
+   case OsiSolverName:
+     value = "glpk";
+@@ -930,11 +913,11 @@ bool OGSI::isProvenOptimal() const
+   LPX *model = getMutableModelPtr();
+ 
+   if (bbWasLast_ == 0) {
+-    int stat = lpx_get_status(model);
+-    return stat == LPX_OPT;
++    int stat = glp_get_status(model);
++    return stat == GLP_OPT;
+   } else {
+-    int stat = lpx_mip_status(model);
+-    return stat == LPX_I_OPT;
++    int stat = glp_mip_status(model);
++    return stat == GLP_OPT;
+   }
+ }
+ 
+@@ -946,9 +929,9 @@ bool OGSI::isProvenPrimalInfeasible() co
+     return true;
+ 
+   if (bbWasLast_ == 0)
+-    return lpx_get_prim_stat(model) == LPX_P_NOFEAS;
++    return glp_get_prim_stat(model) == GLP_NOFEAS;
+   else
+-    return lpx_mip_status(model) == LPX_I_NOFEAS;
++    return glp_mip_status(model) == GLP_NOFEAS;
+ }
+ 
+ bool OGSI::isProvenDualInfeasible() const
+@@ -959,7 +942,7 @@ bool OGSI::isProvenDualInfeasible() cons
+     return true;
+ 
+   if (bbWasLast_ == 0)
+-    return lpx_get_dual_stat(model) == LPX_D_NOFEAS;
++    return glp_get_dual_stat(model) == GLP_NOFEAS;
+   else
+     // Not sure what to do for MIPs;  does it just mean unbounded?
+     // ??? for now, return false
+@@ -1059,22 +1042,22 @@ CoinWarmStart *OGSI::getWarmStart() cons
+    and  Glpk's at-upper-bound will be mapped to Osi's at-lower-bound. 
+ */
+   for (int i = 0; i < numrows; i++) {
+-    int stati = lpx_get_row_stat(lp_, i + 1);
++    int stati = glp_get_row_stat(lp_, i + 1);
+     switch (stati) {
+-    case LPX_BS: {
++    case GLP_BS: {
+       ws->setArtifStatus(i, CoinWarmStartBasis::basic);
+       break;
+     }
+-    case LPX_NS:
+-    case LPX_NL: {
++    case GLP_NS:
++    case GLP_NL: {
+       ws->setArtifStatus(i, CoinWarmStartBasis::atUpperBound);
+       break;
+     }
+-    case LPX_NU: {
++    case GLP_NU: {
+       ws->setArtifStatus(i, CoinWarmStartBasis::atLowerBound);
+       break;
+     }
+-    case LPX_NF: {
++    case GLP_NF: {
+       ws->setArtifStatus(i, CoinWarmStartBasis::isFree);
+       break;
+     }
+@@ -1088,22 +1071,22 @@ CoinWarmStart *OGSI::getWarmStart() cons
+   And repeat for the columns.
+ */
+   for (int j = 0; j < numcols; j++) {
+-    int statj = lpx_get_col_stat(lp_, j + 1);
++    int statj = glp_get_col_stat(lp_, j + 1);
+     switch (statj) {
+-    case LPX_BS: {
++    case GLP_BS: {
+       ws->setStructStatus(j, CoinWarmStartBasis::basic);
+       break;
+     }
+-    case LPX_NS:
+-    case LPX_NL: {
++    case GLP_NS:
++    case GLP_NL: {
+       ws->setStructStatus(j, CoinWarmStartBasis::atLowerBound);
+       break;
+     }
+-    case LPX_NU: {
++    case GLP_NU: {
+       ws->setStructStatus(j, CoinWarmStartBasis::atUpperBound);
+       break;
+     }
+-    case LPX_NF: {
++    case GLP_NF: {
+       ws->setStructStatus(j, CoinWarmStartBasis::isFree);
+       break;
+     }
+@@ -1163,19 +1146,19 @@ bool OGSI::setWarmStart(const CoinWarmSt
+ 
+     switch (ws->getArtifStatus(i)) {
+     case CoinWarmStartBasis::basic: {
+-      stati = LPX_BS;
++      stati = GLP_BS;
+       break;
+     }
+     case CoinWarmStartBasis::atLowerBound: {
+-      stati = LPX_NU;
++      stati = GLP_NU;
+       break;
+     }
+     case CoinWarmStartBasis::atUpperBound: {
+-      stati = LPX_NL;
++      stati = GLP_NL;
+       break;
+     }
+     case CoinWarmStartBasis::isFree: {
+-      stati = LPX_NF;
++      stati = GLP_NF;
+       break;
+     }
+     default: {
+@@ -1184,7 +1167,7 @@ bool OGSI::setWarmStart(const CoinWarmSt
+     }
+     }
+ 
+-    lpx_set_row_stat(lp_, i + 1, stati);
++    glp_set_row_stat(lp_, i + 1, stati);
+   }
+ 
+   for (int j = 0; j < numcols; j++) {
+@@ -1192,19 +1175,19 @@ bool OGSI::setWarmStart(const CoinWarmSt
+ 
+     switch (ws->getStructStatus(j)) {
+     case CoinWarmStartBasis::basic: {
+-      statj = LPX_BS;
++      statj = GLP_BS;
+       break;
+     }
+     case CoinWarmStartBasis::atLowerBound: {
+-      statj = LPX_NL;
++      statj = GLP_NL;
+       break;
+     }
+     case CoinWarmStartBasis::atUpperBound: {
+-      statj = LPX_NU;
++      statj = GLP_NU;
+       break;
+     }
+     case CoinWarmStartBasis::isFree: {
+-      statj = LPX_NF;
++      statj = GLP_NF;
+       break;
+     }
+     default: {
+@@ -1213,7 +1196,7 @@ bool OGSI::setWarmStart(const CoinWarmSt
+     }
+     }
+ 
+-    lpx_set_col_stat(lp_, j + 1, statj);
++    glp_set_col_stat(lp_, j + 1, statj);
+   }
+ 
+   return (true);
+@@ -1244,9 +1227,9 @@ void OGSI::markHotStart()
+     int stat;
+     double val;
+     double dualVal;
+-    stat = lpx_get_col_stat(model, j);
+-    val = lpx_get_col_prim(model, j);
+-    dualVal = lpx_get_col_dual(model, j);
++    stat = glp_get_col_stat(model, j);
++    val = glp_get_col_prim(model, j);
++    dualVal = glp_get_col_dual(model, j);
+     hotStartCStat_[j] = stat;
+     hotStartCVal_[j] = val;
+     hotStartCDualVal_[j] = dualVal;
+@@ -1266,9 +1249,9 @@ void OGSI::markHotStart()
+     int stat;
+     double val;
+     double dualVal;
+-    stat = lpx_get_row_stat(model, i + 1);
+-    val = lpx_get_row_prim(model, i + 1);
+-    dualVal = lpx_get_row_dual(model, i + 1);
++    stat = glp_get_row_stat(model, i + 1);
++    val = glp_get_row_prim(model, i + 1);
++    dualVal = glp_get_row_dual(model, i + 1);
+     hotStartRStat_[i] = stat;
+     hotStartRVal_[i] = val;
+     hotStartRDualVal_[i] = dualVal;
+@@ -1295,11 +1278,11 @@ void OGSI::solveFromHotStart()
+ 
+   int j;
+   for (j = 0; j < numcols; j++) {
+-    lpx_set_col_stat(model, j + 1, hotStartCStat_[j]);
++    glp_set_col_stat(model, j + 1, hotStartCStat_[j]);
+   }
+   int i;
+   for (i = 0; i < numrows; i++) {
+-    lpx_set_row_stat(model, i + 1, hotStartRStat_[i]);
++    glp_set_row_stat(model, i + 1, hotStartRStat_[i]);
+   }
+ 
+   freeCachedData(OGSI::FREECACHED_RESULTS);
+@@ -1326,17 +1309,17 @@ void OGSI::unmarkHotStart()
+ //-----------------------------------------------------------------------------
+ int OGSI::getNumCols() const
+ {
+-  return lpx_get_num_cols(getMutableModelPtr());
++  return glp_get_num_cols(getMutableModelPtr());
+ }
+ 
+ int OGSI::getNumRows() const
+ {
+-  return lpx_get_num_rows(getMutableModelPtr());
++  return glp_get_num_rows(getMutableModelPtr());
+ }
+ 
+ CoinBigIndex OGSI::getNumElements() const
+ {
+-  return lpx_get_num_nz(getMutableModelPtr());
++  return glp_get_num_nz(getMutableModelPtr());
+ }
+ 
+ //-----------------------------------------------------------------------------
+@@ -1362,25 +1345,27 @@ const double *OGSI::getColLower() const
+       int type;
+       double lb;
+       double ub;
+-      type = lpx_get_col_type(model, i + 1);
+-      lb = lpx_get_col_lb(model, i + 1);
+-      ub = lpx_get_col_ub(model, i + 1);
++      type = glp_get_col_type(model, i + 1);
++      lb = glp_get_col_lb(model, i + 1);
++      if (lb == -COIN_DBL_MAX) lb = 0.0;
++      ub = glp_get_col_ub(model, i + 1);
++      if (ub == +COIN_DBL_MAX) ub = 0.0;
+       switch (type) {
+-      case LPX_FR:
++      case GLP_FR:
+         lb = -inf;
+         ub = inf;
+         break;
+ 
+-      case LPX_LO:
++      case GLP_LO:
+         ub = inf;
+         break;
+ 
+-      case LPX_UP:
++      case GLP_UP:
+         lb = -inf;
+         break;
+ 
+-      case LPX_FX:
+-      case LPX_DB:
++      case GLP_FX:
++      case GLP_DB:
+         break;
+ 
+       default:
+@@ -1477,25 +1462,27 @@ const double *OGSI::getRowLower() const
+       int type;
+       double lb;
+       double ub;
+-      type = lpx_get_row_type(model, i + 1);
+-      lb = lpx_get_row_lb(model, i + 1);
+-      ub = lpx_get_row_ub(model, i + 1);
++      type = glp_get_row_type(model, i + 1);
++      lb = glp_get_row_lb(model, i + 1);
++      if (lb == -COIN_DBL_MAX) lb = 0.0;
++      ub = glp_get_row_ub(model, i + 1);
++      if (ub == +COIN_DBL_MAX) ub = 0.0;
+       switch (type) {
+-      case LPX_FR:
++      case GLP_FR:
+         lb = -inf;
+         ub = inf;
+         break;
+ 
+-      case LPX_LO:
++      case GLP_LO:
+         ub = inf;
+         break;
+ 
+-      case LPX_UP:
++      case GLP_UP:
+         lb = -inf;
+         break;
+ 
+-      case LPX_DB:
+-      case LPX_FX:
++      case GLP_DB:
++      case GLP_FX:
+         break;
+ 
+       default:
+@@ -1533,7 +1520,7 @@ const double *OGSI::getObjCoefficients()
+     }
+     int i;
+     for (i = 0; i < numcols; i++) {
+-      obj_[i] = lpx_get_obj_coef(model, i + 1);
++      obj_[i] = glp_get_obj_coef(model, i + 1);
+     }
+   }
+   return obj_;
+@@ -1544,9 +1531,9 @@ const double *OGSI::getObjCoefficients()
+ double OGSI::getObjSense() const
+ 
+ {
+-  if (lpx_get_obj_dir(lp_) == LPX_MIN) {
++  if (glp_get_obj_dir(lp_) == GLP_MIN) {
+     return (+1.0);
+-  } else if (lpx_get_obj_dir(lp_) == LPX_MAX) {
++  } else if (glp_get_obj_dir(lp_) == GLP_MAX) {
+     return (-1.0);
+   } else // internal confusion
+   {
+@@ -1561,7 +1548,7 @@ double OGSI::getObjSense() const
+ 
+ bool OGSI::isContinuous(int colNumber) const
+ {
+-  return lpx_get_col_kind(getMutableModelPtr(), colNumber + 1) == LPX_CV;
++  return glp_get_col_kind(getMutableModelPtr(), colNumber + 1) == GLP_CV;
+ }
+ 
+ //-----------------------------------------------------------------------------
+@@ -1582,13 +1569,13 @@ const CoinPackedMatrix *OGSI::getMatrixB
+     double *colelem = new double[numcols + 1];
+     int i;
+     for (i = 0; i < getNumRows(); i++) {
+-      int colsize = lpx_get_mat_row(model, i + 1, colind, colelem);
++      int colsize = glp_get_mat_row(model, i + 1, colind, colelem);
+       int j;
+       for (j = 1; j <= colsize; j++) {
+         --colind[j];
+       }
+ 
+-      // Note:  lpx_get_mat_row apparently may return the
++      // Note:  glp_get_mat_row apparently may return the
+       // elements in decreasing order.  This differs from
+       // people's standard expectations but is not an error.
+ 
+@@ -1617,7 +1604,7 @@ const CoinPackedMatrix *OGSI::getMatrixB
+     double *rowelem = new double[numrows + 1];
+     int j;
+     for (j = 0; j < getNumCols(); j++) {
+-      int rowsize = lpx_get_mat_col(model, j + 1, rowind, rowelem);
++      int rowsize = glp_get_mat_col(model, j + 1, rowind, rowelem);
+       int i;
+       for (i = 1; i <= rowsize; i++) {
+         --rowind[i];
+@@ -1682,9 +1669,9 @@ const double *OGSI::getColSolution() con
+ */
+   int probStatus;
+   if (bbWasLast_) {
+-    probStatus = lpx_mip_status(lp_);
++    probStatus = glp_mip_status(lp_);
+   } else {
+-    probStatus = lpx_get_status(lp_);
++    probStatus = glp_get_status(lp_);
+   }
+   /*
+   If the problem hasn't been solved, glpk returns zeros, but OSI requires that
+@@ -1693,7 +1680,7 @@ const double *OGSI::getColSolution() con
+   collower[j] < colupper[j]). Solution values will be 0.0 unless that's outside
+   the bounds.
+ */
+-  if (probStatus == LPX_UNDEF || probStatus == LPX_I_UNDEF) {
++  if (probStatus == GLP_UNDEF) {
+     getColLower();
+     int j;
+     for (j = 0; j < numcols; j++) {
+@@ -1712,11 +1699,11 @@ const double *OGSI::getColSolution() con
+   else if (bbWasLast_ == 0) {
+     int j;
+     for (j = 0; j < numcols; j++) {
+-      colsol_[j] = lpx_get_col_prim(lp_, j + 1);
++      colsol_[j] = glp_get_col_prim(lp_, j + 1);
+       if (fabs(colsol_[j]) < GlpkZeroTol) {
+         colsol_[j] = 0.0;
+       }
+-      redcost_[j] = lpx_get_col_dual(lp_, j + 1);
++      redcost_[j] = glp_get_col_dual(lp_, j + 1);
+       if (fabs(redcost_[j]) < GlpkZeroTol) {
+         redcost_[j] = 0.0;
+       }
+@@ -1729,7 +1716,7 @@ const double *OGSI::getColSolution() con
+   else {
+     int j;
+     for (j = 0; j < numcols; j++) {
+-      colsol_[j] = lpx_mip_col_val(lp_, j + 1);
++      colsol_[j] = glp_mip_col_val(lp_, j + 1);
+       if (fabs(colsol_[j]) < GlpkZeroTol) {
+         colsol_[j] = 0.0;
+       }
+@@ -1772,7 +1759,7 @@ const double *OGSI::getRowPrice() const
+   if (bbWasLast_ == 0) {
+     int i;
+     for (i = 0; i < numrows; i++) {
+-      rowsol_[i] = lpx_get_row_dual(lp_, i + 1);
++      rowsol_[i] = glp_get_row_dual(lp_, i + 1);
+       if (fabs(rowsol_[i]) < GlpkZeroTol) {
+         rowsol_[i] = 0.0;
+       }
+@@ -1794,7 +1781,7 @@ const double *OGSI::getRowPrice() const
+   setRowPrice(), and it'd be nice to return reduced costs that agree with the
+   duals.
+ 
+-  To use glpk's routine (lpx_get_col_dual), the interface needs to track the
++  To use glpk's routine (glp_get_col_dual), the interface needs to track the
+   origin of the dual (row price) values.
+ */
+ const double *OGSI::getReducedCost() const
+@@ -1962,7 +1949,7 @@ void OGSI::setObjCoeff(int j, double cj)
+   /*
+   Push the changed objective down to glpk.
+ */
+-  lpx_set_obj_coef(lp_, j + 1, cj);
++  glp_set_obj_coef(lp_, j + 1, cj);
+ 
+   if (obj_) {
+     obj_[j] = cj;
+@@ -1981,16 +1968,17 @@ void OGSI::setColLower(int j, double lbj
+   infinite bound, so we need to check the status and possibly correct.
+ */
+   double inf = getInfinity();
+-  int type = lpx_get_col_type(lp_, j + 1);
+-  double ubj = lpx_get_col_ub(lp_, j + 1);
++  int type = glp_get_col_type(lp_, j + 1);
++  double ubj = glp_get_col_ub(lp_, j + 1);
++  if (ubj == COIN_DBL_MAX) ubj = 0.0;
+   switch (type) {
+-  case LPX_UP:
+-  case LPX_DB:
+-  case LPX_FX: {
++  case GLP_UP:
++  case GLP_DB:
++  case GLP_FX: {
+     break;
+   }
+-  case LPX_FR:
+-  case LPX_LO: {
++  case GLP_FR:
++  case GLP_LO: {
+     ubj = inf;
+     break;
+   }
+@@ -2035,16 +2023,17 @@ void OGSI::setColUpper(int j, double ubj
+   infinite bound, so we need to check the status and possibly correct.
+ */
+   double inf = getInfinity();
+-  int type = lpx_get_col_type(lp_, j + 1);
+-  double lbj = lpx_get_col_lb(lp_, j + 1);
++  int type = glp_get_col_type(lp_, j + 1);
++  double lbj = glp_get_col_lb(lp_, j + 1);
++  if (lbj == -COIN_DBL_MAX) lbj = 0.0;
+   switch (type) {
+-  case LPX_LO:
+-  case LPX_DB:
+-  case LPX_FX: {
++  case GLP_LO:
++  case GLP_DB:
++  case GLP_FX: {
+     break;
+   }
+-  case LPX_FR:
+-  case LPX_UP: {
++  case GLP_FR:
++  case GLP_UP: {
+     lbj = inf;
+     break;
+   }
+@@ -2102,23 +2091,23 @@ void OGSI::setColBounds(int j, double lo
+   int type;
+ 
+   if (lower == upper) {
+-    type = LPX_FX;
++    type = GLP_FX;
+   } else if (lower > -inf && upper < inf) {
+-    type = LPX_DB;
++    type = GLP_DB;
+   } else if (lower > -inf) {
+-    type = LPX_LO;
++    type = GLP_LO;
+   } else if (upper < inf) {
+-    type = LPX_UP;
++    type = GLP_UP;
+   } else {
+-    type = LPX_FR;
++    type = GLP_FR;
+   }
+   /*
+   Push the bound change down into the solver. 1-based addressing.
+ */
+-  int statj = lpx_get_col_stat(lp_, j + 1);
+-  lpx_set_col_bnds(lp_, j + 1, type, lower, upper);
+-  lpx_set_col_stat(lp_, j + 1, statj);
+-  statj = lpx_get_col_stat(lp_, j + 1);
++  int statj = glp_get_col_stat(lp_, j + 1);
++  glp_set_col_bnds(lp_, j + 1, type, lower, upper);
++  glp_set_col_stat(lp_, j + 1, statj);
++  statj = glp_get_col_stat(lp_, j + 1);
+   /*
+   Correct the cached upper and lower bound vectors, if present.
+ */
+@@ -2152,17 +2141,18 @@ void OGSI::setRowLower(int elementIndex,
+   double lb;
+   double ub;
+ 
+-  type = lpx_get_row_type(getMutableModelPtr(), elementIndex + 1);
+-  ub = lpx_get_row_ub(getMutableModelPtr(), elementIndex + 1);
++  type = glp_get_row_type(getMutableModelPtr(), elementIndex + 1);
++  ub = glp_get_row_ub(getMutableModelPtr(), elementIndex + 1);
++  if (ub == COIN_DBL_MAX) ub = 0.0;
+   lb = elementValue;
+   switch (type) {
+-  case LPX_UP:
+-  case LPX_DB:
+-  case LPX_FX:
++  case GLP_UP:
++  case GLP_DB:
++  case GLP_FX:
+     break;
+ 
+-  case LPX_FR:
+-  case LPX_LO:
++  case GLP_FR:
++  case GLP_LO:
+     ub = inf;
+     break;
+ 
+@@ -2182,17 +2172,18 @@ void OGSI::setRowUpper(int elementIndex,
+   double lb;
+   double ub;
+ 
+-  type = lpx_get_row_type(getMutableModelPtr(), elementIndex + 1);
+-  lb = lpx_get_row_lb(getMutableModelPtr(), elementIndex + 1);
++  type = glp_get_row_type(getMutableModelPtr(), elementIndex + 1);
++  lb = glp_get_row_lb(getMutableModelPtr(), elementIndex + 1);
++  if (lb == -COIN_DBL_MAX) lb = 0.0;
+   ub = elementValue;
+   switch (type) {
+-  case LPX_LO:
+-  case LPX_DB:
+-  case LPX_FX:
++  case GLP_LO:
++  case GLP_DB:
++  case GLP_FX:
+     break;
+ 
+-  case LPX_FR:
+-  case LPX_UP:
++  case GLP_FR:
++  case GLP_UP:
+     lb = -inf;
+     break;
+ 
+@@ -2223,18 +2214,18 @@ void OGSI::setRowBounds(int i, double lo
+   int type;
+ 
+   if (lower == upper) {
+-    type = LPX_FX;
++    type = GLP_FX;
+   } else if (lower > -inf && upper < inf) {
+-    type = LPX_DB;
++    type = GLP_DB;
+   } else if (lower > -inf) {
+-    type = LPX_LO;
++    type = GLP_LO;
+   } else if (upper < inf) {
+-    type = LPX_UP;
++    type = GLP_UP;
+   } else {
+-    type = LPX_FR;
++    type = GLP_FR;
+   }
+ 
+-  lpx_set_row_bnds(lp_, i + 1, type, lower, upper);
++  glp_set_row_bnds(lp_, i + 1, type, lower, upper);
+   /*
+   Update cached vectors, if they exist.
+ */
+@@ -2288,7 +2279,7 @@ void OGSI::setContinuous(int index)
+ {
+   LPX *model = getMutableModelPtr();
+   freeCachedData(OGSI::FREECACHED_COLUMN);
+-  lpx_set_col_kind(model, index + 1, LPX_CV);
++  glp_set_col_kind(model, index + 1, GLP_CV);
+ }
+ 
+ //-----------------------------------------------------------------------------
+@@ -2298,7 +2289,7 @@ void OGSI::setInteger(int index)
+ {
+   LPX *model = getMutableModelPtr();
+   freeCachedData(OGSI::FREECACHED_COLUMN);
+-  lpx_set_col_kind(model, index + 1, LPX_IV);
++  glp_set_col_kind(model, index + 1, GLP_IV);
+   /*
+   Temporary hack to correct upper bounds on general integer variables.
+   CoinMpsIO insists on forcing a bound of 1e30 for general integer variables
+@@ -2348,9 +2339,9 @@ void OGSI::setObjSense(double s)
+   freeCachedData(OGSI::FREECACHED_RESULTS);
+ 
+   if (s <= -1.0) {
+-    lpx_set_obj_dir(lp_, LPX_MAX);
++    glp_set_obj_dir(lp_, GLP_MAX);
+   } else {
+-    lpx_set_obj_dir(lp_, LPX_MIN);
++    glp_set_obj_dir(lp_, GLP_MIN);
+   }
+ 
+   return;
+@@ -2416,12 +2407,12 @@ void OGSI::addCol(const CoinPackedVector
+   const double collb, const double colub, const double obj)
+ {
+   // Note: GLPK expects only non-zero coefficients will be given in
+-  //   lpx_set_mat_col and will abort if there are any zeros.  So any
+-  //   zeros must be removed prior to calling lpx_set_mat_col.
++  //   glp_set_mat_col and will abort if there are any zeros.  So any
++  //   zeros must be removed prior to calling glp_set_mat_col.
+   LPX *model = getMutableModelPtr();
+   freeCachedData(OGSI::KEEPCACHED_ROW);
+ 
+-  lpx_add_cols(model, 1);
++  glp_add_cols(model, 1);
+   int numcols = getNumCols();
+   setColBounds(numcols - 1, collb, colub);
+   setObjCoeff(numcols - 1, obj);
+@@ -2439,7 +2430,7 @@ void OGSI::addCol(const CoinPackedVector
+   for (i = 0; i < vec.getNumElements(); i++) {
+     if (elements[i] != 0.0) {
+       if (indices[i] + 1 > numrows) {
+-        lpx_add_rows(model, indices[i] + 1 - numrows);
++        glp_add_rows(model, indices[i] + 1 - numrows);
+         numrows = indices[i] + 1;
+         // ??? could do this more efficiently with a single call based on the max
+       }
+@@ -2449,7 +2440,7 @@ void OGSI::addCol(const CoinPackedVector
+       elements_adj[count] = elements[i];
+     }
+   }
+-  lpx_set_mat_col(model, numcols, count, indices_adj, elements_adj);
++  glp_set_mat_col(model, numcols, count, indices_adj, elements_adj);
+   delete[] indices_adj;
+   delete[] elements_adj;
+ 
+@@ -2486,7 +2477,7 @@ void OGSI::deleteCols(const int num, con
+     columnIndicesPlus1[i + 1] = columnIndices[i] + 1;
+     deleteColNames(columnIndices[i], 1);
+   }
+-  lpx_del_cols(model, num, columnIndicesPlus1);
++  glp_del_cols(model, num, columnIndicesPlus1);
+   delete[] columnIndicesPlus1;
+ 
+ #if OGSI_TRACK_FRESH > 0
+@@ -2502,13 +2493,13 @@ void OGSI::addRow(const CoinPackedVector
+   const double rowlb, const double rowub)
+ {
+   // Note: GLPK expects only non-zero coefficients will be given in
+-  //   lpx_set_mat_row and will abort if there are any zeros.  So any
+-  //   zeros must be removed prior to calling lpx_set_mat_row.
++  //   glp_set_mat_row and will abort if there are any zeros.  So any
++  //   zeros must be removed prior to calling glp_set_mat_row.
+ 
+   LPX *model = getMutableModelPtr();
+   freeCachedData(OGSI::KEEPCACHED_COLUMN);
+ 
+-  lpx_add_rows(model, 1);
++  glp_add_rows(model, 1);
+   int numrows = getNumRows();
+   setRowBounds(numrows - 1, rowlb, rowub);
+   int i;
+@@ -2526,7 +2517,7 @@ void OGSI::addRow(const CoinPackedVector
+     if (elements[i] != 0.0) {
+       if (indices[i] + 1 > numcols) {
+         // ??? Could do this more efficiently with a single call
+-        lpx_add_cols(model, indices[i] + 1 - numcols);
++        glp_add_cols(model, indices[i] + 1 - numcols);
+         numcols = indices[i] + 1;
+       }
+       count++;
+@@ -2534,7 +2525,7 @@ void OGSI::addRow(const CoinPackedVector
+       indices_adj[count] = indices[i] + 1;
+     }
+   }
+-  lpx_set_mat_row(model, numrows, count, indices_adj, elements_adj);
++  glp_set_mat_row(model, numrows, count, indices_adj, elements_adj);
+   delete[] indices_adj;
+   delete[] elements_adj;
+ 
+@@ -2616,8 +2607,8 @@ void OGSI::deleteRows(const int num, con
+   int notBasic = 0;
+   for (ndx = 1; ndx <= num; ndx++) {
+     i = glpkIndices[ndx];
+-    int stati = lpx_get_row_stat(lp_, i);
+-    if (stati != LPX_BS) {
++    int stati = glp_get_row_stat(lp_, i);
++    if (stati != GLP_BS) {
+       notBasic++;
+     }
+   }
+@@ -2632,7 +2623,7 @@ void OGSI::deleteRows(const int num, con
+   /*
+   Tell glpk to delete the rows.
+ */
+-  lpx_del_rows(lp_, num, glpkIndices);
++  glp_del_rows(lp_, num, glpkIndices);
+ 
+   delete[] glpkIndices;
+ 
+@@ -2668,42 +2659,44 @@ void OGSI::loadProblem(const CoinPackedM
+   
+   In any event, get rid of cached data in the OsiGlpk object.
+ */
+-  if (lpx_get_num_cols(lp_) != 0 || lpx_get_num_rows(lp_) != 0) {
+-    int presolVal = lpx_get_int_parm(lp_, LPX_K_PRESOL);
+-    int usedualVal = lpx_get_int_parm(lp_, LPX_K_DUAL);
+-    int scaleVal = lpx_get_int_parm(lp_, LPX_K_SCALE);
+-    int logVal = lpx_get_int_parm(lp_, LPX_K_MSGLEV);
++  if (glp_get_num_cols(lp_) != 0 || glp_get_num_rows(lp_) != 0) {
++    int presolVal = simplex_params_.presolve;
++    int usedualVal = simplex_params_.meth;
++    int logVal = simplex_params_.msg_lev;
+ #if OGSI_TRACK_FRESH > 0
+     std::cout
+       << "    emptying LPX(" << std::hex << lp_ << std::dec << "), "
+ #endif
+-      lpx_delete_prob(lp_);
+-    lp_ = lpx_create_prob();
++      glp_delete_prob(lp_);
++    lp_ = glp_create_prob();
+     assert(lp_);
+ #if OGSI_TRACK_FRESH > 0
+     std::cout
+       << "loading LPX(" << std::hex << lp_ << std::dec << ")."
+       << std::endl;
+ #endif
+-    lpx_set_class(lp_, LPX_MIP);
+-    lpx_set_int_parm(lp_, LPX_K_ITLIM, maxIteration_);
++    glp_init_smcp(&simplex_params_);
++    glp_init_iocp(&integer_params_);
++    simplex_params_.it_lim = maxIteration_;
+     if (getObjSense() == 1) // minimization
+     {
+-      lpx_set_real_parm(lp_, LPX_K_OBJUL, dualObjectiveLimit_);
+-      lpx_set_real_parm(lp_, LPX_K_OBJLL, primalObjectiveLimit_);
++      simplex_params_.obj_ul = dualObjectiveLimit_;
++      simplex_params_.obj_ll = primalObjectiveLimit_;
+     } else // maximization
+     {
+-      lpx_set_real_parm(lp_, LPX_K_OBJLL, dualObjectiveLimit_);
+-      lpx_set_real_parm(lp_, LPX_K_OBJUL, primalObjectiveLimit_);
++      simplex_params_.obj_ll = dualObjectiveLimit_;
++      simplex_params_.obj_ul = primalObjectiveLimit_;
+     }
+-    lpx_set_real_parm(lp_, LPX_K_TOLDJ, dualTolerance_);
+-    lpx_set_real_parm(lp_, LPX_K_TOLBND, primalTolerance_);
+-    lpx_set_obj_coef(lp_, 0, objOffset_);
+-    lpx_set_prob_name(lp_, const_cast< char * >(probName_.c_str()));
+-    lpx_set_int_parm(lp_, LPX_K_PRESOL, presolVal);
+-    lpx_set_int_parm(lp_, LPX_K_DUAL, usedualVal);
+-    lpx_set_int_parm(lp_, LPX_K_SCALE, scaleVal);
+-    lpx_set_int_parm(lp_, LPX_K_MSGLEV, logVal);
++    simplex_params_.tol_dj = dualTolerance_;
++    simplex_params_.tol_bnd = primalTolerance_;
++    glp_set_obj_coef(lp_, 0, objOffset_);
++    glp_set_prob_name(lp_, const_cast< char * >(probName_.c_str()));
++    simplex_params_.presolve = presolVal;
++    simplex_params_.meth = usedualVal;
++    glp_scale_prob(lp_, scale_);
++    simplex_params_.msg_lev = logVal;
++    integer_params_.msg_lev = logVal;
++    integer_params_.presolve = GLP_ON;
+     messageHandler()->setLogLevel(logVal);
+   }
+ 
+@@ -2786,7 +2779,7 @@ void OGSI::loadProblem(const CoinPackedM
+     }
+     // Make sure there are enough rows
+     if (m > getNumRows()) {
+-      lpx_add_rows(lp_, m - getNumRows());
++      glp_add_rows(lp_, m - getNumRows());
+     }
+     for (i = 0; i < m; i++) {
+       setRowBounds(i, rowlb[i], rowub[i]);
+@@ -2798,7 +2791,7 @@ void OGSI::loadProblem(const CoinPackedM
+     }
+     // Make sure there are enough columns
+     if (n > getNumCols()) {
+-      lpx_add_cols(lp_, n - getNumCols());
++      glp_add_cols(lp_, n - getNumCols());
+     }
+     for (j = 0; j < n; j++) {
+       setColBounds(j, collb[j], colub[j]);
+@@ -2907,9 +2900,9 @@ void OGSI::loadProblem(const int numcols
+ 
+   // Can't send 0 to lpx_add_xxx
+   if (numcols > 0)
+-    lpx_add_cols(model, numcols);
++    glp_add_cols(model, numcols);
+   if (numrows > 0)
+-    lpx_add_rows(model, numrows);
++    glp_add_rows(model, numrows);
+ 
+   // How many elements?  Column-major, so indices of start are columns
+   CoinBigIndex numelem = start[numcols];
+@@ -2928,7 +2921,7 @@ void OGSI::loadProblem(const int numcols
+   for (i = 0; i < numcols; i++) {
+     setColBounds(i, collb ? collb[i] : 0.0,
+       colub ? colub[i] : inf);
+-    lpx_set_mat_col(model, i + 1, static_cast< int >(start[i + 1] - start[i]),
++    glp_set_mat_col(model, i + 1, static_cast< int >(start[i + 1] - start[i]),
+       &(index_adj[start[i]]), &(value_adj[start[i]]));
+     setObjCoeff(i, obj ? obj[i] : 0.0);
+   }
+@@ -2993,7 +2986,7 @@ void OGSI::writeMps(const char *filename
+   std::string f(filename);
+   std::string e(extension);
+   std::string fullname = f + "." + e;
+-  lpx_write_mps(getMutableModelPtr(), const_cast< char * >(fullname.c_str()));
++  glp_write_mps(getMutableModelPtr(), GLP_MPS_DECK, nullptr, const_cast< char * >(fullname.c_str()));
+ #else
+   // Fall back on native MPS writer.
+   // These few lines of code haven't been tested. 2004/10/15
+@@ -3161,17 +3154,17 @@ void OGSI::applyColCut(const OsiColCut &
+       // update cached version as well
+       collower_[column] = lower;
+       if (lower == upper)
+-        type = LPX_FX;
++        type = GLP_FX;
+       else if (lower > -inf && upper < inf)
+-        type = LPX_DB;
++        type = GLP_DB;
+       else if (lower > -inf)
+-        type = LPX_LO;
++        type = GLP_LO;
+       else if (upper < inf)
+-        type = LPX_UP;
++        type = GLP_UP;
+       else
+-        type = LPX_FR;
++        type = GLP_FR;
+ 
+-      lpx_set_col_bnds(getMutableModelPtr(), column + 1, type, lower, upper);
++      glp_set_col_bnds(getMutableModelPtr(), column + 1, type, lower, upper);
+     }
+   }
+   // lower bounds
+@@ -3183,17 +3176,17 @@ void OGSI::applyColCut(const OsiColCut &
+       // update cached version as well
+       colupper_[column] = upper;
+       if (lower == upper)
+-        type = LPX_FX;
++        type = GLP_FX;
+       else if (lower > -inf && upper < inf)
+-        type = LPX_DB;
++        type = GLP_DB;
+       else if (lower > -inf)
+-        type = LPX_LO;
++        type = GLP_LO;
+       else if (upper < inf)
+-        type = LPX_UP;
++        type = GLP_UP;
+       else
+-        type = LPX_FR;
++        type = GLP_FR;
+ 
+-      lpx_set_col_bnds(getMutableModelPtr(), column + 1, type, lower, upper);
++      glp_set_col_bnds(getMutableModelPtr(), column + 1, type, lower, upper);
+     }
+   }
+ #endif
+@@ -3261,24 +3254,24 @@ void OGSI::gutsOfCopy(const OsiGlpkSolve
+   held up on the parent OSI object, so we don't need to worry about copying
+   them.
+ */
+-  intParam = lpx_get_int_parm(srclpx, LPX_K_PRESOL);
+-  lpx_set_int_parm(lpx, LPX_K_PRESOL, intParam);
+-  intParam = lpx_get_int_parm(srclpx, LPX_K_DUAL);
+-  lpx_set_int_parm(lpx, LPX_K_DUAL, intParam);
+-  intParam = lpx_get_int_parm(srclpx, LPX_K_SCALE);
+-  lpx_set_int_parm(lpx, LPX_K_SCALE, intParam);
++  simplex_params_.presolve = source.simplex_params_.presolve;
++  simplex_params_.meth = source.simplex_params_.meth;
++  scale_ = source.scale_;
++  glp_scale_prob(lp_, scale_);
+   /*
+   Printing is a bit more complicated. Pull the parameter and set the log
+   level in the message handler and set the print parameter in glpk.
+ */
+-  intParam = lpx_get_int_parm(srclpx, LPX_K_MSGLEV);
+-  lpx_set_int_parm(lpx, LPX_K_MSGLEV, intParam);
++  intParam = source.simplex_params_.msg_lev;
++  simplex_params_.msg_lev = intParam;
++  integer_params_.msg_lev = intParam;
+   messageHandler()->setLogLevel(intParam);
+-
+-#ifdef LPX_K_USECUTS
+-  intParam = lpx_get_int_parm(lp_, LPX_K_USECUTS);
+-  lpx_set_int_parm(lp_, LPX_K_USECUTS, intParam);
+-#endif
++ 
++  integer_params_.presolve = source.integer_params_.presolve;
++  integer_params_.mir_cuts = source.integer_params_.mir_cuts;
++  integer_params_.gmi_cuts = source.integer_params_.gmi_cuts;
++  integer_params_.cov_cuts = source.integer_params_.cov_cuts;
++  integer_params_.clq_cuts = source.integer_params_.clq_cuts;
+ 
+   /*
+   Now --- do we have a problem loaded? If not, we're done.
+@@ -3332,24 +3325,24 @@ void OGSI::gutsOfCopy(const OsiGlpkSolve
+   nonsense, then don't bother. Once we've copied the status into the new lpx
+   object, do the warm-up.
+ */
+-  if (lpx_get_status(srclpx) != LPX_UNDEF) {
++  if (glp_get_status(srclpx) != GLP_UNDEF) {
+     for (j = 1; j <= n; j++) {
+-      int statj = lpx_get_col_stat(srclpx, j);
+-      lpx_set_col_stat(lpx, j, statj);
++      int statj = glp_get_col_stat(srclpx, j);
++      glp_set_col_stat(lpx, j, statj);
+     }
+     for (i = 1; i <= m; i++) {
+-      int stati = lpx_get_row_stat(srclpx, i);
+-      lpx_set_row_stat(lpx, i, stati);
++      int stati = glp_get_row_stat(srclpx, i);
++      glp_set_row_stat(lpx, i, stati);
+     }
+ 
+-#ifndef NDEBUG
+-    int retval = lpx_warm_up(lpx);
++#if !defined(NDEBUG) || OGSI_TRACK_SOLVERS > 1
++    int retval = glp_warm_up(lpx);
+ #endif
+ #if OGSI_TRACK_SOLVERS > 1
+     std::cout
+       << "    lpx_warm_up returns " << retval << "." << std::endl;
+ #endif
+-    assert(retval == LPX_E_OK);
++    assert(retval == 0);
+   }
+ 
+   return;
+@@ -3403,57 +3396,53 @@ void OGSI::gutsOfConstructor()
+   isObjUpperLimitReached_ = false;
+   isFeasible_ = false;
+ 
+-  lp_ = lpx_create_prob();
++  lp_ = glp_create_prob();
+   assert(lp_ != NULL);
+-  // Make all problems MIPs.  See note at top of file.
+-  lpx_set_class(lp_, LPX_MIP);
++  glp_init_smcp(&simplex_params_);
++  glp_init_iocp(&integer_params_);
++  scale_ = 0;
+ 
+   // Push OSI parameters down into LPX object.
+-  lpx_set_int_parm(lp_, LPX_K_ITLIM, maxIteration_);
++  simplex_params_.it_lim = maxIteration_;
+ 
+   if (getObjSense() == 1.0) // minimization
+   {
+-    lpx_set_real_parm(lp_, LPX_K_OBJUL, dualObjectiveLimit_);
+-    lpx_set_real_parm(lp_, LPX_K_OBJLL, primalObjectiveLimit_);
++    simplex_params_.obj_ul = dualObjectiveLimit_;
++    simplex_params_.obj_ll = primalObjectiveLimit_;
+   } else // maximization
+   {
+-    lpx_set_real_parm(lp_, LPX_K_OBJLL, dualObjectiveLimit_);
+-    lpx_set_real_parm(lp_, LPX_K_OBJUL, -primalObjectiveLimit_);
++    simplex_params_.obj_ll = dualObjectiveLimit_;
++    simplex_params_.obj_ul = -primalObjectiveLimit_;
+   }
+-  lpx_set_real_parm(lp_, LPX_K_TOLDJ, dualTolerance_);
+-  lpx_set_real_parm(lp_, LPX_K_TOLBND, primalTolerance_);
++  simplex_params_.tol_dj = dualTolerance_;
++  simplex_params_.tol_bnd = primalTolerance_;
+ 
+-  lpx_set_obj_coef(lp_, 0, objOffset_);
++  glp_set_obj_coef(lp_, 0, objOffset_);
+ 
+-  lpx_set_prob_name(lp_, const_cast< char * >(probName_.c_str()));
++  glp_set_prob_name(lp_, const_cast< char * >(probName_.c_str()));
+ 
+   /* Stefan: with the new simplex algorithm in Glpk 4.31, some netlib instances (e.g., dfl001)
+    take very long or get into a cycle.
+    Thus, let's try to leave parameters onto their defaults.
+ */
+-  //  lpx_set_int_parm(lp_,LPX_K_PRESOL,0) ;
+-  //  lpx_set_int_parm(lp_,LPX_K_DUAL,1) ;
+-  //  lpx_set_int_parm(lp_,LPX_K_SCALE,3) ;
++  //  simplex_params_.presol = GLP_OFF;
++  //  simplex_params_.meth = GLP_PRIMAL;
++  //  scale_ = GLP_SF_AUTO;
++  //  glp_scale_prob(lp_, scale_);
+   /*
+   Printing is a bit more complicated. Set the log level in the handler and set
+   the print parameter in glpk.
+ */
+-  lpx_set_int_parm(lp_, LPX_K_MSGLEV, 1);
++  simplex_params_.msg_lev = GLP_MSG_ERR;
++  integer_params_.msg_lev = GLP_MSG_ERR;
+   messageHandler()->setLogLevel(1);
++  integer_params_.presolve = GLP_ON;
+ 
+-/*
+-  Enable cuts if they're available. This is a bit of a pain,
+-  as the interface has changed since it was first introduced in 4.9.
+-  LPX_K_USECUTS appears in 4.9; the parameter value
+-  appears to be unused in this version. LPX_C_ALL appears in 4.10.
+-*/
+-#ifdef LPX_K_USECUTS
+-#ifdef LPX_C_ALL
+-  lpx_set_int_parm(lp_, LPX_K_USECUTS, LPX_C_ALL);
+-#else
+-  lpx_set_int_parm(lp_, LPX_K_USECUTS, 0);
+-#endif
+-#endif
++// Enable cuts.
++  integer_params_.mir_cuts = GLP_ON;
++  integer_params_.gmi_cuts = GLP_ON;
++  integer_params_.cov_cuts = GLP_ON;
++  integer_params_.clq_cuts = GLP_ON;
+ }
+ 
+ //-----------------------------------------------------------------------------
+@@ -3461,7 +3450,7 @@ void OGSI::gutsOfConstructor()
+ void OGSI::gutsOfDestructor()
+ {
+   if (lp_ != NULL) {
+-    lpx_delete_prob(lp_);
++    glp_delete_prob(lp_);
+     lp_ = NULL;
+     freeAllMemory();
+   }
+@@ -3582,7 +3571,7 @@ void OGSI::setObjName(std::string name)
+ 
+ {
+   OsiSolverInterface::setObjName(name);
+-  lpx_set_obj_name(lp_, const_cast< char * >(name.c_str()));
++  glp_set_obj_name(lp_, const_cast< char * >(name.c_str()));
+ }
+ 
+ /*!
+@@ -3609,7 +3598,7 @@ void OGSI::setRowName(int ndx, std::stri
+   Set the name in the OSI base, then in the consys structure.
+ */
+   OsiSolverInterface::setRowName(ndx, name);
+-  lpx_set_row_name(lp_, ndx + 1, const_cast< char * >(name.c_str()));
++  glp_set_row_name(lp_, ndx + 1, const_cast< char * >(name.c_str()));
+ 
+   return;
+ }
+@@ -3638,7 +3627,7 @@ void OGSI::setColName(int ndx, std::stri
+   Set the name in the OSI base, then in the consys structure.
+ */
+   OsiSolverInterface::setColName(ndx, name);
+-  lpx_set_col_name(lp_, ndx + 1, const_cast< char * >(name.c_str()));
++  glp_set_col_name(lp_, ndx + 1, const_cast< char * >(name.c_str()));
+ 
+   return;
+ }
+diff -up Osi-releases-0.108.9/Osi/src/OsiGlpk/OsiGlpkSolverInterface.hpp.orig Osi-releases-0.108.9/Osi/src/OsiGlpk/OsiGlpkSolverInterface.hpp
+--- Osi-releases-0.108.9/Osi/src/OsiGlpk/OsiGlpkSolverInterface.hpp.orig	2023-10-25 08:08:56.000000000 -0600
++++ Osi-releases-0.108.9/Osi/src/OsiGlpk/OsiGlpkSolverInterface.hpp	2023-11-21 11:04:58.940561712 -0700
+@@ -15,6 +15,10 @@
+ #include "CoinPackedMatrix.hpp"
+ #include "CoinWarmStartBasis.hpp"
+ 
++extern "C" {
++#include <glpk.h>
++}
++
+ /** GPLK Solver Interface
+ 
+     Instantiation of OsiGlpkSolverInterface for GPLK
+@@ -24,15 +28,6 @@
+ #define LPX glp_prob
+ #endif
+ 
+-#ifndef GLP_PROB_DEFINED
+-#define GLP_PROB_DEFINED
+-// Glpk < 4.48:
+-typedef struct {
+-  double _opaque_prob[100];
+-} glp_prob;
+-// Glpk 4.48: typedef struct glp_prob glp_prob;
+-#endif
+-
+ class OsiGlpkSolverInterface : virtual public OsiSolverInterface {
+   friend void OsiGlpkSolverInterfaceUnitTest(const std::string &mpsDir, const std::string &netlibDir);
+ 
+@@ -768,6 +763,15 @@ private:
+   /// GPLK model represented by this class instance
+   mutable LPX *lp_;
+ 
++  /// Parameters passed to the simplex solver
++  glp_smcp simplex_params_;
++
++  /// Parameters passed to the integer solver
++  glp_iocp integer_params_;
++
++  // The scale parameter
++  int scale_;
++
+   /// number of GLPK instances currently in use (counts only those created by OsiGlpk)
+   static unsigned int numInstances_;
+ 

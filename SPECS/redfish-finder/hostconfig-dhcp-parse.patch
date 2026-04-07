@@ -1,0 +1,27 @@
+commit 581327fd45351dd53c06a26517bb7f92e19d8f31
+Author: Charles Rose <charles.rose@dell.com>
+Date:   Mon Aug 31 17:40:08 2020 -0500
+
+    fix parsing HostConfig for DHCP
+    
+    assigntype.append(AssignType.DHCP) fails for DHCP because
+    assigntype [] is not set.
+    
+    Signed-off-by: Charles Rose <charles.rose@dell.com>
+
+diff --git a/redfish-finder b/redfish-finder
+old mode 100644
+new mode 100755
+index 9a185b3..461eff9
+--- a/redfish-finder
++++ b/redfish-finder
+@@ -123,8 +123,8 @@ class HostConfig():
+ 			cursor = cursor_consume_next(cursor, "Host IP Assignment Type: ")
+ 			if cursor == None:
+ 				raise RuntimeError("redfish-finder: Unable to parse SMBIOS Host IP Assignment Type")
++			self.assigntype = []
+ 			if cursor.split()[0] == "Static":
+-				self.assigntype = []
+ 				self.assigntype.append(AssignType.STATIC)
+ 				cursor = cursor_consume_next(cursor, "Host IP Address Format: ")
+ 				if cursor.split()[0] == "IPv4":

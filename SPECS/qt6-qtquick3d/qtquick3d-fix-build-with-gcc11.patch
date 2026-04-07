@@ -1,0 +1,24 @@
+diff --git a/src/3rdparty/assimp/src/code/Common/Importer.cpp b/src/3rdparty/assimp/src/code/Common/Importer.cpp
+index a2ad041..6f2438f 100644
+--- a/src/3rdparty/assimp/src/code/Common/Importer.cpp
++++ b/src/3rdparty/assimp/src/code/Common/Importer.cpp
+@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ #include <assimp/version.h>
+ #include <assimp/config.h>
+ #include <assimp/importerdesc.h>
++#include <exception>
+
+ // ------------------------------------------------------------------------------------------------
+ /* Uncomment this line to prevent Assimp from catching unknown exceptions.
+diff --git a/src/3rdparty/assimp/src/include/assimp/Importer.hpp b/src/3rdparty/assimp/src/include/assimp/Importer.hpp
+index 09b5b68..89eb071 100644
+--- a/src/3rdparty/assimp/src/include/assimp/Importer.hpp
++++ b/src/3rdparty/assimp/src/include/assimp/Importer.hpp
+@@ -58,6 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+ // Public ASSIMP data structures
+ #include <assimp/types.h>
++#include <exception>
+
+ #include <exception>
+

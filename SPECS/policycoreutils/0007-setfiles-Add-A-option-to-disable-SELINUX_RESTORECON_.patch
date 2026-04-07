@@ -1,0 +1,91 @@
+From ae251cfb85090126d5c1de62b94775fae3b43527 Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Wed, 10 Sep 2025 11:42:09 +0100
+Subject: [PATCH] setfiles: Add -A option to disable
+ SELINUX_RESTORECON_ADD_ASSOC
+
+SELINUX_RESTORECON_ADD_ASSOC tracks conflicts between inodes with
+multiple hard links or bind mounts that have differing contexts.
+However doing this involves building a large internal hashtable that
+stores the full path of every file examined by setfiles.  For
+filesystems that have very large numbers of files or long pathnames,
+this uses a lot of memory, which makes SELinux relabelling in
+constrained memory environments infeasible.
+
+This adds a new setfiles -A option that disables this tracking.
+
+For example, using setfiles to relabel a filesystem with 15 million
+files took 3.7GB of RAM.  Using this option, the same filesystem can
+be relabelled in 121MB (albeit with no warnings or errors possible for
+conflicting labels, but for our use case we don't care about that.)
+
+Fixes: https://issues.redhat.com/browse/RHEL-111505
+Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
+Acked-by: Stephen Smalley <stephen.smalley.work@gmail.com>
+---
+ policycoreutils/setfiles/setfiles.8 |  5 +++++
+ policycoreutils/setfiles/setfiles.c | 11 +++++++----
+ 2 files changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/policycoreutils/setfiles/setfiles.8 b/policycoreutils/setfiles/setfiles.8
+index 187f4513..458f3f9f 100644
+--- a/policycoreutils/setfiles/setfiles.8
++++ b/policycoreutils/setfiles/setfiles.8
+@@ -23,6 +23,7 @@ setfiles \- set SELinux file security contexts.
+ .RB [ \-I | \-D ]
+ .RB [ \-T
+ .IR nthreads ]
++.RB [ \-A ]
+ .I spec_file
+ .IR pathname \ ...
+ 
+@@ -187,6 +188,10 @@ use up to
+ threads.  Specify 0 to create as many threads as there are available
+ CPU cores; 1 to use only a single thread (default); or any positive
+ number to use the given number of threads (if possible).
++.TP
++.B \-A
++do not track inodes with multiple hard links or bind mounts that would
++match different contexts (saves memory)
+ 
+ .SH "ARGUMENTS"
+ .TP
+diff --git a/policycoreutils/setfiles/setfiles.c b/policycoreutils/setfiles/setfiles.c
+index ad09f840..31034316 100644
+--- a/policycoreutils/setfiles/setfiles.c
++++ b/policycoreutils/setfiles/setfiles.c
+@@ -40,9 +40,9 @@ static __attribute__((__noreturn__)) void usage(const char *const name)
+ 			name, name);
+ 	} else {
+ 		fprintf(stderr,
+-			"usage:  %s [-diIDlmnpqvCEFUWT] [-e excludedir] [-r alt_root_path] [-c policyfile] spec_file pathname...\n"
+-			"usage:  %s [-diIDlmnpqvCEFUWT] [-e excludedir] [-r alt_root_path] [-c policyfile] spec_file -f filename\n"
+-			"usage:  %s -s [-diIDlmnpqvFUWT] spec_file\n",
++			"usage:  %s [-diIDlmnpqvACEFUWT] [-e excludedir] [-r alt_root_path] [-c policyfile] spec_file pathname...\n"
++			"usage:  %s [-diIDlmnpqvACEFUWT] [-e excludedir] [-r alt_root_path] [-c policyfile] spec_file -f filename\n"
++			"usage:  %s -s [-diIDlmnpqvAFUWT] spec_file\n",
+ 			name, name, name);
+ 	}
+ 	exit(-1);
+@@ -147,7 +147,7 @@ int main(int argc, char **argv)
+ 	const char *base;
+ 	int errors = 0;
+ 	const char *ropts = "e:f:hiIDlmno:pqrsvFURW0xT:";
+-	const char *sopts = "c:de:f:hiIDlmno:pqr:svCEFUR:W0T:";
++	const char *sopts = "c:de:f:hiIDlmno:pqr:svACEFUR:W0T:";
+ 	const char *opts;
+ 	union selinux_callback cb;
+ 	long unsigned skipped_errors;
+@@ -375,6 +375,9 @@ int main(int argc, char **argv)
+ 			if (*optarg == '\0' || *endptr != '\0')
+ 				usage(argv[0]);
+ 			break;
++		case 'A':
++			r_opts.add_assoc = 0;
++			break;
+ 		case 'h':
+ 		case '?':
+ 			usage(argv[0]);
+-- 
+2.49.0
+

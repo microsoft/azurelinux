@@ -1,0 +1,439 @@
+diff --git a/ALGORITHMS.md b/ALGORITHMS.md
+index c16e2417..10a92070 100644
+--- a/ALGORITHMS.md
++++ b/ALGORITHMS.md
+@@ -38,7 +38,7 @@ As standardization for these algorithms within TLS is not done, all TLS code poi
+ | SecP256r1MLKEM768 | 0x11eb | Yes | OQS_CODEPOINT_SECP256R1MLKEM768 |
+ | mlkem1024 | 514 | Yes | OQS_CODEPOINT_MLKEM1024 |
+ | p521_mlkem1024 | 0x2F4D | Yes | OQS_CODEPOINT_P521_MLKEM1024 |
+-| p384_mlkem1024 | 0x2F4E | Yes | OQS_CODEPOINT_P384_MLKEM1024 |
++| SecP384r1MLKEM1024 | 0x11ED | Yes | OQS_CODEPOINT_SECP384R1MLKEM1024 |
+ | bikel1 | 0x0241 | Yes | OQS_CODEPOINT_BIKEL1 |
+ | p256_bikel1 | 0x2F41 | Yes | OQS_CODEPOINT_P256_BIKEL1 |
+ | x25519_bikel1 | 0x2FAE | Yes | OQS_CODEPOINT_X25519_BIKEL1 |
+@@ -279,7 +279,7 @@ If [OQS_KEM_ENCODERS](CONFIGURE.md#OQS_KEM_ENCODERS) is enabled the following li
+ | SecP256r1MLKEM768 | NULL | OQS_OID_SECP256R1MLKEM768
+ | mlkem1024 | 2.16.840.1.101.3.4.4.3 | OQS_OID_MLKEM1024
+ | p521_mlkem1024 | NULL | OQS_OID_P521_MLKEM1024
+-| p384_mlkem1024 | 1.3.6.1.4.1.42235.6 | OQS_OID_P384_MLKEM1024
++| SecP384r1MLKEM1024 | 1.3.6.1.4.1.42235.6 | OQS_OID_SECP384R1MLKEM1024
+ | bikel1 | NULL | OQS_OID_BIKEL1
+ | p256_bikel1 | NULL | OQS_OID_P256_BIKEL1
+ | x25519_bikel1 | NULL | OQS_OID_X25519_BIKEL1
+diff --git a/README.md b/README.md
+index e36730f2..3591a9b7 100644
+--- a/README.md
++++ b/README.md
+@@ -40,7 +40,7 @@ This implementation makes available the following quantum safe algorithms:
+ - **BIKE**: `bikel1`, `p256_bikel1`, `x25519_bikel1`, `bikel3`, `p384_bikel3`, `x448_bikel3`, `bikel5`, `p521_bikel5`
+ - **FrodoKEM**: `frodo640aes`, `p256_frodo640aes`, `x25519_frodo640aes`, `frodo640shake`, `p256_frodo640shake`, `x25519_frodo640shake`, `frodo976aes`, `p384_frodo976aes`, `x448_frodo976aes`, `frodo976shake`, `p384_frodo976shake`, `x448_frodo976shake`, `frodo1344aes`, `p521_frodo1344aes`, `frodo1344shake`, `p521_frodo1344shake`
+ - **HQC**: `hqc128`, `p256_hqc128`, `x25519_hqc128`, `hqc192`, `p384_hqc192`, `x448_hqc192`, `hqc256`, `p521_hqc256`†
+-- **ML-KEM**: `mlkem512`, `p256_mlkem512`, `x25519_mlkem512`, `mlkem768`, `p384_mlkem768`, `x448_mlkem768`, `X25519MLKEM768`, `SecP256r1MLKEM768`, `mlkem1024`, `p521_mlkem1024`, `p384_mlkem1024`
++- **ML-KEM**: `mlkem512`, `p256_mlkem512`, `x25519_mlkem512`, `mlkem768`, `p384_mlkem768`, `x448_mlkem768`, `X25519MLKEM768`, `SecP256r1MLKEM768`, `mlkem1024`, `p521_mlkem1024`, `SecP384r1MLKEM1024`
+ 
+ ### Signature algorithms
+ 
+diff --git a/oqs-template/generate.py b/oqs-template/generate.py
+index e6091874..d93e9e6a 100644
+--- a/oqs-template/generate.py
++++ b/oqs-template/generate.py
+@@ -210,11 +210,11 @@ def load_config(include_disabled_sigs=False):
+             continue
+         hybrid_nids = set()
+         for extra_hybrid in kem['extra_nids']['current']:
+-            if extra_hybrid['hybrid_group'] == "x25519" or extra_hybrid['hybrid_group'] == "p256":
++            if extra_hybrid['hybrid_group'] == "x25519" or extra_hybrid['hybrid_group'] == "p256"  or extra_hybrid['hybrid_group'] == "secp256_r1":
+                extra_hybrid['bit_security'] = 128
+-            if extra_hybrid['hybrid_group'] == "x448" or extra_hybrid['hybrid_group'] == "p384":
++            if extra_hybrid['hybrid_group'] == "x448" or extra_hybrid['hybrid_group'] == "p384" or extra_hybrid['hybrid_group'] == "secp384_r1":
+                extra_hybrid['bit_security'] = 192
+-            if extra_hybrid['hybrid_group'] == "p521":
++            if extra_hybrid['hybrid_group'] == "p521" or extra_hybrid['hybrid_group'] == "secp521_r1":
+                extra_hybrid['bit_security'] = 256
+             if not 'hybrid_oid' in extra_hybrid:
+                 extra_hybrid['hybrid_oid'] = get_tmp_kem_oid()
+diff --git a/oqs-template/generate.yml b/oqs-template/generate.yml
+index 98110dbe..89ace50d 100644
+--- a/oqs-template/generate.yml
++++ b/oqs-template/generate.yml
+@@ -209,7 +209,7 @@ kems:
+ # https://www.ietf.org/archive/id/draft-kwiatkowski-tls-ecdhe-mlkem-02.html#name-x25519mlkem768
+           nid: '0x11ec'
+           standard_name: "X25519MLKEM768"
+-        - hybrid_group: "p256"
++        - hybrid_group: "secp256_r1"
+ # https://www.ietf.org/archive/id/draft-kwiatkowski-tls-ecdhe-mlkem-02.html#name-secp256r1mlkem768
+           nid: '0x11eb'
+           standard_name: "SecP256r1MLKEM768"
+@@ -226,14 +226,15 @@ kems:
+     oqs_alg: 'OQS_KEM_alg_ml_kem_1024'
+     extra_nids:
+       current:
+-        # p384_mlkem1024 hybrid doesn't appear in any standardization drafts
++        # p384_mlkem1024 hybrid not fully standardized
+         # this oid is proposed by Tresorit
+         # if the hybrid combination is standardized, feel free to change it
+-        - hybrid_group: "p384"
++        - hybrid_group: "secp384_r1"
+ # does Tresorit want to update?
+           hybrid_oid: '1.3.6.1.4.1.42235.6'
+-# code point not standardized: Why? XXX
+-          nid: '0x2F4E'
++# code point standardization proposal as per https://www.ietf.org/archive/id/draft-kwiatkowski-tls-ecdhe-mlkem-03.html
++          nid: '0x11ED'
++          standard_name: "SecP384r1MLKEM1024"
+   -
+     family: 'BIKE'
+     name_group: 'bike1l1fo'
+diff --git a/oqs-template/oqs-kem-info.md b/oqs-template/oqs-kem-info.md
+index 35c2d4c9..93aba939 100644
+--- a/oqs-template/oqs-kem-info.md
++++ b/oqs-template/oqs-kem-info.md
+@@ -85,13 +85,13 @@
+ | HQC            | 2023-04-30               | hqc192         | 4            |                    3 | 0x2FB1       | x448                             |
+ | HQC            | 2023-04-30               | hqc256         | 4            |                    5 | 0x0246       |                                  |
+ | HQC            | 2023-04-30               | hqc256         | 4            |                    5 | 0x2F46       | secp521_r1                       |
++| ML-KEM         | ML-KEM                   | mlkem1024      | FIPS203      |                    5 | 0x11ED       | secp384_r1                       |
+ | ML-KEM         | ML-KEM                   | mlkem1024      | FIPS203      |                    5 | 0x2F4D       | secp521_r1                       |
+-| ML-KEM         | ML-KEM                   | mlkem1024      | FIPS203      |                    5 | 0x2F4E       | p384                             |
+ | ML-KEM         | ML-KEM                   | mlkem1024      | FIPS203      |                    5 | 514          |                                  |
+ | ML-KEM         | ML-KEM                   | mlkem512       | FIPS203      |                    1 | 0x2F4B       | secp256_r1                       |
+ | ML-KEM         | ML-KEM                   | mlkem512       | FIPS203      |                    1 | 0x2FB6       | x25519                           |
+ | ML-KEM         | ML-KEM                   | mlkem512       | FIPS203      |                    1 | 512          |                                  |
+-| ML-KEM         | ML-KEM                   | mlkem768       | FIPS203      |                    3 | 0x11eb       | p256                             |
++| ML-KEM         | ML-KEM                   | mlkem768       | FIPS203      |                    3 | 0x11eb       | secp256_r1                       |
+ | ML-KEM         | ML-KEM                   | mlkem768       | FIPS203      |                    3 | 0x11ec       | x25519                           |
+ | ML-KEM         | ML-KEM                   | mlkem768       | FIPS203      |                    3 | 0x2F4C       | secp384_r1                       |
+ | ML-KEM         | ML-KEM                   | mlkem768       | FIPS203      |                    3 | 0x2FB7       | x448                             |
+diff --git a/oqs-template/oqsprov/oqs_kmgmt.c/keymgmt_functions.fragment b/oqs-template/oqsprov/oqs_kmgmt.c/keymgmt_functions.fragment
+index 0c6c5541..36401960 100644
+--- a/oqs-template/oqsprov/oqs_kmgmt.c/keymgmt_functions.fragment
++++ b/oqs-template/oqsprov/oqs_kmgmt.c/keymgmt_functions.fragment
+@@ -12,7 +12,7 @@ MAKE_SIG_KEYMGMT_FUNCTIONS({{variant['name']}}_{{ composite_alg['name'] }})
+ {% for kem in config['kems'] %}
+ MAKE_KEM_KEYMGMT_FUNCTIONS({{kem['name_group']}}, {{kem['oqs_alg']}}, {{kem['bit_security']}})
+ {% for hybrid in kem['hybrids'] %}
+-{% if hybrid['hybrid_group'].startswith('p') -%}
++{% if hybrid['hybrid_group'].startswith('p') or hybrid['hybrid_group'].startswith('secp') -%}
+ MAKE_KEM_ECP_KEYMGMT_FUNCTIONS({% if 'standard_name' in hybrid %}{{hybrid['standard_name']}}{% else %}{{hybrid['hybrid_group']}}_{{kem['name_group']}}{% endif %}, {{kem['oqs_alg']}}, {{hybrid['bit_security']}})
+ {%- else %}
+ MAKE_KEM_ECX_KEYMGMT_FUNCTIONS({% if 'standard_name' in hybrid %}{{hybrid['standard_name']}}{% else %}{{hybrid['hybrid_group']}}_{{kem['name_group']}}{% endif %}, {{kem['oqs_alg']}}, {{hybrid['bit_security']}}, {% if 'fips_standard' in kem %}{{kem['fips_standard']}}{% else %}0{% endif %})
+diff --git a/oqs-template/oqsprov/oqs_prov.h/alg_functions.fragment b/oqs-template/oqsprov/oqs_prov.h/alg_functions.fragment
+index 466af6f4..69f38f39 100644
+--- a/oqs-template/oqsprov/oqs_prov.h/alg_functions.fragment
++++ b/oqs-template/oqsprov/oqs_prov.h/alg_functions.fragment
+@@ -12,7 +12,7 @@ extern const OSSL_DISPATCH oqs_{{ variant['name'] }}_{{ composite_alg['name'] }}
+ {% for kem in config['kems'] %}
+ extern const OSSL_DISPATCH oqs_{{ kem['name_group'] }}_keymgmt_functions[];
+ {% for hybrid in kem['hybrids'] %}
+-{% if hybrid['hybrid_group'].startswith('p') -%}
++{% if hybrid['hybrid_group'].startswith('p') or hybrid['hybrid_group'].startswith('secp') -%}
+ extern const OSSL_DISPATCH oqs_ecp_{% if 'standard_name' in hybrid %}{{hybrid['standard_name']}}{% else %}{{ hybrid['hybrid_group'] }}_{{ kem['name_group'] }}{% endif %}_keymgmt_functions[];
+ {%- else -%}
+ extern const OSSL_DISPATCH oqs_ecx_{% if 'standard_name' in hybrid %}{{hybrid['standard_name']}}{% else %}{{ hybrid['hybrid_group'] }}_{{ kem['name_group'] }}{% endif %}_keymgmt_functions[];
+diff --git a/oqs-template/oqsprov/oqsprov_keys.c/oqsnames.fragment b/oqs-template/oqsprov/oqsprov_keys.c/oqsnames.fragment
+index 611bdcaa..4e96caf7 100644
+--- a/oqs-template/oqsprov/oqsprov_keys.c/oqsnames.fragment
++++ b/oqs-template/oqsprov/oqsprov_keys.c/oqsnames.fragment
+@@ -32,7 +32,7 @@ static oqs_nid_name_t nid_names[NID_TABLE_LEN] = {
+ {% for kem in config['kems'] %}
+   { 0, "{{ kem['name_group'] }}", {{ kem['oqs_alg'] }}, KEY_TYPE_KEM, {{ kem['bit_security'] }}, 0 },
+ {%- for hybrid in kem['hybrids'] %}
+-  { 0, "{% if 'standard_name' in hybrid %}{{hybrid['standard_name']}}{% else %}{{ hybrid['hybrid_group'] }}_{{ kem['name_group'] }}{% endif %}", {{ kem['oqs_alg'] }}, {% if hybrid['hybrid_group'].startswith('p') -%} KEY_TYPE_ECP_HYB_KEM {% else %} KEY_TYPE_ECX_HYB_KEM {% endif %}, {{ kem['bit_security'] }}, {% if 'fips_standard' in kem and hybrid['hybrid_group'] in ["x25519", "x448"] %}1{% else %}0{% endif %} },
++  { 0, "{% if 'standard_name' in hybrid %}{{hybrid['standard_name']}}{% else %}{{ hybrid['hybrid_group'] }}_{{ kem['name_group'] }}{% endif %}", {{ kem['oqs_alg'] }}, {% if hybrid['hybrid_group'].startswith('p') or hybrid['hybrid_group'].startswith('secp') -%} KEY_TYPE_ECP_HYB_KEM {% else %} KEY_TYPE_ECX_HYB_KEM {% endif %}, {{ kem['bit_security'] }}, {% if 'fips_standard' in kem and hybrid['hybrid_group'] in ["x25519", "x448"] %}1{% else %}0{% endif %} },
+ {%- endfor -%}
+ {%- endfor %}
+ 
+diff --git a/oqsprov/oqs_decode_der2key.c b/oqsprov/oqs_decode_der2key.c
+index 62a0285d..fb3c7116 100644
+--- a/oqsprov/oqs_decode_der2key.c
++++ b/oqsprov/oqs_decode_der2key.c
+@@ -609,8 +609,9 @@ MAKE_DECODER(, "mlkem1024", mlkem1024, oqsx, SubjectPublicKeyInfo);
+ MAKE_DECODER(_ecp, "p521_mlkem1024", p521_mlkem1024, oqsx, PrivateKeyInfo);
+ MAKE_DECODER(_ecp, "p521_mlkem1024", p521_mlkem1024, oqsx,
+              SubjectPublicKeyInfo);
+-MAKE_DECODER(_ecp, "p384_mlkem1024", p384_mlkem1024, oqsx, PrivateKeyInfo);
+-MAKE_DECODER(_ecp, "p384_mlkem1024", p384_mlkem1024, oqsx,
++MAKE_DECODER(_ecp, "SecP384r1MLKEM1024", SecP384r1MLKEM1024, oqsx,
++             PrivateKeyInfo);
++MAKE_DECODER(_ecp, "SecP384r1MLKEM1024", SecP384r1MLKEM1024, oqsx,
+              SubjectPublicKeyInfo);
+ MAKE_DECODER(, "bikel1", bikel1, oqsx, PrivateKeyInfo);
+ MAKE_DECODER(, "bikel1", bikel1, oqsx, SubjectPublicKeyInfo);
+diff --git a/oqsprov/oqs_encode_key2any.c b/oqsprov/oqs_encode_key2any.c
+index 8fa57894..e051c842 100644
+--- a/oqsprov/oqs_encode_key2any.c
++++ b/oqsprov/oqs_encode_key2any.c
+@@ -1053,9 +1053,9 @@ static int oqsx_pki_priv_to_der(const void *vxkey, unsigned char **pder) {
+ #define p521_mlkem1024_evp_type 0
+ #define p521_mlkem1024_input_type "p521_mlkem1024"
+ #define p521_mlkem1024_pem_type "p521_mlkem1024"
+-#define p384_mlkem1024_evp_type 0
+-#define p384_mlkem1024_input_type "p384_mlkem1024"
+-#define p384_mlkem1024_pem_type "p384_mlkem1024"
++#define SecP384r1MLKEM1024_evp_type 0
++#define SecP384r1MLKEM1024_input_type "SecP384r1MLKEM1024"
++#define SecP384r1MLKEM1024_pem_type "SecP384r1MLKEM1024"
+ #define bikel1_evp_type 0
+ #define bikel1_input_type "bikel1"
+ #define bikel1_pem_type "bikel1"
+@@ -2099,13 +2099,13 @@ MAKE_ENCODER(_ecp, p521_mlkem1024, oqsx, PrivateKeyInfo, pem);
+ MAKE_ENCODER(_ecp, p521_mlkem1024, oqsx, SubjectPublicKeyInfo, der);
+ MAKE_ENCODER(_ecp, p521_mlkem1024, oqsx, SubjectPublicKeyInfo, pem);
+ MAKE_TEXT_ENCODER(_ecp, p521_mlkem1024);
+-MAKE_ENCODER(_ecp, p384_mlkem1024, oqsx, EncryptedPrivateKeyInfo, der);
+-MAKE_ENCODER(_ecp, p384_mlkem1024, oqsx, EncryptedPrivateKeyInfo, pem);
+-MAKE_ENCODER(_ecp, p384_mlkem1024, oqsx, PrivateKeyInfo, der);
+-MAKE_ENCODER(_ecp, p384_mlkem1024, oqsx, PrivateKeyInfo, pem);
+-MAKE_ENCODER(_ecp, p384_mlkem1024, oqsx, SubjectPublicKeyInfo, der);
+-MAKE_ENCODER(_ecp, p384_mlkem1024, oqsx, SubjectPublicKeyInfo, pem);
+-MAKE_TEXT_ENCODER(_ecp, p384_mlkem1024);
++MAKE_ENCODER(_ecp, SecP384r1MLKEM1024, oqsx, EncryptedPrivateKeyInfo, der);
++MAKE_ENCODER(_ecp, SecP384r1MLKEM1024, oqsx, EncryptedPrivateKeyInfo, pem);
++MAKE_ENCODER(_ecp, SecP384r1MLKEM1024, oqsx, PrivateKeyInfo, der);
++MAKE_ENCODER(_ecp, SecP384r1MLKEM1024, oqsx, PrivateKeyInfo, pem);
++MAKE_ENCODER(_ecp, SecP384r1MLKEM1024, oqsx, SubjectPublicKeyInfo, der);
++MAKE_ENCODER(_ecp, SecP384r1MLKEM1024, oqsx, SubjectPublicKeyInfo, pem);
++MAKE_TEXT_ENCODER(_ecp, SecP384r1MLKEM1024);
+ MAKE_ENCODER(, bikel1, oqsx, EncryptedPrivateKeyInfo, der);
+ MAKE_ENCODER(, bikel1, oqsx, EncryptedPrivateKeyInfo, pem);
+ MAKE_ENCODER(, bikel1, oqsx, PrivateKeyInfo, der);
+diff --git a/oqsprov/oqs_kmgmt.c b/oqsprov/oqs_kmgmt.c
+index 8770fd68..dfd46450 100644
+--- a/oqsprov/oqs_kmgmt.c
++++ b/oqsprov/oqs_kmgmt.c
+@@ -1434,7 +1434,7 @@ MAKE_KEM_ECP_KEYMGMT_FUNCTIONS(SecP256r1MLKEM768, OQS_KEM_alg_ml_kem_768, 128)
+ MAKE_KEM_KEYMGMT_FUNCTIONS(mlkem1024, OQS_KEM_alg_ml_kem_1024, 256)
+ 
+ MAKE_KEM_ECP_KEYMGMT_FUNCTIONS(p521_mlkem1024, OQS_KEM_alg_ml_kem_1024, 256)
+-MAKE_KEM_ECP_KEYMGMT_FUNCTIONS(p384_mlkem1024, OQS_KEM_alg_ml_kem_1024, 192)
++MAKE_KEM_ECP_KEYMGMT_FUNCTIONS(SecP384r1MLKEM1024, OQS_KEM_alg_ml_kem_1024, 192)
+ MAKE_KEM_KEYMGMT_FUNCTIONS(bikel1, OQS_KEM_alg_bike_l1, 128)
+ 
+ MAKE_KEM_ECP_KEYMGMT_FUNCTIONS(p256_bikel1, OQS_KEM_alg_bike_l1, 128)
+diff --git a/oqsprov/oqs_prov.h b/oqsprov/oqs_prov.h
+index 0282b25f..79effe6d 100644
+--- a/oqsprov/oqs_prov.h
++++ b/oqsprov/oqs_prov.h
+@@ -705,22 +705,22 @@ extern const OSSL_DISPATCH
+ extern const OSSL_DISPATCH
+     oqs_SubjectPublicKeyInfo_der_to_p521_mlkem1024_decoder_functions[];
+ extern const OSSL_DISPATCH
+-    oqs_p384_mlkem1024_to_PrivateKeyInfo_der_encoder_functions[];
++    oqs_SecP384r1MLKEM1024_to_PrivateKeyInfo_der_encoder_functions[];
+ extern const OSSL_DISPATCH
+-    oqs_p384_mlkem1024_to_PrivateKeyInfo_pem_encoder_functions[];
++    oqs_SecP384r1MLKEM1024_to_PrivateKeyInfo_pem_encoder_functions[];
+ extern const OSSL_DISPATCH
+-    oqs_p384_mlkem1024_to_EncryptedPrivateKeyInfo_der_encoder_functions[];
++    oqs_SecP384r1MLKEM1024_to_EncryptedPrivateKeyInfo_der_encoder_functions[];
+ extern const OSSL_DISPATCH
+-    oqs_p384_mlkem1024_to_EncryptedPrivateKeyInfo_pem_encoder_functions[];
++    oqs_SecP384r1MLKEM1024_to_EncryptedPrivateKeyInfo_pem_encoder_functions[];
+ extern const OSSL_DISPATCH
+-    oqs_p384_mlkem1024_to_SubjectPublicKeyInfo_der_encoder_functions[];
++    oqs_SecP384r1MLKEM1024_to_SubjectPublicKeyInfo_der_encoder_functions[];
+ extern const OSSL_DISPATCH
+-    oqs_p384_mlkem1024_to_SubjectPublicKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH oqs_p384_mlkem1024_to_text_encoder_functions[];
++    oqs_SecP384r1MLKEM1024_to_SubjectPublicKeyInfo_pem_encoder_functions[];
++extern const OSSL_DISPATCH oqs_SecP384r1MLKEM1024_to_text_encoder_functions[];
+ extern const OSSL_DISPATCH
+-    oqs_PrivateKeyInfo_der_to_p384_mlkem1024_decoder_functions[];
++    oqs_PrivateKeyInfo_der_to_SecP384r1MLKEM1024_decoder_functions[];
+ extern const OSSL_DISPATCH
+-    oqs_SubjectPublicKeyInfo_der_to_p384_mlkem1024_decoder_functions[];
++    oqs_SubjectPublicKeyInfo_der_to_SecP384r1MLKEM1024_decoder_functions[];
+ extern const OSSL_DISPATCH oqs_bikel1_to_PrivateKeyInfo_der_encoder_functions[];
+ extern const OSSL_DISPATCH oqs_bikel1_to_PrivateKeyInfo_pem_encoder_functions[];
+ extern const OSSL_DISPATCH
+@@ -1971,7 +1971,7 @@ extern const OSSL_DISPATCH oqs_ecp_SecP256r1MLKEM768_keymgmt_functions[];
+ extern const OSSL_DISPATCH oqs_mlkem1024_keymgmt_functions[];
+ 
+ extern const OSSL_DISPATCH oqs_ecp_p521_mlkem1024_keymgmt_functions[];
+-extern const OSSL_DISPATCH oqs_ecp_p384_mlkem1024_keymgmt_functions[];
++extern const OSSL_DISPATCH oqs_ecp_SecP384r1MLKEM1024_keymgmt_functions[];
+ extern const OSSL_DISPATCH oqs_bikel1_keymgmt_functions[];
+ 
+ extern const OSSL_DISPATCH oqs_ecp_p256_bikel1_keymgmt_functions[];
+diff --git a/oqsprov/oqsdecoders.inc b/oqsprov/oqsdecoders.inc
+index 6790d438..32f83f86 100644
+--- a/oqsprov/oqsdecoders.inc
++++ b/oqsprov/oqsdecoders.inc
+@@ -96,8 +96,8 @@ DECODER_w_structure("SecP256r1MLKEM768", der, SubjectPublicKeyInfo, SecP256r1MLK
+ DECODER_w_structure("mlkem1024", der, PrivateKeyInfo, mlkem1024),
+ DECODER_w_structure("mlkem1024", der, SubjectPublicKeyInfo, mlkem1024),
+ DECODER_w_structure("p521_mlkem1024", der, PrivateKeyInfo, p521_mlkem1024),
+-DECODER_w_structure("p521_mlkem1024", der, SubjectPublicKeyInfo, p521_mlkem1024),DECODER_w_structure("p384_mlkem1024", der, PrivateKeyInfo, p384_mlkem1024),
+-DECODER_w_structure("p384_mlkem1024", der, SubjectPublicKeyInfo, p384_mlkem1024),
++DECODER_w_structure("p521_mlkem1024", der, SubjectPublicKeyInfo, p521_mlkem1024),DECODER_w_structure("SecP384r1MLKEM1024", der, PrivateKeyInfo, SecP384r1MLKEM1024),
++DECODER_w_structure("SecP384r1MLKEM1024", der, SubjectPublicKeyInfo, SecP384r1MLKEM1024),
+ #endif
+ #ifdef OQS_ENABLE_KEM_bike_l1
+ DECODER_w_structure("bikel1", der, PrivateKeyInfo, bikel1),
+diff --git a/oqsprov/oqsencoders.inc b/oqsprov/oqsencoders.inc
+index 3503b2a8..5f1b0d6d 100644
+--- a/oqsprov/oqsencoders.inc
++++ b/oqsprov/oqsencoders.inc
+@@ -281,13 +281,13 @@ ENCODER_w_structure("p521_mlkem1024", p521_mlkem1024, pem, EncryptedPrivateKeyIn
+ ENCODER_w_structure("p521_mlkem1024", p521_mlkem1024, der, SubjectPublicKeyInfo),
+ ENCODER_w_structure("p521_mlkem1024", p521_mlkem1024, pem, SubjectPublicKeyInfo),
+ ENCODER_TEXT("p521_mlkem1024", p521_mlkem1024),
+-ENCODER_w_structure("p384_mlkem1024", p384_mlkem1024, der, PrivateKeyInfo),
+-ENCODER_w_structure("p384_mlkem1024", p384_mlkem1024, pem, PrivateKeyInfo),
+-ENCODER_w_structure("p384_mlkem1024", p384_mlkem1024, der, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("p384_mlkem1024", p384_mlkem1024, pem, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("p384_mlkem1024", p384_mlkem1024, der, SubjectPublicKeyInfo),
+-ENCODER_w_structure("p384_mlkem1024", p384_mlkem1024, pem, SubjectPublicKeyInfo),
+-ENCODER_TEXT("p384_mlkem1024", p384_mlkem1024),
++ENCODER_w_structure("SecP384r1MLKEM1024", SecP384r1MLKEM1024, der, PrivateKeyInfo),
++ENCODER_w_structure("SecP384r1MLKEM1024", SecP384r1MLKEM1024, pem, PrivateKeyInfo),
++ENCODER_w_structure("SecP384r1MLKEM1024", SecP384r1MLKEM1024, der, EncryptedPrivateKeyInfo),
++ENCODER_w_structure("SecP384r1MLKEM1024", SecP384r1MLKEM1024, pem, EncryptedPrivateKeyInfo),
++ENCODER_w_structure("SecP384r1MLKEM1024", SecP384r1MLKEM1024, der, SubjectPublicKeyInfo),
++ENCODER_w_structure("SecP384r1MLKEM1024", SecP384r1MLKEM1024, pem, SubjectPublicKeyInfo),
++ENCODER_TEXT("SecP384r1MLKEM1024", SecP384r1MLKEM1024),
+ #endif
+ #ifdef OQS_ENABLE_KEM_bike_l1
+ ENCODER_w_structure("bikel1", bikel1, der, PrivateKeyInfo),
+diff --git a/oqsprov/oqsprov.c b/oqsprov/oqsprov.c
+index 498baf7f..4f6d1bc5 100644
+--- a/oqsprov/oqsprov.c
++++ b/oqsprov/oqsprov.c
+@@ -111,7 +111,7 @@ const char *oqs_oid_alg_list[OQS_OID_CNT] = {
+     NULL,
+     "p521_mlkem1024",
+     "1.3.6.1.4.1.42235.6",
+-    "p384_mlkem1024",
++    "SecP384r1MLKEM1024",
+     NULL,
+     "bikel1",
+     NULL,
+@@ -318,7 +318,7 @@ int oqs_patch_oids(void) {
+ 
+         if ((envval = getenv("OQS_OID_P521_MLKEM1024")))
+             oqs_oid_alg_list[50] = envval;
+-        if ((envval = getenv("OQS_OID_P384_MLKEM1024")))
++        if ((envval = getenv("OQS_OID_SECP384R1MLKEM1024")))
+             oqs_oid_alg_list[52] = envval;
+         if ((envval = getenv("OQS_OID_BIKEL1")))
+             oqs_oid_alg_list[54] = envval;
+@@ -637,7 +637,7 @@ static const OSSL_ALGORITHM oqsprovider_asym_kems[] = {
+ #ifdef OQS_ENABLE_KEM_ml_kem_1024
+     KEMBASEALG(mlkem1024, 256)
+     KEMHYBALG(p521_mlkem1024, 256)
+-    KEMHYBALG(p384_mlkem1024, 192)
++    KEMHYBALG(SecP384r1MLKEM1024, 192)
+ #endif
+ #ifdef OQS_ENABLE_KEM_bike_l1
+     KEMBASEALG(bikel1, 128)
+@@ -671,9 +671,8 @@ static const OSSL_ALGORITHM oqsprovider_asym_kems[] = {
+     ///// OQS_TEMPLATE_FRAGMENT_KEM_FUNCTIONS_END
+     {NULL, NULL, NULL}};
+ 
+-static const OSSL_ALGORITHM
+-    oqsprovider_keymgmt[] =
+-        {
++static const OSSL_ALGORITHM oqsprovider_keymgmt[] =
++    {
+ ///// OQS_TEMPLATE_FRAGMENT_KEYMGMT_FUNCTIONS_START
+ // clang-format off
+ 
+@@ -812,7 +811,7 @@ static const OSSL_ALGORITHM
+     KEMKMALG(mlkem1024, 256)
+ 
+     KEMKMHYBALG(p521_mlkem1024, 256, ecp)
+-    KEMKMHYBALG(p384_mlkem1024, 192, ecp)
++    KEMKMHYBALG(SecP384r1MLKEM1024, 192, ecp)
+ #endif
+ #ifdef OQS_ENABLE_KEM_bike_l1
+     KEMKMALG(bikel1, 128)
+@@ -848,9 +847,9 @@ static const OSSL_ALGORITHM
+ 
+     KEMKMHYBALG(p521_hqc256, 256, ecp)
+ #endif
+-            // clang-format on
+-            ///// OQS_TEMPLATE_FRAGMENT_KEYMGMT_FUNCTIONS_END
+-            {NULL, NULL, NULL}};
++        // clang-format on
++        ///// OQS_TEMPLATE_FRAGMENT_KEYMGMT_FUNCTIONS_END
++        {NULL, NULL, NULL}};
+ 
+ static const OSSL_ALGORITHM oqsprovider_encoder[] = {
+ #define ENCODER_PROVIDER "oqsprovider"
+diff --git a/oqsprov/oqsprov_capabilities.c b/oqsprov/oqsprov_capabilities.c
+index 532f851e..204a55eb 100644
+--- a/oqsprov/oqsprov_capabilities.c
++++ b/oqsprov/oqsprov_capabilities.c
+@@ -75,7 +75,7 @@ static OQS_GROUP_CONSTANTS oqs_group_list[] = {
+     {514, 256, TLS1_3_VERSION, 0, DTLS1_3_VERSION, 0, 1},
+ 
+     {0x2F4D, 256, TLS1_3_VERSION, 0, DTLS1_3_VERSION, 0, 1},
+-    {0x2F4E, 256, TLS1_3_VERSION, 0, DTLS1_3_VERSION, 0, 1},
++    {0x11ED, 256, TLS1_3_VERSION, 0, DTLS1_3_VERSION, 0, 1},
+     {0x0241, 128, TLS1_3_VERSION, 0, DTLS1_3_VERSION, 0, 1},
+ 
+     {0x2F41, 128, TLS1_3_VERSION, 0, DTLS1_3_VERSION, 0, 1},
+@@ -190,7 +190,8 @@ static const OSSL_PARAM oqs_param_group_list[][11] = {
+     OQS_GROUP_ENTRY(mlkem1024, mlkem1024, mlkem1024, 24),
+ 
+     OQS_GROUP_ENTRY(p521_mlkem1024, p521_mlkem1024, p521_mlkem1024, 25),
+-    OQS_GROUP_ENTRY(p384_mlkem1024, p384_mlkem1024, p384_mlkem1024, 26),
++    OQS_GROUP_ENTRY(SecP384r1MLKEM1024, SecP384r1MLKEM1024, SecP384r1MLKEM1024,
++                    26),
+ #endif
+ #ifdef OQS_ENABLE_KEM_bike_l1
+     OQS_GROUP_ENTRY(bikel1, bikel1, bikel1, 27),
+@@ -342,9 +343,9 @@ int oqs_patch_codepoints() {
+     if (getenv("OQS_CODEPOINT_P521_MLKEM1024"))
+         oqs_group_list[25].group_id =
+             atoi(getenv("OQS_CODEPOINT_P521_MLKEM1024"));
+-    if (getenv("OQS_CODEPOINT_P384_MLKEM1024"))
++    if (getenv("OQS_CODEPOINT_SECP384R1MLKEM1024"))
+         oqs_group_list[26].group_id =
+-            atoi(getenv("OQS_CODEPOINT_P384_MLKEM1024"));
++            atoi(getenv("OQS_CODEPOINT_SECP384R1MLKEM1024"));
+     if (getenv("OQS_CODEPOINT_BIKEL1"))
+         oqs_group_list[27].group_id = atoi(getenv("OQS_CODEPOINT_BIKEL1"));
+     if (getenv("OQS_CODEPOINT_P256_BIKEL1"))
+diff --git a/oqsprov/oqsprov_keys.c b/oqsprov/oqsprov_keys.c
+index 60082833..0d607b41 100644
+--- a/oqsprov/oqsprov_keys.c
++++ b/oqsprov/oqsprov_keys.c
+@@ -101,8 +101,8 @@ static oqs_nid_name_t nid_names[NID_TABLE_LEN] = {
+     {0, "mlkem1024", OQS_KEM_alg_ml_kem_1024, KEY_TYPE_KEM, 256, 0},
+     {0, "p521_mlkem1024", OQS_KEM_alg_ml_kem_1024, KEY_TYPE_ECP_HYB_KEM, 256,
+      0},
+-    {0, "p384_mlkem1024", OQS_KEM_alg_ml_kem_1024, KEY_TYPE_ECP_HYB_KEM, 256,
+-     0},
++    {0, "SecP384r1MLKEM1024", OQS_KEM_alg_ml_kem_1024, KEY_TYPE_ECP_HYB_KEM,
++     256, 0},
+     {0, "bikel1", OQS_KEM_alg_bike_l1, KEY_TYPE_KEM, 128, 0},
+     {0, "p256_bikel1", OQS_KEM_alg_bike_l1, KEY_TYPE_ECP_HYB_KEM, 128, 0},
+     {0, "x25519_bikel1", OQS_KEM_alg_bike_l1, KEY_TYPE_ECX_HYB_KEM, 128, 0},
+diff --git a/scripts/common.py b/scripts/common.py
+index 59b74c5a..4da828be 100644
+--- a/scripts/common.py
++++ b/scripts/common.py
+@@ -9,7 +9,7 @@
+     # post-quantum key exchanges
+     'frodo640aes','frodo640shake','frodo976aes','frodo976shake','frodo1344aes','frodo1344shake','mlkem512','mlkem768','mlkem1024','bikel1','bikel3','bikel5','hqc128','hqc192','hqc256',
+     # post-quantum + classical key exchanges
+-    'p256_frodo640aes','x25519_frodo640aes','p256_frodo640shake','x25519_frodo640shake','p384_frodo976aes','x448_frodo976aes','p384_frodo976shake','x448_frodo976shake','p521_frodo1344aes','p521_frodo1344shake','p256_mlkem512','x25519_mlkem512','p384_mlkem768','x448_mlkem768','X25519MLKEM768','SecP256r1MLKEM768','p521_mlkem1024','p384_mlkem1024','p256_bikel1','x25519_bikel1','p384_bikel3','x448_bikel3','p521_bikel5','p256_hqc128','x25519_hqc128','p384_hqc192','x448_hqc192','p521_hqc256',
++    'p256_frodo640aes','x25519_frodo640aes','p256_frodo640shake','x25519_frodo640shake','p384_frodo976aes','x448_frodo976aes','p384_frodo976shake','x448_frodo976shake','p521_frodo1344aes','p521_frodo1344shake','p256_mlkem512','x25519_mlkem512','p384_mlkem768','x448_mlkem768','X25519MLKEM768','SecP256r1MLKEM768','p521_mlkem1024','SecP384r1MLKEM1024','p256_bikel1','x25519_bikel1','p384_bikel3','x448_bikel3','p521_bikel5','p256_hqc128','x25519_hqc128','p384_hqc192','x448_hqc192','p521_hqc256',
+ ##### OQS_TEMPLATE_FRAGMENT_KEX_ALGS_END
+ ]
+ signatures = [
+diff --git a/test/oqs_test_evp_pkey_params.c b/test/oqs_test_evp_pkey_params.c
+index c494ca13..7f56c233 100644
+--- a/test/oqs_test_evp_pkey_params.c
++++ b/test/oqs_test_evp_pkey_params.c
+@@ -77,7 +77,7 @@ const char *kHybridKEMAlgorithms[] = {
+     "X25519MLKEM768",
+     "SecP256r1MLKEM768",
+     "p521_mlkem1024",
+-    "p384_mlkem1024",
++    "SecP384r1MLKEM1024",
+     "p256_bikel1",
+     "x25519_bikel1",
+     "p384_bikel3",

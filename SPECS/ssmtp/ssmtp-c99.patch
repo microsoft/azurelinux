@@ -1,0 +1,199 @@
+(char)NULL is not a null pointer constant, and current compilers
+flag it as an int-conversion type error.
+
+While at it, also replace other uses of (char)NULL with a character
+constant.
+
+Submitted upstream:
+
+  <https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1060065>
+
+diff --git a/ssmtp.c b/ssmtp.c
+index ec5d693af325ecef..162ce8ee9e1c94a0 100644
+--- a/ssmtp.c
++++ b/ssmtp.c
+@@ -57,24 +57,24 @@ bool_t use_oldauth = False;		/* use old AUTH LOGIN username style */
+ 
+ #define ARPADATE_LENGTH 32		/* Current date in RFC format */
+ char arpadate[ARPADATE_LENGTH];
+-char *auth_user = (char)NULL;
+-char *auth_pass = (char)NULL;
+-char *auth_method = (char)NULL;		/* Mechanism for SMTP authentication */
+-char *mail_domain = (char)NULL;
+-char *from = (char)NULL;		/* Use this as the From: address */
++char *auth_user = NULL;
++char *auth_pass = NULL;
++char *auth_method = NULL;		/* Mechanism for SMTP authentication */
++char *mail_domain = NULL;
++char *from = NULL;		/* Use this as the From: address */
+ char *hostname;
+ char *mailhost = "mailhub";
+-char *minus_f = (char)NULL;
+-char *minus_F = (char)NULL;
++char *minus_f = NULL;
++char *minus_F = NULL;
+ char *gecos;
+-char *prog = (char)NULL;
++char *prog = NULL;
+ char *root = NULL;
+ char *tls_cert = "/etc/pki/tls/private/ssmtp.pem";	/* Default Certificate */
+ char *tls_key = "/etc/pki/tls/private/ssmtp.pem";    /* Default private key */
+ char *tls_ca_file = NULL;      /* Trusted Certificate file */
+ char *tls_ca_dir = NULL;       /* Trusted Certificate directory */
+-char *uad = (char)NULL;
+-char *config_file = (char)NULL;		/* alternate configuration file */
++char *uad = NULL;
++char *config_file = NULL;		/* alternate configuration file */
+ 
+ headers_t headers, *ht;
+ 
+@@ -266,7 +266,7 @@ char *strip_post_ws(char *str)
+ 
+ 	p = (str + strlen(str));
+ 	while(isspace(*--p)) {
+-		*p = (char)NULL;
++		*p = '\0';
+ 	}
+ 
+ 	return(p);
+@@ -292,7 +292,7 @@ char *addr_parse(char *str)
+ 		q++;
+ 
+ 		if((p = strchr(q, '>'))) {
+-			*p = (char)NULL;
++			*p = '\0';
+ 		}
+ 
+ #if 0
+@@ -315,7 +315,7 @@ char *addr_parse(char *str)
+ 	q = strip_post_ws(p);
+ 	if(*q == ')') {
+ 		while((*--q != '('));
+-		*q = (char)NULL;
++		*q = '\0';
+ 	}
+ 	(void)strip_post_ws(p);
+ 
+@@ -368,7 +368,7 @@ bool_t standardise(char *str, bool_t *linestart)
+ 	*linestart = False;
+ 
+ 	if((p = strchr(str, '\n'))) {
+-		*p = (char)NULL;
++		*p = '\0';
+ 		*linestart = True;
+ 	}
+ 	return(leadingdot);
+@@ -389,7 +389,7 @@ void revaliases(struct passwd *pw)
+ 		while(fgets(buf, sizeof(buf), fp)) {
+ 			/* Make comments invisible */
+ 			if((p = strchr(buf, '#'))) {
+-				*p = (char)NULL;
++				*p = '\0';
+ 			}
+ 
+ 			/* Ignore malformed lines and comments */
+@@ -445,7 +445,7 @@ char *aliases_lookup(char *str)
+ 		while(fgets(buf, sizeof(buf), fp)) {
+ 			/* Make comments invisible */
+ 			if((p = strchr(buf, '#'))) {
+-				*p = (char)NULL;
++				*p = '\0';
+ 			}
+ 
+ 			/* Ignore malformed lines and comments */
+@@ -568,7 +568,7 @@ void rcpt_save(char *str)
+ #endif
+ 
+ 	/* Ignore missing usernames */
+-	if(*str == (char)NULL) {
++	if(*str == '\0') {
+ 		return;
+ 	}
+ 
+@@ -625,7 +625,7 @@ void rcpt_parse(char *str)
+ 		}
+ 
+ 		/* End of string? */
+-		if(*(q + 1) == (char)NULL) {
++		if(*(q + 1) == '\0') {
+ 			got_addr = True;
+ 		}
+ 
+@@ -633,7 +633,7 @@ void rcpt_parse(char *str)
+ 		if((*q == ',') && (in_quotes == False)) {
+ 			got_addr = True;
+ 
+-			*q = (char)NULL;
++			*q = '\0';
+ 		}
+ 
+ 		if(got_addr) {
+@@ -730,7 +730,7 @@ void header_save(char *str)
+ 	if(strncasecmp(ht->string, "From:", 5) == 0) {
+ #if 1
+ 		/* Hack check for NULL From: line */
+-		if(*(p + 6) == (char)NULL) {
++		if(*(p + 6) == '\0') {
+ 			return;
+ 		}
+ #endif
+@@ -795,7 +795,7 @@ void header_parse(FILE *stream)
+ 	size_t size = BUF_SZ, len = 0;
+ 	char *p = (char *)NULL, *q;
+ 	bool_t in_header = True;
+-	char l = (char)NULL;
++	char l = '\0';
+ 	int c;
+ 
+ 	while(in_header && ((c = fgetc(stream)) != EOF)) {
+@@ -830,9 +830,9 @@ void header_parse(FILE *stream)
+ 						in_header = False;
+ 
+ 				default:
+-						*q = (char)NULL;
++						*q = '\0';
+ 						if((q = strrchr(p, '\n'))) {
+-							*q = (char)NULL;
++							*q = '\0';
+ 						}
+ 						header_save(p);
+ 
+@@ -863,9 +863,9 @@ void header_parse(FILE *stream)
+ 						in_header = False;
+ 
+ 				default:
+-						*q = (char)NULL;
++						*q = '\0';
+ 						if((q = strrchr(p, '\n'))) {
+-							*q = (char)NULL;
++							*q = '\0';
+ 						}
+ 						header_save(p);
+ 
+@@ -930,7 +930,7 @@ bool_t read_config()
+ 		char *rightside;
+ 		/* Make comments invisible */
+ 		if((p = strchr(buf, '#'))) {
+-			*p = (char)NULL;
++			*p = '\0';
+ 		}
+ 
+ 		/* Ignore malformed lines and comments */
+@@ -1408,7 +1408,7 @@ char *fd_gets(char *buf, int size, int fd)
+ 			buf[i++] = c;
+ 		}
+ 	}
+-	buf[i] = (char)NULL;
++	buf[i] = '\0';
+ 
+ 	return(buf);
+ }
+@@ -1840,7 +1840,7 @@ char **parse_options(int argc, char *argv[])
+ 		j = 0;
+ 
+ 		add = 1;
+-		while(argv[i][++j] != (char)NULL) {
++		while(argv[i][++j] != '\0') {
+ 			switch(argv[i][j]) {
+ #ifdef INET6
+ 			case '6':

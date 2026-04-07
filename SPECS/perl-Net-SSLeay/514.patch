@@ -1,0 +1,61 @@
+From e73cf1139a6651a968828d1634be8fec5beb50ba Mon Sep 17 00:00:00 2001
+From: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+Date: Wed, 16 Oct 2024 21:48:51 +0200
+Subject: [PATCH 1/2] test: 32_x509_get_cert_info allow single colon.
+
+Starting with 3.4.0 the double colon in emailAddress has been removed.
+Adapt the test to allow a single colon in 3.4.0 and later.
+
+Signed-off-by: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+---
+ t/local/32_x509_get_cert_info.t | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/t/local/32_x509_get_cert_info.t b/t/local/32_x509_get_cert_info.t
+index 0f7e2d5a..0fd1b689 100644
+--- a/t/local/32_x509_get_cert_info.t
++++ b/t/local/32_x509_get_cert_info.t
+@@ -188,6 +188,10 @@ for my $f (keys (%$dump)) {
+                   ) {
+                       $ext_data =~ s{(othername:) [^, ]+}{$1<unsupported>}g;
+                   }
++                  # Starting with 3.4.0 the double colon in emailAddress has been removed.
++                  if (Net::SSLeay::SSLeay >= 0x30400000) {
++                      $ext_data =~ s{emailAddress::}{emailAddress:};
++                  }
+               }
+               elsif ( $nid == 89 ) {
+                   # The output formatting for certificate policies has a
+
+From 800a8c1ea63ef9edd145e7b334c64a7d8f1ef1a7 Mon Sep 17 00:00:00 2001
+From: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+Date: Tue, 18 Feb 2025 18:57:15 +0100
+Subject: [PATCH 2/2] tests: Address another formatting difference in OpenSSL
+ 3.4.1
+
+Since OpenSSL 3.4.1, commit 8a28bca8ee08 ("x509: add a newline after
+printing Full Name") to be exact, there is another new line change.
+
+Adapt the testsuite.
+
+Fixes: #513
+
+Signed-off-by: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+---
+ t/local/32_x509_get_cert_info.t | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/t/local/32_x509_get_cert_info.t b/t/local/32_x509_get_cert_info.t
+index 0fd1b689..08316bf9 100644
+--- a/t/local/32_x509_get_cert_info.t
++++ b/t/local/32_x509_get_cert_info.t
+@@ -218,6 +218,9 @@ for my $f (keys (%$dump)) {
+                       # OpenSSL 1.0.0 to 1.1.1:
+                       $ext_data =~ s{(Full Name:\n  )}{\n$1}g;
+                       $ext_data .= "\n";
++                  } elsif ( Net::SSLeay::SSLeay >  0x3040000f ) {
++                      $ext_data =~ s{(\nFull Name:)}{\n$1}g;
++                      $ext_data .= "\n";
+                   }
+               }
+               elsif ( $nid == 126 ) {

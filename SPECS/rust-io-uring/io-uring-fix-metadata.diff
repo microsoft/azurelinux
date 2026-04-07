@@ -1,0 +1,25 @@
+--- io-uring-0.6.4/Cargo.toml	1970-01-01T00:00:01+00:00
++++ io-uring-0.6.4/Cargo.toml	2024-04-23T10:51:02.419975+00:00
+@@ -33,10 +33,6 @@
+ version = "0.2.98"
+ default-features = false
+ 
+-[dependencies.sc]
+-version = "0.2"
+-optional = true
+-
+ [dev-dependencies.anyhow]
+ version = "1"
+ 
+@@ -46,11 +42,5 @@
+ [dev-dependencies.socket2]
+ version = "0.5"
+ 
+-[build-dependencies.bindgen]
+-version = "0.65"
+-optional = true
+-
+ [features]
+-direct-syscall = ["sc"]
+ io_safety = []
+-overwrite = ["bindgen"]

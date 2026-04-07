@@ -1,0 +1,97 @@
+From: Robert Luberda <robert@debian.org>
+Date: Sun, 20 Dec 2020 11:26:10 +0100
+Subject: Fix .Nm and .Bk mdoc macros handling
+
+Make sure .Nm mdoc remembers the argument used for its very first
+call (that is in NAME section rather than in SYNOPSIS, as it was
+implemented), and then use the saved argument for other calls that
+contain no argument at all or contain only punctation.
+
+Skip any options given to .Bk and .Ek commands. Currently the only
+option possible for .Bk is '-words', that is the default option anyway,
+and .Ek does not take any options, according to groff_mdoc(7).
+
+The two following fixes make it possible to properly display
+dash(1) man page.
+
+Bugs-Debian: https://bugs.debian.org/902606
+---
+ man2html/man2html.c | 38 +++++++++++++++++++-------------------
+ 1 file changed, 19 insertions(+), 19 deletions(-)
+
+diff --git a/man2html/man2html.c b/man2html/man2html.c
+index 9da6d19..d49408c 100644
+--- a/man2html/man2html.c
++++ b/man2html/man2html.c
+@@ -2564,10 +2564,10 @@ scan_request(char *c) {
+ 	     }
+ 	     break;
+ 	case V('S','m'):	/* BSD mandoc - called with arg on/off */
++  case V('B','k'): /* BSD mandoc - may be called with -words arg*/
++	case V('E','k'):	/* BSD mandoc */
+ 	     c=skip_till_newline(c);
+ 	     break;
+-	case V('B','k'):	/* BSD mandoc */
+-	case V('E','k'):	/* BSD mandoc */
+ 	case V('D','d'):	/* BSD mandoc */
+ 	case V('O','s'):	/* BSD mandoc */
+ 	     trans_char(c,'"','\a');
+@@ -2847,33 +2847,32 @@ scan_request(char *c) {
+ 	     static char *mandoc_name = 0;
+ 	     trans_char(c,'"','\a');
+ 	     c=c+j;
++	     while (*c == ' ' || *c == '\t') c++;
++		   if (!mandoc_name) {
++           /* Save the name of the first .Nm call */
++		       char *end, t=0 /* just for gcc */;
++		       end = strpbrk(c, "\t \n");
++		       if (end && end != c) {
++			    t = *end;
++			    *end = 0;
++		        mandoc_name = xstrdup(c);
++			    *end = t;
++		       }
++         }
+ 	     if (mandoc_synopsis) {
+ 		  /*
+-		   * Break lines only in the Synopsis. 
++		   * Break lines only in the Synopsis.
+ 		   * The Synopsis section seems to be treated
+ 		   * as a special case - Bummer!
+ 		   */
+ 		  static int count = 0; /* Don't break on the first Nm */
+ 		  if (count) {
+ 		       out_html("<BR>");
+-		  } else {
+-		       char *end, t=0 /* just for gcc */;
+-		       end = strchr(c, '\n');
+-		       if (end) {
+-			    t = *end;
+-			    *end = 0;
+-		       }
+-		       if (mandoc_name)
+-			    free(mandoc_name);
+-		       mandoc_name = xstrdup(c);
+-		       if (end)
+-			    *end = t;
+ 		  }
+ 		  count++;
+-	     }			
++	     }
+ 	     out_html(change_to_font('B'));
+-	     while (*c == ' ' || *c == '\t') c++;
+-	     if (*c == '\n') {
++	     if (*c == '\n' || (ispunct(*c) && *(c+1) == '\n')) {
+ 		  /*
+ 		   * If Nm has no argument, use one from an earlier
+ 		   * Nm command that did have one.  Hope there aren't
+@@ -2881,7 +2880,8 @@ scan_request(char *c) {
+ 		   */
+ 		  if (mandoc_name)
+ 		       out_html(mandoc_name);
+-	     } else {
++	     }
++	     if (*c != '\n') {
+ 		  c=scan_troff_mandoc(c, 1, NULL);
+ 	     }
+ 	     out_html(change_to_font('R'));

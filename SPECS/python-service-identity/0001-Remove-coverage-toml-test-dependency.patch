@@ -1,0 +1,61 @@
+From 5ab6102dbf6429fe63b2db6f0f6b43a125efe3b5 Mon Sep 17 00:00:00 2001
+From: Carl George <carlwgeorge@gmail.com>
+Date: Wed, 6 Nov 2024 18:30:12 -0600
+Subject: [PATCH 1/2] Remove coverage[toml] test dependency
+
+---
+ pyproject.toml | 31 +------------------------------
+ 1 file changed, 1 insertion(+), 30 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index dabd973..a43705c 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -36,7 +36,7 @@ dynamic = ["version", "readme"]
+ 
+ [project.optional-dependencies]
+ idna = ["idna"]
+-tests = ["coverage[toml]>=5.0.2", "pytest"]
++tests = ["pytest"]
+ docs = ["sphinx", "furo", "myst-parser", "sphinx-notfound-page", "pyOpenSSL"]
+ mypy = ["mypy", "types-pyOpenSSL", "idna"]
+ dev = ["service-identity[tests,mypy,idna]", "pyOpenSSL"]
+@@ -93,35 +93,6 @@ filterwarnings = ["once::Warning"]
+ norecursedirs = ["tests/typing"]
+ 
+ 
+-[tool.coverage.run]
+-parallel = true
+-branch = true
+-source = ["service_identity"]
+-
+-[tool.coverage.paths]
+-source = ["src", ".tox/py*/**/site-packages"]
+-
+-[tool.coverage.report]
+-show_missing = true
+-skip_covered = true
+-exclude_lines = [
+-    # a more strict default pragma
+-    "\\# pragma: no cover\\b",
+-
+-    # allow defensive code
+-    "^\\s*raise AssertionError\\b",
+-    "^\\s*raise NotImplementedError\\b",
+-    "^\\s*return NotImplemented\\b",
+-    "^\\s*raise$",
+-
+-    # typing-related code
+-    "^if (False|TYPE_CHECKING):",
+-    ": \\.\\.\\.(\\s*#.*)?$",
+-    "^ +\\.\\.\\.$",
+-    "-> ['\"]?NoReturn['\"]?:",
+-]
+-
+-
+ [tool.interrogate]
+ omit-covered-files = true
+ verbose = 2
+-- 
+2.47.0
+

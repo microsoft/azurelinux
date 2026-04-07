@@ -1,0 +1,27 @@
+From 89427a6328a737b6a64104a6988e4ab319f239c7 Mon Sep 17 00:00:00 2001
+From: Douglas Gilbert <dgilbert@interlog.com>
+Date: Mon, 16 Oct 2023 14:59:21 +0000
+Subject: [PATCH 1/3] rescan-scsi-bus.sh: fix multipath resize without update,
+ https://github.com/doug-gilbert/sg3_utils/pull/43.diff
+X-Patchwork-Bot: notify
+
+git-svn-id: https://svn.bingwo.ca/repos/sg3_utils/trunk@1055 6180dd3e-e324-4e3e-922d-17de1ae2f315
+---
+ scripts/rescan-scsi-bus.sh | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/scripts/rescan-scsi-bus.sh b/scripts/rescan-scsi-bus.sh
+index 0c25dbb1..7d74d90f 100755
+--- a/scripts/rescan-scsi-bus.sh
++++ b/scripts/rescan-scsi-bus.sh
+@@ -1088,6 +1088,7 @@ findresized()
+   local mpathsize=
+   declare -a mpathsizes
+ 
++  [ -e "$TMPLUNINFOFILE" ] || getallmultipathinfo
+   if [ -z "$lunsearch" ] ; then
+     devs=$(ls /sys/class/scsi_device/)
+   else
+-- 
+2.44.0
+

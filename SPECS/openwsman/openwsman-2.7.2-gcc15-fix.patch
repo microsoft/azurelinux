@@ -1,0 +1,24 @@
+diff -up openwsman-2.8.1/src/plugins/swig/src/target_ruby.c.orig openwsman-2.8.1/src/plugins/swig/src/target_ruby.c
+--- openwsman-2.8.1/src/plugins/swig/src/target_ruby.c.orig	2025-01-23 10:23:52.000000000 +0100
++++ openwsman-2.8.1/src/plugins/swig/src/target_ruby.c	2025-02-03 09:30:36.905616375 +0100
+@@ -49,7 +49,7 @@
+  */
+ 
+ static VALUE
+-load_module()
++load_module(VALUE)
+ {
+   ruby_script(PLUGIN_FILE);
+   return rb_require(PLUGIN_FILE);
+diff -up openwsman-2.8.1/src/server/CMakeLists.txt.orig openwsman-2.8.1/src/server/CMakeLists.txt
+--- openwsman-2.8.1/src/server/CMakeLists.txt.orig	2025-01-23 10:23:52.000000000 +0100
++++ openwsman-2.8.1/src/server/CMakeLists.txt	2025-02-03 09:31:15.258241237 +0100
+@@ -48,7 +48,7 @@ IF( HAVE_LIBDL )
+   TARGET_LINK_LIBRARIES(openwsmand ${DL_LIBRARIES})
+ ENDIF( HAVE_LIBDL )
+ 
+-INSTALL(TARGETS openwsmand DESTINATION ${CMAKE_INSTALL_PREFIX}/sbin)
++INSTALL(TARGETS openwsmand DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+ 
+ #		
+ #

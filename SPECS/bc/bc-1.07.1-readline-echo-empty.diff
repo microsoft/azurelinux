@@ -1,0 +1,14 @@
+diff -Naur bc-1.07.1/bc/scan.l bc-1.07.1-new/bc/scan.l
+--- bc-1.07.1/bc/scan.l	2017-04-07 22:20:02.000000000 +0000
++++ bc-1.07.1-new/bc/scan.l	2021-08-14 12:12:33.860991777 +0000
+@@ -170,6 +170,10 @@
+       if (rl_len != 1)
+ 	add_history (rl_line); 
+       rl_line[rl_len-1] = '\n';
++      /* readline doesn't echo empty lines without a prompt,
++         so do so here. */
++      if (rl_len == 1)
++        putchar ('\n');
+       fflush (stdout);
+     }
+ 

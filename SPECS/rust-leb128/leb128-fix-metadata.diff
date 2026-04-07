@@ -1,0 +1,11 @@
+--- leb128-0.2.5/Cargo.toml	1970-01-01T00:00:01+00:00
++++ leb128-0.2.5/Cargo.toml	2023-02-05T13:24:28.517804+00:00
+@@ -24,7 +24,7 @@
+ 
+ [dependencies]
+ [dev-dependencies.quickcheck]
+-version = "0.8.0"
++version = "0.9.2"
+ 
+ [features]
+ nightly = []

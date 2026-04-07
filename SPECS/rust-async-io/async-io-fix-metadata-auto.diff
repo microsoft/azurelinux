@@ -1,0 +1,21 @@
+--- async-io-2.6.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ async-io-2.6.0/Cargo.toml	2025-09-14T14:55:01.971209+00:00
+@@ -163,13 +163,6 @@
+ [target.'cfg(target_os = "linux")'.dev-dependencies.timerfd]
+ version = "1"
+ 
+-[target."cfg(windows)".dependencies.windows-sys]
+-version = "0.61"
+-features = ["Win32_Foundation"]
+-
+-[target."cfg(windows)".dev-dependencies.uds_windows]
+-version = "1"
+-
+ [lints.rust.unexpected_cfgs]
+ level = "warn"
+ priority = 0
+@@ -177,3 +170,4 @@
+     "cfg(polling_test_poll_backend)",
+     "cfg(async_io_no_pipe)",
+ ]
++

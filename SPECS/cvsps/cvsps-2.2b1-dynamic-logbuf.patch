@@ -1,0 +1,133 @@
+# From: http://ydirson.free.fr/soft/git/cvsps.git
+
+commit 76a9c2aaa0d2957de0bc8f0c0b994abfd1645a50
+Author: David D. Kilzer <ddkilzer@kilzer.net>
+Date:   Mon Jun 20 01:04:34 2005 +0200
+
+    Dynamically allocate the log buffer to prevent warning messages
+    
+    On anoncvs.opensource.apple.com (Apple's anonymous CVS server for
+    WebKit), some very long log entries were included in CVS.  I got tired
+    of cvsps-2.1 truncating them, so I made the 'logbuff' buffer be
+    dynamically allocated.
+
+diff --git i/cache.c w/cache.c
+index 4c51cf7..01a8ed3 100644
+--- i/cache.c
++++ w/cache.c
+@@ -108,10 +108,19 @@ time_t read_cache()
+     int tag_flags = 0;
+     char branchbuff[LOG_STR_MAX] = "";
+     int branch_add = 0;
+-    char logbuff[LOG_STR_MAX] = "";
++    int logbufflen = LOG_STR_MAX + 1;
++    char * logbuff = malloc(logbufflen);
+     time_t cache_date = -1;
+     int read_version;
+ 
++    if (logbuff == NULL)
++    {
++	debug(DEBUG_SYSERROR, "could not malloc %d bytes for logbuff in read_cache", logbufflen);
++	exit(1);
++    }
++
++    logbuff[0] = 0;
++
+     if (!(fp = cache_open("r")))
+ 	goto out;
+ 
+@@ -299,8 +308,19 @@ time_t read_cache()
+ 	    else
+ 	    {
+ 		/* Make sure we have enough in the buffer */
+-		if (strlen(logbuff)+strlen(buff)<LOG_STR_MAX)
+-		    strcat(logbuff, buff);
++		int len = strlen(buff);
++		if (strlen(logbuff) + len >= LOG_STR_MAX)
++		{
++		    logbufflen += (len >= LOG_STR_MAX ? (len+1) : LOG_STR_MAX);
++		    char * newlogbuff = realloc(logbuff, logbufflen);
++		    if (newlogbuff == NULL)
++		    {
++			debug(DEBUG_SYSERROR, "could not realloc %d bytes for logbuff in read_cache", logbufflen);
++			exit(1);
++		    }
++		    logbuff = newlogbuff;
++		}
++		strcat(logbuff, buff);
+ 	    }
+ 	    break;
+ 	case CACHE_NEED_PS_MEMBERS:
+@@ -332,6 +352,7 @@ time_t read_cache()
+  out_close:
+     fclose(fp);
+  out:
++    free(logbuff);
+     return cache_date;
+ }
+ 
+diff --git i/cvsps.c w/cvsps.c
+index f0e7d29..db28d7c 100644
+--- i/cvsps.c
++++ w/cvsps.c
+@@ -269,7 +269,8 @@ static void load_from_cvs()
+     PatchSetMember * psm = NULL;
+     char datebuff[26];
+     char authbuff[AUTH_STR_MAX];
+-    char logbuff[LOG_STR_MAX + 1];
++    int logbufflen = LOG_STR_MAX + 1;
++    char * logbuff = malloc(logbufflen);
+     int loglen = 0;
+     int have_log = 0;
+     char cmd[BUFSIZ];
+@@ -277,6 +278,12 @@ static void load_from_cvs()
+     char use_rep_buff[PATH_MAX];
+     char * ltype;
+ 
++    if (logbuff == NULL)
++    {
++	debug(DEBUG_SYSERROR, "could not malloc %d bytes for logbuff in load_from_cvs", logbufflen);
++	exit(1);
++    }
++
+     if (!no_rlog && !test_log_file && cvs_check_cap(CAP_HAVE_RLOG))
+     {
+ 	ltype = "rlog";
+@@ -484,25 +491,22 @@ static void load_from_cvs()
+ 		 */
+ 		if (have_log || !is_revision_metadata(buff))
+ 		{
+-		    /* if the log buffer is full, that's it.  
+-		     * 
+-		     * Also, read lines (fgets) always have \n in them
+-		     * (unless truncation happens)
+-		     * which we count on.  So if truncation happens,
+-		     * be careful to put a \n on.
+-		     * 
+-		     * Buffer has LOG_STR_MAX + 1 for room for \0 if
+-		     * necessary
+-		     */
+-		    if (loglen < LOG_STR_MAX)
++		    /* If the log buffer is full, try to reallocate more. */
++		    if (loglen < logbufflen)
+ 		    {
+ 			int len = strlen(buff);
+ 			
+-			if (len >= LOG_STR_MAX - loglen)
++			if (len >= logbufflen - loglen)
+ 			{
+-			    debug(DEBUG_APPMSG1, "WARNING: maximum log length exceeded, truncating log");
+-			    len = LOG_STR_MAX - loglen;
+-			    buff[len - 1] = '\n';
++			    debug(DEBUG_STATUS, "reallocating logbufflen to %d bytes for file %s", logbufflen, file->filename);
++			    logbufflen += (len >= LOG_STR_MAX ? (len+1) : LOG_STR_MAX);
++			    char * newlogbuff = realloc(logbuff, logbufflen);
++			    if (newlogbuff == NULL)
++			    {
++				debug(DEBUG_SYSERROR, "could not realloc %d bytes for logbuff in load_from_cvs", logbufflen);
++				exit(1);
++			    }
++			    logbuff = newlogbuff;
+ 			}
+ 
+ 			debug(DEBUG_STATUS, "appending %s to log", buff);

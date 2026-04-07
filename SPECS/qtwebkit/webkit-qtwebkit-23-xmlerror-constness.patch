@@ -1,0 +1,24 @@
+diff -urp webkit-qtwebkit-23.orig/Source/WebCore/xml/XSLTProcessor.h webkit-qtwebkit-23/Source/WebCore/xml/XSLTProcessor.h
+--- webkit-qtwebkit-23.orig/Source/WebCore/xml/XSLTProcessor.h	2014-09-24 20:42:05.000000000 +0900
++++ webkit-qtwebkit-23/Source/WebCore/xml/XSLTProcessor.h	2024-12-31 09:34:43.798982747 +0900
+@@ -67,7 +67,7 @@ public:
+     void reset();
+ 
+ #if !USE(QXMLQUERY)
+-    static void parseErrorFunc(void* userData, xmlError*);
++    static void parseErrorFunc(void* userData, const xmlError*);
+     static void genericErrorFunc(void* userData, const char* msg, ...);
+     
+     // Only for libXSLT callbacks
+diff -urp webkit-qtwebkit-23.orig/Source/WebCore/xml/XSLTProcessorLibxslt.cpp webkit-qtwebkit-23/Source/WebCore/xml/XSLTProcessorLibxslt.cpp
+--- webkit-qtwebkit-23.orig/Source/WebCore/xml/XSLTProcessorLibxslt.cpp	2014-09-24 20:42:05.000000000 +0900
++++ webkit-qtwebkit-23/Source/WebCore/xml/XSLTProcessorLibxslt.cpp	2024-12-31 09:34:52.693990605 +0900
+@@ -80,7 +80,7 @@ void XSLTProcessor::genericErrorFunc(voi
+     // It would be nice to do something with this error message.
+ }
+ 
+-void XSLTProcessor::parseErrorFunc(void* userData, xmlError* error)
++void XSLTProcessor::parseErrorFunc(void* userData, const xmlError* error)
+ {
+     Console* console = static_cast<Console*>(userData);
+     if (!console)

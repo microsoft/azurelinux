@@ -1,0 +1,44 @@
+diff --git a/src/hcom.c b/src/hcom.c
+index e76820e..fb8de99 100644
+--- a/src/hcom.c
++++ b/src/hcom.c
+@@ -428,12 +428,19 @@ static int stopwrite(sox_format_t * ft)
+ {
+   priv_t *p = (priv_t *) ft->priv;
+   unsigned char *compressed_data = p->data;
+-  size_t compressed_len = p->pos;
++  int32_t compressed_len = (int32_t)p->pos;
+   int rc = SOX_SUCCESS;
+ 
++  if (p->pos >> 32 > 0)
++    lsx_warn(
++      "%s: possible data loss"
++      " (the size of data to be written has exceeded its limit)",
++      ft->filename
++    );
++
+   /* Compress it all at once */
+   if (compressed_len)
+-    compress(ft, &compressed_data, (int32_t *)&compressed_len);
++    compress(ft, &compressed_data, &compressed_len);
+   free(p->data);
+ 
+   /* Write the header */
+@@ -447,7 +454,7 @@ static int stopwrite(sox_format_t * ft)
+   if (lsx_error(ft)) {
+     lsx_fail_errno(ft, errno, "write error in HCOM header");
+     rc = SOX_EOF;
+-  } else if (lsx_writebuf(ft, compressed_data, compressed_len) != compressed_len) {
++  } else if (lsx_writebuf(ft, compressed_data, (size_t) compressed_len) != (size_t) compressed_len) {
+     /* Write the compressed_data fork */
+     lsx_fail_errno(ft, errno, "can't write compressed HCOM data");
+     rc = SOX_EOF;
+@@ -456,7 +463,7 @@ static int stopwrite(sox_format_t * ft)
+ 
+   if (rc == SOX_SUCCESS)
+     /* Pad the compressed_data fork to a multiple of 128 bytes */
+-    lsx_padbytes(ft, 128u - (compressed_len % 128));
++    lsx_padbytes(ft, (size_t) 128 - (compressed_len % 128));
+ 
+   return rc;
+ }

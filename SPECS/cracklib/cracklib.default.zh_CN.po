@@ -1,0 +1,78 @@
+# translation of cracklib.default.po to Wei Liu
+# Copyright (C) 2010 Free Software Foundation, Inc.
+# This file is distributed under the same license as the PACKAGE package.
+#
+# Leah Liu <lliu@redhat.com>, 2010.
+msgid ""
+msgstr ""
+"Project-Id-Version: cracklib.default\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-03-02 21:00-0600\n"
+"PO-Revision-Date: 2010-09-07 23:42+1000\n"
+"Last-Translator: Leah Liu <lliu@redhat.com>\n"
+"Language-Team: Wei Liu\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+
+#: lib/fascist.c:550
+msgid "you are not registered in the password file"
+msgstr "尚未在口令文件中注册"
+
+#: lib/fascist.c:564
+msgid "it is based on your username"
+msgstr "它基于用户名"
+
+#: lib/fascist.c:629
+msgid "it is based upon your password entry"
+msgstr "它基于输入的口令"
+
+#: lib/fascist.c:649
+msgid "it is derived from your password entry"
+msgstr "它派生自输入的口令"
+
+#: lib/fascist.c:662
+msgid "it's derived from your password entry"
+msgstr "它派生自输入的口令"
+
+#: lib/fascist.c:676
+msgid "it is derivable from your password entry"
+msgstr "可从输入的口令推断"
+
+#: lib/fascist.c:690
+msgid "it's derivable from your password entry"
+msgstr "可从输入的口令推断"
+
+#: lib/fascist.c:726
+msgid "it is WAY too short"
+msgstr "WAY 过短"
+
+#: lib/fascist.c:731
+msgid "it is too short"
+msgstr "过短"
+
+#: lib/fascist.c:748
+msgid "it does not contain enough DIFFERENT characters"
+msgstr "它没有包含足够的不同字符"
+
+#: lib/fascist.c:762
+msgid "it is all whitespace"
+msgstr "全是空格"
+
+#: lib/fascist.c:781
+msgid "it is too simplistic/systematic"
+msgstr "过于简单化/系统化"
+
+#: lib/fascist.c:786
+msgid "it looks like a National Insurance number."
+msgstr "看起来像国家保险号码。"
+
+#: lib/fascist.c:813
+msgid "it is based on a dictionary word"
+msgstr "它基于字典单词"
+
+#: lib/fascist.c:832
+msgid "it is based on a (reversed) dictionary word"
+msgstr "它基于（颠倒的）字典单词"
+

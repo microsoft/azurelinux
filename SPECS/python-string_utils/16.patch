@@ -1,0 +1,41 @@
+From c31dcf0012ac6ce35867a0a632a86ada260cfde0 Mon Sep 17 00:00:00 2001
+From: David Alexander <opensource@thelonelyghost.com>
+Date: Mon, 15 Jun 2020 13:48:34 -0400
+Subject: [PATCH] Remove README.md as packaged data in the wheel
+
+README.md is not needed here except for reading to provide the
+`long_description` attribute in `setup.py`, which is then used only
+when uploading to pypi. It seems we can safely remove it from the
+manifest while retaining it in git.
+
+Normally the `data` published here is for non-python files necessary
+for the program to function (e.g., i18n translations).
+---
+ setup.py | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 5f24118..e981112 100755
+--- a/setup.py
++++ b/setup.py
+@@ -1,7 +1,10 @@
+ import setuptools
+ 
+-with open('README.md', 'r') as readme:
+-    long_description = readme.read()
++try:
++    with open('README.md', 'r') as readme:
++        long_description = readme.read()
++except Exception:
++    long_description = ''
+ 
+ setuptools.setup(
+     name='python-string-utils',
+@@ -23,7 +26,6 @@
+     ],
+     keywords='string str utilities validation compression development',
+     packages=['string_utils'],
+-    data_files=[('README', ['README.md'])],
+     python_requires='>=3.5',
+     setup_requires=['wheel'],
+ )

@@ -1,0 +1,12 @@
+diff -up bash-4.1/config-top.h.broken_pipe bash-4.1/config-top.h
+--- bash-4.1/config-top.h.broken_pipe	2011-01-06 18:01:30.000000000 +0100
++++ bash-4.1/config-top.h	2011-01-06 18:02:14.000000000 +0100
+@@ -51,7 +51,7 @@
+ /* Define DONT_REPORT_BROKEN_PIPE_WRITE_ERRORS if you don't want builtins
+    like `echo' and `printf' to report errors when output does not succeed
+    due to EPIPE. */
+-/* #define DONT_REPORT_BROKEN_PIPE_WRITE_ERRORS */
++#define DONT_REPORT_BROKEN_PIPE_WRITE_ERRORS
+ 
+ /* The default value of the PATH variable. */
+ #ifndef DEFAULT_PATH_VALUE

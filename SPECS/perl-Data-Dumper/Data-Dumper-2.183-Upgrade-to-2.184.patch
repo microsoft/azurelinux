@@ -1,0 +1,274 @@
+From d3b09ae0076981fb5ef8a979fa387105278a7234 Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Wed, 11 May 2022 11:01:46 +0200
+Subject: [PATCH] Upgrade to 2.184
+
+---
+ Dumper.pm  | 51 +++++++++++++++++++--------------------------------
+ Dumper.xs  | 10 ++++------
+ t/dumper.t | 52 ++++++++++++++++------------------------------------
+ 3 files changed, 39 insertions(+), 74 deletions(-)
+
+diff --git a/Dumper.pm b/Dumper.pm
+index 3b1bb75..ba61ffe 100644
+--- a/Dumper.pm
++++ b/Dumper.pm
+@@ -29,7 +29,7 @@ our ( $Indent, $Trailingcomma, $Purity, $Pad, $Varname, $Useqq, $Terse, $Freezer
+ our ( @ISA, @EXPORT, @EXPORT_OK, $VERSION );
+ 
+ BEGIN {
+-    $VERSION = '2.183'; # Don't forget to set version and release
++    $VERSION = '2.184'; # Don't forget to set version and release
+                         # date in POD below!
+ 
+     @ISA = qw(Exporter);
+@@ -740,15 +740,15 @@ my %esc = (
+     "\e" => "\\e",
+ );
+ 
+-my $low_controls = ($IS_ASCII)
+-
+-                   # This includes \177, because traditionally it has been
+-                   # output as octal, even though it isn't really a "low"
+-                   # control
+-                   ? qr/[\0-\x1f\177]/
+-
+-                     # EBCDIC low controls.
+-                   : qr/[\0-\x3f]/;
++# The low controls are considered to be everything below SPACE, plus the
++# outlier \c? control (but that wasn't properly in existence in early perls,
++# so reconstruct its value here.  This abandons EBCDIC support for this
++# character for perls below 5.8)
++my $low_controls = join "", map { quotemeta chr $_ } 0.. (ord(" ") - 1);
++$low_controls .= ($] < 5.008 || $IS_ASCII)
++                 ? "\x7f"
++                 : chr utf8::unicode_to_native(0x9F);
++my $low_controls_re = qr/[$low_controls]/;
+ 
+ # put a string value in double quotes
+ sub qquote {
+@@ -758,19 +758,10 @@ sub qquote {
+   # This efficiently changes the high ordinal characters to \x{} if the utf8
+   # flag is on.  On ASCII platforms, the high ordinals are all the
+   # non-ASCII's.  On EBCDIC platforms, we don't include in these the non-ASCII
+-  # controls whose ordinals are less than SPACE, excluded below by the range
+-  # \0-\x3f.  On ASCII platforms this range just compiles as part of :ascii:.
+-  # On EBCDIC platforms, there is just one outlier high ordinal control, and
+-  # it gets output as \x{}.
++  # controls.
+   my $bytes; { use bytes; $bytes = length }
+-  s/([^[:ascii:]\0-\x3f])/sprintf("\\x{%x}",ord($1))/ge
+-    if $bytes > length
+-
+-       # The above doesn't get the EBCDIC outlier high ordinal control when
+-       # the string is UTF-8 but there are no UTF-8 variant characters in it.
+-       # We want that to come out as \x{} anyway.  We need is_utf8() to do
+-       # this.
+-       || (! $IS_ASCII && utf8::is_utf8($_));
++  s/([^[:ascii:]$low_controls])/sprintf("\\x{%x}",ord($1))/ge
++    if $bytes > length;
+ 
+   return qq("$_") unless /[[:^print:]]/;  # fast exit if only printables
+ 
+@@ -779,21 +770,17 @@ sub qquote {
+   s/([\a\b\t\n\f\r\e])/$esc{$1}/g;
+ 
+   # no need for 3 digits in escape for octals not followed by a digit.
+-  s/($low_controls)(?!\d)/'\\'.sprintf('%o',ord($1))/eg;
++  s/($low_controls_re)(?!\d)/'\\'.sprintf('%o',ord($1))/eg;
+ 
+   # But otherwise use 3 digits
+-  s/($low_controls)/'\\'.sprintf('%03o',ord($1))/eg;
++  s/($low_controls_re)/'\\'.sprintf('%03o',ord($1))/eg;
+ 
+     # all but last branch below not supported --BEHAVIOR SUBJECT TO CHANGE--
+   my $high = shift || "";
+     if ($high eq "iso8859") {   # Doesn't escape the Latin1 printables
+-      if ($IS_ASCII) {
+-        s/([\200-\240])/'\\'.sprintf('%o',ord($1))/eg;
+-      }
+-      else {
+-        my $high_control = utf8::unicode_to_native(0x9F);
+-        s/$high_control/sprintf('\\%o',ord($1))/eg;
+-      }
++      # Could use /u and [:cntrl:] etc, if khw were confident it worked in
++      # early early perls
++      s/([\200-\240])/'\\'.sprintf('%o',ord($1))/eg if $IS_ASCII;
+     } elsif ($high eq "utf8") {
+ #     Some discussion of what to do here is in
+ #       https://rt.perl.org/Ticket/Display.html?id=113088
+@@ -1461,7 +1448,7 @@ modify it under the same terms as Perl itself.
+ 
+ =head1 VERSION
+ 
+-Version 2.183
++Version 2.184
+ 
+ =head1 SEE ALSO
+ 
+diff --git a/Dumper.xs b/Dumper.xs
+index 0eaa6c9..8bd6397 100644
+--- a/Dumper.xs
++++ b/Dumper.xs
+@@ -287,14 +287,13 @@ esc_q_utf8(pTHX_ SV* sv, const char *src, STRLEN slen, I32 do_utf8, I32 useqq)
+                              * outputs the raw char */
+             normal++;
+         }
+-        else {  /* Is qq, low ordinal, non-printable.  Output escape
+-                 * sequences */
++        else {  /* Is qq, non-printable.  Output escape sequences */
+             if (   k == '\a' || k == '\b' || k == '\t' || k == '\n' || k == '\r'
+                 || k == '\f' || k == ESC_NATIVE)
+             {
+                 grow += 2;  /* 1 char plus backslash */
+             }
+-            else /* The other low ordinals are output as an octal escape
++            else /* The other non-printable controls are output as an octal escape
+                   * sequence */
+                  if (s + 1 >= send || isDIGIT(*(s+1))) {
+                 /* When the following character is a digit, use 3 octal digits
+@@ -341,9 +340,8 @@ esc_q_utf8(pTHX_ SV* sv, const char *src, STRLEN slen, I32 do_utf8, I32 useqq)
+             }
+ 
+             /* Here 1) isn't UTF-8; or
+-             *      2) the current character is ASCII; or
+-             *      3) it is an EBCDIC platform and is a low ordinal
+-             *         non-ASCII control.
++             *      2) the current character is represented as the same single
++             *         byte regardless of the string's UTF-8ness
+              * In each case the character occupies just one byte */
+             k = *(U8*)s;
+             increment = 1;
+diff --git a/t/dumper.t b/t/dumper.t
+index 3cd86a6..80b2c8e 100644
+--- a/t/dumper.t
++++ b/t/dumper.t
+@@ -77,8 +77,8 @@ sub convert_to_native {
+             $index = utf8::unicode_to_native(ord eval "\"$2\"");
+ 
+             # But low hex numbers are always in octal.  These are all
+-            # controls.
+-            my $format = ($index < ord(" "))
++            # controls.  The outlier \c? control is also in octal.
++            my $format = ($index < ord(" ") || $index == ord("\c?"))
+                          ? "\\%o"
+                          : "\\x{%x}";
+             $replacement = sprintf($format, $index);
+@@ -1659,8 +1659,8 @@ EOW
+ #  "\\x{41f}",
+ #  qr/\x{8b80}/,
+ #  qr/\x{41f}/,
+-#  qr/\x{e4}/,
+-#  '\xE4'
++#  qr/\x{b6}/,
++#  '\xb6'
+ #];
+ EOW
+   if ($] lt '5.010001') {
+@@ -1671,9 +1671,9 @@ EOW
+       $want =~ s{/(,?)$}{/u$1}mg;
+   }
+   my $want_xs = $want;
+-  $want_xs =~ s/'\xE4'/"\\x{e4}"/;
+-  $want_xs =~ s<([^\0-\177])> <sprintf '\\x{%x}', ord $1>ge;
+-  TEST_BOTH(qq(Data::Dumper->Dumpxs([ [qq/\x{41f}/, qr/\x{8b80}/, qr/\x{41f}/, qr/\x{e4}/, "\xE4"] ])),
++  $want_xs =~ s/'\xb6'/"\\x{b6}"/;
++  $want_xs =~ s<([[:^ascii:]])> <sprintf '\\x{%x}', ord $1>ge;
++  TEST_BOTH(qq(Data::Dumper->Dumpxs([ [qq/\x{41f}/, qr/\x{8b80}/, qr/\x{41f}/, qr/\x{b6}/, "\xb6"] ])),
+             "string with Unicode + regexp with Unicode",
+             $want, $want_xs);
+ }
+@@ -1715,7 +1715,7 @@ EOW
+ #  qr/ \x{203d}\\/ /,
+ #  qr/ \\\x{203d}\\/ /,
+ #  qr/ \\\x{203d}$bs:\\/ /,
+-#  '\xA3'
++#  '\xB6'
+ #];
+ EOW
+   if ($] lt '5.010001') {
+@@ -1726,9 +1726,9 @@ EOW
+       $want =~ s{/(,?)$}{/u$1}mg;
+   }
+   my $want_xs = $want;
+-  $want_xs =~ s/'\x{A3}'/"\\x{a3}"/;
++  $want_xs =~ s/'\x{B6}'/"\\x{b6}"/;
+   $want_xs =~ s/\x{203D}/\\x{203d}/g;
+-  TEST_BOTH(qq(Data::Dumper->Dumpxs([ [ '\x{2e18}', qr! \x{203d}/ !, qr! \\\x{203d}/ !, qr! \\\x{203d}$bs:/ !, "\xa3"] ])),
++  TEST_BOTH(qq(Data::Dumper->Dumpxs([ [ '\x{2e18}', qr! \x{203d}/ !, qr! \\\x{203d}/ !, qr! \\\x{203d}$bs:/ !, "\xb6"] ])),
+             "github #18614, github #18764, perl #58608 corner cases",
+             $want, $want_xs);
+ }
+@@ -1743,13 +1743,13 @@ EOW
+ #  qr/^\$/,
+ #  qr/${dollar}foo/,
+ #  qr/\\\$foo/,
+-#  qr/$dollar \x{A3} /u,
++#  qr/$dollar \x{B6} /u,
+ #  qr/$dollar \x{203d} /u,
+ #  qr/\\\$ \x{203d} /u,
+ #  qr/\\\\$dollar \x{203d} /u,
+ #  qr/ \$| \x{203d} /u,
+ #  qr/ (\$) \x{203d} /u,
+-#  '\xA3'
++#  '\xB6'
+ #];
+ EOW
+   if ($] lt '5.014') {
+@@ -1760,8 +1760,8 @@ EOW
+       $want =~ s!/,!)/,!g;
+   }
+   my $want_xs = $want;
+-  $want_xs =~ s/'\x{A3}'/"\\x{a3}"/;
+-  $want_xs =~ s/\x{A3}/\\x{a3}/;
++  $want_xs =~ s/'\x{B6}'/"\\x{b6}"/;
++  $want_xs =~ s/\x{B6}/\\x{b6}/;
+   $want_xs =~ s/\x{203D}/\\x{203d}/g;
+   my $have = <<"EOT";
+ Data::Dumper->Dumpxs([ [
+@@ -1770,13 +1770,13 @@ Data::Dumper->Dumpxs([ [
+   qr'^\$',
+   qr'\$foo',
+   qr/\\\$foo/,
+-  qr'\$ \x{A3} ',
++  qr'\$ \x{B6} ',
+   qr'\$ \x{203d} ',
+   qr/\\\$ \x{203d} /,
+   qr'\\\\\$ \x{203d} ',
+   qr/ \$| \x{203d} /,
+   qr/ (\$) \x{203d} /,
+-  '\xA3'
++  '\xB6'
+ ] ]);
+ EOT
+   TEST_BOTH($have, "CPAN #84569", $want, $want_xs);
+@@ -1808,26 +1808,6 @@ EOW
+             "name of code in *foo",
+             $want);
+ }
+-#############
+-
+-{
+-    # There is special code to handle the single control that in EBCDIC is
+-    # not in the block with all the other controls, when it is UTF-8 and
+-    # there are no variants in it (All controls in EBCDIC are invariant.)
+-    # This tests that.  There is no harm in testing this works on ASCII,
+-    # and is better to not have split code paths.
+-    my $outlier = chr utf8::unicode_to_native(0x9F);
+-    my $outlier_hex = sprintf "%x", ord $outlier;
+-    my $want = <<EOT;
+-#\$VAR1 = \"\\x{$outlier_hex}\";
+-EOT
+-    $foo = "$outlier\x{100}";
+-    chop $foo;
+-    local $Data::Dumper::Useqq = 1;
+-    TEST_BOTH (q(Data::Dumper::DumperX($foo)),
+-               'EBCDIC outlier control: DumperX',
+-               $want);
+-}
+ ############# [perl #124091]
+ {
+     my $want = <<'EOT';
+-- 
+2.34.3
+

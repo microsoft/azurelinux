@@ -1,0 +1,8 @@
+--- arcstr-1.2.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ arcstr-1.2.0/Cargo.toml	2025-10-06T13:39:01.471418+00:00
+@@ -71,5 +71,3 @@
+ substr = []
+ substr-usize-indices = ["substr"]
+ 
+-[target."cfg(loom)".dev-dependencies.loom]
+-version = "0.7.1"

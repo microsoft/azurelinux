@@ -1,0 +1,5 @@
+
+To activate the munin plugins, run (as root):
+
+cd /etc/munin/plugins
+for i in /usr/share/munin/plugins/unbound_*; do ln -s $i; done

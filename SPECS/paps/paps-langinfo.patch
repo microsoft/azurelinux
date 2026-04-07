@@ -1,0 +1,37 @@
+diff -pruN paps-0.6.8.orig/src/paps.c paps-0.6.8/src/paps.c
+--- paps-0.6.8.orig/src/paps.c	2008-09-01 15:07:03.000000000 +0900
++++ paps-0.6.8/src/paps.c	2008-09-01 15:49:10.000000000 +0900
+@@ -25,6 +25,7 @@
+ #include <pango/pangoft2.h>
+ #include "libpaps.h"
+ #include <errno.h>
++#include <langinfo.h>
+ #include <stdlib.h>
+ #include <stdio.h>
+ #include <string.h>
+@@ -331,6 +332,9 @@ int main(int argc, char *argv[])
+   GIConv cvh = NULL;
+   GOptionGroup *options;
+ 
++  /* Set locale from environment. */
++  setlocale(LC_ALL, "");
++
+   /* Prerequisite when using glib. */
+   g_type_init();
+ 
+@@ -480,6 +484,15 @@ int main(int argc, char *argv[])
+   page_layout.scale_x = page_layout.scale_y = 1.0;
+       
+ 
++  if (encoding == NULL)
++    {
++      encoding = g_strdup(nl_langinfo(CODESET));
++      if (!strcmp(encoding, "UTF-8"))
++        {
++          g_free(encoding);
++          encoding = NULL;
++        }
++    }
+   if (encoding != NULL)
+     {
+       cvh = g_iconv_open ("UTF-8", encoding);

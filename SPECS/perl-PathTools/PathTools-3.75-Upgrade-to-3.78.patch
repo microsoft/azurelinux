@@ -1,0 +1,283 @@
+From 3c570b93e7ca990b3274219dd828e8fdaac0bf9d Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Thu, 25 Apr 2019 17:04:30 +0200
+Subject: [PATCH] Upgrade to 3.78
+
+---
+ Cwd.pm                     |  8 ++++++--
+ lib/File/Spec.pm           |  2 +-
+ lib/File/Spec/AmigaOS.pm   |  2 +-
+ lib/File/Spec/Cygwin.pm    |  2 +-
+ lib/File/Spec/Epoc.pm      |  2 +-
+ lib/File/Spec/Functions.pm |  2 +-
+ lib/File/Spec/Mac.pm       |  2 +-
+ lib/File/Spec/OS2.pm       |  2 +-
+ lib/File/Spec/Unix.pm      |  2 +-
+ lib/File/Spec/Win32.pm     | 14 ++------------
+ t/Spec.t                   |  4 ++--
+ t/cwd.t                    | 11 ++++++++++-
+ t/cwd_enoent.t             |  9 ++++++---
+ 13 files changed, 34 insertions(+), 28 deletions(-)
+
+diff --git a/Cwd.pm b/Cwd.pm
+index 16d5b11..9b173c2 100644
+--- a/Cwd.pm
++++ b/Cwd.pm
+@@ -3,7 +3,7 @@ use strict;
+ use Exporter;
+ 
+ 
+-our $VERSION = '3.75';
++our $VERSION = '3.78';
+ my $xs_version = $VERSION;
+ $VERSION =~ tr/_//d;
+ 
+@@ -171,7 +171,7 @@ if($^O ne 'MSWin32') {
+ if ($^O =~ /android/) {
+     # If targetsh is executable, then we're either a full
+     # perl, or a miniperl for a native build.
+-    if (-x $Config::Config{targetsh}) {
++    if ( exists($Config::Config{targetsh}) && -x $Config::Config{targetsh}) {
+         $pwd_cmd = "$Config::Config{targetsh} -c pwd"
+     }
+     else {
+@@ -659,6 +659,10 @@ if (exists $METHOD_MAP{$^O}) {
+   }
+ }
+ 
++# built-in from 5.30
++*getcwd = \&Internals::getcwd
++  if !defined &getcwd && defined &Internals::getcwd;
++
+ # In case the XS version doesn't load.
+ *abs_path = \&_perl_abs_path unless defined &abs_path;
+ *getcwd = \&_perl_getcwd unless defined &getcwd;
+diff --git a/lib/File/Spec.pm b/lib/File/Spec.pm
+index eb3b55a..7fe3272 100644
+--- a/lib/File/Spec.pm
++++ b/lib/File/Spec.pm
+@@ -2,7 +2,7 @@ package File::Spec;
+ 
+ use strict;
+ 
+-our $VERSION = '3.75';
++our $VERSION = '3.78';
+ $VERSION =~ tr/_//d;
+ 
+ my %module = (
+diff --git a/lib/File/Spec/AmigaOS.pm b/lib/File/Spec/AmigaOS.pm
+index 1355768..2b7d18a 100644
+--- a/lib/File/Spec/AmigaOS.pm
++++ b/lib/File/Spec/AmigaOS.pm
+@@ -3,7 +3,7 @@ package File::Spec::AmigaOS;
+ use strict;
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.75';
++our $VERSION = '3.78';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+diff --git a/lib/File/Spec/Cygwin.pm b/lib/File/Spec/Cygwin.pm
+index 9dc15a1..d44ced3 100644
+--- a/lib/File/Spec/Cygwin.pm
++++ b/lib/File/Spec/Cygwin.pm
+@@ -3,7 +3,7 @@ package File::Spec::Cygwin;
+ use strict;
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.75';
++our $VERSION = '3.78';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+diff --git a/lib/File/Spec/Epoc.pm b/lib/File/Spec/Epoc.pm
+index bd87b68..b611cd9 100644
+--- a/lib/File/Spec/Epoc.pm
++++ b/lib/File/Spec/Epoc.pm
+@@ -2,7 +2,7 @@ package File::Spec::Epoc;
+ 
+ use strict;
+ 
+-our $VERSION = '3.75';
++our $VERSION = '3.78';
+ $VERSION =~ tr/_//d;
+ 
+ require File::Spec::Unix;
+diff --git a/lib/File/Spec/Functions.pm b/lib/File/Spec/Functions.pm
+index 19ab4db..3f617bd 100644
+--- a/lib/File/Spec/Functions.pm
++++ b/lib/File/Spec/Functions.pm
+@@ -3,7 +3,7 @@ package File::Spec::Functions;
+ use File::Spec;
+ use strict;
+ 
+-our $VERSION = '3.75';
++our $VERSION = '3.78';
+ $VERSION =~ tr/_//d;
+ 
+ require Exporter;
+diff --git a/lib/File/Spec/Mac.pm b/lib/File/Spec/Mac.pm
+index 926a5dd..d920d2f 100644
+--- a/lib/File/Spec/Mac.pm
++++ b/lib/File/Spec/Mac.pm
+@@ -4,7 +4,7 @@ use strict;
+ use Cwd ();
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.75';
++our $VERSION = '3.78';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+diff --git a/lib/File/Spec/OS2.pm b/lib/File/Spec/OS2.pm
+index 4404fe8..603781a 100644
+--- a/lib/File/Spec/OS2.pm
++++ b/lib/File/Spec/OS2.pm
+@@ -4,7 +4,7 @@ use strict;
+ use Cwd ();
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.75';
++our $VERSION = '3.78';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+diff --git a/lib/File/Spec/Unix.pm b/lib/File/Spec/Unix.pm
+index cd29f76..6749e60 100644
+--- a/lib/File/Spec/Unix.pm
++++ b/lib/File/Spec/Unix.pm
+@@ -3,7 +3,7 @@ package File::Spec::Unix;
+ use strict;
+ use Cwd ();
+ 
+-our $VERSION = '3.75';
++our $VERSION = '3.78';
+ $VERSION =~ tr/_//d;
+ 
+ =head1 NAME
+diff --git a/lib/File/Spec/Win32.pm b/lib/File/Spec/Win32.pm
+index 0cf0e28..5934010 100644
+--- a/lib/File/Spec/Win32.pm
++++ b/lib/File/Spec/Win32.pm
+@@ -5,7 +5,7 @@ use strict;
+ use Cwd ();
+ require File::Spec::Unix;
+ 
+-our $VERSION = '3.75';
++our $VERSION = '3.78';
+ $VERSION =~ tr/_//d;
+ 
+ our @ISA = qw(File::Spec::Unix);
+@@ -137,7 +137,7 @@ sub catfile {
+     # Legacy / compatibility support
+     #
+     shift, return _canon_cat( "/", @_ )
+-	if $_[0] eq "";
++	if !@_ || $_[0] eq "";
+ 
+     # Compatibility with File::Spec <= 3.26:
+     #     catfile('A:', 'foo') should return 'A:\foo'.
+@@ -407,16 +407,6 @@ sub _canon_cat				# @path -> path
+ 	       )+			# performance boost -- I do not know why
+ 	     }{\\}gx;
+ 
+-    # XXX I do not know whether more dots are supported by the OS supporting
+-    #     this ... annotation (NetWare or symbian but not MSWin32).
+-    #     Then .... could easily become ../../.. etc:
+-    # Replace \.\.\. by (\.\.\.+)  and substitute with
+-    # { $1 . ".." . "\\.." x (length($2)-2) }gex
+-	     				# ... --> ../..
+-    $path =~ s{ (\A|\\)			# at begin or after a slash
+-    		\.\.\.
+-		(?=\\|\z) 		# at end or followed by slash
+-	     }{$1..\\..}gx;
+     					# xx\yy\..\zz --> xx\zz
+     while ( $path =~ s{(?:
+ 		(?:\A|\\)		# at begin or after a slash
+diff --git a/t/Spec.t b/t/Spec.t
+index 1b26190..c953391 100644
+--- a/t/Spec.t
++++ b/t/Spec.t
+@@ -277,9 +277,9 @@ my @tests = (
+ [ "Win32->canonpath('//a/b/../../c')",  '\\\\a\\b\\c'         ],
+ [ "Win32->canonpath('//a/b/c/../d')",   '\\\\a\\b\\d'         ],
+ [ "Win32->canonpath('//a/b/c/../../d')",'\\\\a\\b\\d'         ],
+-[ "Win32->canonpath('//a/b/c/.../d')",  '\\\\a\\b\\d'         ],
++[ "Win32->canonpath('//a/b/c/.../d')",  '\\\\a\\b\\c\\...\\d' ],
+ [ "Win32->canonpath('/a/b/c/../../d')", '\\a\\d'              ],
+-[ "Win32->canonpath('/a/b/c/.../d')",   '\\a\\d'              ],
++[ "Win32->canonpath('/a/b/c/.../d')",   '\\a\\b\\c\\...\\d'   ],
+ [ "Win32->canonpath('\\../temp\\')",    '\\temp'              ],
+ [ "Win32->canonpath('\\../')",          '\\'                  ],
+ [ "Win32->canonpath('\\..\\')",         '\\'                  ],
+diff --git a/t/cwd.t b/t/cwd.t
+index 483b437..c056938 100644
+--- a/t/cwd.t
++++ b/t/cwd.t
+@@ -10,6 +10,7 @@ chdir 't';
+ use Config;
+ use File::Spec;
+ use File::Path;
++use Errno qw(EACCES);
+ 
+ use lib File::Spec->catdir('t', 'lib');
+ use Test::More;
+@@ -208,7 +209,15 @@ SKIP: {
+ 
+     like($abs_path,      qr|$want$|i, "Cwd::abs_path produced $abs_path");
+     like($fast_abs_path, qr|$want$|i, "Cwd::fast_abs_path produced $fast_abs_path");
+-    like($pas,           qr|$want$|i, "Cwd::_perl_abs_path produced $pas") if $EXTRA_ABSPATH_TESTS;
++    if ($EXTRA_ABSPATH_TESTS) {
++        # _perl_abs_path() can fail if some ancestor directory isn't readable
++        if (defined $pas) {
++            like($pas,           qr|$want$|i, "Cwd::_perl_abs_path produced $pas");
++        }
++        else {
++            is($!+0, EACCES, "check we got the expected error on failure");
++        }
++    }
+ 
+     rmtree($test_dirs[0], 0, 0);
+     1 while unlink $file;
+diff --git a/t/cwd_enoent.t b/t/cwd_enoent.t
+index 8f3a1fb..510c65e 100644
+--- a/t/cwd_enoent.t
++++ b/t/cwd_enoent.t
+@@ -2,7 +2,7 @@ use warnings;
+ use strict;
+ 
+ use Config;
+-use Errno qw(ENOENT);
++use Errno qw();
+ use File::Temp qw(tempdir);
+ use Test::More;
+ 
+@@ -19,6 +19,7 @@ unless(mkdir("$tmp/testdir") && chdir("$tmp/testdir") && rmdir("$tmp/testdir")){
+ plan tests => 8;
+ require Cwd;
+ 
++my @acceptable_errnos = (&Errno::ENOENT, (defined &Errno::ESTALE ? &Errno::ESTALE : ()));
+ foreach my $type (qw(regular perl)) {
+     SKIP: {
+ 	skip "_perl_abs_path() not expected to work", 4
+@@ -36,12 +37,14 @@ foreach my $type (qw(regular perl)) {
+ 	$res = Cwd::getcwd();
+ 	$eno = 0+$!;
+ 	is $res, undef, "$type getcwd result on non-existent directory";
+-	is $eno, ENOENT, "$type getcwd errno on non-existent directory";
++	ok((grep { $eno == $_ } @acceptable_errnos), "$type getcwd errno on non-existent directory")
++	    or diag "Got errno code $eno, expected " . join(", ", @acceptable_errnos);
+ 	$! = 0;
+ 	$res = Cwd::abs_path(".");
+ 	$eno = 0+$!;
+ 	is $res, undef, "$type abs_path result on non-existent directory";
+-	is $eno, ENOENT, "$type abs_path errno on non-existent directory";
++	ok((grep { $eno == $_ } @acceptable_errnos), "$type abs_path errno on non-existent directory")
++	    or diag "Got errno code $eno, expected " . join(", ", @acceptable_errnos);
+     }
+ }
+ 
+-- 
+2.20.1
+

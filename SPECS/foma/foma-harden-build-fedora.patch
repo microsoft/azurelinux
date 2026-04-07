@@ -1,0 +1,20 @@
+diff -Naur foma-b44022c7d9d347dc7392aabbf72c82e558767675.orig/foma/Makefile foma-b44022c7d9d347dc7392aabbf72c82e558767675/foma/Makefile
+--- foma-b44022c7d9d347dc7392aabbf72c82e558767675.orig/foma/Makefile	2020-09-28 22:00:09.000000000 +0300
++++ foma-b44022c7d9d347dc7392aabbf72c82e558767675/foma/Makefile	2020-11-14 20:04:36.797538370 +0200
+@@ -23,13 +23,13 @@
+ all: libfoma foma flookup cgflookup
+ 
+ foma: $(FOMAOBJS) $(LIBOBJS)
+-	$(CC) $(CFLAGS) $(FOMAOBJS) $(LIBOBJS) $(LDFLAGS) -o $@
++	$(CC) $(CFLAGS) -pie $(FOMAOBJS) $(LIBOBJS) $(LDFLAGS) -o $@
+ 
+ flookup: flookup.o libfoma
+-	$(CC) $(CFLAGS) flookup.o $(FLOOKUPLDFLAGS) -o $@
++	$(CC) $(CFLAGS) -pie flookup.o $(FLOOKUPLDFLAGS) -o $@
+ 
+ cgflookup: cgflookup.o libfoma
+-	$(CC) $(CFLAGS) cgflookup.o $(FLOOKUPLDFLAGS) -o $@
++	$(CC) $(CFLAGS) -pie cgflookup.o $(FLOOKUPLDFLAGS) -o $@
+ 
+ STATICLIB = libfoma.a
+ 

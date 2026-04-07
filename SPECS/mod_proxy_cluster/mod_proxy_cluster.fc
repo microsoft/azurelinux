@@ -1,0 +1,1 @@
+/var/cache/httpd/mod_proxy_cluster(/.*)?         gen_context(system_u:object_r:httpd_cache_t,s0)

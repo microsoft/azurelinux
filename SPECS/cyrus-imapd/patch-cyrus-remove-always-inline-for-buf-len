@@ -1,0 +1,13 @@
+diff --git a/lib/util.c b/lib/util.c
+index a2eae15..ef8c25b 100644
+--- a/lib/util.c
++++ b/lib/util.c
+@@ -1188,7 +1188,7 @@ EXPORTED int buf_getline(struct buf *buf, FILE *fp)
+ 
+ #ifdef HAVE_DECLARE_OPTIMIZE
+ EXPORTED inline size_t buf_len(const struct buf *buf)
+-    __attribute__((always_inline, optimize("-O3")));
++    __attribute__((optimize("-O3")));
+ #endif
+ EXPORTED inline size_t buf_len(const struct buf *buf)
+ {

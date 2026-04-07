@@ -1,0 +1,124 @@
+aclocal_cc.m4: Remove use of implicit int from weak symbol checks
+
+Implicit int is no longer part of the C language since the 1999
+revision.
+
+Submitted upstream: <https://github.com/pmodels/mpich/pull/6301>
+
+diff --git a/confdb/aclocal_cc.m4 b/confdb/aclocal_cc.m4
+index a85e082..2710ada 100644
+--- a/confdb/aclocal_cc.m4
++++ b/confdb/aclocal_cc.m4
+@@ -381,7 +381,7 @@ AC_CACHE_CHECK([for multiple weak symbol support], pac_cv_prog_c_multiple_weak_s
+         #pragma weak PFoo_ = Foo
+         #pragma weak pfoo_ = Foo
+         int Foo(int);
+-        int Foo(a) { return a; }
++        int Foo(int a) { return a; }
+     ]])],[AC_LANG_SOURCE([[
+         extern int PFoo(int), PFoo_(int), pfoo_(int);
+         int main() {
+diff --git a/modules/json-c/autoconf-archive/m4/aclocal_cc.m4 b/modules/json-c/autoconf-archive/m4/aclocal_cc.m4
+index 8a1552d..cd28a4f 100644
+--- a/modules/json-c/autoconf-archive/m4/aclocal_cc.m4
++++ b/modules/json-c/autoconf-archive/m4/aclocal_cc.m4
+@@ -383,7 +383,7 @@ extern int pfoo_(int);
+ #pragma weak PFoo_ = Foo
+ #pragma weak pfoo_ = Foo
+ int Foo(int);
+-int Foo(a) { return a; }
++int Foo(int a) { return a; }
+     ])
+ ],[
+     AC_LANG_SOURCE([
+diff --git a/modules/yaksa/m4/aclocal_cc.m4 b/modules/yaksa/m4/aclocal_cc.m4
+index d15d674..9fcf485 100644
+--- a/modules/yaksa/m4/aclocal_cc.m4
++++ b/modules/yaksa/m4/aclocal_cc.m4
+@@ -422,7 +422,7 @@ extern int pfoo_(int);
+ #pragma weak PFoo_ = Foo
+ #pragma weak pfoo_ = Foo
+ int Foo(int);
+-int Foo(a) { return a; }
++int Foo(int a) { return a; }
+     ])
+ ],[
+     AC_LANG_SOURCE([
+diff --git a/src/mpi/romio/confdb/aclocal_cc.m4 b/src/mpi/romio/confdb/aclocal_cc.m4
+index a85e082..2710ada 100644
+--- a/src/mpi/romio/confdb/aclocal_cc.m4
++++ b/src/mpi/romio/confdb/aclocal_cc.m4
+@@ -381,7 +381,7 @@ AC_CACHE_CHECK([for multiple weak symbol support], pac_cv_prog_c_multiple_weak_s
+         #pragma weak PFoo_ = Foo
+         #pragma weak pfoo_ = Foo
+         int Foo(int);
+-        int Foo(a) { return a; }
++        int Foo(int a) { return a; }
+     ]])],[AC_LANG_SOURCE([[
+         extern int PFoo(int), PFoo_(int), pfoo_(int);
+         int main() {
+diff --git a/src/mpi/romio/mpl/confdb/aclocal_cc.m4 b/src/mpi/romio/mpl/confdb/aclocal_cc.m4
+index a85e082..2710ada 100644
+--- a/src/mpi/romio/mpl/confdb/aclocal_cc.m4
++++ b/src/mpi/romio/mpl/confdb/aclocal_cc.m4
+@@ -381,7 +381,7 @@ AC_CACHE_CHECK([for multiple weak symbol support], pac_cv_prog_c_multiple_weak_s
+         #pragma weak PFoo_ = Foo
+         #pragma weak pfoo_ = Foo
+         int Foo(int);
+-        int Foo(a) { return a; }
++        int Foo(int a) { return a; }
+     ]])],[AC_LANG_SOURCE([[
+         extern int PFoo(int), PFoo_(int), pfoo_(int);
+         int main() {
+diff --git a/src/mpl/confdb/aclocal_cc.m4 b/src/mpl/confdb/aclocal_cc.m4
+index a85e082..2710ada 100644
+--- a/src/mpl/confdb/aclocal_cc.m4
++++ b/src/mpl/confdb/aclocal_cc.m4
+@@ -381,7 +381,7 @@ AC_CACHE_CHECK([for multiple weak symbol support], pac_cv_prog_c_multiple_weak_s
+         #pragma weak PFoo_ = Foo
+         #pragma weak pfoo_ = Foo
+         int Foo(int);
+-        int Foo(a) { return a; }
++        int Foo(int a) { return a; }
+     ]])],[AC_LANG_SOURCE([[
+         extern int PFoo(int), PFoo_(int), pfoo_(int);
+         int main() {
+diff --git a/src/pm/hydra/confdb/aclocal_cc.m4 b/src/pm/hydra/confdb/aclocal_cc.m4
+index a85e082..2710ada 100644
+--- a/src/pm/hydra/confdb/aclocal_cc.m4
++++ b/src/pm/hydra/confdb/aclocal_cc.m4
+@@ -381,7 +381,7 @@ AC_CACHE_CHECK([for multiple weak symbol support], pac_cv_prog_c_multiple_weak_s
+         #pragma weak PFoo_ = Foo
+         #pragma weak pfoo_ = Foo
+         int Foo(int);
+-        int Foo(a) { return a; }
++        int Foo(int a) { return a; }
+     ]])],[AC_LANG_SOURCE([[
+         extern int PFoo(int), PFoo_(int), pfoo_(int);
+         int main() {
+diff --git a/test/mpi/confdb/aclocal_cc.m4 b/test/mpi/confdb/aclocal_cc.m4
+index a85e082..2710ada 100644
+--- a/test/mpi/confdb/aclocal_cc.m4
++++ b/test/mpi/confdb/aclocal_cc.m4
+@@ -381,7 +381,7 @@ AC_CACHE_CHECK([for multiple weak symbol support], pac_cv_prog_c_multiple_weak_s
+         #pragma weak PFoo_ = Foo
+         #pragma weak pfoo_ = Foo
+         int Foo(int);
+-        int Foo(a) { return a; }
++        int Foo(int a) { return a; }
+     ]])],[AC_LANG_SOURCE([[
+         extern int PFoo(int), PFoo_(int), pfoo_(int);
+         int main() {
+diff --git a/test/mpi/dtpools/confdb/aclocal_cc.m4 b/test/mpi/dtpools/confdb/aclocal_cc.m4
+index a85e082..2710ada 100644
+--- a/test/mpi/dtpools/confdb/aclocal_cc.m4
++++ b/test/mpi/dtpools/confdb/aclocal_cc.m4
+@@ -381,7 +381,7 @@ AC_CACHE_CHECK([for multiple weak symbol support], pac_cv_prog_c_multiple_weak_s
+         #pragma weak PFoo_ = Foo
+         #pragma weak pfoo_ = Foo
+         int Foo(int);
+-        int Foo(a) { return a; }
++        int Foo(int a) { return a; }
+     ]])],[AC_LANG_SOURCE([[
+         extern int PFoo(int), PFoo_(int), pfoo_(int);
+         int main() {

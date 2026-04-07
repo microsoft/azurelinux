@@ -1,0 +1,19 @@
+
+Use -lldap_r by default.
+
+diff -up php-8.4.0beta1/ext/ldap/config.m4.ldap_r php-8.4.0beta1/ext/ldap/config.m4
+--- php-8.4.0beta1/ext/ldap/config.m4.ldap_r	2024-08-13 15:48:12.000000000 +0200
++++ php-8.4.0beta1/ext/ldap/config.m4	2024-08-13 16:23:24.744311776 +0200
+@@ -72,7 +72,11 @@ if test "$PHP_LDAP" != "no"; then
+   AH_TEMPLATE([HAVE_ORALDAP],
+     [Define to 1 if the ldap extension uses the Oracle Instant Client.])
+ 
+-  if test -f $LDAP_LIBDIR/liblber.a || test -f $LDAP_LIBDIR/liblber.$SHLIB_SUFFIX_NAME || test -f $LDAP_LIBDIR/$MACHINE_INCLUDES/liblber.a || test -f $LDAP_LIBDIR/$MACHINE_INCLUDES/liblber.$SHLIB_SUFFIX_NAME; then
++  if test -f $LDAP_LIBDIR/libldap_r.$SHLIB_SUFFIX_NAME; then
++    PHP_ADD_LIBRARY_WITH_PATH(lber, [$LDAP_LIBDIR], [LDAP_SHARED_LIBADD])
++    PHP_ADD_LIBRARY_WITH_PATH(ldap_r, [$LDAP_LIBDIR], [LDAP_SHARED_LIBADD])
++
++  elif test -f $LDAP_LIBDIR/liblber.a || test -f $LDAP_LIBDIR/liblber.$SHLIB_SUFFIX_NAME || test -f $LDAP_LIBDIR/$MACHINE_INCLUDES/liblber.a || test -f $LDAP_LIBDIR/$MACHINE_INCLUDES/liblber.$SHLIB_SUFFIX_NAME; then
+     PHP_ADD_LIBRARY_WITH_PATH([lber], [$LDAP_LIBDIR], [LDAP_SHARED_LIBADD])
+     PHP_ADD_LIBRARY_WITH_PATH([ldap], [$LDAP_LIBDIR], [LDAP_SHARED_LIBADD])
+ 

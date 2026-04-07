@@ -1,0 +1,113 @@
+From 9020f56e88a7dbaef688c147c281909f95b4e1d1 Mon Sep 17 00:00:00 2001
+From: Karolina Surma <ksurma@redhat.com>
+Date: Wed, 16 Feb 2022 08:36:21 +0100
+Subject: [PATCH] Prevent removing of the system packages installed under
+ /usr/lib when pip install --upgrade is executed.
+
+Resolves: rhbz#1550368
+
+Co-Authored-By: Michal Cyprian <m.cyprian@gmail.com>
+Co-Authored-By: Victor Stinner <vstinner@redhat.com>
+Co-Authored-By: Petr Viktorin <pviktori@redhat.com>
+Co-Authored-By: Lumir Balhar <lbalhar@redhat.com>
+Co-Authored-By: Miro Hrončok <miro@hroncok.cz>
+Co-Authored-By: Karolina Surma <ksurma@redhat.com>
+
+---
+ src/pip/_internal/metadata/base.py                 | 12 +++++++++++-
+ src/pip/_internal/req/req_install.py               |  2 +-
+ src/pip/_internal/resolution/legacy/resolver.py    |  4 +++-
+ src/pip/_internal/resolution/resolvelib/factory.py | 12 ++++++++++++
+ 4 files changed, 27 insertions(+), 3 deletions(-)
+
+diff --git a/src/pip/_internal/metadata/base.py b/src/pip/_internal/metadata/base.py
+index 9eabcdb..9816691 100644
+--- a/src/pip/_internal/metadata/base.py
++++ b/src/pip/_internal/metadata/base.py
+@@ -28,7 +28,7 @@ from pip._vendor.packaging.utils import NormalizedName, canonicalize_name
+ from pip._vendor.packaging.version import Version
+ 
+ from pip._internal.exceptions import NoneMetadataError
+-from pip._internal.locations import site_packages, user_site
++from pip._internal.locations import get_scheme, site_packages, user_site
+ from pip._internal.models.direct_url import (
+     DIRECT_URL_METADATA_NAME,
+     DirectUrl,
+@@ -578,6 +578,16 @@ class BaseDistribution(Protocol):
+             for extra in self._iter_egg_info_extras():
+                 metadata["Provides-Extra"] = extra
+ 
++    @property
++    def in_install_path(self) -> bool:
++        """
++        Return True if given Distribution is installed in
++        path matching distutils_scheme layout.
++        """
++        norm_path = normalize_path(self.installed_location)
++        return norm_path.startswith(normalize_path(
++            get_scheme("").purelib.split('python')[0]))
++
+ 
+ class BaseEnvironment:
+     """An environment containing distributions to introspect."""
+diff --git a/src/pip/_internal/req/req_install.py b/src/pip/_internal/req/req_install.py
+index 2132785..0340890 100644
+--- a/src/pip/_internal/req/req_install.py
++++ b/src/pip/_internal/req/req_install.py
+@@ -449,7 +449,7 @@ class InstallRequirement:
+                         f"lack sys.path precedence to {existing_dist.raw_name} "
+                         f"in {existing_dist.location}"
+                     )
+-            else:
++            elif existing_dist.in_install_path:
+                 self.should_reinstall = True
+         else:
+             if self.editable:
+diff --git a/src/pip/_internal/resolution/legacy/resolver.py b/src/pip/_internal/resolution/legacy/resolver.py
+index 1dd0d70..414bdbe 100644
+--- a/src/pip/_internal/resolution/legacy/resolver.py
++++ b/src/pip/_internal/resolution/legacy/resolver.py
+@@ -319,7 +319,9 @@ class Resolver(BaseResolver):
+         # Don't uninstall the conflict if doing a user install and the
+         # conflict is not a user install.
+         assert req.satisfied_by is not None
+-        if not self.use_user_site or req.satisfied_by.in_usersite:
++        if ((not self.use_user_site
++                or req.satisfied_by.in_usersite)
++                and req.satisfied_by.in_install_path):
+             req.should_reinstall = True
+         req.satisfied_by = None
+ 
+diff --git a/src/pip/_internal/resolution/resolvelib/factory.py b/src/pip/_internal/resolution/resolvelib/factory.py
+index 1f31d83..3804774 100644
+--- a/src/pip/_internal/resolution/resolvelib/factory.py
++++ b/src/pip/_internal/resolution/resolvelib/factory.py
+@@ -1,6 +1,8 @@
+ import contextlib
+ import functools
+ import logging
++import sys
++import sysconfig
+ from typing import (
+     TYPE_CHECKING,
+     Callable,
+@@ -617,6 +619,16 @@ class Factory:
+         if dist is None:  # Not installed, no uninstallation required.
+             return None
+ 
++        # Prevent uninstalling packages from /usr
++        try:
++            if dist.installed_location in (
++                    sysconfig.get_path('purelib', scheme='posix_prefix', vars={'base': sys.base_prefix}),
++                    sysconfig.get_path('platlib', scheme='posix_prefix', vars={'platbase': sys.base_prefix}),
++            ):
++                return None
++        except KeyError:  # this Python doesn't have 'rpm_prefix' scheme yet
++            pass
++
+         # We're installing into global site. The current installation must
+         # be uninstalled, no matter it's in global or user site, because the
+         # user site installation has precedence over global.
+-- 
+2.45.1
+

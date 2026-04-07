@@ -1,0 +1,64 @@
+Some hard-coded paths make problems when package is built into chroot like
+Software Collections. Removing these hard-coded paths should fix it.
+
+Upstream report: https://mariadb.atlassian.net/browse/MDEV-6485
+
+diff -Naur mysql-8.4.6/cmake/install_layout.cmake mysql-8.4.6_patched/cmake/install_layout.cmake
+--- mysql-8.4.6/cmake/install_layout.cmake	2025-07-10 16:20:26.000000000 +0200
++++ mysql-8.4.6_patched/cmake/install_layout.cmake	2025-07-23 09:50:42.278223154 +0200
+@@ -202,6 +202,7 @@
+ ELSE()
+   SET(INSTALL_SBINDIR_RPM                 "sbin")
+ ENDIF()
++SET(INSTALL_SYSCONFDIR_RPM              "/etc")
+ #
+ IF(CMAKE_SYSTEM_PROCESSOR IN_LIST KNOWN_64BIT_ARCHITECTURES)
+   SET(INSTALL_LIBDIR_RPM                "lib64/mysql")
+diff -Naur mysql-8.4.6/mysys/my_default.cc mysql-8.4.6_patched/mysys/my_default.cc
+--- mysql-8.4.6/mysys/my_default.cc	2025-07-10 16:20:26.000000000 +0200
++++ mysql-8.4.6_patched/mysys/my_default.cc	2025-07-23 09:52:21.494414633 +0200
+@@ -1693,12 +1693,12 @@
+ 
+ #else
+ 
+-  errors += add_directory(alloc, "/etc/", dirs);
+-  errors += add_directory(alloc, "/etc/mysql/", dirs);
+-
+ #if defined(DEFAULT_SYSCONFDIR)
+   if (DEFAULT_SYSCONFDIR[0])
++  {
+     errors += add_directory(alloc, DEFAULT_SYSCONFDIR, dirs);
++    errors += add_directory(alloc, DEFAULT_SYSCONFDIR "/mysql", dirs);
++  }
+ #endif /* DEFAULT_SYSCONFDIR */
+ 
+ #endif
+diff -Naur mysql-8.4.6/scripts/CMakeLists.txt mysql-8.4.6_patched/scripts/CMakeLists.txt
+--- mysql-8.4.6/scripts/CMakeLists.txt	2025-07-10 16:20:26.000000000 +0200
++++ mysql-8.4.6_patched/scripts/CMakeLists.txt	2025-07-23 09:53:30.114124746 +0200
+@@ -331,9 +331,9 @@
+ ENDIF(UNIX)
+ 
+ SET(prefix "${CMAKE_INSTALL_PREFIX}")
+-SET(sysconfdir ${prefix})
++SET(sysconfdir ${SYSCONFDIR})
+ SET(bindir ${prefix}/${INSTALL_BINDIR})
+-SET(libexecdir ${prefix}/${INSTALL_SBINDIR})
++SET(libexecdir ${prefix}/${INSTALL_LIBEXECDIR})
+ SET(datadir ${prefix}/${INSTALL_MYSQLSHAREDIR})
+ SET(libsubdir  ${INSTALL_LIBDIR})
+ SET(pkgincludedir ${prefix}/${INSTALL_INCLUDEDIR})
+diff -Naur mysql-8.4.6/scripts/mysqld_multi.pl.in mysql-8.4.6_patched/scripts/mysqld_multi.pl.in
+--- mysql-8.4.6/scripts/mysqld_multi.pl.in	2025-07-10 16:20:26.000000000 +0200
++++ mysql-8.4.6_patched/scripts/mysqld_multi.pl.in	2025-07-23 09:54:16.090991270 +0200
+@@ -587,9 +587,7 @@
+ 
+   my %seen;  # Don't list the same file more than once
+   return grep { defined $_ and not $seen{$_}++ and -f $_ and -r $_ }
+-              ('/etc/my.cnf',
+-               '/etc/mysql/my.cnf',
+-               '@sysconfdir@/my.cnf',
++              ('@sysconfdir@/my.cnf',
+                ($ENV{MYSQL_HOME} ? "$ENV{MYSQL_HOME}/my.cnf" : undef),
+                $opt{'extra-file'},
+                ($ENV{HOME} ? "$ENV{HOME}/.my.cnf" : undef));

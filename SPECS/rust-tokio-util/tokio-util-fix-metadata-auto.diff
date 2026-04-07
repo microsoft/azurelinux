@@ -1,0 +1,21 @@
+--- tokio-util-0.7.18/Cargo.toml	1970-01-01T00:00:01+00:00
++++ tokio-util-0.7.18/Cargo.toml	2026-01-08T17:57:12.278039+00:00
+@@ -263,13 +263,6 @@
+ [dev-dependencies.tokio-test]
+ version = "0.4.0"
+ 
+-[target."cfg(loom)".dev-dependencies.loom]
+-version = "0.7"
+-features = [
+-    "futures",
+-    "checkpoint",
+-]
+-
+ [lints.rust.unexpected_cfgs]
+ level = "warn"
+ priority = 0
+@@ -284,3 +277,4 @@
+     "cfg(tokio_unstable)",
+     'cfg(target_os, values("cygwin"))',
+ ]
++

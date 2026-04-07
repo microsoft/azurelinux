@@ -1,0 +1,15 @@
+diff -up kbd-2.0.2/src/unicode_start.orig kbd-2.0.2/src/unicode_start
+--- kbd-2.0.2/src/unicode_start.orig	2014-08-12 14:47:53.019028849 +0200
++++ kbd-2.0.2/src/unicode_start	2014-08-12 14:54:42.631427602 +0200
+@@ -72,7 +72,10 @@ stty iutf8
+ # have a Unicode map attached, or explicitly specified, e.g.,
+ # by giving `def.uni' as a second argument.
+ 
+-DEFAULT_UNICODE_FONT=latarcyrheb-sun16
++# Source /etc/vconsole.conf to get default font
++. /etc/vconsole.conf
++
++DEFAULT_UNICODE_FONT=$FONT
+ # Also drdos8x16 is a good candidate.
+ 
+ case "$#" in

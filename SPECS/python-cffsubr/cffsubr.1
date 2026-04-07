@@ -1,0 +1,39 @@
+.TH CFFSUBR "1" "October 2021" "" "User Commands"
+.SH NAME
+.B cffsubr
+\(en compress OpenType Font\(cqs CFF or CFF2 table by computing subroutines
+.SH SYNOPSIS
+.B cffsubr
+.RB [ \-h ]
+.RB [ \-o \  \fIOUTPUT_FILE \ |\  \-i ]
+.RB [ \-f \ { 1 , 2 }]
+.RB [ \-N ]
+.RB [ \-d ]
+.I input_file
+.SH OPTIONS
+.SS "POSITIONAL ARGUMENTS"
+.TP
+.I input_file
+Input font file.
+Must contain either CFF or CFF2 table
+.SS "OPTIONAL ARGUMENTS"
+.TP
+.BR \-h ,\  \-\-help
+Show a help message and exit.
+.TP
+.B \-o\ \fIOUTPUT_FILE\fR,\ \fB\-\-output\-file\ \fIOUTPUT_FILE
+Optional path to output file.
+By default, dump binary data to
+.IR stdout .
+.TP
+.BR \-i ,\  \-\-inplace
+Whether to overwrite the input file.
+.TP
+.B \-f\ \fR{\fB1\fR,\fB2\fR},\fB\ \-\-cff\-version\ \fR{\fB1\fR,\fB2\fR}
+Output CFF table format version.
+.TP
+.BR \-N ,\  \-\-no\-glyph\-names
+Whether to drop postscript glyph names when converting from CFF to CFF2.
+.TP
+.BR \-d ,\  \-\-desubroutinize
+Don\(cqt subroutinize, instead remove all subroutines (in any).

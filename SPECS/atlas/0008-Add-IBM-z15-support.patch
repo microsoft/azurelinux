@@ -1,0 +1,105 @@
+From d249a8128806d08285eeda00b2a35b62a22236f4 Mon Sep 17 00:00:00 2001
+From: Andreas Arnez <arnez@linux.ibm.com>
+Date: Thu, 26 Mar 2020 17:14:49 +0100
+Subject: [PATCH 8/8] Add IBM z15 support
+
+Add support for specifying "IBMz15" as target architecture.
+---
+ CONFIG/include/atlconf.h            | 8 ++++----
+ CONFIG/src/atlcomp.txt              | 4 ++++
+ CONFIG/src/backend/archinfo_linux.c | 1 +
+ CONFIG/src/probe_comp.c             | 1 +
+ include/atlas_prefetch.h            | 2 +-
+ 5 files changed, 11 insertions(+), 5 deletions(-)
+
+diff --git a/CONFIG/include/atlconf.h b/CONFIG/include/atlconf.h
+index 3828fdb..382601f 100644
+--- a/CONFIG/include/atlconf.h
++++ b/CONFIG/include/atlconf.h
+@@ -25,11 +25,11 @@ enum ARCHFAM {AFOther=0, AFPPC, AFSPARC, AFALPHA, AFX86, AFIA64, AFMIPS,
+  * Corei3EP: v3 Haswell, E5-26XX
+  * Corei4: skylake
+  */
+-#define NMACH 63
++#define NMACH 64
+ static char *machnam[NMACH] =
+    {"UNKNOWN", "PPCG4", "PPCG5", "POWER3", "POWER4", "POWER5",
+     "POWER6", "POWER7", "POWER8", "POWERe6500",
+-    "IBMz9", "IBMz10", "IBMz196", "IBMz12", "IBMz13", "IBMz14",
++    "IBMz9", "IBMz10", "IBMz196", "IBMz12", "IBMz13", "IBMz14", "IBMz15",
+     "x86x87", "x86SSE1", "x86SSE2", "x86SSE3",
+     "P5", "P5MMX", "PPRO", "PII", "PIII", "PM", "CoreSolo",
+     "CoreDuo", "Core2Solo", "Core2", "Corei1", "Corei2", "Corei3",
+@@ -42,7 +42,7 @@ static char *machnam[NMACH] =
+     "ARM64xgene1", "ARM64a53", "ARM64a57"};
+ enum MACHTYPE {MACHOther, PPCG4, PPCG5, IbmPwr3, IbmPwr4, IbmPwr5,
+                IbmPwr6, IbmPwr7, IbmPwr8, Pwre6500,
+-               IbmZ9, IbmZ10, IbmZ196, IbmZ12, IbmZ13, IbmZ14, /* s390(x) */
++               IbmZ9, IbmZ10, IbmZ196, IbmZ12, IbmZ13, IbmZ14, IbmZ15,
+                x86x87, x86SSE1, x86SSE2, x86SSE3, /* generic targets */
+                IntP5, IntP5MMX, IntPPRO, IntPII, IntPIII, IntPM, IntCoreS,
+                IntCoreDuo, IntCore2Solo, IntCore2, IntCorei1, IntCorei2,
+@@ -82,7 +82,7 @@ enum MACHTYPE {MACHOther, PPCG4, PPCG5, IbmPwr3, IbmPwr4, IbmPwr5,
+ #define MachIsARM64(mach_) \
+    ( (mach_) >= ARM64xg && || (mach_) <= ARM64a57)
+ #define MachIsS390(mach_) \
+-   ( (mach_) >= IbmZ9 && (mach_) <= IbmZ14 )
++   ( (mach_) >= IbmZ9 && (mach_) <= IbmZ15 )
+ 
+ 
+ static char *f2c_namestr[5] = {"UNKNOWN","Add_", "Add__", "NoChange", "UpCase"};
+diff --git a/CONFIG/src/atlcomp.txt b/CONFIG/src/atlcomp.txt
+index 2cfacc2..acb2c83 100644
+--- a/CONFIG/src/atlcomp.txt
++++ b/CONFIG/src/atlcomp.txt
+@@ -254,6 +254,10 @@ MACH=IBMz14 OS=ALL LVL=1000 COMPS=smc,dmc,skc,dkc,icc,xcc,gcc
+    'gcc' '-march=z14 -mtune=z14 -O2'
+ MACH=IBMz14 OS=ALL LVL=1000 COMPS=f77
+    'gfortran' '-march=z14 -mtune=z14 -O2'
++MACH=IBMz15 OS=ALL LVL=1000 COMPS=smc,dmc,skc,dkc,icc,xcc,gcc
++   'gcc' '-march=arch13 -mtune=arch13 -O2'
++MACH=IBMz15 OS=ALL LVL=1000 COMPS=f77
++   'gfortran' '-march=arch13 -mtune=arch13 -O2'
+ #
+ # Windows defaults ; need to make SSE/SSE2 arch dep.
+ #
+diff --git a/CONFIG/src/backend/archinfo_linux.c b/CONFIG/src/backend/archinfo_linux.c
+index ed6f476..934a005 100644
+--- a/CONFIG/src/backend/archinfo_linux.c
++++ b/CONFIG/src/backend/archinfo_linux.c
+@@ -337,6 +337,7 @@ enum MACHTYPE ProbeArch()
+          else if (strstr(res, "2827") || strstr(res, "2828")) mach = IbmZ12;
+          else if (strstr(res, "2964") || strstr(res, "2965")) mach = IbmZ13;
+          else if (strstr(res, "3906") || strstr(res, "3907")) mach = IbmZ14;
++         else if (strstr(res, "8561") || strstr(res, "8562")) mach = IbmZ15;
+          else mach = IbmZ14;  /* looks risky to me, but IBM folks did it */
+          free(res);
+       }
+diff --git a/CONFIG/src/probe_comp.c b/CONFIG/src/probe_comp.c
+index 857ea82..88bb25e 100644
+--- a/CONFIG/src/probe_comp.c
++++ b/CONFIG/src/probe_comp.c
+@@ -1208,6 +1208,7 @@ void GetBestGccVers(enum OSTYPE OS, enum MACHTYPE arch,
+    case IbmZ12:
+    case IbmZ13:
+    case IbmZ14:
++   case IbmZ15:
+    case IntCorei3:
+    case IntCorei4:
+    case IntCorei2:
+diff --git a/include/atlas_prefetch.h b/include/atlas_prefetch.h
+index fa426ac..583f19d 100644
+--- a/include/atlas_prefetch.h
++++ b/include/atlas_prefetch.h
+@@ -156,7 +156,7 @@
+    #define ATL_L2LS 64
+ #elif defined(ATL_ARCH_IBMz196) || defined(ATL_ARCH_IBMz10) || \
+       defined(ATL_ARCH_IBMzEC12) || defined(ATL_ARCH_IBMz13) || \
+-      defined(ATL_ARCH_IbmZ14)
++      defined(ATL_ARCH_IbmZ14) || defined(ATL_ARCH_IbmZ15)
+    #define ATL_pfl1R(mem) __builtin_prefetch(mem, 0, 3)
+    #define ATL_pfl1W(mem) __builtin_prefetch(mem, 1, 3)
+    #define ATL_GOT_L1PREFETCH
+-- 
+2.23.0
+

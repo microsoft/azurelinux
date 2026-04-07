@@ -1,0 +1,12 @@
+diff -up sqlite-2.8.17/Makefile.in.ldflags sqlite-2.8.17/Makefile.in
+--- sqlite-2.8.17/Makefile.in.ldflags	2019-04-10 15:01:39.401934112 -0400
++++ sqlite-2.8.17/Makefile.in	2019-04-10 15:01:48.856740555 -0400
+@@ -38,7 +38,7 @@ RELEASE = @ALLOWRELEASE@
+ 
+ # libtool compile/link/install
+ LTCOMPILE = $(LIBTOOL) --mode=compile $(TCC)
+-LTLINK = $(LIBTOOL) --mode=link $(TCC)
++LTLINK = $(LIBTOOL) --mode=link $(TCC) $(LDFLAGS)
+ LTINSTALL = $(LIBTOOL) --mode=install $(INSTALL)
+ 
+ # Compiler options needed for programs that use the TCL library.

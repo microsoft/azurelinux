@@ -1,0 +1,85 @@
+From 45a4762bf3241e7fb6a2e01d382791ae44236841 Mon Sep 17 00:00:00 2001
+From: Paul Eggert <eggert@cs.ucla.edu>
+Date: Wed, 23 Apr 2025 11:34:20 -0700
+Subject: [PATCH] sdiff: pacify gcc -flto -Wmaybe-uninitialized
+
+* src/sdiff.c (edit): Portmanteauize two locals into one, which
+arguably makes the code clearer, and anyway pacifies gcc -flto
+-Wmaybe-uninitialized with gcc (GCC) 15.0.1 20250329 (Red Hat
+15.0.1-0) x86-64 (Bug#78019).
+---
+ src/sdiff.c | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
+
+diff --git a/src/sdiff.c b/src/sdiff.c
+index 5b1b162..15b8dce 100644
+--- a/src/sdiff.c
++++ b/src/sdiff.c
+@@ -857,8 +857,7 @@ edit (struct line_filter *left, char const *lname, lin lline, lin llen,
+ {
+   for (;;)
+     {
+-      int cmd0;
+-      int cmd1;
++      int cmd;
+       bool gotcmd = false;
+ 
+       while (! gotcmd)
+@@ -867,8 +866,8 @@ edit (struct line_filter *left, char const *lname, lin lline, lin llen,
+             perror_fatal (_("write failed"));
+           ck_fflush (stdout);
+ 
+-          cmd0 = skip_white ();
+-          switch (cmd0)
++	  cmd = skip_white ();
++          switch (cmd)
+             {
+             case '1': case '2': case 'l': case 'r':
+             case 's': case 'v': case 'q':
+@@ -882,12 +881,15 @@ edit (struct line_filter *left, char const *lname, lin lline, lin llen,
+               break;
+ 
+             case 'e':
+-              cmd1 = skip_white ();
++	      int cmd1 = skip_white ();
+               switch (cmd1)
+                 {
+                 case '1': case '2': case 'b': case 'd': case 'l': case 'r':
+ 		  if (skip_white () == '\n')
+-		    gotcmd = true;
++		    {
++		      gotcmd = true;
++		      cmd |= cmd1 << UCHAR_WIDTH;
++		    }
+ 		  else
+                     {
+                       give_help ();
+@@ -908,7 +910,7 @@ edit (struct line_filter *left, char const *lname, lin lline, lin llen,
+               if (feof (stdin))
+                 {
+                   gotcmd = true;
+-                  cmd0 = 'q';
++                  cmd = 'q';
+                   break;
+                 }
+               FALLTHROUGH;
+@@ -921,7 +923,7 @@ edit (struct line_filter *left, char const *lname, lin lline, lin llen,
+             }
+         }
+ 
+-      switch (cmd0)
++      switch (cmd & UCHAR_MAX)
+         {
+         case '1': case 'l':
+           lf_copy (left, llen, outfile);
+@@ -954,6 +956,7 @@ edit (struct line_filter *left, char const *lname, lin lline, lin llen,
+           if (! tmp)
+ 	    perror_fatal (squote (0, tmpname));
+ 
++	  int cmd1 = cmd >> UCHAR_WIDTH;
+           switch (cmd1)
+             {
+             case 'd':
+-- 
+2.48.1
+

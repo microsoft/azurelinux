@@ -1,0 +1,385 @@
+From 4be779f5f73bcf808fe26d4e8968b3f34f96d3a2 Mon Sep 17 00:00:00 2001
+From: Hartley McGuire <skipkayhil@gmail.com>
+Date: Sat, 29 Jul 2023 18:28:17 -0400
+Subject: [PATCH] Fix Minitest constant name in tests
+
+Minitest 5.19.0 removed the "ancient MiniTest compatibility layer" that
+aliased `Minitest` as `MiniTest`. CI runs without a lock file so tests
+are failing due to this new release.
+
+This commit renames all of the tests to the correct `Minitest` constant
+---
+ test/sprockets_test.rb               |  2 +-
+ test/test_babel_processor.rb         |  2 +-
+ test/test_cache_store.rb             | 10 +++++-----
+ test/test_closure_compressor.rb      |  2 +-
+ test/test_coffee_script_processor.rb |  2 +-
+ test/test_digest_utils.rb            |  2 +-
+ test/test_eco_processor.rb           |  2 +-
+ test/test_ejs_processor.rb           |  2 +-
+ test/test_encoding_utils.rb          |  2 +-
+ test/test_erb_processor.rb           |  2 +-
+ test/test_http_utils.rb              |  2 +-
+ test/test_jsminc_compressor.rb       |  2 +-
+ test/test_jst_processor.rb           |  2 +-
+ test/test_manifest_utils.rb          |  2 +-
+ test/test_path_dependency_utils.rb   |  2 +-
+ test/test_path_digest_utils.rb       |  2 +-
+ test/test_path_utils.rb              |  2 +-
+ test/test_processor_utils.rb         |  2 +-
+ test/test_require.rb                 |  2 +-
+ test/test_source_map_utils.rb        |  2 +-
+ test/test_uglifier_compressor.rb     |  2 +-
+ test/test_uri_utils.rb               |  2 +-
+ test/test_utils.rb                   |  2 +-
+ test/test_yui_compressor.rb          |  2 +-
+ 24 files changed, 28 insertions(+), 28 deletions(-)
+
+diff --git a/test/sprockets_test.rb b/test/sprockets_test.rb
+index 8b45d0aa1..f6da782b0 100644
+--- a/test/sprockets_test.rb
++++ b/test/sprockets_test.rb
+@@ -93,7 +93,7 @@ def test(name, &block)
+   end
+ end
+ 
+-class Sprockets::TestCase < MiniTest::Test
++class Sprockets::TestCase < Minitest::Test
+   extend Sprockets::TestDefinition
+ 
+   FIXTURE_ROOT = File.join(__dir__, "fixtures")
+diff --git a/test/test_babel_processor.rb b/test/test_babel_processor.rb
+index 93cc1a166..bdabbaeaa 100644
+--- a/test/test_babel_processor.rb
++++ b/test/test_babel_processor.rb
+@@ -4,7 +4,7 @@
+ require 'sprockets/cache'
+ require 'sprockets/babel_processor'
+ 
+-class TestBabelProcessor < MiniTest::Test
++class TestBabelProcessor < Minitest::Test
+   def setup
+     @env = Sprockets::Environment.new
+     @env.append_path File.expand_path("../fixtures", __FILE__)
+diff --git a/test/test_cache_store.rb b/test/test_cache_store.rb
+index f4ed3ccc5..bbaa18867 100644
+--- a/test/test_cache_store.rb
++++ b/test/test_cache_store.rb
+@@ -85,7 +85,7 @@ def test_clear
+   end
+ end
+ 
+-class TestNullStore < MiniTest::Test
++class TestNullStore < Minitest::Test
+   def setup
+     @_store = Sprockets::Cache::NullStore.new
+     @store = Sprockets::Cache.new(Sprockets::Cache::NullStore.new)
+@@ -99,7 +99,7 @@ def test_inspect
+   include CacheStoreNullTests
+ end
+ 
+-class TestMemoryStore < MiniTest::Test
++class TestMemoryStore < Minitest::Test
+   def setup
+     @_store = Sprockets::Cache::MemoryStore.new
+     @store = Sprockets::Cache.new(@_store)
+@@ -132,7 +132,7 @@ def test_set_with_lru
+   end
+ end
+ 
+-class TestZeroMemoryStore < MiniTest::Test
++class TestZeroMemoryStore < Minitest::Test
+   def setup
+     @_store = Sprockets::Cache::MemoryStore.new(0)
+     @store = Sprockets::Cache.new(@_store)
+@@ -145,7 +145,7 @@ def test_inspect
+   include CacheStoreNullTests
+ end
+ 
+-class TestFileStore < MiniTest::Test
++class TestFileStore < Minitest::Test
+   def setup
+     @root = Dir::mktmpdir "sprockets-file-store"
+     @_store = Sprockets::Cache::FileStore.new(@root)
+@@ -180,7 +180,7 @@ def test_clear_store_dir_not_exist
+   include CacheStoreTests
+ end
+ 
+-class TestZeroFileStore < MiniTest::Test
++class TestZeroFileStore < Minitest::Test
+   def setup
+     @tmpdir = Dir::mktmpdir "sprockets-file-store-zero"
+     @_store = Sprockets::Cache::FileStore.new(@tmpdir, 0)
+diff --git a/test/test_closure_compressor.rb b/test/test_closure_compressor.rb
+index fe39c2a0c..fd73a8944 100644
+--- a/test/test_closure_compressor.rb
++++ b/test/test_closure_compressor.rb
+@@ -3,7 +3,7 @@
+ require 'sprockets/cache'
+ require 'sprockets/closure_compressor'
+ 
+-class TestClosureCompressor < MiniTest::Test
++class TestClosureCompressor < Minitest::Test
+   def test_compress_javascript
+     input = {
+       data: "function foo() {\n  return true;\n}",
+diff --git a/test/test_coffee_script_processor.rb b/test/test_coffee_script_processor.rb
+index 614460ebd..e5496ef16 100644
+--- a/test/test_coffee_script_processor.rb
++++ b/test/test_coffee_script_processor.rb
+@@ -5,7 +5,7 @@
+ require 'sprockets/coffee_script_processor'
+ require 'sprockets/source_map_utils'
+ 
+-class TestCoffeeScriptProcessor < MiniTest::Test
++class TestCoffeeScriptProcessor < Minitest::Test
+   def setup
+     @env = Sprockets::Environment.new
+     @env.append_path File.expand_path("../fixtures", __FILE__)
+diff --git a/test/test_digest_utils.rb b/test/test_digest_utils.rb
+index c0548070b..246afbd09 100644
+--- a/test/test_digest_utils.rb
++++ b/test/test_digest_utils.rb
+@@ -2,7 +2,7 @@
+ require 'minitest/autorun'
+ require 'sprockets/digest_utils'
+ 
+-class TestDigestUtils < MiniTest::Test
++class TestDigestUtils < Minitest::Test
+   include Sprockets::DigestUtils
+ 
+   def test_detect_digest_class
+diff --git a/test/test_eco_processor.rb b/test/test_eco_processor.rb
+index 85b606481..d6903902d 100644
+--- a/test/test_eco_processor.rb
++++ b/test/test_eco_processor.rb
+@@ -3,7 +3,7 @@
+ require 'sprockets/cache'
+ require 'sprockets/eco_processor'
+ 
+-class TestEcoProcessor < MiniTest::Test
++class TestEcoProcessor < Minitest::Test
+   def test_compile_eco_template_to_js
+     input = {
+       content_type: 'application/javascript',
+diff --git a/test/test_ejs_processor.rb b/test/test_ejs_processor.rb
+index 4c306d001..99e72b051 100644
+--- a/test/test_ejs_processor.rb
++++ b/test/test_ejs_processor.rb
+@@ -3,7 +3,7 @@
+ require 'sprockets/cache'
+ require 'sprockets/ejs_processor'
+ 
+-class TestEjsProcessor < MiniTest::Test
++class TestEjsProcessor < Minitest::Test
+   def test_compile_ejs_template_to_js
+     input = {
+       content_type: 'application/javascript',
+diff --git a/test/test_encoding_utils.rb b/test/test_encoding_utils.rb
+index e276e2e3b..724d923ff 100644
+--- a/test/test_encoding_utils.rb
++++ b/test/test_encoding_utils.rb
+@@ -3,7 +3,7 @@
+ require 'minitest/autorun'
+ require 'sprockets/encoding_utils'
+ 
+-class TestDigestUtils < MiniTest::Test
++class TestDigestUtils < Minitest::Test
+   include Sprockets::EncodingUtils
+ 
+   def test_deflate
+diff --git a/test/test_erb_processor.rb b/test/test_erb_processor.rb
+index 7ab0a88cb..d82127f1d 100644
+--- a/test/test_erb_processor.rb
++++ b/test/test_erb_processor.rb
+@@ -5,7 +5,7 @@
+ require 'sprockets/erb_processor'
+ require 'sass'
+ 
+-class TestERBProcessor < MiniTest::Test
++class TestERBProcessor < Minitest::Test
+ 
+   def uri_path(path)
+     path = '/' + path if path[1] == ':' # Windows path / drive letter
+diff --git a/test/test_http_utils.rb b/test/test_http_utils.rb
+index b476dc568..9a042d32f 100644
+--- a/test/test_http_utils.rb
++++ b/test/test_http_utils.rb
+@@ -2,7 +2,7 @@
+ require 'minitest/autorun'
+ require 'sprockets/http_utils'
+ 
+-class TestHTTPUtils < MiniTest::Test
++class TestHTTPUtils < Minitest::Test
+   include Sprockets::HTTPUtils
+ 
+   def test_match_mime_type
+diff --git a/test/test_jsminc_compressor.rb b/test/test_jsminc_compressor.rb
+index d7cfb6a8a..6e402c791 100644
+--- a/test/test_jsminc_compressor.rb
++++ b/test/test_jsminc_compressor.rb
+@@ -4,7 +4,7 @@
+ unless RUBY_PLATFORM.include?('java')
+   require 'sprockets/jsminc_compressor'
+ 
+-  class TestJSMincCompressor < MiniTest::Test
++  class TestJSMincCompressor < Minitest::Test
+ 
+     def test_compress_javascript
+       input = {
+diff --git a/test/test_jst_processor.rb b/test/test_jst_processor.rb
+index d9d2e5d54..d7e16a60f 100644
+--- a/test/test_jst_processor.rb
++++ b/test/test_jst_processor.rb
+@@ -3,7 +3,7 @@
+ require 'sprockets/cache'
+ require 'sprockets/jst_processor'
+ 
+-class TestJstProcessor < MiniTest::Test
++class TestJstProcessor < Minitest::Test
+   def test_export_js_template_in_JST
+     input = {
+       name: 'users/show',
+diff --git a/test/test_manifest_utils.rb b/test/test_manifest_utils.rb
+index 02a1755bb..3f0beeb37 100644
+--- a/test/test_manifest_utils.rb
++++ b/test/test_manifest_utils.rb
+@@ -3,7 +3,7 @@
+ require 'sprockets/manifest_utils'
+ require 'logger'
+ 
+-class TestManifestUtils < MiniTest::Test
++class TestManifestUtils < Minitest::Test
+   include Sprockets::ManifestUtils
+ 
+   def test_generate_manifest_path
+diff --git a/test/test_path_dependency_utils.rb b/test/test_path_dependency_utils.rb
+index 2159af4fa..9dd10f94a 100644
+--- a/test/test_path_dependency_utils.rb
++++ b/test/test_path_dependency_utils.rb
+@@ -2,7 +2,7 @@
+ require 'minitest/autorun'
+ require 'sprockets/path_dependency_utils'
+ 
+-class TestPathDependencyUtils < MiniTest::Test
++class TestPathDependencyUtils < Minitest::Test
+   include Sprockets::PathDependencyUtils
+ 
+   def test_entries_with_dependencies
+diff --git a/test/test_path_digest_utils.rb b/test/test_path_digest_utils.rb
+index a62d5e550..1e93a1ce3 100644
+--- a/test/test_path_digest_utils.rb
++++ b/test/test_path_digest_utils.rb
+@@ -2,7 +2,7 @@
+ require 'minitest/autorun'
+ require 'sprockets/path_digest_utils'
+ 
+-class TestPathDigestUtils < MiniTest::Test
++class TestPathDigestUtils < Minitest::Test
+   include Sprockets::PathDigestUtils
+ 
+   def test_file_stat_digest
+diff --git a/test/test_path_utils.rb b/test/test_path_utils.rb
+index 0464247ee..3e7c6dc93 100644
+--- a/test/test_path_utils.rb
++++ b/test/test_path_utils.rb
+@@ -2,7 +2,7 @@
+ require 'minitest/autorun'
+ require 'sprockets/path_utils'
+ 
+-class TestPathUtils < MiniTest::Test
++class TestPathUtils < Minitest::Test
+   include Sprockets::PathUtils
+ 
+   DOSISH = File::ALT_SEPARATOR != nil
+diff --git a/test/test_processor_utils.rb b/test/test_processor_utils.rb
+index 01f92ae21..775d45e6f 100644
+--- a/test/test_processor_utils.rb
++++ b/test/test_processor_utils.rb
+@@ -37,7 +37,7 @@ def test_charset_supersedes_default
+   end
+ end
+ 
+-class TestProcessorUtils < MiniTest::Test
++class TestProcessorUtils < Minitest::Test
+   include Sprockets::ProcessorUtils
+ 
+   class Processor
+diff --git a/test/test_require.rb b/test/test_require.rb
+index f356a718f..cfe110fba 100644
+--- a/test/test_require.rb
++++ b/test/test_require.rb
+@@ -1,7 +1,7 @@
+ # frozen_string_literal: true
+ require 'minitest/autorun'
+ 
+-class TestRequire < MiniTest::Test
++class TestRequire < Minitest::Test
+   parallelize_me!
+ 
+   ROOT = File.expand_path("../..", __FILE__)
+diff --git a/test/test_source_map_utils.rb b/test/test_source_map_utils.rb
+index 1fff15d7a..6ab0d2a2e 100644
+--- a/test/test_source_map_utils.rb
++++ b/test/test_source_map_utils.rb
+@@ -2,7 +2,7 @@
+ require 'minitest/autorun'
+ require 'sprockets/source_map_utils'
+ 
+-class TestSourceMapUtils < MiniTest::Test
++class TestSourceMapUtils < Minitest::Test
+ 
+   def deep_dup(object)
+     Marshal.load( Marshal.dump(object) )
+diff --git a/test/test_uglifier_compressor.rb b/test/test_uglifier_compressor.rb
+index 0c4de5763..8c120b53e 100644
+--- a/test/test_uglifier_compressor.rb
++++ b/test/test_uglifier_compressor.rb
+@@ -4,7 +4,7 @@
+ require 'sprockets/cache'
+ require 'sprockets/uglifier_compressor'
+ 
+-class TestUglifierCompressor < MiniTest::Test
++class TestUglifierCompressor < Minitest::Test
+   def setup
+     @env = Sprockets::Environment.new
+     @env.append_path File.expand_path("../fixtures", __FILE__)
+diff --git a/test/test_uri_utils.rb b/test/test_uri_utils.rb
+index f3b946d47..8a9f7dbfc 100644
+--- a/test/test_uri_utils.rb
++++ b/test/test_uri_utils.rb
+@@ -2,7 +2,7 @@
+ require 'minitest/autorun'
+ require 'sprockets/uri_utils'
+ 
+-class TestURIUtils < MiniTest::Test
++class TestURIUtils < Minitest::Test
+   include Sprockets::URIUtils
+ 
+   DOSISH = File::ALT_SEPARATOR != nil
+diff --git a/test/test_utils.rb b/test/test_utils.rb
+index 49f511d7b..65b009337 100644
+--- a/test/test_utils.rb
++++ b/test/test_utils.rb
+@@ -2,7 +2,7 @@
+ require 'minitest/autorun'
+ require 'sprockets/utils'
+ 
+-class TestUtils < MiniTest::Test
++class TestUtils < Minitest::Test
+   include Sprockets::Utils
+ 
+   def test_duplicable
+diff --git a/test/test_yui_compressor.rb b/test/test_yui_compressor.rb
+index fe701234a..152033253 100644
+--- a/test/test_yui_compressor.rb
++++ b/test/test_yui_compressor.rb
+@@ -3,7 +3,7 @@
+ require 'sprockets/cache'
+ require 'sprockets/yui_compressor'
+ 
+-class TestYUICompressor < MiniTest::Test
++class TestYUICompressor < Minitest::Test
+   def test_compress_javascript
+     input = {
+       content_type: 'application/javascript',

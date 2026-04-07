@@ -1,0 +1,31 @@
+From 701e4d7569d6bd777704ab3364d7d1c519d89a91 Mon Sep 17 00:00:00 2001
+From: zhailiangliang <zhailiangliang@loongson.cn>
+Date: Mon, 4 Nov 2024 08:56:07 +0000
+Subject: [PATCH] fix memleak in function DlgCreate8
+
+---
+ gdraw/gaskdlg.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/gdraw/gaskdlg.c b/gdraw/gaskdlg.c
+index 3563361796..8178be14c8 100644
+--- a/gdraw/gaskdlg.c
++++ b/gdraw/gaskdlg.c
+@@ -209,12 +209,13 @@ static GWindow DlgCreate8(const char *title,const char *question,va_list ap,
+     extern GBox _GGadget_defaultbutton_box;
+ 
+     if ( d!=NULL )
+-	memset(d,0,sizeof(*d));
++        memset(d,0,sizeof(*d));
+     buf = vsmprintf(question, ap);
+     if ( screen_display==NULL ) {
+-	fprintf(stderr, "%s\n", buf );
+-	if ( d!=NULL ) d->done = true;
+-return( NULL );
++        fprintf(stderr, "%s\n", buf);
++        if ( d!=NULL ) d->done = true;
++        free(buf);
++        return( NULL );
+     }
+     ubuf = utf82u_copy(buf);
+     free(buf);

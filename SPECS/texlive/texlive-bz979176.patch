@@ -1,0 +1,12 @@
+diff -up source/texk/kpathsea/mktexlsr.than source/texk/kpathsea/mktexlsr
+--- source/texk/kpathsea/mktexlsr.than	2015-04-29 16:52:42.800897655 +0200
++++ source/texk/kpathsea/mktexlsr	2015-04-29 16:53:12.500695909 +0200
+@@ -66,7 +66,7 @@ if tty -s; then verbose=true; else verbo
+ dry_run=false
+ trees=
+ 
+-treefile="${TMPDIR-/tmp}/mktexlsrtrees$$.tmp"
++treefile=`mktemp -q --tmpdir mktexlsrtrees.XXXXXXXXXX`
+ trap 'cd /; rm -f $treefile; test -z "$db_dir_tmp" || rm -rf "$db_dir_tmp"; 
+       exit' 0 1 2 3 7 13 15
+ 

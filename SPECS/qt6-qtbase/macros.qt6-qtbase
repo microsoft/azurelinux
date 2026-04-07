@@ -1,0 +1,4 @@
+%_qt6 @@NAME@@
+%_qt6_epoch @@EPOCH@@
+%_qt6_version @@VERSION@@
+%_qt6_evr @@EVR@@

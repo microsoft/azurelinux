@@ -1,0 +1,33 @@
+diff -up DyLP-1.10.4/configure.orig DyLP-1.10.4/configure
+--- DyLP-1.10.4/configure.orig	2019-02-22 15:11:56.000000000 -0700
++++ DyLP-1.10.4/configure	2019-06-21 10:58:31.245241959 -0600
+@@ -26905,7 +26905,7 @@ echo "${ECHO_T}$doxysrcdir (src)" >&6
+   fi
+   # Not built, fall back to installed tag file
+   if test $doxyfound = no ; then
+-    eval doxydir="${datadir}/coin/doc/${proj}/doxydoc"
++    eval doxydir="${datadir}/doc/coin-or-${proj}"
+     # AC_MSG_NOTICE([Considering $doxydir (install)])
+     # AC_MSG_NOTICE([Subdirs: $coin_subdirs)])
+     coin_doxy_tagfiles="$coin_doxy_tagfiles $doxydir/$doxytag=$doxydir/html"
+diff -up DyLP-1.10.4/Makefile.in.orig DyLP-1.10.4/Makefile.in
+--- DyLP-1.10.4/Makefile.in.orig	2015-03-30 10:45:53.000000000 -0600
++++ DyLP-1.10.4/Makefile.in	2019-06-21 10:57:47.616987506 -0600
+@@ -356,7 +356,7 @@ EXTRA_DIST = AUTHORS LICENSE README NEWS
+ ########################################################################
+ pkgconfiglibdir = $(libdir)/pkgconfig
+ pkgconfiglib_DATA = dylp.pc $(am__append_3)
+-addlibsdir = $(DESTDIR)$(datadir)/coin/doc/DyLP
++addlibsdir = $(DESTDIR)$(datadir)/doc/coin-or-$(PACKAGE_NAME)
+ 
+ ########################################################################
+ #                         Maintainer Stuff                             #
+@@ -368,7 +368,7 @@ ACLOCAL_AMFLAGS = -I m4
+ # Files that are generated and should be cleaned with make distclean
+ DISTCLEANFILES = $(am__append_5) $(VPATH_DISTCLEANFILES)
+ DocFiles = README AUTHORS LICENSE 
+-DocInstallDir = $(datadir)/coin/doc/$(PACKAGE_NAME)
++DocInstallDir = $(datadir)/doc/coin-or-$(PACKAGE_NAME)
+ COIN_HAS_DOXYGEN = @COIN_HAS_DOXYGEN_TRUE@TRUE
+ COIN_HAS_LATEX = @COIN_HAS_LATEX_TRUE@TRUE
+ all: all-recursive

@@ -1,0 +1,86 @@
+2026-01-21  Jakub Jelinek  <jakub@redhat.com>
+
+	PR c++/123737
+	* parser.cc (cp_parser_expression): Don't handle CPP_EMBED just
+	as the last byte in it if expression has or might have overloaded
+	type.  In that case call build_x_compound_expr for each byte
+	in CPP_EMBED separately.
+
+	* g++.dg/cpp/embed-28.C: New test.
+	* g++.dg/parse/comma3.C: New test.
+
+--- gcc/cp/parser.cc.jj	2026-01-20 01:13:20.324260446 +0100
++++ gcc/cp/parser.cc	2026-01-21 14:04:32.086336386 +0100
+@@ -12132,10 +12132,24 @@ cp_parser_expression (cp_parser* parser,
+ 	     and one CPP_NUMBER plus CPP_COMMA before it and one
+ 	     CPP_COMMA plus CPP_NUMBER after it is guaranteed by
+ 	     the preprocessor.  Thus, parse the whole CPP_EMBED just
+-	     as a single INTEGER_CST, the last byte in it.  */
++	     as a single INTEGER_CST, the last byte in it.  Though,
++	     don't use that shortcut if the comma operator could be
++	     overloaded.  */
+ 	  tree raw_data = cp_lexer_peek_token (parser->lexer)->u.value;
+ 	  location_t loc = cp_lexer_peek_token (parser->lexer)->location;
+ 	  cp_lexer_consume_token (parser->lexer);
++	  if (OVERLOAD_TYPE_P (TREE_TYPE (expression))
++	      || type_dependent_expression_p (expression))
++	    for (unsigned i = 0; i < RAW_DATA_LENGTH (raw_data) - 1U; ++i)
++	      {
++		assignment_expression
++		  = *raw_data_iterator (raw_data, i);
++		assignment_expression.set_location (loc);
++		expression
++		  = build_x_compound_expr (loc, expression,
++					   assignment_expression, NULL_TREE,
++					   complain_flags (decltype_p));
++	      }
+ 	  assignment_expression
+ 	    = *raw_data_iterator (raw_data, RAW_DATA_LENGTH (raw_data) - 1);
+ 	  assignment_expression.set_location (loc);
+--- gcc/testsuite/g++.dg/cpp/embed-28.C.jj	2026-01-21 14:11:14.617520864 +0100
++++ gcc/testsuite/g++.dg/cpp/embed-28.C	2026-01-21 14:11:01.121749695 +0100
+@@ -0,0 +1,19 @@
++// PR c++/123737
++// { dg-do run }
++// { dg-options "--embed-dir=${srcdir}/c-c++-common/cpp/embed-dir" }
++
++struct A {
++  A (int x) : a (0), e (x) {}
++  unsigned long a, e;
++  A &operator, (int) { ++a; return *this; }
++  ~A () { if (a != e) __builtin_abort (); }
++};
++
++int
++main ()
++{
++  A a = 231;
++  a,
++#embed <magna-carta.txt> limit (231)
++    ;
++}
+--- gcc/testsuite/g++.dg/parse/comma3.C.jj	2026-01-21 14:08:53.834908004 +0100
++++ gcc/testsuite/g++.dg/parse/comma3.C	2026-01-21 12:15:02.334948163 +0100
+@@ -0,0 +1,22 @@
++// PR c++/123737
++// { dg-do run }
++
++struct A {
++  A (int x) : a (0), e (x) {}
++  unsigned long a, e;
++  A &operator, (int) { ++a; return *this; }
++  ~A () { if (a != e) __builtin_abort (); }
++};
++
++int
++main ()
++{
++  A a = 131;
++  a, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
++     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
++     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
++     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
++     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
++     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
++     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0;
++}

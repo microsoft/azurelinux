@@ -1,0 +1,8 @@
+--- which-4.4.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ which-4.4.2/Cargo.toml	2024-01-19T19:30:28.339537+00:00
+@@ -55,5 +55,3 @@
+ [target."cfg(any(windows, unix, target_os = \"redox\"))".dependencies.home]
+ version = "0.5.5"
+ 
+-[target."cfg(windows)".dependencies.once_cell]
+-version = "1"

@@ -1,0 +1,15 @@
+--- t/01-dict.t
++++ t/01-dict.t
+@@ -23,10 +23,10 @@ use Time::HiRes qw/time/;
+ $| = 1;
+ my $time2load = time();
+ print "# loading t/_dict.rx ... ";
+-my $rx = do 't/_dict.rx';
++my $rx = do './t/_dict.rx';
+ $time2load = time() - $time2load;
+ print "done. took $time2load seconds.\n";
+-open my $dict, "<:raw", "t/dict" or die "$!";
++open my $dict, "<:raw", "t/_dict" or die "$!";
+ while ( my $line = <$dict> ) {
+     chomp $line;
+     ok( $line =~ /^$rx$/, $line );

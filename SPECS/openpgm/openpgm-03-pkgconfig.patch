@@ -1,0 +1,11 @@
+diff --git a/openpgm/pgm/openpgm-5.2.pc.in b/openpgm/pgm/openpgm-5.2.pc.in
+index 1e56d944..9e30a6da 100644
+--- a/openpgm/pgm/openpgm-5.2.pc.in
++++ b/openpgm/pgm/openpgm-5.2.pc.in
+@@ -9,4 +9,4 @@ Version: @PACKAGE_VERSION@
+ # packagers may wish to move @LIBS@ to Libs.private for platforms with
+ # versions of pkg-config that support static linking.
+ Libs: -L${libdir} -lpgm @LIBS@
+-Cflags: -I${includedir}/pgm-@VERSION_MAJOR@.@VERSION_MINOR@
++Cflags: -I${includedir}
+

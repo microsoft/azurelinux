@@ -1,0 +1,315 @@
+#
+# Please note that the parameters in this configuration file control the
+# behavior of the tools from the shadow-utils component. None of these
+# tools uses the PAM mechanism, and the utilities that use PAM (such as the
+# passwd command) should therefore be configured elsewhere. Refer to
+# /etc/pam.d/system-auth for more information.
+#
+
+#
+# Delay in seconds before being allowed another attempt after a login failure
+# Note: When PAM is used, some modules may enforce a minimum delay (e.g.
+#       pam_unix(8) enforces a 2s delay)
+#
+#FAIL_DELAY		3
+
+# Currently FAILLOG_ENAB is not supported
+
+#
+# Enable display of unknown usernames when login(1) failures are recorded.
+#
+#LOG_UNKFAIL_ENAB	no
+
+# Currently LOG_OK_LOGINS is not supported
+
+# Currently LASTLOG_ENAB is not supported
+
+#
+# Limit the highest user ID number for which the lastlog entries should
+# be updated.
+#
+# No LASTLOG_UID_MAX means that there is no user ID limit for writing
+# lastlog entries.
+#
+#LASTLOG_UID_MAX
+
+# Currently MAIL_CHECK_ENAB is not supported
+
+# Currently OBSCURE_CHECKS_ENAB is not supported
+
+# Currently PORTTIME_CHECKS_ENAB is not supported
+
+# Currently QUOTAS_ENAB is not supported
+
+# Currently SYSLOG_SU_ENAB is not supported
+
+#
+# Enable "syslog" logging of newgrp(1) and sg(1) activity.
+#
+#SYSLOG_SG_ENAB		yes
+
+# Currently CONSOLE is not supported
+
+# Currently SULOG_FILE is not supported
+
+# Currently MOTD_FILE is not supported
+
+# Currently ISSUE_FILE is not supported
+
+# Currently TTYTYPE_FILE is not supported
+
+# Currently FTMP_FILE is not supported
+
+# Currently NOLOGINS_FILE is not supported
+
+# Currently SU_NAME is not supported
+
+# *REQUIRED*
+#   Directory where mailboxes reside, _or_ name of file, relative to the
+#   home directory.  If you _do_ define both, MAIL_DIR takes precedence.
+#
+MAIL_DIR	/var/spool/mail
+#MAIL_FILE	.mail
+
+#
+# If defined, file which inhibits all the usual chatter during the login
+# sequence.  If a full pathname, then hushed mode will be enabled if the
+# user's name or shell are found in the file.  If not a full pathname, then
+# hushed mode will be enabled if the file exists in the user's home directory.
+#
+#HUSHLOGIN_FILE	.hushlogin
+#HUSHLOGIN_FILE	/etc/hushlogins
+
+# Currently ENV_TZ is not supported
+
+# Currently ENV_HZ is not supported
+
+#
+# The default PATH settings, for superuser and normal users.
+#
+# (they are minimal, add the rest in the shell startup files)
+#ENV_SUPATH	PATH=/sbin:/bin:/usr/sbin:/usr/bin
+#ENV_PATH	PATH=/bin:/usr/bin
+
+#
+# Terminal permissions
+#
+#	TTYGROUP	Login tty will be assigned this group ownership.
+#	TTYPERM		Login tty will be set to this permission.
+#
+# If you have a write(1) program which is "setgid" to a special group
+# which owns the terminals, define TTYGROUP as the number of such group
+# and TTYPERM as 0620.  Otherwise leave TTYGROUP commented out and
+# set TTYPERM to either 622 or 600.
+#
+#TTYGROUP	tty
+#TTYPERM		0600
+
+# Currently ERASECHAR, KILLCHAR and ULIMIT are not supported
+
+# Default initial "umask" value used by login(1) on non-PAM enabled systems.
+# Default "umask" value for pam_umask(8) on PAM enabled systems.
+# UMASK is also used by useradd(8) and newusers(8) to set the mode for new
+# home directories if HOME_MODE is not set.
+# 022 is the default value, but 027, or even 077, could be considered
+# for increased privacy. There is no One True Answer here: each sysadmin
+# must make up their mind.
+UMASK		022
+
+# HOME_MODE is used by useradd(8) and newusers(8) to set the mode for new
+# home directories.
+# If HOME_MODE is not set, the value of UMASK is used to create the mode.
+HOME_MODE	0700
+
+# Password aging controls:
+#
+#	PASS_MAX_DAYS	Maximum number of days a password may be used.
+#	PASS_MIN_DAYS	Minimum number of days allowed between password changes.
+#	PASS_MIN_LEN	Minimum acceptable password length.
+#	PASS_WARN_AGE	Number of days warning given before a password expires.
+#
+PASS_MAX_DAYS	99999
+PASS_MIN_DAYS	0
+PASS_MIN_LEN	8
+PASS_WARN_AGE	7
+
+# Currently SU_WHEEL_ONLY is not supported
+
+# Currently CRACKLIB_DICTPATH is not supported
+
+#
+# Min/max values for automatic uid selection in useradd(8)
+#
+UID_MIN                  1000
+UID_MAX                 60000
+# System accounts
+SYS_UID_MIN               201
+SYS_UID_MAX               999
+# Extra per user uids
+SUB_UID_MIN		   524288
+SUB_UID_MAX		600100000
+SUB_UID_COUNT		    65536
+
+#
+# Min/max values for automatic gid selection in groupadd(8)
+#
+GID_MIN                  1000
+GID_MAX                 60000
+# System accounts
+SYS_GID_MIN               201
+SYS_GID_MAX               999
+# Extra per user group ids
+SUB_GID_MIN		   524288
+SUB_GID_MAX		600100000
+SUB_GID_COUNT		    65536
+
+#
+# Max number of login(1) retries if password is bad
+#
+#LOGIN_RETRIES		3
+
+#
+# Max time in seconds for login(1)
+#
+#LOGIN_TIMEOUT		60
+
+#
+# Maximum number of attempts to change password if rejected (too easy)
+#
+PASS_CHANGE_TRIES	5
+
+#
+# Warn about weak passwords (but still allow them) if you are root.
+#
+PASS_ALWAYS_WARN	yes
+
+#
+# Number of significant characters in the password for crypt().
+# Default is 8, don't change unless your crypt() is better.
+# Ignored if MD5_CRYPT_ENAB set to "yes".
+#
+#PASS_MAX_LEN		8
+
+# Currently CHFN_AUTH is not supported
+
+#
+# Which fields may be changed by regular users using chfn(1) - use
+# any combination of letters "frwh" (full name, room number, work
+# phone, home phone).  If not defined, no changes are allowed.
+# For backward compatibility, "yes" = "rwh" and "no" = "frwh".
+# 
+#CHFN_RESTRICT		rwh
+
+# Currently LOGIN_STRING is not supported
+
+# Currently MD5_CRYPT_ENAB is not supported
+
+#
+# If set to MD5, MD5-based algorithm will be used for encrypting password
+# If set to SHA256, SHA256-based algorithm will be used for encrypting password
+# If set to SHA512, SHA512-based algorithm will be used for encrypting password
+# If set to BCRYPT, BCRYPT-based algorithm will be used for encrypting password
+# If set to YESCRYPT, YESCRYPT-based algorithm will be used for encrypting password
+# If set to DES, DES-based algorithm will be used for encrypting password (default)
+#
+ENCRYPT_METHOD YESCRYPT
+
+#
+# Only works if ENCRYPT_METHOD is set to SHA256 or SHA512.
+#
+# Define the number of SHA rounds.
+# With a lot of rounds, it is more difficult to brute-force the password.
+# However, more CPU resources will be needed to authenticate users if
+# this value is increased.
+#
+# If not specified, the libc will choose the default number of rounds (5000).
+# The values must be within the 1000-999999999 range.
+#
+#SHA_CRYPT_MAX_ROUNDS 5000
+
+# Currently SHA_CRYPT_MIN_ROUNDS is not supported
+
+#
+# Only works if ENCRYPT_METHOD is set to BCRYPT.
+#
+# Define the number of BCRYPT rounds.
+# With a lot of rounds, it is more difficult to brute-force the password.
+# However, more CPU resources will be needed to authenticate users if
+# this value is increased.
+#
+# If not specified, 13 rounds will be attempted.
+# If only one of the MIN or MAX values is set, then this value will be used.
+# If MIN > MAX, the highest value will be used.
+#
+#BCRYPT_MIN_ROUNDS 13
+#BCRYPT_MAX_ROUNDS 31
+
+#
+# Only works if ENCRYPT_METHOD is set to YESCRYPT.
+#
+# Define the YESCRYPT cost factor.
+# With a higher cost factor, it is more difficult to brute-force the password.
+# However, more CPU time and more memory will be needed to authenticate users
+# if this value is increased.
+#
+# If not specified, a cost factor of 5 will be used.
+# The value must be within the 1-11 range.
+#
+#YESCRYPT_COST_FACTOR 5
+
+# Currently CONSOLE_GROUPS is not supported
+
+#
+# Should login be allowed if we can't cd to the home directory?
+# Default is yes.
+#
+#DEFAULT_HOME	yes
+
+# Currently ENVIRON_FILE is not supported
+
+#
+# If defined, this command is run when removing a user.
+# It should remove any at/cron/print jobs etc. owned by
+# the user to be removed (passed as the first argument).
+#
+#USERDEL_CMD	/usr/sbin/userdel_local
+
+#
+# Enables userdel(8) to remove user groups if no members exist.
+#
+USERGROUPS_ENAB yes
+
+#
+# If set to a non-zero number, the shadow utilities will make sure that
+# groups never have more than this number of users on one line.
+# This permits to support split groups (groups split into multiple lines,
+# with the same group ID, to avoid limitation of the line length in the
+# group file).
+#
+# 0 is the default value and disables this feature.
+#
+#MAX_MEMBERS_PER_GROUP	0
+
+#
+# If useradd(8) should create home directories for users by default (non
+# system users only).
+# This option is overridden with the -M or -m flags on the useradd(8)
+# command-line.
+#
+CREATE_HOME	yes
+
+#
+# Force use shadow, even if shadow passwd & shadow group files are
+# missing.
+#
+#FORCE_SHADOW    yes
+
+#
+# Select the HMAC cryptography algorithm.
+# Used in pam_timestamp module to calculate the keyed-hash message
+# authentication code.
+#
+# Note: It is recommended to check hmac(3) to see the possible algorithms
+# that are available in your system.
+#
+HMAC_CRYPTO_ALGO SHA512

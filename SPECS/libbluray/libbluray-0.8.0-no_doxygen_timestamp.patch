@@ -1,0 +1,11 @@
+--- libbluray-0.2.2/doc/doxygen-footer.html.orig	2012-06-13 02:25:30.740725465 +0200
++++ libbluray-0.2.2/doc/doxygen-footer.html	2012-06-13 02:25:56.585725752 +0200
+@@ -1,7 +1,7 @@
+ <hr size="1">
+ <div id="footer">
+   <small>
+-    Generated on $datetime for $projectname by&nbsp;
++    Generated for $projectname by&nbsp;
+     <a href="http://www.doxygen.org/index.html">
+     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.1<br />
+     Copyright &copy; 2010 John Stebbins et al.<br />

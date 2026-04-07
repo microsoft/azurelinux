@@ -1,0 +1,29 @@
+From 9cba9e81aa96e1d64ae2eaaf88330e09dadfce79 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Lyson=C4=9Bk?= <olysonek@redhat.com>
+Date: Fri, 5 Jan 2018 09:40:09 +0100
+Subject: [PATCH 48/59] Fix default value of strict_ssl_read_eof in man page
+
+---
+ vsftpd.conf.5 | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/vsftpd.conf.5 b/vsftpd.conf.5
+index a5abeb2..43b0435 100644
+--- a/vsftpd.conf.5
++++ b/vsftpd.conf.5
+@@ -574,10 +574,9 @@ Default: YES
+ .B strict_ssl_read_eof
+ If enabled, SSL data uploads are required to terminate via SSL, not an
+ EOF on the socket. This option is required to be sure that an attacker did
+-not terminate an upload prematurely with a faked TCP FIN. Unfortunately, it
+-is not enabled by default because so few clients get it right. (New in v2.0.7).
++not terminate an upload prematurely with a faked TCP FIN. (New in v2.0.7).
+ 
+-Default: NO
++Default: YES
+ .TP
+ .B strict_ssl_write_shutdown
+ If enabled, SSL data downloads are required to terminate via SSL, not an
+-- 
+2.14.4
+

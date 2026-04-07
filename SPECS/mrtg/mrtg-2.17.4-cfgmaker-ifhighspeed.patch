@@ -1,0 +1,12 @@
+diff -up mrtg-2.17.10/bin/cfgmaker.orig mrtg-2.17.10/bin/cfgmaker
+--- mrtg-2.17.10/bin/cfgmaker.orig	2022-01-20 08:05:38.441966441 +0100
++++ mrtg-2.17.10/bin/cfgmaker	2022-01-20 08:05:59.947909140 +0100
+@@ -224,7 +224,7 @@ sub InterfaceInfo($$$$$) {
+ #            maximum value (4,294,967,295) and ifHighSpeed must be used
+ #            to report the interface's speed.  For a sub-layer which has
+ #            no concept of bandwidth, this object should be zero."
+-            if ( (not defined $value) || ($value == 2**32-1) ) {
++            if ( (not defined $value) || ($value == 2**32-1) || ($value == 2**32-2)) {
+                 ($if, $value) = split /:/, $ifHighSpeed[$i], 2;
+ 	        $value = $value * 1000000;  # highSpeed = contador * 10^6
+                 debug('base',"Speed: $if - $value");

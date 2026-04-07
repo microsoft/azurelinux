@@ -1,0 +1,46 @@
+From 42345d92f52a6fa5030dffe29017597665de001f Mon Sep 17 00:00:00 2001
+From: Yaakov Selkowitz <yselkowi@redhat.com>
+Date: Sun, 8 Sep 2024 12:20:17 -0400
+Subject: [PATCH] tcp: avoid deprecated ENGINE_cleanup
+
+ENGINE_cleanup is deprecated as of OpenSSL 1.1.0, and may not be available
+with 3.0 and OPENSSL_NO_ENGINE.
+
+Signed-off-by: Yaakov Selkowitz <yselkowi@redhat.com>
+---
+ src/tcp.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/tcp.c b/src/tcp.c
+index 18cffda..ff88077 100644
+--- a/src/tcp.c
++++ b/src/tcp.c
+@@ -69,7 +69,6 @@
+ #	if OPENSSL_VERSION_NUMBER >= 0x30000000L && !defined(LIBRESSL_VERSION_NUMBER)
+ #		include <openssl/bioerr.h>
+ #	endif
+-#	include <openssl/engine.h>
+ /* OpenSSL API differences */
+ #	if OPENSSL_VERSION_NUMBER >= 0x10100000L
+ #		define RSYSLOG_X509_NAME_oneline(X509CERT) X509_get_subject_name(X509CERT)
+@@ -77,6 +76,7 @@
+ #		define RSYSLOG_BIO_number_read(SSLBIO) BIO_number_read(SSLBIO)
+ #		define RSYSLOG_BIO_number_written(SSLBIO) BIO_number_written(SSLBIO)
+ #	else
++#		include <openssl/engine.h>
+ #		define RSYSLOG_X509_NAME_oneline(X509CERT) (X509CERT != NULL ? X509CERT->cert_info->subject : NULL)
+ #		define RSYSLOG_BIO_method_name(SSLBIO) SSLBIO->method->name
+ #		define RSYSLOG_BIO_number_read(SSLBIO) SSLBIO->num
+@@ -1989,7 +1989,9 @@ relpTcpExitTLS_ossl(void)
+ 			SSL_CTX_free(ctx);
+ 			ctx = NULL;
+ 		}
++#if OPENSSL_VERSION_NUMBER < 0x10100000L
+ 		ENGINE_cleanup();
++#endif
+ 		ERR_free_strings();
+ 		EVP_cleanup();
+ 		CRYPTO_cleanup_all_ex_data();
+-- 
+2.46.0
+

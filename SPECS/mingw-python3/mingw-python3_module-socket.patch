@@ -1,0 +1,95 @@
+diff -rupN --no-dereference Python-3.11.14/configure.ac Python-3.11.14-new/configure.ac
+--- Python-3.11.14/configure.ac	2025-10-09 23:07:48.638582926 +0200
++++ Python-3.11.14-new/configure.ac	2025-10-09 23:07:50.656585870 +0200
+@@ -4646,8 +4646,8 @@ AC_CHECK_FUNCS([ \
+   faccessat fchmod fchmodat fchown fchownat fdopendir fdwalk fexecve \
+   fork fork1 fpathconf fstatat ftime ftruncate futimens futimes futimesat \
+   gai_strerror getegid getentropy geteuid getgid getgrgid getgrgid_r \
+-  getgrnam_r getgrouplist getgroups gethostname getitimer getloadavg getlogin \
+-  getpeername getpgid getpid getppid getpriority _getpty \
++  getgrnam_r getgrouplist getgroups getitimer getloadavg getlogin \
++  getpgid getpid getppid getpriority _getpty \
+   getpwent getpwnam_r getpwuid getpwuid_r getresgid getresuid getrusage getsid getspent \
+   getspnam getuid getwd if_nameindex initgroups kill killpg lchown linkat \
+   lockf lstat lutimes madvise mbrtowc memrchr mkdirat mkfifo mkfifoat \
+@@ -4889,7 +4889,13 @@ PKG_CHECK_MODULES([LIBLZMA], [liblzma],
+ ])
+ 
+ dnl PY_CHECK_NETDB_FUNC(FUNCTION)
+-AC_DEFUN([PY_CHECK_NETDB_FUNC], [PY_CHECK_FUNC([$1], [#include <netdb.h>])])
++AC_DEFUN([PY_CHECK_NETDB_FUNC], [PY_CHECK_FUNC([$1], [
++#ifdef _WIN32
++#  include <winsock2.h>
++#else
++#  include <netdb.h>
++#endif
++])])
+ 
+ PY_CHECK_NETDB_FUNC([hstrerror])
+ dnl not available in WASI yet
+@@ -4898,13 +4904,18 @@ PY_CHECK_NETDB_FUNC([getservbyport])
+ PY_CHECK_NETDB_FUNC([gethostbyname])
+ PY_CHECK_NETDB_FUNC([gethostbyaddr])
+ PY_CHECK_NETDB_FUNC([getprotobyname])
++PY_CHECK_NETDB_FUNC([gethostname])
+ 
+ dnl PY_CHECK_SOCKET_FUNC(FUNCTION)
+ AC_DEFUN([PY_CHECK_SOCKET_FUNC], [PY_CHECK_FUNC([$1], [
+ #include <sys/types.h>
+-#include <sys/socket.h>
+-#include <netinet/in.h>
+-#include <arpa/inet.h>
++#ifdef _WIN32
++#  include <winsock2.h>
++#else
++#  include <sys/socket.h>
++#  include <netinet/in.h>
++#  include <arpa/inet.h>
++#endif
+ ])])
+ 
+ PY_CHECK_SOCKET_FUNC([inet_aton])
+diff -rupN --no-dereference Python-3.11.14/Modules/Setup Python-3.11.14-new/Modules/Setup
+--- Python-3.11.14/Modules/Setup	2025-10-09 23:07:50.651914972 +0200
++++ Python-3.11.14-new/Modules/Setup	2025-10-09 23:07:50.657813615 +0200
+@@ -144,7 +144,7 @@ PYTHONPATH=$(COREPYTHONPATH)
+ #_pickle _pickle.c
+ #_queue _queuemodule.c
+ #_random _randommodule.c
+-#_socket socketmodule.c
++_socket socketmodule.c -lws2_32 -liphlpapi
+ #_statistics _statisticsmodule.c
+ #_struct _struct.c
+ #_typing _typingmodule.c
+diff -rupN --no-dereference Python-3.11.14/Modules/socketmodule.c Python-3.11.14-new/Modules/socketmodule.c
+--- Python-3.11.14/Modules/socketmodule.c	2025-10-09 18:16:55.000000000 +0200
++++ Python-3.11.14-new/Modules/socketmodule.c	2025-10-09 23:07:50.658585873 +0200
+@@ -274,7 +274,7 @@ shutdown(how) -- shut down traffic in on
+ # endif
+ 
+ /* Macros based on the IPPROTO enum, see: https://bugs.python.org/issue29515 */
+-#ifdef MS_WINDOWS
++#ifdef _MSC_VER
+ #define IPPROTO_ICMP IPPROTO_ICMP
+ #define IPPROTO_IGMP IPPROTO_IGMP
+ #define IPPROTO_GGP IPPROTO_GGP
+@@ -404,6 +404,10 @@ remove_unusable_flags(PyObject *m)
+   /* Do not include addrinfo.h for MSVC7 or greater. 'addrinfo' and
+    * EAI_* constants are defined in (the already included) ws2tcpip.h.
+    */
++#elif defined(__MINGW32__)
++  /* Do not include addrinfo.h as minimum supported version is
++   * _WIN32_WINNT >= WindowsXP(0x0501)
++   */
+ #else
+ #  include "addrinfo.h"
+ #endif
+@@ -8112,7 +8116,7 @@ PyInit__socket(void)
+     PyModule_AddIntMacro(m, IPPROTO_MAX);
+ #endif
+ 
+-#ifdef  MS_WINDOWS
++#ifdef  _MSC_VER
+     PyModule_AddIntMacro(m, IPPROTO_ICLFXBM);
+     PyModule_AddIntMacro(m, IPPROTO_ST);
+     PyModule_AddIntMacro(m, IPPROTO_CBT);

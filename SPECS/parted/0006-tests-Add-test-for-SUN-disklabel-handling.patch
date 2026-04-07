@@ -1,0 +1,116 @@
+From bdb92f73112177c091a764836a9ceaa59f7e9b15 Mon Sep 17 00:00:00 2001
+From: "Brian C. Lane" <bcl@redhat.com>
+Date: Wed, 8 Jan 2025 11:59:40 -0800
+Subject: [PATCH 6/8] tests: Add test for SUN disklabel handling
+
+When fixed the output from script mode should be an unknown disklabel,
+not sun.
+---
+ tests/Makefile.am           |  3 ++-
+ tests/sun-badlabel          | 42 +++++++++++++++++++++++++++++++++++++
+ tests/t4002-sun-badlabel.sh | 23 ++++++++++++++++++++
+ 3 files changed, 67 insertions(+), 1 deletion(-)
+ create mode 100755 tests/sun-badlabel
+ create mode 100644 tests/t4002-sun-badlabel.sh
+
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index fa27b44..00f4a9d 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -67,6 +67,7 @@ TESTS = \
+   t3400-whole-disk-FAT-partition.sh \
+   t4000-sun-raid-type.sh \
+   t4001-sun-vtoc.sh \
++  t4002-sun-badlabel.sh \
+   t4100-msdos-partition-limits.sh \
+   t4100-dvh-partition-limits.sh \
+   t4100-msdos-starting-sector.sh \
+@@ -103,7 +104,7 @@ TESTS = \
+ EXTRA_DIST = \
+   $(TESTS) t-local.sh t-lvm.sh \
+   init.cfg init.sh t-lib-helpers.sh gpt-header-munge \
+-  gpt-header-move msdos-overlap gpt-attrs
++  gpt-header-move msdos-overlap gpt-attrs sun-badlabel
+ 
+ check_PROGRAMS = print-align print-flags print-max dup-clobber duplicate \
+   fs-resize
+diff --git a/tests/sun-badlabel b/tests/sun-badlabel
+new file mode 100755
+index 0000000..6a28e86
+--- /dev/null
++++ b/tests/sun-badlabel
+@@ -0,0 +1,42 @@
++#!/usr/bin/python3
++# Mangle the CHS values stored in a SUN disklabel
++# This sets CHS to 1 track, 2 sectors and updates the checksum
++# This triggers a bug in the SUN disklabel code when the CHS
++# error is UNHANDLED (in script mode or with a custom exception
++# handler) and it continues using a bad label which will coredump
++# when .duplicate() is called on it.
++
++import array
++from struct import unpack_from, pack_into
++import sys
++
++file = open(sys.argv[1],'rb+')
++header = file.read(512)
++
++# Make sure it looks like a SUN disklabel first
++magic = unpack_from(">H", header, 0x1FC)[0]
++if magic != 0xDABE:
++    raise RuntimeError("Not a SUN disklabel. magic = 0x%04X" % magic)
++csum = unpack_from(">H", header, 0x1FE)[0]
++ntrks = unpack_from(">H", header, 0x1B4)[0]
++nsect = unpack_from(">H", header, 0x1B6)[0]
++
++header = array.array('B', header)
++# cylinders at 0x1B0
++# modify ntrks at offset 0x1B4
++pack_into('>H', header, 0x1B4, 1)
++# modify nsect at offset 0x1B6
++pack_into('>H', header, 0x1B6, 2)
++
++## Undo old values
++csum ^= ntrks
++csum ^= nsect
++
++## Add new
++csum ^= 1
++csum ^= 2
++pack_into('>H', header, 0x1FE, csum)
++
++file.seek(0)
++file.write(header)
++file.close()
+diff --git a/tests/t4002-sun-badlabel.sh b/tests/t4002-sun-badlabel.sh
+new file mode 100644
+index 0000000..177c0e4
+--- /dev/null
++++ b/tests/t4002-sun-badlabel.sh
+@@ -0,0 +1,23 @@
++#!/bin/sh
++# Test exception handling on a bad SUN disklabel
++
++. "${srcdir=.}/init.sh"; path_prepend_ ../parted $srcdir
++ss=$sector_size_
++
++n_sectors=2000 # number of sectors
++dev=sun-disk-file
++# create an empty file as a test disk
++dd if=/dev/zero of=$dev bs=$ss count=$n_sectors 2> /dev/null || fail=1
++
++# label the test disk as a sun disk
++parted -s $dev mklabel sun > out 2>&1 || fail=1
++compare /dev/null out || fail=1
++
++# Mangle the disklabel to have incorrect CHS values, but a valid checksum
++sun-badlabel $dev || fail=1
++
++# Check the output (this should return 1, but depend on checking the output for the test)
++parted -m -s $dev p > out 2>&1
++grep unknown out || { cat out; fail=1; }
++
++Exit $fail
+-- 
+2.47.1
+

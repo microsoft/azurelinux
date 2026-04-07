@@ -1,0 +1,36 @@
+diff -ru impacket-0.12.0/requirements.txt impacket-0.12.0.new/requirements.txt
+--- impacket-0.12.0/requirements.txt	2024-09-02 17:15:49.000000000 +0200
++++ impacket-0.12.0.new/requirements.txt	2025-04-02 12:34:02.275142185 +0200
+@@ -4,7 +4,7 @@
+ pyasn1>=0.2.3
+ pyasn1_modules
+ pycryptodomex
+-pyOpenSSL==24.0.0
++pyOpenSSL>=24.0
+ ldap3>=2.5,!=2.5.2,!=2.5.0,!=2.6
+ ldapdomaindump>=0.9.0
+ flask>=1.0
+diff -ru impacket-0.12.0/impacket.egg-info/requires.txt impacket-0.12.0.new/impacket.egg-info/requires.txt
+--- impacket-0.12.0/impacket.egg-info/requires.txt	2024-09-02 17:16:06.000000000 +0200
++++ impacket-0.12.0.new/impacket.egg-info/requires.txt	2025-04-02 12:38:40.900208063 +0200
+@@ -2,7 +2,7 @@
+ flask>=1.0
+ ldap3!=2.5.0,!=2.5.2,!=2.6,>=2.5
+ ldapdomaindump>=0.9.0
+-pyOpenSSL==24.0.0
++pyOpenSSL>=24.0
+ pyasn1>=0.2.3
+ pyasn1_modules
+ pycryptodomex
+diff -ru impacket-0.12.0/setup.py impacket-0.12.0.new/setup.py
+--- impacket-0.12.0/setup.py	2025-04-02 12:37:49.752607858 +0200
++++ impacket-0.12.0.new/setup.py	2025-04-02 12:39:16.539395711 +0200
+@@ -71,7 +71,7 @@
+     scripts=glob.glob(os.path.join('examples', '*.py')),
+     data_files=data_files,
+ 
+-    install_requires=['pyasn1>=0.2.3', 'pyasn1_modules', 'pycryptodomex', 'pyOpenSSL==24.0.0', 'six', 'ldap3>=2.5,!=2.5.2,!=2.5.0,!=2.6',
++    install_requires=['pyasn1>=0.2.3', 'pyasn1_modules', 'pycryptodomex', 'pyOpenSSL>=24.0', 'six', 'ldap3>=2.5,!=2.5.2,!=2.5.0,!=2.6',
+                       'ldapdomaindump>=0.9.0', 'flask>=1.0', 'setuptools', 'charset_normalizer'],
+     extras_require={':sys_platform=="win32"': ['pyreadline3'],
+                     },

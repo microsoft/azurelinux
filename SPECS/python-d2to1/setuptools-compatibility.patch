@@ -1,0 +1,28 @@
+From dd3cbb7d97771e5cfb0f82345e0304aa16e518c3 Mon Sep 17 00:00:00 2001
+From: Lumir Balhar <lbalhar@redhat.com>
+Date: Fri, 22 Sep 2023 13:25:20 +0200
+Subject: [PATCH] setuptools compatibility
+
+---
+ d2to1/core.py | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/d2to1/core.py b/d2to1/core.py
+index f0ae10f..3fefdb9 100644
+--- a/d2to1/core.py
++++ b/d2to1/core.py
+@@ -27,7 +27,10 @@ def d2to1(dist, attr, value):
+     """
+ 
+     from distutils.core import Distribution
+-    from setuptools.dist import _get_unpatched
++    try:
++        from setuptools.dist import _get_unpatched
++    except ImportError:
++        from setuptools.dist import get_unpatched as _get_unpatched
+ 
+     _Distribution = _get_unpatched(Distribution)
+ 
+-- 
+2.41.0
+

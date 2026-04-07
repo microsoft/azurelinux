@@ -1,0 +1,16 @@
+diff --git a/src/gui/configure.cmake b/src/gui/configure.cmake
+index 0bf250ea..2d1bb645 100644
+--- a/src/gui/configure.cmake
++++ b/src/gui/configure.cmake
+@@ -174,9 +174,9 @@ qt_config_compile_test(egl_x11
+ int main(void)
+ {
+     /* BEGIN TEST: */
+-Display *dpy = EGL_DEFAULT_DISPLAY;
++Display *dpy = reinterpret_cast<Display *>(EGL_DEFAULT_DISPLAY);
+ EGLNativeDisplayType egldpy = XOpenDisplay(\"\");
+-dpy = egldpy;
++dpy = reinterpret_cast<Display *>(egldpy);
+ EGLNativeWindowType w = XCreateWindow(dpy, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+ XDestroyWindow(dpy, w);
+ XCloseDisplay(dpy);

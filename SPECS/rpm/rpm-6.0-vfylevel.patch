@@ -1,0 +1,12 @@
+diff -up rpm-5.99.91/macros.in.rpmformat rpm-5.99.91/macros.in
+--- rpm-5.99.91/macros.in.rpmformat	2025-07-02 10:35:25.595849666 +0300
++++ rpm-5.99.91/macros.in	2025-07-02 10:35:38.956370457 +0300
+@@ -676,7 +676,7 @@ Supplements:   (%{name} = %{version}-%{r
+ # signature	require valid signature(s)
+ # digest	require valid digest(s)
+ # none		traditional rpm behavior, nothing required
+-%_pkgverify_level all
++%_pkgverify_level digest
+ 
+ # Disabler flags for package verification (similar to vsflags)
+ # Set to 0x0 for full compatibility with v4 packages.

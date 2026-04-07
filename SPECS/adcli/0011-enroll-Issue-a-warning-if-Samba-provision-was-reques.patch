@@ -1,0 +1,30 @@
+From 5a8b64a1647808d6649f82b2ea20331fcc7367f9 Mon Sep 17 00:00:00 2001
+From: Samuel Cabrero <scabrero@suse.de>
+Date: Wed, 6 Sep 2023 16:29:32 +0200
+Subject: [PATCH 11/17] enroll: Issue a warning if Samba provision was
+ requested but failed
+
+Signed-off-by: Samuel Cabrero <scabrero@suse.de>
+---
+ library/adenroll.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/library/adenroll.c b/library/adenroll.c
+index 72f1b6f..c5a85a5 100644
+--- a/library/adenroll.c
++++ b/library/adenroll.c
+@@ -2618,9 +2618,9 @@ enroll_join_or_update_tasks (adcli_enroll *enroll,
+ 	if ( (flags & ADCLI_ENROLL_ADD_SAMBA_DATA) && ! (flags & ADCLI_ENROLL_PASSWORD_VALID)) {
+ 		res = update_samba_data (enroll);
+ 		if (res != ADCLI_SUCCESS) {
+-			_adcli_info ("Failed to add Samba specific data, smbd "
++			_adcli_warn ("Failed to add Samba specific data, smbd "
+ 			             "or winbindd might not work as "
+-			             "expected.\n");
++			             "expected.");
+ 		}
+ 	}
+ 
+-- 
+2.47.0
+

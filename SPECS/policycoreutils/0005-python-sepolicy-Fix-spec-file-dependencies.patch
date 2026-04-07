@@ -1,0 +1,48 @@
+From 84b051139ab536519cc8e9c333483475d830d40b Mon Sep 17 00:00:00 2001
+From: Vit Mojzis <vmojzis@redhat.com>
+Date: Tue, 30 May 2023 09:07:28 +0200
+Subject: [PATCH] python/sepolicy: Fix spec file dependencies
+Content-type: text/plain
+
+semanage is part of policycoreutils-python-utils package, selinuxenabled
+is part of libselinux-utils (required by ^^^) and restorecon/load_policy
+are part of policycoreutils (also required by policycoreutils-python-utils).
+
+Signed-off-by: Vit Mojzis <vmojzis@redhat.com>
+---
+ python/sepolicy/sepolicy/templates/spec.py | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/python/sepolicy/sepolicy/templates/spec.py b/python/sepolicy/sepolicy/templates/spec.py
+index 433c298a17e0..a6d4508bb670 100644
+--- a/python/sepolicy/sepolicy/templates/spec.py
++++ b/python/sepolicy/sepolicy/templates/spec.py
+@@ -11,18 +11,20 @@ Version:	1.0
+ Release:	1%{?dist}
+ Summary:	SELinux policy module for MODULENAME
+ 
+-Group:	System Environment/Base		
+-License:	GPLv2+	
++Group:	System Environment/Base
++License:	GPLv2+
+ # This is an example. You will need to change it.
++# For a complete guide on packaging your policy
++# see https://fedoraproject.org/wiki/SELinux/IndependentPolicy
+ URL:		http://HOSTNAME
+ Source0:	MODULENAME.pp
+ Source1:	MODULENAME.if
+ Source2:	DOMAINNAME_selinux.8
+ Source3:	DOMAINNAME_u
+ 
+-Requires: policycoreutils, libselinux-utils
+-Requires(post): selinux-policy-base >= %{selinux_policyver}, policycoreutils
+-Requires(postun): policycoreutils
++Requires: policycoreutils-python-utils, libselinux-utils
++Requires(post): selinux-policy-base >= %{selinux_policyver}, policycoreutils-python-utils
++Requires(postun): policycoreutils-python-utils
+ """
+ 
+ mid_section="""\
+-- 
+2.50.1
+

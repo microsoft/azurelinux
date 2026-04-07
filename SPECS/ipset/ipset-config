@@ -1,0 +1,5 @@
+# Save current ipsets on stop.
+#   Value: yes|no,  default: no
+# Saves all ipsets to /etc/sysconfig/ipset.d/ if service gets stopped
+# (e.g. on system shutdown).
+IPSET_SAVE_ON_STOP="no"

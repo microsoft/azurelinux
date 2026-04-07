@@ -1,0 +1,32 @@
+From 7a5bbfe3bd5905a7daefac690ebdfd7403c8ef7a Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Tue, 12 Nov 2024 01:05:25 -0500
+Subject: [PATCH 5/5] Partially revert "TST: Fix minor issues in interactive
+ backend test (#28838)"
+
+This reverts commit 7c7f94c5f71e99f148255e3bb570fec25c8fe754.
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ lib/matplotlib/tests/test_backends_interactive.py | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/lib/matplotlib/tests/test_backends_interactive.py b/lib/matplotlib/tests/test_backends_interactive.py
+index 4e3c1bbc2b..903ae87cbb 100644
+--- a/lib/matplotlib/tests/test_backends_interactive.py
++++ b/lib/matplotlib/tests/test_backends_interactive.py
+@@ -232,7 +232,10 @@ def _test_interactive_impl():
+     result_after = io.BytesIO()
+     fig.savefig(result_after, format='png')
+ 
+-    assert result.getvalue() == result_after.getvalue()
++    if 'qt' not in backend and 'wx' not in backend:
++        # FIXME: This should be enabled everywhere once Qt5 is fixed on macOS
++        # to not resize incorrectly.
++        assert result.getvalue() == result_after.getvalue()
+ 
+ 
+ @pytest.mark.parametrize("env", _get_testable_interactive_backends())
+-- 
+2.52.0
+

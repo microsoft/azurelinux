@@ -1,0 +1,132 @@
+From c84b288cecf1cb4ec4a7bc5221bbc897cd1ab477 Mon Sep 17 00:00:00 2001
+From: Tom Rix <Tom.Rix@amd.com>
+Date: Sat, 16 Nov 2024 17:00:02 -0800
+Subject: [PATCH] Replace use of mktemp with mkstemp
+
+Signed-off-by: Tom Rix <Tom.Rix@amd.com>
+---
+ amd/hipcc/src/hipBin_base.h | 43 ++++++++++++++++++++++++++-----------
+ amd/hipcc/src/hipBin_util.h | 29 -------------------------
+ 2 files changed, 30 insertions(+), 42 deletions(-)
+
+diff --git a/amd/hipcc/src/hipBin_base.h b/amd/hipcc/src/hipBin_base.h
+index 6c1a7767be35..fdb74fd3404b 100644
+--- a/amd/hipcc/src/hipBin_base.h
++++ b/amd/hipcc/src/hipBin_base.h
+@@ -24,6 +24,10 @@ THE SOFTWARE.
+ 
+ 
+ #include "hipBin_util.h"
++#include <stdio.h>
++#include <unistd.h>
++#include <stdlib.h>
++#include <string.h>
+ #include <iostream>
+ #include <vector>
+ #include <string>
+@@ -467,22 +471,35 @@ bool HipBinBase::canRunCompiler(string exeName, string& cmdOut) {
+   string temp_dir = hipBinUtilPtr_->getTempDir();
+   fs::path templateFs = temp_dir;
+   templateFs /= "canRunXXXXXX";
+-  string tmpFileName = hipBinUtilPtr_->mktempFile(templateFs.string());
+-  compilerName += " --version > " + tmpFileName + " 2>&1";
+   bool executable = false;
+-  if (system(const_cast<char*>(compilerName.c_str()))) {
+-    executable = false;
+-  } else {
+-    string myline;
+-    ifstream fp;
+-    fp.open(tmpFileName);
+-    if (fp.is_open()) {
+-      while (std::getline(fp, myline)) {
+-        cmdOut += myline;
++  string str = templateFs.string();
++  int fd = mkstemp(&str[0]);
++  if (fd >= 0) {
++    unlink(&str[0]);
++#if defined(_WIN32) || defined(_WIN64)
++    int tmpfd = _dup(STDOUT_FILENO);
++    int newfd = _dup2(fd, STDOUT_FILENO);
++#else
++    int tmpfd = dup(STDOUT_FILENO);
++    int newfd = dup2(fd, STDOUT_FILENO);
++#endif 
++    if (newfd != -1) {
++      compilerName += " --version 2>&1";
++      if (!system(const_cast<char*>(compilerName.c_str()))) {
++	if (!lseek(newfd, SEEK_SET, 0)) {
++	  char output[128] = {0};
++	  ssize_t b;
++	  memset(output, 0, 128);
++	  while (read(newfd, &output, 128) > 0) {
++	    cmdOut += output;
++	    memset(output, 0, 128);
++	  }
++	  executable = true;
++	}
+       }
++      close(newfd);
++      dup2(tmpfd, STDOUT_FILENO);
+     }
+-    fp.close();
+-    executable = true;
+   }
+   return executable;
+ }
+diff --git a/amd/hipcc/src/hipBin_util.h b/amd/hipcc/src/hipBin_util.h
+index b4556ef81647..91486e8ded9f 100644
+--- a/amd/hipcc/src/hipBin_util.h
++++ b/amd/hipcc/src/hipBin_util.h
+@@ -158,8 +158,6 @@ class HipBinUtil {
+                       string replaceWith) const;
+   SystemCmdOut exec(const char* cmd, bool printConsole) const;
+   string getTempDir();
+-  void deleteTempFiles();
+-  string mktempFile(string name);
+   string trim(string str) const;
+   string readConfigMap(map<string, string> hipVersionMap,
+                        string keyName, string defaultValue) const;
+@@ -178,19 +176,6 @@ HipBinUtil *HipBinUtil::instance = 0;
+ 
+ // deleting temp files created
+ HipBinUtil::~HipBinUtil() {
+-  deleteTempFiles();
+-}
+-
+-// create temp file with the template name
+-string HipBinUtil::mktempFile(string name) {
+-  string fileName;
+-#if defined(_WIN32) || defined(_WIN64)
+-  fileName = _mktemp(&name[0]);
+-#else
+-  fileName = mktemp(&name[0]);
+-#endif
+-  tmpFiles_.push_back(fileName);
+-  return fileName;
+ }
+ 
+ // gets the path of the executable name
+@@ -291,20 +276,6 @@ map<string, string> HipBinUtil::parseConfigFile(fs::path configPath) const {
+   return configMap;
+ }
+ 
+-// Delete all created temporary files
+-void HipBinUtil::deleteTempFiles() {
+-  // Deleting temp files vs the temp directory
+-  for (unsigned int i = 0; i < tmpFiles_.size(); i++) {
+-    try {
+-      if (!fs::remove(tmpFiles_.at(i)))
+-        std::cerr << "Error deleting temp name: "<< tmpFiles_.at(i) <<endl;
+-    }
+-    catch(...) {
+-      std::cerr << "Error deleting temp name: "<< tmpFiles_.at(i) <<endl;
+-    }
+-  }
+-}
+-
+ // Create a new temporary directory and return it
+ string HipBinUtil::getTempDir() {
+   // mkdtemp is only applicable for unix and not windows.
+-- 
+2.47.0
+

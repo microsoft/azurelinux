@@ -1,0 +1,27 @@
+From 302d5ff3dd9d7d619da7cbf1a108d2168de1a630 Mon Sep 17 00:00:00 2001
+From: Samuel Cabrero <scabrero@suse.de>
+Date: Wed, 6 Sep 2023 12:05:03 +0200
+Subject: [PATCH 09/17] util: Flag write end of pipe as invalid after closing
+ it
+
+Signed-off-by: Samuel Cabrero <scabrero@suse.de>
+---
+ library/adutil.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/library/adutil.c b/library/adutil.c
+index 6a8e612..2947391 100644
+--- a/library/adutil.c
++++ b/library/adutil.c
+@@ -679,7 +679,7 @@ _adcli_call_external_program (const char *binary, char * const *argv,
+ 		close (pipefd_to_child[0]);
+ 		pipefd_to_child[0] = -1;
+ 		close (pipefd_to_child[1]);
+-		pipefd_to_child[0] = -1;
++		pipefd_to_child[1] = -1;
+ 
+ 		if (stdout_data != NULL || stdout_data_len != NULL) {
+ 			rlen = read (pipefd_from_child[0], read_buf, sizeof (read_buf));
+-- 
+2.47.0
+

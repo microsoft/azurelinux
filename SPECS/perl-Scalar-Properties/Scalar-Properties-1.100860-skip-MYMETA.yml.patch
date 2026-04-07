@@ -1,0 +1,11 @@
+--- Scalar-Properties/MANIFEST.SKIP
++++ Scalar-Properties/MANIFEST.SKIP
+@@ -7,6 +7,8 @@
+ 
+ # Makemaker/Build.PL generated files and dirs.
+ MANIFEST.old
++MYMETA.json
++MYMETA.yml
+ ^Makefile$
+ ^Build$
+ ^blib

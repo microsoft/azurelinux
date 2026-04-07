@@ -1,0 +1,27 @@
+From 6f6a8771afdaa27208d3aea63525f62cafe787cf Mon Sep 17 00:00:00 2001
+From: Neal Gompa <ngompa@fedoraproject.org>
+Date: Sun, 25 Sep 2022 16:46:47 -0400
+Subject: [PATCH] containmentactions/contextmenu: Enable lock/logout
+ actions by default
+
+Fedora users expect these items to exist in the desktop context menu
+by default unless they've been manually disabled or removed via the
+Kiosk mode.
+---
+ containmentactions/contextmenu/menu.cpp | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff -Naur plasma-workspace-6.0.0/containmentactions/contextmenu/menu.cpp plasma-workspace-6.0.0-b/containmentactions/contextmenu/menu.cpp
+--- plasma-workspace-6.0.0/containmentactions/contextmenu/menu.cpp      2024-02-22 09:47:05.872197643 +0100
++++ plasma-workspace-6.0.0-b/containmentactions/contextmenu/menu.cpp    2024-02-22 09:47:44.725173857 +0100
+@@ -81,8 +81,6 @@
+         disabled.insert(QStringLiteral("_add panel"));
+         disabled.insert(QStringLiteral("configure shortcuts"));
+         disabled.insert(QStringLiteral("_run_command"));
+-        disabled.insert(QStringLiteral("_lock_screen"));
+-        disabled.insert(QStringLiteral("_logout"));
+     }
+     // clang-format on
+ 
+-- 
+2.36.1

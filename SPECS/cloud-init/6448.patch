@@ -1,0 +1,21 @@
+From ffe13614ba5a47a262abba7e4867493595e3b92b Mon Sep 17 00:00:00 2001
+From: Brett Holman <brett.holman@canonical.com>
+Date: Tue, 2 Sep 2025 10:24:52 -0600
+Subject: [PATCH] fix(systemd): revert auditd.service dependency
+
+---
+ systemd/cloud-init-local.service.tmpl | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/systemd/cloud-init-local.service.tmpl b/systemd/cloud-init-local.service.tmpl
+index b8a2f33111c..e88b15ca246 100644
+--- a/systemd/cloud-init-local.service.tmpl
++++ b/systemd/cloud-init-local.service.tmpl
+@@ -7,7 +7,6 @@ DefaultDependencies=no
+ {% endif %}
+ Wants=network-pre.target
+ After=hv_kvp_daemon.service
+-Before=auditd.service
+ Before=network-pre.target
+ Before=shutdown.target
+ {% if variant in ["almalinux", "cloudlinux", "rhel"] %}

@@ -1,0 +1,28 @@
+From bf852f7efc7c6461675cf70c8de9f3db28f5a4e1 Mon Sep 17 00:00:00 2001
+Message-ID: <bf852f7efc7c6461675cf70c8de9f3db28f5a4e1.1761772186.git.mjg@fedoraproject.org>
+From: Michael J Gruber <mjg@fedoraproject.org>
+Date: Mon, 11 Nov 2024 16:08:56 +0100
+Subject: [PATCH] setup.py: do not bundle c and c++ libs in wheel
+
+We want to package libs separately, so do not include them in the wheel
+(and, consequently, not in the python package).
+---
+ setup.py | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 0462eeaa7..768212a22 100755
+--- a/setup.py
++++ b/setup.py
+@@ -356,8 +356,6 @@ def build():
+                 ]
+     else:
+         names = [
+-                pipcl.get_soname(f'{build_dir()}/libmupdf.so'),     # C.
+-                pipcl.get_soname(f'{build_dir()}/libmupdfcpp.so'),  # C++.
+                 f'{build_dir()}/_mupdf.so',                         # Python internals.
+                 f'{build_dir()}/mupdf.py',                          # Python.
+                 ]
+-- 
+2.51.2.1007.g590f8df4db
+

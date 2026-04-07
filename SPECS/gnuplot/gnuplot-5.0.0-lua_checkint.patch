@@ -1,0 +1,13 @@
+diff -up wrk/term/lua.trm.wrk wrk/term/lua.trm
+--- wrk/term/lua.trm.wrk	2015-01-26 18:36:53.242174908 +0100
++++ wrk/term/lua.trm	2015-01-26 18:38:44.674258427 +0100
+@@ -114,6 +114,9 @@ TERM_PUBLIC void LUA_boxed_text __PROTO(
+ #include <lualib.h>
+ #include <lauxlib.h>
+ 
++//luaL_checkint macro disappeared
++#define luaL_checkint(L,n)      ((int)luaL_checkinteger(L, (n))) 
++
+ static lua_State *L = NULL;
+ 
+ static char *LUA_script = NULL;

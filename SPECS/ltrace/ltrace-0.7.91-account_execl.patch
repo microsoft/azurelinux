@@ -1,0 +1,834 @@
+From 0cf4ab66e9927e101a51dd9fa9adc6c8dc56b5e7 Mon Sep 17 00:00:00 2001
+From: Petr Machata <pmachata@redhat.com>
+Date: Thu, 21 Nov 2013 20:25:53 +0100
+Subject: [PATCH] Consider exec and exit events an end of outstanding calls
+
+- This cleans up a lot of stuff.  The actual substance is addition of
+  account_current_callstack in handle_event.c (which however uses
+  those cleaned-up interfaces).
+
+- trace-exec.exp was extended to check that the exec syscall can be
+  seen in -c output.  That's one of the symptoms of what this fixes.
+---
+ Makefile.am                           |    8 +-
+ common.h                              |    2 -
+ forward.h                             |    1 +
+ handle_event.c                        |  225 ++++++++++++++++++++-------------
+ libltrace.c                           |    5 +-
+ options.h                             |    8 +-
+ output.c                              |   86 +++----------
+ output.h                              |    5 +-
+ proc.h                                |    2 +-
+ summary.c                             |   89 +++++++++++++-
+ summary.h                             |   35 +++++
+ testsuite/ltrace.minor/trace-exec.exp |   16 ++-
+ 12 files changed, 299 insertions(+), 183 deletions(-)
+ create mode 100644 summary.h
+
+diff --git a/Makefile.am b/Makefile.am
+index d711aec..efcf18a 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -54,10 +54,10 @@ ltrace_LDADD = \
+ 
+ noinst_HEADERS = bits.h backend.h breakpoint.h common.h debug.h		\
+ 	defs.h demangle.h dict.h forward.h ltrace-elf.h ltrace.h	\
+-	options.h output.h proc.h read_config_file.h library.h		\
+-	filter.h glob.h vect.h type.h value.h value_dict.h callback.h	\
+-	expr.h fetch.h vect.h param.h printf.h zero.h lens.h		\
+-	lens_default.h lens_enum.h memstream.h prototype.h
++	options.h output.h proc.h read_config_file.h summary.h		\
++	library.h filter.h glob.h vect.h type.h value.h value_dict.h	\
++	callback.h expr.h fetch.h vect.h param.h printf.h zero.h	\
++	lens.h lens_default.h lens_enum.h memstream.h prototype.h
+ 
+ dist_man1_MANS = ltrace.1
+ dist_man5_MANS = ltrace.conf.5
+diff --git a/common.h b/common.h
+index a53c5db..7259ba4 100644
+--- a/common.h
++++ b/common.h
+@@ -54,8 +54,6 @@ extern void handle_event(Event * event);
+ 
+ extern pid_t execute_program(const char * command, char ** argv);
+ 
+-extern void show_summary(void);
+-
+ struct breakpoint;
+ struct library_symbol;
+ 
+diff --git a/forward.h b/forward.h
+index 8641213..58d8f05 100644
+--- a/forward.h
++++ b/forward.h
+@@ -34,6 +34,7 @@ struct param_enum;
+ struct process;
+ struct protolib;
+ struct prototype;
++struct timedelta;
+ struct value;
+ struct value_dict;
+ struct vect;
+diff --git a/handle_event.c b/handle_event.c
+index 9ed62a2..6fa7e98 100644
+--- a/handle_event.c
++++ b/handle_event.c
+@@ -32,7 +32,6 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+-#include <sys/time.h>
+ #include <stdbool.h>
+ 
+ #include "backend.h"
+@@ -41,8 +40,9 @@
+ #include "fetch.h"
+ #include "library.h"
+ #include "proc.h"
+-#include "value_dict.h"
+ #include "prototype.h"
++#include "summary.h"
++#include "value_dict.h"
+ 
+ static void handle_signal(Event *event);
+ static void handle_exit(Event *event);
+@@ -419,32 +419,11 @@ handle_signal(Event *event) {
+ 	continue_after_signal(event->proc->pid, event->e_un.signum);
+ }
+ 
+-static void
+-handle_exit(Event *event) {
+-	debug(DEBUG_FUNCTION, "handle_exit(pid=%d, status=%d)", event->proc->pid, event->e_un.ret_val);
+-	if (event->proc->state != STATE_IGNORED) {
+-		output_line(event->proc, "+++ exited (status %d) +++",
+-				event->e_un.ret_val);
+-	}
+-	remove_process(event->proc);
+-}
+-
+-static void
+-handle_exit_signal(Event *event) {
+-	debug(DEBUG_FUNCTION, "handle_exit_signal(pid=%d, signum=%d)", event->proc->pid, event->e_un.signum);
+-	if (event->proc->state != STATE_IGNORED) {
+-		output_line(event->proc, "+++ killed by %s +++",
+-				shortsignal(event->proc, event->e_un.signum));
+-	}
+-	remove_process(event->proc);
+-}
+-
+-static void
+-output_syscall(struct process *proc, const char *name, enum tof tof,
+-	       void (*output)(enum tof, struct process *,
+-			      struct library_symbol *))
++static int
++init_syscall_symbol(struct library_symbol *libsym, const char *name)
+ {
+ 	static struct library syscall_lib;
++
+ 	if (syscall_lib.protolib == NULL) {
+ 		struct protolib *protolib
+ 			= protolib_cache_load(&g_protocache, "syscalls", 0, 1);
+@@ -475,10 +454,91 @@ output_syscall(struct process *proc, const char *name, enum tof tof,
+ 		syscall_lib.protolib = protolib;
+ 	}
+ 
++	if (library_symbol_init(libsym, 0, name, 0, LS_TOPLT_NONE) < 0)
++		return -1;
++
++	libsym->lib = &syscall_lib;
++	return 0;
++}
++
++/* Account the unfinished functions on the call stack.  */
++static void
++account_current_callstack(struct process *proc)
++{
++	if (! options.summary)
++		return;
++
++	struct timedelta spent[proc->callstack_depth];
++
++	size_t i;
++	for (i = 0; i < proc->callstack_depth; ++i) {
++		struct callstack_element *elem = &proc->callstack[i];
++		spent[i] = calc_time_spent(elem->enter_time);
++	}
++
++	for (i = 0; i < proc->callstack_depth; ++i) {
++		struct callstack_element *elem = &proc->callstack[i];
++		struct library_symbol syscall, *libsym = NULL;
++		if (elem->is_syscall) {
++			const char *name = sysname(proc, elem->c_un.syscall);
++			if (init_syscall_symbol(&syscall, name) >= 0)
++				libsym = &syscall;
++
++		} else {
++			libsym = elem->c_un.libfunc;
++		}
++
++		if (libsym != NULL) {
++			summary_account_call(libsym, spent[i]);
++
++			if (elem->is_syscall)
++				library_symbol_destroy(&syscall);
++		}
++	}
++}
++
++static void
++handle_exit(Event *event) {
++	debug(DEBUG_FUNCTION, "handle_exit(pid=%d, status=%d)", event->proc->pid, event->e_un.ret_val);
++	if (event->proc->state != STATE_IGNORED) {
++		output_line(event->proc, "+++ exited (status %d) +++",
++				event->e_un.ret_val);
++	}
++
++	account_current_callstack(event->proc);
++	remove_process(event->proc);
++}
++
++static void
++handle_exit_signal(Event *event) {
++	debug(DEBUG_FUNCTION, "handle_exit_signal(pid=%d, signum=%d)", event->proc->pid, event->e_un.signum);
++	if (event->proc->state != STATE_IGNORED) {
++		output_line(event->proc, "+++ killed by %s +++",
++				shortsignal(event->proc, event->e_un.signum));
++	}
++
++	account_current_callstack(event->proc);
++	remove_process(event->proc);
++}
++
++static void
++output_syscall(struct process *proc, const char *name, enum tof tof,
++	       bool left, struct timedelta *spent)
++{
++	if (left)
++		assert(spent == NULL);
++
+ 	struct library_symbol syscall;
+-	if (library_symbol_init(&syscall, 0, name, 0, LS_TOPLT_NONE) >= 0) {
+-		syscall.lib = &syscall_lib;
+-		(*output)(tof, proc, &syscall);
++	if (init_syscall_symbol(&syscall, name) >= 0) {
++		if (left) {
++			if (! options.summary)
++				output_left(tof, proc, &syscall);
++		} else if (options.summary) {
++			summary_account_call(&syscall, *spent);
++		} else {
++			output_right(tof, proc, &syscall, spent);
++		}
++
+ 		library_symbol_destroy(&syscall);
+ 	}
+ }
+@@ -486,17 +546,19 @@ output_syscall(struct process *proc, const char *name, enum tof tof,
+ static void
+ output_syscall_left(struct process *proc, const char *name)
+ {
+-	output_syscall(proc, name, LT_TOF_SYSCALL, &output_left);
++	output_syscall(proc, name, LT_TOF_SYSCALL, true, NULL);
+ }
+ 
+ static void
+-output_syscall_right(struct process *proc, const char *name)
++output_syscall_right(struct process *proc, const char *name,
++		     struct timedelta *spent)
+ {
+-	output_syscall(proc, name, LT_TOF_SYSCALLR, &output_right);
++	output_syscall(proc, name, LT_TOF_SYSCALLR, false, spent);
+ }
+ 
+ static void
+-handle_syscall(Event *event) {
++handle_syscall(Event *event)
++{
+ 	debug(DEBUG_FUNCTION, "handle_syscall(pid=%d, sysnum=%d)", event->proc->pid, event->e_un.sysnum);
+ 	if (event->proc->state != STATE_IGNORED) {
+ 		callstack_push_syscall(event->proc, event->e_un.sysnum);
+@@ -526,6 +588,8 @@ handle_exec(Event *event)
+ 	}
+ 	output_line(proc, "--- Called exec() ---");
+ 
++	account_current_callstack(proc);
++
+ 	if (process_exec(proc) < 0) {
+ 		fprintf(stderr,
+ 			"couldn't reinitialize process %d after exec\n", pid);
+@@ -549,74 +613,58 @@ handle_arch_syscall(Event *event) {
+ 	continue_process(event->proc->pid);
+ }
+ 
+-struct timeval current_time_spent;
+-
+ static void
+-calc_time_spent(struct process *proc)
++handle_x_sysret(Event *event, char *(*name_cb)(struct process *, int))
+ {
+-	struct timeval tv;
+-	struct timezone tz;
+-	struct timeval diff;
+-	struct callstack_element *elem;
+-
+-	debug(DEBUG_FUNCTION, "calc_time_spent(pid=%d)", proc->pid);
+-	elem = &proc->callstack[proc->callstack_depth - 1];
+-
+-	gettimeofday(&tv, &tz);
++	debug(DEBUG_FUNCTION, "handle_x_sysret(pid=%d, sysnum=%d)",
++	      event->proc->pid, event->e_un.sysnum);
+ 
+-	diff.tv_sec = tv.tv_sec - elem->time_spent.tv_sec;
+-	if (tv.tv_usec >= elem->time_spent.tv_usec) {
+-		diff.tv_usec = tv.tv_usec - elem->time_spent.tv_usec;
+-	} else {
+-		diff.tv_sec--;
+-		diff.tv_usec = 1000000 + tv.tv_usec - elem->time_spent.tv_usec;
+-	}
+-	current_time_spent = diff;
+-}
++	unsigned d = event->proc->callstack_depth;
++	assert(d > 0);
++	struct callstack_element *elem = &event->proc->callstack[d - 1];
++	assert(elem->is_syscall);
+ 
+-static void
+-handle_sysret(Event *event) {
+-	debug(DEBUG_FUNCTION, "handle_sysret(pid=%d, sysnum=%d)", event->proc->pid, event->e_un.sysnum);
+ 	if (event->proc->state != STATE_IGNORED) {
+-		if (opt_T || options.summary) {
+-			calc_time_spent(event->proc);
+-		}
++		struct timedelta spent = calc_time_spent(elem->enter_time);
+ 		if (options.syscalls)
+ 			output_syscall_right(event->proc,
+-					     sysname(event->proc,
+-						     event->e_un.sysnum));
++					     name_cb(event->proc,
++						     event->e_un.sysnum),
++					     &spent);
+ 
+-		assert(event->proc->callstack_depth > 0);
+-		unsigned d = event->proc->callstack_depth - 1;
+-		assert(event->proc->callstack[d].is_syscall);
+ 		callstack_pop(event->proc);
+ 	}
+ 	continue_after_syscall(event->proc, event->e_un.sysnum, 1);
+ }
+ 
+ static void
+-handle_arch_sysret(Event *event) {
+-	debug(DEBUG_FUNCTION, "handle_arch_sysret(pid=%d, sysnum=%d)", event->proc->pid, event->e_un.sysnum);
+-	if (event->proc->state != STATE_IGNORED) {
+-		if (opt_T || options.summary) {
+-			calc_time_spent(event->proc);
+-		}
+-		if (options.syscalls)
+-			output_syscall_right(event->proc,
+-					     arch_sysname(event->proc,
+-							  event->e_un.sysnum));
+-		callstack_pop(event->proc);
+-	}
+-	continue_process(event->proc->pid);
++handle_sysret(Event *event)
++{
++	handle_x_sysret(event, &sysname);
++}
++
++static void
++handle_arch_sysret(Event *event)
++{
++	handle_x_sysret(event, &arch_sysname);
+ }
+ 
+ static void
+ output_right_tos(struct process *proc)
+ {
+ 	size_t d = proc->callstack_depth;
++	assert(d > 0);
+ 	struct callstack_element *elem = &proc->callstack[d - 1];
+-	if (proc->state != STATE_IGNORED)
+-		output_right(LT_TOF_FUNCTIONR, proc, elem->c_un.libfunc);
++	assert(! elem->is_syscall);
++
++	if (proc->state != STATE_IGNORED) {
++		struct timedelta spent = calc_time_spent(elem->enter_time);
++		if (options.summary)
++			summary_account_call(elem->c_un.libfunc, spent);
++		else
++			output_right(LT_TOF_FUNCTIONR, proc, elem->c_un.libfunc,
++				     &spent);
++	}
+ }
+ 
+ #ifndef ARCH_HAVE_SYMBOL_RET
+@@ -645,14 +693,8 @@ handle_breakpoint(Event *event)
+ 
+ 	for (i = event->proc->callstack_depth - 1; i >= 0; i--) {
+ 		if (brk_addr == event->proc->callstack[i].return_addr) {
+-			for (j = event->proc->callstack_depth - 1; j > i; j--) {
++			for (j = event->proc->callstack_depth - 1; j > i; j--)
+ 				callstack_pop(event->proc);
+-			}
+-			if (event->proc->state != STATE_IGNORED) {
+-				if (opt_T || options.summary) {
+-					calc_time_spent(event->proc);
+-				}
+-			}
+ 
+ 			struct library_symbol *libsym =
+ 			    event->proc->callstack[i].c_un.libfunc;
+@@ -705,11 +747,14 @@ handle_breakpoint(Event *event)
+ 	/* breakpoint_on_hit may delete its own breakpoint, so we have
+ 	 * to look it up again.  */
+ 	if ((sbp = address2bpstruct(leader, brk_addr)) != NULL) {
++
+ 		if (event->proc->state != STATE_IGNORED
+ 		    && sbp->libsym != NULL) {
+ 			event->proc->stack_pointer = get_stack_pointer(event->proc);
+ 			callstack_push_symfunc(event->proc, sbp);
+-			output_left(LT_TOF_FUNCTION, event->proc, sbp->libsym);
++			if (! options.summary)
++				output_left(LT_TOF_FUNCTION, event->proc,
++					    sbp->libsym);
+ 		}
+ 
+ 		breakpoint_on_continue(sbp, event->proc);
+@@ -743,7 +788,7 @@ callstack_push_syscall(struct process *proc, int sysnum)
+ 	proc->callstack_depth++;
+ 	if (opt_T || options.summary) {
+ 		struct timezone tz;
+-		gettimeofday(&elem->time_spent, &tz);
++		gettimeofday(&elem->enter_time, &tz);
+ 	}
+ }
+ 
+@@ -781,7 +826,7 @@ callstack_push_symfunc(struct process *proc, struct breakpoint *bp)
+ 
+ 	if (opt_T || options.summary) {
+ 		struct timezone tz;
+-		gettimeofday(&elem->time_spent, &tz);
++		gettimeofday(&elem->enter_time, &tz);
+ 	}
+ }
+ 
+diff --git a/libltrace.c b/libltrace.c
+index 2d910a1..0112c9f 100644
+--- a/libltrace.c
++++ b/libltrace.c
+@@ -32,11 +32,12 @@
+ #include <string.h>
+ #include <unistd.h>
+ 
++#include "backend.h"
+ #include "common.h"
+ #include "proc.h"
+-#include "read_config_file.h"
+-#include "backend.h"
+ #include "prototype.h"
++#include "read_config_file.h"
++#include "summary.h"
+ 
+ char *command = NULL;
+ 
+diff --git a/options.h b/options.h
+index 6c28ed9..d0df3a7 100644
+--- a/options.h
++++ b/options.h
+@@ -1,6 +1,6 @@
+ /*
+  * This file is part of ltrace.
+- * Copyright (C) 2012 Petr Machata, Red Hat Inc.
++ * Copyright (C) 2012,2013 Petr Machata, Red Hat Inc.
+  * Copyright (C) 2009,2010 Joe Damato
+  * Copyright (C) 1998,2002,2008 Juan Cespedes
+  * Copyright (C) 2006 Ian Wienand
+@@ -103,12 +103,6 @@ int parse_colon_separated_list(const char *paths, struct vect *vec);
+ /* Vector of struct opt_F_t.  */
+ extern struct vect opt_F;
+ 
+-struct opt_c_struct {
+-	int count;
+-	struct timeval tv;
+-};
+-extern struct dict *dict_opt_c;
+-
+ extern char **process_options(int argc, char **argv);
+ 
+ #endif /* _OPTIONS_H_ */
+diff --git a/output.c b/output.c
+index edf4522..82b6a5e 100644
+--- a/output.c
++++ b/output.c
+@@ -44,16 +44,12 @@
+ #include "param.h"
+ #include "proc.h"
+ #include "prototype.h"
++#include "summary.h"
+ #include "type.h"
+ #include "value.h"
+ #include "value_dict.h"
+ 
+-/* TODO FIXME XXX: include in common.h: */
+-extern struct timeval current_time_spent;
+-
+-struct dict *dict_opt_c = NULL;
+-
+-static struct process *current_proc = 0;
++static struct process *current_proc = NULL;
+ static size_t current_depth = 0;
+ static int current_column = 0;
+ 
+@@ -498,9 +494,8 @@ void
+ output_left(enum tof type, struct process *proc,
+ 	    struct library_symbol *libsym)
+ {
+-	if (options.summary) {
+-		return;
+-	}
++	assert(! options.summary);
++
+ 	if (current_proc) {
+ 		fprintf(options.output, " <unfinished ...>\n");
+ 		current_column = 0;
+@@ -572,70 +567,21 @@ output_left(enum tof type, struct process *proc,
+ 	stel->out.need_delim = need_delim;
+ }
+ 
+-static void
+-free_stringp_cb(const char **stringp, void *data)
+-{
+-	free((char *)*stringp);
+-}
+-
+ void
+-output_right(enum tof type, struct process *proc, struct library_symbol *libsym)
++output_right(enum tof type, struct process *proc, struct library_symbol *libsym,
++	     struct timedelta *spent)
+ {
++	assert(! options.summary);
++
+ 	struct prototype *func = lookup_symbol_prototype(proc, libsym);
+ 	if (func == NULL)
+ 		return;
+ 
+-again:
+-	if (options.summary) {
+-		if (dict_opt_c == NULL) {
+-			dict_opt_c = malloc(sizeof(*dict_opt_c));
+-			if (dict_opt_c == NULL) {
+-			oom:
+-				fprintf(stderr,
+-					"Can't allocate memory for "
+-					"keeping track of -c.\n");
+-				free(dict_opt_c);
+-				options.summary = 0;
+-				goto again;
+-			}
+-			DICT_INIT(dict_opt_c, char *, struct opt_c_struct,
+-				  dict_hash_string, dict_eq_string, NULL);
+-		}
+-
+-		struct opt_c_struct *st
+-			= DICT_FIND_REF(dict_opt_c, &libsym->name,
+-					struct opt_c_struct);
+-		if (st == NULL) {
+-			const char *na = strdup(libsym->name);
+-			struct opt_c_struct new_st = {.count = 0, .tv = {0, 0}};
+-			if (na == NULL
+-			    || DICT_INSERT(dict_opt_c, &na, &new_st) < 0) {
+-				free((char *)na);
+-				DICT_DESTROY(dict_opt_c, const char *,
+-					     struct opt_c_struct,
+-					     free_stringp_cb, NULL, NULL);
+-				goto oom;
+-			}
+-			st = DICT_FIND_REF(dict_opt_c, &libsym->name,
+-					   struct opt_c_struct);
+-			assert(st != NULL);
+-		}
+-
+-		if (st->tv.tv_usec + current_time_spent.tv_usec > 1000000) {
+-			st->tv.tv_usec += current_time_spent.tv_usec - 1000000;
+-			st->tv.tv_sec++;
+-		} else {
+-			st->tv.tv_usec += current_time_spent.tv_usec;
+-		}
+-		st->count++;
+-		st->tv.tv_sec += current_time_spent.tv_sec;
+-		return;
+-	}
+-
+-	if (current_proc && (current_proc != proc ||
+-			    current_depth != proc->callstack_depth)) {
++	if (current_proc != NULL
++		    && (current_proc != proc
++			|| current_depth != proc->callstack_depth)) {
+ 		fprintf(options.output, " <unfinished ...>\n");
+-		current_proc = 0;
++		current_proc = NULL;
+ 	}
+ 	if (current_proc != proc) {
+ 		begin_of_line(proc, type == LT_TOF_FUNCTIONR, 1);
+@@ -689,10 +635,12 @@ again:
+ 		value_destroy(&retval);
+ 
+ 	if (opt_T) {
++		assert(spent != NULL);
+ 		fprintf(options.output, " <%lu.%06d>",
+-			(unsigned long)current_time_spent.tv_sec,
+-			(int)current_time_spent.tv_usec);
++			(unsigned long) spent->tm.tv_sec,
++			(int) spent->tm.tv_usec);
+ 	}
++
+ 	fprintf(options.output, "\n");
+ 
+ #if defined(HAVE_LIBUNWIND)
+@@ -746,7 +694,7 @@ again:
+ 	}
+ #endif /* defined(HAVE_LIBUNWIND) */
+ 
+-	current_proc = 0;
++	current_proc = NULL;
+ 	current_column = 0;
+ }
+ 
+diff --git a/output.h b/output.h
+index b9f0518..2e74d61 100644
+--- a/output.h
++++ b/output.h
+@@ -1,6 +1,6 @@
+ /*
+  * This file is part of ltrace.
+- * Copyright (C) 2011, 2012 Petr Machata, Red Hat Inc.
++ * Copyright (C) 2011, 2012, 2013 Petr Machata, Red Hat Inc.
+  * Copyright (C) 2009 Juan Cespedes
+  *
+  * This program is free software; you can redistribute it and/or
+@@ -28,7 +28,8 @@ void output_line(struct process *proc, const char *fmt, ...);
+ void output_left(enum tof type, struct process *proc,
+ 		 struct library_symbol *libsym);
+ void output_right(enum tof type, struct process *proc,
+-		  struct library_symbol *libsym);
++		  struct library_symbol *libsym,
++		  struct timedelta *spent);
+ 
+ /* This function is for emitting lists of comma-separated strings.
+  *
+diff --git a/proc.h b/proc.h
+index e8032fa..64f8fe2 100644
+--- a/proc.h
++++ b/proc.h
+@@ -66,7 +66,7 @@ struct callstack_element {
+ 	} c_un;
+ 	int is_syscall;
+ 	arch_addr_t return_addr;
+-	struct timeval time_spent;
++	struct timeval enter_time;
+ 	struct fetch_context *fetch_context;
+ 	struct value_dict *arguments;
+ 	struct output_state out;
+diff --git a/summary.c b/summary.c
+index 9e22086..9103f71 100644
+--- a/summary.c
++++ b/summary.c
+@@ -22,11 +22,15 @@
+ 
+ #include "config.h"
+ 
++#include <sys/time.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+-#include <sys/time.h>
++#include <string.h>
+ 
+-#include "common.h"
++#include "summary.h"
++#include "dict.h"
++#include "library.h"
++#include "options.h"
+ 
+ struct entry_st {
+ 	const char *name;
+@@ -40,6 +44,32 @@ struct fill_struct_data {
+ 	unsigned long tot_usecs;
+ };
+ 
++struct opt_c_struct {
++	int count;
++	struct timeval tv;
++};
++
++static struct dict *dict_opt_c;
++
++struct timedelta
++calc_time_spent(struct timeval start)
++{
++	struct timeval tv;
++	gettimeofday(&tv, NULL);
++
++	struct timeval diff;
++	diff.tv_sec = tv.tv_sec - start.tv_sec;
++	if (tv.tv_usec >= start.tv_usec) {
++		diff.tv_usec = tv.tv_usec - start.tv_usec;
++	} else {
++		diff.tv_sec--;
++		diff.tv_usec = 1000000 + tv.tv_usec - start.tv_usec;
++	}
++
++	struct timedelta ret = { diff };
++	return ret;
++}
++
+ static enum callback_status
+ fill_struct(const char **namep, struct opt_c_struct *st, void *u)
+ {
+@@ -114,3 +144,58 @@ show_summary(void)
+ 
+ 	vect_destroy(&cdata.entries, NULL, NULL);
+ }
++
++static void
++free_stringp_cb(const char **stringp, void *data)
++{
++	free((char *)*stringp);
++}
++
++void
++summary_account_call(struct library_symbol *libsym, struct timedelta spent)
++{
++	assert(options.summary);
++
++	if (dict_opt_c == NULL) {
++		dict_opt_c = malloc(sizeof(*dict_opt_c));
++		if (dict_opt_c == NULL) {
++		oom:
++			fprintf(stderr,
++				"Can't allocate memory for "
++				"keeping track of -c.\n");
++			free(dict_opt_c);
++			options.summary = 0;
++			return;
++		}
++		DICT_INIT(dict_opt_c, char *, struct opt_c_struct,
++			  dict_hash_string, dict_eq_string, NULL);
++	}
++
++	struct opt_c_struct *st = DICT_FIND_REF(dict_opt_c, &libsym->name,
++						struct opt_c_struct);
++	if (st == NULL) {
++		const char *na = strdup(libsym->name);
++		struct opt_c_struct new_st = {.count = 0, .tv = {0, 0}};
++		if (na == NULL
++		    || DICT_INSERT(dict_opt_c, &na, &new_st) < 0) {
++			free((char *) na);
++			DICT_DESTROY(dict_opt_c, const char *,
++				     struct opt_c_struct,
++				     free_stringp_cb, NULL, NULL);
++			goto oom;
++		}
++		st = DICT_FIND_REF(dict_opt_c, &libsym->name,
++				   struct opt_c_struct);
++		assert(st != NULL);
++	}
++
++	if (st->tv.tv_usec + spent.tm.tv_usec > 1000000) {
++		st->tv.tv_usec += spent.tm.tv_usec - 1000000;
++		st->tv.tv_sec++;
++	} else {
++		st->tv.tv_usec += spent.tm.tv_usec;
++	}
++	st->count++;
++	st->tv.tv_sec += spent.tm.tv_sec;
++	return;
++}
+diff --git a/summary.h b/summary.h
+new file mode 100644
+index 0000000..f680ef9
+--- /dev/null
++++ b/summary.h
+@@ -0,0 +1,35 @@
++/*
++ * This file is part of ltrace.
++ * Copyright (C) 2013 Petr Machata, Red Hat Inc.
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
++ * 02110-1301 USA
++ */
++
++#ifndef _SUMMARY_H_
++#define _SUMMARY_H_
++
++#include "forward.h"
++
++struct timedelta {
++	struct timeval tm;
++};
++
++struct timedelta calc_time_spent(struct timeval start);
++void summary_account_call(struct library_symbol *libsym,
++			  struct timedelta spent);
++void show_summary(void);
++
++#endif /* _SUMMARY_H_ */
+diff --git a/testsuite/ltrace.minor/trace-exec.exp b/testsuite/ltrace.minor/trace-exec.exp
+index 7a953de..57260f8 100644
+--- a/testsuite/ltrace.minor/trace-exec.exp
++++ b/testsuite/ltrace.minor/trace-exec.exp
+@@ -1,5 +1,5 @@
+ # This file is part of ltrace.
+-# Copyright (C) 2012 Petr Machata, Red Hat Inc.
++# Copyright (C) 2012, 2013 Petr Machata, Red Hat Inc.
+ #
+ # This program is free software; you can redistribute it and/or
+ # modify it under the terms of the GNU General Public License as
+@@ -16,22 +16,30 @@
+ # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ # 02110-1301 USA
+ 
+-ltraceMatch [ltraceRun -xmain -- [ltraceCompile {} [ltraceSource c {
++set bin1 [ltraceCompile {} [ltraceSource c {
+     #include <unistd.h>
+     #include <stdlib.h>
+     int main(int argc, char ** argv) {
+ 	execl(argv[1], argv[1], NULL);
+ 	abort();
+     }
+-}]] [ltraceCompile {} [ltraceSource c {
++}]]
++
++set bin2 [ltraceCompile {} [ltraceSource c {
+     #include <stdio.h>
+     int main(void) {
+ 	return puts("Hello, World.");
+     }
+-}]]] {
++}]]
++
++ltraceMatch [ltraceRun -xmain -- $bin1 $bin2] {
+     {{^execl\(} == 1}
+     {{^puts\(.*\) .*= 14} == 1}
+     {{^main\(} == 2}
+ }
+ 
++ltraceMatch [ltraceRun -c -- $bin1 $bin2] {
++    {{exec} > 0}
++}
++
+ ltraceDone
+-- 
+1.7.6.5
+

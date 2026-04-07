@@ -1,0 +1,13 @@
+[Unit]
+Description=Simple Network Management Protocol (SNMP) Trap Daemon.
+After=syslog.target network-online.target
+
+[Service]
+Type=notify
+Environment=OPTIONS="-Lsd"
+EnvironmentFile=-/etc/sysconfig/snmptrapd
+ExecStart=/usr/sbin/snmptrapd $OPTIONS -f
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,35 @@
+From 567d4ab44bbdd3c87aa58126208485d82413bff7 Mon Sep 17 00:00:00 2001
+From: Peter Hutterer <peter.hutterer@who-t.net>
+Date: Mon, 15 Jul 2024 09:52:07 +1000
+Subject: [PATCH] meson.build: pass the target dir as arg instead of an env
+
+Shouldn't have any functional changes but seem more expressive.
+
+Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+---
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index 23ed622f2253..f17e835e7a8a 100644
+--- a/meson.build
++++ b/meson.build
+@@ -38,6 +38,7 @@ use_bpf_tracing = get_option('bpf-tracing')
+ 
+ cargo_options = [
+     '--manifest-path', meson.project_source_root() / 'Cargo.toml',
++    '--target-dir', meson.project_build_root(),
+ ]
+ 
+ if get_option('buildtype') == 'release'
+@@ -57,7 +58,6 @@ cargo_env = {
+     'MESON_BUILD': '1',
+     'MESON_BINDIR': bindir,
+     'CARGO_HOME': meson.project_build_root() / 'cargo-home',
+-    'CARGO_TARGET_DIR': meson.project_build_root(),
+     'BPF_SOURCE_ROOT': meson.project_source_root(),
+     'BPF_INSTALL_DIR': bpfdir,
+     'BPF_LOOKUP_DIRS': lookup_bpfdirs,
+-- 
+2.45.2
+

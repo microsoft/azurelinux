@@ -1,0 +1,62 @@
+#!/bin/sh
+#
+# net-snmp-config
+#
+# this shell script is designed to merely dump the configuration
+# information about how the net-snmp package was compiled.  The
+# information is particularily useful for applications that need to
+# link against the net-snmp libraries and hence must know about any
+# other libraries that must be linked in as well.
+
+# this particular shell script calls arch specific script to avoid
+# multilib conflicts
+
+# Supported arches ix86 ia64 ppc ppc64 s390 s390x x86_64 alpha sparc sparc64
+
+arch=`arch`
+echo $arch | grep -q i.86
+if [ $? -eq 0 ] ; then
+    net-snmp-config-i386 "$@"
+    exit 0
+fi
+if [ "$arch" = "ia64" ] ; then
+    net-snmp-config-ia64 "$@"
+    exit 0
+fi
+if [ "$arch" = "ppc" ] ; then
+    net-snmp-config-ppc "$@"
+    exit 0
+fi
+if [ "$arch" = "ppc64" ] ; then
+    net-snmp-config-ppc64 "$@"
+    exit 0
+fi
+if [ "$arch" = "s390" ] ; then
+    net-snmp-config-s390 "$@"
+    exit 0
+fi
+if [ "$arch" = "s390x" ] ; then
+    net-snmp-config-s390x "$@"
+    exit 0
+fi
+if [ "$arch" = "x86_64" ] ; then
+    net-snmp-config-x86_64 "$@"
+    exit 0
+fi
+if [ "$arch" = "alpha" ] ; then
+    net-snmp-config-alpha "$@"
+    exit 0
+fi
+if [ "$arch" = "sparc" ] ; then
+    net-snmp-config-sparc "$@"
+    exit 0
+fi
+if [ "$arch" = "sparc64" ] ; then
+    net-snmp-config-sparc64 "$@"
+    exit 0
+fi
+if [ "$arch" = "aarch64" ] ; then
+    net-snmp-config-aarch64 "$@"
+    exit 0
+fi
+echo "Cannot determine architecture"

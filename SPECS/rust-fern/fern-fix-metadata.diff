@@ -1,0 +1,23 @@
+--- fern-0.7.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ fern-0.7.1/Cargo.toml	2025-01-04T15:29:27.217591+00:00
+@@ -51,10 +51,6 @@
+ path = "src/lib.rs"
+ 
+ [[example]]
+-name = "cmd-program"
+-path = "examples/cmd-program.rs"
+-
+-[[example]]
+ name = "colored"
+ path = "examples/colored.rs"
+ required-features = ["colored"]
+@@ -145,9 +141,6 @@
+ [dependencies.log]
+ version = "0.4"
+ features = ["std"]
+-
+-[dev-dependencies.clap]
+-version = "2.22"
+ 
+ [dev-dependencies.humantime]
+ version = "2.1.0"

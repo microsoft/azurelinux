@@ -1,0 +1,11 @@
+--- linux-atm/src/ilmid/Makefile.am~	2007-07-11 17:07:57.000000000 +0100
++++ linux-atm/src/ilmid/Makefile.am	2007-08-23 09:22:45.000000000 +0100
+@@ -2,7 +2,7 @@ SUBDIRS = asn1
+ 
+ INCLUDES = -I$(srcdir)/../ilmid/asn1
+ 
+-sbin_PROGRAMS = ilmid ilmidiag
++sbin_PROGRAMS = ilmid
+ 
+ ilmid_SOURCES = rfc1157_snmp.c rfc1157_snmp.h rfc1155_smi.c rfc1155_smi.h \
+ 			util.c util.h io.c io.h message.c message.h \

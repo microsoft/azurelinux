@@ -1,0 +1,6 @@
+diff -urNp a/dist/autoconf-version b/dist/autoconf-version
+--- a/dist/autoconf-version	2024-02-16 08:21:36.551729028 +0100
++++ b/dist/autoconf-version	2024-02-16 08:24:39.035608191 +0100
+@@ -1 +1 @@
+-2.71
++2.72

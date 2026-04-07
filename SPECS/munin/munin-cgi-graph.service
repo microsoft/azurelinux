@@ -1,0 +1,8 @@
+[Unit]
+Description=Munin FastCGI Graphs Service
+Requires=munin-cgi-graph.socket
+
+[Service]
+User=munin
+ExecStart=/var/www/html/munin/cgi/munin-cgi-graph
+StandardInput=socket

@@ -1,0 +1,74 @@
+From 76a6604302bc45e77b701d21831d9b97d770fbdc Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Tue, 27 Jan 2026 11:45:01 +0000
+Subject: [PATCH 400/404] service: sanitize paths to all resources
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Look for SSL cert config in /etc/pccs/ssl
+Look for DB migrations in /usr/share/pccs
+Use log file in /var/log/pccs
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ service/pccs_server.js   | 4 ++--
+ service/utils/Logger.js  | 2 +-
+ service/utils/apputil.js | 6 +++---
+ 3 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/service/pccs_server.js b/service/pccs_server.js
+index 363f74d..caa693e 100644
+--- a/service/pccs_server.js
++++ b/service/pccs_server.js
+@@ -129,8 +129,8 @@ function startHttpsServer() {
+   let privateKey;
+   let certificate;
+   try {
+-    privateKey = fs.readFileSync('./ssl_key/private.pem', 'utf8');
+-    certificate = fs.readFileSync('./ssl_key/file.crt', 'utf8');
++    privateKey = fs.readFileSync('/etc/pccs/ssl/server-key.pem', 'utf8');
++    certificate = fs.readFileSync('/etc/pccs/ssl/server-cert.pem', 'utf8');
+   } catch (err) {
+     logger.error('The private key or certificate for HTTPS server is missing.');
+     logger.endAndExitProcess();
+diff --git a/service/utils/Logger.js b/service/utils/Logger.js
+index e011539..82125ed 100644
+--- a/service/utils/Logger.js
++++ b/service/utils/Logger.js
+@@ -51,7 +51,7 @@ export function formatLogMessage (tokens, req, res) {
+ const options = {
+   file: {
+     level: Config.has('LogLevel') ? Config.get('LogLevel') : 'info',
+-    filename: __dirname + `/../logs/pccs_server.log`,
++    filename: `/var/log/pccs/pccs_server.log`,
+     handleExceptions: true,
+     json: false,
+     colorize: true,
+diff --git a/service/utils/apputil.js b/service/utils/apputil.js
+index 6f910ee..6eb9d15 100644
+--- a/service/utils/apputil.js
++++ b/service/utils/apputil.js
+@@ -84,8 +84,8 @@ async function test_db_status() {
+ }
+ 
+ async function db_migration() {
+-  const migrations = fs.readdirSync('./migrations').map(name => {
+-    const path = `./migrations/${name}`;
++  const migrations = fs.readdirSync('/usr/lib/node_modules/pccs/migrations').map(name => {
++    const path = `/usr/lib/node_modules/pccs/migrations/${name}`;
+ 
+     return {
+       name,
+@@ -126,7 +126,7 @@ async function db_migration() {
+   
+   const umzug = new Umzug({
+     migrations: {
+-      glob: './migrations/*.{js,up.sql}',
++      glob: '/usr/lib/node_modules/pccs/migrations/*.{js,up.sql}',
+       resolve: ({ name }) => {
+         const migration = migrations.find(migration => migration.name === name);
+         logger.debug(`Resolving migration: ${name}, found: ${migration ? migration.name : 'none'}`);
+-- 
+2.52.0
+

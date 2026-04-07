@@ -1,0 +1,28 @@
+diff -urN libxslt-1.1.32/libxslt/xsltconfig.h.in libxslt-1.1.32.completemultilib/libxslt/xsltconfig.h.in
+--- libxslt-1.1.32/libxslt/xsltconfig.h.in	2017-10-26 07:55:47.000000000 +0000
++++ libxslt-1.1.32.completemultilib/libxslt/xsltconfig.h.in	2019-05-06 11:35:57.948191169 +0000
+@@ -120,7 +120,11 @@
+ #ifndef WITH_MODULES
+ #define WITH_MODULES
+ #endif
+-#define LIBXSLT_DEFAULT_PLUGINS_PATH() "@LIBXSLT_DEFAULT_PLUGINS_PATH@"
++#ifdef __LP64__
++#define LIBXSLT_DEFAULT_PLUGINS_PATH() "/usr/lib64/libxslt-plugins"
++#else
++#define LIBXSLT_DEFAULT_PLUGINS_PATH() "/usr/lib/libxslt-plugins"
++#endif
+ #endif
+ 
+ /**
+diff -urN libxslt-1.1.32/xslt-config.in libxslt-1.1.32.completemultilib/xslt-config.in
+--- libxslt-1.1.32/xslt-config.in	2015-05-10 14:11:30.000000000 +0000
++++ libxslt-1.1.32.completemultilib/xslt-config.in	2019-05-06 11:34:59.670592304 +0000
+@@ -65,7 +65,7 @@
+ 	;;
+ 
+     --plugins)
+-	echo @LIBXSLT_DEFAULT_PLUGINS_PATH@
++	echo ${libdir}/libxslt-plugins
+ 	exit 0
+ 	;;
+ 

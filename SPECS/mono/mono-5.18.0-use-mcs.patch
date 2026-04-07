@@ -1,0 +1,11 @@
+--- a/mcs/class/Microsoft.Build.Tasks/Microsoft.Build.Tasks/Csc.cs	2019-02-20 21:17:20.324780985 +0000
++++ b/mcs/class/Microsoft.Build.Tasks/Microsoft.Build.Tasks/Csc.cs	2019-02-20 21:17:43.537165909 +0000
+@@ -219,7 +219,7 @@
+ 
+ 		protected override string ToolName {
+ 			get {
+-				return MSBuildUtils.RunningOnWindows ? "csc.bat" : "csc.exe";
++				return MSBuildUtils.RunningOnWindows ? "mcs.bat" : "mcs.exe";
+ 			}
+ 		}
+ 

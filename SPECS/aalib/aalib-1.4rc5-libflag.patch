@@ -1,0 +1,17 @@
+--- aalib-config.in.libflag	2008-03-24 20:42:47.000000000 -0700
++++ aalib-config.in	2008-03-24 20:44:24.000000000 -0700
+@@ -49,12 +49,12 @@ while test $# -gt 0; do
+       ;;
+ @ENABLE_SHARED_TRUE@    --libs)
+ @ENABLE_SHARED_TRUE@      libdirs=""
+-@ENABLE_SHARED_TRUE@      echo $libdirs @AALIB_LIBS@
++@ENABLE_SHARED_TRUE@      echo $libdirs -laa
+ @ENABLE_SHARED_TRUE@      ;;
+ @ENABLE_STATIC_TRUE@@ENABLE_SHARED_TRUE@    --static-libs)
+ @ENABLE_STATIC_TRUE@@ENABLE_SHARED_FALSE@    --libs|--static-libs)
+ @ENABLE_STATIC_TRUE@      libdirs=""
+-@ENABLE_STATIC_TRUE@      echo $libdirs @AALIB_LIBS@ 
++@ENABLE_STATIC_TRUE@      echo $libdirs -laa
+ @ENABLE_STATIC_TRUE@      ;;
+     *)
+       echo "${usage}" 1>&2

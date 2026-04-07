@@ -1,0 +1,20 @@
+--- ../man-1.6g-orig/man2html/hman.sh	2005-08-20 16:26:06.000000000 -0700
++++ ./man2html/hman.sh	2012-05-24 17:00:56.488558100 -0700
+@@ -72,7 +72,7 @@
+      0)   $BROWSER $CG/man2html ;;
+      1)   case "$1" in
+ 	    1|2|3|4|5|6|7|8|l|n)
+-		$BROWSER "$CG/mansec?$CG+$1" ;;
++		$BROWSER "$CG/mansec?$1" ;;
+ 	    /*)
+ 		$BROWSER "$CG/man2html?$1" ;;
+ 	    */*)
+@@ -85,7 +85,7 @@
+                 $BROWSER "$CG/mansearch?$2" ;;
+             *)
+ 		if [ "$2" = index ]; then
+-		    $BROWSER "$CG/manwhatis?$CG+$1"
++		    $BROWSER "$CG/manwhatis?$1"
+                 else
+ 		    $BROWSER "$CG/man2html?$1+$2"
+                 fi ;;

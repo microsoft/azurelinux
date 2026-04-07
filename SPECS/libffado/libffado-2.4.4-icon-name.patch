@@ -1,0 +1,12 @@
+diff -up libffado-2.4.4/support/mixer-qt4/ffado/ffadowindow.py.icon-name libffado-2.4.4/support/mixer-qt4/ffado/ffadowindow.py
+--- libffado-2.4.4/support/mixer-qt4/ffado/ffadowindow.py.icon-name	2020-05-29 08:59:52.000000000 +0200
++++ libffado-2.4.4/support/mixer-qt4/ffado/ffadowindow.py	2021-01-05 16:30:40.293184745 +0100
+@@ -267,7 +267,7 @@ def ffadomain(args):
+     log.debug("Using %s with Qt: %s PyQt: %s" % (get_ffado_version(), QtCore.QT_VERSION_STR, QtCore.PYQT_VERSION_STR))
+ 
+     app = QApplication(args)
+-    app.setWindowIcon( QIcon( SHAREDIR + "/icons/hi64-apps-ffado.png" ) )
++    app.setWindowIcon( QIcon( SHAREDIR + "/icons/ffado.png" ) )
+ 
+     app.setOrganizationName("FFADO")
+     app.setOrganizationDomain("ffado.org")

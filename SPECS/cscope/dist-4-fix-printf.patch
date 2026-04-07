@@ -1,0 +1,16 @@
+diff --git a/contrib/ocs b/contrib/ocs
+index e924f4f..bd556b4 100755
+--- a/contrib/ocs
++++ b/contrib/ocs
+@@ -210,7 +210,7 @@ exp_inc()
+     then
+ 	for i in `cat ${theInc}`
+ 	do
+-	    printf "-I $i "
++	    printf -- "-I $i "
+ 	done
+     fi
+ }
+-- 
+2.26.2
+

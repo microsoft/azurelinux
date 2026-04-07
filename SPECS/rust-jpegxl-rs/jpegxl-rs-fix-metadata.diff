@@ -1,0 +1,32 @@
+--- jpegxl-rs-0.11.2+libjxl-0.11.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ jpegxl-rs-0.11.2+libjxl-0.11.1/Cargo.toml	2025-01-11T19:37:50.672660+00:00
+@@ -46,18 +46,6 @@
+ path = "src/lib.rs"
+ bench = false
+ 
+-[[bench]]
+-name = "decode"
+-path = "benches/decode.rs"
+-harness = false
+-required-features = ["bench"]
+-
+-[[bench]]
+-name = "encode"
+-path = "benches/encode.rs"
+-harness = false
+-required-features = ["bench"]
+-
+ [dependencies.byteorder]
+ version = "1.5.0"
+ 
+@@ -101,10 +89,6 @@
+ default = ["image"]
+ docs = ["jpegxl-sys/docs"]
+ image = ["dep:image"]
+-vendored = ["jpegxl-sys/vendored"]
+-
+-[target.'cfg(not(target_family = "wasm"))'.dev-dependencies.criterion]
+-version = "0.5.1"
+ 
+ [lints.clippy]
+ pedantic = "warn"

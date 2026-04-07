@@ -1,0 +1,22 @@
+diff -uNr a/humanfriendly/tests.py b/humanfriendly/tests.py
+--- a/humanfriendly/tests.py	2021-09-17 14:40:11.000000000 -0700
++++ b/humanfriendly/tests.py	2022-04-27 16:07:02.760886091 -0700
+@@ -123,7 +123,7 @@
+ )
+ 
+ # Test dependencies.
+-from mock import MagicMock
++from unittest.mock import MagicMock
+ 
+ 
+ class HumanFriendlyTestCase(TestCase):
+diff -uNr a/requirements-tests.txt b/requirements-tests.txt
+--- a/requirements-tests.txt	2021-09-17 14:40:11.000000000 -0700
++++ b/requirements-tests.txt	2022-04-27 16:06:51.557820147 -0700
+@@ -2,6 +2,5 @@
+ capturer >= 2.1
+ coloredlogs >= 15.0.1
+ docutils >= 0.15
+-mock >= 3.0.5
+ pytest >= 3.0.7
+ pytest-cov >= 2.4.0

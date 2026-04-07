@@ -1,0 +1,84 @@
+# This file is used to configure how the plugins are invoked.
+# Place in /etc/munin/plugin-conf.d/ or corresponding directory.
+#
+# PLEASE NOTE: Changes in the plugin-conf.d directory are only
+# read at munin-node startup, so restart at any changes.
+#
+#  user <user>         # Set the user to run the plugin as
+#  group <group>       # Set the group to run the plugin as
+#  command <command>   # Run <command> instead of the plugin. %c
+# 	                 expands to what would normally be run.
+#  env.<variable> <value> # Sets <variable> in the plugin's environment, see the
+#                        individual plugins to find out which variables they
+#                        care about.
+
+[bind9_rndc]
+user root
+env.rndc /usr/sbin/rndc
+env.querystats /var/named/data/named_stats.txt
+
+[cps*]
+user root
+
+[df*]
+user root
+env.exclude none unknown binfmt_misc cgroup_root debugfs devpts devtmpfs fuse.gvfs-fuse-daemon iso9660 ramfs romfs rootfs rpc_pipefs squashfs udf
+env.exclude_re ^/run/user/ ^/sys/ ^/var/lib/docker ^/var/lib/containers/storage/overlay ^/var/lib/mock/ ^/media/ ^/mnt$
+
+[exim*]
+group mail
+
+[fw_*]
+user root
+
+[hddtemp_smartctl]
+user root
+
+[if_*]
+user root
+
+[ipmi_*]
+user root
+timeout 20
+
+[load]
+env.load_warning 100
+
+[mailman]
+user mailman
+
+[munin_stats]
+env.fields update limits
+
+[mysql*]
+#env.mysqlopts -u someuser
+
+[mysql_replication]
+env.slave_io_running_warning 0.5
+env.slave_sql_running_warning 0.5
+env.seconds_behind_master_warning 3600
+env.seconds_behind_master_critical 86400
+
+[mysql_wsrep_flow_paused_ns]
+env.wsrep_flow_control_paused_ns_warning 200000000
+env.wsrep_flow_control_paused_ns_critical 10000000000
+
+[postfix*]
+user root
+env.logfile maillog
+env.logdir /var/log
+
+[postgres_*]
+user postgres
+env.PGUSER postgres
+env.PGPORT 5432
+
+[sendmail*]
+user root
+env.mspqueue /var/spool/clientmqueue
+
+[smart_*]
+user root
+
+[vlan*]
+user root

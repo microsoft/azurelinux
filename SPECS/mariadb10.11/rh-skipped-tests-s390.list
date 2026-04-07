@@ -1,0 +1,2 @@
+# Fails since 10.11.15
+innodb.log_corruption_recovery      : BUG#0

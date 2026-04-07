@@ -1,0 +1,58 @@
+From 1161dd03e25dac8c301cea3e15fbb6fad184be96 Mon Sep 17 00:00:00 2001
+From: Jaeyoon Jung <jaeyoon.jung@lge.com>
+Date: Mon, 15 Feb 2021 08:31:06 +0900
+Subject: [PATCH 02/55] Fix issue with repeated window size changes
+
+Check if the new window size is different from the size requested
+previously before calling wl_egl_window_resize. It addresses the issue
+where repeated setGeometry calls between two sizes might not work as
+expected. The problem occurs when wl_egl_window_get_attached_size does
+not get the same size that was requested by the previous setGeometry
+call. If the returned size happened to match the new size instead,
+we would mistakenly skip the resize.
+
+Change-Id: Iafe4a91cc707f854b9099b6109b6be1423d7bd29
+Reviewed-by: Eskil Abrahamsen Blomfeldt <eskil.abrahamsen-blomfeldt@qt.io>
+(cherry picked from commit 14d066c61025e548227ccd8d655e80ffa31fa15e)
+---
+ .../client/wayland-egl/qwaylandeglwindow.cpp                  | 4 +++-
+ .../client/wayland-egl/qwaylandeglwindow.h                    | 1 +
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/hardwareintegration/client/wayland-egl/qwaylandeglwindow.cpp b/src/hardwareintegration/client/wayland-egl/qwaylandeglwindow.cpp
+index 30740e83..9971a9ff 100644
+--- a/src/hardwareintegration/client/wayland-egl/qwaylandeglwindow.cpp
++++ b/src/hardwareintegration/client/wayland-egl/qwaylandeglwindow.cpp
+@@ -123,14 +123,16 @@ void QWaylandEglWindow::updateSurface(bool create)
+             if (!disableResizeCheck) {
+                 wl_egl_window_get_attached_size(m_waylandEglWindow, &current_width, &current_height);
+             }
+-            if (disableResizeCheck || (current_width != sizeWithMargins.width() || current_height != sizeWithMargins.height())) {
++            if (disableResizeCheck || (current_width != sizeWithMargins.width() || current_height != sizeWithMargins.height()) || m_requestedSize != sizeWithMargins) {
+                 wl_egl_window_resize(m_waylandEglWindow, sizeWithMargins.width(), sizeWithMargins.height(), mOffset.x(), mOffset.y());
++                m_requestedSize = sizeWithMargins;
+                 mOffset = QPoint();
+ 
+                 m_resize = true;
+             }
+         } else if (create && wlSurface()) {
+             m_waylandEglWindow = wl_egl_window_create(wlSurface(), sizeWithMargins.width(), sizeWithMargins.height());
++            m_requestedSize = sizeWithMargins;
+         }
+ 
+         if (!m_eglSurface && m_waylandEglWindow && create) {
+diff --git a/src/hardwareintegration/client/wayland-egl/qwaylandeglwindow.h b/src/hardwareintegration/client/wayland-egl/qwaylandeglwindow.h
+index 2fccbcea..ad1e5ee9 100644
+--- a/src/hardwareintegration/client/wayland-egl/qwaylandeglwindow.h
++++ b/src/hardwareintegration/client/wayland-egl/qwaylandeglwindow.h
+@@ -85,6 +85,7 @@ private:
+     mutable QOpenGLFramebufferObject *m_contentFBO = nullptr;
+ 
+     QSurfaceFormat m_format;
++    QSize m_requestedSize;
+ };
+ 
+ }
+-- 
+2.51.1
+

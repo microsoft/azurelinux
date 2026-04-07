@@ -1,0 +1,97 @@
+From 4d1abf9cc029a713b4bf433af06d3c6507ae2ebc Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Wed, 6 Mar 2024 19:17:17 +0100
+Subject: [PATCH 26/59] FIPS: RSA: Disallow SHAKE in OAEP and PSS
+
+According to FIPS 140-3 IG, section C.C, the SHAKE digest algorithms
+must not be used in higher-level algorithms (such as RSA-OAEP and
+RSASSA-PSS):
+
+"To be used in an approved mode of operation, the SHA-3 hash functions
+may be implemented either as part of an approved higher-level algorithm,
+for example, a digital signature algorithm, or as the standalone
+functions. The SHAKE128 and SHAKE256 extendable-output functions may
+only be used as the standalone algorithms."
+
+Add a check to prevent their use as message digest in PSS signatures and
+as MGF1 hash function in both OAEP and PSS.
+
+Signed-off-by: Clemens Lang <cllang@redhat.com>
+
+From-dist-git-commit: 4334bc837fbc64d14890fdc51679a80770d498ce
+---
+ crypto/rsa/rsa_oaep.c | 16 ++++++++++++++++
+ crypto/rsa/rsa_pss.c  | 16 ++++++++++++++++
+ 2 files changed, 32 insertions(+)
+
+diff --git a/crypto/rsa/rsa_oaep.c b/crypto/rsa/rsa_oaep.c
+index 5a1c080fcd..11cd78618b 100644
+--- a/crypto/rsa/rsa_oaep.c
++++ b/crypto/rsa/rsa_oaep.c
+@@ -76,6 +76,14 @@ int ossl_rsa_padding_add_PKCS1_OAEP_mgf1_ex(OSSL_LIB_CTX *libctx,
+     if (mgf1md == NULL)
+         mgf1md = md;
+ 
++#ifdef FIPS_MODULE
++    if (EVP_MD_is_a(md, "SHAKE-128") || EVP_MD_is_a(md, "SHAKE-256") ||
++        EVP_MD_is_a(mgf1md, "SHAKE-128") || EVP_MD_is_a(mgf1md, "SHAKE-256")) {
++        ERR_raise(ERR_LIB_RSA, RSA_R_DIGEST_NOT_ALLOWED);
++        return 0;
++    }
++#endif
++
+ #ifdef FIPS_MODULE
+     /* XOF are approved as standalone; Shake256 in Ed448; MGF */
+     if (EVP_MD_xof(md)) {
+@@ -194,6 +202,14 @@ int RSA_padding_check_PKCS1_OAEP_mgf1(unsigned char *to, int tlen,
+     if (mgf1md == NULL)
+         mgf1md = md;
+ 
++#ifdef FIPS_MODULE
++    if (EVP_MD_is_a(md, "SHAKE-128") || EVP_MD_is_a(md, "SHAKE-256") ||
++        EVP_MD_is_a(mgf1md, "SHAKE-128") || EVP_MD_is_a(mgf1md, "SHAKE-256")) {
++        ERR_raise(ERR_LIB_RSA, RSA_R_DIGEST_NOT_ALLOWED);
++        return -1;
++    }
++#endif
++
+ #ifdef FIPS_MODULE
+     /* XOF are approved as standalone; Shake256 in Ed448; MGF */
+     if (EVP_MD_xof(md)) {
+diff --git a/crypto/rsa/rsa_pss.c b/crypto/rsa/rsa_pss.c
+index a2bc198a89..2833ca50f3 100644
+--- a/crypto/rsa/rsa_pss.c
++++ b/crypto/rsa/rsa_pss.c
+@@ -61,6 +61,14 @@ int ossl_rsa_verify_PKCS1_PSS_mgf1(RSA *rsa, const unsigned char *mHash,
+     if (mgf1Hash == NULL)
+         mgf1Hash = Hash;
+ 
++#ifdef FIPS_MODULE
++    if (EVP_MD_is_a(Hash, "SHAKE-128") || EVP_MD_is_a(Hash, "SHAKE-256"))
++        goto err;
++
++    if (EVP_MD_is_a(mgf1Hash, "SHAKE-128") || EVP_MD_is_a(mgf1Hash, "SHAKE-256"))
++        goto err;
++#endif
++
+     hLen = EVP_MD_get_size(Hash);
+     if (hLen <= 0)
+         goto err;
+@@ -186,6 +194,14 @@ int ossl_rsa_padding_add_PKCS1_PSS_mgf1(RSA *rsa, unsigned char *EM,
+     if (mgf1Hash == NULL)
+         mgf1Hash = Hash;
+ 
++#ifdef FIPS_MODULE
++    if (EVP_MD_is_a(Hash, "SHAKE-128") || EVP_MD_is_a(Hash, "SHAKE-256"))
++        goto err;
++
++    if (EVP_MD_is_a(mgf1Hash, "SHAKE-128") || EVP_MD_is_a(mgf1Hash, "SHAKE-256"))
++        goto err;
++#endif
++
+     hLen = EVP_MD_get_size(Hash);
+     if (hLen <= 0)
+         goto err;
+-- 
+2.51.0
+

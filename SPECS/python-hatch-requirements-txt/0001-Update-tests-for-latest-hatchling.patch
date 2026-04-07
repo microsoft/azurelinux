@@ -1,0 +1,277 @@
+From 5e8382a220c7ed469a1049c41642dda2a7742b7b Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Tue, 26 Mar 2024 13:25:24 -0400
+Subject: [PATCH] Update tests for latest hatchling.
+
+Based on:
+https://github.com/repo-helper/hatch-requirements-txt/commit/1aa21b86db3503ed46683fa7af748d7aa1e853e1
+
+Cherry-picked to 0.4.1; changes to files in .github/ managed by
+repo_helper omitted.
+---
+ repo_helper.yml      | 41 ++++++++++++++-------
+ tests/test_errors.py | 53 +++++++++++++++++++++++++++
+ tox.ini              | 85 ++++++++++++++++++++++++++++++--------------
+ 3 files changed, 141 insertions(+), 38 deletions(-)
+
+diff --git a/repo_helper.yml b/repo_helper.yml
+index 89ad7fd..235469c 100644
+--- a/repo_helper.yml
++++ b/repo_helper.yml
+@@ -22,18 +22,30 @@ conda_channels:
+ 
+ # Versions to run tests for
+ python_versions:
+- - '3.6'
+- - '3.7'
+- - '3.8'
+- - '3.9'
+- - "3.10"
+- - "3.11"
+- - "3.12"
+- - 3.13-dev
+- - pypy36
+- - pypy37
+- - pypy38
+- - pypy39
++ '3.6':
++    matrix_exclude:
++     hatchling:
++      - 1.21
++ '3.7':
++    matrix_exclude:
++     hatchling:
++      - 1.21
++ '3.8':
++ '3.9':
++ "3.10":
++ "3.11":
++ "3.12":
++ 3.13-dev:
++ pypy36:
++    matrix_exclude:
++     hatchling:
++      - 1.21
++ pypy37:
++    matrix_exclude:
++     hatchling:
++      - 1.21
++ pypy38:
++ pypy39:
+ 
+ classifiers:
+  - 'Development Status :: 4 - Beta'
+@@ -50,3 +62,8 @@ keywords:
+ entry_points:
+  hatch:
+   - requirements_txt = hatch_requirements_txt
++
++third_party_version_matrix:
++  hatchling:
++   - 1.21
++   - latest
+diff --git a/tests/test_errors.py b/tests/test_errors.py
+index f470ec0..56a58f3 100644
+--- a/tests/test_errors.py
++++ b/tests/test_errors.py
+@@ -3,9 +3,14 @@ from typing import Callable
+ 
+ # 3rd party
+ import pytest
++from domdf_python_tools.compat import importlib_metadata
+ from domdf_python_tools.paths import PathPlus, in_directory
+ from hatchling.build import build_sdist, build_wheel
+ from packaging.requirements import InvalidRequirement
++from packaging.version import Version
++
++_hatchling_version = Version(importlib_metadata.version("hatchling"))
++hatchling_version = (_hatchling_version.major, _hatchling_version.minor)
+ 
+ pyproject_toml = """
+ [project]
+@@ -66,6 +71,7 @@ def test_missing_invalid_requirements(tmp_pathplus: PathPlus, build_func: Callab
+ 		wheel_file = build_func(dist_dir)
+ 
+ 
++@pytest.mark.xfail(hatchling_version >= (1, 22), reason="Metadata hooks no longer called if dynamic not set")
+ @pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
+ def test_not_dynamic_but_files_defined(tmp_pathplus: PathPlus, build_func: Callable):
+ 
+@@ -86,6 +92,29 @@ def test_not_dynamic_but_files_defined(tmp_pathplus: PathPlus, build_func: Calla
+ 		wheel_file = build_func(dist_dir)
+ 
+ 
++@pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
++def test_not_in_dynamic_but_files_defined(tmp_pathplus: PathPlus, build_func: Callable):
++
++	dist_dir = tmp_pathplus / "dist"
++	dist_dir.maybe_make()
++
++	(tmp_pathplus / "pyproject.toml").write_clean(
++			pyproject_toml.replace('dynamic = ["dependencies"]', 'dynamic = ["classifiers"]')
++			)
++	(tmp_pathplus / "requirements.txt").write_lines(["Foo", "bar", "# fizz", "baz>1"])
++	(tmp_pathplus / "README.md").touch()
++	(tmp_pathplus / "LICENSE").touch()
++	(tmp_pathplus / "demo").maybe_make()
++	(tmp_pathplus / "demo" / "__init__.py").touch()
++
++	with in_directory(tmp_pathplus), pytest.raises(ValueError, match=(
++		r"^Cannot specify 'files' in \[tool.hatch.metadata.hooks.requirements_txt\] "
++		r"when 'dependencies' is not listed in 'project.dynamic'.$"
++	)):
++		wheel_file = build_func(dist_dir)
++
++
++@pytest.mark.xfail(hatchling_version >= (1, 22), reason="Metadata hooks no longer called if dynamic not set")
+ @pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
+ def test_not_dynamic_but_filename_defined(tmp_pathplus: PathPlus, build_func: Callable):
+ 
+@@ -109,6 +138,30 @@ def test_not_dynamic_but_filename_defined(tmp_pathplus: PathPlus, build_func: Ca
+ 		build_func(dist_dir)
+ 
+ 
++@pytest.mark.xfail(hatchling_version >= (1, 22), reason="Metadata hooks no longer called if dynamic not set")
++@pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
++def test_not_in_dynamic_but_filename_defined(tmp_pathplus: PathPlus, build_func: Callable):
++
++	dist_dir = tmp_pathplus / "dist"
++	dist_dir.maybe_make()
++
++	new_pyproject_toml = pyproject_toml.replace('dynamic = ["dependencies"]', 'dynamic = ["classifiers"]').replace(
++			'files = ["requirements.txt"]', 'filename = "requirements.txt"'
++			)
++	(tmp_pathplus / "pyproject.toml").write_clean(new_pyproject_toml)
++	(tmp_pathplus / "requirements.txt").write_lines(["Foo", "bar", "# fizz", "baz>1"])
++	(tmp_pathplus / "README.md").touch()
++	(tmp_pathplus / "LICENSE").touch()
++	(tmp_pathplus / "demo").maybe_make()
++	(tmp_pathplus / "demo" / "__init__.py").touch()
++
++	with in_directory(tmp_pathplus), pytest.raises(ValueError, match=(
++		r"^Cannot specify 'filename' in \[tool.hatch.metadata.hooks.requirements_txt\] "
++		r"when 'dependencies' is not listed in 'project.dynamic'.$"
++	)):
++		build_func(dist_dir)
++
++
+ @pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
+ def test_optional_not_dynamic(tmp_pathplus: PathPlus, build_func: Callable):
+ 
+diff --git a/tox.ini b/tox.ini
+index 23b2960..5aa3efe 100644
+--- a/tox.ini
++++ b/tox.ini
+@@ -22,18 +22,18 @@
+ 
+ [tox]
+ envlist =
+-    py36
+-    py37
+-    py38
+-    py39
+-    py310
+-    py311
+-    py312
+-    py313-dev
+-    pypy36
+-    pypy37
+-    pypy38
+-    pypy39
++    py36-hatchlinglatest
++    py37-hatchlinglatest
++    py38-hatchling{1.21,latest}
++    py39-hatchling{1.21,latest}
++    py310-hatchling{1.21,latest}
++    py311-hatchling{1.21,latest}
++    py312-hatchling{1.21,latest}
++    py313-dev-hatchling{1.21,latest}
++    pypy36-hatchlinglatest
++    pypy37-hatchlinglatest
++    pypy38-hatchling{1.21,latest}
++    pypy39-hatchling{1.21,latest}
+     mypy
+     build
+ skip_missing_interpreters = True
+@@ -46,27 +46,30 @@ requires =
+ 
+ [envlists]
+ test =
+-    py36
+-    py37
+-    py38
+-    py39
+-    py310
+-    py311
+-    py312
+-    py313-dev
+-    pypy36
+-    pypy37
+-    pypy38
+-    pypy39
++    py36-hatchlinglatest
++    py37-hatchlinglatest
++    py38-hatchling{1.21,latest}
++    py39-hatchling{1.21,latest}
++    py310-hatchling{1.21,latest}
++    py311-hatchling{1.21,latest}
++    py312-hatchling{1.21,latest}
++    py313-dev-hatchling{1.21,latest}
++    pypy36-hatchlinglatest
++    pypy37-hatchlinglatest
++    pypy38-hatchling{1.21,latest}
++    pypy39-hatchling{1.21,latest}
+ qa = mypy, lint
+-cov = py37, coverage
++cov = py37-hatchlinglatest, coverage
+ 
+ [testenv]
+ setenv =
+     PYTHONDEVMODE=1
+     PIP_DISABLE_PIP_VERSION_CHECK=1
+     SETUPTOOLS_USE_DISTUTILS=stdlib
+-deps = -r{toxinidir}/tests/requirements.txt
++deps =
++    -r{toxinidir}/tests/requirements.txt
++    hatchling1.21: hatchling~=1.21.0
++    hatchlinglatest: hatchling
+ commands =
+     python --version
+     python -m pytest --cov=hatch_requirements_txt -r aR tests/ {posargs}
+@@ -229,3 +232,33 @@ timeout = 300
+ filterwarnings =
+     error
+     ignore:can't resolve package from __spec__ or __package__, falling back on __name__ and __path__:ImportWarning
++
++[testenv:py312-hatchling{1.21,latest}]
++setenv =
++    PYTHONDEVMODE=1
++    PIP_DISABLE_PIP_VERSION_CHECK=1
++
++[testenv:py313-dev-hatchling{1.21,latest}]
++setenv =
++    PYTHONDEVMODE=1
++    PIP_DISABLE_PIP_VERSION_CHECK=1
++
++[testenv:py312-hatchling{1.21.1,latest}]
++setenv =
++    PYTHONDEVMODE=1
++    PIP_DISABLE_PIP_VERSION_CHECK=1
++
++[testenv:py313-dev-hatchling{1.21.1,latest}]
++setenv =
++    PYTHONDEVMODE=1
++    PIP_DISABLE_PIP_VERSION_CHECK=1
++
++[testenv:py312-hatchling{0.21.0,1.21.1,latest}]
++setenv =
++    PYTHONDEVMODE=1
++    PIP_DISABLE_PIP_VERSION_CHECK=1
++
++[testenv:py313-dev-hatchling{0.21.0,1.21.1,latest}]
++setenv =
++    PYTHONDEVMODE=1
++    PIP_DISABLE_PIP_VERSION_CHECK=1
+-- 
+2.44.0
+

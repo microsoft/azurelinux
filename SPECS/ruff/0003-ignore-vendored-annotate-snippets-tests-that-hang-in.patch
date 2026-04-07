@@ -1,0 +1,47 @@
+From 6527e1abf0cdc077c619cfaeb8a01b9055bc2d9a Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Wed, 12 Mar 2025 19:34:50 +0100
+Subject: [PATCH 3/3] ignore vendored annotate-snippets tests that hang
+ indefinitely
+
+---
+ crates/ruff_annotate_snippets/tests/examples.rs | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/crates/ruff_annotate_snippets/tests/examples.rs b/crates/ruff_annotate_snippets/tests/examples.rs
+index b6576629f9..b7d66af319 100644
+--- a/crates/ruff_annotate_snippets/tests/examples.rs
++++ b/crates/ruff_annotate_snippets/tests/examples.rs
+@@ -1,4 +1,5 @@
+ #[test]
++#[ignore]
+ fn expected_type() {
+     let target = "expected_type";
+     let expected = snapbox::file!["../examples/expected_type.svg": TermSvg];
+@@ -6,6 +7,7 @@ fn expected_type() {
+ }
+ 
+ #[test]
++#[ignore]
+ fn footer() {
+     let target = "footer";
+     let expected = snapbox::file!["../examples/footer.svg": TermSvg];
+@@ -13,6 +15,7 @@ fn footer() {
+ }
+ 
+ #[test]
++#[ignore]
+ fn format() {
+     let target = "format";
+     let expected = snapbox::file!["../examples/format.svg": TermSvg];
+@@ -20,6 +23,7 @@ fn format() {
+ }
+ 
+ #[test]
++#[ignore]
+ fn multislice() {
+     let target = "multislice";
+     let expected = snapbox::file!["../examples/multislice.svg": TermSvg];
+-- 
+2.52.0
+

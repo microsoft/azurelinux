@@ -1,0 +1,21 @@
+commit 52e77ef8d314501d8cae5734dba1cf918dd53456
+Author: Tom Hughes <tom@compton.nu>
+Date:   Sun Apr 1 11:28:19 2018 +0100
+
+    Disable the AutoprogramDirectiveTestCase test
+    
+    It requires a module called cli and I am still attempting to
+    figure out exactly which version of cli that is and whether it
+    is packaged in  Fedora or not.
+
+diff --git a/sphinxcontrib/autoprogram.py b/sphinxcontrib/autoprogram.py
+index 489fea8..6fdc0c9 100644
+--- a/sphinxcontrib/autoprogram.py
++++ b/sphinxcontrib/autoprogram.py
+@@ -409,5 +409,5 @@ class UtilTestCase(unittest.TestCase):
+ 
+ 
+ suite = unittest.TestSuite()
+-for test_case in ScannerTestCase, AutoprogramDirectiveTestCase, UtilTestCase:
++for test_case in ScannerTestCase, UtilTestCase:
+     suite.addTests(unittest.defaultTestLoader.loadTestsFromTestCase(test_case))

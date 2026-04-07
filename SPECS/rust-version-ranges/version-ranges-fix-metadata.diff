@@ -1,0 +1,8 @@
+--- version-ranges-0.1.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ version-ranges-0.1.2/Cargo.toml	2026-02-12T23:19:27.315978+00:00
+@@ -64,4 +64,4 @@
+ version = "1.6.0"
+ 
+ [dev-dependencies.ron]
+-version = "0.11.0"
++version = "0.12"

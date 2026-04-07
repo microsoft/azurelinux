@@ -1,0 +1,200 @@
+# RPM macros for Fedora MinGW.
+
+%mingw64_pkg_name        %(echo %{name} | sed -E 's/^(mingw-|)/mingw64-/')
+%mingw64_target          x86_64-w64-mingw32
+
+# Paths.
+%mingw64_sysroot         %{_prefix}/%{mingw64_target}/sys-root
+%mingw64_prefix          %{mingw64_sysroot}/mingw
+%mingw64_exec_prefix     %{mingw64_prefix}
+%mingw64_bindir          %{mingw64_exec_prefix}/bin
+%mingw64_sbindir         %{mingw64_exec_prefix}/sbin
+%mingw64_libexecdir      %{mingw64_exec_prefix}/libexec
+%mingw64_libdir          %{mingw64_exec_prefix}/lib
+%mingw64_datadir         %{mingw64_prefix}/share
+%mingw64_docdir          %{mingw64_prefix}/share/doc
+%mingw64_infodir         %{mingw64_prefix}/share/info
+%mingw64_mandir          %{mingw64_prefix}/share/man
+%mingw64_sysconfdir      %{mingw64_prefix}/etc
+%mingw64_sharedstatedir  %{mingw64_prefix}/com
+%mingw64_localstatedir   %{mingw64_prefix}/var
+%mingw64_includedir      %{mingw64_prefix}/include
+
+# Build macros.
+%mingw64_host            %{mingw64_target}
+
+%mingw64_cflags          %{mingw64_cppflags} -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4
+%mingw64_cppflags        %{nil}
+%mingw64_fflags          -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4
+%mingw64_ldflags         -fstack-protector -lssp
+%mingw64_rustflags       -Copt-level=3 -Cdebuginfo=2 -Ccodegen-units=1 -Cforce-frame-pointers=yes --cap-lints=warn
+
+%mingw64_cc              %{mingw64_target}-gcc
+%mingw64_cxx             %{mingw64_target}-g++
+%mingw64_cpp             %{mingw64_target}-gcc -E
+%mingw64_addr2line       %{mingw64_target}-addr2line
+%mingw64_ar              %{mingw64_target}-ar
+%mingw64_as              %{mingw64_target}-as
+%mingw64_dlltool         %{mingw64_target}-dlltool
+%mingw64_dllwrap         %{mingw64_target}-dllwrap
+%mingw64_gcov            %{mingw64_target}-gcov
+%mingw64_gprof           %{mingw64_target}-gprof
+%mingw64_ld              %{mingw64_target}-ld
+%mingw64_nm              %{mingw64_target}-nm
+%mingw64_objcopy         %{mingw64_target}-objcopy
+%mingw64_objdump         %{mingw64_target}-objdump
+%mingw64_ranlib          %{mingw64_target}-ranlib
+%mingw64_readelf         %{mingw64_target}-readelf
+%mingw64_size            %{mingw64_target}-size
+%mingw64_strings         %{mingw64_target}-strings
+%mingw64_strip           %{mingw64_target}-strip
+%mingw64_windmc          %{mingw64_target}-windmc
+%mingw64_windres         %{mingw64_target}-windres
+
+%mingw64_env unset $(/usr/bin/env | grep -E '^(\w+)=(.*)$' | grep -Evw 'PWD|USER|LANG' | /usr/bin/cut -d= -f1); \
+  if test -z "$PATH_ORIG" ; then \
+    PATH_ORIG="$PATH"; export PATH_ORIG; \
+  fi; \
+  PATH="%{mingw64_bindir}:$PATH_ORIG"; export PATH; \
+  HOST_CC=gcc; export HOST_CC; \
+  unset PKG_CONFIG_PATH; \
+  _PREFIX="%{_bindir}/%{mingw64_target}-"; \
+  for i in `ls -1 ${_PREFIX}* | grep -v 'gcc-'`; do \
+    x=`echo $i|sed "s,${_PREFIX},,"|tr "a-z+-." "A-ZX__"`; \
+    declare -x $x="$i" ; export $x; \
+  done; \
+  unset _PREFIX; \
+  CC="${MINGW64_CC:-%mingw64_cc}"; export CC; \
+  CFLAGS="${MINGW64_CFLAGS-%mingw64_cflags}"; export CFLAGS; \
+  CPPFLAGS="${MINGW64_CPPFLAGS-%mingw64_cppflags}"; export CPPFLAGS; \
+  if [ -x "%{_bindir}/%{mingw64_cxx}" ]; then \
+    CXX="${MINGW64_CXX:-%mingw64_cxx}"; export CXX; \
+    CXXFLAGS="${MINGW64_CXXFLAGS-%mingw64_cflags}"; export CXXFLAGS; \
+  else \
+    CXX=; export CXX; \
+    ac_cv_prog_CXX=no; export ac_cv_prog_CXX; \
+    CXXFLAGS=; export CXXFLAGS; \
+  fi; \
+  FFLAGS="${MINGW64_FFLAGS-%mingw64_fflags}"; export FFLAGS; \
+  FCFLAGS="${MINGW64_FCFLAGS-%mingw64_fflags}"; export FCFLAGS; \
+  LDFLAGS="${MINGW64_LDFLAGS:-%mingw64_ldflags}"; export LDFLAGS; \
+  RUSTFLAGS="${MINGW64_RUSTFLAGS:-%mingw64_rustflags}"; export RUSTFLAGS; \
+  for i in `ls %{mingw64_bindir}/*|grep -- "-config\$"` ; do \
+    x=`basename $i|tr "a-z+-." "A-ZX_"`; \
+    declare -x $x="$i" ; export $x; \
+  done; \
+  unset x i
+
+%mingw64_pkg_config %{mingw64_target}-pkg-config "$@"
+%mingw64_pkgconfig_personalitydir %{mingw32_datadir}/pkgconfig/personality.d
+
+%mingw64_configure %{mingw64_env} ; \
+  __mingw64_topdir=.; if ! test -x configure; then __mingw64_topdir=..; fi; \\\
+  $__mingw64_topdir/configure \\\
+	--host=%{mingw64_host} \\\
+	--build=%_build \\\
+	--target=%{mingw64_target} \\\
+	--prefix=%{mingw64_prefix} \\\
+	--exec-prefix=%{mingw64_exec_prefix} \\\
+	--bindir=%{mingw64_bindir} \\\
+	--sbindir=%{mingw64_sbindir} \\\
+	--sysconfdir=%{mingw64_sysconfdir} \\\
+	--datadir=%{mingw64_datadir} \\\
+	--includedir=%{mingw64_includedir} \\\
+	--libdir=%{mingw64_libdir} \\\
+	--libexecdir=%{mingw64_libexecdir} \\\
+	--localstatedir=%{mingw64_localstatedir} \\\
+	--sharedstatedir=%{mingw64_sharedstatedir} \\\
+	--mandir=%{mingw64_mandir} \\\
+	--infodir=%{mingw64_infodir} \\\
+	${MINGW_CONFIGURE_ARGS} \\\
+	${MINGW64_CONFIGURE_ARGS} "$@"
+
+%mingw64_make %{mingw64_env} ; \
+  make \\\
+	prefix=%{mingw64_prefix} \\\
+	exec_prefix=%{mingw64_exec_prefix} \\\
+	bindir=%{mingw64_bindir} \\\
+	sbindir=%{mingw64_sbindir} \\\
+	sysconfdir=%{mingw64_sysconfdir} \\\
+	datadir=%{mingw64_datadir} \\\
+	includedir=%{mingw64_includedir} \\\
+	libdir=%{mingw64_libdir} \\\
+	libexecdir=%{mingw64_libexecdir} \\\
+	localstatedir=%{mingw64_localstatedir} \\\
+	sharedstatedir=%{mingw64_sharedstatedir} \\\
+	mandir=%{mingw64_mandir} \\\
+	infodir=%{mingw64_infodir} "$@"
+
+%mingw64_cmake_generic %{mingw64_env} ; \
+  PKG_CONFIG_LIBDIR="%{mingw64_libdir}/pkgconfig:%{mingw64_datadir}/pkgconfig"; export PKG_CONFIG_LIBDIR; \
+  if test -f CMakeLists.txt; then __mingw64_topdir=.; \\\
+  elif test -f ../CMakeLists.txt; then __mingw64_topdir=..; \\\
+  else __mingw64_topdir=""; fi; \\\
+  if test "${MINGW_CMAKE_NO_VERBOSE}" == "" ; then \
+    MINGW64_CMAKE_ARGS="${MINGW64_CMAKE_ARGS} -DCMAKE_VERBOSE_MAKEFILE=ON" \
+  fi \
+  PATH=%{_prefix}/%{mingw64_target}/bin:$PATH %__cmake \\\
+        -DCMAKE_TOOLCHAIN_FILE=/usr/share/mingw/toolchain-mingw64.cmake \\\
+        -DBUILD_SHARED_LIBS:BOOL=ON \\\
+        -DSYSCONF_INSTALL_DIR:PATH=%{mingw64_sysconfdir} \\\
+        -DSHARE_INSTALL_PREFIX:PATH=%{mingw64_datadir} \\\
+        -DCMAKE_INSTALL_PREFIX:PATH=%{mingw64_prefix} \\\
+        ${MINGW_CMAKE_ARGS} \\\
+        ${MINGW64_CMAKE_ARGS} \\\
+        "$@" $__mingw64_topdir
+
+%mingw64_cmake \
+  MINGW64_CMAKE_ARGS="-DINCLUDE_INSTALL_DIR:PATH=%{mingw64_includedir} ${MINGW64_CMAKE_ARGS}" \
+  %mingw64_cmake_generic
+
+%mingw64_qmake_qt5 /usr/bin/mingw64-qmake-qt5
+
+%mingw64_qmake_qt6 /usr/bin/%{mingw64_target}-qmake-qt6
+
+%mingw64_meson %{mingw64_env} ; \
+  unset CC CFLAGS CPPFLAGS CXX CXXFLAGS LD LDFLAGS; \\\
+  CFLAGS="${MINGW64_CFLAGS-%mingw64_cflags}"; export CFLAGS; \\\
+  CPPFLAGS="${MINGW64_CPPFLAGS-%mingw64_cppflags}"; export CPPFLAGS; \\\
+  FFLAGS="${MINGW64_FFLAGS-%mingw64_fflags}"; export FFLAGS; \
+  FCFLAGS="${MINGW64_FCFLAGS-%mingw64_fflags}"; export FCFLAGS; \
+  LDFLAGS="${MINGW64_LDFLAGS:-%mingw64_ldflags}"; export LDFLAGS; \\\
+  if test -f meson.build; then __mingw64_topdir=.; \\\
+  elif test -f ../meson.build; then __mingw64_topdir=..; \\\
+  else __mingw64_topdir=""; fi; \\\
+  %__meson setup \\\
+        --cross-file /usr/share/mingw/toolchain-mingw64.meson \\\
+        --default-library shared \\\
+        --prefix %{mingw64_prefix} \\\
+        --bindir %{mingw64_bindir} \\\
+        --sbindir %{mingw64_sbindir} \\\
+        --sysconfdir %{mingw64_sysconfdir} \\\
+        --datadir %{mingw64_datadir} \\\
+        --includedir %{mingw64_includedir} \\\
+        --libdir %{mingw64_libdir} \\\
+        --libexecdir %{mingw64_libexecdir} \\\
+        --localstatedir %{mingw64_localstatedir} \\\
+        --sharedstatedir %{mingw64_sharedstatedir} \\\
+        --mandir %{mingw64_mandir} \\\
+        --infodir %{mingw64_infodir} \\\
+        ${MINGW_MESON_ARGS} \\\
+        ${MINGW64_MESON_ARGS} \\\
+        "$@" $__mingw64_topdir
+
+%mingw64_description This is the cross-compiled version of this library / tool.\
+You should only install this package if you want to cross-compile programs for \
+Win64 (64 bit Windows).
+
+%mingw64_debug_package                                                   \
+%package -n %{mingw64_pkg_name}-debuginfo                                \
+Summary: Debug information for package %{mingw64_pkg_name}               \
+Group: Development/Debug                                                 \
+BuildArch: noarch                                                        \
+%description -n %{mingw64_pkg_name}-debuginfo                            \
+This package provides debug information for package %{mingw64_pkg_name}. \
+Debug information is useful when developing applications that use this   \
+package or when debugging this package.                                  \
+%files -n %{mingw64_pkg_name}-debuginfo -f mingw64-debugfiles.list       \
+%defattr(-,root,root,-)                                                  \
+%{nil}
+

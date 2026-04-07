@@ -1,0 +1,1274 @@
+commit 092a90b38b0988c0d9faa23d44aa91362b2a78b3
+Author: Tomas Korbar <tkorbar@redhat.com>
+Date:   Wed Jun 23 13:50:36 2021 +0200
+
+    Backport cmake support
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+new file mode 100644
+index 0000000..3f10eae
+--- /dev/null
++++ b/CMakeLists.txt
+@@ -0,0 +1,368 @@
++# ===================================================================
++#   Licensed to the Apache Software Foundation (ASF) under one
++#   or more contributor license agreements.  See the NOTICE file
++#   distributed with this work for additional information
++#   regarding copyright ownership.  The ASF licenses this file
++#   to you under the Apache License, Version 2.0 (the
++#   "License"); you may not use this file except in compliance
++#   with the License.  You may obtain a copy of the License at
++#
++#     http://www.apache.org/licenses/LICENSE-2.0
++#
++#   Unless required by applicable law or agreed to in writing,
++#   software distributed under the License is distributed on an
++#   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++#   KIND, either express or implied.  See the License for the
++#   specific language governing permissions and limitations
++#   under the License.
++# ===================================================================
++
++# ===================================================================
++# The following variables can be set to locate dependencies that
++# are not installed in standard paths.  These variables are used
++# by the find_package() modules.
++#
++# APR_ROOT          - Path to APR's install area
++# APRUtil_ROOT      - Path to APR-Util's install area
++# OPENSSL_ROOT_DIR  - Path to OpenSSL's install area
++# ZLIB_ROOT         - Path to zlib's install area
++# ===================================================================
++
++cmake_minimum_required(VERSION 3.0)
++
++# Silence warnings about ${<PackageName>_ROOT} in CMake 3.12+
++if((${CMAKE_MAJOR_VERSION} GREATER 3) OR (${CMAKE_MINOR_VERSION} GREATER 11))
++  cmake_policy(SET CMP0074 NEW)
++endif()
++
++set(SERF_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
++set(CMAKE_MODULE_PATH "${SERF_SOURCE_DIR}/build")
++include(SerfVersion)
++
++project("Serf" VERSION ${SERF_VERSION} LANGUAGES C)
++message(WARNING
++        "Serf's CMake build is considered EXPERIMENTAL. "
++        "Some features are not supported and the build "
++        "has not been tested on many supported platforms.")
++
++
++# Build options
++option(DEBUG "Enable debugging info and strict compile warnings" OFF)
++option(SKIP_SHARED "Disable building shared Serf libraries" OFF)
++option(SKIP_STATIC "Disable building static Serf libraries" OFF)
++option(LIBDIR "Install directory for architecture-dependent libraries" "")
++option(GSSAPI "Path to GSSAPI's install area" "")
++option(BROTLI "Path to Brotli's install area" "")
++option(DISABLE_LOGGING "Disable the logging framework at compile time" OFF)
++option(SKIP_TESTS "Disable building the unit tests and utilities" OFF)
++option(ENABLE_SLOW_TESTS "Enable long-running unit tests" OFF)
++
++# Platform-specific build options
++option(APR_STATIC "Windows: Link with static APR/-Util libraries" OFF)
++option(EXPAT "Windows: optional path to Expat's install area for APR_STATIC" "")
++option(RELATIVE_RPATH "macOS: Use @rpath in installed shared library" OFF)
++
++if(SKIP_SHARED AND SKIP_STATIC)
++  message(FATAL_ERROR "You have disabled both shared and static library builds.")
++endif()
++
++# Initialize the build type if it was not set on the command line.
++if(NOT CMAKE_BUILD_TYPE)
++  if(DEBUG)
++    set(CMAKE_BUILD_TYPE DEBUG CACHE STRING "Default to debug build.")
++  else()
++    set(CMAKE_BUILD_TYPE RELEASE CACHE STRING "Default to release build.")
++  endif()
++endif()
++
++include(SerfPlatform)
++include(SerfWindowsToolkit)
++
++
++# Public headers
++list(APPEND HEADERS
++    "serf.h"
++    "serf_bucket_types.h"
++    "serf_bucket_util.h"
++)
++
++# List of symbols that should not be exported from the shared library.
++list(APPEND EXPORTS_BLACKLIST
++     "serf_connection_switch_protocol"
++     "serf_http_protocol_create"
++     "serf_https_protocol_create"
++     "serf_http_request_queue"
++)
++
++# Serf library source files
++list(APPEND SOURCES
++    "context.c"
++    "incoming.c"
++    "outgoing.c"
++    "ssltunnel.c"
++    "auth/auth.c"
++    "auth/auth_basic.c"
++    "auth/auth_digest.c"
++    "auth/auth_spnego.c"
++    "auth/auth_spnego_gss.c"
++    "auth/auth_spnego_sspi.c"
++    "buckets/aggregate_buckets.c"
++    "buckets/allocator.c"
++    "buckets/barrier_buckets.c"
++    "buckets/buckets.c"
++    "buckets/bwtp_buckets.c"
++    "buckets/chunk_buckets.c"
++    "buckets/dechunk_buckets.c"
++    "buckets/deflate_buckets.c"
++    "buckets/file_buckets.c"
++    "buckets/headers_buckets.c"
++    "buckets/iovec_buckets.c"
++    "buckets/limit_buckets.c"
++    "buckets/mmap_buckets.c"
++    "buckets/request_buckets.c"
++    "buckets/response_body_buckets.c"
++    "buckets/response_buckets.c"
++    "buckets/simple_buckets.c"
++    "buckets/socket_buckets.c"
++    "buckets/ssl_buckets.c"
++)
++
++if(SERF_WINDOWS)
++  # Generate the .def file for the Windows DLL import library.
++  set(SERF_DEF_FILE "${CMAKE_CURRENT_BINARY_DIR}/serf.def")
++  add_custom_command(
++    OUTPUT "${SERF_DEF_FILE}"
++    DEPENDS ${HEADERS}
++    COMMAND ${CMAKE_COMMAND}
++            -DCMAKE_SYSTEM_NAME="${CMAKE_SYSTEM_NAME}"
++            -DCMAKE_MODULE_PATH="${CMAKE_MODULE_PATH}"
++            -DSERF_DEF_BLACKLIST="${EXPORTS_BLACKLIST}"
++            -DSERF_DEF_HEADERS="${HEADERS}"
++            -DSERF_DEF_FILE="${SERF_DEF_FILE}"
++            -P "build/SerfWindowsGenDef.cmake"
++    WORKING_DIRECTORY "${SERF_SOURCE_DIR}"
++  )
++  set(SHARED_SOURCES "serf.rc" "${SERF_DEF_FILE}")
++
++  # Static OpenSSL, APR and APR-Util need additional libraries that are not
++  # linked by default by CMake. These will be ignored by the linker if they're
++  # not actually used.
++  set(SERF_STANDARD_LIBRARIES
++      "crypt32.lib"
++      "mswsock.lib"
++      "rpcrt4.lib"
++      "secur32.lib"
++      "ws2_32.lib"
++  )
++endif(SERF_WINDOWS)
++
++
++# Process build options for dependency search
++if(GSSAPI)
++  message(WARNING "option GSSAPI is not implemented")
++endif()
++
++if(BROTLI)
++  message(WARNING "option BROTLI is not implemented")
++endif()
++
++if(SERF_WINDOWS)
++  if(EXPAT)
++    set(PC_EXPAT_INCLUDE_DIRS "${EXPAT}/include")
++    set(PC_EXPAT_LIBRARY_DIRS "${EXPAT}/lib")
++  endif(EXPAT)
++else(SERF_WINDOWS)
++  if(EXPAT)
++    message(WARNING "option EXPAT is not implemented on this platform")
++  endif(EXPAT)
++endif(SERF_WINDOWS)
++
++# Find dependencies
++find_package(OpenSSL)
++find_package(ZLIB)
++find_package(APR)
++find_package(APRUtil)
++
++# Calculate the set of private and public targets
++set(SERF_PRIVATE_TARGETS OpenSSL::Crypto OpenSSL::SSL ZLIB::ZLIB)
++
++if(APR_STATIC)
++  if(SERF_WINDOWS)
++    list(APPEND SERF_PUBLIC_TARGETS APR::APR_static)
++    if(NOT APR_CONTAINS_APRUTIL)
++      list(APPEND SERF_PUBLIC_TARGETS APR::APRUTIL_static)
++    endif()
++    add_definitions("/DAPR_DECLARE_STATIC" "/DAPU_DECLARE_STATIC")
++  else(SERF_WINDOWS)
++    message(WARNING "option APR_STATIC is not implemented on this platform")
++  endif(SERF_WINDOWS)
++else(APR_STATIC)
++  list(APPEND SERF_PUBLIC_TARGETS APR::APR)
++  if(NOT APR_CONTAINS_APRUTIL)
++    list(APPEND SERF_PUBLIC_TARGETS APR::APRUTIL)
++  endif()
++endif(APR_STATIC)
++
++# Feature tests
++include(SerfChecks)
++CheckNotFunction("BIO_set_init" "SERF_NO_SSL_BIO_WRAPPERS" ${OPENSSL_LIBRARIES} ${SERF_STANDARD_LIBRARIES})
++CheckNotFunction("X509_STORE_get0_param" "SERF_NO_SSL_X509_STORE_WRAPPERS" ${OPENSSL_LIBRARIES} ${SERF_STANDARD_LIBRARIES})
++CheckNotFunction("X509_get0_notBefore" "SERF_NO_SSL_X509_GET0_NOTBEFORE" ${OPENSSL_LIBRARIES} ${SERF_STANDARD_LIBRARIES})
++CheckNotFunction("X509_get0_notAfter" "SERF_NO_SSL_X509_GET0_NOTAFTER" ${OPENSSL_LIBRARIES} ${SERF_STANDARD_LIBRARIES})
++CheckNotFunction("X509_STORE_CTX_get0_chain" "SERF_NO_SSL_X509_GET0_CHAIN" ${OPENSSL_LIBRARIES} ${SERF_STANDARD_LIBRARIES})
++CheckNotFunction("ASN1_STRING_get0_data" "SERF_NO_SSL_ASN1_STRING_GET0_DATA" ${OPENSSL_LIBRARIES} ${SERF_STANDARD_LIBRARIES})
++CheckFunction("CRYPTO_set_locking_callback" "SERF_HAVE_SSL_LOCKING_CALLBACKS" ${OPENSSL_LIBRARIES} ${SERF_STANDARD_LIBRARIES})
++CheckFunction("OpenSSL_version_num" "SERF_HAVE_OPENSSL_VERSION_NUM" ${OPENSSL_LIBRARIES} ${SERF_STANDARD_LIBRARIES})
++CheckFunction("SSL_set_alpn_protos" "SERF_HAVE_OPENSSL_ALPN" ${OPENSSL_LIBRARIES} ${SERF_STANDARD_LIBRARIES})
++CheckFunctionMacro("OPENSSL_malloc_init" "SERF_HAVE_OPENSSL_MALLOC_INIT" "openssl/crypto.h"
++                   "${OPENSSL_INCLUDE_DIR}" ${OPENSSL_LIBRARIES} ${SERF_STANDARD_LIBRARIES})
++CheckFunctionMacro("SSL_library_init" "SERF_HAVE_OPENSSL_SSL_LIBRARY_INIT" "openssl/ssl.h"
++                   "${OPENSSL_INCLUDE_DIR}" ${OPENSSL_LIBRARIES} ${SERF_STANDARD_LIBRARIES})
++CheckHeader("openssl/applink.c" "SERF_HAVE_OPENSSL_APPLINK_C" ${OPENSSL_INCLUDE_DIR})
++CheckHeader("stdbool.h" "HAVE_STDBOOL_H=1")
++CheckType("OSSL_HANDSHAKE_STATE" "openssl/ssl.h" "SERF_HAVE_OSSL_HANDSHAKE_STATE" ${OPENSSL_INCLUDE_DIR})
++
++if(CMAKE_COMPILER_IS_GNUCC OR (CMAKE_C_COMPILER_ID MATCHES "Clang"))
++  set(CC_LIKE_GNUC TRUE)
++endif()
++
++# Process other build options
++if(LIBDIR)
++  message(WARNING "option LIBDIR is not implemented yet")
++endif()
++
++if(DEBUG)
++  add_definitions("-DDEBUG" "-D_DEBUG")
++endif()
++
++if(DISABLE_LOGGING)
++  add_definitions("-DSERF_DISABLE_LOGGING")
++endif()
++
++if(ENABLE_SLOW_TESTS)
++  add_definitions("-DSERF_TEST_DEFLATE_4GBPLUS_BUCKETS")
++endif()
++
++
++# Set common compiler flags
++if(NOT MSVC)
++  if(CC_LIKE_GNUC)
++    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
++    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wdeclaration-after-statement")
++    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wmissing-prototypes")
++    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c89")
++
++    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0")
++  endif()
++else()
++  # Warning level 4, no unused argument warnings
++  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W4 /wd4100")
++  # Conditional expression is constant
++  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4127")
++  # Assignment within conditional expression
++  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4706")
++
++  add_definitions(
++    "/DWIN32" "/DWIN32_LEAN_AND_MEAN"
++    "/DNOUSER" "/DNOGDI" "/DNONLS" "/DNOCRYPT"
++    "/D_CRT_SECURE_NO_WARNINGS"
++    "/D_CRT_NONSTDC_NO_WARNINGS"
++  )
++  if(SERF_WIN64)
++    add_definitions("/DWIN64")
++  endif()
++
++  set(CMAKE_IMPORT_LIBRARY_PREFIX "lib")
++  set(CMAKE_SHARED_LIBRARY_PREFIX "lib")
++endif(NOT MSVC)
++
++# Define all targets
++if(NOT SKIP_SHARED)
++  add_library(serf_shared SHARED ${SOURCES} ${SHARED_SOURCES})
++  target_compile_options(serf_shared PUBLIC ${APR_CFLAGS})
++  target_include_directories(serf_shared PUBLIC ${SERF_SOURCE_DIR})
++  target_link_libraries(serf_shared
++                        PRIVATE ${SERF_PRIVATE_TARGETS}
++                                ${SERF_STANDARD_LIBRARIES}
++                        PUBLIC ${SERF_PUBLIC_TARGETS})
++  set_target_properties(serf_shared PROPERTIES
++                        VERSION ${SERF_VERSION}
++                        SOVERSION ${SERF_SOVERSION})
++  if(SERF_DARWIN AND NOT RELATIVE_RPATH)
++    set_target_properties(serf_shared PROPERTIES
++                          INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
++  endif()
++  set(SERF_TARGETS "serf_shared")
++
++  if(SERF_WINDOWS)
++    install(FILES $<TARGET_PDB_FILE:serf_shared> DESTINATION "bin")
++  endif()
++endif()
++
++if(NOT SKIP_STATIC)
++  add_library(serf_static STATIC ${SOURCES})
++  target_compile_options(serf_static PUBLIC ${APR_CFLAGS})
++  target_include_directories(serf_static PUBLIC ${SERF_SOURCE_DIR})
++  target_link_libraries(serf_static
++                        ${SERF_PRIVATE_TARGETS}
++                        ${SERF_PUBLIC_TARGETS}
++                        ${SERF_STANDARD_LIBRARIES})
++  list(APPEND SERF_TARGETS "serf_static")
++endif()
++
++set_target_properties(${SERF_TARGETS}
++                      PROPERTIES
++                      OUTPUT_NAME "serf-${SERF_MAJOR_VERSION}")
++
++install(TARGETS ${SERF_TARGETS}
++        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
++        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++        RUNTIME DESTINATION "bin")
++
++if(NOT SERF_WINDOWS)
++  set(SERF_INCLUDE_SUBDIR "serf-${SERF_MAJOR_VERSION}")
++endif()
++install(FILES ${HEADERS} DESTINATION "include/${SERF_INCLUDE_SUBDIR}")
++
++
++# Generate the pkg-config module file.
++if(NOT SERF_WINDOWS)
++  # Use a separate variable scope for the substitutions in serf.pc.in.
++  function(make_pkgconfig)
++    set(PREFIX ${CMAKE_INSTALL_PREFIX})
++    if(NOT LIBDIR)
++      set(LIBDIR "\${prefix}/lib")
++    endif()
++    set(INCLUDE_SUBDIR ${SERF_INCLUDE_SUBDIR})
++    set(VERSION ${SERF_VERSION})
++    set(MAJOR ${SERF_MAJOR_VERSION})
++    set(SERF_INTERFACE_LIBS
++      ${APR_LIBRARIES}
++      ${APR_EXTRALIBS}
++      ${APRUTIL_LIBRARIES}
++      ${APRUTIL_EXTRALIBS}
++      )
++    list(REMOVE_DUPLICATES SERF_INTERFACE_LIBS)
++    unset(LIBS)
++    foreach(DEPLIB ${SERF_INTERFACE_LIBS})
++      string(APPEND LIBS " ${DEPLIB}")
++    endforeach()
++    configure_file("build/serf.pc.in" "serf-${SERF_MAJOR_VERSION}.pc" @ONLY)
++  endfunction()
++
++  make_pkgconfig()
++  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/serf-${SERF_MAJOR_VERSION}.pc"
++          DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
++endif()
++
++
++if(NOT SKIP_TESTS)
++  if(SKIP_STATIC)
++    message(WARNING "The tests depend on the Serf static library")
++    message(STATUS "Skipping tests; to silence this message, either remove")
++    message(STATUS "the SKIP_STATIC option or add the SKIP_TESTS option.")
++  else()
++    enable_testing()
++    add_subdirectory(test)
++  endif()
++endif()
+diff --git a/build/FindAPR.cmake b/build/FindAPR.cmake
+new file mode 100644
+index 0000000..073ffe7
+--- /dev/null
++++ b/build/FindAPR.cmake
+@@ -0,0 +1,269 @@
++# ===================================================================
++#   Licensed to the Apache Software Foundation (ASF) under one
++#   or more contributor license agreements.  See the NOTICE file
++#   distributed with this work for additional information
++#   regarding copyright ownership.  The ASF licenses this file
++#   to you under the Apache License, Version 2.0 (the
++#   "License"); you may not use this file except in compliance
++#   with the License.  You may obtain a copy of the License at
++#
++#     http://www.apache.org/licenses/LICENSE-2.0
++#
++#   Unless required by applicable law or agreed to in writing,
++#   software distributed under the License is distributed on an
++#   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++#   KIND, either express or implied.  See the License for the
++#   specific language governing permissions and limitations
++#   under the License.
++# ===================================================================
++
++cmake_minimum_required(VERSION 3.0)
++
++#.rst:
++# FindAPR
++# --------
++#
++# Find the native Apache Portable Runtime includes and library.
++#
++# IMPORTED Targets
++# ^^^^^^^^^^^^^^^^
++#
++# This module defines :prop_tgt:`IMPORTED` target ``APR::APR``, if
++# APR has been found. On Windows, it may define the :prop_tgt:`IMPORTED`
++# target ``APR::APR_static`` if the static libraries are found.
++#
++# Result Variables
++# ^^^^^^^^^^^^^^^^
++#
++# This module defines the following variables:
++#
++# ::
++#
++#   APR_FOUND          - True if APR was found.
++#   APR_VERSION        - The version of APR found (x.y.z)
++#   APR_CONTAINS_APRUTIL - True if the APR major version is 2 or greater.
++#   APR_INCLUDES       - Where to find apr.h, etc.
++#   APR_LIBRARIES      - Linker switches to use with ld to link against APR
++#
++# ::
++#
++#   APR_EXTRALIBS      - Additional libraries to link against
++#   APR_CFLAGS         - The flags to use to compile.
++#   APR_STATIC_LIBS    - On Windows: list of APR static libraries
++#   APR_RUNTIME_LIBS   - On Windows: list of APR runtime DLLs
++#
++# Hints
++# ^^^^^
++#
++# A user may set ``APR_ROOT`` to an APR installation root to tell this
++# module where to look. This variable must be defined on Windows.
++
++
++# -------------------------------------------------------------------
++# Common utility functions for FindAPR.cmaks and FindAPRtil.cmake
++# -------------------------------------------------------------------
++
++# Run the APR/Util configuration program
++function(_apru_config _program _varname _regexp)
++  execute_process(COMMAND ${_program} ${ARGN}
++                  OUTPUT_VARIABLE _apru_output
++                  RESULT_VARIABLE _apru_failed)
++
++  if(_apru_failed)
++    message(FATAL_ERROR "${_program} ${ARGN} failed")
++  else()
++    # Join multi-line outupt
++    string(REGEX REPLACE "[\r\n]"       ""  _apru_output "${_apru_output}")
++
++    # Optionally apply the regular expression filter
++    if(NOT ${_regexp} STREQUAL "")
++      string(REGEX REPLACE "${_regexp}" " " _apru_output "${_apru_output}")
++    endif()
++
++    # Remove leading and trailing spaces
++    string(REGEX REPLACE "^ +"          ""  _apru_output "${_apru_output}")
++    string(REGEX REPLACE " +$"          ""  _apru_output "${_apru_output}")
++
++    separate_arguments(_apru_output)
++    set(${_varname} ${_apru_output} PARENT_SCOPE)
++  endif()
++endfunction(_apru_config)
++
++# Parse the APR/Util version number from the header
++function(_apru_version _version_varname _major_varname _minor_varname _header _prefix)
++  file(STRINGS ${_header} _apru_major
++       REGEX "^ *# *define +${_prefix}_MAJOR_VERSION +[0-9]+.*$")
++  file(STRINGS ${_header} _apru_minor
++       REGEX "^ *# *define +${_prefix}_MINOR_VERSION +[0-9]+.*$")
++  file(STRINGS ${_header} _apru_patch
++       REGEX "^ *# *define +${_prefix}_PATCH_VERSION +[0-9]+.*$")
++  string(REGEX REPLACE "^[^0-9]+([0-9]+).*$" "\\1" _apru_major ${_apru_major})
++  string(REGEX REPLACE "^[^0-9]+([0-9]+).*$" "\\1" _apru_minor ${_apru_minor})
++  string(REGEX REPLACE "^[^0-9]+([0-9]+).*$" "\\1" _apru_patch ${_apru_patch})
++  set(${_version_varname} "${_apru_major}.${_apru_minor}.${_apru_patch}" PARENT_SCOPE)
++  set(${_major_varname} ${_apru_major} PARENT_SCOPE)
++  set(${_minor_varname} ${_apru_minor} PARENT_SCOPE)
++endfunction(_apru_version)
++
++# Windows: Find the DLL (runtime) library
++function(_apru_find_dll _varname _dllname)
++  set(CMAKE_FIND_LIBRARY_SUFFIXES ".dll")
++  find_library(${_varname} NAMES ${_dllname}
++               PATHS ${ARGN} NO_DEFAULT_PATH PATH_SUFFIXES "bin" "lib")
++endfunction(_apru_find_dll)
++
++# Extract the main and extra static libraries
++function(_apru_extras _static_var _extra_var)
++  # The first element in the list of static libraries will be the the main
++  # APR/Util static library, anything else will be additional interface
++  # libraries.
++  set(_extra "${ARGN}")
++  list(GET _extra 0 _static)
++  list(REMOVE_AT _extra 0)
++  set(${_static_var} ${_static} PARENT_SCOPE)
++  set(${_extra_var} ${_extra} PARENT_SCOPE)
++endfunction(_apru_extras)
++
++# From the list of link libraries, extract the imported location
++function(_apru_location _location_var _extralibs_var)
++  unset(_dir)
++  unset(_lib)
++  unset(_extra)
++  foreach(_part ${ARGN})
++    string(SUBSTRING "${_part}" 0 2 _flag)
++    if(_flag STREQUAL "-L")
++      if(NOT _dir AND NOT _lib)
++        string(SUBSTRING "${_part}" 2 -1 _rest)
++        set(_dir "${_rest}")
++      else()
++        list(APPEND _extra "${_part}")
++      endif()
++    elseif(_flag STREQUAL "-l")
++      if(NOT _lib)
++        string(SUBSTRING "${_part}" 2 -1 _rest)
++        set(_lib "${_rest}")
++      else()
++        list(APPEND _extra " ${_part}")
++      endif()
++    else()
++      if(NOT _lib)
++        set(_lib "${_rest}")
++      else()
++        list(APPEND _extra " ${_part}")
++      endif()
++    endif()
++  endforeach()
++
++  if(NOT _lib)
++    message(FATAL_ERROR "did not find any libraries in '${ARGN}'")
++  endif()
++
++  if(NOT _dir)
++    find_library(${_location_var} NAMES "${_lib}")
++  else()
++    find_library(${_location_var} NAMES "${_lib}" PATHS "${_dir}" NO_DEFAULT_PATH)
++  endif()
++  set(${_extralibs_var} ${_extra} PARENT_SCOPE)
++endfunction(_apru_location)
++
++# -------------------------------------------------------------------
++
++if(NOT _apru_include_only_utilities)
++
++  set(APR_FOUND FALSE)
++
++  if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
++
++    if(DEFINED APR_ROOT)
++      get_filename_component(APR_ROOT "${APR_ROOT}" REALPATH)
++    else()
++      message(FATAL_ERROR "APR_ROOT must be defined on Windows")
++    endif()
++
++    include(CheckIncludeFile)
++
++    set(APR_INCLUDES "${APR_ROOT}/include")
++    if(NOT EXISTS "${APR_INCLUDES}/apr.h")
++      message(FATAL_ERROR "apr.h was not found in ${APR_INCLUDES}")
++    endif()
++    if(NOT EXISTS "${APR_INCLUDES}/apr_version.h")
++      message(FATAL_ERROR "apr_version.h was not found in ${APR_INCLUDES}")
++    endif()
++
++    _apru_version(APR_VERSION _apr_major _apr_minor "${APR_INCLUDES}/apr_version.h" "APR")
++    set(_apr_name "apr-${_apr_major}")
++
++    find_library(APR_LIBRARIES NAMES "lib${_apr_name}.lib"
++                 PATHS ${APR_ROOT} NO_DEFAULT_PATH PATH_SUFFIXES "lib")
++    find_library(APR_STATIC_LIBS NAMES "${_apr_name}.lib"
++                 PATHS ${APR_ROOT} NO_DEFAULT_PATH PATH_SUFFIXES "lib")
++    _apru_find_dll(APR_RUNTIME_LIBS "lib${_apr_name}.dll" ${APR_ROOT})
++
++  else()    # NOT Windows
++
++    if(DEFINED APR_ROOT)
++      get_filename_component(APR_ROOT "${APR_ROOT}" REALPATH)
++      find_program(APR_CONFIG_EXECUTABLE NAMES apr-2-config apr-1-config
++                   PATHS "${APR_ROOT}/bin" NO_DEFAULT_PATH)
++    else()
++      find_program(APR_CONFIG_EXECUTABLE NAMES apr-2-config apr-1-config)
++    endif()
++    mark_as_advanced(APR_CONFIG_EXECUTABLE)
++
++    macro(_apr_invoke _varname _regexp)
++      _apru_config(${APR_CONFIG_EXECUTABLE} ${_varname} "${_regexp}" "${ARGN}")
++    endmacro(_apr_invoke)
++
++    _apr_invoke(APR_CFLAGS     "(^| )-(g|O)[^ ]*" --cppflags --cflags)
++    _apr_invoke(APR_INCLUDES   "(^| )-I"          --includes)
++    _apr_invoke(APR_LIBRARIES  ""                 --link-ld)
++    _apr_invoke(APR_EXTRALIBS  ""                 --libs)
++    _apr_invoke(APR_VERSION    ""                 --version)
++    string(REGEX REPLACE "^([0-9]+)\\..*$" "\\1" _apr_major "${APR_VERSION}")
++
++  endif()   # NOT Windows
++
++  if(${_apr_major} GREATER 1)
++    set(APR_CONTAINS_APRUTIL TRUE)
++  else()
++    set(APR_CONTAINS_APRUTIL FALSE)
++  endif()
++
++  include(FindPackageHandleStandardArgs)
++  find_package_handle_standard_args(APR
++                                    REQUIRED_VARS APR_LIBRARIES APR_INCLUDES
++                                    VERSION_VAR APR_VERSION)
++
++  if(APR_FOUND)
++    if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
++
++      if(APR_LIBRARIES AND APR_RUNTIME_LIBS)
++        add_library(APR::APR SHARED IMPORTED)
++        set_target_properties(APR::APR PROPERTIES
++          INTERFACE_INCLUDE_DIRECTORIES "${APR_INCLUDES}"
++          IMPORTED_LOCATION "${APR_RUNTIME_LIBS}"
++          IMPORTED_IMPLIB "${APR_LIBRARIES}")
++      endif()
++
++      if(APR_STATIC_LIBS)
++        _apru_extras(_apr_static _apr_extra ${APR_STATIC_LIBS})
++        add_library(APR::APR_static STATIC IMPORTED)
++        set_target_properties(APR::APR_static PROPERTIES
++          INTERFACE_INCLUDE_DIRECTORIES "${APR_INCLUDES}"
++          IMPORTED_INTERFACE_LINK_LIBRARIES "${_apr_extra}"
++          IMPORTED_LOCATION "${_apr_static}")
++      endif()
++
++    else()    # NOT Windows
++
++      _apru_location(_apr_library _apr_extra "${APR_LIBRARIES}")
++      add_library(APR::APR UNKNOWN IMPORTED)
++      set_target_properties(APR::APR PROPERTIES
++        INTERFACE_INCLUDE_DIRECTORIES "${APR_INCLUDES}"
++        INTERFACE_LINK_LIBRARIES "${APR_EXTRALIBS};${_apr_extra}"
++        IMPORTED_LOCATION "${_apr_library}")
++
++    endif()   # NOT Windows
++  endif(APR_FOUND)
++
++endif(NOT _apru_include_only_utilities)
+diff --git a/build/FindAPRUtil.cmake b/build/FindAPRUtil.cmake
+new file mode 100644
+index 0000000..9812320
+--- /dev/null
++++ b/build/FindAPRUtil.cmake
+@@ -0,0 +1,195 @@
++# ===================================================================
++#   Licensed to the Apache Software Foundation (ASF) under one
++#   or more contributor license agreements.  See the NOTICE file
++#   distributed with this work for additional information
++#   regarding copyright ownership.  The ASF licenses this file
++#   to you under the Apache License, Version 2.0 (the
++#   "License"); you may not use this file except in compliance
++#   with the License.  You may obtain a copy of the License at
++#
++#     http://www.apache.org/licenses/LICENSE-2.0
++#
++#   Unless required by applicable law or agreed to in writing,
++#   software distributed under the License is distributed on an
++#   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++#   KIND, either express or implied.  See the License for the
++#   specific language governing permissions and limitations
++#   under the License.
++# ===================================================================
++
++cmake_minimum_required(VERSION 3.0)
++
++#.rst:
++# FindAPRUtil
++# --------
++#
++# Find the native Apache Portable Runtime Utilities includes and library.
++#
++# IMPORTED Targets
++# ^^^^^^^^^^^^^^^^
++#
++# This module defines :prop_tgt:`IMPORTED` target ``APR::APRUTIL``, if
++# APR-Util has been found. On Windows, it may define the :prop_tgt:`IMPORTED`
++# target ``APR::APRUTIL_static`` if the static libraries are found.
++#
++# Result Variables
++# ^^^^^^^^^^^^^^^^
++#
++# This module defines the following variables:
++#
++# ::
++#
++#   APRUTIL_FOUND          - True if APR-Util was found
++#   APRUTIL_VERSION        - The version of APR-Util found (x.y.z)
++#   APRUTIL_INCLUDES       - Where to find apr.h, etc.
++#   APRUTIL_LIBRARIES      - Linker switches to use with ld to link against APR
++#
++# ::
++#
++#   APRUTIL_EXTRALIBS      - Additional libraries to link against
++#   APRUTIL_STATIC_LIBS    - On Windows: list of APR-Util static libraries
++#   APRUTIL_RUNTIME_LIBS   - On Windows: list of APR-Util runtime DLLs
++#
++# Hints
++# ^^^^^
++#
++# A user may set ``APRUtil_ROOT`` to an APR-Util installation root to tell
++# this module where to look. This variable must be defined on Windows.
++
++
++if(NOT APR_FOUND)
++  find_package(APR REQUIRED)
++endif()
++
++set(APRUTIL_FOUND FALSE)
++
++if(APR_CONTAINS_APRUTIL)
++
++  set(APRUTIL_VERSION ${APR_VERSION})
++  include(FindPackageHandleStandardArgs)
++  find_package_handle_standard_args(APRUTIL
++                                    REQUIRED_VARS APRUTIL_VERSION
++                                    VERSION_VAR APRUTIL_VERSION)
++
++else(APR_CONTAINS_APRUTIL)
++
++  set(_apru_include_only_utilities TRUE)
++  include(${CMAKE_CURRENT_LIST_DIR}/FindAPR.cmake)
++  unset(_apru_include_only_utilities)
++
++  if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
++
++    if(DEFINED APRUtil_ROOT)
++      get_filename_component(APRUtil_ROOT "${APRUtil_ROOT}" REALPATH)
++    else()
++      message(FATAL_ERROR "APRUtil_ROOT must be defined on Windows")
++    endif()
++
++    include(CheckIncludeFile)
++
++    set(APRUTIL_INCLUDES "${APRUtil_ROOT}/include")
++    if(NOT EXISTS "${APRUTIL_INCLUDES}/apu.h")
++      message(FATAL_ERROR "apu.h was not found in ${APRUTIL_INCLUDES}")
++    endif()
++    if(NOT EXISTS "${APRUTIL_INCLUDES}/apu_version.h")
++      message(FATAL_ERROR "apu_version.h was not found in ${APRUTIL_INCLUDES}")
++    endif()
++
++    _apru_version(APRUTIL_VERSION _apu_major _apu_minor "${APRUTIL_INCLUDES}/apu_version.h" "APU")
++    set(_apu_name "aprutil-${_apu_major}")
++
++    if(${_apu_major} GREATER 1 OR (${_apu_major} EQUAL 1 AND ${_apu_minor} GREATER 5))
++      set(_apu_expat_name "expat.lib")
++    else()
++      set(_apu_expat_name "xml.lib")
++    endif()
++
++    find_library(APRUTIL_LIBRARIES NAMES "lib${_apu_name}.lib"
++                 PATHS ${APRUtil_ROOT} NO_DEFAULT_PATH PATH_SUFFIXES "lib")
++    find_library(_apu_static NAMES "${_apu_name}.lib"
++                 PATHS ${APRUtil_ROOT} NO_DEFAULT_PATH PATH_SUFFIXES "lib")
++    find_library(_apu_expat NAMES ${_apu_expat_name}
++                 PATHS ${APRUtil_ROOT} NO_DEFAULT_PATH PATH_SUFFIXES "lib")
++    _apru_find_dll(APRUTIL_RUNTIME_LIBS "lib${_apu_name}.dll" ${APRUtil_ROOT})
++
++    if(NOT _apu_expat AND (_apu_expat_name MATCHES "expat"))
++      find_package(EXPAT QUIET)
++      if(EXPAT_FOUND)
++        set(_apu_expat ${EXPAT_LIBRARIES})
++      endif()
++    endif()
++    if(NOT _apu_expat)
++      message(WARNING "Could not find ${_apu_expat_name}"
++                      " for APR-Util static linking.")
++    endif()
++    set(APRUTIL_STATIC_LIBS ${_apu_static} ${_apu_expat}
++        CACHE STRING "APR-Util static libraies.")
++
++  else()    # NOT Windows
++
++    if(DEFINED APRUtil_ROOT)
++      get_filename_component(APRUtil_ROOT "${APRUtil_ROOT}" REALPATH)
++      find_program(APRUTIL_CONFIG_EXECUTABLE apu-1-config
++                   PATHS "${APRUtil_ROOT}/bin" NO_DEFAULT_PATH)
++    else()
++      find_program(APRUTIL_CONFIG_EXECUTABLE apu-1-config)
++    endif()
++    mark_as_advanced(APRUTIL_CONFIG_EXECUTABLE)
++
++    macro(_apu_invoke _varname _regexp)
++      _apru_config(${APRUTIL_CONFIG_EXECUTABLE} ${_varname} "${_regexp}" "${ARGN}")
++    endmacro(_apu_invoke)
++
++    _apu_invoke(APRUTIL_INCLUDES  "(^| )-I" --includes)
++    _apu_invoke(APRUTIL_EXTRALIBS ""        --libs)
++    _apu_invoke(APRUTIL_LIBRARIES ""        --link-ld)
++    _apu_invoke(APRUTIL_LDFLAGS   ""        --ldflags)
++    _apu_invoke(APRUTIL_VERSION   ""        --version)
++
++  endif()   # NOT Windows
++
++  include(FindPackageHandleStandardArgs)
++  find_package_handle_standard_args(APRUTIL
++                                    REQUIRED_VARS APRUTIL_LIBRARIES APRUTIL_INCLUDES
++                                    VERSION_VAR APRUTIL_VERSION)
++
++  if(APRUTIL_FOUND)
++    if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
++
++      if(APRUTIL_LIBRARIES AND APRUTIL_RUNTIME_LIBS)
++        add_library(APR::APRUTIL SHARED IMPORTED)
++        set_target_properties(APR::APRUTIL PROPERTIES
++          INTERFACE_INCLUDE_DIRECTORIES "${APRUTIL_INCLUDES}"
++          IMPORTED_LOCATION "${APRUTIL_RUNTIME_LIBS}"
++          IMPORTED_IMPLIB "${APRUTIL_LIBRARIES}")
++        if(TARGET APR::APR)
++          set_target_properties(APR::APRUTIL PROPERTIES
++            INTERFACE_LINK_LIBRARIES APR::APR)
++        endif()
++      endif()
++
++      if(APRUTIL_STATIC_LIBS)
++        _apru_extras(_apu_static _apu_extra ${APRUTIL_STATIC_LIBS})
++        if(TARGET APR::APR_static)
++          list(APPEND _apu_extra APR::APR_static)
++        endif()
++        add_library(APR::APRUTIL_static STATIC IMPORTED)
++        set_target_properties(APR::APRUTIL_static PROPERTIES
++          INTERFACE_INCLUDE_DIRECTORIES "${APRUTIL_INCLUDES}"
++          INTERFACE_LINK_LIBRARIES "${_apu_extra}"
++          IMPORTED_LOCATION "${_apu_static}")
++      endif()
++
++    else()    # NOT Windows
++
++      _apru_location(_apu_library _apu_extra "${APRUTIL_LIBRARIES}")
++      add_library(APR::APRUTIL UNKNOWN IMPORTED)
++      set_target_properties(APR::APRUTIL PROPERTIES
++        INTERFACE_INCLUDE_DIRECTORIES "${APRUTIL_INCLUDES}"
++        INTERFACE_LINK_LIBRARIES "${APRUTIL_EXTRALIBS};${_apu_extra}"
++        IMPORTED_LOCATION "${_apu_library}")
++
++    endif()   # NOT Windows
++  endif(APRUTIL_FOUND)
++
++endif(APR_CONTAINS_APRUTIL)
+diff --git a/build/SerfChecks.cmake b/build/SerfChecks.cmake
+new file mode 100644
+index 0000000..093833e
+--- /dev/null
++++ b/build/SerfChecks.cmake
+@@ -0,0 +1,137 @@
++# ===================================================================
++#   Licensed to the Apache Software Foundation (ASF) under one
++#   or more contributor license agreements.  See the NOTICE file
++#   distributed with this work for additional information
++#   regarding copyright ownership.  The ASF licenses this file
++#   to you under the Apache License, Version 2.0 (the
++#   "License"); you may not use this file except in compliance
++#   with the License.  You may obtain a copy of the License at
++#
++#     http://www.apache.org/licenses/LICENSE-2.0
++#
++#   Unless required by applicable law or agreed to in writing,
++#   software distributed under the License is distributed on an
++#   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++#   KIND, either express or implied.  See the License for the
++#   specific language governing permissions and limitations
++#   under the License.
++# ===================================================================
++
++include(CheckFunctionExists)
++include(CheckIncludeFile)
++include(CheckSymbolExists)
++include(CheckTypeSize)
++
++function(_CheckFunction var_ name_ libraries_)
++  if(libraries_)
++    set(CMAKE_REQUIRED_LIBRARIES "${libraries_}")
++  else()
++    unset(CMAKE_REQUIRED_LIBRARIES)
++  endif()
++
++  check_function_exists("${name_}" "serf_foundit_${name_}_")
++  if(serf_foundit_${name_}_)
++    set("${var_}" TRUE PARENT_SCOPE)
++  else()
++    set("${var_}" FALSE PARENT_SCOPE)
++  endif()
++  unset(CMAKE_REQUIRED_LIBRARIES)
++endfunction(_CheckFunction)
++
++macro(CheckFunction name_ symbol_)
++  _CheckFunction("serf_feature_CheckFunction_${name}_" "${name_}" "${ARGN}")
++  if("${serf_feature_CheckFunction_${name}_}")
++    add_definitions("-D${symbol_}")
++  endif()
++endmacro(CheckFunction)
++
++macro(CheckNotFunction name_ symbol_)
++  _CheckFunction("serf_feature_CheckNotFunction_${name}_" "${name_}" "${ARGN}")
++  if(NOT "${serf_feature_CheckNotFunction_${name}_}")
++    add_definitions("-D${symbol_}")
++  endif()
++endmacro(CheckNotFunction)
++
++
++function(_CheckSymbol var_ name_ header_ includes_)
++  if(includes_)
++    set(CMAKE_REQUIRED_INCLUDES "${includes_}")
++  else()
++    unset(CMAKE_REQUIRED_INCLUDES)
++  endif()
++
++  check_symbol_exists("${name_}" "${header_}" "serf_foundit_symbol_${name_}_")
++  if(serf_foundit_symbol_${name_}_)
++    set("${var_}" TRUE PARENT_SCOPE)
++  else()
++    set("${var_}" FALSE PARENT_SCOPE)
++  endif()
++  unset(CMAKE_REQUIRED_INCLUDES)
++endfunction(_CheckSymbol)
++
++macro(CheckFunctionMacro name_ symbol_ header_ includes_)
++  _CheckFunction("serf_feature_CheckFunctionMacro_${name}_" "${name_}" "${ARGN}")
++  if("${serf_feature_CheckFunctionMacro_${name}_}")
++    add_definitions("-D${symbol_}")
++  else()
++    _CheckSymbol("serf_feature_CheckFunctionMacro_${name}_" "${name_}" "${header_}" "${includes_}")
++    if("${serf_feature_CheckFunctionMacro_${name}_}")
++      add_definitions("-D${symbol_}")
++    endif()
++  endif()
++endmacro(CheckFunctionMacro)
++
++
++function(_CheckHeader var_ name_ includes_)
++  if(includes_)
++    set(CMAKE_REQUIRED_INCLUDES "${includes_}")
++  else()
++    unset(CMAKE_REQUIRED_INCLUDES)
++  endif()
++
++  check_include_file("${name_}" "serf_foundit_${name_}_")
++  if(${serf_foundit_${name_}_})
++    set("${var_}" TRUE PARENT_SCOPE)
++  else()
++    set("${var_}" FALSE PARENT_SCOPE)
++  endif()
++  unset(CMAKE_REQUIRED_INCLUDES)
++endfunction(_CheckHeader)
++
++macro(CheckHeader name_ symbol_)
++  _CheckHeader("serf_feature_CheckHeader_${name}_" "${name_}" "${ARGN}")
++  if("${serf_feature_CheckHeader_${name}_}")
++    add_definitions("-D${symbol_}")
++  endif()
++endmacro(CheckHeader)
++
++
++function(_CheckType var_ name_ header_ includes_)
++  if(includes_)
++    set(CMAKE_REQUIRED_INCLUDES "${includes_}")
++  else()
++    unset(CMAKE_REQUIRED_INCLUDES)
++  endif()
++
++  if(header_)
++    set(CMAKE_EXTRA_INCLUDE_FILES "${header_}")
++  else()
++    unset(CMAKE_EXTRA_INCLUDE_FILES)
++  endif()
++
++  check_type_size("${name_}" "serf_foundit_${name_}_")
++  if(${HAVE_serf_foundit_${name_}_})
++    set("${var_}" TRUE PARENT_SCOPE)
++  else()
++    set("${var_}" FALSE PARENT_SCOPE)
++  endif()
++  unset(CMAKE_REQUIRED_INCLUDES)
++  unset(CMAKE_EXTRA_INCLUDE_FILES)
++endfunction(_CheckType)
++
++macro(CheckType name_ header_ symbol_)
++  _CheckType("serf_feature_CheckType_${name}_" "${name_}" "${header_}" "${ARGN}")
++  if("${serf_feature_CheckType_${name}_}")
++    add_definitions("-D${symbol_}")
++  endif()
++endmacro(CheckType)
+diff --git a/build/SerfPlatform.cmake b/build/SerfPlatform.cmake
+new file mode 100644
+index 0000000..18aacef
+--- /dev/null
++++ b/build/SerfPlatform.cmake
+@@ -0,0 +1,41 @@
++# ===================================================================
++#   Licensed to the Apache Software Foundation (ASF) under one
++#   or more contributor license agreements.  See the NOTICE file
++#   distributed with this work for additional information
++#   regarding copyright ownership.  The ASF licenses this file
++#   to you under the Apache License, Version 2.0 (the
++#   "License"); you may not use this file except in compliance
++#   with the License.  You may obtain a copy of the License at
++#
++#     http://www.apache.org/licenses/LICENSE-2.0
++#
++#   Unless required by applicable law or agreed to in writing,
++#   software distributed under the License is distributed on an
++#   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++#   KIND, either express or implied.  See the License for the
++#   specific language governing permissions and limitations
++#   under the License.
++# ===================================================================
++
++if(${CMAKE_SYSTEM_NAME} MATCHES  "Darwin")
++  set(SERF_DARWIN TRUE)
++  if(NOT RELATIVE_RPATH)
++    set(CMAKE_MACOSX_RPATH FALSE)
++  endif()
++  message(STATUS "Target platform is Darwin (macOS)")
++elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
++  set(SERF_LINUX TRUE)
++  message(STATUS "Target platform is Linux")
++elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
++  set(SERF_WINDOWS TRUE)
++  if(CMAKE_GENERATOR MATCHES "(Win64|IA64)")
++    set(SERF_WIN64 TRUE)
++    message(STATUS "Target platform is Windows (64-bit)")
++  else()
++    set(SERF_WIN32 TRUE)
++    message(STATUS "Target platform is Windows (32-bit)")
++  endif()
++else()
++  set(SERF_UNIX TRUE)
++  message(STATUS "Assuming generic Unix target platform")
++endif()
+diff --git a/build/SerfVersion.cmake b/build/SerfVersion.cmake
+new file mode 100644
+index 0000000..04fdc8b
+--- /dev/null
++++ b/build/SerfVersion.cmake
+@@ -0,0 +1,53 @@
++# ===================================================================
++#   Licensed to the Apache Software Foundation (ASF) under one
++#   or more contributor license agreements.  See the NOTICE file
++#   distributed with this work for additional information
++#   regarding copyright ownership.  The ASF licenses this file
++#   to you under the Apache License, Version 2.0 (the
++#   "License"); you may not use this file except in compliance
++#   with the License.  You may obtain a copy of the License at
++#
++#     http://www.apache.org/licenses/LICENSE-2.0
++#
++#   Unless required by applicable law or agreed to in writing,
++#   software distributed under the License is distributed on an
++#   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++#   KIND, either express or implied.  See the License for the
++#   specific language governing permissions and limitations
++#   under the License.
++# ===================================================================
++
++# Find the version number in serf.h so that we don't keep it in two places.
++
++function(serf_parse_version_number_from_header)
++  set(header_ "${SERF_SOURCE_DIR}/serf.h")
++  file(STRINGS "${header_}" version_parts_
++       REGEX "^ *# *define +SERF_[A-Z]+_VERSION +[0-9]+ *$")
++
++  foreach(STR ${version_parts_})
++    if(STR MATCHES "SERF_MAJOR_VERSION")
++      string(REGEX REPLACE "^[^0-9]+([0-9]+) *$" "\\1" major_ ${STR})
++    elseif(STR MATCHES "SERF_MINOR_VERSION")
++      string(REGEX REPLACE "^[^0-9]+([0-9]+) *$" "\\1" minor_ ${STR})
++    elseif(STR MATCHES "SERF_PATCH_VERSION")
++      string(REGEX REPLACE "^[^0-9]+([0-9]+) *$" "\\1" patch_ ${STR})
++    endif()
++  endforeach()
++
++  if(NOT DEFINED major_ OR NOT DEFINED minor_ OR NOT DEFINED patch_)
++    message(FATAL_ERROR "Could not find the version number in '${header_}'")
++  endif()
++
++  set(SERF_VERSION "${major_}.${minor_}.${patch_}" PARENT_SCOPE)
++  set(SERF_SOVERSION "0" PARENT_SCOPE)
++  set(SERF_MAJOR_VERSION "${major_}" PARENT_SCOPE)
++  set(SERF_MINOR_VERSION "${minor_}" PARENT_SCOPE)
++  set(SERF_PATCH_VERSION "${patch_}" PARENT_SCOPE)
++endfunction()
++
++unset(SERF_VERSION)
++unset(SERF_SOVERSION)
++unset(SERF_MAJOR_VERSION)
++unset(SERF_MINOR_VERSION)
++unset(SERF_PATCH_VERSION)
++serf_parse_version_number_from_header()
+diff --git a/build/SerfWindowsGenDef.cmake b/build/SerfWindowsGenDef.cmake
+new file mode 100644
+index 0000000..a955eae
+--- /dev/null
++++ b/build/SerfWindowsGenDef.cmake
+@@ -0,0 +1,26 @@
++# ===================================================================
++#   Licensed to the Apache Software Foundation (ASF) under one
++#   or more contributor license agreements.  See the NOTICE file
++#   distributed with this work for additional information
++#   regarding copyright ownership.  The ASF licenses this file
++#   to you under the Apache License, Version 2.0 (the
++#   "License"); you may not use this file except in compliance
++#   with the License.  You may obtain a copy of the License at
++#
++#     http://www.apache.org/licenses/LICENSE-2.0
++#
++#   Unless required by applicable law or agreed to in writing,
++#   software distributed under the License is distributed on an
++#   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++#   KIND, either express or implied.  See the License for the
++#   specific language governing permissions and limitations
++#   under the License.
++# ===================================================================
++
++# Generate Serf's .def file for Windows DLLs.
++
++include(SerfWindowsToolkit)
++
++string(REGEX REPLACE " +" ";" SERF_DEF_BLACKLIST "${SERF_DEF_BLACKLIST}")
++string(REGEX REPLACE " +" ";" SERF_DEF_HEADERS "${SERF_DEF_HEADERS}")
++SerfWindowsGenDef("${SERF_DEF_BLACKLIST}" "${SERF_DEF_FILE}" ${SERF_DEF_HEADERS})
+diff --git a/build/SerfWindowsToolkit.cmake b/build/SerfWindowsToolkit.cmake
+new file mode 100644
+index 0000000..fef4837
+--- /dev/null
++++ b/build/SerfWindowsToolkit.cmake
+@@ -0,0 +1,55 @@
++# ===================================================================
++#   Licensed to the Apache Software Foundation (ASF) under one
++#   or more contributor license agreements.  See the NOTICE file
++#   distributed with this work for additional information
++#   regarding copyright ownership.  The ASF licenses this file
++#   to you under the Apache License, Version 2.0 (the
++#   "License"); you may not use this file except in compliance
++#   with the License.  You may obtain a copy of the License at
++#
++#     http://www.apache.org/licenses/LICENSE-2.0
++#
++#   Unless required by applicable law or agreed to in writing,
++#   software distributed under the License is distributed on an
++#   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++#   KIND, either express or implied.  See the License for the
++#   specific language governing permissions and limitations
++#   under the License.
++# ===================================================================
++
++# Generate a Windows DLL .def file from a list of headers.
++function(SerfWindowsGenDef blacklist_ target_)
++  if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
++    set(W "[a-zA-Z_0-9]") # Word characters pattern
++    set(base_func_rx_     "^((${W}+|\\*) )+\\*?(serf_[a-z]${W}*)\\(")
++    set(base_type_rx_     "^extern const serf_bucket_type_t (serf_[a-z_]*)")
++    set(func_search_rx_   "${base_func_rx_}")
++    set(type_search_rx_   "${base_type_rx_};")
++    set(func_name_rx_     "${base_func_rx_}.*$")
++    set(type_name_rx_     "${base_type_rx_}.*$")
++
++    foreach(file_ ${ARGN})
++      message(STATUS "Looking for exports in ${file_}")
++      file(STRINGS ${file_} funcs_ REGEX "${func_search_rx_}")
++      file(STRINGS ${file_} types_ REGEX "${type_search_rx_}")
++      foreach(sym_ ${funcs_})
++        string(REGEX REPLACE "${func_name_rx_}" "\\3" def_ ${sym_})
++        list(APPEND defs_ ${def_})
++      endforeach()
++      foreach(sym_ ${types_})
++        string(REGEX REPLACE "${type_name_rx_}" "\\1" def_ ${sym_})
++        list(APPEND defs_ ${def_})
++      endforeach()
++    endforeach()
++
++    list(SORT defs_)
++    list(REMOVE_DUPLICATES defs_)
++    file(WRITE ${target_} "EXPORTS\n")
++    foreach(def_ ${defs_})
++      list(FIND blacklist_ "${def_}" skip_)
++      if(skip_ LESS 0)
++        file(APPEND ${target_} "${def_}\n")
++      endif()
++    endforeach()
++  endif()
++endfunction(SerfWindowsGenDef)
+diff --git a/test/CMakeLists.txt b/test/CMakeLists.txt
+new file mode 100644
+index 0000000..ce56f15
+--- /dev/null
++++ b/test/CMakeLists.txt
+@@ -0,0 +1,70 @@
++# ===================================================================
++#   Licensed to the Apache Software Foundation (ASF) under one
++#   or more contributor license agreements.  See the NOTICE file
++#   distributed with this work for additional information
++#   regarding copyright ownership.  The ASF licenses this file
++#   to you under the Apache License, Version 2.0 (the
++#   "License"); you may not use this file except in compliance
++#   with the License.  You may obtain a copy of the License at
++#
++#     http://www.apache.org/licenses/LICENSE-2.0
++#
++#   Unless required by applicable law or agreed to in writing,
++#   software distributed under the License is distributed on an
++#   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++#   KIND, either express or implied.  See the License for the
++#   specific language governing permissions and limitations
++#   under the License.
++# ===================================================================
++
++
++set(TEST_ALL_SOURCES
++    "test_all.c"
++    "CuTest.c"
++    "test_util.c"
++    "test_context.c"
++    "test_buckets.c"
++    "test_auth.c"
++    "mock_buckets.c"
++    "test_ssl.c"
++    "server/test_server.c"
++    "server/test_sslserver.c"
++)
++
++set(SIMPLE_TEST_TARGETS
++    "serf_get"
++    "serf_response"
++    "serf_request"
++    "serf_spider"
++    "serf_server"
++    "serf_bwtp"
++)
++
++if(CC_LIKE_GNUC)
++  # MockHTTP requires C99 standard, so use it for the test suite.
++  string(REPLACE "-std=c89" "-std=c99" CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
++endif()
++
++foreach(TEST_TARGET ${SIMPLE_TEST_TARGETS})
++  add_executable(${TEST_TARGET} "${TEST_TARGET}.c")
++  add_dependencies(${TEST_TARGET} serf_static)
++  target_link_libraries(${TEST_TARGET} serf_static)
++endforeach()
++
++add_executable(test_all ${TEST_ALL_SOURCES})
++add_dependencies(test_all serf_static)
++target_compile_definitions(test_all PRIVATE "-DMOCKHTTP_OPENSSL")
++target_include_directories(test_all SYSTEM BEFORE PRIVATE ${SERF_DEPENDENCY_INCLUDES})
++target_link_libraries(test_all serf_static)
++
++file(GLOB RESPONSE_TEST_CASES "${CMAKE_CURRENT_SOURCE_DIR}/testcases/*.response")
++foreach(TEST_CASE ${RESPONSE_TEST_CASES})
++  get_filename_component(TEST_CASE_NAME ${TEST_CASE} NAME)
++  add_test(NAME "${TEST_CASE_NAME}" COMMAND serf_response "${TEST_CASE}")
++  list(APPEND RESPONSE_TESTS "${TEST_CASE_NAME}")
++endforeach()
++
++add_test(NAME test_all COMMAND test_all)
++
++set_tests_properties(${RESPONSE_TESTS} test_all PROPERTIES
++                     ENVIRONMENT srcdir=${SERF_SOURCE_DIR})

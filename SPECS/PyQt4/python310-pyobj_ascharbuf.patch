@@ -1,0 +1,40 @@
+commit 02d2c731e0252d2ea4af253652007b078e823d1f
+Author: Victor Stinner <vstinner@python.org>
+Date:   Mon Nov 23 18:39:00 2020 +0100
+
+    Fix compatibility with Python 3.10
+
+diff --git a/qpy/QtCore/qpycore_qstring.cpp b/qpy/QtCore/qpycore_qstring.cpp
+index 0b5d58f..fb40bd8 100644
+--- a/qpy/QtCore/qpycore_qstring.cpp
++++ b/qpy/QtCore/qpycore_qstring.cpp
+@@ -238,6 +238,29 @@ QString qpycore_PyObject_AsQString(PyObject *obj)
+ #define QT_DEPRECATED_SINCE(m, n)   1
+ #endif
+ #if QT_DEPRECATED_SINCE(5, 0)
++
++// Function removed in Python 3.10. Code copied/pasted from Python 3.9.
++#if PY_VERSION_HEX >= 0x030A0000
++static int
++PyObject_AsCharBuffer(PyObject *obj, const char **buffer, Py_ssize_t *buffer_len)
++{
++    Py_buffer view;
++
++    if (obj == NULL || buffer == NULL || buffer_len == NULL) {
++        PyErr_SetString(PyExc_SystemError,
++                        "null argument to internal routine");
++        return -1;
++    }
++    if (PyObject_GetBuffer(obj, &view, PyBUF_SIMPLE) != 0)
++        return -1;
++
++    *buffer = (char*)view.buf;
++    *buffer_len = view.len;
++    PyBuffer_Release(&view);
++    return 0;
++}
++#endif
++
+ // Convert a Python unicode/string/bytes object to a character string encoded
+ // according to the given encoding.  Update the object with a new reference to
+ // the object that owns the data.

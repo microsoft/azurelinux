@@ -1,0 +1,28 @@
+From 2273531d349423c33c9ea91f9e71adea93991184 Mon Sep 17 00:00:00 2001
+From: Christoph Feck <christoph@maxiom.de>
+Date: Fri, 25 Jun 2010 03:06:05 +0000
+Subject: [PATCH 26/33] Fix cmake_policy call
+
+CCMAIL:neundorf@kde.org
+
+svn path=/trunk/kdesupport/automoc/; revision=1142454
+---
+ Automoc4Config.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Automoc4Config.cmake b/Automoc4Config.cmake
+index 95f528d..d608513 100644
+--- a/Automoc4Config.cmake
++++ b/Automoc4Config.cmake
+@@ -59,7 +59,7 @@ endif(COMMAND cmake_policy)
+ cmake_minimum_required( VERSION 2.6.4 FATAL_ERROR )
+ 
+ # allow duplicate target names, this is also done in FindKDE4Internal.cmake
+-cmake_policy(CMP0002 OLD)
++cmake_policy(SET CMP0002 OLD)
+ 
+ get_filename_component(_AUTOMOC4_CURRENT_DIR  "${CMAKE_CURRENT_LIST_FILE}" PATH)
+ 
+-- 
+2.4.3
+

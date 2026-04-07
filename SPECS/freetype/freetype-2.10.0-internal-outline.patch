@@ -1,0 +1,72 @@
+--- freetype-2.10.0/include/freetype/ftoutln.h
++++ freetype-2.10.0/include/freetype/ftoutln.h
+@@ -165,6 +165,15 @@ FT_BEGIN_HEADER
+                   FT_Int       numContours,
+                   FT_Outline  *anoutline );
+ 
++  /*
++   * Kept downstream for ABI compatibility only.
++   * It just throws error now. Remove once soname has been bumped.
++   */
++  FT_EXPORT( FT_Error )
++  FT_Outline_New_Internal( FT_Memory    memory,
++                           FT_UInt      numPoints,
++                           FT_Int       numContours,
++                           FT_Outline  *anoutline );
+ 
+   /**************************************************************************
+    *
+@@ -192,6 +201,13 @@ FT_BEGIN_HEADER
+   FT_Outline_Done( FT_Library   library,
+                    FT_Outline*  outline );
+ 
++  /*
++   * Kept downstream for ABI compatibility only.
++   * It just throws error now. Remove once soname has been bumped.
++   */
++  FT_EXPORT( FT_Error )
++  FT_Outline_Done_Internal( FT_Memory    memory,
++                            FT_Outline*  outline );
+ 
+   /**************************************************************************
+    *
+--- freetype-2.10.0/src/base/ftoutln.c
++++ freetype-2.10.0/src/base/ftoutln.c
+@@ -291,6 +291,19 @@
+ 
+   /* documentation is in ftoutln.h */
+ 
++  /*
++   * Kept downstream for ABI compatibility only.
++   * It just throws error now. Remove once soname has been bumped.
++   */
++  FT_EXPORT_DEF( FT_Error )
++  FT_Outline_New_Internal( FT_Memory    memory,
++                           FT_UInt      numPoints,
++                           FT_Int       numContours,
++                           FT_Outline  *anoutline )
++  {
++    return FT_THROW( Unimplemented_Feature );
++  }
++
+   FT_EXPORT_DEF( FT_Error )
+   FT_Outline_New( FT_Library   library,
+                   FT_UInt      numPoints,
+@@ -423,6 +436,17 @@
+ 
+   /* documentation is in ftoutln.h */
+ 
++  /*
++   * Kept downstream for ABI compatibility only.
++   * It just throws error now. Remove once soname has been bumped.
++   */
++  FT_EXPORT_DEF( FT_Error )
++  FT_Outline_Done_Internal( FT_Memory    memory,
++                            FT_Outline*  outline )
++  {
++    return FT_THROW( Unimplemented_Feature );
++  }
++
+   FT_EXPORT_DEF( FT_Error )
+   FT_Outline_Done( FT_Library   library,
+                    FT_Outline*  outline )

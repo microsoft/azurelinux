@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<openbox_menu xmlns="http://openbox.org/3.4/menu">
+
+<menu id="applications-menu" label="Applications" execute="_LIBEXECDIR_/openbox-xdg-menu applications"/>
+<menu id="preferences-menu" label="Preferences" execute="_LIBEXECDIR_/openbox-xdg-menu preferences"/>
+<menu id="administration-menu" label="Administration" execute="_LIBEXECDIR_/openbox-xdg-menu system-settings"/>
+<menu id="terminals-menu" label="Terminals" execute="_LIBEXECDIR_/openbox-xdg-menu /etc/xdg/openbox/terminals"/>
+
+<menu id="root-menu" label="Openbox 3">
+  <separator label="Openbox"/>
+  <menu id="applications-menu"/>
+  <menu id="preferences-menu"/>
+  <menu id="administration-menu"/>
+  <separator/>
+  <menu id="terminals-menu"/>
+  <separator/>
+  <item label="Reconfigure">
+    <action name="Reconfigure" />
+  </item>
+  <item label="Exit">
+    <action name="Exit">
+      <prompt>yes</prompt>
+    </action>
+  </item>
+  <separator/>
+  <item label="Log Out">
+    <action name="SessionLogout">
+      <prompt>yes</prompt>
+    </action>
+  </item>
+</menu>
+
+</openbox_menu>

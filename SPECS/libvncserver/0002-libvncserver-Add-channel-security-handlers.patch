@@ -1,0 +1,366 @@
+From c2ef52b3ba332d15ab2849abec47f846c290868b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?S=C3=A9rgio=20M=2E=20Basto?= <sergio@serjux.com>
+Date: Fri, 7 Feb 2025 02:50:48 +0000
+Subject: [PATCH 2/3] libvncserver: Add channel security handlers
+
+Add another type of security handler that is meant to be used initially
+to set up a secure channel. Regular security handlers would be
+advertised and processed after any channel security have succeeded.
+
+For example, this, together with the custom I/O functions allows a
+LibVNCServer user to implement TLS in combination with VNCAuth. This is
+done by adding a single channel security handler with the rfbTLS (18)
+with a handler that initiates a TLS session, and when a TLS session is
+initiated, the regular security handler list is sent.
+---
+ include/rfb/rfb.h            |  13 ++-
+ src/libvncserver/auth.c      | 164 +++++++++++++++++++++++++++--------
+ src/libvncserver/rfbserver.c |   1 +
+ 3 files changed, 141 insertions(+), 37 deletions(-)
+
+diff --git a/include/rfb/rfb.h b/include/rfb/rfb.h
+index 204fa052..8bee2e10 100644
+--- a/include/rfb/rfb.h
++++ b/include/rfb/rfb.h
+@@ -147,6 +147,11 @@ typedef struct {
+   } data; /**< there have to be count*3 entries */
+ } rfbColourMap;
+ 
++enum rfbSecurityTag {
++    RFB_SECURITY_TAG_NONE = 0,
++    RFB_SECURITY_TAG_CHANNEL = 1 << 0
++};
++
+ /**
+  * Security handling (RFB protocol version 3.7)
+  */
+@@ -155,6 +160,7 @@ typedef struct _rfbSecurity {
+ 	uint8_t type;
+ 	void (*handler)(struct _rfbClientRec* cl);
+ 	struct _rfbSecurity* next;
++	enum rfbSecurityTag securityTags;
+ } rfbSecurityHandler;
+ 
+ /**
+@@ -495,7 +501,7 @@ typedef struct _rfbClientRec {
+                                 /** Possible client states: */
+     enum {
+         RFB_PROTOCOL_VERSION,   /**< establishing protocol version */
+-	RFB_SECURITY_TYPE,      /**< negotiating security (RFB v.3.7) */
++        RFB_SECURITY_TYPE,      /**< negotiating security (RFB v.3.7) */
+         RFB_AUTHENTICATION,     /**< authenticating */
+         RFB_INITIALISATION,     /**< sending initialisation messages */
+         RFB_NORMAL,             /**< normal protocol messages */
+@@ -504,6 +510,8 @@ typedef struct _rfbClientRec {
+          * using LibVNCServer to provide services: */
+ 
+         RFB_INITIALISATION_SHARED, /**< sending initialisation messages with implicit shared-flag already true */
++
++        RFB_CHANNEL_SECURITY_TYPE, /**< negotiating security (RFB v.3.7) */
+         RFB_SHUTDOWN            /**< Client is shutting down */
+     } state;
+ 
+@@ -874,6 +882,9 @@ extern void rfbProcessClientSecurityType(rfbClientPtr cl);
+ extern void rfbAuthProcessClientMessage(rfbClientPtr cl);
+ extern void rfbRegisterSecurityHandler(rfbSecurityHandler* handler);
+ extern void rfbUnregisterSecurityHandler(rfbSecurityHandler* handler);
++extern void rfbRegisterChannelSecurityHandler(rfbSecurityHandler* handler);
++extern void rfbUnregisterChannelSecurityHandler(rfbSecurityHandler* handler);
++extern void rfbSendSecurityTypeList(rfbClientPtr cl, enum rfbSecurityTag exclude);
+ 
+ /* rre.c */
+ 
+diff --git a/src/libvncserver/auth.c b/src/libvncserver/auth.c
+index 748027b1..fc74c800 100644
+--- a/src/libvncserver/auth.c
++++ b/src/libvncserver/auth.c
+@@ -37,18 +37,17 @@ void rfbClientSendString(rfbClientPtr cl, const char *reason);
+  * Handle security types
+  */
+ 
++/* Channel security handlers to set up a secure channel, e.g. TLS. */
++static rfbSecurityHandler* channelSecurityHandlers = NULL;
++
++/* Security handlers when channel security is established. */
+ static rfbSecurityHandler* securityHandlers = NULL;
+ 
+-/*
+- * This method registers a list of new security types.  
+- * It avoids same security type getting registered multiple times. 
+- * The order is not preserved if multiple security types are
+- * registered at one-go.
+- */
+ void
+-rfbRegisterSecurityHandler(rfbSecurityHandler* handler)
++rfbRegisterSecurityHandlerTo(rfbSecurityHandler* handler,
++                             rfbSecurityHandler** handlerList)
+ {
+-	rfbSecurityHandler *head = securityHandlers, *next = NULL;
++	rfbSecurityHandler *head = *handlerList, *next = NULL;
+ 
+ 	if(handler == NULL)
+ 		return;
+@@ -57,39 +56,35 @@ rfbRegisterSecurityHandler(rfbSecurityHandler* handler)
+ 
+ 	while(head != NULL) {
+ 		if(head == handler) {
+-			rfbRegisterSecurityHandler(next);
++			rfbRegisterSecurityHandlerTo(next, handlerList);
+ 			return;
+ 		}
+ 
+ 		head = head->next;
+ 	}
+ 
+-	handler->next = securityHandlers;
+-	securityHandlers = handler;
++	handler->next = *handlerList;
++	*handlerList = handler;
+ 
+-	rfbRegisterSecurityHandler(next);
++	rfbRegisterSecurityHandlerTo(next, handlerList);
+ }
+ 
+-/*
+- * This method unregisters a list of security types. 
+- * These security types won't be available for any new
+- * client connection. 
+- */
+-void
+-rfbUnregisterSecurityHandler(rfbSecurityHandler* handler)
++static void
++rfbUnregisterSecurityHandlerFrom(rfbSecurityHandler* handler,
++                                 rfbSecurityHandler** handlerList)
+ {
+ 	rfbSecurityHandler *cur = NULL, *pre = NULL;
+ 
+ 	if(handler == NULL)
+ 		return;
+ 
+-	if(securityHandlers == handler) {
+-		securityHandlers = securityHandlers->next;
+-		rfbUnregisterSecurityHandler(handler->next);
++	if(*handlerList == handler) {
++		*handlerList = (*handlerList)->next;
++		rfbUnregisterSecurityHandlerFrom(handler->next, handlerList);
+ 		return;
+ 	}
+ 
+-	cur = pre = securityHandlers;
++	cur = pre = *handlerList;
+ 
+ 	while(cur) {
+ 		if(cur == handler) {
+@@ -99,7 +94,50 @@ rfbUnregisterSecurityHandler(rfbSecurityHandler* handler)
+ 		pre = cur;
+ 		cur = cur->next;
+ 	}
+-	rfbUnregisterSecurityHandler(handler->next);
++	rfbUnregisterSecurityHandlerFrom(handler->next, handlerList);
++}
++
++void
++rfbRegisterChannelSecurityHandler(rfbSecurityHandler* handler)
++{
++    rfbRegisterSecurityHandlerTo(handler, &channelSecurityHandlers);
++}
++
++/*
++ * This method unregisters a list of security types.
++ * These security types won't be available for any new
++ * client connection.
++ */
++
++void
++rfbUnregisterChannelSecurityHandler(rfbSecurityHandler* handler)
++{
++    rfbUnregisterSecurityHandlerFrom(handler, &channelSecurityHandlers);
++}
++
++/*
++ * This method registers a list of new security types.
++ * It avoids same security type getting registered multiple times.
++ * The order is not preserved if multiple security types are
++ * registered at one-go.
++ */
++
++void
++rfbRegisterSecurityHandler(rfbSecurityHandler* handler)
++{
++    rfbRegisterSecurityHandlerTo(handler, &securityHandlers);
++}
++
++/*
++ * This method unregisters a list of security types.
++ * These security types won't be available for any new
++ * client connection.
++ */
++
++void
++rfbUnregisterSecurityHandler(rfbSecurityHandler* handler)
++{
++    rfbUnregisterSecurityHandlerFrom(handler, &securityHandlers);
+ }
+ 
+ /*
+@@ -197,9 +235,22 @@ static rfbSecurityHandler VncSecurityHandlerNone = {
+     NULL
+ };
+                         
++static int32_t
++determinePrimarySecurityType(rfbClientPtr cl)
++{
++    if (!cl->screen->authPasswdData || cl->reverseConnection) {
++        /* chk if this condition is valid or not. */
++        return rfbSecTypeNone;
++    } else if (cl->screen->authPasswdData) {
++        return rfbSecTypeVncAuth;
++    } else {
++        return rfbSecTypeInvalid;
++    }
++}
+ 
+-static void
+-rfbSendSecurityTypeList(rfbClientPtr cl, int primaryType)
++void
++rfbSendSecurityTypeList(rfbClientPtr cl,
++                        enum rfbSecurityTag exclude)
+ {
+     /* The size of the message is the count of security types +1,
+      * since the first byte is the number of types. */
+@@ -207,9 +258,10 @@ rfbSendSecurityTypeList(rfbClientPtr cl, int primaryType)
+     rfbSecurityHandler* handler;
+ #define MAX_SECURITY_TYPES 255
+     uint8_t buffer[MAX_SECURITY_TYPES+1];
+-
++    int32_t primaryType;
+ 
+     /* Fill in the list of security types in the client structure. (NOTE: Not really in the client structure) */
++    primaryType = determinePrimarySecurityType(cl);
+     switch (primaryType) {
+     case rfbSecTypeNone:
+ 	rfbUnregisterSecurityHandler(&VncSecurityHandlerVncAuth);
+@@ -223,6 +275,9 @@ rfbSendSecurityTypeList(rfbClientPtr cl, int primaryType)
+ 
+     for (handler = securityHandlers;
+ 	    handler && size<MAX_SECURITY_TYPES; handler = handler->next) {
++	if (exclude && (handler->securityTags & exclude))
++	    continue;
++
+ 	buffer[size] = handler->type;
+ 	size++;
+     }
+@@ -251,7 +306,29 @@ rfbSendSecurityTypeList(rfbClientPtr cl, int primaryType)
+     cl->state = RFB_SECURITY_TYPE;
+ }
+ 
++static void
++rfbSendChannelSecurityTypeList(rfbClientPtr cl)
++{
++    int size = 1;
++    rfbSecurityHandler* handler;
++    uint8_t buffer[MAX_SECURITY_TYPES+1];
++
++    for (handler = channelSecurityHandlers;
++	    handler && size<MAX_SECURITY_TYPES; handler = handler->next) {
++	buffer[size] = handler->type;
++	size++;
++    }
++    buffer[0] = (unsigned char)size-1;
++
++    if (rfbWriteExact(cl, (char *)buffer, size) < 0) {
++	rfbLogPerror("rfbSendSecurityTypeList: write");
++	rfbCloseClient(cl);
++	return;
++    }
+ 
++    /* Dispatch client input to rfbProcessClientChannelSecurityType. */
++    cl->state = RFB_CHANNEL_SECURITY_TYPE;
++}
+ 
+ 
+ /*
+@@ -299,18 +376,19 @@ rfbSendSecurityType(rfbClientPtr cl, int32_t securityType)
+ void
+ rfbAuthNewClient(rfbClientPtr cl)
+ {
+-    int32_t securityType = rfbSecTypeInvalid;
++    int32_t securityType;
+ 
+-    if (!cl->screen->authPasswdData || cl->reverseConnection) {
+-	/* chk if this condition is valid or not. */
+-	securityType = rfbSecTypeNone;
+-    } else if (cl->screen->authPasswdData) {
+- 	    securityType = rfbSecTypeVncAuth;
+-    }
++    securityType = determinePrimarySecurityType(cl);
+ 
+     if (cl->protocolMajorVersion==3 && cl->protocolMinorVersion < 7)
+     {
+ 	/* Make sure we use only RFB 3.3 compatible security types. */
++	if (channelSecurityHandlers) {
++	    rfbLog("VNC channel security enabled - RFB 3.3 client rejected\n");
++	    rfbClientConnFailed(cl, "Your viewer cannot hnadler required "
++				"security methods");
++	    return;
++	}
+ 	if (securityType == rfbSecTypeInvalid) {
+ 	    rfbLog("VNC authentication disabled - RFB 3.3 client rejected\n");
+ 	    rfbClientConnFailed(cl, "Your viewer cannot handle required "
+@@ -318,9 +396,13 @@ rfbAuthNewClient(rfbClientPtr cl)
+ 	    return;
+ 	}
+ 	rfbSendSecurityType(cl, securityType);
++    } else if (channelSecurityHandlers) {
++	rfbLog("Send channel security type list\n");
++	rfbSendChannelSecurityTypeList(cl);
+     } else {
+ 	/* Here it's ok when securityType is set to rfbSecTypeInvalid. */
+-	rfbSendSecurityTypeList(cl, securityType);
++	rfbLog("Send channel security type 'none'\n");
++	rfbSendSecurityTypeList(cl, RFB_SECURITY_TAG_NONE);
+     }
+ }
+ 
+@@ -334,6 +416,7 @@ rfbProcessClientSecurityType(rfbClientPtr cl)
+     int n;
+     uint8_t chosenType;
+     rfbSecurityHandler* handler;
++    rfbSecurityHandler* handlerListHead;
+     
+     /* Read the security type. */
+     n = rfbReadExact(cl, (char *)&chosenType, 1);
+@@ -346,8 +429,17 @@ rfbProcessClientSecurityType(rfbClientPtr cl)
+ 	return;
+     }
+ 
++    switch (cl->state) {
++    case RFB_CHANNEL_SECURITY_TYPE:
++        handlerListHead = channelSecurityHandlers;
++        break;
++    case RFB_SECURITY_TYPE:
++        handlerListHead = securityHandlers;
++        break;
++    }
++
+     /* Make sure it was present in the list sent by the server. */
+-    for (handler = securityHandlers; handler; handler = handler->next) {
++    for (handler = handlerListHead; handler; handler = handler->next) {
+ 	if (chosenType == handler->type) {
+ 	      rfbLog("rfbProcessClientSecurityType: executing handler for type %d\n", chosenType);
+ 	      handler->handler(cl);
+diff --git a/src/libvncserver/rfbserver.c b/src/libvncserver/rfbserver.c
+index 2385dbaa..b2804ad8 100644
+--- a/src/libvncserver/rfbserver.c
++++ b/src/libvncserver/rfbserver.c
+@@ -679,6 +679,7 @@ rfbProcessClientMessage(rfbClientPtr cl)
+     case RFB_PROTOCOL_VERSION:
+         rfbProcessClientProtocolVersion(cl);
+         return;
++    case RFB_CHANNEL_SECURITY_TYPE:
+     case RFB_SECURITY_TYPE:
+         rfbProcessClientSecurityType(cl);
+         return;
+-- 
+2.48.1
+

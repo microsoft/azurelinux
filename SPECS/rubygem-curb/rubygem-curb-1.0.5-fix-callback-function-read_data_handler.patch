@@ -1,0 +1,42 @@
+From 43501a23786b1c707c23ccc5ddb3d4c9b3515953 Mon Sep 17 00:00:00 2001
+From: Mamoru TASAKA <mtasaka@fedoraproject.org>
+Date: Fri, 5 Jul 2024 16:00:31 +0900
+Subject: [PATCH] FIX: for callback function read_data_handler
+
+unify condition check for remaining vs read_bytes and remove
+unneeded branch, and fix return value as the result.
+
+Fixes #451 .
+---
+ ext/curb_easy.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/ext/curb_easy.c b/ext/curb_easy.c
+index 9054be6..8fd9600 100644
+--- a/ext/curb_easy.c
++++ b/ext/curb_easy.c
+@@ -79,7 +79,7 @@ static size_t read_data_handler(void *ptr,
+     remaining = len - rbcu->offset;
+     str_ptr = RSTRING_PTR(str);
+ 
+-    if( remaining < read_bytes ) {
++    if( remaining <= read_bytes ) {
+       if( remaining > 0 ) {
+         memcpy(ptr, str_ptr+rbcu->offset, remaining);
+         read_bytes = remaining;
+@@ -87,14 +87,10 @@ static size_t read_data_handler(void *ptr,
+       }
+       return remaining;
+     }
+-    else if( remaining > read_bytes ) { // read_bytes <= remaining - send what we can fit in the buffer(ptr)
++    else { // read_bytes < remaining - send what we can fit in the buffer(ptr)
+       memcpy(ptr, str_ptr+rbcu->offset, read_bytes);
+       rbcu->offset += read_bytes;
+     }
+-    else { // they're equal
+-      memcpy(ptr, str_ptr+rbcu->offset, --read_bytes);
+-      rbcu->offset += read_bytes;
+-    }
+     return read_bytes;
+   }
+   else {

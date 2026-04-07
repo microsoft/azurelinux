@@ -1,0 +1,29 @@
+From dd4d8926703b8be0e94aae15a5d574992be20dbe Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Mon, 27 Oct 2014 16:11:38 +0100
+Subject: [PATCH] Unbundle version
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ lib/ExtUtils/MakeMaker.pm | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/ExtUtils/MakeMaker.pm b/lib/ExtUtils/MakeMaker.pm
+index 1a5f045..71c3751 100644
+--- a/lib/ExtUtils/MakeMaker.pm
++++ b/lib/ExtUtils/MakeMaker.pm
+@@ -8,7 +8,7 @@ BEGIN {require 5.006;}
+ 
+ require Exporter;
+ use ExtUtils::MakeMaker::Config;
+-use ExtUtils::MakeMaker::version; # ensure we always have our fake version.pm
++use version; # ensure we always have version.pm
+ use Carp;
+ use File::Path;
+ my $CAN_DECODE = eval { require ExtUtils::MakeMaker::Locale; }; # 2 birds, 1 stone
+-- 
+1.9.3
+

@@ -1,0 +1,35 @@
+From 0c3a1123c391995ab46cfde603fa025ff180a819 Mon Sep 17 00:00:00 2001
+From: Martin Sehnoutka <msehnout@redhat.com>
+Date: Wed, 7 Sep 2016 11:43:54 +0200
+Subject: [PATCH 12/59] Replace syscall(__NR_clone ..) with clone ()
+
+in order to fix incorrect order of params on s390 arch
+---
+ sysdeputil.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/sysdeputil.c b/sysdeputil.c
+index b2782da..3bbabaa 100644
+--- a/sysdeputil.c
++++ b/sysdeputil.c
+@@ -1306,7 +1306,7 @@ vsf_sysutil_fork_isolate_failok()
+   static int cloneflags_work = 1;
+   if (cloneflags_work)
+   {
+-    int ret = syscall(__NR_clone, CLONE_NEWPID | CLONE_NEWIPC | SIGCHLD, NULL);
++    int ret = clone(NULL, NULL, CLONE_NEWPID | CLONE_NEWIPC | SIGCHLD, NULL);
+     if (ret != -1 || (errno != EINVAL && errno != EPERM))
+     {
+       if (ret == 0)
+@@ -1328,7 +1328,7 @@ vsf_sysutil_fork_newnet()
+   static int cloneflags_work = 1;
+   if (cloneflags_work)
+   {
+-    int ret = syscall(__NR_clone, CLONE_NEWNET | SIGCHLD, NULL);
++    int ret = clone(NULL, NULL, CLONE_NEWNET | SIGCHLD, NULL);
+     if (ret != -1 || (errno != EINVAL && errno != EPERM))
+     {
+       if (ret == 0)
+-- 
+2.14.4
+

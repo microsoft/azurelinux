@@ -1,0 +1,13 @@
+diff --git a/cmake/QtFlagHandlingHelpers.cmake b/cmake/QtFlagHandlingHelpers.cmake
+index 28231cb5..018d697b 100644
+--- a/cmake/QtFlagHandlingHelpers.cmake
++++ b/cmake/QtFlagHandlingHelpers.cmake
+@@ -69,7 +69,7 @@ function(qt_internal_add_linker_version_script target)
+             endforeach()
+         endforeach()
+ 
+-        string(APPEND contents "\n};\nQt_${PROJECT_VERSION_MAJOR}_PRIVATE_API { qt_private_api_tag*;\n")
++        string(APPEND contents "\n};\nQt_${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}_PRIVATE_API { qt_private_api_tag*;\n")
+         if(arg_PRIVATE_HEADERS)
+             foreach(ph ${arg_PRIVATE_HEADERS})
+                 string(APPEND contents "    @FILE:${ph}@\n")

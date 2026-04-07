@@ -1,0 +1,32 @@
+Avoid an implicit declaration of exit.  This prevents compilation
+failures in case compilers switch to rejecting implicit function
+declarations by default.
+
+Submitted upstream: <https://github.com/oetiker/mrtg/pull/104>
+
+diff --git a/configure b/configure
+index 07b0fbda88c3847a..8b87d2750822c02b 100755
+--- a/configure
++++ b/configure
+@@ -3670,7 +3670,7 @@ else
+                 char buffer[1000];
+                 sprintf (buffer, "%${format}u", a);
+                 sscanf (buffer, "%${format}u", &b);
+-                exit (b!=a);
++                return b!=a;
+             }
+ 
+ _ACEOF
+diff --git a/configure.ac b/configure.ac
+index 1416f3c2d6e2f645..939725ccf306fb2f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -37,7 +37,7 @@ AC_CACHE_VAL(mr_cv_long_long_format_specifier,[
+                 char buffer[1000];
+                 sprintf (buffer, "%${format}u", a);
+                 sscanf (buffer, "%${format}u", &b);
+-                exit (b!=a);
++                return b!=a;
+             }
+             ]])],[mr_cv_long_long_format_specifier="%${format}d"
+             mr_cv_long_long_format="${format}d"

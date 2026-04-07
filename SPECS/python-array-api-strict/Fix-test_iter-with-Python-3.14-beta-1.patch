@@ -1,0 +1,30 @@
+From 5250d3f68934d3205a3de07f57276f51ff0c4e9c Mon Sep 17 00:00:00 2001
+From: Lumir Balhar <lbalhar@redhat.com>
+Date: Fri, 16 May 2025 12:22:55 +0200
+Subject: [PATCH] Fix test_iter with Python 3.14 beta 1
+
+In Python 3.14 beta 1, generator expression returned by the
+__iter__ method needs to be executed to throw the expected
+TypeError.
+
+Fixes: https://github.com/data-apis/array-api-strict/issues/151
+---
+ array_api_strict/tests/test_array_object.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/array_api_strict/tests/test_array_object.py b/array_api_strict/tests/test_array_object.py
+index b0d4868..6e37018 100644
+--- a/array_api_strict/tests/test_array_object.py
++++ b/array_api_strict/tests/test_array_object.py
+@@ -426,7 +426,7 @@ def test_array_namespace():
+     pytest.raises(ValueError, lambda: a.__array_namespace__(api_version="2024.12"))
+ 
+ def test_iter():
+-    pytest.raises(TypeError, lambda: iter(asarray(3)))
++    pytest.raises(TypeError, lambda: next(iter(asarray(3))))
+     assert list(ones(3)) == [asarray(1.), asarray(1.), asarray(1.)]
+     assert all_(isinstance(a, Array) for a in iter(ones(3)))
+     assert all_(a.shape == () for a in iter(ones(3)))
+-- 
+2.49.0
+

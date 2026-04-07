@@ -1,0 +1,51 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Miss Islington (bot)"
+ <31488909+miss-islington@users.noreply.github.com>
+Date: Mon, 31 Mar 2025 20:29:04 +0200
+Subject: 00452: Properly apply exported CFLAGS for dtrace/systemtap builds
+
+When using --with-dtrace the resulting object file could be missing
+specific CFLAGS exported by the build system due to the systemtap
+script using specific defaults.
+
+Exporting the CC and CFLAGS variables before the dtrace invocation
+allows us to properly apply CFLAGS exported by the build system
+even when cross-compiling.
+
+Co-authored-by: stratakis <cstratak@redhat.com>
+---
+ Makefile.pre.in                                               | 4 ++--
+ .../next/Build/2025-03-31-19-22-41.gh-issue-131865.PIJy7X.rst | 2 ++
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+ create mode 100644 Misc/NEWS.d/next/Build/2025-03-31-19-22-41.gh-issue-131865.PIJy7X.rst
+
+diff --git a/Makefile.pre.in b/Makefile.pre.in
+index 81d4d50f82..0bd3447638 100644
+--- a/Makefile.pre.in
++++ b/Makefile.pre.in
+@@ -1453,7 +1453,7 @@ Python/frozen.o: $(FROZEN_FILES_OUT)
+ # an include guard, so we can't use a pipeline to transform its output.
+ Include/pydtrace_probes.h: $(srcdir)/Include/pydtrace.d
+ 	$(MKDIR_P) Include
+-	$(DTRACE) $(DFLAGS) -o $@ -h -s $<
++	CC="$(CC)" CFLAGS="$(CFLAGS)" $(DTRACE) $(DFLAGS) -o $@ -h -s $<
+ 	: sed in-place edit with POSIX-only tools
+ 	sed 's/PYTHON_/PyDTrace_/' $@ > $@.tmp
+ 	mv $@.tmp $@
+@@ -1463,7 +1463,7 @@ Python/import.o: $(srcdir)/Include/pydtrace.h
+ Modules/gcmodule.o: $(srcdir)/Include/pydtrace.h
+ 
+ Python/pydtrace.o: $(srcdir)/Include/pydtrace.d $(DTRACE_DEPS)
+-	$(DTRACE) $(DFLAGS) -o $@ -G -s $< $(DTRACE_DEPS)
++	CC="$(CC)" CFLAGS="$(CFLAGS)" $(DTRACE) $(DFLAGS) -o $@ -G -s $< $(DTRACE_DEPS)
+ 
+ Objects/typeobject.o: Objects/typeslots.inc
+ 
+diff --git a/Misc/NEWS.d/next/Build/2025-03-31-19-22-41.gh-issue-131865.PIJy7X.rst b/Misc/NEWS.d/next/Build/2025-03-31-19-22-41.gh-issue-131865.PIJy7X.rst
+new file mode 100644
+index 0000000000..a287e0b228
+--- /dev/null
++++ b/Misc/NEWS.d/next/Build/2025-03-31-19-22-41.gh-issue-131865.PIJy7X.rst
+@@ -0,0 +1,2 @@
++The DTrace build now properly passes the ``CC`` and ``CFLAGS`` variables
++to the ``dtrace`` command when utilizing SystemTap on Linux.

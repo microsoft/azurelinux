@@ -1,0 +1,19 @@
+--- crossterm-0.29.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ crossterm-0.29.0/Cargo.toml	2025-12-22T15:08:50.075002+00:00
+@@ -50,7 +50,6 @@
+ default = [
+     "bracketed-paste",
+     "events",
+-    "windows",
+     "derive-more",
+ ]
+ derive-more = ["dep:derive_more"]
+@@ -71,8 +70,6 @@
+ use-dev-tty = [
+     "filedescriptor",
+     "rustix/process",
+-]
+-windows = [
+ ]
+ 
+ [lib]

@@ -1,0 +1,39 @@
+--- qdbm-1.8.78/ruby/curia/mod_curia.c.c99	2022-11-25 23:26:58.118743130 +0900
++++ qdbm-1.8.78/ruby/curia/mod_curia.c	2022-11-25 23:50:02.026266422 +0900
+@@ -88,8 +88,8 @@ static VALUE rbcrfatalerror(VALUE vself,
+  * public objects
+  *************************************************************************************************/
+ 
+-
+-Init_mod_curia(){
++void
++Init_mod_curia(void){
+   crinit();
+   ccuriaerror = rb_define_class("CuriaError", rb_eStandardError);
+   ccuriaerror_ENOERR = rb_define_class("CuriaError_ENOERR", ccuriaerror);
+--- qdbm-1.8.78/ruby/depot/mod_depot.c.c99	2022-11-25 23:26:58.118743130 +0900
++++ qdbm-1.8.78/ruby/depot/mod_depot.c	2022-11-25 23:49:23.060219261 +0900
+@@ -87,8 +87,8 @@ static VALUE rbdpfatalerror(VALUE vself,
+  * public objects
+  *************************************************************************************************/
+ 
+-
+-Init_mod_depot(){
++void
++Init_mod_depot(void){
+   dpinit();
+   cdepoterror = rb_define_class("DepotError", rb_eStandardError);
+   cdepoterror_ENOERR = rb_define_class("DepotError_ENOERR", cdepoterror);
+--- qdbm-1.8.78/ruby/villa/mod_villa.c.c99	2022-11-25 23:26:58.119743131 +0900
++++ qdbm-1.8.78/ruby/villa/mod_villa.c	2022-11-25 23:51:19.881360642 +0900
+@@ -101,8 +101,8 @@ static VALUE rbvltranabort(VALUE vself,
+  * public objects
+  *************************************************************************************************/
+ 
+-
+-Init_mod_villa(){
++void
++Init_mod_villa(void){
+   vlinit();
+   cvillaerror = rb_define_class("VillaError", rb_eStandardError);
+   cvillaerror_ENOERR = rb_define_class("VillaError_ENOERR", cvillaerror);

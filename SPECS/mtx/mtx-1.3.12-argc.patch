@@ -1,0 +1,45 @@
+From f8e0af006f6a85243f0882ed08d31016032531b1 Mon Sep 17 00:00:00 2001
+From: =?utf-8?q?Dan=20Hor=C3=A1k?= <dan@danny.cz>
+Date: Thu, 19 Nov 2009 15:45:54 +0100
+Subject: [PATCH 2/2] remove the weird debugging-like info
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+
+The loaderinfo and tapeinfo utilities print a debugging-like information
+about the number of arguments on command line when started with wrong number
+of arguments.
+
+Signed-off-by: Dan Horák <dan@danny.cz>
+---
+ mtx/loaderinfo.c |    1 -
+ mtx/tapeinfo.c   |    1 -
+ 2 files changed, 0 insertions(+), 2 deletions(-)
+
+diff --git a/mtx/loaderinfo.c b/mtx/loaderinfo.c
+index 534666f..27d22d9 100644
+--- a/mtx/loaderinfo.c
++++ b/mtx/loaderinfo.c
+@@ -488,7 +488,6 @@ int main(int argc, char **argv)
+ 	argv0=argv[0];
+ 	if (argc != 3)
+ 	{
+-		fprintf(stderr,"argc=%d",argc);
+ 		usage();
+ 	}
+ 
+diff --git a/mtx/tapeinfo.c b/mtx/tapeinfo.c
+index 4d9c283..67547a6 100644
+--- a/mtx/tapeinfo.c
++++ b/mtx/tapeinfo.c
+@@ -933,7 +933,6 @@ int main(int argc, char **argv)
+ 
+ 	if (argc != 3)
+ 	{
+-		fprintf(stderr,"argc=%d",argc);
+ 		usage();
+ 	}
+ 
+-- 
+1.6.3.3
+

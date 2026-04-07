@@ -1,0 +1,16 @@
+diff --git a/ftp/cmds.c b/ftp/cmds.c
+index f0478fd..9622779 100644
+--- a/ftp/cmds.c
++++ b/ftp/cmds.c
+@@ -1052,9 +1052,9 @@ checkglob(int fd, const char *pattern)
+ }
+ 
+ static const char *
+-onoff(int bool)
++onoff(int opt)
+ {
+-	return (bool ? "on" : "off");
++	return (opt ? "on" : "off");
+ }
+ 
+ /*

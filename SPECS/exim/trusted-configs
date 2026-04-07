@@ -1,0 +1,6 @@
+# This file contains a list, one per line, of the files which are permitted
+# to be used as Exim configuration files with root privileges. If you want
+# to be able to run Exim with the -C option, and have it re-execute itself
+# for local delivery, then you'll need to add your configuration file here.
+/etc/exim/exim4.conf
+/etc/exim/exim.conf

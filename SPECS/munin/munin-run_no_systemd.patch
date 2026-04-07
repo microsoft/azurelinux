@@ -1,0 +1,28 @@
+diff -ur munin-2.0.63.orig/node/sbin/munin-run munin-2.0.63/node/sbin/munin-run
+--- munin-2.0.63.orig/node/sbin/munin-run	2020-05-27 23:52:55.000000000 +0300
++++ munin-2.0.63/node/sbin/munin-run	2020-07-04 10:55:27.079868324 +0300
+@@ -31,7 +31,7 @@
+ #   --pipe: 235 or later
+ #   --collect: 236 or later
+ 
+-my $REQUIRED_SYSTEMD_VERSION = 236;
++my $REQUIRED_SYSTEMD_VERSION = 999;
+ 
+ # See "man systemd.exec" for the list of all systemd properties.
+ # The following properties belong to the relevant sections "Capabilities",
+@@ -50,7 +50,6 @@
+     EnvironmentFile
+     Group
+     Limit\w+
+-    LockPersonality
+     MemoryDenyWriteExecute
+     MountFlags
+     NetworkNamespacePath
+@@ -189,6 +188,7 @@
+         # "systemd show" does not output the EnvironmentFile property in a readable format.
+         # See https://github.com/systemd/systemd/issues/14723.
+         next if ($property_definition =~ /^EnvironmentFiles?=(.*) \(ignore_errors=(yes|no)\)$/);
++	next if ($property_definition =~ /^RestrictSUIDSGID=/);
+         push @flag_list, $1 if $property_definition =~ /$flag_name_regex/;
+     }
+     return @flag_list;

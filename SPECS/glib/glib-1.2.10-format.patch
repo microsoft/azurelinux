@@ -1,0 +1,29 @@
+--- grel.c
++++ grel.c
+@@ -413,7 +413,7 @@ g_relation_print_one (gpointer tuple_key
+     }
+   
+   g_string_append (gstring, "]");
+-  g_log (g_log_domain_glib, G_LOG_LEVEL_INFO, gstring->str);
++  g_log (g_log_domain_glib, G_LOG_LEVEL_INFO, "%s", gstring->str);
+   g_string_free (gstring, TRUE);
+ }
+ 
+--- testglib.c
++++ testglib.c
+@@ -277,6 +277,9 @@ my_traverse (gpointer key,
+   return FALSE;
+ }
+ 
++/* This program explicitly tests for a NULL format string */
++#pragma GCC diagnostic push
++#pragma GCC diagnostic warning "-Wformat-security"
+ int
+ main (int   argc,
+       char *argv[])
+@@ -918,4 +921,5 @@ main (int   argc,
+ 
+   return 0;
+ }
++#pragma GCC diagnostic pop
+ 

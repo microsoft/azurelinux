@@ -1,0 +1,23 @@
+diff -up hdparm-9.54/hdparm.c.bak hdparm-9.54/hdparm.c
+--- hdparm-9.54/hdparm.c.bak	2020-06-01 17:56:47.257520643 +0200
++++ hdparm-9.54/hdparm.c	2020-06-01 17:57:29.285084217 +0200
+@@ -461,12 +461,15 @@ static void dump_identity (__u16 *idw)
+ {
+ 	int i;
+ 	char pmodes[64] = {0,}, dmodes[128]={0,}, umodes[128]={0,};
+-	char *model = strip(strndup((char *)&idw[27], 40));
+-	char *fwrev = strip(strndup((char *)&idw[23],  8));
+-	char *serno = strip(strndup((char *)&idw[10], 20));
++	char *model = strndup((char *)&idw[27], 40);
++	char *model_s = strip(model);
++	char *fwrev = strndup((char *)&idw[23],  8);
++	char *fwrev_s = strip(fwrev);
++	char *serno = strndup((char *)&idw[10], 20);
++	char *serno_s = strip(serno);
+ 	__u8 tPIO;
+ 
+-	printf("\n Model=%.40s, FwRev=%.8s, SerialNo=%.20s", model, fwrev, serno);
++	printf("\n Model=%.40s, FwRev=%.8s, SerialNo=%.20s", model_s, fwrev_s, serno_s);
+ 	printf("\n Config={");
+ 	for (i = 0; i <= 15; i++) {
+ 		if (idw[0] & (1<<i))

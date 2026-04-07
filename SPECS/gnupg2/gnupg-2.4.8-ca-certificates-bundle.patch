@@ -1,0 +1,11 @@
+diff -up ./dirmngr/certcache.c.certbundle ./dirmngr/certcache.c
+--- ./dirmngr/certcache.c.certbundle	2025-07-25 09:02:24.354664993 +0200
++++ ./dirmngr/certcache.c	2025-07-25 09:03:10.639991559 +0200
+@@ -705,6 +705,7 @@ load_certs_from_system (void)
+ #ifdef DEFAULT_TRUST_STORE_FILE
+     { DEFAULT_TRUST_STORE_FILE }
+ #else
++    { "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem" },
+     { "/etc/ssl/ca-bundle.pem" },
+     { "/etc/ssl/certs/ca-certificates.crt" },
+     { "/etc/pki/tls/cert.pem" },

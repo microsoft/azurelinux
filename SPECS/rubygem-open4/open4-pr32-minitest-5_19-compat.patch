@@ -1,0 +1,29 @@
+From e756b87030601277911142c1761a0f57fd02bf51 Mon Sep 17 00:00:00 2001
+From: Mamoru TASAKA <mtasaka@fedoraproject.org>
+Date: Thu, 28 Sep 2023 14:06:24 +0900
+Subject: [PATCH] Test: use recent Minitest style
+
+Current style has long been to use Minitest instead of MiniTest
+at least for 3 years, and with minitest 5.19, MiniTest usage support is
+hidden unless explicitly setting ENV["MT_COMPAT"].
+
+https://github.com/minitest/minitest/commit/a2c6c18570f6f0a1bf6af70fe3b6d9599a13fdd6
+
+Use Minitest::Test instead of MiniTest::Unit::TestCase .
+---
+ test/lib/test_case.rb | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/lib/test_case.rb b/test/lib/test_case.rb
+index 915aa14..33c28fb 100644
+--- a/test/lib/test_case.rb
++++ b/test/lib/test_case.rb
+@@ -5,7 +5,7 @@
+ require 'rbconfig'
+ 
+ module Open4
+-  class TestCase < MiniTest::Unit::TestCase
++  class TestCase < Minitest::Test
+     include Open4
+ 
+     # Custom exception class for tests so we don't shadow possible

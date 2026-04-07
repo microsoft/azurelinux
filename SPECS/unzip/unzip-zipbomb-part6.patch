@@ -1,0 +1,95 @@
+From 122050bac16fae82a460ff739fb1ca0f106e9d85 Mon Sep 17 00:00:00 2001
+From: Mark Adler <madler@alumni.caltech.edu>
+Date: Sat, 2 Jan 2021 13:09:34 -0800
+Subject: [PATCH] Determine Zip64 status entry-by-entry instead of for entire
+ file.
+
+Fixes a bug for zip files with mixed Zip64 and not Zip64 entries,
+which resulted in an incorrect data descriptor length. The bug is
+seen when a Zip64 entry precedes a non-Zip64 entry, in which case
+the data descriptor would have been assumed to be larger than it
+is, resulting in an incorrect bomb warning due to a perceived
+overlap with the next entry. This commit determines and saves the
+Zip64 status for each entry based on the central directory, and
+then computes the length of each data descriptor accordingly.
+---
+ extract.c | 5 +++--
+ globals.h | 2 --
+ process.c | 4 +---
+ unzpriv.h | 1 +
+ 4 files changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/extract.c b/extract.c
+index 504afd6..878817d 100644
+--- a/extract.c
++++ b/extract.c
+@@ -658,6 +658,7 @@ int extract_or_test_files(__G)    /* return PK-type error code */
+                     break;
+                 }
+             }
++            G.pInfo->zip64 = FALSE;
+             if ((error = do_string(__G__ G.crec.extra_field_length,
+                 EXTRA_FIELD)) != 0)
+             {
+@@ -2187,12 +2188,12 @@ static int extract_or_test_member(__G)    /* return PK-type error code */
+              (clen == SIG &&                    /* if not SIG, no signature */
+               ((G.lrec.csize & LOW) != SIG ||   /* if not SIG, have signature */
+                (ulen == SIG &&                  /* if not SIG, no signature */
+-                (G.zip64 ? G.lrec.csize >> 32 : G.lrec.ucsize) != SIG
++                (G.pInfo->zip64 ? G.lrec.csize >> 32 : G.lrec.ucsize) != SIG
+                                                 /* if not SIG, have signature */
+                 )))))
+                    /* skip four more bytes to account for signature */
+                    shy += 4 - readbuf((char *)buf, 4);
+-        if (G.zip64)
++        if (G.pInfo->zip64)
+             shy += 8 - readbuf((char *)buf, 8); /* skip eight more for ZIP64 */
+         if (shy)
+             error = PK_ERR;
+diff --git a/globals.h b/globals.h
+index f9c6daf..a883c90 100644
+--- a/globals.h
++++ b/globals.h
+@@ -261,8 +261,6 @@ typedef struct Globals {
+     ecdir_rec       ecrec;         /* used in unzip.c, extract.c */
+     z_stat   statbuf;              /* used by main, mapname, check_for_newer */
+ 
+-    int zip64;                     /* true if Zip64 info in extra field */
+-
+     int      mem_mode;
+     uch      *outbufptr;           /* extract.c static */
+     ulg      outsize;              /* extract.c static */
+diff --git a/process.c b/process.c
+index d75d405..d643c6f 100644
+--- a/process.c
++++ b/process.c
+@@ -1903,8 +1903,6 @@ int getZip64Data(__G__ ef_buf, ef_len)
+ #define Z64FLGS 0xffff
+ #define Z64FLGL 0xffffffff
+ 
+-    G.zip64 = FALSE;
+-
+     if (ef_len == 0 || ef_buf == NULL)
+         return PK_COOL;
+ 
+@@ -1943,7 +1941,7 @@ int getZip64Data(__G__ ef_buf, ef_len)
+           break;                /* Expect only one EF_PKSZ64 block. */
+ #endif /* 0 */
+ 
+-          G.zip64 = TRUE;
++          G.pInfo->zip64 = TRUE;
+         }
+ 
+         /* Skip this extra field block. */
+diff --git a/unzpriv.h b/unzpriv.h
+index 09f288e..75b3359 100644
+--- a/unzpriv.h
++++ b/unzpriv.h
+@@ -2034,6 +2034,7 @@ typedef struct min_info {
+ #ifdef UNICODE_SUPPORT
+     unsigned GPFIsUTF8: 1;   /* crec gen_purpose_flag UTF-8 bit 11 is set */
+ #endif
++    unsigned zip64: 1;       /* true if entry has Zip64 extra block */
+ #ifndef SFX
+     char Far *cfilname;      /* central header version of filename */
+ #endif

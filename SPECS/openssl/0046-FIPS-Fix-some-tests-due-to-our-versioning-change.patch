@@ -1,0 +1,106 @@
+From 552dec327a579572ca17a560bb415d8f407ce990 Mon Sep 17 00:00:00 2001
+From: Simo Sorce <simo@redhat.com>
+Date: Mon, 10 Mar 2025 13:52:50 -0400
+Subject: [PATCH 46/59] FIPS: Fix some tests due to our versioning change
+
+Signed-off-by: Simo Sorce <simo@redhat.com>
+---
+ test/ssl-tests/13-fragmentation.cnf.in    | 4 ++--
+ test/ssl-tests/17-renegotiate.cnf.in      | 4 ++--
+ test/ssl-tests/18-dtls-renegotiate.cnf.in | 2 +-
+ test/ssl-tests/19-mac-then-encrypt.cnf.in | 2 +-
+ test/ssl-tests/20-cert-select.cnf.in      | 6 +++---
+ 5 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/test/ssl-tests/13-fragmentation.cnf.in b/test/ssl-tests/13-fragmentation.cnf.in
+index 318fd65960..87ec08ee5b 100644
+--- a/test/ssl-tests/13-fragmentation.cnf.in
++++ b/test/ssl-tests/13-fragmentation.cnf.in
+@@ -14,7 +14,7 @@ use warnings;
+ 
+ package ssltests;
+ 
+-our $fips_3_4;
++our $fips_mode;
+ 
+ our @tests = (
+     # Default fragment size is 512.
+@@ -273,4 +273,4 @@ my @tests_rsa = (
+ );
+ 
+ push @tests, @tests_rsa
+-    unless $fips_3_4;
++    unless $fips_mode;
+diff --git a/test/ssl-tests/17-renegotiate.cnf.in b/test/ssl-tests/17-renegotiate.cnf.in
+index 2812e4c38b..9cbd972eba 100644
+--- a/test/ssl-tests/17-renegotiate.cnf.in
++++ b/test/ssl-tests/17-renegotiate.cnf.in
+@@ -15,7 +15,7 @@ use warnings;
+ package ssltests;
+ use OpenSSL::Test::Utils;
+ 
+-our $fips_3_4;
++our $fips_mode;
+ 
+ our @tests = (
+     {
+@@ -318,5 +318,5 @@ our @tests_tls1_2 = (
+     }
+ );
+ 
+-push @tests, @tests_tls1_2_rsa unless disabled("tls1_2") or $fips_3_4;
++push @tests, @tests_tls1_2_rsa unless disabled("tls1_2") or $fips_mode;
+ push @tests, @tests_tls1_2 unless disabled("tls1_2");
+diff --git a/test/ssl-tests/18-dtls-renegotiate.cnf.in b/test/ssl-tests/18-dtls-renegotiate.cnf.in
+index 8996849a2c..415dc2978d 100644
+--- a/test/ssl-tests/18-dtls-renegotiate.cnf.in
++++ b/test/ssl-tests/18-dtls-renegotiate.cnf.in
+@@ -133,7 +133,7 @@ foreach my $sctp ("No", "Yes")
+     );
+     push @tests, @tests_basic;
+ 
+-    next if disabled("dtls1_2") || $fips_3_4;
++    next if disabled("dtls1_2") || $fips_mode;
+     our @tests_dtls1_2 = (
+         {
+             name => "renegotiate-aead-to-non-aead".$suffix,
+diff --git a/test/ssl-tests/19-mac-then-encrypt.cnf.in b/test/ssl-tests/19-mac-then-encrypt.cnf.in
+index 32bcec4be4..2f8a123c20 100644
+--- a/test/ssl-tests/19-mac-then-encrypt.cnf.in
++++ b/test/ssl-tests/19-mac-then-encrypt.cnf.in
+@@ -17,7 +17,7 @@ our $fips_mode;
+ our $fips_3_4;
+ 
+ # Nothing to test with newer fips providers
+-return if $fips_3_4;
++return if $fips_mode;
+ 
+ our @tests = (
+     {
+diff --git a/test/ssl-tests/20-cert-select.cnf.in b/test/ssl-tests/20-cert-select.cnf.in
+index af47842fd8..21c75033e8 100644
+--- a/test/ssl-tests/20-cert-select.cnf.in
++++ b/test/ssl-tests/20-cert-select.cnf.in
+@@ -266,7 +266,7 @@ our @tests = (
+         },
+         test   => {
+             "ExpectedServerCertType" =>, "RSA",
+-            "ExpectedResult" => $fips_3_4 ? "ClientFail" : "Success"
++            "ExpectedResult" => $fips_mode ? "ClientFail" : "Success"
+         },
+     },
+     {
+@@ -1005,8 +1005,8 @@ my @tests_dsa_tls_1_3 = (
+ );
+ 
+ if (!disabled("dsa")) {
+-    push @tests, @tests_dsa_tls_1_2 unless disabled("dh") || $fips_3_4;
+-    push @tests, @tests_dsa_tls_1_3 unless disabled("tls1_3");
++    push @tests, @tests_dsa_tls_1_2 unless disabled("dh") || $fips_mode;
++    push @tests, @tests_dsa_tls_1_3 unless disabled("tls1_3") || $fips_mode;
+ }
+ 
+ my @tests_mldsa_tls_1_3 = (
+-- 
+2.51.0
+

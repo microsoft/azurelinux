@@ -1,0 +1,68 @@
+From f62f97e51849297c93d52b311b812e64c753e083 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Fri, 1 Nov 2024 18:00:54 +0100
+Subject: [PATCH] Ruby 3.4 replaces initial backtick by single quote
+
+This prevents test error such as:
+
+~~~cucumber
+  Scenario: specify a method does not throw an expection                                               # features/its.feature:145
+    Given a file named "example_spec.rb" with:                                                         # aruba-2.2.0/lib/aruba/cucumber/file.rb:26
+      """
+      class Klass; end
+
+      describe Klass do
+        subject { Klass.new }
+        its(:foo) { will_not raise_error }
+      end
+      """
+    When I run rspec                                                                                   # features/step_definitions/additional_cli_steps.rb:1
+    Then the example should fail                                                                       # features/step_definitions/additional_cli_steps.rb:23
+    And the output should contain "Failure/Error: its(:foo) { will_not raise_error }"                  # aruba-2.2.0/lib/aruba/cucumber/command.rb:123
+    And the output should contain "expected no Exception, got #<NoMethodError: undefined method `foo'" # aruba-2.2.0/lib/aruba/cucumber/command.rb:123
+      expected "F\n\nFailures:\n\n  1) Klass foo is expected not to raise Exception\n     Failure/Error: its(:foo) {...e\n\nFailed examples:\n\nrspec ./example_spec.rb:5 # Klass foo is expected not to raise Exception\n" to string includes: "expected no Exception, got #<NoMethodError: undefined method `foo'"
+      Diff:
+      @@ -1,17 +1,33 @@
+      -expected no Exception, got #<NoMethodError: undefined method `foo'
+      +F
+      +
+      +Failures:
+      +
+      +  1) Klass foo is expected not to raise Exception
+      +     Failure/Error: its(:foo) { will_not raise_error }
+      +
+      +       expected no Exception, got #<NoMethodError: undefined method 'foo' for an instance of Klass> with backtrace:
+      +         # ./example_spec.rb:5:in 'block (2 levels) in <top (required)>'
+      +     # ./example_spec.rb:5:in 'block (2 levels) in <top (required)>'
+      +
+      +Finished in 0.01104 seconds (files took 0.05894 seconds to load)
+      +1 example, 1 failure
+      +
+      +Failed examples:
+      +
+      +rspec ./example_spec.rb:5 # Klass foo is expected not to raise Exception
+       (RSpec::Expectations::ExpectationNotMetError)
+      <internal:array>:42:in 'Array#each'
+      features/its.feature:158:in `the output should contain "expected no Exception, got #<NoMethodError: undefined method `foo'"'
+~~~
+
+Ruby upstream ticket:
+
+https://bugs.ruby-lang.org/issues/16495
+---
+ features/its.feature | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/features/its.feature b/features/its.feature
+index d83f01f..dc23c69 100644
+--- a/features/its.feature
++++ b/features/its.feature
+@@ -188,7 +188,7 @@ Feature: attribute of subject
+     When I run rspec
+     Then the example should fail
+     And the output should contain "Failure/Error: its(:foo) { will_not raise_error }"
+-    And the output should contain "expected no Exception, got #<NoMethodError: undefined method `foo'"
++    And the output should match /expected no Exception, got #<NoMethodError: undefined method [`']foo'/
+ 
+   Scenario: examples will warn when using non block expectations
+     Given a file named "example_spec.rb" with:

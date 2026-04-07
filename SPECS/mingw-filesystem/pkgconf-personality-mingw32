@@ -1,0 +1,6 @@
+# MinGW 32-bit x86 Windows target
+Triplet: i686-w64-mingw32
+SysrootDir: /usr/i686-w64-mingw32/sys-root/mingw
+DefaultSearchPaths: /usr/i686-w64-mingw32/sys-root/mingw/lib/pkgconfig:/usr/i686-w64-mingw32/sys-root/mingw/share/pkgconfig
+SystemIncludePaths: /usr/i686-w64-mingw32/sys-root/mingw/include
+SystemLibraryPaths: /usr/i686-w64-mingw32/sys-root/mingw/lib

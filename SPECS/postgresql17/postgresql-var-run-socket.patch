@@ -1,0 +1,50 @@
+Change the built-in default socket directory to be /var/run/postgresql.
+For backwards compatibility with (probably non-libpq-based) clients that
+might still expect to find the socket in /tmp, also create a socket in
+/tmp.  This is to resolve communication problems with clients operating
+under systemd's PrivateTmp environment, which won't be using the same
+global /tmp directory as the server; see bug #825448.
+
+Note that we apply the socket directory change at the level of the
+hard-wired defaults in the C code, not by just twiddling the setting in
+postgresql.conf.sample; this is so that the change will take effect on
+server package update, without requiring any existing postgresql.conf
+to be updated.  (Of course, a user who dislikes this behavior can still
+override it via postgresql.conf.)
+
+diff -ur -x 'cscope*' postgresql-16beta1/src/backend/utils/misc/guc_tables.c postgresql16_socket_patch/src/backend/utils/misc/guc_tables.c
+--- postgresql-16beta1/src/backend/utils/misc/guc_tables.c	2023-05-22 23:08:08.000000000 +0200
++++ postgresql16_socket_patch/src/backend/utils/misc/guc_tables.c	2023-06-01 09:39:24.000000000 +0200
+@@ -4300,7 +4300,7 @@
+ 			GUC_LIST_INPUT | GUC_LIST_QUOTE | GUC_SUPERUSER_ONLY
+ 		},
+ 		&Unix_socket_directories,
+-		DEFAULT_PGSOCKET_DIR,
++		DEFAULT_PGSOCKET_DIR ", /tmp",
+ 		NULL, NULL, NULL
+ 	},
+
+diff -ur -x 'cscope*' postgresql-16beta1/src/bin/initdb/initdb.c postgresql16_socket_patch/src/bin/initdb/initdb.c
+--- postgresql-16beta1/src/bin/initdb/initdb.c	2023-05-22 23:08:08.000000000 +0200
++++ postgresql16_socket_patch/src/bin/initdb/initdb.c	2023-06-01 09:42:16.000000000 +0200
+@@ -1291,7 +1291,7 @@
+ 	 * these are indeed defaults, keep the postgresql.conf lines commented.
+ 	 */
+ 	conflines = replace_guc_value(conflines, "unix_socket_directories",
+-								  DEFAULT_PGSOCKET_DIR, true);
++								  DEFAULT_PGSOCKET_DIR ", /tmp", true);
+
+ 	conflines = replace_guc_value(conflines, "port",
+ 								  DEF_PGPORT_STR, true);
+diff -ur -x 'cscope*' postgresql-16beta1/src/include/pg_config_manual.h postgresql16_socket_patch/src/include/pg_config_manual.h
+--- postgresql-16beta1/src/include/pg_config_manual.h	2023-05-22 23:08:08.000000000 +0200
++++ postgresql16_socket_patch/src/include/pg_config_manual.h	2023-06-01 09:43:19.000000000 +0200
+@@ -206,7 +206,7 @@
+  * support them yet.
+  */
+ #ifndef WIN32
+-#define DEFAULT_PGSOCKET_DIR  "/tmp"
++#define DEFAULT_PGSOCKET_DIR  "/var/run/postgresql"
+ #else
+ #define DEFAULT_PGSOCKET_DIR ""
+ #endif

@@ -1,0 +1,24 @@
+[Unit]
+Description=Intel(R) TD Quoting Generation Service 
+After=syslog.target network.target auditd.service mpa_registration.service
+ConditionPathExists=/dev/sgx_enclave
+Requires=mpa_registration.service
+
+[Service]
+Type=simple
+User=qgs
+EnvironmentFile=-/etc/sysconfig/qgs
+ExecStart=/usr/bin/qgs --no-daemon -m=0666 $QGS_ARGS
+ExecReload=/bin/kill -SIGHUP $MAINPID
+Restart=on-failure
+RestartSec=15s
+
+RuntimeDirectory=tdx-qgs
+WorkingDirectory=/var/lib/qgs
+InaccessibleDirectories=/home
+DevicePolicy=closed
+DeviceAllow=/dev/sgx_enclave rw
+DeviceAllow=/dev/sgx_provision rw
+
+[Install]
+WantedBy=multi-user.target

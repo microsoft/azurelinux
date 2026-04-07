@@ -1,0 +1,99 @@
+diff -up db-5.3.28/src/dbinc_auto/int_def.in.rpmlock db-5.3.28/src/dbinc_auto/int_def.in
+--- db-5.3.28/src/dbinc_auto/int_def.in.rpmlock	2017-06-26 15:09:17.883356255 +0200
++++ db-5.3.28/src/dbinc_auto/int_def.in	2017-06-26 15:09:27.421170401 +0200
+@@ -1573,6 +1573,7 @@
+ #define	__os_posix_err __os_posix_err@DB_VERSION_UNIQUE_NAME@
+ #define	__os_fileid __os_fileid@DB_VERSION_UNIQUE_NAME@
+ #define	__check_lock_fn __check_lock_fn@DB_VERSION_UNIQUE_NAME@
++#define	__rpm_lock_free __rpm_lock_free@DB_VERSION_UNIQUE_NAME@
+ #define	__os_fdlock __os_fdlock@DB_VERSION_UNIQUE_NAME@
+ #define	__os_fsync __os_fsync@DB_VERSION_UNIQUE_NAME@
+ #define	__os_getenv __os_getenv@DB_VERSION_UNIQUE_NAME@
+diff -up db-5.3.28/src/dbinc_auto/os_ext.h.rpmlock db-5.3.28/src/dbinc_auto/os_ext.h
+--- db-5.3.28/src/dbinc_auto/os_ext.h.rpmlock	2017-06-26 15:09:21.940277203 +0200
++++ db-5.3.28/src/dbinc_auto/os_ext.h	2017-06-26 15:09:27.354171707 +0200
+@@ -42,6 +42,7 @@ char *__os_strerror __P((int, char *, si
+ int __os_posix_err __P((int));
+ int __os_fileid __P((ENV *, const char *, int, u_int8_t *));
+ int __check_lock_fn __P((char *, pid_t));
++int __rpm_lock_free __P((ENV *));
+ int __os_fdlock __P((ENV *, DB_FH *, off_t, db_lockmode_t, int));
+ int __os_fsync __P((ENV *, DB_FH *));
+ int __os_getenv __P((ENV *, const char *, char **, size_t));
+diff -up db-5.3.28/src/env/env_region.c.rpmlock db-5.3.28/src/env/env_region.c
+--- db-5.3.28/src/env/env_region.c.rpmlock	2017-06-26 15:09:12.479461558 +0200
++++ db-5.3.28/src/env/env_region.c	2017-06-26 15:09:12.481461519 +0200
+@@ -291,18 +291,23 @@ user_map_functions:
+ 	if (create_ok &&
+ 	    ret == DB_OLD_VERSION &&
+ 	    ENV_PRIMARY_LOCK(env, DB_LOCK_WRITE, 1) == 0) {
+-		if (FLD_ISSET(dbenv->verbose, DB_VERB_RECOVERY))
+-			__db_msg(env, "Recreating idle environment");
+-		F_SET(infop, REGION_CREATE_OK);
++		/* If the rpm transaction lock is taken we cannot safely rebuild */
++        if (!__rpm_lock_free(env))
++            ENV_PRIMARY_UNLOCK(env);
++        else {
++            if (FLD_ISSET(dbenv->verbose, DB_VERB_RECOVERY))
++                __db_msg(env, "Recreating idle environment");
++            F_SET(infop, REGION_CREATE_OK);
+ 
+-		/*
+-		 * Detach from the environment region; we need to unmap it (and
+-		 * close any file handle) so that we don't leak memory or files.
+-		 */
+-		DB_ASSERT(env, infop->rp == NULL);
+-		infop->rp = &tregion;
+-		(void)__env_sys_detach(env, infop, 0);
+-		goto creation;
++            /*
++             * Detach from the environment region; we need to unmap it (and
++             * close any file handle) so that we don't leak memory or files.
++             */
++            DB_ASSERT(env, infop->rp == NULL);
++            infop->rp = &tregion;
++            (void)__env_sys_detach(env, infop, 0);
++            goto creation;
++        }
+ 	}
+ 
+ 	if (renv->majver != DB_VERSION_MAJOR ||
+diff -up db-5.3.28/src/os/os_flock.c.rpmlock db-5.3.28/src/os/os_flock.c
+--- db-5.3.28/src/os/os_flock.c.rpmlock	2017-06-26 15:09:12.480461538 +0200
++++ db-5.3.28/src/os/os_flock.c	2017-06-26 15:09:12.481461519 +0200
+@@ -79,6 +79,35 @@ int __check_lock_fn(fn, pid)
+ }
+ 
+ /*
++ * __rpm_lock_free --
++ * Try to look at a lock used by rpm to see if libdb is being
++ * updated and it is safe to access its environment files.
++ * PUBLIC: int __rpm_lock_free __P((ENV *));
++ */
++
++#define RPM_PATH SHAREDSTATEDIR "/rpm"
++#define RPMLOCK_PATH RPM_PATH "/.rpm.lock"
++
++int __rpm_lock_free(env)
++    ENV *env;
++{
++    int ret;
++
++    /* No need to check the transaction lock if not in rpm */
++    if (strstr(env->db_home, RPM_PATH) == NULL)
++        return 1;
++
++    /* Assume it is safe to rebuild if the lock file does not exist */
++    if (access(RPMLOCK_PATH, F_OK) && errno == ENOENT)
++        return 1;
++
++    ret = __check_lock_fn(RPMLOCK_PATH, 0);
++    /* __check_lock_fn can return -1 on failure - return 0 (taken) instead */
++    return ret == -1 ? 0: ret;
++
++}
++
++/*
+  * __os_fdlock --
+  *	Acquire/release a lock on a byte in a file.
+  *

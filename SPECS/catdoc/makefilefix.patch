@@ -1,0 +1,70 @@
+diff -up catdoc-0.95/charsets/Makefile.in.makefilefix catdoc-0.95/charsets/Makefile.in
+--- catdoc-0.95/charsets/Makefile.in.makefilefix	2016-04-26 11:13:38.000000000 -0400
++++ catdoc-0.95/charsets/Makefile.in	2017-06-20 14:17:55.494732868 -0400
+@@ -30,15 +30,15 @@ all: @charsetcheck@
+ clean:
+ install: install-dirs install-spc install-charsets
+ install-spc: tex.spc ascii.spc tex.rpl ascii.rpl
+-	    $(INSTALL) -m 644 ascii.spc $(installroot)$(LIB_DIR)/ascii$(SPEC_EXT) 
+-	    $(INSTALL) -m 644 tex.spc $(installroot)$(LIB_DIR)/tex$(SPEC_EXT) 
+-	    $(INSTALL) -m 644 ascii.rpl $(installroot)$(LIB_DIR)/ascii$(REPL_EXT)
+-	    $(INSTALL) -m 644 tex.rpl $(installroot)$(LIB_DIR)/tex$(REPL_EXT)
++	    $(INSTALL) -p -m 644 ascii.spc $(DESTDIR)$(installroot)$(LIB_DIR)/ascii$(SPEC_EXT) 
++	    $(INSTALL) -p -m 644 tex.spc $(DESTDIR)$(installroot)$(LIB_DIR)/tex$(SPEC_EXT) 
++	    $(INSTALL) -p -m 644 ascii.rpl $(DESTDIR)$(installroot)$(LIB_DIR)/ascii$(REPL_EXT)
++	    $(INSTALL) -p -m 644 tex.rpl $(DESTDIR)$(installroot)$(LIB_DIR)/tex$(REPL_EXT)
+ install-charsets:
+ 	for i in *.txt; do\
+-	   $(INSTALL) -m 0644 $$i $(installroot)$(LIB_DIR);\
++	   $(INSTALL) -p -m 0644 $$i $(DESTDIR)$(installroot)$(LIB_DIR);\
+ 	done
+ install-dirs:
+-	../mkinstalldirs $(installroot)$(LIB_DIR)
++	../mkinstalldirs $(DESTDIR)$(installroot)$(LIB_DIR)
+ distclean:
+ 	rm Makefile
+diff -up catdoc-0.95/doc/Makefile.in.makefilefix catdoc-0.95/doc/Makefile.in
+--- catdoc-0.95/doc/Makefile.in.makefilefix	2017-06-20 14:17:55.494732868 -0400
++++ catdoc-0.95/doc/Makefile.in	2017-06-20 14:20:00.266641962 -0400
+@@ -30,13 +30,13 @@ clean:
+             wordview.txt wordview.ps build
+ install: @installtargets@
+ install-catdoc: catdoc.1 xls2csv.1 catppt.1
+-	../mkinstalldirs $(installroot)$(mandir)
+-	$(INSTALL) -m 644 catdoc.1 $(installroot)$(mandir)/man1/catdoc.1
+-	$(INSTALL) -m 644 xls2csv.1 $(installroot)$(mandir)/man1/xls2csv.1
+-	$(INSTALL) -m 644 catppt.1 $(installroot)$(mandir)/man1/catppt.1
++	../mkinstalldirs $(DESTDIR)$(installroot)$(mandir)/man1/
++	$(INSTALL) -m 644 catdoc.1 $(DESTDIR)$(installroot)$(mandir)/man1/catdoc.1
++	$(INSTALL) -m 644 xls2csv.1 $(DESTDIR)$(installroot)$(mandir)/man1/xls2csv.1
++	$(INSTALL) -m 644 catppt.1 $(DESTDIR)$(installroot)$(mandir)/man1/catppt.1
+ install-wordview:	
+-	../mkinstalldirs $(installroot)$(mandir)
+-	$(INSTALL) -m 644 wordview.1 $(installroot)$(mandir)/man1/wordview.1
++	../mkinstalldirs $(DESTDIR)$(installroot)$(mandir)
++	$(INSTALL) -m 644 wordview.1 $(DESTDIR)$(installroot)$(mandir)/man1/wordview.1
+ distclean: clean
+ 	$(RM)  Makefile catdoc.1 xls2csv.1 catppt.1 wordview.1
+ 
+diff -up catdoc-0.95/src/Makefile.in.makefilefix catdoc-0.95/src/Makefile.in
+--- catdoc-0.95/src/Makefile.in.makefilefix	2016-04-26 11:13:38.000000000 -0400
++++ catdoc-0.95/src/Makefile.in	2017-06-20 14:17:55.494732868 -0400
+@@ -84,13 +84,13 @@ catppt: $(OBJPPT)
+ 
+ install: @installtargets@
+ install-catdoc:catdoc xls2csv catppt 
+-	../mkinstalldirs $(installroot)$(bindir)
+-	$(INSTALL) -m 755 catdoc $(installroot)$(bindir)/catdoc
+-	$(INSTALL) -m 755 xls2csv $(installroot)$(bindir)/xls2csv
+-	$(INSTALL) -m 755 catppt $(installroot)$(bindir)/catppt
++	../mkinstalldirs $(DESTDIR)$(installroot)$(bindir)
++	$(INSTALL) -p -m 755 catdoc $(DESTDIR)$(installroot)$(bindir)/catdoc
++	$(INSTALL) -p -m 755 xls2csv $(DESTDIR)$(installroot)$(bindir)/xls2csv
++	$(INSTALL) -p -m 755 catppt $(DESTDIR)$(installroot)$(bindir)/catppt
+ install-wordview: wordview 
+ 	../mkinstalldirs $(installroot)$(bindir)
+-	$(INSTALL) -m 755 wordview $(installroot)$(bindir)/wordview
++	$(INSTALL) -p -m 755 wordview $(DESTDIR)$(installroot)$(bindir)/wordview
+ wordview: wordview.tcl
+ 	echo "#! $(WISH)" >wordview
+ 	echo set charset_lib "\"$(CHARSETPATH)\"">>wordview

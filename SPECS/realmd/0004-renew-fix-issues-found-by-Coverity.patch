@@ -1,0 +1,47 @@
+From 5c895df94c5a529a78c733a24635f23450e30fb0 Mon Sep 17 00:00:00 2001
+From: Sumit Bose <sbose@redhat.com>
+Date: Thu, 24 Apr 2025 11:38:35 +0200
+Subject: [PATCH 4/4] renew: fix issues found by Coverity
+
+---
+ service/realm-kerberos.c | 4 ++--
+ service/realm-sssd-ad.c  | 1 -
+ 2 files changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/service/realm-kerberos.c b/service/realm-kerberos.c
+index 0cf2da0..2b617a5 100644
+--- a/service/realm-kerberos.c
++++ b/service/realm-kerberos.c
+@@ -447,8 +447,6 @@ handle_renew (RealmDbusKerberosMembership *dbus_membership,
+ 		return TRUE;
+ 	}
+ 
+-	method = method_closure_new (self, invocation);
+-
+ 	if (iface->renew_async == NULL || iface->renew_finish == NULL) {
+ 		g_dbus_method_invocation_return_error (invocation, G_DBUS_ERROR,
+ 		                                       G_DBUS_ERROR_UNKNOWN_METHOD,
+@@ -456,6 +454,8 @@ handle_renew (RealmDbusKerberosMembership *dbus_membership,
+ 		return TRUE;
+ 	}
+ 
++	method = method_closure_new (self, invocation);
++
+ 	(iface->renew_async) (membership, options, invocation, on_renew_complete, method);
+ 
+ 	return TRUE;
+diff --git a/service/realm-sssd-ad.c b/service/realm-sssd-ad.c
+index c04557b..249e796 100644
+--- a/service/realm-sssd-ad.c
++++ b/service/realm-sssd-ad.c
+@@ -675,7 +675,6 @@ on_renew_done (GObject *source,
+ 	if (error != NULL) {
+ 		realm_diagnostics_error (renew->invocation, error,
+ 		                         "Task failed with: ");
+-		g_error_free (error);
+ 		g_task_return_error (task, error);
+ 	} else {
+ 		g_task_return_boolean (task, TRUE);
+-- 
+2.49.0
+

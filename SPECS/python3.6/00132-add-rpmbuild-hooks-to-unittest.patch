@@ -1,0 +1,74 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: David Malcolm <dmalcolm@redhat.com>
+Date: Fri, 19 Jun 2020 16:54:05 +0200
+Subject: 00132: Add rpmbuild hooks to unittest
+
+Add non-standard hooks to unittest for use in the "check" phase, when
+running selftests within the build:
+  @unittest._skipInRpmBuild(reason)
+for tests that hang or fail intermittently within the build environment, and:
+  @unittest._expectedFailureInRpmBuild
+for tests that always fail within the build environment
+
+The hooks only take effect if WITHIN_PYTHON_RPM_BUILD is set in the
+environment, which we set manually in the appropriate portion of the "check"
+phase below (and which potentially other python-* rpms could set, to reuse
+these unittest hooks in their own "check" phases)
+
+Co-Authored-By: David Malcolm <dmalcolm@redhat.com>
+Co-Authored-By: Bohuslav Kabrda <bkabrda@redhat.com>
+Co-Authored-By: Robert Kuska <rkuska@redhat.com>
+---
+ Lib/unittest/__init__.py |  3 ++-
+ Lib/unittest/case.py     | 17 +++++++++++++++++
+ 2 files changed, 19 insertions(+), 1 deletion(-)
+
+diff --git a/Lib/unittest/__init__.py b/Lib/unittest/__init__.py
+index c55d563e0c..79c4b10681 100644
+--- a/Lib/unittest/__init__.py
++++ b/Lib/unittest/__init__.py
+@@ -57,7 +57,8 @@ __unittest = True
+ 
+ from .result import TestResult
+ from .case import (TestCase, FunctionTestCase, SkipTest, skip, skipIf,
+-                   skipUnless, expectedFailure)
++                   skipUnless, expectedFailure,
++                   _skipInRpmBuild)
+ from .suite import BaseTestSuite, TestSuite
+ from .loader import (TestLoader, defaultTestLoader, makeSuite, getTestCaseNames,
+                      findTestCases)
+diff --git a/Lib/unittest/case.py b/Lib/unittest/case.py
+index 402fa47f28..8329d47882 100644
+--- a/Lib/unittest/case.py
++++ b/Lib/unittest/case.py
+@@ -3,6 +3,7 @@
+ import sys
+ import functools
+ import difflib
++import os
+ import logging
+ import pprint
+ import re
+@@ -134,6 +135,22 @@ class _BaseTestCaseContext:
+         msg = self.test_case._formatMessage(self.msg, standardMsg)
+         raise self.test_case.failureException(msg)
+ 
++# Non-standard/downstream-only hooks for handling issues with specific test
++# cases:
++
++def _skipInRpmBuild(reason):
++    """
++    Non-standard/downstream-only decorator for marking a specific unit test
++    to be skipped when run within the %check of an rpmbuild.
++
++    Specifically, this takes effect when WITHIN_PYTHON_RPM_BUILD is set within
++    the environment, and has no effect otherwise.
++    """
++    if 'WITHIN_PYTHON_RPM_BUILD' in os.environ:
++        return skip(reason)
++    else:
++        return _id
++
+ class _AssertRaisesBaseContext(_BaseTestCaseContext):
+ 
+     def __init__(self, expected, test_case, expected_regex=None):

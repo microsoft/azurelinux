@@ -1,0 +1,37 @@
+--- predicates-2.1.5/Cargo.toml	1970-01-01T00:00:01+00:00
++++ predicates-2.1.5/Cargo.toml	2023-04-08T20:01:04.538082+00:00
+@@ -87,10 +87,6 @@
+ [Unreleased]: https://github.com/assert-rs/predicates-rs/compare/{{tag_name}}...HEAD"""
+ exactly = 1
+ 
+-[dependencies.concolor]
+-version = "0.0.11"
+-optional = true
+-
+ [dependencies.difflib]
+ version = "0.4"
+ optional = true
+@@ -113,23 +109,10 @@
+ version = "1.0"
+ optional = true
+ 
+-[dependencies.yansi]
+-version = "0.5.1"
+-optional = true
+-
+ [dev-dependencies.predicates-tree]
+ version = "1.0"
+ 
+ [features]
+-color = [
+-    "dep:yansi",
+-    "dep:concolor",
+-    "concolor?/std",
+-]
+-color-auto = [
+-    "color",
+-    "concolor?/auto",
+-]
+ default = [
+     "diff",
+     "regex",

@@ -1,0 +1,11 @@
+--- less-394/Makefile.in.time	2005-09-14 04:21:38.000000000 +0200
++++ less-394/Makefile.in	2007-02-07 13:21:24.000000000 +0100
+@@ -6,7 +6,7 @@
+ VPATH = @srcdir@
+ 
+ CC = @CC@
+-INSTALL = @INSTALL@
++INSTALL = @INSTALL@ -p
+ INSTALL_PROGRAM = @INSTALL_PROGRAM@
+ INSTALL_DATA = @INSTALL_DATA@
+ 

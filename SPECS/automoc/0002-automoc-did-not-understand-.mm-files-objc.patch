@@ -1,0 +1,61 @@
+From afd4718e69ca380f15d1afcf8816c0c078f6eb68 Mon Sep 17 00:00:00 2001
+From: Benjamin Reed <ranger@befunk.com>
+Date: Tue, 3 Mar 2009 15:42:18 +0000
+Subject: [PATCH 02/33] automoc did not understand .mm files (objc++)
+
+svn path=/trunk/kdesupport/automoc/; revision=934696
+---
+ Automoc4Config.cmake | 8 ++++----
+ kde4automoc.cpp      | 2 +-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/Automoc4Config.cmake b/Automoc4Config.cmake
+index 5fcab74..12e00f7 100644
+--- a/Automoc4Config.cmake
++++ b/Automoc4Config.cmake
+@@ -105,9 +105,9 @@ macro(AUTOMOC4 _target_NAME _SRCS)
+       if(NOT  _generated  AND NOT  _skip)
+          get_filename_component(_suffix "${_current_FILE}" EXT)
+          # skip every source file that's not C++
+-         if(_suffix STREQUAL ".cpp" OR _suffix STREQUAL ".cc" OR _suffix STREQUAL ".cxx" OR _suffix STREQUAL ".C")
++         if(_suffix STREQUAL ".cpp" OR _suffix STREQUAL ".cc" OR _suffix STREQUAL ".cxx" OR _suffix STREQUAL ".C" OR _suffix STREQUAL ".mm")
+              list(APPEND _moc_files ${_abs_current_FILE})
+-         endif(_suffix STREQUAL ".cpp" OR _suffix STREQUAL ".cc" OR _suffix STREQUAL ".cxx" OR _suffix STREQUAL ".C")
++         endif(_suffix STREQUAL ".cpp" OR _suffix STREQUAL ".cc" OR _suffix STREQUAL ".cxx" OR _suffix STREQUAL ".C" OR _suffix STREQUAL ".mm")
+       endif(NOT  _generated  AND NOT  _skip)
+    endforeach (_current_FILE)
+ 
+@@ -156,7 +156,7 @@ macro(_ADD_AUTOMOC4_TARGET _target_NAME _SRCS)
+       if(NOT  _generated  AND NOT  _skip)
+          get_filename_component(_suffix "${_current_FILE}" EXT)
+          # skip every source file that's not C++
+-         if(_suffix STREQUAL ".cpp" OR _suffix STREQUAL ".cc" OR _suffix STREQUAL ".cxx" OR _suffix STREQUAL ".C")
++         if(_suffix STREQUAL ".cpp" OR _suffix STREQUAL ".cc" OR _suffix STREQUAL ".cxx" OR _suffix STREQUAL ".C" OR _suffix STREQUAL ".mm")
+              get_filename_component(_basename "${_current_FILE}" NAME_WE)
+              get_filename_component(_abs_path "${_abs_current_FILE}" PATH)
+              set(_header "${_abs_path}/${_basename}.h")
+@@ -168,7 +168,7 @@ macro(_ADD_AUTOMOC4_TARGET _target_NAME _SRCS)
+                 list(APPEND _moc_headers ${_pheader})
+              endif(EXISTS "${_pheader}")
+              list(APPEND _moc_files ${_abs_current_FILE})
+-         endif(_suffix STREQUAL ".cpp" OR _suffix STREQUAL ".cc" OR _suffix STREQUAL ".cxx" OR _suffix STREQUAL ".C")
++         endif(_suffix STREQUAL ".cpp" OR _suffix STREQUAL ".cc" OR _suffix STREQUAL ".cxx" OR _suffix STREQUAL ".C" OR _suffix STREQUAL ".mm")
+       endif(NOT  _generated  AND NOT  _skip)
+    endforeach (_current_FILE)
+ 
+diff --git a/kde4automoc.cpp b/kde4automoc.cpp
+index ae2cff4..7636601 100644
+--- a/kde4automoc.cpp
++++ b/kde4automoc.cpp
+@@ -326,7 +326,7 @@ bool AutoMoc::run()
+     foreach (const QString &absFilename, sourceFiles) {
+         //qDebug() << absFilename;
+         const QFileInfo sourceFileInfo(absFilename);
+-        if (absFilename.endsWith(".cpp") || absFilename.endsWith(".cc") ||
++        if (absFilename.endsWith(".cpp") || absFilename.endsWith(".cc") || absFilename.endsWith(".mm") ||
+                 absFilename.endsWith(".cxx") || absFilename.endsWith(".C")) {
+             //qDebug() << "check .cpp file";
+             QFile sourceFile(absFilename);
+-- 
+2.4.3
+

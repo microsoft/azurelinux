@@ -1,0 +1,28 @@
+From 9edd1cc5223d959687ccfd834433af5e830c56c2 Mon Sep 17 00:00:00 2001
+From: Ahmet Furkan Kavraz <kavraz@amazon.com>
+Date: Thu, 8 Jan 2026 08:42:53 +0000
+Subject: [PATCH] Fix CVE-2025-15275: Heap buffer overflow in SFD image parsing
+
+Validate clutlen parameter (0-256) before use to prevent heap buffer
+overflow when writing to fixed-size clut array.
+
+Fixes: CVE-2025-15275 | ZDI-25-1189 | ZDI-CAN-28543
+---
+ fontforge/sfd.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/fontforge/sfd.c b/fontforge/sfd.c
+index 6b980a4785..0590c119f3 100644
+--- a/fontforge/sfd.c
++++ b/fontforge/sfd.c
+@@ -3653,6 +3653,10 @@ static ImageList *SFDGetImage(FILE *sfd) {
+     getint(sfd,&image_type);
+     getint(sfd,&bpl);
+     getint(sfd,&clutlen);
++    if ( clutlen < 0 || clutlen > 256 ) {
++        LogError(_("Invalid clut length %d in sfd file, must be between 0 and 256"), clutlen);
++        return NULL;
++    }
+     gethex(sfd,&trans);
+     image = GImageCreate(image_type,width,height);
+     base = image->list_len==0?image->u.image:image->u.images[0];

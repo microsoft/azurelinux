@@ -1,0 +1,23 @@
+diff -up kpipewire-6.4.91/src/encoder_p.h.ffmpeg8 kpipewire-6.4.91/src/encoder_p.h
+--- kpipewire-6.4.91/src/encoder_p.h.ffmpeg8	2025-10-02 12:59:59.000000000 +0200
++++ kpipewire-6.4.91/src/encoder_p.h	2025-10-15 17:11:57.402259666 +0200
+@@ -20,6 +20,19 @@ extern "C" {
+ #include "libavfilter/avfilter.h"
+ }
+ 
++#ifndef FF_PROFILE_H264_BASELINE // removed in ffmpeg 8
++# define FF_PROFILE_H264_BASELINE AV_PROFILE_H264_BASELINE
++#endif
++#ifndef FF_PROFILE_H264_CONSTRAINED_BASELINE
++# define FF_PROFILE_H264_CONSTRAINED_BASELINE AV_PROFILE_H264_CONSTRAINED_BASELINE
++#endif
++#ifndef FF_PROFILE_H264_MAIN
++# define FF_PROFILE_H264_MAIN AV_PROFILE_H264_MAIN
++#endif
++#ifndef FF_PROFILE_H264_HIGH
++# define FF_PROFILE_H264_HIGH AV_PROFILE_H264_HIGH
++#endif
++
+ #undef av_err2str
+ // The one provided by libav fails to compile on GCC due to passing data from the function scope outside
+ char *av_err2str(int errnum);

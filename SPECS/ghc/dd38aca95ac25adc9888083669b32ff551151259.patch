@@ -1,0 +1,26 @@
+From dd38aca95ac25adc9888083669b32ff551151259 Mon Sep 17 00:00:00 2001
+From: Andreas Schwab <schwab@suse.de>
+Date: Mon, 19 Jun 2023 10:38:26 +0200
+Subject: [PATCH] Hadrian: enable GHCi support on riscv64
+
+---
+ hadrian/src/Oracles/Setting.hs | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/hadrian/src/Oracles/Setting.hs b/hadrian/src/Oracles/Setting.hs
+index b9e5d312074..93561a94fe4 100644
+--- a/hadrian/src/Oracles/Setting.hs
++++ b/hadrian/src/Oracles/Setting.hs
+@@ -302,7 +302,8 @@ ghcWithInterpreter = do
+                           , "darwin", "kfreebsdgnu" ]
+     goodArch <- anyTargetArch [ "i386", "x86_64", "powerpc"
+                               , "arm", "aarch64", "s390x"
+-                              , "powerpc64", "powerpc64le" ]
++                              , "powerpc64", "powerpc64le"
++                              , "riscv64" ]
+     return $ goodOs && goodArch
+ 
+ -- | Variants of the ARM architecture.
+-- 
+GitLab
+

@@ -1,0 +1,11 @@
+[Unit]
+Description=Clamd Exim An Interface Between MTA And Content Checkers
+After=network.target
+
+[Service]
+Type=forking
+PIDFile=/run/clamd.exim/clamd.pid
+ExecStart=/usr/sbin/clamd -c /etc/clamd.d/exim.conf
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,44 @@
+From 76af91b516bb31ae0a79f55f315bef2c2105a06e Mon Sep 17 00:00:00 2001
+From: Nizamudeen A <nia@redhat.com>
+Date: Thu, 26 Jun 2025 12:55:22 +0530
+Subject: [PATCH 2/2] mgr/dashboard: catch protobuf error due to mismatch in
+ version
+
+Signed-off-by: Nizamudeen A <nia@redhat.com>
+(cherry picked from commit acb0f19c4a50b2ea68f328a61a14a2da06be298b)
+
+ Conflicts:
+	src/pybind/mgr/dashboard/services/nvmeof_client.py
+ - only kept relavant portion applicable for squid
+---
+ src/pybind/mgr/dashboard/services/nvmeof_client.py | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/src/pybind/mgr/dashboard/services/nvmeof_client.py b/src/pybind/mgr/dashboard/services/nvmeof_client.py
+index e0ea6d1e48b3..be2b5edbaa52 100644
+--- a/src/pybind/mgr/dashboard/services/nvmeof_client.py
++++ b/src/pybind/mgr/dashboard/services/nvmeof_client.py
+@@ -1,3 +1,5 @@
++# pylint: disable=unexpected-keyword-arg
++
+ import functools
+ import logging
+ from collections.abc import Iterable
+@@ -9,6 +11,14 @@ from .nvmeof_conf import NvmeofGatewaysConfig
+ logger = logging.getLogger("nvmeof_client")
+ 
+ try:
++    # if the protobuf version is newer than what we generated with
++    # proto file import will fail (because of differences between what's
++    # available in centos and ubuntu).
++    # this "hack" should be removed once we update both the
++    # distros; centos and ubuntu.
++    import os
++    os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
++
+     import grpc  # type: ignore
+     import grpc._channel  # type: ignore
+     from google.protobuf.message import Message  # type: ignore
+-- 
+2.50.1
+

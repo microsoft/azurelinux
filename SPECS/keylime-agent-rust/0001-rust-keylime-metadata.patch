@@ -1,0 +1,57 @@
+--- a/keylime/Cargo.toml	2026-02-13 09:29:02.000000000 +0100
++++ b/keylime/Cargo.toml	2026-02-13 09:48:22.122618066 +0100
+@@ -40,7 +40,6 @@
+ tokio.workspace = true
+ uuid.workspace = true
+ zip.workspace = true
+-zmq = {version = "0.9.2", optional = true}
+
+ [dev-dependencies]
+ tempfile.workspace = true
+@@ -48,6 +47,5 @@
+ wiremock = {version = "0.6"}
+
+ [features]
++default = []
+ testing = []
+-# This feature is deprecated and will be removed on next major release
+-with-zmq = ["zmq"]
+--- a/keylime-agent/Cargo.toml	2026-02-13 09:29:02.000000000 +0100
++++ b/keylime-agent/Cargo.toml	2026-02-13 09:48:27.988361994 +0100
+@@ -28,7 +28,6 @@
+ thiserror.workspace = true
+ uuid.workspace = true
+ zip.workspace = true
+-zmq = {version = "0.9.2", optional = true}
+
+ [dev-dependencies]
+ actix-rt.workspace = true
+@@ -37,18 +36,6 @@
+ # The features enabled by default
+ default = []
+ testing = []
+-# Whether the agent should be compiled with support to listen for notification
+-# messages on ZeroMQ
+-#
+-# This feature is deprecated and will be removed on next major release
+-with-zmq = ["zmq"]
+-# Whether the agent should be compiled with support for python revocation
+-# actions loaded as modules, which is the only kind supported by the python
+-# agent (unless the enhancement-55 is implemented). See:
+-# https://github.com/keylime/enhancements/blob/master/55_revocation_actions_without_python.md
+-#
+-# This feature is deprecated and will be removed on next major release
+-legacy-python-actions = []
+
+ [package.metadata.deb]
+ section = "net"
+--- a/keylime-push-model-agent/Cargo.toml	2026-02-13 09:29:02.000000000 +0100
++++ b/keylime-push-model-agent/Cargo.toml	2026-02-13 09:48:36.030812674 +0100
+@@ -34,7 +34,6 @@
+ # The features enabled by default
+ default = []
+ testing = ["keylime/testing"]
+-legacy-python-actions = []
+
+ [package.metadata.deb]
+ section = "net"

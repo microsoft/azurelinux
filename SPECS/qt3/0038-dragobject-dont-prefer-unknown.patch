@@ -1,0 +1,57 @@
+qt-bugs@ issue : 38642
+bugs.kde.org number : 71084
+applied: no
+author: Lubos Lunak <l.lunak@kde.org>
+
+Hello,
+
+ start Mozilla, go e.g. to http://kde.org, start KWrite (or basically any Qt 
+app that accepts text drops), select 'Conquer your Desktop!', and try to 
+drag&drop it onto KWrite. The only text pasted should be 'm'.
+
+ I don't know much the related mimetype and encoding stuff, so I'm unsure 
+whose fault this actually is. The text drag is provided as a lot of 
+text/something targets, to list some text/_moz_htmlinfo, text/x-moz-url, 
+text/unicode and similar. The problem is, Kate uses QTextDrag::decode() with 
+no subtype specified, probably with the intention that as Kate is a text 
+editor, it can accept any text pasted. And since the first target provided by 
+mozilla is text/x-moz-url, (which moreover seems to be encoded as 16bit 
+unicode), the text dropped is completely wrong. You can easily see all 
+targets provided by Mozilla with see_mime.patch applied.
+
+ Solution #1: Say that Kate (any pretty much everybody else expecting text) 
+should say "plain" as the subtype. In such case, I suggest you drop the 
+QTextDrag::decode() variant with no subtype specified, and stress more the 
+fact that not specifying a subtype can result in a lot of rubbish. It's 
+simply too tempting to leave the subtype empty and try to accept anything.
+
+ Solution #2: When trying to accept anything, try to get useful data. Which 
+means either sorting the subtypes available somehow, checking only the ones 
+Qt knows.
+
+ To me, #1 seems to be a better choice, or possibly at least something like 
+the attached QTextDrag patch, which simply always tries first "plain" subtype 
+if none is specified. With this patch, Mozilla even works (that's irony, of 
+course, Mozilla still pastes the text/plain text as HTML, but at least now it 
+pastes something where it's easy to point at the offender).
+
+
+--- src/kernel/qdragobject.cpp.sav	2004-01-06 19:24:35.000000000 +0100
++++ src/kernel/qdragobject.cpp	2004-01-06 19:47:01.000000000 +0100
+@@ -844,6 +844,16 @@ bool QTextDrag::decode( const QMimeSourc
+ {
+     if(!e)
+ 	return FALSE;
++        
++    // when subtype is not specified, try text/plain first, otherwise this may read
++    // things like text/x-moz-url even though better targets are available
++    if( subtype.isNull()) {
++        QCString subtmp = "plain";
++        if( decode( e, str, subtmp )) {
++            subtype = subtmp;
++            return true;
++        }
++    }
+ 
+     if ( e->cacheType == QMimeSource::Text ) {
+ 	str = *e->cache.txt.str;

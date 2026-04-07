@@ -1,0 +1,17 @@
+--- rpm-sequoia-1.10.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ rpm-sequoia-1.10.1/Cargo.toml	2026-02-23T16:05:57.871791+00:00
+@@ -41,13 +41,10 @@
+ status = "actively-developed"
+ 
+ [features]
+-crypto-botan = ["sequoia-openpgp/crypto-botan"]
+-crypto-botan2 = ["sequoia-openpgp/crypto-botan2"]
+-crypto-cng = ["sequoia-openpgp/crypto-cng"]
+ crypto-nettle = ["sequoia-openpgp/crypto-nettle"]
+ crypto-openssl = ["sequoia-openpgp/crypto-openssl"]
+ crypto-rust = ["sequoia-openpgp/crypto-rust"]
+-default = ["crypto-nettle"]
++default = ["crypto-openssl"]
+ 
+ [lib]
+ name = "rpm_sequoia"

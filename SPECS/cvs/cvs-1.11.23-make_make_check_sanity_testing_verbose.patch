@@ -1,0 +1,30 @@
+From f923e7c9dd4c71a1f6318d4d9fb0bdd4476ab6c5 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Mon, 25 Oct 2010 17:14:47 +0200
+Subject: [PATCH] Make `make check' sanity testing verbose
+
+---
+ src/Makefile.am |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 63e6b18..1adc157 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -125,11 +125,11 @@ check-local: localcheck remotecheck
+ 
+ .PHONY: localcheck
+ localcheck:
+-	$(SHELL) $(srcdir)/sanity.sh `pwd`/cvs$(EXEEXT)
++	$(SHELL) $(srcdir)/sanity.sh -v `pwd`/cvs$(EXEEXT)
+ 
+ .PHONY: remotecheck
+ remotecheck: all
+-	$(SHELL) $(srcdir)/sanity.sh -r `pwd`/cvs$(EXEEXT)
++	$(SHELL) $(srcdir)/sanity.sh -v -r `pwd`/cvs$(EXEEXT)
+ 
+ ## MAINTAINER Targets
+ 
+-- 
+1.7.2.3
+

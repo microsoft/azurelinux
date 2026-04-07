@@ -1,0 +1,39 @@
+From 78ae64ad0aa3ca274c6a94482d08d4e25a0d658e Mon Sep 17 00:00:00 2001
+From: Neal Gompa <ngompa@fedoraproject.org>
+Date: Mon, 26 Aug 2024 07:36:29 -0400
+Subject: [PATCH] Use isomd5sum by default for tagging ISO files
+
+---
+ kiwi.yml         | 2 +-
+ kiwi/defaults.py | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/kiwi.yml b/kiwi.yml
+index 683e4e315..d40dce6b5 100644
+--- a/kiwi.yml
++++ b/kiwi.yml
+@@ -62,7 +62,7 @@
+ #  - tool_category: xorriso
+ #  # Specify media tag tool used to implant iso checksums
+ #  # Possible values are checkmedia and isomd5sum
+-#  - media_tag_tool: checkmedia
++#  - media_tag_tool: isomd5sum
+ 
+ 
+ # Setup process parameters for OCI toolchain
+diff --git a/kiwi/defaults.py b/kiwi/defaults.py
+index 7e1aad87b..4aaad7f27 100644
+--- a/kiwi/defaults.py
++++ b/kiwi/defaults.py
+@@ -1767,7 +1767,7 @@ class Defaults:
+ 
+         :rtype: str
+         """
+-        return 'checkmedia'
++        return 'isomd5sum'
+ 
+     @staticmethod
+     def get_container_compression():
+-- 
+2.45.2
+

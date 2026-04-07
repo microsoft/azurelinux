@@ -1,0 +1,452 @@
+From 95b014d7f2a5dfbba5dd36d9a836d009ce765b94 Mon Sep 17 00:00:00 2001
+From: Lorenzo Lucignano <lorenzo.lucignano@topseven.com>
+Date: Mon, 23 Oct 2023 09:50:49 +0200
+Subject: [PATCH 6/7] Fix HereMap plugin not supporting authentication via
+ apiKey
+
+The authentication of the Here services no longer supports app id and token.
+Authentication is now done via apiKey string and using https.
+The change fixes also the generation of subdomain urls in QGeoUriProvider.
+
+Fixes: QTBUG-118447
+Pick-to: 6.6 6.5 5.15
+Change-Id: I6e7e8b18cd0456963ab89feeaa8bfda136c14c43
+Reviewed-by: Qt CI Bot <qt_ci_bot@qt-project.org>
+Reviewed-by: Volker Hilsheimer <volker.hilsheimer@qt.io>
+(cherry picked from commit fab72389e13921602cffb2b698d1d2415b70372f)
+---
+ .../nokia/qgeocodingmanagerengine_nokia.cpp   | 16 ++----
+ .../nokia/qgeocodingmanagerengine_nokia.h     |  3 +-
+ .../geoservices/nokia/qgeoerror_messages.cpp  |  2 +-
+ .../nokia/qgeoroutingmanagerengine_nokia.cpp  | 15 +++---
+ .../nokia/qgeoroutingmanagerengine_nokia.h    |  3 +-
+ .../nokia/qgeoserviceproviderplugin_nokia.cpp | 15 ++----
+ .../nokia/qgeotilefetcher_nokia.cpp           | 49 ++++++-------------
+ .../geoservices/nokia/qgeotilefetcher_nokia.h |  6 +--
+ .../geoservices/nokia/qgeouriprovider.cpp     |  2 +-
+ .../nokia/qplacemanagerengine_nokiav2.cpp     | 20 ++++----
+ .../nokia/qplacemanagerengine_nokiav2.h       |  3 +-
+ .../geoservices/nokia/uri_constants.cpp       | 12 ++---
+ 12 files changed, 53 insertions(+), 93 deletions(-)
+
+diff --git a/src/plugins/geoservices/nokia/qgeocodingmanagerengine_nokia.cpp b/src/plugins/geoservices/nokia/qgeocodingmanagerengine_nokia.cpp
+index 68b2429ec..deef29f91 100644
+--- a/src/plugins/geoservices/nokia/qgeocodingmanagerengine_nokia.cpp
++++ b/src/plugins/geoservices/nokia/qgeocodingmanagerengine_nokia.cpp
+@@ -66,11 +66,8 @@ QGeoCodingManagerEngineNokia::QGeoCodingManagerEngineNokia(
+     Q_ASSERT(networkManager);
+     m_networkManager->setParent(this);
+ 
+-    if (parameters.contains(QStringLiteral("here.token")))
+-        m_token = parameters.value(QStringLiteral("here.token")).toString();
+-
+-    if (parameters.contains(QStringLiteral("here.app_id")))
+-        m_applicationId = parameters.value(QStringLiteral("here.app_id")).toString();
++    if (parameters.contains(QStringLiteral("here.apiKey")))
++        m_apiKey = parameters.value(QStringLiteral("here.apiKey")).toString();
+ 
+     if (error)
+         *error = QGeoServiceProvider::NoError;
+@@ -85,12 +82,9 @@ QString QGeoCodingManagerEngineNokia::getAuthenticationString() const
+ {
+     QString authenticationString;
+ 
+-    if (!m_token.isEmpty() && !m_applicationId.isEmpty()) {
+-        authenticationString += "?app_code=";
+-        authenticationString += m_token;
+-
+-        authenticationString += "&app_id=";
+-        authenticationString += m_applicationId;
++    if (!m_apiKey.isEmpty()) {
++        authenticationString += "?apiKey=";
++        authenticationString += m_apiKey;
+     }
+ 
+     return authenticationString;
+diff --git a/src/plugins/geoservices/nokia/qgeocodingmanagerengine_nokia.h b/src/plugins/geoservices/nokia/qgeocodingmanagerengine_nokia.h
+index 9e1564aa2..a7cfd06a6 100644
+--- a/src/plugins/geoservices/nokia/qgeocodingmanagerengine_nokia.h
++++ b/src/plugins/geoservices/nokia/qgeocodingmanagerengine_nokia.h
+@@ -82,8 +82,7 @@ private:
+     QGeoNetworkAccessManager *m_networkManager;
+     QGeoUriProvider *m_uriProvider;
+     QGeoUriProvider *m_reverseGeocodingUriProvider;
+-    QString m_token;
+-    QString m_applicationId;
++    QString m_apiKey;
+ };
+ 
+ QT_END_NAMESPACE
+diff --git a/src/plugins/geoservices/nokia/qgeoerror_messages.cpp b/src/plugins/geoservices/nokia/qgeoerror_messages.cpp
+index 576ecd431..f49e09052 100644
+--- a/src/plugins/geoservices/nokia/qgeoerror_messages.cpp
++++ b/src/plugins/geoservices/nokia/qgeoerror_messages.cpp
+@@ -39,7 +39,7 @@
+ QT_BEGIN_NAMESPACE
+ 
+ const char NOKIA_PLUGIN_CONTEXT_NAME[] = "QtLocationQML";
+-const char MISSED_CREDENTIALS[] = QT_TRANSLATE_NOOP("QtLocationQML", "Qt Location requires app_id and token parameters.\nPlease register at https://developer.here.com/ to get your personal application credentials.");
++const char MISSED_CREDENTIALS[] = QT_TRANSLATE_NOOP("QtLocationQML", "Qt Location requires apiKey parameter.\nPlease register at https://developer.here.com/ to get your personal application credentials.");
+ const char SAVING_PLACE_NOT_SUPPORTED[] = QT_TRANSLATE_NOOP("QtLocationQML", "Saving places is not supported.");
+ const char REMOVING_PLACE_NOT_SUPPORTED[] = QT_TRANSLATE_NOOP("QtLocationQML", "Removing places is not supported.");
+ const char SAVING_CATEGORY_NOT_SUPPORTED[] = QT_TRANSLATE_NOOP("QtLocationQML", "Saving categories is not supported.");
+diff --git a/src/plugins/geoservices/nokia/qgeoroutingmanagerengine_nokia.cpp b/src/plugins/geoservices/nokia/qgeoroutingmanagerengine_nokia.cpp
+index 73b998b12..a938096b0 100644
+--- a/src/plugins/geoservices/nokia/qgeoroutingmanagerengine_nokia.cpp
++++ b/src/plugins/geoservices/nokia/qgeoroutingmanagerengine_nokia.cpp
+@@ -60,8 +60,7 @@ QGeoRoutingManagerEngineNokia::QGeoRoutingManagerEngineNokia(
+     Q_ASSERT(networkManager);
+     m_networkManager->setParent(this);
+ 
+-    m_appId = parameters.value(QStringLiteral("here.app_id")).toString();
+-    m_token = parameters.value(QStringLiteral("here.token")).toString();
++    m_apiKey = parameters.value(QStringLiteral("here.apiKey")).toString();
+ 
+     QGeoRouteRequest::FeatureTypes featureTypes;
+     featureTypes |= QGeoRouteRequest::TollFeature;
+@@ -219,18 +218,16 @@ QStringList QGeoRoutingManagerEngineNokia::calculateRouteRequestString(const QGe
+         return QStringList();
+     QStringList requests;
+ 
+-    QString baseRequest = QStringLiteral("http://");
++    QString baseRequest = QStringLiteral("https://");
+     baseRequest += m_uriProvider->getCurrentHost();
+     baseRequest += QStringLiteral("/routing/7.2/calculateroute.xml");
+ 
+     baseRequest += QStringLiteral("?alternatives=");
+     baseRequest += QString::number(request.numberAlternativeRoutes());
+ 
+-    if (!m_appId.isEmpty() && !m_token.isEmpty()) {
+-        baseRequest += QStringLiteral("&app_id=");
+-        baseRequest += m_appId;
+-        baseRequest += QStringLiteral("&token=");
+-        baseRequest += m_token;
++    if (!m_apiKey.isEmpty()) {
++        baseRequest += QStringLiteral("&apiKey=");
++        baseRequest += m_apiKey;
+     }
+ 
+     const QList<QVariantMap> metadata = request.waypointsMetadata();
+@@ -281,7 +278,7 @@ QStringList QGeoRoutingManagerEngineNokia::updateRouteRequestString(const QGeoRo
+         return QStringList();
+     QStringList requests;
+ 
+-    QString baseRequest = "http://";
++    QString baseRequest = "https://";
+     baseRequest += m_uriProvider->getCurrentHost();
+     baseRequest += "/routing/7.2/getroute.xml";
+ 
+diff --git a/src/plugins/geoservices/nokia/qgeoroutingmanagerengine_nokia.h b/src/plugins/geoservices/nokia/qgeoroutingmanagerengine_nokia.h
+index 9335bcacf..67fb5825c 100644
+--- a/src/plugins/geoservices/nokia/qgeoroutingmanagerengine_nokia.h
++++ b/src/plugins/geoservices/nokia/qgeoroutingmanagerengine_nokia.h
+@@ -77,8 +77,7 @@ private:
+ 
+     QGeoNetworkAccessManager *m_networkManager;
+     QGeoUriProvider *m_uriProvider;
+-    QString m_appId;
+-    QString m_token;
++    QString m_apiKey;
+ };
+ 
+ QT_END_NAMESPACE
+diff --git a/src/plugins/geoservices/nokia/qgeoserviceproviderplugin_nokia.cpp b/src/plugins/geoservices/nokia/qgeoserviceproviderplugin_nokia.cpp
+index e4ef86d6c..2c53dd169 100644
+--- a/src/plugins/geoservices/nokia/qgeoserviceproviderplugin_nokia.cpp
++++ b/src/plugins/geoservices/nokia/qgeoserviceproviderplugin_nokia.cpp
+@@ -75,20 +75,15 @@ namespace
+ 
+     void checkUsageTerms(const QVariantMap &parameters, QGeoServiceProvider::Error *error, QString *errorString)
+     {
+-        QString appId, token;
++        const QString apiKey = parameters.value(QStringLiteral("here.apiKey")).toString();
+ 
+-        appId = parameters.value(QStringLiteral("here.app_id")).toString();
+-        token = parameters.value(QStringLiteral("here.token")).toString();
+-
+-        if (isValidParameter(appId) && isValidParameter(token))
++        if (isValidParameter(apiKey))
+              return;
+-        else if (!isValidParameter(appId))
+-            qWarning() << "Invalid here.app_id";
+         else
+-            qWarning() << "Invalid here.token";
++            qWarning() << "Invalid here.apiKey";
+ 
+-        if (parameters.contains(QStringLiteral("app_id")) || parameters.contains(QStringLiteral("token")))
+-            qWarning() << QStringLiteral("Please prefix 'app_id' and 'token' with prefix 'here' (e.g.: 'here.app_id')");
++        if (parameters.contains(QStringLiteral("apiKey")))
++            qWarning() << QStringLiteral("Please prefix 'apiKey' with prefix 'here' (e.g.: 'here.apiKey')");
+ 
+         *error = QGeoServiceProvider::MissingRequiredParameterError;
+         *errorString = QCoreApplication::translate(NOKIA_PLUGIN_CONTEXT_NAME, MISSED_CREDENTIALS);
+diff --git a/src/plugins/geoservices/nokia/qgeotilefetcher_nokia.cpp b/src/plugins/geoservices/nokia/qgeotilefetcher_nokia.cpp
+index d07a93ba3..4cfd62f89 100644
+--- a/src/plugins/geoservices/nokia/qgeotilefetcher_nokia.cpp
++++ b/src/plugins/geoservices/nokia/qgeotilefetcher_nokia.cpp
+@@ -84,8 +84,7 @@ QGeoTileFetcherNokia::QGeoTileFetcherNokia(const QVariantMap &parameters,
+     m_tileSize = qMax(tileSize.width(), tileSize.height());
+     m_networkManager->setParent(this);
+ 
+-    m_applicationId = parameters.value(QStringLiteral("here.app_id")).toString();
+-    m_token = parameters.value(QStringLiteral("here.token")).toString();
++    m_apiKey = parameters.value(QStringLiteral("here.apiKey")).toString();
+ }
+ 
+ QGeoTileFetcherNokia::~QGeoTileFetcherNokia()
+@@ -127,7 +126,7 @@ QString QGeoTileFetcherNokia::getRequestString(const QGeoTileSpec &spec, int ppi
+     if (!m_engineNokia)
+         return QString();
+ 
+-    static const QString http("http://");
++    static const QString http("https://");
+     static const QString path("/maptile/2.1/maptile/newest/");
+     static const QChar slash('/');
+ 
+@@ -152,12 +151,9 @@ QString QGeoTileFetcherNokia::getRequestString(const QGeoTileSpec &spec, int ppi
+     static const QString slashpng("/png8");
+     requestString += slashpng;
+ 
+-    if (!m_token.isEmpty() && !m_applicationId.isEmpty()) { // TODO: remove the if
+-        requestString += "?token=";
+-        requestString += m_token;
+-
+-        requestString += "&app_id=";
+-        requestString += m_applicationId;
++    if (!m_apiKey.isEmpty()) { // TODO: remove the if
++        requestString += "?apiKey=";
++        requestString += m_apiKey;
+     }
+ 
+     requestString += "&ppi=" + QString::number(ppi);
+@@ -235,14 +231,9 @@ QString QGeoTileFetcherNokia::getLanguageString() const
+     // No "lg" param means that we want English.
+ }
+ 
+-QString QGeoTileFetcherNokia::token() const
+-{
+-    return m_token;
+-}
+-
+-QString QGeoTileFetcherNokia::applicationId() const
++QString QGeoTileFetcherNokia::apiKey() const
+ {
+-    return m_applicationId;
++    return m_apiKey;
+ }
+ 
+ void QGeoTileFetcherNokia::copyrightsFetched()
+@@ -271,19 +262,14 @@ void QGeoTileFetcherNokia::versionFetched()
+ 
+ void QGeoTileFetcherNokia::fetchCopyrightsData()
+ {
+-    QString copyrightUrl = QStringLiteral("http://");
++    QString copyrightUrl = QStringLiteral("https://");
+ 
+     copyrightUrl += m_baseUriProvider->getCurrentHost();
+     copyrightUrl += QStringLiteral("/maptile/2.1/copyright/newest?output=json");
+ 
+-    if (!token().isEmpty()) {
+-        copyrightUrl += QStringLiteral("&token=");
+-        copyrightUrl += token();
+-    }
+-
+-    if (!applicationId().isEmpty()) {
+-        copyrightUrl += QStringLiteral("&app_id=");
+-        copyrightUrl += applicationId();
++    if (!apiKey().isEmpty()) {
++        copyrightUrl += QStringLiteral("&apiKey=");
++        copyrightUrl += apiKey();
+     }
+ 
+     QNetworkRequest netRequest((QUrl(copyrightUrl)));
+@@ -303,19 +289,14 @@ void QGeoTileFetcherNokia::fetchCopyrightsData()
+ 
+ void QGeoTileFetcherNokia::fetchVersionData()
+ {
+-    QString versionUrl = QStringLiteral("http://");
++    QString versionUrl = QStringLiteral("https://");
+ 
+     versionUrl += m_baseUriProvider->getCurrentHost();
+     versionUrl += QStringLiteral("/maptile/2.1/version");
+ 
+-    if (!token().isEmpty()) {
+-        versionUrl += QStringLiteral("?token=");
+-        versionUrl += token();
+-    }
+-
+-    if (!applicationId().isEmpty()) {
+-        versionUrl += QStringLiteral("&app_id=");
+-        versionUrl += applicationId();
++    if (!apiKey().isEmpty()) {
++        versionUrl += QStringLiteral("?apiKey=");
++        versionUrl += apiKey();
+     }
+ 
+     QNetworkRequest netRequest((QUrl(versionUrl)));
+diff --git a/src/plugins/geoservices/nokia/qgeotilefetcher_nokia.h b/src/plugins/geoservices/nokia/qgeotilefetcher_nokia.h
+index 06d1bba98..ee0cb0e9a 100644
+--- a/src/plugins/geoservices/nokia/qgeotilefetcher_nokia.h
++++ b/src/plugins/geoservices/nokia/qgeotilefetcher_nokia.h
+@@ -62,8 +62,7 @@ public:
+ 
+     QGeoTiledMapReply *getTileImage(const QGeoTileSpec &spec);
+ 
+-    QString token() const;
+-    QString applicationId() const;
++    QString apiKey() const;
+ 
+ public Q_SLOTS:
+     void copyrightsFetched();
+@@ -82,11 +81,10 @@ private:
+     QGeoNetworkAccessManager *m_networkManager;
+     int m_tileSize;
+     int m_ppi;
+-    QString m_token;
+     QNetworkReply *m_copyrightsReply;
+     QNetworkReply *m_versionReply;
+ 
+-    QString m_applicationId;
++    QString m_apiKey;
+     QGeoUriProvider *m_baseUriProvider;
+     QGeoUriProvider *m_aerialUriProvider;
+ };
+diff --git a/src/plugins/geoservices/nokia/qgeouriprovider.cpp b/src/plugins/geoservices/nokia/qgeouriprovider.cpp
+index 7be90bb25..6a4f69868 100644
+--- a/src/plugins/geoservices/nokia/qgeouriprovider.cpp
++++ b/src/plugins/geoservices/nokia/qgeouriprovider.cpp
+@@ -61,7 +61,7 @@ QGeoUriProvider::QGeoUriProvider(
+ QString QGeoUriProvider::getCurrentHost() const
+ {
+     if (m_maxSubdomains) {
+-        QString result(m_firstSubdomain.toLatin1() + QRandomGenerator::global()->bounded(m_maxSubdomains));
++        QString result(static_cast<char>(m_firstSubdomain.toLatin1() + QRandomGenerator::global()->bounded(m_maxSubdomains)));
+         result += '.' + m_currentHost;
+         return result;
+     }
+diff --git a/src/plugins/geoservices/nokia/qplacemanagerengine_nokiav2.cpp b/src/plugins/geoservices/nokia/qplacemanagerengine_nokiav2.cpp
+index c5c05a2e1..4c6e9774f 100644
+--- a/src/plugins/geoservices/nokia/qplacemanagerengine_nokiav2.cpp
++++ b/src/plugins/geoservices/nokia/qplacemanagerengine_nokiav2.cpp
+@@ -208,8 +208,7 @@ QPlaceManagerEngineNokiaV2::QPlaceManagerEngineNokiaV2(
+ 
+     m_locales.append(QLocale());
+ 
+-    m_appId = parameters.value(QStringLiteral("here.app_id")).toString();
+-    m_appCode = parameters.value(QStringLiteral("here.token")).toString();
++    m_apiKey = parameters.value(QStringLiteral("here.apiKey")).toString();
+ 
+     m_theme = parameters.value(IconThemeKey, QString()).toString();
+ 
+@@ -237,7 +236,7 @@ QPlaceManagerEngineNokiaV2::~QPlaceManagerEngineNokiaV2() {}
+ 
+ QPlaceDetailsReply *QPlaceManagerEngineNokiaV2::getPlaceDetails(const QString &placeId)
+ {
+-    QUrl requestUrl(QString::fromLatin1("http://") + m_uriProvider->getCurrentHost() +
++    QUrl requestUrl(QString::fromLatin1("https://") + m_uriProvider->getCurrentHost() +
+                     QStringLiteral("/places/v1/places/") + placeId);
+ 
+     QUrlQuery queryItems;
+@@ -268,7 +267,7 @@ QPlaceContentReply *QPlaceManagerEngineNokiaV2::getPlaceContent(const QPlaceCont
+ 
+        networkReply = sendRequest(u);
+     } else {
+-        QUrl requestUrl(QString::fromLatin1("http://") + m_uriProvider->getCurrentHost() +
++        QUrl requestUrl(QString::fromLatin1("https://") + m_uriProvider->getCurrentHost() +
+                         QStringLiteral("/places/v1/places/") + request.placeId() +
+                         QStringLiteral("/media/"));
+ 
+@@ -410,7 +409,7 @@ QPlaceSearchReply *QPlaceManagerEngineNokiaV2::search(const QPlaceSearchRequest
+         networkReply = sendRequest(u);
+     } else if (!query.searchTerm().isEmpty()) {
+         // search term query
+-        QUrl requestUrl(QString::fromLatin1("http://") + m_uriProvider->getCurrentHost() +
++        QUrl requestUrl(QString::fromLatin1("https://") + m_uriProvider->getCurrentHost() +
+                         QStringLiteral("/places/v1/discover/search"));
+ 
+         queryItems.addQueryItem(QStringLiteral("q"), query.searchTerm());
+@@ -432,7 +431,7 @@ QPlaceSearchReply *QPlaceManagerEngineNokiaV2::search(const QPlaceSearchRequest
+ 
+         return reply;
+     } else if (!query.recommendationId().isEmpty()) {
+-        QUrl requestUrl(QString::fromLatin1("http://") + m_uriProvider->getCurrentHost() +
++        QUrl requestUrl(QString::fromLatin1("https://") + m_uriProvider->getCurrentHost() +
+                         QStringLiteral("/places/v1/places/") + query.recommendationId() +
+                         QStringLiteral("/related/recommended"));
+ 
+@@ -443,7 +442,7 @@ QPlaceSearchReply *QPlaceManagerEngineNokiaV2::search(const QPlaceSearchRequest
+         networkReply = sendRequest(requestUrl);
+     } else {
+         // category search
+-        QUrl requestUrl(QStringLiteral("http://") + m_uriProvider->getCurrentHost() +
++        QUrl requestUrl(QStringLiteral("https://") + m_uriProvider->getCurrentHost() +
+              QStringLiteral("/places/v1/discover/explore"));
+ 
+         QStringList ids;
+@@ -498,7 +497,7 @@ QPlaceSearchSuggestionReply *QPlaceManagerEngineNokiaV2::searchSuggestions(const
+         return reply;
+     }
+ 
+-    QUrl requestUrl(QString::fromLatin1("http://") + m_uriProvider->getCurrentHost() +
++    QUrl requestUrl(QString::fromLatin1("https://") + m_uriProvider->getCurrentHost() +
+                     QStringLiteral("/places/v1/suggest"));
+ 
+     QUrlQuery queryItems;
+@@ -633,7 +632,7 @@ QPlaceReply *QPlaceManagerEngineNokiaV2::initializeCategories()
+     for (auto it = m_tempTree.keyBegin(), end = m_tempTree.keyEnd(); it != end; ++it) {
+         if (*it == QString())
+             continue;
+-        QUrl requestUrl(QString::fromLatin1("http://") + m_uriProvider->getCurrentHost() +
++        QUrl requestUrl(QString::fromLatin1("https://") + m_uriProvider->getCurrentHost() +
+                         QStringLiteral("/places/v1/categories/places/") + *it);
+         QNetworkReply *networkReply = sendRequest(requestUrl);
+         connect(networkReply, SIGNAL(finished()), this, SLOT(categoryReplyFinished()));
+@@ -831,8 +830,7 @@ void QPlaceManagerEngineNokiaV2::categoryReplyError()
+ QNetworkReply *QPlaceManagerEngineNokiaV2::sendRequest(const QUrl &url)
+ {
+     QUrlQuery queryItems(url);
+-    queryItems.addQueryItem(QStringLiteral("app_id"), m_appId);
+-    queryItems.addQueryItem(QStringLiteral("app_code"), m_appCode);
++    queryItems.addQueryItem(QStringLiteral("apiKey"), m_apiKey);
+ 
+     QUrl requestUrl = url;
+     requestUrl.setQuery(queryItems);
+diff --git a/src/plugins/geoservices/nokia/qplacemanagerengine_nokiav2.h b/src/plugins/geoservices/nokia/qplacemanagerengine_nokiav2.h
+index cd632958f..6784ce4f5 100644
+--- a/src/plugins/geoservices/nokia/qplacemanagerengine_nokiav2.h
++++ b/src/plugins/geoservices/nokia/qplacemanagerengine_nokiav2.h
+@@ -122,8 +122,7 @@ private:
+     QPointer<QPlaceCategoriesReplyHere> m_categoryReply;
+     QHash<QString, QNetworkReply *> m_categoryRequests;
+ 
+-    QString m_appId;
+-    QString m_appCode;
++    QString m_apiKey;
+ 
+     QString m_localDataPath;
+     QString m_theme;
+diff --git a/src/plugins/geoservices/nokia/uri_constants.cpp b/src/plugins/geoservices/nokia/uri_constants.cpp
+index 8db47beb5..030006f59 100644
+--- a/src/plugins/geoservices/nokia/uri_constants.cpp
++++ b/src/plugins/geoservices/nokia/uri_constants.cpp
+@@ -37,11 +37,11 @@
+ 
+ QT_BEGIN_NAMESPACE
+ 
+-const QString ROUTING_HOST = QLatin1String("route.api.here.com");
+-const QString GEOCODING_HOST = QLatin1String("geocoder.api.here.com");
+-const QString REVERSE_GEOCODING_HOST = QLatin1String("reverse.geocoder.api.here.com");
+-const QString PLACES_HOST = QLatin1String("places.api.here.com");
+-const QString MAP_TILES_HOST = QLatin1String("1-4.base.maps.api.here.com");
+-const QString MAP_TILES_HOST_AERIAL = QLatin1String("1-4.aerial.maps.api.here.com");
++const QString ROUTING_HOST = QLatin1String("route.ls.hereapi.com");
++const QString GEOCODING_HOST = QLatin1String("geocoder.ls.hereapi.com");
++const QString REVERSE_GEOCODING_HOST = QLatin1String("reverse.geocoder.ls.hereapi.com");
++const QString PLACES_HOST = QLatin1String("places.ls.hereapi.com");
++const QString MAP_TILES_HOST = QLatin1String("1-4.base.maps.ls.hereapi.com");
++const QString MAP_TILES_HOST_AERIAL = QLatin1String("1-4.aerial.maps.ls.hereapi.com");
+ 
+ QT_END_NAMESPACE
+-- 
+2.51.1
+

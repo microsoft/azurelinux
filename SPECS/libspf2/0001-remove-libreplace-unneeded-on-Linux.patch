@@ -1,0 +1,61 @@
+From d559339883f61bfb44188c4fe92851a2905e8a8e Mon Sep 17 00:00:00 2001
+From: Matt Domsch <mdomsch@fedoraproject.org>
+Date: Thu, 23 Jan 2014 10:51:07 -0600
+Subject: [PATCH 1/2] remove libreplace, unneeded on Linux
+
+---
+ configure.ac            | 3 ---
+ src/Makefile.am         | 2 +-
+ src/libspf2/Makefile.am | 4 ----
+ 3 files changed, 1 insertion(+), 8 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 63e398c..63e5392 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -273,8 +273,6 @@ AC_CHECK_FUNCS([strchr strcspn strdup strerror])
+ AC_CHECK_FUNCS([strcasecmp strncasecmp strspn strtoul])
+ AC_CHECK_FUNCS([gethostbyname inet_ntoa select strrchr strstr strtol])
+ 
+-AC_REPLACE_FUNCS([getopt_long_only strncasecmp])
+-AC_REPLACE_FUNCS([__ns_initparse __ns_name_uncompress __ns_msg_getflag])
+ dnl Magnus Holmgren says this avoids linking a private function
+ AC_LIBOBJ([__ns_get16])
+ 
+@@ -282,7 +280,6 @@ AC_CONFIG_FILES([Makefile
+                  Doxyfile
+                  src/Makefile
+                  src/include/Makefile
+-                 src/libreplace/Makefile
+                  src/libspf2/Makefile
+                  src/spfquery/Makefile
+                  src/spftest/Makefile
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 307bf10..02f09b4 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -4,5 +4,5 @@ AUTOMAKE_OPTIONS = foreign
+ # Attempt to disable parallel processing.
+ .NOTPARALLEL:
+ .NO_PARALLEL:
+-SUBDIRS =	include libreplace libspf2 spfquery spftest spfd spf_example
++SUBDIRS =	include libspf2 spfquery spftest spfd spf_example
+ TARGETS =
+diff --git a/src/libspf2/Makefile.am b/src/libspf2/Makefile.am
+index 6b5a147..77ef3b9 100644
+--- a/src/libspf2/Makefile.am
++++ b/src/libspf2/Makefile.am
+@@ -34,10 +34,6 @@ libspf2_la_SOURCES	= \
+ 	spf_utils.c \
+ 	spf_win32.c
+ 
+-libspf2_la_LIBADD	= $(top_builddir)/src/libreplace/libreplace.la
+-
+-
+-
+ libspf2_la_LDFLAGS	= -version-info 3:0:1
+ 
+ # Copied from the libtool info file:
+-- 
+1.8.4.2
+

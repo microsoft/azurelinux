@@ -1,0 +1,11 @@
+--- cborg-0.2.10.0/src/Codec/CBOR/Magic.hs~	2001-09-09 09:46:40.000000000 +0800
++++ cborg-0.2.10.0/src/Codec/CBOR/Magic.hs	2025-04-12 13:54:16.901381291 +0800
+@@ -173,7 +173,7 @@
+ grabWord64 (Ptr ip#) = W64# (byteSwap# (indexWord64OffAddr# ip# 0#))
+ #endif
+ #else
+-grabWord64 (Ptr ip#) = W64# (byteSwap64# (word64ToWord# (indexWord64OffAddr# ip# 0#)))
++grabWord64 (Ptr ip#) = W64# (byteSwap64# ({-word64ToWord#-} (indexWord64OffAddr# ip# 0#)))
+ #endif
+ 
+ #elif defined(MEM_UNALIGNED_OPS) && \

@@ -1,0 +1,56 @@
+From 42c654c1aeb3848295c4405ff8f68681e1543cee Mon Sep 17 00:00:00 2001
+From: Yaakov Selkowitz <yselkowi@redhat.com>
+Date: Tue, 9 Dec 2025 21:58:07 -0500
+Subject: [PATCH] Python: Provide dist-info metadata
+
+This causes the Python bindings to be registered with pip and replace the
+unofficial builds posted to PyPI from the Pulp project.  Some packaging
+systems will also treat this as if it were so built, e.g. Fedora/RHEL RPMs
+will generate Provides: python3dist(solv).
+---
+ bindings/python/CMakeLists.txt  | 4 +++-
+ bindings/python/METADATA.in     | 3 +++
+ bindings/python3/CMakeLists.txt | 1 +
+ 3 files changed, 7 insertions(+), 1 deletion(-)
+ create mode 100644 bindings/python/METADATA.in
+
+diff --git a/bindings/python/CMakeLists.txt b/bindings/python/CMakeLists.txt
+index 4bd0fae8..deeb41f9 100644
+--- a/bindings/python/CMakeLists.txt
++++ b/bindings/python/CMakeLists.txt
+@@ -27,6 +27,8 @@ MESSAGE (STATUS "Python executable: ${PYTHON_EXECUTABLE}")
+ MESSAGE (STATUS "Python installation dir: ${PYTHON_INSTALL_DIR}")
+ MESSAGE (STATUS "Python include path: ${PYTHON_INCLUDE_PATH}")
+ 
++CONFIGURE_FILE (${CMAKE_CURRENT_SOURCE_DIR}/METADATA.in ${CMAKE_CURRENT_BINARY_DIR}/METADATA @ONLY)
++
+ ADD_CUSTOM_COMMAND (
+     OUTPUT solv_python.c
+     COMMAND ${SWIG_EXECUTABLE} ${SWIG_FLAGS} -python ${SWIG_PY_FLAGS} -I${CMAKE_SOURCE_DIR}/src -o solv_python.c ${CMAKE_SOURCE_DIR}/bindings/solv.i
+@@ -43,4 +45,4 @@ TARGET_LINK_LIBRARIES (bindings_python ${LIBSOLV_BINDINGS_LIBRARIES} ${SYSTEM_LI
+ 
+ INSTALL (TARGETS bindings_python LIBRARY DESTINATION ${PYTHON_INSTALL_DIR})
+ INSTALL (FILES ${CMAKE_CURRENT_BINARY_DIR}/solv.py DESTINATION ${PYTHON_INSTALL_DIR})
+-
++INSTALL (FILES ${CMAKE_CURRENT_BINARY_DIR}/METADATA DESTINATION ${PYTHON_INSTALL_DIR}/solv-${VERSION}.dist-info)
+diff --git a/bindings/python/METADATA.in b/bindings/python/METADATA.in
+new file mode 100644
+index 00000000..87ef32c4
+--- /dev/null
++++ b/bindings/python/METADATA.in
+@@ -0,0 +1,3 @@
++Metadata-Version: 2.1
++Name: solv
++Version: @VERSION@
+diff --git a/bindings/python3/CMakeLists.txt b/bindings/python3/CMakeLists.txt
+index e2da6845..90357775 100644
+--- a/bindings/python3/CMakeLists.txt
++++ b/bindings/python3/CMakeLists.txt
+@@ -36,3 +36,4 @@ TARGET_LINK_LIBRARIES (bindings_python3 ${LIBSOLV_BINDINGS_LIBRARIES} ${SYSTEM_L
+ 
+ INSTALL (TARGETS bindings_python3 LIBRARY DESTINATION ${PYTHON3_INSTALL_DIR})
+ INSTALL (FILES ${CMAKE_CURRENT_BINARY_DIR}/solv.py DESTINATION ${PYTHON3_INSTALL_DIR})
++INSTALL (FILES ${CMAKE_BINARY_DIR}/bindings/python/METADATA DESTINATION ${PYTHON3_INSTALL_DIR}/solv-${VERSION}.dist-info)
+-- 
+2.52.0
+

@@ -1,0 +1,42 @@
+From f5da1fd64fd848a10397d5b380a6e0fdf7330a89 Mon Sep 17 00:00:00 2001
+From: Andreas Sturmlechner <asturm@gentoo.org>
+Date: Fri, 18 Mar 2022 12:43:18 +0100
+Subject: [PATCH 2/3] Drop superfluous network dependency from
+ assistant/{help,qhelpgenerator}.pro
+
+Upstream's cmake equivalent commit is a9804f1a6496eccb79fb006fe4c9247eee1c4cec
+
+See also:
+https://codereview.qt-project.org/gitweb?p=qt%2Fqttools.git;a=commit;h=a9804f1a6496eccb79fb006fe4c9247eee1c4cec
+
+Signed-off-by: Andreas Sturmlechner <asturm@gentoo.org>
+---
+ src/assistant/help/help.pro                     | 1 -
+ src/assistant/qhelpgenerator/qhelpgenerator.pro | 2 +-
+ 2 files changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/src/assistant/help/help.pro b/src/assistant/help/help.pro
+index 800c4a38d..7556f451b 100644
+--- a/src/assistant/help/help.pro
++++ b/src/assistant/help/help.pro
+@@ -1,7 +1,6 @@
+ TARGET = QtHelp
+ 
+ QT = core-private gui widgets sql
+-QT_PRIVATE = network
+ 
+ DEFINES += QHELP_LIB
+ 
+diff --git a/src/assistant/qhelpgenerator/qhelpgenerator.pro b/src/assistant/qhelpgenerator/qhelpgenerator.pro
+index bb22000c8..415347a00 100644
+--- a/src/assistant/qhelpgenerator/qhelpgenerator.pro
++++ b/src/assistant/qhelpgenerator/qhelpgenerator.pro
+@@ -1,4 +1,4 @@
+-QT += network help-private
++QT += help-private
+ 
+ QTPLUGIN.platforms = qminimal
+ QTPLUGIN.sqldrivers = qsqlite
+-- 
+2.51.1
+

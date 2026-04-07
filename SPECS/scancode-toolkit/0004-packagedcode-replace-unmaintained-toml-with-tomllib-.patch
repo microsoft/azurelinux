@@ -1,0 +1,149 @@
+From 53c3aa899e17c2d450f15f3eee2d3c8c2ba7b349 Mon Sep 17 00:00:00 2001
+From: Maxwell G <maxwell@gtmx.me>
+Date: Wed, 20 Aug 2025 00:42:56 -0500
+Subject: [PATCH 4/4] packagedcode: replace unmaintained toml with
+ tomllib/tomli
+
+toml has been unmaintained for years and was superseded by tomli on PyPI
+which was eventually added to the stdlib as tomllib in Python 3.11.
+
+Signed-off-by: Maxwell G <maxwell@gtmx.me>
+---
+ CHANGELOG.rst             |  2 ++
+ setup.cfg                 |  2 +-
+ src/packagedcode/cargo.py | 16 +++++++++++++---
+ src/packagedcode/pypi.py  | 19 +++++++++++++++----
+ 4 files changed, 31 insertions(+), 8 deletions(-)
+
+diff --git a/CHANGELOG.rst b/CHANGELOG.rst
+index 22c4620..ae88116 100644
+--- a/CHANGELOG.rst
++++ b/CHANGELOG.rst
+@@ -5,6 +5,8 @@ Next release
+ --------------
+ 
+ 
++- Replace unmaintained ``toml`` library with ``tomllib`` / ``tomli``.
++  https://github.com/aboutcode-org/scancode-toolkit/issues/4532
+ 
+ v32.4.1 - 2025-07-23
+ --------------------
+diff --git a/setup.cfg b/setup.cfg
+index d4566f5..c7e448c 100644
+--- a/setup.cfg
++++ b/setup.cfg
+@@ -110,7 +110,7 @@ install_requires =
+     saneyaml >= 0.6.0
+     spdx_tools == 0.8.2
+     text_unidecode >= 1.0
+-    toml >= 0.10.0
++    tomli >= 2; python_version < "3.11"
+     urlpy
+     xmltodict >= 0.11.0
+     zipp >= 3.0.0; python_version < "3.9"
+diff --git a/src/packagedcode/cargo.py b/src/packagedcode/cargo.py
+index 3a0533d..8cd087c 100644
+--- a/src/packagedcode/cargo.py
++++ b/src/packagedcode/cargo.py
+@@ -12,11 +12,19 @@ import os
+ import re
+ import sys
+ 
+-import toml
+ from packageurl import PackageURL
+ 
+ from packagedcode import models
+ 
++# tomli was added to the stdlib as tomllib in Python 3.11.
++# It's the same code.
++# Still, prefer tomli if it's installed, as on newer Python versions, it is
++# compiled with mypyc and is more performant.
++try:
++    import tomli as tomllib
++except ImportError:
++    import tomllib
++
+ """
+ Handle Rust cargo crates
+ """
+@@ -170,7 +178,8 @@ class CargoTomlHandler(CargoBaseHandler):
+ 
+     @classmethod
+     def parse(cls, location, package_only=False):
+-        package_data_toml = toml.load(location, _dict=dict)
++        with open(location, "rb") as fp:
++            package_data_toml = tomllib.load(fp)
+         workspace = package_data_toml.get('workspace', {})
+         core_package_data = package_data_toml.get('package', {})
+         extra_data = {}
+@@ -283,7 +292,8 @@ class CargoLockHandler(CargoBaseHandler):
+ 
+     @classmethod
+     def parse(cls, location, package_only=False):
+-        cargo_lock = toml.load(location, _dict=dict)
++        with open(location, "rb") as fp:
++            cargo_lock = tomllib.load(fp)
+         dependencies = []
+         package = cargo_lock.get('package', [])
+         for dep in package:
+diff --git a/src/packagedcode/pypi.py b/src/packagedcode/pypi.py
+index 489e977..7b873c7 100644
+--- a/src/packagedcode/pypi.py
++++ b/src/packagedcode/pypi.py
+@@ -29,7 +29,6 @@ import importlib_metadata
+ import packvers as packaging
+ import pip_requirements_parser
+ import pkginfo as pkginfo2
+-import toml
+ from commoncode import fileutils
+ from commoncode.fileutils import as_posixpath
+ from commoncode.resource import Resource
+@@ -46,6 +45,15 @@ from packagedcode.utils import yield_dependencies_from_package_data
+ from packagedcode.utils import yield_dependencies_from_package_resource
+ from packagedcode.utils import get_base_purl
+ 
++# tomli was added to the stdlib as tomllib in Python 3.11.
++# It's the same code.
++# Still, prefer tomli if it's installed, as on newer Python versions, it is
++# compiled with mypyc and is more performant.
++try:
++    import tomli as tomllib
++except ImportError:
++    import tomllib
++
+ try:
+     from zipfile import Path as ZipPath
+ except ImportError:
+@@ -463,7 +471,8 @@ class PyprojectTomlHandler(BaseExtractedPythonLayout):
+ 
+     @classmethod
+     def parse(cls, location, package_only=False):
+-        package_data = toml.load(location, _dict=dict)
++        with open(location, "rb") as fp:
++            package_data = tomllib.load(fp)
+         project_data = package_data.get("project")
+         if not project_data:
+             return
+@@ -647,7 +656,8 @@ class PoetryPyprojectTomlHandler(BasePoetryPythonLayout):
+ 
+     @classmethod
+     def parse(cls, location, package_only=False):
+-        toml_data = toml.load(location, _dict=dict)
++        with open(location, "rb") as fp:
++            toml_data = tomllib.load(fp)
+ 
+         tool_data = toml_data.get('tool')
+         if not tool_data:
+@@ -725,7 +735,8 @@ class PoetryLockHandler(BasePoetryPythonLayout):
+ 
+     @classmethod
+     def parse(cls, location, package_only=False):
+-        toml_data = toml.load(location, _dict=dict)
++        with open(location, "rb") as fp:
++            toml_data = tomllib.load(fp)
+ 
+         packages = toml_data.get('package')
+         if not packages:
+-- 
+2.51.0
+

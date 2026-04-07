@@ -1,0 +1,128 @@
+From 2e14a9f44b79fe6a13cd1ecec3f8c50d44be2188 Mon Sep 17 00:00:00 2001
+From: groff owner <groff-owner@fedoraproject.org>
+Date: Mon, 10 Jul 2023 13:15:36 +0000
+Subject: [PATCH] various security fixes
+
+CVE-2009-5044 (#709413)
+CVE-2009-5080 (#720058)
+CVE-2009-5081 (#720057)
+
+---
+ contrib/eqn2graph/eqn2graph.sh   |  2 ++
+ contrib/grap2graph/grap2graph.sh |  2 ++
+ contrib/pdfmark/pdfroff.1.man    |  5 +++--
+ contrib/pic2graph/pic2graph.sh   |  2 ++
+ doc/groff.texi                   |  6 +++---
+ gendef.sh                        | 10 +++-------
+ 6 files changed, 15 insertions(+), 12 deletions(-)
+
+diff --git a/contrib/eqn2graph/eqn2graph.sh b/contrib/eqn2graph/eqn2graph.sh
+index 3e9c374..4e4f11e 100644
+--- a/contrib/eqn2graph/eqn2graph.sh
++++ b/contrib/eqn2graph/eqn2graph.sh
+@@ -74,6 +74,8 @@ then
+     # but is supported by the stripped-down dash shell, for instance.
+     tmp="$d/eqn2graph$$-${RANDOM:-$PPID}"
+     (umask 077 && mkdir "$tmp") 2> /dev/null
++
++    tmp=
+ fi
+ 
+ if ! test -d "$tmp"
+diff --git a/contrib/grap2graph/grap2graph.sh b/contrib/grap2graph/grap2graph.sh
+index 29df25b..94c436b 100644
+--- a/contrib/grap2graph/grap2graph.sh
++++ b/contrib/grap2graph/grap2graph.sh
+@@ -76,6 +76,8 @@ then
+     # but is supported by the stripped-down dash shell, for instance.
+     tmp="$d/grap2graph$$-${RANDOM:-$PPID}"
+     (umask 077 && mkdir "$tmp") 2> /dev/null
++
++    tmp=
+ fi
+ 
+ if ! test -d "$tmp"
+diff --git a/contrib/pdfmark/pdfroff.1.man b/contrib/pdfmark/pdfroff.1.man
+index 029a1f4..ee7ac13 100644
+--- a/contrib/pdfmark/pdfroff.1.man
++++ b/contrib/pdfmark/pdfroff.1.man
+@@ -619,7 +619,7 @@ gs \-dBATCH \-dQUIET \-dNOPAUSE \-dSAFER \-sDEVICE=pdfwrite \e
+ .I GROFF_TMPDIR
+ Identifies the directory in which
+ .I pdfroff
+-should create temporary files.
++should create a subdirectory for its temporary files.
+ .
+ If
+ .I \%GROFF_TMPDIR
+@@ -635,7 +635,8 @@ are considered in turn as possible temporary file repositories.
+ .
+ If none of these are set,
+ then temporary files are created
+-in the current directory.
++in a subdirectory of
++.BR /tmp .
+ .
+ .
+ .TP
+diff --git a/contrib/pic2graph/pic2graph.sh b/contrib/pic2graph/pic2graph.sh
+index b229914..2d6e77c 100644
+--- a/contrib/pic2graph/pic2graph.sh
++++ b/contrib/pic2graph/pic2graph.sh
+@@ -89,6 +89,8 @@ then
+     # but is supported by the stripped-down dash shell, for instance.
+     tmp="$d/pic2graph$$-${RANDOM:-$PPID}"
+     (umask 077 && mkdir "$tmp") 2> /dev/null
++
++    tmp=
+ fi
+ 
+ if ! test -d "$tmp"
+diff --git a/doc/groff.texi b/doc/groff.texi
+index 2a6635e..1fdf632 100644
+--- a/doc/groff.texi
++++ b/doc/groff.texi
+@@ -16005,9 +16005,9 @@ The following code fragment introduces the current time into a document.
+ @pindex perl
+ @Example
+ .sy perl -e 'printf ".nr H %d\\n.nr M %d\\n.nr S %d\\n",\
+-             (localtime(time))[2,1,0]' > /tmp/x\n[$$]
+-.so /tmp/x\n[$$]
+-.sy rm /tmp/x\n[$$]
++             (localtime(time))[2,1,0]' > timefile\n[$$]
++.so timefile\n[$$]
++.sy rm timefile\n[$$]
+ \nH:\nM:\nS
+ @endExample
+ 
+diff --git a/gendef.sh b/gendef.sh
+index bb30a4f..eb2e31c 100644
+--- a/gendef.sh
++++ b/gendef.sh
+@@ -33,11 +33,9 @@ do
+ #define $def"
+ done
+ 
+-# Use $TMPDIR if defined.  Default to cwd, for non-Unix systems
+-# which don't have /tmp on each drive (we are going to remove
+-# the file before we exit anyway).  Put the PID in the basename,
+-# since the extension can only hold 3 characters on MS-DOS.
+-t=${TMPDIR-.}/gro$$.tmp
++t="`mktemp -t groff-gendef.XXXXXXXXXX`" || exit
++trap 'rm -f -- "$t"' EXIT
++trap 'trap - EXIT; rm -f -- "$t"; exit 1' HUP INT QUIT TERM
+ 
+ sed -e 's/=/ /' >$t <<EOF
+ $defs
+@@ -45,8 +43,6 @@ EOF
+ 
+ test -r $file && cmp -s $t $file || cp $t $file
+ 
+-rm -f $t
+-
+ exit 0
+ 
+ # eof
+-- 
+2.41.0
+

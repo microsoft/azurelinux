@@ -1,0 +1,27 @@
+Manifest-Version: 1.0
+Created-By: Maven Archiver 3.5.1
+Build-Jdk-Spec: 11
+Main-Class: org.eclipse.jdt.internal.compiler.batch.Main
+Bundle-ManifestVersion: 2
+Bundle-Name: Eclipse Compiler for Java(TM)
+Bundle-SymbolicName: org.eclipse.jdt.core.compiler.batch
+Bundle-Version: 3.28.0.v20211117-1416
+Bundle-ClassPath: .
+Bundle-Vendor: Eclipse.org
+Export-Package: org.eclipse.jdt.core,org.eclipse.jdt.core.compiler,org.e
+ clipse.jdt.internal.antadapter;x-internal:=true,org.eclipse.jdt.interna
+ l.compiler;x-internal:=true,org.eclipse.jdt.internal.compiler.apt.dispa
+ tch;x-internal:=true,org.eclipse.jdt.internal.compiler.apt.model;x-inte
+ rnal:=true,org.eclipse.jdt.internal.compiler.apt.util;x-internal:=true,
+ org.eclipse.jdt.internal.compiler.ast;x-internal:=true,org.eclipse.jdt.
+ internal.compiler.batch;x-internal:=true,org.eclipse.jdt.internal.compi
+ ler.classfmt;x-internal:=true,org.eclipse.jdt.internal.compiler.codegen
+ ;x-internal:=true,org.eclipse.jdt.internal.compiler.env;x-internal:=tru
+ e,org.eclipse.jdt.internal.compiler.flow;x-internal:=true,org.eclipse.j
+ dt.internal.compiler.impl;x-internal:=true,org.eclipse.jdt.internal.com
+ piler.lookup;x-internal:=true,org.eclipse.jdt.internal.compiler.parser;
+ x-internal:=true,org.eclipse.jdt.internal.compiler.parser.diagnose;x-in
+ ternal:=true,org.eclipse.jdt.internal.compiler.problem;x-internal:=true
+ ,org.eclipse.jdt.internal.compiler.util;x-internal:=true,org.eclipse.jd
+ t.internal.compiler.tool;x-internal:=true
+

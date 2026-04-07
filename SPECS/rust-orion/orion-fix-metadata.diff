@@ -1,0 +1,24 @@
+--- orion-0.17.12/Cargo.toml	1970-01-01T00:00:01+00:00
++++ orion-0.17.12/Cargo.toml	2026-01-12T16:04:15.585124+00:00
+@@ -67,11 +67,6 @@
+ name = "orion"
+ path = "src/lib.rs"
+ 
+-[[bench]]
+-name = "bench"
+-path = "benches/bench.rs"
+-harness = false
+-
+ [dependencies.ct-codecs]
+ version = "1.1.1"
+ optional = true
+@@ -97,9 +92,6 @@
+ [dependencies.zeroize]
+ version = "1.1.0"
+ default-features = false
+-
+-[dev-dependencies.criterion]
+-version = "0.8.1"
+ 
+ [dev-dependencies.hex]
+ version = "0.4.0"

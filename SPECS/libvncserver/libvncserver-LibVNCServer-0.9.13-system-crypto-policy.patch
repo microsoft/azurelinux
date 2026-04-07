@@ -1,0 +1,13 @@
+--- ./src/libvncclient/tls_gnutls.c.crypto_policy	2023-11-15 13:20:04.136352789 +0000
++++ ./src/libvncclient/tls_gnutls.c	2023-11-15 13:21:40.971072818 +0000
+@@ -25,8 +25,8 @@
+ #include "tls.h"
+ 
+ 
+-static const char *rfbTLSPriority = "NORMAL:+DHE-DSS:+RSA:+DHE-RSA";
+-static const char *rfbAnonTLSPriority = "NORMAL:+ANON-ECDH:+ANON-DH";
++static const char *rfbTLSPriority = "@SYSTEM";
++static const char *rfbAnonTLSPriority= "@SYSTEM:+ANON-DH";
+ 
+ #define DH_BITS 1024
+ static gnutls_dh_params_t rfbDHParams;

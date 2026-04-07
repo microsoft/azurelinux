@@ -1,0 +1,37 @@
+--- netkit-ftp-0.17-dist/ftp/ftp.c	2012-10-02 14:44:06.328343277 +0200
++++ netkit-ftp-0.17-new/ftp/ftp.c	2012-10-03 09:07:47.381868330 +0200
+@@ -328,14 +328,12 @@ dologin(const char *host)
+ 		return(0);
+ 	}
+ 	while (luser == NULL) {
+-		char *myname = getlogin();
++		char *myname = NULL;
+ 
+-		if (myname == NULL) {
+-			struct passwd *pp = getpwuid(getuid());
++		struct passwd *pp = getpwuid(getuid());
+ 
+-			if (pp != NULL)
+-				myname = pp->pw_name;
+-		}
++		if (pp != NULL)
++			myname = pp->pw_name;
+ 		if (myname)
+ 			printf("Name (%s:%s): ", host, myname);
+ 		else
+--- netkit-ftp-0.17-dist/ftp/main.c	2012-10-02 14:44:06.330343274 +0200
++++ netkit-ftp-0.17-new/ftp/main.c	2012-10-03 09:07:36.849862227 +0200
+@@ -204,12 +204,7 @@ main(volatile int argc, char **volatile
+ 	/*
+ 	 * Set up the home directory in case we're globbing.
+ 	 */
+-	cp = getlogin();
+-	if (cp != NULL) {
+-		pw = getpwnam(cp);
+-	}
+-	if (pw == NULL)
+-		pw = getpwuid(getuid());
++	pw = getpwuid(getuid());
+ 	if (pw != NULL) {
+ 		strncpy(homedir, pw->pw_dir, sizeof(homedir));
+ 		homedir[sizeof(homedir)-1] = 0;

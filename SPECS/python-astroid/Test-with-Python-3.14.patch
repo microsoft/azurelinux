@@ -1,0 +1,193 @@
+From f3b71fd5f8dc5ca61c44c0ba6aba68d9efd28fb2 Mon Sep 17 00:00:00 2001
+From: Pierre Sassoulas <pierre.sassoulas@gmail.com>
+Date: Tue, 20 May 2025 13:56:15 +0200
+Subject: [PATCH 2/2] Test with Python 3.14
+
+---
+ tests/test_builder.py                     |  5 +-
+ tests/test_nodes.py                       | 28 ++++++-
+ tests/testdata/python3/data/module.py     |  4 +-
+ tests/testdata/python3/data/module3.14.py | 91 +++++++++++++++++++++++
+ 4 files changed, 119 insertions(+), 9 deletions(-)
+ create mode 100644 tests/testdata/python3/data/module3.14.py
+
+diff --git a/tests/test_builder.py b/tests/test_builder.py
+index b5335d5..24a7f16 100644
+--- a/tests/test_builder.py
++++ b/tests/test_builder.py
+@@ -895,11 +895,8 @@ class FileBuildTest(unittest.TestCase):
+     def test_method_locals(self) -> None:
+         """Test the 'locals' dictionary of an astroid method."""
+         method = self.module["YOUPI"]["method"]
+-        _locals = method.locals
+-        keys = sorted(_locals)
+         # ListComp variables are not accessible outside
+-        self.assertEqual(len(_locals), 3)
+-        self.assertEqual(keys, ["autre", "local", "self"])
++        self.assertEqual(sorted(method.locals), ["a", "autre", "local", "self"])
+ 
+     def test_unknown_encoding(self) -> None:
+         with self.assertRaises(AstroidSyntaxError):
+diff --git a/tests/test_nodes.py b/tests/test_nodes.py
+index dced983..4ce9c36 100644
+--- a/tests/test_nodes.py
++++ b/tests/test_nodes.py
+@@ -28,7 +28,7 @@ from astroid import (
+     transforms,
+     util,
+ )
+-from astroid.const import IS_PYPY, PY310_PLUS, PY312_PLUS, Context
++from astroid.const import IS_PYPY, PY310_PLUS, PY312_PLUS, PY314_PLUS, Context
+ from astroid.context import InferenceContext
+ from astroid.exceptions import (
+     AstroidBuildingError,
+@@ -109,11 +109,31 @@ class AsStringTest(resources.SysPathSetup, unittest.TestCase):
+         ast = abuilder.string_build("raise_string(*args, **kwargs)").body[0]
+         self.assertEqual(ast.as_string(), "raise_string(*args, **kwargs)")
+ 
+-    def test_module_as_string(self) -> None:
+-        """Check as_string on a whole module prepared to be returned identically."""
++    @pytest.mark.skipif(PY314_PLUS, reason="return in finally is now a syntax error")
++    def test_module_as_string_pre_3_14(self) -> None:
++        """Check as_string on a whole module prepared to be returned identically for py < 3.14."""
++        self.maxDiff = None
+         module = resources.build_file("data/module.py", "data.module")
+         with open(resources.find("data/module.py"), encoding="utf-8") as fobj:
+-            self.assertMultiLineEqual(module.as_string(), fobj.read())
++            # Ignore comments in python file
++            data_str = "\n".join(
++                [s for s in fobj.read().split("\n") if not s.lstrip().startswith("# ")]
++            )
++            self.assertMultiLineEqual(module.as_string(), data_str)
++
++    @pytest.mark.skipif(
++        not PY314_PLUS, reason="return in finally is now a syntax error"
++    )
++    def test_module_as_string(self) -> None:
++        """Check as_string on a whole module prepared to be returned identically for py > 3.14."""
++        self.maxDiff = None
++        module = resources.build_file("data/module3.14.py", "data.module3.14")
++        with open(resources.find("data/module3.14.py"), encoding="utf-8") as fobj:
++            # Ignore comments in python file
++            data_str = "\n".join(
++                [s for s in fobj.read().split("\n") if not s.lstrip().startswith("# ")]
++            )
++            self.assertMultiLineEqual(module.as_string(), data_str)
+ 
+     def test_module2_as_string(self) -> None:
+         """Check as_string on a whole module prepared to be returned identically."""
+diff --git a/tests/testdata/python3/data/module.py b/tests/testdata/python3/data/module.py
+index af4a75f..fba4c9c 100644
+--- a/tests/testdata/python3/data/module.py
++++ b/tests/testdata/python3/data/module.py
+@@ -59,7 +59,9 @@ class YOUPI(YO):
+                 return 'hehe'
+             global_access(local, val=autre)
+         finally:
+-            return local
++            # return in finally was previously tested here but became a syntax error
++            # in 3.14 and this file is used in 188/1464 tests
++            a = local
+     
+     def static_method():
+         """static method test"""
+diff --git a/tests/testdata/python3/data/module3.14.py b/tests/testdata/python3/data/module3.14.py
+new file mode 100644
+index 0000000..a29b14d
+--- /dev/null
++++ b/tests/testdata/python3/data/module3.14.py
+@@ -0,0 +1,91 @@
++"""test module for astroid
++"""
++
++__revision__ = '$Id: module.py,v 1.2 2005-11-02 11:56:54 syt Exp $'
++from astroid.nodes.node_classes import Name as NameNode
++from astroid import modutils
++from astroid.utils import *
++import os.path
++MY_DICT = {}
++
++def global_access(key, val):
++    """function test"""
++    local = 1
++    MY_DICT[key] = val
++    for i in val:
++        if i:
++            del MY_DICT[i]
++            continue
++        else:
++            break
++    else:
++        return
++
++
++class YO:
++    """hehe
++    haha"""
++    a = 1
++    
++    def __init__(self):
++        try:
++            self.yo = 1
++        except ValueError as ex:
++            pass
++        except (NameError, TypeError):
++            raise XXXError()
++        except:
++            raise
++
++
++
++class YOUPI(YO):
++    class_attr = None
++    
++    def __init__(self):
++        self.member = None
++    
++    def method(self):
++        """method
++        test"""
++        global MY_DICT
++        try:
++            MY_DICT = {}
++            local = None
++            autre = [a for (a, b) in MY_DICT if b]
++            if b in autre:
++                return
++            elif a in autre:
++                return 'hehe'
++            global_access(local, val=autre)
++        finally:
++            # return in finally was previously tested here but became a syntax error
++            # in 3.14 and is used in 188/1464 tests
++            print(local)
++    
++    def static_method():
++        """static method test"""
++        assert MY_DICT, '???'
++    static_method = staticmethod(static_method)
++    
++    def class_method(cls):
++        """class method test"""
++        exec(a, b)
++    class_method = classmethod(class_method)
++
++
++def four_args(a, b, c, d):
++    """four arguments (was nested_args)"""
++    while 1:
++        if a:
++            break
++        a += +1
++    else:
++        b += -2
++    if c:
++        d = a and (b or c)
++    else:
++        c = a and b or d
++    list(map(lambda x, y: (y, x), a))
++redirect = four_args
++
+-- 
+2.49.0
+

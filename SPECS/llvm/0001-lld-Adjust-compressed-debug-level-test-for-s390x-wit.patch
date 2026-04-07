@@ -1,0 +1,29 @@
+From 4fbbdb4f6b95158b87e1b072b3a246722ccf3b7d Mon Sep 17 00:00:00 2001
+From: Nikita Popov <npopov@redhat.com>
+Date: Fri, 19 Dec 2025 17:02:24 +0100
+Subject: [PATCH] [lld] Adjust compressed-debug-level test for s390x with
+ DFLTCC (#172972)
+
+After enabling DFLTCC in zlib-ng for s390x this test starts failing,
+because slightly better compression is produced at level 1. Add 1c as a
+permissible output.
+---
+ lld/test/ELF/compressed-debug-level.test | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lld/test/ELF/compressed-debug-level.test b/lld/test/ELF/compressed-debug-level.test
+index 5a4d37e31eca..7d64298e518f 100644
+--- a/lld/test/ELF/compressed-debug-level.test
++++ b/lld/test/ELF/compressed-debug-level.test
+@@ -18,7 +18,7 @@
+ # RUN: llvm-readelf --sections %t.6 | FileCheck -check-prefixes=HEADER,LEVEL6 %s
+ 
+ # HEADER: [Nr] Name        Type     Address  Off    Size
+-# LEVEL1: [ 1] .debug_info PROGBITS 00000000 000094 0000{{1[def]|21}}
++# LEVEL1: [ 1] .debug_info PROGBITS 00000000 000094 0000{{1[cdef]|21}}
+ # LEVEL6: [ 1] .debug_info PROGBITS 00000000 000094 00001{{[abc]}}
+ 
+ ## A little arbitrary debug section which has a different size after
+-- 
+2.50.1
+

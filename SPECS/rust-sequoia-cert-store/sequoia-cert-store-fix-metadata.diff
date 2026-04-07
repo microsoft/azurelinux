@@ -1,0 +1,10 @@
+--- sequoia-cert-store-0.7.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ sequoia-cert-store-0.7.1/Cargo.toml	2025-12-01T22:21:47.417158+00:00
+@@ -41,6 +41,7 @@
+ ]
+ license = "LGPL-2.0-or-later"
+ repository = "https://gitlab.com/sequoia-pgp/sequoia-cert-store"
++exclude = ["/tests"]
+ 
+ [package.metadata.docs.rs]
+ features = ["sequoia-openpgp/default"]

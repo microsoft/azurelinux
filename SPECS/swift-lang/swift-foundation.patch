@@ -1,0 +1,19 @@
+diff --git swift-foundation.orig/Sources/_FoundationCShims/include/_CStdlib.h swift-foundation/Sources/_FoundationCShims/include/_CStdlib.h
+index 71e2fd2..a63a9dc 100644
+--- swift-foundation.orig/Sources/_FoundationCShims/include/_CStdlib.h
++++ swift-foundation/Sources/_FoundationCShims/include/_CStdlib.h
+@@ -51,8 +51,14 @@
+ #include <locale.h>
+ #endif
+ 
++#ifndef _GLIBCXX_MATH_H
+ #if __has_include(<math.h>)
++#ifndef _MATH_H
++#define _GLIBCXX_MATH_H 1
+ #include <math.h>
++#undef _GLIBCXX_MATH_H
++#endif
++#endif
+ #endif
+ 
+ #if __has_include(<signal.h>)

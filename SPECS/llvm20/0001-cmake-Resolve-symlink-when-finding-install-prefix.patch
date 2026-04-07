@@ -1,0 +1,39 @@
+From 06774eb8a7dc0bc36b59e53310c7f5b5d89f6c29 Mon Sep 17 00:00:00 2001
+From: Nikita Popov <npopov@redhat.com>
+Date: Tue, 28 Jan 2025 12:31:49 +0100
+Subject: [PATCH] [cmake] Resolve symlink when finding install prefix
+
+When determining the install prefix in LLVMConfig.cmake etc resolve
+symlinks in CMAKE_CURRENT_LIST_FILE first. The motivation for this
+is to support symlinks like `/usr/lib64/cmake/llvm` to
+`/usr/lib64/llvm19/lib/cmake/llvm`. This only works correctly if
+the paths are relative to the resolved symlink.
+
+It's worth noting that this *mostly* already works out of the box,
+because cmake automatically does the symlink resolution when the
+library is found via CMAKE_PREFIX_PATH. It just doesn't happen
+when it's found via the default prefix path.
+---
+ cmake/Modules/FindPrefixFromConfig.cmake | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/cmake/Modules/FindPrefixFromConfig.cmake b/cmake/Modules/FindPrefixFromConfig.cmake
+index 22211e4b72f2..3daff607ff84 100644
+--- a/cmake/Modules/FindPrefixFromConfig.cmake
++++ b/cmake/Modules/FindPrefixFromConfig.cmake
+@@ -39,10 +39,10 @@ function(find_prefix_from_config out_var prefix_var path_to_leave)
+     # install prefix, and avoid hard-coding any absolute paths.
+     set(config_code
+       "# Compute the installation prefix from this LLVMConfig.cmake file location."
+-      "get_filename_component(${prefix_var} \"\${CMAKE_CURRENT_LIST_FILE}\" PATH)")
++      "get_filename_component(${prefix_var} \"\${CMAKE_CURRENT_LIST_FILE}\" REALPATH)")
+     # Construct the proper number of get_filename_component(... PATH)
+     # calls to compute the installation prefix.
+-    string(REGEX REPLACE "/" ";" _count "${path_to_leave}")
++    string(REGEX REPLACE "/" ";" _count "${path_to_leave}/plus_one")
+     foreach(p ${_count})
+       list(APPEND config_code
+         "get_filename_component(${prefix_var} \"\${${prefix_var}}\" PATH)")
+-- 
+2.48.1
+

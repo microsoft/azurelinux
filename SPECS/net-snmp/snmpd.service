@@ -1,0 +1,13 @@
+[Unit]
+Description=Simple Network Management Protocol (SNMP) Daemon.
+After=syslog.target network-online.target
+
+[Service]
+Type=notify
+Environment=OPTIONS="-LS0-6d"
+EnvironmentFile=-/etc/sysconfig/snmpd
+ExecStart=/usr/sbin/snmpd $OPTIONS -f
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target

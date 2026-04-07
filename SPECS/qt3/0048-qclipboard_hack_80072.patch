@@ -1,0 +1,48 @@
+qt-bugs@ issue : none, probably even won't be
+bugs.kde.org number : 80072
+applied: no
+author: Lubos Lunak <l.lunak@kde.org>
+
+A crude hack for KDE #80072. No good idea how to fix it properly yet :(.
+
+--- src/kernel/qclipboard_x11.cpp.sav	2004-04-30 12:00:06.000000000 +0200
++++ src/kernel/qclipboard_x11.cpp	2004-05-09 21:18:10.269264304 +0200
+@@ -109,6 +109,7 @@ static int pending_timer_id = 0;
+ static bool pending_clipboard_changed = FALSE;
+ static bool pending_selection_changed = FALSE;
+ 
++Q_EXPORT bool qt_qclipboard_bailout_hack = false;
+ 
+ // event capture mechanism for qt_xclb_wait_for_event
+ static bool waiting_for_data = FALSE;
+@@ -453,6 +454,15 @@ static int qt_xclb_event_filter(XEvent *
+     return 0;
+ }
+ 
++static bool selection_request_pending = false;
++
++static Bool check_selection_request_pending( Display*, XEvent* e, XPointer )
++    {
++    if( e->type == SelectionRequest && e->xselectionrequest.owner == owner->winId())
++        selection_request_pending = true;
++    return False;
++    }
++
+ bool qt_xclb_wait_for_event( Display *dpy, Window win, int type, XEvent *event,
+ 			     int timeout )
+ {
+@@ -504,6 +514,14 @@ bool qt_xclb_wait_for_event( Display *dp
+     do {
+         if ( XCheckTypedWindowEvent(dpy,win,type,event) )
+ 	    return TRUE;
++        if( qt_qclipboard_bailout_hack ) {
++            XEvent dummy;
++            selection_request_pending = false;
++            if ( owner != NULL )
++                XCheckIfEvent(dpy,&dummy,check_selection_request_pending,NULL);
++            if( selection_request_pending )
++	        return TRUE;
++        }
+ 
+ 	now = QTime::currentTime();
+ 	if ( started > now )			// crossed midnight

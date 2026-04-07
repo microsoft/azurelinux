@@ -1,0 +1,80 @@
+qt-bugs@ issue : none
+bugs.kde.org number : none
+applied: no
+author: Lubos Lunak <l.lunak@kde.org>
+
+This patch makes override-redirect windows (popup menu, dropdown menu,
+tooltip, combobox, etc.) also have more window properties like WM_CLASS,
+so they can be used when compositing.
+
+--- src/kernel/qwidget_x11.cpp.sav	2007-06-25 10:36:42.000000000 +0200
++++ src/kernel/qwidget_x11.cpp	2007-10-02 15:30:13.000000000 +0200
+@@ -557,7 +557,10 @@ void QWidget::create( WId window, bool i
+ 	wsa.save_under = True;
+ 	XChangeWindowAttributes( dpy, id, CWOverrideRedirect | CWSaveUnder,
+ 				 &wsa );
+-	x11SetWindowType();
++	XClassHint class_hint;
++	class_hint.res_name = (char *) qAppName(); // application name
++	class_hint.res_class = (char *) qAppClass();	// application class
++        XSetClassHint( dpy, id, &class_hint );
+     } else if ( topLevel && !desktop ) {	// top-level widget
+ 	QWidget *p = parentWidget();	// real parent
+ 	if (p)
+@@ -620,8 +623,6 @@ void QWidget::create( WId window, bool i
+         else
+             XDeleteProperty(dpy, id, qt_xa_motif_wm_hints);
+ 
+-	x11SetWindowType();
+-
+ 	// set _NET_WM_WINDOW_STATE
+ 	if (curr_winstate > 0)
+ 	    XChangeProperty(dpy, id, qt_net_wm_state, XA_ATOM, 32, PropModeReplace,
+@@ -629,11 +630,6 @@ void QWidget::create( WId window, bool i
+         else
+             XDeleteProperty(dpy, id, qt_net_wm_state);
+ 
+-	// set _NET_WM_PID
+-	long curr_pid = getpid();
+-	XChangeProperty(dpy, id, qt_net_wm_pid, XA_CARDINAL, 32, PropModeReplace,
+-			(unsigned char *) &curr_pid, 1);
+-
+ #ifndef QT_NO_XSYNC
+         // set _NET_WM_SYNC_COUNTER
+         createSyncCounter();
+@@ -645,19 +641,31 @@ void QWidget::create( WId window, bool i
+ 	// when we create a toplevel widget, the frame strut should be dirty
+ 	fstrut_dirty = 1;
+ 
++    } else {
++	// non-toplevel widgets don't have a frame, so no need to
++	// update the strut
++	fstrut_dirty = 0;
++    }
++
++    if (initializeWindow && (popup || (topLevel && !desktop))) { // properties set on all toplevel windows
++	x11SetWindowType();
++
++	// set _NET_WM_PID
++	long curr_pid = getpid();
++	XChangeProperty(dpy, id, qt_net_wm_pid, XA_CARDINAL, 32, PropModeReplace,
++			(unsigned char *) &curr_pid, 1);
++
+ 	// declare the widget's object name as window role
+ 	XChangeProperty( dpy, id,
+ 			 qt_window_role, XA_STRING, 8, PropModeReplace,
+ 			 (unsigned char *)name(), qstrlen( name() ) );
+ 
+ 	// set client leader property
++	if ( !qt_x11_wm_client_leader )
++	    qt_x11_create_wm_client_leader();
+ 	XChangeProperty( dpy, id, qt_wm_client_leader,
+ 			 XA_WINDOW, 32, PropModeReplace,
+ 			 (unsigned char *)&qt_x11_wm_client_leader, 1 );
+-    } else {
+-	// non-toplevel widgets don't have a frame, so no need to
+-	// update the strut
+-	fstrut_dirty = 0;
+     }
+ 
+     if ( initializeWindow ) {

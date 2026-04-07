@@ -1,0 +1,25 @@
+.TH CVS.SH 5
+.SH NAME
+cvs.sh \- Bourne shell log-in script for CVS users
+.SH SYNOPSIS
+.B /etc/profile.d/cvs.sh
+.SH DESCRIPTION
+The
+.B cvs.sh
+script is sourced when a user of a Bourne log-in shell is logged in. The
+purpose is to set
+.B CVS_RSH
+environment variable, so that a cvs user connecting to a remote CVS server
+utilizes SSH-secured connection by default.
+.SH EXAMPLE
+.PP
+export CVS_RSH=${CVS_RSH-ssh}
+.SH FILES
+.PD 0
+.TP 20
+.B /etc/profile.d/cvs.sh
+.PD
+.SH SEE ALSO
+.BR cvs (1),
+.BR bash (1),
+.BR ssh (1).

@@ -1,0 +1,153 @@
+From 7f81fcc091d0ed10e7ef0607d45710070d0c5f21 Mon Sep 17 00:00:00 2001
+From: Sebastian Pipping <sebastian@pipping.org>
+Date: Fri, 21 Nov 2025 19:51:09 +0100
+Subject: [PATCH 1/3] Bio/Entrez/Parser.py: Enforce TLS/SSL with DTD downloads
+
+---
+ Bio/Entrez/Parser.py | 24 +++++++++++++++++++++++-
+ 1 file changed, 23 insertions(+), 1 deletion(-)
+
+diff --git a/Bio/Entrez/Parser.py b/Bio/Entrez/Parser.py
+index dd401a22ec4..4281f69e93a 100644
+--- a/Bio/Entrez/Parser.py
++++ b/Bio/Entrez/Parser.py
+@@ -40,6 +40,7 @@
+ 
+ import os
+ import warnings
++import urllib
+ import xml.etree.ElementTree as ET
+ from collections import Counter
+ from io import BytesIO
+@@ -1128,7 +1129,7 @@ def externalEntityRefHandler(self, context, base, systemId, publicId):
+             # DTD is not available as a local file. Try accessing it through
+             # the internet instead.
+             try:
+-                handle = urlopen(url)
++                handle = urlopen(with_tls(url))
+             except OSError:
+                 raise RuntimeError(f"Failed to access {filename} at {url}") from None
+             text = handle.read()
+@@ -1143,3 +1144,24 @@ def externalEntityRefHandler(self, context, base, systemId, publicId):
+         self.dtd_urls.pop()
+         self.parser.StartElementHandler = self.startElementHandler
+         return 1
++
++
++def with_tls(url: str) -> str:
++    """Activates TLS/SSL for the given URL, if not already active."""
++    parsed = urllib.parse.urlparse(url)
++
++    new_scheme = {
++        "http": "https",
++        "ftp": "ftps",
++    }.get(parsed.scheme, parsed.scheme)
++
++    return urllib.parse.urlunparse(
++        (
++            new_scheme,
++            parsed.netloc,
++            parsed.path,
++            parsed.params,
++            parsed.query,
++            parsed.fragment,
++        )
++    )
+
+From 3f4acf73b9ba8493fa26faf136b76470e5a447af Mon Sep 17 00:00:00 2001
+From: Sebastian Pipping <sebastian@pipping.org>
+Date: Fri, 21 Nov 2025 20:02:55 +0100
+Subject: [PATCH 2/3] Bio/Entrez/Parser.py: Enforce TLS/SSL with XSD downloads
+
+---
+ Bio/Entrez/Parser.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Bio/Entrez/Parser.py b/Bio/Entrez/Parser.py
+index 4281f69e93a..f29c039de7c 100644
+--- a/Bio/Entrez/Parser.py
++++ b/Bio/Entrez/Parser.py
+@@ -582,7 +582,7 @@ def schemaHandler(self, name, attrs):
+         handle = self.open_xsd_file(os.path.basename(schema))
+         # if there is no local xsd file grab the url and parse the file
+         if not handle:
+-            handle = urlopen(schema)
++            handle = urlopen(with_tls(schema))
+             text = handle.read()
+             self.save_xsd_file(os.path.basename(schema), text)
+             handle.close()
+
+From 865768774af6043a6913d826d7899622345e8678 Mon Sep 17 00:00:00 2001
+From: Sebastian Pipping <sebastian@pipping.org>
+Date: Fri, 21 Nov 2025 19:51:16 +0100
+Subject: [PATCH 3/3] Tests/test_Entrez_parser.py: Cover enforcement of TLS/SSL
+ with DTD downloads
+
+---
+ Tests/test_Entrez_parser.py | 46 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
+
+diff --git a/Tests/test_Entrez_parser.py b/Tests/test_Entrez_parser.py
+index fa7b4ee4821..f5bb29ebfa4 100644
+--- a/Tests/test_Entrez_parser.py
++++ b/Tests/test_Entrez_parser.py
+@@ -9,6 +9,9 @@
+ import pickle
+ import unittest
+ from io import BytesIO
++from textwrap import dedent
++from unittest.mock import Mock, patch
++from urllib.parse import urlparse
+ 
+ from Bio import Entrez
+ from Bio import StreamModeError
+@@ -12347,6 +12350,49 @@ def test_truncated_xml(self):
+         self.assertRaises(CorruptedXMLError, next, records)
+ 
+ 
++class TlsEnforcementTest(unittest.TestCase):
++    """Test for DTD downloads enforcing TLS/SSL."""
++
++    def test_tls_enforced(self):
++        content = (
++            dedent(
++                """\
++                <?xml version="1.0"?>
++                <!DOCTYPE eInfoResult PUBLIC "-//NLM//DTD eInfoResult, 11 May 2002//EN"
++                    "https://www.ncbi.nlm.nih.gov/entrez/query/DTD/eInfo_020511.dtd">
++                <eInfoResult />
++                """
++            )
++            .replace("https", "http")
++            .encode("utf-8")
++        )
++
++        self.assertIn(b"http:", content)  # self-test, without TLS
++
++        handler = Entrez.Parser.DataHandler(
++            validate=True, escape=False, ignore_errors=False
++        )
++
++        handler.open_dtd_file = Mock(return_value=None)  # i.e. bypass cache read
++        handler.save_dtd_file = Mock()  # i.e. bypass cache write
++
++        mock_urlopen = Mock(
++            return_value=Mock(
++                read=Mock(return_value=b"<!ELEMENT eInfoResult (DbList|DbInfo|ERROR)>")
++            )
++        )
++
++        with patch("Bio.Entrez.Parser.urlopen", mock_urlopen):
++            handler.read(BytesIO(content))
++
++        expected_schemes = ["https"]  # i.e. now with TLS
++        actual_schemes = [
++            urlparse(call_.args[0]).scheme for call_ in mock_urlopen.call_args_list
++        ]
++
++        self.assertEqual(actual_schemes, expected_schemes)
++
++
+ if __name__ == "__main__":
+     runner = unittest.TextTestRunner(verbosity=2)
+     unittest.main(testRunner=runner)

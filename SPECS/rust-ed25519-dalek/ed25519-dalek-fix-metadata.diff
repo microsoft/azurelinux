@@ -1,0 +1,44 @@
+--- ed25519-dalek-2.2.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ ed25519-dalek-2.2.0/Cargo.toml	2026-01-03T00:41:00.167202+00:00
+@@ -128,12 +128,6 @@
+ name = "x25519"
+ path = "tests/x25519.rs"
+ 
+-[[bench]]
+-name = "ed25519_benchmarks"
+-path = "benches/ed25519_benchmarks.rs"
+-harness = false
+-required-features = ["rand_core"]
+-
+ [dependencies.curve25519-dalek]
+ version = "4"
+ features = ["digest"]
+@@ -181,10 +175,6 @@
+ 
+ [dev-dependencies.blake2]
+ version = "0.10"
+-
+-[dev-dependencies.criterion]
+-version = "0.5"
+-features = ["html_reports"]
+ 
+ [dev-dependencies.curve25519-dalek]
+ version = "4"
+@@ -198,7 +188,7 @@
+ version = "0.4"
+ 
+ [dev-dependencies.hex-literal]
+-version = "0.4"
++version = ">=0.4, <2.0"
+ 
+ [dev-dependencies.rand]
+ version = "0.8"
+@@ -218,7 +208,7 @@
+ version = "0.10"
+ 
+ [dev-dependencies.toml]
+-version = "0.7"
++version = "0.9"
+ 
+ [dev-dependencies.x25519-dalek]
+ version = "2"

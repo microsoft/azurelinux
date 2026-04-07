@@ -1,0 +1,35 @@
+From ccd4be5043628c4389230b4c012a7115b8e44c81 Mon Sep 17 00:00:00 2001
+From: Jeremy Daer <jeremy@rubyonrails.org>
+Date: Fri, 1 Mar 2024 13:16:03 -0800
+Subject: [PATCH] Limit Rack::Lint::InputWrapper test to Rack 2
+
+---
+ test/mime_type_test.rb | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/test/mime_type_test.rb b/test/mime_type_test.rb
+index 08fa674..a3ce693 100644
+--- a/test/mime_type_test.rb
++++ b/test/mime_type_test.rb
+@@ -38,10 +38,19 @@ def setup
+     assert_equal "image/gif", content_type
+   end
+ 
+-  test "gets content type from sources that conform to Rack::Lint::InputWrapper" do
++  test "gets content type from sources that conform to Rack RewindableInput" do
+     io = StringIO.new(File.read(@path))
+-    wrapper = Rack::Lint::InputWrapper.new(io)
++    wrapper = Rack::RewindableInput.new(io)
+     content_type = Marcel::MimeType.for wrapper
+     assert_equal "image/gif", content_type
+   end
++
++  if Rack::Lint.const_defined?(:InputWrapper)
++    test "gets content type from sources that conform to Rack 2's Rack::Lint::InputWrapper" do
++      io = StringIO.new(File.read(@path))
++      wrapper = Rack::Lint::InputWrapper.new(io)
++      content_type = Marcel::MimeType.for wrapper
++      assert_equal "image/gif", content_type
++    end
++  end
+ end

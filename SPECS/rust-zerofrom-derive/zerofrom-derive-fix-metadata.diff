@@ -1,0 +1,13 @@
+--- zerofrom-derive-0.1.6/Cargo.toml	1970-01-01T00:00:01+00:00
++++ zerofrom-derive-0.1.6/Cargo.toml	2025-02-26T19:57:55.695693+00:00
+@@ -45,10 +45,6 @@
+ path = "src/lib.rs"
+ proc-macro = true
+ 
+-[[example]]
+-name = "zf_derive"
+-path = "examples/zf_derive.rs"
+-
+ [dependencies.proc-macro2]
+ version = "1.0.61"
+ 

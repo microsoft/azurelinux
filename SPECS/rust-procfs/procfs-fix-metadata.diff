@@ -1,0 +1,17 @@
+--- procfs-0.18.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ procfs-0.18.0/Cargo.toml	2026-01-04T20:43:22.856109+00:00
+@@ -178,14 +178,5 @@
+ features = ["derive"]
+ optional = true
+ 
+-[dev-dependencies.criterion]
+-version = "0.5"
+-
+-[dev-dependencies.failure]
+-version = "0.1"
+-
+ [dev-dependencies.libc]
+ version = "0.2.139"
+-
+-[dev-dependencies.procinfo]
+-version = "0.4.2"

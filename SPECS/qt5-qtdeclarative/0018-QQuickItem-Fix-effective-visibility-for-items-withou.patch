@@ -1,0 +1,81 @@
+From 63bced2b449bd235a2f0b4313662ac8600a49dd7 Mon Sep 17 00:00:00 2001
+From: Volker Hilsheimer <volker.hilsheimer@qt.io>
+Date: Fri, 18 Nov 2022 14:20:20 +0100
+Subject: [PATCH 18/22] QQuickItem: Fix effective visibility for items without
+ parent
+
+Items are visible if they are children of a visible parent, and not
+explicitly hidden. The effectiveVisible member stores the state and is
+updated when conditions that impact the item visibility changes.
+
+The old code returned true for items outside a visual hierarchy, which
+broke signal emission when items were removed from a parent, e.g.
+because the parent got destroyed. With this change, items removed from
+a visual hierarchy will emit the visibleChanged signal.
+
+Note: QQuickItem initializes the effectiveVisible member to true, even
+if the item was created without parent item. Visual items are required
+to be added to a visual hierarchy via setParentItem. For this reason,
+newly created items never emit visibleChanged when they are added to
+a parent.
+
+Adjust the QQuickItem::visible test - it creates an item hierarchy
+without window. Such items are never visible, so add a window and
+parent the test item hierarchy to the window's content item.
+
+This fixes the expected failures in the tests. It does introduce an
+incompatibility with QGraphicsView and QGraphicsItem, which continue
+to return true from QGraphicsItem::isVisible for items that are not
+in an item hierarchy.
+
+[ChangeLog][Qt Quick][QQuickItem] The visible property of Items without
+a parent now always returns false, and the visibleChanged signal gets
+emitted when the parent item of a visible item becomes null.
+
+Fixes: QTBUG-108213
+Change-Id: If4b2947cefd1407853f0f29e6c3fdbd49fc9af65
+Reviewed-by: Fabian Kosmale <fabian.kosmale@qt.io>
+Reviewed-by: Shawn Rutledge <shawn.rutledge@qt.io>
+(cherry picked from commit d1b9a4cacfb966cf0a37983d8f8044f3aedf5de3)
+
+CCBUG: 467909
+CCBUG: 396359
+---
+ src/quick/items/qquickitem.cpp                 | 6 ++----
+ tests/auto/quick/qquickitem/tst_qquickitem.cpp | 2 ++
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/quick/items/qquickitem.cpp b/src/quick/items/qquickitem.cpp
+index 8b139cb539..a5e91b2b61 100644
+--- a/src/quick/items/qquickitem.cpp
++++ b/src/quick/items/qquickitem.cpp
+@@ -6082,10 +6082,8 @@ void QQuickItem::setEnabled(bool e)
+ 
+ bool QQuickItemPrivate::calcEffectiveVisible() const
+ {
+-    // XXX todo - Should the effective visible of an element with no parent just be the current
+-    // effective visible?  This would prevent pointless re-processing in the case of an element
+-    // moving to/from a no-parent situation, but it is different from what graphics view does.
+-    return explicitVisible && (!parentItem || QQuickItemPrivate::get(parentItem)->effectiveVisible);
++    // An item is visible if it is a child of a visible parent, and not explicitly hidden.
++    return explicitVisible && parentItem && QQuickItemPrivate::get(parentItem)->effectiveVisible;
+ }
+ 
+ bool QQuickItemPrivate::setEffectiveVisibleRecur(bool newEffectiveVisible)
+diff --git a/tests/auto/quick/qquickitem/tst_qquickitem.cpp b/tests/auto/quick/qquickitem/tst_qquickitem.cpp
+index 42348d8dd1..34eefd85e6 100644
+--- a/tests/auto/quick/qquickitem/tst_qquickitem.cpp
++++ b/tests/auto/quick/qquickitem/tst_qquickitem.cpp
+@@ -989,7 +989,9 @@ void tst_qquickitem::setParentItem()
+ 
+ void tst_qquickitem::visible()
+ {
++    QQuickWindow window;
+     QQuickItem *root = new QQuickItem;
++    root->setParentItem(window.contentItem());
+ 
+     QQuickItem *child1 = new QQuickItem;
+     child1->setParentItem(root);
+-- 
+2.51.1
+

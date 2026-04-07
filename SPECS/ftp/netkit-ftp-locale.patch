@@ -1,0 +1,18 @@
+--- netkit-ftp-0.17/ftp/main.c.locale	2004-12-15 16:52:14.504193752 +0000
++++ netkit-ftp-0.17/ftp/main.c	2004-12-15 16:52:51.719133655 +0000
+@@ -51,6 +51,7 @@
+ 
+ /* #include <arpa/ftp.h>	<--- unused? */
+ 
++#include <locale.h>
+ #include <signal.h>
+ #include <unistd.h>
+ #include <string.h>
+@@ -109,6 +110,7 @@
+ 
+ 	tick = 0;
+ 
++	setlocale (LC_ALL, "");
+ 	sp = getservbyname("ftp", "tcp");
+ 	if (sp == 0) {
+ 		fprintf(stderr, "ftp: ftp/tcp: unknown service\n");

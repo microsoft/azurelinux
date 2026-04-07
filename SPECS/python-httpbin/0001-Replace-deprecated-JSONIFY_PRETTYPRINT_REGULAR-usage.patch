@@ -1,0 +1,30 @@
+From a576ebe2a82d3bc5c8d4cf05d3f077e23f34c114 Mon Sep 17 00:00:00 2001
+From: Adam Williamson <awilliam@redhat.com>
+Date: Tue, 17 Oct 2023 18:42:22 -0700
+Subject: [PATCH] Replace deprecated JSONIFY_PRETTYPRINT_REGULAR usage
+
+This was deprecated in 2.2.0, and is gone in 2.3.0. We already
+require 2.2.4 or higher. The deprecation notice says to set
+`app.json.compact` instead, so we'll do that!
+
+Signed-off-by: Adam Williamson <awilliam@redhat.com>
+---
+ httpbin/core.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/httpbin/core.py b/httpbin/core.py
+index a82c1b8..aef8262 100644
+--- a/httpbin/core.py
++++ b/httpbin/core.py
+@@ -89,7 +89,7 @@ tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")
+ 
+ app = Flask(__name__, template_folder=tmpl_dir)
+ app.debug = bool(os.environ.get("DEBUG"))
+-app.config["JSONIFY_PRETTYPRINT_REGULAR"] = True
++app.json.compact = False
+ 
+ app.add_template_global("HTTPBIN_TRACKING" in os.environ, name="tracking_enabled")
+ 
+-- 
+2.41.0
+

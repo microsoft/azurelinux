@@ -1,0 +1,63 @@
+From b8a1900a623555186971957a4f15acaf63fcb680 Mon Sep 17 00:00:00 2001
+From: James Zern <jzern@google.com>
+Date: Wed, 30 Apr 2025 19:28:48 -0700
+Subject: [PATCH] vpx_codec_enc_init_multi: fix double free on init failure
+
+In `vp8e_init()`, the encoder would take ownership of
+`mr_cfg.mr_low_res_mode_info` even if `vp8_create_compressor()` failed.
+This caused confusion at the call site as other failures in
+`vp8e_init()` did not result in ownership transfer and the caller would
+free the memory. In the case of `vp8_create_compressor()` failure both
+the caller and `vpx_codec_destroy()` would free the memory, causing a
+crash. `mr_*` related variables are now cleared on failure to prevent
+this situation.
+
+Bug: webm:413411335
+Bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1962421
+Change-Id: Ie951d42b9029a586bf9059b650bd8863db9f9ffc
+(cherry picked from commit 1c758781c428c0e895645b95b8ff1512b6bdcecb)
+---
+ vp8/vp8_cx_iface.c    | 12 +++++++++++-
+ vpx/src/vpx_encoder.c |  3 +++
+ 2 files changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/vp8/vp8_cx_iface.c b/vp8/vp8_cx_iface.c
+index 38456d2b9..35c94fb04 100644
+--- a/vp8/vp8_cx_iface.c
++++ b/vp8/vp8_cx_iface.c
+@@ -732,7 +732,17 @@ static vpx_codec_err_t vp8e_init(vpx_codec_ctx_t *ctx,
+ 
+       set_vp8e_config(&priv->oxcf, priv->cfg, priv->vp8_cfg, mr_cfg);
+       priv->cpi = vp8_create_compressor(&priv->oxcf);
+-      if (!priv->cpi) res = VPX_CODEC_MEM_ERROR;
++      if (!priv->cpi) {
++#if CONFIG_MULTI_RES_ENCODING
++        // Release ownership of mr_cfg->mr_low_res_mode_info on failure. This
++        // prevents ownership confusion with the caller and avoids a double
++        // free when vpx_codec_destroy() is called on this instance.
++        priv->oxcf.mr_total_resolutions = 0;
++        priv->oxcf.mr_encoder_id = 0;
++        priv->oxcf.mr_low_res_mode_info = NULL;
++#endif
++        res = VPX_CODEC_MEM_ERROR;
++      }
+     }
+   }
+ 
+diff --git a/vpx/src/vpx_encoder.c b/vpx/src/vpx_encoder.c
+index 001d854ab..3af4cea3a 100644
+--- a/vpx/src/vpx_encoder.c
++++ b/vpx/src/vpx_encoder.c
+@@ -114,6 +114,9 @@ vpx_codec_err_t vpx_codec_enc_init_multi_ver(
+           ctx->priv = NULL;
+           ctx->init_flags = flags;
+           ctx->config.enc = cfg;
++          // ctx takes ownership of mr_cfg.mr_low_res_mode_info if and only if
++          // this call succeeds. The first ctx entry in the array is
++          // responsible for freeing the memory.
+           res = ctx->iface->init(ctx, &mr_cfg);
+         }
+ 
+-- 
+2.49.0
+

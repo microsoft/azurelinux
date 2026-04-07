@@ -1,0 +1,15 @@
+diff -up ply-3.11/test/testyacc.py.315 ply-3.11/test/testyacc.py
+--- ply-3.11/test/testyacc.py.315	2025-12-18 10:26:56.257393912 -0500
++++ ply-3.11/test/testyacc.py	2025-12-18 10:28:21.171945680 -0500
+@@ -22,7 +22,10 @@ def make_pymodule_path(filename):
+     file = os.path.basename(filename)
+     mod, ext = os.path.splitext(file)
+ 
+-    if sys.hexversion >= 0x3040000:
++    if sys.hexversion >= 0x3050000:
++        import importlib.util
++        fullpath = importlib.util.cache_from_source(filename)
++    elif sys.hexversion >= 0x3040000:
+         import importlib.util
+         fullpath = importlib.util.cache_from_source(filename, ext=='.pyc')
+     elif sys.hexversion >= 0x3020000:

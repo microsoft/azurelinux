@@ -1,0 +1,42 @@
+--- a/telnetd/telnetd.c
++++ b/telnetd/telnetd.c
+@@ -772,7 +772,6 @@ void telnet(int f, int p)
+     int on = 1;
+     char *HE;
+     const char *IM;
+-    int pty_read_ok = 0; /* track whether the pty read has worked yet */
+ 
+     /*
+      * Initialize the slc mapping table.
+@@ -1086,19 +1085,24 @@ void telnet(int f, int p)
+ 	 * Something to read from the pty...
+ 	 */
+ 	if (FD_ISSET(p, &ibits)) {
++	    int eio = 0;
++read_pty:
+ 	    pcc = read(p, ptyibuf, BUFSIZ);
+-	    /*
+-	     * On some systems, if we try to read something
+-	     * off the master side before the slave side is
+-	     * opened, we get EIO.
+-	     */
+-	    if (pcc < 0 && (errno == EWOULDBLOCK || (errno == EIO && pty_read_ok == 0))) {
++	    if (pcc < 0 && errno == EWOULDBLOCK) {
+ 		pcc = 0;
+ 	    } 
++	    /*
++	     * If we try to read something off the master side while the slave
++	     * side is temporarily closed by login process, we get EIO.
++	     */
++	    else if (pcc < 0 && errno == EIO && eio < 1000) {
++		    eio++;
++		    poll(NULL, 0, 10);
++		    goto read_pty;
++	    }
+ 	    else {
+ 		if (pcc <= 0)
+ 		    break;
+-		pty_read_ok = 1;	/* mark connection up for read */
+ #ifdef	LINEMODE
+ 				/*
+ 				 * If ioctl from pty, pass it through net

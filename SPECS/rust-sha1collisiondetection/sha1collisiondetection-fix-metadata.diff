@@ -1,0 +1,19 @@
+--- sha1collisiondetection-0.3.4/Cargo.toml	1970-01-01T00:00:01+00:00
++++ sha1collisiondetection-0.3.4/Cargo.toml	2025-12-03T20:43:49.130370+00:00
+@@ -26,6 +26,7 @@
+     "/vs2015/",
+     "/compile_commands.json",
+     "/Makefile",
++    "/test/",
+     "/test-sha1sum-protocol.sh",
+     "/*.yml",
+ ]
+@@ -89,7 +90,7 @@
+ version = "0.2"
+ 
+ [dev-dependencies.hex-literal]
+-version = "0.4"
++version = ">=0.4, <2.0"
+ 
+ [dev-dependencies.sha1]
+ version = "0.10"

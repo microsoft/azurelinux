@@ -1,0 +1,65 @@
+From 98cd707e8106e9e77b179bccbeb4fd4004b4c601 Mon Sep 17 00:00:00 2001
+From: Petr Lautrbach <lautrbach@redhat.com>
+Date: Mon, 5 May 2025 18:28:40 +0200
+Subject: [PATCH] sepolicy: Fix detection of writeable locations
+
+- update substitutions from /etc/dnf/var
+
+It seems that by default dnf api does not read /etc/dnf/var/* files to
+update substitutions and so it can't resolve correct mirror list when a
+variable is part of the link.
+
+- alway run query.run()
+
+Fixes:
+    Traceback (most recent call last):
+      File "/usr/lib/python3.12/site-packages/dnf/repo.py", line 574, in load
+        ret = self._repo.load()
+              ^^^^^^^^^^^^^^^^^
+      File "/usr/lib64/python3.12/site-packages/libdnf/repo.py", line 467, in load
+        return _repo.Repo_load(self)
+               ^^^^^^^^^^^^^^^^^^^^^
+    libdnf._error.Error: Failed to download metadata for repo 'baseos':
+    Cannot prepare internal mirrorlist: Status code: 404 for
+    https://mirrors.centos.org/metalink?repo=centos-baseos-$stream&arch=x86_64&protocol=https,http (IP:152.19.134.198)
+
+Signed-off-by: Petr Lautrbach <lautrbach@redhat.com>
+---
+ python/sepolicy/sepolicy/generate.py | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/python/sepolicy/sepolicy/generate.py b/python/sepolicy/sepolicy/generate.py
+index f726ad51..a0314a70 100644
+--- a/python/sepolicy/sepolicy/generate.py
++++ b/python/sepolicy/sepolicy/generate.py
+@@ -1267,15 +1267,15 @@ allow %s_t %s_t:%s_socket name_%s;
+         import dnf
+ 
+         with dnf.Base() as base:
++            base.conf.substitutions.update_from_etc('/')
+             base.read_all_repos()
+             base.fill_sack(load_system_repo=True)
+ 
+             query = base.sack.query()
+ 
+-            pq = query.available()
+-            pq = pq.filter(file=self.program)
++            pq = query.filter(file=self.program)
+ 
+-            for pkg in pq:
++            for pkg in pq.run():
+                 self.rpms.append(pkg.name)
+                 for fname in pkg.files:
+                     for b in self.DEFAULT_DIRS:
+@@ -1288,7 +1288,7 @@ allow %s_t %s_t:%s_socket name_%s;
+                                 self.add_dir(fname)
+                 sq = query.available()
+                 sq = sq.filter(provides=pkg.source_name)
+-                for bpkg in sq:
++                for bpkg in sq.run():
+                     for fname in bpkg.files:
+                         for b in self.DEFAULT_DIRS:
+                             if b == "/etc":
+-- 
+2.49.0
+

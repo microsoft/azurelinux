@@ -1,0 +1,142 @@
+From 4d44531c8f624f5b479c3ff23e8fecc67eb848ab Mon Sep 17 00:00:00 2001
+From: Jeremy Linton <jeremy.linton@arm.com>
+Date: Fri, 22 Oct 2021 14:51:54 -0500
+Subject: [PATCH] Delay for logind, and fallback to seat0
+
+There is systemd/logind race with when restarting
+sddm that causes logind1 not to be available. Previously
+this meant the seat0 was immediately created regardless
+of the state of CanGraphical.
+
+Fixing this, though we still want seat0 to be started
+if none of the seats appear to be graphical. Presumably
+there are some graphics on the machine, otherwise
+why run sddm? Wait a bit, and create seat0 anyway. If
+this fails the output from Xorg should tell us why. This
+is generally a better strategy than what happens a good
+amount of time now, where sddm is started and silent about
+why the screen is blank.
+
+References:
+* https://bugzilla.redhat.com/2011991
+* https://bugzilla.redhat.com/2016310
+
+Signed-off-by: Jeremy Linton <jeremy.linton@arm.com>
+---
+ src/daemon/LogindDBusTypes.cpp | 31 +++++++++++++++++++++----------
+ src/daemon/SeatManager.cpp     | 22 ++++++++++++++++++++++
+ src/daemon/SeatManager.h       |  1 +
+ 3 files changed, 44 insertions(+), 10 deletions(-)
+
+diff --git a/src/daemon/LogindDBusTypes.cpp b/src/daemon/LogindDBusTypes.cpp
+index 011bb7f..6255c69 100644
+--- a/src/daemon/LogindDBusTypes.cpp
++++ b/src/daemon/LogindDBusTypes.cpp
+@@ -8,6 +8,8 @@
+ 
+ #include <QDebug>
+ 
++#include <unistd.h>
++
+ class LogindPathInternal {
+ public:
+     LogindPathInternal();
+@@ -46,17 +48,26 @@ LogindPathInternal::LogindPathInternal()
+     qRegisterMetaType<UserInfoList>("UserInfoList");
+     qDBusRegisterMetaType<UserInfoList>();
+ 
+-    if (QDBusConnection::systemBus().interface()->isServiceRegistered(QStringLiteral("org.freedesktop.login1"))) {
+-        qDebug() << "Logind interface found";
+-        available = true;
+-        serviceName = QStringLiteral("org.freedesktop.login1");
+-        managerPath = QStringLiteral("/org/freedesktop/login1");
+-        managerIfaceName = QStringLiteral("org.freedesktop.login1.Manager");
+-        seatIfaceName = QStringLiteral("org.freedesktop.login1.Seat");
+-        sessionIfaceName = QStringLiteral("org.freedesktop.login1.Session");
+-        userIfaceName = QStringLiteral("org.freedesktop.login1.User");
+-        return;
++#ifdef HAVE_SYSTEMD
++    // systemd-logind should be running, although because it takes a few moments to restart after
++    // systemctl isolate calls, it may not yet be running. Wait a few seconds for it, while blocking everything else.
++    int logind_wait_seconds = 50;
++    while (logind_wait_seconds--) {
++        if (QDBusConnection::systemBus().interface()->isServiceRegistered(QStringLiteral("org.freedesktop.login1"))) {
++            qDebug() << "Logind interface found";
++            available = true;
++            serviceName = QStringLiteral("org.freedesktop.login1");
++            managerPath = QStringLiteral("/org/freedesktop/login1");
++            managerIfaceName = QStringLiteral("org.freedesktop.login1.Manager");
++            seatIfaceName = QStringLiteral("org.freedesktop.login1.Seat");
++            sessionIfaceName = QStringLiteral("org.freedesktop.login1.Session");
++            userIfaceName = QStringLiteral("org.freedesktop.login1.User");
++            return;
++        }
++	qDebug() << "Sleeping for systemd-logind";
++	usleep(100000);
+     }
++#endif
+ 
+     if (QDBusConnection::systemBus().interface()->isServiceRegistered(QStringLiteral("org.freedesktop.ConsoleKit"))) {
+         qDebug() << "Console kit interface found";
+diff --git a/src/daemon/SeatManager.cpp b/src/daemon/SeatManager.cpp
+index bd207e6..39d8b85 100644
+--- a/src/daemon/SeatManager.cpp
++++ b/src/daemon/SeatManager.cpp
+@@ -26,6 +26,9 @@
+ #include <QDBusMessage>
+ #include <QDBusPendingReply>
+ #include <QDBusContext>
++#include <QDebug>
++#include <QFileInfo>
++#include <QTimer>
+ 
+ #include "LogindDBusTypes.h"
+ 
+@@ -115,6 +118,8 @@ namespace SDDM {
+ 
+         QDBusConnection::systemBus().connect(Logind::serviceName(), Logind::managerPath(), Logind::managerIfaceName(), QStringLiteral("SeatNew"), this, SLOT(logindSeatAdded(QString,QDBusObjectPath)));
+         QDBusConnection::systemBus().connect(Logind::serviceName(), Logind::managerPath(), Logind::managerIfaceName(), QStringLiteral("SeatRemoved"), this, SLOT(logindSeatRemoved(QString,QDBusObjectPath)));
++
++	QTimer::singleShot(5000, this, &SeatManager::checkSeat);
+     }
+ 
+     void SeatManager::createSeat(const QString &name) {
+@@ -152,6 +157,23 @@ namespace SDDM {
+         m_seats.value(name)->createDisplay(Display::defaultDisplayServerType());
+     }
+ 
++    // this is a bit hacky, but linux DRM drivers
++    // won't initially be available so there is a race
++    // between determing if a efifb/etc graphical object
++    // is the only graphics on the machine, or a DRM driver
++    // will take over the display. So we will hang out for a few
++    // seconds and if none of the seats are declared cangraphical
++    // its possible the only graphics on the machine don't have
++    // a drm driver.
++    void SeatManager::checkSeat(void) {
++        if (m_seats.isEmpty()) {
++	     //if (QFileInfo::exists(QStringLiteral("/dev/fb0"))) {
++                 qWarning() << "No graphical seats found, attempt to start one on the main console anyway...";
++                 createSeat(QStringLiteral("seat0"));
++	     //}
++        }
++    }
++
+     void SDDM::SeatManager::logindSeatAdded(const QString& name, const QDBusObjectPath& objectPath)
+     {
+         auto logindSeat = new LogindSeat(name, objectPath);
+diff --git a/src/daemon/SeatManager.h b/src/daemon/SeatManager.h
+index b2f9796..aa43047 100644
+--- a/src/daemon/SeatManager.h
++++ b/src/daemon/SeatManager.h
+@@ -49,6 +49,7 @@ namespace SDDM {
+     private:
+         QHash<QString, Seat *> m_seats; //these will exist only for graphical seats
+         QHash<QString, LogindSeat*> m_systemSeats; //these will exist for all seats
++        void checkSeat(void);
+     };
+ }
+ 
+-- 
+2.39.2
+

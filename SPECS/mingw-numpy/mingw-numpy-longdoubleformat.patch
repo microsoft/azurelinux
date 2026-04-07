@@ -1,0 +1,20 @@
+diff -rupN --no-dereference numpy-2.3.3/meson.options numpy-2.3.3-new/meson.options
+--- numpy-2.3.3/meson.options	2025-09-07 03:26:27.000000000 +0200
++++ numpy-2.3.3-new/meson.options	2025-09-14 16:55:17.595373962 +0200
+@@ -42,3 +42,4 @@ option('test-simd', type: 'array',
+         description: 'Specify a list of CPU features to be tested against NumPy SIMD interface')
+ option('test-simd-args', type: 'string', value: '',
+         description: 'Extra args to be passed to the `_simd` module that is used for testing the NumPy SIMD interface')
++option('longdouble_format', type: 'string', value: '', description: 'The longdouble format string')
+diff -rupN --no-dereference numpy-2.3.3/numpy/_core/meson.build numpy-2.3.3-new/numpy/_core/meson.build
+--- numpy-2.3.3/numpy/_core/meson.build	2025-09-07 03:26:27.000000000 +0200
++++ numpy-2.3.3-new/numpy/_core/meson.build	2025-09-14 16:55:17.595715525 +0200
+@@ -436,7 +436,7 @@ endforeach
+ # https://github.com/numpy/numpy/blob/eead09a3d02c09374942cdc787c0b5e4fe9e7472/numpy/core/setup_common.py#L264-L434
+ # This port is in service of solving gh-23972
+ # as well as https://github.com/mesonbuild/meson/issues/11068
+-longdouble_format = meson.get_external_property('longdouble_format', 'UNKNOWN')
++longdouble_format = meson.get_external_property('longdouble_format', get_option('longdouble_format'))
+ if longdouble_format == 'UNKNOWN'
+   longdouble_format = meson.get_compiler('c').run(
+ '''

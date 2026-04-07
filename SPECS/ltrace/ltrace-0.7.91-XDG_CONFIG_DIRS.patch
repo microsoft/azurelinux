@@ -1,0 +1,151 @@
+diff -rupN a/options.c b/options.c
+--- a/options.c	2019-06-28 17:15:31.515626363 -0400
++++ b/options.c	2019-06-28 17:18:59.490632337 -0400
+@@ -440,7 +440,8 @@ parse_int(const char *optarg, char opt,
+ }
+ 
+ int
+-parse_colon_separated_list(const char *paths, struct vect *vec)
++parse_colon_separated_list(const char *paths, struct vect *vec,
++			   enum opt_F_origin origin)
+ {
+ 	/* PATHS contains a colon-separated list of directories and
+ 	 * files to load.  It's modeled after shell PATH variable,
+@@ -467,6 +468,7 @@ parse_colon_separated_list(const char *p
+ 		struct opt_F_t arg = {
+ 			.pathname = tok,
+ 			.own_pathname = tok == clone,
++			.origin = origin,
+ 		};
+ 		if (VECT_PUSHBACK(vec, &arg) < 0)
+ 			/* Presumably this is not a deal-breaker.  */
+@@ -494,16 +496,18 @@ opt_F_get_kind(struct opt_F_t *entry)
+ 	if (entry->kind == OPT_F_UNKNOWN) {
+ 		struct stat st;
+ 		if (lstat(entry->pathname, &st) < 0) {
+-			fprintf(stderr, "Couldn't stat %s: %s\n",
+-				entry->pathname, strerror(errno));
++			if (entry->origin == OPT_F_CMDLINE)
++				fprintf(stderr, "Couldn't stat %s: %s\n",
++					entry->pathname, strerror(errno));
+ 			entry->kind = OPT_F_BROKEN;
+ 		} else if (S_ISDIR(st.st_mode)) {
+ 			entry->kind = OPT_F_DIR;
+ 		} else if (S_ISREG(st.st_mode) || S_ISLNK(st.st_mode)) {
+ 			entry->kind = OPT_F_FILE;
+ 		} else {
+-			fprintf(stderr, "%s is neither a regular file, "
+-				"nor a directory.\n", entry->pathname);
++			if (entry->origin == OPT_F_CMDLINE)
++				fprintf(stderr, "%s is neither a regular file, "
++					"nor a directory.\n", entry->pathname);
+ 			entry->kind = OPT_F_BROKEN;
+ 		}
+ 	}
+@@ -607,7 +611,8 @@ process_options(int argc, char **argv)
+ 			options.follow = 1;
+ 			break;
+ 		case 'F':
+-			parse_colon_separated_list(optarg, &opt_F);
++			parse_colon_separated_list(optarg, &opt_F,
++						   OPT_F_CMDLINE);
+ 			break;
+ 		case 'h':
+ 			usage();
+diff -rupN a/options.h b/options.h
+--- a/options.h	2019-06-28 17:15:31.515626363 -0400
++++ b/options.h	2019-06-28 17:18:55.984632238 -0400
+@@ -1,6 +1,6 @@
+ /*
+  * This file is part of ltrace.
+- * Copyright (C) 2012,2013 Petr Machata, Red Hat Inc.
++ * Copyright (C) 2012, 2013, 2015 Petr Machata, Red Hat Inc.
+  * Copyright (C) 2009,2010 Joe Damato
+  * Copyright (C) 1998,2002,2008 Juan Cespedes
+  * Copyright (C) 2006 Ian Wienand
+@@ -77,10 +77,16 @@ enum opt_F_kind {
+ 	OPT_F_DIR,
+ };
+ 
++enum opt_F_origin {
++	OPT_F_CMDLINE = 0,
++	OPT_F_ENVIRON,
++};
++
+ struct opt_F_t {
+ 	char *pathname;
+ 	int own_pathname : 1;
+ 	enum opt_F_kind kind : 2;
++	enum opt_F_origin origin : 1;
+ };
+ 
+ /* If entry->kind is OPT_F_UNKNOWN, figure out whether it should be
+@@ -98,7 +104,8 @@ void opt_F_destroy(struct opt_F_t *entry
+  * The list is split and added to VEC, which shall be a vector
+  * initialized like VECT_INIT(VEC, struct opt_F_t); Returns 0 on
+  * success or a negative value on failure.  */
+-int parse_colon_separated_list(const char *paths, struct vect *vec);
++int parse_colon_separated_list(const char *paths, struct vect *vec,
++			       enum opt_F_origin origin);
+ 
+ /* Vector of struct opt_F_t.  */
+ extern struct vect opt_F;
+diff -rupN a/sysdeps/linux-gnu/hooks.c b/sysdeps/linux-gnu/hooks.c
+--- a/sysdeps/linux-gnu/hooks.c	2013-11-04 20:08:03.000000000 -0500
++++ b/sysdeps/linux-gnu/hooks.c	2019-06-28 17:18:55.989632238 -0400
+@@ -1,6 +1,6 @@
+ /*
+  * This file is part of ltrace.
+- * Copyright (C) 2012, 2013 Petr Machata
++ * Copyright (C) 2012, 2013, 2015 Petr Machata
+  *
+  * This program is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU General Public License as
+@@ -153,7 +153,7 @@ again:
+ 	if (xdg_sys != NULL) {
+ 		struct vect v;
+ 		VECT_INIT(&v, struct opt_F_t);
+-		if (parse_colon_separated_list(xdg_sys, &v) < 0
++		if (parse_colon_separated_list(xdg_sys, &v, OPT_F_ENVIRON) < 0
+ 		    || VECT_EACH(&v, struct opt_F_t, NULL,
+ 				 add_dir_component_cb, &dirs) != NULL)
+ 			fprintf(stderr,
+diff -rupN a/testsuite/ltrace.main/XDG_CONFIG_DIRS.exp b/testsuite/ltrace.main/XDG_CONFIG_DIRS.exp
+--- a/testsuite/ltrace.main/XDG_CONFIG_DIRS.exp	1969-12-31 19:00:00.000000000 -0500
++++ b/testsuite/ltrace.main/XDG_CONFIG_DIRS.exp	2019-06-28 17:18:55.989632238 -0400
+@@ -0,0 +1,35 @@
++# This file is part of ltrace.
++# Copyright (C) 2015 Petr Machata, Red Hat Inc.
++#
++# This program is free software; you can redistribute it and/or
++# modify it under the terms of the GNU General Public License as
++# published by the Free Software Foundation; either version 2 of the
++# License, or (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful, but
++# WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++# General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
++# 02110-1301 USA
++
++set bin [ltraceCompile {} [ltraceSource c {
++    int main() { return 0; }
++}]]
++
++setenv XDG_CONFIG_DIRS "blah"
++ltraceRun -L -- $bin
++unsetenv XDG_CONFIG_DIRS
++
++if {[catch "exec $LTRACE -L -F blah -- $bin" output]} {
++    ltraceMatch [ltraceSource ltrace "$output"] {
++	{blah == 1}
++    }
++} else {
++    fail "expected error message regarding `blah`"
++}
++
++ltraceDone

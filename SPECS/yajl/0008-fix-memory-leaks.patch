@@ -1,0 +1,30 @@
+From 9cb871049261eeda844b8943d15580763a0ac3d3 Mon Sep 17 00:00:00 2001
+From: "zhang.jiujiu" <282627424@qq.com>
+Date: Tue, 7 Dec 2021 22:37:02 +0800
+Subject: [PATCH 8/8] fix memory leaks
+
+(cherry picked from commit 23a122eddaa28165a6c219000adcc31ff9a8a698
+ in https://github.com/openEuler-BaseService)
+
+Fixes: https://github.com/lloyd/yajl/issues/250  (CVE-2023-33460)
+---
+ src/yajl_tree.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/yajl_tree.c b/src/yajl_tree.c
+index 4b3cf2b..56c7012 100644
+--- a/src/yajl_tree.c
++++ b/src/yajl_tree.c
+@@ -449,6 +449,9 @@ yajl_val yajl_tree_parse (const char *input,
+              yajl_tree_free(v);
+         }
+         yajl_free (handle);
++	//If the requested memory is not released in time, it will cause memory leakage
++	if(ctx.root)
++	     yajl_tree_free(ctx.root);
+         return NULL;
+     }
+ 
+-- 
+2.41.0
+

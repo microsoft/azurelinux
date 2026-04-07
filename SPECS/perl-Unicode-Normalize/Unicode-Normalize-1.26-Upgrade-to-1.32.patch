@@ -1,0 +1,927 @@
+From 0850dba96e3cb8ee37fe405b0cf76d7f910e90e4 Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Thu, 18 May 2023 21:02:00 +0200
+Subject: [PATCH] Upgrade to 1.32
+
+---
+ Makefile.PL  | 22 +++++++-------
+ Normalize.pm | 81 +++++++++++++++++++++++++++++++++++++---------------
+ Normalize.xs | 71 ++++++++++++++-------------------------------
+ mkheader     | 20 +++----------
+ t/fcdc.t     | 22 ++------------
+ t/form.t     | 20 +------------
+ t/func.t     | 22 ++------------
+ t/illegal.t  | 22 ++------------
+ t/norm.t     | 24 ++--------------
+ t/null.t     | 11 -------
+ t/partial1.t | 20 +------------
+ t/partial2.t | 24 ++--------------
+ t/proto.t    | 20 +------------
+ t/split.t    | 24 ++--------------
+ t/test.t     | 24 ++--------------
+ t/tie.t      | 20 +------------
+ 16 files changed, 118 insertions(+), 329 deletions(-)
+
+diff --git a/Makefile.PL b/Makefile.PL
+index 18bc2e2..a848b0d 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -1,4 +1,6 @@
+-require 5.006001;
++use strict;
++use warnings;
++
+ use ExtUtils::MakeMaker;
+ 
+ my $clean = {};
+@@ -6,7 +8,7 @@ my $clean = {};
+ my $mm_ver = ExtUtils::MakeMaker->VERSION;
+ 
+ if (-f "Normalize.xs") {
+-    print STDERR "Making header files for XS...\n";
++    print "Making header files for XS...\n";
+ 
+     do './mkheader' or die $@ || "mkheader: $!";
+ 
+@@ -29,14 +31,14 @@ WriteMakefile(
+     'clean'             => $clean,
+     'depend'            => { 'Normalize.o' => '$(H_FILES)' },
+     'PREREQ_PM'         => {
+-        Carp            => 0,
+-        constant        => 0,
+-        DynaLoader      => 0,
+-        Exporter        => 0,
+-        File::Spec      => 0,
+-        strict          => 0,
+-        warnings        => 0,
+-        SelectSaver     => 0,
++        'Carp'          => 0,
++        'constant'      => 0,
++        'DynaLoader'    => 0,
++        'Exporter'      => 0,
++        'File::Spec'    => 0,
++        'strict'        => 0,
++        'warnings'      => 0,
++        'SelectSaver'   => 0,
+     },
+     ($mm_ver < 6.48 ? () : MIN_PERL_VERSION => 5.6.0),
+     ($mm_ver < 6.46 ? () : (META_MERGE => {
+diff --git a/Normalize.pm b/Normalize.pm
+index adf3db5..c8053f7 100644
+--- a/Normalize.pm
++++ b/Normalize.pm
+@@ -1,14 +1,5 @@
+ package Unicode::Normalize;
+ 
+-BEGIN {
+-    unless ('A' eq pack('U', 0x41)) {
+-	die "Unicode::Normalize cannot stringify a Unicode code point\n";
+-    }
+-    unless (0x41 == unpack('U', 'A')) {
+-	die "Unicode::Normalize cannot get Unicode code point\n";
+-    }
+-}
+-
+ use 5.006;
+ use strict;
+ use warnings;
+@@ -16,7 +7,7 @@ use Carp;
+ 
+ no warnings 'utf8';
+ 
+-our $VERSION = '1.26';
++our $VERSION = '1.32';
+ our $PACKAGE = __PACKAGE__;
+ 
+ our @EXPORT = qw( NFC NFD NFKC NFKD );
+@@ -40,16 +31,58 @@ our %EXPORT_TAGS = (
+ ## utilities for tests
+ ##
+ 
+-sub pack_U {
+-    return pack('U*', @_);
++                             # No EBCDIC support on early perls
++*to_native = ($::IS_ASCII || $] < 5.008)
++             ? sub { return shift }
++             : sub { utf8::unicode_to_native(shift) };
++
++*from_native = ($::IS_ASCII || $] < 5.008)
++             ? sub { return shift }
++             : sub { utf8::native_to_unicode(shift) };
++
++# The .t files are all in terms of Unicode, so xlate to/from native
++sub dot_t_pack_U {
++    return pack('U*', map { to_native($_) } @_);
+ }
+ 
+-sub unpack_U {
++sub dot_t_unpack_U {
+ 
+     # The empty pack returns an empty UTF-8 string, so the effect is to force
+     # the shifted parameter into being UTF-8.  This allows this to work on
+     # Perl 5.6, where there is no utf8::upgrade().
+-    return unpack('U*', shift(@_).pack('U*'));
++    return map { from_native($_) } unpack('U*', shift(@_).pack('U*'));
++}
++
++sub get_printable_string ($) {
++    use bytes;
++    my $s = shift;
++
++    # DeMorgan's laws cause this to mean ascii printables
++    return $s if $s =~ /[^[:^ascii:][:^print:]]/;
++
++    return join " ", map { sprintf "\\x%02x", ord $_ } split "", $s;
++}
++
++sub ok ($$;$) {
++    my $count_ref = shift;  # Test number in caller
++    my $p = my $r = shift;
++    my $x;
++    if (@_) {
++        $x = shift;
++        $p = !defined $x ? !defined $r : !defined $r ? 0 : $r eq $x;
++    }
++
++    print $p ? "ok" : "not ok", ' ', ++$$count_ref, "\n";
++
++    return if $p;
++
++    my (undef, $file, $line) = caller(1);
++    print STDERR "# Failed test $$count_ref at $file line $line\n";
++
++    return unless defined $x;
++
++    print STDERR "#      got ", get_printable_string($r), "\n";
++    print STDERR "# expected ", get_printable_string($x), "\n";
+ }
+ 
+ require Exporter;
+@@ -343,7 +376,7 @@ Note that C<$unprocessed> will be modified as a side-effect.
+ 
+ =head2 Quick Check
+ 
+-(see Annex 8, UAX #15; and F<DerivedNormalizationProps.txt>)
++(see Annex 8, UAX #15; and F<lib/unicore/DerivedNormalizationProps.txt>)
+ 
+ The following functions check whether the string is in that normalization form.
+ 
+@@ -571,8 +604,10 @@ so one could cause Unicode 3.2 to be used in any perl version starting with
+ 
+ In older Unicode versions, a small number of characters (all of which are
+ CJK compatibility ideographs as far as they have been found) may have
+-an erroneous decomposition mapping (see F<NormalizationCorrections.txt>).
+-Anyhow, this module will neither refer to F<NormalizationCorrections.txt>
++an erroneous decomposition mapping (see
++F<lib/unicore/NormalizationCorrections.txt>).
++Anyhow, this module will neither refer to
++F<lib/unicore/NormalizationCorrections.txt>
+ nor provide any specific version of normalization. Therefore this module
+ running on an older perl with an older Unicode database may use
+ the erroneous decomposition mapping blindly conforming to the Unicode database.
+@@ -606,27 +641,27 @@ and/or modify it under the same terms as Perl itself.
+ 
+ =over 4
+ 
+-=item http://www.unicode.org/reports/tr15/
++=item L<http://www.unicode.org/reports/tr15/>
+ 
+ Unicode Normalization Forms - UAX #15
+ 
+-=item http://www.unicode.org/Public/UNIDATA/CompositionExclusions.txt
++=item L<http://www.unicode.org/Public/UNIDATA/CompositionExclusions.txt>
+ 
+ Composition Exclusion Table
+ 
+-=item http://www.unicode.org/Public/UNIDATA/DerivedNormalizationProps.txt
++=item L<http://www.unicode.org/Public/UNIDATA/DerivedNormalizationProps.txt>
+ 
+ Derived Normalization Properties
+ 
+-=item http://www.unicode.org/Public/UNIDATA/NormalizationCorrections.txt
++=item L<http://www.unicode.org/Public/UNIDATA/NormalizationCorrections.txt>
+ 
+ Normalization Corrections
+ 
+-=item http://www.unicode.org/review/pr-29.html
++=item L<http://www.unicode.org/review/pr-29.html>
+ 
+ Public Review Issue #29: Normalization Issue
+ 
+-=item http://www.unicode.org/notes/tn5/
++=item L<http://www.unicode.org/notes/tn5/>
+ 
+ Canonical Equivalence in Applications - UTN #5
+ 
+diff --git a/Normalize.xs b/Normalize.xs
+index 4acff7f..210917e 100644
+--- a/Normalize.xs
++++ b/Normalize.xs
+@@ -13,6 +13,9 @@
+ #include "perl.h"
+ #include "XSUB.h"
+ 
++#define NEED_utf8_to_uvchr_buf
++#include "ppport.h"
++
+ /* These 5 files are prepared by mkheader */
+ #include "unfcmb.h"
+ #include "unfcan.h"
+@@ -23,45 +26,15 @@
+ /* The generated normalization tables since v5.20 are in native character set
+  * terms.  Prior to that, they were in Unicode terms.  So we use 'uvchr' for
+  * later perls, and redefine that to be 'uvuni' for earlier ones */
+-#if PERL_VERSION < 20
++#if PERL_VERSION_LT(5,20,0)
+ #   undef uvchr_to_utf8
+ #   ifdef uvuni_to_utf8
+ #       define uvchr_to_utf8   uvuni_to_utf8
+ #   else /* Perl 5.6.1 */
+ #       define uvchr_to_utf8   uv_to_utf8
+ #   endif
+-
+-#   undef utf8n_to_uvchr
+-#   ifdef utf8n_to_uvuni
+-#       define utf8n_to_uvchr   utf8n_to_uvuni
+-#   else /* Perl 5.6.1 */
+-#       define utf8n_to_uvchr   utf8_to_uv
+-#   endif
+ #endif
+ 
+-/* UTF8_ALLOW_BOM is used before Perl 5.8.0 */
+-#ifndef UTF8_ALLOW_BOM
+-#define UTF8_ALLOW_BOM  (0)
+-#endif /* UTF8_ALLOW_BOM */
+-
+-#ifndef UTF8_ALLOW_SURROGATE
+-#define UTF8_ALLOW_SURROGATE  (0)
+-#endif /* UTF8_ALLOW_SURROGATE */
+-
+-#ifndef UTF8_ALLOW_FE_FF
+-#define UTF8_ALLOW_FE_FF  (0)
+-#endif /* UTF8_ALLOW_FE_FF */
+-
+-#ifndef UTF8_ALLOW_FFFF
+-#define UTF8_ALLOW_FFFF  (0)
+-#endif /* UTF8_ALLOW_FFFF */
+-
+-#ifndef PERL_UNUSED_VAR
+-#  define PERL_UNUSED_VAR(x) ((void)sizeof(x))
+-#endif
+-
+-#define AllowAnyUTF (UTF8_ALLOW_SURROGATE|UTF8_ALLOW_BOM|UTF8_ALLOW_FE_FF|UTF8_ALLOW_FFFF)
+-
+ /* check if the string buffer is enough before uvchr_to_utf8(). */
+ /* dstart, d, and dlen should be defined outside before. */
+ #define Renew_d_if_not_enough_to(need)	STRLEN curlen = d - dstart;	\
+@@ -71,7 +44,7 @@
+ 		    d = dstart + curlen;	\
+ 		}
+ 
+-/* if utf8n_to_uvchr() sets retlen to 0 (if broken?) */
++/* if utf8_to_uvchr_buf() sets retlen to 0 (if broken?) */
+ #define ErrRetlenIsZero "panic (Unicode::Normalize %s): zero-length character"
+ 
+ /* utf8_hop() hops back before start. Maybe broken UTF-8 */
+@@ -139,8 +112,8 @@ static U8* dec_canonical(UV uv)
+     plane = (U8***)UNF_canon[uv >> 16];
+     if (! plane)
+ 	return NULL;
+-    row = plane[(uv >> 8) & 0xff];
+-    return row ? row[uv & 0xff] : NULL;
++    row = plane[(U8) (uv >> 8)];
++    return row ? row[(U8) uv] : NULL;
+ }
+ 
+ static U8* dec_compat(UV uv)
+@@ -151,8 +124,8 @@ static U8* dec_compat(UV uv)
+     plane = (U8***)UNF_compat[uv >> 16];
+     if (! plane)
+ 	return NULL;
+-    row = plane[(uv >> 8) & 0xff];
+-    return row ? row[uv & 0xff] : NULL;
++    row = plane[(U8) (uv >> 8)];
++    return row ? row[(U8) uv] : NULL;
+ }
+ 
+ static UV composite_uv(UV uv, UV uv2)
+@@ -175,10 +148,10 @@ static UV composite_uv(UV uv, UV uv2)
+     plane = UNF_compos[uv >> 16];
+     if (! plane)
+ 	return 0;
+-    row = plane[(uv >> 8) & 0xff];
++    row = plane[(U8) (uv >> 8)];
+     if (! row)
+ 	return 0;
+-    cell = row[uv & 0xff];
++    cell = row[(U8) uv];
+     if (! cell)
+ 	return 0;
+     for (i = cell; i->nextchar; i++) {
+@@ -196,8 +169,8 @@ static U8 getCombinClass(UV uv)
+     plane = (U8**)UNF_combin[uv >> 16];
+     if (! plane)
+ 	return 0;
+-    row = plane[(uv >> 8) & 0xff];
+-    return row ? row[uv & 0xff] : 0;
++    row = plane[(U8) (uv >> 8)];
++    return row ? row[(U8) uv] : 0;
+ }
+ 
+ static U8* pv_cat_decompHangul(pTHX_ U8* d, UV uv)
+@@ -244,7 +217,7 @@ U8* pv_utf8_decompose(pTHX_ U8* s, STRLEN slen, U8** dp, STRLEN dlen, bool iscom
+ 
+     while (p < e) {
+ 	STRLEN retlen;
+-	UV uv = utf8n_to_uvchr(p, e - p, &retlen, AllowAnyUTF);
++	UV uv = utf8_to_uvchr_buf(p, e, &retlen);
+ 	if (!retlen)
+ 	    croak(ErrRetlenIsZero, "decompose");
+ 	p += retlen;
+@@ -289,7 +262,7 @@ U8* pv_utf8_reorder(pTHX_ U8* s, STRLEN slen, U8** dp, STRLEN dlen)
+     while (p < e) {
+ 	U8 curCC;
+ 	STRLEN retlen;
+-	UV uv = utf8n_to_uvchr(p, e - p, &retlen, AllowAnyUTF);
++	UV uv = utf8_to_uvchr_buf(p, e, &retlen);
+ 	if (!retlen)
+ 	    croak(ErrRetlenIsZero, "reorder");
+ 	p += retlen;
+@@ -366,7 +339,7 @@ U8* pv_utf8_compose(pTHX_ U8* s, STRLEN slen, U8** dp, STRLEN dlen, bool isconti
+     while (p < e) {
+ 	U8 curCC;
+ 	STRLEN retlen;
+-	UV uv = utf8n_to_uvchr(p, e - p, &retlen, AllowAnyUTF);
++	UV uv = utf8_to_uvchr_buf(p, e, &retlen);
+ 	if (!retlen)
+ 	    croak(ErrRetlenIsZero, "compose");
+ 	p += retlen;
+@@ -636,7 +609,7 @@ checkNFD(src)
+ 
+     preCC = 0;
+     for (p = s; p < e; p += retlen) {
+-	UV uv = utf8n_to_uvchr(p, e - p, &retlen, AllowAnyUTF);
++	UV uv = utf8_to_uvchr_buf(p, e, &retlen);
+ 	if (!retlen)
+ 	    croak(ErrRetlenIsZero, "checkNFD or -NFKD");
+ 
+@@ -673,7 +646,7 @@ checkNFC(src)
+ 
+     preCC = 0;
+     for (p = s; p < e; p += retlen) {
+-	UV uv = utf8n_to_uvchr(p, e - p, &retlen, AllowAnyUTF);
++	UV uv = utf8_to_uvchr_buf(p, e, &retlen);
+ 	if (!retlen)
+ 	    croak(ErrRetlenIsZero, "checkNFC or -NFKC");
+ 
+@@ -731,7 +704,7 @@ checkFCD(src)
+ 	U8 *sCan;
+ 	UV uvLead;
+ 	STRLEN canlen = 0;
+-	UV uv = utf8n_to_uvchr(p, e - p, &retlen, AllowAnyUTF);
++	UV uv = utf8_to_uvchr_buf(p, e, &retlen);
+ 	if (!retlen)
+ 	    croak(ErrRetlenIsZero, "checkFCD or -FCC");
+ 
+@@ -740,7 +713,7 @@ checkFCD(src)
+ 	if (sCan) {
+ 	    STRLEN canret;
+ 	    canlen = (STRLEN)strlen((char *) sCan);
+-	    uvLead = utf8n_to_uvchr(sCan, canlen, &canret, AllowAnyUTF);
++	    uvLead = utf8_to_uvchr_buf(sCan, sCan + canlen, &canret);
+ 	    if (!canret)
+ 		croak(ErrRetlenIsZero, "checkFCD or -FCC");
+ 	}
+@@ -771,7 +744,7 @@ checkFCD(src)
+ 	    U8* pCan = utf8_hop(eCan, -1);
+ 	    if (pCan < sCan)
+ 		croak(ErrHopBeforeStart);
+-	    uvTrail = utf8n_to_uvchr(pCan, eCan - pCan, &canret, AllowAnyUTF);
++	    uvTrail = utf8_to_uvchr_buf(pCan, eCan, &canret);
+ 	    if (!canret)
+ 		croak(ErrRetlenIsZero, "checkFCD or -FCC");
+ 	    preCC = getCombinClass(uvTrail);
+@@ -910,7 +883,7 @@ splitOnLastStarter(src)
+ 	p = utf8_hop(p, -1);
+ 	if (p < s)
+ 	    croak(ErrHopBeforeStart);
+-	uv = utf8n_to_uvchr(p, e - p, NULL, AllowAnyUTF);
++	uv = utf8_to_uvchr_buf(p, e, NULL);
+ 	if (getCombinClass(uv) == 0) /* Last Starter found */
+ 	    break;
+     }
+diff --git a/mkheader b/mkheader
+index 8d4c1b8..669a8a2 100644
+--- a/mkheader
++++ b/mkheader
+@@ -24,28 +24,16 @@ use Carp;
+ use File::Spec;
+ use SelectSaver;
+ 
+-BEGIN {
+-    unless ('A' eq pack('U', 0x41)) {
+-	die "Unicode::Normalize cannot stringify a Unicode code point\n";
+-    }
+-    unless (0x41 == unpack('U', 'A')) {
+-	die "Unicode::Normalize cannot get Unicode code point\n";
+-    }
+-}
+-
+ our $PACKAGE = 'Unicode::Normalize, mkheader';
+ 
+ our $prefix = "UNF_";
+ our $structname = "${prefix}complist";
+ 
+ # Starting in v5.20, the tables in lib/unicore are built using the platform's
+-# native character set for code points 0-255.
+-*pack_U = ($] ge 5.020)
+-          ? sub { return pack('W*', @_).pack('U*'); } # The empty pack returns
+-                                                      # an empty UTF-8 string,
+-                                                      # so the effect is to
+-                                                      # force the return into
+-                                                      # being UTF-8.
++# native character set for code points 0-255.  But in v5.35, pack U stopped
++# trying to compensate
++*pack_U = ($] ge 5.020 && $] lt 5.035)
++          ? sub { return pack('U*', map { utf8::unicode_to_native($_) } @_); }
+           : sub { return pack('U*', @_); };
+ 
+ # %Canon and %Compat will be ($codepoint => $hexstring) after _U_stringify()
+diff --git a/t/fcdc.t b/t/fcdc.t
+index d2ef28b..b5dc195 100644
+--- a/t/fcdc.t
++++ b/t/fcdc.t
+@@ -1,15 +1,4 @@
+ 
+-BEGIN {
+-    unless ('A' eq pack('U', 0x41)) {
+-	print "1..0 # Unicode::Normalize cannot pack a Unicode code point\n";
+-	exit 0;
+-    }
+-    unless (0x41 == unpack('U', 'A')) {
+-	print "1..0 # Unicode::Normalize cannot get a Unicode code point\n";
+-	exit 0;
+-    }
+-}
+-
+ BEGIN {
+     if ($ENV{PERL_CORE}) {
+         chdir('t') if -d 't';
+@@ -23,20 +12,13 @@ use strict;
+ use warnings;
+ BEGIN { $| = 1; print "1..70\n"; }
+ my $count = 0;
+-sub ok ($;$) {
+-    my $p = my $r = shift;
+-    if (@_) {
+-	my $x = shift;
+-	$p = !defined $x ? !defined $r : !defined $r ? 0 : $r eq $x;
+-    }
+-    print $p ? "ok" : "not ok", ' ', ++$count, "\n";
+-}
++sub ok { Unicode::Normalize::ok(\$count, @_) }
+ 
+ use Unicode::Normalize qw(:all);
+ 
+ ok(1);
+ 
+-sub _pack_U { Unicode::Normalize::pack_U(@_) }
++sub _pack_U { Unicode::Normalize::dot_t_pack_U(@_) }
+ sub hexU { _pack_U map hex, split ' ', shift }
+ sub answer { defined $_[0] ? $_[0] ? "YES" : "NO" : "MAYBE" }
+ 
+diff --git a/t/form.t b/t/form.t
+index 6bbfb08..9a0850c 100644
+--- a/t/form.t
++++ b/t/form.t
+@@ -1,15 +1,4 @@
+ 
+-BEGIN {
+-    unless ('A' eq pack('U', 0x41)) {
+-	print "1..0 # Unicode::Normalize cannot pack a Unicode code point\n";
+-	exit 0;
+-    }
+-    unless (0x41 == unpack('U', 'A')) {
+-	print "1..0 # Unicode::Normalize cannot get a Unicode code point\n";
+-	exit 0;
+-    }
+-}
+-
+ BEGIN {
+     if ($ENV{PERL_CORE}) {
+ 	chdir('t') if -d 't';
+@@ -23,14 +12,7 @@ use strict;
+ use warnings;
+ BEGIN { $| = 1; print "1..37\n"; }
+ my $count = 0;
+-sub ok ($;$) {
+-    my $p = my $r = shift;
+-    if (@_) {
+-	my $x = shift;
+-	$p = !defined $x ? !defined $r : !defined $r ? 0 : $r eq $x;
+-    }
+-    print $p ? "ok" : "not ok", ' ', ++$count, "\n";
+-}
++sub ok { Unicode::Normalize::ok(\$count, @_) }
+ 
+ use Unicode::Normalize qw(:all);
+ 
+diff --git a/t/func.t b/t/func.t
+index 2bd6e50..a5eb0b3 100644
+--- a/t/func.t
++++ b/t/func.t
+@@ -1,15 +1,4 @@
+ 
+-BEGIN {
+-    unless ('A' eq pack('U', 0x41)) {
+-	print "1..0 # Unicode::Normalize cannot pack a Unicode code point\n";
+-	exit 0;
+-    }
+-    unless (0x41 == unpack('U', 'A')) {
+-	print "1..0 # Unicode::Normalize cannot get a Unicode code point\n";
+-	exit 0;
+-    }
+-}
+-
+ BEGIN {
+     if ($ENV{PERL_CORE}) {
+         chdir('t') if -d 't';
+@@ -23,20 +12,13 @@ use strict;
+ use warnings;
+ BEGIN { $| = 1; print "1..217\n"; }
+ my $count = 0;
+-sub ok ($;$) {
+-    my $p = my $r = shift;
+-    if (@_) {
+-	my $x = shift;
+-	$p = !defined $x ? !defined $r : !defined $r ? 0 : $r eq $x;
+-    }
+-    print $p ? "ok" : "not ok", ' ', ++$count, "\n";
+-}
++sub ok { Unicode::Normalize::ok(\$count, @_) }
+ 
+ use Unicode::Normalize qw(:all);
+ 
+ ok(1);
+ 
+-sub _pack_U { Unicode::Normalize::pack_U(@_) }
++sub _pack_U { Unicode::Normalize::dot_t_pack_U(@_) }
+ sub hexU { _pack_U map hex, split ' ', shift }
+ 
+ # This won't work on EBCDIC platforms prior to v5.8.0, which is when this
+diff --git a/t/illegal.t b/t/illegal.t
+index ccf2b4a..6a1160c 100644
+--- a/t/illegal.t
++++ b/t/illegal.t
+@@ -1,15 +1,4 @@
+ 
+-BEGIN {
+-    unless ('A' eq pack('U', 0x41)) {
+-	print "1..0 # Unicode::Normalize cannot pack a Unicode code point\n";
+-	exit 0;
+-    }
+-    unless (0x41 == unpack('U', 'A')) {
+-	print "1..0 # Unicode::Normalize cannot get a Unicode code point\n";
+-	exit 0;
+-    }
+-}
+-
+ BEGIN {
+     if ($ENV{PERL_CORE}) {
+         chdir('t') if -d 't';
+@@ -43,14 +32,7 @@ use warnings;
+ 
+ BEGIN { $| = 1; print "1..113\n"; }
+ my $count = 0;
+-sub ok ($;$) {
+-    my $p = my $r = shift;
+-    if (@_) {
+-	my $x = shift;
+-	$p = !defined $x ? !defined $r : !defined $r ? 0 : $r eq $x;
+-    }
+-    print $p ? "ok" : "not ok", ' ', ++$count, "\n";
+-}
++sub ok { Unicode::Normalize::ok(\$count, @_) }
+ 
+ ok(1);
+ 
+@@ -77,7 +59,7 @@ for my $u (0xD800, 0xDFFF, 0xFDD0, 0xFDEF, 0xFEFF, 0xFFFE, 0xFFFF,
+ our $proc;    # before the last starter
+ our $unproc;  # the last starter and after
+ 
+-sub _pack_U   { Unicode::Normalize::pack_U(@_) }
++sub _pack_U   { Unicode::Normalize::dot_t_pack_U(@_) }
+ 
+ ($proc, $unproc) = splitOnLastStarter(_pack_U(0x41, 0x300, 0x327, 0xFFFF));
+ ok($proc   eq _pack_U(0x41, 0x300, 0x327));
+diff --git a/t/norm.t b/t/norm.t
+index d3cec3a..ffb7449 100644
+--- a/t/norm.t
++++ b/t/norm.t
+@@ -1,15 +1,4 @@
+ 
+-BEGIN {
+-    unless ('A' eq pack('U', 0x41)) {
+-	print "1..0 # Unicode::Normalize cannot pack a Unicode code point\n";
+-	exit 0;
+-    }
+-    unless (0x41 == unpack('U', 'A')) {
+-	print "1..0 # Unicode::Normalize cannot get a Unicode code point\n";
+-	exit 0;
+-    }
+-}
+-
+ BEGIN {
+     if ($ENV{PERL_CORE}) {
+         chdir('t') if -d 't';
+@@ -23,21 +12,14 @@ use strict;
+ use warnings;
+ BEGIN { $| = 1; print "1..64\n"; }
+ my $count = 0;
+-sub ok ($;$) {
+-    my $p = my $r = shift;
+-    if (@_) {
+-	my $x = shift;
+-	$p = !defined $x ? !defined $r : !defined $r ? 0 : $r eq $x;
+-    }
+-    print $p ? "ok" : "not ok", ' ', ++$count, "\n";
+-}
++sub ok { Unicode::Normalize::ok(\$count, @_) }
+ 
+ use Unicode::Normalize qw(normalize);
+ 
+ ok(1);
+ 
+-sub _pack_U   { Unicode::Normalize::pack_U(@_) }
+-sub _unpack_U { Unicode::Normalize::unpack_U(@_) }
++sub _pack_U   { Unicode::Normalize::dot_t_pack_U(@_) }
++sub _unpack_U { Unicode::Normalize::dot_t_unpack_U(@_) }
+ 
+ #########################
+ 
+diff --git a/t/null.t b/t/null.t
+index 9a00087..93d1bbc 100644
+--- a/t/null.t
++++ b/t/null.t
+@@ -1,15 +1,4 @@
+ 
+-BEGIN {
+-    unless ('A' eq pack('U', 0x41)) {
+-	print "1..0 # Unicode::Normalize cannot pack a Unicode code point\n";
+-	exit 0;
+-    }
+-    unless (0x41 == unpack('U', 'A')) {
+-	print "1..0 # Unicode::Normalize cannot get a Unicode code point\n";
+-	exit 0;
+-    }
+-}
+-
+ BEGIN {
+     if ($ENV{PERL_CORE}) {
+         chdir('t') if -d 't';
+diff --git a/t/partial1.t b/t/partial1.t
+index 3e44a63..97d8343 100644
+--- a/t/partial1.t
++++ b/t/partial1.t
+@@ -1,15 +1,4 @@
+ 
+-BEGIN {
+-    unless ('A' eq pack('U', 0x41)) {
+-	print "1..0 # Unicode::Normalize cannot pack a Unicode code point\n";
+-	exit 0;
+-    }
+-    unless (0x41 == unpack('U', 'A')) {
+-	print "1..0 # Unicode::Normalize cannot get a Unicode code point\n";
+-	exit 0;
+-    }
+-}
+-
+ BEGIN {
+     if ($ENV{PERL_CORE}) {
+         chdir('t') if -d 't';
+@@ -31,14 +20,7 @@ use strict;
+ use warnings;
+ BEGIN { $| = 1; print "1..26\n"; }
+ my $count = 0;
+-sub ok ($;$) {
+-    my $p = my $r = shift;
+-    if (@_) {
+-	my $x = shift;
+-	$p = !defined $x ? !defined $r : !defined $r ? 0 : $r eq $x;
+-    }
+-    print $p ? "ok" : "not ok", ' ', ++$count, "\n";
+-}
++sub ok { Unicode::Normalize::ok(\$count, @_) }
+ 
+ use Unicode::Normalize qw(:all);
+ 
+diff --git a/t/partial2.t b/t/partial2.t
+index 7f19e93..1cf510d 100644
+--- a/t/partial2.t
++++ b/t/partial2.t
+@@ -1,15 +1,4 @@
+ 
+-BEGIN {
+-    unless ('A' eq pack('U', 0x41)) {
+-	print "1..0 # Unicode::Normalize cannot pack a Unicode code point\n";
+-	exit 0;
+-    }
+-    unless (0x41 == unpack('U', 'A')) {
+-	print "1..0 # Unicode::Normalize cannot get a Unicode code point\n";
+-	exit 0;
+-    }
+-}
+-
+ BEGIN {
+     if ($ENV{PERL_CORE}) {
+         chdir('t') if -d 't';
+@@ -31,21 +20,14 @@ use strict;
+ use warnings;
+ BEGIN { $| = 1; print "1..26\n"; }
+ my $count = 0;
+-sub ok ($;$) {
+-    my $p = my $r = shift;
+-    if (@_) {
+-	my $x = shift;
+-	$p = !defined $x ? !defined $r : !defined $r ? 0 : $r eq $x;
+-    }
+-    print $p ? "ok" : "not ok", ' ', ++$count, "\n";
+-}
++sub ok { Unicode::Normalize::ok(\$count, @_) }
+ 
+ use Unicode::Normalize qw(:all);
+ 
+ ok(1);
+ 
+-sub _pack_U   { Unicode::Normalize::pack_U(@_) }
+-sub _unpack_U { Unicode::Normalize::unpack_U(@_) }
++sub _pack_U   { Unicode::Normalize::dot_t_pack_U(@_) }
++sub _unpack_U { Unicode::Normalize::undot_t_pack_U(@_) }
+ 
+ #########################
+ 
+diff --git a/t/proto.t b/t/proto.t
+index 38c6985..f90777c 100644
+--- a/t/proto.t
++++ b/t/proto.t
+@@ -1,15 +1,4 @@
+ 
+-BEGIN {
+-    unless ('A' eq pack('U', 0x41)) {
+-	print "1..0 # Unicode::Normalize cannot pack a Unicode code point\n";
+-	exit 0;
+-    }
+-    unless (0x41 == unpack('U', 'A')) {
+-	print "1..0 # Unicode::Normalize cannot get a Unicode code point\n";
+-	exit 0;
+-    }
+-}
+-
+ BEGIN {
+     if ($ENV{PERL_CORE}) {
+         chdir('t') if -d 't';
+@@ -23,14 +12,7 @@ use strict;
+ use warnings;
+ BEGIN { $| = 1; print "1..48\n"; }
+ my $count = 0;
+-sub ok ($;$) {
+-    my $p = my $r = shift;
+-    if (@_) {
+-	my $x = shift;
+-	$p = !defined $x ? !defined $r : !defined $r ? 0 : $r eq $x;
+-    }
+-    print $p ? "ok" : "not ok", ' ', ++$count, "\n";
+-}
++sub ok { Unicode::Normalize::ok(\$count, @_) }
+ 
+ use Unicode::Normalize qw(:all);
+ 
+diff --git a/t/split.t b/t/split.t
+index a92957c..ae166f4 100644
+--- a/t/split.t
++++ b/t/split.t
+@@ -1,15 +1,4 @@
+ 
+-BEGIN {
+-    unless ('A' eq pack('U', 0x41)) {
+-	print "1..0 # Unicode::Normalize cannot pack a Unicode code point\n";
+-	exit 0;
+-    }
+-    unless (0x41 == unpack('U', 'A')) {
+-	print "1..0 # Unicode::Normalize cannot get a Unicode code point\n";
+-	exit 0;
+-    }
+-}
+-
+ BEGIN {
+     if ($ENV{PERL_CORE}) {
+         chdir('t') if -d 't';
+@@ -31,21 +20,14 @@ use strict;
+ use warnings;
+ BEGIN { $| = 1; print "1..34\n"; }
+ my $count = 0;
+-sub ok ($;$) {
+-    my $p = my $r = shift;
+-    if (@_) {
+-	my $x = shift;
+-	$p = !defined $x ? !defined $r : !defined $r ? 0 : $r eq $x;
+-    }
+-    print $p ? "ok" : "not ok", ' ', ++$count, "\n";
+-}
++sub ok { Unicode::Normalize::ok(\$count, @_) }
+ 
+ use Unicode::Normalize qw(:all);
+ 
+ ok(1);
+ 
+-sub _pack_U   { Unicode::Normalize::pack_U(@_) }
+-sub _unpack_U { Unicode::Normalize::unpack_U(@_) }
++sub _pack_U   { Unicode::Normalize::dot_t_pack_U(@_) }
++sub _unpack_U { Unicode::Normalize::dot_t_unpack_U(@_) }
+ 
+ #########################
+ 
+diff --git a/t/test.t b/t/test.t
+index cb4b6ea..cec3ca7 100644
+--- a/t/test.t
++++ b/t/test.t
+@@ -1,15 +1,4 @@
+ 
+-BEGIN {
+-    unless ('A' eq pack('U', 0x41)) {
+-	print "1..0 # Unicode::Normalize cannot pack a Unicode code point\n";
+-	exit 0;
+-    }
+-    unless (0x41 == unpack('U', 'A')) {
+-	print "1..0 # Unicode::Normalize cannot get a Unicode code point\n";
+-	exit 0;
+-    }
+-}
+-
+ BEGIN {
+     if ($ENV{PERL_CORE}) {
+         chdir('t') if -d 't';
+@@ -23,21 +12,14 @@ use strict;
+ use warnings;
+ BEGIN { $| = 1; print "1..72\n"; }
+ my $count = 0;
+-sub ok ($;$) {
+-    my $p = my $r = shift;
+-    if (@_) {
+-	my $x = shift;
+-	$p = !defined $x ? !defined $r : !defined $r ? 0 : $r eq $x;
+-    }
+-    print $p ? "ok" : "not ok", ' ', ++$count, "\n";
+-}
++sub ok { Unicode::Normalize::ok(\$count, @_) }
+ 
+ use Unicode::Normalize;
+ 
+ ok(1);
+ 
+-sub _pack_U   { Unicode::Normalize::pack_U(@_) }
+-sub _unpack_U { Unicode::Normalize::unpack_U(@_) }
++sub _pack_U   { Unicode::Normalize::dot_t_pack_U(@_) }
++sub _unpack_U { Unicode::Normalize::dot_t_unpack_U(@_) }
+ 
+ #########################
+ 
+diff --git a/t/tie.t b/t/tie.t
+index 4fdd121..1282405 100644
+--- a/t/tie.t
++++ b/t/tie.t
+@@ -1,15 +1,4 @@
+ 
+-BEGIN {
+-    unless ('A' eq pack('U', 0x41)) {
+-	print "1..0 # Unicode::Normalize cannot pack a Unicode code point\n";
+-	exit 0;
+-    }
+-    unless (0x41 == unpack('U', 'A')) {
+-	print "1..0 # Unicode::Normalize cannot get a Unicode code point\n";
+-	exit 0;
+-    }
+-}
+-
+ BEGIN {
+     if ($ENV{PERL_CORE}) {
+         chdir('t') if -d 't';
+@@ -34,14 +23,7 @@ use strict;
+ use warnings;
+ BEGIN { $| = 1; print "1..17\n"; }
+ my $count = 0;
+-sub ok ($;$) {
+-    my $p = my $r = shift;
+-    if (@_) {
+-	my $x = shift;
+-	$p = !defined $x ? !defined $r : !defined $r ? 0 : $r eq $x;
+-    }
+-    print $p ? "ok" : "not ok", ' ', ++$count, "\n";
+-}
++sub ok { Unicode::Normalize::ok(\$count, @_) }
+ 
+ ok(1);
+ 
+-- 
+2.40.1
+

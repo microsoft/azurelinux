@@ -1,0 +1,17 @@
+--- gmakefile.orig	2016-05-16 04:57:35.000000000 +0200
++++ gmakefile	2016-06-22 13:59:47.905111833 +0200
+@@ -31,10 +31,10 @@
+ absbasename_all = $(basename $(basename $(basename $(basename $(abspath $(1))))))# arch/lib/libpetsc.so.3.8.0 -> /path/to/arch/lib/libpetsc
+ sl_linker_args = $(call SL_LINKER_FUNCTION,$(call absbasename_all,$@),$(libpetsc_abi_version),$(libpetsc_lib_version))
+ 
+-libpetsc_shared  := $(LIBDIR)/libpetsc$(LIB_NAME_SUFFIX).$(SL_LINKER_SUFFIX)
+-libpetsc_soname  := $(call soname_function,$(LIBDIR)/libpetsc)
+-libpetsc_libname := $(call libname_function,$(LIBDIR)/libpetsc)
+-libpetsc_static  := $(LIBDIR)/libpetsc$(LIB_NAME_SUFFIX).$(AR_LIB_SUFFIX)
++libpetsc_shared  := $(LIBDIR)/libpetsc64$(LIB_NAME_SUFFIX).$(SL_LINKER_SUFFIX)
++libpetsc_soname  := $(call soname_function,$(LIBDIR)/libpetsc64)
++libpetsc_libname := $(call libname_function,$(LIBDIR)/libpetsc64)
++libpetsc_static  := $(LIBDIR)/libpetsc64$(LIB_NAME_SUFFIX).$(AR_LIB_SUFFIX)
+ libpetscpkgs_shared  := $(foreach pkg, $(pkgs), $(LIBDIR)/libpetsc$(pkg)$(LIB_NAME_SUFFIX).$(SL_LINKER_SUFFIX))
+ libpetscpkgs_soname  := $(foreach pkg, $(pkgs), $(call soname_function,$(LIBDIR)/libpetsc$(pkg)))
+ libpetscpkgs_libname := $(foreach pkg, $(pkgs), $(call libname_function,$(LIBDIR)/libpetsc$(pkg)))

@@ -1,0 +1,479 @@
+## module name # reason for enablement in ffmpeg (usually there is another package that already got legal review)
+aac
+aasc
+libfdk_aac # fdk-aac-free
+ac3
+acelp_kelvin
+adpcm_4xm
+adpcm_adx
+adpcm_afc
+adpcm_agm
+adpcm_aica
+adpcm_argo
+adpcm_ct
+adpcm_dtk
+adpcm_ea
+adpcm_ea_maxis_xa
+adpcm_ea_r1
+adpcm_ea_r2
+adpcm_ea_r3
+adpcm_ea_xas
+adpcm_g722
+adpcm_g726
+adpcm_g726le
+adpcm_ima_acorn
+adpcm_ima_alp
+adpcm_ima_amv
+adpcm_ima_apc
+adpcm_ima_apm
+adpcm_ima_cunning
+adpcm_ima_dat4
+adpcm_ima_dk3
+adpcm_ima_dk4
+adpcm_ima_ea_eacs
+adpcm_ima_ea_sead
+adpcm_ima_iss
+adpcm_ima_moflex
+adpcm_ima_mtf
+adpcm_ima_oki
+adpcm_ima_qt
+adpcm_ima_qt_at
+adpcm_ima_rad
+adpcm_ima_smjpeg
+adpcm_ima_ssi
+adpcm_ima_wav
+adpcm_ima_ws
+adpcm_ms
+adpcm_mtaf
+adpcm_psx
+adpcm_sbpro_2
+adpcm_sbpro_3
+adpcm_sbpro_4
+adpcm_swf
+adpcm_thp
+adpcm_thp_le
+adpcm_vima
+adpcm_xa
+adpcm_xmd
+adpcm_yamaha
+adpcm_zork
+aic
+alac
+alias_pix
+amrnb
+amrwb
+amv
+anm
+ansi # trivial
+anull
+apac
+ape
+apng # animated png
+arbc
+argo
+ass # trivial
+asv1
+asv2
+atrac1
+atrac3
+atrac3al
+atrac3p
+atrac3pal
+aura
+aura2
+av1 # libaom
+av1_qsv # libaom
+bethsoftvid # trivial
+bfi # trivial
+bink
+binkaudio_dct
+binkaudio_rdft
+bintext
+bitpacked # trivial
+bmp # trivial
+bmv_audio
+bmv_video
+bonk
+brender_pix
+c93
+cbd2_dpcm
+ccaption
+cdgraphics
+cdtoons
+cdxl
+cinepak
+clearvideo
+cljr
+cook
+cpia
+cscd
+cyuv
+dca
+dds
+derf_dpcm
+dfa
+dfpwm
+dirac # dirac
+dnxhd
+dnxhr
+dolby_e
+dpx
+dsd_lsbf
+dsd_msbf
+dsicinaudio
+dsicinvideo
+dss_sp
+dvaudio
+dvbsub
+dvdsub
+dvvideo
+dxa
+dxtory
+eacmv
+eamad
+eatgq
+eatgv
+eatqi
+eightbps
+eightsvx_exp
+eightsvx_fib
+escape124
+escape130
+evrc
+exr # openEXR
+ffv1 # ffmpeg
+ffvhuff # ffmpeg
+ffwavesynth # pseudo
+fits
+flac # libFLAC
+flashsv
+flashsv2
+flic
+flv
+fmvc
+fourxm
+ftr # fdk-aac
+g723_1
+g729
+gdv
+gem
+gif # libpng
+gremlin_dpcm
+gsm # libgsm
+gsm_ms
+gsm_ms_at
+h261
+h263
+h263_v4l2m2m # hardware
+h263i
+h263p
+hap
+hca
+hcom
+hdr
+hnm4_video
+hq_hqa
+hqx
+huffyuv # trivial+zlib
+hymt # huffyuv-mt
+iac
+idcin
+idf
+iff_ilbm
+ilbc # ilbc
+imc
+indeo2
+indeo3
+indeo4
+indeo5
+interplay_acm
+interplay_dpcm
+interplay_video
+ipu
+jacosub
+jpeg2000 # openjpeg2
+jpegls
+jv
+kgv1
+kmvc
+lagarith
+libaribb24 # aribb24
+libaribcaption # libaribcaption
+libaom # libaom
+libaom_av1 # libaom
+libcodec2 # codec2
+libdav1d # av1
+libgsm # libgsm
+libgsm_ms # libgsm
+libilbc # ilbc
+libjxl # libjxl
+liblc3 # liblc3
+libopencore_amrnb # opencore-amr
+libopencore_amrwb # opencore-amr
+libopenh264 # openh264_dlopen
+libopenjpeg # openjpeg
+libopus # opus
+librsvg # librsvg
+libschroedinger # schroedinger
+libspeex # speex
+libvorbis # libvorbis
+libvpx_vp8 # libvpx
+libvpx_vp9 # libvpx
+libxevd
+libzvbi_teletext # zvbi
+loco
+lscr
+m101
+mace3
+mace6
+mdec
+media100
+metasound
+microdvd
+mimic
+misc4
+mjpeg # mjpegtools
+mjpeg_qsv # mjpegtools
+mjpegb
+mlp
+mmvideo
+motionpixels
+mp1 # twolame/lame
+mp1float # twolame/lame
+mp2 # twolame
+mp2float # twolame
+mp3 # lame
+mp3adu
+mp3adufloat
+mp3float # lame
+mp3on4
+mp3on4float
+mpc7
+mpc8
+mpeg1_v4l2m2m
+mpeg1video
+mpeg2_qsv
+mpeg2_v4l2m2m
+mpeg2video
+mpeg4
+mpeg4_v4l2m2m # hardware
+mpegvideo
+mpl2
+msa1
+mscc
+msmpeg4v1
+msmpeg4v2
+msmpeg4v3
+msnsiren
+msp2
+msrle
+mss1
+mss2
+msvideo1
+mszh
+mts2
+mv30
+mvc1
+mvc2
+mvdv
+mvha
+mwsc
+mxpeg
+nellymoser
+nuv
+on2avc
+opus # libopus
+paf_audio
+paf_video
+pam # trivial
+pbm # trivial
+pcm_alaw # trivial
+pcm_bluray
+pcm_dvd
+pcm_f16le # trivial
+pcm_f24le # trivial
+pcm_f32be # trivial
+pcm_f32le # trivial
+pcm_f64be # trivial
+pcm_f64le # trivial
+pcm_lxf # trivial
+pcm_mulaw # trivial
+pcm_s16be # trivial
+pcm_s16be_planar # trivial
+pcm_s16le # trivial
+pcm_s16le_planar # trivial
+pcm_s24be # trivial
+pcm_s24daud # trivial
+pcm_s24le # trivial
+pcm_s24le_planar # trivial
+pcm_s32be # trivial
+pcm_s32le # trivial
+pcm_s32le_planar # trivial
+pcm_s64be # trivial
+pcm_s64le # trivial
+pcm_s8 # trivial
+pcm_s8_planar # trivial
+pcm_sga # trivial
+pcm_u16be # trivial
+pcm_u16le # trivial
+pcm_u24be # trivial
+pcm_u24le # trivial
+pcm_u32be # trivial
+pcm_u32le # trivial
+pcm_u8 # trivial
+pcm_vidc # trivial
+pcx
+pfm # trivial
+pgm # trivial
+pgmyuv # trivial
+pgssub # mkvtoolnix
+pgx
+phm # trivial
+photocd
+pictor
+pjs
+png # libpng
+ppm # trivial
+prores
+prosumer
+psd
+ptx
+qcelp
+qdm2
+qdmc
+qdraw
+qoa
+qoi
+qpeg
+qtrle
+r10k
+r210
+ra_144
+ra_288
+rasc
+rawvideo # trivial
+realtext
+rka
+rl2
+roq
+roq_dpcm
+rpza
+rscc
+rv10
+rv20
+s302m
+sami
+sanm
+sbc
+screenpresso
+sdx2_dpcm
+sgi # trivial
+sgirle # trivial
+shorten
+simbiosis_imx
+sipr
+siren
+smackaud
+smacker
+smc
+smvjpeg
+snow
+sol_dpcm
+sonic
+sp5x
+speedhq
+speex
+srgc
+srt # trivial
+ssa # trivial
+stl
+subrip
+subviewer
+subviewer1
+sunrast # trivial
+svq1
+svq3
+tak
+targa # trivial
+targa_y216
+tdsc
+text # trivial
+theora # libtheora
+thp
+tiertexseqvideo
+tiff # libtiff
+tmv
+truehd
+truemotion1
+truemotion2
+truemotion2rt
+truespeech
+tscc
+tscc2
+tta
+twinvq
+txd
+ulti
+utvideo
+v210 # trivial
+v210x # trivial
+v308 # trivial
+v408 # trivial
+v410 # trivial
+vb
+vble
+vcr1
+vmdaudio
+vmdvideo
+vmnc
+vnull
+vorbis # libvorbis
+vp3 # libav
+vp4 # libav
+vp5 # libav
+vp6 # libav
+vp6a # libav
+vp6f # libav
+vp7 # libav
+vp8 # libvpx
+vp8_qsv # libvpx
+vp8_v4l2m2m # libvpx
+vp9 # libvpx
+vp9_qsv # libvpx
+vp9_v4l2m2m # libvpx
+vplayer
+vqa
+vqc
+wady_dpcm
+wavarc
+wavpack
+wbmp
+wcmv
+webp # libwebp
+webvtt # trivial
+wmav1
+wmav2
+wmavoice
+wmv1
+wmv2
+wnv1
+wrapped_avframe # passthrough
+ws_snd1
+xan_dpcm
+xan_wc3
+xan_wc4
+xbin
+xbm # trivial
+xface
+xl
+xpm
+xsub
+xwd # xwd
+y41p # trivial
+ylc
+yop
+yuv4 # trivial
+zero12v
+zerocodec
+zlib # zlib
+zmbv # dosbox

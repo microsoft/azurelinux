@@ -1,0 +1,96 @@
+From 923dc05d68031a217684aba87acdadc7f711c88a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Thu, 10 Mar 2011 15:16:04 +0100
+Subject: [PATCH] Set PAM_TTY and PAM_RHOST on PAM authentication
+
+When loging to server, PAM can make decision on client network address, so set
+it appropriately. Also some modules require non-empy console name, thus set
+PAM_TTY to cvs PAM service name (`cvs').
+
+PAM failure is reported back to client.
+
+This code is back-ported from from upstream developemt tree (r1.489).
+`peer' and `len' types fixed to cover any address family.
+---
+ src/server.c |   47 ++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 46 insertions(+), 1 deletions(-)
+
+diff --git a/src/server.c b/src/server.c
+index 0505ab9..bc6f0d0 100644
+--- a/src/server.c
++++ b/src/server.c
+@@ -5799,18 +5799,61 @@ error 0 %s: no such user\n", username);
+ #if PAM_SUPPORT
+         pam_handle_t *pamh = NULL;
+         struct pam_conv conv;
++        char *pam_stage = "start";
++        struct sockaddr_storage peer;
++        socklen_t len;
++        char host[NI_MAXHOST];
+         int retval;
+ 
++        /* get the client's ip address */
++        len = sizeof (peer);
++        if (getpeername (STDIN_FILENO, (struct sockaddr *)&peer, &len) < 0)
++        {
++            printf ("E Fatal error, aborting.\n\
++error %s getpeername failed\n", strerror (errno));
++            exit (EXIT_FAILURE);
++        }
++
++        /* convert the ip address to text */
++        if (getnameinfo((struct sockaddr *)&peer, len, host, NI_MAXHOST,
++                    NULL, 0, NI_NUMERICHOST) < 0)
++        {
++            printf ("E Fatal error, aborting.\n\
++error %s getnameinfo failed\n", strerror (errno));
++            exit (EXIT_FAILURE);
++        }
++
+         conv.conv = silent_conv;
+         conv.appdata_ptr = password;
+ 
+-        retval = pam_start("cvs", username, &conv, &pamh);
++#define PAM_SERVICE_NAME "cvs"
++        retval = pam_start(PAM_SERVICE_NAME, username, &conv, &pamh);
++
++        /* sets a dummy tty name which pam modules can check for */
++        if (retval == PAM_SUCCESS)
++        {
++            pam_stage = "set dummy tty";
++            retval = pam_set_item (pamh, PAM_TTY, PAM_SERVICE_NAME);
++        }
++#undef PAM_SERVICE_NAME
++
++        if (retval == PAM_SUCCESS)
++        {
++            pam_stage = "set remote host ip";
++            retval = pam_set_item (pamh, PAM_RHOST, host);
++        }
+ 
+         if (retval == PAM_SUCCESS)
++        {
++            pam_stage = "authenticate";
+             retval = pam_authenticate(pamh, 0); /* is user really user? */
++        }
+ 
+         if (retval == PAM_SUCCESS)
++        {
++            pam_stage = "account";
+             retval = pam_acct_mgmt(pamh, 0);    /* permitted access? */
++        }
+ 
+         /* This is where we have been authorized or not. */
+ 
+@@ -5818,6 +5861,8 @@ error 0 %s: no such user\n", username);
+             host_user = xstrdup (username);
+         } else {
+             host_user = NULL;
++            printf ("E PAM %s error: %s\n",
++                 pam_stage, pam_strerror (pamh, retval));
+         }
+ 
+         if (pam_end(pamh,retval) != PAM_SUCCESS) {   /* close Linux-PAM */
+-- 
+1.7.4
+

@@ -1,0 +1,240 @@
+Description: Fix FTBFS
+ - Remove redefintions of __STDC_VERSION__
+ - Add _XOPEN_SOURCE=700 to expose some APIs being used
+ - Remove dangerous usage of mktemp and sscanf
+ - Use standard C types over non-standard aliases
+ - Remove CFLAGS disabling mitigations
+ - Stop building EFI binaries
+Author: Mate Kukri <mate.kukri@canonical.com>
+Bug-Ubuntu: https://bugs.launchpad.net/ubuntu/+source/efitools/+bug/2083030
+Last-Update: 2024-09-27
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+--- a/Make.rules
++++ b/Make.rules
+@@ -17,7 +17,7 @@
+ endif
+ INCDIR	   = -I$(TOPDIR)include/ -I/usr/include/efi -I/usr/include/efi/$(ARCH) -I/usr/include/efi/protocol
+ CPPFLAGS   = -DCONFIG_$(ARCH)
+-CFLAGS	   = -O2 -g $(ARCH3264) -fpic -Wall -fshort-wchar -fno-strict-aliasing -fno-merge-constants -fno-stack-protector -ffreestanding -fno-stack-check
++CFLAGS	   = -O2 -g $(ARCH3264) -fpic -Wall -fshort-wchar -fno-strict-aliasing -fno-merge-constants -D_XOPEN_SOURCE=700
+ LDFLAGS	   = -nostdlib
+ CRTOBJ		= crt0-efi-$(ARCH).o
+ CRTPATHS	= /lib /lib64 /lib/efi /lib64/efi /usr/lib /usr/lib64 /usr/lib/efi /usr/lib64/efi /usr/lib/gnuefi /usr/lib64/gnuefi
+--- a/cert-to-efi-sig-list.c
++++ b/cert-to-efi-sig-list.c
+@@ -6,7 +6,6 @@
+ 
+ 
+ #include <stdint.h>
+-#define __STDC_VERSION__ 199901L
+ #include <efi.h>
+ #ifdef CONFIG_arm
+ /* FIXME:
+--- a/efi-keytool.c
++++ b/efi-keytool.c
+@@ -15,7 +15,6 @@
+ #include <fcntl.h>
+ #include <unistd.h>
+ 
+-#define __STDC_VERSION__ 199901L
+ #include <efi.h>
+ 
+ #include <kernel_efivars.h>
+--- a/efi-readvar.c
++++ b/efi-readvar.c
+@@ -17,7 +17,6 @@
+ 
+ #include <openssl/x509.h>
+ 
+-#define __STDC_VERSION__ 199901L
+ #include <efi.h>
+ 
+ #include <kernel_efivars.h>
+--- a/efi-updatevar.c
++++ b/efi-updatevar.c
+@@ -11,6 +11,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <strings.h>
+ #include <sys/stat.h>
+ #include <fcntl.h>
+ #include <unistd.h>
+@@ -20,7 +21,6 @@
+ #include <openssl/err.h>
+ #include <openssl/pem.h>
+ 
+-#define __STDC_VERSION__ 199901L
+ #include <efi.h>
+ 
+ #include <kernel_efivars.h>
+--- a/flash-var.c
++++ b/flash-var.c
+@@ -10,7 +10,6 @@
+ #include <fcntl.h>
+ #include <unistd.h>
+ 
+-#define __STDC_VERSION__ 199901L
+ #include <efi.h>
+ 
+ #include <version.h>
+--- a/hash-to-efi-sig-list.c
++++ b/hash-to-efi-sig-list.c
+@@ -4,7 +4,6 @@
+  * see COPYING file
+  */
+ #include <stdint.h>
+-#define __STDC_VERSION__ 199901L
+ #include <efi.h>
+ #ifdef CONFIG_arm
+ /* FIXME:
+--- a/lib/kernel_efivars.c
++++ b/lib/kernel_efivars.c
+@@ -16,7 +16,6 @@
+ #include <unistd.h>
+ #include <time.h>
+ 
+-#define __STDC_VERSION__ 199901L
+ #include <efi.h>
+ 
+ #include <kernel_efivars.h>
+@@ -29,54 +28,39 @@
+ void
+ kernel_variable_init(void)
+ {
+-	char fname[] = "/tmp/efi.XXXXXX";
+-	char cmdline[256];
+-	int fd, ret;
+-	struct stat st;
+-	char *buf;
+-
+-	if (kernel_efi_path)
+-		return;
+-	mktemp(fname);
+-	snprintf(cmdline, sizeof(cmdline), "mount -l > %s", fname);
+-	ret = system(cmdline);
+-	if (WEXITSTATUS(ret) != 0)
+-		/* hopefully stderr said what was wrong */
+-		exit(1);
+-	fd = open(fname, O_RDONLY);
+-	unlink(fname);
+-	if (fd < 0) {
+-		fprintf(stderr, "Failed to open output of %s\n", cmdline);
+-		exit(1);
+-	}
+-	if (fstat(fd, &st) < 0) {
+-		perror("stat failed");
+-		exit(1);
+-	}
+-	if (st.st_size == 0) {
+-		fprintf(stderr, "No efivarfs filesystem is mounted\n");
++	FILE *mount_l_fp = NULL;
++	char *path = NULL;
++	char *type = NULL;
++
++	mount_l_fp = popen("mount -l", "r");
++
++	if (mount_l_fp == NULL) {
++		fprintf(stderr, "Failed to get output of mount -l\n");
+ 		exit(1);
+ 	}
+-	buf = malloc(st.st_size);
+-	read(fd, buf, st.st_size);
+-	close(fd);
+-
+-	char *ptr = buf;
+-	char path[512], type[512];
+-	while (ptr < buf + st.st_size) {
+-		int count;
+-
+-		sscanf(ptr, "%*s on %s type %s %*[^\n]\n%n", path, type, &count);
+-		ptr += count;
+-		if (strcmp(type, "efivarfs") == 0)
++
++	while (fscanf(mount_l_fp, "%*s on %ms type %ms %*[^\n]\n", &path, &type) == 2) {
++		if (strcmp(type, "efivarfs") == 0) {
++			kernel_efi_path = strdup(path);
+ 			break;
++		}
++		free(path);
++		path = NULL;
++		free(type);
++		type = NULL;
+ 	}
+-	if (strcmp(type, "efivarfs") != 0) {
++
++	if (mount_l_fp != NULL)
++		pclose(mount_l_fp);
++	if (path != NULL)
++		free(path);
++	if (type != NULL)
++		free(type);
++
++	if (kernel_efi_path == NULL) {
+ 		fprintf(stderr, "No efivarfs filesystem is mounted\n");
+ 		exit(1);
+ 	}
+-	kernel_efi_path = malloc(strlen(path) + 1);
+-	strcpy(kernel_efi_path, path);
+ }
+ 
+ int
+--- a/sig-list-to-certs.c
++++ b/sig-list-to-certs.c
+@@ -4,7 +4,6 @@
+  * see COPYING file
+  */
+ #include <stdint.h>
+-#define __STDC_VERSION__ 199901L
+ #include <efi.h>
+ #ifdef CONFIG_arm
+ /* FIXME:
+--- a/sign-efi-sig-list.c
++++ b/sign-efi-sig-list.c
+@@ -4,7 +4,6 @@
+  * see COPYING file
+  */
+ #include <stdint.h>
+-#define __STDC_VERSION__ 199901L
+ #include <efi.h>
+ #ifdef CONFIG_arm
+ /* FIXME:
+--- a/lib/asn1/oid.h
++++ b/lib/asn1/oid.h
+@@ -11,11 +11,11 @@
+ #define OID_H_
+ 
+ typedef struct {
+-    u_char octet;
+-    u_int  next;
+-    u_int  down;
+-    u_int  level;
+-    const u_char *name;
++    unsigned char octet;
++    unsigned int  next;
++    unsigned int  down;
++    unsigned int  level;
++    const unsigned char *name;
+ } oid_t;
+ 
+ extern const oid_t oid_names[];
+--- a/Makefile
++++ b/Makefile
+@@ -30,15 +30,13 @@
+ 
+ EFISIGNED = $(patsubst %.efi,%-signed.efi,$(EFIFILES))
+ 
+-all: $(EFISIGNED) $(BINARIES) $(MANPAGES) noPK.auth $(KEYAUTH) \
++all: $(BINARIES) $(MANPAGES) noPK.auth $(KEYAUTH) \
+ 	$(KEYUPDATEAUTH) $(KEYBLACKLISTAUTH) $(KEYHASHBLACKLISTAUTH)
+ 
+ 
+ install: all
+ 	$(INSTALL) -m 755 -d $(MANDIR)
+ 	$(INSTALL) -m 644 $(MANPAGES) $(MANDIR)
+-	$(INSTALL) -m 755 -d $(EFIDIR)
+-	$(INSTALL) -m 755 $(EFIFILES) $(EFIDIR)
+ 	$(INSTALL) -m 755 -d $(BINDIR)
+ 	$(INSTALL) -m 755 $(BINARIES) $(BINDIR)
+ 	$(INSTALL) -m 755 mkusb.sh $(BINDIR)/efitool-mkusb

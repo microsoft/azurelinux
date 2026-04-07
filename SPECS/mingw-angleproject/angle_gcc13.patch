@@ -1,0 +1,73 @@
+diff -rupN angle-57ea533/src/libANGLE/Error.h angle-57ea533-new/src/libANGLE/Error.h
+--- angle-57ea533/src/libANGLE/Error.h	2017-11-29 00:33:41.000000000 +0100
++++ angle-57ea533-new/src/libANGLE/Error.h	2023-07-24 23:30:48.032290487 +0200
+@@ -90,7 +90,7 @@ class ANGLE_NO_DISCARD Error final
+     inline ~Error() = default;
+ 
+     // automatic error type conversion
+-    inline Error(egl::Error &&eglErr);
++    // inline Error(egl::Error &&eglErr);
+     inline Error(egl::Error eglErr);
+ 
+     inline Error &operator=(const Error &other);
+@@ -161,7 +161,7 @@ class ANGLE_NO_DISCARD Error final
+     inline ~Error() = default;
+ 
+     // automatic error type conversion
+-    inline Error(gl::Error &&glErr);
++    //inline Error(gl::Error &&glErr);
+     inline Error(gl::Error glErr);
+ 
+     inline Error &operator=(const Error &other);
+diff -rupN angle-57ea533/src/libANGLE/Error.inl angle-57ea533-new/src/libANGLE/Error.inl
+--- angle-57ea533/src/libANGLE/Error.inl	2017-11-29 00:33:41.000000000 +0100
++++ angle-57ea533-new/src/libANGLE/Error.inl	2023-07-24 23:31:53.369880946 +0200
+@@ -38,12 +38,12 @@ Error::Error(Error &&other)
+ }
+ 
+ // automatic error type conversion
+-Error::Error(egl::Error &&eglErr)
+-    : mCode(GL_INVALID_OPERATION),
+-      mID(0),
+-      mMessage(std::move(eglErr.mMessage))
+-{
+-}
++// Error::Error(egl::Error &&eglErr)
++//     : mCode(GL_INVALID_OPERATION),
++//       mID(0),
++//       mMessage(std::move(eglErr.mMessage))
++// {
++// }
+ 
+ Error::Error(egl::Error eglErr)
+     : mCode(GL_INVALID_OPERATION),
+@@ -127,12 +127,12 @@ Error::Error(Error &&other)
+ }
+ 
+ // automatic error type conversion
+-Error::Error(gl::Error &&glErr)
+-    : mCode(EGL_BAD_ACCESS),
+-      mID(0),
+-      mMessage(std::move(glErr.mMessage))
+-{
+-}
++// Error::Error(gl::Error &&glErr)
++//     : mCode(EGL_BAD_ACCESS),
++//       mID(0),
++//       mMessage(std::move(glErr.mMessage))
++// {
++// }
+ 
+ Error::Error(gl::Error glErr)
+     : mCode(EGL_BAD_ACCESS),
+diff -rupN angle-57ea533/include/GLSLANG/ShaderVars.h angle-57ea533-new/include/GLSLANG/ShaderVars.h
+--- angle-57ea533/include/GLSLANG/ShaderVars.h	2017-11-29 00:33:41.000000000 +0100
++++ angle-57ea533-new/include/GLSLANG/ShaderVars.h	2023-07-25 06:35:38.030894349 +0200
+@@ -14,6 +14,7 @@
+ #include <array>
+ #include <string>
+ #include <vector>
++#include <cstdint>
+ 
+ // This type is defined here to simplify ANGLE's integration with glslang for SPIRv.
+ using ShCompileOptions = uint64_t;

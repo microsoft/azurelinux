@@ -1,0 +1,12 @@
+diff -up zip30/util.c.currdir zip30/util.c
+--- zip30/util.c.currdir	2009-11-16 12:42:17.783961701 +0100
++++ zip30/util.c	2009-11-16 12:42:58.185960707 +0100
+@@ -493,6 +493,8 @@ int cs;                 /* force case-se
+ /* Compare the sh pattern p with the string s and return true if they match,
+    false if they don't or if there is a syntax error in the pattern. */
+ {
++  while (s[0] == '.' && s[1] == '/') 
++    s += 2;                /* strip redundant leading "./" sections */
+   return recmatch(p, s, cs) == 1;
+ }
+ 

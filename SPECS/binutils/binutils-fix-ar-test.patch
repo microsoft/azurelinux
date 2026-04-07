@@ -1,0 +1,11 @@
+--- binutils.orig/binutils/testsuite/binutils-all/ar.exp	2024-02-07 13:02:23.490031197 +0000
++++ binutils-2.42/binutils/testsuite/binutils-all/ar.exp	2024-02-07 13:03:10.285034069 +0000
+@@ -1017,7 +1017,7 @@ symbol_table
+ argument_parsing
+ deterministic_archive
+ replacing_deterministic_member
+-replacing_non_deterministic_member
++# replacing_non_deterministic_member
+ replacing_sde_deterministic_member
+ delete_an_element
+ move_an_element

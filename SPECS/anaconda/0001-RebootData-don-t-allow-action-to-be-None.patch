@@ -1,0 +1,66 @@
+From c7dce0445423e7386fdc6998a6a8de50a7a39bca Mon Sep 17 00:00:00 2001
+From: Adam Williamson <awilliam@redhat.com>
+Date: Thu, 9 Oct 2025 10:07:01 -0700
+Subject: [PATCH] RebootData: don't allow action to be None
+
+Silverblue installs (and probably others where the kickstart data
+does not explicitly specify a reboot action) crash, because
+the `RebootData` instance's `action` winds up as `None`, since
+this is the default value of `self.action` in
+`pykickstart.commands.reboot.F23_Reboot`. Trying to translate
+this to a DBus structure with `RebootData.to_structure` fails,
+because DBus has no concept of `None`.
+
+To avoid this, let's have the setter convert `None` to `-1`, the
+same value we use as a default when initializing the instance.
+
+Signed-off-by: Adam Williamson <awilliam@redhat.com>
+---
+ pyanaconda/modules/common/structures/reboot.py         |  5 ++++-
+ .../modules/runtime/test_module_runtime.py             | 10 ++++++++++
+ 2 files changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/pyanaconda/modules/common/structures/reboot.py b/pyanaconda/modules/common/structures/reboot.py
+index fd2673b169..cadbfbd01f 100644
+--- a/pyanaconda/modules/common/structures/reboot.py
++++ b/pyanaconda/modules/common/structures/reboot.py
+@@ -46,7 +46,10 @@ class RebootData(DBusData):
+         return self._action
+ 
+     @action.setter
+-    def action(self, value: Int):
++    def action(self, value: Int | None):
++        if value is None:
++            # dbus cannot handle None
++            value = -1
+         self._action = value
+ 
+     @property
+diff --git a/tests/unit_tests/pyanaconda_tests/modules/runtime/test_module_runtime.py b/tests/unit_tests/pyanaconda_tests/modules/runtime/test_module_runtime.py
+index 22286e59c1..83d3a123ef 100644
+--- a/tests/unit_tests/pyanaconda_tests/modules/runtime/test_module_runtime.py
++++ b/tests/unit_tests/pyanaconda_tests/modules/runtime/test_module_runtime.py
+@@ -18,6 +18,7 @@
+ import unittest
+ from textwrap import dedent
+ 
++from pyanaconda.modules.common.structures.reboot import RebootData
+ from pyanaconda.modules.runtime.runtime import RuntimeService
+ from pyanaconda.modules.runtime.runtime_interface import RuntimeInterface
+ from tests.unit_tests.pyanaconda_tests import check_kickstart_interface
+@@ -166,3 +167,12 @@ class RuntimeInterfaceTestCase(unittest.TestCase):
+         ks_in = "halt --eject\n"
+         ks_out = "# Halt after installation\nhalt --eject\n"
+         self._test_kickstart(ks_in, ks_out)
++
++    def test_process_kickstart_with_no_payload(self):
++        """Test all values are ints when reading empty kickstart."""
++        self.interface.ReadKickstart("")
++        assert isinstance(self.module.reboot.action, int)
++        assert isinstance(self.module.reboot.eject, int)
++        assert isinstance(self.module.reboot.kexec, int)
++        # and check we can to_structure it
++        RebootData.to_structure(self.module.reboot)
+-- 
+2.51.0
+

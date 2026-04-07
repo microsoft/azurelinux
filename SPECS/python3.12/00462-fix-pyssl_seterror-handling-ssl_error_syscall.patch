@@ -1,0 +1,196 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: yevgeny hong <hongyevgeny@gmail.com>
+Date: Tue, 26 Mar 2024 16:45:43 +0900
+Subject: 00462: Fix PySSL_SetError handling SSL_ERROR_SYSCALL
+
+Python 3.10 changed from using SSL_write() and SSL_read() to SSL_write_ex() and
+SSL_read_ex(), but did not update handling of the return value.
+
+Change error handling so that the return value is not examined.
+OSError (not EOF) is now returned when retval is 0.
+
+This resolves the issue of failing tests when a system is
+stressed on OpenSSL 3.5.
+
+Co-authored-by: Serhiy Storchaka <storchaka@gmail.com>
+Co-authored-by: Petr Viktorin <encukou@gmail.com>
+---
+ Lib/test/test_ssl.py                          | 28 ++++++-----
+ ...-02-18-09-50-31.gh-issue-115627.HGchj0.rst |  2 +
+ Modules/_ssl.c                                | 48 +++++++------------
+ 3 files changed, 35 insertions(+), 43 deletions(-)
+ create mode 100644 Misc/NEWS.d/next/Library/2024-02-18-09-50-31.gh-issue-115627.HGchj0.rst
+
+diff --git a/Lib/test/test_ssl.py b/Lib/test/test_ssl.py
+index b13e37d0cd..daeb8cba74 100644
+--- a/Lib/test/test_ssl.py
++++ b/Lib/test/test_ssl.py
+@@ -2427,16 +2427,18 @@ def run(self):
+                         self.write(msg.lower())
+                 except OSError as e:
+                     # handles SSLError and socket errors
++                    if isinstance(e, ConnectionError):
++                        # OpenSSL 1.1.1 sometimes raises
++                        # ConnectionResetError when connection is not
++                        # shut down gracefully.
++                        if self.server.chatty and support.verbose:
++                            print(f" Connection reset by peer: {self.addr}")
++
++                        self.close()
++                        self.running = False
++                        return
+                     if self.server.chatty and support.verbose:
+-                        if isinstance(e, ConnectionError):
+-                            # OpenSSL 1.1.1 sometimes raises
+-                            # ConnectionResetError when connection is not
+-                            # shut down gracefully.
+-                            print(
+-                                f" Connection reset by peer: {self.addr}"
+-                            )
+-                        else:
+-                            handle_error("Test server failure:\n")
++                        handle_error("Test server failure:\n")
+                     try:
+                         self.write(b"ERROR\n")
+                     except OSError:
+@@ -3148,8 +3150,8 @@ def test_wrong_cert_tls13(self):
+                                         suppress_ragged_eofs=False) as s:
+             s.connect((HOST, server.port))
+             with self.assertRaisesRegex(
+-                ssl.SSLError,
+-                'alert unknown ca|EOF occurred|TLSV1_ALERT_UNKNOWN_CA'
++                OSError,
++                'alert unknown ca|EOF occurred|TLSV1_ALERT_UNKNOWN_CA|closed by the remote host|Connection reset by peer'
+             ):
+                 # TLS 1.3 perform client cert exchange after handshake
+                 s.write(b'data')
+@@ -4422,8 +4424,8 @@ def msg_cb(conn, direction, version, content_type, msg_type, data):
+                 # test sometimes fails with EOF error. Test passes as long as
+                 # server aborts connection with an error.
+                 with self.assertRaisesRegex(
+-                    ssl.SSLError,
+-                    '(certificate required|EOF occurred)'
++                    OSError,
++                    'certificate required|EOF occurred|closed by the remote host|Connection reset by peer'
+                 ):
+                     # receive CertificateRequest
+                     data = s.recv(1024)
+diff --git a/Misc/NEWS.d/next/Library/2024-02-18-09-50-31.gh-issue-115627.HGchj0.rst b/Misc/NEWS.d/next/Library/2024-02-18-09-50-31.gh-issue-115627.HGchj0.rst
+new file mode 100644
+index 0000000000..75d926ab59
+--- /dev/null
++++ b/Misc/NEWS.d/next/Library/2024-02-18-09-50-31.gh-issue-115627.HGchj0.rst
+@@ -0,0 +1,2 @@
++Fix the :mod:`ssl` module error handling of connection terminate by peer.
++It now throws an OSError with the appropriate error code instead of an EOFError.
+diff --git a/Modules/_ssl.c b/Modules/_ssl.c
+index 0b8cf0b6df..42a4c95890 100644
+--- a/Modules/_ssl.c
++++ b/Modules/_ssl.c
+@@ -573,7 +573,7 @@ PySSL_ChainExceptions(PySSLSocket *sslsock) {
+ }
+ 
+ static PyObject *
+-PySSL_SetError(PySSLSocket *sslsock, int ret, const char *filename, int lineno)
++PySSL_SetError(PySSLSocket *sslsock, const char *filename, int lineno)
+ {
+     PyObject *type;
+     char *errstr = NULL;
+@@ -586,7 +586,6 @@ PySSL_SetError(PySSLSocket *sslsock, int ret, const char *filename, int lineno)
+     _sslmodulestate *state = get_state_sock(sslsock);
+     type = state->PySSLErrorObject;
+ 
+-    assert(ret <= 0);
+     e = ERR_peek_last_error();
+ 
+     if (sslsock->ssl != NULL) {
+@@ -619,32 +618,21 @@ PySSL_SetError(PySSLSocket *sslsock, int ret, const char *filename, int lineno)
+         case SSL_ERROR_SYSCALL:
+         {
+             if (e == 0) {
+-                PySocketSockObject *s = GET_SOCKET(sslsock);
+-                if (ret == 0 || (((PyObject *)s) == Py_None)) {
++                /* underlying BIO reported an I/O error */
++                ERR_clear_error();
++#ifdef MS_WINDOWS
++                if (err.ws) {
++                    return PyErr_SetFromWindowsErr(err.ws);
++                }
++#endif
++                if (err.c) {
++                    errno = err.c;
++                    return PyErr_SetFromErrno(PyExc_OSError);
++                }
++                else {
+                     p = PY_SSL_ERROR_EOF;
+                     type = state->PySSLEOFErrorObject;
+                     errstr = "EOF occurred in violation of protocol";
+-                } else if (s && ret == -1) {
+-                    /* underlying BIO reported an I/O error */
+-                    ERR_clear_error();
+-#ifdef MS_WINDOWS
+-                    if (err.ws) {
+-                        return PyErr_SetFromWindowsErr(err.ws);
+-                    }
+-#endif
+-                    if (err.c) {
+-                        errno = err.c;
+-                        return PyErr_SetFromErrno(PyExc_OSError);
+-                    }
+-                    else {
+-                        p = PY_SSL_ERROR_EOF;
+-                        type = state->PySSLEOFErrorObject;
+-                        errstr = "EOF occurred in violation of protocol";
+-                    }
+-                } else { /* possible? */
+-                    p = PY_SSL_ERROR_SYSCALL;
+-                    type = state->PySSLSyscallErrorObject;
+-                    errstr = "Some I/O error occurred";
+                 }
+             } else {
+                 if (ERR_GET_LIB(e) == ERR_LIB_SSL &&
+@@ -1007,7 +995,7 @@ _ssl__SSLSocket_do_handshake_impl(PySSLSocket *self)
+              err.ssl == SSL_ERROR_WANT_WRITE);
+     Py_XDECREF(sock);
+     if (ret < 1)
+-        return PySSL_SetError(self, ret, __FILE__, __LINE__);
++        return PySSL_SetError(self, __FILE__, __LINE__);
+     if (PySSL_ChainExceptions(self) < 0)
+         return NULL;
+     Py_RETURN_NONE;
+@@ -2424,7 +2412,7 @@ _ssl__SSLSocket_write_impl(PySSLSocket *self, Py_buffer *b)
+ 
+     Py_XDECREF(sock);
+     if (retval == 0)
+-        return PySSL_SetError(self, retval, __FILE__, __LINE__);
++        return PySSL_SetError(self, __FILE__, __LINE__);
+     if (PySSL_ChainExceptions(self) < 0)
+         return NULL;
+     return PyLong_FromSize_t(count);
+@@ -2454,7 +2442,7 @@ _ssl__SSLSocket_pending_impl(PySSLSocket *self)
+     self->err = err;
+ 
+     if (count < 0)
+-        return PySSL_SetError(self, count, __FILE__, __LINE__);
++        return PySSL_SetError(self, __FILE__, __LINE__);
+     else
+         return PyLong_FromLong(count);
+ }
+@@ -2577,7 +2565,7 @@ _ssl__SSLSocket_read_impl(PySSLSocket *self, Py_ssize_t len,
+              err.ssl == SSL_ERROR_WANT_WRITE);
+ 
+     if (retval == 0) {
+-        PySSL_SetError(self, retval, __FILE__, __LINE__);
++        PySSL_SetError(self, __FILE__, __LINE__);
+         goto error;
+     }
+     if (self->exc != NULL)
+@@ -2703,7 +2691,7 @@ _ssl__SSLSocket_shutdown_impl(PySSLSocket *self)
+     }
+     if (ret < 0) {
+         Py_XDECREF(sock);
+-        PySSL_SetError(self, ret, __FILE__, __LINE__);
++        PySSL_SetError(self, __FILE__, __LINE__);
+         return NULL;
+     }
+     if (self->exc != NULL)

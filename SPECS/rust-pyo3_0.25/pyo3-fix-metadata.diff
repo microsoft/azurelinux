@@ -1,0 +1,10 @@
+--- pyo3-0.25.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ pyo3-0.25.1/Cargo.toml	2025-06-19T13:36:54.665056+00:00
+@@ -145,7 +145,6 @@
+     "smallvec",
+     "uuid",
+ ]
+-generate-import-lib = ["pyo3-ffi/generate-import-lib"]
+ macros = [
+     "pyo3-macros",
+     "indoc",

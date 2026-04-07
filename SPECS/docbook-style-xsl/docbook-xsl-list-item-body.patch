@@ -1,0 +1,110 @@
+diff -ruNp docbook-xsl-1.74.0.orig/fo/lists.xsl docbook-xsl-1.74.0/fo/lists.xsl
+--- docbook-xsl-1.74.0.orig/fo/lists.xsl	2008-08-06 13:32:46.000000000 +0200
++++ docbook-xsl-1.74.0/fo/lists.xsl	2008-08-06 13:41:27.000000000 +0200
+@@ -248,9 +248,17 @@
+       </fo:block>
+     </fo:list-item-label>
+     <fo:list-item-body start-indent="body-start()">
+-      <fo:block>
+-        <xsl:apply-templates/>
+-      </fo:block>
++      <xsl:choose>
++        <!-- * work around broken passivetex list-item-body rendering -->
++        <xsl:when test="$passivetex.extensions = '1'">
++          <xsl:apply-templates/>
++        </xsl:when>
++        <xsl:otherwise>
++          <fo:block>
++            <xsl:apply-templates/>
++          </fo:block>
++        </xsl:otherwise>
++      </xsl:choose>
+     </fo:list-item-body>
+   </xsl:variable>
+ 
+@@ -446,10 +454,18 @@
+       </fo:block>
+     </fo:list-item-label>
+     <fo:list-item-body start-indent="body-start()">
+-      <fo:block>
+-        <xsl:apply-templates select="listitem"/>
+-      </fo:block>
+-    </fo:list-item-body>
++      <xsl:choose>
++        <!-- * work around broken passivetex list-item-body rendering -->
++        <xsl:when test="$passivetex.extensions = '1'">
++          <xsl:apply-templates select="listitem"/>
++        </xsl:when>
++        <xsl:otherwise>
++          <fo:block>
++            <xsl:apply-templates select="listitem"/>
++          </fo:block>
++        </xsl:otherwise>
++      </xsl:choose>
++     </fo:list-item-body>
+   </xsl:variable>
+ 
+   <xsl:choose>
+@@ -925,9 +941,17 @@
+       </fo:block>
+     </fo:list-item-label>
+     <fo:list-item-body start-indent="body-start()">
+-      <fo:block>
+-        <xsl:apply-templates/>
+-      </fo:block>
++      <xsl:choose>
++        <!-- * work around broken passivetex list-item-body rendering -->
++        <xsl:when test="$passivetex.extensions = '1'">
++          <xsl:apply-templates/>
++        </xsl:when>
++        <xsl:otherwise>
++          <fo:block>
++            <xsl:apply-templates/>
++          </fo:block>
++        </xsl:otherwise>
++      </xsl:choose>
+     </fo:list-item-body>
+   </fo:list-item>
+ </xsl:template>
+@@ -951,9 +975,17 @@
+       </fo:block>
+     </fo:list-item-label>
+     <fo:list-item-body start-indent="body-start()">
+-      <fo:block>
+-        <xsl:apply-templates/>
+-      </fo:block>
++      <xsl:choose>
++        <!-- * work around broken passivetex list-item-body rendering -->
++        <xsl:when test="$passivetex.extensions = '1'">
++          <xsl:apply-templates/>
++        </xsl:when>
++        <xsl:otherwise>
++          <fo:block>
++            <xsl:apply-templates/>
++          </fo:block>
++        </xsl:otherwise>
++      </xsl:choose>
+     </fo:list-item-body>
+   </fo:list-item>
+ </xsl:template>
+@@ -1141,9 +1173,17 @@
+       </fo:block>
+     </fo:list-item-label>
+     <fo:list-item-body start-indent="body-start()">
+-      <fo:block>
+-        <xsl:apply-templates/>
+-      </fo:block>
++      <xsl:choose>
++        <!-- * work around broken passivetex list-item-body rendering -->
++        <xsl:when test="$passivetex.extensions = '1'">
++          <xsl:apply-templates/>
++        </xsl:when>
++        <xsl:otherwise>
++          <fo:block>
++            <xsl:apply-templates/>
++          </fo:block>
++        </xsl:otherwise>
++      </xsl:choose>
+     </fo:list-item-body>
+   </fo:list-item>
+ </xsl:template>

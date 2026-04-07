@@ -1,0 +1,24 @@
+--- podman-sequoia-0.2.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ podman-sequoia-0.2.0/Cargo.toml	2025-11-10T07:12:03.650690+00:00
+@@ -40,12 +40,7 @@
+ repository = "https://github.com/ueno/podman-sequoia"
+ 
+ [features]
+-crypto-botan = ["sequoia-openpgp/crypto-botan"]
+-crypto-botan2 = ["sequoia-openpgp/crypto-botan2"]
+-crypto-cng = ["sequoia-openpgp/crypto-cng"]
+-crypto-nettle = ["sequoia-openpgp/crypto-nettle"]
+ crypto-openssl = ["sequoia-openpgp/crypto-openssl"]
+-crypto-rust = ["sequoia-openpgp/crypto-rust"]
+ default = ["crypto-openssl"]
+ 
+ [lib]
+@@ -57,7 +52,7 @@
+ version = "1"
+ 
+ [dependencies.dirs]
+-version = "5"
++version = ">=5, <7"
+ 
+ [dependencies.libc]
+ version = "0.2"

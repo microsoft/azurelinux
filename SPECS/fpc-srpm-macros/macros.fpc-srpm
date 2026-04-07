@@ -1,0 +1,3 @@
+%fpc_arches %{ix86} %{arm} x86_64 ppc64le aarch64
+# fpc_arches lists the architectures where the Free Pascal Compiler is
+# available in Fedora.

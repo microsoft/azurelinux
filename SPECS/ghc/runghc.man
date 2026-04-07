@@ -1,0 +1,45 @@
+.TH RUNGHC 1 "28 NOVEMBER 2007"
+.SH NAME
+runghc \- program to run Haskell programs without first having to compile them.
+.SH SYNOPSIS
+.B runghc
+.RI 
+[runghc|flags] [GHC|flags] module [program|flags]...
+.br
+.SH DESCRIPTION
+.B runghc 
+is considered a non-interactive interpreter and part of The Glasgow Haskell Compiler. 
+.B runghc
+is a compiler that automatically runs its results at the end.  
+.PP
+.SH OPTIONS
+.TP
+the flags are: 
+.TP
+.B \-f
+it tells runghc which GHC to use to run the program. If it is not given then runghc will search for GHC in the directories in the system search path. runghc -f /path/to/ghc
+.TP
+.B \-- 
+runghc will try to work out where the boundaries between [runghc flags] and [GHC flags], and [GHC flags] and module are, but you can use a -- flag if it doesn't get it right. For example, runghc -- -fglasgow-exts Foo 
+means runghc won't try to use glasgow-exts as the path to GHC, but instead will pass the flag to GHC.
+
+.SH EXAMPLES
+.TP 
+.B runghc foo
+.PP
+.B runghc -f /path/to/ghc foo
+.TP 
+.B runghc -- -fglasgow-exts Foo
+
+.SH SEE ALSO
+.BR ghc (1),
+.BR ghci (1).
+.br
+
+.SH COPYRIGHT
+Copyright 2002, The University Court of the University of Glasgow. All rights reserved.
+
+.SH AUTHOR
+This manual page was written by Efrain Valles Pulgar <effie.jayx@gmail.com>. This is free documentation; see the GNU 
+General Public Licence version 2 or later for copying conditions. There is NO WARRANTY.
+

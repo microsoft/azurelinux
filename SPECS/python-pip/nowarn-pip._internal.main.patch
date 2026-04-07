@@ -1,0 +1,79 @@
+From 9d1e0a0e91cad143702b3a2d8c54bd765a5d9eb2 Mon Sep 17 00:00:00 2001
+From: Karolina Surma <ksurma@redhat.com>
+Date: Thu, 27 Jun 2024 10:48:03 +0200
+Subject: [PATCH] Don't warn the user about pip._internal.main() entrypoint
+
+In Fedora, we use that in ensurepip and users cannot do anything about it,
+this warning is juts moot. Also, the warning breaks CPython test suite.
+
+Co-Authored-By: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+---
+ src/pip/_internal/__init__.py          |  2 +-
+ src/pip/_internal/utils/entrypoints.py | 19 ++++++++++---------
+ tests/functional/test_cli.py           |  3 ++-
+ 3 files changed, 13 insertions(+), 11 deletions(-)
+
+diff --git a/src/pip/_internal/__init__.py b/src/pip/_internal/__init__.py
+index 1a5b7f8..682b9e4 100755
+--- a/src/pip/_internal/__init__.py
++++ b/src/pip/_internal/__init__.py
+@@ -15,4 +15,4 @@ def main(args: Optional[List[str]] = None) -> int:
+     """
+     from pip._internal.utils.entrypoints import _wrapper
+ 
+-    return _wrapper(args)
++    return _wrapper(args, _nowarn=True)
+diff --git a/src/pip/_internal/utils/entrypoints.py b/src/pip/_internal/utils/entrypoints.py
+index 1501369..70034eb 100644
+--- a/src/pip/_internal/utils/entrypoints.py
++++ b/src/pip/_internal/utils/entrypoints.py
+@@ -20,7 +20,7 @@ if WINDOWS:
+     ]
+ 
+ 
+-def _wrapper(args: Optional[List[str]] = None) -> int:
++def _wrapper(args: Optional[List[str]] = None, _nowarn: bool = False) -> int:
+     """Central wrapper for all old entrypoints.
+ 
+     Historically pip has had several entrypoints defined. Because of issues
+@@ -32,14 +32,15 @@ def _wrapper(args: Optional[List[str]] = None) -> int:
+     directing them to an appropriate place for help, we now define all of
+     our old entrypoints as wrappers for the current one.
+     """
+-    sys.stderr.write(
+-        "WARNING: pip is being invoked by an old script wrapper. This will "
+-        "fail in a future version of pip.\n"
+-        "Please see https://github.com/pypa/pip/issues/5599 for advice on "
+-        "fixing the underlying issue.\n"
+-        "To avoid this problem you can invoke Python with '-m pip' instead of "
+-        "running pip directly.\n"
+-    )
++    if not _nowarn:
++        sys.stderr.write(
++            "WARNING: pip is being invoked by an old script wrapper. This will "
++            "fail in a future version of pip.\n"
++            "Please see https://github.com/pypa/pip/issues/5599 for advice on "
++            "fixing the underlying issue.\n"
++            "To avoid this problem you can invoke Python with '-m pip' instead of "
++            "running pip directly.\n"
++        )
+     return main(args)
+ 
+ 
+diff --git a/tests/functional/test_cli.py b/tests/functional/test_cli.py
+index e1ccf04..30b8f74 100644
+--- a/tests/functional/test_cli.py
++++ b/tests/functional/test_cli.py
+@@ -49,7 +49,8 @@ def test_entrypoints_work(entrypoint: str, script: PipTestEnvironment) -> None:
+     result = script.pip("-V")
+     result2 = script.run("fake_pip", "-V", allow_stderr_warning=True)
+     assert result.stdout == result2.stdout
+-    assert "old script wrapper" in result2.stderr
++    if entrypoint[0] != "fake_pip = pip._internal:main":
++        assert "old script wrapper" in result2.stderr
+ 
+ 
+ @pytest.mark.parametrize(
+-- 
+2.45.1
+

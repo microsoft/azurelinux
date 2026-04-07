@@ -1,0 +1,35 @@
+--- a/examples/chroot-setup/LINUX2	2006-01-01 15:53:58.000000000 -0800
++++ b/examples/chroot-setup/LINUX2	2016-11-27 00:45:52.145301784 -0800
+@@ -45,14 +45,14 @@
+ # 20060101 /lib64 support by Keith Owens.
+ #
+ 
+-CP="cp -p"
++CP="cp -p -Z"
+ 
+ cond_copy() {
+   # find files as per pattern in $1
+   # if any, copy to directory $2
+   dir=`dirname "$1"`
+   pat=`basename "$1"`
+-  lr=`find "$dir" -maxdepth 1 -name "$pat"`
++  lr=`find "$dir/" -maxdepth 1 -name "$pat"`
+   if test ! -d "$2" ; then exit 1 ; fi
+   if test "x$lr" != "x" ; then $CP $1 "$2" ; fi
+ } 
+@@ -63,8 +63,8 @@
+ POSTFIX_DIR=${POSTFIX_DIR-/var/spool/postfix}
+ cd ${POSTFIX_DIR}
+ 
+-mkdir -p etc lib usr/lib/zoneinfo
+-test -d /lib64 && mkdir -p lib64
++mkdir -p -Z etc lib usr/lib/zoneinfo
++test -d /lib64 && mkdir -p -Z lib64
+ 
+ # find localtime (SuSE 5.3 does not have /etc/localtime)
+ lt=/etc/localtime
+@@ -88,4 +88,3 @@
+   cond_copy '/lib64/libdb.so*' lib64
+ fi
+ 
+-postfix reload

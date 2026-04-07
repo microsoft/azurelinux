@@ -1,0 +1,29 @@
+From 8153a1add19018f65527faad3c4d3941705baf39 Mon Sep 17 00:00:00 2001
+From: Craig Scott <craig.scott@crascit.com>
+Date: Wed, 16 Aug 2023 15:55:44 +1000
+Subject: [PATCH] Specify CMake policy range to avoid deprecation warning
+
+CMake 3.27 started issuing a deprecation warning for any
+cmake_minimum_required() call that specified a minimum
+version older than 3.5. Specifying a version range instead of
+a simple minimum version avoids that warning without
+raising the minimum supported CMake version. The NEW
+policy behavior will be used for all policies introduced up to
+CMake 3.14 with this change.
+---
+ CMakeLists.txt | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 46dc18059..1ae92e2b7 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,5 +1,6 @@
+-# 3.5 is actually available almost everywhere, but this a good minimum
+-cmake_minimum_required(VERSION 3.4)
++# 3.5 is actually available almost everywhere, but this a good minimum.
++# 3.14 as the upper policy limit avoids CMake deprecation warnings.
++cmake_minimum_required(VERSION 3.4...3.14)
+ 
+ # enable MSVC_RUNTIME_LIBRARY target property
+ # see https://cmake.org/cmake/help/latest/policy/CMP0091.html

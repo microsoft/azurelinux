@@ -1,0 +1,49 @@
+From 42d34719f01229b25d2725cb56e7a527a3ec35cc Mon Sep 17 00:00:00 2001
+From: Karolina Surma <ksurma@redhat.com>
+Date: Wed, 12 Mar 2025 14:46:09 +0100
+Subject: [PATCH] Avoid the multiprocessing forkserver method
+
+From Python 3.14 on, the default method of spawning processes on
+non-macOS POSIX systems has been changed from fork to forkserver.
+Ensure the correct method is used in the test.
+---
+ tests/test_multiprocessing.py | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/tests/test_multiprocessing.py b/tests/test_multiprocessing.py
+index 44a891b..01a5a0c 100644
+--- a/tests/test_multiprocessing.py
++++ b/tests/test_multiprocessing.py
+@@ -1,6 +1,6 @@
+ import unittest
+ try:
+-    from multiprocessing import Process, Queue, Pipe
++    from multiprocessing import Process, Queue, Pipe, get_start_method, get_context
+     disabled = False
+ except ImportError:
+     Process = None
+@@ -14,6 +14,16 @@
+ class TestIni(unittest.TestCase):
+     """Test sending INIConfig objects."""
+ 
++    # Since Python 3.14 on non-macOS POSIX systems
++    # the default method has been changed to forkserver.
++    # The code in this module does not work with it,
++    # hence the explicit change to 'fork'
++    # See https://github.com/python/cpython/issues/125714
++    if get_start_method() == "forkserver":
++        _mp_context = get_context(method="fork")
++    else:
++        _mp_context = get_context()
++
+     def test_queue(self):
+         def getxy(_q, _w):
+             _cfg = _q.get_nowait()
+@@ -23,6 +33,6 @@ def getxy(_q, _w):
+         q = Queue()
+         w = Queue()
+         q.put(cfg)
+-        p = Process(target=getxy, args=(q, w))
++        p = self._mp_context.Process(target=getxy, args=(q, w))
+         p.start()
+         self.assertEqual(w.get(timeout=1), '42')

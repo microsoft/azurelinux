@@ -1,0 +1,37 @@
+From 1d5ce3e2e6341b01609aefab20786a8638fee17a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 6 Dec 2011 18:44:11 +0100
+Subject: [PATCH] Fix multilib
+
+Do not set RPATH nor add explicit -L path to compiler.
+---
+ pcre-config.in |   12 ------------
+ 1 files changed, 0 insertions(+), 12 deletions(-)
+
+diff --git a/pcre-config.in b/pcre-config.in
+index ccbf210..aeee182 100644
+--- a/pcre-config.in
++++ b/pcre-config.in
+@@ -16,19 +16,7 @@ if test $# -eq 0; then
+ fi
+ 
+ libR=
+-case `uname -s` in
+-  *SunOS*)
+-  libR=" -R@libdir@"
+-  ;;
+-  *BSD*)
+-  libR=" -Wl,-R@libdir@"
+-  ;;
+-esac
+-
+ libS=
+-if test @libdir@ != /usr/lib ; then
+-  libS=-L@libdir@
+-fi
+ 
+ while test $# -gt 0; do
+   case "$1" in
+-- 
+1.7.7.4
+

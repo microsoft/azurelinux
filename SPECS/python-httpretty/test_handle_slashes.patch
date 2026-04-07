@@ -1,0 +1,28 @@
+From 44a9b748a24253fb483f3338f7ae145ca90b7178 Mon Sep 17 00:00:00 2001
+From: Jiri Popelka <jpopelka@redhat.com>
+Date: Wed, 3 Aug 2022 15:51:54 +0200
+Subject: [PATCH 4/4] Update
+ test_httpretty_should_handle_paths_starting_with_two_slashes
+
+http.server.BaseHTTPRequestHandler.parse_request() now replaces '//' with '/'.
+https://github.com/python/cpython/pull/93879
+
+Patch-name: test_handle_slashes.patch
+Patch-status: https://github.com/gabrielfalcao/HTTPretty/issues/457
+---
+ tests/functional/test_requests.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/functional/test_requests.py b/tests/functional/test_requests.py
+index 752428b..59e36b0 100644
+--- a/tests/functional/test_requests.py
++++ b/tests/functional/test_requests.py
+@@ -946,4 +946,4 @@ def test_httpretty_should_handle_paths_starting_with_two_slashes():
+     response = requests.get('http://example.com//foo')
+     expect(response.text).to.equal('Find the best foo')
+     expect(HTTPretty.last_request.method).to.equal('GET')
+-    expect(HTTPretty.last_request.path).to.equal('//foo')
++    expect(HTTPretty.last_request.path).to.equal('/foo')
+-- 
+2.37.1
+

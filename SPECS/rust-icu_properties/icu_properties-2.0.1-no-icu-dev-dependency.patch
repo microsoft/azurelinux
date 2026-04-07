@@ -1,0 +1,12 @@
+diff -Naur icu_properties-2.0.1-original/src/code_point_set.rs icu_properties-2.0.1/src/code_point_set.rs
+--- icu_properties-2.0.1-original/src/code_point_set.rs	2006-07-23 21:21:28.000000000 -0400
++++ icu_properties-2.0.1/src/code_point_set.rs	2025-07-13 09:28:01.660223953 -0400
+@@ -241,6 +241,8 @@
+     }
+ }
+ 
++// All of these would require the circular dev-dependency on the icu crate.
++#[cfg(any())]
+ #[cfg(test)]
+ mod tests {
+     #[test]

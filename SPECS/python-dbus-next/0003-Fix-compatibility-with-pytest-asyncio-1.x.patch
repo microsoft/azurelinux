@@ -1,0 +1,168 @@
+From 1cb15b80315d69d759eabe513b377f5846354cd8 Mon Sep 17 00:00:00 2001
+From: Aleksei Bavshin <alebastr89@gmail.com>
+Date: Sun, 21 Sep 2025 09:45:04 -0700
+Subject: [PATCH 3/3] Fix compatibility with pytest-asyncio 1.x
+
+---
+ pytest.ini                 | 2 ++
+ test/test_aio_low_level.py | 5 +++--
+ test/test_disconnect.py    | 9 +++++----
+ test/test_fd_passing.py    | 9 +++++----
+ test/test_tcp_address.py   | 3 ++-
+ 5 files changed, 17 insertions(+), 11 deletions(-)
+
+diff --git a/pytest.ini b/pytest.ini
+index 1ea6b80..56440ca 100644
+--- a/pytest.ini
++++ b/pytest.ini
+@@ -1,2 +1,4 @@
+ [pytest]
++asyncio_default_fixture_loop_scope = function
++asyncio_default_test_loop_scope = function
+ timeout = 5
+diff --git a/test/test_aio_low_level.py b/test/test_aio_low_level.py
+index 1042a1a..93db905 100644
+--- a/test/test_aio_low_level.py
++++ b/test/test_aio_low_level.py
+@@ -1,6 +1,7 @@
+ from dbus_next.aio import MessageBus
+ from dbus_next import Message, MessageType, MessageFlag
+ 
++import asyncio
+ import pytest
+ 
+ 
+@@ -101,7 +102,7 @@ async def test_sending_messages_between_buses():
+ 
+ 
+ @pytest.mark.asyncio
+-async def test_sending_signals_between_buses(event_loop):
++async def test_sending_signals_between_buses():
+     bus1 = await MessageBus().connect()
+     bus2 = await MessageBus().connect()
+ 
+@@ -115,7 +116,7 @@ async def test_sending_signals_between_buses(event_loop):
+     await bus1.call(add_match_msg)
+ 
+     async def wait_for_message():
+-        future = event_loop.create_future()
++        future = asyncio.get_running_loop().create_future()
+ 
+         def message_handler(signal):
+             if signal.sender == bus2.unique_name:
+diff --git a/test/test_disconnect.py b/test/test_disconnect.py
+index d04d996..8de7742 100644
+--- a/test/test_disconnect.py
++++ b/test/test_disconnect.py
+@@ -1,13 +1,14 @@
+ from dbus_next.aio import MessageBus
+ from dbus_next import Message
+ 
++import asyncio
+ import os
+ import pytest
+ import functools
+ 
+ 
+ @pytest.mark.asyncio
+-async def test_bus_disconnect_before_reply(event_loop):
++async def test_bus_disconnect_before_reply():
+     '''In this test, the bus disconnects before the reply comes in. Make sure
+     the caller receives a reply with the error instead of hanging.'''
+     bus = MessageBus()
+@@ -21,7 +22,7 @@ async def test_bus_disconnect_before_reply(event_loop):
+                 interface='org.freedesktop.DBus',
+                 member='Ping'))
+ 
+-    event_loop.call_soon(bus.disconnect)
++    asyncio.get_running_loop().call_soon(bus.disconnect)
+ 
+     with pytest.raises((EOFError, BrokenPipeError)):
+         await ping
+@@ -32,7 +33,7 @@ async def test_bus_disconnect_before_reply(event_loop):
+ 
+ 
+ @pytest.mark.asyncio
+-async def test_unexpected_disconnect(event_loop):
++async def test_unexpected_disconnect():
+     bus = MessageBus()
+     assert not bus.connected
+     await bus.connect()
+@@ -44,7 +45,7 @@ async def test_unexpected_disconnect(event_loop):
+                 interface='org.freedesktop.DBus',
+                 member='Ping'))
+ 
+-    event_loop.call_soon(functools.partial(os.close, bus._fd))
++    asyncio.get_running_loop().call_soon(functools.partial(os.close, bus._fd))
+ 
+     with pytest.raises(OSError):
+         await ping
+diff --git a/test/test_fd_passing.py b/test/test_fd_passing.py
+index 28331d3..debc46e 100644
+--- a/test/test_fd_passing.py
++++ b/test/test_fd_passing.py
+@@ -3,6 +3,7 @@ from dbus_next.service import ServiceInterface, method, signal, dbus_property
+ from dbus_next.signature import SignatureTree, Variant
+ from dbus_next.aio import MessageBus
+ from dbus_next import Message, MessageType
++import asyncio
+ import os
+ 
+ import pytest
+@@ -112,7 +113,7 @@ async def test_sending_file_descriptor_low_level():
+ 
+ 
+ @pytest.mark.asyncio
+-async def test_high_level_service_fd_passing(event_loop):
++async def test_high_level_service_fd_passing():
+     bus1 = await MessageBus(negotiate_unix_fd=True).connect()
+     bus2 = await MessageBus(negotiate_unix_fd=True).connect()
+ 
+@@ -151,7 +152,7 @@ async def test_high_level_service_fd_passing(event_loop):
+     os.close(fd)
+ 
+     # signals
+-    fut = event_loop.create_future()
++    fut = asyncio.get_running_loop().create_future()
+ 
+     def fd_listener(msg):
+         if msg.sender == bus1.unique_name and msg.message_type == MessageType.SIGNAL:
+@@ -212,7 +213,7 @@ async def test_high_level_service_fd_passing(event_loop):
+ 
+ 
+ @pytest.mark.asyncio
+-async def test_sending_file_descriptor_with_proxy(event_loop):
++async def test_sending_file_descriptor_with_proxy():
+     name = 'dbus.next.test.service'
+     path = '/test/path'
+     interface_name = 'test.interface'
+@@ -251,7 +252,7 @@ async def test_sending_file_descriptor_with_proxy(event_loop):
+     interface.cleanup()
+     os.close(fd)
+ 
+-    fut = event_loop.create_future()
++    fut = asyncio.get_running_loop().create_future()
+ 
+     def on_signal_fd(fd):
+         fut.set_result(fd)
+diff --git a/test/test_tcp_address.py b/test/test_tcp_address.py
+index a6b6ebb..1045af5 100644
+--- a/test/test_tcp_address.py
++++ b/test/test_tcp_address.py
+@@ -8,11 +8,12 @@ import os
+ 
+ 
+ @pytest.mark.asyncio
+-async def test_tcp_connection_with_forwarding(event_loop):
++async def test_tcp_connection_with_forwarding():
+     closables = []
+     host = '127.0.0.1'
+     port = '55556'
+ 
++    event_loop = asyncio.get_running_loop()
+     addr_info = parse_address(os.environ.get('DBUS_SESSION_BUS_ADDRESS'))
+     assert addr_info
+     assert 'abstract' in addr_info[0][1]
+-- 
+2.51.0
+

@@ -1,0 +1,18 @@
+diff -up chrony-4.7/examples/chronyd.service.servicedirs chrony-4.7/examples/chronyd.service
+--- chrony-4.7/examples/chronyd.service.servicedirs	2025-06-11 15:06:19.000000000 +0200
++++ chrony-4.7/examples/chronyd.service	2025-07-10 12:06:57.354215498 +0200
+@@ -10,7 +10,13 @@ Type=notify
+ PIDFile=/run/chrony/chronyd.pid
+ Environment="OPTIONS="
+ EnvironmentFile=-/etc/sysconfig/chronyd
+-ExecStart=/usr/sbin/chronyd -n $OPTIONS
++ExecStart=!/usr/sbin/chronyd -n $OPTIONS
++
++User=chrony
++LogsDirectory=chrony
++LogsDirectoryMode=0750
++StateDirectory=chrony
++StateDirectoryMode=0750
+ 
+ CapabilityBoundingSet=~CAP_AUDIT_CONTROL CAP_AUDIT_READ CAP_AUDIT_WRITE
+ CapabilityBoundingSet=~CAP_BLOCK_SUSPEND CAP_KILL CAP_LEASE CAP_LINUX_IMMUTABLE

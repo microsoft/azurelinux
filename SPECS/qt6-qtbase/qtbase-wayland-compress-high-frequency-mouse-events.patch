@@ -1,0 +1,174 @@
+From 095759818854e5a011aa8f859e566bbc6368ab76 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?B=C5=82a=C5=BCej=20Szczygie=C5=82?= <mumei6102@gmail.com>
+Date: Sun, 27 Jul 2025 00:50:00 +0200
+Subject: [PATCH] wayland: Compress high frequency mouse events
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Add support for Qt::AA_CompressHighFrequencyEvents on Wayland.
+
+The highest USB HID polling rate is 8 kHz (125 μs). Most mice use lower
+polling rate [125 Hz - 1000 Hz]. Reject all events faster than 100 μs,
+because it definitely means the application main thread is freezed by
+the long operation and events are delivered one after another from the
+queue. Since now we rely on the 0 ms timer to deliver the last pending
+event when application main thread is no longer freezed.
+
+Pick-to: 6.10
+Task-number: QTBUG-138706
+Change-Id: Ie9d539e233c5551b1756d599b65495571e195f9d
+Reviewed-by: David Edmundson <davidedmundson@kde.org>
+---
+ src/corelib/global/qnamespace.qdoc            |  1 +
+ .../platforms/wayland/qwaylandinputdevice.cpp | 38 +++++++++++++++++++
+ .../platforms/wayland/qwaylandinputdevice_p.h | 12 ++++++
+ .../platforms/wayland/qwaylandintegration.cpp |  2 +
+ tests/auto/wayland/client/tst_client.cpp      |  2 +
+ 5 files changed, 55 insertions(+)
+
+diff --git a/src/corelib/global/qnamespace.qdoc b/src/corelib/global/qnamespace.qdoc
+index c845cfa7..f463d736 100644
+--- a/src/corelib/global/qnamespace.qdoc
++++ b/src/corelib/global/qnamespace.qdoc
+@@ -227,6 +227,7 @@
+            application later.
+            On Windows 8 and above the default value is also true, but it only applies
+            to touch events. Mouse and window events remain unaffected by this flag.
++           On Wayland the default value is also true, but it only applies to mouse events.
+            On other platforms, the default is false.
+            (In the future, the compression feature may be implemented across platforms.)
+            You can test the attribute to see whether compression is enabled.
+diff --git a/src/plugins/platforms/wayland/qwaylandinputdevice.cpp b/src/plugins/platforms/wayland/qwaylandinputdevice.cpp
+index 170e80f8..45c78765 100644
+--- a/src/plugins/platforms/wayland/qwaylandinputdevice.cpp
++++ b/src/plugins/platforms/wayland/qwaylandinputdevice.cpp
+@@ -63,6 +63,34 @@ Q_LOGGING_CATEGORY(lcQpaWaylandInput, "qt.qpa.wayland.input");
+ // reasonable number of them. As of 2021 most touchscreen panels support 10 concurrent touchpoints.
+ static const int MaxTouchPoints = 10;
+ 
++QWaylandEventCompressionPrivate::QWaylandEventCompressionPrivate()
++{
++    timeElapsed.start();
++    delayTimer.setSingleShot(true);
++}
++
++bool QWaylandEventCompressionPrivate::compressEvent()
++{
++    using namespace std::chrono_literals;
++
++    if (!QCoreApplication::testAttribute(Qt::AA_CompressHighFrequencyEvents))
++        return false;
++
++    const auto elapsed = timeElapsed.durationElapsed();
++    timeElapsed.start();
++    if (elapsed < 100us || delayTimer.isActive())
++    {
++        // The highest USB HID polling rate is 8 kHz (125 μs). Most mice use lowe polling rate [125 Hz - 1000 Hz].
++        // Reject all events faster than 100 μs, because it definitely means the application main thread is
++        // freezed by long operation and events are delivered one after another from the queue. Since now we rely
++        // on the 0 ms timer to deliver the last pending event when application main thread is no longer freezed.
++        delayTimer.start(0);
++        return true;
++    }
++
++    return false;
++}
++
+ QWaylandInputDevice::Keyboard::Keyboard(QWaylandInputDevice *p)
+     : mParent(p)
+ {
+@@ -140,6 +168,8 @@ QWaylandInputDevice::Pointer::Pointer(QWaylandInputDevice *seat)
+         cursorTimerCallback();
+     });
+ #endif
++
++    mEventCompression.delayTimer.callOnTimeout(this, &QWaylandInputDevice::Pointer::flushFrameEvent);
+ }
+ 
+ QWaylandInputDevice::Pointer::~Pointer()
+@@ -922,6 +952,11 @@ void QWaylandInputDevice::Pointer::pointer_axis(uint32_t time, uint32_t axis, in
+ 
+ void QWaylandInputDevice::Pointer::pointer_frame()
+ {
++    if (mEventCompression.compressEvent()) {
++        qCDebug(lcQpaWaylandInput) << "compressed pointer_frame event";
++        return;
++    }
++
+     flushFrameEvent();
+ }
+ 
+@@ -1051,6 +1086,7 @@ void QWaylandInputDevice::Pointer::setFrameEvent(QWaylandPointerEvent *event)
+         flushFrameEvent();
+     }
+ 
++    delete mFrameData.event;
+     mFrameData.event = event;
+ 
+     if (version() < WL_POINTER_FRAME_SINCE_VERSION) {
+@@ -1170,6 +1206,8 @@ void QWaylandInputDevice::Pointer::flushScrollEvent()
+ 
+ void QWaylandInputDevice::Pointer::flushFrameEvent()
+ {
++    mEventCompression.delayTimer.stop();
++
+     if (auto *event = mFrameData.event) {
+         if (auto window = event->surface) {
+             window->handleMouse(mParent, *event);
+diff --git a/src/plugins/platforms/wayland/qwaylandinputdevice_p.h b/src/plugins/platforms/wayland/qwaylandinputdevice_p.h
+index bcaf0258..0b24999e 100644
+--- a/src/plugins/platforms/wayland/qwaylandinputdevice_p.h
++++ b/src/plugins/platforms/wayland/qwaylandinputdevice_p.h
+@@ -75,6 +75,16 @@ class CursorSurface;
+ 
+ Q_DECLARE_LOGGING_CATEGORY(lcQpaWaylandInput);
+ 
++struct QWaylandEventCompressionPrivate
++{
++    QWaylandEventCompressionPrivate();
++
++    bool compressEvent();
++
++    QElapsedTimer timeElapsed;
++    QTimer delayTimer;
++};
++
+ class Q_WAYLANDCLIENT_EXPORT QWaylandInputDevice
+                             : public QObject
+                             , public QtWayland::wl_seat
+@@ -381,6 +391,8 @@ public:
+     bool mScrollBeginSent = false;
+     QPointF mScrollDeltaRemainder;
+ 
++    QWaylandEventCompressionPrivate mEventCompression;
++
+     void setFrameEvent(QWaylandPointerEvent *event);
+     void flushScrollEvent();
+     void flushFrameEvent();
+diff --git a/src/plugins/platforms/wayland/qwaylandintegration.cpp b/src/plugins/platforms/wayland/qwaylandintegration.cpp
+index 669d47ee..fc869de6 100644
+--- a/src/plugins/platforms/wayland/qwaylandintegration.cpp
++++ b/src/plugins/platforms/wayland/qwaylandintegration.cpp
+@@ -87,6 +87,8 @@ QWaylandIntegration::QWaylandIntegration(const QString &platformName)
+     : mPlatformName(platformName), mFontDb(new QGenericUnixFontDatabase())
+ #endif
+ {
++    QCoreApplication::setAttribute(Qt::AA_CompressHighFrequencyEvents);
++
+     mDisplay.reset(new QWaylandDisplay(this));
+     mPlatformServices.reset(new QWaylandPlatformServices(mDisplay.data()));
+ 
+diff --git a/tests/auto/wayland/client/tst_client.cpp b/tests/auto/wayland/client/tst_client.cpp
+index 04400e3f..09ac4f7f 100644
+--- a/tests/auto/wayland/client/tst_client.cpp
++++ b/tests/auto/wayland/client/tst_client.cpp
+@@ -276,6 +276,8 @@ void tst_WaylandClient::events()
+     exec([&] {
+         pointer()->sendEnter(s, window.frameOffset() + mousePressPos);
+         pointer()->sendFrame(client());
++        pointer()->sendMotion(client(), window.frameOffset() + mousePressPos / 2);
++        pointer()->sendFrame(client());
+         pointer()->sendMotion(client(), window.frameOffset() + mousePressPos);
+         pointer()->sendFrame(client());
+         pointer()->sendButton(client(), BTN_LEFT, Pointer::button_state_pressed);

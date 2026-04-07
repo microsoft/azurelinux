@@ -1,0 +1,46 @@
+Parent:     f5a4e984 (QQuickTextInputPrivate: refactor getImplicitWidth() to calculateImplicitWidth())
+Author:     David Redondo <qt@david-redondo.de>
+AuthorDate: 2020-05-13 11:04:23 +0200
+Commit:     Mitch Curtis <mitch.curtis@qt.io>
+CommitDate: 2020-05-25 10:58:35 +0200
+
+QQuickItemView: Fix max(X/Y)Extent()
+
+QQuickFlickable maxXExtent() and maxYExtent() return the amount of space
+that is not shown when inside a ScrollView. QQuickItemView however just
+returned width() if vertical and height() if horizontal. In these cases
+just defer to the QQuickFlickable base implementation like minXExtent()
+and minYExtent() already do.
+
+This change also adds tst_qquicklistview2 to speed up development.
+tst_QQuickListView is almost 9000 lines long, and compiling it
+is slow. In addition, a similar approach (creating a second test to
+avoid the slowness of a massive one) already exists for QQuickItem
+tests.
+
+Fixes: QTBUG-83890
+Pick-to: 5.15
+Change-Id: I7f4060c2f46ae07611bedceca0d322c5f7f6affb
+
+diff --git a/src/quick/items/qquickitemview.cpp b/src/quick/items/qquickitemview.cpp
+index 2b4ca9e2..f2feba2a 100644
+--- a/src/quick/items/qquickitemview.cpp
++++ b/src/quick/items/qquickitemview.cpp
+@@ -1393,7 +1393,7 @@ qreal QQuickItemView::maxYExtent() const
+ {
+     Q_D(const QQuickItemView);
+     if (d->layoutOrientation() == Qt::Horizontal)
+-        return height();
++        return QQuickFlickable::maxYExtent();
+
+     if (d->vData.maxExtentDirty) {
+         d->maxExtent = d->maxExtentForAxis(d->vData, false);
+@@ -1421,7 +1421,7 @@ qreal QQuickItemView::maxXExtent() const
+ {
+     Q_D(const QQuickItemView);
+     if (d->layoutOrientation() == Qt::Vertical)
+-        return width();
++        return QQuickFlickable::maxXExtent();
+
+     if (d->hData.maxExtentDirty) {
+         d->maxExtent = d->maxExtentForAxis(d->hData, true);

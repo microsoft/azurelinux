@@ -1,0 +1,21 @@
+diff -rupN xerces-c-3.2.5/src/CMakeLists.txt xerces-c-3.2.5-new/src/CMakeLists.txt
+--- xerces-c-3.2.5/src/CMakeLists.txt	2023-12-06 17:57:51.000000000 +0100
++++ xerces-c-3.2.5-new/src/CMakeLists.txt	2023-12-24 09:56:09.642855390 +0100
+@@ -1284,6 +1284,8 @@ if(MSVC)
+   set_target_properties(xerces-c PROPERTIES OUTPUT_NAME "xerces-c_${INTERFACE_VERSION_MAJOR}")
+   set_target_properties(xerces-c PROPERTIES RUNTIME_OUTPUT_NAME "xerces-c_${INTERFACE_VERSION_U}")
+   set_target_properties(xerces-c PROPERTIES DEBUG_POSTFIX "D")
++elseif(MINGW)
++  set_target_properties(xerces-c PROPERTIES SUFFIX "-${INTERFACE_VERSION_D}${CMAKE_SHARED_LIBRARY_SUFFIX}")
+ elseif(UNIX)
+   # For strict libtool compatibility on Unix.  It's a horrible hack to
+   # set the version in the filename, and create the symlink at install
+@@ -1310,7 +1312,7 @@ else()
+ endif()
+ set_target_properties(xerces-c PROPERTIES FOLDER "Library")
+ 
+-if(WIN32)
++if(MSVC)
+   set(xerces_config_dir "cmake")
+ else()
+   set(xerces_config_dir "${CMAKE_INSTALL_LIBDIR}/cmake/XercesC")

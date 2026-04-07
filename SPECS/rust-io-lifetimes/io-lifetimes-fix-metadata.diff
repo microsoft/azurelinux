@@ -1,0 +1,17 @@
+--- io-lifetimes-2.0.4/Cargo.toml	1970-01-01T00:00:01+00:00
++++ io-lifetimes-2.0.4/Cargo.toml	2025-01-20T16:55:00.623462+00:00
+@@ -62,14 +62,6 @@
+ features = ["io_safety"]
+ optional = true
+ 
+-[target.'cfg(not(target_os = "wasi"))'.dependencies.mio]
+-version = "0.8.0"
+-features = [
+-    "net",
+-    "os-ext",
+-]
+-optional = true
+-
+ [target.'cfg(not(target_os = "wasi"))'.dependencies.os_pipe]
+ version = "1.0.0"
+ features = ["io_safety"]

@@ -1,0 +1,36 @@
+From c1f9c3af43d48b4bf0df3a59b27ded052e79c7e4 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Fri, 25 Apr 2025 16:17:53 +1000
+Subject: [PATCH 2/2] CMakeLists: fix add_custom_command warning
+
+Fixes:
+    CMake Warning (dev) at CMakeLists.txt:104 (add_custom_command):
+      Exactly one of PRE_BUILD, PRE_LINK, or POST_BUILD must be given.  Assuming
+      POST_BUILD to preserve backward compatibility.
+
+      Policy CMP0175 is not set: add_custom_command() rejects invalid arguments.
+      Run "cmake --help-policy CMP0175" for policy details.  Use the cmake_policy
+      command to set the policy and suppress this warning.
+    This warning is for project developers.  Use -Wno-dev to suppress it.
+
+Ref: https://cmake.org/cmake/help/v3.0/command/add_custom_command.html
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 062f6d80..45b21de9 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -160,7 +160,7 @@ if(RAPIDJSON_BUILD_DOC)
+ endif()
+ 
+ add_custom_target(travis_doc)
+-add_custom_command(TARGET travis_doc
++add_custom_command(TARGET travis_doc POST_BUILD
+     COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/travis-doxygen.sh)
+ 
+ if(RAPIDJSON_BUILD_EXAMPLES)
+-- 
+2.50.1
+

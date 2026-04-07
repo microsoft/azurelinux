@@ -1,0 +1,13 @@
+--- a/data/caribou-autostart.desktop.in.in
++++ b/data/caribou-autostart.desktop.in.in
+@@ -2,7 +2,7 @@
+ Type=Application
+ Name=Caribou
+ Exec=@libexecdir@/caribou
+-AutostartCondition=GSettings org.gnome.desktop.a11y.applications screen-keyboard-enabled
++AutostartCondition=GSettings org.cinnamon.desktop.a11y.applications screen-keyboard-enabled
+ X-GNOME-AutoRestart=true
+ #X-GNOME-Autostart-Phase=Initialization
+-OnlyShowIn=GNOME;Unity;
++OnlyShowIn=X-Cinnamon;
+

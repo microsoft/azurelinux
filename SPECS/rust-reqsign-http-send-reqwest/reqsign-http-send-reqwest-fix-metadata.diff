@@ -1,0 +1,12 @@
+--- reqsign-http-send-reqwest-2.0.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ reqsign-http-send-reqwest-2.0.1/Cargo.toml	2025-11-05T11:46:28.493995+00:00
+@@ -72,9 +72,6 @@
+ features = ["default-tls"]
+ default-features = false
+ 
+-[dev-dependencies.wasm-bindgen-test]
+-version = "0.3"
+-
+ [target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies.tokio]
+ version = "1"
+ features = [

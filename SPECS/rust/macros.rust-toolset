@@ -1,0 +1,256 @@
+# __rustc: path to the default rustc executable
+%__rustc /usr/bin/rustc
+
+# __rustdoc: path to the default rustdoc executable
+%__rustdoc /usr/bin/rustdoc
+
+# rustflags_opt_level: default optimization level
+#
+# It corresponds to the "-Copt-level" rustc command line option.
+%rustflags_opt_level 3
+
+# rustflags_debuginfo: default verbosity of debug information
+#
+# It corresponds to the "-Cdebuginfo" rustc command line option.
+# In some cases, it might be required to override this macro with "1" or even
+# "0", if memory usage gets too high during builds on some resource-constrained
+# architectures (most likely on 32-bit architectures), which will however
+# reduce the quality of the produced debug symbols.
+%rustflags_debuginfo 2
+
+# rustflags_codegen_units: default number of parallel code generation units
+#
+# The default value of "1" results in generation of better code, but comes at
+# the cost of longer build times.
+%rustflags_codegen_units 1
+
+# build_rustflags: default compiler flags for rustc (RUSTFLAGS)
+#
+# -Copt-level: set optimization level (default: highest optimization level)
+# -Cdebuginfo: set debuginfo verbosity (default: full debug information)
+# -Ccodegen-units: set number of parallel code generation units (default: 1)
+# -Cforce-frame-pointers: force inclusion of frame pointers (default: enabled
+#       on x86_64 and aarch64 on Fedora 37+)
+#
+# Additionally, some linker flags are set which correspond to the default
+# Fedora compiler flags for hardening and for embedding package versions into
+# compiled binaries.
+#
+# ref. https://doc.rust-lang.org/rustc/codegen-options/index.html
+%build_rustflags %{shrink:
+  -Copt-level=%rustflags_opt_level
+  -Cdebuginfo=%rustflags_debuginfo
+  -Ccodegen-units=%rustflags_codegen_units
+  -Cstrip=none
+  %{expr:0%{?_include_frame_pointers} && ("%{_arch}" != "ppc64le" && "%{_arch}" != "s390x" && "%{_arch}" != "i386") ? "-Cforce-frame-pointers=yes" : ""}
+  %[0%{?_package_note_status} ? "-Clink-arg=%_package_note_flags" : ""]
+}
+
+# __cargo: cargo command with environment variables
+#
+# CARGO_HOME: This ensures cargo reads configuration file from .cargo/config.toml,
+#       and prevents writing any files to $HOME during RPM builds.
+%__cargo /usr/bin/env CARGO_HOME=.cargo RUSTFLAGS='%{build_rustflags}' /usr/bin/cargo
+
+# __cargo_common_opts: common command line flags for cargo
+#
+# _smp_mflags: run builds and tests in parallel
+%__cargo_common_opts %{?_smp_mflags}
+
+# cargo_prep: macro to set up build environment for cargo projects
+#
+# This involves four steps:
+# - create the ".cargo" directory if it doesn't exist yet
+# - dump custom cargo configuration into ".cargo/config.toml"
+# - remove "Cargo.lock" if it exists (it breaks builds with custom cargo config)
+# - remove "Cargo.toml.orig" if it exists (it breaks running "cargo package")
+#
+# Options:
+#   -V <number>    - unpack and use vendored sources from Source<number> tarball
+#                    (deprecated; use -v instead)
+#   -v <directory> - use vendored sources from <directory>
+#   -N             - Don't set up any registry. Only set up the build configuration.
+%cargo_prep(V:v:N)\
+%{-v:%{-V:%{error:-v and -V are mutually exclusive!}}}\
+%{-v:%{-N:%{error:-v and -N are mutually exclusive!}}}\
+(\
+set -euo pipefail\
+%{__mkdir} -p target/rpm\
+/usr/bin/ln -s rpm target/release\
+%{__rm} -rf .cargo/\
+%{__mkdir} -p .cargo\
+cat > .cargo/config.toml << EOF\
+[build]\
+rustc = "%{__rustc}"\
+rustdoc = "%{__rustdoc}"\
+\
+[profile.rpm]\
+inherits = "release"\
+opt-level = %{rustflags_opt_level}\
+codegen-units = %{rustflags_codegen_units}\
+debug = %{rustflags_debuginfo}\
+strip = "none"\
+\
+[env]\
+CFLAGS = "%{build_cflags}"\
+CXXFLAGS = "%{build_cxxflags}"\
+LDFLAGS = "%{build_ldflags}"\
+\
+[install]\
+root = "%{buildroot}%{_prefix}"\
+\
+[term]\
+verbose = true\
+EOF\
+%{-V:%{__tar} -xoaf %{S:%{-V*}}}\
+%{!?-N:\
+cat >> .cargo/config.toml << EOF\
+[source.vendored-sources]\
+directory = "%{-v*}%{-V:./vendor}"\
+\
+[source.crates-io]\
+registry = "https://crates.io"\
+replace-with = "vendored-sources"\
+EOF}\
+%{__rm} -f Cargo.toml.orig\
+)
+
+# __cargo_parse_opts: function-like macro which parses common flags into the
+#       equivalent command-line flags for cargo
+%__cargo_parse_opts(naf:) %{shrink:\
+    %{-n:%{-a:%{error:Can't specify both -n and -a}}}           \
+    %{-f:%{-a:%{error:Can't specify both -f(%{-f*}) and -a}}}   \
+    %{-n:--no-default-features}                                 \
+    %{-a:--all-features}                                        \
+    %{-f:--features %{-f*}}                                     \
+    %{nil}                                                      \
+}
+
+# cargo_build: builds the crate with cargo with the specified feature flags
+%cargo_build(naf:)\
+%{shrink:                                               \
+    %{__cargo} build                                    \
+    %{__cargo_common_opts}                              \
+    --profile rpm                                       \
+    %{__cargo_parse_opts %{-n} %{-a} %{-f:-f%{-f*}}}    \
+    %*                                                  \
+}
+
+# cargo_test: runs the test suite with cargo with the specified feature flags
+#
+# To pass command-line arguments to the cargo test runners directly (for
+# example, to skip certain tests during package builds), both the cargo_test
+# macro argument parsing and "cargo test" argument parsing need to be bypassed,
+# i.e. "%%cargo_test -- -- --skip foo" for skipping all tests with names that
+# match "foo".
+%cargo_test(naf:)\
+%{shrink:                                               \
+    %{__cargo} test                                     \
+    %{__cargo_common_opts}                              \
+    --profile rpm                                       \
+    --no-fail-fast                                      \
+    %{__cargo_parse_opts %{-n} %{-a} %{-f:-f%{-f*}}}    \
+    %*                                                  \
+}
+
+# cargo_install: install files into the buildroot
+#
+# For "binary" crates, this macro installs all "bin" build targets to _bindir
+# inside the buildroot. The "--no-track" option prevents the creation of the
+# "$CARGO_HOME/.crates.toml" file, which is used to keep track of which version
+# of a specific binary has been installed, but which conflicts between builds
+# of different Rust applications and is not needed when building RPM packages.
+%cargo_install(t:naf:)\
+(\
+set -euo pipefail                                                   \
+  %{shrink:                                                         \
+    %{__cargo} install                                              \
+      %{__cargo_common_opts}                                        \
+      --profile rpm                                                 \
+      --no-track                                                    \
+      --path .                                                      \
+      %{__cargo_parse_opts %{-n} %{-a} %{-f:-f%{-f*}}}              \
+      %*                                                            \
+  }                                                                 \
+)
+
+# cargo_license: print license information for all crate dependencies
+#
+# The "no-build,no-dev,no-proc-macro" argument results in only crates which are
+# linked into the final binary to be considered.
+#
+# Additionally, deprecated SPDX syntax ("/" instead of "OR") is normalized
+# before sorting the results to ensure reproducible output of this macro.
+#
+# This macro must be called with the same feature flags as other cargo macros,
+# in particular, "cargo_build", otherwise its output will be incomplete.
+#
+# The "cargo tree" command called by this macro will fail if there are missing
+# (optional) dependencies.
+%cargo_license(naf:)\
+(\
+set -euo pipefail\
+%{shrink:                                                           \
+    %{__cargo} tree                                                 \
+    --workspace                                                     \
+    --offline                                                       \
+    --edges no-build,no-dev,no-proc-macro                           \
+    --no-dedupe                                                     \
+    %{__cargo_parse_opts %{-n} %{-a} %{-f:-f%{-f*}}}                \
+    --prefix none                                                   \
+    --format "{l}: {p}"                                             \
+    | sed -e "s: ($(pwd)[^)]*)::g" -e "s: / :/:g" -e "s:/: OR :g"   \
+    | sort -u                                                       \
+}\
+)
+
+# cargo_license_summary: print license summary for all crate dependencies
+#
+# This macro works in the same way as cargo_license, except that it only prints
+# a list of licenses, and not the complete license information for every crate
+# in the dependency tree. This is useful for determining the correct License
+# tag for packages that contain compiled Rust binaries.
+%cargo_license_summary(naf:)\
+(\
+set -euo pipefail\
+%{shrink:                                                           \
+    %{__cargo} tree                                                 \
+    --workspace                                                     \
+    --offline                                                       \
+    --edges no-build,no-dev,no-proc-macro                           \
+    --no-dedupe                                                     \
+    %{__cargo_parse_opts %{-n} %{-a} %{-f:-f%{-f*}}}                \
+    --prefix none                                                   \
+    --format "# {l}"                                                \
+    | sed -e "s: / :/:g" -e "s:/: OR :g"                            \
+    | sort -u                                                       \
+}\
+)
+
+# cargo_vendor_manifest: write list of vendored crates and their versions
+#
+# The arguments for the internal "cargo tree" call emulate the logic
+# that determines which crates are included when running "cargo vendor".
+# The results are written to "cargo-vendor.txt".
+#
+# TODO: --all-features may be overly broad; this should be modified to
+# use %%__cargo_parse_opts to handle feature flags.
+%cargo_vendor_manifest()\
+(\
+set -euo pipefail\
+%{shrink:                                                           \
+    %{__cargo} tree                                                 \
+    --workspace                                                     \
+    --offline                                                       \
+    --edges normal,build                                            \
+    --no-dedupe                                                     \
+    --all-features                                                  \
+    --prefix none                                                   \
+    --format "{p}"                                                  \
+    | grep -v "$(pwd)"                                              \
+    | sed -e "s: (proc-macro)::"                                    \
+    | sort -u                                                       \
+    > cargo-vendor.txt                                              \
+}\
+)
+

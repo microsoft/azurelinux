@@ -1,0 +1,67 @@
+--- glpk-5.0/src/env/stream.c.orig	2020-12-16 12:09:41.512487497 -0700
++++ glpk-5.0/src/env/stream.c	2025-01-16 17:07:18.705253689 -0700
+@@ -19,8 +19,9 @@
+ *  along with GLPK. If not, see <http://www.gnu.org/licenses/>.
+ ***********************************************************************/
+ 
++#define WITH_GZFILEOP
+ #include "env.h"
+-#include <zlib.h>
++#include <zlib-ng.h>
+ 
+ struct glp_file
+ {     /* sequential stream descriptor */
+@@ -138,7 +139,7 @@ glp_file *glp_open(const char *name, con
+             else if (strcmp(mode, "a") == 0)
+                mode = "ab";
+ #endif
+-            file = gzopen(name, mode);
++            file = zng_gzopen(name, mode);
+             if (file == NULL)
+ #if 0 /* 29/I-2017 */
+             {  put_err_msg(strerror(errno));
+@@ -255,10 +256,10 @@ int glp_read(glp_file *f, void *buf, int
+             else
+             {  int errnum;
+                const char *msg;
+-               cnt = gzread((gzFile)(f->file), f->base, f->size);
++               cnt = zng_gzread((gzFile)(f->file), f->base, f->size);
+                if (cnt < 0)
+                {  f->flag |= IOERR;
+-                  msg = gzerror((gzFile)(f->file), &errnum);
++                  msg = zng_gzerror((gzFile)(f->file), &errnum);
+                   if (errnum == Z_ERRNO)
+ #if 0 /* 29/I-2017 */
+                      put_err_msg(strerror(errno));
+@@ -347,9 +348,9 @@ static int do_flush(glp_file *f)
+          else
+          {  int errnum;
+             const char *msg;
+-            if (gzwrite((gzFile)(f->file), f->base, f->cnt) != f->cnt)
++            if (zng_gzwrite((gzFile)(f->file), f->base, f->cnt) != f->cnt)
+             {  f->flag |= IOERR;
+-               msg = gzerror((gzFile)(f->file), &errnum);
++               msg = zng_gzerror((gzFile)(f->file), &errnum);
+                if (errnum == Z_ERRNO)
+ #if 0 /* 29/I-2017 */
+                   put_err_msg(strerror(errno));
+@@ -483,7 +484,7 @@ int glp_close(glp_file *f)
+       }
+       else
+       {  int errnum;
+-         errnum = gzclose((gzFile)(f->file));
++         errnum = zng_gzclose((gzFile)(f->file));
+          if (errnum == Z_OK)
+             ;
+          else if (errnum == Z_ERRNO)
+--- glpk-5.0/src/Makefile.am.orig	2025-01-16 17:11:59.960573993 -0700
++++ glpk-5.0/src/Makefile.am	2025-01-16 17:12:31.382162908 -0700
+@@ -23,7 +23,7 @@ libglpk_la_LDFLAGS = \
+ -export-symbols-regex '^glp_*' \
+ ${NOUNDEFINED}
+ 
+-libglpk_la_LIBADD = -lamd -lcolamd -lz
++libglpk_la_LIBADD = -lamd -lcolamd -lz-ng
+ 
+ libglpk_la_SOURCES = \
+ api/advbas.c \

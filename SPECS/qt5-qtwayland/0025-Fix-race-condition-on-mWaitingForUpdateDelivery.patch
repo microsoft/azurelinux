@@ -1,0 +1,59 @@
+From 6b351b8de422be8d7ced3145870270b6a407fac5 Mon Sep 17 00:00:00 2001
+From: Paul Olav Tvete <paul.tvete@qt.io>
+Date: Tue, 15 Mar 2022 16:53:04 +0100
+Subject: [PATCH 25/55] Fix race condition on mWaitingForUpdateDelivery
+
+Change-Id: I0e91bda73722468b9339fc434fe04420b5e7d3da
+Reviewed-by: David Edmundson <davidedmundson@kde.org>
+---
+ src/client/qwaylandwindow.cpp | 7 ++-----
+ src/client/qwaylandwindow_p.h | 2 +-
+ 2 files changed, 3 insertions(+), 6 deletions(-)
+
+diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
+index 3d1be31c..014e2d87 100644
+--- a/src/client/qwaylandwindow.cpp
++++ b/src/client/qwaylandwindow.cpp
+@@ -652,24 +652,21 @@ void QWaylandWindow::handleFrameCallback()
+ 
+     // The rest can wait until we can run it on the correct thread
+     auto doHandleExpose = [this]() {
++        mWaitingForUpdateDelivery.storeRelease(false);
+         bool wasExposed = isExposed();
+         mFrameCallbackTimedOut = false;
+         if (!wasExposed && isExposed()) // Did setting mFrameCallbackTimedOut make the window exposed?
+             sendExposeEvent(QRect(QPoint(), geometry().size()));
+         if (wasExposed && hasPendingUpdateRequest())
+             deliverUpdateRequest();
+-
+-        mWaitingForUpdateDelivery = false;
+     };
+ 
+-    if (!mWaitingForUpdateDelivery) {
++    if (mWaitingForUpdateDelivery.testAndSetAcquire(false, true)) {
+         // Queued connection, to make sure we don't call handleUpdate() from inside waitForFrameSync()
+         // in the single-threaded case.
+-        mWaitingForUpdateDelivery = true;
+         QMetaObject::invokeMethod(this, doHandleExpose, Qt::QueuedConnection);
+     }
+ 
+-
+     mFrameSyncWait.notify_all();
+ }
+ 
+diff --git a/src/client/qwaylandwindow_p.h b/src/client/qwaylandwindow_p.h
+index 54ac67a9..c0a76345 100644
+--- a/src/client/qwaylandwindow_p.h
++++ b/src/client/qwaylandwindow_p.h
+@@ -228,7 +228,7 @@ protected:
+     WId mWindowId;
+     bool mWaitingForFrameCallback = false;
+     bool mFrameCallbackTimedOut = false; // Whether the frame callback has timed out
+-    bool mWaitingForUpdateDelivery = false;
++    QAtomicInt mWaitingForUpdateDelivery = false;
+     int mFrameCallbackCheckIntervalTimerId = -1;
+     QElapsedTimer mFrameCallbackElapsedTimer;
+     struct ::wl_callback *mFrameCallback = nullptr;
+-- 
+2.51.1
+

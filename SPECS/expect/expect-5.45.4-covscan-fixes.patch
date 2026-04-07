@@ -1,0 +1,107 @@
+diff -up expect5.45.4/exp_chan.c.orig expect5.45.4/exp_chan.c
+--- expect5.45.4/exp_chan.c.orig	2018-02-02 20:15:52.000000000 +0100
++++ expect5.45.4/exp_chan.c	2018-10-09 14:14:44.851965292 +0200
+@@ -51,6 +51,8 @@ static void		ExpWatchProc _ANSI_ARGS_((C
+ 		            int mask));
+ static int		ExpGetHandleProc _ANSI_ARGS_((ClientData instanceData,
+ 		            int direction, ClientData *handlePtr));
++void			exp_background_channelhandler _ANSI_ARGS_((ClientData,
++		            int));
+ 
+ /*
+  * This structure describes the channel type structure for Expect-based IO:
+diff -up expect5.45.4/exp_clib.c.orig expect5.45.4/exp_clib.c
+--- expect5.45.4/exp_clib.c.orig	2018-10-09 14:14:44.841965281 +0200
++++ expect5.45.4/exp_clib.c	2018-10-09 14:14:44.873965319 +0200
+@@ -37,6 +37,14 @@ would appreciate credit if this program
+ # endif
+ #endif
+ 
++#ifdef HAVE_UNISTD_H
++# include <unistd.h>
++#endif
++
++//#ifdef HAVE_SYS_WAIT_H
++# include <sys/wait.h>
++//#endif
++
+ #ifdef HAVE_SYS_FCNTL_H
+ #  include <sys/fcntl.h>
+ #else
+@@ -2196,6 +2204,7 @@ int exp_getptyslave();
+ #define sysreturn(x)	return(errno = x, -1)
+ 
+ void exp_init_pty();
++void exp_init_tty();
+ 
+ /*
+    The following functions are linked from the Tcl library.  They
+@@ -2715,6 +2724,7 @@ exp_spawnl TCL_VARARGS_DEF(char *,arg1)
+ 		argv[i] = va_arg(args,char *);
+ 		if (!argv[i]) break;
+ 	}
++	va_end(args);
+ 	i = exp_spawnv(argv[0],argv+1);
+ 	free((char *)argv);
+ 	return(i);
+@@ -3188,6 +3198,7 @@ exp_expectl TCL_VARARGS_DEF(int,arg1)
+ 		/* Ultrix 4.2 compiler refuses enumerations comparison!? */
+ 		if ((int)type < 0 || (int)type >= (int)exp_bogus) {
+ 			fprintf(stderr,"bad type (set %d) in exp_expectl\n",i);
++			va_end(args);
+ 			sysreturn(EINVAL);
+ 		}
+ 
+@@ -3253,6 +3264,7 @@ exp_fexpectl TCL_VARARGS_DEF(FILE *,arg1
+ 		/* Ultrix 4.2 compiler refuses enumerations comparison!? */
+ 		if ((int)type < 0 || (int)type >= (int)exp_bogus) {
+ 			fprintf(stderr,"bad type (set %d) in exp_expectl\n",i);
++			va_end(args);
+ 			sysreturn(EINVAL);
+ 		}
+ 
+diff -up expect5.45.4/exp_log.c.orig expect5.45.4/exp_log.c
+--- expect5.45.4/exp_log.c.orig	2018-10-09 14:14:44.838965277 +0200
++++ expect5.45.4/exp_log.c	2018-10-09 14:14:44.852965294 +0200
+@@ -174,7 +174,10 @@ expStdoutLog TCL_VARARGS_DEF(int,arg1)
+     force_stdout = TCL_VARARGS_START(int,arg1,args);
+     fmt = va_arg(args,char *);
+ 
+-    if ((!tsdPtr->logUser) && (!force_stdout) && (!tsdPtr->logAll)) return;
++    if ((!tsdPtr->logUser) && (!force_stdout) && (!tsdPtr->logAll)) {
++	va_end(args);
++	return;
++    }
+ 
+     (void) vsnprintf(bigbuf,sizeof(bigbuf),fmt,args);
+     expDiagWriteBytes(bigbuf,-1);
+diff -up expect5.45.4/exp_main_sub.c.orig expect5.45.4/exp_main_sub.c
+--- expect5.45.4/exp_main_sub.c.orig	2018-10-09 14:14:44.848965289 +0200
++++ expect5.45.4/exp_main_sub.c	2018-10-09 14:14:44.852965294 +0200
+@@ -57,6 +57,7 @@ int exp_cmdlinecmds = FALSE;
+ int exp_interactive =  FALSE;
+ int exp_buffer_command_input = FALSE;/* read in entire cmdfile at once */
+ int exp_fgets();
++int exp_tty_cooked_echo(Tcl_Interp *interp, exp_tty *tty_old, int *was_raw, int *was_echo);
+ 
+ Tcl_Interp *exp_interp;	/* for use by signal handlers who can't figure out */
+ 			/* the interpreter directly */
+diff -up expect5.45.4/pty_termios.c.orig expect5.45.4/pty_termios.c
+--- expect5.45.4/pty_termios.c.orig	2018-10-09 14:17:00.132127498 +0200
++++ expect5.45.4/pty_termios.c	2018-10-09 14:33:59.393315570 +0200
+@@ -105,6 +105,7 @@ with openpty which supports 4000 while p
+ 
+ void expDiagLog();
+ void expDiagLogPtr();
++char *expErrnoMsg(int errorNo);
+ 
+ #include <errno.h>
+ /*extern char *sys_errlist[];*/
+@@ -189,6 +190,7 @@ static char slave_name[MAXPTYNAMELEN];
+ #endif /* HAVE_SCO_CLIST_PTYS */
+ 
+ #ifdef HAVE_OPENPTY
++#include <pty.h>
+ static char master_name[64];
+ static char slave_name[64];
+ #endif

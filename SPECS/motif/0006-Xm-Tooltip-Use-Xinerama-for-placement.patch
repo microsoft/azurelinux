@@ -1,0 +1,53 @@
+From f2bc91c789ed33fc1e0a31d167a6a7bc0383429e Mon Sep 17 00:00:00 2001
+From: Olivier Fourdan <ofourdan@redhat.com>
+Date: Thu, 21 Nov 2024 14:24:30 +0100
+Subject: [PATCH 6/7] Xm/Tooltip: Use Xinerama for placement
+
+Signed-off-by: Olivier Fourdan <ofourdan@redhat.com>
+---
+ lib/Xm/ToolTip.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/lib/Xm/ToolTip.c b/lib/Xm/ToolTip.c
+index dc65071d..fdd32221 100644
+--- a/lib/Xm/ToolTip.c
++++ b/lib/Xm/ToolTip.c
+@@ -29,6 +29,7 @@
+ #include <Xm/VendorSEP.h>
+ #include <Xm/GadgetP.h>
+ #include <Xm/SlideC.h>
++#include <Xm/ScreenP.h>
+ #include <Xm/TraitP.h>
+ #include <Xm/ToolTipCT.h>
+ #include <Xm/ToolTipT.h>
+@@ -153,6 +154,8 @@ ToolTipPost (XtPointer client_data,
+    XtWidgetGeometry geo;
+    Position destX,
+      destY;
++   Position dispMaxX,
++     dispMaxY;
+ 
+    XmToolTipConfigTrait ttp; /* ToolTip pointer */
+ 
+@@ -197,12 +200,14 @@ ToolTipPost (XtPointer client_data,
+       Don't let the tip be off the right/bottom of the screen
+     */
+    destX = rx + (XmIsGadget (w) ? XtX (w) : 0) - x + XtWidth (w) / 2;
+-   if (destX + geo.width > WidthOfScreen (XtScreen (w)))
++   destY = ry + (XmIsGadget (w) ? XtY (w) : 0) - y + XtHeight (w);
++   _XmScreenGetBoundariesAtpoint(XtScreen(w), destX, destY, NULL, NULL, &dispMaxX, &dispMaxY);
++
++   if (destX + geo.width > dispMaxX)
+    {
+-      destX = WidthOfScreen (XtScreen (w)) - geo.width;
++      destX = dispMaxX - geo.width;
+    }
+-   destY = ry + (XmIsGadget (w) ? XtY (w) : 0) - y + XtHeight (w);
+-   if (destY + geo.height > HeightOfScreen (XtScreen (w)))
++   if (destY + geo.height > dispMaxY)
+    {
+       destY = ry + (XmIsGadget (w) ? XtY (w) : 0) - y - geo.height;
+    }
+-- 
+2.49.0
+

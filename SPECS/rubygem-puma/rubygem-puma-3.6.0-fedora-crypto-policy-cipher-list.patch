@@ -1,0 +1,16 @@
+diff --git a/ext/puma_http11/mini_ssl.c b/ext/puma_http11/mini_ssl.c
+index 7e0fd5e..88c4652 100644
+--- a/ext/puma_http11/mini_ssl.c
++++ b/ext/puma_http11/mini_ssl.c
+@@ -441,7 +441,7 @@ sslctx_initialize(VALUE self, VALUE mini_ssl_ctx) {
+     SSL_CTX_set_cipher_list(ctx, RSTRING_PTR(ssl_cipher_filter));
+   }
+   else {
+-    SSL_CTX_set_cipher_list(ctx, "HIGH:!aNULL@STRENGTH");
++    SSL_CTX_set_cipher_list(ctx, "PROFILE=SYSTEM");
+   }
+ 
+ #if OPENSSL_VERSION_NUMBER < 0x10002000L
+-- 
+2.30.0
+

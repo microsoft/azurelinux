@@ -1,0 +1,39 @@
+From 388be633842a9f3e4b0a76fe40cf7035912a913a Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:28 +0200
+Subject: [PATCH 05/50] openssh-5.9p1-ipv6man
+
+---
+ ssh.1  | 2 ++
+ sshd.8 | 2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/ssh.1 b/ssh.1
+index 697f4e42..db92ac9a 100644
+--- a/ssh.1
++++ b/ssh.1
+@@ -1663,6 +1663,8 @@ manual page for more information.
+ .Nm
+ exits with the exit status of the remote command or with 255
+ if an error occurred.
++.Sh IPV6
++IPv6 address can be used everywhere where IPv4 address. In all entries must be the IPv6 address enclosed in square brackets. Note: The square brackets are metacharacters for the shell and must be escaped in shell.
+ .Sh SEE ALSO
+ .Xr scp 1 ,
+ .Xr sftp 1 ,
+diff --git a/sshd.8 b/sshd.8
+index 08ebf53a..2aa73271 100644
+--- a/sshd.8
++++ b/sshd.8
+@@ -1018,6 +1018,8 @@ concurrently for different ports, this contains the process ID of the one
+ started last).
+ The content of this file is not sensitive; it can be world-readable.
+ .El
++.Sh IPV6
++IPv6 address can be used everywhere where IPv4 address. In all entries must be the IPv6 address enclosed in square brackets. Note: The square brackets are metacharacters for the shell and must be escaped in shell.
+ .Sh SEE ALSO
+ .Xr scp 1 ,
+ .Xr sftp 1 ,
+-- 
+2.49.0
+

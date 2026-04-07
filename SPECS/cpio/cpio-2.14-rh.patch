@@ -1,0 +1,69 @@
+From: Pavel Raiskup <praiskup@redhat.com>
+Date: Mon, 14 Sep 2015 09:27:21 +0200
+Subject: [PATCH 1/7] make '-c' equivalent to '-H newc'
+
+diff --git a/doc/cpio.texi b/doc/cpio.texi
+index edf0c12..bef7ba5 100644
+--- a/doc/cpio.texi
++++ b/doc/cpio.texi
+@@ -271,7 +271,8 @@ Sets the I/O block size to @var{block-size} * 512 bytes.
+ @item -B
+ Set the I/O block size to 5120 bytes.
+ @item -c
+-Use the old portable (ASCII) archive format.
++Identical to "-H newc", use the new (SVR4) portable format.  If you wish the old
++portable (ASCII) archive format, use "-H odc" instead.
+ @item -C @var{number}
+ @itemx --io-size=@var{number}
+ Set the I/O block size to the given @var{number} of bytes.
+@@ -354,7 +355,8 @@ Equivalent to @option{-sS}.
+ @item -B
+ Set the I/O block size to 5120 bytes.
+ @item -c
+-Use the old portable (ASCII) archive format.
++Identical to "-H newc", use the new (SVR4) portable format.  If you wish the old
++portable (ASCII) archive format, use "-H odc" instead.
+ @item -C @var{number}
+ @itemx --io-size=@var{number}
+ Set the I/O block size to the given @var{number} of bytes.
+@@ -465,7 +467,8 @@ Sets the I/O block size to @var{block-size} * 512 bytes.
+ @item -B
+ Set the I/O block size to 5120 bytes.
+ @item -c
+-Use the old portable (ASCII) archive format.
++Identical to "-H newc", use the new (SVR4) portable format.  If you wish the old
++portable (ASCII) archive format, use "-H odc" instead.
+ @item -C @var{number}
+ @itemx --io-size=@var{number}
+ Set the I/O block size to the given @var{number} of bytes.
+@@ -614,7 +617,8 @@ block size is 512 bytes.
+ 
+ @item -c
+ [@ref{copy-in},@ref{copy-out},@ref{copy-pass}]
+-@*Use the old portable (ASCII) archive format.
++@*Identical to "-H newc", use the new (SVR4) portable format.  If you wish the
++old portable (ASCII) archive format, use "-H odc" instead.
+ 
+ @item -C @var{io-size}
+ @itemx --io-size=@var{io-size}
+diff --git a/src/main.c b/src/main.c
+index b27bd17..542a71f 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -124,7 +124,7 @@ static struct argp_option options[] = {
+   {"block-size", BLOCK_SIZE_OPTION, N_("BLOCK-SIZE"), 0,
+    N_("Set the I/O block size to BLOCK-SIZE * 512 bytes"), GRID+1 },
+   {NULL, 'c', NULL, 0,
+-   N_("Use the old portable (ASCII) archive format"), GRID+1 },
++   N_("Identical to \"-H newc\", use the new (SVR4) portable format. If you wish the old portable (ASCII) archive format, use \"-H odc\" instead."), GRID+1 },
+   {"dot", 'V', NULL, 0,
+    N_("Print a \".\" for each file processed"), GRID+1 },
+   {"io-size", 'C', N_("NUMBER"), 0,
+@@ -331,6 +331,7 @@ parse_opt (int key, char *arg, struct argp_state *state)
+     case 'c':		/* Use the old portable ASCII format.  */
+       if (archive_format != arf_unknown)
+ 	USAGE_ERROR ((0, 0, _("Archive format multiply defined")));
++#define SVR4_COMPAT
+ #ifdef SVR4_COMPAT
+       archive_format = arf_newascii; /* -H newc.  */
+ #else

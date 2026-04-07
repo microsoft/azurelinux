@@ -1,0 +1,90 @@
+From abefc739f769a8c9bd89db78b9a3e9dd9e366064 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20Men=C5=A1=C3=ADk?= <pemensik@redhat.com>
+Date: Mon, 11 Jan 2021 12:25:27 +0100
+Subject: [PATCH] Fix CLANG_WARNING
+
+libmy/argv.c:1352:7: warning[core.uninitialized.Assign]: The expression is an uninitialized value. The computed value will also be garbage
+      (*(int *)var)++;
+      ^~~~~~~~~~~~~
+libmy/argv.c:1207:29: note: Assuming field 'at_value' is not equal to 0
+  for (type_p = argv_types; type_p->at_value != 0; type_p++) {
+                            ^~~~~~~~~~~~~~~~~~~~~
+libmy/argv.c:1207:3: note: Loop condition is true.  Entering loop body
+  for (type_p = argv_types; type_p->at_value != 0; type_p++) {
+  ^
+libmy/argv.c:1208:9: note: Assuming 'val_type' is equal to field 'at_value'
+    if (type_p->at_value == val_type) {
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+libmy/argv.c:1208:5: note: Taking true branch
+    if (type_p->at_value == val_type) {
+    ^
+libmy/argv.c:1210:7: note:  Execution continues on line 1214
+      break;
+      ^
+libmy/argv.c:1214:15: note: Field 'at_value' is not equal to 0
+  if (type_p->at_value == 0) {
+              ^
+libmy/argv.c:1214:3: note: Taking false branch
+  if (type_p->at_value == 0) {
+  ^
+libmy/argv.c:1222:7: note: Assuming the condition is true
+  if (type & ARGV_FLAG_ARRAY) {
+      ^~~~~~~~~~~~~~~~~~~~~~
+libmy/argv.c:1222:3: note: Taking true branch
+  if (type & ARGV_FLAG_ARRAY) {
+  ^
+libmy/argv.c:1225:9: note: Assuming field 'aa_entry_n' is equal to 0
+    if (arr_p->aa_entry_n == 0) {
+        ^~~~~~~~~~~~~~~~~~~~~~
+libmy/argv.c:1225:5: note: Taking true branch
+    if (arr_p->aa_entry_n == 0) {
+    ^
+libmy/argv.c:1226:35: note: Storing uninitialized value
+      arr_p->aa_entries = (char *)malloc(ARRAY_INCR *size);
+                                  ^~~~~~~~~~~~~~~~~~~~~~~~
+libmy/argv.c:1234:9: note: Assuming field 'aa_entries' is not equal to NULL
+    if (arr_p->aa_entries == NULL) {
+        ^~~~~~~~~~~~~~~~~~~~~~~~~
+libmy/argv.c:1234:5: note: Taking false branch
+    if (arr_p->aa_entries == NULL) {
+    ^
+libmy/argv.c:1251:3: note: Control jumps to 'case 17:'  at line 1349
+  switch (val_type) {
+  ^
+libmy/argv.c:1351:9: note: Assuming 'arg' is equal to NULL
+    if (arg == NULL) {
+        ^~~~~~~~~~~
+libmy/argv.c:1351:5: note: Taking true branch
+    if (arg == NULL) {
+    ^
+libmy/argv.c:1352:7: note: The expression is an uninitialized value. The computed value will also be garbage
+      (*(int *)var)++;
+      ^~~~~~~~~~~~~
+---
+ libmy/argv.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/libmy/argv.c b/libmy/argv.c
+index 0b28026..547065c 100644
+--- a/libmy/argv.c
++++ b/libmy/argv.c
+@@ -1223,12 +1223,15 @@ static	int	string_to_value(const char *arg, ARGV_PNT var,
+     arr_p = (argv_array_t *)var;
+     
+     if (arr_p->aa_entry_n == 0) {
+-      arr_p->aa_entries = (char *)malloc(ARRAY_INCR *size);
++      arr_p->aa_entries = (char *)calloc(ARRAY_INCR, size);
+     }
+     else if (arr_p->aa_entry_n % ARRAY_INCR == 0) {
+       arr_p->aa_entries =
+ 	(char *)realloc(arr_p->aa_entries, (arr_p->aa_entry_n + ARRAY_INCR) *
+ 			size);
++      if (arr_p->aa_entries != NULL)
++	memset((char *)(arr_p->aa_entries) + arr_p->aa_entry_n * size, 0,
++	       ARRAY_INCR*size);
+     }
+     
+     if (arr_p->aa_entries == NULL) {
+-- 
+2.26.3
+

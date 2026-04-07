@@ -1,0 +1,15 @@
+--- manuel-1.11.2/src/manuel/index.txt.orig	2022-05-15 16:15:13.000000000 -0600
++++ manuel-1.11.2/src/manuel/index.txt	2022-06-20 11:08:41.585155482 -0600
+@@ -212,9 +212,9 @@ When tests are run this way:
+     >>> sys.stdout.writeln = lambda s: sys.stdout.write(s+'\n')
+     >>> suite = loader.loadTestsFromTestCase(MyTest)
+     >>> result = suite.run(unittest.TextTestResult(sys.stdout, True, 3))
+-    test1 (tests.MyTest) ... ok
+-    test2 (tests.MyTest) ... ok
+-    test3 (tests.MyTest) ... FAIL
++    test1 (tests.MyTest.test1) ... ok
++    test2 (tests.MyTest.test2) ... ok
++    test3 (tests.MyTest.test3) ... FAIL
+ 
+     >>> for _, e in result.errors:
+     ...     print(e); print

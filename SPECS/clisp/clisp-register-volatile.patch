@@ -1,0 +1,11 @@
+--- src/lispbibl.d.orig	2018-11-11 17:05:07.000000000 -0700
++++ src/lispbibl.d	2019-03-19 20:25:04.289654626 -0600
+@@ -11884,7 +11884,7 @@ All other long words on the LISP-Stack a
+     #define FAST_SP
+   #endif
+ #elif defined(GNU) && defined(SP_register)
+-  register __volatile__ aint __SP __asm__(SP_register);
++  register aint __SP __asm__(SP_register);
+   #ifdef SPARC64
+     #define SP()  (__SP+2048)
+   #else

@@ -1,0 +1,39 @@
+From: Robert Fairley <rfairley@redhat.com>
+Date: Wed, 17 Jun 2020 10:14:19 -0400
+Subject: [PATCH] examples/nm-dispatcher.dhcp: use sysconfig
+
+Use the PEERNTP and NTPSERVERARGS environment variables from
+/etc/sysconfig/network{-scripts}.
+
+Co-Authored-By: Christian Glombek <cglombek@redhat.com>
+
+diff --git a/examples/chrony.nm-dispatcher.dhcp b/examples/chrony.nm-dispatcher.dhcp
+index 6ea4c37..a6ad35a 100644
+--- a/examples/chrony.nm-dispatcher.dhcp
++++ b/examples/chrony.nm-dispatcher.dhcp
+@@ -8,15 +8,23 @@ export LC_ALL=C
+ interface=$1
+ action=$2
+ 
++[ -f /etc/sysconfig/network ] && . /etc/sysconfig/network
++[ -f /etc/sysconfig/network-scripts/ifcfg-"${interface}" ] && \
++    . /etc/sysconfig/network-scripts/ifcfg-"${interface}"
++
+ chronyc=/usr/bin/chronyc
+-server_options=iburst
+-server_dir=/var/run/chrony-dhcp
++server_options=${NTPSERVERARGS:-iburst}
++server_dir=/run/chrony-dhcp
+ 
+ dhcp_server_file=$server_dir/$interface.sources
+ dhcp_ntp_servers="$DHCP4_NTP_SERVERS $DHCP6_DHCP6_NTP_SERVERS"
+ 
+ add_servers_from_dhcp() {
+     rm -f "$dhcp_server_file"
++
++    # Don't add NTP servers if PEERNTP=no specified; return early.
++    [ "$PEERNTP" = "no" ] && return
++
+     for server in $dhcp_ntp_servers; do
+         # Check for invalid characters (from the DHCPv6 NTP FQDN suboption)
+         len1=$(printf '%s' "$server" | wc -c)

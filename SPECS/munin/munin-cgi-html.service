@@ -1,0 +1,8 @@
+[Unit]
+Description=Munin FastCGI HTML Pages Service
+Requires=munin-cgi-html.socket
+
+[Service]
+User=munin
+ExecStart=/var/www/html/munin/cgi/munin-cgi-html
+StandardInput=socket

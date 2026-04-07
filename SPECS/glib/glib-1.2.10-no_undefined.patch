@@ -1,0 +1,48 @@
+--- glib-1.2.10/gthread/Makefile.am.no_undefined	1999-08-26 08:09:43.000000000 -0500
++++ glib-1.2.10/gthread/Makefile.am	2006-05-04 08:38:36.000000000 -0500
+@@ -17,9 +17,11 @@
+ libgthread_la_LDFLAGS = \
+ 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
+ 	-release $(LT_RELEASE) \
++	-no-undefined -Wl,--no-undefined \
+ 	-export-dynamic
+ 
+-libgthread_la_LIBADD = @G_THREAD_LIBS@
++libgthread_la_DEPENDENCIES = $(libglib) $(top_builddir)/gmodule/libgmodule.la
++libgthread_la_LIBADD = @G_THREAD_LIBS@ $(libglib) $(top_builddir)/gmodule/libgmodule.la
+ 
+ noinst_PROGRAMS = testgthread
+-testgthread_LDADD = ../libglib.la libgthread.la 
++testgthread_LDADD = libgthread.la 
+--- glib-1.2.10/gmodule/Makefile.am.no_undefined	2001-03-15 09:33:10.000000000 -0600
++++ glib-1.2.10/gmodule/Makefile.am	2006-05-04 08:33:22.000000000 -0500
+@@ -27,23 +27,25 @@
+ 	@G_MODULE_LDFLAGS@ \
+ 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
+ 	-release $(LT_RELEASE) \
++	-no-undefined -Wl,--no-undefined \
+ 	-export-dynamic
+ 
+-libgmodule_la_LIBADD = @G_MODULE_LIBS@ # $(libglib)
++libgmodule_la_DEPENDENCIES = $(libglib)
++libgmodule_la_LIBADD = @G_MODULE_LIBS@ $(libglib)
+ # we should really depend on $(libglib) for libgmodule.la, but libtool has a
+ # problem with this ;(
+ 
+ libgplugin_a_la_SOURCES = libgplugin_a.c
+ libgplugin_a_la_LDFLAGS = @G_MODULE_LDFLAGS@ -avoid-version -module
+-libgplugin_a_la_LIBADD = @G_MODULE_LIBS@ # $(libglib)
++libgplugin_a_la_LIBADD = @G_MODULE_LIBS@ $(libglib)
+ 
+ libgplugin_b_la_SOURCES = libgplugin_b.c
+ libgplugin_b_la_LDFLAGS = @G_MODULE_LDFLAGS@ -avoid-version -module
+-libgplugin_b_la_LIBADD = @G_MODULE_LIBS@ # $(libglib)
++libgplugin_b_la_LIBADD = @G_MODULE_LIBS@ $(libglib)
+ 
+ noinst_PROGRAMS = testgmodule
+ testgmodule_LDFLAGS += @G_MODULE_LDFLAGS@
+-testgmodule_LDADD = libgmodule.la $(libglib) @G_MODULE_LIBS@
++testgmodule_LDADD = libgmodule.la @G_MODULE_LIBS@
+ 
+ .PHONY: files release
+ 

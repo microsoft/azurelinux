@@ -1,0 +1,26 @@
+Port the GNU/Linux parts of config.guess to C99 because the script is
+invoked without CFLAGS.
+
+diff --git a/autoconf/config.guess b/autoconf/config.guess
+index 41249c1295106577..bf567065edc492a6 100755
+--- a/autoconf/config.guess
++++ b/autoconf/config.guess
+@@ -686,7 +686,8 @@ EOF
+ 	  # Determine whether the default compiler is a.out or elf
+ 	  cat >dummy.c <<EOF
+ #include <features.h>
+-main(argc, argv)
++#include <stdio.h>
++int main(argc, argv)
+      int argc;
+      char *argv[];
+ {
+@@ -900,7 +901,7 @@ cat >dummy.c <<EOF
+ # include <sys/types.h>
+ # include <sys/utsname.h>
+ #endif
+-main ()
++int main (void)
+ {
+ #if defined (sony)
+ #if defined (MIPSEB)

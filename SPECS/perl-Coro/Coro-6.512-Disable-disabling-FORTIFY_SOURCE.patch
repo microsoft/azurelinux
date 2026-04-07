@@ -1,0 +1,49 @@
+From 7accb61160334aa89bf771323c91e40f42af8574 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Fri, 14 Jul 2017 14:59:32 +0200
+Subject: [PATCH] Disable disabling FORTIFY_SOURCE
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+6.512 started to disable FORTIFY_SOURCE feature because it breaks
+jumps on some C standard libraries.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ Coro/Makefile.PL    | 1 -
+ Coro/libcoro/coro.h | 6 ------
+ 2 files changed, 7 deletions(-)
+
+diff --git a/Coro/Makefile.PL b/Coro/Makefile.PL
+index f86424b..6e63075 100644
+--- a/Coro/Makefile.PL
++++ b/Coro/Makefile.PL
+@@ -219,7 +219,6 @@ if ($iface eq "u") {
+    print "\nUsing ucontext implementation\n\n";
+    conftest ("TEST_makecontext");
+ } elsif ($iface eq "s") {
+-   $DEFINE .= " -D_FORTIFY_SOURCE=0";
+    $DEFINE .= " -DCORO_SJLJ";
+    print "\nUsing setjmp/longjmp/sigaltstack implementation\n\n";
+    conftest ("TEST_sigaltstack");
+diff --git a/Coro/libcoro/coro.h b/Coro/libcoro/coro.h
+index 82c9dab..bf8577f 100644
+--- a/Coro/libcoro/coro.h
++++ b/Coro/libcoro/coro.h
+@@ -342,12 +342,6 @@ struct coro_context
+ #  define _GNU_SOURCE /* for glibc */
+ # endif
+ 
+-/* try to disable well-meant but buggy checks in some libcs */
+-# ifdef _FORTIFY_SOURCE
+-#  undef _FORTIFY_SOURCE
+-#  undef __USE_FORTIFY_LEVEL /* helps some more when too much has been included already */
+-# endif
+-
+ # if !CORO_LOSER
+ #  include <unistd.h>
+ # endif
+-- 
+2.9.4
+

@@ -1,0 +1,39 @@
+From a13d0191d1f4bf8e8de34a5513e980ea8bf85e5c Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Mon, 28 Oct 2024 19:51:10 -0600
+Subject: [PATCH 2/2] Drop pretty_assertions removed upstream
+
+---
+ Cargo.toml             | 3 ---
+ tests/decode_reader.rs | 1 -
+ 2 files changed, 4 deletions(-)
+
+diff --git a/Cargo.toml b/Cargo.toml
+index 9d06d0a..2b01f7a 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -31,9 +31,6 @@ version = "1.2.1"
+ [dependencies.tinyvec]
+ version = "1.1"
+ 
+-[dev-dependencies.pretty_assertions]
+-version = "0.6"
+-
+ [features]
+ default = []
+ rustc_1_37 = []
+diff --git a/tests/decode_reader.rs b/tests/decode_reader.rs
+index a99cf30..5808718 100644
+--- a/tests/decode_reader.rs
++++ b/tests/decode_reader.rs
+@@ -1,7 +1,6 @@
+ use std::io::{self, Read};
+ 
+ use bzip2_rs::decoder::DecoderReader;
+-use pretty_assertions::assert_eq;
+ 
+ #[test]
+ fn empty() {
+-- 
+2.47.0
+

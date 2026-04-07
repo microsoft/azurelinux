@@ -1,0 +1,323 @@
+Description: wraps some api call to use with ruby1.9 as well as ruby1.8
+Origin:      vendor
+Author:      KURASHIKI Satoru <lurdan@gmail.com>
+             Lucas Nussbaum <lucas@lucas-nussbaum.net>
+
+Index: qdbm/ruby/depot/mod_depot.c
+===================================================================
+--- qdbm.orig/ruby/depot/mod_depot.c	2010-08-12 20:39:10.627245535 +0900
++++ qdbm/ruby/depot/mod_depot.c	2010-08-12 20:42:58.951245088 +0900
+@@ -23,6 +23,11 @@
+ 
+ #define MAXOPEN 1024
+ 
++#ifndef RUBY_19
++#ifndef RSTRING_LEN
++#define RSTRING_LEN(v) (RSTRING(v)->len)
++#endif
++#endif
+ 
+ VALUE cdepoterror;
+ VALUE cdepoterror_ENOERR;
+@@ -232,7 +237,7 @@
+   const char *name;
+   int index, omode, bnum;
+   if((index = getnewindex()) == -1) myerror(DP_EMISC);
+-  name = STR2CSTR(vname);
++  name = StringValuePtr(vname);
+   FIXNUM_P(vomode);
+   omode = FIX2INT(vomode);
+   FIXNUM_P(vbnum);
+@@ -273,10 +278,10 @@
+   int index, ksiz, vsiz, dmode;
+   FIXNUM_P(vindex);
+   if((index = FIX2INT(vindex)) == -1) myerror(DP_EMISC);
+-  kbuf = STR2CSTR(vkey);
+-  ksiz = RSTRING(vkey)->len;
+-  vbuf = STR2CSTR(vval);
+-  vsiz = RSTRING(vval)->len;
++  kbuf = StringValuePtr(vkey);
++  ksiz = RSTRING_LEN(vkey);
++  vbuf = StringValuePtr(vval);
++  vsiz = RSTRING_LEN(vval);
+   FIXNUM_P(vdmode);
+   dmode = FIX2INT(vdmode);
+   depot = dptable[index];
+@@ -294,8 +299,8 @@
+   int index, ksiz;
+   FIXNUM_P(vindex);
+   if((index = FIX2INT(vindex)) == -1) myerror(DP_EMISC);
+-  kbuf = STR2CSTR(vkey);
+-  ksiz = RSTRING(vkey)->len;
++  kbuf = StringValuePtr(vkey);
++  ksiz = RSTRING_LEN(vkey);
+   depot = dptable[index];
+   if(!dpout(depot, kbuf, ksiz)){
+     if(dpsltable[index] && dpecode == DP_ENOITEM) return Qfalse;
+@@ -313,8 +318,8 @@
+   VALUE vval;
+   FIXNUM_P(vindex);
+   if((index = FIX2INT(vindex)) == -1) myerror(DP_EMISC);
+-  kbuf = STR2CSTR(vkey);
+-  ksiz = RSTRING(vkey)->len;
++  kbuf = StringValuePtr(vkey);
++  ksiz = RSTRING_LEN(vkey);
+   FIXNUM_P(vstart);
+   start = FIX2INT(vstart);
+   FIXNUM_P(vmax);
+@@ -336,8 +341,8 @@
+   int index, ksiz, vsiz;
+   FIXNUM_P(vindex);
+   if((index = FIX2INT(vindex)) == -1) myerror(DP_EMISC);
+-  kbuf = STR2CSTR(vkey);
+-  ksiz = RSTRING(vkey)->len;
++  kbuf = StringValuePtr(vkey);
++  ksiz = RSTRING_LEN(vkey);
+   depot = dptable[index];
+   if((vsiz = dpvsiz(depot, kbuf, ksiz)) == -1){
+     if(dpsltable[index] && dpecode == DP_ENOITEM) return INT2FIX(-1);
+Index: qdbm/ruby/curia/mod_curia.c
+===================================================================
+--- qdbm.orig/ruby/curia/mod_curia.c	2010-08-12 20:39:31.855253284 +0900
++++ qdbm/ruby/curia/mod_curia.c	2010-08-12 20:42:40.351244536 +0900
+@@ -24,6 +24,11 @@
+ 
+ #define MAXOPEN 1024
+ 
++#ifndef RUBY_19
++#ifndef RSTRING_LEN
++#define RSTRING_LEN(v) (RSTRING(v)->len)
++#endif
++#endif
+ 
+ VALUE ccuriaerror;
+ VALUE ccuriaerror_ENOERR;
+@@ -233,7 +238,7 @@
+   const char *name;
+   int index, omode, bnum, dnum;
+   if((index = getnewindex()) == -1) myerror(DP_EMISC);
+-  name = STR2CSTR(vname);
++  name = StringValuePtr(vname);
+   FIXNUM_P(vomode);
+   omode = FIX2INT(vomode);
+   FIXNUM_P(vbnum);
+@@ -276,10 +281,10 @@
+   int index, ksiz, vsiz, dmode;
+   FIXNUM_P(vindex);
+   if((index = FIX2INT(vindex)) == -1) myerror(DP_EMISC);
+-  kbuf = STR2CSTR(vkey);
+-  ksiz = RSTRING(vkey)->len;
+-  vbuf = STR2CSTR(vval);
+-  vsiz = RSTRING(vval)->len;
++  kbuf = StringValuePtr(vkey);
++  ksiz = RSTRING_LEN(vkey);
++  vbuf = StringValuePtr(vval);
++  vsiz = RSTRING_LEN(vval);
+   FIXNUM_P(vdmode);
+   dmode = FIX2INT(vdmode);
+   curia = crtable[index];
+@@ -297,8 +302,8 @@
+   int index, ksiz;
+   FIXNUM_P(vindex);
+   if((index = FIX2INT(vindex)) == -1) myerror(DP_EMISC);
+-  kbuf = STR2CSTR(vkey);
+-  ksiz = RSTRING(vkey)->len;
++  kbuf = StringValuePtr(vkey);
++  ksiz = RSTRING_LEN(vkey);
+   curia = crtable[index];
+   if(!crout(curia, kbuf, ksiz)){
+     if(crsltable[index] && dpecode == DP_ENOITEM) return Qfalse;
+@@ -316,8 +321,8 @@
+   VALUE vval;
+   FIXNUM_P(vindex);
+   if((index = FIX2INT(vindex)) == -1) myerror(DP_EMISC);
+-  kbuf = STR2CSTR(vkey);
+-  ksiz = RSTRING(vkey)->len;
++  kbuf = StringValuePtr(vkey);
++  ksiz = RSTRING_LEN(vkey);
+   FIXNUM_P(vstart);
+   start = FIX2INT(vstart);
+   FIXNUM_P(vmax);
+@@ -339,8 +344,8 @@
+   int index, ksiz, vsiz;
+   FIXNUM_P(vindex);
+   if((index = FIX2INT(vindex)) == -1) myerror(DP_EMISC);
+-  kbuf = STR2CSTR(vkey);
+-  ksiz = RSTRING(vkey)->len;
++  kbuf = StringValuePtr(vkey);
++  ksiz = RSTRING_LEN(vkey);
+   curia = crtable[index];
+   if((vsiz = crvsiz(curia, kbuf, ksiz)) == -1){
+     if(crsltable[index] && dpecode == DP_ENOITEM) return INT2FIX(-1);
+Index: qdbm/ruby/villa/mod_villa.c
+===================================================================
+--- qdbm.orig/ruby/villa/mod_villa.c	2010-08-12 20:39:40.855248815 +0900
++++ qdbm/ruby/villa/mod_villa.c	2010-08-12 20:43:25.211242671 +0900
+@@ -25,6 +25,11 @@
+ 
+ #define MAXOPEN 1024
+ 
++#ifndef RUBY_19
++#ifndef RSTRING_LEN
++#define RSTRING_LEN(v) (RSTRING(v)->len)
++#endif
++#endif
+ 
+ VALUE cvillaerror;
+ VALUE cvillaerror_ENOERR;
+@@ -304,7 +309,7 @@
+   int index, omode, cmode;
+   VLCFUNC cmp;
+   if((index = getnewindex()) == -1) myerror(DP_EMISC);
+-  name = STR2CSTR(vname);
++  name = StringValuePtr(vname);
+   FIXNUM_P(vomode);
+   omode = FIX2INT(vomode);
+   FIXNUM_P(vcmode);
+@@ -352,10 +357,10 @@
+   int index, ksiz, vsiz, dmode;
+   FIXNUM_P(vindex);
+   if((index = FIX2INT(vindex)) == -1) myerror(DP_EMISC);
+-  kbuf = STR2CSTR(vkey);
+-  ksiz = RSTRING(vkey)->len;
+-  vbuf = STR2CSTR(vval);
+-  vsiz = RSTRING(vval)->len;
++  kbuf = StringValuePtr(vkey);
++  ksiz = RSTRING_LEN(vkey);
++  vbuf = StringValuePtr(vval);
++  vsiz = RSTRING_LEN(vval);
+   FIXNUM_P(vdmode);
+   dmode = FIX2INT(vdmode);
+   villa = vltable[index];
+@@ -373,8 +378,8 @@
+   int index, ksiz;
+   FIXNUM_P(vindex);
+   if((index = FIX2INT(vindex)) == -1) myerror(DP_EMISC);
+-  kbuf = STR2CSTR(vkey);
+-  ksiz = RSTRING(vkey)->len;
++  kbuf = StringValuePtr(vkey);
++  ksiz = RSTRING_LEN(vkey);
+   villa = vltable[index];
+   if(!vlout(villa, kbuf, ksiz)){
+     if(vlsltable[index] && dpecode == DP_ENOITEM) return Qfalse;
+@@ -391,8 +396,8 @@
+   VALUE vval;
+   FIXNUM_P(vindex);
+   if((index = FIX2INT(vindex)) == -1) myerror(DP_EMISC);
+-  kbuf = STR2CSTR(vkey);
+-  ksiz = RSTRING(vkey)->len;
++  kbuf = StringValuePtr(vkey);
++  ksiz = RSTRING_LEN(vkey);
+   villa = vltable[index];
+   if(!(vbuf = vlget(villa, kbuf, ksiz, &vsiz))){
+     if(vlsltable[index] && dpecode == DP_ENOITEM) return Qnil;
+@@ -409,8 +414,8 @@
+   int index, ksiz, vsiz;
+   FIXNUM_P(vindex);
+   if((index = FIX2INT(vindex)) == -1) myerror(DP_EMISC);
+-  kbuf = STR2CSTR(vkey);
+-  ksiz = RSTRING(vkey)->len;
++  kbuf = StringValuePtr(vkey);
++  ksiz = RSTRING_LEN(vkey);
+   villa = vltable[index];
+   if((vsiz = vlvsiz(villa, kbuf, ksiz)) == -1){
+     if(vlsltable[index] && dpecode == DP_ENOITEM) return INT2FIX(-1);
+@@ -426,8 +431,8 @@
+   int index, ksiz, vnum;
+   FIXNUM_P(vindex);
+   if((index = FIX2INT(vindex)) == -1) myerror(DP_EMISC);
+-  kbuf = STR2CSTR(vkey);
+-  ksiz = RSTRING(vkey)->len;
++  kbuf = StringValuePtr(vkey);
++  ksiz = RSTRING_LEN(vkey);
+   villa = vltable[index];
+   vnum = vlvnum(villa, kbuf, ksiz);
+   return INT2FIX(vnum);
+@@ -497,8 +502,8 @@
+   VALUE vval;
+   FIXNUM_P(vindex);
+   if((index = FIX2INT(vindex)) == -1) myerror(DP_EMISC);
+-  kbuf = STR2CSTR(vkey);
+-  ksiz = RSTRING(vkey)->len;
++  kbuf = StringValuePtr(vkey);
++  ksiz = RSTRING_LEN(vkey);
+   FIXNUM_P(vjmode);
+   jmode = FIX2INT(vjmode);
+   villa = vltable[index];
+@@ -551,8 +556,8 @@
+   int index, vsiz, cpmode;
+   FIXNUM_P(vindex);
+   if((index = FIX2INT(vindex)) == -1) myerror(DP_EMISC);
+-  vbuf = STR2CSTR(vval);
+-  vsiz = RSTRING(vval)->len;
++  vbuf = StringValuePtr(vval);
++  vsiz = RSTRING_LEN(vval);
+   FIXNUM_P(vcpmode);
+   cpmode = FIX2INT(vcpmode);
+   villa = vltable[index];
+Index: qdbm/ruby/curia/rbcrtest
+===================================================================
+--- qdbm.orig/ruby/curia/rbcrtest	2010-08-12 20:48:17.871249729 +0900
++++ qdbm/ruby/curia/rbcrtest	2010-08-12 20:48:33.739252026 +0900
+@@ -21,7 +21,7 @@
+ 
+ # main routine
+ def main()
+-  $0.gsub!(/.*\//, "")
++  $0 = $0.gsub(/.*\//, "")
+   (ARGV.length >= 1) || usage()
+   if(ARGV[0] == "write")
+     rv = runwrite()
+@@ -283,7 +283,7 @@
+ 
+ 
+ # execute main
+-$0.gsub!(/.*\//, "")
++$0 = $0.gsub(/.*\//, "")
+ exit(main())
+ 
+ 
+Index: qdbm/ruby/depot/rbdptest
+===================================================================
+--- qdbm.orig/ruby/depot/rbdptest	2010-08-12 20:48:47.999242043 +0900
++++ qdbm/ruby/depot/rbdptest	2010-08-12 20:48:57.379246136 +0900
+@@ -21,7 +21,7 @@
+ 
+ # main routine
+ def main()
+-  $0.gsub!(/.*\//, "")
++  $0 = $0.gsub(/.*\//, "")
+   (ARGV.length >= 1) || usage()
+   if(ARGV[0] == "write")
+     rv = runwrite()
+@@ -278,7 +278,7 @@
+ 
+ 
+ # execute main
+-$0.gsub!(/.*\//, "")
++$0 = $0.gsub(/.*\//, "")
+ exit(main())
+ 
+ 
+Index: qdbm/ruby/villa/rbvltest
+===================================================================
+--- qdbm.orig/ruby/villa/rbvltest	2010-08-12 20:49:13.847254224 +0900
++++ qdbm/ruby/villa/rbvltest	2010-08-12 20:49:20.167246365 +0900
+@@ -21,7 +21,7 @@
+ 
+ # main routine
+ def main()
+-  $0.gsub!(/.*\//, "")
++  $0 = $0.gsub(/.*\//, "")
+   (ARGV.length >= 1) || usage()
+   if(ARGV[0] == "write")
+     rv = runwrite()
+@@ -280,7 +280,7 @@
+ 
+ 
+ # execute main
+-$0.gsub!(/.*\//, "")
++$0 = $0.gsub(/.*\//, "")
+ exit(main())
+ 
+ 

@@ -1,0 +1,12 @@
+diff -ur v5.0_original/ncompress-5.0/compress.c v5.0/ncompress-5.0/compress.c
+--- v5.0_original/ncompress-5.0/compress.c	2021-02-02 09:16:16.000000000 +0100
++++ v5.0/ncompress-5.0/compress.c	2022-06-24 11:20:37.795568007 +0200
+@@ -1236,7 +1236,7 @@
+ 		int boff;
+ 		int n_bits;
+ 		int ratio;
+-		long checkpoint;
++		unsigned long long checkpoint;
+ 		code_int extcode;
+ 		union
+ 		{

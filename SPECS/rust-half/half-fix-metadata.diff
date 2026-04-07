@@ -1,0 +1,12 @@
+--- half-2.7.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ half-2.7.1/Cargo.toml	2025-10-24T20:50:59.540053+00:00
+@@ -118,9 +118,6 @@
+ ]
+ default-features = false
+ 
+-[dev-dependencies.criterion]
+-version = "0.5"
+-
+ [dev-dependencies.crunchy]
+ version = "0.2.2"
+ 

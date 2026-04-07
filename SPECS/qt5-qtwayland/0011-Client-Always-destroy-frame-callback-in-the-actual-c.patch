@@ -1,0 +1,58 @@
+From 803f1163d44846fc1d919e30b8cc83d9885d75c8 Mon Sep 17 00:00:00 2001
+From: Georges Basile Stavracas Neto <gbsneto@gnome.org>
+Date: Thu, 27 May 2021 20:02:53 -0300
+Subject: [PATCH 11/55] Client: Always destroy frame callback in the actual
+ callback
+
+It's good hygiene to destroy all frame callbacks. Destroy the
+frame callback and cleanup the mFrameCallback class member in
+the callback itself. The callback destruction happens before
+calling handleFrameCallback() to avoid the theoretical case
+where another frame callback is queued by handleFrameCallback(),
+and then immediately destroyed in the callback handler.
+
+* asturmlechner 2021-09-27:
+  Conflict resolved from non-backported commit in dev branch:
+  93058de8d7e7c2f320c22b3bd898aa06cf5babcd
+
+Change-Id: Ide6dc95e3402932c58bfc088a9d471fda821e9a1
+Reviewed-by: Eskil Abrahamsen Blomfeldt <eskil.abrahamsen-blomfeldt@qt.io>
+(cherry picked from commit 42cdc61a93cf2acb09936aebb5e431fdbc0a26c6)
+---
+ src/client/qwaylandwindow.cpp | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
+
+diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
+index 9de284de..e0093013 100644
+--- a/src/client/qwaylandwindow.cpp
++++ b/src/client/qwaylandwindow.cpp
+@@ -635,9 +635,13 @@ void QWaylandWindow::commit()
+ 
+ const wl_callback_listener QWaylandWindow::callbackListener = {
+     [](void *data, wl_callback *callback, uint32_t time) {
+-        Q_UNUSED(callback);
+         Q_UNUSED(time);
+         auto *window = static_cast<QWaylandWindow*>(data);
++
++        Q_ASSERT(callback == window->mFrameCallback);
++        wl_callback_destroy(callback);
++        window->mFrameCallback = nullptr;
++
+         window->handleFrameCallback();
+     }
+ };
+@@ -1208,11 +1212,6 @@ void QWaylandWindow::handleUpdate()
+     if (!mSurface)
+         return;
+ 
+-    if (mFrameCallback) {
+-        wl_callback_destroy(mFrameCallback);
+-        mFrameCallback = nullptr;
+-    }
+-
+     QMutexLocker locker(mFrameQueue.mutex);
+     struct ::wl_surface *wrappedSurface = reinterpret_cast<struct ::wl_surface *>(wl_proxy_create_wrapper(mSurface->object()));
+     wl_proxy_set_queue(reinterpret_cast<wl_proxy *>(wrappedSurface), mFrameQueue.queue);
+-- 
+2.51.1
+

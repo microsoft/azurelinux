@@ -1,0 +1,7 @@
+#!/usr/bin/bash
+#
+# Run Firefox on X11 backend
+#
+
+export MOZ_DISABLE_WAYLAND=1
+exec /__PREFIX__/bin/firefox "$@"

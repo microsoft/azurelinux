@@ -1,0 +1,13 @@
+diff --git a/cunit/unit.c b/cunit/unit.c
+index 46dc358..ca37f22 100644
+--- a/cunit/unit.c
++++ b/cunit/unit.c
+@@ -97,7 +97,7 @@ EXPORTED void fatal(const char *s, int code)
+ }
+ 
+ /* Each test gets a maximum of 20 seconds. */
+-#define TEST_TIMEOUT_MS (20*1000)
++#define TEST_TIMEOUT_MS (300*1000)
+ 
+ static jmp_buf jbuf;
+ static const char *code;

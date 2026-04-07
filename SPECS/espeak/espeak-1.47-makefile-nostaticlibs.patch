@@ -1,0 +1,13 @@
+diff --git a/src/Makefile b/src/Makefile
+index f04b4c4..17de93a 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -143,7 +143,7 @@ install: all
+ 	# Install shared library
+ 	$(INSTALL) -m 755 $(LIB_NAME).$(LIBTAG) $(DESTDIR)$(LIBDIR)
+ 	# Install static library
+-	$(INSTALL) -m 755 $(STATIC_LIB_NAME) $(DESTDIR)$(LIBDIR)
++	#$(INSTALL) -m 755 $(STATIC_LIB_NAME) $(DESTDIR)$(LIBDIR)
+ 	$(LN_SF) $(LIB_NAME).$(LIBTAG) $(DESTDIR)$(LIBDIR)/$(LIB_NAME).$(LIB_VERSION)
+ 	$(LN_SF) $(LIB_NAME).$(LIB_VERSION) $(DESTDIR)$(LIBDIR)/$(LIB_NAME)
+ 	# Install development headers

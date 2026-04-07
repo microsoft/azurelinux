@@ -1,0 +1,22 @@
+diff -rup libgcrypt.orig/src/Makefile.am libgcrypt-1.8.3/src/Makefile.am
+--- libgcrypt.orig/src/Makefile.am	2021-10-18 16:36:20.914025497 +0100
++++ libgcrypt-1.8.3/src/Makefile.am	2021-10-19 12:23:08.652960618 +0100
+@@ -108,6 +108,7 @@ endif !HAVE_W32_SYSTEM
+ 
+ 
+ libgcrypt_la_LDFLAGS = $(no_undefined) $(export_symbols) $(extra_ltoptions) \
++	-Wc,-fplugin=annobin \
+ 	$(libgcrypt_version_script_cmd) -version-info \
+ 	@LIBGCRYPT_LT_CURRENT@:@LIBGCRYPT_LT_REVISION@:@LIBGCRYPT_LT_AGE@
+ libgcrypt_la_DEPENDENCIES = \
+Only in libgcrypt-1.8.3/src: Makefile.am.annobin
+diff -rup libgcrypt.orig/src/Makefile.in libgcrypt-1.8.3/src/Makefile.in
+--- libgcrypt.orig/src/Makefile.in	2021-10-18 16:36:20.914025497 +0100
++++ libgcrypt-1.8.3/src/Makefile.in	2021-10-19 12:23:37.791875325 +0100
+@@ -483,6 +483,7 @@ gcrypt_hwf_modules = @GCRYPT_HWF_MODULES
+ @HAVE_W32_SYSTEM_TRUE@gcrypt_deps = $(gcrypt_res) libgcrypt.def
+ @HAVE_W32_SYSTEM_FALSE@gcrypt_res_ldflag = 
+ libgcrypt_la_LDFLAGS = $(no_undefined) $(export_symbols) $(extra_ltoptions) \
++	-Wc,-fplugin=annobin \
+ 	$(libgcrypt_version_script_cmd) -version-info \
+ 	@LIBGCRYPT_LT_CURRENT@:@LIBGCRYPT_LT_REVISION@:@LIBGCRYPT_LT_AGE@

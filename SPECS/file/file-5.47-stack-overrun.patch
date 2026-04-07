@@ -1,0 +1,25 @@
+From b3384a1fbfa1fee99986e5750ab8e700de4f24ad Mon Sep 17 00:00:00 2001
+From: Christos Zoulas <christos@zoulas.com>
+Date: Thu, 5 Dec 2024 18:35:40 +0000
+Subject: [PATCH] PR/579: net147: Fix stack overrun.
+
+---
+ src/readelf.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/readelf.c b/src/readelf.c
+index aede140..1cec09b 100644
+--- a/src/readelf.c
++++ b/src/readelf.c
+@@ -1720,7 +1720,7 @@ dophn_exec(struct magic_set *ms, int clazz, int swap, int fd, off_t off,
+ 	Elf64_Phdr ph64;
+ 	const char *str;
+ 	unsigned char nbuf[NBUFSIZE];
+-	char interp[128];
++	char interp[NBUFSIZE];
+ 	ssize_t bufsize;
+ 	size_t offset, align, need = 0;
+ 	int pie = 0, dynamic = 0;
+-- 
+2.49.0
+

@@ -1,0 +1,12 @@
+diff --git a/ext/redcloth_scan/extconf.rb b/ext/redcloth_scan/extconf.rb
+index 506d4a3..edd46c4 100644
+--- a/ext/redcloth_scan/extconf.rb
++++ b/ext/redcloth_scan/extconf.rb
+@@ -1,6 +1,6 @@
+ require 'mkmf'
+ CONFIG['warnflags'].gsub!(/-Wshorten-64-to-32/, '') if CONFIG['warnflags']
+-$CFLAGS << ' -O0 -Wall ' if CONFIG['CC'] =~ /gcc/
++$CFLAGS << ' -O0 -Wall -fsigned-char' if CONFIG['CC'] =~ /gcc/
+ dir_config("redcloth_scan")
+ have_library("c", "main")
+ create_makefile("redcloth_scan")

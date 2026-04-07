@@ -1,0 +1,33 @@
+--- unicode-truncate-1.0.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ unicode-truncate-1.0.0/Cargo.toml	2025-07-20T15:49:32.598307+00:00
+@@ -31,20 +31,12 @@
+ license = "MIT OR Apache-2.0"
+ repository = "https://github.com/Aetf/unicode-truncate"
+ 
+-[profile.bench]
+-lto = true
+-codegen-units = 1
+-
+ [lib]
+ bench = false
+ 
+ [[test]]
+ name = "integration"
+ required-features = ["std"]
+-
+-[[bench]]
+-name = "benchmark"
+-harness = false
+ 
+ [dependencies.itertools]
+ version = "0.12.1"
+@@ -53,9 +45,6 @@
+ [dependencies.unicode-width]
+ version = "0.1"
+ 
+-[dev-dependencies.criterion]
+-version = "0.5"
+-
+ [features]
+ default = ["std"]
+ std = []

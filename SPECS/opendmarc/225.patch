@@ -1,0 +1,24 @@
+From 3d46ebfc92063e248ed0ac509398cce4bd90ec23 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Alexander=20Bostr=C3=B6m?= <abo@kth.se>
+Date: Wed, 6 Jul 2022 10:19:49 +0200
+Subject: [PATCH] Increase OPENDMARC_ARCSEAL_MAX_TOKEN_LEN to 768
+
+Enough for 3072 bit key signatures.
+https://github.com/trusteddomainproject/OpenDMARC/issues/183
+---
+ opendmarc/opendmarc-arcseal.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/opendmarc/opendmarc-arcseal.c b/opendmarc/opendmarc-arcseal.c
+index 73eebb7..2a23f5e 100644
+--- a/opendmarc/opendmarc-arcseal.c
++++ b/opendmarc/opendmarc-arcseal.c
+@@ -29,7 +29,7 @@
+ #include "opendmarc.h"
+ 
+ #define OPENDMARC_ARCSEAL_MAX_FIELD_NAME_LEN 255
+-#define OPENDMARC_ARCSEAL_MAX_TOKEN_LEN      512
++#define OPENDMARC_ARCSEAL_MAX_TOKEN_LEN      768
+ 
+ /* tables */
+ struct opendmarc_arcseal_lookup

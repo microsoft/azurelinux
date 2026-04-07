@@ -1,0 +1,239 @@
+From 2947373cd6325b273e3206b63d16ddbfc1118ecf Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Thu, 3 Nov 2022 17:28:43 +0100
+Subject: [PATCH] Fix kwargs matching with rspec-mock 3.12 and Ruby 3+
+
+The test seems to be broken by:
+
+https://github.com/rspec/rspec-mocks/pull/1461
+---
+ spec/lib/listen/adapter/base_spec.rb        |  2 +-
+ spec/lib/listen/adapter/linux_spec.rb       |  6 ++++--
+ spec/lib/listen/adapter/polling_spec.rb     |  2 +-
+ spec/lib/listen/directory_spec.rb           | 12 ++++++------
+ spec/lib/listen/listener_spec.rb            | 20 ++++++++++----------
+ spec/lib/listen/silencer/controller_spec.rb | 12 ++++++------
+ 6 files changed, 28 insertions(+), 26 deletions(-)
+
+diff --git a/spec/lib/listen/adapter/base_spec.rb b/spec/lib/listen/adapter/base_spec.rb
+index 6cf0cad..2b53127 100644
+--- a/spec/lib/listen/adapter/base_spec.rb
++++ b/spec/lib/listen/adapter/base_spec.rb
+@@ -91,7 +91,7 @@ RSpec.describe Listen::Adapter::Base do
+       it 'passes invalidates the snapshot based on the event' do
+         subject.start
+ 
+-        expect(snapshot).to receive(:invalidate).with(:file, 'bar', cookie: 3)
++        expect(snapshot).to receive(:invalidate).with(:file, 'bar', { cookie: 3 })
+ 
+         event = { dir: '/foo/dir1', file: 'bar', type: :moved, cookie: 3 }
+         subject.fake_event(event)
+diff --git a/spec/lib/listen/adapter/linux_spec.rb b/spec/lib/listen/adapter/linux_spec.rb
+index e55bbf6..14f5d48 100644
+--- a/spec/lib/listen/adapter/linux_spec.rb
++++ b/spec/lib/listen/adapter/linux_spec.rb
+@@ -112,8 +112,10 @@ RSpec.describe Listen::Adapter::Linux do
+             expect(snapshot).to receive(:invalidate).with(
+               :file,
+               'path/foo.txt',
+-              cookie: 123,
+-              change: change
++              {
++                cookie: 123,
++                change: change
++              }
+             )
+           end
+         end
+diff --git a/spec/lib/listen/adapter/polling_spec.rb b/spec/lib/listen/adapter/polling_spec.rb
+index 925db74..fae546f 100644
+--- a/spec/lib/listen/adapter/polling_spec.rb
++++ b/spec/lib/listen/adapter/polling_spec.rb
+@@ -56,7 +56,7 @@ RSpec.describe Adapter::Polling do
+ 
+       it 'notifies change on every listener directories path' do
+         expect(snapshot).to receive(:invalidate).
+-          with(:dir, '.', recursive: true)
++          with(:dir, '.', { recursive: true })
+ 
+         t = Thread.new { subject.start }
+         sleep 0.25
+diff --git a/spec/lib/listen/directory_spec.rb b/spec/lib/listen/directory_spec.rb
+index 43ea522..3340067 100644
+--- a/spec/lib/listen/directory_spec.rb
++++ b/spec/lib/listen/directory_spec.rb
+@@ -76,7 +76,7 @@ RSpec.describe Directory do
+           expect(snapshot).to receive(:invalidate).with(:file, 'file.rb', {})
+ 
+           expect(snapshot).to receive(:invalidate).
+-            with(:dir, 'subdir', recursive: false)
++            with(:dir, 'subdir', { recursive: false })
+ 
+           described_class.scan(snapshot, '.', options)
+         end
+@@ -91,7 +91,7 @@ RSpec.describe Directory do
+ 
+         it 'notices subdir does not exist' do
+           expect(snapshot).to receive(:invalidate).
+-            with(:dir, 'subdir', recursive: false)
++            with(:dir, 'subdir', { recursive: false })
+ 
+           described_class.scan(snapshot, '.', options)
+         end
+@@ -219,7 +219,7 @@ RSpec.describe Directory do
+           expect(snapshot).to receive(:invalidate).with(:file, 'file.rb', {})
+ 
+           expect(snapshot).to receive(:invalidate).
+-            with(:dir, 'subdir', recursive: true)
++            with(:dir, 'subdir', { recursive: true })
+ 
+           described_class.scan(snapshot, '.', options)
+         end
+@@ -240,10 +240,10 @@ RSpec.describe Directory do
+           expect(snapshot).to receive(:invalidate).with(:file, 'file.rb', {})
+ 
+           expect(snapshot).to receive(:invalidate).
+-            with(:dir, 'subdir', recursive: true)
++            with(:dir, 'subdir', { recursive: true })
+ 
+           expect(snapshot).to receive(:invalidate).
+-            with(:dir, 'subdir2', recursive: true)
++            with(:dir, 'subdir2', { recursive: true })
+ 
+           described_class.scan(snapshot, '.', options)
+         end
+@@ -274,7 +274,7 @@ RSpec.describe Directory do
+ 
+         it 'snapshots changes for subdir' do
+           expect(snapshot).to receive(:invalidate).
+-            with(:dir, 'subdir', recursive: true)
++            with(:dir, 'subdir', { recursive: true })
+ 
+           described_class.scan(snapshot, '.', options)
+         end
+diff --git a/spec/lib/listen/listener_spec.rb b/spec/lib/listen/listener_spec.rb
+index 9b67e27..8dd9a7a 100644
+--- a/spec/lib/listen/listener_spec.rb
++++ b/spec/lib/listen/listener_spec.rb
+@@ -245,12 +245,12 @@ RSpec.describe Listener do
+       let(:options) { { ignore: /bar/ } }
+ 
+       it 'adds up to existing ignore options' do
+-        expect(silencer).to receive(:configure).once.with(ignore: [/bar/])
++        expect(silencer).to receive(:configure).once.with({ ignore: [/bar/] })
+ 
+         subject
+ 
+         expect(silencer).to receive(:configure).once.
+-          with(ignore: [/bar/, /foo/])
++          with({ ignore: [/bar/, /foo/] })
+ 
+         subject.ignore(/foo/)
+       end
+@@ -260,12 +260,12 @@ RSpec.describe Listener do
+       let(:options) { { ignore: [/bar/] } }
+ 
+       it 'adds up to existing ignore options' do
+-        expect(silencer).to receive(:configure).once.with(ignore: [/bar/])
++        expect(silencer).to receive(:configure).once.with({ ignore: [/bar/] })
+ 
+         subject
+ 
+         expect(silencer).to receive(:configure).once.
+-          with(ignore: [/bar/, /foo/])
++          with({ ignore: [/bar/, /foo/] })
+ 
+         subject.ignore(/foo/)
+       end
+@@ -287,9 +287,9 @@ RSpec.describe Listener do
+       let(:options) { { ignore!: /bar/ } }
+ 
+       it 'overwrites existing ignore options' do
+-        expect(silencer).to receive(:configure).once.with(ignore!: [/bar/])
++        expect(silencer).to receive(:configure).once.with({ ignore!: [/bar/] })
+         subject
+-        expect(silencer).to receive(:configure).once.with(ignore!: [/foo/])
++        expect(silencer).to receive(:configure).once.with({ ignore!: [/foo/] })
+         subject.ignore!([/foo/])
+       end
+     end
+@@ -298,9 +298,9 @@ RSpec.describe Listener do
+       let(:options) { { ignore: /bar/ } }
+ 
+       it 'deletes ignore options' do
+-        expect(silencer).to receive(:configure).once.with(ignore: [/bar/])
++        expect(silencer).to receive(:configure).once.with({ ignore: [/bar/] })
+         subject
+-        expect(silencer).to receive(:configure).once.with(ignore!: [/foo/])
++        expect(silencer).to receive(:configure).once.with({ ignore!: [/foo/] })
+         subject.ignore!([/foo/])
+       end
+     end
+@@ -311,9 +311,9 @@ RSpec.describe Listener do
+       let(:options) { { only: /bar/ } }
+ 
+       it 'overwrites existing ignore options' do
+-        expect(silencer).to receive(:configure).once.with(only: [/bar/])
++        expect(silencer).to receive(:configure).once.with({ only: [/bar/] })
+         subject
+-        expect(silencer).to receive(:configure).once.with(only: [/foo/])
++        expect(silencer).to receive(:configure).once.with({ only: [/foo/] })
+         subject.only([/foo/])
+       end
+     end
+diff --git a/spec/lib/listen/silencer/controller_spec.rb b/spec/lib/listen/silencer/controller_spec.rb
+index 984630c..5393a34 100644
+--- a/spec/lib/listen/silencer/controller_spec.rb
++++ b/spec/lib/listen/silencer/controller_spec.rb
+@@ -26,7 +26,7 @@ RSpec.describe Listen::Silencer::Controller do
+       context 'when providing a single regexp as argument' do
+         it 'sets the given :ignore rules as array' do
+           subject
+-          allow(silencer).to receive(:configure).with(ignore: [/foo/])
++          allow(silencer).to receive(:configure).with({ ignore: [/foo/] })
+           subject.append_ignores(/foo/)
+         end
+       end
+@@ -34,7 +34,7 @@ RSpec.describe Listen::Silencer::Controller do
+       context 'when providing multiple arguments' do
+         it 'sets the given :ignore rules as a flat array' do
+           subject
+-          allow(silencer).to receive(:configure).with(ignore: [/foo/, /bar/])
++          allow(silencer).to receive(:configure).with({ ignore: [/foo/, /bar/] })
+           subject.append_ignores(/foo/, /bar/)
+         end
+       end
+@@ -42,7 +42,7 @@ RSpec.describe Listen::Silencer::Controller do
+       context 'when providing as array' do
+         it 'sets the given :ignore rules' do
+           subject
+-          allow(silencer).to receive(:configure).with(ignore: [/foo/, /bar/])
++          allow(silencer).to receive(:configure).with({ ignore: [/foo/, /bar/] })
+           subject.append_ignores([/foo/, /bar/])
+         end
+       end
+@@ -50,18 +50,18 @@ RSpec.describe Listen::Silencer::Controller do
+ 
+     context 'with previous :ignore rules' do
+       subject do
+-        described_class.new(silencer, ignore: [/foo/, /bar/])
++        described_class.new(silencer, { ignore: [/foo/, /bar/] })
+       end
+ 
+       before do
+-        allow(silencer).to receive(:configure).with(ignore: [/foo/, /bar/])
++        allow(silencer).to receive(:configure).with({ ignore: [/foo/, /bar/] })
+       end
+ 
+       context 'when providing a nil' do
+         # TODO: should this invocation maybe reset the rules?
+         it 'reconfigures with existing :ignore rules' do
+           subject
+-          allow(silencer).to receive(:configure).with(ignore: [/foo/, /bar/])
++          allow(silencer).to receive(:configure).with({ ignore: [/foo/, /bar/] })
+           subject.append_ignores(nil)
+         end
+       end
+-- 
+2.38.1
+

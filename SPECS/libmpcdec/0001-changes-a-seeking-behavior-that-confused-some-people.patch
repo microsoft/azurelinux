@@ -1,0 +1,39 @@
+From b823edffc71103308ede0ebc0fcb3c783466db81 Mon Sep 17 00:00:00 2001
+From: r2d <r2d@c51c8d5e-032a-db11-a0f2-0002b3467eef>
+Date: Thu, 24 Nov 2011 22:45:02 +0000
+Subject: [PATCH 01/19] changes a seeking behavior that confused some people
+ using the library. mpc_demux_decode() would return zero samples a couple of
+ times requiring the caller to loop over. patch by DEATH
+
+git-svn-id: http://svn.musepack.net/libmpc/trunk@476 c51c8d5e-032a-db11-a0f2-0002b3467eef
+---
+ libmpcdec/mpc_demux.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/libmpcdec/mpc_demux.c b/libmpcdec/mpc_demux.c
+index 63e58e6..e486382 100644
+--- a/libmpcdec/mpc_demux.c
++++ b/libmpcdec/mpc_demux.c
+@@ -637,10 +637,15 @@ static mpc_status mpc_demux_decode_inner(mpc_demux * d, mpc_frame_info * i)
+ }
+ 
+ mpc_status mpc_demux_decode(mpc_demux * d, mpc_frame_info * i) {
+-	mpc_status s = mpc_demux_decode_inner(d, i);
+-	if (MPC_IS_FAILURE(s))
+-		i->bits = -1; // we pretend it's end of file
+-	return s;
++	for(;;) {
++		// mpc_demux_decode_inner may return 0 samples and require repeated calls after a seek. Loop over until we have data to return.
++		mpc_status s = mpc_demux_decode_inner(d, i);
++		if (MPC_IS_FAILURE(s))
++			i->bits = -1; // we pretend it's end of file
++
++		if (MPC_IS_FAILURE(s) || i->samples > 0)
++			return s;
++	}
+ }
+ 
+ mpc_status mpc_demux_seek_second(mpc_demux * d, double seconds)
+-- 
+2.46.0
+

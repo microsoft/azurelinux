@@ -1,0 +1,36 @@
+From 775f65d44ceabffa44df3a3a549371ab923384f9 Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Fri, 20 Aug 2021 04:22:34 -0400
+Subject: [PATCH 4/6] Re-add Snappy to tests
+
+Blosc on Fedora is not missing Snappy support.
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ numcodecs/tests/test_blosc.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/numcodecs/tests/test_blosc.py b/numcodecs/tests/test_blosc.py
+index 52ef183..85db82f 100644
+--- a/numcodecs/tests/test_blosc.py
++++ b/numcodecs/tests/test_blosc.py
+@@ -30,7 +30,7 @@ codecs = [
+     Blosc(cname='zlib', clevel=1, shuffle=0),
+     Blosc(cname='zstd', clevel=1, shuffle=1),
+     Blosc(cname='blosclz', clevel=1, shuffle=2),
+-    None,  # was snappy
++    Blosc(cname='snappy', clevel=1, shuffle=2),
+     Blosc(shuffle=Blosc.SHUFFLE, blocksize=0),
+     Blosc(shuffle=Blosc.SHUFFLE, blocksize=2**8),
+     Blosc(cname='lz4', clevel=1, shuffle=Blosc.NOSHUFFLE, blocksize=2**8),
+@@ -136,6 +136,7 @@ def test_compress_complib(use_threads):
+         'lz4': 'LZ4',
+         'lz4hc': 'LZ4',
+         'blosclz': 'BloscLZ',
++        'snappy': 'Snappy',
+         'zlib': 'Zlib',
+         'zstd': 'Zstd',
+     }
+-- 
+2.50.0
+

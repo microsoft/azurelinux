@@ -1,0 +1,79 @@
+From b020d9754883ce42eab1f38ffc031f0b82b079fe Mon Sep 17 00:00:00 2001
+From: Ed Page <eopage@gmail.com>
+Date: Fri, 26 Jul 2024 13:30:09 -0500
+Subject: [PATCH] docs: Fix infostrings
+
+---
+ src/lib.rs | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index f200dc9..b8905e7 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -32,18 +32,18 @@
+ //!
+ //! Assumes the binary is `main`:
+ //!
+-//! ```{.bash}
++//! ```console
+ //! $ RUST_LOG=error ./main
+ //! [2017-11-09T02:12:24Z ERROR main] this is printed by default
+ //! ```
+ //!
+-//! ```{.bash}
++//! ```console
+ //! $ RUST_LOG=info ./main
+ //! [2017-11-09T02:12:24Z ERROR main] this is printed by default
+ //! [2017-11-09T02:12:24Z INFO main] the answer was: 12
+ //! ```
+ //!
+-//! ```{.bash}
++//! ```console
+ //! $ RUST_LOG=debug ./main
+ //! [2017-11-09T02:12:24Z DEBUG main] this is a debug message
+ //! [2017-11-09T02:12:24Z ERROR main] this is printed by default
+@@ -52,7 +52,7 @@
+ //!
+ //! You can also set the log level on a per module basis:
+ //!
+-//! ```{.bash}
++//! ```console
+ //! $ RUST_LOG=main=info ./main
+ //! [2017-11-09T02:12:24Z ERROR main] this is printed by default
+ //! [2017-11-09T02:12:24Z INFO main] the answer was: 12
+@@ -60,7 +60,7 @@
+ //!
+ //! And enable all logging:
+ //!
+-//! ```{.bash}
++//! ```console
+ //! $ RUST_LOG=main ./main
+ //! [2017-11-09T02:12:24Z DEBUG main] this is a debug message
+ //! [2017-11-09T02:12:24Z ERROR main] this is printed by default
+@@ -70,7 +70,7 @@
+ //! If the binary name contains hyphens, you will need to replace
+ //! them with underscores:
+ //!
+-//! ```{.bash}
++//! ```console
+ //! $ RUST_LOG=my_app ./my-app
+ //! [2017-11-09T02:12:24Z DEBUG my_app] this is a debug message
+ //! [2017-11-09T02:12:24Z ERROR my_app] this is printed by default
+@@ -88,14 +88,14 @@
+ //! **By default all logging is disabled except for the `error` level**
+ //!
+ //! The **`RUST_LOG`** environment variable controls logging with the syntax:
+-//! ```text
++//! ```console
+ //! RUST_LOG=[target][=][level][,...]
+ //! ```
+ //! Or in other words, its a comma-separated list of directives.
+ //! Directives can filter by **target**, by **level**, or both (using `=`).
+ //!
+ //! For example,
+-//! ```text
++//! ```console
+ //! RUST_LOG=data=debug,hardware=debug
+ //! ```
+ //!

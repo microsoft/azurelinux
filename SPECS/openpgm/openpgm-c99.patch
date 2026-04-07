@@ -1,0 +1,32 @@
+Include <grp.h> for the setgroups function.  This avoids an implicit
+function declaration and build failures with C99 compilers that do not
+support them.
+
+Submitted upstream: <https://github.com/steve-o/openpgm/pull/73>
+
+diff -ur openpgm-release-5-2-122.orig/openpgm/pgm/configure.ac openpgm-release-5-2-122/openpgm/pgm/configure.ac
+--- openpgm-release-5-2-122.orig/openpgm/pgm/configure.ac	2012-12-04 03:56:54.000000000 +0100
++++ openpgm-release-5-2-122/openpgm/pgm/configure.ac	2023-01-03 16:07:39.751560631 +0100
+@@ -62,7 +62,7 @@
+ 
+ # Checks for header files.
+ AC_FUNC_ALLOCA
+-AC_CHECK_HEADERS([arpa/inet.h fcntl.h float.h inttypes.h libintl.h limits.h locale.h malloc.h memory.h netdb.h netinet/in.h stddef.h stdint.h stdlib.h string.h strings.h sys/ioctl.h sys/param.h sys/socket.h sys/time.h sys/timeb.h syslog.h unistd.h wchar.h])
++AC_CHECK_HEADERS([arpa/inet.h fcntl.h float.h grp.h inttypes.h libintl.h limits.h locale.h malloc.h memory.h netdb.h netinet/in.h stddef.h stdint.h stdlib.h string.h strings.h sys/ioctl.h sys/param.h sys/socket.h sys/time.h sys/timeb.h syslog.h unistd.h wchar.h])
+ 
+ # Checks for typedefs, structures, and compiler characteristics.
+ AC_HEADER_STDBOOL
+diff -ur openpgm-release-5-2-122.orig/openpgm/pgm/engine.c openpgm-release-5-2-122/openpgm/pgm/engine.c
+--- openpgm-release-5-2-122.orig/openpgm/pgm/engine.c	2023-01-03 16:03:16.834181524 +0100
++++ openpgm-release-5-2-122/openpgm/pgm/engine.c	2023-01-03 16:08:05.458304376 +0100
+@@ -31,6 +31,10 @@
+ #	include <config.h>
+ #endif
+ 
++#ifdef HAVE_GRP_H
++#	include <grp.h>
++#endif
++
+ #ifndef _BSD_SOURCE
+ #	define _BSD_SOURCE	1	/* getprotobyname_r */
+ #endif

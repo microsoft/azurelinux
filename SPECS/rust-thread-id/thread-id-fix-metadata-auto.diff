@@ -1,0 +1,10 @@
+--- thread-id-4.2.2/Cargo.toml	2024-07-18T18:38:11+00:00
++++ thread-id-4.2.2/Cargo.toml	2024-07-29T21:57:39.735297+00:00
+@@ -22,6 +22,4 @@
+ repository = "https://github.com/ruuda/thread-id"
+ [target."cfg(unix)".dependencies.libc]
+ version = "0.2.147"
+-[target."cfg(windows)".dependencies.winapi]
+-version = "0.3"
+-features = ["processthreadsapi"]
++

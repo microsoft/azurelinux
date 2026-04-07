@@ -1,0 +1,22 @@
+--- diesel-2.3.6/Cargo.toml	1970-01-01T00:00:01+00:00
++++ diesel-2.3.6/Cargo.toml	2026-02-04T16:05:04.485400+00:00
+@@ -73,11 +73,8 @@
+     "diesel_derives/64-column-tables",
+ ]
+ __with_asan_tests = [
+-    "libsqlite3-sys?/bundled",
+     "libsqlite3-sys?/with-asan",
+-    "pq-sys?/bundled",
+     "pq-src?/with-asan",
+-    "mysqlclient-sys?/bundled",
+     "mysqlclient-src?/with-asan",
+ ]
+ chrono = [
+@@ -278,7 +275,6 @@
+ 
+ [target.'cfg(not(all(target_family = "wasm", target_os = "unknown")))'.dependencies.libsqlite3-sys]
+ version = ">=0.17.2, <0.36.0"
+-features = ["bundled_bindings"]
+ optional = true
+ 
+ [lints.rust.unexpected_cfgs]

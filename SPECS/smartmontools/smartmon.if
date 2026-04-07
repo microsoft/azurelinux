@@ -1,0 +1,68 @@
+## <summary>Smart disk monitoring daemon.</summary>
+
+#######################################
+## <summary>
+##	Read smartmon temporary files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`smartmon_read_tmp_files',`
+	gen_require(`
+		type fsdaemon_tmp_t;
+	')
+
+	files_search_tmp($1)
+	allow $1 fsdaemon_tmp_t:file read_file_perms;
+')
+
+########################################
+## <summary>
+##	All of the rules required to
+##	administrate an smartmon environment.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <param name="role">
+##	<summary>
+##	Role allowed access.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`smartmon_admin',`
+	gen_require(`
+		type fsdaemon_t, fsdaemon_tmp_t, fsdaemon_var_run_t;
+		type fsdaemon_var_lib_t, fsdaemon_initrc_exec_t;
+		type smartdwarn_t, smartdwarn_script_t;
+	')
+
+	allow $1 fsdaemon_t:process signal_perms;
+	ps_process_pattern($1, fsdaemon_t)
+
+	tunable_policy(`deny_ptrace',`',`
+		allow $1 fsdaemon_t:process ptrace;
+	')
+
+	init_labeled_script_domtrans($1, fsdaemon_initrc_exec_t)
+	domain_system_change_exemption($1)
+	role_transition $2 fsdaemon_initrc_exec_t system_r;
+	allow $2 system_r;
+
+	admin_pattern($1, smartdwarn_script_t)
+
+	files_list_tmp($1)
+	admin_pattern($1, fsdaemon_tmp_t)
+
+	files_list_pids($1)
+	admin_pattern($1, fsdaemon_var_run_t)
+
+	files_list_var_lib($1)
+	admin_pattern($1, fsdaemon_var_lib_t)
+')

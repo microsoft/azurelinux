@@ -1,0 +1,32 @@
+From: Robert Luberda <robert@debian.org>
+Date: Thu, 9 Feb 2006 19:35:25 +0100
+Subject: 019 man2html noindex segfault
+
+Fix segfault on man pages with no sections (see bug #349907).
+---
+ man2html/man2html.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/man2html/man2html.c b/man2html/man2html.c
+index 8ef4e23..6e866f3 100644
+--- a/man2html/man2html.c
++++ b/man2html/man2html.c
+@@ -3256,11 +3256,13 @@ main(int argc, char **argv) {
+     out_html(NEWLINE);
+     if (output_possible) {
+ 	/* &nbsp; for mosaic users */
+-	printf("<HR>\n<A NAME=\"index\">&nbsp;</A><H2>Index</H2>\n<DL>\n");
+-	manidx[mip]=0;
+-	printf("%s", manidx);
+-	if (subs) printf("</DL>\n");
+-	printf("</DL>\n");
++	if (manidx) {
++	    printf("<HR>\n<A NAME=\"index\">&nbsp;</A><H2>Index</H2>\n<DL>\n");
++	    manidx[mip]=0;
++	    printf("%s", manidx);
++	    if (subs) printf("</DL>\n");
++	    printf("</DL>\n");
++	}
+ 	print_sig();
+ 	printf("</BODY>\n</HTML>\n");
+     } else {

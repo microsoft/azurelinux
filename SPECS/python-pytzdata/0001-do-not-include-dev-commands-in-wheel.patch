@@ -1,0 +1,26 @@
+From 5ed1eb721bdb045b9c2115a51ad0b6caeced3797 Mon Sep 17 00:00:00 2001
+Message-ID: <5ed1eb721bdb045b9c2115a51ad0b6caeced3797.1724944409.git.git@grubix.eu>
+From: Michael J Gruber <git@grubix.eu>
+Date: Thu, 29 Aug 2024 17:06:25 +0200
+Subject: [PATCH] do not include dev commands in wheel
+
+---
+ pyproject.toml | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 850266e..66be51c 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -17,6 +17,8 @@ classifiers = [
+     "Topic :: Software Development :: Libraries :: Python Modules"
+ ]
+ 
++exclude = ["pytzdata/commands/*" ]
++
+ [tool.poetry.dependencies]
+ python = "~2.7 || ^3.4"
+ 
+-- 
+2.46.0.594.g8200347fe6
+

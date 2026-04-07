@@ -1,0 +1,21 @@
+--- ceph-19.1.0/src/cpp_redis/CMakeLists.txt.orig	2024-07-11 15:16:22.487082035 -0400
++++ ceph-19.1.0/src/cpp_redis/CMakeLists.txt	2024-07-11 15:17:57.226534456 -0400
+@@ -174,6 +174,7 @@
+   set_target_properties(${PROJECT} PROPERTIES COMPILE_DEFINITIONS "__CPP_REDIS_USE_CUSTOM_TCP_CLIENT=${USE_CUSTOM_TCP_CLIENT}")
+ endif(USE_CUSTOM_TCP_CLIENT)
+ 
++install(TARGETS ${PROJECT} DESTINATION ${CMAKE_INSTALL_LIBDIR}/ceph)
+ 
+ ###
+ # examples
+--- ceph-19.1.0/src/cpp_redis/tacopie/CMakeLists.txt.orig	2024-01-30 21:47:59.000000000 -0500
++++ ceph-19.1.0/src/cpp_redis/tacopie/CMakeLists.txt	2024-07-12 07:37:23.584654640 -0400
+@@ -162,6 +162,8 @@
+ ENDIF(SELECT_TIMEOUT)
+ 
+ 
++install(TARGETS ${PROJECT} DESTINATION ${CMAKE_INSTALL_LIBDIR}/ceph)
++
+ ###
+ # examples
+ ###

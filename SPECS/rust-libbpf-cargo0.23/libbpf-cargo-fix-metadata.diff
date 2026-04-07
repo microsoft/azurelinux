@@ -1,0 +1,11 @@
+--- libbpf-cargo-0.23.3/Cargo.toml	1970-01-01T00:00:01+00:00
++++ libbpf-cargo-0.23.3/Cargo.toml	2024-11-03T12:52:55.081281+00:00
+@@ -76,7 +76,7 @@
+ version = "3.3"
+ 
+ [dev-dependencies.goblin]
+-version = "0.6"
++version = "0.9"
+ 
+ [features]
+ default = ["libbpf-rs/default"]

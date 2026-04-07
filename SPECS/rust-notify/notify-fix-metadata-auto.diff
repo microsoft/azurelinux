@@ -1,0 +1,57 @@
+--- notify-8.2.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ notify-8.2.0/Cargo.toml	2025-08-10T14:26:24.569388+00:00
+@@ -67,20 +67,12 @@
+ 
+ [features]
+ default = ["macos_fsevent"]
+-macos_fsevent = ["fsevent-sys"]
++macos_fsevent = []
+ macos_kqueue = [
+-    "kqueue",
+     "mio",
+ ]
+ serde = ["notify-types/serde"]
+ serialization-compat-6 = ["notify-types/serialization-compat-6"]
+-
+-[target."cfg(any(target_os=\"freebsd\", target_os=\"openbsd\", target_os = \"netbsd\", target_os = \"dragonflybsd\", target_os = \"ios\"))".dependencies.kqueue]
+-version = "1.1.1"
+-
+-[target."cfg(any(target_os=\"freebsd\", target_os=\"openbsd\", target_os = \"netbsd\", target_os = \"dragonflybsd\", target_os = \"ios\"))".dependencies.mio]
+-version = "1.0"
+-features = ["os-ext"]
+ 
+ [target."cfg(any(target_os=\"linux\", target_os=\"android\"))".dependencies.inotify]
+ version = "0.11.0"
+@@ -90,32 +82,3 @@
+ version = "1.0"
+ features = ["os-ext"]
+ 
+-[target."cfg(target_os = \"windows\")".dev-dependencies.trash]
+-version = "5.2.2"
+-
+-[target."cfg(target_os=\"macos\")".dependencies.bitflags]
+-version = "2.7.0"
+-
+-[target."cfg(target_os=\"macos\")".dependencies.fsevent-sys]
+-version = "4.0.0"
+-optional = true
+-
+-[target."cfg(target_os=\"macos\")".dependencies.kqueue]
+-version = "1.1.1"
+-optional = true
+-
+-[target."cfg(target_os=\"macos\")".dependencies.mio]
+-version = "1.0"
+-features = ["os-ext"]
+-optional = true
+-
+-[target."cfg(windows)".dependencies.windows-sys]
+-version = "0.60.1"
+-features = [
+-    "Win32_System_Threading",
+-    "Win32_Foundation",
+-    "Win32_Storage_FileSystem",
+-    "Win32_Security",
+-    "Win32_System_WindowsProgramming",
+-    "Win32_System_IO",
+-]

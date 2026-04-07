@@ -1,0 +1,39 @@
+diff -up expect5.45/exp_log.c.orig expect5.45/exp_log.c
+--- expect5.45/exp_log.c.orig	2013-12-12 12:43:38.527854189 +0100
++++ expect5.45/exp_log.c	2013-12-12 12:49:26.866576387 +0100
+@@ -176,7 +176,7 @@ expStdoutLog TCL_VARARGS_DEF(int,arg1)
+ 
+     if ((!tsdPtr->logUser) && (!force_stdout) && (!tsdPtr->logAll)) return;
+ 
+-    (void) vsprintf(bigbuf,fmt,args);
++    (void) vsnprintf(bigbuf,sizeof(bigbuf),fmt,args);
+     expDiagWriteBytes(bigbuf,-1);
+     if (tsdPtr->logAll || (LOGUSER && tsdPtr->logChannel)) Tcl_WriteChars(tsdPtr->logChannel,bigbuf,-1);
+     if (LOGUSER) fprintf(stdout,"%s",bigbuf);
+@@ -222,7 +222,7 @@ expErrorLog TCL_VARARGS_DEF(char *,arg1)
+     va_list args;
+ 
+     fmt = TCL_VARARGS_START(char *,arg1,args);
+-    (void) vsprintf(bigbuf,fmt,args);
++    (void) vsnprintf(bigbuf,sizeof(bigbuf),fmt,args);
+ 
+     expDiagWriteChars(bigbuf,-1);
+     fprintf(stderr,"%s",bigbuf);
+@@ -264,7 +264,7 @@ expDiagLog TCL_VARARGS_DEF(char *,arg1)
+ 
+     fmt = TCL_VARARGS_START(char *,arg1,args);
+ 
+-    (void) vsprintf(bigbuf,fmt,args);
++    (void) vsnprintf(bigbuf,sizeof(bigbuf),fmt,args);
+ 
+     expDiagWriteBytes(bigbuf,-1);
+     if (tsdPtr->diagToStderr) {
+@@ -307,7 +307,7 @@ expPrintf TCL_VARARGS_DEF(char *,arg1)
+   int len, rc;
+ 
+   fmt = TCL_VARARGS_START(char *,arg1,args);
+-  len = vsprintf(bigbuf,arg1,args);
++  len = vsnprintf(bigbuf,sizeof(bigbuf),arg1,args);
+  retry:
+   rc = write(2,bigbuf,len);
+   if ((rc == -1) && (errno == EAGAIN)) goto retry;

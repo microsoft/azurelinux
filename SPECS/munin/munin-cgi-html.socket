@@ -1,0 +1,11 @@
+[Unit]
+Description=Munin FastCGI HTML Pages Socket
+
+[Socket]
+ListenStream=/run/munin/munin-cgi-html.sock
+SocketMode=0660
+SocketUser=nginx
+SocketGroup=munin
+
+[Install]
+WantedBy=sockets.target

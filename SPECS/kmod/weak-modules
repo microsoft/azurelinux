@@ -1,0 +1,1210 @@
+#!/bin/bash
+#
+# weak-modules - determine which modules are kABI compatible with installed
+#                kernels and set up the symlinks in /lib/*/weak-updates.
+#
+unset LANG LC_ALL LC_COLLATE
+
+tmpdir=$(mktemp -td ${0##*/}.XXXXXX)
+trap "rm -rf $tmpdir" EXIT
+unset ${!changed_modules_*} ${!changed_initramfs_*}
+
+unset BASEDIR
+unset CHECK_INITRAMFS
+weak_updates_dir_override=""
+default_initramfs_prefix="/boot" # will be combined with BASEDIR
+dracut="/usr/bin/dracut"
+depmod="/sbin/depmod"
+depmod_orig="$depmod"
+declare -a modules
+declare -A module_krels
+declare -A weak_modules_before
+
+declare -A groups
+declare -A grouped_modules
+
+# output of validate_weak_links, one iteration
+# short_name -> path
+declare -A compatible_modules
+
+# state for update_modules_for_krel (needed for add_kernel case)
+# short_name -> path
+declare -A installed_modules
+
+# doit:
+# A wrapper used whenever we're going to perform a real operation.
+doit() {
+    [ -n "$verbose" ] && echo "$@"
+    [ -n "$dry_run" ] || "$@"
+}
+
+# pr_verbose:
+# print verbose -- wrapper used to print extra messages if required
+pr_verbose() {
+    [ -n "$verbose" ] && echo "$@"
+}
+
+# pr_warning:
+# print warning
+pr_warning() {
+    echo "WARNING: $*"
+}
+
+# rpmsort: The sort in coreutils can't sort the RPM list how we want it so we
+# instead transform the list into a form it will sort correctly, then sort.
+rpmsort() {
+    local IFS=$' '
+    REVERSE=""
+    rpmlist=($(cat))
+
+    if [ "-r" == "$1" ];
+    then
+        REVERSE="-r"
+    fi
+
+    echo ${rpmlist[@]} | \
+        sed -e 's/-/../g' | \
+        sort ${REVERSE} -n -t"." -k1,1 -k2,2 -k3,3 -k4,4 -k5,5 -k6,6 -k7,7 \
+             -k8,8 -k9,9 -k10,10 | \
+        sed -e 's/\.\./-/g'
+}
+
+# krel_of_module:
+# Compute the kernel release of a module.
+krel_of_module() {
+    local module="$1"
+
+    if [ x"${module_krels[$module]+set}" = x"set" ]; then
+        # version cached in the array already
+        echo "${module_krels[$module]}"
+    elif [ -f "$module" ]; then
+        krel_of_module_modinfo "$module"
+    else
+        # Try to extract the kernel release from the path
+        # delete case, the .ko already deleted
+        set -- "${module#*/lib/modules/}"
+        echo "${1%%/*}"
+    fi
+}
+
+# krel_of_module_modinfo:
+# Fetches module version from internal module info
+krel_of_module_modinfo() {
+    local module="$1"
+    /sbin/modinfo -F vermagic "$module" | awk '{print $1}'
+}
+
+# weak_updates_dir:
+# gives the root directory for the weak-updates
+# We need some flexibility here because of dry-run.
+weak_updates_dir() {
+    local krel="$1"
+
+    if [[ -z "$weak_updates_dir_override" ]]; then
+        echo "$BASEDIR/lib/modules/$krel/weak-updates"
+    else
+        echo "$weak_updates_dir_override"
+    fi
+}
+
+# read_modules_list:
+# Read in a list of modules from standard input. Convert the filenames into
+# absolute paths and compute the kernel release for each module (either using
+# the modinfo section or through the absolute path.
+# If used with input redirect, should be used as read_module_list < input,
+# not input | read_modules_list, the latter spawns a subshell
+# and the arrays are not seen in the caller
+read_modules_list() {
+    local IFS=$'\n'
+    modules=($(cat))
+
+    for ((n = 0; n < ${#modules[@]}; n++)); do
+        if [ ${modules[n]:0:1} != '/' ]; then
+            modules[n]="$PWD/${modules[n]}"
+        fi
+        module_krels["${modules[n]}"]=$(krel_of_module ${modules[n]})
+    done
+}
+
+decompress_initramfs() {
+    local input=$1
+    local output=$2
+
+    # First, check if this is compressed at all
+    if cpio -i -t < "$input" > /dev/null 2>/dev/null; then
+        # If this archive contains a file early_cpio, it's a trick. Strip off
+        # the early cpio archive and try again.
+        if cpio -i -t < "$input" 2>/dev/null | grep -q '^early_cpio$' ; then
+            /usr/lib/dracut/skipcpio "$input" > "${tmpdir}/post_early_cpio.img"
+            decompress_initramfs "${tmpdir}/post_early_cpio.img" "$output"
+            retval="$?"
+            rm -f "${tmpdir}/post_early_cpio.img"
+            return $retval
+        fi
+
+        cp "$input" "$output"
+        return 0
+    fi
+
+    # Try gzip
+    if gzip -cd < "$input" > "$output" 2>/dev/null ; then
+        return 0
+    fi
+
+    # Next try xz
+    if xz -cd < "$input" > "$output" 2>/dev/null ; then
+        return 0
+    fi
+
+    echo "Unable to decompress $input: Unknown format" >&2
+    return 1
+}
+
+# List all module files and modprobe configuration that could require a new
+# initramfs. The current directory must be the root of the uncompressed
+# initramfs. The unsorted list of files is output to stdout.
+list_module_files() {
+    find . -iname \*.ko -o -iname '*.ko.xz' -o -iname '*.ko.gz' 2>/dev/null
+    find etc/modprobe.d usr/lib/modprobe.d -name \*.conf 2>/dev/null
+}
+
+# read_old_initramfs:
+compare_initramfs_modules() {
+    local old_initramfs=$1
+    local new_initramfs=$2
+
+    rm -rf "$tmpdir/old_initramfs"
+    rm -rf "$tmpdir/new_initramfs"
+    mkdir "$tmpdir/old_initramfs"
+    mkdir "$tmpdir/new_initramfs"
+
+    decompress_initramfs "$old_initramfs" "$tmpdir/old_initramfs.img"
+    pushd "$tmpdir/old_initramfs" >/dev/null || exit
+    cpio -i < "$tmpdir/old_initramfs.img" 2>/dev/null
+    rm "$tmpdir/old_initramfs.img"
+    n=0; for i in `list_module_files|sort`; do
+        old_initramfs_modules[n]="$i"
+        n=$((n+1))
+    done
+    popd >/dev/null || exit
+
+    decompress_initramfs "$new_initramfs" "$tmpdir/new_initramfs.img"
+    pushd "$tmpdir/new_initramfs" >/dev/null || exit
+    cpio -i < "$tmpdir/new_initramfs.img" 2>/dev/null
+    rm "$tmpdir/new_initramfs.img"
+    n=0; for i in `list_module_files|sort`; do
+        new_initramfs_modules[n]="$i"
+        n=$((n+1))
+    done
+    popd >/dev/null || exit
+
+    # Compare the length and contents of the arrays
+    if [ "${#old_initramfs_modules[@]}" == "${#new_initramfs_modules[@]}" -a \
+         "${old_initramfs_modules[*]}" == "${new_initramfs_modules[*]}" ];
+    then
+        # If the file lists are the same, compare each file to find any that changed
+        for ((n = 0; n < ${#old_initramfs_modules[@]}; n++)); do
+            if ! cmp "$tmpdir/old_initramfs/${old_initramfs_modules[n]}" \
+                     "$tmpdir/new_initramfs/${new_initramfs_modules[n]}" \
+                     >/dev/null 2>&1
+            then
+                return 1
+            fi
+        done
+    else
+        return 1
+    fi
+
+    return 0
+}
+
+# check_initramfs:
+# check and possibly also update the initramfs for changed kernels
+check_initramfs() {
+    local kernel=$1
+
+    # If there is no initramfs already we will not make one here.
+    if [ -e "$initramfs_prefix/initramfs-$kernel.img" ];
+    then
+        old_initramfs="$initramfs_prefix/initramfs-$kernel.img"
+        tmp_initramfs="$initramfs_prefix/initramfs-$kernel.tmp"
+        new_initramfs="$initramfs_prefix/initramfs-$kernel.img"
+
+        $dracut -f "$tmp_initramfs" "$kernel"
+
+        if ! compare_initramfs_modules "$old_initramfs" "$tmp_initramfs";
+        then
+            doit mv "$tmp_initramfs" "$new_initramfs"
+        else
+            rm -f "$tmp_initramfs"
+        fi
+    fi
+}
+
+usage() {
+    echo "Usage: ${0##*/} [options] {--add-modules|--remove-modules}"
+    echo "${0##*/} [options] {--add-kernel|--remove-kernel} {kernel-release}"
+    cat <<'EOF'
+--add-modules
+        Add a list of modules read from standard input. Create
+        symlinks in compatible kernel's weak-updates/ directory.
+        The list of modules is read from standard input.
+
+--remove-modules
+        Remove compatibility symlinks from weak-updates/ directories
+        for a list of modules.  The list of modules is read from
+        standard input. Note: it doesn't attempt to locate any
+        compatible modules to replace those being removed.
+
+--add-kernel
+        Add compatibility symlinks for all compatible modules to the
+        specified or running kernel.
+
+--remove-kernel
+        Remove all compatibility symlinks for the specified or current
+        kernel.
+
+--no-initramfs
+        Do not generate an initramfs.
+
+--verbose
+        Print the commands executed.
+
+--dry-run
+        Do not create/remove any files.
+EOF
+    exit $1
+}
+
+# module_has_changed:
+# Mark if an actual change occured that we need to deal with later by calling
+# depmod or mkinitramfs against the affected kernel.
+module_has_changed() {
+
+    declare module=$1 krel=$2
+    declare orig_module=$module
+
+    module=${module%.ko}
+    [[ $module == $orig_module ]] && module=${module%.ko.xz}
+    [[ $module == $orig_module ]] && module=${module%.ko.gz}
+    module=${module##*/}
+
+    eval "changed_modules_${krel//[^a-zA-Z0-9]/_}=$krel"
+    eval "changed_initramfs_${krel//[^a-zA-Z0-9]/_}=$krel"
+
+}
+
+# module_weak_link:
+# Generate a weak link path for the module.
+# Takes module file name and the target kernel release as arguments
+# The way of generation intentionally left from the initial version
+module_weak_link() {
+    local module="$1"
+    local krel="$2"
+    local module_krel
+    local subpath
+    local module_krel_escaped
+
+    module_krel="$(krel_of_module "$module")"
+    module_krel_escaped=$(echo "$module_krel" | \
+                              sed 's/\([.+?^$\/\\|()\[]\|\]\)/\\\0/g')
+    subpath=$(echo $module | sed -nre "s:$BASEDIR(/usr)?/lib/modules/$module_krel_escaped/([^/]*)/(.*):\3:p")
+
+    if [[ -z $subpath ]]; then
+        # module is not in /lib/modules/$krel?
+        # It's possible for example for Oracle ACFS compatibility check
+        # Install it with its full path as a /lib/modules subpath
+        subpath="$module"
+    fi
+
+    echo "$(weak_updates_dir $krel)/${subpath#/}"
+}
+
+# module_short_name:
+# 'basename' version purely in bash, cuts off path from the filename
+module_short_name() {
+    echo "${1##*/}"
+}
+
+#### Helper predicates
+
+# is_weak_for_module_valid:
+# Takes real module filename and target kernel as arguments.
+# Calculates weak symlink filename for the corresponding module
+# for the target kernel,
+# returns 'true' if the symlink filename is a symlink
+# and the symlink points to a readable file
+# EVEN if it points to a different filename
+is_weak_for_module_valid() {
+    local module="$1"
+    local krel="$2"
+    local weak_link
+
+    weak_link="$(module_weak_link $module $krel)"
+    [[ -L "$weak_link" ]] && [[ -r "$weak_link" ]]
+}
+
+# is_weak_link:
+# Takes a filename and a kernel release.
+# 'true' if the filename is symlink under weak-updates/ for the kernel.
+# It doesn't matter, if it's a valid symlink (points to a real file) or not.
+is_weak_link() {
+    local link="$1"
+    local krel="$2"
+
+    echo $link | grep -q "$(weak_updates_dir $krel)" || return 1
+    [[ -L $link ]]
+}
+
+# is_extra_exists:
+# Takes a module filename, the module's kernel release and target kernel release.
+# The module filename should be a real, not a symlink, filename (i.e. in extra/).
+# Returns 'true' if the same module exists for the target kernel.
+is_extra_exists() {
+    local module="$1"
+    local module_krel="$2"
+    local krel="$3"
+    local subpath="${module#*/lib/modules/$module_krel/extra/}"
+
+    [[ -f $BASEDIR/lib/modules/$krel/extra/$subpath ]]
+}
+
+is_kernel_installed() {
+    local krel="$1"
+
+    find_symvers_file "$krel" > /dev/null &&
+        find_systemmap_file "$krel" > /dev/null
+}
+
+is_empty_file() {
+    local file="$1"
+
+    [[ "$(wc -l "$file" | cut -f 1 -d ' ')" == 0 ]]
+}
+
+#### Helpers
+
+# find_modules:
+# Takes kernel release and a list of subdirectories.
+# Produces list of module files in the subdirectories for the kernel
+find_modules() {
+    local krel="$1"
+    shift
+    local dirs="$*"
+
+    for dir in $dirs; do
+        find $BASEDIR/lib/modules/$krel/$dir \
+             -name '*.ko' -o -name '*.ko.xz' -o -name '*.ko.gz' \
+             2>/dev/null
+    done
+}
+
+# find_modules_dirs:
+# Takes a list of directories.
+# Produces list of module files in the subdirectories
+find_modules_dirs() {
+    local dirs="$*"
+
+    for dir in $dirs; do
+        find $dir -name '*.ko' -o -name '*.ko.xz' -o -name '*.ko.gz' \
+             2>/dev/null
+    done
+}
+
+# find_installed_kernels:
+# Produces list of kernels, which modules are still installed
+find_installed_kernels() {
+    ls $BASEDIR/lib/modules/
+}
+
+# find_kernels_with_extra:
+# Produces list of kernels, where exists extra/ directory
+find_kernels_with_extra() {
+    local krel
+    local extra_dir
+
+    for krel in $(find_installed_kernels); do
+        extra_dir="$BASEDIR/lib/modules/$krel/extra"
+        [[ -d "$extra_dir" ]] || continue
+        echo "$krel"
+    done
+}
+
+# remove_weak_link_quiet:
+# Takes symlink filename and target kernel release.
+# Removes the symlink and the directory tree
+# if it was the last file in the tree
+remove_weak_link_quiet() {
+    local link="$1"
+    local krel="$2"
+    local subpath="${link#*$(weak_updates_dir $krel)}"
+
+    rm -f $link
+    ( cd "$(weak_updates_dir $krel)" && \
+          rmdir --parents --ignore-fail-on-non-empty "$(dirname "${subpath#/}")" 2>/dev/null )
+}
+
+# prepare_sandbox:
+# Takes kernel release, creates temporary weak-modules directory for it
+# and depmod config to operate on it.
+# Sets the global state accordingly
+
+prepare_sandbox() {
+    local krel="$1"
+    local orig_dir
+    local dir
+    local conf="$tmpdir/depmod.conf"
+
+    #directory
+    orig_dir=$(weak_updates_dir $krel)
+    dir="$tmpdir/$krel/weak-updates"
+
+    mkdir -p "$dir"
+    # the orig_dir can be empty
+    cp -R "$orig_dir"/* "$dir" 2>/dev/null
+
+    weak_updates_dir_override="$dir"
+
+    #config
+    echo "search external extra built-in weak-updates" >"$conf"
+    echo "external * $dir" >>"$conf"
+
+    depmod="$depmod_orig -C $conf"
+}
+
+# discard_installed:
+# remove installed_modules[] from modules[]
+discard_installed()
+{
+    local short_name
+
+    for m in "${!modules[@]}"; do
+        short_name="$(module_short_name "${modules[$m]}")"
+
+        [[ -z "${installed_modules[$short_name]}" ]] && continue
+
+        unset "modules[$m]"
+    done
+}
+
+# update_installed:
+# add compatible_modules[] to installed_modules[]
+update_installed()
+{
+    for m in "${!compatible_modules[@]}"; do
+        installed_modules[$m]="${compatible_modules[$m]}"
+    done
+}
+
+# finish_sandbox:
+# restore global state after sandboxing
+# copy configuration to the kernel directory if not dry run
+finish_sandbox() {
+    local krel="$1"
+    local override="$weak_updates_dir_override"
+    local wa_dir
+
+    weak_updates_dir_override=""
+    depmod="$depmod_orig"
+
+    [[ -n "$dry_run" ]] && return
+
+    wa_dir="$(weak_updates_dir $krel)"
+
+    rm -rf "$wa_dir"
+    mkdir -p "$wa_dir"
+
+    cp -R "${override}"/* "$wa_dir" 2>/dev/null
+}
+
+# Auxiliary functions to find symvers file
+make_kernel_file_names() {
+    local krel="$1"
+    shift
+    local file="$1"
+    shift
+
+    for suffix in "$@"; do
+        echo "${BASEDIR}/boot/${file}-${krel}${suffix}"
+        echo "${BASEDIR}/lib/modules/${krel}/${file}${suffix}"
+    done
+}
+
+find_kernel_file() {
+    local krel="$1"
+    shift
+    local file="$1"
+    shift
+    local print="$1"
+    shift
+    local i
+
+    if [[ "$print" != "" ]]; then
+        make_kernel_file_names "$krel" "$file" "$@"
+        return 0
+    fi
+
+    for i in  $(make_kernel_file_names "$krel" "$file" "$@"); do
+        if [[ -r "$i" ]]; then
+            echo "$i"
+            return 0
+        fi
+    done
+
+    return 1
+}
+
+# find_symvers_file:
+# Since /boot/ files population process is now controlled by systemd's
+# kernel-install bash script and its plug-ins, it might be the case
+# that, while present, symvers file is not populated in /boot.
+# Let's also check for /lib/modules/$kver/symvers.gz, since that's where
+# it is populated from.
+#
+# $1 - krel
+# return - 0 if symvers file is found, 1 otherwise.
+# Prints symvers path if found, empty string otherwise.
+find_symvers_file() {
+    local krel="$1"
+    local print="$2"
+
+    find_kernel_file "$krel" symvers "$print" .xz .gz
+}
+
+# find_systemmap_file:
+# Same as above but for System.map
+find_systemmap_file() {
+    local krel="$1"
+    local print="$2"
+    local no_suffix=""
+
+    find_kernel_file "$krel" System.map "$print" "$no_suffix"
+}
+
+#### Main logic
+
+# update_modules_for_krel:
+# Takes kernel release and "action" function name.
+# Skips kernel without symvers,
+# otherwise triggers the main logic of modules installing/removing
+# for the given kernel, which is:
+# - save current state of weak modules symlinks
+# - install/remove the symlinks for the given (via stdin) list of modules
+# - validate the state and remove invalid symlinks
+#   (for the modules, which are not compatible (became incompatible) for
+#   the given kernel)
+# - check the state after validation to produce needed messages
+#   and trigger initrd regeneration if the list changed.
+#
+update_modules_for_krel() {
+    local krel="$1"
+    local func="$2"
+    local force_update="$3"
+
+    is_kernel_installed "$krel" || return
+
+    prepare_sandbox $krel
+
+    global_link_state_save $krel
+
+    # remove already installed from modules[]
+    discard_installed
+
+    # do not run heavy validation procedure if no modules to install
+    if [[ "${#modules[@]}" -eq 0 ]]; then
+        finish_sandbox $krel
+        return
+    fi
+
+    $func $krel
+
+    if ! validate_weak_links $krel && [[ -z "$force_update" ]]; then
+        global_link_state_restore $krel
+    fi
+
+    # add compatible to installed
+    update_installed
+
+    global_link_state_announce_changes $krel
+
+    finish_sandbox $krel
+}
+
+# update_modules:
+# Common entry point for add/remove modules command
+# Takes the "action" function, the module list is supplied via stdin.
+# Reads the module list and triggers modules update for all installed
+# kernels.
+# Triggers initrd rebuild for the kernels, which modules are installed.
+update_modules() {
+    local func="$1"
+    local force_update="$2"
+    local module_krel
+    declare -a saved_modules
+
+    read_modules_list || exit 1
+    [[ ${#modules[@]} -gt 0 ]] || return
+    saved_modules=("${modules[@]}")
+
+    for krel in $(find_installed_kernels); do
+        update_modules_for_krel $krel $func $force_update
+        modules=("${saved_modules[@]}")
+        installed_modules=()
+    done
+
+    for module in "${modules[@]}"; do
+        # Module was built against this kernel, update initramfs.
+        module_krel="${module_krels[$module]}"
+        module_has_changed $module $module_krel
+    done
+}
+
+# add_weak_links:
+# Action function for the "add-modules" command
+# Takes the kernel release, where the modules are added
+# and the modules[] and module_krels[] global arrays.
+# Install symlinks for the kernel with minimal checks
+# (just filename checks, no symbol checks)
+add_weak_links() {
+    local krel="$1"
+    local module_krel
+    local weak_link
+
+    for module in "${modules[@]}"; do
+        module_krel="$(krel_of_module $module)"
+
+        case "$module" in
+            $BASEDIR/lib/modules/$krel/*)
+                # Module already installed to the current kernel
+                continue ;;
+        esac
+
+        if is_extra_exists $module $module_krel $krel; then
+            pr_verbose "found $(module_short_name $module) for $krel while installing for $module_krel, update case?"
+        fi
+
+        if is_weak_for_module_valid $module $krel; then
+            pr_verbose "weak module for $(module_short_name $module) already exists for kernel $krel, update case?"
+            # we should update initrd in update case,
+            # the change is not seen by the symlink detector
+            # (global_link_state_announce_changes())
+            module_has_changed $module $krel
+        fi
+
+        weak_link="$(module_weak_link $module $krel)"
+
+        mkdir -p "$(dirname $weak_link)"
+        ln -sf $module $weak_link
+
+    done
+}
+
+# remove_weak_links:
+# Action function for the "remove-modules" command
+# Takes the kernel release, where the modules are removed
+# and the modules[] and module_krels[] global arrays.
+# Removes symlinks from the given kernel if they are installed
+# for the modules in the list.
+remove_weak_links() {
+    local krel="$1"
+    local weak_link
+    local target
+    local module_krel
+
+    for module in "${modules[@]}"; do
+        module_krel="$(krel_of_module $module)"
+
+        weak_link="$(module_weak_link $module $krel)"
+        target="$(readlink $weak_link)"
+
+        if [[ "$module" != "$target" ]]; then
+            pr_verbose "Skipping symlink $weak_link"
+            continue
+        fi
+        # In update case the --remove-modules call is performed
+        # after --add-modules (from postuninstall).
+        # So, we shouldn't really remove the symlink in this case.
+        # But in the remove case the actual target already removed.
+        if ! is_weak_for_module_valid "$module" "$krel"; then
+            remove_weak_link_quiet "$weak_link" "$krel"
+        fi
+    done
+}
+
+# validate_weak_links:
+# Takes kernel release.
+# Checks if all the weak symlinks are suitable for the given kernel.
+# Uses depmod to perform the actual symbol checks and parses the output.
+# Since depmod internally creates the module list in the beginning of its work
+# accroding to the priority list in its configuration, but without symbol
+# check and doesn't amend the list during the check, the function runs it
+# in a loop in which it removes discovered incompatible symlinks
+#
+# Returns 0 (success) if proposal is fine or
+#         1 (false) if some incompatible symlinks were removed
+# initializes global hashmap compatible_modules with all the valid ones
+validate_weak_links() {
+    local krel="$1"
+    local basedir=${BASEDIR:+-b $BASEDIR}
+    local tmp
+    declare -A symbols
+    local is_updates_changed=1
+    local module
+    local module_krel
+    local target
+    local modpath
+    local symbol
+    local weak_link
+    # to return to caller that original proposal is not valid
+    # here 0 is true, 1 is false, since it will be the return code
+    local is_configuration_valid=0
+    local cat_prog
+
+    tmp=$(mktemp -p $tmpdir)
+    compatible_modules=()
+
+    if ! [[ -e $tmpdir/symvers-$krel ]]; then
+        local symvers_path=$(find_symvers_file "$krel")
+
+        [[ -n "$symvers_path" ]] || return
+        cat_prog="cat"
+        case "$symvers" in
+        *.gz) cat_prog="zcat" ;;
+        *.xz) cat_prog="xzcat" ;;
+        esac
+        "$cat_prog" "$symvers_path" > $tmpdir/symvers-$krel
+    fi
+
+    while ((is_updates_changed)); do
+        is_updates_changed=0
+
+        # again $tmp because of subshell, see read_modules_list() comment
+        # create incompatibility report by depmod
+        # Shorcut if depmod finds a lot of incompatible modules elsewhere,
+        # we care only about weak-updates
+        $depmod $basedir -naeE $tmpdir/symvers-$krel $krel 2>&1 1>/dev/null | \
+            grep "$(weak_updates_dir $krel)" 2>/dev/null >$tmp
+        # parse it into symbols[] associative array in form a-la
+        #   symbols["/path/to/the/module"]="list of bad symbols"
+        while read line; do
+            set -- $(echo $line | awk '/needs unknown symbol/{print $3 " " $NF}')
+            modpath=$1
+            symbol=$2
+            if [[ -n "$modpath" ]]; then
+                symbols[$modpath]="${symbols[$modpath]} $symbol"
+                continue
+            fi
+
+            set -- $(echo $line | awk '/disagrees about version of symbol/{print $3 " " $NF}')
+            modpath=$1
+            symbol=$2
+            if [[ -n "$modpath" ]]; then
+                symbols[$modpath]="${symbols[$modpath]} $symbol"
+                continue
+            fi
+        done < $tmp
+
+        # loop through all the weak links from the list of incompatible
+        # modules and remove them. Skips non-weak incompatibilities
+        for modpath in "${!symbols[@]}"; do
+            is_weak_link $modpath $krel || continue
+
+            target=$(readlink $modpath)
+            module_krel=$(krel_of_module $target)
+
+            remove_weak_link_quiet "$modpath" "$krel"
+
+            pr_verbose "Module $(module_short_name $modpath) from kernel $module_krel is not compatible with kernel $krel in symbols: ${symbols[$modpath]}"
+            is_updates_changed=1
+            is_configuration_valid=1 # inversed value
+        done
+    done
+    rm -f $tmp
+
+    # this loop is just to produce verbose compatibility messages
+    # for the compatible modules
+    for module in "${modules[@]}"; do
+        is_weak_for_module_valid $module $krel || continue
+
+        weak_link="$(module_weak_link $module $krel)"
+        target="$(readlink $weak_link)"
+        module_krel=$(krel_of_module $target)
+
+        if [[ "$module" == "$target" ]]; then
+            short_name="$(module_short_name "$module")"
+            compatible_modules+=([$short_name]="$module")
+
+            pr_verbose "Module ${module##*/} from kernel $module_krel is compatible with kernel $krel"
+        fi
+    done
+    return $is_configuration_valid
+}
+
+# global_link_state_save:
+# Takes kernel release
+# Saves the given kernel's weak symlinks state into the global array
+# weak_modules_before[] for later processing
+global_link_state_save() {
+    local krel="$1"
+    local link
+    local target
+
+    weak_modules_before=()
+    for link in $(find_modules_dirs $(weak_updates_dir $krel) | xargs); do
+        target=$(readlink $link)
+        weak_modules_before[$link]=$target
+    done
+}
+
+# global_link_state_restore:
+# Takes kernel release
+# Restores the previous weak links state
+# (for example, if incompatible modules were installed)
+global_link_state_restore() {
+    local krel="$1"
+    local link
+    local target
+
+    pr_verbose "Falling back weak-modules state for kernel $krel"
+
+    ( cd "$(weak_updates_dir $krel)" 2>/dev/null && rm -rf * )
+
+    for link in "${!weak_modules_before[@]}"; do
+        target=${weak_modules_before[$link]}
+
+        mkdir -p "$(dirname $link)"
+        ln -sf $target $link
+    done
+}
+
+# global_link_state_announce_changes:
+# Takes kernel release
+# Reads the given kernel's weak symlinks state, compares to the saved,
+# triggers initrd rebuild if there were changes
+# and produces message on symlink removal
+global_link_state_announce_changes() {
+    local krel="$1"
+    local link
+    local target
+    local new_target
+    declare -A weak_modules_after
+
+    for link in $(find_modules_dirs $(weak_updates_dir $krel) | xargs); do
+        target=${weak_modules_before[$link]}
+        new_target=$(readlink $link)
+        weak_modules_after[$link]=$new_target
+
+        # report change of existing link and appearing of a new link
+        [[ "$target" == "$new_target" ]] || module_has_changed $new_target $krel
+    done
+
+    for link in "${!weak_modules_before[@]}"; do
+        target=${weak_modules_before[$link]}
+        new_target=${weak_modules_after[$link]}
+
+        # report change of existing link and disappearing of an old link
+        [[ "$target" == "$new_target" ]] && continue
+        module_has_changed $target $krel
+        [[ -n "$new_target" ]] ||
+            pr_verbose "Removing compatible module $(module_short_name $target) from kernel $krel"
+    done
+}
+
+# remove_modules:
+# Read in a list of modules from stdinput and process them for removal.
+# Parameter (noreplace) is deprecated, acts always as "noreplace".
+# There is no sense in the "replace" functionality since according
+# to the current requirements RPM will track existing of only one version
+# of extra/ module (no same extra/ modules for different kernels).
+remove_modules() {
+    update_modules remove_weak_links force_update
+}
+
+# add_modules:
+# Read in a list of modules from stdinput and process them for compatibility
+# with installed kernels under /lib/modules.
+add_modules() {
+    no_force_update=""
+
+    update_modules add_weak_links $no_force_update
+}
+
+# do_make_groups:
+# Takes tmp file which contains preprocessed modules.dep
+# output (or modules.dep)
+#
+# reads modules.dep format information from stdin
+# produces groups associative array
+# the group is a maximum subset of modules having at least a link
+#
+# more fine tuned extra filtering.
+do_make_groups()
+{
+    local tmp="$1"
+    local group_name
+    local mod
+    declare -a mods
+
+    while read i; do
+        read -a mods <<< "$i"
+
+        echo "${mods[0]}" |grep -q "extra/" || continue
+
+        # if the module already met, then its dependencies already counted
+        module_group="${grouped_modules[${mods[0]}]}"
+        [[ -n $module_group ]] && continue
+
+        # new group
+        group_name="${mods[0]}"
+
+        for mod in "${mods[@]}"; do
+            echo "$mod" |grep -q "extra/" || continue
+
+            # if there is already such group,
+            # it is a subset of the one being created
+            # due to depmod output
+            unset groups[$mod]
+
+            # extra space doesn't matter, since later (in add_kernel())
+            # it is expanded without quotes
+            groups[$group_name]+=" $mod"
+            grouped_modules[$mod]=$group_name
+        done
+    done < $tmp # avoid subshell
+}
+
+# filter_depmod_deps:
+# preprocess output for make_groups
+# depmod -n produces also aliases, so it cuts them off
+# also it removes colon after the first module
+cut_depmod_deps()
+{
+    awk 'BEGIN { pr = 1 } /^#/{ pr = 0 } pr == 1 {sub(":",""); print $0}'
+}
+
+# filter_extra_absoluted:
+# Takes kernel version
+# makes full path from the relative module path
+# (produced by depmod for in-kernel-dir modules)
+# filter only extra/ modules
+filter_extra_absoluted()
+{
+    local kver="$1"
+    local mod
+    declare -a mods
+
+    while read i; do
+        # skip non-extra. The check is not perfect, but ok
+        # to speed up handling in general cases
+        echo "$i" |grep -q "extra/" || continue
+
+        read -a mods <<< "$i"
+        for j in "${!mods[@]}"; do
+            mod="${mods[$j]}"
+
+            [[ ${mod:0:1} == "/" ]] || mod="$BASEDIR/lib/modules/$kver/$mod"
+            mods[$j]="$mod"
+        done
+        echo "${mods[@]}"
+    done
+}
+
+# make_groups:
+# takes k -- kernel version, we are installing extras from
+# prepares and feeds to do_make_groups
+# to create the module groups (global)
+make_groups()
+{
+    local k="$1"
+    local tmp2=$(mktemp -p $tmpdir)
+    local basedir=${BASEDIR:+-b $BASEDIR}
+
+    groups=()
+    grouped_modules=()
+
+    $depmod -n $basedir $k 2>/dev/null |
+        cut_depmod_deps | filter_extra_absoluted $k > $tmp2
+
+    do_make_groups $tmp2
+
+    rm -f $tmp2
+}
+
+add_kernel() {
+    local krel=${1:-$(uname -r)}
+    local tmp
+    local no_force_update=""
+    local num
+
+    tmp=$(mktemp -p $tmpdir)
+
+    if ! find_symvers_file "$krel" > /dev/null; then
+        echo "Symvers dump file is not found in" \
+             $(find_symvers_file "$krel" print) >&2
+        exit 1
+    fi
+
+    for k in $(find_kernels_with_extra | rpmsort -r); do
+        [[ "$krel" == "$k" ]] && continue
+        find_modules $k extra > $tmp
+
+        is_empty_file "$tmp" || make_groups $k
+
+        # reuse tmp
+
+	# optimization, check independent modules in one run.
+	# first try groups with one element in each.
+	# it means independent modules, so we can safely remove
+	# incompatible links
+	# some cut and paste here
+
+	echo > $tmp
+        for g in "${groups[@]}"; do
+	    num="$(echo "$g" | wc -w)"
+	    [ "$num" -gt 1 ] && continue
+
+            printf '%s\n' $g >> $tmp
+	done
+        # to avoid subshell, see the read_modules_list comment
+        read_modules_list < $tmp
+        update_modules_for_krel $krel add_weak_links force_update
+
+        for g in "${groups[@]}"; do
+	    num="$(echo "$g" | wc -w)"
+	    [ "$num" -eq 1 ] && continue
+
+            printf '%s\n' $g > $tmp
+            read_modules_list < $tmp
+            update_modules_for_krel $krel add_weak_links $no_force_update
+        done
+    done
+
+    rm -f $tmp
+
+}
+
+remove_kernel() {
+    remove_krel=${1:-$(uname -r)}
+    weak_modules="$(weak_updates_dir $remove_krel)"
+    module_has_changed $weak_modules $remove_krel
+
+    # Remove everything beneath the weak-updates directory
+    ( cd "$weak_modules" && doit rm -rf * )
+}
+
+################################################################################
+################################## MAIN GUTS ###################################
+################################################################################
+
+options=`getopt -o h --long help,add-modules,remove-modules \
+                     --long add-kernel,remove-kernel \
+                     --long dry-run,no-initramfs,verbose,delete-modules \
+                     --long basedir:,dracut:,check-initramfs-prog: -- "$@"`
+
+[ $? -eq 0 ] || usage 1
+
+eval set -- "$options"
+
+while :; do
+    case "$1" in
+    --add-modules)
+        do_add_modules=1
+        ;;
+    --remove-modules)
+        do_remove_modules=1
+        ;;
+    --add-kernel)
+        do_add_kernel=1
+        ;;
+    --remove-kernel)
+        do_remove_kernel=1
+        ;;
+    --dry-run)
+        dry_run=1
+        # --dry-run option is not pure dry run anymore,
+        # because of depmod used internally.
+        # For add/remove modules we have to add/remove the symlinks
+        # and just restore the original configuration afterwards.
+        ;;
+    --no-initramfs)
+        no_initramfs=1
+        ;;
+    --verbose)
+        verbose=1
+        ;;
+    --delete-modules)
+        pr_warning "--delete-modules is deprecated, no effect"
+        ;;
+    --basedir)
+        BASEDIR="$2"
+        shift
+        ;;
+    --dracut)
+        dracut="$2"
+        shift
+        ;;
+    --check-initramfs-prog)
+        CHECK_INITRAMFS="$2"
+        shift
+        ;;
+    -h|--help)
+        usage 0
+        ;;
+    --)
+        shift
+        break
+        ;;
+    esac
+    shift
+done
+
+if [ ! -x "$dracut" ]
+then
+    echo "weak-modules: could not find dracut at $dracut"
+    exit 1
+fi
+
+initramfs_prefix="$BASEDIR/${default_initramfs_prefix#/}"
+
+if [ -n "$do_add_modules" ]; then
+    add_modules
+
+elif [ -n "$do_remove_modules" ]; then
+    remove_modules
+
+elif [ -n "$do_add_kernel" ]; then
+    kernel=${1:-$(uname -r)}
+    add_kernel $kernel
+
+elif [ -n "$do_remove_kernel" ]; then
+    kernel=${1:-$(uname -r)}
+    remove_kernel $kernel
+
+    exit 0
+else
+    usage 1
+fi
+
+################################################################################
+###################### CLEANUP POST ADD/REMOVE MODULE/KERNEL ###################
+################################################################################
+
+# run depmod and dracut as needed
+for krel in ${!changed_modules_*}; do
+    krel=${!krel}
+    basedir=${BASEDIR:+-b $BASEDIR}
+
+    if is_kernel_installed $krel; then
+        doit $depmod $basedir -ae -F $(find_systemmap_file $krel) $krel
+    else
+        pr_verbose "Skipping depmod for non-installed kernel $krel"
+    fi
+done
+
+for krel in ${!changed_initramfs_*}; do
+    krel=${!krel}
+
+    if [ ! -n "$no_initramfs" ]; then
+        ${CHECK_INITRAMFS:-check_initramfs} $krel
+    fi
+done

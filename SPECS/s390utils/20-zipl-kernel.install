@@ -1,0 +1,183 @@
+#!/bin/bash
+
+if ! [[ $KERNEL_INSTALL_MACHINE_ID ]]; then
+    exit 0
+fi
+
+[[ -f /etc/sysconfig/kernel ]] && . /etc/sysconfig/kernel
+
+COMMAND="$1"
+KERNEL_VERSION="$2"
+BOOT_DIR_ABS="$3"
+KERNEL_IMAGE="$4"
+
+KERNEL_DIR="${KERNEL_IMAGE%/*}"
+
+MACHINE_ID=$KERNEL_INSTALL_MACHINE_ID
+
+BLS_DIR="/boot/loader/entries"
+ZIPLCFG="/etc/zipl.conf"
+CMDLINE_LINUX_DEBUG=" systemd.log_level=debug systemd.log_target=kmsg"
+LINUX_DEBUG_VERSION_POSTFIX="_with_debugging"
+LINUX_DEBUG_TITLE_POSTFIX=" with debugging"
+
+mkbls() {
+    local kernelver=$1 && shift
+    local datetime=$1 && shift
+    local kernelopts=$1 && shift
+
+    local debugname=""
+    local flavor=""
+
+    if [[ "$kernelver" == *\+* ]] ; then
+        local flavor=-"${kernelver##*+}"
+        if [[ "${flavor}" == "-debug" ]]; then
+            local debugname=" with debugging"
+	    local debugid="-debug"
+        fi
+    fi
+
+    cat <<EOF
+title ${NAME} (${kernelver}) ${VERSION}${debugname}
+version ${kernelver}${debugid}
+linux /boot/vmlinuz-${kernelver}
+initrd /boot/initramfs-${kernelver}.img
+options ${kernelopts}
+id ${ID}-${datetime}-${kernelver}${debugid}
+grub_users \$grub_users
+grub_arg --unrestricted
+grub_class kernel${flavor}
+EOF
+}
+
+[[ "$KERNEL_VERSION" == *\+* ]] && flavor=-"${KERNEL_VERSION##*+}"
+case "$COMMAND" in
+    add)
+        if [[ "${KERNEL_DIR}" != "/boot" ]]; then
+            # rename to match the name used in the pseudo-BLS snippet above
+            cp --remove-destination --preserve=timestamps -T "${KERNEL_IMAGE}" "/boot/vmlinuz-${KERNEL_VERSION}"
+            command -v restorecon &>/dev/null && \
+                restorecon -R "/boot/vmlinuz-${KERNEL_VERSION}"
+
+            for i in \
+                    "$KERNEL_DIR"/System.map \
+                    "$KERNEL_DIR"/config \
+                    "$KERNEL_DIR"/zImage.stub
+            do
+                [[ -e "$i" ]] || continue
+                cp --preserve=timestamps -T "$i" "/boot/${i##*/}-${KERNEL_VERSION}"
+                command -v restorecon &>/dev/null && \
+                    restorecon -R "/boot/${i##*/}-${KERNEL_VERSION}"
+            done
+            # hmac is .vmlinuz-<version>.hmac so needs a special treatment
+            i="$KERNEL_DIR/.${KERNEL_IMAGE##*/}.hmac"
+            if [[ -e "$i" ]]; then
+                cp --preserve=timestamps "$i" "/boot/.${KERNEL_IMAGE##*/}-${KERNEL_VERSION}.hmac"
+                command -v restorecon &>/dev/null && \
+                    restorecon "/boot/.${KERNEL_IMAGE##*/}-${KERNEL_VERSION}.hmac"
+            fi
+        fi
+
+        if [[ ! -f /sbin/new-kernel-pkg || -d "${BLS_DIR}" ]]; then
+            declare -a BOOT_OPTIONS
+            if [[ -f /etc/kernel/cmdline ]]; then
+                read -r -d '' -a BOOT_OPTIONS < /etc/kernel/cmdline
+            fi
+
+            if ! [[ ${BOOT_OPTIONS[*]} ]]; then
+                read -r -d '' -a line < /proc/cmdline
+                for i in "${line[@]}"; do
+                    [[ "${i#initrd=*}" != "$i" || "${i#BOOT_IMAGE=*}" != "$i" ]] && continue
+                    BOOT_OPTIONS+=("$i")
+                done
+            fi
+
+            [[ -d "$BLS_DIR" ]] || mkdir -m 0700 -p "$BLS_DIR"
+            BLS_TARGET="${BLS_DIR}/${MACHINE_ID}-${KERNEL_VERSION}.conf"
+            if [[ -f "${KERNEL_DIR}/bls.conf" ]]; then
+                cp --preserve=timestamps -T "${KERNEL_DIR}/bls.conf" "${BLS_TARGET}" || exit $?
+                sed -i -e "s,^linux.*,linux /boot/vmlinuz-${KERNEL_VERSION},g" "${BLS_TARGET}"
+                sed -i -e "s,^initrd.*,initrd /boot/initramfs-${KERNEL_VERSION}.img,g" "${BLS_TARGET}"
+                sed -i -e "s#^options.*#options ${BOOT_OPTIONS[*]}#g" "${BLS_TARGET}"
+            else
+                mkbls "${KERNEL_VERSION}" \
+                    "$(date -u +%Y%m%d%H%M%S -d "$(stat -c '%y' "${KERNEL_DIR}")")" \
+                    "${BOOT_OPTIONS[*]}" >"${BLS_TARGET}"
+            fi
+
+            if [[ "$KERNEL_VERSION" == *\+* ]] && [ "x$DEFAULTDEBUG" != "xyes" ]; then
+                UPDATEDEFAULT="no"
+            fi
+
+            if [[ "x$UPDATEDEFAULT" = "xyes" ]]; then
+                TITLE="$(grep '^title[ \t]' "${BLS_TARGET}" | sed -e 's/^title[ \t]*//')"
+                NEWDEFAULT="${TITLE}"
+            fi
+
+            if [ "x${MAKEDEBUG}" = "xyes" ]; then
+                BLS_DEBUG="$(echo ${BLS_TARGET} | sed -e "s/${KERNEL_VERSION}/${KERNEL_VERSION}~debug/")"
+                cp --preserve=timestamps -T  "${BLS_TARGET}" "${BLS_DEBUG}"
+                TITLE="$(grep '^title[ \t]' "${BLS_DEBUG}" | sed -e 's/^title[ \t]*//')"
+		VERSION="$(grep '^version[ \t]' "${BLS_DEBUG}" | sed -e 's/^version[ \t]*//')"
+                BLSID="$(grep '^id[ \t]' "${BLS_DEBUG}" | sed -e "s/${KERNEL_VERSION}/${KERNEL_VERSION}~debug/")"
+                sed -i -e "s/^title.*/title ${TITLE}${LINUX_DEBUG_TITLE_POSTFIX}/" "${BLS_DEBUG}"
+		sed -i -e "s/^version.*/version ${VERSION}${LINUX_DEBUG_VERSION_POSTFIX}/" "${BLS_DEBUG}"
+                sed -i -e "s/^id.*/${BLSID}/" "${BLS_DEBUG}"
+                sed -i -e "s#^options.*#options ${BOOT_OPTIONS[*]}${CMDLINE_LINUX_DEBUG}#" "${BLS_DEBUG}"
+                if [ -n "$NEWDEFAULT" -a "x$DEFAULTDEBUG" = "xyes" ]; then
+                    TITLE="$(grep '^title[ \t]' "${BLS_DEBUG}" | sed -e 's/^title[ \t]*//')"
+                    NEWDEFAULT="${TITLE}"
+                fi
+	    fi
+
+            if [ -n "$NEWDEFAULT" ] && [ -f "${ZIPLCFG}" ]; then
+                if grep -q "^default=" "${ZIPLCFG}"; then
+                    sed -i -e "s,^default=.*,default=${NEWDEFAULT}," "${ZIPLCFG}"
+                else
+                    echo "default=${NEWDEFAULT}" >> "${ZIPLCFG}"
+                fi
+            fi
+
+            exit 0
+        fi
+
+        /sbin/new-kernel-pkg --package "kernel${flavor}" --install "$KERNEL_VERSION" || exit $?
+        /sbin/new-kernel-pkg --package "kernel${flavor}" --mkinitrd --dracut --depmod --update "$KERNEL_VERSION" || exit $?
+        /sbin/new-kernel-pkg --package "kernel${flavor}" --rpmposttrans "$KERNEL_VERSION" || exit $?
+        # If grubby is used there's no need to run other installation plugins
+        exit 77
+        ;;
+    remove)
+        if [[ ! -f /sbin/new-kernel-pkg || -d "${BLS_DIR}" ]]; then
+            ARCH="$(uname -m)"
+            BLS_TARGET="${BLS_DIR}/${MACHINE_ID}-${KERNEL_VERSION}.conf"
+            BLS_DEBUG="$(echo ${BLS_TARGET} | sed -e "s/${KERNEL_VERSION}/${KERNEL_VERSION}~debug/")"
+
+            if [ -f "${BLS_TARGET}" ] && [ -f "${ZIPLCFG}" ]; then
+                TITLE="$(grep '^title[ \t]' "${BLS_TARGET}" | sed -e 's/^title[ \t]*//')"
+                sed -i -e "/^default=${TITLE}/d" "${ZIPLCFG}"
+            fi
+
+            if [[ -f "${BLS_DEBUG}" ]]; then
+                TITLE="$(grep '^title[ \t]' "${BLS_DEBUG}" | sed -e 's/^title[ \t]*//')"
+                sed -i -e "/^default=${TITLE}/d" "${ZIPLCFG}"
+            fi
+
+            rm -f "${BLS_TARGET}" "${BLS_DEBUG}"
+
+            for i in vmlinuz System.map config zImage.stub dtb; do
+                rm -rf "/boot/${i}-${KERNEL_VERSION}"
+            done
+            # hmac is .vmlinuz-<version>.hmac so needs a special treatment
+            rm -f "/boot/.vmlinuz-${KERNEL_VERSION}.hmac"
+
+            exit 0
+        fi
+
+        /sbin/new-kernel-pkg --package "kernel${flavor+-$flavor}" --rminitrd --rmmoddep --remove "$KERNEL_VERSION" || exit $?
+        # If grubby is used there's no need to run other installation plugins
+        exit 77
+        ;;
+    *)
+        ;;
+esac

@@ -1,0 +1,16 @@
+--- tpm2-policy-0.6.0/Cargo.toml.orig	2024-01-29 23:02:24.244454933 +0000
++++ tpm2-policy-0.6.0/Cargo.toml	2024-01-29 23:02:54.011665824 +0000
+@@ -24,9 +24,12 @@
+ version = "1.0"
+ 
+ [dependencies.tss-esapi]
+-version = "7.0.0"
++version = "7.4.0"
+ [dev-dependencies.serde_json]
+ version = "1.0.59"
+ 
+ [dev-dependencies.tempfile]
+ version = "3.1.0"
++
++[features]
++generate-bindings = ["tss-esapi/generate-bindings"]

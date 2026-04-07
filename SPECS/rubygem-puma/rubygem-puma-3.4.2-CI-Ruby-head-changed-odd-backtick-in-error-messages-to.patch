@@ -1,0 +1,37 @@
+From 7fde3ed58aadeedaedfb1f129432769b4114f303 Mon Sep 17 00:00:00 2001
+From: MSP-Greg <Greg.mpls@gmail.com>
+Date: Sat, 17 Feb 2024 18:03:00 -0600
+Subject: [PATCH] [CI] - Ruby head changed 'odd' backtick in error messages to
+ apostrophe / single quote
+
+---
+ test/test_error_logger.rb | 2 +-
+ test/test_puma_server.rb  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/test/test_error_logger.rb b/test/test_error_logger.rb
+index 08be915803..533c970f60 100644
+--- a/test/test_error_logger.rb
++++ b/test/test_error_logger.rb
+@@ -80,7 +80,7 @@ def dummy_error
+       end
+ 
+       assert_match %r!non-blank!, err
+-      assert_match %r!:in `dummy_error'!, err
++      assert_match %r!:in [`'](TestErrorLogger#)?dummy_error'!, err
+     end
+   end
+ 
+diff --git a/test/test_puma_server.rb b/test/test_puma_server.rb
+index 74d626bb7f..82d98362b7 100644
+--- a/test/test_puma_server.rb
++++ b/test/test_puma_server.rb
+@@ -473,7 +473,7 @@ def test_lowlevel_error_body_close
+     data = send_http_and_sysread "GET / HTTP/1.0\r\n\r\n"
+ 
+     assert_includes data, 'HTTP/1.0 500 Internal Server Error'
+-    assert_includes data, "Puma caught this error: undefined method `to_i' for"
++    assert_match(/Puma caught this error: undefined method [`']to_i' for/, data)
+     assert_includes data, "Array"
+     refute_includes data, 'lowlevel_error'
+     sleep 0.1 unless ::Puma::IS_MRI

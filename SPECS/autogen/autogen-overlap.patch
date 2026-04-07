@@ -1,0 +1,12 @@
+diff -up autogen-5.18.16/compat/pathfind.c.orig autogen-5.18.16/compat/pathfind.c
+--- autogen-5.18.16/compat/pathfind.c.orig	2018-07-25 21:44:31.000000000 +0200
++++ autogen-5.18.16/compat/pathfind.c	2019-02-05 12:39:02.625001009 +0100
+@@ -211,7 +211,7 @@ canonicalize_pathname( char *path )
+                 (result[i + 2] == '/' || !result[i + 2])) {
+                 while (--start > -1 && result[start] != '/')
+                     ;
+-                strcpy( result + start + 1, result + i + 2 );
++                memmove( result + start + 1, result + i + 2, strlen(result + i + 2) + 1 );
+                 i = (start < 0) ? 0 : start;
+                 continue;
+             }

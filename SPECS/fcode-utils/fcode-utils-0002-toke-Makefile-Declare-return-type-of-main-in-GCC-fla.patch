@@ -1,0 +1,20 @@
+From: Florian Weimer <fweimer@redhat.com>
+Date: Tue, 7 Feb 2023 12:47:13 +0100
+Subject: [PATCH] toke/Makefile: Declare return type of main in GCC flag probe
+
+Without it, the probe may incorrectly fail with future compilers
+which do not support implicit ints.
+
+diff --git a/toke/Makefile b/toke/Makefile
+index 3306549..783c70c 100644
+--- a/toke/Makefile
++++ b/toke/Makefile
+@@ -41,7 +41,7 @@ LDFLAGS =
+ # CFLAGS  := $(CFLAGS) -g
+ 
+ # for gcc 4. remove if you fixed the code.
+-_GCC4_CFLAGS=$(shell echo 'main(int argc, char **argv){return 0;}' > .test.c;   \
++_GCC4_CFLAGS=$(shell echo 'int main(int argc, char **argv){return 0;}' > .test.c;   \
+ 		$(CC) -Wno-pointer-sign -c .test.c -o .test.o > /dev/null 2>&1 \
+ 		&& echo -Wno-pointer-sign; rm .test.c .test.o )
+ CFLAGS  := $(CFLAGS) $(_GCC4_CFLAGS)

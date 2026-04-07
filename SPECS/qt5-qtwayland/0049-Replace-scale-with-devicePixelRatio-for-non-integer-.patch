@@ -1,0 +1,169 @@
+From 1ba45e04b989ef9b22742ccd3a4a5fc3c6a4018b Mon Sep 17 00:00:00 2001
+From: Jungi Byun <jungi.byun@lge.com>
+Date: Wed, 27 Jan 2021 08:24:23 +0900
+Subject: [PATCH 49/55] Replace scale with devicePixelRatio for non-integer
+ scaling
+
+The 'scale' event from wayland cannot support non-integer scaling
+which was originally supported in Qt.
+
+As default, devicePixelRatio follows the 'scale' so that the high DPI
+still works as the mechanism in Wayland. But if non-integer scaling
+factor such as 150% is needed, it can be supported to override the
+devicePixelRatio.
+
+Change-Id: I63a04db27bd521264b6d0904e1ddd05a572dc970
+Reviewed-by: Elvis Lee <kwangwoong.lee@lge.com>
+Reviewed-by: Jungi Byun <jungi.byun@lge.com>
+Reviewed-by: Eskil Abrahamsen Blomfeldt <eskil.abrahamsen-blomfeldt@qt.io>
+(cherry picked from commit cf98abbc6ae9ba9373803ffe193f839324e0c80b)
+---
+ src/client/qwaylandabstractdecoration.cpp        |  2 +-
+ src/client/qwaylandshmbackingstore.cpp           |  6 +++---
+ src/client/qwaylandshmbackingstore_p.h           |  2 +-
+ src/client/qwaylandwindow.cpp                    | 16 ++++++++--------
+ src/client/qwaylandwindow_p.h                    |  2 +-
+ .../client/wayland-egl/qwaylandglcontext.cpp     |  2 +-
+ 6 files changed, 15 insertions(+), 15 deletions(-)
+
+diff --git a/src/client/qwaylandabstractdecoration.cpp b/src/client/qwaylandabstractdecoration.cpp
+index b628930d..d15a7f9f 100644
+--- a/src/client/qwaylandabstractdecoration.cpp
++++ b/src/client/qwaylandabstractdecoration.cpp
+@@ -122,7 +122,7 @@ const QImage &QWaylandAbstractDecoration::contentImage()
+     if (d->m_isDirty) {
+         // Update the decoration backingstore
+ 
+-        const int bufferScale = waylandWindow()->scale();
++        const qreal bufferScale = waylandWindow()->scale();
+         const QSize imageSize = waylandWindow()->surfaceSize() * bufferScale;
+         d->m_decorationContentImage = QImage(imageSize, QImage::Format_ARGB32_Premultiplied);
+         // Only scale by buffer scale, not QT_SCALE_FACTOR etc.
+diff --git a/src/client/qwaylandshmbackingstore.cpp b/src/client/qwaylandshmbackingstore.cpp
+index 41cffdf7..90e37e95 100644
+--- a/src/client/qwaylandshmbackingstore.cpp
++++ b/src/client/qwaylandshmbackingstore.cpp
+@@ -72,7 +72,7 @@ QT_BEGIN_NAMESPACE
+ namespace QtWaylandClient {
+ 
+ QWaylandShmBuffer::QWaylandShmBuffer(QWaylandDisplay *display,
+-                     const QSize &size, QImage::Format format, int scale)
++                     const QSize &size, QImage::Format format, qreal scale)
+ {
+     int stride = size.width() * 4;
+     int alloc = stride * size.height();
+@@ -114,7 +114,7 @@ QWaylandShmBuffer::QWaylandShmBuffer(QWaylandDisplay *display,
+     QWaylandShm* shm = display->shm();
+     wl_shm_format wl_format = shm->formatFrom(format);
+     mImage = QImage(data, size.width(), size.height(), stride, format);
+-    mImage.setDevicePixelRatio(qreal(scale));
++    mImage.setDevicePixelRatio(scale);
+ 
+     mShmPool = wl_shm_create_pool(shm->object(), fd, alloc);
+     init(wl_shm_pool_create_buffer(mShmPool,0, size.width(), size.height(),
+@@ -277,7 +277,7 @@ QWaylandShmBuffer *QWaylandShmBackingStore::getBuffer(const QSize &size)
+ void QWaylandShmBackingStore::resize(const QSize &size)
+ {
+     QMargins margins = windowDecorationMargins();
+-    int scale = waylandWindow()->scale();
++    qreal scale = waylandWindow()->scale();
+     QSize sizeWithMargins = (size + QSize(margins.left()+margins.right(),margins.top()+margins.bottom())) * scale;
+ 
+     // We look for a free buffer to draw into. If the buffer is not the last buffer we used,
+diff --git a/src/client/qwaylandshmbackingstore_p.h b/src/client/qwaylandshmbackingstore_p.h
+index e01632da..f3fae438 100644
+--- a/src/client/qwaylandshmbackingstore_p.h
++++ b/src/client/qwaylandshmbackingstore_p.h
+@@ -71,7 +71,7 @@ class QWaylandWindow;
+ class Q_WAYLAND_CLIENT_EXPORT QWaylandShmBuffer : public QWaylandBuffer {
+ public:
+     QWaylandShmBuffer(QWaylandDisplay *display,
+-           const QSize &size, QImage::Format format, int scale = 1);
++           const QSize &size, QImage::Format format, qreal scale = 1);
+     ~QWaylandShmBuffer() override;
+     QSize size() const override { return mImage.size(); }
+     int scale() const override { return int(mImage.devicePixelRatio()); }
+diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
+index 5280a9f7..38b10269 100644
+--- a/src/client/qwaylandwindow.cpp
++++ b/src/client/qwaylandwindow.cpp
+@@ -185,7 +185,7 @@ void QWaylandWindow::initWindow()
+     // typically be integer 1 (normal-dpi) or 2 (high-dpi). Call set_buffer_scale()
+     // to inform the compositor that high-resolution buffers will be provided.
+     if (mDisplay->compositorVersion() >= 3)
+-        mSurface->set_buffer_scale(scale());
++        mSurface->set_buffer_scale(mScale);
+ 
+     if (QScreen *s = window()->screen())
+         setOrientationMask(s->orientationUpdateMask());
+@@ -572,9 +572,9 @@ void QWaylandWindow::damage(const QRect &rect)
+     if (mSurface == nullptr)
+         return;
+ 
+-    const int s = scale();
++    const qreal s = scale();
+     if (mDisplay->compositorVersion() >= 4)
+-        mSurface->damage_buffer(s * rect.x(), s * rect.y(), s * rect.width(), s * rect.height());
++        mSurface->damage_buffer(qFloor(s * rect.x()), qFloor(s * rect.y()), qCeil(s * rect.width()), qCeil(s * rect.height()));
+     else
+         mSurface->damage(rect.x(), rect.y(), rect.width(), rect.height());
+ }
+@@ -613,9 +613,9 @@ void QWaylandWindow::commit(QWaylandBuffer *buffer, const QRegion &damage)
+ 
+     attachOffset(buffer);
+     if (mDisplay->compositorVersion() >= 4) {
+-        const int s = scale();
++        const qreal s = scale();
+         for (const QRect &rect: damage)
+-            mSurface->damage_buffer(s * rect.x(), s * rect.y(), s * rect.width(), s * rect.height());
++            mSurface->damage_buffer(qFloor(s * rect.x()), qFloor(s * rect.y()), qCeil(s * rect.width()), qCeil(s * rect.height()));
+     } else {
+         for (const QRect &rect: damage)
+             mSurface->damage(rect.x(), rect.y(), rect.width(), rect.height());
+@@ -1106,14 +1106,14 @@ bool QWaylandWindow::isActive() const
+     return mDisplay->isWindowActivated(this);
+ }
+ 
+-int QWaylandWindow::scale() const
++qreal QWaylandWindow::scale() const
+ {
+-    return mScale;
++    return devicePixelRatio();
+ }
+ 
+ qreal QWaylandWindow::devicePixelRatio() const
+ {
+-    return mScale;
++    return qreal(mScale);
+ }
+ 
+ bool QWaylandWindow::setMouseGrabEnabled(bool grab)
+diff --git a/src/client/qwaylandwindow_p.h b/src/client/qwaylandwindow_p.h
+index 2f219d8c..741f9e5c 100644
+--- a/src/client/qwaylandwindow_p.h
++++ b/src/client/qwaylandwindow_p.h
+@@ -158,7 +158,7 @@ public:
+ 
+     void setMask(const QRegion &region) override;
+ 
+-    int scale() const;
++    qreal scale() const;
+     qreal devicePixelRatio() const override;
+ 
+     void requestActivateWindow() override;
+diff --git a/src/hardwareintegration/client/wayland-egl/qwaylandglcontext.cpp b/src/hardwareintegration/client/wayland-egl/qwaylandglcontext.cpp
+index c1f45fa6..bbc63444 100644
+--- a/src/hardwareintegration/client/wayland-egl/qwaylandglcontext.cpp
++++ b/src/hardwareintegration/client/wayland-egl/qwaylandglcontext.cpp
+@@ -195,7 +195,7 @@ public:
+         QOpenGLTextureCache *cache = QOpenGLTextureCache::cacheForContext(m_context->context());
+ 
+         QSize surfaceSize = window->surfaceSize();
+-        int scale = window->scale() ;
++        qreal scale = window->scale() ;
+         glViewport(0, 0, surfaceSize.width() * scale, surfaceSize.height() * scale);
+ 
+         //Draw Decoration
+-- 
+2.51.1
+

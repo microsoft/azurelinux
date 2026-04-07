@@ -1,0 +1,51 @@
+From a93a3780ddc6aaeac4fa42d528e7532d0aa874ec Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20Van=C4=9Bk?= <arkamar@atlas.cz>
+Date: Mon, 1 Jul 2024 10:00:05 +0200
+Subject: [PATCH] Prepare tests for upcoming twisted version
+
+Twisted recently changed behavior of logger on failures [1]. It newly
+logs the `Main loop terminated.` even on exceptions, which breaks two
+test in twistedsupport test suite. This hack attempts to address the
+upcoming issue.
+
+[1] https://github.com/twisted/twisted/pull/12207
+
+(cherry picked from commit 5b8cb6497c7159f593e68de6a13e15f7e78e56e3)
+---
+ testtools/tests/twistedsupport/test_runtest.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/testtools/tests/twistedsupport/test_runtest.py b/testtools/tests/twistedsupport/test_runtest.py
+index 4b46cc6..f8faf7c 100644
+--- a/testtools/tests/twistedsupport/test_runtest.py
++++ b/testtools/tests/twistedsupport/test_runtest.py
+@@ -16,7 +16,6 @@ from testtools.matchers import (
+     Contains,
+     ContainsAll,
+     ContainsDict,
+-    EndsWith,
+     Equals,
+     Is,
+     KeysEqual,
+@@ -749,7 +748,7 @@ class TestAsynchronousDeferredRunTest(NeedsTwistedTestCase):
+                     test,
+                     {
+                         "traceback": Not(Is(None)),
+-                        "twisted-log": AsText(EndsWith(" foo\n")),
++                        "twisted-log": AsText(Contains(" foo\n")),
+                     },
+                 ),
+                 ("stopTest", test),
+@@ -790,7 +789,8 @@ class TestAsynchronousDeferredRunTest(NeedsTwistedTestCase):
+         result = self.make_result()
+         runner.run(result)
+         self.assertThat(
+-            messages, MatchesListwise([ContainsDict({"message": Equals(("foo",))})])
++            messages[0:1],
++            MatchesListwise([ContainsDict({"message": Equals(("foo",))})]),
+         )
+ 
+     def test_restore_observers(self):
+-- 
+2.48.0
+

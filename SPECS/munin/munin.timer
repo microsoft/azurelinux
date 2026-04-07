@@ -1,0 +1,9 @@
+[Unit]
+Description=Munin server to collect data from nodes
+Documentation=man:munin-cron(8)
+
+[Timer]
+OnCalendar=*:00/5
+
+[Install]
+WantedBy=timers.target

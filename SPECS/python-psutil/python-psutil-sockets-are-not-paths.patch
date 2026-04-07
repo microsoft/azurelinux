@@ -1,0 +1,30 @@
+From 18cf4d22252d16872f59a265d4f5e9d7252f2b16 Mon Sep 17 00:00:00 2001
+From: Jeremy Cline <jeremycline@linux.microsoft.com>
+Date: Sat, 14 Jun 2025 15:57:50 +0200
+Subject: [PATCH] Don't treat sockets as paths in tests
+
+Reported upstream at https://github.com/giampaolo/psutil/pull/2435.
+
+Signed-off-by: Nils Philippsen <nils@redhat.com>
+---
+ psutil/tests/test_process_all.py | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/psutil/tests/test_process_all.py b/psutil/tests/test_process_all.py
+index aaa3fa0..4dbc4d1 100755
+--- a/psutil/tests/test_process_all.py
++++ b/psutil/tests/test_process_all.py
+@@ -404,7 +404,9 @@ class TestFetchAllProcesses(PsutilTestCase):
+             for fname in nt._fields:
+                 value = getattr(nt, fname)
+                 if fname == 'path':
+-                    if value.startswith(("[", "anon_inode:")):  # linux
++                    if value.startswith(
++                        ("[", "anon_inode:", "socket:")
++                    ):  # linux
+                         continue
+                     if BSD and value == "pvclock":  # seen on FreeBSD
+                         continue
+-- 
+2.49.0
+

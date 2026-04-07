@@ -1,0 +1,27 @@
+libtool sucks.
+--- ltmain.sh.jj	2007-12-07 14:53:21.000000000 +0100
++++ ltmain.sh	2008-09-05 21:51:48.000000000 +0200
+@@ -5394,6 +5394,7 @@ EOF
+ 	  rpath="$finalize_rpath"
+ 	  test "$mode" != relink && rpath="$compile_rpath$rpath"
+ 	  for libdir in $rpath; do
++	    case "$libdir" in /usr/lib|/usr/lib64|/usr/lib/../lib|/usr/lib/../lib64|/usr/lib/../lib64/lp64d) continue;; esac
+ 	    if test -n "$hardcode_libdir_flag_spec"; then
+ 	      if test -n "$hardcode_libdir_separator"; then
+ 		if test -z "$hardcode_libdirs"; then
+@@ -6071,6 +6072,7 @@ EOF
+       rpath=
+       hardcode_libdirs=
+       for libdir in $compile_rpath $finalize_rpath; do
++	case "$libdir" in /usr/lib|/usr/lib64|/usr/lib/../lib|/usr/lib/../lib64|/usr/lib/../lib64/lp64d) continue;; esac
+ 	if test -n "$hardcode_libdir_flag_spec"; then
+ 	  if test -n "$hardcode_libdir_separator"; then
+ 	    if test -z "$hardcode_libdirs"; then
+@@ -6120,6 +6122,7 @@ EOF
+       rpath=
+       hardcode_libdirs=
+       for libdir in $finalize_rpath; do
++	case "$libdir" in /usr/lib|/usr/lib64|/usr/lib/../lib|/usr/lib/../lib64|/usr/lib/../lib64/lp64d) continue;; esac
+ 	if test -n "$hardcode_libdir_flag_spec"; then
+ 	  if test -n "$hardcode_libdir_separator"; then
+ 	    if test -z "$hardcode_libdirs"; then

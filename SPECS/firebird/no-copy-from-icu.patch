@@ -1,0 +1,51 @@
+Description: Link isql with ICU instead of embedding part of it in the source
+Author: Damyan Ivanov <dmn@debian.org>
+
+--- a/src/isql/isql.epp
++++ b/src/isql/isql.epp
+@@ -173,34 +173,6 @@ const char* UNKNOWN = "*unknown*";
+ 
+ namespace IcuUtil
+ {
+-	// Duplicate from ICU to not need to link ISQL with it. It's used by U8_NEXT_UNSAFE.
+-	static const uint8_t utf8_countTrailBytes[256] = {
+-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-
+-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-
+-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+-
+-		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+-		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+-
+-		2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+-		3, 3, 3, 3, 3,
+-		3, 3, 3,    /* illegal in Unicode */
+-		4, 4, 4, 4, /* illegal in Unicode */
+-		5, 5,       /* illegal in Unicode */
+-		0, 0        /* illegal bytes 0xfe and 0xff */
+-	};
+-
+ 	// Return the number of characters of a string.
+ 	static unsigned charLength(SSHORT charset, unsigned len, const char* str)
+ 	{
+--- a/builds/posix/Makefile.in
++++ b/builds/posix/Makefile.in
+@@ -543,7 +543,7 @@ $(GSTAT):		$(GSTAT_Objects) $(COMMON_LIB
+ isql:			$(ISQL)
+ 
+ $(ISQL):		$(ISQL_Objects) $(COMMON_LIB)
+-	$(EXE_LINK) $(EXE_LINK_OPTIONS) $^ -o $@ $(FIREBIRD_LIBRARY_LINK) $(LIBEDITLINE) $(TERMLIB) $(LINK_LIBS)
++	$(EXE_LINK) $(EXE_LINK_OPTIONS) $^ -o $@ $(FIREBIRD_LIBRARY_LINK) $(LIBEDITLINE) $(TERMLIB) $(LINK_LIBS) $(ICU_LIBS)
+ 
+ nbackup:		$(NBACKUP)
+ 

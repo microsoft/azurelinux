@@ -1,0 +1,27 @@
+From bf03db0979954ef4dd8646c53b73a003af70a953 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Fri, 24 Jul 2020 20:39:25 +0200
+Subject: [PATCH] Properly fix test failure with Rack 2.1+.
+
+Rack is not to blame, just naive test case which was enough so far.
+
+Fixes #1119
+---
+ spec/support/shared_examples/request_method.rb | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/spec/support/shared_examples/request_method.rb b/spec/support/shared_examples/request_method.rb
+index 8e2828a2..917e48ca 100644
+--- a/spec/support/shared_examples/request_method.rb
++++ b/spec/support/shared_examples/request_method.rb
+@@ -13,8 +13,8 @@
+   end
+ 
+   it 'handles headers with multiple values' do
+-    request_stub.to_return(headers: { 'Set-Cookie' => 'one, two' })
+-    expect(response.headers['set-cookie']).to eq('one, two')
++    request_stub.to_return(headers: { 'Set-Cookie' => 'name=value' })
++    expect(response.headers['set-cookie']).to eq('name=value')
+   end
+ 
+   it 'retrieves the response headers' do

@@ -1,0 +1,9 @@
+--- async-fs-2.2.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ async-fs-2.2.0/Cargo.toml	2025-09-14T14:48:46.823166+00:00
+@@ -55,6 +55,3 @@
+ [target."cfg(unix)".dev-dependencies.libc]
+ version = "0.2.78"
+ 
+-[target."cfg(windows)".dev-dependencies.windows-sys]
+-version = "0.61"
+-features = ["Win32_Storage_FileSystem"]

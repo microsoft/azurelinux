@@ -1,0 +1,44 @@
+From 3205fbb00a07b1622060f19a1013055fe74fff21 Mon Sep 17 00:00:00 2001
+From: Jan-Michael Brummer <jan-michael.brummer1@volkswagen.de>
+Date: Mon, 15 Dec 2025 11:41:06 +0100
+Subject: [PATCH] Make use of meson library
+
+Use meson library instead of defining shared and static library on their
+own.
+
+Fixes: https://github.com/libproxy/libproxy/issues/343
+---
+ src/libproxy/meson.build | 13 +------------
+ 1 file changed, 1 insertion(+), 12 deletions(-)
+
+diff --git a/src/libproxy/meson.build b/src/libproxy/meson.build
+index ff8d80e..b508c33 100644
+--- a/src/libproxy/meson.build
++++ b/src/libproxy/meson.build
+@@ -32,7 +32,7 @@ elif build_machine.system() == 'sunos'
+   endif
+ endif
+ 
+-libproxy = shared_library(
++libproxy = library(
+   'proxy',
+   libproxy_sources,
+   include_directories: px_backend_inc,
+@@ -45,17 +45,6 @@ libproxy = shared_library(
+   install_rpath: pkglibdir,
+ )
+ 
+-libproxy_static = static_library(
+-  'proxy',
+-  libproxy_sources,
+-  include_directories: px_backend_inc,
+-  dependencies: libproxy_deps,
+-  link_args : vflag,
+-  link_depends : mapfile,
+-  install: true,
+-  install_rpath: pkglibdir,
+-)
+-
+ libproxy_dep = declare_dependency (
+   include_directories: libproxy_inc,
+   link_with: libproxy,

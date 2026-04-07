@@ -1,0 +1,15 @@
+diff '--color=auto' -r -U3 sphinxext_opengraph-0.12.0.orig/sphinxext/opengraph/_social_cards.py sphinxext_opengraph-0.12.0/sphinxext/opengraph/_social_cards.py
+--- sphinxext_opengraph-0.12.0.orig/sphinxext/opengraph/_social_cards.py	2025-08-05 00:53:20.476389400 +0300
++++ sphinxext_opengraph-0.12.0/sphinxext/opengraph/_social_cards.py	2025-08-05 17:41:48.254714681 +0300
+@@ -182,9 +182,9 @@
+     """Create the Matplotlib objects for the first time."""
+     # If no font specified, load the Roboto Flex font as a fallback
+     if font is None:
+-        path_font = Path(__file__).parent / '_static/Roboto-Flex.ttf'
++        path_font = '/usr/share/fonts/google-roboto/Roboto-Regular.ttf'
+         roboto_font = matplotlib.font_manager.FontEntry(
+-            fname=str(path_font), name='Roboto Flex'
++            fname=str(path_font), name='Roboto'
+         )
+         matplotlib.font_manager.fontManager.addfont(path_font)
+         font = roboto_font.name

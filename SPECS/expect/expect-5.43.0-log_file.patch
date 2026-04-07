@@ -1,0 +1,12 @@
+diff -up expect5.45.4/exp_log.c.orig expect5.45.4/exp_log.c
+--- expect5.45.4/exp_log.c.orig	2018-02-02 20:15:52.000000000 +0100
++++ expect5.45.4/exp_log.c	2018-06-27 10:46:53.065655463 +0200
+@@ -499,7 +499,7 @@ expLogChannelOpen(interp,filename,append
+ 	Tcl_DStringAppend(&tsdPtr->logFilename,filename,-1);
+     }
+ 
+-    tsdPtr->logChannel = Tcl_OpenFileChannel(interp,newfilename,mode,0777);
++    tsdPtr->logChannel = Tcl_OpenFileChannel(interp,newfilename,mode,0666);
+     if (!tsdPtr->logChannel) {
+ 	Tcl_DStringFree(&tsdPtr->logFilename);
+ 	return TCL_ERROR;

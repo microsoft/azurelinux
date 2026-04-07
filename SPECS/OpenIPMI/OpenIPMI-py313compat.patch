@@ -1,0 +1,13 @@
+diff --git a/swig/python/OpenIPMI_lang.i b/swig/python/OpenIPMI_lang.i
+index 67221fd..d150d81 100644
+--- a/swig/python/OpenIPMI_lang.i
++++ b/swig/python/OpenIPMI_lang.i
+@@ -541,7 +541,7 @@ static void OI_put_py_state(int current)
+ #else
+ static void init_lang(void)
+ {
+-    PyEval_InitThreads();
++    /* nothing */
+ }
+ #define OI_PY_STATE PyGILState_STATE
+ #define OI_PY_STATE_GET() PyGILState_Ensure()

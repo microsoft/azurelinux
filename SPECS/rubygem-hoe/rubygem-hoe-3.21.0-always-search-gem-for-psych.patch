@@ -1,0 +1,13 @@
+--- hoe-3.21.0/lib/hoe.rb.ruby27	2020-01-12 08:58:43.000000000 +0900
++++ hoe-3.21.0/lib/hoe.rb	2020-01-31 12:05:45.445601471 +0900
+@@ -12,6 +12,10 @@ require "rake/testtask"
+ require "rbconfig"
+ 
+ begin
++  gem "psych"
++rescue Gem::LoadError
++end
++begin
+   require "psych"
+ rescue LoadError
+   # do nothing

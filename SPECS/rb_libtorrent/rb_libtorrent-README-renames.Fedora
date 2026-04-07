@@ -1,0 +1,14 @@
+Author: Peter Gordon <peter@thecodergeek.com>
+This document is placed in the public domain.
+
+Please note that, due to potential issues in having somewhat of a
+limited namespace in the standard $BINDIR (e.g., /usr/bin or /usr/bin64), some
+of the files in this package had to renamed from what they are shipped as in
+the upstream tarball. They are as follows:
+
+There are multiple example programs for rb_libtorrent. Of them, client_test
+had to be renamed to torrent_client_test and simple_client had to be renamed
+to simple_torrent_client.
+
+We appreciate your understanding in this matter, and work is underway to
+resolve this issue upstream. Thanks.

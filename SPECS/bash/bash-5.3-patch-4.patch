@@ -1,0 +1,25 @@
+diff --git a/builtins/evalfile.c b/builtins/evalfile.c
+--- a/builtins/evalfile.c
++++ b/builtins/evalfile.c
+@@ -160,8 +160,10 @@ file_error_and_exit:
+       nr = read (fd, string, file_size);
+       if (nr >= 0)
+ 	string[nr] = '\0';
++#if 0
+       if (nr != file_size)
+ 	nr = -1;		/* XXX - didn't get the whole file */
++#endif
+     }
+   else
+     nr = zmapfd (fd, &string, 0);
+diff --git a/patchlevel.h b/patchlevel.h
+--- a/patchlevel.h
++++ b/patchlevel.h
+@@ -25,6 +25,6 @@
+    regexp `^#define[ 	]*PATCHLEVEL', since that's what support/mkversion.sh
+    looks for to find the patch level (for the sccs version string). */
+ 
+-#define PATCHLEVEL 2
++#define PATCHLEVEL 4
+ 
+ #endif /* _PATCHLEVEL_H_ */

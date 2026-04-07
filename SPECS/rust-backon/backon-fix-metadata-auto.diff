@@ -1,0 +1,35 @@
+--- backon-1.6.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ backon-1.6.0/Cargo.toml	2025-10-20T21:20:48.615423+00:00
+@@ -45,7 +45,7 @@
+ ]
+ embassy-sleep = ["embassy-time"]
+ futures-timer-sleep = ["futures-timer"]
+-gloo-timers-sleep = ["gloo-timers/futures"]
++gloo-timers-sleep = []
+ std = ["fastrand/std"]
+ std-blocking-sleep = []
+ tokio-sleep = ["tokio/time"]
+@@ -96,23 +96,3 @@
+     "rt-multi-thread",
+ ]
+ 
+-[target.'cfg(target_arch = "wasm32")'.dependencies.futures-timer]
+-version = "3.0.3"
+-features = ["gloo-timers"]
+-optional = true
+-
+-[target.'cfg(target_arch = "wasm32")'.dependencies.gloo-timers]
+-version = "0.3"
+-optional = true
+-
+-[target.'cfg(target_arch = "wasm32")'.dev-dependencies.tokio]
+-version = "1"
+-features = [
+-    "macros",
+-    "rt",
+-    "sync",
+-]
+-default-features = false
+-
+-[target.'cfg(target_arch = "wasm32")'.dev-dependencies.wasm-bindgen-test]
+-version = "0.3"

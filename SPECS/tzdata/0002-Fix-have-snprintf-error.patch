@@ -1,0 +1,12 @@
+diff -Nrup a/Makefile b/Makefile
+--- a/Makefile	2024-01-01 17:57:30.112884304 -0500
++++ b/Makefile	2024-01-01 17:59:33.641497622 -0500
+@@ -423,6 +423,7 @@ GCC_DEBUG_FLAGS = -DGCC_LINT -g3 -O3 -fn
+ # Uncomment the following line and edit its contents as needed.
+ 
+ #CFLAGS= -O 1
++CFLAGS= -DHAVE_SNPRINTF=1
+ 
+ 
+ # The name of a POSIX-like library archiver, its flags, C compiler,
+Binary files a/tzdata2023d-rearguard.tar.gz and b/tzdata2023d-rearguard.tar.gz differ

@@ -1,0 +1,36 @@
+#!/bin/sh
+#
+# This file is run on a daily basis to perform a backup of your
+# mailbox list which can be used to recreate mailboxes.db from backup.
+# Restore is done using ctl_mboxlist after uncompressing the file.
+
+BACKDIR="/var/lib/imap/backup"
+MBOXLIST="${BACKDIR}/mboxlist"
+ROTATE=6
+
+# fallback to su if runuser not available
+if [ -x /sbin/runuser ]; then
+  RUNUSER=runuser
+else
+  RUNUSER=su
+fi
+
+# source custom configuration
+if [ -f /etc/sysconfig/cyrus-imapd ]; then
+  . /etc/sysconfig/cyrus-imapd
+fi
+
+[ -x /usr/sbin/ctl_mboxlist ] || exit 0
+[ -f /var/lib/imap/db/skipstamp ] || exit 0
+
+# rotate mailbox lists
+seq $[ $ROTATE - 1 ] -1 1 | while read i; do
+  [ -f ${MBOXLIST}.${i}.gz ] && mv -f ${MBOXLIST}.${i}.gz ${MBOXLIST}.$[ $i + 1 ].gz
+done
+[ -f ${MBOXLIST}.gz ] && mv -f ${MBOXLIST}.gz ${MBOXLIST}.1.gz
+
+# export mailboxes.db
+$RUNUSER - cyrus -s /bin/sh -c "umask 077 < /dev/null ; /usr/sbin/ctl_mboxlist -d | gzip > ${MBOXLIST}.gz"
+
+exit 0
+# EOF

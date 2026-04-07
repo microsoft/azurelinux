@@ -1,0 +1,15 @@
+--- matrixcompare-0.3.0/Cargo.toml	1970-01-01T00:00:00+00:00
++++ matrixcompare-0.3.0/Cargo.toml	2024-12-27T13:27:57.958171+00:00
+@@ -40,10 +40,10 @@
+ version = "0.1"
+ 
+ [dev-dependencies.pretty_assertions]
+-version = "0.6.1"
++version = "1.4"
+ 
+ [dev-dependencies.proptest]
+-version = "0.10"
++version = "1.0"
+ 
+ [dev-dependencies.quickcheck]
+ version = "0.9"

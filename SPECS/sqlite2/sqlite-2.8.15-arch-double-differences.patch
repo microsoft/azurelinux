@@ -1,0 +1,22 @@
+--- sqlite/test/format3.test.bak	2003-12-23 03:17:35.000000000 +0100
++++ sqlite/test/format3.test	2005-01-28 18:06:35.066538463 +0100
+@@ -686,7 +686,7 @@
+   execsql {SELECT '0'==0.0}
+ } {1}
+ do_test format3-11.3 {
+-  execsql {SELECT '123456789012345678901'=='123456789012345678900'}
++  execsql {SELECT '1234567890123456789012'=='1234567890123456789011'}
+ } {1}
+ do_test format3-11.4 {
+   execsql {
+--- sqlite/test/misc1.test.bak	2003-08-05 15:13:39.000000000 +0200
++++ sqlite/test/misc1.test	2005-01-28 18:07:26.976971054 +0100
+@@ -335,7 +335,7 @@
+   execsql {SELECT '0'==0.0}
+ } {1}
+ do_test misc1-12.3 {
+-  execsql {SELECT '12345678901234567890'=='12345678901234567891'}
++  execsql {SELECT '1234567890123456789012'=='1234567890123456789011'}
+ } {0}
+ do_test misc1-12.4 {
+   execsql {

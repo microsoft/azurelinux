@@ -1,0 +1,69 @@
+From 65d602246c65d6d77abf0d7902a764ae947ab872 Mon Sep 17 00:00:00 2001
+From: Vlad Zahorodnii <vlad.zahorodnii@kde.org>
+Date: Wed, 30 Aug 2023 09:49:41 +0300
+Subject: [PATCH 54/55] Client: Avoid locking resizing in
+ QWaylandShmBackingStore
+
+QWaylandWindow::setCanResize(false) will block applying configure
+events. QWaylandWindow::setCanResize(true) will unblock configure events
+and potentially apply a scheduled configure event if there's one.
+
+QWaylandWindow::setCanResize(true) has to be called **after** committing
+the surface to ensure that the xdg window geometry matches the buffer.
+We don't want the xdg window geometry change when painting.
+
+Unfortunately, setCanResize(true) can be called before the surface is
+committed when using a RasterSurface, for example
+
+ - QWaylandShmBackingStore::beginPaint(): calls setCanResize(false)
+ - QWaylandShmBackingStore::endPaint(): calls setCanResize(true)
+ - QWaylandWindow::setCanResize(true): applies pending configure event
+ - QWaylandShmBackingStore::flush(): commits the surface, but the xdg
+   window geometry is wrong now
+
+As is, beginPaint() and endPaint() are not entirely correct functions
+where configure events can be blocked. We need functions that wrap both
+painting and flushing, which are not feasible with the current backing
+store design.
+
+On the other hand, it's worth noting that blocking configure events in
+the backing store is not necessary because painting happens on the main
+thread unlike OpenGL or Vulkan code paths.
+
+Given the lack of synchronization points and the fact that rendering
+happens on the main thread, this change removes blocking configure
+events in QWaylandShmBackingStore. It fixes dolphin and various other
+applications that use QtWidgets jumping while being interactively
+resized.
+
+Change-Id: I156e4fd5e04a6bba7e8d48171510d5ab0ec89713
+Reviewed-by: David Edmundson <davidedmundson@kde.org>
+(cherry picked from commit 8828452bcf2ecf4e02a64380a1697d148c4366b0)
+---
+ src/client/qwaylandshmbackingstore.cpp | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/src/client/qwaylandshmbackingstore.cpp b/src/client/qwaylandshmbackingstore.cpp
+index 90e37e95..145f933b 100644
+--- a/src/client/qwaylandshmbackingstore.cpp
++++ b/src/client/qwaylandshmbackingstore.cpp
+@@ -186,8 +186,6 @@ void QWaylandShmBackingStore::beginPaint(const QRegion &region)
+     mPainting = true;
+     ensureSize();
+ 
+-    waylandWindow()->setCanResize(false);
+-
+     if (mBackBuffer->image()->hasAlphaChannel()) {
+         QPainter p(paintDevice());
+         p.setCompositionMode(QPainter::CompositionMode_Source);
+@@ -202,7 +200,6 @@ void QWaylandShmBackingStore::endPaint()
+     mPainting = false;
+     if (mPendingFlush)
+         flush(window(), mPendingRegion, QPoint());
+-    waylandWindow()->setCanResize(true);
+ }
+ 
+ void QWaylandShmBackingStore::ensureSize()
+-- 
+2.51.1
+

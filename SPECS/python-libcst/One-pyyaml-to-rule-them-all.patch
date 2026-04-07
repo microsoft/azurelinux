@@ -1,0 +1,26 @@
+From b78c4e00bdea23dc048334ae5e9bb38c1c1b1c70 Mon Sep 17 00:00:00 2001
+From: Karolina Surma <ksurma@redhat.com>
+Date: Wed, 28 May 2025 12:28:30 +0200
+Subject: [PATCH] One pyyaml to rule them all
+
+---
+ pyproject.toml | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 27dbb71..e77dc57 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -19,8 +19,7 @@ classifiers = [
+ ]
+ requires-python = ">=3.9"
+ dependencies = [
+-    "pyyaml>=5.2; python_version < '3.13'",
+-    "pyyaml-ft; python_version >= '3.13'",
++    "pyyaml>=5.2",
+ ]
+ 
+ [project.urls]
+-- 
+2.49.0
+

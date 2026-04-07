@@ -1,0 +1,40 @@
+--- astral-pubgrub-0.3.3/Cargo.toml	1970-01-01T00:00:01+00:00
++++ astral-pubgrub-0.3.3/Cargo.toml	2025-12-03T09:31:26.946447+00:00
+@@ -89,14 +89,6 @@
+ path = "tests/examples.rs"
+ 
+ [[test]]
+-name = "proptest"
+-path = "tests/proptest.rs"
+-
+-[[test]]
+-name = "sat_dependency_provider"
+-path = "tests/sat_dependency_provider.rs"
+-
+-[[test]]
+ name = "tests"
+ path = "tests/tests.rs"
+ 
+@@ -140,10 +132,6 @@
+ version = "0.1.0"
+ package = "astral-version-ranges"
+ 
+-[dev-dependencies.criterion]
+-version = "4.0.1"
+-package = "codspeed-criterion-compat"
+-
+ [dev-dependencies.env_logger]
+ version = "0.11.6"
+ 
+@@ -151,10 +139,7 @@
+ version = "1.6.0"
+ 
+ [dev-dependencies.ron]
+-version = "0.12.0"
+-
+-[dev-dependencies.varisat]
+-version = "0.2.2"
++version = ">=0.10.0, <0.13.0"
+ 
+ [dev-dependencies.version-ranges]
+ version = "0.1.0"

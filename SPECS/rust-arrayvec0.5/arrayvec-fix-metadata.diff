@@ -1,0 +1,28 @@
+--- arrayvec-0.5.2/Cargo.toml	2020-10-23T16:33:15+00:00
++++ arrayvec-0.5.2/Cargo.toml	2024-09-01T16:03:32.726340+00:00
+@@ -27,25 +27,14 @@
+ [package.metadata.release]
+ no-dev-version = true
+ tag-name = "{{version}}"
+-[profile.bench]
+-debug = true
+ 
+ [profile.release]
+ debug = true
+ 
+-[[bench]]
+-name = "extend"
+-harness = false
+-
+-[[bench]]
+-name = "arraystring"
+-harness = false
+ [dependencies.serde]
+ version = "1.0"
+ optional = true
+ default-features = false
+-[dev-dependencies.bencher]
+-version = "0.1.4"
+ 
+ [dev-dependencies.matches]
+ version = "0.1"

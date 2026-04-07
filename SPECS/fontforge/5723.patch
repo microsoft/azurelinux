@@ -1,0 +1,35 @@
+From a0eedb850e1216cece0f9be61bfd45ddfc4a719d Mon Sep 17 00:00:00 2001
+From: Ahmet Furkan Kavraz <kavraz@amazon.com>
+Date: Fri, 9 Jan 2026 13:39:17 +0000
+Subject: [PATCH] Fix CVE-2025-15279: Move bounds check inside cnt >= 3 block
+
+Move the bounds check to inside the 'if (cnt >= 3)' block. This fixes
+the issue where cnt == 0, cnt == 1, and cnt == 2 require different ii
+calculations (end-of-line, end-of-bitmap, delta) and the bounds check
+before the conditional would incorrectly reject valid operations.
+
+CVE-2025-15279
+CVSS: 7.8 (High)
+ZDI-CAN-27517
+---
+ gutils/gimagereadbmp.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/gutils/gimagereadbmp.c b/gutils/gimagereadbmp.c
+index 133336787c..ad365158cc 100644
+--- a/gutils/gimagereadbmp.c
++++ b/gutils/gimagereadbmp.c
+@@ -190,10 +190,10 @@ static int readpixels(FILE *file,struct bmpheader *head) {
+ 		    head->byte_pixels[ii++] = ch;
+ 	    } else {
+ 		cnt = getc(file);
+-		if (cnt < 0 || ii + cnt > head->height * head->width) {
+-		    return 0;
+-		}
+ 		if ( cnt>= 3 ) {
++		    if (ii + cnt > head->height * head->width) {
++			return 0;
++		    }
+ 		    int odd = cnt&1;
+ 		    while ( --cnt>=0 )
+ 			head->byte_pixels[ii++] = getc(file);

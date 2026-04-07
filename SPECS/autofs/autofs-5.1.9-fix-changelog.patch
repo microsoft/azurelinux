@@ -1,0 +1,23 @@
+autofs-5.1.9 - fix changelog
+
+From: Ian Kent <raven@themaw.net>
+
+Add missed changelog entries.
+
+Signed-off-by: Ian Kent <raven@themaw.net>
+---
+ CHANGELOG |    3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/CHANGELOG b/CHANGELOG
+index 3fe6b6310..505993f95 100644
+--- a/CHANGELOG
++++ b/CHANGELOG
+@@ -1,4 +1,7 @@
+ 
++- Update configure script.
++- fix ldap_parse_page_control() check.
++- fix crash in make_options_string().
+ - Fix incompatible function pointer types in cyrus-sasl module.
+ - fix always recreate credential cache.
+ 

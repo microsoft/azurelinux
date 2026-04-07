@@ -1,0 +1,652 @@
+From 2746b7330b728fcefe8884934bcdb221ceacda6a Mon Sep 17 00:00:00 2001
+From: Jordan Borean <jborean93@gmail.com>
+Date: Thu, 1 Aug 2024 09:26:44 +1000
+Subject: [PATCH] Cleanup tests
+
+Removes test files that were empty and moved away from unittest to
+pytest for the transport tests. In this move the tests also utilise
+monkeypatch to set/clear env vars during testing to ensure outside
+environmental details do not affect the test run. The tests were also
+updated to capture the expected deprecation warnings that the tests were
+running explicitly.
+---
+ pyproject.toml                          |   4 -
+ winrm/tests/sample_script.ps1           |   0
+ winrm/tests/test_cmd.py                 |   0
+ winrm/tests/test_integration_session.py |   8 -
+ winrm/tests/test_nori_type_casting.py   |   0
+ winrm/tests/test_powershell.py          |   0
+ winrm/tests/test_transport.py           | 526 ++++++++++++------------
+ winrm/tests/test_wql.py                 |   0
+ 8 files changed, 269 insertions(+), 269 deletions(-)
+ delete mode 100644 winrm/tests/sample_script.ps1
+ delete mode 100644 winrm/tests/test_cmd.py
+ delete mode 100644 winrm/tests/test_integration_session.py
+ delete mode 100644 winrm/tests/test_nori_type_casting.py
+ delete mode 100644 winrm/tests/test_powershell.py
+ delete mode 100644 winrm/tests/test_wql.py
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 312757bb..5cbd76e8 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -111,7 +111,3 @@ ignore_missing_imports = true
+ [[tool.mypy.overrides]]
+ module = "requests_credssp"
+ ignore_missing_imports = true
+-
+-[[tool.mypy.overrides]]
+-module = "requests_ntlm"
+-ignore_missing_imports = true
+\ No newline at end of file
+diff --git a/winrm/tests/sample_script.ps1 b/winrm/tests/sample_script.ps1
+deleted file mode 100644
+index e69de29b..00000000
+diff --git a/winrm/tests/test_cmd.py b/winrm/tests/test_cmd.py
+deleted file mode 100644
+index e69de29b..00000000
+diff --git a/winrm/tests/test_integration_session.py b/winrm/tests/test_integration_session.py
+deleted file mode 100644
+index ea6eaa27..00000000
+--- a/winrm/tests/test_integration_session.py
++++ /dev/null
+@@ -1,8 +0,0 @@
+-import pytest
+-
+-xfail = pytest.mark.xfail
+-
+-
+-@xfail()
+-def test_run_cmd():
+-    raise NotImplementedError()
+diff --git a/winrm/tests/test_nori_type_casting.py b/winrm/tests/test_nori_type_casting.py
+deleted file mode 100644
+index e69de29b..00000000
+diff --git a/winrm/tests/test_powershell.py b/winrm/tests/test_powershell.py
+deleted file mode 100644
+index e69de29b..00000000
+diff --git a/winrm/tests/test_transport.py b/winrm/tests/test_transport.py
+index 0c8660f9..1f49d91a 100644
+--- a/winrm/tests/test_transport.py
++++ b/winrm/tests/test_transport.py
+@@ -1,308 +1,320 @@
+-# coding=utf-8
+-import os
+-import unittest
+ from unittest import mock
+ 
++import pytest
++
+ from winrm import transport
+ from winrm.exceptions import InvalidCredentialsError, WinRMError
+ 
+ 
+-class TestTransport(unittest.TestCase):
+-    maxDiff = 2048
+-    _old_env = None
+-
+-    def setUp(self):
+-        super(TestTransport, self).setUp()
+-        self._old_env = {}
+-        os.environ.pop("REQUESTS_CA_BUNDLE", None)
+-        os.environ.pop("TRAVIS_APT_PROXY", None)
+-        os.environ.pop("CURL_CA_BUNDLE", None)
+-        os.environ.pop("HTTPS_PROXY", None)
+-        os.environ.pop("HTTP_PROXY", None)
+-        os.environ.pop("NO_PROXY", None)
+-        transport.DISPLAYED_PROXY_WARNING = False
+-        transport.DISPLAYED_CA_TRUST_WARNING = False
+-
+-    def tearDown(self):
+-        super(TestTransport, self).tearDown()
+-        os.environ.pop("REQUESTS_CA_BUNDLE", None)
+-        os.environ.pop("TRAVIS_APT_PROXY", None)
+-        os.environ.pop("CURL_CA_BUNDLE", None)
+-        os.environ.pop("HTTPS_PROXY", None)
+-        os.environ.pop("HTTP_PROXY", None)
+-        os.environ.pop("NO_PROXY", None)
+-
+-    def test_build_session_cert_validate_default(self):
+-        t_default = transport.Transport(
+-            endpoint="https://example.com",
+-            username="test",
+-            password="test",
+-            auth_method="basic",
+-        )
++@pytest.fixture(scope="function", autouse=True)
++def clean_env(monkeypatch: pytest.MonkeyPatch):
++    monkeypatch.setattr(transport, "DISPLAYED_CA_TRUST_WARNING", False)
++    monkeypatch.setattr(transport, "DISPLAYED_PROXY_WARNING", False)
++
++    monkeypatch.delenv("REQUESTS_CA_BUNDLE", raising=False)
++    monkeypatch.delenv("TRAVIS_APT_PROXY", raising=False)
++    monkeypatch.delenv("CURL_CA_BUNDLE", raising=False)
++    monkeypatch.delenv("HTTPS_PROXY", raising=False)
++    monkeypatch.delenv("https_proxy", raising=False)
++    monkeypatch.delenv("HTTP_PROXY", raising=False)
++    monkeypatch.delenv("http_proxy", raising=False)
++    monkeypatch.delenv("NO_PROXY", raising=False)
++    monkeypatch.delenv("no_proxy", raising=False)
++
++
++def test_build_session_verify_default_no_env():
++    t_default = transport.Transport(
++        endpoint="https://example.com",
++        username="test",
++        password="test",
++        auth_method="basic",
++    )
++    t_default.build_session()
++    assert t_default.session.verify
++
++
++@pytest.mark.parametrize("env_var", ["CURL_CA_BUNDLE", "REQUESTS_CA_BUNDLE"])
++def test_build_session_verify_default_from_env(env_var, monkeypatch):
++    monkeypatch.setenv(env_var, f"path_to_{env_var}")
++
++    t_default = transport.Transport(
++        endpoint="https://example.com",
++        username="test",
++        password="test",
++        auth_method="basic",
++    )
++    with pytest.deprecated_call(match="'pywinrm' will use an environment variable defined CA Trust\\."):
+         t_default.build_session()
+-        self.assertEqual(True, t_default.session.verify)
++    assert f"path_to_{env_var}" == t_default.session.verify
+ 
+-    def test_build_session_cert_validate_default_env(self):
+-        os.environ["REQUESTS_CA_BUNDLE"] = "path_to_REQUESTS_CA_CERT"
+ 
+-        t_default = transport.Transport(
+-            endpoint="https://example.com",
+-            username="test",
+-            password="test",
+-            auth_method="basic",
+-        )
++@pytest.mark.parametrize("env_var", ["CURL_CA_BUNDLE", "REQUESTS_CA_BUNDLE"])
++def test_build_session_verify_validate_from_env(env_var, monkeypatch):
++    monkeypatch.setenv(env_var, f"path_to_{env_var}")
++
++    t_default = transport.Transport(
++        endpoint="https://example.com",
++        server_cert_validation="validate",
++        username="test",
++        password="test",
++        auth_method="basic",
++    )
++    with pytest.deprecated_call(match="'pywinrm' will use an environment variable defined CA Trust\\."):
+         t_default.build_session()
+-        self.assertEqual("path_to_REQUESTS_CA_CERT", t_default.session.verify)
++    assert f"path_to_{env_var}" == t_default.session.verify
++
++
++@pytest.mark.parametrize("env_var", ["CURL_CA_BUNDLE", "REQUESTS_CA_BUNDLE"])
++def test_build_session_verify_explicit_with_env_var(env_var, monkeypatch, recwarn):
++    monkeypatch.setenv(env_var, f"path_to_{env_var}")
++
++    t_default = transport.Transport(
++        endpoint="https://example.com",
++        server_cert_validation="validate",
++        username="test",
++        password="test",
++        auth_method="basic",
++        ca_trust_path="overridepath",
++    )
++
++    t_default.build_session()
++    assert len(recwarn) == 0
++    assert "overridepath" == t_default.session.verify
++
++
++@pytest.mark.parametrize("env_var", ["CURL_CA_BUNDLE", "REQUESTS_CA_BUNDLE"])
++def test_build_session_verify_none_with_env_var(env_var, monkeypatch, recwarn):
++    monkeypatch.setenv(env_var, f"path_to_{env_var}")
++
++    t_default = transport.Transport(
++        endpoint="https://example.com",
++        server_cert_validation="validate",
++        username="test",
++        password="test",
++        auth_method="basic",
++        ca_trust_path=None,
++    )
++    t_default.build_session()
++    assert len(recwarn) == 0
++    assert t_default.session.verify is True
++
++
++@pytest.mark.parametrize("env_var", ["CURL_CA_BUNDLE", "REQUESTS_CA_BUNDLE"])
++def test_build_session_verify_ignore_with_env_var(env_var, monkeypatch, recwarn):
++    monkeypatch.setenv(env_var, f"path_to_{env_var}")
++
++    t_default = transport.Transport(
++        endpoint="https://example.com",
++        server_cert_validation="ignore",
++        username="test",
++        password="test",
++        auth_method="basic",
++    )
++    t_default.build_session()
++    assert len(recwarn) == 0
++    assert t_default.session.verify is False
++
++
++@pytest.mark.parametrize("env_var", ["CURL_CA_BUNDLE", "REQUESTS_CA_BUNDLE"])
++def test_build_session_verify_ignore_bogus_path_and_with_env_var(env_var, monkeypatch, recwarn):
++    monkeypatch.setenv(env_var, f"path_to_{env_var}")
++
++    t_default = transport.Transport(
++        endpoint="https://example.com",
++        server_cert_validation="ignore",
++        username="test",
++        password="test",
++        auth_method="basic",
++        ca_trust_path="boguspath",
++    )
++    t_default.build_session()
++    assert len(recwarn) == 0
++    assert t_default.session.verify is False
++
++
++def test_build_session_proxy_none_with_env_var(monkeypatch, recwarn):
++    monkeypatch.setenv("HTTP_PROXY", "random_proxy")
++    monkeypatch.setenv("HTTPS_PROXY", "random_proxy_2")
++
++    t_default = transport.Transport(
++        endpoint="https://example.com",
++        server_cert_validation="validate",
++        username="test",
++        password="test",
++        auth_method="basic",
++        proxy=None,
++    )
++
++    t_default.build_session()
++    assert len(recwarn) == 0
++    assert {"no_proxy": "*"} == t_default.session.proxies
++
++
++def test_build_session_proxy_explicit_value_no_env(recwarn):
++    t_default = transport.Transport(
++        endpoint="https://example.com",
++        server_cert_validation="validate",
++        username="test",
++        password="test",
++        auth_method="basic",
++        proxy="test_proxy",
++    )
++
++    t_default.build_session()
++    assert len(recwarn) == 0
++    assert {"http": "test_proxy", "https": "test_proxy"} == t_default.session.proxies
++
++
++def test_build_session_proxy_explicit_value_with_env(monkeypatch, recwarn):
++    monkeypatch.setenv("HTTPS_PROXY", "random_proxy")
++
++    t_default = transport.Transport(
++        endpoint="https://example.com", server_cert_validation="validate", username="test", password="test", auth_method="basic", proxy="test_proxy"
++    )
++
++    t_default.build_session()
++    assert len(recwarn) == 0
++    assert {"http": "test_proxy", "https": "test_proxy"} == t_default.session.proxies
++
++
++def test_build_session_proxy_with_env_https(monkeypatch):
++    monkeypatch.setenv("HTTPS_PROXY", "random_proxy")
++
++    t_default = transport.Transport(
++        endpoint="https://example.com",
++        server_cert_validation="validate",
++        username="test",
++        password="test",
++        auth_method="basic",
++    )
++
++    with pytest.deprecated_call(match="'pywinrm' will use an environment defined proxy\\."):
++        t_default.build_session()
++    assert {"https": "random_proxy"} == t_default.session.proxies
+ 
+-    def test_build_session_cert_validate_1(self):
+-        os.environ["REQUESTS_CA_BUNDLE"] = "path_to_REQUESTS_CA_CERT"
+ 
+-        t_default = transport.Transport(
+-            endpoint="https://example.com",
+-            server_cert_validation="validate",
+-            username="test",
+-            password="test",
+-            auth_method="basic",
+-        )
+-        t_default.build_session()
+-        self.assertEqual("path_to_REQUESTS_CA_CERT", t_default.session.verify)
++def test_build_session_proxy_with_env_http(monkeypatch):
++    monkeypatch.setenv("HTTP_PROXY", "random_proxy")
+ 
+-    def test_build_session_cert_validate_2(self):
+-        os.environ["CURL_CA_BUNDLE"] = "path_to_CURL_CA_CERT"
++    t_default = transport.Transport(
++        endpoint="https://example.com",
++        server_cert_validation="validate",
++        username="test",
++        password="test",
++        auth_method="basic",
++    )
+ 
+-        t_default = transport.Transport(
+-            endpoint="https://example.com",
+-            server_cert_validation="validate",
+-            username="test",
+-            password="test",
+-            auth_method="basic",
+-        )
++    with pytest.deprecated_call(match="'pywinrm' will use an environment defined proxy\\."):
+         t_default.build_session()
+-        self.assertEqual("path_to_CURL_CA_CERT", t_default.session.verify)
++    assert {"http": "random_proxy"} == t_default.session.proxies
+ 
+-    def test_build_session_cert_override_1(self):
+-        os.environ["REQUESTS_CA_BUNDLE"] = "path_to_REQUESTS_CA_CERT"
+ 
+-        t_default = transport.Transport(
+-            endpoint="https://example.com",
+-            server_cert_validation="validate",
++def test_build_session_server_cert_validation_invalid():
++    with pytest.raises(WinRMError) as exc:
++        transport.Transport(
++            endpoint="Endpoint",
++            server_cert_validation="invalid_value",
+             username="test",
+             password="test",
+             auth_method="basic",
+-            ca_trust_path="overridepath",
+         )
+-        t_default.build_session()
+-        self.assertEqual("overridepath", t_default.session.verify)
++    assert "invalid server_cert_validation mode: invalid_value" == str(exc.value)
+ 
+-    def test_build_session_cert_override_2(self):
+-        os.environ["CURL_CA_BUNDLE"] = "path_to_CURL_CA_CERT"
+ 
+-        t_default = transport.Transport(
+-            endpoint="https://example.com",
+-            server_cert_validation="validate",
+-            username="test",
+-            password="test",
+-            auth_method="basic",
+-            ca_trust_path="overridepath",
+-        )
+-        t_default.build_session()
+-        self.assertEqual("overridepath", t_default.session.verify)
++def test_build_session_krb_delegation_as_str():
++    winrm_transport = transport.Transport(
++        endpoint="Endpoint", server_cert_validation="validate", username="test", password="test", auth_method="kerberos", kerberos_delegation="True"
++    )
++    winrm_transport.kerberos_delegation is True
+ 
+-    def test_build_session_cert_override_3(self):
+-        os.environ["CURL_CA_BUNDLE"] = "path_to_CURL_CA_CERT"
+ 
+-        t_default = transport.Transport(
+-            endpoint="https://example.com",
++def test_build_session_krb_delegation_as_invalid_str():
++    with pytest.raises(ValueError) as exc:
++        transport.Transport(
++            endpoint="Endpoint",
+             server_cert_validation="validate",
+             username="test",
+             password="test",
+-            auth_method="basic",
+-            ca_trust_path=None,
++            auth_method="kerberos",
++            kerberos_delegation="invalid_value",
+         )
+-        t_default.build_session()
+-        self.assertEqual(True, t_default.session.verify)
++    assert "invalid truth value 'invalid_value'" == str(exc.value)
+ 
+-    def test_build_session_cert_ignore_1(self):
+-        os.environ["REQUESTS_CA_BUNDLE"] = "path_to_REQUESTS_CA_CERT"
+-        os.environ["CURL_CA_BUNDLE"] = "path_to_CURL_CA_CERT"
+ 
+-        t_default = transport.Transport(
+-            endpoint="https://example.com",
+-            server_cert_validation="ignore",
+-            username="test",
++def test_build_session_no_username():
++    with pytest.raises(InvalidCredentialsError) as exc:
++        transport.Transport(
++            endpoint="Endpoint",
++            server_cert_validation="validate",
+             password="test",
+             auth_method="basic",
+         )
++    assert "auth method basic requires a username" == str(exc.value)
+ 
+-        t_default.build_session()
+-        self.assertIs(False, t_default.session.verify)
+-
+-    def test_build_session_cert_ignore_2(self):
+-        os.environ["REQUESTS_CA_BUNDLE"] = "path_to_REQUESTS_CA_CERT"
+-        os.environ["CURL_CA_BUNDLE"] = "path_to_CURL_CA_CERT"
+-
+-        t_default = transport.Transport(
+-            endpoint="https://example.com", server_cert_validation="ignore", username="test", password="test", auth_method="basic", ca_trust_path="boguspath"
+-        )
+-
+-        t_default.build_session()
+-        self.assertIs(False, t_default.session.verify)
+-
+-    def test_build_session_proxy_none(self):
+-        os.environ["HTTP_PROXY"] = "random_proxy"
+-        os.environ["HTTPS_PROXY"] = "random_proxy_2"
+-
+-        t_default = transport.Transport(
+-            endpoint="https://example.com", server_cert_validation="validate", username="test", password="test", auth_method="basic", proxy=None
+-        )
+-
+-        t_default.build_session()
+-        self.assertEqual({"no_proxy": "*"}, t_default.session.proxies)
+-
+-    def test_build_session_proxy_defined(self):
+-        t_default = transport.Transport(
+-            endpoint="https://example.com", server_cert_validation="validate", username="test", password="test", auth_method="basic", proxy="test_proxy"
+-        )
+-
+-        t_default.build_session()
+-        self.assertEqual({"http": "test_proxy", "https": "test_proxy"}, t_default.session.proxies)
+-
+-    def test_build_session_proxy_defined_and_env(self):
+-        os.environ["HTTPS_PROXY"] = "random_proxy"
+-
+-        t_default = transport.Transport(
+-            endpoint="https://example.com", server_cert_validation="validate", username="test", password="test", auth_method="basic", proxy="test_proxy"
+-        )
+-
+-        t_default.build_session()
+-        self.assertEqual({"http": "test_proxy", "https": "test_proxy"}, t_default.session.proxies)
+-
+-    def test_build_session_proxy_with_env_https(self):
+-        os.environ["HTTPS_PROXY"] = "random_proxy"
+ 
+-        t_default = transport.Transport(
+-            endpoint="https://example.com",
++def test_build_session_no_password():
++    with pytest.raises(InvalidCredentialsError) as exc:
++        transport.Transport(
++            endpoint="Endpoint",
+             server_cert_validation="validate",
+             username="test",
+-            password="test",
+             auth_method="basic",
+         )
++    assert "auth method basic requires a password" == str(exc.value)
+ 
+-        t_default.build_session()
+-        self.assertEqual({"https": "random_proxy"}, t_default.session.proxies)
+ 
+-    def test_build_session_proxy_with_env_http(self):
+-        os.environ["HTTP_PROXY"] = "random_proxy"
++def test_build_session_invalid_auth():
++    winrm_transport = transport.Transport(
++        endpoint="Endpoint",
++        server_cert_validation="validate",
++        username="test",
++        password="test",
++        auth_method="invalid_value",
++    )
+ 
+-        t_default = transport.Transport(
+-            endpoint="https://example.com",
+-            server_cert_validation="validate",
+-            username="test",
+-            password="test",
+-            auth_method="basic",
+-        )
++    with pytest.raises(WinRMError) as exc:
++        winrm_transport.build_session()
++    assert "unsupported auth method: invalid_value" == str(exc.value)
+ 
+-        t_default.build_session()
+-        self.assertEqual({"http": "random_proxy"}, t_default.session.proxies)
+-
+-    def test_build_session_server_cert_validation_invalid(self):
+-        with self.assertRaises(WinRMError) as exc:
+-            transport.Transport(
+-                endpoint="Endpoint",
+-                server_cert_validation="invalid_value",
+-                username="test",
+-                password="test",
+-                auth_method="basic",
+-            )
+-        self.assertEqual("invalid server_cert_validation mode: invalid_value", str(exc.exception))
+-
+-    def test_build_session_krb_delegation_as_str(self):
+-        winrm_transport = transport.Transport(
+-            endpoint="Endpoint", server_cert_validation="validate", username="test", password="test", auth_method="kerberos", kerberos_delegation="True"
+-        )
+-        self.assertTrue(winrm_transport.kerberos_delegation)
+-
+-    def test_build_session_krb_delegation_as_invalid_str(self):
+-        with self.assertRaises(ValueError) as exc:
+-            transport.Transport(
+-                endpoint="Endpoint",
+-                server_cert_validation="validate",
+-                username="test",
+-                password="test",
+-                auth_method="kerberos",
+-                kerberos_delegation="invalid_value",
+-            )
+-        self.assertEqual("invalid truth value 'invalid_value'", str(exc.exception))
+-
+-    def test_build_session_no_username(self):
+-        with self.assertRaises(InvalidCredentialsError) as exc:
+-            transport.Transport(
+-                endpoint="Endpoint",
+-                server_cert_validation="validate",
+-                password="test",
+-                auth_method="basic",
+-            )
+-        self.assertEqual("auth method basic requires a username", str(exc.exception))
+-
+-    def test_build_session_no_password(self):
+-        with self.assertRaises(InvalidCredentialsError) as exc:
+-            transport.Transport(
+-                endpoint="Endpoint",
+-                server_cert_validation="validate",
+-                username="test",
+-                auth_method="basic",
+-            )
+-        self.assertEqual("auth method basic requires a password", str(exc.exception))
+-
+-    def test_build_session_invalid_auth(self):
+-        winrm_transport = transport.Transport(
+-            endpoint="Endpoint",
+-            server_cert_validation="validate",
+-            username="test",
+-            password="test",
+-            auth_method="invalid_value",
+-        )
+ 
+-        with self.assertRaises(WinRMError) as exc:
+-            winrm_transport.build_session()
+-        self.assertEqual("unsupported auth method: invalid_value", str(exc.exception))
+-
+-    def test_build_session_invalid_encryption(self):
+-
+-        with self.assertRaises(WinRMError) as exc:
+-            transport.Transport(
+-                endpoint="Endpoint",
+-                server_cert_validation="validate",
+-                username="test",
+-                password="test",
+-                auth_method="basic",
+-                message_encryption="invalid_value",
+-            )
+-        self.assertEqual("invalid message_encryption arg: invalid_value. Should be 'auto', 'always', or 'never'", str(exc.exception))
+-
+-    @mock.patch("requests.Session")
+-    def test_close_session(self, mock_session):
+-        t_default = transport.Transport(
+-            endpoint="Endpoint",
+-            server_cert_validation="ignore",
+-            username="test",
+-            password="test",
+-            auth_method="basic",
+-        )
+-        t_default.build_session()
+-        t_default.close_session()
+-        mock_session.return_value.close.assert_called_once_with()
+-        self.assertIsNone(t_default.session)
++def test_build_session_invalid_encryption():
+ 
+-    @mock.patch("requests.Session")
+-    def test_close_session_not_built(self, mock_session):
+-        t_default = transport.Transport(
++    with pytest.raises(WinRMError) as exc:
++        transport.Transport(
+             endpoint="Endpoint",
+-            server_cert_validation="ignore",
++            server_cert_validation="validate",
+             username="test",
+             password="test",
+             auth_method="basic",
++            message_encryption="invalid_value",
+         )
+-        t_default.close_session()
+-        self.assertFalse(mock_session.return_value.close.called)
+-        self.assertIsNone(t_default.session)
++    assert "invalid message_encryption arg: invalid_value. Should be 'auto', 'always', or 'never'" == str(exc.value)
++
++
++@mock.patch("requests.Session")
++def test_close_session(mock_session):
++    t_default = transport.Transport(
++        endpoint="Endpoint",
++        server_cert_validation="ignore",
++        username="test",
++        password="test",
++        auth_method="basic",
++    )
++    t_default.build_session()
++    t_default.close_session()
++    mock_session.return_value.close.assert_called_once_with()
++    assert t_default.session is None
++
++
++@mock.patch("requests.Session")
++def test_close_session_not_built(mock_session):
++    t_default = transport.Transport(
++        endpoint="Endpoint",
++        server_cert_validation="ignore",
++        username="test",
++        password="test",
++        auth_method="basic",
++    )
++    t_default.close_session()
++    assert mock_session.return_value.close.called is False
++    assert t_default.session is None
+diff --git a/winrm/tests/test_wql.py b/winrm/tests/test_wql.py
+deleted file mode 100644
+index e69de29b..00000000

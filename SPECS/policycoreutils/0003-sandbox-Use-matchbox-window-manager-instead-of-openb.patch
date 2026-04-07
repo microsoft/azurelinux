@@ -1,0 +1,75 @@
+From 16fd581da479f80b8f8ff8ae8ff58a4f0a610d54 Mon Sep 17 00:00:00 2001
+From: Petr Lautrbach <plautrba@redhat.com>
+Date: Wed, 18 Jul 2018 09:09:35 +0200
+Subject: [PATCH] sandbox: Use matchbox-window-manager instead of openbox
+Content-type: text/plain
+
+---
+ sandbox/sandbox     |  4 ++--
+ sandbox/sandbox.8   |  2 +-
+ sandbox/sandboxX.sh | 14 --------------
+ 3 files changed, 3 insertions(+), 17 deletions(-)
+
+diff --git a/sandbox/sandbox b/sandbox/sandbox
+index e3fd6119ed4d..e01425f0c637 100644
+--- a/sandbox/sandbox
++++ b/sandbox/sandbox
+@@ -270,7 +270,7 @@ class Sandbox:
+             copyfile(f, "/tmp", self.__tmpdir)
+             copyfile(f, "/var/tmp", self.__tmpdir)
+ 
+-    def __setup_sandboxrc(self, wm="/usr/bin/openbox"):
++    def __setup_sandboxrc(self, wm="/usr/bin/matchbox-window-manager"):
+         execfile = self.__homedir + "/.sandboxrc"
+         fd = open(execfile, "w+")
+         if self.__options.session:
+@@ -370,7 +370,7 @@ sandbox [-h] [-l level ] [-[X|M] [-H homedir] [-T tempdir]] [-I includefile ] [-
+ 
+         parser.add_option("-W", "--windowmanager", dest="wm",
+                           type="string",
+-                          default="/usr/bin/openbox",
++                          default="/usr/bin/matchbox-window-manager",
+                           help=_("alternate window manager"))
+ 
+         parser.add_option("-l", "--level", dest="level",
+diff --git a/sandbox/sandbox.8 b/sandbox/sandbox.8
+index 095b9e27042d..1c1870190e51 100644
+--- a/sandbox/sandbox.8
++++ b/sandbox/sandbox.8
+@@ -80,7 +80,7 @@ Specifies the windowsize when creating an X based Sandbox. The default windowsiz
+ \fB\-W\fR \fB\-\-windowmanager\fR
+ Select alternative window manager to run within
+ .B sandbox \-X.
+-Default to /usr/bin/openbox.
++Default to /usr/bin/matchbox-window-manager.
+ .TP
+ \fB\-X\fR
+ Create an X based Sandbox for gui apps, temporary files for
+diff --git a/sandbox/sandboxX.sh b/sandbox/sandboxX.sh
+index 28169182ce42..e2a7ad9b2ac7 100644
+--- a/sandbox/sandboxX.sh
++++ b/sandbox/sandboxX.sh
+@@ -7,20 +7,6 @@ export TITLE="Sandbox $context -- `grep ^#TITLE: ~/.sandboxrc | /usr/bin/cut -b8
+ [ -z $3 ] && export DPI="96" || export DPI="$3"
+ trap "exit 0" HUP
+ 
+-mkdir -p ~/.config/openbox
+-cat > ~/.config/openbox/rc.xml << EOF
+-<openbox_config xmlns="http://openbox.org/3.4/rc"
+-		xmlns:xi="http://www.w3.org/2001/XInclude">
+-<applications>
+-  <application class="*">
+-    <decor>no</decor>
+-    <desktop>all</desktop>
+-    <maximized>yes</maximized>
+-  </application>
+-</applications>
+-</openbox_config>
+-EOF
+-
+ if [ "$WAYLAND_NATIVE" == "no" ]; then
+     if [ -z "$WAYLAND_DISPLAY" ]; then
+         DISPLAY_COMMAND='/usr/bin/Xephyr -resizeable -title "$TITLE" -terminate -screen $SCREENSIZE -dpi $DPI -nolisten tcp -displayfd 5 5>&1 2>/dev/null'
+-- 
+2.50.1
+

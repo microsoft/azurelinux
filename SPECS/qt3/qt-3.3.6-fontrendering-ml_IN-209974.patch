@@ -1,0 +1,11 @@
+--- qt-x11-free-3.3.6/src/kernel/qscriptengine_x11.cpp.orig	2006-11-29 17:17:26.000000000 +0100
++++ qt-x11-free-3.3.6/src/kernel/qscriptengine_x11.cpp	2006-11-29 17:22:34.000000000 +0100
+@@ -864,7 +864,7 @@
+     None, None, None, Post,
+ 
+     None, None, None, None,
+-    None, Post, None, None,
++    None, None, None, None,
+     None, None, None, None,
+     None, None, Post, Post,
+ 

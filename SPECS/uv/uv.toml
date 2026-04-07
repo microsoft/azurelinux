@@ -1,0 +1,22 @@
+# The RPM-packaged uv deviates from the default configuration in two ways.
+#
+# First, we set "python-downloads" to "manual" in order to avoid unintended
+# Python downloads. We suggest using RPM-packaged (system) Pythons that benefit
+# from distribution maintenance and integration. Use "uv python install" to
+# manually install managed Pythons.
+#
+# Second, we set "python-preference" to "system" instead of "managed".
+# Otherwise, any managed Python would be used for uv operations where no
+# particular Python is specified, even if the only available managed Python
+# were much older than the primary system Python.
+#
+# No choices can be appropriate for all users and applications. To restore the
+# default behavior, comment out settings in this file or override them in a
+# configuration file with higher precedence, such as a user-level configuration
+# file. See https://docs.astral.sh/uv/configuration/files/ for details on the
+# interaction of project-, user-, and system-level configuration files.
+#
+# https://docs.astral.sh/uv/reference/settings/#python-downloads
+python-downloads = "manual"
+# https://docs.astral.sh/uv/reference/settings/#python-preference
+python-preference = "system"

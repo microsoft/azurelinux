@@ -1,0 +1,33 @@
+--- qdbm-1.8.78/java/CuriaTester.java.java17	2006-05-15 18:50:03.000000000 +0900
++++ qdbm-1.8.78/java/CuriaTester.java	2021-12-05 11:55:32.569918347 +0900
+@@ -265,7 +265,7 @@ class CuriaTester extends Thread {
+       // store a record into the database
+       byte[] buf = Util.numstr(i, 8, '0').getBytes();
+       try {
+-        if(RND.nextInt(LOOPNUM / 20) == 0) yield();
++        if(RND.nextInt(LOOPNUM / 20) == 0) Thread.yield();
+         if(mylob){
+           mycuria.putlob(buf, (myid % 2 == 0 ? "=" : "*").getBytes(), Curia.DCAT);
+         } else {
+--- qdbm-1.8.78/java/DepotTester.java.java17	2006-05-15 03:04:27.000000000 +0900
++++ qdbm-1.8.78/java/DepotTester.java	2021-12-05 11:55:37.139921278 +0900
+@@ -232,7 +232,7 @@ class DepotTester extends Thread {
+       // store a record into the database
+       byte[] buf = Util.numstr(i, 8, '0').getBytes();
+       try {
+-        if(RND.nextInt(LOOPNUM / 20) == 0) yield();
++        if(RND.nextInt(LOOPNUM / 20) == 0) Thread.yield();
+         mydepot.put(buf, (myid % 2 == 0 ? "=" : "*").getBytes(), Depot.DCAT);
+       } catch(DepotException e){
+         myde = e;
+--- qdbm-1.8.78/java/VillaTester.java.java17	2006-06-07 17:17:19.000000000 +0900
++++ qdbm-1.8.78/java/VillaTester.java	2021-12-05 11:55:20.699910731 +0900
+@@ -250,7 +250,7 @@ class VillaTester extends Thread {
+           myvilla.tranbegin();
+           tran = true;
+         }
+-        if(RND.nextInt(LOOPNUM / 20) == 0) yield();
++        if(RND.nextInt(LOOPNUM / 20) == 0) Thread.yield();
+         myvilla.put(buf, (myid % 2 == 0 ? "=" : "*").getBytes(),
+                     RND.nextInt(3) == 0 ? Villa.DDUPR : Villa.DDUP);
+       } catch(VillaException e){

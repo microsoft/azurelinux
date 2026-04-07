@@ -1,0 +1,239 @@
+From f58cb9543ae34a6b5f495e21b53c6d9147760ba7 Mon Sep 17 00:00:00 2001
+From: Pavel Valena <pvalena@redhat.com>
+Date: Wed, 12 Jun 2024 06:30:42 +0200
+Subject: [PATCH 2/9] revert: "fix(install.d): correctly install pre-genned
+ image and die if no args"
+
+revert: "fix(install.d): simplify and use what kernel-install gives us"
+
+This reverts commits:
+  d40155385d060f8d8608fa8a4931e2e42ddc3a8f
+  8388ad149c698c951089606352fdb0cdcaaf40c9
+
+https://github.com/dracut-ng/dracut-ng/issues/334
+
+This is temporary, until the `20-grub.install` will be able to handle initrd
+from kernel staging area.
+---
+ install.d/50-dracut.install        | 153 ++++++++++++++++++-----------
+ install.d/51-dracut-rescue.install |  22 +----
+ 2 files changed, 97 insertions(+), 78 deletions(-)
+
+diff --git a/install.d/50-dracut.install b/install.d/50-dracut.install
+index 6019e8d8..441414ac 100755
+--- a/install.d/50-dracut.install
++++ b/install.d/50-dracut.install
+@@ -1,13 +1,13 @@
+ #!/bin/bash
+ 
+-COMMAND="${1:?}"
+-KERNEL_VERSION="${2:?}"
+-#shellcheck disable=SC2034
++COMMAND="$1"
++KERNEL_VERSION="$2"
+ BOOT_DIR_ABS="$3"
+ KERNEL_IMAGE="$4"
+ 
+-# If the initrd was provided on the kernel command line, we shouldn't generate our own.
+-if [[ "$COMMAND" != "add" || "$#" -gt 4 ]]; then
++# If KERNEL_INSTALL_MACHINE_ID is defined but empty, BOOT_DIR_ABS is a fake directory.
++# So, let's skip to create initrd.
++if ! [[ ${KERNEL_INSTALL_MACHINE_ID-x} ]]; then
+     exit 0
+ fi
+ 
+@@ -16,65 +16,102 @@ if [[ "$KERNEL_INSTALL_IMAGE_TYPE" = "uki" ]]; then
+     exit 0
+ fi
+ 
+-if [[ "${KERNEL_INSTALL_INITRD_GENERATOR:-dracut}" = "dracut" ]]; then
+-    # We are the initrd generator
+-    IMAGE="initrd"
+-    UEFI_OPTS="--no-uefi"
++# Mismatching the install layout and the --uefi/--no-uefi opts just creates a mess.
++if [[ $KERNEL_INSTALL_LAYOUT == "uki" && -n $KERNEL_INSTALL_STAGING_AREA ]]; then
++    BOOT_DIR_ABS="$KERNEL_INSTALL_STAGING_AREA"
++    if [[ -z $KERNEL_INSTALL_UKI_GENERATOR || $KERNEL_INSTALL_UKI_GENERATOR == "dracut" ]]; then
++        # No uki generator preference set or we have been chosen
++        IMAGE="uki.efi"
++        UEFI_OPTS="--uefi"
++    elif [[ -z $KERNEL_INSTALL_INITRD_GENERATOR || $KERNEL_INSTALL_INITRD_GENERATOR == "dracut" ]]; then
++        # We aren't the uki generator, but we have been requested to make the initrd
++        IMAGE="initrd"
++        UEFI_OPTS="--no-uefi"
++    else
++        exit 0
++    fi
++elif [[ $KERNEL_INSTALL_LAYOUT == "bls" && -n $KERNEL_INSTALL_STAGING_AREA ]]; then
++    BOOT_DIR_ABS="$KERNEL_INSTALL_STAGING_AREA"
++    if [[ -z $KERNEL_INSTALL_INITRD_GENERATOR || $KERNEL_INSTALL_INITRD_GENERATOR == "dracut" ]]; then
++        IMAGE="initrd"
++        UEFI_OPTS="--no-uefi"
++    else
++        exit 0
++    fi
+ else
+-    exit 0
++    # No layout information, use users --uefi/--no-uefi preference
++    UEFI_OPTS=""
++    if [[ -d $BOOT_DIR_ABS ]]; then
++        IMAGE="initrd"
++    else
++        BOOT_DIR_ABS="/boot"
++        IMAGE="initramfs-${KERNEL_VERSION}.img"
++    fi
+ fi
+ 
+-if [[ "$KERNEL_INSTALL_UKI_GENERATOR" = "dracut" ]]; then
+-    # We are chosen to generate the UKI as well as initrd
+-    IMAGE="uki.efi"
+-    UEFI_OPTS="--uefi"
+-fi
++ret=0
+ 
+-if [[ -f ${KERNEL_IMAGE%/*}/$IMAGE ]]; then
+-    # we found an initrd or uki.efi at the same place as the kernel
+-    # use this and don't generate a new one
+-    [[ $KERNEL_INSTALL_VERBOSE == 1 ]] && echo \
+-        "There is an $IMAGE image at the same place as the kernel, skipping generating a new one"
+-    cp --reflink=auto "${KERNEL_IMAGE%/*}/$IMAGE" "$KERNEL_INSTALL_STAGING_AREA/$IMAGE" \
+-        && chown root:root "$KERNEL_INSTALL_STAGING_AREA/$IMAGE" \
+-        && chmod 0600 "$KERNEL_INSTALL_STAGING_AREA/$IMAGE" \
+-        && exit 0
+-fi
++case "$COMMAND" in
++    add)
++        if [[ $IMAGE == "uki.efi" ]]; then
++            IMAGE_PREGENERATED=${KERNEL_IMAGE%/*}/uki.efi
++        else
++            IMAGE_PREGENERATED=${KERNEL_IMAGE%/*}/initrd
++        fi
++        if [[ -f ${IMAGE_PREGENERATED} ]]; then
++            # we found an initrd or uki.efi at the same place as the kernel
++            # use this and don't generate a new one
++            [[ $KERNEL_INSTALL_VERBOSE == 1 ]] && echo \
++                "There is an ${IMAGE} image at the same place as the kernel, skipping generating a new one"
++            cp --reflink=auto "$IMAGE_PREGENERATED" "$BOOT_DIR_ABS/$IMAGE" \
++                && chown root:root "$BOOT_DIR_ABS/$IMAGE" \
++                && chmod 0600 "$BOOT_DIR_ABS/$IMAGE" \
++                && exit 0
++        fi
+ 
+-if [ -n "$KERNEL_INSTALL_CONF_ROOT" ]; then
+-    if [ -f "$KERNEL_INSTALL_CONF_ROOT/cmdline" ]; then
+-        read -r -d '' -a BOOT_OPTIONS < "$KERNEL_INSTALL_CONF_ROOT/cmdline"
+-    fi
+-elif [[ -f /etc/kernel/cmdline ]]; then
+-    read -r -d '' -a BOOT_OPTIONS < /etc/kernel/cmdline
+-elif [[ -f /usr/lib/kernel/cmdline ]]; then
+-    read -r -d '' -a BOOT_OPTIONS < /usr/lib/kernel/cmdline
+-else
+-    declare -a BOOT_OPTIONS
++        if [ -n "$KERNEL_INSTALL_CONF_ROOT" ]; then
++            if [ -f "$KERNEL_INSTALL_CONF_ROOT/cmdline" ]; then
++                read -r -d '' -a BOOT_OPTIONS < "$KERNEL_INSTALL_CONF_ROOT/cmdline"
++            fi
++        elif [[ -f /etc/kernel/cmdline ]]; then
++            read -r -d '' -a BOOT_OPTIONS < /etc/kernel/cmdline
++        elif [[ -f /usr/lib/kernel/cmdline ]]; then
++            read -r -d '' -a BOOT_OPTIONS < /usr/lib/kernel/cmdline
++        else
++            declare -a BOOT_OPTIONS
+ 
+-    read -r -d '' -a line < /proc/cmdline
+-    for i in "${line[@]}"; do
+-        [[ ${i#initrd=*} != "$i" ]] && continue
+-        BOOT_OPTIONS+=("$i")
+-    done
+-fi
++            read -r -d '' -a line < /proc/cmdline
++            for i in "${line[@]}"; do
++                [[ ${i#initrd=*} != "$i" ]] && continue
++                BOOT_OPTIONS+=("$i")
++            done
++        fi
+ 
+-unset noimageifnotneeded
++        unset noimageifnotneeded
+ 
+-for ((i = 0; i < "${#BOOT_OPTIONS[@]}"; i++)); do
+-    # shellcheck disable=SC1001
+-    if [[ ${BOOT_OPTIONS[$i]} == root\=PARTUUID\=* ]]; then
+-        noimageifnotneeded="yes"
+-        break
+-    fi
+-done
++        for ((i = 0; i < "${#BOOT_OPTIONS[@]}"; i++)); do
++            # shellcheck disable=SC1001
++            if [[ ${BOOT_OPTIONS[$i]} == root\=PARTUUID\=* ]]; then
++                noimageifnotneeded="yes"
++                break
++            fi
++        done
++
++        # shellcheck disable=SC2046
++        dracut -f \
++            ${noimageifnotneeded:+--noimageifnotneeded} \
++            $([[ $KERNEL_INSTALL_VERBOSE == 1 ]] && echo --verbose) \
++            $([[ -n $KERNEL_IMAGE ]] && echo --kernel-image "$KERNEL_IMAGE") \
++            "$UEFI_OPTS" \
++            --kver "$KERNEL_VERSION" \
++            "$BOOT_DIR_ABS/$IMAGE"
++        ret=$?
++        ;;
++
++    remove)
++        rm -f -- "$BOOT_DIR_ABS/$IMAGE"
++        ret=$?
++        ;;
++esac
+ 
+-# shellcheck disable=SC2046
+-dracut -f \
+-    --add-confdir hostonly \
+-    ${noimageifnotneeded:+--noimageifnotneeded} \
+-    $([[ $KERNEL_INSTALL_VERBOSE == 1 ]] && echo --verbose) \
+-    $([[ -n $KERNEL_IMAGE ]] && echo --kernel-image "$KERNEL_IMAGE") \
+-    "$UEFI_OPTS" \
+-    --kver "$KERNEL_VERSION" \
+-    "$KERNEL_INSTALL_STAGING_AREA/$IMAGE" || exit 1
++exit $ret
+diff --git a/install.d/51-dracut-rescue.install b/install.d/51-dracut-rescue.install
+index 4ec9e3c5..9312e242 100755
+--- a/install.d/51-dracut-rescue.install
++++ b/install.d/51-dracut-rescue.install
+@@ -2,29 +2,11 @@
+ 
+ export LANG=C
+ 
+-COMMAND="${1:?}"
+-KERNEL_VERSION="${2:?}"
++COMMAND="$1"
++KERNEL_VERSION="$2"
+ BOOT_DIR_ABS="${3%/*}/0-rescue"
+ KERNEL_IMAGE="$4"
+ 
+-# If the initrd was provided on the kernel command line, we shouldn't generate our own.
+-if [[ "$COMMAND" = "add" && "$#" -gt 4 ]]; then
+-    exit 0
+-fi
+-
+-# Do not attempt to create initramfs if the supplied image is already a UKI
+-if [[ "$KERNEL_INSTALL_IMAGE_TYPE" = "uki" ]]; then
+-    exit 0
+-fi
+-
+-if [[ "$KERNEL_INSTALL_UKI_GENERATOR" = "dracut" ]]; then
+-    # Rescue images currently not compatible with UKIs
+-    exit 0
+-elif [[ "${KERNEL_INSTALL_INITRD_GENERATOR:-dracut}" != "dracut" ]]; then
+-    # We are not the initrd generator
+-    exit 0
+-fi
+-
+ dropindirs_sort() {
+     suffix=$1
+     shift
+-- 
+2.49.0
+

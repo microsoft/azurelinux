@@ -1,0 +1,37 @@
+--- libz-sys-1.1.24/Cargo.toml	2006-07-24T01:21:28+00:00
++++ libz-sys-1.1.24/Cargo.toml	2026-02-24T06:18:30.933073+00:00
+@@ -66,18 +66,11 @@
+ repository = "https://github.com/rust-lang/libz-sys"
+ 
+ [features]
+-asm = []
+ default = [
+     "libc",
+     "stock-zlib",
+ ]
+-static = []
+ stock-zlib = []
+-zlib-ng = [
+-    "libc",
+-    "cmake",
+-]
+-zlib-ng-no-cmake-experimental-community-maintained = ["libc"]
+ 
+ [lib]
+ name = "libz_sys"
+@@ -90,15 +83,8 @@
+ [build-dependencies.cc]
+ version = "1.0.98"
+ 
+-[build-dependencies.cmake]
+-version = "0.1.50"
+-optional = true
+-
+ [build-dependencies.pkg-config]
+ version = "0.3.9"
+-
+-[build-dependencies.vcpkg]
+-version = "0.2.11"
+ 
+ [lints.rust.unexpected_cfgs]
+ level = "warn"

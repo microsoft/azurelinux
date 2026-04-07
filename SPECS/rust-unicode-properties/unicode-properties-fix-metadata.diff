@@ -1,0 +1,11 @@
+--- unicode-properties-0.1.4/Cargo.toml	1970-01-01T00:00:01+00:00
++++ unicode-properties-0.1.4/Cargo.toml	2025-11-02T09:11:39.461922+00:00
+@@ -39,7 +39,7 @@
+     "unicode",
+ ]
+ categories = ["no-std::no-alloc"]
+-license = "MIT/Apache-2.0"
++license = "(MIT OR Apache-2.0) AND Unicode-3.0"
+ repository = "https://github.com/unicode-rs/unicode-properties"
+ 
+ [features]

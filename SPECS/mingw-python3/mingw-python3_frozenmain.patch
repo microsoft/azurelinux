@@ -1,0 +1,32 @@
+diff -rupN --no-dereference Python-3.11.14/configure.ac Python-3.11.14-new/configure.ac
+--- Python-3.11.14/configure.ac	2025-10-09 23:07:48.129173396 +0200
++++ Python-3.11.14-new/configure.ac	2025-10-09 23:07:48.393098166 +0200
+@@ -6411,6 +6411,16 @@ do
+   THREADHEADERS="$THREADHEADERS \$(srcdir)/$h"
+ done
+ 
++dnl Python interpreter main program for frozen scripts
++AC_SUBST(PYTHON_OBJS_FROZENMAIN)
++PYTHON_OBJS_FROZENMAIN="Python/frozenmain.o"
++case $host in
++  *-*-mingw*)
++    dnl 'PC/frozen_dllmain.c' - not yet
++    PYTHON_OBJS_FROZENMAIN=
++    ;;
++esac
++
+ AC_SUBST(SRCDIRS)
+ SRCDIRS="\
+   Modules \
+diff -rupN --no-dereference Python-3.11.14/Makefile.pre.in Python-3.11.14-new/Makefile.pre.in
+--- Python-3.11.14/Makefile.pre.in	2025-10-09 23:07:48.130584449 +0200
++++ Python-3.11.14-new/Makefile.pre.in	2025-10-09 23:07:48.393937921 +0200
+@@ -390,7 +390,7 @@ PYTHON_OBJS=	\
+ 		Python/dynamic_annotations.o \
+ 		Python/errors.o \
+ 		Python/frame.o \
+-		Python/frozenmain.o \
++		@PYTHON_OBJS_FROZENMAIN@ \
+ 		Python/future.o \
+ 		Python/getargs.o \
+ 		Python/getcompiler.o \

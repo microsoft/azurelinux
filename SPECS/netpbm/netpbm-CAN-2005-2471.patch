@@ -1,0 +1,17 @@
+diff -urNp a/converter/other/pstopnm.c b/converter/other/pstopnm.c
+--- a/converter/other/pstopnm.c	2025-02-04 10:47:27.857451432 +0100
++++ b/converter/other/pstopnm.c	2025-02-04 10:55:56.430470597 +0100
+@@ -896,11 +896,11 @@ execGhostscript(int               const
+                    ghostscriptProg, arg0,
+                    deviceopt, outfileopt, gopt, ropt, textalphabitsopt,
+                    "-q", "-dNOPAUSE",
+-                   "-dSAFER", "-");
++                   "-dPARANOIDSAFER", "-");
+     }
+ 
+     execl(ghostscriptProg, arg0, deviceopt, outfileopt, gopt, ropt,
+-          textalphabitsopt, "-q", "-dNOPAUSE", "-dSAFER", "-", NULL);
++          "-q", "-dNOPAUSE", "-dPARANOIDSAFER", "-", NULL);
+ 
+     pm_error("execl() of Ghostscript ('%s') failed, errno=%d (%s)",
+              ghostscriptProg, errno, strerror(errno));

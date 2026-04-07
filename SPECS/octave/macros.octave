@@ -1,0 +1,83 @@
+# Octave packaging macros
+
+# Octave binary API provided
+%octave_api %(octave-config -p API_VERSION || echo 0)
+
+# Octave Package Directories
+%octshareprefix %{_datadir}/octave
+%octprefix %{octshareprefix}/packages
+%octarchprefix %{_libdir}/octave/packages
+%octpkgdir %{octprefix}/%{octpkg}-%{version}
+%octpkglibdir %{octarchprefix}/%{octpkg}-%{version}
+
+# Run an octave command - quietly with no startup files
+%octave_cmd() octave -H -q --no-window-system --no-site-file --eval '%*';
+
+# For compiled tarfile name
+%octave_host %(octave-config -p CANONICAL_HOST_TYPE || echo 0)
+
+# Build unpacked source directory into a package tar file in a temporary location
+# Pass -T to use source tarball
+%octave_pkg_build(T) %{lua: 
+  if (rpm.expand("%{-T}") == "-T") then
+    octpkg_tarfile = rpm.expand("%{SOURCE0}")
+  else
+    octpkg_tarfile = rpm .expand("%{_tmppath}/%{octpkg}-%{version}.tar.gz")
+    print("tar czf "..octpkg_tarfile.." -C "..rpm.expand("%{_builddir} %{buildsubdir}").."\\n")
+  end
+  -- Avoid a warning from pkg build about making the build directory
+  -- and use a clean directory as octave pkg build will delete contents
+  print(rpm.expand("mkdir -p %{_builddir}/%{buildsubdir}/build\\n"))
+  -- This fails to keep the arguments to %octave_cmd for some reason
+  -- print(rpm.expand("%octave_cmd pkg build -verbose -nodeps %{_builddir}/%{buildsubdir} "..octpkg_tarfile).."\\n")
+  print(rpm.expand("octave -H -q --no-window-system --no-site-file --eval 'pkg build -verbose -nodeps %{_builddir}/%{buildsubdir}/build "..octpkg_tarfile).."'\\n")
+  -- Extract the source tarball for debuginfo generation
+  print(rpm.expand("tar xf "..octpkg_tarfile.." -C %{_builddir}/%{buildsubdir}/build\\n"))
+}
+
+# Install a package.  We use the octave pkg install command to install the
+# built package into the buildroot.  We also put a note to prevent the root
+# user from removing the package with the octave pkg uninstall command
+# We call unlink to remove the 'octave_packages' file which contains the
+# buildroot string and needs to be generated at package install time.
+%octave_pkg_install \
+mkdir -p %{buildroot}%{octprefix} \
+mkdir -p %{buildroot}%{octarchprefix} \
+%octave_cmd pkg("prefix","%{buildroot}%{octprefix}","%{buildroot}%{octarchprefix}");pkg("global_list",fullfile("%{buildroot}%{octshareprefix}","octave_packages"));pkg("install","-nodeps","-verbose",glob("%{_builddir}/%{buildsubdir}/build/%{octpkg}-%{version}-*.tar.gz"){1,1});unlink(pkg("global_list")); \
+if [ -e %{buildroot}%{octpkgdir}/packinfo/on_uninstall.m ] \
+then \
+  mv %{buildroot}%{octpkgdir}/packinfo/on_uninstall.m %{buildroot}%{octpkgdir}/packinfo/on_uninstall.m.orig \
+fi \
+echo "function on_uninstall (desc)" > %{buildroot}%{octpkgdir}/packinfo/on_uninstall.m \
+echo "  error ('Can not uninstall %s installed by the redhat package manager', desc.name);" >> %{buildroot}%{octpkgdir}/packinfo/on_uninstall.m \
+echo "endfunction" >> %{buildroot}%{octpkgdir}/packinfo/on_uninstall.m \
+if [ -e %{_builddir}/%{buildsubdir}/build/%{octpkg}-%{version}/*.metainfo.xml ] \
+then \
+  echo "Found .metainfo.xml appdata file" \
+  mkdir -p %{buildroot}/%{_metainfodir} \
+  cp -p %{_builddir}/%{buildsubdir}/build/%{octpkg}-%{version}/*.metainfo.xml %{buildroot}/%{_metainfodir}/ \
+  appstream-util validate-relax --nonet %{buildroot}/%{_metainfodir}/*.metainfo.xml \
+else \
+  echo "Did not find a .metainfo.xml appdata file" \
+fi \
+%{nil}
+
+# Run pkg tests - We need to reinstall to recreate 'octave_packages' so that
+# octave can find the package, then remove 'octave_packages' again, and re-strip
+# any shared objects.
+%octave_pkg_check \
+%octave_cmd pkg("prefix","%{buildroot}%{octprefix}","%{buildroot}%{octarchprefix}");pkg("local_list",fullfile("%{buildroot}%{octshareprefix}","octave_packages"));pkg("list");pkg("install","-verbose",glob("%{_builddir}/%{buildsubdir}/build/%{octpkg}-%{version}-*.tar.gz"){1,1});pkg("load","%{octpkg}");pkg("list");oruntests("%{buildroot}%{octpkgdir}");unlink(pkg("local_list")); \
+/usr/lib/rpm/brp-strip %{__strip} \
+%{nil}
+
+# preun script - we need to remove our uninstall protection and perhaps
+# run the package's own uninstall script.
+%octave_pkg_preun \
+if [ -e %{octpkgdir}/packinfo/on_uninstall.m.orig ]; then \
+  mv %{octpkgdir}/packinfo/on_uninstall.m.orig %{octpkgdir}/packinfo/on_uninstall.m \
+  cd %{octpkgdir}/packinfo \
+  %octave_cmd l=pkg("list");on_uninstall(l{cellfun(@(x)strcmp(x.name,"%{octpkg}"),l)}); \
+else \
+  echo > %{octpkgdir}/packinfo/on_uninstall.m \
+fi \
+%{nil}

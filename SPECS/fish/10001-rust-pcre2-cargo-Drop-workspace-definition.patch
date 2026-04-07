@@ -1,0 +1,27 @@
+From 1e9f38b5825e684f1b8df6a7dbefe1bca77ac8f7 Mon Sep 17 00:00:00 2001
+From: Neal Gompa <ngompa@fedoraproject.org>
+Date: Wed, 26 Feb 2025 09:31:22 -0500
+Subject: [PATCH] cargo: Drop workspace definition
+
+We cannot have this when we are nesting inside another workspace.
+---
+ third-party-forks/rust-pcre2/Cargo.toml | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/third-party-forks/rust-pcre2/Cargo.toml b/third-party-forks/rust-pcre2/Cargo.toml
+index cc35675..f5245be 100644
+--- a/third-party-forks/rust-pcre2/Cargo.toml
++++ b/third-party-forks/rust-pcre2/Cargo.toml
+@@ -12,9 +12,6 @@ license = "Unlicense OR MIT"
+ categories = ["text-processing"]
+ edition = "2021"
+ 
+-[workspace]
+-members = ["pcre2-sys"]
+-
+ [dependencies]
+ libc = "0.2.146"
+ log = "0.4.19"
+-- 
+2.48.1
+

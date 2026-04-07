@@ -1,0 +1,53 @@
+diff -urNp docbook-xsl-1.78.0-orig/fo/lists.xsl docbook-xsl-1.78.0/fo/lists.xsl
+--- docbook-xsl-1.78.0-orig/fo/lists.xsl	2012-12-20 11:45:07.870679175 +0100
++++ docbook-xsl-1.78.0/fo/lists.xsl	2012-12-20 11:55:31.440307881 +0100
+@@ -376,7 +376,7 @@
+       </xsl:when>
+       <xsl:when test="@termlength">
+         <xsl:variable name="termlength.is.number">
+-          <xsl:value-of select="@termlength + 0"/>
++          <xsl:value-of select="@termlength"/>
+         </xsl:variable>
+         <xsl:choose>
+           <xsl:when test="string($termlength.is.number) = 'NaN'">
+@@ -385,7 +385,7 @@
+           </xsl:when>
+           <xsl:otherwise>
+             <xsl:value-of select="@termlength"/>
+-            <xsl:text>em * 0.60</xsl:text>
++            <xsl:text>em</xsl:text>
+           </xsl:otherwise>
+         </xsl:choose>
+       </xsl:when>
+@@ -394,7 +394,7 @@
+           <xsl:with-param name="terms" select="varlistentry/term"/>
+           <xsl:with-param name="maxlength" select="$variablelist.max.termlength"/>
+         </xsl:call-template>
+-        <xsl:text>em * 0.60</xsl:text>
++        <xsl:text>em</xsl:text>
+       </xsl:otherwise>
+     </xsl:choose>
+   </xsl:variable>
+@@ -409,8 +409,6 @@
+   <xsl:variable name="label-separation">1em</xsl:variable>
+   <xsl:variable name="distance-between-starts">
+     <xsl:value-of select="$termlength"/>
+-    <xsl:text>+</xsl:text>
+-    <xsl:value-of select="$label-separation"/>
+   </xsl:variable>
+ 
+   <xsl:if test="title">
+diff -ruNp docbook-xsl-1.74.0.orig/fo/param.xsl docbook-xsl-1.74.0/fo/param.xsl
+--- docbook-xsl-1.74.0.orig/fo/param.xsl	2008-06-02 01:06:18.000000000 +0200
++++ docbook-xsl-1.74.0/fo/param.xsl	2008-08-06 13:32:46.000000000 +0200
+@@ -133,8 +133,8 @@
+ <xsl:attribute-set name="component.title.properties">
+   <xsl:attribute name="keep-with-next.within-column">always</xsl:attribute>
+   <xsl:attribute name="space-before.optimum"><xsl:value-of select="concat($body.font.master, 'pt')"/></xsl:attribute>
+-  <xsl:attribute name="space-before.minimum"><xsl:value-of select="concat($body.font.master, 'pt * 0.8')"/></xsl:attribute>
+-  <xsl:attribute name="space-before.maximum"><xsl:value-of select="concat($body.font.master, 'pt * 1.2')"/></xsl:attribute>
++  <xsl:attribute name="space-before.minimum"><xsl:value-of select="concat($body.font.master*0.8, 'pt')"/></xsl:attribute>
++  <xsl:attribute name="space-before.maximum"><xsl:value-of select="concat($body.font.master*1.2, 'pt')"/></xsl:attribute>
+   <xsl:attribute name="hyphenate">false</xsl:attribute>
+   <xsl:attribute name="text-align">
+     <xsl:choose>

@@ -1,0 +1,616 @@
+From be23afbab800c9b5ffea56b3f410a04156c08df2 Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:29 +0200
+Subject: [PATCH 45/50] openssh-9.0p1-evp-fips-kex
+
+---
+ dh.c      |  98 +++++++++++++++++++++++++++++++++-----
+ kex.c     | 139 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ kex.h     |   6 +++
+ kexdh.c   |  52 ++++++++++++++++++--
+ kexecdh.c | 129 ++++++++++++++++++++++++++++++++++++++++----------
+ 5 files changed, 382 insertions(+), 42 deletions(-)
+
+diff --git a/dh.c b/dh.c
+index 8c9a29fa..ea0a0b09 100644
+--- a/dh.c
++++ b/dh.c
+@@ -37,6 +37,9 @@
+ #include <openssl/bn.h>
+ #include <openssl/dh.h>
+ #include <openssl/fips.h>
++#include <openssl/evp.h>
++#include <openssl/core_names.h>
++#include <openssl/param_build.h>
+ 
+ #include "dh.h"
+ #include "pathnames.h"
+@@ -290,10 +293,15 @@ dh_pub_is_valid(const DH *dh, const BIGNUM *dh_pub)
+ int
+ dh_gen_key(DH *dh, int need)
+ {
+-	int pbits;
+-	const BIGNUM *dh_p, *pub_key;
++	const BIGNUM *dh_p, *dh_g;
++	BIGNUM *pub_key = NULL, *priv_key = NULL;
++	EVP_PKEY *pkey = NULL;
++  	EVP_PKEY_CTX *ctx = NULL;
++  	OSSL_PARAM_BLD *param_bld = NULL;
++  	OSSL_PARAM *params = NULL;
++	int pbits, r = 0;
+ 
+-	DH_get0_pqg(dh, &dh_p, NULL, NULL);
++	DH_get0_pqg(dh, &dh_p, NULL, &dh_g);
+ 
+ 	if (need < 0 || dh_p == NULL ||
+ 	    (pbits = BN_num_bits(dh_p)) <= 0 ||
+@@ -301,19 +309,85 @@ dh_gen_key(DH *dh, int need)
+ 		return SSH_ERR_INVALID_ARGUMENT;
+ 	if (need < 256)
+ 		need = 256;
++
++	if ((param_bld = OSSL_PARAM_BLD_new()) == NULL ||
++	    (ctx = EVP_PKEY_CTX_new_from_name(NULL, "DH", NULL)) == NULL) {
++		OSSL_PARAM_BLD_free(param_bld);
++		return SSH_ERR_ALLOC_FAIL;
++	}
++
++	if (OSSL_PARAM_BLD_push_BN(param_bld,
++	        OSSL_PKEY_PARAM_FFC_P, dh_p) != 1 ||
++	    OSSL_PARAM_BLD_push_BN(param_bld,
++	        OSSL_PKEY_PARAM_FFC_G, dh_g) != 1) {
++		error_f("Could not set p,q,g parameters");
++		r = SSH_ERR_LIBCRYPTO_ERROR;
++		goto out;
++	}
+ 	/*
+ 	 * Pollard Rho, Big step/Little Step attacks are O(sqrt(n)),
+ 	 * so double requested need here.
+ 	 */
+-	if (!DH_set_length(dh, MINIMUM(need * 2, pbits - 1)))
+-		return SSH_ERR_LIBCRYPTO_ERROR;
+-
+-	if (DH_generate_key(dh) == 0)
+-		return SSH_ERR_LIBCRYPTO_ERROR;
+-	DH_get0_key(dh, &pub_key, NULL);
+-	if (!dh_pub_is_valid(dh, pub_key))
+-		return SSH_ERR_INVALID_FORMAT;
+-	return 0;
++	if (OSSL_PARAM_BLD_push_int(param_bld,
++	        OSSL_PKEY_PARAM_DH_PRIV_LEN,
++		MINIMUM(need * 2, pbits - 1)) != 1 ||
++	    (params = OSSL_PARAM_BLD_to_param(param_bld)) == NULL) {
++		r = SSH_ERR_LIBCRYPTO_ERROR;
++		goto out;
++	}
++	if (EVP_PKEY_fromdata_init(ctx) != 1) {
++		r = SSH_ERR_LIBCRYPTO_ERROR;
++		goto out;
++	}
++	if (EVP_PKEY_fromdata(ctx, &pkey,
++	        EVP_PKEY_KEY_PARAMETERS, params) != 1) {
++		error_f("Failed key generation");
++		r = SSH_ERR_LIBCRYPTO_ERROR;
++		goto out;
++	}
++
++	/* reuse context for key generation */
++	EVP_PKEY_CTX_free(ctx);
++	ctx = NULL;
++
++	if ((ctx = EVP_PKEY_CTX_new_from_pkey(NULL, pkey, NULL)) == NULL ||
++	    EVP_PKEY_keygen_init(ctx) != 1) {
++		error_f("Could not create or init context");
++		r = SSH_ERR_LIBCRYPTO_ERROR;
++		goto out;
++	}
++	if (EVP_PKEY_generate(ctx, &pkey) != 1) {
++		error_f("Could not generate keys");
++		r = SSH_ERR_LIBCRYPTO_ERROR;
++		goto out;
++	}
++	if (EVP_PKEY_public_check(ctx) != 1) {
++		error_f("The public key is incorrect");
++		r = SSH_ERR_LIBCRYPTO_ERROR;
++		goto out;
++	}
++
++	if (EVP_PKEY_get_bn_param(pkey, OSSL_PKEY_PARAM_PUB_KEY,
++	    &pub_key) != 1 ||
++	    EVP_PKEY_get_bn_param(pkey, OSSL_PKEY_PARAM_PRIV_KEY,
++	    &priv_key) != 1 ||
++	    DH_set0_key(dh, pub_key, priv_key) != 1) {
++		error_f("Could not set pub/priv keys to DH struct");
++		r = SSH_ERR_LIBCRYPTO_ERROR;
++		goto out;
++	}
++
++	/* transferred */
++	pub_key = NULL;
++	priv_key = NULL;
++out:
++	OSSL_PARAM_free(params);
++	OSSL_PARAM_BLD_free(param_bld);
++	EVP_PKEY_CTX_free(ctx);
++	EVP_PKEY_free(pkey);
++	BN_clear_free(pub_key);
++	BN_clear_free(priv_key);
++	return r;
+ }
+ 
+ DH *
+diff --git a/kex.c b/kex.c
+index 71fbe5cb..ce6a7b81 100644
+--- a/kex.c
++++ b/kex.c
+@@ -1614,3 +1614,142 @@ kex_exchange_identification(struct ssh *ssh, int timeout_ms,
+ 	return r;
+ }
+ 
++#ifdef WITH_OPENSSL
++/* 
++ * Creates an EVP_PKEY from the given parameters and keys.
++ * The private key can be omitted.
++ */
++EVP_PKEY *
++sshkey_create_evp(OSSL_PARAM_BLD *param_bld, EVP_PKEY_CTX *ctx)
++{
++  	EVP_PKEY *ret = NULL;
++  	OSSL_PARAM *params = NULL;
++  	if (param_bld == NULL || ctx == NULL) {
++  		debug2_f("param_bld or ctx is NULL");
++  		return NULL;
++  	}
++  	if ((params = OSSL_PARAM_BLD_to_param(param_bld)) == NULL) {
++  		debug2_f("Could not build param list");
++  		return NULL;
++  	}
++  	if (EVP_PKEY_fromdata_init(ctx) != 1 ||
++  	    EVP_PKEY_fromdata(ctx, &ret, EVP_PKEY_KEYPAIR, params) != 1) {
++  		debug2_f("EVP_PKEY_fromdata failed");
++  		OSSL_PARAM_free(params);
++  		return NULL;
++  	}
++  	return ret;
++}
++
++int
++kex_create_evp_ec(EC_KEY *k, int ecdsa_nid, EVP_PKEY **pkey)
++{
++	OSSL_PARAM_BLD *param_bld = NULL;
++	EVP_PKEY_CTX *ctx = NULL;
++  	BN_CTX *bn_ctx = NULL;
++  	uint8_t *pub_ser = NULL;
++  	const char *group_name;
++  	const EC_POINT *pub = NULL;
++  	const BIGNUM *priv = NULL;
++  	int ret = 0;
++
++	if (k == NULL)
++    		return SSH_ERR_INVALID_ARGUMENT;
++  	if ((ctx = EVP_PKEY_CTX_new_from_name(NULL, "EC", NULL)) == NULL ||
++      	    (param_bld = OSSL_PARAM_BLD_new()) == NULL ||
++      	    (bn_ctx = BN_CTX_new()) == NULL) {
++    		ret = SSH_ERR_ALLOC_FAIL;
++    		goto out;
++  	}
++
++	if ((group_name = OSSL_EC_curve_nid2name(ecdsa_nid)) == NULL ||
++     	    OSSL_PARAM_BLD_push_utf8_string(param_bld,
++                OSSL_PKEY_PARAM_GROUP_NAME,
++                group_name,
++                strlen(group_name)) != 1) {
++    		ret = SSH_ERR_LIBCRYPTO_ERROR;
++    		goto out;
++	}
++  	if ((pub = EC_KEY_get0_public_key(k)) != NULL) {
++    		const EC_GROUP *group;
++    		size_t len;
++
++		group = EC_KEY_get0_group(k);
++		len = EC_POINT_point2oct(group, pub,
++		    POINT_CONVERSION_UNCOMPRESSED, NULL, 0, NULL);
++		if ((pub_ser = malloc(len)) == NULL) {
++			ret = SSH_ERR_ALLOC_FAIL;
++			goto out;
++		}
++		EC_POINT_point2oct(group,
++		    pub,
++		    POINT_CONVERSION_UNCOMPRESSED,
++		    pub_ser,
++		    len,
++		    bn_ctx);
++		if (OSSL_PARAM_BLD_push_octet_string(param_bld,
++		    OSSL_PKEY_PARAM_PUB_KEY,
++		    pub_ser,
++		    len) != 1) {
++			ret = SSH_ERR_LIBCRYPTO_ERROR;
++			goto out;
++		}
++	}
++  	if ((priv = EC_KEY_get0_private_key(k)) != NULL &&
++	    OSSL_PARAM_BLD_push_BN(param_bld,
++               OSSL_PKEY_PARAM_PRIV_KEY, priv) != 1) {
++		ret = SSH_ERR_LIBCRYPTO_ERROR;
++		goto out;
++  	}
++  	if ((*pkey = sshkey_create_evp(param_bld, ctx)) == NULL) {
++    		ret = SSH_ERR_LIBCRYPTO_ERROR;
++    		goto out;
++  	}
++
++out:
++  	OSSL_PARAM_BLD_free(param_bld);
++  	EVP_PKEY_CTX_free(ctx);
++  	BN_CTX_free(bn_ctx);
++  	free(pub_ser);
++  	return ret;
++}
++
++int
++kex_create_evp_dh(EVP_PKEY **pkey, const BIGNUM *p, const BIGNUM *q,
++    const BIGNUM *g, const BIGNUM *pub, const BIGNUM *priv)
++{
++	OSSL_PARAM_BLD *param_bld = NULL;
++	EVP_PKEY_CTX *ctx = NULL;
++	int r = 0;
++
++	/* create EVP_PKEY-DH key */
++	if ((ctx = EVP_PKEY_CTX_new_from_name(NULL, "DH", NULL)) == NULL ||
++	    (param_bld = OSSL_PARAM_BLD_new()) == NULL) {
++		error_f("EVP_PKEY_CTX or PARAM_BLD init failed");
++		r = SSH_ERR_ALLOC_FAIL;
++		goto out;
++	}
++	if (OSSL_PARAM_BLD_push_BN(param_bld, OSSL_PKEY_PARAM_FFC_P, p) != 1 ||
++	    OSSL_PARAM_BLD_push_BN(param_bld, OSSL_PKEY_PARAM_FFC_Q, q) != 1 ||
++	    OSSL_PARAM_BLD_push_BN(param_bld, OSSL_PKEY_PARAM_FFC_G, g) != 1 ||
++	    OSSL_PARAM_BLD_push_BN(param_bld,
++	        OSSL_PKEY_PARAM_PUB_KEY, pub) != 1) {
++		error_f("Failed pushing params to OSSL_PARAM_BLD");
++		r = SSH_ERR_LIBCRYPTO_ERROR;
++		goto out;
++	}
++	if (priv != NULL &&
++	    OSSL_PARAM_BLD_push_BN(param_bld,
++	        OSSL_PKEY_PARAM_PRIV_KEY, priv) != 1) {
++		error_f("Failed pushing private key to OSSL_PARAM_BLD");
++		r = SSH_ERR_LIBCRYPTO_ERROR;
++		goto out;
++	}
++	if ((*pkey = sshkey_create_evp(param_bld, ctx)) == NULL)
++		r = SSH_ERR_LIBCRYPTO_ERROR;
++out:
++	OSSL_PARAM_BLD_free(param_bld);
++	EVP_PKEY_CTX_free(ctx);
++	return r;
++}
++#endif /* WITH_OPENSSL */
+diff --git a/kex.h b/kex.h
+index 6a55aadf..48f3bb87 100644
+--- a/kex.h
++++ b/kex.h
+@@ -37,6 +37,9 @@
+ # include <openssl/bn.h>
+ # include <openssl/dh.h>
+ # include <openssl/ecdsa.h>
++# include <openssl/evp.h>
++# include <openssl/core_names.h>
++# include <openssl/param_build.h>
+ # ifdef OPENSSL_HAS_ECC
+ #  include <openssl/ec.h>
+ # else /* OPENSSL_HAS_ECC */
+@@ -311,6 +314,9 @@ int	kexc25519_shared_key_ext(const u_char key[CURVE25519_SIZE],
+     const u_char pub[CURVE25519_SIZE], struct sshbuf *out, int)
+ 	__attribute__((__bounded__(__minbytes__, 1, CURVE25519_SIZE)))
+ 	__attribute__((__bounded__(__minbytes__, 2, CURVE25519_SIZE)));
++int	kex_create_evp_dh(EVP_PKEY **, const BIGNUM *, const BIGNUM *,
++    const BIGNUM *, const BIGNUM *, const BIGNUM *);
++int    kex_create_evp_ec(EC_KEY *k, int ecdsa_nid, EVP_PKEY **pkey);
+ 
+ #if defined(DEBUG_KEX) || defined(DEBUG_KEXDH) || defined(DEBUG_KEXECDH)
+ void	dump_digest(const char *, const u_char *, int);
+diff --git a/kexdh.c b/kexdh.c
+index 0faab21b..32e1de51 100644
+--- a/kexdh.c
++++ b/kexdh.c
+@@ -35,6 +35,10 @@
+ 
+ #include "openbsd-compat/openssl-compat.h"
+ #include <openssl/dh.h>
++#include <openssl/err.h>
++#include <openssl/evp.h>
++#include <openssl/core_names.h>
++#include <openssl/param_build.h>
+ 
+ #include "sshkey.h"
+ #include "kex.h"
+@@ -83,9 +87,12 @@ int
+ kex_dh_compute_key(struct kex *kex, BIGNUM *dh_pub, struct sshbuf *out)
+ {
+ 	BIGNUM *shared_secret = NULL;
++	const BIGNUM *pub, *priv, *p, *q, *g;
++	EVP_PKEY *pkey = NULL, *dh_pkey = NULL;
++	EVP_PKEY_CTX *ctx = NULL;
+ 	u_char *kbuf = NULL;
+ 	size_t klen = 0;
+-	int kout, r;
++	int r = 0;
+ 
+ #ifdef DEBUG_KEXDH
+ 	fprintf(stderr, "dh_pub= ");
+@@ -100,24 +107,59 @@ kex_dh_compute_key(struct kex *kex, BIGNUM *dh_pub, struct sshbuf *out)
+ 		r = SSH_ERR_MESSAGE_INCOMPLETE;
+ 		goto out;
+ 	}
+-	klen = DH_size(kex->dh);
++
++	DH_get0_key(kex->dh, &pub, &priv);
++	DH_get0_pqg(kex->dh, &p, &q, &g);
++	/* import key */
++	r = kex_create_evp_dh(&pkey, p, q, g, pub, priv);
++	if (r != 0) {
++		error_f("Could not create EVP_PKEY for dh");
++		ERR_print_errors_fp(stderr);
++		goto out;
++	}
++	/* import peer key 
++	 * the parameters should be the same as with pkey
++	 */
++	r = kex_create_evp_dh(&dh_pkey, p, q, g, dh_pub, NULL);
++	if (r != 0) {
++		error_f("Could not import peer key for dh");
++		ERR_print_errors_fp(stderr);
++		goto out;
++	}
++
++	if ((ctx = EVP_PKEY_CTX_new_from_pkey(NULL, pkey, NULL)) == NULL) {
++		error_f("Could not init EVP_PKEY_CTX for dh");
++		r = SSH_ERR_ALLOC_FAIL;
++		goto out;
++	}
++	if (EVP_PKEY_derive_init(ctx) != 1 ||
++	    EVP_PKEY_derive_set_peer(ctx, dh_pkey) != 1 ||
++	    EVP_PKEY_derive(ctx, NULL, &klen) != 1) {
++		error_f("Could not get key size");
++		r = SSH_ERR_LIBCRYPTO_ERROR;
++		goto out;
++	}
+ 	if ((kbuf = malloc(klen)) == NULL ||
+ 	    (shared_secret = BN_new()) == NULL) {
+ 		r = SSH_ERR_ALLOC_FAIL;
+ 		goto out;
+ 	}
+-	if ((kout = DH_compute_key(kbuf, dh_pub, kex->dh)) < 0 ||
+-	    BN_bin2bn(kbuf, kout, shared_secret) == NULL) {
++	if (EVP_PKEY_derive(ctx, kbuf, &klen) != 1 ||
++	    BN_bin2bn(kbuf, klen, shared_secret) == NULL) {
++		error_f("Could not derive key");
+ 		r = SSH_ERR_LIBCRYPTO_ERROR;
+ 		goto out;
+ 	}
+ #ifdef DEBUG_KEXDH
+-	dump_digest("shared secret", kbuf, kout);
++	dump_digest("shared secret", kbuf, klen);
+ #endif
+ 	r = sshbuf_put_bignum2(out, shared_secret);
+  out:
+ 	freezero(kbuf, klen);
+ 	BN_clear_free(shared_secret);
++	EVP_PKEY_free(pkey);
++	EVP_PKEY_free(dh_pkey);
++	EVP_PKEY_CTX_free(ctx);
+ 	return r;
+ }
+ 
+diff --git a/kexecdh.c b/kexecdh.c
+index efb2e55a..d92ba54f 100644
+--- a/kexecdh.c
++++ b/kexecdh.c
+@@ -35,17 +35,57 @@
+ #include <signal.h>
+ 
+ #include <openssl/ecdh.h>
++#include <openssl/evp.h>
++#include <openssl/core_names.h>
++#include <openssl/param_build.h>
++#include <openssl/err.h>
+ 
+ #include "sshkey.h"
+ #include "kex.h"
+ #include "sshbuf.h"
+ #include "digest.h"
+ #include "ssherr.h"
++#include "log.h"
+ 
+ static int
+ kex_ecdh_dec_key_group(struct kex *, const struct sshbuf *, EC_KEY *key,
+     const EC_GROUP *, struct sshbuf **);
+ 
++static EC_KEY *
++generate_ec_keys(int ec_nid)
++{
++	EC_KEY *client_key = NULL;
++	EVP_PKEY *pkey = NULL;
++	EVP_PKEY_CTX *ctx = NULL;
++	OSSL_PARAM_BLD *param_bld = NULL;
++	OSSL_PARAM *params = NULL;
++	const char *group_name;
++
++	if ((ctx = EVP_PKEY_CTX_new_from_name(NULL, "EC", NULL)) == NULL ||
++	    (param_bld = OSSL_PARAM_BLD_new()) == NULL)
++		goto out;
++	if ((group_name = OSSL_EC_curve_nid2name(ec_nid)) == NULL ||
++	    OSSL_PARAM_BLD_push_utf8_string(param_bld,
++	        OSSL_PKEY_PARAM_GROUP_NAME, group_name, 0) != 1 ||
++	    (params = OSSL_PARAM_BLD_to_param(param_bld)) == NULL) {
++		error_f("Could not create OSSL_PARAM");
++		goto out;
++	}
++	if (EVP_PKEY_keygen_init(ctx) != 1 ||
++	    EVP_PKEY_CTX_set_params(ctx, params) != 1 ||
++	    EVP_PKEY_generate(ctx, &pkey) != 1 ||
++	    (client_key = EVP_PKEY_get1_EC_KEY(pkey)) == NULL) {
++		error_f("Could not generate ec keys");
++		goto out;
++	}
++out:
++	EVP_PKEY_free(pkey);
++	EVP_PKEY_CTX_free(ctx);
++	OSSL_PARAM_BLD_free(param_bld);
++	OSSL_PARAM_free(params);
++	return client_key;
++}
++
+ int
+ kex_ecdh_keypair(struct kex *kex)
+ {
+@@ -55,11 +95,7 @@ kex_ecdh_keypair(struct kex *kex)
+ 	struct sshbuf *buf = NULL;
+ 	int r;
+ 
+-	if ((client_key = EC_KEY_new_by_curve_name(kex->ec_nid)) == NULL) {
+-		r = SSH_ERR_ALLOC_FAIL;
+-		goto out;
+-	}
+-	if (EC_KEY_generate_key(client_key) != 1) {
++	if ((client_key = generate_ec_keys(kex->ec_nid)) == NULL) {
+ 		r = SSH_ERR_LIBCRYPTO_ERROR;
+ 		goto out;
+ 	}
+@@ -101,11 +137,7 @@ kex_ecdh_enc(struct kex *kex, const struct sshbuf *client_blob,
+ 	*server_blobp = NULL;
+ 	*shared_secretp = NULL;
+ 
+-	if ((server_key = EC_KEY_new_by_curve_name(kex->ec_nid)) == NULL) {
+-		r = SSH_ERR_ALLOC_FAIL;
+-		goto out;
+-	}
+-	if (EC_KEY_generate_key(server_key) != 1) {
++	if ((server_key = generate_ec_keys(kex->ec_nid)) == NULL) {
+ 		r = SSH_ERR_LIBCRYPTO_ERROR;
+ 		goto out;
+ 	}
+@@ -140,11 +172,21 @@ kex_ecdh_dec_key_group(struct kex *kex, const struct sshbuf *ec_blob,
+ {
+ 	struct sshbuf *buf = NULL;
+ 	BIGNUM *shared_secret = NULL;
+-	EC_POINT *dh_pub = NULL;
+-	u_char *kbuf = NULL;
+-	size_t klen = 0;
++	EVP_PKEY_CTX *ctx = NULL;
++	EVP_PKEY *pkey = NULL, *dh_pkey = NULL;
++	OSSL_PARAM_BLD *param_bld = NULL;
++	OSSL_PARAM *params = NULL;
++	u_char *kbuf = NULL, *pub = NULL;
++	size_t klen = 0, publen;
++	const char *group_name;
+ 	int r;
+ 
++	/* import EC_KEY to EVP_PKEY */
++	if ((r = kex_create_evp_ec(key, kex->ec_nid, &pkey)) != 0) {
++		error_f("Could not create EVP_PKEY");
++		goto out;
++	}
++
+ 	*shared_secretp = NULL;
+ 
+ 	if ((buf = sshbuf_new()) == NULL) {
+@@ -153,45 +195,82 @@ kex_ecdh_dec_key_group(struct kex *kex, const struct sshbuf *ec_blob,
+ 	}
+ 	if ((r = sshbuf_put_stringb(buf, ec_blob)) != 0)
+ 		goto out;
+-	if ((dh_pub = EC_POINT_new(group)) == NULL) {
++
++	/* the public key is in the buffer in octet string UNCOMPRESSED
++	 * format. See sshbuf_put_ec */
++	if ((r = sshbuf_get_string(buf, &pub, &publen)) != 0)
++		goto out;
++	sshbuf_reset(buf);
++	if ((ctx = EVP_PKEY_CTX_new_from_pkey(NULL, pkey, NULL)) == NULL ||
++	    (param_bld = OSSL_PARAM_BLD_new()) == NULL) {
+ 		r = SSH_ERR_ALLOC_FAIL;
+ 		goto out;
+ 	}
+-	if ((r = sshbuf_get_ec(buf, dh_pub, group)) != 0) {
++	if ((group_name = OSSL_EC_curve_nid2name(kex->ec_nid)) == NULL) {
++		r = SSH_ERR_LIBCRYPTO_ERROR;
++		goto out;
++	}
++	if (OSSL_PARAM_BLD_push_octet_string(param_bld,
++	        OSSL_PKEY_PARAM_PUB_KEY, pub, publen) != 1 ||
++	    OSSL_PARAM_BLD_push_utf8_string(param_bld,
++	        OSSL_PKEY_PARAM_GROUP_NAME, group_name, 0) != 1 ||
++	    (params = OSSL_PARAM_BLD_to_param(param_bld)) == NULL) {
++		error_f("Failed to set params for dh_pkey");
++		r = SSH_ERR_LIBCRYPTO_ERROR;
++		goto out;
++	}
++	if (EVP_PKEY_fromdata_init(ctx) != 1 ||
++	    EVP_PKEY_fromdata(ctx, &dh_pkey,
++	        EVP_PKEY_PUBLIC_KEY, params) != 1 ||
++	    EVP_PKEY_public_check(ctx) != 1) {
++		error_f("Peer public key import failed");
++		r = SSH_ERR_LIBCRYPTO_ERROR;
+ 		goto out;
+ 	}
+-	sshbuf_reset(buf);
+ 
+ #ifdef DEBUG_KEXECDH
+ 	fputs("public key:\n", stderr);
+-	sshkey_dump_ec_point(group, dh_pub);
++	EVP_PKEY_print_public_fp(stderr, dh_pkey, 0, NULL);
+ #endif
+-	if (sshkey_ec_validate_public(group, dh_pub) != 0) {
+-		r = SSH_ERR_MESSAGE_INCOMPLETE;
++	EVP_PKEY_CTX_free(ctx);
++	ctx = NULL;
++	if ((ctx = EVP_PKEY_CTX_new_from_pkey(NULL, pkey, NULL)) == NULL ||
++	    EVP_PKEY_derive_init(ctx) != 1 ||
++	    EVP_PKEY_derive_set_peer(ctx, dh_pkey) != 1 ||
++	    EVP_PKEY_derive(ctx, NULL, &klen) != 1) {
++		error_f("Failed to get derive information");
++		r = SSH_ERR_LIBCRYPTO_ERROR;
+ 		goto out;
+ 	}
+-	klen = (EC_GROUP_get_degree(group) + 7) / 8;
+-	if ((kbuf = malloc(klen)) == NULL ||
+-	    (shared_secret = BN_new()) == NULL) {
++	if ((kbuf = malloc(klen)) == NULL) {
+ 		r = SSH_ERR_ALLOC_FAIL;
+ 		goto out;
+ 	}
+-	if (ECDH_compute_key(kbuf, klen, dh_pub, key, NULL) != (int)klen ||
+-	    BN_bin2bn(kbuf, klen, shared_secret) == NULL) {
++	if (EVP_PKEY_derive(ctx, kbuf, &klen) != 1) {
+ 		r = SSH_ERR_LIBCRYPTO_ERROR;
+ 		goto out;
+ 	}
+ #ifdef DEBUG_KEXECDH
+ 	dump_digest("shared secret", kbuf, klen);
+ #endif
++	if ((shared_secret = BN_new()) == NULL ||
++	    (BN_bin2bn(kbuf, klen, shared_secret) == NULL)) {
++		r = SSH_ERR_ALLOC_FAIL;
++		goto out;
++	}
+ 	if ((r = sshbuf_put_bignum2(buf, shared_secret)) != 0)
+ 		goto out;
+ 	*shared_secretp = buf;
+ 	buf = NULL;
+  out:
+-	EC_POINT_clear_free(dh_pub);
++	EVP_PKEY_CTX_free(ctx);
++	EVP_PKEY_free(pkey);
++	EVP_PKEY_free(dh_pkey);
++	OSSL_PARAM_BLD_free(param_bld);
++	OSSL_PARAM_free(params);
+ 	BN_clear_free(shared_secret);
+ 	freezero(kbuf, klen);
++	freezero(pub, publen);
+ 	sshbuf_free(buf);
+ 	return r;
+ }
+-- 
+2.49.0
+

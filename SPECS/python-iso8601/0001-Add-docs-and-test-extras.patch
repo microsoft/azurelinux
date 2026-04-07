@@ -1,0 +1,40 @@
+From 9cfdc09dad98a62c17a0e84c2b348cff726d0b87 Mon Sep 17 00:00:00 2001
+From: Carl George <carlwgeorge@gmail.com>
+Date: Fri, 20 Dec 2024 02:35:10 -0600
+Subject: [PATCH] Add docs and test extras
+
+This makes it easier to install just documentation or test dependencies
+without installing all dev dependencies.
+---
+ pyproject.toml | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 77cad0a..c5b1d92 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -11,6 +11,10 @@ documentation = "https://pyiso8601.readthedocs.io/en/latest/"
+ 
+ [tool.poetry.dependencies]
+ python = ">=3.7,<4.0"
++pytest = { version = "*", optional = true }
++hypothesis = { version = "*", optional = true }
++pytz = { version = "*", optional = true }
++Sphinx = { version = "*", optional = true }
+ 
+ [tool.poetry.group.dev.dependencies]
+ mypy = "*"
+@@ -24,6 +28,10 @@ Sphinx = "*"
+ changelog-manager = "*"
+ ruff = "*"
+ 
++[tool.poetry.extras]
++docs = ["Sphinx"]
++test = ["pytest", "hypothesis", "pytz"]
++
+ [build-system]
+ requires = ["poetry-core>=1.0.0"]
+ build-backend = "poetry.core.masonry.api"
+-- 
+2.47.1
+

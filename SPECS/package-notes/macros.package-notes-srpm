@@ -1,0 +1,29 @@
+# This file is part of the package-notes package.
+#
+# Add an ELF note with information about the package the code was compiled for.
+# See https://fedoraproject.org/wiki/Changes/Package_information_on_ELF_objects
+# for details.
+#
+# To opt out of the use of this feature completely, include this in the spec
+# file:
+#
+#   %undefine _package_note_flags
+#
+# Which linker will be used? This should be either "bfd", "gold", "mold", or "lld".
+#
+# (The default linker for clang on armv7hl is lld.)
+%_package_note_linker   %["%_target_cpu" == "armv7hl" && "%{toolchain}" == "clang" ? "lld" : "bfd"]
+
+# These are defined for backwards compatibility. Do not use.
+%_package_note_file     1
+%_generate_package_note_file %{nil}
+
+# Overall status: 1 if looks like we can insert the note, 0 otherwise
+# Unfortunately "clang" does not support specs files so the note insertion is disabled when using it.
+%_package_note_status   %{!?_package_note_flags:0}%{?_package_note_flags:%[0%{?_package_note_file:1} && 0%{?name:1} && "%_target_cpu" != "noarch" && "%{toolchain}" != "clang" ? 1 : 0]}
+
+
+# The linker flags to be passed to the compiler to insert the notes section will
+# be created by the spec file, to avoid issues with quoting and escaping across
+# different build systems and shells.
+%_package_note_flags    %[%_package_note_status ? "-specs=/usr/lib/rpm/redhat/redhat-package-notes" : ""]

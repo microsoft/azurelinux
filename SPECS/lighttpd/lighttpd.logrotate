@@ -1,0 +1,15 @@
+
+# Warning: Using logrotate together with `max-workers` Lighty option is
+# a pretty complicated thing:
+# https://redmine.lighttpd.net/projects/1/wiki/Docs_ModAccesslog
+# If you use max-workers, you probably want cronolog, which in turn means
+# you shouldn't be using logrotate at all.
+
+/var/log/lighttpd/*log {
+    missingok
+    notifempty
+    sharedscripts
+    postrotate
+        /usr/bin/systemctl kill --signal=HUP --kill-whom=main lighttpd.service 2>/dev/null || true
+    endscript
+}

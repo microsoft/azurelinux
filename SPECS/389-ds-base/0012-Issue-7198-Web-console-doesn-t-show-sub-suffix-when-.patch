@@ -1,0 +1,517 @@
+From 8d87a9dba330e8a584bcc9dc9710099bcf720339 Mon Sep 17 00:00:00 2001
+From: Simon Pichugin <spichugi@redhat.com>
+Date: Fri, 23 Jan 2026 17:35:45 -0800
+Subject: [PATCH] Issue 7198 - Web console doesn't show sub-suffix when
+ parent-suffix points to an entry (#7202)
+
+Description: The web console doesn't show sub-suffixes when the
+nsslapd-parent-suffix attribute points to an entry rather than a backend
+suffix.
+For example, creating a sub-suffix ou=foo,ou=people,dc=example,dc=com
+with parent-suffix ou=people,dc=example,dc=com (where ou=people is just an
+entry, not a suffix) would not appear in the web console tree.
+
+Fix: In backend_build_tree() and get_sub_suffixes(), the code only matched
+when nsslapd-parent-suffix exactly equaled an existing backend suffix.
+Now it also checks if the parent-suffix is an entry under the current
+suffix (ends with ,suffix) and is not itself a backend suffix. This
+correctly attaches sub-suffixes to their containing suffix when the
+parent-suffix points to an intermediate entry.
+
+Fixes: https://github.com/389ds/389-ds-base/issues/7198
+
+Reviewed by: @progier389 (Thanks!)
+---
+ .../suites/lib389/subsuffix_tree_test.py      | 313 ++++++++++++++++++
+ src/lib389/lib389/backend.py                  |  47 ++-
+ src/lib389/lib389/cli_conf/backend.py         |  34 +-
+ 3 files changed, 370 insertions(+), 24 deletions(-)
+ create mode 100644 dirsrvtests/tests/suites/lib389/subsuffix_tree_test.py
+
+diff --git a/dirsrvtests/tests/suites/lib389/subsuffix_tree_test.py b/dirsrvtests/tests/suites/lib389/subsuffix_tree_test.py
+new file mode 100644
+index 000000000..fa10ba530
+--- /dev/null
++++ b/dirsrvtests/tests/suites/lib389/subsuffix_tree_test.py
+@@ -0,0 +1,313 @@
++# --- BEGIN COPYRIGHT BLOCK ---
++# Copyright (C) 2026 Red Hat, Inc.
++# All rights reserved.
++#
++# License: GPL (version 3 or any later version).
++# See LICENSE for details.
++# --- END COPYRIGHT BLOCK ---
++#
++import logging
++import os
++import pytest
++from lib389.topologies import topology_st as topo
++from lib389.backend import Backends
++from lib389.idm.organizationalunit import OrganizationalUnits
++from lib389._constants import DEFAULT_SUFFIX
++
++pytestmark = pytest.mark.tier1
++
++logging.getLogger(__name__).setLevel(logging.INFO)
++log = logging.getLogger(__name__)
++
++
++@pytest.fixture(scope="function")
++def setup_subsuffix_with_entry_parent(topo, request):
++    """Setup a sub-suffix whose parent-suffix points to an entry, not a suffix."""
++    inst = topo.standalone
++
++    # Create ou=people entry under the root suffix
++    log.info("Creating ou=people,dc=example,dc=com entry")
++    ous = OrganizationalUnits(inst, DEFAULT_SUFFIX)
++    ou_people = ous.get('people')
++
++    # Create sub-suffix with parent-suffix pointing to the entry
++    log.info("Creating sub-suffix ou=foo,ou=people,dc=example,dc=com")
++    backends = Backends(inst)
++    subsuffix_dn = 'ou=foo,ou=people,dc=example,dc=com'
++    parent_suffix_dn = 'ou=people,dc=example,dc=com'
++
++    foo_backend = backends.create(properties={
++        'cn': 'foo',
++        'nsslapd-suffix': subsuffix_dn,
++        'parent': parent_suffix_dn,
++    })
++
++    # Create the suffix entry
++    foo_ous = OrganizationalUnits(inst, parent_suffix_dn)
++    foo_ou = foo_ous.create(properties={'ou': 'foo'})
++
++    def cleanup():
++        log.info("Cleaning up test backends and entries")
++        try:
++            foo_ou.delete()
++        except Exception as e:
++            log.warning(f"Failed to delete foo_ou: {e}")
++        try:
++            foo_backend.delete()
++        except Exception as e:
++            log.warning(f"Failed to delete foo_backend: {e}")
++
++    request.addfinalizer(cleanup)
++
++    return {
++        'instance': inst,
++        'backends': backends,
++        'foo_backend': foo_backend,
++        'ou_people': ou_people,
++        'subsuffix_dn': subsuffix_dn,
++        'parent_suffix_dn': parent_suffix_dn,
++    }
++
++
++def test_subsuffix_with_entry_parent_in_tree(topo, setup_subsuffix_with_entry_parent):
++    """Test that a sub-suffix with parent pointing to an entry is visible in the tree.
++
++    :id: 256f36f5-76ad-4043-ad8d-1f9e2afc4e1d
++    :setup: Standalone instance with sub-suffix whose parent is an entry
++    :steps:
++        1. Verify the sub-suffix backend exists
++        2. Get sub-suffixes of the root backend
++        3. Verify the sub-suffix appears in the list
++    :expectedresults:
++        1. Backend should exist
++        2. Sub-suffixes should be retrievable
++        3. Sub-suffix should be visible (this is where the bug manifested)
++    """
++    backends = setup_subsuffix_with_entry_parent['backends']
++    foo_backend = setup_subsuffix_with_entry_parent['foo_backend']
++    subsuffix_dn = setup_subsuffix_with_entry_parent['subsuffix_dn']
++
++    # Step 1: Verify the sub-suffix backend exists
++    assert foo_backend.exists(), "The foo backend should exist"
++
++    # Step 2: Get sub-suffixes of the root backend
++    root_backend = backends.get(DEFAULT_SUFFIX)
++    sub_suffixes = root_backend.get_sub_suffixes()
++    log.info(f"Sub-suffixes found: {[s.get_attr_val_utf8('nsslapd-suffix') for s in sub_suffixes]}")
++
++    # Step 3: Verify sub-suffix is in the list
++    sub_suffix_found = any(
++        s.get_attr_val_utf8_l('nsslapd-suffix') == subsuffix_dn.lower()
++        for s in sub_suffixes
++    )
++
++    assert sub_suffix_found, (
++        f"Sub-suffix {subsuffix_dn} should be visible in get_sub_suffixes(). "
++        "The parent-suffix points to an entry, not a backend suffix."
++    )
++
++
++def test_subsuffix_in_backend_list(topo, setup_subsuffix_with_entry_parent):
++    """Test that the sub-suffix appears in the backend list.
++
++    :id: 0ccc49af-91bb-4e8f-b0e1-1bd0b75c041b
++    :setup: Standalone instance with sub-suffix configuration
++    :steps:
++        1. Get all backends
++        2. Verify both root suffix and sub-suffix are present
++    :expectedresults:
++        1. Should retrieve all backends
++        2. Both suffixes should be listed
++    """
++    backends = setup_subsuffix_with_entry_parent['backends']
++    subsuffix_dn = setup_subsuffix_with_entry_parent['subsuffix_dn']
++
++    be_list = backends.list()
++    suffixes = [be.get_attr_val_utf8_l('nsslapd-suffix') for be in be_list]
++
++    assert DEFAULT_SUFFIX.lower() in suffixes, \
++        f"Root suffix {DEFAULT_SUFFIX} should be in the list"
++    assert subsuffix_dn.lower() in suffixes, \
++        f"Sub-suffix {subsuffix_dn} should be in the list"
++
++
++def test_subsuffix_dn_boundary_matching():
++    """Test that suffix matching respects DN component boundaries.
++
++    :id: 0b856e26-c394-4c36-b9ba-d7894aa2ed11
++    :setup: None (unit test)
++    :steps:
++        1. Test exact suffix match
++        2. Test proper DN ancestor match (ends with ,suffix)
++        3. Test that partial string matches are rejected
++    :expectedresults:
++        1. Exact match should return True
++        2. Proper ancestor should return True
++        3. Partial string match should return False
++    """
++    from lib389.backend import is_subsuffix_of
++
++    all_suffixes = {'dc=com', 'dc=example,dc=com', 'ou=dept,dc=example,dc=com'}
++
++    # Test 1: Exact match
++    assert is_subsuffix_of('dc=example,dc=com', 'dc=example,dc=com', all_suffixes), \
++        "Exact match should return True"
++
++    # Test 2: Parent is an entry under the suffix (not itself a suffix)
++    assert is_subsuffix_of('ou=people,dc=example,dc=com', 'dc=example,dc=com', all_suffixes), \
++        "Parent entry under suffix should return True"
++
++    # Test 3: Parent IS a suffix - should return False (handled separately)
++    assert not is_subsuffix_of('ou=dept,dc=example,dc=com', 'dc=example,dc=com', all_suffixes), \
++        "Parent that is itself a suffix should return False"
++
++    # Test 4: Edge case - wrong DN boundary (string ends with suffix but wrong boundary)
++    edge_suffixes = {'dc=com', 'st,dc=com'}
++    assert is_subsuffix_of('dc=test,dc=com', 'dc=com', edge_suffixes), \
++        "dc=test,dc=com should match dc=com"
++    assert not is_subsuffix_of('dc=test,dc=com', 'st,dc=com', edge_suffixes), \
++        "dc=test,dc=com should NOT match st,dc=com (wrong DN boundary)"
++
++    # Test 5: None input
++    assert not is_subsuffix_of(None, 'dc=com', all_suffixes), \
++        "None parent should return False"
++
++    # Test 6: Closest ancestor - should only match the nearest suffix
++    # Hierarchy: dc=com -> dc=example,dc=com -> ou=branch,dc=example,dc=com (suffix)
++    #            -> ou=dept,ou=branch,dc=example,dc=com (entry) -> subsuffix
++    # The subsuffix should only appear under ou=branch, not under dc=example,dc=com
++    nested_suffixes = {'dc=com', 'dc=example,dc=com', 'ou=branch,dc=example,dc=com'}
++    entry_parent = 'ou=dept,ou=branch,dc=example,dc=com'
++    # Should match ou=branch (closest)
++    assert is_subsuffix_of(entry_parent, 'ou=branch,dc=example,dc=com', nested_suffixes), \
++        "Should match closest ancestor suffix (ou=branch)"
++    # Should NOT match dc=example,dc=com (not closest)
++    assert not is_subsuffix_of(entry_parent, 'dc=example,dc=com', nested_suffixes), \
++        "Should NOT match distant ancestor (dc=example) - ou=branch is closer"
++    # Should NOT match dc=com (not closest)
++    assert not is_subsuffix_of(entry_parent, 'dc=com', nested_suffixes), \
++        "Should NOT match distant ancestor (dc=com) - ou=branch is closer"
++
++    log.info("All DN boundary edge cases passed")
++
++
++def test_deep_suffix_hierarchy(topo, request):
++    """Test complex hierarchy: suffix -> suffix -> entry -> suffix -> suffix.
++
++    :id: fd06491a-defa-4780-8472-78c077febdfb
++    :setup: Standalone instance
++    :steps:
++        1. Create sub-suffix ou=branch (parent=dc=example,dc=com - a suffix)
++        2. Create entry ou=dept,ou=branch (not a suffix)
++        3. Create sub-suffix ou=team,ou=dept,ou=branch (parent=ou=dept - an entry)
++        4. Create sub-suffix ou=sub,ou=team,ou=dept,ou=branch (parent=ou=team - a suffix)
++        5. Verify all sub-suffixes are correctly placed in the tree
++    :expectedresults:
++        1. Sub-suffix created successfully
++        2. Entry created successfully
++        3. Sub-suffix with entry parent created successfully
++        4. Sub-suffix with suffix parent created successfully
++        5. Tree hierarchy is correct
++    """
++    inst = topo.standalone
++    backends = Backends(inst)
++
++    # Define the hierarchy
++    branch_suffix = f'ou=branch,{DEFAULT_SUFFIX}'
++    dept_entry = f'ou=dept,{branch_suffix}'  # This is an ENTRY, not a suffix
++    team_suffix = f'ou=team,{dept_entry}'
++    sub_suffix = f'ou=sub,{team_suffix}'
++
++    created_backends = []
++    created_entries = []
++
++    def cleanup():
++        log.info("Cleaning up deep hierarchy test")
++        for entry in reversed(created_entries):
++            try:
++                entry.delete()
++            except Exception as e:
++                log.warning(f"Failed to delete entry: {e}")
++        for be in reversed(created_backends):
++            try:
++                be.delete()
++            except Exception as e:
++                log.warning(f"Failed to delete backend: {e}")
++
++    request.addfinalizer(cleanup)
++
++    # Step 1: Create ou=branch sub-suffix (parent is root suffix)
++    log.info(f"Creating sub-suffix {branch_suffix}")
++    branch_be = backends.create(properties={
++        'cn': 'branch',
++        'nsslapd-suffix': branch_suffix,
++        'parent': DEFAULT_SUFFIX,
++    })
++    created_backends.append(branch_be)
++    branch_ous = OrganizationalUnits(inst, DEFAULT_SUFFIX)
++    branch_ou = branch_ous.create(properties={'ou': 'branch'})
++    created_entries.append(branch_ou)
++
++    # Step 2: Create ou=dept entry under branch (NOT a suffix)
++    log.info(f"Creating entry {dept_entry}")
++    dept_ous = OrganizationalUnits(inst, branch_suffix)
++    dept_ou = dept_ous.create(properties={'ou': 'dept'})
++    created_entries.append(dept_ou)
++
++    # Step 3: Create ou=team sub-suffix (parent is dept ENTRY, not a suffix)
++    log.info(f"Creating sub-suffix {team_suffix} with entry parent {dept_entry}")
++    team_be = backends.create(properties={
++        'cn': 'team',
++        'nsslapd-suffix': team_suffix,
++        'parent': dept_entry,  # Parent is an ENTRY!
++    })
++    created_backends.append(team_be)
++    team_ous = OrganizationalUnits(inst, dept_entry)
++    team_ou = team_ous.create(properties={'ou': 'team'})
++    created_entries.append(team_ou)
++
++    # Step 4: Create ou=sub sub-suffix (parent is team suffix)
++    log.info(f"Creating sub-suffix {sub_suffix} with suffix parent {team_suffix}")
++    sub_be = backends.create(properties={
++        'cn': 'sub',
++        'nsslapd-suffix': sub_suffix,
++        'parent': team_suffix,  # Parent is a SUFFIX
++    })
++    created_backends.append(sub_be)
++    sub_ous = OrganizationalUnits(inst, team_suffix)
++    sub_ou = sub_ous.create(properties={'ou': 'sub'})
++    created_entries.append(sub_ou)
++
++    # Step 5: Verify the tree hierarchy
++    log.info("Verifying tree hierarchy...")
++
++    # Root should have branch as sub-suffix
++    root_be = backends.get(DEFAULT_SUFFIX)
++    root_subs = root_be.get_sub_suffixes()
++    root_sub_suffixes = [s.get_attr_val_utf8_l('nsslapd-suffix') for s in root_subs]
++    log.info(f"Root sub-suffixes: {root_sub_suffixes}")
++    assert branch_suffix.lower() in root_sub_suffixes, \
++        f"branch should be under root suffix"
++
++    # Branch should have team as sub-suffix (even though team's parent is an entry)
++    branch_be_obj = backends.get(branch_suffix)
++    branch_subs = branch_be_obj.get_sub_suffixes()
++    branch_sub_suffixes = [s.get_attr_val_utf8_l('nsslapd-suffix') for s in branch_subs]
++    log.info(f"Branch sub-suffixes: {branch_sub_suffixes}")
++    assert team_suffix.lower() in branch_sub_suffixes, \
++        f"team should be under branch suffix (parent is entry under branch)"
++
++    # Team should have sub as sub-suffix
++    team_be_obj = backends.get(team_suffix)
++    team_subs = team_be_obj.get_sub_suffixes()
++    team_sub_suffixes = [s.get_attr_val_utf8_l('nsslapd-suffix') for s in team_subs]
++    log.info(f"Team sub-suffixes: {team_sub_suffixes}")
++    assert sub_suffix.lower() in team_sub_suffixes, \
++        f"sub should be under team suffix"
++
++    log.info("Deep hierarchy test passed!")
++
++
++if __name__ == '__main__':
++    CURRENT_FILE = os.path.realpath(__file__)
++    pytest.main(["-s", CURRENT_FILE])
+diff --git a/src/lib389/lib389/backend.py b/src/lib389/lib389/backend.py
+index db464b43a..274d45abe 100644
+--- a/src/lib389/lib389/backend.py
++++ b/src/lib389/lib389/backend.py
+@@ -38,6 +38,36 @@ from lib389.lint import DSBLE0001, DSBLE0002, DSBLE0003, DSBLE0004, DSBLE0005, D
+ from lib389.plugins import USNPlugin
+ 
+ 
++def is_subsuffix_of(sub_parent, be_suffix, all_suffixes):
++    """Check if sub_parent indicates this is a sub-suffix of be_suffix.
++
++    Returns True only if be_suffix is the CLOSEST ancestor suffix of sub_parent.
++    This prevents a sub-suffix from appearing under multiple ancestors.
++
++    :param sub_parent: The nsslapd-parent-suffix value (lowercase)
++    :param be_suffix: The suffix to check against (lowercase)
++    :param all_suffixes: Set of all backend suffixes (lowercase)
++    :returns: True if be_suffix is the closest ancestor suffix
++    """
++    if not sub_parent:
++        return False
++    if sub_parent == be_suffix:
++        return True
++    if sub_parent in all_suffixes:
++        # sub_parent is itself a suffix, will be handled separately
++        return False
++    if not sub_parent.endswith(',' + be_suffix):
++        return False
++    # Find the closest (longest) matching suffix for this parent
++    best_match = None
++    for sfx in all_suffixes:
++        if sub_parent == sfx or sub_parent.endswith(',' + sfx):
++            if best_match is None or len(sfx) > len(best_match):
++                best_match = sfx
++    # Only return True if be_suffix is the closest match
++    return best_match == be_suffix
++
++
+ class BackendLegacy(object):
+     proxied_methods = 'search_s getEntry'.split()
+ 
+@@ -1104,22 +1134,27 @@ class Backend(DSLdapObject):
+         vlv.create(rdn="cn=" + vlvname, properties=props, basedn=basedn)
+ 
+     def get_sub_suffixes(self):
+-        """Return a list of Backend's
+-        returns: a List of subsuffix entries
++        """Return a list of Backend's that are sub-suffixes of this backend.
++        :returns: A list of Backend instances that are sub-suffixes
+         """
+         subsuffixes = []
+         top_be_suffix = self.get_attr_val_utf8_l('nsslapd-suffix')
++        if not top_be_suffix:
++            return subsuffixes
++
+         mts = self._mts.list()
++        be_insts = Backends(self._instance).list()
++        all_suffixes = {be.get_attr_val_utf8_l('nsslapd-suffix') for be in be_insts}
++
+         for mt in mts:
+             parent_suffix = mt.get_attr_val_utf8_l('nsslapd-parent-suffix')
+             if parent_suffix is None:
+                 continue
+-            if parent_suffix == top_be_suffix:
++
++            if is_subsuffix_of(parent_suffix, top_be_suffix, all_suffixes):
+                 child_suffix = mt.get_attr_val_utf8_l('cn')
+-                be_insts = Backends(self._instance).list()
+                 for be in be_insts:
+-                    be_suffix = be.get_attr_val_utf8_l('nsslapd-suffix')
+-                    if child_suffix == be_suffix:
++                    if child_suffix == be.get_attr_val_utf8_l('nsslapd-suffix'):
+                         subsuffixes.append(be)
+                         break
+         return subsuffixes
+diff --git a/src/lib389/lib389/cli_conf/backend.py b/src/lib389/lib389/cli_conf/backend.py
+index d0ec4bd9e..9772e39d4 100644
+--- a/src/lib389/lib389/cli_conf/backend.py
++++ b/src/lib389/lib389/cli_conf/backend.py
+@@ -7,7 +7,7 @@
+ # See LICENSE for details.
+ # --- END COPYRIGHT BLOCK ---
+ 
+-from lib389.backend import Backend, Backends, DatabaseConfig, BackendSuffixView
++from lib389.backend import Backend, Backends, DatabaseConfig, BackendSuffixView, is_subsuffix_of
+ from lib389.configurations.sample import (
+     create_base_domain,
+     create_base_org,
+@@ -338,6 +338,7 @@ def is_db_replicated(inst, suffix):
+ def backend_get_subsuffixes(inst, basedn, log, args):
+     subsuffixes = []
+     be_insts = MANY(inst).list()
++    all_suffixes = {be.get_attr_val_utf8_l('nsslapd-suffix') for be in be_insts}
+     for be in be_insts:
+         be_suffix = be.get_attr_val_utf8_l('nsslapd-suffix')
+         if be_suffix == args.be_name.lower():
+@@ -347,7 +348,7 @@ def backend_get_subsuffixes(inst, basedn, log, args):
+                 db_type = "suffix"
+                 sub = mt.get_attr_val_utf8_l('nsslapd-parent-suffix')
+                 sub_be = mt.get_attr_val_utf8_l('nsslapd-backend')
+-                if sub == be_suffix:
++                if is_subsuffix_of(sub, be_suffix, all_suffixes):
+                     # We have a subsuffix (maybe a db link?)
+                     if is_db_link(inst, sub_be):
+                         db_type = "link"
+@@ -399,38 +400,34 @@ def build_node(suffix, be_name, subsuf=False, link=False, replicated=False):
+     }
+ 
+ 
+-def backend_build_tree(inst, be_insts, nodes):
+-    """Recursively build the tree
+-    """
+-    if len(nodes) == 0:
+-        # Done
++def backend_build_tree(inst, be_insts, nodes, all_suffixes):
++    """Recursively build the tree."""
++    if not nodes:
+         return
+ 
+     for node in nodes:
+-        node_suffix = node['id']
++        node_suffix = node['id'].lower()
+         # Get sub suffixes and chaining of node
+         for be in be_insts:
+             be_suffix = be.get_attr_val_utf8_l('nsslapd-suffix')
+-            if be_suffix == node_suffix.lower():
++            if be_suffix == node_suffix:
+                 # We have our parent, now find the children
+                 mts = be._mts.list()
+-
+                 for mt in mts:
+                     sub_parent = mt.get_attr_val_utf8_l('nsslapd-parent-suffix')
+                     sub_be = mt.get_attr_val_utf8_l('nsslapd-backend')
+                     sub_suffix = mt.get_attr_val_utf8_l('cn')
+-                    if sub_parent == be_suffix:
++                    if is_subsuffix_of(sub_parent, be_suffix, all_suffixes):
+                         # We have a subsuffix (maybe a db link?)
+                         link = is_db_link(inst, sub_be)
+                         replicated = is_db_replicated(inst, sub_suffix)
+                         node['children'].append(build_node(sub_suffix,
+-                                                        sub_be,
+-                                                        subsuf=True,
+-                                                        link=link,
+-                                                        replicated=replicated))
+-
++                                                           sub_be,
++                                                           subsuf=True,
++                                                           link=link,
++                                                           replicated=replicated))
+                 # Recurse over the new subsuffixes
+-                backend_build_tree(inst, be_insts, node['children'])
++                backend_build_tree(inst, be_insts, node['children'], all_suffixes)
+                 break
+ 
+ 
+@@ -471,7 +468,8 @@ def backend_get_tree(inst, basedn, log, args):
+     else:
+         # Build the tree
+         be_insts = Backends(inst).list()
+-        backend_build_tree(inst, be_insts, nodes)
++        all_suffixes = {be.get_attr_val_utf8_l('nsslapd-suffix') for be in be_insts}
++        backend_build_tree(inst, be_insts, nodes, all_suffixes)
+ 
+         # Done
+         if args.json:
+-- 
+2.52.0
+

@@ -1,0 +1,11 @@
+--- adler32-1.2.0/Cargo.toml	2020-07-30T19:05:16+00:00
++++ adler32-1.2.0/Cargo.toml	2024-09-15T03:05:04.789749+00:00
+@@ -54,8 +54,4 @@
+ default = ["std"]
+ rustc-dep-of-std = ["core", "compiler_builtins"]
+ std = []
+-[target."cfg(target_arch = \"wasm32\")".dev-dependencies.wasm-bindgen]
+-version = "0.2.63"
+ 
+-[target."cfg(target_arch = \"wasm32\")".dev-dependencies.wasm-bindgen-test]
+-version = "0.3"

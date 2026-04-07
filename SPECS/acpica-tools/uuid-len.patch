@@ -1,0 +1,13 @@
+Index: acpica-unix2-20240321/source/tools/acpiexec/aeregion.c
+===================================================================
+--- acpica-unix2-20240321.orig/source/tools/acpiexec/aeregion.c
++++ acpica-unix2-20240321/source/tools/acpiexec/aeregion.c
+@@ -97,7 +97,7 @@ AeRegionHandler (
+     UINT32                  Value1;
+     UINT32                  Value2;
+     ACPI_RESOURCE           *Resource;
+-    char                    Uuid[ACPI_PRM_INPUT_BUFFER_SIZE + 1];
++    char                    Uuid[UUID_STRING_LENGTH + 1];
+ 
+ 
+     ACPI_FUNCTION_NAME (AeRegionHandler);

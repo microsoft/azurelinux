@@ -1,0 +1,846 @@
+commit b70b241cc5ca88cc129ff9ba14f8af2e889b90e6
+Author: Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+Date:   Thu Nov 21 12:26:51 2024 +0900
+
+    53238 (+53239 Mikael): support dnf5
+    
+    some options etc for dnf4 are also updated
+
+diff --git a/Completion/Redhat/Command/_dnf b/Completion/Redhat/Command/_dnf
+index a5edf8564..c41795adf 100644
+--- a/Completion/Redhat/Command/_dnf
++++ b/Completion/Redhat/Command/_dnf
+@@ -1,7 +1,11 @@
+-#compdef dnf dnf-2 dnf-3
+-#
+-# based on dnf-4.2.18
+-#
++#compdef dnf dnf-2 dnf-3 dnf4
++# based on dnf-4.21.1
++
++# avoid 'dnf --version' since it's rather slow for dnf4
++if [[ $service = dnf && $commands[dnf]:P = */dnf5 ]]; then
++  _dnf5 "$@" && return 0
++  return 1
++fi
+ 
+ _dnf_helper() {
+   # Get the pathname of the python executable from the 1st line of dnf-2/dnf-3.
+@@ -68,25 +72,23 @@ _dnf_packages_or_rpms() {
+   fi
+ }
+ 
+-_dnf_groups_caching_policy() {
+-  # TODO: Are there any reliable ways to validate the cache?
+-  local -a newer=( "$1"(Nmw-1) )    # rebuild if more than a week old
+-  return $#newer
+-}
+-
+ _dnf_groups() {
+-  local package_groups update_policy expl
+-  zstyle -s ":completion:${curcontext}:" cache-policy update_policy
+-  if [[ -z "$update_policy" ]]; then
+-    zstyle ":completion:${curcontext}:" cache-policy _dnf_groups_caching_policy
+-  fi
+-  if _cache_invalid dnf-groups || ! _retrieve_cache dnf-groups; then
+-    # this can be very slow
+-    package_groups=( ${${${(M)${(f)"$(_call_program package-groups \
+-                     $service group list -v 2>/dev/null)"}:# *}#*\(}%\)*} )
+-    _store_cache dnf-groups package_groups
+-  fi
+-  _wanted package-groups expl 'package group' compadd "$@" -a package_groups
++  # optional option: -T (available|installed)
++  local selected line groups section=none
++  zparseopts -D -E - T:=selected
++  selected=$selected[2]
++  [[ -z $selected ]] && selected=all
++  # XXX hidden groups are not included.
++  # --installed and --available can't be specified with --hidden
++  for line in ${(f)"$(_call_program package-groups
++                      $service group list --$selected -qCv 2>/dev/null)"}; do
++    # a line for each group is of the following form:
++    # '  description of the group (group-id)'
++    if [[ $line = \ ##(#b)(*)\(([-_[:alnum:]]#)\) ]]; then
++      groups+=( "${match[2]}:${match[1]}" )
++    fi
++  done
++  _describe -t groups "$selected group" groups
+ }
+ 
+ _dnf_repoquery() {
+@@ -194,7 +196,7 @@ _dnf_repository_packages() {
+   fi
+ }
+ 
+-_dnf() {
++_dnf4() {
+   local cache_file="/var/cache/dnf/packages.db"
+   local -a opts=(
+     '(-6)-4[resolve to IPv4 addresses only]'
+@@ -226,7 +228,7 @@ _dnf() {
+     '*'{-x+,--exclude=}'[exclude specified packages]: : _sequence _dnf_packages -T all'
+     '--forcearch=[force the use of the specified arch]:arch: '
+     '(-)'{-h,--help}'[show the help message]'
+-    '--installroot=[set install root]:directory:_files -/'
++    '--installroot=[set install root]:directory:_files -/ -g "/*"'
+     '--newpackage[include newpackage relevant packages]'
+     '--noautoremove[disable removal of dependencies that are no longer used]'
+     '--nobest[do not limit transactions to best candidates]'
+@@ -289,18 +291,21 @@ _dnf_command() {
+   if (( CURRENT == 1 )); then
+     _describe -t dnf-commands 'dnf command' dnf_cmds
+   else
+-    local curcontext=$curcontext cur=$words[CURRENT] cmd tmp expl ret=1
++    local cur=$words[CURRENT] cmd=$words[1] tmp expl ret=1
+     # Deal with aliases (not comprehensive)
+-    case $words[1] in
++    case $cmd in
+       check-updgrade) cmd=check-update;;
+       distrosync|dsync) cmd=distro-sync;;
+       dg) cmd=downgrade;;
++      dsync) cmd=distro-sync;;
+       erase|rm) cmd=remove;;
+       groups|grp) cmd=group;;
+       hist) cmd=history;;
+       in) cmd=install;;
++      if) cmd=info;;
++      ls) cmd=list;;
+       mc) cmd=makecache;;
+-      prov|whatprovides) cmd=provides;;
++      prov|whatprovides|wp) cmd=provides;;
+       rei) cmd=reinstall;;
+       repoinfo) cmd=repolist;;
+       rq) cmd=repoquery;;
+@@ -308,9 +313,9 @@ _dnf_command() {
+       sh) cmd=shell;;
+       update|up) cmd=upgrade;;
+       update-minimal|up-min) cmd=upgrade-minimal;;
+-      *) cmd="${${dnf_cmds[(r)$words[1]:*]%%:*}}";;
++      upif) cmd=updateinfo;;
+     esac
+-    (( $#cmd )) && curcontext="${curcontext%:*:*}:dnf-${cmd}:"
++    local curcontext="${curcontext%:*:*}:dnf-${cmd}:"
+ 
+     case $cmd in
+       alias)
+@@ -337,11 +342,9 @@ _dnf_command() {
+         _describe -t options 'option' tmp && ret=0
+         ;;
+       check-update)
+-        if [[ $cur = -* ]]; then
+-          _wanted options expl 'option' compadd - --changelogs && ret=0
+-        else
+-          _dnf_packages -T installed && ret=0
+-        fi
++        _arguments : \
++          '--changelogs[also print changelog delta of packages]' \
++          '*: :_dnf_packages -T installed' && ret=0
+         ;;
+       clean)
+         tmp=(
+@@ -368,23 +371,38 @@ _dnf_command() {
+             "mark:mark a group for installation or removal"
+           )
+           _describe -t subcommands 'subcommand' tmp && ret=0
+-        elif (( CURRENT == 3 )) && [[ $cur = -* ]]; then
+-          if [[ $words[2] == install ]]; then
+-            _wanted options expl 'option' compadd - --with-optional && ret=0
+-          elif [[ $words[2] == list ]]; then
+-            tmp=(
+-              '--available:show only available groups'
+-              '--installed:show only installed groups'
+-              '--hidden:show also hidden groups'
+-              '--ids:show also ID of groups'
+-            )
+-            _describe -t options 'option' tmp && ret=0
+-          fi
+-        elif (( CURRENT == 3 )) && [[ $words[2] == mark ]]; then
+-          _wanted subcommands expl 'subcommand' \
+-                  compadd - install remove && ret=0
+         else
+-          _dnf_groups && ret=0
++          case $words[2] in
++            summary)
++              _arguments : '--hidden' '2: :_dnf_groups' && ret=0
++              ;;
++            info)
++              _dnf_groups && ret=0
++              ;;
++            install)
++              _arguments : '--with-optional[also include optional packages]' \
++                            '*: :_dnf_groups -T available' && ret=0
++              ;;
++            list)
++              _arguments : \
++                '(--installed)--available[show only available groups]' \
++                '(--available)--installed[show only installed groups]' \
++                '--hidden[show also hidden groups]' \
++                {--ids,-v}'[show also ID of groups]' \
++                '*: :_dnf_groups' && ret=0
++              ;;
++            remove|upgrade)
++              _dnf_groups -T installed && ret=0
++              ;;
++            mark)
++              if (( CURRENT == 3 )); then
++                _wanted subcommands expl 'subcommand' \
++                        compadd - install remove && ret=0
++              else
++                _dnf_groups && ret=0
++              fi
++              ;;
++          esac
+         fi
+         ;;
+       help)
+@@ -399,13 +417,32 @@ _dnf_command() {
+             "list:list transactions"
+             "info:describe the given transactions"
+             "redo:repeat the specified transaction"
++            "replay:replay transaction stored in the specified file"
+             "rollback:undo all since the given transaction"
++            "store:store the specified transaction in file"
+             "undo:undo transactions"
+             "userinstalled:list all packages installed by users"
+           )
+           _describe -t subcommands 'subcommand' tmp && ret=0
+-        elif [[ $words[2] != userinstalled ]]; then
+-          _message 'transaction' && ret=0
++        else
++          case $words[2] in
++            list)
++              _arguments : '--reverse[output history in reverse order]' \
++                '*:transaction ID or ID..ID: ' && ret=0 ;;
++            info)
++              _message 'transaction ID or ID..ID' && ret=0 ;;
++            redo|rollback|undo)
++              _message 'transaction or package' && ret=0 ;;
++            replay)
++              _arguments : \
++                "--ignore-installed[don't check for installed packages being in the same state as recorded in transaction]" \
++                "--ignore-extras[don't check for extra packages pulled into the transaction on the target system]" \
++                '--skip-unavailable[skip packages that are in transaction but not in target system]' \
++                '2:transaction file:_files' && ret=0 ;;
++            store)
++              _arguments : {-o+,--output=}'[store in specified file]: :_files' \
++                          '2:transaction: ' && ret=0 ;;
++          esac
+         fi
+         ;;
+       info|list)
+@@ -413,7 +450,7 @@ _dnf_command() {
+           if [[ $cur = -* ]]; then
+             tmp=( --all --available --installed --extras
+                   --obsoletes --upgrades --autoremove --recent )
+-            _wanted options expl 'option' compadd -a tmp
++            _wanted options expl 'option' compadd -a tmp && ret=0
+           else
+             _dnf_packages -T all && ret=0
+           fi
+@@ -449,6 +486,7 @@ _dnf_command() {
+           tmp=(
+             'install:install a module profile including its packages'
+             'update:update packages associated with an active module stream'
++            'switch-to:switch to a module stream and change versions of installed packages'
+             'remove:remove installed module profiles and their packages'
+             'enable:enable a module stream'
+             'disable:disable a module with all its streams'
+@@ -502,7 +540,7 @@ _dnf_command() {
+         _dnf_repoquery && ret=0
+         ;;
+       repository-packages)
+-        _dnf_repository_packages
++        _dnf_repository_packages && ret=0
+         ;;
+       search)
+         if [[ $cur = -* ]]; then
+@@ -531,6 +569,7 @@ _dnf_command() {
+           '--list[display list of advisories]'
+           '--info[display detailed information of advisories]'
+           + '(availability)'
++          '-all[include advisories about any versions of installed packages]'
+           '--available[limit to advisories about newer versions of installed packages]'
+           '--installed[limit to advisories about equal or older versions of installed packages]'
+           '--updates[limit to advisories about newer and available versions of installed packages]'
+@@ -548,4 +587,4 @@ _dnf_command() {
+   fi
+ }
+ 
+-_dnf "$@"
++_dnf4 "$@"
+diff --git a/Completion/Redhat/Command/_dnf5 b/Completion/Redhat/Command/_dnf5
+new file mode 100644
+index 000000000..e194dd5a7
+--- /dev/null
++++ b/Completion/Redhat/Command/_dnf5
+@@ -0,0 +1,570 @@
++#compdef dnf5
++# based on dnf-5.2.6.2
++
++# utility functions
++
++_dnf5_helper() {
++  _call_program specs $service "${(q-)@}" "${(q-)PREFIX}\*" \
++        -qC --assumeno --nogpgcheck 2>/dev/null </dev/null
++}
++
++_dnf5_repositories() {
++  # required option: -T (all|disabled|enabled)
++  local selected expl
++  zparseopts -D -E - T:=selected
++  selected=$selected[2]
++  _wanted $selected-repositories expl "$selected repository" \
++    compadd "$@" - "${(@)${(f)$(_dnf5_helper repo list --$selected)}[2,-1]%% *}"
++}
++
++_dnf5_packages() {
++  # required option: -T (all|available|installed|upgradable)
++  local selected opt expl
++  zparseopts -D -E - T:=selected
++  selected=$selected[2]
++  case $selected in
++    all)        opt='' ;;   # option --all does not exist
++    upgradable) opt='--upgrades' ;;
++    *)          opt="--$selected" ;;
++  esac
++  _wanted $selected-packages expl "$selected package" \
++    compadd "$@" - $(_dnf5_helper repoquery $opt --qf='%{name} ')
++}
++
++_dnf5_rpm_files() {
++  local expl
++  _wanted rpm-files expl 'rpm file' _files -g '(#i)*.rpm(-.)'
++}
++
++_dnf5_packages_or_rpms() {
++  if [[ "$words[CURRENT]" = (*/*|\~*) ]]; then # if looks like a path name
++    _dnf_rpm_files
++  else
++    _dnf5_packages "$@"
++  fi
++}
++
++_dnf5_groups() {
++  # optional option: -T (available|installed)
++  local update_policy selected line pat groups
++  zparseopts -D -E - T:=selected
++  selected=$selected[2]
++  if [[ -z $selected ]]; then
++    selected=all
++    opt=  # option --all does not exist
++  else
++    opt=--$selected
++  fi
++  # XXX hidden groups are not included
++  for line in ${${(f)"$(_dnf5_helper group list $opt)"}[2,-1]}; do
++    line=( ${(z)line} )
++    groups+=( "$line[1]:$line[2,-2]" )
++  done
++  _describe -t $selected-groups "$selected group" groups
++}
++
++_dnf5_environments() {
++  local line envs
++  for line in ${${(f)"$(_dnf5_helper environment list)"}[2,-1]}; do
++    line=( ${(z)line} )
++    envs+=( "$line[1]:$line[2,-2]" )
++  done
++  _describe -t environments 'environment' envs
++}
++
++# completers for (several) dnf commands
++
++_dnf5-advisory () {
++  _arguments : \
++    $advisory_opts \
++    '--contains-pkgs=[only show advisories containing specified packages]: : _sequence _dnf5_packages -T installed' \
++    + '(with)' \
++    '--with-cve[show only advisories referencing CVE ticket]' \
++    '--with-bz[show only advisories referencing Bugzilla ticket]' \
++    + '(type)' \
++    '--all[show all advisories]' \
++    '--available[show advisories containing newer versions of installed packages (default)]' \
++    '--installed[show advisories containing equal and older version of installed packages]' \
++    '--updates[show advisories containing upgradable packages]' \
++    + args \
++    ':subcommand:(list info summary)' '*:advisory spec:'
++}
++
++_dnf5-group() {
++  local -a tmp
++  if (( CURRENT == 2 )); then
++    tmp=(
++      'list:list all matching groups'
++      'info:print detailed information about groups'
++      'install:install packages from specified groups'
++      'remove:remove removable packages in specified groups'
++      'upgrade:upgrade specified groups and packages in them'
++    )
++    _describe -t subcommands 'subcommand' tmp
++  else
++    case $words[2] in
++      list|info)
++        tmp=(
++          '(--installed)--available[show only available groups]'
++          '(--available)--installed[show only installed groups]'
++          '--hidden[show also hidden groups]'
++          '--contains-pkgs=[show only groups containing specified packages]: : _sequence _dnf5_packages -T all'
++          '*: : _dnf5_groups'
++        )
++        ;;
++      install)
++        tmp=( $common_opts
++              '--with-optional[include optional packages from the groups]'
++              '*: : _dnf5_groups -T available' )
++        ;|
++      upgrade)
++        tmp=( ${common_opts:#--skip-broken*}
++              '*: : _dnf5_groups -T installed' )
++        ;|
++      remove)
++        tmp=( $offline_opts
++              '*: : _dnf5_groups -T installed' )
++        ;|
++      install|remove)
++        tmp+=( '--no-packages[operate on groups only, not manipulate any packages]' )
++        ;|
++      install|upgrade)
++        tmp+=( $downgrade_opts )
++        ;;
++    esac
++    _arguments : $tmp
++  fi
++}
++
++_dnf5-history() {
++  local -a tmp
++  if (( CURRENT == 2 )); then
++    tmp=(
++      'list:list info about recorded transactions'
++      'info:print detailed about specific transactions'
++      'undo:revert all actions from the specified transaction'
++      'redo:repeat the specified transaction'
++      'rollback:undo all transactions performed after the specified transaction'
++      'store:store the transaction into a directory'
++    )
++    _describe -t subcommands 'subcommand' tmp
++  else
++    case $words[2] in
++      list|info)
++        tmp=( '--reverse[reverse the order of transactions in output]' )
++        ;;
++      undo|rollback|redo)
++        tmp=( '--skip-unavailable[allow skipping impossible actions]' )
++        ;|
++      undo|rollback)
++        tmp+=( $replay_opts )
++        ;;
++      store)
++        tmp=( {-o,--output=}'[directory for storing the transaction (default ./transaction)]: : _directories')
++    esac
++    _arguments : $tmp '2:transaction:( )'
++  fi
++}
++
++_dnf5-mark() {
++  local -a tmp
++  if (( CURRENT == 2 )); then
++    tmp=(
++      'user:mark the package as user-installed'
++      'dependency:mark the package as a dependency'
++      'weak:mark the package as a weak dependency'
++      'group:mark the package as installed by the specified group'
++    )
++    _describe -t subcommands 'subcommand' tmp
++  else
++    tmp=(
++      '--skip-unavailable[skip packages not installed on the system]'
++      '--store=[store the transaction in specified directory]: : _directories'
++    )
++    if [[ $words[2] = group ]]; then
++        tmp+=( '2:group-id: _dnf5_groups -T installed' )
++    fi
++    _arguments : $tmp '*: : _dnf5_packages -T installed'
++  fi
++}
++
++_dnf5-module() {
++  local -a tmp
++  if (( CURRENT == 2 )); then
++    tmp=(
++      'list:list module streams'
++      'info:print details about module streams'
++      'enable:enable module streams'
++      'disable:disable modules including all their streams'
++      "reset:reset module state so it's no longer enabled or disabled"
++    )
++    _describe -t subcommands 'subcommand' tmp
++  elif (( CURRENT == 3 )) && [[ $cur = -* ]]; then
++    case $words[2] in
++      list|info) tmp=( --enabled --disabled ) ;;
++      enable)    tmp=( --skip-broken --skip-unavailable ) ;;
++      *)         tmp=( --skip-unavailable ) ;;
++    esac
++    _wanted options expl 'option' compadd -a tmp
++  else
++    _message 'module spec'
++  fi
++}
++
++_dnf5-offline() {  # also used by the 'system-upgrade' command
++  local -a tmp
++  if (( CURRENT == 2 )); then
++    tmp=(
++      'clean:remove any stored offline transactions and cached packages'
++      'log:list boots during which offline transaction was attempted'
++      'reboot:prepare the system for offline transaction and reboot'
++    )
++    if [[ $cmd = offline ]]; then
++      tmp+=( 'status:show status of the current offline transaction' )
++    else
++      tmp+=( 'download:download all packages needed for upgrade' )
++    fi
++    _describe -t subcommands 'subcommand' tmp && ret=0
++  else
++    case $words[2] in
++      download)
++        _arguments : \
++          '--releasever=[the version to upgrade to]:version number:' \
++          '--no-downgrade:do not install packages older than currently installed' '*: :' && ret=0
++        ;;
++      log)
++        _arguments : \
++          '--number=[show log of transaction specified by number]:transaction number:' '*: :' && ret=0
++        ;;
++      reboot)
++        _wanted options expl 'option' compadd -- --poweroff && ret=0
++        ;;
++    esac
++  fi
++}
++
++_dnf5-repoquery() {
++  local v
++  local -a opts=(
++    $advisory_opts
++    '--arch=[limit results to specified architectures]:list of archs: '
++    '--available[limit results to available packages]'
++    '--disable-modular-filtering[include packages of inactive module streams]'
++    '--duplicates[limit to installed duplicate packages]'
++    '--exactdeps[limit to packages that require capability specified by ==what{requires,depends}]'
++    '--extras[limit to installed packages that are not present in any available repository]'
++    '--file=[limit results to packages which own specified file]:list of files: _sequence _files'
++    '--installed[query installed packages]'
++    '--installonly[limit to installed installonly packages]'
++    '--latest-limit=[limit to latest packages of specified number]:number:'
++    '--leaves[limit to groups of installed packages not required by other installed packages]'
++    '--providers-of=[select packages that provide specified attribute]:attribute:(conflicts depends enhances obsoletes provides recommends requires requires_pre suggests supplement)'
++    '--recent[limit to only recently changed packages]'
++    '--recursive[make --whatrequires/--providers-of work recursively]'
++    '--security[limit to packages in security advisories]'
++    '--srpm[use the corresponding source RPM]'
++    '--unneeded[limit to unneeded installed packages]'
++    '--upgrades[limit to available packages that provide upgrade for installed packages]'
++    '--userinstalled[limit to packages that are not installed as dependencies]'
++    '--whatdepends=[limit to packages that require, enhance, recommend, suggest of supplement specified capability]:list of capability:'
++    '--whatconflicts=[limit to packages that conflicts with specified capabilities]:list of capability: '
++  )
++  for v in enhance obsolete provide recommend require suggest supplement; do
++    opts+=( "--what${v}s=[limit to packages that $v specified capabilities]:list of capability: ")
++  done
++  # mutually exclusive formating options
++  opts+=(
++    + '(format)'
++    '--conflicts[display capabilities that the package conflicts with]'
++    '--depends[display capabilities that the package depends on, enables, recommends, suggests or supplements]'
++    '--files[show files in the package]'
++    '--requires-pre[display capabilities required to run pre/post scripts of the package]'
++    '--sourcerpm[display source RPM of the package]'
++    '--location[display location of the package]'
++    '--info[show detailed information about the package]'
++    '--changelogs[print the package changelogs]'
++    '(- *)--querytags[list tags recognized by --queryformat]'
++    '--queryformat=[specify output format]:format:'
++  )
++  for v in enhance obsolete provide recommend require suggest supplement; do
++    opts+=( "--${v}s[display capabilities ${v}ed by the package]" )
++  done
++
++  _arguments : '*: : _dnf5_packages -T all' $opts
++}
++
++# dnf commands
++
++_dnf5_commands() {
++  local -a dnf_cmds=(
++    'advisory:manage advisories'
++    'autoremove:remove unneeded packages'
++    'check:check for problems in package database'
++    'check-upgrade:check for available package upgrades'
++    'clean:remove or invalidate cached data'
++    'distro-sync:up/downgrade installed packages to the latest available'
++    'downgrade:downgrade packages'
++    'download:download packages'
++    'environment:manage comps environments'
++    'group:manage comps groups'
++    'history:manage transaction history'
++    'info:provide detailed information about packages'
++    'install:install packages'
++    'leaves:list groups of leaf packages'
++    'list:list installed or available packages'
++    'makecache:generate the metadata cache'
++    'mark:change the reason of an installed package'
++    'module:manage modules'
++    'offline:manage offline transactions'
++    'provides:find what package provides the given value'
++    'reinstall:reinstall packages'
++    'remove:remove packages'
++    'replay:replay stored transactions'
++    'repo:manage repositories'
++    'repoquery:search for packages in repositories'
++    'search:search for packages using keywords'
++    'swap:remove software and install another in the single transaction'
++    'system-upgrade:upgrade the system to a new major release'
++    'upgrade:upgrade packages'
++    'versionlock:protect packages from updates to newer versions'
++  )
++  _describe -t dnf-commands 'dnf command' dnf_cmds
++}
++
++# subcommands and options
++
++_dnf5_subcmds_opts() {
++  local cur=$words[CURRENT] cmd=$words[1] expl ret=1
++  local -a tmp
++  # common options
++  local -a offline_opts=(
++    '(--store)--offline[store the transaction to be performed offline]'
++    '(--offline)--store=[store the transaction in specified directory]: : _directories'
++  )
++  local -a common_opts=(
++    $offline_opts
++    '--allowerasing[allow erasing of installed packages]'
++    '--skip-broken[resolve dependency problems by skipping problematic packages]'
++    "--skip-unavailable[skip packages that can't be synchronized]"
++    '--downloadonly[download packages without executing transaction]'
++  )
++  local -a advisory_opts=(
++    '--advisories=[consider only specified advisories]:list of advisories:'
++    '--advisory-severities=[limit to advisories with specified severity]:severity:_sequence compadd - critical important moderate low none'
++    '--bzs=[limit to advisories that fix specified Bugzilla ID]:list of Bugzilla ID:'
++    '--cves=[limit to advisories that fix specified CVE ID]:list of CVD ID]:'
++    '--security[limit to security advisories]'
++    '--bugfix[limit to bugfix advisories]'
++    '--enhancement[limit to enhancement advisories]'
++    '--newpackage[limit to newpackage advisories]'
++  )
++  local -a downgrade_opts=(
++    '(--no-allow-downgrade)--allow-downgrade[enable downgrade of dependencies]'
++    '(--allow-downgrade)--no-allow-downgrade[disable downgrade of dependencies]'
++  )
++  local -a replay_opts=(
++    '--ignore-extras[not consider extra packages]'
++    '--ignore-installed[mismatches between installed and stored transaction are not errors]'
++  )
++  # Deal with some aliases (not comprehensive)
++  case $cmd in
++    check-updgrade) cmd=check-update;;
++    dg) cmd=downgrade;;
++    dsync) cmd=distro-sync;;
++    grp) cmd=group;;
++    if) cmd=info;;
++    in) cmd=install;;
++    ls) cmd=list;;
++    mc) cmd=makecache;;
++    rei) cmd=reinstall;;
++    rm) cmd=remove ;;
++    rq) cmd=repoquery;;
++    se) cmd=search;;
++    update|up) cmd=upgrade;;
++  esac
++  local curcontext="${curcontext%:*:*}:dnf-${cmd}:"
++
++  case $cmd in
++    advisory|group|history|mark|module|offline|repoquery)
++      _dnf5-$cmd && ret=0
++      ;;
++    system-upgrade)
++      _dnf5-offline && ret=0
++      ;;
++    autoremove)
++      _arguments : $offline_opts && ret=0
++      ;;
++    check)
++      _arguments : \
++        '--dependencies[show missing dependencies and conflicts]' \
++        '--duplicates[show duplicated packages]' \
++        '--obsoleted[show obsoleted packages]' && ret=0
++      ;;
++    check-upgrade)
++      _arguments : \
++        $advisory_opts \
++        '--changelogs[print package changelogs]' \
++        '--minimal[reports the lowest versions of packages that fix advisories]' \
++        '*: : _dnf5_packages -T installed' && ret=0
++      ;;
++    clean)
++      tmp=(
++        'dbcache:remove cache files generated from the repository metadata'
++        'expire-cache:mark the repository metadata expired'
++        'metadata:remove the repository metadata'
++        'packages:remove any cached packages'
++        'all:clean all'
++      )
++      _describe -t cache-types 'cache type' tmp && ret=0
++      ;;
++    distro-sync)
++      _arguments : $common_opts '*: : _dnf5_packages -T installed' && ret=0
++      ;;
++    downgrade)
++      _arguments : \
++        $common_opts $downgrade_opts \
++        '*: : _dnf5_packages -T installed' && ret=0
++      ;;
++    download)
++      _arguments : \
++        '--arch=[limit to packages of specified architecture]:list of architectures:' \
++        '--resolve[resolve and download needed dependencies]' \
++        '--alldeps[with --resolve, also download already installed dependencies]' \
++        '--destdir=[download to the specified directory]: : _directories' \
++        '--srpm[download the source rpm]' \
++        '--url[print the list of URLs where the rpms can be downloaded]' \
++        '*--urlprotocol=[with --url, limit to specified protocols]:protocol:_sequence compadd - http https ftp file' \
++        '*: : _dnf5_packages -T all' && ret=0
++      ;;
++    environment)
++      _arguments : \
++        '--available[show only available environments]' \
++        '--installed[show only installed environments]' \
++        ':subcommand:(list info)' \
++        '*: : _dnf5_environments' && ret=0
++      ;;
++    info|list)
++      _arguments : \
++        '--showduplicates[show all versions of the packages]' \
++        '*: : _dnf5_packages -T all' \
++        + '(type)' \
++        '--installed[list only installed packages]:*: : _dnf5_packages -T installed' \
++        '--available[list only available packages]:*: : _dnf5_packages -T available' \
++        '--extras[list only extras]' \
++        '--obsoletes[list only installed but obsoleted packages]:*: : _dnf5_packages -T installed' \
++        '--recent[list only recently added packages]' \
++        '--upgrades[list only available upgrades of installed packages]:*: : _dnf5_packages -T upgradable' \
++        '--autoremove[list only packages that will be autoremoved]:*: : _dnf5_packages -T installed' &&ret=0
++      ;;
++    install)
++      _arguments : \
++        $common_opts $downgrade_opts $advisory_opts \
++        '*: : _dnf5_packages_or_rpms -T available' && ret=0
++      ;;
++    leaves|makecache)
++      # nothing to complete
++      ;;
++    provides)
++      _files && ret=0
++      ;;
++    reinstall)
++      _arguments : \
++        $common_opts $downgrade_opts \
++        '*: : _dnf5_packages_or_rpms -T installed' && ret=0
++      ;;
++    remove)
++      _arguments : \
++        $offline_opts \
++        '--no-autoremove[not remove dependencies that are no longer used]' \
++        '*: : _dnf5_packages -T installed' && ret=0
++      ;;
++    replay)
++      _arguments : \
++        $replay_opts \
++        ':transaction path:_directories' && ret=0
++      ;;
++    repo)
++      _arguments : \
++        '--all[show info about all repositories]' \
++        '--enabled[show info only about enabled repositories]' \
++        '--disabled[show info only about disabled repositories]' \
++        ':subcommand:(list info)' && ret=0
++      ;;
++    search)
++      _arguments : \
++        '--all[search patterns also inside description and URL fields]' \
++        '--showduplicates[show all versions of packages, not only the latest ones]' \
++        '*:search pattern:' && ret=0
++      ;;
++    swap)
++      _arguments : \
++        $offline_opts \
++        '--allowerasing[allow erasing of installed packages]' \
++        ': : _dnf5_packages -T installed' \
++        ': : _dnf5_packages -T available' && ret=0
++      ;;
++    upgrade)
++      _arguments : \
++        ${common_opts:#--skip-broken*} $downgrade_opts $advisory_opts \
++        '--minimal[upgrade only to the lowest available versions that fix advisories]' \
++        '--destdir=[specify directory into which downloading packages]: : _directories' \
++      '*: : _dnf5_packages_or_rpms -T upgradable' && ret=0
++      ;;
++    versionlock)
++      _arguments : \
++        ':subcommand:(add exclude clear delete list)' \
++        '*: : _dnf5_packages -T all' && ret=0
++      ;;
++  esac
++  return ret
++}
++
++# main completer
++
++_dnf5() {
++  local curcontext="$curcontext" state state_descr line ret=1
++  typeset -A opt_args
++  local -a opts=(
++    '(-y --assumeyes)--assumeno[answer no for all questions]'
++    '--best[try the best available package version]'
++    '(-C --cacheonly)'{-C,--cacheonly}"[run entirely from system cache, don't update cache]"
++    '--comment=[add comment to transaction history]:comment:'
++    '(-c --config)'{-c+,--config=}'[specify configuration file]:config file:_files'
++    '--debugsolver[dump detailed solving results in file ./debugdata]'
++    '*--disable-plugin=[disable specified plugins]:list of plugin names:'
++    '(--repo)*--disable-repo=[disable specified repos]: : _sequence _dnf5_repositories -T enabled'
++    '--dump-main-config[print main configuration values to stdout]'
++    '*--dump-repo-config=[print repository configuration values to stdout]:repi id'
++    '--dump-variables[print variable values to stdout]'
++    '*--enable-plugin=[enable specified plugins]:list of plugin names:'
++    '*--enable-repo=[enable additional repos]: : _sequence _dnf5_repositories -T disabled'
++    '--forcearch=[force the use of the specified arch]:arch:'
++    '(-)'{-h,--help}'[show the help message]'
++    '--installroot=[set install root]: : _directories'
++    '--no-best[do not limit transactions to best candidates]'
++    '--no-docs[do not install documentation]'
++    '--no-gpgcheck[skip checking GPG signatures on packages]'
++    '--no-plugins[disable all plugins]'
++    '(-q --quiet)'{-q,--quiet}'[show just the relevant content]'
++    '--refresh[force refreshing metadata before running the command]'
++    '--releasever=[override distribution release in config files]:release ver:'
++    '(--disablerepo)*--repo=[enable just the specified repo]: : _sequence _dnf5_repositories -T all'
++    '*--repofrompath=[specify additional repos]:repository_label,path_or_url: '
++    '*--setopt=[override option in config file]:repoid.option=value:'
++    '*--setvar=[override DNF5 variable value]'
++    '--show-new-leaves[show newly installed leaf packages]'
++    '--use-host-config[use config files and variables from host system]'
++    '(- *)--version[show dnf version]'
++    '(-y --assumeyes --assumeno)'{-y,--assumeyes}'[answer yes for all questions]'
++    '*'{-x+,--exclude=}'[exclude specified packages from transaction]: : _sequence _dnf5_packages -T all'
++  )
++  _arguments -C -s : $opts ': :->command' '*:: :->cmd_args' && ret=0
++
++  case $state in
++    command) _dnf5_commands && ret=0 ;;
++    cmd_args) _dnf5_subcmds_opts && ret=0 ;;
++  esac
++  return ret
++}
++
++_dnf5 "$@"

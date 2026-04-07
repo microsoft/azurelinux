@@ -1,0 +1,10 @@
+diff --git a/test/test_python.py b/test/test_python.py
+index 252c51a97256..8388d9a5aa36 100755
+--- a/test/test_python.py
++++ b/test/test_python.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #------------------------------------------------------------------------
+ #  Copyright 2019 (c) Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+ #

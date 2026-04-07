@@ -1,0 +1,11 @@
+--- fastrand-2.3.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ fastrand-2.3.0/Cargo.toml	2024-12-09T19:46:08.344862+00:00
+@@ -70,8 +70,5 @@
+ [features]
+ alloc = []
+ default = ["std"]
+-js = [
+-    "std",
+-]
+ std = ["alloc"]
+ 

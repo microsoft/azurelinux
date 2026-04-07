@@ -1,0 +1,98 @@
+From f07e2d173fdf77dbf9244d2dfa594576d6ccfb9a Mon Sep 17 00:00:00 2001
+From: Adam Williamson <awilliam@redhat.com>
+Date: Fri, 11 Jul 2025 01:37:09 -0700
+Subject: [PATCH 11/12] Revert "feat(systemd-sysusers): run systemd-sysusers as
+ part  of the build process"
+
+This reverts commit f3dacc013d90bd2c0bbfa04f5f9b167b65298440.
+It breaks kernel builds on Fedora - see
+https://bugzilla.redhat.com/show_bug.cgi?id=2379116 .
+---
+ modules.d/01systemd-sysusers/module-setup.sh  | 31 +++++++++++++++++++
+ .../01systemd-sysusers/sysusers-dracut.conf   |  2 ++
+ modules.d/99systemd-sysusers/module-setup.sh  | 26 ----------------
+ 3 files changed, 33 insertions(+), 26 deletions(-)
+ create mode 100755 modules.d/01systemd-sysusers/module-setup.sh
+ create mode 100644 modules.d/01systemd-sysusers/sysusers-dracut.conf
+ delete mode 100755 modules.d/99systemd-sysusers/module-setup.sh
+
+diff --git a/modules.d/01systemd-sysusers/module-setup.sh b/modules.d/01systemd-sysusers/module-setup.sh
+new file mode 100755
+index 00000000..4c6b39d7
+--- /dev/null
++++ b/modules.d/01systemd-sysusers/module-setup.sh
+@@ -0,0 +1,31 @@
++#!/bin/bash
++# This file is part of dracut.
++# SPDX-License-Identifier: GPL-2.0-or-later
++
++# Prerequisite check(s) for module.
++check() {
++    # If the binary(s) requirements are not fulfilled the module can't be installed.
++    require_binaries systemd-sysusers || return 1
++
++    # Return 255 to only include the module, if another module requires it.
++    return 255
++}
++
++# Install the required file(s) and directories for the module in the initramfs.
++install() {
++    inst_simple "$moddir/sysusers-dracut.conf" "$systemdsystemunitdir/systemd-sysusers.service.d/sysusers-dracut.conf"
++
++    inst_sysusers basic.conf
++
++    inst_multiple -o \
++        "$systemdsystemunitdir"/systemd-sysusers.service \
++        "$systemdsystemunitdir"/sysinit.target.wants/systemd-sysusers.service \
++        systemd-sysusers
++
++    # Install the hosts local user configurations if enabled.
++    if [[ $hostonly ]]; then
++        inst_multiple -H -o \
++            "$systemdsystemconfdir"/systemd-sysusers.service \
++            "$systemdsystemconfdir/systemd-sysusers.service.d/*.conf"
++    fi
++}
+diff --git a/modules.d/01systemd-sysusers/sysusers-dracut.conf b/modules.d/01systemd-sysusers/sysusers-dracut.conf
+new file mode 100644
+index 00000000..9b13364b
+--- /dev/null
++++ b/modules.d/01systemd-sysusers/sysusers-dracut.conf
+@@ -0,0 +1,2 @@
++[Unit]
++ConditionNeedsUpdate=
+diff --git a/modules.d/99systemd-sysusers/module-setup.sh b/modules.d/99systemd-sysusers/module-setup.sh
+deleted file mode 100755
+index c1ef40cd..00000000
+--- a/modules.d/99systemd-sysusers/module-setup.sh
++++ /dev/null
+@@ -1,26 +0,0 @@
+-#!/bin/bash
+-# This file is part of dracut.
+-# SPDX-License-Identifier: GPL-2.0-or-later
+-
+-# This module should be orders afer all modules that depends on it
+-# This is to make sure that all inst_sysusers calls are in place before systemd-sysusers is called.
+-
+-# Prerequisite check(s) for module.
+-check() {
+-    # If the binary(s) requirements are not fulfilled the module can't be installed.
+-    require_binaries systemd-sysusers || return 1
+-
+-    # Return 255 to only include the module, if another module requires it.
+-    return 255
+-}
+-
+-# Install the required file(s) and directories for the module in the initramfs.
+-install() {
+-    inst_sysusers basic.conf
+-
+-    # redirect stdout temporarily to FD 3 to use filter stderr
+-    {
+-        set -o pipefail
+-        systemd-sysusers --root="$initdir" 2>&1 >&3 | grep -v "^Creating " >&2
+-    } 3>&1
+-}
+-- 
+2.50.1
+

@@ -1,0 +1,33 @@
+The non-reentrant gethostbyXXXX() functions deadlock if called recursively, for
+example if libldap needs to be initialized from within gethostbyXXXX() (which
+actually happens if nss_ldap is used for hostname resolution and earlier
+modules can't resolve the local host name), so use the reentrant versions of
+the functions, even if we're not being compiled for use in libldap_r
+
+Resolves: #179730
+Author: Jeffery Layton <jlayton@redhat.com>
+
+diff --git a/libraries/libldap/util-int.c b/libraries/libldap/util-int.c
+index aa69f70..4461bf2 100644
+--- a/libraries/libldap/util-int.c
++++ b/libraries/libldap/util-int.c
+@@ -52,8 +52,8 @@ extern int h_errno;
+ #ifndef LDAP_R_COMPILE
+ # undef HAVE_REENTRANT_FUNCTIONS
+ # undef HAVE_CTIME_R
+-# undef HAVE_GETHOSTBYNAME_R
+-# undef HAVE_GETHOSTBYADDR_R
++/* # undef HAVE_GETHOSTBYNAME_R */
++/* # undef HAVE_GETHOSTBYADDR_R */
+ 
+ #else
+ # include <ldap_pvt_thread.h>
+@@ -442,7 +442,7 @@ ldap_pvt_csnstr(char *buf, size_t len, unsigned int replica, unsigned int mod)
+ #define BUFSTART (1024-32)
+ #define BUFMAX (32*1024-32)
+ 
+-#if defined(LDAP_R_COMPILE)
++#if defined(LDAP_R_COMPILE) || defined(HAVE_GETHOSTBYNAME_R) && defined(HAVE_GETHOSTBYADDR_R)
+ static char *safe_realloc( char **buf, int len );
+ 
+ #if !(defined(HAVE_GETHOSTBYNAME_R) && defined(HAVE_GETHOSTBYADDR_R))

@@ -1,0 +1,11 @@
+--- freetype-2.8/builds/unix/freetype-config.in.orig	2017-03-30 12:20:23.000000001 +0200
++++ freetype-2.8/builds/unix/freetype-config.in	2017-05-16 13:25:39.223041128 +0200
+@@ -205,7 +205,7 @@ if test "$echo_libs" = "yes" ; then
+ fi
+ 
+ if test "$echo_libtool" = "yes" ; then
+-  echo ${SYSROOT}$libdir/libfreetype.la
++  echo ""
+ fi
+ 
+ # EOF

@@ -1,0 +1,18 @@
+From: Sandro Mani <manisandro@gmail.com>
+Date: Mon, 5 Dec 2022 14:43:54 +0100
+Subject: [PATCH] fix for MinGW
+
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index c9f9e70..36bf4f8 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -612,7 +612,7 @@ install(TARGETS ${WAVPACK_INSTALL_TARGETS}
+ 
+ if(WAVPACK_INSTALL_CMAKE_MODULE)
+ 
+-	if(WIN32)
++	if(MSVC)
+ 		set(CMAKE_INSTALL_PACKAGEDIR cmake)
+ 	else()
+ 		set(CMAKE_INSTALL_PACKAGEDIR ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})

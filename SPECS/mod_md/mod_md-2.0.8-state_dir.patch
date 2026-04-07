@@ -1,0 +1,23 @@
+
+Enable state_dir support for 2.4.x.
+
+--- mod_md-2.2.6/src/mod_md_config.c.state_dir
++++ mod_md-2.2.6/src/mod_md_config.c
+@@ -54,7 +54,7 @@
+ /* Default settings for the global conf */
+ static md_mod_conf_t defmc = {
+     NULL,                      /* list of mds */
+-#if AP_MODULE_MAGIC_AT_LEAST(20180906, 2)
++#if 1
+     NULL,                      /* base dirm by default state-dir-relative */
+ #else
+     MD_DEFAULT_BASE_DIR,
+@@ -1039,7 +1039,7 @@
+         mc->hsts_header = apr_psprintf(p, "max-age=%d", mc->hsts_max_age);
+     }
+ 
+-#if AP_MODULE_MAGIC_AT_LEAST(20180906, 2)
++#if 1
+     if (mc->base_dir == NULL) {
+         mc->base_dir = ap_state_dir_relative(p, MD_DEFAULT_BASE_DIR);
+     }

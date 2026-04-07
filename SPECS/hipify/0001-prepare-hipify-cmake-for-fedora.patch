@@ -1,0 +1,60 @@
+From 969dfb6b9a575a8291abbe03e11c00cb0d95dbba Mon Sep 17 00:00:00 2001
+From: Tom Rix <trix@redhat.com>
+Date: Sun, 1 Oct 2023 06:15:36 -0700
+Subject: [PATCH] prepare hipify cmake for fedora
+
+Signed-off-by: Tom Rix <trix@redhat.com>
+---
+ CMakeLists.txt | 36 ++----------------------------------
+ 1 file changed, 2 insertions(+), 34 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ce188b7..3c69c80 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -69,40 +69,8 @@ if (NOT HIPIFY_CLANG_TESTS_ONLY)
+ 
+   # Link against LLVM and CLANG libraries.
+   target_link_libraries(hipify-clang PRIVATE
+-    clangASTMatchers
+-    clangFrontend
+-    clangTooling
+-    clangParse
+-    clangSerialization
+-    clangSema
+-    clangEdit
+-    clangFormat
+-    clangLex
+-    clangAnalysis
+-    clangDriver
+-    clangAST
+-    clangToolingCore
+-    clangRewrite
+-    clangBasic
+-    LLVMProfileData
+-    LLVMSupport
+-    LLVMMCParser
+-    LLVMMC
+-    LLVMBitReader
+-    LLVMOption
+-    LLVMCore)
+-
+-  if(LLVM_PACKAGE_VERSION VERSION_GREATER "6.0.1")
+-    target_link_libraries(hipify-clang PRIVATE clangToolingInclusions)
+-  endif()
+-
+-  if(LLVM_PACKAGE_VERSION VERSION_GREATER "9.0.1")
+-    target_link_libraries(hipify-clang PRIVATE LLVMFrontendOpenMP)
+-  endif()
+-
+-  if(LLVM_PACKAGE_VERSION VERSION_EQUAL "15.0.0" OR LLVM_PACKAGE_VERSION VERSION_GREATER "15.0.0")
+-    target_link_libraries(hipify-clang PRIVATE LLVMWindowsDriver clangSupport)
+-  endif()
++    clang-cpp
++    LLVM)
+ 
+   if(LLVM_PACKAGE_VERSION VERSION_EQUAL "16.0.0" OR LLVM_PACKAGE_VERSION VERSION_GREATER "16.0.0")
+     if(MSVC)
+-- 
+2.41.0
+

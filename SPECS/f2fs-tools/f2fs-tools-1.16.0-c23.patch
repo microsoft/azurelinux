@@ -1,0 +1,20 @@
+--- f2fs-tools-1.16.0/include/f2fs_fs.h.orig	2025-01-25 22:10:30.737357814 -0300
++++ f2fs-tools-1.16.0/include/f2fs_fs.h	2025-01-25 21:58:22.260070581 -0300
+@@ -26,6 +26,7 @@
+ #include <stddef.h>
+ #include <string.h>
+ #include <time.h>
++#include <stdbool.h>
+ 
+ #ifdef HAVE_CONFIG_H
+ #include <config.h>
+@@ -103,9 +104,6 @@
+ typedef uint8_t		u8;
+ typedef u32		block_t;
+ typedef u32		nid_t;
+-#ifndef bool
+-typedef u8		bool;
+-#endif
+ typedef unsigned long	pgoff_t;
+ typedef unsigned short	umode_t;
+ 

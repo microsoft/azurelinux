@@ -1,0 +1,86 @@
+[org.cinnamon]
+number-workspaces=4
+startup-animation=true
+workspace-expo-view-as-grid=true
+enable-indicators=false
+enabled-applets=['panel1:left:0:menu@cinnamon.org', 'panel1:left:1:show-desktop@cinnamon.org', 'panel1:left:2:grouped-window-list@cinnamon.org', 'panel1:right:0:keyboard@cinnamon.org','panel1:right:1:systray@cinnamon.org','panel1:right:2:xapp-status@cinnamon.org',  'panel1:right:3:notifications@cinnamon.org', 'panel1:right:4:printers@cinnamon.org', 'panel1:right:5:removable-drives@cinnamon.org', 'panel1:right:6:network@cinnamon.org', 'panel1:right:7:nightlight@cinnamon.org', 'panel1:right:8:power@cinnamon.org', 'panel1:right:9:calendar@cinnamon.org', 'panel1:right:10:sound@cinnamon.org']
+app-menu-label='Menu'
+app-menu-icon-name='fedora-logo-sprite'
+panels-height=['1:26']
+system-icon='fedora-logo-sprite'
+
+[org.cinnamon.sounds]
+login-enabled=true
+login-file='/usr/share/cinnamon-control-center/sounds/login.oga'
+logout-enabled=true
+logout-file='/usr/share/cinnamon-control-center/sounds/logout.ogg'
+switch-enabled=true
+switch-file='/usr/share/cinnamon-control-center/sounds/switch.oga'
+close-enabled=true
+close-file='/usr/share/cinnamon-control-center/sounds/close.oga'
+map-enabled=true
+map-file='/usr/share/cinnamon-control-center/sounds/map.oga'
+minimize-enabled=true
+minimize-file='/usr/share/cinnamon-control-center/sounds/minimize.oga'
+maximize-enabled=true
+maximize-file='/usr/share/cinnamon-control-center/sounds/maximize.oga'
+notification-enabled=true
+notification-file='/usr/share/cinnamon-control-center/sounds/notification.oga'
+unmaximize-enabled=true
+unmaximize-file='/usr/share/cinnamon-control-center/sounds/unmaximize.oga'
+tile-enabled=true
+tile-file='/usr/share/cinnamon-control-center/sounds/tile.oga'
+plug-enabled=true
+plug-file='/usr/share/cinnamon-control-center/sounds/plug.oga'
+unplug-enabled=true
+unplug-file='/usr/share/cinnamon-control-center/sounds/unplug.oga'
+
+[org.cinnamon.desktop.sound]
+event-sounds=true
+input-feedback-sounds=false
+volume-sound-enabled=true
+volume-sound-file='/usr/share/cinnamon-control-center/sounds/volume.oga'
+
+[org.cinnamon.desktop.screensaver]
+ask-for-away-message=false
+font-date='Noto Sans 24'
+font-message='Noto Sans 14'
+show-clock=true
+font-time='Noto Sans 64'
+
+[org.cinnamon.settings-daemon.peripherals.keyboard]
+input-sources-switcher='alt-shift'
+bell-mode='off'
+
+[org.cinnamon.desktop.background]
+primary-color='#023c88'
+secondary-color='#5789ca'
+
+[org.cinnamon.desktop.interface]
+cursor-theme='Paper'
+menus-have-icons=true
+font-name='Noto Sans 9'
+gtk-overlay-scrollbars=false
+gtk-theme='Mint-Y-Dark-Aqua'
+icon-theme='Mint-Y-Aqua'
+
+[org.cinnamon.desktop.wm.preferences]
+button-layout=':minimize,maximize,close'
+titlebar-font='Noto Sans Bold 10'
+
+[org.cinnamon.SessionManager]
+quit-delay-toggle=true
+prefer-hybrid-sleep=false
+
+[org.cinnamon.settings-daemon.plugins.xsettings]
+hinting='slight'
+menus-have-icons=true
+
+[org.cinnamon.settings-daemon.plugins.power]
+lock-on-suspend=true
+
+[org.cinnamon.theme]
+name='Mint-Y-Dark-Aqua'
+
+[org.gnome.desktop.interface]
+monospace-font-name='Noto Sans Mono 10'

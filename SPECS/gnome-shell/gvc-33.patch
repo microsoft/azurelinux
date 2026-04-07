@@ -1,0 +1,54 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Guido=20G=C3=BCnther?= <agx@sigxcpu.org>
+Date: Fri, 6 Feb 2026 18:24:26 +0100
+Subject: [PATCH] mixer-control: Only stream-id for bluetooth devices only
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+They're the only ones that merely flip ports and clearing it for
+other devices breaks e.g. lineout and headphone combinations.
+
+Fixes: 8bf60ee ("mixer-control: Reset `stream-id`s on UI devices")
+
+Closes: #40
+Signed-off-by: Guido Günther <agx@sigxcpu.org>
+---
+ gvc-mixer-control.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/gvc-mixer-control.c b/gvc-mixer-control.c
+index 45764849bb2e..57dc2d4f2ccd 100644
+--- a/gvc-mixer-control.c
++++ b/gvc-mixer-control.c
+@@ -1218,7 +1218,8 @@ add_stream (GvcMixerControl *control,
+ static gboolean
+ match_stream_with_devices (GvcMixerControl    *control,
+                            GvcMixerStreamPort *stream_port,
+-                           GvcMixerStream     *stream)
++                           GvcMixerStream     *stream,
++                           gboolean            is_bluetooth)
+ {
+         g_autoptr (GList)        devices = NULL;
+         guint                    stream_card_id;
+@@ -1279,7 +1280,7 @@ match_stream_with_devices (GvcMixerControl    *control,
+                                         in_possession = TRUE;
+                                 } else {
+                                         /* Other UI devices on that card that match the stream can't be valid */
+-                                        if (device_stream_id == stream_id) {
++                                        if (device_stream_id == stream_id && is_bluetooth) {
+                                                 g_object_set (G_OBJECT (device),
+                                                               "stream-id", GVC_MIXER_UI_DEVICE_INVALID,
+                                                               NULL);
+@@ -1390,7 +1391,7 @@ sync_devices (GvcMixerControl *control,
+                 GvcMixerStreamPort *stream_port;
+                 stream_port = n->data;
+ 
+-                if (match_stream_with_devices (control, stream_port, stream))
++                if (match_stream_with_devices (control, stream_port, stream, is_bluetooth))
+                         continue;
+ 
+                 g_warning ("Sync_devices: Failed to match stream id: %u, description: '%s', origin: '%s'",
+-- 
+2.53.0
+

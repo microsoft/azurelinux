@@ -1,0 +1,123 @@
+--- actix-http-3.11.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ actix-http-3.11.2/Cargo.toml	2025-10-19T21:57:36.885103+00:00
+@@ -48,11 +48,6 @@
+     "http2",
+     "ws",
+     "openssl",
+-    "rustls-0_20",
+-    "rustls-0_21",
+-    "rustls-0_22",
+-    "rustls-0_23",
+-    "compress-brotli",
+     "compress-gzip",
+     "compress-zstd",
+ ]
+@@ -81,10 +76,6 @@
+ [features]
+ __compress = []
+ __tls = []
+-compress-brotli = [
+-    "__compress",
+-    "dep:brotli",
+-]
+ compress-gzip = [
+     "__compress",
+     "dep:flate2",
+@@ -100,30 +91,6 @@
+     "actix-tls/accept",
+     "actix-tls/openssl",
+ ]
+-rustls = [
+-    "__tls",
+-    "rustls-0_20",
+-]
+-rustls-0_20 = [
+-    "__tls",
+-    "actix-tls/accept",
+-    "actix-tls/rustls-0_20",
+-]
+-rustls-0_21 = [
+-    "__tls",
+-    "actix-tls/accept",
+-    "actix-tls/rustls-0_21",
+-]
+-rustls-0_22 = [
+-    "__tls",
+-    "actix-tls/accept",
+-    "actix-tls/rustls-0_22",
+-]
+-rustls-0_23 = [
+-    "__tls",
+-    "actix-tls/accept",
+-    "actix-tls/rustls-0_23",
+-]
+ ws = [
+     "dep:local-channel",
+     "dep:base64",
+@@ -167,22 +134,6 @@
+ name = "streaming-error"
+ path = "examples/streaming-error.rs"
+ 
+-[[example]]
+-name = "tls_rustls"
+-path = "examples/tls_rustls.rs"
+-required-features = [
+-    "http2",
+-    "rustls-0_23",
+-]
+-
+-[[example]]
+-name = "ws"
+-path = "examples/ws.rs"
+-required-features = [
+-    "ws",
+-    "rustls-0_23",
+-]
+-
+ [[test]]
+ name = "test_client"
+ path = "tests/test_client.rs"
+@@ -196,10 +147,6 @@
+ path = "tests/test_openssl.rs"
+ 
+ [[test]]
+-name = "test_rustls"
+-path = "tests/test_rustls.rs"
+-
+-[[test]]
+ name = "test_server"
+ path = "tests/test_server.rs"
+ 
+@@ -207,21 +154,6 @@
+ name = "test_ws"
+ path = "tests/test_ws.rs"
+ 
+-[[bench]]
+-name = "date-formatting"
+-path = "benches/date-formatting.rs"
+-harness = false
+-
+-[[bench]]
+-name = "response-body-compression"
+-path = "benches/response-body-compression.rs"
+-harness = false
+-required-features = [
+-    "compress-brotli",
+-    "compress-gzip",
+-    "compress-zstd",
+-]
+-
+ [dependencies.actix-codec]
+ version = "0.5"
+ 
+@@ -246,10 +178,6 @@
+ 
+ [dependencies.bitflags]
+ version = "2"
+-
+-[dependencies.brotli]
+-version = "8"
+-optional = true
+ 
+ [dependencies.bytes]
+ version = "1"

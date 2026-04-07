@@ -1,0 +1,58 @@
+From d35a08a77306210ed95a797d5a6ed1160df84b95 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Thu, 4 Apr 2019 17:03:01 +0200
+Subject: [PATCH] Configure /usr/sbin/slapd for tests
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The tests need to know slapd executable file name.
+
+The tests uses sssvlv overlay without loading its module. That's maybe
+for statically built openldap. However, we have a dynamically built
+server and we want to rely on a default module path because it varies
+among architectures. Thus we just uncomment loading the module.
+
+Also enable SSL and IPC tests.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ data/slapd.conf.in | 2 +-
+ test.cfg           | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/data/slapd.conf.in b/data/slapd.conf.in
+index c6c06a3..3c7b6fb 100644
+--- a/data/slapd.conf.in
++++ b/data/slapd.conf.in
+@@ -11,7 +11,7 @@ include $SLAPD_SCHEMA_DIR/openldap.schema
+ # get required dynmaic modules
+ #modulepath     $SLAPD_MODULE_DIR
+ #moduleload     back_$SLAPD_DB
+-#moduleload	sssvlv
++moduleload	sssvlv
+ 
+ # PID & args file
+ pidfile         $TESTDB/slapd.pid
+diff --git a/test.cfg b/test.cfg
+index 0f951f6..ea5a50c 100644
+--- a/test.cfg
++++ b/test.cfg
+@@ -4,12 +4,12 @@
+ 
+ # Set this to the full path of your LDAP server executable
+ # (e.g '/usr/sbin/slapd')
+-$SERVER_EXE = '<path to ldap server executable>';
++$SERVER_EXE = '/usr/sbin/slapd';
+ 
+ # This should be one of
+ # * openldap[+ssl][+ipc][+sasl]
+ # options  are appended with '+' signs
+-$SERVER_TYPE = 'openldap';
++$SERVER_TYPE = 'openldap+ssl+ipc';
+ 
+ # Change this if your host cannot be contacted as localhost
+ # Some tests may fail if the name does not resolve to an IPv4 and an IPv6 address
+-- 
+2.20.1
+

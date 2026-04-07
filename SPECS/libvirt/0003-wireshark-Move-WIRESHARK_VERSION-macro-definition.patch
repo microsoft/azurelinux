@@ -1,0 +1,81 @@
+From 02a0e78bf54c903da8922c56bade9b3298ade351 Mon Sep 17 00:00:00 2001
+Message-ID: <02a0e78bf54c903da8922c56bade9b3298ade351.1760476767.git.crobinso@redhat.com>
+In-Reply-To: <b825bb556bd3967bf5422c243b77bd4038e317e2.1760476767.git.crobinso@redhat.com>
+References: <b825bb556bd3967bf5422c243b77bd4038e317e2.1760476767.git.crobinso@redhat.com>
+From: Michal Privoznik <mprivozn@redhat.com>
+Date: Mon, 13 Oct 2025 09:04:17 +0200
+Subject: [PATCH 3/8] wireshark: Move WIRESHARK_VERSION macro definition
+Content-type: text/plain
+
+Soon, other parts of the wireshark code will need to
+differentiate wrt wireshark version. Therefore, move the
+WIRESHARK_VERSION macro definition among with its deps into
+packet-libvirt.h.
+
+Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
+Reviewed-by: Peter Krempa <pkrempa@redhat.com>
+Signed-off-by: Cole Robinson <crobinso@redhat.com>
+---
+ tools/wireshark/src/packet-libvirt.h | 14 ++++++++++++++
+ tools/wireshark/src/plugin.c         | 14 --------------
+ 2 files changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/tools/wireshark/src/packet-libvirt.h b/tools/wireshark/src/packet-libvirt.h
+index 14e6e13696..15cfcb0534 100644
+--- a/tools/wireshark/src/packet-libvirt.h
++++ b/tools/wireshark/src/packet-libvirt.h
+@@ -19,5 +19,19 @@
+ 
+ #pragma once
+ 
++#ifdef WITH_WS_VERSION
++# include <wireshark/ws_version.h>
++#else
++# include <wireshark/config.h>
++# define WIRESHARK_VERSION_MAJOR VERSION_MAJOR
++# define WIRESHARK_VERSION_MINOR VERSION_MINOR
++# define WIRESHARK_VERSION_MICRO VERSION_MICRO
++#endif
++
++#define WIRESHARK_VERSION \
++    ((WIRESHARK_VERSION_MAJOR * 1000 * 1000) + \
++     (WIRESHARK_VERSION_MINOR * 1000) + \
++     (WIRESHARK_VERSION_MICRO))
++
+ void proto_register_libvirt(void);
+ void proto_reg_handoff_libvirt(void);
+diff --git a/tools/wireshark/src/plugin.c b/tools/wireshark/src/plugin.c
+index 19b25e7b1a..64317b5280 100644
+--- a/tools/wireshark/src/plugin.c
++++ b/tools/wireshark/src/plugin.c
+@@ -12,15 +12,6 @@
+ 
+ #include <config.h>
+ 
+-#ifdef WITH_WS_VERSION
+-# include <wireshark/ws_version.h>
+-#else
+-# include <wireshark/config.h>
+-# define WIRESHARK_VERSION_MAJOR VERSION_MAJOR
+-# define WIRESHARK_VERSION_MINOR VERSION_MINOR
+-# define WIRESHARK_VERSION_MICRO VERSION_MICRO
+-#endif
+-
+ #define HAVE_PLUGINS 1
+ #include <wireshark/epan/proto.h>
+ /* plugins are DLLs */
+@@ -32,11 +23,6 @@
+ /* Let the plugin version be the version of libvirt */
+ #define PLUGIN_VERSION VERSION
+ 
+-#define WIRESHARK_VERSION \
+-    ((WIRESHARK_VERSION_MAJOR * 1000 * 1000) + \
+-     (WIRESHARK_VERSION_MINOR * 1000) + \
+-     (WIRESHARK_VERSION_MICRO))
+-
+ #if WIRESHARK_VERSION < 2005000
+ 
+ WS_DLL_PUBLIC_DEF const gchar version[] = VERSION;
+-- 
+2.51.0
+

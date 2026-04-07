@@ -1,0 +1,10 @@
+--- astral-tl-0.7.11/Cargo.toml	1970-01-01T00:00:01+00:00
++++ astral-tl-0.7.11/Cargo.toml	2026-02-23T10:36:04.907345+00:00
+@@ -50,7 +50,3 @@
+ 
+ [dependencies.memchr]
+ version = "2.7"
+-
+-[dev-dependencies.criterion]
+-version = "0.3"
+-features = ["html_reports"]

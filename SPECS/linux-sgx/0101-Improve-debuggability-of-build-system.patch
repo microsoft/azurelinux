@@ -1,0 +1,225 @@
+From 3173daff9069d6d50c9e47bd04f9c6dedcf15d8c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Fri, 1 Mar 2024 12:05:01 +0000
+Subject: [PATCH 101/131] Improve debuggability of build system
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Preserve make args by using $(MAKE).
+Don't hide commands that are run, so compiler flags are visible.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ QuoteGeneration/qcnl/linux/Makefile           |  2 +-
+ QuoteVerification/QvE/Makefile                | 26 ++++++++---------
+ QuoteVerification/appraisal/qal/Makefile      |  2 +-
+ .../dcap_quoteverify/linux/Makefile           | 28 +++++++++----------
+ 4 files changed, 29 insertions(+), 29 deletions(-)
+
+diff --git a/QuoteGeneration/qcnl/linux/Makefile b/QuoteGeneration/qcnl/linux/Makefile
+index 860eb268..7be0370d 100644
+--- a/QuoteGeneration/qcnl/linux/Makefile
++++ b/QuoteGeneration/qcnl/linux/Makefile
+@@ -113,7 +113,7 @@ $(CNL_Lib_Name_Static): $(CNL_Lib_Cpp_Objects) $(CNL_Lib_C_Objects) $(PCK_Select
+ 	$(AR) rsD $(CNL_Lib_Name_Static) $(CNL_Lib_Cpp_Objects) $(CNL_Lib_C_Objects) $(PCK_Selection_Cpp_Objects)
+ 
+ $(PCK_Selection_Lib_Static):
+-	make -C ../../../tools/PCKCertSelection/PCKCertSelectionLib -f Makefile.static_lib
++	$(MAKE) -C ../../../tools/PCKCertSelection/PCKCertSelectionLib -f Makefile.static_lib VERBOSE=1
+ force_look:
+ 	true
+ 
+diff --git a/QuoteVerification/QvE/Makefile b/QuoteVerification/QvE/Makefile
+index 218bb8e6..f6148df6 100644
+--- a/QuoteVerification/QvE/Makefile
++++ b/QuoteVerification/QvE/Makefile
+@@ -138,37 +138,37 @@ PREPARE_SGXSSL := ../prepare_sgxssl.sh
+ SGXSSL_HEADER_CHECK := $(SGXSSL_PACKAGE_PATH)/include/openssl/opensslconf.h
+ PREPARE_SGX_SSL:
+ ifdef SERVTD_ATTEST
+-	@test -f $(SGXSSL_PACKAGE_PATH)/lib64/lib$(SGXSSL_TCRYPTO).a && test -f $(SGXSSL_PACKAGE_PATH)/lib64/lib$(SGXSSL_TLIB).a && test -f $(SGXSSL_HEADER_CHECK) || $(PREPARE_SGXSSL) SERVTD_ATTEST
++	test -f $(SGXSSL_PACKAGE_PATH)/lib64/lib$(SGXSSL_TCRYPTO).a && test -f $(SGXSSL_PACKAGE_PATH)/lib64/lib$(SGXSSL_TLIB).a && test -f $(SGXSSL_HEADER_CHECK) || $(PREPARE_SGXSSL) SERVTD_ATTEST
+ else
+-	@test -f $(SGXSSL_PACKAGE_PATH)/lib64/lib$(SGXSSL_TCRYPTO).a && test -f $(SGXSSL_PACKAGE_PATH)/lib64/lib$(SGXSSL_TLIB).a && test -f $(SGXSSL_HEADER_CHECK) || $(PREPARE_SGXSSL) $(if $(FIPS),FIPS)
++	test -f $(SGXSSL_PACKAGE_PATH)/lib64/lib$(SGXSSL_TCRYPTO).a && test -f $(SGXSSL_PACKAGE_PATH)/lib64/lib$(SGXSSL_TLIB).a && test -f $(SGXSSL_HEADER_CHECK) || $(PREPARE_SGXSSL) $(if $(FIPS),FIPS)
+ endif
+ 
+ $(SGXSSL_HEADER_CHECK): PREPARE_SGX_SSL
+ 
+ install_lib: $(SIGNED_QVE_NAME) | $(BUILD_DIR)
+-	 @$(CP) $(SIGNED_QVE_NAME) $(BUILD_DIR)
++	$(CP) $(SIGNED_QVE_NAME) $(BUILD_DIR)
+ 
+ ######## Enclave Objects ########
+ 
+ ifndef SERVTD_ATTEST
+ Enclave/sgx_base64.o: $(DCAP_QPL_DIR)/sgx_base64.cpp
+-	@$(CXX) $(ENCLAVE_CXXFLAGS) $(QVL_LIB_INC) -c $< -o $@
++	$(CXX) $(ENCLAVE_CXXFLAGS) $(QVL_LIB_INC) -c $< -o $@
+ 	@echo "CXX  <=  $<"
+ Enclave/ec_key.o: $(DCAP_QV_DIR)/appraisal/common/ec_key.cpp
+-	@$(CXX) $(ENCLAVE_CXXFLAGS) $(QVL_LIB_INC) -c $< -o $@
++	$(CXX) $(ENCLAVE_CXXFLAGS) $(QVL_LIB_INC) -c $< -o $@
+ 	@echo "CXX  <=  $<"
+ endif
+ 
+ $(QVL_LIB_OBJS): %.o: %.cpp $(SGXSSL_HEADER_CHECK)
+ ifdef SERVTD_ATTEST
+-	@$(CXX) -DSERVTD_ATTEST $(ENCLAVE_CXXFLAGS) $(QVL_LIB_INC) -c $< -o $@
++	$(CXX) -DSERVTD_ATTEST $(ENCLAVE_CXXFLAGS) $(QVL_LIB_INC) -c $< -o $@
+ else
+-	@$(CXX) $(ENCLAVE_CXXFLAGS) $(QVL_LIB_INC) -c $< -o $@
++	$(CXX) $(ENCLAVE_CXXFLAGS) $(QVL_LIB_INC) -c $< -o $@
+ endif
+ 	@echo "CXX  <=  $<"
+ 
+ $(QVL_PARSER_OBJS): %.o: %.cpp $(SGXSSL_HEADER_CHECK)
+-	@$(CXX) $(ENCLAVE_CXXFLAGS) $(QVL_PARSER_INC) -c $< -o $@
++	$(CXX) $(ENCLAVE_CXXFLAGS) $(QVL_PARSER_INC) -c $< -o $@
+ 	@echo "CXX  <=  $<"
+ 
+ ifndef SERVTD_ATTEST
+@@ -179,7 +179,7 @@ Enclave/qve_t.h: Enclave/qve.edl $(SGX_EDGER8R)
+ Enclave/qve_t.c: Enclave/qve_t.h
+ 
+ Enclave/qve_t.o: Enclave/qve_t.c
+-	@$(CC) $(SGX_COMMON_CFLAGS) $(ENCLAVE_CFLAGS) -c $< -o $@
++	$(CC) $(SGX_COMMON_CFLAGS) $(ENCLAVE_CFLAGS) -c $< -o $@
+ 	@echo "CC   <=  $<"
+ endif
+ 
+@@ -188,7 +188,7 @@ Enclave/%.o: Enclave/%.cpp $(SGXSSL_HEADER_CHECK)
+ else
+ Enclave/%.o: Enclave/%.cpp Enclave/qve_t.h $(SGXSSL_HEADER_CHECK)
+ endif
+-	@$(CXX) $(SGX_COMMON_CXXFLAGS) $(ENCLAVE_CXXFLAGS) $(if $(FIPS),-DSGXSSL_FIPS) $(QVL_LIB_INC) -I$(QVL_SRC_PATH) -c $< -o $@
++	$(CXX) $(SGX_COMMON_CXXFLAGS) $(ENCLAVE_CXXFLAGS) $(if $(FIPS),-DSGXSSL_FIPS) $(QVL_LIB_INC) -I$(QVL_SRC_PATH) -c $< -o $@
+ 	@echo "CXX  <=  $<"
+ 
+ ifdef SERVTD_ATTEST
+@@ -209,16 +209,16 @@ endif
+ ifdef SERVTD_ATTEST
+ $(QVE_NAME): $(QVE_OBJS) $(QVL_PARSER_OBJS) $(QVL_LIB_OBJS)
+ 	if [ ! -d "$(SERVTD_ATTEST_BUILD_DIR)" ]; then mkdir -p '$(SERVTD_ATTEST_BUILD_DIR)';fi
+-	@$(CXX) $^ -shared -o $(SERVTD_ATTEST_BUILD_DIR)/$@ $(ENCLAVE_LDFLAGS) $(ENCLAVE_CXXFLAGS)
++	$(CXX) $^ -shared -o $(SERVTD_ATTEST_BUILD_DIR)/$@ $(ENCLAVE_LDFLAGS) $(ENCLAVE_CXXFLAGS)
+ else
+ $(QVE_NAME): $(QVE_OBJS) Enclave/qve_t.o $(QVL_PARSER_OBJS) $(QVL_LIB_OBJS) $(QVL_LIB_COMMON_OBJS)
+-	@$(CXX) $^ -o $@ $(ENCLAVE_LDFLAGS) $(ENCLAVE_CXXFLAGS) -Wl,-soname=${SIGNED_QVE_NAME}.$(call get_major_version,QVE_VERSION)
++	$(CXX) $^ -o $@ $(ENCLAVE_LDFLAGS) $(ENCLAVE_CXXFLAGS) -Wl,-soname=${SIGNED_QVE_NAME}.$(call get_major_version,QVE_VERSION)
+ 	$(STRIP) --strip-unneeded --remove-section=.comment --remove-section=.note $@
+ endif
+ 	@echo "LINK =>  $@"
+ 
+ $(SIGNED_QVE_NAME): $(QVE_NAME) $(QVE_CONFIG_FILE)
+-	@$(SGX_ENCLAVE_SIGNER) sign -key Enclave/qve_test_key.pem -enclave $< -out $@ -config $(QVE_CONFIG_FILE)
++	$(SGX_ENCLAVE_SIGNER) sign -key Enclave/qve_test_key.pem -enclave $< -out $@ -config $(QVE_CONFIG_FILE)
+ 	@echo "SIGN =>  $@"
+ 
+ print-% : ; @echo $* = $($*)
+diff --git a/QuoteVerification/appraisal/qal/Makefile b/QuoteVerification/appraisal/qal/Makefile
+index 89c26de2..94469dda 100644
+--- a/QuoteVerification/appraisal/qal/Makefile
++++ b/QuoteVerification/appraisal/qal/Makefile
+@@ -102,7 +102,7 @@ $(QAL_CXX_Common_Objs): %.o: ../common/%.cpp
+ 	$(CXX) $(QAL_Cpp_Flags) -c $< -o $@
+ 
+ wasm_lib:
+-	test -f $(WARM_Lib_Path)/libiwasm.a || ($(MKDIR) $(WARM_Lib_Path) && cd $(WARM_Lib_Path) && cmake .. $(WASM_CONFIG) && $(MAKE) vmlib)
++	test -f $(WARM_Lib_Path)/libiwasm.a || ($(MKDIR) $(WARM_Lib_Path) && cd $(WARM_Lib_Path) && cmake .. $(WASM_CONFIG) && $(MAKE) vmlib VERBOSE=1)
+ 
+ clean:
+ 	$(RM) $(QAL_Obj_Files) $(Target_Lib_Name) $(Target_Lib_Name).$(SGX_MAJOR_VER) $(Target_Static_Lib_Name) $(BUILD_DIR)/$(Target_Lib_Name) $(QVL_Cpp_Obj_Files)
+diff --git a/QuoteVerification/dcap_quoteverify/linux/Makefile b/QuoteVerification/dcap_quoteverify/linux/Makefile
+index 96ad3e56..49d74948 100644
+--- a/QuoteVerification/dcap_quoteverify/linux/Makefile
++++ b/QuoteVerification/dcap_quoteverify/linux/Makefile
+@@ -82,13 +82,13 @@ $(BUILD_DIR):
+ 	@$(MKDIR) $@
+ 
+ install_lib: $(QVL_VERIFY_LIB_NAME_Dynamic) | $(BUILD_DIR)
+-	@$(CP) $(QVL_VERIFY_LIB_NAME_Dynamic) $|/$(QVL_VERIFY_LIB_NAME_Dynamic_Full)
+-	@$(LN) $(QVL_VERIFY_LIB_NAME_Dynamic_Full) $|/$(QVL_VERIFY_LIB_NAME_Dynamic_Major)
+-	@$(LN) $(QVL_VERIFY_LIB_NAME_Dynamic_Major) $|/$(QVL_VERIFY_LIB_NAME_Dynamic)
++	$(CP) $(QVL_VERIFY_LIB_NAME_Dynamic) $|/$(QVL_VERIFY_LIB_NAME_Dynamic_Full)
++	$(LN) $(QVL_VERIFY_LIB_NAME_Dynamic_Full) $|/$(QVL_VERIFY_LIB_NAME_Dynamic_Major)
++	$(LN) $(QVL_VERIFY_LIB_NAME_Dynamic_Major) $|/$(QVL_VERIFY_LIB_NAME_Dynamic)
+ 	$(CP) $(PREBUILD_PATH)/opa_bin/policy.wasm $|/tee_appraisal_policy.wasm
+ 
+ ifeq ($(GEN_STATIC),1)
+-	@$(MAKE) $(QVL_VERIFY_LIB_NAME_Static)
++	$(MAKE) $(QVL_VERIFY_LIB_NAME_Static)
+ 	@$(CP) $(QVL_VERIFY_LIB_NAME_Static) $|
+ endif
+ 
+@@ -98,13 +98,13 @@ run: all
+ ######## QVL Library Objects ########
+ 
+ qve_u.h: $(QVE_SRC_PATH)/Enclave/qve.edl $(SGX_EDGER8R)
+-	@$(SGX_EDGER8R) --untrusted $< $(addprefix --search-path ,$(QVE_SRC_PATH)/Enclave $(SGX_SDK)/include $(addprefix $(SGXSSL_PACKAGE_PATH)/include/,. $(if $(FIPS),,no)filefunc))
++	$(SGX_EDGER8R) --untrusted $< $(addprefix --search-path ,$(QVE_SRC_PATH)/Enclave $(SGX_SDK)/include $(addprefix $(SGXSSL_PACKAGE_PATH)/include/,. $(if $(FIPS),,no)filefunc))
+ 	@echo "GEN  =>  $@"
+ 
+ qve_u.c : qve_u.h
+ 
+ $(QVL_VERIFY_C_OBJS): %.o: %.c qve_u.c
+-	@$(CC) $(SGX_COMMON_CFLAGS) $(QVL_VERIFY_INC) -c $< -o $@
++	$(CC) $(SGX_COMMON_CFLAGS) $(QVL_VERIFY_INC) -c $< -o $@
+ 	@echo "CC  <=  $<"
+ 
+ -include $(QPL_BASE64_CPP_DEP)
+@@ -118,15 +118,15 @@ ec_key.o: $(DCAP_QV_DIR)/appraisal/common/ec_key.cpp
+ 	@echo "CXX  <=  $<"
+ 
+ $(QVL_VERIFY_CPP_OBJS): %.o: %.cpp qve_u.h
+-	@$(CXX) $(SGX_COMMON_CXXFLAGS) $(QVL_VERIFY_INC) -c $< -o $@
++	$(CXX) $(SGX_COMMON_CXXFLAGS) $(QVL_VERIFY_INC) -c $< -o $@
+ 	@echo "CXX  <=  $<"
+ 
+ $(QVL_VERIFY_CPP_OBJS_STATIC): %_s.o: %.cpp qve_u.h
+-	@$(CXX) -DGEN_STATIC $(SGX_COMMON_CXXFLAGS) $(QVL_VERIFY_INC) -c $< -o $@
++	$(CXX) -DGEN_STATIC $(SGX_COMMON_CXXFLAGS) $(QVL_VERIFY_INC) -c $< -o $@
+ 	@echo "CXX  <=  $<"
+ 
+ $(QVE_CPP_OBJ): $(QVE_CPP_SRC)
+-	@$(CXX) $(SGX_COMMON_CXXFLAGS) $(QVL_VERIFY_INC) -c $< -o $(QVE_CPP_OBJ)
++	$(CXX) $(SGX_COMMON_CXXFLAGS) $(QVL_VERIFY_INC) -c $< -o $(QVE_CPP_OBJ)
+ 	@echo "CXX  <=  $<"
+ 
+ $(QVE_LOGIC_CPP_OBJ): $(QVE_LOGIC_CPP_SRC)
+@@ -134,18 +134,18 @@ $(QVE_LOGIC_CPP_OBJ): $(QVE_LOGIC_CPP_SRC)
+ 	@echo "CXX  <=  $<"
+ 
+ $(QVL_LIB_OBJS): %_untrusted.o: %.cpp
+-	@$(CXX) $(SGX_COMMON_CXXFLAGS) $(QVL_LIB_INC) -c $< -o $@
++	$(CXX) $(SGX_COMMON_CXXFLAGS) $(QVL_LIB_INC) -c $< -o $@
+ 	@echo "CXX  <=  $<"
+ 
+ $(QVL_PARSER_OBJS): %_untrusted.o: %.cpp
+-	@$(CXX) $(SGX_COMMON_CXXFLAGS) $(QVL_PARSER_INC) -c $< -o $@
++	$(CXX) $(SGX_COMMON_CXXFLAGS) $(QVL_PARSER_INC) -c $< -o $@
+ 	@echo "CXX  <=  $<"
+ 
+ $(QVL_LIB_NAME): $(QVL_LIB_OBJS)
+-	@$(AR) rsD $(QVL_LIB_NAME) $(QVL_LIB_OBJS)
++	$(AR) rsD $(QVL_LIB_NAME) $(QVL_LIB_OBJS)
+ 
+ $(QVL_PARSER_NAME): $(QVL_PARSER_OBJS)
+-	@$(AR) rsD $(QVL_PARSER_NAME) $(QVL_PARSER_OBJS)
++	$(AR) rsD $(QVL_PARSER_NAME) $(QVL_PARSER_OBJS)
+ 
+ 
+ $(QVL_VERIFY_LIB_NAME_Dynamic): $(QVL_VERIFY_CPP_OBJS) $(QVL_VERIFY_C_OBJS) $(QVE_CPP_OBJ) $(QVE_LOGIC_CPP_OBJ) $(QVL_LIB_NAME) $(QVL_PARSER_NAME) $(QVL_LIB_COMMON_OBJS) qal
+@@ -153,7 +153,7 @@ $(QVL_VERIFY_LIB_NAME_Dynamic): $(QVL_VERIFY_CPP_OBJS) $(QVL_VERIFY_C_OBJS) $(QV
+ 	@ln -sf $(QVL_VERIFY_LIB_NAME_Dynamic) $(QVL_VERIFY_LIB_NAME_Dynamic).1
+ 
+ $(QVL_VERIFY_LIB_NAME_Static): $(QVL_VERIFY_CPP_OBJS_STATIC) $(QVL_VERIFY_C_OBJS) $(QVE_CPP_OBJ) $(QVE_LOGIC_CPP_OBJ) $(QVL_LIB_NAME) $(QVL_PARSER_NAME) $(QVL_LIB_COMMON_OBJS)
+-	@$(AR) rsD $(QVL_VERIFY_LIB_NAME_Static) $(QVL_VERIFY_CPP_OBJS_STATIC) $(QVL_VERIFY_C_OBJS) $(QVE_CPP_OBJ) $(QVE_LOGIC_CPP_OBJ) $(QVL_LIB_COMMON_OBJS)
++	$(AR) rsD $(QVL_VERIFY_LIB_NAME_Static) $(QVL_VERIFY_CPP_OBJS_STATIC) $(QVL_VERIFY_C_OBJS) $(QVE_CPP_OBJ) $(QVE_LOGIC_CPP_OBJ) $(QVL_LIB_COMMON_OBJS)
+ 
+ .PHONY: qal
+ qal:
+-- 
+2.53.0
+

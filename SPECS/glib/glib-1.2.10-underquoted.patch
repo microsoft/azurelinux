@@ -1,0 +1,11 @@
+--- glib-1.2.10/glib.m4.underquoted	2004-08-09 09:10:44.497000620 +0100
++++ glib-1.2.10/glib.m4	2004-08-09 09:11:01.446759680 +0100
+@@ -5,7 +5,7 @@
+ dnl Test for GLIB, and define GLIB_CFLAGS and GLIB_LIBS, if "gmodule" or 
+ dnl gthread is specified in MODULES, pass to glib-config
+ dnl
+-AC_DEFUN(AM_PATH_GLIB,
++AC_DEFUN([AM_PATH_GLIB],
+ [dnl 
+ dnl Get the cflags and libraries from the glib-config script
+ dnl

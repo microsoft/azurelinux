@@ -1,0 +1,47 @@
+--- netkit-ftp-0.17/ftp/ftp.c.vsftp	2005-08-29 16:07:35.000000000 +0200
++++ netkit-ftp-0.17/ftp/ftp.c	2005-08-30 10:58:10.000000000 +0200
+@@ -582,6 +582,7 @@
+ 	volatile long long bytes = 0, hashbytes = HASHBYTES;
+ 	char buf[BUFSIZ], *bufp;
+ 	const char *volatile lmode;
++        int old_code_l;
+ 
+ 	if (verbose && printnames) {
+ 		if (local && *local != '-')
+@@ -799,7 +800,35 @@
+ 	(void) fclose(dout);
+ 	/* closes data as well, so discard it */
+ 	data = -1;
+-	(void) getreply(0);
++	old_code_l = code;
++	(void) getreply(0);
++
++	/* Following "if" will avoid a bug #165083 in ftp-server */
++	/* It can be later removed.                              */
++	if (old_code_l == 150 && code == 150 && cpend == 1
++	    && sunique == 1 && cin !=  NULL && fileno (cin) >=  0 ) {
++		#include <sys/poll.h>
++		struct pollfd  fds_events_l [2] ;
++		int rc;
++
++		fds_events_l [0] .fd = fileno (cin);
++		fds_events_l [0] .events = POLLIN | POLLERR | POLLHUP;
++           
++		rc = poll (fds_events_l, 1, 5000);
++		switch (rc) {
++		case  1:
++			(void) getreply (0);
++			break;
++		case  0:
++			fprintf (stderr, "ftp: no answer from ftp-server "
++			                 "(more than 5 sec).\n");
++			break;
++		case -1:
++			perror("ftp: poll");
++			break;
++		}
++	}
++
+ 	(void) signal(SIGINT, oldintr);
+ 	if (oldintp)
+ 		(void) signal(SIGPIPE, oldintp);

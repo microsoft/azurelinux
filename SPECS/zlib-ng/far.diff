@@ -1,0 +1,12 @@
+diff --git a/zconf.h.in b/zconf.h.in
+index 074f0255..e7183db3 100644
+--- a/zconf.h.in
++++ b/zconf.h.in
+@@ -200,4 +200,7 @@ typedef PTRDIFF_TYPE ptrdiff_t;
+ 
+ typedef size_t z_size_t;
+ 
++/* Some packages depend on FAR being defined, i.e. old versions of minizip. */
++#define FAR
++
+ #endif /* ZCONF_H */

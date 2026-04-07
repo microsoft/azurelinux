@@ -1,0 +1,80 @@
+From 5976b75cfd29018fa189375041ebe7d30a7a8432 Mon Sep 17 00:00:00 2001
+From: Jakub Jelen <jakuje@redhat.com>
+Date: Tue, 11 Feb 2025 14:44:23 +0100
+Subject: Support large RSA keygen in non-batch mode
+
+---
+ doc/gpg.texi                             | 11 +++++------
+ g10/keygen.c                             |  2 +-
+ tests/openpgp/quick-key-manipulation.scm | 13 +++++++++++++
+ 3 files changed, 19 insertions(+), 7 deletions(-)
+
+diff --git a/doc/gpg.texi b/doc/gpg.texi
+index 9ccb74996..a11857235 100644
+--- a/doc/gpg.texi
++++ b/doc/gpg.texi
+@@ -1543,12 +1543,11 @@ the opposite meaning. The options are:
+ @itemx --disable-large-rsa
+ @opindex enable-large-rsa
+ @opindex disable-large-rsa
+-With --generate-key and --batch, enable the creation of RSA secret keys as
+-large as 8192 bit.  Note: 8192 bit is more than is generally
+-recommended.  These large keys don't significantly improve security,
+-but they are more expensive to use, and their signatures and
+-certifications are larger.  This option is only available if the
+-binary was build with large-secmem support.
++Enable the creation of RSA secret keys as large as 8192 bit.
++Note: 8192 bit is more than is generally recommended.  These large
++keys don't significantly improve security, but they are more expensive
++to use, and their signatures and certifications are larger.  This option
++is only available if the binary was build with large-secmem support.
+ 
+ @item --enable-dsa2
+ @itemx --disable-dsa2
+diff --git a/g10/keygen.c b/g10/keygen.c
+index 5d936feab..dec517121 100644
+--- a/g10/keygen.c
++++ b/g10/keygen.c
+@@ -3022,7 +3022,7 @@ get_keysize_range (int algo, unsigned int *min, unsigned int *max)
+ 
+     default:
+       *min = opt.compliance == CO_DE_VS ? 2048: 1024;
+-      *max = 4096;
++      *max = opt.flags.large_rsa == 1 ? 8192 : 4096;
+       def = 3072;
+       break;
+     }
+diff --git a/tests/openpgp/quick-key-manipulation.scm b/tests/openpgp/quick-key-manipulation.scm
+index 71d222a22..37ac708fc 100755
+--- a/tests/openpgp/quick-key-manipulation.scm
++++ b/tests/openpgp/quick-key-manipulation.scm
+@@ -31,6 +31,14 @@
+ 		   `(--with-fingerprint
+ 		     --list-secret-keys ,(exact id))))))
+ 
++(define (count-8192-keys id)
++  (length (filter (lambda (x) (and (string=? "sec" (car x))
++			   (string=? "8192" (caddr x))))
++		  (gpg-with-colons
++		   `(--with-fingerprint
++		     --list-secret-keys ,(exact id))))))
++
++(define mega "Mega <mega@invalid.example.net>")
+ (define alpha "Alpha <alpha@invalid.example.net>")
+ (define bravo "Bravo <bravo@invalid.example.net>")
+ (define bravohash "F75B1420CC5881F4005333379355CFF5873094DE")
+@@ -54,6 +62,11 @@
+ (assert (= 1 (count-uids-of-secret-key alpha)))
+ (assert (not (equal? "" (:expire (assoc "pub" keyinfo)))))
+ 
++(info "Checking quick key generation of large RSA key...")
++(call-check `(,@GPG --enable-large-rsa --quick-generate-key ,mega rsa8192))
++
++(assert (= 1 (count-8192-keys mega)))
++
+ (info "Checking that we can add a user ID...")
+ 
+ ;; Make sure the key capabilities don't change when we add a user id.
+-- 
+2.39.5
+

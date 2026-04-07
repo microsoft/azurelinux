@@ -1,0 +1,8 @@
+--- ignore-0.4.25/Cargo.toml	1970-01-01T00:00:01+00:00
++++ ignore-0.4.25/Cargo.toml	2025-12-29T16:11:42.387047+00:00
+@@ -96,5 +96,3 @@
+ [dev-dependencies.crossbeam-channel]
+ version = "0.5.15"
+ 
+-[target."cfg(windows)".dependencies.winapi-util]
+-version = "0.1.2"

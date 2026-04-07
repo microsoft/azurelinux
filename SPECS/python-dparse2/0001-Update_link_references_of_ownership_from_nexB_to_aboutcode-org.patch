@@ -1,0 +1,157 @@
+From 9b6bd1c223ca5a874c6dcf96cad8fe4c47b0bf2a Mon Sep 17 00:00:00 2001
+From: Chin Yeung Li <tli@nexb.com>
+Date: Wed, 21 Aug 2024 12:09:11 +0800
+Subject: [PATCH] Update link references of ownership from nexB to
+ aboutcode-org
+
+Signed-off-by: Chin Yeung Li <tli@nexb.com>
+---
+ CONTRIBUTING.rst           | 4 ++--
+ README.rst                 | 4 ++--
+ dparse2/__init__.py        | 2 +-
+ dparse2/dependencies.py    | 2 +-
+ dparse2/parser.py          | 3 +--
+ setup.py                   | 2 +-
+ tests/test_dependencies.py | 4 ++--
+ tests/test_parse.py        | 2 +-
+ 8 files changed, 11 insertions(+), 12 deletions(-)
+
+diff --git a/CONTRIBUTING.rst b/CONTRIBUTING.rst
+index e8bea16..f9147e7 100644
+--- a/CONTRIBUTING.rst
++++ b/CONTRIBUTING.rst
+@@ -15,7 +15,7 @@ Types of Contributions
+ Report Bugs
+ ~~~~~~~~~~~
+ 
+-Report bugs at https://github.com/nexB/dparse2/issues.
++Report bugs at https://github.com/aboutcode-org/dparse2/issues.
+ 
+ If you are reporting a bug, please include:
+ 
+@@ -45,7 +45,7 @@ articles, and such.
+ Submit Feedback
+ ~~~~~~~~~~~~~~~
+ 
+-The best way to send feedback is to file an issue at https://github.com/nexB/dparse2/issues.
++The best way to send feedback is to file an issue at https://github.com/aboutcode-org/dparse2/issues.
+ 
+ If you are proposing a feature:
+ 
+diff --git a/README.rst b/README.rst
+index b9edc99..53e66f1 100644
+--- a/README.rst
++++ b/README.rst
+@@ -3,8 +3,8 @@ Dependency Parser
+ =================
+ 
+ 
+-A parser for Python manifests and dependency files now at 
+-https://github.com/nexB/dparse2
++A parser for Python manifests and dependency files now at
++https://github.com/aboutcode-org/dparse2
+ 
+ Originally at https://github.com/pyupio/dparse
+ 
+diff --git a/dparse2/__init__.py b/dparse2/__init__.py
+index e90b93f..ae9b708 100644
+--- a/dparse2/__init__.py
++++ b/dparse2/__init__.py
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: MIT
+ # Copyright (c)  Jannis Gebauer and others
+ # Originally from https://github.com/pyupio/dparse/
+-# Now maintained at https://github.com/nexB/dparse2
++# Now maintained at https://github.com/aboutcode-org/dparse2
+ 
+ # Originally from
+ # __author__ = """Jannis Gebauer"""
+diff --git a/dparse2/dependencies.py b/dparse2/dependencies.py
+index e3a1596..54c4dbe 100644
+--- a/dparse2/dependencies.py
++++ b/dparse2/dependencies.py
+@@ -3,7 +3,7 @@
+ # SPDX-License-Identifier: MIT
+ # Copyright (c)  Jannis Gebauer and others
+ # Originally from https://github.com/pyupio/dparse/
+-# Now maintained at https://github.com/nexB/dparse2
++# Now maintained at https://github.com/aboutcode-org/dparse2
+ 
+ import json
+ 
+diff --git a/dparse2/parser.py b/dparse2/parser.py
+index 0cef9ec..a730226 100644
+--- a/dparse2/parser.py
++++ b/dparse2/parser.py
+@@ -3,7 +3,7 @@
+ # SPDX-License-Identifier: MIT
+ # Copyright (c)  Jannis Gebauer and others
+ # Originally from https://github.com/pyupio/dparse/
+-# Now maintained at https://github.com/nexB/dparse2
++# Now maintained at https://github.com/aboutcode-org/dparse2
+ 
+ import json
+ from collections import OrderedDict
+@@ -42,7 +42,6 @@ def setuptools_parse_requirements_backport(strs):  # pragma: no cover
+     # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+     # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+     # DEALINGS IN THE SOFTWARE.
+-
+     """
+     Yield ``Requirement`` objects for each specification in `strs`
+     `strs` must be a string, or a (possibly-nested) iterable thereof.
+diff --git a/setup.py b/setup.py
+index ab7f7e1..bad0d4f 100644
+--- a/setup.py
++++ b/setup.py
+@@ -19,7 +19,7 @@
+     long_description_content_type="text/x-rst",
+     author="originally from Jannis Gebauer, maintained by AboutCode.org",
+     author_email="info@nexb.com",
+-    url="https://github.com/nexB/dparse2",
++    url="https://github.com/aboutcode-org/dparse2",
+     packages=find_packages(include=["dparse2"]),
+     include_package_data=True,
+     install_requires=[
+diff --git a/tests/test_dependencies.py b/tests/test_dependencies.py
+index 3dd7c98..cb07e62 100644
+--- a/tests/test_dependencies.py
++++ b/tests/test_dependencies.py
+@@ -4,7 +4,7 @@
+ # SPDX-License-Identifier: MIT
+ # Copyright (c)  Jannis Gebauer and others
+ # Originally from https://github.com/pyupio/dparse/
+-# Now maintained at https://github.com/nexB/dparse2
++# Now maintained at https://github.com/aboutcode-org/dparse2
+ 
+ 
+ import pytest
+@@ -16,7 +16,6 @@
+ from dparse2.dependencies import UnknownDependencyFileError
+ 
+ 
+-
+ def test_dependency_serialize():
+     dep = Dependency(name="foo", specs=(), line="foo==1.2.3")
+ 
+@@ -54,6 +53,7 @@ def test_dependency_deserialize():
+     assert d["hashes"] == dep.hashes
+     assert d["dependency_type"] == dep.dependency_type
+ 
++
+ def test_parser_class():
+     dep_file = parse("", file_name="tox.ini")
+     assert isinstance(dep_file.parser, parser.ToxINIParser)
+diff --git a/tests/test_parse.py b/tests/test_parse.py
+index a20d4e9..b892b5a 100644
+--- a/tests/test_parse.py
++++ b/tests/test_parse.py
+@@ -4,7 +4,7 @@
+ # SPDX-License-Identifier: MIT
+ # Copyright (c)  Jannis Gebauer and others
+ # Originally from https://github.com/pyupio/dparse/
+-# Now maintained at https://github.com/nexB/dparse2
++# Now maintained at https://github.com/aboutcode-org/dparse2
+ 
+ from packvers.specifiers import SpecifierSet
+ 

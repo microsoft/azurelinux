@@ -1,0 +1,27 @@
+From 2f0f86e7004c19f23c1cb2192023d678045dfd06 Mon Sep 17 00:00:00 2001
+From: Jerry James <loganjerry@gmail.com>
+Date: Mon, 14 Jul 2025 17:03:16 -0600
+Subject: [PATCH] Fix reference counting issue (#65)
+
+---
+ crick/space_saving_stubs.c.in | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/crick/space_saving_stubs.c.in b/crick/space_saving_stubs.c.in
+index fe7ce38..b514db0 100644
+--- a/crick/space_saving_stubs.c.in
++++ b/crick/space_saving_stubs.c.in
+@@ -97,10 +97,9 @@ fail:
+ 
+ CRICK_INLINE void spsv_{{name}}_free(spsv_{{name}}_t *T) {
+     {{if refcount}}
+-    khiter_t iter;
+-    for (iter = kh_begin(T->hashmap); iter != kh_end(T->hashmap); ++iter) {
+-        if (kh_exist(T->hashmap, iter))
+-            Py_DECREF(kh_key(T->hashmap, iter));
++    npy_intp i;
++    for (i = 0; i < T->size; ++i) {
++        Py_DECREF(T->list[i].counter.item);
+     }
+     {{endif}}
+     kh_destroy({{name}}, T->hashmap);

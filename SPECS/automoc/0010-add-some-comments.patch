@@ -1,0 +1,74 @@
+From 6e2c63a4f5da60a05de86d15605622a78609417d Mon Sep 17 00:00:00 2001
+From: Alexander Neundorf <neundorf@kde.org>
+Date: Tue, 21 Apr 2009 21:04:26 +0000
+Subject: [PATCH 10/33] -add some comments
+
+Alex
+
+
+svn path=/trunk/kdesupport/automoc/; revision=957350
+---
+ KDECTestNightly.cmake | 33 +++++++++++++++++++++------------
+ 1 file changed, 21 insertions(+), 12 deletions(-)
+
+diff --git a/KDECTestNightly.cmake b/KDECTestNightly.cmake
+index 2db53d9..f28c0b0 100644
+--- a/KDECTestNightly.cmake
++++ b/KDECTestNightly.cmake
+@@ -3,6 +3,7 @@
+ # CTEST_SOURCE_DIRECTORY - defaults to $HOME/Dashboards/<CTEST_PROJECT_NAME>/src dir/
+ # CTEST_BINARY_DIRECTORY - defaults to $HOME/Dashboards/<CTEST_PROJECT_NAME>/build dir/
+ # if CTEST_AVOID_SPACES is TRUE, the spaces in the path above will be removed.
++# CTEST_BUILD_NAME - the name of the build as displayed by cdash
+ 
+ 
+ ###########################################################
+@@ -29,6 +30,25 @@ endif(NOT EXISTS "${currentDirectory}/CMakeLists.txt")
+ include("${currentDirectory}/CTestConfig.cmake")
+ include("${currentDirectory}/CTestCustom.cmake" OPTIONAL)
+ 
++
++site_name(CTEST_SITE)
++
++if(NOT CTEST_BUILD_NAME)
++   set(CTEST_BUILD_NAME ${CMAKE_SYSTEM_NAME})
++endif(NOT CTEST_BUILD_NAME)
++
++
++if("${CTEST_CMAKE_GENERATOR}" MATCHES Makefile)
++   find_program(MAKE_EXECUTABLE make gmake)
++   set(CTEST_BUILD_COMMAND    "${MAKE_EXECUTABLE}" )
++else("${CTEST_CMAKE_GENERATOR}" MATCHES Makefile)
++   if(NOT DEFINED CTEST_BUILD_COMMAND)
++      message(FATAL_ERROR "CTEST_CMAKE_GENERATOR is set to \"${CTEST_CMAKE_GENERATOR}\", but CTEST_BUILD_COMMAND has not been set")
++   endif(NOT DEFINED CTEST_BUILD_COMMAND)
++endif("${CTEST_CMAKE_GENERATOR}" MATCHES Makefile)
++
++
++############# set up CTEST_SOURCE_DIRECTORY and CTEST_BINARY_DIRECTORY #############
+ set(DASHBOARD_DIR "$ENV{HOME}/Dashboards" )
+ 
+ if(NOT DEFINED CTEST_SOURCE_DIRECTORY)
+@@ -48,18 +68,7 @@ if(NOT DEFINED CTEST_BINARY_DIRECTORY)
+ endif(NOT DEFINED CTEST_BINARY_DIRECTORY)
+ 
+ 
+-
+-site_name(CTEST_SITE)
+-set(CTEST_BUILD_NAME ${CMAKE_SYSTEM_NAME})
+-
+-if("${CTEST_CMAKE_GENERATOR}" MATCHES Makefile)
+-   find_program(MAKE_EXECUTABLE make gmake)
+-   set(CTEST_BUILD_COMMAND    "${MAKE_EXECUTABLE}" )
+-else("${CTEST_CMAKE_GENERATOR}" MATCHES Makefile)
+-   if(NOT DEFINED CTEST_BUILD_COMMAND)
+-      message(FATAL_ERROR "CTEST_CMAKE_GENERATOR is set to \"${CTEST_CMAKE_GENERATOR}\", but CTEST_BUILD_COMMAND has not been set")
+-   endif(NOT DEFINED CTEST_BUILD_COMMAND)
+-endif("${CTEST_CMAKE_GENERATOR}" MATCHES Makefile)
++############### set up VCS support ###################
+ 
+ string(TOLOWER ${CTEST_VCS} _ctest_vcs)
+ set(_have_vcs FALSE)
+-- 
+2.4.3
+

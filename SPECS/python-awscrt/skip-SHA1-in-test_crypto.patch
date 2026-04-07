@@ -1,0 +1,58 @@
+diff --git a/test/test_crypto.py b/test/test_crypto.py
+index 628900f..7f2296d 100644
+--- a/test/test_crypto.py
++++ b/test/test_crypto.py
+@@ -236,15 +236,11 @@ class TestCredentials(NativeResourceTest):
+ 
+     def test_rsa_signing_roundtrip(self):
+         param_list = [RSASignatureAlgorithm.PKCS1_5_SHA256,
+-                      RSASignatureAlgorithm.PSS_SHA256,
+-                      RSASignatureAlgorithm.PKCS1_5_SHA1]
++                      RSASignatureAlgorithm.PSS_SHA256]
+ 
+         for p in param_list:
+             with self.subTest(msg="RSA Signing Roundtrip using algo p", p=p):
+-                if (p == RSASignatureAlgorithm.PKCS1_5_SHA1):
+-                    h = Hash.sha1_new()
+-                else:
+-                    h = Hash.sha256_new()
++                h = Hash.sha256_new()
+                 h.update(b'totally original test string')
+                 digest = h.digest()
+ 
+@@ -257,15 +253,11 @@ class TestCredentials(NativeResourceTest):
+ 
+     def test_rsa_signing_roundtrip_pkcs8(self):
+         param_list = [RSASignatureAlgorithm.PKCS1_5_SHA256,
+-                      RSASignatureAlgorithm.PSS_SHA256,
+-                      RSASignatureAlgorithm.PKCS1_5_SHA1]
++                      RSASignatureAlgorithm.PSS_SHA256]
+ 
+         for p in param_list:
+             with self.subTest(msg="RSA Signing Roundtrip using algo p", p=p):
+-                if (p == RSASignatureAlgorithm.PKCS1_5_SHA1):
+-                    h = Hash.sha1_new()
+-                else:
+-                    h = Hash.sha256_new()
++                h = Hash.sha256_new()
+                 h.update(b'totally original test string')
+                 digest = h.digest()
+ 
+@@ -275,15 +267,11 @@ class TestCredentials(NativeResourceTest):
+ 
+     def test_rsa_signing_roundtrip_der(self):
+         param_list = [RSASignatureAlgorithm.PKCS1_5_SHA256,
+-                      RSASignatureAlgorithm.PSS_SHA256,
+-                      RSASignatureAlgorithm.PKCS1_5_SHA1]
++                      RSASignatureAlgorithm.PSS_SHA256]
+ 
+         for p in param_list:
+             with self.subTest(msg="RSA Signing Roundtrip using algo p", p=p):
+-                if (p == RSASignatureAlgorithm.PKCS1_5_SHA1):
+-                    h = Hash.sha1_new()
+-                else:
+-                    h = Hash.sha256_new()
++                h = Hash.sha256_new()
+                 h.update(b'totally original test string')
+                 digest = h.digest()
+ 

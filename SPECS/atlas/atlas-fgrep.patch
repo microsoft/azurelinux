@@ -1,0 +1,858 @@
+From b4e6ca29ce1c0a3c3e5caf807f2bd4f6f72d1762 Mon Sep 17 00:00:00 2001
+From: Jakub Martisko <jamartis@redhat.com>
+Date: Fri, 3 Mar 2023 16:37:07 +0100
+Subject: [PATCH] Replace fgrep with grep -F
+
+---
+ CONFIG/ARCHS/CreateTar.sh           |  2 +-
+ CONFIG/src/Makefile                 |  2 +-
+ CONFIG/src/atlconf_misc.c           |  8 +--
+ CONFIG/src/backend/archinfo_linux.c | 46 +++++++--------
+ CONFIG/src/config.c                 | 12 ++--
+ CONFIG/src/probe_aff.c              |  4 +-
+ CONFIG/src/probe_arch.c             |  6 +-
+ CONFIG/src/probe_asm.c              |  4 +-
+ CONFIG/src/probe_comp.c             | 10 ++--
+ CONFIG/src/probe_f2c.c              |  6 +-
+ CONFIG/src/probe_pmake.c            |  2 +-
+ CONFIG/src/probe_vec.c              |  4 +-
+ INSTALL.txt                         | 10 ++--
+ Make.top                            | 92 ++++++++++++++---------------
+ bin/l2peak.sh                       |  2 +-
+ bin/sum2csv.sh                      |  2 +-
+ makes/Make.mmtune                   |  8 +--
+ tune/sysinfo/emit_buildinfo.c       |  4 +-
+ 18 files changed, 112 insertions(+), 112 deletions(-)
+
+diff --git a/CONFIG/ARCHS/CreateTar.sh b/CONFIG/ARCHS/CreateTar.sh
+index 516eede..652c4dd 100644
+--- a/CONFIG/ARCHS/CreateTar.sh
++++ b/CONFIG/ARCHS/CreateTar.sh
+@@ -1,6 +1,6 @@
+ #!/bin/sh
+ # Creates the appropriate .tgz from all subdirs
+-for arch in `ls -F | fgrep "/" | sed -e 's/\///'`
++for arch in `ls -F | grep -F "/" | sed -e 's/\///'`
+ do
+ tar cvf $arch.tar $arch/*
+ bzip2 --best $arch.tar
+diff --git a/CONFIG/src/Makefile b/CONFIG/src/Makefile
+index 212b9d7..c7d9f66 100644
+--- a/CONFIG/src/Makefile
++++ b/CONFIG/src/Makefile
+@@ -351,7 +351,7 @@ IRunC2C :
+ IRunFlib :
+ 	@ - rm config0.out
+ 	@ $(F77) $(F77FLAGS) -v -o xtst $(SRCdir)/backend/comptestF.f 2>&1 | \
+-           fgrep -e '-L' > config0.out
++           grep -F -e '-L' > config0.out
+ 	@ rm -f xtst
+ 	@ - cat config0.out
+ IRunTestCFLink :
+diff --git a/CONFIG/src/atlconf_misc.c b/CONFIG/src/atlconf_misc.c
+index fb62214..0119a4b 100644
+--- a/CONFIG/src/atlconf_misc.c
++++ b/CONFIG/src/atlconf_misc.c
+@@ -891,10 +891,10 @@ int CompIsMinGW(char *comp)
+    {
+       char *cmnd, *res;
+       int i;
+-      i = strlen(comp) + 24;
++      i = strlen(comp) + 26;
+       cmnd = malloc(sizeof(char)*i);
+       assert(cmnd);
+-      sprintf(cmnd, "%s -v 2>&1 | fgrep mingw", comp);
++      sprintf(cmnd, "%s -v 2>&1 | grep -F mingw", comp);
+       res = atlsys_1L(NULL, cmnd, 0, 0);
+       free(cmnd);
+       if (res)
+@@ -920,10 +920,10 @@ int CompIsAppleGcc(char *comp)
+    if (CompIsGcc(comp))
+    {
+       int i;
+-      i = strlen(comp) + 24;
++      i = strlen(comp) + 26;
+       cmnd = malloc(sizeof(char)*i);
+       assert(cmnd);
+-      sprintf(cmnd, "%s -v 2>&1 | fgrep Apple", comp);
++      sprintf(cmnd, "%s -v 2>&1 | grep -F Apple", comp);
+       res = atlsys_1L(NULL, cmnd, 0, 0);
+       free(cmnd);
+       if (res)
+diff --git a/CONFIG/src/backend/archinfo_linux.c b/CONFIG/src/backend/archinfo_linux.c
+index cdcee92..f1655bd 100644
+--- a/CONFIG/src/backend/archinfo_linux.c
++++ b/CONFIG/src/backend/archinfo_linux.c
+@@ -62,7 +62,7 @@ enum MACHTYPE ProbeArch()
+    switch(fam)
+    {
+    case AFPPC:
+-      res = atlsys_1L(NULL, "cat /proc/cpuinfo | fgrep cpu", 0, 0);
++      res = atlsys_1L(NULL, "cat /proc/cpuinfo | grep -F cpu", 0, 0);
+       if (res)
+       {
+ #if 0
+@@ -87,7 +87,7 @@ enum MACHTYPE ProbeArch()
+       }
+       break;
+    case AFMIPS:
+-      res = atlsys_1L(NULL, "fgrep 'cpu model' /proc/cpuinfo", 0, 0);
++      res = atlsys_1L(NULL, "grep -F 'cpu model' /proc/cpuinfo", 0, 0);
+       if (res)
+       {
+          if (res[0] != '\0')
+@@ -106,9 +106,9 @@ enum MACHTYPE ProbeArch()
+       }
+       break;
+    case AFARM:
+-      res = atlsys_1L(NULL, "fgrep 'Processor' /proc/cpuinfo", 0, 0);
++      res = atlsys_1L(NULL, "grep -F 'Processor' /proc/cpuinfo", 0, 0);
+       if (!res)
+-         res = atlsys_1L(NULL, "fgrep cpu /proc/cpuinfo", 0, 0);
++         res = atlsys_1L(NULL, "grep -F cpu /proc/cpuinfo", 0, 0);
+       if (!res)
+          res = atlsys_1L(NULL, "uname -a", 0, 0);
+       if (res)
+@@ -116,7 +116,7 @@ enum MACHTYPE ProbeArch()
+          if (strstr(res, "ARMv7") || strstr(res,"v7l"))
+          {
+             free(res);
+-            res = atlsys_1L(NULL, "fgrep 'CPU part' /proc/cpuinfo", 0, 0);
++            res = atlsys_1L(NULL, "grep -F 'CPU part' /proc/cpuinfo", 0, 0);
+             if (res)
+             {
+                char *sp;
+@@ -150,14 +150,14 @@ enum MACHTYPE ProbeArch()
+          else if (strstr(res, "AArch64") || strstr(res, "aarch64"))
+          {
+             free(res);
+-            res = atlsys_1L(NULL, "fgrep 'Hardware' /proc/cpuinfo", 0, 0);
++            res = atlsys_1L(NULL, "grep -F 'Hardware' /proc/cpuinfo", 0, 0);
+             if (res && strstr(res, "X-Gene "))
+                mach = ARM64xg;
+             else
+             {
+                if(res)
+                   free(res);
+-               res = atlsys_1L(NULL, "fgrep 'CPU part' /proc/cpuinfo", 0, 0);
++               res = atlsys_1L(NULL, "grep -F 'CPU part' /proc/cpuinfo", 0, 0);
+                if (res)
+                {
+                   char *sp;
+@@ -187,7 +187,7 @@ enum MACHTYPE ProbeArch()
+       }
+       break;
+    case AFIA64:
+-      res = atlsys_1L(NULL, "fgrep 'Itanium' /proc/cpuinfo", 0, 0);
++      res = atlsys_1L(NULL, "grep -F 'Itanium' /proc/cpuinfo", 0, 0);
+       if (res && res[0] == '\0')
+       {
+          free(res);
+@@ -195,7 +195,7 @@ enum MACHTYPE ProbeArch()
+       }
+       if (!res)
+       {
+-         res = atlsys_1L(NULL, "fgrep 'IA-64' /proc/cpuinfo", 0, 0);
++         res = atlsys_1L(NULL, "grep -F 'IA-64' /proc/cpuinfo", 0, 0);
+          if (res && res[0] == '\0')
+          {
+             free(res);
+@@ -203,7 +203,7 @@ enum MACHTYPE ProbeArch()
+          }
+       }
+       if (!res)
+-         res = atlsys_1L(NULL, "fgrep \"model name\" /proc/cpuinfo", 0, 0);
++         res = atlsys_1L(NULL, "grep -F \"model name\" /proc/cpuinfo", 0, 0);
+       if (res)
+       {
+          if (res[0] != '\0')
+@@ -216,14 +216,14 @@ enum MACHTYPE ProbeArch()
+       }
+       break;
+    case AFX86:
+-      res = atlsys_1L(NULL, "fgrep 'model name' /proc/cpuinfo", 0, 0);
++      res = atlsys_1L(NULL, "grep -F 'model name' /proc/cpuinfo", 0, 0);
+       if (res && res[0] == '\0')
+       {
+          free(res);
+          res = NULL;
+       }
+       if (!res)
+-         res = atlsys_1L(NULL, "fgrep model /proc/cpuinfo", 0, 0);
++         res = atlsys_1L(NULL, "grep -F model /proc/cpuinfo", 0, 0);
+       if (res && res[0] == '\0')
+       {
+          free(res);
+@@ -241,7 +241,7 @@ enum MACHTYPE ProbeArch()
+             {
+                char *rs2;
+                rs2 = atlsys_1L(NULL,
+-                      "fgrep 'model' /proc/cpuinfo | fgrep -v 'name'", 0, 0);
++                      "grep -F 'model' /proc/cpuinfo | grep -F -v 'name'", 0, 0);
+                if (rs2)
+                {
+                   i = GetLastInt(res);
+@@ -299,7 +299,7 @@ enum MACHTYPE ProbeArch()
+  *    Add these back if we get machine access and can test
+  */
+    case AFSPARC:  /* don't know here anymore */
+-      res = atlsys_1L(NULL, "fgrep cpu /proc/cpuinfo", 0, 0);
++      res = atlsys_1L(NULL, "grep -F cpu /proc/cpuinfo", 0, 0);
+       if (res)
+       {
+          if (strstr(res, "UltraSparc T2")) mach = SunUST2;
+@@ -315,9 +315,9 @@ enum MACHTYPE ProbeArch()
+    case AFALPHA:
+       #if 0
+       res[0] = '\0';
+-      ierr = CmndOneLine(NULL, "fgrep 'model name' /proc/cpuinfo", res);
++      ierr = CmndOneLine(NULL, "grep -F 'model name' /proc/cpuinfo", res);
+       if (ierr || res[0] == '\0')
+-         ierr = CmndOneLine(NULL, "fgrep model /proc/cpuinfo", res);
++         ierr = CmndOneLine(NULL, "grep -F model /proc/cpuinfo", res);
+       if (!ierr && res[0] != '\0')
+       {
+          if (strstr(res, "EV5")) mach = Dec21164;
+@@ -327,7 +327,7 @@ enum MACHTYPE ProbeArch()
+       #endif
+       break;
+    case AFS390:
+-      res = atlsys_1L(NULL, "cat /proc/cpuinfo | fgrep \"processor \"", 0, 0);
++      res = atlsys_1L(NULL, "cat /proc/cpuinfo | grep -F \"processor \"", 0, 0);
+       if (res)
+       {
+          if (strstr(res, "2094") || strstr(res, "2096")) mach = IbmZ9;
+@@ -342,7 +342,7 @@ enum MACHTYPE ProbeArch()
+       break;
+    default:
+ #if 0
+-      if (!CmndOneLine(NULL, "fgrep 'cpu family' /proc/cpuinfo", res))
++      if (!CmndOneLine(NULL, "grep -F 'cpu family' /proc/cpuinfo", res))
+          if (strstr(res, "PA-RISC 2.0")) mach = HPPA20;
+ #else
+      ;
+@@ -358,7 +358,7 @@ int ProbeNCPU()
+    #if 0
+    if (mach == Dec21264 || mach == Dec21164 || mach == Dec21064)
+    {
+-      if ( !CmndOneLine(NULL, "fgrep 'cpus detected' /proc/cpuinfo", res) )
++      if ( !CmndOneLine(NULL, "grep -F 'cpus detected' /proc/cpuinfo", res) )
+          ncpu = GetLastInt(res);
+    }
+    #endif
+@@ -436,7 +436,7 @@ int ProbeMhz()
+ {
+    int mhz=0;
+    char *res;
+-   res = atlsys_1L(NULL, "fgrep 'cpu MHz' /proc/cpuinfo", 0, 0);
++   res = atlsys_1L(NULL, "grep -F 'cpu MHz' /proc/cpuinfo", 0, 0);
+    if (res)
+    {
+       mhz = GetFirstDouble(res) + 0.5;
+@@ -444,7 +444,7 @@ int ProbeMhz()
+    }
+    if (!mhz)
+    {
+-      res = atlsys_1L(NULL, "cat /proc/cpuinfo | fgrep clock | fgrep MHz",0,0);
++      res = atlsys_1L(NULL, "cat /proc/cpuinfo | grep -F clock | grep -F MHz",0,0);
+       if (res)
+       {
+          mhz = GetLastLongWithRound(res);
+@@ -456,7 +456,7 @@ int ProbeMhz()
+  */
+    if (!mhz)
+    {
+-      res = atlsys_1L(NULL, "fgrep 'ClkTck' /proc/cpuinfo", 0, 0);
++      res = atlsys_1L(NULL, "grep -F 'ClkTck' /proc/cpuinfo", 0, 0);
+       if (res)
+       {
+          mhz = GetLastHex(res) / 1000000;
+@@ -514,7 +514,7 @@ int ProbeMhz()
+  */
+    if (!mhz)
+    {
+-      res = atlsys_1L(NULL, "cat /proc/cpuinfo | fgrep bogomips",0,0);
++      res = atlsys_1L(NULL, "cat /proc/cpuinfo | grep -F bogomips",0,0);
+       if (res)
+       {
+          double result = GetFirstDouble(res);
+diff --git a/CONFIG/src/config.c b/CONFIG/src/config.c
+index d459298..7d1b0e4 100644
+--- a/CONFIG/src/config.c
++++ b/CONFIG/src/config.c
+@@ -10,10 +10,10 @@ char *GetStrProbe(int verb, char *targarg, char *prb, char *id)
+    char *ln, *res;
+    int i;
+ 
+-   i = strlen(targarg) + strlen(prb) + strlen(id) + 48;
++   i = strlen(targarg) + strlen(prb) + strlen(id) + 50;
+    ln = malloc(i*sizeof(char));
+    assert(ln);
+-   sprintf(ln, "make IRun_%s args=\"-v %d %s\" | fgrep '%s='",
++   sprintf(ln, "make IRun_%s args=\"-v %d %s\" | grep -F '%s='",
+            prb, verb, targarg, id);
+ 
+    if (verb > 1)
+@@ -44,10 +44,10 @@ int GetIntProbe(int verb, char *targarg, char *prb, char *id, int N)
+    char *ln, *res;
+    int iret=0, i;
+ 
+-   i = strlen(targarg) + strlen(prb) + strlen(id) + 48;
++   i = strlen(targarg) + strlen(prb) + strlen(id) + 50;
+    ln = malloc(i*sizeof(char));
+    assert(ln);
+-   sprintf(ln, "make IRun_%s args=\"-v %d %s\" | fgrep '%s='",
++   sprintf(ln, "make IRun_%s args=\"-v %d %s\" | grep -F '%s='",
+            prb, verb, targarg, id);
+    if (verb > 1)
+       printf("cmnd=%s\n", ln);
+@@ -75,10 +75,10 @@ int GetIntProbeSure(int verb, char *targarg, char *prb, char *id,
+    char *ln, *res;
+    int iret=0, ierr, i;
+ 
+-   i = strlen(targarg) + strlen(prb) + strlen(id) + 48;
++   i = strlen(targarg) + strlen(prb) + strlen(id) + 50;
+    ln = malloc(i*sizeof(char));
+    assert(ln);
+-   sprintf(ln, "make IRun_%s args=\"-v %d %s\" | fgrep '%s='",
++   sprintf(ln, "make IRun_%s args=\"-v %d %s\" | grep -F '%s='",
+            prb, verb, targarg, id);
+    if (verb > 1)
+       printf("cmnd=%s\n", ln);
+diff --git a/CONFIG/src/probe_aff.c b/CONFIG/src/probe_aff.c
+index cd035b4..33dc57b 100644
+--- a/CONFIG/src/probe_aff.c
++++ b/CONFIG/src/probe_aff.c
+@@ -30,10 +30,10 @@ int RunAffProbe(int iaff, int verb, char *targ, int iproc)
+    if (targ)
+    {
+       i += strlen(targ);
+-      frm = "make IRun_%s atlrun=atlas_runX targ=%s LIBS='%s' args='%d' 2> /dev/null | fgrep SUCCESS";
++      frm = "make IRun_%s atlrun=atlas_runX targ=%s LIBS='%s' args='%d' 2> /dev/null | grep -F SUCCESS";
+    }
+    else
+-      frm = "make IRun_%s LIBS='%s' args='%d' 2> /dev/null | fgrep SUCCESS";
++      frm = "make IRun_%s LIBS='%s' args='%d' 2> /dev/null | grep -F SUCCESS";
+    i += strlen(frm) + strlen(AFFS[iaff]) + strlen(lib) + 11;
+    cmnd = malloc(sizeof(char)*i);
+    assert(cmnd);
+diff --git a/CONFIG/src/probe_arch.c b/CONFIG/src/probe_arch.c
+index 0ab92c8..0702481 100644
+--- a/CONFIG/src/probe_arch.c
++++ b/CONFIG/src/probe_arch.c
+@@ -123,7 +123,7 @@ int ProbeOneInt(enum OSTYPE OS0, enum ASMDIA asmd0, char *targ0,
+  */
+    if (asmd == gas_x86_32 || asmd == gas_x86_64 || asmd == gas_wow64)
+    {
+-      frm = "make IRunArchInfo_x86 MYFLAGS=\"-DATL_OS_%s -DATL_%s\" args=\"%s\" %s | fgrep '%s'";
++      frm = "make IRunArchInfo_x86 MYFLAGS=\"-DATL_OS_%s -DATL_%s\" args=\"%s\" %s | grep -F '%s'";
+       i = strlen(frm) + strlen(osnam[OS]) + strlen(ASMNAM[asmd]) + strlen(flag)
+           + strlen(targ) + strlen(find) + 1;
+       cmnd = malloc(sizeof(char)*i);
+@@ -143,7 +143,7 @@ int ProbeOneInt(enum OSTYPE OS0, enum ASMDIA asmd0, char *targ0,
+  */
+    if (!iret)
+    {
+-      frm = "make IRunArchInfo_%s MYFLAGS=\"-DATL_OS_%s -DATL_%s\" args=\"%s\" %s | fgrep '%s'";
++      frm = "make IRunArchInfo_%s MYFLAGS=\"-DATL_OS_%s -DATL_%s\" args=\"%s\" %s | grep -F '%s'";
+       i = 1 + strlen(frm) + strlen(osname) + 3+strlen(osnam[OS]) +
+           strlen(ASMNAM[asmd]) + strlen(flag) + strlen(targ) + strlen(find);
+       cmnd = malloc(sizeof(char)*i);
+@@ -170,7 +170,7 @@ int ConfirmPtrbits(enum OSTYPE OS0, enum ASMDIA asmd0, char *targ0,
+ {
+    char osname[128];
+    char *cmnd, *res, *targ;
+-   char *frm="make IRunArchInfo_%s MYFLAGS=\"-m64 -DATL_OS_%s -DATL_%s\" args=\"%s\" %s | fgrep '%s'";
++   char *frm="make IRunArchInfo_%s MYFLAGS=\"-m64 -DATL_OS_%s -DATL_%s\" args=\"%s\" %s | grep -F '%s'";
+    enum OSTYPE OS;
+    enum ASMDIA asmd;
+    int i, iret=0;
+diff --git a/CONFIG/src/probe_asm.c b/CONFIG/src/probe_asm.c
+index f3984ef..ee44564 100644
+--- a/CONFIG/src/probe_asm.c
++++ b/CONFIG/src/probe_asm.c
+@@ -7,11 +7,11 @@ int RunASMProbe(char *targ, int verb, enum OSTYPE OS, char *asmnam)
+    int i = 0;
+    if (targ)
+    {
+-      frm = "make IRun_%s atlrun=atlas_runX args=\"-v %d\" MYFLAGS=\"-DATL_OS_%s\" targ=%s 2> /dev/null | fgrep SUCCESS";
++      frm = "make IRun_%s atlrun=atlas_runX args=\"-v %d\" MYFLAGS=\"-DATL_OS_%s\" targ=%s 2> /dev/null | grep -F SUCCESS";
+       i = strlen(targ);
+    }
+    else
+-      frm = "make IRun_%s args=\"-v %d\" MYFLAGS=\"-DATL_OS_%s\" 2> /dev/null | fgrep SUCCESS";
++      frm = "make IRun_%s args=\"-v %d\" MYFLAGS=\"-DATL_OS_%s\" 2> /dev/null | grep -F SUCCESS";
+ 
+    i += strlen(frm) + strlen(asmnam) + 11 + strlen(osnam[OS]) + 1;
+    cmnd = malloc(i*sizeof(char));
+diff --git a/CONFIG/src/probe_comp.c b/CONFIG/src/probe_comp.c
+index 1652e24..1798d9b 100644
+--- a/CONFIG/src/probe_comp.c
++++ b/CONFIG/src/probe_comp.c
+@@ -547,9 +547,9 @@ int CompTest(int verb, char *targ, int icomp, char *comp, char *flag)
+    if (icomp == ICC_)
+       targ = NULL;
+    if (icomp == F77_)
+-      frm = "make IRunF77Comp F77='%s' F77FLAGS='%s' %s | fgrep SUCCESS";
++      frm = "make IRunF77Comp F77='%s' F77FLAGS='%s' %s | grep -F SUCCESS";
+    else
+-      frm = "make IRunCComp CC='%s' CCFLAGS='%s' %s | fgrep SUCCESS";
++      frm = "make IRunCComp CC='%s' CCFLAGS='%s' %s | grep -F SUCCESS";
+    i = 1 + strlen(frm) + strlen(comp) + strlen(flag) + strlen(trg);
+    cmnd = malloc(sizeof(char)*i);
+    assert(cmnd);
+@@ -1610,7 +1610,7 @@ void TestComps(enum OSTYPE OS, enum MACHTYPE arch, int verb, char *targ,
+       {
+          if (strcmp(comps[i], comps[ICC_])) /* only check if different */
+          {
+-            char *frm = "make IRunC2C CC='%s' CCFLAGS='%s' CC1='%s' CC1FLAGS='%s' | fgrep SUCCESS";
++            char *frm = "make IRunC2C CC='%s' CCFLAGS='%s' CC1='%s' CC1FLAGS='%s' | grep -F SUCCESS";
+             char *cmnd, *res;
+             int j;
+ 
+@@ -1653,9 +1653,9 @@ void TestComps(enum OSTYPE OS, enum MACHTYPE arch, int verb, char *targ,
+       int j;
+       j = (strstr(comps[F77_], "mgwgfortran") != NULL);
+       if (j)
+-         frm = "make IRun_f2c args=\"%s -C ic '%s' -F ic '%s' -C if '%s' -F if '%s -static'\" | fgrep 'F2C=('";
++         frm = "make IRun_f2c args=\"%s -C ic '%s' -F ic '%s' -C if '%s' -F if '%s -static'\" | grep -F 'F2C=('";
+       else
+-         frm = "make IRun_f2c args=\"%s -C ic '%s' -F ic '%s' -C if '%s' -F if '%s'\" | fgrep 'F2C=('";
++         frm = "make IRun_f2c args=\"%s -C ic '%s' -F ic '%s' -C if '%s' -F if '%s'\" | grep -F 'F2C=('";
+ 
+       j = strlen(frm) + strlen(targarg) + strlen(comps[ICC_]) +
+           strlen(comps[ICC_+NCOMP]) + strlen(comps[F77_]) +
+diff --git a/CONFIG/src/probe_f2c.c b/CONFIG/src/probe_f2c.c
+index 2296af2..e885df6 100644
+--- a/CONFIG/src/probe_f2c.c
++++ b/CONFIG/src/probe_f2c.c
+@@ -2,7 +2,7 @@
+ 
+ int probe_name(char *targarg, int verb, char **usrcomps)
+ {
+-   char *frm = "make IRunF2C_name %s F77=\"%s\" F77FLAGS=\"%s\" CC=\"%s\" CCFLAGS=\"%s\" | fgrep 'F2C name'";
++   char *frm = "make IRunF2C_name %s F77=\"%s\" F77FLAGS=\"%s\" CC=\"%s\" CCFLAGS=\"%s\" | grep -F 'F2C name'";
+    char *cmnd, *res;
+    enum F2CNAME f2cname = f2c_NamErr;
+    int i;
+@@ -39,7 +39,7 @@ int probe_name(char *targarg, int verb, char **usrcomps)
+ 
+ int probe_int(char *targarg, int verb, char **usrcomps, int f2cname)
+ {
+-   char *frm="make IRunF2C_int %s F77=\"%s\" F77FLAGS=\"%s\" CC=\"%s\" CCFLAGS=\"-D%s %s\" | fgrep 'F2C int'";
++   char *frm="make IRunF2C_int %s F77=\"%s\" F77FLAGS=\"%s\" CC=\"%s\" CCFLAGS=\"-D%s %s\" | grep -F 'F2C int'";
+    char *cmnd, *res;
+    enum F2CINT f2c_int = f2c_IntErr;
+    int i;
+@@ -75,7 +75,7 @@ int probe_int(char *targarg, int verb, char **usrcomps, int f2cname)
+ 
+ int probe_str(char *targarg, int verb, char **usrcomps, int f2cname, int f2cint)
+ {
+-   char *frm = "make IRunF2C_str %s F77=\"%s\" F77FLAGS=\"%s\" CC=\"%s\" CCFLAGS=\"-D%s -D%s -DString%s %s\" | fgrep 'F2C string'";
++   char *frm = "make IRunF2C_str %s F77=\"%s\" F77FLAGS=\"%s\" CC=\"%s\" CCFLAGS=\"-D%s -D%s -DString%s %s\" | grep -F 'F2C string'";
+    enum F2CSTRING f2cstr = f2c_StrErr;
+    int i, len;
+ 
+diff --git a/CONFIG/src/probe_pmake.c b/CONFIG/src/probe_pmake.c
+index cbb68a8..7328307 100644
+--- a/CONFIG/src/probe_pmake.c
++++ b/CONFIG/src/probe_pmake.c
+@@ -7,7 +7,7 @@ void GetPmake(int verb, enum OSTYPE OS, int ncpu, char *pmake)
+    if (!OSIsWin(OS))
+    { /* using gnu make */
+       char *res;
+-      res = atlsys_1L(NULL, "make DoNothing --version | fgrep GNU", verb, 1);
++      res = atlsys_1L(NULL, "make DoNothing --version | grep -F GNU", verb, 1);
+       if (res)
+       {
+          free(res);
+diff --git a/CONFIG/src/probe_vec.c b/CONFIG/src/probe_vec.c
+index 473570a..0bbec77 100644
+--- a/CONFIG/src/probe_vec.c
++++ b/CONFIG/src/probe_vec.c
+@@ -35,11 +35,11 @@ int RunISAProbe(char *isaxnam, int verb, char *targ, char *opt)
+    int i=1;
+    if (targ)
+    {
+-      frm = "make IRun_%s atlrun=atlas_runX targ=%s MYFLAGS='%s' 2> /dev/null | fgrep SUCCESS";
++      frm = "make IRun_%s atlrun=atlas_runX targ=%s MYFLAGS='%s' 2> /dev/null | grep -F SUCCESS";
+       i += strlen(targ);
+    }
+    else
+-      frm = "make IRun_%s MYFLAGS='%s' 2> /dev/null | fgrep SUCCESS";
++      frm = "make IRun_%s MYFLAGS='%s' 2> /dev/null | grep -F SUCCESS";
+    i += strlen(frm) + strlen(isaxnam) + strlen(opt);
+    cmnd = malloc(sizeof(char)*i);
+    assert(cmnd);
+diff --git a/INSTALL.txt b/INSTALL.txt
+index b32d706..d91c8ac 100644
+--- a/INSTALL.txt
++++ b/INSTALL.txt
+@@ -184,7 +184,7 @@ with something like:
+ ===========================================================================
+ DONE BUILDING TESTERS, RUNNING:
+ SCOPING FOR FAILURES IN BIN TESTS:
+-fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
++grep -F -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
+         bin/Linux_PIIISSE1/sanity.out
+ 8 cases: 8 passed, 0 skipped, 0 failed
+ 4 cases: 4 passed, 0 skipped, 0 failed
+@@ -196,15 +196,15 @@ fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
+ 4 cases: 4 passed, 0 skipped, 0 failed
+ DONE
+ SCOPING FOR FAILURES IN CBLAS TESTS:
+-fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
++grep -F -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
+         interfaces/blas/C/testing/Linux_PIIISSE1/sanity.out | \
+-                fgrep -v PASSED
++                grep -F -v PASSED
+ make[1]: [sanity_test] Error 1 (ignored)
+ DONE
+ SCOPING FOR FAILURES IN F77BLAS TESTS:
+-fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
++grep -F -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
+         interfaces/blas/F77/testing/Linux_PIIISSE1/sanity.out | \
+-                fgrep -v PASSED
++                grep -F -v PASSED
+ make[1]: [sanity_test] Error 1 (ignored)
+ DONE
+ make[1]: Leaving directory `/home/rwhaley/TEST/TEST/ATLAS3.3.15'
+diff --git a/Make.top b/Make.top
+index 8434537..e3a7680 100644
+--- a/Make.top
++++ b/Make.top
+@@ -20,7 +20,7 @@ C_sanity_test:
+ 	@ echo "BUILDING C TESTERS ONLY (GET F77 FOR MORE COMPLETE TESTING):"
+ 	cd bin ; $(MAKE) sanity_test
+ 	@ echo "SCOPING FOR FAILURES IN BIN TESTS:"
+-	- fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
++	- grep -F -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
+ 	        bin/sanity.out
+ 	@ echo "DONE"
+ sanity_test :
+@@ -31,24 +31,24 @@ sanity_test :
+ 	@ echo "   "
+ 	@ echo "DONE BUILDING TESTERS, RUNNING:"
+ 	@ echo "SCOPING FOR FAILURES IN BIN TESTS:"
+-	- fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
++	- grep -F -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
+ 	        bin/sanity.out
+ 	@ echo "DONE"
+ 	@ echo "SCOPING FOR FAILURES IN CBLAS TESTS:"
+-	- fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
++	- grep -F -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
+ 	        interfaces/blas/C/testing/sanity.out | \
+-                fgrep -v PASSED
++                grep -F -v PASSED
+ 	@ echo "DONE"
+ 	@ echo "SCOPING FOR FAILURES IN F77BLAS TESTS:"
+-	- fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
++	- grep -F -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
+ 	        interfaces/blas/F77/testing/sanity.out | \
+-                fgrep -v PASSED
++                grep -F -v PASSED
+ 	@ echo "DONE"
+ C_ptsanity_test:
+ 	@ echo "BUILDING C TESTERS ONLY (GET F77 FOR MORE COMPLETE TESTING):"
+ 	cd bin ; $(MAKE) ptsanity_test
+ 	@ echo "SCOPING FOR FAILURES IN PTBIN TESTS:"
+-	- fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
++	- grep -F -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
+ 	        bin/ptsanity.out
+ 	@ echo "DONE"
+ ptsanity_test :
+@@ -59,18 +59,18 @@ ptsanity_test :
+ 	@ echo "   "
+ 	@ echo "DONE BUILDING TESTERS, RUNNING:"
+ 	@ echo "SCOPING FOR FAILURES IN PTBIN TESTS:"
+-	- fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
++	- grep -F -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
+ 	        bin/ptsanity.out
+ 	@ echo "DONE"
+ 	@ echo "SCOPING FOR FAILURES IN PTCBLAS TESTS:"
+-	- fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
++	- grep -F -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
+ 	        interfaces/blas/C/testing/ptsanity.out | \
+-                fgrep -v PASSED
++                grep -F -v PASSED
+ 	@ echo "DONE"
+ 	@ echo "SCOPING FOR FAILURES IN PTF77BLAS TESTS:"
+-	- fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
++	- grep -F -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
+ 	        interfaces/blas/F77/testing/ptsanity.out | \
+-                fgrep -v PASSED
++                grep -F -v PASSED
+ 	@ echo "DONE"
+ $(BINdir)/AtlasTest : $(SRCdir)/CONFIG/ARCHS/atlas_test1.1.3.tar.bz2
+ 	cd $(BINdir) ; $(BUNZIP) -c \
+@@ -83,8 +83,8 @@ $(BINdir)/LAPACK_TEST : $(SRCdir)/CONFIG/ARCHS/lapack_test.tar.bz2
+            $(SRCdir)/CONFIG/ARCHS/lapack_test.tar.bz2 | tar xf -
+ scope_lapack_test_pt_pt :
+ 	cd $(BINdir)/LAPACK_TEST/LAOUT_PT_PT ; \
+-           fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
+-           | fgrep -v "error exits"
++           grep -F -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
++           | grep -F -v "error exits"
+ lapack_test_pt_pt: $(BINdir)/LAPACK_TEST
+ 	cd $(BINdir)/LAPACK_TEST ; make cleanup
+ 	- rm -rf $(BINdir)/LAPACK_TEST/LAOUT_PT_PT \
+@@ -98,8 +98,8 @@ lapack_test_pt_pt: $(BINdir)/LAPACK_TEST
+                 $(BINdir)/LAPACK_TEST/SUMMARY_pt_pt.txt 2>&1
+ scope_lapack_test_pt_ab :
+ 	cd $(BINdir)/LAPACK_TEST/LAOUT_PT_AB ; \
+-           fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
+-           | fgrep -v "error exits"
++           grep -F -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
++           | grep -F -v "error exits"
+ lapack_test_pt_ab: $(BINdir)/LAPACK_TEST
+ 	cd $(BINdir)/LAPACK_TEST ; make cleanup
+ 	- rm -rf $(BINdir)/LAPACK_TEST/LAOUT_PT_AB \
+@@ -113,8 +113,8 @@ lapack_test_pt_ab: $(BINdir)/LAPACK_TEST
+                 $(BINdir)/LAPACK_TEST/SUMMARY_pt_ab.txt 2>&1
+ scope_lapack_test_pt_sb :
+ 	cd $(BINdir)/LAPACK_TEST/LAOUT_PT_SB ; \
+-           fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
+-           | fgrep -v "error exits"
++           grep -F -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
++           | grep -F -v "error exits"
+ lapack_test_pt_sb: $(BINdir)/LAPACK_TEST
+ 	cd $(BINdir)/LAPACK_TEST ; make cleanup
+ 	- rm -rf $(BINdir)/LAPACK_TEST/LAOUT_PT_SB \
+@@ -128,8 +128,8 @@ lapack_test_pt_sb: $(BINdir)/LAPACK_TEST
+                 $(BINdir)/LAPACK_TEST/SUMMARY_pt_sb.txt 2>&1
+ scope_lapack_test_pt_fb :
+ 	cd $(BINdir)/LAPACK_TEST/LAOUT_PT_FB ; \
+-           fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
+-           | fgrep -v "error exits"
++           grep -F -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
++           | grep -F -v "error exits"
+ lapack_test_pt_fb: $(BINdir)/LAPACK_TEST
+ 	cd $(BINdir)/LAPACK_TEST ; make cleanup
+ 	- rm -rf $(BINdir)/LAPACK_TEST/LAOUT_PT_FB \
+@@ -143,8 +143,8 @@ lapack_test_pt_fb: $(BINdir)/LAPACK_TEST
+                 $(BINdir)/LAPACK_TEST/SUMMARY_pt_fb.txt 2>&1
+ scope_lapack_test_al_pt :
+ 	cd $(BINdir)/LAPACK_TEST/LAOUT_AL_PT ; \
+-           fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
+-           | fgrep -v "error exits"
++           grep -F -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
++           | grep -F -v "error exits"
+ lapack_test_al_pt: $(BINdir)/LAPACK_TEST
+ 	cd $(BINdir)/LAPACK_TEST ; make cleanup
+ 	- rm -rf $(BINdir)/LAPACK_TEST/LAOUT_AL_PT \
+@@ -158,8 +158,8 @@ lapack_test_al_pt: $(BINdir)/LAPACK_TEST
+                 $(BINdir)/LAPACK_TEST/SUMMARY_al_pt.txt 2>&1
+ scope_lapack_test_al_ab :
+ 	cd $(BINdir)/LAPACK_TEST/LAOUT_AL_AB ; \
+-           fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
+-           | fgrep -v "error exits"
++           grep -F -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
++           | grep -F -v "error exits"
+ lapack_test_al_ab: $(BINdir)/LAPACK_TEST
+ 	cd $(BINdir)/LAPACK_TEST ; make cleanup
+ 	- rm -rf $(BINdir)/LAPACK_TEST/LAOUT_AL_AB \
+@@ -173,8 +173,8 @@ lapack_test_al_ab: $(BINdir)/LAPACK_TEST
+                 $(BINdir)/LAPACK_TEST/SUMMARY_al_ab.txt 2>&1
+ scope_lapack_test_al_sb :
+ 	cd $(BINdir)/LAPACK_TEST/LAOUT_AL_SB ; \
+-           fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
+-           | fgrep -v "error exits"
++           grep -F -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
++           | grep -F -v "error exits"
+ lapack_test_al_sb: $(BINdir)/LAPACK_TEST
+ 	cd $(BINdir)/LAPACK_TEST ; make cleanup
+ 	- rm -rf $(BINdir)/LAPACK_TEST/LAOUT_AL_SB \
+@@ -188,8 +188,8 @@ lapack_test_al_sb: $(BINdir)/LAPACK_TEST
+                 $(BINdir)/LAPACK_TEST/SUMMARY_al_sb.txt 2>&1
+ scope_lapack_test_al_fb :
+ 	cd $(BINdir)/LAPACK_TEST/LAOUT_AL_FB ; \
+-           fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
+-           | fgrep -v "error exits"
++           grep -F -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
++           | grep -F -v "error exits"
+ lapack_test_al_fb: $(BINdir)/LAPACK_TEST
+ 	cd $(BINdir)/LAPACK_TEST ; make cleanup
+ 	- rm -rf $(BINdir)/LAPACK_TEST/LAOUT_AL_FB \
+@@ -203,8 +203,8 @@ lapack_test_al_fb: $(BINdir)/LAPACK_TEST
+                 $(BINdir)/LAPACK_TEST/SUMMARY_al_fb.txt 2>&1
+ scope_lapack_test_sl_pt :
+ 	cd $(BINdir)/LAPACK_TEST/LAOUT_SL_PT ; \
+-           fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
+-           | fgrep -v "error exits"
++           grep -F -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
++           | grep -F -v "error exits"
+ lapack_test_sl_pt: $(BINdir)/LAPACK_TEST
+ 	cd $(BINdir)/LAPACK_TEST ; make cleanup
+ 	- rm -rf $(BINdir)/LAPACK_TEST/LAOUT_SL_PT \
+@@ -218,8 +218,8 @@ lapack_test_sl_pt: $(BINdir)/LAPACK_TEST
+                 $(BINdir)/LAPACK_TEST/SUMMARY_sl_pt.txt 2>&1
+ scope_lapack_test_sl_ab :
+ 	cd $(BINdir)/LAPACK_TEST/LAOUT_SL_AB ; \
+-           fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
+-           | fgrep -v "error exits"
++           grep -F -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
++           | grep -F -v "error exits"
+ lapack_test_sl_ab: $(BINdir)/LAPACK_TEST
+ 	cd $(BINdir)/LAPACK_TEST ; make cleanup
+ 	- rm -rf $(BINdir)/LAPACK_TEST/LAOUT_SL_AB \
+@@ -233,8 +233,8 @@ lapack_test_sl_ab: $(BINdir)/LAPACK_TEST
+                 $(BINdir)/LAPACK_TEST/SUMMARY_sl_ab.txt 2>&1
+ scope_lapack_test_sl_sb :
+ 	cd $(BINdir)/LAPACK_TEST/LAOUT_SL_SB ; \
+-           fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
+-           | fgrep -v "error exits"
++           grep -F -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
++           | grep -F -v "error exits"
+ lapack_test_sl_sb: $(BINdir)/LAPACK_TEST
+ 	cd $(BINdir)/LAPACK_TEST ; make cleanup
+ 	- rm -rf $(BINdir)/LAPACK_TEST/LAOUT_SL_SB \
+@@ -248,8 +248,8 @@ lapack_test_sl_sb: $(BINdir)/LAPACK_TEST
+                 $(BINdir)/LAPACK_TEST/SUMMARY_sl_sb.txt 2>&1
+ scope_lapack_test_sl_fb :
+ 	cd $(BINdir)/LAPACK_TEST/LAOUT_SL_FB ; \
+-           fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
+-           | fgrep -v "error exits"
++           grep -F -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
++           | grep -F -v "error exits"
+ lapack_test_sl_fb: $(BINdir)/LAPACK_TEST
+ 	cd $(BINdir)/LAPACK_TEST ; make cleanup
+ 	- rm -rf $(BINdir)/LAPACK_TEST/LAOUT_SL_FB \
+@@ -263,8 +263,8 @@ lapack_test_sl_fb: $(BINdir)/LAPACK_TEST
+                 $(BINdir)/LAPACK_TEST/SUMMARY_sl_fb.txt 2>&1
+ scope_lapack_test_fl_pt :
+ 	cd $(BINdir)/LAPACK_TEST/LAOUT_FL_PT ; \
+-           fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
+-           | fgrep -v "error exits"
++           grep -F -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
++           | grep -F -v "error exits"
+ lapack_test_fl_pt: $(BINdir)/LAPACK_TEST
+ 	cd $(BINdir)/LAPACK_TEST ; make cleanup
+ 	- rm -rf $(BINdir)/LAPACK_TEST/LAOUT_FL_PT \
+@@ -278,8 +278,8 @@ lapack_test_fl_pt: $(BINdir)/LAPACK_TEST
+                 $(BINdir)/LAPACK_TEST/SUMMARY_fl_pt.txt 2>&1
+ scope_lapack_test_fl_ab :
+ 	cd $(BINdir)/LAPACK_TEST/LAOUT_FL_AB ; \
+-           fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
+-           | fgrep -v "error exits"
++           grep -F -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
++           | grep -F -v "error exits"
+ lapack_test_fl_ab: $(BINdir)/LAPACK_TEST
+ 	cd $(BINdir)/LAPACK_TEST ; make cleanup
+ 	- rm -rf $(BINdir)/LAPACK_TEST/LAOUT_FL_AB \
+@@ -293,8 +293,8 @@ lapack_test_fl_ab: $(BINdir)/LAPACK_TEST
+                 $(BINdir)/LAPACK_TEST/SUMMARY_fl_ab.txt 2>&1
+ scope_lapack_test_fl_sb :
+ 	cd $(BINdir)/LAPACK_TEST/LAOUT_FL_SB ; \
+-           fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
+-           | fgrep -v "error exits"
++           grep -F -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
++           | grep -F -v "error exits"
+ lapack_test_fl_sb: $(BINdir)/LAPACK_TEST
+ 	cd $(BINdir)/LAPACK_TEST ; make cleanup
+ 	- rm -rf $(BINdir)/LAPACK_TEST/LAOUT_FL_SB \
+@@ -308,8 +308,8 @@ lapack_test_fl_sb: $(BINdir)/LAPACK_TEST
+                 $(BINdir)/LAPACK_TEST/SUMMARY_fl_sb.txt 2>&1
+ scope_lapack_test_fl_fb :
+ 	cd $(BINdir)/LAPACK_TEST/LAOUT_FL_FB ; \
+-           fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
+-           | fgrep -v "error exits"
++           grep -F -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
++           | grep -F -v "error exits"
+ lapack_test_fl_fb: $(BINdir)/LAPACK_TEST
+ 	cd $(BINdir)/LAPACK_TEST ; make cleanup
+ 	- rm -rf $(BINdir)/LAPACK_TEST/LAOUT_FL_FB \
+@@ -330,8 +330,8 @@ $(BINdir)/AtlasTest/$(ARCH) : force_build
+ 	cd $(BINdir)/AtlasTest/$(ARCH) ; ../configure --atldir=$(BLDdir)
+ scope_full_results: force_build
+ 	cd $(BINdir)/AtlasTest/$(ARCH) ;  ../scope.sh
+-	- fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
+-                 $(BINdir)/AtlasTest/$(ARCH)/$(ARCH).out | fgrep -v PASSED
++	- grep -F -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
++                 $(BINdir)/AtlasTest/$(ARCH)/$(ARCH).out | grep -F -v PASSED
+ 
+ full_test : $(BINdir)/AtlasTest
+ 	$(MAKE) -f Make.top $(BINdir)/AtlasTest/$(ARCH)
+diff --git a/bin/l2peak.sh b/bin/l2peak.sh
+index e6bca06..4b218fc 100755
+--- a/bin/l2peak.sh
++++ b/bin/l2peak.sh
+@@ -4,7 +4,7 @@
+ #
+ # Discover the BLDdir
+ #
+-SRCdir=`fgrep "SRCdir =" Make.inc | sed -e "s/ *SRCdir = *//"`
++SRCdir=`grep -F "SRCdir =" Make.inc | sed -e "s/ *SRCdir = *//"`
+ BINdir=$SRCdir/bin
+ #
+ # First time out-of-cache operations
+diff --git a/bin/sum2csv.sh b/bin/sum2csv.sh
+index fe1929f..923fa9d 100755
+--- a/bin/sum2csv.sh
++++ b/bin/sum2csv.sh
+@@ -8,7 +8,7 @@ tfil=tmptmp.out
+ ofil=`echo ${fil} | sed -e "s/out/csv/"`
+ make xr1sum2csv
+ rm -f $ofil $tfil
+-n=`fgrep -n 'CUT HERE' $fil | sed 's/:.*//'`
++n=`grep -F -n 'CUT HERE' $fil | sed 's/:.*//'`
+ head -n $n $fil > $tfil
+ ./xr1sum2csv -i $tfil -m $imf -D 2 YU XU -p 1 -o $ofil
+ rm -f $tfil
+diff --git a/makes/Make.mmtune b/makes/Make.mmtune
+index 2ac8230..bbf49ce 100644
+--- a/makes/Make.mmtune
++++ b/makes/Make.mmtune
+@@ -809,7 +809,7 @@ xsmmtime_pt : force_build
+            -L $(loopO) -M $(mb) -N $(nb) -K $(kb) -m $(mu) -n $(nu) -k $(ku) \
+            -lda $(lda) -ldb $(ldb) -ldc $(ldc) -csA $(csA) -csB $(csB) \
+            -csC $(csC) -F0 $(if) -FN $(nf) -FF $(ff) -b $(beta) -a $(alpha) \
+-           -Z 1 -C $(cleanup) -R -3 | fgrep -v "define ATL_USERMM" > smm.c
++           -Z 1 -C $(cleanup) -R -3 | grep -F -v "define ATL_USERMM" > smm.c
+ 	cat $(mmrout) >> smm.c
+ 	$(SMC) $(CDEFS) $(SMCFLAGS) -DATL_BETA=$(beta) -c smm.c 
+ 	$(CLINKER) $(CLINKFLAGS) -o xsmmtime_pt smmtime_pt.o \
+@@ -926,7 +926,7 @@ xdmmtime_pt : force_build
+            -L $(loopO) -M $(mb) -N $(nb) -K $(kb) -m $(mu) -n $(nu) -k $(ku) \
+            -lda $(lda) -ldb $(ldb) -ldc $(ldc) -csA $(csA) -csB $(csB) \
+            -csC $(csC) -F0 $(if) -FN $(nf) -FF $(ff) -b $(beta) -a $(alpha) \
+-           -Z 1 -C $(cleanup) -R -3 | fgrep -v "define ATL_USERMM" > dmm.c
++           -Z 1 -C $(cleanup) -R -3 | grep -F -v "define ATL_USERMM" > dmm.c
+ 	cat $(mmrout) >> dmm.c
+ 	$(DMC) $(CDEFS) $(DMCFLAGS) -DATL_BETA=$(beta) -c dmm.c 
+ 	$(CLINKER) $(CLINKFLAGS) -o xdmmtime_pt dmmtime_pt.o \
+@@ -1044,7 +1044,7 @@ xcmmtime_pt : force_build
+            -L $(loopO) -M $(mb) -N $(nb) -K $(kb) -m $(mu) -n $(nu) -k $(ku) \
+            -lda $(lda) -ldb $(ldb) -ldc $(ldc) -csA $(csA) -csB $(csB) \
+            -csC $(csC) -F0 $(if) -FN $(nf) -FF $(ff) -b $(beta) -a $(alpha) \
+-           -Z 1 -C $(cleanup) -R -3 | fgrep -v "define ATL_USERMM" > cmm.c
++           -Z 1 -C $(cleanup) -R -3 | grep -F -v "define ATL_USERMM" > cmm.c
+ 	cat $(mmrout) >> cmm.c
+ 	$(SMC) $(CDEFS) $(SMCFLAGS) -DATL_BETA=$(beta) -c cmm.c 
+ 	$(CLINKER) $(CLINKFLAGS) -o xcmmtime_pt cmmtime_pt.o \
+@@ -1162,7 +1162,7 @@ xzmmtime_pt : force_build
+            -L $(loopO) -M $(mb) -N $(nb) -K $(kb) -m $(mu) -n $(nu) -k $(ku) \
+            -lda $(lda) -ldb $(ldb) -ldc $(ldc) -csA $(csA) -csB $(csB) \
+            -csC $(csC) -F0 $(if) -FN $(nf) -FF $(ff) -b $(beta) -a $(alpha) \
+-           -Z 1 -C $(cleanup) -R -3 | fgrep -v "define ATL_USERMM" > zmm.c
++           -Z 1 -C $(cleanup) -R -3 | grep -F -v "define ATL_USERMM" > zmm.c
+ 	cat $(mmrout) >> zmm.c
+ 	$(DMC) $(CDEFS) $(DMCFLAGS) -DATL_BETA=$(beta) -c zmm.c 
+ 	$(CLINKER) $(CLINKFLAGS) -o xzmmtime_pt zmmtime_pt.o \
+diff --git a/tune/sysinfo/emit_buildinfo.c b/tune/sysinfo/emit_buildinfo.c
+index 98389f2..e39f400 100644
+--- a/tune/sysinfo/emit_buildinfo.c
++++ b/tune/sysinfo/emit_buildinfo.c
+@@ -121,8 +121,8 @@ void GetVers(char *comp, char *vers)
+ 
+ void GetMakeMacro(char *str, char *val)
+ {
+-   char ln[128];
+-   sprintf(ln, "make print_%s | fgrep -v make", str);
++   char ln[130];
++   sprintf(ln, "make print_%s | grep -F -v make", str);
+    if (CmndOneLine(ln, val)) strcpy(val, "UNKNOWN");
+ }
+ void GetInstInfo()
+-- 
+2.39.0
+

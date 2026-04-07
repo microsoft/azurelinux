@@ -1,0 +1,28 @@
+From 20aabb2c445e29d211266ce7434bb0273edf88b9 Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:28 +0200
+Subject: [PATCH 17/50] openssh-6.4p1-fromto-remote
+
+---
+ scp.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/scp.c b/scp.c
+index 57c242ff..716ae386 100644
+--- a/scp.c
++++ b/scp.c
+@@ -1162,7 +1162,10 @@ toremote(int argc, char **argv, enum scp_mode_e mode, char *sftp_direct)
+ 			addargs(&alist, "%s", ssh_program);
+ 			addargs(&alist, "-x");
+ 			addargs(&alist, "-oClearAllForwardings=yes");
+-			addargs(&alist, "-n");
++			if (isatty(fileno(stdin)))
++				addargs(&alist, "-t");
++			else
++				addargs(&alist, "-n");
+ 			for (j = 0; j < remote_remote_args.num; j++) {
+ 				addargs(&alist, "%s",
+ 				    remote_remote_args.list[j]);
+-- 
+2.49.0
+

@@ -1,0 +1,421 @@
+From 1f5918346f1e6be3cc0550cfa0b011b17fb5111e Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Sun, 6 Jul 2025 20:44:21 +0200
+Subject: [PATCH] Upgrade to 0.280242
+
+---
+ Changes                                       | 17 +++++++++
+ LICENSE                                       |  9 +++--
+ Makefile.PL                                   |  2 +-
+ lib/ExtUtils/CBuilder.pm                      |  2 +-
+ lib/ExtUtils/CBuilder/Base.pm                 | 36 +++++++++++--------
+ lib/ExtUtils/CBuilder/Platform/Unix.pm        |  2 +-
+ lib/ExtUtils/CBuilder/Platform/VMS.pm         |  2 +-
+ lib/ExtUtils/CBuilder/Platform/Windows.pm     |  2 +-
+ lib/ExtUtils/CBuilder/Platform/Windows/BCC.pm |  2 +-
+ lib/ExtUtils/CBuilder/Platform/Windows/GCC.pm |  2 +-
+ .../CBuilder/Platform/Windows/MSVC.pm         |  2 +-
+ lib/ExtUtils/CBuilder/Platform/aix.pm         |  2 +-
+ lib/ExtUtils/CBuilder/Platform/android.pm     |  2 +-
+ lib/ExtUtils/CBuilder/Platform/cygwin.pm      |  2 +-
+ lib/ExtUtils/CBuilder/Platform/darwin.pm      |  2 +-
+ lib/ExtUtils/CBuilder/Platform/dec_osf.pm     |  2 +-
+ lib/ExtUtils/CBuilder/Platform/os2.pm         |  2 +-
+ t/00-have-compiler.t                          |  2 +-
+ t/01-basic.t                                  |  2 +-
+ t/02-link.t                                   |  2 +-
+ t/03-cplusplus.t                              | 22 ++++++++++--
+ 21 files changed, 79 insertions(+), 39 deletions(-)
+
+diff --git a/Changes b/Changes
+index 14aa6e5..1e50a56 100644
+--- a/Changes
++++ b/Changes
+@@ -1,5 +1,22 @@
+ Revision history for Perl extension ExtUtils::CBuilder.
+ 
++0.280242
++
++ Fix:
++
++ - account for possibility of envvar $CC being defined
++   https://github.com/Perl/perl5/issues/23355
++
++0.280241
++
++ Fix:
++
++ - finding the correct cplusplus compiler
++
++0.280240
++
++ - make ExtUtils::CBuilder throw an exception on Windows on linker errors
++
+ 0.280239
+ 
+  - make the definition of boot_compilet() in the probe code generated
+diff --git a/LICENSE b/LICENSE
+index 1bffb03..023fd13 100644
+--- a/LICENSE
++++ b/LICENSE
+@@ -22,7 +22,7 @@ This is free software, licensed under:
+                      Version 1, February 1989
+ 
+  Copyright (C) 1989 Free Software Foundation, Inc.
+- 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++                    <https://fsf.org/>
+ 
+  Everyone is permitted to copy and distribute verbatim copies
+  of this license document, but changing it is not allowed.
+@@ -236,8 +236,7 @@ the exclusion of warranty; and each file should have at least the
+     GNU General Public License for more details.
+ 
+     You should have received a copy of the GNU General Public License
+-    along with this program; if not, write to the Free Software
+-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
++    along with this program; if not, see <https://www.gnu.org/licenses/>.
+ 
+ 
+ Also add information on how to contact you by electronic and paper mail.
+@@ -264,8 +263,8 @@ necessary.  Here a sample; alter the names:
+   program `Gnomovision' (a program to direct compilers to make passes
+   at assemblers) written by James Hacker.
+ 
+-  <signature of Ty Coon>, 1 April 1989
+-  Ty Coon, President of Vice
++  <signature of Moe Ghoul>, 1 April 1989
++  Moe Ghoul, President of Vice
+ 
+ That's all there is to it!
+ 
+diff --git a/Makefile.PL b/Makefile.PL
+index 5b7dd5d..895fb12 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
+   "TEST_REQUIRES" => {
+     "Test::More" => "0.47"
+   },
+-  "VERSION" => "0.280235",
++  "VERSION" => "0.280242",
+   "test" => {
+     "TESTS" => "t/*.t"
+   }
+diff --git a/lib/ExtUtils/CBuilder.pm b/lib/ExtUtils/CBuilder.pm
+index ddaf24d..af66b97 100644
+--- a/lib/ExtUtils/CBuilder.pm
++++ b/lib/ExtUtils/CBuilder.pm
+@@ -7,7 +7,7 @@ use Perl::OSType qw/os_type/;
+ 
+ use warnings;
+ use strict;
+-our $VERSION = '0.280240'; # VERSION
++our $VERSION = '0.280242'; # VERSION
+ our @ISA;
+ 
+ # We only use this once - don't waste a symbol table entry on it.
+diff --git a/lib/ExtUtils/CBuilder/Base.pm b/lib/ExtUtils/CBuilder/Base.pm
+index 3024de5..4f29970 100644
+--- a/lib/ExtUtils/CBuilder/Base.pm
++++ b/lib/ExtUtils/CBuilder/Base.pm
+@@ -9,7 +9,7 @@ use Text::ParseWords;
+ use IPC::Cmd qw(can_run);
+ use File::Temp qw(tempfile);
+ 
+-our $VERSION = '0.280240'; # VERSION
++our $VERSION = '0.280242'; # VERSION
+ 
+ # More details about C/C++ compilers:
+ # http://developers.sun.com/sunstudio/documentation/product/compiler.jsp
+@@ -24,6 +24,7 @@ my %cc2cxx = (
+     xlc => [ 'xlC' ], # IBM C/C++ Set, xlc without thread-safety
+     xlc_r => [ 'xlC_r' ], # IBM C/C++ Set, xlc with thread-safety
+     cl    => [ 'cl' ], # Microsoft Visual Studio
++    clang => [ 'clang++' ], # LLVM compiler frontend
+ );
+ 
+ sub new {
+@@ -51,24 +52,31 @@ sub new {
+ 
+     ## If the path is just "cc", fileparse returns $ccpath as "./"
+     $ccpath = "" if $self->{config}{cc} =~ /^\Q$ccbase$ccsfx\E$/;
+-      
++
+     foreach my $cxx (@{$cc2cxx{$ccbase}}) {
+-      my $cxx1 = File::Spec->catfile( $ccpath, $cxx . $ccsfx);
+ 
+-      if( can_run( $cxx1 ) ) {
+-        $self->{config}{cxx} = $cxx1;
+-	last;
+-      }
+-      my $cxx2 = $cxx . $ccsfx;
++      if ( $ccpath ) {
++          my $cxx1 = File::Spec->catfile( $ccpath, $cxx . $ccsfx);
++
++          if( can_run( $cxx1 ) ) {
++              $self->{config}{cxx} = $cxx1;
++              last;
++          }
+ 
+-      if( can_run( $cxx2 ) ) {
+-        $self->{config}{cxx} = $cxx2;
+-	last;
+       }
++      else {
++          my $cxx2 = $cxx . $ccsfx;
++
++          if( can_run( $cxx2 ) ) {
++              $self->{config}{cxx} = $cxx2;
++              last;
++          }
++
++          if( can_run( $cxx ) ) {
++              $self->{config}{cxx} = $cxx;
++              last;
++          }
+ 
+-      if( can_run( $cxx ) ) {
+-        $self->{config}{cxx} = $cxx;
+-	last;
+       }
+     }
+     unless ( exists $self->{config}{cxx} ) {
+diff --git a/lib/ExtUtils/CBuilder/Platform/Unix.pm b/lib/ExtUtils/CBuilder/Platform/Unix.pm
+index bc7a4fe..09ef330 100644
+--- a/lib/ExtUtils/CBuilder/Platform/Unix.pm
++++ b/lib/ExtUtils/CBuilder/Platform/Unix.pm
+@@ -4,7 +4,7 @@ use warnings;
+ use strict;
+ use ExtUtils::CBuilder::Base;
+ 
+-our $VERSION = '0.280240'; # VERSION
++our $VERSION = '0.280242'; # VERSION
+ our @ISA = qw(ExtUtils::CBuilder::Base);
+ 
+ sub link_executable {
+diff --git a/lib/ExtUtils/CBuilder/Platform/VMS.pm b/lib/ExtUtils/CBuilder/Platform/VMS.pm
+index f7579a2..0d3ef4a 100644
+--- a/lib/ExtUtils/CBuilder/Platform/VMS.pm
++++ b/lib/ExtUtils/CBuilder/Platform/VMS.pm
+@@ -4,7 +4,7 @@ use warnings;
+ use strict;
+ use ExtUtils::CBuilder::Base;
+ 
+-our $VERSION = '0.280240'; # VERSION
++our $VERSION = '0.280242'; # VERSION
+ our @ISA = qw(ExtUtils::CBuilder::Base);
+ 
+ use File::Spec::Functions qw(catfile catdir);
+diff --git a/lib/ExtUtils/CBuilder/Platform/Windows.pm b/lib/ExtUtils/CBuilder/Platform/Windows.pm
+index 3ad649d..8c34a87 100644
+--- a/lib/ExtUtils/CBuilder/Platform/Windows.pm
++++ b/lib/ExtUtils/CBuilder/Platform/Windows.pm
+@@ -8,7 +8,7 @@ use File::Spec;
+ use ExtUtils::CBuilder::Base;
+ use IO::File;
+ 
+-our $VERSION = '0.280240'; # VERSION
++our $VERSION = '0.280242'; # VERSION
+ our @ISA = qw(ExtUtils::CBuilder::Base);
+ 
+ =begin comment
+diff --git a/lib/ExtUtils/CBuilder/Platform/Windows/BCC.pm b/lib/ExtUtils/CBuilder/Platform/Windows/BCC.pm
+index 737448f..6f28b52 100644
+--- a/lib/ExtUtils/CBuilder/Platform/Windows/BCC.pm
++++ b/lib/ExtUtils/CBuilder/Platform/Windows/BCC.pm
+@@ -1,6 +1,6 @@
+ package ExtUtils::CBuilder::Platform::Windows::BCC;
+ 
+-our $VERSION = '0.280240'; # VERSION
++our $VERSION = '0.280242'; # VERSION
+ 
+ use strict;
+ use warnings;
+diff --git a/lib/ExtUtils/CBuilder/Platform/Windows/GCC.pm b/lib/ExtUtils/CBuilder/Platform/Windows/GCC.pm
+index d2da1ed..93fbbf5 100644
+--- a/lib/ExtUtils/CBuilder/Platform/Windows/GCC.pm
++++ b/lib/ExtUtils/CBuilder/Platform/Windows/GCC.pm
+@@ -1,6 +1,6 @@
+ package ExtUtils::CBuilder::Platform::Windows::GCC;
+ 
+-our $VERSION = '0.280240'; # VERSION
++our $VERSION = '0.280242'; # VERSION
+ 
+ use warnings;
+ use strict;
+diff --git a/lib/ExtUtils/CBuilder/Platform/Windows/MSVC.pm b/lib/ExtUtils/CBuilder/Platform/Windows/MSVC.pm
+index 2acca7a..8be9135 100644
+--- a/lib/ExtUtils/CBuilder/Platform/Windows/MSVC.pm
++++ b/lib/ExtUtils/CBuilder/Platform/Windows/MSVC.pm
+@@ -1,6 +1,6 @@
+ package ExtUtils::CBuilder::Platform::Windows::MSVC;
+ 
+-our $VERSION = '0.280240'; # VERSION
++our $VERSION = '0.280242'; # VERSION
+ 
+ use warnings;
+ use strict;
+diff --git a/lib/ExtUtils/CBuilder/Platform/aix.pm b/lib/ExtUtils/CBuilder/Platform/aix.pm
+index 373d025..acaa4c6 100644
+--- a/lib/ExtUtils/CBuilder/Platform/aix.pm
++++ b/lib/ExtUtils/CBuilder/Platform/aix.pm
+@@ -5,7 +5,7 @@ use strict;
+ use ExtUtils::CBuilder::Platform::Unix;
+ use File::Spec;
+ 
+-our $VERSION = '0.280240'; # VERSION
++our $VERSION = '0.280242'; # VERSION
+ our @ISA = qw(ExtUtils::CBuilder::Platform::Unix);
+ 
+ sub need_prelink { 1 }
+diff --git a/lib/ExtUtils/CBuilder/Platform/android.pm b/lib/ExtUtils/CBuilder/Platform/android.pm
+index 5eec4e5..7565de9 100644
+--- a/lib/ExtUtils/CBuilder/Platform/android.pm
++++ b/lib/ExtUtils/CBuilder/Platform/android.pm
+@@ -6,7 +6,7 @@ use File::Spec;
+ use ExtUtils::CBuilder::Platform::Unix;
+ use Config;
+ 
+-our $VERSION = '0.280240'; # VERSION
++our $VERSION = '0.280242'; # VERSION
+ our @ISA = qw(ExtUtils::CBuilder::Platform::Unix);
+ 
+ # The Android linker will not recognize symbols from
+diff --git a/lib/ExtUtils/CBuilder/Platform/cygwin.pm b/lib/ExtUtils/CBuilder/Platform/cygwin.pm
+index 175d22a..a4faa28 100644
+--- a/lib/ExtUtils/CBuilder/Platform/cygwin.pm
++++ b/lib/ExtUtils/CBuilder/Platform/cygwin.pm
+@@ -5,7 +5,7 @@ use strict;
+ use File::Spec;
+ use ExtUtils::CBuilder::Platform::Unix;
+ 
+-our $VERSION = '0.280240'; # VERSION
++our $VERSION = '0.280242'; # VERSION
+ our @ISA = qw(ExtUtils::CBuilder::Platform::Unix);
+ 
+ # TODO: If a specific exe_file name is requested, if the exe created
+diff --git a/lib/ExtUtils/CBuilder/Platform/darwin.pm b/lib/ExtUtils/CBuilder/Platform/darwin.pm
+index 42f28b1..3e0c991 100644
+--- a/lib/ExtUtils/CBuilder/Platform/darwin.pm
++++ b/lib/ExtUtils/CBuilder/Platform/darwin.pm
+@@ -5,7 +5,7 @@ use strict;
+ use ExtUtils::CBuilder::Platform::Unix;
+ use Config;
+ 
+-our $VERSION = '0.280240'; # VERSION
++our $VERSION = '0.280242'; # VERSION
+ our @ISA = qw(ExtUtils::CBuilder::Platform::Unix);
+ 
+ my ($osver) = split /\./, $Config{osvers};
+diff --git a/lib/ExtUtils/CBuilder/Platform/dec_osf.pm b/lib/ExtUtils/CBuilder/Platform/dec_osf.pm
+index f020dca..d225244 100644
+--- a/lib/ExtUtils/CBuilder/Platform/dec_osf.pm
++++ b/lib/ExtUtils/CBuilder/Platform/dec_osf.pm
+@@ -5,7 +5,7 @@ use strict;
+ use ExtUtils::CBuilder::Platform::Unix;
+ use File::Spec;
+ 
+-our $VERSION = '0.280240'; # VERSION
++our $VERSION = '0.280242'; # VERSION
+ our @ISA = qw(ExtUtils::CBuilder::Platform::Unix);
+ 
+ sub link_executable {
+diff --git a/lib/ExtUtils/CBuilder/Platform/os2.pm b/lib/ExtUtils/CBuilder/Platform/os2.pm
+index 53e63b9..9d34e0e 100644
+--- a/lib/ExtUtils/CBuilder/Platform/os2.pm
++++ b/lib/ExtUtils/CBuilder/Platform/os2.pm
+@@ -4,7 +4,7 @@ use warnings;
+ use strict;
+ use ExtUtils::CBuilder::Platform::Unix;
+ 
+-our $VERSION = '0.280240'; # VERSION
++our $VERSION = '0.280242'; # VERSION
+ our @ISA = qw(ExtUtils::CBuilder::Platform::Unix);
+ 
+ sub need_prelink { 1 }
+diff --git a/t/00-have-compiler.t b/t/00-have-compiler.t
+index bd2ed10..bac6451 100644
+--- a/t/00-have-compiler.t
++++ b/t/00-have-compiler.t
+@@ -13,7 +13,7 @@ BEGIN {
+   if ($^O eq 'VMS') {
+     # So we can get the return value of system()
+     require vmsish;
+-    import vmsish;
++    vmsish->import;
+   }
+ }
+ 
+diff --git a/t/01-basic.t b/t/01-basic.t
+index d6b75e9..80435fa 100644
+--- a/t/01-basic.t
++++ b/t/01-basic.t
+@@ -6,7 +6,7 @@ BEGIN {
+   if ($^O eq 'VMS') {
+     # So we can get the return value of system()
+     require vmsish;
+-    import vmsish;
++    vmsish->import;
+   }
+ }
+ use ExtUtils::CBuilder;
+diff --git a/t/02-link.t b/t/02-link.t
+index 6160c26..6ee68cc 100644
+--- a/t/02-link.t
++++ b/t/02-link.t
+@@ -6,7 +6,7 @@ BEGIN {
+   if ($^O eq 'VMS') {
+     # So we can get the return value of system()
+     require vmsish;
+-    import vmsish;
++    vmsish->import;
+   }
+ }
+ use ExtUtils::CBuilder;
+diff --git a/t/03-cplusplus.t b/t/03-cplusplus.t
+index 2fae11f..cfa720d 100644
+--- a/t/03-cplusplus.t
++++ b/t/03-cplusplus.t
+@@ -6,7 +6,7 @@ BEGIN {
+   if ($^O eq 'VMS') {
+     # So we can get the return value of system()
+     require vmsish;
+-    import vmsish;
++    vmsish->import;
+   }
+ }
+ use ExtUtils::CBuilder;
+@@ -26,8 +26,6 @@ else {
+   plan tests => 7;
+ }
+ 
+-ok $b, "created EU::CB object";
+-
+ ok $b->have_cplusplus, "have_cplusplus";
+ 
+ $source_file = File::Spec->catfile('t', 'cplust.cc');
+@@ -62,3 +60,21 @@ if ($^O eq 'VMS') {
+    1 while unlink 'CPLUST.OPT';
+ }
+ 
++{
++    # GH #23355
++    local $ENV{CC};
++    delete $ENV{CC};
++    local $ENV{CXX};
++    delete $ENV{CXX};
++    # GH #23146
++    my $fake_cc = File::Spec->rel2abs(File::Spec->catfile(qw(some directory what doesnt exist), 'cc'));
++    my $cb = ExtUtils::CBuilder->new(
++        quiet => $quiet,
++        config => {
++            cc => $fake_cc,
++        },
++    );
++
++    is $cb->{config}{cxx}, $fake_cc, "did not search PATH for C++ compiler when given absolute path to C compiler";
++}
++
+-- 
+2.50.0
+

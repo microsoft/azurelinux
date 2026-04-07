@@ -1,0 +1,26 @@
+--- hickory-resolver-0.24.4/Cargo.toml	1970-01-01T00:00:01+00:00
++++ hickory-resolver-0.24.4/Cargo.toml	2025-09-18T09:14:29.616235+00:00
+@@ -237,7 +237,6 @@
+     "hickory-proto/serde-config",
+ ]
+ system-config = [
+-    "ipconfig",
+     "resolv-conf",
+ ]
+ testing = []
+@@ -250,10 +249,6 @@
+     "hickory-proto/webpki-roots",
+ ]
+ 
+-[target."cfg(windows)".dependencies.ipconfig]
+-version = "0.3.0"
+-optional = true
+-
+ [badges.codecov]
+ branch = "main"
+ repository = "hickory-dns/hickory-dns"
+@@ -266,3 +261,4 @@
+ level = "warn"
+ priority = 0
+ check-cfg = ["cfg(nightly)"]
++

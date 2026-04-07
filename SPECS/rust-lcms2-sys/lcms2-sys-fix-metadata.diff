@@ -1,0 +1,31 @@
+--- lcms2-sys-4.0.5/Cargo.toml	1970-01-01T00:00:01+00:00
++++ lcms2-sys-4.0.5/Cargo.toml	2024-04-02T12:03:08.844522+00:00
+@@ -19,12 +19,8 @@
+ include = [
+     "src/*",
+     "Cargo.toml",
+-    "COPYING",
++    "LICENSE",
+     "README.md",
+-    "vendor/LICENSE",
+-    "vendor/src/*.c",
+-    "vendor/src/*.h",
+-    "vendor/include/*.h",
+ ]
+ description = """
+ Bindings for liblcms2 (Little CMS) with support for Linux, macOS, and Windows.
+@@ -70,14 +66,11 @@
+ [features]
+ default = [
+     "dynamic",
+-    "static-fallback",
+     "parallel",
+ ]
+ dynamic = ["dep:pkg-config"]
+ lcms2-strict-cgats = []
+ parallel = ["cc?/parallel"]
+-static = ["dep:cc"]
+-static-fallback = ["dep:cc"]
+ 
+ [badges.maintenance]
+ status = "actively-developed"

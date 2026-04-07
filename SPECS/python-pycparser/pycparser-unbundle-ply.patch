@@ -1,0 +1,51 @@
+diff --git a/pycparser/c_lexer.py b/pycparser/c_lexer.py
+index 22c64bc..a97c5d1 100644
+--- a/pycparser/c_lexer.py
++++ b/pycparser/c_lexer.py
+@@ -8,8 +8,8 @@
+ #------------------------------------------------------------------------------
+ import re
+ 
+-from .ply import lex
+-from .ply.lex import TOKEN
++from ply import lex
++from ply.lex import TOKEN
+ 
+ 
+ class CLexer(object):
+diff --git a/pycparser/c_parser.py b/pycparser/c_parser.py
+index d31574a..5fc3544 100644
+--- a/pycparser/c_parser.py
++++ b/pycparser/c_parser.py
+@@ -6,7 +6,7 @@
+ # Eli Bendersky [https://eli.thegreenplace.net/]
+ # License: BSD
+ #------------------------------------------------------------------------------
+-from .ply import yacc
++from ply import yacc
+ 
+ from . import c_ast
+ from .c_lexer import CLexer
+diff --git a/setup.py b/setup.py
+index f7e89bf..f78f559 100644
+--- a/setup.py
++++ b/setup.py
+@@ -8,6 +8,8 @@ except ImportError:
+     from distutils.command.install import install as _install
+     from distutils.command.sdist import sdist as _sdist
+ 
++import ply
++
+ 
+ def _run_build_tables(dir):
+     from subprocess import check_call
+@@ -60,7 +62,8 @@ setup(
+         'Programming Language :: Python :: 3.12',
+     ],
+     python_requires=">=3.8",
+-    packages=['pycparser', 'pycparser.ply'],
++    packages=['pycparser'],
++    install_requires=['ply==' + ply.__version__],
+     package_data={'pycparser': ['*.cfg']},
+     cmdclass={'install': install, 'sdist': sdist},
+ )

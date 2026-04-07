@@ -1,0 +1,15 @@
+unzip uses C89-only features, so it needs to be built in C89 mode.
+
+diff --git a/unix/Makefile b/unix/Makefile
+index ab32270cf4b9b2cf..5eabbe13095e1f58 100644
+--- a/unix/Makefile
++++ b/unix/Makefile
+@@ -545,7 +545,7 @@ generic:	flags	   # now try autoconfigure first
+ #	make $(MAKEF) unzips CF="${CF} `cat flags`"
+ 
+ generic_gcc:
+-	$(MAKE) $(MAKEF) generic CC=gcc IZ_BZIP2="$(IZ_BZIP2)"
++	$(MAKE) $(MAKEF) generic CC="gcc -std=gnu89" IZ_BZIP2="$(IZ_BZIP2)"
+ 
+ # extensions to perform SVR4 package-creation after compilation
+ generic_pkg:	generic svr4package

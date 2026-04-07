@@ -1,0 +1,24 @@
+diff --git a/setup.cfg b/setup.cfg
+index 05fa374..9ff5e8d 100644
+--- a/setup.cfg
++++ b/setup.cfg
+@@ -64,8 +64,6 @@
+ 	sphinx_rtd_theme
+ test = 
+ 	pytest
+-	flake8
+-	isort
+ 
+ [bdist_wheel]
+ python-tag = py3
+@@ -82,10 +80,6 @@
+ 	.git
+ 	*.egg-info
+ 
+-[isort]
+-default_section = THIRDPARTY
+-multi_line_output = 4
+-
+ [egg_info]
+ tag_build = 
+ tag_date = 0

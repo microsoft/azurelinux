@@ -1,0 +1,32 @@
+commit 3cd9d2e5f9b4760c4c178c6e6c23247249012611
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Wed Jul 3 18:26:34 2024 +0200
+
+    tests: Use p384 instead of p192
+    
+    The p192 is not available on all platforms, such as Fedora.
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+
+diff --git a/test/test_cryptography.py b/test/test_cryptography.py
+index ed3dd6f..7f1bad5 100644
+--- a/test/test_cryptography.py
++++ b/test/test_cryptography.py
+@@ -297,14 +297,14 @@ class TestCryptography(TSS2_EsapiTest):
+         )
+         privkey = tpm_ecc_private_key(self.ectx, handle)
+ 
+-        peer_key = ec.generate_private_key(ec.SECP192R1())
++        peer_key = ec.generate_private_key(ec.SECP384R1())
+         peer_public_key = peer_key.public_key()
+ 
+         with self.assertRaises(ValueError) as e:
+             privkey.exchange(ec.ECDH(), peer_public_key)
+         self.assertEqual(
+             str(e.exception),
+-            "curve mismatch for peer key, got secp192r1, expected secp256r1",
++            "curve mismatch for peer key, got secp384r1, expected secp256r1",
+         )
+ 
+     def test_ecc_no_sign(self):
+

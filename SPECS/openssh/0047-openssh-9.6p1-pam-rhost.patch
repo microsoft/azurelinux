@@ -1,0 +1,25 @@
+From 497de886faaddec60b7ad1013396c7d4f3145968 Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:29 +0200
+Subject: [PATCH 47/50] openssh-9.6p1-pam-rhost
+
+---
+ auth-pam.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/auth-pam.c b/auth-pam.c
+index a042c3c8..a321e0d3 100644
+--- a/auth-pam.c
++++ b/auth-pam.c
+@@ -741,7 +741,7 @@ sshpam_init(struct ssh *ssh, Authctxt *authctxt)
+ 		sshpam_laddr = get_local_ipaddr(
+ 		    ssh_packet_get_connection_in(ssh));
+ 	}
+-	if (sshpam_rhost != NULL) {
++	if (sshpam_rhost != NULL && strcmp(sshpam_rhost, "UNKNOWN") != 0) {
+ 		debug("PAM: setting PAM_RHOST to \"%s\"", sshpam_rhost);
+ 		sshpam_err = pam_set_item(sshpam_handle, PAM_RHOST,
+ 		    sshpam_rhost);
+-- 
+2.49.0
+

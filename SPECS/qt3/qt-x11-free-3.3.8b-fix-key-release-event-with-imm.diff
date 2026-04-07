@@ -1,0 +1,57 @@
+diff -up qt-x11-free-3.3.8b/src/kernel/qapplication_x11.cpp.fix-key-release-event-with-imm qt-x11-free-3.3.8b/src/kernel/qapplication_x11.cpp
+--- qt-x11-free-3.3.8b/src/kernel/qapplication_x11.cpp.fix-key-release-event-with-imm	2008-10-08 14:50:10.000000000 +0200
++++ qt-x11-free-3.3.8b/src/kernel/qapplication_x11.cpp	2008-10-08 14:50:10.000000000 +0200
+@@ -3297,11 +3297,7 @@ int QApplication::x11ProcessEvent( XEven
+     // filtering opportunity first to ensure all input methods work
+     // properly regardless of application design.
+ 
+-#ifndef QT_NO_IM_EXTENSIONS
+     if( keywidget && keywidget->isEnabled() && keywidget->isInputMethodEnabled() ) {
+-#else
+-    if( keywidget && keywidget->isEnabled() ) {
+-#endif
+ 	if( ( event->type==XKeyPress || event->type==XKeyRelease ) &&
+ 	    sm_blockUserInput ) // block user interaction during session management
+ 	    return TRUE;
+@@ -5223,11 +5219,12 @@ bool QETWidget::translateKeyEventInterna
+     } else {
+ 	key = (int)(long)keyDict->find( keycode );
+ 	if ( key )
+-	    if( !willRepeat ) // Take out key of dictionary only if this call.
++	    if( !willRepeat && statefulTranslation ) // Take out key of dictionary only if this call.
+ 		keyDict->take( keycode );
+ 	long s = (long)textDict->find( keycode );
+ 	if ( s ) {
+-	    textDict->take( keycode );
++	    if( statefulTranslation )
++	        textDict->take( keycode );
+ 	    ascii = (char)(s-256);
+ 	}
+     }
+diff -up qt-x11-free-3.3.8b/src/kernel/qwidget_x11.cpp.fix-key-release-event-with-imm qt-x11-free-3.3.8b/src/kernel/qwidget_x11.cpp
+--- qt-x11-free-3.3.8b/src/kernel/qwidget_x11.cpp.fix-key-release-event-with-imm	2008-10-08 14:50:10.000000000 +0200
++++ qt-x11-free-3.3.8b/src/kernel/qwidget_x11.cpp	2008-10-08 14:59:03.000000000 +0200
+@@ -2700,11 +2700,10 @@ QInputContext *QWidget::getInputContext(
+ {
+     QInputContext *qic = 0;
+ 
+-#if !defined(QT_NO_IM_EXTENSIONS)
+     if ( isInputMethodEnabled() ) {
++#if !defined(QT_NO_IM_EXTENSIONS)
+       qic = icHolderWidget()->ic;
+ #else
+-    {
+       // icHolderWidget is always topLevelWidget
+       QTLWExtra *topdata = icHolderWidget()->topData();
+       qic = (QInputContext *)topdata->xic;
+@@ -2755,10 +2754,8 @@ void QWidget::changeInputContext( const 
+ */
+ void QWidget::createInputContext()
+ {
+-#if !defined(QT_NO_IM_EXTENSIONS)
+     if( !isInputMethodEnabled() || QApplication::closingDown() )
+       return;
+-#endif
+ 
+     QWidget *icWidget = icHolderWidget();
+ #ifndef QT_NO_IM

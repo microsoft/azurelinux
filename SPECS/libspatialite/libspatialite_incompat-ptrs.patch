@@ -1,0 +1,175 @@
+diff -rupN libspatialite-5.1.0/src/gaiaaux/gg_utf8.c libspatialite-5.1.0-new/src/gaiaaux/gg_utf8.c
+--- libspatialite-5.1.0/src/gaiaaux/gg_utf8.c	2023-08-04 09:51:40.000000000 +0200
++++ libspatialite-5.1.0-new/src/gaiaaux/gg_utf8.c	2024-03-05 23:09:38.938054342 +0100
+@@ -130,7 +130,12 @@ gaiaConvertCharset (char **buf, const ch
+     pBuf = *buf;
+     utf8buf = sqlite3_malloc (utf8len);
+     pUtf8buf = utf8buf;
+-    if (iconv (cvt, &pBuf, &len, &pUtf8buf, &utf8len) == (size_t) (-1))
++#if defined(__MINGW32__)
++    WINICONV_CONST char ** ppBuf = (WINICONV_CONST char**)&pBuf;
++#else
++    char ** ppBuf = &pBuf;
++#endif
++    if (iconv (cvt, ppBuf, &len, &pUtf8buf, &utf8len) == (size_t) (-1))
+ 	goto error;
+     utf8buf[maxlen - utf8len] = '\0';
+     sqlite3_free (*buf);
+@@ -188,7 +193,12 @@ gaiaConvertToUTF8 (void *cvtCS, const ch
+     utf8len = maxlen;
+     pBuf = (char *) buf;
+     pUtf8buf = utf8buf;
+-    if (iconv (cvtCS, &pBuf, &len, &pUtf8buf, &utf8len) == (size_t) (-1))
++#if defined(__MINGW32__)
++    WINICONV_CONST char ** ppBuf = (WINICONV_CONST char**)&pBuf;
++#else
++    char ** ppBuf = &pBuf;
++#endif
++    if (iconv (cvtCS, ppBuf, &len, &pUtf8buf, &utf8len) == (size_t) (-1))
+       {
+ 	  free (utf8buf);
+ 	  *err = 1;
+@@ -224,7 +234,12 @@ url_toUtf8 (const char *url, const char
+     utf8len = maxlen;
+     utf8buf = malloc (maxlen);
+     pUtf8buf = utf8buf;
+-    if (iconv (cvt, &pBuf, &len, &pUtf8buf, &utf8len) == (size_t) (-1))
++#if defined(__MINGW32__)
++    WINICONV_CONST char ** ppBuf = (WINICONV_CONST char**)&pBuf;
++#else
++    char ** ppBuf = &pBuf;
++#endif
++    if (iconv (cvt, ppBuf, &len, &pUtf8buf, &utf8len) == (size_t) (-1))
+ 	goto error;
+     utf8buf[maxlen - utf8len] = '\0';
+     iconv_close (cvt);
+@@ -252,6 +267,12 @@ url_fromUtf8 (const char *url, const cha
+ #else /* not WIN32 */
+     char *pBuf = (char *) url;
+ #endif
++#if defined(__MINGW32__)
++    WINICONV_CONST char ** ppBuf = (WINICONV_CONST char**)&pBuf;
++#else
++    char ** ppBuf = &pBuf;
++#endif
++
+ 
+     if (url == NULL || out_charset == NULL)
+ 	return NULL;
+@@ -263,7 +284,7 @@ url_fromUtf8 (const char *url, const cha
+     utf8len = maxlen;
+     utf8buf = malloc (maxlen);
+     pUtf8buf = utf8buf;
+-    if (iconv (cvt, &pBuf, &len, &pUtf8buf, &utf8len) == (size_t) (-1))
++    if (iconv (cvt, ppBuf, &len, &pUtf8buf, &utf8len) == (size_t) (-1))
+ 	goto error;
+     utf8buf[maxlen - utf8len] = '\0';
+     iconv_close (cvt);
+diff -rupN libspatialite-5.1.0/src/gaiageo/gg_shape.c libspatialite-5.1.0-new/src/gaiageo/gg_shape.c
+--- libspatialite-5.1.0/src/gaiageo/gg_shape.c	2023-08-04 09:51:40.000000000 +0200
++++ libspatialite-5.1.0-new/src/gaiageo/gg_shape.c	2024-03-05 23:21:43.191027073 +0100
+@@ -694,8 +694,13 @@ gaiaOpenShpRead (gaiaShapefilePtr shp, c
+ 	  utf8len = 2048;
+ 	  pBuf = (char *) field_name;
+ 	  pUtf8buf = utf8buf;
++#if defined(__MINGW32__)
++	  WINICONV_CONST char ** ppBuf = (WINICONV_CONST char**)&pBuf;
++#else
++	  char ** ppBuf = &pBuf;
++#endif
+ 	  if (iconv
+-	      ((iconv_t) (shp->IconvObj), &pBuf, &len, &pUtf8buf,
++	      ((iconv_t) (shp->IconvObj), ppBuf, &len, &pUtf8buf,
+ 	       &utf8len) == (size_t) (-1))
+ 	    {
+ 		spatialite_e
+@@ -1178,8 +1183,13 @@ gaiaOpenShpWriteEx (gaiaShapefilePtr shp
+ 	  utf8len = 2048;
+ 	  pBuf = buf;
+ 	  pUtf8buf = utf8buf;
++#if defined(__MINGW32__)
++	  WINICONV_CONST char ** ppBuf = (WINICONV_CONST char**)&pBuf;
++#else
++	  char ** ppBuf = &pBuf;
++#endif
+ 	  if (iconv
+-	      ((iconv_t) (shp->IconvObj), &pBuf, &len, &pUtf8buf,
++	      ((iconv_t) (shp->IconvObj), ppBuf, &len, &pUtf8buf,
+ 	       &utf8len) == (size_t) (-1))
+ 	      sprintf (buf, "FLD#%d", defaultId++);
+ 	  else
+@@ -1546,8 +1556,13 @@ parseDbfField (unsigned char *buf_dbf, v
+ 		utf8len = 2048;
+ 		pBuf = (char *) buf;
+ 		pUtf8buf = utf8buf;
++#if defined(__MINGW32__)
++		WINICONV_CONST char ** ppBuf = (WINICONV_CONST char**)&pBuf;
++#else
++		char ** ppBuf = &pBuf;
++#endif
+ 		if (iconv
+-		    ((iconv_t) (iconv_obj), &pBuf, &len, &pUtf8buf,
++		    ((iconv_t) (iconv_obj), ppBuf, &len, &pUtf8buf,
+ 		     &utf8len) == (size_t) (-1))
+ 		    return 0;
+ 		memcpy (buf, utf8buf, 2048 - utf8len);
+@@ -3029,8 +3044,13 @@ gaiaWriteShpEntity (gaiaShapefilePtr shp
+ 			    utf8len = 2048;
+ 			    pBuf = dynbuf;
+ 			    pUtf8buf = utf8buf;
++#if defined(__MINGW32__)
++			    WINICONV_CONST char ** ppBuf = (WINICONV_CONST char**)&pBuf;
++#else
++			    char ** ppBuf = &pBuf;
++#endif
+ 			    if (iconv
+-				((iconv_t) (shp->IconvObj), &pBuf, &len,
++				((iconv_t) (shp->IconvObj), ppBuf, &len,
+ 				 &pUtf8buf, &utf8len) == (size_t) (-1))
+ 			      {
+ 				  spatialite_e
+@@ -5115,8 +5135,13 @@ gaiaOpenDbfRead (gaiaDbfPtr dbf, const c
+ 	  utf8len = 2048;
+ 	  pBuf = (char *) field_name;
+ 	  pUtf8buf = utf8buf;
++#if defined(__MINGW32__)
++	  WINICONV_CONST char ** ppBuf = (WINICONV_CONST char**)&pBuf;
++#else
++	  char ** ppBuf = &pBuf;
++#endif
+ 	  if (iconv
+-	      ((iconv_t) (dbf->IconvObj), &pBuf, &len, &pUtf8buf,
++	      ((iconv_t) (dbf->IconvObj), ppBuf, &len, &pUtf8buf,
+ 	       &utf8len) == (size_t) (-1))
+ 	    {
+ 		spatialite_e
+@@ -5311,8 +5336,13 @@ gaiaOpenDbfWriteEx (gaiaDbfPtr dbf, cons
+ 	  utf8len = 2048;
+ 	  pBuf = buf;
+ 	  pUtf8buf = utf8buf;
++#if defined(__MINGW32__)
++	  WINICONV_CONST char ** ppBuf = (WINICONV_CONST char**)&pBuf;
++#else
++	  char ** ppBuf = &pBuf;
++#endif
+ 	  if (iconv
+-	      ((iconv_t) (dbf->IconvObj), &pBuf, &len, &pUtf8buf,
++	      ((iconv_t) (dbf->IconvObj), ppBuf, &len, &pUtf8buf,
+ 	       &utf8len) == (size_t) (-1))
+ 	      sprintf (buf, "FLD#%d", defaultId++);
+ 	  else
+@@ -5432,8 +5462,13 @@ gaiaWriteDbfEntity (gaiaDbfPtr dbf, gaia
+ 			    utf8len = 2048;
+ 			    pBuf = dynbuf;
+ 			    pUtf8buf = utf8buf;
++#if defined(__MINGW32__)
++			    WINICONV_CONST char ** ppBuf = (WINICONV_CONST char**)&pBuf;
++#else
++			    char ** ppBuf = &pBuf;
++#endif
+ 			    if (iconv
+-				((iconv_t) (dbf->IconvObj), &pBuf, &len,
++				((iconv_t) (dbf->IconvObj), ppBuf, &len,
+ 				 &pUtf8buf, &utf8len) == (size_t) (-1))
+ 			      {
+ 				  spatialite_e

@@ -1,0 +1,330 @@
+## START: Set by rpmautospec
+## (rpmautospec version 0.8.4)
+## RPMAUTOSPEC: autorelease, autochangelog
+%define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
+    release_number = 2;
+    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
+    print(release_number + base_release_number - 1);
+}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
+## END: Set by rpmautospec
+
+# This spec file has been modified by azldev to include build configuration overlays.
+# Do not edit manually; changes may be overwritten.
+
+# All package versioning is found here:
+# the actual version is composed from these below
+#   bzrmajor:  main bzr version
+#   Version: bzr version, add subrelease version here
+%global brzmajor 3.3
+%global brzminor .17
+
+Name:           breezy
+Version:        %{brzmajor}%{?brzminor}
+Release:        %autorelease
+Summary:        Friendly distributed version control system
+
+# breezy is GPL-2.0-or-later, but it has Rust dependencies
+# see packaged LICENSE.dependencies for details
+License:        GPL-2.0-or-later AND (MIT OR Apache-2.0) AND Unicode-DFS-2016 AND MIT AND (Unlicense OR MIT)
+URL:            http://www.breezy-vcs.org/
+Source0:        https://github.com/breezy-team/breezy/archive/brz-%{version}%{?brzrc}.tar.gz
+Source1:        brz-icon-64.png
+
+BuildRequires:  python3-devel
+BuildRequires:  rust-packaging >= 21
+BuildRequires:  zlib-devel
+BuildRequires:  gcc
+BuildRequires:  gettext
+BuildRequires:  make
+
+# This is the name of the command, note that it is brz, not bzr
+Provides:       brz = %{version}-%{release}
+
+# breezy is a fork of bzr and replaces it
+Provides:       bzr = %{version}-%{release}
+Obsoletes:      bzr < 3
+Provides:       git-remote-bzr = %{version}-%{release}
+Obsoletes:      git-remote-bzr < 3
+
+# This is needed for launchpad support
+Recommends:     python3-launchpadlib
+
+# Docs are not needed, but some might want them
+Suggests:       %{name}-doc = %{version}-%{release}
+
+%description
+Breezy (brz) is a decentralized revision control system, designed to be easy
+for developers and end users alike.
+
+By default, Breezy provides support for both the Bazaar and Git file formats.
+
+
+%package doc
+Summary:        Documentation for Breezy
+License:        GPL-2.0-or-later
+BuildArch:      noarch
+
+%description doc
+This package contains the documentation for the Breezy version control system.
+
+%prep
+%autosetup -p1 -n %{name}-brz-%{version}%{?brzrc}
+
+%cargo_prep
+
+# Remove unused shebangs
+sed -i '1{/#![[:space:]]*\/usr\/bin\/\(python\|env\)/d}' \
+    breezy/__main__.py \
+    breezy/git/git_remote_helper.py \
+    breezy/git/tests/test_git_remote_helper.py \
+    breezy/plugins/bash_completion/bashcomp.py \
+    breezy/plugins/zsh_completion/zshcomp.py \
+    breezy/tests/ssl_certs/create_ssls.py \
+    contrib/brz_access
+
+# Remove Cython generated .c files
+find . -name '*_pyx.c' -exec rm \{\} \;
+
+# Don't strip debug symbols, we generate debuginfo packages
+sed -i 's/Strip.All/Strip.No/' setup.py
+
+
+%generate_buildrequires
+%cargo_generate_buildrequires
+%pyproject_buildrequires -x doc
+
+
+%build
+%pyproject_wheel
+
+chmod a-x contrib/bash/brzbashprompt.sh
+
+# Generate man pages (needed because pyproject_wheel doesn't run setup.py build_man)
+%{__python3} tools/generate_docs.py man
+
+# Build documents
+make docs-sphinx PYTHON=%{__python3}
+rm doc/*/_build/html/.buildinfo
+rm -f doc/*/_build/html/_static/*/Makefile
+pushd doc
+for dir in *; do
+  test -d $dir/_build/html && mv $dir/_build/html ../$dir
+done
+popd
+
+# Add Rust licenses
+%{cargo_license_summary}
+%{cargo_license} > LICENSE.dependencies
+
+%install
+%pyproject_install
+%pyproject_save_files -l breezy
+chmod -R a+rX contrib
+chmod 0644 contrib/debian/init.d
+chmod 0644 contrib/bzr_ssh_path_limiter  # note the bzr here
+chmod 0644 contrib/brz_access
+chmod 0755 %{buildroot}%{python3_sitearch}/%{name}/*.so
+
+install -Dpm 0644 contrib/bash/brz %{buildroot}%{bash_completions_dir}/brz
+rm contrib/bash/brz
+
+install -d %{buildroot}%{_datadir}/pixmaps
+install -m 0644 %{SOURCE1} %{buildroot}%{_datadir}/pixmaps/brz.png
+
+# Install man pages manually
+install -d %{buildroot}%{_mandir}/man1
+install -m 0644 brz.1 %{buildroot}%{_mandir}/man1/
+install -m 0644 breezy/git/git-remote-bzr.1 %{buildroot}%{_mandir}/man1/
+
+# move git-remote-bzr to avoid conflict
+mv %{buildroot}%{_bindir}/git-remote-bzr %{buildroot}%{_bindir}/git-remote-brz
+mv %{buildroot}%{_mandir}/man1/git-remote-bzr.1 %{buildroot}%{_mandir}/man1/git-remote-brz.1
+
+# backwards compatible symbolic links
+ln -s brz %{buildroot}%{_bindir}/bzr
+ln -s git-remote-brz %{buildroot}%{_bindir}/git-remote-bzr
+echo ".so man1/brz.1" > %{buildroot}%{_mandir}/man1/bzr.1
+echo ".so man1/git-remote-brz.1" > %{buildroot}%{_mandir}/man1/git-remote-bzr.1
+
+# With older versions of setuptools-gettext, locales are generated to a weird
+# directory; move them to datadir.
+if [ -d %{buildroot}%{buildroot}%{_datadir}/locale ]
+then
+  mv %{buildroot}%{buildroot}%{_datadir}/locale %{buildroot}%{_datadir}
+fi
+%find_lang %{name}
+cat %{name}.lang >> %{pyproject_files}
+
+
+%check
+# for now, at least run a basic smoke test to prevent undetected major breakages
+# like https://bugzilla.redhat.com/2366194
+export %{py3_test_envvars}
+brz init-repo testrepo
+
+
+%files -f %{pyproject_files}
+%license LICENSE.dependencies
+%doc NEWS README.rst TODO contrib/
+%{_bindir}/brz
+%{_bindir}/bzr-*-pack
+%{_bindir}/git-remote-brz
+%{_bindir}/bzr
+%{_bindir}/git-remote-bzr
+%{_mandir}/man1/*
+%{bash_completions_dir}/brz
+%{_datadir}/pixmaps/brz.png
+
+
+%files doc
+%license COPYING.txt LICENSE.dependencies
+%doc en developers
+
+
+%changelog
+## START: Generated by rpmautospec
+* Mon Apr 06 2026 azldev <> - 3.3.17-2
+- Latest state for breezy
+
+* Mon Nov 03 2025 Miro Hrončok <miro@hroncok.cz> - 3.3.17-1
+- Update to 3.3.17
+- Fixes: rhbz#2392255
+
+* Mon Nov 03 2025 Miro Hrončok <miro@hroncok.cz> - 3.3.12-4
+- Don't strip debug symbols, generate proper debuginfo packages
+
+* Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 3.3.12-3
+- Rebuilt for Python 3.14.0rc3 bytecode
+
+* Fri Aug 15 2025 Python Maint <python-maint@redhat.com> - 3.3.12-2
+- Rebuilt for Python 3.14.0rc2 bytecode
+
+* Mon Aug 04 2025 Ondřej Pohořelský <opohorel@redhat.com> - 3.3.12-1
+- Update to 3.3.12
+
+* Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 3.3.11-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
+
+* Tue Jun 03 2025 Python Maint <python-maint@redhat.com> - 3.3.11-2
+- Rebuilt for Python 3.14
+
+* Tue Apr 08 2025 Ondřej Pohořelský <opohorel@redhat.com> - 3.3.11-1
+- Update to 3.3.11
+- Fixes: rhbz#2352584
+
+* Thu Jan 16 2025 Fedora Release Engineering <releng@fedoraproject.org> - 3.3.9-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
+
+* Fri Nov 15 2024 Benjamin A. Beasley <code@musicinmybrain.net> - 3.3.9-2
+- Fix setuptools-gettext 0.1.14 compatibility
+- Only work around wrong locale installation path if it happens
+
+* Tue Oct 22 2024 Ondřej Pohořelský <opohorel@redhat.com> - 3.3.9-1
+- Update to 3.3.9
+- Fixes: rhbz#2320109
+
+* Mon Aug 05 2024 Ondřej Pohořelský <opohorel@redhat.com> - 3.3.8-1
+- Update to 3.3.8
+- Fixes: rhbz#2300372
+
+* Fri Jul 19 2024 Miro Hrončok <miro@hroncok.cz> - 3.3.7-4
+- Restrict pyo3 version to < 0.22
+- Fixes: rhbz#2295405
+
+* Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.3.7-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 3.3.7-2
+- Rebuilt for Python 3.13
+
+* Fri Apr 05 2024 Ondřej Pohořelský <opohorel@redhat.com> - 3.3.7-1
+- Update to 3.3.7
+- Use generated locale files
+- Resolves: #2133259
+
+* Tue Jan 23 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.3.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.3.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jul 24 2023 Ondrej Pohorelsky <opohorel@redhat.com> - 3.3.3-1
+- Update to 3.3.3
+- Modernizes specfile, now using automatic buildrequires
+- Resolves: #2219952, #2133259
+
+* Sun Jul 23 2023 Python Maint <python-maint@redhat.com> - 3.2.2-10
+- Rebuilt for Python 3.12
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.2-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Mon Jun 26 2023 Ondrej Pohorelsky <opohorel@redhat.com> - 3.2.2-8
+- Migrate license to SPDX format
+
+* Wed Jan 18 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.2-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Jul 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.2-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 3.2.2-5
+- Rebuilt for Python 3.11
+
+* Tue Jun 07 2022 Ondrej Pohorelsky <opohorel@redhat.com> - 3.2.2-4
+- Update to 3.2.2
+- Resolves: #2070029
+
+* Wed Jan 19 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jul 13 2021 Ondrej Pohorelsky <opohorel@redhat.com> - 3.2.1-1
+- Update to 3.2.1
+- Resolves: #1980401
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 3.2.0-2
+- Rebuilt for Python 3.10
+
+* Wed May 05 2021 Ondrej Pohorelsky <opohorel@redhat.com> - 3.2.0-1
+- Update to 3.2.0
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Oct 26 2020 Ondrej Pohorelsky <opohorel@redhat.com> - 3.1.0-1
+- Update to 3.1.0
+
+* Thu Oct 22 2020 Miro Hrončok <mhroncok@redhat.com> - 3.0.2-5
+- Replace bazaar in ELN as well
+
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Sat May 23 2020 Miro Hrončok <mhroncok@redhat.com> - 3.0.2-3
+- Rebuilt for Python 3.9
+
+* Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
+
+* Sun Dec 01 2019 Miro Hrončok <mhroncok@redhat.com> - 3.0.2-1
+- Update to 3.0.2
+
+* Thu Oct 24 2019 Miro Hrončok <mhroncok@redhat.com> - 3.0.1-4
+- On Fedora 32+, replace bazaar with breezy
+  https://fedoraproject.org/wiki/Changes/ReplaceBazaarWithBreezy
+
+* Thu Oct 17 2019 Miro Hrončok <mhroncok@redhat.com> - 3.0.1-3
+- Reenable all extension modules
+
+* Thu Oct 10 2019 Miro Hrončok <mhroncok@redhat.com> - 3.0.1-2
+- Disable the _static_tuple_c extension module to workaround Python 3.8 problems (#1760260)
+- Other disabled modules depending on the above:
+  _chk_map_pyx, _dirstate_helpers_pyx, _bencode_pyx, _btree_serializer_pyx
+
+* Wed Sep 04 2019 Miro Hrončok <mhroncok@redhat.com> - 3.0.1-1
+- Package breezy
+
+## END: Generated by rpmautospec

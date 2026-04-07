@@ -1,0 +1,18 @@
+Add a missing implied int in the Berkeley DB configure probe.  This
+avoids build failures with future Fedora toolchain defaults.
+ 
+Submitted upstream: <https://bz.apache.org/bugzilla/show_bug.cgi?id=66396>
+
+diff --git a/build/dbm.m4 b/build/dbm.m4
+index 57bd131fc3b74099..ffdbdbc0f43e04da 100644
+--- a/build/dbm.m4
++++ b/build/dbm.m4
+@@ -235,7 +235,7 @@ AC_DEFUN([APU_TRY_BERKELEY_DB],
+ #include <stdlib.h>
+ #include <stdio.h>
+ #include <$apu_try_berkeley_db_header>
+-main ()
++int main ()
+ {
+   int major, minor, patch;
+ 

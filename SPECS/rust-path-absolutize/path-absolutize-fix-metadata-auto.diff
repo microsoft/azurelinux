@@ -1,0 +1,8 @@
+--- path-absolutize-3.1.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ path-absolutize-3.1.1/Cargo.toml	2024-10-23T21:35:11.427680+00:00
+@@ -55,5 +55,3 @@
+ unsafe_cache = ["path-dedot/unsafe_cache"]
+ use_unix_paths_on_wasm = ["path-dedot/use_unix_paths_on_wasm"]
+ 
+-[target."cfg(windows)".dev-dependencies.slash-formatter]
+-version = "3"

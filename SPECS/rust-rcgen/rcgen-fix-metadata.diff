@@ -1,0 +1,40 @@
+--- rcgen-0.14.5/Cargo.toml	1970-01-01T00:00:01+00:00
++++ rcgen-0.14.5/Cargo.toml	2025-11-14T11:19:33.316399+00:00
+@@ -42,25 +42,11 @@
+ ]
+ 
+ [features]
+-aws_lc_rs = [
+-    "crypto",
+-    "dep:aws-lc-rs",
+-    "aws-lc-rs/aws-lc-sys",
+-]
+-aws_lc_rs_unstable = [
+-    "aws_lc_rs",
+-    "aws-lc-rs/unstable",
+-]
+ crypto = []
+ default = [
+     "crypto",
+     "pem",
+     "ring",
+-]
+-fips = [
+-    "crypto",
+-    "dep:aws-lc-rs",
+-    "aws-lc-rs/fips",
+ ]
+ ring = [
+     "crypto",
+@@ -91,11 +77,6 @@
+     "crypto",
+     "pem",
+ ]
+-
+-[dependencies.aws-lc-rs]
+-version = "1.13.3"
+-optional = true
+-default-features = false
+ 
+ [dependencies.pem]
+ version = "3.0.2"

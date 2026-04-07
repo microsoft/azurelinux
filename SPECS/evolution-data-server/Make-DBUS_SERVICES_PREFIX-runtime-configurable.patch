@@ -1,0 +1,671 @@
+From 23c40181b44bc536f3c07aafe966167170856e9f Mon Sep 17 00:00:00 2001
+From: "Owen W. Taylor" <otaylor@fishsoup.net>
+Date: Mon, 20 Nov 2023 12:23:30 -0500
+Subject: [PATCH] Make DBUS_SERVICES_PREFIX runtime-configurable
+
+Rather than making DBUS_SERVICES_PREFIX a runtime config option, instead
+add a config file $sysconfdir/evolution-data-server/dbus-prefix to set
+the prefix and read that file both for the library and on the server
+side.
+
+Add a tool in the private libexecdir 'set-dbus-prefix' to write the
+config file and edit systemd and D-Bus service files as needed.
+
+Resolves #502
+---
+ CMakeLists.txt                                | 14 +----
+ config.h.in                                   |  3 -
+ data/org.gnome.EvolutionDataServer.Devel.json |  3 +-
+ src/addressbook/libebook/e-book-client.c      |  3 +-
+ .../libedata-book/e-data-book-factory.c       |  4 +-
+ ...evolution-addressbook-factory-subprocess.c |  3 +-
+ src/calendar/libecal/e-cal-client.c           |  3 +-
+ .../libedata-cal/e-data-cal-factory.c         |  4 +-
+ .../evolution-calendar-factory-subprocess.c   |  3 +-
+ src/libebackend/e-source-registry-server.c    |  4 +-
+ src/libebackend/e-user-prompter-server.c      |  3 +-
+ src/libebackend/e-user-prompter.c             |  3 +-
+ src/libedataserver/CMakeLists.txt             |  3 +
+ src/libedataserver/e-dbus-prefix.c            | 55 +++++++++++++++++++
+ src/libedataserver/e-dbus-prefix.h            | 26 +++++++++
+ src/libedataserver/e-secret-store.c           |  9 +--
+ src/libedataserver/e-source-registry.c        |  5 +-
+ .../e-credentials-prompter-impl-oauth2.c      |  3 +-
+ .../secret-monitor/module-secret-monitor.c    | 10 +---
+ .../evolution-alarm-notify/e-alarm-notify.c   |  7 +--
+ src/tools/CMakeLists.txt                      |  7 +++
+ src/tools/oauth2-handler/CMakeLists.txt       |  1 +
+ src/tools/oauth2-handler/oauth2-handler.c     |  4 +-
+ src/tools/set-dbus-prefix.in                  | 37 +++++++++++++
+ 24 files changed, 168 insertions(+), 49 deletions(-)
+ create mode 100644 src/libedataserver/e-dbus-prefix.c
+ create mode 100644 src/libedataserver/e-dbus-prefix.h
+ create mode 100644 src/tools/set-dbus-prefix.in
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e7d376add..7b77d02f5 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -38,7 +38,7 @@ set(PROJECT_DISTCONFIGURE_PARAMS
+ # ******************************
+ # D-Bus versioning
+ # ******************************
+-# Actual name can be modified with DBUS_SERVICES_PREFIX option
++# If adding new services with service files, they also need to be added to src/tools/set-dbus-prefix.in
+ set(ADDRESS_BOOK_DBUS_SERVICE_NAME	"org.gnome.evolution.dataserver.AddressBook10")
+ set(ALARM_NOTIFY_DBUS_SERVICE_NAME	"org.gnome.Evolution-alarm-notify")
+ set(CALENDAR_DBUS_SERVICE_NAME		"org.gnome.evolution.dataserver.Calendar8")
+@@ -183,19 +183,6 @@ ensure_default_value(LOCALE_INSTALL_DIR "${SHARE_INSTALL_PREFIX}/locale")
+ ensure_default_value(SYSCONF_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/etc")
+ ensure_default_value(EXTENSIONS_DIR "${LIBEXEC_INSTALL_DIR}/evolution/extensions")
+ 
+-add_printable_variable(DBUS_SERVICES_PREFIX "Prefix for D-Bus services, usually left empty, without trailing dot" "")
+-
+-if(NOT ("${DBUS_SERVICES_PREFIX}" STREQUAL ""))
+-	set(ADDRESS_BOOK_DBUS_SERVICE_NAME	"${DBUS_SERVICES_PREFIX}.${ADDRESS_BOOK_DBUS_SERVICE_NAME}")
+-	set(ALARM_NOTIFY_DBUS_SERVICE_NAME	"${DBUS_SERVICES_PREFIX}.${ALARM_NOTIFY_DBUS_SERVICE_NAME}")
+-	set(CALENDAR_DBUS_SERVICE_NAME		"${DBUS_SERVICES_PREFIX}.${CALENDAR_DBUS_SERVICE_NAME}")
+-	set(SOURCES_DBUS_SERVICE_NAME		"${DBUS_SERVICES_PREFIX}.${SOURCES_DBUS_SERVICE_NAME}")
+-	set(USER_PROMPTER_DBUS_SERVICE_NAME	"${DBUS_SERVICES_PREFIX}.${USER_PROMPTER_DBUS_SERVICE_NAME}")
+-	set(OAUTH2_RESPONSE_DBUS_SERVICE_NAME	"${DBUS_SERVICES_PREFIX}.${OAUTH2_RESPONSE_DBUS_SERVICE_NAME}")
+-else(NOT ("${DBUS_SERVICES_PREFIX}" STREQUAL ""))
+-	unset(DBUS_SERVICES_PREFIX)
+-endif(NOT ("${DBUS_SERVICES_PREFIX}" STREQUAL ""))
+-
+ # ******************************
+ # Special directories
+ # ******************************
+diff --git a/config.h.in b/config.h.in
+index 064873e2a..b895655a9 100644
+--- a/config.h.in
++++ b/config.h.in
+@@ -21,9 +21,6 @@
+ /* Defined to prefix where out-of-tree extensions can be installed */
+ #cmakedefine EXTENSIONS_DIR "@EXTENSIONS_DIR@"
+ 
+-/* Defined to prefix used by the D-Bus services (usually when run in Flatpak) */
+-#cmakedefine DBUS_SERVICES_PREFIX "@DBUS_SERVICES_PREFIX@"
+-
+ /* D-Bus service name for the address book factory */
+ #define ADDRESS_BOOK_DBUS_SERVICE_NAME "@ADDRESS_BOOK_DBUS_SERVICE_NAME@"
+ 
+diff --git a/data/org.gnome.EvolutionDataServer.Devel.json b/data/org.gnome.EvolutionDataServer.Devel.json
+index c8136ec20..118e25da3 100644
+--- a/data/org.gnome.EvolutionDataServer.Devel.json
++++ b/data/org.gnome.EvolutionDataServer.Devel.json
+@@ -342,7 +342,6 @@
+ 				"/share/GConf"
+ 			],
+ 			"config-opts": [
+-				"-DDBUS_SERVICES_PREFIX=org.gnome.EvolutionDataServer.Devel",
+ 				"-DEXTENSIONS_DIR=/app/evolution/extensions",
+ 				"-DENABLE_FILE_LOCKING=fcntl",
+ 				"-DENABLE_DOT_LOCKING=OFF",
+@@ -360,6 +359,9 @@
+ 				"-DWITH_PHONENUMBER=OFF",
+ 				"-DWITH_SYSTEMDUSERUNITDIR=OFF"
+ 			],
++ 			"post-install": [
++				"/app/libexec/evolution-data-server/set-dbus-prefix org.gnome.EvolutionDataServer.Devel"
++ 			],
+ 			"sources": [
+ 				{
+ 					"type": "git",
+diff --git a/src/addressbook/libebook/e-book-client.c b/src/addressbook/libebook/e-book-client.c
+index bd479d8f3..3738d37ce 100644
+--- a/src/addressbook/libebook/e-book-client.c
++++ b/src/addressbook/libebook/e-book-client.c
+@@ -40,6 +40,7 @@
+ 
+ #include <libedataserver/libedataserver.h>
+ #include <libedataserver/e-client-private.h>
++#include <libedataserver/e-dbus-prefix.h>
+ 
+ #include <libebackend/libebackend.h>
+ #include <libedata-book/libedata-book.h>
+@@ -1078,7 +1079,7 @@ book_client_init_in_dbus_thread (GSimpleAsyncResult *simple,
+ 	factory_proxy = e_dbus_address_book_factory_proxy_new_sync (
+ 		connection,
+ 		G_DBUS_PROXY_FLAGS_NONE,
+-		ADDRESS_BOOK_DBUS_SERVICE_NAME,
++		e_dbus_prefix (ADDRESS_BOOK_DBUS_SERVICE_NAME),
+ 		"/org/gnome/evolution/dataserver/AddressBookFactory",
+ 		cancellable, &local_error);
+ 
+diff --git a/src/addressbook/libedata-book/e-data-book-factory.c b/src/addressbook/libedata-book/e-data-book-factory.c
+index 02adb19b4..a9d89d82e 100644
+--- a/src/addressbook/libedata-book/e-data-book-factory.c
++++ b/src/addressbook/libedata-book/e-data-book-factory.c
+@@ -41,6 +41,8 @@
+ #include "e-data-book-factory.h"
+ #include "e-system-locale-watcher.h"
+ 
++#include "libedataserver/e-dbus-prefix.h"
++
+ #define d(x)
+ 
+ struct _EDataBookFactoryPrivate {
+@@ -315,7 +317,7 @@ e_data_book_factory_class_init (EDataBookFactoryClass *class)
+ 	object_class->dispose = data_book_factory_dispose;
+ 
+ 	dbus_server_class = E_DBUS_SERVER_CLASS (class);
+-	dbus_server_class->bus_name = ADDRESS_BOOK_DBUS_SERVICE_NAME;
++	dbus_server_class->bus_name = e_dbus_prefix (ADDRESS_BOOK_DBUS_SERVICE_NAME);
+ 	dbus_server_class->module_directory = modules_directory;
+ 
+ 	data_factory_class = E_DATA_FACTORY_CLASS (class);
+diff --git a/src/addressbook/libedata-book/evolution-addressbook-factory-subprocess.c b/src/addressbook/libedata-book/evolution-addressbook-factory-subprocess.c
+index 3897042e6..ef539573d 100644
+--- a/src/addressbook/libedata-book/evolution-addressbook-factory-subprocess.c
++++ b/src/addressbook/libedata-book/evolution-addressbook-factory-subprocess.c
+@@ -28,6 +28,7 @@
+ #include <e-dbus-subprocess-backend.h>
+ #include <libebackend/libebackend.h>
+ #include <libedataserver/libedataserver.h>
++#include <libedataserver/e-dbus-prefix.h>
+ #include <libedata-book/libedata-book.h>
+ 
+ typedef struct _SubprocessData SubprocessData;
+@@ -198,7 +199,7 @@ main (gint argc,
+ 	/* Watch the factory name and close the subprocess if the factory dies/crashes */
+ 	watched_id = g_bus_watch_name (
+ 		G_BUS_TYPE_SESSION,
+-		ADDRESS_BOOK_DBUS_SERVICE_NAME,
++		e_dbus_prefix (ADDRESS_BOOK_DBUS_SERVICE_NAME),
+ 		G_BUS_NAME_WATCHER_FLAGS_NONE,
+ 		NULL,
+ 		(GBusNameVanishedCallback) vanished_cb,
+diff --git a/src/calendar/libecal/e-cal-client.c b/src/calendar/libecal/e-cal-client.c
+index d0414e4c7..fd6665db5 100644
+--- a/src/calendar/libecal/e-cal-client.c
++++ b/src/calendar/libecal/e-cal-client.c
+@@ -36,6 +36,7 @@
+ #include <e-dbus-calendar-factory.h>
+ 
+ #include <libedataserver/e-client-private.h>
++#include <libedataserver/e-dbus-prefix.h>
+ 
+ #include "e-cal-client.h"
+ #include "e-cal-component.h"
+@@ -1211,7 +1212,7 @@ cal_client_init_in_dbus_thread (GSimpleAsyncResult *simple,
+ 	factory_proxy = e_dbus_calendar_factory_proxy_new_sync (
+ 		connection,
+ 		G_DBUS_PROXY_FLAGS_NONE,
+-		CALENDAR_DBUS_SERVICE_NAME,
++		e_dbus_prefix (CALENDAR_DBUS_SERVICE_NAME),
+ 		"/org/gnome/evolution/dataserver/CalendarFactory",
+ 		cancellable, &local_error);
+ 
+diff --git a/src/calendar/libedata-cal/e-data-cal-factory.c b/src/calendar/libedata-cal/e-data-cal-factory.c
+index e0790e17d..1e4c5e56d 100644
+--- a/src/calendar/libedata-cal/e-data-cal-factory.c
++++ b/src/calendar/libedata-cal/e-data-cal-factory.c
+@@ -47,6 +47,8 @@
+ #include "e-data-cal.h"
+ #include "e-data-cal-factory.h"
+ 
++#include "libedataserver/e-dbus-prefix.h"
++
+ #include <libical-glib/libical-glib.h>
+ 
+ #define d(x)
+@@ -270,7 +272,7 @@ e_data_cal_factory_class_init (EDataCalFactoryClass *class)
+ 		overwrite_subprocess_cal_path = g_strdup (subprocess_cal_path_env);
+ 
+ 	dbus_server_class = E_DBUS_SERVER_CLASS (class);
+-	dbus_server_class->bus_name = CALENDAR_DBUS_SERVICE_NAME;
++	dbus_server_class->bus_name = e_dbus_prefix (CALENDAR_DBUS_SERVICE_NAME);
+ 	dbus_server_class->module_directory = modules_directory;
+ 
+ 	data_factory_class = E_DATA_FACTORY_CLASS (class);
+diff --git a/src/calendar/libedata-cal/evolution-calendar-factory-subprocess.c b/src/calendar/libedata-cal/evolution-calendar-factory-subprocess.c
+index 29732fc6e..514d50e2e 100644
+--- a/src/calendar/libedata-cal/evolution-calendar-factory-subprocess.c
++++ b/src/calendar/libedata-cal/evolution-calendar-factory-subprocess.c
+@@ -28,6 +28,7 @@
+ #include <e-dbus-subprocess-backend.h>
+ #include <libebackend/libebackend.h>
+ #include <libedataserver/libedataserver.h>
++#include <libedataserver/e-dbus-prefix.h>
+ #include <libedata-cal/libedata-cal.h>
+ 
+ typedef struct _SubprocessData SubprocessData;
+@@ -198,7 +199,7 @@ main (gint argc,
+ 	/* Watch the factory name and close the subprocess if the factory dies/crashes */
+ 	watched_id = g_bus_watch_name (
+ 		G_BUS_TYPE_SESSION,
+-		CALENDAR_DBUS_SERVICE_NAME,
++		e_dbus_prefix (CALENDAR_DBUS_SERVICE_NAME),
+ 		G_BUS_NAME_WATCHER_FLAGS_NONE,
+ 		NULL,
+ 		(GBusNameVanishedCallback) vanished_cb,
+diff --git a/src/libebackend/e-source-registry-server.c b/src/libebackend/e-source-registry-server.c
+index 4fe4759a5..fe34a7921 100644
+--- a/src/libebackend/e-source-registry-server.c
++++ b/src/libebackend/e-source-registry-server.c
+@@ -36,6 +36,8 @@
+ #include <string.h>
+ #include <glib/gi18n-lib.h>
+ 
++#include <libedataserver/e-dbus-prefix.h>
++
+ /* Private D-Bus classes. */
+ #include "e-dbus-source.h"
+ #include "e-dbus-source-manager.h"
+@@ -1082,7 +1084,7 @@ e_source_registry_server_class_init (ESourceRegistryServerClass *class)
+ 	object_class->finalize = source_registry_server_finalize;
+ 
+ 	dbus_server_class = E_DBUS_SERVER_CLASS (class);
+-	dbus_server_class->bus_name = SOURCES_DBUS_SERVICE_NAME;
++	dbus_server_class->bus_name = e_dbus_prefix (SOURCES_DBUS_SERVICE_NAME);
+ 	dbus_server_class->module_directory = modules_directory;
+ 	dbus_server_class->bus_acquired = source_registry_server_bus_acquired;
+ 	dbus_server_class->quit_server = source_registry_server_quit_server;
+diff --git a/src/libebackend/e-user-prompter-server.c b/src/libebackend/e-user-prompter-server.c
+index f9febd77f..4357ebc90 100644
+--- a/src/libebackend/e-user-prompter-server.c
++++ b/src/libebackend/e-user-prompter-server.c
+@@ -29,6 +29,7 @@
+ #include <glib/gi18n-lib.h>
+ 
+ #include <libedataserver/libedataserver.h>
++#include <libedataserver/e-dbus-prefix.h>
+ 
+ /* Private D-Bus classes. */
+ #include "e-dbus-user-prompter.h"
+@@ -409,7 +410,7 @@ e_user_prompter_server_class_init (EUserPrompterServerClass *class)
+ 	object_class->finalize = user_prompter_server_finalize;
+ 
+ 	dbus_server_class = E_DBUS_SERVER_CLASS (class);
+-	dbus_server_class->bus_name = USER_PROMPTER_DBUS_SERVICE_NAME;
++	dbus_server_class->bus_name = e_dbus_prefix (USER_PROMPTER_DBUS_SERVICE_NAME);
+ 	dbus_server_class->module_directory = MODULE_DIRECTORY;
+ 	dbus_server_class->bus_acquired = user_prompter_server_bus_acquired;
+ 	dbus_server_class->quit_server = user_prompter_server_quit_server;
+diff --git a/src/libebackend/e-user-prompter.c b/src/libebackend/e-user-prompter.c
+index 054a8b44f..3c3cb5761 100644
+--- a/src/libebackend/e-user-prompter.c
++++ b/src/libebackend/e-user-prompter.c
+@@ -26,6 +26,7 @@
+ #include "evolution-data-server-config.h"
+ 
+ #include <libedataserver/libedataserver.h>
++#include <libedataserver/e-dbus-prefix.h>
+ 
+ #include "e-dbus-user-prompter.h"
+ #include "e-user-prompter.h"
+@@ -251,7 +252,7 @@ user_prompter_prompt_thread (GSimpleAsyncResult *simple,
+ 	dbus_prompter = e_dbus_user_prompter_proxy_new_for_bus_sync (
+ 		G_BUS_TYPE_SESSION,
+ 		G_DBUS_PROXY_FLAGS_NONE,
+-		USER_PROMPTER_DBUS_SERVICE_NAME,
++		e_dbus_prefix (USER_PROMPTER_DBUS_SERVICE_NAME),
+ 		"/org/gnome/evolution/dataserver/UserPrompter",
+ 		cancellable,
+ 		&local_error);
+diff --git a/src/libedataserver/CMakeLists.txt b/src/libedataserver/CMakeLists.txt
+index 5ccb29b56..22e9f0c6d 100644
+--- a/src/libedataserver/CMakeLists.txt
++++ b/src/libedataserver/CMakeLists.txt
+@@ -53,6 +53,8 @@ set(SOURCES
+ 	e-client-private.h
+ 	e-collator.c
+ 	e-credentials.c
++	e-dbus-prefix.c
++	e-dbus-prefix.h
+ 	e-extensible.c
+ 	e-extension.c
+ 	e-flag.c
+@@ -250,6 +252,7 @@ target_compile_definitions(edataserver PRIVATE
+ 	-DE_DATA_SERVER_PREFIX=\"${CMAKE_INSTALL_PREFIX}\"
+ 	-DE_DATA_SERVER_LOCALEDIR=\"${LOCALE_INSTALL_DIR}\"
+ 	-DE_DATA_SERVER_IMAGESDIR=\"${imagesdir}\"
++	-DE_DATA_SERVER_SYSCONFDIR=\"${SYSCONF_INSTALL_DIR}\"
+ 	-DE_DATA_SERVER_CREDENTIALMODULEDIR=\"${credentialmoduledir}\"
+ 	-DE_DATA_SERVER_UIMODULEDIR=\"${uimoduledir}\"
+ 	-DE_DATA_SERVER_PRIVDATADIR=\"${privdatadir}\"
+diff --git a/src/libedataserver/e-dbus-prefix.c b/src/libedataserver/e-dbus-prefix.c
+new file mode 100644
+index 000000000..7018f2396
+--- /dev/null
++++ b/src/libedataserver/e-dbus-prefix.c
+@@ -0,0 +1,55 @@
++/* Copyright 2023 Red Hat, Inc. (www.redhat.com)
++ *
++ * This library is free software: you can redistribute it and/or modify it
++ * under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation.
++ *
++ * This library is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
++ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
++ * for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with this library. If not, see <http://www.gnu.org/licenses/>.
++ *
++ */
++
++#include "evolution-data-server-config.h"
++
++#include <glib.h>
++
++#include "e-dbus-prefix.h"
++
++static char *
++read_prefix (gpointer data)
++{
++	char *contents;
++
++	if (g_file_get_contents (E_DATA_SERVER_SYSCONFDIR "/evolution-data-server/dbus-prefix",
++				 &contents, NULL, NULL)) {
++		g_strstrip (contents);
++		return contents;
++	} else {
++		return NULL;
++	}
++}
++
++const char *
++e_dbus_prefix (const char *base)
++{
++	static GOnce read_prefix_once = G_ONCE_INIT;
++	const char *prefix;
++
++	g_once (&read_prefix_once, (GThreadFunc)read_prefix, NULL);
++	prefix = read_prefix_once.retval;
++
++	if (prefix) {
++		char *prefixed = g_strconcat (prefix, ".", base, NULL);
++		const char *result = g_intern_string (prefixed);
++		g_free (prefixed);
++
++		return result;
++	} else {
++		return base;
++	}
++}
+diff --git a/src/libedataserver/e-dbus-prefix.h b/src/libedataserver/e-dbus-prefix.h
+new file mode 100644
+index 000000000..e8298b3fd
+--- /dev/null
++++ b/src/libedataserver/e-dbus-prefix.h
+@@ -0,0 +1,26 @@
++/* Copyright 2023 Red Hat, Inc. (www.redhat.com)
++ *
++ * This library is free software: you can redistribute it and/or modify it
++ * under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation.
++ *
++ * This library is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
++ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
++ * for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with this library. If not, see <http://www.gnu.org/licenses/>.
++ *
++ */
++
++#ifndef E_DBUS_PREFIX
++#define E_DBUS_PREFIX
++
++G_BEGIN_DECLS
++
++const char *e_dbus_prefix (const char *base);
++
++G_END_DECLS
++
++#endif /* E_DBUS_PREFIX */
+diff --git a/src/libedataserver/e-secret-store.c b/src/libedataserver/e-secret-store.c
+index e15148227..94c4216e5 100644
+--- a/src/libedataserver/e-secret-store.c
++++ b/src/libedataserver/e-secret-store.c
+@@ -35,6 +35,7 @@
+ #include <libsecret/secret.h>
+ #endif
+ 
++#include "e-dbus-prefix.h"
+ #include "e-data-server-util.h"
+ #include "e-secret-store.h"
+ 
+@@ -254,12 +255,6 @@ e_win32_secret_delete_secret_sync (const gchar *uid,
+ #define KEYRING_ITEM_ATTRIBUTE_UID	"e-source-uid"
+ #define KEYRING_ITEM_ATTRIBUTE_ORIGIN	"eds-origin"
+ 
+-#ifdef DBUS_SERVICES_PREFIX
+-#define ORIGIN_KEY DBUS_SERVICES_PREFIX "." PACKAGE
+-#else
+-#define ORIGIN_KEY PACKAGE
+-#endif
+-
+ static SecretSchema password_schema = {
+ 	"org.gnome.Evolution.Data.Source",
+ 	SECRET_SCHEMA_DONT_MATCH_NAME,
+@@ -322,7 +317,7 @@ e_secret_store_store_sync (const gchar *uid,
+ 		collection, label, secret,
+ 		cancellable, error,
+ 		KEYRING_ITEM_ATTRIBUTE_UID, uid,
+-		KEYRING_ITEM_ATTRIBUTE_ORIGIN, ORIGIN_KEY,
++		KEYRING_ITEM_ATTRIBUTE_ORIGIN, e_dbus_prefix (PACKAGE),
+ 		NULL);
+ #endif
+ 
+diff --git a/src/libedataserver/e-source-registry.c b/src/libedataserver/e-source-registry.c
+index 4a9b398ca..9d1c98b49 100644
+--- a/src/libedataserver/e-source-registry.c
++++ b/src/libedataserver/e-source-registry.c
+@@ -51,6 +51,7 @@
+ #include "e-dbus-source-manager.h"
+ 
+ #include "e-data-server-util.h"
++#include "e-dbus-prefix.h"
+ #include "e-source-collection.h"
+ #include "e-source-enumtypes.h"
+ 
+@@ -1091,7 +1092,7 @@ source_registry_object_manager_thread (gpointer data)
+ 	object_manager = e_dbus_object_manager_client_new_for_bus_sync (
+ 		G_BUS_TYPE_SESSION,
+ 		G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE,
+-		SOURCES_DBUS_SERVICE_NAME,
++		e_dbus_prefix (SOURCES_DBUS_SERVICE_NAME),
+ 		DBUS_OBJECT_PATH,
+ 		NULL, &closure->error);
+ 
+@@ -1472,7 +1473,7 @@ source_registry_initable_init (GInitable *initable,
+ 		e_dbus_source_manager_proxy_new_for_bus_sync (
+ 			G_BUS_TYPE_SESSION,
+ 			G_DBUS_PROXY_FLAGS_NONE,
+-			SOURCES_DBUS_SERVICE_NAME,
++			e_dbus_prefix (SOURCES_DBUS_SERVICE_NAME),
+ 			DBUS_OBJECT_PATH,
+ 			cancellable, &local_error);
+ 
+diff --git a/src/libedataserverui/e-credentials-prompter-impl-oauth2.c b/src/libedataserverui/e-credentials-prompter-impl-oauth2.c
+index b82715917..183b6aa27 100644
+--- a/src/libedataserverui/e-credentials-prompter-impl-oauth2.c
++++ b/src/libedataserverui/e-credentials-prompter-impl-oauth2.c
+@@ -23,6 +23,7 @@
+ #include <gtk/gtk.h>
+ 
+ #include <libedataserver/libedataserver.h>
++#include <libedataserver/e-dbus-prefix.h>
+ 
+ #include "libedataserverui-private.h"
+ #include "e-dbus-oauth2-response.h"
+@@ -893,7 +894,7 @@ cpi_oauth2_maybe_prepare_oauth2_service (ECredentialsPrompterImplOAuth2 *prompte
+ 
+ 		prompter_oauth2->priv->bus_owner_id = g_bus_own_name (
+ 			G_BUS_TYPE_SESSION,
+-			OAUTH2_RESPONSE_DBUS_SERVICE_NAME,
++			e_dbus_prefix (OAUTH2_RESPONSE_DBUS_SERVICE_NAME),
+ 			G_BUS_NAME_OWNER_FLAGS_DO_NOT_QUEUE,
+ 			cpi_oauth2_bus_acquired_cb,
+ 			NULL,
+diff --git a/src/modules/secret-monitor/module-secret-monitor.c b/src/modules/secret-monitor/module-secret-monitor.c
+index 0eb21669d..5ec7e376c 100644
+--- a/src/modules/secret-monitor/module-secret-monitor.c
++++ b/src/modules/secret-monitor/module-secret-monitor.c
+@@ -24,6 +24,8 @@
+ 
+ #include <libebackend/libebackend.h>
+ 
++#include <libedataserver/e-dbus-prefix.h>
++
+ /* Standard GObject macros */
+ #define E_TYPE_SECRET_MONITOR \
+ 	(e_secret_monitor_get_type ())
+@@ -57,12 +59,6 @@ struct _ESecretMonitorClass {
+ #define KEYRING_ITEM_ATTRIBUTE_ORIGIN	"eds-origin"
+ #define KEYRING_ITEM_DISPLAY_FORMAT	"Evolution Data Source '%s'"
+ 
+-#ifdef DBUS_SERVICES_PREFIX
+-#define ORIGIN_KEY DBUS_SERVICES_PREFIX "." PACKAGE
+-#else
+-#define ORIGIN_KEY PACKAGE
+-#endif
+-
+ static SecretSchema password_schema = {
+ 	"org.gnome.Evolution.Data.Source",
+ 	SECRET_SCHEMA_DONT_MATCH_NAME,
+@@ -110,7 +106,7 @@ secret_monitor_scan_secrets_thread (gpointer user_data)
+ 	server = E_SOURCE_REGISTRY_SERVER (user_data);
+ 
+ 	attributes = g_hash_table_new (g_str_hash, g_str_equal);
+-	g_hash_table_insert (attributes, (gpointer) KEYRING_ITEM_ATTRIBUTE_ORIGIN, (gpointer) ORIGIN_KEY);
++	g_hash_table_insert (attributes, (gpointer) KEYRING_ITEM_ATTRIBUTE_ORIGIN, (gpointer) e_dbus_prefix (PACKAGE));
+ 
+ 	/* List all items under our custom SecretSchema. */
+ 	list = secret_service_search_sync (
+diff --git a/src/services/evolution-alarm-notify/e-alarm-notify.c b/src/services/evolution-alarm-notify/e-alarm-notify.c
+index a1116ec9b..1fa205366 100644
+--- a/src/services/evolution-alarm-notify/e-alarm-notify.c
++++ b/src/services/evolution-alarm-notify/e-alarm-notify.c
+@@ -30,6 +30,7 @@
+ 
+ #include "libecal/libecal.h"
+ #include "libedataserverui/libedataserverui.h"
++#include "libedataserver/e-dbus-prefix.h"
+ 
+ #include "e-alarm-notify.h"
+ 
+@@ -172,7 +173,7 @@ e_alarm_notify_audio (EAlarmNotify *an,
+ 				gint err = ca_context_play (ca_gtk_context_get (), 0,
+ 					CA_PROP_APPLICATION_NAME, "evolution-alarm-notify",
+ 					CA_PROP_APPLICATION_VERSION, VERSION,
+-					CA_PROP_APPLICATION_ID, "org.gnome.Evolution-alarm-notify",
++					CA_PROP_APPLICATION_ID, e_dbus_prefix (ALARM_NOTIFY_DBUS_SERVICE_NAME),
+ 					CA_PROP_MEDIA_FILENAME, filename,
+ 					NULL);
+ 
+@@ -203,7 +204,7 @@ e_alarm_notify_audio (EAlarmNotify *an,
+ 		gint err = ca_context_play (ca_gtk_context_get (), 0,
+ 			CA_PROP_APPLICATION_NAME, "evolution-alarm-notify",
+ 			CA_PROP_APPLICATION_VERSION, VERSION,
+-			CA_PROP_APPLICATION_ID, "org.gnome.Evolution-alarm-notify",
++			CA_PROP_APPLICATION_ID, e_dbus_prefix (ALARM_NOTIFY_DBUS_SERVICE_NAME),
+ 			CA_PROP_EVENT_ID, "alarm-clock-elapsed",
+ 			NULL);
+ 
+@@ -1280,7 +1281,7 @@ e_alarm_notify_new (GCancellable *cancellable,
+ {
+ 	return g_initable_new (
+ 		E_TYPE_ALARM_NOTIFY, cancellable, error,
+-		"application-id", ALARM_NOTIFY_DBUS_SERVICE_NAME,
++		"application-id", e_dbus_prefix (ALARM_NOTIFY_DBUS_SERVICE_NAME),
+ 		#if GLIB_CHECK_VERSION(2, 60, 0)
+ 		"flags", G_APPLICATION_ALLOW_REPLACEMENT,
+ 		#endif
+diff --git a/src/tools/CMakeLists.txt b/src/tools/CMakeLists.txt
+index e8c70b298..cdcd4971d 100644
+--- a/src/tools/CMakeLists.txt
++++ b/src/tools/CMakeLists.txt
+@@ -1,3 +1,10 @@
+ add_subdirectory(addressbook-export)
+ add_subdirectory(list-sources)
+ add_subdirectory(oauth2-handler)
++
++configure_file(set-dbus-prefix.in set-dbus-prefix @ONLY)
++
++install(FILES ${CMAKE_CURRENT_BINARY_DIR}/set-dbus-prefix
++	DESTINATION ${privlibexecdir}
++	PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
++)
+diff --git a/src/tools/oauth2-handler/CMakeLists.txt b/src/tools/oauth2-handler/CMakeLists.txt
+index 643733d89..0f154c9d0 100644
+--- a/src/tools/oauth2-handler/CMakeLists.txt
++++ b/src/tools/oauth2-handler/CMakeLists.txt
+@@ -1,4 +1,5 @@
+ set(DEPENDENCIES
++	edataserver
+ 	edbus-private
+ )
+ 
+diff --git a/src/tools/oauth2-handler/oauth2-handler.c b/src/tools/oauth2-handler/oauth2-handler.c
+index 952d16fb1..7622293c7 100644
+--- a/src/tools/oauth2-handler/oauth2-handler.c
++++ b/src/tools/oauth2-handler/oauth2-handler.c
+@@ -9,6 +9,8 @@
+ #include <glib.h>
+ #include <gio/gio.h>
+ 
++#include <libedataserver/e-dbus-prefix.h>
++
+ #include "e-dbus-oauth2-response.h"
+ 
+ static const gchar *glob_uri = NULL;
+@@ -73,7 +75,7 @@ got_bus_cb (GObject *source_object,
+ 		G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES |
+ 		G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS |
+ 		G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START,
+-		OAUTH2_RESPONSE_DBUS_SERVICE_NAME,
++		e_dbus_prefix (OAUTH2_RESPONSE_DBUS_SERVICE_NAME),
+ 		"/org/gnome/evolution/dataserver/OAuth2Response",
+ 		NULL,
+ 		proxy_created_cb,
+diff --git a/src/tools/set-dbus-prefix.in b/src/tools/set-dbus-prefix.in
+new file mode 100644
+index 000000000..2e79e4855
+--- /dev/null
++++ b/src/tools/set-dbus-prefix.in
+@@ -0,0 +1,37 @@
++#!/bin/sh
++
++set -ex
++
++dbus_services_prefix="$1"
++
++mkdir -p "@SYSCONF_INSTALL_DIR@/evolution-data-server"
++echo "$dbus_services_prefix" > "@SYSCONF_INSTALL_DIR@/evolution-data-server/dbus-prefix"
++
++edit_file() {
++    sed "s/org.gnome.evolution/${dbus_services_prefix}.org.gnome.evolution/" "$1" > "$1.new" && mv "$1.new" "$1"
++}
++
++SYSTEMD_SERVICE_FILES="
++evolution-addressbook-factory.service
++evolution-calendar-factory.service
++evolution-source-registry.service
++evolution-user-prompter.service
++"
++
++if [ "@WITH_SYSTEMD_USER_UNITS@" = ON ] ; then
++    for f in $SYSTEMD_SERVICE_FILES ; do
++	edit_file "@WITH_SYSTEMDUSERUNITDIR@/$f"
++    done
++fi
++
++DBUS_SERVICE_FILES="
++@ADDRESS_BOOK_DBUS_SERVICE_NAME@.service
++@CALENDAR_DBUS_SERVICE_NAME@.service
++@SOURCES_DBUS_SERVICE_NAME@.service
++@USER_PROMPTER_DBUS_SERVICE_NAME@.service
++"
++
++for f in $DBUS_SERVICE_FILES ; do
++    edit_file "@WITH_DBUS_SERVICE_DIR@/$f"
++    mv "@WITH_DBUS_SERVICE_DIR@/$f" "@WITH_DBUS_SERVICE_DIR@/${dbus_services_prefix}.$f"
++done
+-- 
+2.41.0
+

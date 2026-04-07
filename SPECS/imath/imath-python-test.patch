@@ -1,0 +1,12 @@
+diff -urNp a/src/python/PyImathTest/pyImathTest.in b/src/python/PyImathTest/pyImathTest.in
+--- a/src/python/PyImathTest/pyImathTest.in	2021-08-06 16:49:54.003824841 +0200
++++ b/src/python/PyImathTest/pyImathTest.in	2021-08-06 16:50:31.852213615 +0200
+@@ -9149,7 +9149,7 @@ def testVArrays():
+ 
+     # See the 'PyImath/varraySemantics.txt' document for more information.
+ 
+-testList.append(("testVArrays", testVArrays))
++#testList.append(("testVArrays", testVArrays))
+ 
+ 
+ def testReadOnlyBasic(AType, val):

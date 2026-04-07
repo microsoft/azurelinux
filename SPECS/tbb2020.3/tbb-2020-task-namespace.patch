@@ -1,0 +1,37 @@
+From c18342ba667d1f33f5e9a773aa86b091a9694b97 Mon Sep 17 00:00:00 2001
+From: Sergei Trofimovich <slyich@gmail.com>
+Date: Fri, 20 May 2022 07:50:00 +0100
+Subject: [PATCH] tbb_2020: fix build on gcc-13
+
+On gcc-13 build started failing due to 'task' identifier collision as:
+
+    ../../include/tbb/task.h:300:20: error: declaration of 'tbb::task& tbb::internal::task_prefix::task()' changes meaning of 'task' [-fpermissive]
+      300 |         tbb::task& task() {return *reinterpret_cast<tbb::task*>(this+1);}
+          |                    ^~~~
+    ../../include/tbb/task.h:252:9: note: used here to mean 'class tbb::task'
+      252 |         task* next_offloaded;
+          |         ^~~~
+    ../../include/tbb/task.h:43:7: note: declared here
+       43 | class task;
+          |       ^~~~
+
+The change adds explicit qualifier to class name to avoid ambiguity with method name.
+
+Signed-off-by: Sergei Trofimovich <slyich@gmail.com>
+---
+ include/tbb/task.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/tbb/task.h b/include/tbb/task.h
+index 5e137c6999..b5fb1ac35e 100644
+--- a/include/tbb/task.h
++++ b/include/tbb/task.h
+@@ -249,7 +249,7 @@ namespace internal {
+ #if __TBB_TASK_PRIORITY
+         //! Pointer to the next offloaded lower priority task.
+         /** Used to maintain a list of offloaded tasks inside the scheduler. **/
+-        task* next_offloaded;
++        tbb::task* next_offloaded;
+ #endif
+ 
+ #if __TBB_PREVIEW_RESUMABLE_TASKS

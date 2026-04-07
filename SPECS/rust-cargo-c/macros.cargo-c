@@ -1,0 +1,26 @@
+%cargo_cbuild(naf:)\
+%{shrink:                                               \
+    %{__cargo} cbuild                                   \
+    %{__cargo_common_opts}                              \
+    --profile rpm                                       \
+    %{__cargo_parse_opts %{-n} %{-a} %{-f:-f%{-f*}}}    \
+    --destdir=%{buildroot}                              \
+    --prefix=%{_prefix}                                 \
+    --libdir=%{_libdir}                                 \
+    --includedir=%{_includedir}                         \
+    --pkgconfigdir=%{_libdir}/pkgconfig                 \
+}
+
+%cargo_cinstall(naf:)\
+%{shrink:                                               \
+    %{__cargo} cinstall                                 \
+    %{__cargo_common_opts}                              \
+    --profile rpm                                       \
+    %{__cargo_parse_opts %{-n} %{-a} %{-f:-f%{-f*}}}    \
+    --destdir=%{buildroot}                              \
+    --prefix=%{_prefix}                                 \
+    --libdir=%{_libdir}                                 \
+    --includedir=%{_includedir}                         \
+    --pkgconfigdir=%{_libdir}/pkgconfig                 \
+}
+

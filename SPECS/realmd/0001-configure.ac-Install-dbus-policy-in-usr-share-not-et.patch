@@ -1,0 +1,32 @@
+From 0cdae81ef890a2719035bfa7bcd51a0f2add791f Mon Sep 17 00:00:00 2001
+From: Gioele Barabucci <gioele@svario.it>
+Date: Thu, 6 Jul 2023 17:22:54 +0200
+Subject: [PATCH] configure.ac: Install dbus policy in /usr/share, not /etc
+
+From https://bugs.debian.org/1006631:
+
+> dbus supports policy files in both `/usr/share/dbus-1/system.d` and
+> `/etc/dbus-1/systemd`. [The] recently released dbus 1.14.0, officially
+> deprecates installing packages' default policies into `/etc/dbus-1/systemd`,
+> instead reserving it for the sysadmin. This is the same idea as the
+> difference between `/usr/lib/udev/rules.d` and `/etc/udev/rules.d`.
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 9ed1aeb..521a150 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -266,7 +266,7 @@ fi
+ DBUS_SERVICES_DIR="${datadir}/dbus-1/system-services"
+ AC_SUBST(DBUS_SERVICES_DIR)
+ 
+-DBUS_POLICY_DIR="${sysconfdir}/dbus-1/system.d"
++DBUS_POLICY_DIR="${datadir}/dbus-1/system.d"
+ AC_SUBST(DBUS_POLICY_DIR)
+ 
+ POLKIT_ACTION_DIR="${datadir}/polkit-1/actions"
+-- 
+2.47.1
+

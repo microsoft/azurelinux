@@ -1,0 +1,14 @@
+diff -up sqlite-2.8.17/Makefile.in.cleanup-tempc sqlite-2.8.17/Makefile.in
+--- sqlite-2.8.17/Makefile.in.cleanup-tempc	2019-04-10 14:45:24.990212962 -0400
++++ sqlite-2.8.17/Makefile.in	2019-04-10 14:46:21.140254699 -0400
+@@ -270,8 +270,9 @@ parse.c:	$(TOP)/src/parse.y lemon@BUILD_
+ #
+ config.h:	
+ 	echo '#include <stdio.h>' >temp.c
++	echo '#include <stdlib.h>'>>temp.c
+ 	echo 'int main(){printf(' >>temp.c
+-	echo '"#define SQLITE_PTR_SZ %d",sizeof(char*));' >>temp.c
++	echo '"#define SQLITE_PTR_SZ %ld",sizeof(char*));' >>temp.c
+ 	echo 'exit(0);}' >>temp.c
+ 	$(BCC) -o temp temp.c
+ 	./temp >config.h

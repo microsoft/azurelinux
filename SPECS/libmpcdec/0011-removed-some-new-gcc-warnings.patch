@@ -1,0 +1,228 @@
+From 30196e28ca463803086ce9a15a4194e2ccfccea7 Mon Sep 17 00:00:00 2001
+From: r2d <r2d@c51c8d5e-032a-db11-a0f2-0002b3467eef>
+Date: Sun, 10 Jan 2016 20:36:06 +0000
+Subject: [PATCH 11/19] removed some new gcc warnings
+
+git-svn-id: http://svn.musepack.net/libmpc/trunk@487 c51c8d5e-032a-db11-a0f2-0002b3467eef
+---
+ mpcchap/mpcchap.c | 40 +++++++++++++++++++++++++++-------------
+ mpcenc/mpcenc.c   | 13 +++++++------
+ mpcgain/mpcgain.c | 14 +++++++-------
+ 3 files changed, 41 insertions(+), 26 deletions(-)
+
+diff --git a/mpcchap/mpcchap.c b/mpcchap/mpcchap.c
+index 4f02191..eee3dbd 100644
+--- a/mpcchap/mpcchap.c
++++ b/mpcchap/mpcchap.c
+@@ -22,6 +22,7 @@
+ #include "../libmpcenc/libmpcenc.h"
+ #include "iniparser.h"
+ 
++#include <inttypes.h>
+ #include <sys/stat.h>
+ 
+ #include <cuetools/cuefile.h>
+@@ -82,6 +83,7 @@ mpc_status add_chaps_ini(char * mpc_file, char * chap_file, mpc_demux * demux, m
+ 	int chap_pos, end_pos, chap_size, i, nchap;
+ 	char * tmp_buff;
+ 	dictionary * dict;
++    mpc_status ret = MPC_STATUS_OK;
+ 
+ 	chap_pos = (demux->chap_pos >> 3) + si->header_position;
+ 	end_pos = mpc_demux_pos(demux) >> 3;
+@@ -89,9 +91,13 @@ mpc_status add_chaps_ini(char * mpc_file, char * chap_file, mpc_demux * demux, m
+ 
+ 	stat(mpc_file, &stbuf);
+ 	tmp_buff = malloc(stbuf.st_size - chap_pos - chap_size);
++
+ 	in_file = fopen( mpc_file, "r+b" );
+ 	fseek(in_file, chap_pos + chap_size, SEEK_SET);
+-	fread(tmp_buff, 1, stbuf.st_size - chap_pos - chap_size, in_file);
++    if (1 != fread(tmp_buff, stbuf.st_size - chap_pos - chap_size, 1, in_file)) {
++        ret = MPC_STATUS_FAIL;
++        goto error_read_in_file;
++    }
+ 	fseek(in_file, chap_pos, SEEK_SET);
+ 
+ 	dict = iniparser_load(chap_file);
+@@ -104,8 +110,8 @@ mpc_status add_chaps_ini(char * mpc_file, char * chap_file, mpc_demux * demux, m
+ 		mpc_int64_t chap_pos = atoll(chap_sec);
+ 
+ 		if (chap_pos > si->samples - si->beg_silence)
+-			fprintf(stderr, "warning : chapter %i starts @ %lli samples after the end of the stream (%lli)\n",
+-			        i + 1, chap_pos, si->samples - si->beg_silence);
++            fprintf(stderr, "warning : chapter %i starts @ %" PRId64 " samples after the end of the stream (%" PRId64 ")\n",
++                    i + 1, chap_pos, si->samples - si->beg_silence);
+ 
+ 		Init_Tags();
+ 
+@@ -141,13 +147,15 @@ mpc_status add_chaps_ini(char * mpc_file, char * chap_file, mpc_demux * demux, m
+ 	}
+ 
+ 	fwrite(tmp_buff, 1, stbuf.st_size - chap_pos - chap_size, in_file);
+-	ftruncate(fileno(in_file), ftell(in_file));
++    if (0 != ftruncate(fileno(in_file), ftell(in_file)))
++        ret = MPC_STATUS_FAIL;
+ 
+-	fclose(in_file);
+-	free(tmp_buff);
+-	iniparser_freedict(dict);
++    iniparser_freedict(dict);
++error_read_in_file:
++    fclose(in_file);
++    free(tmp_buff);
+ 
+-	return MPC_STATUS_OK;
++    return ret;
+ }
+ 
+ mpc_status add_chaps_cue(char * mpc_file, char * chap_file, mpc_demux * demux, mpc_streaminfo * si)
+@@ -158,6 +166,7 @@ mpc_status add_chaps_cue(char * mpc_file, char * chap_file, mpc_demux * demux, m
+ 	FILE * in_file;
+ 	int chap_pos, end_pos, chap_size, i;
+ 	char * tmp_buff;
++    mpc_status ret = MPC_STATUS_OK;
+ 
+ 	if (0 == (cd = cf_parse(chap_file, &format))) {
+ 		fprintf(stderr, "%s: input file error\n", chap_file);
+@@ -172,7 +181,10 @@ mpc_status add_chaps_cue(char * mpc_file, char * chap_file, mpc_demux * demux, m
+ 	tmp_buff = malloc(stbuf.st_size - chap_pos - chap_size);
+ 	in_file = fopen( mpc_file, "r+b" );
+ 	fseek(in_file, chap_pos + chap_size, SEEK_SET);
+-	fread(tmp_buff, 1, stbuf.st_size - chap_pos - chap_size, in_file);
++    if (1 != fread(tmp_buff, stbuf.st_size - chap_pos - chap_size, 1, in_file)) {
++        ret = MPC_STATUS_FAIL;
++        goto error_read_in_file;
++    }
+ 	fseek(in_file, chap_pos, SEEK_SET);
+ 
+ 	nchap = cd_get_ntrack(cd);
+@@ -190,7 +202,7 @@ mpc_status add_chaps_cue(char * mpc_file, char * chap_file, mpc_demux * demux, m
+ 		chap_pos = (mpc_int64_t) si->sample_freq * track_get_start (track) / 75;
+ 
+ 		if (chap_pos > si->samples - si->beg_silence)
+-			fprintf(stderr, "warning : chapter %i starts @ %lli samples after the end of the stream (%lli)\n",
++            fprintf(stderr, "warning : chapter %i starts @ %" PRId64 " samples after the end of the stream (%" PRId64 ")\n",
+ 			        i, chap_pos, si->samples - si->beg_silence);
+ 
+ 		Init_Tags();
+@@ -224,12 +236,14 @@ mpc_status add_chaps_cue(char * mpc_file, char * chap_file, mpc_demux * demux, m
+ 	}
+ 
+ 	fwrite(tmp_buff, 1, stbuf.st_size - chap_pos - chap_size, in_file);
+-	ftruncate(fileno(in_file), ftell(in_file));
++    if (0 != ftruncate(fileno(in_file), ftell(in_file)))
++        ret = MPC_STATUS_FAIL;
+ 
++error_read_in_file:
+ 	fclose(in_file);
+ 	free(tmp_buff);
+ 
+-	return MPC_STATUS_OK;
++    return ret;
+ }
+ 
+ mpc_status dump_chaps(mpc_demux * demux, char * chap_file, int chap_nb)
+@@ -247,7 +261,7 @@ mpc_status dump_chaps(mpc_demux * demux, char * chap_file, int chap_nb)
+ 
+ 	for (i = 0; i < chap_nb; i++) {
+ 		chap = mpc_demux_chap(demux, i);
+-		fprintf(out_file, "[%lli]\ngain=%i\npeak=%i\n", chap->sample, chap->gain, chap->peak);
++        fprintf(out_file, "[%" PRId64 "]\ngain=%i\npeak=%i\n", chap->sample, chap->gain, chap->peak);
+ 		if (chap->tag_size > 0) {
+ 			int item_count, j;
+ 			char const * tag = chap->tag;
+diff --git a/mpcenc/mpcenc.c b/mpcenc/mpcenc.c
+index df3453d..84f6376 100644
+--- a/mpcenc/mpcenc.c
++++ b/mpcenc/mpcenc.c
+@@ -1023,7 +1023,7 @@ EvalParameters (PsyModel * m, int argc, char** argv, char** InputFile, char** Ou
+         }
+         else if ( 0 == strcmp ( arg, "stderr") ) {                                      // Offset for threshold in quiet
+             if ( ++k >= argc ) { stderr_printf ( errmsg, arg ); return -1; }
+-            freopen ( argv[k], "a", stderr );
++            stderr = freopen ( argv[k], "a", stderr );
+         }
+         else if ( 0 == strcmp ( arg, "ltq")  ||  0 == strcmp ( arg, "ath") ) {          // threshold in quiet
+             if ( ++k >= argc ) { stderr_printf ( errmsg, arg ); return -1; }
+@@ -1208,11 +1208,12 @@ EvalParameters (PsyModel * m, int argc, char** argv, char** InputFile, char** Ou
+             p = strchr ( argv[k], '=' );
+             if ( p == NULL ) {
+                 stderr_printf (" Enter value for tag key '%s': ", argv[k] );
+-                fgets ( buff, sizeof buff, stdin );
+-                len = strlen (buff);
+-                while ( len > 0  &&  (buff [len-1] == '\r'  ||  buff [len-1] == '\n') )
+-                    len--;
+-                addtag ( arg, strlen(arg), buff, len, NoUnicode*6, 0 );
++                if (0 != fgets ( buff, sizeof buff, stdin )) {
++                    len = strlen (buff);
++                    while ( len > 0  &&  (buff [len-1] == '\r'  ||  buff [len-1] == '\n') )
++                        len--;
++                    addtag ( arg, strlen(arg), buff, len, NoUnicode*6, 0 );
++                }
+             }
+             else {
+                 fp = fopen ( p+1, "rb" );
+diff --git a/mpcgain/mpcgain.c b/mpcgain/mpcgain.c
+index 86a4b02..4e44d3e 100644
+--- a/mpcgain/mpcgain.c
++++ b/mpcgain/mpcgain.c
+@@ -115,7 +115,7 @@ static void write_chaps_gain(mpc_demux * demux, const char * file_name,
+ 
+ 	while (1) {
+ 		fseek(file, next_chap_pos, SEEK_SET);
+-		fread(buffer, 1, MAX_HEAD_SIZE, file);
++        if (0 == fread(buffer, 1, MAX_HEAD_SIZE, file)) break;
+ 		r.buff = buffer;
+ 		r.count = 8;
+ 		size = mpc_bits_get_block(&r, &b);
+@@ -182,7 +182,7 @@ int main(int argc, char **argv)
+ 		chap_nb = mpc_demux_chap_nb(demux);
+ 		mpc_demux_seek_sample(demux, 0);
+ 		if (chap_nb > 0) {
+-			mpc_chap_info * chap_info = mpc_demux_chap(demux, chap);
++            const mpc_chap_info * chap_info = mpc_demux_chap(demux, chap);
+ 			next_chap_sample = chap_info->sample;
+ 			chap_gain = malloc(sizeof(mpc_uint16_t) * 2 * chap_nb);
+ 			chap_peak = chap_gain + chap_nb;
+@@ -215,7 +215,7 @@ int main(int argc, char **argv)
+ 				i += sample_nb;
+ 				cur_sample = next_chap_sample;
+ 				if (chap < chap_nb) {
+-					mpc_chap_info * chap_info = mpc_demux_chap(demux, chap);
++                    const mpc_chap_info * chap_info = mpc_demux_chap(demux, chap);
+ 					next_chap_sample = chap_info->sample;
+ 				} else
+ 					next_chap_sample = mpc_int64_max;
+@@ -260,8 +260,8 @@ int main(int argc, char **argv)
+ 			continue;
+ 		}
+ 		fseek(file, header_pos[j] - 4, SEEK_SET);
+-		fread(buffer, 1, 16, file);
+-		if (memcmp(buffer, "MPCK", 4) != 0) {
++
++        if (fread(buffer, 1, 16, file) != 16 || memcmp(buffer, "MPCK", 4) != 0) {
+ 			fprintf(stderr, "Unsupported file format, not a sv8 file : %s\n", argv[j + 1]);
+ 			fclose(file);
+ 			continue;
+@@ -276,7 +276,7 @@ int main(int argc, char **argv)
+ 			if (memcmp(b.key, "RG", 2) == 0) break;
+ 			header_pos[j] += b.size + size;
+ 			fseek(file, header_pos[j], SEEK_SET);
+-			fread(buffer, 1, 16, file);
++            if (0 == fread(buffer, 1, 16, file)) break;
+ 			r.buff = buffer;
+ 			r.count = 8;
+ 		}
+@@ -286,7 +286,7 @@ int main(int argc, char **argv)
+ 			fclose(file);
+ 			continue;
+ 		}
+-		header_pos[j] += size;
++        header_pos[j] += size;
+ 
+ 		buffer[size] = 1; // replaygain version
+ 		buffer[size + 1] = title_gain[j] >> 8;
+-- 
+2.46.0
+

@@ -1,0 +1,34 @@
+--- diesel-2.3.6/Cargo.toml	1970-01-01T00:00:01+00:00
++++ diesel-2.3.6/Cargo.toml	2026-02-04T16:04:41.223380+00:00
+@@ -144,7 +144,6 @@
+ serde_json = ["dep:serde_json"]
+ sqlite = [
+     "dep:libsqlite3-sys",
+-    "dep:sqlite-wasm-rs",
+     "diesel_derives/sqlite",
+     "time?/formatting",
+     "time?/parsing",
+@@ -277,18 +276,6 @@
+ [dev-dependencies.tempfile]
+ version = "3.10.1"
+ 
+-[target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dependencies.sqlite-wasm-rs]
+-version = ">=0.4.0, <0.6.0"
+-optional = true
+-default-features = false
+-
+-[target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dev-dependencies.getrandom]
+-version = "0.2"
+-features = ["js"]
+-
+-[target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dev-dependencies.wasm-bindgen-test]
+-version = "0.3.49"
+-
+ [target.'cfg(not(all(target_family = "wasm", target_os = "unknown")))'.dependencies.libsqlite3-sys]
+ version = ">=0.17.2, <0.36.0"
+ features = ["bundled_bindings"]
+@@ -298,3 +285,4 @@
+ level = "warn"
+ priority = 0
+ check-cfg = ["cfg(diesel_docsrs)"]
++

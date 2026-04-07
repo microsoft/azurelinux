@@ -1,0 +1,33 @@
+From b7d726abae2921b4411988db49765a248bd040b8 Mon Sep 17 00:00:00 2001
+From: Zhang Liang <zhanglianga@uniontech.com>
+Date: Mon, 1 Feb 2021 19:29:43 +0800
+Subject: [PATCH 07/55] Fix: remove listener
+
+Add the operation for removing the listener form listener list
+
+Change-Id: Ief2ff1303b607eee499543303fe80e51f8f10cc5
+Reviewed-by: David Edmundson <davidedmundson@kde.org>
+(cherry picked from commit 16760280fd04cf70255bab16d9acecad254fdd8f)
+---
+ src/client/qwaylanddisplay.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/client/qwaylanddisplay.cpp b/src/client/qwaylanddisplay.cpp
+index 8a6d5db1..16f8ca1a 100644
+--- a/src/client/qwaylanddisplay.cpp
++++ b/src/client/qwaylanddisplay.cpp
+@@ -456,9 +456,10 @@ void QWaylandDisplay::addRegistryListener(RegistryListener listener, void *data)
+ 
+ void QWaylandDisplay::removeListener(RegistryListener listener, void *data)
+ {
+-    std::remove_if(mRegistryListeners.begin(), mRegistryListeners.end(), [=](Listener l){
++    auto iter = std::remove_if(mRegistryListeners.begin(), mRegistryListeners.end(), [=](Listener l){
+         return (l.listener == listener && l.data == data);
+     });
++    mRegistryListeners.erase(iter, mRegistryListeners.end());
+ }
+ 
+ uint32_t QWaylandDisplay::currentTimeMillisec()
+-- 
+2.51.1
+

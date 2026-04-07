@@ -1,0 +1,11 @@
+--- netkit-ftp-0.17/ftp/cmds.c.printf	2005-05-24 22:12:24.000000000 +0200
++++ netkit-ftp-0.17/ftp/cmds.c	2005-05-24 22:12:37.000000000 +0200
+@@ -2223,7 +2223,7 @@
+ 		printf("restart: offset not specified\n");
+ 	else {
+ 		restart_point = atol(argv[1]);
+-		printf("restarting at %ld. %s\n", restart_point,
++		printf("restarting at %ld. %s\n", (long)restart_point,
+ 		    "execute get, put or append to initiate transfer");
+ 	}
+ }

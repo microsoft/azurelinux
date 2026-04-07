@@ -1,0 +1,14 @@
+[Unit]
+Description=Relabel all filesystems
+DefaultDependencies=no
+Conflicts=shutdown.target
+After=sysinit.target
+Before=shutdown.target
+ConditionSecurity=selinux
+
+[Service]
+ExecStart=/usr/libexec/selinux/selinux-autorelabel
+Type=oneshot
+TimeoutSec=0
+RemainAfterExit=yes
+StandardOutput=journal+console

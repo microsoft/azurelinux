@@ -1,0 +1,153 @@
+Various fixes for the configure script for C99 compatibility.
+Most of the changes are generic in nature, due to the old version
+of autoconf used by upstream (2.12).
+
+diff --git a/configure b/configure
+index db2672686719f7e1..c82ff072e4e1de5d 100755
+--- a/configure
++++ b/configure
+@@ -1008,7 +1008,7 @@ cross_compiling=$ac_cv_prog_cc_cross
+ cat > conftest.$ac_ext <<EOF
+ #line 1010 "configure"
+ #include "confdefs.h"
+-main(){return(0);}
++int main(){return(0);}
+ EOF
+ if { (eval echo configure:1014: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
+   ac_cv_prog_cc_works=yes
+@@ -1489,8 +1489,8 @@ else
+ #define TOUPPER(c) (ISLOWER(c) ? 'A' + ((c) - 'a') : (c))
+ #define XOR(e, f) (((e) && !(f)) || (!(e) && (f)))
+ int main () { int i; for (i = 0; i < 256; i++)
+-if (XOR (islower (i), ISLOWER (i)) || toupper (i) != TOUPPER (i)) exit(2);
+-exit (0); }
++if (XOR (islower (i), ISLOWER (i)) || toupper (i) != TOUPPER (i)) return 2;
++return 0; }
+ 
+ EOF
+ if { (eval echo configure:1497: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest && (./conftest; exit) 2>/dev/null
+@@ -1645,7 +1645,7 @@ for ac_kw in inline __inline__ __inline; do
+ #include "confdefs.h"
+ 
+ int main() {
+-} $ac_kw foo() {
++} $ac_kw int foo() {
+ ; return 0; }
+ EOF
+ if { (eval echo configure:1652: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+@@ -1917,8 +1917,8 @@ else
+ #define TOUPPER(c) (ISLOWER(c) ? 'A' + ((c) - 'a') : (c))
+ #define XOR(e, f) (((e) && !(f)) || (!(e) && (f)))
+ int main () { int i; for (i = 0; i < 256; i++)
+-if (XOR (islower (i), ISLOWER (i)) || toupper (i) != TOUPPER (i)) exit(2);
+-exit (0); }
++if (XOR (islower (i), ISLOWER (i)) || toupper (i) != TOUPPER (i)) return 2;
++return 0; }
+ 
+ EOF
+ if { (eval echo configure:1925: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest && (./conftest; exit) 2>/dev/null
+@@ -2488,14 +2488,14 @@ else
+ #include "confdefs.h"
+ #include <stdio.h>
+ /* If setvbuf has the reversed format, exit 0. */
+-main () {
++int main () {
+   /* This call has the arguments reversed.
+      A reversed system may check and see that the address of main
+      is not _IOLBF, _IONBF, or _IOFBF, and return nonzero.  */
+   if (setvbuf(stdout, _IOLBF, (char *) main, BUFSIZ) != 0)
+-    exit(1);
++    return 1;
+   putc('\r', stdout);
+-  exit(0);			/* Non-reversed systems segv here.  */
++  return 0;			/* Non-reversed systems segv here.  */
+ }
+ EOF
+ if { (eval echo configure:2502: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest && (./conftest; exit) 2>/dev/null
+@@ -2694,12 +2694,15 @@ else
+ #include <sys/types.h>
+ #include <fcntl.h>
+ #include <sys/mman.h>
++#include <sys/stat.h>
++#include <stdlib.h>
++
++#ifdef HAVE_UNISTD_H
++# include <unistd.h>
++#endif
+ 
+ /* This mess was copied from the GNU getpagesize.h.  */
+ #ifndef HAVE_GETPAGESIZE
+-# ifdef HAVE_UNISTD_H
+-#  include <unistd.h>
+-# endif
+ 
+ /* Assume that all systems that can run configure have sys/param.h.  */
+ # ifndef HAVE_SYS_PARAM_H
+@@ -3032,9 +3035,9 @@ find_stack_direction ()
+   else
+     return (&dummy > addr) ? 1 : -1;
+ }
+-main ()
++int main (void)
+ {
+-  exit (find_stack_direction() < 0);
++  return find_stack_direction() < 0;
+ }
+ EOF
+ if { (eval echo configure:3041: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest && (./conftest; exit) 2>/dev/null
+@@ -3470,7 +3473,7 @@ else
+ #include <sys/types.h>
+ #include <sys/timeb.h>
+ #include <stdio.h>
+-main ()
++int main (void)
+ {
+   struct timeb s, slast;
+   int c = 0;
+@@ -3482,14 +3485,14 @@ main ()
+       || (s.time == slast.time && s.millitm < slast.millitm)) {
+       fprintf(stderr,"s: %ld, %ld, slast: %ld, %ld\n",
+       	s.time,s.millitm, slast.time,slast.millitm);
+-    exit (1);
++    return 1;
+ 	}
+       if (s.time != slast.time)
+     ++c;
+       slast.time = s.time;
+       slast.millitm = s.millitm;
+     }
+-  exit (0);
++  return 0;
+ }
+ 
+ EOF
+diff --git a/configure.in b/configure.in
+index 429677e87e99a303..0fbe252a717afb59 100644
+--- a/configure.in
++++ b/configure.in
+@@ -180,7 +180,7 @@ AC_CACHE_VAL(lrzsz_cv_sys_ftime_ok,
+ #include <sys/types.h>
+ #include <sys/timeb.h>
+ #include <stdio.h>
+-main ()
++int main (void)
+ {
+   struct timeb s, slast;
+   int c = 0;
+@@ -192,14 +192,14 @@ main ()
+       || (s.time == slast.time && s.millitm < slast.millitm)) {
+       fprintf(stderr,"s: %ld, %ld, slast: %ld, %ld\n",
+       	s.time,s.millitm, slast.time,slast.millitm);
+-    exit (1);
++    return 1;
+ 	}
+       if (s.time != slast.time)
+     ++c;
+       slast.time = s.time;
+       slast.millitm = s.millitm;
+     }
+-  exit (0);
++  return 0;
+ }
+ ],
+ lrzsz_cv_sys_ftime_ok=yes,

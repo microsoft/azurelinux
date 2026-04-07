@@ -1,0 +1,38 @@
+From 6f325b0370d64335dbe58c0f23fa12d0ee91a6cc Mon Sep 17 00:00:00 2001
+From: Alexander Bokovoy <abokovoy@redhat.com>
+Date: Tue, 27 Aug 2024 10:55:25 +0300
+Subject: [PATCH] Do not use PR_SecondsToInterval in slapi_eq_once_rel
+
+Relative time can be specified directly in seconds
+
+Fixes: https://pagure.io/slapi-nis/issue/54
+Signed-off-by: Alexander Bokovoy <abokovoy@redhat.com>
+---
+ src/back-shr.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/back-shr.c b/src/back-shr.c
+index a29f4f9..95c5c8a 100644
+--- a/src/back-shr.c
++++ b/src/back-shr.c
+@@ -916,7 +916,7 @@ backend_shr_refresh_thread(void *arg)
+ 
+         /* Schedule the initialization of the maps  */
+         slapi_eq_once_rel(backend_shr_data_initialize_thread, cbdata,
+-                          slapi_current_rel_time_t() + PR_SecondsToInterval(1));
++                          slapi_current_rel_time_t() + 1);
+         PR_Sleep(PR_SecondsToInterval(1));
+ 
+         /* Then wait for its completion */
+@@ -975,7 +975,7 @@ backend_shr_startup(struct plugin_state *state,
+ 	 * but make sure it is called a first thing when event loop is created */
+     slapi_eq_once_rel(backend_shr_data_initialize_thread, cbdata,
+                       slapi_current_rel_time_t() +
+-                      PR_SecondsToInterval(PLUGIN_SCAN_DELAY));
++                      PLUGIN_SCAN_DELAY);
+ 
+ 	slapi_log_error(SLAPI_LOG_FATAL,
+ 			cbdata->state->plugin_desc->spd_id,
+-- 
+2.45.2
+

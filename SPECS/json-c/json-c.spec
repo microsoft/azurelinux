@@ -1,0 +1,533 @@
+## START: Set by rpmautospec
+## (rpmautospec version 0.8.4)
+## RPMAUTOSPEC: autochangelog
+## END: Set by rpmautospec
+
+# This spec file has been modified by azldev to include build configuration overlays.
+# Do not edit manually; changes may be overwritten.
+
+%{!?_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
+
+# We don't want accidental SONAME bumps.
+# When there is a SONAME bump in json-c, we need to request
+# a side-tag for bootstrap purposes:
+#
+# 1. Build a bootstrap build of the systemd package, and wait
+#    for it to be available inside the side-tag.
+# 2. Re-build the following build-chain for bootstrap:
+#    json-c : cryptsetup
+# 3. Untag the systemd bootstrap build from the side-tag, and
+#    disable bootstrapping in the systemd package.  Re-build
+#    the systemd package into Rawhide.
+# 4. Wait for the changes to populate and re-build the following
+#    chain into the side-tag:
+#    satyr : libdnf libreport
+# 5. Merge the side-tag using Bodhi.
+#
+# After that procedure any other cosumers can be re-build
+# in Rawhide as usual.
+%global so_ver 5
+
+# Releases are tagged with a date stamp.
+%global reldate 20240915
+
+%bcond_without mingw
+
+
+Name:           json-c
+Version:        0.18
+Release:        7%{?dist}
+Summary:        JSON implementation in C
+
+License:        MIT
+URL:            https://github.com/%{name}/%{name}
+Source0:        %{url}/archive/%{name}-%{version}-%{reldate}.tar.gz
+
+# Add libver to mingw dll
+Patch0:         json-c_mingw-libver.patch
+Patch1:         json-c-0.18-utf8-validation.patch
+
+BuildRequires:  cmake
+BuildRequires:  gcc
+BuildRequires:  ninja-build
+%ifarch %{valgrind_arches}
+BuildRequires:  valgrind
+%endif
+
+%description
+JSON-C implements a reference counting object model that allows you
+to easily construct JSON objects in C, output them as JSON formatted
+strings and parse JSON formatted strings back into the C representation
+of JSON objects.  It aims to conform to RFC 7159.
+
+
+%package        devel
+Summary:        Development files for %{name}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+
+%description    devel
+This package contains libraries and header files for
+developing applications that use %{name}.
+
+
+%package        doc
+Summary:        Reference manual for json-c
+
+#BuildArch:     noarch
+
+BuildRequires:  doxygen
+BuildRequires:  hardlink
+
+%description    doc
+This package contains the reference manual for %{name}.
+
+
+%if %{with mingw}
+%package -n mingw32-%{name}
+Summary:       MinGW Windows %{name} library
+BuildArch:     noarch
+BuildRequires: mingw32-filesystem
+BuildRequires: mingw32-gcc
+
+%description -n mingw32-%{name}
+%{summary}.
+
+
+%package -n mingw64-%{name}
+Summary:       MinGW Windows %{name} library
+BuildArch:     noarch
+BuildRequires: mingw64-filesystem
+BuildRequires: mingw64-gcc
+
+%description -n mingw64-%{name}
+%{summary}.
+
+%{?mingw_debug_package}
+%endif
+
+
+%prep
+%autosetup -n %{name}-%{name}-%{version}-%{reldate} -p 1
+
+# Remove pre-built html documentation.
+rm -fr doc/html
+
+# Update Doxyfile.
+doxygen -s -u doc/Doxyfile.in
+
+
+%build
+cmake_opts="-DBUILD_STATIC_LIBS:BOOL=OFF       \
+  -DCMAKE_BUILD_TYPE:STRING=RELEASE  \
+  -DCMAKE_C_FLAGS_RELEASE:STRING=""  \
+  -DDISABLE_BSYMBOLIC:BOOL=OFF       \
+  -DDISABLE_WERROR:BOOL=ON           \
+  -DENABLE_RDRAND:BOOL=ON            \
+  -DENABLE_THREADING:BOOL=ON         \
+  -DBUILD_APPS=OFF                   \
+  -G Ninja"
+%cmake $cmake_opts
+%cmake_build --target all doc
+
+%if %{with mingw}
+%mingw_cmake $cmake_opts
+%mingw_ninja
+%endif
+
+
+%install
+%cmake_install
+
+%if %{with mingw}
+%mingw_ninja_install
+%mingw_debug_install_post
+%endif
+
+# Documentation
+mkdir -p %{buildroot}%{_pkgdocdir}
+cp -a %{__cmake_builddir}/doc/html ChangeLog README README.* \
+  %{buildroot}%{_pkgdocdir}
+hardlink -cfv %{buildroot}%{_pkgdocdir}
+
+
+%check
+export USE_VALGRIND=0
+%ctest
+%ifarch %{valgrind_arches}
+export USE_VALGRIND=1
+%ctest
+%endif
+unset USE_VALGRIND
+
+
+%ldconfig_scriptlets
+
+
+%files
+%license AUTHORS
+%license COPYING
+%{_libdir}/lib%{name}.so.%{so_ver}*
+
+
+%files devel
+%doc %dir %{_pkgdocdir}
+%doc %{_pkgdocdir}/ChangeLog
+%doc %{_pkgdocdir}/README*
+%{_includedir}/%{name}
+%{_libdir}/cmake/%{name}
+%{_libdir}/lib%{name}.so
+%{_libdir}/pkgconfig/%{name}.pc
+
+
+%files doc
+%if 0%{?fedora} || 0%{?rhel} >= 7
+%license %{_datadir}/licenses/%{name}*
+%endif
+%doc %{_pkgdocdir}
+
+%if %{with mingw}
+%files -n mingw32-%{name}
+%license COPYING
+%{mingw32_includedir}/%{name}
+%{mingw32_bindir}/lib%{name}-%{so_ver}.dll
+%{mingw32_libdir}/lib%{name}.dll.a
+%{mingw32_libdir}/cmake/%{name}
+%{mingw32_libdir}/pkgconfig/%{name}.pc
+
+%files -n mingw64-%{name}
+%license COPYING
+%{mingw64_includedir}/%{name}
+%{mingw64_bindir}/lib%{name}-%{so_ver}.dll
+%{mingw64_libdir}/lib%{name}.dll.a
+%{mingw64_libdir}/cmake/%{name}
+%{mingw64_libdir}/pkgconfig/%{name}.pc
+%endif
+
+%changelog
+## START: Generated by rpmautospec
+* Mon Apr 06 2026 azldev <> - 0.18-9
+- Latest state for json-c
+
+* Mon Jul 28 2025 Tomas Korbar <tkorbar@redhat.com> - 0.18-8
+- Fix utf8 strict validation (rhbz#2381910)
+
+* Mon Jul 28 2025 Tomas Korbar <tkorbar@redhat.com> - 0.18-7
+- Disable building of apps
+
+* Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.18-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
+
+* Sun Jul 13 2025 Sandro Mani <manisandro@gmail.com> - 0.18-5
+- Add libver to mingw dll
+
+* Sun Jun 15 2025 Sandro Mani <manisandro@gmail.com> - 0.18-4
+- Add mingw build
+
+* Mon Jun 09 2025 psklenar@redhat.com <psklenar@redhat.com> - 0.18-3
+- fedora CI plans move to gitlab for centos-stream test space
+  https://issues.redhat.com/browse/RHELMISC-13073
+
+* Fri Jan 17 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.18-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
+
+* Mon Nov 04 2024 Tomas Korbar <tkorbar@redhat.com> - 0.18-1
+- Update to 0.18
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.17-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.17-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jan 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.17-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Aug 13 2023 Björn Esser <besser82@fedoraproject.org> - 0.17-1
+- Update to 0.17
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.16-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu May 04 2023 František Hrdina <fhrdina@redhat.com> - 0.16-6
+- Adding fmf plan and gating.yaml
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.16-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Nov 02 2022 Björn Esser <besser82@fedoraproject.org> - 0.16-4
+- Rebuilt for arc4random in glibc 2.36 (or later)
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.16-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue May 17 2022 Tomas Korbar <tkorbar@redhat.com> - 0.16-2
+- Upload sources for release 0.16
+
+* Tue May 17 2022 Tomas Korbar <tkorbar@redhat.com> - 0.16-1
+- Update to 0.16
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.15-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.15-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Sat Jul 10 2021 Björn Esser <besser82@fedoraproject.org> - 0.15-3
+- Change doc package to be arched
+
+* Thu Jul 08 2021 Björn Esser <besser82@fedoraproject.org> - 0.15-2
+- Backport several fixes from upstream commits
+
+* Thu Jul 08 2021 Björn Esser <besser82@fedoraproject.org> - 0.15-1
+- Update to 0.15
+
+* Thu Jul 08 2021 Björn Esser <besser82@fedoraproject.org> - 0.14-19
+- Drop obsolete patches from repo
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.14-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Jul 27 2020 Björn Esser <besser82@fedoraproject.org> - 0.14-17
+- Use new cmake macros
+
+* Tue May 26 2020 Björn Esser <besser82@fedoraproject.org> - 0.14-16
+- Hardlink the files in %%%%_pkgdocdir
+
+* Tue May 26 2020 Björn Esser <besser82@fedoraproject.org> - 0.14-15
+- Add a patch to apply some optimizations to arraylist
+
+* Tue May 26 2020 Björn Esser <besser82@fedoraproject.org> - 0.14-14
+- Update Doxyfile during %%%%prep
+
+* Tue May 26 2020 Björn Esser <besser82@fedoraproject.org> - 0.14-13
+- Remove pre-built html documentation
+
+* Tue May 26 2020 Björn Esser <besser82@fedoraproject.org> - 0.14-12
+- Add a patch to move Doxyfile into doc subdir
+
+* Tue May 26 2020 Björn Esser <besser82@fedoraproject.org> - 0.14-11
+- Build using Ninja instead of Make
+
+* Mon May 25 2020 Björn Esser <besser82@fedoraproject.org> - 0.14-10
+- Run the testssuite with valgrind on %%%%valgrind_arches
+
+* Mon May 18 2020 Björn Esser <besser82@fedoraproject.org> - 0.14-9
+- Add a patch to fix generation of user-documentation
+
+* Mon May 18 2020 Björn Esser <besser82@fedoraproject.org> - 0.14-8
+- Add a patch to fix a test
+
+* Mon May 11 2020 Björn Esser <besser82@fedoraproject.org> - 0.14-7
+- Add upstream patch fixing usage of errno in json_parse_uint64()
+
+* Sun May 10 2020 Björn Esser <besser82@fedoraproject.org> - 0.14-6
+- Small cosmetics to spec file
+
+* Sun May 10 2020 Björn Esser <besser82@fedoraproject.org> - 0.14-5
+- Disable -Werror during build
+
+* Sun May 10 2020 Björn Esser <besser82@fedoraproject.org> - 0.14-4
+- Re-enable RDRAND as json-c can detect broken implementations in CPUs now
+
+* Sun May 10 2020 Björn Esser <besser82@fedoraproject.org> - 0.14-3
+- Add a patch to backport fixes applied on upstream master branch
+
+* Wed Apr 22 2020 Björn Esser <besser82@fedoraproject.org> - 0.14-2
+- Add instructions for bootstrapping during a SONAME bump
+
+* Tue Apr 21 2020 Björn Esser <besser82@fedoraproject.org> - 0.14-1
+- Update to 0.14
+
+* Mon Apr 20 2020 Björn Esser <besser82@fedoraproject.org> - 0.13.99-6
+- Fix path to config.h
+
+* Mon Apr 20 2020 Björn Esser <besser82@fedoraproject.org> - 0.13.99-5
+- Drop hardlinking of the documentation files
+
+* Mon Apr 20 2020 Björn Esser <besser82@fedoraproject.org> - 0.13.99-4
+- Remove config.h file from installation
+
+* Thu Apr 16 2020 Björn Esser <besser82@fedoraproject.org> - 0.13.99-3
+- Update to recent git snapshot
+
+* Tue Apr 14 2020 Björn Esser <besser82@fedoraproject.org> - 0.13.99-2
+- Update to recent git snapshot
+
+* Tue Apr 14 2020 Björn Esser <besser82@fedoraproject.org> - 0.13.99-1
+- Update to recent git snapshot using forge macros
+
+* Sun Apr 12 2020 Björn Esser <besser82@fedoraproject.org> - 0.13.1-21
+- Drop obsolete patches from repo
+
+* Sun Apr 12 2020 Björn Esser <besser82@fedoraproject.org> - 0.13.1-20
+- Small spec file cleanups
+
+* Sun Apr 12 2020 Björn Esser <besser82@fedoraproject.org> - 0.13.1-19
+- Add some explicit BuildRequires, which were implicit
+
+* Sun Apr 12 2020 Björn Esser <besser82@fedoraproject.org> - 0.13.1-18
+- Drop bootstrap logic, as the package is no dependency of @build anymore
+
+* Sat Apr 11 2020 Björn Esser <besser82@fedoraproject.org> - 0.13.1-17
+- Drop obsolete %%%%pretrans scriptlet
+
+* Sat Apr 11 2020 Björn Esser <besser82@fedoraproject.org> - 0.13.1-16
+- Do not use macros to invoke executables
+
+* Sat Apr 11 2020 Björn Esser <besser82@fedoraproject.org> - 0.13.1-15
+- Add explicit configure switches
+
+* Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.13.1-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
+
+* Thu Nov 28 2019 Petr Menšík <pemensik@redhat.com> - 0.13.1-13
+- Do not own empty directory
+
+* Wed Nov 06 2019 Miroslav Lichvar <mlichvar@redhat.com> - 0.13.1-12
+- Disable rdrand support (#1745333)
+
+* Thu Jul 25 2019 Fedora Release Engineering <releng@fedoraproject.org> - 0.13.1-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
+
+* Wed Jun 26 2019 Björn Esser <besser82@fedoraproject.org> - 0.13.1-10
+- Fix comment
+
+* Wed Jun 26 2019 Björn Esser <besser82@fedoraproject.org> - 0.13.1-9
+- Use new style bootstrap logic
+
+* Wed Jun 26 2019 Björn Esser <besser82@fedoraproject.org> - 0.13.1-8
+- Use hardlink without full path to the binary (#1721964)
+
+* Fri Feb 01 2019 Fedora Release Engineering <releng@fedoraproject.org> - 0.13.1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
+
+* Thu Jan 24 2019 Björn Esser <besser82@fedoraproject.org> - 0.13.1-6
+- Optimize file removal during bootstrap
+
+* Thu Jan 24 2019 Björn Esser <besser82@fedoraproject.org> - 0.13.1-5
+- Update configuration for future bootstrap
+
+* Fri Jul 13 2018 Fedora Release Engineering <releng@fedoraproject.org> - 0.13.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
+
+* Tue May 08 2018 Björn Esser <besser82@fedoraproject.org> - 0.13.1-3
+- Add some cherry-picked fixes from upstream master
+
+* Tue Mar 06 2018 Björn Esser <besser82@fedoraproject.org> - 0.13.1-2
+- New upstream release (rhbz#1552053)
+
+* Tue Mar 06 2018 Björn Esser <besser82@fedoraproject.org> - 0.13.1-1
+- Bootstrapping for so-name bump
+
+* Wed Feb 07 2018 Fedora Release Engineering <releng@fedoraproject.org> - 0.13-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
+
+* Fri Feb 02 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 0.13-9
+- Switch to %%ldconfig_scriptlets
+
+* Thu Dec 14 2017 Björn Esser <besser82@fedoraproject.org> - 0.13-8
+- Update patch fixing a segfault caused by possible invalid frees
+
+* Wed Dec 13 2017 Björn Esser <besser82@fedoraproject.org> - 0.13-7
+- Add upstream patch fixing invalid free in some cases
+
+* Wed Dec 13 2017 Björn Esser <besser82@fedoraproject.org> - 0.13-6
+- Add upstream patch for adding size_t json_c_object_sizeof() Enable
+  partial multi-threaded support
+
+* Mon Dec 11 2017 Björn Esser <besser82@fedoraproject.org> - 0.13-5
+- Drop json_object_private.h
+
+* Mon Dec 11 2017 Björn Esser <besser82@fedoraproject.org> - 0.13-4
+- New upstream release (rhbz#1524155)
+
+* Mon Dec 11 2017 Björn Esser <besser82@fedoraproject.org> - 0.13-3
+- Fix sources
+
+* Sun Dec 10 2017 Björn Esser <besser82@fedoraproject.org> - 0.13-2
+- Bootstrapping for so-name bump Keep json_object_private.h
+
+* Sun Dec 10 2017 Björn Esser <besser82@fedoraproject.org> - 0.13-1
+- New upstream release (rhbz#1524155)
+
+* Thu Aug 03 2017 Fedora Release Engineering <releng@fedoraproject.org> - 0.12.1-4
+- Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
+
+* Wed Jul 26 2017 Fedora Release Engineering <releng@fedoraproject.org> - 0.12.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
+
+* Mon Jul 03 2017 Björn Esser <besser82@fedoraproject.org> - 0.12.1-2
+- Add patch to replace obsolete autotools macro
+
+* Thu Apr 27 2017 Björn Esser <besser82@fedoraproject.org> - 0.12.1-1
+- Update to new upstream release Introduces SONAME bump, that should have
+  been in 0.12 already Unify %%%%doc General spec-file cleanup
+
+* Fri Feb 10 2017 Fedora Release Engineering <releng@fedoraproject.org> - 0.12-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
+
+* Thu Feb 04 2016 Dennis Gilmore <dennis@ausil.us> - 0.12-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
+
+* Wed Jun 17 2015 Dennis Gilmore <dennis@ausil.us> - 0.12-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
+
+* Sat Aug 16 2014 Peter Robinson <pbrobinson@fedoraproject.org> - 0.12-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
+
+* Tue Jul 29 2014 Christopher Meng <i@cicku.me> - 0.12-5
+- SONAME postponed.
+
+* Mon Jul 28 2014 Christopher Meng <i@cicku.me> - 0.12-4
+- SONAME bump
+
+* Fri Jul 25 2014 Christopher Meng <i@cicku.me> - 0.12-3
+- NVR bump.
+
+* Fri Jul 25 2014 Christopher Meng <i@cicku.me> - 0.12-2
+- Remove symlinks.
+
+* Thu Jul 24 2014 Christopher Meng <i@cicku.me> - 0.12-1
+- Update to 0.12
+
+* Sat Jul 12 2014 Tom Callaway <spot@fedoraproject.org> - 0.11-11
+- fix license handling
+
+* Sun Jun 08 2014 Dennis Gilmore <dennis@ausil.us> - 0.11-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
+
+* Wed Apr 09 2014 Susi Lehtola <jussilehtola@fedoraproject.org> - 0.11-9
+- Address CVE issues.
+
+* Mon Feb 10 2014 Susi Lehtola <jussilehtola@fedoraproject.org> - 0.11-7
+- Bump spec.
+
+* Sat Dec 21 2013 Ville Skyttä <ville.skytta@iki.fi> - 0.11-6
+- Run test suite during build.
+- Drop empty NEWS from docs.
+
+* Tue Sep 10 2013 Susi Lehtola <jussilehtola@fedoraproject.org> - 0.11-5
+- Remove -Werror which causes build to fail on EPEL5.
+
+* Tue Sep 10 2013 Susi Lehtola <jussilehtola@fedoraproject.org> - 0.11-4
+- Remove -Werror which causes build to fail on EPEL5.
+
+* Sat Aug 24 2013 Remi Collet <remi@fedoraproject.org> - 0.11-3
+- increase parser strictness for php
+
+* Sat Aug 03 2013 Dennis Gilmore <dennis@ausil.us> - 0.11-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
+
+* Sat May 04 2013 Remi Collet <remi@fedoraproject.org> - 0.11-1
+- update to 0.11 - fix source0 - enable both json and json-c libraries
+
+* Thu Feb 14 2013 Dennis Gilmore <dennis@ausil.us> - 0.10-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
+
+* Sat Nov 24 2012 Jussi Lehtola <jussilehtola@fedoraproject.org> - 0.10-4
+- Compile and install json_object_iterator.
+
+* Sat Nov 24 2012 Jussi Lehtola <jussilehtola@fedoraproject.org> - 0.10-3
+- RPMAUTOSPEC: unresolvable merge
+## END: Generated by rpmautospec

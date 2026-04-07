@@ -1,0 +1,24 @@
+diff -up qt-x11-free-3.3.8b/tools/designer/uic/main.cpp.orig qt-x11-free-3.3.8b/tools/designer/uic/main.cpp
+--- qt-x11-free-3.3.8b/tools/designer/uic/main.cpp.orig	2008-01-24 13:25:29.000000000 +0100
++++ qt-x11-free-3.3.8b/tools/designer/uic/main.cpp	2008-01-24 13:28:17.000000000 +0100
+@@ -320,7 +320,7 @@ int main( int argc, char * argv[] )
+ 	out << "/****************************************************************************" << endl;
+ 	out << "** Form "<< (impl? "implementation" : "interface") << " generated from reading ui file '" << fileName << "'" << endl;
+ 	out << "**" << endl;
+-	out << "** Created: " << QDateTime::currentDateTime().toString() << endl;
++	out << "** Created by User Interface Compiler" << endl;
+ 	out << "**" << endl;
+ 	out << "** WARNING! All changes made in this file will be lost!" << endl;
+ 	out << "****************************************************************************/" << endl << endl;
+diff -up qt-x11-free-3.3.8b/tools/designer/uic/embed.cpp.orig qt-x11-free-3.3.8b/tools/designer/uic/embed.cpp
+--- qt-x11-free-3.3.8b/tools/designer/uic/embed.cpp.orig	2008-01-24 13:28:30.000000000 +0100
++++ qt-x11-free-3.3.8b/tools/designer/uic/embed.cpp	2008-01-24 13:29:10.000000000 +0100
+@@ -137,7 +137,7 @@ void Uic::embed( QTextStream& out, const
+     for ( it = images.begin(); it != images.end(); ++it )
+ 	out << "**      " << *it << "\n";
+     out << "**\n";
+-    out << "** Created: " << QDateTime::currentDateTime().toString() << "\n";
++    out << "** Created by The User Interface Compiler" << "\n";
+     out << "**\n";
+     out << "** WARNING! All changes made in this file will be lost!\n";
+     out << "****************************************************************************/\n";

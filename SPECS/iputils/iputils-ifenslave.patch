@@ -1,0 +1,13 @@
+--- iputils/ifenslave.c.addr	2006-03-29 15:00:24.000000000 +0200
++++ iputils/ifenslave.c	2006-03-29 15:02:01.000000000 +0200
+@@ -524,8 +524,8 @@
+ 	if (ioctl(skfd, SIOCGIFADDR, &ifr) < 0)
+ 		return -1;
+ 	printf("The result of SIOCGIFADDR is %2.2x.%2.2x.%2.2x.%2.2x.\n",
+-	       ifr.ifr_addr.sa_data[0], ifr.ifr_addr.sa_data[1],
+-	       ifr.ifr_addr.sa_data[2], ifr.ifr_addr.sa_data[3]);
++	       ifr.ifr_addr.sa_data[2], ifr.ifr_addr.sa_data[3],
++	       ifr.ifr_addr.sa_data[4], ifr.ifr_addr.sa_data[5]);
+ 
+ 	strcpy(ifr.ifr_name, ifname);
+ 	if (ioctl(skfd, SIOCGIFHWADDR, &ifr) < 0)

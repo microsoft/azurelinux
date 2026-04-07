@@ -1,0 +1,28 @@
+From e43271ec7438ecb78f99db134aeca274a47f6c28 Mon Sep 17 00:00:00 2001
+From: Konrad Kleine <kkleine@redhat.com>
+Date: Thu, 13 Mar 2025 09:12:24 +0100
+Subject: [PATCH] Filter out configuration file from compile commands
+
+The commands to run the compilation when printed with `-###` contain
+various irrelevant lines for the perf-training. Most of them are
+filtered out already but when configured with
+`CLANG_CONFIG_FILE_SYSTEM_DIR` a new line like the following is
+added and needs to be filtered out:
+
+`Configuration file: /etc/clang/x86_64-redhat-linux-gnu-clang.cfg`
+---
+ clang/utils/perf-training/perf-helper.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/clang/utils/perf-training/perf-helper.py b/clang/utils/perf-training/perf-helper.py
+index 80c6356d0497c..29904aded5ab0 100644
+--- a/clang/utils/perf-training/perf-helper.py
++++ b/clang/utils/perf-training/perf-helper.py
+@@ -237,6 +237,7 @@ def get_cc1_command_for_args(cmd, env):
+             or ln.startswith("InstalledDir:")
+             or ln.startswith("LLVM Profile Note")
+             or ln.startswith(" (in-process)")
++            or ln.startswith("Configuration file:")
+             or " version " in ln
+         ):
+             continue

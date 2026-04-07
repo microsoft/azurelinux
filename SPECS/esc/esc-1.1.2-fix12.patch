@@ -1,0 +1,70 @@
+diff -up ./esc/configure.ac.fix12 ./esc/configure.ac
+--- ./esc/configure.ac.fix12	2021-09-27 14:53:49.932567105 -0700
++++ ./esc/configure.ac	2021-09-27 15:31:30.949185258 -0700
+@@ -47,6 +47,30 @@ PKG_CHECK_MODULES([DBUS],[dbus-1])
+ AC_PROG_CC_STDC
+ 
+ # Compiler flags
++
++AC_CANONICAL_HOST
++ARCH_CPPFLAGS=""
++ARCH_CFLAGS=""
++
++AS_CASE([$host_os],
++        [linux*],
++        [
++           AS_CASE([$host_cpu],
++                   [x86_64],
++                   [
++                       ARCH_CPPFLAGS="-fcf-protection=full"
++                       ARCH_CFLAGS="-fcf-protection=full"
++                   ],
++                   [i?86],
++                   [
++                       ARCH_CPPFLAGS="-fcf-protection=full"
++                       ARCH_CFLAGS="-fcf-protection=full"
++                   ])
++        ])
++AC_SUBST(ARCH_CPPFLAGS)
++AC_SUBST(ARCH_CFLAGS)
++
++
+ ESC_CFLAGS="$GOBJECT_CFLAGS"
+ ESC_LIBS="$GOBJECT_LIBS $NSS_LIBS" 
+ 
+diff -up ./esc/src/lib/coolkey/Makefile.am.fix12 ./esc/src/lib/coolkey/Makefile.am
+--- ./esc/src/lib/coolkey/Makefile.am.fix12	2021-09-27 15:26:24.130634037 -0700
++++ ./esc/src/lib/coolkey/Makefile.am	2021-09-27 15:27:24.332545740 -0700
+@@ -24,7 +24,7 @@ EXTRA_DIST =
+ DISTCLEANFILES =
+ lib_LTLIBRARIES =
+ bin_PROGRAMS =
+-COOLKEY_CFLAGS=-D_FORTIFY_SOURCE=2 -fcf-protection=full
++COOLKEY_CFLAGS=-D_FORTIFY_SOURCE=2 $(ARCH_CFLAGS)
+ 
+ AM_CPPFLAGS += \
+ 	$(COOLKEY_CFLAGS) \
+diff -up ./esc/src/lib/coolkey-mgr/Makefile.am.fix12 ./esc/src/lib/coolkey-mgr/Makefile.am
+--- ./esc/src/lib/coolkey-mgr/Makefile.am.fix12	2021-09-27 15:34:18.400943562 -0700
++++ ./esc/src/lib/coolkey-mgr/Makefile.am	2021-09-27 15:34:51.020896480 -0700
+@@ -24,7 +24,7 @@ EXTRA_DIST =
+ DISTCLEANFILES =
+ lib_LTLIBRARIES =
+ bin_PROGRAMS =
+-COOLKEY_MGR_CFLAGS=-fcf-protection=full
++COOLKEY_MGR_CFLAGS=$(ARCH_CFLAGS)
+ 
+ OTHER_CPPFLAGS = -I ../coolkey $(PCSC_CFLAGS) $(COOLKEY_MGR_CFLAGS)
+ OTHER_LIBS = -L../coolkey/.libs -lCoolkey-1.0 -L../nss-http-client/.libs -lNssHttpClient-1.0 $(DBUS_LIBS)
+diff -up ./esc/src/lib/nss-http-client/Makefile.am.fix12 ./esc/src/lib/nss-http-client/Makefile.am
+--- ./esc/src/lib/nss-http-client/Makefile.am.fix12	2021-09-27 15:33:16.482032935 -0700
++++ ./esc/src/lib/nss-http-client/Makefile.am	2021-09-27 15:34:04.524963592 -0700
+@@ -24,7 +24,7 @@ EXTRA_DIST =
+ DISTCLEANFILES =
+ lib_LTLIBRARIES =
+ bin_PROGRAMS =
+-NSS_HTTP_CLIENT_CFLAGS=-D_FORTIFY_SOURCE=2 -fcf-protection=full
++NSS_HTTP_CLIENT_CFLAGS=-D_FORTIFY_SOURCE=2 $(ARCH_CFLAGS)
+ AM_CPPFLAGS += \
+ 	$(NSS_HTTP_CLIENT_CFLAGS) \
+ 	$(NULL)

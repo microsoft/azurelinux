@@ -1,0 +1,75 @@
+From b3ab5461f1a02aa0a07a6f50bc2fa4da057193d1 Mon Sep 17 00:00:00 2001
+From: Dominique <dominique.pelle@gmail.com>
+Date: Sun, 8 May 2022 08:27:32 +0200
+Subject: [PATCH 1/2] fix: access beyond end of string when search called by
+ fails
+Content-type: text/plain
+
+findcalledby() returned a string which was not '\0' terminated.
+That string is later output with the snprintf %s format which
+accessed beyond the end of the string. Bug caused a crash on macOS
+with M1 processor and was also causing a crash on Linux too when
+building with asan (address sanitizer).
+
+Signed-off-by: Vladis Dronov <vdronov@redhat.com>
+---
+ src/find.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/src/find.c b/src/find.c
+index d7a66f0..e8f1141 100644
+--- a/src/find.c
++++ b/src/find.c
+@@ -1044,7 +1044,7 @@ char *
+ findcalledby(char *pattern)
+ {
+ 	char	file[PATHLEN + 1];	/* source file name */
+-	static char found_caller = 'n'; /* seen calling function? */
++	static char found_caller[2] = "n"; /* seen calling function? */
+ 	BOOL	macro = NO;
+ 
+ 	if (invertedindex == YES) {
+@@ -1057,12 +1057,12 @@ findcalledby(char *pattern)
+ 			case FCNDEF:
+ 				if (dbseek(p->lineoffset) != -1 &&
+ 				    scanpast('\t') != NULL) {	/* skip def */
+-					found_caller = 'y';
++					found_caller[0] = 'y';
+ 					findcalledbysub(srcfiles[p->fileindex], macro);
+ 				}
+ 			}
+ 		}
+-		return(&found_caller);
++		return(&found_caller[0]);
+ 	}
+ 	/* find the function definition(s) */
+ 	while (scanpast('\t') != NULL) {
+@@ -1072,7 +1072,7 @@ findcalledby(char *pattern)
+ 			skiprefchar();	/* save file name */
+ 			fetch_string_from_dbase(file, sizeof(file));
+ 			if (*file == '\0') {	/* if end of symbols */
+-				return(&found_caller);
++				return(&found_caller[0]);
+ 			}
+ 			progress("Search", searchcount, nsrcfiles);
+ 			break;
+@@ -1087,14 +1087,14 @@ findcalledby(char *pattern)
+ 		case FCNDEF:
+ 			skiprefchar();	/* match name to pattern */
+ 			if (match()) {
+-				found_caller = 'y';
++				found_caller[0] = 'y';
+ 				findcalledbysub(file, macro);
+ 			}
+ 			break;
+ 		}
+ 	}
+ 
+-	return (&found_caller);
++	return (&found_caller[0]);
+ }
+ 
+ /* find this term, which can be a regular expression */
+-- 
+2.37.3
+

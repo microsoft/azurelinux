@@ -1,0 +1,63 @@
+From 442d8615b2e60ba2274edd7cc24fc631a369bf02 Mon Sep 17 00:00:00 2001
+From: Karolina Surma <ksurma@redhat.com>
+Date: Tue, 7 Jan 2025 10:29:52 +0100
+Subject: [PATCH] Replace ast.Str usages with ast.Constant
+
+Per What's new in Python 3.14:
+ast.Str has been deprecated since Python 3.8, and have emitted deprecation
+warnings since Python 3.12.
+https://docs.python.org/dev/whatsnew/3.14.html#id3
+---
+ tests/test_asttokens.py | 2 +-
+ tests/test_tokenless.py | 4 ++--
+ tests/test_util.py      | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/tests/test_asttokens.py b/tests/test_asttokens.py
+index b9489cb..c654af3 100644
+--- a/tests/test_asttokens.py
++++ b/tests/test_asttokens.py
+@@ -125,7 +125,7 @@ def test_unicode_offsets(self):
+ 
+     # Verify that ast parser produces offsets as we expect. This is just to inform the
+     # implementation.
+-    string_node = next(n for n in ast.walk(root) if isinstance(n, ast.Str))
++    string_node = next(n for n in ast.walk(root) if isinstance(n, ast.Constant))
+     self.assertEqual(string_node.lineno, 1)
+     self.assertEqual(string_node.col_offset, 4)
+ 
+diff --git a/tests/test_tokenless.py b/tests/test_tokenless.py
+index ab2f3d6..881c69a 100644
+--- a/tests/test_tokenless.py
++++ b/tests/test_tokenless.py
+@@ -47,7 +47,7 @@ def is_fstring_format_spec(node):
+       and len(node.values) == 1
+       and (
+           (
+-              isinstance(node.values[0], ast.Str)
++              isinstance(node.values[0], ast.Constant)
+               and node.values[0].value in ['.2f']
+           ) or (
+               isinstance(node.values[0], ast.FormattedValue)
+@@ -97,7 +97,7 @@ def check_node(self, atok, node):
+       atok_text = atok.get_text(node, padded=padded)
+       if ast_text:
+         if sys.version_info < (3, 12) and (
+-          ast_text.startswith("f") and isinstance(node, (ast.Str, ast.FormattedValue))
++          ast_text.startswith("f") and isinstance(node, (ast.Constant, ast.FormattedValue))
+           or is_fstring_format_spec(node)
+           or (not fstring_positions_work() and is_fstring_internal_node(node))
+         ):
+diff --git a/tests/test_util.py b/tests/test_util.py
+index a38fef2..0c7f94d 100644
+--- a/tests/test_util.py
++++ b/tests/test_util.py
+@@ -98,7 +98,7 @@ def test_replace(self):
+     source = "foo(bar(1 + 2), 'hello' + ', ' + 'world')"
+     atok = asttokens.ASTTokens(source, parse=True)
+     names = [n for n in asttokens.util.walk(atok.tree) if isinstance(n, ast.Name)]
+-    strings = [n for n in asttokens.util.walk(atok.tree) if isinstance(n, ast.Str)]
++    strings = [n for n in asttokens.util.walk(atok.tree) if isinstance(n, ast.Constant) and isinstance(n.value, str)]
+     repl1 = [atok.get_text_range(n) + ('TEST',) for n in names]
+     repl2 = [atok.get_text_range(n) + ('val',) for n in strings]
+     self.assertEqual(asttokens.util.replace(source, repl1 + repl2),

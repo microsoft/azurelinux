@@ -1,0 +1,34 @@
+diff --git a/Makefile.am b/Makefile.am
+index 2a8bfebd..74a08cb7 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -535,9 +535,9 @@ install-data-dbus: $(top_builddir)/src/DBus/org.usbguard1.service install-polkit
+ 
+ uninstall-data-dbus: uninstall-polkit-policy uninstall-systemd-dbus-service
+ 	rm -f $(DESTDIR)$(DBUS_SERVICES_DIR)/org.usbguard1.service
+-	rmdir $(DESTDIR)$(DBUS_SERVICES_DIR)
++	-rmdir $(DESTDIR)$(DBUS_SERVICES_DIR)
+ 	rm -f $(DESTDIR)$(DBUS_BUSCONFIG_DIR)/org.usbguard1.conf
+-	rmdir $(DESTDIR)$(DBUS_BUSCONFIG_DIR)
++	-rmdir $(DESTDIR)$(DBUS_BUSCONFIG_DIR)
+ 
+ dbus-docs: $(top_srcdir)/src/DBus/DBusInterface.xml
+ #
+@@ -563,7 +563,7 @@ install-polkit-policy:
+ 
+ uninstall-polkit-policy:
+ 	rm -f $(DESTDIR)$(POLKIT_POLICY_DIR)/org.usbguard1.policy
+-	rmdir $(DESTDIR)$(POLKIT_POLICY_DIR)
++	-rmdir $(DESTDIR)$(POLKIT_POLICY_DIR)
+ 
+ else
+ install-polkit-policy:
+@@ -577,7 +577,7 @@ install-systemd-dbus-service: $(top_builddir)/src/DBus/usbguard-dbus.service
+ 
+ uninstall-systemd-dbus-service:
+ 	rm -f $(DESTDIR)$(SYSTEMD_UNIT_DIR)/usbguard-dbus.service
+-	rmdir $(DESTDIR)$(SYSTEMD_UNIT_DIR)
++	-rmdir $(DESTDIR)$(SYSTEMD_UNIT_DIR)
+ 
+ else
+ install-systemd-dbus-service:

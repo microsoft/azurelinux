@@ -1,0 +1,59 @@
+From 72e38de50cc222646032be3882ede124253f4a64 Mon Sep 17 00:00:00 2001
+From: Samuel Cabrero <scabrero@suse.de>
+Date: Thu, 12 Sep 2024 13:47:56 +0200
+Subject: [PATCH 3/7] service: use 'dnshostname' with net ads join
+
+In bso#14116 samba changed to join with netbios name and realm instead
+of FQDN, and provided additional-dns-hostnames as alternative to
+register other SPNs.
+
+Realmd was adapted to use "additional-dns-hostnames" with commit
+d4fd58bdd4f42f94abccb7d95eb83604567dccef.
+
+Then samba added "dnshostname" to net ads join in bso#14396. This commit
+makes use of this option when the discovered FQDN does not match
+netbios name + dns domain.
+
+Signed-off-by: Samuel Cabrero <scabrero@suse.de>
+---
+ service/realm-samba-enroll.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/service/realm-samba-enroll.c b/service/realm-samba-enroll.c
+index 8b2ee38..1ac45c2 100644
+--- a/service/realm-samba-enroll.c
++++ b/service/realm-samba-enroll.c
+@@ -426,6 +426,10 @@ begin_join (GTask *task,
+ 		                                         upn ? upn : "");
+ 	}
+ 
++	if (join->disco->dns_fqdn) {
++		join->join_args[at++] = g_strdup_printf ("dnshostname=%s", join->disco->dns_fqdn);
++	}
++
+ 	g_assert (at < G_N_ELEMENTS (join->join_args));
+ 
+ 	if (error != NULL) {
+@@ -439,7 +443,8 @@ begin_join (GTask *task,
+ 		                   SMBCLI_KERBEROS, "ads", "join", join->disco->domain_name,
+ 		                   join->join_args[0], join->join_args[1],
+ 		                   join->join_args[2], join->join_args[3],
+-		                   join->join_args[4], NULL);
++		                   join->join_args[4], join->join_args[5],
++		                   NULL);
+ 
+ 	/* Do join with a ccache */
+ 	} else {
+@@ -448,7 +453,8 @@ begin_join (GTask *task,
+ 		                   SMBCLI_KERBEROS, "ads", "join", join->disco->domain_name,
+ 		                   join->join_args[0], join->join_args[1],
+ 		                   join->join_args[2], join->join_args[3],
+-		                   join->join_args[4], NULL);
++		                   join->join_args[4], join->join_args[5],
++		                   NULL);
+ 	}
+ }
+ 
+-- 
+2.47.1
+

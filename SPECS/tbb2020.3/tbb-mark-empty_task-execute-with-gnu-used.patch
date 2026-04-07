@@ -1,0 +1,26 @@
+From db2f2116adfb545bb76c92205f91e3e3f0f9e44a Mon Sep 17 00:00:00 2001
+From: Thomas Rodgers <rodgert@twrodgers.com>
+Date: Wed, 2 Jun 2021 15:18:30 -0700
+Subject: [PATCH] Mark tbb::empty_task::execute with [[gnu::used]]
+
+---
+ include/tbb/task.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/include/tbb/task.h b/include/tbb/task.h
+index 5e137c6..5b60163 100644
+--- a/include/tbb/task.h
++++ b/include/tbb/task.h
+@@ -1040,6 +1040,9 @@ inline void task::resume(suspend_point tag) {
+ //! task that does nothing.  Useful for synchronization.
+ /** @ingroup task_scheduling */
+ class __TBB_DEPRECATED_IN_VERBOSE_MODE empty_task: public task {
++#if __has_cpp_attribute(gnu::used)
++    [[gnu::used]]
++#endif
+     task* execute() __TBB_override {
+         return NULL;
+     }
+-- 
+2.31.1
+

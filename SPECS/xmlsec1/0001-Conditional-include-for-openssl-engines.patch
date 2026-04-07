@@ -1,0 +1,26 @@
+From 57e7e5eb0f9cbc8db2418bf7df6be0d70739408c Mon Sep 17 00:00:00 2001
+From: Tomas Halman <thalman@redhat.com>
+Date: Mon, 29 Jul 2024 12:08:50 +0200
+Subject: [PATCH] Conditional include for openssl engines
+
+---
+ src/openssl/app.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/openssl/app.c b/src/openssl/app.c
+index e68011be..11ca8f9a 100644
+--- a/src/openssl/app.c
++++ b/src/openssl/app.c
+@@ -24,7 +24,9 @@
+ #include <openssl/pem.h>
+ #include <openssl/pkcs12.h>
+ #include <openssl/conf.h>
++#if !defined(OPENSSL_NO_ENGINE) && (!defined(XMLSEC_OPENSSL_API_300) || defined(XMLSEC_OPENSSL3_ENGINES))
+ #include <openssl/engine.h>
++#endif /* !defined(OPENSSL_NO_ENGINE) && (!defined(XMLSEC_OPENSSL_API_300) || defined(XMLSEC_OPENSSL3_ENGINES)) */
+ #include <openssl/ui.h>
+ 
+ #include <xmlsec/xmlsec.h>
+-- 
+2.45.0
+

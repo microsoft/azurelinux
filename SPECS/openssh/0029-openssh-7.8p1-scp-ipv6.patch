@@ -1,0 +1,27 @@
+From 507e6f245557ae7261806f7ecbd40697cb0dd389 Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:28 +0200
+Subject: [PATCH 29/50] openssh-7.8p1-scp-ipv6
+
+---
+ scp.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/scp.c b/scp.c
+index 9554b188..7f9795a5 100644
+--- a/scp.c
++++ b/scp.c
+@@ -1183,7 +1183,9 @@ toremote(int argc, char **argv, enum scp_mode_e mode, char *sftp_direct)
+ 			addargs(&alist, "%s", host);
+ 			addargs(&alist, "%s", cmd);
+ 			addargs(&alist, "%s", src);
+-			addargs(&alist, "%s%s%s:%s",
++			addargs(&alist,
++			    /* IPv6 address needs to be enclosed with sqare brackets */
++			    strchr(host, ':') != NULL ? "%s%s[%s]:%s" : "%s%s%s:%s",
+ 			    tuser ? tuser : "", tuser ? "@" : "",
+ 			    thost, targ);
+ 			if (do_local_cmd(&alist) != 0)
+-- 
+2.49.0
+

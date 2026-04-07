@@ -1,0 +1,12 @@
+diff -urNp a/apps/snmptrapd_log.c b/apps/snmptrapd_log.c
+--- a/apps/snmptrapd_log.c	2025-09-03 15:15:12.510914175 +0200
++++ b/apps/snmptrapd_log.c	2025-09-03 15:15:40.804731480 +0200
+@@ -590,7 +590,7 @@ realloc_handle_time_fmt(u_char ** buf, s
+ static
+ void convert_agent_addr(struct in_addr agent_addr, char *name, size_t size)
+ {
+-    const int numeric = !netsnmp_ds_get_boolean(NETSNMP_DS_APPLICATION_ID,
++    const int numeric = netsnmp_ds_get_boolean(NETSNMP_DS_APPLICATION_ID,
+                                                 NETSNMP_DS_APP_NUMERIC_IP);
+     struct sockaddr_in sin;
+ 

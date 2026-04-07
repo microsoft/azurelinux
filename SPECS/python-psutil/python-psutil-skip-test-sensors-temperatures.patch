@@ -1,0 +1,26 @@
+From cc47e5b48df8e8a0d50da4e1cb259ce902784646 Mon Sep 17 00:00:00 2001
+From: Jeremy Cline <jeremycline@linux.microsoft.com>
+Date: Tue, 14 Jan 2025 09:50:02 -0500
+Subject: [PATCH 4/5] Skip test_sensors_temperatures
+
+Reported upstream at https://github.com/giampaolo/psutil/issues/2434.
+---
+ psutil/tests/test_system.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/psutil/tests/test_system.py b/psutil/tests/test_system.py
+index c130ed87..60586a8b 100755
+--- a/psutil/tests/test_system.py
++++ b/psutil/tests/test_system.py
+@@ -929,7 +929,7 @@ class TestNetAPIs(PsutilTestCase):
+ 
+ 
+ class TestSensorsAPIs(PsutilTestCase):
+-    @pytest.mark.skipif(not HAS_SENSORS_TEMPERATURES, reason="not supported")
++    @pytest.mark.skip("https://github.com/giampaolo/psutil/issues/2434")
+     def test_sensors_temperatures(self):
+         temps = psutil.sensors_temperatures()
+         for name, entries in temps.items():
+-- 
+2.47.1
+

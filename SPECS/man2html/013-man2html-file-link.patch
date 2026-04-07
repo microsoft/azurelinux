@@ -1,0 +1,49 @@
+From: Robert Luberda <robert@debian.org>
+Date: Wed, 29 Jan 2003 21:05:37 +0100
+Subject: 013 man2html file link
+
+---
+ man2html/cgibase.c  | 2 +-
+ man2html/man2html.c | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/man2html/cgibase.c b/man2html/cgibase.c
+index 38c42da..72da527 100644
+--- a/man2html/cgibase.c
++++ b/man2html/cgibase.c
+@@ -97,7 +97,7 @@ void print_sig()
+ 
+ void
+ include_file_html(char *g) {
+-     printf("<A HREF=\"file:/usr/include/%s\">%s</A>&gt;", g,g);
++     printf("<A HREF=\"file:///usr/include/%s\">%s</A>&gt;", g,g);
+ }
+ 
+ void
+diff --git a/man2html/man2html.c b/man2html/man2html.c
+index a6473f0..8ef4e23 100644
+--- a/man2html/man2html.c
++++ b/man2html/man2html.c
+@@ -118,11 +118,11 @@ add_links(char *c)
+     ** www.host.name           -> http://www.host.name
+     ** ftp.host.name           -> ftp://ftp.host.name
+     ** name@host               -> mailto:name@host
+-    ** <name.h>                -> file:/usr/include/name.h   (guess)
++    ** <name.h>                -> file:///usr/include/name.h   (guess)
+     **
+     ** Other possible links to add in the future:
+     **
+-    ** /dir/dir/file  -> file:/dir/dir/file
++    ** /dir/dir/file  -> file:///dir/dir/file
+     */
+     int i,j,nr;
+     char *f, *g, *h;
+@@ -3271,7 +3271,7 @@ main(int argc, char **argv) {
+ 		   "The requested file %s is not a valid (unformatted) "
+ 		   "man page.\nIf the file is a formatted man page, "
+ 		   "you could try to load the\n"
+-		   "<A HREF=\"file://localhost%s\">plain file</A>.\n",
++		   "<A HREF=\"file://%s\">plain file</A>.\n",
+ 		   filename, filename);
+ 	else
+ 	     error_page(403, "Invalid Man Page",

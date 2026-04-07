@@ -1,0 +1,12 @@
+diff -up shared-mime-info-2.4/xdgmime/fuzzing/setup.c.openat shared-mime-info-2.4/xdgmime/fuzzing/setup.c
+--- shared-mime-info-2.4/xdgmime/fuzzing/setup.c.openat	2025-06-25 15:44:08.769573400 +0200
++++ shared-mime-info-2.4/xdgmime/fuzzing/setup.c	2025-06-25 15:44:13.357891192 +0200
+@@ -97,7 +97,7 @@ fuzz_setup (const unsigned char *data,
+           data_len -= file_data_len + blob_separator_len;
+         }
+ 
+-      fd = TEMP_FAILURE_RETRY (openat (dirfd, mime_dir_filenames[i], O_CREAT | O_WRONLY | O_CLOEXEC));
++      fd = TEMP_FAILURE_RETRY (openat (dirfd, mime_dir_filenames[i], O_CREAT | O_WRONLY | O_CLOEXEC, S_IRUSR | S_IWUSR));
+       if (fd < 0)
+         {
+           fuzz_teardown (dirfd);

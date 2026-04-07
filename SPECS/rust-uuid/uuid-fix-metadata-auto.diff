@@ -1,0 +1,66 @@
+--- uuid-1.21.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ uuid-1.21.0/Cargo.toml	2026-02-14T14:17:22.071336+00:00
+@@ -106,8 +106,6 @@
+     "dep:rand",
+ ]
+ js = [
+-    "dep:wasm-bindgen",
+-    "dep:js-sys",
+ ]
+ macro-diagnostics = []
+ md5 = ["dep:md-5"]
+@@ -115,20 +113,14 @@
+ rng-getrandom = [
+     "rng",
+     "dep:getrandom",
+-    "uuid-rng-internal-lib",
+-    "uuid-rng-internal-lib/getrandom",
+ ]
+ rng-rand = [
+     "rng",
+     "dep:rand",
+-    "uuid-rng-internal-lib",
+-    "uuid-rng-internal-lib/rand",
+ ]
+ serde = ["dep:serde_core"]
+ sha1 = ["dep:sha1_smol"]
+ std = [
+-    "wasm-bindgen?/std",
+-    "js-sys?/std",
+ ]
+ v1 = ["atomic"]
+ v3 = ["md5"]
+@@ -208,28 +200,6 @@
+ [dev-dependencies.trybuild]
+ version = "1.0.52"
+ 
+-[target.'cfg(all(target_arch = "wasm32", any(target_os = "unknown", target_os = "none")))'.dependencies.uuid-rng-internal-lib]
+-version = "1.21.0"
+-optional = true
+-package = "uuid-rng-internal"
+-
+-[target.'cfg(all(target_arch = "wasm32", any(target_os = "unknown", target_os = "none")))'.dependencies.wasm-bindgen]
+-version = "0.2"
+-features = ["msrv"]
+-optional = true
+-default-features = false
+-
+-[target.'cfg(all(target_arch = "wasm32", any(target_os = "unknown", target_os = "none")))'.dev-dependencies.wasm-bindgen]
+-version = "0.2"
+-
+-[target.'cfg(all(target_arch = "wasm32", any(target_os = "unknown", target_os = "none")))'.dev-dependencies.wasm-bindgen-test]
+-version = "0.3"
+-
+-[target.'cfg(all(target_arch = "wasm32", any(target_os = "unknown", target_os = "none"), target_feature = "atomics"))'.dependencies.js-sys]
+-version = "0.3"
+-optional = true
+-default-features = false
+-
+ [target.'cfg(not(all(target_arch = "wasm32", any(target_os = "unknown", target_os = "none"))))'.dependencies.getrandom]
+ version = "0.4"
+ optional = true
+@@ -242,3 +212,4 @@
+ level = "allow"
+ priority = 0
+ check-cfg = ["cfg(uuid_unstable)"]
++

@@ -1,0 +1,41 @@
+diff --git a/Makefile.in b/Makefile.in
+index b6caa1b..ebc3dcc 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -333,12 +333,11 @@ MAKEINFOHTML = $(MAKEINFO) --html
+ AM_MAKEINFOHTMLFLAGS = $(AM_MAKEINFOFLAGS)
+ DVIPS = dvips
+ RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
+-	ctags-recursive dvi-recursive html-recursive info-recursive \
+-	install-data-recursive install-dvi-recursive \
+-	install-exec-recursive install-html-recursive \
+-	install-info-recursive install-pdf-recursive \
+-	install-ps-recursive install-recursive installcheck-recursive \
+-	installdirs-recursive pdf-recursive ps-recursive \
++	ctags-recursive \
++	install-data-recursive \
++	install-exec-recursive \
++	install-recursive installcheck-recursive \
++	installdirs-recursive \
+ 	tags-recursive uninstall-recursive
+ am__can_run_installinfo = \
+   case $$AM_UPDATE_INFO_DIR in \
+@@ -378,8 +377,7 @@ am__define_uniq_tagged_files = \
+   unique=`for i in $$list; do \
+     if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
+   done | $(am__uniquify_input)`
+-am__DIST_COMMON = $(dist_man1_MANS) $(doc_libtool_TEXINFOS) \
+-	$(srcdir)/Makefile.in $(srcdir)/config-h.in \
++am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/config-h.in \
+ 	$(srcdir)/libltdl/ltdl.mk $(top_srcdir)/build-aux/compile \
+ 	$(top_srcdir)/build-aux/config.guess \
+ 	$(top_srcdir)/build-aux/config.sub \
+@@ -2051,7 +2049,7 @@ info: info-recursive
+ info-am: $(INFO_DEPS)
+ 
+ install-data-am: install-data-local install-includeHEADERS \
+-	install-info-am install-ltdlincludeHEADERS install-man
++	install-ltdlincludeHEADERS
+ 
+ install-dvi: install-dvi-recursive
+ 

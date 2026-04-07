@@ -1,0 +1,212 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Luca Boccassi <luca.boccassi@gmail.com>
+Date: Tue, 10 Jun 2025 22:30:24 +0100
+Subject: [PATCH] Drop engine options
+
+OpenSSL engines are deprecated in Fedora, remove support
+---
+ efi-updatevar.c        |  8 +-----
+ include/openssl_sign.h |  4 +--
+ lib/openssl_sign.c     | 62 +++---------------------------------------
+ sign-efi-sig-list.c    | 10 ++-----
+ 4 files changed, 9 insertions(+), 75 deletions(-)
+
+diff --git a/efi-updatevar.c b/efi-updatevar.c
+index f9375de..77f3d29 100644
+--- a/efi-updatevar.c
++++ b/efi-updatevar.c
+@@ -52,7 +52,6 @@ help(const char *progname)
+ 	       "\t-g <guid>\tOptional <guid> for the X509 Certificate\n"
+ 	       "\t-k <key>\tSecret key file for authorising User Mode updates\n"
+ 	       "\t-d <list>[-<entry>]\tDelete the signature list <list> (or just a single <entry> within the list)\n"
+-	       "\t--engine <eng>\tUse engine <eng> for private key\n"
+ 	       );
+ }
+ 
+@@ -61,7 +60,6 @@ main(int argc, char *argv[])
+ {
+ 	char *variables[] = { "PK", "KEK", "db", "dbx" };
+ 	char *signedby[] = { "PK", "PK", "KEK", "KEK" };
+-	char *engine = NULL;
+ 	EFI_GUID *owners[] = { &GV_GUID, &GV_GUID, &SIG_DB, &SIG_DB };
+ 	EFI_GUID *owner, guid = MOK_OWNER;
+ 	int i, esl_mode = 0, fd, ret, delsig = -1, delentry = -1;
+@@ -116,10 +114,6 @@ main(int argc, char *argv[])
+ 			sscanf(argv[2], "%d-%d", &delsig, &delentry);
+ 			argv += 2;
+ 			argc -= 2;
+-		} else if (strcmp(argv[1], "--engine") == 0) {
+-			engine = argv[2];
+-			argv += 2;
+-			argc -= 2;
+ 		} else {
+ 			/* unrecognised option */
+ 			break;
+@@ -286,7 +280,7 @@ main(int argc, char *argv[])
+ 			fprintf(stderr, "Can't update variable%s without a key\n", variable_is_setupmode() ? "" : " in User Mode");
+ 			exit(1);
+ 		}
+-		EVP_PKEY *pkey = read_private_key(engine, key_file);
++		EVP_PKEY *pkey = read_private_key(key_file);
+ 		if (!pkey) {
+ 			fprintf(stderr, "error reading private key %s\n", key_file);
+ 			exit(1);
+diff --git a/include/openssl_sign.h b/include/openssl_sign.h
+index 136ad75..f067565 100644
+--- a/include/openssl_sign.h
++++ b/include/openssl_sign.h
+@@ -2,9 +2,9 @@
+ 
+ int
+ sign_efi_var(char *payload, int payload_size, char *keyfile, char *certfile,
+-	     unsigned char **sig, int *sigsize, char *engine);
++	     unsigned char **sig, int *sigsize);
+ int
+ sign_efi_var_ssl(char *payload, int payload_size, EVP_PKEY *pkey, X509 *cert,
+ 		 unsigned char **sig, int *sigsize);
+ EVP_PKEY *
+-read_private_key(char *engine, char *keyfile);
++read_private_key(char *keyfile);
+diff --git a/lib/openssl_sign.c b/lib/openssl_sign.c
+index 714ce1a..c1e8dc2 100644
+--- a/lib/openssl_sign.c
++++ b/lib/openssl_sign.c
+@@ -7,7 +7,6 @@
+ #include <openssl/pem.h>
+ #include <openssl/err.h>
+ #include <openssl/sha.h>
+-#include <openssl/engine.h>
+ 
+ #include <openssl_sign.h>
+ 
+@@ -33,7 +32,7 @@ sign_efi_var_ssl(char *payload, int payload_size, EVP_PKEY *pkey, X509 *cert,
+ 
+ int
+ sign_efi_var(char *payload, int payload_size, char *keyfile, char *certfile,
+-	     unsigned char **sig, int *sigsize, char *engine)
++	     unsigned char **sig, int *sigsize)
+ {
+ 	int ret;
+ 
+@@ -60,7 +59,7 @@ sign_efi_var(char *payload, int payload_size, char *keyfile, char *certfile,
+ 		return 1;
+ 	}
+ 
+-	EVP_PKEY *pkey = read_private_key(engine, keyfile);
++	EVP_PKEY *pkey = read_private_key(keyfile);
+ 	if (!pkey) {
+ 		ERR_print_errors_fp(stdout);
+ 		fprintf(stderr, "error reading private key %s\n", keyfile);
+@@ -96,61 +95,8 @@ read_pem_private_key(char *keyfile)
+ 	return pkey;
+ }
+ 
+-static int ui_read(UI *ui, UI_STRING *uis)
+-{
+-	char password[128];
+-
+-	if (UI_get_string_type(uis) != UIT_PROMPT)
+-		return 0;
+-
+-	EVP_read_pw_string(password, sizeof(password), "Enter engine key pass phrase:", 0);
+-	UI_set_result(ui, uis, password);
+-	return 1;
+-}
+-
+-static EVP_PKEY *
+-read_engine_private_key(char *engine, char *keyfile)
+-{
+-	UI_METHOD *ui;
+-	ENGINE *e;
+-	EVP_PKEY *pkey = NULL;
+-
+-	ENGINE_load_builtin_engines();
+-	e = ENGINE_by_id(engine);
+-
+-	if (!e) {
+-		fprintf(stderr, "Failed to load engine: %s\n", engine);
+-		ERR_print_errors_fp(stderr);
+-		return NULL;
+-	}
+-
+-	ui = UI_create_method("sbsigntools");
+-	if (!ui) {
+-		fprintf(stderr, "Failed to create UI method\n");
+-		ERR_print_errors_fp(stderr);
+-		goto out_free;
+-	}
+-	UI_method_set_reader(ui, ui_read);
+-
+-	if (!ENGINE_init(e)) {
+-		fprintf(stderr, "Failed to initialize engine %s\n", engine);
+-		ERR_print_errors_fp(stderr);
+-		goto out_free;
+-	}
+-
+-	pkey = ENGINE_load_private_key(e, keyfile, ui, NULL);
+-	ENGINE_finish(e);
+-
+- out_free:
+-	ENGINE_free(e);
+-	return pkey;
+-}
+-
+ EVP_PKEY *
+-read_private_key(char *engine, char *keyfile)
++read_private_key(char *keyfile)
+ {
+-	if (engine)
+-		return read_engine_private_key(engine, keyfile);
+-	else
+-		return read_pem_private_key(keyfile);
++	return read_pem_private_key(keyfile);
+ }
+diff --git a/sign-efi-sig-list.c b/sign-efi-sig-list.c
+index 90f3d9f..109d28d 100644
+--- a/sign-efi-sig-list.c
++++ b/sign-efi-sig-list.c
+@@ -30,7 +30,7 @@
+ static void
+ usage(const char *progname)
+ {
+-	printf("Usage: %s [-r] [-m] [-a] [-g <guid>] [-o] [-t <timestamp>] [-i <infile>] [-c <crt file>] [-k <key file>] [-e <engine>] <var> <efi sig list file> <output file>\n", progname);
++	printf("Usage: %s [-r] [-m] [-a] [-g <guid>] [-o] [-t <timestamp>] [-i <infile>] [-c <crt file>] [-k <key file>] <var> <efi sig list file> <output file>\n", progname);
+ }
+ 
+ static void
+@@ -55,7 +55,6 @@ help(const char *progname)
+ 	       "\t-g <guid>        Use <guid> as the signature owner GUID\n"
+ 	       "\t-c <crt>         <crt> is the file containing the signing certificate in PEM format\n"
+ 	       "\t-k <key>         <key> is the file containing the key for <crt> in PEM format\n"
+-	       "\t-e <engine>      Use openssl engine <engine> for the private key\n"
+ 	       );
+ }
+ 
+@@ -66,7 +65,6 @@ main(int argc, char *argv[])
+ 		*str, *signedinput = NULL, *timestampstr = NULL;
+ 	void *out;
+ 	const char *progname = argv[0];
+-	char *engine = NULL;
+ 	unsigned char *sigbuf;
+ 	int rsasig = 0, monotonic = 0, varlen, i, outputforsign = 0, outlen,
+ 		sigsize;
+@@ -125,10 +123,6 @@ main(int argc, char *argv[])
+ 			certfile = argv[2];
+ 			argv += 2;
+ 			argc -= 2;
+-		} else if (strcmp("-e", argv[1]) == 0) {
+-			engine = argv[2];
+-			argv += 2;
+-			argc -= 2;
+ 		} else  {
+ 			break;
+ 		}
+@@ -248,7 +242,7 @@ main(int argc, char *argv[])
+ 			exit(1);
+ 		}
+ 		if (sign_efi_var(signbuf, signbuflen, keyfile, certfile,
+-				 &sigbuf, &sigsize, engine))
++				 &sigbuf, &sigsize))
+ 			exit(1);
+ 	}
+ 	printf("Signature of size %d\n", sigsize);

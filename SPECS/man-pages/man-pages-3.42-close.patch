@@ -1,0 +1,18 @@
+diff --git a/man2/close.2 b/man2/close.2
+index c920b24..a57b0f4 100644
+--- a/man2/close.2
++++ b/man2/close.2
+@@ -123,6 +123,13 @@ other threads in the same process.
+ Since a file descriptor may be reused,
+ there are some obscure race conditions
+ that may cause unintended side effects.
++.PP
++When dealing with sockets, you have to be sure that there is no
++.BR recv (2)
++still blocking on it on another thread, otherwise it might block forever,
++since no more messages will be send via the socket. Be sure to use
++.BR shutdown (2)
++to shut down all parts the connection before closing the socket.
+ .\" Date: Tue, 4 Sep 2007 13:57:35 +0200
+ .\" From: Fredrik Noring <noring@nocrew.org>
+ .\" One such race involves signals and ERESTARTSYS. If a file descriptor

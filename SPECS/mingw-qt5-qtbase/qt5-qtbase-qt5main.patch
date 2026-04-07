@@ -1,0 +1,48 @@
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/mkspecs/features/create_cmake.prf qtbase-everywhere-src-5.15.18-new/mkspecs/features/create_cmake.prf
+--- qtbase-everywhere-src-5.15.18/mkspecs/features/create_cmake.prf	2025-06-05 16:07:26.000000000 +0200
++++ qtbase-everywhere-src-5.15.18-new/mkspecs/features/create_cmake.prf	2025-11-07 14:10:23.022377455 +0100
+@@ -336,14 +336,14 @@ mac {
+     }
+ 
+     mingw {
+-        CMAKE_WINMAIN_FILE_LOCATION_DEBUG = libqtmain$${QT_LIBINFIX}$${debug_suffix}.a
+-        CMAKE_WINMAIN_FILE_LOCATION_RELEASE = libqtmain$${QT_LIBINFIX}.a
++        CMAKE_WINMAIN_FILE_LOCATION_DEBUG = libqt5main$${QT_LIBINFIX}$${debug_suffix}.a
++        CMAKE_WINMAIN_FILE_LOCATION_RELEASE = libqt5main$${QT_LIBINFIX}.a
+ 
+         CMAKE_IMPLIB_FILE_LOCATION_DEBUG = lib$${CMAKE_QT_STEM}$${debug_suffix}.a
+         CMAKE_IMPLIB_FILE_LOCATION_RELEASE = lib$${CMAKE_QT_STEM}.a
+     } else {
+-        CMAKE_WINMAIN_FILE_LOCATION_DEBUG = qtmain$${QT_LIBINFIX}$${debug_suffix}.lib
+-        CMAKE_WINMAIN_FILE_LOCATION_RELEASE = qtmain$${QT_LIBINFIX}.lib
++        CMAKE_WINMAIN_FILE_LOCATION_DEBUG = qt5main$${QT_LIBINFIX}$${debug_suffix}.lib
++        CMAKE_WINMAIN_FILE_LOCATION_RELEASE = qt5main$${QT_LIBINFIX}.lib
+ 
+         CMAKE_IMPLIB_FILE_LOCATION_DEBUG = $${CMAKE_QT_STEM}$${debug_suffix}.lib
+         CMAKE_IMPLIB_FILE_LOCATION_RELEASE = $${CMAKE_QT_STEM}.lib
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/mkspecs/features/win32/windows.prf qtbase-everywhere-src-5.15.18-new/mkspecs/features/win32/windows.prf
+--- qtbase-everywhere-src-5.15.18/mkspecs/features/win32/windows.prf	2025-06-05 16:07:26.000000000 +0200
++++ qtbase-everywhere-src-5.15.18-new/mkspecs/features/win32/windows.prf	2025-11-07 14:10:23.022652668 +0100
+@@ -5,8 +5,8 @@ contains(TEMPLATE, ".*app") {
+     mingw:DEFINES += QT_NEEDS_QMAIN
+ 
+     qt:for(entryLib, $$list($$unique(QMAKE_LIBS_QT_ENTRY))) {
+-        isEqual(entryLib, -lqtmain) {
+-            lib = $$QT.core.libs/$${QMAKE_PREFIX_STATICLIB}qtmain$$QT_LIBINFIX$$qtPlatformTargetSuffix().$$QMAKE_EXTENSION_STATICLIB
++        isEqual(entryLib, -lqt5main) {
++            lib = $$QT.core.libs/$${QMAKE_PREFIX_STATICLIB}qt5main$$QT_LIBINFIX$$qtPlatformTargetSuffix().$$QMAKE_EXTENSION_STATICLIB
+             PRE_TARGETDEPS += $$lib
+             QMAKE_LIBS += $$lib
+         } else {
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/src/winmain/winmain.pro qtbase-everywhere-src-5.15.18-new/src/winmain/winmain.pro
+--- qtbase-everywhere-src-5.15.18/src/winmain/winmain.pro	2025-06-05 16:07:26.000000000 +0200
++++ qtbase-everywhere-src-5.15.18-new/src/winmain/winmain.pro	2025-11-07 14:10:23.022888150 +0100
+@@ -2,7 +2,7 @@
+ !win32:error("$$_FILE_ is intended only for Windows!")
+ 
+ TEMPLATE = lib
+-TARGET = qtmain
++TARGET = qt5main
+ DESTDIR = $$QT.core.libs
+ 
+ CONFIG += static

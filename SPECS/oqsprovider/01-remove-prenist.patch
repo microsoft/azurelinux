@@ -1,0 +1,3112 @@
+diff --git a/ALGORITHMS.md b/ALGORITHMS.md
+index 0af1797d..c16e2417 100644
+--- a/ALGORITHMS.md
++++ b/ALGORITHMS.md
+@@ -28,16 +28,6 @@ As standardization for these algorithms within TLS is not done, all TLS code poi
+ | p521_frodo1344aes | 0x2F04 | Yes | OQS_CODEPOINT_P521_FRODO1344AES |
+ | frodo1344shake | 0x0205 | Yes | OQS_CODEPOINT_FRODO1344SHAKE |
+ | p521_frodo1344shake | 0x2F05 | Yes | OQS_CODEPOINT_P521_FRODO1344SHAKE |
+-| kyber512 | 0x023A | Yes | OQS_CODEPOINT_KYBER512 |
+-| p256_kyber512 | 0x2F3A | Yes | OQS_CODEPOINT_P256_KYBER512 |
+-| x25519_kyber512 | 0x2F39 | Yes | OQS_CODEPOINT_X25519_KYBER512 |
+-| kyber768 | 0x023C | Yes | OQS_CODEPOINT_KYBER768 |
+-| p384_kyber768 | 0x2F3C | Yes | OQS_CODEPOINT_P384_KYBER768 |
+-| x448_kyber768 | 0x2F90 | Yes | OQS_CODEPOINT_X448_KYBER768 |
+-| x25519_kyber768 | 0x6399 | Yes | OQS_CODEPOINT_X25519_KYBER768 |
+-| p256_kyber768 | 0x639A | Yes | OQS_CODEPOINT_P256_KYBER768 |
+-| kyber1024 | 0x023D | Yes | OQS_CODEPOINT_KYBER1024 |
+-| p521_kyber1024 | 0x2F3D | Yes | OQS_CODEPOINT_P521_KYBER1024 |
+ | mlkem512 | 512 | Yes | OQS_CODEPOINT_MLKEM512 |
+ | p256_mlkem512 | 0x2F4B | Yes | OQS_CODEPOINT_P256_MLKEM512 |
+ | x25519_mlkem512 | 0x2FB6 | Yes | OQS_CODEPOINT_X25519_MLKEM512 |
+@@ -65,13 +55,6 @@ As standardization for these algorithms within TLS is not done, all TLS code poi
+ | x448_hqc192 | 0x2FB1 | Yes | OQS_CODEPOINT_X448_HQC192 |
+ | hqc256 | 0x0246 | Yes | OQS_CODEPOINT_HQC256 |
+ | p521_hqc256 | 0x2F46 | Yes | OQS_CODEPOINT_P521_HQC256 |
+-| dilithium2 | 0xfea0 |Yes| OQS_CODEPOINT_DILITHIUM2
+-| p256_dilithium2 | 0xfea1 |Yes| OQS_CODEPOINT_P256_DILITHIUM2
+-| rsa3072_dilithium2 | 0xfea2 |Yes| OQS_CODEPOINT_RSA3072_DILITHIUM2
+-| dilithium3 | 0xfea3 |Yes| OQS_CODEPOINT_DILITHIUM3
+-| p384_dilithium3 | 0xfea4 |Yes| OQS_CODEPOINT_P384_DILITHIUM3
+-| dilithium5 | 0xfea5 |Yes| OQS_CODEPOINT_DILITHIUM5
+-| p521_dilithium5 | 0xfea6 |Yes| OQS_CODEPOINT_P521_DILITHIUM5
+ | mldsa44 | 0x0904 |Yes| OQS_CODEPOINT_MLDSA44
+ | p256_mldsa44 | 0xff06 |Yes| OQS_CODEPOINT_P256_MLDSA44
+ | rsa3072_mldsa44 | 0xff07 |Yes| OQS_CODEPOINT_RSA3072_MLDSA44
+@@ -183,13 +166,6 @@ discussed in https://github.com/open-quantum-safe/oqs-provider/issues/351.
+ <!--- OQS_TEMPLATE_FRAGMENT_OIDS_START -->
+ |Algorithm name |    default OID    | enabled | environment variable |
+ |---------------|:-----------------:|:-------:|----------------------|
+-| dilithium2 | 1.3.6.1.4.1.2.267.7.4.4 |Yes| OQS_OID_DILITHIUM2
+-| p256_dilithium2 | 1.3.9999.2.7.1 |Yes| OQS_OID_P256_DILITHIUM2
+-| rsa3072_dilithium2 | 1.3.9999.2.7.2 |Yes| OQS_OID_RSA3072_DILITHIUM2
+-| dilithium3 | 1.3.6.1.4.1.2.267.7.6.5 |Yes| OQS_OID_DILITHIUM3
+-| p384_dilithium3 | 1.3.9999.2.7.3 |Yes| OQS_OID_P384_DILITHIUM3
+-| dilithium5 | 1.3.6.1.4.1.2.267.7.8.7 |Yes| OQS_OID_DILITHIUM5
+-| p521_dilithium5 | 1.3.9999.2.7.4 |Yes| OQS_OID_P521_DILITHIUM5
+ | mldsa44 | 2.16.840.1.101.3.4.3.17 |Yes| OQS_OID_MLDSA44
+ | p256_mldsa44 | 1.3.9999.7.5 |Yes| OQS_OID_P256_MLDSA44
+ | rsa3072_mldsa44 | 1.3.9999.7.6 |Yes| OQS_OID_RSA3072_MLDSA44
+@@ -293,16 +269,6 @@ If [OQS_KEM_ENCODERS](CONFIGURE.md#OQS_KEM_ENCODERS) is enabled the following li
+ | p521_frodo1344aes | NULL | OQS_OID_P521_FRODO1344AES
+ | frodo1344shake | NULL | OQS_OID_FRODO1344SHAKE
+ | p521_frodo1344shake | NULL | OQS_OID_P521_FRODO1344SHAKE
+-| kyber512 | 1.3.6.1.4.1.2.267.8.2.2 | OQS_OID_KYBER512
+-| p256_kyber512 | NULL | OQS_OID_P256_KYBER512
+-| x25519_kyber512 | NULL | OQS_OID_X25519_KYBER512
+-| kyber768 | 1.3.6.1.4.1.2.267.8.3.3 | OQS_OID_KYBER768
+-| p384_kyber768 | NULL | OQS_OID_P384_KYBER768
+-| x448_kyber768 | NULL | OQS_OID_X448_KYBER768
+-| x25519_kyber768 | NULL | OQS_OID_X25519_KYBER768
+-| p256_kyber768 | NULL | OQS_OID_P256_KYBER768
+-| kyber1024 | 1.3.6.1.4.1.2.267.8.4.4 | OQS_OID_KYBER1024
+-| p521_kyber1024 | NULL | OQS_OID_P521_KYBER1024
+ | mlkem512 | 2.16.840.1.101.3.4.4.1 | OQS_OID_MLKEM512
+ | p256_mlkem512 | 1.3.6.1.4.1.22554.5.7.1 | OQS_OID_P256_MLKEM512
+ | x25519_mlkem512 | 1.3.6.1.4.1.22554.5.8.1 | OQS_OID_X25519_MLKEM512
+diff --git a/README.md b/README.md
+index aa2feb21..e36730f2 100644
+--- a/README.md
++++ b/README.md
+@@ -38,14 +38,13 @@ This implementation makes available the following quantum safe algorithms:
+ ### KEM algorithms
+ 
+ - **BIKE**: `bikel1`, `p256_bikel1`, `x25519_bikel1`, `bikel3`, `p384_bikel3`, `x448_bikel3`, `bikel5`, `p521_bikel5`
+-- **CRYSTALS-Kyber**: `kyber512`, `p256_kyber512`, `x25519_kyber512`, `kyber768`, `p384_kyber768`, `x448_kyber768`, `x25519_kyber768`, `p256_kyber768`, `kyber1024`, `p521_kyber1024`
+ - **FrodoKEM**: `frodo640aes`, `p256_frodo640aes`, `x25519_frodo640aes`, `frodo640shake`, `p256_frodo640shake`, `x25519_frodo640shake`, `frodo976aes`, `p384_frodo976aes`, `x448_frodo976aes`, `frodo976shake`, `p384_frodo976shake`, `x448_frodo976shake`, `frodo1344aes`, `p521_frodo1344aes`, `frodo1344shake`, `p521_frodo1344shake`
+ - **HQC**: `hqc128`, `p256_hqc128`, `x25519_hqc128`, `hqc192`, `p384_hqc192`, `x448_hqc192`, `hqc256`, `p521_hqc256`†
+ - **ML-KEM**: `mlkem512`, `p256_mlkem512`, `x25519_mlkem512`, `mlkem768`, `p384_mlkem768`, `x448_mlkem768`, `X25519MLKEM768`, `SecP256r1MLKEM768`, `mlkem1024`, `p521_mlkem1024`, `p384_mlkem1024`
+ 
+ ### Signature algorithms
+ 
+-- **CRYSTALS-Dilithium**:`dilithium2`\*, `p256_dilithium2`\*, `rsa3072_dilithium2`\*, `dilithium3`\*, `p384_dilithium3`\*, `dilithium5`\*, `p521_dilithium5`\*
++
+ - **ML-DSA**:`mldsa44`\*, `p256_mldsa44`\*, `rsa3072_mldsa44`\*, `mldsa44_pss2048`\*, `mldsa44_rsa2048`\*, `mldsa44_ed25519`\*, `mldsa44_p256`\*, `mldsa44_bp256`\*, `mldsa65`\*, `p384_mldsa65`\*, `mldsa65_pss3072`\*, `mldsa65_rsa3072`\*, `mldsa65_p256`\*, `mldsa65_bp256`\*, `mldsa65_ed25519`\*, `mldsa87`\*, `p521_mldsa87`\*, `mldsa87_p384`\*, `mldsa87_bp384`\*, `mldsa87_ed448`\*
+ - **Falcon**:`falcon512`\*, `p256_falcon512`\*, `rsa3072_falcon512`\*, `falconpadded512`\*, `p256_falconpadded512`\*, `rsa3072_falconpadded512`\*, `falcon1024`\*, `p521_falcon1024`\*, `falconpadded1024`\*, `p521_falconpadded1024`\*
+ 
+diff --git a/oqs-template/generate.yml b/oqs-template/generate.yml
+index 8fb023ed..98110dbe 100644
+--- a/oqs-template/generate.yml
++++ b/oqs-template/generate.yml
+@@ -86,15 +86,21 @@ kems:
+   -
+     family: 'CRYSTALS-Kyber'
+     name_group: 'kyber512'
+-    nid: '0x023A'
+     oid: '1.3.6.1.4.1.2.267.8.2.2'
+-    nid_hybrid: '0x2F3A'
+     oqs_alg: 'OQS_KEM_alg_kyber_512'
+     extra_nids:
+-      current:
+-        - hybrid_group: "x25519"
+-          nid: '0x2F39'
+       old:
++        - implementation_version: NIST Round 3 submission
++          nist-round: 3
++          nid: '0x023A'
++        - implementation_version: NIST Round 3 submission
++          nist-round: 3
++          hybrid_group: secp256_r1
++          nid: '0x2F3A'
++        - implementation_version: NIST Round 3 submission
++          nist-round: 3
++          hybrid_group: x25519
++          nid: '0x2F39'
+         - implementation_version: NIST Round 2 submission
+           nist-round: 2
+           nid: '0x020F'
+@@ -109,18 +115,28 @@ kems:
+   -
+     family: 'CRYSTALS-Kyber'
+     name_group: 'kyber768'
+-    nid: '0x023C'
+     oid: '1.3.6.1.4.1.2.267.8.3.3'
+-    nid_hybrid: '0x2F3C'
+     extra_nids:
+-      current:
+-        - hybrid_group: "x448"
++      old:
++        - implementation_version: NIST Round 3 submission
++          nist-round: 3
++          nid: '0x023C'
++        - implementation_version: NIST Round 3 submission
++          nist-round: 3
++          hybrid_group: x448
+           nid: '0x2F90'
+-        - hybrid_group: "x25519"
++        - implementation_version: NIST Round 3 submission
++          nist-round: 3
++          hybrid_group: x25519
+           nid: '0x6399'
+-        - hybrid_group: "p256"
++        - implementation_version: NIST Round 3 submission
++          nist-round: 3
++          hybrid_group: secp256_r1
+           nid: '0x639A'
+-      old:
++        - implementation_version: NIST Round 3 submission
++          nist-round: 3
++          hybrid_group: secp384_r1
++          nid: '0x2F3C'
+         - implementation_version: NIST Round 2 submission
+           nist-round: 2
+           nid: '0x0210'
+@@ -132,11 +148,16 @@ kems:
+   -
+     family: 'CRYSTALS-Kyber'
+     name_group: 'kyber1024'
+-    nid: '0x023D'
+     oid: '1.3.6.1.4.1.2.267.8.4.4'
+-    nid_hybrid: '0x2F3D'
+     extra_nids:
+       old:
++        - implementation_version: NIST Round 3 submission
++          nist-round: 3
++          nid: '0x023D'
++        - implementation_version: NIST Round 3 submission
++          nist-round: 3
++          hybrid_group: secp521_r1
++          nid: '0x2F3D'
+         - implementation_version: NIST Round 2 submission
+           nist-round: 2
+           nid: '0x0211'
+@@ -490,42 +511,54 @@ sigs:
+         name: 'dilithium2'
+         pretty_name: 'Dilithium2'
+         oqs_meth: 'OQS_SIG_alg_dilithium_2'
+-        oid: '1.3.6.1.4.1.2.267.7.4.4'
+-        code_point: '0xfea0'
+-        supported_encodings: ['draft-uni-qsckeys-dilithium-00/sk-pk']
+-        enable: true
+-        mix_with: [{'name': 'p256',
+-                    'pretty_name': 'ECDSA p256',
+-                    'oid': '1.3.9999.2.7.1',
+-                    'code_point': '0xfea1'},
+-                   {'name': 'rsa3072',
+-                    'pretty_name': 'RSA3072',
+-                    'oid': '1.3.9999.2.7.2',
+-                    'code_point': '0xfea2'}]
++        extra_nids:
++          old:
++            - implementation_version: 3.1
++              nist-round: 3
++              oid: '1.3.6.1.4.1.2.267.7.4.4'
++              code_point: '0xfea0'
++              supported_encodings: ['draft-uni-qsckeys-dilithium-00/sk-pk']
++              enable: true
++              mix_with: [{'name': 'p256',
++                          'pretty_name': 'ECDSA p256',
++                          'oid': '1.3.9999.2.7.1',
++                          'code_point': '0xfea1'},
++                         {'name': 'rsa3072',
++                          'pretty_name': 'RSA3072',
++                          'oid': '1.3.9999.2.7.2',
++                          'code_point': '0xfea2'}]
+       -
+         name: 'dilithium3'
+         pretty_name: 'Dilithium3'
+         oqs_meth: 'OQS_SIG_alg_dilithium_3'
+-        oid: '1.3.6.1.4.1.2.267.7.6.5'
+-        code_point: '0xfea3'
+-        supported_encodings: ['draft-uni-qsckeys-dilithium-00/sk-pk']
+-        enable: true
+-        mix_with: [{'name': 'p384',
+-                    'pretty_name': 'ECDSA p384',
+-                    'oid': '1.3.9999.2.7.3',
+-                    'code_point': '0xfea4'}]
++        extra_nids:
++          old:
++            - implementation_version: 3.1
++              nist-round: 3
++              oid: '1.3.6.1.4.1.2.267.7.6.5'
++              code_point: '0xfea3'
++              supported_encodings: ['draft-uni-qsckeys-dilithium-00/sk-pk']
++              enable: true
++              mix_with: [{'name': 'p384',
++                          'pretty_name': 'ECDSA p384',
++                          'oid': '1.3.9999.2.7.3',
++                          'code_point': '0xfea4'}]
+       -
+         name: 'dilithium5'
+         pretty_name: 'Dilithium5'
+         oqs_meth: 'OQS_SIG_alg_dilithium_5'
+-        oid: '1.3.6.1.4.1.2.267.7.8.7'
+-        code_point: '0xfea5'
+-        supported_encodings: ['draft-uni-qsckeys-dilithium-00/sk-pk']
+-        enable: true
+-        mix_with: [{'name': 'p521',
+-                    'pretty_name': 'ECDSA p521',
+-                    'oid': '1.3.9999.2.7.4',
+-                    'code_point': '0xfea6'}]
++        extra_nids:
++          old:
++            - implementation_version: 3.1
++              nist-round: 3
++              oid: '1.3.6.1.4.1.2.267.7.8.7'
++              code_point: '0xfea5'
++              supported_encodings: ['draft-uni-qsckeys-dilithium-00/sk-pk']
++              enable: true
++              mix_with: [{'name': 'p521',
++                          'pretty_name': 'ECDSA p521',
++                          'oid': '1.3.9999.2.7.4',
++                          'code_point': '0xfea6'}]
+       -
+         name: 'dilithium2_aes'
+         pretty_name: 'Dilithium2_AES'
+diff --git a/oqs-template/oqs-kem-info.md b/oqs-template/oqs-kem-info.md
+index dc52e67f..35c2d4c9 100644
+--- a/oqs-template/oqs-kem-info.md
++++ b/oqs-template/oqs-kem-info.md
+@@ -44,7 +44,7 @@
+ | CRYSTALS-Kyber | NIST Round 3 submission  | kyber768       | 3            |                    3 | 0x2F3C       | secp384_r1                       |
+ | CRYSTALS-Kyber | NIST Round 3 submission  | kyber768       | 3            |                    3 | 0x2F90       | x448                             |
+ | CRYSTALS-Kyber | NIST Round 3 submission  | kyber768       | 3            |                    3 | 0x6399       | x25519                           |
+-| CRYSTALS-Kyber | NIST Round 3 submission  | kyber768       | 3            |                    3 | 0x639A       | p256                             |
++| CRYSTALS-Kyber | NIST Round 3 submission  | kyber768       | 3            |                    3 | 0x639A       | secp256_r1                       |
+ | CRYSTALS-Kyber | NIST Round 3 submission  | kyber90s1024   | 3            |                    5 | 0x0240       |                                  |
+ | CRYSTALS-Kyber | NIST Round 3 submission  | kyber90s1024   | 3            |                    5 | 0x2F40       | secp521_r1                       |
+ | CRYSTALS-Kyber | NIST Round 3 submission  | kyber90s512    | 3            |                    1 | 0x023E       |                                  |
+diff --git a/oqsprov/oqs_decode_der2key.c b/oqsprov/oqs_decode_der2key.c
+index 07308b25..62a0285d 100644
+--- a/oqsprov/oqs_decode_der2key.c
++++ b/oqsprov/oqs_decode_der2key.c
+@@ -581,32 +581,6 @@ MAKE_DECODER(_ecp, "p521_frodo1344shake", p521_frodo1344shake, oqsx,
+              PrivateKeyInfo);
+ MAKE_DECODER(_ecp, "p521_frodo1344shake", p521_frodo1344shake, oqsx,
+              SubjectPublicKeyInfo);
+-MAKE_DECODER(, "kyber512", kyber512, oqsx, PrivateKeyInfo);
+-MAKE_DECODER(, "kyber512", kyber512, oqsx, SubjectPublicKeyInfo);
+-
+-MAKE_DECODER(_ecp, "p256_kyber512", p256_kyber512, oqsx, PrivateKeyInfo);
+-MAKE_DECODER(_ecp, "p256_kyber512", p256_kyber512, oqsx, SubjectPublicKeyInfo);
+-MAKE_DECODER(_ecx, "x25519_kyber512", x25519_kyber512, oqsx, PrivateKeyInfo);
+-MAKE_DECODER(_ecx, "x25519_kyber512", x25519_kyber512, oqsx,
+-             SubjectPublicKeyInfo);
+-MAKE_DECODER(, "kyber768", kyber768, oqsx, PrivateKeyInfo);
+-MAKE_DECODER(, "kyber768", kyber768, oqsx, SubjectPublicKeyInfo);
+-
+-MAKE_DECODER(_ecp, "p384_kyber768", p384_kyber768, oqsx, PrivateKeyInfo);
+-MAKE_DECODER(_ecp, "p384_kyber768", p384_kyber768, oqsx, SubjectPublicKeyInfo);
+-MAKE_DECODER(_ecx, "x448_kyber768", x448_kyber768, oqsx, PrivateKeyInfo);
+-MAKE_DECODER(_ecx, "x448_kyber768", x448_kyber768, oqsx, SubjectPublicKeyInfo);
+-MAKE_DECODER(_ecx, "x25519_kyber768", x25519_kyber768, oqsx, PrivateKeyInfo);
+-MAKE_DECODER(_ecx, "x25519_kyber768", x25519_kyber768, oqsx,
+-             SubjectPublicKeyInfo);
+-MAKE_DECODER(_ecp, "p256_kyber768", p256_kyber768, oqsx, PrivateKeyInfo);
+-MAKE_DECODER(_ecp, "p256_kyber768", p256_kyber768, oqsx, SubjectPublicKeyInfo);
+-MAKE_DECODER(, "kyber1024", kyber1024, oqsx, PrivateKeyInfo);
+-MAKE_DECODER(, "kyber1024", kyber1024, oqsx, SubjectPublicKeyInfo);
+-
+-MAKE_DECODER(_ecp, "p521_kyber1024", p521_kyber1024, oqsx, PrivateKeyInfo);
+-MAKE_DECODER(_ecp, "p521_kyber1024", p521_kyber1024, oqsx,
+-             SubjectPublicKeyInfo);
+ MAKE_DECODER(, "mlkem512", mlkem512, oqsx, PrivateKeyInfo);
+ MAKE_DECODER(, "mlkem512", mlkem512, oqsx, SubjectPublicKeyInfo);
+ 
+@@ -678,21 +652,6 @@ MAKE_DECODER(_ecp, "p521_hqc256", p521_hqc256, oqsx, PrivateKeyInfo);
+ MAKE_DECODER(_ecp, "p521_hqc256", p521_hqc256, oqsx, SubjectPublicKeyInfo);
+ #endif /* OQS_KEM_ENCODERS */
+ 
+-MAKE_DECODER(, "dilithium2", dilithium2, oqsx, PrivateKeyInfo);
+-MAKE_DECODER(, "dilithium2", dilithium2, oqsx, SubjectPublicKeyInfo);
+-MAKE_DECODER(, "p256_dilithium2", p256_dilithium2, oqsx, PrivateKeyInfo);
+-MAKE_DECODER(, "p256_dilithium2", p256_dilithium2, oqsx, SubjectPublicKeyInfo);
+-MAKE_DECODER(, "rsa3072_dilithium2", rsa3072_dilithium2, oqsx, PrivateKeyInfo);
+-MAKE_DECODER(, "rsa3072_dilithium2", rsa3072_dilithium2, oqsx,
+-             SubjectPublicKeyInfo);
+-MAKE_DECODER(, "dilithium3", dilithium3, oqsx, PrivateKeyInfo);
+-MAKE_DECODER(, "dilithium3", dilithium3, oqsx, SubjectPublicKeyInfo);
+-MAKE_DECODER(, "p384_dilithium3", p384_dilithium3, oqsx, PrivateKeyInfo);
+-MAKE_DECODER(, "p384_dilithium3", p384_dilithium3, oqsx, SubjectPublicKeyInfo);
+-MAKE_DECODER(, "dilithium5", dilithium5, oqsx, PrivateKeyInfo);
+-MAKE_DECODER(, "dilithium5", dilithium5, oqsx, SubjectPublicKeyInfo);
+-MAKE_DECODER(, "p521_dilithium5", p521_dilithium5, oqsx, PrivateKeyInfo);
+-MAKE_DECODER(, "p521_dilithium5", p521_dilithium5, oqsx, SubjectPublicKeyInfo);
+ MAKE_DECODER(, "mldsa44", mldsa44, oqsx, PrivateKeyInfo);
+ MAKE_DECODER(, "mldsa44", mldsa44, oqsx, SubjectPublicKeyInfo);
+ MAKE_DECODER(, "p256_mldsa44", p256_mldsa44, oqsx, PrivateKeyInfo);
+diff --git a/oqsprov/oqs_encode_key2any.c b/oqsprov/oqs_encode_key2any.c
+index d27115c8..8fa57894 100644
+--- a/oqsprov/oqs_encode_key2any.c
++++ b/oqsprov/oqs_encode_key2any.c
+@@ -1020,39 +1020,6 @@ static int oqsx_pki_priv_to_der(const void *vxkey, unsigned char **pder) {
+ #define p521_frodo1344shake_evp_type 0
+ #define p521_frodo1344shake_input_type "p521_frodo1344shake"
+ #define p521_frodo1344shake_pem_type "p521_frodo1344shake"
+-#define kyber512_evp_type 0
+-#define kyber512_input_type "kyber512"
+-#define kyber512_pem_type "kyber512"
+-
+-#define p256_kyber512_evp_type 0
+-#define p256_kyber512_input_type "p256_kyber512"
+-#define p256_kyber512_pem_type "p256_kyber512"
+-#define x25519_kyber512_evp_type 0
+-#define x25519_kyber512_input_type "x25519_kyber512"
+-#define x25519_kyber512_pem_type "x25519_kyber512"
+-#define kyber768_evp_type 0
+-#define kyber768_input_type "kyber768"
+-#define kyber768_pem_type "kyber768"
+-
+-#define p384_kyber768_evp_type 0
+-#define p384_kyber768_input_type "p384_kyber768"
+-#define p384_kyber768_pem_type "p384_kyber768"
+-#define x448_kyber768_evp_type 0
+-#define x448_kyber768_input_type "x448_kyber768"
+-#define x448_kyber768_pem_type "x448_kyber768"
+-#define x25519_kyber768_evp_type 0
+-#define x25519_kyber768_input_type "x25519_kyber768"
+-#define x25519_kyber768_pem_type "x25519_kyber768"
+-#define p256_kyber768_evp_type 0
+-#define p256_kyber768_input_type "p256_kyber768"
+-#define p256_kyber768_pem_type "p256_kyber768"
+-#define kyber1024_evp_type 0
+-#define kyber1024_input_type "kyber1024"
+-#define kyber1024_pem_type "kyber1024"
+-
+-#define p521_kyber1024_evp_type 0
+-#define p521_kyber1024_input_type "p521_kyber1024"
+-#define p521_kyber1024_pem_type "p521_kyber1024"
+ #define mlkem512_evp_type 0
+ #define mlkem512_input_type "mlkem512"
+ #define mlkem512_pem_type "mlkem512"
+@@ -1144,27 +1111,6 @@ static int oqsx_pki_priv_to_der(const void *vxkey, unsigned char **pder) {
+ #define p521_hqc256_input_type "p521_hqc256"
+ #define p521_hqc256_pem_type "p521_hqc256"
+ 
+-#define dilithium2_evp_type 0
+-#define dilithium2_input_type "dilithium2"
+-#define dilithium2_pem_type "dilithium2"
+-#define p256_dilithium2_evp_type 0
+-#define p256_dilithium2_input_type "p256_dilithium2"
+-#define p256_dilithium2_pem_type "p256_dilithium2"
+-#define rsa3072_dilithium2_evp_type 0
+-#define rsa3072_dilithium2_input_type "rsa3072_dilithium2"
+-#define rsa3072_dilithium2_pem_type "rsa3072_dilithium2"
+-#define dilithium3_evp_type 0
+-#define dilithium3_input_type "dilithium3"
+-#define dilithium3_pem_type "dilithium3"
+-#define p384_dilithium3_evp_type 0
+-#define p384_dilithium3_input_type "p384_dilithium3"
+-#define p384_dilithium3_pem_type "p384_dilithium3"
+-#define dilithium5_evp_type 0
+-#define dilithium5_input_type "dilithium5"
+-#define dilithium5_pem_type "dilithium5"
+-#define p521_dilithium5_evp_type 0
+-#define p521_dilithium5_input_type "p521_dilithium5"
+-#define p521_dilithium5_pem_type "p521_dilithium5"
+ #define mldsa44_evp_type 0
+ #define mldsa44_input_type "mldsa44"
+ #define mldsa44_pem_type "mldsa44"
+@@ -2080,79 +2026,6 @@ MAKE_ENCODER(_ecp, p521_frodo1344shake, oqsx, PrivateKeyInfo, pem);
+ MAKE_ENCODER(_ecp, p521_frodo1344shake, oqsx, SubjectPublicKeyInfo, der);
+ MAKE_ENCODER(_ecp, p521_frodo1344shake, oqsx, SubjectPublicKeyInfo, pem);
+ MAKE_TEXT_ENCODER(_ecp, p521_frodo1344shake);
+-MAKE_ENCODER(, kyber512, oqsx, EncryptedPrivateKeyInfo, der);
+-MAKE_ENCODER(, kyber512, oqsx, EncryptedPrivateKeyInfo, pem);
+-MAKE_ENCODER(, kyber512, oqsx, PrivateKeyInfo, der);
+-MAKE_ENCODER(, kyber512, oqsx, PrivateKeyInfo, pem);
+-MAKE_ENCODER(, kyber512, oqsx, SubjectPublicKeyInfo, der);
+-MAKE_ENCODER(, kyber512, oqsx, SubjectPublicKeyInfo, pem);
+-MAKE_TEXT_ENCODER(, kyber512);
+-
+-MAKE_ENCODER(_ecp, p256_kyber512, oqsx, EncryptedPrivateKeyInfo, der);
+-MAKE_ENCODER(_ecp, p256_kyber512, oqsx, EncryptedPrivateKeyInfo, pem);
+-MAKE_ENCODER(_ecp, p256_kyber512, oqsx, PrivateKeyInfo, der);
+-MAKE_ENCODER(_ecp, p256_kyber512, oqsx, PrivateKeyInfo, pem);
+-MAKE_ENCODER(_ecp, p256_kyber512, oqsx, SubjectPublicKeyInfo, der);
+-MAKE_ENCODER(_ecp, p256_kyber512, oqsx, SubjectPublicKeyInfo, pem);
+-MAKE_TEXT_ENCODER(_ecp, p256_kyber512);
+-MAKE_ENCODER(_ecx, x25519_kyber512, oqsx, EncryptedPrivateKeyInfo, der);
+-MAKE_ENCODER(_ecx, x25519_kyber512, oqsx, EncryptedPrivateKeyInfo, pem);
+-MAKE_ENCODER(_ecx, x25519_kyber512, oqsx, PrivateKeyInfo, der);
+-MAKE_ENCODER(_ecx, x25519_kyber512, oqsx, PrivateKeyInfo, pem);
+-MAKE_ENCODER(_ecx, x25519_kyber512, oqsx, SubjectPublicKeyInfo, der);
+-MAKE_ENCODER(_ecx, x25519_kyber512, oqsx, SubjectPublicKeyInfo, pem);
+-MAKE_TEXT_ENCODER(_ecx, x25519_kyber512);
+-MAKE_ENCODER(, kyber768, oqsx, EncryptedPrivateKeyInfo, der);
+-MAKE_ENCODER(, kyber768, oqsx, EncryptedPrivateKeyInfo, pem);
+-MAKE_ENCODER(, kyber768, oqsx, PrivateKeyInfo, der);
+-MAKE_ENCODER(, kyber768, oqsx, PrivateKeyInfo, pem);
+-MAKE_ENCODER(, kyber768, oqsx, SubjectPublicKeyInfo, der);
+-MAKE_ENCODER(, kyber768, oqsx, SubjectPublicKeyInfo, pem);
+-MAKE_TEXT_ENCODER(, kyber768);
+-
+-MAKE_ENCODER(_ecp, p384_kyber768, oqsx, EncryptedPrivateKeyInfo, der);
+-MAKE_ENCODER(_ecp, p384_kyber768, oqsx, EncryptedPrivateKeyInfo, pem);
+-MAKE_ENCODER(_ecp, p384_kyber768, oqsx, PrivateKeyInfo, der);
+-MAKE_ENCODER(_ecp, p384_kyber768, oqsx, PrivateKeyInfo, pem);
+-MAKE_ENCODER(_ecp, p384_kyber768, oqsx, SubjectPublicKeyInfo, der);
+-MAKE_ENCODER(_ecp, p384_kyber768, oqsx, SubjectPublicKeyInfo, pem);
+-MAKE_TEXT_ENCODER(_ecp, p384_kyber768);
+-MAKE_ENCODER(_ecx, x448_kyber768, oqsx, EncryptedPrivateKeyInfo, der);
+-MAKE_ENCODER(_ecx, x448_kyber768, oqsx, EncryptedPrivateKeyInfo, pem);
+-MAKE_ENCODER(_ecx, x448_kyber768, oqsx, PrivateKeyInfo, der);
+-MAKE_ENCODER(_ecx, x448_kyber768, oqsx, PrivateKeyInfo, pem);
+-MAKE_ENCODER(_ecx, x448_kyber768, oqsx, SubjectPublicKeyInfo, der);
+-MAKE_ENCODER(_ecx, x448_kyber768, oqsx, SubjectPublicKeyInfo, pem);
+-MAKE_TEXT_ENCODER(_ecx, x448_kyber768);
+-MAKE_ENCODER(_ecx, x25519_kyber768, oqsx, EncryptedPrivateKeyInfo, der);
+-MAKE_ENCODER(_ecx, x25519_kyber768, oqsx, EncryptedPrivateKeyInfo, pem);
+-MAKE_ENCODER(_ecx, x25519_kyber768, oqsx, PrivateKeyInfo, der);
+-MAKE_ENCODER(_ecx, x25519_kyber768, oqsx, PrivateKeyInfo, pem);
+-MAKE_ENCODER(_ecx, x25519_kyber768, oqsx, SubjectPublicKeyInfo, der);
+-MAKE_ENCODER(_ecx, x25519_kyber768, oqsx, SubjectPublicKeyInfo, pem);
+-MAKE_TEXT_ENCODER(_ecx, x25519_kyber768);
+-MAKE_ENCODER(_ecp, p256_kyber768, oqsx, EncryptedPrivateKeyInfo, der);
+-MAKE_ENCODER(_ecp, p256_kyber768, oqsx, EncryptedPrivateKeyInfo, pem);
+-MAKE_ENCODER(_ecp, p256_kyber768, oqsx, PrivateKeyInfo, der);
+-MAKE_ENCODER(_ecp, p256_kyber768, oqsx, PrivateKeyInfo, pem);
+-MAKE_ENCODER(_ecp, p256_kyber768, oqsx, SubjectPublicKeyInfo, der);
+-MAKE_ENCODER(_ecp, p256_kyber768, oqsx, SubjectPublicKeyInfo, pem);
+-MAKE_TEXT_ENCODER(_ecp, p256_kyber768);
+-MAKE_ENCODER(, kyber1024, oqsx, EncryptedPrivateKeyInfo, der);
+-MAKE_ENCODER(, kyber1024, oqsx, EncryptedPrivateKeyInfo, pem);
+-MAKE_ENCODER(, kyber1024, oqsx, PrivateKeyInfo, der);
+-MAKE_ENCODER(, kyber1024, oqsx, PrivateKeyInfo, pem);
+-MAKE_ENCODER(, kyber1024, oqsx, SubjectPublicKeyInfo, der);
+-MAKE_ENCODER(, kyber1024, oqsx, SubjectPublicKeyInfo, pem);
+-MAKE_TEXT_ENCODER(, kyber1024);
+-
+-MAKE_ENCODER(_ecp, p521_kyber1024, oqsx, EncryptedPrivateKeyInfo, der);
+-MAKE_ENCODER(_ecp, p521_kyber1024, oqsx, EncryptedPrivateKeyInfo, pem);
+-MAKE_ENCODER(_ecp, p521_kyber1024, oqsx, PrivateKeyInfo, der);
+-MAKE_ENCODER(_ecp, p521_kyber1024, oqsx, PrivateKeyInfo, pem);
+-MAKE_ENCODER(_ecp, p521_kyber1024, oqsx, SubjectPublicKeyInfo, der);
+-MAKE_ENCODER(_ecp, p521_kyber1024, oqsx, SubjectPublicKeyInfo, pem);
+-MAKE_TEXT_ENCODER(_ecp, p521_kyber1024);
+ MAKE_ENCODER(, mlkem512, oqsx, EncryptedPrivateKeyInfo, der);
+ MAKE_ENCODER(, mlkem512, oqsx, EncryptedPrivateKeyInfo, pem);
+ MAKE_ENCODER(, mlkem512, oqsx, PrivateKeyInfo, der);
+@@ -2353,55 +2226,6 @@ MAKE_ENCODER(_ecp, p521_hqc256, oqsx, SubjectPublicKeyInfo, pem);
+ MAKE_TEXT_ENCODER(_ecp, p521_hqc256);
+ #endif /* OQS_KEM_ENCODERS */
+ 
+-MAKE_ENCODER(, dilithium2, oqsx, EncryptedPrivateKeyInfo, der);
+-MAKE_ENCODER(, dilithium2, oqsx, EncryptedPrivateKeyInfo, pem);
+-MAKE_ENCODER(, dilithium2, oqsx, PrivateKeyInfo, der);
+-MAKE_ENCODER(, dilithium2, oqsx, PrivateKeyInfo, pem);
+-MAKE_ENCODER(, dilithium2, oqsx, SubjectPublicKeyInfo, der);
+-MAKE_ENCODER(, dilithium2, oqsx, SubjectPublicKeyInfo, pem);
+-MAKE_TEXT_ENCODER(, dilithium2);
+-MAKE_ENCODER(, p256_dilithium2, oqsx, EncryptedPrivateKeyInfo, der);
+-MAKE_ENCODER(, p256_dilithium2, oqsx, EncryptedPrivateKeyInfo, pem);
+-MAKE_ENCODER(, p256_dilithium2, oqsx, PrivateKeyInfo, der);
+-MAKE_ENCODER(, p256_dilithium2, oqsx, PrivateKeyInfo, pem);
+-MAKE_ENCODER(, p256_dilithium2, oqsx, SubjectPublicKeyInfo, der);
+-MAKE_ENCODER(, p256_dilithium2, oqsx, SubjectPublicKeyInfo, pem);
+-MAKE_TEXT_ENCODER(, p256_dilithium2);
+-MAKE_ENCODER(, rsa3072_dilithium2, oqsx, EncryptedPrivateKeyInfo, der);
+-MAKE_ENCODER(, rsa3072_dilithium2, oqsx, EncryptedPrivateKeyInfo, pem);
+-MAKE_ENCODER(, rsa3072_dilithium2, oqsx, PrivateKeyInfo, der);
+-MAKE_ENCODER(, rsa3072_dilithium2, oqsx, PrivateKeyInfo, pem);
+-MAKE_ENCODER(, rsa3072_dilithium2, oqsx, SubjectPublicKeyInfo, der);
+-MAKE_ENCODER(, rsa3072_dilithium2, oqsx, SubjectPublicKeyInfo, pem);
+-MAKE_TEXT_ENCODER(, rsa3072_dilithium2);
+-MAKE_ENCODER(, dilithium3, oqsx, EncryptedPrivateKeyInfo, der);
+-MAKE_ENCODER(, dilithium3, oqsx, EncryptedPrivateKeyInfo, pem);
+-MAKE_ENCODER(, dilithium3, oqsx, PrivateKeyInfo, der);
+-MAKE_ENCODER(, dilithium3, oqsx, PrivateKeyInfo, pem);
+-MAKE_ENCODER(, dilithium3, oqsx, SubjectPublicKeyInfo, der);
+-MAKE_ENCODER(, dilithium3, oqsx, SubjectPublicKeyInfo, pem);
+-MAKE_TEXT_ENCODER(, dilithium3);
+-MAKE_ENCODER(, p384_dilithium3, oqsx, EncryptedPrivateKeyInfo, der);
+-MAKE_ENCODER(, p384_dilithium3, oqsx, EncryptedPrivateKeyInfo, pem);
+-MAKE_ENCODER(, p384_dilithium3, oqsx, PrivateKeyInfo, der);
+-MAKE_ENCODER(, p384_dilithium3, oqsx, PrivateKeyInfo, pem);
+-MAKE_ENCODER(, p384_dilithium3, oqsx, SubjectPublicKeyInfo, der);
+-MAKE_ENCODER(, p384_dilithium3, oqsx, SubjectPublicKeyInfo, pem);
+-MAKE_TEXT_ENCODER(, p384_dilithium3);
+-MAKE_ENCODER(, dilithium5, oqsx, EncryptedPrivateKeyInfo, der);
+-MAKE_ENCODER(, dilithium5, oqsx, EncryptedPrivateKeyInfo, pem);
+-MAKE_ENCODER(, dilithium5, oqsx, PrivateKeyInfo, der);
+-MAKE_ENCODER(, dilithium5, oqsx, PrivateKeyInfo, pem);
+-MAKE_ENCODER(, dilithium5, oqsx, SubjectPublicKeyInfo, der);
+-MAKE_ENCODER(, dilithium5, oqsx, SubjectPublicKeyInfo, pem);
+-MAKE_TEXT_ENCODER(, dilithium5);
+-MAKE_ENCODER(, p521_dilithium5, oqsx, EncryptedPrivateKeyInfo, der);
+-MAKE_ENCODER(, p521_dilithium5, oqsx, EncryptedPrivateKeyInfo, pem);
+-MAKE_ENCODER(, p521_dilithium5, oqsx, PrivateKeyInfo, der);
+-MAKE_ENCODER(, p521_dilithium5, oqsx, PrivateKeyInfo, pem);
+-MAKE_ENCODER(, p521_dilithium5, oqsx, SubjectPublicKeyInfo, der);
+-MAKE_ENCODER(, p521_dilithium5, oqsx, SubjectPublicKeyInfo, pem);
+-MAKE_TEXT_ENCODER(, p521_dilithium5);
+ MAKE_ENCODER(, mldsa44, oqsx, EncryptedPrivateKeyInfo, der);
+ MAKE_ENCODER(, mldsa44, oqsx, EncryptedPrivateKeyInfo, pem);
+ MAKE_ENCODER(, mldsa44, oqsx, PrivateKeyInfo, der);
+diff --git a/oqsprov/oqs_kmgmt.c b/oqsprov/oqs_kmgmt.c
+index e9c6dac3..8770fd68 100644
+--- a/oqsprov/oqs_kmgmt.c
++++ b/oqsprov/oqs_kmgmt.c
+@@ -695,560 +695,496 @@ static int oqsx_gen_set_params(void *genctx, const OSSL_PARAM params[]) {
+ }
+ 
+ ///// OQS_TEMPLATE_FRAGMENT_KEYMGMT_CONSTRUCTORS_START
+-static void *dilithium2_new_key(void *provctx) {
+-    return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_dilithium_2,
+-                        "dilithium2", KEY_TYPE_SIG, NULL, 128, 0, 0);
+-}
+-
+-static void *dilithium2_gen_init(void *provctx, int selection) {
+-    return oqsx_gen_init(provctx, selection, OQS_SIG_alg_dilithium_2,
+-                         "dilithium2", 0, 128, 0, 0);
+-}
+-static void *p256_dilithium2_new_key(void *provctx) {
+-    return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_dilithium_2,
+-                        "p256_dilithium2", KEY_TYPE_HYB_SIG, NULL, 128, 1, 0);
+-}
+-
+-static void *p256_dilithium2_gen_init(void *provctx, int selection) {
+-    return oqsx_gen_init(provctx, selection, OQS_SIG_alg_dilithium_2,
+-                         "p256_dilithium2", KEY_TYPE_HYB_SIG, 128, 1, 0);
+-}
+-static void *rsa3072_dilithium2_new_key(void *provctx) {
+-    return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_dilithium_2,
+-                        "rsa3072_dilithium2", KEY_TYPE_HYB_SIG, NULL, 128, 2,
+-                        0);
+-}
+-
+-static void *rsa3072_dilithium2_gen_init(void *provctx, int selection) {
+-    return oqsx_gen_init(provctx, selection, OQS_SIG_alg_dilithium_2,
+-                         "rsa3072_dilithium2", KEY_TYPE_HYB_SIG, 128, 2, 0);
+-}
+-static void *dilithium3_new_key(void *provctx) {
+-    return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_dilithium_3,
+-                        "dilithium3", KEY_TYPE_SIG, NULL, 192, 3, 0);
+-}
+-
+-static void *dilithium3_gen_init(void *provctx, int selection) {
+-    return oqsx_gen_init(provctx, selection, OQS_SIG_alg_dilithium_3,
+-                         "dilithium3", 0, 192, 3, 0);
+-}
+-static void *p384_dilithium3_new_key(void *provctx) {
+-    return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_dilithium_3,
+-                        "p384_dilithium3", KEY_TYPE_HYB_SIG, NULL, 192, 4, 0);
+-}
+-
+-static void *p384_dilithium3_gen_init(void *provctx, int selection) {
+-    return oqsx_gen_init(provctx, selection, OQS_SIG_alg_dilithium_3,
+-                         "p384_dilithium3", KEY_TYPE_HYB_SIG, 192, 4, 0);
+-}
+-static void *dilithium5_new_key(void *provctx) {
+-    return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_dilithium_5,
+-                        "dilithium5", KEY_TYPE_SIG, NULL, 256, 5, 0);
+-}
+-
+-static void *dilithium5_gen_init(void *provctx, int selection) {
+-    return oqsx_gen_init(provctx, selection, OQS_SIG_alg_dilithium_5,
+-                         "dilithium5", 0, 256, 5, 0);
+-}
+-static void *p521_dilithium5_new_key(void *provctx) {
+-    return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_dilithium_5,
+-                        "p521_dilithium5", KEY_TYPE_HYB_SIG, NULL, 256, 6, 0);
+-}
+-
+-static void *p521_dilithium5_gen_init(void *provctx, int selection) {
+-    return oqsx_gen_init(provctx, selection, OQS_SIG_alg_dilithium_5,
+-                         "p521_dilithium5", KEY_TYPE_HYB_SIG, 256, 6, 0);
+-}
+ 
+ static void *mldsa44_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_ml_dsa_44,
+-                        "mldsa44", KEY_TYPE_SIG, NULL, 128, 7, 0);
++                        "mldsa44", KEY_TYPE_SIG, NULL, 128, 0, 0);
+ }
+ 
+ static void *mldsa44_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_ml_dsa_44, "mldsa44",
+-                         0, 128, 7, 0);
++                         0, 128, 0, 0);
+ }
+ static void *p256_mldsa44_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_ml_dsa_44,
+-                        "p256_mldsa44", KEY_TYPE_HYB_SIG, NULL, 128, 8, 0);
++                        "p256_mldsa44", KEY_TYPE_HYB_SIG, NULL, 128, 1, 0);
+ }
+ 
+ static void *p256_mldsa44_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_ml_dsa_44,
+-                         "p256_mldsa44", KEY_TYPE_HYB_SIG, 128, 8, 0);
++                         "p256_mldsa44", KEY_TYPE_HYB_SIG, 128, 1, 0);
+ }
+ static void *rsa3072_mldsa44_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_ml_dsa_44,
+-                        "rsa3072_mldsa44", KEY_TYPE_HYB_SIG, NULL, 128, 9, 0);
++                        "rsa3072_mldsa44", KEY_TYPE_HYB_SIG, NULL, 128, 2, 0);
+ }
+ 
+ static void *rsa3072_mldsa44_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_ml_dsa_44,
+-                         "rsa3072_mldsa44", KEY_TYPE_HYB_SIG, 128, 9, 0);
++                         "rsa3072_mldsa44", KEY_TYPE_HYB_SIG, 128, 2, 0);
+ }
+ static void *mldsa44_pss2048_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_ml_dsa_44,
+-                        "mldsa44_pss2048", KEY_TYPE_CMP_SIG, NULL, 112, 10, 0);
++                        "mldsa44_pss2048", KEY_TYPE_CMP_SIG, NULL, 112, 3, 0);
+ }
+ 
+ static void *mldsa44_pss2048_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_ml_dsa_44,
+-                         "mldsa44_pss2048", KEY_TYPE_CMP_SIG, 112, 10, 0);
++                         "mldsa44_pss2048", KEY_TYPE_CMP_SIG, 112, 3, 0);
+ }
+ static void *mldsa44_rsa2048_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_ml_dsa_44,
+-                        "mldsa44_rsa2048", KEY_TYPE_CMP_SIG, NULL, 112, 11, 0);
++                        "mldsa44_rsa2048", KEY_TYPE_CMP_SIG, NULL, 112, 4, 0);
+ }
+ 
+ static void *mldsa44_rsa2048_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_ml_dsa_44,
+-                         "mldsa44_rsa2048", KEY_TYPE_CMP_SIG, 112, 11, 0);
++                         "mldsa44_rsa2048", KEY_TYPE_CMP_SIG, 112, 4, 0);
+ }
+ static void *mldsa44_ed25519_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_ml_dsa_44,
+-                        "mldsa44_ed25519", KEY_TYPE_CMP_SIG, NULL, 128, 12, 0);
++                        "mldsa44_ed25519", KEY_TYPE_CMP_SIG, NULL, 128, 5, 0);
+ }
+ 
+ static void *mldsa44_ed25519_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_ml_dsa_44,
+-                         "mldsa44_ed25519", KEY_TYPE_CMP_SIG, 128, 12, 0);
++                         "mldsa44_ed25519", KEY_TYPE_CMP_SIG, 128, 5, 0);
+ }
+ static void *mldsa44_p256_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_ml_dsa_44,
+-                        "mldsa44_p256", KEY_TYPE_CMP_SIG, NULL, 128, 13, 0);
++                        "mldsa44_p256", KEY_TYPE_CMP_SIG, NULL, 128, 6, 0);
+ }
+ 
+ static void *mldsa44_p256_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_ml_dsa_44,
+-                         "mldsa44_p256", KEY_TYPE_CMP_SIG, 128, 13, 0);
++                         "mldsa44_p256", KEY_TYPE_CMP_SIG, 128, 6, 0);
+ }
+ static void *mldsa44_bp256_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_ml_dsa_44,
+-                        "mldsa44_bp256", KEY_TYPE_CMP_SIG, NULL, 256, 14, 0);
++                        "mldsa44_bp256", KEY_TYPE_CMP_SIG, NULL, 256, 7, 0);
+ }
+ 
+ static void *mldsa44_bp256_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_ml_dsa_44,
+-                         "mldsa44_bp256", KEY_TYPE_CMP_SIG, 256, 14, 0);
++                         "mldsa44_bp256", KEY_TYPE_CMP_SIG, 256, 7, 0);
+ }
+ static void *mldsa65_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_ml_dsa_65,
+-                        "mldsa65", KEY_TYPE_SIG, NULL, 192, 15, 0);
++                        "mldsa65", KEY_TYPE_SIG, NULL, 192, 8, 0);
+ }
+ 
+ static void *mldsa65_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_ml_dsa_65, "mldsa65",
+-                         0, 192, 15, 0);
++                         0, 192, 8, 0);
+ }
+ static void *p384_mldsa65_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_ml_dsa_65,
+-                        "p384_mldsa65", KEY_TYPE_HYB_SIG, NULL, 192, 16, 0);
++                        "p384_mldsa65", KEY_TYPE_HYB_SIG, NULL, 192, 9, 0);
+ }
+ 
+ static void *p384_mldsa65_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_ml_dsa_65,
+-                         "p384_mldsa65", KEY_TYPE_HYB_SIG, 192, 16, 0);
++                         "p384_mldsa65", KEY_TYPE_HYB_SIG, 192, 9, 0);
+ }
+ static void *mldsa65_pss3072_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_ml_dsa_65,
+-                        "mldsa65_pss3072", KEY_TYPE_CMP_SIG, NULL, 128, 17, 0);
++                        "mldsa65_pss3072", KEY_TYPE_CMP_SIG, NULL, 128, 10, 0);
+ }
+ 
+ static void *mldsa65_pss3072_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_ml_dsa_65,
+-                         "mldsa65_pss3072", KEY_TYPE_CMP_SIG, 128, 17, 0);
++                         "mldsa65_pss3072", KEY_TYPE_CMP_SIG, 128, 10, 0);
+ }
+ static void *mldsa65_rsa3072_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_ml_dsa_65,
+-                        "mldsa65_rsa3072", KEY_TYPE_CMP_SIG, NULL, 128, 18, 0);
++                        "mldsa65_rsa3072", KEY_TYPE_CMP_SIG, NULL, 128, 11, 0);
+ }
+ 
+ static void *mldsa65_rsa3072_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_ml_dsa_65,
+-                         "mldsa65_rsa3072", KEY_TYPE_CMP_SIG, 128, 18, 0);
++                         "mldsa65_rsa3072", KEY_TYPE_CMP_SIG, 128, 11, 0);
+ }
+ static void *mldsa65_p256_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_ml_dsa_65,
+-                        "mldsa65_p256", KEY_TYPE_CMP_SIG, NULL, 128, 19, 0);
++                        "mldsa65_p256", KEY_TYPE_CMP_SIG, NULL, 128, 12, 0);
+ }
+ 
+ static void *mldsa65_p256_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_ml_dsa_65,
+-                         "mldsa65_p256", KEY_TYPE_CMP_SIG, 128, 19, 0);
++                         "mldsa65_p256", KEY_TYPE_CMP_SIG, 128, 12, 0);
+ }
+ static void *mldsa65_bp256_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_ml_dsa_65,
+-                        "mldsa65_bp256", KEY_TYPE_CMP_SIG, NULL, 256, 20, 0);
++                        "mldsa65_bp256", KEY_TYPE_CMP_SIG, NULL, 256, 13, 0);
+ }
+ 
+ static void *mldsa65_bp256_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_ml_dsa_65,
+-                         "mldsa65_bp256", KEY_TYPE_CMP_SIG, 256, 20, 0);
++                         "mldsa65_bp256", KEY_TYPE_CMP_SIG, 256, 13, 0);
+ }
+ static void *mldsa65_ed25519_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_ml_dsa_65,
+-                        "mldsa65_ed25519", KEY_TYPE_CMP_SIG, NULL, 128, 21, 0);
++                        "mldsa65_ed25519", KEY_TYPE_CMP_SIG, NULL, 128, 14, 0);
+ }
+ 
+ static void *mldsa65_ed25519_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_ml_dsa_65,
+-                         "mldsa65_ed25519", KEY_TYPE_CMP_SIG, 128, 21, 0);
++                         "mldsa65_ed25519", KEY_TYPE_CMP_SIG, 128, 14, 0);
+ }
+ static void *mldsa87_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_ml_dsa_87,
+-                        "mldsa87", KEY_TYPE_SIG, NULL, 256, 22, 0);
++                        "mldsa87", KEY_TYPE_SIG, NULL, 256, 15, 0);
+ }
+ 
+ static void *mldsa87_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_ml_dsa_87, "mldsa87",
+-                         0, 256, 22, 0);
++                         0, 256, 15, 0);
+ }
+ static void *p521_mldsa87_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_ml_dsa_87,
+-                        "p521_mldsa87", KEY_TYPE_HYB_SIG, NULL, 256, 23, 0);
++                        "p521_mldsa87", KEY_TYPE_HYB_SIG, NULL, 256, 16, 0);
+ }
+ 
+ static void *p521_mldsa87_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_ml_dsa_87,
+-                         "p521_mldsa87", KEY_TYPE_HYB_SIG, 256, 23, 0);
++                         "p521_mldsa87", KEY_TYPE_HYB_SIG, 256, 16, 0);
+ }
+ static void *mldsa87_p384_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_ml_dsa_87,
+-                        "mldsa87_p384", KEY_TYPE_CMP_SIG, NULL, 192, 24, 0);
++                        "mldsa87_p384", KEY_TYPE_CMP_SIG, NULL, 192, 17, 0);
+ }
+ 
+ static void *mldsa87_p384_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_ml_dsa_87,
+-                         "mldsa87_p384", KEY_TYPE_CMP_SIG, 192, 24, 0);
++                         "mldsa87_p384", KEY_TYPE_CMP_SIG, 192, 17, 0);
+ }
+ static void *mldsa87_bp384_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_ml_dsa_87,
+-                        "mldsa87_bp384", KEY_TYPE_CMP_SIG, NULL, 384, 25, 0);
++                        "mldsa87_bp384", KEY_TYPE_CMP_SIG, NULL, 384, 18, 0);
+ }
+ 
+ static void *mldsa87_bp384_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_ml_dsa_87,
+-                         "mldsa87_bp384", KEY_TYPE_CMP_SIG, 384, 25, 0);
++                         "mldsa87_bp384", KEY_TYPE_CMP_SIG, 384, 18, 0);
+ }
+ static void *mldsa87_ed448_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_ml_dsa_87,
+-                        "mldsa87_ed448", KEY_TYPE_CMP_SIG, NULL, 192, 26, 0);
++                        "mldsa87_ed448", KEY_TYPE_CMP_SIG, NULL, 192, 19, 0);
+ }
+ 
+ static void *mldsa87_ed448_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_ml_dsa_87,
+-                         "mldsa87_ed448", KEY_TYPE_CMP_SIG, 192, 26, 0);
++                         "mldsa87_ed448", KEY_TYPE_CMP_SIG, 192, 19, 0);
+ }
+ 
+ static void *falcon512_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_falcon_512,
+-                        "falcon512", KEY_TYPE_SIG, NULL, 128, 27, 0);
++                        "falcon512", KEY_TYPE_SIG, NULL, 128, 20, 0);
+ }
+ 
+ static void *falcon512_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_falcon_512,
+-                         "falcon512", 0, 128, 27, 0);
++                         "falcon512", 0, 128, 20, 0);
+ }
+ static void *p256_falcon512_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_falcon_512,
+-                        "p256_falcon512", KEY_TYPE_HYB_SIG, NULL, 128, 28, 0);
++                        "p256_falcon512", KEY_TYPE_HYB_SIG, NULL, 128, 21, 0);
+ }
+ 
+ static void *p256_falcon512_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_falcon_512,
+-                         "p256_falcon512", KEY_TYPE_HYB_SIG, 128, 28, 0);
++                         "p256_falcon512", KEY_TYPE_HYB_SIG, 128, 21, 0);
+ }
+ static void *rsa3072_falcon512_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_falcon_512,
+-                        "rsa3072_falcon512", KEY_TYPE_HYB_SIG, NULL, 128, 29,
++                        "rsa3072_falcon512", KEY_TYPE_HYB_SIG, NULL, 128, 22,
+                         0);
+ }
+ 
+ static void *rsa3072_falcon512_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_falcon_512,
+-                         "rsa3072_falcon512", KEY_TYPE_HYB_SIG, 128, 29, 0);
++                         "rsa3072_falcon512", KEY_TYPE_HYB_SIG, 128, 22, 0);
+ }
+ static void *falconpadded512_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx),
+                         OQS_SIG_alg_falcon_padded_512, "falconpadded512",
+-                        KEY_TYPE_SIG, NULL, 128, 30, 0);
++                        KEY_TYPE_SIG, NULL, 128, 23, 0);
+ }
+ 
+ static void *falconpadded512_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_falcon_padded_512,
+-                         "falconpadded512", 0, 128, 30, 0);
++                         "falconpadded512", 0, 128, 23, 0);
+ }
+ static void *p256_falconpadded512_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx),
+                         OQS_SIG_alg_falcon_padded_512, "p256_falconpadded512",
+-                        KEY_TYPE_HYB_SIG, NULL, 128, 31, 0);
++                        KEY_TYPE_HYB_SIG, NULL, 128, 24, 0);
+ }
+ 
+ static void *p256_falconpadded512_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_falcon_padded_512,
+-                         "p256_falconpadded512", KEY_TYPE_HYB_SIG, 128, 31, 0);
++                         "p256_falconpadded512", KEY_TYPE_HYB_SIG, 128, 24, 0);
+ }
+ static void *rsa3072_falconpadded512_new_key(void *provctx) {
+     return oqsx_key_new(
+         PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_falcon_padded_512,
+-        "rsa3072_falconpadded512", KEY_TYPE_HYB_SIG, NULL, 128, 32, 0);
++        "rsa3072_falconpadded512", KEY_TYPE_HYB_SIG, NULL, 128, 25, 0);
+ }
+ 
+ static void *rsa3072_falconpadded512_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_falcon_padded_512,
+-                         "rsa3072_falconpadded512", KEY_TYPE_HYB_SIG, 128, 32,
++                         "rsa3072_falconpadded512", KEY_TYPE_HYB_SIG, 128, 25,
+                          0);
+ }
+ static void *falcon1024_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_falcon_1024,
+-                        "falcon1024", KEY_TYPE_SIG, NULL, 256, 33, 0);
++                        "falcon1024", KEY_TYPE_SIG, NULL, 256, 26, 0);
+ }
+ 
+ static void *falcon1024_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_falcon_1024,
+-                         "falcon1024", 0, 256, 33, 0);
++                         "falcon1024", 0, 256, 26, 0);
+ }
+ static void *p521_falcon1024_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_falcon_1024,
+-                        "p521_falcon1024", KEY_TYPE_HYB_SIG, NULL, 256, 34, 0);
++                        "p521_falcon1024", KEY_TYPE_HYB_SIG, NULL, 256, 27, 0);
+ }
+ 
+ static void *p521_falcon1024_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_falcon_1024,
+-                         "p521_falcon1024", KEY_TYPE_HYB_SIG, 256, 34, 0);
++                         "p521_falcon1024", KEY_TYPE_HYB_SIG, 256, 27, 0);
+ }
+ static void *falconpadded1024_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx),
+                         OQS_SIG_alg_falcon_padded_1024, "falconpadded1024",
+-                        KEY_TYPE_SIG, NULL, 256, 35, 0);
++                        KEY_TYPE_SIG, NULL, 256, 28, 0);
+ }
+ 
+ static void *falconpadded1024_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_falcon_padded_1024,
+-                         "falconpadded1024", 0, 256, 35, 0);
++                         "falconpadded1024", 0, 256, 28, 0);
+ }
+ static void *p521_falconpadded1024_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx),
+                         OQS_SIG_alg_falcon_padded_1024, "p521_falconpadded1024",
+-                        KEY_TYPE_HYB_SIG, NULL, 256, 36, 0);
++                        KEY_TYPE_HYB_SIG, NULL, 256, 29, 0);
+ }
+ 
+ static void *p521_falconpadded1024_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_falcon_padded_1024,
+-                         "p521_falconpadded1024", KEY_TYPE_HYB_SIG, 256, 36, 0);
++                         "p521_falconpadded1024", KEY_TYPE_HYB_SIG, 256, 29, 0);
+ }
+ 
+ static void *sphincssha2128fsimple_new_key(void *provctx) {
+     return oqsx_key_new(
+         PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_sphincs_sha2_128f_simple,
+-        "sphincssha2128fsimple", KEY_TYPE_SIG, NULL, 128, 37, 0);
++        "sphincssha2128fsimple", KEY_TYPE_SIG, NULL, 128, 30, 0);
+ }
+ 
+ static void *sphincssha2128fsimple_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection,
+                          OQS_SIG_alg_sphincs_sha2_128f_simple,
+-                         "sphincssha2128fsimple", 0, 128, 37, 0);
++                         "sphincssha2128fsimple", 0, 128, 30, 0);
+ }
+ static void *p256_sphincssha2128fsimple_new_key(void *provctx) {
+     return oqsx_key_new(
+         PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_sphincs_sha2_128f_simple,
+-        "p256_sphincssha2128fsimple", KEY_TYPE_HYB_SIG, NULL, 128, 38, 0);
++        "p256_sphincssha2128fsimple", KEY_TYPE_HYB_SIG, NULL, 128, 31, 0);
+ }
+ 
+ static void *p256_sphincssha2128fsimple_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(
+         provctx, selection, OQS_SIG_alg_sphincs_sha2_128f_simple,
+-        "p256_sphincssha2128fsimple", KEY_TYPE_HYB_SIG, 128, 38, 0);
++        "p256_sphincssha2128fsimple", KEY_TYPE_HYB_SIG, 128, 31, 0);
+ }
+ static void *rsa3072_sphincssha2128fsimple_new_key(void *provctx) {
+     return oqsx_key_new(
+         PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_sphincs_sha2_128f_simple,
+-        "rsa3072_sphincssha2128fsimple", KEY_TYPE_HYB_SIG, NULL, 128, 39, 0);
++        "rsa3072_sphincssha2128fsimple", KEY_TYPE_HYB_SIG, NULL, 128, 32, 0);
+ }
+ 
+ static void *rsa3072_sphincssha2128fsimple_gen_init(void *provctx,
+                                                     int selection) {
+     return oqsx_gen_init(
+         provctx, selection, OQS_SIG_alg_sphincs_sha2_128f_simple,
+-        "rsa3072_sphincssha2128fsimple", KEY_TYPE_HYB_SIG, 128, 39, 0);
++        "rsa3072_sphincssha2128fsimple", KEY_TYPE_HYB_SIG, 128, 32, 0);
+ }
+ static void *sphincssha2128ssimple_new_key(void *provctx) {
+     return oqsx_key_new(
+         PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_sphincs_sha2_128s_simple,
+-        "sphincssha2128ssimple", KEY_TYPE_SIG, NULL, 128, 40, 0);
++        "sphincssha2128ssimple", KEY_TYPE_SIG, NULL, 128, 33, 0);
+ }
+ 
+ static void *sphincssha2128ssimple_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection,
+                          OQS_SIG_alg_sphincs_sha2_128s_simple,
+-                         "sphincssha2128ssimple", 0, 128, 40, 0);
++                         "sphincssha2128ssimple", 0, 128, 33, 0);
+ }
+ static void *p256_sphincssha2128ssimple_new_key(void *provctx) {
+     return oqsx_key_new(
+         PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_sphincs_sha2_128s_simple,
+-        "p256_sphincssha2128ssimple", KEY_TYPE_HYB_SIG, NULL, 128, 41, 0);
++        "p256_sphincssha2128ssimple", KEY_TYPE_HYB_SIG, NULL, 128, 34, 0);
+ }
+ 
+ static void *p256_sphincssha2128ssimple_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(
+         provctx, selection, OQS_SIG_alg_sphincs_sha2_128s_simple,
+-        "p256_sphincssha2128ssimple", KEY_TYPE_HYB_SIG, 128, 41, 0);
++        "p256_sphincssha2128ssimple", KEY_TYPE_HYB_SIG, 128, 34, 0);
+ }
+ static void *rsa3072_sphincssha2128ssimple_new_key(void *provctx) {
+     return oqsx_key_new(
+         PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_sphincs_sha2_128s_simple,
+-        "rsa3072_sphincssha2128ssimple", KEY_TYPE_HYB_SIG, NULL, 128, 42, 0);
++        "rsa3072_sphincssha2128ssimple", KEY_TYPE_HYB_SIG, NULL, 128, 35, 0);
+ }
+ 
+ static void *rsa3072_sphincssha2128ssimple_gen_init(void *provctx,
+                                                     int selection) {
+     return oqsx_gen_init(
+         provctx, selection, OQS_SIG_alg_sphincs_sha2_128s_simple,
+-        "rsa3072_sphincssha2128ssimple", KEY_TYPE_HYB_SIG, 128, 42, 0);
++        "rsa3072_sphincssha2128ssimple", KEY_TYPE_HYB_SIG, 128, 35, 0);
+ }
+ static void *sphincssha2192fsimple_new_key(void *provctx) {
+     return oqsx_key_new(
+         PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_sphincs_sha2_192f_simple,
+-        "sphincssha2192fsimple", KEY_TYPE_SIG, NULL, 192, 43, 0);
++        "sphincssha2192fsimple", KEY_TYPE_SIG, NULL, 192, 36, 0);
+ }
+ 
+ static void *sphincssha2192fsimple_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection,
+                          OQS_SIG_alg_sphincs_sha2_192f_simple,
+-                         "sphincssha2192fsimple", 0, 192, 43, 0);
++                         "sphincssha2192fsimple", 0, 192, 36, 0);
+ }
+ static void *p384_sphincssha2192fsimple_new_key(void *provctx) {
+     return oqsx_key_new(
+         PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_sphincs_sha2_192f_simple,
+-        "p384_sphincssha2192fsimple", KEY_TYPE_HYB_SIG, NULL, 192, 44, 0);
++        "p384_sphincssha2192fsimple", KEY_TYPE_HYB_SIG, NULL, 192, 37, 0);
+ }
+ 
+ static void *p384_sphincssha2192fsimple_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(
+         provctx, selection, OQS_SIG_alg_sphincs_sha2_192f_simple,
+-        "p384_sphincssha2192fsimple", KEY_TYPE_HYB_SIG, 192, 44, 0);
++        "p384_sphincssha2192fsimple", KEY_TYPE_HYB_SIG, 192, 37, 0);
+ }
+ 
+ static void *sphincsshake128fsimple_new_key(void *provctx) {
+     return oqsx_key_new(
+         PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_sphincs_shake_128f_simple,
+-        "sphincsshake128fsimple", KEY_TYPE_SIG, NULL, 128, 45, 0);
++        "sphincsshake128fsimple", KEY_TYPE_SIG, NULL, 128, 38, 0);
+ }
+ 
+ static void *sphincsshake128fsimple_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection,
+                          OQS_SIG_alg_sphincs_shake_128f_simple,
+-                         "sphincsshake128fsimple", 0, 128, 45, 0);
++                         "sphincsshake128fsimple", 0, 128, 38, 0);
+ }
+ static void *p256_sphincsshake128fsimple_new_key(void *provctx) {
+     return oqsx_key_new(
+         PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_sphincs_shake_128f_simple,
+-        "p256_sphincsshake128fsimple", KEY_TYPE_HYB_SIG, NULL, 128, 46, 0);
++        "p256_sphincsshake128fsimple", KEY_TYPE_HYB_SIG, NULL, 128, 39, 0);
+ }
+ 
+ static void *p256_sphincsshake128fsimple_gen_init(void *provctx,
+                                                   int selection) {
+     return oqsx_gen_init(
+         provctx, selection, OQS_SIG_alg_sphincs_shake_128f_simple,
+-        "p256_sphincsshake128fsimple", KEY_TYPE_HYB_SIG, 128, 46, 0);
++        "p256_sphincsshake128fsimple", KEY_TYPE_HYB_SIG, 128, 39, 0);
+ }
+ static void *rsa3072_sphincsshake128fsimple_new_key(void *provctx) {
+     return oqsx_key_new(
+         PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_sphincs_shake_128f_simple,
+-        "rsa3072_sphincsshake128fsimple", KEY_TYPE_HYB_SIG, NULL, 128, 47, 0);
++        "rsa3072_sphincsshake128fsimple", KEY_TYPE_HYB_SIG, NULL, 128, 40, 0);
+ }
+ 
+ static void *rsa3072_sphincsshake128fsimple_gen_init(void *provctx,
+                                                      int selection) {
+     return oqsx_gen_init(
+         provctx, selection, OQS_SIG_alg_sphincs_shake_128f_simple,
+-        "rsa3072_sphincsshake128fsimple", KEY_TYPE_HYB_SIG, 128, 47, 0);
++        "rsa3072_sphincsshake128fsimple", KEY_TYPE_HYB_SIG, 128, 40, 0);
+ }
+ 
+ static void *mayo1_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_mayo_1,
+-                        "mayo1", KEY_TYPE_SIG, NULL, 128, 48, 0);
++                        "mayo1", KEY_TYPE_SIG, NULL, 128, 41, 0);
+ }
+ 
+ static void *mayo1_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_mayo_1, "mayo1", 0,
+-                         128, 48, 0);
++                         128, 41, 0);
+ }
+ static void *p256_mayo1_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_mayo_1,
+-                        "p256_mayo1", KEY_TYPE_HYB_SIG, NULL, 128, 49, 0);
++                        "p256_mayo1", KEY_TYPE_HYB_SIG, NULL, 128, 42, 0);
+ }
+ 
+ static void *p256_mayo1_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_mayo_1, "p256_mayo1",
+-                         KEY_TYPE_HYB_SIG, 128, 49, 0);
++                         KEY_TYPE_HYB_SIG, 128, 42, 0);
+ }
+ static void *mayo2_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_mayo_2,
+-                        "mayo2", KEY_TYPE_SIG, NULL, 128, 50, 0);
++                        "mayo2", KEY_TYPE_SIG, NULL, 128, 43, 0);
+ }
+ 
+ static void *mayo2_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_mayo_2, "mayo2", 0,
+-                         128, 50, 0);
++                         128, 43, 0);
+ }
+ static void *p256_mayo2_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_mayo_2,
+-                        "p256_mayo2", KEY_TYPE_HYB_SIG, NULL, 128, 51, 0);
++                        "p256_mayo2", KEY_TYPE_HYB_SIG, NULL, 128, 44, 0);
+ }
+ 
+ static void *p256_mayo2_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_mayo_2, "p256_mayo2",
+-                         KEY_TYPE_HYB_SIG, 128, 51, 0);
++                         KEY_TYPE_HYB_SIG, 128, 44, 0);
+ }
+ static void *mayo3_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_mayo_3,
+-                        "mayo3", KEY_TYPE_SIG, NULL, 192, 52, 0);
++                        "mayo3", KEY_TYPE_SIG, NULL, 192, 45, 0);
+ }
+ 
+ static void *mayo3_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_mayo_3, "mayo3", 0,
+-                         192, 52, 0);
++                         192, 45, 0);
+ }
+ static void *p384_mayo3_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_mayo_3,
+-                        "p384_mayo3", KEY_TYPE_HYB_SIG, NULL, 192, 53, 0);
++                        "p384_mayo3", KEY_TYPE_HYB_SIG, NULL, 192, 46, 0);
+ }
+ 
+ static void *p384_mayo3_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_mayo_3, "p384_mayo3",
+-                         KEY_TYPE_HYB_SIG, 192, 53, 0);
++                         KEY_TYPE_HYB_SIG, 192, 46, 0);
+ }
+ static void *mayo5_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_mayo_5,
+-                        "mayo5", KEY_TYPE_SIG, NULL, 256, 54, 0);
++                        "mayo5", KEY_TYPE_SIG, NULL, 256, 47, 0);
+ }
+ 
+ static void *mayo5_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_mayo_5, "mayo5", 0,
+-                         256, 54, 0);
++                         256, 47, 0);
+ }
+ static void *p521_mayo5_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx), OQS_SIG_alg_mayo_5,
+-                        "p521_mayo5", KEY_TYPE_HYB_SIG, NULL, 256, 55, 0);
++                        "p521_mayo5", KEY_TYPE_HYB_SIG, NULL, 256, 48, 0);
+ }
+ 
+ static void *p521_mayo5_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection, OQS_SIG_alg_mayo_5, "p521_mayo5",
+-                         KEY_TYPE_HYB_SIG, 256, 55, 0);
++                         KEY_TYPE_HYB_SIG, 256, 48, 0);
+ }
+ 
+ static void *CROSSrsdp128balanced_new_key(void *provctx) {
+     return oqsx_key_new(PROV_OQS_LIBCTX_OF(provctx),
+                         OQS_SIG_alg_cross_rsdp_128_balanced,
+-                        "CROSSrsdp128balanced", KEY_TYPE_SIG, NULL, 128, 56, 0);
++                        "CROSSrsdp128balanced", KEY_TYPE_SIG, NULL, 128, 49, 0);
+ }
+ 
+ static void *CROSSrsdp128balanced_gen_init(void *provctx, int selection) {
+     return oqsx_gen_init(provctx, selection,
+                          OQS_SIG_alg_cross_rsdp_128_balanced,
+-                         "CROSSrsdp128balanced", 0, 128, 56, 0);
++                         "CROSSrsdp128balanced", 0, 128, 49, 0);
+ }
+ 
+ ///// OQS_TEMPLATE_FRAGMENT_KEYMGMT_CONSTRUCTORS_END
+@@ -1395,13 +1331,6 @@ static void *CROSSrsdp128balanced_gen_init(void *provctx, int selection) {
+         {0, NULL}};
+ 
+ ///// OQS_TEMPLATE_FRAGMENT_KEYMGMT_FUNCTIONS_START
+-MAKE_SIG_KEYMGMT_FUNCTIONS(dilithium2)
+-MAKE_SIG_KEYMGMT_FUNCTIONS(p256_dilithium2)
+-MAKE_SIG_KEYMGMT_FUNCTIONS(rsa3072_dilithium2)
+-MAKE_SIG_KEYMGMT_FUNCTIONS(dilithium3)
+-MAKE_SIG_KEYMGMT_FUNCTIONS(p384_dilithium3)
+-MAKE_SIG_KEYMGMT_FUNCTIONS(dilithium5)
+-MAKE_SIG_KEYMGMT_FUNCTIONS(p521_dilithium5)
+ MAKE_SIG_KEYMGMT_FUNCTIONS(mldsa44)
+ MAKE_SIG_KEYMGMT_FUNCTIONS(p256_mldsa44)
+ MAKE_SIG_KEYMGMT_FUNCTIONS(rsa3072_mldsa44)
+@@ -1489,22 +1418,6 @@ MAKE_KEM_KEYMGMT_FUNCTIONS(frodo1344shake, OQS_KEM_alg_frodokem_1344_shake, 256)
+ 
+ MAKE_KEM_ECP_KEYMGMT_FUNCTIONS(p521_frodo1344shake,
+                                OQS_KEM_alg_frodokem_1344_shake, 256)
+-MAKE_KEM_KEYMGMT_FUNCTIONS(kyber512, OQS_KEM_alg_kyber_512, 128)
+-
+-MAKE_KEM_ECP_KEYMGMT_FUNCTIONS(p256_kyber512, OQS_KEM_alg_kyber_512, 128)
+-
+-MAKE_KEM_ECX_KEYMGMT_FUNCTIONS(x25519_kyber512, OQS_KEM_alg_kyber_512, 128, 0)
+-MAKE_KEM_KEYMGMT_FUNCTIONS(kyber768, OQS_KEM_alg_kyber_768, 192)
+-
+-MAKE_KEM_ECP_KEYMGMT_FUNCTIONS(p384_kyber768, OQS_KEM_alg_kyber_768, 192)
+-
+-MAKE_KEM_ECX_KEYMGMT_FUNCTIONS(x448_kyber768, OQS_KEM_alg_kyber_768, 192, 0)
+-
+-MAKE_KEM_ECX_KEYMGMT_FUNCTIONS(x25519_kyber768, OQS_KEM_alg_kyber_768, 128, 0)
+-MAKE_KEM_ECP_KEYMGMT_FUNCTIONS(p256_kyber768, OQS_KEM_alg_kyber_768, 128)
+-MAKE_KEM_KEYMGMT_FUNCTIONS(kyber1024, OQS_KEM_alg_kyber_1024, 256)
+-
+-MAKE_KEM_ECP_KEYMGMT_FUNCTIONS(p521_kyber1024, OQS_KEM_alg_kyber_1024, 256)
+ MAKE_KEM_KEYMGMT_FUNCTIONS(mlkem512, OQS_KEM_alg_ml_kem_512, 128)
+ 
+ MAKE_KEM_ECP_KEYMGMT_FUNCTIONS(p256_mlkem512, OQS_KEM_alg_ml_kem_512, 128)
+diff --git a/oqsprov/oqs_prov.h b/oqsprov/oqs_prov.h
+index 33d74350..0282b25f 100644
+--- a/oqsprov/oqs_prov.h
++++ b/oqsprov/oqs_prov.h
+@@ -534,176 +534,6 @@ extern const OSSL_DISPATCH
+     oqs_PrivateKeyInfo_der_to_p521_frodo1344shake_decoder_functions[];
+ extern const OSSL_DISPATCH
+     oqs_SubjectPublicKeyInfo_der_to_p521_frodo1344shake_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_kyber512_to_PrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_kyber512_to_PrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_kyber512_to_EncryptedPrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_kyber512_to_EncryptedPrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_kyber512_to_SubjectPublicKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_kyber512_to_SubjectPublicKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH oqs_kyber512_to_text_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_PrivateKeyInfo_der_to_kyber512_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_SubjectPublicKeyInfo_der_to_kyber512_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p256_kyber512_to_PrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p256_kyber512_to_PrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p256_kyber512_to_EncryptedPrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p256_kyber512_to_EncryptedPrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p256_kyber512_to_SubjectPublicKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p256_kyber512_to_SubjectPublicKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH oqs_p256_kyber512_to_text_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_PrivateKeyInfo_der_to_p256_kyber512_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_SubjectPublicKeyInfo_der_to_p256_kyber512_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_x25519_kyber512_to_PrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_x25519_kyber512_to_PrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_x25519_kyber512_to_EncryptedPrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_x25519_kyber512_to_EncryptedPrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_x25519_kyber512_to_SubjectPublicKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_x25519_kyber512_to_SubjectPublicKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH oqs_x25519_kyber512_to_text_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_PrivateKeyInfo_der_to_x25519_kyber512_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_SubjectPublicKeyInfo_der_to_x25519_kyber512_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_kyber768_to_PrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_kyber768_to_PrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_kyber768_to_EncryptedPrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_kyber768_to_EncryptedPrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_kyber768_to_SubjectPublicKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_kyber768_to_SubjectPublicKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH oqs_kyber768_to_text_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_PrivateKeyInfo_der_to_kyber768_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_SubjectPublicKeyInfo_der_to_kyber768_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p384_kyber768_to_PrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p384_kyber768_to_PrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p384_kyber768_to_EncryptedPrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p384_kyber768_to_EncryptedPrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p384_kyber768_to_SubjectPublicKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p384_kyber768_to_SubjectPublicKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH oqs_p384_kyber768_to_text_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_PrivateKeyInfo_der_to_p384_kyber768_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_SubjectPublicKeyInfo_der_to_p384_kyber768_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_x448_kyber768_to_PrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_x448_kyber768_to_PrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_x448_kyber768_to_EncryptedPrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_x448_kyber768_to_EncryptedPrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_x448_kyber768_to_SubjectPublicKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_x448_kyber768_to_SubjectPublicKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH oqs_x448_kyber768_to_text_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_PrivateKeyInfo_der_to_x448_kyber768_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_SubjectPublicKeyInfo_der_to_x448_kyber768_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_x25519_kyber768_to_PrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_x25519_kyber768_to_PrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_x25519_kyber768_to_EncryptedPrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_x25519_kyber768_to_EncryptedPrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_x25519_kyber768_to_SubjectPublicKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_x25519_kyber768_to_SubjectPublicKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH oqs_x25519_kyber768_to_text_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_PrivateKeyInfo_der_to_x25519_kyber768_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_SubjectPublicKeyInfo_der_to_x25519_kyber768_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p256_kyber768_to_PrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p256_kyber768_to_PrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p256_kyber768_to_EncryptedPrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p256_kyber768_to_EncryptedPrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p256_kyber768_to_SubjectPublicKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p256_kyber768_to_SubjectPublicKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH oqs_p256_kyber768_to_text_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_PrivateKeyInfo_der_to_p256_kyber768_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_SubjectPublicKeyInfo_der_to_p256_kyber768_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_kyber1024_to_PrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_kyber1024_to_PrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_kyber1024_to_EncryptedPrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_kyber1024_to_EncryptedPrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_kyber1024_to_SubjectPublicKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_kyber1024_to_SubjectPublicKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH oqs_kyber1024_to_text_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_PrivateKeyInfo_der_to_kyber1024_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_SubjectPublicKeyInfo_der_to_kyber1024_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p521_kyber1024_to_PrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p521_kyber1024_to_PrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p521_kyber1024_to_EncryptedPrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p521_kyber1024_to_EncryptedPrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p521_kyber1024_to_SubjectPublicKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p521_kyber1024_to_SubjectPublicKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH oqs_p521_kyber1024_to_text_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_PrivateKeyInfo_der_to_p521_kyber1024_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_SubjectPublicKeyInfo_der_to_p521_kyber1024_decoder_functions[];
+ extern const OSSL_DISPATCH
+     oqs_mlkem512_to_PrivateKeyInfo_der_encoder_functions[];
+ extern const OSSL_DISPATCH
+@@ -1148,125 +978,6 @@ extern const OSSL_DISPATCH
+ 
+ #endif /* OQS_KEM_ENCODERS */
+ 
+-extern const OSSL_DISPATCH
+-    oqs_dilithium2_to_PrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_dilithium2_to_PrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_dilithium2_to_EncryptedPrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_dilithium2_to_EncryptedPrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_dilithium2_to_SubjectPublicKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_dilithium2_to_SubjectPublicKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH oqs_dilithium2_to_text_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_PrivateKeyInfo_der_to_dilithium2_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_SubjectPublicKeyInfo_der_to_dilithium2_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p256_dilithium2_to_PrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p256_dilithium2_to_PrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p256_dilithium2_to_EncryptedPrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p256_dilithium2_to_EncryptedPrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p256_dilithium2_to_SubjectPublicKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p256_dilithium2_to_SubjectPublicKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH oqs_p256_dilithium2_to_text_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_PrivateKeyInfo_der_to_p256_dilithium2_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_SubjectPublicKeyInfo_der_to_p256_dilithium2_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_rsa3072_dilithium2_to_PrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_rsa3072_dilithium2_to_PrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_rsa3072_dilithium2_to_EncryptedPrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_rsa3072_dilithium2_to_EncryptedPrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_rsa3072_dilithium2_to_SubjectPublicKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_rsa3072_dilithium2_to_SubjectPublicKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH oqs_rsa3072_dilithium2_to_text_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_PrivateKeyInfo_der_to_rsa3072_dilithium2_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_SubjectPublicKeyInfo_der_to_rsa3072_dilithium2_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_dilithium3_to_PrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_dilithium3_to_PrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_dilithium3_to_EncryptedPrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_dilithium3_to_EncryptedPrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_dilithium3_to_SubjectPublicKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_dilithium3_to_SubjectPublicKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH oqs_dilithium3_to_text_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_PrivateKeyInfo_der_to_dilithium3_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_SubjectPublicKeyInfo_der_to_dilithium3_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p384_dilithium3_to_PrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p384_dilithium3_to_PrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p384_dilithium3_to_EncryptedPrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p384_dilithium3_to_EncryptedPrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p384_dilithium3_to_SubjectPublicKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p384_dilithium3_to_SubjectPublicKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH oqs_p384_dilithium3_to_text_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_PrivateKeyInfo_der_to_p384_dilithium3_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_SubjectPublicKeyInfo_der_to_p384_dilithium3_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_dilithium5_to_PrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_dilithium5_to_PrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_dilithium5_to_EncryptedPrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_dilithium5_to_EncryptedPrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_dilithium5_to_SubjectPublicKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_dilithium5_to_SubjectPublicKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH oqs_dilithium5_to_text_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_PrivateKeyInfo_der_to_dilithium5_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_SubjectPublicKeyInfo_der_to_dilithium5_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p521_dilithium5_to_PrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p521_dilithium5_to_PrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p521_dilithium5_to_EncryptedPrivateKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p521_dilithium5_to_EncryptedPrivateKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p521_dilithium5_to_SubjectPublicKeyInfo_der_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_p521_dilithium5_to_SubjectPublicKeyInfo_pem_encoder_functions[];
+-extern const OSSL_DISPATCH oqs_p521_dilithium5_to_text_encoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_PrivateKeyInfo_der_to_p521_dilithium5_decoder_functions[];
+-extern const OSSL_DISPATCH
+-    oqs_SubjectPublicKeyInfo_der_to_p521_dilithium5_decoder_functions[];
+ extern const OSSL_DISPATCH
+     oqs_mldsa44_to_PrivateKeyInfo_der_encoder_functions[];
+ extern const OSSL_DISPATCH
+@@ -2171,13 +1882,6 @@ extern const OSSL_DISPATCH
+ ///// OQS_TEMPLATE_FRAGMENT_ENDECODER_FUNCTIONS_END
+ 
+ ///// OQS_TEMPLATE_FRAGMENT_ALG_FUNCTIONS_START
+-extern const OSSL_DISPATCH oqs_dilithium2_keymgmt_functions[];
+-extern const OSSL_DISPATCH oqs_p256_dilithium2_keymgmt_functions[];
+-extern const OSSL_DISPATCH oqs_rsa3072_dilithium2_keymgmt_functions[];
+-extern const OSSL_DISPATCH oqs_dilithium3_keymgmt_functions[];
+-extern const OSSL_DISPATCH oqs_p384_dilithium3_keymgmt_functions[];
+-extern const OSSL_DISPATCH oqs_dilithium5_keymgmt_functions[];
+-extern const OSSL_DISPATCH oqs_p521_dilithium5_keymgmt_functions[];
+ extern const OSSL_DISPATCH oqs_mldsa44_keymgmt_functions[];
+ extern const OSSL_DISPATCH oqs_p256_mldsa44_keymgmt_functions[];
+ extern const OSSL_DISPATCH oqs_rsa3072_mldsa44_keymgmt_functions[];
+@@ -2254,19 +1958,6 @@ extern const OSSL_DISPATCH oqs_ecp_p521_frodo1344aes_keymgmt_functions[];
+ extern const OSSL_DISPATCH oqs_frodo1344shake_keymgmt_functions[];
+ 
+ extern const OSSL_DISPATCH oqs_ecp_p521_frodo1344shake_keymgmt_functions[];
+-extern const OSSL_DISPATCH oqs_kyber512_keymgmt_functions[];
+-
+-extern const OSSL_DISPATCH oqs_ecp_p256_kyber512_keymgmt_functions[];
+-extern const OSSL_DISPATCH oqs_ecx_x25519_kyber512_keymgmt_functions[];
+-extern const OSSL_DISPATCH oqs_kyber768_keymgmt_functions[];
+-
+-extern const OSSL_DISPATCH oqs_ecp_p384_kyber768_keymgmt_functions[];
+-extern const OSSL_DISPATCH oqs_ecx_x448_kyber768_keymgmt_functions[];
+-extern const OSSL_DISPATCH oqs_ecx_x25519_kyber768_keymgmt_functions[];
+-extern const OSSL_DISPATCH oqs_ecp_p256_kyber768_keymgmt_functions[];
+-extern const OSSL_DISPATCH oqs_kyber1024_keymgmt_functions[];
+-
+-extern const OSSL_DISPATCH oqs_ecp_p521_kyber1024_keymgmt_functions[];
+ extern const OSSL_DISPATCH oqs_mlkem512_keymgmt_functions[];
+ 
+ extern const OSSL_DISPATCH oqs_ecp_p256_mlkem512_keymgmt_functions[];
+diff --git a/oqsprov/oqsdecoders.inc b/oqsprov/oqsdecoders.inc
+index cd0403de..6790d438 100644
+--- a/oqsprov/oqsdecoders.inc
++++ b/oqsprov/oqsdecoders.inc
+@@ -76,28 +76,6 @@ DECODER_w_structure("frodo1344shake", der, SubjectPublicKeyInfo, frodo1344shake)
+ DECODER_w_structure("p521_frodo1344shake", der, PrivateKeyInfo, p521_frodo1344shake),
+ DECODER_w_structure("p521_frodo1344shake", der, SubjectPublicKeyInfo, p521_frodo1344shake),
+ #endif
+-#ifdef OQS_ENABLE_KEM_kyber_512
+-DECODER_w_structure("kyber512", der, PrivateKeyInfo, kyber512),
+-DECODER_w_structure("kyber512", der, SubjectPublicKeyInfo, kyber512),
+-DECODER_w_structure("p256_kyber512", der, PrivateKeyInfo, p256_kyber512),
+-DECODER_w_structure("p256_kyber512", der, SubjectPublicKeyInfo, p256_kyber512),DECODER_w_structure("x25519_kyber512", der, PrivateKeyInfo, x25519_kyber512),
+-DECODER_w_structure("x25519_kyber512", der, SubjectPublicKeyInfo, x25519_kyber512),
+-#endif
+-#ifdef OQS_ENABLE_KEM_kyber_768
+-DECODER_w_structure("kyber768", der, PrivateKeyInfo, kyber768),
+-DECODER_w_structure("kyber768", der, SubjectPublicKeyInfo, kyber768),
+-DECODER_w_structure("p384_kyber768", der, PrivateKeyInfo, p384_kyber768),
+-DECODER_w_structure("p384_kyber768", der, SubjectPublicKeyInfo, p384_kyber768),DECODER_w_structure("x448_kyber768", der, PrivateKeyInfo, x448_kyber768),
+-DECODER_w_structure("x448_kyber768", der, SubjectPublicKeyInfo, x448_kyber768),DECODER_w_structure("x25519_kyber768", der, PrivateKeyInfo, x25519_kyber768),
+-DECODER_w_structure("x25519_kyber768", der, SubjectPublicKeyInfo, x25519_kyber768),DECODER_w_structure("p256_kyber768", der, PrivateKeyInfo, p256_kyber768),
+-DECODER_w_structure("p256_kyber768", der, SubjectPublicKeyInfo, p256_kyber768),
+-#endif
+-#ifdef OQS_ENABLE_KEM_kyber_1024
+-DECODER_w_structure("kyber1024", der, PrivateKeyInfo, kyber1024),
+-DECODER_w_structure("kyber1024", der, SubjectPublicKeyInfo, kyber1024),
+-DECODER_w_structure("p521_kyber1024", der, PrivateKeyInfo, p521_kyber1024),
+-DECODER_w_structure("p521_kyber1024", der, SubjectPublicKeyInfo, p521_kyber1024),
+-#endif
+ #ifdef OQS_ENABLE_KEM_ml_kem_512
+ DECODER_w_structure("mlkem512", der, PrivateKeyInfo, mlkem512),
+ DECODER_w_structure("mlkem512", der, SubjectPublicKeyInfo, mlkem512),
+@@ -165,22 +143,6 @@ DECODER_w_structure("p521_hqc256", der, SubjectPublicKeyInfo, p521_hqc256),
+ #endif /* OQS_KEM_ENCODERS */
+ 
+ 
+-#ifdef OQS_ENABLE_SIG_dilithium_2
+-DECODER_w_structure("dilithium2", der, PrivateKeyInfo, dilithium2),
+-DECODER_w_structure("dilithium2", der, SubjectPublicKeyInfo, dilithium2),DECODER_w_structure("p256_dilithium2", der, PrivateKeyInfo, p256_dilithium2),
+-DECODER_w_structure("p256_dilithium2", der, SubjectPublicKeyInfo, p256_dilithium2),DECODER_w_structure("rsa3072_dilithium2", der, PrivateKeyInfo, rsa3072_dilithium2),
+-DECODER_w_structure("rsa3072_dilithium2", der, SubjectPublicKeyInfo, rsa3072_dilithium2),
+-#endif
+-#ifdef OQS_ENABLE_SIG_dilithium_3
+-DECODER_w_structure("dilithium3", der, PrivateKeyInfo, dilithium3),
+-DECODER_w_structure("dilithium3", der, SubjectPublicKeyInfo, dilithium3),DECODER_w_structure("p384_dilithium3", der, PrivateKeyInfo, p384_dilithium3),
+-DECODER_w_structure("p384_dilithium3", der, SubjectPublicKeyInfo, p384_dilithium3),
+-#endif
+-#ifdef OQS_ENABLE_SIG_dilithium_5
+-DECODER_w_structure("dilithium5", der, PrivateKeyInfo, dilithium5),
+-DECODER_w_structure("dilithium5", der, SubjectPublicKeyInfo, dilithium5),DECODER_w_structure("p521_dilithium5", der, PrivateKeyInfo, p521_dilithium5),
+-DECODER_w_structure("p521_dilithium5", der, SubjectPublicKeyInfo, p521_dilithium5),
+-#endif
+ #ifdef OQS_ENABLE_SIG_ml_dsa_44
+ DECODER_w_structure("mldsa44", der, PrivateKeyInfo, mldsa44),
+ DECODER_w_structure("mldsa44", der, SubjectPublicKeyInfo, mldsa44),DECODER_w_structure("p256_mldsa44", der, PrivateKeyInfo, p256_mldsa44),
+diff --git a/oqsprov/oqsencoders.inc b/oqsprov/oqsencoders.inc
+index 386ef8a0..3503b2a8 100644
+--- a/oqsprov/oqsencoders.inc
++++ b/oqsprov/oqsencoders.inc
+@@ -206,82 +206,6 @@ ENCODER_w_structure("p521_frodo1344shake", p521_frodo1344shake, der, SubjectPubl
+ ENCODER_w_structure("p521_frodo1344shake", p521_frodo1344shake, pem, SubjectPublicKeyInfo),
+ ENCODER_TEXT("p521_frodo1344shake", p521_frodo1344shake),
+ #endif
+-#ifdef OQS_ENABLE_KEM_kyber_512
+-ENCODER_w_structure("kyber512", kyber512, der, PrivateKeyInfo),
+-ENCODER_w_structure("kyber512", kyber512, pem, PrivateKeyInfo),
+-ENCODER_w_structure("kyber512", kyber512, der, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("kyber512", kyber512, pem, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("kyber512", kyber512, der, SubjectPublicKeyInfo),
+-ENCODER_w_structure("kyber512", kyber512, pem, SubjectPublicKeyInfo),
+-ENCODER_TEXT("kyber512", kyber512),
+-ENCODER_w_structure("p256_kyber512", p256_kyber512, der, PrivateKeyInfo),
+-ENCODER_w_structure("p256_kyber512", p256_kyber512, pem, PrivateKeyInfo),
+-ENCODER_w_structure("p256_kyber512", p256_kyber512, der, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("p256_kyber512", p256_kyber512, pem, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("p256_kyber512", p256_kyber512, der, SubjectPublicKeyInfo),
+-ENCODER_w_structure("p256_kyber512", p256_kyber512, pem, SubjectPublicKeyInfo),
+-ENCODER_TEXT("p256_kyber512", p256_kyber512),
+-ENCODER_w_structure("x25519_kyber512", x25519_kyber512, der, PrivateKeyInfo),
+-ENCODER_w_structure("x25519_kyber512", x25519_kyber512, pem, PrivateKeyInfo),
+-ENCODER_w_structure("x25519_kyber512", x25519_kyber512, der, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("x25519_kyber512", x25519_kyber512, pem, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("x25519_kyber512", x25519_kyber512, der, SubjectPublicKeyInfo),
+-ENCODER_w_structure("x25519_kyber512", x25519_kyber512, pem, SubjectPublicKeyInfo),
+-ENCODER_TEXT("x25519_kyber512", x25519_kyber512),
+-#endif
+-#ifdef OQS_ENABLE_KEM_kyber_768
+-ENCODER_w_structure("kyber768", kyber768, der, PrivateKeyInfo),
+-ENCODER_w_structure("kyber768", kyber768, pem, PrivateKeyInfo),
+-ENCODER_w_structure("kyber768", kyber768, der, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("kyber768", kyber768, pem, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("kyber768", kyber768, der, SubjectPublicKeyInfo),
+-ENCODER_w_structure("kyber768", kyber768, pem, SubjectPublicKeyInfo),
+-ENCODER_TEXT("kyber768", kyber768),
+-ENCODER_w_structure("p384_kyber768", p384_kyber768, der, PrivateKeyInfo),
+-ENCODER_w_structure("p384_kyber768", p384_kyber768, pem, PrivateKeyInfo),
+-ENCODER_w_structure("p384_kyber768", p384_kyber768, der, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("p384_kyber768", p384_kyber768, pem, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("p384_kyber768", p384_kyber768, der, SubjectPublicKeyInfo),
+-ENCODER_w_structure("p384_kyber768", p384_kyber768, pem, SubjectPublicKeyInfo),
+-ENCODER_TEXT("p384_kyber768", p384_kyber768),
+-ENCODER_w_structure("x448_kyber768", x448_kyber768, der, PrivateKeyInfo),
+-ENCODER_w_structure("x448_kyber768", x448_kyber768, pem, PrivateKeyInfo),
+-ENCODER_w_structure("x448_kyber768", x448_kyber768, der, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("x448_kyber768", x448_kyber768, pem, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("x448_kyber768", x448_kyber768, der, SubjectPublicKeyInfo),
+-ENCODER_w_structure("x448_kyber768", x448_kyber768, pem, SubjectPublicKeyInfo),
+-ENCODER_TEXT("x448_kyber768", x448_kyber768),
+-ENCODER_w_structure("x25519_kyber768", x25519_kyber768, der, PrivateKeyInfo),
+-ENCODER_w_structure("x25519_kyber768", x25519_kyber768, pem, PrivateKeyInfo),
+-ENCODER_w_structure("x25519_kyber768", x25519_kyber768, der, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("x25519_kyber768", x25519_kyber768, pem, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("x25519_kyber768", x25519_kyber768, der, SubjectPublicKeyInfo),
+-ENCODER_w_structure("x25519_kyber768", x25519_kyber768, pem, SubjectPublicKeyInfo),
+-ENCODER_TEXT("x25519_kyber768", x25519_kyber768),
+-ENCODER_w_structure("p256_kyber768", p256_kyber768, der, PrivateKeyInfo),
+-ENCODER_w_structure("p256_kyber768", p256_kyber768, pem, PrivateKeyInfo),
+-ENCODER_w_structure("p256_kyber768", p256_kyber768, der, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("p256_kyber768", p256_kyber768, pem, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("p256_kyber768", p256_kyber768, der, SubjectPublicKeyInfo),
+-ENCODER_w_structure("p256_kyber768", p256_kyber768, pem, SubjectPublicKeyInfo),
+-ENCODER_TEXT("p256_kyber768", p256_kyber768),
+-#endif
+-#ifdef OQS_ENABLE_KEM_kyber_1024
+-ENCODER_w_structure("kyber1024", kyber1024, der, PrivateKeyInfo),
+-ENCODER_w_structure("kyber1024", kyber1024, pem, PrivateKeyInfo),
+-ENCODER_w_structure("kyber1024", kyber1024, der, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("kyber1024", kyber1024, pem, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("kyber1024", kyber1024, der, SubjectPublicKeyInfo),
+-ENCODER_w_structure("kyber1024", kyber1024, pem, SubjectPublicKeyInfo),
+-ENCODER_TEXT("kyber1024", kyber1024),
+-ENCODER_w_structure("p521_kyber1024", p521_kyber1024, der, PrivateKeyInfo),
+-ENCODER_w_structure("p521_kyber1024", p521_kyber1024, pem, PrivateKeyInfo),
+-ENCODER_w_structure("p521_kyber1024", p521_kyber1024, der, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("p521_kyber1024", p521_kyber1024, pem, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("p521_kyber1024", p521_kyber1024, der, SubjectPublicKeyInfo),
+-ENCODER_w_structure("p521_kyber1024", p521_kyber1024, pem, SubjectPublicKeyInfo),
+-ENCODER_TEXT("p521_kyber1024", p521_kyber1024),
+-#endif
+ #ifdef OQS_ENABLE_KEM_ml_kem_512
+ ENCODER_w_structure("mlkem512", mlkem512, der, PrivateKeyInfo),
+ ENCODER_w_structure("mlkem512", mlkem512, pem, PrivateKeyInfo),
+@@ -493,61 +417,6 @@ ENCODER_TEXT("p521_hqc256", p521_hqc256),
+ #endif /* OQS_KEM_ENCODERS */
+ 
+ 
+-#ifdef OQS_ENABLE_SIG_dilithium_2
+-ENCODER_w_structure("dilithium2", dilithium2, der, PrivateKeyInfo),
+-ENCODER_w_structure("dilithium2", dilithium2, pem, PrivateKeyInfo),
+-ENCODER_w_structure("dilithium2", dilithium2, der, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("dilithium2", dilithium2, pem, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("dilithium2", dilithium2, der, SubjectPublicKeyInfo),
+-ENCODER_w_structure("dilithium2", dilithium2, pem, SubjectPublicKeyInfo),
+-ENCODER_TEXT("dilithium2", dilithium2),
+-ENCODER_w_structure("p256_dilithium2", p256_dilithium2, der, PrivateKeyInfo),
+-ENCODER_w_structure("p256_dilithium2", p256_dilithium2, pem, PrivateKeyInfo),
+-ENCODER_w_structure("p256_dilithium2", p256_dilithium2, der, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("p256_dilithium2", p256_dilithium2, pem, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("p256_dilithium2", p256_dilithium2, der, SubjectPublicKeyInfo),
+-ENCODER_w_structure("p256_dilithium2", p256_dilithium2, pem, SubjectPublicKeyInfo),
+-ENCODER_TEXT("p256_dilithium2", p256_dilithium2),
+-ENCODER_w_structure("rsa3072_dilithium2", rsa3072_dilithium2, der, PrivateKeyInfo),
+-ENCODER_w_structure("rsa3072_dilithium2", rsa3072_dilithium2, pem, PrivateKeyInfo),
+-ENCODER_w_structure("rsa3072_dilithium2", rsa3072_dilithium2, der, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("rsa3072_dilithium2", rsa3072_dilithium2, pem, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("rsa3072_dilithium2", rsa3072_dilithium2, der, SubjectPublicKeyInfo),
+-ENCODER_w_structure("rsa3072_dilithium2", rsa3072_dilithium2, pem, SubjectPublicKeyInfo),
+-ENCODER_TEXT("rsa3072_dilithium2", rsa3072_dilithium2),
+-#endif
+-#ifdef OQS_ENABLE_SIG_dilithium_3
+-ENCODER_w_structure("dilithium3", dilithium3, der, PrivateKeyInfo),
+-ENCODER_w_structure("dilithium3", dilithium3, pem, PrivateKeyInfo),
+-ENCODER_w_structure("dilithium3", dilithium3, der, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("dilithium3", dilithium3, pem, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("dilithium3", dilithium3, der, SubjectPublicKeyInfo),
+-ENCODER_w_structure("dilithium3", dilithium3, pem, SubjectPublicKeyInfo),
+-ENCODER_TEXT("dilithium3", dilithium3),
+-ENCODER_w_structure("p384_dilithium3", p384_dilithium3, der, PrivateKeyInfo),
+-ENCODER_w_structure("p384_dilithium3", p384_dilithium3, pem, PrivateKeyInfo),
+-ENCODER_w_structure("p384_dilithium3", p384_dilithium3, der, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("p384_dilithium3", p384_dilithium3, pem, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("p384_dilithium3", p384_dilithium3, der, SubjectPublicKeyInfo),
+-ENCODER_w_structure("p384_dilithium3", p384_dilithium3, pem, SubjectPublicKeyInfo),
+-ENCODER_TEXT("p384_dilithium3", p384_dilithium3),
+-#endif
+-#ifdef OQS_ENABLE_SIG_dilithium_5
+-ENCODER_w_structure("dilithium5", dilithium5, der, PrivateKeyInfo),
+-ENCODER_w_structure("dilithium5", dilithium5, pem, PrivateKeyInfo),
+-ENCODER_w_structure("dilithium5", dilithium5, der, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("dilithium5", dilithium5, pem, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("dilithium5", dilithium5, der, SubjectPublicKeyInfo),
+-ENCODER_w_structure("dilithium5", dilithium5, pem, SubjectPublicKeyInfo),
+-ENCODER_TEXT("dilithium5", dilithium5),
+-ENCODER_w_structure("p521_dilithium5", p521_dilithium5, der, PrivateKeyInfo),
+-ENCODER_w_structure("p521_dilithium5", p521_dilithium5, pem, PrivateKeyInfo),
+-ENCODER_w_structure("p521_dilithium5", p521_dilithium5, der, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("p521_dilithium5", p521_dilithium5, pem, EncryptedPrivateKeyInfo),
+-ENCODER_w_structure("p521_dilithium5", p521_dilithium5, der, SubjectPublicKeyInfo),
+-ENCODER_w_structure("p521_dilithium5", p521_dilithium5, pem, SubjectPublicKeyInfo),
+-ENCODER_TEXT("p521_dilithium5", p521_dilithium5),
+-#endif
+ #ifdef OQS_ENABLE_SIG_ml_dsa_44
+ ENCODER_w_structure("mldsa44", mldsa44, der, PrivateKeyInfo),
+ ENCODER_w_structure("mldsa44", mldsa44, pem, PrivateKeyInfo),
+diff --git a/oqsprov/oqsprov.c b/oqsprov/oqsprov.c
+index 16420531..498baf7f 100644
+--- a/oqsprov/oqsprov.c
++++ b/oqsprov/oqsprov.c
+@@ -51,9 +51,9 @@ extern OSSL_FUNC_provider_get_capabilities_fn oqs_provider_get_capabilities;
+ ///// OQS_TEMPLATE_FRAGMENT_ASSIGN_SIG_OIDS_START
+ 
+ #ifdef OQS_KEM_ENCODERS
+-#define OQS_OID_CNT 220
++#define OQS_OID_CNT 186
+ #else
+-#define OQS_OID_CNT 114
++#define OQS_OID_CNT 100
+ #endif
+ const char *oqs_oid_alg_list[OQS_OID_CNT] = {
+ 
+@@ -90,26 +90,6 @@ const char *oqs_oid_alg_list[OQS_OID_CNT] = {
+     "frodo1344shake",
+     NULL,
+     "p521_frodo1344shake",
+-    "1.3.6.1.4.1.2.267.8.2.2",
+-    "kyber512",
+-    NULL,
+-    "p256_kyber512",
+-    NULL,
+-    "x25519_kyber512",
+-    "1.3.6.1.4.1.2.267.8.3.3",
+-    "kyber768",
+-    NULL,
+-    "p384_kyber768",
+-    NULL,
+-    "x448_kyber768",
+-    NULL,
+-    "x25519_kyber768",
+-    NULL,
+-    "p256_kyber768",
+-    "1.3.6.1.4.1.2.267.8.4.4",
+-    "kyber1024",
+-    NULL,
+-    "p521_kyber1024",
+     "2.16.840.1.101.3.4.4.1",
+     "mlkem512",
+     "1.3.6.1.4.1.22554.5.7.1",
+@@ -167,20 +147,6 @@ const char *oqs_oid_alg_list[OQS_OID_CNT] = {
+ 
+ #endif /* OQS_KEM_ENCODERS */
+ 
+-    "1.3.6.1.4.1.2.267.7.4.4",
+-    "dilithium2",
+-    "1.3.9999.2.7.1",
+-    "p256_dilithium2",
+-    "1.3.9999.2.7.2",
+-    "rsa3072_dilithium2",
+-    "1.3.6.1.4.1.2.267.7.6.5",
+-    "dilithium3",
+-    "1.3.9999.2.7.3",
+-    "p384_dilithium3",
+-    "1.3.6.1.4.1.2.267.7.8.7",
+-    "dilithium5",
+-    "1.3.9999.2.7.4",
+-    "p521_dilithium5",
+     "2.16.840.1.101.3.4.3.17",
+     "mldsa44",
+     "1.3.9999.7.5",
+@@ -329,211 +295,174 @@ int oqs_patch_oids(void) {
+ 
+         if ((envval = getenv("OQS_OID_P521_FRODO1344SHAKE")))
+             oqs_oid_alg_list[30] = envval;
+-        if ((envval = getenv("OQS_OID_KYBER512")))
+-            oqs_oid_alg_list[32] = envval;
+-
+-        if ((envval = getenv("OQS_OID_P256_KYBER512")))
+-            oqs_oid_alg_list[34] = envval;
+-        if ((envval = getenv("OQS_OID_X25519_KYBER512")))
+-            oqs_oid_alg_list[36] = envval;
+-        if ((envval = getenv("OQS_OID_KYBER768")))
+-            oqs_oid_alg_list[38] = envval;
+-
+-        if ((envval = getenv("OQS_OID_P384_KYBER768")))
+-            oqs_oid_alg_list[40] = envval;
+-        if ((envval = getenv("OQS_OID_X448_KYBER768")))
+-            oqs_oid_alg_list[42] = envval;
+-        if ((envval = getenv("OQS_OID_X25519_KYBER768")))
+-            oqs_oid_alg_list[44] = envval;
+-        if ((envval = getenv("OQS_OID_P256_KYBER768")))
+-            oqs_oid_alg_list[46] = envval;
+-        if ((envval = getenv("OQS_OID_KYBER1024")))
+-            oqs_oid_alg_list[48] = envval;
+-
+-        if ((envval = getenv("OQS_OID_P521_KYBER1024")))
+-            oqs_oid_alg_list[50] = envval;
+         if ((envval = getenv("OQS_OID_MLKEM512")))
+-            oqs_oid_alg_list[52] = envval;
++            oqs_oid_alg_list[32] = envval;
+ 
+         if ((envval = getenv("OQS_OID_P256_MLKEM512")))
+-            oqs_oid_alg_list[54] = envval;
++            oqs_oid_alg_list[34] = envval;
+         if ((envval = getenv("OQS_OID_X25519_MLKEM512")))
+-            oqs_oid_alg_list[56] = envval;
++            oqs_oid_alg_list[36] = envval;
+         if ((envval = getenv("OQS_OID_MLKEM768")))
+-            oqs_oid_alg_list[58] = envval;
++            oqs_oid_alg_list[38] = envval;
+ 
+         if ((envval = getenv("OQS_OID_P384_MLKEM768")))
+-            oqs_oid_alg_list[60] = envval;
++            oqs_oid_alg_list[40] = envval;
+         if ((envval = getenv("OQS_OID_X448_MLKEM768")))
+-            oqs_oid_alg_list[62] = envval;
++            oqs_oid_alg_list[42] = envval;
+         if ((envval = getenv("OQS_OID_X25519MLKEM768")))
+-            oqs_oid_alg_list[64] = envval;
++            oqs_oid_alg_list[44] = envval;
+         if ((envval = getenv("OQS_OID_SECP256R1MLKEM768")))
+-            oqs_oid_alg_list[66] = envval;
++            oqs_oid_alg_list[46] = envval;
+         if ((envval = getenv("OQS_OID_MLKEM1024")))
+-            oqs_oid_alg_list[68] = envval;
++            oqs_oid_alg_list[48] = envval;
+ 
+         if ((envval = getenv("OQS_OID_P521_MLKEM1024")))
+-            oqs_oid_alg_list[70] = envval;
++            oqs_oid_alg_list[50] = envval;
+         if ((envval = getenv("OQS_OID_P384_MLKEM1024")))
+-            oqs_oid_alg_list[72] = envval;
++            oqs_oid_alg_list[52] = envval;
+         if ((envval = getenv("OQS_OID_BIKEL1")))
+-            oqs_oid_alg_list[74] = envval;
++            oqs_oid_alg_list[54] = envval;
+ 
+         if ((envval = getenv("OQS_OID_P256_BIKEL1")))
+-            oqs_oid_alg_list[76] = envval;
++            oqs_oid_alg_list[56] = envval;
+         if ((envval = getenv("OQS_OID_X25519_BIKEL1")))
+-            oqs_oid_alg_list[78] = envval;
++            oqs_oid_alg_list[58] = envval;
+         if ((envval = getenv("OQS_OID_BIKEL3")))
+-            oqs_oid_alg_list[80] = envval;
++            oqs_oid_alg_list[60] = envval;
+ 
+         if ((envval = getenv("OQS_OID_P384_BIKEL3")))
+-            oqs_oid_alg_list[82] = envval;
++            oqs_oid_alg_list[62] = envval;
+         if ((envval = getenv("OQS_OID_X448_BIKEL3")))
+-            oqs_oid_alg_list[84] = envval;
++            oqs_oid_alg_list[64] = envval;
+         if ((envval = getenv("OQS_OID_BIKEL5")))
+-            oqs_oid_alg_list[86] = envval;
++            oqs_oid_alg_list[66] = envval;
+ 
+         if ((envval = getenv("OQS_OID_P521_BIKEL5")))
+-            oqs_oid_alg_list[88] = envval;
++            oqs_oid_alg_list[68] = envval;
+         if ((envval = getenv("OQS_OID_HQC128")))
+-            oqs_oid_alg_list[90] = envval;
++            oqs_oid_alg_list[70] = envval;
+ 
+         if ((envval = getenv("OQS_OID_P256_HQC128")))
+-            oqs_oid_alg_list[92] = envval;
++            oqs_oid_alg_list[72] = envval;
+         if ((envval = getenv("OQS_OID_X25519_HQC128")))
+-            oqs_oid_alg_list[94] = envval;
++            oqs_oid_alg_list[74] = envval;
+         if ((envval = getenv("OQS_OID_HQC192")))
+-            oqs_oid_alg_list[96] = envval;
++            oqs_oid_alg_list[76] = envval;
+ 
+         if ((envval = getenv("OQS_OID_P384_HQC192")))
+-            oqs_oid_alg_list[98] = envval;
++            oqs_oid_alg_list[78] = envval;
+         if ((envval = getenv("OQS_OID_X448_HQC192")))
+-            oqs_oid_alg_list[100] = envval;
++            oqs_oid_alg_list[80] = envval;
+         if ((envval = getenv("OQS_OID_HQC256")))
+-            oqs_oid_alg_list[102] = envval;
++            oqs_oid_alg_list[82] = envval;
+ 
+         if ((envval = getenv("OQS_OID_P521_HQC256")))
+-            oqs_oid_alg_list[104] = envval;
++            oqs_oid_alg_list[84] = envval;
+ 
+-#define OQS_KEMOID_CNT 104 + 2
++#define OQS_KEMOID_CNT 84 + 2
+ #else
+ #define OQS_KEMOID_CNT 0
+ #endif /* OQS_KEM_ENCODERS */
+-        if ((envval = getenv("OQS_OID_DILITHIUM2")))
+-            oqs_oid_alg_list[0 + OQS_KEMOID_CNT] = envval;
+-        if ((envval = getenv("OQS_OID_P256_DILITHIUM2")))
+-            oqs_oid_alg_list[2 + OQS_KEMOID_CNT] = envval;
+-        if ((envval = getenv("OQS_OID_RSA3072_DILITHIUM2")))
+-            oqs_oid_alg_list[4 + OQS_KEMOID_CNT] = envval;
+-        if ((envval = getenv("OQS_OID_DILITHIUM3")))
+-            oqs_oid_alg_list[6 + OQS_KEMOID_CNT] = envval;
+-        if ((envval = getenv("OQS_OID_P384_DILITHIUM3")))
+-            oqs_oid_alg_list[8 + OQS_KEMOID_CNT] = envval;
+-        if ((envval = getenv("OQS_OID_DILITHIUM5")))
+-            oqs_oid_alg_list[10 + OQS_KEMOID_CNT] = envval;
+-        if ((envval = getenv("OQS_OID_P521_DILITHIUM5")))
+-            oqs_oid_alg_list[12 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_MLDSA44")))
+-            oqs_oid_alg_list[14 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[0 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_P256_MLDSA44")))
+-            oqs_oid_alg_list[16 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[2 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_RSA3072_MLDSA44")))
+-            oqs_oid_alg_list[18 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[4 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_MLDSA44_PSS2048")))
+-            oqs_oid_alg_list[20 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[6 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_MLDSA44_RSA2048")))
+-            oqs_oid_alg_list[22 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[8 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_MLDSA44_ED25519")))
+-            oqs_oid_alg_list[24 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[10 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_MLDSA44_P256")))
+-            oqs_oid_alg_list[26 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[12 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_MLDSA44_BP256")))
+-            oqs_oid_alg_list[28 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[14 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_MLDSA65")))
+-            oqs_oid_alg_list[30 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[16 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_P384_MLDSA65")))
+-            oqs_oid_alg_list[32 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[18 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_MLDSA65_PSS3072")))
+-            oqs_oid_alg_list[34 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[20 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_MLDSA65_RSA3072")))
+-            oqs_oid_alg_list[36 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[22 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_MLDSA65_P256")))
+-            oqs_oid_alg_list[38 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[24 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_MLDSA65_BP256")))
+-            oqs_oid_alg_list[40 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[26 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_MLDSA65_ED25519")))
+-            oqs_oid_alg_list[42 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[28 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_MLDSA87")))
+-            oqs_oid_alg_list[44 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[30 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_P521_MLDSA87")))
+-            oqs_oid_alg_list[46 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[32 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_MLDSA87_P384")))
+-            oqs_oid_alg_list[48 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[34 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_MLDSA87_BP384")))
+-            oqs_oid_alg_list[50 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[36 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_MLDSA87_ED448")))
+-            oqs_oid_alg_list[52 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[38 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_FALCON512")))
+-            oqs_oid_alg_list[54 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[40 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_P256_FALCON512")))
+-            oqs_oid_alg_list[56 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[42 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_RSA3072_FALCON512")))
+-            oqs_oid_alg_list[58 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[44 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_FALCONPADDED512")))
+-            oqs_oid_alg_list[60 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[46 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_P256_FALCONPADDED512")))
+-            oqs_oid_alg_list[62 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[48 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_RSA3072_FALCONPADDED512")))
+-            oqs_oid_alg_list[64 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[50 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_FALCON1024")))
+-            oqs_oid_alg_list[66 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[52 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_P521_FALCON1024")))
+-            oqs_oid_alg_list[68 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[54 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_FALCONPADDED1024")))
+-            oqs_oid_alg_list[70 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[56 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_P521_FALCONPADDED1024")))
+-            oqs_oid_alg_list[72 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[58 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_SPHINCSSHA2128FSIMPLE")))
+-            oqs_oid_alg_list[74 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[60 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_P256_SPHINCSSHA2128FSIMPLE")))
+-            oqs_oid_alg_list[76 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[62 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_RSA3072_SPHINCSSHA2128FSIMPLE")))
+-            oqs_oid_alg_list[78 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[64 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_SPHINCSSHA2128SSIMPLE")))
+-            oqs_oid_alg_list[80 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[66 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_P256_SPHINCSSHA2128SSIMPLE")))
+-            oqs_oid_alg_list[82 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[68 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_RSA3072_SPHINCSSHA2128SSIMPLE")))
+-            oqs_oid_alg_list[84 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[70 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_SPHINCSSHA2192FSIMPLE")))
+-            oqs_oid_alg_list[86 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[72 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_P384_SPHINCSSHA2192FSIMPLE")))
+-            oqs_oid_alg_list[88 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[74 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_SPHINCSSHAKE128FSIMPLE")))
+-            oqs_oid_alg_list[90 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[76 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_P256_SPHINCSSHAKE128FSIMPLE")))
+-            oqs_oid_alg_list[92 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[78 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_RSA3072_SPHINCSSHAKE128FSIMPLE")))
+-            oqs_oid_alg_list[94 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[80 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_MAYO1")))
+-            oqs_oid_alg_list[96 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[82 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_P256_MAYO1")))
+-            oqs_oid_alg_list[98 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[84 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_MAYO2")))
+-            oqs_oid_alg_list[100 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[86 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_P256_MAYO2")))
+-            oqs_oid_alg_list[102 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[88 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_MAYO3")))
+-            oqs_oid_alg_list[104 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[90 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_P384_MAYO3")))
+-            oqs_oid_alg_list[106 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[92 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_MAYO5")))
+-            oqs_oid_alg_list[108 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[94 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_P521_MAYO5")))
+-            oqs_oid_alg_list[110 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[96 + OQS_KEMOID_CNT] = envval;
+         if ((envval = getenv("OQS_OID_CROSSRSDP128BALANCED")))
+-            oqs_oid_alg_list[112 + OQS_KEMOID_CNT] = envval;
++            oqs_oid_alg_list[98 + OQS_KEMOID_CNT] = envval;
+     } ///// OQS_TEMPLATE_FRAGMENT_OID_PATCHING_END
+     return 1;
+ }
+@@ -577,19 +506,6 @@ static const OSSL_PARAM oqsprovider_param_types[] = {
+ 
+ static const OSSL_ALGORITHM oqsprovider_signatures[] = {
+ ///// OQS_TEMPLATE_FRAGMENT_SIG_FUNCTIONS_START
+-#ifdef OQS_ENABLE_SIG_dilithium_2
+-    SIGALG("dilithium2", 128, oqs_signature_functions),
+-    SIGALG("p256_dilithium2", 128, oqs_signature_functions),
+-    SIGALG("rsa3072_dilithium2", 128, oqs_signature_functions),
+-#endif
+-#ifdef OQS_ENABLE_SIG_dilithium_3
+-    SIGALG("dilithium3", 192, oqs_signature_functions),
+-    SIGALG("p384_dilithium3", 192, oqs_signature_functions),
+-#endif
+-#ifdef OQS_ENABLE_SIG_dilithium_5
+-    SIGALG("dilithium5", 256, oqs_signature_functions),
+-    SIGALG("p521_dilithium5", 256, oqs_signature_functions),
+-#endif
+ #ifdef OQS_ENABLE_SIG_ml_dsa_44
+     SIGALG("mldsa44", 128, oqs_signature_functions),
+     SIGALG("p256_mldsa44", 128, oqs_signature_functions),
+@@ -706,22 +622,6 @@ static const OSSL_ALGORITHM oqsprovider_asym_kems[] = {
+     KEMBASEALG(frodo1344shake, 256)
+     KEMHYBALG(p521_frodo1344shake, 256)
+ #endif
+-#ifdef OQS_ENABLE_KEM_kyber_512
+-    KEMBASEALG(kyber512, 128)
+-    KEMHYBALG(p256_kyber512, 128)
+-    KEMHYBALG(x25519_kyber512, 128)
+-#endif
+-#ifdef OQS_ENABLE_KEM_kyber_768
+-    KEMBASEALG(kyber768, 192)
+-    KEMHYBALG(p384_kyber768, 192)
+-    KEMHYBALG(x448_kyber768, 192)
+-    KEMHYBALG(x25519_kyber768, 128)
+-    KEMHYBALG(p256_kyber768, 128)
+-#endif
+-#ifdef OQS_ENABLE_KEM_kyber_1024
+-    KEMBASEALG(kyber1024, 256)
+-    KEMHYBALG(p521_kyber1024, 256)
+-#endif
+ #ifdef OQS_ENABLE_KEM_ml_kem_512
+     KEMBASEALG(mlkem512, 128)
+     KEMHYBALG(p256_mlkem512, 128)
+@@ -771,23 +671,12 @@ static const OSSL_ALGORITHM oqsprovider_asym_kems[] = {
+     ///// OQS_TEMPLATE_FRAGMENT_KEM_FUNCTIONS_END
+     {NULL, NULL, NULL}};
+ 
+-static const OSSL_ALGORITHM oqsprovider_keymgmt[] = {
++static const OSSL_ALGORITHM
++    oqsprovider_keymgmt[] =
++        {
+ ///// OQS_TEMPLATE_FRAGMENT_KEYMGMT_FUNCTIONS_START
+ // clang-format off
+ 
+-#ifdef OQS_ENABLE_SIG_dilithium_2
+-    SIGALG("dilithium2", 128, oqs_dilithium2_keymgmt_functions),
+-    SIGALG("p256_dilithium2", 128, oqs_p256_dilithium2_keymgmt_functions),
+-    SIGALG("rsa3072_dilithium2", 128, oqs_rsa3072_dilithium2_keymgmt_functions),
+-#endif
+-#ifdef OQS_ENABLE_SIG_dilithium_3
+-    SIGALG("dilithium3", 192, oqs_dilithium3_keymgmt_functions),
+-    SIGALG("p384_dilithium3", 192, oqs_p384_dilithium3_keymgmt_functions),
+-#endif
+-#ifdef OQS_ENABLE_SIG_dilithium_5
+-    SIGALG("dilithium5", 256, oqs_dilithium5_keymgmt_functions),
+-    SIGALG("p521_dilithium5", 256, oqs_p521_dilithium5_keymgmt_functions),
+-#endif
+ #ifdef OQS_ENABLE_SIG_ml_dsa_44
+     SIGALG("mldsa44", 128, oqs_mldsa44_keymgmt_functions),
+     SIGALG("p256_mldsa44", 128, oqs_p256_mldsa44_keymgmt_functions),
+@@ -905,25 +794,6 @@ static const OSSL_ALGORITHM oqsprovider_keymgmt[] = {
+ 
+     KEMKMHYBALG(p521_frodo1344shake, 256, ecp)
+ #endif
+-#ifdef OQS_ENABLE_KEM_kyber_512
+-    KEMKMALG(kyber512, 128)
+-
+-    KEMKMHYBALG(p256_kyber512, 128, ecp)
+-    KEMKMHYBALG(x25519_kyber512, 128, ecx)
+-#endif
+-#ifdef OQS_ENABLE_KEM_kyber_768
+-    KEMKMALG(kyber768, 192)
+-
+-    KEMKMHYBALG(p384_kyber768, 192, ecp)
+-    KEMKMHYBALG(x448_kyber768, 192, ecx)
+-    KEMKMHYBALG(x25519_kyber768, 128, ecx)
+-    KEMKMHYBALG(p256_kyber768, 128, ecp)
+-#endif
+-#ifdef OQS_ENABLE_KEM_kyber_1024
+-    KEMKMALG(kyber1024, 256)
+-
+-    KEMKMHYBALG(p521_kyber1024, 256, ecp)
+-#endif
+ #ifdef OQS_ENABLE_KEM_ml_kem_512
+     KEMKMALG(mlkem512, 128)
+ 
+@@ -978,9 +848,9 @@ static const OSSL_ALGORITHM oqsprovider_keymgmt[] = {
+ 
+     KEMKMHYBALG(p521_hqc256, 256, ecp)
+ #endif
+-    // clang-format on
+-    ///// OQS_TEMPLATE_FRAGMENT_KEYMGMT_FUNCTIONS_END
+-    {NULL, NULL, NULL}};
++            // clang-format on
++            ///// OQS_TEMPLATE_FRAGMENT_KEYMGMT_FUNCTIONS_END
++            {NULL, NULL, NULL}};
+ 
+ static const OSSL_ALGORITHM oqsprovider_encoder[] = {
+ #define ENCODER_PROVIDER "oqsprovider"
+diff --git a/oqsprov/oqsprov_capabilities.c b/oqsprov/oqsprov_capabilities.c
+index ab59eef3..532f851e 100644
+--- a/oqsprov/oqsprov_capabilities.c
++++ b/oqsprov/oqsprov_capabilities.c
+@@ -62,19 +62,6 @@ static OQS_GROUP_CONSTANTS oqs_group_list[] = {
+     {0x0205, 256, TLS1_3_VERSION, 0, DTLS1_3_VERSION, 0, 1},
+ 
+     {0x2F05, 256, TLS1_3_VERSION, 0, DTLS1_3_VERSION, 0, 1},
+-    {0x023A, 128, TLS1_3_VERSION, 0, DTLS1_3_VERSION, 0, 1},
+-
+-    {0x2F3A, 128, TLS1_3_VERSION, 0, DTLS1_3_VERSION, 0, 1},
+-    {0x2F39, 128, TLS1_3_VERSION, 0, DTLS1_3_VERSION, 0, 1},
+-    {0x023C, 192, TLS1_3_VERSION, 0, DTLS1_3_VERSION, 0, 1},
+-
+-    {0x2F3C, 192, TLS1_3_VERSION, 0, DTLS1_3_VERSION, 0, 1},
+-    {0x2F90, 192, TLS1_3_VERSION, 0, DTLS1_3_VERSION, 0, 1},
+-    {0x6399, 192, TLS1_3_VERSION, 0, DTLS1_3_VERSION, 0, 1},
+-    {0x639A, 192, TLS1_3_VERSION, 0, DTLS1_3_VERSION, 0, 1},
+-    {0x023D, 256, TLS1_3_VERSION, 0, DTLS1_3_VERSION, 0, 1},
+-
+-    {0x2F3D, 256, TLS1_3_VERSION, 0, DTLS1_3_VERSION, 0, 1},
+     {512, 128, TLS1_3_VERSION, 0, DTLS1_3_VERSION, 0, 1},
+ 
+     {0x2F4B, 128, TLS1_3_VERSION, 0, DTLS1_3_VERSION, 0, 1},
+@@ -184,79 +171,60 @@ static const OSSL_PARAM oqs_param_group_list[][11] = {
+     OQS_GROUP_ENTRY(p521_frodo1344shake, p521_frodo1344shake,
+                     p521_frodo1344shake, 15),
+ #endif
+-#ifdef OQS_ENABLE_KEM_kyber_512
+-    OQS_GROUP_ENTRY(kyber512, kyber512, kyber512, 16),
+-
+-    OQS_GROUP_ENTRY(p256_kyber512, p256_kyber512, p256_kyber512, 17),
+-    OQS_GROUP_ENTRY(x25519_kyber512, x25519_kyber512, x25519_kyber512, 18),
+-#endif
+-#ifdef OQS_ENABLE_KEM_kyber_768
+-    OQS_GROUP_ENTRY(kyber768, kyber768, kyber768, 19),
+-
+-    OQS_GROUP_ENTRY(p384_kyber768, p384_kyber768, p384_kyber768, 20),
+-    OQS_GROUP_ENTRY(x448_kyber768, x448_kyber768, x448_kyber768, 21),
+-    OQS_GROUP_ENTRY(x25519_kyber768, x25519_kyber768, x25519_kyber768, 22),
+-    OQS_GROUP_ENTRY(p256_kyber768, p256_kyber768, p256_kyber768, 23),
+-#endif
+-#ifdef OQS_ENABLE_KEM_kyber_1024
+-    OQS_GROUP_ENTRY(kyber1024, kyber1024, kyber1024, 24),
+-
+-    OQS_GROUP_ENTRY(p521_kyber1024, p521_kyber1024, p521_kyber1024, 25),
+-#endif
+ #ifdef OQS_ENABLE_KEM_ml_kem_512
+-    OQS_GROUP_ENTRY(mlkem512, mlkem512, mlkem512, 26),
++    OQS_GROUP_ENTRY(mlkem512, mlkem512, mlkem512, 16),
+ 
+-    OQS_GROUP_ENTRY(p256_mlkem512, p256_mlkem512, p256_mlkem512, 27),
+-    OQS_GROUP_ENTRY(x25519_mlkem512, x25519_mlkem512, x25519_mlkem512, 28),
++    OQS_GROUP_ENTRY(p256_mlkem512, p256_mlkem512, p256_mlkem512, 17),
++    OQS_GROUP_ENTRY(x25519_mlkem512, x25519_mlkem512, x25519_mlkem512, 18),
+ #endif
+ #ifdef OQS_ENABLE_KEM_ml_kem_768
+-    OQS_GROUP_ENTRY(mlkem768, mlkem768, mlkem768, 29),
++    OQS_GROUP_ENTRY(mlkem768, mlkem768, mlkem768, 19),
+ 
+-    OQS_GROUP_ENTRY(p384_mlkem768, p384_mlkem768, p384_mlkem768, 30),
+-    OQS_GROUP_ENTRY(x448_mlkem768, x448_mlkem768, x448_mlkem768, 31),
+-    OQS_GROUP_ENTRY(X25519MLKEM768, X25519MLKEM768, X25519MLKEM768, 32),
++    OQS_GROUP_ENTRY(p384_mlkem768, p384_mlkem768, p384_mlkem768, 20),
++    OQS_GROUP_ENTRY(x448_mlkem768, x448_mlkem768, x448_mlkem768, 21),
++    OQS_GROUP_ENTRY(X25519MLKEM768, X25519MLKEM768, X25519MLKEM768, 22),
+     OQS_GROUP_ENTRY(SecP256r1MLKEM768, SecP256r1MLKEM768, SecP256r1MLKEM768,
+-                    33),
++                    23),
+ #endif
+ #ifdef OQS_ENABLE_KEM_ml_kem_1024
+-    OQS_GROUP_ENTRY(mlkem1024, mlkem1024, mlkem1024, 34),
++    OQS_GROUP_ENTRY(mlkem1024, mlkem1024, mlkem1024, 24),
+ 
+-    OQS_GROUP_ENTRY(p521_mlkem1024, p521_mlkem1024, p521_mlkem1024, 35),
+-    OQS_GROUP_ENTRY(p384_mlkem1024, p384_mlkem1024, p384_mlkem1024, 36),
++    OQS_GROUP_ENTRY(p521_mlkem1024, p521_mlkem1024, p521_mlkem1024, 25),
++    OQS_GROUP_ENTRY(p384_mlkem1024, p384_mlkem1024, p384_mlkem1024, 26),
+ #endif
+ #ifdef OQS_ENABLE_KEM_bike_l1
+-    OQS_GROUP_ENTRY(bikel1, bikel1, bikel1, 37),
++    OQS_GROUP_ENTRY(bikel1, bikel1, bikel1, 27),
+ 
+-    OQS_GROUP_ENTRY(p256_bikel1, p256_bikel1, p256_bikel1, 38),
+-    OQS_GROUP_ENTRY(x25519_bikel1, x25519_bikel1, x25519_bikel1, 39),
++    OQS_GROUP_ENTRY(p256_bikel1, p256_bikel1, p256_bikel1, 28),
++    OQS_GROUP_ENTRY(x25519_bikel1, x25519_bikel1, x25519_bikel1, 29),
+ #endif
+ #ifdef OQS_ENABLE_KEM_bike_l3
+-    OQS_GROUP_ENTRY(bikel3, bikel3, bikel3, 40),
++    OQS_GROUP_ENTRY(bikel3, bikel3, bikel3, 30),
+ 
+-    OQS_GROUP_ENTRY(p384_bikel3, p384_bikel3, p384_bikel3, 41),
+-    OQS_GROUP_ENTRY(x448_bikel3, x448_bikel3, x448_bikel3, 42),
++    OQS_GROUP_ENTRY(p384_bikel3, p384_bikel3, p384_bikel3, 31),
++    OQS_GROUP_ENTRY(x448_bikel3, x448_bikel3, x448_bikel3, 32),
+ #endif
+ #ifdef OQS_ENABLE_KEM_bike_l5
+-    OQS_GROUP_ENTRY(bikel5, bikel5, bikel5, 43),
++    OQS_GROUP_ENTRY(bikel5, bikel5, bikel5, 33),
+ 
+-    OQS_GROUP_ENTRY(p521_bikel5, p521_bikel5, p521_bikel5, 44),
++    OQS_GROUP_ENTRY(p521_bikel5, p521_bikel5, p521_bikel5, 34),
+ #endif
+ #ifdef OQS_ENABLE_KEM_hqc_128
+-    OQS_GROUP_ENTRY(hqc128, hqc128, hqc128, 45),
++    OQS_GROUP_ENTRY(hqc128, hqc128, hqc128, 35),
+ 
+-    OQS_GROUP_ENTRY(p256_hqc128, p256_hqc128, p256_hqc128, 46),
+-    OQS_GROUP_ENTRY(x25519_hqc128, x25519_hqc128, x25519_hqc128, 47),
++    OQS_GROUP_ENTRY(p256_hqc128, p256_hqc128, p256_hqc128, 36),
++    OQS_GROUP_ENTRY(x25519_hqc128, x25519_hqc128, x25519_hqc128, 37),
+ #endif
+ #ifdef OQS_ENABLE_KEM_hqc_192
+-    OQS_GROUP_ENTRY(hqc192, hqc192, hqc192, 48),
++    OQS_GROUP_ENTRY(hqc192, hqc192, hqc192, 38),
+ 
+-    OQS_GROUP_ENTRY(p384_hqc192, p384_hqc192, p384_hqc192, 49),
+-    OQS_GROUP_ENTRY(x448_hqc192, x448_hqc192, x448_hqc192, 50),
++    OQS_GROUP_ENTRY(p384_hqc192, p384_hqc192, p384_hqc192, 39),
++    OQS_GROUP_ENTRY(x448_hqc192, x448_hqc192, x448_hqc192, 40),
+ #endif
+ #ifdef OQS_ENABLE_KEM_hqc_256
+-    OQS_GROUP_ENTRY(hqc256, hqc256, hqc256, 51),
++    OQS_GROUP_ENTRY(hqc256, hqc256, hqc256, 41),
+ 
+-    OQS_GROUP_ENTRY(p521_hqc256, p521_hqc256, p521_hqc256, 52),
++    OQS_GROUP_ENTRY(p521_hqc256, p521_hqc256, p521_hqc256, 42),
+ #endif
+     ///// OQS_TEMPLATE_FRAGMENT_GROUP_NAMES_END
+ };
+@@ -271,35 +239,31 @@ typedef struct oqs_sigalg_constants_st {
+ static OQS_SIGALG_CONSTANTS oqs_sigalg_list[] = {
+     // ad-hoc assignments - take from OQS generate data structures
+     ///// OQS_TEMPLATE_FRAGMENT_SIGALG_ASSIGNMENTS_START
+-    {0xfea0, 128, TLS1_3_VERSION, 0}, {0xfea1, 128, TLS1_3_VERSION, 0},
+-    {0xfea2, 128, TLS1_3_VERSION, 0}, {0xfea3, 192, TLS1_3_VERSION, 0},
+-    {0xfea4, 192, TLS1_3_VERSION, 0}, {0xfea5, 256, TLS1_3_VERSION, 0},
+-    {0xfea6, 256, TLS1_3_VERSION, 0}, {0x0904, 128, TLS1_3_VERSION, 0},
+-    {0xff06, 128, TLS1_3_VERSION, 0}, {0xff07, 128, TLS1_3_VERSION, 0},
+-    {0x090f, 128, TLS1_3_VERSION, 0}, {0x090c, 128, TLS1_3_VERSION, 0},
+-    {0x090a, 128, TLS1_3_VERSION, 0}, {0x0907, 128, TLS1_3_VERSION, 0},
+-    {0xfee5, 128, TLS1_3_VERSION, 0}, {0x0905, 192, TLS1_3_VERSION, 0},
+-    {0xff08, 192, TLS1_3_VERSION, 0}, {0x0910, 192, TLS1_3_VERSION, 0},
+-    {0x090d, 192, TLS1_3_VERSION, 0}, {0x0908, 192, TLS1_3_VERSION, 0},
+-    {0xfee9, 192, TLS1_3_VERSION, 0}, {0x090b, 192, TLS1_3_VERSION, 0},
+-    {0x0906, 256, TLS1_3_VERSION, 0}, {0xff09, 256, TLS1_3_VERSION, 0},
+-    {0x0909, 256, TLS1_3_VERSION, 0}, {0xfeec, 256, TLS1_3_VERSION, 0},
+-    {0x0912, 256, TLS1_3_VERSION, 0}, {0xfed7, 128, TLS1_3_VERSION, 0},
+-    {0xfed8, 128, TLS1_3_VERSION, 0}, {0xfed9, 128, TLS1_3_VERSION, 0},
+-    {0xfedc, 128, TLS1_3_VERSION, 0}, {0xfedd, 128, TLS1_3_VERSION, 0},
+-    {0xfede, 128, TLS1_3_VERSION, 0}, {0xfeda, 256, TLS1_3_VERSION, 0},
+-    {0xfedb, 256, TLS1_3_VERSION, 0}, {0xfedf, 256, TLS1_3_VERSION, 0},
+-    {0xfee0, 256, TLS1_3_VERSION, 0}, {0xfeb3, 128, TLS1_3_VERSION, 0},
+-    {0xfeb4, 128, TLS1_3_VERSION, 0}, {0xfeb5, 128, TLS1_3_VERSION, 0},
+-    {0xfeb6, 128, TLS1_3_VERSION, 0}, {0xfeb7, 128, TLS1_3_VERSION, 0},
+-    {0xfeb8, 128, TLS1_3_VERSION, 0}, {0xfeb9, 192, TLS1_3_VERSION, 0},
+-    {0xfeba, 192, TLS1_3_VERSION, 0}, {0xfec2, 128, TLS1_3_VERSION, 0},
+-    {0xfec3, 128, TLS1_3_VERSION, 0}, {0xfec4, 128, TLS1_3_VERSION, 0},
+-    {0xfeee, 128, TLS1_3_VERSION, 0}, {0xfef2, 128, TLS1_3_VERSION, 0},
+-    {0xfeef, 128, TLS1_3_VERSION, 0}, {0xfef3, 128, TLS1_3_VERSION, 0},
+-    {0xfef0, 192, TLS1_3_VERSION, 0}, {0xfef4, 192, TLS1_3_VERSION, 0},
+-    {0xfef1, 256, TLS1_3_VERSION, 0}, {0xfef5, 256, TLS1_3_VERSION, 0},
+-    {0xfef6, 128, TLS1_3_VERSION, 0},
++    {0x0904, 128, TLS1_3_VERSION, 0}, {0xff06, 128, TLS1_3_VERSION, 0},
++    {0xff07, 128, TLS1_3_VERSION, 0}, {0x090f, 128, TLS1_3_VERSION, 0},
++    {0x090c, 128, TLS1_3_VERSION, 0}, {0x090a, 128, TLS1_3_VERSION, 0},
++    {0x0907, 128, TLS1_3_VERSION, 0}, {0xfee5, 128, TLS1_3_VERSION, 0},
++    {0x0905, 192, TLS1_3_VERSION, 0}, {0xff08, 192, TLS1_3_VERSION, 0},
++    {0x0910, 192, TLS1_3_VERSION, 0}, {0x090d, 192, TLS1_3_VERSION, 0},
++    {0x0908, 192, TLS1_3_VERSION, 0}, {0xfee9, 192, TLS1_3_VERSION, 0},
++    {0x090b, 192, TLS1_3_VERSION, 0}, {0x0906, 256, TLS1_3_VERSION, 0},
++    {0xff09, 256, TLS1_3_VERSION, 0}, {0x0909, 256, TLS1_3_VERSION, 0},
++    {0xfeec, 256, TLS1_3_VERSION, 0}, {0x0912, 256, TLS1_3_VERSION, 0},
++    {0xfed7, 128, TLS1_3_VERSION, 0}, {0xfed8, 128, TLS1_3_VERSION, 0},
++    {0xfed9, 128, TLS1_3_VERSION, 0}, {0xfedc, 128, TLS1_3_VERSION, 0},
++    {0xfedd, 128, TLS1_3_VERSION, 0}, {0xfede, 128, TLS1_3_VERSION, 0},
++    {0xfeda, 256, TLS1_3_VERSION, 0}, {0xfedb, 256, TLS1_3_VERSION, 0},
++    {0xfedf, 256, TLS1_3_VERSION, 0}, {0xfee0, 256, TLS1_3_VERSION, 0},
++    {0xfeb3, 128, TLS1_3_VERSION, 0}, {0xfeb4, 128, TLS1_3_VERSION, 0},
++    {0xfeb5, 128, TLS1_3_VERSION, 0}, {0xfeb6, 128, TLS1_3_VERSION, 0},
++    {0xfeb7, 128, TLS1_3_VERSION, 0}, {0xfeb8, 128, TLS1_3_VERSION, 0},
++    {0xfeb9, 192, TLS1_3_VERSION, 0}, {0xfeba, 192, TLS1_3_VERSION, 0},
++    {0xfec2, 128, TLS1_3_VERSION, 0}, {0xfec3, 128, TLS1_3_VERSION, 0},
++    {0xfec4, 128, TLS1_3_VERSION, 0}, {0xfeee, 128, TLS1_3_VERSION, 0},
++    {0xfef2, 128, TLS1_3_VERSION, 0}, {0xfeef, 128, TLS1_3_VERSION, 0},
++    {0xfef3, 128, TLS1_3_VERSION, 0}, {0xfef0, 192, TLS1_3_VERSION, 0},
++    {0xfef4, 192, TLS1_3_VERSION, 0}, {0xfef1, 256, TLS1_3_VERSION, 0},
++    {0xfef5, 256, TLS1_3_VERSION, 0}, {0xfef6, 128, TLS1_3_VERSION, 0},
+     ///// OQS_TEMPLATE_FRAGMENT_SIGALG_ASSIGNMENTS_END
+ };
+ 
+@@ -351,261 +315,213 @@ int oqs_patch_codepoints() {
+     if (getenv("OQS_CODEPOINT_P521_FRODO1344SHAKE"))
+         oqs_group_list[15].group_id =
+             atoi(getenv("OQS_CODEPOINT_P521_FRODO1344SHAKE"));
+-    if (getenv("OQS_CODEPOINT_KYBER512"))
+-        oqs_group_list[16].group_id = atoi(getenv("OQS_CODEPOINT_KYBER512"));
+-    if (getenv("OQS_CODEPOINT_P256_KYBER512"))
+-        oqs_group_list[17].group_id =
+-            atoi(getenv("OQS_CODEPOINT_P256_KYBER512"));
+-    if (getenv("OQS_CODEPOINT_X25519_KYBER512"))
+-        oqs_group_list[18].group_id =
+-            atoi(getenv("OQS_CODEPOINT_X25519_KYBER512"));
+-    if (getenv("OQS_CODEPOINT_KYBER768"))
+-        oqs_group_list[19].group_id = atoi(getenv("OQS_CODEPOINT_KYBER768"));
+-    if (getenv("OQS_CODEPOINT_P384_KYBER768"))
+-        oqs_group_list[20].group_id =
+-            atoi(getenv("OQS_CODEPOINT_P384_KYBER768"));
+-    if (getenv("OQS_CODEPOINT_X448_KYBER768"))
+-        oqs_group_list[21].group_id =
+-            atoi(getenv("OQS_CODEPOINT_X448_KYBER768"));
+-    if (getenv("OQS_CODEPOINT_X25519_KYBER768"))
+-        oqs_group_list[22].group_id =
+-            atoi(getenv("OQS_CODEPOINT_X25519_KYBER768"));
+-    if (getenv("OQS_CODEPOINT_P256_KYBER768"))
+-        oqs_group_list[23].group_id =
+-            atoi(getenv("OQS_CODEPOINT_P256_KYBER768"));
+-    if (getenv("OQS_CODEPOINT_KYBER1024"))
+-        oqs_group_list[24].group_id = atoi(getenv("OQS_CODEPOINT_KYBER1024"));
+-    if (getenv("OQS_CODEPOINT_P521_KYBER1024"))
+-        oqs_group_list[25].group_id =
+-            atoi(getenv("OQS_CODEPOINT_P521_KYBER1024"));
+     if (getenv("OQS_CODEPOINT_MLKEM512"))
+-        oqs_group_list[26].group_id = atoi(getenv("OQS_CODEPOINT_MLKEM512"));
++        oqs_group_list[16].group_id = atoi(getenv("OQS_CODEPOINT_MLKEM512"));
+     if (getenv("OQS_CODEPOINT_P256_MLKEM512"))
+-        oqs_group_list[27].group_id =
++        oqs_group_list[17].group_id =
+             atoi(getenv("OQS_CODEPOINT_P256_MLKEM512"));
+     if (getenv("OQS_CODEPOINT_X25519_MLKEM512"))
+-        oqs_group_list[28].group_id =
++        oqs_group_list[18].group_id =
+             atoi(getenv("OQS_CODEPOINT_X25519_MLKEM512"));
+     if (getenv("OQS_CODEPOINT_MLKEM768"))
+-        oqs_group_list[29].group_id = atoi(getenv("OQS_CODEPOINT_MLKEM768"));
++        oqs_group_list[19].group_id = atoi(getenv("OQS_CODEPOINT_MLKEM768"));
+     if (getenv("OQS_CODEPOINT_P384_MLKEM768"))
+-        oqs_group_list[30].group_id =
++        oqs_group_list[20].group_id =
+             atoi(getenv("OQS_CODEPOINT_P384_MLKEM768"));
+     if (getenv("OQS_CODEPOINT_X448_MLKEM768"))
+-        oqs_group_list[31].group_id =
++        oqs_group_list[21].group_id =
+             atoi(getenv("OQS_CODEPOINT_X448_MLKEM768"));
+     if (getenv("OQS_CODEPOINT_X25519MLKEM768"))
+-        oqs_group_list[32].group_id =
++        oqs_group_list[22].group_id =
+             atoi(getenv("OQS_CODEPOINT_X25519MLKEM768"));
+     if (getenv("OQS_CODEPOINT_SECP256R1MLKEM768"))
+-        oqs_group_list[33].group_id =
++        oqs_group_list[23].group_id =
+             atoi(getenv("OQS_CODEPOINT_SECP256R1MLKEM768"));
+     if (getenv("OQS_CODEPOINT_MLKEM1024"))
+-        oqs_group_list[34].group_id = atoi(getenv("OQS_CODEPOINT_MLKEM1024"));
++        oqs_group_list[24].group_id = atoi(getenv("OQS_CODEPOINT_MLKEM1024"));
+     if (getenv("OQS_CODEPOINT_P521_MLKEM1024"))
+-        oqs_group_list[35].group_id =
++        oqs_group_list[25].group_id =
+             atoi(getenv("OQS_CODEPOINT_P521_MLKEM1024"));
+     if (getenv("OQS_CODEPOINT_P384_MLKEM1024"))
+-        oqs_group_list[36].group_id =
++        oqs_group_list[26].group_id =
+             atoi(getenv("OQS_CODEPOINT_P384_MLKEM1024"));
+     if (getenv("OQS_CODEPOINT_BIKEL1"))
+-        oqs_group_list[37].group_id = atoi(getenv("OQS_CODEPOINT_BIKEL1"));
++        oqs_group_list[27].group_id = atoi(getenv("OQS_CODEPOINT_BIKEL1"));
+     if (getenv("OQS_CODEPOINT_P256_BIKEL1"))
+-        oqs_group_list[38].group_id = atoi(getenv("OQS_CODEPOINT_P256_BIKEL1"));
++        oqs_group_list[28].group_id = atoi(getenv("OQS_CODEPOINT_P256_BIKEL1"));
+     if (getenv("OQS_CODEPOINT_X25519_BIKEL1"))
+-        oqs_group_list[39].group_id =
++        oqs_group_list[29].group_id =
+             atoi(getenv("OQS_CODEPOINT_X25519_BIKEL1"));
+     if (getenv("OQS_CODEPOINT_BIKEL3"))
+-        oqs_group_list[40].group_id = atoi(getenv("OQS_CODEPOINT_BIKEL3"));
++        oqs_group_list[30].group_id = atoi(getenv("OQS_CODEPOINT_BIKEL3"));
+     if (getenv("OQS_CODEPOINT_P384_BIKEL3"))
+-        oqs_group_list[41].group_id = atoi(getenv("OQS_CODEPOINT_P384_BIKEL3"));
++        oqs_group_list[31].group_id = atoi(getenv("OQS_CODEPOINT_P384_BIKEL3"));
+     if (getenv("OQS_CODEPOINT_X448_BIKEL3"))
+-        oqs_group_list[42].group_id = atoi(getenv("OQS_CODEPOINT_X448_BIKEL3"));
++        oqs_group_list[32].group_id = atoi(getenv("OQS_CODEPOINT_X448_BIKEL3"));
+     if (getenv("OQS_CODEPOINT_BIKEL5"))
+-        oqs_group_list[43].group_id = atoi(getenv("OQS_CODEPOINT_BIKEL5"));
++        oqs_group_list[33].group_id = atoi(getenv("OQS_CODEPOINT_BIKEL5"));
+     if (getenv("OQS_CODEPOINT_P521_BIKEL5"))
+-        oqs_group_list[44].group_id = atoi(getenv("OQS_CODEPOINT_P521_BIKEL5"));
++        oqs_group_list[34].group_id = atoi(getenv("OQS_CODEPOINT_P521_BIKEL5"));
+     if (getenv("OQS_CODEPOINT_HQC128"))
+-        oqs_group_list[45].group_id = atoi(getenv("OQS_CODEPOINT_HQC128"));
++        oqs_group_list[35].group_id = atoi(getenv("OQS_CODEPOINT_HQC128"));
+     if (getenv("OQS_CODEPOINT_P256_HQC128"))
+-        oqs_group_list[46].group_id = atoi(getenv("OQS_CODEPOINT_P256_HQC128"));
++        oqs_group_list[36].group_id = atoi(getenv("OQS_CODEPOINT_P256_HQC128"));
+     if (getenv("OQS_CODEPOINT_X25519_HQC128"))
+-        oqs_group_list[47].group_id =
++        oqs_group_list[37].group_id =
+             atoi(getenv("OQS_CODEPOINT_X25519_HQC128"));
+     if (getenv("OQS_CODEPOINT_HQC192"))
+-        oqs_group_list[48].group_id = atoi(getenv("OQS_CODEPOINT_HQC192"));
++        oqs_group_list[38].group_id = atoi(getenv("OQS_CODEPOINT_HQC192"));
+     if (getenv("OQS_CODEPOINT_P384_HQC192"))
+-        oqs_group_list[49].group_id = atoi(getenv("OQS_CODEPOINT_P384_HQC192"));
++        oqs_group_list[39].group_id = atoi(getenv("OQS_CODEPOINT_P384_HQC192"));
+     if (getenv("OQS_CODEPOINT_X448_HQC192"))
+-        oqs_group_list[50].group_id = atoi(getenv("OQS_CODEPOINT_X448_HQC192"));
++        oqs_group_list[40].group_id = atoi(getenv("OQS_CODEPOINT_X448_HQC192"));
+     if (getenv("OQS_CODEPOINT_HQC256"))
+-        oqs_group_list[51].group_id = atoi(getenv("OQS_CODEPOINT_HQC256"));
++        oqs_group_list[41].group_id = atoi(getenv("OQS_CODEPOINT_HQC256"));
+     if (getenv("OQS_CODEPOINT_P521_HQC256"))
+-        oqs_group_list[52].group_id = atoi(getenv("OQS_CODEPOINT_P521_HQC256"));
++        oqs_group_list[42].group_id = atoi(getenv("OQS_CODEPOINT_P521_HQC256"));
+ 
+-    if (getenv("OQS_CODEPOINT_DILITHIUM2"))
+-        oqs_sigalg_list[0].code_point =
+-            atoi(getenv("OQS_CODEPOINT_DILITHIUM2"));
+-    if (getenv("OQS_CODEPOINT_P256_DILITHIUM2"))
+-        oqs_sigalg_list[1].code_point =
+-            atoi(getenv("OQS_CODEPOINT_P256_DILITHIUM2"));
+-    if (getenv("OQS_CODEPOINT_RSA3072_DILITHIUM2"))
+-        oqs_sigalg_list[2].code_point =
+-            atoi(getenv("OQS_CODEPOINT_RSA3072_DILITHIUM2"));
+-    if (getenv("OQS_CODEPOINT_DILITHIUM3"))
+-        oqs_sigalg_list[3].code_point =
+-            atoi(getenv("OQS_CODEPOINT_DILITHIUM3"));
+-    if (getenv("OQS_CODEPOINT_P384_DILITHIUM3"))
+-        oqs_sigalg_list[4].code_point =
+-            atoi(getenv("OQS_CODEPOINT_P384_DILITHIUM3"));
+-    if (getenv("OQS_CODEPOINT_DILITHIUM5"))
+-        oqs_sigalg_list[5].code_point =
+-            atoi(getenv("OQS_CODEPOINT_DILITHIUM5"));
+-    if (getenv("OQS_CODEPOINT_P521_DILITHIUM5"))
+-        oqs_sigalg_list[6].code_point =
+-            atoi(getenv("OQS_CODEPOINT_P521_DILITHIUM5"));
+     if (getenv("OQS_CODEPOINT_MLDSA44"))
+-        oqs_sigalg_list[7].code_point = atoi(getenv("OQS_CODEPOINT_MLDSA44"));
++        oqs_sigalg_list[0].code_point = atoi(getenv("OQS_CODEPOINT_MLDSA44"));
+     if (getenv("OQS_CODEPOINT_P256_MLDSA44"))
+-        oqs_sigalg_list[8].code_point =
++        oqs_sigalg_list[1].code_point =
+             atoi(getenv("OQS_CODEPOINT_P256_MLDSA44"));
+     if (getenv("OQS_CODEPOINT_RSA3072_MLDSA44"))
+-        oqs_sigalg_list[9].code_point =
++        oqs_sigalg_list[2].code_point =
+             atoi(getenv("OQS_CODEPOINT_RSA3072_MLDSA44"));
+     if (getenv("OQS_CODEPOINT_MLDSA44_PSS2048"))
+-        oqs_sigalg_list[10].code_point =
++        oqs_sigalg_list[3].code_point =
+             atoi(getenv("OQS_CODEPOINT_MLDSA44_PSS2048"));
+     if (getenv("OQS_CODEPOINT_MLDSA44_RSA2048"))
+-        oqs_sigalg_list[11].code_point =
++        oqs_sigalg_list[4].code_point =
+             atoi(getenv("OQS_CODEPOINT_MLDSA44_RSA2048"));
+     if (getenv("OQS_CODEPOINT_MLDSA44_ED25519"))
+-        oqs_sigalg_list[12].code_point =
++        oqs_sigalg_list[5].code_point =
+             atoi(getenv("OQS_CODEPOINT_MLDSA44_ED25519"));
+     if (getenv("OQS_CODEPOINT_MLDSA44_P256"))
+-        oqs_sigalg_list[13].code_point =
++        oqs_sigalg_list[6].code_point =
+             atoi(getenv("OQS_CODEPOINT_MLDSA44_P256"));
+     if (getenv("OQS_CODEPOINT_MLDSA44_BP256"))
+-        oqs_sigalg_list[14].code_point =
++        oqs_sigalg_list[7].code_point =
+             atoi(getenv("OQS_CODEPOINT_MLDSA44_BP256"));
+     if (getenv("OQS_CODEPOINT_MLDSA65"))
+-        oqs_sigalg_list[15].code_point = atoi(getenv("OQS_CODEPOINT_MLDSA65"));
++        oqs_sigalg_list[8].code_point = atoi(getenv("OQS_CODEPOINT_MLDSA65"));
+     if (getenv("OQS_CODEPOINT_P384_MLDSA65"))
+-        oqs_sigalg_list[16].code_point =
++        oqs_sigalg_list[9].code_point =
+             atoi(getenv("OQS_CODEPOINT_P384_MLDSA65"));
+     if (getenv("OQS_CODEPOINT_MLDSA65_PSS3072"))
+-        oqs_sigalg_list[17].code_point =
++        oqs_sigalg_list[10].code_point =
+             atoi(getenv("OQS_CODEPOINT_MLDSA65_PSS3072"));
+     if (getenv("OQS_CODEPOINT_MLDSA65_RSA3072"))
+-        oqs_sigalg_list[18].code_point =
++        oqs_sigalg_list[11].code_point =
+             atoi(getenv("OQS_CODEPOINT_MLDSA65_RSA3072"));
+     if (getenv("OQS_CODEPOINT_MLDSA65_P256"))
+-        oqs_sigalg_list[19].code_point =
++        oqs_sigalg_list[12].code_point =
+             atoi(getenv("OQS_CODEPOINT_MLDSA65_P256"));
+     if (getenv("OQS_CODEPOINT_MLDSA65_BP256"))
+-        oqs_sigalg_list[20].code_point =
++        oqs_sigalg_list[13].code_point =
+             atoi(getenv("OQS_CODEPOINT_MLDSA65_BP256"));
+     if (getenv("OQS_CODEPOINT_MLDSA65_ED25519"))
+-        oqs_sigalg_list[21].code_point =
++        oqs_sigalg_list[14].code_point =
+             atoi(getenv("OQS_CODEPOINT_MLDSA65_ED25519"));
+     if (getenv("OQS_CODEPOINT_MLDSA87"))
+-        oqs_sigalg_list[22].code_point = atoi(getenv("OQS_CODEPOINT_MLDSA87"));
++        oqs_sigalg_list[15].code_point = atoi(getenv("OQS_CODEPOINT_MLDSA87"));
+     if (getenv("OQS_CODEPOINT_P521_MLDSA87"))
+-        oqs_sigalg_list[23].code_point =
++        oqs_sigalg_list[16].code_point =
+             atoi(getenv("OQS_CODEPOINT_P521_MLDSA87"));
+     if (getenv("OQS_CODEPOINT_MLDSA87_P384"))
+-        oqs_sigalg_list[24].code_point =
++        oqs_sigalg_list[17].code_point =
+             atoi(getenv("OQS_CODEPOINT_MLDSA87_P384"));
+     if (getenv("OQS_CODEPOINT_MLDSA87_BP384"))
+-        oqs_sigalg_list[25].code_point =
++        oqs_sigalg_list[18].code_point =
+             atoi(getenv("OQS_CODEPOINT_MLDSA87_BP384"));
+     if (getenv("OQS_CODEPOINT_MLDSA87_ED448"))
+-        oqs_sigalg_list[26].code_point =
++        oqs_sigalg_list[19].code_point =
+             atoi(getenv("OQS_CODEPOINT_MLDSA87_ED448"));
+     if (getenv("OQS_CODEPOINT_FALCON512"))
+-        oqs_sigalg_list[27].code_point =
++        oqs_sigalg_list[20].code_point =
+             atoi(getenv("OQS_CODEPOINT_FALCON512"));
+     if (getenv("OQS_CODEPOINT_P256_FALCON512"))
+-        oqs_sigalg_list[28].code_point =
++        oqs_sigalg_list[21].code_point =
+             atoi(getenv("OQS_CODEPOINT_P256_FALCON512"));
+     if (getenv("OQS_CODEPOINT_RSA3072_FALCON512"))
+-        oqs_sigalg_list[29].code_point =
++        oqs_sigalg_list[22].code_point =
+             atoi(getenv("OQS_CODEPOINT_RSA3072_FALCON512"));
+     if (getenv("OQS_CODEPOINT_FALCONPADDED512"))
+-        oqs_sigalg_list[30].code_point =
++        oqs_sigalg_list[23].code_point =
+             atoi(getenv("OQS_CODEPOINT_FALCONPADDED512"));
+     if (getenv("OQS_CODEPOINT_P256_FALCONPADDED512"))
+-        oqs_sigalg_list[31].code_point =
++        oqs_sigalg_list[24].code_point =
+             atoi(getenv("OQS_CODEPOINT_P256_FALCONPADDED512"));
+     if (getenv("OQS_CODEPOINT_RSA3072_FALCONPADDED512"))
+-        oqs_sigalg_list[32].code_point =
++        oqs_sigalg_list[25].code_point =
+             atoi(getenv("OQS_CODEPOINT_RSA3072_FALCONPADDED512"));
+     if (getenv("OQS_CODEPOINT_FALCON1024"))
+-        oqs_sigalg_list[33].code_point =
++        oqs_sigalg_list[26].code_point =
+             atoi(getenv("OQS_CODEPOINT_FALCON1024"));
+     if (getenv("OQS_CODEPOINT_P521_FALCON1024"))
+-        oqs_sigalg_list[34].code_point =
++        oqs_sigalg_list[27].code_point =
+             atoi(getenv("OQS_CODEPOINT_P521_FALCON1024"));
+     if (getenv("OQS_CODEPOINT_FALCONPADDED1024"))
+-        oqs_sigalg_list[35].code_point =
++        oqs_sigalg_list[28].code_point =
+             atoi(getenv("OQS_CODEPOINT_FALCONPADDED1024"));
+     if (getenv("OQS_CODEPOINT_P521_FALCONPADDED1024"))
+-        oqs_sigalg_list[36].code_point =
++        oqs_sigalg_list[29].code_point =
+             atoi(getenv("OQS_CODEPOINT_P521_FALCONPADDED1024"));
+     if (getenv("OQS_CODEPOINT_SPHINCSSHA2128FSIMPLE"))
+-        oqs_sigalg_list[37].code_point =
++        oqs_sigalg_list[30].code_point =
+             atoi(getenv("OQS_CODEPOINT_SPHINCSSHA2128FSIMPLE"));
+     if (getenv("OQS_CODEPOINT_P256_SPHINCSSHA2128FSIMPLE"))
+-        oqs_sigalg_list[38].code_point =
++        oqs_sigalg_list[31].code_point =
+             atoi(getenv("OQS_CODEPOINT_P256_SPHINCSSHA2128FSIMPLE"));
+     if (getenv("OQS_CODEPOINT_RSA3072_SPHINCSSHA2128FSIMPLE"))
+-        oqs_sigalg_list[39].code_point =
++        oqs_sigalg_list[32].code_point =
+             atoi(getenv("OQS_CODEPOINT_RSA3072_SPHINCSSHA2128FSIMPLE"));
+     if (getenv("OQS_CODEPOINT_SPHINCSSHA2128SSIMPLE"))
+-        oqs_sigalg_list[40].code_point =
++        oqs_sigalg_list[33].code_point =
+             atoi(getenv("OQS_CODEPOINT_SPHINCSSHA2128SSIMPLE"));
+     if (getenv("OQS_CODEPOINT_P256_SPHINCSSHA2128SSIMPLE"))
+-        oqs_sigalg_list[41].code_point =
++        oqs_sigalg_list[34].code_point =
+             atoi(getenv("OQS_CODEPOINT_P256_SPHINCSSHA2128SSIMPLE"));
+     if (getenv("OQS_CODEPOINT_RSA3072_SPHINCSSHA2128SSIMPLE"))
+-        oqs_sigalg_list[42].code_point =
++        oqs_sigalg_list[35].code_point =
+             atoi(getenv("OQS_CODEPOINT_RSA3072_SPHINCSSHA2128SSIMPLE"));
+     if (getenv("OQS_CODEPOINT_SPHINCSSHA2192FSIMPLE"))
+-        oqs_sigalg_list[43].code_point =
++        oqs_sigalg_list[36].code_point =
+             atoi(getenv("OQS_CODEPOINT_SPHINCSSHA2192FSIMPLE"));
+     if (getenv("OQS_CODEPOINT_P384_SPHINCSSHA2192FSIMPLE"))
+-        oqs_sigalg_list[44].code_point =
++        oqs_sigalg_list[37].code_point =
+             atoi(getenv("OQS_CODEPOINT_P384_SPHINCSSHA2192FSIMPLE"));
+     if (getenv("OQS_CODEPOINT_SPHINCSSHAKE128FSIMPLE"))
+-        oqs_sigalg_list[45].code_point =
++        oqs_sigalg_list[38].code_point =
+             atoi(getenv("OQS_CODEPOINT_SPHINCSSHAKE128FSIMPLE"));
+     if (getenv("OQS_CODEPOINT_P256_SPHINCSSHAKE128FSIMPLE"))
+-        oqs_sigalg_list[46].code_point =
++        oqs_sigalg_list[39].code_point =
+             atoi(getenv("OQS_CODEPOINT_P256_SPHINCSSHAKE128FSIMPLE"));
+     if (getenv("OQS_CODEPOINT_RSA3072_SPHINCSSHAKE128FSIMPLE"))
+-        oqs_sigalg_list[47].code_point =
++        oqs_sigalg_list[40].code_point =
+             atoi(getenv("OQS_CODEPOINT_RSA3072_SPHINCSSHAKE128FSIMPLE"));
+     if (getenv("OQS_CODEPOINT_MAYO1"))
+-        oqs_sigalg_list[48].code_point = atoi(getenv("OQS_CODEPOINT_MAYO1"));
++        oqs_sigalg_list[41].code_point = atoi(getenv("OQS_CODEPOINT_MAYO1"));
+     if (getenv("OQS_CODEPOINT_P256_MAYO1"))
+-        oqs_sigalg_list[49].code_point =
++        oqs_sigalg_list[42].code_point =
+             atoi(getenv("OQS_CODEPOINT_P256_MAYO1"));
+     if (getenv("OQS_CODEPOINT_MAYO2"))
+-        oqs_sigalg_list[50].code_point = atoi(getenv("OQS_CODEPOINT_MAYO2"));
++        oqs_sigalg_list[43].code_point = atoi(getenv("OQS_CODEPOINT_MAYO2"));
+     if (getenv("OQS_CODEPOINT_P256_MAYO2"))
+-        oqs_sigalg_list[51].code_point =
++        oqs_sigalg_list[44].code_point =
+             atoi(getenv("OQS_CODEPOINT_P256_MAYO2"));
+     if (getenv("OQS_CODEPOINT_MAYO3"))
+-        oqs_sigalg_list[52].code_point = atoi(getenv("OQS_CODEPOINT_MAYO3"));
++        oqs_sigalg_list[45].code_point = atoi(getenv("OQS_CODEPOINT_MAYO3"));
+     if (getenv("OQS_CODEPOINT_P384_MAYO3"))
+-        oqs_sigalg_list[53].code_point =
++        oqs_sigalg_list[46].code_point =
+             atoi(getenv("OQS_CODEPOINT_P384_MAYO3"));
+     if (getenv("OQS_CODEPOINT_MAYO5"))
+-        oqs_sigalg_list[54].code_point = atoi(getenv("OQS_CODEPOINT_MAYO5"));
++        oqs_sigalg_list[47].code_point = atoi(getenv("OQS_CODEPOINT_MAYO5"));
+     if (getenv("OQS_CODEPOINT_P521_MAYO5"))
+-        oqs_sigalg_list[55].code_point =
++        oqs_sigalg_list[48].code_point =
+             atoi(getenv("OQS_CODEPOINT_P521_MAYO5"));
+     if (getenv("OQS_CODEPOINT_CROSSRSDP128BALANCED"))
+-        oqs_sigalg_list[56].code_point =
++        oqs_sigalg_list[49].code_point =
+             atoi(getenv("OQS_CODEPOINT_CROSSRSDP128BALANCED"));
+     ///// OQS_TEMPLATE_FRAGMENT_CODEPOINT_PATCHING_END
+     return 1;
+@@ -644,147 +560,127 @@ static int oqs_group_capability(OSSL_CALLBACK *cb, void *arg) {
+ 
+ static const OSSL_PARAM oqs_param_sigalg_list[][12] = {
+ ///// OQS_TEMPLATE_FRAGMENT_SIGALG_NAMES_START
+-#ifdef OQS_ENABLE_SIG_dilithium_2
+-    OQS_SIGALG_ENTRY(dilithium2, dilithium2, dilithium2,
+-                     "1.3.6.1.4.1.2.267.7.4.4", 0),
+-    OQS_SIGALG_ENTRY(p256_dilithium2, p256_dilithium2, p256_dilithium2,
+-                     "1.3.9999.2.7.1", 1),
+-    OQS_SIGALG_ENTRY(rsa3072_dilithium2, rsa3072_dilithium2, rsa3072_dilithium2,
+-                     "1.3.9999.2.7.2", 2),
+-#endif
+-#ifdef OQS_ENABLE_SIG_dilithium_3
+-    OQS_SIGALG_ENTRY(dilithium3, dilithium3, dilithium3,
+-                     "1.3.6.1.4.1.2.267.7.6.5", 3),
+-    OQS_SIGALG_ENTRY(p384_dilithium3, p384_dilithium3, p384_dilithium3,
+-                     "1.3.9999.2.7.3", 4),
+-#endif
+-#ifdef OQS_ENABLE_SIG_dilithium_5
+-    OQS_SIGALG_ENTRY(dilithium5, dilithium5, dilithium5,
+-                     "1.3.6.1.4.1.2.267.7.8.7", 5),
+-    OQS_SIGALG_ENTRY(p521_dilithium5, p521_dilithium5, p521_dilithium5,
+-                     "1.3.9999.2.7.4", 6),
+-#endif
+ #ifdef OQS_ENABLE_SIG_ml_dsa_44
+-    OQS_SIGALG_ENTRY(mldsa44, mldsa44, mldsa44, "2.16.840.1.101.3.4.3.17", 7),
++    OQS_SIGALG_ENTRY(mldsa44, mldsa44, mldsa44, "2.16.840.1.101.3.4.3.17", 0),
+     OQS_SIGALG_ENTRY(p256_mldsa44, p256_mldsa44, p256_mldsa44, "1.3.9999.7.5",
+-                     8),
++                     1),
+     OQS_SIGALG_ENTRY(rsa3072_mldsa44, rsa3072_mldsa44, rsa3072_mldsa44,
+-                     "1.3.9999.7.6", 9),
++                     "1.3.9999.7.6", 2),
+     OQS_SIGALG_ENTRY(mldsa44_pss2048, mldsa44_pss2048, mldsa44_pss2048,
+-                     "2.16.840.1.114027.80.8.1.1", 10),
++                     "2.16.840.1.114027.80.8.1.1", 3),
+     OQS_SIGALG_ENTRY(mldsa44_rsa2048, mldsa44_rsa2048, mldsa44_rsa2048,
+-                     "2.16.840.1.114027.80.8.1.2", 11),
++                     "2.16.840.1.114027.80.8.1.2", 4),
+     OQS_SIGALG_ENTRY(mldsa44_ed25519, mldsa44_ed25519, mldsa44_ed25519,
+-                     "2.16.840.1.114027.80.8.1.3", 12),
++                     "2.16.840.1.114027.80.8.1.3", 5),
+     OQS_SIGALG_ENTRY(mldsa44_p256, mldsa44_p256, mldsa44_p256,
+-                     "2.16.840.1.114027.80.8.1.4", 13),
++                     "2.16.840.1.114027.80.8.1.4", 6),
+     OQS_SIGALG_ENTRY(mldsa44_bp256, mldsa44_bp256, mldsa44_bp256,
+-                     "2.16.840.1.114027.80.8.1.5", 14),
++                     "2.16.840.1.114027.80.8.1.5", 7),
+ #endif
+ #ifdef OQS_ENABLE_SIG_ml_dsa_65
+-    OQS_SIGALG_ENTRY(mldsa65, mldsa65, mldsa65, "2.16.840.1.101.3.4.3.18", 15),
++    OQS_SIGALG_ENTRY(mldsa65, mldsa65, mldsa65, "2.16.840.1.101.3.4.3.18", 8),
+     OQS_SIGALG_ENTRY(p384_mldsa65, p384_mldsa65, p384_mldsa65, "1.3.9999.7.7",
+-                     16),
++                     9),
+     OQS_SIGALG_ENTRY(mldsa65_pss3072, mldsa65_pss3072, mldsa65_pss3072,
+-                     "2.16.840.1.114027.80.8.1.6", 17),
++                     "2.16.840.1.114027.80.8.1.6", 10),
+     OQS_SIGALG_ENTRY(mldsa65_rsa3072, mldsa65_rsa3072, mldsa65_rsa3072,
+-                     "2.16.840.1.114027.80.8.1.7", 18),
++                     "2.16.840.1.114027.80.8.1.7", 11),
+     OQS_SIGALG_ENTRY(mldsa65_p256, mldsa65_p256, mldsa65_p256,
+-                     "2.16.840.1.114027.80.8.1.8", 19),
++                     "2.16.840.1.114027.80.8.1.8", 12),
+     OQS_SIGALG_ENTRY(mldsa65_bp256, mldsa65_bp256, mldsa65_bp256,
+-                     "2.16.840.1.114027.80.8.1.9", 20),
++                     "2.16.840.1.114027.80.8.1.9", 13),
+     OQS_SIGALG_ENTRY(mldsa65_ed25519, mldsa65_ed25519, mldsa65_ed25519,
+-                     "2.16.840.1.114027.80.8.1.10", 21),
++                     "2.16.840.1.114027.80.8.1.10", 14),
+ #endif
+ #ifdef OQS_ENABLE_SIG_ml_dsa_87
+-    OQS_SIGALG_ENTRY(mldsa87, mldsa87, mldsa87, "2.16.840.1.101.3.4.3.19", 22),
++    OQS_SIGALG_ENTRY(mldsa87, mldsa87, mldsa87, "2.16.840.1.101.3.4.3.19", 15),
+     OQS_SIGALG_ENTRY(p521_mldsa87, p521_mldsa87, p521_mldsa87, "1.3.9999.7.8",
+-                     23),
++                     16),
+     OQS_SIGALG_ENTRY(mldsa87_p384, mldsa87_p384, mldsa87_p384,
+-                     "2.16.840.1.114027.80.8.1.11", 24),
++                     "2.16.840.1.114027.80.8.1.11", 17),
+     OQS_SIGALG_ENTRY(mldsa87_bp384, mldsa87_bp384, mldsa87_bp384,
+-                     "2.16.840.1.114027.80.8.1.12", 25),
++                     "2.16.840.1.114027.80.8.1.12", 18),
+     OQS_SIGALG_ENTRY(mldsa87_ed448, mldsa87_ed448, mldsa87_ed448,
+-                     "2.16.840.1.114027.80.8.1.13", 26),
++                     "2.16.840.1.114027.80.8.1.13", 19),
+ #endif
+ #ifdef OQS_ENABLE_SIG_falcon_512
+-    OQS_SIGALG_ENTRY(falcon512, falcon512, falcon512, "1.3.9999.3.11", 27),
++    OQS_SIGALG_ENTRY(falcon512, falcon512, falcon512, "1.3.9999.3.11", 20),
+     OQS_SIGALG_ENTRY(p256_falcon512, p256_falcon512, p256_falcon512,
+-                     "1.3.9999.3.12", 28),
++                     "1.3.9999.3.12", 21),
+     OQS_SIGALG_ENTRY(rsa3072_falcon512, rsa3072_falcon512, rsa3072_falcon512,
+-                     "1.3.9999.3.13", 29),
++                     "1.3.9999.3.13", 22),
+ #endif
+ #ifdef OQS_ENABLE_SIG_falcon_padded_512
+     OQS_SIGALG_ENTRY(falconpadded512, falconpadded512, falconpadded512,
+-                     "1.3.9999.3.16", 30),
++                     "1.3.9999.3.16", 23),
+     OQS_SIGALG_ENTRY(p256_falconpadded512, p256_falconpadded512,
+-                     p256_falconpadded512, "1.3.9999.3.17", 31),
++                     p256_falconpadded512, "1.3.9999.3.17", 24),
+     OQS_SIGALG_ENTRY(rsa3072_falconpadded512, rsa3072_falconpadded512,
+-                     rsa3072_falconpadded512, "1.3.9999.3.18", 32),
++                     rsa3072_falconpadded512, "1.3.9999.3.18", 25),
+ #endif
+ #ifdef OQS_ENABLE_SIG_falcon_1024
+-    OQS_SIGALG_ENTRY(falcon1024, falcon1024, falcon1024, "1.3.9999.3.14", 33),
++    OQS_SIGALG_ENTRY(falcon1024, falcon1024, falcon1024, "1.3.9999.3.14", 26),
+     OQS_SIGALG_ENTRY(p521_falcon1024, p521_falcon1024, p521_falcon1024,
+-                     "1.3.9999.3.15", 34),
++                     "1.3.9999.3.15", 27),
+ #endif
+ #ifdef OQS_ENABLE_SIG_falcon_padded_1024
+     OQS_SIGALG_ENTRY(falconpadded1024, falconpadded1024, falconpadded1024,
+-                     "1.3.9999.3.19", 35),
++                     "1.3.9999.3.19", 28),
+     OQS_SIGALG_ENTRY(p521_falconpadded1024, p521_falconpadded1024,
+-                     p521_falconpadded1024, "1.3.9999.3.20", 36),
++                     p521_falconpadded1024, "1.3.9999.3.20", 29),
+ #endif
+ #ifdef OQS_ENABLE_SIG_sphincs_sha2_128f_simple
+     OQS_SIGALG_ENTRY(sphincssha2128fsimple, sphincssha2128fsimple,
+-                     sphincssha2128fsimple, "1.3.9999.6.4.13", 37),
++                     sphincssha2128fsimple, "1.3.9999.6.4.13", 30),
+     OQS_SIGALG_ENTRY(p256_sphincssha2128fsimple, p256_sphincssha2128fsimple,
+-                     p256_sphincssha2128fsimple, "1.3.9999.6.4.14", 38),
++                     p256_sphincssha2128fsimple, "1.3.9999.6.4.14", 31),
+     OQS_SIGALG_ENTRY(rsa3072_sphincssha2128fsimple,
+                      rsa3072_sphincssha2128fsimple,
+-                     rsa3072_sphincssha2128fsimple, "1.3.9999.6.4.15", 39),
++                     rsa3072_sphincssha2128fsimple, "1.3.9999.6.4.15", 32),
+ #endif
+ #ifdef OQS_ENABLE_SIG_sphincs_sha2_128s_simple
+     OQS_SIGALG_ENTRY(sphincssha2128ssimple, sphincssha2128ssimple,
+-                     sphincssha2128ssimple, "1.3.9999.6.4.16", 40),
++                     sphincssha2128ssimple, "1.3.9999.6.4.16", 33),
+     OQS_SIGALG_ENTRY(p256_sphincssha2128ssimple, p256_sphincssha2128ssimple,
+-                     p256_sphincssha2128ssimple, "1.3.9999.6.4.17", 41),
++                     p256_sphincssha2128ssimple, "1.3.9999.6.4.17", 34),
+     OQS_SIGALG_ENTRY(rsa3072_sphincssha2128ssimple,
+                      rsa3072_sphincssha2128ssimple,
+-                     rsa3072_sphincssha2128ssimple, "1.3.9999.6.4.18", 42),
++                     rsa3072_sphincssha2128ssimple, "1.3.9999.6.4.18", 35),
+ #endif
+ #ifdef OQS_ENABLE_SIG_sphincs_sha2_192f_simple
+     OQS_SIGALG_ENTRY(sphincssha2192fsimple, sphincssha2192fsimple,
+-                     sphincssha2192fsimple, "1.3.9999.6.5.10", 43),
++                     sphincssha2192fsimple, "1.3.9999.6.5.10", 36),
+     OQS_SIGALG_ENTRY(p384_sphincssha2192fsimple, p384_sphincssha2192fsimple,
+-                     p384_sphincssha2192fsimple, "1.3.9999.6.5.11", 44),
++                     p384_sphincssha2192fsimple, "1.3.9999.6.5.11", 37),
+ #endif
+ #ifdef OQS_ENABLE_SIG_sphincs_shake_128f_simple
+     OQS_SIGALG_ENTRY(sphincsshake128fsimple, sphincsshake128fsimple,
+-                     sphincsshake128fsimple, "1.3.9999.6.7.13", 45),
++                     sphincsshake128fsimple, "1.3.9999.6.7.13", 38),
+     OQS_SIGALG_ENTRY(p256_sphincsshake128fsimple, p256_sphincsshake128fsimple,
+-                     p256_sphincsshake128fsimple, "1.3.9999.6.7.14", 46),
++                     p256_sphincsshake128fsimple, "1.3.9999.6.7.14", 39),
+     OQS_SIGALG_ENTRY(rsa3072_sphincsshake128fsimple,
+                      rsa3072_sphincsshake128fsimple,
+-                     rsa3072_sphincsshake128fsimple, "1.3.9999.6.7.15", 47),
++                     rsa3072_sphincsshake128fsimple, "1.3.9999.6.7.15", 40),
+ #endif
+ #ifdef OQS_ENABLE_SIG_mayo_1
+-    OQS_SIGALG_ENTRY(mayo1, mayo1, mayo1, "1.3.9999.8.1.1", 48),
+-    OQS_SIGALG_ENTRY(p256_mayo1, p256_mayo1, p256_mayo1, "1.3.9999.8.1.2", 49),
++    OQS_SIGALG_ENTRY(mayo1, mayo1, mayo1, "1.3.9999.8.1.1", 41),
++    OQS_SIGALG_ENTRY(p256_mayo1, p256_mayo1, p256_mayo1, "1.3.9999.8.1.2", 42),
+ #endif
+ #ifdef OQS_ENABLE_SIG_mayo_2
+-    OQS_SIGALG_ENTRY(mayo2, mayo2, mayo2, "1.3.9999.8.2.1", 50),
+-    OQS_SIGALG_ENTRY(p256_mayo2, p256_mayo2, p256_mayo2, "1.3.9999.8.2.2", 51),
++    OQS_SIGALG_ENTRY(mayo2, mayo2, mayo2, "1.3.9999.8.2.1", 43),
++    OQS_SIGALG_ENTRY(p256_mayo2, p256_mayo2, p256_mayo2, "1.3.9999.8.2.2", 44),
+ #endif
+ #ifdef OQS_ENABLE_SIG_mayo_3
+-    OQS_SIGALG_ENTRY(mayo3, mayo3, mayo3, "1.3.9999.8.3.1", 52),
+-    OQS_SIGALG_ENTRY(p384_mayo3, p384_mayo3, p384_mayo3, "1.3.9999.8.3.2", 53),
++    OQS_SIGALG_ENTRY(mayo3, mayo3, mayo3, "1.3.9999.8.3.1", 45),
++    OQS_SIGALG_ENTRY(p384_mayo3, p384_mayo3, p384_mayo3, "1.3.9999.8.3.2", 46),
+ #endif
+ #ifdef OQS_ENABLE_SIG_mayo_5
+-    OQS_SIGALG_ENTRY(mayo5, mayo5, mayo5, "1.3.9999.8.5.1", 54),
+-    OQS_SIGALG_ENTRY(p521_mayo5, p521_mayo5, p521_mayo5, "1.3.9999.8.5.2", 55),
++    OQS_SIGALG_ENTRY(mayo5, mayo5, mayo5, "1.3.9999.8.5.1", 47),
++    OQS_SIGALG_ENTRY(p521_mayo5, p521_mayo5, p521_mayo5, "1.3.9999.8.5.2", 48),
+ #endif
+ #ifdef OQS_ENABLE_SIG_cross_rsdp_128_balanced
+     OQS_SIGALG_ENTRY(CROSSrsdp128balanced, CROSSrsdp128balanced,
+-                     CROSSrsdp128balanced, "1.3.6.1.4.1.62245.2.1.1", 56),
++                     CROSSrsdp128balanced, "1.3.6.1.4.1.62245.2.1.1", 49),
+ #endif
+     ///// OQS_TEMPLATE_FRAGMENT_SIGALG_NAMES_END
+ };
+diff --git a/oqsprov/oqsprov_keys.c b/oqsprov/oqsprov_keys.c
+index 6b8bfd25..60082833 100644
+--- a/oqsprov/oqsprov_keys.c
++++ b/oqsprov/oqsprov_keys.c
+@@ -53,9 +53,9 @@ static int oqsx_key_recreate_classickey(OQSX_KEY *key, oqsx_key_op_t op);
+ ///// OQS_TEMPLATE_FRAGMENT_OQSNAMES_START
+ 
+ #ifdef OQS_KEM_ENCODERS
+-#define NID_TABLE_LEN 110
++#define NID_TABLE_LEN 93
+ #else
+-#define NID_TABLE_LEN 57
++#define NID_TABLE_LEN 50
+ #endif
+ 
+ static oqs_nid_name_t nid_names[NID_TABLE_LEN] = {
+@@ -88,16 +88,6 @@ static oqs_nid_name_t nid_names[NID_TABLE_LEN] = {
+      0},
+     {0, "p521_frodo1344shake", OQS_KEM_alg_frodokem_1344_shake,
+      KEY_TYPE_ECP_HYB_KEM, 256, 0},
+-    {0, "kyber512", OQS_KEM_alg_kyber_512, KEY_TYPE_KEM, 128, 0},
+-    {0, "p256_kyber512", OQS_KEM_alg_kyber_512, KEY_TYPE_ECP_HYB_KEM, 128, 0},
+-    {0, "x25519_kyber512", OQS_KEM_alg_kyber_512, KEY_TYPE_ECX_HYB_KEM, 128, 0},
+-    {0, "kyber768", OQS_KEM_alg_kyber_768, KEY_TYPE_KEM, 192, 0},
+-    {0, "p384_kyber768", OQS_KEM_alg_kyber_768, KEY_TYPE_ECP_HYB_KEM, 192, 0},
+-    {0, "x448_kyber768", OQS_KEM_alg_kyber_768, KEY_TYPE_ECX_HYB_KEM, 192, 0},
+-    {0, "x25519_kyber768", OQS_KEM_alg_kyber_768, KEY_TYPE_ECX_HYB_KEM, 192, 0},
+-    {0, "p256_kyber768", OQS_KEM_alg_kyber_768, KEY_TYPE_ECP_HYB_KEM, 192, 0},
+-    {0, "kyber1024", OQS_KEM_alg_kyber_1024, KEY_TYPE_KEM, 256, 0},
+-    {0, "p521_kyber1024", OQS_KEM_alg_kyber_1024, KEY_TYPE_ECP_HYB_KEM, 256, 0},
+     {0, "mlkem512", OQS_KEM_alg_ml_kem_512, KEY_TYPE_KEM, 128, 0},
+     {0, "p256_mlkem512", OQS_KEM_alg_ml_kem_512, KEY_TYPE_ECP_HYB_KEM, 128, 0},
+     {0, "x25519_mlkem512", OQS_KEM_alg_ml_kem_512, KEY_TYPE_ECX_HYB_KEM, 128,
+@@ -131,13 +121,6 @@ static oqs_nid_name_t nid_names[NID_TABLE_LEN] = {
+     {0, "p521_hqc256", OQS_KEM_alg_hqc_256, KEY_TYPE_ECP_HYB_KEM, 256, 0},
+ 
+ #endif /* OQS_KEM_ENCODERS */
+-    {0, "dilithium2", OQS_SIG_alg_dilithium_2, KEY_TYPE_SIG, 128},
+-    {0, "p256_dilithium2", OQS_SIG_alg_dilithium_2, KEY_TYPE_HYB_SIG, 128},
+-    {0, "rsa3072_dilithium2", OQS_SIG_alg_dilithium_2, KEY_TYPE_HYB_SIG, 128},
+-    {0, "dilithium3", OQS_SIG_alg_dilithium_3, KEY_TYPE_SIG, 192},
+-    {0, "p384_dilithium3", OQS_SIG_alg_dilithium_3, KEY_TYPE_HYB_SIG, 192},
+-    {0, "dilithium5", OQS_SIG_alg_dilithium_5, KEY_TYPE_SIG, 256},
+-    {0, "p521_dilithium5", OQS_SIG_alg_dilithium_5, KEY_TYPE_HYB_SIG, 256},
+     {0, "mldsa44", OQS_SIG_alg_ml_dsa_44, KEY_TYPE_SIG, 128},
+     {0, "p256_mldsa44", OQS_SIG_alg_ml_dsa_44, KEY_TYPE_HYB_SIG, 128},
+     {0, "rsa3072_mldsa44", OQS_SIG_alg_ml_dsa_44, KEY_TYPE_HYB_SIG, 128},
+diff --git a/scripts/common.py b/scripts/common.py
+index b9cd6a8f..59b74c5a 100644
+--- a/scripts/common.py
++++ b/scripts/common.py
+@@ -7,18 +7,18 @@
+ key_exchanges = [
+ ##### OQS_TEMPLATE_FRAGMENT_KEX_ALGS_START
+     # post-quantum key exchanges
+-    'frodo640aes','frodo640shake','frodo976aes','frodo976shake','frodo1344aes','frodo1344shake','kyber512','kyber768','kyber1024','mlkem512','mlkem768','mlkem1024','bikel1','bikel3','bikel5','hqc128','hqc192','hqc256',
++    'frodo640aes','frodo640shake','frodo976aes','frodo976shake','frodo1344aes','frodo1344shake','mlkem512','mlkem768','mlkem1024','bikel1','bikel3','bikel5','hqc128','hqc192','hqc256',
+     # post-quantum + classical key exchanges
+-    'p256_frodo640aes','x25519_frodo640aes','p256_frodo640shake','x25519_frodo640shake','p384_frodo976aes','x448_frodo976aes','p384_frodo976shake','x448_frodo976shake','p521_frodo1344aes','p521_frodo1344shake','p256_kyber512','x25519_kyber512','p384_kyber768','x448_kyber768','x25519_kyber768','p256_kyber768','p521_kyber1024','p256_mlkem512','x25519_mlkem512','p384_mlkem768','x448_mlkem768','X25519MLKEM768','SecP256r1MLKEM768','p521_mlkem1024','p384_mlkem1024','p256_bikel1','x25519_bikel1','p384_bikel3','x448_bikel3','p521_bikel5','p256_hqc128','x25519_hqc128','p384_hqc192','x448_hqc192','p521_hqc256',
++    'p256_frodo640aes','x25519_frodo640aes','p256_frodo640shake','x25519_frodo640shake','p384_frodo976aes','x448_frodo976aes','p384_frodo976shake','x448_frodo976shake','p521_frodo1344aes','p521_frodo1344shake','p256_mlkem512','x25519_mlkem512','p384_mlkem768','x448_mlkem768','X25519MLKEM768','SecP256r1MLKEM768','p521_mlkem1024','p384_mlkem1024','p256_bikel1','x25519_bikel1','p384_bikel3','x448_bikel3','p521_bikel5','p256_hqc128','x25519_hqc128','p384_hqc192','x448_hqc192','p521_hqc256',
+ ##### OQS_TEMPLATE_FRAGMENT_KEX_ALGS_END
+ ]
+ signatures = [
+     'ecdsap256', 'rsa3072',
+ ##### OQS_TEMPLATE_FRAGMENT_SIG_ALGS_START
+     # post-quantum signatures
+-    'dilithium2','dilithium3','dilithium5','mldsa44','mldsa65','mldsa87','falcon512','falconpadded512','falcon1024','falconpadded1024','sphincssha2128fsimple','sphincssha2128ssimple','sphincssha2192fsimple','sphincsshake128fsimple','mayo1','mayo2','mayo3','mayo5','CROSSrsdp128balanced',
++    'mldsa44','mldsa65','mldsa87','falcon512','falconpadded512','falcon1024','falconpadded1024','sphincssha2128fsimple','sphincssha2128ssimple','sphincssha2192fsimple','sphincsshake128fsimple','mayo1','mayo2','mayo3','mayo5','CROSSrsdp128balanced',
+     # post-quantum + classical signatures
+-    'p256_dilithium2','rsa3072_dilithium2','p384_dilithium3','p521_dilithium5','p256_mldsa44','rsa3072_mldsa44','p384_mldsa65','p521_mldsa87','p256_falcon512','rsa3072_falcon512','p256_falconpadded512','rsa3072_falconpadded512','p521_falcon1024','p521_falconpadded1024','p256_sphincssha2128fsimple','rsa3072_sphincssha2128fsimple','p256_sphincssha2128ssimple','rsa3072_sphincssha2128ssimple','p384_sphincssha2192fsimple','p256_sphincsshake128fsimple','rsa3072_sphincsshake128fsimple','p256_mayo1','p256_mayo2','p384_mayo3','p521_mayo5',
++    'p256_mldsa44','rsa3072_mldsa44','p384_mldsa65','p521_mldsa87','p256_falcon512','rsa3072_falcon512','p256_falconpadded512','rsa3072_falconpadded512','p521_falcon1024','p521_falconpadded1024','p256_sphincssha2128fsimple','rsa3072_sphincssha2128fsimple','p256_sphincssha2128ssimple','rsa3072_sphincssha2128ssimple','p384_sphincssha2192fsimple','p256_sphincsshake128fsimple','rsa3072_sphincsshake128fsimple','p256_mayo1','p256_mayo2','p384_mayo3','p521_mayo5',
+     # post-quantum + classical signatures (COMPOSITE)
+     'mldsa44_pss2048','mldsa44_rsa2048','mldsa44_ed25519','mldsa44_p256','mldsa44_bp256','mldsa65_pss3072','mldsa65_rsa3072','mldsa65_p256','mldsa65_bp256','mldsa65_ed25519','mldsa87_p384','mldsa87_bp384','mldsa87_ed448',
+ ##### OQS_TEMPLATE_FRAGMENT_SIG_ALGS_END
+diff --git a/test/oqs_test_evp_pkey_params.c b/test/oqs_test_evp_pkey_params.c
+index fbb28135..c494ca13 100644
+--- a/test/oqs_test_evp_pkey_params.c
++++ b/test/oqs_test_evp_pkey_params.c
+@@ -17,10 +17,6 @@
+ 
+ /** \brief List of hybrid signature algorithms. */
+ const char *kHybridSignatureAlgorithms[] = {
+-    "p256_dilithium2",
+-    "rsa3072_dilithium2",
+-    "p384_dilithium3",
+-    "p521_dilithium5",
+     "p256_mldsa44",
+     "rsa3072_mldsa44",
+     "p384_mldsa65",
+@@ -64,18 +60,35 @@ const char *kCompositeSignatureAlgorithms[] = {
+ 
+ /** \brief List of hybrid KEMs. */
+ const char *kHybridKEMAlgorithms[] = {
+-    "p256_frodo640aes",     "x25519_frodo640aes", "p256_frodo640shake",
+-    "x25519_frodo640shake", "p384_frodo976aes",   "x448_frodo976aes",
+-    "p384_frodo976shake",   "x448_frodo976shake", "p521_frodo1344aes",
+-    "p521_frodo1344shake",  "p256_kyber512",      "x25519_kyber512",
+-    "p384_kyber768",        "x448_kyber768",      "x25519_kyber768",
+-    "p256_kyber768",        "p521_kyber1024",     "p256_mlkem512",
+-    "x25519_mlkem512",      "p384_mlkem768",      "x448_mlkem768",
+-    "X25519MLKEM768",       "SecP256r1MLKEM768",  "p521_mlkem1024",
+-    "p384_mlkem1024",       "p256_bikel1",        "x25519_bikel1",
+-    "p384_bikel3",          "x448_bikel3",        "p521_bikel5",
+-    "p256_hqc128",          "x25519_hqc128",      "p384_hqc192",
+-    "x448_hqc192",          "p521_hqc256",        NULL,
++    "p256_frodo640aes",
++    "x25519_frodo640aes",
++    "p256_frodo640shake",
++    "x25519_frodo640shake",
++    "p384_frodo976aes",
++    "x448_frodo976aes",
++    "p384_frodo976shake",
++    "x448_frodo976shake",
++    "p521_frodo1344aes",
++    "p521_frodo1344shake",
++    "p256_mlkem512",
++    "x25519_mlkem512",
++    "p384_mlkem768",
++    "x448_mlkem768",
++    "X25519MLKEM768",
++    "SecP256r1MLKEM768",
++    "p521_mlkem1024",
++    "p384_mlkem1024",
++    "p256_bikel1",
++    "x25519_bikel1",
++    "p384_bikel3",
++    "x448_bikel3",
++    "p521_bikel5",
++    "p256_hqc128",
++    "x25519_hqc128",
++    "p384_hqc192",
++    "x448_hqc192",
++    "p521_hqc256",
++    NULL,
+ }; ///// OQS_TEMPLATE_FRAGMENT_HYBRID_KEM_ALGS_END
+ 
+ /** \brief Indicates if a string is in a given list of strings.

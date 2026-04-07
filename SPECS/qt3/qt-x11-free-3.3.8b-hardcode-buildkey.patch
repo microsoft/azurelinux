@@ -1,0 +1,25 @@
+diff -ur qt-x11-free-3.3.8b/configure qt-x11-free-3.3.8b-hardcode-buildkey/configure
+--- qt-x11-free-3.3.8b/configure	2008-01-15 20:09:15.000000000 +0100
++++ qt-x11-free-3.3.8b-hardcode-buildkey/configure	2019-01-05 04:57:37.066254942 +0100
+@@ -3081,20 +3081,7 @@
+ g++*)
+     # GNU C++
+     QMAKE_CONF_COMPILER=`grep "QMAKE_CXX[^_A-Z0-9a-z]" $QMAKESPEC/qmake.conf | sed "s,.* *= *\(.*\)$,\1,"`
+-    COMPILER_VERSION=`${QMAKE_CONF_COMPILER} --version 2>/dev/null`
+-    case "$COMPILER_VERSION" in
+-    *2.95.*)
+-	COMPILER_VERSION="2.95.*"
+-	;;
+-    *3.*)
+-	COMPILER_VERSION="3.*"
+-	;;
+-    *4.*)
+-	COMPILER_VERSION="4"
+-	;;
+-    *)
+-	;;
+-    esac
++    COMPILER_VERSION="4.*"
+     [ ! -z "$COMPILER_VERSION" ] && COMPILER="g++-${COMPILER_VERSION}"
+     ;;
+ *)

@@ -1,0 +1,12 @@
+diff -up PyQt4_gpl_x11-4.12.3/qpy/QtCore/qpycore.pro.me PyQt4_gpl_x11-4.12.3/qpy/QtCore/qpycore.pro
+--- PyQt4_gpl_x11-4.12.3/qpy/QtCore/qpycore.pro.me	2022-05-03 11:52:14.219428197 +0200
++++ PyQt4_gpl_x11-4.12.3/qpy/QtCore/qpycore.pro	2022-05-03 11:53:13.692813387 +0200
+@@ -25,7 +25,7 @@ TEMPLATE    = lib
+ DEFINES     += QT_DISABLE_DEPRECATED_BEFORE=0x04ffff
+ 
+ # Python's type system relies on type punning.
+-!win32: QMAKE_CXXFLAGS += -fno-strict-aliasing
++!win32: QMAKE_CXXFLAGS += -fno-strict-aliasing -fpermissive
+ 
+ # This seems to be necessary for Qt v4.5.2.
+ win32: INCLUDEPATH += .

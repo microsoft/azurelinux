@@ -1,0 +1,33 @@
+From 6209ad3e1f8aa61b1e77636baf9d9fa18cbf65d1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Zbigniew=20J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>
+Date: Sat, 22 Mar 2025 12:27:32 +0100
+Subject: [PATCH] twp: add jxl, avif, and webp as allowed wallpaper mimemtypes
+
+Fedora wants to use jxl for wallpapers to reduce installation footprint
+(https://fedoraproject.org/wiki/Changes/SwitchToJXLforDefaultWallpaper).
+As discussed in https://pagure.io/fesco/issue/3376#comment-961826,
+we want thunar to allow jxl and the other newer graphics formats.
+---
+ plugins/thunar-wallpaper/twp-provider.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/plugins/thunar-wallpaper/twp-provider.c b/plugins/thunar-wallpaper/twp-provider.c
+index 5040fae5e..3b6f81489 100644
+--- a/plugins/thunar-wallpaper/twp-provider.c
++++ b/plugins/thunar-wallpaper/twp-provider.c
+@@ -149,8 +149,11 @@ twp_provider_get_file_menu_items (ThunarxMenuProvider *menu_provider,
+           mime_type = thunarx_file_info_get_mime_type (files->data);
+ 
+           if (g_str_has_prefix (mime_type, "image/")
+-              && (thunarx_file_info_has_mime_type (files->data, "image/jpeg")
++              && (thunarx_file_info_has_mime_type (files->data, "image/avif")
++                  || thunarx_file_info_has_mime_type (files->data, "image/jpeg")
++                  || thunarx_file_info_has_mime_type (files->data, "image/jxl")
+                   || thunarx_file_info_has_mime_type (files->data, "image/png")
++                  || thunarx_file_info_has_mime_type (files->data, "image/webp")
+                   || thunarx_file_info_has_mime_type (files->data, "image/svg+xml")
+                   || thunarx_file_info_has_mime_type (files->data, "image/svg+xml-compressed")))
+             {
+-- 
+GitLab
+

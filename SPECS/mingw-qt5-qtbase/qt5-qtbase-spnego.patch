@@ -1,0 +1,19 @@
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/src/network/kernel/qauthenticator.cpp qtbase-everywhere-src-5.15.18-new/src/network/kernel/qauthenticator.cpp
+--- qtbase-everywhere-src-5.15.18/src/network/kernel/qauthenticator.cpp	2025-06-05 16:07:26.000000000 +0200
++++ qtbase-everywhere-src-5.15.18-new/src/network/kernel/qauthenticator.cpp	2025-11-07 14:10:36.713434051 +0100
+@@ -603,11 +603,13 @@ QByteArray QAuthenticatorPrivate::calcul
+         break;
+     case QAuthenticatorPrivate::Negotiate:
+         methodString = "Negotiate";
+-        if (challenge.isEmpty()) {
+-            QByteArray phase1Token;
+ #if QT_CONFIG(sspi) // SSPI
++        if (challenge.isEmpty() || !sspiWindowsHandles) {
++            QByteArray phase1Token;
+             phase1Token = qSspiStartup(this, method, host);
+ #elif QT_CONFIG(gssapi) // GSSAPI
++        if (challenge.isEmpty() || !gssApiHandles) {
++            QByteArray phase1Token;
+             phase1Token = qGssapiStartup(this, host);
+ #endif
+ 

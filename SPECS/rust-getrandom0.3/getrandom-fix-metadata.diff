@@ -1,0 +1,21 @@
+--- getrandom-0.3.4/Cargo.toml	1970-01-01T00:00:01+00:00
++++ getrandom-0.3.4/Cargo.toml	2026-02-14T14:51:28.440921+00:00
+@@ -47,8 +47,6 @@
+ 
+ [features]
+ std = []
+-wasm_js = [
+-]
+ 
+ [lib]
+ name = "getrandom"
+@@ -65,6 +63,9 @@
+ [dependencies.cfg-if]
+ version = "1"
+ 
++[dependencies.libc]
++version = "0.2.154"
++
+ [lints.rust.unexpected_cfgs]
+ level = "warn"
+ priority = 0

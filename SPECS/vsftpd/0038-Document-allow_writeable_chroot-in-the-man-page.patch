@@ -1,0 +1,32 @@
+From 35ec3be5427a54facd5f6299fda2da4c146d4846 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Lyson=C4=9Bk?= <olysonek@redhat.com>
+Date: Fri, 24 Nov 2017 11:22:43 +0100
+Subject: [PATCH 38/59] Document allow_writeable_chroot in the man page
+
+---
+ vsftpd.conf.5 | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/vsftpd.conf.5 b/vsftpd.conf.5
+index 45b3f9c..d1f0db5 100644
+--- a/vsftpd.conf.5
++++ b/vsftpd.conf.5
+@@ -56,6 +56,15 @@ Only applies if
+ is active. If set to YES, anonymous users will be allowed to use secured SSL
+ connections.
+ 
++Default: NO
++.TP
++.B allow_writeable_chroot
++Allow chroot()'ing a user to a directory writable by that user. Note that
++setting this to YES is potentially dangerous. For example, if the user
++creates an 'etc' directory in the new root directory, they could potentially
++trick the C library into loading a user-created configuration file from the
++/etc/ directory.
++
+ Default: NO
+ .TP
+ .B anon_mkdir_write_enable
+-- 
+2.14.4
+

@@ -1,0 +1,39 @@
+# Macros for reducing debug info size using dwz(1) utility.
+
+# The two default values below should result in dwz taking at most
+# 3GB of RAM or so on 64-bit hosts and 2.5GB on 32-bit hosts
+# on the largest *.debug files  (in mid 2012 those are
+# libreoffice-debuginfo, debuginfos containing
+# libxul.so.debug and libwebkitgtk-*.so.*.debug).
+# This needs to be tuned based on the amount of available RAM
+# on build boxes for each architecture as well as virtual address
+# space limitations if dwz is 32-bit program.  While it needs less
+# memory than 64-bit program because pointers are smaller, it can
+# never have more than 4GB-epsilon of RAM and on some architecture
+# even less than that (e.g. 2GB).
+
+# Number of debugging information entries (DIEs) above which
+# dwz will stop considering file for multifile optimizations
+# and enter a low memory mode, in which it will optimize
+# in about half the memory needed otherwise.
+%_dwz_low_mem_die_limit		 10000000
+# Number of DIEs above which dwz will stop processing
+# a file altogether.
+%_dwz_max_die_limit     	 50000000
+
+# On x86_64 increase the higher limit to make libwebkit* optimizable.
+# libwebkit* in mid 2012 contains roughly 87mil DIEs, and 64-bit
+# dwz is able to optimize it from ~1.1GB to ~410MB using 5.2GB of RAM.
+%_dwz_max_die_limit_x86_64	110000000
+
+# On ARM, build boxes often have only 512MB of RAM and are very slow.
+# Lower both the limits.
+%_dwz_low_mem_die_limit_armv5tel  4000000
+%_dwz_low_mem_die_limit_armv7hl	  4000000
+%_dwz_max_die_limit_armv5tel	 10000000
+%_dwz_max_die_limit_armv7hl	 10000000
+
+%_dwz_limit() %{expand:%%{?%{1}_%{_arch}}%%{!?%{1}_%{_arch}:%%%{1}}}
+%_find_debuginfo_dwz_opts --run-dwz\\\
+   --dwz-low-mem-die-limit %{_dwz_limit _dwz_low_mem_die_limit}\\\
+   --dwz-max-die-limit %{_dwz_limit _dwz_max_die_limit}

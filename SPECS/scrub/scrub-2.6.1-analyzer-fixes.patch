@@ -1,0 +1,31 @@
+diff -up scrub-2.6.1/src/fillfile.c.analyzer-fixes scrub-2.6.1/src/fillfile.c
+--- scrub-2.6.1/src/fillfile.c.analyzer-fixes	2021-03-18 10:42:37.201845461 -0400
++++ scrub-2.6.1/src/fillfile.c	2021-03-18 10:43:38.358151439 -0400
+@@ -131,10 +131,13 @@ refill_init(struct memstruct **mpp, refi
+ 
+     if (!(mp = malloc(sizeof(struct memstruct))))
+         goto nomem;
+-    if (!(mp->buf = malloc(memsize)))
++    if (!(mp->buf = malloc(memsize))) {
++        free(mp);
+         goto nomem;
++    }
+     mp->size = memsize;
+     mp->refill = refill;
++    mp->thd = 0;
+ #if WITH_PTHREADS
+     if (!no_threads) {
+         if ((mp->err = pthread_create(&mp->thd, NULL, refill_thread, mp))) {
+diff -up scrub-2.6.1/src/scrub.c.analyzer-fixes scrub-2.6.1/src/scrub.c
+diff -up scrub-2.6.1/src/sig.c.analyzer-fixes scrub-2.6.1/src/sig.c
+--- scrub-2.6.1/src/sig.c.analyzer-fixes	2021-03-18 10:44:20.715363360 -0400
++++ scrub-2.6.1/src/sig.c	2021-03-18 10:44:54.319531489 -0400
+@@ -74,7 +74,7 @@ writesig(char *path)
+         goto nomem;
+     if ((fd = open(path, O_RDWR)) < 0)
+         goto error;
+-    if ((n = read_all(fd, buf, blocksize)) < 0)
++    if (read_all(fd, buf, blocksize) < 0)
+         goto error;
+     memcpy(buf, SCRUB_MAGIC, sizeof(SCRUB_MAGIC));
+     if (lseek(fd, 0, SEEK_SET) < 0)

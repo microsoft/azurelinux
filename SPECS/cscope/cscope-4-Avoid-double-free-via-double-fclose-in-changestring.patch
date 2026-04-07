@@ -1,0 +1,38 @@
+From f632c3fd86fce2c495a290dd70f5f09e3e7e7a28 Mon Sep 17 00:00:00 2001
+From: Hans-Bernhard Broeker <HBBroeker@T-Online.de>
+Date: Sat, 13 Apr 2019 14:52:35 +0200
+Subject: [PATCH 5/9] Avoid double-free via double fclose in changestring.
+
+Mark closed FILE* by setting it to NULL, and check for that.
+
+Signed-off-by: Vladis Dronov <vdronov@redhat.com>
+---
+ src/command.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/command.c b/src/command.c
+index 8740b11..dcb5278 100644
+--- a/src/command.c
++++ b/src/command.c
+@@ -786,6 +786,7 @@ changestring(void)
+     }
+     fprintf(script, "w\nq\n!\n");	/* write and quit */
+     fclose(script);
++    script = NULL;
+ 
+     /* if any line was marked */
+     if (anymarked == YES) {
+@@ -803,7 +804,9 @@ changestring(void)
+     }
+     changing = NO;
+     mousemenu();
+-    fclose(script);
++    if (script != NULL) {
++	fclose(script);
++    }
+     free(change);
+     return(anymarked);
+ }
+-- 
+2.26.2
+

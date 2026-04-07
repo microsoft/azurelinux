@@ -1,0 +1,11 @@
+--- a/tool/lemon.c
++++ b/tool/lemon.c
+@@ -3686,6 +3686,8 @@
+     tpltname = buf;
+   }else if( access(templatename,004)==0 ){
+     tpltname = templatename;
++  }else if( access("/usr/share/lemon/lempar.c", R_OK)==0){
++    tpltname = "/usr/share/lemon/lempar.c";
+   }else{
+     toFree = tpltname = pathsearch(lemp->argv[0],templatename,0);
+   }

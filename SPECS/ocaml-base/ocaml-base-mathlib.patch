@@ -1,0 +1,10 @@
+--- base-0.17.1/src/dune.orig	2024-06-24 15:54:13.000000000 -0600
++++ base-0.17.1/src/dune	2024-06-27 16:32:33.046707765 -0600
+@@ -26,6 +26,7 @@
+  (ocamlopt_flags
+   :standard
+   (:include ocamlopt-flags))
++ (c_library_flags -lm)
+  (libraries base_internalhash_types sexplib0 shadow_stdlib
+    ocaml_intrinsics_kernel)
+  (preprocess no_preprocessing)

@@ -1,0 +1,22 @@
+diff --git a/capture/capture_sync.c b/capture/capture_sync.c
+index af08b32..2e0fcb7 100644
+--- a/capture/capture_sync.c
++++ b/capture/capture_sync.c
+@@ -1825,8 +1832,16 @@ sync_pipe_input_cb(GIOChannel *pipe_io, capture_session *cap_session)
+         if (!ws_strtoi32(buffer, NULL, &exec_errno)) {
+             ws_warning("Invalid errno: %s", buffer);
+         }
+-        primary_msg = ws_strdup_printf("Couldn't run dumpcap in child process: %s",
++        if (exec_errno == EPERM || exec_errno == EACCES) {
++            const char *securitymsg = "\nAre you a member of the 'wireshark' group? Try running\n'usermod -a -G wireshark _your_username_' as root.";
++            primary_msg = ws_strdup_printf("Couldn't run dumpcap in child process: %s%s",
++                                       g_strerror(exec_errno), securitymsg);
++        }
++        else {
++            primary_msg = ws_strdup_printf("Couldn't run dumpcap in child process: %s",
+                                        g_strerror(exec_errno));
++        }
++
+         cap_session->error(cap_session, primary_msg, NULL);
+         /* the capture child will close the sync_pipe, nothing to do for now */
+         /* (an error message doesn't mean we have to stop capturing) */

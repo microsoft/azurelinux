@@ -1,0 +1,12 @@
+diff -ur qt-x11-free-3.3.8b/src/kernel/qimage.h qt-x11-free-3.3.8b-qimage-parentheses/src/kernel/qimage.h
+--- qt-x11-free-3.3.8b/src/kernel/qimage.h	2008-01-15 20:09:13.000000000 +0100
++++ qt-x11-free-3.3.8b-qimage-parentheses/src/kernel/qimage.h	2011-11-04 02:49:22.000000000 +0100
+@@ -58,7 +58,7 @@
+     QCString lang;
+ 
+     bool operator< (const QImageTextKeyLang& other) const
+-	{ return key < other.key || key==other.key && lang < other.lang; }
++	{ return key < other.key || (key==other.key && lang < other.lang); }
+     bool operator== (const QImageTextKeyLang& other) const
+ 	{ return key==other.key && lang==other.lang; }
+ };

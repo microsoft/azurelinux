@@ -1,0 +1,23 @@
+From d8f2219f3060bdc430c8e7c21a699b564c1c37c5 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Sat, 8 Mar 2025 18:43:41 +0100
+Subject: [PATCH 1/2] fix invalid crate manifest for tests workspace member
+
+---
+ tests/Cargo.toml | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/tests/Cargo.toml b/tests/Cargo.toml
+index 0482a0f..1aa3165 100644
+--- a/tests/Cargo.toml
++++ b/tests/Cargo.toml
+@@ -48,4 +48,6 @@ name = "dbus_api_stability"
+ path = "dbus_api_stability.rs"
+ 
+ [dependencies]
++glycin = { workspace = true }
++glycin-utils = { workspace = true }
+ gufo-common.workspace = true
+-- 
+2.51.1
+

@@ -1,0 +1,67 @@
+From 6bce8f6e8c985289c4ac1a4f051c291283c0a1ec Mon Sep 17 00:00:00 2001
+From: Viktor Ashirov <vashirov@redhat.com>
+Date: Mon, 12 Jan 2026 10:58:02 +0100
+Subject: [PATCH 9/9] Issue 7172 - (2nd) Index ordering mismatch after upgrade
+ (#7180)
+
+Commit 742c12e0247ab64e87da000a4de2f3e5c99044ab introduced a regression
+where the check to skip creating parentid/ancestorid indexes if they
+already exist was incorrect.
+The `ainfo_get()` function falls back to returning
+LDBM_PSEUDO_ATTR_DEFAULT attrinfo when the requested attribute is not
+found.
+Since LDBM_PSEUDO_ATTR_DEFAULT is created before the ancestorid check,
+`ainfo_get()` returns LDBM_PSEUDO_ATTR_DEFAULT instead of NULL, causing
+the ancestorid index creation to be skipped entirely.
+
+When operations later try to use the ancestorid index, they fall back to
+LDBM_PSEUDO_ATTR_DEFAULT, and attempting to open the .default dbi
+mid-transaction fails with MDB_NOTFOUND (-30798).
+
+Fix Description:
+Instead of just checking if `ainfo_get()` returns non-NULL, verify that
+the returned attrinfo is actually for the requested attribute.
+
+Fixes: https://github.com/389ds/389-ds-base/issues/7172
+
+Reviewed by: @tbordaz (Thanks!)
+---
+ ldap/servers/slapd/back-ldbm/instance.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/ldap/servers/slapd/back-ldbm/instance.c b/ldap/servers/slapd/back-ldbm/instance.c
+index 71bf0f6fa..2a6e8cbb8 100644
+--- a/ldap/servers/slapd/back-ldbm/instance.c
++++ b/ldap/servers/slapd/back-ldbm/instance.c
+@@ -190,7 +190,7 @@ ldbm_instance_create_default_indexes(backend *be)
+     char *ancestorid_indexes_limit = NULL;
+     char *parentid_indexes_limit = NULL;
+     struct attrinfo *ai = NULL;
+-    struct attrinfo *index_already_configured = NULL;
++    int index_already_configured = 0;
+     struct index_idlistsizeinfo *iter;
+     int cookie;
+     int limit;
+@@ -250,7 +250,8 @@ ldbm_instance_create_default_indexes(backend *be)
+     slapi_entry_free(e);
+ 
+     ainfo_get(be, (char *)LDBM_PARENTID_STR, &ai);
+-    index_already_configured = ai;
++    /* Check if the attrinfo is actually for parentid, not a fallback to .default */
++    index_already_configured = (ai != NULL && strcmp(ai->ai_type, LDBM_PARENTID_STR) == 0);
+     if (!index_already_configured) {
+         e = ldbm_instance_init_config_entry(LDBM_PARENTID_STR, "eq", 0, 0, 0, "integerOrderingMatch", parentid_indexes_limit);
+         ldbm_instance_config_add_index_entry(inst, e, flags);
+@@ -294,7 +295,8 @@ ldbm_instance_create_default_indexes(backend *be)
+      * but we still want to use the attr index file APIs.
+      */
+     ainfo_get(be, (char *)LDBM_ANCESTORID_STR, &ai);
+-    index_already_configured = ai;
++    /* Check if the attrinfo is actually for ancestorid, not a fallback to .default */
++    index_already_configured = (ai != NULL && strcmp(ai->ai_type, LDBM_ANCESTORID_STR) == 0);
+     if (!index_already_configured) {
+         e = ldbm_instance_init_config_entry(LDBM_ANCESTORID_STR, "eq", 0, 0, 0, "integerOrderingMatch", ancestorid_indexes_limit);
+         ldbm_instance_config_add_index_entry(inst, e, flags);
+-- 
+2.52.0
+

@@ -1,0 +1,12 @@
+diff --git cmake.orig/Utilities/cmcppdap/include/dap/network.h cmake/Utilities/cmcppdap/include/dap/network.h
+index 9d14f6b70f..491f023493 100644
+--- cmake.orig/Utilities/cmcppdap/include/dap/network.h
++++ cmake/Utilities/cmcppdap/include/dap/network.h
+@@ -15,6 +15,7 @@
+ #ifndef dap_network_h
+ #define dap_network_h
+ 
++#include <cstdint>
+ #include <functional>
+ #include <memory>
+ 

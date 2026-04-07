@@ -1,0 +1,15 @@
+Include <string.h> for the strcmp function.  This avoids an implicit
+function declaration and build failures with future compilers that no
+longer support them by default.
+
+diff -ur man-1.6g.orig/src/makemsg.c man-1.6g/src/makemsg.c
+--- man-1.6g.orig/src/makemsg.c	2006-08-02 20:11:44.000000000 +0200
++++ man-1.6g/src/makemsg.c	2023-02-07 19:14:51.354523820 +0100
+@@ -20,6 +20,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <unistd.h>
++#include <string.h>
+ #ifdef __QNX__
+ #include <unix.h>
+ #endif

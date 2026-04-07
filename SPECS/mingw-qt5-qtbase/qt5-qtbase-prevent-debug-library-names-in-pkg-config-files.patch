@@ -1,0 +1,13 @@
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/qmake/generators/makefile.cpp qtbase-everywhere-src-5.15.18-new/qmake/generators/makefile.cpp
+--- qtbase-everywhere-src-5.15.18/qmake/generators/makefile.cpp	2025-11-07 14:10:34.467451493 +0100
++++ qtbase-everywhere-src-5.15.18-new/qmake/generators/makefile.cpp	2025-11-07 14:10:34.473451481 +0100
+@@ -3256,6 +3256,9 @@ MakefileGenerator::pkgConfigFileName(boo
+         if (dot != -1)
+             ret = ret.left(dot);
+     }
++    if (project->isActiveConfig("debug")) {
++        ret += "d";
++    }
+     ret += Option::pkgcfg_ext;
+     QString subdir = project->first("QMAKE_PKGCONFIG_DESTDIR").toQString();
+     if(!subdir.isEmpty()) {

@@ -1,0 +1,26 @@
+--- async-lock-3.4.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ async-lock-3.4.2/Cargo.toml	2025-12-28T15:17:16.321437+00:00
+@@ -42,7 +42,6 @@
+ default = ["std"]
+ loom = [
+     "event-listener/loom",
+-    "dep:loom",
+ ]
+ std = [
+     "event-listener/std",
+@@ -96,14 +95,8 @@
+ [dev-dependencies.waker-fn]
+ version = "1.1.0"
+ 
+-[target."cfg(loom)".dependencies.loom]
+-version = "0.7"
+-optional = true
+-
+-[target.'cfg(target_family = "wasm")'.dev-dependencies.wasm-bindgen-test]
+-version = "0.3"
+-
+ [lints.rust.unexpected_cfgs]
+ level = "warn"
+ priority = 0
+ check-cfg = ["cfg(loom)"]
++

@@ -1,0 +1,12 @@
+diff -up gt-0.4/utils/unsf.c~ gt-0.4/utils/unsf.c
+--- gt-0.4/utils/unsf.c~	2008-02-03 13:45:08.000000000 +0100
++++ gt-0.4/utils/unsf.c	2008-02-03 13:45:08.000000000 +0100
+@@ -1462,7 +1462,7 @@ convert_lfo (void)
+ static void convert_tremolo(void)
+ {
+ 	int level;
+-	unsigned int freq;
++	int freq;
+ 
+ 	sp_tremolo_phase_increment = sp_tremolo_sweep_increment = sp_tremolo_depth = 0;
+ 

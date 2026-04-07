@@ -1,0 +1,113 @@
+qt-bugs@ issue : none
+bugs.kde.org number : none
+applied: no
+author: Lubos Lunak <l.lunak@kde.org>
+Makes QPopupMenu aware of Xinerama (see e.g. https://bugzilla.novell.com/show_bug.cgi?id=216235).
+
+
+--- src/widgets/qpopupmenu.cpp
++++ src/widgets/qpopupmenu.cpp
+@@ -454,6 +454,15 @@ void QPopupMenu::frameChanged()
+     menuContentsChanged();
+ }
+ 
++QRect QPopupMenu::screenRect( const QPoint& pos )
++{
++    int screen_num = QApplication::desktop()->screenNumber( pos );
++#ifdef Q_WS_MAC
++    return QApplication::desktop()->availableGeometry( screen_num );
++#else
++    return QApplication::desktop()->screenGeometry( screen_num );
++#endif
++}
+ /*!
+     Displays the popup menu so that the item number \a indexAtPoint
+     will be at the specified \e global position \a pos. To translate a
+@@ -498,6 +507,15 @@ void QPopupMenu::popup( const QPoint &po
+     // point.
+ #endif
+ 
++    QRect screen = screenRect( geometry().center());
++    QRect screen2 = screenRect( QApplication::reverseLayout()
++        ? pos+QPoint(width(),0) : pos );
++    // if the widget is not in the screen given by the position, move it
++    // there, so that updateSize() uses the right size of the screen
++    if( screen != screen2 ) {
++        screen = screen2;
++        move( screen.x(), screen.y());
++    }
+     if(d->scroll.scrollable) {
+ 	d->scroll.scrollable = QPopupMenuPrivate::Scroll::ScrollNone;
+ 	d->scroll.topScrollableIndex = d->scroll.scrollableSize = 0;
+@@ -517,18 +535,6 @@ void QPopupMenu::popup( const QPoint &po
+ 	updateSize(TRUE);
+     }
+ 
+-    int screen_num;
+-    if (QApplication::desktop()->isVirtualDesktop())
+-	screen_num =
+-	    QApplication::desktop()->screenNumber( QApplication::reverseLayout() ?
+-						   pos+QPoint(width(),0) : pos );
+-    else
+-	screen_num = QApplication::desktop()->screenNumber( this );
+-#ifdef Q_WS_MAC
+-    QRect screen = QApplication::desktop()->availableGeometry( screen_num );
+-#else
+-    QRect screen = QApplication::desktop()->screenGeometry( screen_num );
+-#endif
+     int sw = screen.width();			// screen width
+     int sh = screen.height();			// screen height
+     int sx = screen.x();			// screen pos
+@@ -1056,7 +1062,7 @@ QSize QPopupMenu::updateSize(bool force_
+ 				   mi->iconSet()->pixmap( QIconSet::Small, QIconSet::Normal ).width() + 4 );
+ 	}
+ 
+-	int dh = QApplication::desktop()->height();
++	int dh = screenRect( geometry().center()).height();
+ 	ncols = 1;
+ 
+ 	for ( QMenuItemListIt it2( *mitems ); it2.current(); ++it2 ) {
+@@ -2297,9 +2303,9 @@ void QPopupMenu::subMenuTimer() {
+ 	bool right = FALSE;
+ 	if ( ( parentMenu && parentMenu->isPopupMenu &&
+ 	       ((QPopupMenu*)parentMenu)->geometry().x() < geometry().x() ) ||
+-	     p.x() < 0 )
++	     p.x() < screenRect( p ).left())
+ 	    right = TRUE;
+-	if ( right && (ps.width() > QApplication::desktop()->width() - mapToGlobal( r.topRight() ).x() ) )
++	if ( right && (ps.width() > screenRect( p ).right() - mapToGlobal( r.topRight() ).x() ) )
+ 	    right = FALSE;
+ 	if ( right )
+ 	    p.setX( mapToGlobal( r.topRight() ).x() );
+@@ -2310,7 +2316,7 @@ void QPopupMenu::subMenuTimer() {
+ 	bool left = FALSE;
+ 	if ( ( parentMenu && parentMenu->isPopupMenu &&
+ 	       ((QPopupMenu*)parentMenu)->geometry().x() > geometry().x() ) ||
+-	     p.x() + ps.width() > QApplication::desktop()->width() )
++	     p.x() + ps.width() > screenRect( p ).right() )
+ 	    left = TRUE;
+ 	if ( left && (ps.width() > mapToGlobal( r.topLeft() ).x() ) )
+ 	    left = FALSE;
+@@ -2318,8 +2324,8 @@ void QPopupMenu::subMenuTimer() {
+ 	    p.setX( mapToGlobal( r.topLeft() ).x() - ps.width() );
+     }
+     QRect pr = popup->itemGeometry(popup->count() - 1);
+-    if (p.y() + ps.height() > QApplication::desktop()->height() &&
+-	p.y() - ps.height() + (QCOORD) pr.height() >= 0)
++    if (p.y() + ps.height() > screenRect( p ).bottom() &&
++	p.y() - ps.height() + (QCOORD) pr.height() >= screenRect( p ).top())
+ 	p.setY( p.y() - ps.height() + (QCOORD) pr.height());
+ 
+     if ( style().styleHint(QStyle::SH_PopupMenu_SloppySubMenus, this )) {
+Index: src/widgets/qpopupmenu.h
+===================================================================
+--- src/widgets/qpopupmenu.h	(revision 636368)
++++ src/widgets/qpopupmenu.h	(working copy)
+@@ -152,6 +152,7 @@ private:
+ 
+     QSize	updateSize(bool force_recalc=FALSE, bool do_resize=TRUE);
+     void	updateRow( int row );
++    QRect       screenRect(const QPoint& pos);
+ #ifndef QT_NO_ACCEL
+     void	updateAccel( QWidget * );
+     void	enableAccel( bool );

@@ -1,0 +1,26 @@
+From 83370d33327aa9e4b147757cba1bc9c764f0473f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Thu, 22 Dec 2022 15:03:17 +0100
+Subject: [PATCH] Use File.exist?
+
+`File.exists?` was deprecated while ago and removed in Ruby 3.2.
+
+https://bugs.ruby-lang.org/issues/17391
+https://github.com/ruby/ruby/pull/5352
+---
+ exe/convert_to_should_syntax | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/exe/convert_to_should_syntax b/exe/convert_to_should_syntax
+index d1264d07..ebdda984 100755
+--- a/exe/convert_to_should_syntax
++++ b/exe/convert_to_should_syntax
+@@ -31,7 +31,7 @@ usage("Temp directory '#{TMP}' is not valid. Set TMPDIR environment variable to
+ 
+ file = ARGV.shift
+ tmpfile = File.join(TMP, File.basename(file))
+-usage("File '#{file}' doesn't exist") unless File.exists?(file)
++usage("File '#{file}' doesn't exist") unless File.exist?(file)
+ 
+ FileUtils.cp(file, tmpfile)
+ contents = File.read(tmpfile)

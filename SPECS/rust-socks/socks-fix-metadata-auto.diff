@@ -1,0 +1,10 @@
+--- socks-0.3.4/Cargo.toml	1970-01-01T00:00:01+00:00
++++ socks-0.3.4/Cargo.toml	2024-02-12T22:04:03.708595+00:00
+@@ -22,6 +22,4 @@
+ version = "1.0"
+ [target."cfg(unix)".dependencies.libc]
+ version = "0.2"
+-[target."cfg(windows)".dependencies.winapi]
+-version = "0.3.9"
+-features = ["winsock2"]
++

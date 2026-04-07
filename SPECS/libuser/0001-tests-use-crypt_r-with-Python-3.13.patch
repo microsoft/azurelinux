@@ -1,0 +1,74 @@
+From 3341a12021e5dbfd198cdb13ea8c4e1509ba2d42 Mon Sep 17 00:00:00 2001
+From: Yaakov Selkowitz <yselkowi@redhat.com>
+Date: Mon, 24 Jun 2024 17:27:36 -0400
+Subject: [PATCH] tests: use crypt_r with Python 3.13
+
+The crypt module was dropped from the Python standard library, but the
+crypt_r package provides a replacement.
+---
+ tests/default_pw_test | 8 +++++++-
+ tests/files_test.py   | 7 ++++++-
+ tests/ldap_test.py    | 7 ++++++-
+ 3 files changed, 19 insertions(+), 3 deletions(-)
+
+diff --git a/tests/default_pw_test b/tests/default_pw_test
+index bbf23ac..f542add 100755
+--- a/tests/default_pw_test
++++ b/tests/default_pw_test
+@@ -79,7 +79,13 @@ get_ldap_password() # entry filter
+ 
+ valid_password() # encoded value
+ {
+-    local v=$($PYTHON -c "import crypt; print(crypt.crypt('password', '$1'))")
++    local v=$($PYTHON -c "
++try:
++    import crypt_r as crypt
++except ImportError:
++    import crypt
++print(crypt.crypt('password', '$1'))
++")
+     [ "x$v" = "x$1" ]
+ }
+ 
+diff --git a/tests/files_test.py b/tests/files_test.py
+index 23e19e4..c963fb9 100644
+--- a/tests/files_test.py
++++ b/tests/files_test.py
+@@ -1,10 +1,15 @@
+-import crypt
+ import libuser
+ import os
+ import os.path
+ import sys
+ import unittest
+ 
++# crypt was dropped from Python standard library in 3.13
++try:
++    import crypt_r as crypt
++except ImportError:
++    import crypt
++
+ LARGE_ID = 2147483648
+ 
+ workdir = os.environ['workdir']
+diff --git a/tests/ldap_test.py b/tests/ldap_test.py
+index d10d8f3..048a338 100644
+--- a/tests/ldap_test.py
++++ b/tests/ldap_test.py
+@@ -1,7 +1,12 @@
+-import crypt
+ import libuser
+ import unittest
+ 
++# crypt was dropped from Python standard library in 3.13
++try:
++    import crypt_r as crypt
++except ImportError:
++    import crypt
++
+ LARGE_ID = 2147483648
+ 
+ def prompt_callback(prompts):
+-- 
+2.45.2
+

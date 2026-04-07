@@ -1,0 +1,10 @@
+/var/named/data/named.run {
+    missingok
+    su named named
+    create 0644 named named
+    notifempty
+    postrotate
+        /usr/bin/systemctl reload named.service > /dev/null 2>&1 || true
+        /usr/bin/systemctl reload named-chroot.service > /dev/null 2>&1 || true
+    endscript
+}

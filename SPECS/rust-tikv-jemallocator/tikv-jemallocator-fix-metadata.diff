@@ -1,0 +1,35 @@
+--- tikv-jemallocator-0.6.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ tikv-jemallocator-0.6.1/Cargo.toml	2025-10-16T21:31:20.522090+00:00
+@@ -88,14 +88,6 @@
+ bench = false
+ 
+ [[test]]
+-name = "background_thread_defaults"
+-path = "tests/background_thread_defaults.rs"
+-
+-[[test]]
+-name = "background_thread_enabled"
+-path = "tests/background_thread_enabled.rs"
+-
+-[[test]]
+ name = "ffi"
+ path = "tests/ffi.rs"
+ required-features = ["stats"]
+@@ -103,10 +95,6 @@
+ [[test]]
+ name = "grow_in_place"
+ path = "tests/grow_in_place.rs"
+-
+-[[test]]
+-name = "malloctl"
+-path = "tests/malloctl.rs"
+ 
+ [[test]]
+ name = "shrink_in_place"
+@@ -138,6 +126,3 @@
+ 
+ [dev-dependencies.paste]
+ version = "1"
+-
+-[dev-dependencies.tikv-jemalloc-ctl]
+-version = "0.6.1"

@@ -1,0 +1,133 @@
+From 7374c4ecbd591b02f7be4b2918addc6d5852aafb Mon Sep 17 00:00:00 2001
+Message-ID: <7374c4ecbd591b02f7be4b2918addc6d5852aafb.1760476767.git.crobinso@redhat.com>
+In-Reply-To: <b825bb556bd3967bf5422c243b77bd4038e317e2.1760476767.git.crobinso@redhat.com>
+References: <b825bb556bd3967bf5422c243b77bd4038e317e2.1760476767.git.crobinso@redhat.com>
+From: Michal Privoznik <mprivozn@redhat.com>
+Date: Mon, 13 Oct 2025 09:21:30 +0200
+Subject: [PATCH 4/8] wireshark: Fix int type of some virNetMessageHeader
+ members
+Content-type: text/plain
+
+Our virNetMessageHeader is a struct that's declared as follows:
+
+  struct virNetMessageHeader {
+      unsigned prog;
+      unsigned vers;
+      int proc;
+      virNetMessageType type;
+      unsigned serial;
+      virNetMessageStatus status;
+  };
+
+Now, per RFC 4506 enums are also encoded as signed integers. This
+means, that only 'prog', 'vers' and 'serial' are really unsigned
+integers. The others ('proc', 'type' and 'status') are encoded as
+signed integers. Fix their type when dissecting.
+
+While at it, also follow latest trend in wireshark and switch
+from guint32 to uint32_t.
+
+Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
+Reviewed-by: Peter Krempa <pkrempa@redhat.com>
+Signed-off-by: Cole Robinson <crobinso@redhat.com>
+---
+ tools/wireshark/src/packet-libvirt.c | 34 +++++++++++++++++++---------
+ 1 file changed, 23 insertions(+), 11 deletions(-)
+
+diff --git a/tools/wireshark/src/packet-libvirt.c b/tools/wireshark/src/packet-libvirt.c
+index da2aabd98a..af14c6bed7 100644
+--- a/tools/wireshark/src/packet-libvirt.c
++++ b/tools/wireshark/src/packet-libvirt.c
+@@ -92,7 +92,7 @@ typedef gboolean (*vir_xdr_dissector_t)(tvbuff_t *tvb, proto_tree *tree, XDR *xd
+ 
+ typedef struct vir_dissector_index vir_dissector_index_t;
+ struct vir_dissector_index {
+-    guint32             proc;
++    int32_t             proc;
+     vir_xdr_dissector_t args;
+     vir_xdr_dissector_t ret;
+     vir_xdr_dissector_t msg;
+@@ -275,8 +275,10 @@ dissect_xdr_array(tvbuff_t *tvb, proto_tree *tree, XDR *xdrs, int hf, gint ett,
+ }
+ 
+ static vir_xdr_dissector_t
+-find_payload_dissector(guint32 proc, guint32 type,
+-                       const vir_dissector_index_t *pds, gsize length)
++find_payload_dissector(int32_t proc,
++                       enum vir_net_message_type type,
++                       const vir_dissector_index_t *pds,
++                       gsize length)
+ {
+     const vir_dissector_index_t *pd;
+     guint32 first, last, direction;
+@@ -309,6 +311,10 @@ find_payload_dissector(guint32 proc, guint32 type,
+         return pd->ret;
+     case VIR_NET_MESSAGE:
+         return pd->msg;
++    case VIR_NET_STREAM:
++    case VIR_NET_STREAM_HOLE:
++        /* Handled elsewhere */
++        return NULL;
+     }
+     return NULL;
+ }
+@@ -397,8 +403,12 @@ dissect_xdr_stream_hole(tvbuff_t *tvb, proto_tree *tree, XDR *xdrs, int hf)
+ #include "libvirt/protocol.h"
+ 
+ static void
+-dissect_libvirt_payload(tvbuff_t *tvb, proto_tree *tree,
+-                        guint32 prog, guint32 proc, guint32 type, guint32 status)
++dissect_libvirt_payload(tvbuff_t *tvb,
++                        proto_tree *tree,
++                        uint32_t prog,
++                        int32_t proc,
++                        int32_t type,
++                        int32_t status)
+ {
+     gssize payload_length;
+ 
+@@ -430,7 +440,8 @@ dissect_libvirt_payload(tvbuff_t *tvb, proto_tree *tree,
+     return;
+ 
+  unknown:
+-    dbg("Cannot determine payload: Prog=%u, Proc=%u, Type=%u, Status=%u", prog, proc, type, status);
++    dbg("Cannot determine payload: Prog=%u, Proc=%d, Type=%d, Status=%d",
++        prog, proc, type, status);
+     proto_tree_add_item(tree, hf_libvirt_unknown, tvb, VIR_HEADER_LEN, -1, ENC_NA);
+ }
+ 
+@@ -439,7 +450,8 @@ dissect_libvirt_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree,
+                         void *opaque G_GNUC_UNUSED)
+ {
+     goffset offset;
+-    guint32 prog, proc, type, serial, status;
++    uint32_t prog, serial;
++    int32_t proc, type, status;
+     const value_string *vs;
+ 
+     col_set_str(pinfo->cinfo, COL_PROTOCOL, "Libvirt");
+@@ -448,17 +460,17 @@ dissect_libvirt_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree,
+     offset = 4; /* End of length field */
+     prog   = tvb_get_ntohl(tvb, offset); offset += 4;
+     offset += 4; /* Ignore version header field */
+-    proc   = tvb_get_ntohl(tvb, offset); offset += 4;
+-    type   = tvb_get_ntohl(tvb, offset); offset += 4;
++    proc   = tvb_get_ntohil(tvb, offset); offset += 4;
++    type   = tvb_get_ntohil(tvb, offset); offset += 4;
+     serial = tvb_get_ntohl(tvb, offset); offset += 4;
+-    status = tvb_get_ntohl(tvb, offset); offset += 4;
++    status = tvb_get_ntohil(tvb, offset); offset += 4;
+ 
+     col_add_fstr(pinfo->cinfo, COL_INFO, "Prog=%s",
+                  val_to_str(prog, program_strings, "%x"));
+ 
+     vs = get_program_data(prog, VIR_PROGRAM_PROCSTRINGS);
+     if (vs == NULL) {
+-        col_append_fstr(pinfo->cinfo, COL_INFO, " Proc=%u", proc);
++        col_append_fstr(pinfo->cinfo, COL_INFO, " Proc=%d", proc);
+     } else {
+         col_append_fstr(pinfo->cinfo, COL_INFO, " Proc=%s", val_to_str(proc, vs, "%d"));
+     }
+-- 
+2.51.0
+

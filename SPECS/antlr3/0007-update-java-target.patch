@@ -1,0 +1,13 @@
+--- a/antlr3-maven-archetype/src/main/resources/archetype-resources/pom.xml
++++ b/antlr3-maven-archetype/src/main/resources/archetype-resources/pom.xml
+@@ -106,8 +106,8 @@
+                 <artifactId>maven-compiler-plugin</artifactId>
+                 <version>2.0.2</version>
+                 <configuration>
+-                    <source>1.6</source>
+-                    <target>jsr14</target>
++                    <source>1.8</source>
++                    <target>1.8</target>
+                     <sourceDirectory>src</sourceDirectory>
+                 </configuration>
+             </plugin>

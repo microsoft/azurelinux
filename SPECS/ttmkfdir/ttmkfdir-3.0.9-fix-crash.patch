@@ -1,0 +1,79 @@
+--- ttmkfdir-3.0.9.orig/encoding.l	2003-01-08 14:25:25.000000000 +0900
++++ ttmkfdir-3.0.9/encoding.l	2005-08-03 19:24:22.000000000 +0900
+@@ -21,6 +21,19 @@
+ 
+ static Encoding       *cur_enc; 
+ static NumericMapping *cur_map;
++static int is_created_map = 0;
++
++static void
++create_mapping(void)
++{
++    cur_map = new NumericMapping (cur_enc->size,
++				  TT_PLATFORM_MICROSOFT,
++				  TT_MS_ID_UNICODE_CS);
++    
++    cur_enc->enc_size = 0;
++    cur_enc->start_code = 0xffff;
++    is_created_map = 1;
++}
+ 
+ %}
+ 
+@@ -67,12 +80,6 @@
+ }
+ 
+ <INSIDE_ENC_BLOCK>STARTMAPPING{WHITESPACES}unicode {
+-    cur_map = new NumericMapping (cur_enc->size,
+-				  TT_PLATFORM_MICROSOFT,
+-				  TT_MS_ID_UNICODE_CS);
+-    
+-    cur_enc->enc_size = 0;
+-    cur_enc->start_code = 0xffff;
+     BEGIN(INSIDE_MAP_BLOCK);
+ }
+ 
+@@ -107,6 +114,12 @@
+ 	i2 = i1;
+     }
+     
++    /* avoid a crash issue */
++    if (cur_enc->size < i2)
++	cur_enc->size = i2;
++    if (!is_created_map)
++	create_mapping();
++
+     /* now mark all the unassigned codes */
+     for (long i = i1; i <= i2; i++) {
+ 	(*cur_map)[i] = -1;
+@@ -114,10 +127,14 @@
+ }
+ 
+ <INSIDE_MAP_BLOCK>{NUMBER}({WHITESPACES}{NUMBER}){0,2} {
+-    int numbers[3], i = 0, start_range, end_range, target, res;
++    unsigned int start_range;
++    int numbers[3], i = 0, end_range, target, res;
+     char *startptr;
+     char *endptr = yytext;
+ 
++    if (!is_created_map)
++	create_mapping();
++
+     for (i = 0;;i++) {
+ 	startptr = endptr;
+ 	res = std::strtol (startptr, &endptr, 0);
+@@ -150,9 +167,14 @@
+ 
+ 
+ <INSIDE_MAP_BLOCK>ENDMAPPING {
++    /* it may not happens but to be safe */
++    if (!is_created_map)
++	create_mapping();
++
+     cur_enc->AddMapping (cur_map);
+     dest.insert (std::make_pair(cur_map->cmapkey(), cur_enc));;
+     BEGIN(INSIDE_ENC_BLOCK);
++    is_created_map = 0;
+ }
+ 
+ <INSIDE_UNKNOWN_MAP>ENDMAPPING {

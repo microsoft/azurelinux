@@ -1,0 +1,85 @@
+--- ./debian/sources/Makefile.orig	2025-02-25 16:10:07.595524418 +0000
++++ ./debian/sources/Makefile	2025-02-25 16:11:54.668181117 +0000
+@@ -1,13 +1,13 @@
+ CC	   = gcc
+-CGI_DIR    = $(DESTDIR)/usr/lib/cgi-bin/man
++CGI_DIR    = $(DESTDIR)/usr/lib/man2html/cgi-bin/man
+ SHARE_DIR  = $(DESTDIR)/usr/share/man2html
+-DOC_DIR    = $(DESTDIR)/usr/share/doc/man2html-base
++DOC_DIR    = $(DESTDIR)/usr/share/doc/man2html
+ 
+-CGIBASE	   = /cgi-bin/man
+-MAN_CONFIG = /etc/manpath.config
++CGIBASE	   = /man
++MAN_CONFIG = /etc/man_db.conf
+ 
+ CPPFLAGS += -DMAN_CONFIG='"$(MAN_CONFIG)"'
+-CFLAGS   += -pipe -g -Wall -Wextra $(DEBIAN_CFLAGS)
++CFLAGS   += -pipe -g -Wall -Wextra
+ 
+ #
+ # Installer program:
+@@ -29,12 +29,13 @@ man2html.cgi: man2html.cgi.o utils.o
+ 	$(CC) $(LDFLAGS) $^ -o $@
+ 
+ install: targets
++	mkdir -p $(CGI_DIR)
++	mkdir -p $(SHARE_DIR)
++	mkdir -p $(DOC_DIR)
+ 	$(INSTALL) -p -m 0755 man2html.cgi $(CGI_DIR)/man2html
+ 	$(INSTALL) -p -m 0755 mansearch $(CGI_DIR)
+ 	$(INSTALL) -p -m 0755 manwhatis $(CGI_DIR)
+ 	ln $(CGI_DIR)/manwhatis $(CGI_DIR)/mansec
+-	$(INSTALL) -p -m0644 swish++.conf  $(SHARE_DIR)
+-	$(INSTALL) -p -m0644 man.html $(DOC_DIR)/html
+ 
+ 
+ clean:
+--- ../man2html-deb.orig/debian/sources/man2html.cgi.c	2011-11-02 12:45:37.000000000 -0700
++++ ./debian/sources/man2html.cgi.c	2011-12-15 05:23:34.806269725 -0700
+@@ -41,11 +41,11 @@
+ #endif
+ 
+ #ifndef CGIBASE
+-#define CGIBASE "/cgi-bin/man"
++#define CGIBASE "/man"
+ #endif
+ 
+ #ifndef LYNXCGIBASE
+-#define LYNXCGIBASE "lynxcgi:/usr/lib/cgi-bin/man"
++#define LYNXCGIBASE "lynxcgi:/usr/lib/man2html/cgi-bin/man"
+ #endif
+ 
+ 
+diff -ur ../man2html-deb.orig/debian/sources/man.html ./debian/sources/man.html
+--- ../man2html-deb.orig/debian/sources/man.html	2011-11-02 12:45:37.000000000 -0700
++++ ./debian/sources/man.html	2011-12-15 05:13:46.492823889 -0700
+@@ -13,12 +13,10 @@
+ Depending on how you are accessing this file you are now reading, at least one of
+ the following URL should work:
+ <UL>
+-<LI><A HREF="http://localhost/cgi-bin/man/man2html">http://localhost/cgi-bin/man/man2html</A>
+-<LI><A HREF="/cgi-bin/man/man2html">http:/cgi-bin/man/man2html</A>
++<LI><A HREF="http://localhost/man/man2html">http://localhost/cgi-bin/man/man2html</A>
++<LI><A HREF="/man/man2html">http:/cgi-bin/man/man2html</A>
+ <LI><A HREF="lynxcgi:/usr/lib/cgi-bin/man/man2html">lynxcgi:/usr/lib/cgi-bin/man/man2html</A> 
+ (only if you are using <I>lynx</I> with lynxcgi support enabled)
+ </UL>
+-<P>
+-Please see the <A HREF="file:///usr/share/doc/man2html/README.Debian">/usr/share/doc/man2html/README.Debian</A> file for more details.
+ </BODY>
+ </HTML>
+diff -ur ../man2html-deb.orig/debian/sources/manwhatis.c ./debian/sources/manwhatis.c
+--- ../man2html-deb.orig/debian/sources/manwhatis.c	2011-11-02 12:45:37.000000000 -0700
++++ ./debian/sources/manwhatis.c	2011-12-15 05:24:06.484620719 -0700
+@@ -38,8 +38,8 @@
+ 
+ #define MAX 10000
+ 
+-#define CGIBASE "/cgi-bin/man"
+-#define LYNXCGIBASE "lynxcgi:/usr/lib/cgi-bin/man"
++#define CGIBASE "/man"
++#define LYNXCGIBASE "lynxcgi:/usr/lib/man2html/cgi-bin/man"
+ 
+ enum {mansec, manwhatis} called_as=manwhatis;
+ char manpath[200];

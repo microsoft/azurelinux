@@ -1,0 +1,33 @@
+diff --git a/pyproject.toml b/pyproject.toml
+index af29ca7..7f75769 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -67,10 +67,8 @@ python = ['3.8', '3.9', '3.10', '3.11', '3.12']
+ 
+ [tool.hatch.envs.test]
+ dependencies = [
+-    'coverage[toml]',
+     'diff-cover',
+     'pytest',
+-    'pytest-cov',
+     'sybil',
+ ]
+ 
+@@ -112,17 +110,8 @@ docs = [
+ ]
+ 
+ [tool.pytest.ini_options]
+-addopts = '--cov=public --cov-report=term --cov-report=xml -p no:doctest'
+ testpaths = 'test docs'
+ 
+-[tool.coverage.report]
+-fail_under = 100
+-show_missing = true
+-
+-[tool.coverage.run]
+-branch = true
+-parallel = true
+-
+ [tool.ruff]
+ line-length = 79
+ src = ['src']

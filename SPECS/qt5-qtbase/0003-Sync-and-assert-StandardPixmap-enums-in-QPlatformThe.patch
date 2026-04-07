@@ -1,0 +1,78 @@
+From fb0bc2e9f466c37f398af4a7a374fee2b29f5073 Mon Sep 17 00:00:00 2001
+From: Jan Grulich <jgrulich@redhat.com>
+Date: Wed, 26 Jul 2023 13:43:29 +0200
+Subject: [PATCH 03/15] Sync and assert StandardPixmap enums in QPlatformTheme
+ and QStyle
+
+Add missing enum values in QPlatformTheme::standardPixmap to sync with
+QStyle::standardPixmap changes from:
+785d2b9d0728bbbc0d2a92b7d4186a3114d54128
+aa5a595a98f1af4a514485268a18e6cb9cfec783
+
+Add enum values NStandardPixmap at the bottom of both enums as well
+as an assertion in QStyle constructor that these values are identical.
+Add omitvalue for NStandardPixmap in QStyle (QPlatformTheme enum is
+not documented).
+---
+ src/gui/kernel/qplatformtheme.h | 9 +++++++++
+ src/widgets/styles/qstyle.cpp   | 4 ++++
+ src/widgets/styles/qstyle.h     | 1 +
+ 3 files changed, 14 insertions(+)
+
+diff --git a/src/gui/kernel/qplatformtheme.h b/src/gui/kernel/qplatformtheme.h
+index 7e6c9d5740..99a30337f5 100644
+--- a/src/gui/kernel/qplatformtheme.h
++++ b/src/gui/kernel/qplatformtheme.h
+@@ -256,6 +256,15 @@ public:
+         MediaVolume,
+         MediaVolumeMuted,
+         LineEditClearButton,
++        DialogYesToAllButton,
++        DialogNoToAllButton,
++        DialogSaveAllButton,
++        DialogAbortButton,
++        DialogRetryButton,
++        DialogIgnoreButton,
++        RestoreDefaultsButton,
++        NStandardPixmap, // assertion value for sync with QStyle::StandardPixmap
++
+         // do not add any values below/greater than this
+         CustomBase = 0xf0000000
+     };
+diff --git a/src/widgets/styles/qstyle.cpp b/src/widgets/styles/qstyle.cpp
+index 669f158b7b..18d21a843d 100644
+--- a/src/widgets/styles/qstyle.cpp
++++ b/src/widgets/styles/qstyle.cpp
+@@ -412,6 +412,9 @@ QStyle::QStyle(QStylePrivate &dd)
+ {
+   Q_D(QStyle);
+   d->proxyStyle = this;
++  Q_STATIC_ASSERT_X(int(StandardPixmap::NStandardPixmap) ==
++                    int(QPlatformTheme::StandardPixmap::NStandardPixmap),
++                    "StandardPixmap in QPlatformTheme and QStyle out of sync");
+ }
+ 
+ /*!
+@@ -2117,6 +2120,7 @@ void QStyle::drawItemPixmap(QPainter *painter, const QRect &rect, int alignment,
+        This enum value was added in Qt 5.14.
+     \value SP_RestoreDefaultsButton Icon for a standard RestoreDefaults button in a QDialogButtonBox.
+        This enum value was added in Qt 5.14.
++    \omitvalue NStandardPixmap
+     \value SP_CustomBase  Base value for custom standard pixmaps;
+     custom values must be greater than this value.
+ 
+diff --git a/src/widgets/styles/qstyle.h b/src/widgets/styles/qstyle.h
+index 5be1b4b290..9d98f76152 100644
+--- a/src/widgets/styles/qstyle.h
++++ b/src/widgets/styles/qstyle.h
+@@ -845,6 +845,7 @@ public:
+         SP_DialogRetryButton,
+         SP_DialogIgnoreButton,
+         SP_RestoreDefaultsButton,
++        NStandardPixmap, // assertion value for sync with QPlatformTheme::StandardPixmap
+         // do not add any values below/greater than this
+         SP_CustomBase = 0xf0000000
+     };
+-- 
+2.41.0
+

@@ -1,0 +1,25 @@
+From d7a4d9cf4386b7b19ac8179826eb1e97292a483b Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Mon, 18 Nov 2024 04:12:02 -0500
+Subject: [PATCH] TST: Mark test_opener_fsspec_zip_http_fs as using the network
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ tests/test_pyopener.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tests/test_pyopener.py b/tests/test_pyopener.py
+index 5944174..1a6e09f 100644
+--- a/tests/test_pyopener.py
++++ b/tests/test_pyopener.py
+@@ -29,6 +29,7 @@ def test_opener_fsspec_zip_fs():
+         assert "AGBUR" in colxn.schema["properties"]
+ 
+ 
++@pytest.mark.network
+ def test_opener_fsspec_zip_http_fs():
+     """Use fsspec zip+http filesystem as opener."""
+     fs = fsspec.filesystem(
+-- 
+2.47.0
+

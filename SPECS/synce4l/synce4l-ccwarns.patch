@@ -1,0 +1,90 @@
+commit b8089eabc28d665cba462c29aabdb159f0f153a6
+Author: Miroslav Lichvar <mlichvar@redhat.com>
+Date:   Tue May 28 13:38:13 2024 +0200
+
+    Fix more compiler warnings
+    
+    Fix the following warnings observed when -O2 and -D_FORTIFY_SOURCE=2 are
+    added to CFLAGS.
+    
+    synce_dev.c: In function ‘rebuild_inputs_prio’:
+    synce_dev.c:610:28: warning: ‘best_c_idx’ may be used uninitialized [-Wmaybe-uninitialized]
+      610 |                         all[best_c_idx] = NULL;
+          |                            ^
+    synce_dev.c:582:39: note: ‘best_c_idx’ was declared here
+      582 |         int i = 0, prio_count = 0, j, best_c_idx, ret;
+          |                                       ^~~~~~~~~~
+    
+    synce_manager.c: In function ‘synce_manager_server_thread’:
+    synce_manager.c:260:9: warning: ‘strncpy’ specified bound 108 equals destination size [-Wstringop-truncation]
+      260 |         strncpy(server.sun_path, synce_clock_get_socket_path(clk),
+          |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      261 |                 sizeof(server.sun_path));
+          |                 ~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    synce_manager.c:343:20: warning: ‘ret’ may be used uninitialized [-Wmaybe-uninitialized]
+      343 |                 if (!ret)
+          |                    ^
+    synce_manager.c:241:26: note: ‘ret’ was declared here
+      241 |         int tlv_num = 0, ret, i, resp_len, bytes_read;
+          |                          ^~~
+    
+    synce_manager.c: In function ‘synce_manager_server_thread’:
+    synce_manager.c:346:25: warning: ignoring return value of ‘write’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+      346 |                         write(new_socket, response, resp_len);
+          |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+
+diff --git a/synce_dev.c b/synce_dev.c
+index fc784ed..5e2bbb9 100644
+--- a/synce_dev.c
++++ b/synce_dev.c
+@@ -579,7 +579,7 @@ static bool source_invalid(struct synce_clock_source *c)
+ int rebuild_inputs_prio(struct synce_dev *dev)
+ {
+ 	struct synce_clock_source *c, *best_c, **all, **prioritized;
+-	int i = 0, prio_count = 0, j, best_c_idx, ret;
++	int i = 0, prio_count = 0, j, best_c_idx = 0, ret;
+ 	uint32_t prio;
+ 
+ 	all = calloc(dev->num_clock_sources, sizeof(*all));
+diff --git a/synce_manager.c b/synce_manager.c
+index b9ba08d..598ef7e 100644
+--- a/synce_manager.c
++++ b/synce_manager.c
+@@ -257,8 +257,8 @@ static void *synce_manager_server_thread(void *arg)
+ 	}
+ 
+ 	server.sun_family = AF_UNIX;
+-	strncpy(server.sun_path, synce_clock_get_socket_path(clk),
+-		sizeof(server.sun_path));
++	snprintf(server.sun_path, sizeof(server.sun_path), "%s",
++		 synce_clock_get_socket_path(clk));
+ 
+ 	if (bind(server_fd, (struct sockaddr *)&server, sizeof(server)) < 0) {
+ 		pr_err("%s Bind failed", __func__);
+@@ -289,10 +289,12 @@ static void *synce_manager_server_thread(void *arg)
+ 		bytes_read = recv(new_socket, command, MAX_COMMAND_SIZE, 0);
+ 		if (bytes_read <= 0) {
+ 			synce_manager_generate_err_tlv(&err_tlv, "NULL command");
++			ret = -1;
+ 			goto return_response;
+ 		} else if (bytes_read > MAX_COMMAND_SIZE) {
+ 			synce_manager_generate_err_tlv(&err_tlv,
+ 						       "Command size exceeds MAX_COMMAND_SIZE");
++			ret = -1;
+ 			goto return_response;
+ 		}
+ 		ret = synce_manager_parse_input(command, bytes_read, &tlv_array,
+@@ -340,8 +342,8 @@ return_response:
+ 		if (tlv_array)
+ 			free((void *)tlv_array);
+ 
+-		if (!ret)
+-			write(new_socket, response, resp_len);
++		if (!ret && write(new_socket, response, resp_len) != resp_len)
++			ret = -1;
+ 		close(new_socket);
+ 	}
+ 

@@ -1,0 +1,178 @@
+From ed41589e35a534cb47ea7b6dcc685fef2e7ca578 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Stefan=20P=C3=B6schel?= <github@basicmaster.de>
+Date: Sun, 31 Dec 2023 17:42:21 +0100
+Subject: [PATCH 10/10] caja-file-operations: restart timer also for moves
+
+As done for copy/delete jobs, restart the operation timer also for move
+jobs. Thus preparations (e.g. `scan_sources`) later won't affect the
+later transfer rate calculation.
+
+caja-file-operations: stop timer when waiting
+
+When a copy/move operation is created while another operation is already
+active, the new operation is queued. As the (already running) operation
+timer of the new operation is not stopped during the waiting period,
+that period is (erroneously) included in the transfer rate calculation
+and leads to initially low/slowly increasing transfer rates be shown.
+
+Hence stop the operation timer when the (queued) operation is waiting.
+
+Fixes #1420 and #1623.
+---
+ libcaja-private/caja-file-operations.c | 24 +++++++++++++-----------
+ libcaja-private/caja-progress-info.c   |  4 +++-
+ libcaja-private/caja-progress-info.h   |  2 +-
+ 3 files changed, 17 insertions(+), 13 deletions(-)
+
+diff --git a/libcaja-private/caja-file-operations.c b/libcaja-private/caja-file-operations.c
+index 6ab8697d..4b51c907 100644
+--- a/libcaja-private/caja-file-operations.c
++++ b/libcaja-private/caja-file-operations.c
+@@ -1879,7 +1879,7 @@ trash_files (CommonJob *job, GList *files, guint *files_skipped)
+ 	for (l = files;
+ 	     l != NULL && !job_aborted (job);
+ 	     l = l->next) {
+-        caja_progress_info_get_ready (job->progress);
++        caja_progress_info_get_ready (job->progress, job->time);
+ 
+ 		file = l->data;
+ 
+@@ -3632,7 +3632,7 @@ copy_move_directory (CopyMoveJob *copy_job,
+ 		nextinfo = g_file_enumerator_next_file (enumerator, job->cancellable, skip_error?NULL:&error);
+ 		while (!job_aborted (job) &&
+ 		       (info = nextinfo) != NULL) {
+-			caja_progress_info_get_ready (job->progress);
++			caja_progress_info_get_ready (job->progress, job->time);
+ 
+ 			nextinfo = g_file_enumerator_next_file (enumerator, job->cancellable, skip_error?NULL:&error);
+ 			src_file = g_file_get_child (src,
+@@ -4598,7 +4598,7 @@ copy_files (CopyMoveJob *job,
+ 	for (l = job->files;
+ 	     l != NULL && !job_aborted (common);
+ 	     l = l->next) {
+-		caja_progress_info_get_ready (common->progress);
++		caja_progress_info_get_ready (common->progress, common->time);
+ 
+ 		src = l->data;
+ 
+@@ -4915,7 +4915,7 @@ move_file_prepare (CopyMoveJob *move_job,
+ 	}
+ 
+  retry:
+-    caja_progress_info_get_ready (job->progress);
++	caja_progress_info_get_ready (job->progress, job->time);
+ 
+ 	flags = G_FILE_COPY_NOFOLLOW_SYMLINKS | G_FILE_COPY_NO_FALLBACK_FOR_MOVE;
+ 	if (overwrite) {
+@@ -5091,7 +5091,7 @@ move_files_prepare (CopyMoveJob *job,
+ 
+ 	total = left = g_list_length (job->files);
+ 
+-	caja_progress_info_get_ready (common->progress);
++	caja_progress_info_get_ready (common->progress, common->time);
+ 	report_move_progress (job, total, left);
+ 
+ 	i = 0;
+@@ -5155,7 +5155,7 @@ move_files (CopyMoveJob *job,
+ 	for (l = fallbacks;
+ 	     l != NULL && !job_aborted (common);
+ 	     l = l->next) {
+-		caja_progress_info_get_ready (common->progress);
++		caja_progress_info_get_ready (common->progress, common->time);
+ 
+ 		fallback = l->data;
+ 		src = fallback->file;
+@@ -5269,6 +5269,8 @@ move_job (GIOSchedulerJob *io_job,
+ 		goto aborted;
+ 	}
+ 
++	g_timer_start (job->common.time);
++
+ 	memset (&transfer_info, 0, sizeof (transfer_info));
+ 	move_files (job,
+ 		    fallbacks,
+@@ -5579,7 +5581,7 @@ link_job (GIOSchedulerJob *io_job,
+ 	for (l = job->files;
+ 	     l != NULL && !job_aborted (common);
+ 	     l = l->next) {
+-        caja_progress_info_get_ready (common->progress);
++        caja_progress_info_get_ready (common->progress, common->time);
+ 
+ 		src = l->data;
+ 
+@@ -5721,7 +5723,7 @@ set_permissions_file (SetPermissionsJob *job,
+ 
+ 	caja_progress_info_pulse_progress (common->progress);
+ 
+-	caja_progress_info_get_ready (common->progress);
++	caja_progress_info_get_ready (common->progress, common->time);
+ 
+ 	free_info = FALSE;
+ 	if (info == NULL) {
+@@ -6086,7 +6088,7 @@ create_job (GIOSchedulerJob *io_job,
+ 	count = 1;
+ 
+  retry:
+-    caja_progress_info_get_ready (common->progress);
++	caja_progress_info_get_ready (common->progress, common->time);
+ 
+ 	error = NULL;
+ 	if (job->make_dir) {
+@@ -6416,7 +6418,7 @@ delete_trash_file (CommonJob *job,
+ 		   gboolean del_file,
+ 		   gboolean del_children)
+ {
+-	caja_progress_info_get_ready (job->progress);
++	caja_progress_info_get_ready (job->progress, job->time);
+ 
+ 	if (job_aborted (job)) {
+ 		return;
+@@ -6565,7 +6567,7 @@ mark_desktop_file_trusted (CommonJob *common,
+ 	GFileInfo *info;
+ 
+  retry:
+-    caja_progress_info_get_ready (common->progress);
++	caja_progress_info_get_ready (common->progress, common->time);
+ 
+ 	error = NULL;
+ 	if (!g_file_load_contents (file,
+diff --git a/libcaja-private/caja-progress-info.c b/libcaja-private/caja-progress-info.c
+index 1db11351..7ded7ae4 100644
+--- a/libcaja-private/caja-progress-info.c
++++ b/libcaja-private/caja-progress-info.c
+@@ -707,7 +707,7 @@ widget_state_notify_paused_callback (ProgressWidgetData *data)
+ }
+ 
+ void
+-caja_progress_info_get_ready (CajaProgressInfo *info)
++caja_progress_info_get_ready (CajaProgressInfo *info, GTimer *time)
+ {
+     if (info->waiting) {
+         G_LOCK (progress_info);
+@@ -717,8 +717,10 @@ caja_progress_info_get_ready (CajaProgressInfo *info)
+             g_source_set_callback (source, (GSourceFunc)widget_state_notify_paused_callback, info->widget, NULL);
+             g_source_attach (source, NULL);
+ 
++            g_timer_stop (time);
+             while (info->waiting)
+                 g_cond_wait (&info->waiting_c, &G_LOCK_NAME(progress_info));
++            g_timer_continue (time);
+         }
+         G_UNLOCK (progress_info);
+     }
+diff --git a/libcaja-private/caja-progress-info.h b/libcaja-private/caja-progress-info.h
+index c713361b..4b3e59f4 100644
+--- a/libcaja-private/caja-progress-info.h
++++ b/libcaja-private/caja-progress-info.h
+@@ -51,7 +51,7 @@ GType caja_progress_info_get_type (void) G_GNUC_CONST;
+  */
+ 
+ CajaProgressInfo *caja_progress_info_new (gboolean should_start, gboolean can_pause);
+-void caja_progress_info_get_ready (CajaProgressInfo *info);
++void caja_progress_info_get_ready (CajaProgressInfo *info, GTimer *time);
+ void caja_progress_info_disable_pause (CajaProgressInfo *info);
+ 
+ GList *       caja_get_all_progress_info (void);
+-- 
+2.48.1
+

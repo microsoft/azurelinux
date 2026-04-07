@@ -1,0 +1,109 @@
+From 721de88621100f6ed33f1602415bc249f3ed3219 Mon Sep 17 00:00:00 2001
+From: Martin Sehnoutka <msehnout@redhat.com>
+Date: Thu, 17 Nov 2016 10:22:32 +0100
+Subject: [PATCH 19/59] Introduce reverse_lookup_enable option.
+
+vsftpd can transform IP address into hostname before
+PAM authentication. You can disable it to prevent
+performance issues.
+---
+ parseconf.c   |  1 +
+ sysdeputil.c  | 14 +++++++++-----
+ tunables.c    |  2 ++
+ tunables.h    |  1 +
+ vsftpd.conf.5 |  9 +++++++++
+ 5 files changed, 22 insertions(+), 5 deletions(-)
+
+diff --git a/parseconf.c b/parseconf.c
+index 30df598..3e0dba4 100644
+--- a/parseconf.c
++++ b/parseconf.c
+@@ -91,6 +91,7 @@ parseconf_bool_array[] =
+   { "mdtm_write", &tunable_mdtm_write },
+   { "lock_upload_files", &tunable_lock_upload_files },
+   { "pasv_addr_resolve", &tunable_pasv_addr_resolve },
++  { "reverse_lookup_enable", &tunable_reverse_lookup_enable },
+   { "userlist_log", &tunable_userlist_log },
+   { "debug_ssl", &tunable_debug_ssl },
+   { "require_cert", &tunable_require_cert },
+diff --git a/sysdeputil.c b/sysdeputil.c
+index 3bbabaa..2063c87 100644
+--- a/sysdeputil.c
++++ b/sysdeputil.c
+@@ -354,12 +354,16 @@ vsf_sysdep_check_auth(struct mystr* p_user_str,
+     return 0;
+   }
+ #ifdef PAM_RHOST
+-  sin.sin_addr.s_addr = inet_addr(str_getbuf(p_remote_host));
+-  host = gethostbyaddr((char*)&sin.sin_addr.s_addr,sizeof(struct in_addr),AF_INET);
+-  if (host != (struct hostent*)0)
+-    retval = pam_set_item(s_pamh, PAM_RHOST, host->h_name);
+-  else
++  if (tunable_reverse_lookup_enable) {
++    sin.sin_addr.s_addr = inet_addr(str_getbuf(p_remote_host));
++    host = gethostbyaddr((char*)&sin.sin_addr.s_addr,sizeof(struct in_addr),AF_INET);
++    if (host != (struct hostent*)0)
++      retval = pam_set_item(s_pamh, PAM_RHOST, host->h_name);
++    else
++      retval = pam_set_item(s_pamh, PAM_RHOST, str_getbuf(p_remote_host));
++  } else {
+     retval = pam_set_item(s_pamh, PAM_RHOST, str_getbuf(p_remote_host));
++  }
+   if (retval != PAM_SUCCESS)
+   {
+     (void) pam_end(s_pamh, retval);
+diff --git a/tunables.c b/tunables.c
+index b30fca1..c737465 100644
+--- a/tunables.c
++++ b/tunables.c
+@@ -72,6 +72,7 @@ int tunable_force_anon_data_ssl;
+ int tunable_mdtm_write;
+ int tunable_lock_upload_files;
+ int tunable_pasv_addr_resolve;
++int tunable_reverse_lookup_enable;
+ int tunable_userlist_log;
+ int tunable_debug_ssl;
+ int tunable_require_cert;
+@@ -213,6 +214,7 @@ tunables_load_defaults()
+   tunable_mdtm_write = 1;
+   tunable_lock_upload_files = 1;
+   tunable_pasv_addr_resolve = 0;
++  tunable_reverse_lookup_enable = 1;
+   tunable_userlist_log = 0;
+   tunable_debug_ssl = 0;
+   tunable_require_cert = 0;
+diff --git a/tunables.h b/tunables.h
+index e44d64c..9553038 100644
+--- a/tunables.h
++++ b/tunables.h
+@@ -73,6 +73,7 @@ extern int tunable_force_anon_data_ssl;       /* Require anon data uses SSL */
+ extern int tunable_mdtm_write;                /* Allow MDTM to set timestamps */
+ extern int tunable_lock_upload_files;         /* Lock uploading files */
+ extern int tunable_pasv_addr_resolve;         /* DNS resolve pasv_addr */
++extern int tunable_reverse_lookup_enable;     /* Get hostname before pam auth */
+ extern int tunable_userlist_log;              /* Log every failed login attempt */
+ extern int tunable_debug_ssl;                 /* Verbose SSL logging */
+ extern int tunable_require_cert;              /* SSL client cert required */
+diff --git a/vsftpd.conf.5 b/vsftpd.conf.5
+index 72bb86f..fb6324e 100644
+--- a/vsftpd.conf.5
++++ b/vsftpd.conf.5
+@@ -423,6 +423,15 @@ so you may want to disable it. For a discussion of the consequences, see
+ http://scarybeastsecurity.blogspot.com/2009/02/vsftpd-210-released.html
+ (Added in v2.1.0).
+ 
++Default: YES
++.TP
++.B reverse_lookup_enable
++Set to YES if you want vsftpd to transform the ip address into the hostname,
++before pam authentication. This is useful if you use pam_access including the
++hostname. If you want vsftpd to run on the environment where the reverse lookup
++for some hostname is available and the name server doesn't respond for a while,
++you should set this to NO to avoid a performance issue.
++
+ Default: YES
+ .TP
+ .B run_as_launching_user
+-- 
+2.14.4
+

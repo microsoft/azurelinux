@@ -1,0 +1,93 @@
+.TH GRPC_CLI\-PARSE "1" "May 2021" "" "User Commands"
+.SH NAME
+.B grpc_cli\ parse
+\(en parse message
+.SH SYNOPSIS
+.B grpc_cli parse
+.I address
+.I type
+.RI [ message ]
+.RI [ OPTION ]...\:
+.SH OPTIONS
+.TP
+.I address
+.IB host : port
+.TP
+.I type
+Protocol buffer type name
+.TP
+.I message
+Text protobuffer (overrides
+.BR \-\-infile )
+.TP
+.B \-\-protofiles
+Comma separated proto files used as a fallback when parsing request/response
+.TP
+.B \-\-proto_path
+The search paths of proto files
+.RB ( :
+separated), valid only when
+.B \-\-protofiles
+is given
+.TP
+.B \-\-noremotedb
+Don\(cqt attempt to use reflection service at all
+.TP
+.B \-\-infile
+Input filename (defaults to
+.IR stdin )
+.TP
+.B \-\-outfile
+Output filename (defaults to
+.IR stdout )
+.TP
+.B \-\-binary_input
+Input in binary format
+.TP
+.B \-\-binary_output
+Output in binary format
+.TP
+.B \-\-json_input
+Input in json format
+.TP
+.B \-\-json_output
+Output in json format
+.TP
+.B \-\-ssl_target
+Set server host for ssl validation
+.TP
+.B \-\-ssl_client_cert
+Client cert for ssl
+.TP
+.B \-\-ssl_client_key
+Client private key for ssl
+.TP
+.B \-\-local_connect_type
+Set to
+.B local_tcp
+or
+.B uds
+.TP
+.B \-\-channel_creds_type
+Set to
+.BR insecure ,
+.BR ssl ,
+.BR gdc ,
+.BR alts ,
+or
+.B local
+.TP
+.B \-\-call_creds
+Set to
+.BR none ,
+or
+.BI access_token= token
+.SH "SEE\ ALSO"
+.BR grpc_cli (1),
+.BR grpc_cli\-ls (1),
+.BR grpc_cli\-call (1),
+.BR grpc_cli\-type (1),
+.BR grpc_cli\-totext (1),
+.BR grpc_cli\-tojson (1),
+.BR grpc_cli\-tobinary (1),
+.BR grpc_cli\-help (1)

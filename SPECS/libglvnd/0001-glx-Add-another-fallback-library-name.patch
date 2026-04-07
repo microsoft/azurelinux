@@ -1,0 +1,30 @@
+From 24606973bfabd75285fbd489264235167ba0f44c Mon Sep 17 00:00:00 2001
+From: Adam Jackson <ajax@redhat.com>
+Date: Thu, 14 Jun 2018 11:25:21 -0400
+Subject: [PATCH] glx: Add another fallback library name
+
+This is mostly to avoid file conflicts with external packaging.
+
+Signed-off-by: Adam Jackson <ajax@redhat.com>
+---
+ src/GLX/libglxmapping.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/GLX/libglxmapping.c b/src/GLX/libglxmapping.c
+index be384f8..2016a04 100644
+--- a/src/GLX/libglxmapping.c
++++ b/src/GLX/libglxmapping.c
+@@ -591,6 +591,10 @@ __GLXvendorInfo *__glXLookupVendorByScreen(Display *dpy, const int screen)
+             vendor = __glXLookupVendorByName(FALLBACK_VENDOR_NAME);
+         }
+ 
++        if (!vendor) {
++            vendor = __glXLookupVendorByName("system");
++        }
++
+         dpyInfo->vendors[screen] = vendor;
+     }
+     __glvndPthreadFuncs.rwlock_unlock(&dpyInfo->vendorLock);
+-- 
+2.17.0
+

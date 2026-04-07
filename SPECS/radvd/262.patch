@@ -1,0 +1,43 @@
+From 8a0aa7c266500fffc8493fc4110ea2ab2cf3963a Mon Sep 17 00:00:00 2001
+From: Yaakov Selkowitz <yselkowi@redhat.com>
+Date: Wed, 26 Feb 2025 09:57:00 -0500
+Subject: [PATCH] Avoid libbsd header with libc strlcpy
+
+While #256 avoided the libbsd library dependency, this avoids the header
+requirement except when libbsd is actually needed.
+
+Signed-off-by: Yaakov Selkowitz <yselkowi@redhat.com>
+---
+ configure.ac | 2 +-
+ includes.h   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index f82d3ac..1e764a5 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -103,7 +103,7 @@ AC_MSG_RESULT(no)
+ dnl clock_gettime is in librt for glibc <2.17
+ AC_SEARCH_LIBS(clock_gettime, rt)
+ 
+-AC_CHECK_FUNC(strlcpy, found_strlcpy=yes, found_strlcpy=no)
++AC_CHECK_FUNCS(strlcpy, found_strlcpy=yes, found_strlcpy=no)
+ if test "x$found_strlcpy" = xno; then
+ 	dnl check libbsd for strlcpy
+ 	PKG_CHECK_MODULES([BSD], [libbsd >= 0])
+diff --git a/includes.h b/includes.h
+index 2a7a825..13f1440 100644
+--- a/includes.h
++++ b/includes.h
+@@ -26,7 +26,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+-#ifndef __FreeBSD__
++#ifndef HAVE_STRLCPY
+ #include <bsd/string.h> // strlcpy
+ #endif
+ #include <syslog.h>
+-- 
+2.48.1
+

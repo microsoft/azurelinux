@@ -1,0 +1,26 @@
+From 932b112a853367fe9f67824c7eb9d1ed24ec9569 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Thu, 8 Aug 2024 16:36:43 +0200
+Subject: [PATCH] Fix typo in code block attribute to fix issues with Rust
+ 1.80+
+
+---
+ src/lib.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index 1ea51ef..0d5b9d8 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -184,7 +184,7 @@
+ //! To ensure this library had zero dependencies, randomness was moved to the _random_ feature,
+ //! which requires the `rand` crate. You can enable this feature by including the
+ //! following in your `Cargo.toml`.
+-//! ```{toml}
++//! ```toml
+ //! [dependencies]
+ //! convert_case = { version = "^0.3.0", features = ["random"] }
+ //! ```
+-- 
+2.46.0
+

@@ -1,0 +1,28 @@
+From ba4849ffcba132376111363ab8c6bb5afebc9c65 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Veronika=20Hanul=C3=ADkov=C3=A1?= <vhanulik@redhat.com>
+Date: Wed, 23 Jul 2025 14:44:21 +0200
+Subject: [PATCH] Fix bash completion function name
+
+The `_split_longopt` is renamed to `_comp__split_longopt`
+from bash-completion v2.12.0.
+---
+ doc/tools/completion-template | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/doc/tools/completion-template b/doc/tools/completion-template
+index 895a3a9ceb..19a480d3f4 100644
+--- a/doc/tools/completion-template
++++ b/doc/tools/completion-template
+@@ -5,7 +5,11 @@ _FUNCTION_NAME()
+     local cur prev split=false
+     _get_comp_words_by_ref -n : cur prev
+ 
+-    _split_longopt && split=true
++    if type _comp__split_longopt &>/dev/null; then
++        _comp__split_longopt && split=true
++    else
++        _split_longopt && split=true
++    fi
+ 
+     opts="ALLOPTS"
+ 

@@ -1,0 +1,26 @@
+#!/bin/bash
+
+shopt -s failglob
+
+# Print output from failing tests
+printf -v sep "%0.s-" {1..80}
+for exit_file in t/test-results/*.exit; do
+    [ "$(< "$exit_file")" -eq 0 ] && continue
+    out_file="${exit_file%exit}out"
+    printf '\n%s\n%s\n%s\n' "$sep" "$out_file" "$sep"
+    cat "$out_file"
+done
+
+# tar up test-results & $testdir, then print base64 encoded output
+#
+# copy $testdir contents to test-results to avoid absolute paths with tar
+cp -a $testdir/* t/test-results/
+begin='-----BEGIN BASE64 MESSAGE-----'
+end='-----END BASE64 MESSAGE-----'
+printf '\n%s\n' 'test-results and trash directory output follows; decode via:'
+printf '%s\n' "sed -n '/^${begin}$/,/^${end}$/{/^${begin}$/!{/^${end}$/!p}}' build.log | base64 -d >output.tar.zst"
+printf '%s\n' "$begin"
+tar -C t -cf - test-results/ | zstdmt -17 | base64
+printf '%s\n' "$end"
+
+exit 1

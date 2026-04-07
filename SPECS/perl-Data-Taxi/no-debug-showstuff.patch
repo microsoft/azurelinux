@@ -1,0 +1,22 @@
+diff -up Data-Taxi-0.96/Makefile.PL.orig Data-Taxi-0.96/Makefile.PL
+--- Data-Taxi-0.96/Makefile.PL.orig	2010-11-15 04:38:29.000000000 +0100
++++ Data-Taxi-0.96/Makefile.PL	2011-01-16 08:46:40.000000000 +0100
+@@ -5,7 +5,6 @@ WriteMakefile(
+ 	'NAME'            => "Data::Taxi",
+ 	'VERSION_FROM'    => "Taxi.pm", # finds $VERSION
+ 	'PREREQ_PM'       => {
+-		'Debug::ShowStuff' => 1.1,
+ 	}, # e.g., Module::Name => 1.1
+ 	
+ 	# Add these new keywords supported since 5.005
+diff -up Data-Taxi-0.96/Taxi.pm.orig Data-Taxi-0.96/Taxi.pm
+--- Data-Taxi-0.96/Taxi.pm.orig	2010-11-15 04:38:28.000000000 +0100
++++ Data-Taxi-0.96/Taxi.pm	2011-01-16 08:46:44.000000000 +0100
+@@ -3,7 +3,6 @@ use strict;
+ use vars qw[@ISA $VERSION $FORMAT_VERSION %HANDLE_FORMATS @EXPORT_OK %EXPORT_TAGS];
+ use Carp 'croak';
+ use Exporter;
+-use Debug::ShowStuff ':all';
+ @ISA = 'Exporter';
+ use 5.006;
+ 

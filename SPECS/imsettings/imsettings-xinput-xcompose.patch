@@ -1,0 +1,36 @@
+diff -pruN imsettings-1.6.1.orig/data/xinput.sh.in.in imsettings-1.6.1/data/xinput.sh.in.in
+--- imsettings-1.6.1.orig/data/xinput.sh.in.in	2013-04-03 19:23:22.000000000 +0900
++++ imsettings-1.6.1/data/xinput.sh.in.in	2013-04-03 19:23:50.000000000 +0900
+@@ -53,9 +53,10 @@ if [ -r "$USER_XINPUTRC" -a "x$IMSETTING
+     fi
+ elif [ -r "$SYS_XINPUTRC" -a "x$IMSETTINGS_DISABLE_SYS_XINPUTRC" = "xno" ]; then
+     # FIXME: This hardcoded list has to be gone in the future.
+-    _language_list="as bn gu hi ja kn ko mai ml mr ne or pa si ta te th ur vi zh"
++    # Locales that normally use input-method for native input
++    _im_language_list="as bn gu hi ja kn ko mai ml mr ne or pa si ta te th ur vi zh"
+     _sourced_xinputrc=0
+-    for i in $_language_list; do
++    for i in $_im_language_list; do
+         if echo $tmplang | grep -q -E "^$i"; then
+             source "$SYS_XINPUTRC"
+             READ_XINPUTRC=$SYS_XINPUTRC
+@@ -63,6 +64,19 @@ elif [ -r "$SYS_XINPUTRC" ]; then
+             break
+         fi
+     done
++    # Locales that usually use X locale compose
++    # FIXME: which other locales should be included here?
++    if [ $_sourced_xinputrc -eq 0 ]; then
++        _xcompose_language_list="am_ET el_GR fi_FI pt_BR ru_RU"
++        for i in $_xcompose_language_list; do
++            if echo $tmplang | grep -q -E "^$i"; then
++                source @XINPUT_PATH@/xcompose.conf
++                READ_XINPUTRC=@XINPUT_PATH@/xcompose.conf
++                _sourced_xinputrc=1
++                break
++            fi
++        done
++    fi
+     if [ $_sourced_xinputrc -eq 0 ]; then
+         # Read none.conf to set up properly for locales not listed the above.
+         source @XINPUT_PATH@/none.conf

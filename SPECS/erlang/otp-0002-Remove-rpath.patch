@@ -1,0 +1,19 @@
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Thu, 25 Feb 2010 16:57:43 +0300
+Subject: [PATCH] Remove rpath
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+
+diff --git a/lib/crypto/c_src/Makefile.in b/lib/crypto/c_src/Makefile.in
+index aedc9e7a13..b27c2aa01b 100644
+--- a/lib/crypto/c_src/Makefile.in
++++ b/lib/crypto/c_src/Makefile.in
+@@ -147,7 +147,7 @@ endif
+ endif
+ 
+ ifeq ($(DYNAMIC_OR_WIN_CRYPTO_LIB),yes)
+-SSL_DED_LD_RUNTIME_LIBRARY_PATH = @SSL_DED_LD_RUNTIME_LIBRARY_PATH@
++SSL_DED_LD_RUNTIME_LIBRARY_PATH =
+ CRYPTO_LINK_LIB=$(SSL_DED_LD_RUNTIME_LIBRARY_PATH) -L$(SSL_LIBDIR) -l$(SSL_CRYPTO_LIBNAME)
+ EXTRA_FLAGS = -DHAVE_DYNAMIC_CRYPTO_LIB
+ else

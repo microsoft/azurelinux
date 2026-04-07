@@ -1,0 +1,83 @@
+From 341d5f58dfb731bbec24b3969096db12ed1e271e Mon Sep 17 00:00:00 2001
+From: Tom Rix <Tom.Rix@amd.com>
+Date: Wed, 16 Apr 2025 09:24:34 -0700
+Subject: [PATCH] comgr link with static llvm
+
+---
+ amd/comgr/CMakeLists.txt | 53 +++++++++++++++++++---------------------
+ 1 file changed, 25 insertions(+), 28 deletions(-)
+
+diff --git a/amd/comgr/CMakeLists.txt b/amd/comgr/CMakeLists.txt
+index ed01d21cea30..877762811ff6 100644
+--- a/amd/comgr/CMakeLists.txt
++++ b/amd/comgr/CMakeLists.txt
+@@ -418,31 +418,27 @@ else()
+   set(SPIRV_STATIC_LIB "SPIRVAMDLib")
+ endif()
+ 
+-if (LLVM_LINK_LLVM_DYLIB)
+-  set(LLVM_LIBS LLVM ${SPIRV_DYNAMIC_LIB})
+-else()
+-  llvm_map_components_to_libnames(LLVM_LIBS
+-    ${LLVM_TARGETS_TO_BUILD}
+-    BinaryFormat
+-    BitReader
+-    BitWriter
+-    CodeGen
+-    Core
+-    DebugInfoDWARF
+-    Demangle
+-    IRReader
+-    Linker
+-    MC
+-    MCDisassembler
+-    MCParser
+-    Object
+-    Option
+-    Support
+-    Symbolize
+-    TargetParser
+-    ${SPIRV_STATIC_LIB}
+-    )
+-endif()
++llvm_map_components_to_libnames(LLVM_LIBS
++  ${LLVM_TARGETS_TO_BUILD}
++  BinaryFormat
++  BitReader
++  BitWriter
++  CodeGen
++  Core
++  DebugInfoDWARF
++  Demangle
++  IRReader
++  Linker
++  MC
++  MCDisassembler
++  MCParser
++  Object
++  Option
++  Support
++  Symbolize
++  TargetParser
++  ${SPIRV_STATIC_LIB}
++)
+ 
+ target_link_options(amd_comgr
+   PUBLIC
+@@ -452,9 +448,10 @@ target_link_options(amd_comgr
+ 
+ target_link_libraries(amd_comgr
+   PRIVATE
+-    ${LLD_LIBS}
+-    ${LLVM_LIBS}
+-    ${CLANG_LIBS})
++  ${LLD_LIBS}
++  ${CLANG_LIBS}
++  ${LLVM_LIBS}
++)
+ 
+ if (NOT UNIX)
+   target_link_libraries(amd_comgr
+-- 
+2.48.1
+

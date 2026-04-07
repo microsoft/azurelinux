@@ -1,0 +1,401 @@
+From 4794f55bf84699574a44aa9811b572ea195c4b9c Mon Sep 17 00:00:00 2001
+From: Weng Xuetian <wengxt@gmail.com>
+Date: Wed, 20 Jul 2022 15:57:40 -0700
+Subject: [PATCH 28/55] Only close popup in the the hierchary
+
+Imagine following event sequences:
+1. a tooltip is shown. activePopups = {tooltip}
+2. user click menu bar to show the menu, QMenu::setVisible is called.
+    now activePopups(tooltip, menu}
+3. tooltip visibility changed to false.
+4. closePopups() close both tooltip and menu.
+
+This is a common pattern under wayland that menu is shown as a invisible
+state. This patch tries to memorize the surface hierchary used to create
+the popup role. And only close those popups whose ancesotor is hidden.
+
+Pick-to: 6.4
+Change-Id: I78aa0b4e32a5812603e003e756d8bcd202e94af4
+Reviewed-by: David Edmundson <davidedmundson@kde.org>
+(cherry picked from commit f8e3257e9b1e22d52e9c221c62b8d9b6dd1151a3)
+---
+ src/client/qwaylandwindow.cpp                 | 33 ++++---
+ src/client/qwaylandwindow_p.h                 |  6 ++
+ .../xdg-shell-v5/qwaylandxdgpopupv5.cpp       |  5 +-
+ .../xdg-shell-v5/qwaylandxdgpopupv5_p.h       |  3 +-
+ .../xdg-shell-v5/qwaylandxdgshellv5.cpp       |  2 +-
+ .../xdg-shell-v6/qwaylandxdgshellv6.cpp       |  3 +
+ .../xdg-shell/qwaylandxdgshell.cpp            | 22 +++--
+ .../xdg-shell/qwaylandxdgshell_p.h            |  5 +-
+ tests/auto/client/xdgshell/tst_xdgshell.cpp   | 87 +++++++++++++++++++
+ 9 files changed, 136 insertions(+), 30 deletions(-)
+
+diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
+index 014e2d87..1e916ca1 100644
+--- a/src/client/qwaylandwindow.cpp
++++ b/src/client/qwaylandwindow.cpp
+@@ -239,6 +239,7 @@ bool QWaylandWindow::shouldCreateSubSurface() const
+ 
+ void QWaylandWindow::reset()
+ {
++    closeChildPopups();
+     delete mShellSurface;
+     mShellSurface = nullptr;
+     delete mSubSurfaceWindow;
+@@ -397,21 +398,6 @@ void QWaylandWindow::sendExposeEvent(const QRect &rect)
+     mLastExposeGeometry = rect;
+ }
+ 
+-
+-static QVector<QPointer<QWaylandWindow>> activePopups;
+-
+-void QWaylandWindow::closePopups(QWaylandWindow *parent)
+-{
+-    while (!activePopups.isEmpty()) {
+-        auto popup = activePopups.takeLast();
+-        if (popup.isNull())
+-            continue;
+-        if (popup.data() == parent)
+-            return;
+-        popup->reset();
+-    }
+-}
+-
+ QPlatformScreen *QWaylandWindow::calculateScreenFromSurfaceEvents() const
+ {
+     QReadLocker lock(&mSurfaceLock);
+@@ -431,8 +417,6 @@ void QWaylandWindow::setVisible(bool visible)
+     lastVisible = visible;
+ 
+     if (visible) {
+-        if (window()->type() == Qt::Popup || window()->type() == Qt::ToolTip)
+-            activePopups << this;
+         initWindow();
+ 
+         setGeometry(windowGeometry());
+@@ -441,7 +425,6 @@ void QWaylandWindow::setVisible(bool visible)
+         // QWaylandShmBackingStore::beginPaint().
+     } else {
+         sendExposeEvent(QRect());
+-        closePopups(this);
+         reset();
+     }
+ }
+@@ -1304,6 +1287,20 @@ void QWaylandWindow::setOpaqueArea(const QRegion &opaqueArea)
+     wl_region_destroy(region);
+ }
+ 
++void QWaylandWindow::addChildPopup(QWaylandWindow *surface) {
++    mChildPopups.append(surface);
++}
++
++void QWaylandWindow::removeChildPopup(QWaylandWindow *surface) {
++    mChildPopups.removeAll(surface);
++}
++
++void QWaylandWindow::closeChildPopups() {
++    while (!mChildPopups.isEmpty()) {
++        auto popup = mChildPopups.takeLast();
++        popup->reset();
++    }
++}
+ }
+ 
+ QT_END_NAMESPACE
+diff --git a/src/client/qwaylandwindow_p.h b/src/client/qwaylandwindow_p.h
+index c0a76345..2be87bc0 100644
+--- a/src/client/qwaylandwindow_p.h
++++ b/src/client/qwaylandwindow_p.h
+@@ -207,6 +207,10 @@ public:
+     void handleUpdate();
+     void deliverUpdateRequest() override;
+ 
++    void addChildPopup(QWaylandWindow* child);
++    void removeChildPopup(QWaylandWindow* child);
++    void closeChildPopups();
++
+ public slots:
+     void applyConfigure();
+ 
+@@ -262,6 +266,8 @@ protected:
+     QWaylandBuffer *mQueuedBuffer = nullptr;
+     QRegion mQueuedBufferDamage;
+ 
++    QList<QPointer<QWaylandWindow>> mChildPopups;
++
+ private:
+     void setGeometry_helper(const QRect &rect);
+     void initWindow();
+diff --git a/src/plugins/shellintegration/xdg-shell-v5/qwaylandxdgpopupv5.cpp b/src/plugins/shellintegration/xdg-shell-v5/qwaylandxdgpopupv5.cpp
+index 85d25e3c..60bdd491 100644
+--- a/src/plugins/shellintegration/xdg-shell-v5/qwaylandxdgpopupv5.cpp
++++ b/src/plugins/shellintegration/xdg-shell-v5/qwaylandxdgpopupv5.cpp
+@@ -47,18 +47,21 @@ QT_BEGIN_NAMESPACE
+ 
+ namespace QtWaylandClient {
+ 
+-QWaylandXdgPopupV5::QWaylandXdgPopupV5(struct ::xdg_popup_v5 *popup, QWaylandWindow *window)
++QWaylandXdgPopupV5::QWaylandXdgPopupV5(struct ::xdg_popup_v5 *popup, QWaylandWindow* parent, QWaylandWindow *window)
+     : QWaylandShellSurface(window)
+     , QtWayland::xdg_popup_v5(popup)
++    , m_parent(parent)
+     , m_window(window)
+ {
+     if (window->display()->windowExtension())
+         m_extendedWindow = new QWaylandExtendedSurface(window);
++    m_parent->addChildPopup(m_window);
+ }
+ 
+ QWaylandXdgPopupV5::~QWaylandXdgPopupV5()
+ {
+     xdg_popup_destroy(object());
++    m_parent->removeChildPopup(m_window);
+     delete m_extendedWindow;
+ }
+ 
+diff --git a/src/plugins/shellintegration/xdg-shell-v5/qwaylandxdgpopupv5_p.h b/src/plugins/shellintegration/xdg-shell-v5/qwaylandxdgpopupv5_p.h
+index 7494f6a6..d85f130b 100644
+--- a/src/plugins/shellintegration/xdg-shell-v5/qwaylandxdgpopupv5_p.h
++++ b/src/plugins/shellintegration/xdg-shell-v5/qwaylandxdgpopupv5_p.h
+@@ -70,7 +70,7 @@ class Q_WAYLAND_CLIENT_EXPORT QWaylandXdgPopupV5 : public QWaylandShellSurface
+ {
+     Q_OBJECT
+ public:
+-    QWaylandXdgPopupV5(struct ::xdg_popup_v5 *popup, QWaylandWindow *window);
++    QWaylandXdgPopupV5(struct ::xdg_popup_v5 *popup, QWaylandWindow* parent, QWaylandWindow *window);
+     ~QWaylandXdgPopupV5() override;
+ 
+ protected:
+@@ -78,6 +78,7 @@ protected:
+ 
+ private:
+     QWaylandExtendedSurface *m_extendedWindow = nullptr;
++    QWaylandWindow *m_parent = nullptr;
+     QWaylandWindow *m_window = nullptr;
+ };
+ 
+diff --git a/src/plugins/shellintegration/xdg-shell-v5/qwaylandxdgshellv5.cpp b/src/plugins/shellintegration/xdg-shell-v5/qwaylandxdgshellv5.cpp
+index 7e242c4a..def8452a 100644
+--- a/src/plugins/shellintegration/xdg-shell-v5/qwaylandxdgshellv5.cpp
++++ b/src/plugins/shellintegration/xdg-shell-v5/qwaylandxdgshellv5.cpp
+@@ -84,7 +84,7 @@ QWaylandXdgPopupV5 *QWaylandXdgShellV5::createXdgPopup(QWaylandWindow *window, Q
+     int x = position.x() + parentWindow->frameMargins().left();
+     int y = position.y() + parentWindow->frameMargins().top();
+ 
+-    auto popup = new QWaylandXdgPopupV5(get_xdg_popup(window->wlSurface(), parentSurface, seat, m_popupSerial, x, y), window);
++    auto popup = new QWaylandXdgPopupV5(get_xdg_popup(window->wlSurface(), parentSurface, seat, m_popupSerial, x, y), parentWindow, window);
+     m_popups.append(window);
+     QObject::connect(popup, &QWaylandXdgPopupV5::destroyed, [this, window](){
+         m_popups.removeOne(window);
+diff --git a/src/plugins/shellintegration/xdg-shell-v6/qwaylandxdgshellv6.cpp b/src/plugins/shellintegration/xdg-shell-v6/qwaylandxdgshellv6.cpp
+index 8c371661..151c78e3 100644
+--- a/src/plugins/shellintegration/xdg-shell-v6/qwaylandxdgshellv6.cpp
++++ b/src/plugins/shellintegration/xdg-shell-v6/qwaylandxdgshellv6.cpp
+@@ -174,6 +174,7 @@ QWaylandXdgSurfaceV6::Popup::Popup(QWaylandXdgSurfaceV6 *xdgSurface, QWaylandXdg
+     , m_xdgSurface(xdgSurface)
+     , m_parent(parent)
+ {
++    m_parent->window()->addChildPopup(m_xdgSurface->window());
+ }
+ 
+ QWaylandXdgSurfaceV6::Popup::~Popup()
+@@ -181,6 +182,8 @@ QWaylandXdgSurfaceV6::Popup::~Popup()
+     if (isInitialized())
+         destroy();
+ 
++    m_parent->window()->removeChildPopup(m_xdgSurface->window());
++
+     if (m_grabbing) {
+         auto *shell = m_xdgSurface->m_shell;
+         Q_ASSERT(shell->m_topmostGrabbingPopup == this);
+diff --git a/src/plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp b/src/plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp
+index e7bd5117..c79b0e49 100644
+--- a/src/plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp
++++ b/src/plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp
+@@ -196,12 +196,17 @@ QtWayland::xdg_toplevel::resize_edge QWaylandXdgSurface::Toplevel::convertToResi
+                 | ((edges & Qt::RightEdge) ? resize_edge_right : 0));
+ }
+ 
+-QWaylandXdgSurface::Popup::Popup(QWaylandXdgSurface *xdgSurface, QWaylandXdgSurface *parent,
++QWaylandXdgSurface::Popup::Popup(QWaylandXdgSurface *xdgSurface, QWaylandWindow *parent,
+                                  QtWayland::xdg_positioner *positioner)
+-    : xdg_popup(xdgSurface->get_popup(parent->object(), positioner->object()))
+-    , m_xdgSurface(xdgSurface)
++    : m_xdgSurface(xdgSurface)
++    , m_parentXdgSurface(qobject_cast<QWaylandXdgSurface *>(parent->shellSurface()))
+     , m_parent(parent)
+ {
++
++    init(xdgSurface->get_popup(m_parentXdgSurface ? m_parentXdgSurface->object() : nullptr, positioner->object()));
++    if (m_parent) {
++        m_parent->addChildPopup(m_xdgSurface->window());
++    }
+ }
+ 
+ QWaylandXdgSurface::Popup::~Popup()
+@@ -209,10 +214,14 @@ QWaylandXdgSurface::Popup::~Popup()
+     if (isInitialized())
+         destroy();
+ 
++    if (m_parent) {
++        m_parent->removeChildPopup(m_xdgSurface->window());
++    }
++
+     if (m_grabbing) {
+         auto *shell = m_xdgSurface->m_shell;
+         Q_ASSERT(shell->m_topmostGrabbingPopup == this);
+-        shell->m_topmostGrabbingPopup = m_parent->m_popup;
++        shell->m_topmostGrabbingPopup = m_parentXdgSurface ? m_parentXdgSurface->m_popup : nullptr;
+         m_grabbing = false;
+ 
+         // Synthesize Qt enter/leave events for popup
+@@ -406,8 +415,6 @@ void QWaylandXdgSurface::setPopup(QWaylandWindow *parent)
+ {
+     Q_ASSERT(!m_toplevel && !m_popup);
+ 
+-    auto parentXdgSurface = static_cast<QWaylandXdgSurface *>(parent->shellSurface());
+-
+     auto positioner = new QtWayland::xdg_positioner(m_shell->create_positioner());
+     // set_popup expects a position relative to the parent
+     QPoint transientPos = m_window->geometry().topLeft(); // this is absolute
+@@ -422,8 +429,9 @@ void QWaylandXdgSurface::setPopup(QWaylandWindow *parent)
+     positioner->set_size(m_window->geometry().width(), m_window->geometry().height());
+     positioner->set_constraint_adjustment(QtWayland::xdg_positioner::constraint_adjustment_slide_x
+         | QtWayland::xdg_positioner::constraint_adjustment_slide_y);
+-    m_popup = new Popup(this, parentXdgSurface, positioner);
++    m_popup = new Popup(this, parent, positioner);
+     positioner->destroy();
++
+     delete positioner;
+ }
+ 
+diff --git a/src/plugins/shellintegration/xdg-shell/qwaylandxdgshell_p.h b/src/plugins/shellintegration/xdg-shell/qwaylandxdgshell_p.h
+index 96785205..4b518f0a 100644
+--- a/src/plugins/shellintegration/xdg-shell/qwaylandxdgshell_p.h
++++ b/src/plugins/shellintegration/xdg-shell/qwaylandxdgshell_p.h
+@@ -131,14 +131,15 @@ private:
+ 
+     class Popup : public QtWayland::xdg_popup {
+     public:
+-        Popup(QWaylandXdgSurface *xdgSurface, QWaylandXdgSurface *parent, QtWayland::xdg_positioner *positioner);
++        Popup(QWaylandXdgSurface *xdgSurface, QWaylandWindow *parent, QtWayland::xdg_positioner *positioner);
+         ~Popup() override;
+ 
+         void grab(QWaylandInputDevice *seat, uint serial);
+         void xdg_popup_popup_done() override;
+ 
+         QWaylandXdgSurface *m_xdgSurface = nullptr;
+-        QWaylandXdgSurface *m_parent = nullptr;
++        QWaylandXdgSurface *m_parentXdgSurface = nullptr;
++        QWaylandWindow *m_parent = nullptr;
+         bool m_grabbing = false;
+     };
+ 
+diff --git a/tests/auto/client/xdgshell/tst_xdgshell.cpp b/tests/auto/client/xdgshell/tst_xdgshell.cpp
+index 1da70ff2..c5271f63 100644
+--- a/tests/auto/client/xdgshell/tst_xdgshell.cpp
++++ b/tests/auto/client/xdgshell/tst_xdgshell.cpp
+@@ -46,6 +46,7 @@ private slots:
+     void configureStates();
+     void popup();
+     void tooltipOnPopup();
++    void tooltipAndSiblingPopup();
+     void switchPopups();
+     void hidePopupParent();
+     void pongs();
+@@ -346,6 +347,92 @@ void tst_xdgshell::tooltipOnPopup()
+     QCOMPOSITOR_TRY_COMPARE(xdgPopup(0), nullptr);
+ }
+ 
++void tst_xdgshell::tooltipAndSiblingPopup()
++{
++    class ToolTip : public QRasterWindow {
++    public:
++        explicit ToolTip(QWindow *parent) {
++            setTransientParent(parent);
++            setFlags(Qt::ToolTip);
++            resize(100, 100);
++            show();
++        }
++        void mousePressEvent(QMouseEvent *event) override {
++            QRasterWindow::mousePressEvent(event);
++            m_popup = new QRasterWindow;
++            m_popup->setTransientParent(transientParent());
++            m_popup->setFlags(Qt::Popup);
++            m_popup->resize(100, 100);
++            m_popup->show();
++        }
++
++        QRasterWindow *m_popup = nullptr;
++    };
++
++    class Window : public QRasterWindow {
++    public:
++        void mousePressEvent(QMouseEvent *event) override {
++            QRasterWindow::mousePressEvent(event);
++            m_tooltip = new ToolTip(this);
++        }
++        ToolTip *m_tooltip = nullptr;
++    };
++
++    Window window;
++    window.resize(200, 200);
++    window.show();
++
++    QCOMPOSITOR_TRY_VERIFY(xdgToplevel());
++    exec([=] { xdgToplevel()->sendCompleteConfigure(); });
++    QCOMPOSITOR_TRY_VERIFY(xdgToplevel()->m_xdgSurface->m_committedConfigureSerial);
++
++    exec([=] {
++        auto *surface = xdgToplevel()->surface();
++        auto *p = pointer();
++        auto *c = client();
++        p->sendEnter(surface, {100, 100});
++        p->sendFrame(c);
++        p->sendButton(client(), BTN_LEFT, Pointer::button_state_pressed);
++        p->sendButton(client(), BTN_LEFT, Pointer::button_state_released);
++        p->sendFrame(c);
++        p->sendLeave(surface);
++        p->sendFrame(c);
++    });
++
++    QCOMPOSITOR_TRY_VERIFY(xdgPopup());
++    exec([=] { xdgPopup()->sendCompleteConfigure(QRect(100, 100, 100, 100)); });
++    QCOMPOSITOR_TRY_VERIFY(xdgPopup()->m_xdgSurface->m_committedConfigureSerial);
++    QCOMPOSITOR_TRY_VERIFY(!xdgPopup()->m_grabbed);
++
++    exec([=] {
++        auto *surface = xdgPopup()->surface();
++        auto *p = pointer();
++        auto *c = client();
++        p->sendEnter(surface, {100, 100});
++        p->sendFrame(c);
++        p->sendButton(client(), BTN_LEFT, Pointer::button_state_pressed);
++        p->sendButton(client(), BTN_LEFT, Pointer::button_state_released);
++        p->sendFrame(c);
++    });
++
++    QCOMPOSITOR_TRY_VERIFY(xdgPopup(1));
++    exec([=] { xdgPopup(1)->sendCompleteConfigure(QRect(100, 100, 100, 100)); });
++    QCOMPOSITOR_TRY_VERIFY(xdgPopup(1)->m_xdgSurface->m_committedConfigureSerial);
++    QCOMPOSITOR_TRY_VERIFY(xdgPopup(1)->m_grabbed);
++
++    // Close the middle tooltip (it should not close the sibling popup)
++    window.m_tooltip->close();
++
++    QCOMPOSITOR_TRY_COMPARE(xdgPopup(1), nullptr);
++    // Verify the remaining xdg surface is a grab popup..
++    QCOMPOSITOR_TRY_VERIFY(xdgPopup(0));
++    QCOMPOSITOR_TRY_VERIFY(xdgPopup(0)->m_grabbed);
++
++    window.m_tooltip->m_popup->close();
++    QCOMPOSITOR_TRY_COMPARE(xdgPopup(1), nullptr);
++    QCOMPOSITOR_TRY_COMPARE(xdgPopup(0), nullptr);
++}
++
+ // QTBUG-65680
+ void tst_xdgshell::switchPopups()
+ {
+-- 
+2.51.1
+

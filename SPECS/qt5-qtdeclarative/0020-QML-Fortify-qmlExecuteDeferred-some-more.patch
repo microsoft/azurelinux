@@ -1,0 +1,54 @@
+From c635f85b51e152225bb644e0548ec66940f14d3f Mon Sep 17 00:00:00 2001
+From: Ulf Hermann <ulf.hermann@qt.io>
+Date: Wed, 8 Feb 2023 12:14:21 +0100
+Subject: [PATCH 20/22] QML: Fortify qmlExecuteDeferred some more
+
+I don't know how to trigger this, but a recent crash report from the CI
+shows that we can get there without a valid engine.
+
+Pick-to: 6.5
+Change-Id: I9f17894da82b8e7eab88181c96dfa8eaf7795523
+Reviewed-by: Fabian Kosmale <fabian.kosmale@qt.io>
+(cherry picked from commit f69b6f0940b178b46ecbaa5f0b4956ac44e8379e)
+---
+ src/qml/qml/qqmlengine.cpp | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
+
+diff --git a/src/qml/qml/qqmlengine.cpp b/src/qml/qml/qqmlengine.cpp
+index 4337a7f454..5ae937e22f 100644
+--- a/src/qml/qml/qqmlengine.cpp
++++ b/src/qml/qml/qqmlengine.cpp
+@@ -1583,17 +1583,22 @@ void qmlExecuteDeferred(QObject *object)
+ {
+     QQmlData *data = QQmlData::get(object);
+ 
+-    if (data && !data->deferredData.isEmpty() && !data->wasDeleted(object)) {
+-        QQmlEnginePrivate *ep = QQmlEnginePrivate::get(data->context->engine);
++    if (!data
++        || !data->context
++        || !data->context->engine
++        || data->deferredData.isEmpty()
++        || data->wasDeleted(object)) {
++        return;
++    }
+ 
+-        QQmlComponentPrivate::DeferredState state;
+-        QQmlComponentPrivate::beginDeferred(ep, object, &state);
++    QQmlEnginePrivate *ep = QQmlEnginePrivate::get(data->context->engine);
++    QQmlComponentPrivate::DeferredState state;
++    QQmlComponentPrivate::beginDeferred(ep, object, &state);
+ 
+-        // Release the reference for the deferral action (we still have one from construction)
+-        data->releaseDeferredData();
++    // Release the reference for the deferral action (we still have one from construction)
++    data->releaseDeferredData();
+ 
+-        QQmlComponentPrivate::completeDeferred(ep, &state);
+-    }
++    QQmlComponentPrivate::completeDeferred(ep, &state);
+ }
+ 
+ QQmlContext *qmlContext(const QObject *obj)
+-- 
+2.51.1
+

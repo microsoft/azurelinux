@@ -1,0 +1,50 @@
+From be4a42c9638768777f9db6746676519e06e12425 Mon Sep 17 00:00:00 2001
+From: Peter Hutterer <peter.hutterer@who-t.net>
+Date: Mon, 22 Jan 2024 10:53:49 +1000
+Subject: [PATCH 2/3] config: use our name/description setter functions
+
+The direct strncat into the struct is probably the reason no-one noticed
+the wrong #defines being used in those setters (see previous commit).
+We have the setters, let's use them.
+---
+ libxklavier/xklavier_config.c | 14 +++++---------
+ 1 file changed, 5 insertions(+), 9 deletions(-)
+
+diff --git a/libxklavier/xklavier_config.c b/libxklavier/xklavier_config.c
+index ac34a20..c6c9bc1 100644
+--- a/libxklavier/xklavier_config.c
++++ b/libxklavier/xklavier_config.c
+@@ -191,16 +191,13 @@ xkl_read_config_item(XklConfigRegistry * config, gint doc_index,
+ 	vendor_element = xkl_find_element(ptr, XML_TAG_VENDOR);
+ 
+ 	if (name_element != NULL && name_element->children != NULL)
+-		strncat(item->name,
+-			(char *) name_element->children->content,
+-			XKL_MAX_CI_NAME_LENGTH - 1);
++		xkl_config_item_set_name(item, (char *) name_element->children->content);
+ 
+ 	if (short_desc_element != NULL
+ 	    && short_desc_element->children != NULL) {
+-		strncat(item->short_description,
+-			dgettext(XKB_DOMAIN, (const char *)
+-				 short_desc_element->children->content),
+-			XKL_MAX_CI_SHORT_DESC_LENGTH - 1);
++		xkl_config_item_set_short_description(item,
++						      dgettext(XKB_DOMAIN, (const char *)
++								short_desc_element->children->content));
+ 	}
+ 
+ 	if (desc_element != NULL && desc_element->children != NULL) {
+@@ -238,8 +235,7 @@ xkl_read_config_item(XklConfigRegistry * config, gint doc_index,
+ 			g_free(translated);
+ 			translated = unescaped;
+ 		}
+-		strncat(item->description,
+-			translated, XKL_MAX_CI_DESC_LENGTH - 1);
++		xkl_config_item_set_description(item, translated);
+ 		g_free(translated);
+ 	}
+ 
+-- 
+2.43.0
+

@@ -1,0 +1,153 @@
+From: Robert Luberda <robert@debian.org>
+Date: Sat, 5 Jan 2008 11:17:36 +0100
+Subject: 030 man2html man hyphens
+
+Fix lintian's `hyphen-used-as-minus-sign'
+---
+ man/el/hman.man                | 6 +++---
+ man/el/man2html.man            | 2 +-
+ man/ro/man2html.man            | 2 +-
+ man2html/hman.1                | 6 +++---
+ man2html/locales/fr/man2html.1 | 2 +-
+ man2html/locales/it/hman.1     | 6 +++---
+ man2html/locales/it/man2html.1 | 2 +-
+ man2html/man2html.1            | 2 +-
+ 8 files changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/man/el/hman.man b/man/el/hman.man
+index 207bf33..294714f 100644
+--- a/man/el/hman.man
++++ b/man/el/hman.man
+@@ -10,10 +10,10 @@
+ hman \- πλοήγηση στις ηλεκτρονικές σελίδες εγχειριδίου
+ .SH ΣΥΝΟΨΗ
+ .B hman
+-[ -P \fIφυλλομετρητής\fP ] [ -H \fIυπολογιστής_υπηρεσίσς\fP ] [ \fIενότητα\fP ] \fIόνομα\fP
++[ \-P \fIφυλλομετρητής\fP ] [ \-H \fIυπολογιστής_υπηρεσίσς\fP ] [ \fIενότητα\fP ] \fIόνομα\fP
+ .br
+ .B hman
+-[ -P \fIφυλλομετρητής\fP ] [ -H \fIυπολογιστής_υπηρεσίας\fP ] [ \fIενότητα\fP ] [ ευρετήριο ]
++[ \-P \fIφυλλομετρητής\fP ] [ \-H \fIυπολογιστής_υπηρεσίας\fP ] [ \fIενότητα\fP ] [ ευρετήριο ]
+ .SH ΠΕΡΙΓΡΑΦΗ
+ Το σενάριο 
+ .B hman
+@@ -39,7 +39,7 @@ hman \- 
+ netscape, amaya, ...) που θα χρησιμοποιηθεί. 
+ Αυτή η επιλογή υπερισχύει της μεταβλητής περιβάλλοντος
+ .BR MANHTMLPAGER .
+-Η προεπιλογή είναι η μη-httpd έκδοση του
++Η προεπιλογή είναι η μη\-httpd έκδοση του
+ .BR lynx .
+ .TP
+ .B \-\^H " υπολογιστής_υπηρεσίας"
+diff --git a/man/el/man2html.man b/man/el/man2html.man
+index 9aae819..e5529c4 100644
+--- a/man/el/man2html.man
++++ b/man/el/man2html.man
+@@ -141,7 +141,7 @@ name@host	"mailto:name@host"
+ (αντί του \fIlocalhost\fP).  
+ Ένα σενάριο cgi θα μπορούσε να χρησιμοποιήσει τη
+ .IP
+-man2html -H $SERVER_NAME
++man2html \-H $SERVER_NAME
+ .LP
+ αν είχε οριστεί η μεταβλητή SERVER_NAME. 
+ Αυτό θα επέτρεπε στο μηχάνημά σου να λειτουργεί ως εξυπηρετητής,
+diff --git a/man/ro/man2html.man b/man/ro/man2html.man
+index ebe05d0..d510ae3 100644
+--- a/man/ro/man2html.man
++++ b/man/ro/man2html.man
+@@ -129,7 +129,7 @@ selecteaz
+ Opώiunea \-H \fIgazdγ\fP va specifica gazda care va fi folositγ (ξn loc
+ de \fIlocalhost\fP). Un script cgi ar putea folosi
+ .IP
+-man2html -H $SERVER_NAME
++man2html \-H $SERVER_NAME
+ .LP
+ dacγ variabila SERVER_NAME este configuratγ. Aceasta ar permite maΊinii
+ sγ se comporte ca un server Ίi sγ exporte pagini de manual.
+diff --git a/man2html/hman.1 b/man2html/hman.1
+index d2293bf..c0ee1ac 100644
+--- a/man2html/hman.1
++++ b/man2html/hman.1
+@@ -9,10 +9,10 @@
+ hman \- browse the on-line manual pages
+ .SH SYNOPSIS
+ .B hman
+-[ -P \fIbrowser\fP ] [ -H \fIhost\fP ] [ \fIsection\fP ] \fIname\fP
++[ \-P \fIbrowser\fP ] [ \-H \fIhost\fP ] [ \fIsection\fP ] \fIname\fP
+ .br
+ .B hman
+-[ -P \fIbrowser\fP ] [ -H \fIhost\fP ] [ \fIsection\fP ] [ index ]
++[ \-P \fIbrowser\fP ] [ \-H \fIhost\fP ] [ \fIsection\fP ] [ index ]
+ .SH DESCRIPTION
+ The 
+ .B hman
+@@ -72,4 +72,4 @@ The default host to use is selected using this environment variable.
+ .BR xmosaic (1),
+ .BR glimpse (1)
+ 
+-http://www.mcom.com/newsref/std/x-remote.html
++http://www.mcom.com/newsref/std/x\-remote.html
+diff --git a/man2html/locales/fr/man2html.1 b/man2html/locales/fr/man2html.1
+index 1e99cd8..9af7474 100644
+--- a/man2html/locales/fr/man2html.1
++++ b/man2html/locales/fr/man2html.1
+@@ -138,7 +138,7 @@ l'option \-q (for 
+ L'option \-H \fIhost\fP spιcifiera l'hτte ΰ utiliser
+ (ΰ la place \fIlocalhost\fP). Un script cgi pourra utiliser
+ .IP
+-man2html -H $SERVER_NAME
++man2html \-H $SERVER_NAME
+ .LP
+ si la variable SERVER_NAME est positionnιe. Cela permettra ΰ votre machine
+ de fonctionner en tant que serveur et d'exporter les pages manuel.
+diff --git a/man2html/locales/it/hman.1 b/man2html/locales/it/hman.1
+index 730de9c..e30806e 100644
+--- a/man2html/locales/it/hman.1
++++ b/man2html/locales/it/hman.1
+@@ -13,10 +13,10 @@
+ hman \- naviga le pagine di manuale on-line
+ .SH SINTASSI
+ .B hman
+-[ -P \fIbrowser\fP ] [ -H \fIhost\fP ] [ \fIsection\fP ] \fIname\fP
++[ \-P \fIbrowser\fP ] [ \-H \fIhost\fP ] [ \fIsection\fP ] \fIname\fP
+ .br
+ .B hman
+-[ -P \fIbrowser\fP ] [ -H \fIhost\fP ] [ \fIsection\fP ] [ index ]
++[ \-P \fIbrowser\fP ] [ \-H \fIhost\fP ] [ \fIsection\fP ] [ index ]
+ .SH DESCRIZIONE
+ Lo script
+ .B hman
+@@ -68,4 +68,4 @@ L'host predefinito in uso 
+ .BR xmosaic (1),
+ .BR glimpse (1)
+ 
+-http://www.mcom.com/newsref/std/x-remote.html
++http://www.mcom.com/newsref/std/x\-remote.html
+diff --git a/man2html/locales/it/man2html.1 b/man2html/locales/it/man2html.1
+index 41638a7..5348754 100644
+--- a/man2html/locales/it/man2html.1
++++ b/man2html/locales/it/man2html.1
+@@ -137,7 +137,7 @@ l'opzione \-q (per `query') seleziona '?' come separatore.
+ L'opzione \-H \fIhost\fP specificherΰ l'host da usare
+ (invece di \fIlocalhost\fP). Uno script cgi puς usare
+ .IP
+-man2html -H $SERVER_NAME
++man2html \-H $SERVER_NAME
+ .LP
+ se θ impostata la variabile SERVER_NAME . Questo permetterΰ alla propria 
+ macchina di comportarsi come un server ed esportare man page.
+diff --git a/man2html/man2html.1 b/man2html/man2html.1
+index bff0960..cee0ada 100644
+--- a/man2html/man2html.1
++++ b/man2html/man2html.1
+@@ -131,7 +131,7 @@ the option \-q (for `query') selects '?' as a separator.
+ The option \-H \fIhost\fP will specify the host to use
+ (instead of \fIlocalhost\fP).  A cgi script could use
+ .IP
+-man2html -H $SERVER_NAME
++man2html \-H $SERVER_NAME
+ .LP
+ if the variable SERVER_NAME is set.  This would allow your machine
+ to act as a server and export man pages.

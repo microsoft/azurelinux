@@ -1,0 +1,38 @@
+Avoid an implicit function declaration of amd_defaults, cholmod_start.
+Without this change, detection results change with compilers which do
+not support implicit function declarations.  The fake prototypes match
+those that autoconf uses.
+
+The source code for all the autoconf macros is not included here, so
+patch only the generated shell script.
+
+This was solved upstream via:
+
+commit fea612b2327ad347b6e8aba96ff33e87b98d10fb
+Author: Stefan Vigerske <svigerske@gams.com>
+Date:   Fri Feb 26 06:08:27 2021 +0100
+
+    use CHK_LIBHDR macro for amd, cholesky, and (system-)mumps
+
+diff --git a/Clp/configure b/Clp/configure
+index bdbfe60f2613c6c5..4d3a4b4f05a30b12 100755
+--- a/Clp/configure
++++ b/Clp/configure
+@@ -23396,6 +23396,8 @@ cat confdefs.h >>conftest.$ac_ext
+ cat >>conftest.$ac_ext <<_ACEOF
+ /* end confdefs.h.  */
+ 
++char $fnm (void);
++
+ int
+ main ()
+ {
+@@ -23589,6 +23591,8 @@ cat confdefs.h >>conftest.$ac_ext
+ cat >>conftest.$ac_ext <<_ACEOF
+ /* end confdefs.h.  */
+ 
++char $fnm (void);
++
+ int
+ main ()
+ {

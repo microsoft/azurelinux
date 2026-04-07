@@ -1,0 +1,27 @@
+From ed10cb3c612c49a6442e679052b755c52248ab3d Mon Sep 17 00:00:00 2001
+From: "D'Haese, Gratien [GTSBE - Non JJ]" <GDHAESE1@ITS.JNJ.COM>
+Date: Fri, 28 Feb 2025 17:05:21 +0100
+Subject: [PATCH] On EL9 sshd will not start anymore #3413
+
+---
+ usr/share/rear/skel/default/etc/scripts/run-sshd | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/usr/share/rear/skel/default/etc/scripts/run-sshd b/usr/share/rear/skel/default/etc/scripts/run-sshd
+index 23b8233eed..3a422fe7cd 100755
+--- a/usr/share/rear/skel/default/etc/scripts/run-sshd
++++ b/usr/share/rear/skel/default/etc/scripts/run-sshd
+@@ -13,6 +13,12 @@ if grep -q '^ssh:' /etc/inittab ; then
+         ssh-keygen -q -t rsa -N '' -f /etc/ssh/ssh_host_rsa_key
+         echo -e "\nSSH fingerprint: $( ssh-keygen -l -f /etc/ssh/ssh_host_rsa_key.pub )\n" >> /etc/issue
+     fi
++    if ! test -s /etc/ssh/ssh_host_ed25519_key ; then
++        # Generate the ed25519 SSH host key required on EL9
++        ssh-keygen -q -t ed25519 -N '' -f /etc/ssh/ssh_host_ed25519_key
++        echo -e "\nSSH fingerprint: $( ssh-keygen -l -f /etc/ssh/ssh_host_ed25519_key.pub )\n" >> /etc/issue
++    fi
++    mkdir -p /usr/share/empty.sshd   # required on EL9
+     mkdir -p /run/sshd
+     # Avoid "Could not load host key: /etc/ssh/ssh_host_..._key" messages
+     # that look confusing on the recovery system login screen
+

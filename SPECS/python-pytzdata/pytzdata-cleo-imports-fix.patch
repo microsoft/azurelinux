@@ -1,0 +1,52 @@
+From 022682ca3ff6e7a8b0fbc614e106d1b83189f2ca Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tom=C3=A1=C5=A1=20Hrn=C4=8Diar?= <thrnciar@redhat.com>
+Date: Mon, 10 Oct 2022 12:23:13 +0200
+Subject: [PATCH] Adapt imports to the latest version of cleo
+
+---
+ pytzdata/commands/app.py   | 2 +-
+ pytzdata/commands/make.py  | 2 +-
+ pytzdata/commands/zones.py | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/pytzdata/commands/app.py b/pytzdata/commands/app.py
+index 0d09a43..a64998b 100644
+--- a/pytzdata/commands/app.py
++++ b/pytzdata/commands/app.py
+@@ -1,6 +1,6 @@
+ # -*- coding: utf-8 -*-
+ 
+-from cleo import Application
++from cleo.application import Application
+ 
+ from .make import MakeCommand
+ from .zones import ZonesCommand
+diff --git a/pytzdata/commands/make.py b/pytzdata/commands/make.py
+index e0a7b4b..99498d9 100644
+--- a/pytzdata/commands/make.py
++++ b/pytzdata/commands/make.py
+@@ -9,7 +9,7 @@ import subprocess
+ from urllib.request import urlopen
+ from contextlib import closing
+ from distutils.dir_util import copy_tree, remove_tree
+-from cleo import Command
++from cleo.commands.command import Command
+ 
+ 
+ class MakeCommand(Command):
+diff --git a/pytzdata/commands/zones.py b/pytzdata/commands/zones.py
+index ef3e33a..bafadca 100644
+--- a/pytzdata/commands/zones.py
++++ b/pytzdata/commands/zones.py
+@@ -4,7 +4,7 @@ import os
+ import pprint
+ import pytzdata
+ 
+-from cleo import Command
++from cleo.commands.command import Command
+ 
+ 
+ class ZonesCommand(Command):
+-- 
+2.37.3
+

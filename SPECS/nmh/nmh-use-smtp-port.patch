@@ -1,0 +1,14 @@
+diff -ru4 nmh-1.8.orig/uip/post.c nmh-1.8/uip/post.c
+--- nmh-1.8.orig/uip/post.c	2023-01-01 14:25:07.583438071 -0500
++++ nmh-1.8/uip/post.c	2023-01-01 14:21:54.359995820 -0500
+@@ -260,9 +260,9 @@
+ static int nameoutput=0;	/* putadr() has output header name       */
+ static bool sasl;		/* Use SASL auth for SMTP                */
+ static char *saslmech=NULL;	/* Force use of particular SASL mech     */
+ static char *user=NULL;		/* Authenticate as this user             */
+-static char *port="submission";	/* Name of server port for SMTP submission */
++static char *port="smtp";	/* Name of server port for SMTP submission */
+ static int tlsflag=0;		/* Flags to control TLS settings	 */
+ static int fromcount=0;		/* Count of addresses on From: header	 */
+ static bool seensender;		/* Have we seen a Sender: header?	 */
+ 

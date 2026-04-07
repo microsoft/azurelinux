@@ -1,0 +1,40 @@
+From 8119bb8b927271f4c44b44bce6f43ba1c089e6b0 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Mon, 10 Jun 2024 15:48:23 +0200
+Subject: [PATCH] Avoid a DeprecationWarning on Python 3.13+
+
+    ...
+    /usr/lib/python3.13/site-packages/jupyter_client/jsonutil.py:31: in <module>
+        datetime.strptime("1", "%d")  # noqa
+    /usr/lib64/python3.13/_strptime.py:573: in _strptime_datetime
+        tt, fraction, gmtoff_fraction = _strptime(data_string, format)
+    /usr/lib64/python3.13/_strptime.py:336: in _strptime
+        format_regex = _TimeRE_cache.compile(format)
+    /usr/lib64/python3.13/_strptime.py:282: in compile
+        return re_compile(self.pattern(format), IGNORECASE)
+    /usr/lib64/python3.13/_strptime.py:270: in pattern
+        warnings.warn("""\
+    E   DeprecationWarning: Parsing dates involving a day of month without a year specified is ambiguious
+    E   and fails to parse leap day. The default behavior will change in Python 3.15
+    E   to either always raise an exception or to use a different default year (TBD).
+    E   To avoid trouble, add a specific year to the input & format.
+    E   See https://github.com/python/cpython/issues/70647.
+
+Fixes https://github.com/jupyter/jupyter_client/issues/1020
+---
+ jupyter_client/jsonutil.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/jupyter_client/jsonutil.py b/jupyter_client/jsonutil.py
+index 2ba640fe..1d001cb5 100644
+--- a/jupyter_client/jsonutil.py
++++ b/jupyter_client/jsonutil.py
+@@ -28,7 +28,7 @@
+ 
+ # holy crap, strptime is not threadsafe.
+ # Calling it once at import seems to help.
+-datetime.strptime("1", "%d")  # noqa
++datetime.strptime("2000-01-01", "%Y-%m-%d")  # noqa
+ 
+ # -----------------------------------------------------------------------------
+ # Classes and functions

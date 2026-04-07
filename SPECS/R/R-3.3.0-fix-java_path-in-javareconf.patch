@@ -1,0 +1,12 @@
+diff -up R-3.3.0/src/scripts/javareconf.in.fixpath R-3.3.0/src/scripts/javareconf.in
+--- R-3.3.0/src/scripts/javareconf.in.fixpath	2016-05-10 11:13:49.539844250 -0400
++++ R-3.3.0/src/scripts/javareconf.in	2016-05-10 11:15:10.475180907 -0400
+@@ -78,7 +78,7 @@ else
+ 	JAVA_PATH=${PATH}
+     else
+ 	## try jre/bin first just in case we don't have full JDK
+-	JAVA_PATH=${JAVA_HOME}:${JAVA_HOME}/jre/bin:${JAVA_HOME}/bin:${JAVA_HOME}/../bin:${PATH}
++	JAVA_PATH=${JAVA_HOME}:${JAVA_HOME}/jre/bin:${PATH}:${JAVA_HOME}/bin:${JAVA_HOME}/../bin
+     fi
+ fi
+ ## if 'java' is not on the PATH or JAVA_HOME, add some guesses as of

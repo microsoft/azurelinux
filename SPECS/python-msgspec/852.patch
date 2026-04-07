@@ -1,0 +1,157 @@
+From 89ecb0bd481cd4f355dd41b97153155d4463faed Mon Sep 17 00:00:00 2001
+From: Jelle Zijlstra <jelle.zijlstra@gmail.com>
+Date: Mon, 26 May 2025 09:06:43 -0700
+Subject: [PATCH] Fix annotations support on 3.14
+
+With this change, the tests run for me on a local build of Python 3.14.
+There are a lot of failures related to sys.getrefcount() but that seems
+to be an unrelated issue.
+
+Closes #810. Fixes #651. Fixes #795.
+---
+ msgspec/_core.c   | 59 +++++++++++++++++++++++++++++++++++++++++++++--
+ msgspec/_utils.py | 16 +++++++++----
+ 2 files changed, 69 insertions(+), 6 deletions(-)
+
+diff --git a/msgspec/_core.c b/msgspec/_core.c
+index 147ad95a..e5a48042 100644
+--- a/msgspec/_core.c
++++ b/msgspec/_core.c
+@@ -452,6 +452,7 @@ typedef struct {
+ #endif
+     PyObject *astimezone;
+     PyObject *re_compile;
++    PyObject *get_annotate_from_class_namespace;
+     uint8_t gc_cycle;
+ } MsgspecState;
+ 
+@@ -5814,12 +5815,45 @@ structmeta_is_classvar(
+ 
+ static int
+ structmeta_collect_fields(StructMetaInfo *info, MsgspecState *mod, bool kwonly) {
+-    PyObject *annotations = PyDict_GetItemString(
++    PyObject *annotations = PyDict_GetItemString(  // borrowed reference
+         info->namespace, "__annotations__"
+     );
+-    if (annotations == NULL) return 0;
++    if (annotations == NULL) {
++        if (mod->get_annotate_from_class_namespace != NULL) {
++            PyObject *annotate = PyObject_CallOneArg(
++                mod->get_annotate_from_class_namespace, info->namespace
++            );
++            if (annotate == NULL) {
++                return -1;
++            }
++            if (annotate == Py_None) {
++                Py_DECREF(annotate);
++                return 0;
++            }
++            PyObject *format = PyLong_FromLong(1);  /* annotationlib.Format.VALUE */
++            if (format == NULL) {
++                Py_DECREF(annotate);
++                return -1;
++            }
++            annotations = PyObject_CallOneArg(
++                annotate, format
++            );
++            Py_DECREF(annotate);
++            Py_DECREF(format);
++            if (annotations == NULL) {
++                return -1;
++            }
++        }
++        else {
++            return 0;  // No annotations, nothing to do
++        }
++    }
++    else {
++        Py_INCREF(annotations);
++    }
+ 
+     if (!PyDict_Check(annotations)) {
++        Py_DECREF(annotations);
+         PyErr_SetString(PyExc_TypeError, "__annotations__ must be a dict");
+         return -1;
+     }
+@@ -5869,6 +5903,7 @@ structmeta_collect_fields(StructMetaInfo *info, MsgspecState *mod, bool kwonly)
+     }
+     return 0;
+ error:
++    Py_DECREF(annotations);
+     Py_XDECREF(module_ns);
+     return -1;
+ }
+@@ -22225,6 +22260,26 @@ PyInit__core(void)
+     Py_DECREF(temp_module);
+     if (st->re_compile == NULL) return NULL;
+ 
++    /* annotationlib.get_annotate_from_class_namespace */
++    temp_module = PyImport_ImportModule("annotationlib");
++    if (temp_module == NULL) {
++        if (PyErr_ExceptionMatches(PyExc_ModuleNotFoundError)) {
++            // Below Python 3.14
++            PyErr_Clear();
++            st->get_annotate_from_class_namespace = NULL;
++        }
++        else {
++            return NULL;
++        }
++    }
++    else {
++        st->get_annotate_from_class_namespace = PyObject_GetAttrString(
++            temp_module, "get_annotate_from_class_namespace"
++        );
++        Py_DECREF(temp_module);
++        if (st->get_annotate_from_class_namespace == NULL) return NULL;
++    }
++
+     /* Initialize cached constant strings */
+ #define CACHED_STRING(attr, str) \
+     if ((st->attr = PyUnicode_InternFromString(str)) == NULL) return NULL
+diff --git a/msgspec/_utils.py b/msgspec/_utils.py
+index 6d338104..534d17f5 100644
+--- a/msgspec/_utils.py
++++ b/msgspec/_utils.py
+@@ -1,5 +1,6 @@
+ # type: ignore
+ import collections
++import inspect
+ import sys
+ import typing
+ 
+@@ -71,6 +72,13 @@ def _eval_type(t, globalns, localns):
+     _eval_type = typing._eval_type
+ 
+ 
++if sys.version_info >= (3, 10):
++    from inspect import get_annotations as _get_class_annotations
++else:
++    def _get_class_annotations(cls):
++        return cls.__dict__.get("__annotations__", {})
++
++
+ def _apply_params(obj, mapping):
+     if isinstance(obj, typing.TypeVar):
+         return mapping.get(obj, obj)
+@@ -149,17 +157,17 @@ def get_class_annotations(obj):
+         cls_locals = dict(vars(cls))
+         cls_globals = getattr(sys.modules.get(cls.__module__, None), "__dict__", {})
+ 
+-        ann = cls.__dict__.get("__annotations__", {})
++        ann = _get_class_annotations(cls)
+         for name, value in ann.items():
+             if name in hints:
+                 continue
+-            if value is None:
+-                value = type(None)
+-            elif isinstance(value, str):
++            if isinstance(value, str):
+                 value = _forward_ref(value)
+             value = _eval_type(value, cls_locals, cls_globals)
+             if mapping is not None:
+                 value = _apply_params(value, mapping)
++            if value is None:
++                value = type(None)
+             hints[name] = value
+     return hints
+ 

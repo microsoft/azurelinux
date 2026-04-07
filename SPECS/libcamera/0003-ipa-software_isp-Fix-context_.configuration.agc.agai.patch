@@ -1,0 +1,39 @@
+From a246e50c69357eb71ab22fe875ff45b0fe163fa1 Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hansg@kernel.org>
+Date: Mon, 22 Sep 2025 13:20:44 +0200
+Subject: [PATCH 3/8] ipa: software_isp: Fix
+ context_.configuration.agc.againMin init
+
+Currently context_.configuration.agc.againMin is not initialized
+when the control reports a non 0 minimum gain value.
+
+So far only the againMin == 0 case was handled and
+context_.configuration.agc.againMin was left unset otherwise.
+
+Reviewed-by: Milan Zamazal <mzamazal@redhat.com>
+Reviewed-by: Isaac Scott <isaac.scott@ideasonboard.com>
+Tested-by: Milan Zamazal <mzamazal@redhat.com>
+Tested-by: Kieran Bingham <kieran.bingham@ideasonboard.com>
+Signed-off-by: Hans de Goede <hansg@kernel.org>
+---
+ src/ipa/simple/soft_simple.cpp | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/ipa/simple/soft_simple.cpp b/src/ipa/simple/soft_simple.cpp
+index c94c4cd55..e70439ee5 100644
+--- a/src/ipa/simple/soft_simple.cpp
++++ b/src/ipa/simple/soft_simple.cpp
+@@ -246,7 +246,9 @@ int IPASoftSimple::configure(const IPAConfigInfo &configInfo)
+ 		 * other) we limit the range of the gain values used.
+ 		 */
+ 		context_.configuration.agc.againMax = againMax;
+-		if (!againMin) {
++		if (againMin) {
++			context_.configuration.agc.againMin = againMin;
++		} else {
+ 			LOG(IPASoft, Warning)
+ 				<< "Minimum gain is zero, that can't be linear";
+ 			context_.configuration.agc.againMin =
+-- 
+2.51.0
+

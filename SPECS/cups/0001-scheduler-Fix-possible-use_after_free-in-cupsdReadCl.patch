@@ -1,0 +1,29 @@
+From c1d2c631267f28131dd31df5b895b8bfb3005b0d Mon Sep 17 00:00:00 2001
+From: Zdenek Dohnal <zdohnal@redhat.com>
+Date: Thu, 11 Dec 2025 15:12:55 +0100
+Subject: [PATCH] scheduler: Fix possible use_after_free in `cupsdReadClient()`
+
+If `cupsdSendHeader()` fails, we free the connection and return -1, but
+in that case we try to free the connection again in `cupsdReadClient()`.
+---
+ scheduler/client.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/scheduler/client.c b/scheduler/client.c
+index f6166091e..63844d531 100644
+--- a/scheduler/client.c
++++ b/scheduler/client.c
+@@ -2761,10 +2761,7 @@ check_start_tls(cupsd_client_t *con)	/* I - Client connection */
+     httpSetField(con->http, HTTP_FIELD_CONTENT_LENGTH, "0");
+ 
+     if (!cupsdSendHeader(con, HTTP_STATUS_OK, NULL, CUPSD_AUTH_NONE))
+-    {
+-      cupsdCloseClient(con);
+       return (-1);
+-    }
+   }
+ 
+   return (1);
+-- 
+2.52.0
+

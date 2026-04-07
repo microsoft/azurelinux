@@ -1,0 +1,22 @@
+From 59ddde9e1ed5de03b060ff3ce27e35509707dff2 Mon Sep 17 00:00:00 2001
+From: Colin Walters <walters@verbum.org>
+Date: Tue, 31 Jul 2018 12:33:59 -0400
+Subject: [PATCH] tools: Use Python3 for GetAllMatchRules
+
+---
+ tools/GetAllMatchRules.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/GetAllMatchRules.py b/tools/GetAllMatchRules.py
+index 6a7e4cd9..f7e340d6 100755
+--- a/tools/GetAllMatchRules.py
++++ b/tools/GetAllMatchRules.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/python3
+ 
+ import sys
+ import argparse
+-- 
+2.17.1
+

@@ -1,0 +1,9 @@
+[Unit]
+Description=ISNS Server
+After=network.target
+
+[Service]
+ExecStart=/usr/sbin/isnsd -f
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,11 @@
+--- rustls-native-certs-0.6.3/Cargo.toml	1970-01-01T00:00:01+00:00
++++ rustls-native-certs-0.6.3/Cargo.toml	2024-04-19T20:29:00.776455+00:00
+@@ -51,8 +51,3 @@
+ [target."cfg(all(unix, not(target_os = \"macos\")))".dependencies.openssl-probe]
+ version = "0.1.2"
+ 
+-[target."cfg(target_os = \"macos\")".dependencies.security-framework]
+-version = "2.0.0"
+-
+-[target."cfg(windows)".dependencies.schannel]
+-version = "0.1.15"

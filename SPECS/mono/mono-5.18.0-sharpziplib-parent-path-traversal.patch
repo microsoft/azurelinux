@@ -1,0 +1,12 @@
+--- a/mcs/class/ICSharpCode.SharpZipLib/ICSharpCode.SharpZipLib/Zip/FastZip.cs	2019-02-21 05:54:25.493666036 +0000
++++ b/mcs/class/ICSharpCode.SharpZipLib/ICSharpCode.SharpZipLib/Zip/FastZip.cs	2019-02-21 05:55:01.494273426 +0000
+@@ -375,7 +375,8 @@
+ 				
+ 				targetName = Path.Combine(targetDirectory, entryFileName);
+ 				dirName = Path.GetDirectoryName(Path.GetFullPath(targetName));
+-	
++				if (!Path.GetFullPath(targetName).StartsWith(targetDirectory, StringComparison.InvariantCultureIgnoreCase))
++					throw new ZipException("Parent traversal in paths is not allowed");
+ 				doExtraction = doExtraction && (entryFileName.Length > 0);
+ 			}
+ 			

@@ -1,0 +1,85 @@
+From 41423d666fd52eaa6aa2b44a0de1b81d0857ca06 Mon Sep 17 00:00:00 2001
+From: Todd Zullinger <tmz@pobox.com>
+Date: Fri, 26 Aug 2022 18:28:44 -0400
+Subject: [PATCH] t/lib-git-svn: try harder to find a port
+
+As with the previous commits, try harder to find an open port to avoid
+intermittent failures on busy/shared build systems.
+
+By default, we make 3 attempts.  This may be overridden by setting
+GIT_TEST_START_SVNSERVE_TRIES to a different value.
+
+Run svnserve in daemon mode and use 'test_atexit' to stop it.  This is
+cleaner than running in the foreground with --listen-once and having to
+manage the PID ourselves.
+
+Signed-off-by: Todd Zullinger <tmz@pobox.com>
+---
+ t/lib-git-svn.sh                    | 34 +++++++++++++++++++++++++----
+ t/t9113-git-svn-dcommit-new-file.sh |  1 -
+ 2 files changed, 30 insertions(+), 5 deletions(-)
+
+diff --git a/t/lib-git-svn.sh b/t/lib-git-svn.sh
+index ea28971e8e..04e660e2ba 100644
+--- a/t/lib-git-svn.sh
++++ b/t/lib-git-svn.sh
+@@ -17,6 +17,7 @@ fi
+ GIT_DIR=$PWD/.git
+ GIT_SVN_DIR=$GIT_DIR/svn/refs/remotes/git-svn
+ SVN_TREE=$GIT_SVN_DIR/svn-tree
++SVNSERVE_PIDFILE="$PWD"/daemon.pid
+ test_set_port SVNSERVE_PORT
+ 
+ svn >/dev/null 2>&1
+@@ -119,10 +120,35 @@ require_svnserve () {
+ }
+ 
+ start_svnserve () {
+-	svnserve --listen-port $SVNSERVE_PORT \
+-		 --root "$rawsvnrepo" \
+-		 --listen-once \
+-		 --listen-host 127.0.0.1 &
++	test_atexit stop_svnserve
++
++	i=0
++	while test $i -lt ${GIT_TEST_START_SVNSERVE_TRIES:-3}
++	do
++		say >&3 "Starting svnserve on port $SVNSERVE_PORT ..."
++		svnserve --listen-port $SVNSERVE_PORT \
++			 --root "$rawsvnrepo" \
++			 --daemon --pid-file="$SVNSERVE_PIDFILE" \
++			 --listen-host 127.0.0.1
++		ret=$?
++		# increment port and retry if unsuccessful
++		if test $ret -ne 0
++		then
++			SVNSERVE_PORT=$(($SVNSERVE_PORT + 1))
++			export SVNSERVE_PORT
++		else
++			break
++		fi
++	done
++}
++
++stop_svnserve () {
++	say >&3 "Stopping svnserve ..."
++	SVNSERVE_PID="$(cat "$SVNSERVE_PIDFILE")"
++	if test -n "$SVNSERVE_PID"
++	then
++		kill "$SVNSERVE_PID" 2>/dev/null
++	fi
+ }
+ 
+ prepare_utf8_locale () {
+diff --git a/t/t9113-git-svn-dcommit-new-file.sh b/t/t9113-git-svn-dcommit-new-file.sh
+index e8479cec7a..5925891f5d 100755
+--- a/t/t9113-git-svn-dcommit-new-file.sh
++++ b/t/t9113-git-svn-dcommit-new-file.sh
+@@ -28,7 +28,6 @@ test_expect_success 'create files in new directory with dcommit' "
+ 	echo hello > git-new-dir/world &&
+ 	git update-index --add git-new-dir/world &&
+ 	git commit -m hello &&
+-	start_svnserve &&
+ 	git svn dcommit
+ 	"
+ 

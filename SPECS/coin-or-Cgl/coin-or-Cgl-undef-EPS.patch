@@ -1,0 +1,13 @@
+diff -up Cgl-releases-0.60.8/Cgl/src/CglParam.hpp.orig Cgl-releases-0.60.8/Cgl/src/CglParam.hpp
+--- Cgl-releases-0.60.8/Cgl/src/CglParam.hpp.orig	2023-10-25 11:18:20.000000000 -0600
++++ Cgl-releases-0.60.8/Cgl/src/CglParam.hpp	2023-11-12 08:43:37.014688986 -0700
+@@ -19,6 +19,9 @@
+     may have a derived class to add parameters. Each generator might
+     also set different default values for the parameters in CglParam.  */
+ 
++// soplex lets a macro named EPS leak into the global namespace
++#undef EPS
++
+ class CglParam {
+ 
+ public:

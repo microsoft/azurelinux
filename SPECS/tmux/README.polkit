@@ -1,0 +1,44 @@
+If you would like non-root users to be able to manage their system level
+tmux@${USERNAME}.service, you will need to setup PolicyKit rules.
+
+The typical PolicyKit system places rules in `/etc/polkit-1/rules.d/` and
+parses all files that end in `.rules`.
+
+For example, to permit `start`, `stop`, `restart` of the service:
+```js
+polkit.addRule(function(action, subject) {
+  if (action.id == "org.freedesktop.systemd1.manage-units") {
+    var service = action.lookup("unit");
+    if (service && service.startsWith("tmux@")) {
+      var match = service.match(/^tmux@(.+)\.service$/);
+      if (match && match[1] === subject.user) {
+        var verb = action.lookup("verb");
+        if (verb == "start" || verb == "stop" || verb == "restart") {
+          return polkit.Result.YES;
+        }
+      }
+    }
+  } 
+  return polkit.Result.NOT_HANDLED;
+});
+```
+
+If you would like to also let users `enable` or `disable` the service
+to start at boot:
+```js
+polkit.addRule(function(action, subject) {
+  if (action.id == "org.freedesktop.systemd1.manage-unit-files") {
+    var service = action.lookup("unit");
+    if (service && service.startsWith("tmux@")) {
+      var match = service.match(/^tmux@(.+)\.service$/);
+      if (match && match[1] === subject.user) {
+        var verb = action.lookup("verb");
+        if (verb == "enable" || verb == "disable") {
+          return polkit.Result.YES;
+        }
+      }
+    }
+  } 
+  return polkit.Result.NOT_HANDLED;
+});
+```

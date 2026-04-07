@@ -1,0 +1,11 @@
+diff -up qt-mobility-opensource-src-1.2.2/doc/src/snippets/sensors/creating.cpp.sensors_qtbfs qt-mobility-opensource-src-1.2.2/doc/src/snippets/sensors/creating.cpp
+--- qt-mobility-opensource-src-1.2.2/doc/src/snippets/sensors/creating.cpp.sensors_qtbfs	2014-03-25 14:26:00.000000000 -0500
++++ qt-mobility-opensource-src-1.2.2/doc/src/snippets/sensors/creating.cpp	2014-04-28 09:11:14.118957034 -0500
+@@ -41,6 +41,7 @@
+ 
+ #include <QWidget>
+ #include <qaccelerometer.h>
++#include <qmagnetometer.h>
+ #include <qorientationsensor.h>
+ 
+ QTM_USE_NAMESPACE

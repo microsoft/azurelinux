@@ -1,0 +1,74 @@
+From d4b0f5dd2665dfe0124623379bfb6ce233cdd075 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Mon, 6 May 2019 15:22:32 +0200
+Subject: [PATCH] Fix Perl version lookup with Module::CoreList
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+If a distribution declares a dependency on '5.010' Perl,
+inc::Module::Install dies in
+Module::Install::Admin::ScanDeps::scan_dependencies() with:
+
+Module::CoreList has no information on perl 5.010 at /usr/lib/perl5/ site_perl/5.10.1/Module/Install/Admin/ScanDeps.pm line 25.
+
+This is because %Module::CoreList::version is indiced only with some
+arbitrary versions and normalized numeral versions only. E.g. it
+contains an entry for 5.005, 5.005000 and 5.010000 but no entry of 5.010.
+
+This patch fixes the lookup by converting a version string into
+a numeral.
+
+https://rt.cpan.org/Public/Bug/Display.html?id=71565
+https://github.com/Perl-Toolchain-Gang/Module-Install/pull/47
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ lib/Module/Install/Admin/ScanDeps.pm |  1 +
+ t/35_perl_version.t                  | 23 +++++++++++++++++++++++
+ 2 files changed, 24 insertions(+)
+ create mode 100644 t/35_perl_version.t
+
+diff --git a/lib/Module/Install/Admin/ScanDeps.pm b/lib/Module/Install/Admin/ScanDeps.pm
+index a75ba6e..9cee31e 100644
+--- a/lib/Module/Install/Admin/ScanDeps.pm
++++ b/lib/Module/Install/Admin/ScanDeps.pm
+@@ -18,6 +18,7 @@ Please first specify a required perl version, like this:
+     perl_version('5.005');
+ END_MESSAGE
+     $perl_version =~ s{^(\d+)\.(\d+)\.(\d+)}{$1 + $2/1_000 + $3/1_000_000}e;
++    $perl_version = 0 + $perl_version;
+ 
+     require Module::ScanDeps;
+     require Module::CoreList;
+diff --git a/t/35_perl_version.t b/t/35_perl_version.t
+new file mode 100644
+index 0000000..888b8c0
+--- /dev/null
++++ b/t/35_perl_version.t
+@@ -0,0 +1,23 @@
++use strict;
++BEGIN {
++	$|  = 1;
++	$^W = 1;
++}
++use Test::More;
++
++my @existing_versions = ( qw(5.005 5.01 5.010 5.0100 5.01000 5.010000 5.10.0
++    5.010.000) );
++my @missing_versions = ( qw(5.005002 5.5.2) );
++plan tests => 1 + @existing_versions + @missing_versions;
++
++require_ok( 'Module::Install::Admin::ScanDeps' );
++my $m = Module::Install::Admin::ScanDeps->new;
++
++for my $version (@existing_versions) {
++    eval { $m->scan_dependencies(q{Carp}, $version, q{0}) };
++	ok(!$@, "scan_dependencies() can query core modules for $version Perl");
++}
++for my $version (@missing_versions) {
++    eval { $m->scan_dependencies(q{Carp}, $version, q{0}) };
++	ok($@, "scan_dependencies() cannot query core modules for $version Perl");
++}
+-- 
+2.20.1
+

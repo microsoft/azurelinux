@@ -1,0 +1,24 @@
+From 6ababfea184c345d9b887797de871863d0ae9fd5 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Mon, 7 Oct 2024 23:22:34 +0200
+Subject: [PATCH] revert removal of unstable io_slice_advance feature gate
+
+---
+ src/lib.rs | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index 2201e4f..8024f7b 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -10,6 +10,7 @@
+     )
+ ))]
+ #![warn(missing_docs, unsafe_op_in_unsafe_fn)]
++#![cfg_attr(feature = "write-all-vectored", feature(io_slice_advance))]
+ #![cfg_attr(docsrs, feature(doc_cfg))]
+ 
+ #[cfg(all(feature = "bilock", not(feature = "unstable")))]
+-- 
+2.46.2
+

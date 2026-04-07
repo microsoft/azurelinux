@@ -1,0 +1,279 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martin Sirringhaus <msirringhaus@suse.de>
+Date: Tue, 8 Aug 2023 16:18:24 +0300
+Subject: [PATCH] Add KDE integration to Firefox
+
+Bug: https://bugzilla.mozilla.org/show_bug.cgi?id=140751
+Bug: https://bugzilla.suse.com/show_bug.cgi?id=170055
+
+How to apply this patch:
+
+1. Import and apply it
+2. cp browser/base/content/browser.xul browser/base/content/browser-kde.xul
+3. Find editBookmarkPanelDoneButton
+4. Replace #ifndef with #ifdef in the line above (this hanges the button order from Gnome-style to KDE-style)
+5. hg qrefresh
+---
+ browser/components/preferences/main.js        |  18 +++
+ browser/components/shell/moz.build            |   2 +
+ .../components/shell/nsKDEShellService.cpp    | 109 ++++++++++++++++++
+ browser/components/shell/nsKDEShellService.h  |  32 +++++
+ .../components/shell/nsUnixShellService.cpp   |  22 ++++
+ browser/components/shell/nsUnixShellService.h |  15 +++
+ 6 files changed, 198 insertions(+)
+ create mode 100644 browser/components/shell/nsKDEShellService.cpp
+ create mode 100644 browser/components/shell/nsKDEShellService.h
+ create mode 100644 browser/components/shell/nsUnixShellService.cpp
+ create mode 100644 browser/components/shell/nsUnixShellService.h
+
+diff --git a/browser/components/preferences/main.js b/browser/components/preferences/main.js
+index 820e46fb006567bfdf93e2a46da5e3c07d42bf10..57d1c21bdecc2d55d0bed30246e684d3b97ad7fa 100644
+--- a/browser/components/preferences/main.js
++++ b/browser/components/preferences/main.js
+@@ -294,6 +294,13 @@ var gMainPane = {
+       }, backoffTimes[this._backoffIndex]);
+     }
+ 
++    var env = Components.classes["@mozilla.org/process/environment;1"]
++      .getService(Components.interfaces.nsIEnvironment);
++    var kde_session = 0;
++    if (env.get('KDE_FULL_SESSION') == "true") {
++      kde_session = 1;
++    }
++
+     this.initBrowserContainers();
+     this.buildContentProcessCountMenuList();
+ 
+@@ -1727,6 +1734,17 @@ var gMainPane = {
+       }
+       try {
+         shellSvc.setDefaultBrowser(true, false);
++        if (kde_session == 1) {
++          var shellObj = Components.classes["@mozilla.org/file/local;1"]
++            .createInstance(Components.interfaces.nsILocalFile);
++          shellObj.initWithPath("/usr/bin/kwriteconfig");
++          var process = Components.classes["@mozilla.org/process/util;1"]
++            .createInstance(Components.interfaces.nsIProcess);
++          process.init(shellObj);
++          var args = ["--file", "kdeglobals", "--group", "General", "--key",
++              "BrowserApplication", "firefox"];
++          process.run(false, args, args.length);
++        }
+       } catch (ex) {
+         console.error(ex);
+         return;
+diff --git a/browser/components/shell/moz.build b/browser/components/shell/moz.build
+index eb88cb287dc3f04022b74b978666118bbd5fa6b2..95277533781a7224d108e3c45731a6d9a89ba1a0 100644
+--- a/browser/components/shell/moz.build
++++ b/browser/components/shell/moz.build
+@@ -36,6 +36,8 @@ elif CONFIG["MOZ_WIDGET_TOOLKIT"] == "gtk":
+ 
+     SOURCES += [
+         "nsGNOMEShellService.cpp",
++        "nsKDEShellService.cpp",
++        "nsUnixShellService.cpp",
+     ]
+     if CONFIG["MOZ_ENABLE_DBUS"]:
+         SOURCES += [
+diff --git a/browser/components/shell/nsKDEShellService.cpp b/browser/components/shell/nsKDEShellService.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..152a3aca87ea73477bc75c4e93c01e5a52dda102
+--- /dev/null
++++ b/browser/components/shell/nsKDEShellService.cpp
+@@ -0,0 +1,109 @@
++/* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
++/* This Source Code Form is subject to the terms of the Mozilla Public
++ * License, v. 2.0. If a copy of the MPL was not distributed with this
++ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
++
++#include "mozilla/ArrayUtils.h"
++
++#include "nsCOMPtr.h"
++#include "nsKDEShellService.h"
++#include "nsShellService.h"
++#include "nsKDEUtils.h"
++#include "nsIPrefService.h"
++#include "nsIProcess.h"
++#include "nsIFile.h"
++#include "nsServiceManagerUtils.h"
++#include "nsComponentManagerUtils.h"
++#include "nsIMutableArray.h"
++#include "nsISupportsPrimitives.h"
++#include "nsArrayUtils.h"
++
++using namespace mozilla;
++
++nsresult
++nsKDEShellService::Init()
++{
++    if( !nsKDEUtils::kdeSupport())
++        return NS_ERROR_NOT_AVAILABLE;
++    return NS_OK;
++}
++
++NS_IMPL_ISUPPORTS(nsKDEShellService, nsIGNOMEShellService, nsIShellService)
++
++NS_IMETHODIMP
++nsKDEShellService::IsDefaultBrowser(bool aForAllTypes,
++                                    bool* aIsDefaultBrowser)
++{
++    *aIsDefaultBrowser = false;
++
++    nsCOMPtr<nsIMutableArray> command = do_CreateInstance( NS_ARRAY_CONTRACTID );
++    if (!command)
++        return NS_ERROR_FAILURE;
++
++    nsCOMPtr<nsISupportsCString> str = do_CreateInstance( NS_SUPPORTS_CSTRING_CONTRACTID );
++    if (!str)
++        return NS_ERROR_FAILURE;
++
++    str->SetData("ISDEFAULTBROWSER"_ns);
++    command->AppendElement( str );
++
++    if( nsKDEUtils::command( command ))
++        *aIsDefaultBrowser = true;
++    return NS_OK;
++}
++
++NS_IMETHODIMP
++nsKDEShellService::SetDefaultBrowser(bool aClaimAllTypes,
++                                     bool aForAllUsers)
++{
++    nsCOMPtr<nsIMutableArray> command = do_CreateInstance( NS_ARRAY_CONTRACTID );
++    if (!command)
++        return NS_ERROR_FAILURE;
++
++    nsCOMPtr<nsISupportsCString> cmdstr = do_CreateInstance( NS_SUPPORTS_CSTRING_CONTRACTID );
++    nsCOMPtr<nsISupportsCString> paramstr = do_CreateInstance( NS_SUPPORTS_CSTRING_CONTRACTID );
++    if (!cmdstr || !paramstr)
++        return NS_ERROR_FAILURE;
++
++    cmdstr->SetData("SETDEFAULTBROWSER"_ns);
++    command->AppendElement( cmdstr );
++
++    paramstr->SetData( aClaimAllTypes ? "ALLTYPES"_ns : "NORMAL"_ns );
++    command->AppendElement( paramstr );
++
++    return nsKDEUtils::command( command ) ? NS_OK : NS_ERROR_FAILURE;
++}
++
++NS_IMETHODIMP
++nsKDEShellService::GetCanSetDesktopBackground(bool* aResult)
++{
++  *aResult = true;
++  return NS_OK;
++}
++
++NS_IMETHODIMP
++nsKDEShellService::SetDesktopBackground(dom::Element* aElement,
++                                        int32_t aPosition,
++                                        const nsACString& aImageName)
++{
++    return NS_ERROR_NOT_IMPLEMENTED;
++}
++
++NS_IMETHODIMP
++nsKDEShellService::GetDesktopBackgroundColor(PRUint32 *aColor)
++{
++    return NS_ERROR_NOT_IMPLEMENTED;
++}
++
++NS_IMETHODIMP
++nsKDEShellService::SetDesktopBackgroundColor(PRUint32 aColor)
++{
++    return NS_ERROR_NOT_IMPLEMENTED;
++}
++
++NS_IMETHODIMP
++nsKDEShellService::IsDefaultForScheme(nsTSubstring<char> const& aScheme, bool* aIsDefaultBrowser)
++{
++    return NS_ERROR_NOT_IMPLEMENTED;
++}
++
+diff --git a/browser/components/shell/nsKDEShellService.h b/browser/components/shell/nsKDEShellService.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..8b0bb19164352453cfa453dd87c19263160b9ad8
+--- /dev/null
++++ b/browser/components/shell/nsKDEShellService.h
+@@ -0,0 +1,32 @@
++/* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
++/* This Source Code Form is subject to the terms of the Mozilla Public
++ * License, v. 2.0. If a copy of the MPL was not distributed with this
++ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
++
++#ifndef nskdeshellservice_h____
++#define nskdeshellservice_h____
++
++#include "nsIGNOMEShellService.h"
++#include "nsToolkitShellService.h"
++#include "nsString.h"
++#include "mozilla/Attributes.h"
++
++class nsKDEShellService final : public nsIGNOMEShellService,
++                                public nsToolkitShellService
++{
++public:
++  nsKDEShellService() : mCheckedThisSession(false) { }
++
++  NS_DECL_ISUPPORTS
++  NS_DECL_NSISHELLSERVICE
++  NS_DECL_NSIGNOMESHELLSERVICE
++
++  nsresult Init();
++
++private:
++  ~nsKDEShellService() {}
++
++  bool mCheckedThisSession;
++};
++
++#endif // nskdeshellservice_h____
+diff --git a/browser/components/shell/nsUnixShellService.cpp b/browser/components/shell/nsUnixShellService.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..abf266ebdc52e136f495911da3454e69c770c6db
+--- /dev/null
++++ b/browser/components/shell/nsUnixShellService.cpp
+@@ -0,0 +1,22 @@
++/* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
++/* This Source Code Form is subject to the terms of the Mozilla Public
++ * License, v. 2.0. If a copy of the MPL was not distributed with this
++ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
++
++
++#include "nsUnixShellService.h"
++#include "nsGNOMEShellService.h"
++#include "nsKDEShellService.h"
++#include "nsKDEUtils.h"
++#include "mozilla/ModuleUtils.h"
++
++NS_GENERIC_FACTORY_CONSTRUCTOR_INIT(nsGNOMEShellService, Init)
++NS_GENERIC_FACTORY_CONSTRUCTOR_INIT(nsKDEShellService, Init)
++
++NS_IMETHODIMP
++nsUnixShellServiceConstructor(REFNSIID aIID, void **aResult)
++{
++    if( nsKDEUtils::kdeSupport())
++        return nsKDEShellServiceConstructor( aIID, aResult );
++    return nsGNOMEShellServiceConstructor( aIID, aResult );
++}
+diff --git a/browser/components/shell/nsUnixShellService.h b/browser/components/shell/nsUnixShellService.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..26b5dbac47dd9a8ec1fcb6c93575cca750692735
+--- /dev/null
++++ b/browser/components/shell/nsUnixShellService.h
+@@ -0,0 +1,15 @@
++/* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
++/* This Source Code Form is subject to the terms of the Mozilla Public
++ * License, v. 2.0. If a copy of the MPL was not distributed with this
++ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
++
++
++#ifndef nsunixshellservice_h____
++#define nsunixshellservice_h____
++
++#include "nsIGNOMEShellService.h"
++
++NS_IMETHODIMP
++nsUnixShellServiceConstructor(nsISupports *aOuter, REFNSIID aIID, void **aResult);
++
++#endif // nsunixshellservice_h____

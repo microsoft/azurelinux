@@ -1,0 +1,13 @@
+[Unit]
+Description=Hardware Monitoring Sensors
+
+[Service]
+EnvironmentFile=/etc/sysconfig/lm_sensors
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=-@WRAPPER_DIR@/lm_sensors-modprobe-wrapper $BUS_MODULES $HWMON_MODULES
+ExecStart=@WRAPPER_DIR@/lm_sensors-wrapper
+ExecStop=-@WRAPPER_DIR@/lm_sensors-modprobe-r-wrapper $BUS_MODULES $HWMON_MODULES
+
+[Install]
+WantedBy=multi-user.target

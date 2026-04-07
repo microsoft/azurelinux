@@ -1,0 +1,1047 @@
+--- opendbx-1.4.6.orig/lib/opendbx/api	2021-08-22 14:19:48.203645770 -0500
++++ opendbx-1.4.6/lib/opendbx/api	2021-08-22 14:36:16.364776609 -0500
+@@ -265,7 +265,7 @@
+ 		 * @return Lob instance
+ 		 * @throws std::exception If an error occures
+ 		 */
+-		Lob( Lob_Iface* impl ) throw( std::exception );
++		Lob( Lob_Iface* impl );
+ 
+ 	public:
+ 
+@@ -319,7 +319,7 @@
+ 		 *
+ 		 * @throws OpenDBX::Exception If the underlying database library returns an error
+ 		 */
+-		void close() throw( std::exception );
++		void close();
+ 
+ 		/**
+ 		 * Reads content from large object into the buffer.
+@@ -344,7 +344,7 @@
+ 		 * @return Number of bytes written into the buffer
+ 		 * @throws OpenDBX::Exception If the underlying database library returns an error
+ 		 */
+-		ssize_t read( void* buffer, size_t buflen ) throw( std::exception );
++		ssize_t read( void* buffer, size_t buflen );
+ 
+ 		/**
+ 		 * Writes data from the buffer into the large object.
+@@ -368,7 +368,7 @@
+ 		 * @return Number of bytes written into the large object
+ 		 * @throws OpenDBX::Exception If the underlying database library returns an error
+ 		 */
+-		ssize_t write( void* buffer, size_t buflen ) throw( std::exception );
++		ssize_t write( void* buffer, size_t buflen );
+ 	};
+ 
+ 
+@@ -417,7 +417,7 @@
+ 		 * @throws std::exception If an error occures
+ 		 * @return Result instance
+ 		 */
+-		Result( Result_Iface* impl ) throw( std::exception );
++		Result( Result_Iface* impl );
+ 
+ 	public:
+ 
+@@ -470,7 +470,7 @@
+ 		 *
+ 		 * @throws OpenDBX::Exception If the underlying database library returns an error
+ 		 */
+-		void finish() throw( std::exception );
++		void finish();
+ 
+ 		/**
+ 		 * Fetches one result set from the database server.
+@@ -511,7 +511,7 @@
+ 		 * @throws OpenDBX::Exception If the underlying database library returns an error
+ 		 * @see odbxres
+ 		 */
+-		odbxres getResult( struct timeval* timeout = NULL, unsigned long chunk = 0 ) throw( std::exception );
++		odbxres getResult( struct timeval* timeout = NULL, unsigned long chunk = 0 );
+ 
+ 		/**
+ 		 * Makes data of next row available.
+@@ -529,7 +529,7 @@
+ 		 * @return Status of the attempt to fetch one more row
+ 		 * @throws OpenDBX::Exception If the underlying database library returns an error
+ 		 */
+-		odbxrow getRow() throw( std::exception );
++		odbxrow getRow();
+ 
+ 		/**
+ 		 * Returns the number of rows affected by DELETE, INSERT of UPDATE statements.
+@@ -545,7 +545,7 @@
+ 		 * @return Number of rows touched
+ 		 * @throws OpenDBX::Exception If the underlying database library returns an error
+ 		 */
+-		uint64_t rowsAffected() throw( std::exception );
++		uint64_t rowsAffected();
+ 
+ 		/**
+ 		 * Returns the number of columns available in this result set.
+@@ -559,7 +559,7 @@
+ 		 * @return Number of columns
+ 		 * @throws OpenDBX::Exception If the underlying database library returns an error
+ 		 */
+-		unsigned long columnCount() throw( std::exception );
++		unsigned long columnCount();
+ 
+ 		/**
+ 		 * Maps the column name to the column number required by other methods.
+@@ -572,7 +572,7 @@
+ 		 * @return Position of column in result set
+ 		 * @throws OpenDBX::Exception If the underlying database library returns an error
+ 		 */
+-		unsigned long columnPos( const string& name ) throw( std::exception );
++		unsigned long columnPos( const string& name );
+ 
+ 		/**
+ 		 * Returns the name of the column in the current result set.
+@@ -586,7 +586,7 @@
+ 		 * @return Column name
+ 		 * @throws OpenDBX::Exception If the underlying database library returns an error
+ 		 */
+-		const string columnName( unsigned long pos ) throw( std::exception );
++		const string columnName( unsigned long pos );
+ 
+ 		/**
+ 		 * Returns the type of the column in the current result set.
+@@ -643,7 +643,7 @@
+ 		 * @throws OpenDBX::Exception If the underlying database library returns an error
+ 		 * @see odbxtype
+ 		 */
+-		odbxtype columnType( unsigned long pos ) throw( std::exception );
++		odbxtype columnType( unsigned long pos );
+ 
+ 		/**
+ 		 * Returns the size of the content in the current row at the specified postion.
+@@ -656,7 +656,7 @@
+ 		 * @return Size of the data in bytes
+ 		 * @throws OpenDBX::Exception If the underlying database library returns an error
+ 		 */
+-		unsigned long fieldLength( unsigned long pos ) throw( std::exception );
++		unsigned long fieldLength( unsigned long pos );
+ 
+ 		/**
+ 		 * Returns a pointer to the content in the current row at the specified postion.
+@@ -675,7 +675,7 @@
+ 		 * @return Pointer to the data
+ 		 * @throws OpenDBX::Exception If the underlying database library returns an error
+ 		 */
+-		const char* fieldValue( unsigned long pos ) throw( std::exception );
++		const char* fieldValue( unsigned long pos );
+ 
+ 		/**
+ 		 * Creates a large object instance if supported by the database.
+@@ -696,7 +696,7 @@
+ 		 * @throws OpenDBX::Exception If the underlying database library returns an error
+ 		 * @see Lob
+ 		 */
+-		Lob getLob( const char* value ) throw( std::exception );
++		Lob getLob( const char* value );
+ 	};
+ 
+ 
+@@ -745,7 +745,7 @@
+ 		 * @throws std::exception If an error occures
+ 		 * @return Statement instance
+ 		 */
+-		Stmt( Stmt_Iface* impl ) throw( std::exception );
++		Stmt( Stmt_Iface* impl );
+ 
+ 	public:
+ 
+@@ -808,7 +808,7 @@
+ 		 * @throws OpenDBX::Exception If the underlying database library returns an error
+ 		 * @see Result
+ 		 */
+-		Result execute() throw( std::exception );
++		Result execute();
+ 	};
+ 
+ 
+@@ -894,7 +894,7 @@
+ 		 * @throws OpenDBX::Exception If the underlying database library returns an error
+ 		 * @see #Conn( const string&, const string&, const string& )
+ 		 */
+-		Conn( const char* backend, const char* host = "", const char* port = "" ) throw( std::exception );
++		Conn( const char* backend, const char* host = "", const char* port = "" );
+ 
+ 		/**
+ 		 * Creates a connection object using C++ style string parameters.
+@@ -936,7 +936,7 @@
+ 		 * @throws OpenDBX::Exception If the underlying database library returns an error
+ 		 * @see #Conn( const char*, const char*, const char* )
+ 		 */
+-		Conn( const string& backend, const string& host = "", const string& port = "" ) throw( std::exception );
++		Conn( const string& backend, const string& host = "", const string& port = "" );
+ 
+ 		/**
+ 		 * Destroys the connection instance if no other references exist.
+@@ -1009,7 +1009,7 @@
+ 		 * @throws std::invalid_argument If the object was only initialized by the default constructor
+ 		 * @throws OpenDBX::Exception If the underlying database library returns an error
+ 		 */
+-		void bind( const char* database, const char* who = "", const char* cred = "", odbxbind method = ODBX_BIND_SIMPLE ) throw( std::exception );
++		void bind( const char* database, const char* who = "", const char* cred = "", odbxbind method = ODBX_BIND_SIMPLE );
+ 
+ 		/**
+ 		 * Authenticates the user and selects the database using C++ style string
+@@ -1045,7 +1045,7 @@
+ 		 * @throws std::invalid_argument If the object was only initialized by the default constructor
+ 		 * @throws OpenDBX::Exception If the underlying database library returns an error
+ 		 */
+-		void bind( const string& database, const string& who = "", const string& cred = "", odbxbind method = ODBX_BIND_SIMPLE ) throw( std::exception );
++		void bind( const string& database, const string& who = "", const string& cred = "", odbxbind method = ODBX_BIND_SIMPLE );
+ 
+ 		/**
+ 		 * Releases the connection to the database and resets the authentication
+@@ -1054,7 +1054,7 @@
+ 		 * @throws std::invalid_argument If the object was only initialized by the default constructor
+ 		 * @throws OpenDBX::Exception If the underlying database library returns an error
+ 		 */
+-		void unbind() throw( std::exception );
++		void unbind();
+ 
+ 		/**
+ 		 * Cleans up the connection object.
+@@ -1062,7 +1062,7 @@
+ 		 * @throws std::invalid_argument If the object was only initialized by the default constructor
+ 		 * @throws OpenDBX::Exception If the underlying database library returns an error
+ 		 */
+-		void finish() throw( std::exception );
++		void finish();
+ 
+ 		/**
+ 		 * Tests if the database driver module does understand certain extensions.
+@@ -1098,7 +1098,7 @@
+ 		 * @throws std::invalid_argument If the object was only initialized by the default constructor
+ 		 * @throws OpenDBX::Exception If the underlying database library returns an error
+ 		 */
+-		bool getCapability( odbxcap cap ) throw( std::exception );
++		bool getCapability( odbxcap cap );
+ 
+ 		/**
+ 		 * Gets the value of a certain option provided by the database driver module.
+@@ -1155,7 +1155,7 @@
+ 		 * @throws std::invalid_argument If the object was only initialized by the default constructor
+ 		 * @throws OpenDBX::Exception If the underlying database library returns an error
+ 		 */
+-		void getOption( odbxopt option, void* value ) throw( std::exception );
++		void getOption( odbxopt option, void* value );
+ 
+ 		/**
+ 		 * Sets a certain option provided by the database driver module.
+@@ -1210,7 +1210,7 @@
+ 		 * @throws std::invalid_argument If the object was only initialized by the default constructor
+ 		 * @throws OpenDBX::Exception If the underlying database library returns an error
+ 		 */
+-		void setOption( odbxopt option, void* value ) throw( std::exception );
++		void setOption( odbxopt option, void* value );
+ 
+ 		/**
+ 		 * Escapes potentially dangerous characters in user input using a C style buffer.
+@@ -1244,7 +1244,7 @@
+ 		 * @throws std::invalid_argument If the object was only initialized by the default constructor
+ 		 * @throws OpenDBX::Exception If the underlying database library returns an error
+ 		 */
+-		string& escape( const char* from, unsigned long fromlen, string& to ) throw( std::exception );
++		string& escape( const char* from, unsigned long fromlen, string& to );
+ 
+ 		/**
+ 		 * Escapes potentially dangerous characters in user input using a C++
+@@ -1278,7 +1278,7 @@
+ 		 * @throws std::invalid_argument If the object was only initialized by the default constructor
+ 		 * @throws OpenDBX::Exception If the underlying database library returns an error
+ 		 */
+-		string& escape( const string& from, string& to ) throw( std::exception );
++		string& escape( const string& from, string& to );
+ 
+ 		/**
+ 		 * Creates a statement object from a SQL text string using a C style buffer.
+@@ -1327,7 +1327,7 @@
+ 		 * @throws OpenDBX::Exception If the underlying database library returns an error
+ 		 * @see Stmt
+ 		 */
+-		Stmt create( const char* sql, unsigned long size = 0, Stmt::Type type = Stmt::Simple ) throw( std::exception );
++		Stmt create( const char* sql, unsigned long size = 0, Stmt::Type type = Stmt::Simple );
+ 
+ 		/**
+ 		 * Creates a statement object from a SQL text string using a C++ string.
+@@ -1368,7 +1368,7 @@
+ 		 * @throws OpenDBX::Exception If the underlying database library returns an error
+ 		 * @see Stmt
+ 		 */
+-		Stmt create( const string& sql, Stmt::Type type = Stmt::Simple ) throw( std::exception );
++		Stmt create( const string& sql, Stmt::Type type = Stmt::Simple );
+ 	};
+ 
+ 
+diff -urNp opendbx-1.4.6.orig/lib/odbx.cpp opendbx-1.4.6/lib/odbx.cpp
+--- opendbx-1.4.6.orig/lib/odbx.cpp	2021-08-22 17:01:46.395970885 -0500
++++ opendbx-1.4.6/lib/odbx.cpp	2021-08-22 17:02:27.055963754 -0500
+@@ -54,7 +54,7 @@ namespace OpenDBX
+ 	*  OpenDBX large object interface
+ 	*/
+ 
+-	Lob::Lob( Lob_Iface* impl ) throw( std::exception )
++	Lob::Lob( Lob_Iface* impl )
+ 	{
+ 		m_impl = impl;
+ 		m_ref = new int;
+@@ -114,21 +114,21 @@ namespace OpenDBX
+ 
+ 
+ 
+-	void Lob::close() throw( std::exception )
++	void Lob::close()
+ 	{
+ 		return m_impl->close();
+ 	}
+ 
+ 
+ 
+-	ssize_t Lob::read( void* buffer, size_t buflen ) throw( std::exception )
++	ssize_t Lob::read( void* buffer, size_t buflen )
+ 	{
+ 		return m_impl->read( buffer, buflen );
+ 	}
+ 
+ 
+ 
+-	ssize_t Lob::write( void* buffer, size_t buflen ) throw( std::exception )
++	ssize_t Lob::write( void* buffer, size_t buflen )
+ 	{
+ 		return m_impl->write( buffer, buflen );
+ 	}
+@@ -143,7 +143,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	Result::Result( Result_Iface* impl ) throw( std::exception )
++	Result::Result( Result_Iface* impl )
+ 	{
+ 		m_impl = impl;
+ 		m_ref = new int;
+@@ -204,76 +204,76 @@ namespace OpenDBX
+ 
+ 
+ 
+-	void Result::finish() throw( std::exception )
++	void Result::finish()
+ 	{
+ 		return m_impl->finish();
+ 	}
+ 
+ 
+ 
+-	odbxres Result::getResult( struct timeval* timeout, unsigned long chunk ) throw( std::exception )
++	odbxres Result::getResult( struct timeval* timeout, unsigned long chunk )
+ 	{
+ 		return m_impl->getResult( timeout, chunk );
+ 	}
+ 
+ 
+ 
+-	odbxrow Result::getRow() throw( std::exception )
++	odbxrow Result::getRow()
+ 	{
+ 		return m_impl->getRow();
+ 	}
+ 
+ 
+ 
+-	uint64_t Result::rowsAffected() throw( std::exception )
++	uint64_t Result::rowsAffected()
+ 	{
+ 		return m_impl->rowsAffected();
+ 	}
+ 
+ 
+ 
+-	unsigned long Result::columnCount() throw( std::exception )
++	unsigned long Result::columnCount()
+ 	{
+ 		return m_impl->columnCount();
+ 	}
+ 
+ 
+ 
+-	unsigned long Result::columnPos( const string& name ) throw( std::exception )
++	unsigned long Result::columnPos( const string& name )
+ 	{
+ 		return m_impl->columnPos( name );
+ 	}
+ 
+ 
+ 
+-	const string Result::columnName( unsigned long pos ) throw( std::exception )
++	const string Result::columnName( unsigned long pos )
+ 	{
+ 		return m_impl->columnName( pos );
+ 	}
+ 
+ 
+ 
+-	odbxtype Result::columnType( unsigned long pos ) throw( std::exception )
++	odbxtype Result::columnType( unsigned long pos )
+ 	{
+ 		return m_impl->columnType( pos );
+ 	}
+ 
+ 
+ 
+-	unsigned long Result::fieldLength( unsigned long pos ) throw( std::exception )
++	unsigned long Result::fieldLength( unsigned long pos )
+ 	{
+ 		return m_impl->fieldLength( pos );
+ 	}
+ 
+ 
+ 
+-	const char* Result::fieldValue( unsigned long pos ) throw( std::exception )
++	const char* Result::fieldValue( unsigned long pos )
+ 	{
+ 		return m_impl->fieldValue( pos );
+ 	}
+ 
+ 
+-	Lob Result::getLob( const char* value ) throw( std::exception )
++	Lob Result::getLob( const char* value )
+ 	{
+ 		return m_impl->getLob( value );
+ 	}
+@@ -288,7 +288,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	Stmt::Stmt( Stmt_Iface* impl ) throw( std::exception )
++	Stmt::Stmt( Stmt_Iface* impl )
+ 	{
+ 		m_impl = impl;
+ 		m_ref = new int;
+@@ -363,7 +363,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	Result Stmt::execute() throw( std::exception )
++	Result Stmt::execute()
+ 	{
+ 		return Result( m_impl->execute() );
+ 	}
+@@ -384,7 +384,7 @@ namespace OpenDBX
+ 	}
+ 
+ 
+-	Conn::Conn( const char* backend, const char* host, const char* port ) throw( std::exception )
++	Conn::Conn( const char* backend, const char* host, const char* port )
+ 	{
+ 		m_impl = new Conn_Impl( backend, host, port );
+ 		m_ref = new int;
+@@ -393,7 +393,7 @@ namespace OpenDBX
+ 	}
+ 
+ 
+-	Conn::Conn( const string& backend, const string& host, const string& port ) throw( std::exception )
++	Conn::Conn( const string& backend, const string& host, const string& port )
+ 	{
+ 		m_impl = new Conn_Impl( backend.c_str(), host.c_str(), port.c_str() );
+ 		m_ref = new int;
+@@ -454,7 +454,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	void Conn::bind( const char* database, const char* who, const char* cred, odbxbind method ) throw( std::exception )
++	void Conn::bind( const char* database, const char* who, const char* cred, odbxbind method )
+ 	{
+ 		if( m_impl == NULL )
+ 		{
+@@ -466,7 +466,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	void Conn::bind( const string& database, const string& who, const string& cred, odbxbind method ) throw( std::exception )
++	void Conn::bind( const string& database, const string& who, const string& cred, odbxbind method )
+ 	{
+ 		if( m_impl == NULL )
+ 		{
+@@ -478,7 +478,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	void Conn::unbind() throw( std::exception )
++	void Conn::unbind()
+ 	{
+ 		if( m_impl == NULL )
+ 		{
+@@ -490,7 +490,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	void Conn::finish() throw( std::exception )
++	void Conn::finish()
+ 	{
+ 		if( m_impl == NULL )
+ 		{
+@@ -502,7 +502,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	bool Conn::getCapability( odbxcap cap ) throw( std::exception )
++	bool Conn::getCapability( odbxcap cap )
+ 	{
+ 		if( m_impl == NULL )
+ 		{
+@@ -514,7 +514,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	void Conn::getOption( odbxopt option, void* value ) throw( std::exception )
++	void Conn::getOption( odbxopt option, void* value )
+ 	{
+ 		if( m_impl == NULL )
+ 		{
+@@ -526,7 +526,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	void Conn::setOption( odbxopt option, void* value ) throw( std::exception )
++	void Conn::setOption( odbxopt option, void* value )
+ 	{
+ 		if( m_impl == NULL )
+ 		{
+@@ -538,7 +538,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	string& Conn::escape( const string& from, string& to ) throw( std::exception )
++	string& Conn::escape( const string& from, string& to )
+ 	{
+ 		if( m_impl == NULL )
+ 		{
+@@ -550,7 +550,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	string& Conn::escape( const char* from, unsigned long fromlen, string& to ) throw( std::exception )
++	string& Conn::escape( const char* from, unsigned long fromlen, string& to )
+ 	{
+ 		if( m_impl == NULL )
+ 		{
+@@ -562,7 +562,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	Stmt Conn::create( const char* sql, unsigned long length, Stmt::Type type ) throw( std::exception )
++	Stmt Conn::create( const char* sql, unsigned long length, Stmt::Type type )
+ 	{
+ 		if( length == 0 ) { length = (unsigned long) strlen( sql ); }
+ 
+@@ -571,7 +571,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	Stmt Conn::create( const string& sql, Stmt::Type type ) throw( std::exception )
++	Stmt Conn::create( const string& sql, Stmt::Type type )
+ 	{
+ 		if( m_impl == NULL )
+ 		{
+diff -urNp opendbx-1.4.6.orig/lib/odbx_iface.hpp opendbx-1.4.6/lib/odbx_iface.hpp
+--- opendbx-1.4.6.orig/lib/odbx_iface.hpp	2021-08-22 17:01:46.396970910 -0500
++++ opendbx-1.4.6/lib/odbx_iface.hpp	2021-08-22 17:02:27.055963754 -0500
+@@ -27,10 +27,10 @@ namespace OpenDBX
+ 	public:
+ 
+ 		virtual ~Lob_Iface() throw() {}
+-		virtual void close() throw( std::exception ) = 0;
++		virtual void close() = 0;
+ 
+-		virtual ssize_t read( void* buffer, size_t buflen ) throw( std::exception ) = 0;
+-		virtual ssize_t write( void* buffer, size_t buflen ) throw( std::exception ) = 0;
++		virtual ssize_t read( void* buffer, size_t buflen ) = 0;
++		virtual ssize_t write( void* buffer, size_t buflen ) = 0;
+ 	};
+ 
+ 
+@@ -40,22 +40,22 @@ namespace OpenDBX
+ 	public:
+ 
+ 		virtual ~Result_Iface() throw() {}
+-		virtual void finish() throw( std::exception ) = 0;
++		virtual void finish() = 0;
+ 
+-		virtual odbxres getResult( struct timeval* timeout, unsigned long chunk ) throw( std::exception ) = 0;
++		virtual odbxres getResult( struct timeval* timeout, unsigned long chunk ) = 0;
+ 
+-		virtual odbxrow getRow() throw( std::exception ) = 0;
+-		virtual uint64_t rowsAffected() throw( std::exception ) = 0;
++		virtual odbxrow getRow() = 0;
++		virtual uint64_t rowsAffected() = 0;
+ 
+-		virtual unsigned long columnCount() throw( std::exception ) = 0;
+-		virtual unsigned long columnPos( const string& name ) throw( std::exception ) = 0;
+-		virtual const string columnName( unsigned long pos ) throw( std::exception ) = 0;
+-		virtual odbxtype columnType( unsigned long pos ) throw( std::exception ) = 0;
++		virtual unsigned long columnCount() = 0;
++		virtual unsigned long columnPos( const string& name ) = 0;
++		virtual const string columnName( unsigned long pos ) = 0;
++		virtual odbxtype columnType( unsigned long pos ) = 0;
+ 
+-		virtual unsigned long fieldLength( unsigned long pos ) throw( std::exception ) = 0;
+-		virtual const char* fieldValue( unsigned long pos ) throw( std::exception ) = 0;
++		virtual unsigned long fieldLength( unsigned long pos ) = 0;
++		virtual const char* fieldValue( unsigned long pos ) = 0;
+ 
+-		virtual Lob_Iface* getLob( const char* value ) throw( std::exception ) = 0;
++		virtual Lob_Iface* getLob( const char* value ) = 0;
+ 	};
+ 
+ 
+@@ -65,7 +65,7 @@ namespace OpenDBX
+ 	public:
+ 
+ 		virtual ~Stmt_Iface() throw() {};
+-		virtual Result_Iface* execute() throw( std::exception ) = 0;
++		virtual Result_Iface* execute() = 0;
+ 
+ // 		virtual void bind( const void* data, unsigned long size, size_t pos, int flags ) = 0;
+ // 		virtual size_t count() = 0;
+@@ -78,19 +78,19 @@ namespace OpenDBX
+ 	public:
+ 
+ 		virtual ~Conn_Iface() throw() {};
+-		virtual void finish() throw( std::exception ) = 0;
++		virtual void finish() = 0;
+ 
+-		virtual void bind( const char* database, const char* who, const char* cred, odbxbind method = ODBX_BIND_SIMPLE ) throw( std::exception ) = 0;
+-		virtual void unbind() throw( std::exception ) = 0;
++		virtual void bind( const char* database, const char* who, const char* cred, odbxbind method = ODBX_BIND_SIMPLE ) = 0;
++		virtual void unbind() = 0;
+ 
+-		virtual bool getCapability( odbxcap cap ) throw( std::exception ) = 0;
++		virtual bool getCapability( odbxcap cap ) = 0;
+ 
+-		virtual void getOption( odbxopt option, void* value ) throw( std::exception ) = 0;
+-		virtual void setOption( odbxopt option, void* value ) throw( std::exception ) = 0;
++		virtual void getOption( odbxopt option, void* value ) = 0;
++		virtual void setOption( odbxopt option, void* value ) = 0;
+ 
+-		virtual string& escape( const char* from, unsigned long fromlen, string& to ) throw( std::exception ) = 0;
++		virtual string& escape( const char* from, unsigned long fromlen, string& to ) = 0;
+ 
+-		virtual Stmt_Iface* create( const string& sql, Stmt::Type type ) throw( std::exception ) = 0;
++		virtual Stmt_Iface* create( const string& sql, Stmt::Type type ) = 0;
+ 	};
+ 
+ }   // namespace
+diff -urNp opendbx-1.4.6.orig/lib/odbx_impl.cpp opendbx-1.4.6/lib/odbx_impl.cpp
+--- opendbx-1.4.6.orig/lib/odbx_impl.cpp	2021-08-22 17:01:46.396970910 -0500
++++ opendbx-1.4.6/lib/odbx_impl.cpp	2021-08-22 17:02:27.056963778 -0500
+@@ -29,7 +29,7 @@ namespace OpenDBX
+ 	*  OpenDBX large object implementation
+ 	*/
+ 
+-	Lob_Impl::Lob_Impl( odbx_result_t* result, const char* value ) throw( std::exception )
++	Lob_Impl::Lob_Impl( odbx_result_t* result, const char* value )
+ 	{
+ 		int err;
+ 
+@@ -52,7 +52,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	void Lob_Impl::close() throw( std::exception )
++	void Lob_Impl::close()
+ 	{
+ 		int err;
+ 
+@@ -66,7 +66,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	ssize_t Lob_Impl::read( void* buffer, size_t buflen ) throw( std::exception )
++	ssize_t Lob_Impl::read( void* buffer, size_t buflen )
+ 	{
+ 		ssize_t err;
+ 
+@@ -80,7 +80,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	ssize_t Lob_Impl::write( void* buffer, size_t buflen ) throw( std::exception )
++	ssize_t Lob_Impl::write( void* buffer, size_t buflen )
+ 	{
+ 		ssize_t err;
+ 
+@@ -102,7 +102,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	Result_Impl::Result_Impl( odbx_t* handle ) throw( std::exception )
++	Result_Impl::Result_Impl( odbx_t* handle )
+ 	{
+ 		m_handle = handle;
+ 		m_result = NULL;
+@@ -121,7 +121,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	void Result_Impl::finish() throw( std::exception )
++	void Result_Impl::finish()
+ 	{
+ 		odbxres res;
+ 
+@@ -137,7 +137,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	odbxres Result_Impl::getResult( struct timeval* timeout, unsigned long chunk ) throw( std::exception )
++	odbxres Result_Impl::getResult( struct timeval* timeout, unsigned long chunk )
+ 	{
+ 		int err;
+ 
+@@ -162,7 +162,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	odbxrow Result_Impl::getRow() throw( std::exception )
++	odbxrow Result_Impl::getRow()
+ 	{
+ 		int err;
+ 
+@@ -176,21 +176,21 @@ namespace OpenDBX
+ 
+ 
+ 
+-	uint64_t Result_Impl::rowsAffected() throw( std::exception )
++	uint64_t Result_Impl::rowsAffected()
+ 	{
+ 		return odbx_rows_affected( m_result );
+ 	}
+ 
+ 
+ 
+-	unsigned long Result_Impl::columnCount() throw( std::exception )
++	unsigned long Result_Impl::columnCount()
+ 	{
+ 		return odbx_column_count( m_result );
+ 	}
+ 
+ 
+ 
+-	unsigned long Result_Impl::columnPos( const string& name ) throw( std::exception )
++	unsigned long Result_Impl::columnPos( const string& name )
+ 	{
+ 		map<const string, unsigned long>::const_iterator it;
+ 
+@@ -213,7 +213,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	const string Result_Impl::columnName( unsigned long pos ) throw( std::exception )
++	const string Result_Impl::columnName( unsigned long pos )
+ 	{
+ 		if( pos < odbx_column_count( m_result ) )
+ 		{
+@@ -230,7 +230,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	odbxtype Result_Impl::columnType( unsigned long pos ) throw( std::exception )
++	odbxtype Result_Impl::columnType( unsigned long pos )
+ 	{
+ 		if( pos < odbx_column_count( m_result ) )
+ 		{
+@@ -242,7 +242,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	unsigned long Result_Impl::fieldLength( unsigned long pos ) throw( std::exception )
++	unsigned long Result_Impl::fieldLength( unsigned long pos )
+ 	{
+ 		if( pos < odbx_column_count( m_result ) )
+ 		{
+@@ -254,7 +254,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	const char* Result_Impl::fieldValue( unsigned long pos ) throw( std::exception )
++	const char* Result_Impl::fieldValue( unsigned long pos )
+ 	{
+ 		if( pos < odbx_column_count( m_result ) )
+ 		{
+@@ -265,7 +265,7 @@ namespace OpenDBX
+ 	}
+ 
+ 
+-	Lob_Iface* Result_Impl::getLob( const char* value ) throw( std::exception )
++	Lob_Iface* Result_Impl::getLob( const char* value )
+ 	{
+ 		return new Lob_Impl( m_result, value );
+ 	}
+@@ -280,7 +280,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	Stmt_Impl::Stmt_Impl( odbx_t* handle ) throw( std::exception )
++	Stmt_Impl::Stmt_Impl( odbx_t* handle )
+ 	{
+ 		m_handle = handle;
+ 	}
+@@ -301,7 +301,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	StmtSimple_Impl::StmtSimple_Impl( odbx_t* handle, const string& sql ) throw( std::exception ) : Stmt_Impl( handle )
++	StmtSimple_Impl::StmtSimple_Impl( odbx_t* handle, const string& sql ) : Stmt_Impl( handle )
+ 	{
+ 		m_sql = sql;
+ /*		m_buffer = NULL;
+@@ -326,7 +326,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	StmtSimple_Impl::StmtSimple_Impl() throw( std::exception ) : Stmt_Impl( NULL )
++	StmtSimple_Impl::StmtSimple_Impl() : Stmt_Impl( NULL )
+ 	{
+ // 		m_buffer = NULL;
+ // 		m_bufsize = 0;
+@@ -365,7 +365,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	Result_Iface* StmtSimple_Impl::execute() throw( std::exception )
++	Result_Iface* StmtSimple_Impl::execute()
+ 	{
+ // 		if( m_binds.size() ) { _exec_params(); }
+ // 		else { _exec_noparams(); }
+@@ -377,7 +377,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	inline void StmtSimple_Impl::_exec_noparams() throw( std::exception )
++	inline void StmtSimple_Impl::_exec_noparams()
+ 	{
+ 		int err;
+ 
+@@ -452,7 +452,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	Conn_Impl::Conn_Impl( const char* backend, const char* host, const char* port ) throw( std::exception )
++	Conn_Impl::Conn_Impl( const char* backend, const char* host, const char* port )
+ 	{
+ 		int err;
+ 
+@@ -480,7 +480,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	void Conn_Impl::bind( const char* database, const char* who, const char* cred, odbxbind method ) throw( std::exception )
++	void Conn_Impl::bind( const char* database, const char* who, const char* cred, odbxbind method )
+ 	{
+ 		int err;
+ 
+@@ -494,7 +494,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	void Conn_Impl::unbind() throw( std::exception )
++	void Conn_Impl::unbind()
+ 	{
+ 		int err;
+ 
+@@ -508,7 +508,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	void Conn_Impl::finish() throw( std::exception )
++	void Conn_Impl::finish()
+ 	{
+ 		int err;
+ 
+@@ -528,7 +528,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	bool Conn_Impl::getCapability( odbxcap cap ) throw( std::exception )
++	bool Conn_Impl::getCapability( odbxcap cap )
+ 	{
+ 		int err = odbx_capabilities( m_handle, (unsigned int) cap );
+ 
+@@ -545,7 +545,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	void Conn_Impl::getOption( odbxopt option, void* value ) throw( std::exception )
++	void Conn_Impl::getOption( odbxopt option, void* value )
+ 	{
+ 		int err;
+ 
+@@ -557,7 +557,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	void Conn_Impl::setOption( odbxopt option, void* value ) throw( std::exception )
++	void Conn_Impl::setOption( odbxopt option, void* value )
+ 	{
+ 		int err;
+ 
+@@ -569,7 +569,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	string& Conn_Impl::escape( const char* from, unsigned long fromlen, string& to ) throw( std::exception )
++	string& Conn_Impl::escape( const char* from, unsigned long fromlen, string& to )
+ 	{
+ 		int err;
+ 		unsigned long size = m_escsize;
+@@ -594,7 +594,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	Stmt_Iface* Conn_Impl::create( const string& sql, Stmt::Type type ) throw( std::exception )
++	Stmt_Iface* Conn_Impl::create( const string& sql, Stmt::Type type )
+ 	{
+ 		switch( type )
+ 		{
+@@ -607,7 +607,7 @@ namespace OpenDBX
+ 
+ 
+ 
+-	inline char* Conn_Impl::_resize( char* buffer, size_t size ) throw( std::exception )
++	inline char* Conn_Impl::_resize( char* buffer, size_t size )
+ 	{
+ 		if( ( buffer = (char*) std::realloc( buffer, size ) ) == NULL )
+ 		{
+diff -urNp opendbx-1.4.6.orig/lib/odbx_impl.hpp opendbx-1.4.6/lib/odbx_impl.hpp
+--- opendbx-1.4.6.orig/lib/odbx_impl.hpp	2021-08-22 17:01:46.395970885 -0500
++++ opendbx-1.4.6/lib/odbx_impl.hpp	2021-08-22 17:02:27.056963778 -0500
+@@ -37,13 +37,13 @@ namespace OpenDBX
+ 
+ 	public:
+ 
+-		Lob_Impl( odbx_result_t* result, const char* value ) throw( std::exception );
++		Lob_Impl( odbx_result_t* result, const char* value );
+ 		~Lob_Impl() throw();
+ 
+-		void close() throw( std::exception );
++		void close();
+ 
+-		ssize_t read( void* buffer, size_t buflen ) throw( std::exception );
+-		ssize_t write( void* buffer, size_t buflen ) throw( std::exception );
++		ssize_t read( void* buffer, size_t buflen );
++		ssize_t write( void* buffer, size_t buflen );
+ 	};
+ 
+ 
+@@ -56,25 +56,25 @@ namespace OpenDBX
+ 
+ 	public:
+ 
+-		Result_Impl( odbx_t* handle ) throw( std::exception );
++		Result_Impl( odbx_t* handle );
+ 		~Result_Impl() throw();
+ 
+-		void finish() throw( std::exception );
++		void finish();
+ 
+-		odbxres getResult( struct timeval* timeout, unsigned long chunk ) throw( std::exception );
++		odbxres getResult( struct timeval* timeout, unsigned long chunk );
+ 
+-		odbxrow getRow() throw( std::exception );
+-		uint64_t rowsAffected() throw( std::exception );
++		odbxrow getRow();
++		uint64_t rowsAffected();
+ 
+-		unsigned long columnCount() throw( std::exception );
+-		unsigned long columnPos( const string& name ) throw( std::exception );
+-		const string columnName( unsigned long pos ) throw( std::exception );
+-		odbxtype columnType( unsigned long pos ) throw( std::exception );
++		unsigned long columnCount();
++		unsigned long columnPos( const string& name );
++		const string columnName( unsigned long pos );
++		odbxtype columnType( unsigned long pos );
+ 
+-		unsigned long fieldLength( unsigned long pos ) throw( std::exception );
+-		const char* fieldValue( unsigned long pos ) throw( std::exception );
++		unsigned long fieldLength( unsigned long pos );
++		const char* fieldValue( unsigned long pos );
+ 
+-		Lob_Iface* getLob( const char* value ) throw( std::exception );
++		Lob_Iface* getLob( const char* value );
+ 	};
+ 
+ 
+@@ -89,7 +89,7 @@ namespace OpenDBX
+ 
+ 	public:
+ 
+-		Stmt_Impl( odbx_t* handle ) throw( std::exception );
++		Stmt_Impl( odbx_t* handle );
+ 	};
+ 
+ 
+@@ -106,19 +106,19 @@ namespace OpenDBX
+ 
+ 	protected:
+ 
+-// 		inline void _exec_params() throw( std::exception );
+-		inline void _exec_noparams() throw( std::exception );
++// 		inline void _exec_params();
++		inline void _exec_noparams();
+ 
+ 	public:
+ 
+-		StmtSimple_Impl( odbx_t* handle, const string& sql ) throw( std::exception );
+-		StmtSimple_Impl() throw( std::exception );
++		StmtSimple_Impl( odbx_t* handle, const string& sql );
++		StmtSimple_Impl();
+ 		~StmtSimple_Impl() throw();
+ 
+ // 		void bind( const void* data, unsigned long size, size_t pos, int flags );
+ // 		size_t count();
+ 
+-		Result_Iface* execute() throw( std::exception );
++		Result_Iface* execute();
+ 	};
+ 
+ 
+@@ -132,25 +132,25 @@ namespace OpenDBX
+ 
+ 	protected:
+ 
+-		inline char* _resize( char* buffer, size_t size ) throw( std::exception );
++		inline char* _resize( char* buffer, size_t size );
+ 
+ 	public:
+ 
+-		Conn_Impl( const char* backend, const char* host, const char* port ) throw( std::exception );
++		Conn_Impl( const char* backend, const char* host, const char* port );
+ 		~Conn_Impl() throw();
+-		void finish() throw( std::exception );
++		void finish();
+ 
+-		void bind( const char* database, const char* who, const char* cred, odbxbind method = ODBX_BIND_SIMPLE ) throw( std::exception );
+-		void unbind() throw( std::exception );
++		void bind( const char* database, const char* who, const char* cred, odbxbind method = ODBX_BIND_SIMPLE );
++		void unbind();
+ 
+-		bool getCapability( odbxcap cap ) throw( std::exception );
++		bool getCapability( odbxcap cap );
+ 
+-		void getOption( odbxopt option, void* value ) throw( std::exception );
+-		void setOption( odbxopt option, void* value ) throw( std::exception );
++		void getOption( odbxopt option, void* value );
++		void setOption( odbxopt option, void* value );
+ 
+-		string& escape( const char* from, unsigned long fromlen, string& to ) throw( std::exception );
++		string& escape( const char* from, unsigned long fromlen, string& to );
+ 
+-		Stmt_Iface* create( const string& sql, Stmt::Type type ) throw( std::exception );
++		Stmt_Iface* create( const string& sql, Stmt::Type type );
+ 	};
+ 
+ }   // namespace

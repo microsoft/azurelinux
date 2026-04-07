@@ -1,0 +1,85 @@
+From 55d28b259f1a68f60c937ea8be7815685d32757f Mon Sep 17 00:00:00 2001
+From: ethan-thompson <ethan.thompson@networkradius.com>
+Date: Wed, 24 Jul 2024 14:54:25 -0400
+Subject: [PATCH] fix: Check if system is running BSD. If so, update declared
+ types accordingly.
+
+Signed-off-by: ethan-thompson <ethan.thompson@networkradius.com>
+---
+ setup.py | 48 ++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 36 insertions(+), 12 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 1b5f5135..a757b1a8 100644
+--- a/setup.py
++++ b/setup.py
+@@ -1,6 +1,7 @@
+ import site
+ import sys
+ import os
++import platform
+ from setuptools import setup
+ from setuptools.command.build_ext import build_ext
+ from pkgconfig import pkgconfig
+@@ -183,9 +184,20 @@ def get_mappings(self):
+             raise RuntimeError(
+                 f"unable to find tss2_tpm2_types.h in {pk['include_dirs']}"
+             )
+-        pdata = preprocess_file(
+-            header_path, cpp_args=["-D__extension__=", "-D__attribute__(x)="]
+-        )
++
++        if platform.system() == "FreeBSD":
++            pdata = preprocess_file(
++                header_path,
++                cpp_args=[
++                    "-D__builtin_va_list=char*",
++                    "-D__extension__=",
++                    "-D__attribute__(x)=",
++                ],
++            )
++        else:
++            pdata = preprocess_file(
++                header_path, cpp_args=["-D__extension__=", "-D__attribute__(x)="]
++            )
+         parser = c_parser.CParser()
+         ast = parser.parse(pdata, "tss2_tpm2_types.h")
+         tm = self.get_types(ast)
+@@ -202,15 +214,27 @@ def get_mappings(self):
+                     policy_header_path = hp
+                     break
+             if policy_header_path:
+-                pdata = preprocess_file(
+-                    policy_header_path,
+-                    cpp_args=[
+-                        "-D__extension__=",
+-                        "-D__attribute__(x)=",
+-                        "-D__float128=long double",
+-                        "-D_FORTIFY_SOURCE=0",
+-                    ],
+-                )
++                if platform.system() == "FreeBSD":
++                    pdata = preprocess_file(
++                        policy_header_path,
++                        cpp_args=[
++                            "-D__builtin_va_list=char*",
++                            "-D__extension__=",
++                            "-D__attribute__(x)=",
++                            "-D__float128=long double",
++                            "-D_FORTIFY_SOURCE=0",
++                        ],
++                    )
++                else:
++                    pdata = preprocess_file(
++                        policy_header_path,
++                        cpp_args=[
++                            "-D__extension__=",
++                            "-D__attribute__(x)=",
++                            "-D__float128=long double",
++                            "-D_FORTIFY_SOURCE=0",
++                        ],
++                    )
+                 parser = c_parser.CParser()
+                 past = parser.parse(pdata, "tss2_policy.h")
+                 ptm = self.get_types(past)
+

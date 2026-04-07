@@ -1,0 +1,95 @@
+From 548cb9824bee7e8867eb1d6272ca972abd6d4f06 Mon Sep 17 00:00:00 2001
+From: Diego Herrera <dherrera@redhat.com>
+Date: Mon, 30 Dec 2024 18:55:22 -0300
+Subject: [PATCH 06/20] remove-wil
+
+---
+ cmake/external/onnxruntime_external_deps.cmake | 9 +--------
+ cmake/onnxruntime_common.cmake                 | 2 +-
+ cmake/onnxruntime_graph.cmake                  | 2 +-
+ cmake/onnxruntime_providers_dml.cmake          | 2 +-
+ cmake/winml_unittests.cmake                    | 2 +-
+ 5 files changed, 5 insertions(+), 12 deletions(-)
+
+diff --git a/cmake/external/onnxruntime_external_deps.cmake b/cmake/external/onnxruntime_external_deps.cmake
+index 08cc1c4e39..f8a091a01c 100644
+--- a/cmake/external/onnxruntime_external_deps.cmake
++++ b/cmake/external/onnxruntime_external_deps.cmake
+@@ -516,13 +516,6 @@ else()
+   include(eigen) # FetchContent
+ endif()
+ 
+-if(onnxruntime_USE_VCPKG)
+-  find_package(wil CONFIG REQUIRED)
+-  set(WIL_TARGET "WIL::WIL")
+-else()
+-  include(wil) # FetchContent
+-endif()
+-
+ # XNNPACK EP
+ if (onnxruntime_USE_XNNPACK)
+   if (onnxruntime_DISABLE_CONTRIB_OPS)
+@@ -542,7 +535,7 @@ if (onnxruntime_USE_MIMALLOC)
+   onnxruntime_fetchcontent_makeavailable(mimalloc)
+ endif()
+ 
+-set(onnxruntime_EXTERNAL_LIBRARIES ${onnxruntime_EXTERNAL_LIBRARIES_XNNPACK} ${WIL_TARGET} nlohmann_json::nlohmann_json
++set(onnxruntime_EXTERNAL_LIBRARIES ${onnxruntime_EXTERNAL_LIBRARIES_XNNPACK} nlohmann_json::nlohmann_json
+                                    onnx onnx_proto ${PROTOBUF_LIB} re2::re2 Boost::mp11 safeint_interface
+                                    flatbuffers::flatbuffers ${GSL_TARGET} ${ABSEIL_LIBS} date::date
+                                    ${ONNXRUNTIME_CLOG_TARGET_NAME})
+diff --git a/cmake/onnxruntime_common.cmake b/cmake/onnxruntime_common.cmake
+index 896379d743..7721f9c8d2 100644
+--- a/cmake/onnxruntime_common.cmake
++++ b/cmake/onnxruntime_common.cmake
+@@ -127,7 +127,7 @@ if (MSVC)
+     endif()
+ endif()
+ 
+-onnxruntime_add_include_to_target(onnxruntime_common date::date ${WIL_TARGET})
++onnxruntime_add_include_to_target(onnxruntime_common date::date)
+ target_include_directories(onnxruntime_common
+     PRIVATE ${CMAKE_CURRENT_BINARY_DIR} ${ONNXRUNTIME_ROOT} ${eigen_INCLUDE_DIRS}
+     # propagate include directories of dependencies that are part of public interface
+diff --git a/cmake/onnxruntime_graph.cmake b/cmake/onnxruntime_graph.cmake
+index 4d51325b84..a0bdb0a761 100644
+--- a/cmake/onnxruntime_graph.cmake
++++ b/cmake/onnxruntime_graph.cmake
+@@ -96,7 +96,7 @@ endif()
+ 
+ onnxruntime_add_static_library(onnxruntime_graph ${onnxruntime_graph_src} ${orttraining_graph_src})
+ add_dependencies(onnxruntime_graph onnx_proto flatbuffers::flatbuffers)
+-onnxruntime_add_include_to_target(onnxruntime_graph onnxruntime_common ${WIL_TARGET} onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers safeint_interface Boost::mp11)
++onnxruntime_add_include_to_target(onnxruntime_graph onnxruntime_common onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers safeint_interface Boost::mp11)
+ 
+ if (MSVC)
+   set(ONNX_PROTOBUF_NATVIS_FILE "onnx_protobuf.natvis")
+diff --git a/cmake/onnxruntime_providers_dml.cmake b/cmake/onnxruntime_providers_dml.cmake
+index 439be882dc..565a1f7d6d 100644
+--- a/cmake/onnxruntime_providers_dml.cmake
++++ b/cmake/onnxruntime_providers_dml.cmake
+@@ -9,7 +9,7 @@
+   source_group(TREE ${ONNXRUNTIME_ROOT}/core FILES ${onnxruntime_providers_dml_cc_srcs})
+   onnxruntime_add_static_library(onnxruntime_providers_dml ${onnxruntime_providers_dml_cc_srcs})
+   onnxruntime_add_include_to_target(onnxruntime_providers_dml
+-    onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers Boost::mp11 safeint_interface ${WIL_TARGET}
++    onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers Boost::mp11 safeint_interface
+   )
+   add_dependencies(onnxruntime_providers_dml ${onnxruntime_EXTERNAL_DEPENDENCIES})
+   target_include_directories(onnxruntime_providers_dml PRIVATE
+diff --git a/cmake/winml_unittests.cmake b/cmake/winml_unittests.cmake
+index 68acac584f..f31835dca0 100644
+--- a/cmake/winml_unittests.cmake
++++ b/cmake/winml_unittests.cmake
+@@ -186,7 +186,7 @@ add_dependencies(winml_test_common
+   winml_dll
+ )
+ 
+-onnxruntime_add_include_to_target(winml_test_common onnx_proto GTest::gtest ${PROTOBUF_LIB} ${WIL_TARGET} safeint_interface ${GSL_TARGET})
++onnxruntime_add_include_to_target(winml_test_common onnx_proto GTest::gtest ${PROTOBUF_LIB} safeint_interface ${GSL_TARGET})
+ onnxruntime_add_static_library(winml_google_test_lib ${WINML_TEST_SRC_DIR}/common/googletest/main.cpp)
+ onnxruntime_add_include_to_target(winml_google_test_lib GTest::gtest)
+ set_winml_target_properties(winml_google_test_lib)
+-- 
+2.47.1
+

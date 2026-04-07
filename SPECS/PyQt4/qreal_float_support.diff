@@ -1,0 +1,233 @@
+## 03_qreal_float_support.dpatch by Michael Casadevall <sonicmctails@gmail.com>
+Index: python-qt4-4.10.3/sip/QtCore/qlist.sip
+===================================================================
+--- python-qt4-4.10.3.orig/sip/QtCore/qlist.sip	2013-09-20 07:55:07.028033774 +0100
++++ python-qt4-4.10.3/sip/QtCore/qlist.sip	2013-09-20 07:55:07.024033774 +0100
+@@ -819,3 +819,227 @@
+     return sipGetState(sipTransferObj);
+ %End
+ };
++
++// If we're on an architecture where qreal != double, then we need to also
++// explicately handle doubles. On architectures where qreal == double, they
++// will automaticially be cast upwards
++
++%If (!PyQt_qreal_double)
++
++%If (Qt_4_3_0 -)
++// QList<QPair<double, double> > is implemented as a Python list of 2-element tuples.
++%MappedType QList<QPair<double, double> >
++{
++%TypeHeaderCode
++#include <qlist.h>
++#include <qpair.h>
++%End
++
++%ConvertFromTypeCode
++    // Create the list.
++    PyObject *l;
++
++    if ((l = PyList_New(sipCpp->size())) == NULL)
++        return NULL;
++
++    // Set the list elements.
++    for (int i = 0; i < sipCpp->size(); ++i)
++    {
++        const QPair<double, double> &p = sipCpp->at(i);
++        PyObject *pobj;
++
++        if ((pobj = Py_BuildValue((char *)"dd", p.first, p.second)) == NULL)
++        {
++            Py_DECREF(l);
++
++            return NULL;
++        }
++
++        PyList_SET_ITEM(l, i, pobj);
++    }
++
++    return l;
++%End
++
++%ConvertToTypeCode
++    SIP_SSIZE_T len;
++
++    // Check the type if that is all that is required.
++    if (sipIsErr == NULL)
++    {
++        if (!PySequence_Check(sipPy) || (len = PySequence_Size(sipPy)) < 0)
++            return 0;
++
++        for (SIP_SSIZE_T i = 0; i < len; ++i)
++        {
++            PyObject *tup = PySequence_ITEM(sipPy, i);
++
++            if (!PySequence_Check(tup) || PySequence_Size(tup) != 2)
++                return 0;
++        }
++
++        return 1;
++    }
++
++    QList<QPair<double, double> > *ql = new QList<QPair<double, double> >;
++    len = PySequence_Size(sipPy);
++
++    for (SIP_SSIZE_T i = 0; i < len; ++i)
++    {
++        PyObject *tup = PySequence_ITEM(sipPy, i);
++
++        double first = PyFloat_AsDouble(PySequence_ITEM(tup, 0));
++        double second = PyFloat_AsDouble(PySequence_ITEM(tup, 1));
++
++        ql->append(QPair<double, double>(first, second));
++    }
++
++    *sipCppPtr = ql;
++
++    return sipGetState(sipTransferObj);
++%End
++};
++%End
++%If (Qt_4_3_0 -)
++// QList<QPair<double, TYPE> > is implemented as a Python list of 2-element tuples.
++template<double, TYPE>
++%MappedType QList<QPair<double, TYPE> >
++{
++%TypeHeaderCode
++#include <qlist.h>
++#include <qpair.h>
++%End
++
++%ConvertFromTypeCode
++    // Create the list.
++    PyObject *l;
++
++    if ((l = PyList_New(sipCpp->size())) == NULL)
++        return NULL;
++
++    // Set the list elements.
++    for (int i = 0; i < sipCpp->size(); ++i)
++    {
++        const QPair<double, TYPE> &p = sipCpp->at(i);
++        TYPE *t = new TYPE(p.second);
++        PyObject *pobj;
++
++        if ((pobj = sipBuildResult(NULL, "(dB)", p.first, t, sipClass_TYPE, sipTransferObj)) == NULL)
++        {
++            Py_DECREF(l);
++            delete t;
++
++            return NULL;
++        }
++
++        PyList_SET_ITEM(l, i, pobj);
++    }
++
++    return l;
++%End
++
++%ConvertToTypeCode
++    SIP_SSIZE_T len;
++
++    // Check the type if that is all that is required.
++    if (sipIsErr == NULL)
++    {
++        if (!PySequence_Check(sipPy) || (len = PySequence_Size(sipPy)) < 0)
++            return 0;
++
++        for (SIP_SSIZE_T i = 0; i < len; ++i)
++        {
++            PyObject *tup = PySequence_ITEM(sipPy, i);
++
++            if (!PySequence_Check(tup) || PySequence_Size(tup) != 2)
++                return 0;
++
++            if (!sipCanConvertToInstance(PySequence_ITEM(tup, 1), sipClass_TYPE, SIP_NOT_NONE))
++                return 0;
++        }
++
++        return 1;
++    }
++
++    QList<QPair<double, TYPE> > *ql = new QList<QPair<double, TYPE> >;
++    len = PySequence_Size(sipPy);
++
++    for (SIP_SSIZE_T i = 0; i < len; ++i)
++    {
++        PyObject *tup = PySequence_ITEM(sipPy, i);
++        double d;
++        int state;
++
++        d = PyFloat_AsDouble(PySequence_ITEM(tup, 0));
++        TYPE *t = reinterpret_cast<TYPE *>(sipConvertToInstance(PySequence_ITEM(tup, 1), sipClass_TYPE, sipTransferObj, SIP_NOT_NONE, &state, sipIsErr));
++
++        if (*sipIsErr)
++        {
++            sipReleaseInstance(t, sipClass_TYPE, state);
++
++            delete ql;
++            return 0;
++        }
++
++        ql->append(QPair<double, TYPE>(d, *t));
++
++        sipReleaseInstance(t, sipClass_TYPE, state);
++    }
++
++    *sipCppPtr = ql;
++
++    return sipGetState(sipTransferObj);
++%End
++};
++%End
++
++// QList<double> is implemented as a Python list of doubles.
++%MappedType QList<double>
++{
++%TypeHeaderCode
++#include <qlist.h>
++%End
++
++%ConvertFromTypeCode
++    // Create the list.
++    PyObject *l;
++
++    if ((l = PyList_New(sipCpp->size())) == NULL)
++        return NULL;
++
++    // Set the list elements.
++    for (int i = 0; i < sipCpp->size(); ++i)
++    {
++        PyObject *pobj;
++
++        if ((pobj = PyFloat_FromDouble(sipCpp->value(i))) == NULL)
++        {
++            Py_DECREF(l);
++
++            return NULL;
++        }
++
++        PyList_SET_ITEM(l, i, pobj);
++    }
++
++    return l;
++%End
++
++%ConvertToTypeCode
++    // Check the type if that is all that is required.
++    if (sipIsErr == NULL)
++        return (PySequence_Check(sipPy) && PySequence_Size(sipPy) >= 0);
++
++    QList<double> *ql = new QList<double>;
++    SIP_SSIZE_T len = PySequence_Size(sipPy);
++
++    for (SIP_SSIZE_T i = 0; i < len; ++i)
++        ql->append(PyFloat_AsDouble(PySequence_ITEM(sipPy, i)));
++
++    *sipCppPtr = ql;
++
++    return sipGetState(sipTransferObj);
++%End
++};
++
++%End

@@ -1,0 +1,25 @@
+From 399ae81dfbedb7b8acf84e56b0e4b2d5023432ec Mon Sep 17 00:00:00 2001
+From: Karolina Surma <ksurma@redhat.com>
+Date: Wed, 26 Feb 2025 10:43:44 +0100
+Subject: [PATCH] Patch test_theming to accomodate for Fedora-added theme
+
+---
+ tests/test_theming/test_theming.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/test_theming/test_theming.py b/tests/test_theming/test_theming.py
+index 173e0c9..515e546 100644
+--- a/tests/test_theming/test_theming.py
++++ b/tests/test_theming/test_theming.py
+@@ -58,7 +58,7 @@ def test_theme_api(app: SphinxTestApp) -> None:
+     ]
+ 
+     # test Theme class API
+-    assert set(app.registry.html_themes.keys()) == set(themes)
++    assert set(app.registry.html_themes.keys()) >= set(themes)
+     assert app.registry.html_themes['test-theme'] == (
+         app.srcdir / 'test_theme' / 'test-theme'
+     )
+-- 
+2.48.1
+

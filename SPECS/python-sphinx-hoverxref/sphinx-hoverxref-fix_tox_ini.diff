@@ -1,0 +1,12 @@
+--- a/tox.ini
++++ b/tox.ini
+@@ -9,9 +9,7 @@ envlist =
+ [testenv]
+ deps =
+   pytest
+-  pdbpp
+   sphinxcontrib-bibtex
+-  .
+   sphinx50: sphinx~=5.0.0
+   sphinx53: sphinx~=5.3.0
+   sphinx60: sphinx~=6.0.0

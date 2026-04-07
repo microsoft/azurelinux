@@ -1,0 +1,31 @@
+From 1e4b1188408c896c795271fd20af7fc1a902a78a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Wed, 2 Apr 2025 18:39:31 +0100
+Subject: [PATCH 113/131] Don't disable cf-protection for qgs
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ QuoteGeneration/quote_wrapper/qgs/Makefile | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/QuoteGeneration/quote_wrapper/qgs/Makefile b/QuoteGeneration/quote_wrapper/qgs/Makefile
+index 8228bdfc..5116d85e 100644
+--- a/QuoteGeneration/quote_wrapper/qgs/Makefile
++++ b/QuoteGeneration/quote_wrapper/qgs/Makefile
+@@ -43,10 +43,6 @@ QGS_INC = -I$(SGX_SDK)/include \
+ 		  -I$(TOP_DIR)/quote_wrapper/qgs_msg_lib/inc
+ QGS_CFLAGS = -g  -MMD $(CFLAGS) $(QGS_INC)
+ QGS_CXXFLAGS = -g  -MMD $(CXXFLAGS) $(QGS_INC)
+-ifeq ($(CC_NO_LESS_THAN_8), 1)
+-    QGS_CFLAGS += -fcf-protection=none
+-    QGS_CXXFLAGS += -fcf-protection=none
+-endif
+ 
+ DEPENDS = ${QGS_OBJS test_client.o:.o=.d}
+ 
+-- 
+2.53.0
+

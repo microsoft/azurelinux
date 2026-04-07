@@ -1,0 +1,68 @@
+From 24223c0b3ca110af04e34f008943979fc6b71598 Mon Sep 17 00:00:00 2001
+From: Tom Rix <trix@redhat.com>
+Date: Sat, 30 Dec 2023 08:58:47 -0500
+Subject: [PATCH] Fix signatures of functions
+
+Signed-off-by: Tom Rix <trix@redhat.com>
+---
+ foxi/onnxifi_dummy.c   | 11 ++++++++---
+ foxi/onnxifi_wrapper.c |  8 ++++++--
+ 2 files changed, 14 insertions(+), 5 deletions(-)
+
+diff --git a/foxi/onnxifi_dummy.c b/foxi/onnxifi_dummy.c
+index 2115af9..7cc81dc 100644
+--- a/foxi/onnxifi_dummy.c
++++ b/foxi/onnxifi_dummy.c
+@@ -103,7 +103,10 @@ ONNXIFI_PUBLIC ONNXIFI_CHECK_RESULT onnxStatus ONNXIFI_ABI onnxInitGraph(
+     const void* onnxModel,
+     uint32_t weightCount,
+     const onnxTensorDescriptorV1* weightDescriptors,
+-    onnxGraph* graph) {
++    onnxGraph* graph,
++    uint32_t maxSeqLength,
++    void* deferredWeightReader) {
++
+   if (graph == NULL) {
+     return ONNXIFI_STATUS_INVALID_POINTER;
+   }
+@@ -215,6 +218,8 @@ ONNXIFI_PUBLIC ONNXIFI_CHECK_RESULT onnxStatus ONNXIFI_ABI
+ onnxWaitEventFor(onnxEvent event,
+                  uint32_t timeoutMs,
+                  onnxEventState* eventState,
+-                 onnxStatus* eventStatus) {
++		  onnxStatus* eventStatus,
++		  char* message,
++		  size_t* messageLength) {
+   return ONNXIFI_STATUS_SUCCESS;
+-}
+\ No newline at end of file
++}
+diff --git a/foxi/onnxifi_wrapper.c b/foxi/onnxifi_wrapper.c
+index 98a9325..abe1440 100644
+--- a/foxi/onnxifi_wrapper.c
++++ b/foxi/onnxifi_wrapper.c
+@@ -761,7 +761,9 @@ ONNXIFI_PUBLIC onnxStatus ONNXIFI_ABI onnxInitGraph(
+     const void* onnxModel,
+     uint32_t weightsCount,
+     const onnxTensorDescriptorV1* weightDescriptors,
+-    onnxGraph* graph)
++    onnxGraph* graph,
++    uint32_t maxSeqLength,
++    void* deferredWeightReader)
+ {
+   if (graph == NULL) {
+     return ONNXIFI_STATUS_INVALID_POINTER;
+@@ -797,7 +799,9 @@ ONNXIFI_PUBLIC onnxStatus ONNXIFI_ABI onnxInitGraph(
+     onnxModel,
+     weightsCount,
+     weightDescriptors,
+-    &graph_wrapper->graph);
++    &graph_wrapper->graph,
++    maxSeqLength,
++    deferredWeightReader);
+   switch (status) {
+     case ONNXIFI_STATUS_SUCCESS:
+     case ONNXIFI_STATUS_FALLBACK:
+-- 
+2.43.0
+

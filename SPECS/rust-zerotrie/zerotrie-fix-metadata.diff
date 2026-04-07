@@ -1,0 +1,55 @@
+--- zerotrie-0.2.3/Cargo.toml	1970-01-01T00:00:01+00:00
++++ zerotrie-0.2.3/Cargo.toml	2025-10-29T07:49:25.641391+00:00
+@@ -67,10 +67,6 @@
+ name = "zerotrie"
+ path = "src/lib.rs"
+ bench = false
+-
+-[[example]]
+-name = "first_weekday_for_region"
+-path = "examples/first_weekday_for_region.rs"
+ 
+ [[test]]
+ name = "asciitrie_test"
+@@ -149,3 +145,41 @@
+ version = "0.11.3"
+ optional = true
+ default-features = false
++
++[dev-dependencies.bincode]
++version = "1.3.1"
++
++[dev-dependencies.icu_locale_core]
++version = "2.0.0"
++features = ["alloc"]
++default-features = false
++
++[dev-dependencies.postcard]
++version = "1.0.3"
++features = ["alloc"]
++default-features = false
++
++[dev-dependencies.rand]
++version = "0.9"
++
++[dev-dependencies.rand_pcg]
++version = "0.9"
++
++[dev-dependencies.rmp-serde]
++version = "1.2.0"
++
++[dev-dependencies.serde]
++version = "1.0.220"
++features = ["derive"]
++default-features = false
++
++[dev-dependencies.serde_json]
++version = "1.0.45"
++
++[dev-dependencies.writeable]
++version = "0.6.2"
++
++[dev-dependencies.zerovec]
++version = "0.11.5"
++features = ["serde", "hashmap"]
++default-features = false

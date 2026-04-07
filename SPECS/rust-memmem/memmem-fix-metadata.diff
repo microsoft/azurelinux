@@ -1,0 +1,9 @@
+--- memmem-0.1.1/Cargo.toml	2016-05-01T10:14:34+00:00
++++ memmem-0.1.1/Cargo.toml	2023-06-14T14:41:37.889812+00:00
+@@ -9,5 +9,5 @@
+ license = "MIT/Apache-2.0"
+ 
+ [dev-dependencies]
+-quickcheck = "0.2"
++quickcheck = "1"
+ 

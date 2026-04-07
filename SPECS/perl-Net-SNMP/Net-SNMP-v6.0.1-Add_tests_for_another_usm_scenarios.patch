@@ -1,0 +1,551 @@
+From 0ce1418f8261764c1b34c4379ed6af6ef8073678 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Michal=20Josef=20=C5=A0pa=C4=8Dek?=
+ <michal.josef.spacek@gmail.com>
+Date: Mon, 11 Mar 2024 21:08:32 +0100
+Subject: [PATCH 08/11] Add tests for another usm scenarios
+
+---
+ MANIFEST               |   3 +
+ t/usm-sha1-3des.t      | 164 +++++++++++++++++++++++++++++++++++++++
+ t/usm-sha1-aes.t       | 169 +++++++++++++++++++++++++++++++++++++++++
+ t/usm-sha1-cfb192aes.t | 169 +++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 505 insertions(+)
+ create mode 100644 t/usm-sha1-3des.t
+ create mode 100644 t/usm-sha1-aes.t
+ create mode 100644 t/usm-sha1-cfb192aes.t
+
+diff --git a/MANIFEST b/MANIFEST
+index c750573..3430564 100644
+--- a/MANIFEST
++++ b/MANIFEST
+@@ -36,4 +36,7 @@ t/ber.t
+ t/dsp.t
+ t/mp.t
+ t/usm-md5-des.t
++t/usm-sha1-3des.t
++t/usm-sha1-aes.t
++t/usm-sha1-cfb192aes.t
+ t/usm-sha1-des.t
+diff --git a/t/usm-sha1-3des.t b/t/usm-sha1-3des.t
+new file mode 100644
+index 0000000..5921ccf
+--- /dev/null
++++ b/t/usm-sha1-3des.t
+@@ -0,0 +1,164 @@
++# -*- mode: perl -*- 
++# ============================================================================
++
++# Test of the SNMPv3 User-based Security Model. 
++
++# Copyright (c) 2001-2009 David M. Town <dtown@cpan.org>.
++# Copyright (c) 2024 Michal Josef Špaček <skim@cpan.org>.
++# All rights reserved.
++
++# This program is free software; you may redistribute it and/or modify it
++# under the same terms as the Perl 5 programming language system itself.
++
++# ============================================================================
++
++use strict;
++use Test;
++
++BEGIN
++{
++   $|  = 1;
++   $^W = 1;
++   plan tests => 7
++}
++
++use Net::SNMP::Message qw(SEQUENCE OCTET_STRING FALSE);
++
++#
++# Load the Net::SNMP::Security::USM module
++#
++
++eval 'use Net::SNMP::Security::USM';
++
++my $skip = ($@ =~ /locate (:?\S+\.pm)/) ? $@ : FALSE;
++
++#
++# 1. Create the Net::SNMP::Security::USM object
++#
++
++my ($u, $e);
++
++eval
++{
++   ($u, $e) = Net::SNMP::Security::USM->new(
++      -username     => 'dtown',
++      -authpassword => 'maplesyrup',
++      -authprotocol => 'sha',
++      -privpassword => 'maplesyrup',
++      -privprotocol => '3des',
++   );
++
++   # "Perform" discovery...
++   $u->_engine_id_discovery(pack 'x11H2', '02');
++
++   # ...and synchronization
++   $u->_synchronize(10, time);
++};
++
++skip(
++   $skip, ($@ || $e), q{}, 'Failed to create Net::SNMP::Security::USM object'
++);
++
++#
++# 2. Check the localized authKey
++#
++
++eval
++{
++   $e = unpack 'H*', $u->auth_key();
++};
++
++skip(
++   $skip,
++   ($@ || $e),
++   '6695febc9288e36282235fc7151f128497b38f3f',
++   'Invalid authKey calculated'
++);
++
++#
++# 3. Check the localized privKey
++#
++
++eval
++{
++   $e = unpack 'H*', $u->priv_key();
++};
++
++skip(
++   $skip,
++   ($@ || $e),
++   '6695febc9288e36282235fc7151f128497b38f3f9b8b6d78936ba6e7d19dfd9c',
++   'Invalid privKey calculated'
++);
++
++#
++# 4. Create and initalize a Message
++#
++
++my $m;
++
++eval
++{
++   ($m, $e) = Net::SNMP::Message->new();
++   $m->prepare(SEQUENCE, pack('H*', 'deadbeef') x 8);
++   $e = $m->error();
++};
++
++skip($skip, ($@ || $e), q{}, 'Failed to create Net::SNMP::Message object');
++
++#
++# 5. Calculate the HMAC
++#
++
++my $h;
++
++eval
++{
++   $h = unpack 'H*', $u->_auth_hmac($m);
++};
++
++skip($skip, $@, q{}, 'Calculate the HMAC failed');
++
++#
++# 6. Encrypt/descrypt the Message
++#
++
++my $henc;
++
++eval
++{
++   my $salt;
++   my $len = $m->length();
++   my $buff = $m->clear();
++   my $encrypted = $u->_encrypt_data($m, $salt, $buff);
++   $henc = unpack 'H*', $encrypted;
++   $m->append($encrypted);
++   $u->_decrypt_data($m, $salt, $m->process(OCTET_STRING));
++   $e = $u->error();
++   # Remove padding if necessary
++   if ($len -= $m->length()) {
++      substr ${$m->reference()}, $len, -$len, q{};
++   }
++};
++
++skip(
++   $skip,
++   ($@ || $e || $henc),
++   '042858d3a9fffa5afd8ef5cb338fdd79f452e13c0e77f4a918a069a84687c462726148c53198e6c97346',
++   'Privacy failed',
++);
++
++#
++# 7. Check the HMAC
++#
++
++my $h2;
++
++eval
++{
++   $h2 = unpack 'H*', $u->_auth_hmac($m);
++};
++
++skip($skip, ($@ || $h2), $h, 'Authentication failed');
++
++# ============================================================================
+diff --git a/t/usm-sha1-aes.t b/t/usm-sha1-aes.t
+new file mode 100644
+index 0000000..3e1b9f2
+--- /dev/null
++++ b/t/usm-sha1-aes.t
+@@ -0,0 +1,169 @@
++# -*- mode: perl -*- 
++# ============================================================================
++
++# Test of the SNMPv3 User-based Security Model. 
++
++# Copyright (c) 2001-2009 David M. Town <dtown@cpan.org>.
++# Copyright (c) 2024 Michal Josef Špaček <skim@cpan.org>.
++# All rights reserved.
++
++# This program is free software; you may redistribute it and/or modify it
++# under the same terms as the Perl 5 programming language system itself.
++
++# ============================================================================
++
++use strict;
++use Test;
++
++BEGIN
++{
++   $|  = 1;
++   $^W = 1;
++   plan tests => 7
++}
++
++use Net::SNMP::Message qw(SEQUENCE OCTET_STRING FALSE);
++
++#
++# Load the Net::SNMP::Security::USM module
++#
++
++eval 'use Net::SNMP::Security::USM; use Crypt::Rijndael;';
++
++my $skip = ($@ =~ /locate (:?\S+\.pm)/) ? $@ : FALSE;
++
++#
++# 1. Create the Net::SNMP::Security::USM object
++#
++
++my ($u, $e);
++
++eval
++{
++   ($u, $e) = Net::SNMP::Security::USM->new(
++      -username => 'dtown',
++      -authpassword => 'maplesyrup',
++      -authprotocol => 'sha1',
++      -privpassword => 'maplesyrup',
++      -privprotocol => 'aes',
++   );
++
++   # "Perform" discovery...
++   $u->_engine_id_discovery(pack 'x11H2', '02');
++
++   # ...and synchronization
++   $u->_synchronize(10, time);
++};
++
++skip(
++   $skip, ($@ || $e), q{}, 'Failed to create Net::SNMP::Security::USM object'
++);
++
++#
++# 2. Check the localized authKey
++#
++
++eval
++{
++   $e = unpack 'H*', $u->auth_key();
++};
++
++skip(
++   $skip,
++   ($@ || $e),
++   '6695febc9288e36282235fc7151f128497b38f3f',
++   'Invalid authKey calculated'
++);
++
++#
++# 3. Check the localized privKey
++#
++
++eval
++{
++   $e = unpack 'H*', $u->priv_key();
++};
++
++skip(
++   $skip,
++   ($@ || $e),
++   '6695febc9288e36282235fc7151f1284',
++   'Invalid privKey calculated'
++);
++
++#
++# 4. Create and initalize a Message
++#
++
++my $m;
++
++eval
++{
++   ($m, $e) = Net::SNMP::Message->new();
++   $m->prepare(SEQUENCE, pack('H*', 'deadbeef') x 8);
++   $e = $m->error();
++};
++
++skip($skip, ($@ || $e), q{}, 'Failed to create Net::SNMP::Message object');
++
++#
++# 5. Calculate the HMAC
++#
++
++my $h;
++
++eval
++{
++   $h = unpack 'H*', $u->_auth_hmac($m);
++};
++
++skip($skip, $@, q{}, 'Calculate the HMAC failed');
++
++#
++# 6. Encrypt/descrypt the Message
++#
++
++my $henc;
++
++eval
++{
++   my $engine_boots = 0;
++   my $engine_time = 1710186219;
++   my $salt;
++   my $len = $m->length();
++   my $buff = $m->clear();
++   $u->{_engine_boots} = $engine_boots;
++   $u->{_engine_time} = $engine_time;
++   my $encrypted = $u->_encrypt_data($m, $salt, $buff);
++   $henc = unpack 'H*', $encrypted;
++   $m->append($encrypted);
++   substr $salt, 0, 0, pack 'NN', $engine_boots, $engine_time;
++   $u->_decrypt_data($m, $salt, $m->process(OCTET_STRING));
++   $e = $u->error();
++   # Remove padding if necessary
++   if ($len -= $m->length()) {
++      substr ${$m->reference()}, $len, -$len, q{};
++   }
++};
++
++skip(
++   $skip,
++   ($@ || $e || $henc),
++   '0422c538d5445bbfb3a7b53b523349ce6ff3e38774bd14491703e6684aa485c48a9c217f',
++   'Privacy failed',
++);
++
++#
++# 7. Check the HMAC
++#
++
++my $h2;
++
++eval
++{
++   $h2 = unpack 'H*', $u->_auth_hmac($m);
++};
++
++skip($skip, ($@ || $h2), $h, 'Authentication failed');
++
++# ============================================================================
+diff --git a/t/usm-sha1-cfb192aes.t b/t/usm-sha1-cfb192aes.t
+new file mode 100644
+index 0000000..6f6898a
+--- /dev/null
++++ b/t/usm-sha1-cfb192aes.t
+@@ -0,0 +1,169 @@
++# -*- mode: perl -*- 
++# ============================================================================
++
++# Test of the SNMPv3 User-based Security Model. 
++
++# Copyright (c) 2001-2009 David M. Town <dtown@cpan.org>.
++# Copyright (c) 2024 Michal Josef Špaček <skim@cpan.org>.
++# All rights reserved.
++
++# This program is free software; you may redistribute it and/or modify it
++# under the same terms as the Perl 5 programming language system itself.
++
++# ============================================================================
++
++use strict;
++use Test;
++
++BEGIN
++{
++   $|  = 1;
++   $^W = 1;
++   plan tests => 7
++}
++
++use Net::SNMP::Message qw(SEQUENCE OCTET_STRING FALSE);
++
++#
++# Load the Net::SNMP::Security::USM module
++#
++
++eval 'use Net::SNMP::Security::USM; use Crypt::Rijndael;';
++
++my $skip = ($@ =~ /locate (:?\S+\.pm)/) ? $@ : FALSE;
++
++#
++# 1. Create the Net::SNMP::Security::USM object
++#
++
++my ($u, $e);
++
++eval
++{
++   ($u, $e) = Net::SNMP::Security::USM->new(
++      -username     => 'dtown',
++      -authpassword => 'maplesyrup',
++      -authprotocol => 'sha',
++      -privpassword => 'maplesyrup',
++      -privprotocol => 'cfb192-aes',
++   );
++
++   # "Perform" discovery...
++   $u->_engine_id_discovery(pack 'x11H2', '02');
++
++   # ...and synchronization
++   $u->_synchronize(10, time);
++};
++
++skip(
++   $skip, ($@ || $e), q{}, 'Failed to create Net::SNMP::Security::USM object'
++);
++
++#
++# 2. Check the localized authKey
++#
++
++eval
++{
++   $e = unpack 'H*', $u->auth_key();
++};
++
++skip(
++   $skip,
++   ($@ || $e),
++   '6695febc9288e36282235fc7151f128497b38f3f', # RFC 3414 - A.3.2
++   'Invalid authKey calculated'
++);
++
++#
++# 3. Check the localized privKey
++#
++
++eval
++{
++   $e = unpack 'H*', $u->priv_key();
++};
++
++skip(
++   $skip,
++   ($@ || $e),
++   '6695febc9288e36282235fc7151f128497b38f3f505e07eb',
++   'Invalid privKey calculated'
++);
++
++#
++# 4. Create and initalize a Message
++#
++
++my $m;
++
++eval
++{
++   ($m, $e) = Net::SNMP::Message->new();
++   $m->prepare(SEQUENCE, pack('H*', 'deadbeef') x 8);
++   $e = $m->error();
++};
++
++skip($skip, ($@ || $e), q{}, 'Failed to create Net::SNMP::Message object');
++
++#
++# 5. Calculate the HMAC
++#
++
++my $h;
++
++eval
++{
++   $h = unpack 'H*', $u->_auth_hmac($m);
++};
++
++skip($skip, $@, q{}, 'Calculate the HMAC failed');
++
++#
++# 6. Encrypt/descrypt the Message
++#
++
++my $henc;
++
++eval
++{
++   my $engine_boots = 0;
++   my $engine_time = 1710186219;
++   my $salt;
++   my $len = $m->length();
++   my $buff = $m->clear();
++   $u->{_engine_boots} = $engine_boots;
++   $u->{_engine_time} = $engine_time;
++   my $encrypted = $u->_encrypt_data($m, $salt, $buff);
++   $henc = unpack 'H*', $encrypted;
++   $m->append($encrypted);
++   substr $salt, 0, 0, pack 'NN', $engine_boots, $engine_time;
++   $u->_decrypt_data($m, $salt, $m->process(OCTET_STRING));
++   $e = $u->error();
++   # Remove padding if necessary
++   if ($len -= $m->length()) {
++      substr ${$m->reference()}, $len, -$len, q{};
++   }
++};
++
++skip(
++   $skip,
++   ($@ || $e || $henc),
++   '042237eb7b044608e045878caba6d347f125edcad5b919d88d4c74d08b8040d105b3f29a',
++   'Privacy failed',
++);
++
++#
++# 7. Check the HMAC
++#
++
++my $h2;
++
++eval
++{
++   $h2 = unpack 'H*', $u->_auth_hmac($m);
++};
++
++skip($skip, ($@ || $h2), $h, 'Authentication failed');
++
++# ============================================================================
+-- 
+2.45.1
+

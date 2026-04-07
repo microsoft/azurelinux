@@ -1,0 +1,114 @@
+%_kf6_prefix %_prefix
+%_kf6_archdatadir %_qt6_archdatadir
+%_kf6_bindir %_kf6_prefix/bin
+%_kf6_datadir %_datadir
+%_kf6_docdir %_docdir
+%_kf6_includedir %_includedir/KF6
+%_kf6_libdir %_libdir
+%_kf6_libexecdir %_libexecdir/kf6
+%_kf6_metainfodir %_metainfodir
+%_kf6_qtplugindir %_qt6_plugindir
+%_kf6_plugindir %_qt6_plugindir/kf6
+%_kf6_sysconfdir %_sysconfdir
+%_kf6_mandir %_kf6_datadir/man
+%_kf6_buildtype release
+%_kf6_qmldir %_kf6_archdatadir/qml
+%_kf6_version @@kf6_VERSION@@
+
+%cmake_kf6 \\\
+  %undefine __cmake_in_source_build \
+  QTDIR="%{_qt6_prefix}" ; export QTDIR ; \
+  PATH="%{_qt6_bindir}:$PATH" ; export PATH ; \
+  KDE_DOCS="/usr/share/doc/qt6/kde-qdoc-common" ; export KDE_DOCS ; \
+  CFLAGS="${CFLAGS:-%optflags}" ; export CFLAGS ; \
+  CXXFLAGS="${CXXFLAGS:-%optflags}" ; export CXXFLAGS ; \
+  FFLAGS="${FFLAGS:-%optflags%{?_fmoddir: -I%_fmoddir}}" ; export FFLAGS ; \
+  %{?__global_ldflags:LDFLAGS="${LDFLAGS:-%__global_ldflags}" ; export LDFLAGS ;} \
+    %{__cmake} \\\
+    %{?__cmake_builddir:-S "%{_vpath_srcdir}"} \\\
+    %{?__cmake_builddir:-B "%{__cmake_builddir}"} \\\
+    -DCMAKE_C_FLAGS_RELEASE:STRING="-DNDEBUG" \\\
+    -DCMAKE_CXX_FLAGS_RELEASE:STRING="-DNDEBUG" \\\
+    -DCMAKE_Fortran_FLAGS_RELEASE:STRING="-DNDEBUG" \\\
+    -DBUILD_SHARED_LIBS:BOOL=ON \\\
+    -DBUILD_TESTING:BOOL=FALSE \\\
+    -DBUILD_QCH:BOOL=ON \\\
+    -DCMAKE_BUILD_TYPE=%{_kf6_buildtype} \\\
+    -DCMAKE_INSTALL_INCLUDEDIR_kf6:PATH=%{_kf6_includedir} \\\
+    -DCMAKE_INSTALL_LIBEXECDIR_kf6:PATH=%{_kf6_libexecdir} \\\
+    -DCMAKE_INSTALL_PREFIX:PATH=%{_kf6_prefix} \\\
+    -DCMAKE_USE_RELATIVE_PATHS:BOOL=ON \\\
+    -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \\\
+    -DECM_MKSPECS_INSTALL_DIR:PATH=%{_kf6_archdatadir}/mkspecs/modules \\\
+    -DKDE_INSTALL_BINDIR:PATH=%{_kf6_bindir} \\\
+    -DKDE_INSTALL_INCLUDEDIR:PATH=%{_includedir} \\\
+    -DKDE_INSTALL_KCFGDIR:PATH=%{_datadir}/config.kcfg \\\
+    -DKDE_INSTALL_LIBDIR:PATH=%{_kf6_libdir} \\\
+    -DKDE_INSTALL_LIBEXECDIR:PATH=%{_libexecdir} \\\
+    -DKDE_INSTALL_METAINFODIR:PATH=%{_kf6_metainfodir} \\\
+    -DKDE_INSTALL_PLUGINDIR:PATH=%{_qt6_plugindir} \\\
+    -DKDE_INSTALL_QMLDIR:PATH=%{_kf6_qmldir} \\\
+    -DKDE_INSTALL_QTPLUGINDIR:PATH=%{_qt6_plugindir} \\\
+    -DKDE_INSTALL_QTQCHDIR:PATH=%{_qt6_docdir} \\\
+    -DKDE_INSTALL_QTQUICKIMPORTSDIR:PATH=%{_qt6_importdir} \\\
+    -DKDE_INSTALL_SYSCONFDIR:PATH=%{_kf6_sysconfdir} \\\
+    -DKDE_INSTALL_USE_QT_SYS_PATHS:BOOL=ON
+
+%cmake_build_kf6 \\\
+	%cmake_build \
+	%cmake_build -t prepare_docs \
+	%cmake_build -t generate_docs \
+	%cmake_build -t generate_qch
+
+%cmake_install_kf6 \\\
+	%cmake_install \
+	DESTDIR=%{buildroot} ; export DESTDIR ; \
+	%cmake_build -t install_html_docs \
+	%cmake_build -t install_qch_docs 
+
+# %%find_lang_kf6
+#
+# This macro is used in KDE Frameworks 6 packages instead of %%find_lang,
+# becasue find_lang is broken an it thinks that "_qt" in foobar_qt.qm is
+# the name of the language.
+# This macro should NOT be used with anything else but KDE Frameworks, since
+# it does some assumptions regarding the names and locations and it might not
+# work with other packages.
+# We should eventually get this to RPM, or fix %%find_lang
+#                                                       -- dvratil
+# Usage: find_lang_kf6 fooBar6
+#   - will look for fooBar6_qt.qm files in %%{buildroot}/usr/share/locale/
+#
+%find_lang_kf6() \
+    (find %{buildroot}/%{_datadir}/locale/ -name "%1.qm" -type f | sed ' \
+        s:%{buildroot}/:: \
+        s:%{_datadir}/locale/\\([a-zA-Z_\\@]*\\)/\\([a-zA-Z_]*\\)/%1.qm:%lang(\\1) %{_datadir}/locale/\\1/\\2/%1.qm:' > %1.lang)
+
+# Start of backwards compatible macros
+# Used mostly in plasma and gear packages:
+# %%maj_ver_kf6
+# %%min_ver_kf6
+# %%bug_ver_kf6
+# %%majmin_ver_kf6
+# %%stable_kf6
+
+%maj_ver_kf6 %(echo %{version} | cut -d. -f1)
+%min_ver_kf6 %(echo %{version} | cut -d. -f2)
+%bug_ver_kf6 %(echo %{version} | cut -d. -f3)
+
+%stable_kf6 %( \
+    if test %bug_ver_kf6 -ge 50 -o \\( %maj_ver_kf6 -eq 5 -a %min_ver_kf6 -ge 90 \\) ; then
+        echo "unstable"
+    else
+        echo "stable"
+    fi
+    )
+
+%majmin_ver_kf6 %( \
+    if test %bug_ver_kf6 -ge 50 -o \\( %maj_ver_kf6 -eq 5 -a %min_ver_kf6 -ge 90 \\) ; then
+        echo %{maj_ver_kf6}.%{min_ver_kf6}.%{bug_ver_kf6}
+    else
+        echo %{maj_ver_kf6}.%{min_ver_kf6}
+    fi
+    )
+# End of backwards compatible macros

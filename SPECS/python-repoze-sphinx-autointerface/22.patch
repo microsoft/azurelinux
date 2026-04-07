@@ -1,0 +1,22 @@
+From 7570c7ad7308977037c14d661eb5486317541d6a Mon Sep 17 00:00:00 2001
+From: Jerry James <loganjerry@gmail.com>
+Date: Mon, 29 Jan 2024 09:28:30 -0700
+Subject: [PATCH] Fix tests with Sphinx 7.2.x and 8.2.x
+
+---
+ repoze/sphinx/tests/test_autointerface.py | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/repoze/sphinx/tests/test_autointerface.py b/repoze/sphinx/tests/test_autointerface.py
+index d2682f9..9787ac5 100644
+--- a/repoze/sphinx/tests/test_autointerface.py
++++ b/repoze/sphinx/tests/test_autointerface.py
+@@ -29,6 +29,8 @@ class Options(dict):
+     imported_members = False
+     show_inheritance = False
+     noindex = False
++    no_index = False
++    no_index_entry = False
+     annotation = None
+     synopsis = ''
+     platform = ''

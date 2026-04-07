@@ -1,0 +1,23 @@
+diff -up ./src/main.c.orig ./src/main.c
+--- ./src/main.c.orig	2024-08-04 16:49:08.723525637 +0200
++++ ./src/main.c	2024-08-04 16:53:19.967862016 +0200
+@@ -1056,11 +1056,18 @@ Please see the manpage for more informat
+ void
+ myexit(int sig)
+ {
++	/* reset signal handlers to default ones, so myexit() is not called
++	 * recursively as a signal handler during a normal exit */
++	signal(SIGINT, SIG_DFL);
++	signal(SIGQUIT, SIG_DFL);
++	signal(SIGHUP, SIG_DFL);
++	signal(SIGTERM, SIG_DFL);
++
+ 	/* HBB 20010313; close file before unlinking it. Unix may not care
+ 	 * about that, but DOS absolutely needs it */
+ 	if (refsfound != NULL)
+ 		fclose(refsfound);
+-	
++
+ 	/* remove any temporary files */
+ 	if (temp1[0] != '\0') {
+ 		unlink(temp1);

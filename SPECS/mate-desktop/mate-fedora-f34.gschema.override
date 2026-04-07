@@ -1,0 +1,46 @@
+[org.mate.background]
+picture-filename='/usr/share/backgrounds/default.xml'
+
+[org.mate.panel.menubar]
+icon-name='fedora-logo-icon'
+
+[org.mate.panel]
+default-layout='fedora'
+
+[org.mate.interface]
+gtk-theme='BlueMenta'
+icon-theme='mate'
+
+[org.mate.mate-menu]
+applet-icon='/usr/share/icons/hicolor/22x22/apps/fedora-logo-icon.png'
+
+[org.mate.peripherals-mouse]
+cursor-theme='mate'
+
+[org.mate.Marco.general]
+allow-top-tiling=false
+center-new-windows=false
+theme='BlueMenta'
+
+[org.mate.caja.preferences]
+enable-delete=true
+
+[org.mate.terminal.profile]
+title-mode='ignore'
+title='MATE Terminal'
+
+[org.mate.screensaver]
+picture-filename='/usr/share/backgrounds/default.png'
+
+[org.mate.session]
+required-components-list=['windowmanager', 'panel', 'filemanager']
+
+[org.mate.drivemount]
+drivemount-checkmark-color='#6699CC'
+
+[org.mate.panel.applet.window-list-previews]
+show-window-thumbnails=false
+
+[org.gnome.software]
+compatible-projects=['GNOME', 'KDE', 'XFCE', 'MATE']
+

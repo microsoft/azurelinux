@@ -1,0 +1,93 @@
+diff -up openmotif-2.3.3/clients/mwm/WmResParse.c.mwmrc_dir openmotif-2.3.3/clients/mwm/WmResParse.c
+--- openmotif-2.3.3/clients/mwm/WmResParse.c.mwmrc_dir	2009-06-22 23:51:51.000000000 +0200
++++ openmotif-2.3.3/clients/mwm/WmResParse.c	2010-03-23 13:37:03.000000000 +0100
+@@ -2403,7 +2403,7 @@ FILE *FopenConfigFile (void)
+ #endif /* PANELIST */
+ 
+ #ifndef MWMRCDIR
+-#define MWMRCDIR "/usr/lib/X11"
++#define MWMRCDIR "/etc/X11/mwm"
+ #endif
+     if (LANG != NULL)
+     {
+diff -up openmotif-2.3.3/configure.ac.mwmrc_dir openmotif-2.3.3/configure.ac
+--- openmotif-2.3.3/configure.ac.mwmrc_dir	2009-10-27 17:10:23.000000000 +0100
++++ openmotif-2.3.3/configure.ac	2010-03-23 13:38:33.000000000 +0100
+@@ -179,7 +179,7 @@ AC_SUBST(CDE_CONFIGURATION_TOP)
+ LIBDIR="${libdir}/X11"
+ AC_SUBST(LIBDIR)
+ 
+-MWMRCDIR="${libdir}/X11"
++MWMRCDIR="/etc/X11/mwm"
+ AC_SUBST(MWMRCDIR)
+ 
+ INCDIR="${includedir}/X11"
+diff -up openmotif-2.3.3/doc/man/man1/mwm.1.mwmrc_dir openmotif-2.3.3/doc/man/man1/mwm.1
+--- openmotif-2.3.3/doc/man/man1/mwm.1.mwmrc_dir	2002-01-05 16:21:11.000000000 +0100
++++ openmotif-2.3.3/doc/man/man1/mwm.1	2010-03-23 13:37:03.000000000 +0100
+@@ -678,8 +678,8 @@ is set, \fBmwm\fP looks for \fI$HOME/$LA
+ \fB$HOME\fP/\fBconfigFile\fP\&. If the \fIconfigFile\fP pathname does not begin with "~/" or "/", \fBmwm\fP considers it to be relative to the current working directory\&. If
+ the \fIconfigFile\fP resource is not specified
+ or if that file does not exist, \fBmwm\fP uses several default
+-paths to find a configuration file\&. The order of the search is shown below: \fB/usr/X11R6/lib/X11/$LANG/system\&.mwmrc\fP\(dg
+-\fB/usr/X11R6/lib/X11/system\&.mwmrc\fP\(dg Paths marked with \&'\(dg\&' are
++paths to find a configuration file\&. The order of the search is shown below: \fB/etc/X11/mwm/$LANG/system\&.mwmrc\fP\(dg
++\fB/etc/X11/mwm/system\&.mwmrc\fP\(dg Paths marked with \&'\(dg\&' are
+ implementation dependent\&.
+ .IP "\fIdeiconifyKeyFocus\fP\ (class\  \fIDeiconifyKeyFocus\fP)" 10
+ This resource applies only when the keyboard input focus policy is explicit\&.
+@@ -1344,9 +1344,9 @@ the shell to use when executing commands
+ function\&.
+ .SS "Files"
+ .PP
+-\fB/usr/X11R6/lib/X11/$LANG/system\&.mwmrc\fP
++\fB/etc/X11/mwm/$LANG/system\&.mwmrc\fP
+ .PP
+-\fB/usr/X11R6/lib/X11/system\&.mwmrc\fP
++\fB/etc/X11/mwm/system\&.mwmrc\fP
+ .PP
+ \fB/usr/X11R6/lib/X11/app-defaults/Mwm\fP
+ .PP
+diff -up openmotif-2.3.3/doc/man/man4/mwmrc.4.mwmrc_dir openmotif-2.3.3/doc/man/man4/mwmrc.4
+--- openmotif-2.3.3/doc/man/man4/mwmrc.4.mwmrc_dir	2002-01-05 16:21:12.000000000 +0100
++++ openmotif-2.3.3/doc/man/man4/mwmrc.4	2010-03-23 13:37:03.000000000 +0100
+@@ -57,7 +57,7 @@ file that controls much of the behavior 
+ It contains descriptions of resources that cannot easily be
+ written using standard X Window System, Version 11 resource syntax\&. The resource
+ description file contains entries that are referred to by X resources in
+-defaults files (for example, \fB/usr/X11R6/lib/X11/app-defaults/Mwm\fP)
++defaults files (for example, \fB/usr/share/X11/app-defaults/Mwm\fP)
+ or in the \fBRESOURCE_MANAGER\fP property on the
+ root window\&. For example, the resource description file enables you to specify
+ different types of window menus; however, an X resource is used to specify
+@@ -72,8 +72,8 @@ on a per-user basis:
+ .nf
+ \f(CW$HOME/$LANG/\&.mwmrc
+ $HOME/\&.mwmrc
+-/usr/X11R6/lib/X11/$LANG/system\&.mwmrc
+-/usr/X11R6/lib/X11/system\&.mwmrc\fR
++/etc/X11/mwm/$LANG/system\&.mwmrc
++/etc/X11/mwm/system\&.mwmrc\fR
+ .fi
+ .PP
+ .PP
+@@ -84,7 +84,7 @@ resource\&. The following shows how a di
+ be specified from the command line:
+ .PP
+ .nf
+-\f(CW/usr/X11R6/bin/X11/mwm -xrm "mwm*configFile: mymwmrc"\fR
++\f(CW/usr/bin/mwm -xrm "mwm*configFile: mymwmrc"\fR
+ .fi
+ .PP
+ .SS "Resource Types"
+@@ -626,8 +626,8 @@ is not what you expect\&.
+ .nf
+ \fB$HOME/$LANG/\&.mwmrc
+ $HOME/\&.mwmrc
+-/usr/X11R6/lib/X11/$LANG/system\&.mwmrc
+-/usr/X11R6/lib/X11/system\&.mwmrc\fP
++/etc/X11/mwm/$LANG/system\&.mwmrc
++/etc/X11/mwm/system\&.mwmrc\fP
+ .fi
+ .SH "RELATED INFORMATION"
+ .PP

@@ -1,0 +1,33 @@
+--- ../man-1.6g-orig/man2html/hman.sh	2005-08-20 16:26:06.000000000 -0700
++++ ./man2html/hman.sh	2012-05-11 17:04:07.750683958 -0700
+@@ -22,9 +22,9 @@
+ 	exit 0
+ fi
+ 
+-# The user has to set MANHTMLPAGER (or he will get httpd-free lynx).
+-# Pick your favorite browser: lynx, xmosaic, netscape, arena, amaya, grail, ...
+-BROWSER=${MANHTMLPAGER-lynxcgi}
++# The user has to set MANHTMLPAGER (or they will get default via `xdg-open`).
++# Pick your favorite browser: lynx, elinks, firefox, chromium, etc. ...
++BROWSER=${MANHTMLPAGER-xdg-open}
+ #
+ # If the man pages are on a remote host, specify it in MANHTMLHOST.
+ HOST=${MANHTMLHOST-localhost}
+@@ -57,14 +57,14 @@
+ case $BROWSER in
+      lynxcgi)
+ 	BROWSER=lynx
+-	CG="lynxcgi:/home/httpd/cgi-bin/man"
++	CG="lynxcgi:/usr/lib/man2html/cgi-bin/man"
+ 	;;
+      netscape)
+         BROWSER=nsfunc
+-        CG="http://$HOST/cgi-bin/man"
++        CG="http://$HOST/man"
+ 	;;
+      *)
+-	CG="http://$HOST/cgi-bin/man"
++	CG="http://$HOST/man"
+ 	;;
+ esac
+ 

@@ -1,0 +1,36 @@
+diff -up openmotif-2.3.3/configure.ac.bindings openmotif-2.3.3/configure.ac
+--- openmotif-2.3.3/configure.ac.bindings	2009-10-27 17:10:23.000000000 +0100
++++ openmotif-2.3.3/configure.ac	2010-03-19 11:12:39.000000000 +0100
+@@ -185,7 +185,7 @@ AC_SUBST(MWMRCDIR)
+ INCDIR="${includedir}/X11"
+ AC_SUBST(INCDIR)
+ 
+-XMBINDDIR_FALLBACK="${libdir}/X11/bindings"
++XMBINDDIR_FALLBACK="${datadir}/X11/bindings"
+ AC_SUBST(XMBINDDIR_FALLBACK)
+ 
+ RM="rm -f"
+diff -up openmotif-2.3.3/doc/man/man3/VirtualBindings.3.bindings openmotif-2.3.3/doc/man/man3/VirtualBindings.3
+--- openmotif-2.3.3/doc/man/man3/VirtualBindings.3.bindings	2005-07-20 13:47:21.000000000 +0200
++++ openmotif-2.3.3/doc/man/man3/VirtualBindings.3	2010-03-19 11:11:42.000000000 +0100
+@@ -90,7 +90,7 @@ bindings contained in that file\&.
+ If it has found no bindings, Motif next looks for the file
+ \fBxmbind\&.alias\fP in the directory specified by the environment
+ variable \fBXMBINDDIR\fP, if \fBXMBINDDIR\fP is set, or in the directory
+-\fB/usr/lib/Xm/bindings\fP if \fBXMBINDDIR\fP is not set\&.
++\fB/usr/share/X11/bindings\fP if \fBXMBINDDIR\fP is not set\&.
+ If this file exists Motif searches it for a pathname associated with the
+ vendor string or with the vendor string and vendor release\&.
+ If it finds such a pathname and if that file exists, Motif loads the
+diff -up openmotif-2.3.3/lib/Xm/XmosP.h.bindings openmotif-2.3.3/lib/Xm/XmosP.h
+--- openmotif-2.3.3/lib/Xm/XmosP.h.bindings	2002-06-17 22:36:30.000000000 +0200
++++ openmotif-2.3.3/lib/Xm/XmosP.h	2010-03-19 11:11:42.000000000 +0100
+@@ -188,7 +188,7 @@ extern "C" {
+ 
+ #define XMBINDDIR "XMBINDDIR"
+ #ifndef XMBINDDIR_FALLBACK
+-#define XMBINDDIR_FALLBACK "/usr/lib/Xm/bindings"
++#define XMBINDDIR_FALLBACK "/usr/share/X11/bindings"
+ #endif
+ #define XMBINDFILE "xmbind.alias"
+ #define MOTIFBIND ".motifbind"

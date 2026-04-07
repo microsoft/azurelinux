@@ -1,0 +1,12 @@
+diff -up qt-everywhere-opensource-src-4.8.7/src/corelib/tools/tools.pri.me qt-everywhere-opensource-src-4.8.7/src/corelib/tools/tools.pri
+--- qt-everywhere-opensource-src-4.8.7/src/corelib/tools/tools.pri.me	2025-01-24 12:30:26.695276213 +0100
++++ qt-everywhere-opensource-src-4.8.7/src/corelib/tools/tools.pri	2025-01-24 12:30:55.911006885 +0100
+@@ -107,7 +107,7 @@ contains(QT_CONFIG,icu) {
+     cpp11.dependency_type = TYPE_C
+     cpp11.variable_out = OBJECTS
+     cpp11.output = ${QMAKE_VAR_OBJECTS_DIR}${QMAKE_FILE_IN_BASE}$${first(QMAKE_EXT_OBJ)}
+-    cpp11.commands = $${QMAKE_CXX} $(CXXFLAGS) -std=c++11 $(INCPATH) -c ${QMAKE_FILE_IN} -o ${QMAKE_FILE_OUT}
++    cpp11.commands = $${QMAKE_CXX} $(CXXFLAGS) -std=c++17 $(INCPATH) -c ${QMAKE_FILE_IN} -o ${QMAKE_FILE_OUT}
+     QMAKE_EXTRA_COMPILERS += cpp11
+ 
+     SOURCES_CPP11 += tools/qlocale_icu.cpp

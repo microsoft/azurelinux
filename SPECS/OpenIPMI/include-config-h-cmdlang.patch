@@ -1,0 +1,12 @@
+diff -up OpenIPMI-2.0.32/cmdlang/cmdlang.c~ OpenIPMI-2.0.32/cmdlang/cmdlang.c
+--- OpenIPMI-2.0.32/cmdlang/cmdlang.c~	2021-01-22 19:51:28.000000000 +0100
++++ OpenIPMI-2.0.32/cmdlang/cmdlang.c	2022-01-28 11:55:42.375470392 +0100
+@@ -32,6 +32,8 @@
+  */
+ 
+ 
++#include <config.h>
++
+ #include <errno.h>
+ #include <string.h>
+ #include <ctype.h>

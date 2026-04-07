@@ -1,0 +1,30 @@
+From c40b76ce968c522fd45a8cbf609706df29c8e3bb Mon Sep 17 00:00:00 2001
+From: Joshua Goins <josh@redstrate.com>
+Date: Sun, 22 Jan 2023 10:39:59 -0500
+Subject: [PATCH 1/2] Pass explicit GL api when initializing GStreamer backend
+
+Recent GStreamer versions now require an explicit API instead of
+GST_GL_API_ANY, so now we pass GL or GLES depending on what is used.
+
+Cherrypicked from 20153c34a4a46a755f8a48502f0ad36d01de2e98
+---
+ src/gsttools/qgstvideorenderersink.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/gsttools/qgstvideorenderersink.cpp b/src/gsttools/qgstvideorenderersink.cpp
+index 4000f2178..a446d93fe 100644
+--- a/src/gsttools/qgstvideorenderersink.cpp
++++ b/src/gsttools/qgstvideorenderersink.cpp
+@@ -368,7 +368,8 @@ static GstGLContext *gstGLDisplayContext(QAbstractVideoSurface *surface)
+     if (!nativeContext)
+         qWarning() << "Could not find resource for" << contextName;
+ 
+-    GstGLContext *appContext = gst_gl_context_new_wrapped(display, (guintptr)nativeContext, glPlatform, GST_GL_API_ANY);
++    GstGLAPI glApi = QOpenGLContext::openGLModuleType() == QOpenGLContext::LibGL ? GST_GL_API_OPENGL : GST_GL_API_GLES2;
++    GstGLContext *appContext = gst_gl_context_new_wrapped(display, (guintptr)nativeContext, glPlatform, glApi);
+     if (!appContext)
+         qWarning() << "Could not create wrappped context for platform:" << glPlatform;
+ 
+-- 
+2.51.1
+

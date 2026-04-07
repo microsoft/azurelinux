@@ -1,0 +1,235 @@
+From 101800018d82ee1ca6bed1e90915eea7ebb5dc8b Mon Sep 17 00:00:00 2001
+From: Dmitry Klyuchinsky <dmitriy_klyuchinskiy@mail.ru>
+Date: Tue, 12 Dec 2023 12:42:50 +0700
+Subject: [PATCH 1/2] add DMD tests into CMakeLists
+
+---
+ TESTING/CMakeLists.txt     | 14 ++++++++++++--
+ TESTING/EIG/CMakeLists.txt | 13 +++++++++++++
+ 2 files changed, 25 insertions(+), 2 deletions(-)
+
+diff --git a/TESTING/CMakeLists.txt b/TESTING/CMakeLists.txt
+index 27940227cb..f9c2482fc8 100644
+--- a/TESTING/CMakeLists.txt
++++ b/TESTING/CMakeLists.txt
+@@ -53,9 +53,7 @@ add_lapack_test(stest.out stest.in xlintsts)
+ # ======== SINGLE RFP LIN TESTS ========================
+ add_lapack_test(stest_rfp.out stest_rfp.in xlintstrfs)
+ #
+-#
+ # ======== SINGLE EIG TESTS ===========================
+-#
+ add_lapack_test(snep.out nep.in xeigtsts)
+ add_lapack_test(ssep.out sep.in xeigtsts)
+ add_lapack_test(sse2.out se2.in xeigtsts)
+@@ -76,6 +74,9 @@ add_lapack_test(sgqr.out gqr.in xeigtsts)
+ add_lapack_test(sgsv.out gsv.in xeigtsts)
+ add_lapack_test(scsd.out csd.in xeigtsts)
+ add_lapack_test(slse.out lse.in xeigtsts)
++#
++# ======== SINGLE DMD EIG TESTS ===========================
++add_lapack_test(sdmd.out sdmd.in xdmdeigtsts)
+ endif()
+ 
+ if(BUILD_DOUBLE)
+@@ -107,6 +108,9 @@ add_lapack_test(dgqr.out gqr.in xeigtstd)
+ add_lapack_test(dgsv.out gsv.in xeigtstd)
+ add_lapack_test(dcsd.out csd.in xeigtstd)
+ add_lapack_test(dlse.out lse.in xeigtstd)
++#
++# ======== DOUBLE DMD EIG TESTS ===========================
++add_lapack_test(ddmd.out ddmd.in xdmdeigtstd)
+ endif()
+ 
+ if(BUILD_COMPLEX)
+@@ -136,6 +140,9 @@ add_lapack_test(cgqr.out gqr.in xeigtstc)
+ add_lapack_test(cgsv.out gsv.in xeigtstc)
+ add_lapack_test(ccsd.out csd.in xeigtstc)
+ add_lapack_test(clse.out lse.in xeigtstc)
++#
++# ======== COMPLEX DMD EIG TESTS ===========================
++add_lapack_test(cdmd.out cdmd.in xdmdeigtstc)
+ endif()
+ 
+ if(BUILD_COMPLEX16)
+@@ -167,6 +174,9 @@ add_lapack_test(zgqr.out gqr.in xeigtstz)
+ add_lapack_test(zgsv.out gsv.in xeigtstz)
+ add_lapack_test(zcsd.out csd.in xeigtstz)
+ add_lapack_test(zlse.out lse.in xeigtstz)
++#
++# ======== COMPLEX16 DMD EIG TESTS ===========================
++add_lapack_test(zdmd.out zdmd.in xdmdeigtstz)
+ endif()
+ 
+ 
+diff --git a/TESTING/EIG/CMakeLists.txt b/TESTING/EIG/CMakeLists.txt
+index 3c8d9a8b28..d99762d434 100644
+--- a/TESTING/EIG/CMakeLists.txt
++++ b/TESTING/EIG/CMakeLists.txt
+@@ -42,6 +42,8 @@ set(SEIGTST schkee.F
+    sort03.f ssbt21.f ssgt01.f sslect.f sspt21.f sstt21.f
+    sstt22.f ssyl01.f ssyt21.f ssyt22.f)
+ 
++set(SDMDEIGTST schkdmd.f90)
++
+ set(CEIGTST cchkee.F
+    cbdt01.f cbdt02.f cbdt03.f cbdt05.f
+    cchkbb.f cchkbd.f cchkbk.f cchkbl.f cchkec.f
+@@ -59,6 +61,8 @@ set(CEIGTST cchkee.F
+    csgt01.f cslect.f csyl01.f
+    cstt21.f cstt22.f cunt01.f cunt03.f)
+ 
++set(CDMDEIGTST cchkdmd.f90)
++
+ set(DZIGTST dlafts.f dlahd2.f dlasum.f dlatb9.f dstech.f dstect.f
+    dsvdch.f dsvdct.f dsxt1.f)
+ 
+@@ -79,6 +83,8 @@ set(DEIGTST dchkee.F
+    dort03.f dsbt21.f dsgt01.f dslect.f dspt21.f dstt21.f
+    dstt22.f dsyl01.f dsyt21.f dsyt22.f)
+ 
++set(DDMDEIGTST dchkdmd.f90)
++
+ set(ZEIGTST zchkee.F
+    zbdt01.f zbdt02.f zbdt03.f zbdt05.f
+    zchkbb.f zchkbd.f zchkbk.f zchkbl.f zchkec.f
+@@ -96,6 +102,8 @@ set(ZEIGTST zchkee.F
+    zsgt01.f zslect.f zsyl01.f
+    zstt21.f zstt22.f zunt01.f zunt03.f)
+ 
++set(ZDMDEIGTST zchkdmd.f90)
++
+ macro(add_eig_executable name)
+   add_executable(${name} ${ARGN})
+   target_link_libraries(${name} ${TMGLIB} ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES})
+@@ -103,16 +111,21 @@ endmacro()
+ 
+ if(BUILD_SINGLE)
+ add_eig_executable(xeigtsts ${SEIGTST} ${SCIGTST} ${AEIGTST})
++add_eig_executable(xdmdeigtsts ${SDMDEIGTST})
+ endif()
+ 
+ if(BUILD_COMPLEX)
+ add_eig_executable(xeigtstc ${CEIGTST} ${SCIGTST} ${AEIGTST})
++add_eig_executable(xdmdeigtstc ${CDMDEIGTST})
+ endif()
+ 
++
+ if(BUILD_DOUBLE)
+ add_eig_executable(xeigtstd ${DEIGTST} ${DZIGTST} ${AEIGTST})
++add_eig_executable(xdmdeigtstd ${DDMDEIGTST})
+ endif()
+ 
+ if(BUILD_COMPLEX16)
+ add_eig_executable(xeigtstz ${ZEIGTST} ${DZIGTST} ${AEIGTST})
++add_eig_executable(xdmdeigtstz ${ZDMDEIGTST})
+ endif()
+
+From 47879152071b840ba5a94a84ec2d05f7bc76e3fe Mon Sep 17 00:00:00 2001
+From: Dmitry Klyuchinsky <dmitriy_klyuchinskiy@mail.ru>
+Date: Tue, 12 Dec 2023 13:42:37 +0700
+Subject: [PATCH 2/2] init variable SSUM before call of LASSQ in DMD
+
+---
+ SRC/cgedmd.f90 | 6 ++++--
+ SRC/dgedmd.f90 | 6 ++++--
+ SRC/sgedmd.f90 | 6 ++++--
+ SRC/zgedmd.f90 | 6 ++++--
+ 4 files changed, 16 insertions(+), 8 deletions(-)
+
+diff --git a/SRC/cgedmd.f90 b/SRC/cgedmd.f90
+index f7d76428e9..1413130ec3 100644
+--- a/SRC/cgedmd.f90
++++ b/SRC/cgedmd.f90
+@@ -761,7 +761,8 @@ SUBROUTINE CGEDMD( JOBS, JOBZ, JOBR, JOBF,  WHTSVD,   &
+           K = 0
+           DO i = 1, N
+             !WORK(i) = SCNRM2( M, X(1,i), 1 )
+-            SCALE  = ZERO
++            SSUM  = ONE
++            SCALE = ZERO
+             CALL CLASSQ( M, X(1,i), 1, SCALE, SSUM )
+             IF ( SISNAN(SCALE) .OR. SISNAN(SSUM) ) THEN
+                 K    =  0
+@@ -834,7 +835,8 @@ SUBROUTINE CGEDMD( JOBS, JOBZ, JOBR, JOBF,  WHTSVD,   &
+           ! carefully computed using CLASSQ.
+           DO i = 1, N
+             !RWORK(i) = SCNRM2( M, Y(1,i), 1 )
+-            SCALE  = ZERO
++            SSUM  = ONE
++            SCALE = ZERO
+             CALL CLASSQ( M, Y(1,i), 1, SCALE, SSUM )
+             IF ( SISNAN(SCALE) .OR. SISNAN(SSUM) ) THEN
+                 K    =  0
+diff --git a/SRC/dgedmd.f90 b/SRC/dgedmd.f90
+index 3bb505cd92..15df48fe91 100644
+--- a/SRC/dgedmd.f90
++++ b/SRC/dgedmd.f90
+@@ -783,7 +783,8 @@ SUBROUTINE DGEDMD( JOBS, JOBZ, JOBR, JOBF,  WHTSVD,  &
+           K = 0
+           DO i = 1, N
+             !WORK(i) = DNRM2( M, X(1,i), 1 )
+-            SCALE  = ZERO
++            SSUM  = ONE
++            SCALE = ZERO
+             CALL DLASSQ( M, X(1,i), 1, SCALE, SSUM )
+             IF ( DISNAN(SCALE) .OR. DISNAN(SSUM) ) THEN
+                 K    =  0
+@@ -856,7 +857,8 @@ SUBROUTINE DGEDMD( JOBS, JOBZ, JOBR, JOBF,  WHTSVD,  &
+           ! carefully computed using DLASSQ.
+           DO i = 1, N
+             !WORK(i) = DNRM2( M, Y(1,i), 1 )
+-            SCALE  = ZERO
++            SSUM  = ONE
++            SCALE = ZERO
+             CALL DLASSQ( M, Y(1,i), 1, SCALE, SSUM )
+             IF ( DISNAN(SCALE) .OR. DISNAN(SSUM) ) THEN
+                 K    =  0
+diff --git a/SRC/sgedmd.f90 b/SRC/sgedmd.f90
+index d37a654f76..4860e88983 100644
+--- a/SRC/sgedmd.f90
++++ b/SRC/sgedmd.f90
+@@ -782,7 +782,8 @@ SUBROUTINE SGEDMD( JOBS, JOBZ, JOBR, JOBF,  WHTSVD,  &
+           K = 0
+           DO i = 1, N
+             !WORK(i) = DNRM2( M, X(1,i), 1 )
+-            SCALE  = ZERO
++            SSUM  = ONE
++            SCALE = ZERO
+             CALL SLASSQ( M, X(1,i), 1, SCALE, SSUM )
+             IF ( SISNAN(SCALE) .OR. SISNAN(SSUM) ) THEN
+                 K    =  0
+@@ -855,7 +856,8 @@ SUBROUTINE SGEDMD( JOBS, JOBZ, JOBR, JOBF,  WHTSVD,  &
+           ! carefully computed using SLASSQ.
+           DO i = 1, N
+             !WORK(i) = DNRM2( M, Y(1,i), 1 )
+-            SCALE  = ZERO
++            SSUM  = ONE
++            SCALE = ZERO
+             CALL SLASSQ( M, Y(1,i), 1, SCALE, SSUM )
+             IF ( SISNAN(SCALE) .OR. SISNAN(SSUM) ) THEN
+                 K    =  0
+diff --git a/SRC/zgedmd.f90 b/SRC/zgedmd.f90
+index c29151ef39..5045cb166c 100644
+--- a/SRC/zgedmd.f90
++++ b/SRC/zgedmd.f90
+@@ -758,7 +758,8 @@ SUBROUTINE ZGEDMD( JOBS, JOBZ, JOBR, JOBF,  WHTSVD,   &
+           K = 0
+           DO i = 1, N
+             !WORK(i) = DZNRM2( M, X(1,i), 1 )
+-            SCALE  = ZERO
++            SSUM  = ONE
++            SCALE = ZERO
+             CALL ZLASSQ( M, X(1,i), 1, SCALE, SSUM )
+             IF ( DISNAN(SCALE) .OR. DISNAN(SSUM) ) THEN
+                 K    =  0
+@@ -831,7 +832,8 @@ SUBROUTINE ZGEDMD( JOBS, JOBZ, JOBR, JOBF,  WHTSVD,   &
+           ! carefully computed using ZLASSQ.
+           DO i = 1, N
+             !RWORK(i) = DZNRM2( M, Y(1,i), 1 )
+-            SCALE  = ZERO
++            SSUM  = ONE
++            SCALE = ZERO
+             CALL ZLASSQ( M, Y(1,i), 1, SCALE, SSUM )
+             IF ( DISNAN(SCALE) .OR. DISNAN(SSUM) ) THEN
+                 K    =  0

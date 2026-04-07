@@ -1,0 +1,82 @@
+From 3891b3142e6a6211b6502710fa9cd20e079f45ce Mon Sep 17 00:00:00 2001
+From: Stephen Finucane <stephen@that.guru>
+Date: Fri, 30 May 2025 12:26:55 +0200
+Subject: [PATCH] Handle escaped braces in f-strings
+
+---
+ src/flake8/processor.py           |  8 ++++++-
+ tests/integration/test_plugins.py | 35 +++++++++++++++++++++++++++++++
+ 2 files changed, 42 insertions(+), 1 deletion(-)
+
+diff --git a/src/flake8/processor.py b/src/flake8/processor.py
+index 2eea88f..2d5af90 100644
+--- a/src/flake8/processor.py
++++ b/src/flake8/processor.py
+@@ -210,7 +210,13 @@ class FileProcessor:
+             if token_type == tokenize.STRING:
+                 text = mutate_string(text)
+             elif token_type == FSTRING_MIDDLE:
+-                text = "x" * len(text)
++                # A curly brace in an FSTRING_MIDDLE token must be an escaped
++                # curly brace. Both 'text' and 'end' will account for the
++                # escaped version of the token (i.e. a single brace) rather
++                # than the raw double brace version, so we must counteract this
++                brace_offset = text.count("{") + text.count("}")
++                text = "x" * (len(text) + brace_offset)
++                end = (end[0], end[1] + brace_offset)
+             if previous_row:
+                 (start_row, start_column) = start
+                 if previous_row != start_row:
+diff --git a/tests/integration/test_plugins.py b/tests/integration/test_plugins.py
+index d4c22b0..90ca555 100644
+--- a/tests/integration/test_plugins.py
++++ b/tests/integration/test_plugins.py
+@@ -1,6 +1,8 @@
+ """Integration tests for plugin loading."""
+ from __future__ import annotations
+ 
++import sys
++
+ import pytest
+ 
+ from flake8.main.cli import main
+@@ -261,3 +263,36 @@ t.py:1:1: T001 "f'xxxxxxxxxxx'"
+ """
+     out, err = capsys.readouterr()
+     assert out == expected
++
++
++def test_escaping_of_fstrings_in_string_redacter(tmpdir, capsys):
++    cfg_s = f"""\
++[flake8]
++extend-ignore = F
++[flake8:local-plugins]
++extension =
++    T = {yields_logical_line.__module__}:{yields_logical_line.__name__}
++"""
++
++    cfg = tmpdir.join("tox.ini")
++    cfg.write(cfg_s)
++
++    src = """\
++f'{{"{hello}": "{world}"}}'
++"""
++    t_py = tmpdir.join("t.py")
++    t_py.write_binary(src.encode())
++
++    with tmpdir.as_cwd():
++        assert main(("t.py", "--config", str(cfg))) == 1
++
++    if sys.version_info >= (3, 12):  # pragma: >=3.12 cover
++        expected = """\
++t.py:1:1: T001 "f'xxx{hello}xxxx{world}xxx'"
++"""
++    else:  # pragma: <3.12 cover
++        expected = """\
++t.py:1:1: T001 "f'xxxxxxxxxxxxxxxxxxxxxxxx'"
++"""
++    out, err = capsys.readouterr()
++    assert out == expected
+-- 
+2.49.0
+

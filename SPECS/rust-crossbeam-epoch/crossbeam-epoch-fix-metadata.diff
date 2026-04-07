@@ -1,0 +1,12 @@
+--- crossbeam-epoch-0.9.18/Cargo.toml	1970-01-01T00:00:01+00:00
++++ crossbeam-epoch-0.9.18/Cargo.toml	2024-01-11T17:27:11.140087+00:00
+@@ -41,9 +41,6 @@
+ [features]
+ alloc = []
+ default = ["std"]
+-loom = [
+-    "crossbeam-utils/loom",
+-]
+ nightly = ["crossbeam-utils/nightly"]
+ std = [
+     "alloc",

@@ -1,0 +1,404 @@
+From 36361004997dfd6f51c0ed10a2a899bb478ea54c Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Fri, 25 Apr 2025 10:08:02 +0200
+Subject: [PATCH] Upgrade to 2.191
+
+---
+ Dumper.pm     |  9 +++---
+ Dumper.xs     | 26 +++++++++--------
+ t/bugs.t      |  1 +
+ t/deparse.t   | 15 +++++++---
+ t/dumper.t    | 18 ++++++------
+ t/dumpperl.t  | 20 ++-----------
+ t/qquote.t    | 81 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ t/quotekeys.t |  2 +-
+ t/sortkeys.t  |  2 +-
+ 9 files changed, 125 insertions(+), 49 deletions(-)
+ create mode 100644 t/qquote.t
+
+diff --git a/Dumper.pm b/Dumper.pm
+index ca965eb..0ebe348 100644
+--- a/Dumper.pm
++++ b/Dumper.pm
+@@ -17,7 +17,7 @@ use warnings;
+ use 5.008_001;
+ require Exporter;
+ 
+-use constant IS_PRE_516_PERL => $] < 5.016;
++use constant IS_PRE_516_PERL => "$]" < 5.016;
+ use constant SUPPORTS_CORE_BOOLS => defined &builtin::is_bool;
+ 
+ use Carp ();
+@@ -30,7 +30,7 @@ our ( $Indent, $Trailingcomma, $Purity, $Pad, $Varname, $Useqq, $Terse, $Freezer
+ our ( @ISA, @EXPORT, @EXPORT_OK, $VERSION );
+ 
+ BEGIN {
+-    $VERSION = '2.189'; # Don't forget to set version and release
++    $VERSION = '2.192'; # Don't forget to set version and release
+                         # date in POD below!
+ 
+     @ISA = qw(Exporter);
+@@ -210,7 +210,7 @@ sub Dump {
+   return &Dumpxs
+     unless $Data::Dumper::Useperl || (ref($_[0]) && $_[0]->{useperl})
+             # Use pure perl version on earlier releases on EBCDIC platforms
+-        || (! $IS_ASCII && $] lt 5.021_010);
++        || (! $IS_ASCII && "$]" < 5.021_010);
+   return &Dumpperl;
+ }
+ 
+@@ -760,6 +760,7 @@ my $low_controls_re = qr/[$low_controls]/;
+ # put a string value in double quotes
+ sub qquote {
+   local($_) = shift;
++  return qq("") unless defined && length;  # fast exit if undef/empty
+   s/([\\\"\@\$])/\\$1/g;
+ 
+   # This efficiently changes the high ordinal characters to \x{} if the utf8
+@@ -1455,7 +1456,7 @@ modify it under the same terms as Perl itself.
+ 
+ =head1 VERSION
+ 
+-Version 2.189
++Version 2.191
+ 
+ =head1 SEE ALSO
+ 
+diff --git a/Dumper.xs b/Dumper.xs
+index 4d54ba1..1901701 100644
+--- a/Dumper.xs
++++ b/Dumper.xs
+@@ -6,6 +6,7 @@
+ #define NEED_my_sprintf
+ #define NEED_sv_2pv_flags
+ #define NEED_utf8_to_uvchr_buf
++#define NEED_sv_vstring_get
+ #include "ppport.h"
+ 
+ #ifndef strlcpy
+@@ -1240,7 +1241,8 @@ DD_dump(pTHX_ SV *val, const char *name, STRLEN namelen, SV *retval, HV *seenhv,
+     }
+     else {
+ 	STRLEN i;
+-	const MAGIC *mg;
++	STRLEN vstr_len;
++	const char *vstr_pv;
+ 	
+ 	if (namelen) {
+ 	    id_buffer = PTR2UV(val);
+@@ -1386,17 +1388,17 @@ DD_dump(pTHX_ SV *val, const char *name, STRLEN namelen, SV *retval, HV *seenhv,
+ 	    sv_catpvs(retval, "undef");
+ 	}
+ #ifdef SvVOK
+-	else if (SvMAGICAL(val) && (mg = mg_find(val, 'V'))) {
++	else if (SvVOK(val) && (vstr_pv = SvVSTRING(val, vstr_len))) {
+ # if !defined(PL_vtbl_vstring) && PERL_VERSION_LT(5,17,0)
+ 	    SV * const vecsv = sv_newmortal();
+ #  if PERL_VERSION_LT(5,10,0)
+-	    scan_vstring(mg->mg_ptr, vecsv);
++	    scan_vstring(vstr_pv, vecsv);
+ #  else
+-	    scan_vstring(mg->mg_ptr, mg->mg_ptr + mg->mg_len, vecsv);
++	    scan_vstring(vstr_pv, vstr_pv + vstr_len, vecsv);
+ #  endif
+ 	    if (!sv_eq(vecsv, val)) goto integer_came_from_string;
+ # endif
+-	    sv_catpvn(retval, (const char *)mg->mg_ptr, mg->mg_len);
++	    sv_catpvn(retval, vstr_pv, vstr_len);
+ 	}
+ #endif
+ 
+@@ -1701,13 +1703,13 @@ Data_Dumper__vstring(sv)
+ 	CODE:
+ 	{
+ #ifdef SvVOK
+-	    const MAGIC *mg;
+-	    RETVAL =
+-		SvMAGICAL(sv) && (mg = mg_find(sv, 'V'))
+-		 ? newSVpvn((const char *)mg->mg_ptr, mg->mg_len)
+-		 : &PL_sv_undef;
+-#else
+-	    RETVAL = &PL_sv_undef;
++	    if(SvVOK(sv)) {
++		STRLEN vstr_len;
++		const char *vstr_pv = SvVSTRING(sv, vstr_len);
++		RETVAL = newSVpvn(vstr_pv, vstr_len);
++	    }
++	    else
+ #endif
++	    RETVAL = &PL_sv_undef;
+ 	}
+ 	OUTPUT: RETVAL
+diff --git a/t/bugs.t b/t/bugs.t
+index b9a34eb..3c624dc 100644
+--- a/t/bugs.t
++++ b/t/bugs.t
+@@ -83,6 +83,7 @@ SKIP: {
+ 
+ # writing out of bounds with malformed utf8
+ SKIP: {
++    skip("No XS available", 1) if !defined &Data::Dumper::Dumpxs;
+     eval { require Encode };
+     skip("Encode not available", 1) if $@;
+     local $^W=1;
+diff --git a/t/deparse.t b/t/deparse.t
+index d734b23..80f11f3 100644
+--- a/t/deparse.t
++++ b/t/deparse.t
+@@ -5,7 +5,7 @@ use strict;
+ use warnings;
+ 
+ use Data::Dumper;
+-use Test::More tests =>  16;
++use Test::More tests => 16;
+ use lib qw( ./t/lib );
+ use Testing qw( _dumptostr );
+ 
+@@ -14,11 +14,18 @@ use Testing qw( _dumptostr );
+ 
+ note("\$Data::Dumper::Deparse and Deparse()");
+ 
+-for my $useperl (0, 1) {
+-    local $Data::Dumper::Useperl = $useperl;
++run_tests_for_deparse();
++SKIP: {
++    skip "XS version was unavailable, so we already ran with pure Perl", 8
++        if $Data::Dumper::Useperl;
++    local $Data::Dumper::Useperl = 1;
++    run_tests_for_deparse();
++}
++
++sub run_tests_for_deparse {
++    my $useperl = $Data::Dumper::Useperl ? 1 : 0;
+ 
+     my ($obj, %dumps, $deparse, $starting);
+-    use strict;
+     my $struct = { foo => "bar\nbaz", quux => sub { "fleem" } };
+     $obj = Data::Dumper->new( [ $struct ] );
+     $dumps{'noprev'} = _dumptostr($obj);
+diff --git a/t/dumper.t b/t/dumper.t
+index 55a997c..62ddb42 100644
+--- a/t/dumper.t
++++ b/t/dumper.t
+@@ -1670,7 +1670,7 @@ EOW
+ {
+   # [github #18614 - handling of Unicode characters in regexes]
+   # [github #18764 - ... without breaking subsequent Latin-1]
+-  if ($] lt '5.010') {
++  if ("$]" < 5.010) {
+       SKIP_BOTH("Incomplete support for UTF-8 in old perls");
+       last;
+   }
+@@ -1683,11 +1683,11 @@ EOW
+ #  '\xb6'
+ #];
+ EOW
+-  if ($] lt '5.010001') {
++  if ("$]" < 5.010001) {
+       $want =~ s!qr/!qr/(?-xism:!g;
+       $want =~ s!/,!)/,!g;
+   }
+-  elsif ($] gt '5.014') {
++  elsif ("$]" > 5.014) {
+       $want =~ s{/(,?)$}{/u$1}mg;
+   }
+   my $want_xs = $want;
+@@ -1713,7 +1713,7 @@ EOW
+ #  qr/ $bs$bs$bs\\/ /
+ #];
+ EOW
+-  if ($] lt '5.010001') {
++  if ("$]" < 5.010001) {
+       $want =~ s!qr/!qr/(?-xism:!g;
+       $want =~ s! /! )/!g;
+   }
+@@ -1724,7 +1724,7 @@ EOW
+ #############
+ {
+   # [github #18614, github #18764, perl #58608 corner cases]
+-  if ($] lt '5.010') {
++  if ("$]" < 5.010) {
+       SKIP_BOTH("Incomplete support for UTF-8 in old perls");
+       last;
+   }
+@@ -1738,11 +1738,11 @@ EOW
+ #  '\xB6'
+ #];
+ EOW
+-  if ($] lt '5.010001') {
++  if ("$]" < 5.010001) {
+       $want =~ s!qr/!qr/(?-xism:!g;
+       $want =~ s!/,!)/,!g;
+   }
+-  elsif ($] gt '5.014') {
++  elsif ("$]" > 5.014) {
+       $want =~ s{/(,?)$}{/u$1}mg;
+   }
+   my $want_xs = $want;
+@@ -1772,10 +1772,10 @@ EOW
+ #  '\xB6'
+ #];
+ EOW
+-  if ($] lt '5.014') {
++  if ("$]" < 5.014) {
+       $want =~ s{/u,$}{/,}mg;
+   }
+-  if ($] lt '5.010001') {
++  if ("$]" < 5.010001) {
+       $want =~ s!qr/!qr/(?-xism:!g;
+       $want =~ s!/,!)/,!g;
+   }
+diff --git a/t/dumpperl.t b/t/dumpperl.t
+index 6772446..20012e6 100644
+--- a/t/dumpperl.t
++++ b/t/dumpperl.t
+@@ -6,7 +6,7 @@ use warnings;
+ 
+ use Carp;
+ use Data::Dumper;
+-use Test::More tests => 31;
++use Test::More tests => 11;
+ use lib qw( ./t/lib );
+ use Testing qw( _dumptostr );
+ 
+@@ -20,23 +20,7 @@ $Data::Dumper::Indent=1;
+     run_tests_for_pure_perl_implementations();
+ }
+ 
+-{
+-    local $Data::Dumper::Useperl=0;
+-    local $Data::Dumper::Useqq=1;
+-    local $Data::Dumper::Deparse=0;
+-    note('$Data::Dumper::Useqq => 1');
+-    run_tests_for_pure_perl_implementations();
+-}
+-    
+-{
+-    local $Data::Dumper::Useperl=0;
+-    local $Data::Dumper::Useqq=0;
+-    local $Data::Dumper::Deparse=1;
+-    note('$Data::Dumper::Deparse => 1');
+-    run_tests_for_pure_perl_implementations();
+-}
+-    
+-    
++
+ 
+ sub run_tests_for_pure_perl_implementations {
+ 
+diff --git a/t/qquote.t b/t/qquote.t
+new file mode 100644
+index 0000000..b666ecb
+--- /dev/null
++++ b/t/qquote.t
+@@ -0,0 +1,81 @@
++#!./perl -w
++# t/qquote.t - Test qquote()
++
++use strict;
++use warnings;
++
++use Test::More tests => 16;
++use Data::Dumper;
++
++{
++    my $warning = '';
++    local $SIG{__WARN__} = sub { $warning = $_[0] };
++
++    my $str = Data::Dumper::qquote("");
++    is($str,   q{""}, q{qquote("") returned ""});
++    is($warning, "",  q{qquote("") did not warn});
++}
++
++{
++    my $warning = '';
++    local $SIG{__WARN__} = sub { $warning = $_[0] };
++
++    my $str = Data::Dumper::qquote();
++    is($str,   q{""}, q{qquote() returned ""});
++    is($warning, "",  q{qquote() did not warn});
++}
++
++{
++    my $warning = '';
++    local $SIG{__WARN__} = sub { $warning = $_[0] };
++
++    my $str = Data::Dumper::qquote(undef);
++    is($str,   q{""}, q{qquote(undef) returned ""});
++    is($warning, "",  q{qquote(undef) did not warn});
++}
++
++{
++    my $warning = '';
++    local $SIG{__WARN__} = sub { $warning = $_[0] };
++
++    my $str = Data::Dumper::qquote("simple");
++    is($str,   q{"simple"}, q{qquote("simple") returned "simple"});
++    is($warning, "",        q{qquote("simple") did not warn});
++}
++
++{
++    my $warning = '';
++    local $SIG{__WARN__} = sub { $warning = $_[0] };
++
++    my $str = Data::Dumper::qquote(q{check 'single' quote});
++    is($str,   q{"check 'single' quote"}, q{qquote('single') returned correctly});
++    is($warning, "", q{qquote('single') did not warn});
++}
++
++{
++    my $warning = '';
++    local $SIG{__WARN__} = sub { $warning = $_[0] };
++
++    my $str = Data::Dumper::qquote(q{check "double" quote});
++    is($str,     q{"check \"double\" quote"}, q{qquote("double") returned correctly});
++    is($warning, "", 'qquote(undef) did not warn');
++}
++
++{
++    my $warning = '';
++    local $SIG{__WARN__} = sub { $warning = $_[0] };
++
++    my $str = Data::Dumper::qquote(qq{check \a quote});
++    is($str,     q{"check \a quote"}, q{qquote("\a") returned correctly});
++    is($warning, "", 'qquote(undef) did not warn');
++}
++
++SKIP: {
++    skip "ASCII-centric test", 2, unless ord "A" == 65;
++    my $warning = '';
++    local $SIG{__WARN__} = sub { $warning = $_[0] };
++
++    my $str = Data::Dumper::qquote(qq{check \cg quote});
++    is($str,     q{"check \a quote"}, q{qquote("\cg") returned correctly});
++    is($warning, "", 'qquote(undef) did not warn');
++}
+diff --git a/t/quotekeys.t b/t/quotekeys.t
+index a4f647a..d1fcf05 100644
+--- a/t/quotekeys.t
++++ b/t/quotekeys.t
+@@ -20,7 +20,7 @@ my $is_ascii = ord("A") == 65;
+ 
+ run_tests_for_quotekeys();
+ SKIP: {
+-    skip "XS version was unavailable, so we already ran with pure Perl", 5
++    skip "XS version was unavailable, so we already ran with pure Perl", 9
+         if $Data::Dumper::Useperl;
+     local $Data::Dumper::Useperl = 1;
+     run_tests_for_quotekeys();
+diff --git a/t/sortkeys.t b/t/sortkeys.t
+index e02106f..779577e 100644
+--- a/t/sortkeys.t
++++ b/t/sortkeys.t
+@@ -11,7 +11,7 @@ use Testing qw( _dumptostr );
+ 
+ run_tests_for_sortkeys();
+ SKIP: {
+-    skip "XS version was unavailable, so we already ran with pure Perl", 13 
++    skip "XS version was unavailable, so we already ran with pure Perl", 11
+         if $Data::Dumper::Useperl;
+     local $Data::Dumper::Useperl = 1;
+     run_tests_for_sortkeys();
+-- 
+2.49.0
+

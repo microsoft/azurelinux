@@ -1,0 +1,10 @@
+diff -up unzip60/crc_i386.S.exec-shield unzip60/crc_i386.S
+--- unzip60/crc_i386.S.exec-shield	2007-01-07 06:02:58.000000000 +0100
++++ unzip60/crc_i386.S	2009-11-18 11:16:39.630389312 +0100
+@@ -302,3 +302,6 @@ _crc32:                         /* ulg c
+ #endif /* i386 || _i386 || _I386 || __i386 */
+ 
+ #endif /* !USE_ZLIB && !CRC_TABLE_ONLY */
++
++.section .note.GNU-stack, "", @progbits
++.previous

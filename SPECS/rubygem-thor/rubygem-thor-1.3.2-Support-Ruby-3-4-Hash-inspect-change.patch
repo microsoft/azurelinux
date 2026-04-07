@@ -1,0 +1,104 @@
+From 9d7aef1db1666ecc382eeaa5549361a0aa956567 Mon Sep 17 00:00:00 2001
+From: Yasuo Honda <yasuo.honda@gmail.com>
+Date: Wed, 30 Oct 2024 18:35:35 +0900
+Subject: [PATCH] Support Ruby 3.4 `Hash#inspect` change
+
+This commit addresses the following failures against Ruby 3.4.0dev that includes https://github.com/ruby/ruby/pull/10924 .
+
+It also uses Ruby 1.9 style hash syntax to address `Style/HashSyntax: Use the new Ruby 1.9 hash syntax.` offenses
+as per reported https://github.com/rails/thor/actions/runs/11590597621/job/32268507033?pr=887
+
+```ruby
+$ ruby -v
+ruby 3.4.0dev (2024-10-26T13:20:34Z master 484ea00d2e) +PRISM [x86_64-linux]
+$ bundle exec rspec ./spec/thor_spec.rb
+Source locally installed gems is ignoring #<Bundler::StubSpecification name=prism version=1.0.0 platform=ruby> because it is missing extensions
+Source locally installed gems is ignoring #<Bundler::StubSpecification name=json version=2.7.2 platform=ruby> because it is missing extensions
+Source locally installed gems is ignoring #<Bundler::StubSpecification name=google-protobuf version=4.27.0 platform=ruby> because it is missing extensions
+Source locally installed gems is ignoring #<Bundler::StubSpecification name=cgi version=0.4.1 platform=ruby> because it is missing extensions
+rdoc was loaded from the standard library, but will no longer be part of the default gems starting from Ruby 3.5.0.
+You can add rdoc to your Gemfile or gemspec to silence this warning.
+........................................................................................................FF.........
+
+Failures:
+
+  1) Thor edge-cases method_option raises an ArgumentError if name is not a Symbol or String
+     Failure/Error:
+       expect do
+         Class.new(Thor) do
+           method_option loud: true, type: :boolean
+         end
+       end.to raise_error(ArgumentError, "Expected a Symbol or String, got {:loud=>true, :type=>:boolean}")
+
+       expected ArgumentError with "Expected a Symbol or String, got {:loud=>true, :type=>:boolean}", got #<ArgumentError: Expected a Symbol or String, got {loud: true, type: :boolean}> with backtrace:
+         # ./lib/thor.rb:165:in 'Thor.method_option'
+         # ./spec/thor_spec.rb:768:in 'block (5 levels) in <top (required)>'
+         # ./spec/thor_spec.rb:767:in 'Class#initialize'
+         # ./spec/thor_spec.rb:767:in 'Class#new'
+         # ./spec/thor_spec.rb:767:in 'block (4 levels) in <top (required)>'
+         # ./spec/thor_spec.rb:770:in 'block (3 levels) in <top (required)>'
+     # ./spec/thor_spec.rb:770:in 'block (3 levels) in <top (required)>'
+
+  2) Thor edge-cases class_option raises an ArgumentError if name is not a Symbol or String
+     Failure/Error:
+       expect do
+         Class.new(Thor) do
+           class_option loud: true, type: :boolean
+         end
+       end.to raise_error(ArgumentError, "Expected a Symbol or String, got {:loud=>true, :type=>:boolean}")
+
+       expected ArgumentError with "Expected a Symbol or String, got {:loud=>true, :type=>:boolean}", got #<ArgumentError: Expected a Symbol or String, got {loud: true, type: :boolean}> with backtrace:
+         # ./lib/thor/base.rb:330:in 'Thor::Base::ClassMethods#class_option'
+         # ./spec/thor_spec.rb:776:in 'block (5 levels) in <top (required)>'
+         # ./spec/thor_spec.rb:775:in 'Class#initialize'
+         # ./spec/thor_spec.rb:775:in 'Class#new'
+         # ./spec/thor_spec.rb:775:in 'block (4 levels) in <top (required)>'
+         # ./spec/thor_spec.rb:778:in 'block (3 levels) in <top (required)>'
+     # ./spec/thor_spec.rb:778:in 'block (3 levels) in <top (required)>'
+
+Finished in 0.0627 seconds (files took 0.26431 seconds to load)
+115 examples, 2 failures
+
+Failed examples:
+
+rspec ./spec/thor_spec.rb:765 # Thor edge-cases method_option raises an ArgumentError if name is not a Symbol or String
+rspec ./spec/thor_spec.rb:773 # Thor edge-cases class_option raises an ArgumentError if name is not a Symbol or String
+
+Coverage report generated for RSpec to /home/yahonda/src/github.com/rails/thor/coverage.
+Line Coverage: 67.3% (1490 / 2214)
+[Coveralls] Submitting to https://coveralls.io/api/v1
+[Coveralls] Couldn't find a repository matching this job.
+Coverage is at 67.3%.
+Coverage report sent to Coveralls.
+Stopped processing SimpleCov as a previous error not related to SimpleCov has been detected
+$
+```
+
+https://github.com/ruby/ruby/pull/10924
+https://bugs.ruby-lang.org/issues/20433
+---
+ spec/thor_spec.rb | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/spec/thor_spec.rb b/spec/thor_spec.rb
+index f9fd0fe0..3703331a 100644
+--- a/spec/thor_spec.rb
++++ b/spec/thor_spec.rb
+@@ -767,7 +767,7 @@ def hi(name)
+         Class.new(Thor) do
+           method_option loud: true, type: :boolean
+         end
+-      end.to raise_error(ArgumentError, "Expected a Symbol or String, got {:loud=>true, :type=>:boolean}")
++      end.to raise_error(ArgumentError, "Expected a Symbol or String, got #{{loud: true, type: :boolean}}")
+     end
+ 
+     it "class_option raises an ArgumentError if name is not a Symbol or String" do
+@@ -775,7 +775,7 @@ def hi(name)
+         Class.new(Thor) do
+           class_option loud: true, type: :boolean
+         end
+-      end.to raise_error(ArgumentError, "Expected a Symbol or String, got {:loud=>true, :type=>:boolean}")
++      end.to raise_error(ArgumentError, "Expected a Symbol or String, got #{{loud: true, type: :boolean}}")
+     end
+ 
+     it "passes through unknown options" do

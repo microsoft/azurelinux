@@ -1,0 +1,80 @@
+--- zip-2.4.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ zip-2.4.2/Cargo.toml	2026-01-09T22:17:36.640416+00:00
+@@ -98,7 +98,6 @@
+     "_deflate-any",
+ ]
+ lzma = ["lzma-rs/stream"]
+-nt-time = ["dep:nt-time"]
+ unreserved = []
+ xz = ["dep:xz2"]
+ 
+@@ -126,7 +125,7 @@
+ optional = true
+ 
+ [dependencies.bzip2]
+-version = "0.5.0"
++version = ">=0.5.0, <0.7.0"
+ optional = true
+ 
+ [dependencies.chrono]
+@@ -134,7 +133,7 @@
+ optional = true
+ 
+ [dependencies.constant_time_eq]
+-version = "0.3"
++version = "0.4"
+ optional = true
+ 
+ [dependencies.crc32fast]
+@@ -156,7 +155,6 @@
+ [dependencies.getrandom]
+ version = "0.3.1"
+ features = [
+-    "wasm_js",
+     "std",
+ ]
+ optional = true
+@@ -177,11 +175,6 @@
+ [dependencies.memchr]
+ version = "2.7"
+ 
+-[dependencies.nt-time]
+-version = "0.10.6"
+-optional = true
+-default-features = false
+-
+ [dependencies.pbkdf2]
+ version = "0.12"
+ optional = true
+@@ -217,20 +210,9 @@
+ optional = true
+ default-features = false
+ 
+-[dev-dependencies.anyhow]
+-version = "1.0.95"
+-
+-[dev-dependencies.bencher]
+-version = "0.1.5"
+-
+-[dev-dependencies.clap]
+-version = "=4.4.18"
+-features = ["derive"]
+-
+ [dev-dependencies.getrandom]
+ version = "0.3.1"
+ features = [
+-    "wasm_js",
+     "std",
+ ]
+ 
+@@ -244,10 +226,3 @@
+     "macros",
+ ]
+ default-features = false
+-
+-[dev-dependencies.walkdir]
+-version = "2.5"
+-
+-[target.'cfg(any(all(target_arch = "arm", target_pointer_width = "32"), target_arch = "mips", target_arch = "powerpc"))'.dependencies.crossbeam-utils]
+-version = "0.8.21"
+-

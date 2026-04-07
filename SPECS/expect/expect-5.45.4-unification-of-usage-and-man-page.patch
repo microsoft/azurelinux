@@ -1,0 +1,67 @@
+diff -up expect5.45.4/expect.man.orig expect5.45.4/expect.man
+--- expect5.45.4/expect.man.orig	2018-08-29 10:43:24.112949065 +0200
++++ expect5.45.4/expect.man	2018-08-29 10:45:47.652044587 +0200
+@@ -4,7 +4,7 @@ expect \- programmed dialogue with inter
+ .SH SYNOPSIS
+ .B expect
+ [
+-.B \-dDinN
++.B \-dDhinNv
+ ]
+ [
+ .B \-c
+@@ -180,6 +180,9 @@ problems when reading from a fifo or std
+ If the string "\-" is supplied as a filename, standard input is read instead.
+ (Use "./\-" to read from a file actually named "\-".)
+ .PP
++.B \-h
++causes Expect to print its usage message and exit.
++.PP
+ The
+ .B \-i
+ flag causes
+diff -up expect5.45.4/exp_main_sub.c.orig expect5.45.4/exp_main_sub.c
+--- expect5.45.4/exp_main_sub.c.orig	2018-02-04 11:43:58.000000000 +0100
++++ expect5.45.4/exp_main_sub.c	2018-08-29 11:04:44.307916140 +0200
+@@ -72,7 +72,21 @@ usage(interp)
+ Tcl_Interp *interp;
+ {
+   char buffer [] = "exit 1";
+-  expErrorLog("usage: expect [-div] [-c cmds] [[-f] cmdfile] [args]\r\n");
++  expErrorLog("usage: expect [-dDhinNv] [-c cmds] [[-[f|b]] cmdfile] [args]\r\n"
++	"  Flags are as follows:\r\n"
++	"  -b     prefaces a file from which to read commands from\r\n"
++	"           (expect reads one line at a timei from the file)\r\n"
++	"  -c     prefaces a command to be executed before any in the script,\r\n"
++	"           may be used multiple times\r\n"
++	"  -d     enables diagnostic output\r\n"
++	"  -D     enables interactive debugger\r\n"
++	"  -f     prefaces a file from which to read commands from\r\n"
++	"           (expect reads the whole file at once)\r\n"
++	"  -h     prints this usage message and exits\r\n"
++	"  -i     interactively prompts for commands\r\n"
++	"  -n     expect doesn't read personal rc file\r\n"
++	"  -N     expect doesn't read system-wide rc file\r\n"
++	"  -v     prints version and exits\r\n");
+ 
+   /* SF #439042 -- Allow overide of "exit" by user / script
+    */
+@@ -700,7 +714,7 @@ char **argv;
+          * and generate a usage message.
+ 	 */
+ 
+-	while ((c = getopt(argc, argv, "+b:c:dD:f:inN-v")) != EOF) {
++	while ((c = getopt(argc, argv, "+b:c:dD:f:inN-vh")) != EOF) {
+ 		switch(c) {
+ 		case '-':
+ 			/* getopt already handles -- internally, however */
+@@ -768,6 +782,9 @@ char **argv;
+ 			  Tcl_Eval(interp, buffer); 
+ 			}
+ 			break;
++		case 'h':
++			usage(interp);
++			break;
+ 		default: usage(interp);
+ 		}
+ 	}

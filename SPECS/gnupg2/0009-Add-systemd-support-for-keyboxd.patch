@@ -1,0 +1,145 @@
+From f0cac7a8493a3953d209f9a76fdb2564214c6e87 Mon Sep 17 00:00:00 2001
+From: NIIBE Yutaka <gniibe@fsij.org>
+Date: Wed, 23 Aug 2023 09:26:51 +0900
+Subject: Add systemd support for keyboxd
+
+---
+ kbx/keyboxd.c | 79 +++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 77 insertions(+), 2 deletions(-)
+
+diff --git a/kbx/keyboxd.c b/kbx/keyboxd.c
+index f875e115d..55e42bcdf 100644
+--- a/kbx/keyboxd.c
++++ b/kbx/keyboxd.c
+@@ -88,6 +88,7 @@ enum cmd_and_opt_values
+     oLogFile,
+     oServer,
+     oDaemon,
++    oSupervised,
+     oFakedSystemTime,
+     oListenBacklog,
+     oDisableCheckOwnSocket,
+@@ -104,6 +105,9 @@ static gpgrt_opt_t opts[] = {
+ 
+   ARGPARSE_s_n (oDaemon,  "daemon", N_("run in daemon mode (background)")),
+   ARGPARSE_s_n (oServer,  "server", N_("run in server mode (foreground)")),
++#ifndef HAVE_W32_SYSTEM
++  ARGPARSE_s_n (oSupervised,  "supervised", "@"),
++#endif
+   ARGPARSE_s_n (oNoDetach,  "no-detach", N_("do not detach from the console")),
+   ARGPARSE_s_n (oStealSocket, "steal-socket", "@"),
+   ARGPARSE_s_s (oHomedir,    "homedir",      "@"),
+@@ -209,6 +213,9 @@ static int have_homedir_inotify;
+  * reliable.  */
+ static int reliable_homedir_inotify;
+ 
++/* Flag indicating that we are in supervised mode.  */
++static int is_supervised;
++
+ /* Number of active connections.  */
+ static int active_connections;
+ 
+@@ -575,6 +582,7 @@ main (int argc, char **argv )
+         case oLogFile: logfile = pargs.r.ret_str; break;
+         case oServer: pipe_server = 1; break;
+         case oDaemon: is_daemon = 1; break;
++        case oSupervised: is_supervised = 1; break;
+         case oFakedSystemTime:
+           {
+             time_t faked_time = isotime2epoch (pargs.r.ret_str);
+@@ -643,7 +651,7 @@ main (int argc, char **argv )
+   bind_textdomain_codeset (PACKAGE_GT, "UTF-8");
+ #endif
+ 
+-  if (!pipe_server && !is_daemon && !gpgconf_list)
++  if (!pipe_server && !is_daemon && !gpgconf_list && !is_supervised)
+     {
+      /* We have been called without any command and thus we merely
+       * check whether an instance of us is already running.  We do
+@@ -716,6 +724,73 @@ main (int argc, char **argv )
+       kbxd_deinit_default_ctrl (ctrl);
+       xfree (ctrl);
+     }
++  else if (is_supervised && comopt.no_autostart)
++    {
++      log_info ("%s %s not starting in supervised mode due to no-autostart.\n",
++                gpgrt_strusage(11), gpgrt_strusage(13) );
++    }
++  else if (is_supervised)
++    {
++#ifndef HAVE_W32_SYSTEM
++      struct stat statbuf;
++
++      inhibit_socket_removal = 1;
++
++      /* In supervised mode, we expect file descriptor 3 to be an
++         already opened, listening socket.
++
++         We will also not detach from the controlling process or close
++         stderr; the supervisor should handle all of that.  */
++      if (fstat (3, &statbuf) == -1 && errno == EBADF)
++        {
++          log_error ("file descriptor 3 must be validin --supervised mode\n");
++          kbxd_exit (1);
++        }
++      socket_name = gnupg_get_socket_name (3);
++
++      /* when supervised and sending logs to stderr, the process
++         supervisor should handle log entry metadata (pid, name,
++         timestamp) */
++      if (!logfile)
++        log_set_prefix (NULL, 0);
++
++      initialize_modules ();
++
++      log_info ("%s %s starting in supervised mode.\n",
++                gpgrt_strusage(11), gpgrt_strusage(13) );
++
++#ifdef HAVE_SIGPROCMASK
++      if (startup_signal_mask_valid)
++        {
++          if (sigprocmask (SIG_SETMASK, &startup_signal_mask, NULL))
++            log_error ("error restoring signal mask: %s\n",
++                       strerror (errno));
++        }
++      else
++        log_info ("no saved signal mask\n");
++#endif /*HAVE_SIGPROCMASK*/
++
++      {
++        ctrl_t ctrl;
++
++        ctrl = xtrycalloc (1, sizeof *ctrl);
++        if (!ctrl)
++          {
++            log_error ("error allocating connection control data: %s\n",
++                       strerror (errno) );
++            kbxd_exit (1);
++          }
++        kbxd_init_default_ctrl (ctrl);
++        /* kbxd_set_database (ctrl, "pubring.kbx", 0); */
++        kbxd_set_database (ctrl, "pubring.db", 0);
++        kbxd_deinit_default_ctrl (ctrl);
++        xfree (ctrl);
++      }
++
++      handle_connections (3);
++      assuan_sock_close (3);
++#endif /*!HAVE_W32_SYSTEM*/
++    }
+   else if (!is_daemon)
+     ; /* NOTREACHED */
+   else
+@@ -1546,7 +1621,7 @@ handle_connections (gnupg_fd_t listen_fd)
+       /* Shutdown test.  */
+       if (shutdown_pending)
+         {
+-          if (!active_connections)
++          if (!active_connections || is_supervised)
+             break; /* ready */
+ 
+           /* Do not accept new connections but keep on running the
+-- 
+2.43.0
+
+

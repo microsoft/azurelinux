@@ -1,0 +1,19 @@
+diff --git a/src/beakerlib.sh b/src/beakerlib.sh
+index 3355fa4..ceafc44 100644
+--- a/src/beakerlib.sh
++++ b/src/beakerlib.sh
+@@ -274,10 +274,14 @@ https://github.com/beakerlib/beakerlib/wiki/man
+ 
+ =item Issues list
+ 
++https://bugzilla.redhat.com/buglist.cgi?component=beakerlib&&order=bug_status%2Cassigned_to%2Cpriority
++
+ https://github.com/beakerlib/beakerlib/issues
+ 
+ =item Reporting issues
+ 
++https://bugzilla.redhat.com/enter_bug.cgi?product=Fedora&component=beakerlib
++
+ https://github.com/beakerlib/beakerlib/issues/new
+ 
+ =back

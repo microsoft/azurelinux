@@ -1,0 +1,45 @@
+From bf8bdb4b8ddfd90b4d5a808952dd2b8e38effb2b Mon Sep 17 00:00:00 2001
+From: Sandro <devel@penguinpee.nl>
+Date: Mon, 14 Apr 2025 18:53:34 +0200
+Subject: [PATCH 2/4] XFAIL test if NotImplementedError is raised
+
+SciPy < 1.15 does not support 1D sparse slices. Test is expected
+to fail when run with SciPy < 1.15.
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ dask/array/tests/test_array_core.py | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
+
+diff --git a/dask/array/tests/test_array_core.py b/dask/array/tests/test_array_core.py
+index 975caf305..50f42a410 100644
+--- a/dask/array/tests/test_array_core.py
++++ b/dask/array/tests/test_array_core.py
+@@ -5413,10 +5413,20 @@ def test_scipy_sparse_indexing(index, sparse_module_path, container):
+         x[x < 0.9] = 0
+         y = x.map_blocks(getattr(sp, container))
+ 
+-    assert not (
+-        x[index, :].compute(scheduler="single-threaded")
+-        != y[index, :].compute(scheduler="single-threaded")
+-    ).sum()
++    try:
++        assert not (
++            x[index, :].compute(scheduler="single-threaded")
++            != y[index, :].compute(scheduler="single-threaded")
++        ).sum()
++    except NotImplementedError as e:
++        if sparse_module_path == "scipy.sparse" and container == "csr_array":
++            import scipy
++            # scipy < 1.15 has not implement 1D sparse slices
++            # https://github.com/dask/dask/pull/11892
++            if Version(scipy.__version__) < Version("1.15"):
++                pytest.xfail(f"Needs scipy>=1.15: {e}")
++        else:
++            raise
+ 
+ 
+ @pytest.mark.parametrize("axis", [0, 1])
+-- 
+2.52.0
+

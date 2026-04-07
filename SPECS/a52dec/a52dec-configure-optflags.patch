@@ -1,0 +1,23 @@
+--- ./configure.in~	2002-07-28 06:50:42.000000000 +0300
++++ ./configure.in	2003-04-13 17:20:53.000000000 +0300
+@@ -33,13 +33,13 @@
+     dnl arch-specific flags
+     case "$host" in
+     i?86-* | k?-*)
+-	case "$host" in
+-	i386-*) OPT_CFLAGS="$CFLAGS -mcpu=i386";;
+-	i486-*) OPT_CFLAGS="$CFLAGS -mcpu=i486";;
+-	i586-*) OPT_CFLAGS="$CFLAGS -mcpu=pentium";;
+-	i686-*) OPT_CFLAGS="$CFLAGS -mcpu=pentiumpro";;
+-	k6-*)   OPT_CFLAGS="$CFLAGS -mcpu=k6";;
+-	esac
++#	case "$host" in
++#	i386-*) OPT_CFLAGS="$CFLAGS -mcpu=i386";;
++#	i486-*) OPT_CFLAGS="$CFLAGS -mcpu=i486";;
++#	i586-*) OPT_CFLAGS="$CFLAGS -mcpu=pentium";;
++#	i686-*) OPT_CFLAGS="$CFLAGS -mcpu=pentiumpro";;
++#	k6-*)   OPT_CFLAGS="$CFLAGS -mcpu=k6";;
++#	esac
+ 	AC_TRY_CFLAGS([$OPT_CFLAGS],[CFLAGS=$OPT_CFLAGS]);;
+     sparc-* | sparc64-*)
+ 	OPT_CFLAGS="$CFLAGS -mtune=ultrasparc"

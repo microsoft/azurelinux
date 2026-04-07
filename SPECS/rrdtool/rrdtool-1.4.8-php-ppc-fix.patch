@@ -1,0 +1,11 @@
+--- a/php4/ltconfig	2014-08-11 13:01:13.020065855 +0000
++++ a/php4/ltconfig	2014-08-11 13:01:23.870060274 +0000
+@@ -1939,7 +1939,7 @@ 
+   else
+     # Only the GNU ld.so supports shared libraries on MkLinux.
+     case "$host_cpu" in
+-    powerpc*) dynamic_linker=no ;;
++#    powerpc*) dynamic_linker=no ;;
+     *) dynamic_linker='Linux ld.so' ;;
+     esac
+   fi

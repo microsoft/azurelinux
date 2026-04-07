@@ -1,0 +1,12 @@
+diff -up texlive-base-20220321/source/texk/kpathsea/texmf.cnf.out_of_memory texlive-base-20220321/source/texk/kpathsea/texmf.cnf
+--- texlive-base-20220321/source/texk/kpathsea/texmf.cnf.out_of_memory	2022-04-24 15:50:46.472711270 -0400
++++ texlive-base-20220321/source/texk/kpathsea/texmf.cnf	2022-04-24 15:51:47.213026575 -0400
+@@ -789,7 +789,7 @@ texmf_casefold_search = 1
+ % To increase space for boxes (as might be needed by, e.g., PiCTeX),
+ % increase extra_mem_bot.
+ %
+-main_memory = 5000000 % words of inimemory available; also applies to inimf&mp
++main_memory = 6000000 % words of inimemory available; also applies to inimf&mp
+ extra_mem_top = 0     % extra high memory for chars, tokens, etc.
+ extra_mem_bot = 0     % extra low memory for boxes, glue, breakpoints, etc.
+ 

@@ -1,0 +1,10 @@
+--- dbus-tree-0.9.2/Cargo.toml	1970-01-01T00:00:00+00:00
++++ dbus-tree-0.9.2/Cargo.toml	2024-09-13T21:07:48.512316+00:00
+@@ -17,7 +17,6 @@
+ authors = ["David Henningsson <diwic@ubuntu.com>"]
+ description = "Framework for writing D-Bus method handlers (legacy)"
+ documentation = "http://docs.rs/dbus-tree"
+-readme = "../README.md"
+ keywords = ["D-Bus", "DBus", "IPC"]
+ categories = ["os::unix-apis", "api-bindings"]
+ license = "Apache-2.0/MIT"

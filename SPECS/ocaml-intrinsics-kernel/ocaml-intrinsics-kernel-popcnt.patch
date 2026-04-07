@@ -1,0 +1,170 @@
+--- ocaml_intrinsics_kernel-0.17.0/src/int_stubs.c.orig	2024-04-29 09:48:13.000000000 -0600
++++ ocaml_intrinsics_kernel-0.17.0/src/int_stubs.c	2024-06-27 16:21:04.759270229 -0600
+@@ -115,7 +115,7 @@ intnat naive_int32_popcnt (uint32_t x)
+ #define int64_ctz naive_int64_ctz
+ #define int32_popcnt naive_int32_popcnt
+ #define int64_popcnt naive_int64_popcnt
+-#elseif /* _MSC_VER */
++#elif /* _MSC_VER */
+ #error "Target not supported"
+ #endif /* _MSC_VER */
+ #endif /* defined(__GNUC__) */
+@@ -225,8 +225,23 @@ CAMLprim value caml_int_ctz(value v1)
+   return Val_long(caml_int_ctz_untagged_to_untagged(Long_val(v1)));
+ }
+ 
++#ifdef __x86_64__
++#define BASE_FUNC(type,name) static type name##_base
++#define TARGET_FUNC(arch,suffix,type,name) \
++  static type __attribute__((target (arch))) name##_##suffix
++#define POPC_FUNC(type,name) TARGET_FUNC("popcnt",popc,type,name)
++#define POPC_RESOLVER(type,name,params) \
++  static type (*resolve_##name(void)) params { \
++    __builtin_cpu_init(); \
++    return __builtin_cpu_supports("popcnt") ? &name##_base : &name##_popc; \
++  } \
++  type __attribute__((ifunc ("resolve_" #name))) name params
++#else
++#define BASE_FUNC(type,name) type name
++#endif
++
+ /* Takes untagged int and returns untagged int. */
+-intnat caml_int_popcnt_untagged_to_untagged(intnat v1)
++BASE_FUNC(intnat,caml_int_popcnt_untagged_to_untagged)(intnat v1)
+ {
+   /* Untagging brought in one more '1' for negative numbers.
+      Clear the shifted sign bit.
+@@ -239,8 +254,35 @@ intnat caml_int_popcnt_untagged_to_untag
+ #endif
+ }
+ 
++#ifdef __x86_64__
++POPC_FUNC(intnat,caml_int_popcnt_untagged_to_untagged)(intnat v1)
++{
++  /* Untagging brought in one more '1' for negative numbers.
++     Clear the shifted sign bit.
++     This implementation is expected to be faster than [popcnt(x) - 1]
++     where x is tag(v1). */
++#ifdef ARCH_SIXTYFOUR
++  return int64_popcnt(clear_sign_bit(v1));
++#else
++  return int32_popcnt(clear_sign_bit(v1));
++#endif
++}
++POPC_RESOLVER(intnat,caml_int_popcnt_untagged_to_untagged,(intnat v1));
++#endif
++
+ /* Takes tagged int and returns untagged int. */
+-intnat caml_int_popcnt_tagged_to_untagged(value v1)
++BASE_FUNC(intnat,caml_int_popcnt_tagged_to_untagged)(value v1)
++{
++   /* Need -1 to account for the tag. */
++#ifdef ARCH_SIXTYFOUR
++  return int64_popcnt((uint64_t)v1) - 1;
++#else
++  return int32_popcnt((uint32_t)v1) - 1;
++#endif
++}
++
++#ifdef __x86_64__
++POPC_FUNC(intnat,caml_int_popcnt_tagged_to_untagged)(value v1)
+ {
+    /* Need -1 to account for the tag. */
+ #ifdef ARCH_SIXTYFOUR
+@@ -249,6 +291,8 @@ intnat caml_int_popcnt_tagged_to_untagge
+   return int32_popcnt((uint32_t)v1) - 1;
+ #endif
+ }
++POPC_RESOLVER(intnat,caml_int_popcnt_tagged_to_untagged,(value v1));
++#endif
+ 
+ CAMLprim value caml_int_popcnt(value v1)
+ {
+@@ -276,10 +320,18 @@ intnat caml_int32_ctz_nonzero_unboxed_to
+   return int32_ctz((uint32_t) v);
+ }
+ 
+-intnat caml_int32_popcnt_unboxed_to_untagged(int32_t v)
++BASE_FUNC(intnat,caml_int32_popcnt_unboxed_to_untagged)(int32_t v)
++{
++  return int32_popcnt((uint32_t) v);
++}
++
++#ifdef __x86_64__
++POPC_FUNC(intnat,caml_int32_popcnt_unboxed_to_untagged)(int32_t v)
+ {
+   return int32_popcnt((uint32_t) v);
+ }
++POPC_RESOLVER(intnat,caml_int32_popcnt_unboxed_to_untagged,(int32_t v));
++#endif
+ 
+ CAMLprim value caml_int32_clz(value v1)
+ {
+@@ -316,10 +368,18 @@ intnat caml_int64_ctz_nonzero_unboxed_to
+   return int64_ctz((uint64_t) v);
+ }
+ 
+-intnat caml_int64_popcnt_unboxed_to_untagged(int64_t v)
++BASE_FUNC(intnat,caml_int64_popcnt_unboxed_to_untagged)(int64_t v)
++{
++  return int64_popcnt((uint64_t) v);
++}
++
++#ifdef __x86_64__
++POPC_FUNC(intnat,caml_int64_popcnt_unboxed_to_untagged)(int64_t v)
+ {
+   return int64_popcnt((uint64_t) v);
+ }
++POPC_RESOLVER(intnat,caml_int64_popcnt_unboxed_to_untagged,(int64_t v));
++#endif
+ 
+ CAMLprim value caml_int64_clz(value v1)
+ {
+@@ -331,10 +391,18 @@ CAMLprim value caml_int64_ctz(value v1)
+   return Val_long(caml_int64_ctz_unboxed_to_untagged(Int64_val(v1)));
+ }
+ 
+-CAMLprim value caml_int64_popcnt(value v1)
++BASE_FUNC(CAMLprim value,caml_int64_popcnt)(value v1)
++{
++  return Val_long(int64_popcnt(Int64_val(v1)));
++}
++
++#ifdef __x86_64__
++POPC_FUNC(CAMLprim value,caml_int64_popcnt)(value v1)
+ {
+   return Val_long(int64_popcnt(Int64_val(v1)));
+ }
++POPC_RESOLVER(CAMLprim value,caml_int64_popcnt,(value v1));
++#endif
+ 
+ int caml_nativeint_clz_unboxed_to_untagged(intnat v)
+ {
+@@ -372,7 +440,7 @@ intnat caml_nativeint_ctz_nonzero_unboxe
+ #endif
+ }
+ 
+-intnat caml_nativeint_popcnt_unboxed_to_untagged(intnat v)
++BASE_FUNC(intnat,caml_nativeint_popcnt_unboxed_to_untagged)(intnat v)
+ {
+ #ifdef ARCH_SIXTYFOUR
+   return int64_popcnt((uint64_t) v);
+@@ -381,6 +449,18 @@ intnat caml_nativeint_popcnt_unboxed_to_
+ #endif
+ }
+ 
++#ifdef __x86_64__
++POPC_FUNC(intnat,caml_nativeint_popcnt_unboxed_to_untagged)(intnat v)
++{
++#ifdef ARCH_SIXTYFOUR
++  return int64_popcnt((uint64_t) v);
++#else
++  return int32_popcnt((uint32_t) v);
++#endif
++}
++POPC_RESOLVER(intnat,caml_nativeint_popcnt_unboxed_to_untagged,(intnat v));
++#endif
++
+ CAMLprim value caml_nativeint_clz(value v1)
+ {
+   return Val_long(caml_nativeint_clz_unboxed_to_untagged(Int64_val(v1)));

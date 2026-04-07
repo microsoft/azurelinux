@@ -1,0 +1,26 @@
+From ea99be1a7a5973bbe8ed798b65abe5ce3b92f5df Mon Sep 17 00:00:00 2001
+From: Martin Sehnoutka <msehnout@redhat.com>
+Date: Thu, 17 Nov 2016 13:12:52 +0100
+Subject: [PATCH 28/59] Fix man page rendering.
+
+---
+ vsftpd.conf.5 | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/vsftpd.conf.5 b/vsftpd.conf.5
+index 31d317f..cf1ae34 100644
+--- a/vsftpd.conf.5
++++ b/vsftpd.conf.5
+@@ -495,7 +495,8 @@ Default: NO
+ .TP
+ .B ssl_request_cert
+ If enabled, vsftpd will request (but not necessarily require; see
+-.BR require_cert) a certificate on incoming SSL connections. Normally this
++.BR require_cert )
++a certificate on incoming SSL connections. Normally this
+ should not cause any trouble at all, but IBM zOS seems to have issues.
+ (New in v2.0.7).
+ 
+-- 
+2.14.4
+

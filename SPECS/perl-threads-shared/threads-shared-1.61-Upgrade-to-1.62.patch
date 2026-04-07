@@ -1,0 +1,48 @@
+From 25d469721e26fbc7afd670776ae9523013e9fdf5 Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Thu, 6 May 2021 10:38:30 +0200
+Subject: [PATCH] Upgrade to 1.62
+
+---
+ lib/threads/shared.pm | 4 ++--
+ shared.xs             | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/lib/threads/shared.pm b/lib/threads/shared.pm
+index bd0e437..3674d83 100644
+--- a/lib/threads/shared.pm
++++ b/lib/threads/shared.pm
+@@ -8,7 +8,7 @@ use Config;
+ 
+ use Scalar::Util qw(reftype refaddr blessed);
+ 
+-our $VERSION = '1.61'; # Please update the pod, too.
++our $VERSION = '1.62'; # Please update the pod, too.
+ my $XS_VERSION = $VERSION;
+ $VERSION = eval $VERSION;
+ 
+@@ -196,7 +196,7 @@ threads::shared - Perl extension for sharing data structures between threads
+ 
+ =head1 VERSION
+ 
+-This document describes threads::shared version 1.61
++This document describes threads::shared version 1.62
+ 
+ =head1 SYNOPSIS
+ 
+diff --git a/shared.xs b/shared.xs
+index 858c6d6..4931a61 100644
+--- a/shared.xs
++++ b/shared.xs
+@@ -1183,7 +1183,7 @@ sharedsv_array_mg_free(pTHX_ SV *sv, MAGIC *mg)
+  * This is called when perl is about to access an element of
+  * the array -
+  */
+-#if PERL_VERSION >= 11
++#if PERL_VERSION_GE(5,11,0)
+ static int
+ sharedsv_array_mg_copy(pTHX_ SV *sv, MAGIC* mg,
+                        SV *nsv, const char *name, I32 namlen)
+-- 
+2.30.2
+

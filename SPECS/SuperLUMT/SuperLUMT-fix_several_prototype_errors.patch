@@ -1,0 +1,147 @@
+From b36a4a45ae018649f0ae9516468471233872130b Mon Sep 17 00:00:00 2001
+From: Sherry Li <xsli@lbl.gov>
+Date: Sun, 19 May 2024 10:26:51 -0700
+Subject: [PATCH] fixed several prototype errors.
+
+---
+ SRC/creadmt.c     | 2 +-
+ SRC/dreadmt.c     | 2 +-
+ SRC/slu_mt_util.h | 1 +
+ SRC/sreadmt.c     | 2 +-
+ SRC/util.c        | 2 +-
+ SRC/zreadmt.c     | 2 +-
+ 6 files changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/SRC/creadmt.c b/SRC/creadmt.c
+index 3ad1654..5c43814 100644
+--- a/SRC/creadmt.c
++++ b/SRC/creadmt.c
+@@ -17,6 +17,13 @@
+  *
+  */
+ 
++#if defined __GNUC__ && __GNUC__ >= 14
++#pragma GCC diagnostic warning "-Wimplicit-function-declaration"
++#pragma GCC diagnostic warning "-Wincompatible-pointer-types"
++#pragma GCC diagnostic warning "-Wint-conversion"
++#pragma GCC diagnostic warning "-Wreturn-mismatch"
++#endif
++
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include "slu_mt_cdefs.h"
+@@ -26,7 +26,7 @@ at the top-level directory.
+ static void dumptitle();
+ 
+ void
+-creadmt(int *m, int *n, int *nonz, complex **nzval, int **rowind, int **colptr)
++creadmt(int_t *m, int_t *n, int_t *nonz, complex **nzval, int_t **rowind, int_t **colptr)
+ {
+ /*
+  * Output parameters
+diff --git a/SRC/dreadmt.c b/SRC/dreadmt.c
+index 282fd13..90eb0e1 100644
+--- a/SRC/dreadmt.c
++++ b/SRC/dreadmt.c
+@@ -17,6 +17,13 @@
+  *
+  */
+ 
++#if defined __GNUC__ && __GNUC__ >= 14
++#pragma GCC diagnostic warning "-Wimplicit-function-declaration"
++#pragma GCC diagnostic warning "-Wincompatible-pointer-types"
++#pragma GCC diagnostic warning "-Wint-conversion"
++#pragma GCC diagnostic warning "-Wreturn-mismatch"
++#endif
++
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include "slu_mt_ddefs.h"
+@@ -26,7 +26,7 @@ at the top-level directory.
+ static void dumptitle();
+ 
+ void
+-dreadmt(int *m, int *n, int *nonz, double **nzval, int **rowind, int **colptr)
++dreadmt(int_t *m, int_t *n, int_t *nonz, double **nzval, int_t **rowind, int_t **colptr)
+ {
+ /*
+  * Output parameters
+diff --git a/SRC/slu_mt_util.h b/SRC/slu_mt_util.h
+index 1b1e0f9..88acf61 100644
+--- a/SRC/slu_mt_util.h
++++ b/SRC/slu_mt_util.h
+@@ -473,6 +473,7 @@ extern void superlu_free (void*);
+ extern void PrintStat(Gstat_t *);
+ extern int_t  ParallelProfile(const int_t, const int_t, const int_t,
+ 			    const int_t procs, Gstat_t *);
++extern int PrintInt10(char *name, int_t len, int_t *x);
+ 
+ #ifdef __cplusplus
+ 	   }
+diff --git a/SRC/sreadmt.c b/SRC/sreadmt.c
+index 9006dc4..ee68209 100644
+--- a/SRC/sreadmt.c
++++ b/SRC/sreadmt.c
+@@ -17,6 +17,13 @@
+  *
+  */
+ 
++#if defined __GNUC__ && __GNUC__ >= 14
++#pragma GCC diagnostic warning "-Wimplicit-function-declaration"
++#pragma GCC diagnostic warning "-Wincompatible-pointer-types"
++#pragma GCC diagnostic warning "-Wint-conversion"
++#pragma GCC diagnostic warning "-Wreturn-mismatch"
++#endif
++
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include "slu_mt_sdefs.h"
+@@ -26,7 +26,7 @@ at the top-level directory.
+ static void dumptitle();
+ 
+ void
+-sreadmt(int *m, int *n, int *nonz, float **nzval, int **rowind, int **colptr)
++sreadmt(int_t *m, int_t *n, int_t *nonz, float **nzval, int_t **rowind, int_t **colptr)
+ {
+ /*
+  * Output parameters
+diff --git a/SRC/util.c b/SRC/util.c
+index 991b536..efc607a 100644
+--- a/SRC/util.c
++++ b/SRC/util.c
+@@ -589,7 +589,7 @@ void check_repfnz(int_t n, int_t w, int_t jcol, int_t *repfnz)
+ }
+ 
+ 
+-int_t PrintInt10(char *name, int_t len, int_t *x)
++int PrintInt10(char *name, int_t len, int_t *x)
+ {
+     register int_t i;
+     
+diff --git a/SRC/zreadmt.c b/SRC/zreadmt.c
+index 4619506..4f17907 100644
+--- a/SRC/zreadmt.c
++++ b/SRC/zreadmt.c
+@@ -17,6 +17,13 @@
+  *
+  */
+ 
++#if defined __GNUC__ && __GNUC__ >= 14
++#pragma GCC diagnostic warning "-Wimplicit-function-declaration"
++#pragma GCC diagnostic warning "-Wincompatible-pointer-types"
++#pragma GCC diagnostic warning "-Wint-conversion"
++#pragma GCC diagnostic warning "-Wreturn-mismatch"
++#endif
++
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include "slu_mt_zdefs.h"
+@@ -26,7 +26,7 @@ at the top-level directory.
+ static void dumptitle();
+ 
+ void
+-zreadmt(int *m, int *n, int *nonz, doublecomplex **nzval, int **rowind, int **colptr)
++zreadmt(int_t *m, int_t *n, int_t *nonz, doublecomplex **nzval, int_t **rowind, int_t **colptr)
+ {
+ /*
+  * Output parameters

@@ -1,0 +1,27 @@
+--- difference-2.0.0/Cargo.toml	1970-01-01T00:00:00+00:00
++++ difference-2.0.0/Cargo.toml	2024-09-19T15:22:31.402938+00:00
+@@ -21,21 +21,15 @@
+ categories = ["text-processing", "development-tools::testing"]
+ license = "MIT"
+ repository = "https://github.com/johannhof/difference.rs"
++autobins = false
+ 
+-[[bin]]
+-name = "difference"
+-doc = false
+-[dependencies.getopts]
+-version = "0.2"
+-optional = true
+ [dev-dependencies.quickcheck]
+-version = "0.4"
++version = "1.0"
+ 
+ [dev-dependencies.term]
+-version = "0.2.7"
++version = "0.7"
+ 
+ [features]
+-bin = ["getopts"]
+ default = []
+ [badges.appveyor]
+ repository = "johannhof/difference.rs"

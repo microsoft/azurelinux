@@ -1,0 +1,123 @@
+diff -up texlive-base-20220321/source/configure.poppler-22.08.0 texlive-base-20220321/source/configure
+--- texlive-base-20220321/source/configure.poppler-22.08.0	2022-10-31 09:48:21.875540925 -0400
++++ texlive-base-20220321/source/configure	2022-10-31 09:50:13.731220862 -0400
+@@ -23545,7 +23545,7 @@ printf %s "checking requested system \`x
+ int
+ main (void)
+ {
+-GfxFont *gfxFont; gfxFont->decRefCnt();
++GfxFont *gfxFont; gfxFont->getFlags();
+   ;
+   return 0;
+ }
+diff -up texlive-base-20220321/source/texk/web2c/pdftexdir/pdftoepdf.cc.poppler-22.08.0 texlive-base-20220321/source/texk/web2c/pdftexdir/pdftoepdf.cc
+--- texlive-base-20220321/source/texk/web2c/pdftexdir/pdftoepdf.cc.poppler-22.08.0	2022-10-31 09:48:21.872540907 -0400
++++ texlive-base-20220321/source/texk/web2c/pdftexdir/pdftoepdf.cc	2022-10-31 09:48:21.876540932 -0400
+@@ -123,7 +123,7 @@ struct InObj {
+ 
+ struct UsedEncoding {
+     int enc_objnum;
+-    GfxFont *font;
++    std::shared_ptr<GfxFont> font;
+     UsedEncoding *next;
+ };
+ 
+@@ -167,8 +167,8 @@ static PdfDocument *find_add_document(ch
+     p->file_name = xstrdup(file_name);
+     p->xref = xref = 0;
+     p->occurences = 0;
+-    GString *docName = new GString(p->file_name);
+-    p->doc = new PDFDoc(docName);       // takes ownership of docName
++    // GString *docName = new GString(p->file_name);
++    p->doc = new PDFDoc(std::make_unique<GooString>(p->file_name));       // takes ownership of docName
+     if (!p->doc->isOk() || !p->doc->okToPrint()) {
+         pdftex_fail("xpdf: reading PDF image failed");
+     }
+@@ -204,7 +204,7 @@ static void delete_document(PdfDocument
+ 
+ // --------------------------------------------------------------------
+ 
+-static int addEncoding(GfxFont * gfont)
++static int addEncoding(std::shared_ptr<GfxFont> gfont)
+ {
+     UsedEncoding *n;
+     n = new UsedEncoding;
+@@ -395,7 +395,8 @@ static void copyFont(const char *tag, Ob
+ {
+     Object fontdict, subtype, basefont, fontdescRef, fontdesc, charset,
+         stemV;
+-    GfxFont *gfont;
++    // GfxFont *gfont;
++    std::shared_ptr<GfxFont> gfont;
+     fd_entry *fd;
+     fm_entry *fontmap;
+     // Check whether the font has already been embedded before analysing it.
+@@ -666,6 +667,7 @@ static void writeEncodings()
+     UsedEncoding *r, *n;
+     char *glyphNames[256], *s;
+     int i;
++
+     for (r = encodingList; r != 0; r = r->next) {
+         for (i = 0; i < 256; i++) {
+             if (r->font->isCIDFont()) {
+@@ -673,7 +675,8 @@ static void writeEncodings()
+                     ("PDF inclusion: CID fonts are not supported"
+                      " (try to disable font replacement to fix this)");
+             }
+-            if ((s = (char *) ((Gfx8BitFont *) r->font)->getCharName(i)) != 0)
++            const GfxFont *const font = r->font.get();
++            if ((s = (char *) ((Gfx8BitFont *) font)->getCharName(i)) != 0)
+                 glyphNames[i] = s;
+             else
+                 glyphNames[i] = notdef;
+@@ -682,7 +685,7 @@ static void writeEncodings()
+     }
+     for (r = encodingList; r != 0; r = n) {
+         n = r->next;
+-	r->font->decRefCnt();
++	// r->font->decRefCnt();
+         delete r;
+     }
+ }
+diff -up texlive-base-20220321/source/texk/web2c/pdftexdir/pdftosrc.cc.poppler-22.08.0 texlive-base-20220321/source/texk/web2c/pdftexdir/pdftosrc.cc
+--- texlive-base-20220321/source/texk/web2c/pdftexdir/pdftosrc.cc.poppler-22.08.0	2022-10-31 09:48:21.866540870 -0400
++++ texlive-base-20220321/source/texk/web2c/pdftexdir/pdftosrc.cc	2022-10-31 09:48:21.876540932 -0400
+@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
+ {
+     char *p, buf[1024];
+     PDFDoc *doc;
+-    GString *fileName;
++    std::unique_ptr<GooString> fileName;
+     Stream *s;
+     Object srcStream, srcName, catalogDict;
+     FILE *outfile;
+@@ -86,9 +86,9 @@ int main(int argc, char *argv[])
+                 "Usage: pdftosrc <PDF-file> [<stream-object-number>]\n");
+         exit(1);
+     }
+-    fileName = new GString(argv[1]);
++    fileName = std::make_unique<GString>(argv[1]);
+     globalParams = std::unique_ptr<GlobalParams>(new GlobalParams());
+-    doc = new PDFDoc(fileName);
++    doc = new PDFDoc(std::move(fileName));
+     if (!doc->isOk()) {
+         fprintf(stderr, "Invalid PDF file\n");
+         exit(1);
+@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
+             fprintf(stderr, "Not a Stream object\n");
+             exit(1);
+         }
+-        sprintf(buf, "%s", fileName->c_str());
++        sprintf(buf, "%s", argv[1]);
+         if ((p = strrchr(buf, '.')) == 0)
+             p = strchr(buf, 0);
+         if (objgen == 0)
+@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
+         outname = buf;
+     } else {                    // objnum < 0 means we are extracting the XRef table
+         extract_xref_table = true;
+-        sprintf(buf, "%s", fileName->c_str());
++        sprintf(buf, "%s", argv[1]);
+         if ((p = strrchr(buf, '.')) == 0)
+             p = strchr(buf, 0);
+         sprintf(p, ".xref");

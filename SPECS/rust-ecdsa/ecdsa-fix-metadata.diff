@@ -1,0 +1,20 @@
+--- ecdsa-0.16.9/Cargo.toml	1970-01-01T00:00:01+00:00
++++ ecdsa-0.16.9/Cargo.toml	2025-12-03T23:07:58.364805+00:00
+@@ -77,7 +77,7 @@
+ default-features = false
+ 
+ [dependencies.signature]
+-version = "2.0, <2.3"
++version = "2.0"
+ features = ["rand_core"]
+ default-features = false
+ 
+@@ -92,7 +92,7 @@
+ default-features = false
+ 
+ [dev-dependencies.hex-literal]
+-version = "0.4"
++version = ">=0.4, <2.0"
+ 
+ [dev-dependencies.sha2]
+ version = "0.10"

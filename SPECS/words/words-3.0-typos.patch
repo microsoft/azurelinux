@@ -1,0 +1,115 @@
+diff -up mwords/113809of.fic.kzak mwords/113809of.fic
+--- mwords/113809of.fic.kzak	2024-09-10 13:56:34.435114961 +0200
++++ mwords/113809of.fic	2024-09-10 13:58:53.522351783 +0200
+@@ -19561,8 +19561,6 @@ compassing
+ compassion
+ compassionate
+ compassions
+-compatability
+-compatable
+ compatibilities
+ compatibility
+ compatible
+diff -up mwords/256772co.mpo.kzak mwords/256772co.mpo
+--- mwords/256772co.mpo.kzak	1996-06-06 05:33:56.000000000 +0200
++++ mwords/256772co.mpo	2024-09-10 13:50:59.794951154 +0200
+@@ -90189,7 +90189,6 @@ Ultra-byronism
+ Ultra-calvinist
+ Ultra-christian
+ Ultra-english
+-Ultra-englishUltra-french
+ Ultra-french
+ Ultra-gallican
+ Ultra-gangetic
+@@ -116323,7 +116322,6 @@ by-day
+ by-dependency
+ by-design
+ by-doing
+-by-doingby-drinking
+ by-drinking
+ by-dweller
+ by-effect
+@@ -155743,7 +155741,8 @@ half-eaten
+ half-ebb
+ half-educated
+ half-embraced
+-half-embracinghalf-embracingly
++half-embracing
++half-embracingly
+ half-enamored
+ half-enforced
+ half-erased
+@@ -208469,7 +208468,6 @@ rude-looking
+ rude-made
+ rude-mannered
+ rude-spoken
+-rude-spokenrude-spun
+ rude-spun
+ rude-thoughted
+ rude-tongued
+@@ -251103,7 +251101,6 @@ what-is-it
+ what-like
+ what-you-call-it
+ what-you-may call-it
+-what-you-may--call-it
+ what-you-may-call-'em
+ whatever comes
+ whatever may happen
+diff -up mwords/354984si.ngl.kzak mwords/354984si.ngl
+--- mwords/354984si.ngl.kzak	1996-06-06 05:30:48.000000000 +0200
++++ mwords/354984si.ngl	2024-09-10 13:59:57.956998224 +0200
+@@ -17787,7 +17787,6 @@ architecture
+ architecture's
+ architectures
+ architecturesque
+-architecure
+ architis
+ architraval
+ architrave
+@@ -110139,7 +110138,6 @@ flounderingly
+ flounders
+ flour
+ floured
+-flourescent
+ flouriness
+ flouring
+ flourish
+@@ -159510,13 +159508,13 @@ lang
+ langaha
+ langarai
+ langate
+-langauge
+ langbanite
+ langbeinite
+ langca
+ langeel
+ langel
+ langi
++language
+ langiel
+ langite
+ langka
+@@ -271677,7 +271675,6 @@ sensibilia
+ sensibilisin
+ sensibilities
+ sensibilitist
+-sensibilitiy
+ sensibilitous
+ sensibility
+ sensibilium
+@@ -330243,7 +330240,6 @@ unlowly
+ unloyal
+ unloyally
+ unloyalty
+-unltraconservative
+ unlubricant
+ unlubricated
+ unlubricating
+@@ -331241,7 +331237,6 @@ unneath
+ unneatly
+ unneatness
+ unnebulous
+-unneccessary
+ unnecessaries
+ unnecessarily
+ unnecessariness

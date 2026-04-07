@@ -1,0 +1,99 @@
+autofs-5.1.9 - fix crash in make_options_string()
+
+From: Ian Kent <raven@themaw.net>
+
+glibc reports a memory overflow when make_options_string() in snprintf()
+As described by Andreas Hasenack on the autofs mailing list this is due
+to my incorrect use of max_len in snprintf(), it should in fact be
+max_len - <length of buffer already used>.
+
+Anyway looking at the calculated maximum options string length there's
+no actual overflow possible.
+
+To fix this use strcat(3) instead of snprintf(), in this case there's
+probably less overhead anyway. While we are at it drop the useless error
+checks because we know it won't overflow.
+
+Signed-off-by: Ian Kent <raven@themaw.net>
+---
+ lib/mounts.c |   35 +++++++++--------------------------
+ 1 file changed, 9 insertions(+), 26 deletions(-)
+
+diff --git a/lib/mounts.c b/lib/mounts.c
+index 05f18dbcf..7680c59c1 100644
+--- a/lib/mounts.c
++++ b/lib/mounts.c
+@@ -695,10 +695,11 @@ static int cacl_max_options_len(unsigned int flags)
+ 	unsigned int kver_minor = get_kver_minor();
+ 	int max_len;
+ 
+-	/* %d and %u are maximum lenght of 10 and mount type is maximum
+-	 * length of 9 (e. ",indirect").
++	/* %d and %u are maximum length of 10 and mount type is maximum
++	 * length of 9 (ie. ",indirect").
+ 	 * The base temaplate is "fd=%d,pgrp=%u,minproto=5,maxproto=%d"
+-	 * plus the length of mount type plus 1 for the NULL.
++	 * plus the length of mount type plus 1 for the NULL (and an
++	 * additional 10 characters for good measure!).
+ 	 */
+ 	max_len = 79 + 1;
+ 
+@@ -728,7 +729,7 @@ char *make_options_string(char *path, int pipefd,
+ 	unsigned int kver_major = get_kver_major();
+ 	unsigned int kver_minor = get_kver_minor();
+ 	char *options;
+-	int max_len, len, new;
++	int max_len, len;
+ 
+ 	max_len = cacl_max_options_len(flags);
+ 
+@@ -751,21 +752,13 @@ char *make_options_string(char *path, int pipefd,
+ 	if (len < 0)
+ 		goto error_out;
+ 
+-	if (len >= max_len)
+-		goto truncated;
+-
+ 	if (kver_major < 5 || (kver_major == 5 && kver_minor < 4))
+ 		goto out;
+ 
+ 	/* maybe add ",strictexpire" */
+ 	if (flags & MOUNT_FLAG_STRICTEXPIRE) {
+-		new = snprintf(options + len,
+-			       max_len, "%s", ",strictexpire");
+-		if (new < 0)
+-		       goto error_out;
+-		len += new;
+-		if (len >= max_len)
+-			goto truncated;
++		strcat(options, ",strictexpire");
++		len += 13;
+ 	}
+ 
+ 	if (kver_major == 5 && kver_minor < 5)
+@@ -773,23 +766,13 @@ char *make_options_string(char *path, int pipefd,
+ 
+ 	/* maybe add ",ignore" */
+ 	if (flags & MOUNT_FLAG_IGNORE) {
+-		new = snprintf(options + len,
+-			       max_len, "%s", ",ignore");
+-		if (new < 0)
+-		       goto error_out;
+-		len += new;
+-		if (len >= max_len)
+-			goto truncated;
++		strcat(options, ",ignore");
++		len += 7;
+ 	}
+ out:
+ 	options[len] = '\0';
+ 	return options;
+ 
+-truncated:
+-	logerr("buffer to small for options - truncated");
+-	len = max_len -1;
+-	goto out;
+-
+ error_out:
+ 	logerr("error constructing mount options string for %s", path);
+ 	free(options);

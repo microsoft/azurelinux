@@ -1,0 +1,46 @@
+diff -up libmatchbox-1.9/configure.ac.jx libmatchbox-1.9/configure.ac
+--- libmatchbox-1.9/configure.ac.jx	2006-08-04 06:32:31.000000000 -0400
++++ libmatchbox-1.9/configure.ac	2011-11-17 18:29:57.490000763 -0500
+@@ -155,14 +155,14 @@ fi
+ dnl ------ Check for PNG ---------------------------------------------------
+ 
+ if test x$enable_png != xno; then
+-  AC_MSG_CHECKING(for libpng12)
+-  if test x$PKG_CONFIG != xno && $PKG_CONFIG --exists libpng12; then 
++  AC_MSG_CHECKING(for libpng)
++  if test x$PKG_CONFIG != xno && $PKG_CONFIG --exists libpng; then 
+         AC_MSG_RESULT(yes)
+-        PNG_LIBS=`$PKG_CONFIG --libs libpng12`
+-	PNG_CFLAGS=`$PKG_CONFIG --cflags libpng12`
++        PNG_LIBS=`$PKG_CONFIG --libs libpng`
++	PNG_CFLAGS=`$PKG_CONFIG --cflags libpng`
+         AC_DEFINE(USE_PNG, [1], [Use Png])
+ 	SUPPORTS_PNG=1
+-	PNG_REQUIRED="libpng12"
++	PNG_REQUIRED="libpng"
+   else
+ 	AC_MSG_RESULT(no)
+         # AC_CHECK_HEADERS(png.h, [ have_png_h="yes" ], [ have_png_h="no" ] )
+diff -up libmatchbox-1.9/libmb/mbpixbuf.c.jx libmatchbox-1.9/libmb/mbpixbuf.c
+--- libmatchbox-1.9/libmb/mbpixbuf.c.jx	2006-07-26 15:12:25.000000000 -0400
++++ libmatchbox-1.9/libmb/mbpixbuf.c	2011-11-17 18:28:51.981001505 -0500
+@@ -247,7 +247,7 @@ _load_png_file( const char *file,
+     return NULL;
+   }
+ 
+-  if ( setjmp( png_ptr->jmpbuf ) ) {
++  if ( setjmp( png_jmpbuf(png_ptr) ) ) {
+     png_destroy_read_struct( &png_ptr, &info_ptr, NULL);
+     fclose(fd);
+     return NULL;
+@@ -269,8 +269,8 @@ _load_png_file( const char *file,
+       ( color_type == PNG_COLOR_TYPE_GRAY_ALPHA ))
+     png_set_gray_to_rgb(png_ptr);
+  
+-  if ( info_ptr->color_type == PNG_COLOR_TYPE_RGB_ALPHA 
+-       || info_ptr->color_type == PNG_COLOR_TYPE_GRAY_ALPHA
++  if ( png_get_color_type(png_ptr, info_ptr) == PNG_COLOR_TYPE_RGB_ALPHA 
++       || png_get_color_type(png_ptr, info_ptr) == PNG_COLOR_TYPE_GRAY_ALPHA
+        )
+     *has_alpha = 1;
+   else

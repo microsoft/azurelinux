@@ -1,0 +1,241 @@
+From 726f733f03c74542d363797c3c5cb344af6929fd Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?S=C3=A9rgio=20M=2E=20Basto?= <sergio@serjux.com>
+Date: Fri, 7 Feb 2025 02:47:52 +0000
+Subject: [PATCH 1/3] libvncserver: Add API to add custom I/O entry points
+
+Add API to make it possible to channel RFB input and output through
+another layer, for example TLS. This is done by making it possible to
+override the default read/write/peek functions.
+---
+ include/rfb/rfb.h            | 17 ++++++++
+ src/libvncserver/rfbserver.c |  4 ++
+ src/libvncserver/sockets.c   | 79 ++++++++++++++++++++++++++++++++----
+ 3 files changed, 93 insertions(+), 7 deletions(-)
+
+diff --git a/include/rfb/rfb.h b/include/rfb/rfb.h
+index 50acf244..204fa052 100644
+--- a/include/rfb/rfb.h
++++ b/include/rfb/rfb.h
+@@ -402,6 +402,14 @@ typedef struct sraRegion* sraRegionPtr;
+ typedef void (*ClientGoneHookPtr)(struct _rfbClientRec* cl);
+ typedef void (*ClientFramebufferUpdateRequestHookPtr)(struct _rfbClientRec* cl, rfbFramebufferUpdateRequestMsg* furMsg);
+ 
++typedef int (*ClientReadFromSocket)(struct _rfbClientRec* cl,
++                                    char *buf, int len);
++typedef int (*ClientPeekAtSocket)(struct _rfbClientRec* cl,
++                                  char *buf, int len);
++typedef rfbBool (*ClientHasPendingOnSocket)(struct _rfbClientRec* cl);
++typedef int (*ClientWriteToSocket)(struct _rfbClientRec* cl,
++                                   const char *buf, int len);
++
+ typedef struct _rfbFileTransferData {
+   int fd;
+   int compressionEnabled;
+@@ -711,6 +719,11 @@ typedef struct _rfbClientRec {
+     int tightPngDstDataLen;
+ #endif
+ #endif
++
++    ClientReadFromSocket readFromSocket;         /* Read data from socket */
++    ClientPeekAtSocket peekAtSocket;             /* Peek at data from socket */
++    ClientHasPendingOnSocket hasPendingOnSocket; /* Peek at data from socket */
++    ClientWriteToSocket writeToSocket;           /* Write data to socket */
+ } rfbClientRec, *rfbClientPtr;
+ 
+ /**
+@@ -763,8 +776,12 @@ extern void rfbDisconnectUDPSock(rfbScreenInfoPtr rfbScreen);
+ extern void rfbCloseClient(rfbClientPtr cl);
+ extern int rfbReadExact(rfbClientPtr cl, char *buf, int len);
+ extern int rfbReadExactTimeout(rfbClientPtr cl, char *buf, int len,int timeout);
++extern int rfbDefaultReadFromSocket(rfbClientPtr cl, char *buf, int len);
+ extern int rfbPeekExactTimeout(rfbClientPtr cl, char *buf, int len,int timeout);
++extern int rfbDefaultPeekAtSocket(rfbClientPtr cl, char *buf, int len);
++extern rfbBool rfbDefaultHasPendingOnSocket(rfbClientPtr cl);
+ extern int rfbWriteExact(rfbClientPtr cl, const char *buf, int len);
++extern int rfbDefaultWriteToSocket(rfbClientPtr cl, const char *buf, int len);
+ extern int rfbCheckFds(rfbScreenInfoPtr rfbScreen,long usec);
+ extern rfbSocket rfbConnect(rfbScreenInfoPtr rfbScreen, char* host, int port);
+ extern rfbSocket rfbConnectToTcpAddr(char* host, int port);
+diff --git a/src/libvncserver/rfbserver.c b/src/libvncserver/rfbserver.c
+index 8e3c3f6a..2385dbaa 100644
+--- a/src/libvncserver/rfbserver.c
++++ b/src/libvncserver/rfbserver.c
+@@ -321,6 +321,10 @@ rfbNewTCPOrUDPClient(rfbScreenInfoPtr rfbScreen,
+ 
+     cl->screen = rfbScreen;
+     cl->sock = sock;
++    cl->readFromSocket = rfbDefaultReadFromSocket;
++    cl->peekAtSocket = rfbDefaultPeekAtSocket;
++    cl->hasPendingOnSocket = rfbDefaultHasPendingOnSocket;
++    cl->writeToSocket = rfbDefaultWriteToSocket;
+     cl->viewOnly = FALSE;
+     /* setup pseudo scaling */
+     cl->scaledScreen = rfbScreen;
+diff --git a/src/libvncserver/sockets.c b/src/libvncserver/sockets.c
+index c18493cb..cee14177 100644
+--- a/src/libvncserver/sockets.c
++++ b/src/libvncserver/sockets.c
+@@ -101,6 +101,9 @@ int deny_severity=LOG_WARNING;
+ int rfbMaxClientWait = 20000;   /* time (ms) after which we decide client has
+                                    gone away - needed to stop us hanging */
+ 
++static rfbBool
++rfbHasPendingOnSocket(rfbClientPtr cl);
++
+ static rfbBool
+ rfbNewConnectionFromSock(rfbScreenInfoPtr rfbScreen, rfbSocket sock)
+ {
+@@ -364,16 +367,20 @@ rfbCheckFds(rfbScreenInfoPtr rfbScreen,long usec)
+ 	tv.tv_usec = usec;
+ 	nfds = select(rfbScreen->maxFd + 1, &fds, NULL, NULL /* &fds */, &tv);
+ 	if (nfds == 0) {
++            rfbBool hasPendingData = FALSE;
++
+ 	    /* timed out, check for async events */
+             i = rfbGetClientIterator(rfbScreen);
+             while((cl = rfbClientIteratorNext(i))) {
+                 if (cl->onHold)
+                     continue;
++                hasPendingData |= rfbHasPendingOnSocket(cl);
+                 if (FD_ISSET(cl->sock, &(rfbScreen->allFds)))
+                     rfbSendFileTransferChunk(cl);
+             }
+             rfbReleaseClientIterator(i);
+-	    return result;
++            if (!hasPendingData)
++                return result;
+ 	}
+ 
+ 	if (nfds < 0) {
+@@ -449,9 +456,11 @@ rfbCheckFds(rfbScreenInfoPtr rfbScreen,long usec)
+ 	    if (cl->onHold)
+ 		continue;
+ 
+-            if (FD_ISSET(cl->sock, &(rfbScreen->allFds)))
++            if (rfbHasPendingOnSocket (cl) ||
++                FD_ISSET(cl->sock, &(rfbScreen->allFds)))
+             {
+-                if (FD_ISSET(cl->sock, &fds))
++                if (rfbHasPendingOnSocket (cl) ||
++                    FD_ISSET(cl->sock, &fds))
+                 {
+ #ifdef LIBVNCSERVER_WITH_WEBSOCKETS
+                     do {
+@@ -606,6 +615,30 @@ rfbCloseClient(rfbClientPtr cl)
+ }
+ 
+ 
++int
++rfbDefaultReadFromSocket(rfbClientPtr cl, char *buf, int len)
++{
++    return read(cl->sock, buf, len);
++}
++
++static int
++rfbReadFromSocket(rfbClientPtr cl, char *buf, int len)
++{
++    return cl->readFromSocket(cl, buf, len);
++}
++
++rfbBool
++rfbDefaultHasPendingOnSocket(rfbClientPtr cl)
++{
++    return FALSE;
++}
++
++static rfbBool
++rfbHasPendingOnSocket(rfbClientPtr cl)
++{
++    return cl->hasPendingOnSocket(cl);
++}
++
+ /*
+  * rfbConnect is called to make a connection out to a given TCP address.
+  */
+@@ -678,10 +711,10 @@ rfbReadExactTimeout(rfbClientPtr cl, char* buf, int len, int timeout)
+         } else if (cl->sslctx) {
+ 	    n = rfbssl_read(cl, buf, len);
+ 	} else {
+-            n = read(sock, buf, len);
++            n = rfbReadFromSocket(cl, buf, len);
+         }
+ #else
+-        n = read(sock, buf, len);
++        n = rfbReadFromSocket(cl, buf, len);
+ #endif
+ 
+         if (n > 0) {
+@@ -713,6 +746,10 @@ rfbReadExactTimeout(rfbClientPtr cl, char* buf, int len, int timeout)
+ 		    continue;
+ 	    }
+ #endif
++
++            if (rfbHasPendingOnSocket(cl))
++                continue;
++
+             FD_ZERO(&fds);
+             FD_SET(sock, &fds);
+             tv.tv_sec = timeout / 1000;
+@@ -749,6 +786,18 @@ int rfbReadExact(rfbClientPtr cl,char* buf,int len)
+     return(rfbReadExactTimeout(cl,buf,len,rfbMaxClientWait));
+ }
+ 
++int
++rfbDefaultPeekAtSocket(rfbClientPtr cl, char *buf, int len)
++{
++    return recv(cl->sock, buf, len, MSG_PEEK);
++}
++
++int
++rfbPeekAtSocket(rfbClientPtr cl, char *buf, int len)
++{
++    cl->peekAtSocket(cl, buf, len);
++}
++
+ /*
+  * PeekExact peeks at an exact number of bytes from a client.  Returns 1 if
+  * those bytes have been read, 0 if the other end has closed, or -1 if an
+@@ -777,7 +826,7 @@ rfbPeekExactTimeout(rfbClientPtr cl, char* buf, int len, int timeout)
+ 	    n = rfbssl_peek(cl, buf, len);
+ 	else
+ #endif
+-	    n = recv(sock, buf, len, MSG_PEEK);
++            n = rfbPeekAtSocket(cl, buf, len);
+ 
+         if (n == len) {
+ 
+@@ -833,6 +882,22 @@ rfbPeekExactTimeout(rfbClientPtr cl, char* buf, int len, int timeout)
+     return 1;
+ }
+ 
++int
++rfbDefaultWriteToSocket(rfbClientPtr cl,
++			const char *buf,
++			int len)
++{
++    return write(cl->sock, buf, len);
++}
++
++static int
++rfbWriteToSocket(rfbClientPtr cl,
++		 const char *buf,
++		 int len)
++{
++    return cl->writeToSocket(cl, buf, len);
++}
++
+ /*
+  * WriteExact writes an exact number of bytes to a client.  Returns 1 if
+  * those bytes have been written, or -1 if an error occurred (errno is set to
+@@ -893,7 +958,7 @@ rfbWriteExact(rfbClientPtr cl,
+ 	    n = rfbssl_write(cl, buf, len);
+ 	else
+ #endif
+-	    n = write(sock, buf, len);
++	    n = rfbWriteToSocket(cl, buf, len);
+ 
+         if (n > 0) {
+ 
+-- 
+2.48.1
+

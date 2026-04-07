@@ -1,0 +1,12 @@
+--- v_frame-0.5.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ v_frame-0.5.0/Cargo.toml	2026-01-22T14:50:25.962894+00:00
+@@ -46,9 +46,6 @@
+ 
+ [dependencies.thiserror]
+ version = "2.0.17"
+-
+-[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies.criterion]
+-version = "0.6"
+ 
+ [lints.clippy]
+ allow_attributes = "warn"

@@ -1,0 +1,9 @@
+
+# # the architectures theoretically supported by the version of V8 used (#1298011)
+# # You may need some minor patching to build on one of the secondary
+# # architectures, e.g., to add to the Qt -> Chromium -> V8 arch translations.
+# # If you cannot get this package to build on your secondary architecure, please:
+# # * remove your architecture from this list AND
+# # * put #1298011 onto your ExcludeArch tracker.
+%qt6_qtwebengine_arches x86_64 aarch64 ppc64le riscv64
+

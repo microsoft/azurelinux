@@ -1,0 +1,15 @@
+--- tests/streams.tst.orig	2024-07-04 15:55:33.000000000 -0600
++++ tests/streams.tst	2024-07-08 14:50:23.547424881 -0600
+@@ -1288,9 +1288,9 @@ T
+ (streamp (setq s (make-stream :error))) T
+ (or (not (search "#P" (prin1-to-string s))) (pathnamep (truename s))) T
+ (write-line "foo" s) "foo"
+-(let ((*reopen-open-file* nil)) ; stdout can be a file, it will be detected!
+-  (with-open-file (copy s :direction :output) (streamp copy)))
+-#.(if (member (ext:operating-system-type) '("AIX" "Haiku" "Minix" "Windows") :test #'equal) 'ERROR 'T)
++;;(let ((*reopen-open-file* nil)) ; stdout can be a file, it will be detected!
++;;  (with-open-file (copy s :direction :output) (streamp copy)))
++;;#.(if (member (ext:operating-system-type) '("AIX" "Haiku" "Minix" "Windows") :test #'equal) 'ERROR 'T)
+ 
+ #+clisp
+ (progn

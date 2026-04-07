@@ -1,0 +1,20 @@
+diff -up texlive-base-20200327/source/texk/web2c/pdftexdir/pdftoepdf.cc.poppler090 texlive-base-20200327/source/texk/web2c/pdftexdir/pdftoepdf.cc
+--- texlive-base-20200327/source/texk/web2c/pdftexdir/pdftoepdf.cc.poppler090	2020-07-14 13:13:31.620607263 -0400
++++ texlive-base-20200327/source/texk/web2c/pdftexdir/pdftoepdf.cc	2020-07-14 13:16:01.530248309 -0400
+@@ -766,7 +766,7 @@ read_pdf_info(char *image_name, char *pa
+     if (page_name) {
+         // get page by name
+         GString name(page_name);
+-        LinkDest *link = pdf_doc->doc->findDest(&name);
++        std::unique_ptr<LinkDest> link = pdf_doc->doc->findDest(&name);
+         if (link == 0 || !link->isOk())
+             pdftex_fail("PDF inclusion: invalid destination <%s>", page_name);
+         Ref ref = link->getPageRef();
+@@ -774,7 +774,6 @@ read_pdf_info(char *image_name, char *pa
+         if (page_num == 0)
+             pdftex_fail("PDF inclusion: destination is not a page <%s>",
+                         page_name);
+-        delete link;
+     } else {
+         // get page by number
+         if (page_num <= 0 || page_num > epdf_num_pages)

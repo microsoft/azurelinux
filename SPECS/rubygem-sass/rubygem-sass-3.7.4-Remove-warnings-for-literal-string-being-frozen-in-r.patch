@@ -1,0 +1,378 @@
+From 36c8580a47e96624c91ef16dcc2e03dc1ef5b921 Mon Sep 17 00:00:00 2001
+From: Mamoru TASAKA <mtasaka@fedoraproject.org>
+Date: Thu, 19 Dec 2024 17:20:28 +0900
+Subject: [PATCH 1/2] Remove warnings for literal string being frozen in
+ ruby3.4
+
+---
+ sass-3.7.4/lib/sass/media.rb                           |  2 +-
+ sass-3.7.4/lib/sass/script/lexer.rb                    |  1 +
+ sass-3.7.4/lib/sass/script/tree/interpolation.rb       |  4 ++--
+ .../lib/sass/script/tree/string_interpolation.rb       |  4 ++--
+ sass-3.7.4/lib/sass/scss/parser.rb                     |  2 +-
+ sass-3.7.4/lib/sass/scss/rx.rb                         |  2 +-
+ sass-3.7.4/lib/sass/scss/static_parser.rb              |  6 +++---
+ sass-3.7.4/lib/sass/selector.rb                        |  2 +-
+ sass-3.7.4/lib/sass/source/map.rb                      |  4 ++--
+ sass-3.7.4/lib/sass/tree/visitors/convert.rb           |  2 +-
+ sass-3.7.4/lib/sass/tree/visitors/perform.rb           |  3 ++-
+ sass-3.7.4/lib/sass/tree/visitors/to_css.rb            |  6 +++---
+ sass-3.7.4/lib/sass/util.rb                            |  7 ++++---
+ sass-3.7.4/test/sass/css2sass_test.rb                  |  6 +++---
+ sass-3.7.4/test/sass/encoding_test.rb                  | 10 +++++-----
+ sass-3.7.4/test/sass/source_map_test.rb                |  6 ++++--
+ 16 files changed, 36 insertions(+), 31 deletions(-)
+
+diff --git a/sass-3.7.4/lib/sass/media.rb b/sass-3.7.4/lib/sass/media.rb
+index dc4542d..caa49f7 100644
+--- a/sass-3.7.4/lib/sass/media.rb
++++ b/sass-3.7.4/lib/sass/media.rb
+@@ -147,7 +147,7 @@ module Sass::Media
+     #
+     # @return [String]
+     def to_css
+-      css = ''
++      css = ''.dup
+       css << resolved_modifier
+       css << ' ' unless resolved_modifier.empty?
+       css << resolved_type
+diff --git a/sass-3.7.4/lib/sass/script/lexer.rb b/sass-3.7.4/lib/sass/script/lexer.rb
+index 5f02ad9..3bfe175 100644
+--- a/sass-3.7.4/lib/sass/script/lexer.rb
++++ b/sass-3.7.4/lib/sass/script/lexer.rb
+@@ -449,6 +449,7 @@ MESSAGE
+ 
+       def special_fun_body(parens, prefix = nil)
+         str = prefix || ''
++        str = str.dup
+         while (scanned = scan(/.*?([()]|\#\{)/m))
+           str << scanned
+           if scanned[-1] == ?(
+diff --git a/sass-3.7.4/lib/sass/script/tree/interpolation.rb b/sass-3.7.4/lib/sass/script/tree/interpolation.rb
+index c62ac4e..818a972 100644
+--- a/sass-3.7.4/lib/sass/script/tree/interpolation.rb
++++ b/sass-3.7.4/lib/sass/script/tree/interpolation.rb
+@@ -67,7 +67,7 @@ module Sass::Script::Tree
+     def to_sass(opts = {})
+       return to_quoted_equivalent.to_sass if deprecation == :immediate
+ 
+-      res = ""
++      res = "".dup
+       res << @before.to_sass(opts) if @before
+       res << ' ' if @before && @whitespace_before
+       res << '#{' unless @originally_text
+@@ -160,7 +160,7 @@ module Sass::Script::Tree
+     # @return [Sass::Script::Value::String]
+     #   The SassScript string that is the value of the interpolation
+     def _perform(environment)
+-      res = ""
++      res = "".dup
+       res << @before.perform(environment).to_s if @before
+       res << " " if @before && @whitespace_before
+ 
+diff --git a/sass-3.7.4/lib/sass/script/tree/string_interpolation.rb b/sass-3.7.4/lib/sass/script/tree/string_interpolation.rb
+index c373c36..cc82735 100644
+--- a/sass-3.7.4/lib/sass/script/tree/string_interpolation.rb
++++ b/sass-3.7.4/lib/sass/script/tree/string_interpolation.rb
+@@ -52,7 +52,7 @@ module Sass::Script::Tree
+       quote = type == :string ? opts[:quote] || quote_for(self) || '"' : :none
+       opts = opts.merge(:quote => quote)
+ 
+-      res = ""
++      res = "".dup
+       res << quote if quote != :none
+       res << _to_sass(before, opts)
+       res << '#{' << @mid.to_sass(opts.merge(:quote => nil)) << '}'
+@@ -87,7 +87,7 @@ module Sass::Script::Tree
+     # @return [Sass::Script::Value::String]
+     #   The SassScript string that is the value of the interpolation
+     def _perform(environment)
+-      res = ""
++      res = "".dup
+       before = @before.perform(environment)
+       res << before.value
+       mid = @mid.perform(environment)
+diff --git a/sass-3.7.4/lib/sass/scss/parser.rb b/sass-3.7.4/lib/sass/scss/parser.rb
+index 55d1e1b..aa06fdf 100644
+--- a/sass-3.7.4/lib/sass/scss/parser.rb
++++ b/sass-3.7.4/lib/sass/scss/parser.rb
+@@ -1134,7 +1134,7 @@ module Sass
+         pos = @scanner.pos
+         line = @line
+         offset = @offset
+-        @strs.push ""
++        @strs.push "".dup
+         throw_error {yield} && @strs.last
+       rescue Sass::SyntaxError
+         @scanner.pos = pos
+diff --git a/sass-3.7.4/lib/sass/scss/rx.rb b/sass-3.7.4/lib/sass/scss/rx.rb
+index bfb3e4a..63803db 100644
+--- a/sass-3.7.4/lib/sass/scss/rx.rb
++++ b/sass-3.7.4/lib/sass/scss/rx.rb
+@@ -14,7 +14,7 @@ module Sass
+       def self.escape_ident(str)
+         return "" if str.empty?
+         return "\\#{str}" if str == '-' || str == '_'
+-        out = ""
++        out = "".dup
+         value = str.dup
+         out << value.slice!(0...1) if value =~ /^[-_]/
+         if value[0...1] =~ NMSTART
+diff --git a/sass-3.7.4/lib/sass/scss/static_parser.rb b/sass-3.7.4/lib/sass/scss/static_parser.rb
+index fff9d0e..cb5c50a 100644
+--- a/sass-3.7.4/lib/sass/scss/static_parser.rb
++++ b/sass-3.7.4/lib/sass/scss/static_parser.rb
+@@ -83,7 +83,7 @@ module Sass
+         sel = selector
+         return unless sel
+         selectors = [sel]
+-        ws = ''
++        ws = ''.dup
+         while tok(/,/)
+           ws << str {ss}
+           next unless (sel = selector)
+@@ -91,7 +91,7 @@ module Sass
+           if ws.include?("\n")
+             selectors[-1] = Selector::Sequence.new(["\n"] + selectors.last.members)
+           end
+-          ws = ''
++          ws = ''.dup
+         end
+         Selector::CommaSequence.new(selectors)
+       end
+@@ -137,7 +137,7 @@ MESSAGE
+ 
+       def reference_combinator
+         return unless tok(%r{/})
+-        res = '/'
++        res = '/'.dup
+         ns, name = expr!(:qualified_name)
+         res << ns << '|' if ns
+         res << name << tok!(%r{/})
+diff --git a/sass-3.7.4/lib/sass/selector.rb b/sass-3.7.4/lib/sass/selector.rb
+index cac8de4..49aa1c6 100644
+--- a/sass-3.7.4/lib/sass/selector.rb
++++ b/sass-3.7.4/lib/sass/selector.rb
+@@ -310,7 +310,7 @@ module Sass
+ 
+       # @see Selector#to_s
+       def to_s(opts = {})
+-        res = "["
++        res = "[".dup
+         res << @namespace << "|" if @namespace
+         res << @name
+         res << @operator << @value if @value
+diff --git a/sass-3.7.4/lib/sass/source/map.rb b/sass-3.7.4/lib/sass/source/map.rb
+index 80393cc..2e7607a 100644
+--- a/sass-3.7.4/lib/sass/source/map.rb
++++ b/sass-3.7.4/lib/sass/source/map.rb
+@@ -96,7 +96,7 @@ module Sass::Source
+       css_uri ||= Sass::Util.file_uri_from_path(
+         Sass::Util.relative_path_from(css_path, sourcemap_path.dirname))
+ 
+-      result = "{\n"
++      result = "{\n".dup
+       write_json_field(result, "version", 3, true)
+ 
+       source_uri_to_id = {}
+@@ -154,7 +154,7 @@ module Sass::Source
+           end
+ 
+           # `segment` is a data chunk for a single position mapping.
+-          segment = ""
++          segment = "".dup
+ 
+           # Field 1: zero-based starting offset.
+           segment << Sass::Util.encode_vlq(target_pos.offset - previous_target_offset)
+diff --git a/sass-3.7.4/lib/sass/tree/visitors/convert.rb b/sass-3.7.4/lib/sass/tree/visitors/convert.rb
+index ded21a2..87539be 100644
+--- a/sass-3.7.4/lib/sass/tree/visitors/convert.rb
++++ b/sass-3.7.4/lib/sass/tree/visitors/convert.rb
+@@ -174,7 +174,7 @@ class Sass::Tree::Visitors::Convert < Sass::Tree::Visitors::Base
+       if node.args.empty? && node.splat.nil?
+         ""
+       else
+-        str = '('
++        str = '('.dup
+         str << node.args.map do |v, d|
+           if d
+             "#{v.to_sass(@options)}: #{d.to_sass(@options)}"
+diff --git a/sass-3.7.4/lib/sass/tree/visitors/perform.rb b/sass-3.7.4/lib/sass/tree/visitors/perform.rb
+index c997014..84ba6ad 100644
+--- a/sass-3.7.4/lib/sass/tree/visitors/perform.rb
++++ b/sass-3.7.4/lib/sass/tree/visitors/perform.rb
+@@ -557,8 +557,9 @@ WARNING
+   end
+ 
+   def handle_import_loop!(node)
+-    msg = "An @import loop has been found:"
++    msg = "An @import loop has been found:".dup
+     files = @environment.stack.frames.select {|f| f.is_import?}.map {|f| f.filename}.compact
++    files = files.dup
+     if node.filename == node.imported_file.options[:filename]
+       raise Sass::SyntaxError.new("#{msg} #{node.filename} imports itself")
+     end
+diff --git a/sass-3.7.4/lib/sass/tree/visitors/to_css.rb b/sass-3.7.4/lib/sass/tree/visitors/to_css.rb
+index 29ec285..892c119 100644
+--- a/sass-3.7.4/lib/sass/tree/visitors/to_css.rb
++++ b/sass-3.7.4/lib/sass/tree/visitors/to_css.rb
+@@ -131,7 +131,7 @@ class Sass::Tree::Visitors::ToCss < Sass::Tree::Visitors::Base
+     if node.style == :compressed && trailing_semicolon?
+       erase! 1
+     end
+-    return "" if @result.empty?
++    return "".dup if @result.empty?
+ 
+     output "\n"
+ 
+@@ -414,7 +414,7 @@ class Sass::Tree::Visitors::ToCss < Sass::Tree::Visitors::Base
+   def debug_info_rule(debug_info, options)
+     node = Sass::Tree::DirectiveNode.resolved("@media -sass-debug-info")
+     debug_info.map {|k, v| [k.to_s, v.to_s]}.to_a.each do |k, v|
+-      rule = Sass::Tree::RuleNode.new([""])
++      rule = Sass::Tree::RuleNode.new(["".dup])
+       rule.resolved_rules = Sass::Selector::CommaSequence.new(
+         [Sass::Selector::Sequence.new(
+           [Sass::Selector::SimpleSequence.new(
+@@ -422,7 +422,7 @@ class Sass::Tree::Visitors::ToCss < Sass::Tree::Visitors::Base
+             false)
+           ])
+         ])
+-      prop = Sass::Tree::PropNode.new([""], [""], :new)
++      prop = Sass::Tree::PropNode.new(["".dup], ["".dup], :new)
+       prop.resolved_name = "font-family"
+       prop.resolved_value = Sass::SCSS::RX.escape_ident(v.to_s)
+       rule << prop
+diff --git a/sass-3.7.4/lib/sass/util.rb b/sass-3.7.4/lib/sass/util.rb
+index 54606fd..717f4d2 100644
+--- a/sass-3.7.4/lib/sass/util.rb
++++ b/sass-3.7.4/lib/sass/util.rb
+@@ -253,8 +253,9 @@ module Sass
+     # @param arr [Array]
+     # @return [Array] `arr`
+     def strip_string_array(arr)
++      arr[0] = arr.first.dup
+       arr.first.lstrip! if arr.first.is_a?(String)
+-      arr[-1] = Sass::Util.rstrip_except_escapes(arr[-1]) if arr.last.is_a?(String)
++      arr[-1] = Sass::Util.rstrip_except_escapes(arr[-1].dup) if arr.last.is_a?(String)
+       arr
+     end
+ 
+@@ -940,7 +941,7 @@ module Sass
+     def json_escape_string(s)
+       return s if s !~ /["\\\b\f\n\r\t]/
+ 
+-      result = ""
++      result = "".dup
+       s.split("").each do |c|
+         case c
+         when '"', "\\"
+@@ -1005,7 +1006,7 @@ module Sass
+         value <<= 1
+       end
+ 
+-      result = ''
++      result = ''.dup
+       begin
+         digit = value & VLQ_BASE_MASK
+         value >>= VLQ_BASE_SHIFT
+diff --git a/sass-3.7.4/test/sass/css2sass_test.rb b/sass-3.7.4/test/sass/css2sass_test.rb
+index 747610a..1effba6 100755
+--- a/sass-3.7.4/test/sass/css2sass_test.rb
++++ b/sass-3.7.4/test/sass/css2sass_test.rb
+@@ -498,7 +498,7 @@ CSS
+   # Encodings
+ 
+   def test_encoding_error
+-    css2sass("foo\nbar\nb\xFEaz".force_encoding("utf-8"))
++    css2sass("foo\nbar\nb\xFEaz".dup.force_encoding("utf-8"))
+     assert(false, "Expected exception")
+   rescue Sass::SyntaxError => e
+     assert_equal(3, e.sass_line)
+@@ -506,8 +506,8 @@ CSS
+   end
+ 
+   def test_ascii_incompatible_encoding_error
+-    template = "foo\nbar\nb_z".encode("utf-16le")
+-    template[9] = "\xFE".force_encoding("utf-16le")
++    template = "foo\nbar\nb_z".dup.encode("utf-16le")
++    template[9] = "\xFE".dup.force_encoding("utf-16le")
+     css2sass(template)
+     assert(false, "Expected exception")
+   rescue Sass::SyntaxError => e
+diff --git a/sass-3.7.4/test/sass/encoding_test.rb b/sass-3.7.4/test/sass/encoding_test.rb
+index 7dfc9ab..7f08ae9 100755
+--- a/sass-3.7.4/test/sass/encoding_test.rb
++++ b/sass-3.7.4/test/sass/encoding_test.rb
+@@ -7,7 +7,7 @@ class EncodingTest < Minitest::Test
+   include Sass::Util::Test
+ 
+   def test_encoding_error
+-    render("foo\nbar\nb\xFEaz".force_encoding("utf-8"))
++    render("foo\nbar\nb\xFEaz".dup.force_encoding("utf-8"))
+     assert(false, "Expected exception")
+   rescue Sass::SyntaxError => e
+     assert_equal(3, e.sass_line)
+@@ -15,8 +15,8 @@ class EncodingTest < Minitest::Test
+   end
+ 
+   def test_ascii_incompatible_encoding_error
+-    template = "foo\nbar\nb_z".encode("utf-16le")
+-    template[9] = "\xFE".force_encoding("utf-16le")
++    template = "foo\nbar\nb_z".dup.encode("utf-16le")
++    template[9] = "\xFE".dup.force_encoding("utf-16le")
+     render(template)
+     assert(false, "Expected exception")
+   rescue Sass::SyntaxError => e
+@@ -94,7 +94,7 @@ SASS
+   end
+ 
+   def test_utf_8_with_bom
+-    assert_renders_encoded(<<CSS, <<SASS.force_encoding("BINARY"))
++    assert_renders_encoded(<<CSS, <<SASS.dup.force_encoding("BINARY"))
+ @charset "UTF-8";
+ fóó {
+   a: b; }
+@@ -118,7 +118,7 @@ SASS
+   def test_charset_with_special_case_encoding
+     # For some reason, a file with an ASCII-compatible UTF-16 charset
+     # declaration is specced to be parsed as UTF-8.
+-    assert_renders_encoded(<<CSS, <<SASS.force_encoding("BINARY"))
++    assert_renders_encoded(<<CSS, <<SASS.dup.force_encoding("BINARY"))
+ @charset "UTF-8";
+ fóó {
+   a: b; }
+diff --git a/sass-3.7.4/test/sass/source_map_test.rb b/sass-3.7.4/test/sass/source_map_test.rb
+index abcb950..b047334 100755
+--- a/sass-3.7.4/test/sass/source_map_test.rb
++++ b/sass-3.7.4/test/sass/source_map_test.rb
+@@ -180,7 +180,7 @@ JSON
+   end
+ 
+   def test_different_charset_than_encoding_scss
+-    assert_parses_with_sourcemap(<<SCSS.force_encoding("IBM866"), <<CSS, <<JSON)
++    assert_parses_with_sourcemap(<<SCSS.dup.force_encoding("IBM866"), <<CSS, <<JSON)
+ @charset "IBM866";
+ f\x86\x86 {
+   \x86: b;
+@@ -203,7 +203,7 @@ JSON
+   end
+ 
+   def test_different_charset_than_encoding_sass
+-    assert_parses_with_sourcemap(<<SASS.force_encoding("IBM866"), <<CSS, <<JSON, :syntax => :sass)
++    assert_parses_with_sourcemap(<<SASS.dup.force_encoding("IBM866"), <<CSS, <<JSON, :syntax => :sass)
+ @charset "IBM866"
+ f\x86\x86
+   \x86: b
+@@ -963,6 +963,8 @@ CSS
+   end
+ 
+   def assert_parses_with_mapping(source, css, options={})
++    source = source.dup
++    css = css.dup
+     options[:syntax] ||= :scss
+     input_filename = filename_for_test(options[:syntax])
+     mapping = build_mapping_from_annotations(source, css, input_filename)
+-- 
+2.47.1
+

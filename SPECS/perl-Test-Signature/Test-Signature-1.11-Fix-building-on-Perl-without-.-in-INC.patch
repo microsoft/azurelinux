@@ -1,0 +1,28 @@
+From 47e776bedf2d355967988b7bf7014766594a5033 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Thu, 18 May 2017 10:50:41 +0200
+Subject: [PATCH] Fix building on Perl without "." in @INC
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ Makefile.PL | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Makefile.PL b/Makefile.PL
+index 72b0b3d..a4e8736 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -1,6 +1,7 @@
+ #!/usr/local/bin/perl
+ 
+ use strict;
++BEGIN { push @INC, '.'; }
+ use inc::Module::Install;
+ 
+ name        'Test-Signature';
+-- 
+2.9.4
+

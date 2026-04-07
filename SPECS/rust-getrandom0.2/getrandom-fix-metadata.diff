@@ -1,0 +1,36 @@
+--- getrandom-0.2.16/Cargo.toml	1970-01-01T00:00:01+00:00
++++ getrandom-0.2.16/Cargo.toml	2025-05-01T13:06:37.147769+00:00
+@@ -53,17 +53,9 @@
+ 
+ [features]
+ custom = []
+-js = [
+-]
+ linux_disable_fallback = []
+ rdrand = []
+-rustc-dep-of-std = [
+-    "compiler_builtins",
+-    "core",
+-    "libc/rustc-dep-of-std",
+-]
+ std = []
+-test-in-browser = []
+ 
+ [lib]
+ name = "getrandom"
+@@ -88,15 +80,6 @@
+ [dependencies.cfg-if]
+ version = "1"
+ 
+-[dependencies.compiler_builtins]
+-version = "0.1"
+-optional = true
+-
+-[dependencies.core]
+-version = "1.0"
+-optional = true
+-package = "rustc-std-workspace-core"
+-
+ [target."cfg(unix)".dependencies.libc]
+ version = "0.2.154"
+ default-features = false

@@ -1,0 +1,29 @@
+From 06512d47dc1491bf5686b2bd89a8555de9f2acc9 Mon Sep 17 00:00:00 2001
+From: Jun Aruga <jaruga@redhat.com>
+Date: Thu, 22 Dec 2022 16:14:39 +0100
+Subject: [PATCH] Use the SSL pem files in the Git repository.
+
+---
+ spec/mysql2/client_spec.rb | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/spec/mysql2/client_spec.rb b/spec/mysql2/client_spec.rb
+index 5861882..3f5cda8 100644
+--- a/spec/mysql2/client_spec.rb
++++ b/spec/mysql2/client_spec.rb
+@@ -153,9 +153,9 @@ RSpec.describe Mysql2::Client do # rubocop:disable Metrics/BlockLength
+     let(:option_overrides) do
+       {
+         'host'     => 'mysql2gem.example.com', # must match the certificates
+-        :sslkey    => '/etc/mysql/client-key.pem',
+-        :sslcert   => '/etc/mysql/client-cert.pem',
+-        :sslca     => '/etc/mysql/ca-cert.pem',
++        :sslkey    => 'spec/ssl/client-key.pem',
++        :sslcert   => 'spec/ssl/client-cert.pem',
++        :sslca     => 'spec/ssl/ca-cert.pem',
+         :sslcipher => 'DHE-RSA-AES256-SHA',
+         :sslverify => true,
+       }
+-- 
+2.38.1
+

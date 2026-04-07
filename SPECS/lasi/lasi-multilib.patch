@@ -1,0 +1,12 @@
+diff -up libLASi-1.1.3/examples/Makefile.examples.in.multilib libLASi-1.1.3/examples/Makefile.examples.in
+--- libLASi-1.1.3/examples/Makefile.examples.in.multilib	2019-10-01 20:31:50.445254192 -0600
++++ libLASi-1.1.3/examples/Makefile.examples.in	2019-10-01 20:32:42.520497884 -0600
+@@ -1,7 +1,7 @@
+ CXX = @CMAKE_CXX_COMPILER@
+ EXEEXT = @EXEEXT@
+ RPATHCMD = @RPATHCMD@
+-PKG_ENV = PKG_CONFIG_PATH=@PKG_CONFIG_PATH@
++PKG_ENV =
+ 
+ all: MissingGlyphExample.eps SimpleLASiExample.eps ComplexTextLayoutExample.eps
+ 

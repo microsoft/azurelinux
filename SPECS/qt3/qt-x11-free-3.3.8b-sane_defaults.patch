@@ -1,0 +1,76 @@
+diff -up qt-x11-free-3.3.8b/src/kernel/qapplication.cpp.sane_defaults qt-x11-free-3.3.8b/src/kernel/qapplication.cpp
+--- qt-x11-free-3.3.8b/src/kernel/qapplication.cpp.sane_defaults	2008-01-15 13:09:13.000000000 -0600
++++ qt-x11-free-3.3.8b/src/kernel/qapplication.cpp	2009-12-22 14:00:19.078553429 -0600
+@@ -1241,7 +1241,7 @@ QStyle& QApplication::style()
+ #elif defined(Q_WS_X11) && defined(Q_OS_IRIX)
+ 	    style = "SGI";			// default style for X11 on IRIX
+ #elif defined(Q_WS_X11)
+-		style = "Motif";		// default style for X11
++		style = "Platinum";		// default style for X11
+ #elif defined(Q_WS_MAC)
+ 		style = "Macintosh";		// default style for all Mac's
+ #elif defined(Q_WS_QWS)
+@@ -1250,8 +1250,8 @@ QStyle& QApplication::style()
+ 	}
+ 	app_style = QStyleFactory::create( style );
+ 	if ( !app_style &&		// platform default style not available, try alternatives
+-	     !(app_style = QStyleFactory::create( "Windows" ) ) &&
+ 	     !(app_style = QStyleFactory::create( "Platinum" ) ) &&
++	     !(app_style = QStyleFactory::create( "Windows" ) ) &&
+ 	     !(app_style = QStyleFactory::create( "MotifPlus" ) ) &&
+ 	     !(app_style = QStyleFactory::create( "Motif" ) ) &&
+ 	     !(app_style = QStyleFactory::create( "CDE" ) ) &&
+@@ -1731,6 +1731,13 @@ QStringList QApplication::libraryPaths()
+ 	    app_libpaths->append(installPathPlugins);
+ 	}
+ 
++ #if defined(Q_WS_X11)
++	QString kde3PathPlugins = QString("@@KDE3_PLUGIN_PATH@@");
++	if ( QFile::exists(kde3PathPlugins) ) {
++	    app_libpaths->append(kde3PathPlugins);
++	}
++#endif
++
+ 	QString app_location;
+ 	if (qApp)
+ 	    app_location = qApp->applicationFilePath();
+@@ -1933,7 +1940,7 @@ QFont QApplication::font( const QWidget 
+ 	}
+     }
+     if ( !app_font ) {
+-	app_font = new QFont( "Helvetica" );
++	app_font = new QFont( "Sans" );
+ 	Q_CHECK_PTR( app_font );
+     }
+     return *app_font;
+diff -up qt-x11-free-3.3.8b/src/kernel/qapplication_x11.cpp.sane_defaults qt-x11-free-3.3.8b/src/kernel/qapplication_x11.cpp
+--- qt-x11-free-3.3.8b/src/kernel/qapplication_x11.cpp.sane_defaults	2008-01-15 13:09:13.000000000 -0600
++++ qt-x11-free-3.3.8b/src/kernel/qapplication_x11.cpp	2009-12-22 13:54:58.335802790 -0600
+@@ -953,8 +953,11 @@ bool QApplication::x11_apply_settings()
+     // read new QStyle
+     extern bool qt_explicit_app_style; // defined in qapplication.cpp
+     QString stylename = settings.readEntry( "/qt/style" );
+-    if ( !stylename.isEmpty() && !qt_explicit_app_style ) {
+-	QApplication::setStyle( stylename );
++    if ( !qt_explicit_app_style ) {
++	if ( stylename.isEmpty() )
++	    QApplication::setStyle( QString("Platinum") );
++	else
++	    QApplication::setStyle( stylename );
+ 	// took the style from the user settings, so mark the explicit flag FALSE
+ 	qt_explicit_app_style = FALSE;
+     }
+@@ -2095,11 +2098,11 @@ void qt_init_internal( int *argcptr, cha
+ 	// At 95 DPI, a 12 point font should be 16 pixels tall - in which case a 17
+ 	// pixel font is a closer match than a 12 pixel font
+ 	int ptsz =
+-	    (int) ( ( ( QPaintDevice::x11AppDpiY() >= 95 ? 17. : 12. ) *
++	    (int) ( ( ( QPaintDevice::x11AppDpiY() >= 95 ? 13. : 11. ) *
+ 		      72. / (float) QPaintDevice::x11AppDpiY() ) + 0.5 );
+ 
+ 	if ( !qt_app_has_font && !qt_x11_cmdline_font ) {
+-	    QFont f( "Helvetica", ptsz );
++	    QFont f( "Sans", ptsz );
+ 	    QApplication::setFont( f );
+ 	}
+ 

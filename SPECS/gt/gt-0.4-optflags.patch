@@ -1,0 +1,22 @@
+diff -up gt-0.4/src/Makefile.in~ gt-0.4/src/Makefile.in
+--- gt-0.4/src/Makefile.in~	2008-01-27 15:00:48.000000000 +0100
++++ gt-0.4/src/Makefile.in	2008-01-27 15:00:48.000000000 +0100
+@@ -573,7 +573,6 @@ uninstall-man: uninstall-man1
+ 	uninstall-info-am uninstall-man uninstall-man1
+ 
+ 
+-override CFLAGS = -O3 -g -fomit-frame-pointer -ffast-math
+ 
+ cfg.c: cfg.l
+ 	rm -f cfg.c
+diff -up gt-0.4/src/Makefile.am~ gt-0.4/src/Makefile.am
+--- gt-0.4/src/Makefile.am~	2008-01-27 15:00:51.000000000 +0100
++++ gt-0.4/src/Makefile.am	2008-01-27 15:00:51.000000000 +0100
+@@ -7,7 +7,6 @@ AM_INCLUDES = $(CURSES_INCLUDEDIR)
+ AM_CFLAGS = -DDEFAULT_PATH=\"$(TIMID_DIR)\" $(ALSA_CFLAGS) -Wall -W -Wshadow \
+ 	    -Wpointer-arith -Wcast-align $(AM_INCLUDES) $(VORBIS_CFLAGS)
+ 
+-override CFLAGS = -O3 -g -fomit-frame-pointer -ffast-math
+ 
+ 
+ #gt_LDADD = $(ALSA_LIBS) $(CURSES_LIBS) $(AVCODEC_LIBS) $(VORBIS_LIBS)

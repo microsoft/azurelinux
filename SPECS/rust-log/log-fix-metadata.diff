@@ -1,0 +1,85 @@
+--- log-0.4.29/Cargo.toml	2006-07-24T01:21:28+00:00
++++ log-0.4.29/Cargo.toml	2025-12-16T21:17:49.606440+00:00
+@@ -36,45 +36,10 @@
+ features = [
+     "std",
+     "serde",
+-    "kv_std",
+-    "kv_sval",
+-    "kv_serde",
+ ]
+ 
+ [features]
+ kv = []
+-kv_serde = [
+-    "kv_std",
+-    "value-bag/serde",
+-    "serde",
+-]
+-kv_std = [
+-    "std",
+-    "kv",
+-    "value-bag/error",
+-]
+-kv_sval = [
+-    "kv",
+-    "value-bag/sval",
+-    "sval",
+-    "sval_ref",
+-]
+-kv_unstable = [
+-    "kv",
+-    "value-bag",
+-]
+-kv_unstable_serde = [
+-    "kv_serde",
+-    "kv_unstable_std",
+-]
+-kv_unstable_std = [
+-    "kv_std",
+-    "kv_unstable",
+-]
+-kv_unstable_sval = [
+-    "kv_sval",
+-    "kv_unstable",
+-]
+ max_level_debug = []
+ max_level_error = []
+ max_level_info = []
+@@ -111,22 +76,6 @@
+ optional = true
+ default-features = false
+ 
+-[dependencies.sval]
+-version = "2.16"
+-optional = true
+-default-features = false
+-
+-[dependencies.sval_ref]
+-version = "2.16"
+-optional = true
+-default-features = false
+-
+-[dependencies.value-bag]
+-version = "1.12"
+-features = ["inline-i128"]
+-optional = true
+-default-features = false
+-
+ [dev-dependencies.proc-macro2]
+ version = "1.0.63"
+ default-features = false
+@@ -140,13 +89,3 @@
+ 
+ [dev-dependencies.serde_test]
+ version = "1.0"
+-
+-[dev-dependencies.sval]
+-version = "2.16"
+-
+-[dev-dependencies.sval_derive]
+-version = "2.16"
+-
+-[dev-dependencies.value-bag]
+-version = "1.12"
+-features = ["test"]

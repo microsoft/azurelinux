@@ -1,0 +1,61 @@
+From cd64584212c0b684496e649fa7aea1b50b139b84 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Fri, 27 Sep 2024 14:19:09 +0200
+Subject: [PATCH] unconditionally use pkg-config to find libjxl
+
+---
+ build.rs | 40 +++++++++++-----------------------------
+ 1 file changed, 11 insertions(+), 29 deletions(-)
+
+diff --git a/build.rs b/build.rs
+index 803c34b..94b42cc 100644
+--- a/build.rs
++++ b/build.rs
+@@ -18,33 +18,15 @@
+ //! Build script for jpegxl-sys.
+ 
+ fn main() {
+-    #[cfg(all(not(feature = "vendored"), not(feature = "docs")))]
+-    {
+-        use std::env;
+-        let version = env!("CARGO_PKG_VERSION")
+-            .split('+')
+-            .nth(1)
+-            .and_then(|s| s.split('-').nth(1))
+-            .unwrap();
+-
+-        if let Ok(path) = env::var("DEP_JXL_LIB") {
+-            println!("cargo:rustc-link-search=native={path}");
+-            println!("cargo:rustc-link-lib=jxl");
+-            println!("cargo:rustc-link-lib=jxl_threads");
+-        } else {
+-            pkg_config::Config::new()
+-                .atleast_version(version)
+-                .probe("libjxl")
+-                .unwrap_or_else(|_| panic!("Cannot find `libjxl` with version >= {version}"));
+-            pkg_config::Config::new()
+-                .atleast_version(version)
+-                .probe("libjxl_threads")
+-                .unwrap_or_else(|_| {
+-                    panic!("Cannot find `libjxl_threads` with version >= {version}")
+-                });
+-        }
+-    }
+-
+-    #[cfg(feature = "vendored")]
+-    jpegxl_src::build();
++    let version = "0.11.1";
++    pkg_config::Config::new()
++        .atleast_version(version)
++        .probe("libjxl")
++        .unwrap_or_else(|_| panic!("Cannot find `libjxl` with version >= {}", version));
++    pkg_config::Config::new()
++        .atleast_version(version)
++        .probe("libjxl_threads")
++        .unwrap_or_else(|_| {
++            panic!("Cannot find `libjxl_threads` with version >= {}", version)
++        });
+ }
+-- 
+2.51.0
+

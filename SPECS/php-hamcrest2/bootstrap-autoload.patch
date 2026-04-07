@@ -1,0 +1,25 @@
+diff -up ./hamcrest/Hamcrest/Util.php.rpm ./hamcrest/Hamcrest/Util.php
+--- ./hamcrest/Hamcrest/Util.php.rpm	2018-01-22 09:48:17.689161741 +0100
++++ ./hamcrest/Hamcrest/Util.php	2018-01-22 09:48:24.644197714 +0100
+@@ -14,7 +14,7 @@ class Util
+ {
+     public static function registerGlobalFunctions()
+     {
+-        require_once __DIR__.'/../Hamcrest.php';
++        require_once __DIR__.'/Hamcrest.php';
+     }
+ 
+     /**
+diff -up ./tests/bootstrap.php.rpm ./tests/bootstrap.php
+--- ./tests/bootstrap.php.rpm	2016-01-20 09:20:44.000000000 +0100
++++ ./tests/bootstrap.php	2018-01-22 09:46:19.525550567 +0100
+@@ -2,7 +2,8 @@
+ 
+ error_reporting(E_ALL | E_STRICT);
+ 
+-require __DIR__ . '/../vendor/autoload.php';
++require __DIR__ . '/../hamcrest/Hamcrest/autoload.php';
++require __DIR__ . '/autoload.php';
+ 
+ if (defined('E_DEPRECATED')) {
+     error_reporting(error_reporting() | E_DEPRECATED);

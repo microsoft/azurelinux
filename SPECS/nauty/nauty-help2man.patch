@@ -1,0 +1,297 @@
+Description: format usages and helps
+ Attempt to format usages and helps of the invited
+ programs wrt to the original gtools.
+Origin: debian
+Author: Jerome Benoit <calculus@rezozer.net>
+Last-Update: 2016-03-19
+
+--- a/bliss2dre.c
++++ b/bliss2dre.c
+@@ -1,5 +1,6 @@
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <string.h>
+ /* Reads a graph in Bliss/DIMACS format from stdin and writes it in
+  * dreadnaut format to stdout.  If there is an argument, it is written
+  * to the output before the graph.  If there are two arguments, they
+@@ -43,6 +44,13 @@ main(int argc, char *argv[])
+     int i,v,w;
+     int haveptn;
+ 
++    if (argc > 1 && strcmp(argv[1],"--help") == 0)
++    {
++        puts("Usage: bliss2dre < bliss.graph > dreadnaut.graph");
++        puts("       Reads a graph in Bliss/DIMACS format from stdin.");
++        puts("       Writes the graph in dreadnaut format to stdout.");
++        return 0;
++    }
+     haven = 0;
+     j = 0;
+     while ((c = nextchar()) >= 0)
+--- a/cubhamg.c
++++ b/cubhamg.c
+@@ -3,8 +3,7 @@
+    Version 2.1 of December 2025. */
+ 
+ #define USAGE \
+- "cubhamg [-#] [-v|-V]" \
+- " [-n#-#|-y#-#|-i|-I|-o|-O|-x|-e|-E|-c] [-b|-t] [infile [outfile]]"
++ "cubhamg [-#] [-v|-V] [-n#-#|-y#-#|-i|-I|-o|-O|-x|-e|-E|-c] [-b|-t] [infile [outfile]]"
+ 
+ #define HELPTEXT \
+ " cubhamg : Find hamiltonian cycles in sub-cubic graphs\n" \
+--- a/genbg.c
++++ b/genbg.c
+@@ -3,8 +3,7 @@
+ /* TODO: consider colour swaps */
+ 
+ #define USAGE \
+-"genbg [-c -ugs -vq -lzF] [-Z#] [-D#] [-A] [-d#|-d#:#] [-D#|-D#:#] n1 n2 \n\
+-                [mine[:maxe]] [res/mod] [file]"
++"genbg [-c -ugs -vq -lzF] [-Z#] [-D#] [-A] [-d#|-d#:#] [-D#|-D#:#] n1 n2 [mine[:maxe]] [res/mod] [file]"
+ 
+ #define HELPTEXT \
+ " Find all bicoloured graphs of a specified class.\n\
+--- a/geng.c
++++ b/geng.c
+@@ -6,8 +6,7 @@
+ /* geng.c  version 3.7; B D McKay, April 2024. */
+ 
+ #define USAGE \
+-"geng [-cCmtfkbd#D#] [-kTSPF] [-uygsnh] [-lvq] \n\
+-              [-x#X#] n [mine[:maxe]] [res/mod] [file]"
++"geng [-cCmtfkbd#D#] [-kTSPF] [-uygsnh] [-lvq] [-x#X#] n [mine[:maxe]] [res/mod] [file]"
+ 
+ #define HELPTEXT \
+ " Generate all graphs of a specified class.\n\
+--- a/genposetg.c
++++ b/genposetg.c
+@@ -804,14 +804,14 @@ static void all_subsets(int start, int e
+ 
+ static void usage(char name[])
+ 
+-{ fprintf(stderr,"\nUsage: %s n [o|t] [q] [m x y] where n <= 16 is the number of points\n",name );
+-  fprintf(stderr,"   Generate the Hasse diagrams of the posets with n points\n");
+-  fprintf(stderr,"   o  causes digraph6 output in arbitrary order to be written to stdout\n");
+-  fprintf(stderr,"   t  causes digraph6 output in topological order to be written to stdout\n");
+-  fprintf(stderr,"   c  restricts the program to connected posets\n");
+-  fprintf(stderr,"   q  supresses statistics except for the final count\n");
+-  fprintf(stderr,"   m x y  with 0 <= x < y divides the generation\n"
+-              "        into y parts and writes only part x.\n");
++{ printf("\nUsage: %s n [o|t] [q] [m x y] where n <= 16 is the number of points\n",name );
++  printf("   Generate the Hasse diagrams of the posets with n points\n");
++  printf("   -o  causes digraph6 output in arbitrary order to be written to stdout\n");
++  printf("   -t  causes digraph6 output in topological order to be written to stdout\n");
++  printf("   -c  restricts the program to connected posets\n");
++  printf("   -q  supresses statistics except for the final count\n");
++  printf("   -m x y  with 0 <= x < y divides the generation\n"
++         "           into y parts and writes only part x.\n");
+   exit(0); } 
+ 
+ #if 0
+--- a/genrang.c
++++ b/genrang.c
+@@ -2,8 +2,7 @@
+ /* TODO:  Check allocs for no edges */
+ 
+ #define USAGE \
+-"genrang [-P#|-P#/#|-e#|-r#|-R#|-d#] [-M#] [-l#] [-m#] [-t] [-T] [-a] \n" \
+-"         [-s|-g|-z] [-S#] [-q] n|n1,n2 num [outfile]"
++"genrang [-P#|-P#/#|-e#|-r#|-R#|-d#] [-M#] [-l#] [-m#] [-t] [-T] [-a] [-s|-g|-z] [-S#] [-q] n|n1,n2 num [outfile]"
+ 
+ #define HELPTEXT \
+ " Generate random graphs.\n\
+--- a/genspecialg.c
++++ b/genspecialg.c
+@@ -5,8 +5,9 @@
+ 
+ #define HELPTEXT \
+ " Generate special graphs.\n\
+-     #  : size parameter called n in the descriptions\n\
+ \n\
++Options:\n\
++General Options:\n\
+     -s : Write in sparse6 format (default)\n\
+     -g : Write in graph6 format\n\
+     -z : Make digraph versions and write in digraph6 format\n\
+@@ -14,7 +15,10 @@
+     -v : For each graph, report the size to stderr\n\
+     -q : Suppress summary\n\
+ \n\
+-    If defined, the digraph version is shown in <angle brackets>:\n\
++Special Options:\n\
++ If defined, the digraph version is shown in <angle brackets>:\n\
++ # size parameter called n in the descriptoins.\n\
++\n\
+     -p#   : path <directed path> on n vertices\n\
+     -c#   : cycle <directed cycle> on n vertices\n\
+     -e#   : empty graph <digraph with loops only> on n vertices\n\
+@@ -35,9 +39,9 @@
+     -J#,# : Johnson graph J(n,k), args are n and k\n\
+     -K#,# -K#,#,# : Generalized Kneser graph. K(n,k,t) is graph of k-subsets\n\
+             of an n-set whose intersection is t. Default for t is 0.\n\
+-    -C#,#... : circulant <di>graph; first arg is the number of vertices\n\
+-    -T#,#... : theta <di>graph Theta(#,#,...), give path lengths\n\
+-    -G#,#... : <directed> grid, use negative values for open directions\n\
++    -C[,#] : circulant <di>graph; first arg is the number of vertices\n\
++    -T[,#] : theta <di>graph Theta(#,#,...), give path lengths\n\
++    -G[,#] : <directed> grid, use negative values for open directions\n\
+     -Y#   : Paley graph or digraph, depending on size. Nondeterministic.\n\
+     -X# : produce a named graph, # can be an index or a partial name.\n\
+           Use genspecialg --Xhelp for a list.\n\
+--- a/watercluster2.c
++++ b/watercluster2.c
+@@ -1,53 +1,65 @@
+ // cc -O4 -o water2 -DWORDSIZE=32 -DMAXN=WORDSIZE nauty.c naugraph.c nautil.c gtools.c schreier.c naurng.c watercluster2.c
+ 
+-/*
+-Reads graphs in g6 code or multicode (optional) from stdin and directs them 
+-
+-options: 
+-
+-ix  means: the indegree of every vertex may be at most x.
+-
+-oy  means: the outdegree of every vertex may be at most y.
+-
+-  S  means: allow that for every pair of vertices x,y at most one of the edges x-->y 
+-     and y-->x may be present. By default both of them may be present in the same graph.
+-
+-
+-  T  means: Output directed graphs in T-code. This is a simple ASCII output format. Every line
+-     contains one graph. First the number of vertices, then the number of 
+-     directed edges and then the list of directed edges with the start first 
+-     and the end then. E.g.: 3 2 0 1 2 1 means 3 vertices, 2 directed edges:
+-     0-->1 and 2-->1
+-
+-  B  means: Output the directed graphs in a binary code. Every item of the code is an unsigned
+-     char. The first unsigned char is the number nv of vertices. The vertices are numbered 1..nv
+-     Then the list of vertices x for which there is a directed edge 1->x follow. This list is
+-     ended by a 0. Then the list of outgoing neighbours of 2 follows -- again ended with a 0, etc.
+-     The code is complete with the 0 ending the list of outgoing neighbours of nv.
+-
+-  Z  means: Output the directed graphs in digraph6 code. See formats.txt for a complete definition.
+-
+-  C  means: Do really construct all the directed graphs in memory, but don't output them. This is not
+-     a big difference in case of restricted in- and outdegrees, because all that is done extra is that 
+-     edges are directed instead of just keeping track of in- and out-degrees. This option is intended only
+-     for testing purposes to test also routines that are normally not used when counting. Things that would 
+-     speed up the counting also in some cases of restricted in- and out-degrees -- like multiplying the 
+-     possibilities of assigning directions to edges that can be assigned directions independent 
+-     of each other (depending on the degrees of the endvertices and overlaps) -- are not included. 
+-     In case of not restrictive bounds on the in- and out-degree it not really constructing the graphs
+-     can be considerably faster. In cases of restricted in- and out-degrees the only difference is that
+-     the graph isn't modified...
+-     The fact that in case of no output the graph is not modified is mainly to save time for the one 
+-     case of waterclusters, where large numbers were determined. If large numbers (without output)
+-     for other cases shall be determined, one should think about adding the multiplication routines.
+-
+-   m read multicode
+-
+-This program uses different labelling routines -- all based on the ideas of 
++#define GTOOL_USAGEHELP_COMPATIBILITY
+ 
+-G. Brinkmann, Generating water clusters and other directed graphs,
+-Journal of Mathematical Chemistry 46, 1112--1121 (2009)
++#define USAGE "watercluster2 [ix] [oy] [S] [T] [B] [Z] [C] [m]"
+ 
++#define HELPTEXT \
++" Reads graphs in g6 code or multicode (optional) from stdin and directs them\n\
++\n\
++  ix: the indegree of every vertex may be at most x.\n\
++      The default maximum indegree is unlimited.\n\
++\n\
++  oy: the outdegree of every vertex may be at most y.\n\
++      The default maximum outdegree is unlimited.\n\
++\n\
++  S : allow that for every pair of vertices x,y at most one of the edges x-->y\n\
++      and y-->x may be present. By default both of them may be present in the\n\
++      same graph.\n\
++\n\
++  T : Output directed graphs in T-code. This is a simple ASCII output format.\n\
++      Every line contains one graph. First the number of vertices, then the\n\
++      number of directed edges and then the list of directed edges with the\n\
++      start first and the end then. E.g.: 3 2 0 1 2 1 means 3 vertices, 2\n\
++      directed edges:\n\
++      0-->1 and 2-->1\n\
++\n\
++  B : Output the directed graphs in a binary code. Every item of the code is an\n\
++      unsigned char. The first unsigned char is the number nv of vertices. The\n\
++      vertices are numbered 1..nv. Then the list of vertices x for which there\n\
++      is a directed edge 1->x follow. This list is ended by a 0. Then the list\n\
++      of outgoing neighbours of 2 follows -- again ended with a 0, etc.\n\
++      The code is complete with the 0 ending the list of outgoing neighbours of\n\
++      nv.\n\
++\n\
++  Z : Output the directed graphs in digraph6 code. See formats.txt for a\n\
++      complete definition.\n\
++\n\
++  C : Do really construct all the directed graphs in memory, but don't output\n\
++      them. This is not a big difference in case of restricted in- and\n\
++      outdegrees, because all that is done extra is that edges are directed\n\
++      instead of just keeping track of in- and out-degrees. This option is\n\
++      intended only for testing purposes to test also routines that are normally\n\
++      not used when counting. Things that would speed up the counting also in\n\
++      some cases of restricted in- and out-degrees -- like multiplying the\n\
++      possibilities of assigning directions to edges that can be assigned\n\
++      directions independent of each other (depending on the degrees of the\n\
++      endvertices and overlaps) -- are not included.\n\
++      In case of not restrictive bounds on the in- and out-degree it not really\n\
++      constructing the graphs can be considerably faster. In cases of restricted\n\
++      in- and out-degrees the only difference is that the graph isn't modified.\n\
++      The fact that in case of no output the graph is not modified is mainly to\n\
++      save time for the one case of waterclusters, where large numbers were\n\
++      determined. If large numbers (without output) for other cases shall be\n\
++      determined, one should think about adding the multiplication routines.\n\
++\n\
++  m : read multicode instead of g6 code\n\
++\n\
++This program uses different labelling routines -- all based on the ideas of\n\
++\n\
++G. Brinkmann, Generating water clusters and other directed graphs,\n\
++Journal of Mathematical Chemistry 46, 1112--1121 (2009)\n"
++/*
+ October 10, 2011: corrected error caused by overflow of 32bit int used as hashvalue.
+ 
+ Sep, 2012: PROCESS feature added by BDM.
+@@ -73,7 +85,7 @@ Jan, 2025: stack space reduced by making
+  *
+  * If SUMMARY is defined, it must expand as the name of a procedure
+  * with prototype  void SUMMARY(void).  It is called at the end after
+- * the normal summary. 
++ * the normal summary.
+  */
+ 
+ //#include<stdio.h>
+@@ -4046,6 +4058,15 @@ int main(int argc, char *argv[])
+   int multicode=0, g6code=1;
+   // long long int last=0LL;    BDM
+ 
++#ifdef GTOOL_USAGEHELP_COMPATIBILITY
++	if (argc > 1 && (strcmp(argv[1],"-help") == 0
++                       || (strcmp(argv[1],"--help") == 0)))
++	{
++	    printf("Usage: %s\n\n%s",USAGE,HELPTEXT);
++	    exit(0);
++	}
++#endif
++
+   if (sizeof(long long int)<8) 
+     { 
+       fprintf(stderr,">E long long too short; This may cause problems with the hashing function for large degree -- exit().\n");
+@@ -4067,7 +4088,15 @@ int main(int argc, char *argv[])
+             else  if (argv[i][0]=='Z') direct_output=4;    /* BDM */
+               else  if (argv[i][0]=='S') double_allowed=0;
+                 else  if (argv[i][0]=='m') { g6code=0; multicode=1; }
+-      else usage(argv[0]);
++      else {
++#ifdef GTOOL_USAGEHELP_COMPATIBILITY
++        fprintf(stderr, ">E Usage: %s\n", USAGE);
++        fprintf(stderr, "Use watercluster2 -help to see a list of the options.\n");
++        exit(1);
++#else
++        usage(argv[0]);
++#endif
++      }
+     }
+ 
+ #ifdef PROCESS

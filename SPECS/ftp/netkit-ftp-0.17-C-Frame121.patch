@@ -1,0 +1,25 @@
+--- netkit-ftp-0.17/ftp/ftp.c.rasold	2005-10-26 16:56:09.000000000 +0200
++++ netkit-ftp-0.17/ftp/ftp.c	2005-10-26 16:56:46.000000000 +0200
+@@ -1253,14 +1253,14 @@
+ 		switch (data_addr.su_family) {
+ 		case AF_INET:
+ #if 0
+-			if (try_epsv) {
+-				result = command(pasvcmd = "EPSV 1");
+-				if (code / 10 == 22 && code != 229) {
+-					fprintf(stderr,
+-				  "wrong server: return code must be 229\n");
+-					result = COMPLETE + 1;
+-				}
+-			} else {
++/*@*/			if (try_epsv) {
++/*@*/				result = command(pasvcmd = "EPSV 1");
++/*@*/				if (code / 10 == 22 && code != 229) {
++/*@*/					fprintf(stderr,
++/*@*/				  "wrong server: return code must be 229\n");
++/*@*/					result = COMPLETE + 1;
++/*@*/				}
++/*@*/			} else {
+ #endif
+ 			result = COMPLETE + 1;
+ 

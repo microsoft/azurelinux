@@ -1,0 +1,898 @@
+From dd6cec8d5278e11f2a1752aa7b4a712d53b1f1d3 Mon Sep 17 00:00:00 2001
+From: MSP-Greg <greg.mpls@gmail.com>
+Date: Sun, 13 Jan 2019 21:23:03 -0600
+Subject: [PATCH] Update SSL tests, 1.1.x & TLSv1_3
+
+Add Ruby 2.6 to Travis osx for OpenSSL 1.1.0
+
+Note that order of 'ssl_handshake_completed' callbacks in TLSv1_3 are reversed
+---
+ tests/test_ssl_dhparam.rb    |    6 +-
+ tests/test_ssl_ecdh_curve.rb |   45 ++++++
+ tests/test_ssl_extensions.rb |   56 +++++---
+ tests/test_ssl_methods.rb    |    3 
+ tests/test_ssl_protocols.rb  |  322 +++++++++++++++++--------------------------------
+ tests/test_ssl_verify.rb     |  110 ++++++++++------
+ 6 files changed, 263 insertions(+), 279 deletions(-)
+
+diff --git a/tests/test_ssl_dhparam.rb b/tests/test_ssl_dhparam.rb
+index 0a7f01da..e5165caf 100644
+--- a/tests/test_ssl_dhparam.rb
++++ b/tests/test_ssl_dhparam.rb
+@@ -8,7 +8,7 @@ def setup
+ 
+   module Client
+     def post_init
+-      start_tls
++      start_tls(:ssl_version => %w(TLSv1_2))
+     end
+ 
+     def ssl_handshake_completed
+@@ -24,7 +24,7 @@ def unbind
+ 
+   module Server
+     def post_init
+-      start_tls(:dhparam => $dhparam_file, :cipher_list => "DHE,EDH")
++      start_tls(:dhparam => $dhparam_file, :cipher_list => "DHE,EDH", :ssl_version => %w(TLSv1_2))
+     end
+ 
+     def ssl_handshake_completed
+@@ -35,7 +35,7 @@ def ssl_handshake_completed
+ 
+   module NoDhServer
+     def post_init
+-      start_tls(:cipher_list => "DHE,EDH")
++      start_tls(:cipher_list => "DHE,EDH", :ssl_version => %w(TLSv1_2))
+     end
+ 
+     def ssl_handshake_completed
+diff --git a/tests/test_ssl_ecdh_curve.rb b/tests/test_ssl_ecdh_curve.rb
+index c4148ce9..53b8ae24 100644
+--- a/tests/test_ssl_ecdh_curve.rb
++++ b/tests/test_ssl_ecdh_curve.rb
+@@ -1,6 +1,11 @@
+ require 'em_test_helper'
+ 
+ class TestSslEcdhCurve < Test::Unit::TestCase
++  if EM.ssl?
++    SSL_LIB_VERS = EM::OPENSSL_LIBRARY_VERSION[/OpenSSL (\d+\.\d+\.\d+)/, 1]
++      .split('.').map(&:to_i)
++  end
++
+   module Client
+     def post_init
+       start_tls
+@@ -17,7 +15,7 @@ def post_init
+     def ssl_handshake_completed
+       $client_handshake_completed = true
+       $client_cipher_name = get_cipher_name
+-      close_connection
++      close_connection unless /TLSv1\.3/i =~ get_cipher_protocol
+     end
+ 
+     def unbind
+@@ -27,7 +25,11 @@ def unbind
+ 
+   module Server
+     def post_init
+-      start_tls(:ecdh_curve => "prime256v1", :cipher_list => "ECDH")
++      if (SSL_LIB_VERS <=> [1, 1]) == 1
++        start_tls(:cipher_list => "ECDH", :ssl_version => %w(TLSv1_2))
++      else
++        start_tls(:ecdh_curve => "prime256v1", :cipher_list => "ECDH", :ssl_version => %w(TLSv1_2))
++      end
+     end
+ 
+     def ssl_handshake_completed
+@@ -36,9 +38,21 @@ def ssl_handshake_completed
+     end
+   end
+ 
++  module Server1_3
++    def post_init
++      start_tls(:cipher_list => "ECDH", :ssl_version => %w(TLSv1_3))
++    end
++
++    def ssl_handshake_completed
++      $server_handshake_completed = true
++      $server_cipher_name = get_cipher_name
++      close_connection if /TLSv1\.3/i =~ get_cipher_protocol
++    end
++  end
++
+   module NoCurveServer
+     def post_init
+-      start_tls(:cipher_list => "ECDH")
++      start_tls(:cipher_list => "ECDH", :ssl_version => %w(TLSv1_2))
+     end
+ 
+     def ssl_handshake_completed
+@@ -50,6 +64,7 @@ def ssl_handshake_completed
+   def test_no_ecdh_curve
+     omit_unless(EM.ssl?)
+     omit_if(rbx?)
++    omit("OpenSSL 1.1.x (and later) auto selects curve") if (SSL_LIB_VERS <=> [1, 1]) == 1
+ 
+     $client_handshake_completed, $server_handshake_completed = false, false
+ 
+@@ -85,5 +99,27 @@ def test_ecdh_curve
+     assert_match(/^(AECDH|ECDHE)/, $client_cipher_name)
+   end
+ 
++  def test_ecdh_curve_tlsv1_3
++    omit("No SSL") unless EM.ssl?
++    omit_if(EM.library_type == :pure_ruby && RUBY_VERSION < "2.3.0")
++    omit_if(rbx?)
++    omit("TLSv1_3 is unavailable") unless EM.const_defined? :EM_PROTO_TLSv1_3
+ 
++    $client_handshake_completed, $server_handshake_completed = false, false
++    $server_cipher_name, $client_cipher_name = nil, nil
++
++    EM.run {
++      EM.start_server("127.0.0.1", 16784, Server1_3)
++      EM.connect("127.0.0.1", 16784, Client)
++    }
++
++    assert($client_handshake_completed)
++    assert($server_handshake_completed)
++
++    assert($client_cipher_name.length > 0)
++    assert_equal($client_cipher_name, $server_cipher_name)
++    # see https://wiki.openssl.org/index.php/TLS1.3#Ciphersuites
++    # may depend on OpenSSL build options
++    assert_equal("TLS_AES_256_GCM_SHA384", $client_cipher_name)
++  end
+ end
+diff --git a/tests/test_ssl_extensions.rb b/tests/test_ssl_extensions.rb
+index 594feb95..93f4ef5a 100644
+--- a/tests/test_ssl_extensions.rb
++++ b/tests/test_ssl_extensions.rb
+@@ -5,43 +5,57 @@
+ if EM.ssl?
+   class TestSslExtensions < Test::Unit::TestCase
+ 
++    IP, PORT = "127.0.0.1", 16784
++  
+     module Client
+-      def ssl_handshake_completed
+-        $client_handshake_completed = true
+-        close_connection
+-      end
+-
+-      def unbind
+-        EM.stop_event_loop
++      def self.ssl_vers=(val = nil)
++        @@ssl_vers = val
+       end
+ 
+       def post_init
+-        start_tls(:ssl_version => :tlsv1, :sni_hostname => 'example.com')
++        start_tls(:sni_hostname => 'example.com', :ssl_version => @@ssl_vers)
+       end
+     end
+ 
+     module Server
+-      def ssl_handshake_completed
+-        $server_handshake_completed = true
+-        $server_sni_hostname = get_sni_hostname
+-      end
++      @@handshake_completed = false
++      @@sni_hostname = 'Not set'
++      
++      def self.handshake_completed? ; !!@@handshake_completed end
++      def self.sni_hostname         ;   @@sni_hostname        end
+ 
+       def post_init
+-        start_tls(:ssl_version => :TLSv1)
++        start_tls
+       end
+-    end
+ 
+-    def test_tlsext_sni_hostname
+-      $server_handshake_completed = false
++      def ssl_handshake_completed
++        @@handshake_completed = true
++        @@sni_hostname = get_sni_hostname
++      end
++    end
+ 
++    def client_server(client = nil)
+       EM.run do
+-        EM.start_server("127.0.0.1", 16784, Server)
+-        EM.connect("127.0.0.1", 16784, Client)
++        Client.ssl_vers = client
++        EM.start_server IP, PORT, Server
++        EM.connect IP, PORT, Client
++        EM.add_timer(0.3) { EM.stop_event_loop }
+       end
+-
+-      assert($server_handshake_completed)
+-      assert_equal('example.com', $server_sni_hostname)
+     end
++    
++    def test_tlsext_sni_hostname_1_2
++      client_server %w(TLSv1_2)
++      assert Server.handshake_completed?
++      assert_equal 'example.com', Server.sni_hostname
++    end
++    
++    def test_tlsext_sni_hostname_1_3
++      omit("TLSv1_3 is unavailable") unless SSL_AVAIL.include? "tlsv1_3"
++      client_server %w(TLSv1_3)
++      assert Server.handshake_completed?
++      assert_equal 'example.com', Server.sni_hostname
++    end
++    
+   end
+ else
+   warn "EM built without SSL support, skipping tests in #{__FILE__}"
+diff --git a/tests/test_ssl_methods.rb b/tests/test_ssl_methods.rb
+index 3c45ee5d..022844fd 100644
+--- a/tests/test_ssl_methods.rb
++++ b/tests/test_ssl_methods.rb
+@@ -13,6 +13,7 @@ def ssl_handshake_completed
+       $server_cipher_bits = get_cipher_bits
+       $server_cipher_name = get_cipher_name
+       $server_cipher_protocol = get_cipher_protocol
++      EM.stop_event_loop if /TLSv1\.3/ =~ get_cipher_protocol
+     end
+   end
+ 
+@@ -27,7 +28,7 @@ def ssl_handshake_completed
+       $client_cipher_bits = get_cipher_bits
+       $client_cipher_name = get_cipher_name
+       $client_cipher_protocol = get_cipher_protocol
+-      EM.stop_event_loop
++      EM.stop_event_loop if /TLSv1\.3/ !~ get_cipher_protocol
+     end
+   end
+ 
+diff --git a/tests/test_ssl_protocols.rb b/tests/test_ssl_protocols.rb
+index 96c57c23..6b10eb6b 100644
+--- a/tests/test_ssl_protocols.rb
++++ b/tests/test_ssl_protocols.rb
+@@ -3,319 +1,224 @@
+ require 'openssl'
+ 
+ if EM.ssl?
++
+   class TestSslProtocols < Test::Unit::TestCase
+ 
++    IP, PORT = "127.0.0.1", 16784
++    RUBY_SSL_GE_2_1 = OpenSSL::VERSION >= '2.1'
++
+     module Client
+-      def ssl_handshake_completed
+-        $client_handshake_completed = true
+-        close_connection
+-      end
++      @@handshake_completed = false
+ 
+-      def unbind
+-        EM.stop_event_loop
++      def self.ssl_vers=(val = nil)
++        @@ssl_vers = val
+       end
+-    end
+ 
+-    module Server
+-      def ssl_handshake_completed
+-        $server_handshake_completed = true
++      def self.handshake_completed?
++        @@handshake_completed
+       end
+-    end
+ 
+-    module ClientAny
+-      include Client
+       def post_init
+-        start_tls(:ssl_version => TestSslProtocols::SSL_AVAIL)
++        @@handshake_completed = false
++        if @@ssl_vers
++          start_tls(:ssl_version => @@ssl_vers)
++        else
++          start_tls
++        end
+       end
+-    end
+ 
+-    module ClientDefault
+-      include Client
+-      def post_init
+-        start_tls
+-      end
+-    end
+-
+-    module ClientSSLv3
+-      include Client
+-      def post_init
+-        start_tls(:ssl_version => %w(SSLv3))
++      def ssl_handshake_completed
++        @@handshake_completed = true
+       end
+     end
+ 
+-    module ServerSSLv3
+-      include Server
+-      def post_init
+-        start_tls(:ssl_version => %w(SSLv3))
+-      end
+-    end
++    module Server
++      @@handshake_completed = false
+ 
+-    module ClientTLSv1_2
+-      include Client
+-      def post_init
+-        start_tls(:ssl_version => %w(TLSv1_2))
++      def self.ssl_vers=(val = nil)
++        @@ssl_vers = val
+       end
+-    end
+ 
+-    module ServerTLSv1_2
+-      include Server
+-      def post_init
+-        start_tls(:ssl_version => %w(TLSv1_2))
+-      end
+-    end
++      def self.handshake_completed? ; @@handshake_completed end
+ 
+-    module ServerTLSv1CaseInsensitive
+-      include Server
+       def post_init
+-        start_tls(:ssl_version => %w(tlsv1))
+-      end
+-    end
+-
+-    module ServerAny
+-      include Server
+-      def post_init
+-        start_tls(:ssl_version => TestSslProtocols::SSL_AVAIL)
++        @@handshake_completed = false
++        if @@ssl_vers
++          start_tls(:ssl_version => @@ssl_vers)
++        else
++          start_tls
++        end
+       end
+-    end
+ 
+-    module ServerDefault
+-      include Server
+-      def post_init
+-        start_tls
++      def ssl_handshake_completed
++        @@handshake_completed = true
+       end
+     end
+ 
+-    module InvalidProtocol
+-      include Client
+-      def post_init
+-        start_tls(:ssl_version => %w(tlsv1 badinput))
++    def client_server(client = nil, server = nil)
++      EM.run do
++        Client.ssl_vers, Server.ssl_vers = client, server
++        EM.start_server IP, PORT, Server
++        EM.connect IP, PORT, Client
++        EM.add_timer(0.3) { EM.stop_event_loop }
+       end
+     end
+ 
+     def test_invalid_ssl_version
+       assert_raises(RuntimeError, "Unrecognized SSL/TLS Version: badinput") do
+-        EM.run do
+-          EM.start_server("127.0.0.1", 16784, InvalidProtocol)
+-          EM.connect("127.0.0.1", 16784, InvalidProtocol)
+-        end
++        client_server %w(tlsv1 badinput), %w(tlsv1 badinput)
+       end
+     end
+ 
+     def test_any_to_v3
+       omit("SSLv3 is (correctly) unavailable") if EM::OPENSSL_NO_SSL3
+-      $client_handshake_completed, $server_handshake_completed = false, false
+-      EM.run do
+-        EM.start_server("127.0.0.1", 16784, ServerSSLv3)
+-        EM.connect("127.0.0.1", 16784, ClientAny)
+-      end
+-
+-      assert($client_handshake_completed)
+-      assert($server_handshake_completed)
++      client_server SSL_AVAIL, %w(SSLv3)
++      assert Client.handshake_completed?
++      assert Server.handshake_completed?
+     end
+ 
+     def test_any_to_tlsv1_2
+-      omit("TLSv1_2 is unavailable") unless SSL_AVAIL.include? "TLSv1_2"
+-      $client_handshake_completed, $server_handshake_completed = false, false
+-      EM.run do
+-        EM.start_server("127.0.0.1", 16784, ServerTLSv1_2)
+-        EM.connect("127.0.0.1", 16784, ClientAny)
+-      end
+-
+-      assert($client_handshake_completed)
+-      assert($server_handshake_completed)
++      client_server SSL_AVAIL, %w(TLSv1_2)
++      assert Client.handshake_completed?
++      assert Server.handshake_completed?
+     end
+ 
+     def test_case_insensitivity
+-      $client_handshake_completed, $server_handshake_completed = false, false
+-      EM.run do
+-        EM.start_server("127.0.0.1", 16784, ServerTLSv1CaseInsensitive)
+-        EM.connect("127.0.0.1", 16784, ClientAny)
+-      end
+-
+-      assert($client_handshake_completed)
+-      assert($server_handshake_completed)
++      lower_case = SSL_AVAIL.map { |p| p.downcase }
++      client_server %w(tlsv1), lower_case
++      assert Client.handshake_completed?
++      assert Server.handshake_completed?
+     end
+ 
+     def test_v3_to_any
+       omit("SSLv3 is (correctly) unavailable") if EM::OPENSSL_NO_SSL3
+-      $client_handshake_completed, $server_handshake_completed = false, false
+-      EM.run do
+-        EM.start_server("127.0.0.1", 16784, ServerAny)
+-        EM.connect("127.0.0.1", 16784, ClientSSLv3)
+-      end
+-
+-      assert($client_handshake_completed)
+-      assert($server_handshake_completed)
++      client_server %w(SSLv3), SSL_AVAIL
++      assert Client.handshake_completed?
++      assert Server.handshake_completed?
+     end
+ 
+     def test_tlsv1_2_to_any
+-      omit("TLSv1_2 is unavailable") unless SSL_AVAIL.include? "TLSv1_2"
+-      $client_handshake_completed, $server_handshake_completed = false, false
+-      EM.run do
+-        EM.start_server("127.0.0.1", 16784, ServerAny)
+-        EM.connect("127.0.0.1", 16784, ClientTLSv1_2)
+-      end
+-
+-      assert($client_handshake_completed)
+-      assert($server_handshake_completed)
++      client_server %w(TLSv1_2), SSL_AVAIL
++      assert Client.handshake_completed?
++      assert Server.handshake_completed?
+     end
+ 
+     def test_v3_to_v3
+       omit("SSLv3 is (correctly) unavailable") if EM::OPENSSL_NO_SSL3
+-      $client_handshake_completed, $server_handshake_completed = false, false
+-      EM.run do
+-        EM.start_server("127.0.0.1", 16784, ServerSSLv3)
+-        EM.connect("127.0.0.1", 16784, ClientSSLv3)
+-      end
+-
+-      assert($client_handshake_completed)
+-      assert($server_handshake_completed)
++      client_server %w(SSLv3), %w(SSLv3)
++      assert Client.handshake_completed?
++      assert Server.handshake_completed?
+     end
+ 
+     def test_tlsv1_2_to_tlsv1_2
+-      omit("TLSv1_2 is unavailable") unless SSL_AVAIL.include? "TLSv1_2"
+-      $client_handshake_completed, $server_handshake_completed = false, false
+-      EM.run do
+-        EM.start_server("127.0.0.1", 16784, ServerTLSv1_2)
+-        EM.connect("127.0.0.1", 16784, ClientTLSv1_2)
+-      end
++      client_server %w(TLSv1_2), %w(TLSv1_2)
++      assert Client.handshake_completed?
++      assert Server.handshake_completed?
++    end
+ 
+-      assert($client_handshake_completed)
+-      assert($server_handshake_completed)
++    def test_tlsv1_3_to_tlsv1_3
++      omit("TLSv1_3 is unavailable") unless EM.const_defined? :EM_PROTO_TLSv1_3
++      client_server %w(TLSv1_3), %w(TLSv1_3)
++      assert Client.handshake_completed?
++      assert Server.handshake_completed?
+     end
+ 
+     def test_any_to_any
+-      $client_handshake_completed, $server_handshake_completed = false, false
+-      EM.run do
+-        EM.start_server("127.0.0.1", 16784, ServerAny)
+-        EM.connect("127.0.0.1", 16784, ClientAny)
+-      end
+-
+-      assert($client_handshake_completed)
+-      assert($server_handshake_completed)
++      client_server SSL_AVAIL, SSL_AVAIL
++      assert Client.handshake_completed?
++      assert Server.handshake_completed?
+     end
+ 
+     def test_default_to_default
+-      $client_handshake_completed, $server_handshake_completed = false, false
+-      EM.run do
+-        EM.start_server("127.0.0.1", 16784, ServerDefault)
+-        EM.connect("127.0.0.1", 16784, ClientDefault)
+-      end
+-
+-      assert($client_handshake_completed)
+-      assert($server_handshake_completed)
+-    end
+-
+-    module ServerV3StopAfterHandshake
+-      def post_init
+-        start_tls(:ssl_version => %w(SSLv3))
+-      end
+-
+-      def ssl_handshake_completed
+-        $server_handshake_completed = true
+-        EM.stop_event_loop
+-      end
++      client_server
++      assert Client.handshake_completed?
++      assert Server.handshake_completed?
+     end
+ 
+-    module ServerTLSv1_2StopAfterHandshake
+-      def post_init
+-        start_tls(:ssl_version => %w(TLSv1_2))
++    module ServerStopAfterHandshake
++      def self.ssl_vers=(val)
++        @@ssl_vers = val
+       end
+ 
+-      def ssl_handshake_completed
+-        $server_handshake_completed = true
+-        EM.stop_event_loop
+-      end
+-    end
++      def self.handshake_completed? ; @@handshake_completed end
+ 
+-    module ServerAnyStopAfterHandshake
+       def post_init
+-        start_tls(:ssl_version => TestSslProtocols::SSL_AVAIL)
++        @@handshake_completed = false
++        start_tls(:ssl_version => @@ssl_vers)
+       end
+ 
+       def ssl_handshake_completed
+-        $server_handshake_completed = true
++        @@handshake_completed = true
+         EM.stop_event_loop
+       end
+     end
+ 
+-    def test_v3_with_external_client
+-      omit("SSLv3 is (correctly) unavailable") if EM::OPENSSL_NO_SSL3
+-      $server_handshake_completed = false
++    def external_client(ext_min, ext_max, ext_ssl, server)
+       EM.run do
+         setup_timeout(2)
+-        EM.start_server("127.0.0.1", 16784, ServerV3StopAfterHandshake)
++        ServerStopAfterHandshake.ssl_vers = server
++        EM.start_server(IP, PORT, ServerStopAfterHandshake)
+         EM.defer do
+-          sock = TCPSocket.new("127.0.0.1", 16784)
++          sock = TCPSocket.new(IP, PORT)
+           ctx = OpenSSL::SSL::SSLContext.new
+-          ctx.ssl_version = :SSLv3_client
++          if RUBY_SSL_GE_2_1
++            ctx.min_version = ext_min if ext_min
++            ctx.max_version = ext_max if ext_max
++          else
++            ctx.ssl_version = ext_ssl
++          end
+           ssl = OpenSSL::SSL::SSLSocket.new(sock, ctx)
+           ssl.connect
+           ssl.close rescue nil
+           sock.close rescue nil
+         end
+       end
++      assert ServerStopAfterHandshake.handshake_completed?
++    end
+ 
+-      assert($server_handshake_completed)
++    def test_v3_with_external_client
++      omit("SSLv3 is (correctly) unavailable") if EM::OPENSSL_NO_SSL3
++      external_client nil, nil, :SSLv3_client, %w(SSLv3)
+     end
+ 
+     # Fixed Server
+     def test_tlsv1_2_with_external_client
+-      omit("TLSv1_2 is unavailable") unless SSL_AVAIL.include? "TLSv1_2"
+-      $server_handshake_completed = false
+-      EM.run do
+-        setup_timeout(2)
+-        EM.start_server("127.0.0.1", 16784, ServerTLSv1_2StopAfterHandshake)
+-        EM.defer do
+-          sock = TCPSocket.new("127.0.0.1", 16784)
+-          ctx = OpenSSL::SSL::SSLContext.new
+-          ctx.ssl_version = :SSLv23
+-          ssl = OpenSSL::SSL::SSLSocket.new(sock, ctx)
+-          ssl.connect
+-          ssl.close rescue nil
+-          sock.close rescue nil
+-        end
+-      end
++      external_client nil, nil, :SSLv23_client, %w(TLSv1_2)
++    end
+ 
+-      assert($server_handshake_completed)
++    def test_tlsv1_3_with_external_client
++      omit("TLSv1_3 is unavailable") unless EM.const_defined? :EM_PROTO_TLSv1_3
++      external_client nil, nil, :SSLv23_client, %w(TLSv1_3)
+     end
+ 
+     # Fixed Client
+     def test_any_with_external_client_tlsv1_2
+-      omit("TLSv1_2 is unavailable") unless SSL_AVAIL.include? "TLSv1_2"
+-      $server_handshake_completed = false
+-      EM.run do
+-        setup_timeout(2)
+-        EM.start_server("127.0.0.1", 16784, ServerAnyStopAfterHandshake)
+-        EM.defer do
+-          sock = TCPSocket.new("127.0.0.1", 16784)
+-          ctx = OpenSSL::SSL::SSLContext.new
+-          ctx.ssl_version = :TLSv1_2
+-          ssl = OpenSSL::SSL::SSLSocket.new(sock, ctx)
+-          ssl.connect
+-          ssl.close rescue nil
+-          sock.close rescue nil
+-        end
+-      end
++      external_client :TLS1_2, :TLS1_2, :TLSv1_2_client, SSL_AVAIL
++    end
+ 
+-      assert($server_handshake_completed)
++    def test_any_with_external_client_tlsv1_3
++      omit("TLSv1_3 is unavailable") unless EM.const_defined? :EM_PROTO_TLSv1_3
++      external_client :TLS1_3, :TLS1_3, :TLSv1_2_client, SSL_AVAIL
+     end
+ 
+     # Refuse a client?
+     def test_tlsv1_2_required_with_external_client
+-      omit("TLSv1_2 is unavailable") unless SSL_AVAIL.include? "TLSv1_2"
+-      $server_handshake_completed = false
+       EM.run do
+         n = 0
+         EM.add_periodic_timer(0.5) do
+           n += 1
+           (EM.stop rescue nil) if n == 2
+         end
+-        EM.start_server("127.0.0.1", 16784, ServerTLSv1_2StopAfterHandshake)
++        ServerStopAfterHandshake.ssl_vers = %w(TLSv1_2)
++        EM.start_server(IP, PORT, ServerStopAfterHandshake)
+         EM.defer do
+-          sock = TCPSocket.new("127.0.0.1", 16784)
++          sock = TCPSocket.new(IP, PORT)
+           ctx = OpenSSL::SSL::SSLContext.new
+-          ctx.ssl_version = :TLSv1
++          if RUBY_SSL_GE_2_1
++            ctx.max_version = :TLS1_1
++          else
++            ctx.ssl_version = :TLSv1_client
++          end
+           ssl = OpenSSL::SSL::SSLSocket.new(sock, ctx)
+           assert_raise(OpenSSL::SSL::SSLError) { ssl.connect }
+           ssl.close rescue nil
+@@ -323,10 +226,9 @@ def test_tlsv1_2_required_with_external_client
+           EM.stop rescue nil
+         end
+       end
+-
+-      assert(!$server_handshake_completed)
++      assert !ServerStopAfterHandshake.handshake_completed?
+     end
+   end
+ else
+   warn "EM built without SSL support, skipping tests in #{__FILE__}"
+-end
++end
+\ No newline at end of file
+diff --git a/tests/test_ssl_verify.rb b/tests/test_ssl_verify.rb
+index 00ec1466..0c84e97e 100644
+--- a/tests/test_ssl_verify.rb
++++ b/tests/test_ssl_verify.rb
+@@ -1,74 +1,100 @@
+ require 'em_test_helper'
+ 
+ class TestSslVerify < Test::Unit::TestCase
+-  def setup
+-    $dir = File.dirname(File.expand_path(__FILE__)) + '/'
+-    $cert_from_file = File.read($dir+'client.crt')
+-  end
++
++  DIR = File.dirname(File.expand_path(__FILE__)) + '/'
++  CERT_FROM_FILE = File.read(DIR+'client.crt')
++
++  IP, PORT = "127.0.0.1", 16784
+ 
+   module ClientNoCert
+-    def connection_completed
++    @@handshake_completed = nil
++    def self.handshake_completed? ; !!@@handshake_completed end
++
++    def post_init
++      @@handshake_completed = false
+       start_tls()
+     end
+ 
+     def ssl_handshake_completed
+-      $client_handshake_completed = true
+-      close_connection
++      @@handshake_completed = true
+     end
+ 
+     def unbind
+-      EM.stop_event_loop
++      @@handshake_completed = false
+     end
+   end
+ 
+   module Client
+-    def connection_completed
+-      start_tls(:private_key_file => $dir+'client.key', :cert_chain_file => $dir+'client.crt')
++    @@handshake_completed = nil
++    def self.handshake_completed? ; !!@@handshake_completed end
++    def self.timer=(val)          ;   @@timer = val         end
++
++    def post_init #G connection_completed
++      @client_closed = false
++      @@handshake_completed = nil
++      @@timer = false
++      start_tls(:private_key_file => DIR+'client.key', :cert_chain_file => DIR+'client.crt')
+     end
+ 
+     def ssl_handshake_completed
+-      $client_handshake_completed = true
+-      close_connection
++      @@handshake_completed = true
+     end
+ 
+     def unbind
+-      EM.stop_event_loop
++      @@handshake_completed = false unless @@timer
+     end
+   end
+ 
+   module AcceptServer
++    @@handshake_completed = nil
++    def self.handshake_completed? ; !!@@handshake_completed end
++    def self.cert ; @@cert end
++
+     def post_init
++      @@cert = nil
++      @@handshake_completed = false
+       start_tls(:verify_peer => true)
+     end
+ 
+     def ssl_verify_peer(cert)
+-      $cert_from_server = cert
++      @@cert = cert
+       true
+     end
+ 
+     def ssl_handshake_completed
+-      $server_handshake_completed = true
++      @@handshake_completed = true
+     end
+   end
+ 
+   module DenyServer
++    @@handshake_completed = nil
++    def self.handshake_completed? ; !!@@handshake_completed end
++    def self.cert ; @@cert end
++
+     def post_init
++      @@cert = nil
++      @@handshake_completed = nil
+       start_tls(:verify_peer => true)
+     end
+ 
+     def ssl_verify_peer(cert)
+-      $cert_from_server = cert
++      @@cert = cert
+       # Do not accept the peer. This should now cause the connection to shut down without the SSL handshake being completed.
+       false
+     end
+ 
+     def ssl_handshake_completed
+-      $server_handshake_completed = true
++      @@handshake_completed = true
+     end
+   end
+ 
+   module FailServerNoPeerCert
++    @@handshake_completed = nil
++    def self.handshake_completed? ; !!@@handshake_completed end
++
+     def post_init
++      @@handshake_completed = false
+       start_tls(:verify_peer => true, :fail_if_no_peer_cert => true)
+     end
+ 
+@@ -77,52 +103,52 @@ def ssl_verify_peer(cert)
+     end
+ 
+     def ssl_handshake_completed
+-      $server_handshake_completed = true
++      @@handshake_completed = true
+     end
+   end
+ 
++  def em_run(server, client)
++    EM.run {
++      EM.start_server IP, PORT, server
++      EM.connect IP, PORT, client
++      EM.add_timer(0.3) {
++        Client.timer = true
++        EM.stop_event_loop
++      }
++    }
++  end
++
+   def test_fail_no_peer_cert
+     omit_unless(EM.ssl?)
+     omit_if(rbx?)
+ 
+-    $client_handshake_completed, $server_handshake_completed = false, false
++    em_run FailServerNoPeerCert, ClientNoCert
+ 
+-    EM.run {
+-      EM.start_server("127.0.0.1", 16784, FailServerNoPeerCert)
+-      EM.connect("127.0.0.1", 16784, ClientNoCert)
+-    }
+-
+-    assert(!$client_handshake_completed)
+-    assert(!$server_handshake_completed)
++    assert !ClientNoCert.handshake_completed?
++    assert !FailServerNoPeerCert.handshake_completed?
+   end
+ 
+   def test_accept_server
+     omit_unless(EM.ssl?)
+     omit_if(EM.library_type == :pure_ruby) # Server has a default cert chain
+     omit_if(rbx?)
+-    $client_handshake_completed, $server_handshake_completed = false, false
+-    EM.run {
+-      EM.start_server("127.0.0.1", 16784, AcceptServer)
+-      EM.connect("127.0.0.1", 16784, Client).instance_variable_get("@signature")
+-    }
+ 
+-    assert_equal($cert_from_file, $cert_from_server)
+-    assert($client_handshake_completed)
+-    assert($server_handshake_completed)
++    em_run AcceptServer, Client
++
++    assert_equal CERT_FROM_FILE, AcceptServer.cert
++    assert Client.handshake_completed?
++    assert AcceptServer.handshake_completed?
+   end
+ 
+   def test_deny_server
+     omit_unless(EM.ssl?)
+     omit_if(EM.library_type == :pure_ruby) # Server has a default cert chain
+     omit_if(rbx?)
+-    $client_handshake_completed, $server_handshake_completed = false, false
+-    EM.run {
+-      EM.start_server("127.0.0.1", 16784, DenyServer)
+-      EM.connect("127.0.0.1", 16784, Client)
+-    }
+ 
+-    assert_equal($cert_from_file, $cert_from_server)
+-    assert(!$client_handshake_completed)
+-    assert(!$server_handshake_completed)
++    em_run DenyServer, Client
++
++    assert_equal CERT_FROM_FILE, DenyServer.cert
++    assert !Client.handshake_completed?
++    assert !DenyServer.handshake_completed?
+   end
+ end

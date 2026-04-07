@@ -1,0 +1,16 @@
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/configure.pri qtbase-everywhere-src-5.15.18-new/configure.pri
+--- qtbase-everywhere-src-5.15.18/configure.pri	2025-06-05 16:07:26.000000000 +0200
++++ qtbase-everywhere-src-5.15.18-new/configure.pri	2025-11-07 14:10:28.891966440 +0100
+@@ -365,8 +365,11 @@ defineTest(qtConfTest_detectPkgConfig) {
+             qtLog("Found pkg-config from path: $$pkgConfig")
+         }
+     }
++    !isEmpty(pkgConfig):!$$qtConfEvaluate("features.shared") {
++        pkgConfig = "$$pkgConfig --static"
++    }
+ 
+-    $$qtConfEvaluate("features.cross_compile") {
++    false {
+         # cross compiling, check that pkg-config is set up sanely
+         sysroot = $$config.input.sysroot
+ 

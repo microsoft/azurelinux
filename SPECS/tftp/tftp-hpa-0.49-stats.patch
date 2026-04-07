@@ -1,0 +1,14 @@
+diff -up tftp-hpa-0.49/tftp/tftp.c.stats tftp-hpa-0.49/tftp/tftp.c
+--- tftp-hpa-0.49/tftp/tftp.c.stats	2011-01-03 15:38:34.217918067 +0100
++++ tftp-hpa-0.49/tftp/tftp.c	2011-01-03 15:38:37.498917014 +0100
+@@ -400,8 +400,8 @@ static void printstats(const char *direc
+ {
+     double delta;
+ 
+-    delta = (tstop.tv_sec + (tstop.tv_usec / 100000.0)) -
+-        (tstart.tv_sec + (tstart.tv_usec / 100000.0));
++    delta = (tstop.tv_sec + (tstop.tv_usec / 1000000.0)) -
++        (tstart.tv_sec + (tstart.tv_usec / 1000000.0));
+     if (verbose) {
+         printf("%s %lu bytes in %.1f seconds", direction, amount, delta);
+         printf(" [%.0f bit/s]", (amount * 8.) / delta);

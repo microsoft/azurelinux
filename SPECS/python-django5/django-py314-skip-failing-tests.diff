@@ -1,0 +1,18 @@
+--- a/tests/utils_tests/test_html.py
++++ b/tests/utils_tests/test_html.py
+@@ -1,6 +1,7 @@
+ import os
+ import sys
+ from datetime import datetime
++from unittest import skip
+ 
+ from django.core.exceptions import SuspiciousOperation
+ from django.core.serializers.json import DjangoJSONEncoder
+@@ -117,6 +118,7 @@ class TestUtilsHtml(SimpleTestCase):
+                 self.check_output(linebreaks, value, output)
+                 self.check_output(linebreaks, lazystr(value), output)
+ 
++    @skip("Fails on Python 3.14")
+     def test_strip_tags(self):
+         # Python fixed a quadratic-time issue in HTMLParser in 3.13.6, 3.12.12,
+         # 3.11.14, 3.10.19, and 3.9.24. The fix slightly changes HTMLParser's

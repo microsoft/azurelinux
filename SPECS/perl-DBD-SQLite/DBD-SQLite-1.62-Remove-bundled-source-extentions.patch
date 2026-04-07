@@ -1,0 +1,96 @@
+From 244f130b8f918cc80b1c2165877102fe56d6611f Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Wed, 2 Jan 2019 13:34:31 +0100
+Subject: [PATCH] Remove bundled source extentions
+
+---
+ README            | 30 ------------------------------
+ lib/DBD/SQLite.pm | 31 -------------------------------
+ 2 files changed, 61 deletions(-)
+
+diff --git a/README b/README
+index 34973a3..069cdeb 100644
+--- a/README
++++ b/README
+@@ -1439,36 +1439,6 @@ VIRTUAL TABLES IMPLEMENTED IN PERL
+   Other Perl virtual tables may also be published separately on
+   CPAN.
+ 
+-FOR DBD::SQLITE EXTENSION AUTHORS
+-  Since 1.30_01, you can retrieve the bundled SQLite C source and/or
+-  header like this:
+-
+-    use File::ShareDir 'dist_dir';
+-    use File::Spec::Functions 'catfile';
+-  
+-    # the whole sqlite3.h header
+-    my $sqlite3_h = catfile(dist_dir('DBD-SQLite'), 'sqlite3.h');
+-  
+-    # or only a particular header, amalgamated in sqlite3.c
+-    my $what_i_want = 'parse.h';
+-    my $sqlite3_c = catfile(dist_dir('DBD-SQLite'), 'sqlite3.c');
+-    open my $fh, '<', $sqlite3_c or die $!;
+-    my $code = do { local $/; <$fh> };
+-    my ($parse_h) = $code =~ m{(
+-      /\*+[ ]Begin[ ]file[ ]$what_i_want[ ]\*+
+-      .+?
+-      /\*+[ ]End[ ]of[ ]$what_i_want[ ]\*+/
+-    )}sx;
+-    open my $out, '>', $what_i_want or die $!;
+-    print $out $parse_h;
+-    close $out;
+-
+-  You usually want to use this in your extension's "Makefile.PL",
+-  and you may want to add DBD::SQLite to your extension's
+-  "CONFIGURE_REQUIRES" to ensure your extension users use the same C
+-  source/header they use to build DBD::SQLite itself (instead of the
+-  ones installed in their system).
+-
+ TO DO
+   The following items remain to be done.
+ 
+diff --git a/lib/DBD/SQLite.pm b/lib/DBD/SQLite.pm
+index f6b90e4..e1150aa 100644
+--- a/lib/DBD/SQLite.pm
++++ b/lib/DBD/SQLite.pm
+@@ -2649,37 +2649,6 @@ sources, etc.
+ 
+ Other Perl virtual tables may also be published separately on CPAN.
+ 
+-=head1 FOR DBD::SQLITE EXTENSION AUTHORS
+-
+-Since 1.30_01, you can retrieve the bundled SQLite C source and/or
+-header like this:
+-
+-  use File::ShareDir 'dist_dir';
+-  use File::Spec::Functions 'catfile';
+-  
+-  # the whole sqlite3.h header
+-  my $sqlite3_h = catfile(dist_dir('DBD-SQLite'), 'sqlite3.h');
+-  
+-  # or only a particular header, amalgamated in sqlite3.c
+-  my $what_i_want = 'parse.h';
+-  my $sqlite3_c = catfile(dist_dir('DBD-SQLite'), 'sqlite3.c');
+-  open my $fh, '<', $sqlite3_c or die $!;
+-  my $code = do { local $/; <$fh> };
+-  my ($parse_h) = $code =~ m{(
+-    /\*+[ ]Begin[ ]file[ ]$what_i_want[ ]\*+
+-    .+?
+-    /\*+[ ]End[ ]of[ ]$what_i_want[ ]\*+/
+-  )}sx;
+-  open my $out, '>', $what_i_want or die $!;
+-  print $out $parse_h;
+-  close $out;
+-
+-You usually want to use this in your extension's C<Makefile.PL>,
+-and you may want to add DBD::SQLite to your extension's C<CONFIGURE_REQUIRES>
+-to ensure your extension users use the same C source/header they use
+-to build DBD::SQLite itself (instead of the ones installed in their
+-system).
+-
+ =head1 TO DO
+ 
+ The following items remain to be done.
+-- 
+2.17.2
+

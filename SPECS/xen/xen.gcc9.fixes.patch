@@ -1,0 +1,23 @@
+--- xen-4.11.1/xen/drivers/passthrough/vtd/vtd.h.orig	2018-11-29 14:04:11.000000000 +0000
++++ xen-4.11.1/xen/drivers/passthrough/vtd/vtd.h	2019-02-05 21:32:50.056774501 +0000
+@@ -28,7 +28,7 @@
+ /* Allow for both IOAPIC and IOSAPIC. */
+ #define IO_xAPIC_route_entry IO_APIC_route_entry
+ 
+-struct IO_APIC_route_remap_entry {
++struct __packed IO_APIC_route_remap_entry {
+     union {
+         u64 val;
+         struct {
+--- xen-4.11.1/xen/arch/x86/cpu/mtrr/generic.c.orig	2018-11-29 14:04:11.000000000 +0000
++++ xen-4.11.1/xen/arch/x86/cpu/mtrr/generic.c	2019-02-10 19:24:09.378805103 +0000
+@@ -171,6 +171,9 @@
+ 	printk("%sMTRR variable ranges %sabled:\n", level,
+ 	       mtrr_state.enabled ? "en" : "dis");
+ 	width = (paddr_bits - PAGE_SHIFT + 3) / 4;
++	if (  width > 64 ) {
++		width=64;
++	}
+ 
+ 	for (i = 0; i < num_var_ranges; ++i) {
+ 		if (mtrr_state.var_ranges[i].mask & MTRR_PHYSMASK_VALID)

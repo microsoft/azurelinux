@@ -1,0 +1,11 @@
+--- opencv-4.5.5/modules/python/common.cmake.orig	2022-04-11 18:40:18.925266930 +0100
++++ opencv-4.5.5/modules/python/common.cmake	2022-04-11 18:42:17.753849346 +0100
+@@ -179,7 +179,7 @@ else()
+   else()
+     set(__python_binary_subdir "python-${${PYTHON}_VERSION_MAJOR}.${${PYTHON}_VERSION_MINOR}")
+   endif()
+-  set(__python_binary_install_path "${OPENCV_PYTHON_INSTALL_PATH}/${__python_loader_subdir}${__python_binary_subdir}")
++  set(__python_binary_install_path "${OPENCV_PYTHON_INSTALL_PATH}/${__python_loader_subdir}")
+ endif()
+ 
+ install(TARGETS ${the_module}

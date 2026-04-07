@@ -1,0 +1,15 @@
+Index: LPCNet-0.5/src/CMakeLists.txt
+===================================================================
+--- LPCNet-0.5.orig/src/CMakeLists.txt
++++ LPCNet-0.5/src/CMakeLists.txt
+@@ -42,6 +42,10 @@ endif(LPCNET_C_PROC_FLAGS)
+ 
+ add_library(lpcnetfreedv SHARED ${lpcnet_freedv_srcs} ${codec2_import_srcs})
+ 
++if(UNIX)
++target_link_libraries(lpcnetfreedv m)
++endif()
++
+ set_target_properties(lpcnetfreedv PROPERTIES
+     PUBLIC_HEADER lpcnet_freedv.h
+ 	VERSION ${LPCNET_VERSION}

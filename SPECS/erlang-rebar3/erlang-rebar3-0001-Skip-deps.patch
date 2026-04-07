@@ -1,0 +1,41 @@
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Tue, 15 Dec 2020 16:35:56 +0100
+Subject: [PATCH] Skip deps
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+
+diff --git a/bootstrap b/bootstrap
+index 6a8ebfb4..6593654e 100755
+--- a/bootstrap
++++ b/bootstrap
+@@ -40,15 +40,6 @@ main(Args) ->
+     os:putenv("REBAR_PROFILE", "bootstrap"),
+     compile_vendored(),
+ 
+-    %% Fetch and build deps required to build rebar3
+-    BaseDeps = [{providers, []}
+-               ,{getopt, []}
+-               ,{cf, []}
+-               ,{erlware_commons, ["ec_dictionary.erl", "ec_vsn.erl"]}
+-               ,{certifi, ["certifi_pt.erl"]}],
+-    Deps = get_deps(),
+-    [fetch_and_compile(Dep, Deps) || Dep <- BaseDeps],
+-
+     %% Build rebar3 modules with compile:file
+     bootstrap_rebar3(),
+ 
+@@ -70,7 +61,6 @@ main(Args) ->
+     code:add_pathsa(DepsPaths),
+ 
+     rebar3:run(["clean", "-a"]),
+-    rebar3:run(["as", "prod", "escriptize"]),
+ 
+     %% Done with compile, can turn back on error logger
+     error_logger:tty(true).
+diff --git a/rebar.lock b/rebar.lock
+deleted file mode 100644
+index 57afcca0..00000000
+--- a/rebar.lock
++++ /dev/null
+@@ -1 +0,0 @@
+-[].

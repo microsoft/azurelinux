@@ -1,0 +1,52 @@
+diff --git a/statistics.c.old b/statistics.c
+index 8c2e18e..ed5dcaf 100644
+--- a/statistics.c.old
++++ b/statistics.c
+@@ -215,7 +215,7 @@ static const struct entry Tcpexttab[] =
+     {"OfoPruned", N_("%llu packets dropped from out-of-order queue because of socket buffer overrun"), opt_number},
+     {"OutOfWindowIcmps", N_("%llu ICMP packets dropped because they were out-of-window"), opt_number},
+     {"PAWSActive", N_("%llu active connections rejected because of time stamp"), opt_number},
+-    {"PAWSEstab", N_("%llu packetes rejected in established connections because of timestamp"), opt_number},
++    {"PAWSEstab", N_("%llu packets rejected in established connections because of timestamp"), opt_number},
+     {"PAWSPassive", N_("%llu passive connections rejected because of time stamp"), opt_number},
+     {"PruneCalled", N_("%llu packets pruned from receive queue because of socket buffer overrun"), opt_number},
+     {"RcvPruned", N_("%llu packets pruned from receive queue"), opt_number},
+diff --git a/po/cs.po.old b/po/cs.po
+index 7fe0e17..0857a86 100644
+--- a/po/cs.po.old
++++ b/po/cs.po
+@@ -1960,7 +1960,7 @@ msgstr "Počet odmítnutých aktivních spojení kvůli časovému razítku: %u"
+ 
+ #: ../statistics.c:237
+ #, c-format
+-msgid "%u packetes rejected in established connections because of timestamp"
++msgid "%u packets rejected in established connections because of timestamp"
+ msgstr ""
+ "Počet odmítnutých packetů uvnitř navázaného spojení kvůli časovému razítku: %"
+ "u"
+diff --git a/po/et_EE.po.old b/po/et_EE.po
+index ebc9de6..2afbaa9 100644
+--- a/po/et_EE.po.old
++++ b/po/et_EE.po
+@@ -1626,7 +1626,7 @@ msgstr "%u aktiivsest 
+ 
+ #: ../statistics.c:167
+ #, c-format
+-msgid "%u packetes rejected in established connections because of timestamp"
++msgid "%u packets rejected in established connections because of timestamp"
+ msgstr "%u paketist keelduti loodud �hendustes ajatempli t�ttu"
+ 
+ #: ../statistics.c:169
+diff --git a/po/net-tools.pot.old b/po/net-tools.pot
+index 7496818..b81bf1a 100644
+--- a/po/net-tools.pot.old
++++ b/po/net-tools.pot
+@@ -1746,7 +1746,7 @@ msgstr ""
+ 
+ #: ../statistics.c:167
+ #, c-format
+-msgid "%u packetes rejected in established connections because of timestamp"
++msgid "%u packets rejected in established connections because of timestamp"
+ msgstr ""
+ 
+ #: ../statistics.c:169

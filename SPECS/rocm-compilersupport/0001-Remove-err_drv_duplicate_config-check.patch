@@ -1,0 +1,37 @@
+From 5392544bd00915c5984293f40d5494de60e5528e Mon Sep 17 00:00:00 2001
+From: Tom Rix <Tom.Rix@amd.com>
+Date: Wed, 6 Nov 2024 08:35:55 -0800
+Subject: [PATCH] Remove err_drv_duplicate_config check
+
+Signed-off-by: Tom Rix <Tom.Rix@amd.com>
+---
+ clang/lib/Driver/Driver.cpp | 13 -------------
+ 1 file changed, 13 deletions(-)
+
+diff --git a/clang/lib/Driver/Driver.cpp b/clang/lib/Driver/Driver.cpp
+index 5474454bb289..24e9e1fcc866 100644
+--- a/clang/lib/Driver/Driver.cpp
++++ b/clang/lib/Driver/Driver.cpp
+@@ -1230,19 +1230,6 @@ bool Driver::loadConfigFiles() {
+     }
+   }
+ 
+-  // First try to find config file specified in command line.
+-  if (CLOptions) {
+-    std::vector<std::string> ConfigFiles =
+-        CLOptions->getAllArgValues(options::OPT_config);
+-    if (ConfigFiles.size() > 1) {
+-      if (!llvm::all_of(ConfigFiles, [ConfigFiles](const std::string &s) {
+-            return s == ConfigFiles[0];
+-          })) {
+-        Diag(diag::err_drv_duplicate_config);
+-        return true;
+-      }
+-    }
+-  }
+   // Prepare list of directories where config file is searched for.
+   StringRef CfgFileSearchDirs[] = {UserConfigDir, SystemConfigDir, Dir};
+   ExpCtx.setSearchDirs(CfgFileSearchDirs);
+-- 
+2.47.0
+

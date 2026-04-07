@@ -1,0 +1,39 @@
+From: Robert Luberda <robert@debian.org>
+Date: Fri, 28 Jan 2005 18:44:35 +0100
+Subject: 017 man2html.seealso
+
+Add SEE ALSO hman to man2html man page (closes: #285401).
+---
+ man2html/man2html.1 | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/man2html/man2html.1 b/man2html/man2html.1
+index dea25f8..bff0960 100644
+--- a/man2html/man2html.1
++++ b/man2html/man2html.1
+@@ -25,12 +25,12 @@ a html browser like
+ .BR xmosaic (1)
+ or
+ .BR netscape (1).
+-./" (See
+-./" .BR man (1)
+-./" for info on how to browse man pages via
+-./" .BR man2html .
+-./" Usually it would suffice to put "MANHTMLPAGER=/usr/bin/lynx"
+-./" in the environment.)
++.\" (See
++.\" .BR man (1)
++.\" for info on how to browse man pages via
++.\" .BR man2html .
++.\" Usually it would suffice to put "MANHTMLPAGER=/usr/bin/lynx"
++.\" in the environment.)
+ 
+ The main part of
+ .B man2html
+@@ -149,4 +149,5 @@ Federico Lucifredi <flucifredi@acm.org> is the current maintainer.
+ 
+ .SH "SEE ALSO"
+ .BR lynx (1),
+-.BR man (1)
++.BR man (1),
++.BR hman (1)

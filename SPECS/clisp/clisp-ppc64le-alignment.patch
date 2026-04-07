@@ -1,0 +1,18 @@
+Fixes UBSAN errors such as:
+
+../src/spvw_typealloc.d:146:450: runtime error: member access within misaligned address 0x17000000009c for type 'struct s8string_', which requires 8 byte alignment
+0x17000000009c: note: pointer points here
+  53 45 52 00 00 00 00 00  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+              ^ 
+
+--- src/lispbibl.d.orig	2025-02-07 19:25:44.207789666 -0700
++++ src/lispbibl.d	2025-02-10 11:38:31.029348227 -0700
+@@ -6006,7 +6006,7 @@ typedef signed_int_with_n_bits(intVsize)
+ #if defined(I80386) || defined(POWERPC) || defined(ARM) || defined(S390)
+   #define varobject_alignment  4
+ #endif
+-#if defined(SPARC) || defined(HPPA) || defined(MIPS) || defined(DECALPHA) || defined(IA64) || defined(AMD64) || defined(ARM64) || defined(RISCV64) || defined(LOONGARCH64)
++#if defined(SPARC) || defined(HPPA) || defined(MIPS) || defined(DECALPHA) || defined(IA64) || defined(AMD64) || defined(ARM64) || defined(RISCV64) || defined(LOONGARCH64) || defined(POWERPC64)
+   #define varobject_alignment  8
+ #endif
+ #if (!defined(TYPECODES) || defined(GENERATIONAL_GC)) && (varobject_alignment < 4)

@@ -1,0 +1,169 @@
+From c22dd44b5275b6651a821e14e14e14fe86982f4c Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hansg@kernel.org>
+Date: Thu, 25 Sep 2025 21:08:34 +0200
+Subject: [PATCH 7/8] libcamera: software_isp: Add valid flag to struct
+ SwIspStats
+
+Generating statistics for every single frame is not really necessary.
+
+However a roundtrip through ipa_->processStats() still need to be done
+every frame, even if there are no stats to make the IPA generate metadata
+for every frame.
+
+Add a valid flag to the statistics struct to let the IPA know when there
+are no statistics for the frame being processed and modify the IPA to
+only generate metadata for frames without valid statistics.
+
+This is a preparation patch for skipping statistics generation for some
+frames.
+
+Reviewed-by: Kieran Bingham <kieran.bingham@ideasonboard.com>
+Reviewed-by: Milan Zamazal <mzamazal@redhat.com>
+Tested-by: Milan Zamazal <mzamazal@redhat.com>
+Signed-off-by: Hans de Goede <hansg@kernel.org>
+---
+Changes in v4:
+- Add an empty line after the agc substruct declaration
+- Init active-state agc gain and exposue from sensor values in case
+  updateExposure() does not run for the first frame
+
+Changes in v3:
+- Drop if (!stats_->valid) early exit from IPASoftSimple::processStats()
+- Save last AGC calculated new gain and exposure values and re-use these
+  for frames without statistics, this avoids delayedCtrl history underruns
+- Improve SwIspStats.valid documentation
+
+Changes in v2:
+- This is a new patch in v2 of this series
+---
+ .../internal/software_isp/swisp_stats.h       |  5 ++++
+ src/ipa/simple/algorithms/agc.cpp             | 24 ++++++++++++++++++-
+ src/ipa/simple/algorithms/awb.cpp             |  3 +++
+ src/ipa/simple/algorithms/blc.cpp             |  3 +++
+ src/ipa/simple/ipa_context.h                  |  5 ++++
+ src/libcamera/software_isp/swstats_cpu.cpp    |  1 +
+ 6 files changed, 40 insertions(+), 1 deletion(-)
+
+diff --git a/include/libcamera/internal/software_isp/swisp_stats.h b/include/libcamera/internal/software_isp/swisp_stats.h
+index ae11f112e..3c9860185 100644
+--- a/include/libcamera/internal/software_isp/swisp_stats.h
++++ b/include/libcamera/internal/software_isp/swisp_stats.h
+@@ -20,6 +20,11 @@ namespace libcamera {
+  * wrap around.
+  */
+ struct SwIspStats {
++	/**
++	 * \brief True if the statistics buffer contains valid data, false if
++	 *        no statistics were generated for this frame
++	 */
++	bool valid;
+ 	/**
+ 	 * \brief Holds the sum of all sampled red pixels
+ 	 */
+diff --git a/src/ipa/simple/algorithms/agc.cpp b/src/ipa/simple/algorithms/agc.cpp
+index 3471cc881..e0447cbd6 100644
+--- a/src/ipa/simple/algorithms/agc.cpp
++++ b/src/ipa/simple/algorithms/agc.cpp
+@@ -91,13 +91,16 @@ void Agc::updateExposure(IPAContext &context, IPAFrameContext &frameContext, dou
+ 	again = std::clamp(again, context.configuration.agc.againMin,
+ 			   context.configuration.agc.againMax);
+ 
++	context.activeState.agc.exposure = exposure;
++	context.activeState.agc.again = again;
++
+ 	LOG(IPASoftExposure, Debug)
+ 		<< "exposureMSV " << exposureMSV
+ 		<< " exp " << exposure << " again " << again;
+ }
+ 
+ void Agc::process(IPAContext &context,
+-		  [[maybe_unused]] const uint32_t frame,
++		  const uint32_t frame,
+ 		  IPAFrameContext &frameContext,
+ 		  const SwIspStats *stats,
+ 		  ControlList &metadata)
+@@ -107,6 +110,25 @@ void Agc::process(IPAContext &context,
+ 	metadata.set(controls::ExposureTime, exposureTime.get<std::micro>());
+ 	metadata.set(controls::AnalogueGain, frameContext.sensor.gain);
+ 
++	if (frame == 0) {
++		/*
++		 * Init active-state from sensor values in case updateExposure()
++		 * does not run for the first frame.
++		 */
++		context.activeState.agc.exposure = frameContext.sensor.exposure;
++		context.activeState.agc.again = frameContext.sensor.gain;
++	}
++
++	if (!stats->valid) {
++		/*
++		 * Use the new exposure and gain values calculated the last time
++		 * there were valid stats.
++		 */
++		frameContext.sensor.exposure = context.activeState.agc.exposure;
++		frameContext.sensor.gain = context.activeState.agc.again;
++		return;
++	}
++
+ 	/*
+ 	 * Calculate Mean Sample Value (MSV) according to formula from:
+ 	 * https://www.araa.asn.au/acra/acra2007/papers/paper84final.pdf
+diff --git a/src/ipa/simple/algorithms/awb.cpp b/src/ipa/simple/algorithms/awb.cpp
+index cf567e894..ddd0b7914 100644
+--- a/src/ipa/simple/algorithms/awb.cpp
++++ b/src/ipa/simple/algorithms/awb.cpp
+@@ -61,6 +61,9 @@ void Awb::process(IPAContext &context,
+ 	};
+ 	metadata.set(controls::ColourGains, mdGains);
+ 
++	if (!stats->valid)
++		return;
++
+ 	/*
+ 	 * Black level must be subtracted to get the correct AWB ratios, they
+ 	 * would be off if they were computed from the whole brightness range
+diff --git a/src/ipa/simple/algorithms/blc.cpp b/src/ipa/simple/algorithms/blc.cpp
+index 8c1e9ed08..616da0ee7 100644
+--- a/src/ipa/simple/algorithms/blc.cpp
++++ b/src/ipa/simple/algorithms/blc.cpp
+@@ -60,6 +60,9 @@ void BlackLevel::process(IPAContext &context,
+ 	};
+ 	metadata.set(controls::SensorBlackLevels, blackLevels);
+ 
++	if (!stats->valid)
++		return;
++
+ 	if (context.configuration.black.level.has_value())
+ 		return;
+ 
+diff --git a/src/ipa/simple/ipa_context.h b/src/ipa/simple/ipa_context.h
+index 468fccabb..c3081e306 100644
+--- a/src/ipa/simple/ipa_context.h
++++ b/src/ipa/simple/ipa_context.h
+@@ -37,6 +37,11 @@ struct IPASessionConfiguration {
+ };
+ 
+ struct IPAActiveState {
++	struct {
++		int32_t exposure;
++		double again;
++	} agc;
++
+ 	struct {
+ 		uint8_t level;
+ 		int32_t lastExposure;
+diff --git a/src/libcamera/software_isp/swstats_cpu.cpp b/src/libcamera/software_isp/swstats_cpu.cpp
+index 4b77b3600..eb416dfdc 100644
+--- a/src/libcamera/software_isp/swstats_cpu.cpp
++++ b/src/libcamera/software_isp/swstats_cpu.cpp
+@@ -318,6 +318,7 @@ void SwStatsCpu::startFrame(void)
+  */
+ void SwStatsCpu::finishFrame(uint32_t frame, uint32_t bufferId)
+ {
++	stats_.valid = true;
+ 	*sharedStats_ = stats_;
+ 	statsReady.emit(frame, bufferId);
+ }
+-- 
+2.51.0
+

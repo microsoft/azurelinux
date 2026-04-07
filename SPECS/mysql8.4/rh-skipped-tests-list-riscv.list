@@ -1,0 +1,3 @@
+# Fails since 8.0.40
+# [Warning] [MY-011037] [Server] The CYCLE timer is not available. WAIT events in the performance_schema will not be timed.
+main.test_mysql_thd_store_service               : BUG#0

@@ -1,0 +1,10 @@
+[Unit]
+Description=Vsftpd ftp daemon
+After=network-online.target
+
+[Service]
+Type=forking
+ExecStart=/usr/sbin/vsftpd /etc/vsftpd/vsftpd.conf
+
+[Install]
+WantedBy=multi-user.target

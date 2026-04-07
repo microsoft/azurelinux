@@ -1,0 +1,80 @@
+--- tinyvec-1.10.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ tinyvec-1.10.0/Cargo.toml	2025-08-27T16:00:49.273583+00:00
+@@ -66,13 +66,11 @@
+ 
+ [features]
+ alloc = ["tinyvec_macros"]
+-debugger_visualizer = []
+ default = []
+ experimental_write_impl = []
+ grab_spare_slice = []
+ latest_stable_rust = ["rustc_1_61"]
+ nightly_slice_partition_dedup = []
+-real_blackbox = ["criterion/real_blackbox"]
+ rustc_1_40 = []
+ rustc_1_55 = []
+ rustc_1_57 = []
+@@ -88,12 +86,6 @@
+ path = "tests/arrayvec.rs"
+ 
+ [[test]]
+-name = "debugger_visualizer"
+-path = "tests/debugger_visualizer.rs"
+-test = false
+-required-features = ["debugger_visualizer"]
+-
+-[[test]]
+ name = "tinyvec"
+ path = "tests/tinyvec.rs"
+ required-features = [
+@@ -101,34 +93,9 @@
+     "std",
+ ]
+ 
+-[[bench]]
+-name = "macros"
+-path = "benches/macros.rs"
+-harness = false
+-required-features = ["alloc"]
+-
+-[[bench]]
+-name = "smallvec"
+-path = "benches/smallvec.rs"
+-harness = false
+-required-features = [
+-    "alloc",
+-    "real_blackbox",
+-]
+-
+ [dependencies.arbitrary]
+ version = "1"
+ optional = true
+-
+-[dependencies.borsh]
+-version = "1.2.0"
+-optional = true
+-default-features = false
+-
+-[dependencies.generic-array]
+-version = "1.1.1"
+-optional = true
+-default-features = false
+ 
+ [dependencies.serde]
+ version = "1.0"
+@@ -139,15 +106,6 @@
+ version = "0.1"
+ optional = true
+ 
+-[dev-dependencies.criterion]
+-version = "0.3.0"
+-
+-[dev-dependencies.debugger_test]
+-version = "0.1"
+-
+-[dev-dependencies.debugger_test_parser]
+-version = "0.1"
+-
+ [dev-dependencies.serde_test]
+ version = "1.0"
+ 

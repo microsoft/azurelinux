@@ -1,0 +1,23 @@
+From 0737d2e8edbda1520d97ef1851efa4c2d57b469b Mon Sep 17 00:00:00 2001
+From: Jean Boussier <jean.boussier@gmail.com>
+Date: Wed, 13 Nov 2024 08:33:47 +0100
+Subject: [PATCH] Update test suite to pass on Ruby 3.4
+
+---
+ .github/workflows/ci.yaml | 2 +-
+ spec/msgpack_spec.rb      | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/spec/msgpack_spec.rb b/spec/msgpack_spec.rb
+index fd466438..dee9883e 100644
+--- a/spec/msgpack_spec.rb
++++ b/spec/msgpack_spec.rb
+@@ -112,7 +112,7 @@ def asciienc(str)
+ 
+   context 'with other things' do
+     it 'raises an error on #pack with an unsupported type' do
+-      expect { MessagePack.pack(self) }.to raise_error(NoMethodError, /^undefined method `to_msgpack'/)
++      expect { MessagePack.pack(self) }.to raise_error(NoMethodError, /undefined method .*to_msgpack/)
+     end
+ 
+     it 'raises an error on #unpack with garbage' do

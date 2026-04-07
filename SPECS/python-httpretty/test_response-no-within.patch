@@ -1,0 +1,82 @@
+From 2492bd27ee8d55146d9d94875ce058b7b119b284 Mon Sep 17 00:00:00 2001
+From: Jiri Popelka <jpopelka@redhat.com>
+Date: Fri, 4 Feb 2022 15:53:56 +0100
+Subject: [PATCH 3/3] Remove timeout, which causes some tests to fail in Koji
+
+Fixes RHBZ#2046877
+
+Patch-name: test_response-no-within.patch
+---
+ tests/functional/test_httplib2.py | 9 +++------
+ tests/functional/test_urllib2.py  | 7 ++-----
+ 2 files changed, 5 insertions(+), 11 deletions(-)
+
+diff --git a/tests/functional/test_httplib2.py b/tests/functional/test_httplib2.py
+index c913d8a..0f7e31b 100644
+--- a/tests/functional/test_httplib2.py
++++ b/tests/functional/test_httplib2.py
+@@ -112,8 +112,7 @@ def test_httpretty_should_allow_adding_and_overwritting_httplib2():
+ 
+ 
+ @httprettified
+-@within(two=miliseconds)
+-def test_httpretty_should_allow_forcing_headers_httplib2(now):
++def test_httpretty_should_allow_forcing_headers_httplib2():
+     "HTTPretty should allow forcing headers with httplib2"
+ 
+     HTTPretty.register_uri(HTTPretty.GET, "http://github.com/foo",
+@@ -165,8 +164,7 @@ def test_httpretty_should_allow_adding_and_overwritting_by_kwargs_u2():
+ 
+ 
+ @httprettified
+-@within(two=miliseconds)
+-def test_rotating_responses_with_httplib2(now):
++def test_rotating_responses_with_httplib2():
+     "HTTPretty should support rotating responses with httplib2"
+ 
+     HTTPretty.register_uri(
+@@ -263,8 +261,7 @@ def test_httpretty_ignores_querystrings_from_registered_uri(now):
+ 
+ 
+ @httprettified
+-@within(two=miliseconds)
+-def test_callback_response(now):
++def test_callback_response():
+     ("HTTPretty should call a callback function to be set as the body with"
+      " httplib2")
+ 
+diff --git a/tests/functional/test_urllib2.py b/tests/functional/test_urllib2.py
+index 9c8ff39..4cba725 100644
+--- a/tests/functional/test_urllib2.py
++++ b/tests/functional/test_urllib2.py
+@@ -127,7 +127,6 @@ def test_httpretty_should_allow_adding_and_overwritting_urllib2():
+ 
+ 
+ @httprettified
+-@within(two=miliseconds)
+ def test_httpretty_should_allow_forcing_headers_urllib2():
+     "HTTPretty should allow forcing headers with urllib2"
+ 
+@@ -177,8 +176,7 @@ def test_httpretty_should_allow_adding_and_overwritting_by_kwargs_u2():
+ 
+ 
+ @httprettified
+-@within(two=miliseconds)
+-def test_httpretty_should_support_a_list_of_successive_responses_urllib2(now):
++def test_httpretty_should_support_a_list_of_successive_responses_urllib2():
+     ("HTTPretty should support adding a list of successive "
+      "responses with urllib2")
+ 
+@@ -285,8 +283,7 @@ def test_httpretty_ignores_querystrings_from_registered_uri():
+ 
+ 
+ @httprettified
+-@within(two=miliseconds)
+-def test_callback_response(now):
++def test_callback_response():
+     ("HTTPretty should call a callback function to be set as the body with"
+      " urllib2")
+ 
+-- 
+2.34.1
+

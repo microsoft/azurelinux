@@ -1,0 +1,13 @@
+diff -up waf-2.0.18/waf-light.orig waf-2.0.18/waf-light
+--- waf-2.0.18/waf-light.orig	2019-07-14 10:41:10.000000000 +0200
++++ waf-2.0.18/waf-light	2019-10-05 17:55:42.254788427 +0200
+@@ -152,6 +152,9 @@ def find_lib():
+ 		w = test(i + '/lib/' + dirname)
+ 		if w: return w
+ 
++	w = test('/usr/share/%s' % WAF)
++	if w: return w
++
+ 	#waf-local
+ 	dir = join(base, (sys.platform != 'win32' and '.' or '') + dirname)
+ 	w = test(dir)

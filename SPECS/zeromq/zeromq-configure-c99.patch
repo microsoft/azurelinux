@@ -1,0 +1,37 @@
+Build with -D_DEFAULT_SOURCE along with -std=c11
+    
+On its own, -std=c11 hides POSIX and other extensions from C headers
+such as <stdlib.h> when building against glibc. This causes the
+posix_memalign probe to fail incorrectly with compilers that do not
+accept implicit function declarations. _DEFAULT_SOURCE is ignored by
+most non-GNU/Linux systems or not relevant in this context, so there
+is no separate check for adding it.
+
+Submitted upstream: <https://github.com/zeromq/libzmq/pull/4635>
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 68fb7251..f956f3fd 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -122,7 +122,7 @@ if (NOT MSVC)
+   if(NOT CMAKE_C_FLAGS MATCHES "-std=" AND NOT C_STANDARD AND NOT CMAKE_C_STANDARD)
+     check_c_compiler_flag("-std=c11" COMPILER_SUPPORTS_C11)
+     if(COMPILER_SUPPORTS_C11)
+-      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11")
++      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_DEFAULT_SOURCE -std=c11")
+     else()
+       set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99")
+     endif()
+diff --git a/configure.ac b/configure.ac
+index b9e13d4f..ffcc145b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -66,7 +66,7 @@ ZMQ_ORIG_CXXFLAGS="${CXXFLAGS:-none}"
+ 
+ # Checks for programs.
+ AC_PROG_CC
+-AX_CHECK_COMPILE_FLAG([-std=c11], [CFLAGS+=" -std=c11"], [AC_PROG_CC_C99])
++AX_CHECK_COMPILE_FLAG([-std=c11], [CFLAGS+=" -std=c11 -D_DEFAULT_SOURCE"], [AC_PROG_CC_C99])
+ AC_PROG_CXX
+ AX_CODE_COVERAGE
+ AM_PROG_CC_C_O

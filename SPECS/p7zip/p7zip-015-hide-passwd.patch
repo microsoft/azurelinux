@@ -1,0 +1,12 @@
+diff -ru p7zip_16.02.old/install.sh p7zip_16.02.new/install.sh
+--- p7zip_16.02.old/install.sh	2015-10-05 10:39:00.000000000 +0200
++++ p7zip_16.02.new/install.sh	2024-10-02 18:47:30.746978319 +0200
+@@ -10,7 +10,7 @@
+     chmod 755 "${DEST_DIR}${DEST_SHARE}/${prg}"
+     strip     "${DEST_DIR}${DEST_SHARE}/${prg}"
+     echo "#! /bin/sh" > "${DEST_DIR}${DEST_BIN}/${prg}"
+-    echo "\"${DEST_SHARE}/${prg}\" \"\$@\"" >> "${DEST_DIR}${DEST_BIN}/${prg}"
++    echo "exec \"${DEST_SHARE}/${prg}\" \"\$@\"" >> "${DEST_DIR}${DEST_BIN}/${prg}"
+     chmod 755 "${DEST_DIR}${DEST_BIN}/${prg}"
+   fi
+ }

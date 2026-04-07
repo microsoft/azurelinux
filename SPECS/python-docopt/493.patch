@@ -1,0 +1,43 @@
+From 8e06097d68b3f2fb9f44324119de5cefb7a42506 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Mon, 7 Jun 2021 00:52:25 +0200
+Subject: [PATCH] pytest: Use Node.from_parent(...)
+
+Fixes https://github.com/docopt/docopt/issues/483
+
+See https://docs.pytest.org/en/stable/deprecations.html#node-construction-changed-to-node-from-parent
+---
+ conftest.py | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/conftest.py b/conftest.py
+index f5e8c7b..c4c0bb5 100644
+--- a/conftest.py
++++ b/conftest.py
+@@ -11,7 +11,10 @@
+ 
+ def pytest_collect_file(path, parent):
+     if path.ext == ".docopt" and path.basename.startswith("test"):
+-        return DocoptTestFile(path, parent)
++        if hasattr(DocoptTestFile, "from_parent"):
++            return DocoptTestFile.from_parent(parent, fspath=path)
++        else:
++            return DocoptTestFile(path, parent)
+ 
+ 
+ def parse_test(raw):
+@@ -41,7 +44,13 @@ def collect(self):
+         for name, doc, cases in parse_test(raw):
+             name = self.fspath.purebasename
+             for case in cases:
+-                yield DocoptTestItem("%s(%d)" % (name, index), self, doc, case)
++                if hasattr(DocoptTestItem, "from_parent"):
++                    yield DocoptTestItem.from_parent(parent=self,
++                                                     name="%s(%d)" % (name, index),
++                                                     doc=doc,
++                                                     case=case)
++                else:
++                    yield DocoptTestItem("%s(%d)" % (name, index), self, doc, case)
+                 index += 1
+ 
+ 

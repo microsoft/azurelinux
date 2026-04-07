@@ -1,0 +1,28 @@
+From b4de5f36a6b1e31b891492c466888371afb6ee9b Mon Sep 17 00:00:00 2001
+From: Yaakov Selkowitz <yselkowi@redhat.com>
+Date: Tue, 18 Mar 2025 17:11:00 -0400
+Subject: [PATCH] Fix build with GCC 15
+
+```
+src/testcommon/mmap.cpp: In member function 'void MemoryMappedFile::impl::map_file(const char*, int, int, int)':
+src/testcommon/mmap.cpp:273:62: error: 'PTRDIFF_MAX' was not declared in this scope
+  273 |                 if ((file_size = posix::get_file_size(fd)) > PTRDIFF_MAX)
+      |                                                              ^~~~~~~~~~~
+src/testcommon/mmap.cpp:22:1: note: 'PTRDIFF_MAX' is defined in header '<cstdint>'; this is probably fixable by adding '#include <cstdint>'
+```
+---
+ src/testcommon/mmap.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/testcommon/mmap.cpp b/src/testcommon/mmap.cpp
+index b6ba7092..0310fa93 100644
+--- a/src/testcommon/mmap.cpp
++++ b/src/testcommon/mmap.cpp
+@@ -10,6 +10,7 @@
+   #include <Windows.h>
+ #else
+   #include <cerrno>
++  #include <cstdint>
+ 
+   #include <fcntl.h>
+   #include <unistd.h>

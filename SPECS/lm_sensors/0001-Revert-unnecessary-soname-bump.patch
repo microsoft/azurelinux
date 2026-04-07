@@ -1,0 +1,33 @@
+From bc827e6d45f31f20a4f6d27bfc41747900faf60c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Lyson=C4=9Bk?= <olysonek@redhat.com>
+Date: Wed, 2 Jan 2019 12:38:31 +0100
+Subject: [PATCH] Revert unnecessary soname bump
+
+The soname bump in lm-sensors 3.5.0 was unnecessary - there was no
+API/ABI change. I'm reverting it so that we can update lm-sensors
+in released Fedoras as well as Rawhide.
+
+Related:
+https://marc.info/?l=lm-sensors&m=154515276523720&w=2
+---
+ lib/Module.mk | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/Module.mk b/lib/Module.mk
+index 7732242..299b7d3 100644
+--- a/lib/Module.mk
++++ b/lib/Module.mk
+@@ -32,8 +32,8 @@ LIBMAN5FILES := $(MODULE_DIR)/sensors.conf.5
+ # The library soname (major number) must be changed if and only if the interface is
+ # changed in a backward incompatible way.  The interface is defined by
+ # the public header files - in this case they are error.h and sensors.h.
+-LIBMAINVER := 5
+-LIBMINORVER := 0.0
++LIBMAINVER := 4
++LIBMINORVER := 5.0
+ LIBVER := $(LIBMAINVER).$(LIBMINORVER)
+ 
+ # The static lib name, the shared lib name, and the internal ('so') name of
+-- 
+2.17.2
+

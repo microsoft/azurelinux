@@ -1,0 +1,229 @@
+From b64638020badf92b36424c06bda6e49942f77cd6 Mon Sep 17 00:00:00 2001
+From: Dominique <dominique.pelle@gmail.com>
+Date: Sun, 8 May 2022 08:52:41 +0200
+Subject: [PATCH 2/2] docs: typo fixes in man page and in source code comments
+Content-type: text/plain
+
+Signed-off-by: Vladis Dronov <vdronov@redhat.com>
+---
+ contrib/webcscope/hilite.c | 6 +++---
+ doc/xcscope.1              | 8 ++++----
+ src/build.c                | 2 +-
+ src/command.c              | 2 +-
+ src/compath.c              | 2 +-
+ src/crossref.c             | 2 +-
+ src/find.c                 | 4 ++--
+ src/invlib.c               | 2 +-
+ src/main.c                 | 4 ++--
+ src/mouse.c                | 2 +-
+ src/snprintf.c             | 2 +-
+ 11 files changed, 18 insertions(+), 18 deletions(-)
+
+diff --git a/contrib/webcscope/hilite.c b/contrib/webcscope/hilite.c
+index 4f5af07..feacf0f 100644
+--- a/contrib/webcscope/hilite.c
++++ b/contrib/webcscope/hilite.c
+@@ -17,7 +17,7 @@
+  For HTML fragment generation:
+      CHTM file.c > file.htm
+ 
+- - Some input convertion required to use this
++ - Some input conversion required to use this
+    code as CGI module. Will be done soon.
+  - Optimization required for blocks of EOL
+    comments
+@@ -51,7 +51,7 @@
+ #define MODE_STRING      8
+ 
+ 
+-int is_delimeter(char c)
++int is_delimiter(char c)
+ {
+     int ii=0;
+     char dlms[] =
+@@ -318,7 +318,7 @@ int main(int _argc, char** _argv)
+         {
+             buf[bufidx++] = c;
+             buf[bufidx]   = 0;
+-            if (is_delimeter(c))
++            if (is_delimiter(c))
+             {
+                 kw = 0;
+                 if (bufidx>2)
+diff --git a/doc/xcscope.1 b/doc/xcscope.1
+index fa4199c..5bf0de1 100644
+--- a/doc/xcscope.1
++++ b/doc/xcscope.1
+@@ -1,6 +1,6 @@
+ '\" t
+ .\" The xcscope.el man page
+-.\" Origionally written by Darryl Okahata, Apr 2000
++.\" Originally written by Darryl Okahata, Apr 2000
+ .\" 
+ .\" Converted to a man page July 20, 2004 by Neil Horman <nhorman@redhat.com>
+ .\"
+@@ -152,7 +152,7 @@ cscope database directories:
+ .P
+ If a search is initiated from a .c file in /users/jdoe/sources/proj1
+ then (assuming the variable, `cscope-database-regexps', is not set)
+-/users/jdoe/sources/proj1 will be used as the cscope data base directory.
++/users/jdoe/sources/proj1 will be used as the cscope database directory.
+ Only matches in files in /users/jdoe/sources/proj1 will be found.  This
+ can be remedied by typing "C-c s a" and then "M-del" to remove single
+ path element in order to use a cscope database directory of
+@@ -173,7 +173,7 @@ C-c s d       Find global definition.
+ C-c s g       Find global definition (alternate binding).
+ C-c s G       Find global definition without prompting.
+ C-c s c       Find functions calling a function.
+-C-c s C       Find called functions (list functions called
++C-c s C       Find called functions (list functions called)
+ C-c s t       Find text string.
+ C-c s e       Find egrep pattern.
+ C-c s f       Find a file.
+@@ -527,7 +527,7 @@ done.
+ 
+ .P
+ 1. The script, "cscope-indexer", uses a sed command to determine
+-what is and is not a C/C++/lex/yacc source file.  It's idea of a
++what is and is not a C/C++/lex/yacc source file.  Its idea of a
+ source file may not correspond to yours.
+ 
+ .P
+diff --git a/src/build.c b/src/build.c
+index 557e660..4d4e201 100644
+--- a/src/build.c
++++ b/src/build.c
+@@ -133,7 +133,7 @@ samelist(FILE *oldrefs, char **names, int count)
+ }
+ 
+ 
+-/* create the file name(s) used for a new cross-referene */
++/* create the file name(s) used for a new cross-reference */
+ 
+ void setup_build_filenames(char *reffile)
+ {
+diff --git a/src/command.c b/src/command.c
+index dcb5278..75fae6e 100644
+--- a/src/command.c
++++ b/src/command.c
+@@ -890,7 +890,7 @@ countrefs(void)
+     filelen = 4;		/* strlen("File") */
+     fcnlen = 8;		/* strlen("Function") */
+     numlen = 0;
+-    /* HBB NOTE 2012-04-07: it may look like we shouldn't assing tempstring here,
++    /* HBB NOTE 2012-04-07: it may look like we shouldn't assign tempstring here,
+      * since it's not used.  But it has to be assigned just so the return value
+      * of fscanf will actually reach 4. */
+     while (EOF != (i = fscanf(refsfound, 
+diff --git a/src/compath.c b/src/compath.c
+index 037d341..fadca1f 100644
+--- a/src/compath.c
++++ b/src/compath.c
+@@ -40,7 +40,7 @@
+  *
+  *	WARNING: since pathname is altered by this function, it should
+  *		 be located in a temporary buffer. This avoids the problem
+- *		 of accidently changing strings obtained from makefiles
++ *		 of accidentally changing strings obtained from makefiles
+  *		 and stored in global structures.
+  */
+ 
+diff --git a/src/crossref.c b/src/crossref.c
+index 549bc6a..7304fd6 100644
+--- a/src/crossref.c
++++ b/src/crossref.c
+@@ -328,7 +328,7 @@ putcrossref(void)
+ 	    if (c < ' ') {
+ 		++i;
+ 				
+-		/* skip blanks before a preprocesor keyword */
++		/* skip blanks before a preprocessor keyword */
+ 		/* note: don't use isspace() because \f and \v
+ 		   are used for keywords */
+ 		while ((j = my_yytext[i]) == ' ' || j == '\t') {
+diff --git a/src/find.c b/src/find.c
+index d7a66f0..0261161 100644
+--- a/src/find.c
++++ b/src/find.c
+@@ -975,7 +975,7 @@ fetch_string_from_dbase(char *s, size_t length)
+ }
+ 
+ 
+-/* scan past the next occurence of this character in the cross-reference */
++/* scan past the next occurrence of this character in the cross-reference */
+ char *
+ scanpast(char c)
+ {
+@@ -1035,7 +1035,7 @@ lcasify(char *s)
+ 
+ /* find the functions called by this function */
+ 
+-/* HBB 2000/05/05: for consitency of calling interface between the
++/* HBB 2000/05/05: for consistency of calling interface between the
+  * different 'find...()' functions, this now returns a char pointer,
+  * too. Implemented as a pointer to static storage containing 'y' or
+  * 'n', for the boolean result values YES and NO */
+diff --git a/src/invlib.c b/src/invlib.c
+index cd15c35..cdccd32 100644
+--- a/src/invlib.c
++++ b/src/invlib.c
+@@ -106,7 +106,7 @@ invmake(char *invname, char *invpost, FILE *infile)
+ 	unsigned char	*s;
+ 	long	num;
+ 	int	i;
+-	long	fileindex = 0;	/* initialze, to avoid warning */
++	long	fileindex = 0;	/* initialize, to avoid warning */
+ 	unsigned postsize = POSTINC * sizeof(*POST);
+ 	unsigned long	*intptr;
+ 	char	line[TERMMAX];
+diff --git a/src/main.c b/src/main.c
+index d28271c..2ffabc3 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -547,7 +547,7 @@ cscope: Could not create private temp dir %s\n",
+ 	/* put it in the home directory if the database may not be
+ 	 * up-to-date or doesn't exist in the relative directory,
+ 	 * so a database in the current directory will be
+-	 * used instead of failing to open a non-existant database in
++	 * used instead of failing to open a non-existing database in
+ 	 * the home directory
+ 	 */
+ 	snprintf(path, sizeof(path), "%s/%s", home, reffile);
+@@ -884,7 +884,7 @@ cscope: cannot read source file name from file %s\n",
+ 	    break;
+ #endif
+ 	}
+-	/* execute the commmand, updating the display if necessary */
++	/* execute the command, updating the display if necessary */
+ 	if (command(c) == YES) {
+ 	    display();
+ 	}
+diff --git a/src/mouse.c b/src/mouse.c
+index ea75b37..4f55400 100644
+--- a/src/mouse.c
++++ b/src/mouse.c
+@@ -94,7 +94,7 @@ mouseinit(void)
+ 		emacsviterm = YES;
+ 		mouse = YES;
+ 	}
+-	/* the MOUSE enviroment variable is for 5620 terminal programs that have
++	/* the MOUSE environment variable is for 5620 terminal programs that have
+ 	   mouse support but the TERM environment variable is the same as a
+ 	   terminal without a mouse, such as myx */
+ 	else if (strcmp(mygetenv("MOUSE", ""), "myx") == 0) {
+diff --git a/src/snprintf.c b/src/snprintf.c
+index 3981151..5cb0afe 100644
+--- a/src/snprintf.c
++++ b/src/snprintf.c
+@@ -1299,7 +1299,7 @@ again:
+ 	 * C99 says: "If the `0' and `-' flags both appear, the `0' flag is
+ 	 * ignored." (7.19.6.1, 6)
+ 	 */
+-	if (flags & PRINT_F_MINUS)	/* Left justifty. */
++	if (flags & PRINT_F_MINUS)	/* Left justify. */
+ 		padlen = -padlen;
+ 	else if (flags & PRINT_F_ZERO && padlen > 0) {
+ 		if (sign != 0) {	/* Sign. */
+-- 
+2.37.3
+

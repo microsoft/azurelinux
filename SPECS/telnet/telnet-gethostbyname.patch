@@ -1,0 +1,48 @@
+--- netkit-telnet-0.17/telnet/commands.c.old	2006-04-30 10:24:49.000000000 -0700
++++ netkit-telnet-0.17/telnet/commands.c	2006-04-30 10:37:10.000000000 -0700
+@@ -1669,9 +1669,15 @@
+ 
+ 		/* If this is not the full name, try to get it via DNS */
+ 		if (strchr(hbuf, '.') == 0) {
+-			struct hostent *he = gethostbyname(hbuf);
+-			if (he != 0)
+-				strncpy(hbuf, he->h_name, sizeof hbuf-1);
++			struct addrinfo hints;
++			struct addrinfo *res;
++			memset (&hints, '\0', sizeof (hints));
++			hints.ai_flags = AI_V4MAPPED | AI_ADDRCONFIG | AI_CANONNAME;
++			if (getaddrinfo (hbuf, NULL, &hints, &res) == 0) {
++				if (res->ai_canonname != NULL)
++					strncpy(hbuf, res->ai_canonname, sizeof hbuf-1);
++				freeaddrinfo (res);
++			}
+ 			hbuf[sizeof hbuf-1] = '\0';
+ 		}
+ 
+@@ -2832,17 +2838,15 @@
+ 		if (!c)
+ 			cp2 = 0;
+ 
+-		if ((tmp = inet_addr(cp)) != -1) {
+-			sin_addr.s_addr = tmp;
+-		} else if ((host = gethostbyname(cp))) {
+-#if	defined(h_addr)
+-			memmove((caddr_t)&sin_addr,
+-				host->h_addr_list[0], 
+-				sizeof(sin_addr));
+-#else
+-			memmove((caddr_t)&sin_addr, host->h_addr, 
+-				sizeof(sin_addr));
+-#endif
++		struct addrinfo hints;
++		memset (&hints, '\0', sizeof (hints));
++		// XXX The code here seems to allow only IPv4 addresses.
++		hints.ai_family = AF_INET;
++		hints.ai_flags = AI_ADDRCONFIG;
++		struct addrinfo *aires;
++		if (getaddrinfo (cp, NULL, &hints, &aires) == 0) {
++			sin_addr = ((struct sockaddr_in *) aires->ai_addr)->sin_addr;
++			freeaddrinfo (aires);
+ 		} else {
+ 			*cpp = cp;
+ 			return(0);

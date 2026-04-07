@@ -1,0 +1,14 @@
+diff -ur b/t/lib-httpd/apache.conf a/t/lib-httpd/apache.conf
+--- b/t/lib-httpd/apache.conf	2024-01-09 11:06:46.660868023 +0100
++++ a/t/lib-httpd/apache.conf	2024-01-09 11:09:09.572713625 +0100
+@@ -272,7 +272,9 @@
+ <IfDefine DAV>
+ 	LoadModule dav_module modules/mod_dav.so
+ 	LoadModule dav_fs_module modules/mod_dav_fs.so
+-
++	<IfDirective DavLockDBType>
++   		DavLockDBType sdbm
++	</IfDirective>
+ 	DAVLockDB DAVLock
+ 	<Location /dumb/>
+ 		Dav on

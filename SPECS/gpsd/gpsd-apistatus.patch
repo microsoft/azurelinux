@@ -1,0 +1,16 @@
+diff --git a/include/gps.h b/include/gps.h
+index 55b9aa621..e5935304d 100644
+--- a/include/gps.h
++++ b/include/gps.h
+@@ -173,6 +173,11 @@ struct gps_fix_t {
+  * PPS is the encrypted military P(Y)-code */
+ #define STATUS_PPS_FIX  9
+ 
++// Old status names for compatibility
++#define STATUS_NO_FIX   STATUS_UNK
++#define STATUS_FIX      STATUS_GPS
++#define STATUS_DGPS_FIX STATUS_DGPS
++
+     double ept;         // Expected time uncertainty, seconds
+     double latitude;    // Latitude in degrees (valid if mode >= 2)
+     double epy;         // Latitude position uncertainty, meters

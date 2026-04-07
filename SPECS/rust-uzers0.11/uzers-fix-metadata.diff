@@ -1,0 +1,11 @@
+--- uzers-0.11.3/Cargo.toml	1970-01-01T00:00:01+00:00
++++ uzers-0.11.3/Cargo.toml	2025-02-15T15:50:52.847923+00:00
+@@ -32,7 +32,7 @@
+ default_features = false
+ 
+ [dev-dependencies.env_logger]
+-version = "0.7"
++version = "0.11"
+ features = []
+ default_features = false
+ 

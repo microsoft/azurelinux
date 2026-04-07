@@ -1,0 +1,29 @@
+From 4957a561867b4f363b0711bb5e0a3292f3067ce7 Mon Sep 17 00:00:00 2001
+From: Martin Wilck <mwilck@suse.com>
+Date: Tue, 9 Jan 2024 22:10:09 +0100
+Subject: [PATCH] udev rules: avoid spurious warning for non-SCSI devices
+
+The udev rules spit out lots of warnings like this:
+
+55-scsi-sg3_id.rules[15445]: WARNING: SCSI device loop0 has no device ID, consider changing .SCSI_ID_SERIAL_SRC in 00-scsi-sg3_config.rules
+
+Because the warning code had erroneously been inserted in the
+"sg3_utils_id_end" clause. Fix it.
+
+Fixes: d7b8da0 ("udev rules: restrict use of ambiguous device IDs patchset")
+---
+ scripts/55-scsi-sg3_id.rules | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/55-scsi-sg3_id.rules b/scripts/55-scsi-sg3_id.rules
+index 5e9732d6..f3ddb065 100644
+--- a/scripts/55-scsi-sg3_id.rules
++++ b/scripts/55-scsi-sg3_id.rules
+@@ -147,6 +147,6 @@ ENV{SCSI_IDENT_SERIAL}=="?*", ENV{.SCSI_ID_SERIAL_SRC}=="*S*", \
+     ENV{ID_SERIAL}="S$env{SCSI_VENDOR}_$env{SCSI_MODEL}_$env{SCSI_IDENT_SERIAL}", \
+     ENV{ID_SERIAL_SHORT}="$env{SCSI_IDENT_SERIAL}"
+ 
+-LABEL="sg3_utils_id_end"
+ ENV{ID_SERIAL}!="?*", ENV{DEVTYPE}=="disk", \
+     PROGRAM="/bin/logger -t 55-scsi-sg3_id.rules -p daemon.warning \"WARNING: SCSI device %k has no device ID, consider changing .SCSI_ID_SERIAL_SRC in 00-scsi-sg3_config.rules\""
++LABEL="sg3_utils_id_end"

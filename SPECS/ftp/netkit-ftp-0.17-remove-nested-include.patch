@@ -1,0 +1,18 @@
+--- netkit-ftp-0.17/ftp/ftp.c	2012-07-20 07:55:48.545151322 +0200
++++ netkit-ftp-0.17-new/ftp/ftp.c	2012-07-20 08:05:07.941468914 +0200
+@@ -74,6 +74,7 @@ char ftp_rcsid[] =
+ #include <sys/socket.h>
+ #include <sys/time.h>
+ #include <sys/file.h>
++#include <sys/poll.h>
+ 
+ #include <netinet/in.h>
+ #include <netinet/ip.h>
+@@ -820,7 +821,6 @@ sendrequest(const char *cmd, char *local
+ 	/* It can be later removed.                              */
+ 	if (old_code_l == 150 && code == 150 && cpend == 1
+ 	    && sunique == 1 && cin !=  NULL && fileno (cin) >=  0 ) {
+-		#include <sys/poll.h>
+ 		struct pollfd  fds_events_l [2] ;
+ 		int rc;
+ 

@@ -1,0 +1,51 @@
+From f35b64c063c492bb3c9bfa1342b28f925bfd0f10 Mon Sep 17 00:00:00 2001
+From: Sumit Bose <sbose@redhat.com>
+Date: Fri, 10 Jan 2025 13:54:07 +0100
+Subject: [PATCH 3/3] service: use proper macro for os-name and os-version
+
+---
+ service/realm-adcli-enroll.c | 4 ++--
+ service/realm-samba-enroll.c | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/service/realm-adcli-enroll.c b/service/realm-adcli-enroll.c
+index c428f70..bccbeb7 100644
+--- a/service/realm-adcli-enroll.c
++++ b/service/realm-adcli-enroll.c
+@@ -174,13 +174,13 @@ realm_adcli_enroll_join_async (RealmDisco *disco,
+ 			g_ptr_array_add (args, (gpointer)computer_ou);
+ 	}
+ 
+-	os_n = realm_options_ad_specific (options, "os-name");
++	os_n = realm_options_ad_specific (options, REALM_DBUS_OPTION_OS_NAME);
+ 	if (os_n != NULL && !g_str_equal (os_n, "")) {
+ 		g_ptr_array_add (args, "--os-name");
+ 		g_ptr_array_add (args, (gpointer)os_n);
+ 	}
+ 
+-	os_v = realm_options_ad_specific (options, "os-version");
++	os_v = realm_options_ad_specific (options, REALM_DBUS_OPTION_OS_VERSION);
+ 	if (os_v != NULL && !g_str_equal (os_v, "")) {
+ 		g_ptr_array_add (args, "--os-version");
+ 		g_ptr_array_add (args, (gpointer)os_v);
+diff --git a/service/realm-samba-enroll.c b/service/realm-samba-enroll.c
+index 1ac45c2..9d776fa 100644
+--- a/service/realm-samba-enroll.c
++++ b/service/realm-samba-enroll.c
+@@ -409,11 +409,11 @@ begin_join (GTask *task,
+ 		}
+ 	}
+ 
+-	os = realm_options_ad_specific(options, "os-name");
++	os = realm_options_ad_specific(options, REALM_DBUS_OPTION_OS_NAME);
+ 	if (os != NULL && !g_str_equal (os, ""))
+ 		join->join_args[at++] = g_strdup_printf ("osName=%s", os);
+ 
+-	os = realm_options_ad_specific(options, "os-version");
++	os = realm_options_ad_specific(options, REALM_DBUS_OPTION_OS_VERSION);
+ 	if (os != NULL && !g_str_equal (os, ""))
+ 		join->join_args[at++] = g_strdup_printf ("osVer=%s", os);
+ 
+-- 
+2.49.0
+

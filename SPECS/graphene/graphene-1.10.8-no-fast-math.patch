@@ -1,0 +1,11 @@
+diff -up graphene-1.10.8/meson.build.no-fast-math graphene-1.10.8/meson.build
+--- graphene-1.10.8/meson.build.no-fast-math	2025-06-27 11:43:26.184050402 +0200
++++ graphene-1.10.8/meson.build	2025-06-27 11:43:38.801473877 +0200
+@@ -84,7 +84,6 @@ if cc.get_id() == 'msvc'
+   ]
+ else
+   test_cflags = [
+-    '-ffast-math',
+     '-fstrict-aliasing',
+     '-Wpointer-arith',
+     '-Wstrict-prototypes',

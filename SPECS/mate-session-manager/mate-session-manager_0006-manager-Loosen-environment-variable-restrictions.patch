@@ -1,0 +1,78 @@
+From 6df44358e1e1688a32c63d840ea50e21491ffc0a Mon Sep 17 00:00:00 2001
+From: Victor Kareh <vkareh@redhat.com>
+Date: Thu, 9 Oct 2025 09:41:37 -0400
+Subject: [PATCH 6/6] manager: Loosen environment variable restrictions
+
+This loosens mate-session's env var value restrictions to match
+systemd's modern restrictions.
+
+Backported from https://gitlab.gnome.org/GNOME/gnome-session/-/commit/cbc5e5de421359ee5642e44fa9ab670d705d23ea
+---
+ configure.ac            |  6 ++++++
+ mate-session/gsm-util.c | 14 +++++++++++---
+ 2 files changed, 17 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index fd7f6a0..0bf02ca 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -120,6 +120,12 @@ if test "x$with_systemd" != "xno" ; then
+         AC_DEFINE(HAVE_SYSTEMD, 1, [systemd support])
+         AC_SUBST(SYSTEMD_CFLAGS)
+         AC_SUBST(SYSTEMD_LIBS)
++        PKG_CHECK_EXISTS([libsystemd],
++                         [systemd_pkgconfig=libsystemd],
++                         [systemd_pkgconfig=libsystemd-login])
++        PKG_CHECK_EXISTS([$systemd_pkgconfig >= 248],,
++                         [AC_DEFINE([SYSTEMD_STRICT_ENV], [1],
++                         [Use strict environment variable validation for systemd < 248])])
+     fi
+ fi
+ AM_CONDITIONAL(HAVE_SYSTEMD, test "x$use_systemd" = "xyes")
+diff --git a/mate-session/gsm-util.c b/mate-session/gsm-util.c
+index 6b7f7db..5da30d2 100644
+--- a/mate-session/gsm-util.c
++++ b/mate-session/gsm-util.c
+@@ -501,6 +501,13 @@ gsm_util_update_activation_environment (const char  *variable,
+         return environment_updated;
+ }
+ 
++#define ENV_NAME_PATTERN "[a-zA-Z_][a-zA-Z0-9_]*"
++#ifdef SYSTEMD_STRICT_ENV
++#define ENV_VALUE_PATTERN "(?:[ \t\n]|[^[:cntrl:]])*"
++#else
++#define ENV_VALUE_PATTERN ".*"
++#endif
++
+ gboolean
+ gsm_util_export_activation_environment (GError     **error)
+ {
+@@ -519,13 +526,14 @@ gsm_util_export_activation_environment (GError     **error)
+                 return FALSE;
+         }
+ 
+-        name_regex = g_regex_new ("^[a-zA-Z_][a-zA-Z0-9_]*$", G_REGEX_OPTIMIZE, 0, error);
++        name_regex = g_regex_new ("^" ENV_NAME_PATTERN "$", G_REGEX_OPTIMIZE, 0, error);
+ 
+         if (name_regex == NULL) {
+                 return FALSE;
+         }
+ 
+-        value_regex = g_regex_new ("^(?:[ \t\n]|[^[:cntrl:]])*$", G_REGEX_OPTIMIZE, 0, error);
++
++        value_regex = g_regex_new ("^" ENV_VALUE_PATTERN "$", G_REGEX_OPTIMIZE, 0, error);
+ 
+         if (value_regex == NULL) {
+                 return FALSE;
+@@ -597,7 +605,7 @@ gsm_util_export_user_environment (GError     **error)
+                 return FALSE;
+         }
+ 
+-        regex = g_regex_new ("^[a-zA-Z_][a-zA-Z0-9_]*=(?:[ \t\n]|[^[:cntrl:]])*$", G_REGEX_OPTIMIZE, 0, error);
++        regex = g_regex_new ("^" ENV_NAME_PATTERN "=" ENV_VALUE_PATTERN "$", G_REGEX_OPTIMIZE, 0, error);
+ 
+         if (regex == NULL) {
+                 return FALSE;
+-- 
+2.51.0
+

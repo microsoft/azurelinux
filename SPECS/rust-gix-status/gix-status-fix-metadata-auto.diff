@@ -1,0 +1,17 @@
+--- gix-status-0.22.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ gix-status-0.22.0/Cargo.toml	2025-12-02T22:26:13.437408+00:00
+@@ -104,9 +104,6 @@
+ [dependencies.thiserror]
+ version = "2.0.17"
+ 
+-[target.'cfg(not(target_has_atomic = "64"))'.dependencies.portable-atomic]
+-version = "1"
+-
+ [lints.clippy]
+ bool_to_int_with_if = "allow"
+ borrow_as_ptr = "allow"
+@@ -185,3 +182,4 @@
+ priority = -1
+ 
+ [lints.rust]
++

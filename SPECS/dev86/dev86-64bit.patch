@@ -1,0 +1,20 @@
+--- dev86-0.16.17/bcc/bcc.c.fix	2005-01-03 23:41:55.000000000 +0100
++++ dev86-0.16.17/bcc/bcc.c	2006-12-27 16:32:57.000000000 +0100
+@@ -226,12 +226,12 @@
+ 
+    } else {
+       /* Relative paths to normal PREFIX directory */
+-      default_include = build_libpath("-I", "/lib/bcc/include", "");
+-      default_libdir  = build_libpath("-L", "/lib/bcc", libdir_suffix);
+-      optim_rules     = build_libpath("-d", "/lib/bcc", libdir_suffix);
++      default_include = build_libpath("-I", "/lib64/bcc/include", "");
++      default_libdir  = build_libpath("-L", "/lib64/bcc", libdir_suffix);
++      optim_rules     = build_libpath("-d", "/lib64/bcc", libdir_suffix);
+ 
+-      build_prefix("/lib/bcc", libdir_suffix, "");
+-      build_prefix("/lib/bcc", "", "");
++      build_prefix("/lib64/bcc", libdir_suffix, "");
++      build_prefix("/lib64/bcc", "", "");
+    }
+ 
+    build_prefix("/bin", "", "");

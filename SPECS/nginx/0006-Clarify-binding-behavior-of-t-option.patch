@@ -1,0 +1,37 @@
+From dc847f7aedf0b4f8bbf9d7f9ba983541c6ca88c9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Lubo=C5=A1=20Uhliarik?= <luhliari@redhat.com>
+Date: Tue, 20 Jan 2026 19:27:05 +0100
+Subject: [PATCH] Clarify binding behavior of -t option.
+
+Configuration testing includes binding to configured listen addresses
+when opening referenced files.
+---
+ man/nginx.8 | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/man/nginx.8 b/man/nginx.8
+index 10db3e6..64d9ae7 100644
+--- a/man/nginx.8
++++ b/man/nginx.8
+@@ -25,7 +25,7 @@
+ .\" SUCH DAMAGE.
+ .\"
+ .\"
+-.Dd November 5, 2020
++.Dd January 21, 2026
+ .Dt NGINX 8
+ .Os
+ .Sh NAME
+@@ -98,7 +98,8 @@ but additionally dump configuration files to standard output.
+ Do not run, just test the configuration file.
+ .Nm
+ checks the configuration file syntax and then tries to open files
+-referenced in the configuration file.
++referenced in the configuration file, including binding to configured
++listen addresses.
+ .It Fl V
+ Print the
+ .Nm
+-- 
+2.44.0
+

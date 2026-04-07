@@ -1,0 +1,45 @@
+From 398f003660dda242b97217390718a2a90c3d7a88 Mon Sep 17 00:00:00 2001
+From: Stanislav Levin <slev@altlinux.org>
+Date: Tue, 13 Feb 2024 12:44:53 +0300
+Subject: [PATCH] Sync expected test_xfail's xpassed summary to Pytest 8
+
+With Pytest 8:
+https://docs.pytest.org/en/stable/changelog.html#pytest-8-0-0rc2-2024-01-17
+
+> For xpasses, add - in summary between test name and reason, to match how xfail is displayed.
+
+Fixes: https://github.com/pytest-dev/pytest-forked/issues/89
+Signed-off-by: Stanislav Levin <slev@altlinux.org>
+---
+ testing/test_xfail_behavior.py | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
+
+diff --git a/testing/test_xfail_behavior.py b/testing/test_xfail_behavior.py
+index 15edd93..d4e5ee7 100644
+--- a/testing/test_xfail_behavior.py
++++ b/testing/test_xfail_behavior.py
+@@ -7,6 +7,7 @@
+ IS_PYTEST4_PLUS = int(pytest.__version__[0]) >= 4  # noqa: WPS609
+ FAILED_WORD = "FAILED" if IS_PYTEST4_PLUS else "FAIL"
+ PYTEST_GTE_7_2 = hasattr(pytest, "version_tuple") and pytest.version_tuple >= (7, 2)  # type: ignore[attr-defined]
++PYTEST_GTE_8_0 = hasattr(pytest, "version_tuple") and pytest.version_tuple >= (8, 0)  # type: ignore[attr-defined]
+ 
+ pytestmark = pytest.mark.skipif(  # pylint: disable=invalid-name
+     not hasattr(os, "fork"),  # noqa: WPS421
+@@ -60,12 +61,10 @@ def test_xfail(is_crashing, is_strict, testdir):
+     if expected_lowercase == "xpassed":
+         # XPASS wouldn't have the crash message from
+         # pytest-forked because the crash doesn't happen
+-        short_test_summary = " ".join(
+-            (
+-                short_test_summary,
+-                "The process gets terminated",
+-            )
+-        )
++        if PYTEST_GTE_8_0:
++            short_test_summary += " -"
++        short_test_summary += " The process gets terminated"
++
+     reason_string = (
+         f"reason: The process gets terminated; "
+         f"pytest-forked reason: "

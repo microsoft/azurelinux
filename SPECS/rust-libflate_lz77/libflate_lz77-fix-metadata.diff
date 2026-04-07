@@ -1,0 +1,18 @@
+--- libflate_lz77-2.1.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ libflate_lz77-2.1.0/Cargo.toml	2024-05-01T17:54:23.366782+00:00
+@@ -33,15 +33,10 @@
+ [dependencies.rle-decode-fast]
+ version = "1.0.0"
+ 
+-[dev-dependencies.libflate]
+-version = "2.0"
+-default-features = false
+-
+ [features]
+ default = ["std"]
+ std = [
+     "core2/std",
+-    "libflate/std",
+ ]
+ 
+ [badges.coveralls]

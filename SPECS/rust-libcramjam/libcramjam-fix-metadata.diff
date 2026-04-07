@@ -1,0 +1,142 @@
+--- libcramjam-0.8.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ libcramjam-0.8.0/Cargo.toml	2025-12-16T11:07:58.443154+00:00
+@@ -35,15 +35,6 @@
+ strip_include_path_components = 1
+ 
+ [features]
+-blosc2 = ["blosc2-static"]
+-blosc2-shared = [
+-    "dep:blosc2-rs",
+-    "blosc2-rs/shared",
+-]
+-blosc2-static = [
+-    "dep:blosc2-rs",
+-    "blosc2-rs/static",
+-]
+ brotli = ["dep:brotli"]
+ bzip2 = ["dep:bzip2"]
+ capi = ["dep:libc"]
+@@ -58,87 +49,39 @@
+     "deflate",
+     "zlib",
+ ]
+-deflate = ["deflate-static"]
++deflate = ["deflate-shared"]
+ deflate-shared = [
+     "dep:libdeflate-sys",
+     "dep:flate2",
+     "libdeflate-sys/dynamic",
+ ]
+-deflate-static = [
+-    "dep:libdeflate-sys",
+-    "dep:flate2",
+-]
+-gzip = ["gzip-static"]
++gzip = ["gzip-shared"]
+ gzip-shared = [
+     "dep:libdeflate-sys",
+     "dep:flate2",
+     "libdeflate-sys/dynamic",
+     "deflate-shared",
+ ]
+-gzip-static = [
+-    "dep:libdeflate-sys",
+-    "dep:flate2",
+-    "deflate-static",
+-]
+-ideflate = ["isal-static"]
+-ideflate-shared = ["isal-shared"]
+-ideflate-static = ["isal-static"]
+-igzip = ["isal-static"]
+-igzip-shared = ["isal-shared"]
+-igzip-static = ["isal-static"]
+-isal-shared = [
+-    "dep:isal-rs",
+-    "isal-rs/shared",
+-]
+-isal-static = [
+-    "dep:isal-rs",
+-    "isal-rs/static",
+-]
+-izlib = ["isal-static"]
+-izlib-shared = ["isal-shared"]
+-izlib-static = ["isal-static"]
+ lz4 = ["dep:lz4"]
+ snappy = ["dep:snap"]
+-use-system-blosc2 = [
+-    "dep:blosc2-rs",
+-    "blosc2-rs/use-system-blosc2",
+-]
+-use-system-isal = [
+-    "dep:isal-rs",
+-    "isal-rs/use-system-isal",
+-]
+-wasm32-compat = ["blosc2-rs/deactivate-zlib-optim"]
+-xz = ["xz-static"]
++xz = ["xz-shared"]
+ xz-shared = ["dep:xz2"]
+-xz-static = [
+-    "dep:xz2",
+-    "xz2/static",
+-]
+-zlib = ["zlib-static"]
++zlib = ["zlib-shared"]
+ zlib-shared = [
+     "dep:libdeflate-sys",
+     "dep:flate2",
+     "libdeflate-sys/dynamic",
+     "deflate-shared",
+ ]
+-zlib-static = [
+-    "dep:libdeflate-sys",
+-    "dep:flate2",
+-    "deflate-static",
+-]
+ zstd = ["dep:zstd"]
+ 
+ [lib]
+ name = "libcramjam"
+ path = "src/lib.rs"
+-
+-[dependencies.blosc2-rs]
+-version = "0.4.0+2.15.2"
+-optional = true
+-default-features = false
++crate-type = ["lib", "cdylib"]
+ 
+ [dependencies.brotli]
+-version = "^7"
++version = "^8"
+ features = [
+     "std",
+     "ffi-api",
+@@ -147,7 +90,7 @@
+ default-features = false
+ 
+ [dependencies.bzip2]
+-version = ">=0.4,<0.6"
++version = ">=0.4,<0.7"
+ optional = true
+ 
+ [dependencies.flate2]
+@@ -159,7 +102,7 @@
+ optional = true
+ 
+ [dependencies.libdeflate-sys]
+-version = "<1.20.0"
++version = "^1"
+ optional = true
+ 
+ [dependencies.lz4]
+@@ -178,11 +121,6 @@
+ version = "^0.13"
+ optional = true
+ 
+-[target.'cfg(target_pointer_width = "64")'.dependencies.isal-rs]
+-version = "^0.5"
+-optional = true
+-default-features = false
+-
+ [profile.release]
+ opt-level = 3
+ lto = "fat"

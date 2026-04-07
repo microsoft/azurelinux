@@ -1,0 +1,323 @@
+# RPM Macros for packaging Haskell cabalized packages  -*-rpm-spec-*-
+# see https://fedoraproject.org/wiki/Packaging:Haskell for more details
+
+# "cabal"
+%cabal [ -x Setup ] || ghc --make -package Cabal %{!?ghc_subpackaging:-no-user-package-db} %{!?ghc_static_setup:-dynamic} Setup\
+LANG=C.utf8\
+./Setup
+
+# compiler version
+%ghc_version %{lua:
+    local ov = rpm.expand("%{?ghc_version_override}")
+    if ov and ov ~= "" then
+        print(ov)
+        return
+    end
+
+    local cache = rpm.expand("%{?_ghc_version_cache}")
+    if cache ~= "" then
+        print(cache)
+        return
+    end
+
+    local name = rpm.expand("%{?ghc_name}%{!?ghc_name:ghc}")
+    local compiler
+    if name == "ghc" then
+        compiler = "ghc"
+    else
+        compiler = "ghc-" .. string.gsub(name, "^ghc", "")
+    end
+
+    local version = rpm.expand("%(" .. compiler .. " --numeric-version)")
+
+    if version ~= "" then
+       rpm.define("_ghc_version_cache " .. version)
+    end
+    print(version)
+}
+
+%ghc_major_version %(echo %{ghc_version} | sed -e "s/\\(.*\\)\\.[0-9]\\+/\\1/")
+
+# ghc_bin_build: -W: use default ghc (ie ignore ghc_name)
+%ghc_bin_build(W)\
+%ghc_fix_doc_perms\
+%{?!ghc_debuginfo:%global debug_package %{nil}}\
+%cabal_configure\
+%cabal build %{?ghc_smp_mflags} %{?cabal_build_options}
+
+# ghc_lib_build_without_haddock [name] [version]
+%ghc_lib_build_without_haddock(PW)\
+%ghc_fix_doc_perms\
+%{?!ghc_debuginfo:%global debug_package %{nil}}\
+%cabal_configure %{!-P:%{?with_ghc_prof:--enable-library-profiling}} %{!?ghc_without_shared:--enable-shared} %{?ghc_without_shared:--disable-shared} %{!?1:%{?pkg_name:--htmldir=%{ghclibdocdir}/%{pkg_name}-%{version}}} %{?1:--docdir=%{_ghclicensedir}/ghc-%1${licensedirversion} --htmldir=%{ghclibdocdir}/%1-%2} %{?ghc_subpackaging:--user}%{!?ghc_subpackaging:--global} %{?ghc_with_lib_for_ghci:--enable-library-for-ghci} %{?ghc_executable_profiling:--enable-executable-profiling}\
+%cabal build %{?ghc_smp_mflags} %{?cabal_build_options}\
+%{nil}
+
+# ghc_lib_build [name] [version]
+# -H disables haddock
+# -P disables profiling
+# -W disables overriding default ghc
+%ghc_lib_build(HPW)\
+%ghc_lib_build_without_haddock %{-P} %{-W} %{?1} %{?2}\
+%if %{with haddock} && 0%{!?-H:1} \
+%define pkgname %{?1}%{!?1:%{pkg_name}}\
+%define pkgver %{?2}%{!?2:%{version}}\
+if [ -n dist/build/libHS%{pkgname}-%{pkgver}*.so ]; then\
+%cabal haddock --html --hyperlink-source --hoogle %{?cabal_haddock_options}\
+fi\
+%endif\
+%{nil}
+
+# install bin package
+%ghc_bin_install()\
+%cabal_install\
+%ghc_delete_rpaths\
+%{nil}
+
+# ghc_lib_install [name] [version]
+%ghc_lib_install(m)\
+%cabal_install\
+%cabal_pkg_conf %{?1} %{?2}\
+%ghc_gen_filelists %{-m} %{?1} %{?2}\
+%ghc_delete_rpaths\
+%{nil}
+
+# create and install package.conf file
+# cabal_pkg_conf [name] [version]
+%cabal_pkg_conf()\
+%define pkgname %{?1}%{!?1:%{pkg_name}}\
+%define pkgver %{?2}%{!?2:%{version}}\
+%define pkgnamever %{pkgname}-%{pkgver}\
+%cabal register --gen-pkg-config\
+if [ -d "%{ghclibdir}/lib" ]; then\
+subsubdir=/lib\
+fi\
+if [ -d %{pkgnamever}.conf ]; then\
+for i in $(ls "%{pkgnamever}.conf/"); do\
+sub=$(echo $i | sed -e "s/^[0-9]\\+-//")\
+install -D --mode=0644 %{pkgnamever}.conf/${i} %{buildroot}%{ghcliblib}${subsubdir}/package.conf.d/${sub}.conf\
+done\
+else\
+install -D --mode=0644 %{pkgnamever}.conf %{buildroot}%{ghcliblib}${subsubdir}/package.conf.d/%{pkgnamever}.conf\
+fi\
+%{nil}
+
+%ghc_set_gcc_flags\
+%global _lto_cflags %{nil}\
+%global __brp_strip_lto %{nil}\
+%ifarch s390x riscv64\
+%if %[v"%{ghc_version}" < v"9.2"]\
+# -Wunused-label is extremely noisy\
+CFLAGS="$(echo ${CFLAGS:-%optflags} | sed -e 's/-Wall //' -e 's/-Werror=format-security //')"\
+%endif\
+%endif\
+%undefine _package_note_flags\
+%global _hardened_ldflags %{nil}\
+%{nil}
+
+# configure
+%cabal_configure\
+%define pkgname %{?1}%{!?1:%{?pkg_name}%{!?pkg_name:%{name}}}\
+%define pkgver %{?2}%{!?2:%{version}}\
+%define pkgnamever %{pkgname}-%{pkgver}\
+echo\
+echo "==== Build %{pkgnamever} ===="\
+%ghc_set_gcc_flags\
+if ! [ -f Setup.hs -o -f Setup.lhs ]; then\
+# datadir hardcoded for flatpaks\
+cp /usr/share/ghc-rpm-macros/Setup.hs .\
+fi\
+if [ -d "%{ghclibdir}/lib" ]; then\
+subsubdir=/lib\
+fi\
+# bindir hardcoded for flatpaks\
+%cabal configure %{!-W:%{?ghc_name:--with-compiler=/usr/bin/ghc-%{ghc_version}}} --prefix=%{_prefix} --libdir=%{_libdir} --docdir=%{_ghcdocdir} --libsubdir='$compiler'${subsubdir}/'$pkgid' --datasubdir='$pkgid' --libexecsubdir='$pkgid' --ghc --dynlibdir=%{?_ghcdynlibdir}%{?!_ghcdynlibdir:%{_libdir}/ghc-%{ghc_version}${subsubdir}} %{!?ghc_without_dynamic:--enable-executable-dynamic} %{?with_tests:--enable-tests} %{?ghc_subpackaging:--user}%{!?ghc_subpackaging:--global} --ghc-options="-fhide-source-paths ${CFLAGS:+$(echo ' '$CFLAGS | sed -e 's/ / -optc/g')} ${LDFLAGS:+$(echo ' '$LDFLAGS | sed -e 's/ / -optl/g')}" %{?flatpak:--extra-lib-dirs=%{_libdir}} %{?cabal_configure_options} $cabal_configure_extra_options
+
+# install
+%cabal_install %cabal copy --destdir=%{buildroot} %{?cabal_install_options}
+
+# tests
+%cabal_test %cabal test %{?cabal_test_options}
+
+# no _pkgdocdir in EPEL <= 7
+%ghc_pkgdocdir %{?_pkgdocdir}%{!?_pkgdocdir:%{_docdir}/%{name}-%{version}}
+
+# library package prefix
+%ghc_prefix %{?ghc_name}%{!?ghc_name:ghc}
+
+# top ghcdocdir
+%_ghc_doc_dir %{_docdir}/%{ghc_prefix}
+
+# root dir for ghc docs (used by ghc.spec)
+%ghc_html_dir %{_ghc_doc_dir}/html
+# deprecates
+%ghcdocbasedir %ghc_html_dir
+
+# libraries doc dir (internal)
+%ghc_html_libraries_dir %{ghc_html_dir}/libraries
+# deprecates
+%ghclibdocdir %ghc_html_libraries_dir
+
+# pkg doc dir
+%ghc_html_pkg_dir %{ghc_html_libraries_dir}/%{pkg_name}-%{version}
+# deprecates
+%ghcpkgdocdir %ghc_html_pkg_dir
+
+# top library dir
+%ghclibdir %{_libdir}/ghc-%{ghc_version}
+
+%ghcliblib %{ghclibdir}%{?with_hadrian:/lib}
+
+%_ghclicensedir %{?_defaultlicensedir}%{!?_defaultlicensedir:%_docdir}
+
+# Cabal has specific arch names
+%ghcplatform %{_arch}-linux-ghc-%{ghc_version}
+
+%ghclibplatform %{ghcliblib}%{?with_hadrian:/%{ghcplatform}}
+
+# ghc_gen_filelists [-m] [name] [version]
+%ghc_gen_filelists(m)\
+%define pkgname %{?1}%{!?1:%{pkg_name}}\
+%define pkgver %{?2}%{!?2:%{version}}\
+%define pkgnamever %{pkgname}-%{pkgver}\
+%if %{without hadrian}\
+if [ -d "%{ghclibdir}/lib" ]; then\
+subsubdir=/lib\
+fi\
+%endif\
+if [ ! -f %{buildroot}%{ghcliblib}${subsubdir}/package.conf.d/%{pkgnamever}*.conf ]; then\
+echo "%{buildroot}%{ghcliblib}${subsubdir}/package.conf.d/%{pkgnamever}*.conf not found"\
+exit 1\
+fi\
+%define basepkg %{ghc_prefix}-%{pkgname}\
+rm -f %{basepkg}.files %{basepkg}-doc.files\
+touch %{basepkg}.files %{basepkg}-doc.files\
+%if 0%{?1:1}\
+if [ -d "%{buildroot}%{_ghclicensedir}/%{basepkg}" ]; then\
+for i in $(ls %{buildroot}%{_ghclicensedir}/%{basepkg}); do\
+echo "%%license %{pkgnamever}/$i" >> %{basepkg}.files\
+done\
+fi\
+%endif\
+pkgdir="%{buildroot}%{ghcliblib}${subsubdir}%{?with_hadrian:/%{ghcplatform}*}/%{pkgnamever}"\
+%if %[v"%{ghc_version}" > v"9.8"]\
+if [ ! -d ${pkgdir} ]; then\
+pkgdir="${pkgdir}-*"\
+fi\
+%endif\
+if [ -d ${pkgdir} ]; then\
+find ${pkgdir} -type d -fprintf %{basepkg}-devel.files '%%%%dir %p\\n' -o \\( -name '*.p_hi' -o -name '*.p_dyn_hi' -o -name 'libHS*_p.a' \\) -fprint %{basepkg}-prof.files -o -fprint %{basepkg}-devel.files\
+else\
+rm -f %{basepkg}-devel.files %{basepkg}-prof.files\
+touch %{basepkg}-devel.files %{basepkg}-prof.files\
+fi\
+ls %{buildroot}%{ghcliblib}${subsubdir}/package.conf.d/%{pkgnamever}*.conf >> %{basepkg}-devel.files\
+for i in %{buildroot}%{?_ghcdynlibdir}%{!?_ghcdynlibdir:%{ghcliblib}${subsubdir}%{?with_hadrian:/%{ghcplatform}*}%{!?with_hadrian:%{?base_ver:/%{pkgnamever}}}}/libHS%{pkgnamever}-*ghc%{ghc_version}.so; do\
+if [ -x "$i" ]; then\
+    case "$i" in\
+        */libHS%{pkgnamever}-*_p-ghc%{ghc_version}.so) echo $i >> %{basepkg}-prof.files ;;\
+        *) echo $i >> %{basepkg}.files ;;\
+    esac\
+else\
+echo "$i: not found"\
+%if 0%{!-m:1}\
+exit 1\
+%endif\
+fi\
+done\
+%if %{with haddock}\
+haddock_dir=%{ghc_html_libraries_dir}/%{pkgnamever}\
+if [ -d %{buildroot}$haddock_dir ]; then\
+echo $haddock_dir >> %{basepkg}-doc.files\
+%if %{with hadrian}\
+# for < 9.4.1-rc1\
+else\
+haddock_dir=%{ghc_html_libraries_dir}/%{pkgname}\
+if [ -d %{buildroot}$haddock_dir ]; then\
+echo $haddock_dir >> %{basepkg}-doc.files\
+fi\
+%endif\
+fi\
+%endif\
+for i in %{basepkg}.files %{basepkg}-devel.files %{basepkg}-doc.files %{basepkg}-prof.files; do\
+if [ -f "$i" ]; then\
+sed -i -e "s!%{buildroot}!!g" $i\
+fi\
+done\
+%{nil}
+
+# workaround Cabal bug causing executable extra-source-files (deprecated)
+%ghc_fix_doc_perms\
+for f in $(ls | grep -i -e '^\\(ANNOUNCE\\|AUTHORS\\|CHANGELOG\\|CHANGES\\|CONTRIBUTORS\\|README\\|TODO\\)'); do\
+if [ -f $f -a -x $f ]; then chmod a-x $f; fi\
+done\
+%{nil}
+
+# ghc_delete_rpaths
+%ghc_delete_rpaths\
+%if %{undefined disable_ghc_delete_rpaths}\
+echo "deleting rpaths:"\
+if ! type chrpath > /dev/null; then exit 1; fi\
+for i in $(find %{buildroot} -type f -executable -exec sh -c "file {} | grep -q 'dynamically linked'" \\; -print); do\
+%if %{defined _ghcdynlibdir}\
+    chrpath -d $i\
+%else\
+    rpath=$(chrpath $i | sed -e "s@^$i: R.*PATH=@@")\
+    case "$rpath" in\
+         *$PWD/*) chrpath -r "$(echo %{ghclibdir}/lib:%{ghclibdir}/lib/%{ghcplatform}*)" $i ;;\
+         *:%{_libdir}) chrpath -r $(echo "$rpath" | sed -e 's!:%{_libdir}$!!') $i ;;\
+         %{_libdir}:*) chrpath -r $(echo "$rpath" | sed -e 's!^%{_libdir}:!!') $i ;;\
+         *:%{_libdir}:*) chrpath -r $(echo "$rpath" | sed -e 's!:%{_libdir}:!:!') $i ;;\
+         *) ;;\
+    esac\
+%endif\
+done\
+%endif
+
+# deprecated by ghc_delete_rpaths in F35
+%ghc_fix_rpath()\
+%if %{undefined disable_ghc_fix_rpath}\
+if ! type chrpath > /dev/null; then exit 1; fi\
+echo "%0 %*"\
+for i in $(find %{buildroot} -type f -executable -exec sh -c "file {} | grep -q 'dynamically linked'" \\; -print); do\
+for lib in %*; do\
+  if [ -x "$i" ]; then\
+    rpath=$(chrpath $i | sed -e "s@^$i: R.*PATH=@@")\
+    case $rpath in\
+         *$PWD/$lib/dist/build*)\
+         case %{ghc_version} in\
+              7.10.*)\
+                pkgid=$(cd %{buildroot}%{ghcliblib}/package.conf.d; ls ${lib}* | sed -e "s/.conf$//")\
+                syspath=$(%{_rpmconfigdir}/ghc-pkg-wrapper %{buildroot}%{ghcliblib} --global --package-db=%{buildroot}%{ghcliblib}/package.conf.d field $pkgid library-dirs) ;;\
+              8.0)\
+                pkgid=$(cd %{buildroot}%{ghclibdir}; echo ${lib}*)\
+                syspath=$(%{_rpmconfigdir}/ghc-pkg-wrapper %{buildroot}%{ghcliblib} --global --package-db=%{buildroot}%{ghcliblib}/package.conf.d field $lib library-dirs | grep $pkgid) ;;\
+              *)\
+                syspath="" ;;\
+         esac\
+         newrpath=$(echo $rpath | sed -e "s@$PWD/$lib/dist/build@${syspath}@g" -e "s/::/:/" -e "s/^://" -e "s/:$//")\
+         if [ "$newrpath" = "%{_libdir}" ]; then\
+            chrpath -d $i\
+         else\
+            chrpath -r $newrpath $i\
+         fi\
+         ;;\
+         %{_libdir})\
+         chrpath -d $i\
+         ;;\
+    esac\
+  else\
+    echo "%0: no $i executable"\
+    exit 1\
+  fi\
+done\
+done\
+%endif
+
+# bindir hardcoded for flatpaks
+%ghc_pkg_recache /usr/bin/ghc-pkg-%{ghc_version} recache --no-user-package-db || :
+
+# skip prof libs and documentation (deprecated by `haskell_setup -q`)
+%ghc_quick_build\
+%undefine with_ghc_prof\
+%undefine with_haddock

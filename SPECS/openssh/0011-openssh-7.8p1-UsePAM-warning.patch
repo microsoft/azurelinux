@@ -1,0 +1,41 @@
+From 56b8d082bc9e25a77b5227d576f27088446c6fb9 Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:28 +0200
+Subject: [PATCH 11/50] openssh-7.8p1-UsePAM-warning
+
+---
+ sshd-session.c | 4 ++++
+ sshd_config    | 2 ++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/sshd-session.c b/sshd-session.c
+index a365f26f..a70b36c9 100644
+--- a/sshd-session.c
++++ b/sshd-session.c
+@@ -1127,6 +1127,10 @@ main(int ac, char **av)
+ 			    "enabled authentication methods");
+ 	}
+ 
++	/* 'UsePAM no' is not supported in our builds */
++	if (! options.use_pam)
++		logit("WARNING: 'UsePAM no' is not supported in this build and may cause several problems.");
++
+ #ifdef WITH_OPENSSL
+ 	if (options.moduli_file != NULL)
+ 		dh_set_moduli_file(options.moduli_file);
+diff --git a/sshd_config b/sshd_config
+index 608203e4..48af6321 100644
+--- a/sshd_config
++++ b/sshd_config
+@@ -89,6 +89,8 @@ AuthorizedKeysFile	.ssh/authorized_keys
+ # If you just want the PAM account and session checks to run without
+ # PAM authentication, then enable this but set PasswordAuthentication
+ # and KbdInteractiveAuthentication to 'no'.
++# WARNING: 'UsePAM no' is not supported in this build and may cause several
++# problems.
+ #UsePAM no
+ 
+ #AllowAgentForwarding yes
+-- 
+2.49.0
+

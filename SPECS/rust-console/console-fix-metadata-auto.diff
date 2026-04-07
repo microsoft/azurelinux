@@ -1,0 +1,17 @@
+--- console-0.16.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ console-0.16.2/Cargo.toml	2026-01-01T16:11:34.757904+00:00
+@@ -84,14 +84,3 @@
+ [dev-dependencies.regex]
+ version = "1.4.2"
+ 
+-[target."cfg(windows)".dependencies.encode_unicode]
+-version = "1"
+-
+-[target."cfg(windows)".dependencies.windows-sys]
+-version = "0.61"
+-features = [
+-    "Win32_Foundation",
+-    "Win32_System_Console",
+-    "Win32_Storage_FileSystem",
+-    "Win32_UI_Input_KeyboardAndMouse",
+-]

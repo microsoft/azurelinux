@@ -1,0 +1,9 @@
+d /run/httpd   710 root apache
+d /run/httpd/htcacheclean   700 apache apache
+d /var/log/httpd 700 root root -
+d /var/www       755 root root -
+d /var/www/html  755 root root -
+d /var/www/cgi-bin 755 root root -
+d /var/lib/httpd 700 apache apache -
+d /var/cache/httpd 700 apache apache -
+d /var/cache/httpd/proxy 700 apache apache -

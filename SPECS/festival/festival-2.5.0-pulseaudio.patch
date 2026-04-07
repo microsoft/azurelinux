@@ -1,0 +1,14 @@
+diff -u --recursive festival-vanilla/lib/festival.scm festival/lib/festival.scm
+--- festival-vanilla/lib/festival.scm	2018-07-22 17:42:03.513767269 -0400
++++ festival/lib/festival.scm	2018-07-22 18:53:25.698493760 -0400
+@@ -33,6 +33,10 @@
+ ;;;  General Festival Scheme specific functions
+ ;;;  Including definitions of various standard variables.
+ 
++(Parameter.set 'Audio_Required_Format 'aiff)
++(Parameter.set 'Audio_Method 'Audio_Command)
++(Parameter.set 'Audio_Command "paplay $FILE --client-name=Festival --stream-name=Speech")
++
+ ;; will be set automatically on start-up
+ (defvar festival_version "unknown"
+   "festival_version

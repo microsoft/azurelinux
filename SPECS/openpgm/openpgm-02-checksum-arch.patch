@@ -1,0 +1,11 @@
+--- openpgm-release-5-3-128/openpgm/pgm/checksum.c	2020-08-31 05:14:09.000000000 +0200
++++ openpgm-release-5-3-128/openpgm/pgm/checksum.c	2025-01-27 21:07:15.694870023 +0100
+@@ -948,7 +948,7 @@
+ 
+ 		sum = _mm_add_pi32 (sum, lo);
+ 		sum = _mm_add_pi32 (sum, hi);
+-#if 1
++#if defined(__x86_64__)
+ 		*(int64_t*)dst = _mm_cvtm64_si64 (tmp);
+ #else		
+ 		((int*)dst)[1] = _mm_cvtsi64_si32 (tmp);

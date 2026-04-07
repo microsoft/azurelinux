@@ -1,0 +1,210 @@
+diff --git a/config.h.in b/config.h.in
+--- a/config.h.in
++++ b/config.h.in
+@@ -805,6 +805,9 @@
+ /* Define if you have the pselect function.  */
+ #undef HAVE_PSELECT
+ 
++/* Define if you have the pread function. */
++#undef HAVE_PREAD
++
+ /* Define if you have the putenv function.  */
+ #undef HAVE_PUTENV
+ 
+@@ -1032,6 +1035,9 @@
+ /* Define if you have the <dlfcn.h> header file.  */
+ #undef HAVE_DLFCN_H
+ 
++/* Define if you have the <elf.h> header file.  */
++#undef HAVE_ELF_H
++
+ /* Define if you have the <grp.h> header file.  */
+ #undef HAVE_GRP_H
+ 
+diff --git a/configure.ac b/configure.ac
+--- a/configure.ac
++++ b/configure.ac
+@@ -878,7 +878,7 @@ AC_CHECK_FUNCS(dup2 eaccess fcntl getdtablesize getentropy getgroups \
+ 		getrusage gettimeofday kill killpg lstat nanosleep \
+ 		pselect readlink \
+ 		select setdtablesize setitimer statfs \
+-		tcgetpgrp uname ulimit waitpid)
++		tcgetpgrp uname ulimit waitpid pread)
+ AC_REPLACE_FUNCS(rename)
+ 
+ dnl checks for c library functions
+diff --git a/execute_cmd.c b/execute_cmd.c
+--- a/execute_cmd.c
++++ b/execute_cmd.c
+@@ -41,6 +41,10 @@
+ #  include <unistd.h>
+ #endif
+ 
++#ifdef HAVE_ELF_H
++# include <elf.h>
++#endif
++
+ #include "posixtime.h"
+ 
+ #if defined (HAVE_SYS_RESOURCE_H) && !defined (RLIMTYPE)
+@@ -6162,6 +6166,14 @@ shell_execve (char *command, char **args, char **env)
+ 	{
+ 	  /* The file has the execute bits set, but the kernel refuses to
+ 	     run it for some reason.  See why. */
++#if defined (HAVE_HASH_BANG_EXEC) || defined (HAVE_ELF_H)
++       int fd = open (command, O_RDONLY);
++
++       if (fd >= 0)
++               sample_len = read (fd, sample, sizeof (sample));
++       else
++               sample_len = -1;
++#endif
+ #if defined (HAVE_HASH_BANG_EXEC)
+ 	  READ_SAMPLE_BUF (command, sample, sample_len);
+ 	  if (sample_len > 0)
+@@ -6171,6 +6183,7 @@ shell_execve (char *command, char **args, char **env)
+ 	      char *interp;
+ 	      size_t ilen;
+ 
++          close (fd);
+ 	      interp = getinterp (sample, sample_len, (int *)NULL);
+ 	      ilen = strlen (interp);
+ 	      errno = i;
+@@ -6187,6 +6200,137 @@ shell_execve (char *command, char **args, char **env)
+ 	    }
+ 	  else
+ #endif
++#if defined (HAVE_ELF_H)
++	  if (i == ENOENT
++	      && sample_len > EI_NIDENT
++	      && memcmp (sample, ELFMAG, SELFMAG) == 0)
++	    {
++	      off_t offset = -1;
++
++	      /* It is an ELF file.  Now determine whether it is dynamically
++		 linked and if yes, get the offset of the interpreter
++		 string.  */
++	      if (sample[EI_CLASS] == ELFCLASS32
++		  && sample_len > sizeof (Elf32_Ehdr))
++		{
++		  Elf32_Ehdr ehdr;
++		  Elf32_Phdr *phdr;
++		  int nphdr;
++
++		  /* We have to copy the data since the sample buffer
++		     might not be aligned correctly to be accessed as
++		     an Elf32_Ehdr struct.  */
++		  memcpy (&ehdr, sample, sizeof (Elf32_Ehdr));
++
++		  nphdr = ehdr.e_phnum;
++		  phdr = (Elf32_Phdr *) malloc (nphdr * ehdr.e_phentsize);
++		  if (phdr != NULL)
++		    {
++#ifdef HAVE_PREAD
++		      sample_len = pread (fd, phdr, nphdr * ehdr.e_phentsize,
++					  ehdr.e_phoff);
++#else
++		      if (lseek (fd, ehdr.e_phoff, SEEK_SET) != -1)
++			sample_len = read (fd, phdr,
++					   nphdr * ehdr.e_phentsize);
++		      else
++			sample_len = -1;
++#endif
++		      if (sample_len == nphdr * ehdr.e_phentsize)
++			while (nphdr-- > 0)
++			  if (phdr[nphdr].p_type == PT_INTERP)
++			    {
++			      offset = phdr[nphdr].p_offset;
++			      break;
++			    }
++		      free (phdr);
++		    }
++		}
++	      else if (sample[EI_CLASS] == ELFCLASS64
++		       && sample_len > sizeof (Elf64_Ehdr))
++		{
++		  Elf64_Ehdr ehdr;
++		  Elf64_Phdr *phdr;
++		  int nphdr;
++
++		  /* We have to copy the data since the sample buffer
++		     might not be aligned correctly to be accessed as
++		     an Elf64_Ehdr struct.  */
++		  memcpy (&ehdr, sample, sizeof (Elf64_Ehdr));
++
++		  nphdr = ehdr.e_phnum;
++		  phdr = (Elf64_Phdr *) malloc (nphdr * ehdr.e_phentsize);
++		  if (phdr != NULL)
++		    {
++#ifdef HAVE_PREAD
++		      sample_len = pread (fd, phdr, nphdr * ehdr.e_phentsize,
++					  ehdr.e_phoff);
++#else
++		      if (lseek (fd, ehdr.e_phoff, SEEK_SET) != -1)
++			sample_len = read (fd, phdr,
++					   nphdr * ehdr.e_phentsize);
++		      else
++			sample_len = -1;
++#endif
++		      if (sample_len == nphdr * ehdr.e_phentsize)
++			while (nphdr-- > 0)
++			  if (phdr[nphdr].p_type == PT_INTERP)
++			    {
++			      offset = phdr[nphdr].p_offset;
++			      break;
++			    }
++		      free (phdr);
++		    }
++		}
++
++	      if (offset != -1)
++		{
++		  size_t maxlen = 0;
++		  size_t actlen = 0;
++		  char *interp = NULL;
++
++		  do
++		    {
++		      if (actlen == maxlen)
++			{
++			  char *newinterp = realloc (interp, maxlen += 200);
++			  if (newinterp == NULL)
++			    {
++			      actlen = 0;
++			      break;
++			    }
++			  interp = newinterp;
++
++#ifdef HAVE_PREAD
++			  actlen = pread (fd, interp, maxlen, offset);
++#else
++			  if (lseek (fd, offset, SEEK_SET) != -1)
++			    actlen = read (fd, interp, maxlen);
++			  else
++			    actlen = -1;
++#endif
++			}
++		    }
++		  while (actlen > 0 && memchr (interp, '\0', actlen) == NULL);
++
++		  if (actlen > 0)
++		    {
++		      close (fd);
++		      errno = i;
++		      sys_error ("%s: %s: bad ELF interpreter", command,
++				 interp);
++		      free (interp);
++		      return (EX_NOEXEC);
++		    }
++
++		  free (interp);
++		}
++	    }
++#endif
++#if defined (HAVE_HASH_BANG_EXEC) || defined (HAVE_ELF_H)
++	  close (fd);
++#endif
++
+ 	  if (i == ENOENT)
+ 	    {
+ 	      errno = i;

@@ -1,0 +1,111 @@
+diff -rupN --no-dereference Python-3.11.14/Lib/site.py Python-3.11.14-new/Lib/site.py
+--- Python-3.11.14/Lib/site.py	2025-10-09 18:16:55.000000000 +0200
++++ Python-3.11.14-new/Lib/site.py	2025-10-09 23:07:50.156906662 +0200
+@@ -371,7 +371,7 @@ def getsitepackages(prefixes=None):
+             continue
+         seen.add(prefix)
+ 
+-        if os.sep == '/':
++        if True: #os.sep == '/':
+             libdirs = [sys.platlibdir]
+             if sys.platlibdir != "lib":
+                 libdirs.append("lib")
+diff -rupN --no-dereference Python-3.11.14/Lib/sysconfig.py Python-3.11.14-new/Lib/sysconfig.py
+--- Python-3.11.14/Lib/sysconfig.py	2025-10-09 23:07:49.896584782 +0200
++++ Python-3.11.14-new/Lib/sysconfig.py	2025-10-09 23:07:50.157274192 +0200
+@@ -48,13 +48,13 @@ _INSTALL_SCHEMES = {
+         'data': '{base}',
+         },
+     'nt': {
+-        'stdlib': '{installed_base}/Lib',
+-        'platstdlib': '{base}/Lib',
+-        'purelib': '{base}/Lib/site-packages',
+-        'platlib': '{base}/Lib/site-packages',
+-        'include': '{installed_base}/Include',
+-        'platinclude': '{installed_base}/Include',
+-        'scripts': '{base}/Scripts',
++        'stdlib': '{installed_base}/lib/python{py_version_short}',
++        'platstdlib': '{base}/lib/python{py_version_short}',
++        'purelib': '{base}/lib/python{py_version_short}/site-packages',
++        'platlib': '{base}/lib/python{py_version_short}/site-packages',
++        'include': '{installed_base}/include/python{py_version_short}',
++        'platinclude': '{installed_base}/include/python{py_version_short}',
++        'scripts': '{base}/bin',
+         'data': '{base}',
+         },
+     # Downstream distributors can overwrite the default install scheme.
+@@ -135,12 +135,12 @@ if _HAS_USER_BASE:
+     _INSTALL_SCHEMES |= {
+         # NOTE: When modifying "purelib" scheme, update site._get_path() too.
+         'nt_user': {
+-            'stdlib': '{userbase}/Python{py_version_nodot_plat}',
+-            'platstdlib': '{userbase}/Python{py_version_nodot_plat}',
+-            'purelib': '{userbase}/Python{py_version_nodot_plat}/site-packages',
+-            'platlib': '{userbase}/Python{py_version_nodot_plat}/site-packages',
+-            'include': '{userbase}/Python{py_version_nodot_plat}/Include',
+-            'scripts': '{userbase}/Python{py_version_nodot_plat}/Scripts',
++            'stdlib': '{userbase}/lib/python{py_version_short}',
++            'platstdlib': '{userbase}/lib/python{py_version_short}',
++            'purelib': '{userbase}/lib/python{py_version_short}/site-packages',
++            'platlib': '{userbase}/lib/python{py_version_short}/site-packages',
++            'include': '{userbase}/include/python{py_version_short}',
++            'scripts': '{userbase}/bin',
+             'data': '{userbase}',
+             },
+         'posix_user': {
+@@ -560,7 +560,7 @@ def _init_non_posix(vars):
+     vars['INCLUDEPY'] = get_path('include')
+     vars['EXT_SUFFIX'] = _imp.extension_suffixes()[0]
+     vars['EXE'] = '.exe'
+-    vars['VERSION'] = _PY_VERSION_SHORT_NO_DOT
++    vars['VERSION'] = _PY_VERSION_SHORT
+     vars['BINDIR'] = os.path.dirname(_safe_realpath(sys.executable))
+     vars['TZPATH'] = ''
+ 
+diff -rupN --no-dereference Python-3.11.14/Modules/getpath.c Python-3.11.14-new/Modules/getpath.c
+--- Python-3.11.14/Modules/getpath.c	2025-10-09 18:16:55.000000000 +0200
++++ Python-3.11.14-new/Modules/getpath.c	2025-10-09 23:07:50.157572394 +0200
+@@ -883,7 +883,11 @@ _PyConfig_InitPathConfig(PyConfig *confi
+ 
+     if (
+ #ifdef MS_WINDOWS
++# ifdef __MINGW32__
++        !decode_to_dict(dict, "os_name", "mingw") ||
++# else
+         !decode_to_dict(dict, "os_name", "nt") ||
++# endif
+ #elif defined(__APPLE__)
+         !decode_to_dict(dict, "os_name", "darwin") ||
+ #else
+diff -rupN --no-dereference Python-3.11.14/Modules/getpath.py Python-3.11.14-new/Modules/getpath.py
+--- Python-3.11.14/Modules/getpath.py	2025-10-09 18:16:55.000000000 +0200
++++ Python-3.11.14-new/Modules/getpath.py	2025-10-09 23:07:50.157873857 +0200
+@@ -186,6 +186,19 @@ if os_name == 'posix' or os_name == 'dar
+     DELIM = ':'
+     SEP = '/'
+ 
++elif os_name == 'mingw':
++    BUILDDIR_TXT = 'pybuilddir.txt'
++    BUILD_LANDMARK = f'Modules\\Setup.local'
++    DEFAULT_PROGRAM_NAME = f'python{VERSION_MAJOR}'
++    STDLIB_SUBDIR = f'{platlibdir}\\python{VERSION_MAJOR}.{VERSION_MINOR}'
++    STDLIB_LANDMARKS = [f'{STDLIB_SUBDIR}\\os.py', f'{STDLIB_SUBDIR}\\os.pyc']
++    PLATSTDLIB_LANDMARK = f'{platlibdir}\\python{VERSION_MAJOR}.{VERSION_MINOR}\\lib-dynload'
++    BUILDSTDLIB_LANDMARKS = ['Lib\\os.py']
++    VENV_LANDMARK = 'pyvenv.cfg'
++    ZIP_LANDMARK = f'{platlibdir}\\python{VERSION_MAJOR}{VERSION_MINOR}.zip'
++    DELIM = ';'
++    SEP = '\\'
++
+ elif os_name == 'nt':
+     BUILDDIR_TXT = 'pybuilddir.txt'
+     BUILD_LANDMARK = f'{VPATH}\\Modules\\Setup.local'
+@@ -456,7 +469,7 @@ if not py_setpath and not home_was_set:
+     # ._pth file, but it cannot override the library's one.
+     for p in [library, executable, real_executable]:
+         if p:
+-            if os_name == 'nt' and (hassuffix(p, 'exe') or hassuffix(p, 'dll')):
++            if (os_name == 'nt' or os_name == 'mingw') and (hassuffix(p, 'exe') or hassuffix(p, 'dll')):
+                 p = p.rpartition('.')[0]
+             p += '._pth'
+             try:

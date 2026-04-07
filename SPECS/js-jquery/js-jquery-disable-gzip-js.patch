@@ -1,0 +1,11 @@
+diff -up jquery-3.7.1/Gruntfile.js.gzip jquery-3.7.1/Gruntfile.js
+--- jquery-3.7.1/Gruntfile.js.gzip	2023-08-28 07:37:56.000000000 -0600
++++ jquery-3.7.1/Gruntfile.js	2023-09-01 18:36:58.570497362 -0600
+@@ -14,7 +14,6 @@ module.exports = function( grunt ) {
+ 
+ 	const fs = require( "fs" );
+ 	const { spawn } = require( "child_process" );
+-	const gzip = require( "gzip-js" );
+ 	const nodeV16OrNewer = !/^v1[0-5]\./.test( process.version );
+ 	const nodeV17OrNewer = !/^v1[0-6]\./.test( process.version );
+ 	const customBrowsers = process.env.BROWSERS && process.env.BROWSERS.split( "," );

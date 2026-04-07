@@ -1,0 +1,18 @@
+[Unit]
+Description=Munin RRDtool Cache
+After=network.target
+
+[Service]
+User=munin
+ExecStart=/usr/bin/rrdcached \
+    -g -p /run/munin/munin-rrdcached.pid \
+    -m 0660 -l unix:/run/munin/rrdcached.sock \
+    -w 1800 -z 1800 -f 3600 \
+    -B -b /var/lib/munin/ \
+    -F -j /var/lib/munin/rrdcached/
+PIDFile=/run/munin/munin-rrdcached.pid
+StandardOutput=null
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,50 @@
+From 1bc4a96cd1b0f67be55ee4182afabdd42dd6b4d7 Mon Sep 17 00:00:00 2001
+From: Cole Mickens <cole.mickens@gmail.com>
+Date: Sun, 26 Jan 2020 01:27:08 -0800
+Subject: [PATCH] CMakeLists.txt: output date.pc for pkg-config
+
+---
+ CMakeLists.txt |  9 +++++++++
+ date.pc.in     | 10 ++++++++++
+ 2 files changed, 19 insertions(+)
+ create mode 100644 date.pc.in
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 082f835..dc96fb5 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -206,6 +206,15 @@ if( ENABLE_DATE_INSTALL )
+           LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+           RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} )  # This is for Windows
+       export( TARGETS date-tz NAMESPACE date:: APPEND FILE dateTargets.cmake )
++
++      # Cflags: -I${includedir} @TZ_COMPILE_DEFINITIONS@
++      set( TZ_COMPILE_DEFINITIONS
++          "-D$<JOIN:$<TARGET_PROPERTY:date-tz,INTERFACE_COMPILE_DEFINITIONS>, -D>" )
++      configure_file(date.pc.in date.pc.cf @ONLY)
++      file( GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/date.pc"
++          INPUT "${CMAKE_CURRENT_BINARY_DIR}/date.pc.cf" )
++      install( FILES ${CMAKE_BINARY_DIR}/date.pc
++          DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+   endif( )
+ 
+   if( WIN32 AND NOT CYGWIN)
+diff --git a/date.pc.in b/date.pc.in
+new file mode 100644
+index 0000000..afe660e
+--- /dev/null
++++ b/date.pc.in
+@@ -0,0 +1,10 @@
++prefix=@CMAKE_INSTALL_PREFIX@
++exec_prefix=${prefix}
++libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
++includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
++
++Name: date
++Description: A date and time library based on the C++11/14/17 <chrono> header
++Version: @PACKAGE_VERSION@
++Libs: -L${libdir} -ldate-tz
++Cflags: -I${includedir} @TZ_COMPILE_DEFINITIONS@
+-- 
+2.47.0
+

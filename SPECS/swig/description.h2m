@@ -1,0 +1,24 @@
+[name]
+swig - Simplified Wrapper and Interface Generator
+
+[synopsis]
+swig [ options ] " file"
+
+[description]
+The swig command is used to create wrapper code to connect C and C++ code to
+scripting languages like Perl, Python, Tcl etc. from the definition of the
+interface. For detailed information on writing those interface definitions
+please refer to /usr/share/doc/swig-doc/Doc/Manual/index.html from the swig-doc
+package.
+
+This manpage concentrates on explaining the invocation of the swig command.
+
+[author]
+SWIG was originally created by David Beazley. For up-to-date information
+about authors and contributors please check http://www.swig.org/guilty.html.
+This manual page was written by Torsten Landschoff <torsten@debian.org> and
+updated by Jitka Plesnikova <jplesnik@redhat.com> (but may be used by
+others).
+
+
+

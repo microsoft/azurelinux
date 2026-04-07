@@ -1,0 +1,19 @@
+diff -up DBD-MariaDB-1.23/t/testrules.yml.orig DBD-MariaDB-1.23/t/testrules.yml
+--- DBD-MariaDB-1.23/t/testrules.yml.orig	2023-09-10 16:18:55.000000000 +0200
++++ DBD-MariaDB-1.23/t/testrules.yml	2024-12-10 12:14:23.045521148 +0100
+@@ -1,10 +1,11 @@
+ seq:
++  - seq: t/test-setup.t
+   - seq: t/00base.t
+   - seq: t/05dbcreate.t
+   - seq: t/10connect.t
++  - seq: t/87async.t
++  - seq: t/rt75353-innodb-lock-timeout.t
++  - seq: t/rt85919-fetch-lost-connection.t
+   - par:
+-    - seq: t/60leaks.t
+-    - seq: t/87async.t
+-    - seq: t/rt75353-innodb-lock-timeout.t
+-    - seq: t/rt85919-fetch-lost-connection.t
+     - par: **
++  - seq: t/test-clean.t

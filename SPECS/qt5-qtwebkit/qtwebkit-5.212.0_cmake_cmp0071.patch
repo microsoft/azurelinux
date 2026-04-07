@@ -1,0 +1,32 @@
+Index: qtwebkit-5.212.0-alpha2/CMakeLists.txt
+===================================================================
+--- qtwebkit-5.212.0-alpha2.orig/CMakeLists.txt
++++ qtwebkit-5.212.0-alpha2/CMakeLists.txt
+@@ -6,6 +6,11 @@ if (POLICY CMP0058)
+     cmake_policy(SET CMP0058 NEW)
+ endif ()
+ 
++# Explicitly process generated files with AUTOMOC.
++if (POLICY CMP0071)
++    cmake_policy(SET CMP0071 NEW)
++endif ()
++
+ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/Source/cmake")
+ 
+ if (NOT DEFINED ENABLE_WEBKIT)
+Index: qtwebkit-5.212.0-alpha2/Source/WebKit/CMakeLists.txt
+===================================================================
+--- qtwebkit-5.212.0-alpha2.orig/Source/WebKit/CMakeLists.txt
++++ qtwebkit-5.212.0-alpha2/Source/WebKit/CMakeLists.txt
+@@ -1,6 +1,11 @@
+ cmake_minimum_required(VERSION 2.8.12)
+ include(WebKitCommon)
+ 
++# Explicitly process generated files with AUTOMOC.
++if (POLICY CMP0071)
++    cmake_policy(SET CMP0071 NEW)
++endif ()
++
+ set(WebKit_SOURCES
+     Storage/StorageAreaImpl.cpp
+     Storage/StorageAreaSync.cpp

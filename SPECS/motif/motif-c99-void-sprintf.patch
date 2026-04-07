@@ -1,0 +1,37 @@
+Stop defining VOID_SPRINTF, following what upstream libXpm does.  The
+check has an implicit declaration of exit and an implicit int, so it
+will fail to build with future compilers.
+
+diff --git a/configure.ac b/configure.ac
+index 3b412361e6f43da4..6cbeb2f5eea235eb 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -120,7 +120,6 @@ AC_FUNC_STRCOLL
+ AC_FUNC_STRFTIME
+ AC_FUNC_FORK([])
+ AC_FUNC_VPRINTF
+-AM_FUNC_VOID_SPRINTF
+ AC_CHECK_FUNCS(wcslen wcscpy wcsncpy wcschr wcscat wcsncat getcwd gettimeofday mkdir re_comp regcmp select strcspn strerror strstr strtod strtol uname)
+ AC_CHECK_FUNCS(strdup,,AC_DEFINE(NEED_STRDUP, 1, no strdup))
+ AC_CHECK_FUNCS(strcasecmp,,AC_DEFINE(NEED_STRCASECMP, 1, no strcasecmp))
+--- motif-2.3.8/acinclude.m4~	2025-08-14 13:27:19.058051442 -0500
++++ motif-2.3.8/acinclude.m4	2025-08-14 13:29:04.868675609 -0500
+@@ -46,18 +46,6 @@
+ fi
+ ])
+ 
+-dnl This test is not very reliable probably ...
+-AC_DEFUN([AM_FUNC_VOID_SPRINTF],
+-[AC_CACHE_CHECK(whether sprintf returns void, ac_cv_func_void_sprintf,
+-[AC_TRY_RUN([#include <stdio.h>
+-int sprintf(); main() { exit(sprintf(".")); }],
+-  ac_cv_func_void_sprintf=no, ac_cv_func_void_sprintf=yes, ac_cv_func_void_sprintf=yes)])
+-if test $ac_cv_func_void_sprintf = no; then
+-  AC_DEFINE(VOID_SPRINTF,1,
+-  [Define if sprintf doesn't return the number of chars written])
+-fi
+-])
+-
+ dnl This tests whether weak aliases are supported.
+ AC_DEFUN([WEAK_ALIAS_SUPPORT],
+ [AC_CACHE_CHECK(whether weak aliases are supported, ac_cv_weak_alias_support,

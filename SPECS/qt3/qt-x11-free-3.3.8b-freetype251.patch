@@ -1,0 +1,45 @@
+diff -ur qt-x11-free-3.3.8b/config.tests/x11/xfreetype.test qt-x11-free-3.3.8b-freetype251/config.tests/x11/xfreetype.test
+--- qt-x11-free-3.3.8b/config.tests/x11/xfreetype.test	2008-01-15 20:09:15.000000000 +0100
++++ qt-x11-free-3.3.8b-freetype251/config.tests/x11/xfreetype.test	2014-02-23 19:22:02.000000000 +0100
+@@ -116,33 +116,14 @@
+ # check for freetype2 headers
+ FREETYPE2_INCDIR=
+ if [ "$XFT" = "yes" ]; then
+-    INC="freetype2/freetype/freetype.h"
+-    XDIRS=`sed -n -e '/^QMAKE_INCDIR_X11[	]*=/ { s/[^=]*=[	 ]*//; s/-I/ /g; p; }' $XCONFIG`
+-    LDIRS=`sed -n -e '/^QMAKE_INCDIR[	]*=/ { s/[^=]*=[	 ]*//; s/-I/ /g; p; }' $XCONFIG`
+-    INCDIRS="$IN_INCDIRS $XDIRS $LDIRS /usr/include /include"
+-    F=
+-    for INCDIR in $INCDIRS; do
+-	if [ -f $INCDIR/$INC ]; then
+-	    # detect major version of freetype2
+-	    FREETYPE_MAJOR=`grep "#define FREETYPE_MAJOR" $INCDIR/$INC | head -n 1 | awk '{ print \$3 }'`
+-	    FREETYPE_MINOR=`grep "#define FREETYPE_MINOR" $INCDIR/$INC | head -n 1 | awk '{ print \$3 }'`
+-	    FREETYPE_PATCH=`grep "#define FREETYPE_PATCH" $INCDIR/$INC | head -n 1 | awk '{ print \$3 }'`
+-	    test -z "$FREETYPE_PATCH" && FREETYPE_PATCH="0"
+-	    [ "$VERBOSE" = "yes" ] && \
+-		echo "  Found Freetype version $FREETYPE_MAJOR.$FREETYPE_MINOR.$FREETYPE_PATCH"
+-	    if [ "$FREETYPE_MAJOR" -eq "2" ] \
+-               && [ "$FREETYPE_MINOR" -ge "0" -a "$FREETYPE_PATCH" -ge "9" ] \
+-               || [ "$FREETYPE_MINOR" -ge "1" ]; then
+-		F=yes
+-		FREETYPE2_INCDIR=$INCDIR/freetype2
+-		[ "$VERBOSE" = "yes" ] && echo "  Found $INC in $INCDIR"
+-		break
+-	    fi
+-	fi
+-    done
+-    if [ -z "$F" ]; then
+-	XFT=no
+-	[ "$VERBOSE" = "yes" ] && echo "  Could not find $INC anywhere in $INCDIRS"
++    # minimum is freetype 2.0.9, which had libtool version 6.3.0
++    if pkg-config --atleast-version=6.3.0 freetype2; then
++        [ "$VERBOSE" = "yes" ] && echo "  Found Freetype >= 2.0.9 using pkg-config"
++        FREETYPE2_INCDIR=`pkg-config --cflags-only-I freetype2 | sed -e 's/^-I//g' -e 's/ -I/ /g'`
++        [ "$VERBOSE" = "yes" ] && echo "  Freetype headers in $FREETYPE2_INCDIR"
++    else
++        XFT=no
++        [ "$VERBOSE" = "yes" ] && echo "  Could not find Freetype >= 2.0.9 using pkg-config"
+     fi
+ fi
+ 

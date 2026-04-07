@@ -1,0 +1,239 @@
+From 9f37f5d29f255285cbc7822788963681a8f659dd Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Tue, 26 Jan 2021 15:22:57 -0500
+Subject: [PATCH] test: use a power of 2 for file sizes
+
+Reduce the change of tests failing due to block size round-up.
+Freebsd was failing that way.
+
+Upstream: https://github.com/chaos/scrub/commit/5c66fc0537f4ecb21d4c3dcdd9020a02c8a2d819
+---
+ test/t02     |  2 +-
+ test/t02.exp |  2 +-
+ test/t03     |  2 +-
+ test/t03.exp |  2 +-
+ test/t04     |  2 +-
+ test/t04.exp |  2 +-
+ test/t05     |  2 +-
+ test/t05.exp |  2 +-
+ test/t06     |  2 +-
+ test/t06.exp |  2 +-
+ test/t07     |  2 +-
+ test/t11     |  2 +-
+ test/t11.exp |  2 +-
+ test/t12     |  8 ++++----
+ test/t12.exp | 12 ++++++------
+ 15 files changed, 23 insertions(+), 23 deletions(-)
+
+diff --git a/test/t02 b/test/t02
+index d09a517..14c5ca7 100755
+--- a/test/t02
++++ b/test/t02
+@@ -1,6 +1,6 @@
+ #!/bin/sh
+ TESTFILE=${TMPDIR:-/tmp}/scrub-testfile.$$
+ rm -f $TESTFILE
+-./pad 400k $TESTFILE || exit 1
++./pad 512k $TESTFILE || exit 1
+ $PATH_SCRUB -r $TESTFILE 2>&1 | sed -e "s!${TESTFILE}!file!" >t02.out || exit 1
+ diff t02.exp t02.out >t02.diff
+diff --git a/test/t02.exp b/test/t02.exp
+index 848c9b7..e026a17 100644
+--- a/test/t02.exp
++++ b/test/t02.exp
+@@ -1,5 +1,5 @@
+ scrub: using NNSA NAP-14.1-C patterns
+-scrub: scrubbing file 409600 bytes (~400KB)
++scrub: scrubbing file 524288 bytes (~512KB)
+ scrub: random  |................................................|
+ scrub: random  |................................................|
+ scrub: 0x00    |................................................|
+diff --git a/test/t03 b/test/t03
+index db9ca61..917ec52 100755
+--- a/test/t03
++++ b/test/t03
+@@ -1,6 +1,6 @@
+ #!/bin/sh
+ TESTFILE=${TMPDIR:-/tmp}/scrub-testfile.$$
+ rm -f $TESTFILE
+-./pad 400k $TESTFILE || exit 1
++./pad 512k $TESTFILE || exit 1
+ $PATH_SCRUB -r -p dod $TESTFILE 2>&1 | sed -e "s!$TESTFILE!file!" >t03.out || exit 1
+ diff t03.exp t03.out >t03.diff
+diff --git a/test/t03.exp b/test/t03.exp
+index e7e8015..4456149 100644
+--- a/test/t03.exp
++++ b/test/t03.exp
+@@ -1,5 +1,5 @@
+ scrub: using DoD 5220.22-M patterns
+-scrub: scrubbing file 409600 bytes (~400KB)
++scrub: scrubbing file 524288 bytes (~512KB)
+ scrub: random  |................................................|
+ scrub: 0x00    |................................................|
+ scrub: 0xff    |................................................|
+diff --git a/test/t04 b/test/t04
+index 3dd4165..a33e9cd 100755
+--- a/test/t04
++++ b/test/t04
+@@ -1,6 +1,6 @@
+ #!/bin/sh
+ TESTFILE=${TMPDIR:-/tmp}/scrub-testfile.$$
+ rm -f $TESTFILE
+-./pad 400k $TESTFILE || exit 1
++./pad 512k $TESTFILE || exit 1
+ $PATH_SCRUB -r -p bsi $TESTFILE 2>&1 | sed -e "s!$TESTFILE!file!" >t04.out || exit 1
+ diff t04.exp t04.out >t04.diff
+diff --git a/test/t04.exp b/test/t04.exp
+index 2bb6822..ac98d54 100644
+--- a/test/t04.exp
++++ b/test/t04.exp
+@@ -1,5 +1,5 @@
+ scrub: using BSI patterns
+-scrub: scrubbing file 409600 bytes (~400KB)
++scrub: scrubbing file 524288 bytes (~512KB)
+ scrub: 0xff    |................................................|
+ scrub: 0xfe    |................................................|
+ scrub: 0xfd    |................................................|
+diff --git a/test/t05 b/test/t05
+index 474fcd3..d9a6061 100755
+--- a/test/t05
++++ b/test/t05
+@@ -1,6 +1,6 @@
+ #!/bin/sh
+ TESTFILE=${TMPDIR:-/tmp}/scrub-testfile.$$
+ rm -f $TESTFILE
+-./pad 400k $TESTFILE || exit 1
++./pad 512k $TESTFILE || exit 1
+ $PATH_SCRUB -r -p fastold $TESTFILE 2>&1 | sed -e "s!$TESTFILE!file!" >t05.out || exit 1
+ diff t05.exp t05.out >t05.diff
+diff --git a/test/t05.exp b/test/t05.exp
+index 48ba9b7..118d7e4 100644
+--- a/test/t05.exp
++++ b/test/t05.exp
+@@ -1,5 +1,5 @@
+ scrub: using pre v1.7 scrub (skip random) patterns
+-scrub: scrubbing file 409600 bytes (~400KB)
++scrub: scrubbing file 524288 bytes (~512KB)
+ scrub: 0x00    |................................................|
+ scrub: 0xff    |................................................|
+ scrub: 0xaa    |................................................|
+diff --git a/test/t06 b/test/t06
+index 28eb856..48bde5a 100755
+--- a/test/t06
++++ b/test/t06
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ TESTFILE=${TMPDIR:-/tmp}/scrub-testfile.$$
+ rm -f $TESTFILE
+-./pad 400k $TESTFILE || exit 1
++./pad 512k $TESTFILE || exit 1
+ $PATH_SCRUB -r -p old $TESTFILE 2>&1 | sed -e "s!$TESTFILE!file!" >t06.out || exit 1
+ diff t06.exp t06.out >t06.diff
+ rc=$?
+diff --git a/test/t06.exp b/test/t06.exp
+index 49967ec..e84360a 100644
+--- a/test/t06.exp
++++ b/test/t06.exp
+@@ -1,5 +1,5 @@
+ scrub: using pre v1.7 scrub patterns
+-scrub: scrubbing file 409600 bytes (~400KB)
++scrub: scrubbing file 524288 bytes (~512KB)
+ scrub: 0x00    |................................................|
+ scrub: 0xff    |................................................|
+ scrub: 0xaa    |................................................|
+diff --git a/test/t07 b/test/t07
+index cb935bf..69eab76 100755
+--- a/test/t07
++++ b/test/t07
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ TESTFILE=${TMPDIR:-/tmp}/scrub-testfile.$$
+ rm -f $TESTFILE
+-./pad 400k $TESTFILE
++./pad 512k $TESTFILE
+ (./tsig $TESTFILE && ./tsig $TESTFILE) >t07.out 2>&1
+ diff t07.exp t07.out >t07.diff 
+ rc=$?
+diff --git a/test/t11 b/test/t11
+index 5a17b46..dd5444f 100755
+--- a/test/t11
++++ b/test/t11
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ TESTFILE=${TMPDIR:-/tmp}/scrub-testfile.$$
+ rm -f $TESTFILE
+-./pad 400k $TESTFILE || exit 1
++./pad 512k $TESTFILE || exit 1
+ $PATH_SCRUB -r -p gutmann $TESTFILE 2>&1 | sed -e "s!$TESTFILE!file!" >t11.out || exit 1
+ diff t11.exp t11.out >t11.diff
+ rc=$?
+diff --git a/test/t11.exp b/test/t11.exp
+index abd2abf..895d903 100644
+--- a/test/t11.exp
++++ b/test/t11.exp
+@@ -1,5 +1,5 @@
+ scrub: using Gutmann patterns
+-scrub: scrubbing file 409600 bytes (~400KB)
++scrub: scrubbing file 524288 bytes (~512KB)
+ scrub: random  |................................................|
+ scrub: random  |................................................|
+ scrub: random  |................................................|
+diff --git a/test/t12 b/test/t12
+index c312220..260198f 100755
+--- a/test/t12
++++ b/test/t12
+@@ -1,14 +1,14 @@
+ #!/bin/sh
+ TESTFILE=${TMPDIR:-/tmp}/scrub-testfile.$$
+ rm -f $TESTFILE
+-./pad 400k $TESTFILE || exit 1
+-$PATH_SCRUB -s 400k $TESTFILE 2>&1 | sed -e "s!$TESTFILE!file!" >t12.out
++./pad 512k $TESTFILE || exit 1
++$PATH_SCRUB -s 512k $TESTFILE 2>&1 | sed -e "s!$TESTFILE!file!" >t12.out
+ test $? = 0 || exit 1
+ ./tsize $TESTFILE >>t12.out 2>&1
+-$PATH_SCRUB -f -s 300k $TESTFILE 2>&1 | sed -e "s!$TESTFILE!file!" >>t12.out
++$PATH_SCRUB -f -s 256k $TESTFILE 2>&1 | sed -e "s!$TESTFILE!file!" >>t12.out
+ test $? = 0 || exit 1
+ ./tsize $TESTFILE >>t12.out 2>&1
+-$PATH_SCRUB -f -s 500k $TESTFILE 2>&1 | sed -e "s!$TESTFILE!file!" >>t12.out
++$PATH_SCRUB -f -s 1024k $TESTFILE 2>&1 | sed -e "s!$TESTFILE!file!" >>t12.out
+ test $? = 0 || exit 1
+ ./tsize $TESTFILE >>t12.out 2>&1
+ diff t12.exp t12.out >t12.diff
+diff --git a/test/t12.exp b/test/t12.exp
+index 33f2c97..4c5d987 100644
+--- a/test/t12.exp
++++ b/test/t12.exp
+@@ -1,22 +1,22 @@
+ scrub: using NNSA NAP-14.1-C patterns
+-scrub: scrubbing file 409600 bytes (~400KB)
++scrub: scrubbing file 524288 bytes (~512KB)
+ scrub: random  |................................................|
+ scrub: random  |................................................|
+ scrub: 0x00    |................................................|
+ scrub: verify  |................................................|
+-409600
++524288
+ scrub: warning: -s size < file size
+ scrub: using NNSA NAP-14.1-C patterns
+-scrub: scrubbing file 307200 bytes (~300KB)
++scrub: scrubbing file 262144 bytes (~256KB)
+ scrub: random  |................................................|
+ scrub: random  |................................................|
+ scrub: 0x00    |................................................|
+ scrub: verify  |................................................|
+-409600
++524288
+ scrub: using NNSA NAP-14.1-C patterns
+-scrub: scrubbing file 512000 bytes (~500KB)
++scrub: scrubbing file 1048576 bytes (~1024KB)
+ scrub: random  |................................................|
+ scrub: random  |................................................|
+ scrub: 0x00    |................................................|
+ scrub: verify  |................................................|
+-512000
++1048576
+-- 
+2.27.0
+

@@ -1,0 +1,51 @@
+--- itertools-0.12.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ itertools-0.12.1/Cargo.toml	2024-05-28T12:06:20.840267+00:00
+@@ -39,48 +39,9 @@
+ test = false
+ bench = false
+ 
+-[[bench]]
+-name = "tuple_combinations"
+-harness = false
+-
+-[[bench]]
+-name = "tuples"
+-harness = false
+-
+-[[bench]]
+-name = "fold_specialization"
+-harness = false
+-
+-[[bench]]
+-name = "combinations_with_replacement"
+-harness = false
+-
+-[[bench]]
+-name = "tree_fold1"
+-harness = false
+-
+-[[bench]]
+-name = "bench1"
+-harness = false
+-
+-[[bench]]
+-name = "combinations"
+-harness = false
+-
+-[[bench]]
+-name = "powerset"
+-harness = false
+-
+-[[bench]]
+-name = "specializations"
+-harness = false
+-
+ [dependencies.either]
+ version = "1.0"
+ default-features = false
+-
+-[dev-dependencies.criterion]
+-version = "0.4.0"
+ 
+ [dev-dependencies.paste]
+ version = "1.0.0"

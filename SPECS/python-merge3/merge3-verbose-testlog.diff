@@ -1,0 +1,8 @@
+--- a/tox.ini
++++ b/tox.ini
+@@ -2,4 +2,4 @@
+ downloadcache = {toxworkdir}/cache/
+ 
+ [testenv]
+-commands = python3 -m unittest test_merge3
++commands = python3 -m unittest test_merge3 -v

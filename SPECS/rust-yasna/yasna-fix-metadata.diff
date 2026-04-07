@@ -1,0 +1,10 @@
+--- yasna-0.5.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ yasna-0.5.2/Cargo.toml	2024-09-12T20:38:17.544568+00:00
+@@ -17,6 +17,7 @@
+ include = [
+     "src/**/*.rs",
+     "Cargo.toml",
++    "LICENSE-*",
+ ]
+ description = "ASN.1 library for Rust"
+ homepage = "https://github.com/qnighy/yasna.rs"

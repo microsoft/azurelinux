@@ -1,0 +1,80 @@
+diff --git a/untracked/gio/giomm/dbusconnection.cc b/untracked/gio/giomm/dbusconnection.cc
+index 9ddeeb4..9701106 100644
+--- a/untracked/gio/giomm/dbusconnection.cc
++++ b/untracked/gio/giomm/dbusconnection.cc
+@@ -494,7 +494,7 @@ Connection::send_message_with_reply(const Glib::RefPtr<Message>& message, int ti
+   const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
+ {
+   auto slot_copy = new SlotAsyncReady(slot);
+-  volatile guint32 out_serial = 0;
++  guint32 out_serial = 0;
+   g_dbus_connection_send_message_with_reply(gobj(), Glib::unwrap(message),
+     static_cast<GDBusSendMessageFlags>(message->get_flags()), timeout_msec, &out_serial,
+     Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+@@ -506,7 +506,7 @@ Connection::send_message_with_reply(
+   const Glib::RefPtr<Message>& message, int timeout_msec, const SlotAsyncReady& slot)
+ {
+   auto slot_copy = new SlotAsyncReady(slot);
+-  volatile guint32 out_serial = 0;
++  guint32 out_serial = 0;
+   g_dbus_connection_send_message_with_reply(gobj(), Glib::unwrap(message),
+     static_cast<GDBusSendMessageFlags>(message->get_flags()), timeout_msec, &out_serial, nullptr,
+     &SignalProxy_async_callback, slot_copy);
+@@ -517,7 +517,7 @@ Glib::RefPtr<Message>
+ Connection::send_message_with_reply_sync(const Glib::RefPtr<Message>& message,
+   const Glib::RefPtr<Cancellable>& cancellable, gint timeout_msec)
+ {
+-  volatile guint32 out_serial = 0;
++  guint32 out_serial = 0;
+   GError* gerror = nullptr;
+ 
+   GDBusMessage* result = g_dbus_connection_send_message_with_reply_sync(gobj(),
+@@ -533,7 +533,7 @@ Connection::send_message_with_reply_sync(const Glib::RefPtr<Message>& message,
+ Glib::RefPtr<Message>
+ Connection::send_message_with_reply_sync(const Glib::RefPtr<Message>& message, gint timeout_msec)
+ {
+-  volatile guint32 out_serial = 0;
++  guint32 out_serial = 0;
+   GError* gerror = nullptr;
+ 
+   GDBusMessage* result = g_dbus_connection_send_message_with_reply_sync(gobj(),
+diff --git a/gio/src/dbusconnection.ccg b/gio/src/dbusconnection.ccg
+index e28e7b4..3d9860a 100644
+--- a/gio/src/dbusconnection.ccg
++++ b/gio/src/dbusconnection.ccg
+@@ -477,7 +477,7 @@ Connection::send_message_with_reply(const Glib::RefPtr<Message>& message, int ti
+   const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
+ {
+   auto slot_copy = new SlotAsyncReady(slot);
+-  volatile guint32 out_serial = 0;
++  guint32 out_serial = 0;
+   g_dbus_connection_send_message_with_reply(gobj(), Glib::unwrap(message),
+     static_cast<GDBusSendMessageFlags>(message->get_flags()), timeout_msec, &out_serial,
+     Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+@@ -489,7 +489,7 @@ Connection::send_message_with_reply(
+   const Glib::RefPtr<Message>& message, int timeout_msec, const SlotAsyncReady& slot)
+ {
+   auto slot_copy = new SlotAsyncReady(slot);
+-  volatile guint32 out_serial = 0;
++  guint32 out_serial = 0;
+   g_dbus_connection_send_message_with_reply(gobj(), Glib::unwrap(message),
+     static_cast<GDBusSendMessageFlags>(message->get_flags()), timeout_msec, &out_serial, nullptr,
+     &SignalProxy_async_callback, slot_copy);
+@@ -500,7 +500,7 @@ Glib::RefPtr<Message>
+ Connection::send_message_with_reply_sync(const Glib::RefPtr<Message>& message,
+   const Glib::RefPtr<Cancellable>& cancellable, gint timeout_msec)
+ {
+-  volatile guint32 out_serial = 0;
++  guint32 out_serial = 0;
+   GError* gerror = nullptr;
+ 
+   GDBusMessage* result = g_dbus_connection_send_message_with_reply_sync(gobj(),
+@@ -516,7 +516,7 @@ Connection::send_message_with_reply_sync(const Glib::RefPtr<Message>& message,
+ Glib::RefPtr<Message>
+ Connection::send_message_with_reply_sync(const Glib::RefPtr<Message>& message, gint timeout_msec)
+ {
+-  volatile guint32 out_serial = 0;
++  guint32 out_serial = 0;
+   GError* gerror = nullptr;
+ 
+   GDBusMessage* result = g_dbus_connection_send_message_with_reply_sync(gobj(),

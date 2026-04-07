@@ -1,0 +1,215 @@
+From 23b1fcb104c666429451ffaf936f8da5fcd3d43a Mon Sep 17 00:00:00 2001
+From: Mark Eggleston <markeggleston@gcc.gnu.org>
+Date: Fri, 22 Jan 2021 12:29:47 +0000
+Subject: [PATCH 01/10] Allow duplicate declarations.
+
+Enabled by -fdec-duplicates and -fdec.
+
+Some fixes by Jim MacArthur <jim.macarthur@codethink.co.uk>
+Addition of -fdec-duplicates by Mark Eggleston <mark.eggleston@codethink.com>
+---
+ gcc/fortran/lang.opt                          |  4 ++++
+ gcc/fortran/options.cc                        |  1 +
+ gcc/fortran/symbol.cc                         | 21 +++++++++++++++++--
+ .../gfortran.dg/duplicate_type_4.f90          | 13 ++++++++++++
+ .../gfortran.dg/duplicate_type_5.f90          | 13 ++++++++++++
+ .../gfortran.dg/duplicate_type_6.f90          | 13 ++++++++++++
+ .../gfortran.dg/duplicate_type_7.f90          | 13 ++++++++++++
+ .../gfortran.dg/duplicate_type_8.f90          | 12 +++++++++++
+ .../gfortran.dg/duplicate_type_9.f90          | 12 +++++++++++
+ 9 files changed, 100 insertions(+), 2 deletions(-)
+ create mode 100644 gcc/testsuite/gfortran.dg/duplicate_type_4.f90
+ create mode 100644 gcc/testsuite/gfortran.dg/duplicate_type_5.f90
+ create mode 100644 gcc/testsuite/gfortran.dg/duplicate_type_6.f90
+ create mode 100644 gcc/testsuite/gfortran.dg/duplicate_type_7.f90
+ create mode 100644 gcc/testsuite/gfortran.dg/duplicate_type_8.f90
+ create mode 100644 gcc/testsuite/gfortran.dg/duplicate_type_9.f90
+
+diff --git a/gcc/fortran/lang.opt b/gcc/fortran/lang.opt
+index 2b1977c523b..52bd522051e 100644
+--- a/gcc/fortran/lang.opt
++++ b/gcc/fortran/lang.opt
+@@ -469,6 +469,10 @@ Fortran Var(flag_dec_char_conversions)
+ Enable the use of character literals in assignments and data statements
+ for non-character variables.
+ 
++fdec-duplicates
++Fortran Var(flag_dec_duplicates)
++Allow varibles to be duplicated in the type specification matches.
++
+ fdec-include
+ Fortran Var(flag_dec_include)
+ Enable legacy parsing of INCLUDE as statement.
+diff --git a/gcc/fortran/options.cc b/gcc/fortran/options.cc
+index 3a0b98bf1ec..f19ba87f8a0 100644
+--- a/gcc/fortran/options.cc
++++ b/gcc/fortran/options.cc
+@@ -77,6 +77,7 @@ set_dec_flags (int value)
+   SET_BITFLAG (flag_dec_format_defaults, value, value);
+   SET_BITFLAG (flag_dec_blank_format_item, value, value);
+   SET_BITFLAG (flag_dec_char_conversions, value, value);
++  SET_BITFLAG (flag_dec_duplicates, value, value);
+ }
+ 
+ /* Finalize DEC flags.  */
+diff --git a/gcc/fortran/symbol.cc b/gcc/fortran/symbol.cc
+index 3b988d1be22..9843175cc2a 100644
+--- a/gcc/fortran/symbol.cc
++++ b/gcc/fortran/symbol.cc
+@@ -1995,6 +1995,8 @@ gfc_add_type (gfc_symbol *sym, gfc_typespec *ts, locus *where)
+   if (sym->attr.result && type == BT_UNKNOWN && sym->ns->proc_name)
+     type = sym->ns->proc_name->ts.type;
+ 
++  flavor = sym->attr.flavor;
++
+   if (type != BT_UNKNOWN && !(sym->attr.function && sym->attr.implicit_type)
+       && !(gfc_state_stack->previous && gfc_state_stack->previous->previous
+ 	   && gfc_state_stack->previous->previous->state == COMP_SUBMODULE)
+@@ -2007,6 +2009,23 @@ gfc_add_type (gfc_symbol *sym, gfc_typespec *ts, locus *where)
+       else if (sym->attr.function && sym->attr.result)
+ 	gfc_error ("Symbol %qs at %L already has basic type of %s",
+ 		   sym->ns->proc_name->name, where, gfc_basic_typename (type));
++      else if (flag_dec_duplicates)
++	{
++	  /* Ignore temporaries and class/procedure names */
++	  if (sym->ts.type == BT_DERIVED || sym->ts.type == BT_CLASS
++	      || sym->ts.type == BT_PROCEDURE)
++	    return false;
++
++	  if (gfc_compare_types (&sym->ts, ts)
++	      && (flavor == FL_UNKNOWN || flavor == FL_VARIABLE
++	      || flavor == FL_PROCEDURE))
++	    {
++	      return gfc_notify_std (GFC_STD_LEGACY,
++				     "Symbol '%qs' at %L already has "
++				     "basic type of %s", sym->name, where,
++				     gfc_basic_typename (type));
++	    }
++	}
+       else
+ 	gfc_error ("Symbol %qs at %L already has basic type of %s", sym->name,
+ 		   where, gfc_basic_typename (type));
+@@ -2020,8 +2039,6 @@ gfc_add_type (gfc_symbol *sym, gfc_typespec *ts, locus *where)
+       return false;
+     }
+ 
+-  flavor = sym->attr.flavor;
+-
+   if (flavor == FL_PROGRAM || flavor == FL_BLOCK_DATA || flavor == FL_MODULE
+       || flavor == FL_LABEL
+       || (flavor == FL_PROCEDURE && sym->attr.subroutine)
+diff --git a/gcc/testsuite/gfortran.dg/duplicate_type_4.f90 b/gcc/testsuite/gfortran.dg/duplicate_type_4.f90
+new file mode 100644
+index 00000000000..cdd29ea8846
+--- /dev/null
++++ b/gcc/testsuite/gfortran.dg/duplicate_type_4.f90
+@@ -0,0 +1,13 @@
++! { dg-do compile }
++! { dg-options "-std=f95" }
++
++! PR fortran/30239
++! Check for errors when a symbol gets declared a type twice, even if it
++! is the same.
++
++INTEGER FUNCTION foo ()
++  IMPLICIT NONE
++  INTEGER :: x
++  INTEGER :: x ! { dg-error "basic type of" }
++  x = 42
++END FUNCTION foo
+diff --git a/gcc/testsuite/gfortran.dg/duplicate_type_5.f90 b/gcc/testsuite/gfortran.dg/duplicate_type_5.f90
+new file mode 100644
+index 00000000000..00f931809aa
+--- /dev/null
++++ b/gcc/testsuite/gfortran.dg/duplicate_type_5.f90
+@@ -0,0 +1,13 @@
++! { dg-do run }
++! { dg-options "-fdec" }
++!
++! Test case contributed by Mark Eggleston <mark.eggleston@codethink.com>
++!
++
++program test
++  implicit none
++  integer :: x
++  integer :: x
++  x = 42
++  if (x /= 42) stop 1
++end program test
+diff --git a/gcc/testsuite/gfortran.dg/duplicate_type_6.f90 b/gcc/testsuite/gfortran.dg/duplicate_type_6.f90
+new file mode 100644
+index 00000000000..f0df27e323c
+--- /dev/null
++++ b/gcc/testsuite/gfortran.dg/duplicate_type_6.f90
+@@ -0,0 +1,13 @@
++! { dg-do run }
++! { dg-options "-std=legacy -fdec-duplicates" }
++!
++! Test case contributed by Mark Eggleston <mark.eggleston@codethink.com>
++!
++
++program test
++  implicit none
++  integer :: x
++  integer :: x
++  x = 42
++  if (x /= 42) stop 1
++end program test
+diff --git a/gcc/testsuite/gfortran.dg/duplicate_type_7.f90 b/gcc/testsuite/gfortran.dg/duplicate_type_7.f90
+new file mode 100644
+index 00000000000..f32472ff586
+--- /dev/null
++++ b/gcc/testsuite/gfortran.dg/duplicate_type_7.f90
+@@ -0,0 +1,13 @@
++! { dg-do run }
++! { dg-options "-fdec-duplicates" }
++!
++! Test case contributed by Mark Eggleston <mark.eggleston@codethink.com>
++!
++
++program test
++  implicit none
++  integer :: x
++  integer :: x! { dg-warning "Legacy Extension" }
++  x = 42
++  if (x /= 42) stop 1
++end program test
+diff --git a/gcc/testsuite/gfortran.dg/duplicate_type_8.f90 b/gcc/testsuite/gfortran.dg/duplicate_type_8.f90
+new file mode 100644
+index 00000000000..23c94add179
+--- /dev/null
++++ b/gcc/testsuite/gfortran.dg/duplicate_type_8.f90
+@@ -0,0 +1,12 @@
++! { dg-do compile }
++! { dg-options "-fdec -fno-dec-duplicates" }
++!
++! Test case contributed by Mark Eggleston <mark.eggleston@codethink.com>
++!
++
++integer function foo ()
++  implicit none
++  integer :: x
++  integer :: x ! { dg-error "basic type of" }
++  x = 42
++end function foo
+diff --git a/gcc/testsuite/gfortran.dg/duplicate_type_9.f90 b/gcc/testsuite/gfortran.dg/duplicate_type_9.f90
+new file mode 100644
+index 00000000000..d5edee4d8ee
+--- /dev/null
++++ b/gcc/testsuite/gfortran.dg/duplicate_type_9.f90
+@@ -0,0 +1,12 @@
++! { dg-do compile }
++! { dg-options "-fdec-duplicates -fno-dec-duplicates" }
++!
++! Test case contributed by Mark Eggleston <mark.eggleston@codethink.com>
++!
++
++integer function foo ()
++  implicit none
++  integer :: x
++  integer :: x ! { dg-error "basic type of" }
++  x = 42
++end function foo
+-- 
+2.27.0
+

@@ -1,0 +1,173 @@
+From 993f2f8277ca01a5167e02f46ac6a962c98a3a12 Mon Sep 17 00:00:00 2001
+From: Joseph Marrero Corchado <jmarrero@redhat.com>
+Date: Wed, 28 Jan 2026 17:02:10 -0500
+Subject: [PATCH] rpmostreed-transaction-types: fix override reset
+
+PR #5510 introduced an early return optimization for container-based
+deployments to handle idempotent package layering. However, this early
+return checked only `remove_changed` (package removals) and not override
+changes, causing `rpm-ostree override reset --all` to silently return
+without staging a new deployment on container-based systems.
+
+The issue occurs because:
+1. `skip_base_check` is TRUE for container-based ostree hosts
+2. `no_overrides` (the -a flag) sets `changed = TRUE` but not `remove_changed`
+3. The early return condition `!remove_changed` was satisfied, skipping deployment
+
+This fix adds an `override_changed` tracking variable that is set when
+overrides are reset, and includes it in the early return condition. Now
+when `rpm-ostree override reset --all` is called, the deployment is
+properly staged.
+
+Also extends the idempotent-layering test to cover this scenario:
+- Performs a kernel override on a container-based deployment
+- Tests that `override reset --all` properly stages a new deployment
+- Verifies the pending deployment has no overrides
+
+This would have caught the regression introduced in PR #5510.
+
+Fixes: https://github.com/coreos/rpm-ostree/pull/5510
+Assisted-by: Claude (OpenCode)
+Signed-off-by: Joseph Marrero Corchado <jmarrero@redhat.com>
+---
+ src/daemon/rpmostreed-transaction-types.cxx   | 17 ++++--
+ .../kolainst/destructive/idempotent-layering  | 59 ++++++++++++++++++-
+ 2 files changed, 68 insertions(+), 8 deletions(-)
+
+diff --git a/src/daemon/rpmostreed-transaction-types.cxx b/src/daemon/rpmostreed-transaction-types.cxx
+index 9937d4dd..e2002b28 100644
+--- a/src/daemon/rpmostreed-transaction-types.cxx
++++ b/src/daemon/rpmostreed-transaction-types.cxx
+@@ -1194,6 +1194,7 @@ deploy_transaction_execute (RpmostreedTransaction *transaction, GCancellable *ca
+ 
+   gboolean changed = FALSE;
+   gboolean remove_changed = FALSE;
++  gboolean override_changed = FALSE;
+   if (no_initramfs
+       && (rpmostree_origin_get_regenerate_initramfs (origin)
+           || rpmostree_origin_has_initramfs_etc_files (origin)))
+@@ -1329,7 +1330,10 @@ deploy_transaction_execute (RpmostreedTransaction *transaction, GCancellable *ca
+   if (no_overrides)
+     {
+       if (rpmostree_origin_remove_all_overrides (origin))
+-        changed = TRUE;
++        {
++          changed = TRUE;
++          override_changed = TRUE;
++        }
+     }
+   else if (override_reset_pkgs || override_replace_local_pkgs)
+     {
+@@ -1463,6 +1467,7 @@ deploy_transaction_execute (RpmostreedTransaction *transaction, GCancellable *ca
+             }
+         }
+       changed = TRUE;
++      override_changed = TRUE;
+     }
+   auto treefile = (const char *)vardict_lookup_ptr (self->modifiers, "treefile", "&s");
+   if (treefile && !rpmostree_origin_merge_treefile (origin, treefile, &changed, error))
+@@ -1591,10 +1596,12 @@ deploy_transaction_execute (RpmostreedTransaction *transaction, GCancellable *ca
+   /* When using containers and nothing changed after prep_layering, return early.
+    * This happens when all requested packages are already present in the container image.
+    * For idempotent mode, this avoids the "No packages in transaction" error.
+-   * However, if packages were removed from the origin, we need to deploy to update the origin
+-   * even if no layering is needed. Similarly, if we're rebasing (refspec) or deploying a
+-   * specific revision, we need to deploy. */
+-  if (skip_base_check && !layering_changed && !remove_changed && !self->refspec && !self->revision)
++   * However, if packages were removed from the origin, or overrides were reset, we need to
++   * deploy to update the origin even if no layering is needed. Similarly, if we're rebasing
++   * (refspec) or deploying a specific revision, we need to deploy. */
++  const bool origin_changed = layering_changed || remove_changed || override_changed;
++  const bool have_refspec_or_revision = self->refspec || self->revision;
++  if (skip_base_check && !origin_changed && !have_refspec_or_revision)
+     return TRUE;
+ 
+   if (dry_run)
+diff --git a/tests/kolainst/destructive/idempotent-layering b/tests/kolainst/destructive/idempotent-layering
+index 344a59ae..ae876d28 100755
+--- a/tests/kolainst/destructive/idempotent-layering
++++ b/tests/kolainst/destructive/idempotent-layering
+@@ -1,10 +1,11 @@
+ #!/bin/bash
+ ## kola:
+-##   # Increase timeout since this test involves rebasing and container operations
+-##   timeoutMin: 20
++##   # Increase timeout since this test involves rebasing, container operations,
++##   # and kernel override/reset which requires additional reboots
++##   timeoutMin: 30
+ ##   # This test only runs on FCOS
+ ##   distros: fcos
+-##   # Needs internet access for package installation
++##   # Needs internet access for package installation and koji access
+ ##   tags: "needs-internet platform-independent"
+ ##   minMemory: 2048
+ #
+@@ -33,6 +34,23 @@ set -x
+ 
+ cd "$(mktemp -d)"
+ 
++# Get Fedora version and set up kernel override URLs
++. /etc/os-release
++case "$VERSION_ID" in
++  42)
++    koji_kernel_url="https://koji.fedoraproject.org/koji/buildinfo?buildID=2693809"
++    kernel_release=6.14.1-300.fc42.x86_64
++    ;;
++  43)
++    koji_kernel_url="https://koji.fedoraproject.org/koji/buildinfo?buildID=2837146"
++    kernel_release=6.17.1-300.fc43.x86_64
++    ;;
++  *)
++    echo "Unsupported Fedora version: $VERSION_ID"
++    exit 1
++    ;;
++esac
++
+ # TODO: It'd be much better to test this via a registry
+ image_dir=/var/tmp/fcos
+ image=oci:$image_dir
+@@ -109,6 +127,41 @@ EOF
+     rpm -q vim-enhanced
+     echo "ok idempotent install of new package"
+ 
++    # Test 5: Override kernel on container-based deployment
++    # This tests that override replace works on container-based systems
++    current_kernel=$(uname -r)
++    echo "Current kernel: ${current_kernel}"
++
++    # Fail if already on target kernel - we need to test the override/reset flow
++    if [[ "${current_kernel}" == "${kernel_release}" ]]; then
++      fatal "Cannot test kernel override: current kernel ${current_kernel} already matches target ${kernel_release}"
++    fi
++    rpm-ostree override replace "${koji_kernel_url}"
++    rpmostree_assert_status '.deployments[0]["base-local-replacements"]|length > 0'
++    echo "ok kernel override on container-based deployment"
++
++    /tmp/autopkgtest-reboot 3
++    ;;
++  3)
++    # Verify override was applied
++    current_kernel=$(uname -r)
++    echo "Current kernel after reboot: ${current_kernel}"
++
++    # Test 6: Override reset --all on container-based deployment
++    # This is the critical test that was broken - override reset -a should
++    # actually stage a new deployment, not silently do nothing
++    echo "Testing override reset --all on container-based deployment..."
++
++    rpm-ostree override reset --all
++
++    # Verify that a new deployment was staged (not just silently returned)
++    # The pending deployment should have no overrides
++    # Note: We check >= 2 because ostree may keep additional rollback deployments
++    rpmostree_assert_status '.deployments|length >= 2'
++    rpmostree_assert_status '.deployments[0].staged == true'
++    rpmostree_assert_status '.deployments[0]["base-local-replacements"]|length == 0'
++    echo "ok override reset --all on container-based deployment"
++
+     ;;
+   *) echo "unexpected mark: ${AUTOPKGTEST_REBOOT_MARK}"; exit 1;;
+ esac
+-- 
+2.52.0
+

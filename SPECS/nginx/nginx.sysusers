@@ -1,0 +1,3 @@
+#Type Name     ID             GECOS                 Home directory Shell
+g nginx -
+u nginx - "Nginx web server" /var/lib/nginx /sbin/nologin

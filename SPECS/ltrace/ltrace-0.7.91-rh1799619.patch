@@ -1,0 +1,16 @@
+diff -rup a/expr.c b/expr.c
+--- a/expr.c	2013-10-10 08:43:55.000000000 -0400
++++ b/expr.c	2020-02-06 17:05:40.658679755 -0500
+@@ -189,10 +189,10 @@ int
+ expr_clone(struct expr_node *retp, const struct expr_node *node)
+ {
+ 	*retp = *node;
++	struct expr_node *nlhs;
++	struct expr_node *nrhs = NULL;
+ 
+ 	switch (node->kind) {
+-		struct expr_node *nlhs;
+-		struct expr_node *nrhs;
+ 
+ 	case EXPR_OP_ARGNO:
+ 	case EXPR_OP_SELF:

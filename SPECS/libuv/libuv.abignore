@@ -1,0 +1,6 @@
+[suppress_function]
+symbol_name_regexp = ^uv__.*
+
+[suppress_function]
+symbol_name_regexp = .*
+change_kind = added-function

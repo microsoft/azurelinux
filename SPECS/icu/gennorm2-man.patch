@@ -1,0 +1,128 @@
+Description: supply manual page for program that doesn't have one
+Author: Jay Berkenbilt <qjb@debian.org>
+Bug: http://bugs.icu-project.org/trac/ticket/7554
+
+diff -r -u -N icu.orig/source/tools/gennorm2/gennorm2.8.in icu/source/tools/gennorm2/gennorm2.8.in
+--- icu.orig/source/tools/gennorm2/gennorm2.8.in	1970-01-01 01:00:00.000000000 +0100
++++ icu/source/tools/gennorm2/gennorm2.8.in	2013-02-25 16:43:28.297062638 +0100
+@@ -0,0 +1,71 @@
++.\" Hey, Emacs! This is -*-nroff-*- you know...
++.\"
++.\" gennorm2.8: manual page for the gennorm2 utility
++.\"
++.\" Copyright (C) 2005-2006 International Business Machines Corporation and others
++.\"
++.TH GENNORM2 8 "15 March 2010" "ICU MANPAGE" "ICU @VERSION@ Manual"
++.SH NAME
++.B gennorm2
++\- Builds binary data file with Unicode normalization data.
++.SH SYNOPSIS
++.B gennorm2
++[
++.BR "\-h\fP, \fB\-?\fP, \fB\-\-help"
++]
++[
++.BR "\-V\fP, \fB\-\-version"
++]
++[
++.BR "\-c\fP, \fB\-\-copyright"
++]
++[
++.BR "\-v\fP, \fB\-\-verbose"
++]
++[
++.BI "\-u\fP, \fB\-\-unicode" " unicode\-version\-number"
++]
++[
++.BI "\-s\fP, \fB\-\-sourcedir" " source\-directory"
++]
++[
++.BI "\-o\fP, \fB\-\-output" " output\-filename"
++]
++.BI "\fB\-\-fast"
++.SH DESCRIPTION
++.B gennorm2
++reads text files that define Unicode normalization,
++them, and builds a binary data file.
++.SH OPTIONS
++.TP
++.BR "\-h\fP, \fB\-?\fP, \fB\-\-help"
++Print help about usage and exit.
++.TP
++.BR "\-V\fP, \fB\-\-version"
++Print the version of
++.B gennorm2
++and exit.
++.TP
++.BR "\-c\fP, \fB\-\-copyright"
++Include a copyright notice.
++.TP
++.BR "\-v\fP, \fB\-\-verbose"
++Display extra informative messages during execution.
++.TP
++.BR "\-u\fP, \fB\-\-unicode"
++Specify Unicode version number, such as 5.2.0.
++.TP
++.BI "\-s\fP, \fB\-\-sourcedir" " source\-directory"
++Specify the input directory.
++.TP
++.BI "\-s\fP, \fB\-\-sourcedir" " source\-directory"
++Set the name of the output file.
++.TP
++.BI "\fB\-\-fast"
++optimize the .nrm file for fast normalization,
++which might increase its size  (Writes fully decomposed
++regular mappings instead of delta mappings.
++You should measure the runtime speed to make sure that
++this is a good trade-off.)
++.SH COPYRIGHT
++Copyright (C) 2009-2010 International Business Machines Corporation and others
+diff -r -u -N icu.orig/source/tools/gennorm2/Makefile.in icu/source/tools/gennorm2/Makefile.in
+--- icu.orig/source/tools/gennorm2/Makefile.in	2013-01-11 01:23:32.000000000 +0100
++++ icu/source/tools/gennorm2/Makefile.in	2013-02-25 16:43:28.296062632 +0100
+@@ -16,8 +16,13 @@
+ 
+ TARGET_STUB_NAME = gennorm2
+ 
++SECTION = 8
++
++MAN_FILES = $(TARGET_STUB_NAME).$(SECTION)
++
++
+ ## Extra files to remove for 'make clean'
+-CLEANFILES = *~ $(DEPS)
++CLEANFILES = *~ $(DEPS) $(MAN_FILES)
+ 
+ ## Target information
+ TARGET = $(BINDIR)/$(TARGET_STUB_NAME)$(EXEEXT)
+@@ -44,12 +49,16 @@
+ dist: dist-local
+ check: all check-local
+ 
+-all-local: $(TARGET)
++all-local: $(TARGET) $(MAN_FILES)
+ 
+-install-local: all-local
++install-local: all-local install-man
+ 	$(MKINSTALLDIRS) $(DESTDIR)$(sbindir)
+ 	$(INSTALL) $(TARGET) $(DESTDIR)$(sbindir)
+ 
++install-man: $(MAN_FILES)
++	$(MKINSTALLDIRS) $(DESTDIR)$(mandir)/man$(SECTION)
++	$(INSTALL_DATA) $? $(DESTDIR)$(mandir)/man$(SECTION)
++
+ dist-local:
+ 
+ clean-local:
+@@ -70,6 +79,11 @@
+ 	$(POST_BUILD_STEP)
+ 
+ 
++%.$(SECTION): $(srcdir)/%.$(SECTION).in
++	cd $(top_builddir) \
++	 && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
++
++
+ ifeq (,$(MAKECMDGOALS))
+ -include $(DEPS)
+ else

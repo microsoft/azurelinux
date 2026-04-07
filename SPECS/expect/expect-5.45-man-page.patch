@@ -1,0 +1,39 @@
+diff --git a/example/autoexpect.man b/example/autoexpect.man
+index 45f24a4..79fc059 100644
+--- a/example/autoexpect.man
++++ b/example/autoexpect.man
+@@ -136,7 +136,7 @@ using the date command while running autoexpect is a sure way to
+ produce a script that will require editing in order for it to work.
+ 
+ The \-p flag puts autoexpect into "prompt mode".  In this mode,
+-autoexpect will only look for the the last line of program output \-
++autoexpect will only look for the last line of program output \-
+ which is usually the prompt.  This handles the date problem (see
+ above) and most others.
+ 
+diff --git a/example/tknewsbiff.man b/example/tknewsbiff.man
+index dc5d4ad..63aec9f 100644
+--- a/example/tknewsbiff.man
++++ b/example/tknewsbiff.man
+@@ -177,7 +177,7 @@ The "server" variable names an NNTP news-server.
+ The default is "news".  The "server" variable is
+ only used if the "active_file" variable is not set.
+ 
+-The "server_timeout" variable describes how how many seconds to wait
++The "server_timeout" variable describes how many seconds to wait
+ for a response from the server before giving up.  -1 means wait
+ forever or until the server itself times out.  The default is 60
+ seconds.
+diff --git a/expect.man b/expect.man
+index 1edff14..10352b6 100644
+--- a/expect.man
++++ b/expect.man
+@@ -623,7 +623,7 @@ patterns are specified as with Tcl's
+ command.  (Such patterns are also similar to C-shell regular expressions
+ usually referred to as "glob" patterns).  The
+ .B \-gl
+-flag may may
++flag may
+ be used to protect patterns that might otherwise match
+ .B expect
+ flags from doing so.

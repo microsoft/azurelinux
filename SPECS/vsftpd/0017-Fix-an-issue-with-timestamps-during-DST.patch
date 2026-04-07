@@ -1,0 +1,161 @@
+From 5ec0b86e5c1ff060720b5a6cd1af9d93ec993650 Mon Sep 17 00:00:00 2001
+From: Martin Sehnoutka <msehnout@redhat.com>
+Date: Thu, 29 Sep 2016 11:14:03 +0200
+Subject: [PATCH 17/59] Fix an issue with timestamps during DST.
+
+vsftpd now checks whether a file was uploaded during DST and
+adjust the timestamp accordingly.
+---
+ sysutil.c | 104 ++++++++++++++++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 77 insertions(+), 27 deletions(-)
+
+diff --git a/sysutil.c b/sysutil.c
+index c848356..2abdd13 100644
+--- a/sysutil.c
++++ b/sysutil.c
+@@ -26,8 +26,10 @@
+ /* For Linux, this adds nothing :-) */
+ #include "port/porting_junk.h"
+ 
++#define F_LOCALTIME "/etc/localtime"
++#define BUFTZSIZ 64
++
+ #include <signal.h>
+-#include <string.h>
+ #include <stdlib.h>
+ #include <unistd.h>
+ #include <sys/types.h>
+@@ -56,6 +58,11 @@
+ #include <netdb.h>
+ #include <sys/resource.h>
+ 
++#ifndef __USE_GNU
++  #define __USE_GNU
++#endif
++#include <string.h>
++
+ /* Private variables to this file */
+ /* Current umask() */
+ static unsigned int s_current_umask;
+@@ -2574,49 +2581,92 @@ error:
+   die("reopening standard file descriptors to /dev/null failed");
+ }
+ 
++char* vsf_sysutil_get_tz()
++{
++  char *ret_tz = NULL;
++  char buff[BUFTZSIZ];
++  off_t s_pos, e_pos;
++  size_t rcnt, rest;
++  int fd;
++
++  if ((fd = open(F_LOCALTIME, O_RDONLY)) > -1)
++  {
++    if ((e_pos = lseek(fd, 0, SEEK_END)) <= 0)
++    {
++      close(fd);
++      return NULL;
++    }
++    s_pos = e_pos > BUFTZSIZ ? e_pos - BUFTZSIZ : 0;
++    lseek(fd, s_pos, SEEK_SET);
++    rcnt = read(fd, buff, BUFTZSIZ);
++
++    if (rcnt && buff[rcnt-1] == '\n')
++    {
++      buff[rcnt-1] = 0;
++      e_pos--;
++    }
++
++    do {
++       char *nl = memrchr(buff, '\n', rcnt);
++       if (rcnt && nl)
++       {
++         int offset = (++nl) - buff;
++         int len = e_pos - s_pos - offset;
++         if (len)
++         {
++           lseek(fd, s_pos + offset, SEEK_SET);
++           ret_tz = calloc(1, len+4);
++           memcpy(ret_tz, "TZ=", 3);
++           rcnt = read(fd, ret_tz+3, len);
++         }
++         break;
++       }
++       if (!s_pos)
++       {
++         break;
++       }
++       rest = s_pos > BUFTZSIZ ? s_pos - BUFTZSIZ : 0;
++       s_pos -= rest;
++       lseek(fd, s_pos, SEEK_SET);
++       rcnt = read(fd, buff, rest);
++    } while (rcnt > 0);
++
++    close (fd);
++  }
++
++  return ret_tz;
++}
++
+ void
+ vsf_sysutil_tzset(void)
+ {
+   int retval;
+-  char tzbuf[sizeof("+HHMM!")];
++  char *tz=NULL, tzbuf[sizeof("+HHMM!")];
+   time_t the_time = time(NULL);
+   struct tm* p_tm;
++
++  /* Set our timezone in the TZ environment variable to cater for the fact
++   * that modern glibc does not cache /etc/localtime (which becomes inaccessible
++   * when we chroot().
++   */
++  tz = vsf_sysutil_get_tz();;
++  if (tz)
++  {
++    putenv(tz);
++  }
+   tzset();
+   p_tm = localtime(&the_time);
+   if (p_tm == NULL)
+   {
+     die("localtime");
+   }
+-  /* Set our timezone in the TZ environment variable to cater for the fact
+-   * that modern glibc does not cache /etc/localtime (which becomes inaccessible
+-   * when we chroot().
+-   */
+   retval = strftime(tzbuf, sizeof(tzbuf), "%z", p_tm);
+   tzbuf[sizeof(tzbuf) - 1] = '\0';
+   if (retval == 5)
+   {
+-    /* Static because putenv() does not copy the string. */
+-    static char envtz[sizeof("TZ=UTC-hh:mm")];
+-    /* Insert a colon so we have e.g. -05:00 instead of -0500 */
+-    tzbuf[5] = tzbuf[4];
+-    tzbuf[4] = tzbuf[3];
+-    tzbuf[3] = ':';
+-    /* Invert the sign - we just got the offset _from_ UTC but for TZ, we need
+-     * the offset _to_ UTC.
+-     */
+-    if (tzbuf[0] == '+')
+-    {
+-      tzbuf[0] = '-';
+-    }
+-    else
+-    {
+-      tzbuf[0] = '+';
+-    }
+-    snprintf(envtz, sizeof(envtz), "TZ=UTC%s", tzbuf);
+-    putenv(envtz);
+     s_timezone = ((tzbuf[1] - '0') * 10 + (tzbuf[2] - '0')) * 60 * 60;
+-    s_timezone += ((tzbuf[4] - '0') * 10 + (tzbuf[5] - '0')) * 60;
+-    if (tzbuf[0] == '-')
++    s_timezone += ((tzbuf[3] - '0') * 10 + (tzbuf[4] - '0')) * 60;
++    if (tzbuf[0] == '+')
+     {
+       s_timezone *= -1;
+     }
+-- 
+2.14.4
+

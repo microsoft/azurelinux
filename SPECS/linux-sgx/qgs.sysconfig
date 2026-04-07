@@ -1,0 +1,5 @@
+# To enable QGS verbose mode, or debugging (implies verbose),
+# uncomment one of these:
+QGS_ARGS=
+#QGS_ARGS=--debug
+#QGS_ARGS=--verbose

@@ -1,0 +1,12 @@
+diff -up libdbus-c++-0.9.0/src/Makefile.am.linkfix libdbus-c++-0.9.0/src/Makefile.am
+--- libdbus-c++-0.9.0/src/Makefile.am.linkfix	2013-12-17 16:07:22.326715886 +0100
++++ libdbus-c++-0.9.0/src/Makefile.am	2013-12-17 16:07:34.474542044 +0100
+@@ -29,7 +29,7 @@ libdbus_c___1_la_CXXFLAGS = \
+ 	-Wno-unused-parameter
+ 
+ libdbus_c___1_la_LIBADD = \
+-	$(dbus_LIBS)
++	$(dbus_LIBS) $(xml_LIBS)
+ 
+ AM_CPPFLAGS = \
+ 	$(dbus_CFLAGS) \

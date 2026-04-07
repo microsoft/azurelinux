@@ -1,0 +1,8 @@
+--- pnet_datalink-0.35.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ pnet_datalink-0.35.0/Cargo.toml	2025-05-20T13:17:43.378755+00:00
+@@ -66,5 +66,3 @@
+ netmap = []
+ std = ["pnet_base/std"]
+ 
+-[target."cfg(windows)".dependencies.winapi]
+-version = "0.3.9"

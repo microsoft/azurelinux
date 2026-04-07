@@ -1,0 +1,29 @@
+From fc8aa721d2f55aa40eb8e1a681a78c24db811b10 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Thu, 27 Mar 2025 16:07:10 +0000
+Subject: [PATCH 11/17] psw: make aesm_service build verbose.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ psw/ae/aesm_service/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/psw/ae/aesm_service/Makefile b/psw/ae/aesm_service/Makefile
+index 89a15875..dbfa3fb6 100644
+--- a/psw/ae/aesm_service/Makefile
++++ b/psw/ae/aesm_service/Makefile
+@@ -80,7 +80,7 @@ copy_data_file:
+ 	@$(CP) $(WHITE_LIST_FILE) data/white_list_cert_to_be_verify.bin
+ 
+ $(APPNAME): $(CPPMICROSERVICES) source/build/CMakeCache.txt urts RDRAND
+-	$(MAKE) -C source/build
++	$(MAKE) -C source/build VERBOSE=1
+ ifeq ($(USE_HOST_CPPMICROSERVICES), 0)
+ 	$(CP) $(CPPMICROSERVICES) source/build/bin/
+ endif
+-- 
+2.52.0
+

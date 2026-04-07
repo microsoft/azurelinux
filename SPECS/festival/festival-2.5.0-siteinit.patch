@@ -1,0 +1,157 @@
+diff -u --recursive festival-vanilla/doc/festival.texi festival/doc/festival.texi
+--- festival-vanilla/doc/festival.texi	2017-09-04 11:54:08.000000000 -0400
++++ festival/doc/festival.texi	2018-09-09 10:04:50.409877809 -0400
+@@ -936,14 +936,15 @@
+ @cindex initialization
+ @cindex installation initialization
+ @cindex @file{init.scm}
+-@cindex @file{siteinit.scm}
++@cindex @file{/etc/festival.scm}
++@cindex @file{/etc/festivalvars.scm}
+ Once compiled Festival may be further customized for particular sites.
+ At start up time Festival loads the file @file{init.scm} from its
+ library directory.  This file further loads other necessary files such
+ as phoneset descriptions, duration parameters, intonation parameters,
+ definitions of voices etc.  It will also load the files
+-@file{sitevars.scm} and @file{siteinit.scm} if they exist.  
+-@file{sitevars.scm} is loaded after the basic Scheme library functions
++@file{/etc/festivalvars.scm} and @file{/etc/festival.scm} if they exist.
++@file{/etc/festivalvars.scm} is loaded after the basic Scheme library functions
+ are loaded but before any of the festival related functions are
+ loaded.  This file is intended to set various path names before
+ various subsystems are loaded.  Typically variables such
+@@ -951,17 +952,17 @@
+ @code{voices_dir} (pointing to voice directories) should
+ be reset here if necessary.
+ 
+-@cindex change libdir at run-time
++@cindex change libdir or datadir at run-time
+ @cindex run-time configuration
+ @cindex @code{load-path}
+ The default installation will try to find its lexicons and voices
+ automatically based on the value of @code{load-path} (this is derived
+-from @code{FESTIVAL_HOME} at compilation time or by using the @code{--libdir}
++from @code{FESTIVAL_HOME} at compilation time or by using the @code{--datadir}
+ at run-time).  If the voices and lexicons have been unpacked into
+ subdirectories of the library directory (the default) then no site
+ specific initialization of the above pathnames will be necessary.
+ 
+-The second site specific file is @file{siteinit.scm}.  Typical examples
++The second site specific file is @file{/etc/festival.scm}.  Typical examples
+ of local initialization are as follows.  The default audio output method
+ is NCD's NAS system if that is supported as that's what we use normally
+ in CSTR.  If it is not supported, any hardware specific mode is the
+@@ -969,7 +970,7 @@
+ But that default is just a setting in @file{init.scm}.  If for example
+ in your environment you may wish the default audio output method to be
+ 8k mulaw through @file{/dev/audio} you should add the following line to
+-your @file{siteinit.scm} file
++your @file{/etc/festival.scm} file
+ @lisp
+ (Parameter.set 'Audio_Method 'sunaudio)
+ @end lisp
+@@ -990,7 +991,7 @@
+ for sample rate and file type.  When playing waveforms, Festival, by
+ default, outputs as unheadered waveform in native byte order.  In this
+ example you would set up the default audio playing mechanism in
+-@file{siteinit.scm} as follows
++@file{/etc/festival.scm} as follows
+ @lisp
+ (Parameter.set 'Audio_Method 'Audio_Command)
+ (Parameter.set 'Audio_Command "adplay -raw -r $SR $FILE")
+@@ -1036,12 +1037,12 @@
+ depend on many things but due to various licence (and resource)
+ restrictions you may only have some diphone/nphone databases available
+ in your installation.  The function name that is the value of
+-@code{voice_default} is called immediately after @file{siteinit.scm} is
++@code{voice_default} is called immediately after @file{/etc/festival.scm} is
+ loaded offering the opportunity for you to change it.  In
+ the standard distribution no change should be required.  If you
+ download all the distributed voices @code{voice_rab_diphone} is
+ the default voice.  You may change this for a site by adding
+-the following to @file{siteinit.scm} or per person by changing
++the following to @file{/etc/festival.scm} or per person by changing
+ your @file{.festivalrc}.  For example if you wish to
+ change the default voice to the American one @code{voice_ked_diphone}
+ @lisp
+@@ -1085,7 +1086,9 @@
+ Copyright (C) University of Edinburgh, 1996-2003. All rights reserved.
+ For details type `(festival_warranty)'
+ festival> libdir
+-"/projects/festival/lib/"
++"/usr/lib/festival"
++festival> datadir
++"/usr/share/festival"
+ festival> ^D
+ @end example
+ This should show the pathname you set in your @file{config/config}.
+@@ -1106,7 +1109,7 @@
+ You have selected NAS as the audio output but have no server running on
+ that machine or your @code{DISPLAY} or @code{AUDIOSERVER} environment
+ variable is not set properly for your output device.  Either set these
+-properly or change the audio output device in @file{lib/siteinit.scm} as
++properly or change the audio output device in @file{lib/festival.scm} as
+ described above.
+ 
+ Ensure your audio device actually works the way you think it does.  On
+@@ -1136,7 +1139,7 @@
+ @code{voice_rab_diphone} (@file{festvox_rabxxxx.tar.gz}) is the default
+ voice and that @code{voice_ked_diphone} and @code{voice_don_diphone}
+ (@file{festvox_kedxxxx.tar.gz} and @file{festvox_don.tar.gz}) are
+-installed.  Also local settings in your @file{festival/lib/siteinit.scm}
++installed.  Also local settings in your @file{/etc/festival.scm}
+ may affect these tests.  However, after installation it may
+ be worth trying
+ @example
+Only in festival/doc: festival.texi.orig
+Only in festival-vanilla/: festival
+diff -u --recursive festival-vanilla/lib/init.scm festival/lib/init.scm
+--- festival-vanilla/lib/init.scm	2017-09-04 11:54:08.000000000 -0400
++++ festival/lib/init.scm	2018-09-09 10:04:50.406877794 -0400
+@@ -42,6 +42,10 @@
+   "home-directory
+    Place looked at for .festivalrc etc.")
+ 
++;;; system-wide startup initialization
++(if (probe_file (path-append sysconfdir "festivalvars.scm"))
++	(load (path-append sysconfdir "festivalvars.scm")))
++
+ ;;;  User startup initialization, can be used to override load-path
+ ;;;  to allow alternate basic modules to be loaded.
+ (if (probe_file (path-append home-directory ".siodvarsrc"))
+@@ -50,11 +54,6 @@
+ (if (probe_file (path-append home-directory ".festivalvarsrc"))
+     (load (path-append home-directory ".festivalvarsrc")))
+ 
+-;;;  A chance to set various variables to a local setting e.g.
+-;;;  lexdir, voices_dir audio etc etc.
+-(if (probe_file (path-append libdir "sitevars.scm"))
+-    (load (path-append libdir "sitevars.scm")))
+-
+ ;;; CSTR siod extensions
+ (require 'cstr)
+ 
+@@ -135,8 +134,8 @@
+ ;;;
+ ;;;  Local site initialization, if the file exists load it
+ ;;;
+-(if (probe_file (path-append libdir "siteinit.scm"))
+-    (load (path-append libdir "siteinit.scm")))
++(if (probe_file (path-append sysconfdir "festival.scm"))
++    (load (path-append sysconfdir "festival.scm")))
+ 
+ ;;;  User initialization, if a user has a personal customization
+ ;;;  file loaded it
+diff -u --recursive festival-vanilla/lib/synthesis.scm festival/lib/synthesis.scm
+--- festival-vanilla/lib/synthesis.scm	2017-09-04 11:54:08.000000000 -0400
++++ festival/lib/synthesis.scm	2018-09-09 10:04:50.380877660 -0400
+@@ -68,7 +68,7 @@
+    The default list of functions to be run on all synthesized utterances
+    after Wave_Synth.  This will normally be nil but if for some reason you
+    need to change the gain or rescale *all* waveforms you could set the
+-   function here, in your siteinit.scm.")
++   function here, in your /etc/festival.scm.")
+ 
+ (defvar after_synth_hooks default_after_synth_hooks
+   "after_synth_hooks
+Only in festival/src/arch/festival: festival.cc.orig

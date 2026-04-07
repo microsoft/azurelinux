@@ -1,0 +1,14 @@
+--- libxdg-basedir-1.2.0/src/basedir.c	2012-01-22 02:29:11.000000000 +0100
++++ libxdg-basedir-1.2.0/src/basedir.c	2013-10-13 00:55:11.174671212 +0200
+@@ -160,6 +160,11 @@
+ 		free(cache->cacheHome);
+ 		cache->cacheHome = 0;
+ 	}
++	if (cache->runtimeDirectory)
++	{
++		free(cache->runtimeDirectory);
++		cache->runtimeDirectory = 0;
++	}
+ 	xdgFreeStringList(cache->searchableDataDirectories);
+ 	cache->searchableDataDirectories = 0;
+ 	xdgFreeStringList(cache->searchableConfigDirectories);

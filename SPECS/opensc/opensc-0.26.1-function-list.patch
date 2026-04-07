@@ -1,0 +1,108 @@
+From 03013c8de50aac63af3a57787104b70a1fc2fac7 Mon Sep 17 00:00:00 2001
+From: Jakub Jelen <jjelen@redhat.com>
+Date: Mon, 5 May 2025 15:20:04 +0200
+Subject: [PATCH] pkcs11-spy: Fall back to PKCS#11 2.* interfaces rather than
+ returning NULL function list pointer
+
+---
+ src/pkcs11/pkcs11-spy.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/pkcs11/pkcs11-spy.c b/src/pkcs11/pkcs11-spy.c
+index 98ab07b65c..73b65f4555 100644
+--- a/src/pkcs11/pkcs11-spy.c
++++ b/src/pkcs11/pkcs11-spy.c
+@@ -1631,10 +1631,10 @@ spy_interface_function_list(CK_INTERFACE_PTR pInterface, CK_INTERFACE_PTR_PTR re
+ 	}
+ 
+ 	version = (CK_VERSION *)pInterface->pFunctionList;
+-	if (version->major == 2) {
+-		(*retInterface)->pFunctionList = pkcs11_spy;
+-	} else if (version->major == 3 && version->minor == 0) {
++	if (version->major == 3 && version->minor == 0) {
+ 		(*retInterface)->pFunctionList = pkcs11_spy_3_0;
++	} else {
++		(*retInterface)->pFunctionList = pkcs11_spy;
+ 	}
+ }
+ 
+From 541df5f7708387a92909b8b2aab3ea25b80e209b Mon Sep 17 00:00:00 2001
+From: Jakub Jelen <jjelen@redhat.com>
+Date: Tue, 13 Jan 2026 18:28:17 +0100
+Subject: [PATCH] pkcs11-spy: Avoid buffer overrun with bad modules
+
+Turns out softhsm returns function list with version 3
+from GetFunctionList, which will cause we overrun the structure
+we get from `C_LoadModule()`.
+
+This is fixed by copying the provided function list to our memory
+and checking that we really have the Interface function before
+calling them.
+
+https://github.com/softhsm/SoftHSMv2/issues/839
+---
+ src/pkcs11/pkcs11-spy.c | 25 +++++++++++++++++++++----
+ 1 file changed, 21 insertions(+), 4 deletions(-)
+
+diff --git a/src/pkcs11/pkcs11-spy.c b/src/pkcs11/pkcs11-spy.c
+index 0c08646006..e94a91497f 100644
+--- a/src/pkcs11/pkcs11-spy.c
++++ b/src/pkcs11/pkcs11-spy.c
+@@ -337,13 +337,28 @@ init_spy(void)
+ 		return CKR_DEVICE_ERROR;
+ 	}
+ 	modhandle = C_LoadModule(module, &po_v2);
+-	po = (CK_FUNCTION_LIST_3_0_PTR) po_v2;
++	/* Make sure we do not overrun underlying list if broken
++	 * module returns version 3 from GetFuntionList()
++	 * https://github.com/softhsm/SoftHSMv2/issues/839
++	 */
++	po = calloc(1, sizeof(CK_FUNCTION_LIST_3_0));
++	if (po == NULL) {
++		free(pkcs11_spy);
++		pkcs11_spy = NULL;
++		free(pkcs11_spy_3_0);
++		pkcs11_spy_3_0 = NULL;
++		return CKR_HOST_MEMORY;
++	}
++	memcpy(po, po_v2, sizeof(CK_FUNCTION_LIST));
+ 	if (modhandle && po) {
+ 		fprintf(spy_output, "Loaded: \"%s\"\n", module);
+ 	}
+ 	else {
+ 		po = NULL;
+ 		free(pkcs11_spy);
++		pkcs11_spy = NULL;
++		free(pkcs11_spy_3_0);
++		pkcs11_spy_3_0 = NULL;
+ 		rv = CKR_GENERAL_ERROR;
+ 	}
+ 
+@@ -1750,7 +1767,7 @@ C_GetInterfaceList(CK_INTERFACE_PTR pInterfacesList, CK_ULONG_PTR pulCount)
+ 	}
+ 
+ 	enter("C_GetInterfaceList");
+-	if (po->version.major < 3) {
++	if (po->version.major < 3 || po->C_GetInterfaceList == NULL) {
+ 		fprintf(spy_output, "[compat]\n");
+ 
+ 		if (pulCount == NULL_PTR)
+@@ -1820,7 +1837,7 @@ C_GetInterface(CK_UTF8CHAR_PTR pInterfaceName, CK_VERSION_PTR pVersion,
+ 	}
+ 
+ 	enter("C_GetInterface");
+-	if (po->version.major < 3) {
++	if (po->version.major < 3 || po->C_GetInterface == NULL) {
+ 		fprintf(spy_output, "[compat]\n");
+ 	}
+ 	if (pInterfaceName != NULL) {
+@@ -1835,7 +1852,7 @@ C_GetInterface(CK_UTF8CHAR_PTR pInterfaceName, CK_VERSION_PTR pVersion,
+ 	}
+ 	fprintf(spy_output, "[in] flags = %s\n",
+ 		(flags & CKF_INTERFACE_FORK_SAFE ? "CKF_INTERFACE_FORK_SAFE" : ""));
+-	if (po->version.major >= 3) {
++	if (po->version.major >= 3 && po->C_GetInterface != NULL) {
+ 		CK_VERSION in_version = {0, 0};
+ 		CK_VERSION_PTR fakeVersion = NULL;
+ 		CK_INTERFACE_PTR rInterface = NULL;
+

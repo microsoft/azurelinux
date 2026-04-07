@@ -1,0 +1,24 @@
+diff -up pegasus/rpm/manLinux/man8.Z/cimconfig.8.orig pegasus/rpm/manLinux/man8.Z/cimconfig.8
+--- pegasus/rpm/manLinux/man8.Z/cimconfig.8.orig	2020-06-25 14:03:32.211892328 +0200
++++ pegasus/rpm/manLinux/man8.Z/cimconfig.8	2020-06-25 14:11:31.687821336 +0200
+@@ -463,7 +463,7 @@ mentioned between single quotes since it
+ like .+, !, -. 
+ .PD 0
+ .IP
+-.BR "Default Value: " DEFAULT\ (The\ default\ cipher\ list\ of\ OpenSSL)
++.BR "Default Value: " PROFILE=SYSTEM\ (Protocols\ enforced\ by\ system-wide\ crypto\ policy)
+ .IP
+ .BR Dynamic: \0No
+ .PD
+diff -up pegasus/src/Pegasus/Config/SecurityPropertyOwner.cpp.orig pegasus/src/Pegasus/Config/SecurityPropertyOwner.cpp
+--- pegasus/src/Pegasus/Config/SecurityPropertyOwner.cpp.orig	2020-06-25 14:02:19.104445704 +0200
++++ pegasus/src/Pegasus/Config/SecurityPropertyOwner.cpp	2020-06-25 14:02:54.695663130 +0200
+@@ -140,7 +140,7 @@ static struct ConfigPropertyRow properti
+ #ifdef PEGASUS_ENABLE_USERGROUP_AUTHORIZATION
+     {"authorizedUserGroups", "", IS_STATIC, IS_VISIBLE},
+ #endif
+-    {"sslCipherSuite", "DEFAULT", IS_STATIC, IS_VISIBLE}
++    {"sslCipherSuite", "PROFILE=SYSTEM", IS_STATIC, IS_VISIBLE}
+ #ifdef PEGASUS_ENABLE_SESSION_COOKIES
+     ,{"httpSessionTimeout", "0", IS_DYNAMIC, IS_VISIBLE}
+ #endif

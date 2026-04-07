@@ -1,0 +1,37 @@
+From 607aa65e82e0fae1e9e4666206f746d7ffc1a3b7 Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Mon, 12 Feb 2024 22:39:36 -0500
+Subject: [PATCH 3/6] TST: Fix IntervalIndex constructor tests on big-endian
+ systems
+
+Two tests cases specify the expected data to be little-endian. However,
+none of the other cases do so, and the test creates native endian data,
+causing these tests to fail only in these specific cases.
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ pandas/tests/indexes/interval/test_constructors.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/pandas/tests/indexes/interval/test_constructors.py b/pandas/tests/indexes/interval/test_constructors.py
+index e47a014f18..28a6ac4c6d 100644
+--- a/pandas/tests/indexes/interval/test_constructors.py
++++ b/pandas/tests/indexes/interval/test_constructors.py
+@@ -44,12 +44,12 @@ class ConstructorTests:
+             (Index(np.arange(-10, 11, dtype=np.int64)), np.int64),
+             (Index(np.arange(10, 31, dtype=np.uint64)), np.uint64),
+             (Index(np.arange(20, 30, 0.5), dtype=np.float64), np.float64),
+-            (date_range("20180101", periods=10), "<M8[ns]"),
++            (date_range("20180101", periods=10), "M8[ns]"),
+             (
+                 date_range("20180101", periods=10, tz="US/Eastern"),
+                 "datetime64[ns, US/Eastern]",
+             ),
+-            (timedelta_range("1 day", periods=10), "<m8[ns]"),
++            (timedelta_range("1 day", periods=10), "m8[ns]"),
+         ]
+     )
+     def breaks_and_expected_subtype(self, request):
+-- 
+2.43.0
+

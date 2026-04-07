@@ -1,0 +1,2 @@
+u keylime -   "Keylime unprivileged user" /var/lib/keylime /usr/sbin/nologin
+m keylime tss

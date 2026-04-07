@@ -1,0 +1,146 @@
+diff -urNp a/include/net-snmp/library/default_store.h b/include/net-snmp/library/default_store.h
+--- a/include/net-snmp/library/default_store.h	2025-09-01 10:02:06.355543487 +0200
++++ b/include/net-snmp/library/default_store.h	2025-09-01 10:06:35.524663762 +0200
+@@ -183,6 +183,8 @@ extern          "C" {
+ #define NETSNMP_DS_LIB_SSH_PUBKEY        33
+ #define NETSNMP_DS_LIB_SSH_PRIVKEY       34
+ #define NETSNMP_DS_LIB_OUTPUT_PRECISION  35
++#define NETSNMP_DS_LIB_TLS_MIN_VERSION   36
++#define NETSNMP_DS_LIB_TLS_MAX_VERSION   37
+ #define NETSNMP_DS_LIB_MAX_STR_ID        48 /* match NETSNMP_DS_MAX_SUBIDS */
+ 
+     /*
+diff -urNp a/man/snmpd.conf.5.def b/man/snmpd.conf.5.def
+--- a/man/snmpd.conf.5.def	2025-09-01 10:02:06.417543463 +0200
++++ b/man/snmpd.conf.5.def	2025-09-01 10:07:03.717037472 +0200
+@@ -203,6 +203,12 @@ HIGH:!AES128\-SHA
+ .RE
+ .IP
+ The default value is whatever openssl itself was configured with.
++.IP "tlsMinVersion STRING"
++The function sets the minimum supported TLS protocol version. 
++OPTION can be one of < tls1 | tls1_1| tls1_2 | tls1_3 >.
++.IP "tlsMaxVersion STRING"
++The function sets the maximum supported TLS protocol version. 
++OPTION can be one of < tls1 | tls1_1| tls1_2 | tls1_3 >.
+ .IP "[snmp] x509CRLFile"
+ If you are using a Certificate Authority (CA) that publishes a
+ Certificate Revocation List (CRL) then this token can be used to
+diff -urNp a/snmplib/transports/snmpTLSBaseDomain.c b/snmplib/transports/snmpTLSBaseDomain.c
+--- a/snmplib/transports/snmpTLSBaseDomain.c	2025-09-01 10:02:06.457543447 +0200
++++ b/snmplib/transports/snmpTLSBaseDomain.c	2025-09-01 10:10:02.796751304 +0200
+@@ -479,6 +479,9 @@ SSL_CTX *
+ _sslctx_common_setup(SSL_CTX *the_ctx, _netsnmpTLSBaseData *tlsbase) {
+     char         *crlFile;
+     char         *cipherList;
++    char         *tlsMinVersion;
++    char         *tlsMaxVersion;
++    int          tlsVersion;
+     X509_LOOKUP  *lookup;
+     X509_STORE   *cert_store = NULL;
+ 
+@@ -502,6 +505,63 @@ _sslctx_common_setup(SSL_CTX *the_ctx, _
+                              X509_V_FLAG_CRL_CHECK | X509_V_FLAG_CRL_CHECK_ALL);
+     }
+ 
++#ifdef SSL_CTX_set_min_proto_version
++    tlsVersion = TLS1_2_VERSION;
++    tlsMinVersion = "tls1_2";
++    tlsMinVersion = netsnmp_ds_get_string(NETSNMP_DS_LIBRARY_ID,
++                                          NETSNMP_DS_LIB_TLS_MIN_VERSION);
++    if (NULL != tlsMinVersion) {
++        if (strcmp("tls1",tlsMinVersion) == 0) {
++           tlsVersion = TLS1_VERSION;
++        }
++        else if (strcmp("tls1_1",tlsMinVersion) == 0) {
++           tlsVersion = TLS1_1_VERSION;
++        }
++        else if (strcmp("tls1_2",tlsMinVersion) == 0) {
++           tlsVersion = TLS1_2_VERSION;
++        }
++        else if (strcmp("tls1_3",tlsMinVersion) == 0) {
++           tlsVersion = TLS1_3_VERSION;
++        }
++        else {
++            LOGANDDIE("Invalid tlsMinVersion value");
++        }
++    }
++    if (1 == SSL_CTX_set_min_proto_version(the_ctx, tlsVersion)) {
++        snmp_log(LOG_INFO,"Set tlsMinVersion to '%s'\n", tlsMinVersion);
++    }
++    else {
++        LOGANDDIE("Set tlsMinVersion failed");
++    }
++    tlsVersion = TLS1_3_VERSION;
++    tlsMaxVersion = "tls1_3";
++    tlsMaxVersion = netsnmp_ds_get_string(NETSNMP_DS_LIBRARY_ID,
++                                          NETSNMP_DS_LIB_TLS_MAX_VERSION);
++    if (NULL != tlsMaxVersion) {
++        if (strcmp("tls1",tlsMaxVersion) == 0) {
++            tlsVersion = TLS1_VERSION;
++        }
++        else if (strcmp("tls1_1",tlsMaxVersion) == 0) {
++            tlsVersion = TLS1_1_VERSION;
++        }
++        else if (strcmp("tls1_2",tlsMaxVersion) == 0) {
++            tlsVersion = TLS1_2_VERSION;
++        }
++        else if (strcmp("tls1_3",tlsMaxVersion) == 0) {
++            tlsVersion = TLS1_3_VERSION;
++        }
++        else {
++            LOGANDDIE("Invalid tlsMaxVersion value");
++        }
++    }
++    if (1 == SSL_CTX_set_max_proto_version(the_ctx, tlsVersion)) {
++        snmp_log(LOG_INFO,"Set tlsMaxVersion to '%s'\n", tlsMaxVersion);
++    }
++    else {
++        LOGANDDIE("Set tlsMaxVersion failed");
++    }
++#endif
++
+     cipherList = netsnmp_ds_get_string(NETSNMP_DS_LIBRARY_ID,
+                                        NETSNMP_DS_LIB_TLS_ALGORITMS);
+     if (NULL != cipherList) {
+@@ -803,6 +863,15 @@ netsnmp_tlsbase_ctor(void) {
+                                NETSNMP_DS_LIBRARY_ID,
+                                NETSNMP_DS_LIB_TLS_ALGORITMS);
+ 
++    /* What TLS version should be used at least */
++    netsnmp_ds_register_config(ASN_OCTET_STR, "snmp", "tlsMinVersion",
++                               NETSNMP_DS_LIBRARY_ID,
++                               NETSNMP_DS_LIB_TLS_MIN_VERSION);
++    /* What TLS version should be used at max */
++    netsnmp_ds_register_config(ASN_OCTET_STR, "snmp", "tlsMaxVersion",
++                               NETSNMP_DS_LIBRARY_ID,
++                               NETSNMP_DS_LIB_TLS_MAX_VERSION);
++
+     /*
+      * for the client
+      */
+diff -urNp a/snmplib/transports/snmpTLSTCPDomain.c b/snmplib/transports/snmpTLSTCPDomain.c
+--- a/snmplib/transports/snmpTLSTCPDomain.c	2025-09-01 10:02:06.460543446 +0200
++++ b/snmplib/transports/snmpTLSTCPDomain.c	2025-09-01 10:10:46.100597968 +0200
+@@ -718,10 +718,6 @@ netsnmp_tlstcp_open_client(netsnmp_trans
+         return NULL;
+     }
+ 
+-#ifdef SSL_CTX_set_max_proto_version
+-    SSL_CTX_set_max_proto_version(tlsdata->ssl_context, TLS1_VERSION);
+-#endif
+-
+     /* RFC5953 Section 5.3.1:  Establishing a Session as a Client
+        3)  Using the destTransportDomain and destTransportAddress values,
+        the client will initiate the (D)TLS handshake protocol to
+@@ -917,10 +913,6 @@ netsnmp_tlstcp_open_server(netsnmp_trans
+ 
+     /* create the OpenSSL TLS context */
+     tlsdata->ssl_context = sslctx_server_setup(TLS_method());
+-#ifdef SSL_CTX_set_max_proto_version
+-    if (tlsdata->ssl_context)
+-        SSL_CTX_set_max_proto_version(tlsdata->ssl_context, TLS1_VERSION);
+-#endif
+ 
+     t->sock = BIO_get_fd(tlsdata->accept_bio, NULL);
+     t->flags |= NETSNMP_TRANSPORT_FLAG_LISTEN;

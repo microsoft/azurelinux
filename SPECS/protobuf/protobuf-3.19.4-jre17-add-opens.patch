@@ -1,0 +1,10 @@
+--- protobuf-3.19.4/java/pom.xml.jre17	2022-02-13 11:45:39.367028268 +0900
++++ protobuf-3.19.4/java/pom.xml	2022-02-13 12:43:18.212542147 +0900
+@@ -37,6 +37,7 @@
+     <test.proto.dir>src/test/proto</test.proto.dir>
+     <generated.sources.dir>${project.build.directory}/generated-sources</generated.sources.dir>
+     <generated.testsources.dir>${project.build.directory}/generated-test-sources</generated.testsources.dir>
++    <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
+   </properties>
+ 
+   <licenses>

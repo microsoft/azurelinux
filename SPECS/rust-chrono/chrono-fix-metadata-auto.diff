@@ -1,0 +1,37 @@
+--- chrono-0.4.44/Cargo.toml	1970-01-01T00:00:01+00:00
++++ chrono-0.4.44/Cargo.toml	2026-02-23T13:52:46.881664+00:00
+@@ -96,10 +96,8 @@
+ std = ["alloc"]
+ unstable-locales = ["pure-rust-locales"]
+ wasmbind = [
+-    "wasm-bindgen",
+-    "js-sys",
+ ]
+-winapi = ["windows-link"]
++winapi = []
+ 
+ [lib]
+ name = "chrono"
+@@ -160,22 +158,8 @@
+ [dev-dependencies.windows-bindgen]
+ version = "0.66"
+ 
+-[target.'cfg(all(target_arch = "wasm32", not(any(target_os = "emscripten", target_os = "wasi"))))'.dependencies.js-sys]
+-version = "0.3"
+-optional = true
+-
+-[target.'cfg(all(target_arch = "wasm32", not(any(target_os = "emscripten", target_os = "wasi"))))'.dependencies.wasm-bindgen]
+-version = "0.2"
+-optional = true
+-
+-[target.'cfg(all(target_arch = "wasm32", not(any(target_os = "emscripten", target_os = "wasi"))))'.dev-dependencies.wasm-bindgen-test]
+-version = "0.3"
+-
+ [target."cfg(unix)".dependencies.iana-time-zone]
+ version = "0.1.45"
+ features = ["fallback"]
+ optional = true
+ 
+-[target."cfg(windows)".dependencies.windows-link]
+-version = "0.2"
+-optional = true

@@ -1,0 +1,184 @@
+diff -rup binutils.orig/ld/testsuite/ld-riscv-elf/attr-phdr.d binutils-2.40/ld/testsuite/ld-riscv-elf/attr-phdr.d
+--- binutils.orig/ld/testsuite/ld-riscv-elf/attr-phdr.d	2023-02-16 10:11:38.656875289 +0000
++++ binutils-2.40/ld/testsuite/ld-riscv-elf/attr-phdr.d	2023-02-16 10:49:26.786573665 +0000
+@@ -12,8 +12,8 @@ Program Headers:
+   Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align
+   RISCV_ATTRIBUT .*
+   LOAD           .*
+-
++#...
+  Section to Segment mapping:
+   Segment Sections...
+    00     .riscv.attributes 
+-   01     .text 
++#pass
+diff -rup binutils.orig/ld/testsuite/ld-riscv-elf/pcgp-relax-01.d binutils-2.40/ld/testsuite/ld-riscv-elf/pcgp-relax-01.d
+--- binutils.orig/ld/testsuite/ld-riscv-elf/pcgp-relax-01.d	2023-02-16 10:11:38.659875285 +0000
++++ binutils-2.40/ld/testsuite/ld-riscv-elf/pcgp-relax-01.d	2023-02-16 10:42:54.803431287 +0000
+@@ -8,7 +8,7 @@
+ Disassembly of section \.text:
+ 
+ 0+[0-9a-f]+ <_start>:
+-.*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a0,a0,[0-9]+
++.*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a0,a0,\-[0-9]+
+ .*:[ 	]+[0-9a-f]+[ 	]+jal[ 	]+ra,[0-9a-f]+ <_start>
+ .*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a1,gp,\-[0-9]+ # [0-9a-f]+ <data_g>
+ .*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a2,gp,\-[0-9]+ # [0-9a-f]+ <data_g>
+diff -rup binutils.orig/ld/testsuite/ld-riscv-elf/pcgp-relax-02.d binutils-2.40/ld/testsuite/ld-riscv-elf/pcgp-relax-02.d
+--- binutils.orig/ld/testsuite/ld-riscv-elf/pcgp-relax-02.d	2023-02-16 10:11:38.659875285 +0000
++++ binutils-2.40/ld/testsuite/ld-riscv-elf/pcgp-relax-02.d	2023-02-16 10:43:49.540306593 +0000
+@@ -11,5 +11,5 @@ Disassembly of section .text:
+ [0-9a-f]+ <_start>:
+ .*:[ 	]+[0-9a-f]+[ 	]+auipc[ 	]+a1.*
+ .*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a0,gp.*<data_a>
+-.*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a1,a1.*<data_b>
++.*:[ 	]+[0-9a-f]+[ 	]+mv[ 	]+a1,a1
+ #pass
+diff -rup binutils.orig/ld/testsuite/ld-riscv-elf/pcrel-lo-addend-2a.d binutils-2.40/ld/testsuite/ld-riscv-elf/pcrel-lo-addend-2a.d
+--- binutils.orig/ld/testsuite/ld-riscv-elf/pcrel-lo-addend-2a.d	2023-02-16 10:11:38.659875285 +0000
++++ binutils-2.40/ld/testsuite/ld-riscv-elf/pcrel-lo-addend-2a.d	2023-02-16 10:46:55.570899994 +0000
+@@ -2,4 +2,5 @@
+ #source: pcrel-lo-addend-2a.s
+ #as: -march=rv32ic
+ #ld: -m[riscv_choose_ilp32_emul] --no-relax
++#skip: *-*-*
+ #error: .*dangerous relocation: %pcrel_lo overflow with an addend, the value of %pcrel_hi is 0x1000 without any addend, but may be 0x2000 after adding the %pcrel_lo addend
+diff -rup binutils.orig/ld/testsuite/ld-elf/dwarf.exp binutils-2.40/ld/testsuite/ld-elf/dwarf.exp
+--- binutils.orig/ld/testsuite/ld-elf/dwarf.exp	2023-02-16 10:11:38.515875516 +0000
++++ binutils-2.40/ld/testsuite/ld-elf/dwarf.exp	2023-02-16 11:08:52.209377332 +0000
+@@ -29,6 +29,10 @@ if ![is_elf_format] {
+     return
+ }
+ 
++if { [istarget riscv*-*-*] } then {
++    return
++}
++
+ # Skip targets where -shared is not supported
+ 
+ if ![check_shared_lib_support] {
+diff -rup binutils.orig/ld/testsuite/ld-elf/tls.exp binutils-2.40/ld/testsuite/ld-elf/tls.exp
+--- binutils.orig/ld/testsuite/ld-elf/tls.exp	2023-02-16 10:11:38.540875476 +0000
++++ binutils-2.40/ld/testsuite/ld-elf/tls.exp	2023-02-16 11:08:56.944369374 +0000
+@@ -28,6 +28,10 @@ if { !([istarget *-*-linux*]
+     return
+ }
+ 
++if { [istarget riscv*-*-*] } then {
++    return
++}
++
+ # Check to see if the C compiler works.
+ if { ![check_compiler_available] } {
+     return
+--- binutils.orig/binutils/testsuite/binutils-all/objcopy.exp	2023-08-24 07:48:30.429195480 +0100
++++ binutils-2.41/binutils/testsuite/binutils-all/objcopy.exp	2023-08-24 07:57:05.535302711 +0100
+@@ -1409,6 +1409,8 @@ proc objcopy_test_without_global_symbol
+ # The AArch64 and ARM targets preserve mapping symbols
+ # in object files, so they will fail this test.
+ setup_xfail aarch64*-*-* arm*-*-*
++# The RISC-V target compiles with annotation enabled and these symbols remain after stripping.
++setup_xfail riscv*-*-* 
+ 
+ objcopy_test_without_global_symbol
+ 
+--- binutils.orig/ld/testsuite/ld-plugin/plugin.exp	2023-08-24 07:48:31.808196076 +0100
++++ binutils-2.41/ld/testsuite/ld-plugin/plugin.exp	2023-08-24 07:59:30.285716568 +0100
+@@ -132,6 +132,10 @@ if [is_pecoff_format] {
+     append libs " --image-base=0x10000000"
+ }
+ 
++if { [istarget riscv*-*-*] } then {
++    return
++}
++
+ set plugin_tests [list \
+     [list "load plugin" "-plugin $plugin_path \
+     $testobjfiles $libs" "" "" "" {{ld plugin-1.d}} "main.x" ] \
+--- binutils.orig/binutils/testsuite/binutils-all/compress.exp	2023-12-11 10:09:16.923374463 +0000
++++ binutils-2.41/binutils/testsuite/binutils-all/compress.exp	2023-12-12 09:00:15.150036675 +0000
+@@ -818,6 +818,10 @@ proc test_gnu_debuglink {} {
+     }
+ }
+ 
++if { [istarget riscv*-*-*] } then {
++    return
++}
++
+ if {[is_elf_format]} then {
+     test_gnu_debuglink
+ }
+--- binutils-2.41/ld/testsuite/ld-riscv-elf/pcgp-relax-01-norelaxgp.d	2023-07-03 00:00:00.000000000 +0100
++++ binutils.new/ld/testsuite/ld-riscv-elf/pcgp-relax-01-norelaxgp.d	2023-12-12 11:52:54.564057931 +0000
+@@ -8,10 +8,10 @@
+ Disassembly of section \.text:
+ 
+ 0+[0-9a-f]+ <_start>:
+-.*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a0,a0,[0-9]+
++.*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a0,a0,\-[0-9]+
+ .*:[ 	]+[0-9a-f]+[ 	]+jal[ 	        ]+ra,[0-9a-f]+ <_start>
+ .*:[ 	]+[0-9a-f]+[ 	]+auipc[ 	]+a1,0x[0-9a-f]+
+-.*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a1,a1,[0-9]+ # [0-9a-f]+ <data_g>
++.*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a1,a1,\-[0-9]+ # [0-9a-f]+ <data_g>
+ .*:[ 	]+[0-9a-f]+[ 	]+lui[ 	        ]+a2,0x[0-9a-f]+
+ .*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a2,a2,[0-9]+ # [0-9a-f]+ <data_g>
+ .*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a3,tp,0 # 0 <data_t>
+--- binutils.orig/binutils/testsuite/binutils-all/objcopy.exp	2023-12-12 14:21:10.225342926 +0000
++++ binutils-2.41/binutils/testsuite/binutils-all/objcopy.exp	2023-12-12 14:22:12.453421499 +0000
+@@ -1410,7 +1410,7 @@ proc objcopy_test_without_global_symbol
+ # in object files, so they will fail this test.
+ setup_xfail aarch64*-*-* arm*-*-*
+ # The RISC-V target compiles with annotation enabled and these symbols remain after stripping.
+-setup_xfail riscv*-*-* 
++# setup_xfail riscv*-*-* 
+ 
+ objcopy_test_without_global_symbol
+ 
+diff -rup binutils.orig/ld/testsuite/ld-riscv-elf/pcgp-relax-01-norelaxgp.d binutils-2.43.50-1f4aee70ed1/ld/testsuite/ld-riscv-elf/pcgp-relax-01-norelaxgp.d
+--- binutils.orig/ld/testsuite/ld-riscv-elf/pcgp-relax-01-norelaxgp.d	2024-10-03 15:21:47.926570551 +0100
++++ binutils-2.43.50-1f4aee70ed1/ld/testsuite/ld-riscv-elf/pcgp-relax-01-norelaxgp.d	2024-10-03 15:24:26.152502612 +0100
+@@ -8,10 +8,10 @@
+ Disassembly of section \.text:
+ 
+ 0+[0-9a-f]+ <_start>:
+-.*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a0,a0,\-[0-9]+
++.*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a0,a0,.*
+ .*:[ 	]+[0-9a-f]+[ 	]+jal[ 	        ]+ra,[0-9a-f]+ <_start>
+ .*:[ 	]+[0-9a-f]+[ 	]+auipc[ 	]+a1,0x[0-9a-f]+
+-.*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a1,a1,\-[0-9]+ # [0-9a-f]+ <data_g>
++.*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a1,a1,.*
+ .*:[ 	]+[0-9a-f]+[ 	]+lui[ 	        ]+a2,0x[0-9a-f]+
+ .*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a2,a2,[0-9]+ # [0-9a-f]+ <data_g>
+ .*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a3,tp,0 # 0 <data_t>
+diff -rup binutils.orig/ld/testsuite/ld-riscv-elf/pcgp-relax-01.d binutils-2.43.50-1f4aee70ed1/ld/testsuite/ld-riscv-elf/pcgp-relax-01.d
+--- binutils.orig/ld/testsuite/ld-riscv-elf/pcgp-relax-01.d	2024-10-03 15:21:47.926570551 +0100
++++ binutils-2.43.50-1f4aee70ed1/ld/testsuite/ld-riscv-elf/pcgp-relax-01.d	2024-10-03 15:23:54.512530979 +0100
+@@ -8,7 +8,7 @@
+ Disassembly of section \.text:
+ 
+ 0+[0-9a-f]+ <_start>:
+-.*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a0,a0,\-[0-9]+
++.*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a0,a0,.*
+ .*:[ 	]+[0-9a-f]+[ 	]+jal[ 	]+ra,[0-9a-f]+ <_start>
+ .*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a1,gp,\-[0-9]+ # [0-9a-f]+ <data_g>
+ .*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a2,gp,\-[0-9]+ # [0-9a-f]+ <data_g>
+diff -rup binutils.orig/ld/testsuite/ld-riscv-elf/pcgp-relax-02.d binutils-2.43.50-1f4aee70ed1/ld/testsuite/ld-riscv-elf/pcgp-relax-02.d
+--- binutils.orig/ld/testsuite/ld-riscv-elf/pcgp-relax-02.d	2024-10-03 15:21:47.926570551 +0100
++++ binutils-2.43.50-1f4aee70ed1/ld/testsuite/ld-riscv-elf/pcgp-relax-02.d	2024-10-03 15:25:01.687468496 +0100
+@@ -11,5 +11,5 @@ Disassembly of section .text:
+ [0-9a-f]+ <_start>:
+ .*:[ 	]+[0-9a-f]+[ 	]+auipc[ 	]+a1.*
+ .*:[ 	]+[0-9a-f]+[ 	]+addi[ 	]+a0,gp.*<data_a>
+-.*:[ 	]+[0-9a-f]+[ 	]+mv[ 	]+a1,a1
++.*:[ 	]+[0-9a-f]+[ 	]+.*
+ #pass
+--- binutils-with-gold-2.45.50-79b2b564fec.orig/ld/testsuite/ld-riscv-elf/zicfilp-unlabeled-plt.d	2025-09-09 15:52:30.684689609 +0100
++++ binutils-with-gold-2.45.50-79b2b564fec/ld/testsuite/ld-riscv-elf/zicfilp-unlabeled-plt.d	2025-09-09 15:53:12.837859447 +0100
+@@ -30,6 +30,6 @@ Disassembly of section \.plt:
+ 
+ [0-9a-f]+ <bar@plt>:
+ .*:[ 	]+[0-9a-f]+[ 	]+lpad[ 	]+0x0
+-.*:[ 	]+[0-9a-f]+[ 	]+auipc[ 	]+t3,0x1
++.*:[ 	]+[0-9a-f]+[ 	]+auipc[ 	]+t3,0x[0-9a-f]+
+ .*:[ 	]+[0-9a-f]+[ 	]+ld[ 	]+t3,[0-9]+\(t3\) # [0-9a-f]+ <bar>
+ .*:[ 	]+[0-9a-f]+[ 	]+jalr[ 	]+t1,t3

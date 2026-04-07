@@ -1,0 +1,42 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "qrcode"
+version = "@VERSION@"
+description = "QR Code image generator"
+authors = [
+    { name = "Lincoln Loop", email = "info@lincolnloop.com" },
+]
+license = { file = "LICENSE" }
+readme = "README.rst"
+keywords = ["qr", "denso-wave", "IEC18004"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Multimedia :: Graphics",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+requires-python = "~=3.9"
+dependencies = [
+    "colorama; sys_platform == 'win32'",
+]
+
+[project.scripts]
+qr = "qrcode.console_scripts:main"
+
+[project.optional-dependencies]
+pil = ["pillow >=9.1.0"]
+png = ["pypng"]
+all = ["pypng", "pillow >=9.1.0"]

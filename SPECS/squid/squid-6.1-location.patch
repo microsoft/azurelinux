@@ -1,0 +1,32 @@
+diff -up squid-3.1.0.9/QUICKSTART.location squid-3.1.0.9/QUICKSTART
+--- squid-3.1.0.9/QUICKSTART.location	2009-06-26 12:35:27.000000000 +0200
++++ squid-3.1.0.9/QUICKSTART	2009-07-17 14:03:10.000000000 +0200
+@@ -10,10 +10,9 @@ After you retrieved, compiled and instal
+ INSTALL in the same directory), you have to configure the squid.conf
+ file. This is the list of the values you *need* to change, because no
+ sensible defaults could be defined. Do not touch the other variables
+-for now.  We assume you have installed Squid in the default location:
+-/usr/local/squid
++for now.
+ 
+-Uncomment and edit the following lines in /usr/local/squid/etc/squid.conf:
++Uncomment and edit the following lines in /etc/squid/squid.conf:
+ 
+ ==============================================================================
+ 
+@@ -82,12 +81,12 @@ After editing squid.conf to your liking,
+ line TWICE:
+ 
+ To create any disk cache_dir configured:
+-    % /usr/local/squid/sbin/squid -z
++    % /usr/sbin/squid -z
+ 
+ To start squid:
+-    % /usr/local/squid/sbin/squid 
++    % /usr/sbin/squid 
+ 
+-Check in the cache.log (/usr/local/squid/var/logs/cache.log) that
++Check in the cache.log (/var/log/squid/cache.log) that
+ everything is all right.
+ 
+ Once Squid created all its files (it can take several minutes on some

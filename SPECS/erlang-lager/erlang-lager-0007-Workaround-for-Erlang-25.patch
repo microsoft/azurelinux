@@ -1,0 +1,19 @@
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Tue, 4 Oct 2022 14:33:12 +0200
+Subject: [PATCH] Workaround for Erlang 25+
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+
+diff --git a/test/lager_test_backend.erl b/test/lager_test_backend.erl
+index a036b74..08d2796 100644
+--- a/test/lager_test_backend.erl
++++ b/test/lager_test_backend.erl
+@@ -1124,7 +1124,7 @@ error_logger_redirect_crash_test_() ->
+         TestBody("bad arity",badarity,"gen_server crash terminated with reason: fun called with wrong arity of 1 instead of 3 in crash:handle_call/3"),
+         TestBody("bad arg1",badarg1,"gen_server crash terminated with reason: bad argument in call to erlang:list_to_binary([\"foo\",bar]) in crash:handle_call/3"),
+         TestBody("bad arg2",badarg2,"gen_server crash terminated with reason: bad argument in call to erlang:iolist_to_binary([\"foo\",bar]) in crash:handle_call/3"),
+-        TestBody("bad record",badrecord,"gen_server crash terminated with reason: bad record state in crash:handle_call/3"),
++        TestBody("bad record",badrecord,"gen_server crash terminated with reason: bad record {} in crash:handle_call/3"),
+         TestBody("noproc",noproc,"gen_server crash terminated with reason: no such process or port in call to gen_event:call(foo, bar, baz)"),
+         TestBody("noproc_proc_lib",noproc_proc_lib,"gen_server crash terminated with reason: no such process or port in call to proc_lib:stop/3"),
+         TestBody("badfun",badfun,"gen_server crash terminated with reason: bad function booger in crash:handle_call/3")

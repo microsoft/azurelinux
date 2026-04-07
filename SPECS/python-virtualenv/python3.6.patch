@@ -1,0 +1,50 @@
+From d10eb6e06e0925b91a1567953168124c3ad9891a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Fri, 9 Jan 2026 11:52:40 +0100
+Subject: [PATCH] Restore support for Python 3.6 virtual environments
+
+This allows our users to continue using virtualenv (and tox) with Python 3.6.
+
+It's only tested on Fedora CI, not in %check.
+---
+ src/virtualenv/create/via_global_ref/_virtualenv.py | 2 --
+ src/virtualenv/discovery/py_info.py                 | 4 +---
+ 2 files changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/src/virtualenv/create/via_global_ref/_virtualenv.py b/src/virtualenv/create/via_global_ref/_virtualenv.py
+index 0d95b28..5387248 100644
+--- a/src/virtualenv/create/via_global_ref/_virtualenv.py
++++ b/src/virtualenv/create/via_global_ref/_virtualenv.py
+@@ -1,7 +1,5 @@
+ """Patches that are applied at runtime to the virtual environment."""
+ 
+-from __future__ import annotations
+-
+ import contextlib
+ import os
+ import sys
+diff --git a/src/virtualenv/discovery/py_info.py b/src/virtualenv/discovery/py_info.py
+index c2310cd..4eff06f 100644
+--- a/src/virtualenv/discovery/py_info.py
++++ b/src/virtualenv/discovery/py_info.py
+@@ -4,8 +4,6 @@ The PythonInfo contains information about a concrete instance of a Python interp
+ Note: this file is also used to query target interpreters, so can only use standard library methods
+ """
+ 
+-from __future__ import annotations
+-
+ import json
+ import logging
+ import os
+@@ -441,7 +439,7 @@ class PythonInfo:  # noqa: PLR0904
+         return cls._current
+ 
+     @classmethod
+-    def current_system(cls, app_data=None) -> PythonInfo:
++    def current_system(cls, app_data=None) -> "PythonInfo":
+         """
+         This locates the current host interpreter information. This might be different than what we run into in case
+         the host python has been upgraded from underneath us.
+-- 
+2.52.0
+

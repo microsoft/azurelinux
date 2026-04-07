@@ -1,0 +1,12 @@
+diff -up mpmath-1.0.0/doc/source/conf.py.sphinx mpmath-1.0.0/doc/source/conf.py
+--- mpmath-1.0.0/doc/source/conf.py.sphinx	2017-09-27 16:59:02.000000000 +0200
++++ mpmath-1.0.0/doc/source/conf.py	2018-05-05 12:03:22.313112845 +0200
+@@ -76,7 +76,7 @@ pygments_style = 'sphinx'
+ # -----------------------
+ 
+ # The "theme" that the HTML output should use.
+-html_theme = 'classic'
++html_theme = 'traditional'
+ 
+ # Add any paths that contain custom static files (such as style sheets) here,
+ # relative to this directory. They are copied after the builtin static files,

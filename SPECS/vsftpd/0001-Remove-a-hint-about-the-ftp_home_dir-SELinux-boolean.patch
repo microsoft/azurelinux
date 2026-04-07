@@ -1,0 +1,25 @@
+From ab797dcffc855b05c9e7c8db4e5be2fc7510831b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Lyson=C4=9Bk?= <olysonek@redhat.com>
+Date: Tue, 17 Mar 2020 12:57:36 +0100
+Subject: [PATCH] Remove a hint about the ftp_home_dir SELinux boolean
+
+The boolean has been removed from SELinux.
+---
+ vsftpd.conf | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/vsftpd.conf b/vsftpd.conf
+index 6b8eebb..ea20a72 100644
+--- a/vsftpd.conf
++++ b/vsftpd.conf
+@@ -12,7 +12,6 @@
+ anonymous_enable=NO
+ #
+ # Uncomment this to allow local users to log in.
+-# When SELinux is enforcing check for SE bool ftp_home_dir
+ local_enable=YES
+ #
+ # Uncomment this to enable any form of FTP write command.
+-- 
+2.25.1
+

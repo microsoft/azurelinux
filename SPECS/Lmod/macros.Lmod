@@ -1,0 +1,3 @@
+# RPM macros for environment modules
+
+%_modulesdir %{_datadir}/modulefiles

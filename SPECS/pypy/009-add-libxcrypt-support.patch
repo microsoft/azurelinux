@@ -1,0 +1,13 @@
+diff --git a/pypy/module/crypt/interp_crypt.py b/pypy/module/crypt/interp_crypt.py
+index bd13f6f..1022c9e 100644
+--- a/pypy/module/crypt/interp_crypt.py
++++ b/pypy/module/crypt/interp_crypt.py
+@@ -9,7 +9,7 @@ elif sys.platform.startswith('linux'):
+     # crypt() is defined only in crypt.h on some Linux variants (eg. Fedora 28)
+     eci = ExternalCompilationInfo(libraries=['crypt'], includes=["crypt.h"])
+ else:
+-    eci = ExternalCompilationInfo(libraries=['crypt'])
++    eci = ExternalCompilationInfo(libraries=['crypt'], includes=['crypt.h'])
+ c_crypt = rffi.llexternal('crypt', [rffi.CCHARP, rffi.CCHARP], rffi.CCHARP,
+                           compilation_info=eci, releasegil=False)
+ 

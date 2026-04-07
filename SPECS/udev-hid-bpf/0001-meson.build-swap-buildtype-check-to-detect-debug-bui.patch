@@ -1,0 +1,44 @@
+From 71649bf093aa95d04180b137f53581cdb4f2c6ab Mon Sep 17 00:00:00 2001
+From: Peter Hutterer <peter.hutterer@who-t.net>
+Date: Mon, 15 Jul 2024 10:16:16 +1000
+Subject: [PATCH] meson.build: swap buildtype check to detect debug builds
+
+Instead of detecting a release build, detect a debug build to
+enable the debug build and --all-targets - everything else
+goes to --release.
+
+This is more reliable for distributions like Fedora that use
+-Dbuildtype=plain which before we'd detect as debug build.
+
+Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+---
+ meson.build | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index f17e835e7a8a..212edefecad5 100644
+--- a/meson.build
++++ b/meson.build
+@@ -41,14 +41,14 @@ cargo_options = [
+     '--target-dir', meson.project_build_root(),
+ ]
+ 
+-if get_option('buildtype') == 'release'
+-  cargo_options += [ '--release' ]
+-  rust_target = 'release'
+-  message('Building in release mode')
+-else
++if get_option('buildtype') in ['debug', 'debugoptimized']
+   cargo_options += [ '--all-targets' ]
+   rust_target = 'debug'
+   message('Building in debug mode')
++else
++  cargo_options += [ '--release' ]
++  rust_target = 'release'
++  message('Building in release mode')
+ endif
+ 
+ subdir('src')
+-- 
+2.45.2
+

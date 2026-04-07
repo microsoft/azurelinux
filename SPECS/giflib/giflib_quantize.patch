@@ -1,0 +1,17 @@
+diff -rupN --no-dereference giflib-5.2.2/Makefile giflib-5.2.2-new/Makefile
+--- giflib-5.2.2/Makefile	2024-02-19 02:01:50.000000000 +0100
++++ giflib-5.2.2-new/Makefile	2025-04-15 16:56:27.204960961 +0200
+@@ -29,11 +29,11 @@ LIBPOINT=0
+ LIBVER=$(LIBMAJOR).$(LIBMINOR).$(LIBPOINT)
+ 
+ SOURCES = dgif_lib.c egif_lib.c gifalloc.c gif_err.c gif_font.c \
+-	gif_hash.c openbsd-reallocarray.c
++	gif_hash.c openbsd-reallocarray.c quantize.c
+ HEADERS = gif_hash.h  gif_lib.h  gif_lib_private.h
+ OBJECTS = $(SOURCES:.c=.o)
+ 
+-USOURCES = qprintf.c quantize.c getarg.c 
++USOURCES = qprintf.c getarg.c
+ UHEADERS = getarg.h
+ UOBJECTS = $(USOURCES:.c=.o)
+ 

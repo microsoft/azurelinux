@@ -1,0 +1,20 @@
+From: =?UTF-8?q?Ond=C5=99ej=20Va=C5=A1=C3=ADk?= <ovasik@redhat.com>
+Date: Mon, 14 Sep 2015 09:39:13 +0200
+Subject: [PATCH 4/7] define default remote shell as /usr/bin/ssh(#452904), use
+ /etc/rmt as default rmt command
+
+diff --git a/lib/rtapelib.c b/lib/rtapelib.c
+index 7213031..7d0bd52 100644
+--- a/lib/rtapelib.c
++++ b/lib/rtapelib.c
+@@ -59,6 +59,10 @@
+ # include <netdb.h>
+ #endif
+ 
++#ifndef REMOTE_SHELL
++# define REMOTE_SHELL "/usr/bin/ssh"
++#endif
++
+ #include <rmt.h>
+ #include <rmt-command.h>
+ 

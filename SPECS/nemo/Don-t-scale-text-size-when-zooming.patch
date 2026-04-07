@@ -1,0 +1,74 @@
+From 9665ce9ff5ae5feca6f33fb43af4628f6e37b2a9 Mon Sep 17 00:00:00 2001
+From: leigh123linux <leigh123linux@googlemail.com>
+Date: Sun, 4 Jun 2017 12:14:10 +0100
+Subject: [PATCH] Don't scale text size when zooming
+
+---
+ src/nemo-list-view.c | 40 ----------------------------------------
+ 1 file changed, 40 deletions(-)
+
+diff --git a/src/nemo-list-view.c b/src/nemo-list-view.c
+index 1bb4b5bca..ca2b228cb 100644
+--- a/src/nemo-list-view.c
++++ b/src/nemo-list-view.c
+@@ -144,8 +144,6 @@ static GList *nemo_list_view_get_selection_for_file_transfer (NemoView   *view);
+ static void   nemo_list_view_set_zoom_level                  (NemoListView        *view,
+ 								  NemoZoomLevel  new_level,
+ 								  gboolean           always_set_level);
+-static void   nemo_list_view_scale_font_size                 (NemoListView        *view,
+-								  NemoZoomLevel  new_level);
+ static void   nemo_list_view_scroll_to_file                  (NemoListView        *view,
+ 								  NemoFile      *file);
+ static void   nemo_list_view_rename_callback                 (NemoFile      *file,
+     g_signal_handlers_unblock_by_func (NEMO_LIST_VIEW (view)->details->tree_view,
+                                        columns_reordered_callback,
+                                        NEMO_LIST_VIEW (view));
+-}
+-
+-static void
+-nemo_list_view_scale_font_size (NemoListView *view,
+-				    NemoZoomLevel new_level)
+-{
+-	GList *l;
+-	static gboolean first_time = TRUE;
+-	static double pango_scale[7];
+-	int medium;
+-	int i;
+-
+-	g_return_if_fail (new_level >= NEMO_ZOOM_LEVEL_SMALLEST &&
+-			  new_level <= NEMO_ZOOM_LEVEL_LARGEST);
+-
+-	if (first_time) {
+-		first_time = FALSE;
+-		medium = NEMO_ZOOM_LEVEL_SMALLER;
+-		pango_scale[medium] = PANGO_SCALE_MEDIUM;
+-		for (i = medium; i > NEMO_ZOOM_LEVEL_SMALLEST; i--) {
+-			pango_scale[i - 1] = (1 / 1.2) * pango_scale[i];
+-		}
+-		for (i = medium; i < NEMO_ZOOM_LEVEL_LARGEST; i++) {
+-			pango_scale[i + 1] = 1.2 * pango_scale[i];
+-		}
+-	}
+-
+-	g_object_set (G_OBJECT (view->details->file_name_cell),
+-		      "scale", pango_scale[new_level],
+-		      NULL);
+-	for (l = view->details->cells; l != NULL; l = l->next) {
+-		g_object_set (G_OBJECT (l->data),
+-			      "scale", pango_scale[new_level],
+-			      NULL);
+-	}
+ }
+ 
+ static void
+
+@@ -3231,9 +3194,6 @@ nemo_list_view_set_zoom_level (NemoListView *view,
+ 					     "surface", column,
+ 					     NULL);
+ 
+-	/* Scale text. */
+-	nemo_list_view_scale_font_size (view, new_level);
+-
+ 	/* Make all rows the same size. */
+ 	icon_size = nemo_get_list_icon_size_for_zoom_level (new_level);
+ 	gtk_cell_renderer_set_fixed_size (GTK_CELL_RENDERER (view->details->pixbuf_cell),

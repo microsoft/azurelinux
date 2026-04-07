@@ -1,0 +1,66 @@
+Only in binutils-2.34/gold: autom4te.cache
+diff -rup binutils.orig/gold/configure binutils-2.34/gold/configure
+--- binutils.orig/gold/configure	2020-04-20 12:35:13.048297305 +0100
++++ binutils-2.34/gold/configure	2020-04-20 14:02:06.743725696 +0100
+@@ -5180,7 +5180,8 @@ for targ in $target $canon_targets; do
+     . ${srcdir}/configure.tgt
+ 
+     if test "$targ_obj" = "UNKNOWN"; then
+-      as_fn_error $? "\"unsupported target $targ\"" "$LINENO" 5
++      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"unsupported target $targ\"" >&5
++$as_echo "$as_me: WARNING: \"unsupported target $targ\"" >&2;}
+     else
+       targetobjs="$targetobjs ${targ_obj}.\$(OBJEXT)"
+       if test "$targ_extra_obj" != ""; then
+diff -rup binutils.orig/gold/configure.ac binutils-2.34/gold/configure.ac
+--- binutils.orig/gold/configure.ac	2020-04-20 12:35:13.050297291 +0100
++++ binutils-2.34/gold/configure.ac	2020-04-20 14:01:46.435868770 +0100
+@@ -181,7 +181,7 @@ for targ in $target $canon_targets; do
+     . ${srcdir}/configure.tgt
+ 
+     if test "$targ_obj" = "UNKNOWN"; then
+-      AC_MSG_ERROR("unsupported target $targ")
++      AC_MSG_WARN("unsupported target $targ")
+     else
+       targetobjs="$targetobjs ${targ_obj}.\$(OBJEXT)"
+       if test "$targ_extra_obj" != ""; then
+--- binutils.orig/ld/configure.tgt	2020-04-20 12:35:12.465301359 +0100
++++ binutils-2.34/ld/configure.tgt	2020-04-20 14:17:52.123066333 +0100
+@@ -220,7 +220,7 @@ bfin-*-linux-uclibc*)	targ_emul=elf32bfi
+ 			targ_extra_emuls="elf32bfin"
+ 			targ_extra_libpath=$targ_extra_emuls
+ 			;;
+-bpf-*-*)		targ_emul=elf64bpf
++bpf-* | bpf-*-*)	targ_emul=elf64bpf
+ 			;;
+ cr16-*-elf*)		targ_emul=elf32cr16
+ 			;;
+@@ -1026,7 +1026,7 @@ z8k-*-coff)		targ_emul=z8002
+ 			targ_extra_ofiles=
+ 			;;
+ *)
+-  echo 2>&1 "*** ld does not support target ${targ}"
++  echo 2>&1 "*** ld does not support target '${targ}' NO REALLY"
+   echo 2>&1 "*** see ld/configure.tgt for supported targets"
+   exit 1
+ 
+--- binutils.orig/bfd/config.bfd	2020-04-20 12:35:13.038297375 +0100
++++ binutils-2.34/bfd/config.bfd	2020-04-20 14:25:26.452869193 +0100
+@@ -473,7 +473,7 @@ case "${targ}" in
+     ;;
+ 
+ #ifdef BFD64
+-  bpf-*-none)
++  bpf-*-none | bpf-*)
+     targ_defvec=bpf_elf64_le_vec
+     targ_selvecs=bpf_elf64_be_vec
+     targ_underscore=yes
+@@ -1427,7 +1427,7 @@ case "${targ}" in
+     ;;
+ 
+   *)
+-    echo 1>&2 "*** BFD does not support target ${targ}."
++    echo 1>&2 "*** BFD does not support target '${targ}'.  Honest."
+     echo 1>&2 "*** Look in bfd/config.bfd for supported targets."
+     exit 1
+     ;;

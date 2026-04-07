@@ -1,0 +1,722 @@
+From 50d39af19539e5308b2f3fae041aef85201459aa Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Sat, 3 Feb 2024 19:05:21 +0100
+Subject: [PATCH] remove references to removed "built" and "profiling" crates
+
+The "built" crate embeds information about the state of the git
+repository into the binary, but this is useless when using tarballs.
+
+The macros from the "profiling" crate are compiled down to no-ops
+since the required features are disabled in release builds.
+---
+ build.rs                  |  2 --
+ src/activity.rs           |  2 --
+ src/api/internal.rs       | 10 ----------
+ src/api/lookahead.rs      |  4 ----
+ src/bin/common.rs         |  9 +--------
+ src/bin/muxer/ivf.rs      |  1 -
+ src/bin/muxer/y4m.rs      |  1 -
+ src/bin/rav1e.rs          |  2 --
+ src/bin/stats.rs          |  1 -
+ src/cdef.rs               |  4 ----
+ src/context/block_unit.rs |  1 -
+ src/deblock.rs            |  3 ---
+ src/encoder.rs            | 13 -------------
+ src/lib.rs                | 27 +++++----------------------
+ src/lrf.rs                |  5 -----
+ src/me.rs                 |  8 --------
+ src/rate.rs               |  2 --
+ src/rdo.rs                |  8 --------
+ src/segmentation.rs       |  2 --
+ 19 files changed, 6 insertions(+), 99 deletions(-)
+
+diff --git a/build.rs b/build.rs
+index e515aae6..7a686347 100644
+--- a/build.rs
++++ b/build.rs
+@@ -246,8 +246,6 @@ fn build_asm_files() {
+ 
+ #[allow(unused_variables)]
+ fn main() {
+-  built::write_built_file().expect("Failed to acquire build-time information");
+-
+   let arch = env::var("CARGO_CFG_TARGET_ARCH").unwrap();
+   let os = env::var("CARGO_CFG_TARGET_OS").unwrap();
+   // let env = env::var("CARGO_CFG_TARGET_ENV").unwrap();
+diff --git a/src/activity.rs b/src/activity.rs
+index 3398deab..e851a795 100644
+--- a/src/activity.rs
++++ b/src/activity.rs
+@@ -19,7 +19,6 @@ pub struct ActivityMask {
+ }
+ 
+ impl ActivityMask {
+-  #[profiling::function]
+   pub fn from_plane<T: Pixel>(luma_plane: &Plane<T>) -> ActivityMask {
+     let PlaneConfig { width, height, .. } = luma_plane.cfg;
+ 
+@@ -54,7 +53,6 @@ impl ActivityMask {
+     ActivityMask { variances: variances.into_boxed_slice() }
+   }
+ 
+-  #[profiling::function]
+   pub fn fill_scales(
+     &self, bit_depth: usize, activity_scales: &mut Box<[DistortionScale]>,
+   ) {
+diff --git a/src/api/internal.rs b/src/api/internal.rs
+index 153610c4..9008a9f3 100644
+--- a/src/api/internal.rs
++++ b/src/api/internal.rs
+@@ -334,7 +334,6 @@ impl<T: Pixel> ContextInner<T> {
+     }
+   }
+ 
+-  #[profiling::function]
+   pub fn send_frame(
+     &mut self, mut frame: Option<Arc<Frame<T>>>,
+     params: Option<FrameParameters>,
+@@ -666,7 +665,6 @@ impl<T: Pixel> ContextInner<T> {
+   /// `rec_buffer` and `lookahead_rec_buffer` on the `FrameInvariants`. This
+   /// function must be called after every new `FrameInvariants` is initially
+   /// computed.
+-  #[profiling::function]
+   fn compute_lookahead_motion_vectors(&mut self, output_frameno: u64) {
+     let frame_data = self.frame_data.get(&output_frameno).unwrap();
+ 
+@@ -876,7 +874,6 @@ impl<T: Pixel> ContextInner<T> {
+       });
+   }
+ 
+-  #[profiling::function]
+   pub fn compute_keyframe_placement(
+     lookahead_frames: &[&Arc<Frame<T>>], keyframes_forced: &BTreeSet<u64>,
+     keyframe_detector: &mut SceneChangeDetector<T>,
+@@ -895,7 +892,6 @@ impl<T: Pixel> ContextInner<T> {
+     *next_lookahead_frame += 1;
+   }
+ 
+-  #[profiling::function]
+   pub fn compute_frame_invariants(&mut self) {
+     while self.set_frame_properties(self.next_lookahead_output_frameno).is_ok()
+     {
+@@ -908,7 +904,6 @@ impl<T: Pixel> ContextInner<T> {
+     }
+   }
+ 
+-  #[profiling::function]
+   fn update_block_importances(
+     fi: &FrameInvariants<T>, me_stats: &crate::me::FrameMEStats,
+     frame: &Frame<T>, reference_frame: &Frame<T>, bit_depth: usize,
+@@ -1071,7 +1066,6 @@ impl<T: Pixel> ContextInner<T> {
+   }
+ 
+   /// Computes the block importances for the current output frame.
+-  #[profiling::function]
+   fn compute_block_importances(&mut self) {
+     // SEF don't need block importances.
+     if self.frame_data[&self.output_frameno]
+@@ -1295,7 +1289,6 @@ impl<T: Pixel> ContextInner<T> {
+     }
+   }
+ 
+-  #[profiling::function]
+   pub fn encode_show_existing_packet(
+     &mut self, cur_output_frameno: u64,
+   ) -> Result<Packet<T>, EncoderStatus> {
+@@ -1331,7 +1324,6 @@ impl<T: Pixel> ContextInner<T> {
+     self.finalize_packet(rec, source, input_frameno, frame_type, qp, enc_stats)
+   }
+ 
+-  #[profiling::function]
+   pub fn encode_normal_packet(
+     &mut self, cur_output_frameno: u64,
+   ) -> Result<Packet<T>, EncoderStatus> {
+@@ -1494,7 +1486,6 @@ impl<T: Pixel> ContextInner<T> {
+     }
+   }
+ 
+-  #[profiling::function]
+   pub fn receive_packet(&mut self) -> Result<Packet<T>, EncoderStatus> {
+     if self.done_processing() {
+       return Err(EncoderStatus::LimitReached);
+@@ -1560,7 +1551,6 @@ impl<T: Pixel> ContextInner<T> {
+     })
+   }
+ 
+-  #[profiling::function]
+   fn garbage_collect(&mut self, cur_input_frameno: u64) {
+     if cur_input_frameno == 0 {
+       return;
+diff --git a/src/api/lookahead.rs b/src/api/lookahead.rs
+index 177f6ad8..51450fa1 100644
+--- a/src/api/lookahead.rs
++++ b/src/api/lookahead.rs
+@@ -26,7 +26,6 @@ pub(crate) const IMP_BLOCK_SIZE_IN_MV_UNITS: i64 =
+ pub(crate) const IMP_BLOCK_AREA_IN_MV_UNITS: i64 =
+   IMP_BLOCK_SIZE_IN_MV_UNITS * IMP_BLOCK_SIZE_IN_MV_UNITS;
+ 
+-#[profiling::function]
+ pub(crate) fn estimate_intra_costs<T: Pixel>(
+   temp_plane: &mut Plane<T>, frame: &Frame<T>, bit_depth: usize,
+   cpu_feature_level: CpuFeatureLevel,
+@@ -122,7 +121,6 @@ pub(crate) fn estimate_intra_costs<T: Pixel>(
+   intra_costs.into_boxed_slice()
+ }
+ 
+-#[profiling::function]
+ pub(crate) fn estimate_importance_block_difference<T: Pixel>(
+   frame: Arc<Frame<T>>, ref_frame: Arc<Frame<T>>,
+ ) -> f64 {
+@@ -178,7 +176,6 @@ pub(crate) fn estimate_importance_block_difference<T: Pixel>(
+   imp_block_costs as f64 / (w_in_imp_b * h_in_imp_b) as f64
+ }
+ 
+-#[profiling::function]
+ pub(crate) fn estimate_inter_costs<T: Pixel>(
+   frame: Arc<Frame<T>>, ref_frame: Arc<Frame<T>>, bit_depth: usize,
+   mut config: EncoderConfig, sequence: Arc<Sequence>, buffer: RefMEStats,
+@@ -267,7 +264,6 @@ pub(crate) fn estimate_inter_costs<T: Pixel>(
+   inter_costs as f64 / (w_in_imp_b * h_in_imp_b) as f64
+ }
+ 
+-#[profiling::function]
+ pub(crate) fn compute_motion_vectors<T: Pixel>(
+   fi: &mut FrameInvariants<T>, fs: &mut FrameState<T>, inter_cfg: &InterConfig,
+ ) {
+diff --git a/src/bin/common.rs b/src/bin/common.rs
+index 7fa0ed48..6c1fe557 100644
+--- a/src/bin/common.rs
++++ b/src/bin/common.rs
+@@ -24,11 +24,6 @@ use std::io::prelude::*;
+ use std::path::PathBuf;
+ use std::sync::OnceLock;
+ 
+-pub mod built_info {
+-  // The file has been placed there by the build script.
+-  include!(concat!(env!("OUT_DIR"), "/built.rs"));
+-}
+-
+ #[derive(Clap)]
+ #[clap(
+   name = "rav1e",
+@@ -293,10 +288,8 @@ fn get_long_version() -> &'static str {
+       rustflags.replace(0x1F as char, " ")
+     };
+     format!(
+-      "{}\n{} {}\nCompiled CPU Features: {}\nRuntime Assembly Support: {}{}\nThreading: {}\nUnstable Features: {}\nCompiler Flags: {}",
++      "{}\nCompiled CPU Features: {}\nRuntime Assembly Support: {}{}\nThreading: {}\nUnstable Features: {}\nCompiler Flags: {}",
+       get_version(),
+-      built_info::RUSTC_VERSION,
+-      built_info::TARGET,
+       option_env!("CARGO_CFG_TARGET_FEATURE").unwrap_or("(None)"),
+       if cfg!(feature = "asm") { "Enabled" } else { "Disabled" },
+       if cfg!(feature = "asm") {
+diff --git a/src/bin/muxer/ivf.rs b/src/bin/muxer/ivf.rs
+index 8b1333b6..ecc4b8da 100644
+--- a/src/bin/muxer/ivf.rs
++++ b/src/bin/muxer/ivf.rs
+@@ -36,7 +36,6 @@ impl Muxer for IvfMuxer {
+     );
+   }
+ 
+-  #[profiling::function]
+   fn write_frame(&mut self, pts: u64, data: &[u8], _frame_type: FrameType) {
+     write_ivf_frame(&mut self.output, pts, data);
+   }
+diff --git a/src/bin/muxer/y4m.rs b/src/bin/muxer/y4m.rs
+index 0246a146..c6e51528 100644
+--- a/src/bin/muxer/y4m.rs
++++ b/src/bin/muxer/y4m.rs
+@@ -12,7 +12,6 @@ use rav1e::prelude::*;
+ use std::io::Write;
+ use std::slice;
+ 
+-#[profiling::function]
+ pub fn write_y4m_frame<T: Pixel>(
+   y4m_enc: &mut y4m::Encoder<Box<dyn Write + Send>>, rec: &Frame<T>,
+   y4m_details: VideoDetails,
+diff --git a/src/bin/rav1e.rs b/src/bin/rav1e.rs
+index bf1e9707..bd8369cd 100644
+--- a/src/bin/rav1e.rs
++++ b/src/bin/rav1e.rs
+@@ -73,7 +73,6 @@ impl<D: Decoder> Source<D> {
+     }
+   }
+ 
+-  #[profiling::function]
+   fn read_frame<T: Pixel>(
+     &mut self, ctx: &mut Context<T>, video_info: VideoDetails,
+   ) -> Result<(), CliError> {
+@@ -109,7 +108,6 @@ impl<D: Decoder> Source<D> {
+ 
+ // Encode and write a frame.
+ // Returns frame information in a `Result`.
+-#[profiling::function]
+ fn process_frame<T: Pixel, D: Decoder>(
+   ctx: &mut Context<T>, output_file: &mut dyn Muxer, source: &mut Source<D>,
+   pass1file: Option<&mut File>, pass2file: Option<&mut File>,
+diff --git a/src/bin/stats.rs b/src/bin/stats.rs
+index 7a592cbd..a9b1a670 100644
+--- a/src/bin/stats.rs
++++ b/src/bin/stats.rs
+@@ -27,7 +27,6 @@ pub struct FrameSummary {
+   pub enc_stats: EncoderStats,
+ }
+ 
+-#[profiling::function]
+ pub fn build_frame_summary<T: Pixel>(
+   packets: Packet<T>, bit_depth: usize, chroma_sampling: ChromaSampling,
+   metrics_cli: MetricsEnabled,
+diff --git a/src/cdef.rs b/src/cdef.rs
+index ff1d0fa4..e39f45e8 100644
+--- a/src/cdef.rs
++++ b/src/cdef.rs
+@@ -321,7 +321,6 @@ fn adjust_strength(strength: i32, var: i32) -> i32 {
+   }
+ }
+ 
+-#[profiling::function]
+ pub fn cdef_analyze_superblock_range<T: Pixel>(
+   fi: &FrameInvariants<T>, in_frame: &Frame<T>, blocks: &TileBlocks<'_>,
+   sb_w: usize, sb_h: usize,
+@@ -336,7 +335,6 @@ pub fn cdef_analyze_superblock_range<T: Pixel>(
+   ret
+ }
+ 
+-#[profiling::function]
+ pub fn cdef_analyze_superblock<T: Pixel>(
+   fi: &FrameInvariants<T>, in_frame: &Frame<T>, blocks: &TileBlocks<'_>,
+   sbo: TileSuperBlockOffset,
+@@ -397,7 +395,6 @@ pub fn cdef_analyze_superblock<T: Pixel>(
+ /// # Panics
+ ///
+ /// - If called with invalid parameters
+-#[profiling::function]
+ pub fn cdef_filter_superblock<T: Pixel>(
+   fi: &FrameInvariants<T>, input: &Frame<T>, output: &mut TileMut<'_, T>,
+   blocks: &TileBlocks<'_>, tile_sbo: TileSuperBlockOffset, cdef_index: u8,
+@@ -593,7 +590,6 @@ pub fn cdef_filter_superblock<T: Pixel>(
+ //   tile boundary), the filtering process ignores input pixels that
+ //   don't exist.
+ 
+-#[profiling::function]
+ pub fn cdef_filter_tile<T: Pixel>(
+   fi: &FrameInvariants<T>, input: &Frame<T>, tb: &TileBlocks,
+   output: &mut TileMut<'_, T>,
+diff --git a/src/context/block_unit.rs b/src/context/block_unit.rs
+index 410953ad..88afceb4 100644
+--- a/src/context/block_unit.rs
++++ b/src/context/block_unit.rs
+@@ -1123,7 +1123,6 @@ impl ContextWriter<'_> {
+     }
+   }
+ 
+-  #[profiling::function]
+   fn setup_mvref_list<T: Pixel>(
+     &self, bo: TileBlockOffset, ref_frames: [RefType; 2],
+     mv_stack: &mut ArrayVec<CandidateMV, 9>, bsize: BlockSize,
+diff --git a/src/deblock.rs b/src/deblock.rs
+index 2f39bd5f..1ab12320 100644
+--- a/src/deblock.rs
++++ b/src/deblock.rs
+@@ -1290,7 +1290,6 @@ fn sse_h_edge<T: Pixel>(
+ }
+ 
+ // Deblocks all edges, vertical and horizontal, in a single plane
+-#[profiling::function]
+ pub fn deblock_plane<T: Pixel>(
+   deblock: &DeblockState, p: &mut PlaneRegionMut<T>, pli: usize,
+   blocks: &TileBlocks, crop_w: usize, crop_h: usize, bd: usize,
+@@ -1540,7 +1539,6 @@ fn sse_plane<T: Pixel>(
+ }
+ 
+ // Deblocks all edges in all planes of a frame
+-#[profiling::function]
+ pub fn deblock_filter_frame<T: Pixel>(
+   deblock: &DeblockState, tile: &mut TileMut<T>, blocks: &TileBlocks,
+   crop_w: usize, crop_h: usize, bd: usize, planes: usize,
+@@ -1616,7 +1614,6 @@ fn sse_optimize<T: Pixel>(
+   level
+ }
+ 
+-#[profiling::function]
+ pub fn deblock_filter_optimize<T: Pixel, U: Pixel>(
+   fi: &FrameInvariants<T>, rec: &Tile<U>, input: &Tile<U>,
+   blocks: &TileBlocks, crop_w: usize, crop_h: usize,
+diff --git a/src/encoder.rs b/src/encoder.rs
+index 5c85320b..0c9966ae 100644
+--- a/src/encoder.rs
++++ b/src/encoder.rs
+@@ -562,7 +562,6 @@ pub struct SegmentationState {
+ }
+ 
+ impl SegmentationState {
+-  #[profiling::function]
+   pub fn update_threshold(&mut self, base_q_idx: u8, bd: usize) {
+     let base_ac_q = ac_q(base_q_idx, 0, bd).get() as u64;
+     let real_ac_q = ArrayVec::<_, MAX_SEGMENTS>::from_iter(
+@@ -740,7 +739,6 @@ impl<T: Pixel> CodedFrameData<T> {
+ 
+   // Assumes that we have already computed activity scales and distortion scales
+   // Returns -0.5 log2(mean(scale))
+-  #[profiling::function]
+   pub fn compute_spatiotemporal_scores(&mut self) -> i64 {
+     let mut scores = self
+       .distortion_scales
+@@ -766,7 +764,6 @@ impl<T: Pixel> CodedFrameData<T> {
+ 
+   // Assumes that we have already computed distortion_scales
+   // Returns -0.5 log2(mean(scale))
+-  #[profiling::function]
+   pub fn compute_temporal_scores(&mut self) -> i64 {
+     let inv_mean = DistortionScale::inv_mean(&self.distortion_scales);
+     for scale in self.distortion_scales.iter_mut() {
+@@ -1663,7 +1660,6 @@ pub fn encode_tx_block<T: Pixel, W: Writer>(
+ /// # Panics
+ ///
+ /// - If the block size is invalid for subsampling
+-#[profiling::function]
+ pub fn motion_compensate<T: Pixel>(
+   fi: &FrameInvariants<T>, ts: &mut TileStateMut<'_, T>,
+   cw: &mut ContextWriter, luma_mode: PredictionMode, ref_frames: [RefType; 2],
+@@ -1892,7 +1888,6 @@ pub fn save_block_motion<T: Pixel>(
+   }
+ }
+ 
+-#[profiling::function]
+ pub fn encode_block_pre_cdef<T: Pixel, W: Writer>(
+   seq: &Sequence, ts: &TileStateMut<'_, T>, cw: &mut ContextWriter, w: &mut W,
+   bsize: BlockSize, tile_bo: TileBlockOffset, skip: bool,
+@@ -1933,7 +1928,6 @@ pub fn encode_block_pre_cdef<T: Pixel, W: Writer>(
+ ///
+ /// - If chroma and luma do not match for inter modes
+ /// - If an invalid motion vector is found
+-#[profiling::function]
+ pub fn encode_block_post_cdef<T: Pixel, W: Writer>(
+   fi: &FrameInvariants<T>, ts: &mut TileStateMut<'_, T>,
+   cw: &mut ContextWriter, w: &mut W, luma_mode: PredictionMode,
+@@ -2563,7 +2557,6 @@ pub fn write_tx_tree<T: Pixel, W: Writer>(
+   (partition_has_coeff, tx_dist)
+ }
+ 
+-#[profiling::function]
+ pub fn encode_block_with_modes<T: Pixel, W: Writer>(
+   fi: &FrameInvariants<T>, ts: &mut TileStateMut<'_, T>,
+   cw: &mut ContextWriter, w_pre_cdef: &mut W, w_post_cdef: &mut W,
+@@ -2630,7 +2623,6 @@ pub fn encode_block_with_modes<T: Pixel, W: Writer>(
+   );
+ }
+ 
+-#[profiling::function]
+ fn encode_partition_bottomup<T: Pixel, W: Writer>(
+   fi: &FrameInvariants<T>, ts: &mut TileStateMut<'_, T>,
+   cw: &mut ContextWriter, w_pre_cdef: &mut W, w_post_cdef: &mut W,
+@@ -3233,7 +3225,6 @@ fn get_initial_cdfcontext<T: Pixel>(fi: &FrameInvariants<T>) -> CDFContext {
+   cdf.unwrap_or_else(|| CDFContext::new(fi.base_q_idx))
+ }
+ 
+-#[profiling::function]
+ fn encode_tile_group<T: Pixel>(
+   fi: &FrameInvariants<T>, fs: &mut FrameState<T>, inter_cfg: &InterConfig,
+ ) -> Vec<u8> {
+@@ -3372,7 +3363,6 @@ pub struct SBSQueueEntry {
+   pub w_post_cdef: WriterBase<WriterRecorder>,
+ }
+ 
+-#[profiling::function]
+ fn check_lf_queue<T: Pixel>(
+   fi: &FrameInvariants<T>, ts: &mut TileStateMut<'_, T>,
+   cw: &mut ContextWriter, w: &mut WriterBase<WriterEncoder>,
+@@ -3464,7 +3454,6 @@ fn check_lf_queue<T: Pixel>(
+   }
+ }
+ 
+-#[profiling::function]
+ fn encode_tile<'a, T: Pixel>(
+   fi: &FrameInvariants<T>, ts: &'a mut TileStateMut<'_, T>,
+   fc: &'a mut CDFContext, blocks: &'a mut TileBlocksMut<'a>,
+@@ -3689,7 +3678,6 @@ fn write_tile_group_header(tile_start_and_end_present_flag: bool) -> Vec<u8> {
+ /// # Panics
+ ///
+ /// - If the frame packets cannot be written
+-#[profiling::function]
+ pub fn encode_show_existing_frame<T: Pixel>(
+   fi: &FrameInvariants<T>, fs: &mut FrameState<T>, inter_cfg: &InterConfig,
+ ) -> Vec<u8> {
+@@ -3764,7 +3752,6 @@ fn get_initial_segmentation<T: Pixel>(
+ /// # Panics
+ ///
+ /// - If the frame packets cannot be written
+-#[profiling::function]
+ pub fn encode_frame<T: Pixel>(
+   fi: &FrameInvariants<T>, fs: &mut FrameState<T>, inter_cfg: &InterConfig,
+ ) -> Vec<u8> {
+diff --git a/src/lib.rs b/src/lib.rs
+index 670416e6..1c2cdac4 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -49,11 +49,6 @@ use crate::encoder::*;
+ pub use crate::frame::Frame;
+ pub use crate::util::{CastFromPrimitive, Pixel, PixelType};
+ 
+-pub(crate) mod built_info {
+-  // The file has been placed there by the build script.
+-  include!(concat!(env!("OUT_DIR"), "/built.rs"));
+-}
+-
+ mod serialize {
+   cfg_if::cfg_if! {
+     if #[cfg(feature="serialize")] {
+@@ -232,24 +227,12 @@ pub mod version {
+     }
+   }
+ 
+-  cfg_if::cfg_if! {
+-    if #[cfg(feature="git_version")] {
+-      fn git_version() -> &'static str {
+-        crate::built_info::GIT_VERSION.unwrap_or_default()
+-      }
+-
+-      fn git_hash() -> &'static str {
+-        crate::built_info::GIT_COMMIT_HASH.unwrap_or_default()
+-      }
+-    } else {
+-      fn git_version() -> &'static str {
+-        "UNKNOWN"
+-      }
++  fn git_version() -> &'static str {
++    "UNKNOWN"
++  }
+ 
+-      fn git_hash() -> &'static str {
+-        "UNKNOWN"
+-      }
+-    }
++  fn git_hash() -> &'static str {
++    "UNKNOWN"
+   }
+   /// Commit hash (short)
+   ///
+diff --git a/src/lrf.rs b/src/lrf.rs
+index 7a3d0837..54a978b5 100644
+--- a/src/lrf.rs
++++ b/src/lrf.rs
+@@ -526,7 +526,6 @@ impl<'a, T: Pixel> Iterator for HorzPaddedIter<'a, T> {
+ impl<T: Pixel> ExactSizeIterator for HorzPaddedIter<'_, T> {}
+ impl<T: Pixel> FusedIterator for HorzPaddedIter<'_, T> {}
+ 
+-#[profiling::function]
+ pub fn setup_integral_image<T: Pixel>(
+   integral_image_buffer: &mut IntegralImageBuffer,
+   integral_image_stride: usize, crop_w: usize, crop_h: usize, stripe_w: usize,
+@@ -626,7 +625,6 @@ pub fn setup_integral_image<T: Pixel>(
+   }
+ }
+ 
+-#[profiling::function]
+ pub fn sgrproj_stripe_filter<T: Pixel, U: Pixel>(
+   set: u8, xqd: [i8; 2], fi: &FrameInvariants<T>,
+   integral_image_buffer: &IntegralImageBuffer, integral_image_stride: usize,
+@@ -843,7 +841,6 @@ pub fn sgrproj_stripe_filter<T: Pixel, U: Pixel>(
+ 
+ // Input params follow the same rules as sgrproj_stripe_filter.
+ // Inputs are relative to the colocated slice views.
+-#[profiling::function]
+ pub fn sgrproj_solve<T: Pixel>(
+   set: u8, fi: &FrameInvariants<T>,
+   integral_image_buffer: &IntegralImageBuffer, input: &PlaneRegion<'_, T>,
+@@ -1095,7 +1092,6 @@ pub fn sgrproj_solve<T: Pixel>(
+   }
+ }
+ 
+-#[profiling::function]
+ fn wiener_stripe_filter<T: Pixel>(
+   coeffs: [[i8; 3]; 2], fi: &FrameInvariants<T>, crop_w: usize, crop_h: usize,
+   stripe_w: usize, stripe_h: usize, stripe_x: usize, stripe_y: isize,
+@@ -1478,7 +1474,6 @@ impl RestorationState {
+     }
+   }
+ 
+-  #[profiling::function]
+   pub fn lrf_filter_frame<T: Pixel>(
+     &mut self, out: &mut Frame<T>, pre_cdef: &Frame<T>,
+     fi: &FrameInvariants<T>,
+diff --git a/src/me.rs b/src/me.rs
+index 8ebe1546..8b66e762 100644
+--- a/src/me.rs
++++ b/src/me.rs
+@@ -382,7 +382,6 @@ impl MotionEstimationSubsets {
+   }
+ }
+ 
+-#[profiling::function]
+ fn get_subset_predictors(
+   tile_bo: TileBlockOffset, tile_me_stats: &TileMEStats<'_>,
+   frame_ref_opt: Option<ReadGuardMEStats<'_>>, ref_frame_id: usize,
+@@ -689,7 +688,6 @@ fn refine_subsampled_motion_estimate<T: Pixel>(
+   }
+ }
+ 
+-#[profiling::function]
+ fn full_pixel_me<T: Pixel>(
+   fi: &FrameInvariants<T>, ts: &TileStateMut<'_, T>,
+   org_region: &PlaneRegion<T>, p_ref: &Plane<T>, tile_bo: TileBlockOffset,
+@@ -880,7 +878,6 @@ fn sub_pixel_me<T: Pixel>(
+   );
+ }
+ 
+-#[profiling::function]
+ fn get_best_predictor<T: Pixel>(
+   fi: &FrameInvariants<T>, po: PlaneOffset, org_region: &PlaneRegion<T>,
+   p_ref: &Plane<T>, predictors: &[MotionVector], bit_depth: usize,
+@@ -951,7 +948,6 @@ const DIAMOND_R1_PATTERN: [MotionVector; 4] = search_pattern!(
+ /// For each step size, candidate motion vectors are examined for improvement
+ /// to the current search location. The search location is moved to the best
+ /// candidate (if any). This is repeated until the search location stops moving.
+-#[profiling::function]
+ fn fullpel_diamond_search<T: Pixel>(
+   fi: &FrameInvariants<T>, po: PlaneOffset, org_region: &PlaneRegion<T>,
+   p_ref: &Plane<T>, current: &mut MotionSearchResult, bit_depth: usize,
+@@ -1051,7 +1047,6 @@ const SQUARE_REFINE_PATTERN: [MotionVector; 8] = search_pattern!(
+ ///
+ /// `current` provides the initial search location and serves as
+ /// the output for the final search results.
+-#[profiling::function]
+ fn hexagon_search<T: Pixel>(
+   fi: &FrameInvariants<T>, po: PlaneOffset, org_region: &PlaneRegion<T>,
+   p_ref: &Plane<T>, current: &mut MotionSearchResult, bit_depth: usize,
+@@ -1166,7 +1161,6 @@ const UMH_PATTERN: [MotionVector; 16] = search_pattern!(
+ /// the output for the final search results.
+ ///
+ /// `me_range` parameter determines how far these stages can search.
+-#[profiling::function]
+ fn uneven_multi_hex_search<T: Pixel>(
+   fi: &FrameInvariants<T>, po: PlaneOffset, org_region: &PlaneRegion<T>,
+   p_ref: &Plane<T>, current: &mut MotionSearchResult, bit_depth: usize,
+@@ -1307,7 +1301,6 @@ fn uneven_multi_hex_search<T: Pixel>(
+ /// For each step size, candidate motion vectors are examined for improvement
+ /// to the current search location. The search location is moved to the best
+ /// candidate (if any). This is repeated until the search location stops moving.
+-#[profiling::function]
+ fn subpel_diamond_search<T: Pixel>(
+   fi: &FrameInvariants<T>, po: PlaneOffset, org_region: &PlaneRegion<T>,
+   _p_ref: &Plane<T>, bit_depth: usize, pmv: [MotionVector; 2], lambda: u32,
+@@ -1460,7 +1453,6 @@ fn compute_mv_rd<T: Pixel>(
+   MVCandidateRD { cost: 256 * sad as u64 + rate as u64 * lambda as u64, sad }
+ }
+ 
+-#[profiling::function]
+ fn full_search<T: Pixel>(
+   fi: &FrameInvariants<T>, x_lo: isize, x_hi: isize, y_lo: isize, y_hi: isize,
+   w: usize, h: usize, org_region: &PlaneRegion<T>, p_ref: &Plane<T>,
+diff --git a/src/rate.rs b/src/rate.rs
+index d9a71c52..cd443101 100644
+--- a/src/rate.rs
++++ b/src/rate.rs
+@@ -720,7 +720,6 @@ impl RCState {
+   }
+ 
+   // TODO: Separate quantizers for Cb and Cr.
+-  #[profiling::function]
+   pub(crate) fn select_qi<T: Pixel>(
+     &self, ctx: &ContextInner<T>, output_frameno: u64, fti: usize,
+     maybe_prev_log_base_q: Option<i64>, log_isqrt_mean_scale: i64,
+@@ -1069,7 +1068,6 @@ impl RCState {
+     (log_base_q, log_q)
+   }
+ 
+-  #[profiling::function]
+   pub fn update_state(
+     &mut self, bits: i64, fti: usize, show_frame: bool, log_target_q: i64,
+     trial: bool, droppable: bool,
+diff --git a/src/rdo.rs b/src/rdo.rs
+index 3f6bfb48..a21b0d23 100644
+--- a/src/rdo.rs
++++ b/src/rdo.rs
+@@ -812,7 +812,6 @@ const fn dmv_in_range(mv: MotionVector, ref_mv: MotionVector) -> bool {
+ }
+ 
+ #[inline]
+-#[profiling::function]
+ fn luma_chroma_mode_rdo<T: Pixel>(
+   luma_mode: PredictionMode, fi: &FrameInvariants<T>, bsize: BlockSize,
+   tile_bo: TileBlockOffset, ts: &mut TileStateMut<'_, T>,
+@@ -959,7 +958,6 @@ fn luma_chroma_mode_rdo<T: Pixel>(
+ ///
+ /// - If the best RD found is negative.
+ ///   This should never happen and indicates a development error.
+-#[profiling::function]
+ pub fn rdo_mode_decision<T: Pixel>(
+   fi: &FrameInvariants<T>, ts: &mut TileStateMut<'_, T>,
+   cw: &mut ContextWriter, bsize: BlockSize, tile_bo: TileBlockOffset,
+@@ -1117,7 +1115,6 @@ pub fn rdo_mode_decision<T: Pixel>(
+   }
+ }
+ 
+-#[profiling::function]
+ fn inter_frame_rdo_mode_decision<T: Pixel>(
+   fi: &FrameInvariants<T>, ts: &mut TileStateMut<'_, T>,
+   cw: &mut ContextWriter, bsize: BlockSize, tile_bo: TileBlockOffset,
+@@ -1390,7 +1387,6 @@ fn inter_frame_rdo_mode_decision<T: Pixel>(
+   best
+ }
+ 
+-#[profiling::function]
+ fn intra_frame_rdo_mode_decision<T: Pixel>(
+   fi: &FrameInvariants<T>, ts: &mut TileStateMut<'_, T>,
+   cw: &mut ContextWriter, bsize: BlockSize, tile_bo: TileBlockOffset,
+@@ -1589,7 +1585,6 @@ fn intra_frame_rdo_mode_decision<T: Pixel>(
+ /// # Panics
+ ///
+ /// - If the block size is invalid for subsampling.
+-#[profiling::function]
+ pub fn rdo_cfl_alpha<T: Pixel>(
+   ts: &mut TileStateMut<'_, T>, tile_bo: TileBlockOffset, bsize: BlockSize,
+   luma_tx_size: TxSize, fi: &FrameInvariants<T>,
+@@ -1945,7 +1940,6 @@ fn rdo_partition_simple<T: Pixel, W: Writer>(
+ ///
+ /// - If the best RD found is negative.
+ ///   This should never happen, and indicates a development error.
+-#[profiling::function]
+ pub fn rdo_partition_decision<T: Pixel, W: Writer>(
+   fi: &FrameInvariants<T>, ts: &mut TileStateMut<'_, T>,
+   cw: &mut ContextWriter, w_pre_cdef: &mut W, w_post_cdef: &mut W,
+@@ -2023,7 +2017,6 @@ pub fn rdo_partition_decision<T: Pixel, W: Writer>(
+   }
+ }
+ 
+-#[profiling::function]
+ fn rdo_loop_plane_error<T: Pixel>(
+   base_sbo: TileSuperBlockOffset, offset_sbo: TileSuperBlockOffset,
+   sb_w: usize, sb_h: usize, fi: &FrameInvariants<T>, ts: &TileStateMut<'_, T>,
+@@ -2100,7 +2093,6 @@ fn rdo_loop_plane_error<T: Pixel>(
+ /// # Panics
+ ///
+ /// - If both CDEF and LRF are disabled.
+-#[profiling::function]
+ pub fn rdo_loop_decision<T: Pixel, W: Writer>(
+   base_sbo: TileSuperBlockOffset, fi: &FrameInvariants<T>,
+   ts: &mut TileStateMut<'_, T>, cw: &mut ContextWriter, w: &mut W,
+diff --git a/src/segmentation.rs b/src/segmentation.rs
+index a733398f..d97c1193 100644
+--- a/src/segmentation.rs
++++ b/src/segmentation.rs
+@@ -19,7 +19,6 @@ use crate::FrameState;
+ 
+ pub const MAX_SEGMENTS: usize = 8;
+ 
+-#[profiling::function]
+ pub fn segmentation_optimize<T: Pixel>(
+   fi: &FrameInvariants<T>, fs: &mut FrameState<T>,
+ ) {
+@@ -159,7 +158,6 @@ fn segmentation_optimize_inner<T: Pixel>(
+   fs.segmentation.update_threshold(fi.base_q_idx, fi.config.bit_depth);
+ }
+ 
+-#[profiling::function]
+ pub fn select_segment<T: Pixel>(
+   fi: &FrameInvariants<T>, ts: &TileStateMut<'_, T>, tile_bo: TileBlockOffset,
+   bsize: BlockSize, skip: bool,
+-- 
+2.52.0
+

@@ -1,0 +1,18 @@
+diff -rupN --no-dereference libkml-1.3.0/CMakeLists.txt libkml-1.3.0-new/CMakeLists.txt
+--- libkml-1.3.0/CMakeLists.txt	2015-12-21 18:23:05.000000000 +0100
++++ libkml-1.3.0-new/CMakeLists.txt	2025-07-17 16:25:38.971893531 +0200
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 2.8)
++cmake_minimum_required(VERSION 3.5)
+ project(LibKML)
+ 
+ set(VERSION_MAJOR "1")
+diff -rupN libkml-1.3.0/cmake/UriParser_cmake_lists_txt libkml-1.3.0-new/cmake/UriParser_cmake_lists_txt
+--- libkml-1.3.0/cmake/UriParser_cmake_lists_txt	2015-12-21 18:23:05.000000000 +0100
++++ libkml-1.3.0-new/cmake/UriParser_cmake_lists_txt	2025-07-17 16:26:11.404006311 +0200
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 2.8)
++cmake_minimum_required(VERSION 3.5)
+ 
+ set(SRCS
+   lib/UriCommon.c

@@ -1,0 +1,12 @@
+diff -urp flexmock.orig/test/partial_mock_test.rb flexmock/test/partial_mock_test.rb
+--- flexmock.orig/test/partial_mock_test.rb	2024-11-18 15:38:57.625597258 +0900
++++ flexmock/test/partial_mock_test.rb	2024-11-18 15:44:56.469851634 +0900
+@@ -633,7 +633,7 @@ class TestStubbing < Minitest::Test
+     exception = assert_raises(NameError) do
+         obj.mocked_method
+     end
+-    assert_match(/undefined method `does_not_exist' for/, exception.message)
++    assert_match(/undefined method [`']does_not_exist' for/, exception.message)
+   end
+ 
+   def test_it_checks_whether_mocks_are_forbidden_before_forwarding_the_call

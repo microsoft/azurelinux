@@ -1,0 +1,55 @@
+Various manual pages changes:
+* removes LIBEXECDIR from slapd.8
+
+diff --git a/doc/man/man5/ldap.conf.5 b/doc/man/man5/ldap.conf.5
+index d47481d6ed..ff86fc52ca 100644
+--- a/doc/man/man5/ldap.conf.5
++++ b/doc/man/man5/ldap.conf.5
+@@ -341,6 +341,7 @@ be specified, separated by a semi-colon.  The
+ .B TLS_CACERT
+ is always used before
+ .BR TLS_CACERTDIR .
++The specified directory must be managed with the OpenSSL c_rehash utility.
+ .TP
+ .B TLS_CERT <filename>
+ Specifies the file that contains the client certificate.
+diff --git a/doc/man/man8/slapd.8 b/doc/man/man8/slapd.8
+index 807634e52d..a06110687b 100644
+--- a/doc/man/man8/slapd.8
++++ b/doc/man/man8/slapd.8
+@@ -5,7 +5,7 @@
+ .SH NAME
+ slapd \- Stand-alone LDAP Daemon
+ .SH SYNOPSIS
+-.B LIBEXECDIR/slapd 
++.B slapd
+ [\c
+ .BR \-V [ V [ V ]]
+ [\c
+@@ -333,7 +333,7 @@ the LDAP databases defined in the default config file, just type:
+ .LP
+ .nf
+ .ft tt
+-	LIBEXECDIR/slapd
++        slapd
+ .ft
+ .fi
+ .LP
+@@ -344,7 +344,7 @@ on voluminous debugging which will be printed on standard error, type:
+ .LP
+ .nf
+ .ft tt
+-	LIBEXECDIR/slapd \-f /var/tmp/slapd.conf \-d 255
++	slapd -f /var/tmp/slapd.conf -d 255
+ .ft
+ .fi
+ .LP
+@@ -352,7 +352,7 @@ To test whether the configuration file is correct or not, type:
+ .LP
+ .nf
+ .ft tt
+-	LIBEXECDIR/slapd \-Tt
++	slapd -Tt
+ .ft
+ .fi
+ .LP

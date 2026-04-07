@@ -1,0 +1,24 @@
+--- interpolator-0.5.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ interpolator-0.5.0/Cargo.toml	2025-10-04T15:58:10.515883+00:00
+@@ -59,21 +59,6 @@
+ [dev-dependencies.collection_literals]
+ version = "1.0.1"
+ 
+-[dev-dependencies.derive_more]
+-version = "0.99.17"
+-
+-[dev-dependencies.proptest]
+-version = "1.1.0"
+-
+-[dev-dependencies.proptest-derive]
+-version = "0.3.0"
+-
+-[dev-dependencies.quote]
+-version = "1.0.23"
+-
+-[dev-dependencies.trybuild2]
+-version = "1.0.0"
+-
+ [features]
+ debug = []
+ iter = []

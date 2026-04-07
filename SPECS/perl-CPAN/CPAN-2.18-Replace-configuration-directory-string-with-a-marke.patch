@@ -1,0 +1,164 @@
+From c6f460b4bb60352e40e25efe72acd3c2bd14f216 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Wed, 28 Jan 2015 13:21:10 +0100
+Subject: [PATCH] Replace configuration directory string with a marker
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This allows to redefine the configuration directory name at build
+time.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ Makefile.PL              | 10 +++++-----
+ README                   | 10 +++++-----
+ lib/CPAN.pm              | 10 +++++-----
+ lib/CPAN/HandleConfig.pm |  2 +-
+ scripts/cpan-mirrors     |  2 +-
+ 5 files changed, 17 insertions(+), 17 deletions(-)
+
+diff --git a/Makefile.PL b/Makefile.PL
+index 2cd2f82..3b826cf 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -339,21 +339,21 @@ record-session :
+ 	$(PERL) -Ilib -MCPAN -e '$$CPAN::Suppress_readline=$$CPAN::Echo_readline=1;shell' | tee ttt.out
+ 
+ run-with-sqlite :
+-	$(PERL) -I$$HOME/.cpan -Ilib -MCPAN::SQLite -MCPAN::MyConfig -MCPAN -e '$$CPAN::Config->{use_sqlite}++; $$CPAN::Config->{sqlite_dbname}="cpandb-sqlite"; shell'
++	$(PERL) -I$$HOME/.XCPANCONFIGNAMEX -Ilib -MCPAN::SQLite -MCPAN::MyConfig -MCPAN -e '$$CPAN::Config->{use_sqlite}++; $$CPAN::Config->{sqlite_dbname}="cpandb-sqlite"; shell'
+ 
+ testrun_very_offline : rm_mirrored_by run_emu_offline
+ 
+ testrun_emu_offline :
+-	$(PERL) -I$$HOME/.cpan -Ilib -MCPAN::MyConfig -MCPAN -e '@CPAN::Defaultsites = qw(file:///dev/null); $$CPAN::Config->{urllist} = []; shell'
++	$(PERL) -I$$HOME/.XCPANCONFIGNAMEX -Ilib -MCPAN::MyConfig -MCPAN -e '@CPAN::Defaultsites = qw(file:///dev/null); $$CPAN::Config->{urllist} = []; shell'
+ 
+ rm_mirrored_by :
+-	rm -f $$HOME/.cpan/sources/MIRRORED.BY*
++	rm -f $$HOME/.XCPANCONFIGNAMEX/sources/MIRRORED.BY*
+ 
+ testrun_http_only :
+-	$(PERL) -I$$HOME/.cpan -Ilib -MCPAN::MyConfig -MCPAN -e '$$CPAN::Config->{urllist} = [qw(http://www.planet-elektronik.de/CPAN/)]; shell'
++	$(PERL) -I$$HOME/.XCPANCONFIGNAMEX -Ilib -MCPAN::MyConfig -MCPAN -e '$$CPAN::Config->{urllist} = [qw(http://www.planet-elektronik.de/CPAN/)]; shell'
+ 
+ urllist :
+-	$(PERL) -Ilib -MCPAN -MCPAN::FirstTime -e 'CPAN::FirstTime::init("$$ENV{HOME}/.cpan/CPAN/MyConfig", args => [qw(urllist)])'
++	$(PERL) -Ilib -MCPAN -MCPAN::FirstTime -e 'CPAN::FirstTime::init("$$ENV{HOME}/.XCPANCONFIGNAMEX/CPAN/MyConfig", args => [qw(urllist)])'
+ 
+ runadmin :
+ 	$(PERL) -Ilib -MCPAN::Admin -eshell
+diff --git a/README b/README
+index aaf3101..2618d71 100644
+--- a/README
++++ b/README
+@@ -269,7 +269,7 @@ DESCRIPTION
+       restarting the whole get/make/test/install procedure from scratch.
+ 
+     Lockfile
+-      Interactive sessions maintain a lockfile, by default "~/.cpan/.lock".
++      Interactive sessions maintain a lockfile, by default "~/.XCPANCONFIGNAMEX/.lock".
+       Batch jobs can run without a lockfile and not disturb each other.
+ 
+       The shell offers to run in *downgraded mode* when another process is
+@@ -329,7 +329,7 @@ DESCRIPTION
+     successfully but have not yet been installed. See also "install_tested".
+ 
+   mkmyconfig
+-    mkmyconfig() writes your own CPAN::MyConfig file into your "~/.cpan/"
++    mkmyconfig() writes your own CPAN::MyConfig file into your "~/.XCPANCONFIGNAMEX/"
+     directory so that you can save your own preferences instead of the
+     system-wide ones.
+ 
+@@ -530,7 +530,7 @@ CONFIGURATION
+ 
+     Default values defined in the CPAN/Config.pm file can be overridden in a
+     user specific file: CPAN/MyConfig.pm. Such a file is best placed in
+-    "$HOME/.cpan/CPAN/MyConfig.pm", because "$HOME/.cpan" is added to the
++    "$HOME/.XCPANCONFIGNAMEX/CPAN/MyConfig.pm", because "$HOME/.XCPANCONFIGNAMEX" is added to the
+     search path of the CPAN module before the use() or require() statements.
+     The mkmyconfig command writes this file for you.
+ 
+@@ -1996,8 +1996,8 @@ FAQ
+ 
+         You may want to configure something like
+ 
+-          o conf make_arg "| tee -ai /root/.cpan/logs/make.out"
+-          o conf make_install_arg "| tee -ai /root/.cpan/logs/make_install.out"
++          o conf make_arg "| tee -ai /root/.XCPANCONFIGNAMEX/logs/make.out"
++          o conf make_install_arg "| tee -ai /root/.XCPANCONFIGNAMEX/logs/make_install.out"
+ 
+         so that STDOUT is captured in a file for later inspection.
+ 
+diff --git a/lib/CPAN.pm b/lib/CPAN.pm
+index 4f02850..2c117b4 100644
+--- a/lib/CPAN.pm
++++ b/lib/CPAN.pm
+@@ -1745,7 +1745,7 @@ restarting the whole get/make/test/install procedure from scratch.
+ 
+ =item Lockfile
+ 
+-Interactive sessions maintain a lockfile, by default C<~/.cpan/.lock>.
++Interactive sessions maintain a lockfile, by default C<~/.XCPANCONFIGNAMEX/.lock>.
+ Batch jobs can run without a lockfile and not disturb each other.
+ 
+ The shell offers to run in I<downgraded mode> when another process is
+@@ -1819,7 +1819,7 @@ C<install_tested>.
+ 
+ =head2 mkmyconfig
+ 
+-mkmyconfig() writes your own CPAN::MyConfig file into your C<~/.cpan/>
++mkmyconfig() writes your own CPAN::MyConfig file into your C<~/.XCPANCONFIGNAMEX/>
+ directory so that you can save your own preferences instead of the
+ system-wide ones.
+ 
+@@ -2034,7 +2034,7 @@ in a file CPAN/Config.pm.
+ 
+ Default values defined in the CPAN/Config.pm file can be
+ overridden in a user specific file: CPAN/MyConfig.pm. Such a file is
+-best placed in C<$HOME/.cpan/CPAN/MyConfig.pm>, because C<$HOME/.cpan> is
++best placed in C<$HOME/.XCPANCONFIGNAMEX/CPAN/MyConfig.pm>, because C<$HOME/.XCPANCONFIGNAMEX> is
+ added to the search path of the CPAN module before the use() or
+ require() statements. The mkmyconfig command writes this file for you.
+ 
+@@ -3729,8 +3729,8 @@ there is too much output to keep track of.
+ 
+ You may want to configure something like
+ 
+-  o conf make_arg "| tee -ai /root/.cpan/logs/make.out"
+-  o conf make_install_arg "| tee -ai /root/.cpan/logs/make_install.out"
++  o conf make_arg "| tee -ai /root/.XCPANCONFIGNAMEX/logs/make.out"
++  o conf make_install_arg "| tee -ai /root/.XCPANCONFIGNAMEX/logs/make_install.out"
+ 
+ so that STDOUT is captured in a file for later inspection.
+ 
+diff --git a/lib/CPAN/HandleConfig.pm b/lib/CPAN/HandleConfig.pm
+index c72439f..a6b92e8 100644
+--- a/lib/CPAN/HandleConfig.pm
++++ b/lib/CPAN/HandleConfig.pm
+@@ -538,7 +538,7 @@ sub cpan_home_dir_candidates {
+     push @dirs, $ENV{USERPROFILE} if $ENV{USERPROFILE};
+ 
+     $CPAN::Config->{load_module_verbosity} = $old_v;
+-    my $dotcpan = $^O eq 'VMS' ? '_cpan' : '.cpan';
++    my $dotcpan = $^O eq 'VMS' ? '_XCPANCONFIGNAMEX' : '.XCPANCONFIGNAMEX';
+     @dirs = map { File::Spec->catdir($_, $dotcpan) } grep { defined } @dirs;
+     return wantarray ? @dirs : $dirs[0];
+ }
+diff --git a/scripts/cpan-mirrors b/scripts/cpan-mirrors
+index fe0e29c..493c140 100644
+--- a/scripts/cpan-mirrors
++++ b/scripts/cpan-mirrors
+@@ -143,7 +143,7 @@ to your configuration.
+ 
+ If you don't have a F<MIRRORED.BY> file, this program will download one
+ for you. It looks through your existing C<urllist> configuration and
+-then default locations. It stores it in C<~/.cpan> (or your configured
++then default locations. It stores it in C<~/.XCPANCONFIGNAMEX> (or your configured
+ location to store files).
+ 
+ =head1 TO DO
+-- 
+2.13.6
+

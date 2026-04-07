@@ -1,0 +1,79 @@
+From 81221b4a75f9ca6f6c02fd83256c4a3c9879fd63 Mon Sep 17 00:00:00 2001
+From: Vlad Zahorodnii <vlad.zahorodnii@kde.org>
+Date: Tue, 1 Feb 2022 13:05:36 +0200
+Subject: [PATCH 20/55] Client: Remove mWaitingForUpdateDelivery
+
+Currently, mWaitingForUpdateDelivery is shared between the main thread
+(doHandleFrameCallback()) and the frame callback event thread
+(handleFrameCallback()), however the access to it is not synchronized
+between both threads. On the other hand, QWaylandWindow
+already ensures not to create a frame callback if there's already one
+pending.
+
+This change removes mWaitingForUpdateDelivery flag because it should be
+already covered by mWaitingForFrameCallback and to remove unsynchronized
+shared state between threads.
+
+Change-Id: I0e5a25d18d1e66c4d7683e7e972330c4d7cbbf38
+Reviewed-by: David Edmundson <davidedmundson@kde.org>
+(cherry picked from commit feb1a5c207c13d0bf87c0d8ad039279dbf8cee9e)
+---
+ src/client/qwaylandwindow.cpp | 29 ++++++++++++-----------------
+ src/client/qwaylandwindow_p.h |  1 -
+ 2 files changed, 12 insertions(+), 18 deletions(-)
+
+diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
+index a38f7d55..6bf0fc4b 100644
+--- a/src/client/qwaylandwindow.cpp
++++ b/src/client/qwaylandwindow.cpp
+@@ -651,23 +651,18 @@ void QWaylandWindow::handleFrameCallback()
+     mFrameCallbackElapsedTimer.invalidate();
+ 
+     // The rest can wait until we can run it on the correct thread
+-    if (!mWaitingForUpdateDelivery) {
+-        auto doHandleExpose = [this]() {
+-            bool wasExposed = isExposed();
+-            mFrameCallbackTimedOut = false;
+-            if (!wasExposed && isExposed()) // Did setting mFrameCallbackTimedOut make the window exposed?
+-                sendExposeEvent(QRect(QPoint(), geometry().size()));
+-            if (wasExposed && hasPendingUpdateRequest())
+-                deliverUpdateRequest();
+-
+-            mWaitingForUpdateDelivery = false;
+-        };
+-
+-        // Queued connection, to make sure we don't call handleUpdate() from inside waitForFrameSync()
+-        // in the single-threaded case.
+-        mWaitingForUpdateDelivery = true;
+-        QMetaObject::invokeMethod(this, doHandleExpose, Qt::QueuedConnection);
+-    }
++    auto doHandleExpose = [this]() {
++        bool wasExposed = isExposed();
++        mFrameCallbackTimedOut = false;
++        if (!wasExposed && isExposed()) // Did setting mFrameCallbackTimedOut make the window exposed?
++            sendExposeEvent(QRect(QPoint(), geometry().size()));
++        if (wasExposed && hasPendingUpdateRequest())
++            deliverUpdateRequest();
++    };
++
++    // Queued connection, to make sure we don't call handleUpdate() from inside waitForFrameSync()
++    // in the single-threaded case.
++    QMetaObject::invokeMethod(this, doHandleExpose, Qt::QueuedConnection);
+ 
+     mFrameSyncWait.notify_all();
+ }
+diff --git a/src/client/qwaylandwindow_p.h b/src/client/qwaylandwindow_p.h
+index 54ac67a9..cf7ce879 100644
+--- a/src/client/qwaylandwindow_p.h
++++ b/src/client/qwaylandwindow_p.h
+@@ -228,7 +228,6 @@ protected:
+     WId mWindowId;
+     bool mWaitingForFrameCallback = false;
+     bool mFrameCallbackTimedOut = false; // Whether the frame callback has timed out
+-    bool mWaitingForUpdateDelivery = false;
+     int mFrameCallbackCheckIntervalTimerId = -1;
+     QElapsedTimer mFrameCallbackElapsedTimer;
+     struct ::wl_callback *mFrameCallback = nullptr;
+-- 
+2.51.1
+

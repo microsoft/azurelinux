@@ -1,0 +1,24 @@
+--- xen-4.14.0/xen/include/crypto/vmac.h.orig	2020-07-23 16:07:51.000000000 +0100
++++ xen-4.14.0/xen/include/crypto/vmac.h	2020-10-24 15:45:49.246467465 +0100
+@@ -142,7 +142,7 @@
+ 
+ #define vmac_update vhash_update
+ 
+-void vhash_update(unsigned char m[],
++void vhash_update(uint8_t *m,
+           unsigned int mbytes,
+           vmac_ctx_t *ctx);
+ 
+diff --git a/xen/arch/x86/tboot.c b/xen/arch/x86/tboot.c
+index 320e06f..618ae92 100644
+--- a/xen/arch/x86/tboot.c
++++ b/xen/arch/x86/tboot.c
+@@ -91,7 +91,7 @@ static void __init tboot_copy_memory(unsigned char *va, uint32_t size,
+ 
+ void __init tboot_probe(void)
+ {
+-    tboot_shared_t *tboot_shared;
++    tboot_shared_t * volatile tboot_shared;
+     static const uuid_t __initconst tboot_shared_uuid = TBOOT_SHARED_UUID;
+ 
+     /* Look for valid page-aligned address for shared page. */

@@ -1,0 +1,27 @@
+From 72c5d975c022e63aed17ffe2933f7f63a3791c82 Mon Sep 17 00:00:00 2001
+From: Kevin Backhouse <kevinbackhouse@github.com>
+Date: Sat, 30 Aug 2025 21:44:49 +0100
+Subject: [PATCH] Make methods non-virtual
+
+---
+ include/exiv2/image.hpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/exiv2/image.hpp b/include/exiv2/image.hpp
+index 6de3f3eafd..344d69840d 100644
+--- a/include/exiv2/image.hpp
++++ b/include/exiv2/image.hpp
+@@ -197,11 +197,11 @@ class EXIV2API Image {
+     @param size number of bytes to append
+     @param bTestValid - tests that iccProfile contains credible data
+    */
+-  virtual void appendIccProfile(const uint8_t* bytes, size_t size, bool bTestValid);
++  void appendIccProfile(const uint8_t* bytes, size_t size, bool bTestValid);
+   /*!
+     @brief Throw an exception if the size at the beginning of the iccProfile isn't correct.
+    */
+-  virtual void checkIccProfile();
++  void checkIccProfile();
+   /*!
+     @brief Erase iccProfile. the profile is not removed from
+         the actual image until the writeMetadata() method is called.

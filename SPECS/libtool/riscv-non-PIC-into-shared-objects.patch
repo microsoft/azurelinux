@@ -1,0 +1,13 @@
+diff --git a/tests/demo.at b/tests/demo.at
+index b9791eb..ab41252 100644
+--- a/tests/demo.at
++++ b/tests/demo.at
+@@ -518,7 +518,7 @@ AT_CLEANUP
+ AT_SETUP([force non-PIC objects])
+ 
+ AT_CHECK([case $host in
+-hppa*|amd64*|x86_64*|s390*|arm*)
++hppa*|amd64*|x86_64*|s390*|arm*|riscv*)
+   # These hosts cannot use non-PIC shared libs
+   exit 77 ;;
+ *-solaris*|*-sunos*)

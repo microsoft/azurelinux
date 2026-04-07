@@ -1,0 +1,513 @@
+From 5315e2b57b2df54b294893adc5185c474985bcc2 Mon Sep 17 00:00:00 2001
+From: Jochen Kellner <jochen@jochen.org>
+Date: Mon, 9 Sep 2024 19:18:42 +0200
+Subject: [PATCH 1/2] virt-what: detect systemd-nspawn
+
+The following patch adds detection of systemd-nspawn containers to
+virt-what for me.  It is inspired by systemd-detect-virt which also
+looks at /proc/1/environ.
+---
+ configure.ac                             |   2 +
+ tests/nspawn/Makefile.am                 |  30 +++
+ tests/nspawn/proc/1/environ              | Bin 0 -> 262 bytes
+ tests/nspawn/proc/cpuinfo                | 224 +++++++++++++++++++++++
+ tests/nspawn/proc/self/status            |  61 ++++++
+ tests/nspawn/run/host/container-manager  |   5 +
+ tests/nspawn/sbin/dmidecode              |   7 +
+ tests/nspawn/sbin/uname                  |   2 +
+ tests/nspawn/sbin/virt-what-cpuid-helper |   2 +
+ tests/nspawn/test.sh                     |  32 ++++
+ virt-what.in                             |   6 +
+ virt-what.pod                            |   6 +
+ 12 files changed, 377 insertions(+)
+ create mode 100644 tests/nspawn/Makefile.am
+ create mode 100644 tests/nspawn/proc/1/environ
+ create mode 100644 tests/nspawn/proc/cpuinfo
+ create mode 100644 tests/nspawn/proc/self/status
+ create mode 100755 tests/nspawn/run/host/container-manager
+ create mode 100755 tests/nspawn/sbin/dmidecode
+ create mode 100755 tests/nspawn/sbin/uname
+ create mode 100755 tests/nspawn/sbin/virt-what-cpuid-helper
+ create mode 100755 tests/nspawn/test.sh
+
+diff --git a/configure.ac b/configure.ac
+index e93d237..2882db4 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -59,6 +59,7 @@ tests="\
+ 	lkvm-arm \
+ 	lx86 \
+ 	lxc \
++        nspawn \
+ 	nutanix-ahv \
+ 	oci \
+ 	parallels-desktop \
+@@ -112,6 +113,7 @@ AC_CONFIG_FILES([Makefile
+ 	         tests/lkvm-arm/Makefile
+ 	         tests/lx86/Makefile
+ 	         tests/lxc/Makefile
++	         tests/nspawn/Makefile
+ 	         tests/nutanix-ahv/Makefile
+ 	         tests/oci/Makefile
+ 	         tests/parallels-desktop/Makefile
+diff --git a/tests/nspawn/Makefile.am b/tests/nspawn/Makefile.am
+new file mode 100644
+index 0000000..e566063
+--- /dev/null
++++ b/tests/nspawn/Makefile.am
+@@ -0,0 +1,30 @@
++# Makefile for virt-what
++# Copyright (C) 2008-2024 Red Hat Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++
++CLEANFILES = *~
++
++TESTS = test.sh
++
++EXTRA_DIST = \
++	test.sh \
++	proc/1/environ \
++	proc/cpuinfo \
++	proc/self/status \
++	run/host/container-manager \
++	sbin/dmidecode \
++	sbin/uname \
++	sbin/virt-what-cpuid-helper
+diff --git a/tests/nspawn/proc/1/environ b/tests/nspawn/proc/1/environ
+new file mode 100644
+index 0000000000000000000000000000000000000000..918a77694ad4a0821246c14db4c5976f001a6982
+GIT binary patch
+literal 262
+zcmZ9ET?>LR7=`zT#>!MG*hPeWP->)IbS0ac^g_LhZ5ICf$e^UV^PGos4vTWbS?esj
+znp#|$lYsL9fAJ^!>Vp!H)CRo()Rw!>d3{q9-CaD9Z1ObW%o^j#sYs5zPy2kGEz;xz
+z-)Yshpm;1I5h$&xid93y$)u*!D5_}~H(JV3D4JkKvb@}`&Q*~wcS*^aZINA!^9+rL
+arW;(o+v=gM1A`SPJ`VmRD6X^wf#d~ua$48`
+
+literal 0
+HcmV?d00001
+
+diff --git a/tests/nspawn/proc/cpuinfo b/tests/nspawn/proc/cpuinfo
+new file mode 100644
+index 0000000..243aa53
+--- /dev/null
++++ b/tests/nspawn/proc/cpuinfo
+@@ -0,0 +1,224 @@
++processor	: 0
++vendor_id	: GenuineIntel
++cpu family	: 6
++model		: 94
++model name	: Intel(R) Core(TM) i7-6700 CPU @ 3.40GHz
++stepping	: 3
++microcode	: 0xf0
++cpu MHz		: 800.000
++cache size	: 8192 KB
++physical id	: 0
++siblings	: 8
++core id		: 0
++cpu cores	: 4
++apicid		: 0
++initial apicid	: 0
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 22
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb pti ssbd ibrs ibpb stibp tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid mpx rdseed adx smap clflushopt intel_pt xsaveopt xsavec xgetbv1 xsaves dtherm ida arat pln pts hwp hwp_notify hwp_act_window hwp_epp vnmi md_clear flush_l1d arch_capabilities
++vmx flags	: vnmi preemption_timer invvpid ept_x_only ept_ad ept_1gb flexpriority tsc_offset vtpr mtf vapic ept vpid unrestricted_guest ple shadow_vmcs pml
++bugs		: cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf mds swapgs taa itlb_multihit srbds mmio_stale_data retbleed gds
++bogomips	: 6799.81
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 39 bits physical, 48 bits virtual
++power management:
++
++processor	: 1
++vendor_id	: GenuineIntel
++cpu family	: 6
++model		: 94
++model name	: Intel(R) Core(TM) i7-6700 CPU @ 3.40GHz
++stepping	: 3
++microcode	: 0xf0
++cpu MHz		: 3999.967
++cache size	: 8192 KB
++physical id	: 0
++siblings	: 8
++core id		: 1
++cpu cores	: 4
++apicid		: 2
++initial apicid	: 2
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 22
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb pti ssbd ibrs ibpb stibp tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid mpx rdseed adx smap clflushopt intel_pt xsaveopt xsavec xgetbv1 xsaves dtherm ida arat pln pts hwp hwp_notify hwp_act_window hwp_epp vnmi md_clear flush_l1d arch_capabilities
++vmx flags	: vnmi preemption_timer invvpid ept_x_only ept_ad ept_1gb flexpriority tsc_offset vtpr mtf vapic ept vpid unrestricted_guest ple shadow_vmcs pml
++bugs		: cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf mds swapgs taa itlb_multihit srbds mmio_stale_data retbleed gds
++bogomips	: 6799.81
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 39 bits physical, 48 bits virtual
++power management:
++
++processor	: 2
++vendor_id	: GenuineIntel
++cpu family	: 6
++model		: 94
++model name	: Intel(R) Core(TM) i7-6700 CPU @ 3.40GHz
++stepping	: 3
++microcode	: 0xf0
++cpu MHz		: 800.000
++cache size	: 8192 KB
++physical id	: 0
++siblings	: 8
++core id		: 2
++cpu cores	: 4
++apicid		: 4
++initial apicid	: 4
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 22
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb pti ssbd ibrs ibpb stibp tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid mpx rdseed adx smap clflushopt intel_pt xsaveopt xsavec xgetbv1 xsaves dtherm ida arat pln pts hwp hwp_notify hwp_act_window hwp_epp vnmi md_clear flush_l1d arch_capabilities
++vmx flags	: vnmi preemption_timer invvpid ept_x_only ept_ad ept_1gb flexpriority tsc_offset vtpr mtf vapic ept vpid unrestricted_guest ple shadow_vmcs pml
++bugs		: cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf mds swapgs taa itlb_multihit srbds mmio_stale_data retbleed gds
++bogomips	: 6799.81
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 39 bits physical, 48 bits virtual
++power management:
++
++processor	: 3
++vendor_id	: GenuineIntel
++cpu family	: 6
++model		: 94
++model name	: Intel(R) Core(TM) i7-6700 CPU @ 3.40GHz
++stepping	: 3
++microcode	: 0xf0
++cpu MHz		: 3975.686
++cache size	: 8192 KB
++physical id	: 0
++siblings	: 8
++core id		: 3
++cpu cores	: 4
++apicid		: 6
++initial apicid	: 6
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 22
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb pti ssbd ibrs ibpb stibp tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid mpx rdseed adx smap clflushopt intel_pt xsaveopt xsavec xgetbv1 xsaves dtherm ida arat pln pts hwp hwp_notify hwp_act_window hwp_epp vnmi md_clear flush_l1d arch_capabilities
++vmx flags	: vnmi preemption_timer invvpid ept_x_only ept_ad ept_1gb flexpriority tsc_offset vtpr mtf vapic ept vpid unrestricted_guest ple shadow_vmcs pml
++bugs		: cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf mds swapgs taa itlb_multihit srbds mmio_stale_data retbleed gds
++bogomips	: 6799.81
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 39 bits physical, 48 bits virtual
++power management:
++
++processor	: 4
++vendor_id	: GenuineIntel
++cpu family	: 6
++model		: 94
++model name	: Intel(R) Core(TM) i7-6700 CPU @ 3.40GHz
++stepping	: 3
++microcode	: 0xf0
++cpu MHz		: 800.000
++cache size	: 8192 KB
++physical id	: 0
++siblings	: 8
++core id		: 0
++cpu cores	: 4
++apicid		: 1
++initial apicid	: 1
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 22
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb pti ssbd ibrs ibpb stibp tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid mpx rdseed adx smap clflushopt intel_pt xsaveopt xsavec xgetbv1 xsaves dtherm ida arat pln pts hwp hwp_notify hwp_act_window hwp_epp vnmi md_clear flush_l1d arch_capabilities
++vmx flags	: vnmi preemption_timer invvpid ept_x_only ept_ad ept_1gb flexpriority tsc_offset vtpr mtf vapic ept vpid unrestricted_guest ple shadow_vmcs pml
++bugs		: cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf mds swapgs taa itlb_multihit srbds mmio_stale_data retbleed gds
++bogomips	: 6799.81
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 39 bits physical, 48 bits virtual
++power management:
++
++processor	: 5
++vendor_id	: GenuineIntel
++cpu family	: 6
++model		: 94
++model name	: Intel(R) Core(TM) i7-6700 CPU @ 3.40GHz
++stepping	: 3
++microcode	: 0xf0
++cpu MHz		: 3955.023
++cache size	: 8192 KB
++physical id	: 0
++siblings	: 8
++core id		: 1
++cpu cores	: 4
++apicid		: 3
++initial apicid	: 3
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 22
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb pti ssbd ibrs ibpb stibp tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid mpx rdseed adx smap clflushopt intel_pt xsaveopt xsavec xgetbv1 xsaves dtherm ida arat pln pts hwp hwp_notify hwp_act_window hwp_epp vnmi md_clear flush_l1d arch_capabilities
++vmx flags	: vnmi preemption_timer invvpid ept_x_only ept_ad ept_1gb flexpriority tsc_offset vtpr mtf vapic ept vpid unrestricted_guest ple shadow_vmcs pml
++bugs		: cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf mds swapgs taa itlb_multihit srbds mmio_stale_data retbleed gds
++bogomips	: 6799.81
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 39 bits physical, 48 bits virtual
++power management:
++
++processor	: 6
++vendor_id	: GenuineIntel
++cpu family	: 6
++model		: 94
++model name	: Intel(R) Core(TM) i7-6700 CPU @ 3.40GHz
++stepping	: 3
++microcode	: 0xf0
++cpu MHz		: 3846.764
++cache size	: 8192 KB
++physical id	: 0
++siblings	: 8
++core id		: 2
++cpu cores	: 4
++apicid		: 5
++initial apicid	: 5
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 22
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb pti ssbd ibrs ibpb stibp tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid mpx rdseed adx smap clflushopt intel_pt xsaveopt xsavec xgetbv1 xsaves dtherm ida arat pln pts hwp hwp_notify hwp_act_window hwp_epp vnmi md_clear flush_l1d arch_capabilities
++vmx flags	: vnmi preemption_timer invvpid ept_x_only ept_ad ept_1gb flexpriority tsc_offset vtpr mtf vapic ept vpid unrestricted_guest ple shadow_vmcs pml
++bugs		: cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf mds swapgs taa itlb_multihit srbds mmio_stale_data retbleed gds
++bogomips	: 6799.81
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 39 bits physical, 48 bits virtual
++power management:
++
++processor	: 7
++vendor_id	: GenuineIntel
++cpu family	: 6
++model		: 94
++model name	: Intel(R) Core(TM) i7-6700 CPU @ 3.40GHz
++stepping	: 3
++microcode	: 0xf0
++cpu MHz		: 3892.180
++cache size	: 8192 KB
++physical id	: 0
++siblings	: 8
++core id		: 3
++cpu cores	: 4
++apicid		: 7
++initial apicid	: 7
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 22
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb pti ssbd ibrs ibpb stibp tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid mpx rdseed adx smap clflushopt intel_pt xsaveopt xsavec xgetbv1 xsaves dtherm ida arat pln pts hwp hwp_notify hwp_act_window hwp_epp vnmi md_clear flush_l1d arch_capabilities
++vmx flags	: vnmi preemption_timer invvpid ept_x_only ept_ad ept_1gb flexpriority tsc_offset vtpr mtf vapic ept vpid unrestricted_guest ple shadow_vmcs pml
++bugs		: cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf mds swapgs taa itlb_multihit srbds mmio_stale_data retbleed gds
++bogomips	: 6799.81
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 39 bits physical, 48 bits virtual
++power management:
++
+diff --git a/tests/nspawn/proc/self/status b/tests/nspawn/proc/self/status
+new file mode 100644
+index 0000000..e1c867a
+--- /dev/null
++++ b/tests/nspawn/proc/self/status
+@@ -0,0 +1,61 @@
++Name:	cat
++Umask:	0022
++State:	R (running)
++Tgid:	2359
++Ngid:	0
++Pid:	2359
++PPid:	2049
++TracerPid:	0
++Uid:	0	0	0	0
++Gid:	0	0	0	0
++FDSize:	256
++Groups:	 
++NStgid:	2359
++NSpid:	2359
++NSpgid:	2359
++NSsid:	2049
++Kthread:	0
++VmPeak:	    3044 kB
++VmSize:	    3044 kB
++VmLck:	       0 kB
++VmPin:	       0 kB
++VmHWM:	    1408 kB
++VmRSS:	    1408 kB
++RssAnon:	       0 kB
++RssFile:	    1408 kB
++RssShmem:	       0 kB
++VmData:	     360 kB
++VmStk:	     132 kB
++VmExe:	      20 kB
++VmLib:	    1520 kB
++VmPTE:	      44 kB
++VmSwap:	       0 kB
++HugetlbPages:	       0 kB
++CoreDumping:	0
++THP_enabled:	1
++untag_mask:	0xffffffffffffffff
++Threads:	1
++SigQ:	0/127646
++SigPnd:	0000000000000000
++ShdPnd:	0000000000000000
++SigBlk:	0000000000000000
++SigIgn:	0000000000000000
++SigCgt:	0000000000000000
++CapInh:	0000000000000000
++CapPrm:	00000000fdecbfff
++CapEff:	00000000fdecbfff
++CapBnd:	00000000fdecbfff
++CapAmb:	0000000000000000
++NoNewPrivs:	0
++Seccomp:	2
++Seccomp_filters:	5
++Speculation_Store_Bypass:	thread vulnerable
++SpeculationIndirectBranch:	conditional enabled
++Cpus_allowed:	ff
++Cpus_allowed_list:	0-7
++Mems_allowed:	00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000001
++Mems_allowed_list:	0
++voluntary_ctxt_switches:	0
++nonvoluntary_ctxt_switches:	0
++x86_Thread_features:	
++x86_Thread_features_locked:	
+diff --git a/tests/nspawn/run/host/container-manager b/tests/nspawn/run/host/container-manager
+new file mode 100755
+index 0000000..e8bd250
+--- /dev/null
++++ b/tests/nspawn/run/host/container-manager
+@@ -0,0 +1,5 @@
++#!/bin/sh -
++cat <<'EOF'
++systemd-nspawn
++EOF
++exit 0
+diff --git a/tests/nspawn/sbin/dmidecode b/tests/nspawn/sbin/dmidecode
+new file mode 100755
+index 0000000..78e5cea
+--- /dev/null
++++ b/tests/nspawn/sbin/dmidecode
+@@ -0,0 +1,7 @@
++#!/bin/sh -
++cat <<'EOF'
++# dmidecode 3.4
++Scanning /dev/mem for entry point.
++/dev/mem: No such file or directory
++EOF
++exit 1
+diff --git a/tests/nspawn/sbin/uname b/tests/nspawn/sbin/uname
+new file mode 100755
+index 0000000..ab0ec89
+--- /dev/null
++++ b/tests/nspawn/sbin/uname
+@@ -0,0 +1,2 @@
++#!/bin/sh -
++echo x86_64
+diff --git a/tests/nspawn/sbin/virt-what-cpuid-helper b/tests/nspawn/sbin/virt-what-cpuid-helper
+new file mode 100755
+index 0000000..481e1e6
+--- /dev/null
++++ b/tests/nspawn/sbin/virt-what-cpuid-helper
+@@ -0,0 +1,2 @@
++#!/bin/sh -
++# no output
+diff --git a/tests/nspawn/test.sh b/tests/nspawn/test.sh
+new file mode 100755
+index 0000000..09e5b9a
+--- /dev/null
++++ b/tests/nspawn/test.sh
+@@ -0,0 +1,32 @@
++# Test for systemd-nspawn
++# Copyright (C) 2008-2024 Red Hat Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++
++output="$(PATH=../..:$PATH virt-what --test-root=. 2>&1)"
++expected="systemd_nspawn"
++
++if [ "$output" != "$expected" ]; then
++    echo "$0: test failed because output did not match expected"
++    echo "Expected output was:"
++    echo "----------------------------------------"
++    echo "$expected"
++    echo "----------------------------------------"
++    echo "But the actual output of the program was:"
++    echo "----------------------------------------"
++    echo "$output"
++    echo "----------------------------------------"
++    exit 1
++fi
+diff --git a/virt-what.in b/virt-what.in
+index ba35cc5..39f0497 100644
+--- a/virt-what.in
++++ b/virt-what.in
+@@ -238,6 +238,12 @@ elif grep -qF /libpod- "${root}/proc/self/cgroup" 2>/dev/null; then
+     echo podman
+ fi
+ 
++# Check for container=systemd-nspawn
++if [ -e "${root}/proc/1/environ" ] &&
++    cat "${root}/proc/1/environ" | tr '\000' '\n' | grep -Eiq '^container=systemd-nspawn'; then
++    echo systemd_nspawn
++fi
++
+ # Check for Linux-VServer
+ if test -e "${root}/proc/self/status" \
+    && cat "${root}/proc/self/status" | grep -q "VxID: [0-9]*"; then
+diff --git a/virt-what.pod b/virt-what.pod
+index d5eeb76..0eb0b93 100644
+--- a/virt-what.pod
++++ b/virt-what.pod
+@@ -270,6 +270,12 @@ The guest is running on the Red Hat hypervisor.
+ 
+ Status: confirmed by RWMJ
+ 
++=item B<systemd_nspawn>
++
++This process is running in a systemd nspawn container.
++
++Status: contributed by Jochen Kellner
++
+ =item B<uml>
+ 
+ This is a User-Mode Linux (UML) guest.
+-- 
+2.49.0
+

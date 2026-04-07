@@ -1,0 +1,41 @@
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Thu, 25 Feb 2010 16:45:28 +0300
+Subject: [PATCH] Do not format man-pages and do not install miscellaneous
+ utilities for dealing with man-pages.
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+
+diff --git a/erts/etc/common/Makefile.in b/erts/etc/common/Makefile.in
+index 42af9c87dc..c017e0a4ed 100644
+--- a/erts/etc/common/Makefile.in
++++ b/erts/etc/common/Makefile.in
+@@ -552,10 +552,6 @@ endif
+ ifneq ($(INSTALL_TOP_BIN),)
+ 	$(INSTALL_PROGRAM) $(INSTALL_TOP_BIN) "$(RELEASE_PATH)"
+ endif
+-ifneq ($(INSTALL_MISC),)
+-	$(INSTALL_DIR) "$(RELEASE_PATH)/misc"
+-	$(INSTALL_SCRIPT) $(INSTALL_MISC) "$(RELEASE_PATH)/misc"
+-endif
+ ifneq ($(INSTALL_SRC),)
+ 	$(INSTALL_DIR) "$(RELEASE_PATH)/erts-$(VSN)/src"
+ 	$(INSTALL_DATA) $(INSTALL_SRC) "$(RELEASE_PATH)/erts-$(VSN)/src"
+diff --git a/erts/etc/unix/Install.src b/erts/etc/unix/Install.src
+index b00dd09f1a..2147774f50 100644
+--- a/erts/etc/unix/Install.src
++++ b/erts/etc/unix/Install.src
+@@ -143,14 +143,5 @@ cp -p ../releases/%I_SYSTEM_VSN%/start_*.boot .
+ cp -p ../releases/%I_SYSTEM_VSN%/no_dot_erlang.boot .
+ cp -p $Name.boot start.boot
+ cp -p ../releases/%I_SYSTEM_VSN%/$Name.script start.script
+-#
+-# Fixing the man pages
+-#
+-
+-if [ -d "$ERL_ROOT/man" ]
+-then
+-    cd "$ERL_ROOT"
+-    ./misc/format_man_pages "$ERL_ROOT"
+-fi
+ 
+ exit 0

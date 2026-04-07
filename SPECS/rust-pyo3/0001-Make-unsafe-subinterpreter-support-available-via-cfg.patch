@@ -1,0 +1,25 @@
+From d59176bc05aa37838fd4a8dd253f47c962f61118 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Tue, 23 Jul 2024 14:41:04 +0200
+Subject: [PATCH] Make unsafe subinterpreter support available via cfg flag
+
+---
+ src/impl_/pymodule.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/impl_/pymodule.rs b/src/impl_/pymodule.rs
+index b05652b..94555ff 100644
+--- a/src/impl_/pymodule.rs
++++ b/src/impl_/pymodule.rs
+@@ -107,7 +107,7 @@ impl ModuleDef {
+         // that static data is not reused across interpreters.
+         //
+         // PyPy does not have subinterpreters, so no need to check interpreter ID.
+-        #[cfg(not(any(PyPy, GraalPy)))]
++        #[cfg(not(any(PyPy, GraalPy, pyo3_unsafe_allow_subinterpreters)))]
+         {
+             // PyInterpreterState_Get is only available on 3.9 and later, but is missing
+             // from python3.dll for Windows stable API on 3.9
+-- 
+2.45.2
+

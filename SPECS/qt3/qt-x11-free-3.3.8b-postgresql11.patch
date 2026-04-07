@@ -1,0 +1,57 @@
+diff -ur qt-x11-free-3.3.8b/src/sql/qsqlextension_p.cpp qt-x11-free-3.3.8b-postgresql11/src/sql/qsqlextension_p.cpp
+--- qt-x11-free-3.3.8b/src/sql/qsqlextension_p.cpp	2008-01-15 20:09:13.000000000 +0100
++++ qt-x11-free-3.3.8b-postgresql11/src/sql/qsqlextension_p.cpp	2019-01-05 05:21:29.839087511 +0100
+@@ -68,7 +68,7 @@
+     if ( index.contains( (int)values.count() ) ) {
+ 	index[ (int)values.count() ] = placeholder;
+     }
+-    values[ placeholder ] = Param( val, tp );
++    values[ placeholder ] = Parame( val, tp );
+ }
+ 
+ void QSqlExtension::bindValue( int pos, const QVariant& val, QSql::ParameterType tp )
+@@ -76,7 +76,7 @@
+     bindm = BindByPosition;
+     index[ pos ] = QString::number( pos );
+     QString nm = QString::number( pos );
+-    values[ nm ] = Param( val, tp );
++    values[ nm ] = Parame( val, tp );
+ }
+ 
+ void QSqlExtension::addBindValue( const QVariant& val, QSql::ParameterType tp )
+@@ -130,7 +130,7 @@
+ 
+ QMap<QString, QVariant> QSqlExtension::boundValues() const
+ {
+-    QMap<QString, Param>::ConstIterator it;
++    QMap<QString, Parame>::ConstIterator it;
+     QMap<QString, QVariant> m;
+     if ( bindm == BindByName ) {
+ 	for ( it = values.begin(); it != values.end(); ++it )
+diff -ur qt-x11-free-3.3.8b/src/sql/qsqlextension_p.h qt-x11-free-3.3.8b-postgresql11/src/sql/qsqlextension_p.h
+--- qt-x11-free-3.3.8b/src/sql/qsqlextension_p.h	2008-01-15 20:09:13.000000000 +0100
++++ qt-x11-free-3.3.8b-postgresql11/src/sql/qsqlextension_p.h	2019-01-05 05:20:59.605555077 +0100
+@@ -71,11 +71,11 @@
+ #define QM_TEMPLATE_EXTERN_SQL Q_TEMPLATE_EXTERN
+ #endif
+ 
+-struct Param {
+-    Param( const QVariant& v = QVariant(), QSql::ParameterType t = QSql::In ): value( v ), typ( t ) {}
++struct Parame {
++    Parame( const QVariant& v = QVariant(), QSql::ParameterType t = QSql::In ): value( v ), typ( t ) {}
+     QVariant value;
+     QSql::ParameterType typ;
+-    Q_DUMMY_COMPARISON_OPERATOR(Param)
++    Q_DUMMY_COMPARISON_OPERATOR(Parame)
+ };
+ 
+ struct Holder {
+@@ -114,7 +114,7 @@
+     int bindCount;
+ 
+     QMap<int, QString> index;
+-    typedef QMap<QString, Param> ValueMap;
++    typedef QMap<QString, Parame> ValueMap;
+     ValueMap values;
+ 
+     // convenience container for QSqlQuery

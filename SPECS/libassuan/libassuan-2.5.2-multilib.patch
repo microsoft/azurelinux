@@ -1,0 +1,28 @@
+diff -up libassuan-2.5.2/src/libassuan-config.in.multilib libassuan-2.5.2/src/libassuan-config.in
+--- libassuan-2.5.2/src/libassuan-config.in.multilib	2019-01-08 16:31:11.042204893 +0100
++++ libassuan-2.5.2/src/libassuan-config.in	2019-01-08 16:31:20.026048884 +0100
+@@ -19,7 +19,7 @@ lib="@LIBASSUAN_CONFIG_LIBS@"
+ extralibs="$gpg_error_libs"
+ cflags="@LIBASSUAN_CONFIG_CFLAGS@ $gpg_error_cflags"
+ api_version="@LIBASSUAN_CONFIG_API_VERSION@"
+-my_host="@LIBASSUAN_CONFIG_HOST@"
++my_host="myhost"
+ prefix=@prefix@
+ exec_prefix=@exec_prefix@
+ includes=""
+@@ -131,13 +131,7 @@ if test "$echo_cflags" = "yes"; then
+ fi
+ 
+ if test "$echo_libs" = "yes"; then
+-    if test "@libdir@" != "/usr/lib" ; then
+-      libdirs="-L@libdir@"
+-      for i in $lib $extralibs ; do
+-	if test "$i" = "-L@libdir@" ; then
+-	  libdirs=""
+-	fi
+-      done
+-    fi
++    # libdir is always standard and implicitly searched
++    libdirs=""
+     echo $libdirs $lib $extralibs
+ fi

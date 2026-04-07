@@ -1,0 +1,42 @@
+diff -up sblim-cmpi-base-1.6.4/provider-register.sh.orig sblim-cmpi-base-1.6.4/provider-register.sh
+--- sblim-cmpi-base-1.6.4/provider-register.sh.orig	2015-02-19 13:39:18.057255372 +0100
++++ sblim-cmpi-base-1.6.4/provider-register.sh	2015-02-19 13:40:32.471535246 +0100
+@@ -351,20 +351,8 @@ sfcb_rebuild()
+     if ps -C sfcbd > /dev/null 2>&1
+     then
+         # sfcb is running -- need to restart
+-	for INITSCRIPT in /etc/init.d/sfcb /usr/local/etc/init.d/sfcb none
+-	do
+-	  if test -x $INITSCRIPT
+-	  then
+-	      break;
+-	  fi
+-	done
+ 	chatter "Shutting down sfcb."
+-	if test $INITSCRIPT = none
+-	then
+-	    killall sfcbd
+-	else
+-	    $INITSCRIPT stop
+-	fi
++	systemctl stop sblim-sfcb
+ 	t=0
+ 	while ps -C sfcbd > /dev/null 2>&1
+ 	do
+@@ -385,14 +373,8 @@ sfcb_rebuild()
+ 	    return 1
+ 	fi
+ 	
+-	if test $INITSCRIPT = none
+-	then
+-	    echo "No init script found - you need to start sfcbd manually." >&2
+-	    return 1
+-	else
+-	    chatter "Restarting sfcb."
+-	    $INITSCRIPT start
+-	fi
++	chatter "Restarting sfcb."
++	systemctl start sblim-sfcb
+     else
+ 	# Not running - rebuild repository
+ 	chatter "Rebuilding repository."

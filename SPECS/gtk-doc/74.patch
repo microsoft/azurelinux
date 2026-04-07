@@ -1,0 +1,33 @@
+From 951743698610eaaa0cc9030f7d7d02437419ac24 Mon Sep 17 00:00:00 2001
+From: Neil Hanlon <neil@shrug.pw>
+Date: Fri, 9 Feb 2024 15:32:38 -0500
+Subject: [PATCH] Add gobject example source code to path for mkhtml test
+
+Fixes #150
+
+I'm not really sure why this is required, but I suspect it has to do
+with changes in how GCC handles path traversal due to recent (ish)
+security issues, as the code here is evaluated to
+`../xml/../../examples/gobject.c` which probably looks unhealthy to
+automatically include.
+
+Signed-off-by: Neil Hanlon <neil@shrug.pw>
+---
+ tests/gobject/docs/meson.build | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tests/gobject/docs/meson.build b/tests/gobject/docs/meson.build
+index a1dd66c..236a1cc 100644
+--- a/tests/gobject/docs/meson.build
++++ b/tests/gobject/docs/meson.build
+@@ -119,6 +119,7 @@ test(
+     '--path=@0@'.format(':'.join([
+       gobject_test_docs_dir,
+       srcdir,
++      join_paths(srcdir, 'tests/gobject/examples'),
+       ])
+     ),
+   ],
+-- 
+GitLab
+

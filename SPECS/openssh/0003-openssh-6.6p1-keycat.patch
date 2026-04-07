@@ -1,0 +1,514 @@
+From 5e35e18a419a5a66b6e1cb2b98beaaf4d9db0dc6 Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:28 +0200
+Subject: [PATCH 03/50] openssh-6.6p1-keycat
+
+---
+ HOWTO.ssh-keycat                 |  12 ++
+ Makefile.in                      |   8 +-
+ configure.ac                     |   6 +
+ misc.c                           |   7 +
+ openbsd-compat/port-linux-sshd.c |  44 +++++-
+ openbsd-compat/port-linux.h      |   2 +
+ platform.c                       |   2 +-
+ ssh-keycat.c                     | 241 +++++++++++++++++++++++++++++++
+ 8 files changed, 314 insertions(+), 8 deletions(-)
+ create mode 100644 HOWTO.ssh-keycat
+ create mode 100644 ssh-keycat.c
+
+diff --git a/HOWTO.ssh-keycat b/HOWTO.ssh-keycat
+new file mode 100644
+index 00000000..630ec628
+--- /dev/null
++++ b/HOWTO.ssh-keycat
+@@ -0,0 +1,12 @@
++The ssh-keycat retrieves the content of the ~/.ssh/authorized_keys
++of an user in any environment. This includes environments with
++polyinstantiation of home directories and SELinux MLS policy enabled.
++
++To use ssh-keycat, set these options in /etc/ssh/sshd_config file:
++        AuthorizedKeysCommand /usr/libexec/openssh/ssh-keycat
++        AuthorizedKeysCommandUser root
++
++Do not forget to enable public key authentication:
++        PubkeyAuthentication yes
++
++
+diff --git a/Makefile.in b/Makefile.in
+index 4617cebc..438efc51 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -23,6 +23,7 @@ SSH_PROGRAM=@bindir@/ssh
+ ASKPASS_PROGRAM=$(libexecdir)/ssh-askpass
+ SFTP_SERVER=$(libexecdir)/sftp-server
+ SSH_KEYSIGN=$(libexecdir)/ssh-keysign
++SSH_KEYCAT=$(libexecdir)/ssh-keycat
+ SSHD_SESSION=$(libexecdir)/sshd-session
+ SSHD_AUTH=$(libexecdir)/sshd-auth
+ SSH_PKCS11_HELPER=$(libexecdir)/ssh-pkcs11-helper
+@@ -57,6 +58,7 @@ CHANNELLIBS=@CHANNELLIBS@
+ K5LIBS=@K5LIBS@
+ GSSLIBS=@GSSLIBS@
+ SSHDLIBS=@SSHDLIBS@
++KEYCATLIBS=@KEYCATLIBS@
+ LIBEDIT=@LIBEDIT@
+ LIBFIDO2=@LIBFIDO2@
+ LIBWTMPDB=@LIBWTMPDB@
+@@ -74,7 +76,7 @@ MKDIR_P=@MKDIR_P@
+ 
+ .SUFFIXES: .lo
+ 
+-TARGETS=ssh$(EXEEXT) sshd$(EXEEXT) sshd-session$(EXEEXT) sshd-auth$(EXEEXT) ssh-add$(EXEEXT) ssh-keygen$(EXEEXT) ssh-keyscan${EXEEXT} ssh-keysign${EXEEXT} ssh-pkcs11-helper$(EXEEXT) ssh-agent$(EXEEXT) scp$(EXEEXT) sftp-server$(EXEEXT) sftp$(EXEEXT) ssh-sk-helper$(EXEEXT) $(SK_STANDALONE)
++TARGETS=ssh$(EXEEXT) sshd$(EXEEXT) sshd-session$(EXEEXT) sshd-auth$(EXEEXT) ssh-add$(EXEEXT) ssh-keygen$(EXEEXT) ssh-keyscan${EXEEXT} ssh-keysign${EXEEXT} ssh-pkcs11-helper$(EXEEXT) ssh-agent$(EXEEXT) scp$(EXEEXT) sftp-server$(EXEEXT) sftp$(EXEEXT) ssh-sk-helper$(EXEEXT) ssh-keycat$(EXEEXT) $(SK_STANDALONE)
+ 
+ XMSS_OBJS=\
+ 	ssh-xmss.o \
+@@ -260,6 +262,9 @@ ssh-pkcs11-helper$(EXEEXT): $(LIBCOMPAT) libssh.a $(P11HELPER_OBJS)
+ ssh-sk-helper$(EXEEXT): $(LIBCOMPAT) libssh.a $(SKHELPER_OBJS)
+ 	$(LD) -o $@ $(SKHELPER_OBJS) $(LDFLAGS) -lssh -lopenbsd-compat -lssh -lopenbsd-compat $(LIBS) $(LIBFIDO2) $(CHANNELLIBS)
+ 
++ssh-keycat$(EXEEXT): $(LIBCOMPAT) $(SSHDOBJS) libssh.a ssh-keycat.o uidswap.o
++	$(LD) -o $@ ssh-keycat.o uidswap.o $(LDFLAGS) -lssh -lopenbsd-compat $(KEYCATLIBS) $(LIBS)
++
+ ssh-keyscan$(EXEEXT): $(LIBCOMPAT) libssh.a $(SSHKEYSCAN_OBJS)
+ 	$(LD) -o $@ $(SSHKEYSCAN_OBJS) $(LDFLAGS) -lssh -lopenbsd-compat -lssh $(LIBS) $(CHANNELLIBS)
+ 
+@@ -447,6 +452,7 @@ install-files:
+ 	$(INSTALL) -m 4711 $(STRIP_OPT) ssh-keysign$(EXEEXT) $(DESTDIR)$(SSH_KEYSIGN)$(EXEEXT)
+ 	$(INSTALL) -m 0755 $(STRIP_OPT) ssh-pkcs11-helper$(EXEEXT) $(DESTDIR)$(SSH_PKCS11_HELPER)$(EXEEXT)
+ 	$(INSTALL) -m 0755 $(STRIP_OPT) ssh-sk-helper$(EXEEXT) $(DESTDIR)$(SSH_SK_HELPER)$(EXEEXT)
++	$(INSTALL) -m 0755 $(STRIP_OPT) ssh-keycat$(EXEEXT) $(DESTDIR)$(libexecdir)/ssh-keycat$(EXEEXT)
+ 	$(INSTALL) -m 0755 $(STRIP_OPT) sftp$(EXEEXT) $(DESTDIR)$(bindir)/sftp$(EXEEXT)
+ 	$(INSTALL) -m 0755 $(STRIP_OPT) sftp-server$(EXEEXT) $(DESTDIR)$(SFTP_SERVER)$(EXEEXT)
+ 	$(INSTALL) -m 644 ssh.1.out $(DESTDIR)$(mandir)/$(mansubdir)1/ssh.1
+diff --git a/configure.ac b/configure.ac
+index ee77a048..d546788c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -3566,6 +3566,7 @@ AC_ARG_WITH([pam],
+ 			PAM_MSG="yes"
+ 
+ 			SSHDLIBS="$SSHDLIBS -lpam"
++			KEYCATLIBS="$KEYCATLIBS -lpam"
+ 			AC_DEFINE([USE_PAM], [1],
+ 				[Define if you want to enable PAM support])
+ 
+@@ -3576,6 +3577,7 @@ AC_ARG_WITH([pam],
+ 					;;
+ 				*)
+ 					SSHDLIBS="$SSHDLIBS -ldl"
++					KEYCATLIBS="$KEYCATLIBS -ldl"
+ 					;;
+ 				esac
+ 			fi
+@@ -4801,6 +4803,7 @@ AC_ARG_WITH([selinux],
+ 	fi ]
+ )
+ AC_SUBST([SSHDLIBS])
++AC_SUBST([KEYCATLIBS])
+ 
+ # Check whether user wants Kerberos 5 support
+ KRB5_MSG="no"
+@@ -5812,6 +5815,9 @@ fi
+ if test ! -z "${SSHDLIBS}"; then
+ echo "         +for sshd: ${SSHDLIBS}"
+ fi
++if test ! -z "${KEYCATLIBS}"; then
++echo "   +for ssh-keycat: ${KEYCATLIBS}"
++fi
+ 
+ echo ""
+ 
+diff --git a/misc.c b/misc.c
+index c932f9bb..1e31acc9 100644
+--- a/misc.c
++++ b/misc.c
+@@ -2897,6 +2897,13 @@ subprocess(const char *tag, const char *command,
+ 			error("%s: dup2: %s", tag, strerror(errno));
+ 			_exit(1);
+ 		}
++#ifdef WITH_SELINUX
++		if (sshd_selinux_setup_env_variables() < 0) {
++			error ("failed to copy environment:  %s",
++			    strerror(errno));
++			_exit(127);
++		}
++#endif
+ 		if (env != NULL)
+ 			execve(av[0], av, env);
+ 		else
+diff --git a/openbsd-compat/port-linux-sshd.c b/openbsd-compat/port-linux-sshd.c
+index dfafc622..8c5fc1fe 100644
+--- a/openbsd-compat/port-linux-sshd.c
++++ b/openbsd-compat/port-linux-sshd.c
+@@ -52,6 +52,20 @@ extern ServerOptions options;
+ extern Authctxt *the_authctxt;
+ extern int inetd_flag;
+ 
++/* Wrapper around is_selinux_enabled() to log its return value once only */
++int
++sshd_selinux_enabled(void)
++{
++	static int enabled = -1;
++
++	if (enabled == -1) {
++		enabled = (is_selinux_enabled() == 1);
++		debug("SELinux support %s", enabled ? "enabled" : "disabled");
++	}
++
++	return (enabled);
++}
++
+ /* Send audit message */
+ static int
+ sshd_selinux_send_audit_message(int success, security_context_t default_context,
+@@ -317,7 +331,7 @@ sshd_selinux_getctxbyname(char *pwname,
+ 
+ /* Setup environment variables for pam_selinux */
+ static int
+-sshd_selinux_setup_pam_variables(void)
++sshd_selinux_setup_variables(int(*set_it)(char *, const char *))
+ {
+ 	const char *reqlvl;
+ 	char *role;
+@@ -328,16 +342,16 @@ sshd_selinux_setup_pam_variables(void)
+ 
+ 	ssh_selinux_get_role_level(&role, &reqlvl);
+ 
+-	rv = do_pam_putenv("SELINUX_ROLE_REQUESTED", role ? role : "");
++	rv = set_it("SELINUX_ROLE_REQUESTED", role ? role : "");
+ 
+ 	if (inetd_flag) {
+ 		use_current = "1";
+ 	} else {
+ 		use_current = "";
+-		rv = rv || do_pam_putenv("SELINUX_LEVEL_REQUESTED", reqlvl ? reqlvl: "");
++		rv = rv || set_it("SELINUX_LEVEL_REQUESTED", reqlvl ? reqlvl: "");
+ 	}
+ 
+-	rv = rv || do_pam_putenv("SELINUX_USE_CURRENT_RANGE", use_current);
++	rv = rv || set_it("SELINUX_USE_CURRENT_RANGE", use_current);
+ 
+ 	if (role != NULL)
+ 		free(role);
+@@ -345,6 +359,24 @@ sshd_selinux_setup_pam_variables(void)
+ 	return rv;
+ }
+ 
++static int
++sshd_selinux_setup_pam_variables(void)
++{
++	return sshd_selinux_setup_variables(do_pam_putenv);
++}
++
++static int
++do_setenv(char *name, const char *value)
++{
++	return setenv(name, value, 1);
++}
++
++int
++sshd_selinux_setup_env_variables(void)
++{
++	return sshd_selinux_setup_variables(do_setenv);
++}
++
+ /* Set the execution context to the default for the specified user */
+ void
+ sshd_selinux_setup_exec_context(char *pwname)
+@@ -353,7 +385,7 @@ sshd_selinux_setup_exec_context(char *pwname)
+ 	int r = 0;
+ 	security_context_t default_ctx = NULL;
+ 
+-	if (!ssh_selinux_enabled())
++	if (!sshd_selinux_enabled())
+ 		return;
+ 
+ 	if (options.use_pam) {
+@@ -420,7 +452,7 @@ sshd_selinux_copy_context(void)
+ {
+ 	security_context_t *ctx;
+ 
+-	if (!ssh_selinux_enabled())
++	if (!sshd_selinux_enabled())
+ 		return;
+ 
+ 	if (getexeccon((security_context_t *)&ctx) != 0) {
+diff --git a/openbsd-compat/port-linux.h b/openbsd-compat/port-linux.h
+index 498d242a..1b745a76 100644
+--- a/openbsd-compat/port-linux.h
++++ b/openbsd-compat/port-linux.h
+@@ -23,8 +23,10 @@ void ssh_selinux_setup_pty(char *, const char *);
+ void ssh_selinux_change_context(const char *);
+ void ssh_selinux_setfscreatecon(const char *);
+ 
++int sshd_selinux_enabled(void);
+ void sshd_selinux_copy_context(void);
+ void sshd_selinux_setup_exec_context(char *);
++int sshd_selinux_setup_env_variables(void);
+ #endif
+ 
+ #ifdef LINUX_OOM_ADJUST
+diff --git a/platform.c b/platform.c
+index 1bfb4bea..0d12f311 100644
+--- a/platform.c
++++ b/platform.c
+@@ -55,7 +55,7 @@ platform_setusercontext(struct passwd *pw)
+ {
+ #ifdef WITH_SELINUX
+ 	/* Cache selinux status for later use */
+-	(void)ssh_selinux_enabled();
++	(void)sshd_selinux_enabled();
+ #endif
+ 
+ #ifdef USE_SOLARIS_PROJECTS
+diff --git a/ssh-keycat.c b/ssh-keycat.c
+new file mode 100644
+index 00000000..5678be07
+--- /dev/null
++++ b/ssh-keycat.c
+@@ -0,0 +1,241 @@
++/*
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, and the entire permission notice in its entirety,
++ *    including the disclaimer of warranties.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ * 3. The name of the author may not be used to endorse or promote
++ *    products derived from this software without specific prior
++ *    written permission.
++ *
++ * ALTERNATIVELY, this product may be distributed under the terms of
++ * the GNU Public License, in which case the provisions of the GPL are
++ * required INSTEAD OF the above restrictions.  (This clause is
++ * necessary due to a potential bad interaction between the GPL and
++ * the restrictions contained in a BSD-style copyright.)
++ *
++ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
++ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
++ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
++ * DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT,
++ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
++ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
++ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
++ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
++ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
++ * OF THE POSSIBILITY OF SUCH DAMAGE.
++ */
++
++/*
++ * Copyright (c) 2011 Red Hat, Inc.
++ * Written by Tomas Mraz <tmraz@redhat.com>
++*/
++
++#define _GNU_SOURCE
++
++#include "config.h"
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <pwd.h>
++#include <fcntl.h>
++#include <unistd.h>
++#ifdef HAVE_STDINT_H
++#include <stdint.h>
++#endif
++
++#include <security/pam_appl.h>
++
++#include "uidswap.h"
++#include "misc.h"
++
++#define ERR_USAGE 1
++#define ERR_PAM_START 2
++#define ERR_OPEN_SESSION 3
++#define ERR_CLOSE_SESSION 4
++#define ERR_PAM_END 5
++#define ERR_GETPWNAM 6
++#define ERR_MEMORY 7
++#define ERR_OPEN 8
++#define ERR_FILE_MODE 9
++#define ERR_FDOPEN 10
++#define ERR_STAT 11
++#define ERR_WRITE 12
++#define ERR_PAM_PUTENV 13
++#define BUFLEN 4096
++
++/* Just ignore the messages in the conversation function */
++static int
++dummy_conv(int num_msg, const struct pam_message **msgm,
++	   struct pam_response **response, void *appdata_ptr)
++{
++	struct pam_response *rsp;
++
++	(void)msgm;
++	(void)appdata_ptr;
++
++	if (num_msg <= 0)
++		return PAM_CONV_ERR;
++
++	/* Just allocate the array as empty responses */
++	rsp = calloc (num_msg, sizeof (struct pam_response));
++	if (rsp == NULL)
++		return PAM_CONV_ERR;
++
++	*response = rsp;
++	return PAM_SUCCESS;
++}
++
++static struct pam_conv conv = {
++	dummy_conv,
++	NULL
++};
++
++char *
++make_auth_keys_name(const struct passwd *pwd)
++{
++	char *fname;
++
++	if (asprintf(&fname, "%s/.ssh/authorized_keys", pwd->pw_dir) < 0)
++		return NULL;
++
++	return fname;
++}
++
++int
++dump_keys(const char *user)
++{
++	struct passwd *pwd;
++	int fd = -1;
++	FILE *f = NULL;
++	char *fname = NULL;
++	int rv = 0;
++	char buf[BUFLEN];
++	size_t len;
++	struct stat st;
++
++	if ((pwd = getpwnam(user)) == NULL) {
++		return ERR_GETPWNAM;
++	}
++
++	if ((fname = make_auth_keys_name(pwd)) == NULL) {
++		return ERR_MEMORY;
++	}
++
++	temporarily_use_uid(pwd);
++
++	if ((fd = open(fname, O_RDONLY|O_NONBLOCK|O_NOFOLLOW, 0)) < 0) {
++		rv = ERR_OPEN;
++		goto fail;
++	}
++
++	if (fstat(fd, &st) < 0) {
++		rv = ERR_STAT;
++		goto fail;
++	}
++
++	if (!S_ISREG(st.st_mode) || 
++		(st.st_uid != pwd->pw_uid && st.st_uid != 0)) {
++		rv = ERR_FILE_MODE;
++		goto fail;
++	}
++
++	unset_nonblock(fd);
++
++	if ((f = fdopen(fd, "r")) == NULL) {
++		rv = ERR_FDOPEN;
++		goto fail;
++	}
++
++	fd = -1;
++
++	while ((len = fread(buf, 1, sizeof(buf), f)) > 0) {
++		rv = fwrite(buf, 1, len, stdout) != len ? ERR_WRITE : 0;
++	}
++
++fail:
++	if (fd != -1)
++		close(fd);
++	if (f != NULL)
++		fclose(f);
++	free(fname);
++	restore_uid();
++	return rv;
++}
++
++static const char *env_names[] = { "SELINUX_ROLE_REQUESTED",
++	"SELINUX_LEVEL_REQUESTED",
++	"SELINUX_USE_CURRENT_RANGE"
++};
++
++extern char **environ;
++
++int
++set_pam_environment(pam_handle_t *pamh)
++{
++	int i;
++	size_t j;
++
++	for (j = 0; j < sizeof(env_names)/sizeof(env_names[0]); ++j) {
++		int len = strlen(env_names[j]);
++
++		for (i = 0; environ[i] != NULL; ++i) {
++			if (strncmp(env_names[j], environ[i], len) == 0 &&
++			    environ[i][len] == '=') {
++				if (pam_putenv(pamh, environ[i]) != PAM_SUCCESS)
++					return ERR_PAM_PUTENV;
++			}
++		}
++	}
++
++	return 0;
++}
++
++int
++main(int argc, char *argv[])
++{
++	pam_handle_t *pamh = NULL;
++	int retval;
++	int ev = 0;
++
++	if (argc != 2) {
++		fprintf(stderr, "Usage: %s <user-name>\n", argv[0]);
++		return ERR_USAGE;
++	}
++
++	retval = pam_start("ssh-keycat", argv[1], &conv, &pamh);
++	if (retval != PAM_SUCCESS) {
++		return ERR_PAM_START;
++	}
++
++	ev = set_pam_environment(pamh);
++	if (ev != 0)
++		goto finish;
++
++	retval = pam_open_session(pamh, PAM_SILENT);
++	if (retval != PAM_SUCCESS) {
++		ev = ERR_OPEN_SESSION;
++		goto finish;
++	}
++
++	ev = dump_keys(argv[1]);
++
++	retval = pam_close_session(pamh, PAM_SILENT);
++	if (retval != PAM_SUCCESS) {
++		ev = ERR_CLOSE_SESSION;
++	}
++
++finish:
++	retval = pam_end (pamh,retval);
++	if (retval != PAM_SUCCESS) {
++		ev = ERR_PAM_END;
++	}
++	return ev;
++}
+-- 
+2.49.0
+

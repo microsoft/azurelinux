@@ -1,0 +1,45 @@
+From c25cfd4921fd4a539905caf84889c0c516f1a4b0 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Mon, 15 Jan 2024 19:22:01 +0000
+Subject: [PATCH 03/12] Use system linenoise library
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ tools/shell/CMakeLists.txt | 10 +---------
+ 1 file changed, 1 insertion(+), 9 deletions(-)
+
+diff --git a/tools/shell/CMakeLists.txt b/tools/shell/CMakeLists.txt
+index da8b1891..1e32b6f2 100644
+--- a/tools/shell/CMakeLists.txt
++++ b/tools/shell/CMakeLists.txt
+@@ -4,23 +4,15 @@ include_directories(../../third_party)
+ 
+ set(srcs
+   Shell.cpp
+-  ../../third_party/linenoise.c
+ )
+ 
+-if(MSVC)
+-  set_property(
+-    SOURCE ../../third_party/linenoise.c APPEND_STRING
+-    PROPERTY COMPILE_FLAGS " /wd4996"
+-  )
+-endif()
+-
+ set(US_SHELL_EXECUTABLE_TARGET usShell)
+ set(US_SHELL_EXECUTABLE_OUTPUT_NAME ${US_SHELL_EXECUTABLE_TARGET}${US_GLOBAL_VERSION_SUFFIX})
+ 
+ add_executable(${US_SHELL_EXECUTABLE_TARGET} ${srcs})
+ set_property(TARGET ${US_SHELL_EXECUTABLE_TARGET} PROPERTY OUTPUT_NAME ${US_SHELL_EXECUTABLE_OUTPUT_NAME})
+ 
+-target_link_libraries(${US_SHELL_EXECUTABLE_TARGET} ${US_LIBRARIES})
++target_link_libraries(${US_SHELL_EXECUTABLE_TARGET} ${US_LIBRARIES} -llinenoise)
+ 
+ if(NOT US_NO_INSTALL)
+   install(TARGETS ${US_SHELL_EXECUTABLE_TARGET}
+-- 
+2.48.1
+

@@ -1,0 +1,78 @@
+From e70a6cf01361e773c361cdb8debf1be2859e0b09 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Fri, 4 Oct 2024 16:33:20 +0100
+Subject: [PATCH 07/17] psw: prefer /dev/sgx_provision & /dev/sgx_enclave
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The default behaviour for SGX deployments in upstream Linux is to
+have /dev/sgx_provision & /dev/sgx_enclave device paths, instead of
+the old /dev/sgx/provision & /dev/sgx/enclave paths
+
+The code should prefer opening the current default device paths first,
+with the old paths as the fallback, so the common case will be an
+immediate success.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ psw/enclave_common/sgx_enclave_common.cpp |  6 +++---
+ psw/urts/linux/edmm_utility.cpp           | 12 ++++++------
+ 2 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/psw/enclave_common/sgx_enclave_common.cpp b/psw/enclave_common/sgx_enclave_common.cpp
+index 399d63b2..f63149a0 100644
+--- a/psw/enclave_common/sgx_enclave_common.cpp
++++ b/psw/enclave_common/sgx_enclave_common.cpp
+@@ -481,11 +481,11 @@ static void enclave_set_provision_access(int hdevice, void* enclave_base)
+     
+     if (s_driver_type == SGX_DRIVER_IN_KERNEL)
+     {
+-        hdev_prov = open("/dev/sgx/provision", O_RDWR);
++        hdev_prov = open("/dev/sgx_provision", O_RDWR);
+         if (-1 == hdev_prov)
+         {
+-            //if /dev/sgx/provision is not present, try to open /dev/sgx_provision
+-            hdev_prov = open("/dev/sgx_provision", O_RDWR);
++            //if /dev/sgx_provision is not present, try to open /dev/sgx/provision
++            hdev_prov = open("/dev/sgx/provision", O_RDWR);
+         }
+         if (-1 == hdev_prov)
+         {
+diff --git a/psw/urts/linux/edmm_utility.cpp b/psw/urts/linux/edmm_utility.cpp
+index 49f2b9aa..fc537a84 100644
+--- a/psw/urts/linux/edmm_utility.cpp
++++ b/psw/urts/linux/edmm_utility.cpp
+@@ -99,11 +99,11 @@ bool get_driver_type(int *driver_type)
+         *driver_type = sgx_driver_type;
+     }
+     
+-    int hdev = open("/dev/sgx/enclave", O_RDWR);    //attempt to open the in-kernel driver
++    int hdev = open("/dev/sgx_enclave", O_RDWR);    //attempt to open the in-kernel driver
+     if (-1 == hdev)
+     {
+-        //if /dev/sgx/enclave is not present, try to open /dev/sgx_enclave
+-        hdev = open("/dev/sgx_enclave", O_RDWR);
++        //if /dev/sgx_enclave is not present, try to open /dev/sgx/enclave
++        hdev = open("/dev/sgx/enclave", O_RDWR);
+     }
+     if (-1 == hdev)
+     {
+@@ -154,11 +154,11 @@ extern "C" bool open_se_device(int driver_type, int *hdevice)
+     *hdevice = -1;
+     if (driver_type == SGX_DRIVER_IN_KERNEL)
+     {
+-        *hdevice = open("/dev/sgx/enclave", O_RDWR);    //attempt to open the in-kernel driver
+-        //if /dev/sgx/enclave is not present, try to open /dev/sgx_enclave
++        *hdevice = open("/dev/sgx_enclave", O_RDWR);    //attempt to open the in-kernel driver
++        //if /dev/sgx_enclave is not present, try to open /dev/sgx/enclave
+         if(-1 == *hdevice)
+         {
+-            *hdevice = open("/dev/sgx_enclave", O_RDWR);
++            *hdevice = open("/dev/sgx/enclave", O_RDWR);
+         }
+     }
+     else if (driver_type == SGX_DRIVER_DCAP)
+-- 
+2.52.0
+

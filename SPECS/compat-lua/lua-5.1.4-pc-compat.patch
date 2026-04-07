@@ -1,0 +1,10 @@
+--- lua-5.1.4/etc/lua.pc.in~	2013-08-03 12:01:51.000000000 +0200
++++ lua-5.1.4/etc/lua.pc.in	2013-08-03 12:03:24.788963457 +0200
+@@ -9,5 +9,5 @@ Name: Lua
+ Description: An Extensible Extension Language
+ Version: ${R}
+ Requires: 
+-Libs: -llua @LUA_LIBS@
+-Cflags: -I${includedir}
++Libs: -llua-5.1 @LUA_LIBS@
++Cflags: -I${includedir}/lua-5.1

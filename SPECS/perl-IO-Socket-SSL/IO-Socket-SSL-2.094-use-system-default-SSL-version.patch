@@ -1,0 +1,37 @@
+--- lib/IO/Socket/SSL.pm
++++ lib/IO/Socket/SSL.pm
+@@ -200,8 +200,7 @@ if ( defined &Net::SSLeay::CTX_set_min_p
+ # global defaults
+ my %DEFAULT_SSL_ARGS = (
+     SSL_check_crl => 0,
+-    # TLS 1.1 and lower are deprecated with RFC 8996
+-    SSL_version => 'SSLv23:!TLSv1:!TLSv1_1:!SSLv3:!SSLv2',
++    SSL_version => '',
+     SSL_verify_callback => undef,
+     SSL_verifycn_scheme => undef,  # fallback cn verification
+     SSL_verifycn_publicsuffix => undef,  # fallback default list verification
+@@ -2559,7 +2560,7 @@ sub new {
+ 
+     my $ssl_op = $DEFAULT_SSL_OP;
+ 
+-    my $ver;
++    my $ver = '';
+     for (split(/\s*:\s*/,$arg_hash->{SSL_version})) {
+ 	m{^(!?)(?:(SSL(?:v2|v3|v23|v2/3))|(TLSv1(?:_?[123])?))$}i
+ 	or croak("invalid SSL_version specified");
+--- lib/IO/Socket/SSL.pod
++++ lib/IO/Socket/SSL.pod
+@@ -1061,11 +1061,12 @@ All values are case-insensitive.  Instea
+ versions are actually supported depend on the versions of OpenSSL and
+ Net::SSLeay installed, but modern protocols like TLS 1.3 are supported by these
+ for many years now.
++The default SSL_version is defined by the underlying cryptographic library.
+ 
+ Independent from the handshake format you can limit to set of accepted SSL
+ versions by adding !version separated by ':'.
+ 
+-The default SSL_version is 'SSLv23:!TLSv1:!TLSv1_1:!SSLv3:!SSLv2'. This means,
++For example, 'SSLv23:!TLSv1:!TLSv1_1:!SSLv3:!SSLv2' means
+ that the handshake format is compatible to SSL2.0 and higher, but that the
+ successful handshake is limited to TLS1.2 and higher, that is no SSL2.0, SSL3.0,
+ TLS 1.0 or TLS 1.1 because these versions have serious security issues and

@@ -1,0 +1,25 @@
+From baaeb0ad028568749aa2bc1cf9a3034aa6dd2452 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Mon, 29 Dec 2025 15:49:21 +0100
+Subject: [PATCH] drop unnecessary opt-level crate API calls
+
+---
+ tests/ryu_comparison.rs | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/tests/ryu_comparison.rs b/tests/ryu_comparison.rs
+index f9c59da..beb717e 100644
+--- a/tests/ryu_comparison.rs
++++ b/tests/ryu_comparison.rs
+@@ -3,8 +3,6 @@ use rand::{RngCore as _, SeedableRng as _};
+ 
+ const N: usize = if cfg!(miri) {
+     500
+-} else if let b"0" = opt_level::OPT_LEVEL.as_bytes() {
+-    1_000_000
+ } else {
+     100_000_000
+ };
+-- 
+2.52.0
+

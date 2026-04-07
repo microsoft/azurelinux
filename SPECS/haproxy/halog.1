@@ -1,0 +1,108 @@
+.TH HALOG "1" "July 2013" "halog" "User Commands"
+.SH NAME
+halog \- HAProxy log statistics reporter
+.SH SYNOPSIS
+.B halog
+[\fI-h|--help\fR]
+.br
+.B halog
+[\fIoptions\fR] <LOGFILE
+.SH DESCRIPTION
+.B halog
+reads HAProxy log data from stdin and extracts and displays lines matching
+user-specified criteria.
+.SH OPTIONS
+.SS Input filters \fR(several filters may be combined)
+.TP
+\fB\-H\fR
+Only match lines containing HTTP logs (ignore TCP)
+.TP
+\fB\-E\fR
+Only match lines without any error (no 5xx status)
+.TP
+\fB\-e\fR
+Only match lines with errors (status 5xx or negative)
+.TP
+\fB\-rt\fR|\fB\-RT\fR <time>
+Only match response times larger|smaller than <time>
+.TP
+\fB\-Q\fR|\fB\-QS\fR
+Only match queued requests (any queue|server queue)
+.TP
+\fB\-tcn\fR|\fB\-TCN\fR <code>
+Only match requests with/without termination code <code>
+.TP
+\fB\-hs\fR|\fB\-HS\fR <[min][:][max]>
+Only match requests with HTTP status codes within/not within min..max. Any of
+them may be omitted. Exact code is checked for if no ':' is specified.
+.SS
+Modifiers
+.TP
+\fB\-v\fR
+Invert the input filtering condition
+.TP
+\fB\-q\fR
+Don't report errors/warnings
+.TP
+\fB\-m\fR <lines>
+Limit output to the first <lines> lines
+.SS
+Output filters \fR\- only one may be used at a time
+.TP
+\fB\-c\fR
+Only report the number of lines that would have been printed
+.TP
+\fB\-pct\fR
+Output connect and response times percentiles
+.TP
+\fB\-st\fR
+Output number of requests per HTTP status code
+.TP
+\fB\-cc\fR
+Output number of requests per cookie code (2 chars)
+.TP
+\fB\-tc\fR
+Output number of requests per termination code (2 chars)
+.TP
+\fB\-srv\fR
+Output statistics per server (time, requests, errors)
+.TP
+\fB\-u\fR*
+Output statistics per URL (time, requests, errors)
+.br
+Additional characters indicate the output sorting key:
+.RS
+.TP
+\fB\-u\fR
+URL
+.TP
+\fB\-uc\fR
+Request count
+.TP
+\fB\-ue\fR
+Error count
+.TP
+\fB\-ua\fR
+Average response time
+.TP
+\fB\-ut\fR
+Average total time
+.TP
+\fB\-uao\fR, \fB\-uto\fR
+Average times computed on valid ('OK') requests
+.TP
+\fB\-uba\fR
+Average bytes returned
+.TP
+\fB\-ubt\fR
+Total bytes returned
+.RE
+.SH "SEE ALSO"
+.BR haproxy (1)
+.SH AUTHOR
+.PP
+\fBhalog\fR was written by Willy Tarreau <w@1wt.eu> and is part of \fBhaproxy\fR(1).
+.PP
+This  manual page was written by Apollon Oikonomopoulos <apoikos@gmail.com> for the Debian project (but may
+be used by others).
+

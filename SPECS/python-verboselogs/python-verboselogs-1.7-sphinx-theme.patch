@@ -1,0 +1,12 @@
+diff -uNr a/docs/conf.py b/docs/conf.py
+--- a/docs/conf.py	2017-08-07 12:45:42.000000000 -0700
++++ b/docs/conf.py	2019-03-13 17:12:14.251222745 -0700
+@@ -74,7 +74,7 @@
+ 
+ # The theme to use for HTML and HTML Help pages.  See the documentation for
+ # a list of builtin themes.
+-html_theme = 'classic'
++html_theme = 'nature'
+ 
+ # Output file base name for HTML help builder.
+ htmlhelp_basename = 'verboselogsdoc'

@@ -1,0 +1,14 @@
+--- iai-0.1.1/Cargo.toml	2021-01-24T15:48:16+00:00
++++ iai-0.1.1/Cargo.toml	2023-05-25T11:27:05.894109+00:00
+@@ -25,11 +25,7 @@
+ [[bench]]
+ name = "test_regular_bench"
+ harness = false
+-[dependencies.iai_macro]
+-version = "0.1.0"
+-optional = true
+ 
+ [features]
+ default = []
+-macro = ["iai_macro"]
+ real_blackbox = []

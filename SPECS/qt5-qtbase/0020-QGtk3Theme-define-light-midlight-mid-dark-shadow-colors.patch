@@ -1,0 +1,40 @@
+From fd09519bbd4e7ea89b898c7496e7e06980ee9672 Mon Sep 17 00:00:00 2001
+From: Axel Spoerl <axel.spoerl@qt.io>
+Date: Thu, 19 Oct 2023 15:19:12 +0200
+Subject: QGtk3Theme: define light, midlight, mid, dark and shadow colors
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Define color groups used for shading and in order to render specific
+inactive texts, e.g. menu item text.
+
+Found-by: Piotr Wierciński <piotr.wiercinski@qt.io>
+Pick-to: 6.6 6.5
+Change-Id: I736f5aff1ff5379ce3f78b53e547b0b5f552779f
+Reviewed-by: Santhosh Kumar <santhosh.kumar.selvaraj@qt.io>
+Reviewed-by: Piotr Wierciński <piotr.wiercinski@qt.io>
+
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3storage.cpp b/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
+index 22cfabb843..90c0282651 100644
+--- a/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
++++ b/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
+@@ -578,6 +578,18 @@ void QGtk3Storage::createMapping()
+         MODIFY(Normal, Text, -100, -100, -100);
+         ADD(All, PlaceholderText, Dark);
+ 
++        // Light, midlight, dark, mid, shadow colors
++        LIGHTER(Normal, Button, 125);
++        ADD(All, Light)
++        LIGHTER(Normal, Button, 113);
++        ADD(All, Midlight)
++        LIGHTER(Normal, Button, 113);
++        ADD(All, Mid)
++        LIGHTER(Normal, Button, 87);
++        ADD(All, Dark)
++        LIGHTER(Normal, Button, 5);
++        ADD(All, Shadow)
++
+         SAVE(SystemPalette);
+         CLEAR;
+     }

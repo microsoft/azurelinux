@@ -1,0 +1,11 @@
+--- unzip60/man/unzip.1	2011-01-11 11:59:59.000000000 +0000
++++ unzip60/man/unzip_new	2011-02-05 18:45:55.000000000 +0000
+@@ -424,7 +424,7 @@
+ .\" Amiga support possible eventually, but not yet
+ [MS-DOS, OS/2, NT] restore the volume label if the extraction medium is
+ removable (e.g., a diskette).  Doubling the option (\fB\-$$\fP) allows fixed
+-media (hard disks) to be labelled as well.  By default, volume labels are
++media (hard disks) to be labeled as well.  By default, volume labels are
+ ignored.
+ .IP \fB\-/\fP\ \fIextensions\fP
+ [Acorn only] overrides the extension list supplied by Unzip$Ext environment

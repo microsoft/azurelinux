@@ -1,0 +1,40 @@
+--- ./man/zipsplit.1	2008-05-08 10:17:48.000000000 +0200
++++ ./man/zipsplit.1	2013-04-26 18:33:12.492008280 +0200
+@@ -12,6 +12,7 @@
+ .RB [ \-r\ room ]
+ .RB [ \-b\ path ]
+ .RB [ \-h ]
++.RB [ \-q ]
+ .RB [ \-v ]
+ .RB [ \-L ]
+ zipfile
+@@ -47,6 +48,9 @@
+ .BI \-h
+ Show a short help.
+ .TP
++.BI \-q
++Suppress some informational messages.
++.TP
+ .BI \-v
+ Show version information.
+ .TP
+--- ./man/zipnote.1	2013-04-26 18:40:32.145018756 +0200
++++ ./man/zipnote.1	2013-04-26 18:40:18.943018442 +0200
+@@ -7,6 +7,7 @@
+ .RB [ \-w ]
+ .RB [ \-b\ path ]
+ .RB [ \-h ]
++.RB [ \-q ]
+ .RB [ \-v ]
+ .RB [ \-L ]
+ zipfile
+@@ -27,6 +28,9 @@
+ .BI \-h
+ Show a short help.
+ .TP
++.BI \-q
++Suppress some informational messages.
++.TP
+ .BI \-v
+ Show version information.
+ .TP

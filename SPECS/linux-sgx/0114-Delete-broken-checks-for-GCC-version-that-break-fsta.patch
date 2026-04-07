@@ -1,0 +1,205 @@
+From 32b371963c82b3dd391081e7ada861e652748db3 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Thu, 3 Apr 2025 17:44:48 +0100
+Subject: [PATCH 114/131] Delete broken checks for GCC version that break
+ -fstack-protector-strong
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The expr comparison is performing a string comparison and is thus
+broken for any GCC version >= 10, preventing use of -fstack-protector-strong
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ QuoteGeneration/buildenv.mk                              | 7 +------
+ QuoteGeneration/quote_wrapper/qgs_msg_lib/linux/Makefile | 2 +-
+ QuoteGeneration/quote_wrapper/tdx_attest/linux/Makefile  | 4 ++--
+ QuoteVerification/QvE/Makefile                           | 7 +------
+ QuoteVerification/dcap_tvl/Makefile                      | 7 +------
+ QuoteVerification/dcap_tvl/Makefile.standalone           | 7 +------
+ SampleCode/QuoteAppraisalSample/QAEAppraisal/Makefile    | 8 +-------
+ SampleCode/QuoteGenerationSample/Makefile                | 6 +-----
+ SampleCode/QuoteVerificationSample/Makefile              | 8 +-------
+ tools/PCKRetrievalTool/Makefile                          | 7 +------
+ 10 files changed, 11 insertions(+), 52 deletions(-)
+
+diff --git a/QuoteGeneration/buildenv.mk b/QuoteGeneration/buildenv.mk
+index 5cf2ed6e..56aefe20 100644
+--- a/QuoteGeneration/buildenv.mk
++++ b/QuoteGeneration/buildenv.mk
+@@ -71,12 +71,7 @@ ifeq ($(CC_NO_LESS_THAN_8), 1)
+ endif
+ 
+ # turn on stack protector for SDK
+-CC_BELOW_4_9 := $(shell expr "`$(CC) -dumpversion`" \< "4.9")
+-ifeq ($(CC_BELOW_4_9), 1)
+-    COMMON_FLAGS += -fstack-protector
+-else
+-    COMMON_FLAGS += -fstack-protector-strong
+-endif
++COMMON_FLAGS += -fstack-protector-strong
+ 
+ ifdef DEBUG
+     COMMON_FLAGS += -O0 -ggdb -DDEBUG -UNDEBUG
+diff --git a/QuoteGeneration/quote_wrapper/qgs_msg_lib/linux/Makefile b/QuoteGeneration/quote_wrapper/qgs_msg_lib/linux/Makefile
+index dff0af23..9ece3cc4 100644
+--- a/QuoteGeneration/quote_wrapper/qgs_msg_lib/linux/Makefile
++++ b/QuoteGeneration/quote_wrapper/qgs_msg_lib/linux/Makefile
+@@ -33,7 +33,7 @@
+ TOP_DIR  = ../../..
+ SDK_NOT_REQUIRED = 1
+ ifeq ($(wildcard $(TOP_DIR)/buildenv.mk),)
+-	CXXFLAGS ?= -Wnon-virtual-dtor -std=c++14 -fstack-protector -O2 -D_FORTIFY_SOURCE=2 -UDEBUG -DNDEBUG \
++	CXXFLAGS ?= -Wnon-virtual-dtor -std=c++14 -fstack-protector-strong -O2 -D_FORTIFY_SOURCE=2 -UDEBUG -DNDEBUG \
+ 		-ffunction-sections -fdata-sections -Wall -Wextra -Winit-self -Wpointer-arith -Wreturn-type -Waddress \
+ 		-Wsequence-point -Wformat-security -Wmissing-include-dirs -Wfloat-equal -Wundef -Wshadow -Wcast-align \
+ 		-Wconversion -Wredundant-decls -DITT_ARCH_IA64 -fcf-protection
+diff --git a/QuoteGeneration/quote_wrapper/tdx_attest/linux/Makefile b/QuoteGeneration/quote_wrapper/tdx_attest/linux/Makefile
+index f0a5e364..20f30221 100644
+--- a/QuoteGeneration/quote_wrapper/tdx_attest/linux/Makefile
++++ b/QuoteGeneration/quote_wrapper/tdx_attest/linux/Makefile
+@@ -33,11 +33,11 @@
+ TOP_DIR  = ../../..
+ SDK_NOT_REQUIRED = 1
+ ifeq ($(wildcard $(TOP_DIR)/buildenv.mk),)
+-	CFLAGS ?= -Wjump-misses-init -Wstrict-prototypes -Wunsuffixed-float-constants -fstack-protector -O2 \
++	CFLAGS ?= -Wjump-misses-init -Wstrict-prototypes -Wunsuffixed-float-constants -fstack-protector-strong -O2 \
+ 		-D_FORTIFY_SOURCE=2 -UDEBUG -DNDEBUG -ffunction-sections -fdata-sections -Wall -Wextra -Winit-self \
+ 		-Wpointer-arith -Wreturn-type -Waddress -Wsequence-point -Wformat-security -Wmissing-include-dirs \
+ 		-Wfloat-equal -Wundef -Wshadow -Wcast-align -Wconversion -Wredundant-decls -DITT_ARCH_IA64 -fcf-protection
+-	CXXFLAGS ?= -Wnon-virtual-dtor -std=c++14 -fstack-protector -O2 -D_FORTIFY_SOURCE=2 -UDEBUG -DNDEBUG \
++	CXXFLAGS ?= -Wnon-virtual-dtor -std=c++14 -fstack-protector-strong -O2 -D_FORTIFY_SOURCE=2 -UDEBUG -DNDEBUG \
+ 		-ffunction-sections -fdata-sections -Wall -Wextra -Winit-self -Wpointer-arith -Wreturn-type -Waddress \
+ 		-Wsequence-point -Wformat-security -Wmissing-include-dirs -Wfloat-equal -Wundef -Wshadow -Wcast-align \
+ 		-Wconversion -Wredundant-decls -DITT_ARCH_IA64 -fcf-protection
+diff --git a/QuoteVerification/QvE/Makefile b/QuoteVerification/QvE/Makefile
+index f6148df6..cd9094b2 100644
+--- a/QuoteVerification/QvE/Makefile
++++ b/QuoteVerification/QvE/Makefile
+@@ -76,12 +76,7 @@ endif
+ ifneq ($(DEBUG), 1)
+     ENCLAVE_CFLAGS += -ffunction-sections -fdata-sections
+ endif
+-CC_BELOW_4_9 := $(shell expr "`$(CC) -dumpversion`" \< "4.9")
+-ifeq ($(CC_BELOW_4_9), 1)
+-	ENCLAVE_CFLAGS += -fstack-protector
+-else
+-	ENCLAVE_CFLAGS += -fstack-protector-strong
+-endif
++ENCLAVE_CFLAGS += -fstack-protector-strong
+ 
+ ENCLAVE_CXXFLAGS += $(ENCLAVE_CFLAGS) -std=c++17 -DSGX_TRUSTED -DSGX_JWT -DPICOJSON_USE_LOCALE=0
+ 
+diff --git a/QuoteVerification/dcap_tvl/Makefile b/QuoteVerification/dcap_tvl/Makefile
+index 2d62f283..49b4b686 100644
+--- a/QuoteVerification/dcap_tvl/Makefile
++++ b/QuoteVerification/dcap_tvl/Makefile
+@@ -56,12 +56,7 @@ endif
+ ifneq ($(DEBUG), 1)
+     COMMON_FLAGS += -ffunction-sections -fdata-sections
+ endif
+-CC_BELOW_4_9 := $(shell expr "`$(CC) -dumpversion`" \< "4.9")
+-ifeq ($(CC_BELOW_4_9), 1)
+-    COMMON_FLAGS += -fstack-protector
+-else
+-    COMMON_FLAGS += -fstack-protector-strong
+-endif
++COMMON_FLAGS += -fstack-protector-strong
+ 
+ ENCLAVE_CXXFLAGS += $(SGX_COMMON_CXXFLAGS) $(COMMON_FLAGS) -fPIC -std=c++11
+ 
+diff --git a/QuoteVerification/dcap_tvl/Makefile.standalone b/QuoteVerification/dcap_tvl/Makefile.standalone
+index 8a1cb730..713d8afc 100644
+--- a/QuoteVerification/dcap_tvl/Makefile.standalone
++++ b/QuoteVerification/dcap_tvl/Makefile.standalone
+@@ -45,12 +45,7 @@ COMMON_LDFLAGS := -Wl,-z,relro,-z,now,-z,noexecstack
+ ifneq ($(DEBUG), 1)
+     COMMON_FLAGS += -ffunction-sections -fdata-sections
+ endif
+-CC_BELOW_4_9 := $(shell expr "`$(CC) -dumpversion`" \< "4.9")
+-ifeq ($(CC_BELOW_4_9), 1)
+-    COMMON_FLAGS += -fstack-protector
+-else
+-    COMMON_FLAGS += -fstack-protector-strong
+-endif
++COMMON_FLAGS += -fstack-protector-strong
+ 
+ ENCLAVE_CFLAGS   = -ffreestanding -nostdinc -fvisibility=hidden -fpie -fno-strict-overflow -fno-delete-null-pointer-checks
+ ENCLAVE_CXXFLAGS = $(ENCLAVE_CFLAGS) -nostdinc++
+diff --git a/SampleCode/QuoteAppraisalSample/QAEAppraisal/Makefile b/SampleCode/QuoteAppraisalSample/QAEAppraisal/Makefile
+index 662ac3e5..868d72df 100644
+--- a/SampleCode/QuoteAppraisalSample/QAEAppraisal/Makefile
++++ b/SampleCode/QuoteAppraisalSample/QAEAppraisal/Makefile
+@@ -87,13 +87,7 @@ Crypto_Library_Name := sgx_tcrypto
+ Enclave_Cpp_Files := Enclave/Enclave.cpp
+ Enclave_Include_Paths := -I$(SGX_SDK)/include -I$(SGX_SDK)/include/tlibc 
+ 
+-Enclave_C_Flags := $(Enclave_Include_Paths) -nostdinc -fvisibility=hidden -fpie -ffunction-sections -fdata-sections $(MITIGATION_CFLAGS)
+-CC_BELOW_4_9 := $(shell expr "`$(CC) -dumpversion`" \< "4.9")
+-ifeq ($(CC_BELOW_4_9), 1)
+-    Enclave_C_Flags += -fstack-protector
+-else
+-    Enclave_C_Flags += -fstack-protector-strong
+-endif
++Enclave_C_Flags := $(Enclave_Include_Paths) -nostdinc -fvisibility=hidden -fpie -ffunction-sections -fdata-sections $(MITIGATION_CFLAGS) -fstack-protector-strong
+ 
+ Enclave_Cpp_Flags := $(Enclave_C_Flags) -std=c++11 -nostdinc++
+ 
+diff --git a/SampleCode/QuoteGenerationSample/Makefile b/SampleCode/QuoteGenerationSample/Makefile
+index 4fdbb36e..fd5b4e25 100644
+--- a/SampleCode/QuoteGenerationSample/Makefile
++++ b/SampleCode/QuoteGenerationSample/Makefile
+@@ -104,11 +104,7 @@ Enclave_Cpp_Files := Enclave/Enclave.cpp
+ Enclave_Include_Paths := -I$(SGX_SDK)/include -I$(SGX_SDK)/include/tlibc -I$(SGX_SDK)/include/libcxx
+ 
+ CC_BELOW_4_9 := $(shell expr "`$(CC) -dumpversion`" \< "4.9")
+-ifeq ($(CC_BELOW_4_9), 1)
+-        Enclave_C_Flags := $(SGX_COMMON_CFLAGS) -nostdinc -fvisibility=hidden -fpie -ffunction-sections -fdata-sections -fstack-protector
+-else
+-        Enclave_C_Flags := $(SGX_COMMON_CFLAGS) -nostdinc -fvisibility=hidden -fpie -ffunction-sections -fdata-sections -fstack-protector-strong
+-endif
++Enclave_C_Flags := $(SGX_COMMON_CFLAGS) -nostdinc -fvisibility=hidden -fpie -ffunction-sections -fdata-sections
+ Enclave_C_Flags += $(Enclave_Include_Paths)
+ Enclave_Cpp_Flags := $(Enclave_C_Flags) -std=c++11 -nostdinc++
+ 
+diff --git a/SampleCode/QuoteVerificationSample/Makefile b/SampleCode/QuoteVerificationSample/Makefile
+index 5b3df2cb..0b4b1acc 100644
+--- a/SampleCode/QuoteVerificationSample/Makefile
++++ b/SampleCode/QuoteVerificationSample/Makefile
+@@ -105,13 +105,7 @@ DCAP_DIR  ?= ../../
+ Enclave_Cpp_Files := Enclave/Enclave.cpp
+ Enclave_Include_Paths := -IEnclave -I$(SGX_SDK)/include -I$(SGX_SDK)/include/tlibc -I$(SGX_SDK)/include/libcxx
+ 
+-Enclave_C_Flags := $(Enclave_Include_Paths) -nostdinc -fvisibility=hidden -fpie -ffunction-sections -fdata-sections
+-CC_BELOW_4_9 := $(shell expr "`$(CC) -dumpversion`" \< "4.9")
+-ifeq ($(CC_BELOW_4_9), 1)
+-	Enclave_C_Flags += -fstack-protector
+-else
+-	Enclave_C_Flags += -fstack-protector-strong
+-endif
++Enclave_C_Flags := $(Enclave_Include_Paths) -nostdinc -fvisibility=hidden -fpie -ffunction-sections -fdata-sections -fstack-protector-strong
+ 
+ Enclave_Cpp_Flags := $(Enclave_C_Flags) -nostdinc++
+ 
+diff --git a/tools/PCKRetrievalTool/Makefile b/tools/PCKRetrievalTool/Makefile
+index 422f329a..7bd86398 100644
+--- a/tools/PCKRetrievalTool/Makefile
++++ b/tools/PCKRetrievalTool/Makefile
+@@ -34,12 +34,7 @@ else
+ endif
+ 
+ # turn on stack protector for SDK
+-CC_BELOW_4_9 := $(shell expr "`$(CC) -dumpversion`" \< "4.9")
+-ifeq ($(CC_BELOW_4_9), 1)
+-    COMMON_FLAGS += -fstack-protector
+-else
+-    COMMON_FLAGS += -fstack-protector-strong
+-endif
++COMMON_FLAGS += -fstack-protector-strong
+ 
+ ifdef DEBUG
+     COMMON_FLAGS += -O0 -ggdb -DDEBUG -UNDEBUG
+-- 
+2.53.0
+

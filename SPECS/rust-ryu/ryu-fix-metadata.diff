@@ -1,0 +1,10 @@
+--- ryu-1.0.22/Cargo.toml	2006-07-24T01:21:28+00:00
++++ ryu-1.0.22/Cargo.toml	2025-12-29T13:58:13.187420+00:00
+@@ -108,7 +108,3 @@
+ 
+ [dev-dependencies.rand_xorshift]
+ version = "0.4"
+-
+-[target."cfg(not(miri))".dev-dependencies.criterion]
+-version = "0.8"
+-default-features = false

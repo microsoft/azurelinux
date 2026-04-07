@@ -1,0 +1,14 @@
+--- number_prefix-0.4.0/Cargo.toml	2020-04-07T01:48:03+00:00
++++ number_prefix-0.4.0/Cargo.toml	2024-09-14T12:32:42.747206+00:00
+@@ -14,10 +14,9 @@
+ name = "number_prefix"
+ version = "0.4.0"
+ authors = ["Benjamin Sago <ogham@bsago.me>"]
+-exclude = ["/README.md", "/LICENCE", "/.rustfmt.toml", "/.travis.yml"]
++exclude = ["/README.md", "/.rustfmt.toml", "/.travis.yml"]
+ description = "Library for numeric prefixes (kilo, giga, kibi)."
+ documentation = "https://docs.rs/number_prefix"
+-readme = "README.md"
+ keywords = ["mathematics", "numerics"]
+ categories = ["algorithms", "no-std"]
+ license = "MIT"

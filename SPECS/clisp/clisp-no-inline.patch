@@ -1,0 +1,11 @@
+--- src/foreign.d.orig	2021-06-28 14:32:42.000000000 -0600
++++ src/foreign.d	2022-02-03 21:52:22.932176743 -0700
+@@ -2417,7 +2417,7 @@ local void count_walk_post (object fvd,
+ {
+   unused(fvd); unused(obj); unused(walk);
+ }
+-local maygc void convert_to_foreign_needs (object fvd, object obj,
++local maygc __attribute__((noinline)) void convert_to_foreign_needs (object fvd, object obj,
+                                            struct foreign_layout *sas)
+ {
+   struct walk_lisp walk

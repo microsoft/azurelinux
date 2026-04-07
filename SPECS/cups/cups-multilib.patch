@@ -1,0 +1,14 @@
+diff -up cups-2.3.0/cups-config.in.multilib cups-2.3.0/cups-config.in
+--- cups-2.3.0/cups-config.in.multilib	2019-10-07 12:10:09.508859587 +0200
++++ cups-2.3.0/cups-config.in	2019-10-07 12:11:56.614025934 +0200
+@@ -17,7 +17,9 @@ prefix=@prefix@
+ exec_prefix=@exec_prefix@
+ bindir=@bindir@
+ includedir=@includedir@
+-libdir=@libdir@
++# Fetch libdir from gnutls's pkg-config script.  This is a bit
++# of a cheat, but the cups-devel package requires gnutls-devel anyway.
++libdir=`pkg-config --variable=libdir gnutls`
+ datarootdir=@datadir@
+ datadir=@datadir@
+ sysconfdir=@sysconfdir@

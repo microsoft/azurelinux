@@ -1,0 +1,51 @@
+Fix C99 compatibility issues (implicit int, implicit function
+declarations) in the configure script.  Upstream has removed
+autotools altogether, addressing this issue:
+
+commit 5ea5d5ec7c7f4e628db5f0b4c446dc510ff2777a
+Author: Brian Stafford <contact@brianstafford.info>
+Date:   Tue Mar 3 18:40:30 2020 +0000
+
+    Remove autotools
+    
+    * it has only been a 20 year wait for this :-)
+
+diff --git a/acinclude.m4 b/acinclude.m4
+index 912149736f74a70b..3632220c1a107dd1 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -355,12 +355,12 @@ AC_DEFUN([ACX_SNPRINTF], [
+ 	AC_TRY_RUN([
+ #include <stdio.h> 
+ 
+-main ()
++int main (void)
+ {
+   char buf[16];
+ 
+   snprintf (buf, 4, "abcd");
+-  exit ((buf[3] == '\0') ? 0 : 1);
++  return (buf[3] == '\0') ? 0 : 1;
+ }
+ 
+ ], acx_cv_working_snprintf=yes, acx_cv_working_snprintf=no, acx_cv_working_snprintf=yes)
+diff --git a/configure b/configure
+index d586ca2df4fc0435..f5e13a62ef13a55d 100755
+--- a/configure
++++ b/configure
+@@ -13211,13 +13211,14 @@ else
+ /* end confdefs.h.  */
+ 
+ #include <stdio.h>
++#include <string.h>
+ 
+ main ()
+ {
+   char buf[16];
+ 
+   snprintf (buf, 4, "abcd");
+-  exit ((buf[3] == '\0') ? 0 : 1);
++  return (buf[3] == '\0') ? 0 : 1;
+ }
+ 
+ 

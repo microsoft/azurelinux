@@ -1,0 +1,25 @@
+--- concurrent-queue-2.5.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ concurrent-queue-2.5.0/Cargo.toml	2024-05-08T18:20:46.719744+00:00
+@@ -36,10 +36,6 @@
+ [lib]
+ bench = false
+ 
+-[[bench]]
+-name = "bench"
+-harness = false
+-
+ [dependencies.crossbeam-utils]
+ version = "0.8.11"
+ default-features = false
+@@ -47,11 +43,6 @@
+ [dependencies.portable-atomic]
+ version = "1"
+ optional = true
+-default-features = false
+-
+-[dev-dependencies.criterion]
+-version = "0.5"
+-features = ["cargo_bench_support"]
+ default-features = false
+ 
+ [dev-dependencies.easy-parallel]

@@ -1,0 +1,54 @@
+diff -urN fonts-rpm-macros-2.0.5.orig/templates/rpm/spectemplate-fonts-0-simple-bare.spec fonts-rpm-macros-2.0.5/templates/rpm/spectemplate-fonts-0-simple-bare.spec
+--- fonts-rpm-macros-2.0.5.orig/templates/rpm/spectemplate-fonts-0-simple-bare.spec	2020-04-03 04:25:50.000000000 +0530
++++ fonts-rpm-macros-2.0.5/templates/rpm/spectemplate-fonts-0-simple-bare.spec	2025-05-26 13:35:41.909998756 +0530
+@@ -36,9 +36,9 @@
+ 
+ # The identifier of the entity, that released the font family.
+ %global foundry           
+-# The font family license identifier. Adjust as necessary. The OFL is our
++# The font family license identifier. Adjust as necessary. The OFL-1.1 is our
+ # recommended font license.
+-%global fontlicense       OFL
++%global fontlicense       OFL-1.1
+ #
+ # The following directives are lists of space-separated shell globs
+ #   – matching files associated with the font family,
+diff -urN fonts-rpm-macros-2.0.5.orig/templates/rpm/spectemplate-fonts-0-simple.spec fonts-rpm-macros-2.0.5/templates/rpm/spectemplate-fonts-0-simple.spec
+--- fonts-rpm-macros-2.0.5.orig/templates/rpm/spectemplate-fonts-0-simple.spec	2020-04-03 04:25:50.000000000 +0530
++++ fonts-rpm-macros-2.0.5/templates/rpm/spectemplate-fonts-0-simple.spec	2025-05-26 13:35:27.319884489 +0530
+@@ -36,9 +36,9 @@
+ 
+ # The identifier of the entity, that released the font family.
+ %global foundry           
+-# The font family license identifier. Adjust as necessary. The OFL is our
++# The font family license identifier. Adjust as necessary. The OFL-1.1 is our
+ # recommended font license.
+-%global fontlicense       OFL
++%global fontlicense       OFL-1.1
+ #
+ # The following directives are lists of space-separated shell globs
+ #   – matching files associated with the font family,
+diff -urN fonts-rpm-macros-2.0.5.orig/templates/rpm/spectemplate-fonts-1-full-bare.spec fonts-rpm-macros-2.0.5/templates/rpm/spectemplate-fonts-1-full-bare.spec
+--- fonts-rpm-macros-2.0.5.orig/templates/rpm/spectemplate-fonts-1-full-bare.spec	2020-04-03 04:25:50.000000000 +0530
++++ fonts-rpm-macros-2.0.5/templates/rpm/spectemplate-fonts-1-full-bare.spec	2025-05-26 13:36:06.345335750 +0530
+@@ -16,7 +16,7 @@
+ URL:     
+ 
+ %global foundry           
+-%global fontlicense       OFL
++%global fontlicense       OFL-1.1
+ #
+ # The following directives are lists of space-separated shell globs
+ #   – matching files associated with the font family,
+diff -urN fonts-rpm-macros-2.0.5.orig/templates/rpm/spectemplate-fonts-1-full.spec fonts-rpm-macros-2.0.5/templates/rpm/spectemplate-fonts-1-full.spec
+--- fonts-rpm-macros-2.0.5.orig/templates/rpm/spectemplate-fonts-1-full.spec	2020-04-03 04:25:50.000000000 +0530
++++ fonts-rpm-macros-2.0.5/templates/rpm/spectemplate-fonts-1-full.spec	2025-05-26 13:36:15.813055012 +0530
+@@ -16,7 +16,7 @@
+ URL:     
+ 
+ %global foundry           
+-%global fontlicense       OFL
++%global fontlicense       OFL-1.1
+ #
+ # The following directives are lists of space-separated shell globs
+ #   – matching files associated with the font family,

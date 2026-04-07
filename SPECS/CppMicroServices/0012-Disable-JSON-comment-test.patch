@@ -1,0 +1,42 @@
+From ba7f6171edb9afd6c8f47990b24202492e73221b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Fri, 7 Mar 2025 17:23:39 +0000
+Subject: [PATCH 12/12] Disable JSON comment test
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+jsoncpp 1.9.6 now honours the allowComments = false setting. This
+test was dubious given that it tries to prove comments are accepted,
+while the code has attempted to disable comments. The test only
+worked historically because jsoncpp was broken.
+
+https://github.com/CppMicroServices/CppMicroServices/issues/1065
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ framework/test/gtest/ResourceCompilerTest.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/framework/test/gtest/ResourceCompilerTest.cpp b/framework/test/gtest/ResourceCompilerTest.cpp
+index 7e01115b..676425d2 100644
+--- a/framework/test/gtest/ResourceCompilerTest.cpp
++++ b/framework/test/gtest/ResourceCompilerTest.cpp
+@@ -930,6 +930,7 @@ TEST_F(ResourceCompilerTest, testUnicodeManifestAdd)
+     ChangeDirectory(origdir);
+ }
+ 
++#if 0
+ // In jsoncpp 0.10.6 not allowing comments does NOT result in a parse failure for a JSON file with comments.
+ // Instead, assuming the JSON is valid, parsing returns JSON stripped of the comments.
+ // This test will only makes sure that JSON with comments can be added successfully.
+@@ -959,6 +960,7 @@ TEST_F(ResourceCompilerTest, testManifestAddWithJSONComments)
+     // Test embedding a manifest containing JSON comments.
+     ASSERT_EQ(EXIT_SUCCESS, runExecutable(cmd.str()));
+ }
++#endif
+ 
+ TEST_F(ResourceCompilerTest, testManifestAddWithDuplicateKeys)
+ {
+-- 
+2.48.1
+

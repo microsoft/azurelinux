@@ -1,0 +1,12 @@
+diff -Naurp db_old/src/os/os_cpu.c db_new/src/os/os_cpu.c
+--- db_old/src/os/os_cpu.c	2012-05-11 12:57:54.000000000 -0500
++++ db_new/src/os/os_cpu.c	2015-08-12 14:00:37.232498880 -0500
+@@ -40,6 +40,8 @@ __os_cpu_count()
+ 	long nproc;
+ 
+ 	nproc = sysconf(_SC_NPROCESSORS_ONLN);
++	if (nproc > 1024)
++		nproc = 1024;
+ 	return ((u_int32_t)(nproc > 1 ? nproc : 1));
+ #else
+ 	return (1);

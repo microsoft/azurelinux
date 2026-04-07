@@ -1,0 +1,30 @@
+From 06ca82cad9898f5df40011fe0614ee1dfd89f1ae Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Fri, 3 Aug 2012 17:50:24 +0100
+Subject: [PATCH 1/2] missing-plugins: Remove the mpegaudioversion field
+
+From missing plugins requests as it's a duplicate of mpegversion
+and its presence would break codec discovery when using RPM.
+
+https://bugzilla.redhat.com/show_bug.cgi?id=680809
+---
+ gst-libs/gst/pbutils/missing-plugins.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/gst-libs/gst/pbutils/missing-plugins.c b/gst-libs/gst/pbutils/missing-plugins.c
+index a08803b18..cdce4bf05 100644
+--- a/gst-libs/gst/pbutils/missing-plugins.c
++++ b/gst-libs/gst/pbutils/missing-plugins.c
+@@ -151,6 +151,9 @@ copy_and_clean_caps (const GstCaps * caps)
+   gst_structure_remove_field (s, "play-speed");
+   gst_structure_remove_field (s, "play-scale");
+   gst_structure_remove_field (s, "dynamic_range");
++  /* mpegaudioversion is a duplicate for mpegversion
++   * https://bugzilla.redhat.com/show_bug.cgi?id=680809 */
++  gst_structure_remove_field (s, "mpegaudioversion");
+ 
+   return ret;
+ }
+-- 
+2.14.3
+

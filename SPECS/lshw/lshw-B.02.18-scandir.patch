@@ -1,0 +1,26 @@
+diff --git a/src/core/abi.cc b/src/core/abi.cc
+index 76c664c..b5bd9c9 100644
+--- a/src/core/abi.cc
++++ b/src/core/abi.cc
+@@ -36,13 +36,15 @@ bool scan_abi(hwNode & system)
+     struct dirent **namelist;
+ 
+     n = scandir(".", &namelist, selectfile, alphasort);
+-    for(i=0; i<n; i++)
+-    {
+-      system.addCapability(namelist[i]->d_name);
+-      free(namelist[i]);
++    if (n > 0) {
++      for(i=0; i<n; i++)
++	{
++	  system.addCapability(namelist[i]->d_name);
++	  free(namelist[i]);
++	}
++      if(namelist)
++	free(namelist);
+     }
+-    if(namelist)
+-      free(namelist);
+   }
+ 
+   popd();

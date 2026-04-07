@@ -1,0 +1,3 @@
+#Type Name ID GECOS                                      Home directory   Shell
+g pegasus 65
+u pegasus 66 "tog-pegasus OpenPegasus WBEM/CIM services" /var/lib/Pegasus /sbin/nologin

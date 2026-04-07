@@ -1,0 +1,38 @@
+diff -up less-678-build/less-678/configure.ac.fsync less-678-build/less-678/configure.ac
+--- less-678-build/less-678/configure.ac.fsync	2025-05-01 22:42:03.000000000 +0200
++++ less-678-build/less-678/configure.ac	2025-05-22 18:10:23.572796329 +0200
+@@ -210,6 +210,8 @@ AH_TEMPLATE([HAVE_TIME_T],
+ 	[Define HAVE_TIME_T if your system supports the "time_t" type.])
+ AH_TEMPLATE([HAVE_STRERROR],
+ 	[Define HAVE_STRERROR if you have the strerror() function.])
++AH_TEMPLATE([HAVE_FSYNC],
++	[Define HAVE_FSYNC if fsync() on a tty works.])
+ AH_TEMPLATE([HAVE_FILENO],
+ 	[Define HAVE_FILENO if you have the fileno() macro.])
+ AH_TEMPLATE([HAVE_ERRNO],
+@@ -259,7 +261,7 @@ AC_MSG_CHECKING(for ANSI function protot
+ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[int f(int a) { return a; }]])],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_ANSI_PROTOS)],[AC_MSG_RESULT(no)])
+ 
+ # Checks for library functions.
+-AC_CHECK_FUNCS([fchmod fsync nanosleep poll popen realpath _setjmp sigprocmask sigsetmask snprintf stat strsignal system ttyname usleep])
++AC_CHECK_FUNCS([fchmod nanosleep poll popen realpath _setjmp sigprocmask sigsetmask snprintf stat strsignal system ttyname usleep])
+ AC_CHECK_DECL(sigsetjmp, [AC_DEFINE(HAVE_SIGSETJMP)], [], [#include <setjmp.h>])
+ 
+ # AC_CHECK_FUNCS may not work for inline functions, so test these separately.
+@@ -302,6 +304,16 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[
+ #include <errno.h>
+ #endif]], [[static char *x; x = strerror(0);]])],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_STRERROR)],[AC_MSG_RESULT(no)])
+ 
++AC_MSG_CHECKING(for fsync)
++AC_TRY_RUN([
++#include <fcntl.h>
++#include <unistd.h>
++int main(void)
++{
++        int fd = open("/dev/tty", O_RDWR);
++        return fsync(fd);
++}], [AC_MSG_RESULT(yes); AC_DEFINE(HAVE_FSYNC)], [AC_MSG_RESULT(no)])
++
+ AC_MSG_CHECKING(for sys_errlist)
+ AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[extern char *sys_errlist[]; static char **x; x = sys_errlist;]])],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SYS_ERRLIST)],[AC_MSG_RESULT(no)])
+ 

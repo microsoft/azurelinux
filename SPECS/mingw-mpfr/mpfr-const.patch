@@ -1,0 +1,184 @@
+diff -Naurd mpfr-4.0.2-a/PATCHES mpfr-4.0.2-b/PATCHES
+--- mpfr-4.0.2-a/PATCHES	2020-03-30 16:31:45.813415121 +0000
++++ mpfr-4.0.2-b/PATCHES	2020-03-30 16:33:54.623893528 +0000
+@@ -0,0 +1 @@
++const
+diff -Naurd mpfr-4.0.2-a/VERSION mpfr-4.0.2-b/VERSION
+--- mpfr-4.0.2-a/VERSION	2020-03-30 13:09:17.502071540 +0000
++++ mpfr-4.0.2-b/VERSION	2020-03-30 15:17:31.535330224 +0000
+@@ -1,1 +1,1 @@
+-4.0.2-p4
++4.0.2-p5
+diff -Naurd mpfr-4.0.2-a/configure mpfr-4.0.2-b/configure
+--- mpfr-4.0.2-a/configure	2019-01-31 20:43:19.000000000 +0000
++++ mpfr-4.0.2-b/configure	2020-03-30 16:33:29.340190160 +0000
+@@ -15868,9 +15868,9 @@
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+ 
+-char *number = "0123456789";
+-char *lower  = "abcdefghijklmnopqrstuvwxyz";
+-char *upper  = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
++const char *number = "0123456789";
++const char *lower  = "abcdefghijklmnopqrstuvwxyz";
++const char *upper  = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+ 
+ int
+ main (void)
+diff -Naurd mpfr-4.0.2-a/src/mpfr.h mpfr-4.0.2-b/src/mpfr.h
+--- mpfr-4.0.2-a/src/mpfr.h	2020-03-30 13:09:17.498071589 +0000
++++ mpfr-4.0.2-b/src/mpfr.h	2020-03-30 15:17:31.535330224 +0000
+@@ -27,7 +27,7 @@
+ #define MPFR_VERSION_MAJOR 4
+ #define MPFR_VERSION_MINOR 0
+ #define MPFR_VERSION_PATCHLEVEL 2
+-#define MPFR_VERSION_STRING "4.0.2-p4"
++#define MPFR_VERSION_STRING "4.0.2-p5"
+ 
+ /* User macros:
+    MPFR_USE_FILE:        Define it to make MPFR define functions dealing
+diff -Naurd mpfr-4.0.2-a/src/version.c mpfr-4.0.2-b/src/version.c
+--- mpfr-4.0.2-a/src/version.c	2020-03-30 13:09:17.502071540 +0000
++++ mpfr-4.0.2-b/src/version.c	2020-03-30 15:17:31.535330224 +0000
+@@ -25,5 +25,5 @@
+ const char *
+ mpfr_get_version (void)
+ {
+-  return "4.0.2-p4";
++  return "4.0.2-p5";
+ }
+diff -Naurd mpfr-4.0.2-a/tests/tdiv.c mpfr-4.0.2-b/tests/tdiv.c
+--- mpfr-4.0.2-a/tests/tdiv.c	2019-01-07 13:53:20.000000000 +0000
++++ mpfr-4.0.2-b/tests/tdiv.c	2020-03-30 15:17:31.523330366 +0000
+@@ -23,7 +23,7 @@
+ #include "mpfr-test.h"
+ 
+ static void
+-check_equal (mpfr_srcptr a, mpfr_srcptr a2, char *s,
++check_equal (mpfr_srcptr a, mpfr_srcptr a2, const char *s,
+              mpfr_srcptr b, mpfr_srcptr c, mpfr_rnd_t r)
+ {
+   if (SAME_VAL (a, a2))
+diff -Naurd mpfr-4.0.2-a/tests/tfpif.c mpfr-4.0.2-b/tests/tfpif.c
+--- mpfr-4.0.2-a/tests/tfpif.c	2019-01-07 13:53:20.000000000 +0000
++++ mpfr-4.0.2-b/tests/tfpif.c	2020-03-30 15:17:31.523330366 +0000
+@@ -30,8 +30,8 @@
+ static void
+ doit (int argc, char *argv[], mpfr_prec_t p1, mpfr_prec_t p2)
+ {
+-  char *filenameCompressed = FILE_NAME_RW;
+-  char *data = FILE_NAME_R;
++  const char *filenameCompressed = FILE_NAME_RW;
++  const char *data = FILE_NAME_R;
+   int status;
+   FILE *fh;
+   mpfr_t x[9];
+@@ -198,7 +198,7 @@
+ static void
+ check_bad (void)
+ {
+-  char *filenameCompressed = FILE_NAME_RW;
++  const char *filenameCompressed = FILE_NAME_RW;
+   int status;
+   FILE *fh;
+   mpfr_t x;
+@@ -340,7 +340,7 @@
+ static void
+ extra (void)
+ {
+-  char *data = FILE_NAME_R2;
++  const char *data = FILE_NAME_R2;
+   mpfr_t x;
+   FILE *fp;
+   int ret;
+diff -Naurd mpfr-4.0.2-a/tests/tmul_2exp.c mpfr-4.0.2-b/tests/tmul_2exp.c
+--- mpfr-4.0.2-a/tests/tmul_2exp.c	2019-01-07 13:53:20.000000000 +0000
++++ mpfr-4.0.2-b/tests/tmul_2exp.c	2020-03-30 15:17:31.523330366 +0000
+@@ -258,7 +258,7 @@
+   mpfr_exp_t old_emax;
+   mpfr_t x, y1, y2;
+   int neg, r, op;
+-  static char *sop[4] = { "mul_2ui", "mul_2si", "div_2ui", "div_2si" };
++  static const char *sop[4] = { "mul_2ui", "mul_2si", "div_2ui", "div_2si" };
+ 
+   old_emax = mpfr_get_emax ();
+   set_emax (emax);
+diff -Naurd mpfr-4.0.2-a/tests/trandom.c mpfr-4.0.2-b/tests/trandom.c
+--- mpfr-4.0.2-a/tests/trandom.c	2019-01-07 13:53:20.000000000 +0000
++++ mpfr-4.0.2-b/tests/trandom.c	2020-03-30 15:17:31.523330366 +0000
+@@ -185,7 +185,7 @@
+   {
+     gmp_randstate_t s;
+     mpfr_t x;
+-    char *str = "0.1010111100000000000000000000000000000000E-32";
++    const char *str = "0.1010111100000000000000000000000000000000E-32";
+     int k;
+ 
+     gmp_randinit_default (s);
+diff -Naurd mpfr-4.0.2-a/tests/trint.c mpfr-4.0.2-b/tests/trint.c
+--- mpfr-4.0.2-a/tests/trint.c	2019-01-25 02:00:06.000000000 +0000
++++ mpfr-4.0.2-b/tests/trint.c	2020-03-30 15:17:31.523330366 +0000
+@@ -308,7 +308,7 @@
+ #if __MPFR_STDC (199901L)
+ 
+ static void
+-test_fct (double (*f)(double), int (*g)(), char *s, mpfr_rnd_t r)
++test_fct (double (*f)(double), int (*g)(), const char *s, mpfr_rnd_t r)
+ {
+   double d, y;
+   mpfr_t dd, yy;
+diff -Naurd mpfr-4.0.2-a/tests/tsum.c mpfr-4.0.2-b/tests/tsum.c
+--- mpfr-4.0.2-a/tests/tsum.c	2019-01-07 13:53:20.000000000 +0000
++++ mpfr-4.0.2-b/tests/tsum.c	2020-03-30 15:17:31.523330366 +0000
+@@ -285,7 +285,7 @@
+ static void
+ check_more_special (void)
+ {
+-  char *str[NC] = { "NaN", "+Inf", "-Inf", "+0", "-0", "+1", "-1" };
++  const char *str[NC] = { "NaN", "+Inf", "-Inf", "+0", "-0", "+1", "-1" };
+   int i, r, k[NS];
+   mpfr_t c[NC], s[NS], sum;
+   mpfr_ptr p[NS];
+@@ -724,7 +724,7 @@
+ {
+   mpfr_t sum, t[4];
+   mpfr_ptr p[4];
+-  char *s[4] = {
++  const char *s[4] = {
+     "0x1p1000",
+     "-0x0.fffffffffffff80000000000000001p1000",
+     "-0x1p947",
+@@ -771,7 +771,11 @@
+ {
+   mpfr_t sum1, sum2, t[3];
+   mpfr_ptr p[3];
+-  char *s[3] = { "0.10000111110101000010101011100001", "1E-100", "0.1E95" };
++  const char *s[3] = {
++    "0.10000111110101000010101011100001",
++    "1E-100",
++    "0.1E95"
++  };
+   int i, r;
+ 
+   mpfr_inits2 (58, sum1, sum2, (mpfr_ptr) 0);
+@@ -1268,7 +1272,7 @@
+ {
+   mpfr_t r, t[4];
+   mpfr_ptr p[4];
+-  char *s[4] = { "0.10E20", "0", "0.11E382", "0.10E826" };
++  const char *s[4] = { "0.10E20", "0", "0.11E382", "0.10E826" };
+   int i;
+ 
+   mpfr_init2 (r, 2);
+diff -Naurd mpfr-4.0.2-a/tests/turandom.c mpfr-4.0.2-b/tests/turandom.c
+--- mpfr-4.0.2-a/tests/turandom.c	2019-01-07 13:53:20.000000000 +0000
++++ mpfr-4.0.2-b/tests/turandom.c	2020-03-30 15:17:31.523330366 +0000
+@@ -526,7 +526,7 @@
+ #define N 6
+   /* Run this program with the MPFR_REPROD_ABI_OUTPUT environment variable
+      set to get the array of strings. */
+-  char *t[5 * N] = {
++  const char *t[5 * N] = {
+     "1.0@-1",
+     "3.0@-1",
+     "7.0@-1",

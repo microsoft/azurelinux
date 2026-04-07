@@ -1,0 +1,19 @@
+diff -up slang-2.3.0/src/test/signal.sl.sighuptest slang-2.3.0/src/test/signal.sl
+--- slang-2.3.0/src/test/signal.sl.sighuptest	2014-09-18 05:02:24.000000000 +0200
++++ slang-2.3.0/src/test/signal.sl	2014-12-11 15:57:36.857955195 +0100
+@@ -9,6 +9,7 @@ private define handle_hup (sig)
+    Signal = sig;
+ }
+ 
++#iffalse
+ private define test_signal (sig, func, old_func)
+ {
+    variable old;
+@@ -23,6 +24,7 @@ test_signal (SIGHUP, SIG_APP, &handle_hu
+ test_signal (SIGHUP, SIG_DFL, SIG_DFL);
+ test_signal (SIGHUP, SIG_IGN, SIG_DFL);
+ test_signal (SIGHUP, &handle_hup, SIG_IGN);
++#endif
+ 
+ private define test_signal (sig, func)
+ {

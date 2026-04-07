@@ -1,0 +1,1734 @@
+From 43580ed75bde0b7d6ad442c90a22f80b50ce844d Mon Sep 17 00:00:00 2001
+From: Kjell Ahlstedt <kjellahlstedt@gmail.com>
+Date: Mon, 7 Apr 2025 08:50:47 +0200
+Subject: [PATCH] Change license info to mention Lesser GPL 2.1 instead of
+ Library GPL 2
+
+The GNU Library General Public License has been superseded by
+the GNU Lesser General Public License.
+https://www.gnu.org/licenses/old-licenses/lgpl-2.0.html
+
+Remove obsolete FSF (Free Software Foundation) address.
+---
+ COPYING                           | 210 ++++++++++++++++--------------
+ cairomm/cairomm.h                 |  12 +-
+ cairomm/context.cc                |  12 +-
+ cairomm/context.h                 |  12 +-
+ cairomm/context_private.h         |  12 +-
+ cairomm/context_surface_quartz.cc |  12 +-
+ cairomm/context_surface_win32.cc  |  12 +-
+ cairomm/context_surface_xlib.cc   |  12 +-
+ cairomm/device.cc                 |  12 +-
+ cairomm/device.h                  |  12 +-
+ cairomm/enums.h                   |  12 +-
+ cairomm/exception.cc              |  12 +-
+ cairomm/exception.h               |  12 +-
+ cairomm/fontface.cc               |  12 +-
+ cairomm/fontface.h                |  12 +-
+ cairomm/fontoptions.cc            |  12 +-
+ cairomm/fontoptions.h             |  12 +-
+ cairomm/matrix.cc                 |  12 +-
+ cairomm/matrix.h                  |  12 +-
+ cairomm/path.cc                   |  12 +-
+ cairomm/path.h                    |  12 +-
+ cairomm/pattern.cc                |  12 +-
+ cairomm/pattern.h                 |  12 +-
+ cairomm/private.cc                |  12 +-
+ cairomm/private.h                 |  12 +-
+ cairomm/quartz_font.cc            |  12 +-
+ cairomm/quartz_font.h             |  12 +-
+ cairomm/quartz_surface.cc         |  12 +-
+ cairomm/quartz_surface.h          |  12 +-
+ cairomm/refptr.h                  |  12 +-
+ cairomm/region.cc                 |  12 +-
+ cairomm/region.h                  |  12 +-
+ cairomm/scaledfont.cc             |  12 +-
+ cairomm/scaledfont.h              |  12 +-
+ cairomm/script.cc                 |  12 +-
+ cairomm/script.h                  |  12 +-
+ cairomm/script_surface.cc         |  12 +-
+ cairomm/script_surface.h          |  12 +-
+ cairomm/surface.cc                |  12 +-
+ cairomm/surface.h                 |  12 +-
+ cairomm/types.h                   |  12 +-
+ cairomm/win32_font.cc             |  12 +-
+ cairomm/win32_font.h              |  12 +-
+ cairomm/win32_surface.cc          |  12 +-
+ cairomm/win32_surface.h           |  12 +-
+ cairomm/xlib_surface.cc           |  12 +-
+ cairomm/xlib_surface.h            |  12 +-
+ examples/text/text-rotate.cc      |  12 +-
+ 48 files changed, 350 insertions(+), 424 deletions(-)
+
+diff --git a/COPYING b/COPYING
+index 12735e6..f6683e7 100644
+--- a/COPYING
++++ b/COPYING
+@@ -1,13 +1,14 @@
+-                  GNU LIBRARY GENERAL PUBLIC LICENSE
+-                       Version 2, June 1991
++                  GNU LESSER GENERAL PUBLIC LICENSE
++                       Version 2.1, February 1999
+ 
+- Copyright (C) 1991 Free Software Foundation, Inc.
+- 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
++ Copyright (C) 1991, 1999 Free Software Foundation, Inc.
++ <https://fsf.org/>
+  Everyone is permitted to copy and distribute verbatim copies
+  of this license document, but changing it is not allowed.
+ 
+-[This is the first released version of the library GPL.  It is
+- numbered 2 because it goes with version 2 of the ordinary GPL.]
++[This is the first released version of the Lesser GPL.  It also counts
++ as the successor of the GNU Library Public License, version 2, hence
++ the version number 2.1.]
+ 
+                             Preamble
+ 
+@@ -16,97 +17,109 @@ freedom to share and change it.  By contrast, the GNU General Public
+ Licenses are intended to guarantee your freedom to share and change
+ free software--to make sure the software is free for all its users.
+ 
+-  This license, the Library General Public License, applies to some
+-specially designated Free Software Foundation software, and to any
+-other libraries whose authors decide to use it.  You can use it for
+-your libraries, too.
+-
+-  When we speak of free software, we are referring to freedom, not
+-price.  Our General Public Licenses are designed to make sure that you
+-have the freedom to distribute copies of free software (and charge for
+-this service if you wish), that you receive source code or can get it
+-if you want it, that you can change the software or use pieces of it
+-in new free programs; and that you know you can do these things.
++  This license, the Lesser General Public License, applies to some
++specially designated software packages--typically libraries--of the
++Free Software Foundation and other authors who decide to use it.  You
++can use it too, but we suggest you first think carefully about whether
++this license or the ordinary General Public License is the better
++strategy to use in any particular case, based on the explanations below.
++
++  When we speak of free software, we are referring to freedom of use,
++not price.  Our General Public Licenses are designed to make sure that
++you have the freedom to distribute copies of free software (and charge
++for this service if you wish); that you receive source code or can get
++it if you want it; that you can change the software and use pieces of
++it in new free programs; and that you are informed that you can do
++these things.
+ 
+   To protect your rights, we need to make restrictions that forbid
+-anyone to deny you these rights or to ask you to surrender the rights.
+-These restrictions translate to certain responsibilities for you if
+-you distribute copies of the library, or if you modify it.
++distributors to deny you these rights or to ask you to surrender these
++rights.  These restrictions translate to certain responsibilities for
++you if you distribute copies of the library or if you modify it.
+ 
+   For example, if you distribute copies of the library, whether gratis
+ or for a fee, you must give the recipients all the rights that we gave
+ you.  You must make sure that they, too, receive or can get the source
+-code.  If you link a program with the library, you must provide
+-complete object files to the recipients so that they can relink them
+-with the library, after making changes to the library and recompiling
++code.  If you link other code with the library, you must provide
++complete object files to the recipients, so that they can relink them
++with the library after making changes to the library and recompiling
+ it.  And you must show them these terms so they know their rights.
+ 
+-  Our method of protecting your rights has two steps: (1) copyright
+-the library, and (2) offer you this license which gives you legal
++  We protect your rights with a two-step method: (1) we copyright the
++library, and (2) we offer you this license, which gives you legal
+ permission to copy, distribute and/or modify the library.
+ 
+-  Also, for each distributor's protection, we want to make certain
+-that everyone understands that there is no warranty for this free
+-library.  If the library is modified by someone else and passed on, we
+-want its recipients to know that what they have is not the original
+-version, so that any problems introduced by others will not reflect on
+-the original authors' reputations.
++  To protect each distributor, we want to make it very clear that
++there is no warranty for the free library.  Also, if the library is
++modified by someone else and passed on, the recipients should know
++that what they have is not the original version, so that the original
++author's reputation will not be affected by problems that might be
++introduced by others.
+ 
+-  Finally, any free program is threatened constantly by software
+-patents.  We wish to avoid the danger that companies distributing free
+-software will individually obtain patent licenses, thus in effect
+-transforming the program into proprietary software.  To prevent this,
+-we have made it clear that any patent must be licensed for everyone's
+-free use or not licensed at all.
+-
+-  Most GNU software, including some libraries, is covered by the ordinary
+-GNU General Public License, which was designed for utility programs.  This
+-license, the GNU Library General Public License, applies to certain
+-designated libraries.  This license is quite different from the ordinary
+-one; be sure to read it in full, and don't assume that anything in it is
+-the same as in the ordinary license.
+-
+-  The reason we have a separate public license for some libraries is that
+-they blur the distinction we usually make between modifying or adding to a
+-program and simply using it.  Linking a program with a library, without
+-changing the library, is in some sense simply using the library, and is
+-analogous to running a utility program or application program.  However, in
+-a textual and legal sense, the linked executable is a combined work, a
+-derivative of the original library, and the ordinary General Public License
+-treats it as such.
+-
+-  Because of this blurred distinction, using the ordinary General
+-Public License for libraries did not effectively promote software
+-sharing, because most developers did not use the libraries.  We
+-concluded that weaker conditions might promote sharing better.
+-
+-  However, unrestricted linking of non-free programs would deprive the
+-users of those programs of all benefit from the free status of the
+-libraries themselves.  This Library General Public License is intended to
+-permit developers of non-free programs to use free libraries, while
+-preserving your freedom as a user of such programs to change the free
+-libraries that are incorporated in them.  (We have not seen how to achieve
+-this as regards changes in header files, but we have achieved it as regards
+-changes in the actual functions of the Library.)  The hope is that this
+-will lead to faster development of free libraries.
++  Finally, software patents pose a constant threat to the existence of
++any free program.  We wish to make sure that a company cannot
++effectively restrict the users of a free program by obtaining a
++restrictive license from a patent holder.  Therefore, we insist that
++any patent license obtained for a version of the library must be
++consistent with the full freedom of use specified in this license.
++
++  Most GNU software, including some libraries, is covered by the
++ordinary GNU General Public License.  This license, the GNU Lesser
++General Public License, applies to certain designated libraries, and
++is quite different from the ordinary General Public License.  We use
++this license for certain libraries in order to permit linking those
++libraries into non-free programs.
++
++  When a program is linked with a library, whether statically or using
++a shared library, the combination of the two is legally speaking a
++combined work, a derivative of the original library.  The ordinary
++General Public License therefore permits such linking only if the
++entire combination fits its criteria of freedom.  The Lesser General
++Public License permits more lax criteria for linking other code with
++the library.
++
++  We call this license the "Lesser" General Public License because it
++does Less to protect the user's freedom than the ordinary General
++Public License.  It also provides other free software developers Less
++of an advantage over competing non-free programs.  These disadvantages
++are the reason we use the ordinary General Public License for many
++libraries.  However, the Lesser license provides advantages in certain
++special circumstances.
++
++  For example, on rare occasions, there may be a special need to
++encourage the widest possible use of a certain library, so that it becomes
++a de-facto standard.  To achieve this, non-free programs must be
++allowed to use the library.  A more frequent case is that a free
++library does the same job as widely used non-free libraries.  In this
++case, there is little to gain by limiting the free library to free
++software only, so we use the Lesser General Public License.
++
++  In other cases, permission to use a particular library in non-free
++programs enables a greater number of people to use a large body of
++free software.  For example, permission to use the GNU C Library in
++non-free programs enables many more people to use the whole GNU
++operating system, as well as its variant, the GNU/Linux operating
++system.
++
++  Although the Lesser General Public License is Less protective of the
++users' freedom, it does ensure that the user of a program that is
++linked with the Library has the freedom and the wherewithal to run
++that program using a modified version of the Library.
+ 
+   The precise terms and conditions for copying, distribution and
+ modification follow.  Pay close attention to the difference between a
+ "work based on the library" and a "work that uses the library".  The
+-former contains code derived from the library, while the latter only
+-works together with the library.
+-
+-  Note that it is possible for a library to be covered by the ordinary
+-General Public License rather than by this special one.
++former contains code derived from the library, whereas the latter must
++be combined with the library in order to run.
+ 
+-                  GNU LIBRARY GENERAL PUBLIC LICENSE
++                  GNU LESSER GENERAL PUBLIC LICENSE
+    TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+ 
+-  0. This License Agreement applies to any software library which
+-contains a notice placed by the copyright holder or other authorized
+-party saying it may be distributed under the terms of this Library
+-General Public License (also called "this License").  Each licensee is
+-addressed as "you".
++  0. This License Agreement applies to any software library or other
++program which contains a notice placed by the copyright holder or
++other authorized party saying it may be distributed under the terms of
++this Lesser General Public License (also called "this License").
++Each licensee is addressed as "you".
+ 
+   A "library" means a collection of software functions and/or data
+ prepared so as to be conveniently linked with application programs
+@@ -255,7 +268,7 @@ distribute the object code for the work under the terms of Section 6.
+ Any executables containing that work also fall under Section 6,
+ whether or not they are linked directly with the Library itself.
+ 
+-  6. As an exception to the Sections above, you may also compile or
++  6. As an exception to the Sections above, you may also combine or
+ link a "work that uses the Library" with the Library to produce a
+ work containing portions of the Library, and distribute that work
+ under terms of your choice, provided that the terms permit
+@@ -282,23 +295,31 @@ of these things:
+     Library will not necessarily be able to recompile the application
+     to use the modified definitions.)
+ 
+-    b) Accompany the work with a written offer, valid for at
++    b) Use a suitable shared library mechanism for linking with the
++    Library.  A suitable mechanism is one that (1) uses at run time a
++    copy of the library already present on the user's computer system,
++    rather than copying library functions into the executable, and (2)
++    will operate properly with a modified version of the library, if
++    the user installs one, as long as the modified version is
++    interface-compatible with the version that the work was made with.
++
++    c) Accompany the work with a written offer, valid for at
+     least three years, to give the same user the materials
+     specified in Subsection 6a, above, for a charge no more
+     than the cost of performing this distribution.
+ 
+-    c) If distribution of the work is made by offering access to copy
++    d) If distribution of the work is made by offering access to copy
+     from a designated place, offer equivalent access to copy the above
+     specified materials from the same place.
+ 
+-    d) Verify that the user has already received a copy of these
++    e) Verify that the user has already received a copy of these
+     materials or that you have already sent this user a copy.
+ 
+   For an executable, the required form of the "work that uses the
+ Library" must include any data and utility programs needed for
+ reproducing the executable from it.  However, as a special exception,
+-the source code distributed need not include anything that is normally
+-distributed (in either source or binary form) with the major
++the materials to be distributed need not include anything that is
++normally distributed (in either source or binary form) with the major
+ components (compiler, kernel, and so on) of the operating system on
+ which the executable runs, unless that component itself accompanies
+ the executable.
+@@ -347,7 +368,7 @@ Library), the recipient automatically receives a license from the
+ original licensor to copy, distribute, link with or modify the Library
+ subject to these terms and conditions.  You may not impose any further
+ restrictions on the recipients' exercise of the rights granted herein.
+-You are not responsible for enforcing compliance by third parties to
++You are not responsible for enforcing compliance by third parties with
+ this License.
+ 
+   11. If, as a consequence of a court judgment or allegation of patent
+@@ -390,7 +411,7 @@ excluded.  In such case, this License incorporates the limitation as if
+ written in the body of this License.
+ 
+   13. The Free Software Foundation may publish revised and/or new
+-versions of the Library General Public License from time to time.
++versions of the Lesser General Public License from time to time.
+ Such new versions will be similar in spirit to the present version,
+ but may differ in detail to address new problems or concerns.
+ 
+@@ -453,18 +474,17 @@ convey the exclusion of warranty; and each file should have at least the
+     Copyright (C) <year>  <name of author>
+ 
+     This library is free software; you can redistribute it and/or
+-    modify it under the terms of the GNU Library General Public
++    modify it under the terms of the GNU Lesser General Public
+     License as published by the Free Software Foundation; either
+-    version 2 of the License, or (at your option) any later version.
++    version 2.1 of the License, or (at your option) any later version.
+ 
+     This library is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+-    Library General Public License for more details.
++    Lesser General Public License for more details.
+ 
+-    You should have received a copy of the GNU Library General Public
+-    License along with this library; if not, write to the Free Software
+-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
++    You should have received a copy of the GNU Lesser General Public
++    License along with this library; if not, see <https://www.gnu.org/licenses/>.
+ 
+ Also add information on how to contact you by electronic and paper mail.
+ 
+@@ -475,7 +495,7 @@ necessary.  Here is a sample; alter the names:
+   Yoyodyne, Inc., hereby disclaims all copyright interest in the
+   library `Frob' (a library for tweaking knobs) written by James Random Hacker.
+ 
+-  <signature of Ty Coon>, 1 April 1990
+-  Ty Coon, President of Vice
++  <signature of Moe Ghoul>, 1 April 1990
++  Moe Ghoul, President of Vice
+ 
+ That's all there is to it!
+diff --git a/cairomm/cairomm.h b/cairomm/cairomm.h
+index 19dad97..d6ff349 100644
+--- a/cairomm/cairomm.h
++++ b/cairomm/cairomm.h
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2005 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #ifndef __CAIROMM_H
+diff --git a/cairomm/context.cc b/cairomm/context.cc
+index aa217ba..9cab7bb 100644
+--- a/cairomm/context.cc
++++ b/cairomm/context.cc
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2005 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ /* M_PI is defined in math.h in the case of Microsoft Visual C++ */
+diff --git a/cairomm/context.h b/cairomm/context.h
+index b7ac222..80b6fbd 100644
+--- a/cairomm/context.h
++++ b/cairomm/context.h
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2005 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #ifndef __CAIROMM_CONTEXT_H
+diff --git a/cairomm/context_private.h b/cairomm/context_private.h
+index 3081dca..b9ab32e 100644
+--- a/cairomm/context_private.h
++++ b/cairomm/context_private.h
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2008 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #ifndef __CAIROMM_CONTEXT_PRIVATE_H
+diff --git a/cairomm/context_surface_quartz.cc b/cairomm/context_surface_quartz.cc
+index aa09763..158486e 100644
+--- a/cairomm/context_surface_quartz.cc
++++ b/cairomm/context_surface_quartz.cc
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2008 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #include <cairommconfig.h>
+diff --git a/cairomm/context_surface_win32.cc b/cairomm/context_surface_win32.cc
+index 6c520bb..d1be310 100644
+--- a/cairomm/context_surface_win32.cc
++++ b/cairomm/context_surface_win32.cc
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2008 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #include <cairommconfig.h>
+diff --git a/cairomm/context_surface_xlib.cc b/cairomm/context_surface_xlib.cc
+index 846d13e..62841cc 100644
+--- a/cairomm/context_surface_xlib.cc
++++ b/cairomm/context_surface_xlib.cc
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2008 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #include <cairommconfig.h>
+diff --git a/cairomm/device.cc b/cairomm/device.cc
+index cc8bdef..4a2beda 100644
+--- a/cairomm/device.cc
++++ b/cairomm/device.cc
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2010s The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #include <cairomm/device.h>
+diff --git a/cairomm/device.h b/cairomm/device.h
+index 227f4fb..f4b0463 100644
+--- a/cairomm/device.h
++++ b/cairomm/device.h
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2010 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #ifndef __CAIROMM_DEVICE_H
+diff --git a/cairomm/enums.h b/cairomm/enums.h
+index 0a92f32..2a480d8 100644
+--- a/cairomm/enums.h
++++ b/cairomm/enums.h
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2005 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #ifndef __CAIROMM_ENUMS_H
+diff --git a/cairomm/exception.cc b/cairomm/exception.cc
+index 3667401..b23e22a 100644
+--- a/cairomm/exception.cc
++++ b/cairomm/exception.cc
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2005 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #include <string>
+diff --git a/cairomm/exception.h b/cairomm/exception.h
+index 6af99b8..8c7194f 100644
+--- a/cairomm/exception.h
++++ b/cairomm/exception.h
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2005 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #ifndef __CAIRO_EXCEPTION_H
+diff --git a/cairomm/fontface.cc b/cairomm/fontface.cc
+index c9363df..3b213e8 100644
+--- a/cairomm/fontface.cc
++++ b/cairomm/fontface.cc
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2005 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #include <iostream>
+diff --git a/cairomm/fontface.h b/cairomm/fontface.h
+index 0919bea..e90d541 100644
+--- a/cairomm/fontface.h
++++ b/cairomm/fontface.h
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2005 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #ifndef __CAIROMM_FONTFACE_H
+diff --git a/cairomm/fontoptions.cc b/cairomm/fontoptions.cc
+index ea82037..9376b77 100644
+--- a/cairomm/fontoptions.cc
++++ b/cairomm/fontoptions.cc
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2005 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #include <cairomm/fontoptions.h>
+diff --git a/cairomm/fontoptions.h b/cairomm/fontoptions.h
+index c3c1f2c..31e2c4e 100644
+--- a/cairomm/fontoptions.h
++++ b/cairomm/fontoptions.h
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2005 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #ifndef __CAIROMM_FONTOPTIONS_H
+diff --git a/cairomm/matrix.cc b/cairomm/matrix.cc
+index 4a48f2c..4cf7962 100644
+--- a/cairomm/matrix.cc
++++ b/cairomm/matrix.cc
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2008 Jonathon Jongsma
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ #include <cairomm/matrix.h>
+ #include <cairomm/private.h>
+diff --git a/cairomm/matrix.h b/cairomm/matrix.h
+index 603576d..d1246e9 100644
+--- a/cairomm/matrix.h
++++ b/cairomm/matrix.h
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2008 Jonathon Jongsma
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ #ifndef __CAIROMM_MATRIX_H
+ #define __CAIROMM_MATRIX_H
+diff --git a/cairomm/path.cc b/cairomm/path.cc
+index 73e429b..954d0af 100644
+--- a/cairomm/path.cc
++++ b/cairomm/path.cc
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2005 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #include <cairomm/path.h>
+diff --git a/cairomm/path.h b/cairomm/path.h
+index d1f7d5f..e28c3ae 100644
+--- a/cairomm/path.h
++++ b/cairomm/path.h
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2005 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #ifndef __CAIROMM_PATH_H
+diff --git a/cairomm/pattern.cc b/cairomm/pattern.cc
+index af8c510..8cb5a58 100644
+--- a/cairomm/pattern.cc
++++ b/cairomm/pattern.cc
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2005 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #include <cairomm/pattern.h>
+diff --git a/cairomm/pattern.h b/cairomm/pattern.h
+index 8154ddf..165b2e7 100644
+--- a/cairomm/pattern.h
++++ b/cairomm/pattern.h
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2005 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #ifndef __CAIROMM_PATTERN_H
+diff --git a/cairomm/private.cc b/cairomm/private.cc
+index aaff833..e4955af 100644
+--- a/cairomm/private.cc
++++ b/cairomm/private.cc
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2005 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #include <cairommconfig.h> //For CAIROMM_EXCEPTIONS_ENABLED
+diff --git a/cairomm/private.h b/cairomm/private.h
+index 6b911b5..940e516 100644
+--- a/cairomm/private.h
++++ b/cairomm/private.h
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2005 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #ifndef __CAIROMM_PRIVATE_H
+diff --git a/cairomm/quartz_font.cc b/cairomm/quartz_font.cc
+index b30d1c5..d01bfad 100644
+--- a/cairomm/quartz_font.cc
++++ b/cairomm/quartz_font.cc
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2008 Jonathon Jongsma
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #include <cairomm/quartz_font.h>
+diff --git a/cairomm/quartz_font.h b/cairomm/quartz_font.h
+index 16fd479..0170287 100644
+--- a/cairomm/quartz_font.h
++++ b/cairomm/quartz_font.h
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2008 Jonathon Jongsma
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ #ifndef __CAIROMM_QUARTZ_FONT_H
+ #define __CAIROMM_QUARTZ_FONT_H
+diff --git a/cairomm/quartz_surface.cc b/cairomm/quartz_surface.cc
+index 2d7bfbc..d4f802d 100644
+--- a/cairomm/quartz_surface.cc
++++ b/cairomm/quartz_surface.cc
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2007 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #include <cairomm/quartz_surface.h>
+diff --git a/cairomm/quartz_surface.h b/cairomm/quartz_surface.h
+index 31737f7..b7f289d 100644
+--- a/cairomm/quartz_surface.h
++++ b/cairomm/quartz_surface.h
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2007 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #ifndef __CAIROMM_QUARTZ_SURFACE_H
+diff --git a/cairomm/refptr.h b/cairomm/refptr.h
+index e6b603f..fe0759c 100644
+--- a/cairomm/refptr.h
++++ b/cairomm/refptr.h
+@@ -3,19 +3,17 @@
+ /* Copyright 2005 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #include <memory>
+diff --git a/cairomm/region.cc b/cairomm/region.cc
+index e5a5e7c..8bcb295 100644
+--- a/cairomm/region.cc
++++ b/cairomm/region.cc
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2005 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #include <cairomm/region.h>
+diff --git a/cairomm/region.h b/cairomm/region.h
+index 632344d..1178e30 100644
+--- a/cairomm/region.h
++++ b/cairomm/region.h
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2010 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #ifndef __CAIROMM_REGION_H
+diff --git a/cairomm/scaledfont.cc b/cairomm/scaledfont.cc
+index 4974e90..72d3334 100644
+--- a/cairomm/scaledfont.cc
++++ b/cairomm/scaledfont.cc
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2006 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #include <cairomm/scaledfont.h>
+diff --git a/cairomm/scaledfont.h b/cairomm/scaledfont.h
+index fa76bb0..1829b33 100644
+--- a/cairomm/scaledfont.h
++++ b/cairomm/scaledfont.h
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2006 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #ifndef __CAIROMM_SCALEDFONT_H
+diff --git a/cairomm/script.cc b/cairomm/script.cc
+index 2f705c9..96ee00e 100644
+--- a/cairomm/script.cc
++++ b/cairomm/script.cc
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2014 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #include <cairomm/script_surface.h>
+diff --git a/cairomm/script.h b/cairomm/script.h
+index 5a27417..cf739a3 100644
+--- a/cairomm/script.h
++++ b/cairomm/script.h
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2014 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #ifndef __CAIROMM_SCRIPT_H
+diff --git a/cairomm/script_surface.cc b/cairomm/script_surface.cc
+index 6de10b0..f2b5ff6 100644
+--- a/cairomm/script_surface.cc
++++ b/cairomm/script_surface.cc
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2014 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #include <cairomm/script_surface.h>
+diff --git a/cairomm/script_surface.h b/cairomm/script_surface.h
+index f2fc076..40f79d5 100644
+--- a/cairomm/script_surface.h
++++ b/cairomm/script_surface.h
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2014 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #ifndef __CAIROMM_SCRIPT_SURFACE_H
+diff --git a/cairomm/surface.cc b/cairomm/surface.cc
+index 275c2ae..68a8bc9 100644
+--- a/cairomm/surface.cc
++++ b/cairomm/surface.cc
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2005 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #include <cairomm/surface.h>
+diff --git a/cairomm/surface.h b/cairomm/surface.h
+index 01ef589..111e7f5 100644
+--- a/cairomm/surface.h
++++ b/cairomm/surface.h
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2005 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #ifndef __CAIROMM_SURFACE_H
+diff --git a/cairomm/types.h b/cairomm/types.h
+index 80f7a5c..4bbe11d 100644
+--- a/cairomm/types.h
++++ b/cairomm/types.h
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2008 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ #ifndef __CAIROMM_TYPES_H
+ #define __CAIROMM_TYPES_H
+diff --git a/cairomm/win32_font.cc b/cairomm/win32_font.cc
+index e923109..0c154c9 100644
+--- a/cairomm/win32_font.cc
++++ b/cairomm/win32_font.cc
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2008 Jonathon Jongsma
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #include <cairomm/win32_font.h>
+diff --git a/cairomm/win32_font.h b/cairomm/win32_font.h
+index 65d50e7..ff19f42 100644
+--- a/cairomm/win32_font.h
++++ b/cairomm/win32_font.h
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2008 Jonathon Jongsma
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ #ifndef __CAIROMM_WIN32_FONT_H
+ #define __CAIROMM_WIN32_FONT_H
+diff --git a/cairomm/win32_surface.cc b/cairomm/win32_surface.cc
+index b734c62..1185bf6 100644
+--- a/cairomm/win32_surface.cc
++++ b/cairomm/win32_surface.cc
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2005 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #include <cairomm/win32_surface.h>
+diff --git a/cairomm/win32_surface.h b/cairomm/win32_surface.h
+index d421bd3..4aa8322 100644
+--- a/cairomm/win32_surface.h
++++ b/cairomm/win32_surface.h
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2005 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #ifndef __CAIROMM_WIN32_SURFACE_H
+diff --git a/cairomm/xlib_surface.cc b/cairomm/xlib_surface.cc
+index 69c0fcc..bdb14df 100644
+--- a/cairomm/xlib_surface.cc
++++ b/cairomm/xlib_surface.cc
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2005 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #include <cairomm/xlib_surface.h>
+diff --git a/cairomm/xlib_surface.h b/cairomm/xlib_surface.h
+index 24e5a29..5d4e46c 100644
+--- a/cairomm/xlib_surface.h
++++ b/cairomm/xlib_surface.h
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2005 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ #ifndef __CAIROMM_XLIB_SURFACE_H
+diff --git a/examples/text/text-rotate.cc b/examples/text/text-rotate.cc
+index a38c590..feab046 100644
+--- a/examples/text/text-rotate.cc
++++ b/examples/text/text-rotate.cc
+@@ -1,19 +1,17 @@
+ /* Copyright (C) 2008 The cairomm Development Team
+  *
+  * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
++ * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
++ * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+- * 02110-1301, USA.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+  */
+ 
+ /* M_PI is defined in math.h in the case of Microsoft Visual C++, and
+-- 
+GitLab
+

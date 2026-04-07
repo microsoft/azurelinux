@@ -1,0 +1,26 @@
+From fe43f40a7acfd93493ac587a74e147732a39c782 Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Tue, 15 Jul 2025 18:06:55 +0100
+Subject: [PATCH 2/2] TEMPORARY: increase test timeout
+
+https://gitlab.com/qemu-project/qemu/-/issues/3035
+---
+ tests/unit/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/unit/meson.build b/tests/unit/meson.build
+index d5248ae51d..a490fe0316 100644
+--- a/tests/unit/meson.build
++++ b/tests/unit/meson.build
+@@ -176,7 +176,7 @@ slow_tests = {
+   'test-crypto-block' : 300,
+   'test-crypto-tlscredsx509': 90,
+   'test-crypto-tlssession': 90,
+-  'test-replication': 60,
++  'test-replication': 6000,
+ }
+ 
+ foreach test_name, extra: tests
+-- 
+2.50.1
+

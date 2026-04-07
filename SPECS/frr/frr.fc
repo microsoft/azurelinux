@@ -1,0 +1,30 @@
+/usr/libexec/frr/(.*)?              gen_context(system_u:object_r:frr_exec_t,s0)
+
+/usr/lib/systemd/system/frr.*   gen_context(system_u:object_r:frr_unit_file_t,s0)
+
+/etc/frr(/.*)?                  gen_context(system_u:object_r:frr_conf_t,s0)
+
+/var/log/frr(/.*)?              gen_context(system_u:object_r:frr_log_t,s0)
+/var/tmp/frr(/.*)?              gen_context(system_u:object_r:frr_tmp_t,s0)
+/var/lib/frr(/.*)?              gen_context(system_u:object_r:frr_var_lib_t,s0)
+
+/run/lock/subsys/bfdd       --  gen_context(system_u:object_r:frr_lock_t,s0)
+/run/lock/subsys/bgpd       --  gen_context(system_u:object_r:frr_lock_t,s0)
+/run/lock/subsys/eigrpd     --  gen_context(system_u:object_r:frr_lock_t,s0)
+/run/lock/subsys/fabricd    --  gen_context(system_u:object_r:frr_lock_t,s0)
+/run/lock/subsys/isisd      --  gen_context(system_u:object_r:frr_lock_t,s0)
+/run/lock/subsys/nhrpd      --  gen_context(system_u:object_r:frr_lock_t,s0)
+/run/lock/subsys/ospf6d     --  gen_context(system_u:object_r:frr_lock_t,s0)
+/run/lock/subsys/ospfd      --  gen_context(system_u:object_r:frr_lock_t,s0)
+/run/lock/subsys/pbrd       --  gen_context(system_u:object_r:frr_lock_t,s0)
+/run/lock/subsys/pimd       --  gen_context(system_u:object_r:frr_lock_t,s0)
+/run/lock/subsys/ripd       --  gen_context(system_u:object_r:frr_lock_t,s0)
+/run/lock/subsys/ripngd     --  gen_context(system_u:object_r:frr_lock_t,s0)
+/run/lock/subsys/staticd    --  gen_context(system_u:object_r:frr_lock_t,s0)
+/run/lock/subsys/zebra      --  gen_context(system_u:object_r:frr_lock_t,s0)
+/run/lock/subsys/vrrpd      --  gen_context(system_u:object_r:frr_lock_t,s0)
+/run/lock/subsys/pathd      --  gen_context(system_u:object_r:frr_lock_t,s0)
+
+/run/frr(/.*)?              gen_context(system_u:object_r:frr_var_run_t,s0)
+
+/usr/bin/vtysh              --  gen_context(system_u:object_r:frr_exec_t,s0)

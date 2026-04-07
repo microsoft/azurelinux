@@ -1,0 +1,21 @@
+--- ring-0.17.14/Cargo.toml	1970-01-01T00:00:01+00:00
++++ ring-0.17.14/Cargo.toml	2025-03-27T20:40:55.018179+00:00
+@@ -157,7 +157,7 @@
+     "cryptography",
+     "no-std",
+ ]
+-license = "Apache-2.0 AND ISC"
++license = "Apache-2.0 AND ISC AND (MIT OR Apache-2.0)"
+ repository = "https://github.com/briansmith/ring"
+ 
+ [package.metadata.docs.rs]
+@@ -175,9 +175,6 @@
+ slow_tests = []
+ std = ["alloc"]
+ test_logging = []
+-unstable-testing-arm-no-hw = []
+-unstable-testing-arm-no-neon = []
+-wasm32_unknown_unknown_js = ["getrandom/js"]
+ 
+ [lib]
+ name = "ring"

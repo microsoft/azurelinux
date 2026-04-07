@@ -1,0 +1,29 @@
+From 04f396231ea859e61ca2d9c68e1c1815280d347e Mon Sep 17 00:00:00 2001
+From: Petr Mensik <pemensik@redhat.com>
+Date: Mon, 16 Oct 2023 20:14:32 +0200
+Subject: [PATCH] Force new interface enumeration when DBus settings
+
+If new servers arrive from dbus, run always full interface enumeration.
+If interfaces were specified we need to update interface numbers if they
+have changed since the last time we checked them.
+---
+ src/network.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/src/network.c b/src/network.c
+index 1e41a78..fc6337b 100644
+--- a/src/network.c
++++ b/src/network.c
+@@ -1564,8 +1564,7 @@ void check_servers(int no_loop_check)
+   mark_servers(0);
+   
+  /* interface may be new since startup */
+-  if (!option_bool(OPT_NOWILD))
+-    enumerate_interfaces(0);
++  enumerate_interfaces(0);
+ 
+   /* don't garbage collect pre-allocated sfds. */
+   for (sfd = daemon->sfds; sfd; sfd = sfd->next)
+-- 
+2.41.0
+

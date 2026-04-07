@@ -1,0 +1,47 @@
+diff -up opencryptoki-3.24.0/misc/tmpfiles.conf.in.me opencryptoki-3.24.0/misc/tmpfiles.conf.in
+--- opencryptoki-3.24.0/misc/tmpfiles.conf.in.me	2025-02-04 16:59:16.072468667 +0100
++++ opencryptoki-3.24.0/misc/tmpfiles.conf.in	2025-02-04 17:02:06.151451176 +0100
+@@ -1,5 +1,8 @@
+ # path          mode    uid     gid     age
+ D /run/opencryptoki 710 @pkcsslotd_user@ @pkcs_group@ -
+ d @localstatedir@/lib/opencryptoki 0770 root @pkcs_group@ -
++d @localstatedir@/lib/opencryptoki/HSM_MK_CHANGE 770 root @pkcs_group@ -
++z /etc/opencryptoki/p11sak_defined_attrs.conf 0640 root pkcs11 -
++z /etc/opencryptoki/strength.conf 0640 root pkcs11 -
+ d @logdir@      0770    root    @pkcs_group@  -
+ D @lockdir@     0770    root    @pkcs_group@  -
+diff -Nur opencryptoki-3.24.0.me/opencryptoki-ccatok.conf opencryptoki-3.24.0/opencryptoki-ccatok.conf
+--- opencryptoki-3.24.0.me/opencryptoki-ccatok.conf	1970-01-01 01:00:00.000000000 +0100
++++ opencryptoki-3.24.0/opencryptoki-ccatok.conf	2025-03-12 15:40:01.270065049 +0100
+@@ -0,0 +1,2 @@
++d /var/lib/opencryptoki/ccatok 770 root pkcs11 -
++d /var/lib/opencryptoki/ccatok/TOK_OBJ 770 root pkcs11 -
+diff -Nur opencryptoki-3.24.0.me/opencryptoki-ep11tok.conf opencryptoki-3.24.0/opencryptoki-ep11tok.conf
+--- opencryptoki-3.24.0.me/opencryptoki-ep11tok.conf	1970-01-01 01:00:00.000000000 +0100
++++ opencryptoki-3.24.0/opencryptoki-ep11tok.conf	2025-03-12 15:40:01.270122658 +0100
+@@ -0,0 +1,2 @@
++d /var/lib/opencryptoki/ep11tok 770 root pkcs11 -
++d /var/lib/opencryptoki/ep11tok/TOK_OBJ 770 root pkcs11 -
+diff -Nur opencryptoki-3.24.0.me/opencryptoki-icatok.conf opencryptoki-3.24.0/opencryptoki-icatok.conf
+--- opencryptoki-3.24.0.me/opencryptoki-icatok.conf	1970-01-01 01:00:00.000000000 +0100
++++ opencryptoki-3.24.0/opencryptoki-icatok.conf	2025-03-12 15:40:01.270168936 +0100
+@@ -0,0 +1,2 @@
++d /var/lib/opencryptoki/lite 770 root pkcs11 -
++d /var/lib/opencryptoki/lite/TOK_OBJ 770 root pkcs11 -
+diff -Nur opencryptoki-3.24.0.me/opencryptoki-icsftok.conf opencryptoki-3.24.0/opencryptoki-icsftok.conf
+--- opencryptoki-3.24.0.me/opencryptoki-icsftok.conf	1970-01-01 01:00:00.000000000 +0100
++++ opencryptoki-3.24.0/opencryptoki-icsftok.conf	2025-03-12 15:40:01.270213441 +0100
+@@ -0,0 +1 @@
++d /var/lib/opencryptoki/icsf 770 root pkcs11 -
+diff -Nur opencryptoki-3.24.0.me/opencryptoki-swtok.conf opencryptoki-3.24.0/opencryptoki-swtok.conf
+--- opencryptoki-3.24.0.me/opencryptoki-swtok.conf	1970-01-01 01:00:00.000000000 +0100
++++ opencryptoki-3.24.0/opencryptoki-swtok.conf	2025-03-12 15:40:01.270256492 +0100
+@@ -0,0 +1,3 @@
++# path          mode    uid     gid     age
++d /var/lib/opencryptoki/swtok 770 root pkcs11 -
++d /var/lib/opencryptoki/swtok/TOK_OBJ 770 root pkcs11 -
+diff -Nur opencryptoki-3.24.0.me/opencryptoki-tpmtok.conf opencryptoki-3.24.0/opencryptoki-tpmtok.conf
+--- opencryptoki-3.24.0.me/opencryptoki-tpmtok.conf	1970-01-01 01:00:00.000000000 +0100
++++ opencryptoki-3.24.0/opencryptoki-tpmtok.conf	2025-03-12 15:40:01.270339921 +0100
+@@ -0,0 +1 @@
++d /var/lib/opencryptoki/tpm 770 root pkcs11 -

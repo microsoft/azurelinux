@@ -1,0 +1,62 @@
+No ENGINE_* APIs are used anymore.
+
+diff --git a/src/tss2-esys/esys_crypto_ossl.c b/src/tss2-esys/esys_crypto_ossl.c
+index 1620788..b990f6e 100644
+--- a/src/tss2-esys/esys_crypto_ossl.c
++++ b/src/tss2-esys/esys_crypto_ossl.c
+@@ -19,7 +19,6 @@
+ #include <openssl/params.h>
+ #include <openssl/param_build.h>
+ #endif
+-#include <openssl/engine.h>
+ #include <stdio.h>
+ 
+ #include "tss2_esys.h"
+diff --git a/test/integration/fapi-data-crypt.int.c b/test/integration/fapi-data-crypt.int.c
+index 07437b6..cc0dfd6 100644
+--- a/test/integration/fapi-data-crypt.int.c
++++ b/test/integration/fapi-data-crypt.int.c
+@@ -15,7 +15,6 @@
+ 
+ #include <openssl/evp.h>
+ #include <openssl/rsa.h>
+-#include <openssl/engine.h>
+ #include <openssl/pem.h>
+ 
+ #include "tss2_fapi.h"
+diff --git a/test/integration/fapi-ext-public-key.int.c b/test/integration/fapi-ext-public-key.int.c
+index 787a6c9..5d30d2c 100644
+--- a/test/integration/fapi-ext-public-key.int.c
++++ b/test/integration/fapi-ext-public-key.int.c
+@@ -11,7 +11,6 @@
+ #include <openssl/evp.h>
+ #include <openssl/aes.h>
+ #include <openssl/rsa.h>
+-#include <openssl/engine.h>
+ #include <openssl/pem.h>
+ #include <stdio.h>
+ #include <stddef.h>
+diff --git a/test/integration/fapi-key-create-policy-signed-keyedhash.int.c b/test/integration/fapi-key-create-policy-signed-keyedhash.int.c
+index f9f4131..d65ea10 100644
+--- a/test/integration/fapi-key-create-policy-signed-keyedhash.int.c
++++ b/test/integration/fapi-key-create-policy-signed-keyedhash.int.c
+@@ -17,7 +17,6 @@
+ 
+ #include <openssl/evp.h>
+ #include <openssl/hmac.h>
+-#include <openssl/engine.h>
+ #include <openssl/pem.h>
+ 
+ #include "tss2_fapi.h"
+diff --git a/test/integration/fapi-key-create-policy-signed.int.c b/test/integration/fapi-key-create-policy-signed.int.c
+index d20554a..0eb848e 100644
+--- a/test/integration/fapi-key-create-policy-signed.int.c
++++ b/test/integration/fapi-key-create-policy-signed.int.c
+@@ -17,7 +17,6 @@
+ 
+ #include <openssl/evp.h>
+ #include <openssl/rsa.h>
+-#include <openssl/engine.h>
+ #include <openssl/pem.h>
+ 
+ #include "tss2_fapi.h"

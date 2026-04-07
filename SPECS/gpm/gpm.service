@@ -1,0 +1,33 @@
+[Unit]
+Description=Console Mouse Manager
+ConditionVirtualization=!container
+
+# This could probably benefit from socket activation, but honestly I think it
+# is time for gpm to go away, and hence I am not planning to spend the time
+# to add socket activation here.
+
+[Service]
+ExecStart=gpm -m /dev/input/mice -t exps2
+Type=forking
+PIDFile=/run/gpm.pid
+
+ProtectSystem=full
+ProtectHome=yes
+ProtectProc=invisible
+ProtectControlGroups=yes
+ProtectKernelTunables=yes
+PrivateNetwork=yes
+CapabilityBoundingSet=CAP_DAC_OVERRIDE CAP_SYS_ADMIN
+DeviceAllow=char-tty
+DeviceAllow=char-input
+# See also https://github.com/systemd/systemd/pull/21350
+SystemCallFilter=@basic-io @io-event @network-io @file-system @process @signal ioctl mprotect setsid
+SystemCallArchitectures=native
+SystemCallErrorNumber=EPERM
+RestrictAddressFamilies=AF_UNIX
+
+# Note that "special commands" are disallowed by default.
+# To enable, add '-S' to ExecStart= line, and tweak the SystemCallFilter= as appropriate.
+
+[Install]
+WantedBy=multi-user.target

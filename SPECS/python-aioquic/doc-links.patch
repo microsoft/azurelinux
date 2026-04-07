@@ -1,0 +1,14 @@
+diff -ruN aioquic-1.2.0/docs/conf.py aioquic-1.2.0-mod/docs/conf.py
+--- aioquic-1.2.0/docs/conf.py	2024-07-07 02:01:24.000000000 +0300
++++ aioquic-1.2.0-mod/docs/conf.py	2024-11-22 16:32:38.654856862 +0300
+@@ -29,8 +29,8 @@
+     "sphinx_aioquic",
+ ]
+ intersphinx_mapping = {
+-    "cryptography": ("https://cryptography.io/en/latest", None),
+-    "python": ("https://docs.python.org/3", None),
++    "cryptography": ("https://cryptography.io/en/latest", "cryptography.inv",),
++    "python": ("https://docs.python.org/3", "python.inv",),
+ }
+ 
+ # Add any paths that contain templates here, relative to this directory.

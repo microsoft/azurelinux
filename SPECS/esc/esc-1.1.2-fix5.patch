@@ -1,0 +1,12 @@
+diff -up ./esc/src/lib/nss-http-client/httpClientNss.cpp.fix5 ./esc/src/lib/nss-http-client/httpClientNss.cpp
+--- ./esc/src/lib/nss-http-client/httpClientNss.cpp.fix5	2019-10-29 11:16:36.042807434 -0700
++++ ./esc/src/lib/nss-http-client/httpClientNss.cpp	2019-10-29 11:18:22.169301918 -0700
+@@ -172,6 +172,8 @@ PSHttpResponse *HttpClientNss::httpSendC
+  
+     request.addHeader( "Content-Type", "text/plain" );
+ 
++    request.setMethod(method);
++
+     if(cb)
+     {
+         request.setChunkedCallback(cb);

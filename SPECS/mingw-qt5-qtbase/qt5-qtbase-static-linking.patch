@@ -1,0 +1,67 @@
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/mkspecs/features/default_post.prf qtbase-everywhere-src-5.15.18-new/mkspecs/features/default_post.prf
+--- qtbase-everywhere-src-5.15.18/mkspecs/features/default_post.prf	2025-06-05 16:07:26.000000000 +0200
++++ qtbase-everywhere-src-5.15.18-new/mkspecs/features/default_post.prf	2025-11-07 14:10:32.230400558 +0100
+@@ -1,5 +1,14 @@
+ # This file is loaded by qmake right after loading the actual project file.
+ 
++win32:contains(CONFIG, static) {
++        # Ensure defines are set correctly for static build
++        DEFINES -= QT_SHARED
++        DEFINES *= QT_STATIC QT_DESIGNER_STATIC DBUS_STATIC_BUILD PCRE_STATIC PCRE2_STATIC
++        contains(QT_CONFIG, angle): DEFINES *= QT_OPENGL_ES_2_ANGLE_STATIC
++        # Ensure we link against all dependencies statically
++        QMAKE_LFLAGS += -static -static-libstdc++ -static-libgcc
++}
++
+ contains(TEMPLATE, ".*(lib|app)"):CONFIG += have_target
+ 
+ !have_target:!force_qt: CONFIG -= qt
+@@ -130,18 +139,11 @@ c++latest: CONFIG *= c++2b c++2a c++1z c
+     !greaterThan(QT_COMPILER_STDCXX_no_L, 199711): CONFIG += c++11
+ }
+ c++11|c++14|c++1z|c++2a|c++2b {
+-    # Disable special compiler flags for host builds
+-    !host_build|!cross_compile {
+-        c++2b:       cxxstd = CXX2B
+-        else: c++2a: cxxstd = CXX2A
+-        else: c++1z: cxxstd = CXX1Z
+-        else: c++14: cxxstd = CXX14
+-        else:        cxxstd = CXX11
+-    } else {
+-        # Fall back to c++11, because since 5.7 c++11 is required everywhere,
+-        # including host builds
+-        cxxstd = CXX11
+-    }
++    c++2b:       cxxstd = CXX2B
++    else: c++2a: cxxstd = CXX2A
++    else: c++1z: cxxstd = CXX1Z
++    else: c++14: cxxstd = CXX14
++    else:        cxxstd = CXX11
+ 
+     # Check if we should disable compiler extensions or not
+     isEmpty(QMAKE_CXXFLAGS_GNU$$cxxstd) {
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/mkspecs/features/qt.prf qtbase-everywhere-src-5.15.18-new/mkspecs/features/qt.prf
+--- qtbase-everywhere-src-5.15.18/mkspecs/features/qt.prf	2025-11-07 14:10:26.537802210 +0100
++++ qtbase-everywhere-src-5.15.18-new/mkspecs/features/qt.prf	2025-11-07 14:10:32.230651988 +0100
+@@ -259,6 +259,21 @@ for(ever) {
+             !isEmpty(MODULE_WINRT_CAPABILITIES_DEVICE): \
+                 WINRT_MANIFEST.capabilities_device_default += $$MODULE_WINRT_CAPABILITIES_DEVICE
+         }
++
++        # Ensure linking against all required static libraries as defined in mingw-w64-g++ mkspec
++        win32:contains(CONFIG, static) {
++            isEqual(MODULE_NAME, QtCore) {
++                LIBS$$var_sfx += $$QMAKE_LIBS_CORE
++            } else:isEqual(MODULE_NAME, QtGui) {
++                LIBS$$var_sfx += $$QMAKE_LIBS_GUI
++            } else:isEqual(MODULE_NAME, QtNetwork) {
++                LIBS$$var_sfx += $$QMAKE_LIBS_NETWORK
++            } else:isEqual(MODULE_NAME, QtDBus) {
++                LIBS$$var_sfx += $$QMAKE_LIBS_DBUS
++            } else:isEqual(MODULE_NAME, QtOpenGL) {
++                LIBS$$var_sfx += $$QMAKE_LIBS_OPENGL
++            }
++        }
+     }
+     !isEmpty(BAD_QT):error("Unknown module(s) in QT$$var_sfx: $$replace(BAD_QT, _private$, -private)")
+ 

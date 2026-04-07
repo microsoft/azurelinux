@@ -1,0 +1,61 @@
+From 82bed46bc78089656a28c4daca0901f7b3f409a7 Mon Sep 17 00:00:00 2001
+From: Siteshwar Vashisht <svashisht@redhat.com>
+Date: Thu, 21 Feb 2019 15:26:38 +0100
+Subject: [PATCH] Upstream says it's up to distributions to add a way to
+ support local-magic.
+
+---
+ magic/magic.local | 2 ++
+ src/Makefile.am   | 2 +-
+ src/Makefile.in   | 2 +-
+ src/apprentice.c  | 2 +-
+ 4 files changed, 5 insertions(+), 3 deletions(-)
+ create mode 100644 magic/magic.local
+
+diff --git a/magic/magic.local b/magic/magic.local
+new file mode 100644
+index 0000000..33580e4
+--- /dev/null
++++ b/magic/magic.local
+@@ -0,0 +1,2 @@
++# Magic local data for file(1) command.
++# Insert here your local magic data. Format is described in magic(5).
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 64c0414..fb04b7e 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -1,4 +1,4 @@
+-MAGIC = $(pkgdatadir)/magic
++MAGIC = /etc/magic:$(pkgdatadir)/magic
+ lib_LTLIBRARIES = libmagic.la
+ nodist_include_HEADERS = magic.h
+ 
+diff --git a/src/Makefile.in b/src/Makefile.in
+index a7ced28..091e89f 100644
+--- a/src/Makefile.in
++++ b/src/Makefile.in
+@@ -359,7 +359,7 @@ target_alias = @target_alias@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+-MAGIC = $(pkgdatadir)/magic
++MAGIC = /etc/magic:$(pkgdatadir)/magic
+ lib_LTLIBRARIES = libmagic.la
+ nodist_include_HEADERS = magic.h
+ AM_CPPFLAGS = -DMAGIC='"$(MAGIC)"'
+diff --git a/src/apprentice.c b/src/apprentice.c
+index cf040cd..080cfe7 100644
+--- a/src/apprentice.c
++++ b/src/apprentice.c
+@@ -495,7 +495,7 @@ apprentice_1(struct magic_set *ms, const char *fn, int action)
+ #ifndef COMPILE_ONLY
+ 	map = apprentice_map(ms, fn);
+ 	if (map == NULL) {
+-		if (ms->flags & MAGIC_CHECK)
++		if (ms->flags & MAGIC_CHECK && strcmp("/etc/magic", fn) != 0)
+ 			file_magwarn(ms, "using regular magic file `%s'", fn);
+ 		map = apprentice_load(ms, fn, action);
+ 		if (map == NULL)
+-- 
+2.47.0
+

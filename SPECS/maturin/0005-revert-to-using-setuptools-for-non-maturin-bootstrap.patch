@@ -1,0 +1,30 @@
+From cc78b683075ebf8e096013c2ef09b2615875acd1 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Tue, 23 Sep 2025 22:47:53 +0200
+Subject: [PATCH 5/6] revert to using setuptools for non-maturin bootstrap
+ build
+
+---
+ pyproject.toml | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index c1fcb4b1..5cf98f5e 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -3,10 +3,9 @@
+ requires = [
+     "setuptools>=77.0.0",
+     "tomli>=1.1.0 ; python_version<'3.11'",
+-    "setuptools-rust>=1.11.0",
++    "setuptools-rust>=1.4.0",
+ ]
+-backend-path = ["maturin"]
+-build-backend = "bootstrap"
++build-backend = "setuptools.build_meta"
+ 
+ [project]
+ name = "maturin"
+-- 
+2.52.0
+

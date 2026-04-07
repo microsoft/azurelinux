@@ -1,0 +1,42 @@
+From 10594f38bcccdb4bd3ea8478e84f264a06153077 Mon Sep 17 00:00:00 2001
+From: David Edmundson <davidedmundson@kde.org>
+Date: Wed, 7 Jun 2023 22:12:15 +0100
+Subject: [PATCH 47/55] client: Fix crash on dnd updates after client facing
+ drag ends
+
+A platform drag and a application-facing drag have two different
+lifespans.
+
+The platform drag lasts until all mimedata is transferred and the client
+receiving the drops marks it as finished.
+
+The application facing QDrag lasts until the client deletes it. We can
+get a crash if we get updates during this time.
+
+The drop event is guarded, but not the action negotiation.
+
+Pick-to: 6.6
+Change-Id: Ib9c047f04d65883105d4cd3f169637d0e038a63f
+Reviewed-by: Eskil Abrahamsen Blomfeldt <eskil.abrahamsen-blomfeldt@qt.io>
+(cherry picked from commit 22daca49b807fefba58113a06b86df4274e49f62)
+---
+ src/client/qwaylanddatadevice.cpp | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/client/qwaylanddatadevice.cpp b/src/client/qwaylanddatadevice.cpp
+index 5c5b8485..c57f1a49 100644
+--- a/src/client/qwaylanddatadevice.cpp
++++ b/src/client/qwaylanddatadevice.cpp
+@@ -138,6 +138,9 @@ bool QWaylandDataDevice::startDrag(QMimeData *mimeData, Qt::DropActions supporte
+     connect(m_dragSource.data(), &QWaylandDataSource::cancelled, this, &QWaylandDataDevice::dragSourceCancelled);
+     connect(m_dragSource.data(), &QWaylandDataSource::dndResponseUpdated, this, [this](bool accepted, Qt::DropAction action) {
+             auto drag = static_cast<QWaylandDrag *>(QGuiApplicationPrivate::platformIntegration()->drag());
++            if (!drag->currentDrag()) {
++                return;
++            }
+             // in old versions drop action is not set, so we guess
+             if (wl_data_source_get_version(m_dragSource->object()) < 3) {
+                 drag->setResponse(accepted);
+-- 
+2.51.1
+

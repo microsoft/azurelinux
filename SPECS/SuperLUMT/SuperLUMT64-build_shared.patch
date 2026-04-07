@@ -1,0 +1,63 @@
+--- SRC/Makefile.orig	2016-03-26 08:47:18.885503561 -0400
++++ SRC/Makefile	2016-03-26 08:52:10.512497969 -0400
+@@ -101,36 +101,40 @@
+ 
+ all:    single double complex complex16
+ 
+-single: $(SLUSRC) $(ALLAUX) $(SZAUX)
+-	$(ARCH) $(ARCHFLAGS) ../lib/$(SUPERLULIB) $(SLUSRC) $(ALLAUX) $(SZAUX)
+-	$(RANLIB) ../lib/$(SUPERLULIB)
+-
+-double: $(DLUSRC) $(ALLAUX) $(DZAUX)
+-	$(ARCH) $(ARCHFLAGS) ../lib/$(SUPERLULIB) $(DLUSRC) $(ALLAUX) $(DZAUX)
+-	$(RANLIB) ../lib/$(SUPERLULIB)
+-
+-complex: $(CLUSRC) $(ALLAUX) $(SZAUX)
+-	$(ARCH) $(ARCHFLAGS) ../lib/$(SUPERLULIB) $(CLUSRC) $(ALLAUX) $(SZAUX)
+-	$(RANLIB) ../lib/$(SUPERLULIB)
+-
+-complex16: $(ZLUSRC) $(ALLAUX) $(DZAUX)
+-	$(ARCH) $(ARCHFLAGS) ../lib/$(SUPERLULIB) $(ZLUSRC) $(ALLAUX) $(DZAUX)
+-	$(RANLIB) ../lib/$(SUPERLULIB)
++single: $(SLUSRC) $(ALLAUX) $(SZAUX) $(SLASRC)
++	$(CC) $(LDFLAGS) $(BLASLIB) $(MFLIB) $(MATHLIB) -shared -Wl,-soname,libsuperlumt64_s.so.$(SONAME) -o libsuperlumt64_s.so.$(SONAME) \
++	$(SLUSRC) $(ALLAUX) $(SZAUX) $(SLASRC)
++	ln -sf libsuperlumt64_s.so.$(SONAME) libsuperlumt64_s.so
++
++double: $(DLUSRC) $(ALLAUX) $(DZAUX) $(DLASRC)
++	$(CC) $(LDFLAGS) $(BLASLIB) $(MFLIB) $(MATHLIB) -shared -Wl,-soname,libsuperlumt64_d.so.$(SONAME) -o libsuperlumt64_d.so.$(SONAME) \
++	$(DLUSRC) $(ALLAUX) $(DZAUX) $(DLASRC)
++	ln -sf libsuperlumt64_d.so.$(SONAME) libsuperlumt64_d.so
++
++complex: $(CLUSRC) $(ALLAUX) $(SZAUX) $(CLASRC)
++	$(CC) $(LDFLAGS) $(BLASLIB) $(MFLIB) $(MATHLIB) -shared -Wl,-soname,libsuperlumt64_c.so.$(SONAME) -o libsuperlumt64_c.so.$(SONAME) \
++	$(CLUSRC) $(ALLAUX) $(SZAUX) $(CLASRC)
++	ln -sf libsuperlumt64_c.so.$(SONAME) libsuperlumt64_c.so
++
++complex16: $(ZLUSRC) $(ALLAUX) $(DZAUX) $(ZLASRC)
++	$(CC) $(LDFLAGS) $(BLASLIB) $(MFLIB) $(MATHLIB) -shared -Wl,-soname,libsuperlumt64_z.so.$(SONAME) -o libsuperlumt64_z.so.$(SONAME) \
++	$(ZLUSRC) $(ALLAUX) $(DZAUX) $(ZLASRC)
++	ln -sf libsuperlumt64_z.so.$(SONAME) libsuperlumt64_z.so
+ 
+ ##################################
+ # Do not optimize this routine   #
+ ##################################
+-dlamch.o: dlamch.c ; $(CC) -c $(NOOPTS) $<
+-slamch.o: slamch.c ; $(CC) -c $(NOOPTS) $<
+-superlu_timer.o:  superlu_timer.c ; $(CC) -c $(PREDEFS) $(NOOPTS) $<
+-dclock.o:  dclock.c ; $(CC) -c $(PREDEFS) $(NOOPTS) $<
++slamch.o: slamch.c ; $(CC) -fPIC $(BLASLIB) -c $(NOOPTS) $(CDEFS) $<
++dlamch.o: dlamch.c ; $(CC) -fPIC $(BLASLIB) -c $(NOOPTS) $(CDEFS) $<
++superlu_timer.o:  superlu_timer.c ; $(CC) -fPIC $(BLASLIB) -c $(NOOPTS) $<
++dclock.o:  dclock.c ; $(CC) -fPIC $(BLASLIB) -c $(NOOPTS) $(CDEFS) $<
+ 
+ # Do not optimize this on Cray; related to 'volatile' variable.
+ await.o: await.c
+ 	$(CC) -c $(NOOPTS) $< $(VERBOSE)
+ 
+ .c.o:
+-	$(CC) $(CFLAGS) $(CDEFS) $(BLASDEF) -c $< $(VERBOSE)
++	$(CC) $(CFLAGS) $(CDEFS) $(BLASDEF) $(BLASLIB) -c $< $(VERBOSE)
+ 
+ clean:	
+ 	rm -f *.o core ../lib/$(SUPERLULIB)

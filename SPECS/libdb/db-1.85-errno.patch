@@ -1,0 +1,89 @@
+glibc doesn't like errno as the name of a field.
+--- db.1.85/hash/hash.h	Mon Feb 18 19:12:14 2002
++++ db.1.85/hash/hash.h	Mon Feb 18 19:12:20 2002
+@@ -103,7 +103,7 @@
+ 	BUFHEAD 	*cpage;		/* Current page */
+ 	int		cbucket;	/* Current bucket */
+ 	int		cndx;		/* Index of next item on cpage */
+-	int		errno;		/* Error Number -- for DBM 
++	int		err;		/* Error Number -- for DBM 
+ 					 * compatability */
+ 	int		new_file;	/* Indicates if fd is backing store 
+ 					 * or no */
+--- db.1.85/hash/hash.c	Mon Feb 18 19:12:24 2002
++++ db.1.85/hash/hash.c	Mon Feb 18 19:12:44 2002
+@@ -505,7 +505,7 @@
+ 	else
+ 		if (wsize != sizeof(HASHHDR)) {
+ 			errno = EFTYPE;
+-			hashp->errno = errno;
++			hashp->err = errno;
+ 			return (-1);
+ 		}
+ 	for (i = 0; i < NCACHED; i++)
+@@ -536,7 +536,7 @@
+ 
+ 	hashp = (HTAB *)dbp->internal;
+ 	if (flag) {
+-		hashp->errno = errno = EINVAL;
++		hashp->err = errno = EINVAL;
+ 		return (ERROR);
+ 	}
+ 	return (hash_access(hashp, HASH_GET, (DBT *)key, data));
+@@ -553,11 +553,11 @@
+ 
+ 	hashp = (HTAB *)dbp->internal;
+ 	if (flag && flag != R_NOOVERWRITE) {
+-		hashp->errno = errno = EINVAL;
++		hashp->err = errno = EINVAL;
+ 		return (ERROR);
+ 	}
+ 	if ((hashp->flags & O_ACCMODE) == O_RDONLY) {
+-		hashp->errno = errno = EPERM;
++		hashp->err = errno = EPERM;
+ 		return (ERROR);
+ 	}
+ 	return (hash_access(hashp, flag == R_NOOVERWRITE ?
+@@ -574,11 +574,11 @@
+ 
+ 	hashp = (HTAB *)dbp->internal;
+ 	if (flag && flag != R_CURSOR) {
+-		hashp->errno = errno = EINVAL;
++		hashp->err = errno = EINVAL;
+ 		return (ERROR);
+ 	}
+ 	if ((hashp->flags & O_ACCMODE) == O_RDONLY) {
+-		hashp->errno = errno = EPERM;
++		hashp->err = errno = EPERM;
+ 		return (ERROR);
+ 	}
+ 	return (hash_access(hashp, HASH_DELETE, (DBT *)key, NULL));
+@@ -729,7 +729,7 @@
+ 
+ 	hashp = (HTAB *)dbp->internal;
+ 	if (flag && flag != R_FIRST && flag != R_NEXT) {
+-		hashp->errno = errno = EINVAL;
++		hashp->err = errno = EINVAL;
+ 		return (ERROR);
+ 	}
+ #ifdef HASH_STATISTICS
+--- db.1.85/hash/ndbm.c	Mon Feb 18 19:12:58 2002
++++ db.1.85/hash/ndbm.c	Mon Feb 18 19:13:05 2002
+@@ -180,7 +180,7 @@
+ 	HTAB *hp;
+ 
+ 	hp = (HTAB *)db->internal;
+-	return (hp->errno);
++	return (hp->err);
+ }
+ 
+ extern int
+@@ -190,7 +190,7 @@
+ 	HTAB *hp;
+ 
+ 	hp = (HTAB *)db->internal;
+-	hp->errno = 0;
++	hp->err = 0;
+ 	return (0);
+ }
+ 

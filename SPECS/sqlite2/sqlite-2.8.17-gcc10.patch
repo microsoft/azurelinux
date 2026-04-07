@@ -1,0 +1,24 @@
+diff -up sqlite-2.8.17/src/btree.h.gcc10 sqlite-2.8.17/src/btree.h
+--- sqlite-2.8.17/src/btree.h.gcc10	2020-01-31 18:01:50.668986995 -0500
++++ sqlite-2.8.17/src/btree.h	2020-01-31 18:02:22.000333901 -0500
+@@ -149,7 +149,7 @@ int sqliteRbtreeOpen(const char *zFilena
+                 (btOps(pBt)->PageDump(pBt, pgno, recursive))
+ #define sqliteBtreeCursorDump(pCur, aResult)\
+                 (btCOps(pCur)->CursorDump(pCur, aResult))
+-int btree_native_byte_order;
++extern int btree_native_byte_order;
+ #endif /* SQLITE_TEST */
+ 
+ 
+diff -up sqlite-2.8.17/src/pager.h.gcc10 sqlite-2.8.17/src/pager.h
+--- sqlite-2.8.17/src/pager.h.gcc10	2020-01-31 18:02:39.963959449 -0500
++++ sqlite-2.8.17/src/pager.h	2020-01-31 18:02:58.769567449 -0500
+@@ -102,6 +102,6 @@ void sqlitepager_set_codec(Pager*,void(*
+ 
+ #ifdef SQLITE_TEST
+ void sqlitepager_refdump(Pager*);
+-int pager_refinfo_enable;
+-int journal_format;
++extern int pager_refinfo_enable;
++extern int journal_format;
+ #endif

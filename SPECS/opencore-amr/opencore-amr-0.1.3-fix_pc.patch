@@ -1,0 +1,18 @@
+diff -up opencore-amr-0.1.3/amrnb/opencore-amrnb.pc.in.fix opencore-amr-0.1.3/amrnb/opencore-amrnb.pc.in
+--- opencore-amr-0.1.3/amrnb/opencore-amrnb.pc.in.fix	2011-04-06 22:30:37.000000000 +0200
++++ opencore-amr-0.1.3/amrnb/opencore-amrnb.pc.in	2012-05-18 13:05:36.469324787 +0200
+@@ -7,4 +7,4 @@ Name: OpenCORE AMR-NB
+ Description: Adaptive Multi-Rate speech codec library
+ Version: @PACKAGE_VERSION@
+ Libs: -L${libdir} -lopencore-amrnb
+-Cflags: -I${includedir}
++Cflags: -I${includedir}/opencore-amrnb
+diff -up opencore-amr-0.1.3/amrwb/opencore-amrwb.pc.in.fix opencore-amr-0.1.3/amrwb/opencore-amrwb.pc.in
+--- opencore-amr-0.1.3/amrwb/opencore-amrwb.pc.in.fix	2011-04-06 22:30:37.000000000 +0200
++++ opencore-amr-0.1.3/amrwb/opencore-amrwb.pc.in	2012-05-18 13:06:01.901435760 +0200
+@@ -7,4 +7,4 @@ Name: OpenCORE AMR-WB
+ Description: Adaptive Multi-Rate Wideband speech codec library
+ Version: @PACKAGE_VERSION@
+ Libs: -L${libdir} -lopencore-amrwb
+-Cflags: -I${includedir}
++Cflags: -I${includedir}/opencore-amrwb

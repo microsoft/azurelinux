@@ -1,0 +1,11 @@
+--- a/src/java/org/apache/ivy/ant/IvyAntSettings.java
++++ b/src/java/org/apache/ivy/ant/IvyAntSettings.java
+@@ -345,7 +345,7 @@
+         File[] settingsLocations = new File[] {
+                 new File(getProject().getBaseDir(), settingsFileName),
+                 new File(getProject().getBaseDir(), "ivyconf.xml"), new File(settingsFileName),
+-                new File("ivyconf.xml")};
++                new File("ivyconf.xml"), new File("/etc/ivy/ivysettings.xml")};
+         for (File settingsFile : settingsLocations) {
+             task.log("searching settings file: trying " + settingsFile, Project.MSG_VERBOSE);
+             if (settingsFile.exists()) {

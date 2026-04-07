@@ -1,0 +1,27 @@
+From 446f7c1ec54e06b5da2e890e0cd8fbd7308322c9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Lyson=C4=9Bk?= <olysonek@redhat.com>
+Date: Tue, 2 Jan 2018 16:33:18 +0100
+Subject: [PATCH 46/59] vsftpd.conf: Refer to the man page regarding the
+ ascii_* options
+
+---
+ vsftpd.conf | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/vsftpd.conf b/vsftpd.conf
+index 4626c1b..e70bc6d 100644
+--- a/vsftpd.conf
++++ b/vsftpd.conf
+@@ -73,7 +73,8 @@ xferlog_std_format=YES
+ #
+ # By default the server will pretend to allow ASCII mode but in fact ignore
+ # the request. Turn on the below options to have the server actually do ASCII
+-# mangling on files when in ASCII mode.
++# mangling on files when in ASCII mode. The vsftpd.conf(5) man page explains
++# the behaviour when these options are disabled.
+ # Beware that on some FTP servers, ASCII support allows a denial of service
+ # attack (DoS) via the command "SIZE /big/file" in ASCII mode. vsftpd
+ # predicted this attack and has always been safe, reporting the size of the
+-- 
+2.14.4
+

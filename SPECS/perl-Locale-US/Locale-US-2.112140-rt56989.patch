@@ -1,0 +1,21 @@
+--- Locale-US/t/1.t
++++ Locale-US/t/1.t
+@@ -6,7 +6,7 @@
+ # change 'tests => 1' to 'tests => last_test_to_print';
+ 
+ use Test;
+-BEGIN { plan tests => 3 };
++BEGIN { plan tests => 4 };
+ use Locale::US;
+ ok(1); # If we made it this far, we're ok.
+ 
+@@ -32,4 +32,8 @@ ok (
+     $u->{state2code}{$state}, $code
+    );
+ 
+-
++# rt #56989 Locale::US fails after second call to new
++my $v = Locale::US->new();
++ok (
++    $v->{code2state}{$code}, $state
++);

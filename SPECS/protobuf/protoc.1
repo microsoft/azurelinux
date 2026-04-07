@@ -1,0 +1,193 @@
+.TH protoc "1" "December 2022" protoc "User Commands"
+.SH NAME
+protoc \- Protobuf compiler
+.SH SYNOPSIS
+protoc
+.RI [ OPTION ]
+.I PROTO_FILES
+.SH DESCRIPTION
+.PP
+Parse
+.I PROTO_FILES
+and generate output based on the options given.
+.SH OPTIONS
+.TP
+.B \-I\fIPATH\fR, \fB\-\-proto_path=\fIPATH
+Specify the directory in which to search for imports.
+May be specified multiple times; directories will be searched in order.
+If not given, the current working directory is used.
+If not found in any of the these directories, the
+.B \-\-descriptor_set_in
+descriptors will be checked for required proto file.
+.TP
+.B \-\-version
+Show version info and exit.
+.TP
+.B \-h\fR, \fB\-\-help
+Show a help message and exit.
+.TP
+.BI \-\-encode= MESSAGE_TYPE
+Read a text-format message of the given type
+from standard input and write it in binary
+to standard output.
+The message type must be defined in
+.I PROTO_FILES
+or their imports.
+.TP
+.B \-\-deterministic_output
+When using
+.BR \-\-encode ,
+ensure map fields are deterministically ordered.
+Note that this order is not canonical,
+and changes across builds or releases of
+.BR protoc (1).
+.TP
+.BI \-\-decode= MESSAGE_TYPE
+Read a binary message of the given type
+from standard input and write it in text format
+to standard output.
+The message type must be defined in
+.I PROTO_FILES
+or their imports.
+.TP
+.B \-\-decode_raw
+Read an arbitrary protocol message
+from standard input and write the raw tag/value pairs in text format
+to standard output.
+No
+.I PROTO_FILES
+should be given when using this flag.
+.TP
+.BI \-\-descriptor_set_in= FILES
+Specifies a delimited list of
+.I FILES
+each containing a
+.B FileDescriptorSet
+(a protocol buffer defined in
+.BR descriptor.proto ).
+The
+.B FileDescriptor
+for each of the
+.I PROTO_FILES
+provided will be loaded from these
+.BR FileDescriptorSets .
+If a
+.B FileDescriptor
+appears multiple times, the first occurrence will be used.
+.TP
+.B \-o\fIFILE\fR, \fB\-\-descriptor_set_out=\fIFILE
+Writes a
+.B FileDescriptorSet
+(a protocol buffer, defined in
+.BR descriptor.proto )
+containing all of the input files to
+.IR FILE .
+.TP
+.B \-\-include_imports
+When using
+.BR \-\-descriptor_set_out ,
+also include all dependencies of the input files in the set,
+so that the set is self-contained.
+.TP
+.B \-\-include_source_info
+When using
+.BR \-\-descriptor_set_out ,
+do not strip
+.B SourceCodeInfo
+from the
+.BR FileDescriptorProto .
+This results in vastly larger descriptors
+that include information about the original location
+of each decl in the source file
+as well as surrounding comments.
+.TP
+.BI \-\-dependency_out= FILE
+Write a dependency output file in the format expected by
+.BR make (1).
+This writes the transitive set of input file paths to
+.I FILE
+.TP
+.BI \-\-error_format= FORMAT
+Set the format in which to print errors.
+.I FORMAT
+may be
+.RB \(oq gcc \(cq
+(the default) or
+.RP \(oq msvs \(cq
+(Microsoft Visual Studio format).
+.TP
+.B \-\-fatal_warnings
+Make warnings be fatal (similar to
+.B \-Werr
+in
+.BR gcc (1)).
+This flag will make
+.BR protoc (1)
+ return with a non-zero exit code
+if any warnings are generated.
+.TP
+.B \-\-print_free_field_numbers
+Print the free field numbers of the messages
+defined in the given proto files.
+Groups share the same field number space with the parent message.
+Extension ranges are counted as occupied fields numbers.
+.TP
+.BI \-\-plugin= EXECUTABLE
+Specifies a plugin executable to use.
+Normally,
+.BR protoc (1)
+searches the
+.B PATH
+for plugins, but you may specify additional executables
+not in the path using this flag.
+Additionally,
+.I EXECUTABLE
+may be of the form
+.BR NAME=\fIPATH ,
+in which case the given plugin name
+is mapped to the given executable
+even if the executable\(cqs own name differs.
+.TP
+.BI \-\-cpp_out= OUT_DIR
+Generate C++ header and source.
+.TP
+.BI \-\-csharp_out= OUT_DIR
+Generate C# source file.
+.TP
+.BI \-\-java_out= OUT_DIR
+Generate Java source file.
+.TP
+.BI \-\-js_out= OUT_DIR
+Generate JavaScript source.
+.TP
+.BI \-\-kotlin_out= OUT_DIR
+Generate Kotlin file.
+.TP
+.BI \-\-objc_out= OUT_DIR
+Generate Objective-C header and source.
+.TP
+.BI \-\-php_out= OUT_DIR
+Generate PHP source file.
+.TP
+.BI \-\-python_out= OUT_DIR
+Generate Python source file.
+.TP
+.BI \-\-ruby_out= OUT_DIR
+Generate Ruby source file.
+.TP
+.BI @ <filename>
+Read options and filenames from file.
+If a relative file path is specified,
+the file will be searched in the working directory.
+The
+.B \-\-proto_path
+option will not affect how this argument file is searched.
+Content of the file will be expanded in the position of
+.BI @ <filename>
+as in the argument list.
+Note that shell expansion is not applied to the content of the file
+(i.e., you cannot use quotes, wildcards, escapes, commands, etc.).
+Each line corresponds to a single argument, even if it contains spaces.
+.SH "SEE ALSO"
+.BR make (1),
+.BR gcc (1)

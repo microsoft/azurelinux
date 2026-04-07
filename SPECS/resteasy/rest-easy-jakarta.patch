@@ -1,0 +1,557 @@
+diff -ru ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/core/AsynchronousDispatcher.java /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/core/AsynchronousDispatcher.java
+--- ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/core/AsynchronousDispatcher.java	2018-07-09 05:23:37.000000000 -0700
++++ /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/core/AsynchronousDispatcher.java	2024-12-06 10:40:08.115006557 -0800
+@@ -11,7 +11,7 @@
+ import org.jboss.resteasy.util.HttpHeaderNames;
+ import org.jboss.resteasy.util.HttpResponseCodes;
+ 
+-import javax.servlet.ServletContext;
++import jakarta.servlet.ServletContext;
+ import javax.ws.rs.DELETE;
+ import javax.ws.rs.DefaultValue;
+ import javax.ws.rs.GET;
+diff -ru ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/core/ResteasyHttpServletRequestWrapper.java /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/core/ResteasyHttpServletRequestWrapper.java
+--- ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/core/ResteasyHttpServletRequestWrapper.java	2018-07-09 05:23:37.000000000 -0700
++++ /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/core/ResteasyHttpServletRequestWrapper.java	2024-12-06 15:05:39.099986669 -0800
+@@ -5,15 +5,15 @@
+ import java.util.Collection;
+ import java.util.Enumeration;
+ 
+-import javax.servlet.ServletException;
+-import javax.servlet.ServletRequest;
+-import javax.servlet.ServletRequestWrapper;
+-import javax.servlet.http.Cookie;
+-import javax.servlet.http.HttpServletRequest;
+-import javax.servlet.http.HttpServletResponse;
+-import javax.servlet.http.HttpSession;
+-import javax.servlet.http.HttpUpgradeHandler;
+-import javax.servlet.http.Part;
++import jakarta.servlet.ServletException;
++import jakarta.servlet.ServletRequest;
++import jakarta.servlet.ServletRequestWrapper;
++import jakarta.servlet.http.Cookie;
++import jakarta.servlet.http.HttpServletRequest;
++import jakarta.servlet.http.HttpServletResponse;
++import jakarta.servlet.http.HttpSession;
++import jakarta.servlet.http.HttpUpgradeHandler;
++import jakarta.servlet.http.Part;
+ 
+ /**
+  * ResteasyHttpServletRequestWrapper is introduced to support the use of
+@@ -201,12 +201,12 @@
+    *            instead.
+    *
+    */
+-   @Override
+-   public boolean isRequestedSessionIdFromUrl()
++/*   @Override
++   public boolean isRequestedSessionIdFromURL()
+    {
+-      return proxy.isRequestedSessionIdFromUrl();
++      return proxy.isRequestedSessionIdFromURL();
+    }
+-
++*/
+    @Override
+    public String changeSessionId()
+    {
+diff -ru ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/core/ResteasyHttpServletResponseWrapper.java /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/core/ResteasyHttpServletResponseWrapper.java
+--- ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/core/ResteasyHttpServletResponseWrapper.java	2018-07-09 05:23:37.000000000 -0700
++++ /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/core/ResteasyHttpServletResponseWrapper.java	2024-12-06 15:48:30.299581332 -0800
+@@ -5,11 +5,11 @@
+ import java.util.Collection;
+ import java.util.Locale;
+ 
+-import javax.servlet.ServletOutputStream;
+-import javax.servlet.ServletResponse;
+-import javax.servlet.ServletResponseWrapper;
+-import javax.servlet.http.Cookie;
+-import javax.servlet.http.HttpServletResponse;
++import jakarta.servlet.ServletOutputStream;
++import jakarta.servlet.ServletResponse;
++import jakarta.servlet.ServletResponseWrapper;
++import jakarta.servlet.http.Cookie;
++import jakarta.servlet.http.HttpServletResponse;
+ 
+ /**
+  * ResteasyHttpServletResponseWrapper is introduced to support the use of
+@@ -165,12 +165,12 @@
+     * @return    the encoded URL if encoding is needed; 
+     *         the unchanged URL otherwise.
+     */
+-   @Override
++/*   @Override
+    public String encodeUrl(String url)
+    {
+       return proxy.encodeUrl(url);
+    }
+-
++*/
+    /**
+     * @deprecated   As of version 2.1, use 
+     *         encodeRedirectURL(String url) instead
+@@ -179,12 +179,12 @@
+     * @return    the encoded URL if encoding is needed; 
+     *         the unchanged URL otherwise.
+     */
+-   @Override
++/*   @Override
+    public String encodeRedirectUrl(String url)
+    {
+       return proxy.encodeRedirectUrl(url);
+    }
+-
++*/
+    @Override
+    public void sendError(int sc, String msg) throws IOException
+    {
+@@ -256,12 +256,12 @@
+     * @param  sc the status code
+     * @param  sm the status message
+     */
+-   @Override
++/*   @Override
+    public void setStatus(int sc, String sm)
+    {
+       proxy.setStatus(sc, sm);
+    }
+-
++*/
+    @Override
+    public int getStatus()
+    {
+diff -ru ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/interceptors/encoding/GZIPDecodingInterceptor.java /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/interceptors/encoding/GZIPDecodingInterceptor.java
+--- ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/interceptors/encoding/GZIPDecodingInterceptor.java	2018-07-09 05:23:37.000000000 -0700
++++ /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/interceptors/encoding/GZIPDecodingInterceptor.java	2024-12-06 10:43:25.211526985 -0800
+@@ -1,7 +1,7 @@
+ package org.jboss.resteasy.plugins.interceptors.encoding;
+ 
+ import javax.annotation.Priority;
+-import javax.servlet.ServletContext;
++import jakarta.servlet.ServletContext;
+ import javax.ws.rs.Priorities;
+ import javax.ws.rs.ProcessingException;
+ import javax.ws.rs.WebApplicationException;
+diff -ru ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/Filter30Dispatcher.java /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/Filter30Dispatcher.java
+--- ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/Filter30Dispatcher.java	2018-07-09 05:23:37.000000000 -0700
++++ /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/Filter30Dispatcher.java	2024-12-06 10:44:09.171643053 -0800
+@@ -6,9 +6,9 @@
+ import org.jboss.resteasy.spi.HttpResponse;
+ import org.jboss.resteasy.spi.ResteasyUriInfo;
+ 
+-import javax.servlet.annotation.WebFilter;
+-import javax.servlet.http.HttpServletRequest;
+-import javax.servlet.http.HttpServletResponse;
++import jakarta.servlet.annotation.WebFilter;
++import jakarta.servlet.http.HttpServletRequest;
++import jakarta.servlet.http.HttpServletResponse;
+ import javax.ws.rs.core.NewCookie;
+ import java.util.concurrent.Executors;
+ import java.util.concurrent.ScheduledExecutorService;
+diff -ru ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/FilterBootstrap.java /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/FilterBootstrap.java
+--- ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/FilterBootstrap.java	2018-07-09 05:23:37.000000000 -0700
++++ /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/FilterBootstrap.java	2024-12-06 10:46:19.398988728 -0800
+@@ -2,8 +2,8 @@
+ 
+ import org.jboss.resteasy.spi.ResteasyDeployment;
+ 
+-import javax.servlet.FilterConfig;
+-import javax.servlet.ServletContext;
++import jakarta.servlet.FilterConfig;
++import jakarta.servlet.ServletContext;
+ import java.util.Enumeration;
+ import java.util.HashSet;
+ import java.util.Set;
+@@ -61,4 +61,4 @@
+       while (en.hasMoreElements()) set.add(en.nextElement());
+       return set;
+    }
+-}
+\ No newline at end of file
++}
+diff -ru ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/FilterDispatcher.java /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/FilterDispatcher.java
+--- ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/FilterDispatcher.java	2018-07-09 05:23:37.000000000 -0700
++++ /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/FilterDispatcher.java	2024-12-06 10:44:52.930758586 -0800
+@@ -7,15 +7,15 @@
+ import org.jboss.resteasy.spi.HttpResponse;
+ import org.jboss.resteasy.spi.ResteasyUriInfo;
+ 
+-import javax.servlet.Filter;
+-import javax.servlet.FilterChain;
+-import javax.servlet.FilterConfig;
+-import javax.servlet.ServletContext;
+-import javax.servlet.ServletException;
+-import javax.servlet.ServletRequest;
+-import javax.servlet.ServletResponse;
+-import javax.servlet.http.HttpServletRequest;
+-import javax.servlet.http.HttpServletResponse;
++import jakarta.servlet.Filter;
++import jakarta.servlet.FilterChain;
++import jakarta.servlet.FilterConfig;
++import jakarta.servlet.ServletContext;
++import jakarta.servlet.ServletException;
++import jakarta.servlet.ServletRequest;
++import jakarta.servlet.ServletResponse;
++import jakarta.servlet.http.HttpServletRequest;
++import jakarta.servlet.http.HttpServletResponse;
+ import javax.ws.rs.NotFoundException;
+ import java.io.IOException;
+ 
+diff -ru ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/HttpRequestFactory.java /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/HttpRequestFactory.java
+--- ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/HttpRequestFactory.java	2018-07-09 05:23:37.000000000 -0700
++++ /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/HttpRequestFactory.java	2024-12-06 10:46:45.517060408 -0800
+@@ -5,8 +5,8 @@
+ import org.jboss.resteasy.spi.HttpResponse;
+ import org.jboss.resteasy.spi.ResteasyUriInfo;
+ 
+-import javax.servlet.http.HttpServletRequest;
+-import javax.servlet.http.HttpServletResponse;
++import jakarta.servlet.http.HttpServletRequest;
++import jakarta.servlet.http.HttpServletResponse;
+ 
+ /**
+  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
+diff -ru ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/HttpResponseFactory.java /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/HttpResponseFactory.java
+--- ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/HttpResponseFactory.java	2018-07-09 05:23:37.000000000 -0700
++++ /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/HttpResponseFactory.java	2024-12-06 10:46:59.927099952 -0800
+@@ -2,7 +2,7 @@
+ 
+ import org.jboss.resteasy.spi.HttpResponse;
+ 
+-import javax.servlet.http.HttpServletResponse;
++import jakarta.servlet.http.HttpServletResponse;
+ 
+ /**
+  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
+diff -ru ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/HttpServlet30Dispatcher.java /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/HttpServlet30Dispatcher.java
+--- ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/HttpServlet30Dispatcher.java	2018-07-09 05:23:37.000000000 -0700
++++ /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/HttpServlet30Dispatcher.java	2024-12-06 10:47:11.082130566 -0800
+@@ -6,9 +6,9 @@
+ import org.jboss.resteasy.spi.HttpResponse;
+ import org.jboss.resteasy.spi.ResteasyUriInfo;
+ 
+-import javax.servlet.annotation.WebServlet;
+-import javax.servlet.http.HttpServletRequest;
+-import javax.servlet.http.HttpServletResponse;
++import jakarta.servlet.annotation.WebServlet;
++import jakarta.servlet.http.HttpServletRequest;
++import jakarta.servlet.http.HttpServletResponse;
+ import javax.ws.rs.core.NewCookie;
+ import java.util.concurrent.Executors;
+ import java.util.concurrent.ScheduledExecutorService;
+diff -ru ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/HttpServletDispatcher.java /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/HttpServletDispatcher.java
+--- ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/HttpServletDispatcher.java	2018-07-09 05:23:37.000000000 -0700
++++ /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/HttpServletDispatcher.java	2024-12-06 10:51:17.309806301 -0800
+@@ -7,11 +7,11 @@
+ import org.jboss.resteasy.spi.HttpResponse;
+ import org.jboss.resteasy.spi.ResteasyUriInfo;
+ 
+-import javax.servlet.ServletConfig;
+-import javax.servlet.ServletException;
+-import javax.servlet.http.HttpServlet;
+-import javax.servlet.http.HttpServletRequest;
+-import javax.servlet.http.HttpServletResponse;
++import jakarta.servlet.ServletConfig;
++import jakarta.servlet.ServletException;
++import jakarta.servlet.http.HttpServlet;
++import jakarta.servlet.http.HttpServletRequest;
++import jakarta.servlet.http.HttpServletResponse;
+ import java.io.IOException;
+ 
+ /**
+diff -ru ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/HttpServletInputMessage.java /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/HttpServletInputMessage.java
+--- ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/HttpServletInputMessage.java	2018-07-09 05:23:37.000000000 -0700
++++ /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/HttpServletInputMessage.java	2024-12-06 10:47:35.963198849 -0800
+@@ -12,10 +12,10 @@
+ import org.jboss.resteasy.spi.ResteasyUriInfo;
+ import org.jboss.resteasy.util.Encode;
+ 
+-import javax.servlet.ServletContext;
+-import javax.servlet.ServletException;
+-import javax.servlet.http.HttpServletRequest;
+-import javax.servlet.http.HttpServletResponse;
++import jakarta.servlet.ServletContext;
++import jakarta.servlet.ServletException;
++import jakarta.servlet.http.HttpServletRequest;
++import jakarta.servlet.http.HttpServletResponse;
+ import javax.ws.rs.core.HttpHeaders;
+ import javax.ws.rs.core.MediaType;
+ import javax.ws.rs.core.MultivaluedMap;
+diff -ru ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/HttpServletResponseHeaders.java /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/HttpServletResponseHeaders.java
+--- ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/HttpServletResponseHeaders.java	2018-07-09 05:23:37.000000000 -0700
++++ /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/HttpServletResponseHeaders.java	2024-12-06 14:41:58.860376600 -0800
+@@ -4,7 +4,7 @@
+ import org.jboss.resteasy.spi.ResteasyProviderFactory;
+ import org.jboss.resteasy.util.CaseInsensitiveMap;
+ 
+-import javax.servlet.http.HttpServletResponse;
++import jakarta.servlet.http.HttpServletResponse;
+ import javax.ws.rs.core.MultivaluedMap;
+ import javax.ws.rs.ext.RuntimeDelegate;
+ 
+diff -ru ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/HttpServletResponseWrapper.java /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/HttpServletResponseWrapper.java
+--- ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/HttpServletResponseWrapper.java	2018-07-09 05:23:37.000000000 -0700
++++ /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/HttpServletResponseWrapper.java	2024-12-06 10:47:50.851239706 -0800
+@@ -3,7 +3,7 @@
+ import org.jboss.resteasy.spi.HttpResponse;
+ import org.jboss.resteasy.spi.ResteasyProviderFactory;
+ 
+-import javax.servlet.http.HttpServletResponse;
++import jakarta.servlet.http.HttpServletResponse;
+ import javax.ws.rs.core.MultivaluedMap;
+ import javax.ws.rs.core.NewCookie;
+ import java.io.IOException;
+diff -ru ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/ListenerBootstrap.java /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/ListenerBootstrap.java
+--- ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/ListenerBootstrap.java	2018-07-09 05:23:37.000000000 -0700
++++ /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/ListenerBootstrap.java	2024-12-06 10:48:01.339268490 -0800
+@@ -3,7 +3,7 @@
+ import org.jboss.resteasy.spi.ResteasyConfiguration;
+ import org.jboss.resteasy.spi.ResteasyDeployment;
+ 
+-import javax.servlet.ServletContext;
++import jakarta.servlet.ServletContext;
+ import java.net.MalformedURLException;
+ import java.net.URL;
+ import java.util.ArrayList;
+diff -ru ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/ResteasyBootstrap.java /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/ResteasyBootstrap.java
+--- ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/ResteasyBootstrap.java	2018-07-09 05:23:37.000000000 -0700
++++ /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/ResteasyBootstrap.java	2024-12-06 14:43:48.320656316 -0800
+@@ -5,9 +5,9 @@
+ import org.jboss.resteasy.spi.ResteasyDeployment;
+ import org.jboss.resteasy.spi.ResteasyProviderFactory;
+ 
+-import javax.servlet.ServletContext;
+-import javax.servlet.ServletContextEvent;
+-import javax.servlet.ServletContextListener;
++import jakarta.servlet.ServletContext;
++import jakarta.servlet.ServletContextEvent;
++import jakarta.servlet.ServletContextListener;
+ 
+ /**
+  * This is a ServletContextListener that creates the registry for resteasy and stuffs it as a servlet context attribute
+diff -ru ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/Servlet3AsyncHttpRequest.java /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/Servlet3AsyncHttpRequest.java
+--- ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/Servlet3AsyncHttpRequest.java	2018-07-09 05:23:37.000000000 -0700
++++ /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/Servlet3AsyncHttpRequest.java	2024-12-06 14:44:03.779695820 -0800
+@@ -12,13 +12,13 @@
+ import org.jboss.resteasy.spi.ResteasyUriInfo;
+ import org.jboss.resteasy.spi.UnhandledException;
+ 
+-import javax.servlet.AsyncContext;
+-import javax.servlet.AsyncEvent;
+-import javax.servlet.AsyncListener;
+-import javax.servlet.ServletContext;
+-import javax.servlet.ServletRequest;
+-import javax.servlet.http.HttpServletRequest;
+-import javax.servlet.http.HttpServletResponse;
++import jakarta.servlet.AsyncContext;
++import jakarta.servlet.AsyncEvent;
++import jakarta.servlet.AsyncListener;
++import jakarta.servlet.ServletContext;
++import jakarta.servlet.ServletRequest;
++import jakarta.servlet.http.HttpServletRequest;
++import jakarta.servlet.http.HttpServletResponse;
+ import javax.ws.rs.ServiceUnavailableException;
+ import javax.ws.rs.core.HttpHeaders;
+ import javax.ws.rs.core.Response;
+diff -ru ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/ServletBootstrap.java /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/ServletBootstrap.java
+--- ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/ServletBootstrap.java	2018-07-09 05:23:37.000000000 -0700
++++ /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/ServletBootstrap.java	2024-12-06 14:44:44.545799992 -0800
+@@ -2,8 +2,8 @@
+ 
+ import org.jboss.resteasy.spi.ResteasyDeployment;
+ 
+-import javax.servlet.ServletConfig;
+-import javax.servlet.ServletContext;
++import jakarta.servlet.ServletConfig;
++import jakarta.servlet.ServletContext;
+ import java.util.Enumeration;
+ import java.util.HashSet;
+ import java.util.Set;
+@@ -63,4 +63,4 @@
+       return set;
+    }
+ 
+-}
+\ No newline at end of file
++}
+diff -ru ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/ServletContainerDispatcher.java /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/ServletContainerDispatcher.java
+--- ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/ServletContainerDispatcher.java	2018-07-09 05:23:37.000000000 -0700
++++ /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/ServletContainerDispatcher.java	2024-12-06 10:50:27.407669353 -0800
+@@ -14,10 +14,10 @@
+ import org.jboss.resteasy.spi.ResteasyUriInfo;
+ import org.jboss.resteasy.util.GetRestful;
+ 
+-import javax.servlet.ServletContext;
+-import javax.servlet.ServletException;
+-import javax.servlet.http.HttpServletRequest;
+-import javax.servlet.http.HttpServletResponse;
++import jakarta.servlet.ServletContext;
++import jakarta.servlet.ServletException;
++import jakarta.servlet.http.HttpServletRequest;
++import jakarta.servlet.http.HttpServletResponse;
+ import javax.ws.rs.NotFoundException;
+ import javax.ws.rs.core.Application;
+ import javax.ws.rs.core.SecurityContext;
+diff -ru ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/ServletSecurityContext.java /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/ServletSecurityContext.java
+--- ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/ServletSecurityContext.java	2018-07-09 05:23:37.000000000 -0700
++++ /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/ServletSecurityContext.java	2024-12-06 14:44:42.186793965 -0800
+@@ -1,6 +1,6 @@
+ package org.jboss.resteasy.plugins.server.servlet;
+ 
+-import javax.servlet.http.HttpServletRequest;
++import jakarta.servlet.http.HttpServletRequest;
+ import javax.ws.rs.core.SecurityContext;
+ import java.security.Principal;
+ 
+diff -ru ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/ServletUtil.java /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/ServletUtil.java
+--- ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/ServletUtil.java	2018-07-09 05:23:37.000000000 -0700
++++ /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/plugins/server/servlet/ServletUtil.java	2024-12-06 14:44:39.961788279 -0800
+@@ -8,7 +8,7 @@
+ import org.jboss.resteasy.util.MediaTypeHelper;
+ import org.jboss.resteasy.util.PathHelper;
+ 
+-import javax.servlet.http.HttpServletRequest;
++import jakarta.servlet.http.HttpServletRequest;
+ import javax.ws.rs.core.Cookie;
+ import javax.ws.rs.core.HttpHeaders;
+ import javax.ws.rs.core.MediaType;
+@@ -65,7 +65,7 @@
+       Map<String, Cookie> cookies = new HashMap<String, Cookie>();
+       if (request.getCookies() != null)
+       {
+-         for (javax.servlet.http.Cookie cookie : request.getCookies())
++         for (jakarta.servlet.http.Cookie cookie : request.getCookies())
+          {
+             cookies.put(cookie.getName(), new Cookie(cookie.getName(), cookie.getValue(), cookie.getPath(), cookie.getDomain(), cookie.getVersion()));
+ 
+diff -ru ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/util/HttpServletRequestDelegate.java /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/util/HttpServletRequestDelegate.java
+--- ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/util/HttpServletRequestDelegate.java	2018-07-09 05:23:37.000000000 -0700
++++ /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/util/HttpServletRequestDelegate.java	2024-12-09 15:57:09.902096788 -0800
+@@ -1,19 +1,20 @@
+ package org.jboss.resteasy.util;
+ 
+-import javax.servlet.AsyncContext;
+-import javax.servlet.DispatcherType;
+-import javax.servlet.RequestDispatcher;
+-import javax.servlet.ServletContext;
+-import javax.servlet.ServletException;
+-import javax.servlet.ServletInputStream;
+-import javax.servlet.ServletRequest;
+-import javax.servlet.ServletResponse;
+-import javax.servlet.http.Cookie;
+-import javax.servlet.http.HttpServletRequest;
+-import javax.servlet.http.HttpServletResponse;
+-import javax.servlet.http.HttpSession;
+-import javax.servlet.http.HttpUpgradeHandler;
+-import javax.servlet.http.Part;
++import jakarta.servlet.AsyncContext;
++import jakarta.servlet.DispatcherType;
++import jakarta.servlet.RequestDispatcher;
++import jakarta.servlet.ServletContext;
++import jakarta.servlet.ServletException;
++import jakarta.servlet.ServletInputStream;
++import jakarta.servlet.ServletRequest;
++import jakarta.servlet.ServletResponse;
++import jakarta.servlet.ServletConnection;
++import jakarta.servlet.http.Cookie;
++import jakarta.servlet.http.HttpServletRequest;
++import jakarta.servlet.http.HttpServletResponse;
++import jakarta.servlet.http.HttpSession;
++import jakarta.servlet.http.HttpUpgradeHandler;
++import jakarta.servlet.http.Part;
+ 
+ import java.io.BufferedReader;
+ import java.io.IOException;
+@@ -42,6 +43,10 @@
+       return delegate.getUserPrincipal();
+    }
+ 
++   public ServletConnection getServletConnection() {
++      return delegate.getServletConnection();
++   }
++
+    public HttpServletRequestDelegate(HttpServletRequest delegate)
+    {
+       this.delegate = delegate;
+@@ -161,13 +166,13 @@
+    {
+       return delegate.isRequestedSessionIdFromURL();
+    }
+-
++/*
+    @SuppressWarnings("deprecation")
+    public boolean isRequestedSessionIdFromUrl()
+    {
+       return delegate.isRequestedSessionIdFromUrl();
+    }
+-
++*/
+    public Object getAttribute(String s)
+    {
+       return delegate.getAttribute(s);
+@@ -290,13 +295,13 @@
+    {
+       return delegate.getRequestDispatcher(s);
+    }
+-
++/*
+    @SuppressWarnings("deprecation")
+    public String getRealPath(String s)
+    {
+       return delegate.getRealPath(s);
+    }
+-
++*/
+    public int getRemotePort()
+    {
+       return delegate.getRemotePort();
+@@ -417,5 +422,16 @@
+       // TODO Auto-generated method stub
+       return null;
+    }
+-   
++
++   @Override
++   public String getProtocolRequestId()
++   {
++       return delegate.getProtocolRequestId();
++   }    
++
++   @Override
++   public String getRequestId()
++   {
++       return delegate.getRequestId();
++   }
+ }
+diff -ru ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/util/StringContextReplacement.java /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/util/StringContextReplacement.java
+--- ./resteasy-jaxrs/src/main/java/org/jboss/resteasy/util/StringContextReplacement.java	2018-07-09 05:23:37.000000000 -0700
++++ /home/jmagne/Resteasy-3.0.26.Final/resteasy-jaxrs/src/main/java/org/jboss/resteasy/util/StringContextReplacement.java	2024-12-06 14:47:39.797247430 -0800
+@@ -2,7 +2,7 @@
+ 
+ import org.jboss.resteasy.spi.ResteasyProviderFactory;
+ 
+-import javax.servlet.http.HttpServletRequest;
++import jakarta.servlet.http.HttpServletRequest;
+ import javax.ws.rs.core.UriInfo;
+ import java.util.regex.Pattern;
+ 
+diff -ru ./resteasy-servlet-initializer/src/main/java/org/jboss/resteasy/plugins/servlet/ResteasyServletInitializer.java /home/jmagne/Resteasy-3.0.26.Final/resteasy-servlet-initializer/src/main/java/org/jboss/resteasy/plugins/servlet/ResteasyServletInitializer.java
+--- ./resteasy-servlet-initializer/src/main/java/org/jboss/resteasy/plugins/servlet/ResteasyServletInitializer.java	2018-07-09 05:23:37.000000000 -0700
++++ /home/jmagne/Resteasy-3.0.26.Final/resteasy-servlet-initializer/src/main/java/org/jboss/resteasy/plugins/servlet/ResteasyServletInitializer.java	2024-12-09 16:59:48.444870285 -0800
+@@ -6,11 +6,11 @@
+ import org.jboss.resteasy.plugins.servlet.i18n.Messages;
+ import org.jboss.resteasy.spi.NotImplementedYetException;
+ 
+-import javax.servlet.ServletContainerInitializer;
+-import javax.servlet.ServletContext;
+-import javax.servlet.ServletException;
+-import javax.servlet.ServletRegistration;
+-import javax.servlet.annotation.HandlesTypes;
++import jakarta.servlet.ServletContainerInitializer;
++import jakarta.servlet.ServletContext;
++import jakarta.servlet.ServletException;
++import jakarta.servlet.ServletRegistration;
++import jakarta.servlet.annotation.HandlesTypes;
+ import javax.ws.rs.ApplicationPath;
+ import javax.ws.rs.Path;
+ import javax.ws.rs.core.Application;

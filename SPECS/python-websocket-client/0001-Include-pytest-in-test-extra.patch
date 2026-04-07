@@ -1,0 +1,28 @@
+From dd3e11fbaa0705e52ac58088f543403521dfe58c Mon Sep 17 00:00:00 2001
+From: Carl George <carlwgeorge@gmail.com>
+Date: Fri, 30 Aug 2024 14:32:00 -0500
+Subject: [PATCH] Include pytest in test extra
+
+Fedora uses the test extra to automatically generate build-time
+dependencies, so including pytest in this extra allows removal of an
+explicit BuildRequires in the RPM spec file.
+---
+ setup.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index 8781948..f6a31f6 100644
+--- a/setup.py
++++ b/setup.py
+@@ -39,7 +39,7 @@
+     download_url="https://github.com/websocket-client/websocket-client/releases",
+     python_requires=">=3.8",
+     extras_require={
+-        "test": ["websockets"],
++        "test": ["pytest", "websockets"],
+         "optional": ["python-socks", "wsaccel"],
+         "docs": ["Sphinx >= 6.0", "sphinx_rtd_theme >= 1.1.0", "myst-parser >= 2.0.0"],
+     },
+-- 
+2.46.0
+

@@ -1,0 +1,35 @@
+From 4691661243060cc6ad88902f422f058c547264f6 Mon Sep 17 00:00:00 2001
+From: Simo Sorce <simo@redhat.com>
+Date: Wed, 5 Mar 2025 13:22:03 -0500
+Subject: [PATCH 40/59] FIPS: Fix encoder/decoder negative test
+
+Signed-off-by: Simo Sorce <simo@redhat.com>
+---
+ test/recipes/04-test_encoder_decoder.t | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+ mode change 100644 => 100755 test/recipes/04-test_encoder_decoder.t
+
+diff --git a/test/recipes/04-test_encoder_decoder.t b/test/recipes/04-test_encoder_decoder.t
+old mode 100644
+new mode 100755
+index 2acc980e90..660d4e1115
+--- a/test/recipes/04-test_encoder_decoder.t
++++ b/test/recipes/04-test_encoder_decoder.t
+@@ -75,10 +75,10 @@ SKIP: {
+ }
+     my $no_des = disabled("des");
+ SKIP: {
+-    skip "MD5 disabled", 2 if disabled("md5");
+-    ok(run(app([ 'openssl', 'genrsa', '-aes128', '-out', 'epki.pem',
+-                 '-traditional', '-passout', 'pass:pass' ])),
+-       "rsa encrypted using a non fips algorithm MD5 in pbe");
++    skip "DES disabled", 2 if disabled("des3");
++    ok(run(app([ 'openssl', 'genrsa', '-des3', '-out', 'epki.pem',
++                 '-traditional', '-passout', 'pass:pass'])),
++       "rsa encrypted using a non fips algorithm DES3 in pbe");
+ 
+     my $conf2 = srctop_file("test", "default-and-fips.cnf");
+     ok(run(test(['decoder_propq_test', '-config', $conf2,
+-- 
+2.51.0
+

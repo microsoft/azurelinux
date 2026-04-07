@@ -1,0 +1,27 @@
+From 686357a40ca038edc902276cb3b33f4757d8cfb2 Mon Sep 17 00:00:00 2001
+From: Paul Eggert <eggert@cs.ucla.edu>
+Date: Sat, 26 Apr 2025 12:54:06 -0700
+Subject: [PATCH] sdiff: port back to C17-
+
+* src/sdiff.c (edit): Do not use a label just before a statement.
+Problem reported by Bruno Haible (Bug#78032).
+---
+ src/sdiff.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/sdiff.c b/src/sdiff.c
+index 15b8dce..cc961c3 100644
+--- a/src/sdiff.c
++++ b/src/sdiff.c
+@@ -880,7 +880,7 @@ edit (struct line_filter *left, char const *lname, lin lline, lin llen,
+                 }
+               break;
+ 
+-            case 'e':
++	    case 'e':;
+ 	      int cmd1 = skip_white ();
+               switch (cmd1)
+                 {
+-- 
+2.48.1
+

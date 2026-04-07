@@ -1,0 +1,20 @@
+diff -up cyrus-sasl-2.1.25/m4/cyrus.m4.no_rpath cyrus-sasl-2.1.25/m4/cyrus.m4
+--- cyrus-sasl-2.1.25/m4/cyrus.m4.no_rpath	2010-01-22 16:12:01.000000000 +0100
++++ cyrus-sasl-2.1.25/m4/cyrus.m4	2012-12-06 14:59:47.956102057 +0100
+@@ -32,14 +32,5 @@ AC_DEFUN([CMU_ADD_LIBPATH_TO], [
+ dnl runpath initialization
+ AC_DEFUN([CMU_GUESS_RUNPATH_SWITCH], [
+    # CMU GUESS RUNPATH SWITCH
+-  AC_CACHE_CHECK(for runpath switch, andrew_cv_runpath_switch, [
+-    # first, try -R
+-    SAVE_LDFLAGS="${LDFLAGS}"
+-    LDFLAGS="-R /usr/lib"
+-    AC_TRY_LINK([],[],[andrew_cv_runpath_switch="-R"], [
+-  	LDFLAGS="-Wl,-rpath,/usr/lib"
+-    AC_TRY_LINK([],[],[andrew_cv_runpath_switch="-Wl,-rpath,"],
+-    [andrew_cv_runpath_switch="none"])
+-    ])
+-  LDFLAGS="${SAVE_LDFLAGS}"
+-  ])])
++    andrew_cv_runpath_switch="none"
++  ])

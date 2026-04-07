@@ -1,0 +1,96 @@
+diff -r -U3 -p ltrace-0.7.91.orig/filter.c ltrace-0.7.91.dj/filter.c
+--- ltrace-0.7.91.orig/filter.c	2012-12-16 20:53:44.000000000 -0500
++++ ltrace-0.7.91.dj/filter.c	2016-06-17 19:07:23.678490985 -0400
+@@ -79,7 +79,7 @@ filter_lib_matcher_name_init(struct filt
+ {
+ 	switch (type) {
+ 	case FLM_MAIN:
+-		assert(type != type);
++		//assert(type != type);
+ 		abort();
+ 
+ 	case FLM_SONAME:
+@@ -137,7 +137,7 @@ matcher_matches_library(struct filter_li
+ 	case FLM_MAIN:
+ 		return lib->type == LT_LIBTYPE_MAIN;
+ 	}
+-	assert(matcher->type != matcher->type);
++	//assert(matcher->type != matcher->type);
+ 	abort();
+ }
+ 
+Only in ltrace-0.7.91.dj/: filter.c~
+diff -r -U3 -p ltrace-0.7.91.orig/sysdeps/linux-gnu/proc.c ltrace-0.7.91.dj/sysdeps/linux-gnu/proc.c
+--- ltrace-0.7.91.orig/sysdeps/linux-gnu/proc.c	2013-10-11 15:27:11.000000000 -0400
++++ ltrace-0.7.91.dj/sysdeps/linux-gnu/proc.c	2016-06-17 18:59:42.333774042 -0400
+@@ -242,9 +242,10 @@ process_tasks(pid_t pid, pid_t **ret_tas
+ 	size_t alloc = 0;
+ 
+ 	while (1) {
+-		struct dirent entry;
+ 		struct dirent *result;
+-		if (readdir_r(d, &entry, &result) != 0) {
++		errno = 0;
++		result = readdir(d);
++		if (result == NULL && errno != 0) {
+ 		fail:
+ 			free(tasks);
+ 			closedir(d);
+Only in ltrace-0.7.91.dj/sysdeps/linux-gnu: proc.c~
+diff -r -U3 -p ltrace-0.7.91.orig/sysdeps/linux-gnu/x86/fetch.c ltrace-0.7.91.dj/sysdeps/linux-gnu/x86/fetch.c
+--- ltrace-0.7.91.orig/sysdeps/linux-gnu/x86/fetch.c	2013-10-24 08:33:35.000000000 -0400
++++ ltrace-0.7.91.dj/sysdeps/linux-gnu/x86/fetch.c	2016-06-17 18:52:33.962842191 -0400
+@@ -523,7 +523,7 @@ classify(struct process *proc, struct fe
+ 
+ 	default:
+ 		/* Unsupported type.  */
+-		assert(info->type != info->type);
++		//assert(info->type != info->type);
+ 		abort();
+ 	}
+ 	abort();
+Only in ltrace-0.7.91.dj/sysdeps/linux-gnu/x86: fetch.c~
+diff -r -U3 -p ltrace-0.7.91.orig/sysdeps/linux-gnu/x86/trace.c ltrace-0.7.91.dj/sysdeps/linux-gnu/x86/trace.c
+--- ltrace-0.7.91.orig/sysdeps/linux-gnu/x86/trace.c	2012-12-16 20:53:45.000000000 -0500
++++ ltrace-0.7.91.dj/sysdeps/linux-gnu/x86/trace.c	2016-06-17 18:52:16.699844065 -0400
+@@ -145,7 +145,7 @@ arch_type_sizeof(struct process *proc, s
+ 		return (size_t)-2;
+ 
+ 	default:
+-		assert(info->type != info->type);
++		//assert(info->type != info->type);
+ 		abort();
+ 	}
+ }
+@@ -158,7 +158,7 @@ arch_type_alignof(struct process *proc,
+ 
+ 	switch (info->type) {
+ 	default:
+-		assert(info->type != info->type);
++		//assert(info->type != info->type);
+ 		abort();
+ 		break;
+ 
+Only in ltrace-0.7.91.dj/sysdeps/linux-gnu/x86: trace.c~
+diff -r -U3 -p ltrace-0.7.91.orig/value.c ltrace-0.7.91.dj/value.c
+--- ltrace-0.7.91.orig/value.c	2013-10-10 08:43:55.000000000 -0400
++++ ltrace-0.7.91.dj/value.c	2016-06-17 19:11:43.441047589 -0400
+@@ -363,7 +363,7 @@ value_set_word(struct value *value, long
+ 		u.u64 = word;
+ 		break;
+ 	default:
+-		assert(sz != sz);
++		//assert(sz != sz);
+ 		abort();
+ 	}
+ 
+@@ -414,7 +414,7 @@ value_extract_word(struct value *value,
+ 		*retp = (long)u.u64;
+ 		return 0;
+ 	default:
+-		assert(sz != sz);
++		//assert(sz != sz);
+ 		abort();
+ 	}
+ }
+Only in ltrace-0.7.91.dj/: value.c~

@@ -1,0 +1,37 @@
+From 8b4bc05fd0b3b0ecd108fceca002934d9a2f0bd3 Mon Sep 17 00:00:00 2001
+From: Scott Talbert <swt@techie.net>
+Date: Wed, 10 Jan 2024 00:17:41 -0500
+Subject: [PATCH] Fix /bytes endpoint with newer werkzeug versions
+
+At some point, werkzeug starting checking the inputs to the write()
+method, which caused the following traceback:
+Traceback (most recent call last):
+  File "/usr/lib/python3/dist-packages/werkzeug/serving.py", line 364, in run_wsgi
+    execute(self.server.app)
+  File "/usr/lib/python3/dist-packages/werkzeug/serving.py", line 328, in execute
+    write(data)
+  File "/usr/lib/python3/dist-packages/werkzeug/serving.py", line 296, in write
+    assert isinstance(data, bytes), "applications must write bytes"
+AssertionError: applications must write bytes
+
+Fix this by using bytes instead of bytearray.
+---
+ httpbin/core.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/httpbin/core.py b/httpbin/core.py
+index a82c1b8..a282789 100644
+--- a/httpbin/core.py
++++ b/httpbin/core.py
+@@ -1449,7 +1449,7 @@ def random_bytes(n):
+     response = make_response()
+ 
+     # Note: can't just use os.urandom here because it ignores the seed
+-    response.data = bytearray(random.randint(0, 255) for i in range(n))
++    response.data = bytes(random.randint(0, 255) for i in range(n))
+     response.content_type = "application/octet-stream"
+     return response
+ 
+-- 
+2.43.0
+

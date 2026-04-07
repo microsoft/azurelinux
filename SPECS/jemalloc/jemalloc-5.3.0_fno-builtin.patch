@@ -1,0 +1,29 @@
+commit 3de0c24859f4413bf03448249078169bb50bda0f
+Author: divanorama <divanorama@gmail.com>
+Date:   Thu Sep 29 23:35:59 2022 +0200
+
+    Disable builtin malloc in tests
+    
+    With `--with-jemalloc-prefix=` and without `-fno-builtin` or `-O1` both clang and gcc may optimize out `malloc` calls
+    whose result is unused. Comparing result to NULL also doesn't necessarily count as being used.
+    
+    This won't be a problem in most client programs as this only concerns really unused pointers, but in
+    tests it's important to actually execute allocations.
+    `-fno-builtin` should disable this optimization for both gcc and clang, and applying it only to tests code shouldn't hopefully be an issue.
+    Another alternative is to force "use" of result but that'd require more changes and may miss some other optimization-related issues.
+    
+    This should resolve https://github.com/jemalloc/jemalloc/issues/2091
+
+diff --git a/Makefile.in b/Makefile.in
+index 6809fb29..a964f07e 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -458,6 +458,8 @@ $(TESTS_OBJS): $(objroot)test/%.$(O): $(srcroot)test/%.c
+ $(TESTS_CPP_OBJS): $(objroot)test/%.$(O): $(srcroot)test/%.cpp
+ $(TESTS_OBJS): CPPFLAGS += -I$(srcroot)test/include -I$(objroot)test/include
+ $(TESTS_CPP_OBJS): CPPFLAGS += -I$(srcroot)test/include -I$(objroot)test/include
++$(TESTS_OBJS): CFLAGS += -fno-builtin
++$(TESTS_CPP_OBJS): CPPFLAGS += -fno-builtin
+ ifneq ($(IMPORTLIB),$(SO))
+ $(CPP_OBJS) $(C_SYM_OBJS) $(C_OBJS) $(C_JET_SYM_OBJS) $(C_JET_OBJS): CPPFLAGS += -DDLLEXPORT
+ endif

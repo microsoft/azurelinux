@@ -1,0 +1,65 @@
+commit 80053ab7b57c1f0825deb4a22018dacfa62d7272
+Author: Paul Eggert <eggert@cs.ucla.edu>
+Date:   Wed Apr 23 11:17:53 2025 -0700
+
+    sdiff: continue → break
+    
+    * src/sdiff.c (edit): Don’t use ‘continue’ when a simple
+    break from the switch will do.
+
+diff --git a/src/sdiff.c b/src/sdiff.c
+index 7734a82..5b1b162 100644
+--- a/src/sdiff.c
++++ b/src/sdiff.c
+@@ -872,13 +872,13 @@ edit (struct line_filter *left, char const *lname, lin lline, lin llen,
+             {
+             case '1': case '2': case 'l': case 'r':
+             case 's': case 'v': case 'q':
+-              if (skip_white () != '\n')
++	      if (skip_white () == '\n')
++		gotcmd = true;
++	      else
+                 {
+                   give_help ();
+                   flush_line ();
+-                  continue;
+                 }
+-              gotcmd = true;
+               break;
+ 
+             case 'e':
+@@ -886,13 +886,13 @@ edit (struct line_filter *left, char const *lname, lin lline, lin llen,
+               switch (cmd1)
+                 {
+                 case '1': case '2': case 'b': case 'd': case 'l': case 'r':
+-                  if (skip_white () != '\n')
++		  if (skip_white () == '\n')
++		    gotcmd = true;
++		  else
+                     {
+                       give_help ();
+                       flush_line ();
+-                      continue;
+                     }
+-                  gotcmd = true;
+                   break;
+                 case '\n':
+                   gotcmd = true;
+@@ -900,7 +900,7 @@ edit (struct line_filter *left, char const *lname, lin lline, lin llen,
+                 default:
+                   give_help ();
+                   flush_line ();
+-                  continue;
++		  break;
+                 }
+               break;
+ 
+@@ -917,7 +917,7 @@ edit (struct line_filter *left, char const *lname, lin lline, lin llen,
+               FALLTHROUGH;
+             case '\n':
+               give_help ();
+-              continue;
++	      break;
+             }
+         }
+ 

@@ -1,0 +1,39 @@
+--- unicode-segmentation-1.12.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ unicode-segmentation-1.12.0/Cargo.toml	2024-09-16T20:37:35.225395+00:00
+@@ -21,7 +21,7 @@
+ exclude = [
+     "/.github",
+     "/benches/texts",
+-    "/scripts/**.rs",
++    "/scripts/*",
+     "*.txt",
+ ]
+ autobins = false
+@@ -52,26 +52,8 @@
+ name = "test"
+ path = "tests/test.rs"
+ 
+-[[bench]]
+-name = "chars"
+-path = "benches/chars.rs"
+-harness = false
+-
+-[[bench]]
+-name = "word_bounds"
+-path = "benches/word_bounds.rs"
+-harness = false
+-
+-[[bench]]
+-name = "words"
+-path = "benches/words.rs"
+-harness = false
+-
+-[dev-dependencies.criterion]
+-version = "0.5"
+-
+ [dev-dependencies.quickcheck]
+-version = "0.7"
++version = "1.0"
+ 
+ [features]
+ no_std = []

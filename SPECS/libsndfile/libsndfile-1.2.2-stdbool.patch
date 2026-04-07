@@ -1,0 +1,31 @@
+diff -up libsndfile-1.2.2/src/ALAC/alac_decoder.c.stdbool libsndfile-1.2.2/src/ALAC/alac_decoder.c
+--- libsndfile-1.2.2/src/ALAC/alac_decoder.c.stdbool	2025-01-29 14:04:19.283411270 +0100
++++ libsndfile-1.2.2/src/ALAC/alac_decoder.c	2025-01-29 14:04:49.058349842 +0100
+@@ -38,10 +38,7 @@
+ #include "ALACBitUtilities.h"
+ #include "EndianPortable.h"
+ 
+-typedef enum
+-{	false = 0,
+-	true = 1
+-} bool ;
++#include <stdbool.h>
+ 
+ // constants/data
+ const uint32_t kMaxBitDepth = 32 ;			// max allowed bit depth is 32
+diff -up libsndfile-1.2.2/src/ALAC/alac_encoder.c.stdbool libsndfile-1.2.2/src/ALAC/alac_encoder.c
+--- libsndfile-1.2.2/src/ALAC/alac_encoder.c.stdbool	2025-01-29 14:04:30.167388813 +0100
++++ libsndfile-1.2.2/src/ALAC/alac_encoder.c	2025-01-29 14:05:03.133174488 +0100
+@@ -44,11 +44,7 @@
+ #include "ALACAudioTypes.h"
+ #include "EndianPortable.h"
+ 
+-typedef enum
+-{
+-	false = 0,
+-	true = 1
+-} bool ;
++#include <stdbool.h>
+ 
+ static void	GetConfig (ALAC_ENCODER *p, ALACSpecificConfig * config) ;
+ 

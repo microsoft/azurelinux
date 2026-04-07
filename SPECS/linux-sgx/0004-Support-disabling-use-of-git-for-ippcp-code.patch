@@ -1,0 +1,49 @@
+From 42a8e6203754527a76752d3aef2045c7b08a8e71 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Thu, 13 Feb 2025 14:37:24 +0000
+Subject: [PATCH 04/17] Support disabling use of git for ippcp code
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Allow the user to provide the ippcp source ahead of time,
+to avoid use of git in environments where there is no
+network access available.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ external/ippcp_internal/Makefile | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/external/ippcp_internal/Makefile b/external/ippcp_internal/Makefile
+index a57c22a9..d78ba90e 100644
+--- a/external/ippcp_internal/Makefile
++++ b/external/ippcp_internal/Makefile
+@@ -33,6 +33,8 @@ include ../../buildenv.mk
+ 
+ DIR = $(CURDIR)
+ 
++IPP_USE_GIT := 1
++
+ IPP_CONFIG = -Bbuild -DCMAKE_VERBOSE_MAKEFILE=on
+ 
+ # Ignore the CMAKE C/C++ compiler check to avoid conflicts with mitigation options
+@@ -85,6 +87,7 @@ build_ipp: $(CHECK_SOURCE)
+ 	cd $(IPP_SOURCE) && $(PRE_CONFIG) cmake CMakeLists.txt $(IPP_CONFIG) && cd build && make ippcp_s
+ 
+ $(IPP_SOURCE)/build:
++ifeq ($(IPP_USE_GIT), 1)
+ ifeq ($(shell git rev-parse --is-inside-work-tree), true)
+ 	git submodule update -f --init --recursive --remote -- $(IPP_SOURCE)
+ else
+@@ -92,6 +95,7 @@ else
+ 	git clone -b ipp-crypto_2021_12_1 https://github.com/intel/ipp-crypto.git --depth 1 $(IPP_SOURCE)
+ endif
+ 	cd $(IPP_SOURCE) && git apply ../0001-IPP-crypto-for-SGX.patch
++endif
+ 	mkdir -p $(IPP_SOURCE)/build
+ 
+ .PHONY: clean
+-- 
+2.52.0
+

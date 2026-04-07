@@ -1,0 +1,35 @@
+[Unit]
+Description=Valkey persistent key-value database
+After=network.target
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+WorkingDirectory=/var/lib/valkey
+# ensure var is set
+Environment=OPTIONS=
+EnvironmentFile=-/etc/sysconfig/valkey
+# we must keep $OPTIONS and the env file as some older installs will still be using /etc/sysconfig/valkey
+ExecStart=/usr/bin/valkey-server /etc/valkey/valkey.conf --daemonize no --supervised systemd $OPTIONS
+Type=notify
+User=valkey
+Group=valkey
+RuntimeDirectory=valkey
+RuntimeDirectoryMode=0755
+
+# If you need to change max open file limit
+# for example, when you change maxclient in configuration
+# you can change the LimitNOFILE value below.
+# See "man systemd.exec" for more information.
+LimitNOFILE=10240
+
+# Slave nodes on large system may take lot of time to start.
+# You may need to uncomment TimeoutStartSec and TimeoutStopSec
+# directives below and raise their value.
+# See "man systemd.service" for more information.
+#TimeoutStartSec=90s
+#TimeoutStopSec=90s
+
+[Install]
+WantedBy=multi-user.target
+

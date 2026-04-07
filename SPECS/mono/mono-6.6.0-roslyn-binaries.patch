@@ -1,0 +1,16 @@
+--- a/mcs/packages/Makefile	2019-02-21 04:53:46.843939657 +0000
++++ b/mcs/packages/Makefile	2019-02-21 04:53:40.111824983 +0000
+@@ -42,11 +42,13 @@
+ 
+ install-local:
+ 	$(MKINSTALLDIRS) $(TARGET_DIR)
++ifndef MCS_MODE
+ 	$(INSTALL_LIB) $(ROSLYN_FILES_FOR_MONO) $(TARGET_DIR)
+ 	$(MKINSTALLDIRS) $(MSBUILD_ROSLYN_DIR)
+ 	$(INSTALL_LIB) $(ROSLYN_FILES_TO_COPY_FOR_MSBUILD) $(MSBUILD_ROSLYN_DIR)
+ 
+ 	(cd $(MSBUILD_ROSLYN_DIR); for asm in $(ROSLYN_FILES_FOR_MONO); do ln -fs ../../../../$(FRAMEWORK_VERSION)/$$(basename $$asm) . ; done)
++endif
+ 
+ run-test-local: test-csi
+ 

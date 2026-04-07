@@ -1,0 +1,39 @@
+From fb4a884fe6266e664cc886273bad3b2ae761118a Mon Sep 17 00:00:00 2001
+From: Vit Mojzis <vmojzis@redhat.com>
+Date: Thu, 11 Dec 2025 13:50:45 +0100
+Subject: [PATCH] browser: Always show "Report Bug" button
+
+Without python3-libreport the "Report Bug" button was not shown at all.
+After this change the button is always visible, but without libreport it
+is disabled and the tooltip tells the user how to enable it.
+
+Signed-off-by: Vit Mojzis <vmojzis@redhat.com>
+---
+ src/setroubleshoot/browser.py | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/src/setroubleshoot/browser.py b/src/setroubleshoot/browser.py
+index 73fc26e..47788a7 100644
+--- a/src/setroubleshoot/browser.py
++++ b/src/setroubleshoot/browser.py
+@@ -548,11 +548,15 @@ class BrowserApplet:
+             report_button.connect("clicked", self.fix_bug, alert.local_id, plugin.analysis_id)
+             vbox.add(report_button)
+ 
+-        elif plugin.report_bug and has_libreport:
++        elif plugin.report_bug:
+             report_button = Gtk.Button()
+             report_button.set_label(_("Report\nBug"))
+             report_button.show()
+-            report_button.connect("clicked", self.report_bug, alert)
++            if has_libreport:
++                report_button.connect("clicked", self.report_bug, alert)
++            else:
++                report_button.set_sensitive(False)
++                report_button.set_tooltip_text(_("Please install python3-libreport to enable bug reporting."))
+             vbox.add(report_button)
+ 
+         vbox.set_sensitive(highlight)
+-- 
+2.52.0
+

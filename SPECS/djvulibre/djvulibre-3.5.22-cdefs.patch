@@ -1,0 +1,12 @@
+diff -up djvulibre-3.5.22/libdjvu/GSmartPointer.h.cdefs djvulibre-3.5.22/libdjvu/GSmartPointer.h
+--- djvulibre-3.5.22/libdjvu/GSmartPointer.h.cdefs	2008-03-05 01:44:20.000000000 +0000
++++ djvulibre-3.5.22/libdjvu/GSmartPointer.h	2011-01-31 13:43:37.595917364 +0000
+@@ -65,6 +65,8 @@
+ # pragma interface
+ #endif
+ 
++#include <cstddef>
++
+ /** @name GSmartPointer.h
+ 
+     Files #"GSmartPointer.h"# and #"GSmartPointer.cpp"# define a smart-pointer

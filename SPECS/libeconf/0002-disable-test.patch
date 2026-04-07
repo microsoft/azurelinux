@@ -1,0 +1,25 @@
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 1c6b448..3732bfa 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -65,7 +65,6 @@ set(TESTS tst-filedoesnotexit1
+           tst-quote1
+ 	  tst-parse-error
+ 	  tst-getpath
+-	  tst-write-string-data
+ 	  tst-write-comments )
+ 
+ foreach (TESTCASE ${TESTS})
+diff --git a/tests/meson.build b/tests/meson.build
+index 8a48d5a..d5af24d 100644
+--- a/tests/meson.build
++++ b/tests/meson.build
+@@ -23,8 +23,6 @@ test('tst-merge4', tst_merge4_exe)
+ tst_merge5_exe = executable('tst-merge5', 'tst-merge5.c', c_args: test_args, dependencies : libeconf_dep)
+ test('tst-merge5', tst_merge5_exe)
+ 
+-tst_write_string_data_exe = executable('tst-write-string-data', 'tst-write-string-data.c', c_args: test_args, dependencies : libeconf_dep)
+-test('tst-write-string-data', tst_write_string_data_exe)
+ tst_write_comments_exe = executable('tst-write-comments', 'tst-write-comments.c', c_args: test_args, dependencies : libeconf_dep)
+ test('tst-write-comments', tst_write_comments_exe)
+ 

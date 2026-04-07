@@ -1,0 +1,145 @@
+--- a/src/basedir.c	2019-04-01 17:11:52.293770606 +0200
++++ b/src/basedir.c	2019-04-01 14:03:23.465154736 +0200
+@@ -142,26 +142,22 @@
+ /** Free all data in the cache and set pointers to null. */
+ static void xdgFreeData(xdgCachedData *cache)
+ {
+-	if (cache->dataHome);
+-	{
++        if (cache->dataHome) {
+ 		/* the first element of the directory lists is usually the home directory */
+ 		if (cache->searchableDataDirectories && cache->searchableDataDirectories[0] != cache->dataHome)
+ 			free(cache->dataHome);
+ 		cache->dataHome = 0;
+ 	}
+-	if (cache->configHome);
+-	{
++	if (cache->configHome) {
+ 		if (cache->searchableConfigDirectories && cache->searchableConfigDirectories[0] != cache->configHome)
+ 			free(cache->configHome);
+ 		cache->configHome = 0;
+ 	}
+-	if (cache->cacheHome)
+-	{
++	if (cache->cacheHome) {
+ 		free(cache->cacheHome);
+ 		cache->cacheHome = 0;
+ 	}
+-	if (cache->runtimeDirectory)
+-	{
++	if (cache->runtimeDirectory) {
+ 		free(cache->runtimeDirectory);
+ 		cache->runtimeDirectory = 0;
+ 	}
+@@ -327,8 +323,12 @@
+ 
+ 	if (cache->dataHome && cache->configHome && cache->cacheHome) return TRUE;
+ 
+-	if (!(homeenv = xdgGetEnv("HOME")))
+-		return FALSE;
++	if (!(homeenv = xdgGetEnv("HOME"))) {
++          cache->dataHome = NULL;
++          cache->configHome = NULL;
++          cache->cacheHome = NULL;
++          return TRUE;
++        }
+ 
+ 	/* Allocate maximum needed for any of the 3 default values */
+ 	if (!(value = (char*)malloc((homelen = strlen(homeenv))+extralen))) return FALSE;
+@@ -614,8 +614,8 @@
+ 	else
+ 	{
+ 		char *datahome = (char*)xdgDataHome(NULL);
+-		char **datadirs = 0;
+-		if (datahome && !(datadirs = xdgGetDirectoryLists("XDG_DATA_DIRS", datahome, DefaultDataDirectoriesList)))
++		char **datadirs = xdgGetDirectoryLists("XDG_DATA_DIRS", datahome, DefaultDataDirectoriesList);
++		if (datahome && !datadirs)
+ 			free(datahome);
+ 		return (const char * const *)datadirs;
+ 	}
+@@ -634,8 +634,8 @@
+ 	else
+ 	{
+ 		char *confighome = (char*)xdgConfigHome(NULL);
+-		char **configdirs = 0;
+-		if (confighome && !(configdirs = xdgGetDirectoryLists("XDG_CONFIG_DIRS", confighome, DefaultConfigDirectoriesList)))
++		char **configdirs = xdgGetDirectoryLists("XDG_CONFIG_DIRS", confighome, DefaultConfigDirectoriesList);
++		if (confighome && !configdirs)
+ 			free(confighome);
+ 		return (const char * const *)configdirs;
+ 	}
+--- a/tests/testdump.c	2012-01-22 02:29:11.000000000 +0100
++++ b/tests/testdump.c	2019-04-01 14:03:23.463154767 +0200
+@@ -24,27 +24,56 @@
+ 
+ #include <basedir.h>
+ #include <stdio.h>
++#include <stdlib.h>
++
++static void print_item_list(const char * const * item_list, int do_free)
++{
++  const char * const * item;
++  for (item = item_list; *item; item++) {
++    printf("%s%c", *item, (item[1] ? ':' : '\n'));
++    if (do_free) free((void *)*item);
++  }
++  if (do_free) free((void *)item_list);
++}
++
++static void do_test(xdgHandle *handle) {
++  int do_free = (handle == NULL);
++
++  char *dataHome = xdgDataHome(handle);
++  printf("${XDG_DATA_HOME:-$HOME/.local/share}=%s\n", dataHome);
++  if (do_free) free(dataHome);
++
++  char *configHome = xdgConfigHome(handle);
++  printf("${XDG_CONFIG_HOME:-$HOME/.config}=%s\n", configHome);
++  if (do_free) free(configHome);
++
++  printf("${XDG_DATA_DIRS:-/usr/local/share/:/usr/share/}=");
++  print_item_list(xdgDataDirectories(handle), do_free);
++
++  printf("${XDG_DATA_HOME:-$HOME/.local/share}:${XDG_DATA_DIRS:-/usr/local/share/:/usr/share/}=");
++  print_item_list(xdgSearchableDataDirectories(handle), do_free);
++
++  printf("${XDG_CONFIG_DIRS:-/etc/xdg}=");
++  print_item_list(xdgConfigDirectories(handle), do_free);
++
++  printf("${XDG_CONFIG_HOME:-$HOME/.config}:${XDG_CONFIG_DIRS:-/etc/xdg}=");
++  print_item_list(xdgSearchableConfigDirectories(handle), do_free);
++
++  char *cacheHome = xdgCacheHome(handle);
++  printf("${XDG_CACHE_HOME:-$HOME/.cache}=%s\n", cacheHome);
++  if (do_free) free(cacheHome);
++}
+ 
+ int main(int argc, char* argv[])
+ {
+-	const char * const * item;
+ 	xdgHandle handle;
++
++        printf("UNCACHED\n");
++        do_test(0);
+ 	if (!xdgInitHandle(&handle)) return 1;
+-	printf("${XDG_DATA_HOME:-$HOME/.local/share}=%s\n", xdgDataHome(&handle));
+-	printf("${XDG_CONFIG_HOME:-$HOME/.config}=%s\n", xdgConfigHome(&handle));
+-	printf("${XDG_DATA_DIRS:-/usr/local/share/:/usr/share/}=");
+-	for (item = xdgDataDirectories(&handle); *item; item++)
+-		printf("%s%c", *item, (item[1] ? ':' : '\n'));
+-	printf("${XDG_DATA_HOME:-$HOME/.local/share}:${XDG_DATA_DIRS:-/usr/local/share/:/usr/share/}=");
+-	for (item = xdgSearchableDataDirectories(&handle); *item; item++)
+-		printf("%s%c", *item, (item[1] ? ':' : '\n'));
+-	printf("${XDG_CONFIG_DIRS:-/etc/xdg}=");
+-	for (item = xdgConfigDirectories(&handle); *item; item++)
+-		printf("%s%c", *item, (item[1] ? ':' : '\n'));
+-	printf("${XDG_CONFIG_HOME:-$HOME/.config}:${XDG_CONFIG_DIRS:-/etc/xdg}=");
+-	for (item = xdgSearchableConfigDirectories(&handle); *item; item++)
+-		printf("%s%c", *item, (item[1] ? ':' : '\n'));
+-	printf("${XDG_CACHE_HOME:-$HOME/.cache}=%s\n", xdgCacheHome(&handle));
++        printf("CACHED\n");
++        do_test(&handle);
+ 	xdgWipeHandle(&handle);
++        printf("DONE\n");
+ 	return 0;
+ }

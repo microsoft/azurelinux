@@ -1,0 +1,30 @@
+--- minijinja-2.15.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ minijinja-2.15.1/Cargo.toml	2026-02-12T21:36:30.167779+00:00
+@@ -71,10 +71,6 @@
+ internal_safe_search = []
+ json = ["serde_json"]
+ key_interning = []
+-loader = [
+-    "self_cell",
+-    "memo-map",
+-]
+ loop_controls = []
+ macros = []
+ multi_template = []
+@@ -106,16 +102,8 @@
+ version = "2.2.0"
+ optional = true
+ 
+-[dependencies.memo-map]
+-version = "0.3.1"
+-optional = true
+-
+ [dependencies.percent-encoding]
+ version = "2.2.0"
+-optional = true
+-
+-[dependencies.self_cell]
+-version = "1.0.4"
+ optional = true
+ 
+ [dependencies.serde]

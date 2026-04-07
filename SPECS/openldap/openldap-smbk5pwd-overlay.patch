@@ -1,0 +1,59 @@
+Compile smbk5pwd together with other overlays.
+
+Author: Jan Šafránek <jsafrane@redhat.com>
+Resolves: #550895
+
+Update to link against OpenSSL
+
+Author: Jan Vcelak <jvcelak@redhat.com>
+Resolves: #841560
+
+diff --git a/contrib/slapd-modules/smbk5pwd/README b/contrib/slapd-modules/smbk5pwd/README
+index 4a710a7..0cd4e9e 100644
+--- a/contrib/slapd-modules/smbk5pwd/README
++++ b/contrib/slapd-modules/smbk5pwd/README
+@@ -1,3 +1,8 @@
++******************************************************************************
++Red Hat note: We do not provide Heimdal Kerberos but MIT. Therefore the module
++is compiled only with Samba features in Fedora and Red Hat Enterprise Linux.
++******************************************************************************
++
+ This directory contains a slapd overlay, smbk5pwd, that extends the
+ PasswordModify Extended Operation to update Kerberos keys and Samba
+ password hashes for an LDAP user.
+diff --git a/servers/slapd/overlays/Makefile.in b/servers/slapd/overlays/Makefile.in
+index b84bc54..b5c3fc8 100644
+--- a/servers/slapd/overlays/Makefile.in
++++ b/servers/slapd/overlays/Makefile.in
+@@ -37,7 +37,8 @@ SRCS = overlays.c \
+ 	syncprov.c \
+ 	translucent.c \
+ 	unique.c \
+-	valsort.c
++	valsort.c \
++	smbk5pwd.c
+ OBJS = statover.o \
+ 	@SLAPD_STATIC_OVERLAYS@ \
+ 	overlays.o
+@@ -57,7 +58,7 @@ NT_LINK_LIBS = -L.. -lslapd $(@BUILD_LIBS_DYNAMIC@_LDAP_LIBS)
+ UNIX_LINK_LIBS = $(@BUILD_LIBS_DYNAMIC@_LDAP_LIBS)
+ 
+ LIBRARY = ../liboverlays.a
+-PROGRAMS = @SLAPD_DYNAMIC_OVERLAYS@
++PROGRAMS = @SLAPD_DYNAMIC_OVERLAYS@ smbk5pwd.la
+ 
+ XINCPATH = -I.. -I$(srcdir)/..
+ XDEFS = $(MODULES_CPPFLAGS)
+@@ -141,6 +142,12 @@ unique.la : unique.lo
+ valsort.la : valsort.lo
+ 	$(LTLINK_MOD) -module -o $@ valsort.lo version.lo $(LINK_LIBS)
+ 
++smbk5pwd.lo : smbk5pwd.c
++	$(LTCOMPILE_MOD) -DDO_SAMBA -UHAVE_MOZNSS -DHAVE_OPENSSL $(shell pkg-config openssl --cflags) $<
++
++smbk5pwd.la : smbk5pwd.lo
++	$(LTLINK_MOD) -module -o $@ smbk5pwd.lo version.lo $(LINK_LIBS) $(shell pkg-config openssl --libs)
++
+ install-local:	$(PROGRAMS)
+ 	@if test -n "$?" ; then \
+ 		$(MKDIR) $(DESTDIR)$(moduledir); \

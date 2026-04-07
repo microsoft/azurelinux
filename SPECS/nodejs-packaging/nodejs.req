@@ -1,0 +1,707 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+# Copyright 2012, 2013 T.C. Hollingsworth <tchollingsworth@gmail.com>
+# Copyright 2019 Jan Staněk <jstanek@redat.com>
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to
+# deal in the Software without restriction, including without limitation the
+# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+# sell copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+# IN THE SOFTWARE.
+
+""" Automatic dependency generator for Node.js libraries.
+
+Metadata parsed from package.json.  See `man npm-json` for details.
+"""
+
+from __future__ import print_function, with_statement
+
+import json
+import operator
+import os
+import re
+import sys
+from collections import namedtuple
+from itertools import chain
+from itertools import takewhile
+
+# Python version detection
+_PY2 = sys.version_info[0] <= 2
+_PY3 = sys.version_info[0] >= 3
+
+if _PY2:
+    from future_builtins import map, filter
+
+
+#: Name format of the requirements
+REQUIREMENT_NAME_TEMPLATE = "npm({name})"
+
+#: ``simple`` product of the NPM semver grammar.
+RANGE_SPECIFIER_SIMPLE = re.compile(
+    r"""
+    (?P<operator>
+        <= | >= | < | > | =     # primitive
+        | ~ | \^                # tilde/caret operators
+    )?
+    \s*(?P<version>\S+)\s*  # version specifier
+    """,
+    flags=re.VERBOSE,
+)
+
+
+class UnsupportedVersionToken(ValueError):
+    """Version specifier contains token unsupported by the parser."""
+
+
+class Version(tuple):
+    """Normalized RPM/NPM version.
+
+    The version has up to 3 components – major, minor, patch.
+    Any part set to None is treated as unspecified.
+
+    ::
+
+        1.2.3 == Version(1, 2, 3)
+        1.2   == Version(1, 2)
+        1     == Version(1)
+        *     == Version()
+    """
+
+    __slots__ = ()
+
+    #: Version part meaning 'Any'
+    #: ``xr`` in https://docs.npmjs.com/misc/semver#range-grammar
+    _PART_ANY = re.compile(r"^[xX*]$")
+    #: Numeric version part
+    #: ``nr`` in https://docs.npmjs.com/misc/semver#range-grammar
+    _PART_NUMERIC = re.compile(r"0|[1-9]\d*")
+
+    def __new__(cls, *args):
+        """Create new version.
+
+        Arguments:
+            Version components in the order of "major", "minor", "patch".
+            All parts are optional::
+
+                >>> Version(1, 2, 3)
+                Version(1, 2, 3)
+                >>> Version(1)
+                Version(1)
+                >>> Version()
+                Version()
+
+        Returns:
+            New Version.
+        """
+
+        if len(args) > 3:
+            raise ValueError("Version has maximum of 3 components")
+        return super(Version, cls).__new__(cls, map(int, args))
+
+    def __repr__(self):
+        """Pretty debugging format."""
+
+        return "{0}({1})".format(self.__class__.__name__, ", ".join(map(str, self)))
+
+    def __str__(self):
+        """RPM version format."""
+
+        return ".".join(format(part, "d") for part in self)
+
+    @property
+    def major(self):
+        """Major version number, if any."""
+        return self[0] if len(self) > 0 else None
+
+    @property
+    def minor(self):
+        """Major version number, if any."""
+        return self[1] if len(self) > 1 else None
+
+    @property
+    def patch(self):
+        """Major version number, if any."""
+        return self[2] if len(self) > 2 else None
+
+    @property
+    def empty(self):
+        """True if the version contains nothing but zeroes."""
+        return not any(self)
+
+    @classmethod
+    def parse(cls, version_string):
+        """Parse individual version string (like ``1.2.3``) into Version.
+
+        This is the ``partial`` production in the grammar:
+        https://docs.npmjs.com/misc/semver#range-grammar
+
+        Examples::
+
+            >>> Version.parse("1.2.3")
+            Version(1, 2, 3)
+            >>> Version.parse("v2.x")
+            Version(2)
+            >>> Version.parse("")
+            Version()
+
+        Arguments:
+            version_string (str): The version_string to parse.
+
+        Returns:
+            Version: Parsed result.
+        """
+
+        # Ignore leading ``v``, if any
+        version_string = version_string.lstrip("v")
+
+        part_list = version_string.split(".", 2)
+        # Use only parts up to first "Any" indicator
+        part_list = list(takewhile(lambda p: not cls._PART_ANY.match(p), part_list))
+
+        if not part_list:
+            return cls()
+
+        # Strip off and discard any pre-release or build qualifiers at the end.
+        # We can get away with this, because there is no sane way to represent
+        # these kinds of version requirements in RPM, and we generally expect
+        # the distro will only carry proper releases anyway.
+        try:
+            part_list[-1] = cls._PART_NUMERIC.match(part_list[-1]).group()
+        except AttributeError:  # no match
+            part_list.pop()
+
+        # Extend with ``None``s at the end, if necessary
+        return cls(*part_list)
+
+    def incremented(self):
+        """Increment the least significant part of the version::
+
+            >>> Version(1, 2, 3).incremented()
+            Version(1, 2, 4)
+            >>> Version(1, 2).incremented()
+            Version(1, 3)
+            >>> Version(1).incremented()
+            Version(2)
+            >>> Version().incremented()
+            Version()
+
+        Returns:
+            Version: New incremented Version.
+        """
+
+        if len(self) == 0:
+            return self.__class__()
+        else:
+            args = self[:-1] + (self[-1] + 1,)
+            return self.__class__(*args)
+
+
+class VersionBoundary(namedtuple("VersionBoundary", ("version", "operator"))):
+    """Normalized version range boundary."""
+
+    __slots__ = ()
+
+    #: Ordering of primitive operators.
+    #: Operators not listed here are handled specially; see __compare below.
+    #: Convention: Lower boundary < 0, Upper boundary > 0
+    _OPERATOR_ORDER = {"<": 2, "<=": 1, ">=": -1, ">": -2}
+
+    def __str__(self):
+        """Pretty-print the boundary"""
+
+        return "{0.operator}{0.version}".format(self)
+
+    def __compare(self, other, operator):
+        """Compare two boundaries with provided operator.
+
+        Boundaries compare same as (version, operator_order) tuple.
+        In case the boundary operator is not listed in _OPERATOR_ORDER,
+        it's order is treated as 0.
+
+        Arguments:
+            other (VersionBoundary): The other boundary to compare with.
+            operator (Callable[[VersionBoundary, VersionBoundary], bool]):
+                Comparison operator to delegate to.
+
+        Returns:
+            bool: The result of the operator's comparison.
+        """
+
+        ORDER = self._OPERATOR_ORDER
+
+        lhs = self.version, ORDER.get(self.operator, 0)
+        rhs = other.version, ORDER.get(other.operator, 0)
+        return operator(lhs, rhs)
+
+    def __eq__(self, other):
+        return self.__compare(other, operator.eq)
+
+    def __lt__(self, other):
+        return self.__compare(other, operator.lt)
+
+    def __le__(self, other):
+        return self.__compare(other, operator.le)
+
+    def __gt__(self, other):
+        return self.__compare(other, operator.gt)
+
+    def __ge__(self, other):
+        return self.__compare(other, operator.ge)
+
+    @property
+    def upper(self):
+        """True if self is upper boundary."""
+        return self._OPERATOR_ORDER.get(self.operator, 0) > 0
+
+    @property
+    def lower(self):
+        """True if self is lower boundary."""
+        return self._OPERATOR_ORDER.get(self.operator, 0) < 0
+
+    @classmethod
+    def equal(cls, version):
+        """Normalize single samp:`={version}` into equivalent x-range::
+
+            >>> empty = VersionBoundary.equal(Version()); tuple(map(str, empty))
+            ()
+            >>> patch = VersionBoundary.equal(Version(1, 2, 3)); tuple(map(str, patch))
+            ('>=1.2.3', '<1.2.4')
+            >>> minor = VersionBoundary.equal(Version(1, 2)); tuple(map(str, minor))
+            ('>=1.2', '<1.3')
+            >>> major = VersionBoundary.equal(Version(1)); tuple(map(str, major))
+            ('>=1', '<2')
+
+        See `X-Ranges <https://docs.npmjs.com/misc/semver#x-ranges-12x-1x-12->`_
+        for details.
+
+        Arguments:
+            version (Version): The version the x-range should be equal to.
+
+        Returns:
+            (VersionBoundary, VersionBoundary):
+                Lower and upper bound of the x-range.
+            (): Empty tuple in case version is empty (any version matches).
+        """
+
+        if version:
+            return (
+                cls(version=version, operator=">="),
+                cls(version=version.incremented(), operator="<"),
+            )
+        else:
+            return ()
+
+    @classmethod
+    def tilde(cls, version):
+        """Normalize :samp:`~{version}` into equivalent range.
+
+        Tilde allows patch-level changes if a minor version is specified.
+        Allows minor-level changes if not::
+
+            >>> with_minor = VersionBoundary.tilde(Version(1, 2, 3)); tuple(map(str, with_minor))
+            ('>=1.2.3', '<1.3')
+            >>> no_minor = VersionBoundary.tilde(Version(1)); tuple(map(str, no_minor))
+            ('>=1', '<2')
+
+        Arguments:
+            version (Version): The version to tilde-expand.
+
+        Returns:
+            (VersionBoundary, VersionBoundary):
+                The lower and upper boundary of the tilde range.
+        """
+
+        # Fail on ``~*`` or similar nonsense specifier
+        assert version.major is not None, "Nonsense '~*' specifier"
+
+        lower_boundary = cls(version=version, operator=">=")
+
+        if version.minor is None:
+            upper_boundary = cls(version=Version(version.major + 1), operator="<")
+        else:
+            upper_boundary = cls(
+                version=Version(version.major, version.minor + 1), operator="<"
+            )
+
+        return lower_boundary, upper_boundary
+
+    @classmethod
+    def caret(cls, version):
+        """Normalize :samp:`^{version}` into equivalent range.
+
+        Caret allows changes that do not modify the left-most non-zero digit
+        in the ``(major, minor, patch)`` tuple.
+        In other words, this allows
+        patch and minor updates for versions 1.0.0 and above,
+        patch updates for versions 0.X >=0.1.0,
+        and no updates for versions 0.0.X::
+
+            >>> major = VersionBoundary.caret(Version(1, 2, 3)); tuple(map(str, major))
+            ('>=1.2.3', '<2')
+            >>> minor = VersionBoundary.caret(Version(0, 2, 3)); tuple(map(str, minor))
+            ('>=0.2.3', '<0.3')
+            >>> patch = VersionBoundary.caret(Version(0, 0, 3)); tuple(map(str, patch))
+            ('>=0.0.3', '<0.0.4')
+
+        When parsing caret ranges, a missing patch value desugars to the number 0,
+        but will allow flexibility within that value,
+        even if the major and minor versions are both 0::
+
+            >>> rel = VersionBoundary.caret(Version(1, 2)); tuple(map(str, rel))
+            ('>=1.2', '<2')
+            >>> pre = VersionBoundary.caret(Version(0, 0)); tuple(map(str, pre))
+            ('>=0.0', '<0.1')
+
+        A missing minor and patch values will desugar to zero,
+        but also allow flexibility within those values,
+        even if the major version is zero::
+
+            >>> rel = VersionBoundary.caret(Version(1)); tuple(map(str, rel))
+            ('>=1', '<2')
+            >>> pre = VersionBoundary.caret(Version(0)); tuple(map(str, pre))
+            ('>=0', '<1')
+
+        Arguments:
+            version (Version): The version to range-expand.
+
+        Returns:
+            (VersionBoundary, VersionBoundary):
+                The lower and upper boundary of caret-range.
+        """
+
+        # Fail on ^* or similar nonsense specifier
+        assert len(version) != 0, "Nonsense '^*' specifier"
+
+        lower_boundary = cls(version=version, operator=">=")
+
+        # Increment left-most non-zero part
+        for idx, part in enumerate(version):
+            if part != 0:
+                upper_version = Version(*(version[:idx] + (part + 1,)))
+                break
+        else:  # No non-zero found; increment last specified part
+            upper_version = version.incremented()
+
+        upper_boundary = cls(version=upper_version, operator="<")
+
+        return lower_boundary, upper_boundary
+
+    @classmethod
+    def hyphen(cls, lower_version, upper_version):
+        """Construct hyphen range (inclusive set)::
+
+            >>> full = VersionBoundary.hyphen(Version(1, 2, 3), Version(2, 3, 4)); tuple(map(str, full))
+            ('>=1.2.3', '<=2.3.4')
+
+        If a partial version is provided as the first version in the inclusive range,
+        then the missing pieces are treated as zeroes::
+
+            >>> part = VersionBoundary.hyphen(Version(1, 2), Version(2, 3, 4)); tuple(map(str, part))
+            ('>=1.2', '<=2.3.4')
+
+        If a partial version is provided as the second version in the inclusive range,
+        then all versions that start with the supplied parts of the tuple are accepted,
+        but nothing that would be greater than the provided tuple parts::
+
+            >>> part = VersionBoundary.hyphen(Version(1, 2, 3), Version(2, 3)); tuple(map(str, part))
+            ('>=1.2.3', '<2.4')
+            >>> part = VersionBoundary.hyphen(Version(1, 2, 3), Version(2)); tuple(map(str, part))
+            ('>=1.2.3', '<3')
+
+        Arguments:
+            lower_version (Version): Version on the lower range boundary.
+            upper_version (Version): Version on the upper range boundary.
+
+        Returns:
+            (VersionBoundary, VersionBoundary):
+                Lower and upper boundaries of the hyphen range.
+        """
+
+        lower_boundary = cls(version=lower_version, operator=">=")
+
+        if len(upper_version) < 3:
+            upper_boundary = cls(version=upper_version.incremented(), operator="<")
+        else:
+            upper_boundary = cls(version=upper_version, operator="<=")
+
+        return lower_boundary, upper_boundary
+
+
+def parse_simple_seq(specifier_string):
+    """Parse all specifiers from a space-separated string::
+
+        >>> single = parse_simple_seq(">=1.2.3"); list(map(str, single))
+        ['>=1.2.3']
+        >>> multi = parse_simple_seq("~1.2.0 <1.2.5"); list(map(str, multi))
+        ['>=1.2.0', '<1.3', '<1.2.5']
+
+    This method implements the ``simple (' ' simple)*`` part of the grammar:
+    https://docs.npmjs.com/misc/semver#range-grammar.
+
+    Arguments:
+        specifier_string (str): Space-separated string of simple version specifiers.
+
+    Yields:
+        VersionBoundary: Parsed boundaries.
+    """
+
+    # Per-operator dispatch table
+    # API: Callable[[Version], Iterable[VersionBoundary]]
+    handler = {
+        ">": lambda v: [VersionBoundary(version=v, operator=">")],
+        ">=": lambda v: [VersionBoundary(version=v, operator=">=")],
+        "<=": lambda v: [VersionBoundary(version=v, operator="<=")],
+        "<": lambda v: [VersionBoundary(version=v, operator="<")],
+        "=": VersionBoundary.equal,
+        "~": VersionBoundary.tilde,
+        "^": VersionBoundary.caret,
+        None: VersionBoundary.equal,
+    }
+
+    for match in RANGE_SPECIFIER_SIMPLE.finditer(specifier_string):
+        operator, version_string = match.group("operator", "version")
+
+        for boundary in handler[operator](Version.parse(version_string)):
+            yield boundary
+
+
+def parse_range(range_string):
+    """Parse full NPM version range specification::
+
+        >>> empty = parse_range(""); list(map(str, empty))
+        []
+        >>> simple = parse_range("^1.0"); list(map(str, simple))
+        ['>=1.0', '<2']
+        >>> hyphen = parse_range("1.0 - 2.0"); list(map(str, hyphen))
+        ['>=1.0', '<2.1']
+
+    This method implements the ``range`` part of the grammar:
+    https://docs.npmjs.com/misc/semver#range-grammar.
+
+    Arguments:
+        range_string (str): The range specification to parse.
+
+    Returns:
+        Iterable[VersionBoundary]: Parsed boundaries.
+
+    Raises:
+        UnsupportedVersionToken: ``||`` is present in range_string.
+    """
+
+    HYPHEN = " - "
+
+    # FIXME: rpm should be able to process OR in dependencies
+    # This error reporting kept for backward compatibility
+    if "||" in range_string:
+        raise UnsupportedVersionToken(range_string)
+
+    if HYPHEN in range_string:
+        version_pair = map(Version.parse, range_string.split(HYPHEN, 2))
+        return VersionBoundary.hyphen(*version_pair)
+
+    elif range_string != "":
+        return parse_simple_seq(range_string)
+
+    else:
+        return []
+
+
+def unify_range(boundary_iter):
+    """Calculate largest allowed continuous version range from a set of boundaries::
+
+        >>> unify_range([])
+        ()
+        >>> _ = unify_range(parse_range("=1.2.3 <2")); tuple(map(str, _))
+        ('>=1.2.3', '<1.2.4')
+        >>> _ = unify_range(parse_range("~1.2 <1.2.5")); tuple(map(str, _))
+        ('>=1.2', '<1.2.5')
+
+    Arguments:
+        boundary_iter (Iterable[VersionBoundary]): The version boundaries to unify.
+
+    Returns:
+        (VersionBoundary, VersionBoundary):
+            Lower and upper boundary of the unified range.
+    """
+
+    # Drop boundaries with empty version
+    boundary_iter = (
+        boundary for boundary in boundary_iter if not boundary.version.empty
+    )
+
+    # Split input sequence into upper/lower boundaries
+    lower_list, upper_list = [], []
+    for boundary in boundary_iter:
+        if boundary.lower:
+            lower_list.append(boundary)
+        elif boundary.upper:
+            upper_list.append(boundary)
+        else:
+            msg = "Unsupported boundary for unify_range: {0}".format(boundary)
+            raise ValueError(msg)
+
+    # Select maximum from lower boundaries and minimum from upper boundaries
+    intermediate = (
+        max(lower_list) if lower_list else None,
+        min(upper_list) if upper_list else None,
+    )
+
+    return tuple(filter(None, intermediate))
+
+
+def rpm_format(requirement, version_spec="*"):
+    """Format requirement as RPM boolean dependency::
+
+        >>> rpm_format("nodejs(engine)")
+        'nodejs(engine)'
+        >>> rpm_format("npm(foo)", ">=1.0.0")
+        'npm(foo) >= 1.0.0'
+        >>> rpm_format("npm(bar)", "~1.2")
+        '(npm(bar) >= 1.2 with npm(bar) < 1.3)'
+
+    Arguments:
+        requirement (str): The name of the requirement.
+        version_spec (str): The NPM version specification for the requirement.
+
+    Returns:
+        str: Formatted requirement.
+    """
+
+    TEMPLATE = "{name} {boundary.operator} {boundary.version!s}"
+
+    try:
+        boundary_tuple = unify_range(parse_range(version_spec))
+
+    except UnsupportedVersionToken:
+        # FIXME: Typos and print behavior kept for backward compatibility
+        warning_lines = [
+            "WARNING: The {requirement} dependency contains an OR (||) dependency: '{version_spec}.",
+            "Please manually include a versioned dependency in your spec file if necessary",
+        ]
+        warning = "\n".join(warning_lines).format(
+            requirement=requirement, version_spec=version_spec
+        )
+        print(warning, end="", file=sys.stderr)
+
+        return requirement
+
+    formatted = [
+        TEMPLATE.format(name=requirement, boundary=boundary)
+        for boundary in boundary_tuple
+    ]
+
+    if len(formatted) > 1:
+        return "({0})".format(" with ".join(formatted))
+    elif len(formatted) == 1:
+        return formatted[0]
+    else:
+        return requirement
+
+
+def has_only_bundled_dependencies(module_dir_path):
+    """Determines if the module contains only bundled dependencies.
+
+    Dependencies are considered un-bundled when they are symlinks
+    pointing outside the root module's tree.
+
+    Arguments:
+        module_dir_path (str):
+            Path to the module directory (directory with ``package.json``).
+
+    Returns:
+        bool: True if all dependencies are bundled, False otherwise.
+    """
+
+    module_root_path = os.path.abspath(module_dir_path)
+    dependency_root_path = os.path.join(module_root_path, "node_modules")
+
+    try:
+        dependency_path_iter = (
+            os.path.join(dependency_root_path, basename)
+            for basename in os.listdir(dependency_root_path)
+        )
+        bundled_dependency_iter = (
+            path
+            for path in dependency_path_iter
+            if not os.path.islink(path) or os.path.realpath(path).startswith(module_root_path)
+        )
+
+        return any(bundled_dependency_iter)
+    except OSError:  # node_modules does not exist
+        return False
+
+
+def extract_dependencies(metadata_path, optional=False):
+    """Extract all dependencies in RPM format from package metadata.
+
+    Arguments:
+        metadata_path (str): Path to package metadata (``package.json``).
+        optional (bool):
+            If True, extract ``optionalDependencies``
+            instead of ``dependencies``.
+
+    Yields:
+        RPM-formatted dependencies.
+
+    Raises:
+        TypeError: Invalid dependency data type.
+    """
+
+    # Read metadata
+    try:
+        with open(metadata_path, mode="r") as metadata_file:
+            metadata = json.load(metadata_file)
+    except OSError:  # Invalid metadata file
+        return  # skip
+
+    # Report required NodeJS version with required dependencies
+    if not optional:
+        try:
+            yield rpm_format("nodejs(engine)", metadata["engines"]["node"])
+        except KeyError:  # NodeJS engine version unspecified
+            yield rpm_format("nodejs(engine)")
+
+    if has_only_bundled_dependencies(os.path.dirname(metadata_path)):
+        return  # skip
+
+    # Report listed dependencies
+    kind = "optionalDependencies" if optional else "dependencies"
+    container = metadata.get(kind, {})
+
+    if isinstance(container, dict):
+        for name, version_spec in container.items():
+            yield rpm_format(REQUIREMENT_NAME_TEMPLATE.format(name=name), version_spec)
+
+    elif isinstance(container, list):
+        for name in container:
+            yield rpm_format(REQUIREMENT_NAME_TEMPLATE.format(name=name))
+
+    elif isinstance(container, str):
+        yield rpm_format(REQUIREMENT_NAME_TEMPLATE.format(name=name))
+
+    else:
+        raise TypeError("invalid package.json: dependencies not a valid type")
+
+
+if __name__ == "__main__":
+    nested = (
+        extract_dependencies(path.strip(), optional="--optional" in sys.argv)
+        for path in sys.stdin
+    )
+    flat = chain.from_iterable(nested)
+    # Ignore parentheses around the requirements when sorting
+    ordered = sorted(flat, key=lambda s: s.strip("()"))
+
+    print(*ordered, sep="\n")

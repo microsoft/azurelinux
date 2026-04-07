@@ -1,0 +1,49 @@
+From 46c9caf733ea16f272ad2f131de9e78e2280d0ca Mon Sep 17 00:00:00 2001
+From: Lumir Balhar <lbalhar@redhat.com>
+Date: Wed, 9 Aug 2023 11:55:53 +0200
+Subject: [PATCH] Fix compatibility with pytest 7.4.0
+
+Fixes: https://github.com/html5lib/html5lib-python/issues/572
+---
+ html5lib/tests/tokenizer.py         | 8 +++++++-
+ html5lib/tests/tree_construction.py | 8 +++++++-
+ 2 files changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/html5lib/tests/tokenizer.py b/html5lib/tests/tokenizer.py
+index cc9897a4..8c4b1629 100644
+--- a/html5lib/tests/tokenizer.py
++++ b/html5lib/tests/tokenizer.py
+@@ -246,7 +246,13 @@ def runtest(self):
+     def repr_failure(self, excinfo):
+         traceback = excinfo.traceback
+         ntraceback = traceback.cut(path=__file__)
+-        excinfo.traceback = ntraceback.filter()
++
++        if pytest.version_tuple >= (7, 4, 0):
++            filter_args = (excinfo,)
++        else:
++            filter_args = ()
++
++        excinfo.traceback = ntraceback.filter(*filter_args)
+ 
+         return excinfo.getrepr(funcargs=True,
+                                showlocals=False,
+diff --git a/html5lib/tests/tree_construction.py b/html5lib/tests/tree_construction.py
+index fb0657bf..c7c91bec 100644
+--- a/html5lib/tests/tree_construction.py
++++ b/html5lib/tests/tree_construction.py
+@@ -135,7 +135,13 @@ def runtest(self):
+     def repr_failure(self, excinfo):
+         traceback = excinfo.traceback
+         ntraceback = traceback.cut(path=__file__)
+-        excinfo.traceback = ntraceback.filter()
++
++        if pytest.version_tuple >= (7, 4, 0):
++            filter_args = (excinfo,)
++        else:
++            filter_args = ()
++
++        excinfo.traceback = ntraceback.filter(*filter_args)
+ 
+         return excinfo.getrepr(funcargs=True,
+                                showlocals=False,

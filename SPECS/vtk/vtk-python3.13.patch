@@ -1,0 +1,90 @@
+diff --git a/Utilities/PythonInterpreter/vtkPythonInterpreter.cxx b/Utilities/PythonInterpreter/vtkPythonInterpreter.cxx
+index 0471594..bc92c85 100644
+--- a/Utilities/PythonInterpreter/vtkPythonInterpreter.cxx
++++ b/Utilities/PythonInterpreter/vtkPythonInterpreter.cxx
+@@ -114,7 +114,9 @@ wchar_t* vtk_Py_UTF8ToWide(const char* arg)
+ 
+   return result;
+ }
++#endif
+ 
++#if PY_VERSION_HEX < 0x03080000
+ std::string vtk_Py_WideToUTF8(const wchar_t* arg)
+ {
+   std::string result;
+@@ -859,15 +861,20 @@ void vtkPythonInterpreter::SetupVTKPythonPaths()
+   if (vtklib.empty())
+   {
+     VTKPY_DEBUG_MESSAGE(
+-      "`GetVTKVersion` library couldn't be found. Will use `Py_GetProgramName` next.");
++      "`GetVTKVersion` library couldn't be found. Will use `sys.executable` next.");
+   }
+ 
+   if (vtklib.empty())
+   {
+-#if PY_VERSION_HEX >= 0x03000000
+-    vtklib = vtk_Py_WideToUTF8(Py_GetProgramName());
++#if PY_VERSION_HEX >= 0x03080000
++    vtkPythonScopeGilEnsurer gilEnsurer;
++    PyObject* executable_path = PySys_GetObject("executable");
++    if (executable_path != Py_None)
++    {
++      vtklib = PyUnicode_AsUTF8AndSize(executable_path, nullptr);
++    }
+ #else
+-    vtklib = Py_GetProgramName();
++    vtklib = vtk_Py_WideToUTF8(Py_GetProgramName());
+ #endif
+   }
+ 
+diff --git a/Wrapping/Python/vtkmodules/test/Testing.py b/Wrapping/Python/vtkmodules/test/Testing.py
+index 59186bb..d0643c1 100644
+--- a/Wrapping/Python/vtkmodules/test/Testing.py
++++ b/Wrapping/Python/vtkmodules/test/Testing.py
+@@ -513,8 +513,10 @@ def test(cases):
+     """
+     # Make the test suites from the arguments.
+     suites = []
+-    for case in cases:
+-        suites.append(unittest.makeSuite(case[0], case[1]))
++    loader = unittest.TestLoader()
++    # the "name" is ignored (it was always just 'test')
++    for test,name in cases:
++        suites.append(loader.loadTestsFromTestCase(test))
+     test_suite = unittest.TestSuite(suites)
+ 
+     # Now run the tests.
+diff --git a/Wrapping/PythonCore/PyVTKNamespace.cxx b/Wrapping/PythonCore/PyVTKNamespace.cxx
+index 927eef1..7460eb7 100644
+--- a/Wrapping/PythonCore/PyVTKNamespace.cxx
++++ b/Wrapping/PythonCore/PyVTKNamespace.cxx
+@@ -113,8 +113,10 @@ PyObject* PyVTKNamespace_New(const char* name)
+   {
+     // make sure python has readied the type object
+     PyType_Ready(&PyVTKNamespace_Type);
+-    // call the allocator provided by python for this type
+-    self = PyVTKNamespace_Type.tp_alloc(&PyVTKNamespace_Type, 0);
++    // call the superclass new function
++    PyObject* empty = PyTuple_New(0);
++    self = PyVTKNamespace_Type.tp_base->tp_new(&PyVTKNamespace_Type, empty, nullptr);
++    Py_DECREF(empty);
+     // call the superclass init function
+     PyObject* args = PyTuple_New(1);
+     PyTuple_SET_ITEM(args, 0, PyString_FromString(name));
+diff --git a/Wrapping/PythonCore/PyVTKTemplate.cxx b/Wrapping/PythonCore/PyVTKTemplate.cxx
+index e0ff31e..c89900f 100644
+--- a/Wrapping/PythonCore/PyVTKTemplate.cxx
++++ b/Wrapping/PythonCore/PyVTKTemplate.cxx
+@@ -788,8 +788,10 @@ PyObject* PyVTKTemplate_New(const char* name, const char* docstring)
+ {
+   // make sure python has readied the type object
+   PyType_Ready(&PyVTKTemplate_Type);
+-  // call the allocator provided by python for this type
+-  PyObject* self = PyVTKTemplate_Type.tp_alloc(&PyVTKTemplate_Type, 0);
++  // call the superclass new function
++  PyObject* empty = PyTuple_New(0);
++  PyObject* self = PyVTKTemplate_Type.tp_base->tp_new(&PyVTKTemplate_Type, empty, nullptr);
++  Py_DECREF(empty);
+   // call the superclass init function
+   PyObject* args = PyTuple_New(2);
+   PyTuple_SET_ITEM(args, 0, PyString_FromString(name));

@@ -1,0 +1,226 @@
+From 100738652ca35e39f21742b8c54c1181efb38a0f Mon Sep 17 00:00:00 2001
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 30 Jan 2024 10:38:50 +0100
+Subject: [PATCH 2/3] -c flag
+Content-Type: text/plain; charset=UTF-8
+
+---
+ sed/execute.c | 10 ++++--
+ sed/sed.c     | 20 +++++++++++-
+ sed/sed.h     |  4 +++
+ sed/utils.c   | 86 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ sed/utils.h   |  2 ++
+ 5 files changed, 119 insertions(+), 3 deletions(-)
+
+diff --git a/sed/execute.c b/sed/execute.c
+index 485bca7..8d0cde7 100644
+--- a/sed/execute.c
++++ b/sed/execute.c
+@@ -673,11 +673,17 @@ closedown (struct input *input)
+       if (strcmp (in_place_extension, "*") != 0)
+         {
+           char *backup_file_name = get_backup_file_name (target_name);
+-          ck_rename (target_name, backup_file_name);
++          if (copy_instead_of_rename)
++            ck_fccopy (target_name, backup_file_name);
++          else
++            ck_rename (target_name, backup_file_name);
+           free (backup_file_name);
+         }
+ 
+-      ck_rename (input->out_file_name, target_name);
++      if (copy_instead_of_rename)
++        ck_fcmove (input->out_file_name, target_name);
++      else
++        ck_rename (input->out_file_name, target_name);
+       cancel_cleanup ();
+       free (input->out_file_name);
+     }
+diff --git a/sed/sed.c b/sed/sed.c
+index bdf590b..cebef70 100644
+--- a/sed/sed.c
++++ b/sed/sed.c
+@@ -67,6 +67,10 @@ bool debug = false;
+ /* How do we edit files in-place? (we don't if NULL) */
+ char *in_place_extension = NULL;
+ 
++/* Do we use copy or rename when in in-place edit mode? (boolean
++ +   value, non-zero for copy, zero for rename).*/
++int copy_instead_of_rename = 0;
++
+ /* The mode to use to read/write files, either "r"/"w" or "rb"/"wb".  */
+ char const *read_mode = "r";
+ char const *write_mode = "w";
+@@ -149,6 +153,10 @@ Usage: %s [OPTION]... {script-only-if-no-other-script} [input-file]...\n\
+ #endif
+   fprintf (out, _("  -i[SUFFIX], --in-place[=SUFFIX]\n\
+                  edit files in place (makes backup if SUFFIX supplied)\n"));
++
++  fprintf(out, _("  -c, --copy\n\
++                 use copy instead of rename when shuffling files in -i mode\n"));
++
+ #if O_BINARY
+   fprintf (out, _("  -b, --binary\n\
+                  open files in binary mode (CR+LFs are not" \
+@@ -193,7 +201,7 @@ specified, then the standard input is read.\n\
+ int
+ main (int argc, char **argv)
+ {
+-#define SHORTOPTS "bsnrzuEe:f:l:i::V:"
++#define SHORTOPTS "bcsnrzuEe:f:l:i::V:"
+ 
+   enum { SANDBOX_OPTION = CHAR_MAX+1,
+          DEBUG_OPTION
+@@ -207,6 +215,7 @@ main (int argc, char **argv)
+     {"file", 1, NULL, 'f'},
+     {"in-place", 2, NULL, 'i'},
+     {"line-length", 1, NULL, 'l'},
++    {"copy", 0, NULL, 'c'},
+     {"null-data", 0, NULL, 'z'},
+     {"zero-terminated", 0, NULL, 'z'},
+     {"quiet", 0, NULL, 'n'},
+@@ -285,6 +294,10 @@ main (int argc, char **argv)
+           follow_symlinks = true;
+           break;
+ 
++        case 'c':
++          copy_instead_of_rename = true;
++          break;
++
+         case 'i':
+           separate_files = true;
+           IF_LINT (free (in_place_extension));
+@@ -355,6 +368,11 @@ main (int argc, char **argv)
+         }
+     }
+ 
++  if (copy_instead_of_rename && in_place_extension == NULL)
++    {
++      fprintf (stderr, _("Error: -c used without -i.\n"));
++      usage(4);
++    }
+   if (!the_program)
+     {
+       if (optind < argc)
+diff --git a/sed/sed.h b/sed/sed.h
+index 1c96bc5..2de60ae 100644
+--- a/sed/sed.h
++++ b/sed/sed.h
+@@ -241,6 +241,10 @@ extern countT lcmd_out_line_len;
+ /* How do we edit files in-place? (we don't if NULL) */
+ extern char *in_place_extension;
+ 
++/* Do we use copy or rename when in in-place edit mode? (boolean
++   value, non-zero for copy, zero for rename).*/
++extern int copy_instead_of_rename;
++
+ /* The mode to use to read and write files, either "rt"/"w" or "rb"/"wb".  */
+ extern char const *read_mode;
+ extern char const *write_mode;
+diff --git a/sed/utils.c b/sed/utils.c
+index 4bd6587..05f7a44 100644
+--- a/sed/utils.c
++++ b/sed/utils.c
+@@ -25,6 +25,7 @@
+ #include <sys/stat.h>
+ #include <unistd.h>
+ #include <limits.h>
++#include <fcntl.h>
+ 
+ #include "binary-io.h"
+ #include "eloop-threshold.h"
+@@ -408,7 +409,78 @@ ck_rename (const char *from, const char *to)
+   panic (_("cannot rename %s: %s"), from, strerror (errno));
+ }
+ 
++/* Downstream -c related functions */
+ 
++/* Panic on failing unlink */
++void
++ck_unlink (const char *name)
++{
++  if (unlink (name) == -1)
++    panic (_("cannot remove %s: %s"), name, strerror (errno));
++}
++
++/* Copy contents between files. */
++static int
++_copy (from, to)
++  const char *from, *to;
++{
++  static char buf[4096];
++
++  FILE *infile, *outfile;
++  int retval = 0;
++  errno = 0;
++
++  infile = fopen (from, "r");
++  if (infile == NULL)
++    return -1;
++
++  outfile = fopen (to, "w");
++  if (outfile == NULL)
++    {
++      fclose (infile);
++      return -1;
++    }
++
++  while (1)
++    {
++      size_t bytes_in = fread (buf, 1, sizeof (buf), infile);
++      size_t bytes_out;
++      if (bytes_in == 0)
++        {
++          if (ferror (infile))
++            retval = -1;
++          break;
++        }
++
++      bytes_out = fwrite (buf, 1, bytes_in, outfile);
++      if (bytes_out != bytes_in)
++        {
++          retval = -1;
++          break;
++        }
++    }
++
++  fclose (outfile);
++  fclose (infile);
++
++  return retval;
++}
++
++/* Attempt to copy file contents between the files. */
++void
++ck_fccopy (const char *from, const char *to)
++{
++  if (_copy (from, to) == -1)
++    panic (_("cannot copy %s to %s: %s"), from, to, strerror (errno));
++}
++
++/* Copy contents between files, and then unlink the source. */
++void
++ck_fcmove (const char *from, const char *to)
++{
++   ck_fccopy (from, to);
++   ck_unlink (from);
++}
+ 
+ 
+ /* Implement a variable sized buffer of `stuff'.  We don't know what it is,
+diff --git a/sed/utils.h b/sed/utils.h
+index cac8a05..93bbcf2 100644
+--- a/sed/utils.h
++++ b/sed/utils.h
+@@ -41,6 +41,8 @@ size_t ck_getdelim (char **text, size_t *buflen, char buffer_delimiter,
+ FILE * ck_mkstemp (char **p_filename, const char *tmpdir, const char *base,
+                    const char *mode) _GL_ARG_NONNULL ((1, 2, 3, 4));
+ void ck_rename (const char *from, const char *to);
++void ck_fccopy (const char *from, const char *to);
++void ck_fcmove (const char *from, const char *to);
+ 
+ void *ck_malloc (size_t size);
+ void *ck_realloc (void *ptr, size_t size);
+-- 
+2.43.0
+

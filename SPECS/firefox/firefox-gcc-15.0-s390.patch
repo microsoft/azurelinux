@@ -1,0 +1,19 @@
+diff -up firefox-137.0.2/toolkit/components/protobuf/src/google/protobuf/port_def.inc.s390 firefox-137.0.2/toolkit/components/protobuf/src/google/protobuf/port_def.inc
+--- firefox-137.0.2/toolkit/components/protobuf/src/google/protobuf/port_def.inc.s390	2025-04-22 11:42:00.650759505 +0200
++++ firefox-137.0.2/toolkit/components/protobuf/src/google/protobuf/port_def.inc	2025-04-22 11:46:02.522031338 +0200
+@@ -257,12 +257,14 @@
+ #if __has_cpp_attribute(clang::musttail) && !defined(__arm__) && \
+     !defined(_ARCH_PPC) && !defined(__wasm__) &&                 \
+     !(defined(_MSC_VER) && defined(_M_IX86)) &&                  \
+-    !(defined(__NDK_MAJOR__) && __NDK_MAJOR <= 24)
++    !(defined(__NDK_MAJOR__) && __NDK_MAJOR <= 24) &&            \
++    !defined(__s390__)
+ #  ifndef PROTO2_OPENSOURCE
+ // Compilation fails on ARM32: b/195943306
+ // Compilation fails on powerpc64le: b/187985113
+ // Compilation fails on X86 Windows:
+ // https://github.com/llvm/llvm-project/issues/53271
++// Compilation fails on S390 for calls with more than 4 arguments
+ #  endif
+ #define PROTOBUF_MUSTTAIL [[clang::musttail]]
+ #define PROTOBUF_TAILCALL true

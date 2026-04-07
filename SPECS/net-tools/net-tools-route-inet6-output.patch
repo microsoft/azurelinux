@@ -1,0 +1,10 @@
+--- a/lib/inet6_gr.c
++++ b/lib/inet6_gr.c
+@@ -146,7 +146,7 @@
+ 	    strcat(flags, "f");
+ 
+ 	/* Print the info. */
+-	printf("%-30s %-26s %-4s %-3d %-1d%6d %s\n",
++	printf("%-30s %-26s %-4s %-3d %-1d %6d %s\n",
+ 	       addr6, naddr6, flags, metric, refcnt, use, iface);
+     }

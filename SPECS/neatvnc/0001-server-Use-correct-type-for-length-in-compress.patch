@@ -1,0 +1,42 @@
+From e0e0ce5c579cafc763992f1c1bb964eb95999fb7 Mon Sep 17 00:00:00 2001
+From: Han Gao <rabenda.cn@gmail.com>
+Date: Wed, 20 Nov 2024 12:54:45 +0000
+Subject: [PATCH] server: Use correct type for length in compress()
+
+This fixes data type mismatch on 32 bit systems
+
+Signed-off-by: Han Gao <rabenda.cn@gmail.com>
+---
+ src/server.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/src/server.c b/src/server.c
+index ac15b0b..b94ed0d 100644
+--- a/src/server.c
++++ b/src/server.c
+@@ -1509,9 +1509,8 @@ static void ext_clipboard_save_provide_msg(struct nvnc* server, const char* text
+ 	memcpy(provide_msg_buf + 4, text, len);
+ 	provide_msg_buf[provide_msg_len - 1] = 0;
+ 
+-	server->ext_clipboard_provide_msg.length = compressBound(provide_msg_len);
+-	server->ext_clipboard_provide_msg.buffer = malloc(
+-			server->ext_clipboard_provide_msg.length);
++	unsigned long length = compressBound(provide_msg_len);
++	server->ext_clipboard_provide_msg.buffer = malloc(length);
+ 	if (!server->ext_clipboard_provide_msg.buffer) {
+ 		nvnc_log(NVNC_LOG_ERROR, "OOM: %m");
+ 		return;
+@@ -1519,8 +1518,8 @@ static void ext_clipboard_save_provide_msg(struct nvnc* server, const char* text
+ 
+ 	int rc;
+ 	rc = compress((unsigned char*)server->ext_clipboard_provide_msg.buffer,
+-			&server->ext_clipboard_provide_msg.length,
+-			provide_msg_buf, provide_msg_len);
++			&length, provide_msg_buf, provide_msg_len);
++	server->ext_clipboard_provide_msg.length = length;
+ 
+ 	free(provide_msg_buf);
+ 
+-- 
+2.47.0
+

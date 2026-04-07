@@ -1,0 +1,94 @@
+From 036fd45c16afec1b713ae7f37393c76c3ff528a5 Mon Sep 17 00:00:00 2001
+From: Aymeric Augustin <aymeric.augustin@fractalideas.com>
+Date: Tue, 15 Jul 2025 22:09:02 +0200
+Subject: [PATCH] Confirm support for Python 3.14.
+
+---
+ .github/workflows/release.yml | 2 +-
+ .github/workflows/tests.yml   | 1 +
+ docs/project/changelog.rst    | 5 +++++
+ pyproject.toml                | 1 +
+ tests/legacy/utils.py         | 3 ++-
+ tox.ini                       | 5 +++--
+ 6 files changed, 13 insertions(+), 4 deletions(-)
+
+diff --git a/.github/workflows/release.yml b/.github/workflows/release.yml
+index 0ff07c9df..7bd392136 100644
+--- a/.github/workflows/release.yml
++++ b/.github/workflows/release.yml
+@@ -53,7 +53,7 @@ jobs:
+       with:
+         platforms: all
+     - name: Build wheels
+-      uses: pypa/cibuildwheel@v2.22.0
++      uses: pypa/cibuildwheel@v3.0.1
+       env:
+         BUILD_EXTENSION: yes
+     - name: Save wheels
+diff --git a/.github/workflows/tests.yml b/.github/workflows/tests.yml
+index f6a77bce0..bbe91fc6d 100644
+--- a/.github/workflows/tests.yml
++++ b/.github/workflows/tests.yml
+@@ -59,6 +59,7 @@ jobs:
+           - "3.11"
+           - "3.12"
+           - "3.13"
++          - "3.14"
+           - "pypy-3.10"
+         is_main:
+           - ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+diff --git a/pyproject.toml b/pyproject.toml
+index d9f31b8c9..ae26643ac 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -23,6 +23,7 @@ classifiers = [
+     "Programming Language :: Python :: 3.11",
+     "Programming Language :: Python :: 3.12",
+     "Programming Language :: Python :: 3.13",
++    "Programming Language :: Python :: 3.14",
+ ]
+ dynamic = ["version", "readme"]
+ 
+diff --git a/tests/legacy/utils.py b/tests/legacy/utils.py
+index 20b0191f8..bbbb34fa1 100644
+--- a/tests/legacy/utils.py
++++ b/tests/legacy/utils.py
+@@ -1,5 +1,6 @@
+ import asyncio
+ import functools
++import inspect
+ import sys
+ import unittest
+ 
+@@ -23,7 +24,7 @@ def __init_subclass__(cls, **kwargs):
+         super().__init_subclass__(**kwargs)
+         for name in unittest.defaultTestLoader.getTestCaseNames(cls):
+             test = getattr(cls, name)
+-            if asyncio.iscoroutinefunction(test):
++            if inspect.iscoroutinefunction(test):
+                 setattr(cls, name, cls.convert_async_to_sync(test))
+ 
+     @staticmethod
+diff --git a/tox.ini b/tox.ini
+index bfd753b3d..aa88b0591 100644
+--- a/tox.ini
++++ b/tox.ini
+@@ -4,6 +4,7 @@ env_list =
+     py311
+     py312
+     py313
++    py314
+     coverage
+     ruff
+     mypy
+@@ -14,8 +15,8 @@ commands =
+ pass_env =
+     WEBSOCKETS_*
+ deps =
+-    py311,py312,py313,coverage,maxi_cov: mitmproxy
+-    py311,py312,py313,coverage,maxi_cov: python-socks[asyncio]
++    py311,py312,py313,py314,coverage,maxi_cov: mitmproxy
++    py311,py312,py313,py314,coverage,maxi_cov: python-socks[asyncio]
+     werkzeug
+ 
+ [testenv:coverage]

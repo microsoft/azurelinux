@@ -1,0 +1,48 @@
+diff --git a/test/test_aiohttp_client.py b/test/test_aiohttp_client.py
+index f3fa544..3b04218 100644
+--- a/test/test_aiohttp_client.py
++++ b/test/test_aiohttp_client.py
+@@ -288,6 +288,7 @@ class TestAsyncClient(NativeResourceTest):
+ 
+         return connection
+ 
++    @unittest.skip("Requires network")
+     async def _test_h2_client(self):
+         url = urlparse("https://d1cz66xoahf9cl.cloudfront.net/http_test_doc.txt")
+         connection = await self._new_h2_client_connection(url)
+@@ -309,6 +310,7 @@ class TestAsyncClient(NativeResourceTest):
+ 
+         await connection.close()
+ 
++    @unittest.skip("Requires network")
+     async def _test_h2_manual_write_exception(self):
+         url = urlparse("https://d1cz66xoahf9cl.cloudfront.net/http_test_doc.txt")
+         connection = await self._new_h2_client_connection(url)
+@@ -428,6 +430,7 @@ class TestAsyncClient(NativeResourceTest):
+         finally:
+             self._stop_server()
+ 
++    @unittest.skip("Requires network")
+     async def _test_cross_thread_http2_client(self):
+         """Test using an HTTP/2 client from a different thread/event loop."""
+         url = urlparse("https://d1cz66xoahf9cl.cloudfront.net/http_test_doc.txt")
+diff --git a/test/test_http_client.py b/test/test_http_client.py
+index 6aa9917..ad4b700 100644
+--- a/test/test_http_client.py
++++ b/test/test_http_client.py
+@@ -354,6 +354,7 @@ class TestClient(NativeResourceTest):
+                                                       tls_connection_options=tls_conn_opt)
+         return connection_future.result(self.timeout)
+ 
++    @unittest.skip("Requires network")
+     def test_h2_client(self):
+         url = urlparse("https://d1cz66xoahf9cl.cloudfront.net/http_test_doc.txt")
+         connection = self._new_h2_client_connection(url)
+@@ -376,6 +377,7 @@ class TestClient(NativeResourceTest):
+ 
+         self.assertEqual(None, connection.close().exception(self.timeout))
+ 
++    @unittest.skip("Requires network")
+     def test_h2_manual_write_exception(self):
+         url = urlparse("https://d1cz66xoahf9cl.cloudfront.net/http_test_doc.txt")
+         connection = self._new_h2_client_connection(url)

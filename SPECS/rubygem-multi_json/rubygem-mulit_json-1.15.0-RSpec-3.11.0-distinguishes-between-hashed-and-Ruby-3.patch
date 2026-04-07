@@ -1,0 +1,100 @@
+From 27732abae55d126ce28412b26e9c1b4358b8925a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Tue, 6 Sep 2022 09:57:31 +0200
+Subject: [PATCH] RSpec 3.11.0+ distinguishes between hashed and Ruby 3
+ keywords
+
+This is due to change in RSpec [[1]], which cuases issues such as:
+
+~~~
+  1) MultiJson default options sets both load and dump options
+     Failure/Error: self.load_options = self.dump_options = value
+
+       MultiJson received :dump_options= with unexpected arguments
+         expected: ({:foo=>"bar"})
+              got: ({:foo=>"bar"})
+     # ./lib/multi_json.rb:15:in `default_options='
+     # ./spec/multi_json_spec.rb:171:in `block (4 levels) in <top (required)>'
+     # /builddir/build/BUILD/spec/spec_helper.rb:12:in `silence_warnings'
+     # ./spec/multi_json_spec.rb:171:in `block (3 levels) in <top (required)>'
+~~~
+
+Fixes #203
+
+[1]: https://github.com/rspec/rspec-mocks/pull/1394
+---
+ spec/multi_json_spec.rb            | 4 ++--
+ spec/shared/adapter.rb             | 8 ++++----
+ spec/shared/json_common_adapter.rb | 4 ++--
+ 3 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/spec/multi_json_spec.rb b/spec/multi_json_spec.rb
+index 323bff9..b3ffb4f 100644
+--- a/spec/multi_json_spec.rb
++++ b/spec/multi_json_spec.rb
+@@ -166,8 +166,8 @@
+     end
+ 
+     it 'sets both load and dump options' do
+-      expect(MultiJson).to receive(:dump_options=).with(:foo => 'bar')
+-      expect(MultiJson).to receive(:load_options=).with(:foo => 'bar')
++      expect(MultiJson).to receive(:dump_options=).with({:foo => 'bar'})
++      expect(MultiJson).to receive(:load_options=).with({:foo => 'bar'})
+       silence_warnings { MultiJson.default_options = {:foo => 'bar'} }
+     end
+   end
+diff --git a/spec/shared/adapter.rb b/spec/shared/adapter.rb
+index e850b99..52a6bc9 100644
+--- a/spec/shared/adapter.rb
++++ b/spec/shared/adapter.rb
+@@ -19,7 +19,7 @@
+       before { MultiJson.dump_options = MultiJson.adapter.dump_options = {} }
+ 
+       after do
+-        expect(MultiJson.adapter.instance).to receive(:dump).with(1, :foo => 'bar', :fizz => 'buzz')
++        expect(MultiJson.adapter.instance).to receive(:dump).with(1, {:foo => 'bar', :fizz => 'buzz'})
+         MultiJson.dump(1, :fizz => 'buzz')
+         MultiJson.dump_options = MultiJson.adapter.dump_options = nil
+       end
+@@ -100,8 +100,8 @@
+     end
+ 
+     it 'passes options to the adapter' do
+-      expect(MultiJson.adapter).to receive(:dump).with('foo', :bar => :baz)
+-      MultiJson.dump('foo', :bar => :baz)
++      expect(MultiJson.adapter).to receive(:dump).with('foo', {:bar => :baz})
++      MultiJson.dump('foo', {:bar => :baz})
+     end
+ 
+     it 'dumps custom objects that implement to_json' do
+@@ -128,7 +128,7 @@ def to_json(*)
+       before { MultiJson.load_options = MultiJson.adapter.load_options = {} }
+ 
+       after do
+-        expect(MultiJson.adapter.instance).to receive(:load).with('1', :foo => 'bar', :fizz => 'buzz')
++        expect(MultiJson.adapter.instance).to receive(:load).with('1', {:foo => 'bar', :fizz => 'buzz'})
+         MultiJson.load('1', :fizz => 'buzz')
+         MultiJson.load_options = MultiJson.adapter.load_options = nil
+       end
+diff --git a/spec/shared/json_common_adapter.rb b/spec/shared/json_common_adapter.rb
+index 9597d90..5a23c38 100644
+--- a/spec/shared/json_common_adapter.rb
++++ b/spec/shared/json_common_adapter.rb
+@@ -15,7 +15,7 @@
+     describe 'with :indent option' do
+       it 'passes it on dump' do
+         object = 'foo'
+-        expect(object).to receive(:to_json).with(:indent => "\t")
++        expect(object).to receive(:to_json).with({:indent => "\t"})
+         MultiJson.dump(object, :indent => "\t")
+       end
+     end
+@@ -23,7 +23,7 @@
+ 
+   describe '.load' do
+     it 'passes :quirks_mode option' do
+-      expect(::JSON).to receive(:parse).with('[123]', :quirks_mode => false, :create_additions => false)
++      expect(::JSON).to receive(:parse).with('[123]', {:quirks_mode => false, :create_additions => false})
+       MultiJson.load('[123]', :quirks_mode => false)
+     end
+   end

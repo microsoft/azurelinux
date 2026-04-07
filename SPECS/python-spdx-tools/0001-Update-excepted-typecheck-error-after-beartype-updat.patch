@@ -1,0 +1,38 @@
+From da6d92a58eb2d7f492481870bde82b9f2df92cac Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Armin=20T=C3=A4nzer?= <armin.taenzer@tngtech.com>
+Date: Fri, 11 Apr 2025 15:12:56 +0200
+Subject: [PATCH 1/2] Update excepted typecheck error after beartype update
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Armin Tänzer <armin.taenzer@tngtech.com>
+---
+ src/spdx_tools/common/typing/dataclass_with_properties.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/spdx_tools/common/typing/dataclass_with_properties.py b/src/spdx_tools/common/typing/dataclass_with_properties.py
+index 3f13950..e0b5c96 100644
+--- a/src/spdx_tools/common/typing/dataclass_with_properties.py
++++ b/src/spdx_tools/common/typing/dataclass_with_properties.py
+@@ -4,7 +4,7 @@
+ from dataclasses import dataclass
+ 
+ from beartype import beartype
+-from beartype.roar import BeartypeCallHintException
++from beartype.roar import BeartypeCallHintParamViolation
+ 
+ 
+ def dataclass_with_properties(cls):
+@@ -30,7 +30,7 @@ def make_setter(field_name, field_type):
+     def set_field_with_error_conversion(self, value: field_type):
+         try:
+             set_field(self, value)
+-        except BeartypeCallHintException as err:
++        except BeartypeCallHintParamViolation as err:
+             error_message: str = f"SetterError {self.__class__.__name__}: {err}"
+ 
+             # As setters are created dynamically, their argument name is always "value". We replace it by the
+-- 
+2.50.0
+

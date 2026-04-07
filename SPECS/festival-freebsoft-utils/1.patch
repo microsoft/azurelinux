@@ -1,0 +1,24 @@
+From 4bd40a905585764696cafff8d246bb0fb0eafcc5 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Fri, 8 Oct 2021 10:42:10 -0400
+Subject: [PATCH] Fix a section level error in fdl.texi
+
+Fixes errors like:
+  ./fdl.texi:404: raising the section level of @appendixsubsec which is too low
+---
+ doc/fdl.texi | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/doc/fdl.texi b/doc/fdl.texi
+index 2cd5840..0e22414 100644
+--- a/doc/fdl.texi
++++ b/doc/fdl.texi
+@@ -401,7 +401,7 @@ as a draft) by the Free Software Foundation.
+ @end enumerate
+ 
+ @page
+-@appendixsubsec ADDENDUM: How to use this License for your documents
++@appendixsec ADDENDUM: How to use this License for your documents
+ 
+ To use this License in a document you have written, include a copy of
+ the License in the document and put the following copyright and

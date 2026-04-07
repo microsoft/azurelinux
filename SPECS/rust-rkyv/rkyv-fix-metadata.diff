@@ -1,0 +1,138 @@
+--- rkyv-0.8.15/Cargo.toml	2006-07-24T01:21:28+00:00
++++ rkyv-0.8.15/Cargo.toml	2026-02-10T10:47:47.538378+00:00
+@@ -46,7 +46,6 @@
+ aligned = []
+ alloc = [
+     "dep:hashbrown",
+-    "tinyvec-1?/alloc",
+     "rancor/alloc",
+ ]
+ big_endian = []
+@@ -59,31 +58,15 @@
+     "std",
+     "bytecheck",
+ ]
+-hashbrown-0_16 = ["dep:hashbrown"]
+-indexmap-2 = [
+-    "dep:indexmap-2",
+-    "alloc",
+-]
+ little_endian = []
+ pointer_width_16 = []
+ pointer_width_32 = []
+ pointer_width_64 = []
+ std = [
+     "alloc",
+-    "bytes-1?/std",
+-    "indexmap-2?/std",
+     "ptr_meta/std",
+-    "uuid-1?/std",
+-]
+-triomphe-0_1 = [
+-    "dep:triomphe-0_1",
+-    "alloc",
+ ]
+ unaligned = []
+-uuid-1 = [
+-    "dep:uuid-1",
+-    "bytecheck?/uuid-1",
+-]
+ 
+ [lib]
+ name = "rkyv"
+@@ -144,46 +127,16 @@
+ path = "benches/minecraft_savedata.rs"
+ harness = false
+ 
+-[dependencies.arrayvec-0_7]
+-version = "0.7"
+-optional = true
+-default-features = false
+-package = "arrayvec"
+-
+ [dependencies.bytecheck]
+ version = "0.8"
+ features = ["simdutf8"]
+ optional = true
+ default-features = false
+ 
+-[dependencies.bytes-1]
+-version = "1"
+-optional = true
+-default-features = false
+-package = "bytes"
+-
+ [dependencies.hashbrown]
+ version = "0.16"
+ optional = true
+ default-features = false
+-
+-[dependencies.hashbrown-0_14]
+-version = "0.14"
+-optional = true
+-default-features = false
+-package = "hashbrown"
+-
+-[dependencies.hashbrown-0_15]
+-version = "0.15"
+-optional = true
+-default-features = false
+-package = "hashbrown"
+-
+-[dependencies.indexmap-2]
+-version = "2"
+-optional = true
+-default-features = false
+-package = "indexmap"
+ 
+ [dependencies.munge]
+ version = "0.4"
+@@ -211,48 +164,8 @@
+ default-features = false
+ package = "smallvec"
+ 
+-[dependencies.smol_str-0_2]
+-version = "0.2"
+-optional = true
+-default-features = false
+-package = "smol_str"
+-
+-[dependencies.smol_str-0_3]
+-version = "0.3"
+-optional = true
+-default-features = false
+-package = "smol_str"
+-
+-[dependencies.thin-vec-0_2]
+-version = "0.2.12"
+-optional = true
+-default-features = false
+-package = "thin-vec"
+-
+-[dependencies.tinyvec-1]
+-version = "1"
+-optional = true
+-default-features = false
+-package = "tinyvec"
+-
+-[dependencies.triomphe-0_1]
+-version = "0.1"
+-optional = true
+-default-features = false
+-package = "triomphe"
+-
+-[dependencies.uuid-1]
+-version = "1"
+-optional = true
+-default-features = false
+-package = "uuid"
+-
+ [dev-dependencies.ahash]
+ version = "0.8"
+-
+-[dev-dependencies.divan]
+-version = "0.1"
+-default-features = false
+ 
+ [dev-dependencies.rustversion]
+ version = "1"

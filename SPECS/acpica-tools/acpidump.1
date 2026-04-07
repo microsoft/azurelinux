@@ -1,0 +1,106 @@
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH ACPIDUMP 1 "July 24, 2013"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+acpidump \- ACPI table dump utility
+.SH SYNOPSIS
+.B acpidump
+.RI [ <option> ... ]
+
+.SH DESCRIPTION
+This manual page briefly documents the
+.B acpidump
+command.  The option list is taken from the interactive help.
+.PP
+The
+.B acpidump
+command extracts the ACPI tables currently in use from the running
+kernel in a form usable for later processing by the
+.B acpixtract
+command.
+.PP
+Invocation of
+.B acpidump
+without parameters will dump all available ACPI tables.  Multiple mixed
+instances of the
+.B \-a
+,
+.B \-f
+, and
+.B \-n
+parameters can be used.
+
+.SH OPTIONS
+.PP
+.TP
+.B \-b
+Dump tables in binary format (versus the default human-readable form)
+
+.PP
+.TP
+.B \-h | \-?
+Display this help message
+
+.PP
+.TP
+.B \-o <file>
+Redirect output to a file.  This file can be used later by
+.B acpixtract
+to examine the contents of the ACPI tables.
+
+.PP
+.TP
+.B \-s
+Print table summaries only.
+
+.PP
+.TP
+.B \-v
+Print the version of this utility.
+
+.PP
+.TP
+.B \-z
+Verbose mode.
+
+.PP
+.TP
+.B \-a <address>
+Get a table from a physical address (must be superuser and you must be
+careful which address you use -- dmesg will typically report the addresses
+for the various tables).
+
+.PP
+.TP
+.B \-f <binary-file>
+Get a table from a binary file (see the
+.B \-b
+option).
+
+.PP
+.TP
+.B \-n <signature>
+Get a table via it's name or signature (e.g., MADT or SSDT).
+
+.SH SEE ALSO
+.B acpixtract(1)
+
+.SH AUTHOR
+acpidump was written by Robert Moore <robert.moore@intel.com> and
+Chao Guan <chao.guan@intel.com>.
+.PP
+This manual page was written by Al Stone <ahs3@redhat.com> for the
+Fedora project (but may be used by others).

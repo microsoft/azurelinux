@@ -1,0 +1,57 @@
+From ae3c67b6df950abb7c81167193c5235dfa325412 Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Sun, 17 Nov 2024 03:23:22 -0500
+Subject: [PATCH 5/6] Fix testing setup for Fedora
+
+We don't need coverage for testing, and we don't want to use the current
+directory for tests, but the installed version.
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ pyproject.toml | 13 +------------
+ 1 file changed, 1 insertion(+), 12 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 5043738..e35cdac 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -54,9 +54,7 @@ docs = [
+     "numpydoc",
+ ]
+ test = [
+-    "coverage",
+     "pytest",
+-    "pytest-cov",
+     "pyzstd"
+ ]
+ test_extras = [
+@@ -117,25 +115,16 @@ write_to = "numcodecs/version.py"
+ skip = "./.git,fixture"
+ ignore-words-list = "ba, compiletime, hist, nd, unparseable"
+ 
+-[tool.coverage.report]
+-exclude_lines = [
+-    "pragma: no cover",
+-    "pragma: ${PY_MAJOR_VERSION} no cover",
+-]
+-
+ [tool.repo-review]
+ ignore = ["PY005", "PY007", "PP302", "PP308", "PP309", "GH103", "GH212", "PC111", "PC140", "PC160", "PC170", "PC180", "MY100", "RF103"]
+ 
+ [tool.pytest.ini_options]
+-addopts = "-ra --strict-config --strict-markers --cov=numcodecs --cov-report xml --doctest-modules --doctest-glob=*.pyx"
++addopts = "-ra --strict-config --strict-markers --doctest-modules --doctest-glob=*.pyx"
+ doctest_optionflags = [
+     "NORMALIZE_WHITESPACE",
+     "ELLIPSIS",
+     "IGNORE_EXCEPTION_DETAIL",
+ ]
+-testpaths = [
+-    "numcodecs/tests",
+-]
+ norecursedirs = [
+     ".git",
+     ".github",
+-- 
+2.50.0
+

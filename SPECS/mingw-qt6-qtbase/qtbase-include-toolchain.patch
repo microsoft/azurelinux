@@ -1,0 +1,12 @@
+diff -rupN --no-dereference qtbase-everywhere-src-6.10.1/cmake/QtConfig.cmake.in qtbase-everywhere-src-6.10.1-new/cmake/QtConfig.cmake.in
+--- qtbase-everywhere-src-6.10.1/cmake/QtConfig.cmake.in	2025-08-11 06:54:51.000000000 +0200
++++ qtbase-everywhere-src-6.10.1-new/cmake/QtConfig.cmake.in	2025-09-02 15:30:06.629468389 +0200
+@@ -7,6 +7,8 @@
+ include("${CMAKE_CURRENT_LIST_DIR}/QtPublicCMakeEarlyPolicyHelpers.cmake")
+ __qt_internal_save_directory_scope_policy_cmp0156()
+ 
++include(${CMAKE_CURRENT_LIST_DIR}/../Qt@PROJECT_VERSION_MAJOR@/qt.toolchain.cmake OPTIONAL)
++
+ cmake_minimum_required(VERSION @min_new_policy_version@...@max_new_policy_version@)
+ 
+ include("${CMAKE_CURRENT_LIST_DIR}/QtPublicCMakeHelpers.cmake")

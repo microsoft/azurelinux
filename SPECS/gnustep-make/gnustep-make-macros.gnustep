@@ -1,0 +1,57 @@
+%gnustep_libdir %{_libdir}/GNUstep
+
+%gnustep_appdir %{gnustep_libdir}/Applications
+%gnustep_appsupdir %{gnustep_libdir}/ApplicationSupport
+%gnustep_bundledir %{gnustep_libdir}/Bundles
+%gnustep_cpickdir %{gnustep_libdir}/ColorPickers
+%gnustep_srvdir %{gnustep_libdir}/Services
+
+%gnustep_makefiles %{gnustep_libdir}/Makefiles
+%gnustep_additional %{gnustep_libdir}/Makefiles/Additional
+%gnustep_libraries %{gnustep_libdir}/Libraries
+
+%gnustep_docdir %{gnustep_libdir}/Documentation
+%gnustep_devdocdic %{gnustep_docdir}/Development
+%gnustep_userdocdir %{gnustep_docdir}/User
+%gnustep_dtddir %{gnustep_libdir}/DTDs
+%gnustep_fontdir %{gnustep_libdir}/Fonts
+%gnustep_imagedir %{gnustep_libdir}/Images
+%gnustep_kbdir %{gnustep_libdir}/KeyBindings
+%gnustep_psdir %{gnustep_libdir}/PostScript
+%gnustep_sounddir %{gnustep_libdir}/Sounds
+
+%gnustep_configure\
+%if 0%{?rhel} >= 8\
+CC=${CC:-gobjc} \
+%endif\
+%configure --with-installation-domain=SYSTEM
+
+%gnustep_make(n)\
+%if 0%{?rhel} >= 8\
+CC=${CC:-gobjc} \
+%endif\
+make %{?_smp_mflags} \\\
+%if "X%{-n:Y}" == "X" \
+    GNUSTEP_MAKEFILES=%{gnustep_makefiles} \\\
+%endif\
+    messages=yes
+
+%gnustep_makedoc\
+make -C Documentation %{?_smp_mflags} messages=yes \\\
+    GNUSTEP_MAKEFILES=%{gnustep_makefiles} 
+
+%gnustep_install(n)\
+make install messages=yes \\\
+    DESTDIR=%{buildroot} \\\
+%if "X%{-n:Y}" == "X" \
+    GNUSTEP_MAKEFILES=%{gnustep_makefiles} \\\
+%endif \
+    GNUSTEP_INSTALLATION_DOMAIN=SYSTEM
+
+%gnustep_install_without_gnustep_makefiles() %gnustep_install -n
+
+%gnustep_installdoc\
+make -C Documentation install messages=yes \\\
+    DESTDIR=%{buildroot} \\\
+    GNUSTEP_INSTALLATION_DOMAIN=SYSTEM \\\
+    GNUSTEP_MAKEFILES=%{gnustep_makefiles} 

@@ -1,0 +1,60 @@
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Sat, 19 Jun 2010 09:59:39 +0400
+Subject: [PATCH] Do not install nteventlog and related doc-files on non-win32
+ systems
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+
+diff --git a/lib/os_mon/doc/src/Makefile b/lib/os_mon/doc/src/Makefile
+index 8e3882bfdc..ea999cf9c7 100644
+--- a/lib/os_mon/doc/src/Makefile
++++ b/lib/os_mon/doc/src/Makefile
+@@ -31,11 +31,16 @@ APPLICATION=os_mon
+ # Target Specs
+ # ----------------------------------------------------
+ XML_APPLICATION_FILES = ref_man.xml
++ifeq ($(findstring win32,$(TARGET)),win32)
++NTEVENTLOG_DOCFILE=nteventlog.xml
++else
++NTEVENTLOG_DOCFILE=
++endif
+ XML_REF3_FILES = cpu_sup.xml \
+ 	disksup.xml \
+ 	memsup.xml \
+ 	os_sup.xml \
+-	nteventlog.xml
++	$(NTEVENTLOG_DOCFILE)
+ 
+ XML_REF6_FILES = os_mon_app.xml
+ 
+diff --git a/lib/os_mon/src/Makefile b/lib/os_mon/src/Makefile
+index e28fb12548..ee32f3946f 100644
+--- a/lib/os_mon/src/Makefile
++++ b/lib/os_mon/src/Makefile
+@@ -34,7 +34,13 @@ RELSYSDIR = $(RELEASE_PATH)/lib/os_mon-$(VSN)
+ # ----------------------------------------------------
+ # Target Specs
+ # ----------------------------------------------------
+-MODULES= disksup memsup cpu_sup os_mon os_mon_mib os_sup os_mon_sysinfo nteventlog
++ifeq ($(findstring win32,$(TARGET)),win32)
++NTEVENTLOG=nteventlog
++else
++NTEVENTLOG=
++endif
++MODULES= disksup memsup cpu_sup os_mon os_mon_mib os_sup os_mon_sysinfo \
++	 $(NTEVENTLOG)
+ 
+ INCLUDE=../include
+ CSRC=../c_src
+@@ -78,7 +84,11 @@ docs:
+ # ----------------------------------------------------
+ 
+ $(APP_TARGET): $(APP_SRC) ../vsn.mk
++ifeq ($(findstring win32,$(TARGET)),win32)
+ 	$(vsn_verbose)sed -e 's;%VSN%;$(VSN);' $< > $@
++else
++	$(vsn_verbose)sed -e 's;%VSN%;$(VSN);;s;,\s*nteventlog;;' $< > $@
++endif
+ 
+ $(APPUP_TARGET): $(APPUP_SRC) ../vsn.mk
+ 	$(vsn_verbose)sed -e 's;%VSN%;$(VSN);' $< > $@

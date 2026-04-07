@@ -1,0 +1,12 @@
+--- a/scripts/mono-find-provides.in	2018-03-02 21:56:22.911149656 +0100
++++ b/scripts/mono-find-provides.in	2018-03-02 21:56:57.985962849 +0100
+@@ -16,7 +16,8 @@
+ 
+ # Only include files with /gac/, /Facades/ or /4.5/ in path
+ #  (Allows packages to contain private assemblies that don't conflict with other packages)
+-monolist=($(printf "%s\n" "${monolist[@]}" | egrep "/(gac|Facades|4\\.5)/"))
++#quite a number of files are not in the gac, eg. System.IO, and Mono.Configuration.Crypto, and others
++#monolist=($(printf "%s\n" "${monolist[@]}" | egrep "/(gac|Facades|4\\.5)/"))
+ # Disabled... see ChangeLog
+ 
+ # Set the prefix, unless it is overriden (used when building mono rpms)

@@ -1,0 +1,2 @@
+%__supermin_requires   %{_rpmconfigdir}/supermin-find-requires
+%__supermin_path       /supermin\.d/[^/]*packages[^/]*

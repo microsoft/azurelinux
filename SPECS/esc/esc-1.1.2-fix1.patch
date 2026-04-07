@@ -1,0 +1,33 @@
+diff -up ./esc/src/lib/coolkey/Makefile.am.fix1 ./esc/src/lib/coolkey/Makefile.am
+--- ./esc/src/lib/coolkey/Makefile.am.fix1	2018-10-08 14:04:44.963523599 -0700
++++ ./esc/src/lib/coolkey/Makefile.am	2018-10-08 14:06:18.605022660 -0700
+@@ -54,6 +54,7 @@ lib_LTLIBRARIES += libCoolkey-1.0.la
+ libCoolkey_1_0_la_CFLAGS = @PCSC_CFLAGS@ @NSPR_CFLAGS@ @NSS_CFLAGS@  -I ../nss-http-client
+ libCoolkey_1_0_la_CPPFLAGS = @PCSC_CFLAGS@ @NSPR_CFLAGS@ @NSS_CFLAGS@ -I ../nss-http-client
+ libCoolkey_1_0_la_LIBADD = $(COOLKEY_LIBS)
++libCoolkey_1_0_la_LDFLAGS = -Wl,-z,now
+ libCoolkey_1_0_la_SOURCES = $(source_c) $(source_cpp)
+ 
+ coolkeyincludedir = $(includedir)/src/lib/coolkey
+diff -up ./esc/src/lib/coolkey-mgr/Makefile.am.fix1 ./esc/src/lib/coolkey-mgr/Makefile.am
+--- ./esc/src/lib/coolkey-mgr/Makefile.am.fix1	2018-10-08 14:04:30.132602938 -0700
++++ ./esc/src/lib/coolkey-mgr/Makefile.am	2018-10-08 14:05:38.265238463 -0700
+@@ -59,6 +59,7 @@ source_cpp = \
+ 
+ lib_LTLIBRARIES += libcoolkeymgr-1.0.la
+ libcoolkeymgr_1_0_la_LIBADD = $(COOLKEY_MGR_LIBS) $(ESC_LIBS) $(OTHER_LIBS)
++libcoolkeymgr_1_0_la_LDFLAGS = -Wl,-z,now
+ libcoolkeymgr_1_0_la_SOURCES = $(source_c) $(source_cpp) $(source_h)
+ 
+ coolkeymgrincludedir = $(includedir)/coolkey-mgr
+diff -up ./esc/src/lib/nss-http-client/Makefile.am.fix1 ./esc/src/lib/nss-http-client/Makefile.am
+--- ./esc/src/lib/nss-http-client/Makefile.am.fix1	2018-10-08 14:04:57.302457592 -0700
++++ ./esc/src/lib/nss-http-client/Makefile.am	2018-10-08 14:06:44.701883050 -0700
+@@ -52,6 +52,7 @@ lib_LTLIBRARIES += libNssHttpClient-1.0.
+ #libNssHttpClient_1_0_la_CFLAGS = @PCSC_CFLAGS@ @NSPR_CFLAGS@ @NSS_CFLAGS@ -DLINUX -I ../coolkey
+ libNssHttpClient_1_0_la_CPPFLAGS = @PCSC_CFLAGS@ @NSPR_CFLAGS@ @NSS_CFLAGS@ -I ../coolkey @DEFS@
+ libNssHttpClient_1_0_la_LIBADD = $(COOLKEY_LIBS)
++libNssHttpClient_1_0_la_LDFLAGS = -Wl,-z,now
+ libNssHttpClient_1_0_la_SOURCES = $(source_c) $(source_cpp) $(source_h)
+ 
+ coolkeyincludedir = $(includedir)/src/lib/coolkey

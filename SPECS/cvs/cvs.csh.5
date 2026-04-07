@@ -1,0 +1,25 @@
+.TH CVS.CSH 5
+.SH NAME
+cvs.sh \- C shell log-in script for CVS users
+.SH SYNOPSIS
+.B /etc/profile.d/cvs.csh
+.SH DESCRIPTION
+The
+.B cvs.csh
+script is sourced when a user of a C log-in shell is logged in. The
+purpose is to set
+.B CVS_RSH
+environment variable, so that a cvs user connecting to a remote CVS server
+utilizes SSH-secured connection by default.
+.SH EXAMPLE
+.PP
+if ( "$?CVS_RSH" == 0 ) setenv CVS_RSH ssh
+.SH FILES
+.PD 0
+.TP 20
+.B /etc/profile.d/cvs.csh
+.PD
+.SH SEE ALSO
+.BR csh (1),
+.BR cvs (1),
+.BR bash (1).

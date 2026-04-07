@@ -1,0 +1,68 @@
+--- reqwest-0.12.28/Cargo.toml	2006-07-24T01:21:28+00:00
++++ reqwest-0.12.28/Cargo.toml	2025-12-30T19:38:59.652603+00:00
+@@ -75,7 +75,6 @@
+     "hyper-rustls?/ring",
+     "tokio-rustls?/ring",
+     "rustls?/ring",
+-    "quinn?/ring",
+ ]
+ __tls = [
+     "dep:rustls-pki-types",
+@@ -122,15 +121,7 @@
+     "hyper-util/http2",
+     "hyper-rustls?/http2",
+ ]
+-http3 = [
+-    "rustls-tls-manual-roots",
+-    "dep:h3",
+-    "dep:h3-quinn",
+-    "dep:quinn",
+-    "tokio/macros",
+-]
+ json = ["dep:serde_json"]
+-macos-system-configuration = ["system-proxy"]
+ multipart = [
+     "dep:mime_guess",
+     "dep:futures-util",
+@@ -141,10 +132,6 @@
+     "native-tls-crate?/alpn",
+     "hyper-tls?/alpn",
+ ]
+-native-tls-vendored = [
+-    "native-tls",
+-    "native-tls-crate?/vendored",
+-]
+ rustls-tls = ["rustls-tls-webpki-roots"]
+ rustls-tls-manual-roots = [
+     "rustls-tls-manual-roots-no-provider",
+@@ -256,14 +243,6 @@
+ version = "0.4"
+ optional = true
+ 
+-[target.'cfg(not(target_arch = "wasm32"))'.dependencies.h3]
+-version = "0.0.8"
+-optional = true
+-
+-[target.'cfg(not(target_arch = "wasm32"))'.dependencies.h3-quinn]
+-version = "0.0.10"
+-optional = true
+-
+ [target.'cfg(not(target_arch = "wasm32"))'.dependencies.hickory-resolver]
+ version = "0.25"
+ features = ["tokio"]
+@@ -326,15 +305,6 @@
+ 
+ [target.'cfg(not(target_arch = "wasm32"))'.dependencies.pin-project-lite]
+ version = "0.2.11"
+-
+-[target.'cfg(not(target_arch = "wasm32"))'.dependencies.quinn]
+-version = "0.11.1"
+-features = [
+-    "rustls",
+-    "runtime-tokio",
+-]
+-optional = true
+-default-features = false
+ 
+ [target.'cfg(not(target_arch = "wasm32"))'.dependencies.rustls]
+ version = "0.23.4"

@@ -1,0 +1,24 @@
+diff --git a/src/linguist/lrelease-pro/main.cpp b/src/linguist/lrelease-pro/main.cpp
+index bd20eea..6d80738 100644
+--- a/src/linguist/lrelease-pro/main.cpp
++++ b/src/linguist/lrelease-pro/main.cpp
+@@ -145,6 +145,6 @@ int main(int argc, char **argv)
+         projectDescription->setAutoRemove(false);
+     lreleaseOptions << QStringLiteral("-project") << projectDescription->fileName();
+ 
+-    runQtTool(QStringLiteral("lrelease"), lreleaseOptions);
++    runQtTool(QStringLiteral("lrelease-qt6"), lreleaseOptions);
+     return 0;
+ }
+diff --git a/src/linguist/lupdate-pro/main.cpp b/src/linguist/lupdate-pro/main.cpp
+index 1910467..160b421 100644
+--- a/src/linguist/lupdate-pro/main.cpp
++++ b/src/linguist/lupdate-pro/main.cpp
+@@ -154,6 +154,6 @@ int main(int argc, char **argv)
+         projectDescription->setAutoRemove(false);
+     lupdateOptions << QStringLiteral("-project") << projectDescription->fileName();
+ 
+-    runQtTool(QStringLiteral("lupdate"), lupdateOptions);
++    runQtTool(QStringLiteral("lupdate-qt6"), lupdateOptions);
+     return 0;
+ }

@@ -1,0 +1,16 @@
+--- tikv-jemalloc-sys-0.6.1+5.3.0-1-ge13ca993e8ccb9ba9847cc330696e02839f328f7/Cargo.toml	1970-01-01T00:00:01+00:00
++++ tikv-jemalloc-sys-0.6.1+5.3.0-1-ge13ca993e8ccb9ba9847cc330696e02839f328f7/Cargo.toml	2025-10-16T20:00:08.528131+00:00
+@@ -13,7 +13,7 @@
+ edition = "2018"
+ rust-version = "1.71.0"
+ name = "tikv-jemalloc-sys"
+-version = "0.6.1+5.3.0-1-ge13ca993e8ccb9ba9847cc330696e02839f328f7"
++version = "0.6.1"
+ authors = [
+     "Alex Crichton <alex@alexcrichton.com>",
+     "Gonzalo Brito Gadeschi <gonzalobg88@gmail.com>",
+@@ -99,3 +99,4 @@
+     "cfg(jemallocator_docs)",
+     "cfg(prefixed)",
+ ]
++

@@ -1,0 +1,21 @@
+diff -Naur zip-6.0.0-original/src/read.rs zip-6.0.0/src/read.rs
+--- zip-6.0.0-original/src/read.rs	2006-07-24 02:21:28.000000000 +0100
++++ zip-6.0.0/src/read.rs	2025-12-17 11:48:28.449459541 +0000
+@@ -2316,6 +2316,8 @@
+ 
+     #[test]
+     #[cfg(feature = "deflate-flate2")]
++    // Downstream patch: we do not include the test file needed for this test.
++    #[cfg(any())]
+     fn test_utf8_extra_field() {
+         let mut reader =
+             ZipArchive::new(Cursor::new(include_bytes!("../tests/data/chinese.zip"))).unwrap();
+@@ -2399,6 +2401,8 @@
+     }
+ 
+     #[test]
++    // Downstream patch: we do not include the test file needed for this test.
++    #[cfg(any())]
+     fn test_central_directory_not_at_end() -> ZipResult<()> {
+         let mut reader = ZipArchive::new(Cursor::new(include_bytes!("../tests/data/omni.ja")))?;
+         let mut file = reader.by_name("chrome.manifest")?;

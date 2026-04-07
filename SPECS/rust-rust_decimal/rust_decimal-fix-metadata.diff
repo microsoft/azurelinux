@@ -1,0 +1,87 @@
+--- rust_decimal-1.39.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ rust_decimal-1.39.0/Cargo.toml	2025-10-23T12:01:38.954138+00:00
+@@ -49,10 +49,6 @@
+ 
+ [features]
+ align16 = []
+-borsh = [
+-    "dep:borsh",
+-    "std",
+-]
+ c-repr = []
+ db-diesel-mysql = [
+     "diesel/mysql_backend",
+@@ -106,7 +102,6 @@
+ serde-with-str = ["serde"]
+ std = [
+     "arrayvec/std",
+-    "borsh?/std",
+     "bytes?/std",
+     "rand?/std",
+     "rkyv?/std",
+@@ -154,15 +149,6 @@
+ version = "0.7"
+ default-features = false
+ 
+-[dependencies.borsh]
+-version = "1.1.1"
+-features = [
+-    "derive",
+-    "unstable__schema",
+-]
+-optional = true
+-default-features = false
+-
+ [dependencies.bytes]
+ version = "1.0"
+ optional = true
+@@ -247,27 +233,11 @@
+ version = "1.0"
+ default-features = false
+ 
+-[dev-dependencies.criterion]
+-version = "0.5"
+-default-features = false
+-
+ [dev-dependencies.csv]
+ version = "1"
+ 
+-[dev-dependencies.diesel]
+-version = "2.2.3"
+-features = [
+-    "mysql",
+-    "postgres",
+-]
+-default-features = false
+-
+ [dev-dependencies.futures]
+ version = "0.3"
+-default-features = false
+-
+-[dev-dependencies.postgres]
+-version = "0.19"
+ default-features = false
+ 
+ [dev-dependencies.rand]
+@@ -280,10 +250,6 @@
+ features = ["thread_rng"]
+ default-features = false
+ package = "rand"
+-
+-[dev-dependencies.rkyv-0_8]
+-version = "0.8"
+-package = "rkyv"
+ 
+ [dev-dependencies.serde]
+ version = "1.0"
+@@ -300,10 +266,6 @@
+     "rt-multi-thread",
+     "test-util",
+ ]
+-default-features = false
+-
+-[dev-dependencies.tokio-postgres]
+-version = "0.7"
+ default-features = false
+ 
+ [dev-dependencies.version-sync]

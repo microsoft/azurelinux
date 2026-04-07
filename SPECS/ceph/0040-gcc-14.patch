@@ -1,0 +1,41 @@
+From f5d3e9146d9ceb12858bc94d60090bd851b1c088 Mon Sep 17 00:00:00 2001
+From: Adam Emerson <aemerson@redhat.com>
+Date: Wed, 20 Dec 2023 13:51:21 -0500
+Subject: [PATCH] test/neorados: Use two fewer GTest internals
+
+To get coroutine tests working, I used some internals. Two of these
+are no longer available in newer versions. Since they can be
+implemented with regular old C++ features, use those.
+
+This fixes an FTBFS on Fedora Rawhide introduced in
+`35231f7251ed70d8d817ee7e727d9763669d101f`.
+
+Signed-off-by: Adam Emerson <aemerson@redhat.com>
+---
+ src/test/neorados/common_tests.h | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/src/test/neorados/common_tests.h b/src/test/neorados/common_tests.h
+index 9610f08f643f3..396432e417e84 100644
+--- a/src/test/neorados/common_tests.h
++++ b/src/test/neorados/common_tests.h
+@@ -391,10 +391,14 @@ class NeoRadosECTest : public NeoRadosTestBase {
+   public:                                                                      \
+     GTEST_TEST_CLASS_NAME_(test_suite_name, test_name)() = default;            \
+     ~GTEST_TEST_CLASS_NAME_(test_suite_name, test_name)() override = default;  \
+-    GTEST_DISALLOW_COPY_AND_ASSIGN_(GTEST_TEST_CLASS_NAME_(test_suite_name,    \
+-							   test_name));        \
+-    GTEST_DISALLOW_MOVE_AND_ASSIGN_(GTEST_TEST_CLASS_NAME_(test_suite_name,    \
+-							   test_name));        \
++    GTEST_TEST_CLASS_NAME_(test_suite_name, test_name)(			       \
++      const GTEST_TEST_CLASS_NAME_(test_suite_name, test_name)&) = delete;     \
++    GTEST_TEST_CLASS_NAME_(test_suite_name, test_name)& operator =(	       \
++      const GTEST_TEST_CLASS_NAME_(test_suite_name, test_name)&) = delete;     \
++    GTEST_TEST_CLASS_NAME_(test_suite_name, test_name)(			       \
++      GTEST_TEST_CLASS_NAME_(test_suite_name, test_name)&&) = delete;	       \
++    GTEST_TEST_CLASS_NAME_(test_suite_name, test_name)& operator =(	       \
++      GTEST_TEST_CLASS_NAME_(test_suite_name, test_name)&&) = delete;	       \
+ 									       \
+   private:                                                                     \
+     boost::asio::awaitable<void> CoTestBody() override;                        \
+

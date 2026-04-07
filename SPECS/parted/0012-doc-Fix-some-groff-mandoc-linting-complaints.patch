@@ -1,0 +1,90 @@
+From a2164c99b4d7d37334f9ca5ece55d8af95d002b7 Mon Sep 17 00:00:00 2001
+From: "Brian C. Lane" <bcl@redhat.com>
+Date: Wed, 28 May 2025 13:09:32 -0700
+Subject: [PATCH 12/12] doc: Fix some groff/mandoc linting complaints
+
+---
+ doc/C/parted.8 | 27 ++++++++++++---------------
+ 1 file changed, 12 insertions(+), 15 deletions(-)
+
+diff --git a/doc/C/parted.8 b/doc/C/parted.8
+index 171269c..c852112 100644
+--- a/doc/C/parted.8
++++ b/doc/C/parted.8
+@@ -54,7 +54,6 @@ Use optimum alignment as given by the disk topology information. This
+ aligns to a multiple of the physical block size in a way that guarantees
+ optimal performance.
+ .RE
+-
+ .SH COMMANDS
+ .TP
+ .B [device]
+@@ -62,8 +61,7 @@ The block device to be used.  When none is given, \fBparted\fP will use the
+ first block device it finds.
+ .TP
+ .B [command [options]]
+-Specifies the command to be executed.  If no command is given,
+-.BR parted
++Specifies the command to be executed.  If no command is given, \fBparted\fP
+ will present a command prompt.  Possible commands are:
+ .RS
+ .TP
+@@ -119,8 +117,8 @@ or an LVM logical volume if necessary.
+ .B set \fIpartition\fP \fIflag\fP \fIstate\fP
+ Change the state of the \fIflag\fP on \fIpartition\fP to \fIstate\fP.
+ Supported flags are: "boot", "root", "swap", "hidden", "raid", "lvm", "lba",
+-"legacy_boot", "irst", "msftres", "esp", "chromeos_kernel", "bls_boot", "linux-home",
+-"no_automount", "bios_grub", and "palo".
++"legacy_boot", "irst", "msftres", "esp", "chromeos_kernel", "bls_boot",
++"linux-home", "no_automount", "bios_grub", and "palo".
+ \fIstate\fP should be either "on" or "off".
+ .TP
+ .B unit \fIunit\fP
+@@ -140,10 +138,10 @@ On MS-DOS set the type aka. partition id of \fIpartition\fP to
+ the type-uuid of \fIpartition\fP to \fIuuid\fP.
+ .TP
+ .B disk_set \fIflag\fP \fIstate\fP
+-Change a \fIflag\fP on the disk to \fIstate\fP. A flag can be either "on" or "off".
+-Some or all of these flags will be available, depending on what disk label you
+-are using.  Supported flags are: "pmbr_boot" on GPT to enable the boot flag on the
+-GPT's protective MBR partition.
++Change a \fIflag\fP on the disk to \fIstate\fP. A flag can be either "on" or
++"off".  Some or all of these flags will be available, depending on what disk
++abel you are using.  Supported flags are: "pmbr_boot" on GPT to enable the
++boot flag on the GPT's protective MBR partition.
+ .TP
+ .B disk_toggle \fIflag\fP
+ Toggle the state of the disk \fIflag\fP.
+@@ -155,24 +153,23 @@ Display version information and a copyright message.
+ \fBparted\fP will compute sensible ranges for the locations you specify when using
+ units like "GB", "MB", etc. Use the sector unit "s" or IEC binary units like
+ "GiB", "MiB", to specify exact locations.
+-
+ When you specify start or end values using IEC binary units like "MiB",
+ "GiB", "TiB", etc., \fBparted\fP treats those values as exact, and equivalent to
+ the same number specified in bytes (i.e., with the "B" suffix), in that it
+ provides no helpful range of sloppiness.  Contrast that with a partition
+ start request of "4GB", which may actually resolve to some sector up to 500MB
+-before or after that point.  Thus, when creating a partition in an exact location
+-you should use units of bytes ("B"), sectors ("s"), or IEC binary units like
+-"MiB", "GiB", but not "MB", "GB", etc.
++before or after that point.  Thus, when creating a partition in an exact
++location you should use units of bytes ("B"), sectors ("s"), or IEC binary units
++like "MiB", "GiB", but not "MB", "GB", etc.
+ .SH REPORTING BUGS
+ Report bugs to <bug-parted@gnu.org>
+ .SH SEE ALSO
+ .BR fdisk (8),
+ .BR mkfs (8),
+ The \fIparted\fP program is fully documented in the
+-.BR info(1)
++.BR info (1)
+ format
+-.IR "GNU partitioning software"
++.I "GNU partitioning software"
+ manual.
+ .SH AUTHOR
+ This manual page was written by Timshel Knoll <timshel@debian.org>,
+-- 
+2.49.0
+

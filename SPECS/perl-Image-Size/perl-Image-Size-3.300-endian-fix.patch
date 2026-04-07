@@ -1,0 +1,12 @@
+diff -up Image-Size-3.300/lib/Image/Size.pm.endianfix Image-Size-3.300/lib/Image/Size.pm
+--- Image-Size-3.300/lib/Image/Size.pm.endianfix	2017-06-01 11:22:58.895383664 -0400
++++ Image-Size-3.300/lib/Image/Size.pm	2017-06-01 11:23:10.462104933 -0400
+@@ -933,7 +933,7 @@ sub webpsize {
+     #    - frame meta, 8 bytes
+     #    - marker, 3 bytes
+     my $buf = $READ_IN->($img, 4, 26);
+-    my ($raw_w, $raw_h) = unpack 'SS', $buf;
++    my ($raw_w, $raw_h) = unpack '(SS)<', $buf;
+     my $b14 = 2**14 - 1;
+ 
+     # The width and height values contain a 2-bit scaling factor,

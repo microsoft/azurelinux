@@ -1,0 +1,71 @@
+From 01d7101b39dd9049ae3cb9c30195b42ed9c76579 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Tue, 20 Jun 2023 11:36:40 -0400
+Subject: [PATCH 1/2] Do not use importlib find_module API
+
+This API was removed in Python 3.12
+(https://github.com/python/cpython/issues/98040).
+
+Fixes Python 3.12 support in grpcio tests.
+---
+ src/python/grpcio_tests/tests/_loader.py | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/python/grpcio_tests/tests/_loader.py b/src/python/grpcio_tests/tests/_loader.py
+index 80c107aa8e..c497a9aabd 100644
+--- a/src/python/grpcio_tests/tests/_loader.py
++++ b/src/python/grpcio_tests/tests/_loader.py
+@@ -71,7 +71,9 @@ class Loader(object):
+     """
+         for importer, module_name, is_package in (
+                 pkgutil.walk_packages(package_paths)):
+-            module = importer.find_module(module_name).load_module(module_name)
++            spec = importer.find_spec(module_name)
++            module = importlib.util.module_from_spec(spec)
++            spec.loader.exec_module(module)
+             self.visit_module(module)
+ 
+     def visit_module(self, module):
+-- 
+2.40.1
+
+
+From a7191f6781674340740896d5a284ab856e596b2e Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Tue, 20 Jun 2023 12:38:23 -0400
+Subject: [PATCH 2/2] More importlib find_module migration
+
+Do not use importlib find_module API in bazel/_gevent_test_main.py
+
+This API was removed in Python 3.12
+(https://github.com/python/cpython/issues/98040).
+---
+ bazel/_gevent_test_main.py | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/bazel/_gevent_test_main.py b/bazel/_gevent_test_main.py
+index f7936daaf0..bec31a911b 100644
+--- a/bazel/_gevent_test_main.py
++++ b/bazel/_gevent_test_main.py
+@@ -42,6 +42,7 @@ import unittest
+ import sys
+ import os
+ import pkgutil
++import importlib
+ 
+ def trace_callback(event, args):
+     if event in ("switch", "throw"):
+@@ -73,7 +74,9 @@ class SingleLoader(object):
+         tests = []
+         for importer, module_name, is_package in pkgutil.walk_packages([os.path.dirname(os.path.relpath(__file__))]):
+             if pattern in module_name:
+-                module = importer.find_module(module_name).load_module(module_name)
++                spec = importer.find_spec(module_name)
++                module = importlib.util.module_from_spec(spec)
++                spec.loader.exec_module(module)
+                 tests.append(loader.loadTestsFromModule(module))
+         if len(tests) != 1:
+             raise AssertionError("Expected only 1 test module. Found {}".format(tests))
+-- 
+2.40.1
+

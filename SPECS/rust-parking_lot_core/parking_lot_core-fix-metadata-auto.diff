@@ -1,0 +1,14 @@
+--- parking_lot_core-0.9.12/Cargo.toml	1970-01-01T00:00:01+00:00
++++ parking_lot_core-0.9.12/Cargo.toml	2025-10-27T11:33:38.798606+00:00
+@@ -62,11 +62,6 @@
+ [dependencies.smallvec]
+ version = "1.6.1"
+ 
+-[target.'cfg(target_os = "redox")'.dependencies.redox_syscall]
+-version = "0.5"
+-
+ [target."cfg(unix)".dependencies.libc]
+ version = "0.2.95"
+ 
+-[target."cfg(windows)".dependencies.windows-link]
+-version = "0.2.0"

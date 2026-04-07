@@ -1,0 +1,104 @@
+From 213285adab6b8da41800cd7fdb8bc4a3f4d2e0c5 Mon Sep 17 00:00:00 2001
+From: martinwhitaker <memtest@martin-whitaker.me.uk>
+Date: Sun, 18 Jan 2026 23:51:27 +0000
+Subject: [PATCH] Work-arounds for issues with Fedora GRUB EFI "linux" command
+ (#572)
+
+* Extend the header size to 4KB align the code segment in the image file.
+
+A recent change (commit e41655885) to the Fedora implementation of the
+GRUB "linux" command for EFI boot means it now loads the entire image
+(including the header) at the preferred load address instead of just
+loading the code section. This means the code section is no longer 4KB
+aligned. In our image, the code section contains the combined .text and
+.data sections, so this means the .data section is also no longer 4kB
+aligned, which results in a GPF when the startup code loads the new page
+directory address into CR3.
+
+Work around this issue by extending the header size to force the code to
+start on a 4KB boundary.
+
+* Disable memory write protection after EFI setup.
+
+A recent change (commit e41655885) to the Fedora implementation of the
+GRUB "linux" command for EFI boot means it now attempts to make the
+loaded code section read-only, using the EFI_MEMORY_ATTRIBUTE_PROTOCOL.
+In our image the code section contains the combined .text and .data
+sections. Our startup code needs to write to the .data section before
+we can switch to our own page descriptor table, so globally disable
+write protection as soon as we return from efisetup().
+
+Our page descriptor table makes all pages writable (we need to be able
+to write to memory to test it), so there's no need to reenable the
+write protection once we've made the switch.
+
+I have no UEFI firmware that implements the EFI_MEMORY_ATTRIBUTE_PROTOCOL,
+so this fix is not yet proven.
+---
+ boot/boot.h                            | 2 +-
+ boot/x86/startup64.S                   | 8 +++++++-
+ build/i586/ldscripts/memtest_efi.lds   | 2 +-
+ build/x86_64/ldscripts/memtest_efi.lds | 2 +-
+ 4 files changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/boot/boot.h b/boot/boot.h
+index 8f7103f9..d188ef1d 100644
+--- a/boot/boot.h
++++ b/boot/boot.h
+@@ -33,7 +33,7 @@
+ #define LOW_LOAD_ADDR	0x00010000	/* The low  load address for the main program */
+ #define HIGH_LOAD_ADDR	0x00100000	/* The high load address for the main program */
+ 
+-#define SETUP_SECS	2		/* Size of the 16-bit setup code in sectors */
++#define SETUP_SECS	7		/* Size of the 16-bit setup code in sectors */
+ 
+ #define BOOT_SEG	0x07c0		/* Segment address for the 16-bit boot code */
+ #define SETUP_SEG	0x07e0		/* Segment address for the 16-bit setup code */
+diff --git a/boot/x86/startup64.S b/boot/x86/startup64.S
+index c718e245..4b2342c9 100644
+--- a/boot/x86/startup64.S
++++ b/boot/x86/startup64.S
+@@ -6,7 +6,7 @@
+ // It supports both the 32-bit and 64-bit Linux boot protocols and EFI boot
+ // for the first boot of the BSP.
+ //
+-// Copyright (C) 2020-2024 Martin Whitaker.
++// Copyright (C) 2020-2025 Martin Whitaker.
+ //
+ // Derived from memtest86+ head.S:
+ //
+@@ -134,6 +134,12 @@ efi_handover:
+ 	andq	$~0xf, %rsp
+ 	call	efi_setup
+ 
++	# Disable write protection in case the boot loader has made the
++	# loaded image read-only.
++	movq	%cr0, %rcx
++	andw	$0x7fff, %cx
++	movq	%rcx, %cr0
++
+ 	# Save the boot params pointer.
+ 
+ 	movq	%rax, boot_params_addr(%rip)
+diff --git a/build/i586/ldscripts/memtest_efi.lds b/build/i586/ldscripts/memtest_efi.lds
+index aa01761e..5b87ef84 100644
+--- a/build/i586/ldscripts/memtest_efi.lds
++++ b/build/i586/ldscripts/memtest_efi.lds
+@@ -59,5 +59,5 @@ SECTIONS {
+ 	_virt_img_size = _virt_sbat_start + _virt_sbat_size;
+ 
+ 	. = ASSERT(header == 0x202, "The setup header has the wrong offset!");
+-	. = ASSERT(_file_text_start == 0x600, "The .text is at the wrong offset!");
++	. = ASSERT(_file_text_start == 0x1000, "The .text is at the wrong offset!");
+ }
+diff --git a/build/x86_64/ldscripts/memtest_efi.lds b/build/x86_64/ldscripts/memtest_efi.lds
+index a24c5bf6..dbcd4e8a 100644
+--- a/build/x86_64/ldscripts/memtest_efi.lds
++++ b/build/x86_64/ldscripts/memtest_efi.lds
+@@ -59,5 +59,5 @@ SECTIONS {
+ 	_virt_img_size = _virt_sbat_start + _virt_sbat_size;
+ 
+ 	. = ASSERT(header == 0x202, "The setup header has the wrong offset!");
+-	. = ASSERT(_file_text_start == 0x600, "The .text is at the wrong offset!");
++	. = ASSERT(_file_text_start == 0x1000, "The .text is at the wrong offset!");
+ }

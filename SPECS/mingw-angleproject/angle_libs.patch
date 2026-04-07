@@ -1,0 +1,40 @@
+diff -rupN angle-57ea533/src/libEGL.gypi angle-57ea533-new/src/libEGL.gypi
+--- angle-57ea533/src/libEGL.gypi	2017-11-29 00:33:41.000000000 +0100
++++ angle-57ea533-new/src/libEGL.gypi	2021-01-15 13:23:10.827372223 +0100
+@@ -51,7 +51,16 @@
+                         'DYLIB_INSTALL_NAME_BASE': '@rpath',
+                     },
+                 }],
++                ['TARGET=="win32"', {
++                    'ldflags': [ '-Wl,--out-implib,libEGL.dll.a', '../src/libEGL/libEGL_mingw32.def' ],
++                }],
++                ['TARGET=="win64"', {
++                    'ldflags': [ '-Wl,--out-implib,libEGL.dll.a', '../src/libEGL/libEGL_mingw64.def' ],
++                }],
+             ],
++            'libraries': [
++                '-ld3d9 -lgdi32 -ldxguid'
++            ]
+         },
+ 
+         {
+diff -rupN angle-57ea533/src/libGLESv2.gypi angle-57ea533-new/src/libGLESv2.gypi
+--- angle-57ea533/src/libGLESv2.gypi	2021-01-15 13:23:57.849302175 +0100
++++ angle-57ea533-new/src/libGLESv2.gypi	2021-01-15 22:14:17.508666828 +0100
+@@ -1266,7 +1266,16 @@
+                 {
+                     'msvs_requires_importlibrary' : 'true',
+                 }],
++                ['TARGET=="win32"', {
++                    'ldflags': [ '-Wl,--out-implib,libGLESv2.dll.a', '../src/libGLESv2/libGLESv2_mingw32.def' ],
++                }],
++                ['TARGET=="win64"', {
++                    'ldflags': [ '-Wl,--out-implib,libGLESv2.dll.a', '../src/libGLESv2/libGLESv2_mingw64.def' ],
++                }],
+             ],
++            'libraries': [
++                '-ld3d9 -lgdi32 -lsetupapi'
++            ]
+         },
+
+         {

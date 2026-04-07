@@ -1,0 +1,32 @@
+From a2899ef0e20bb638f47e74077281e73f4f18faf3 Mon Sep 17 00:00:00 2001
+From: Miroslav Lisik <mlisik@redhat.com>
+Date: Thu, 10 Jul 2025 19:48:28 +0200
+Subject: [PATCH 2/2] fix ruby NameError exception in pcsd/pcsd.rb occuring
+ with older rack
+
+---
+ pcsd/pcsd.rb | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/pcsd/pcsd.rb b/pcsd/pcsd.rb
+index e8ae9f106..c9f668851 100644
+--- a/pcsd/pcsd.rb
++++ b/pcsd/pcsd.rb
+@@ -74,9 +74,11 @@ configure do
+   CAPABILITIES_PCSD = capabilities_pcsd.freeze
+ end
+ 
+-error Rack::QueryParser::QueryLimitError do
+-  $logger.warn(env['sinatra.error'].message)
+-  return 400, env['sinatra.error'].message
++if Rack.const_defined?(:QueryParser) and Rack::QueryParser.const_defined?(:QueryLimitError)
++  error Rack::QueryParser::QueryLimitError do
++    $logger.warn(env['sinatra.error'].message)
++    return 400, env['sinatra.error'].message
++  end
+ end
+ 
+ get '/remote/?:command?' do
+-- 
+2.50.1
+

@@ -1,0 +1,36 @@
+diff -up graphviz-0.20.1/setup.cfg.deps graphviz-0.20.1/setup.cfg
+--- graphviz-0.20.1/setup.cfg.deps	2022-07-23 05:20:40.000000000 -0600
++++ graphviz-0.20.1/setup.cfg	2024-10-23 20:27:44.667912038 -0600
+@@ -22,19 +22,12 @@ addopts =
+   # - (p/P)assed (no output)
+   -r fsxX
+   --durations=10
+-  --cov --cov-report=term --cov-report=html
+   --strict-config --strict-markers
+-mock_use_standalone_module = true
+ log_cli = true
+ log_cli_level = WARNING
+ log_file = test-log.txt
+ log_file_level = DEBUG
+ 
+-[coverage:run]
+-source = graphviz
+-branch = false
+-omit = */conftest.py
+-
+ [pytype]
+ inputs = graphviz
+ 
+diff -up graphviz-0.20.1/setup.py.deps graphviz-0.20.1/setup.py
+--- graphviz-0.20.1/setup.py.deps	2022-07-23 05:20:40.000000000 -0600
++++ graphviz-0.20.1/setup.py	2024-10-23 20:18:40.663277765 -0600
+@@ -23,8 +23,7 @@ setup(
+     extras_require={
+         'dev': ['tox>=3', 'flake8', 'pep8-naming', 'wheel', 'twine'],
+         'test': ['pytest>=7',
+-                 'pytest-mock>=3', 'mock>=4',
+-                 'pytest-cov', 'coverage'],
++                 'pytest-mock>=3'],
+         'docs': ['sphinx>=5', 'sphinx-autodoc-typehints', 'sphinx-rtd-theme'],
+     },
+     long_description=pathlib.Path('README.rst').read_text(encoding='utf-8'),

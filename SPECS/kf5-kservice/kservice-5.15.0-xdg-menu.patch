@@ -1,0 +1,75 @@
+diff -ur kservice-5.15.0/kbuildsycoca/applications.menu kservice-5.15.0-xdg-menu/kbuildsycoca/applications.menu
+--- kservice-5.15.0/src/applications.menu	2015-07-05 11:13:00.000000000 +0200
++++ kservice-5.15.0-xdg-menu/src/applications.menu	2015-08-16 00:29:20.823019434 +0200
+@@ -31,29 +31,31 @@
+ 					<Category>Core</Category>
+ 					<Not><Category>KDE</Category></Not>
+ 				</And>
++				<Category>X-Red-Hat-Base</Category>
+ 				<!-- Don't list SUSE's YaST in here -->
+ 				<Category>X-SuSE-YaST</Category>
+-				<Category>X-KDE-settings-hardware</Category>
+-				<Category>X-KDE-settings-accessibility</Category>
+-				<Category>X-KDE-settings-components</Category>
+-				<Category>X-KDE-settings-desktop</Category>
+-				<Category>X-KDE-settings-looknfeel</Category>
+-				<Category>X-KDE-settings-network</Category>
+-				<Category>X-KDE-settings-webbrowsing</Category>
+-				<Category>X-KDE-settings-peripherals</Category>
+-				<Category>X-KDE-settings-hardware</Category>
+-				<Category>X-KDE-settings-power</Category>
+-				<Category>X-KDE-settings-security</Category>
+-				<Category>X-KDE-settings-sound</Category>
+-				<Category>X-KDE-settings-system</Category>
+-				<Category>X-KDE-information</Category>
+-				<Filename>kde-kcm_knetworkconfmodule_ss.desktop</Filename>
+-				<Filename>kde-medianotifications.desktop</Filename>
+-				<Filename>kde-audioencoding.desktop</Filename>
+ 			</Not>
+ 		</Include>
+ 	</Menu>
+ 	<Menu>
++		<Name>System Settings</Name>
++		<Directory>SystemConfig.directory</Directory>
++		<Include>
++			<And>
++				<Category>System</Category>
++				<Category>Settings</Category>
++				<Not><Category>X-Red-Hat-ServerConfig</Category></Not>
++			</And>
++		</Include>
++		<Menu>
++			<Name>Server</Name>
++			<Directory>ServerConfig.directory</Directory>
++			<Include>
++				<Category>X-Red-Hat-ServerConfig</Category>
++			</Include>
++		</Menu>
++	</Menu>
++	<Menu>
+ 		<Name>Development</Name>
+ 		<Directory>kf5-development.directory</Directory>
+ 		<Menu>
+@@ -369,7 +371,11 @@
+ 		<Name>Settingsmenu</Name>
+ 		<Directory>kf5-settingsmenu.directory</Directory>
+ 		<Include>
+-			<Category>Settings</Category>
++			<And>
++				<Category>Settings</Category>
++				<Not><Category>System</Category></Not>
++				<Not><Category>X-Red-Hat-ServerConfig</Category></Not>
++			</And>
+ 		</Include>
+ 	</Menu>
+ 	<Menu>
+@@ -378,7 +384,9 @@
+ 		<Include>
+ 			<And>
+ 				<Category>System</Category>
++				<Not><Category>Settings</Category></Not>
+ 				<Not><Category>X-KDE-More</Category></Not>
++				<Not><Category>X-Red-Hat-ServerConfig</Category></Not>
+ 			</And>
+ 		</Include>
+ 		<Menu>

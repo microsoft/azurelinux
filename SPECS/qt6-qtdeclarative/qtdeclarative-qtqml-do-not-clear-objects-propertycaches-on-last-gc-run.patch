@@ -1,0 +1,133 @@
+From dc2358e98b8ddab532866a403ffc09d1162ad0f9 Mon Sep 17 00:00:00 2001
+From: Ulf Hermann <ulf.hermann@qt.io>
+Date: Tue, 13 Jan 2026 11:53:27 +0100
+Subject: [PATCH] QtQml: Do not clear objects' propertyCaches on last GC run
+
+The property caches are not specific to the engine. The same object may
+be exposed to other engines and still require its property cache. When
+the clearing of the property caches on engine destruction was
+introduced, the property caches were still engine-specific and we had no
+choice but to clear them. Otherwise any further access would lead to a
+dereference of a dangling pointer.
+
+Furthermore, when clearing the JS wrapper for a QObject, check if it's
+actually the wrapper being deleted. We don't want to clear some other
+engine's wrapper.
+
+Amends commit 749a7212e903d8e8c6f256edb1836b9449cc7fe1.
+Amends commit c6b2dd879d02b21b18f80faab541f8f04286685a.
+
+Pick-to: 6.11 6.10
+Fixes: QTBUG-142514
+Change-Id: I40bb1aeca65225d56cb1d2ff498f5f1722216a70
+Reviewed-by: Fabian Kosmale <fabian.kosmale@qt.io>
+---
+
+diff --git a/src/qml/jsruntime/qv4qobjectwrapper.cpp b/src/qml/jsruntime/qv4qobjectwrapper.cpp
+index a8dfd50..e61867b 100644
+--- a/src/qml/jsruntime/qv4qobjectwrapper.cpp
++++ b/src/qml/jsruntime/qv4qobjectwrapper.cpp
+@@ -1583,10 +1583,9 @@
+                     o->deleteLater();
+             } else {
+                 // If the object is C++-owned, we still have to release the weak reference we have
+-                // to it.
+-                ddata->jsWrapper.clear();
+-                if (lastCall && ddata->propertyCache)
+-                    ddata->propertyCache.reset();
++                // to it. If the "main" wrapper is not ours, we should leave it alone, though.
++                if (ddata->jsWrapper.as<QObjectWrapper>() == this)
++                    ddata->jsWrapper.clear();
+             }
+         }
+     }
+diff --git a/tests/auto/qml/qjsengine/tst_qjsengine.cpp b/tests/auto/qml/qjsengine/tst_qjsengine.cpp
+index b56b241..11bc62e 100644
+--- a/tests/auto/qml/qjsengine/tst_qjsengine.cpp
++++ b/tests/auto/qml/qjsengine/tst_qjsengine.cpp
+@@ -1119,7 +1119,7 @@
+         engine.newQObject(obj.data());
+         QVERIFY(QQmlData::get(obj.data())->propertyCache);
+     }
+-    QVERIFY(!QQmlData::get(obj.data())->propertyCache);
++    QVERIFY(QQmlData::get(obj.data())->propertyCache);
+ }
+ 
+ void tst_QJSEngine::newQMetaObject() {
+diff --git a/tests/auto/qml/qmlcppcodegen/data/CMakeLists.txt b/tests/auto/qml/qmlcppcodegen/data/CMakeLists.txt
+index 88cc102..8949d00 100644
+--- a/tests/auto/qml/qmlcppcodegen/data/CMakeLists.txt
++++ b/tests/auto/qml/qmlcppcodegen/data/CMakeLists.txt
+@@ -326,6 +326,7 @@
+     stringLength.qml
+     stringToByteArray.qml
+     structuredValueType.qml
++    multiEnginePropertyCache.qml
+     takenumber.qml
+     testlogger.js
+     text.qml
+diff --git a/tests/auto/qml/qmlcppcodegen/data/multiEnginePropertyCache.qml b/tests/auto/qml/qmlcppcodegen/data/multiEnginePropertyCache.qml
+new file mode 100644
+index 0000000..222b2f8
+--- /dev/null
++++ b/tests/auto/qml/qmlcppcodegen/data/multiEnginePropertyCache.qml
+@@ -0,0 +1,20 @@
++pragma Strict
++import QtQml
++
++QtObject {
++    id: root
++
++    property int foo: 0
++    onFooChanged: root.close1()
++
++    property int bar: 0
++    onBarChanged: close2()
++
++    function close1() {
++        console.log("close1")
++    }
++
++    function close2() {
++        console.log("close2")
++    }
++}
+diff --git a/tests/auto/qml/qmlcppcodegen/tst_qmlcppcodegen.cpp b/tests/auto/qml/qmlcppcodegen/tst_qmlcppcodegen.cpp
+index 3ce5627..8d98c02 100644
+--- a/tests/auto/qml/qmlcppcodegen/tst_qmlcppcodegen.cpp
++++ b/tests/auto/qml/qmlcppcodegen/tst_qmlcppcodegen.cpp
+@@ -280,6 +280,7 @@
+     void stringLength();
+     void stringToByteArray();
+     void structuredValueType();
++    void multiEnginePropertyCache();
+     void takeNumbers();
+     void takeNumbers_data();
+     void testIsnan();
+@@ -5795,6 +5796,26 @@
+     QCOMPARE(o->property("w2").value<WeatherModelUrl>(), w2);
+ }
+ 
++void tst_QmlCppCodegen::multiEnginePropertyCache()
++{
++    QQmlEngine engine;
++    QQmlComponent c(&engine, QUrl(u"qrc:/qt/qml/TestTypes/multiEnginePropertyCache.qml"_s));
++    QVERIFY2(c.isReady(), qPrintable(c.errorString()));
++    std::unique_ptr<QObject> o(c.create());
++    QVERIFY(o);
++
++    {
++        QJSEngine other;
++        other.newQObject(o.get());
++    }
++
++    QTest::ignoreMessage(QtDebugMsg, "close1");
++    o->setProperty("foo", 1);
++
++    QTest::ignoreMessage(QtDebugMsg, "close2");
++    o->setProperty("bar", 2);
++}
++
+ void tst_QmlCppCodegen::takeNumbers()
+ {
+     QFETCH(QByteArray, method);

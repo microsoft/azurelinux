@@ -1,0 +1,33 @@
+From 91c283b6201dbd0ddb4b22dc8cbf1b3e84cd3a6a Mon Sep 17 00:00:00 2001
+From: Maxwell G <maxwell@gtmx.me>
+Date: Tue, 10 Jun 2025 21:08:34 -0500
+Subject: [PATCH] Fix py3.14 test failure due to NotImplemented changes
+
+---
+ rdflib/term.py | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/rdflib/term.py b/rdflib/term.py
+index 3e397674..a9129302 100644
+--- a/rdflib/term.py
++++ b/rdflib/term.py
+@@ -1179,7 +1179,15 @@ class Literal(Identifier):
+             return False  # Nothing is less than None
+         if isinstance(other, Literal):
+             try:
+-                return not self.__gt__(other) and not self.eq(other)
++                is_gt = self.__gt__(other)
++                if is_gt is NotImplemented:
++                    # NOTE(gotmax23): This is obviously wrong,
++                    # but this is how this code behaved prior to Python 3.14
++                    # and what the tests apparently expected, as
++                    # bool(NotImplemented) used to be True and now raises a TypeError.
++                    # See https://github.com/RDFLib/rdflib/issues/3083.
++                    is_gt = True
++                return not is_gt and not self.eq(other)
+             except TypeError:
+                 return NotImplemented
+         if isinstance(other, Node):
+-- 
+2.49.0
+

@@ -1,0 +1,20 @@
+--- libheif-sys-5.0.0+1.20.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ libheif-sys-5.0.0+1.20.2/Cargo.toml	2025-10-28T21:45:46.900928+00:00
+@@ -12,7 +12,7 @@
+ [package]
+ edition = "2021"
+ name = "libheif-sys"
+-version = "5.0.0+1.20.2"
++version = "5.0.0"
+ authors = ["Kirill Kuzminykh <cykooz@gmail.com>"]
+ build = "build.rs"
+ links = "heif"
+@@ -123,8 +123,4 @@
+ [build-dependencies.system-deps]
+ version = "7.0"
+ 
+-[target."cfg(windows)".build-dependencies.vcpkg]
+-version = "0.2.15"
+ 
+-[target."cfg(windows)".build-dependencies.walkdir]
+-version = "2.5"

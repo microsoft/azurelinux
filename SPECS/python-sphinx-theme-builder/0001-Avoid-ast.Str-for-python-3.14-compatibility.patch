@@ -1,0 +1,29 @@
+From bef651880a125419e5b53eb0a1b9c236d01f5228 Mon Sep 17 00:00:00 2001
+From: Jerry James <loganjerry@gmail.com>
+Date: Mon, 27 Jan 2025 17:04:02 -0700
+Subject: [PATCH] Avoid ast.Str for python 3.14 compatibility
+
+---
+ src/sphinx_theme_builder/_internal/project.py | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/sphinx_theme_builder/_internal/project.py b/src/sphinx_theme_builder/_internal/project.py
+index b90e677..98eaf26 100644
+--- a/src/sphinx_theme_builder/_internal/project.py
++++ b/src/sphinx_theme_builder/_internal/project.py
+@@ -40,9 +40,10 @@ def get_version_using_ast(contents: bytes) -> Optional[str]:
+             and len(child.targets) == 1
+             and isinstance(child.targets[0], ast.Name)
+             and child.targets[0].id == "__version__"
+-            and isinstance(child.value, ast.Str)
++            and isinstance(child.value, ast.Constant)
++            and isinstance(child.value.value, str)
+         ):
+-            version = child.value.s
++            version = child.value.value
+             break
+ 
+     return version
+-- 
+2.48.1
+

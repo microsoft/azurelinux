@@ -1,0 +1,8 @@
+--- async-channel-2.5.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ async-channel-2.5.0/Cargo.toml	2025-07-08T15:12:07.342814+00:00
+@@ -96,5 +96,3 @@
+ [dev-dependencies.futures-lite]
+ version = "2"
+ 
+-[target.'cfg(target_family = "wasm")'.dev-dependencies.wasm-bindgen-test]
+-version = "0.3.37"

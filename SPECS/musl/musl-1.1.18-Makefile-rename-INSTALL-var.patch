@@ -1,0 +1,68 @@
+From 694d7321915204318a3b6be77bd30a23ca5c1e85 Mon Sep 17 00:00:00 2001
+From: Neal Gompa <ngompa13@gmail.com>
+Date: Sun, 5 Nov 2017 11:47:48 -0500
+Subject: [PATCH] Makefile: Rename INSTALL variable to INSTALL_SH
+
+This is intended to be a variable to point to an internal tool.
+
+Changing this variable prevents it from colliding with tools that
+pass an INSTALL variable automatically.
+
+Signed-off-by: Neal Gompa <ngompa13@gmail.com>
+---
+ Makefile | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index d2e8997..f39ea3c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -53,7 +53,7 @@ LDFLAGS_ALL = $(LDFLAGS_AUTO) $(LDFLAGS)
+ 
+ AR      = $(CROSS_COMPILE)ar
+ RANLIB  = $(CROSS_COMPILE)ranlib
+-INSTALL = $(srcdir)/tools/install.sh
++INSTALL_SH = $(srcdir)/tools/install.sh
+ 
+ ARCH_INCLUDES = $(wildcard $(srcdir)/arch/$(ARCH)/bits/*.h)
+ GENERIC_INCLUDES = $(wildcard $(srcdir)/arch/generic/bits/*.h)
+@@ -194,28 +194,28 @@ obj/%-clang: $(srcdir)/tools/%-clang.in config.mak
+ 	chmod +x $@
+ 
+ $(DESTDIR)$(bindir)/%: obj/%
+-	$(INSTALL) -D $< $@
++	$(INSTALL_SH) -D $< $@
+ 
+ $(DESTDIR)$(libdir)/%.so: lib/%.so
+-	$(INSTALL) -D -m 755 $< $@
++	$(INSTALL_SH) -D -m 755 $< $@
+ 
+ $(DESTDIR)$(libdir)/%: lib/%
+-	$(INSTALL) -D -m 644 $< $@
++	$(INSTALL_SH) -D -m 644 $< $@
+ 
+ $(DESTDIR)$(includedir)/bits/%: $(srcdir)/arch/$(ARCH)/bits/%
+-	$(INSTALL) -D -m 644 $< $@
++	$(INSTALL_SH) -D -m 644 $< $@
+ 
+ $(DESTDIR)$(includedir)/bits/%: $(srcdir)/arch/generic/bits/%
+-	$(INSTALL) -D -m 644 $< $@
++	$(INSTALL_SH) -D -m 644 $< $@
+ 
+ $(DESTDIR)$(includedir)/bits/%: obj/include/bits/%
+-	$(INSTALL) -D -m 644 $< $@
++	$(INSTALL_SH) -D -m 644 $< $@
+ 
+ $(DESTDIR)$(includedir)/%: $(srcdir)/include/%
+-	$(INSTALL) -D -m 644 $< $@
++	$(INSTALL_SH) -D -m 644 $< $@
+ 
+ $(DESTDIR)$(LDSO_PATHNAME): $(DESTDIR)$(libdir)/libc.so
+-	$(INSTALL) -D -l $(libdir)/libc.so $@ || true
++	$(INSTALL_SH) -D -l $(libdir)/libc.so $@ || true
+ 
+ install-libs: $(ALL_LIBS:lib/%=$(DESTDIR)$(libdir)/%) $(if $(SHARED_LIBS),$(DESTDIR)$(LDSO_PATHNAME),)
+ 
+-- 
+2.13.6
+

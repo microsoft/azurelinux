@@ -1,0 +1,100 @@
+From 4bdb4d2f9eaad5d75094e6f6e8441c6844333963 Mon Sep 17 00:00:00 2001
+From: Stefan Eissing <stefan@eissing.org>
+Date: Mon, 21 Jul 2025 15:56:19 +0200
+Subject: [PATCH] curl: tool_read_cb fix of segfault
+
+When transfers read client input without an upload file, the check if
+upload file is '.' strcompared a NULL.
+
+Add test 1548 to reproduce and verify fix.
+
+Reported-by: d1r3ct0r
+Fixes #17978
+Closes #17987
+
+(cherry picked from commit 9657a2041e7745aecd5b16c5c6d812424edfc6fd)
+---
+ src/tool_cb_rea.c      |  2 +-
+ tests/data/Makefile.am |  2 +-
+ tests/data/test1548    | 43 ++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 45 insertions(+), 2 deletions(-)
+ create mode 100644 tests/data/test1548
+
+diff --git a/src/tool_cb_rea.c b/src/tool_cb_rea.c
+index 2ceca242b..8268d0a1a 100644
+--- a/src/tool_cb_rea.c
++++ b/src/tool_cb_rea.c
+@@ -90,7 +90,7 @@ size_t tool_read_cb(char *buffer, size_t sz, size_t nmemb, void *userdata)
+    Make sure we are in non-blocking mode and infd is not regular stdin
+    On Linux per->infd should be stdin (0) and the block below should not
+    execute */
+-  if(!strcmp(per->uploadfile, ".") && per->infd > 0) {
++  if(per->uploadfile && !strcmp(per->uploadfile, ".") && per->infd > 0) {
+ #if defined(_WIN32) && !defined(CURL_WINDOWS_UWP) && !defined(UNDER_CE)
+     rc = recv(per->infd, buffer, curlx_uztosi(sz * nmemb), 0);
+     if(rc < 0) {
+diff --git a/tests/data/Makefile.am b/tests/data/Makefile.am
+index a72f6740f..7d8e8c7fc 100644
+--- a/tests/data/Makefile.am
++++ b/tests/data/Makefile.am
+@@ -203,7 +203,7 @@ test1516 test1517 test1518 test1519 test1520 test1521 test1522 test1523 \
+ test1524 test1525 test1526 test1527 test1528 test1529 test1530 test1531 \
+ test1532 test1533 test1534 test1535 test1536 test1537 test1538 test1539 \
+ test1540 test1541 test1542 test1543 test1544 test1545 test1546 test1547 \
+-\
++test1548 \
+ test1550 test1551 test1552 test1553 test1554 test1555 test1556 test1557 \
+ test1558 test1559 test1560 test1561 test1562 test1563 test1564 test1565 \
+ test1566 test1567 test1568 test1569 test1570 test1571 test1572 test1573 \
+diff --git a/tests/data/test1548 b/tests/data/test1548
+new file mode 100644
+index 000000000..e888b5563
+--- /dev/null
++++ b/tests/data/test1548
+@@ -0,0 +1,43 @@
++<testcase>
++<info>
++<keywords>
++TELNET
++</keywords>
++</info>
++
++#
++# Server-side
++<reply>
++<data>
++</data>
++</reply>
++
++#
++# Client-side
++<client>
++<server>
++http
++</server>
++<features>
++telnet
++</features>
++<name>
++TELNET read stdin without upload file
++</name>
++<stdin>
++GET /we/want/%TESTNUMBER HTTP/1.0
++
++</stdin>
++<command>
++-m 1 telnet://%HOSTIP:%HTTPPORT
++</command>
++</client>
++
++#
++# Verify data after the test has been "shot"
++<verify>
++<errorcode>
++28
++</errorcode>
++</verify>
++</testcase>
+-- 
+2.52.0
+

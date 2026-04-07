@@ -1,0 +1,15 @@
+--- qt-x11-free-3.0.5/src/tools/qgpluginmanager.cpp.bero	2002-08-21 15:16:19.000000000 +0200
++++ qt-x11-free-3.0.5/src/tools/qgpluginmanager.cpp	2002-08-21 15:16:41.000000000 +0200
+@@ -501,10 +501,10 @@
+ 			     (*f).latin1(),
+ 			     (const char*) QFile::encodeName( old->library() ) );
+ 		} else {
+-		    qWarning("%s: Feature %s already defined in %s!",
++/*		    qWarning("%s: Feature %s already defined in %s!",
+ 			     (const char*) QFile::encodeName( old->library() ),
+ 			     (*f).latin1(),
+-			     (const char*) QFile::encodeName( plugin->library() ) );
++			     (const char*) QFile::encodeName( plugin->library() ) ); */
+ 		}
+ 	    }
+ 	}

@@ -1,0 +1,37 @@
+--- petgraph-0.6.5/Cargo.toml	1970-01-01T00:00:01+00:00
++++ petgraph-0.6.5/Cargo.toml	2025-01-21T15:16:51.491414+00:00
+@@ -30,6 +30,14 @@
+ categories = ["data-structures"]
+ license = "MIT OR Apache-2.0"
+ repository = "https://github.com/petgraph/petgraph"
++exclude = [
++    "/clippy.toml",
++    "/custom.css",
++    "/graph-example.dot",
++    "/Makefile",
++    # Note that contents of assets/ are licensed CC-BY-SA-4.0
++    "/assets/**",
++]
+ 
+ [package.metadata.docs.rs]
+ features = [
+@@ -56,11 +64,6 @@
+ 
+ [dependencies.indexmap]
+ version = "2.0"
+-
+-[dependencies.quickcheck]
+-version = "0.8"
+-optional = true
+-default-features = false
+ 
+ [dependencies.rayon]
+ version = "1.5.3"
+@@ -99,7 +102,6 @@
+ [features]
+ all = [
+     "unstable",
+-    "quickcheck",
+     "matrix_graph",
+     "stable_graph",
+     "graphmap",

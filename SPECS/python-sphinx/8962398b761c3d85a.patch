@@ -1,0 +1,29 @@
+From 8962398b761c3d85a7c74b6f789b3ffb127bde0c Mon Sep 17 00:00:00 2001
+From: Adam Turner <9087854+AA-Turner@users.noreply.github.com>
+Date: Thu, 6 Mar 2025 16:03:44 +0000
+Subject: [PATCH] autosummary: Update test for Python 3.14.0a5+ (#13418)
+
+`types.UnionType` and `typing.Union` have been merged.
+---
+ tests/test_extensions/test_ext_autosummary.py | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/tests/test_extensions/test_ext_autosummary.py b/tests/test_extensions/test_ext_autosummary.py
+index 35dc7d180ef..c807ddba3d1 100644
+--- a/tests/test_extensions/test_ext_autosummary.py
++++ b/tests/test_extensions/test_ext_autosummary.py
+@@ -447,8 +447,12 @@ def test_autosummary_generate_content_for_module_imported_members(app):
+     ]
+     assert context['functions'] == ['bar']
+     assert context['all_functions'] == ['_quux', 'bar']
+-    assert context['classes'] == ['Class', 'Foo']
+-    assert context['all_classes'] == ['Class', 'Foo', '_Baz']
++    if sys.version_info >= (3, 14, 0, 'alpha', 5):
++        assert context['classes'] == ['Class', 'Foo', 'Union']
++        assert context['all_classes'] == ['Class', 'Foo', 'Union', '_Baz']
++    else:
++        assert context['classes'] == ['Class', 'Foo']
++        assert context['all_classes'] == ['Class', 'Foo', '_Baz']
+     assert context['exceptions'] == ['Exc']
+     assert context['all_exceptions'] == ['Exc', '_Exc']
+     assert context['attributes'] == ['CONSTANT1', 'qux', 'quuz', 'non_imported_member']

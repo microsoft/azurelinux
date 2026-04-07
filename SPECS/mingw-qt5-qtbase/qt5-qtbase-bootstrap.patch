@@ -1,0 +1,11 @@
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/src/tools/bootstrap/bootstrap.pro qtbase-everywhere-src-5.15.18-new/src/tools/bootstrap/bootstrap.pro
+--- qtbase-everywhere-src-5.15.18/src/tools/bootstrap/bootstrap.pro	2025-11-07 14:10:32.226541143 +0100
++++ qtbase-everywhere-src-5.15.18-new/src/tools/bootstrap/bootstrap.pro	2025-11-07 14:10:37.845460791 +0100
+@@ -112,6 +112,7 @@ SOURCES += \
+            ../../corelib/tools/qline.cpp \
+            ../../corelib/tools/qversionnumber.cpp \
+            ../../xml/dom/qdom.cpp \
++           ../../xml/dom/qdomhelpers.cpp \
+            ../../xml/sax/qxml.cpp
+ 
+ unix:SOURCES += ../../corelib/kernel/qcore_unix.cpp \

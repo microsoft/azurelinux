@@ -1,0 +1,387 @@
+diff --git a/Makefile.in b/Makefile.in
+index 3cde955..06232f1 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -106,6 +106,9 @@ rsync$(EXEEXT): $(OBJS)
+ rrsync: support/rrsync
+ 	cp -p $(srcdir)/support/rrsync rrsync
+ 
++rrsync.1.md: support/rrsync.1.md
++	cp -p $(srcdir)/support/rrsync.1.md rrsync.1.md
++
+ $(OBJS): $(HEADERS)
+ $(CHECK_OBJS): $(HEADERS)
+ tls.o xattrs.o: lib/sysxattrs.h
+@@ -269,7 +269,7 @@ rsyncd.conf.5: rsyncd.conf.5.md md-convert version.h Makefile
+ 	@$(srcdir)/maybe-make-man rsyncd.conf.5.md
+ 
+ rrsync.1: support/rrsync.1.md md-convert Makefile
+-	@$(srcdir)/maybe-make-man support/rrsync.1.md
++	@$(srcdir)/maybe-make-man rrsync.1.md
+ 
+ .PHONY: clean
+ clean: cleantests
+diff --git a/patches/detect-renamed.diff.old b/patches/detect-renamed.diff
+index 0eb1dfc..be2f199 100644
+--- a/patches/detect-renamed.diff.old
++++ b/patches/detect-renamed.diff
+@@ -781,359 +781,6 @@ diff --git a/util1.c b/util1.c
+  			*fn = '/';
+  			return 0;
+  		}
+-diff -Nurp a/rrsync.1 b/rrsync.1
+---- a/rrsync.1
+-+++ b/rrsync.1
+-@@ -1,176 +0,0 @@
+--.TH "rrsync" "1" "15 Jan 2025" "rrsync from rsync 3.4.1" "User Commands"
+--.\" prefix=/usr
+--.P
+--.SH "NAME"
+--.P
+--rrsync \- a script to setup restricted rsync users via ssh logins
+--.P
+--.SH "SYNOPSIS"
+--.P
+--.nf
+--rrsync [-ro|-wo] [-munge] [-no-del] [-no-lock] [-no-overwrite]  DIR
+--.fi
+--.P
+--The single non-option argument specifies the restricted \fIDIR\fP to use. It can be
+--relative to the user's home directory or an absolute path.
+--.P
+--The online version of this manpage (that includes cross-linking of topics)
+--is available at
+--.UR https://download.samba.org/pub/rsync/rrsync.1
+--.UE .
+--.P
+--.SH "DESCRIPTION"
+--.P
+--A user's ssh login can be restricted to only allow the running of an rsync
+--transfer in one of two easy ways:
+--.P
+--.IP o
+--forcing the running of the rrsync script
+--.IP o
+--forcing the running of an rsync daemon-over-ssh command.
+--.P
+--Both of these setups use a feature of ssh that allows a command to be forced to
+--run instead of an interactive shell.  However, if the user's home shell is bash,
+--please see BASH SECURITY ISSUE for a potential issue.
+--.P
+--To use the rrsync script, edit the user's \fB~/.ssh/authorized_keys\fP file and add
+--a prefix like one of the following (followed by a space) in front of each
+--ssh-key line that should be restricted:
+--.RS 4
+--.P
+--.nf
+--command="rrsync DIR"
+--command="rrsync -ro DIR"
+--command="rrsync -munge -no-del DIR"
+--.fi
+--.RE
+--.P
+--Then, ensure that the rrsync script has your desired option restrictions. You
+--may want to copy the script to a local bin dir with a unique name if you want
+--to have multiple configurations. One or more rrsync options can be specified
+--prior to the \fIDIR\fP if you want to further restrict the transfer.
+--.P
+--To use an rsync daemon setup, edit the user's \fB~/.ssh/authorized_keys\fP file and
+--add a prefix like one of the following (followed by a space) in front of each
+--ssh-key line that should be restricted:
+--.RS 4
+--.P
+--.nf
+--command="rsync --server --daemon ."
+--command="rsync --server --daemon --config=/PATH/TO/rsyncd.conf ."
+--.fi
+--.RE
+--.P
+--Then, ensure that the rsyncd.conf file is created with one or more module names
+--with the appropriate path and option restrictions.  If rsync's
+--\fB\-\-config\fP option is omitted, it defaults to \fB~/rsyncd.conf\fP.
+--See the \fBrsyncd.conf\fP(5) manpage for details of how to
+--configure an rsync daemon.
+--.P
+--When using rrsync, there can be just one restricted dir per authorized key.  A
+--daemon setup, on the other hand, allows multiple module names inside the config
+--file, each one with its own path setting.
+--.P
+--The remainder of this manpage is dedicated to using the rrsync script.
+--.P
+--.SH "OPTIONS"
+--.P
+--.IP "\fB\-ro\fP"
+--Allow only reading from the DIR. Implies \fB\-no-del\fP and
+--\fB\-no-lock\fP.
+--.IP "\fB\-wo\fP"
+--Allow only writing to the DIR.
+--.IP "\fB\-munge\fP"
+--Enable rsync's \fB\-\-munge-links\fP on the server side.
+--.IP "\fB\-no-del\fP"
+--Disable rsync's \fB\-\-delete*\fP and \fB\-\-remove*\fP options.
+--.IP "\fB\-no-lock\fP"
+--Avoid the single-run (per-user) lock check.  Useful with \fB\-munge\fP.
+--.IP "\fB\-no-overwrite\fP"
+--Enforce \fB\-\-ignore-existing\fP on the server. Prevents overwriting existing
+--files when the server is the receiver.
+--.IP "\fB\-help\fP, \fB\-h\fP"
+--Output this help message and exit.
+--.P
+--.SH "SECURITY RESTRICTIONS"
+--.P
+--The rrsync script validates the path arguments it is sent to try to restrict
+--them to staying within the specified DIR.
+--.P
+--The rrsync script rejects rsync's \fB\-\-copy-links\fP option (by
+--default) so that a copy cannot dereference a symlink within the DIR to get to a
+--file outside the DIR.
+--.P
+--The rrsync script rejects rsync's \fB\-\-protect-args\fP (\fB\-s\fP) option
+--because it would allow options to be sent to the server-side that the script
+--cannot check.  If you want to support \fB\-\-protect-args\fP, use a daemon-over-ssh
+--setup.
+--.P
+--The rrsync script accepts just a subset of rsync's options that the real rsync
+--uses when running the server command.  A few extra convenience options are also
+--included to help it to interact with BackupPC and accept some convenient user
+--overrides.
+--.P
+--The script (or a copy of it) can be manually edited if you want it to customize
+--the option handling.
+--.P
+--.SH "BASH SECURITY ISSUE"
+--.P
+--If your users have bash set as their home shell, bash may try to be overly
+--helpful and ensure that the user's login bashrc files are run prior to
+--executing the forced command.  This can be a problem if the user can somehow
+--update their home bashrc files, perhaps via the restricted copy, a shared home
+--directory, or something similar.
+--.P
+--One simple way to avoid the issue is to switch the user to a simpler shell,
+--such as dash.  When choosing the new home shell, make sure that you're not
+--choosing bash in disguise, as it is unclear if it avoids the security issue.
+--.P
+--Another potential fix is to ensure that the user's home directory is not a
+--shared mount and that they have no means of copying files outside of their
+--restricted directories.  This may require you to force the enabling of symlink
+--munging on the server side.
+--.P
+--A future version of openssh may have a change to the handling of forced
+--commands that allows it to avoid using the user's home shell.
+--.P
+--.SH "EXAMPLES"
+--.P
+--The \fB~/.ssh/authorized_keys\fP file might have lines in it like this:
+--.RS 4
+--.P
+--.nf
+--command="rrsync client/logs" ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAIEAzG...
+--command="rrsync -ro results" ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAIEAmk...
+--.fi
+--.RE
+--.P
+--.SH "FILES"
+--.P
+--~/.ssh/authorized_keys
+--.P
+--.SH "SEE ALSO"
+--.P
+--\fBrsync\fP(1), \fBrsyncd.conf\fP(5)
+--.P
+--.SH "VERSION"
+--.P
+--This manpage is current for version 3.4.1 of rsync.
+--.P
+--.SH "CREDITS"
+--.P
+--rsync is distributed under the GNU General Public License.  See the file
+--COPYING for details.
+--.P
+--An rsync web site is available at
+--.UR https://rsync.samba.org/
+--.UE
+--and its github
+--project is
+--.UR https://github.com/RsyncProject/rsync
+--.UE .
+--.P
+--.SH "AUTHOR"
+--.P
+--The original rrsync perl script was written by Joe Smith.  Many people have
+--later contributed to it.  The python version was created by Wayne Davison.
+-diff -Nurp a/rrsync.1.html b/rrsync.1.html
+---- a/rrsync.1.html
+-+++ b/rrsync.1.html
+-@@ -1,169 +0,0 @@
+--<html><head>
+--<title>rrsync(1) manpage</title>
+--<meta charset="UTF-8"/>
+--<link href="https://fonts.googleapis.com/css2?family=Roboto&family=Roboto+Mono&display=swap" rel="stylesheet">
+--<style>
+--body {
+--  max-width: 50em;
+--  margin: auto;
+--}
+--body, b, strong, u {
+--  font-family: 'Roboto', sans-serif;
+--}
+--a.tgt { font-face: symbol; font-weight: 400; font-size: 70%; visibility: hidden; text-decoration: none; color: #ddd; padding: 0 4px; border: 0; }
+--a.tgt:after { content: '🔗'; }
+--a.tgt:hover { color: #444; background-color: #eaeaea; }
+--h1:hover > a.tgt, h2:hover > a.tgt, h3:hover > a.tgt, dt:hover > a.tgt { visibility: visible; }
+--code {
+--  font-family: 'Roboto Mono', monospace;
+--  font-weight: bold;
+--  white-space: pre;
+--}
+--pre code {
+--  display: block;
+--  font-weight: normal;
+--}
+--blockquote pre code {
+--  background: #f1f1f1;
+--}
+--dd p:first-of-type {
+--  margin-block-start: 0em;
+--}
+--</style>
+--</head><body>
+--<h2 id="NAME">NAME<a href="#NAME" class="tgt"></a></h2>
+--<p>rrsync -&#8288; a script to setup restricted rsync users via ssh logins</p>
+--<h2 id="SYNOPSIS">SYNOPSIS<a href="#SYNOPSIS" class="tgt"></a></h2>
+--<pre><code>rrsync [-ro|-wo] [-munge] [-no-del] [-no-lock] [-no-overwrite]  DIR
+--</code></pre>
+--<p>The single non-option argument specifies the restricted <u>DIR</u> to use. It can be
+--relative to the user's home directory or an absolute path.</p>
+--<p>The online version of this manpage (that includes cross-linking of topics)
+--is available at <a href="https://download.samba.org/pub/rsync/rrsync.1">https://download.samba.org/pub/rsync/rrsync.1</a>.</p>
+--<h2 id="DESCRIPTION">DESCRIPTION<a href="#DESCRIPTION" class="tgt"></a></h2>
+--<p>A user's ssh login can be restricted to only allow the running of an rsync
+--transfer in one of two easy ways:</p>
+--<ul>
+--<li>forcing the running of the rrsync script</li>
+--<li>forcing the running of an rsync daemon-over-ssh command.</li>
+--</ul>
+--<p>Both of these setups use a feature of ssh that allows a command to be forced to
+--run instead of an interactive shell.  However, if the user's home shell is bash,
+--please see <a href="#BASH_SECURITY_ISSUE">BASH SECURITY ISSUE</a> for a potential issue.</p>
+--<p>To use the rrsync script, edit the user's <code>~/.ssh/authorized_keys</code> file and add
+--a prefix like one of the following (followed by a space) in front of each
+--ssh-key line that should be restricted:</p>
+--<blockquote>
+--<pre><code>command=&quot;rrsync DIR&quot;
+--command=&quot;rrsync -ro DIR&quot;
+--command=&quot;rrsync -munge -no-del DIR&quot;
+--</code></pre>
+--</blockquote>
+--<p>Then, ensure that the rrsync script has your desired option restrictions. You
+--may want to copy the script to a local bin dir with a unique name if you want
+--to have multiple configurations. One or more rrsync options can be specified
+--prior to the <u>DIR</u> if you want to further restrict the transfer.</p>
+--<p>To use an rsync daemon setup, edit the user's <code>~/.ssh/authorized_keys</code> file and
+--add a prefix like one of the following (followed by a space) in front of each
+--ssh-key line that should be restricted:</p>
+--<blockquote>
+--<pre><code>command=&quot;rsync --server --daemon .&quot;
+--command=&quot;rsync --server --daemon --config=/PATH/TO/rsyncd.conf .&quot;
+--</code></pre>
+--</blockquote>
+--<p>Then, ensure that the rsyncd.conf file is created with one or more module names
+--with the appropriate path and option restrictions.  If rsync's
+--<a href="rsync.1#dopt--config"><code>--config</code></a> option is omitted, it defaults to <code>~/rsyncd.conf</code>.
+--See the <a href="rsyncd.conf.5"><strong>rsyncd.conf</strong>(5)</a> manpage for details of how to
+--configure an rsync daemon.</p>
+--<p>When using rrsync, there can be just one restricted dir per authorized key.  A
+--daemon setup, on the other hand, allows multiple module names inside the config
+--file, each one with its own path setting.</p>
+--<p>The remainder of this manpage is dedicated to using the rrsync script.</p>
+--<h2 id="OPTIONS">OPTIONS<a href="#OPTIONS" class="tgt"></a></h2>
+--<dl>
+--
+--<dt id="opt-ro"><code>-ro</code><a href="#opt-ro" class="tgt"></a></dt><dd>
+--<p>Allow only reading from the DIR. Implies <a href="#opt-no-del"><code>-no-del</code></a> and
+--<a href="#opt-no-lock"><code>-no-lock</code></a>.</p>
+--</dd>
+--
+--<dt id="opt-wo"><code>-wo</code><a href="#opt-wo" class="tgt"></a></dt><dd>
+--<p>Allow only writing to the DIR.</p>
+--</dd>
+--
+--<dt id="opt-munge"><code>-munge</code><a href="#opt-munge" class="tgt"></a></dt><dd>
+--<p>Enable rsync's <a href="rsync.1#opt--munge-links"><code>--munge-links</code></a> on the server side.</p>
+--</dd>
+--
+--<dt id="opt-no-del"><code>-no-del</code><a href="#opt-no-del" class="tgt"></a></dt><dd>
+--<p>Disable rsync's <code>--delete*</code> and <code>--remove*</code> options.</p>
+--</dd>
+--
+--<dt id="opt-no-lock"><code>-no-lock</code><a href="#opt-no-lock" class="tgt"></a></dt><dd>
+--<p>Avoid the single-run (per-user) lock check.  Useful with <a href="#opt-munge"><code>-munge</code></a>.</p>
+--</dd>
+--
+--<dt id="opt-no-overwrite"><code>-no-overwrite</code><a href="#opt-no-overwrite" class="tgt"></a></dt><dd>
+--<p>Enforce <code>--ignore-existing</code> on the server. Prevents overwriting existing
+--files when the server is the receiver.</p>
+--</dd>
+--
+--<span id="opt-h"></span><dt id="opt-help"><code>-help</code>, <code>-h</code><a href="#opt-help" class="tgt"></a></dt><dd>
+--<p>Output this help message and exit.</p>
+--</dd>
+--</dl>
+--<h2 id="SECURITY_RESTRICTIONS">SECURITY RESTRICTIONS<a href="#SECURITY_RESTRICTIONS" class="tgt"></a></h2>
+--<p>The rrsync script validates the path arguments it is sent to try to restrict
+--them to staying within the specified DIR.</p>
+--<p>The rrsync script rejects rsync's <a href="rsync.1#opt--copy-links"><code>--copy-links</code></a> option (by
+--default) so that a copy cannot dereference a symlink within the DIR to get to a
+--file outside the DIR.</p>
+--<p>The rrsync script rejects rsync's <a href="rsync.1#opt--protect-args"><code>--protect-args</code></a> (<code>-s</code>) option
+--because it would allow options to be sent to the server-side that the script
+--cannot check.  If you want to support <code>--protect-args</code>, use a daemon-over-ssh
+--setup.</p>
+--<p>The rrsync script accepts just a subset of rsync's options that the real rsync
+--uses when running the server command.  A few extra convenience options are also
+--included to help it to interact with BackupPC and accept some convenient user
+--overrides.</p>
+--<p>The script (or a copy of it) can be manually edited if you want it to customize
+--the option handling.</p>
+--<h2 id="BASH_SECURITY_ISSUE">BASH SECURITY ISSUE<a href="#BASH_SECURITY_ISSUE" class="tgt"></a></h2>
+--<p>If your users have bash set as their home shell, bash may try to be overly
+--helpful and ensure that the user's login bashrc files are run prior to
+--executing the forced command.  This can be a problem if the user can somehow
+--update their home bashrc files, perhaps via the restricted copy, a shared home
+--directory, or something similar.</p>
+--<p>One simple way to avoid the issue is to switch the user to a simpler shell,
+--such as dash.  When choosing the new home shell, make sure that you're not
+--choosing bash in disguise, as it is unclear if it avoids the security issue.</p>
+--<p>Another potential fix is to ensure that the user's home directory is not a
+--shared mount and that they have no means of copying files outside of their
+--restricted directories.  This may require you to force the enabling of symlink
+--munging on the server side.</p>
+--<p>A future version of openssh may have a change to the handling of forced
+--commands that allows it to avoid using the user's home shell.</p>
+--<h2 id="EXAMPLES">EXAMPLES<a href="#EXAMPLES" class="tgt"></a></h2>
+--<p>The <code>~/.ssh/authorized_keys</code> file might have lines in it like this:</p>
+--<blockquote>
+--<pre><code>command=&quot;rrsync client/logs&quot; ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAIEAzG...
+--command=&quot;rrsync -ro results&quot; ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAIEAmk...
+--</code></pre>
+--</blockquote>
+--<h2 id="FILES">FILES<a href="#FILES" class="tgt"></a></h2>
+--<p>~/.ssh/authorized_keys</p>
+--<h2 id="SEE_ALSO">SEE ALSO<a href="#SEE_ALSO" class="tgt"></a></h2>
+--<p><a href="rsync.1"><strong>rsync</strong>(1)</a>, <a href="rsyncd.conf.5"><strong>rsyncd.conf</strong>(5)</a></p>
+--<h2 id="VERSION">VERSION<a href="#VERSION" class="tgt"></a></h2>
+--<p>This manpage is current for version 3.4.1 of rsync.</p>
+--<h2 id="CREDITS">CREDITS<a href="#CREDITS" class="tgt"></a></h2>
+--<p>rsync is distributed under the GNU General Public License.  See the file
+--<a href="COPYING">COPYING</a> for details.</p>
+--<p>An rsync web site is available at <a href="https://rsync.samba.org/">https://rsync.samba.org/</a> and its github
+--project is <a href="https://github.com/RsyncProject/rsync">https://github.com/RsyncProject/rsync</a>.</p>
+--<h2 id="AUTHOR">AUTHOR<a href="#AUTHOR" class="tgt"></a></h2>
+--<p>The original rrsync perl script was written by Joe Smith.  Many people have
+--later contributed to it.  The python version was created by Wayne Davison.</p>
+--<div style="float: right"><p><i>15 Jan 2025</i></p></div>
+--</body></html>
+ diff -Nurp a/rsync.1 b/rsync.1
+ --- a/rsync.1
+ +++ b/rsync.1

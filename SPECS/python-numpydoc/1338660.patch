@@ -1,0 +1,25 @@
+From 1338660931330bfd881c2c5792ac7ac1ee3dab96 Mon Sep 17 00:00:00 2001
+From: Ross Barnowski <rossbar@caltech.edu>
+Date: Thu, 17 Oct 2024 07:21:24 -0700
+Subject: [PATCH] MAINT: Add _exception_on_warning to MockApp (#586)
+
+MockApp in test suite is now breaking due to the absence
+of a private _exception_on_warning attribute.
+
+Fix by explicitly adding to the MockApp.
+---
+ numpydoc/tests/test_numpydoc.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/numpydoc/tests/test_numpydoc.py b/numpydoc/tests/test_numpydoc.py
+index f46e2565..997cb0a5 100644
+--- a/numpydoc/tests/test_numpydoc.py
++++ b/numpydoc/tests/test_numpydoc.py
+@@ -49,6 +49,7 @@ def __init__(self):
+         self.verbosity = 2
+         self._warncount = 0
+         self.warningiserror = False
++        self._exception_on_warning = False
+ 
+ 
+ def test_mangle_docstrings_basic():

@@ -1,0 +1,102 @@
+From 548375b2122f83771dc0b8571f16e5b5adabba98 Mon Sep 17 00:00:00 2001
+From: Martin Sehnoutka <msehnout@redhat.com>
+Date: Wed, 7 Sep 2016 10:04:31 +0200
+Subject: [PATCH 07/59] Make filename filters smarter.
+
+In the original version vsftpd was not able to prevent
+users from downloading for instance /etc/passwd by
+defining filters such as deny_file=/etc/passwd or /etc*
+or passwd. Example of erroneous behavior:
+230 Login successful.
+Remote system type is UNIX.
+Using binary mode to transfer files.
+ftp> cd /
+250 Directory successfully changed.
+ftp> cd /etc
+550 Permission denied.
+ftp> cd etc
+250 Directory successfully changed.
+ftp> get passwd
+local: passwd remote: passwd
+227 Entering Passive Mode (127,0,0,1,99,251)
+150 Opening BINARY mode data connection for passwd (2813 bytes).
+226 File send OK.
+2813 bytes received in 0.00016 seconds (1.7e+04 Kbytes/s)
+ftp> quit
+221 Goodbye.
+---
+ ls.c  | 24 +++++++++++++++++++++++-
+ str.c | 11 +++++++++++
+ str.h |  1 +
+ 3 files changed, 35 insertions(+), 1 deletion(-)
+
+diff --git a/ls.c b/ls.c
+index 7e1376d..f489478 100644
+--- a/ls.c
++++ b/ls.c
+@@ -246,8 +246,30 @@ vsf_filename_passes_filter(const struct mystr* p_filename_str,
+   int ret = 0;
+   char last_token = 0;
+   int must_match_at_current_pos = 1;
++
++
+   str_copy(&filter_remain_str, p_filter_str);
+-  str_copy(&name_remain_str, p_filename_str);
++
++  if (!str_isempty (&filter_remain_str) && !str_isempty(p_filename_str)) {
++    if (str_get_char_at(p_filter_str, 0) == '/') {
++      if (str_get_char_at(p_filename_str, 0) != '/') {
++        str_getcwd (&name_remain_str);
++
++        if (str_getlen(&name_remain_str) > 1) /* cwd != root dir */
++          str_append_char (&name_remain_str, '/');
++
++        str_append_str (&name_remain_str, p_filename_str);
++      }
++      else
++       str_copy (&name_remain_str, p_filename_str);
++    } else {
++      if (str_get_char_at(p_filter_str, 0) != '{')
++        str_basename (&name_remain_str, p_filename_str);
++      else
++        str_copy (&name_remain_str, p_filename_str);
++    }
++  } else
++    str_copy(&name_remain_str, p_filename_str);
+ 
+   while (!str_isempty(&filter_remain_str) && *iters < VSFTP_MATCHITERS_MAX)
+   {
+diff --git a/str.c b/str.c
+index 6596204..ba4b92a 100644
+--- a/str.c
++++ b/str.c
+@@ -711,3 +711,14 @@ str_replace_unprintable(struct mystr* p_str, char new_char)
+   }
+ }
+ 
++void
++str_basename (struct mystr* d_str, const struct mystr* path)
++{
++  static struct mystr tmp;
++
++  str_copy (&tmp, path);
++  str_split_char_reverse(&tmp, d_str, '/');
++
++  if (str_isempty(d_str))
++   str_copy (d_str, path);
++}
+diff --git a/str.h b/str.h
+index ab0a9a4..3a21b50 100644
+--- a/str.h
++++ b/str.h
+@@ -100,6 +100,7 @@ void str_replace_unprintable(struct mystr* p_str, char new_char);
+ int str_atoi(const struct mystr* p_str);
+ filesize_t str_a_to_filesize_t(const struct mystr* p_str);
+ unsigned int str_octal_to_uint(const struct mystr* p_str);
++void str_basename (struct mystr* d_str, const struct mystr* path);
+ 
+ /* PURPOSE: Extract a line of text (delimited by \n or EOF) from a string
+  * buffer, starting at character position 'p_pos'. The extracted line will
+-- 
+2.14.4
+

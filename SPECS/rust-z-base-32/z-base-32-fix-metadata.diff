@@ -1,0 +1,50 @@
+--- z-base-32-0.1.4/Cargo.toml	1970-01-01T00:00:01+00:00
++++ z-base-32-0.1.4/Cargo.toml	2024-03-08T12:38:35.702352+00:00
+@@ -26,6 +26,11 @@
+ categories = ["encoding"]
+ license = "MIT"
+ repository = "https://github.com/matusf/z-base-32"
++exclude = [
++    "/pyproject.toml",
++    "/test.py",
++]
++autobins = false
+ 
+ [profile.dist]
+ lto = "thin"
+@@ -33,35 +38,6 @@
+ 
+ [lib]
+ name = "zbase32"
+-crate-type = [
+-    "cdylib",
+-    "rlib",
+-]
+-
+-[[bin]]
+-name = "zbase32"
+-required-features = ["cli"]
+-
+-[dependencies.anyhow]
+-version = "1"
+-optional = true
+-
+-[dependencies.clap]
+-version = "4.5.1"
+-features = ["derive"]
+-optional = true
+-
+-[dependencies.pyo3]
+-version = "0.20.2"
+-features = ["extension-module"]
+-optional = true
+ 
+ [dev-dependencies.quickcheck]
+ version = "1"
+-
+-[features]
+-cli = [
+-    "dep:clap",
+-    "dep:anyhow",
+-]
+-python = ["dep:pyo3"]

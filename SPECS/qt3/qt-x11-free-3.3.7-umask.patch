@@ -1,0 +1,14 @@
+--- qt-x11-free-3.3.7/src/tools/qsettings.cpp.tn	2006-11-09 20:53:25.000000000 +0100
++++ qt-x11-free-3.3.7/src/tools/qsettings.cpp	2006-11-09 20:59:53.000000000 +0100
+@@ -994,7 +994,10 @@
+ #endif
+ 
+ 	QFile file( filename + ".tmp" );
+-	if (! file.open(IO_WriteOnly)) {
++	mode_t old_umask = umask(0022);
++	bool f = file.open(IO_WriteOnly);
++	umask(old_umask);
++	if (! f) {
+ 
+ #ifdef QT_CHECK_STATE
+ 	    qWarning("QSettings::sync: failed to open '%s' for writing",

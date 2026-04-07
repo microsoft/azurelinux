@@ -1,0 +1,32 @@
+From d7baa5c396b3dc231043b92d965b2eaadcc8b5dd Mon Sep 17 00:00:00 2001
+From: Sean Young <sean@mess.org>
+Date: Sun, 8 Jun 2025 12:13:09 +0100
+Subject: [PATCH] Revert "build: Fix missing media/lirc.h (BTS #872074)."
+
+This reverts commit ec4232aa6fe68410981053b4dcd5b69ce7f24875.
+---
+ Makefile.am | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 17faa549..a9d036d1 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -72,11 +72,9 @@ pkgconfigdir            = $(libdir)/pkgconfig
+ dist_pkgconfig_DATA     = lirc.pc lirc-driver.pc
+ 
+ headerdir               = $(includedir)/lirc
+-header_HEADERS          = include/linux/input-event-codes.h \
+-                          drivers/irpipe/irpipe.h
+-
+-mediadir                = $(includedir)/lirc/media
+-media_HEADERS           = include/media/lirc.h
++nobase_header_HEADERS   = include/media/lirc.h \
++                          include/linux/input-event-codes.h
++header_HEADERS          = drivers/irpipe/irpipe.h
+ 
+ py_pkgdir               = $(pkgdatadir)/python-pkg
+ dist_py_pkg_DATA        = python-pkg/setup.py \
+-- 
+2.49.0
+

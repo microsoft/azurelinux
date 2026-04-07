@@ -1,0 +1,13 @@
+--- doc/gphelp.in.orig	2024-09-28 01:04:40.000000000 -0600
++++ doc/gphelp.in	2024-09-30 10:45:39.612497616 -0600
+@@ -43,8 +43,8 @@ $datadir= "@datadir@";
+ #
+ $wwwsite= "https://pari.math.u-bordeaux.fr/";
+ 
+-$xdvi = $ENV{GPXDVI} || "xdvi";
+-$xdviref = $ENV{GPXDVIREF} || "$xdvi -paper 29.7x21cm";
++$xdvi = $ENV{GPXDVI} || "xdg-open";
++$xdviref = $ENV{GPXDVIREF} || "$xdvi";
+ $gzip = "gzip";
+ $zcat = "$gzip -dc";
+ $bzip = "bzip2";

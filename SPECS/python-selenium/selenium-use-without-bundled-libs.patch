@@ -1,0 +1,19 @@
+--- selenium-4.14.0--orig/selenium/webdriver/firefox/firefox_binary.py	2000-01-01 01:00:00.000000000 +0100
++++ selenium-4.14.0--patched/selenium/webdriver/firefox/firefox_binary.py	2023-10-10 14:43:20.849776538 +0200
+@@ -209,11 +209,13 @@
+         for path in paths:
+             library_path = os.path.join(profile.path, path)
+             if not os.path.exists(library_path):
+                 os.makedirs(library_path)
+-            import shutil
+-
+-            shutil.copy(os.path.join(os.path.dirname(__file__), path, self.NO_FOCUS_LIBRARY_NAME), library_path)
++            try:
++                import shutil
++                shutil.copy(os.path.join(os.path.dirname(__file__), path, self.NO_FOCUS_LIBRARY_NAME), library_path)
++            except:
++                pass
+             built_path += library_path + ":"
+ 
+         return built_path
+ 

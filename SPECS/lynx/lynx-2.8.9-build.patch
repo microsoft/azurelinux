@@ -1,0 +1,179 @@
+From e6f2bec676f7abb4962821475fbc7cf918503e00 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Wed, 13 Feb 2013 15:25:00 +0100
+Subject: [PATCH] prepare upstream sources for parallel make
+
+---
+ makefile.in     | 48 +++++++++++++++++++++++-------------------------
+ src/makefile.in | 10 ++++------
+ 2 files changed, 27 insertions(+), 31 deletions(-)
+
+diff --git a/makefile.in b/makefile.in
+index ad78441..0fd8b1e 100644
+--- a/makefile.in
++++ b/makefile.in
+@@ -108,8 +108,6 @@ COMPRESS_EXT=@COMPRESS_EXT@
+ # Path of scripts directory
+ scripts_dir=$(srcdir)/scripts
+ 
+-MAKE_RECUR = $(MAKE) @cf_cv_makeflags@ DESTDIR="$(DESTDIR)" CC="$(CC)"
+-
+ @LYNXCFG_MAKE@CFG2HTML = alphatoc.html body.html cattoc.html
+ 
+ # !!!!!!!!!!! SUN resolv LIBRARY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+@@ -199,20 +197,20 @@ binary_PROG  = $(actual_PROG)$x
+ 
+ all lynx$x: cfg_defs.h LYHelp.h
+ @MSG_DIR_MAKE@	$(SHELL) $(scripts_dir)/fixtext.sh $(srcdir)/LYMessages_en.h >LYMessages.c
+-@MSG_DIR_MAKE@	( cd $(PO_DIR) && $(MAKE_RECUR) )
+-	( cd $(WWW_DIR) && $(MAKE_RECUR) $(WWW_CFLAGS) )
+-	( cd $(CHR_DIR) && $(MAKE_RECUR) all $(CHR_CFLAGS) )
+-	( cd $(SRC_DIR) && $(MAKE_RECUR) all $(SRC_CFLAGS) )
++@MSG_DIR_MAKE@	( $(MAKE) -C $(PO_DIR) )
++	( $(MAKE) -C $(WWW_DIR) $(WWW_CFLAGS) )
++	( $(MAKE) -C $(CHR_DIR) all $(CHR_CFLAGS) )
++	( $(MAKE) -C $(SRC_DIR) all $(SRC_CFLAGS) )
+ 
+ lint:
+-	( cd $(WWW_DIR) && $(MAKE_RECUR) LINT="$(LINT)" $(WWW_CFLAGS) $@ )
+-	( cd $(SRC_DIR) && $(MAKE_RECUR) LINT="$(LINT)" $(SRC_CFLAGS) $@ )
+-	( cd $(CHR_DIR) && $(MAKE_RECUR) LINT="$(LINT)" $@ )
++	( $(MAKE) -C $(WWW_DIR) LINT="$(LINT)" $(WWW_CFLAGS) $@ )
++	( $(MAKE) -C $(SRC_DIR) LINT="$(LINT)" $(SRC_CFLAGS) $@ )
++	( $(MAKE) -C $(CHR_DIR) LINT="$(LINT)" $@ )
+ 
+ tags:
+-	( cd $(WWW_DIR) && $(MAKE_RECUR) $(WWW_CFLAGS) $@ )
+-	( cd $(SRC_DIR) && $(MAKE_RECUR) $(SRC_CFLAGS) $@ )
+-	( cd $(CHR_DIR) && $(MAKE_RECUR) $@ )
++	( $(MAKE) -C $(WWW_DIR) $(WWW_CFLAGS) $@ )
++	( $(MAKE) -C $(SRC_DIR) $(SRC_CFLAGS) $@ )
++	( $(MAKE) -C $(CHR_DIR) $@ )
+ 
+ etags:
+ 	$(ETAGS) *.[ch] */*.[ch] */*/*.[ch] */*/*/*.[ch]
+@@ -233,27 +231,27 @@ help:
+ clean:
+ 	rm -f WWW/Library/*/*.[aoib]
+ 	rm -f WWW/Library/*/.created
+-	( cd $(WWW_DIR) && $(MAKE_RECUR) $@ )
+-	( cd $(SRC_DIR) && $(MAKE_RECUR) $@ )
++	( $(MAKE) -C $(WWW_DIR) $@ )
++	( $(MAKE) -C $(SRC_DIR) $@ )
+ @MSG_DIR_MAKE@	rm -f LYMessages.c
+-@MSG_DIR_MAKE@	( cd $(PO_DIR) && $(MAKE_RECUR) $@ )
++@MSG_DIR_MAKE@	( $(MAKE) -C $(PO_DIR) $@ )
+ 	rm -f *.b $(SRC_DIR)/lynx$x *.leaks cfg_defs.h LYHelp.h lint.*
+ @LYNXCFG_MAKE@	-rm -f $(CFG2HTML)
+ 	rm -f help_files.sed
+ 	rm -f core *.core
+ 
+ depend: cfg_defs.h LYHelp.h
+-	( cd $(WWW_DIR) && $(MAKE_RECUR) $@ )
+-	( cd $(SRC_DIR) && $(MAKE_RECUR) $@ )
++	( $(MAKE) -C $(WWW_DIR) $@ )
++	( $(MAKE) -C $(SRC_DIR) $@ )
+ 
+ distclean: clean
+ 	-rm -f WWW/Library/*/*~
+ 	-rm -f WWW/Library/*/*.bak
+ 	-rm -rf $(SRC_DIR)/obsolete
+-	-( cd $(WWW_DIR) && $(MAKE_RECUR) $@ )
+-	-( cd $(SRC_DIR) && $(MAKE_RECUR) $@ )
+-	-( cd $(CHR_DIR) && $(MAKE_RECUR) $@ )
+-@MSG_DIR_MAKE@	-( cd $(PO_DIR) && $(MAKE_RECUR) $@ )
++	-( $(MAKE) -C $(WWW_DIR) $@ )
++	-( $(MAKE) -C $(SRC_DIR) $@ )
++	-( $(MAKE) -C $(CHR_DIR) $@ )
++@MSG_DIR_MAKE@	( $(MAKE) -C $(PO_DIR) $@ )
+ @MSG_DIR_MAKE@	-rmdir $(PO_DIR)
+ 	-rm -f *~ *.bak *.sav tags TAGS
+ 	-rm -f $(WWW_DIR)/makefile $(SRC_DIR)/makefile $(CHR_DIR)/makefile
+@@ -299,7 +297,7 @@ install-full: install install-help install-doc
+ 	@echo "Full installation complete."
+ 
+ install-bin: $(BINDIR) lynx$x
+-@MSG_DIR_MAKE@	( cd $(PO_DIR) && $(MAKE_RECUR) install )
++@MSG_DIR_MAKE@	( $(MAKE) -C $(PO_DIR) install )
+ 	@ECHO_CC@$(SHELL) -c "P=$(binary_PROG); \
+ 	if test -f $(BINDIR)/$$P ; then \
+ 	      mv -f $(BINDIR)/$$P $(BINDIR)/$$P.old; fi"; \
+@@ -350,7 +348,7 @@ LYNXHELP_URL='$(LYNX_URL)/lynx_help/'
+ @LYNXCFG_MAKE@@MAKE_PHONY@$(CFG2HTML): htmlized_cfg
+ @LYNXCFG_MAKE@@MAKE_PHONY@htmlized_cfg:
+ @LYNXCFG_MAKE@	@echo "Making htmlized lynx.cfg"
+-@LYNXCFG_MAKE@	( cd $(SRC_DIR) && $(MAKE_RECUR) LYReadCFG.i )
++@LYNXCFG_MAKE@	( $(MAKE) -C $(SRC_DIR) LYReadCFG.i )
+ @LYNXCFG_MAKE@	@-rm -f $(CFG2HTML)
+ @LYNXCFG_MAKE@	sed -n -e '/Config_Type  *Config_Table/,/{0, *0, *0}/ p' $(SRC_DIR)/LYReadCFG.i | \
+ @LYNXCFG_MAKE@	sed  -e 's/ *{ *"\([^"]*\)".*/\1/' | \
+@@ -448,7 +446,7 @@ install-lss : $(SYSCONFDIR)
+ 	@$(SHELL) $(scripts_dir)/install-lss.sh "$(INSTALL_DATA)" $(srcdir)/samples/lynx.lss $(SYSCONFDIR)/lynx.lss
+ 
+ uninstall ::
+-@MSG_DIR_MAKE@	( cd $(PO_DIR) && $(MAKE_RECUR) uninstall )
++@MSG_DIR_MAKE@	( $(MAKE) -C $(PO_DIR) uninstall )
+ 	-rm -f $(BINDIR)/$(binary_PROG) ;\
+ 	rm -f $(MANDIR)/$(actual_PROG).1 ;\
+ 	rm -f $(SYSCONFDIR)/lynx.cfg ;\
+@@ -481,7 +479,7 @@ uninstall-doc ::
+ 
+ update-po:
+ 	rsync -Lrtvz  translationproject.org::tp/latest/lynx/  $(PO_SRCDIR) ;\
+-	( test -f $(PO_SRCDIR)/makefile && cd $(PO_SRCDIR) && $(MAKE_RECUR) $@ )
++	( test -f $(PO_SRCDIR)/makefile && $(MAKE) -C $(PO_SRCDIR) $@ )
+ 
+ preinstall :
+ 	@ echo '' ;\
+diff --git a/src/makefile.in b/src/makefile.in
+index 55611da..7cceaa8 100644
+--- a/src/makefile.in
++++ b/src/makefile.in
+@@ -36,8 +36,6 @@ BUILD_EXEEXT	= @BUILD_EXEEXT@
+ BUILD_LDFLAGS	= @BUILD_LDFLAGS@
+ BUILD_LIBS	= @BUILD_LIBS@
+ 
+-MAKE_RECUR	= $(MAKE) @cf_cv_makeflags@ DESTDIR="$(DESTDIR)" CC="$(CC)"
+-
+ YACC		= @YACC@
+ WINDRES		= @WINDRES@
+ 
+@@ -117,7 +115,7 @@ message:
+ 	@echo "Compiling Lynx sources"
+ 
+ do_chartrans_stuff:
+-	-( cd chrtrans && $(MAKE_RECUR) \
++	-( $(MAKE) -C chrtrans \
+ 		SITE_DEFS="$(SITE_DEFS)" \
+ 		BUILD_CFLAGS="$(BUILD_CFLAGS)" \
+ 		BUILD_CPPFLAGS="$(BUILD_CPPFLAGS)" \
+@@ -130,7 +128,7 @@ lint:
+ 
+ clean:
+ 	rm -f lynx$x core *.core *.leaks *.i *$o *.bak tags TAGS test_*
+-	( cd chrtrans && $(MAKE_RECUR) clean )
++	( $(MAKE) -C chrtrans clean )
+ 
+ tags:
+ 	$(CTAGS) *.[ch]
+@@ -209,7 +207,7 @@ TABLES= \
+  $(CHRTR)viscii_uni.h
+ 
+ $(TABLES):
+-	-( cd chrtrans && $(MAKE_RECUR) tables )
++	-( $(MAKE) -C chrtrans tables )
+ 
+ UCdomap$o :	UCdomap.c \
+ 		chrtrans/UCkd.h \
+@@ -218,7 +216,7 @@ UCdomap$o :	UCdomap.c \
+ 	UCdomap.h $(CMN)UCMap.h $(TABLES) $(top_srcdir)/userdefs.h
+ 
+ chrtrans/makeuctb$(BUILD_EXEEXT):
+-	( cd chrtrans && $(MAKE_RECUR) makeuctb$(BUILD_EXEEXT) )
++	( $(MAKE) -C chrtrans makeuctb$(BUILD_EXEEXT) )
+ 
+ UCAux$o : UCAux.c $(CMN)UCAux.h $(CMN)UCDefs.h
+ LYCookie$o : $(top_srcdir)/userdefs.h
+-- 
+1.8.3.1
+

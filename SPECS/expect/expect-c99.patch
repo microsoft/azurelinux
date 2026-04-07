@@ -1,0 +1,24 @@
+Adjustments for compatibility with the currrent (Tcl 8.4.0+) channel
+implementation.
+
+diff --git a/exp_chan.c b/exp_chan.c
+index c92e26b6fbd02305..944200a63b102672 100644
+--- a/exp_chan.c
++++ b/exp_chan.c
+@@ -60,7 +60,7 @@ void			exp_background_channelhandler _ANSI_ARGS_((ClientData,
+ 
+ Tcl_ChannelType expChannelType = {
+     "exp",				/* Type name. */
+-    ExpBlockModeProc,			/* Set blocking/nonblocking mode.*/
++    TCL_CHANNEL_VERSION_2,
+     ExpCloseProc,			/* Close proc. */
+     ExpInputProc,			/* Input proc. */
+     ExpOutputProc,			/* Output proc. */
+@@ -70,6 +70,7 @@ Tcl_ChannelType expChannelType = {
+     ExpWatchProc,			/* Initialize notifier. */
+     ExpGetHandleProc,			/* Get OS handles out of channel. */
+     NULL,				/* Close2 proc */
++    ExpBlockModeProc,			/* Set blocking/nonblocking mode.*/
+ };
+ 
+ typedef struct ThreadSpecificData {

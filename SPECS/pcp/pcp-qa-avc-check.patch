@@ -1,0 +1,35 @@
+commit c1d85e50a537302c10ef38bbfa173497281e5f5d
+Author: Ken McDonell <kenj@kenj.id.au>
+Date:   Thu Feb 12 07:25:50 2026 +1100
+
+    qa/check.callback.sample: AVC checks were being missed
+    
+    Normal mortals cannot access /var/log/audit/audit.log but on some
+    systems (vm39, RHEL 8), the parent directory's permissions prevent
+    test -f from even knowing the file exists, and thus the AVC checks
+    were not being done.
+    
+    A small amount of $sudo love will fix this.
+
+diff --git a/qa/check.callback.sample b/qa/check.callback.sample
+index b5fd4fab3a..4ed2c127f8 100755
+--- a/qa/check.callback.sample
++++ b/qa/check.callback.sample
+@@ -101,7 +101,7 @@ then
+     echo "--- start pre-check ---"
+     ./941 --check $1
+     ./870 --check $1
+-    if [ -f "$audit" ]
++    if $sudo test -f "$audit"
+     then
+ 	$sudo grep -E '^type=(AVC|SELINUX).*pcp' "$audit" \
+ 	| _suppress_avc >$1.pre-avc 2>/dev/null
+@@ -306,7 +306,7 @@ then
+     $abort && status=1
+ fi
+ 
+-if [ -f "$audit" ]
++if $sudo test -f "$audit"
+ then
+     # Check audit log for any Security Enhanced Linux access denials
+     # related to PCP ...

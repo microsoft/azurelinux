@@ -1,0 +1,12 @@
+diff -up libmatchbox-1.9/tests/Makefile.am.jx libmatchbox-1.9/tests/Makefile.am
+--- libmatchbox-1.9/tests/Makefile.am.jx	2006-07-07 11:16:57.000000000 -0400
++++ libmatchbox-1.9/tests/Makefile.am	2010-02-16 18:45:35.000000000 -0500
+@@ -3,7 +3,7 @@ SUBDIRS = menu
+ TESTS = dot-desktop pixbuf
+ 
+ AM_CPPFLAGS = @CHECK_CFLAGS@ -I../libmb @GCC_WARNINGS@ @XLIBS_CFLAGS@ @PANGO_CFLAGS@ @PNG_CFLAGS@
+-AM_LDFLAGS = -L../libmb -lmb
++AM_LDFLAGS = -L../libmb -lmb @XLIBS_LIBS@
+ 
+ if HAVE_CHECK
+ 

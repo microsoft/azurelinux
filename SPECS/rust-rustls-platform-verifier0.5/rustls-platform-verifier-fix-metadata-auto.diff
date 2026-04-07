@@ -1,0 +1,62 @@
+--- rustls-platform-verifier-0.5.3/Cargo.toml	1970-01-01T00:00:01+00:00
++++ rustls-platform-verifier-0.5.3/Cargo.toml	2026-02-23T17:24:59.037887+00:00
+@@ -51,7 +51,6 @@
+ dbg = []
+ docsrs = ["jni"]
+ ffi-testing = [
+-    "android_logger",
+     "rustls/ring",
+ ]
+ 
+@@ -96,51 +95,3 @@
+ default-features = false
+ package = "rustls-webpki"
+ 
+-[target.'cfg(any(target_vendor = "apple"))'.dependencies.core-foundation]
+-version = "0.10"
+-
+-[target.'cfg(any(target_vendor = "apple"))'.dependencies.core-foundation-sys]
+-version = "0.8"
+-
+-[target.'cfg(any(target_vendor = "apple"))'.dependencies.security-framework]
+-version = "3"
+-features = ["OSX_10_14"]
+-
+-[target.'cfg(any(target_vendor = "apple"))'.dependencies.security-framework-sys]
+-version = "2.10"
+-features = ["OSX_10_14"]
+-
+-[target.'cfg(target_arch = "wasm32")'.dependencies.webpki]
+-version = "0.103"
+-default-features = false
+-package = "rustls-webpki"
+-
+-[target.'cfg(target_arch = "wasm32")'.dependencies.webpki-root-certs]
+-version = "0.26"
+-
+-[target.'cfg(target_os = "android")'.dependencies.android_logger]
+-version = "0.15"
+-optional = true
+-
+-[target.'cfg(target_os = "android")'.dependencies.jni]
+-version = "0.21"
+-default-features = false
+-
+-[target.'cfg(target_os = "android")'.dependencies.rustls-platform-verifier-android]
+-version = "0.1.0"
+-
+-[target.'cfg(target_os = "android")'.dependencies.webpki]
+-version = "0.103"
+-default-features = false
+-package = "rustls-webpki"
+-
+-[target.'cfg(target_os = "freebsd")'.dev-dependencies.webpki-root-certs]
+-version = "0.26"
+-
+-[target."cfg(windows)".dependencies.windows-sys]
+-version = ">=0.52.0, <0.60.0"
+-features = [
+-    "Win32_Foundation",
+-    "Win32_Security_Cryptography",
+-]
+-default-features = false

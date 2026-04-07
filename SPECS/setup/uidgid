@@ -1,0 +1,209 @@
+#NAME	UID	GID	HOME		SHELL	PACKAGES
+root	0	0	/root		/bin/bash	setup
+bin	1	1	/bin		/usr/sbin/nologin	setup
+daemon	2	2	/sbin		/usr/sbin/nologin	setup
+sys	-	3	-		-	setup
+adm	3	4	/var/adm		/bin/bash	setup
+tty	-	5	-		-	setup
+disk	-	6	-		-	setup
+lp	4	7	/var/spool/lpd		/usr/sbin/nologin	setup
+mem	-	8	-		-	setup
+kmem	-	9	-		-	setup
+wheel	-	10	-		-	setup
+cdrom	-	11	-		-	setup
+sync	5	(0)	/sbin		/bin/sync	setup
+shutdown	6	(0)	/sbin		/sbin/shutdown	setup
+halt	7	(0)	/sbin		/sbin/halt	setup
+mail	8	12	/var/spool/mail		/usr/sbin/nologin	setup
+news	9	13	/var/spool/news		/usr/sbin/nologin	inn
+uucp	10	14	/var/spool/uucp		/usr/sbin/nologin	uucp
+operator	11	(0)	/root		/usr/sbin/nologin	setup
+games	12	(100)	/usr/games		/usr/sbin/nologin	setup
+# Removed in 2013 (#918206, #1667231), can be reused if necessary later
+# gopher	13	30	/var/gopher		/usr/sbin/nologin	-
+ftp	14	50	/var/ftp		/usr/sbin/nologin	setup
+man	-	15	-		-	setup
+# Retired in 2018 (https://src.fedoraproject.org/rpms/oprofile/c/80fe828c879b1f67a109998cdd42a1bd8513bc3c)
+# oprofile	16	16	/var/lib/oprofile		/usr/sbin/nologin	oprofile
+# Retired sometime between 2011 and 2014 (https://src.fedoraproject.org/rpms/pki-ca/c/4ca1ce11a6e090099b36493653808cfe380911e1)
+# pkiuser	17	17	/usr/share/pki		/usr/sbin/nologin	pki-ca,rhpki-ca
+dialout	-	18	-		-	setup
+floppy	-	19	-		-	setup
+games	-	20	-		-	setup
+# mlocate retired in 2024 (https://src.fedoraproject.org/rpms/mlocate/c/7277dd5f59db126d1046a6aa5c4077a597dddddc)
+# slocate	-	21	-		-	slocate
+utmp	-	22	-		-	initscripts,libutempter
+squid	23	23	/var/spool/squid		/dev/null	squid
+# Retired in 2015 (https://src.fedoraproject.org/rpms/pvm/c/eb6972917befbed00aff622c2c428d18439efe27)
+# pvm	24	24	/usr/share/pvm3		/bin/bash	pvm
+named	25	25	/var/named		/bin/false	bind
+postgres	26	26	/var/lib/pgsql		/bin/bash	postgresql-server
+# Dynamic on new systems, removed Mar2025, can be reused if necessary later
+#mysql	27	27	/var/lib/mysql		/bin/bash	mysql
+nscd	28	28	/		/bin/false	nscd
+rpcuser	29	29	/var/lib/nfs		/bin/false	nfs-utils
+# Present in https://pagure.io/setup/c/08258e0f748c4f372fcbf1dd7947c132ee0b8a12, probably already unused in 2008
+# console	-	31	-		-	dev
+rpc	32	32	/var/lib/rpcbind		/usr/sbin/nologin	portmap
+amandabackup	33	(6)	/var/lib/amanda		/bin/false	amanda
+tape	-	33	-		-	setup
+# Retired in 2021 (https://src.fedoraproject.org/rpms/netdump-server/c/9bbe604e20c113eaa7c897b9b12a705a36afb109)
+# netdump	34	34	/var/crash		/bin/bash	netdump-client, netdump-server
+utempter	-	35	-		-	libutempter
+kvm	-	36	-		-	kvm, vdsm, libvirt
+vdsm	36	(36)	/		/bin/bash	kvm, vdsm
+rpm	37	37	/var/lib/rpm		/bin/bash	rpm
+ntp	38	38	/etc/ntp		/usr/sbin/nologin	ntp
+video	-	39	-		-	setup
+dip	-	40	-		-	ppp
+mailman	41	41	/usr/lib/mailman		/usr/sbin/nologin	mailman
+gdm	42	42	/var/lib/gdm		/usr/sbin/nologin	gdm
+# Retired in 2022 (https://src.fedoraproject.org/rpms/xorg-x11-xfs/c/3e273d8a939cf5f08bd4eea4f594fedd508dabcf)
+# xfs	43	43	/etc/X11/fs		/bin/false	XFree86-xfs
+pppusers	-	44	-		-	linuxconf
+popusers	-	45	-		-	linuxconf
+slipusers	-	46	-		-	linuxconf
+mailnull	47	47	/var/spool/mqueue		/dev/null	sendmail
+apache	48	48	/usr/share/httpd		/bin/false	httpd
+# Retired sometime before 2008 (https://src.fedoraproject.org/rpms/FreeWnn/c/8f9ac4e26531c704a26057be48261fb3d1ebea8e)
+# wnn	49	49	/var/lib/wnn		/usr/sbin/nologin	FreeWnn
+smmsp	51	51	/var/spool/mqueue		/dev/null	sendmail
+puppet	52	52	/var/lib/puppet		/usr/sbin/nologin	puppet
+tomcat	53	53	/var/lib/tomcat		/usr/sbin/nologin	tomcat
+lock	-	54	-		-	setup
+ldap	55	55	/var/lib/ldap		/bin/false	openldap-servers
+# Last references on the web appear around 2007…
+# frontpage	56	56	/var/www		/bin/false	mod_frontpage
+nut	57	57	/var/lib/ups		/bin/false	nut
+# Retired in 2011 (https://src.fedoraproject.org/rpms/beagle/c/5721c9577eebdc7a0f6566f3efd955b3f4427a0e)
+# beagleindex	58	58	/var/cache/beagle		/bin/false	beagle
+tss	59	59	-		/usr/sbin/nologin	trousers
+# Retired in 2012 (https://src.fedoraproject.org/rpms/piranha/c/15262075b63d48e2ee236ffb87d2db0a4aef1c42)
+# piranha	60	60	/etc/sysconfig/ha		/dev/null	piranha
+# Retired in 2025 (https://src.fedoraproject.org/rpms/prelude-manager/c/68cce28aa0e1788d857791155812e1f20d35036e)
+# prelude-manager	61	61	-		/usr/sbin/nologin	prelude-manager
+# Retired in 2011 (https://src.fedoraproject.org/rpms/snort/c/e2e149974cb3b56b70ed158339a3cb931497dfa2)
+# snortd	62	62	-		/usr/sbin/nologin	snortd
+audio	-	63	-		-	setup
+condor	64	64	/var/lib/condor		/usr/sbin/nologin	condord
+nslcd	65	(55)	/		/usr/sbin/nologin	nslcd
+wine	-	66	-		-	wine
+pegasus	66	65	/var/lib/Pegasus		/usr/sbin/nologin	tog-pegasus
+webalizer	67	67	/var/www/usage		/usr/sbin/nologin	webalizer
+# Retired in 2011 (https://src.fedoraproject.org/rpms/hal/c/e6690cd150b5e1c13e7779de1ce32ded0bc22bc1)
+# haldaemon	68	68	/		/usr/sbin/nologin	hal
+# Present in https://pagure.io/setup/c/08258e0f748c4f372fcbf1dd7947c132ee0b8a12, probably already unused in 2008
+# vcsa	69	69	-		/usr/sbin/nologin	dev,MAKEDEV
+avahi	70	70	/var/run/avahi-daemon		/usr/sbin/nologin	avahi
+# Present in https://pagure.io/setup/c/08258e0f748c4f372fcbf1dd7947c132ee0b8a12, probably already unused in 2008
+# realtime	-	71	-		-	-
+tcpdump	72	72	/		/usr/sbin/nologin	tcpdump
+privoxy	73	73	/etc/privoxy		/bin/bash	privoxy
+sshd	74	74	/var/empty/sshd		/usr/sbin/nologin	openssh-server
+radvd	75	75	/		/bin/false	radvd
+cyrus	76	(12)	/var/imap		/bin/bash	cyrus-imapd
+saslauth	-	76	-		-	cyrus-sasl, cyrus-imap
+# Dynamic on new systems, removed Dec2023, can be reused if necessary later
+#arpwatch       77      77      /var/lib/arpwatch               /usr/sbin/nologin       arpwatch
+fax	78	78	/var/spool/fax		/usr/sbin/nologin	mgetty
+# Retired in 2014 (https://src.fedoraproject.org/rpms/nocpulse-common/c/2ee190601831472ca3ae9857311cfbd31c129c0e)
+# nocpulse	79	79	/etc/sysconfig/nocpulse		/bin/bash	nocpulse
+desktop	80	80	-		/usr/sbin/nologin	desktop-file-utils
+dbus	81	81	/		/usr/sbin/nologin	dbus
+# References to JOnAS in FC3 around 2005…
+# jonas	82	82	/var/lib/jonas		/usr/sbin/nologin	jonas
+clamav	83	83	/tmp		/usr/sbin/nologin	clamav
+screen	-	84	-		-	screen
+# Retired in 2021 (https://src.fedoraproject.org/rpms/quagga/c/42d57331ac98fcc4c7103854cb1ce0ddfc4bbbc2)
+# quaggavt	-	85	-		-	quagga
+# Retired in 2014 (https://src.fedoraproject.org/rpms/sabayon/c/e1c4c886227e8123e55fd3fad93dc966d512b9b9)
+# sabayon	86	86	-		/usr/sbin/nologin	sabayon
+polkituser	87	87	/		/usr/sbin/nologin	PolicyKit
+wbpriv	-	88	-		-	samba-common
+postfix	89	89	/var/spool/postfix		/bin/true	postfix
+postdrop	-	90	-		-	postfix
+# https://en.wikipedia.org/wiki/Majordomo_(software) says final release was 19 January 2000
+# majordomo	91	91	/usr/lib/majordomo		/bin/bash	majordomo
+# Retired in 2021 (https://src.fedoraproject.org/rpms/quagga/c/42d57331ac98fcc4c7103854cb1ce0ddfc4bbbc2)
+# quagga	92	92	/		/usr/sbin/nologin	quagga
+exim	93	93	/var/spool/exim		/usr/sbin/nologin	exim
+distcache	94	94	/		/usr/sbin/nologin	distcache
+radiusd	95	95	/		/bin/false	freeradius
+# Retired in 2021 (https://src.fedoraproject.org/rpms/hsqldb/c/54def1d22548601a91ccf6a92c17645a1c5d7cdf)
+# hsqldb	96	96	/var/lib/hsqldb		/usr/sbin/nologin	hsqldb
+dovecot	97	97	/usr/libexec/dovecot		/usr/sbin/nologin	dovecot
+ident	98	98	/		/usr/sbin/nologin	ident
+# Note: 99 used to be the old uid for nobody, now moved to 65534, do not reuse
+users	-	100	-		-	setup
+ssh_keys	-	101	-		-	openssh
+clock	-	103	-		-	systemd
+input	-	104	-		-	systemd
+render	-	105	-		-	systemd
+sgx	-	106	-		-	systemd
+qemu	107	107	/		/usr/sbin/nologin	libvirt
+ovirt	108	108	/		/usr/sbin/nologin	libvirt
+# Retired in 2019 (https://src.fedoraproject.org/rpms/vdsm/c/6f1df621f648aa3b65edfcf3389649a6d13df5d4)
+# rhevm	109	109	/home/rhevm		/usr/sbin/nologin	vdsm-reg
+jetty	110	110	/usr/share/jetty		/usr/sbin/nologin	jetty
+saned	111	111	/		/usr/sbin/nologin	sane-backends
+vhostmd	112	112	/usr/share/vhostmd		/usr/sbin/nologin	vhostmd
+usbmuxd	113	113	/		/usr/sbin/nologin	usbmuxd
+polkitd	114	114	/		/usr/sbin/nologin	polkit
+bacula	133	133	/var/spool/bacula		/usr/sbin/nologin	bacula
+cimsrvr	134	134	/		/usr/sbin/nologin	tog-pegasus-libs
+mock	-	135	/		-	mock
+# Retired in 2012 (https://src.fedoraproject.org/rpms/ricci/c/02a86812383253577ce309d633a400c9c6353ecd,
+#                  https://fedoraproject.org/wiki/Features/Cluster)
+# ricci	140	140	/var/lib/ricci		/usr/sbin/nologin	ricci
+# luci	141	141	/var/lib/luci		/usr/sbin/nologin	luci
+activemq	142	142	/usr/share/activemq		/usr/sbin/nologin	activemq
+# Retired in 2019 (https://src.fedoraproject.org/rpms/cassandra/c/8fcb780b616a034aa5d787d04d631ac1f815f694)
+# cassandra	143	143	/var/lib/cassandra		/usr/sbin/nologin	cassandra
+stap-server	155	155	/var/lib/stap-server		/usr/sbin/nologin	systemtap
+stapusr	-	156	/		-	systemtap-runtime
+stapsys	-	157	/		-	systemtap-runtime
+stapdev	-	158	/		-	systemtap-runtime
+swift	160	160	/var/lib/swift		/usr/sbin/nologin	openstack-swift
+glance	161	161	/var/lib/glance		/usr/sbin/nologin	openstack-glance
+nova	162	162	/var/lib/nova		/usr/sbin/nologin	openstack-nova
+keystone	163	163	/var/lib/keystone		/usr/sbin/nologin	openstack-keystone
+quantum	164	164	/var/lib/quantum		/usr/sbin/nologin	openstack-quantum
+cinder	165	165	/var/lib/cinder		/usr/sbin/nologin	openstack-cinder
+ceilometer	166	166	/var/lib/ceilometer		/usr/sbin/nologin	openstack-ceilometer
+ceph	167	167	/var/lib/ceph		/usr/sbin/nologin	ceph-common
+avahi-autoipd	170	170	/var/lib/avahi-autoipd		/usr/sbin/nologin	avahi
+pulse	171	171	/var/run/pulse		/usr/sbin/nologin	pulseaudio
+# Dynamic on new systems, removed Mar2025, can be reused if necessary later
+# rtkit	172	172	/proc		/usr/sbin/nologin	rtkit
+abrt	173	173	/etc/abrt		/usr/sbin/nologin	abrt
+retrace	174	174	/usr/share/retrace-server		/usr/sbin/nologin	retrace-server
+ovirtagent	175	175	/		/usr/sbin/nologin	ovirt-guest-agent
+ats	176	176	/		/usr/sbin/nologin	trafficserver
+dhcpd	177	177	/		/usr/sbin/nologin	dhcp
+myproxy	178	178	/var/lib/myproxy		/usr/sbin/nologin	myproxy-server
+sanlock	179	179	/var/run/sanlock		/usr/sbin/nologin	sanlock
+# Retired in 2012 (https://src.fedoraproject.org/rpms/aeolus-all/c/4b303d259fb530130e413be462e032390595714d)
+# aeolus	180	180	/var/aeolus		/usr/sbin/nologin	aeolus-configure
+# Retired in 2015 (https://src.fedoraproject.org/rpms/wallaby/c/93d5de780d22a378db988a8b72d3d30ebf628930)
+# wallaby	181	181	/var/lib/wallaby		/usr/sbin/nologin	wallaby
+# Not used anymore, removed Jun2021, can be reused if necessary later
+#katello	182	182	/usr/share/katello		/usr/sbin/nologin	katello-common
+elasticsearch	183	183	/usr/share/java/elasticsearch		/usr/sbin/nologin	elasticsearch
+mongodb	184	184	/var/lib/mongodb		/usr/sbin/nologin	mongodb
+# Previously provided by the 'jboss-as' package.
+wildfly	185	185	/usr/share/wildfly		/usr/sbin/nologin	wildfly
+jbosson	-	186	-		-	jboss-on-agent
+jbosson-agent	186	(186)	/		/usr/sbin/nologin	jboss-on-agent
+heat	187	187	/var/lib/heat		/usr/sbin/nologin	heat
+haproxy	188	188	/var/lib/haproxy		/usr/sbin/nologin	haproxy
+haclient	-	189	-		-	pacemaker
+hacluster	189	(189)	/		/usr/sbin/nologin	pacemaker
+systemd-journal	-	190	-		-	systemd
+# Dynamic on new systems, removed Dec2014, can be reused if necessary later
+#systemd-journal-gateway	191	191	/		/usr/sbin/nologin	systemd
+systemd-network	192	192	/		/usr/sbin/nologin	systemd
+systemd-resolve	193	193	/		/usr/sbin/nologin	systemd
+xrootd	194	194	/var/spool/xrootd		-	xrootd-server
+#gnats	?	?	?		?	gnats, gnats-db
+#listar	?	?	?		?	listar
+nobody	65534	65534	/		/usr/sbin/nologin	setup

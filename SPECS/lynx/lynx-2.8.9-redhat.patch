@@ -1,0 +1,154 @@
+From bccfb8ac43da56cb1f53c4b421e09dcac1fd1af0 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Wed, 13 Feb 2013 15:17:08 +0100
+Subject: [PATCH] lynx-2.8.6-redhat.patch rebased for 2.9.2
+
+---
+ lynx.cfg   | 18 ++++++++++++------
+ userdefs.h | 18 +++++++++---------
+ 2 files changed, 21 insertions(+), 15 deletions(-)
+
+diff --git a/lynx.cfg b/lynx.cfg
+index f01782f..ccc0846 100644
+--- a/lynx.cfg
++++ b/lynx.cfg
+@@ -1,7 +1,9 @@
+ # $LynxId: lynx.cfg,v 1.358 2024/05/31 22:09:16 tom Exp $
+ # lynx.cfg file.
+-# The default placement for this file is /usr/local/lib/lynx.cfg (Unix)
+-#                                     or Lynx_Dir:lynx.cfg (VMS)
++# The default placement for this file is /etc/lynx.cfg
++#
++# Please don't edit this file directly (it is updated with every Red Hat
++# Linux update, overwriting your changes). Instead, edit /etc/lynx-site.cfg.
+ #
+ # LYNX_VERSION "2.9.2"
+ # LYNX_DATE    "31 May 2024"
+@@ -108,7 +110,7 @@
+ #
+ # Normally we expect you will connect to a remote site, e.g., the Lynx starting
+ # site:
+-STARTFILE:https://lynx.invisible-island.net/
++STARTFILE:https://start.fedoraproject.org/
+ #
+ # As an alternative, you may want to use a local URL.  A good choice for this is
+ # the user's home directory:
+@@ -142,7 +144,7 @@ HELPFILE:https://lynx.invisible-island.net/lynx_help/lynx_help_main.html
+ # An index to your CWIS can be placed here or a document containing
+ # pointers to lots of interesting places on the web.
+ #
+-DEFAULT_INDEX_FILE:http://scout.wisc.edu/
++DEFAULT_INDEX_FILE:http://www.google.com/
+ 
+ .h1 Interaction
+ 
+@@ -454,7 +456,7 @@ DEFAULT_INDEX_FILE:http://scout.wisc.edu/
+ # Find RFC 1345 at
+ .url http://tools.ietf.org/html/rfc1345
+ #
+-#CHARACTER_SET:iso-8859-1
++CHARACTER_SET:utf-8
+ 
+ .h2 LOCALE_CHARSET
+ # LOCALE_CHARSET overrides CHARACTER_SET if true, using the current locale to
+@@ -467,7 +469,7 @@ DEFAULT_INDEX_FILE:http://scout.wisc.edu/
+ # values and their relationship to the locale value is not.  GNU libiconv
+ # happens to give useful values, but other implementations are not guaranteed
+ # to do this.
+-#LOCALE_CHARSET:FALSE
++LOCALE_CHARSET:TRUE
+ 
+ .h2 HTML5_CHARSETS
+ # HTML5_CHARSETS is an alternative to ASSUME_CHARSET and ASSUME_LOCAL_CHARSET.
+@@ -1858,6 +1860,9 @@ DEFAULT_INDEX_FILE:http://scout.wisc.edu/
+ .ex
+ #DOWNLOADER:Save OS/390 binary file: iconv -f IBM-1047 -t ISO8859-1 %s >%s:FALSE
+ 
++# Added by Red Hat:
++DOWNLOADER:View with less:less %s:TRUE
++
+ .h1 Interaction
+ 
+ .h2 NO_DOT_FILES
+@@ -3467,6 +3472,7 @@ COLOR:6:brightred:black
+ #ENABLE_LYNXRC:VI_KEYS:ON
+ #ENABLE_LYNXRC:VISITED_LINKS:ON
+ .fi
++INCLUDE:/etc/lynx-site.cfg
+ 
+ .h1 External Programs
+ # Any of the compiled-in pathnames of external programs can be overridden
+diff --git a/userdefs.h b/userdefs.h
+index 40a954b..4afe835 100644
+--- a/userdefs.h
++++ b/userdefs.h
+@@ -105,7 +105,7 @@
+  * mailcap files (see the examples in the samples directory).
+  */
+ #ifndef LYNX_CFG_FILE
+-#define LYNX_CFG_FILE "Lynx_Dir:lynx.cfg"
++#define LYNX_CFG_FILE "/etc/lynx.cfg"
+ #endif /* LYNX_CFG_FILE */
+ 
+ #ifndef LYNX_CFG_PATH
+@@ -119,8 +119,8 @@
+  * Mappings in these global and personal files override any SUFFIX
+  * definitions in lynx.cfg and built-in defaults from src/HTInit.c.
+  */
+-#define GLOBAL_EXTENSION_MAP "Lynx_Dir:mime.types"
+-#define PERSONAL_EXTENSION_MAP "mime.types"
++#define GLOBAL_EXTENSION_MAP "/etc/mime.types"
++#define PERSONAL_EXTENSION_MAP ".mime.types"
+ 
+ /**************************
+  * The MAILCAP file allows you to map file MIME types to
+@@ -129,7 +129,7 @@
+  * Mappings in these global and personal files override any VIEWER
+  * definitions in lynx.cfg and built-in defaults from src/HTInit.c.
+  */
+-#define GLOBAL_MAILCAP "Lynx_Dir:mailcap"
++#define GLOBAL_MAILCAP "/etc/mailcap"
+ #define PERSONAL_MAILCAP ".mailcap"
+ 
+ /**************************
+@@ -300,8 +300,8 @@
+ #define LYNX_CFG_PATH "."
+ #define LYNX_CFG_FILE "./lynx.cfg"
+ #else
+-#define LYNX_CFG_PATH "/usr/local/lib"
+-#define LYNX_CFG_FILE "/usr/local/lib/lynx.cfg"
++#define LYNX_CFG_PATH "/etc"
++#define LYNX_CFG_FILE "/etc/lynx.cfg"
+ #endif /* DOSPATH */
+ #endif /* LYNX_CFG_FILE */
+ #endif /* HAVE_CONFIG_H */
+@@ -345,7 +345,7 @@
+  * use any default viewers for image types.  Note that open is used as
+  * the default for NeXT, instead of the XLOADIMAGE_COMMAND definition.
+  */
+-#define XLOADIMAGE_COMMAND "xli %s &"
++#define XLOADIMAGE_COMMAND "display %s &"
+ 
+ /**************************
+  * For UNIX systems, SYSTEM_MAIL and SYSTEM_MAIL_FLAGS are set by the
+@@ -366,7 +366,7 @@
+  * the "TMPDIR" (unix), or "TEMP" or "TMP" (Windows,DOS,OS/2)
+  * variable.
+  */
+-#define TEMP_SPACE "/tmp/"
++#define TEMP_SPACE "~"
+ 
+ /********************************
+  * Comment this line out to disable code that implements command logging
+@@ -1175,7 +1175,7 @@
+  * OSU server distribution.
+  */
+ #ifndef HAVE_CONFIG_H
+-/* #define LYNXCGI_LINKS */
++#define LYNXCGI_LINKS
+ #endif
+ 
+ /*********************************
+-- 
+2.9.4
+

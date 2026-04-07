@@ -1,0 +1,20 @@
+--- normpath-1.5.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ normpath-1.5.0/Cargo.toml	2025-10-22T12:24:02.692545+00:00
+@@ -66,17 +66,8 @@
+ name = "normpath"
+ path = "src/lib.rs"
+ 
+-[dependencies.print_bytes]
+-version = "2.0"
+-features = ["os_str_bytes"]
+-optional = true
+-
+ [dependencies.serde]
+ version = "1.0"
+-optional = true
+-
+-[dependencies.uniquote]
+-version = "4.0"
+ optional = true
+ 
+ [dev-dependencies.bincode]

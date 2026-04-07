@@ -1,0 +1,27 @@
+From ddd168ee69fe031daed68f794254d1b8b0801a6d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Wed, 23 Aug 2023 14:52:49 +0200
+Subject: [PATCH] Fix compatibility with Mocha 2.0+
+
+Replace `mocha/setup` by `mocha/minitest`. The former was deprecated by
+Mocha 1.10 [[1]] and removed in Mocha 2.0 [[2]].
+
+[1]: https://github.com/freerange/mocha/commit/36adf880a0b9302fb5e770161c2e962e7e20fe71
+[2]: https://github.com/freerange/mocha/commit/642a0ff4f3806ae0a625c50c14a6a39702735e51
+---
+ test/test_helper.rb | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/test_helper.rb b/test/test_helper.rb
+index 6ace748..4b2346e 100644
+--- a/test/test_helper.rb
++++ b/test/test_helper.rb
+@@ -1,7 +1,7 @@
+ require 'minitest'
+ require "minitest/autorun"
+ 
+-require 'mocha/setup'
++require 'mocha/minitest'
+ require 'test_construct'
+ 
+ class Minitest::Test

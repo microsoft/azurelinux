@@ -1,0 +1,121 @@
+From bbb05bcf8f8385e5e7a65ae61a34278f256d0858 Mon Sep 17 00:00:00 2001
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 6 Oct 2025 09:11:59 +0200
+Subject: [PATCH 20/21] OvmfPkg/PlatformDxe: add check for 1g page support
+
+---
+ OvmfPkg/PlatformDxe/PageFault.c | 72 ++++++++++++++++++++-------------
+ 1 file changed, 43 insertions(+), 29 deletions(-)
+
+diff --git a/OvmfPkg/PlatformDxe/PageFault.c b/OvmfPkg/PlatformDxe/PageFault.c
+index 50482d0c993d..ef24933d8644 100644
+--- a/OvmfPkg/PlatformDxe/PageFault.c
++++ b/OvmfPkg/PlatformDxe/PageFault.c
+@@ -130,18 +130,12 @@ PageFaultGetPte (
+ VOID
+ EFIAPI
+ PageFaultFixMap (
+-  CHAR8 *Reason
++  CHAR8  *Reason
+   )
+ {
+   UINT64  Idx;
+   UINT64  *Pd3;
+ 
+-  if (PcdGet64 (PcdConfidentialComputingGuestAttr) != 0) {
+-    /* switching to 1G pages will break things */
+-    DEBUG ((DEBUG_INFO, "%a: skip global RW+NX fixup in CVM\n", __func__));
+-    return;
+-  }
+-
+   DEBUG ((DEBUG_INFO, "%a: global RW+NX fixup (%a)\n", __func__, Reason));
+ 
+   Pd3 = PageFaultGetPd3 (0);
+@@ -249,6 +243,24 @@ PageFaultHandler (
+   CpuDeadLoop ();
+ }
+ 
++STATIC
++BOOLEAN
++PageFaultHave1GPages (
++  )
++{
++  UINT32  RegEax, RegEdx;
++
++  AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
++  if (RegEax >= 0x80000001) {
++    AsmCpuid (0x80000001, NULL, NULL, NULL, &RegEdx);
++    if ((RegEdx & BIT26) != 0) {
++      return TRUE;
++    }
++  }
++
++  return FALSE;
++}
++
+ /*
+  * In case any fixups have been applies report them to the console at
+  * ExitBootService time.
+@@ -277,13 +289,13 @@ PageFaultExitBoot (
+   HaveOldShim = (ShimLock != NULL) && (ShimLoader == NULL);
+ 
+   DEBUG ((
+-      DEBUG_INFO,
+-      "%a: shim protocols: lock=%a, loader=%a -> old-shim=%a\n",
+-      __func__,
+-      (ShimLock != NULL) ? "yes" : "no",
+-      (ShimLoader != NULL) ? "yes" : "no",
+-      (HaveOldShim) ? "yes" : "no"
+-      ));
++    DEBUG_INFO,
++    "%a: shim protocols: lock=%a, loader=%a -> old-shim=%a\n",
++    __func__,
++    (ShimLock != NULL) ? "yes" : "no",
++    (ShimLoader != NULL) ? "yes" : "no",
++    (HaveOldShim) ? "yes" : "no"
++    ));
+   DEBUG ((DEBUG_INFO, "%a: fixups: %d NX, %d RW\n", __func__, mFixupNX, mFixupRW));
+ 
+   if (mFixupNX || mFixupRW) {
+@@ -299,21 +311,23 @@ PageFaultExitBoot (
+     MessageWait = TRUE;
+   }
+ 
+-  if (mFixupNX) {
+-    /* we had to fixup NX faults -> apply global fixup as precaution + report it */
+-    AsciiPrint (
+-      "%a: Applying global page table fixup (saw NX faults).\n",
+-      __func__
+-      );
+-    PageFaultFixMap ("nx-fault");
+-
+-  } else if (HaveOldShim) {
+-    /* we detected shim older than v16 -> apply global fixup as precaution + report it */
+-    AsciiPrint (
+-      "%a: Applying global page table fixup (shim is older than v16).\n",
+-      __func__
+-      );
+-    PageFaultFixMap ("old-shim");
++  if (PageFaultHave1GPages () &&
++      PcdGet64 (PcdConfidentialComputingGuestAttr) == 0) {
++    if (mFixupNX) {
++      /* we had to fixup NX faults -> apply global fixup as precaution + report it */
++      AsciiPrint (
++        "%a: Applying global page table fixup (saw NX faults).\n",
++        __func__
++        );
++      PageFaultFixMap ("nx-fault");
++    } else if (HaveOldShim) {
++      /* we detected shim older than v16 -> apply global fixup as precaution + report it */
++      AsciiPrint (
++        "%a: Applying global page table fixup (shim is older than v16).\n",
++        __func__
++        );
++      PageFaultFixMap ("old-shim");
++    }
+   }
+ 
+   if (MessageWait) {
+-- 
+2.51.1
+

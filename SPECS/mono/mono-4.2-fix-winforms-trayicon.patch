@@ -1,0 +1,27 @@
+From bc9d2b37c682f3fdc2c41450cf367c78d0f6ca22 Mon Sep 17 00:00:00 2001
+From: Arsen Shnurkov <Arsen.Shnurkov@gmail.com>
+Date: Thu, 4 Jun 2015 21:32:20 +0300
+Subject: [PATCH] https://bugzilla.xamarin.com/show_bug.cgi?id=14976
+
+---
+ mcs/class/System.Windows.Forms/System.Windows.Forms/XplatUIX11.cs | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/mcs/class/System.Windows.Forms/System.Windows.Forms/XplatUIX11.cs b/mcs/class/System.Windows.Forms/System.Windows.Forms/XplatUIX11.cs
+index b0777b5..d50d6c4 100644
+--- a/mcs/class/System.Windows.Forms/System.Windows.Forms/XplatUIX11.cs
++++ b/mcs/class/System.Windows.Forms/System.Windows.Forms/XplatUIX11.cs
+@@ -6219,9 +6219,6 @@ namespace System.Windows.Forms {
+ 				atoms [0] = (IntPtr)1;			// Version 1
+ 				atoms [1] = (IntPtr)1;			// we want to be mapped
+ 
+-				// This line cost me 3 days...
+-				XChangeProperty(DisplayHandle, hwnd.whole_window, _XEMBED_INFO, _XEMBED_INFO, 32, PropertyMode.Replace, atoms, 2);
+-
+ 				// Need to pick some reasonable defaults
+ 				tt = new ToolTip();
+ 				tt.AutomaticDelay = 350;
+-- 
+2.0.5
+
+

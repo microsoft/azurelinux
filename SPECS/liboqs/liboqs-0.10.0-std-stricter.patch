@@ -1,0 +1,14 @@
+diff -up liboqs-0.10.0/.CMake/alg_support.cmake.xxx liboqs-0.10.0/.CMake/alg_support.cmake
+--- liboqs-0.10.0/.CMake/alg_support.cmake.xxx	2024-05-06 05:52:52.668502602 -0400
++++ liboqs-0.10.0/.CMake/alg_support.cmake	2024-05-06 05:57:03.715008552 -0400
+@@ -182,6 +182,10 @@ elseif (${OQS_ALGS_ENABLED} STREQUAL "ST
+ ##### OQS_COPY_FROM_UPSTREAM_FRAGMENT_LIST_STANDARDIZED_ALGS_START
+ 	filter_algs("KEM_ml_kem_512;KEM_ml_kem_768;KEM_ml_kem_1024;SIG_ml_dsa_44;SIG_ml_dsa_65;SIG_ml_dsa_87;SIG_falcon_512;SIG_falcon_1024;SIG_falcon_padded_512;SIG_falcon_padded_1024;SIG_sphincs_sha2_128f_simple;SIG_sphincs_sha2_128s_simple;SIG_sphincs_sha2_192f_simple;SIG_sphincs_sha2_192s_simple;SIG_sphincs_sha2_256f_simple;SIG_sphincs_sha2_256s_simple;SIG_sphincs_shake_128f_simple;SIG_sphincs_shake_128s_simple;SIG_sphincs_shake_192f_simple;SIG_sphincs_shake_192s_simple;SIG_sphincs_shake_256f_simple;SIG_sphincs_shake_256s_simple")
+ ##### OQS_COPY_FROM_UPSTREAM_FRAGMENT_LIST_STANDARDIZED_ALGS_END
++elseif (${OQS_ALGS_ENABLED} STREQUAL "NIST_2024")
++##### OQS_COPY_FROM_UPSTREAM_FRAGMENT_LIST_STANDARDIZED_ALGS_START
++	filter_algs("KEM_ml_kem_512;KEM_ml_kem_768;KEM_ml_kem_1024;SIG_ml_dsa_44;SIG_ml_dsa_65;SIG_ml_dsa_87;SIG_sphincs_sha2_128f_simple;SIG_sphincs_sha2_128s_simple;SIG_sphincs_sha2_192f_simple;SIG_sphincs_sha2_192s_simple;SIG_sphincs_sha2_256f_simple;SIG_sphincs_sha2_256s_simple;SIG_sphincs_shake_128f_simple;SIG_sphincs_shake_128s_simple;SIG_sphincs_shake_192f_simple;SIG_sphincs_shake_192s_simple;SIG_sphincs_shake_256f_simple;SIG_sphincs_shake_256s_simple")
++##### OQS_COPY_FROM_UPSTREAM_FRAGMENT_LIST_STANDARDIZED_ALGS_END
+ elseif(${OQS_ALGS_ENABLED} STREQUAL "NIST_R4")
+ 	filter_algs("KEM_classic_mceliece_348864;KEM_classic_mceliece_348864f;KEM_classic_mceliece_460896;KEM_classic_mceliece_460896f;KEM_classic_mceliece_6688128;KEM_classic_mceliece_6688128f;KEM_classic_mceliece_6960119;KEM_classic_mceliece_6960119f;KEM_classic_mceliece_8192128;KEM_classic_mceliece_8192128f;KEM_hqc_128;KEM_hqc_192;KEM_hqc_256;KEM_bike_l1;KEM_bike_l3;KEM_bike_l5")
+ elseif(${OQS_ALGS_ENABLED} STREQUAL "NIST_SIG_ONRAMP")

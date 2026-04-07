@@ -1,0 +1,120 @@
+From 6e2d042505a006ab5fd703631661e68d1cdc66df Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20Men=C5=A1=C3=ADk?= <pemensik@redhat.com>
+Date: Fri, 15 Nov 2024 13:25:34 +0100
+Subject: [PATCH] Customize unbound.conf for Fedora defaults
+
+Set some Fedora/RHEL specific changes to example configuration file. By
+patching upstream provided config file we would not need to manually
+update external copy in source RPM.
+---
+ doc/example.conf.in | 33 +++++++++++++++++++++++++++++++--
+ 1 file changed, 31 insertions(+), 2 deletions(-)
+
+diff --git a/doc/example.conf.in b/doc/example.conf.in
+index 59090c6..3a86809 100644
+--- a/doc/example.conf.in
++++ b/doc/example.conf.in
+@@ -8,6 +8,9 @@
+ # Use this anywhere in the file to include other text into this file.
+ #include: "otherfile.conf"
+
++# Default Fedora settings
++include: "@UNBOUND_SHARE_DIR@/fedora-defaults.conf"
++
+ # Use this anywhere in the file to include other text, that explicitly starts a
+ # clause, into this file. Text after this directive needs to start a clause.
+ #include-toplevel: "otherfile.conf"
+@@ -51,11 +51,19 @@ server:
+ 	# specify 0.0.0.0 and ::0 to bind to all available interfaces.
+ 	# specify every interface[@port] on a new 'interface:' labelled line.
+ 	# The listen interfaces are not changed on reload, only on restart.
++	# interface: 0.0.0.0
++	# interface: ::0
+ 	# interface: 192.0.2.153
+ 	# interface: 192.0.2.154
+ 	# interface: 192.0.2.154@5003
+ 	# interface: 2001:DB8::5
+ 	# interface: eth0@5003
++	#
++	# for dns over tls and raw dns over port 80
++	# interface: 0.0.0.0@443
++	# interface: ::0@443
++	# interface: 0.0.0.0@80
++	# interface: ::0@80
+ 
+ 	# enable this feature to copy the source address of queries to reply.
+ 	# Socket options are not supported on all platforms. experimental.
+@@ -285,6 +293,8 @@ server:
+ 	# nat64-prefix: 64:ff9b::0/96
+ 
+ 	# Enable UDP, "yes" or "no".
++	# NOTE: if setting up an Unbound on tls443 for public use, you might want to
++	# disable UDP to avoid being used in DNS amplification attacks.
+ 	# do-udp: yes
+ 
+ 	# Enable TCP, "yes" or "no".
+@@ -320,6 +330,9 @@ server:
+ 	# can be dropped. Default is 0, disabled. In seconds, such as 3.
+ 	# sock-queue-timeout: 0
+ 
++	# Fedora note: do not activate this - not compiled in because
++	# it causes frequent unbound crashes. Also, socket activation
++	# is bad when you have things like dnsmasq also running with libvirt.
+ 	# Use systemd socket activation for UDP, TCP, and control sockets.
+ 	# use-systemd: no
+ 
+@@ -906,6 +919,8 @@ server:
+ 	# you need to do the reverse notation yourself.
+ 	# local-data-ptr: "192.0.2.3 www.example.com"
+ 
++	include: /etc/unbound/local.d/*.conf
++
+ 	# tag a localzone with a list of tag names (in "" with spaces between)
+ 	# local-zone-tag: "example.com" "tag2 tag3"
+ 
+@@ -916,8 +931,8 @@ server:
+ 	# the TLS stream, and over HTTPS using HTTP/2 as specified in RFC8484.
+ 	# Give the certificate to use and private key.
+ 	# default is "" (disabled).  requires restart to take effect.
+-	# tls-service-key: "path/to/privatekeyfile.key"
+-	# tls-service-pem: "path/to/publiccertfile.pem"
++	# tls-service-key: "/etc/unbound/unbound_server.key"
++	# tls-service-pem: "/etc/unbound/unbound_server.pem"
+ 	# tls-port: 853
+ 	# https-port: 443
+ 	# quic-port: 853
+@@ -1166,6 +1181,9 @@ remote-control:
+ 	# unbound-control certificate file.
+ 	# control-cert-file: "@UNBOUND_RUN_DIR@/unbound_control.pem"
+
++# Stub and Forward zones
++include: "@sysconfdir@/unbound/conf.d/*.conf"
++
+ # Stub zones.
+ # Create entries like below, to make all queries for 'example.com' and
+ # 'example.org' go to the given list of nameservers. list zero or more
+@@ -1186,6 +1207,10 @@ remote-control:
+ #	name: "example.org"
+ #	stub-host: ns.example.com.
+ 
++# You can now also dynamically create and delete stub-zone's using
++# unbound-control stub_add domain.com 1.2.3.4 5.6.7.8
++# unbound-control stub_remove domain.com 1.2.3.4 5.6.7.8
++
+ # Forward zones
+ # Create entries like below, to make all queries for 'example.com' and
+ # 'example.org' go to the given list of servers. These servers have to handle
+@@ -1203,6 +1228,10 @@ remote-control:
+ # forward-zone:
+ # 	name: "example.org"
+ # 	forward-host: fwd.example.com
++#
++# You can now also dynamically create and delete forward-zone's using
++# unbound-control forward_add domain.com 1.2.3.4 5.6.7.8
++# unbound-control forward_remove domain.com 1.2.3.4 5.6.7.8
+ 
+ # Authority zones
+ # The data for these zones is kept locally, from a file or downloaded.
+-- 
+2.47.0
+

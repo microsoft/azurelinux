@@ -1,0 +1,24 @@
+From 5c646b1cc55e18648918f101961afd1589a58168 Mon Sep 17 00:00:00 2001
+From: Christopher Chavez <chrischavez@gmx.us>
+Date: Mon, 19 Feb 2024 13:50:44 -0600
+Subject: [PATCH] pregcomp2.c: Avoid using incompatible pointer type
+
+See https://github.com/eserte/perl-tk/issues/98#issuecomment-1948125587
+---
+ config/pregcomp2.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/config/pregcomp2.c b/config/pregcomp2.c
+index 98506999..bb0b4539 100644
+--- a/config/pregcomp2.c
++++ b/config/pregcomp2.c
+@@ -4,5 +4,5 @@
+ 
+ int main() {
+     SV* sv = newSViv(0);
+-    regexp* rx = pregcomp(sv, 0);
++    void* rx = pregcomp(sv, 0);
+ }
+-- 
+2.43.0
+

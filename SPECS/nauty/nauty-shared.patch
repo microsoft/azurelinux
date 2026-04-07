@@ -1,0 +1,304 @@
+--- nauty2_9_3/makefile.in.orig	2025-12-31 05:56:01.000000000 -0700
++++ nauty2_9_3/makefile.in	2026-01-08 08:53:59.122144394 -0700
+@@ -583,191 +583,170 @@ clean :
+ 	      config.log config.cache config.status .libs/* \
+ 	      ${NAUTESTS} naucompare nauty*.a ${TESTPROGS}
+ 
+-dreadnaut : dreadnaut.c traces${XO} ${XGTOOLSO} naututil${XO}
+-	${LTP} -o dreadnaut dreadnaut.c naututil${XO} \
+-		nautinv${XO} gtools${XO} traces${XO} ${XNAUTYO}
++dreadnaut : dreadnaut.c libnauty.la
++	${LTP} -o dreadnaut dreadnaut.c .libs/libnauty.so
+ 
+-nbrhoodg : ${GTOOLSH} nbrhoodg.c ${XGTOOLSO}
+-	${LTP} -o nbrhoodg nbrhoodg.c ${XGTOOLSO}
++nbrhoodg : ${GTOOLSH} nbrhoodg.c libnauty.la
++	${LTP} -o nbrhoodg nbrhoodg.c .libs/libnauty.so
+ 
+-productg : ${GTOOLSH} productg.c gtools${XO} ${XNAUTYO}
+-	${LTP} -o productg productg.c gtools${XO} ${XNAUTYO}
++productg : ${GTOOLSH} productg.c libnauty.la
++	${LTP} -o productg productg.c .libs/libnauty.so
+ 
+-ancestorg : ${GTOOLSH} ancestorg.c gtools${XO} ${XNAUTYO}
+-	${LTP} -o ancestorg ancestorg.c gtools${XO} ${XNAUTYO}
++ancestorg : ${GTOOLSH} ancestorg.c libnauty.la
++	${LTP} -o ancestorg ancestorg.c .libs/libnauty.so
+ 
+-dimacs2g : ${GTOOLSH} dimacs2g.c naututil${XO} gtools${XO} ${XNAUTYO}
+-	${LTP} -o dimacs2g dimacs2g.c naututil${XO} gtools${XO} ${XNAUTYO}
++dimacs2g : ${GTOOLSH} dimacs2g.c libnauty.la
++	${LTP} -o dimacs2g dimacs2g.c .libs/libnauty.so
+ 
+-catg : ${GTOOLSH} catg.c gtools${XO}
+-	${LTP} -o catg catg.c gtools${XO}
++catg : ${GTOOLSH} catg.c libnauty.la
++	${LTP} -o catg catg.c .libs/libnauty.so
+ 
+-copyg : ${GTOOLSH} copyg.c gtools${XO}
+-	${LTP} -o copyg copyg.c gtools${XO}
++copyg : ${GTOOLSH} copyg.c libnauty.la
++	${LTP} -o copyg copyg.c .libs/libnauty.so
+ 
+-addptg : ${GTOOLSH} addptg.c ${XGTOOLSO}
+-	${LTP} -o addptg addptg.c ${XGTOOLSO}
++addptg : ${GTOOLSH} addptg.c libnauty.la
++	${LTP} -o addptg addptg.c .libs/libnauty.so
+ 
+-genspecialg : ${GTOOLSH} namedgraphs.h genspecialg.c ${XGTOOLSO} naututil${XO}
+-	${LTP} -o genspecialg genspecialg.c ${XGTOOLSO} naututil${XO}
++genspecialg : ${GTOOLSH} namedgraphs.h genspecialg.c libnauty.la
++	${LTP} -o genspecialg genspecialg.c .libs/libnauty.so
+ 
+-listg : ${GTOOLSH} listg.c gtools${XO} nautil${XO}
+-	${LTP} -o listg listg.c gtools${XO} nautil${XO}
++listg : ${GTOOLSH} listg.c libnauty.la
++	${LTP} -o listg listg.c .libs/libnauty.so
+ 
+-labelg : ${GTOOLSH} labelg.c ${XGTOOLSO} traces${XO} naututil${XO}
+-	${LTP} -o labelg labelg.c naututil${XO} traces${XO} ${XGTOOLSO}
++labelg : ${GTOOLSH} labelg.c libnauty.la
++	${LTP} -o labelg labelg.c .libs/libnauty.so
+ 
+-shortg : ${GTOOLSH} shortg.c ${XGTOOLSO} naututil${XO} traces${XO}
+-	${LTP} -o shortg shortg.c ${XGTOOLSO} naututil${XO} traces${XO}
++shortg : ${GTOOLSH} shortg.c libnauty.la
++	${LTP} -o shortg shortg.c .libs/libnauty.so
+ 
+-uniqg : ${GTOOLSH} uniqg.c ${XGTOOLSO} traces${XO} nausha.c nausha.h
+-	${LTP} -o uniqg uniqg.c nausha.c ${XGTOOLSO} traces${XO}
++uniqg : ${GTOOLSH} uniqg.c nausha.c nausha.h libnauty.la
++	${LTP} -o uniqg uniqg.c nausha.c .libs/libnauty.so
+ 
+-dretog : ${GTOOLSH} dretog.c naututil${XO} gtools${XO} ${XNAUTYO} 
+-	${LTP} -o dretog dretog.c naututil${XO} gtools${XO} ${XNAUTYO}
++dretog : ${GTOOLSH} dretog.c libnauty.la
++	${LTP} -o dretog dretog.c .libs/libnauty.so
+ 
+-dretodot : ${GTOOLSH} dretodot.c naututil${XO} gtools${XO} traces${XO} ${XNAUTYO} 
+-	${LTP} -o dretodot dretodot.c naututil${XO} gtools${XO} \
+-	    traces${XO} ${XNAUTYO} -lm
++dretodot : ${GTOOLSH} dretodot.c libnauty.la
++	${LTP} -o dretodot dretodot.c .libs/libnauty.so -lm
+ 
+-amtog : ${GTOOLSH} amtog.c gtools${XO} ${XNAUTYO}
+-	${LTP} -o amtog amtog.c gtools${XO} ${XNAUTYO}
++amtog : ${GTOOLSH} amtog.c libnauty.la
++	${LTP} -o amtog amtog.c .libs/libnauty.so
+ 
+-genbg : ${GTOOLSH} genbg.c gtoolsW${XO} nautyW1${XO} nautilW1${XO} naugraphW1${XO} \
+-	    schreierW${XO} naurng${XO}
+-	${LTP} -o genbg ${W1} genbg.c gtoolsW${XO} schreierW${XO} \
+-		nautyW1${XO} nautilW1${XO} naugraphW1${XO} naurng${XO}
++genbg : ${GTOOLSH} genbg.c libnautyW1.la
++	${LTP} -o genbg ${W1} genbg.c .libs/libnautyW1.so
+ 
+-genbgL : ${GTOOLSH} genbg.c gtoolsL${XO} nautyL1${XO} nautilL1${XO} naugraphL1${XO} \
+-	    schreierL${XO} naurng${XO}
+-	${LTP} -o genbgL ${L1} -DMAXN1=30 genbg.c gtoolsL${XO} \
+-	    schreierL${XO} naurng${XO} nautyL1${XO} nautilL1${XO} naugraphL1${XO}
++genbgL : ${GTOOLSH} genbg.c libnautyL1.la
++	${LTP} -o genbgL ${L1} -DMAXN1=30 genbg.c .libs/libnautyL1.so
+ 
+-geng : ${GTOOLSH} geng.c gtoolsW${XO} nautyW1${XO} nautilW1${XO} naugraphW1${XO} schreierW${XO} naurng${XO}
+-	${LTP} -o geng ${W1} geng.c gtoolsW${XO} nautyW1${XO} \
+-		nautilW1${XO} naugraphW1${XO} schreierW${XO} naurng${XO}
++geng : ${GTOOLSH} geng.c libnautyW1.la
++	${LTP} -o geng ${W1} geng.c .libs/libnautyW1.so
+ 
+-gengL : ${GTOOLSH} geng.c gtoolsL${XO} nautyL1${XO} nautilL1${XO} naugraphL1${XO} schreierL${XO} naurng${XO}
+-	${LTP} -o gengL ${L1} geng.c gtoolsL${XO} nautyL1${XO} \
+-		nautilL1${XO} naugraphL1${XO} schreierL${XO} naurng${XO}
++gengL : ${GTOOLSH} geng.c libnautyL1.la
++	${LTP} -o gengL ${L1} geng.c .libs/libnautyL1.so
+ 
+-gentourng : ${GTOOLSH} gentourng.c gtoolsW${XO} nautyW1${XO} nautilW1${XO} \
+-	    naugraphW1${XO} schreierW${XO} naurng${XO}
+-	${LTP} -o gentourng -DMAXN=24 ${W} gentourng.c gtoolsW${XO} nautyW1${XO} \
+-		nautilW1${XO} naugraphW1${XO} schreierW${XO} naurng${XO}
++gentourng : ${GTOOLSH} gentourng.c libnautyW.la
++	${LTP} -o gentourng -DMAXN=24 ${W} gentourng.c .libs/libnautyW.so
+ 
+-genquarticg : ${GTOOLSH} quarticirred28.h genquarticg.c gtoolsL${XO} nautyL1${XO} \
+-	    nautilL1${XO} naugraphL1${XO} schreierL${XO} naurng${XO}
+-	${LTP} -o genquarticg ${L} genquarticg.c gtoolsL${XO} nautyL1${XO} \
+-		nautilL1${XO} naugraphL1${XO} schreierL${XO} naurng${XO}
++genquarticg : ${GTOOLSH} quarticirred28.h genquarticg.c libnautyL1.la
++	${LTP} -o genquarticg ${L} genquarticg.c .libs/libnautyL1.so
+ 
+-gentreeg : gentreeg.c gtools${XO} nauty.h gtools.h
+-	${LTP} -o gentreeg gentreeg.c gtools${XO}
++gentreeg : gentreeg.c nauty.h gtools.h libnauty.la
++	${LTP} -o gentreeg gentreeg.c .libs/libnauty.so
+ 
+-genktreeg : genktreeg.c gtools${XO} nauty.h gtools.h ${XNAUTY1O}
+-	${LTP} -o genktreeg ${SMALL} genktreeg.c gtools${XO} ${XNAUTY1O}
++genktreeg : genktreeg.c nauty.h gtools.h libnauty1.la
++	${LTP} -o genktreeg ${SMALL} genktreeg.c .libs/libnauty1.so
+ 
+-genrang : ${GTOOLSH} genrang.c gtools${XO} naututil${XO} nautinv${XO} gtnauty${XO} ${XNAUTYO}
+-	${LTP} -o genrang genrang.c \
+-		gtools${XO} naututil${XO} nautinv${XO} gtnauty${XO} ${XNAUTYO}
++genrang : ${GTOOLSH} genrang.c libnauty.la
++	${LTP} -o genrang genrang.c .libs/libnauty.so
+ 
+-complg : ${GTOOLSH} complg.c ${XGTOOLSO}
+-	${LTP} -o complg complg.c ${XGTOOLSO}
++complg : ${GTOOLSH} complg.c libnauty.la
++	${LTP} -o complg complg.c .libs/libnauty.so
+ 
+-ransubg : ${GTOOLSH} ransubg.c ${XGTOOLSO}
+-	${LTP} -o ransubg ransubg.c ${XGTOOLSO}
++ransubg : ${GTOOLSH} ransubg.c libnauty.la
++	${LTP} -o ransubg ransubg.c .libs/libnauty.so
+ 
+-cubhamg : ${GTOOLSH} cubhamg.c gtools${XO} ${XNAUTYO}
+-	${LTP} -o cubhamg cubhamg.c gtools${XO} ${XNAUTYO}
++cubhamg : ${GTOOLSH} cubhamg.c libnauty.la
++	${LTP} -o cubhamg cubhamg.c .libs/libnauty.so
+ 
+-twohamg : ${GTOOLSH} twohamg.c gtools${XO} ${XNAUTYO}
+-	${LTP} -o twohamg twohamg.c gtools${XO} ${XNAUTYO}
++twohamg : ${GTOOLSH} twohamg.c libnauty.la
++	${LTP} -o twohamg twohamg.c .libs/libnauty.so
+ 
+-hamheuristic : ${GTOOLSH} hamheuristic.c gtools${XO} ${XNAUTYO}
+-	${LTP} -o hamheuristic hamheuristic.c gtools${XO} ${XNAUTYO}
++hamheuristic : ${GTOOLSH} hamheuristic.c libnauty.la
++	${LTP} -o hamheuristic hamheuristic.c .libs/libnauty.so
+ 
+-converseg : ${GTOOLSH} converseg.c gtools${XO} ${XNAUTYO} nautinv${XO}
+-	${LTP} -o converseg converseg.c nautinv${XO} gtools${XO} ${XNAUTYO}
++converseg : ${GTOOLSH} converseg.c libnauty.la
++	${LTP} -o converseg converseg.c .libs/libnauty.so
+ 
+-assembleg : ${GTOOLSH} assembleg.c gtools${XO} ${XNAUTYO}
+-	${LTP} -o assembleg assembleg.c gtools${XO} ${XNAUTYO}
++assembleg : ${GTOOLSH} assembleg.c libnauty.la
++	${LTP} -o assembleg assembleg.c .libs/libnauty.so
+ 
+-underlyingg : ${GTOOLSH} underlyingg.c gtools${XO} ${XNAUTYO}
+-	${LTP} -o underlyingg underlyingg.c gtools${XO} ${XNAUTYO}
++underlyingg : ${GTOOLSH} underlyingg.c libnauty.la
++	${LTP} -o underlyingg underlyingg.c .libs/libnauty.so
+ 
+-distgraphg : ${GTOOLSH} distgraphg.c gtools${XO} ${XNAUTYO}
+-	${LTP} -o distgraphg distgraphg.c gtools${XO} ${XNAUTYO}
++distgraphg : ${GTOOLSH} distgraphg.c libnauty.la
++	${LTP} -o distgraphg distgraphg.c .libs/libnauty.so
+ 
+-linegraphg : ${GTOOLSH} linegraphg.c gtools${XO} ${XNAUTYO}
+-	${LTP} -o linegraphg linegraphg.c gtools${XO} ${XNAUTYO}
++linegraphg : ${GTOOLSH} linegraphg.c libnauty.la
++	${LTP} -o linegraphg linegraphg.c .libs/libnauty.so
+ 
+-subdivideg : ${GTOOLSH} subdivideg.c gtools${XO} ${XNAUTYO}
+-	${LTP} -o subdivideg subdivideg.c gtools${XO} ${XNAUTYO}
++subdivideg : ${GTOOLSH} subdivideg.c libnauty.la
++	${LTP} -o subdivideg subdivideg.c .libs/libnauty.so
+ 
+-vcolg : ${GTOOLSH} vcolg.c ${XGTOOLSO} naugroup${XO} \
+-		 nautinv${XO} naututil${XO} naugroup.h gutils.h
+-	${LTP} -o vcolg vcolg.c naututil${XO} gutil2${XO} naugroup${XO} ${XGTOOLSO}
++vcolg : ${GTOOLSH} vcolg.c naugroup.h gutils.h libnauty.la
++	${LTP} -o vcolg vcolg.c .libs/libnauty.so
+ 
+-edgetransg : ${GTOOLSH} edgetransg.c ${XGTOOLSO} naugroup${XO} \
+-		 naututil${XO} naugroup.h
+-	${LTP} -o edgetransg edgetransg.c naututil${XO} naugroup${XO} ${XGTOOLSO}
++edgetransg : ${GTOOLSH} edgetransg.c naugroup.h libnauty.la
++	${LTP} -o edgetransg edgetransg.c .libs/libnauty.so
+ 
+-biplabg : ${GTOOLSH} gutils.h biplabg.c gutil1${XO} ${XGTOOLSO}
+-	${LTP} -o biplabg biplabg.c gutil1${XO} ${XGTOOLSO}
++biplabg : ${GTOOLSH} gutils.h biplabg.c libnauty.la
++	${LTP} -o biplabg biplabg.c .libs/libnauty.so
+ 
+-ranlabg : ${GTOOLSH} ranlabg.c gtools${XO} ${XNAUTYO}
+-	${LTP} -o ranlabg ranlabg.c gtools${XO} ${XNAUTYO}
++ranlabg : ${GTOOLSH} ranlabg.c libnauty.la
++	${LTP} -o ranlabg ranlabg.c .libs/libnauty.so
+ 
+-NRswitchg : ${GTOOLSH} NRswitchg.c ${XGTOOLSO}
+-	${LTP} -o NRswitchg NRswitchg.c ${XGTOOLSO}
++NRswitchg : ${GTOOLSH} NRswitchg.c libnauty.la
++	${LTP} -o NRswitchg NRswitchg.c .libs/libnauty.so
+ 
+-deledgeg : ${GTOOLSH} deledgeg.c ${XGTOOLSO}
+-	${LTP} -o deledgeg deledgeg.c ${XGTOOLSO}
++deledgeg : ${GTOOLSH} deledgeg.c libnauty.la
++	${LTP} -o deledgeg deledgeg.c .libs/libnauty.so
+ 
+-delptg : ${GTOOLSH} delptg.c ${XGTOOLSO}
+-	${LTP} -o delptg delptg.c ${XGTOOLSO}
++delptg : ${GTOOLSH} delptg.c libnauty.la
++	${LTP} -o delptg delptg.c .libs/libnauty.so
+ 
+-addedgeg : ${GTOOLSH} addedgeg.c gutil1${XO} ${XGTOOLSO}
+-	${LTP} -o addedgeg addedgeg.c gutil1${XO} ${XGTOOLSO}
++addedgeg : ${GTOOLSH} addedgeg.c libnauty.la
++	${LTP} -o addedgeg addedgeg.c .libs/libnauty.so
+ 
+-newedgeg : ${GTOOLSH} newedgeg.c ${XGTOOLSO}
+-	${LTP} -o newedgeg newedgeg.c ${XGTOOLSO}
++newedgeg : ${GTOOLSH} newedgeg.c libnauty.la
++	${LTP} -o newedgeg newedgeg.c .libs/libnauty.so
+ 
+-pickg : ${GTOOLSH} testg.c splay.c ${XGTOOLSO} \
+-	     gutil1${XO} gutil2${XO} nautycliquer${XO} nauconnect${XO} nauchromatic${XO}
+-	${LTP} -o pickg testg.c gtools${XO} gtnauty${XO} gutil1${XO} \
+-	        gutil2${XO} nautinv${XO} nautycliquer${XO} nauchromatic${XO} \
+-		nauconnect${XO} ${XNAUTYO}
++pickg : ${GTOOLSH} testg.c splay.c libnauty.la
++	${LTP} -o pickg testg.c .libs/libnauty.so
+ 
+-countg : ${GTOOLSH} testg.c splay.c ${XGTOOLSO} gutil1${XO} gutil2${XO} \
+-	     nautycliquer${XO} nauchromatic${XO} nauconnect${XO} nauchromatic${XO}
+-	${LTP} -o countg testg.c gutil1${XO} gutil2${XO} nautycliquer${XO} \
+-	     nauchromatic${XO} nauconnect${XO} ${XGTOOLSO}
++countg : ${GTOOLSH} testg.c splay.c libnauty.la
++	${LTP} -o countg testg.c .libs/libnauty.so
+ 
+-countneg : ${GTOOLSH} countneg.c splay.c gtools${XO} 
+-	${LTP} -o countneg countneg.c gtools${XO}
++countneg : ${GTOOLSH} countneg.c splay.c libnauty.la
++	${LTP} -o countneg countneg.c .libs/libnauty.so
+ 
+-directg : ${GTOOLSH} directg.c gtools${XO} naugroup${XO} ${XNAUTYO}
+-	${LTP} -o directg directg.c gtools${XO} ${XNAUTYO} naugroup${XO}
++directg : ${GTOOLSH} directg.c libnauty.la
++	${LTP} -o directg directg.c .libs/libnauty.so
+ 
+-multig : ${GTOOLSH} multig.c naugroup${XO} ${XGTOOLSO}
+-	${LTP} -o multig multig.c ${XGTOOLSO} naugroup${XO}
++multig : ${GTOOLSH} multig.c libnauty.la
++	${LTP} -o multig multig.c .libs/libnauty.so
+ 
+-planarg : ${GTOOLSH} planarg.c gtools${XO} planarity.c
+-	${LTP} -o planarg planarg.c planarity.c gtools${XO}
++planarg : ${GTOOLSH} planarg.c planarity.c libnauty.la
++	${LTP} -o planarg planarg.c planarity.c .libs/libnauty.so
+ 
+-watercluster2 : ${GTOOLSH} watercluster2.c gtoolsW${XO} ${XNAUTYW1O}
+-	${LTP} -o watercluster2 ${W1} watercluster2.c \
+-	         gtoolsW${XO} ${XNAUTYW1O}
++watercluster2 : ${GTOOLSH} watercluster2.c libnautyW1.la
++	${LTP} -o watercluster2 ${W1} watercluster2.c .libs/libnautyW1.so
+ 
+-genposetg : ${GTOOLSH} genposetg.c gtoolsS${XO} ${XNAUTYS1O}
+-	${LTP} -o genposetg ${S1} genposetg.c gtoolsS${XO} ${XNAUTYS1O}
++genposetg : ${GTOOLSH} genposetg.c libnautyS1.la
++	${LTP} -o genposetg ${S1} genposetg.c .libs/libnautyS1.so
+ 
+-blisstog : ${GTOOLSH} blisstog.c gtools${XO} ${XNAUTYO}
+-	${LTP} -o blisstog blisstog.c gtools${XO} ${XNAUTYO}
++blisstog : ${GTOOLSH} blisstog.c libnauty.la
++	${LTP} -o blisstog blisstog.c .libs/libnauty.so
+ 
+-bliss2dre : ${GTOOLSH} bliss2dre.c gtools${XO} ${XNAUTYO}
+-	${LTP} -o bliss2dre bliss2dre.c gtools${XO} ${XNAUTYO}
++bliss2dre : ${GTOOLSH} bliss2dre.c libnauty.la
++	${LTP} -o bliss2dre bliss2dre.c .libs/libnauty.so
+ 
+ showg : showg.c
+ 	${CCC} -o showg showg.c ${LDFLAGS}

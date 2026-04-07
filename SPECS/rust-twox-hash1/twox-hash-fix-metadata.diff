@@ -1,0 +1,10 @@
+--- twox-hash-1.6.3/Cargo.toml	1970-01-01T00:00:01+00:00
++++ twox-hash-1.6.3/Cargo.toml	2024-12-02T18:06:47.744861+00:00
+@@ -26,6 +26,7 @@
+ categories = ["algorithms"]
+ license = "MIT"
+ repository = "https://github.com/shepmaster/twox-hash"
++autobins = false
+ 
+ [dependencies.cfg-if]
+ version = ">= 0.1, < 2"

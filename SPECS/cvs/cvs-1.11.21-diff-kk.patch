@@ -1,0 +1,11 @@
+--- cvs-1.11.21/src/diff.c.old	2005-12-19 11:01:59.000000000 +0100
++++ cvs-1.11.21/src/diff.c	2005-12-21 15:45:40.000000000 +0100
+@@ -438,7 +438,7 @@
+ 
+ 	/* Send the current files unless diffing two revs from the archive */
+ 	if (diff_rev2 == NULL && diff_date2 == NULL)
+-	    send_files (argc, argv, local, 0, 0);
++	    send_files (argc, argv, local, 0, options[0] == '\0' ? 0 : SEND_FORCE);
+ 	else
+ 	    send_files (argc, argv, local, 0, SEND_NO_CONTENTS);
+ 

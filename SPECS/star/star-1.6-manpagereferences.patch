@@ -1,0 +1,43 @@
+diff --git a/star/spax.1 b/star/spax.1
+index b9a77e0..c462fe3 100644
+--- a/star/spax.1
++++ b/star/spax.1
+@@ -4047,7 +4047,7 @@ Interfaces volume of IEEE Std 1003.1-2001,
+ .BR chown (2), 
+ .BR creat (2),
+ .BR mkdir (2),
+-.BR mkfifo (2),
++.BR mkfifo (3),
+ .BR stat (2),
+ .BR utime (2),
+ .BR write (2).
+@@ -4099,7 +4099,7 @@ entry is added to the ENVIRONMENT VARIABLES section.
+ IEEE PASC Interpretation 1003.2 #168 is applied, clarifying that
+ .BR mkdir (2)
+ and 
+-.BR mkfifo (2)
++.BR mkfifo (3)
+ calls can ignore an [EEXIST] error when
+ extracting an archive.
+ .PP
+diff --git a/star/star.1 b/star/star.1
+index caed9f4..a24d619 100644
+--- a/star/star.1
++++ b/star/star.1
+@@ -5293,7 +5293,6 @@ cron script).
+ Is used for the interactive user interface.
+ .SH "SEE ALSO"
+ .BR spax (1), 
+-.BR suntar (1), 
+ .BR scpio (1), 
+ .BR tar (1), 
+ .BR cpio (1), 
+@@ -5308,7 +5307,7 @@ Is used for the interactive user interface.
+ .BR ssh (1),
+ .BR star_sym (1),
+ .BR tartest (1),
+-.BR star (4),
++.BR star (1),
+ .BR rcmd (3),
+ .BR fssnap (1m)
+ .SH DIAGNOSTICS

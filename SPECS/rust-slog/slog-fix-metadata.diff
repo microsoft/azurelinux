@@ -1,0 +1,20 @@
+--- slog-2.7.0/Cargo.toml	2020-11-30T06:26:08+00:00
++++ slog-2.7.0/Cargo.toml	2022-12-15T13:05:59.148285+00:00
+@@ -26,17 +26,6 @@
+ repository = "https://github.com/slog-rs/slog"
+ [package.metadata.docs.rs]
+ features = ["std", "nested-values", "dynamic-keys"]
+-[profile.bench]
+-opt-level = 3
+-lto = true
+-debug = false
+-debug-assertions = false
+-
+-[profile.release]
+-opt-level = 3
+-lto = true
+-debug = false
+-debug-assertions = false
+ 
+ [[example]]
+ name = "singlethread"

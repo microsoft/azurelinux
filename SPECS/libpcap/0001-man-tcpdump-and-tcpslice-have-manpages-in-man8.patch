@@ -1,0 +1,28 @@
+From 208bb414553d5444d82601e6fd4ca25fbb192998 Mon Sep 17 00:00:00 2001
+From: Michal Sekletar <msekleta@redhat.com>
+Date: Mon, 29 Sep 2014 08:19:05 +0200
+Subject: [PATCH 1/4] man: tcpdump and tcpslice have manpages in man8
+
+Both should be run only by root, hence manpages for them should be located in
+/usr/share/man/man8/
+---
+ pcap.3pcap.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pcap.3pcap.in b/pcap.3pcap.in
+index 492c227..46a2a4b 100644
+--- a/pcap.3pcap.in
++++ b/pcap.3pcap.in
+@@ -1025,8 +1025,8 @@ script or some other configuration script to check whether the libpcap
+ 1.0 APIs are available and use them only if they are.
+ .SH SEE ALSO
+ .BR autoconf (1),
+-.BR tcpdump (1),
+-.BR tcpslice (1),
++.BR tcpdump (8),
++.BR tcpslice (8),
+ .BR \%pcap-filter (@MAN_MISC_INFO@),
+ .BR pfconfig (8),
+ .BR usermod (@MAN_ADMIN_COMMANDS@)
+-- 
+1.8.3.1

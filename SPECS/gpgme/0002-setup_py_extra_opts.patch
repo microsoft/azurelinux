@@ -1,0 +1,12 @@
+diff --git a/lang/python/Makefile.in b/lang/python/Makefile.in
+index c0fc091..d567ecb 100644
+--- a/lang/python/Makefile.in
++++ b/lang/python/Makefile.in
+@@ -802,6 +802,7 @@ install-exec-local:
+ 	  --build-base="$$(basename "$${PYTHON}")-gpg" \
+ 	  install \
+ 	  --prefix "$(DESTDIR)$(prefix)" \
++	  $${SETUP_PY_EXTRA_OPTS:-} \
+ 	  --verbose ; \
+ 	done
+ 

@@ -1,0 +1,55 @@
+From 307b0ff6d27b6788cdc4b4f4abac9e949129c19e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Thu, 4 Dec 2025 18:05:14 +0000
+Subject: [PATCH 124/131] pcsclient: ignore errors trying to clear the keyring
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+On authentication errors with PCS, an attempt is made to clear the
+keyring. This may fail if the user's login environment has no keyring
+configured. The user would have declined to store the key when first
+prompted, so there would be nothing to clear either in this case.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ tools/PcsClientTool/lib/intelsgx/pcs.py | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/tools/PcsClientTool/lib/intelsgx/pcs.py b/tools/PcsClientTool/lib/intelsgx/pcs.py
+index 1368b57b..dd4eba40 100644
+--- a/tools/PcsClientTool/lib/intelsgx/pcs.py
++++ b/tools/PcsClientTool/lib/intelsgx/pcs.py
+@@ -404,7 +404,13 @@ class PCS:
+         if response.status_code != 200:
+             print(str(response.content, 'utf-8'))
+             if response.status_code == 401:
+-                Credentials().set_pcs_api_key('')   #reset ApiKey
++                try:
++                    Credentials().set_pcs_api_key('')   #reset ApiKey
++                except:
++                    # If keyring is unavailable, we don't want to trigger
++                    # traceback, as the user may have declined to save
++                    # the key in the keyring earlier
++                    pass
+             return None
+ 
+         # Verify expected headers
+@@ -479,7 +485,13 @@ class PCS:
+         if response.status_code != 200:
+             print(str(response.content, 'utf-8'))
+             if response.status_code == 401:
+-                Credentials().set_pcs_api_key('')   #reset ApiKey
++                try:
++                    Credentials().set_pcs_api_key('')   #reset ApiKey
++                except:
++                    # If keyring is unavailable, we don't want to trigger
++                    # traceback, as the user may have declined to save
++                    # the key in the keyring earlier
++                    pass
+             return None
+ 
+         # Verify expected headers
+-- 
+2.53.0
+

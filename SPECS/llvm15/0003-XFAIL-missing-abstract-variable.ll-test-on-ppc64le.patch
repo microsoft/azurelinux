@@ -1,0 +1,33 @@
+From 01529ba2c76be37e41713cf7f3eca8b61833e320 Mon Sep 17 00:00:00 2001
+From: Tom Stellard <tstellar@redhat.com>
+Date: Tue, 9 Nov 2021 15:05:07 +0100
+Subject: [PATCH] XFAIL missing-abstract-variable.ll test on ppc64le
+
+It's seems the strategy with this test is to XFAIL it on all
+architectures that it fails on.  I wonder if we should be passing
+it a specific triple?  Also, from what I can tell, this tests only
+runs when llvm is configured with LLVM_DEFAULT_TARGET_TRIPLE set
+to a non-empty value, which is why it may not fail in every build
+configuration.
+
+Differential Revision: https://reviews.llvm.org/D109806
+---
+ llvm/test/DebugInfo/Generic/missing-abstract-variable.ll | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/llvm/test/DebugInfo/Generic/missing-abstract-variable.ll b/llvm/test/DebugInfo/Generic/missing-abstract-variable.ll
+index 8f8d404..07a8778 100644
+--- a/llvm/test/DebugInfo/Generic/missing-abstract-variable.ll
++++ b/llvm/test/DebugInfo/Generic/missing-abstract-variable.ll
+@@ -4,7 +4,7 @@
+ ; powerpc64 (and on x86_64 at at least -O2). Presumably this is a SelectionDAG
+ ; issue.
+ ; FIXME: arm64 is an alias for aarch64 on macs, apparently?
+-; XFAIL: powerpc64, aarch64, arm64, hexagon, riscv, sparc
++; XFAIL: powerpc64, aarch64, arm64, hexagon, riscv, sparc, ppc64le
+ 
+ ; Build from the following source with clang -O2.
+ 
+-- 
+1.8.3.1
+

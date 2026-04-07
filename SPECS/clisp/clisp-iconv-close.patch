@@ -1,0 +1,38 @@
+--- src/stream.d.orig	2024-12-28 00:47:59.000000000 -0700
++++ src/stream.d	2025-02-07 11:47:28.448086694 -0700
+@@ -4239,6 +4239,9 @@ global uintL iconv_wcslen (object encodi
+                   != (size_t)(-1)) {
+                 inptr += sizeof(chart); insize -= sizeof(chart);
+               } else {
++                var int saved_errno = errno;
++                iconv_close(cd);
++                errno = saved_errno;
+                 if (errno != EILSEQ) {
+                   ANSIC_error();
+                 } else {
+@@ -4247,6 +4250,7 @@ global uintL iconv_wcslen (object encodi
+                 }
+               }
+             } else {
++              iconv_close(cd);
+               end_system_call();
+               error_unencodable(encoding,*(const chart*)inptr);
+             }
+@@ -4317,6 +4321,9 @@ global void iconv_wcstombs (object encod
+               if (iconv(cd,&inptr1,&insize1,&outptr,&outsize) != (size_t)(-1)) {
+                 inptr += sizeof(chart); insize -= sizeof(chart);
+               } else {
++                var int saved_errno = errno;
++                iconv_close(cd);
++                errno = saved_errno;
+                 if (errno != EILSEQ) {
+                   ANSIC_error();
+                 } else {
+@@ -4325,6 +4332,7 @@ global void iconv_wcstombs (object encod
+                 }
+               }
+             } else {
++              iconv_close(cd);
+               end_system_call();
+               error_unencodable(encoding,*(const chart*)inptr);
+             }

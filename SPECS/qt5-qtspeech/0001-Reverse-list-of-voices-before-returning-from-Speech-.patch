@@ -1,0 +1,36 @@
+From aa2376f9b1302222edcd16b4641bbd7004318c00 Mon Sep 17 00:00:00 2001
+From: Jeremy Whiting <jpwhiting@kde.org>
+Date: Tue, 8 Feb 2022 11:04:41 -0700
+Subject: [PATCH] Reverse list of voices before returning from
+ Speech-Dispatcher
+
+Since QMultiMap::values() gives voices in reverse order from the order
+inserted (latest first, oldest last) reverse the list before returning
+it to users.
+
+Change-Id: I908560d671f760b6722a3164ed2cb925238f7fc8
+Reviewed-by: Jarkko Koivikko <jarkko.koivikko@code-q.fi>
+Reviewed-by: Assam Boudjelthia <assam.boudjelthia@qt.io>
+(cherry picked from commit b5f91c3e92a1afeed73e1b907082fabff39a29d9)
+---
+ src/plugins/tts/speechdispatcher/qtexttospeech_speechd.cpp | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/plugins/tts/speechdispatcher/qtexttospeech_speechd.cpp b/src/plugins/tts/speechdispatcher/qtexttospeech_speechd.cpp
+index 6eb74b8..bcc7dd1 100644
+--- a/src/plugins/tts/speechdispatcher/qtexttospeech_speechd.cpp
++++ b/src/plugins/tts/speechdispatcher/qtexttospeech_speechd.cpp
+@@ -357,7 +357,9 @@ QVector<QLocale> QTextToSpeechEngineSpeechd::availableLocales() const
+ 
+ QVector<QVoice> QTextToSpeechEngineSpeechd::availableVoices() const
+ {
+-    return m_voices.values(m_currentLocale.name()).toVector();
++    QList<QVoice> resultList = m_voices.values(m_currentLocale.name());
++    std::reverse(resultList.begin(), resultList.end());
++    return resultList.toVector();
+ }
+ 
+ // We have no way of knowing our own client_id since speech-dispatcher seems to be incomplete
+-- 
+2.51.1
+

@@ -1,0 +1,37 @@
+From 4b38cffd86456aa05a263bd7168a6046a4198c05 Mon Sep 17 00:00:00 2001
+From: Pavel Valena <pvalena@redhat.com>
+Date: Wed, 16 Jul 2025 17:33:36 +0200
+Subject: [PATCH 12/12] Revert "feat(hwdb): add hwdb module to install hwdb.bin
+ on demand"
+
+This reverts commit 7ff102c722877e78e222fae819fb1b3cddef8d25.
+
+Ref: https://github.com/redhat-plumbers/dracut-fedora/issues/60
+---
+ modules.d/95hwdb/module-setup.sh | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/modules.d/95hwdb/module-setup.sh b/modules.d/95hwdb/module-setup.sh
+index c7371ddd..a8e10ab4 100644
+--- a/modules.d/95hwdb/module-setup.sh
++++ b/modules.d/95hwdb/module-setup.sh
+@@ -12,11 +12,12 @@ check() {
+ 
+ # called by dracut
+ install() {
+-    # Follow the same priority as `systemd-hwdb`; `/etc` is the default
+-    # and `/usr/lib` an alternative location.
+-    inst_multiple "${udevconfdir}"/hwdb.bin
++    inst_multiple -o \
++        "${udevdir}"/hwdb.bin
+ 
++    # Install the hosts local user configurations if enabled.
+     if [[ $hostonly ]]; then
+-        inst_multiple -H -o "${udevdir}"/hwdb.bin
++        inst_multiple -H -o \
++            "$udevconfdir"/hwdb.bin
+     fi
+ }
+-- 
+2.50.1
+

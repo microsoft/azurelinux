@@ -1,0 +1,33 @@
+--- fixed-1.29.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ fixed-1.29.0/Cargo.toml	2025-03-03T21:33:50.442798+00:00
+@@ -42,7 +42,6 @@
+ [package.metadata.docs.rs]
+ features = [
+     "arbitrary",
+-    "borsh",
+     "num-traits",
+     "serde",
+     "std",
+@@ -51,10 +50,8 @@
+ [features]
+ arbitrary = ["dep:arbitrary"]
+ az = []
+-borsh = ["dep:borsh"]
+ f16 = []
+ fail-on-warnings = []
+-nightly-float = []
+ num-traits = ["dep:num-traits"]
+ serde = ["dep:serde"]
+ serde-str = [
+@@ -74,11 +71,6 @@
+ 
+ [dependencies.az]
+ version = "1.2"
+-
+-[dependencies.borsh]
+-version = "1"
+-optional = true
+-default-features = false
+ 
+ [dependencies.bytemuck]
+ version = "1.2"

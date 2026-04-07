@@ -1,0 +1,12 @@
+--- fancy-regex-0.16.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ fancy-regex-0.16.2/Cargo.toml	2026-02-05T12:06:23.680611+00:00
+@@ -115,9 +115,6 @@
+ version = "0.8"
+ default-features = false
+ 
+-[dev-dependencies.criterion]
+-version = "0.5"
+-
+ [dev-dependencies.matches]
+ version = "0.1.10"
+ 

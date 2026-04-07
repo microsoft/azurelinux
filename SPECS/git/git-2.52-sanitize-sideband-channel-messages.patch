@@ -1,0 +1,275 @@
+From 65e88e659008e2cbf79cf44975406ff0d569a3a9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Poho=C5=99elsk=C3=BD?= <opohorel@redhat.com>
+Date: Thu, 20 Nov 2025 12:24:59 +0100
+Subject: [PATCH] sideband: mask control characters
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The output of `git clone` is a vital component for understanding what
+has happened when things go wrong. However, these logs are partially
+under the control of the remote server (via the "sideband", which
+typically contains what the remote `git pack-objects` process sends to
+`stderr`), and is currently not sanitized by Git.
+
+This makes Git susceptible to ANSI escape sequence injection (see
+CWE-150, https://cwe.mitre.org/data/definitions/150.html), which allows
+attackers to corrupt terminal state, to hide information, and even to
+insert characters into the input buffer (i.e. as if the user had typed
+those characters).
+
+To plug this vulnerability, disallow any control character in the
+sideband, replacing them instead with the common `^<letter/symbol>`
+(e.g. `^[` for `\x1b`, `^A` for `\x01`).
+
+There is likely a need for more fine-grained controls instead of using a
+"heavy hammer" like this, which will be introduced subsequently.
+
+Signed-off-by: Johannes Schindelin <johannes.schindelin@gmx.de>
+
+sideband: introduce an "escape hatch" to allow control characters
+
+The preceding commit fixed the vulnerability whereas sideband messages
+(that are under the control of the remote server) could contain ANSI
+escape sequences that would be sent to the terminal verbatim.
+
+However, this fix may not be desirable under all circumstances, e.g.
+when remote servers deliberately add coloring to their messages to
+increase their urgency.
+
+To help with those use cases, give users a way to opt-out of the
+protections: `sideband.allowControlCharacters`.
+
+Signed-off-by: Johannes Schindelin <johannes.schindelin@gmx.de>
+
+sideband: do allow ANSI color sequences by default
+
+The preceding two commits introduced special handling of the sideband
+channel to neutralize ANSI escape sequences before sending the payload
+to the terminal, and `sideband.allowControlCharacters` to override that
+behavior.
+
+However, some `pre-receive` hooks that are actively used in practice
+want to color their messages and therefore rely on the fact that Git
+passes them through to the terminal.
+
+In contrast to other ANSI escape sequences, it is highly unlikely that
+coloring sequences can be essential tools in attack vectors that mislead
+Git users e.g. by hiding crucial information.
+
+Therefore we can have both: Continue to allow ANSI coloring sequences to
+be passed to the terminal, and neutralize all other ANSI escape
+sequences.
+
+Signed-off-by: Johannes Schindelin <johannes.schindelin@gmx.de>
+
+sideband: default to allowControlCharacters=true
+
+We don't want to change the default Git behaviour, just add the option
+to filter control characters.
+
+Signed-off-by: Ondřej Pohořelský <opohorel@redhat.com>
+---
+ Documentation/config.adoc           |  2 +
+ Documentation/config/sideband.adoc  | 16 ++++++
+ sideband.c                          | 78 ++++++++++++++++++++++++++++-
+ t/t5409-colorize-remote-messages.sh | 31 ++++++++++++
+ 4 files changed, 125 insertions(+), 2 deletions(-)
+ create mode 100644 Documentation/config/sideband.adoc
+
+diff --git a/Documentation/config.adoc b/Documentation/config.adoc
+index 62eebe7c54..dcea3c0c15 100644
+--- a/Documentation/config.adoc
++++ b/Documentation/config.adoc
+@@ -523,6 +523,8 @@ include::config/sequencer.adoc[]
+ 
+ include::config/showbranch.adoc[]
+ 
++include::config/sideband.adoc[]
++
+ include::config/sparse.adoc[]
+ 
+ include::config/splitindex.adoc[]
+diff --git a/Documentation/config/sideband.adoc b/Documentation/config/sideband.adoc
+new file mode 100644
+index 0000000000..c9ba24a02c
+--- /dev/null
++++ b/Documentation/config/sideband.adoc
+@@ -0,0 +1,16 @@
++sideband.allowControlCharacters::
++	By default, control characters that are delivered via the sideband
++	are NOT masked. Use this config setting to prevent potentially
++	unwanted ANSI escape sequences from being sent to the terminal:
+++
++--
++	color::
++		Allow ANSI color sequences, line feeds and horizontal tabs,
++		but mask all other control characters.
++	false::
++		Mask all control characters other than line feeds and
++		horizontal tabs.
++	true::
++		Allow all control characters to be sent to the terminal.
++		This is the default.
++--
+\ No newline at end of file
+diff --git a/sideband.c b/sideband.c
+index ea7c25211e..88d1b44a7a 100644
+--- a/sideband.c
++++ b/sideband.c
+@@ -26,6 +26,12 @@ static struct keyword_entry keywords[] = {
+ 	{ "error",	GIT_COLOR_BOLD_RED },
+ };
+ 
++static enum {
++	ALLOW_NO_CONTROL_CHARACTERS = 0,
++	ALLOW_ALL_CONTROL_CHARACTERS = 1,
++	ALLOW_ANSI_COLOR_SEQUENCES = 2
++} allow_control_characters = ALLOW_ALL_CONTROL_CHARACTERS;
++
+ /* Returns a color setting (GIT_COLOR_NEVER, etc). */
+ static enum git_colorbool use_sideband_colors(void)
+ {
+@@ -39,6 +45,25 @@ static enum git_colorbool use_sideband_colors(void)
+ 	if (use_sideband_colors_cached != GIT_COLOR_UNKNOWN)
+ 		return use_sideband_colors_cached;
+ 
++	switch (repo_config_get_maybe_bool(the_repository, "sideband.allowcontrolcharacters", &i)) {
++	case 0: /* Boolean value */
++		allow_control_characters = i ? ALLOW_ALL_CONTROL_CHARACTERS :
++			ALLOW_NO_CONTROL_CHARACTERS;
++		break;
++	case -1: /* non-Boolean value */
++		if (repo_config_get_string_tmp(the_repository, "sideband.allowcontrolcharacters",
++					      &value))
++			; /* huh? `get_maybe_bool()` returned -1 */
++		else if (!strcmp(value, "color"))
++			allow_control_characters = ALLOW_ANSI_COLOR_SEQUENCES;
++		else
++			warning(_("unrecognized value for `sideband."
++				  "allowControlCharacters`: '%s'"), value);
++		break;
++	default:
++		break; /* not configured */
++	}
++
+ 	if (!repo_config_get_string_tmp(the_repository, key, &value))
+ 		use_sideband_colors_cached = git_config_colorbool(key, value);
+ 	else if (!repo_config_get_string_tmp(the_repository, "color.ui", &value))
+@@ -66,6 +91,55 @@ void list_config_color_sideband_slots(struct string_list *list, const char *pref
+ 		list_config_item(list, prefix, keywords[i].keyword);
+ }
+ 
++static int handle_ansi_color_sequence(struct strbuf *dest, const char *src, int n)
++{
++	int i;
++
++	/*
++	 * Valid ANSI color sequences are of the form
++	 *
++	 * ESC [ [<n> [; <n>]*] m
++	 */
++
++	if (allow_control_characters != ALLOW_ANSI_COLOR_SEQUENCES ||
++	    n < 3 || src[0] != '\x1b' || src[1] != '[')
++		return 0;
++
++	for (i = 2; i < n; i++) {
++		if (src[i] == 'm') {
++			strbuf_add(dest, src, i + 1);
++			return i;
++		}
++		if (!isdigit(src[i]) && src[i] != ';')
++			break;
++	}
++
++	return 0;
++}
++
++static void strbuf_add_sanitized(struct strbuf *dest, const char *src, int n)
++{
++	int i;
++
++	if (allow_control_characters == ALLOW_ALL_CONTROL_CHARACTERS) {
++		strbuf_add(dest, src, n);
++		return;
++	}
++
++	strbuf_grow(dest, n);
++	for (; n && *src; src++, n--) {
++		if (!iscntrl(*src) || *src == '\t' || *src == '\n')
++			strbuf_addch(dest, *src);
++		else if ((i = handle_ansi_color_sequence(dest, src, n))) {
++			src += i;
++			n -= i;
++		} else {
++			strbuf_addch(dest, '^');
++			strbuf_addch(dest, 0x40 + *src);
++		}
++	}
++}
++
+ /*
+  * Optionally highlight one keyword in remote output if it appears at the start
+  * of the line. This should be called for a single line only, which is
+@@ -81,7 +155,7 @@ static void maybe_colorize_sideband(struct strbuf *dest, const char *src, int n)
+ 	int i;
+ 
+ 	if (!want_color_stderr(use_sideband_colors())) {
+-		strbuf_add(dest, src, n);
++		strbuf_add_sanitized(dest, src, n);
+ 		return;
+ 	}
+ 
+@@ -114,7 +188,7 @@ static void maybe_colorize_sideband(struct strbuf *dest, const char *src, int n)
+ 		}
+ 	}
+ 
+-	strbuf_add(dest, src, n);
++	strbuf_add_sanitized(dest, src, n);
+ }
+ 
+ 
+diff --git a/t/t5409-colorize-remote-messages.sh b/t/t5409-colorize-remote-messages.sh
+index fa5de4500a..2d40d8c640 100755
+--- a/t/t5409-colorize-remote-messages.sh
++++ b/t/t5409-colorize-remote-messages.sh
+@@ -98,4 +98,35 @@ test_expect_success 'fallback to color.ui' '
+ 	grep "<BOLD;RED>error<RESET>: error" decoded
+ '
+ 
++test_expect_success 'disallow (color) control sequences in sideband' '
++	write_script .git/color-me-surprised <<-\EOF &&
++	printf "error: Have you \\033[31mread\\033[m this?\\a\\n" >&2
++	exec "$@"
++	EOF
++	test_config_global uploadPack.packObjectshook ./color-me-surprised &&
++	test_commit need-at-least-one-commit &&
++
++	git -c sideband.allowControlCharacters=color \
++		clone --no-local . throw-away 2>stderr &&
++	test_decode_color <stderr >decoded &&
++	test_grep RED decoded &&
++	test_grep "\\^G" stderr &&
++	tr -dc "\\007" <stderr >actual &&
++	test_must_be_empty actual &&
++
++	rm -rf throw-away &&
++	git -c sideband.allowControlCharacters=false \
++		clone --no-local . throw-away 2>stderr &&
++	test_decode_color <stderr >decoded &&
++	test_grep ! RED decoded &&
++	test_grep "\\^G" stderr &&
++
++	rm -rf throw-away &&
++	git -c sideband.allowControlCharacters clone --no-local . throw-away 2>stderr &&
++	test_decode_color <stderr >decoded &&
++	test_grep RED decoded &&
++	tr -dc "\\007" <stderr >actual &&
++	test_file_not_empty actual
++'
++
+ test_done
+-- 
+2.51.1
+

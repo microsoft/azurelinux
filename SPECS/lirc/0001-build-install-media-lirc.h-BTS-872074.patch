@@ -1,0 +1,60 @@
+From 52173b7ae62ac421960083f936bd32cc54522fbc Mon Sep 17 00:00:00 2001
+From: Alec Leamas <leamas.alec@gmail.com>
+Date: Mon, 14 Aug 2017 10:31:55 +0200
+Subject: [PATCH] build: install media/lirc.h (BTS #872074).
+
+The plugin builds references this file. Basically, this should be
+resolved by lirc_driver.h, testing if the kernel header is
+available and using it if so, but without including config.h
+
+This fix adds an evil symlink to not remove anything. The proper
+fix includes actually moving the file and also streamlining the
+HAVE_KERNEL_LIRC_H to the generic HAVE_LINUX_LIRC_H.
+---
+ Makefile.am  | 5 ++++-
+ configure.ac | 3 +++
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 27eea83c..17faa549 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -146,12 +146,15 @@ install-data-hook:
+ 	$(SED) -i -e '/^plugindir/s|/usr/lib|$(libdir)|' \
+ 	    $(DESTDIR)$(lirc_confdir)/lirc_options.conf
+ 	cp -pr $(srcdir)/contrib $(DESTDIR)$(pkgdatadir)
++	chmod u+w $(DESTDIR)$(includedir)
++	cd $(DESTDIR)$(includedir)/lirc; ln -s include/media .
+ 
+ uninstall-hook:
+ 	-chmod -R u+w $(DESTDIR)/$(pkgdatadir)/contrib
+ 	-rm -rf $(DESTDIR)/$(pkgdatadir) \
+ 	        $(DESTDIR)/$(pkgpythondir) \
+-	        $(DESTDIR)/$(pkgdatadir)/contrib
++	        $(DESTDIR)/$(pkgdatadir)/contrib \
++		$(DESTDIR)$(includedir)/lirc
+ 
+ dist-hook: ChangeLog fix-version
+ 	touch -d "$(GIT_DATE_ISO)" $(distdir)/lib/lirc/* VERSION
+diff --git a/configure.ac b/configure.ac
+index 7b3b2d9e..28632c9d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -506,11 +506,14 @@ AC_DEFINE(LIRC_OPTIONS_VAR, ["LIRC_OPTIONS_PATH"],[
+         Environment variable overriding options file path])
+ 
+ AH_TOP([
++#ifndef ROOT_CONFIG_H
++#define ROOT_CONFIG_H
+ #include     "paths.h"
+ ])
+ 
+ AH_BOTTOM([
+ #include     "lirc/lirc_config.h"
++#endif // ROOT_CONFIG_H
+ ])
+ 
+ dnl write these decisions out to the Makefiles
+-- 
+2.49.0
+

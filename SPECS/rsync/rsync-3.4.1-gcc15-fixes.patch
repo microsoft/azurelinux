@@ -1,0 +1,36 @@
+From 026ef4cd09660c0a096e285e668b4ba7cd396509 Mon Sep 17 00:00:00 2001
+From: Michal Ruprich <mruprich@redhat.com>
+Date: Fri, 17 Jan 2025 12:37:57 +0100
+Subject: [PATCH] bool is a keyword in C23
+
+---
+ wildtest.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/wildtest.c b/wildtest.c
+index bea4cebbe..482cdf170 100644
+--- a/wildtest.c
++++ b/wildtest.c
+@@ -32,7 +32,9 @@ int fnmatch_errors = 0;
+ 
+ int wildmatch_errors = 0;
+ 
++#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 202311L
+ typedef char bool;
++#endif
+ 
+ int output_iterations = 0;
+ int explode_mod = 0;
+diff --git a/flist.c b/flist.c
+index d726394..0ac2020 100644
+--- a/flist.c
++++ b/flist.c
+@@ -2784,7 +2784,7 @@ struct file_list *recv_file_list(int f, int dir_ndx)
+ 		memcpy(the_fattr_list.files, flist->files,
+ 		       j * sizeof (struct file_struct *));
+ 		qsort(the_fattr_list.files, j,
+-		      sizeof the_fattr_list.files[0], (int (*)())fattr_compare);
++		      sizeof the_fattr_list.files[0], (int (*)(const void *, const void *))fattr_compare);
+ 		the_fattr_list.low = 0;
+ 		while (j-- > 0) {
+ 			struct file_struct *fp = the_fattr_list.files[j];

@@ -1,0 +1,44 @@
+From 3d94eee83717a5534adc992b00858d52dd46b6a3 Mon Sep 17 00:00:00 2001
+From: Fabian Affolter <mail@fabian-affolter.ch>
+Date: Tue, 24 Sep 2024 18:49:01 +0200
+Subject: [PATCH] Drop seedir
+
+---
+ tests/helpers.py | 17 -----------------
+ 1 file changed, 17 deletions(-)
+
+diff --git a/tests/helpers.py b/tests/helpers.py
+index 0b24d82..e88cb92 100644
+--- a/tests/helpers.py
++++ b/tests/helpers.py
+@@ -12,7 +12,6 @@
+ from unittest import TextTestRunner, main as unittest_main, SkipTest
+ 
+ from pytest import CaptureFixture, ExceptionInfo, main as pytest_main
+-from seedir import seedir
+ from testfixtures import compare
+ 
+ from sybil import Sybil
+@@ -112,22 +111,6 @@ def check_text(text: str, sybil: Sybil):
+     return document
+ 
+ 
+-def check_tree(expected: str, path: str):
+-    raw = seedir(
+-        DOCS / path,
+-        printout=False,
+-        first='folders',
+-        sort=True,
+-        regex=True,
+-        exclude_folders=r'\..+|__pycache__'
+-    )
+-    actual = '\n'+raw.split('\n', 1)[1]
+-    text = compare(expected=expected.strip(), actual=actual.strip(), raises=False)
+-    if text:  # pragma: no cover
+-        text += '\n\nShould be:\n'+actual
+-        raise AssertionError(text)
+-
+-
+ FUNCTIONAL_TEST_DIR = join(dirname(__file__), 'functional')
+ PYTEST = 'pytest'
+ UNITTEST = 'unittest'

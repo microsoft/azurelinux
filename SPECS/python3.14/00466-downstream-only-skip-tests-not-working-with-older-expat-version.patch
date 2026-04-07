@@ -1,0 +1,69 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Karolina Surma <ksurma@redhat.com>
+Date: Tue, 24 Jun 2025 11:12:13 +0200
+Subject: 00466: Downstream only: Skip tests not working with older expat
+ version
+
+We want to run these tests in Fedora and EPEL 10, but not in EPEL 9,
+which has too old version of expat. We set the upper bound version
+in the conditionalized skip to a release available in CentOS Stream 10,
+which is tested as working.
+---
+ Lib/test/test_pyexpat.py   | 2 ++
+ Lib/test/test_sax.py       | 2 ++
+ Lib/test/test_xml_etree.py | 6 ++++++
+ 3 files changed, 10 insertions(+)
+
+diff --git a/Lib/test/test_pyexpat.py b/Lib/test/test_pyexpat.py
+index daeaa38a3c..b243f1da14 100644
+--- a/Lib/test/test_pyexpat.py
++++ b/Lib/test/test_pyexpat.py
+@@ -847,6 +847,8 @@ def start_element(name, _):
+ 
+         self.assertEqual(started, ['doc'])
+ 
++    @unittest.skipIf(expat.version_info < (2, 7, 1),
++                     f"Skip for expat < 2.7.1 (version available in RHEL 10)")
+     def test_reparse_deferral_disabled(self):
+         started = []
+ 
+diff --git a/Lib/test/test_sax.py b/Lib/test/test_sax.py
+index 5c10bcedc6..1fd7a273b5 100644
+--- a/Lib/test/test_sax.py
++++ b/Lib/test/test_sax.py
+@@ -1241,6 +1241,8 @@ def test_flush_reparse_deferral_enabled(self):
+ 
+         self.assertEqual(result.getvalue(), start + b"<doc></doc>")
+ 
++    @unittest.skipIf(pyexpat.version_info < (2, 7, 1),
++                     f"Skip for expat < 2.7.1 (version available in RHEL 10)")
+     def test_flush_reparse_deferral_disabled(self):
+         result = BytesIO()
+         xmlgen = XMLGenerator(result)
+diff --git a/Lib/test/test_xml_etree.py b/Lib/test/test_xml_etree.py
+index 0b343cc4bb..145ecacd21 100644
+--- a/Lib/test/test_xml_etree.py
++++ b/Lib/test/test_xml_etree.py
+@@ -1573,9 +1573,13 @@ def test_simple_xml(self, chunk_size=None, flush=False):
+         self.assert_event_tags(parser, [('end', 'root')])
+         self.assertIsNone(parser.close())
+ 
++    @unittest.skipIf(pyexpat.version_info < (2, 7, 1),
++                     f"Skip for expat < 2.7.1 (version available in RHEL 10)")
+     def test_simple_xml_chunk_1(self):
+         self.test_simple_xml(chunk_size=1, flush=True)
+ 
++    @unittest.skipIf(pyexpat.version_info < (2, 7, 1),
++                     f"Skip for expat < 2.7.1 (version available in RHEL 10)")
+     def test_simple_xml_chunk_5(self):
+         self.test_simple_xml(chunk_size=5, flush=True)
+ 
+@@ -1802,6 +1806,8 @@ def test_flush_reparse_deferral_enabled(self):
+ 
+         self.assert_event_tags(parser, [('end', 'doc')])
+ 
++    @unittest.skipIf(pyexpat.version_info < (2, 7, 1),
++                     f"Skip for expat < 2.7.1 (version available in RHEL 10)")
+     def test_flush_reparse_deferral_disabled(self):
+         parser = ET.XMLPullParser(events=('start', 'end'))
+ 

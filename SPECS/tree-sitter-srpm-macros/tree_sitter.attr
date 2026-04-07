@@ -1,0 +1,26 @@
+# -*- rpm-spec -*-
+
+%__tree_sitter_provides() %{lua:
+    local lang = ({
+            string.find(rpm.expand('%1'), "/libtree%-sitter%-(.+)%.so")
+    })[3]
+    print(string.format("tree-sitter(%s)", lang))
+}
+
+%__tree_sitter_requires() %{lua:
+    local v = ({
+        string.find(rpm.expand('%1'), "/libtree%-sitter%-.+%.so%.(%d+)")
+    })[3]
+    if tonumber(v) == nil then
+    elseif tonumber(v) == 0 then
+        -- ABI version used cannot be determined from the filename.
+        -- Require any, and hope for the best.
+        print("tree-sitter(:LANGUAGE_VERSION)")
+    else
+        print(string.format("tree-sitter(:LANGUAGE_VERSION) = %d", v))
+    end
+}
+
+%__tree_sitter_magic %{__elf_magic}
+%__tree_sitter_path %{_libdir}/libtree-sitter-.+\.so.*
+%__tree_sitter_flags exeonly,magic_and_path

@@ -1,0 +1,119 @@
+diff --git a/gfx/layers/NativeLayerWayland.cpp b/gfx/layers/NativeLayerWayland.cpp
+--- a/gfx/layers/NativeLayerWayland.cpp
++++ b/gfx/layers/NativeLayerWayland.cpp
+@@ -1032,28 +1032,28 @@
+     mState.mMutatedPlacement = true;
+   }
+   mDirtyRegion = aUpdateRegion;
+ 
+   MOZ_DIAGNOSTIC_ASSERT(!mInProgressBuffer);
+-  if (mFrontBuffer && !mFrontBuffer->IsAttached()) {
++  if (mFrontBuffer && !mFrontBuffer->IsAttached(lock)) {
+     LOGVERBOSE(
+         "NativeLayerWaylandRender::NextSurfaceAsDrawTarget(): use front buffer "
+         "for rendering");
+     // the Wayland compositor released the buffer early, we can reuse it
+     mInProgressBuffer = std::move(mFrontBuffer);
+   } else {
+     LOGVERBOSE(
+         "NativeLayerWaylandRender::NextSurfaceAsDrawTarget(): use progress "
+         "buffer for rendering");
+     mInProgressBuffer = mSurfacePoolHandle->ObtainBufferFromPool(
+-        mSize, mRootLayer->GetDRMFormat());
++        lock, mSize, mRootLayer->GetDRMFormat());
+     if (mFrontBuffer) {
+       LOGVERBOSE(
+           "NativeLayerWaylandRender::NextSurfaceAsDrawTarget(): read-back from "
+           "front buffer");
+       ReadBackFrontBuffer(lock);
+-      mSurfacePoolHandle->ReturnBufferToPool(mFrontBuffer);
++      mSurfacePoolHandle->ReturnBufferToPool(lock, mFrontBuffer);
+       mFrontBuffer = nullptr;
+     }
+   }
+   MOZ_DIAGNOSTIC_ASSERT(!mFrontBuffer);
+ 
+@@ -1062,11 +1062,11 @@
+     wr::RenderThread::Get()->HandleWebRenderError(
+         wr::WebRenderError::NEW_SURFACE);
+     return nullptr;
+   }
+ 
+-  MOZ_DIAGNOSTIC_ASSERT(!mInProgressBuffer->IsAttached(),
++  MOZ_DIAGNOSTIC_ASSERT(!mInProgressBuffer->IsAttached(lock),
+                         "Reusing attached buffer!");
+ 
+   return mInProgressBuffer->Lock();
+ }
+ 
+@@ -1082,31 +1082,31 @@
+     mState.mMutatedPlacement = true;
+   }
+   mDirtyRegion = IntRegion(aUpdateRegion);
+ 
+   MOZ_DIAGNOSTIC_ASSERT(!mInProgressBuffer);
+-  if (mFrontBuffer && !mFrontBuffer->IsAttached()) {
++  if (mFrontBuffer && !mFrontBuffer->IsAttached(lock)) {
+     LOGVERBOSE(
+         "NativeLayerWaylandRender::NextSurfaceAsFramebuffer(): use front "
+         "buffer for rendering");
+     // the Wayland compositor released the buffer early, we can reuse it
+     mInProgressBuffer = std::move(mFrontBuffer);
+   } else {
+     LOGVERBOSE(
+         "NativeLayerWaylandRender::NextSurfaceAsFramebuffer(): use progress "
+         "buffer for rendering");
+     mInProgressBuffer = mSurfacePoolHandle->ObtainBufferFromPool(
+-        mSize, mRootLayer->GetDRMFormat());
++        lock, mSize, mRootLayer->GetDRMFormat());
+   }
+ 
+   MOZ_DIAGNOSTIC_ASSERT(mInProgressBuffer,
+                         "NativeLayerWaylandRender: Failed to obtain buffer");
+   if (!mInProgressBuffer) {
+     return Nothing();
+   }
+ 
+-  MOZ_DIAGNOSTIC_ASSERT(!mInProgressBuffer->IsAttached(),
++  MOZ_DIAGNOSTIC_ASSERT(!mInProgressBuffer->IsAttached(lock),
+                         "Reusing attached buffer!");
+ 
+   // get the framebuffer before handling partial damage so we don't accidently
+   // create one without depth buffer
+   Maybe<GLuint> fbo = mSurfacePoolHandle->GetFramebufferForBuffer(
+@@ -1120,11 +1120,11 @@
+   if (mFrontBuffer) {
+     LOGVERBOSE(
+         "NativeLayerWaylandRender::NextSurfaceAsFramebuffer(): read-back from "
+         "front buffer");
+     ReadBackFrontBuffer(lock);
+-    mSurfacePoolHandle->ReturnBufferToPool(mFrontBuffer);
++    mSurfacePoolHandle->ReturnBufferToPool(lock, mFrontBuffer);
+     mFrontBuffer = nullptr;
+   }
+ 
+   return fbo;
+ }
+@@ -1226,16 +1226,17 @@
+     const WaylandSurfaceLock& aProofOfLock, bool aForce) {
+   LOGVERBOSE(
+       "NativeLayerWaylandRender::DiscardBackbuffersLocked() force %d progress "
+       "%p front %p",
+       aForce, mInProgressBuffer.get(), mFrontBuffer.get());
+-  if (mInProgressBuffer && (!mInProgressBuffer->IsAttached() || aForce)) {
+-    mSurfacePoolHandle->ReturnBufferToPool(mInProgressBuffer);
++  if (mInProgressBuffer &&
++      (!mInProgressBuffer->IsAttached(aProofOfLock) || aForce)) {
++    mSurfacePoolHandle->ReturnBufferToPool(aProofOfLock, mInProgressBuffer);
+     mInProgressBuffer = nullptr;
+   }
+-  if (mFrontBuffer && (!mFrontBuffer->IsAttached() || aForce)) {
+-    mSurfacePoolHandle->ReturnBufferToPool(mFrontBuffer);
++  if (mFrontBuffer && (!mFrontBuffer->IsAttached(aProofOfLock) || aForce)) {
++    mSurfacePoolHandle->ReturnBufferToPool(aProofOfLock, mFrontBuffer);
+     mFrontBuffer = nullptr;
+   }
+ }
+ 
+ NativeLayerWaylandRender::~NativeLayerWaylandRender() {
+

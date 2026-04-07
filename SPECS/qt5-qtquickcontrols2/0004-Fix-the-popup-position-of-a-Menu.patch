@@ -1,0 +1,45 @@
+From 4d026ba17dac2c46a19073451570d93f1e58c52e Mon Sep 17 00:00:00 2001
+From: Inho Lee <inho.lee@qt.io>
+Date: Mon, 22 Aug 2022 21:05:00 +0800
+Subject: [PATCH 4/5] Fix the popup position of a Menu
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+QPA code should operate in native coord.
+Treat QWidgetPlatformMenu::showPopup's input as native coord.
+
+Fixes: QTBUG-94619
+Fixes: QTBUG-94783
+Change-Id: Iaa030c96d84e4a588e625fe191e4324f70be961f
+Reviewed-by: Morten Johan Sørvig <morten.sorvig@qt.io>
+(cherry picked from commit f8cf17166c9af147f0b8fea72f5b4a8a6098a5d7 in
+qtdeclarative)
+---
+ src/imports/platform/widgets/qwidgetplatformmenu.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/imports/platform/widgets/qwidgetplatformmenu.cpp b/src/imports/platform/widgets/qwidgetplatformmenu.cpp
+index e5fe734f7..e36922775 100644
+--- a/src/imports/platform/widgets/qwidgetplatformmenu.cpp
++++ b/src/imports/platform/widgets/qwidgetplatformmenu.cpp
+@@ -38,6 +38,7 @@
+ #include "qwidgetplatformmenuitem_p.h"
+ 
+ #include <QtGui/qwindow.h>
++#include <QtGui/private/qhighdpiscaling_p.h>
+ #include <QtWidgets/qmenu.h>
+ #include <QtWidgets/qaction.h>
+ 
+@@ -145,7 +146,7 @@ void QWidgetPlatformMenu::showPopup(const QWindow *window, const QRect &targetRe
+ 
+     QPoint targetPos = targetRect.bottomLeft();
+     if (window)
+-        targetPos = window->mapToGlobal(targetPos);
++        targetPos = window->mapToGlobal(QHighDpi::fromNativeLocalPosition(targetPos, window));
+ 
+     const QWidgetPlatformMenuItem *widgetItem = qobject_cast<const QWidgetPlatformMenuItem *>(item);
+     m_menu->popup(targetPos, widgetItem ? widgetItem->action() : nullptr);
+-- 
+2.51.1
+

@@ -1,0 +1,11 @@
+--- getrandom-0.1.16/Cargo.toml	2020-12-31T12:12:09+00:00
++++ getrandom-0.1.16/Cargo.toml	2023-05-18T14:44:12.577132+00:00
+@@ -43,8 +43,6 @@
+ std = []
+ test-in-browser = ["wasm-bindgen"]
+ wasm-bindgen = ["bindgen", "js-sys"]
+-[target."cfg(target_os = \"wasi\")".dependencies.wasi]
+-version = "0.9"
+ [target."cfg(unix)".dependencies.libc]
+ version = "0.2.64"
+ default-features = false

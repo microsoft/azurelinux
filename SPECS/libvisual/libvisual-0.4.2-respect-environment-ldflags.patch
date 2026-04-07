@@ -1,0 +1,12 @@
+diff -up libvisual-0.4.2/libvisual/Makefile.am.ldflags libvisual-0.4.2/libvisual/Makefile.am
+--- libvisual-0.4.2/libvisual/Makefile.am.ldflags	2025-07-02 11:32:52.931923204 -0400
++++ libvisual-0.4.2/libvisual/Makefile.am	2025-07-02 11:33:07.373056985 -0400
+@@ -29,7 +29,7 @@ AM_CFLAGS = -DPLUGPATH="\"$(LIBVISUAL_PL
+ AM_CPPFLAGS = -I$(top_srcdir) -I$(top_srcdir)/libvisual \
+ 	-I$(top_builddir) -I$(top_builddir)/libvisual
+ 
+-libvisual_@LIBVISUAL_VERSION_SUFFIX@_la_LDFLAGS = -export-dynamic -no-undefined
++libvisual_@LIBVISUAL_VERSION_SUFFIX@_la_LDFLAGS = $(LDFLAGS) -export-dynamic -no-undefined
+ 
+ libvisual_@LIBVISUAL_VERSION_SUFFIX@_la_SOURCES = lv_actor.c lv_input.c lv_event.c \
+ 		       lv_bin.c lv_plugin.c lv_video.c lv_video_simd.c lv_mem.c \

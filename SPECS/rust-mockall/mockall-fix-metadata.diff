@@ -1,0 +1,14 @@
+--- mockall-0.11.4/Cargo.toml	1970-01-01T00:00:01+00:00
++++ mockall-0.11.4/Cargo.toml	2023-03-27T08:38:49.079591+00:00
+@@ -55,11 +55,6 @@
+ replace = "{{date}}"
+ search = "ReleaseDate"
+ 
+-[[example]]
+-name = "serde"
+-crate-type = ["lib"]
+-path = "examples/serde.rs"
+-
+ [dependencies.cfg-if]
+ version = "1.0"
+ 

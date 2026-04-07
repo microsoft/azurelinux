@@ -1,0 +1,91 @@
+--- rustls-0.23.36/Cargo.toml	1970-01-01T00:00:01+00:00
++++ rustls-0.23.36/Cargo.toml	2026-01-25T08:58:28.597831+00:00
+@@ -54,13 +54,6 @@
+ ]
+ 
+ [features]
+-aws-lc-rs = ["aws_lc_rs"]
+-aws_lc_rs = [
+-    "dep:aws-lc-rs",
+-    "webpki/aws-lc-rs",
+-    "aws-lc-rs/aws-lc-sys",
+-    "aws-lc-rs/prebuilt-nasm",
+-]
+ brotli = [
+     "dep:brotli",
+     "dep:brotli-decompressor",
+@@ -68,19 +61,12 @@
+ ]
+ custom-provider = []
+ default = [
+-    "aws_lc_rs",
+     "logging",
+-    "prefer-post-quantum",
++    "ring",
+     "std",
+     "tls12",
+ ]
+-fips = [
+-    "aws_lc_rs",
+-    "aws-lc-rs?/fips",
+-    "webpki/aws-lc-rs-fips",
+-]
+ logging = ["log"]
+-prefer-post-quantum = ["aws_lc_rs"]
+ read_buf = [
+     "rustversion",
+     "std",
+@@ -105,25 +91,14 @@
+ name = "test_ca"
+ path = "examples/internal/test_ca.rs"
+ 
+-[[bench]]
+-name = "benchmarks"
+-path = "benches/benchmarks.rs"
+-harness = false
+-required-features = ["ring"]
+-
+-[dependencies.aws-lc-rs]
+-version = "1.14"
+-optional = true
+-default-features = false
+-
+ [dependencies.brotli]
+-version = "8"
++version = ">=7,<9"
+ features = ["std"]
+ optional = true
+ default-features = false
+ 
+ [dependencies.brotli-decompressor]
+-version = "5.0.0"
++version = ">=4,<6"
+ optional = true
+ 
+ [dependencies.hashbrown]
+@@ -170,15 +145,12 @@
+ version = "1.8"
+ 
+ [dependencies.zlib-rs]
+-version = "0.5"
++version = "0.6"
+ optional = true
+ 
+ [dev-dependencies.base64]
+ version = "0.22"
+ 
+-[dev-dependencies.bencher]
+-version = "0.1.5"
+-
+ [dev-dependencies.env_logger]
+ version = "0.11"
+ 
+@@ -198,7 +170,7 @@
+ version = "0.14"
+ features = [
+     "pem",
+-    "aws_lc_rs",
++    "ring",
+ ]
+ default-features = false
+ 

@@ -1,0 +1,65 @@
+--- freetype-2.9/builds/unix/freetype-config.in
++++ freetype-2.9/builds/unix/freetype-config.in
+@@ -13,45 +13,25 @@ LC_ALL=C
+ export LC_ALL
+ 
+ 
+-# if `pkg-config' is available, use values from `freetype2.pc'
+-%PKG_CONFIG% --atleast-pkgconfig-version 0.24 >/dev/null 2>&1
+-if test $? -eq 0 ; then
+-  # note that option `--variable' is not affected by the
+-  # PKG_CONFIG_SYSROOT_DIR environment variable
+-  if test "x$SYSROOT" != "x" ; then
+-    PKG_CONFIG_SYSROOT_DIR="$SYSROOT"
+-    export PKG_CONFIG_SYSROOT_DIR
+-  fi
+-
+-  prefix=`%PKG_CONFIG% --variable prefix freetype2`
+-  exec_prefix=`%PKG_CONFIG% --variable exec_prefix freetype2`
+-
+-  includedir=`%PKG_CONFIG% --variable includedir freetype2`
+-  libdir=`%PKG_CONFIG% --variable libdir freetype2`
+-
+-  version=`%PKG_CONFIG% --modversion freetype2`
+-
+-  cflags=`%PKG_CONFIG% --cflags freetype2`
+-  dynamic_libs=`%PKG_CONFIG% --libs freetype2`
+-  static_libs=`%PKG_CONFIG% --static --libs freetype2`
+-else
+-  prefix="%prefix%"
+-  exec_prefix="%exec_prefix%"
+-
+-  includedir="%includedir%"
+-  libdir="%libdir%"
+-
+-  version=%ft_version%
+-
+-  cflags="-I${SYSROOT}$includedir/freetype2"
+-  dynamic_libs="-lfreetype"
+-  static_libs="%LIBSSTATIC_CONFIG%"
+-  if test "${SYSROOT}$libdir" != "/usr/lib"   &&
+-     test "${SYSROOT}$libdir" != "/usr/lib64" ; then
+-    libs_L="-L${SYSROOT}$libdir"
+-  fi
++# note that option `--variable' is not affected by the
++# PKG_CONFIG_SYSROOT_DIR environment variable
++if test "x$SYSROOT" != "x" ; then
++  PKG_CONFIG_SYSROOT_DIR="$SYSROOT"
++  export PKG_CONFIG_SYSROOT_DIR
+ fi
+ 
++prefix=`pkgconf --variable prefix freetype2`
++exec_prefix=`pkgconf --variable exec_prefix freetype2`
++
++includedir=`pkgconf --variable includedir freetype2`
++libdir=`pkgconf --variable libdir freetype2`
++
++version=`pkgconf --modversion freetype2`
++
++cflags=`pkgconf --cflags freetype2`
++dynamic_libs=`pkgconf --libs freetype2`
++static_libs=`pkgconf --static --libs freetype2`
++
+ orig_prefix=$prefix
+ orig_exec_prefix=$exec_prefix
+ 

@@ -1,0 +1,215 @@
+diff --git a/logging.c b/logging.c
+index 9e86808..613ff4b 100644
+--- a/logging.c
++++ b/logging.c
+@@ -171,7 +171,14 @@ vsf_log_do_log_to_file(int fd, struct mystr* p_str)
+       return;
+     }
+   }
+-  str_replace_unprintable(p_str, '?');
++  if (tunable_wc_logs_enable)
++  {
++    str_replace_unprintable_with_hex_wc(p_str);
++  }
++  else
++  {
++    str_replace_unprintable_with_hex(p_str);
++  }
+   str_append_char(p_str, '\n');
+   /* Ignore write failure; maybe the disk filled etc. */
+   (void) str_write_loop(p_str, fd);
+diff --git a/parseconf.c b/parseconf.c
+index 3cfe7da..3729818 100644
+--- a/parseconf.c
++++ b/parseconf.c
+@@ -113,6 +113,7 @@ parseconf_bool_array[] =
+   { "allow_writeable_chroot", &tunable_allow_writeable_chroot },
+   { "better_stou", &tunable_better_stou },
+   { "log_die", &tunable_log_die },
++  { "wc_logs_enable", &tunable_wc_logs_enable },
+   { 0, 0 }
+ };
+ 
+diff --git a/str.c b/str.c
+index 82b8ae4..c03e7d8 100644
+--- a/str.c
++++ b/str.c
+@@ -20,6 +20,11 @@
+ #include "utility.h"
+ #include "sysutil.h"
+ 
++#include <stdio.h>
++#include <string.h>
++#include <wchar.h>
++#include <wctype.h>
++
+ /* File local functions */
+ static void str_split_text_common(struct mystr* p_src, struct mystr* p_rhs,
+                                   const char* p_text, int is_reverse);
+@@ -723,6 +728,102 @@ str_replace_unprintable(struct mystr* p_str, char new_char)
+   }
+ }
+ 
++void
++str_replace_unprintable_with_hex(struct mystr* p_str)
++{
++  unsigned int ups_size = sizeof(unsigned int) * (p_str->len);
++  if (ups_size < p_str->len)
++  {
++    str_replace_unprintable(p_str, '?');
++    str_append_text(p_str, ": BUG: string is too long");
++    bug(p_str->p_buf);
++  }
++  unsigned int* ups = vsf_sysutil_malloc(ups_size);
++  unsigned int up_count = 0;
++  for (unsigned int i=0; i < p_str->len; i++)
++  {
++    if (!vsf_sysutil_isprint(p_str->p_buf[i]))
++    {
++      ups[up_count++] = i;
++    }
++  }
++  str_replace_positions_with_hex(p_str, ups, up_count);
++  vsf_sysutil_free(ups);
++}
++
++void str_replace_unprintable_with_hex_wc(struct mystr* p_str)
++{
++  unsigned int ups_size = sizeof(unsigned int) * (p_str->len);
++  if (ups_size < p_str->len)
++  {
++    str_replace_unprintable(p_str, '?');
++    str_append_text(p_str, ": BUG: string is too long");
++    bug(p_str->p_buf);
++  }
++  unsigned int* ups = vsf_sysutil_malloc(ups_size);
++  unsigned int up_count = 0;
++
++  size_t current = 0;
++  wchar_t pwc;
++  mbstate_t ps;
++  memset(&ps, 0, sizeof(ps));
++  ssize_t len = 0;
++  while ((len = mbrtowc(&pwc, p_str->p_buf, p_str->len - current, &ps)) > 0)
++  {
++    if (!iswprint(pwc))
++    {
++      for (int i = 0; i < len; i++)
++      {
++        ups[up_count++] = current++;
++      }
++    }
++    else
++    {
++      current += len;
++    }
++  }
++  if (len < 0)
++  {
++    while (current < p_str->len)
++    {
++      ups[up_count++] = current++;
++    }
++  }
++  str_replace_positions_with_hex(p_str, ups, up_count);
++  vsf_sysutil_free(ups);
++}
++
++void
++str_replace_positions_with_hex(struct mystr* p_str, const unsigned int* poss, const unsigned int pos_count)
++{
++  if (pos_count == 0)
++    return;
++
++  struct mystr tmp_str = INIT_MYSTR;
++  str_reserve(&tmp_str, p_str->len + 3 * pos_count);
++  unsigned int current = 0;
++
++  for (unsigned int i=0; i < pos_count; i++)
++  {
++    unsigned int pos = poss[i];
++
++    if (current < pos)
++      private_str_append_memchunk(&tmp_str, p_str->p_buf + current, pos - current);
++
++    char hex_buf[5];
++    memset(hex_buf, 0, sizeof(hex_buf));
++    sprintf(hex_buf, "\\x%02X", (unsigned char) p_str->p_buf[pos]);
++    str_append_text(&tmp_str, hex_buf);
++    current = pos + 1;
++  }
++
++  if (current < p_str->len)
++    private_str_append_memchunk(&tmp_str, p_str->p_buf + current, p_str->len - current);
++
++  str_copy(p_str, &tmp_str);
++  str_free(&tmp_str);
++}
++
+ void
+ str_basename (struct mystr* d_str, const struct mystr* path)
+ {
+diff --git a/str.h b/str.h
+index 44270da..95a83b5 100644
+--- a/str.h
++++ b/str.h
+@@ -98,6 +98,10 @@ int str_contains_space(const struct mystr* p_str);
+ int str_all_space(const struct mystr* p_str);
+ int str_contains_unprintable(const struct mystr* p_str);
+ void str_replace_unprintable(struct mystr* p_str, char new_char);
++void str_replace_unprintable_with_hex(struct mystr* p_str);
++void str_replace_unprintable_with_hex_wc(struct mystr* p_str);
++void str_replace_positions_with_hex(struct mystr* p_str, const unsigned int* poss,
++                                    const unsigned int pos_count);
+ int str_atoi(const struct mystr* p_str);
+ filesize_t str_a_to_filesize_t(const struct mystr* p_str);
+ unsigned int str_octal_to_uint(const struct mystr* p_str);
+diff --git a/tunables.c b/tunables.c
+index a7ce9c8..c96c1ac 100644
+--- a/tunables.c
++++ b/tunables.c
+@@ -94,6 +94,7 @@ int tunable_seccomp_sandbox;
+ int tunable_allow_writeable_chroot;
+ int tunable_better_stou;
+ int tunable_log_die;
++int tunable_wc_logs_enable;
+ 
+ unsigned int tunable_accept_timeout;
+ unsigned int tunable_connect_timeout;
+@@ -244,6 +245,7 @@ tunables_load_defaults()
+   tunable_allow_writeable_chroot = 0;
+   tunable_better_stou = 0;
+   tunable_log_die = 0;
++  tunable_wc_logs_enable = 0;
+ 
+   tunable_accept_timeout = 60;
+   tunable_connect_timeout = 60;
+diff --git a/tunables.h b/tunables.h
+index 029d645..8d50150 100644
+--- a/tunables.h
++++ b/tunables.h
+@@ -98,6 +98,7 @@ extern int tunable_better_stou;               /* Use better file name generation
+ 					       */
+ extern int tunable_log_die;                   /* Log calls to die(), die2()
+                                                * and bug() */
++extern int tunable_wc_logs_enable;            /* Allow non ASCII characters in logs */
+ 
+ /* Integer/numeric defines */
+ extern unsigned int tunable_accept_timeout;
+diff --git a/vsftpd.conf.5 b/vsftpd.conf.5
+index ce3fba3..815773f 100644
+--- a/vsftpd.conf.5
++++ b/vsftpd.conf.5
+@@ -735,6 +735,12 @@ If enabled, use CLONE_NEWPID and CLONE_NEWIPC to isolate processes to their
+ ipc and pid namespaces. So separated processes can not interact with each other.
+ 
+ Default: YES
++.TP
++.B wc_logs_enable
++If enabled, logs will be treated as wide-character strings and not just
++ASCII strings when filtering out non-printable characters.
++
++Default: NO
+ 
+ .SH NUMERIC OPTIONS
+ Below is a list of numeric options. A numeric option must be set to a non

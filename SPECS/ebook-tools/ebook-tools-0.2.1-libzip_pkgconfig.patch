@@ -1,0 +1,82 @@
+diff -up ebook-tools-0.2.1/cmake/FindLibZip.cmake.libzip_pkgconfig ebook-tools-0.2.1/cmake/FindLibZip.cmake
+--- ebook-tools-0.2.1/cmake/FindLibZip.cmake.libzip_pkgconfig	2008-04-06 12:16:33.000000000 -0500
++++ ebook-tools-0.2.1/cmake/FindLibZip.cmake	2012-07-10 14:48:32.540578446 -0500
+@@ -2,35 +2,55 @@
+ # Once done this will define
+ #
+ #  LIBZIP_FOUND - system has the zip library
+-#  LIBZIP_INCLUDE_DIR - the zip include directory
+-#  LIBZIP_LIBRARY - Link this to use the zip library
++#  LIBZIP_INCLUDE_DIRS - the zip include directories
++#  LIBZIP_LIBRARIES - Link this to use the zip library
+ #
+ # Copyright (c) 2006, Pino Toscano, <toscano.pino@tiscali.it>
+ #
+ # Redistribution and use is allowed according to the terms of the BSD license.
+ # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
+ 
+-if (LIBZIP_LIBRARY AND LIBZIP_INCLUDE_DIR)
++if (LIBZIP_LIBRARIES AND LIBZIP_INCLUDE_DIRS)
+   # in cache already
+   set(LIBZIP_FOUND TRUE)
+-else (LIBZIP_LIBRARY AND LIBZIP_INCLUDE_DIR)
++else (LIBZIP_LIBRARIES AND LIBZIP_INCLUDE_DIRS)
++
++  # use pkg-config to get the directories and then use these values
++  # in the FIND_PATH() and FIND_LIBRARY() calls
++  FIND_PACKAGE(PkgConfig QUIET)
++  PKG_CHECK_MODULES(PC_LIBZIP libzip)
+ 
+   find_path(LIBZIP_INCLUDE_DIR zip.h
++    HINTS
++    ${GNUWIN32_DIR}/include
++    ${PC_LIBZIP_INCLUDEDIR}
++    ${PC_LIBZIP_INCLUDE_DIRS}
++    PATH_SUFFIXES libzip
++  )
++
++  find_path(LIBZIP_LIB_INCLUDE_DIR zipconf.h
++    HINTS
+     ${GNUWIN32_DIR}/include
++    ${PC_LIBZIP_INCLUDEDIR}
++    ${PC_LIBZIP_INCLUDE_DIRS}
++    PATH_SUFFIXES libzip
+   )
++  set(LIBZIP_INCLUDE_DIRS ${LIBZIP_INCLUDE_DIR} ${LIBZIP_LIB_INCLUDE_DIR})
+ 
+-  find_library(LIBZIP_LIBRARY NAMES zip
+-    PATHS
++  find_library(LIBZIP_LIBRARIES NAMES zip
++    HINTS 
++    ${PC_LIBZIP_LIBDIR}
++    ${PC_LIBZIP_LIBRARY_DIRS}
+     ${GNUWIN32_DIR}/lib
+   )
+ 
+   include(FindPackageHandleStandardArgs)
+-  FIND_PACKAGE_HANDLE_STANDARD_ARGS(LibZip DEFAULT_MSG LIBZIP_LIBRARY LIBZIP_INCLUDE_DIR)
++  FIND_PACKAGE_HANDLE_STANDARD_ARGS(LibZip DEFAULT_MSG LIBZIP_LIBRARIES LIBZIP_INCLUDE_DIRS)
+ 
+     # ensure that they are cached
+-    set(LIBZIP_INCLUDE_DIR ${LIBZIP_INCLUDE_DIR} CACHE INTERNAL "The libzip include path")
+-    set(LIBZIP_LIBRARY ${LIBZIP_LIBRARY} CACHE INTERNAL "The libraries needed to use libzip")
++    set(LIBZIP_INCLUDE_DIRS ${LIBZIP_INCLUDE_DIRS} CACHE INTERNAL "The libzip include paths")
++    set(LIBZIP_LIBRARIES ${LIBZIP_LIBRARIES} CACHE INTERNAL "The libraries needed to use libzip")
+ 
+-endif (LIBZIP_LIBRARY AND LIBZIP_INCLUDE_DIR)
++endif (LIBZIP_LIBRARIES AND LIBZIP_INCLUDE_DIRS)
+ 
+-mark_as_advanced(LIBZIP_INCLUDE_DIR LIBZIP_LIBRARY)
++mark_as_advanced(LIBZIP_INCLUDE_DIRS LIBZIP_LIBRARIES)
+diff -up ebook-tools-0.2.1/src/libepub/CMakeLists.txt.libzip_pkgconfig ebook-tools-0.2.1/src/libepub/CMakeLists.txt
+--- ebook-tools-0.2.1/src/libepub/CMakeLists.txt.libzip_pkgconfig	2012-07-10 14:32:58.356257360 -0500
++++ ebook-tools-0.2.1/src/libepub/CMakeLists.txt	2012-07-10 14:32:58.359257323 -0500
+@@ -1,6 +1,6 @@
+-include_directories (${EBOOK-TOOLS_SOURCE_DIR}/src/libepub ${LIBXML2_INCLUDE_DIR} ${LIBZIP_INCLUDE_DIR})
++include_directories (${EBOOK-TOOLS_SOURCE_DIR}/src/libepub ${LIBXML2_INCLUDE_DIR} ${LIBZIP_INCLUDE_DIRS})
+ add_library (epub SHARED epub.c ocf.c opf.c linklist.c list.c)
+-target_link_libraries (epub ${LIBZIP_LIBRARY} ${LIBXML2_LIBRARIES})
++target_link_libraries (epub ${LIBZIP_LIBRARIES} ${LIBXML2_LIBRARIES})
+ 
+ set_target_properties (epub PROPERTIES VERSION 0.2.1 SOVERSION 0)
+ 

@@ -1,0 +1,55 @@
+From d18ad2911676b4d6b03877ffe94178ea983dc387 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Wed, 3 Jul 2024 12:58:59 +0200
+Subject: [PATCH] Stop accessing None as a dictionary
+
+PyMapping_HasKeyString does not work on None
+Accidentally, it used to return false result on silent errors.
+
+Since Python 3.13, this is what happens instead:
+
+    >>> import pylibmc
+    >>> m = pylibmc.Client(["10.0.0.1"], binary=True)
+    Exception ignored in PyMapping_HasKeyString(); consider using PyMapping_HasKeyStringWithError(), PyMapping_GetOptionalItemString() or PyMapping_GetItemString():
+    Traceback (most recent call last):
+      File "/usr/lib64/python3.13/site-packages/pylibmc/client.py", line 142, in __init__
+        super().__init__(servers=translate_server_specs(servers),
+    TypeError: 'NoneType' object is not subscriptable
+    ...
+    Exception ignored in PyMapping_HasKeyString(); consider using PyMapping_HasKeyStringWithError(), PyMapping_GetOptionalItemString() or PyMapping_GetItemString():
+    Traceback (most recent call last):
+      File "/usr/lib64/python3.13/site-packages/pylibmc/client.py", line 142, in __init__
+        super().__init__(servers=translate_server_specs(servers),
+    TypeError: 'NoneType' object is not subscriptable
+
+When this is run via pytest, it leads to:
+
+    pytest.PytestUnraisableExceptionWarning: Exception ignored in PyMapping_HasKeyString(); consider using PyMapping_HasKeyStringWithError(), PyMapping_GetOptionalItemString() or PyMapping_GetItemString(): None
+
+Fixes https://github.com/pallets-eco/cachelib/issues/400
+---
+ src/_pylibmcmodule.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/_pylibmcmodule.c b/src/_pylibmcmodule.c
+index a34d2b5..545b658 100644
+--- a/src/_pylibmcmodule.c
++++ b/src/_pylibmcmodule.c
+@@ -2082,7 +2082,7 @@ static PyObject *PylibMC_Client_set_behaviors(PylibMC_Client *self,
+     char *key;
+ 
+     for (b = PylibMC_behaviors; b->name != NULL; b++) {
+-        if (!PyMapping_HasKeyString(behaviors, b->name)) {
++        if (behaviors == Py_None || !PyMapping_HasKeyString(behaviors, b->name)) {
+             continue;
+         } else if ((py_v = PyMapping_GetItemString(behaviors, b->name)) == NULL) {
+             goto error;
+@@ -2112,7 +2112,7 @@ static PyObject *PylibMC_Client_set_behaviors(PylibMC_Client *self,
+     }
+ 
+     for (b = PylibMC_callbacks; b->name != NULL; b++) {
+-        if (!PyMapping_HasKeyString(behaviors, b->name)) {
++        if (behaviors == Py_None || !PyMapping_HasKeyString(behaviors, b->name)) {
+             continue;
+         } else if ((py_v = PyMapping_GetItemString(behaviors, b->name)) == NULL) {
+             goto error;

@@ -1,0 +1,22 @@
+--- a/qpy/QtCore/qpycore_pyqtsignal.orig.cpp	2018-08-31 09:37:06.000000000 +0200
++++ b/qpy/QtCore/qpycore_pyqtsignal.cpp	2023-11-05 17:47:42.354946586 +0100
+@@ -658,7 +658,7 @@
+     if (!func)
+         return 0;
+ 
+-    PyObject *result = PyCFunction_Call(func, args, kw);
++    PyObject *result = PyObject_Call(func, args, kw);
+ 
+     Py_DECREF(func);
+ 
+--- a/qpy/QtCore/qpycore_qtlib.orig.cpp	2018-08-31 09:37:06.000000000 +0200
++++ b/qpy/QtCore/qpycore_qtlib.cpp	2024-07-15 15:30:16.120246662 +0200
+@@ -127,7 +127,7 @@
+ 
+     for (;;)
+     {
+-        PyObject *resobj = PyEval_CallObject(sfunc, sa);
++        PyObject *resobj = PyObject_Call(sfunc, sa, NULL);
+ 
+         if (resobj)
+         {

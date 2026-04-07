@@ -1,0 +1,35 @@
+From 423cbf4ddca6578b87e0f8a3fc425688cd1ca89c Mon Sep 17 00:00:00 2001
+From: Martin Sehnoutka <msehnout@redhat.com>
+Date: Tue, 6 Sep 2016 16:18:39 +0200
+Subject: [PATCH 06/59] Close stdin/out/err before listening for incoming
+ connections.
+
+When running vsftpd as a stand-alone FTP daemon, vsftpd
+did not close stdin/out/err. This caused the start script
+to hang waiting for stdin to close. Before this patch was
+applied, one had to hit ctrl+c in order to get shell prompt
+back. Correct behavior:
+$ /etc/init.d/vsftpd start | tee
+Starting vsftpd for vsftpd:                                [  OK  ]
+$
+---
+ standalone.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/standalone.c b/standalone.c
+index ba01ab1..e0f2d5b 100644
+--- a/standalone.c
++++ b/standalone.c
+@@ -130,6 +130,9 @@ vsf_standalone_main(void)
+       die("could not bind listening IPv6 socket");
+     }
+   }
++  vsf_sysutil_close(0);
++  vsf_sysutil_close(1);
++  vsf_sysutil_close(2);
+   retval = vsf_sysutil_listen(listen_sock, VSFTP_LISTEN_BACKLOG);
+   if (vsf_sysutil_retval_is_error(retval))
+   {
+-- 
+2.14.4
+

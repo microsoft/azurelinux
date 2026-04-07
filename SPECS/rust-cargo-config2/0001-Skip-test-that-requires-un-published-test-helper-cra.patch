@@ -1,0 +1,29 @@
+From 4c63b7bb390cda05b6ff7e32c930e2e814bd3223 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Fri, 12 Sep 2025 15:10:32 +0200
+Subject: [PATCH] Skip test that requires un-published test-helper crate
+
+---
+ src/gen/tests/track_size.rs | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/src/gen/tests/track_size.rs b/src/gen/tests/track_size.rs
+index 94ef470..be2d8ca 100644
+--- a/src/gen/tests/track_size.rs
++++ b/src/gen/tests/track_size.rs
+@@ -17,11 +17,7 @@ fn write_size<T>(out: &mut String) {
+ /// Ignore non-64-bit targets due to usize/ptr size, ignore Miri/cargo-careful as we set
+ /// -Z randomize-layout for them, and ignore old rustc as any::type_name output and size
+ /// optimization may differ between compiler versions.
+-#[rustversion::attr(
+-    nightly,
+-    cfg_attr(any(not(target_pointer_width = "64"), miri, careful), ignore)
+-)]
+-#[rustversion::attr(not(nightly), ignore)]
++#[cfg(any())]
+ #[test]
+ fn track_size() {
+     let mut out = String::new();
+-- 
+2.51.0
+

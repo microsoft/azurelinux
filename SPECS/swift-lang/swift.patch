@@ -1,0 +1,50 @@
+diff --git swift.orig/include/swift/AST/FunctionRefInfo.h swift/include/swift/AST/FunctionRefInfo.h
+index a298f08e8c2..75d3f18c222 100644
+--- swift.orig/include/swift/AST/FunctionRefInfo.h
++++ swift/include/swift/AST/FunctionRefInfo.h
+@@ -18,6 +18,7 @@
+ #ifndef SWIFT_AST_FUNCTION_REF_INFO_H
+ #define SWIFT_AST_FUNCTION_REF_INFO_H
+ 
++#include <cstdint>
+ #include "swift/Basic/Debug.h"
+ #include "swift/Basic/LLVM.h"
+ 
+diff --git swift.orig/stdlib/include/llvm/ADT/SmallVector.h swift/stdlib/include/llvm/ADT/SmallVector.h
+index 56b9e606302..ca651fc8845 100644
+--- swift.orig/stdlib/include/llvm/ADT/SmallVector.h
++++ swift/stdlib/include/llvm/ADT/SmallVector.h
+@@ -21,6 +21,7 @@
+ #include <algorithm>
+ #include <cassert>
+ #include <cstddef>
++#include <cstdint>
+ #include <cstdlib>
+ #include <cstring>
+ #include <functional>
+diff --git swift.orig/utils/build-presets.ini swift/utils/build-presets.ini
+index 75043cb69a7..25aec6bc29a 100644
+--- swift.orig/utils/build-presets.ini
++++ swift/utils/build-presets.ini
+@@ -886,7 +886,7 @@ build-wasm-stdlib
+ # Executes the lit tests for the installable package that is created
+ # Assumes the swift-integration-tests repo is checked out
+ 
+-test-installable-package
++# test-installable-package
+ 
+ # Build the benchmarks against the toolchain.
+ toolchain-benchmarks
+diff --git swift.orig/utils/build-script-impl swift/utils/build-script-impl
+index 3140c8bb545..32a0b502ae6 100755
+--- swift.orig/utils/build-script-impl
++++ swift/utils/build-script-impl
+@@ -2179,7 +2179,7 @@ for host in "${ALL_HOSTS[@]}"; do
+                     -DLLDB_ENABLE_CURSES=ON
+                     -DLLDB_ENABLE_LIBEDIT=ON
+                     -DLLDB_ENABLE_PYTHON=ON
+-                    -DLLDB_ENABLE_LZMA=OFF
++                    -DLLDB_ENABLE_LZMA=ON
+                     -DLLDB_ENABLE_LUA=OFF
+                     -DLLDB_INCLUDE_TESTS:BOOL="${should_configure_tests}"
+                     -DLLDB_TEST_LIBCXX_ROOT_DIR:STRING="${libcxx_build_dir}"

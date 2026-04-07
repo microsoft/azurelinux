@@ -1,0 +1,25 @@
+From 33de54a6aa78cd39453a23501ceaa87230140009 Mon Sep 17 00:00:00 2001
+Message-ID: <33de54a6aa78cd39453a23501ceaa87230140009.1724357801.git.git@grubix.eu>
+From: Michael J Gruber <git@grubix.eu>
+Date: Thu, 22 Aug 2024 22:16:36 +0200
+Subject: [PATCH] reduce poetry build dependency to core
+
+---
+ pyproject.toml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 2b479bd..850266e 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -30,5 +30,5 @@ black = {version = "^18.9b0", python = "^3.6"}
+ 
+ 
+ [build-system]
+-requires = ["poetry>=1.0.0"]
+-build-backend = "poetry.masonry.api"
++requires = ["poetry-core>=1.0.0"]
++build-backend = "poetry.core.masonry.api"
+-- 
+2.46.0.444.g7c79821ace
+

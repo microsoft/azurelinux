@@ -1,0 +1,146 @@
+## Fedora README
+
+0.9.2
+
+This a major upstream update. Don't expect things to be the same, read
+the NEWS file in the documentation (/usr/share/doc/lirc/NEWS).
+
+Packaging-wise, the package has been split into smaller packages. Installing
+the 'lirc' package will bring all of them. You might be interested in
+not installing or removing e. g., unused drivers, the gui and/or the
+config package.
+
+The lircd daemon now runs as user lirc. This is using the new
+--effective-user option, so it's still started as root and runs as root
+until all devices and files are opened. Should this become a problem, just
+change the effective-user option in lirc_options.conf.
+
+
+
+0.9.1
+
+#### Systemd
+
+The fedora lirc package supports two systemd services lircd.socket
+and lircmd.service. See below for enabling and starting these
+services.
+
+Since systemd quite aggressively runs things in parallel during startup,
+clients like irexec sometimes runs into troubles because the socket
+they want to connect to isn't available. This can cause hard to debug
+problems. From this version, lircd supports a --wait-for-socket option.
+Using this, the calling party is blocked until the socket is available.
+
+#### New configuration file(s)
+
+From this version lirc supports a new configuration file
+/etc/lirc/lirc_options.conf. This holds default values for all
+command line options, and does in fact replace those in most
+installations. When updating, you need to use your old
+/etc/sysconfig/lirc config file to update lirc_options.conf.
+
+The old file /etc/sysconfig/lirc is no longer used.
+
+The need to define a device that should be reserved (the old
+LIRC_IR_DEVICE option) is no longer needed - lircd is clever enough
+to do this by itself.
+
+#### Enable lirc protocol (obsolete)
+
+In previous version the lirc protocol had to be  be enabled
+for the actual device used.  This was done using either by installing the
+lirc-disable-kernel-rc subpackage or by setting the LIRCD_IR_DEVICE in
+/etc/sysconfig/lirc. This is no longer needed, lircd does this
+automatically. The lirc-disable-kernel-rc subpackage is still available
+"just in case" but should normally not be needed.
+
+#### Socket activation
+
+As of 0.9.4-15+, the Fedora lirc package sports systemd socket
+activation. This should fix the problems at startup when clients can't
+connect to /var/run/lircd because the lircd service is yet not started.
+
+To start the lircd service using socket activation:
+```
+    # systemctl enable lircd.socket
+    # systemctl start lircd.socket
+```
+The lircmd is started the usual way:
+```
+    # systemctl enable lircmd.service
+    # systemctl start lircmd.service
+```
+#### Running another instance.
+
+Sometimes another lircd instance is required to handle some other input
+device. This could be done by creating a new service definition in
+/etc/systemd/system.
+
+In my case I have an extra instance handling ir output to the transciever.
+This is accomplished with  a file /etc/systemd/system/lirc-tx:
+----------------
+[Unit]
+Description=LIRC Infrared Signal Decoder
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/sbin/lircd --driver=iguanaIR \
+                          --device=/var/run/iguanaIR/0 \
+                          --output=/var/run/lirc/lircd-tx \
+                          --pidfile=/run/lirc/dont-use-lircd-tx.pid \
+                          --nodaemon \
+                          --allow-simulate
+
+[Install]
+WantedBy=multi-user.target
+
+-----------------------
+
+This defines a new service which can be started using
+'systemctl start lirc-tx' etc. It's essential that each service has an
+unique output socket. You should probably also think twice before running
+two instances with the same input device.
+
+## Troubleshooting
+
+Getting lircd logs from last boot cycle:
+```
+    # journalctl -b /usr/sbin/lircd
+```
+
+If lircd fails to start or dies after restart, first check logs for errors:
+```
+    # journalctl -f &
+    # systemctl restart lircd.service
+```
+
+You could also run lircd in foreground after stopping service:
+```
+    # systemctl stop lircd.service
+    # bash
+    # source /etc/systconfig/lirc
+    # /usr/sbin/lircd $LIRCD_OPTIONS --driver $LIRC_DRIVER \
+    > --device $LIRC_DEVICE  --nodaemon
+```
+
+Sometimes kernel complains about multiple clients trying to access the
+same device. In this case you need to blacklist some kernel module
+to make the kernel device available for lircd. One example is my RF
+remote using the atilibusb driver. This needs to blacklist the built_in
+ati_remote module. This is is done by creating the file
+/etc/modprobe.conf.d/blacklist-ati-remote.conf as:
+```
+# Block built-in handling of ati-remote (use lircd instead).
+blacklist ati_remote
+```
+
+
+
+
+
+
+
+
+
+

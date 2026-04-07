@@ -1,0 +1,17 @@
+--- a/config/pstoedit.pc.orig.in	2018-04-16 14:26:28.000000000 +0200
++++ b/config/pstoedit.pc.in	2020-10-05 14:37:16.750980762 +0200
+@@ -1,7 +1,7 @@
+ prefix=@prefix@
+ exec_prefix=@exec_prefix@
+ libdir=@libdir@
+-includedir=@includedir@
++includedir=@includedir@/pstoedit
+ 
+ Name: pstoedit
+ Description: converts PostScript(TM) and PDF files to other vector graphic formats
+@@ -8,4 +8,4 @@
+ Version: @VERSION@.0
+ Requires: 
+ Libs: -L@libdir@ -lpstoedit @CXX_STD_LIB@ @CXX_RUNTIME_LIB@ @LIBLD_LDFLAGS@
+-Cflags: -I@includedir@
++Cflags: -I@includedir@/pstoedit

@@ -1,0 +1,83 @@
+commit 8497de2d8a029460b0e47119b0664f0d254c97ac
+Author: Pavel Cahyna <pcahyna@redhat.com>
+Date:   Thu Aug 14 16:11:08 2025 +0200
+
+    Copy a sshd helper to the rescue ramdisk
+    
+    Without it, sshd in the rescue ramdisk does not start on EL 10
+    and aborts with
+    "/usr/libexec/openssh/sshd-session does not exist or is not executable"
+    
+    The idea is very similar to the sftp-server part of the script, but the
+    implementation is deliberately different:
+    - Instead of grepping a fixed known configuration file, the output of
+      sshd -T is used. sshd -T prints the effective configuration on stdout.
+      This way one does not need to know the path to the sshd configuration
+      file, while avoiding possible issues like the one described in
+      https://github.com/rear/rear/pull/1538#issuecomment-337883867
+      and one also gets automatic support for more complicated setups
+      with configuration snippets like on Debian,
+      see its sshd_config(5) manual page:
+      "Note that the Debian openssh-server package sets several options as stan-
+       dard in /etc/ssh/sshd_config which are not the default in sshd(8):
+              -   Include /etc/ssh/sshd_config.d/*.conf
+       ..."
+      At the same time, the command takes care of removing comments and
+      assigning default values (one would not get them by grepping the
+      configuration file).
+    - awk is used instead of grep, allowing to match the precise value of a
+      configuration option and not just the prefix, and to not rely on the
+      shell to parse the output into fields.
+    - The path to the helper gets added to COPY_AS_IS instead of to PROGS.
+      The problem with PROGS is that it ignores the path (even if the program
+      gets specified by its absolute path) and copies the program to
+      /usr/bin - but sshd need the helper at exactly the same path as on the
+      original system, as it invokes the helper via its full path (not
+      $PATH). This behavior of PROGS is arguably something that should be
+      changed and PROGS should use an absolute path as target if provided. For
+      now, use COPY_AS_IS as a workaround.
+    
+    (The sftp-server part would of course benefit from the same changes, as
+    the arguments above apply to it equally. In particular, the last point
+    looks fatal, as the sftp-server gets also copied to /usr/bin instead
+    to its correct path, but sshd refers to it by its full path. Indeed,
+    sftp to the rescue system does not work, even if ssh does:
+    $ sftp root@...
+    Warning: Permanently added ... to the list of known hosts.
+    Connection closed.
+    Connection closed
+    
+    Similar code has been here since the beginning of the git history
+    (2009), so I wonder whether the sftp part has ever worked... )
+
+diff --git a/usr/share/rear/rescue/default/500_ssh.sh b/usr/share/rear/rescue/default/500_ssh.sh
+index 27e48742a..60d9fbd5a 100644
+--- a/usr/share/rear/rescue/default/500_ssh.sh
++++ b/usr/share/rear/rescue/default/500_ssh.sh
+@@ -44,6 +44,26 @@ contains_visible_char "${copy_as_is_ssh_files[*]}" && COPY_AS_IS+=( "${copy_as_i
+ # Copy the usual SSH programs into the recovery system:
+ PROGS+=( ssh sshd scp sftp ssh-agent ssh-keygen ssh-add )
+ 
++# Copy a helper needed at least on EL 10.
++# Without it, sshd aborts with
++# "/usr/libexec/openssh/sshd-session does not exist or is not executable".
++# sshd -T prints the effective configuration on stdout. This way one
++# does not need to know the path to the sshd configuration file, while
++# avoiding possible issues like the one described in
++# https://github.com/rear/rear/pull/1538#issuecomment-337883867
++# and one also gets automatic support for more complicated setups
++# with configuration snippets like on Debian,
++# see its sshd_config(5) manual page:
++# "Note that the Debian openssh-server package sets several options as stan-
++#  dard in /etc/ssh/sshd_config which are not the default in sshd(8):
++#         -   Include /etc/ssh/sshd_config.d/*.conf
++#  ..."
++# At the same time, the command takes care of removing comments and assigning
++# default values (one would not get them by grepping the configuration file).
++# The path to the helper is the value of the sshdsessionpath option.
++local sshdsessionpath="$( sshd -T | awk '$1=="sshdsessionpath" { print $2 }' )"
++test "$sshdsessionpath" && COPY_AS_IS+=( "$sshdsessionpath" )
++
+ # Copy a sftp-server program (e.g. /usr/lib/ssh/sftp-server) into the recovery system (if exists).
+ # Because only OpenSSH >= 3.1 is supported where /etc/ssh/ is the default directory for configuration files
+ # only /etc/ssh/sshd_config is inspected to grep for a sftp-server program therein

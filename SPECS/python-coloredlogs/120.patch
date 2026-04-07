@@ -1,0 +1,43 @@
+From 9d4f4020897fcf48d381de8e099dc29b53fc9531 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Wed, 12 Jun 2024 14:00:28 -0400
+Subject: [PATCH] Replace pipes.quote with shlex.quote on Python 3
+
+The shlex.quote() API is available from Python 3.3 on; pipes.quote() was
+never documented, and is removed in Python 3.13.
+
+Fixes #119.
+---
+ coloredlogs/converter/__init__.py | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/coloredlogs/converter/__init__.py b/coloredlogs/converter/__init__.py
+index a424469..96817a0 100644
+--- a/coloredlogs/converter/__init__.py
++++ b/coloredlogs/converter/__init__.py
+@@ -9,11 +9,15 @@
+ # Standard library modules.
+ import codecs
+ import os
+-import pipes
+ import re
+ import subprocess
+ import tempfile
+ 
++try:
++    from shlex import quote  # Python 3
++except ImportError:
++    from pipes import quote  # Python 2 (removed in 3.13)
++
+ # External dependencies.
+ from humanfriendly.terminal import (
+     ANSI_CSI,
+@@ -75,7 +79,7 @@ def capture(command, encoding='UTF-8'):
+         #
+         # [1] http://man7.org/linux/man-pages/man1/script.1.html
+         # [2] https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man1/script.1.html
+-        command_line = ['script', '-qc', ' '.join(map(pipes.quote, command)), '/dev/null']
++        command_line = ['script', '-qc', ' '.join(map(quote, command)), '/dev/null']
+         script = subprocess.Popen(command_line, stdout=subprocess.PIPE, stderr=dev_null)
+         stdout, stderr = script.communicate()
+         if script.returncode == 0:

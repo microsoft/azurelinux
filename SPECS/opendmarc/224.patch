@@ -1,0 +1,26 @@
+From 721896d6855ac066c68ae9a5ed934b3e469f9652 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Alexander=20Bostr=C3=B6m?= <abo@kth.se>
+Date: Wed, 6 Jul 2022 10:24:04 +0200
+Subject: [PATCH] Log warnings for ARC-Seal header parse failures
+
+---
+ opendmarc/opendmarc.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/opendmarc/opendmarc.c b/opendmarc/opendmarc.c
+index 7c1eda6..28b8833 100644
+--- a/opendmarc/opendmarc.c
++++ b/opendmarc/opendmarc.c
+@@ -2621,7 +2621,12 @@ mlfi_eom(SMFICTX *ctx)
+ 
+ 		/* parse it */
+ 		if (opendmarc_arcseal_parse(hdr->hdr_value, &as_hdr_new->arcseal) != 0)
++		{
++			syslog(LOG_WARNING,
++			       "%s: ignoring invalid %s header \"%s\"",
++			       dfc->mctx_jobid, hdr->hdr_name, hdr->hdr_value);
+ 			continue;
++		}
+ 
+ 		if (dfc->mctx_ashead == NULL)
+ 		{

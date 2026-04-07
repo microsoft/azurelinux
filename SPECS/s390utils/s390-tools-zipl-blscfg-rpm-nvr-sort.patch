@@ -1,0 +1,348 @@
+From b2daaa34776ba6afec879e362378f6f7563590a6 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Dan=20Hor=C3=A1k?= <dan@danny.cz>
+Date: Mon, 20 Jun 2022 17:43:05 +0200
+Subject: [PATCH 1/2] Revert "zipl/src: Implement sorting bls entries by
+ versions"
+
+This reverts commit a0dba6bfdb50ff373fa710ffe2a307cc0748f18b.
+---
+ zipl/src/scan.c | 139 ++----------------------------------------------
+ 1 file changed, 3 insertions(+), 136 deletions(-)
+
+diff --git a/zipl/src/scan.c b/zipl/src/scan.c
+index 0cea1d4..9352f76 100644
+--- a/zipl/src/scan.c
++++ b/zipl/src/scan.c
+@@ -10,7 +10,6 @@
+  *
+  */
+ 
+-static const char *VERSION_KEYWORD = "version";
+ 
+ /* Need ISOC99 function isblank() in ctype.h */
+ #ifndef __USE_ISOC99
+@@ -646,7 +645,7 @@ scan_file(const char* filename, struct scan_token** token)
+ 
+ 
+ static int
+-bls_filter_by_names(const struct dirent *ent)
++bls_filter(const struct dirent *ent)
+ {
+ 	int offset = strlen(ent->d_name) - strlen(".conf");
+ 
+@@ -656,111 +655,13 @@ bls_filter_by_names(const struct dirent *ent)
+ 	return strncmp(ent->d_name + offset, ".conf", strlen(".conf")) == 0;
+ }
+ 
+-struct version {
+-	char *line; /* pointer to a line with version keyword */
+-	int offset; /* offset of version value in the line */
+-};
+-
+-/*
+- * Locate version in bls file represented by ENT
+- */
+-static void get_version(const struct dirent *ent, struct version *v)
+-{
+-	char *line = NULL;
+-	size_t len = 0;
+-	char *d_name;
+-	FILE *stream;
+-	ssize_t read;
+-
+-	memset(v, 0, sizeof(*v));
+-	d_name = misc_make_path((char *)blsdir, (char *)ent->d_name);
+-	if (!d_name)
+-		return;
+-
+-	stream = fopen(d_name, "r");
+-	free(d_name);
+-	if (!stream)
+-		return;
+-
+-	while ((read = getline(&line, &len, stream)) != -1) {
+-		if (line[read - 1] == '\n') {
+-			line[read - 1] = '\0';
+-			read--;
+-		}
+-		if ((size_t)read <= strlen(VERSION_KEYWORD) + 1)
+-			continue;
+-		if (strcmp(VERSION_KEYWORD, line) > 0)
+-			continue;
+-		if (!isblank(line[strlen(VERSION_KEYWORD)]))
+-			continue;
+-		/* skip blanks */
+-		v->offset = strlen(VERSION_KEYWORD) + 1;
+-		while (v->offset < read - 1 && isblank(line[v->offset]))
+-			v->offset++;
+-		if (isblank(line[v->offset]))
+-			/*
+-			 * all characters after the keyword
+-			 * are blanks. Invalid version
+-			 */
+-			continue;
+-		v->line = line;
+-		fclose(stream);
+-		return;
+-	}
+-	free(line);
+-	fclose(stream);
+-}
+-
+-static void put_version(struct version *v)
+-{
+-	free(v->line);
+-}
+-
+-/**
+- * Check version in bls file represented by ENT.
+- * Return 1 if version is valid. Otherwise return 0
+- */
+-static int bls_filter_by_versions(const struct dirent *ent)
+-{
+-	struct version v;
+-
+-	if (bls_filter_by_names(ent) == 0)
+-		return 0;
+-
+-	get_version(ent, &v);
+-	if (v.line) {
+-		put_version(&v);
+-		return 1;
+-	}
+-	return 0;
+-}
+-
+ 
+ static int
+-bls_sort_by_names(const struct dirent **ent_a, const struct dirent **ent_b)
++bls_sort(const struct dirent **ent_a, const struct dirent **ent_b)
+ {
+ 	return strverscmp((*ent_a)->d_name, (*ent_b)->d_name);
+ }
+ 
+-static int
+-bls_sort_by_versions(const struct dirent **ent_a, const struct dirent **ent_b)
+-{
+-	struct version v1, v2;
+-	int ret;
+-
+-	get_version(*ent_a, &v1);
+-	get_version(*ent_b, &v2);
+-	/*
+-	 * Both versions are valid.
+-	 * It is guaranteed by bls_filter_by_versions()
+-	 */
+-	ret = strverscmp(v1.line + v1.offset, v2.line + v2.offset);
+-
+-	put_version(&v1);
+-	put_version(&v2);
+-
+-	return ret;
+-}
+ 
+ static int
+ scan_append_section_heading(struct scan_token* scan, int* index, char* name);
+@@ -1110,40 +1011,6 @@ scan_count_target_keywords(char* keyword[])
+ 	return num;
+ }
+ 
+-static int bls_scandir(struct dirent ***bls_entries)
+-{
+-	struct dirent **entries1;
+-	struct dirent **entries2;
+-	int n1, n2;
+-
+-	/* arrange by names */
+-	n1 = scandir(blsdir, &entries1,
+-		     bls_filter_by_names, bls_sort_by_names);
+-	if (n1 <= 0)
+-		return n1;
+-	/* arrange by versions */
+-	n2 = scandir(blsdir, &entries2,
+-		     bls_filter_by_versions, bls_sort_by_versions);
+-
+-	if (n2 <= 0 || n2 < n1) {
+-		/*
+-		 * failed to sort by versions,
+-		 * fall back to sorting by filenames
+-		 */
+-		*bls_entries = entries1;
+-		while (n2--)
+-			free(entries2[n2]);
+-		free(entries2);
+-		return n1;
+-	}
+-	/* use arrangement by versions */
+-	*bls_entries = entries2;
+-	while (n1--)
+-		free(entries1[n1]);
+-	free(entries1);
+-	return n2;
+-}
+-
+ int
+ scan_check_target_data(char* keyword[], int* line)
+ {
+@@ -1464,7 +1331,7 @@ int scan_bls(struct scan_token **token, int scan_size)
+ 	if (!(stat(blsdir, &sb) == 0 && S_ISDIR(sb.st_mode)))
+ 		return 0;
+ 
+-	n = bls_scandir(&bls_entries);
++	n = scandir(blsdir, &bls_entries, bls_filter, bls_sort);
+ 	if (n <= 0)
+ 		return n;
+ 
+-- 
+2.39.2
+
+
+From 692e70bcfc32a05e30146bd7077c41e0eaceff03 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 20 Jun 2022 17:46:59 +0200
+Subject: [PATCH 2/2] blscfg: sort like rpm nvr, not like a single version
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+Signed-off-by: Dan Horák <dan@danny.cz>
+---
+ zipl/src/Makefile |  1 +
+ zipl/src/scan.c   | 96 ++++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 95 insertions(+), 2 deletions(-)
+
+diff --git a/zipl/src/Makefile b/zipl/src/Makefile
+index cab5655..7ec215d 100644
+--- a/zipl/src/Makefile
++++ b/zipl/src/Makefile
+@@ -9,6 +9,7 @@ ALL_LDFLAGS += -Wl,-z,noexecstack $(NO_PIE_LDFLAGS)
+ 
+ libs =  $(rootdir)/libutil/libutil.a \
+ 	$(rootdir)/libvtoc/libvtoc.a \
++	-lrpmio -lrpm
+ 
+ objects = misc.o error.o scan.o job.o boot.o bootmap.o fs-map.o disk.o \
+ 	  bootmap_header.o envblk.o install.o zipl.o
+diff --git a/zipl/src/scan.c b/zipl/src/scan.c
+index 9352f76..3327e2d 100644
+--- a/zipl/src/scan.c
++++ b/zipl/src/scan.c
+@@ -35,6 +35,8 @@
+ 
+ #include "lib/util_base.h"
+ 
++#include <rpm/rpmlib.h>
++
+ #include "boot.h"
+ #include "error.h"
+ #include "misc.h"
+@@ -655,13 +657,103 @@ bls_filter(const struct dirent *ent)
+ 	return strncmp(ent->d_name + offset, ".conf", strlen(".conf")) == 0;
+ }
+ 
++/* returns name/version/release */
++/* NULL string pointer returned if nothing found */
++static void
++split_package_string (char *package_string, char **name,
++                     char **version, char **release)
++{
++	char *package_version, *package_release;
++
++	/* Release */
++	package_release = strrchr (package_string, '-');
++
++	if (package_release != NULL)
++		*package_release++ = '\0';
++
++	*release = package_release;
++
++	/* Version */
++	package_version = strrchr(package_string, '-');
++
++	if (package_version != NULL)
++		*package_version++ = '\0';
++
++	*version = package_version;
++	/* Name */
++	*name = package_string;
++
++	/* Bubble up non-null values from release to name */
++	if (name != NULL && *name == NULL) {
++		*name = (*version == NULL ? *release : *version);
++		*version = *release;
++		*release = NULL;
++	}
++	if (*version == NULL) {
++		*version = *release;
++		*release = NULL;
++	}
++}
+ 
+ static int
+-bls_sort(const struct dirent **ent_a, const struct dirent **ent_b)
++split_cmp(char *nvr0, char *nvr1, int has_name)
++{
++	int ret = 0;
++	char *name0, *version0, *release0;
++	char *name1, *version1, *release1;
++
++	split_package_string(nvr0, has_name ? &name0 : NULL, &version0, &release0);
++	split_package_string(nvr1, has_name ? &name1 : NULL, &version1, &release1);
++
++	if (has_name) {
++		ret = rpmvercmp(name0 == NULL ? "" : name0,
++                                name1 == NULL ? "" : name1);
++		if (ret != 0)
++			return ret;
++	}
++
++	ret = rpmvercmp(version0 == NULL ? "" : version0,
++                        version1 == NULL ? "" : version1);
++	if (ret != 0)
++		return ret;
++
++	ret = rpmvercmp(release0 == NULL ? "" : release0,
++                        release1 == NULL ? "" : release1);
++	return ret;
++}
++
++/* return 1: filename0 is newer than filename1 */
++/*        0: filename0 and filename1 are the same version */
++/*       -1: filename1 is newer than filename0 */
++static int bls_cmp(const char *filename0, const char *filename1)
+ {
+-	return strverscmp((*ent_a)->d_name, (*ent_b)->d_name);
++	char *id0, *id1;
++	int l, r;
++
++	id0 = strdup(filename0);
++	id1 = strdup(filename1);
++
++	l = strlen(id0);
++	if (l > 5 && strcmp(id0 + l - 5, ".conf"))
++		id0[l-5] = '\0';
++
++	l = strlen(id1);
++	if (l > 5 && strcmp(id1 + l - 5, ".conf"))
++		id1[l-5] = '\0';
++
++	r = split_cmp(id0, id1, 1);
++
++	free(id0);
++	free(id1);
++
++	return r;
+ }
+ 
++static int
++bls_sort(const struct dirent **ent_a, const struct dirent **ent_b)
++{
++	return bls_cmp((*ent_a)->d_name, (*ent_b)->d_name);
++}
+ 
+ static int
+ scan_append_section_heading(struct scan_token* scan, int* index, char* name);
+-- 
+2.39.2
+

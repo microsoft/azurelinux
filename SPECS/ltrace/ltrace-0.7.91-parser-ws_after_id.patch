@@ -1,0 +1,144 @@
+From 2e9f9f1f5d0fb223b109429b9c904504b7f638e2 Mon Sep 17 00:00:00 2001
+From: Petr Machata <pmachata@redhat.com>
+Date: Fri, 8 Aug 2014 16:53:41 +0200
+Subject: [PATCH] In config files, allow whitespace between identifier and
+ opening paren
+
+---
+ read_config_file.c                    |   61 ++++++--------------------------
+ testsuite/ltrace.main/parameters2.exp |   14 +++++++-
+ 2 files changed, 25 insertions(+), 50 deletions(-)
+
+diff --git a/read_config_file.c b/read_config_file.c
+index ea3ab88..05ff283 100644
+--- a/read_config_file.c
++++ b/read_config_file.c
+@@ -1,6 +1,6 @@
+ /*
+  * This file is part of ltrace.
+- * Copyright (C) 2011,2012,2013 Petr Machata, Red Hat Inc.
++ * Copyright (C) 2011,2012,2013,2014 Petr Machata, Red Hat Inc.
+  * Copyright (C) 1998,1999,2003,2007,2008,2009 Juan Cespedes
+  * Copyright (C) 2006 Ian Wienand
+  * Copyright (C) 2006 Steve Fink
+@@ -168,38 +168,6 @@ parse_ident(struct locus *loc, char **str)
+ 	return xstrndup(ident, *str - ident);
+ }
+ 
+-/*
+-  Returns position in string at the left parenthesis which starts the
+-  function's argument signature. Returns NULL on error.
+-*/
+-static char *
+-start_of_arg_sig(char *str) {
+-	char *pos;
+-	int stacked = 0;
+-
+-	if (!strlen(str))
+-		return NULL;
+-
+-	pos = &str[strlen(str)];
+-	do {
+-		pos--;
+-		if (pos < str)
+-			return NULL;
+-		while ((pos > str) && (*pos != ')') && (*pos != '('))
+-			pos--;
+-
+-		if (*pos == ')')
+-			stacked++;
+-		else if (*pos == '(')
+-			stacked--;
+-		else
+-			return NULL;
+-
+-	} while (stacked > 0);
+-
+-	return (stacked == 0) ? pos : NULL;
+-}
+-
+ static int
+ parse_int(struct locus *loc, char **str, long *ret)
+ {
+@@ -1110,7 +1078,6 @@ static int
+ process_line(struct protolib *plib, struct locus *loc, char *buf)
+ {
+ 	char *str = buf;
+-	char *tmp;
+ 
+ 	debug(3, "Reading line %d of `%s'", loc->line_no, loc->filename);
+ 	eat_spaces(&str);
+@@ -1148,22 +1115,13 @@ process_line(struct protolib *plib, struct locus *loc, char *buf)
+ 	debug(4, " return_type = %d", fun.return_info->type);
+ 
+ 	eat_spaces(&str);
+-	tmp = start_of_arg_sig(str);
+-	if (tmp == NULL) {
+-		report_error(loc->filename, loc->line_no, "syntax error");
++	proto_name = parse_ident(loc, &str);
++	if (proto_name == NULL)
+ 		goto err;
+-	}
+-	*tmp = '\0';
+ 
+-	proto_name = strdup(str);
+-	if (proto_name == NULL) {
+-	oom:
+-		report_error(loc->filename, loc->line_no,
+-			     "%s", strerror(errno));
++	eat_spaces(&str);
++	if (parse_char(loc, &str, '(') < 0)
+ 		goto err;
+-	}
+-
+-	str = tmp + 1;
+ 	debug(3, " name = %s", proto_name);
+ 
+ 	struct param *extra_param = NULL;
+@@ -1177,8 +1135,13 @@ process_line(struct protolib *plib, struct locus *loc, char *buf)
+ 			if (have_stop == 0) {
+ 				struct param param;
+ 				param_init_stop(&param);
+-				if (prototype_push_param(&fun, &param) < 0)
+-					goto oom;
++				if (prototype_push_param(&fun, &param) < 0) {
++				oom:
++					report_error(loc->filename,
++						     loc->line_no,
++						     "%s", strerror(errno));
++					goto err;
++				}
+ 				have_stop = 1;
+ 			}
+ 			str++;
+diff --git a/testsuite/ltrace.main/parameters2.exp b/testsuite/ltrace.main/parameters2.exp
+index 6318fc5..9850079 100644
+--- a/testsuite/ltrace.main/parameters2.exp
++++ b/testsuite/ltrace.main/parameters2.exp
+@@ -1,5 +1,5 @@
+ # This file is part of ltrace.
+-# Copyright (C) 2012, 2013 Petr Machata, Red Hat Inc.
++# Copyright (C) 2012, 2013, 2014 Petr Machata, Red Hat Inc.
+ #
+ # This program is free software; you can redistribute it and/or
+ # modify it under the terms of the GNU General Public License as
+@@ -259,4 +259,16 @@ ltraceMatch1 [ltraceLibTest {
+     somefunc();
+ }] {somefunc\(\) *= nil} == 1
+ 
++# Test that spaces in function name make no difference.
++
++ltraceMatch1 [ltraceLibTest {
++    void somefunc ();
++} {
++    void somefunc(void);
++} {
++    void somefunc(void) {}
++} {
++    somefunc();
++}] {somefunc\(\)} == 1
++
+ ltraceDone
+-- 
+1.7.6.5
+

@@ -1,0 +1,66 @@
+From 90be7e78d6ca200727681b99a918baf524f4184b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Wed, 14 Jan 2026 15:22:10 +0100
+Subject: [PATCH] Avoid ResourceWarning: Implicitly cleaning up <addinfourl
+ ...>
+
+Close the urllib.response.addinfourl by using a context manager.
+
+Without this:
+
+    =================================== FAILURES ===================================
+    _________________________________ test session _________________________________
+    /usr/lib64/python3.14/tempfile.py:484: in __del__
+        _warnings.warn(self.warn_message, ResourceWarning)
+    E   ResourceWarning: Implicitly cleaning up <addinfourl at 281473371898608 whose fp = <http.client.HTTPResponse object at 0xffff9fe82470>>
+    The above exception was the direct cause of the following exception:
+    /usr/lib/python3.14/site-packages/_pytest/runner.py:344: in from_call
+        result: TResult | None = func()
+                                 ^^^^^^
+    /usr/lib/python3.14/site-packages/_pytest/runner.py:246: in <lambda>
+        lambda: runtest_hook(item=item, **kwds), when=when, reraise=reraise
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    /usr/lib/python3.14/site-packages/pluggy/_hooks.py:512: in __call__
+        return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    /usr/lib/python3.14/site-packages/pluggy/_manager.py:120: in _hookexec
+        return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    /usr/lib/python3.14/site-packages/_pytest/logging.py:850: in pytest_runtest_call
+        yield
+    /usr/lib/python3.14/site-packages/_pytest/capture.py:900: in pytest_runtest_call
+        return (yield)
+                ^^^^^
+    /usr/lib/python3.14/site-packages/_pytest/skipping.py:263: in pytest_runtest_call
+        return (yield)
+                ^^^^^
+    /usr/lib/python3.14/site-packages/_pytest/unraisableexception.py:158: in pytest_runtest_call
+        collect_unraisable(item.config)
+    /usr/lib/python3.14/site-packages/_pytest/unraisableexception.py:79: in collect_unraisable
+        raise errors[0]
+    /usr/lib/python3.14/site-packages/_pytest/unraisableexception.py:67: in collect_unraisable
+        warnings.warn(pytest.PytestUnraisableExceptionWarning(msg))
+    E   pytest.PytestUnraisableExceptionWarning: Exception ignored while calling deallocator <function _TemporaryFileCloser.__del__ at 0xffffa6b34720>: None
+
+CPython reference: https://github.com/python/cpython/commit/bad3cdefa840ff099e5e08cf88dcf6dfed7d37b8
+---
+ html5lib/tests/test_stream.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/html5lib/tests/test_stream.py b/html5lib/tests/test_stream.py
+index efe9b472..346837bc 100644
+--- a/html5lib/tests/test_stream.py
++++ b/html5lib/tests/test_stream.py
+@@ -212,9 +212,9 @@ def makefile(self, _mode, _bufsize=None):
+ 
+     source = http_client.HTTPResponse(FakeSocket())
+     source.begin()
+-    wrapped = urllib.response.addinfourl(source, source.msg, "http://example.com")
+-    stream = HTMLInputStream(wrapped)
+-    assert stream.charsUntil(" ") == "Text"
++    with urllib.response.addinfourl(source, source.msg, "http://example.com") as wrapped:
++        stream = HTMLInputStream(wrapped)
++        assert stream.charsUntil(" ") == "Text"
+ 
+ 
+ @pytest.mark.parametrize("inp,num",

@@ -1,0 +1,26 @@
+From 29bbbaf04a32ce01d3a1a486a6a39f694f321888 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Michal=20Josef=20=C5=A0pa=C4=8Dek?= <mspacek@redhat.com>
+Date: Thu, 1 Dec 2022 10:17:27 +0100
+Subject: [PATCH] Fix warning in test
+
+There are three variables and printf was print two only
+---
+ t/negotiate.t | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/t/negotiate.t b/t/negotiate.t
+index ef3f889..fa9af51 100644
+--- a/t/negotiate.t
++++ b/t/negotiate.t
+@@ -106,7 +106,7 @@ sub show_res
+ {
+     print "-------------\n";
+     for (@_) {
+-	printf "%-6s %.3f\n", @$_;
++	printf "%-6s %.3f %6d\n", @$_;
+     }
+     print "-------------\n";
+ }
+-- 
+2.38.1
+

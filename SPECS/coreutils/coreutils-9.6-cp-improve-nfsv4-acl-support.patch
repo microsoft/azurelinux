@@ -1,0 +1,512 @@
+From 6ad28e2b6627caf7b83bf893027c087b8cea1a97 Mon Sep 17 00:00:00 2001
+From: Paul Eggert <eggert@cs.ucla.edu>
+Date: Fri, 9 May 2025 18:02:29 -0700
+Subject: [PATCH 1/2] qcopy-acl: port better to NFSv4 on GNU/Linux
+
+Problem reported by Ian Dall in <https://bugs.gnu.org/78328>
+and by Thomas Clark in <https://bugzilla.redhat.com/2363149>.
+* lib/file-has-acl.c (smack_new_label_from_file) [!HAVE_SMACK]:
+New dummy function.
+(has_xattr, get_aclinfo): New arg FD.  All callers changed.
+Remove some unnecessary MAYBE_UNUSEDs.
+(acl_get_fd_np): Fall back on acl_get_fd if this function is
+needed but not available.
+(acl_get_fdfile): New function, if needed.
+(file_has_aclinfo): Reimplement in terms of ...
+(fdfile_has_aclinfo): ... this new function,
+which also has an FD argument.
+* lib/qcopy-acl.c [USE_XATTR]: Include dirent.h, for DT_DIR etc.
+(qcopy_acl): If attr_copy_file or attr_copy_fd fail with EOPNOTSUPP,
+don’t fail if the source has a trivial ACL (this is the part
+that fixes the bug; the rest is optimization).
+
+(cherry picked from commit 8a356b77717a2e4f735ec06e326880ca1f61aadb)
+---
+ lib/acl.h          |   2 +
+ lib/copy-acl.c     |   1 +
+ lib/file-has-acl.c | 172 ++++++++++++++++++++++++++++++++-------------
+ lib/qcopy-acl.c    |  29 ++++++--
+ 4 files changed, 152 insertions(+), 52 deletions(-)
+
+diff --git a/lib/acl.h b/lib/acl.h
+index 90fd24e..e3c134f 100644
+--- a/lib/acl.h
++++ b/lib/acl.h
+@@ -79,6 +79,8 @@ struct aclinfo
+ bool acl_errno_valid (int) _GL_ATTRIBUTE_CONST;
+ int file_has_acl (char const *, struct stat const *);
+ int file_has_aclinfo (char const *restrict, struct aclinfo *restrict, int);
++int fdfile_has_aclinfo (int, char const *restrict,
++                        struct aclinfo *restrict, int);
+ 
+ #if HAVE_LINUX_XATTR_H && HAVE_LISTXATTR
+ bool aclinfo_has_xattr (struct aclinfo const *, char const *)
+diff --git a/lib/copy-acl.c b/lib/copy-acl.c
+index c36f64e..2fce6c7 100644
+--- a/lib/copy-acl.c
++++ b/lib/copy-acl.c
+@@ -33,6 +33,7 @@
+    a valid file descriptor, use file descriptor operations, else use
+    filename based operations on SRC_NAME. Likewise for DEST_DESC and
+    DST_NAME.
++   MODE should be the source file's st_mode.
+    If access control lists are not available, fchmod the target file to
+    MODE.  Also sets the non-permission bits of the destination file
+    (S_ISUID, S_ISGID, S_ISVTX) to those from MODE if any are set.
+diff --git a/lib/file-has-acl.c b/lib/file-has-acl.c
+index 66b920c..a356ee0 100644
+--- a/lib/file-has-acl.c
++++ b/lib/file-has-acl.c
+@@ -85,6 +85,13 @@ smack_new_label_from_path (MAYBE_UNUSED const char *path,
+ {
+   return -1;
+ }
++static ssize_t
++smack_new_label_from_file (MAYBE_UNUSED int fd,
++                           MAYBE_UNUSED const char *xattr,
++                           MAYBE_UNUSED char **label)
++{
++  return -1;
++}
+ # endif
+ static bool
+ is_smack_enabled (void)
+@@ -115,14 +122,16 @@ aclinfo_may_indicate_xattr (struct aclinfo const *ai)
+ 
+ static bool
+ has_xattr (char const *xattr, struct aclinfo const *ai,
+-           MAYBE_UNUSED char const *restrict name, MAYBE_UNUSED int flags)
++           int fd, char const *restrict name, int flags)
+ {
+   if (ai && aclinfo_has_xattr (ai, xattr))
+     return true;
+   else if (!ai || aclinfo_may_indicate_xattr (ai))
+     {
+-      int ret = ((flags & ACL_SYMLINK_FOLLOW ? getxattr : lgetxattr)
+-                (name, xattr, NULL, 0));
++      int ret = (fd < 0
++                 ? ((flags & ACL_SYMLINK_FOLLOW ? getxattr : lgetxattr)
++                    (name, xattr, NULL, 0))
++                 : fgetxattr (fd, xattr, NULL, 0));
+       if (0 <= ret || (errno == ERANGE || errno == E2BIG))
+         return true;
+     }
+@@ -145,11 +154,12 @@ aclinfo_has_xattr (struct aclinfo const *ai, char const *xattr)
+   return false;
+ }
+ 
+-/* Get attributes of the file NAME into AI, if USE_ACL.
++/* Get attributes of the file FD aka NAME into AI, if USE_ACL.
++   Ignore FD if it is negative.
+    If FLAGS & ACL_GET_SCONTEXT, also get security context.
+    If FLAGS & ACL_SYMLINK_FOLLOW, follow symbolic links.  */
+ static void
+-get_aclinfo (char const *name, struct aclinfo *ai, int flags)
++get_aclinfo (int fd, char const *name, struct aclinfo *ai, int flags)
+ {
+   int scontext_err = ENOTSUP;
+   ai->buf = ai->u.__gl_acl_ch;
+@@ -163,7 +173,9 @@ get_aclinfo (char const *name, struct aclinfo *ai, int flags)
+         = (flags & ACL_SYMLINK_FOLLOW ? listxattr : llistxattr);
+       while (true)
+         {
+-          ai->size = lsxattr (name, ai->buf, acl_alloc);
++          ai->size = (fd < 0
++                      ? lsxattr (name, ai->buf, acl_alloc)
++                      : flistxattr (fd, ai->buf, acl_alloc));
+           if (0 < ai->size)
+             break;
+           ai->u.err = ai->size < 0 ? errno : 0;
+@@ -171,7 +183,9 @@ get_aclinfo (char const *name, struct aclinfo *ai, int flags)
+             break;
+ 
+           /* The buffer was too small.  Find how large it should have been.  */
+-          ssize_t size = lsxattr (name, NULL, 0);
++          ssize_t size = (fd < 0
++                          ? lsxattr (name, NULL, 0)
++                          : flistxattr (fd, NULL, 0));
+           if (size <= 0)
+             {
+               ai->size = size;
+@@ -214,9 +228,13 @@ get_aclinfo (char const *name, struct aclinfo *ai, int flags)
+         {
+           if (ai->size < 0 || aclinfo_has_xattr (ai, XATTR_NAME_SMACK))
+             {
+-              ssize_t r = smack_new_label_from_path (name, "security.SMACK64",
+-                                                     flags & ACL_SYMLINK_FOLLOW,
+-                                                     &ai->scontext);
++              static char const SMACK64[] = "security.SMACK64";
++              ssize_t r =
++                (fd < 0
++                 ? smack_new_label_from_path (name, SMACK64,
++                                              flags & ACL_SYMLINK_FOLLOW,
++                                              &ai->scontext)
++                 : smack_new_label_from_file (fd, SMACK64, &ai->scontext));
+               scontext_err = r < 0 ? errno : 0;
+             }
+         }
+@@ -226,8 +244,10 @@ get_aclinfo (char const *name, struct aclinfo *ai, int flags)
+           if (ai->size < 0 || aclinfo_has_xattr (ai, XATTR_NAME_SELINUX))
+             {
+               ssize_t r =
+-                ((flags & ACL_SYMLINK_FOLLOW ? getfilecon : lgetfilecon)
+-                 (name, &ai->scontext));
++                (fd < 0
++                 ? ((flags & ACL_SYMLINK_FOLLOW ? getfilecon : lgetfilecon)
++                    (name, &ai->scontext))
++                 : fgetfilecon (fd, &ai->scontext));
+               scontext_err = r < 0 ? errno : 0;
+ #  ifndef SE_SELINUX_INLINE
+               /* Gnulib's selinux-h module is not in use, so getfilecon and
+@@ -362,11 +382,13 @@ acl_nfs4_nontrivial (uint32_t *xattr, ssize_t nbytes)
+ }
+ #endif
+ 
+-#if (!USE_LINUX_XATTR && USE_ACL && HAVE_ACL_GET_FD \
+-     && !HAVE_ACL_EXTENDED_FILE && !HAVE_ACL_TYPE_EXTENDED \
+-     && !HAVE_ACL_GET_LINK_NP)
+-# include <fcntl.h>
+-# ifdef O_PATH
++#if (!USE_LINUX_XATTR && USE_ACL && !HAVE_ACL_EXTENDED_FILE \
++     && !HAVE_ACL_TYPE_EXTENDED)
++
++# if HAVE_ACL_GET_FD && !HAVE_ACL_GET_LINK_NP
++#  include <fcntl.h>
++#  ifdef O_PATH
++#   define acl_get_fd_np(fd, type) acl_get_fd (fd)
+ 
+ /* Like acl_get_file, but do not follow symbolic links.  */
+ static acl_t
+@@ -381,8 +403,24 @@ acl_get_link_np (char const *name, acl_type_t type)
+   errno = err;
+   return r;
+ }
+-#  define HAVE_ACL_GET_LINK_NP 1
++#   define HAVE_ACL_GET_LINK_NP 1
++#  endif
+ # endif
++
++static acl_t
++acl_get_fdfile (int fd, char const *name, acl_type_t type, int flags)
++{
++  acl_t (*get) (char const *, acl_type_t) = acl_get_file;
++# if HAVE_ACL_GET_LINK_NP /* FreeBSD, NetBSD >= 10, Cygwin >= 2.5 */
++  if (0 <= fd)
++    return acl_get_fd_np (fd, type);
++  if (! (flags & ACL_SYMLINK_FOLLOW))
++    get = acl_get_link_np;
++# else
++  /* Ignore FD and FLAGS, unfortunately.  */
++# endif
++  return get (name, type);
++}
+ #endif
+ 
+ /* Return 1 if NAME has a nontrivial access control list,
+@@ -398,14 +436,35 @@ acl_get_link_np (char const *name, acl_type_t type)
+    If the d_type value is not known, use DT_UNKNOWN though this may be less
+    efficient.  */
+ int
+-file_has_aclinfo (MAYBE_UNUSED char const *restrict name,
++file_has_aclinfo (char const *restrict name,
+                   struct aclinfo *restrict ai, int flags)
++{
++  return fdfile_has_aclinfo (-1, name, ai, flags);
++}
++
++/* Return 1 if FD aka NAME has a nontrivial access control list,
++   0 if ACLs are not supported, or if NAME has no or only a base ACL,
++   and -1 (setting errno) on error.  Note callers can determine
++   if ACLs are not supported as errno is set in that case also.
++   Ignore FD if it is negative.
++   Set *AI to ACL info regardless of return value.
++   FLAGS should be a <dirent.h> d_type value, optionally ORed with
++     - _GL_DT_NOTDIR if it is known that NAME is not a directory,
++     - ACL_GET_SCONTEXT to retrieve security context and return 1 if present,
++     - ACL_SYMLINK_FOLLOW to follow the link if NAME is a symbolic link;
++       otherwise do not follow them if possible.
++   If the d_type value is not known, use DT_UNKNOWN though this may be less
++   efficient.  */
++int
++fdfile_has_aclinfo (MAYBE_UNUSED int fd,
++                    MAYBE_UNUSED char const *restrict name,
++                    struct aclinfo *restrict ai, int flags)
+ {
+   MAYBE_UNUSED unsigned char d_type = flags & UCHAR_MAX;
+ 
+ #if USE_LINUX_XATTR
+   int initial_errno = errno;
+-  get_aclinfo (name, ai, flags);
++  get_aclinfo (fd, name, ai, flags);
+ 
+   if (!aclinfo_may_indicate_xattr (ai) && ai->size <= 0)
+     {
+@@ -418,11 +477,11 @@ file_has_aclinfo (MAYBE_UNUSED char const *restrict name,
+      In earlier Fedora the two types of ACLs were mutually exclusive.
+      Attempt to work correctly on both kinds of systems.  */
+ 
+-  if (!has_xattr (XATTR_NAME_NFSV4_ACL, ai, name, flags))
++  if (!has_xattr (XATTR_NAME_NFSV4_ACL, ai, fd, name, flags))
+     return
+-      (has_xattr (XATTR_NAME_POSIX_ACL_ACCESS, ai, name, flags)
++      (has_xattr (XATTR_NAME_POSIX_ACL_ACCESS, ai, fd, name, flags)
+        || ((d_type == DT_DIR || d_type == DT_UNKNOWN)
+-           && has_xattr (XATTR_NAME_POSIX_ACL_DEFAULT, ai, name, flags)));
++           && has_xattr (XATTR_NAME_POSIX_ACL_DEFAULT, ai, fd, name, flags)));
+ 
+   /* A buffer large enough to hold any trivial NFSv4 ACL.
+      The max length of a trivial NFSv4 ACL is 6 words for owner,
+@@ -432,8 +491,10 @@ file_has_aclinfo (MAYBE_UNUSED char const *restrict name,
+      everyone is another word to hold "EVERYONE@".  */
+   uint32_t buf[2 * (6 + 6 + 7)];
+ 
+-  int ret = ((flags & ACL_SYMLINK_FOLLOW ? getxattr : lgetxattr)
+-             (name, XATTR_NAME_NFSV4_ACL, buf, sizeof buf));
++  int ret = (fd < 0
++             ? ((flags & ACL_SYMLINK_FOLLOW ? getxattr : lgetxattr)
++                (name, XATTR_NAME_NFSV4_ACL, buf, sizeof buf))
++             : fgetxattr (fd, XATTR_NAME_NFSV4_ACL, buf, sizeof buf));
+   if (ret < 0)
+     switch (errno)
+       {
+@@ -467,20 +528,23 @@ file_has_aclinfo (MAYBE_UNUSED char const *restrict name,
+       /* On Linux, acl_extended_file is an optimized function: It only
+          makes two calls to getxattr(), one for ACL_TYPE_ACCESS, one for
+          ACL_TYPE_DEFAULT.  */
+-    ret = ((flags & ACL_SYMLINK_FOLLOW
+-            ? acl_extended_file
+-            : acl_extended_file_nofollow)
+-           (name));
++    ret = (fd < 0
++           ? ((flags & ACL_SYMLINK_FOLLOW
++               ? acl_extended_file
++               : acl_extended_file_nofollow)
++              (name))
++           : acl_extended_fd (fd));
+ #   elif HAVE_ACL_TYPE_EXTENDED /* Mac OS X */
+     /* On Mac OS X, acl_get_file (name, ACL_TYPE_ACCESS)
+        and acl_get_file (name, ACL_TYPE_DEFAULT)
+        always return NULL / EINVAL.  There is no point in making
+        these two useless calls.  The real ACL is retrieved through
+-       acl_get_file (name, ACL_TYPE_EXTENDED).  */
+-    acl_t acl = ((flags & ACL_SYMLINK_FOLLOW
+-                  ? acl_get_file
+-                  : acl_get_link_np)
+-                 (name, ACL_TYPE_EXTENDED));
++       ACL_TYPE_EXTENDED.  */
++    acl_t acl =
++      (fd < 0
++       ? ((flags & ACL_SYMLINK_FOLLOW ? acl_get_file : acl_get_link_np)
++          (name, ACL_TYPE_EXTENDED))
++       : acl_get_fd_np (fd, ACL_TYPE_EXTENDED));
+     if (acl)
+       {
+         ret = acl_extended_nontrivial (acl);
+@@ -489,13 +553,8 @@ file_has_aclinfo (MAYBE_UNUSED char const *restrict name,
+     else
+       ret = -1;
+ #   else /* FreeBSD, NetBSD >= 10, IRIX, Tru64, Cygwin >= 2.5 */
+-    acl_t (*acl_get_file_or_link) (char const *, acl_type_t) = acl_get_file;
+-#    if HAVE_ACL_GET_LINK_NP /* FreeBSD, NetBSD >= 10, Cygwin >= 2.5 */
+-    if (! (flags & ACL_SYMLINK_FOLLOW))
+-      acl_get_file_or_link = acl_get_link_np;
+-#    endif
+ 
+-    acl_t acl = acl_get_file_or_link (name, ACL_TYPE_ACCESS);
++    acl_t acl = acl_get_fdfile (fd, name, ACL_TYPE_ACCESS, flags);
+     if (acl)
+       {
+         ret = acl_access_nontrivial (acl);
+@@ -517,7 +576,7 @@ file_has_aclinfo (MAYBE_UNUSED char const *restrict name,
+             && (d_type == DT_DIR
+                 || (d_type == DT_UNKNOWN && !(flags & _GL_DT_NOTDIR))))
+           {
+-            acl = acl_get_file_or_link (name, ACL_TYPE_DEFAULT);
++            acl = acl_get_fdfile (fd, name, ACL_TYPE_DEFAULT, flags);
+             if (acl)
+               {
+ #     ifdef __CYGWIN__ /* Cygwin >= 2.5 */
+@@ -562,7 +621,10 @@ file_has_aclinfo (MAYBE_UNUSED char const *restrict name,
+ 
+       /* Solaris 10 (newer version), which has additional API declared in
+          <sys/acl.h> (acl_t) and implemented in libsec (acl_set, acl_trivial,
+-         acl_fromtext, ...).  */
++         acl_fromtext, ...).
++
++         Ignore FD, unfortunately.  That is better than mishandling
++         ZFS-style ACLs, as the general case code does.  */
+       return acl_trivial (name);
+ 
+ #    else /* Solaris, Cygwin, general case */
+@@ -586,7 +648,9 @@ file_has_aclinfo (MAYBE_UNUSED char const *restrict name,
+ 
+         for (;;)
+           {
+-            count = acl (name, GETACL, alloc, entries);
++            count = (fd < 0
++                     ? acl (name, GETACL, alloc, entries)
++                     : facl (fd, GETACL, alloc, entries));
+             if (count < 0 && errno == ENOSPC)
+               {
+                 /* Increase the size of the buffer.  */
+@@ -657,7 +721,9 @@ file_has_aclinfo (MAYBE_UNUSED char const *restrict name,
+ 
+         for (;;)
+           {
+-            count = acl (name, ACE_GETACL, alloc, entries);
++            count = (fd < 0
++                     ? acl (name, ACE_GETACL, alloc, entries)
++                     : facl (fd, ACE_GETACL, alloc, entries));
+             if (count < 0 && errno == ENOSPC)
+               {
+                 /* Increase the size of the buffer.  */
+@@ -722,7 +788,9 @@ file_has_aclinfo (MAYBE_UNUSED char const *restrict name,
+         struct acl_entry entries[NACLENTRIES];
+         int count;
+ 
+-        count = getacl (name, NACLENTRIES, entries);
++        count = (fd < 0
++                 ? getacl (name, NACLENTRIES, entries)
++                 : fgetacl (fd, NACLENTRIES, entries));
+ 
+         if (count < 0)
+           {
+@@ -751,7 +819,8 @@ file_has_aclinfo (MAYBE_UNUSED char const *restrict name,
+             {
+               struct stat statbuf;
+ 
+-              if (stat (name, &statbuf) == -1 && errno != EOVERFLOW)
++              if ((fd < 0 ? stat (name, &statbuf) : fstat (fd, &statbuf)) < 0
++                  && errno != EOVERFLOW)
+                 return -1;
+ 
+               return acl_nontrivial (count, entries);
+@@ -765,6 +834,7 @@ file_has_aclinfo (MAYBE_UNUSED char const *restrict name,
+         struct acl entries[NACLVENTRIES];
+         int count;
+ 
++        /* Ignore FD, unfortunately.  */
+         count = acl ((char *) name, ACL_GET, NACLVENTRIES, entries);
+ 
+         if (count < 0)
+@@ -809,7 +879,9 @@ file_has_aclinfo (MAYBE_UNUSED char const *restrict name,
+           /* The docs say that type being 0 is equivalent to ACL_ANY, but it
+              is not true, in AIX 5.3.  */
+           type.u64 = ACL_ANY;
+-          if (aclx_get (name, 0, &type, aclbuf, &aclsize, &mode) >= 0)
++          if (0 <= (fd < 0
++                    ? aclx_get (name, 0, &type, aclbuf, &aclsize, &mode)
++                    : aclx_fget (fd, 0, &type, aclbuf, &aclsize, &mode)))
+             break;
+           if (errno == ENOSYS)
+             return 0;
+@@ -855,7 +927,10 @@ file_has_aclinfo (MAYBE_UNUSED char const *restrict name,
+ 
+       union { struct acl a; char room[4096]; } u;
+ 
+-      if (statacl ((char *) name, STX_NORMAL, &u.a, sizeof (u)) < 0)
++      if ((fd < 0
++           ? statacl ((char *) name, STX_NORMAL, &u.a, sizeof u)
++           : fstatacl (fd, STX_NORMAL, &u.a, sizeof u))
++          < 0)
+         return -1;
+ 
+       return acl_nontrivial (&u.a);
+@@ -866,6 +941,7 @@ file_has_aclinfo (MAYBE_UNUSED char const *restrict name,
+         struct acl entries[NACLENTRIES];
+         int count;
+ 
++        /* Ignore FD, unfortunately.  */
+         count = acl ((char *) name, ACL_GET, NACLENTRIES, entries);
+ 
+         if (count < 0)
+diff --git a/lib/qcopy-acl.c b/lib/qcopy-acl.c
+index ad79661..282f4b2 100644
+--- a/lib/qcopy-acl.c
++++ b/lib/qcopy-acl.c
+@@ -26,6 +26,7 @@
+ #if USE_XATTR
+ 
+ # include <attr/libattr.h>
++# include <dirent.h>
+ # include <string.h>
+ 
+ # if HAVE_LINUX_XATTR_H
+@@ -61,6 +62,7 @@ is_attr_permissions (const char *name, struct error_context *ctx)
+    a valid file descriptor, use file descriptor operations, else use
+    filename based operations on SRC_NAME. Likewise for DEST_DESC and
+    DST_NAME.
++   MODE should be the source file's st_mode.
+    If access control lists are not available, fchmod the target file to
+    MODE.  Also sets the non-permission bits of the destination file
+    (S_ISUID, S_ISGID, S_ISVTX) to those from MODE if any are set.
+@@ -86,10 +88,29 @@ qcopy_acl (const char *src_name, int source_desc, const char *dst_name,
+      Functions attr_copy_* return 0 in case we copied something OR nothing
+      to copy */
+   if (ret == 0)
+-    ret = source_desc <= 0 || dest_desc <= 0
+-      ? attr_copy_file (src_name, dst_name, is_attr_permissions, NULL)
+-      : attr_copy_fd (src_name, source_desc, dst_name, dest_desc,
+-                      is_attr_permissions, NULL);
++    {
++      ret = source_desc <= 0 || dest_desc <= 0
++        ? attr_copy_file (src_name, dst_name, is_attr_permissions, NULL)
++        : attr_copy_fd (src_name, source_desc, dst_name, dest_desc,
++                        is_attr_permissions, NULL);
++
++      /* Copying can fail with EOPNOTSUPP even when the source
++         permissions are trivial (Bug#78328).  Don't report an error
++         in this case, as the chmod_or_fchmod suffices.  */
++      if (ret < 0 && errno == EOPNOTSUPP)
++        {
++          /* fdfile_has_aclinfo cares only about DT_DIR, _GL_DT_NOTDIR,
++             and DT_LNK (but DT_LNK is not possible here),
++             so use _GL_DT_NOTDIR | DT_UNKNOWN for other file types.  */
++          int flags = S_ISDIR (mode) ? DT_DIR : _GL_DT_NOTDIR | DT_UNKNOWN;
++
++          struct aclinfo ai;
++          if (!fdfile_has_aclinfo (source_desc, src_name, &ai, flags))
++            ret = 0;
++          aclinfo_free (&ai);
++          errno = EOPNOTSUPP;
++        }
++    }
+ #else
+   /* no XATTR, so we proceed the old dusty way */
+   struct permission_context ctx;
+-- 
+2.49.0
+
+
+From ed2bda5888829f4ebacd6dc9c86b7494dbf2a3b7 Mon Sep 17 00:00:00 2001
+From: Paul Eggert <eggert@cs.ucla.edu>
+Date: Fri, 9 May 2025 18:48:03 -0700
+Subject: [PATCH 2/2] acl-tests: link with $(FILE_HAS_ACL_LIB)
+
+* modules/acl-tests (test_copy_acl_LDADD): Add
+$(FILE_HAS_ACL_LIB), since qcopy-acl depends on file-has-acl.
+Although this suggests that QCOPY_ACL_LIB should contain
+FILE_HAS_ACL_LIB, I’m not sure whether that’s the right course of
+action and anyway this is good enough for coreutils.
+
+(cherry picked from commit 955360a66c99bdd9ac3688519a8b521b06958fd3)
+---
+ gnulib-tests/gnulib.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gnulib-tests/gnulib.mk b/gnulib-tests/gnulib.mk
+index e222c63..4b78de4 100644
+--- a/gnulib-tests/gnulib.mk
++++ b/gnulib-tests/gnulib.mk
+@@ -99,7 +99,7 @@ TESTS += \
+ TESTS_ENVIRONMENT += USE_ACL=$(USE_ACL)
+ check_PROGRAMS += test-set-mode-acl test-copy-acl test-sameacls
+ test_set_mode_acl_LDADD = $(LDADD) $(LIB_ACL) $(LIBUNISTRING) @LIBINTL@ $(MBRTOWC_LIB) $(LIBC32CONV)
+-test_copy_acl_LDADD = $(LDADD) $(LIB_ACL) $(QCOPY_ACL_LIB) $(LIBUNISTRING) @LIBINTL@ $(MBRTOWC_LIB) $(LIBC32CONV)
++test_copy_acl_LDADD = $(LDADD) $(LIB_ACL) $(QCOPY_ACL_LIB) $(FILE_HAS_ACL_LIB) $(LIBUNISTRING) @LIBINTL@ $(MBRTOWC_LIB) $(LIBC32CONV)
+ test_sameacls_LDADD = $(LDADD) $(LIB_ACL) @LIBINTL@ $(MBRTOWC_LIB)
+ EXTRA_DIST += test-set-mode-acl.sh test-set-mode-acl-1.sh test-set-mode-acl-2.sh test-copy-acl.sh test-copy-acl-1.sh test-copy-acl-2.sh test-set-mode-acl.c test-copy-acl.c test-sameacls.c macros.h
+ 
+-- 
+2.49.0
+

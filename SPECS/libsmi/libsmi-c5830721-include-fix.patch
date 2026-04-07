@@ -1,0 +1,22 @@
+diff -up libsmi-c5830721/lib/error.h.include-fix libsmi-c5830721/lib/error.h
+--- libsmi-c5830721/lib/error.h.include-fix	2021-01-15 06:10:12.000000000 -0500
++++ libsmi-c5830721/lib/error.h	2024-01-05 09:58:04.954515295 -0500
+@@ -14,6 +14,7 @@
+ #ifndef _ERROR_H
+ #define _ERROR_H
+ 
++#include "smi-check.h"
+ #include "smi-data.h"
+ #include "errormacros.h" /* list of error macros generated from error.c */
+ 
+diff -up libsmi-c5830721/lib/parser-yang.y.include-fix libsmi-c5830721/lib/parser-yang.y
+--- libsmi-c5830721/lib/parser-yang.y.include-fix	2024-01-05 09:59:45.714924347 -0500
++++ libsmi-c5830721/lib/parser-yang.y	2024-01-05 10:00:01.192140785 -0500
+@@ -37,6 +37,7 @@
+ #include "yang-data.h"
+ #include "parser-yang.h"
+ #include "scanner-yang.h"
++#include "yang-check.h"
+ #include "yang-complex-types.h"
+ #include "util.h"
+ #include "error.h"

@@ -1,0 +1,19 @@
+--- a/superlu_dist.pc.orig.in	2018-12-09 21:29:35.000000000 +0100
++++ b/superlu_dist.pc.in	2019-02-24 14:58:05.388656330 +0100
+@@ -1,12 +1,12 @@
+ prefix=@CMAKE_INSTALL_PREFIX@
+-libdir=@pkgconfig_libdir@
+-includedir=@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_INCLUDEDIR@
++libdir=@CMAKE_INSTALL_LIBDIR@
++includedir=@CMAKE_INSTALL_INCLUDEDIR@
+ 
+ Name: @CMAKE_PROJECT_NAME@
+ Description: Distributed-memory direct solution of sparse systems of linear equations
+ Version: @PROJECT_VERSION@
+ URL: https://portal.nersc.gov/project/sparse/superlu/
+ 
+-Libs: -L${libdir} -lsuperlu_dist
++Libs: -L@CMAKE_INSTALL_LIBDIR@ -lsuperlu_dist
+ Libs.private: @BLAS_LIB@ @LAPACK_LIB@ @PARMETIS_LIB@ @COLAMD_LIB@ @COMBBLAS_LIB@ -lm
+-Cflags: -I${includedir}
++Cflags: -I@CMAKE_INSTALL_INCLUDEDIR@

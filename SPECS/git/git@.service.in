@@ -1,0 +1,10 @@
+[Unit]
+Description=Git Repositories Server Daemon
+Documentation=man:git-daemon(1)
+
+[Service]
+User=nobody
+ExecStart=-@GITEXECDIR@/git-daemon --base-path=@BASE_PATH@ --export-all \
+          --user-path=public_git --inetd --log-destination=stderr --verbose
+StandardInput=socket
+StandardError=journal

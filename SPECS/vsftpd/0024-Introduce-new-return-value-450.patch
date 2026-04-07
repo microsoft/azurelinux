@@ -1,0 +1,77 @@
+From 1d5cdf309387ff92988ab17d746f015d833a4b92 Mon Sep 17 00:00:00 2001
+From: Martin Sehnoutka <msehnout@redhat.com>
+Date: Thu, 17 Nov 2016 11:08:52 +0100
+Subject: [PATCH 24/59] Introduce new return value 450:
+
+ *450 Requested file action not taken.
+      File unavailable (e.g., file busy).
+---
+ ftpcodes.h  | 1 +
+ postlogin.c | 9 ++++++++-
+ sysutil.c   | 3 +++
+ sysutil.h   | 3 ++-
+ 4 files changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/ftpcodes.h b/ftpcodes.h
+index 93290c0..81e25c5 100644
+--- a/ftpcodes.h
++++ b/ftpcodes.h
+@@ -52,6 +52,7 @@
+ #define FTP_TLS_FAIL          421
+ #define FTP_BADSENDCONN       425
+ #define FTP_BADSENDNET        426
++#define FTP_FILETMPFAIL       450
+ #define FTP_BADSENDFILE       451
+ 
+ #define FTP_BADCMD            500
+diff --git a/postlogin.c b/postlogin.c
+index bf12970..29958c0 100644
+--- a/postlogin.c
++++ b/postlogin.c
+@@ -679,7 +679,14 @@ handle_retr(struct vsf_session* p_sess, int is_http)
+   opened_file = str_open(&p_sess->ftp_arg_str, kVSFSysStrOpenReadOnly);
+   if (vsf_sysutil_retval_is_error(opened_file))
+   {
+-    vsf_cmdio_write(p_sess, FTP_FILEFAIL, "Failed to open file.");
++    if (kVSFSysUtilErrAGAIN == vsf_sysutil_get_error())
++    {
++      vsf_cmdio_write(p_sess, FTP_FILETMPFAIL, "Temporarily failed to open file");
++    }
++    else
++    {
++      vsf_cmdio_write(p_sess, FTP_FILEFAIL, "Failed to open file.");
++    }
+     return;
+   }
+   /* Lock file if required */
+diff --git a/sysutil.c b/sysutil.c
+index 9881a66..6d7cb3f 100644
+--- a/sysutil.c
++++ b/sysutil.c
+@@ -1632,6 +1632,9 @@ vsf_sysutil_get_error(void)
+     case ENOENT:
+       retval = kVSFSysUtilErrNOENT;
+       break;
++    case EAGAIN:
++      retval = kVSFSysUtilErrAGAIN;
++      break;
+     default:
+       break;
+   }
+diff --git a/sysutil.h b/sysutil.h
+index 79b5514..c145bdf 100644
+--- a/sysutil.h
++++ b/sysutil.h
+@@ -18,7 +18,8 @@ enum EVSFSysUtilError
+   kVSFSysUtilErrINVAL,
+   kVSFSysUtilErrOPNOTSUPP,
+   kVSFSysUtilErrACCES,
+-  kVSFSysUtilErrNOENT
++  kVSFSysUtilErrNOENT,
++  kVSFSysUtilErrAGAIN
+ };
+ enum EVSFSysUtilError vsf_sysutil_get_error(void);
+ 
+-- 
+2.14.4
+

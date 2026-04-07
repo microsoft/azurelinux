@@ -1,0 +1,25 @@
+From 6fe24bc56694808ac7f8038855883a971967f0fb Mon Sep 17 00:00:00 2001
+From: Martin Sehnoutka <msehnout@redhat.com>
+Date: Tue, 6 Sep 2016 13:40:53 +0200
+Subject: [PATCH 02/59] Enable build with SSL.
+
+---
+ builddefs.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/builddefs.h b/builddefs.h
+index e908352..63cc62b 100644
+--- a/builddefs.h
++++ b/builddefs.h
+@@ -3,7 +3,7 @@
+ 
+ #undef VSF_BUILD_TCPWRAPPERS
+ #define VSF_BUILD_PAM
+-#undef VSF_BUILD_SSL
++#define VSF_BUILD_SSL
+ 
+ #endif /* VSF_BUILDDEFS_H */
+ 
+-- 
+2.14.4
+

@@ -1,0 +1,15 @@
+--- ttmkfdir-3.0.9.old/Makefile	2020-03-25 16:06:55.999792212 +0100
++++ ttmkfdir-3.0.9/Makefile	2020-03-25 17:04:16.179479496 +0100
+@@ -40,10 +40,10 @@
+ all: ttmkfdir
+ 
+ .cpp.o:
+-	libtool --mode=compile $(CXX) $(CXXFLAGS) -o $@ -c $^
++	libtool --tag=CC --mode=compile $(CXX) $(CXXFLAGS) -o $@ -c $^
+ 
+ ttmkfdir: ttmkfdir.o directory.o commandline.o ttf.o encoding.o parser.o builtin.o
+-	libtool --mode=link $(CXX) -o $@ $^ $(LDFLAGS)
++	libtool --tag=CC --mode=link $(CXX) -o $@ $^ $(LDFLAGS)
+ 
+ parser.cpp: encoding.l
+ 	    flex -i -8 -o$@ $<

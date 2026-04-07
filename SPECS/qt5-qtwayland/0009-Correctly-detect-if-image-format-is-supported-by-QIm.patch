@@ -1,0 +1,68 @@
+From 62aff865a1965aac2c6e501d930c0e0308b1c4c3 Mon Sep 17 00:00:00 2001
+From: Jan Blackquill <uhhadd@gmail.com>
+Date: Tue, 24 Aug 2021 14:36:34 -0400
+Subject: [PATCH 09/55] Correctly detect if image format is supported by
+ QImageWriter
+
+The code queries potential image formats by stripping a mimetype of its
+'image/' prefix and making the rest of the mimetype capitalised, such as
+'image/png' -> 'PNG'. The problem is that this is then searched for in
+QImageWriter::supportedImageFormats() by simple equality. The method
+returns a list of lowercase byte arrays, not uppercase. As the codepath
+can never match due to checking for an uppercase word in an array of
+lowercase words, this means that images are effectively always sent as
+BMP format, even if they should be sent in other formats, such as PNG
+or JPEG.
+
+A simple inspection with GDB (or a qDebug) reveals this:
+
+```
+(gdb) p QImageWriter::supportedImageFormats()
+$31 = {"bmp" = {...}, "bw" = {...}, "cur" = {...}, "eps" = {...},
+  "epsf" = {...}, "epsi" = {...}, "icns" = {...},
+  "ico" = {...}, "jp2" = {...}, "jpeg" = {...}, "jpg" = {...},
+  "pbm" = {...}, "pcx" = {...}, "pgm" = {...},
+  "pic" = {...}, "png" = {...}, "ppm" = {...},
+  "rgb" = {...}, "rgba" = {...}, "sgi" = {...},
+  "tga" = {...}, "tif" = {...}, "tiff" = {...},
+  "wbmp" = {...}, "webp" = {...}, "xbm" = {...}, "xpm" = {...}}
+```
+
+```
+(gdb) p QImageWriter::supportedImageFormats().contains("PNG")
+$32 = false
+```
+
+```
+(gdb) p QImageWriter::supportedImageFormats().contains("png")
+$33 = true
+```
+
+The fix for this is simple: lowercase the remainder of the mimetype,
+instead of uppercasing it, and we can start hitting the codepath that's
+supposed to write non-BMP formats.
+
+Change-Id: Id3e9b730b7edcabcb2f1b04d8ef0a4c1fb9c9159
+Reviewed-by: David Edmundson <davidedmundson@kde.org>
+Reviewed-by: Qt CI Bot <qt_ci_bot@qt-project.org>
+(cherry picked from commit 6072c1dc87e185f30c014f764737ac97b906640f)
+---
+ src/shared/qwaylandmimehelper.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/shared/qwaylandmimehelper.cpp b/src/shared/qwaylandmimehelper.cpp
+index c5266ab3..e2fe1928 100644
+--- a/src/shared/qwaylandmimehelper.cpp
++++ b/src/shared/qwaylandmimehelper.cpp
+@@ -60,7 +60,7 @@ QByteArray QWaylandMimeHelper::getByteArray(QMimeData *mimeData, const QString &
+             buf.open(QIODevice::ReadWrite);
+             QByteArray fmt = "BMP";
+             if (mimeType.startsWith(QLatin1String("image/"))) {
+-                QByteArray imgFmt = mimeType.mid(6).toUpper().toLatin1();
++                QByteArray imgFmt = mimeType.mid(6).toLower().toLatin1();
+                 if (QImageWriter::supportedImageFormats().contains(imgFmt))
+                     fmt = imgFmt;
+             }
+-- 
+2.51.1
+

@@ -1,0 +1,29 @@
+--- JUnitParams-JUnitParams-1.1.1/src/main/java/junitparams/internal/InvokeParameterisedMethod.java.orig	2023-11-03 14:36:37.224929445 -0600
++++ JUnitParams-JUnitParams-1.1.1/src/main/java/junitparams/internal/InvokeParameterisedMethod.java	2023-11-03 14:52:02.457809490 -0600
+@@ -14,6 +14,8 @@ import java.beans.PropertyEditorManager;
+ import java.lang.annotation.Annotation;
+ import java.lang.reflect.Array;
+ import java.math.BigDecimal;
++import java.text.DecimalFormat;
++import java.text.ParseException;
+ 
+ /**
+  * JUnit invoker for parameterised test methods
+@@ -209,8 +211,15 @@ class InvokeParameterisedMethod extends
+             return object.toString().charAt(0);
+         if (clazz.isAssignableFrom(Byte.TYPE) || clazz.isAssignableFrom(Byte.class))
+             return Byte.parseByte((String) object);
+-        if (clazz.isAssignableFrom(BigDecimal.class))
+-            return new BigDecimal((String) object);
++        if (clazz.isAssignableFrom(BigDecimal.class)) {
++            DecimalFormat decimalFormat = new DecimalFormat();
++            decimalFormat.setParseBigDecimal(true);
++            try {
++                return decimalFormat.parse((String) object);
++            } catch (ParseException e) {
++                throw new IllegalArgumentException("Illegal BigDecimal value (" + object + ")", e);
++            }
++	}
+         PropertyEditor editor = PropertyEditorManager.findEditor(clazz);
+         if (editor != null) {
+             editor.setAsText((String) object);

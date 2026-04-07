@@ -1,0 +1,25 @@
+Revert relevant parts of 96a7a652166bece8acc96d6335ebb8091de2f496 so we can use older setuptools on F42
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,5 +1,5 @@
+ [build-system]
+-requires = ["setuptools>=77.0.3"]
++requires = ["setuptools>=69.3"]
+ build-backend = "setuptools.build_meta"
+ 
+ [project]
+@@ -16,13 +16,12 @@ authors = [
+ ]
+ description = "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
+ readme = "README.rst"
+-license = "BSD-3-Clause"
+-license-files = ["LICENSE", "LICENSE.python"]
+ classifiers = [
+     "Development Status :: 5 - Production/Stable",
+     "Environment :: Web Environment",
+     "Framework :: Django",
+     "Intended Audience :: Developers",
++    "License :: OSI Approved :: BSD License",
+     "Operating System :: OS Independent",
+     "Programming Language :: Python",
+     "Programming Language :: Python :: 3",

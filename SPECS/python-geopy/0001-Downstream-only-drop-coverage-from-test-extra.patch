@@ -1,0 +1,25 @@
+From ad80cef95aec289a3610c16f5023b15b22e3fc37 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Sat, 1 Jul 2023 11:58:59 -0400
+Subject: [PATCH 1/2] Downstream-only: drop coverage from test extra
+
+https://docs.fedoraproject.org/en-US/packaging-guidelines/Python/#_linters
+---
+ setup.py | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index 8d7716f..cc846e4 100755
+--- a/setup.py
++++ b/setup.py
+@@ -10,7 +10,6 @@ EXTRAS_DEV_LINT = [
+ ]
+ 
+ EXTRAS_DEV_TEST = [
+-    "coverage",
+     "pytest-asyncio>=0.17",
+     "pytest>=3.10",
+     "sphinx<=4.3.2",  # `docutils` from sphinx is used in tests
+-- 
+2.41.0
+

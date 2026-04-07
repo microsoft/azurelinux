@@ -1,0 +1,10 @@
+--- apache-arrow-17.0.0/python/pyarrow/tests/read_record_batch.py.orig	2024-07-17 15:20:35.279004865 -0400
++++ apache-arrow-17.0.0/python/pyarrow/tests/read_record_batch.py	2024-07-17 15:21:41.285943684 -0400
+@@ -21,5 +21,7 @@
+ 
+ import pyarrow as pa
+ 
++print("argv[1]: ", sys.argv[1])
++
+ with open(sys.argv[1], 'rb') as f:
+     pa.ipc.open_file(f).read_all().to_pandas()

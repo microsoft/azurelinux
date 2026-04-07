@@ -1,0 +1,34 @@
+From 7d4b76abb437184fa692533cb5537318026a30e8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Lyson=C4=9Bk?= <olysonek@redhat.com>
+Date: Fri, 24 Nov 2017 11:26:37 +0100
+Subject: [PATCH 39/59] Improve documentation of ASCII mode in the man page
+
+---
+ vsftpd.conf.5 | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/vsftpd.conf.5 b/vsftpd.conf.5
+index d1f0db5..3ca55e4 100644
+--- a/vsftpd.conf.5
++++ b/vsftpd.conf.5
+@@ -113,11 +113,17 @@ Default: YES
+ .TP
+ .B ascii_download_enable
+ When enabled, ASCII mode data transfers will be honoured on downloads.
++When disabled, the server will pretend to allow ASCII mode but in fact
++ignore the request. Turn this option on to have the server actually do
++ASCII mangling on files when in ASCII mode.
+ 
+ Default: NO
+ .TP
+ .B ascii_upload_enable
+ When enabled, ASCII mode data transfers will be honoured on uploads.
++See also
++.BR ascii_download_enable
++for more details.
+ 
+ Default: NO
+ .TP
+-- 
+2.14.4
+

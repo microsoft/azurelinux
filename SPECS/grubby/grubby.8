@@ -1,0 +1,177 @@
+.TH GRUBBY 8 "Wed Apr 29 2020"
+.SH NAME
+grubby \- command line tool for configuring grub and zipl
+
+.SH SYNOPSIS
+\fBgrubby\fR [--add-kernel=\fIkernel-path\fR] [--args=\fIargs\fR]
+       [--bad-image-okay] [--config-file=\fIpath\fR] [--copy-default]
+       [--default-kernel] [--default-index] [--default-title]
+       [--env=\fIpath\fR] [--grub2] [--info=\fIkernel-path\fR]
+       [--initrd=\fIinitrd-path\fR] [--extra-initrd=\fIinitrd-path\fR]
+       [--make-default] [--remove-args=\fIargs\fR]
+       [--remove-kernel=\fIkernel-path\fR] [--set-default=\fIkernel-path\fR]
+       [--set-default-index=\fientry-index\fR] [--title=\fentry-title\fR]
+       [--update-kernel=\fIkernel-path\fR] [--zipl] [--bls-directory=\fIpath\fR]
+
+.SH DESCRIPTION
+\fBgrubby\fR is a command line tool for updating and displaying information
+about the configuration files for the \fBgrub2\fR and \fBzipl\fR boot loaders.
+It is primarily designed to be used from scripts which install new kernels and
+need to find information about the current boot environment.
+
+On BIOS-based Intel x86, PowerPC and UEFI-based platforms, \fBgrub2\fR is the
+default bootloader and the configuration file is in \fB/boot/grub2/grub.cfg\fR.
+On s390x platforms, the \fBzipl\fR bootloader use a default configuration in
+\fB/etc/zipl.conf\fR.
+
+All bootloaders define the boot entries as individual configuration fragments
+that are stored by default in \fB/boot/loader/entries\fR. The format for the
+config files is specified at \fBhttps://systemd.io/BOOT_LOADER_SPECIFICATION\fR.
+The \fBgrubby\fR tool is used to update and display the configuration defined
+in the BootLoaderSpec fragment files.
+
+There are a number of ways to specify the kernel used for \fB-\-info\fR,
+\fB-\-remove-kernel\fR, and \fB-\-update-kernel\fR. Specificying \fBDEFAULT\fR
+or \fBALL\fR selects the default entry and all of the entries, respectively.
+Also, the title of a boot entry may be specified by using \fBTITLE=\fItitle\fR
+as the argument; all entries with that title are used.
+
+.SH OPTIONS
+.TP
+\fB-\-add-kernel\fR=\fIkernel-path\fR
+Add a new boot entry for the kernel located at \fIkernel-path\fR.
+
+.TP
+\fB-\-args\fR=\fIkernel-args\fR
+When a new kernel is added, this specifies the command line arguments
+which should be passed to the kernel by default (note they are merged
+with the arguments of the default entry if \fB-\-copy-default\fR is used).
+When \fB-\-update-kernel\fR is used, this specifies new arguments to add
+to the argument list. Multiple, space separated arguments may be used. If
+an argument already exists the new value replaces the old values. The
+\fBroot=\fR kernel argument gets special handling if the configuration
+file has special handling for specifying the root filesystem.
+
+.TP
+\fB-\-bad-image-okay\fR
+When \fBgrubby\fR is looking for an entry to use for something (such
+as a default boot entry) it uses sanity checks, such as ensuring that
+the kernel exists in the filesystem, to make sure entries that obviously
+won't work aren't selected. This option overrides that behavior, and is
+designed primarily for testing.
+
+.TP
+\fB-\-config-file\fR=\fIpath\fR
+Use \fIpath\fR as the configuration file rather then the default.
+
+.TP
+\fB-\-copy-default\fR
+\fBgrubby\fR will copy as much information (such as kernel arguments and
+root device) as possible from the current default kernel. The kernel path
+and initrd path will never be copied.
+
+.TP
+\fB-\-default-kernel\fR
+Display the full path to the current default kernel and exit.
+
+.TP
+\fB-\-default-index\fR
+Display the numeric index of the current default boot entry and exit.
+
+.TP
+\fB-\-default-title\fR
+Display the title of the current default boot entry and exit.
+
+.TP
+\fB-\-env\fR=\fIpath\fR
+Use \fIpath\fR as the grub2 environment block file rather then the default path.
+
+.TP
+\fB-\-grub2\fR
+Configure \fBgrub2\fR bootloader.
+
+.TP
+\fB-\-info\fR=\fIkernel-path\fR
+Display information on all boot entries which match \fIkernel-path\fR. If
+\fIkernel-path\fR is \fBDEFAULT\fR, then information on the default kernel
+is displayed. If \fIkernel-path\fR is \fBALL\fR, then information on all boot
+entries are displayed.
+
+.TP
+\fB-\-initrd\fR=\fIinitrd-path\fR
+Use \fIinitrd-path\fR as the path to an initial ram disk for a new kernel
+being added.
+
+.TP
+\fB-\-extrainitrd\fR=\fIinitrd-path\fR
+Use \fIinitrd-path\fR as the path to an auxiliary init ram disk image to be
+added to the boot entry.
+
+.TP
+\fB-\-make-default\fR
+Make the new kernel entry being added the default entry.
+
+.TP
+\fB-\-remove-args\fR=\fIkernel-args\fR
+The arguments specified by \fIkernel-args\fR are removed from the kernels
+specified by \fB-\-update-kernel\fR. The \fBroot\fR argument gets special
+handling for configuration files that support separate root filesystem
+configuration.
+
+.TP
+\fB-\-remove-kernel\fR=\fIkernel-path\fR
+Removes all boot entries which match \fIkernel-path\fR. This may be used
+along with -\-add-kernel, in which case the new kernel being added will
+never be removed.
+
+.TP
+\fB-\-set-default\fR=\fIkernel-path\fR
+The first entry which boots the specified kernel is made the default
+boot entry.
+
+.TP
+\fB-\-set-default-index\fR=\fIentry-index\fR
+Makes the given entry number the default boot entry.
+
+.TP
+\fB-\-title\fR=\fIentry-title\fR
+When a new kernel entry is added \fIentry-title\fR is used as the title
+for the entry.
+
+.TP
+\fB-\-update-kernel\fR=\fIkernel-path\fR
+The entries for kernels matching \fRkernel-path\fR are updated. Currently
+the only items that can be updated is the kernel argument list, which is
+modified via the \fB-\-args\fR and \fB-\-remove-args\fR options. If the
+\fBALL\fR argument is used the variable \fB GRUB_CMDLINE_LINUX\fR in
+\fB/etc/default/grub\fR is updated with the latest kernel argument list,
+unless the \fB-\-no-etc-grub-update\fR option is used or the file does not
+exist (e.g., on s390x).
+
+.TP
+\fB-\-zipl\fR
+Configure \fBzipl\fR bootloader.
+
+.TP
+\fB-\-bls-directory\fR=\fIpath\fR
+Use \fIpath\fR as the directory for the BootLoaderSpec config files rather
+than the default \fB/boot/loader/entries\fR.
+
+.TP
+\fB-\-no-etc-grub-update\fR
+Makes grubby to not update the \fBGRUB_CMDLINE_LINUX\fR variable in
+\fB/etc/default/grub\fR when the \fB-\-update-kernel\fR option is
+used with the \fBALL\fR argument.
+
+.SH "SEE ALSO"
+.BR zipl (8),
+.BR mkinitrd (8),
+.BR kernel-install (8)
+
+.SH AUTHORS
+.nf
+Erik Troan
+Jeremy Katz
+Peter Jones
+Javier Martinez
+.fi

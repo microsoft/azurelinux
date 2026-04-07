@@ -1,0 +1,130 @@
+From 6b05dc28e94e90ab4852c9977d7fbe66fec6cd48 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Fri, 8 Feb 2019 14:50:32 +0100
+Subject: [PATCH] Test client performs Post-Handshake-Authentication
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This test uses openssl tool because PHA is not yet supported by
+IO::Socket::SSL's server implementation. The openssl tool uses a fixed
+port. So the test can fail.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ MANIFEST       |  1 +
+ t/pha_client.t | 90 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 91 insertions(+)
+ create mode 100755 t/pha_client.t
+
+diff --git a/MANIFEST b/MANIFEST
+index 20cddb6..2b8328d 100644
+--- a/MANIFEST
++++ b/MANIFEST
+@@ -56,6 +56,7 @@ t/mitm.t
+ t/multiple-cert-rsa-ecc.t
+ t/nonblock.t
+ t/npn.t
++t/pha_client.t
+ t/plain_upgrade_downgrade.t
+ t/protocol_version.t
+ t/psk.t
+diff --git a/t/pha_client.t b/t/pha_client.t
+new file mode 100755
+index 0000000..2413588
+--- /dev/null
++++ b/t/pha_client.t
+@@ -0,0 +1,90 @@
++#!/usr/bin/perl
++use strict;
++use warnings;
++use Test::More;
++use IPC::Run ();
++use IO::Socket::SSL ();
++use Net::SSLeay ();
++use IO::Select ();
++
++if (system('openssl', 'version')) {
++    plan skip_all => 'openssl tool is not available';
++} elsif (!defined &Net::SSLeay::CTX_set_post_handshake_auth) {
++    plan skip_all => 'Net::SSLeay does not expose PHA';
++} else {
++    plan tests => 5;
++}
++
++my $port = 2000;
++my $ca_cert = 't/certs/test-ca.pem';
++
++diag 'Starting a server';
++my ($server, $input, $stdout, $stderr);
++eval {
++    $server = IPC::Run::start(['openssl', 's_server', '-port', $port,
++            '-Verify', '1',
++            '-cert', 't/certs/server-wildcard.pem',
++            '-key', 't/certs/server-wildcard.pem', '-CAfile', $ca_cert],
++        \$input, \$stdout, \$stderr);
++    # subsequent \undef does not work
++    # <https://github.com/toddr/IPC-Run/issues/124>
++};
++if (!$server or $@) {
++    BAIL_OUT("Could not start a server: $@");
++}
++# openssl s_server does not return a non-zero exit code in case of bind(2) failure.
++while ($server->pumpable && $stdout !~ /\nACCEPT\n/) { $server->pump; }
++if ($stderr =~ /unable to bind socket/) {
++    $server->kill_kill;
++    BAIL_OUT("Could not start a server: $stderr");
++}
++ok($server, 'Server started');
++
++my $client = IO::Socket::SSL->new(
++    PeerHost => 'localhost',
++    PeerPort => $port,
++    SSL_verify_mode => IO::Socket::SSL::SSL_VERIFY_PEER,
++    SSL_verifycn_scheme => 'www',
++    SSL_verifycn_name => 'www.server.local',
++    SSL_ca_file => $ca_cert,
++    SSL_key_file => 't/certs/client-key.pem',
++    SSL_cert_file => 't/certs/client-cert.pem'
++);
++ok($client, 'Client connected');
++
++SKIP: {
++    skip "Connection failed: errno=$!, SSL errror=$IO::Socket::SSL::SSL_ERROR", 2
++        unless $client;
++    $client->blocking(0);
++
++    SKIP: {
++        # Ask openssl s_server for PHA request and wait for the result.
++        $input .= "c\n";
++        while ($server->pumpable &&
++            $stderr !~ /SSL_verify_client_post_handshake/ &&
++            $stdout !~ /SSL_do_handshake -> 1/
++        ) {
++            # Push the PHA command to the server and read outputs.
++            $server->pump;
++
++            # Client also must perform I/O to process the PHA request.
++            my $select = IO::Select->new($client);
++            while ($select->can_read(1)) {  # 1 second time-out because of
++                                            # blocking IPC::Run
++                my $retval = $client->read(my $buf, 1);
++                if (defined $buf and $buf eq 'c') {
++                    skip 'openssl tool does not support PHA command', 1;
++                }
++            }
++        }
++        ok($stdout =~ /SSL_do_handshake -> 1/, 'Client performed PHA');
++    }
++
++    ok($client->close, 'Client disconnected');
++}
++
++eval {
++    $server->kill_kill;
++};
++ok(!$@, 'Server terminated');
++
+-- 
+2.20.1
+

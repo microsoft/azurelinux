@@ -1,0 +1,135 @@
+diff -up db-5.3.28/src/dbinc_auto/int_def.in.pthreads_ppc db-5.3.28/src/dbinc_auto/int_def.in
+--- db-5.3.28/src/dbinc_auto/int_def.in.pthreads_ppc	2017-06-26 15:06:09.282020804 +0200
++++ db-5.3.28/src/dbinc_auto/int_def.in	2017-06-26 15:06:22.238771039 +0200
+@@ -1572,6 +1572,7 @@
+ #define	__os_strerror __os_strerror@DB_VERSION_UNIQUE_NAME@
+ #define	__os_posix_err __os_posix_err@DB_VERSION_UNIQUE_NAME@
+ #define	__os_fileid __os_fileid@DB_VERSION_UNIQUE_NAME@
++#define	__check_lock_fn __check_lock_fn@DB_VERSION_UNIQUE_NAME@
+ #define	__os_fdlock __os_fdlock@DB_VERSION_UNIQUE_NAME@
+ #define	__os_fsync __os_fsync@DB_VERSION_UNIQUE_NAME@
+ #define	__os_getenv __os_getenv@DB_VERSION_UNIQUE_NAME@
+diff -up db-5.3.28/src/dbinc_auto/os_ext.h.pthreads_ppc db-5.3.28/src/dbinc_auto/os_ext.h
+--- db-5.3.28/src/dbinc_auto/os_ext.h.pthreads_ppc	2017-06-26 15:05:23.792897700 +0200
++++ db-5.3.28/src/dbinc_auto/os_ext.h	2017-06-26 15:06:22.172772311 +0200
+@@ -41,6 +41,7 @@ void __os_set_errno __P((int));
+ char *__os_strerror __P((int, char *, size_t));
+ int __os_posix_err __P((int));
+ int __os_fileid __P((ENV *, const char *, int, u_int8_t *));
++int __check_lock_fn __P((char *, pid_t));
+ int __os_fdlock __P((ENV *, DB_FH *, off_t, db_lockmode_t, int));
+ int __os_fsync __P((ENV *, DB_FH *));
+ int __os_getenv __P((ENV *, const char *, char **, size_t));
+diff -up db-5.3.28/src/env/env_region.c.pthreads_ppc db-5.3.28/src/env/env_region.c
+--- db-5.3.28/src/env/env_region.c.pthreads_ppc	2017-06-26 15:04:40.805726365 +0200
++++ db-5.3.28/src/env/env_region.c	2017-06-26 15:04:40.807726326 +0200
+@@ -305,14 +305,6 @@ user_map_functions:
+ 		goto creation;
+ 	}
+ 
+-    /* We have an old environment but cannot rebuild it safely. */
+-    if (ret == DB_OLD_VERSION) {
+- 		__db_errx(env, DB_STR("1539",
+-		    "Build signature doesn't match environment"));
+-		ret = DB_VERSION_MISMATCH;
+-        goto err;
+-    }
+-
+ 	if (renv->majver != DB_VERSION_MAJOR ||
+ 	    renv->minver != DB_VERSION_MINOR) {
+ 		/*
+@@ -337,6 +329,20 @@ user_map_functions:
+ 		goto err;
+ 	}
+ 
++    /*
++     * We have an old environment but cannot rebuild it safely.
++     * The environment might still be readable by the current process
++     * (only the libpthread timestamp changed) if this process is the one
++     * that is holding the lock on the region file as we can be sure
++     * the environment did not get rebuilt under our feet.
++     */
++    if (ret == DB_OLD_VERSION && __check_lock_fn(env->lockfhp->name, getpid()) ) {
++       __db_errx(env, DB_STR("1539",
++           "Build signature doesn't match environment"));
++       ret = DB_VERSION_MISMATCH;
++        goto err;
++    }
++
+ 	/*
+ 	 * Check if the environment has had a catastrophic failure.
+ 	 *
+diff -up db-5.3.28/src/os/os_flock.c.pthreads_ppc db-5.3.28/src/os/os_flock.c
+--- db-5.3.28/src/os/os_flock.c.pthreads_ppc	2017-06-26 15:04:40.806726346 +0200
++++ db-5.3.28/src/os/os_flock.c	2017-06-26 15:04:40.807726326 +0200
+@@ -15,6 +15,70 @@ static int __os_filelocking_notsup __P((
+ #endif
+ 
+ /*
++ * __check_lock_fn --
++ * Parse /proc/locks to see if the file described by 'fn' is locked.
++ * Additionally (if 'pid' is not 0) check if the process holding
++ * the lock has the same pid value as 'pid'.
++ *
++ * Returns 0 if a lock on fn is found, 1 if it is not found and -1 on error.
++ * PUBLIC: int __check_lock_fn __P((char *, pid_t));
++ */
++
++int __check_lock_fn(fn, pid)
++    char *fn;
++    pid_t pid;
++{
++    FILE* fp;
++    char buffer[PATH_MAX];
++    char *token;
++    int i, inode;
++    struct stat st;
++    pid_t lpid = 0;
++
++    if (!fn)
++       return -1;
++
++    fp = fopen("/proc/locks", "r");
++    if (!fp)
++        return -1;
++
++    /* Get the file's inode */
++    if (stat(fn, &st)) {
++        fclose(fp);
++        return -1;
++    }
++
++    while (fgets(buffer, sizeof(buffer), fp))
++        for (token = strtok(buffer, " "), i = 0; token; token = strtok(NULL, " "), i++) {
++            /* Do not parse any other fields */
++            if (i > 5)
++                break;
++            /* Save the PID */
++            if (i == 4)
++                lpid = atoi(token);
++            /* Check the inode */
++            else if (i == 5) {
++                inode = 0;
++                sscanf(token, "%*02x:%*02x:%d", &inode);
++                /* Not the inode we are looking for */
++                if (inode != st.st_ino)
++                    continue;
++                /*
++                 * We have the correct file.
++                 * We are either looking for a specific process or we do not care at all.
++                 */
++                if (!pid || lpid == pid) {
++                    fclose(fp);
++                    return 0;
++                }
++                /* Not the lock we are looking for */
++            }
++        }
++    fclose(fp);
++    return 1;
++}
++
++/*
+  * __os_fdlock --
+  *	Acquire/release a lock on a byte in a file.
+  *

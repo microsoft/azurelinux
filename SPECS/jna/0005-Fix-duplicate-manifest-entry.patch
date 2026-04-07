@@ -1,0 +1,28 @@
+From de939d7c9266f89542cea5ebef5980a95f1244a9 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Mon, 10 Jul 2017 11:48:43 +0200
+Subject: [PATCH 5/6] Fix duplicate manifest entry
+
+---
+ build.xml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/build.xml b/build.xml
+index aa5aa00..9deb2b7 100644
+--- a/build.xml
++++ b/build.xml
+@@ -681,9 +681,9 @@ osname=macosx;processor=aarch64
+                   includes="LICENSE,LGPL2.1,AL2.0"
+                   prefix="META-INF"/>
+     </jar>
+-    <zip zipfile="${build}/${minjar}">
++    <jar zipfile="${build}/${minjar}" filesetmanifest="merge">
+       <zipfileset src="${build}/${jar}" excludes="**/*jnidispatch*"/>
+-    </zip>
++    </jar>
+     <jar jarfile="${build}/jna-jpms.jar" duplicate="preserve" createUnicodeExtraFields="never" encoding="UTF-8" manifest="${build}/manifest/module.mf">
+       <zipfileset src="${build}/${jar}" excludes="META-INF/MANIFEST.mf"/>
+       <zipfileset dir="${build}/manifest/" includes="module-info.class" prefix="META-INF/versions/9"/>
+-- 
+2.20.1
+

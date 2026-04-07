@@ -1,0 +1,12 @@
+diff -rupN --no-dereference libwebp-1.5.0/CMakeLists.txt libwebp-1.5.0-new/CMakeLists.txt
+--- libwebp-1.5.0/CMakeLists.txt	2024-12-21 00:47:47.728835051 +0100
++++ libwebp-1.5.0-new/CMakeLists.txt	2024-12-21 00:47:47.732835055 +0100
+@@ -793,7 +793,7 @@ install(
+   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+-set(ConfigPackageLocation ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}/cmake/)
++set(ConfigPackageLocation ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}/)
+ install(EXPORT ${PROJECT_NAME}Targets NAMESPACE ${PROJECT_NAME}::
+         DESTINATION ${ConfigPackageLocation})
+ 

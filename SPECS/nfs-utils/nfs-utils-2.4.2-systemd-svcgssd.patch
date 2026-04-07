@@ -1,0 +1,12 @@
+diff -up nfs-utils-2.6.2/systemd/auth-rpcgss-module.service.orig nfs-utils-2.6.2/systemd/auth-rpcgss-module.service
+--- nfs-utils-2.6.2/systemd/auth-rpcgss-module.service.orig	2023-01-10 09:58:33.559453143 -0500
++++ nfs-utils-2.6.2/systemd/auth-rpcgss-module.service	2023-01-10 10:07:27.476996363 -0500
+@@ -7,7 +7,7 @@
+ [Unit]
+ Description=Kernel Module supporting RPCSEC_GSS
+ DefaultDependencies=no
+-Before=gssproxy.service rpc-svcgssd.service rpc-gssd.service
++Before=gssproxy.service rpc-gssd.service
+ Wants=gssproxy.service rpc-gssd.service
+ ConditionPathExists=/etc/krb5.keytab
+ ConditionVirtualization=!container

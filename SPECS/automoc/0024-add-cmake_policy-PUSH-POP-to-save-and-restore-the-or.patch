@@ -1,0 +1,83 @@
+From 086dd2b06c18d3935ffb87b286e548c375580fba Mon Sep 17 00:00:00 2001
+From: Alexander Neundorf <neundorf@kde.org>
+Date: Wed, 23 Jun 2010 21:09:24 +0000
+Subject: [PATCH 24/33] -add cmake_policy(PUSH|POP) to save and restore the
+ original cmake policy settings -add the cmake_minimum_required(VERSION 2.6.4
+ FATAL_ERROR) back, since this is indeed required
+
+Alex
+
+
+svn path=/trunk/kdesupport/automoc/; revision=1141941
+---
+ Automoc4Config.cmake | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+
+diff --git a/Automoc4Config.cmake b/Automoc4Config.cmake
+index 2d2d9d2..679a77c 100644
+--- a/Automoc4Config.cmake
++++ b/Automoc4Config.cmake
+@@ -48,6 +48,16 @@
+ #     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ #     THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ 
++# push the current cmake policy settings on the policy stack and pop them again at the
++# end of this file, so any policies which are changed in this file don't affect anything
++# on the outside (cmake_minimum_required() sets all policies to NEW for version 2.6.4). Alex
++if(COMMAND cmake_policy)
++  cmake_policy(PUSH)
++endif(COMMAND cmake_policy)
++
++# 2.6.4 is required because of the get_filename_component(REALPATH)
++cmake_minimum_required( VERSION 2.6.4 FATAL_ERROR )
++
+ 
+ get_filename_component(_AUTOMOC4_CURRENT_DIR  "${CMAKE_CURRENT_LIST_FILE}" PATH)
+ 
+@@ -62,6 +72,9 @@ if(EXISTS ${_AUTOMOC4_CURRENT_DIR}/kde4automoc.cpp)
+ else(EXISTS ${_AUTOMOC4_CURRENT_DIR}/kde4automoc.cpp)
+    get_filename_component(_AUTOMOC4_BIN_DIR  "${_AUTOMOC4_CURRENT_DIR}" PATH)
+    get_filename_component(_AUTOMOC4_BIN_DIR  "${_AUTOMOC4_BIN_DIR}" PATH)
++
++   # This REALPATH here is necessary for the case that the path is a "virtual" drive 
++   # created using "subst", in this case otherwise the drive letter is missing:
+    if(WIN32)
+       get_filename_component(_AUTOMOC4_BIN_DIR  "${_AUTOMOC4_BIN_DIR}" REALPATH)
+    endif(WIN32)
+@@ -139,6 +152,7 @@ macro(AUTOMOC4 _target_NAME _SRCS)
+    endif(_moc_files)
+ endmacro(AUTOMOC4)
+ 
++
+ macro(_ADD_AUTOMOC4_TARGET _target_NAME _SRCS)
+    set(_moc_files)
+    set(_moc_headers)
+@@ -208,6 +222,7 @@ macro(_ADD_AUTOMOC4_TARGET _target_NAME _SRCS)
+    endif(_moc_files)
+ endmacro(_ADD_AUTOMOC4_TARGET)
+ 
++
+ macro(AUTOMOC4_ADD_EXECUTABLE _target_NAME)
+    set(_SRCS ${ARGN})
+ 
+@@ -226,6 +241,7 @@ macro(AUTOMOC4_ADD_EXECUTABLE _target_NAME)
+ 
+ endmacro(AUTOMOC4_ADD_EXECUTABLE)
+ 
++
+ macro(AUTOMOC4_ADD_LIBRARY _target_NAME)
+    set(_SRCS ${ARGN})
+ 
+@@ -252,3 +268,9 @@ endmacro(_AUTOMOC4_KDE4_PRE_TARGET_HANDLING)
+ macro(_AUTOMOC4_KDE4_POST_TARGET_HANDLING _target)
+    add_dependencies(${_target} "${_target}_automoc")
+ endmacro(_AUTOMOC4_KDE4_POST_TARGET_HANDLING)
++
++
++# restore previous policy settings:
++if(COMMAND cmake_policy)
++  cmake_policy(POP)
++endif(COMMAND cmake_policy)
+-- 
+2.4.3
+

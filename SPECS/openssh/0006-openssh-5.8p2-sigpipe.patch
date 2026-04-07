@@ -1,0 +1,26 @@
+From 80359feb76fd8061b5ce18f73451d7b9db0c2477 Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:28 +0200
+Subject: [PATCH 06/50] openssh-5.8p2-sigpipe
+
+---
+ ssh-keyscan.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/ssh-keyscan.c b/ssh-keyscan.c
+index 3436c0b5..9f76ad22 100644
+--- a/ssh-keyscan.c
++++ b/ssh-keyscan.c
+@@ -798,6 +798,9 @@ main(int argc, char **argv)
+ 	if (maxfd > fdlim_get(0))
+ 		fdlim_set(maxfd);
+ 	fdcon = xcalloc(maxfd, sizeof(con));
++ 
++	signal(SIGPIPE, SIG_IGN);
++
+ 	read_wait = xcalloc(maxfd, sizeof(struct pollfd));
+ 	for (j = 0; j < maxfd; j++)
+ 		read_wait[j].fd = -1;
+-- 
+2.49.0
+

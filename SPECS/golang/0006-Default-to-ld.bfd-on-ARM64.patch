@@ -1,0 +1,46 @@
+From 46ec67413008607e2150e3395668e54e538c5b6b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Alejandro=20S=C3=A1ez?= <asm@redhat.com>
+Date: Wed, 19 Jun 2024 10:18:58 +0200
+Subject: [PATCH] Default to ld.bfd on ARM64
+
+---
+ src/cmd/link/internal/ld/lib.go | 20 +++++++-------------
+ 1 file changed, 7 insertions(+), 13 deletions(-)
+
+diff --git a/src/cmd/link/internal/ld/lib.go b/src/cmd/link/internal/ld/lib.go
+index eab74dc328..b401f58727 100644
+--- a/src/cmd/link/internal/ld/lib.go
++++ b/src/cmd/link/internal/ld/lib.go
+@@ -1620,22 +1620,16 @@ func (ctxt *Link) hostlink() {
+ 		}
+ 
+ 		if ctxt.Arch.InFamily(sys.ARM64) && buildcfg.GOOS == "linux" {
+-			// On ARM64, the GNU linker will fail with
+-			// -znocopyreloc if it thinks a COPY relocation is
+-			// required. Switch to gold.
+-			// https://sourceware.org/bugzilla/show_bug.cgi?id=19962
+-			// https://go.dev/issue/22040
+-			altLinker = "gold"
+-
+-			// If gold is not installed, gcc will silently switch
+-			// back to ld.bfd. So we parse the version information
+-			// and provide a useful error if gold is missing.
++			// Use ld.bfd as the default linker
++			altLinker = "bfd"
++
++			// Provide a useful error if ld.bfd is missing
+ 			name, args := flagExtld[0], flagExtld[1:]
+-			args = append(args, "-fuse-ld=gold", "-Wl,--version")
++			args = append(args, "-fuse-ld=bfd", "-Wl,--version")
+ 			cmd := exec.Command(name, args...)
+ 			if out, err := cmd.CombinedOutput(); err == nil {
+-				if !bytes.Contains(out, []byte("GNU gold")) {
+-					log.Fatalf("ARM64 external linker must be gold (issue #15696, 22040), but is not: %s", out)
++				if !bytes.Contains(out, []byte("GNU ld")) {
++					log.Fatalf("ARM64 external linker must be ld.bfd, but is not: %s", out)
+ 				}
+ 			}
+ 		}
+-- 
+2.45.1
+

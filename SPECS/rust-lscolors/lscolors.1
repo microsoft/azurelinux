@@ -1,0 +1,28 @@
+.TH LSCOLORS "1" "May 2025" "" "User Commands"
+.SH NAME
+.B lscolors
+\(en
+Colorize the output of other commands
+.SH SYNOPSIS
+.B lscolors
+.SH ENVIRONMENT
+.TP
+.B LS_COLORS
+Controls colorization, in the same manner as
+.BR ls (1);
+see also
+.BR dircolors (1).
+.SH EXAMPLES
+.EX
+.B find . -maxdepth 2 | lscolors
+.EE
+.P
+.EX
+.B rg foo -l | lscolors
+.EE
+.SH "SEE ALSO"
+.BR dircolors (1),
+.BR ls (1)
+.P
+.BR find (1),
+.BR rg (1)

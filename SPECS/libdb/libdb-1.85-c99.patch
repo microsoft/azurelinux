@@ -1,0 +1,34 @@
+Do not build snprintf.  Instead use the one in glibc.
+This avoids an implicit function declaration of vsprintf.
+
+snprintf is only called from db.1.85/btree/bt_open.c, and the length
+checking in the glibc implementation seems harmless there.
+
+Furthermore, NULL is not a valid integer constant, so use 0 directly
+(the __bt_first function in bt_seq.c returns int).
+
+diff -ur db-5.3.28.orig/db.1.85/PORT/linux/Makefile db-5.3.28/db.1.85/PORT/linux/Makefile
+--- db-5.3.28.orig/db.1.85/PORT/linux/Makefile	2022-12-10 12:29:48.599322424 +0100
++++ db-5.3.28/db.1.85/PORT/linux/Makefile	2022-12-10 12:35:08.415288426 +0100
+@@ -11,7 +11,7 @@
+ OBJ5=	rec_close.o rec_delete.o rec_get.o rec_open.o rec_put.o rec_search.o \
+ 	rec_seq.o rec_utils.o
+ 
+-MISC=	snprintf.o
++MISC=
+ 
+ ${LIBDB}: ${OBJ1} ${OBJ2} ${OBJ3} ${OBJ4} ${OBJ5} ${MISC}
+ 	rm -f $@
+only in patch2:
+unchanged:
+--- db-5.3.28.orig/db.1.85/btree/bt_seq.c	1994-07-26 18:57:24.000000000 +0200
++++ db-5.3.28/db.1.85/btree/bt_seq.c	2024-01-05 15:53:31.859178929 +0100
+@@ -358,7 +358,7 @@
+ 	 * page) and return it.
+ 	 */
+ 	if ((ep = __bt_search(t, key, exactp)) == NULL)
+-		return (NULL);
++		return 0;
+ 	if (*exactp) {
+ 		if (F_ISSET(t, B_NODUPS)) {
+ 			*erval = *ep;

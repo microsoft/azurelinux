@@ -1,0 +1,38 @@
+diff --git a/modules/files.c b/modules/files.c
+index 109f4af..c3fef5b 100644
+--- a/modules/files.c
++++ b/modules/files.c
+@@ -360,6 +360,8 @@ editing_open(struct lu_module *module, const char *file_suffix,
+ 	     struct lu_error **error)
+ {
+ 	struct editing *e;
++	struct stat st;
++	char *tmp;
+ 	char *backup_name;
+ 	int fd;
+ 
+@@ -391,7 +393,23 @@ editing_open(struct lu_module *module, const char *file_suffix,
+ 		goto err_fscreate;
+ 	close(fd);
+ 
+-	e->new_filename = g_strconcat(e->filename, "+", NULL);
++	/* If file is a symlink, create new file at target location,
++	 * otherwise later rename() could fail, because symlink and target
++	 * can be at different directories which could mean different mount
++	 * points. This is especially true for containers and ostree */
++	if (lstat(e->filename, &st) == 0 && S_ISLNK(st.st_mode)) {
++		tmp = realpath(e->filename, NULL);
++		if (tmp == NULL) {
++			lu_error_new(error, lu_error_generic,
++				     _("Error resolving `%s': %s"), e->filename,
++				     strerror(errno));
++			goto err_fscreate;
++		}
++		e->new_filename = g_strconcat(tmp, "+", NULL);
++		free(tmp);
++	} else {
++		e->new_filename = g_strconcat(e->filename, "+", NULL);
++	}
+ 	e->new_fd = open_and_copy_file(e->filename, e->new_filename, TRUE,
+ 			       	       error);
+ 	if (e->new_fd == -1)

@@ -1,0 +1,12 @@
+diff -uNr netplan-1.1.2.orig/src/parse.c netplan-1.1.2/src/parse.c
+--- netplan-1.1.2.orig/src/parse.c	2025-06-12 14:05:42.601949889 -0500
++++ netplan-1.1.2/src/parse.c	2025-06-12 14:06:46.772354907 -0500
+@@ -1098,7 +1098,7 @@
+ 
+     /* networkd can handle all device types at the moment, so nothing
+      * type-specific */
+-    return NETPLAN_BACKEND_NETWORKD;
++    return NETPLAN_BACKEND_NM;
+ }
+ 
+ STATIC gboolean

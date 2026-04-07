@@ -1,0 +1,33 @@
+diff -up Cbc-releases-2.10.4/Cbc/src/Cbc_C_Interface.cpp.orig Cbc-releases-2.10.4/Cbc/src/Cbc_C_Interface.cpp
+--- Cbc-releases-2.10.4/Cbc/src/Cbc_C_Interface.cpp.orig	2020-01-31 04:34:18.000000000 -0700
++++ Cbc-releases-2.10.4/Cbc/src/Cbc_C_Interface.cpp	2020-02-20 11:57:30.731295819 -0700
+@@ -870,7 +870,7 @@ Cbc_solve(Cbc_Model *model)
+   try {
+ 
+     CbcMain1((int)argv.size(), &argv[0], *model->model_, NULL, *model->cbcData);
+-  } catch (CoinError e) {
++  } catch (CoinError& e) {
+     printf("%s ERROR: %s::%s, %s\n", prefix,
+       e.className().c_str(), e.methodName().c_str(), e.message().c_str());
+   }
+diff -up Cbc-releases-2.10.4/Cbc/test/OsiCbcSolverInterfaceTest.cpp.orig Cbc-releases-2.10.4/Cbc/test/OsiCbcSolverInterfaceTest.cpp
+--- Cbc-releases-2.10.4/Cbc/test/OsiCbcSolverInterfaceTest.cpp.orig	2020-01-31 04:34:18.000000000 -0700
++++ Cbc-releases-2.10.4/Cbc/test/OsiCbcSolverInterfaceTest.cpp	2020-02-20 11:57:30.731295819 -0700
+@@ -124,7 +124,7 @@ void OsiCbcSolverInterfaceUnitTest(const
+       try {
+         solver.setObjCoeff(0, 0.0);
+         OSIUNITTEST_ADD_OUTCOME("cbc", "setObjCoeff on empty model", "should throw exception", OsiUnitTest::TestOutcome::ERROR, false);
+-      } catch (CoinError e) {
++      } catch (CoinError& e) {
+         if (OsiUnitTest::verbosity >= 1)
+           std::cout << "Correct throw from setObjCoeff on empty model" << std::endl;
+       }
+@@ -138,7 +138,7 @@ void OsiCbcSolverInterfaceUnitTest(const
+         double value[] = { 0.0, 0.0, 0.0, 0.0 };
+         solver.setColSetBounds(index, index + 2, value);
+         OSIUNITTEST_ADD_OUTCOME("cbc", "setColSetBounds on cols not in model", "should throw exception", OsiUnitTest::TestOutcome::ERROR, false);
+-      } catch (CoinError e) {
++      } catch (CoinError& e) {
+         if (OsiUnitTest::verbosity >= 1)
+           std::cout << "Correct throw from setObjCoeff on empty model" << std::endl;
+       }

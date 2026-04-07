@@ -1,0 +1,15 @@
+--- notify-8.2.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ notify-8.2.0/Cargo.toml	2025-08-10T14:26:24.572419+00:00
+@@ -66,11 +66,7 @@
+ version = "3.10.0"
+ 
+ [features]
+-default = ["macos_fsevent"]
+-macos_fsevent = []
+-macos_kqueue = [
+-    "mio",
+-]
++default = []
+ serde = ["notify-types/serde"]
+ serialization-compat-6 = ["notify-types/serialization-compat-6"]
+ 

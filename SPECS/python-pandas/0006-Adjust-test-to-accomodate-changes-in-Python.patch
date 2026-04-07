@@ -1,0 +1,89 @@
+From 4426e095bdcc332cc594047fea765f4cf18c259b Mon Sep 17 00:00:00 2001
+From: Sandro <devel@penguinpee.nl>
+Date: Thu, 23 Oct 2025 17:22:42 +0200
+Subject: [PATCH 6/7] Adjust test to accomodate changes in Python
+
+The wording of a TypeError has changed. This takes into account the
+changed wording, allowing tests to pass when using Python >= 3.14.
+
+Using inversion operator on bool is deprecated and emits a
+DeprecationWarning regardless of engine or parser.
+---
+ pandas/tests/computation/test_eval.py | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
+
+diff --git a/pandas/tests/computation/test_eval.py b/pandas/tests/computation/test_eval.py
+index 859cbd30cf..8c62f3aba9 100644
+--- a/pandas/tests/computation/test_eval.py
++++ b/pandas/tests/computation/test_eval.py
+@@ -172,12 +172,13 @@ class TestEval:
+             return
+ 
+         ex = f"lhs {cmp_op} rhs"
++        # With Python >= 3.14 the TypeError uses a different wording
+         msg = "|".join(
+             [
+                 r"only list-like( or dict-like)? objects are allowed to be "
+                 r"passed to (DataFrame\.)?isin\(\), you passed a "
+                 r"(`|')bool(`|')",
+-                "argument of type 'bool' is not iterable",
++                "argument of type 'bool' is not (a container or )?iterable",
+             ]
+         )
+         if cmp_op in ("in", "not in") and not is_list_like(rhs):
+@@ -217,12 +218,13 @@ class TestEval:
+         skip_these = ["in", "not in"]
+         ex = f"~(lhs {op} rhs)"
+ 
++        # With Python >= 3.14 the TypeError uses a different wording
+         msg = "|".join(
+             [
+                 r"only list-like( or dict-like)? objects are allowed to be "
+                 r"passed to (DataFrame\.)?isin\(\), you passed a "
+                 r"(`|')float(`|')",
+-                "argument of type 'float' is not iterable",
++                "argument of type 'float' is not (a container or )?iterable",
+             ]
+         )
+         if is_scalar(rhs) and op in skip_these:
+@@ -564,8 +566,6 @@ class TestEval:
+     def test_scalar_unary(self, engine, parser):
+         msg = "bad operand type for unary ~: 'float'"
+         warn = None
+-        if PY312 and not (engine == "numexpr" and parser == "pandas"):
+-            warn = DeprecationWarning
+         with pytest.raises(TypeError, match=msg):
+             pd.eval("~1.0", engine=engine, parser=parser)
+ 
+@@ -574,13 +574,14 @@ class TestEval:
+         assert pd.eval("~1", parser=parser, engine=engine) == ~1
+         assert pd.eval("-1", parser=parser, engine=engine) == -1
+         assert pd.eval("+1", parser=parser, engine=engine) == +1
++        # Bitwise inversion on bool is deprecated since Python 3.12.
++        # It throws a DeprecationWarning regardless of engine or parser.
++        if PY312:
++            warn = DeprecationWarning
+         with tm.assert_produces_warning(
+             warn, match="Bitwise inversion", check_stacklevel=False
+         ):
+             assert pd.eval("~True", parser=parser, engine=engine) == ~True
+-        with tm.assert_produces_warning(
+-            warn, match="Bitwise inversion", check_stacklevel=False
+-        ):
+             assert pd.eval("~False", parser=parser, engine=engine) == ~False
+         assert pd.eval("-True", parser=parser, engine=engine) == -True
+         assert pd.eval("-False", parser=parser, engine=engine) == -False
+@@ -1091,8 +1092,9 @@ class TestOperations:
+             ex2 = f"x {op} 1"
+             ex3 = f"1 {op} (x + 1)"
+ 
++            # With Python >= 3.14 the TypeError uses a different wording
+             if op in ("in", "not in"):
+-                msg = "argument of type 'int' is not iterable"
++                msg = "argument of type 'int' is not (a container or )?iterable"
+                 with pytest.raises(TypeError, match=msg):
+                     pd.eval(ex, engine=engine, parser=parser)
+             else:
+-- 
+2.51.0
+

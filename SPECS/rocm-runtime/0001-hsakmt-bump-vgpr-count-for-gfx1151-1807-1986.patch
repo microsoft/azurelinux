@@ -1,0 +1,41 @@
+From ae335344f979f00e91768db3a60304c2831fd959 Mon Sep 17 00:00:00 2001
+From: David Yat Sin <77975354+dayatsin-amd@users.noreply.github.com>
+Date: Mon, 1 Dec 2025 16:33:00 -0500
+Subject: [PATCH] hsakmt: bump vgpr count for gfx1151 (#1807) (#1986)
+
+GFX1151 has 1.5x VGPR memory compared to the rest of GFX11.
+
+Co-authored-by: jokim-amd <44032736+jokim-amd@users.noreply.github.com>
+Co-authored-by: shwetakhatri-amd <155576586+shwetagkhatri@users.noreply.github.com>
+---
+ projects/rocr-runtime/libhsakmt/src/libhsakmt.h | 1 +
+ projects/rocr-runtime/libhsakmt/src/queues.c    | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/projects/rocr-runtime/libhsakmt/src/libhsakmt.h b/projects/rocr-runtime/libhsakmt/src/libhsakmt.h
+index f7387082d784..0e1d4aecd547 100644
+--- a/projects/rocr-runtime/libhsakmt/src/libhsakmt.h
++++ b/projects/rocr-runtime/libhsakmt/src/libhsakmt.h
+@@ -169,6 +169,7 @@ enum full_gfx_versions {
+ 	GFX_VERSION_YELLOW_CARP	 	= 0x0A0305,
+ 	GFX_VERSION_PLUM_BONITO		= 0x0B0000,
+ 	GFX_VERSION_WHEAT_NAS		= 0x0B0001,
++	GFX_VERSION_GFX1151		= 0x0B0501,
+ 	GFX_VERSION_GFX1200		= 0x0C0000,
+ 	GFX_VERSION_GFX1201		= 0x0C0001,
+ };
+diff --git a/projects/rocr-runtime/libhsakmt/src/queues.c b/projects/rocr-runtime/libhsakmt/src/queues.c
+index 0e3500f5ef2a..90658fa5432d 100644
+--- a/projects/rocr-runtime/libhsakmt/src/queues.c
++++ b/projects/rocr-runtime/libhsakmt/src/queues.c
+@@ -95,6 +95,7 @@ uint32_t hsakmt_get_vgpr_size_per_cu(uint32_t gfxv)
+ 
+ 	else if (gfxv == GFX_VERSION_PLUM_BONITO ||
+ 		 gfxv == GFX_VERSION_WHEAT_NAS ||
++		 gfxv == GFX_VERSION_GFX1151 ||
+ 		 gfxv == GFX_VERSION_GFX1200 ||
+ 		 gfxv == GFX_VERSION_GFX1201)
+ 		vgpr_size = 0x60000;
+-- 
+2.52.0
+

@@ -1,0 +1,81 @@
+Avoid implicit ints and implicit function declarations.  These
+language features have been removed from C in 1999. Future compilers
+are likely to stop accepting these constructs by default.
+
+Submitted upstream: <https://github.com/eserte/perl-tk/pull/91>
+
+diff -ur Tk-804.036.orig/config/signedchar.c Tk-804.036/config/signedchar.c
+--- Tk-804.036.orig/config/signedchar.c	2023-02-24 10:48:08.060779006 +0100
++++ Tk-804.036/config/signedchar.c	2023-02-24 10:48:58.315268904 +0100
+@@ -1,4 +1,4 @@
+-main()
++int main(void)
+ {
+  signed char x = 'a';
+  return (x - 'a');
+diff -ur Tk-804.036.orig/config/unsigned.c Tk-804.036/config/unsigned.c
+--- Tk-804.036.orig/config/unsigned.c	2023-02-24 10:48:08.054779067 +0100
++++ Tk-804.036/config/unsigned.c	2023-02-24 10:49:27.580971854 +0100
+@@ -1,15 +1,16 @@
++#include <stdio.h>
+ int main()
+ {
+  char x[] = "\377";
+  if (x[0] > 0)
+   {
+    printf("char is unsigned type\n");
+-   exit(0);
++   return 0;
+   }
+  else
+   {
+    printf("char is signed type\n");
+-   exit(1);
++   return 1;
+   }
+ }
+ 
+diff -ur Tk-804.036.orig/pTk/config/Hstrdup.c Tk-804.036/pTk/config/Hstrdup.c
+--- Tk-804.036.orig/pTk/config/Hstrdup.c	2023-02-24 10:48:08.010779514 +0100
++++ Tk-804.036/pTk/config/Hstrdup.c	2023-02-24 10:53:04.326771841 +0100
+@@ -6,7 +6,7 @@
+ {char *e;
+  char *p = strdup(STRING);
+  if (!p || strcmp(p,STRING))
+-  exit(1);
++  return 1;
+  return 0;
+ }
+ 
+diff -ur Tk-804.036.orig/pTk/config/Hstrtoul.c Tk-804.036/pTk/config/Hstrtoul.c
+--- Tk-804.036.orig/pTk/config/Hstrtoul.c	2023-02-24 10:48:08.013779483 +0100
++++ Tk-804.036/pTk/config/Hstrtoul.c	2023-02-24 10:50:13.205508745 +0100
+@@ -1,4 +1,5 @@
+ #include <stdlib.h>
++#include <string.h>
+ 
+ int main()
+ {char *e;
+diff -ur Tk-804.036.orig/pTk/mTk/generic/tkEvent.c Tk-804.036/pTk/mTk/generic/tkEvent.c
+--- Tk-804.036.orig/pTk/mTk/generic/tkEvent.c	2023-02-24 10:48:07.324786476 +0100
++++ Tk-804.036/pTk/mTk/generic/tkEvent.c	2023-02-24 10:54:20.859995000 +0100
+@@ -1153,6 +1153,7 @@
+ Time
+ TkCurrentTime(dispPtr, fallbackCurrent)
+     TkDisplay *dispPtr;		/* Display for which the time is desired. */
++    int fallbackCurrent;
+ {
+     register XEvent *eventPtr;
+     ThreadSpecificData *tsdPtr = (ThreadSpecificData *)
+diff -ur Tk-804.036.orig/pTk/mTk/generic/tkImage.c Tk-804.036/pTk/mTk/generic/tkImage.c
+--- Tk-804.036.orig/pTk/mTk/generic/tkImage.c	2023-02-24 10:48:07.321786507 +0100
++++ Tk-804.036/pTk/mTk/generic/tkImage.c	2023-02-24 10:55:56.174027554 +0100
+@@ -1083,6 +1083,8 @@
+ int y;
+ int width;
+ int height;
++int imgWidth;
++int imgHeight;
+ {
+     Tk_Tile tile = (Tk_Tile) clientData;
+     Tk_TileChange *handler;

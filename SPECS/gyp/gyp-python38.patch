@@ -1,0 +1,63 @@
+commit 7b0a3fd85beb67c990da3fb1b690444a27a6ee42
+Author: Tom Hughes <tom@compton.nu>
+Date:   Fri Aug 23 09:33:14 2019 +0100
+
+    Fix python 3.8 warnings
+
+diff --git a/pylib/gyp/input.py b/pylib/gyp/input.py
+index 42c279cf..013231dc 100644
+--- a/pylib/gyp/input.py
++++ b/pylib/gyp/input.py
+@@ -1181,7 +1181,7 @@ def LoadVariablesFromVariablesDict(variables, the_dict, the_dict_key):
+       if variable_name in variables:
+         # If the variable is already set, don't set it.
+         continue
+-      if the_dict_key is 'variables' and variable_name in the_dict:
++      if the_dict_key == 'variables' and variable_name in the_dict:
+         # If the variable is set without a % in the_dict, and the_dict is a
+         # variables dict (making |variables| a varaibles sub-dict of a
+         # variables dict), use the_dict's definition.
+diff --git a/test/lib/TestCmd.py b/test/lib/TestCmd.py
+index 1ec50933..457694c8 100644
+--- a/test/lib/TestCmd.py
++++ b/test/lib/TestCmd.py
+@@ -283,7 +283,7 @@ if os.name in ('posix', 'nt'):
+ else:
+     tempfile.template = 'testcmd.'
+ 
+-re_space = re.compile('\s')
++re_space = re.compile(r'\s')
+ 
+ _Cleanup = []
+ 
+@@ -882,7 +882,7 @@ class TestCmd(object):
+                 #self.diff_function = difflib.unified_diff
+         self._dirlist = []
+         self._preserve = {'pass_test': 0, 'fail_test': 0, 'no_result': 0}
+-        if 'PRESERVE' in os.environ and os.environ['PRESERVE'] is not '':
++        if 'PRESERVE' in os.environ and os.environ['PRESERVE'] != '':
+             self._preserve['pass_test'] = os.environ['PRESERVE']
+             self._preserve['fail_test'] = os.environ['PRESERVE']
+             self._preserve['no_result'] = os.environ['PRESERVE']
+@@ -1103,7 +1103,7 @@ class TestCmd(object):
+         the temporary working directories to be preserved for all
+         conditions.
+         """
+-        if conditions is ():
++        if len(conditions) == 0:
+             conditions = ('pass_test', 'fail_test', 'no_result')
+         for cond in conditions:
+             self._preserve[cond] = 1
+diff --git a/test/lib/TestGyp.py b/test/lib/TestGyp.py
+index cba2d3cc..43865ee1 100644
+--- a/test/lib/TestGyp.py
++++ b/test/lib/TestGyp.py
+@@ -742,7 +742,7 @@ def FindVisualStudioInstallation():
+           build_tool = None
+       if not build_tool:
+         args1 = ['reg', 'query',
+-                    'HKLM\Software\Microsoft\VisualStudio\SxS\VS7',
++                    r'HKLM\Software\Microsoft\VisualStudio\SxS\VS7',
+                     '/v', '15.0', '/reg:32']
+         build_tool = subprocess.check_output(args1).decode(
+             'utf-8', 'ignore').strip().split(b'\r\n').pop().split(b' ').pop()

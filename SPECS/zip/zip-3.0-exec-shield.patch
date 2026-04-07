@@ -1,0 +1,20 @@
+diff -up zip30/crc_i386.S.exec_shield zip30/crc_i386.S
+--- zip30/crc_i386.S.exec_shield	2009-11-13 18:37:45.000000000 +0100
++++ zip30/crc_i386.S	2009-11-13 18:39:54.435390166 +0100
+@@ -302,3 +302,6 @@ _crc32:                         /* ulg c
+ #endif /* i386 || _i386 || _I386 || __i386 */
+ 
+ #endif /* !USE_ZLIB && !CRC_TABLE_ONLY */
++
++.section .note.GNU-stack, "", @progbits
++.previous
+diff -up zip30/match.S.exec_shield zip30/match.S
+--- zip30/match.S.exec_shield	2005-01-28 10:40:14.000000000 +0100
++++ zip30/match.S	2009-11-13 18:39:48.570389058 +0100
+@@ -405,3 +405,6 @@ L__return:
+ #endif /* i386 || _I386 || _i386 || __i386  */
+ 
+ #endif /* !USE_ZLIB */
++
++.section .note.GNU-stack, "", @progbits
++.previous

@@ -1,0 +1,26 @@
+From 0fc825def2f812af70189a01b0fe66e1c5050aec Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20Men=C5=A1=C3=ADk?= <pemensik@redhat.com>
+Date: Fri, 24 Oct 2025 20:20:50 +0200
+Subject: [PATCH] Use $action instead of $function in python SWIG interface
+
+$function is not supported since SWIG 4.4.0.
+---
+ libunbound/python/libunbound.i | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libunbound/python/libunbound.i b/libunbound/python/libunbound.i
+index dc12514..4576844 100644
+--- a/libunbound/python/libunbound.i
++++ b/libunbound/python/libunbound.i
+@@ -853,7 +853,7 @@ Result: ['74.125.43.147', '74.125.43.99', '74.125.43.103', '74.125.43.104']
+ %{ 
+   //printf("resolve_start(%lX)\n",(long unsigned int)arg1);
+   Py_BEGIN_ALLOW_THREADS 
+-  $function 
++  $action 
+   Py_END_ALLOW_THREADS 
+   //printf("resolve_stop()\n");
+ %} 
+-- 
+2.51.0
+

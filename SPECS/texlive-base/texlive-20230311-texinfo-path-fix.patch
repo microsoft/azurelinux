@@ -1,0 +1,44 @@
+diff -up texlive-base-20230311/source/texk/kpathsea/texmf.cnf.texinfo-fix texlive-base-20230311/source/texk/kpathsea/texmf.cnf
+--- texlive-base-20230311/source/texk/kpathsea/texmf.cnf.texinfo-fix	2023-05-25 10:49:55.510891474 -0400
++++ texlive-base-20230311/source/texk/kpathsea/texmf.cnf	2023-05-25 11:44:59.261966579 -0400
+@@ -59,7 +59,7 @@
+ % SELFAUTOPARENT (its grandparent = /usr/local/texlive/YYYY), and
+ % SELFAUTOGRANDPARENT (its great-grandparent = /usr/local/texlive).
+ % Sorry for the off-by-one-generation names.
+-TEXMFROOT = $SELFAUTOPARENT
++TEXMFROOT = /usr/share/texlive
+ 
+ % The main tree of distributed packages and programs:
+ TEXMFDIST = $TEXMFROOT/texmf-dist
+@@ -69,10 +69,10 @@ TEXMFDIST = $TEXMFROOT/texmf-dist
+ TEXMFMAIN = $TEXMFDIST
+ 
+ % Local additions to the distribution trees.
+-TEXMFLOCAL = $SELFAUTOGRANDPARENT/texmf-local
++TEXMFLOCAL = /usr/share/texlive/texmf-local
+ 
+ % TEXMFSYSVAR, where *-sys store cached runtime data.
+-TEXMFSYSVAR = $TEXMFROOT/texmf-var
++TEXMFSYSVAR = /var/lib/texmf
+ 
+ % TEXMFSYSCONFIG, where *-sys store configuration data.
+ TEXMFSYSCONFIG = $TEXMFROOT/texmf-config
+@@ -83,6 +83,9 @@ TEXMFSYSCONFIG = $TEXMFROOT/texmf-config
+ % to %USERPROFILE% on Windows, $HOME otherwise.
+ TEXMFHOME = ~/texmf
+ 
++% Texinfo on Fedora lives out of $TEXMFROOT
++TEXINFOHOME = /usr/share/texmf
++
+ % TEXMFVAR, where texconfig/updmap/fmtutil store cached runtime data.
+ TEXMFVAR = ~/.texlive2023/texmf-var
+ 
+@@ -108,7 +111,7 @@ TEXMFAUXTREES = {}
+ % The odd-looking $TEXMFAUXTREES$TEXMF... construct is so that if no auxtree is
+ % ever defined (the 99% common case), no extra elements will be added to
+ % the search paths. tlmgr takes care to end any value with a trailing comma.
+-TEXMF = {$TEXMFAUXTREES$TEXMFCONFIG,$TEXMFVAR,$TEXMFHOME,!!$TEXMFLOCAL,!!$TEXMFSYSCONFIG,!!$TEXMFSYSVAR,!!$TEXMFDIST}
++TEXMF = {$TEXMFAUXTREES$TEXMFCONFIG,$TEXMFVAR,$TEXMFHOME,!!$TEXINFOHOME,!!$TEXMFLOCAL,!!$TEXMFSYSCONFIG,!!$TEXMFSYSVAR,!!$TEXMFDIST}
+ 
+ % Where to look for, and where mktexlsr creates, ls-R files. By default,
+ % this is all and only the !! elements of TEXMF, so that mktexlsr does not

@@ -1,0 +1,12 @@
+diff -up ATLAS/CONFIG/src/config.c.zaloha ATLAS/CONFIG/src/config.c
+--- ATLAS/CONFIG/src/config.c.zaloha	2012-10-25 11:29:02.495425989 +0200
++++ ATLAS/CONFIG/src/config.c	2012-10-25 11:42:10.218216957 +0200
+@@ -711,6 +711,8 @@ int ProbePtrbits(int verb, char *targarg
+ 
+ int ProbeCPUThrottle(int verb, char *targarg, enum OSTYPE OS, enum ASMDIA asmb)
+ {
++   return 0; /* impossible to turn off cpu throttling => ignore */
++             /* this undermines performance of compiled library */
+    int i, iret;
+    char *ln;
+    i = strlen(targarg) + 22 + 12;

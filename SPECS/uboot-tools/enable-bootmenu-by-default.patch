@@ -1,0 +1,49 @@
+From a956480a6d52ae90ef4a46275c2ee29a4074de36 Mon Sep 17 00:00:00 2001
+From: Peter Robinson <pbrobinson@gmail.com>
+Date: Fri, 18 Aug 2023 23:10:42 +0100
+Subject: [PATCH] enable bootmenu by default
+
+We want the boot menu on all Fedora devices as it makes
+it a whole lot more user friendly.
+
+Signed-off-by: Peter Robinson <pbrobinson@gmail.com>
+---
+ boot/Kconfig | 2 ++
+ cmd/Kconfig  | 1 +
+ 2 files changed, 3 insertions(+)
+
+diff --git a/boot/Kconfig b/boot/Kconfig
+index 467b09e2350..ad67b1f65a6 100644
+--- a/boot/Kconfig
++++ b/boot/Kconfig
+@@ -1281,6 +1281,7 @@ config BOOTDELAY
+ 
+ config AUTOBOOT_KEYED
+ 	bool "Stop autobooting via specific input key / string"
++	default y
+ 	help
+ 	  This option enables stopping (aborting) of the automatic
+ 	  boot feature only by issuing a specific input key or
+@@ -1433,6 +1434,7 @@ config AUTOBOOT_MENUKEY
+ 
+ config AUTOBOOT_MENU_SHOW
+ 	bool "Show a menu on boot"
++	default y
+ 	depends on CMD_BOOTMENU
+ 	help
+ 	  This enables the boot menu, controlled by environment variables
+diff --git a/cmd/Kconfig b/cmd/Kconfig
+index 43ca10f69cc..3d39f2914cc 100644
+--- a/cmd/Kconfig
++++ b/cmd/Kconfig
+@@ -413,6 +413,7 @@ source lib/efi_selftest/Kconfig
+ 
+ config CMD_BOOTMENU
+ 	bool "bootmenu"
++	default y
+ 	select MENU
+ 	select CHARSET
+ 	help
+-- 
+2.41.0
+

@@ -1,0 +1,53 @@
+From 6f0e4d5001aa319c3a69c2848f223cd874f65c6a Mon Sep 17 00:00:00 2001
+From: Mike Dalessio <mike.dalessio@gmail.com>
+Date: Fri, 31 Jan 2025 12:55:17 -0500
+Subject: [PATCH] fix: tests pass on bigendian architecture
+
+Fixes #615 reporting failures on s390x.
+---
+ test/test_pragmas.rb | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/test/test_pragmas.rb b/test/test_pragmas.rb
+index 2b42debb..f9c208b4 100644
+--- a/test/test_pragmas.rb
++++ b/test/test_pragmas.rb
+@@ -2,6 +2,8 @@
+ 
+ module SQLite3
+   class TestPragmas < SQLite3::TestCase
++    BIGENDIAN = ([1].pack("I") == [1].pack("N"))
++
+     class DatabaseTracker < SQLite3::Database
+       attr_reader :test_statements
+ 
+@@ -78,7 +80,8 @@ def test_encoding_uppercase
+       assert_equal(Encoding::UTF_8, @db.encoding)
+ 
+       @db.encoding = "UTF-16"
+-      assert_equal(Encoding::UTF_16LE, @db.encoding)
++      native = BIGENDIAN ? Encoding::UTF_16BE : Encoding::UTF_16LE
++      assert_equal(native, @db.encoding)
+ 
+       @db.encoding = "UTF-16LE"
+       assert_equal(Encoding::UTF_16LE, @db.encoding)
+@@ -94,7 +97,8 @@ def test_encoding_lowercase
+       assert_equal(Encoding::UTF_8, @db.encoding)
+ 
+       @db.encoding = "utf-16"
+-      assert_equal(Encoding::UTF_16LE, @db.encoding)
++      native = BIGENDIAN ? Encoding::UTF_16BE : Encoding::UTF_16LE
++      assert_equal(native, @db.encoding)
+ 
+       @db.encoding = "utf-16le"
+       assert_equal(Encoding::UTF_16LE, @db.encoding)
+@@ -110,7 +114,8 @@ def test_encoding_objects
+       assert_equal(Encoding::UTF_8, @db.encoding)
+ 
+       @db.encoding = Encoding::UTF_16
+-      assert_equal(Encoding::UTF_16LE, @db.encoding)
++      native = BIGENDIAN ? Encoding::UTF_16BE : Encoding::UTF_16LE
++      assert_equal(native, @db.encoding)
+ 
+       @db.encoding = Encoding::UTF_16LE
+       assert_equal(Encoding::UTF_16LE, @db.encoding)

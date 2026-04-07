@@ -1,0 +1,19 @@
+--- ceph-18.2.3/src/mgr/PyModule.cc.orig	2024-06-06 16:31:10.340731851 -0400
++++ ceph-18.2.3/src/mgr/PyModule.cc	2024-06-07 12:58:49.913571410 -0400
+@@ -342,6 +342,16 @@
+   return ceph_module;
+ }
+ 
++// FIXME
++// Removed in Python 3.13 API, but kept for the stable ABI
++#ifdef __cplusplus
++extern "C" {
++#endif
++PyAPI_FUNC(void) PySys_SetPath(const wchar_t *);
++#ifdef __cplusplus
++}
++#endif
++
+ int PyModule::load(PyThreadState *pMainThreadState)
+ {
+   ceph_assert(pMainThreadState != nullptr);

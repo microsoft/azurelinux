@@ -1,0 +1,12 @@
+diff -up lua-5.4.8/src/lparser.c.934fdd4 lua-5.4.8/src/lparser.c
+--- lua-5.4.8/src/lparser.c.934fdd4	2025-11-11 10:40:03.947006383 -0500
++++ lua-5.4.8/src/lparser.c	2025-11-11 10:41:02.927214689 -0500
+@@ -940,6 +940,8 @@ static void constructor (LexState *ls, e
+     if (ls->t.token == '}') break;
+     closelistfield(fs, &cc);
+     field(ls, &cc);
++    checklimit(fs, cc.tostore + cc.na + cc.nh, INT_MAX/2,
++               "items in a constructor");
+   } while (testnext(ls, ',') || testnext(ls, ';'));
+   check_match(ls, '}', '{', line);
+   lastlistfield(fs, &cc);

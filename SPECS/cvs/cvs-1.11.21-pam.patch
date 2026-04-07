@@ -1,0 +1,137 @@
+diff -up cvs-1.11.23/configure.in.pam cvs-1.11.23/configure.in
+--- cvs-1.11.23/configure.in.pam	2008-07-15 15:40:50.000000000 -0400
++++ cvs-1.11.23/configure.in	2008-07-15 15:40:50.000000000 -0400
+@@ -904,6 +904,36 @@ if test no != "$enable_server"; then
+       [The high water mark in bytes for server flow control.  Required if
+        SERVER_FLOWCONTROL is defined, and useless otherwise.])
+   fi # enable_server_flow_control
++  
++  dnl
++  dnl Give the confiscator control over whether the pam support is used
++  dnl
++  AC_ARG_ENABLE(
++    [pam],
++    AC_HELP_STRING(
++      [--enable-pam],
++      [Include code for running with pam code (default)]), ,
++    [if test "$ac_cv_search_connect" != yes; then
++       enable_pam=no
++     fi])
++
++  if test no != "$enable_pam"; then
++    AC_DEFINE(
++      [PAM_SUPPORT], [1],
++      [Define if you want CVS to be able to serve repositories to remote
++       clients.])  
++       
++      dnl
++      dnl Finding the pam_authenticate function. 
++      dnl
++      AC_SEARCH_LIBS(
++      [pam_authenticate], [pam],
++      [AC_DEFINE(
++         [HAVE_PAM], [1],
++         [Define if you have the pam_authenticate function.])
++      ]) dnl AC_SEARCH_LIBS
++  fi #enable_pam
++  
+ fi # enable_server
+ 
+ 
+diff -up cvs-1.11.23/src/server.c.pam cvs-1.11.23/src/server.c
+--- cvs-1.11.23/src/server.c.pam	2008-07-15 15:40:50.000000000 -0400
++++ cvs-1.11.23/src/server.c	2008-07-15 15:42:02.000000000 -0400
+@@ -20,6 +20,12 @@
+ # include <process.h>
+ #endif
+ 
++/* needed for PAM authentication - fk 2000 */
++#if PAM_SUPPORT
++#include <security/pam_appl.h>
++#include <security/pam_misc.h>
++#endif
++
+ int server_active = 0;
+ 
+ #if defined(SERVER_SUPPORT) || defined(CLIENT_SUPPORT)
+@@ -5673,7 +5679,36 @@ check_repository_password (username, pas
+     return retval;
+ }
+ 
+-
++/* callback for PAM authentication - fk 2000 */
++#if PAM_SUPPORT
++int silent_conv(int num_msg, const struct pam_message **msgm,
++      struct pam_response **response, void *appdata) {
++      int replies;
++      struct pam_response *reply = NULL;
++
++      reply = calloc(num_msg,sizeof(struct pam_response));
++      for (replies=0; replies<num_msg; replies++) {
++              switch (msgm[replies]->msg_style) {
++                      case PAM_PROMPT_ECHO_ON:
++                      case PAM_PROMPT_ECHO_OFF:
++                              /* printf("Prompt: %s\n",msgm[replies]->msg); */
++                              reply[replies].resp_retcode = PAM_SUCCESS;
++                              reply[replies].resp = strdup((char*)appdata);
++                              break;
++                      case PAM_ERROR_MSG:
++                      case PAM_TEXT_INFO:
++                              reply[replies].resp_retcode = PAM_SUCCESS;
++                              reply[replies].resp = NULL;
++                              break;
++                      default:
++                              free(reply);
++                              return PAM_CONV_ERR;
++              }
++      }
++      *response = reply;
++      return PAM_SUCCESS;
++}
++#endif
+ 
+ /* Return a hosting username if password matches, else NULL. */
+ static char *
+@@ -5761,6 +5796,34 @@ error 0 %s: no such user\n", username);
+     if (*found_passwd)
+     {
+ 	/* user exists and has a password */
++#if PAM_SUPPORT
++        pam_handle_t *pamh = NULL;
++        struct pam_conv conv;
++        int retval;
++
++        conv.conv = silent_conv;
++        conv.appdata_ptr = password;
++
++        retval = pam_start("cvs", username, &conv, &pamh);
++
++        if (retval == PAM_SUCCESS)
++            retval = pam_authenticate(pamh, 0); /* is user really user? */
++
++        if (retval == PAM_SUCCESS)
++            retval = pam_acct_mgmt(pamh, 0);    /* permitted access? */
++
++        /* This is where we have been authorized or not. */
++
++        if (retval == PAM_SUCCESS) {
++            host_user = xstrdup (username);
++        } else {
++            host_user = NULL;
++        }
++
++        if (pam_end(pamh,retval) != PAM_SUCCESS) {   /* close Linux-PAM */
++            pamh = NULL;
++        }
++#else
+ 	if (strcmp (found_passwd, crypt (password, found_passwd)) == 0)
+ 	{
+ 	    host_user = xstrdup (username);
+@@ -5774,6 +5837,7 @@ error 0 %s: no such user\n", username);
+ 		    crypt(password, found_passwd), found_passwd);
+ #endif
+ 	}
++#endif
+ 	goto handle_return;
+     }
+ 

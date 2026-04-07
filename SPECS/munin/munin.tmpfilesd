@@ -1,0 +1,13 @@
+# Create runtime directory
+
+d /run/munin 0775 root munin -
+
+# Cleanup for old rrd/png etc files
+
+x /var/lib/munin/.ssh
+x /var/lib/munin/cgi-tmp
+x /var/lib/munin/rrdcached
+
+e /var/lib/munin/cgi-tmp/* - - - 1d
+e /var/lib/munin/spool - - - 14d
+e /var/lib/munin - - - 30d

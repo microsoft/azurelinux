@@ -1,0 +1,17 @@
+--- tracing-0.1.43/Cargo.toml	1970-01-01T00:00:01+00:00
++++ tracing-0.1.43/Cargo.toml	2026-01-09T19:06:09.067726+00:00
+@@ -239,9 +239,6 @@
+ [dev-dependencies.log]
+ version = "0.4.17"
+ 
+-[target.'cfg(target_arch = "wasm32")'.dev-dependencies.wasm-bindgen-test]
+-version = "0.3.38"
+-
+ [lints.rust.unexpected_cfgs]
+ level = "warn"
+ priority = 0
+@@ -250,3 +247,4 @@
+     "cfg(tracing_unstable)",
+     "cfg(unsound_local_offset)",
+ ]
++

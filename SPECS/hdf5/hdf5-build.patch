@@ -1,0 +1,41 @@
+diff --git a/java/src/Makefile.am b/java/src/Makefile.am
+index aaa4052..0d66096 100644
+--- a/java/src/Makefile.am
++++ b/java/src/Makefile.am
+@@ -32,8 +32,8 @@ JAVAROOT = .classes
+ classes:
+ 	test -d $(@D)/$(JAVAROOT) || $(MKDIR_P) $(@D)/$(JAVAROOT)
+ 
+-jarfile = jar$(PACKAGE_TARNAME)-$(PACKAGE_VERSION).jar
+-hdf5_javadir = $(libdir)
++jarfile = $(PACKAGE_TARNAME).jar
++hdf5_javadir = $(prefix)/lib/java
+ 
+ pkgpath = hdf/hdf5lib
+ CLASSPATH_ENV=CLASSPATH=.:$(top_srcdir)/java/lib/slf4j-api-2.0.6.jar:$$CLASSPATH
+diff --git a/java/test/Makefile.am b/java/test/Makefile.am
+index 9f39be9..d58f3cd 100644
+--- a/java/test/Makefile.am
++++ b/java/test/Makefile.am
+@@ -26,7 +26,7 @@ classes:
+ 	test -d $(@D)/$(JAVAROOT) || $(MKDIR_P) $(@D)/$(JAVAROOT)
+ 
+ pkgpath = test
+-hdfjarfile = jar$(PACKAGE_TARNAME)-$(PACKAGE_VERSION).jar
++hdfjarfile = $(PACKAGE_TARNAME).jar
+ CLASSPATH_ENV=CLASSPATH=.:$(JAVAROOT):$(top_builddir)/java/src/$(hdfjarfile):$(top_srcdir)/java/lib/junit.jar:$(top_srcdir)/java/lib/hamcrest-core.jar:$(top_srcdir)/java/lib/slf4j-api-2.0.6.jar:$(top_srcdir)/java/lib/ext/slf4j-simple-2.0.6.jar:$$CLASSPATH
+ 
+ jarfile = jar$(PACKAGE_TARNAME)test.jar
+diff --git a/java/test/junit.sh.in b/java/test/junit.sh.in
+index 0690081..9a784a1 100644
+--- a/java/test/junit.sh.in
++++ b/java/test/junit.sh.in
+@@ -48,7 +48,7 @@ BLDLIBDIR="$BLDDIR/testlibs"
+ HDFTEST_HOME="$top_srcdir/java/test"
+ DUMP_TESTFILES="$top_srcdir/tools/test/h5dump/testfiles"
+ 
+-JARFILE=jar@PACKAGE_TARNAME@-@PACKAGE_VERSION@.jar
++JARFILE=@PACKAGE_TARNAME@.jar
+ TESTJARFILE=jar@PACKAGE_TARNAME@test.jar
+ test -d $BLDLIBDIR || mkdir -p $BLDLIBDIR
+ 

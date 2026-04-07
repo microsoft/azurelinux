@@ -1,0 +1,135 @@
+--- tokio-1.49.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ tokio-1.49.0/Cargo.toml	2026-01-08T17:51:19.100453+00:00
+@@ -770,11 +770,9 @@
+ ]
+ io-std = []
+ io-uring = [
+-    "dep:io-uring",
+     "libc",
+     "mio/os-poll",
+     "mio/os-ext",
+-    "dep:slab",
+ ]
+ io-util = ["bytes"]
+ macros = ["tokio-macros"]
+@@ -784,11 +782,6 @@
+     "mio/os-ext",
+     "mio/net",
+     "socket2",
+-    "windows-sys/Win32_Foundation",
+-    "windows-sys/Win32_Security",
+-    "windows-sys/Win32_Storage_FileSystem",
+-    "windows-sys/Win32_System_Pipes",
+-    "windows-sys/Win32_System_SystemServices",
+ ]
+ process = [
+     "bytes",
+@@ -797,9 +790,6 @@
+     "mio/os-ext",
+     "mio/net",
+     "signal-hook-registry",
+-    "windows-sys/Win32_Foundation",
+-    "windows-sys/Win32_System_Threading",
+-    "windows-sys/Win32_System_WindowsProgramming",
+ ]
+ rt = []
+ rt-multi-thread = ["rt"]
+@@ -809,11 +799,9 @@
+     "mio/net",
+     "mio/os-ext",
+     "signal-hook-registry",
+-    "windows-sys/Win32_Foundation",
+-    "windows-sys/Win32_System_Console",
+ ]
+ sync = []
+-taskdump = ["dep:backtrace"]
++taskdump = []
+ test-util = [
+     "rt",
+     "sync",
+@@ -821,45 +809,6 @@
+ ]
+ time = []
+ 
+-[target.'cfg(all(target_family = "wasm", not(target_os = "wasi")))'.dev-dependencies.wasm-bindgen-test]
+-version = "0.3.0"
+-
+-[target.'cfg(all(tokio_unstable, target_has_atomic = "64"))'.dev-dependencies.tracing-mock]
+-version = "= 0.1.0-beta.1"
+-
+-[target.'cfg(all(tokio_unstable, target_os = "linux"))'.dependencies.backtrace]
+-version = "0.3.58"
+-optional = true
+-
+-[target.'cfg(all(tokio_unstable, target_os = "linux"))'.dependencies.io-uring]
+-version = "0.7.6"
+-optional = true
+-default-features = false
+-
+-[target.'cfg(all(tokio_unstable, target_os = "linux"))'.dependencies.libc]
+-version = "0.2.168"
+-optional = true
+-
+-[target.'cfg(all(tokio_unstable, target_os = "linux"))'.dependencies.mio]
+-version = "1.0.1"
+-features = [
+-    "os-poll",
+-    "os-ext",
+-]
+-optional = true
+-default-features = false
+-
+-[target.'cfg(all(tokio_unstable, target_os = "linux"))'.dependencies.slab]
+-version = "0.4.9"
+-optional = true
+-
+-[target."cfg(loom)".dev-dependencies.loom]
+-version = "0.7"
+-features = [
+-    "futures",
+-    "checkpoint",
+-]
+-
+ [target.'cfg(not(all(target_family = "wasm", target_os = "unknown")))'.dev-dependencies.rand]
+ version = "0.9"
+ 
+@@ -876,16 +825,6 @@
+ 
+ [target.'cfg(not(target_family = "wasm"))'.dev-dependencies.tempfile]
+ version = "3.1.0"
+-
+-[target.'cfg(target_os = "freebsd")'.dev-dependencies.mio-aio]
+-version = "1"
+-features = ["tokio"]
+-
+-[target."cfg(tokio_unstable)".dependencies.tracing]
+-version = "0.1.29"
+-features = ["std"]
+-optional = true
+-default-features = false
+ 
+ [target."cfg(unix)".dependencies.libc]
+ version = "0.2.168"
+@@ -906,17 +845,6 @@
+     "socket",
+ ]
+ default-features = false
+-
+-[target."cfg(windows)".dependencies.windows-sys]
+-version = "0.61"
+-optional = true
+-
+-[target."cfg(windows)".dev-dependencies.windows-sys]
+-version = "0.61"
+-features = [
+-    "Win32_Foundation",
+-    "Win32_Security_Authorization",
+-]
+ 
+ [lints.rust.unexpected_cfgs]
+ level = "warn"
+@@ -932,3 +860,4 @@
+     "cfg(tokio_unstable)",
+     'cfg(target_os, values("cygwin"))',
+ ]
++

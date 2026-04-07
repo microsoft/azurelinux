@@ -1,0 +1,43 @@
+--- rustls-webpki-0.103.8/Cargo.toml	1970-01-01T00:00:01+00:00
++++ rustls-webpki-0.103.8/Cargo.toml	2025-10-29T10:37:49.267793+00:00
+@@ -80,19 +80,6 @@
+     "ring?/alloc",
+     "pki-types/alloc",
+ ]
+-aws-lc-rs = [
+-    "dep:aws-lc-rs",
+-    "aws-lc-rs/aws-lc-sys",
+-    "aws-lc-rs/prebuilt-nasm",
+-]
+-aws-lc-rs-fips = [
+-    "dep:aws-lc-rs",
+-    "aws-lc-rs/fips",
+-]
+-aws-lc-rs-unstable = [
+-    "aws-lc-rs",
+-    "aws-lc-rs/unstable",
+-]
+ default = ["std"]
+ ring = ["dep:ring"]
+ std = [
+@@ -103,11 +90,6 @@
+ [lib]
+ name = "webpki"
+ path = "src/lib.rs"
+-
+-[dependencies.aws-lc-rs]
+-version = "1.14"
+-optional = true
+-default-features = false
+ 
+ [dependencies.pki-types]
+ version = "1.12"
+@@ -136,7 +118,7 @@
+ 
+ [dev-dependencies.rcgen]
+ version = "0.14.2"
+-features = ["aws_lc_rs"]
++features = ["ring"]
+ default-features = false
+ 
+ [dev-dependencies.serde]

@@ -1,0 +1,14 @@
+[Unit]
+Description=Exim Mail Transport Agent
+After=network.target
+Conflicts=sendmail.service postfix.service
+
+[Service]
+PrivateTmp=true
+Environment=QUEUE=1h
+EnvironmentFile=-/etc/sysconfig/exim
+ExecStartPre=-/usr/libexec/exim-gen-cert
+ExecStart=/usr/sbin/exim -bd -q${QUEUE}
+
+[Install]
+WantedBy=multi-user.target

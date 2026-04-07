@@ -1,0 +1,25 @@
+From 5bf37e237694ac7bf028f9129561d1265fd95621 Mon Sep 17 00:00:00 2001
+From: Alfredo Moralejo <amoralej@redhat.com>
+Date: Tue, 6 Feb 2018 16:57:17 +0000
+Subject: [PATCH] Skip unit test in packaging
+
+Tarball from pypy does not provides tests.js file.
+---
+ tests.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tests.py b/tests.py
+index 548d28b..0386e29 100755
+--- a/tests.py
++++ b/tests.py
+@@ -13,6 +13,7 @@ import sys
+ 
+ class ApplyPatchTestCase(unittest.TestCase):
+ 
++    @unittest.skip("Skipping in packaging")
+     def test_js_file(self):
+         with open('./tests.js', 'r') as f:
+             tests = json.load(f)
+-- 
+1.8.3.1
+

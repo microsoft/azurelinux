@@ -1,0 +1,3 @@
+# snmpd command line options
+# '-f' is implicitly added by snmpd systemd unit file
+# OPTIONS="-LS0-6d"

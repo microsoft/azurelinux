@@ -1,0 +1,21 @@
+--- curl-sys-0.4.84+curl-8.17.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ curl-sys-0.4.84+curl-8.17.0/Cargo.toml	2025-12-11T20:51:37.304823+00:00
+@@ -12,7 +12,7 @@
+ [package]
+ edition = "2018"
+ name = "curl-sys"
+-version = "0.4.84+curl-8.17.0"
++version = "0.4.84"
+ authors = ["Alex Crichton <alex@alexcrichton.com>"]
+ build = "build.rs"
+ links = "curl"
+@@ -83,9 +83,4 @@
+ version = "0.9.64"
+ optional = true
+ 
+-[target.'cfg(target_env = "msvc")'.build-dependencies.vcpkg]
+-version = "0.2"
+ 
+-[target."cfg(windows)".dependencies.windows-sys]
+-version = "0.59"
+-features = ["Win32_Networking_WinSock"]

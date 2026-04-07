@@ -1,0 +1,26 @@
+diff --git a/build.xml b/build.xml
+index eb6a80b..dcf3522 100644
+--- a/build.xml
++++ b/build.xml
+@@ -58,8 +58,8 @@
+ 		       destdir="${target.classes.dir}"
+ 		       debug="true"
+ 		       classpathref="compile.classpath"
+-		       source="${jdk.source}"
+-		       target="${jdk.target}"
++		       source="1.8"
++		       target="1.8"
+ 		  />
+ 		
+ 		<copy todir="${target.classes.dir}">
+@@ -73,8 +73,8 @@
+ 		<javac srcdir="${test.src.dir}"
+ 		       destdir="${target.test-classes.dir}"
+ 		       debug="true"
+-		       source="${jdk.source}"
+-		       target="${jdk.target}">
++		       source="1.8"
++		       target="1.8">
+ 			<classpath>
+ 				<path refid="test.classpath" />
+ 				<pathelement location="${target.classes.dir}" />

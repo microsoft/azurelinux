@@ -1,0 +1,33 @@
+From db6b1c3e0da45059394c5376ef8964c323021e32 Mon Sep 17 00:00:00 2001
+From: Karolina Surma <ksurma@redhat.com>
+Date: Thu, 3 Mar 2022 11:07:06 +0100
+Subject: [PATCH] Don't include standard paths in runtime library paths
+
+---
+ setup3.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/setup3.py b/setup3.py
+index fe388ba..1b8a32d 100644
+--- a/setup3.py
++++ b/setup3.py
+@@ -39,6 +39,7 @@ import os
+ import re
+ import sys
+ import glob
++import sysconfig
+ 
+ if (sys.version_info[0] < 3) and (sys.version_info >= (2, 6)) :
+     # Silence deprecation warnings during "setup"
+@@ -539,7 +540,7 @@ pybsddb_doc/>`__ --
+                                depends = ['Modules/bsddb.h'],
+                                include_dirs = [ incdir ],
+                                library_dirs = [ libdir ],
+-                               runtime_library_dirs = [ libdir ],
++                               runtime_library_dirs = [ libdir ] if libdir != sysconfig.get_config_var('LIBDIR') else [],
+                                libraries = libname,
+                                extra_link_args = lflags_arg,
+                                )],
+-- 
+2.35.1
+

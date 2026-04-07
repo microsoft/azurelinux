@@ -1,0 +1,153 @@
+From 50e1cc8bc0d090164762ec166439f8b0f3855308 Mon Sep 17 00:00:00 2001
+From: Julien Schueller <schueller@phimeca.com>
+Date: Thu, 10 Apr 2025 17:22:15 +0200
+Subject: [PATCH 1/3] Python: Handle __package__ removal
+
+Closes #2967
+---
+ Doc/Manual/Python.html    | 6 +++---
+ Source/Modules/python.cxx | 8 +++++---
+ 2 files changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/Doc/Manual/Python.html b/Doc/Manual/Python.html
+index 23587e5dbcc..01fc449a68a 100644
+--- a/Doc/Manual/Python.html
++++ b/Doc/Manual/Python.html
+@@ -6552,7 +6552,7 @@ <H4><a name="Python_package_search_both_package_modules">33.11.6.1 Both modules
+ 
+ <p>
+ In this configuration, the pure Python module, foo.py, tries to load the C/C++ module, _foo, from the same package foo.py is
+-located in.  The package name is determined from the <tt>__package__</tt>
++located in.  The package name is determined from the <tt>__spec__.parent</tt> (or <tt>__package__</tt> before Python 3.4)
+ attribute if available, see <a href="https://www.python.org/dev/peps/pep-0366/">PEP 366</a>. Otherwise it is derived from the <tt>__name__</tt>
+ attribute given to foo.py by the Python loader that imported foo.py.
+ The interface file for this configuration would contain:
+@@ -6675,7 +6675,7 @@ <H4><a name="Python_custom_module_import">33.11.6.4 More on customizing the modu
+ 
+ <div class="targetlang">
+ <pre>
+-if __package__ or '.' in __name__:
++if getattr(__spec__, "parent", None) or '.' in __name__:
+     from . import _foo
+ else:
+     import _foo
+@@ -6760,7 +6760,7 @@ <H4><a name="Python_custom_module_import">33.11.6.4 More on customizing the modu
+ 
+ <div class="targetlang">
+ <pre>
+-if __package__ or '.' in __name__:
++if getattr(__spec__, "parent", None) or '.' in __name__:
+     from ._foo import *
+ else:
+     from _foo import *
+diff --git a/Source/Modules/python.cxx b/Source/Modules/python.cxx
+index 86daf131c8b..a71fc3cdb25 100644
+--- a/Source/Modules/python.cxx
++++ b/Source/Modules/python.cxx
+@@ -703,20 +703,22 @@ class PYTHON:public Language {
+ 	 * onwards (implicit relative imports raised a DeprecationWarning in 2.6,
+ 	 * and fail in 2.7 onwards).
+ 	 *
+-	 * First check for __package__ which is available from 2.6 onwards, see PEP366.
++	 * First check for __spec__.parent which is available from 3.4 onwards,
++	 * see https://docs.python.org/3/reference/import.html#spec. If not,
++	 * check for __package__, which was set before 3.14.
+ 	 * Next try determine the shadow wrapper's package based on the __name__ it
+ 	 * was given by the importer that loaded it.
+ 	 * If the module is in a package, load the low-level C/C++ module from the
+ 	 * same package, otherwise load it as a global module.
+ 	 */
+         Printv(default_import_code, "# Import the low-level C/C++ module\n", NULL);
+-        Printv(default_import_code, "if __package__ or \".\" in __name__:\n", NULL);
++        Printv(default_import_code, "if getattr(globals().get(\"__spec__\"), \"parent\", None) or globals().get(\"__package__\") or \".\" in __name__:\n", NULL);
+         Printv(default_import_code, tab4, "from . import ", module, "\n", NULL);
+         Printv(default_import_code, "else:\n", NULL);
+         Printv(default_import_code, tab4, "import ", module, "\n", NULL);
+       } else {
+         Printv(default_import_code, "# Pull in all the attributes from the low-level C/C++ module\n", NULL);
+-        Printv(default_import_code, "if __package__ or \".\" in __name__:\n", NULL);
++        Printv(default_import_code, "if getattr(globals().get(\"__spec__\"), \"parent\", None) or globals().get(\"__package__\") or \".\" in __name__:\n", NULL);
+         Printv(default_import_code, tab4, "from .", module, " import *\n", NULL);
+         Printv(default_import_code, "else:\n", NULL);
+         Printv(default_import_code, tab4, "from ", module, " import *\n", NULL);
+
+From 3bfdf13c602f877860a9949ba751a5b5a9ba70aa Mon Sep 17 00:00:00 2001
+From: Julien Schueller <schueller@phimeca.com>
+Date: Thu, 10 Apr 2025 18:35:25 +0200
+Subject: [PATCH 2/3] Python: Add ht_token
+
+---
+ Source/Modules/python.cxx | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/Source/Modules/python.cxx b/Source/Modules/python.cxx
+index a71fc3cdb25..3070a94face 100644
+--- a/Source/Modules/python.cxx
++++ b/Source/Modules/python.cxx
+@@ -4374,6 +4374,11 @@ class PYTHON:public Language {
+     Printv(f, "#if PY_VERSION_HEX >= 0x030b0000\n", NIL);
+     printSlot(f, getSlot(n, "feature:python:_ht_tpname"), "_ht_tpname", "char *");
+ 
++    // void *ht_token;
++    Printv(f, "#if PY_VERSION_HEX >= 0x030e0000\n", NIL);
++    printSlot(f, getSlot(n, "feature:python:ht_token"), "ht_token", "void *");
++    Printv(f, "#endif\n", NIL);
++
+     // struct _specialization_cache _spec_cache;
+     Printf(f, "  {\n");
+     printSlot(f, getSlot(n, "feature:python:getitem"), "getitem", "PyObject *");
+
+From 55237efa7219f65a04e0ffc69a81c574b5f5e162 Mon Sep 17 00:00:00 2001
+From: Julien Schueller <schueller@phimeca.com>
+Date: Thu, 10 Apr 2025 17:47:59 +0200
+Subject: [PATCH 3/3] Python: Amend annotations test
+
+---
+ .../python_annotations_variable_c_runme.py    | 24 +++++++++++++------
+ 1 file changed, 17 insertions(+), 7 deletions(-)
+
+diff --git a/Examples/test-suite/python/python_annotations_variable_c_runme.py b/Examples/test-suite/python/python_annotations_variable_c_runme.py
+index 153852d05e6..d1f359bbbd0 100644
+--- a/Examples/test-suite/python/python_annotations_variable_c_runme.py
++++ b/Examples/test-suite/python/python_annotations_variable_c_runme.py
+@@ -1,4 +1,17 @@
+ import sys
++import inspect
++
++
++def get_annotations(cls):
++    # Python >=3.14 removed the __annotations__ attribute
++    # retrieve it via inspect (see also annotationlib)
++    if hasattr(inspect, "get_annotations"):
++        # Python >=3.10
++        return inspect.get_annotations(cls)
++    else:
++        # Python <3.10
++        return getattr(cls, "__annotations__", {})
++
+ 
+ # Variable annotations for properties is only supported in python-3.6 and later (PEP 526)
+ if sys.version_info[0:2] >= (3, 6):
+@@ -8,17 +21,14 @@
+     annotations_supported = not(is_python_builtin() or is_python_fastproxy())
+ 
+     if annotations_supported:
+-        ts = TemplateShort()
+-        anno = ts.__annotations__
++        anno = get_annotations(TemplateShort)
+         if anno != {'member_variable': 'int'}:
+             raise RuntimeError("annotations mismatch: {}".format(anno))
+ 
+-        ts = StructWithVar()
+-        anno = ts.__annotations__
++        anno = get_annotations(StructWithVar)
+         if anno != {'member_variable': 'int'}:
+             raise RuntimeError("annotations mismatch: {}".format(anno))
+ 
+-        ts = StructWithVarNotAnnotated()
+-        if getattr(ts, "__annotations__", None) != None:
+-            anno = ts.__annotations__
++        anno = get_annotations(StructWithVarNotAnnotated)
++        if anno != {}:
+             raise RuntimeError("annotations mismatch: {}".format(anno))
+

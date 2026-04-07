@@ -1,0 +1,91 @@
+From 0af52906aac18e7f5fba8acb3d3dc1c6220e759d Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Wed, 28 Aug 2024 10:18:33 +0200
+Subject: [PATCH] Drop tracing-level log statements that depend on kv-log-macro
+
+---
+ src/task/builder.rs | 40 ++++++++++++++++++++--------------------
+ 1 file changed, 20 insertions(+), 20 deletions(-)
+
+diff --git a/src/task/builder.rs b/src/task/builder.rs
+index aba0d61..40c31ab 100644
+--- a/src/task/builder.rs
++++ b/src/task/builder.rs
+@@ -54,10 +54,10 @@ impl Builder {
+     {
+         let wrapped = self.build(future);
+ 
+-        kv_log_macro::trace!("spawn", {
+-            task_id: wrapped.tag.id().0,
+-            parent_task_id: TaskLocalsWrapper::get_current(|t| t.id().0).unwrap_or(0),
+-        });
++        //kv_log_macro::trace!("spawn", {
++        //    task_id: wrapped.tag.id().0,
++        //    parent_task_id: TaskLocalsWrapper::get_current(|t| t.id().0).unwrap_or(0),
++        //});
+ 
+         let task = wrapped.tag.task().clone();
+         let handle = async_global_executor::spawn(wrapped);
+@@ -74,10 +74,10 @@ impl Builder {
+     {
+         let wrapped = self.build(future);
+ 
+-        kv_log_macro::trace!("spawn_local", {
+-            task_id: wrapped.tag.id().0,
+-            parent_task_id: TaskLocalsWrapper::get_current(|t| t.id().0).unwrap_or(0),
+-        });
++        //kv_log_macro::trace!("spawn_local", {
++        //    task_id: wrapped.tag.id().0,
++        //    parent_task_id: TaskLocalsWrapper::get_current(|t| t.id().0).unwrap_or(0),
++        //});
+ 
+         let task = wrapped.tag.task().clone();
+         let handle = async_global_executor::spawn_local(wrapped);
+@@ -99,10 +99,10 @@ impl Builder {
+             let res = future.await;
+             let _ = sender.send(res);
+         });
+-        kv_log_macro::trace!("spawn_local", {
+-            task_id: wrapped.tag.id().0,
+-            parent_task_id: TaskLocalsWrapper::get_current(|t| t.id().0).unwrap_or(0),
+-        });
++        //kv_log_macro::trace!("spawn_local", {
++        //    task_id: wrapped.tag.id().0,
++        //    parent_task_id: TaskLocalsWrapper::get_current(|t| t.id().0).unwrap_or(0),
++        //});
+ 
+         let task = wrapped.tag.task().clone();
+         wasm_bindgen_futures::spawn_local(wrapped);
+@@ -125,10 +125,10 @@ impl Builder {
+             let _ = sender.send(res);
+         });
+ 
+-        kv_log_macro::trace!("spawn_local", {
+-            task_id: wrapped.tag.id().0,
+-            parent_task_id: TaskLocalsWrapper::get_current(|t| t.id().0).unwrap_or(0),
+-        });
++        //kv_log_macro::trace!("spawn_local", {
++        //    task_id: wrapped.tag.id().0,
++        //    parent_task_id: TaskLocalsWrapper::get_current(|t| t.id().0).unwrap_or(0),
++        //});
+ 
+         let task = wrapped.tag.task().clone();
+         wasm_bindgen_futures::spawn_local(wrapped);
+@@ -147,10 +147,10 @@ impl Builder {
+         let wrapped = self.build(future);
+ 
+         // Log this `block_on` operation.
+-        kv_log_macro::trace!("block_on", {
+-            task_id: wrapped.tag.id().0,
+-            parent_task_id: TaskLocalsWrapper::get_current(|t| t.id().0).unwrap_or(0),
+-        });
++        //kv_log_macro::trace!("block_on", {
++        //    task_id: wrapped.tag.id().0,
++        //    parent_task_id: TaskLocalsWrapper::get_current(|t| t.id().0).unwrap_or(0),
++        //});
+ 
+         thread_local! {
+             /// Tracks the number of nested block_on calls.
+-- 
+2.49.0
+

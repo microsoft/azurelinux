@@ -1,0 +1,52 @@
+#!/bin/bash
+
+. /usr/libexec/tomcat/functions
+
+# Get the tomcat config (use this for environment specific settings)
+
+if [ -z "${TOMCAT_CFG_LOADED}" ]; then
+  if [ -z "${TOMCAT_CFG}" ]; then
+    TOMCAT_CFG="/etc/tomcat/tomcat.conf"
+  fi
+  . $TOMCAT_CFG
+fi
+
+if [ -d "${TOMCAT_CONFD=/etc/tomcat/conf.d}" ]; then
+  for file in ${TOMCAT_CONFD}/*.conf ; do
+    if [ -f "$file" ] ; then
+      . "$file"
+    fi
+  done
+fi
+
+if [ -z "$CATALINA_BASE" ]; then
+  if [ -n "$NAME" ]; then
+    if [ -z "$TOMCATS_BASE" ]; then
+      TOMCATS_BASE="/var/lib/tomcats/"
+    fi
+    CATALINA_BASE="${TOMCATS_BASE}${NAME}"
+  else
+    CATALINA_BASE="${CATALINA_HOME}"
+  fi
+fi
+VERBOSE=1
+set_javacmd
+cd ${CATALINA_HOME}
+# CLASSPATH munging
+if [ ! -z "$CLASSPATH" ] ; then
+  CLASSPATH="$CLASSPATH":
+fi
+
+if [ -n "$JSSE_HOME" ]; then
+  CLASSPATH="${CLASSPATH}$(build-classpath jcert jnet jsse 2>/dev/null):"
+fi
+CLASSPATH="${CLASSPATH}${CATALINA_HOME}/bin/bootstrap.jar"
+CLASSPATH="${CLASSPATH}:${CATALINA_HOME}/bin/tomcat-juli.jar"
+CLASSPATH="${CLASSPATH}:$(build-classpath commons-daemon 2>/dev/null)"
+
+if [ -z "$LOGGING_PROPERTIES" ] ; then
+  LOGGING_PROPERTIES="${CATALINA_BASE}/conf/logging.properties"
+  if [ ! -f "${LOGGING_PROPERTIES}" ] ; then
+    LOGGING_PROPERTIES="${CATALINA_HOME}/conf/logging.properties"
+  fi
+fi

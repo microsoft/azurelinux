@@ -1,0 +1,93 @@
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Fri, 18 Jun 2010 23:41:33 +0400
+Subject: [PATCH] Do not install C sources
+
+Don't install *.c and *.o files.
+
+Excepts ones from the internal erl_interface. These
+API headers are necessary. See rhbz #818419 for the
+explanation why they're necessary for the low-level
+interaction with the Erlang nodes:
+
+https://bugzilla.redhat.com/818419
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+
+diff --git a/lib/asn1/c_src/Makefile b/lib/asn1/c_src/Makefile
+index 82a6b6e87a..5f2fe8ba7d 100644
+--- a/lib/asn1/c_src/Makefile
++++ b/lib/asn1/c_src/Makefile
+@@ -137,8 +137,6 @@ include $(ERL_TOP)/make/otp_release_targets.mk
+ release_spec: opt
+ 	$(INSTALL_DIR) "$(RELSYSDIR)/priv/lib"
+ 	$(INSTALL_PROGRAM) $(NIF_SHARED_OBJ_FILE) "$(RELSYSDIR)/priv/lib"
+-	$(INSTALL_DIR) "$(RELSYSDIR)/c_src"
+-	$(INSTALL_DATA) *.c "$(RELSYSDIR)/c_src"
+ 
+ release_docs_spec:
+ 
+diff --git a/lib/erl_interface/src/Makefile.in b/lib/erl_interface/src/Makefile.in
+index fa1ea3cd39..b977b6afe5 100644
+--- a/lib/erl_interface/src/Makefile.in
++++ b/lib/erl_interface/src/Makefile.in
+@@ -715,13 +715,11 @@ ifeq (@DYNAMIC_LIB@, yes)
+ endif
+ 	$(INSTALL_PROGRAM) $(EXE_TARGETS) "$(RELSYSDIR)/bin"
+ 	$(INSTALL_DATA) $(EXTRA)        "$(RELSYSDIR)/src"
+-	$(INSTALL_DATA) connect/*.[ch]  "$(RELSYSDIR)/src/connect"
+-	$(INSTALL_DATA) decode/*.[ch]   "$(RELSYSDIR)/src/decode"
+-	$(INSTALL_DATA) encode/*.[ch]   "$(RELSYSDIR)/src/encode"
+-	$(INSTALL_DATA) epmd/*.[ch]     "$(RELSYSDIR)/src/epmd"
+-	$(INSTALL_DATA) misc/*.[ch]     "$(RELSYSDIR)/src/misc"
+-	$(INSTALL_DATA) global/*.[ch]   "$(RELSYSDIR)/src/global"
+-	$(INSTALL_DATA) prog/*.[ch]     "$(RELSYSDIR)/src/prog"
++	$(INSTALL_DATA) connect/*.h  "$(RELSYSDIR)/src/connect"
++	$(INSTALL_DATA) decode/*.h   "$(RELSYSDIR)/src/decode"
++	$(INSTALL_DATA) encode/*.h   "$(RELSYSDIR)/src/encode"
++	$(INSTALL_DATA) epmd/*.h     "$(RELSYSDIR)/src/epmd"
++	$(INSTALL_DATA) misc/*.h     "$(RELSYSDIR)/src/misc"
+ 
+ release_docs:
+ 
+diff --git a/lib/megaco/src/flex/Makefile.in b/lib/megaco/src/flex/Makefile.in
+index 3649e2c392..d8c5c68b99 100644
+--- a/lib/megaco/src/flex/Makefile.in
++++ b/lib/megaco/src/flex/Makefile.in
+@@ -251,7 +251,7 @@ release_spec: opt
+ 	$(INSTALL_DATA) $(ERL_FILES) $(INTERNAL_HRL_FILES) "$(RELSYSDIR)/src/flex"
+ 	$(INSTALL_DATA) $(TARGET_FILES) "$(RELSYSDIR)/ebin"
+ ifeq ($(ENABLE_MEGACO_FLEX_SCANNER),true)
+-	$(INSTALL_DATA) $(FLEX_FILES) $(C_TARGETS) "$(RELSYSDIR)/src/flex"
++	$(INSTALL_DATA) $(FLEX_FILES) "$(RELSYSDIR)/src/flex"
+ 	$(INSTALL_PROGRAM) $(SOLIBS) "$(RELSYSDIR)/priv/lib"
+ endif
+ 
+diff --git a/lib/odbc/c_src/Makefile.in b/lib/odbc/c_src/Makefile.in
+index d1b26743a6..cf8faae1f5 100644
+--- a/lib/odbc/c_src/Makefile.in
++++ b/lib/odbc/c_src/Makefile.in
+@@ -129,11 +129,8 @@ include $(ERL_TOP)/make/otp_release_targets.mk
+ 
+ release_spec: opt
+ ifdef EXE_TARGET
+-	$(INSTALL_DIR) "$(RELSYSDIR)/c_src"
+-	$(INSTALL_DATA) $(C_FILES) $(H_FILES) "$(RELSYSDIR)/c_src"
+ 	$(INSTALL_DIR) "$(RELSYSDIR)/priv"
+ 	$(INSTALL_DIR) "$(RELSYSDIR)/priv/bin"
+-	$(INSTALL_DIR) "$(RELSYSDIR)/priv/obj"
+ 	$(INSTALL_PROGRAM) $(EXE_TARGET) "$(RELSYSDIR)/priv/bin"
+ endif
+ 
+diff --git a/lib/os_mon/c_src/Makefile.in b/lib/os_mon/c_src/Makefile.in
+index 27b156a2c9..f11ff303b6 100644
+--- a/lib/os_mon/c_src/Makefile.in
++++ b/lib/os_mon/c_src/Makefile.in
+@@ -126,8 +126,6 @@ $(OBJDIR)/memsup.o: memsup.h
+ include $(ERL_TOP)/make/otp_release_targets.mk
+ 
+ release_spec: opt
+-	$(INSTALL_DIR) "$(RELSYSDIR)/src"
+-	$(INSTALL_DATA) $(C_FILES) "$(RELSYSDIR)/src"
+ 	$(INSTALL_DIR) "$(RELSYSDIR)/priv/bin"
+ 	$(INSTALL_PROGRAM) $(TARGET_FILES) "$(RELSYSDIR)/priv/bin"
+ 

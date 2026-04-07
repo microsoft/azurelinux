@@ -1,0 +1,759 @@
+diff -up db-5.3.28/dist/android/android_config.in.pthreads db-5.3.28/dist/android/android_config.in
+--- db-5.3.28/dist/android/android_config.in.pthreads	2013-09-09 17:35:02.000000000 +0200
++++ db-5.3.28/dist/android/android_config.in	2017-06-13 11:15:15.323215161 +0200
+@@ -123,6 +123,9 @@
+ /* Define to 1 if allocated filesystem blocks are not zeroed. */
+ /* #undef HAVE_FILESYSTEM_NOTZERO */
+ 
++/* Define to 1 if you have the `flock' function. */
++#undef HAVE_FLOCK
++
+ /* Define to 1 if you have the `fopen' function. */
+ #define HAVE_FOPEN 1
+ 
+diff -up db-5.3.28/dist/config.hin.pthreads db-5.3.28/dist/config.hin
+--- db-5.3.28/dist/config.hin.pthreads	2013-09-09 17:35:02.000000000 +0200
++++ db-5.3.28/dist/config.hin	2017-06-13 11:15:15.000000000 +0200
+@@ -92,6 +92,9 @@
+ /* Define to 1 if you have the <dlfcn.h> header file. */
+ #undef HAVE_DLFCN_H
+ 
++/* Define to 1 if you have the `dl_iterate_phdr' function. */
++#undef HAVE_DL_ITERATE_PHDR
++
+ /* Define to 1 to use dtrace for performance monitoring. */
+ #undef HAVE_DTRACE
+ 
+@@ -125,6 +128,9 @@
+ /* Define to 1 if allocated filesystem blocks are not zeroed. */
+ #undef HAVE_FILESYSTEM_NOTZERO
+ 
++/* Define to 1 if you have the `flock' function. */
++#undef HAVE_FLOCK
++
+ /* Define to 1 if you have the `fopen' function. */
+ #undef HAVE_FOPEN
+ 
+@@ -360,6 +366,9 @@
+ /* Define to 1 if you have the `pstat_getdynamic' function. */
+ #undef HAVE_PSTAT_GETDYNAMIC
+ 
++/* Define to 1 if you have dl_iterate_phdr and use pthread-based mutexes. */
++#undef HAVE_PTHREADS_TIMESTAMP
++
+ /* Define to 1 if it is OK to initialize an already initialized
+    pthread_cond_t. */
+ #undef HAVE_PTHREAD_COND_REINIT_OKAY
+@@ -620,6 +629,11 @@
+ /* Define to 1 to mask harmless uninitialized memory read/writes. */
+ #undef UMRW
+ 
++/* Enable large inode numbers on Mac OS X 10.5.  */
++#ifndef _DARWIN_USE_64_BIT_INODE
++# define _DARWIN_USE_64_BIT_INODE 1
++#endif
++
+ /* Number of bits in a file offset, on hosts where this is settable. */
+ #undef _FILE_OFFSET_BITS
+ 
+diff -up db-5.3.28/dist/configure.ac.pthreads db-5.3.28/dist/configure.ac
+--- db-5.3.28/dist/configure.ac.pthreads	2017-06-13 11:15:15.309215434 +0200
++++ db-5.3.28/dist/configure.ac	2017-06-13 11:15:15.323215161 +0200
+@@ -698,7 +698,7 @@ AC_REPLACE_FUNCS(\
+ # Check for system functions we optionally use.
+ AC_CHECK_FUNCS(\
+ 	_fstati64 backtrace backtrace_symbols directio fchmod fclose\
+-	fcntl fdatasync fgetc fgets fopen fwrite getgid\
++	fcntl fdatasync fgetc fgets flock fopen fwrite getgid\
+ 	getrusage getuid hstrerror mprotect pstat_getdynamic\
+ 	pthread_self pthread_yield random sched_yield select setgid setuid\
+ 	sigaction snprintf stat sysconf vsnprintf yield)
+@@ -1042,6 +1042,34 @@ if test "$db_cv_localization" = "yes"; t
+ [Define to 1 if you have localization function to support globalization.])
+ fi
+ 
++# Check for dl_iterate_phdr; do the test explicitly instead of using
++# AC_CHECK_FUNCS because <netdb.h> isn't a standard include file.
++AC_CACHE_CHECK([for dl_iterate_phdr], db_cv_dl_iterate_phdr, [
++AC_TRY_LINK([
++#include <sys/types.h>
++#include <netdb.h>], [
++	dl_iterate_phdr(0, 0);
++], [db_cv_dl_iterate_phdr=yes], [db_cv_dl_iterate_phdr=no])])
++if test "$db_cv_dl_iterate_phdr" = "yes"; then
++	AC_DEFINE(HAVE_DL_ITERATE_PHDR)
++	AH_TEMPLATE(HAVE_DL_ITERATE_PHDR,
++	    [Define to 1 if you have the `dl_iterate_phdr' function.])
++fi
++ 
++# If we are using pthread mutex or condition variables, and dl_iterate_phdr() is 
++# available, then we try to detect when libpthread is updated -- which can
++# render existing environment invalid.   DB_ENV->open() tries to rebuild such
++# environments when they are idle.
++case "$db_cv_mutex" in
++    *pthreads*)
++    if test "$db_cv_dl_iterate_phdr" = "yes" ; then
++	AC_DEFINE(HAVE_PTHREADS_TIMESTAMP)
++	AH_TEMPLATE(HAVE_PTHREADS_TIMESTAMP,
++     [Define to 1 if you have dl_iterate_phdr and use pthread-based mutexes.])
++    fi
++    ;;
++esac
++
+ # We need to add the additional object files into the Makefile with the correct
+ # suffix.  We can't use $LTLIBOBJS itself, because that variable has $U encoded
+ # in it for automake, and that's not what we want.  See SR #7227 for additional
+diff -up db-5.3.28/src/db/db_meta.c.pthreads db-5.3.28/src/db/db_meta.c
+--- db-5.3.28/src/db/db_meta.c.pthreads	2013-09-09 17:35:07.000000000 +0200
++++ db-5.3.28/src/db/db_meta.c	2017-06-13 11:15:15.323215161 +0200
+@@ -1330,8 +1330,9 @@ __db_haslock(env, locker, dbmfp, pgno, m
+ }
+ /*
+  * __db_has_pagelock --
+- *	Determine if this locker holds a particular page lock.
+- *	Returns 0 if lock is held, non-zero otherwise.
++ *	Determine if this locker holds a particular page lock, and return an
++ *	error if it is missing a page lock that it should have.
++ *	Otherwise (TDS with the page locked, or DS or CDS) return 0.
+  *
+  * PUBLIC: #ifdef DIAGNOSTIC
+  * PUBLIC: int __db_has_pagelock __P((ENV *, DB_LOCKER *,
+@@ -1348,6 +1349,9 @@ __db_has_pagelock(env, locker, dbmfp, pa
+ {
+ 	int ret;
+ 
++	if (!FLD_ISSET(env->open_flags, DB_INIT_TXN))
++		return (0);
++
+ 	switch (pagep->type) {
+ 	case P_OVERFLOW:
+ 	case P_INVALID:
+diff -up db-5.3.28/src/dbinc_auto/int_def.in.pthreads db-5.3.28/src/dbinc_auto/int_def.in
+--- db-5.3.28/src/dbinc_auto/int_def.in.pthreads	2017-06-13 11:15:15.317215278 +0200
++++ db-5.3.28/src/dbinc_auto/int_def.in	2017-06-13 11:15:15.324215141 +0200
+@@ -1545,6 +1545,7 @@
+ #if defined(HAVE_REPLICATION_THREADS)
+ #define	__os_freeaddrinfo __os_freeaddrinfo@DB_VERSION_UNIQUE_NAME@
+ #endif
++#define	__os_pthreads_timestamp __os_pthreads_timestamp@DB_VERSION_UNIQUE_NAME@
+ #define	__os_umalloc __os_umalloc@DB_VERSION_UNIQUE_NAME@
+ #define	__os_urealloc __os_urealloc@DB_VERSION_UNIQUE_NAME@
+ #define	__os_ufree __os_ufree@DB_VERSION_UNIQUE_NAME@
+diff -up db-5.3.28/src/dbinc_auto/os_ext.h.pthreads db-5.3.28/src/dbinc_auto/os_ext.h
+--- db-5.3.28/src/dbinc_auto/os_ext.h.pthreads	2013-09-09 17:35:08.000000000 +0200
++++ db-5.3.28/src/dbinc_auto/os_ext.h	2017-06-13 11:15:15.324215141 +0200
+@@ -14,6 +14,7 @@ int __os_getaddrinfo __P((ENV *, const c
+ #if defined(HAVE_REPLICATION_THREADS)
+ void __os_freeaddrinfo __P((ENV *, ADDRINFO *));
+ #endif
++time_t __os_pthreads_timestamp __P((ENV *));
+ int __os_umalloc __P((ENV *, size_t, void *));
+ int __os_urealloc __P((ENV *, size_t, void *));
+ void __os_ufree __P((ENV *, void *));
+@@ -40,7 +41,7 @@ void __os_set_errno __P((int));
+ char *__os_strerror __P((int, char *, size_t));
+ int __os_posix_err __P((int));
+ int __os_fileid __P((ENV *, const char *, int, u_int8_t *));
+-int __os_fdlock __P((ENV *, DB_FH *, off_t, int, int));
++int __os_fdlock __P((ENV *, DB_FH *, off_t, db_lockmode_t, int));
+ int __os_fsync __P((ENV *, DB_FH *));
+ int __os_getenv __P((ENV *, const char *, char **, size_t));
+ int __os_openhandle __P((ENV *, const char *, int, int, DB_FH **));
+diff -up db-5.3.28/src/dbinc/region.h.pthreads db-5.3.28/src/dbinc/region.h
+--- db-5.3.28/src/dbinc/region.h.pthreads	2013-09-09 17:35:08.000000000 +0200
++++ db-5.3.28/src/dbinc/region.h	2017-06-13 11:15:15.324215141 +0200
+@@ -178,6 +178,16 @@ typedef struct __db_reg_env { /* SHARED
+ 	u_int32_t envid;		/* Unique environment ID. */
+ 
+ 	u_int32_t signature;		/* Structure signatures. */
++#if defined(HAVE_PTHREADS_TIMESTAMP) && defined(HAVE_MUTEX_PTHREADS)
++	/*
++	 * Updates to glibc/libpthread can change its pthreads implementation
++	 * and invalidate on-disk environments, even without changing the
++	 * version number.  If using POSIX mutexes and a change in this
++	 * timestamp is detecting when opening an environment with DB_CREATE,
++	 *  __env_attach recreates any existing on-disk environment.
++	 */
++	time_t pthreads_timestamp;
++#endif
+ 
+ 	time_t	  timestamp;		/* Creation time. */
+ 
+diff -up db-5.3.28/src/env/env_open.c.pthreads db-5.3.28/src/env/env_open.c
+--- db-5.3.28/src/env/env_open.c.pthreads	2013-09-09 17:35:08.000000000 +0200
++++ db-5.3.28/src/env/env_open.c	2017-06-13 11:15:15.324215141 +0200
+@@ -1031,11 +1031,11 @@ __env_attach_regions(dbenv, flags, orig_
+ 		goto err;
+ 
+ 	/*
+-	 * __env_attach will return the saved init_flags field, which contains
++	 * __env_attach has returned the saved init_flags field, which contains
+ 	 * the DB_INIT_* flags used when the environment was created.
+ 	 *
+-	 * We may be joining an environment -- reset our flags to match the
+-	 * ones in the environment.
++	 * We may be joining an existing environment -- reset our flags to match
++	 * the ones in the environment.
+ 	 */
+ 	if (FLD_ISSET(init_flags, DB_INITENV_CDB))
+ 		LF_SET(DB_INIT_CDB);
+diff -up db-5.3.28/src/env/env_region.c.pthreads db-5.3.28/src/env/env_region.c
+--- db-5.3.28/src/env/env_region.c.pthreads	2013-09-09 17:35:08.000000000 +0200
++++ db-5.3.28/src/env/env_region.c	2017-06-13 11:16:02.159299222 +0200
+@@ -18,13 +18,49 @@ static int  __env_des_get __P((ENV *, RE
+ static int  __env_faultmem __P((ENV *, void *, size_t, int));
+ static int  __env_sys_attach __P((ENV *, REGINFO *, REGION *));
+ static int  __env_sys_detach __P((ENV *, REGINFO *, int));
++static int  __env_check_recreate __P((ENV *, REGENV *, u_int32_t));
+ static void __env_des_destroy __P((ENV *, REGION *));
+ static void __env_remove_file __P((ENV *));
+ 
++
++/*
++ * If the system supports flock()-like file locking, then the primary region
++ * file __db.001 is exclusively locked during creation, and is read-locked while
++ * the environment is open. Most Unix-like systems have flock(), with the
++ * notable exception of Solaris.
++ * Note: fcntl cannot be used for this locking because of the unfortunate
++ * definition of its interaction with close(2). A process's fcntl locks are
++ * released whenever it closes any file descriptor for that file. So, if an
++ * environment is opened more than once, closing one of the DB_ENV handles would
++ * release the read lock that protects the other handle.
++ */
++#ifdef HAVE_FLOCK
++#define ENV_PRIMARY_LOCK(env, lockmode, async)	\
++	((env)->lockfhp == NULL ? 0 :	\
++	__os_fdlock((env), (env)->lockfhp, -1, lockmode, async))
++#define ENV_PRIMARY_UNLOCK(env)			\
++	((env)->lockfhp == NULL ? 0 :	\
++	__os_fdlock((env), (env)->lockfhp, -1, DB_LOCK_NG, 0))
++#else
++#define ENV_PRIMARY_LOCK(env, lockmode, async)	(0)
++#define ENV_PRIMARY_UNLOCK(env)			(0)
++#endif
++
+ /*
+  * __env_attach
+  *	Join/create the environment
+  *
++ * Safely detecting and managing multiple processes' environment handles:
++ *	BDB uses a shared or exclusive fcntl()-style lock on the first byte
++ *	of the primary region file (__db.001) to detect whether other processes
++ *	have the environment open, and to single-thread attempts to create the
++ *	environment.  If the open includes DB_CREATE, an exclusive lock is
++ *	obtained during the open call.  After the creation is finished, and
++ *	anytime during a non-DB_CREATE env open, the process holds a shared
++ *	lock. 
++ *	- single-thread creation of the environment
++ *	- detect whether any other processes are currently attached to it.
++ *
+  * PUBLIC: int __env_attach __P((ENV *, u_int32_t *, int, int));
+  */
+ int
+@@ -122,7 +158,11 @@ loop:	renv = NULL;
+ 	if ((ret = __os_open(
+ 	    env, infop->name, 0, DB_OSO_REGION, 0, &env->lockfhp)) != 0)
+ 		goto err;
+-
++	/* Wait to get shared access to the primary region. */
++	if ((ret = ENV_PRIMARY_LOCK(env, DB_LOCK_READ, 0)) != 0) {
++		__db_err(env, ret, "__env_attach: existing: shared lock error");
++		goto err;
++	}
+ 	/*
+ 	 * !!!
+ 	 * The region may be in system memory not backed by the filesystem
+@@ -218,11 +258,10 @@ loop:	renv = NULL;
+ 		segid = ref.segid;
+ 	}
+ 
+-#ifndef HAVE_MUTEX_FCNTL
++#if !defined(HAVE_FCNTL) && !defined(HAVE_PTHREADS_TIMESTAMP)
+ 	/*
+-	 * If we're not doing fcntl locking, we can close the file handle.  We
+-	 * no longer need it and the less contact between the buffer cache and
+-	 * the VM, the better.
++	 * Without fcntl-like support, we no longer need the file handle.  Close
++	 * it to limit the interaction between the buffer cache and the VM.
+ 	 */
+ 	(void)__os_closehandle(env, env->lockfhp);
+ 	 env->lockfhp = NULL;
+@@ -233,6 +272,8 @@ loop:	renv = NULL;
+ 	tregion.size = (roff_t)size;
+ 	tregion.max = (roff_t)max;
+ 	tregion.segid = segid;
++	/* Attach to the existing primary region. */
++	/* The leaking db.001 gets open inside of here, in __os_attach(). */
+ 	if ((ret = __env_sys_attach(env, infop, &tregion)) != 0)
+ 		goto err;
+ 
+@@ -245,21 +286,48 @@ user_map_functions:
+ 	infop->primary = infop->addr;
+ 	infop->head = (u_int8_t *)infop->addr + sizeof(REGENV);
+ 	renv = infop->primary;
++    ret = __env_check_recreate(env, renv, signature);
++
++	if (create_ok &&
++	    ret == DB_OLD_VERSION &&
++	    ENV_PRIMARY_LOCK(env, DB_LOCK_WRITE, 1) == 0) {
++		if (FLD_ISSET(dbenv->verbose, DB_VERB_RECOVERY))
++			__db_msg(env, "Recreating idle environment");
++		F_SET(infop, REGION_CREATE_OK);
++
++		/*
++		 * Detach from the environment region; we need to unmap it (and
++		 * close any file handle) so that we don't leak memory or files.
++		 */
++		DB_ASSERT(env, infop->rp == NULL);
++		infop->rp = &tregion;
++		(void)__env_sys_detach(env, infop, 0);
++		goto creation;
++	}
++
++    /* We have an old environment but cannot rebuild it safely. */
++    if (ret == DB_OLD_VERSION) {
++ 		__db_errx(env, DB_STR("1539",
++		    "Build signature doesn't match environment"));
++		ret = DB_VERSION_MISMATCH;
++        goto err;
++    }
+ 
+-	/*
+-	 * Make sure the region matches our build.  Special case a region
+-	 * that's all nul bytes, just treat it like any other corruption.
+-	 */
+ 	if (renv->majver != DB_VERSION_MAJOR ||
+ 	    renv->minver != DB_VERSION_MINOR) {
+-		if (renv->majver != 0 || renv->minver != 0) {
++		/*
++		 * Special case a region that's all nul bytes, just treat it
++		 * like any other corruption.
++		 */
++		if (renv->majver == 0 && renv->minver == 0)
++			ret = EINVAL;
++		else {
+ 			__db_errx(env, DB_STR_A("1538",
+-	    "Program version %d.%d doesn't match environment version %d.%d",
++	"Program version %d.%d doesn't match in-use environment version %d.%d",
+ 			    "%d %d %d %d"), DB_VERSION_MAJOR, DB_VERSION_MINOR,
+ 			    renv->majver, renv->minver);
+ 			ret = DB_VERSION_MISMATCH;
+-		} else
+-			ret = EINVAL;
++		}
+ 		goto err;
+ 	}
+ 	if (renv->signature != signature) {
+@@ -289,6 +357,18 @@ user_map_functions:
+ 	}
+ 	if (renv->magic != DB_REGION_MAGIC)
+ 		goto retry;
++	    /*
++	     * A bad magic number means that the env is new and not yet available:
++	     * wait a while and try again.  If the magic number says recovery is in
++	     * process, remember the env creation time to record that recovery was
++	     * the reason that the open failed.
++	     */
++	    if (renv->magic != DB_REGION_MAGIC) {
++		    __db_msg(env, "attach sees bad region magic 0x%lx",
++			(u_long)renv->magic);
++		    goto retry;
++	    }
++
+ 
+ 	/*
+ 	 * Get a reference to the underlying REGION information for this
+@@ -346,6 +426,12 @@ user_map_functions:
+ 	return (0);
+ 
+ creation:
++	/* Should this wait for the lock (passing 0 instead of 1)? */
++	if ((ret = ENV_PRIMARY_LOCK(env, DB_LOCK_WRITE, 1)) != 0) {
++		__db_err(env, ret, "__env_attach: creation could not lock %s",
++		    env->lockfhp->name);
++		goto err;
++	}
+ 	/* Create the environment region. */
+ 	F_SET(infop, REGION_CREATE);
+ 
+@@ -437,7 +523,14 @@ creation:
+ 	renv->minver = (u_int32_t)minver;
+ 	renv->patchver = (u_int32_t)patchver;
+ 	renv->signature = signature;
+-
++#ifdef HAVE_PTHREADS_TIMESTAMP
++	renv->pthreads_timestamp = __os_pthreads_timestamp(env);
++	{
++		char *s = getenv("TS_ADJUST");
++		if (s != NULL)
++			renv->pthreads_timestamp -= atoi(s);
++	}
++#endif
+ 	(void)time(&renv->timestamp);
+ 	__os_unique_id(env, &renv->envid);
+ 
+@@ -513,16 +606,24 @@ find_err:	__db_errx(env, DB_STR_A("1544"
+ 		}
+ 	}
+ 
+-#ifndef HAVE_MUTEX_FCNTL
+-	/*
+-	 * If we're not doing fcntl locking, we can close the file handle.  We
+-	 * no longer need it and the less contact between the buffer cache and
+-	 * the VM, the better.
+-	 */
++#ifdef HAVE_FCNTL
++	if ((ret = ENV_PRIMARY_UNLOCK(env)) != 0) {
++		__db_err(env, ret, "__env_attach: release exclusive lock");
++		goto err;
++	}
++	if ((ret = ENV_PRIMARY_LOCK(env, DB_LOCK_READ, 0)) != 0) {
++		__db_err(env, ret, "__env_attach: new: acquire shared lock");
++		goto err;
++	}
++#else
++ 	/*
++	 * We no longer need the primary region file's handle and the less
++	 * contact between the buffer cache and the VM, the better.
++ 	 */
+ 	if (env->lockfhp != NULL) {
+ 		 (void)__os_closehandle(env, env->lockfhp);
+ 		 env->lockfhp = NULL;
+-	}
++ 	}
+ #endif
+ 
+ 	/* Everything looks good, we're done. */
+@@ -562,9 +663,9 @@ retry:	/* Close any open file handle. */
+ 	/* If we had a temporary error, wait awhile and try again. */
+ 	if (ret == 0) {
+ 		if (!retry_ok || ++retry_cnt > 3) {
++			ret = EAGAIN;
+ 			__db_errx(env, DB_STR("1546",
+ 			    "unable to join the environment"));
+-			ret = EAGAIN;
+ 		} else {
+ 			__os_yield(env, retry_cnt * 3, 0);
+ 			goto loop;
+@@ -575,6 +676,59 @@ retry:	/* Close any open file handle. */
+ }
+ 
+ /*
++ * __env_check_recreate --
++ *	Determine whether an existing on-disk environment should be recreated
++ *	because it is not compatible with this compiled BDB library.
++ *
++ *	Returns:
++ *	    0 -
++ *		The env was generated by this library. No recreation needed.
++ *	    DB_OLD_VERSION -
++ *		It was created by an earlier BDB version, or by an earlier
++ *		version of libpthreads (on certain Linux systems).  The caller
++ *		will try to recreate it with the currently configured settings.
++ *	    DB_VERSION_MISMATCH -
++ *		It was created by a newer version of BDB.  Do not attempt to
++ *		fix it, something is probably wrong with the application setup.
++ */
++static int
++__env_check_recreate(env, renv, signature)
++	ENV	*env;
++	REGENV	*renv;
++	u_int32_t signature;
++{
++#ifdef HAVE_PTHREADS_TIMESTAMP
++	time_t pthreads_time;
++	char envtime[CTIME_BUFLEN], libtime[CTIME_BUFLEN];
++#endif
++
++	/* First, bail out if the env is too new for this code to handle. */
++	if (renv->majver > DB_VERSION_MAJOR ||
++	    (renv->majver == DB_VERSION_MAJOR &&
++	    renv->minver > DB_VERSION_MINOR))
++	    	return (DB_VERSION_MISMATCH);
++
++#ifdef HAVE_PTHREADS_TIMESTAMP
++	pthreads_time = __os_pthreads_timestamp(env);
++	if (pthreads_time != renv->pthreads_timestamp) {
++		if (FLD_ISSET(env->dbenv->verbose, DB_VERB_RECOVERY))
++			__db_msg(env,
++			"Pthreads timestamp changed: env %.24s current %.24s",
++			    __os_ctime(&renv->pthreads_timestamp, envtime),
++			    __os_ctime(&pthreads_time, libtime));
++		return (DB_OLD_VERSION);
++	}
++#endif
++	if (renv->signature != signature || renv->majver != DB_VERSION_MAJOR ||
++	    renv->minver != DB_VERSION_MINOR) {
++		if (FLD_ISSET(env->dbenv->verbose, DB_VERB_RECOVERY))
++			__db_msg(env, "Signature or version changed");
++		return (DB_OLD_VERSION);
++	}
++    	return (0);
++}
++
++/*
+  * __env_turn_on --
+  *	Turn on the created environment.
+  *
+diff -up db-5.3.28/src/env/env_register.c.pthreads db-5.3.28/src/env/env_register.c
+--- db-5.3.28/src/env/env_register.c.pthreads	2013-09-09 17:35:08.000000000 +0200
++++ db-5.3.28/src/env/env_register.c	2017-06-13 11:15:15.325215121 +0200
+@@ -19,9 +19,9 @@
+ #define	PID_LEN		(25)				/* PID entry length */
+ 
+ #define	REGISTRY_LOCK(env, pos, nowait)					\
+-	__os_fdlock(env, (env)->dbenv->registry, (off_t)(pos), 1, nowait)
++	__os_fdlock(env, (env)->dbenv->registry, (off_t)(pos), DB_LOCK_WRITE, nowait)
+ #define	REGISTRY_UNLOCK(env, pos)					\
+-	__os_fdlock(env, (env)->dbenv->registry, (off_t)(pos), 0, 0)
++	__os_fdlock(env, (env)->dbenv->registry, (off_t)(pos), DB_LOCK_NG, 0)
+ #define	REGISTRY_EXCL_LOCK(env, nowait)					\
+ 	REGISTRY_LOCK(env, 1, nowait)
+ #define	REGISTRY_EXCL_UNLOCK(env)					\
+diff -up db-5.3.28/src/env/env_stat.c.pthreads db-5.3.28/src/env/env_stat.c
+--- db-5.3.28/src/env/env_stat.c.pthreads	2013-09-09 17:35:08.000000000 +0200
++++ db-5.3.28/src/env/env_stat.c	2017-06-13 11:15:15.325215121 +0200
+@@ -177,6 +177,10 @@ __env_print_stats(env, flags)
+ 	STAT_LONG("Txn version", DB_TXNVERSION);
+ 	__db_msg(env,
+ 	    "%.24s\tCreation time", __os_ctime(&renv->timestamp, time_buf));
++#if defined(HAVE_PTHREADS_TIMESTAMP) && defined(HAVE_MUTEX_PTHREADS)
++	__db_msg(env,
++	    "%.24s\tlibpthread timestamp", __os_ctime(&renv->pthreads_timestamp, time_buf));
++#endif
+ 	STAT_HEX("Environment ID", renv->envid);
+ 	__mutex_print_debug_single(env,
+ 	    "Primary region allocation and reference count mutex",
+diff -up db-5.3.28/src/os/os_addrinfo.c.pthreads db-5.3.28/src/os/os_addrinfo.c
+--- db-5.3.28/src/os/os_addrinfo.c.pthreads	2013-09-09 17:35:09.000000000 +0200
++++ db-5.3.28/src/os/os_addrinfo.c	2017-06-13 11:15:15.325215121 +0200
+@@ -10,6 +10,10 @@
+ 
+ #include "db_int.h"
+ 
++#ifdef HAVE_PTHREADS_TIMESTAMP
++#include <link.h>
++#endif
++
+ /*
+  * __os_getaddrinfo and __os_freeaddrinfo wrap the getaddrinfo and freeaddrinfo
+  * calls, as well as the associated platform dependent error handling, mapping
+@@ -177,3 +181,48 @@ __os_freeaddrinfo(env, ai)
+ 	}
+ #endif
+ }
++
++#ifdef HAVE_PTHREADS_TIMESTAMP
++/*
++ *  callback_find_pthreads --
++ *  	dl_iterate_phdr() calls this once for each loaded library.
++ *
++ * Returns:
++ *	0 - the library does not appear to be libpthreads.
++ *	1 - the library *does* seem to be libpthreads. Its modification time is
++ *	    stored into into the last argument's location.
++ */
++static int
++callback_find_pthreads(struct dl_phdr_info *info, size_t size, void *data)
++{
++	struct stat stbuf;
++
++	/* Stop (return non-zero) when libc is found. */
++	if (strstr(info->dlpi_name, "libpthread") != NULL &&
++	    stat(info->dlpi_name, &stbuf) == 0) {
++		*(time_t *)data = stbuf.st_mtime;
++		return (1);
++	}
++	COMPQUIET(size, 0);
++	COMPQUIET(data, NULL);
++	return (0);
++}
++
++/*
++ * __os_pthreads_timestamp --
++ *
++ * PUBLIC: time_t __os_pthreads_timestamp __P((ENV *));
++ */
++time_t
++__os_pthreads_timestamp(env)
++	ENV *env;
++{
++	time_t	timestamp;
++
++	timestamp = 0;
++	dl_iterate_phdr(callback_find_pthreads, &timestamp);
++
++	COMPQUIET(env, 0);
++	return (timestamp);
++}
++#endif
+diff -up db-5.3.28/src/os/os_flock.c.pthreads db-5.3.28/src/os/os_flock.c
+--- db-5.3.28/src/os/os_flock.c.pthreads	2013-09-09 17:35:09.000000000 +0200
++++ db-5.3.28/src/os/os_flock.c	2017-06-13 11:15:15.325215121 +0200
+@@ -10,41 +10,98 @@
+ 
+ #include "db_int.h"
+ 
++#if !defined(HAVE_FCNTL) || !defined(HAVE_FLOCK)
++static int __os_filelocking_notsup __P((ENV *));
++#endif
++
+ /*
+  * __os_fdlock --
+  *	Acquire/release a lock on a byte in a file.
+  *
+- * PUBLIC: int __os_fdlock __P((ENV *, DB_FH *, off_t, int, int));
++ *	The lock modes supported here are:
++ *	DB_LOCK_NG	- release the lock
++ *	DB_LOCK_READ	- get shared access
++ *	DB_LOCK_WRITE	- get exclusive access
++ *
++ *	Use fcntl()-like semantics most of the time (DB_REGISTER support). Fcntl
++ *	supports range locking, but has the additional broken semantics that
++ *	closing any of the file's descriptors releases any locks, even if its
++ *	other file descriptors remain open. Thanks SYSV & POSIX.
++ *	However, if the offset is negative (which is allowed, because POSIX
++ *	off_t a signed integer) then use flock() instead.  It has only whole-
++ *	file locks, but they persist until explicitly unlocked or the process
++ *	exits.
++ * PUBLIC: int __os_fdlock __P((ENV *, DB_FH *, off_t, db_lockmode_t, int));
+  */
+ int
+-__os_fdlock(env, fhp, offset, acquire, nowait)
++__os_fdlock(env, fhp, offset, lockmode, nowait)
+ 	ENV *env;
+ 	DB_FH *fhp;
+-	int acquire, nowait;
+ 	off_t offset;
++	db_lockmode_t lockmode;
++	int nowait;
+ {
+ #ifdef HAVE_FCNTL
+ 	DB_ENV *dbenv;
+ 	struct flock fl;
+ 	int ret, t_ret;
++	static char *mode_string[DB_LOCK_WRITE + 1] = {
++		"unlock",
++		"read",
++		"write"
++	};
++	short mode_fcntl[DB_LOCK_WRITE + 1] = {
++		F_UNLCK,
++		F_RDLCK,
++		F_WRLCK
++	};
++#ifdef HAVE_FLOCK
++	short mode_flock[DB_LOCK_WRITE + 1] = {
++		LOCK_UN,
++		LOCK_SH,
++		LOCK_EX
++	};
++#endif
+ 
+ 	dbenv = env == NULL ? NULL : env->dbenv;
+ 
+ 	DB_ASSERT(env, F_ISSET(fhp, DB_FH_OPENED) && fhp->fd != -1);
++	DB_ASSERT(env, lockmode <= DB_LOCK_WRITE);
+ 
+-	if (dbenv != NULL && FLD_ISSET(dbenv->verbose, DB_VERB_FILEOPS_ALL))
+-		__db_msg(env, DB_STR_A("0138",
+-		    "fileops: flock %s %s offset %lu", "%s %s %lu"), fhp->name,
+-		    acquire ? DB_STR_P("acquire"): DB_STR_P("release"),
+-		    (u_long)offset);
+-
+-	fl.l_start = offset;
+-	fl.l_len = 1;
+-	fl.l_type = acquire ? F_WRLCK : F_UNLCK;
+-	fl.l_whence = SEEK_SET;
+-
+-	RETRY_CHK_EINTR_ONLY(
+-	    (fcntl(fhp->fd, nowait ? F_SETLK : F_SETLKW, &fl)), ret);
++	if (dbenv != NULL && FLD_ISSET(dbenv->verbose, DB_VERB_FILEOPS_ALL)) {
++		if (offset < 0)
++		      __db_msg(env, DB_STR_A("####",
++			  "fileops: flock %s %s %s", "%s %s %s"),
++			  fhp->name, mode_string[lockmode],
++			  nowait ? "nowait" : "");
++	      else
++		      __db_msg(env, DB_STR_A("0020",
++			  "fileops: fcntls %s %s offset %lu", "%s %s %lu"),
++			  fhp->name, mode_string[lockmode], (u_long)offset);
++	}
++
++	if (offset < 0) {
++#ifdef HAVE_FLOCK
++	        RETRY_CHK_EINTR_ONLY(flock(fhp->fd,
++	            mode_flock[lockmode] | (nowait ? LOCK_NB : 0)), ret);
++#else
++		ret = __os_filelocking_notsup(env);
++#endif
++	} else {
++	        fl.l_start = offset;
++	        fl.l_len = 1;
++	        fl.l_whence = SEEK_SET;
++	        fl.l_type = mode_fcntl[lockmode];
++	           RETRY_CHK_EINTR_ONLY(
++	            fcntl(fhp->fd, nowait ? F_SETLK : F_SETLKW, &fl), ret);
++	}
++
++	if (offset < 0 && dbenv != NULL &&
++	    FLD_ISSET(dbenv->verbose, DB_VERB_FILEOPS_ALL))
++		__db_msg(env, DB_STR_A("####",
++		    "fileops: flock %s %s %s returns %s", "%s %s %s"),
++		    fhp->name, mode_string[lockmode],
++		    nowait ? "nowait" : "", db_strerror(ret));
+ 
+ 	if (ret == 0)
+ 		return (0);
+@@ -53,12 +110,29 @@ __os_fdlock(env, fhp, offset, acquire, n
+ 		__db_syserr(env, ret, DB_STR("0139", "fcntl"));
+ 	return (t_ret);
+ #else
++	ret = __os_filelocking_notsup(env);
+ 	COMPQUIET(fhp, NULL);
+-	COMPQUIET(acquire, 0);
++	COMPQUIET(lockmode, 0);
+ 	COMPQUIET(nowait, 0);
+ 	COMPQUIET(offset, 0);
++	return (ret)
++#endif
++}
++
++
++#if !defined(HAVE_FCNTL) || !defined(HAVE_FLOCK)
++/*
++ * __os_filelocking_notsup --
++ *	Generate an error message if fcntl() or flock() is requested on a
++ *	platform that does not support it.
++ *
++ */
++static int
++__os_filelocking_notsup(env)
++ 	ENV *env;
++{
+ 	__db_syserr(env, DB_OPNOTSUP, DB_STR("0140",
+ 	    "advisory file locking unavailable"));
+ 	return (DB_OPNOTSUP);
+-#endif
+ }
++#endif
+diff -up db-5.3.28/src/os/os_map.c.pthreads db-5.3.28/src/os/os_map.c
+--- db-5.3.28/src/os/os_map.c.pthreads	2013-09-09 17:35:09.000000000 +0200
++++ db-5.3.28/src/os/os_map.c	2017-06-13 11:15:15.325215121 +0200
+@@ -32,7 +32,7 @@ static int __no_system_mem __P((ENV *));
+ 
+ /*
+  * __os_attach --
+- *	Create/join a shared memory region.
++ *	Create/join a 'shared' region of Berkeley DB memory.
+  *
+  * PUBLIC: int __os_attach __P((ENV *, REGINFO *, REGION *));
+  */
+@@ -50,6 +50,7 @@ __os_attach(env, infop, rp)
+ 	 * so there must be a valid handle.
+ 	 */
+ 	DB_ASSERT(env, env != NULL && env->dbenv != NULL);
++	DB_ASSERT(env, infop->fhp == NULL);
+ 	dbenv = env->dbenv;
+ 
+ 	if (DB_GLOBAL(j_region_map) != NULL) {

@@ -1,0 +1,10 @@
+[Unit]
+Description=update of the root trust anchor for DNSSEC validation in unbound
+Documentation=man:unbound-anchor(8)
+
+[Service]
+Type=oneshot
+User=unbound
+EnvironmentFile=-/etc/sysconfig/unbound
+ExecStart=/bin/bash -c 'if [ "$DISABLE_UNBOUND_ANCHOR" = "yes" ] || [ -f /run/unbound/anchor-disable ]; then echo "Updates of root keys with unbound-anchor is disabled"; else /usr/sbin/unbound-anchor $UNBOUND_ANCHOR_OPTIONS; fi'
+SuccessExitStatus=1

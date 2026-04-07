@@ -1,0 +1,15 @@
+diff --git a/OS/Makefile-Linux b/OS/Makefile-Linux
+index dfb2fa8..58c30f7 100644
+--- a/OS/Makefile-Linux
++++ b/OS/Makefile-Linux
+@@ -27,8 +27,8 @@ LIBRESOLV = -lresolv
+ 
+ X11=/usr/X11R6
+ XINCLUDE=-I$(X11)/include
+-XLFLAGS=-L$(X11)/lib
+-X11_LD_LIB=$(X11)/lib
++XLFLAGS=-L$(X11)/$(_lib)
++X11_LD_LIB=$(X11)/$(_lib)
+ 
+ EXIWHAT_PS_ARG=ax
+ EXIWHAT_EGREP_ARG='/exim( |$$)'

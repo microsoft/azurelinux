@@ -1,0 +1,15 @@
+---
+ config/BuildSystem/config/setCompilers.py |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- config/BuildSystem/config/setCompilers.py
++++ config/BuildSystem/config/setCompilers.py
+@@ -2545,7 +2545,7 @@
+         testFlags = []
+       # test '-R' before '-rpath' as sun compilers [c,fortran] don't give proper errors with wrong options.
+       elif not Configure.isDarwin(self.log):
+-        testFlags = ['-Wl,-rpath,', '-R','-rpath ' , '-Wl,-R,']
++        testFlags = []
+       else:
+         testFlags = ['-Wl,-rpath,']
+       # test '-R' before '-Wl,-rpath' for SUN compilers [as cc on linux accepts -Wl,-rpath, but  f90 & CC do not.

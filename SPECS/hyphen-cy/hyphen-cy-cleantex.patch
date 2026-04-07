@@ -1,0 +1,15 @@
+--- hyph-cy.tex.orig	2009-06-13 19:28:14.000000000 +0100
++++ hyph-cy.tex	2009-06-13 19:28:42.000000000 +0100
+@@ -23,7 +23,6 @@
+ % - 1996 - last change to patterns
+ % - 2008 - inclusion into hyph-utf8 and file rename (cyhyph.tex -> hyph-cy.tex)
+ % - June 2011 - added LPPL licence
+-\patterns{
+ .ac4t
+ .ad3ae
+ .add5as
+@@ -6752,4 +6751,3 @@
+ ywy3na
+ ywy5ne
+ y1y
+-}

@@ -1,0 +1,69 @@
+From 52d56b3fd94fa66edb2a24250f3a937831cb108f Mon Sep 17 00:00:00 2001
+From: Alfredo Moralejo <amoralej@redhat.com>
+Date: Mon, 30 Sep 2024 12:08:47 +0200
+Subject: [PATCH] identity: in `service set` command, don't pass the enable
+ option when it is None
+
+Currently, it is passing None value which is not accepted by keystone
+parameters validation:
+
+BadRequestException: 400: Client Error for url: ... Invalid input for field 'enabled': None is not of type 'boolean'
+
+Failed validating 'type' in schema['properties']['enabled']:
+    {'enum': [True, False, None], 'type': 'boolean'}
+
+On instance['enabled']:
+    None
+
+Closes-Bug: #2083021
+Change-Id: Ia8772560deb54e71672102157659d4eb22e6ad59
+---
+ openstackclient/identity/v3/service.py                 | 3 ++-
+ openstackclient/tests/unit/identity/v3/test_service.py | 3 ---
+ 2 files changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/openstackclient/identity/v3/service.py b/openstackclient/identity/v3/service.py
+index f04fa979..41faa255 100644
+--- a/openstackclient/identity/v3/service.py
++++ b/openstackclient/identity/v3/service.py
+@@ -225,7 +225,8 @@ class SetService(command.Command):
+             kwargs['name'] = parsed_args.name
+         if parsed_args.description:
+             kwargs['description'] = parsed_args.description
+-        kwargs['is_enabled'] = parsed_args.is_enabled
++        if parsed_args.is_enabled is not None:
++            kwargs['is_enabled'] = parsed_args.is_enabled
+ 
+         identity_client.update_service(service.id, **kwargs)
+ 
+diff --git a/openstackclient/tests/unit/identity/v3/test_service.py b/openstackclient/tests/unit/identity/v3/test_service.py
+index 4c02d989..d6dd0287 100644
+--- a/openstackclient/tests/unit/identity/v3/test_service.py
++++ b/openstackclient/tests/unit/identity/v3/test_service.py
+@@ -311,7 +311,6 @@ class TestServiceSet(identity_fakes.TestIdentityv3):
+         # Set expected values
+         kwargs = {
+             'type': self.service.type,
+-            'is_enabled': None,
+         }
+         self.identity_sdk_client.update_service.assert_called_with(
+             self.service.id, **kwargs
+@@ -338,7 +337,6 @@ class TestServiceSet(identity_fakes.TestIdentityv3):
+         # Set expected values
+         kwargs = {
+             'name': self.service.name,
+-            'is_enabled': None,
+         }
+         self.identity_sdk_client.update_service.assert_called_with(
+             self.service.id, **kwargs
+@@ -365,7 +363,6 @@ class TestServiceSet(identity_fakes.TestIdentityv3):
+         # Set expected values
+         kwargs = {
+             'description': self.service.description,
+-            'is_enabled': None,
+         }
+         self.identity_sdk_client.update_service.assert_called_with(
+             self.service.id, **kwargs
+-- 
+2.46.0
+

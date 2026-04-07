@@ -1,0 +1,32 @@
+From 1c31d25d00eab1422fa54e109f0201640f08c340 Mon Sep 17 00:00:00 2001
+From: Stanislav Levin <slev@altlinux.org>
+Date: Thu, 18 Dec 2025 12:25:17 +0300
+Subject: [PATCH] Support build against bind 9.18.43
+
+bind 9.18.43 introduced their version of CHECK macro:
+https://gitlab.isc.org/isc-projects/bind9/-/merge_requests/11080
+
+which is different from the local one. Prefer the latter because
+it provides additional logging feature.
+
+Fixes: https://pagure.io/bind-dyndb-ldap/issue/243
+Signed-off-by: Stanislav Levin <slev@altlinux.org>
+---
+ src/util.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/util.h b/src/util.h
+index 5da0f5c0a..f453a3836 100644
+--- a/src/util.h
++++ b/src/util.h
+@@ -42,6 +42,7 @@ extern bool verbose_checks; /* from settings.c */
+ 		goto cleanup;					\
+ 	} while(0)
+ 
++#undef CHECK
+ #define CHECK(op)						\
+ 	do {							\
+ 		result = (op);					\
+-- 
+2.52.0
+

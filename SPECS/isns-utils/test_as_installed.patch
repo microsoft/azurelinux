@@ -1,0 +1,57 @@
+From f04f3c56ac1598a787cee58489e3de5589d7f879 Mon Sep 17 00:00:00 2001
+From: Chris Leech <cleech@redhat.com>
+Date: Fri, 13 Dec 2024 20:48:21 -0800
+Subject: [PATCH 1/1] Test from installed for CI
+
+Signed-off-by: Chris Leech <cleech@redhat.com>
+---
+ tests/Makefile   | 5 +++++
+ tests/harness.py | 6 ++++++
+ 2 files changed, 11 insertions(+)
+ create mode 100644 tests/Makefile
+
+diff --git a/tests/Makefile b/tests/Makefile
+new file mode 100644
+index 0000000..cd856c2
+--- /dev/null
++++ b/tests/Makefile
+@@ -0,0 +1,5 @@
++# Run tests on installed executables for CI
++# Excludes tests that use external test binaries (8-11)
++tests-as-installed:
++	@echo running tests from installed executables
++	./test-isns.py --bin-dir=/usr/sbin Test0{1..7}
+diff --git a/tests/harness.py b/tests/harness.py
+index f232132..d5a03b1 100644
+--- a/tests/harness.py
++++ b/tests/harness.py
+@@ -60,6 +60,8 @@ def get_bindir():
+     """
+     return the directory where binaries live
+     """
++    if os.path.isabs(Global.isns_bin_dir):
++        return Global.isns_bin_dir
+     return '%s/%s' % (Global.test_dir, Global.isns_bin_dir)
+ 
+ def isns_stage(name, msg):
+@@ -148,6 +150,9 @@ def new_initArgParsers(self):
+     self._main_parser.add_argument('-D', '--test-dir', dest='test_dir',
+             default='.',
+             help='Sets the test dir (default ".")')
++    self._main_parser.add_argument('--bin-dir', dest='bin_dir',
++            default='../builddir',
++            help='Sets the isns bin dir (default "../builddir")')
+ 
+ def new_parseArgs(self, argv):
+     """
+@@ -160,6 +165,7 @@ def new_parseArgs(self, argv):
+     Global.security = self.security
+     Global.debug = self.debug
+     Global.test_dir = self.test_dir
++    Global.isns_bin_dir = self.bin_dir
+     dprint("found: debug=%s, verbosity=%d, security=%s, list=%s, test_dir='%s'" % \
+            (Global.debug, Global.verbosity,
+             Global.security, self.list, self.test_dir))
+-- 
+2.47.0
+

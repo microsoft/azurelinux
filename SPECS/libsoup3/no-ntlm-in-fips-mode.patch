@@ -1,0 +1,97 @@
+From 667e6977ac21a7f4aeadd825436f5de972cab2df Mon Sep 17 00:00:00 2001
+From: Michael Catanzaro <mcatanzaro@gnome.org>
+Date: Thu, 29 Jan 2026 15:06:17 -0600
+Subject: [PATCH] Disable NTLM auth and tests in FIPS mode
+
+This is a downstream Fedora/RHEL-ecosystem patch. Upstream GHmac
+supports MD5 unconditionally, but in Fedora/RHEL trying to use MD5 HMAC
+will crash if FIPS mode is enabled due to the glib2 package's
+gnutls-hmac.patch, which I have thus far failed to upstream. This isn't
+great, but it looks like finding an upstream solution will be difficult,
+so we'll just have to carry this patch for now.
+
+https://gitlab.gnome.org/GNOME/glib/merge_requests/897
+---
+ libsoup/auth/soup-auth-ntlm.c | 12 ++++++++++++
+ tests/ntlm-test.c             | 21 +++++++++++++++++++++
+ 2 files changed, 33 insertions(+)
+
+diff --git a/libsoup/auth/soup-auth-ntlm.c b/libsoup/auth/soup-auth-ntlm.c
+index 7108a32c..dc440ad1 100644
+--- a/libsoup/auth/soup-auth-ntlm.c
++++ b/libsoup/auth/soup-auth-ntlm.c
+@@ -455,6 +455,17 @@ soup_auth_ntlm_authenticate (SoupAuth *auth, const char *username,
+ 	priv->password_state = SOUP_NTLM_PASSWORD_PROVIDED;
+ }
+ 
++static gboolean
++soup_auth_ntlm_can_authenticate (SoupAuth *auth)
++{
++	GHmac *hmac = g_hmac_new (G_CHECKSUM_MD5, (const unsigned char *)"abc123", sizeof ("abc123"));
++	if (hmac) {
++		g_hmac_unref (hmac);
++		return TRUE;
++	}
++	return FALSE;
++}
++
+ static gboolean
+ soup_auth_ntlm_is_authenticated (SoupAuth *auth)
+ {
+@@ -587,6 +598,7 @@ soup_auth_ntlm_class_init (SoupAuthNTLMClass *auth_ntlm_class)
+ 
+ 	auth_class->get_protection_space = soup_auth_ntlm_get_protection_space;
+ 	auth_class->authenticate = soup_auth_ntlm_authenticate;
++	auth_class->can_authenticate = soup_auth_ntlm_can_authenticate;
+ 	auth_class->is_authenticated = soup_auth_ntlm_is_authenticated;
+ 
+ 	connauth_class->create_connection_state = soup_auth_ntlm_create_connection_state;
+diff --git a/tests/ntlm-test.c b/tests/ntlm-test.c
+index a92a21c8..18f13a7d 100644
+--- a/tests/ntlm-test.c
++++ b/tests/ntlm-test.c
+@@ -578,6 +578,17 @@ static const NtlmTest ntlmv2_tests[] = {
+ 	{ "/ntlm/v2/basic", "alice", FALSE, BUILTIN }
+ };
+ 
++static gboolean
++can_do_ntlm_test (void)
++{
++	GHmac *hmac = g_hmac_new (G_CHECKSUM_MD5, (const unsigned char *)"abc123", sizeof ("abc123"));
++	if (hmac) {
++		g_hmac_unref (hmac);
++		return TRUE;
++	}
++	return FALSE;
++}
++
+ static void
+ do_ntlm_test (TestServer *ts,
+ 	      gconstpointer data)
+@@ -585,6 +596,11 @@ do_ntlm_test (TestServer *ts,
+ 	const NtlmTest *test = data;
+ 	gboolean use_builtin_ntlm = TRUE;
+ 
++	if (!can_do_ntlm_test ()) {
++		g_test_skip ("NTLM authentication not available (likely due to FIPS mode)");
++		return;
++	}
++
+ 	switch (test->ntlm_type) {
+ 	case BUILTIN:
+ 		/* Built-in NTLM auth support. (We set SOUP_NTLM_AUTH_DEBUG to
+@@ -668,6 +684,11 @@ do_retrying_test (TestServer *ts,
+ 
+ 	g_test_bug ("693222");
+ 
++	if (!can_do_ntlm_test ()) {
++		g_test_skip ("NTLM authentication not available (likely due to FIPS mode)");
++		return;
++	}
++
+ 	g_setenv ("SOUP_NTLM_AUTH_DEBUG", "", TRUE);
+ 
+ 	debug_printf (1, "  /alice\n");
+-- 
+2.52.0
+

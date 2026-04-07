@@ -1,0 +1,33 @@
+From c3cd77fbb9e374e3133648048a6f0fa560296993 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Sat, 14 Sep 2024 17:21:08 +0200
+Subject: [PATCH] port from pulldown-cmark 0.9 to 0.11
+
+---
+ src/markdown_deps.rs | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/markdown_deps.rs b/src/markdown_deps.rs
+index d39b0de..64d590a 100644
+--- a/src/markdown_deps.rs
++++ b/src/markdown_deps.rs
+@@ -1,6 +1,6 @@
+ #![cfg(feature = "markdown_deps_updated")]
+ use pulldown_cmark::CodeBlockKind::Fenced;
+-use pulldown_cmark::{Event, Parser, Tag};
++use pulldown_cmark::{Event, Parser, Tag, TagEnd};
+ use semver::{Version, VersionReq};
+ use toml::Value;
+ 
+@@ -78,7 +78,7 @@ fn find_toml_blocks(text: &str) -> Vec<CodeBlock> {
+                     block.content.push_str(&code);
+                 }
+             }
+-            Event::End(Tag::CodeBlock(_)) => {
++            Event::End(TagEnd::CodeBlock) => {
+                 if let Some(block) = current_block.take() {
+                     code_blocks.push(block);
+                 }
+-- 
+2.46.0
+

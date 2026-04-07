@@ -1,0 +1,79 @@
+--- async-std-1.13.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ async-std-1.13.2/Cargo.toml	2025-08-15T20:31:53.705427+00:00
+@@ -62,7 +62,6 @@
+     "async-global-executor",
+     "async-io",
+     "futures-lite",
+-    "kv-log-macro",
+     "log",
+     "pin-project-lite",
+ ]
+@@ -84,8 +83,6 @@
+     "async-channel",
+     "async-lock",
+ ]
+-tokio02 = ["async-global-executor/tokio02"]
+-tokio03 = ["async-global-executor/tokio03"]
+ tokio1 = ["async-global-executor/tokio"]
+ unstable = [
+     "std",
+@@ -114,10 +111,6 @@
+ path = "examples/list-dir.rs"
+ 
+ [[example]]
+-name = "logging"
+-path = "examples/logging.rs"
+-
+-[[example]]
+ name = "print-file"
+ path = "examples/print-file.rs"
+ 
+@@ -132,11 +125,6 @@
+ [[example]]
+ name = "stdin-timeout"
+ path = "examples/stdin-timeout.rs"
+-
+-[[example]]
+-name = "surf-web"
+-path = "examples/surf-web.rs"
+-required-features = ["surf"]
+ 
+ [[example]]
+ name = "task-local"
+@@ -253,7 +241,7 @@
+ optional = true
+ 
+ [dependencies.async-channel]
+-version = "1.8.0"
++version = "2.2.0"
+ optional = true
+ 
+ [dependencies.async-lock]
+@@ -273,13 +261,8 @@
+ version = "0.3.4"
+ optional = true
+ 
+-[dependencies.kv-log-macro]
+-version = "1.0.6"
+-optional = true
+-
+ [dependencies.log]
+ version = "0.4.8"
+-features = ["kv_unstable"]
+ optional = true
+ 
+ [dependencies.memchr]
+@@ -301,13 +284,6 @@
+ [dependencies.slab]
+ version = "0.4.2"
+ optional = true
+-
+-[dependencies.surf]
+-version = "2.0.0"
+-optional = true
+-
+-[dev-dependencies.femme]
+-version = "2.1.1"
+ 
+ [dev-dependencies.futures]
+ version = "0.3.4"

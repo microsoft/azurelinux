@@ -1,0 +1,92 @@
+diff --git a/prog/sensors/main.c b/prog/sensors/main.c
+index f535b66..a19b919 100644
+--- a/prog/sensors/main.c
++++ b/prog/sensors/main.c
+@@ -54,15 +54,16 @@ static void print_short_help(void)
+ static void print_long_help(void)
+ {
+ 	printf("Usage: %s [OPTION]... [CHIP]...\n", PROGRAM);
+-	puts("  -c, --config-file     Specify a config file\n"
+-	     "  -h, --help            Display this help text\n"
+-	     "  -s, --set             Execute `set' statements (root only)\n"
+-	     "  -f, --fahrenheit      Show temperatures in degrees fahrenheit\n"
+-	     "  -A, --no-adapter      Do not show adapter for each chip\n"
+-	     "      --bus-list        Generate bus statements for sensors.conf\n"
+-	     "  -u                    Raw output\n"
+-	     "  -j                    Json output\n"
+-	     "  -v, --version         Display the program version\n"
++	puts("  -c, --config-file      Specify a config file\n"
++	     "  -h, --help             Display this help text\n"
++	     "  -s, --set              Execute `set' statements (root only)\n"
++	     "  -f, --fahrenheit       Show temperatures in degrees fahrenheit\n"
++	     "  -A, --no-adapter       Do not show adapter for each chip\n"
++	     "      --bus-list         Generate bus statements for sensors.conf\n"
++	     "  -u                     Raw output\n"
++	     "  -j                     Json output\n"
++	     "  -v, --version          Display the program version\n"
++	     "  -n, --allow-no-sensors Do not fail if no sensors found\n"
+ 	     "\n"
+ 	     "Use `-' after `-c' to read the config file from stdin.\n"
+ 	     "If no chips are specified, all chip info will be printed.\n"
+@@ -270,7 +271,7 @@ static void print_bus_list(void)
+ 
+ int main(int argc, char *argv[])
+ {
+-	int c, i, err, do_bus_list;
++	int c, i, err, do_bus_list, allow_no_sensors;
+ 	const char *config_file_name = NULL;
+ 
+ 	struct option long_opts[] =  {
+@@ -281,6 +282,7 @@ int main(int argc, char *argv[])
+ 		{ "no-adapter", no_argument, NULL, 'A' },
+ 		{ "config-file", required_argument, NULL, 'c' },
+ 		{ "bus-list", no_argument, NULL, 'B' },
++		{ "allow-no-sensors", no_argument, NULL, 'n' },
+ 		{ 0, 0, 0, 0 }
+ 	};
+ 
+@@ -291,8 +293,9 @@ int main(int argc, char *argv[])
+ 	do_sets = 0;
+ 	do_bus_list = 0;
+ 	hide_adapter = 0;
++	allow_no_sensors = 0;
+ 	while (1) {
+-		c = getopt_long(argc, argv, "hsvfAc:uj", long_opts, NULL);
++		c = getopt_long(argc, argv, "hsvfAc:ujn", long_opts, NULL);
+ 		if (c == EOF)
+ 			break;
+ 		switch(c) {
+@@ -327,6 +330,9 @@ int main(int argc, char *argv[])
+ 		case 'B':
+ 			do_bus_list = 1;
+ 			break;
++		case 'n':
++			allow_no_sensors = 1;
++			break;
+ 		default:
+ 			fprintf(stderr,
+ 				"Internal error while parsing options!\n");
+@@ -349,7 +355,9 @@ int main(int argc, char *argv[])
+ 				"No sensors found!\n"
+ 				"Make sure you loaded all the kernel drivers you need.\n"
+ 				"Try sensors-detect to find out which these are.\n");
+-			err = 1;
++			if (!allow_no_sensors) {
++				err = 1;
++			}
+ 		}
+ 	} else {
+ 		int cnt = 0;
+diff --git a/prog/sensors/sensors.1 b/prog/sensors/sensors.1
+index 7d66e4b..d207aa1 100644
+--- a/prog/sensors/sensors.1
++++ b/prog/sensors/sensors.1
+@@ -78,6 +78,8 @@ are only needed if you have several chips sharing the same address on different
+ buses of the same type. As bus numbers are usually not guaranteed to be stable
+ over reboots, these statements let you refer to each bus by its name rather
+ than numbers.
++.IP "-n, --allow-no-sensors"
++Do not fail if no sensors found. The error message will be printed in the log.
+ .SH FILES
+ .I /etc/sensors3.conf
+ .br

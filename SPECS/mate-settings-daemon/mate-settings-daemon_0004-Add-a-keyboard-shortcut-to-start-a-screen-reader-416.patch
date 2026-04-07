@@ -1,0 +1,26 @@
+From a007205797df6d1027f54d06cec3c16451c9ffd5 Mon Sep 17 00:00:00 2001
+From: vojtapolasek <krecoun@gmail.com>
+Date: Tue, 10 Sep 2024 11:04:42 +0200
+Subject: [PATCH 4/5] Add a keyboard shortcut to start a screen reader (#416)
+
+alt+super+s
+---
+ data/org.mate.SettingsDaemon.plugins.media-keys.gschema.xml.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/data/org.mate.SettingsDaemon.plugins.media-keys.gschema.xml.in b/data/org.mate.SettingsDaemon.plugins.media-keys.gschema.xml.in
+index 866fbf7a..2bb86120 100644
+--- a/data/org.mate.SettingsDaemon.plugins.media-keys.gschema.xml.in
++++ b/data/org.mate.SettingsDaemon.plugins.media-keys.gschema.xml.in
+@@ -156,7 +156,7 @@
+       <description>Binding to show the screen magnifier</description>
+     </key>
+     <key name="screenreader" type="s">
+-      <default>''</default>
++      <default>'&lt;Alt&gt;&lt;Mod4&gt;s'</default>
+       <summary>Toggle screen reader</summary>
+       <description>Binding to start the screen reader</description>
+     </key>
+-- 
+2.49.0
+

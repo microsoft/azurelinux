@@ -1,0 +1,117 @@
+From c52ce71c49dc8d6109a58d16cc8d491d7bd1d781 Mon Sep 17 00:00:00 2001
+From: Rico Tzschichholz <ricotz@ubuntu.com>
+Date: Wed, 20 Jan 2021 22:59:49 +0100
+Subject: [PATCH] Stop patching the generated GIR
+
+---
+ libcaribou/Makefile.am |  8 ++-----
+ tools/Makefile.am      |  1 -
+ tools/fix_gir.py       | 53 ------------------------------------------
+ 3 files changed, 2 insertions(+), 60 deletions(-)
+ delete mode 100755 tools/fix_gir.py
+
+diff --git a/libcaribou/Makefile.am b/libcaribou/Makefile.am
+index 05f2774..0634374 100644
+--- a/libcaribou/Makefile.am
++++ b/libcaribou/Makefile.am
+@@ -7,7 +7,7 @@ libcaribou_la_VALAFLAGS = \
+ 	--pkg xtst --pkg gee-0.8 --pkg gdk-x11-3.0 --pkg libxml-2.0 \
+ 	--pkg libxklavier --pkg external-libs \
+ 	--internal-vapi caribou-internals-1.0.vapi \
+-	--library caribou-1.0 --gir _Caribou-1.0.gir \
++	--library caribou-1.0 --gir Caribou-1.0.gir \
+ 	--symbols libcaribou.symbols \
+ 	$(VALAFLAGS)
+ 
+@@ -63,9 +63,6 @@ gir_DATA = Caribou-1.0.gir
+ typelibdir = $(libdir)/girepository-1.0
+ typelib_DATA = Caribou-1.0.typelib
+ 
+-Caribou-1.0.gir: _Caribou-1.0.gir
+-	$(AM_V_GEN)$(PYTHON) -B $(top_srcdir)/tools/fix_gir.py $< > $@
+-
+ Caribou-1.0.typelib: Caribou-1.0.gir
+ 	@INTROSPECTION_COMPILER@ --shared-library=libcaribou.so.0 -o $@ $^
+ 
+@@ -81,8 +78,7 @@ CLEANFILES = \
+ 	caribou-1.0.vapi \
+ 	caribou-internals-1.0.vapi \
+ 	Caribou-1.0.typelib \
+-	Caribou-1.0.gir \
+-	_Caribou-1.0.gir
++	Caribou-1.0.gir
+ 
+ DISTCLEANFILES = \
+ 	caribou-1.0.pc
+diff --git a/tools/Makefile.am b/tools/Makefile.am
+index 3a9bcdb..89f753d 100644
+--- a/tools/Makefile.am
++++ b/tools/Makefile.am
+@@ -1,5 +1,4 @@
+ EXTRA_DIST = \
+-	fix_gir.py \
+ 	make_schema.py \
+ 	convert_cldr.py \
+ 	basic.xsl
+diff --git a/tools/fix_gir.py b/tools/fix_gir.py
+deleted file mode 100755
+index 182d108..0000000
+--- a/tools/fix_gir.py
++++ /dev/null
+@@ -1,53 +0,0 @@
+-#!/usr/bin/python
+-
+-from xml.dom import minidom
+-
+-def purge_white_space_and_fix_namespace(node, indent=0):
+-    if getattr(node, "tagName", None) == "namespace":
+-        name = node.getAttribute("name")
+-        node.setAttribute("name", name.lstrip('_'))
+-    for child in [c for c in node.childNodes]:
+-        if child.nodeType == node.TEXT_NODE or \
+-                getattr(child, "tagName", None) == "annotation":
+-            node.removeChild(child)
+-            continue
+-        purge_white_space_and_fix_namespace(child, indent+1)
+-
+-def find_ancestor(node, name):
+-    if getattr(node, "tagName", None) == name:
+-        return node
+-    parent = getattr(node, "parentNode", None)
+-    if not parent:
+-        return None
+-    return find_ancestor(parent, name)
+-
+-def fix_vfuncs(dom):
+-    for f in dom.getElementsByTagName("field"):
+-        callbacks = f.getElementsByTagName("callback")
+-
+-        record = find_ancestor(f, "record")
+-        if not record:
+-            continue
+-
+-        name = record.getAttribute("name")
+-        cname = record.getAttribute("c:type")
+-
+-        assert(name.endswith("Class") or name.endswith("Iface"))
+-        assert(cname.endswith("Class") or name.endswith("Iface"))
+-
+-        if len(callbacks) == 2:
+-            callbacks[-1].parentNode.removeChild(callbacks[-1])
+-
+-if __name__ == "__main__":
+-    import sys
+-
+-    if len(sys.argv) != 2:
+-        print("supply a gir file")
+-        sys.exit(1)
+-
+-    dom = minidom.parse(sys.argv[-1])
+-
+-    purge_white_space_and_fix_namespace(dom)
+-    fix_vfuncs(dom)
+-
+-    print(dom.toprettyxml(indent=" ", newl="\n"))
+-- 
+GitLab
+

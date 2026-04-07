@@ -1,0 +1,28 @@
+From fc16e90a9fd64e2db12a815417b538b193fe48db Mon Sep 17 00:00:00 2001
+From: "Brian C. Lane" <bcl@redhat.com>
+Date: Wed, 10 Jul 2024 15:41:16 -0700
+Subject: [PATCH 1/2] parted: Print the Fixing... message to stderr
+
+Otherwise it messes up stdout of things like --json
+
+Thanks to Mikael Q for reporting this.
+---
+ parted/ui.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/parted/ui.c b/parted/ui.c
+index 33a1808..d6d1da4 100644
+--- a/parted/ui.c
++++ b/parted/ui.c
+@@ -645,7 +645,7 @@ exception_handler (PedException* ex)
+         /* script-mode and fix? */
+         int fix_is_an_option = (ex->options & PED_EXCEPTION_FIX);
+         if (opt_script_mode && opt_fix_mode && fix_is_an_option) {
+-                printf ("Fixing, due to --fix\n");
++                fprintf (stderr, "Fixing, due to --fix\n");
+                 return PED_EXCEPTION_FIX;
+         }
+ 
+-- 
+2.45.2
+

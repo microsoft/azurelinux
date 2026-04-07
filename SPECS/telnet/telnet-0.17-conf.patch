@@ -1,0 +1,23 @@
+--- netkit-telnet-0.17/configure.confverb	2000-07-29 20:00:29.000000000 +0200
++++ netkit-telnet-0.17/configure	2004-07-05 10:50:36.492963840 +0200
+@@ -263,14 +263,19 @@
+ cat <<EOF >__conftest.cc
+ #include <unistd.h>
+ #include <signal.h>
+-int count=0;
++volatile int count=0;
+ void handle(int foo) { count++; }
+ int main() {
++    sigset_t sset;
+     int pid=getpid();
++    sigemptyset(&sset);
++    sigaddset(&sset, SIGINT);
++    sigprocmask(SIG_UNBLOCK, &sset, NULL);
+     signal(SIGINT, handle);
+     kill(pid,SIGINT);
+     kill(pid,SIGINT);
+     kill(pid,SIGINT);
++    sleep(1);
+     if (count!=3) return 1;
+     return 0;
+ }

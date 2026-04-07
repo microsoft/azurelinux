@@ -1,0 +1,50 @@
+From 9bb31b63142adaaf949e20c2d86c97f9b787217b Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:28 +0200
+Subject: [PATCH 24/50] openssh-7.2p2-s390-closefrom
+
+---
+ openbsd-compat/bsd-closefrom.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/openbsd-compat/bsd-closefrom.c b/openbsd-compat/bsd-closefrom.c
+index 49a4f35f..f6112458 100644
+--- a/openbsd-compat/bsd-closefrom.c
++++ b/openbsd-compat/bsd-closefrom.c
+@@ -140,7 +140,33 @@ closefrom(int lowfd)
+ 	    fd = strtol(dent->d_name, &endp, 10);
+ 	    if (dent->d_name != endp && *endp == '\0' &&
+ 		fd >= 0 && fd < INT_MAX && fd >= lowfd && fd != dirfd(dirp))
++#ifdef __s390__
++		{
++		    /*
++		     * the filedescriptors used to communicate with
++		     * the device drivers to provide hardware support
++		     * should survive. HF <freude@de.ibm.com>
++		     */
++		    char fpath[PATH_MAX], lpath[PATH_MAX];
++		    len = snprintf(fpath, sizeof(fpath), "%s/%s",
++				   fdpath, dent->d_name);
++		    if (len > 0 && (size_t)len <= sizeof(fpath)) {
++			len = readlink(fpath, lpath, sizeof(lpath));
++			if (len > 0) {
++			    lpath[len] = 0;
++			    if (strstr(lpath, "dev/z90crypt")
++				|| strstr(lpath, "dev/zcrypt")
++				|| strstr(lpath, "dev/prandom")
++				|| strstr(lpath, "dev/shm/icastats"))
++				fd = -1;
++			}
++		    }
++		    if (fd >= 0)
++			(void) close((int) fd);
++		}
++#else
+ 		(void) close((int) fd);
++#endif
+ 	}
+ 	(void) closedir(dirp);
+ 	return;
+-- 
+2.49.0
+

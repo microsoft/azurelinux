@@ -1,0 +1,28 @@
+--- smartstring-1.0.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ smartstring-1.0.1/Cargo.toml	2025-09-25T11:22:07.443952+00:00
+@@ -28,9 +28,6 @@
+ [package.metadata.docs.rs]
+ features = ["arbitrary", "proptest", "serde"]
+ 
+-[[bench]]
+-name = "smartstring"
+-harness = false
+ [dependencies.arbitrary]
+ version = "1"
+ optional = true
+@@ -45,14 +42,12 @@
+ 
+ [dependencies.static_assertions]
+ version = "1"
+-[dev-dependencies.criterion]
+-version = "0.3"
+ 
+ [dev-dependencies.proptest]
+ version = "1"
+ 
+ [dev-dependencies.proptest-derive]
+-version = "0.3"
++version = ">=0.5, <0.7"
+ 
+ [dev-dependencies.rand]
+ version = "0.8"

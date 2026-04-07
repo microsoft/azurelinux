@@ -1,0 +1,28 @@
+diff -Naurp libiec61883-1.2.0.orig/examples/Makefile.am libiec61883-1.2.0/examples/Makefile.am
+--- libiec61883-1.2.0.orig/examples/Makefile.am	2006-09-24 15:34:12.000000000 -0400
++++ libiec61883-1.2.0/examples/Makefile.am	2009-01-15 10:29:02.265594991 -0500
+@@ -1,6 +1,6 @@
+ 
+-noinst_PROGRAMS = test-amdtp test-dv test-mpeg2 test-plugs
+-bin_PROGRAMS = plugreport plugctl
++noinst_PROGRAMS =
++bin_PROGRAMS = plugreport plugctl test-amdtp test-dv test-mpeg2 test-plugs
+ man_MANS = plugreport.1 plugctl.1
+ EXTRA_DIST = plugreport.1 plugctl.1
+ 
+diff -Naurp libiec61883-1.2.0.orig/examples/Makefile.in libiec61883-1.2.0/examples/Makefile.in
+--- libiec61883-1.2.0.orig/examples/Makefile.in	2009-01-15 01:33:33.000000000 -0500
++++ libiec61883-1.2.0/examples/Makefile.in	2009-01-15 10:28:57.088402078 -0500
+@@ -32,9 +32,10 @@ PRE_UNINSTALL = :
+ POST_UNINSTALL = :
+ build_triplet = @build@
+ host_triplet = @host@
+-noinst_PROGRAMS = test-amdtp$(EXEEXT) test-dv$(EXEEXT) \
++noinst_PROGRAMS =
++bin_PROGRAMS = plugreport$(EXEEXT) plugctl$(EXEEXT) \
++	test-amdtp$(EXEEXT) test-dv$(EXEEXT) \
+ 	test-mpeg2$(EXEEXT) test-plugs$(EXEEXT)
+-bin_PROGRAMS = plugreport$(EXEEXT) plugctl$(EXEEXT)
+ subdir = examples
+ DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
+ ACLOCAL_M4 = $(top_srcdir)/aclocal.m4

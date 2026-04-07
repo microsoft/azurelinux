@@ -1,0 +1,48 @@
+From d6956ef82051a9c805b02431e6c0083754549edd Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Renaud=20M=C3=A9trich?= <rmetrich@redhat.com>
+Date: Wed, 21 Jan 2026 11:30:58 +0100
+Subject: [PATCH] Map file with MAP_SHARED instead of MAP_PRIVATE
+Content-type: text/plain
+
+When setting up a user probe using ebpf or systemtap on a file,
+fapolicyd computes a different checksum, causing (usually) denial to
+occur.
+
+eBPF is used by Microsoft's MDATP, in particular for monitoring
+/usr/lib64/libpam.so.0 function calls. Through setting a user probe,
+mdatp and fapolicyd cannot be used concurrently.
+
+The reason for computing a different checksum is using mmap(MAP_PRIVATE)
+which makes the hooks set by ebpf and/or systemtap be visible:
+~~~
+1140 char *get_hash_from_fd2(int fd, size_t size, file_hash_alg_t alg)
+1141 {
+ :
+1165         mapped = mmap(0, size, PROT_READ, MAP_PRIVATE|MAP_POPULATE, fd, 0);
+1166         if (mapped != MAP_FAILED) {
+ :
+~~~
+
+A solution consists in using MAP_SHARED instead of MAP_PRIVATE.
+
+Fixes RHEL-142628.
+---
+ src/library/file.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/library/file.c b/src/library/file.c
+index 6491733c0042..802a89cc028a 100644
+--- a/src/library/file.c
++++ b/src/library/file.c
+@@ -1162,7 +1162,7 @@ char *get_hash_from_fd2(int fd, size_t size, file_hash_alg_t alg)
+ 	if (digest_length == 0)
+ 		return NULL;
+ 
+-	mapped = mmap(0, size, PROT_READ, MAP_PRIVATE|MAP_POPULATE, fd, 0);
++	mapped = mmap(0, size, PROT_READ, MAP_SHARED|MAP_POPULATE, fd, 0);
+ 	if (mapped != MAP_FAILED) {
+ 		unsigned char hptr[SHA512_DIGEST_LENGTH];
+ 		int computed = 0;
+-- 
+2.52.0
+

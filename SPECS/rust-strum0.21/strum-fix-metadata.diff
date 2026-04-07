@@ -1,0 +1,10 @@
+--- strum-0.21.0/Cargo.toml	1970-01-01T00:00:00+00:00
++++ strum-0.21.0/Cargo.toml	2024-09-14T14:17:30.666101+00:00
+@@ -18,7 +18,6 @@
+ description = "Helpful macros for working with enums and strings"
+ homepage = "https://github.com/Peternator7/strum"
+ documentation = "https://docs.rs/strum"
+-readme = "../README.md"
+ keywords = ["enum", "string", "macros", "proc-macros"]
+ categories = ["development-tools::procedural-macro-helpers", "parsing"]
+ license = "MIT"

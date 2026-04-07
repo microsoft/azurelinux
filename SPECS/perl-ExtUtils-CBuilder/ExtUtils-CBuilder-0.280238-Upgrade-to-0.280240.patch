@@ -1,0 +1,335 @@
+From a53c889b6bfb04a998a2fd2504de358cbb293530 Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Thu, 9 May 2024 15:06:30 +0200
+Subject: [PATCH] Upgrade to 0.280240
+
+---
+ Changes                                       |  6 +++
+ lib/ExtUtils/CBuilder.pm                      |  2 +-
+ lib/ExtUtils/CBuilder/Base.pm                 | 12 ++++--
+ lib/ExtUtils/CBuilder/Platform/Unix.pm        |  2 +-
+ lib/ExtUtils/CBuilder/Platform/VMS.pm         |  2 +-
+ lib/ExtUtils/CBuilder/Platform/Windows.pm     |  4 +-
+ lib/ExtUtils/CBuilder/Platform/Windows/BCC.pm |  2 +-
+ lib/ExtUtils/CBuilder/Platform/Windows/GCC.pm | 39 ++-----------------
+ .../CBuilder/Platform/Windows/MSVC.pm         |  2 +-
+ lib/ExtUtils/CBuilder/Platform/aix.pm         |  2 +-
+ lib/ExtUtils/CBuilder/Platform/android.pm     |  2 +-
+ lib/ExtUtils/CBuilder/Platform/cygwin.pm      |  2 +-
+ lib/ExtUtils/CBuilder/Platform/darwin.pm      |  2 +-
+ lib/ExtUtils/CBuilder/Platform/dec_osf.pm     |  2 +-
+ lib/ExtUtils/CBuilder/Platform/os2.pm         |  2 +-
+ t/00-have-compiler.t                          |  3 +-
+ t/03-cplusplus.t                              |  2 +-
+ 17 files changed, 34 insertions(+), 54 deletions(-)
+
+diff --git a/Changes b/Changes
+index 5c5c7ce..14aa6e5 100644
+--- a/Changes
++++ b/Changes
+@@ -1,5 +1,11 @@
+ Revision history for Perl extension ExtUtils::CBuilder.
+ 
++0.280239
++
++ - make the definition of boot_compilet() in the probe code generated
++   by have_compiler() a prototype to prevent warnings.
++   https://github.com/Perl/perl5/issues/21109
++
+ 0.280238
+ 
+   Fix:
+diff --git a/lib/ExtUtils/CBuilder.pm b/lib/ExtUtils/CBuilder.pm
+index 705d30a..ddaf24d 100644
+--- a/lib/ExtUtils/CBuilder.pm
++++ b/lib/ExtUtils/CBuilder.pm
+@@ -7,7 +7,7 @@ use Perl::OSType qw/os_type/;
+ 
+ use warnings;
+ use strict;
+-our $VERSION = '0.280238'; # VERSION
++our $VERSION = '0.280240'; # VERSION
+ our @ISA;
+ 
+ # We only use this once - don't waste a symbol table entry on it.
+diff --git a/lib/ExtUtils/CBuilder/Base.pm b/lib/ExtUtils/CBuilder/Base.pm
+index 0494caf..3024de5 100644
+--- a/lib/ExtUtils/CBuilder/Base.pm
++++ b/lib/ExtUtils/CBuilder/Base.pm
+@@ -9,7 +9,7 @@ use Text::ParseWords;
+ use IPC::Cmd qw(can_run);
+ use File::Temp qw(tempfile);
+ 
+-our $VERSION = '0.280238'; # VERSION
++our $VERSION = '0.280240'; # VERSION
+ 
+ # More details about C/C++ compilers:
+ # http://developers.sun.com/sunstudio/documentation/product/compiler.jsp
+@@ -202,10 +202,16 @@ sub have_compiler {
+   binmode $FH;
+ 
+   if ( $is_cplusplus ) {
+-    print $FH "class Bogus { public: int boot_compilet() { return 1; } };\n";
++    print $FH q<namespace Bogus { extern "C" int boot_compilet() { return 1; } };> . "\n";
+   }
+   else {
+-    print $FH "int boot_compilet() { return 1; }\n";
++    # Use extern "C" if "cc" was set to a C++ compiler.
++    print $FH <<EOF;
++#ifdef __cplusplus
++extern "C"
++#endif
++int boot_compilet(void) { return 1; }
++EOF
+   }
+   close $FH;
+ 
+diff --git a/lib/ExtUtils/CBuilder/Platform/Unix.pm b/lib/ExtUtils/CBuilder/Platform/Unix.pm
+index 2eaf591..bc7a4fe 100644
+--- a/lib/ExtUtils/CBuilder/Platform/Unix.pm
++++ b/lib/ExtUtils/CBuilder/Platform/Unix.pm
+@@ -4,7 +4,7 @@ use warnings;
+ use strict;
+ use ExtUtils::CBuilder::Base;
+ 
+-our $VERSION = '0.280238'; # VERSION
++our $VERSION = '0.280240'; # VERSION
+ our @ISA = qw(ExtUtils::CBuilder::Base);
+ 
+ sub link_executable {
+diff --git a/lib/ExtUtils/CBuilder/Platform/VMS.pm b/lib/ExtUtils/CBuilder/Platform/VMS.pm
+index d09a608..f7579a2 100644
+--- a/lib/ExtUtils/CBuilder/Platform/VMS.pm
++++ b/lib/ExtUtils/CBuilder/Platform/VMS.pm
+@@ -4,7 +4,7 @@ use warnings;
+ use strict;
+ use ExtUtils::CBuilder::Base;
+ 
+-our $VERSION = '0.280238'; # VERSION
++our $VERSION = '0.280240'; # VERSION
+ our @ISA = qw(ExtUtils::CBuilder::Base);
+ 
+ use File::Spec::Functions qw(catfile catdir);
+diff --git a/lib/ExtUtils/CBuilder/Platform/Windows.pm b/lib/ExtUtils/CBuilder/Platform/Windows.pm
+index 2fffc83..3ad649d 100644
+--- a/lib/ExtUtils/CBuilder/Platform/Windows.pm
++++ b/lib/ExtUtils/CBuilder/Platform/Windows.pm
+@@ -8,7 +8,7 @@ use File::Spec;
+ use ExtUtils::CBuilder::Base;
+ use IO::File;
+ 
+-our $VERSION = '0.280238'; # VERSION
++our $VERSION = '0.280240'; # VERSION
+ our @ISA = qw(ExtUtils::CBuilder::Base);
+ 
+ =begin comment
+@@ -238,7 +238,7 @@ sub link {
+ 
+   my @cmds = $self->format_linker_cmd(%spec);
+   while ( my $cmd = shift @cmds ) {
+-    $self->do_system( @$cmd );
++    $self->do_system( @$cmd ) or die "error building $output from @objects"
+   }
+ 
+   $spec{output} =~ tr/'"//d;
+diff --git a/lib/ExtUtils/CBuilder/Platform/Windows/BCC.pm b/lib/ExtUtils/CBuilder/Platform/Windows/BCC.pm
+index 6ab48ba..737448f 100644
+--- a/lib/ExtUtils/CBuilder/Platform/Windows/BCC.pm
++++ b/lib/ExtUtils/CBuilder/Platform/Windows/BCC.pm
+@@ -1,6 +1,6 @@
+ package ExtUtils::CBuilder::Platform::Windows::BCC;
+ 
+-our $VERSION = '0.280238'; # VERSION
++our $VERSION = '0.280240'; # VERSION
+ 
+ use strict;
+ use warnings;
+diff --git a/lib/ExtUtils/CBuilder/Platform/Windows/GCC.pm b/lib/ExtUtils/CBuilder/Platform/Windows/GCC.pm
+index c3eb7a0..d2da1ed 100644
+--- a/lib/ExtUtils/CBuilder/Platform/Windows/GCC.pm
++++ b/lib/ExtUtils/CBuilder/Platform/Windows/GCC.pm
+@@ -1,6 +1,6 @@
+ package ExtUtils::CBuilder::Platform::Windows::GCC;
+ 
+-our $VERSION = '0.280238'; # VERSION
++our $VERSION = '0.280240'; # VERSION
+ 
+ use warnings;
+ use strict;
+@@ -47,42 +47,12 @@ sub format_linker_cmd {
+     $path = "-L$path";
+   }
+ 
+-  my @cmds; # Stores the series of commands needed to build the module.
+-
+-  my $DLLTOOL = $cf->{dlltool} || 'dlltool';
+-
+-  push @cmds, [
+-    $DLLTOOL, '--def'        , $spec{def_file},
+-              '--output-exp' , $spec{explib}
+-  ];
+-
+   # split off any -arguments included in ld
+   my @ld = split / (?=-)/, $spec{ld};
+ 
+-  push @cmds, [ grep {defined && length} (
+-    @ld                       ,
+-    '-o', $spec{output}       ,
+-    "-Wl,--base-file,$spec{base_file}"   ,
+-    "-Wl,--enable-auto-image-base" ,
+-    @{$spec{lddlflags}}       ,
+-    @{$spec{libpath}}         ,
+-    @{$spec{startup}}         ,
+-    @{$spec{objects}}         ,
+-    @{$spec{other_ldflags}}   ,
+-    $spec{libperl}            ,
+-    @{$spec{perllibs}}        ,
+-    $spec{explib}             ,
+-    $spec{map_file} ? ('-Map', $spec{map_file}) : ''
+-  ) ];
+-
+-  push @cmds, [
+-    $DLLTOOL, '--def'        , $spec{def_file},
+-              '--output-exp' , $spec{explib},
+-              '--base-file'  , $spec{base_file}
+-  ];
+-
+-  push @cmds, [ grep {defined && length} (
++  return [ grep {defined && length} (
+     @ld                       ,
++    $spec{def_file}           ,
+     '-o', $spec{output}       ,
+     "-Wl,--enable-auto-image-base" ,
+     @{$spec{lddlflags}}       ,
+@@ -92,11 +62,8 @@ sub format_linker_cmd {
+     @{$spec{other_ldflags}}   ,
+     $spec{libperl}            ,
+     @{$spec{perllibs}}        ,
+-    $spec{explib}             ,
+     $spec{map_file} ? ('-Map', $spec{map_file}) : ''
+   ) ];
+-
+-  return @cmds;
+ }
+ 
+ sub write_linker_script {
+diff --git a/lib/ExtUtils/CBuilder/Platform/Windows/MSVC.pm b/lib/ExtUtils/CBuilder/Platform/Windows/MSVC.pm
+index ce5e99f..2acca7a 100644
+--- a/lib/ExtUtils/CBuilder/Platform/Windows/MSVC.pm
++++ b/lib/ExtUtils/CBuilder/Platform/Windows/MSVC.pm
+@@ -1,6 +1,6 @@
+ package ExtUtils::CBuilder::Platform::Windows::MSVC;
+ 
+-our $VERSION = '0.280238'; # VERSION
++our $VERSION = '0.280240'; # VERSION
+ 
+ use warnings;
+ use strict;
+diff --git a/lib/ExtUtils/CBuilder/Platform/aix.pm b/lib/ExtUtils/CBuilder/Platform/aix.pm
+index 35de7fa..373d025 100644
+--- a/lib/ExtUtils/CBuilder/Platform/aix.pm
++++ b/lib/ExtUtils/CBuilder/Platform/aix.pm
+@@ -5,7 +5,7 @@ use strict;
+ use ExtUtils::CBuilder::Platform::Unix;
+ use File::Spec;
+ 
+-our $VERSION = '0.280238'; # VERSION
++our $VERSION = '0.280240'; # VERSION
+ our @ISA = qw(ExtUtils::CBuilder::Platform::Unix);
+ 
+ sub need_prelink { 1 }
+diff --git a/lib/ExtUtils/CBuilder/Platform/android.pm b/lib/ExtUtils/CBuilder/Platform/android.pm
+index 44ad646..5eec4e5 100644
+--- a/lib/ExtUtils/CBuilder/Platform/android.pm
++++ b/lib/ExtUtils/CBuilder/Platform/android.pm
+@@ -6,7 +6,7 @@ use File::Spec;
+ use ExtUtils::CBuilder::Platform::Unix;
+ use Config;
+ 
+-our $VERSION = '0.280238'; # VERSION
++our $VERSION = '0.280240'; # VERSION
+ our @ISA = qw(ExtUtils::CBuilder::Platform::Unix);
+ 
+ # The Android linker will not recognize symbols from
+diff --git a/lib/ExtUtils/CBuilder/Platform/cygwin.pm b/lib/ExtUtils/CBuilder/Platform/cygwin.pm
+index 14d814c..175d22a 100644
+--- a/lib/ExtUtils/CBuilder/Platform/cygwin.pm
++++ b/lib/ExtUtils/CBuilder/Platform/cygwin.pm
+@@ -5,7 +5,7 @@ use strict;
+ use File::Spec;
+ use ExtUtils::CBuilder::Platform::Unix;
+ 
+-our $VERSION = '0.280238'; # VERSION
++our $VERSION = '0.280240'; # VERSION
+ our @ISA = qw(ExtUtils::CBuilder::Platform::Unix);
+ 
+ # TODO: If a specific exe_file name is requested, if the exe created
+diff --git a/lib/ExtUtils/CBuilder/Platform/darwin.pm b/lib/ExtUtils/CBuilder/Platform/darwin.pm
+index 7e8ae7a..42f28b1 100644
+--- a/lib/ExtUtils/CBuilder/Platform/darwin.pm
++++ b/lib/ExtUtils/CBuilder/Platform/darwin.pm
+@@ -5,7 +5,7 @@ use strict;
+ use ExtUtils::CBuilder::Platform::Unix;
+ use Config;
+ 
+-our $VERSION = '0.280238'; # VERSION
++our $VERSION = '0.280240'; # VERSION
+ our @ISA = qw(ExtUtils::CBuilder::Platform::Unix);
+ 
+ my ($osver) = split /\./, $Config{osvers};
+diff --git a/lib/ExtUtils/CBuilder/Platform/dec_osf.pm b/lib/ExtUtils/CBuilder/Platform/dec_osf.pm
+index 6b97095..f020dca 100644
+--- a/lib/ExtUtils/CBuilder/Platform/dec_osf.pm
++++ b/lib/ExtUtils/CBuilder/Platform/dec_osf.pm
+@@ -5,7 +5,7 @@ use strict;
+ use ExtUtils::CBuilder::Platform::Unix;
+ use File::Spec;
+ 
+-our $VERSION = '0.280238'; # VERSION
++our $VERSION = '0.280240'; # VERSION
+ our @ISA = qw(ExtUtils::CBuilder::Platform::Unix);
+ 
+ sub link_executable {
+diff --git a/lib/ExtUtils/CBuilder/Platform/os2.pm b/lib/ExtUtils/CBuilder/Platform/os2.pm
+index a7d11dc..53e63b9 100644
+--- a/lib/ExtUtils/CBuilder/Platform/os2.pm
++++ b/lib/ExtUtils/CBuilder/Platform/os2.pm
+@@ -4,7 +4,7 @@ use warnings;
+ use strict;
+ use ExtUtils::CBuilder::Platform::Unix;
+ 
+-our $VERSION = '0.280238'; # VERSION
++our $VERSION = '0.280240'; # VERSION
+ our @ISA = qw(ExtUtils::CBuilder::Platform::Unix);
+ 
+ sub need_prelink { 1 }
+diff --git a/t/00-have-compiler.t b/t/00-have-compiler.t
+index e4706a0..bd2ed10 100644
+--- a/t/00-have-compiler.t
++++ b/t/00-have-compiler.t
+@@ -62,7 +62,8 @@ my $b3 = ExtUtils::CBuilder->new(quiet => 1);
+ configure_fake_present_compilers($b3);
+ is( $b3->have_compiler, 1, "have_compiler: fake present cc" );
+ }
+-{
++SKIP: {
++skip 'C++ test is broken on windows', 1 if $^O eq 'MSWin32';
+ my $b4 = ExtUtils::CBuilder->new(quiet => 1);
+ configure_fake_present_compilers($b4);
+ is( $b4->have_cplusplus, 1, "have_cpp_compiler: fake present c++" );
+diff --git a/t/03-cplusplus.t b/t/03-cplusplus.t
+index 0c05ae2..2fae11f 100644
+--- a/t/03-cplusplus.t
++++ b/t/03-cplusplus.t
+@@ -33,7 +33,7 @@ ok $b->have_cplusplus, "have_cplusplus";
+ $source_file = File::Spec->catfile('t', 'cplust.cc');
+ {
+   open my $FH, '>', $source_file or die "Can't create $source_file: $!";
+-  print $FH "class Bogus { public: int boot_cplust() { return 1; } };\n";
++  print $FH q<namespace Bogus { extern "C" int boot_cplust() { return 1; } };> . "\n";
+   close $FH;
+ }
+ ok -e $source_file, "source file '$source_file' created";
+-- 
+2.45.0
+

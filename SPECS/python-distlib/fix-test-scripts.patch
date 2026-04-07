@@ -1,0 +1,53 @@
+From 895bd27ce44a78c1bd70031c3529b0a6a152187b Mon Sep 17 00:00:00 2001
+From: Vinay Sajip <vinay_sajip@yahoo.co.uk>
+Date: Fri, 18 Jul 2025 07:59:29 +0100
+Subject: [PATCH] Fix #251: Use more appropriate function in test.
+
+---
+ CHANGES.rst           | 4 ++++
+ tests/test_scripts.py | 6 ++----
+ 2 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/CHANGES.rst b/CHANGES.rst
+index 290be09..d6aefc2 100644
+--- a/CHANGES.rst
++++ b/CHANGES.rst
+@@ -6,6 +6,10 @@ Change log for ``distlib``
+ 
+ Released: Not yet.
+ 
++- tests
++
++    - Fix #251: Change test function following a reorganization which happened in the Python stdlib.
++
+ 0.4.0
+ ~~~~~
+ 
+diff --git a/tests/test_scripts.py b/tests/test_scripts.py
+index a93a08a..99417c5 100644
+--- a/tests/test_scripts.py
++++ b/tests/test_scripts.py
+@@ -341,10 +341,8 @@ class ScriptTestCase(DistlibTestCase):
+     def test_script_run(self):
+         if sys.version_info[:2] < (3, 13):
+             target = 'cgi:print_directory'
+-        elif os.name != 'nt':
+-            target = 'test.support.interpreters:list_all'
+         else:
+-            raise unittest.SkipTest('test not available on Windows for Python >= 3.13')
++            target = 'logging:getHandlerNames'
+         files = self.maker.make('test = %s' % target)
+         self.assertEqual(len(files), 2)
+         p = subprocess.Popen([sys.executable, files[0]], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+@@ -353,7 +351,7 @@ class ScriptTestCase(DistlibTestCase):
+             self.assertIn(b'<H3>Current Working Directory:</H3>', stdout)
+             self.assertIn(os.getcwd().encode('utf-8'), stdout)
+         else:
+-            self.assertIn(b'[Interpreter(0)]', stderr)
++            self.assertIn(b'frozenset(', stderr)
+             self.assertEqual(p.returncode, 1)
+ 
+     @unittest.skipUnless(os.name == 'posix', 'Test only valid for POSIX')
+-- 
+2.50.1
+

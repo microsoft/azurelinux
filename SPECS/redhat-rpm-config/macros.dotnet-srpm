@@ -1,0 +1,2 @@
+# Architectures that .NET and dependent packages run on
+%dotnet_arches aarch64 ppc64le s390x x86_64

@@ -1,0 +1,71 @@
+diff -pruN fonts-rpm-macros-2.0.5.orig/rpm/macros.d/macros.fonts-rpm.internal fonts-rpm-macros-2.0.5/rpm/macros.d/macros.fonts-rpm.internal
+--- fonts-rpm-macros-2.0.5.orig/rpm/macros.d/macros.fonts-rpm.internal	2025-01-20 18:11:48.934309823 +0900
++++ fonts-rpm-macros-2.0.5/rpm/macros.d/macros.fonts-rpm.internal	2025-01-20 18:11:03.038433084 +0900
+@@ -57,6 +57,10 @@
+     [[ -n $line ]] && fontappstreams+=("$lines")
+   done <<< ${lines}
+   if  [ ${#fontappstreams[@]} -eq 0 ]; then
++    if [[ -z "${fontnames}" ]] ; then
++      echo "%{?currentfontpkgname}: fonts not found for appstream file" >&2
++      exit 1
++    fi
+     echo "Generating the %{currentfontpkgname} appstream file"
+     cat > "%{fontorg}.%{currentfontpkgname}.metainfo.xml" << EOF_APPSTREAM
+ <?xml version="1.0" encoding="UTF-8"?>
+@@ -99,6 +103,11 @@ echo "" > "%{currentfontfilelist}"
+       install -m 0644 -vp "${font}" "%{buildroot}%{currentfontdir}"
+       echo \\"%{currentfontdir}/$(basename "${font}")\\" >> "%{currentfontfilelist}"
+     done
++  else
++    if [[ -n "%{?currentfonts}" ]]; then
++      echo "%{?currentfontpkgname}: missing fonts files in fonts macro" >&2
++      exit 1
++    fi
+   fi
+   %define listfiles_include %{?currentfontconfngs}
+   %define listfiles_exclude %{?currentfontngsex}
+@@ -127,6 +136,11 @@ echo "" > "%{currentfontfilelist}"
+   if [ ${#fontconfs[@]} -gt 0 ] || [ ${#newfontconfs[@]} -gt 0 ]; then
+     install -m 0755 -vd "%{buildroot}%{_fontconfig_templatedir}" \\
+                         "%{buildroot}%{_fontconfig_confdir}"
++  else
++    if [[ -n "%{?currentfontconfs}" ]] || [[ -n "%{?currentfontconfngs}" ]] ; then
++      echo "%{?currentfontpkgname}: missing config files in fontconfs or fontconfngs macro" >&2
++      exit 1
++    fi
+   fi
+   for fontconf in "${fontconfs[@]}" "${newfontconfs[@]}"; do
+     if [[ -n $fontconf ]] ; then
+@@ -154,6 +168,11 @@ echo "" > "%{currentfontfilelist}"
+       install -m 0644 -vp "${fontappstream}" "%{buildroot}%{_metainfodir}"
+       echo \\"%{_metainfodir}/$(basename "${fontappstream}")\\" >> "%{currentfontfilelist}"
+     done
++  else
++    if [[ -n "%{?currentfontappstreams}" ]]; then
++      echo "%{?currentfontpkgname}: missing appstream files in fontappstreams macro" >&2
++      exit 1
++    fi
+   fi
+ )
+ (
+@@ -167,6 +186,10 @@ echo "" > "%{currentfontfilelist}"
+   for fontdoc in "${fontdocs[@]}"; do
+     echo %doc \\"${fontdoc}\\" >> "%{currentfontfilelist}"
+   done
++  if [ ${#fontdocs[@]} -eq 0 ] && [ -n "%{?currentfontdocs}" ]; then
++    echo "%{?currentfontpkgname}: missing docs in fontdocs macro" >&2
++    exit 1
++  fi
+ )
+ (
+   %define listfiles_include %{?currentfontlicenses}
+@@ -179,5 +202,9 @@ echo "" > "%{currentfontfilelist}"
+   for fontlicense in "${fontlicenses[@]}"; do
+     echo "%"license \\"${fontlicense}\\" >> "%{currentfontfilelist}"
+   done
++  if [ ${#fontlicenses[@]} -eq 0 ] && [ -n "%{?currentfontlicenses}" ]; then
++    echo "%{?currentfontpkgname}: missing license files in fontlicenses macro" >&2
++    exit 1
++  fi
+ )
+ }

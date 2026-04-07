@@ -1,0 +1,71 @@
+From 77cf351a61f3683b74e07857ca77b5580d1cedf0 Mon Sep 17 00:00:00 2001
+From: Sandro Mani <manisandro@gmail.com>
+Date: Fri, 8 Apr 2016 23:21:26 +0200
+Subject: [PATCH 2/4] Fix mistaken use of std::cerr instead of std::endl
+
+---
+ examples/engine/inlinestyles.cc | 8 ++++----
+ examples/engine/splitstyles.cc  | 8 ++++----
+ 2 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/examples/engine/inlinestyles.cc b/examples/engine/inlinestyles.cc
+index 1cb4755..8ad1f57 100644
+--- a/examples/engine/inlinestyles.cc
++++ b/examples/engine/inlinestyles.cc
+@@ -35,20 +35,20 @@
+ bool InlineStyles(const char* input_filename, const char* output_filename) {
+   std::string kml_input;
+   if (!kmlbase::File::ReadFileToString(input_filename, &kml_input)) {
+-    std::cerr << "read failed: " << input_filename << std::cerr;
++    std::cerr << "read failed: " << input_filename << std::endl;
+     return false;
+   }
+   std::string errors;
+   kmldom::ElementPtr root = kmlengine::InlineStyles(kml_input, &errors);
+   if (!root) {
+-    std::cerr << "parse failed: " << input_filename << std::cerr;
+-    std::cerr << "parse failed: " << errors << std::cerr;
++    std::cerr << "parse failed: " << input_filename << std::endl;
++    std::cerr << "parse failed: " << errors << std::endl;
+     return false;
+   }
+ 
+   std::string kml_output = kmldom::SerializePretty(root);
+   if (!kmlbase::File::WriteStringToFile(kml_output, output_filename)) {
+-    std::cerr << "write failed: " << output_filename << std::cerr;
++    std::cerr << "write failed: " << output_filename << std::endl;
+     return false;
+   }
+   return true;
+diff --git a/examples/engine/splitstyles.cc b/examples/engine/splitstyles.cc
+index a3b190a..56203c9 100644
+--- a/examples/engine/splitstyles.cc
++++ b/examples/engine/splitstyles.cc
+@@ -35,20 +35,20 @@
+ bool SplitStyles(const char* input_filename, const char* output_filename) {
+   std::string kml_input;
+   if (!kmlbase::File::ReadFileToString(input_filename, &kml_input)) {
+-    std::cerr << "read failed: " << input_filename << std::cerr;
++    std::cerr << "read failed: " << input_filename << std::endl;
+     return false;
+   }
+   std::string errors;
+   kmldom::ElementPtr root = kmlengine::SplitStyles(kml_input, &errors);
+   if (!root) {
+-    std::cerr << "parse failed: " << input_filename << std::cerr;
+-    std::cerr << "parse failed: " << errors << std::cerr;
++    std::cerr << "parse failed: " << input_filename << std::endl;
++    std::cerr << "parse failed: " << errors << std::endl;
+     return false;
+   }
+ 
+   std::string kml_output = kmldom::SerializePretty(root);
+   if (!kmlbase::File::WriteStringToFile(kml_output, output_filename)) {
+-    std::cerr << "write failed: " << output_filename << std::cerr;
++    std::cerr << "write failed: " << output_filename << std::endl;
+     return false;
+   }
+   return true;
+-- 
+2.8.1
+

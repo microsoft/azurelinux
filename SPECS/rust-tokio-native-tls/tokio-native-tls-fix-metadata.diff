@@ -1,0 +1,12 @@
+--- tokio-native-tls-0.3.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ tokio-native-tls-0.3.1/Cargo.toml	2023-02-09T13:57:42.580889+00:00
+@@ -68,9 +68,6 @@
+ version = "0.6.0"
+ features = ["full"]
+ 
+-[features]
+-vendored = ["native-tls/vendored"]
+-
+ [target."cfg(all(not(target_os = \"macos\"), not(windows), not(target_os = \"ios\")))".dev-dependencies.openssl]
+ version = "0.10"
+ 

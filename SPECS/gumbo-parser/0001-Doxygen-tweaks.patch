@@ -1,0 +1,34 @@
+From 4445c669843f111d06eb999b607b4d96c31eac10 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ralf=20Cors=C3=A9pius?= <corsepiu@corsepiu.home>
+Date: Wed, 16 Oct 2013 09:37:03 +0200
+Subject: [PATCH 2/3] Doxygen tweaks
+
+---
+ Doxyfile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Doxyfile b/Doxyfile
+index b411da6..3fda5a2 100644
+--- a/Doxyfile
++++ b/Doxyfile
+@@ -128,7 +128,7 @@ FULL_PATH_NAMES        = NO
+ # If left blank the directory from which doxygen is run is used as the
+ # path to strip.
+ 
+-STRIP_FROM_PATH        =
++STRIP_FROM_PATH        = src/
+ 
+ # The STRIP_FROM_INC_PATH tag can be used to strip a user-defined part of
+ # the path mentioned in the documentation of a class, which tells
+@@ -883,7 +883,7 @@ HTML_HEADER            =
+ # each generated HTML page. If it is left blank doxygen will generate a
+ # standard footer.
+ 
+-HTML_FOOTER            =
++HTML_FOOTER            = footer.html
+ 
+ # The HTML_STYLESHEET tag can be used to specify a user-defined cascading
+ # style sheet that is used by each HTML page. It can be used to
+-- 
+2.4.3
+

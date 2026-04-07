@@ -1,0 +1,35 @@
+From ef1fb4dc1fc8797fd70c45e31cf3ae5e6447740a Mon Sep 17 00:00:00 2001
+From: Tom Rix <trix@redhat.com>
+Date: Thu, 11 Jan 2024 08:16:09 -0500
+Subject: [PATCH] cppheaderparser silence invalid escape sequence
+
+Signed-off-by: Tom Rix <trix@redhat.com>
+---
+ CppHeaderParser/CppHeaderParser.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/CppHeaderParser/CppHeaderParser.py b/CppHeaderParser/CppHeaderParser.py
+index 06a17fc..8dfe8ba 100644
+--- a/CppHeaderParser/CppHeaderParser.py
++++ b/CppHeaderParser/CppHeaderParser.py
+@@ -149,7 +149,7 @@ def t_COMMENT_MULTILINE(t):
+         #not sure why, but get double new lines
+         v = t.value.replace("\n\n", "\n")
+         #strip prefixing whitespace
+-        v = re.sub("\n[\s]+\*", "\n*", v)
++        v = re.sub(r"\n[\s]+\*", "\n*", v)
+         doxygenCommentCache += v
+     t.lexer.lineno += len([a for a in t.value if a=="\n"])
+ def t_NEWLINE(t):
+@@ -834,7 +834,7 @@ class CppMethod( _CppMethod ):
+             doxyLines = self["doxygen"].split("\n")
+             lastParamDesc = ""
+             for doxyLine in doxyLines:
+-                if " @param " in doxyLine or " \param " in doxyLine:
++                if " @param " in doxyLine or r" \param " in doxyLine:
+                     try:
+                         #Strip out the param
+                         doxyLine = doxyLine[doxyLine.find("param ") + 6:]
+-- 
+2.43.0
+

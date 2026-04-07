@@ -1,0 +1,73 @@
+From 52093add7b3f38156e632fa81fcf1c0b6ad4d549 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 3 Dec 2013 15:11:14 +0100
+Subject: [PATCH] Pass compilation with -Wformat-security
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ diff/diff3.c |  2 +-
+ src/main.c   |  2 +-
+ src/subr.c   | 12 ++++--------
+ 3 files changed, 6 insertions(+), 10 deletions(-)
+
+diff --git a/diff/diff3.c b/diff/diff3.c
+index 006039f..e9418ce 100644
+--- a/diff/diff3.c
++++ b/diff/diff3.c
+@@ -1505,7 +1505,7 @@ output_diff3 (diff, mapping, rev_mapping)
+ 	      line = 0;
+ 	      do
+ 		{
+-		  printf_output (line_prefix);
++		  printf_output ("%s", line_prefix);
+ 		  cp = D_RELNUM (ptr, realfile, line);
+ 		  length = D_RELLEN (ptr, realfile, line);
+ 		  write_output (cp, length);
+diff --git a/src/main.c b/src/main.c
+index 24a6e6f..e7f0439 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -1154,6 +1154,6 @@ usage (cpp)
+ {
+     (void) fprintf (stderr, *cpp++, program_name, cvs_cmd_name);
+     for (; *cpp; cpp++)
+-	(void) fprintf (stderr, *cpp);
++	(void) fprintf (stderr, "%s", *cpp);
+     error_exit ();
+ }
+diff --git a/src/subr.c b/src/subr.c
+index 0725503..94907ce 100644
+--- a/src/subr.c
++++ b/src/subr.c
+@@ -46,10 +46,8 @@ xmalloc (bytes)
+     cp = malloc (bytes);
+     if (cp == NULL)
+     {
+-	char buf[80];
+-	sprintf (buf, "out of memory; can not allocate %lu bytes",
+-		 (unsigned long) bytes);
+-	error (1, 0, buf);
++	error (1, 0, "out of memory; can not allocate %lu bytes",
++		(unsigned long) bytes);
+     }
+     return (cp);
+ }
+@@ -73,10 +71,8 @@ xrealloc (ptr, bytes)
+ 
+     if (cp == NULL)
+     {
+-	char buf[80];
+-	sprintf (buf, "out of memory; can not reallocate %lu bytes",
+-		 (unsigned long) bytes);
+-	error (1, 0, buf);
++	error (1, 0, "out of memory; can not reallocate %lu bytes",
++		(unsigned long) bytes);
+     }
+     return (cp);
+ }
+-- 
+1.8.3.1
+

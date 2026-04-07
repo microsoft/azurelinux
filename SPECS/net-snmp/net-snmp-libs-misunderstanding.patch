@@ -1,0 +1,59 @@
+Libs.private should contain a list of libraries the library that the package
+exposes is linked too. So let's filter out unrelated link flags.
+
+diff --git net-snmp-5.9.1/netsnmp.pc.in~ net-snmp-5.9.1/netsnmp.pc.in
+index 0a1f5785a4..524ca91d82 100644
+--- net-snmp-5.9.1/netsnmp.pc.in~
++++ net-snmp-5.9.1/netsnmp.pc.in
+@@ -9,4 +9,4 @@ URL: http://www.net-snmp.org
+ Version: @PACKAGE_VERSION@
+ Cflags: -I${includedir}
+ Libs: -L${libdir} -lnetsnmp
+-Libs.private: @LDFLAGS@ @LNETSNMPLIBS@ @LIBS@ @PERLLDOPTS_FOR_APPS@
++Libs.private: @LNETSNMPLIBS@ @LIBS@
+diff --git net-snmp-5.9.1/netsnmp-agent.pc.in~ net-snmp-5.9.1/netsnmp-agent.pc.in
+index 3a1c77bbf8..3d3b308d21 100644
+--- net-snmp-5.9.1/netsnmp-agent.pc.in~
++++ net-snmp-5.9.1/netsnmp-agent.pc.in
+@@ -9,4 +9,4 @@ URL: http://www.net-snmp.org
+ Version: @PACKAGE_VERSION@
+ Cflags: -I${includedir}
+ Libs: -L${libdir} -lnetsnmpmibs -lnetsnmpagent -lnetsnmp
+-Libs.private: @LDFLAGS@ @LMIBLIBS@ @LAGENTLIBS@ @PERLLDOPTS_FOR_APPS@ @LNETSNMPLIBS@ @LIBS@
++Libs.private: @LMIBLIBS@ @LAGENTLIBS@ @LNETSNMPLIBS@ @LIBS@
+diff --git net-snmp-5.9.1/net-snmp-config.in~ net-snmp-5.9.1/net-snmp-config.in
+index 6b5abf8f83..ee81ce98fa 100644
+--- net-snmp-5.9.1/net-snmp-config.in~
++++ net-snmp-5.9.1/net-snmp-config.in
+@@ -193,13 +193,13 @@ else
+     #################################################### client lib
+     --libs)
+       # use this one == --netsnmp-libs + --external-libs
+-      echo $NSC_LDFLAGS $NSC_LIBDIR $NSC_SNMPLIBS $NSC_LIBS
++      echo $NSC_LIBDIR $NSC_SNMPLIBS $NSC_LIBS
+       ;;
+     --netsnmp-libs)
+       echo $NSC_LIBDIR $NSC_BASE_SNMP_LIBS
+       ;;
+     --external-libs)
+-      echo $NSC_LDFLAGS $NSC_LNETSNMPLIBS $NSC_LIBS @PERLLDOPTS_FOR_APPS@
++      echo $NSC_LNETSNMPLIBS $NSC_LIBS
+       ;;
+     #################################################### agent lib
+     --base-agent-libs)
+@@ -210,13 +210,13 @@ else
+       ;;
+     --agent-libs)
+       # use this one == --netsnmp-agent-libs + --external-libs
+-      echo $NSC_LDFLAGS $NSC_LIBDIR $NSC_AGENTLIBS $NSC_LIBS
++      echo $NSC_LIBDIR $NSC_AGENTLIBS $NSC_LIBS
+       ;;
+     --netsnmp-agent-libs)
+       echo $NSC_LIBDIR $NSC_BASE_AGENT_LIBS
+       ;;
+     --external-agent-libs)
+-      echo $NSC_LDFLAGS $NSC_LMIBLIBS $NSC_LAGENTLIBS $NSC_LNETSNMPLIBS $NSC_LIBS
++      echo $NSC_LMIBLIBS $NSC_LAGENTLIBS $NSC_LNETSNMPLIBS $NSC_LIBS
+       ;;
+     ####################################################
+     --version|--ver*)

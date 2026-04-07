@@ -1,0 +1,101 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martin Wilck <mwilck@suse.com>
+Date: Thu, 23 Jan 2025 22:19:39 +0100
+Subject: [PATCH] multipathd: trigger uevents for blacklisted paths in
+ reconfigure
+
+If multipathd has already configured maps, and the user changes the
+blacklist or other parameters that cause currently multipathed
+devices to be skipped, and then runs "multipathd reconfigure"
+or restarts multipathd, multipathd flushes the maps in question,
+but doesn't trigger uevents for the now-blacklisted paths.
+
+This is because the blacklisted paths are removed from the discovered
+maps internally when update_pathvec_from_dm() is called through
+map_discovery() and update_multipath_table(); when later
+trigger_paths_udev_change() is called from coalesce_maps(), the
+map contains no paths for which an uevent could be triggered.
+
+The map_discovery() code flow is special, because we will call
+coalesce_paths() afterwards anyway and reconstruct the mpvec. Unlike the
+regular code flow, we don't want the maps to be "corrected" in this
+case, because the maps discovered here aren't going to be reloaded.
+We just want update_pathvec_from_dm() to populate the pathvec.
+
+Therefore add a new flag DI_DISCOVERY, which is only set when
+update_multipath_table() is called from map_discovery(), and if
+this flag is set, keep PATHINFO_SKIPPED paths in the map's table in
+update_pathvec_from_dm(). Later on, the paths will still be visible
+in the old mpp (ompp) in coalesce_maps(), and uevents will be
+triggered for them to release them to systemd.
+
+We can't always do this for PATHINFO_SKIPPED, because in some cases
+paths may be accepted in a map first and SKIPPED later (for example if
+the WWID wasn't yet available at startup). Therefore the special
+case for DI_DISCOVERY is necessary.
+
+Signed-off-by: Martin Wilck <mwilck@suse.com>
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libmultipath/discovery.h   | 2 ++
+ libmultipath/structs_vec.c | 6 +++++-
+ multipathd/main.c          | 2 +-
+ 3 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/libmultipath/discovery.h b/libmultipath/discovery.h
+index 7d42eae5..9824a8d3 100644
+--- a/libmultipath/discovery.h
++++ b/libmultipath/discovery.h
+@@ -72,6 +72,7 @@ enum discovery_mode {
+ 	DI_BLACKLIST__,
+ 	DI_NOIO__,
+ 	DI_NOFALLBACK__,
++	DI_DISCOVERY__,
+ };
+ 
+ #define DI_SYSFS	(1 << DI_SYSFS__)
+@@ -82,6 +83,7 @@ enum discovery_mode {
+ #define DI_BLACKLIST	(1 << DI_BLACKLIST__)
+ #define DI_NOIO		(1 << DI_NOIO__) /* Avoid IO on the device */
+ #define DI_NOFALLBACK	(1 << DI_NOFALLBACK__) /* do not allow wwid fallback */
++#define DI_DISCOVERY	(1 << DI_DISCOVERY__) /* set only during map discovery */
+ 
+ #define DI_ALL		(DI_SYSFS  | DI_SERIAL | DI_CHECKER | DI_PRIO | \
+ 			 DI_WWID)
+diff --git a/libmultipath/structs_vec.c b/libmultipath/structs_vec.c
+index 7a4e3eb0..5ccdaea0 100644
+--- a/libmultipath/structs_vec.c
++++ b/libmultipath/structs_vec.c
+@@ -109,6 +109,9 @@ static bool update_pathvec_from_dm(vector pathvec, struct multipath *mpp,
+ 	bool mpp_has_wwid;
+ 	bool must_reload = false;
+ 	bool pg_deleted = false;
++	bool map_discovery = !!(pathinfo_flags & DI_DISCOVERY);
++
++	pathinfo_flags &= ~DI_DISCOVERY;
+ 
+ 	if (!mpp->pg)
+ 		return false;
+@@ -195,7 +198,8 @@ static bool update_pathvec_from_dm(vector pathvec, struct multipath *mpp,
+ 					rc = pathinfo(pp, conf,
+ 						      DI_SYSFS|DI_WWID|DI_BLACKLIST|DI_NOFALLBACK|pathinfo_flags);
+ 					pthread_cleanup_pop(1);
+-					if (rc != PATHINFO_OK) {
++					if (rc == PATHINFO_FAILED ||
++					    (rc == PATHINFO_SKIPPED && !map_discovery)) {
+ 						condlog(1, "%s: error %d in pathinfo, discarding path",
+ 							pp->dev, rc);
+ 						vector_del_slot(pgp->paths, j--);
+diff --git a/multipathd/main.c b/multipathd/main.c
+index 9ed27da0..fb3e44a8 100644
+--- a/multipathd/main.c
++++ b/multipathd/main.c
+@@ -1763,7 +1763,7 @@ map_discovery (struct vectors * vecs)
+ 		return 1;
+ 
+ 	vector_foreach_slot (vecs->mpvec, mpp, i)
+-		if (update_multipath_table(mpp, vecs->pathvec, 0) != DMP_OK) {
++		if (update_multipath_table(mpp, vecs->pathvec, DI_DISCOVERY) != DMP_OK) {
+ 			remove_map(mpp, vecs->pathvec, vecs->mpvec);
+ 			i--;
+ 		}

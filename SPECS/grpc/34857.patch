@@ -1,0 +1,40 @@
+From d583a79750a7f3cf2c955d880ebfbfd5b8aa1675 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Thu, 2 Nov 2023 07:00:37 -0400
+Subject: [PATCH] [Python] Do not call PyEval_InitThreads
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Since Python 3.7, it’s called by Py_Initialize and doesn’t need to be called manually, so this removal has no effect.
+
+Since Python 3.9, it does nothing, and in Python 3.13, it will be removed, which makes this change necessary.
+
+References:
+
+https://docs.python.org/3/c-api/init.html#c.PyEval_InitThreads
+
+https://github.com/python/cpython/issues/105182
+---
+ src/python/grpcio/grpc/_cython/cygrpc.pyx | 7 -------
+ 1 file changed, 7 deletions(-)
+
+diff --git a/src/python/grpcio/grpc/_cython/cygrpc.pyx b/src/python/grpcio/grpc/_cython/cygrpc.pyx
+index 2fd2347352a27..3b6ae9281139d 100644
+--- a/src/python/grpcio/grpc/_cython/cygrpc.pyx
++++ b/src/python/grpcio/grpc/_cython/cygrpc.pyx
+@@ -80,14 +80,7 @@ include "_cygrpc/aio/server.pyx.pxi"
+ #
+ # initialize gRPC
+ #
+-cdef extern from "Python.h":
+-
+-  int PyEval_InitThreads()
+-
+ cdef _initialize():
+-  # We have Python callbacks called by c-core threads, this ensures the GIL
+-  # is initialized.
+-  PyEval_InitThreads()
+   grpc_set_ssl_roots_override_callback(
+           <grpc_ssl_roots_override_callback>ssl_roots_override_callback)
+ 

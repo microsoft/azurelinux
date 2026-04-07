@@ -1,0 +1,120 @@
+--- actix-web-4.12.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ actix-web-4.12.1/Cargo.toml	2025-12-11T20:10:44.192074+00:00
+@@ -47,11 +47,6 @@
+ features = [
+     "macros",
+     "openssl",
+-    "rustls-0_20",
+-    "rustls-0_21",
+-    "rustls-0_22",
+-    "rustls-0_23",
+-    "compress-brotli",
+     "compress-gzip",
+     "compress-zstd",
+     "cookies",
+@@ -88,10 +83,6 @@
+ __tls = []
+ compat = ["compat-routing-macros-force-pub"]
+ compat-routing-macros-force-pub = ["actix-web-codegen?/compat-routing-macros-force-pub"]
+-compress-brotli = [
+-    "actix-http/compress-brotli",
+-    "__compress",
+-]
+ compress-gzip = [
+     "actix-http/compress-gzip",
+     "__compress",
+@@ -103,7 +94,6 @@
+ cookies = ["dep:cookie"]
+ default = [
+     "macros",
+-    "compress-brotli",
+     "compress-gzip",
+     "compress-zstd",
+     "cookies",
+@@ -112,7 +102,6 @@
+     "compat",
+     "ws",
+ ]
+-experimental-io-uring = ["actix-server/io-uring"]
+ http2 = ["actix-http/http2"]
+ macros = [
+     "dep:actix-macros",
+@@ -125,35 +114,6 @@
+     "actix-tls/accept",
+     "actix-tls/openssl",
+ ]
+-rustls = ["rustls-0_20"]
+-rustls-0_20 = [
+-    "__tls",
+-    "http2",
+-    "actix-http/rustls-0_20",
+-    "actix-tls/accept",
+-    "actix-tls/rustls-0_20",
+-]
+-rustls-0_21 = [
+-    "__tls",
+-    "http2",
+-    "actix-http/rustls-0_21",
+-    "actix-tls/accept",
+-    "actix-tls/rustls-0_21",
+-]
+-rustls-0_22 = [
+-    "__tls",
+-    "http2",
+-    "actix-http/rustls-0_22",
+-    "actix-tls/accept",
+-    "actix-tls/rustls-0_22",
+-]
+-rustls-0_23 = [
+-    "__tls",
+-    "http2",
+-    "actix-http/rustls-0_23",
+-    "actix-tls/accept",
+-    "actix-tls/rustls-0_23",
+-]
+ secure-cookies = [
+     "cookies",
+     "cookie/secure",
+@@ -200,15 +160,6 @@
+ path = "examples/worker-cpu-pin.rs"
+ 
+ [[test]]
+-name = "compression"
+-path = "tests/compression.rs"
+-required-features = [
+-    "compress-brotli",
+-    "compress-gzip",
+-    "compress-zstd",
+-]
+-
+-[[test]]
+ name = "test-macro-import-conflict"
+ path = "tests/test-macro-import-conflict.rs"
+ 
+@@ -219,16 +170,6 @@
+ [[test]]
+ name = "test_httpserver"
+ path = "tests/test_httpserver.rs"
+-
+-[[test]]
+-name = "test_server"
+-path = "tests/test_server.rs"
+-required-features = [
+-    "compress-brotli",
+-    "compress-gzip",
+-    "compress-zstd",
+-    "cookies",
+-]
+ 
+ [[test]]
+ name = "test_streaming_response"
+@@ -406,9 +347,6 @@
+ version = "3"
+ features = ["openssl"]
+ 
+-[dev-dependencies.brotli]
+-version = "8"
+-
+ [dev-dependencies.const-str]
+ version = "0.5"
+ 

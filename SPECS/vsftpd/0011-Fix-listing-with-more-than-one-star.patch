@@ -1,0 +1,38 @@
+From 32e6642640635d7305969f808b5badb706a11bff Mon Sep 17 00:00:00 2001
+From: Martin Sehnoutka <msehnout@redhat.com>
+Date: Wed, 7 Sep 2016 11:36:17 +0200
+Subject: [PATCH 11/59] Fix listing with more than one star '*'.
+
+This is a regression introduced by some previous patch.
+---
+ ls.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/ls.c b/ls.c
+index f489478..616b2d9 100644
+--- a/ls.c
++++ b/ls.c
+@@ -311,6 +311,20 @@ vsf_filename_passes_filter(const struct mystr* p_filename_str,
+       {
+         goto out;
+       }
++      if (!must_match_at_current_pos && last_token == 0)
++      {
++        struct mystr last_str = INIT_MYSTR;
++        str_mid_to_end(&name_remain_str, &last_str,
++          str_getlen(&name_remain_str) - str_getlen(&s_match_needed_str));
++        locate_result = str_locate_str(&last_str, &s_match_needed_str);
++        str_free(&last_str);
++
++        if (locate_result.found)
++        {
++          ret = 1;
++        }
++        goto out;
++      }
+       /* Chop matched string out of remainder */
+       str_mid_to_end(&name_remain_str, &temp_str,
+                      indexx + str_getlen(&s_match_needed_str));
+-- 
+2.14.4
+

@@ -1,0 +1,154 @@
+From 351113b3a88befccca165314fc31a480159ad5a0 Mon Sep 17 00:00:00 2001
+From: anthony sottile <asottile@umich.edu>
+Date: Fri, 30 May 2025 12:29:30 +0200
+Subject: [PATCH] Support Python 3.14
+
+---
+ src/flake8/_compat.py             |  7 +++++++
+ src/flake8/checker.py             |  3 +++
+ src/flake8/processor.py           | 17 +++++++++++++---
+ tests/integration/test_plugins.py | 33 +++++++++++++++++++++++++++++++
+ 4 files changed, 57 insertions(+), 3 deletions(-)
+
+diff --git a/src/flake8/_compat.py b/src/flake8/_compat.py
+index f4a0903..163986c 100644
+--- a/src/flake8/_compat.py
++++ b/src/flake8/_compat.py
+@@ -9,3 +9,10 @@ if sys.version_info >= (3, 12):
+     FSTRING_END = tokenize.FSTRING_END
+ else:
+     FSTRING_START = FSTRING_MIDDLE = FSTRING_END = -1
++
++if sys.version_info >= (3, 14):  # pragma: >=3.14 cover
++    TSTRING_START = tokenize.TSTRING_START
++    TSTRING_MIDDLE = tokenize.TSTRING_MIDDLE
++    TSTRING_END = tokenize.TSTRING_END
++else:  # pragma: <3.14 cover
++    TSTRING_START = TSTRING_MIDDLE = TSTRING_END = -1
+diff --git a/src/flake8/checker.py b/src/flake8/checker.py
+index 6c4caef..323862a 100644
+--- a/src/flake8/checker.py
++++ b/src/flake8/checker.py
+@@ -21,6 +21,7 @@ from flake8 import exceptions
+ from flake8 import processor
+ from flake8 import utils
+ from flake8._compat import FSTRING_START
++from flake8._compat import TSTRING_START
+ from flake8.discover_files import expand_paths
+ from flake8.options.parse_args import parse_args
+ from flake8.plugins.finder import Checkers
+@@ -554,6 +555,8 @@ class FileChecker:
+         assert self.processor is not None
+         if token.type == FSTRING_START:  # pragma: >=3.12 cover
+             self.processor.fstring_start(token.start[0])
++        elif token.type == TSTRING_START:  # pragma: >=3.14 cover
++            self.processor.tstring_start(token.start[0])
+         # a newline token ends a single physical line.
+         elif processor.is_eol_token(token):
+             # if the file does not end with a newline, the NEWLINE
+diff --git a/src/flake8/processor.py b/src/flake8/processor.py
+index 2d5af90..01eb863 100644
+--- a/src/flake8/processor.py
++++ b/src/flake8/processor.py
+@@ -14,6 +14,8 @@ from flake8 import defaults
+ from flake8 import utils
+ from flake8._compat import FSTRING_END
+ from flake8._compat import FSTRING_MIDDLE
++from flake8._compat import TSTRING_END
++from flake8._compat import TSTRING_MIDDLE
+ from flake8.plugins.finder import LoadedPlugin
+ 
+ LOG = logging.getLogger(__name__)
+@@ -117,7 +119,7 @@ class FileProcessor:
+         self._file_tokens: list[tokenize.TokenInfo] | None = None
+         # map from line number to the line we'll search for `noqa` in
+         self._noqa_line_mapping: dict[int, str] | None = None
+-        self._fstring_start = -1
++        self._fstring_start = self._tstring_start = -1
+ 
+     @property
+     def file_tokens(self) -> list[tokenize.TokenInfo]:
+@@ -134,12 +136,18 @@ class FileProcessor:
+         """Signal the beginning of an fstring."""
+         self._fstring_start = lineno
+ 
++    def tstring_start(self, lineno: int) -> None:  # pragma: >=3.14 cover
++        """Signal the beginning of an tstring."""
++        self._tstring_start = lineno
++
+     def multiline_string(
+         self, token: tokenize.TokenInfo
+     ) -> Generator[str, None, None]:
+         """Iterate through the lines of a multiline string."""
+         if token.type == FSTRING_END:
+             start = self._fstring_start
++        elif token.type == TSTRING_END:  # pragma: >=3.14 cover
++            start = self._tstring_start
+         else:
+             start = token.start[0]
+ 
+@@ -209,7 +217,10 @@ class FileProcessor:
+                 continue
+             if token_type == tokenize.STRING:
+                 text = mutate_string(text)
+-            elif token_type == FSTRING_MIDDLE:
++            elif token_type in {
++                FSTRING_MIDDLE,
++                TSTRING_MIDDLE,
++            }:  # pragma: >=3.12 cover  # noqa: E501
+                 # A curly brace in an FSTRING_MIDDLE token must be an escaped
+                 # curly brace. Both 'text' and 'end' will account for the
+                 # escaped version of the token (i.e. a single brace) rather
+@@ -401,7 +412,7 @@ def is_eol_token(token: tokenize.TokenInfo) -> bool:
+ 
+ def is_multiline_string(token: tokenize.TokenInfo) -> bool:
+     """Check if this is a multiline string."""
+-    return token.type == FSTRING_END or (
++    return token.type in {FSTRING_END, TSTRING_END} or (
+         token.type == tokenize.STRING and "\n" in token.string
+     )
+ 
+diff --git a/tests/integration/test_plugins.py b/tests/integration/test_plugins.py
+index 90ca555..471cab8 100644
+--- a/tests/integration/test_plugins.py
++++ b/tests/integration/test_plugins.py
+@@ -296,3 +296,36 @@ t.py:1:1: T001 "f'xxxxxxxxxxxxxxxxxxxxxxxx'"
+ """
+     out, err = capsys.readouterr()
+     assert out == expected
++
++
++@pytest.mark.xfail(sys.version_info < (3, 14), reason="3.14+")
++def test_tstring_logical_line(tmpdir, capsys):  # pragma: >=3.14 cover
++    cfg_s = f"""\
++[flake8]
++extend-ignore = F
++[flake8:local-plugins]
++extension =
++    T = {yields_logical_line.__module__}:{yields_logical_line.__name__}
++"""
++
++    cfg = tmpdir.join("tox.ini")
++    cfg.write(cfg_s)
++
++    src = """\
++t'''
++hello {world}
++'''
++t'{{"{hello}": "{world}"}}'
++"""
++    t_py = tmpdir.join("t.py")
++    t_py.write_binary(src.encode())
++
++    with tmpdir.as_cwd():
++        assert main(("t.py", "--config", str(cfg))) == 1
++
++    expected = """\
++t.py:1:1: T001 "t'''xxxxxxx{world}x'''"
++t.py:4:1: T001 "t'xxx{hello}xxxx{world}xxx'"
++"""
++    out, err = capsys.readouterr()
++    assert out == expected
+-- 
+2.49.0
+

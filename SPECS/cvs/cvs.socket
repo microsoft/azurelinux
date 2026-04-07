@@ -1,0 +1,10 @@
+[Unit]
+Description=CVS Server Activation Socket
+PartOf=cvs.target
+
+[Socket]
+ListenStream=2401
+Accept=true
+
+[Install]
+WantedBy=sockets.target

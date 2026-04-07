@@ -1,0 +1,18 @@
+--- open-5.3.3/Cargo.toml	1970-01-01T00:00:01+00:00
++++ open-5.3.3/Cargo.toml	2025-11-24T14:33:11.640773+00:00
+@@ -39,7 +39,7 @@
+ repository = "https://github.com/Byron/open-rs"
+ 
+ [features]
+-shellexecute-on-windows = ["dep:dunce"]
++shellexecute-on-windows = []
+ 
+ [lib]
+ name = "open"
+@@ -60,6 +60,3 @@
+ [target."cfg(unix)".dependencies.libc]
+ version = "0.2"
+ 
+-[target."cfg(windows)".dependencies.dunce]
+-version = "1"
+-optional = true

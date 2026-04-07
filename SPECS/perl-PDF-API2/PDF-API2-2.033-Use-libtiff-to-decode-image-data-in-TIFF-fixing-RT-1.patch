@@ -1,0 +1,691 @@
+diff --git a/Makefile.PL b/Makefile.PL
+index 62e446b..bf68aa5 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -18,7 +18,8 @@ my %WriteMakefileArgs = (
+   "NAME" => "PDF::API2",
+   "PREREQ_PM" => {
+     "Compress::Zlib" => "1.0",
+-    "Font::TTF" => 0
++    "Font::TTF" => 0,
++    "Graphics::TIFF" => 0,
+   },
+   "TEST_REQUIRES" => {
+     "Test::Exception" => 0,
+diff --git a/lib/PDF/API2/Resource/XObject/Image/TIFF.pm b/lib/PDF/API2/Resource/XObject/Image/TIFF.pm
+index fd283a5..469ab23 100644
+--- a/lib/PDF/API2/Resource/XObject/Image/TIFF.pm
++++ b/lib/PDF/API2/Resource/XObject/Image/TIFF.pm
+@@ -14,6 +14,7 @@ use Compress::Zlib;
+ use PDF::API2::Basic::PDF::Utils;
+ use PDF::API2::Resource::XObject::Image::TIFF::File;
+ use PDF::API2::Util;
++use Graphics::TIFF ':all';
+ use Scalar::Util qw(weaken);
+ 
+ =head1 NAME
+@@ -54,140 +55,31 @@ sub new {
+     return $self;
+ }
+ 
+-sub deLZW {
+-    my ($ibits, $stream) = @_;
+-    my $bits = $ibits;
+-    my $resetcode = 1 << ($ibits - 1);
+-    my $endcode = $resetcode + 1;
+-    my $nextcode = $endcode + 1;
+-    my $ptr = 0;
+-    $stream = unpack('B*', $stream);
+-    my $maxptr = length($stream);
+-    my $tag;
+-    my $out = '';
+-    my $outptr = 0;
+-
+-    # print STDERR "reset=$resetcode\nend=$endcode\nmax=$maxptr\n";
+-
+-    my @d = map { chr($_) } (0 .. $resetcode - 1);
+-
+-    while (($ptr + $bits) <= $maxptr) {
+-        $tag=0;
+-        foreach my $off (reverse 1 .. $bits) {
+-            $tag <<= 1;
+-            $tag |= substr($stream, $ptr + $bits - $off, 1);
+-        }
+-        # print STDERR "ptr=$ptr,tag=$tag,bits=$bits,next=$nextcode\n";
+-        # print STDERR "tag to large\n" if($tag>$nextcode);
+-        $ptr += $bits;
+-        if ($tag == $resetcode) {
+-            $bits = $ibits;
+-            $nextcode = $endcode + 1;
+-            next;
+-        }
+-        elsif ($tag == $endcode) {
+-            last;
+-        }
+-        elsif ($tag < $resetcode) {
+-            $d[$nextcode] = $d[$tag];
+-            $out .= $d[$nextcode];
+-            $nextcode++;
+-        }
+-        elsif ($tag > $endcode) {
+-            $d[$nextcode] = $d[$tag];
+-            $d[$nextcode] .= substr($d[$tag + 1], 0, 1);
+-            $out .= $d[$nextcode];
+-            $nextcode++;
+-        }
+-        $bits++ if $nextcode == (1 << $bits);
+-    }
+-    return $out;
+-}
+-
+ sub handle_generic {
+     my ($self, $pdf, $tif) = @_;
+ 
+-    if ($tif->{'filter'}) {
+-        # should we die here?
+-        # die "unknown tiff-compression";
+-        $self->filters($tif->{filter});
+-        $self->{' nofilt'} = 1;
+-    }
+-    else {
+-        $self->filters('FlateDecode');
+-    }
+-
+-    if (ref($tif->{'imageOffset'})) {
+-        $self->{' stream'} = '';
+-        my $d = scalar @{$tif->{'imageOffset'}};
+-        foreach (1..$d) {
+-            my $buf;
+-            $tif->{'fh'}->seek(shift(@{$tif->{'imageOffset'}}), 0);
+-            $tif->{'fh'}->read($buf, shift(@{$tif->{'imageLength'}}));
+-            $self->{' stream'} .= $buf;
+-        }
+-    }
+-    else {
+-        $tif->{'fh'}->seek($tif->{'imageOffset'}, 0);
+-        $tif->{'fh'}->read($self->{' stream'}, $tif->{'imageLength'});
+-    }
+-
+-    return $self;
+-}
+-
+-sub handle_flate {
+-    my ($self, $pdf, $tif) = @_;
+     $self->filters('FlateDecode');
+ 
+-    if (ref($tif->{'imageOffset'})) {
+-        $self->{' stream'} = '';
+-        my $d = scalar @{$tif->{'imageOffset'}};
+-        foreach (1 .. $d) {
+-            my $buf;
+-            $tif->{'fh'}->seek(shift(@{$tif->{'imageOffset'}}),0);
+-            $tif->{'fh'}->read($buf, shift(@{$tif->{'imageLength'}}));
+-            $buf=uncompress($buf);
+-            $self->{' stream'} .= $buf;
+-        }
+-    }
+-    else {
+-        $tif->{'fh'}->seek($tif->{'imageOffset'}, 0);
+-        $tif->{'fh'}->read($self->{' stream'}, $tif->{'imageLength'});
+-        $self->{' stream'} = uncompress($self->{' stream'});
+-    }
+-
+-    return $self;
+-}
+-
+-sub handle_lzw {
+-    my ($self, $pdf, $tif) = @_;
+-    $self->filters('FlateDecode');
+-    my $imageWidth = $tif->{'imageWidth'};
+-    my $mod = $imageWidth % 8;
+-    if ($mod > 0) {
+-        $imageWidth += 8 - $mod;
++    my $stripcount = $tif->{object}->NumberOfStrips();
++    my $buffer = '';
++    for my $i ( 0 .. $stripcount - 1 ) {
++        $buffer .= $tif->{object}->ReadEncodedStrip( $i, -1 );
+     }
+-    my $max_raw_strip = $imageWidth * $tif->{'bitsPerSample'} * $tif->{'RowsPerStrip'} / 8;
+ 
+-    if (ref($tif->{'imageOffset'})) {
+-        $self->{' stream'}='';
+-        my $d = scalar @{$tif->{'imageOffset'}};
+-        foreach (1 .. $d) {
+-            my $buf;
+-            $tif->{'fh'}->seek(shift(@{$tif->{imageOffset}}), 0);
+-            $tif->{'fh'}->read($buf, shift(@{$tif->{'imageLength'}}));
+-            $buf = deLZW(9, $buf);
+-            if (length($buf) > $max_raw_strip) {
+-                $buf = substr($buf, 0, $max_raw_strip);
++    if ($tif->{SamplesPerPixel} == $tif->{bitsPerSample} + 1) {
++        if ($tif->{ExtraSamples} == EXTRASAMPLE_ASSOCALPHA) {
++            if ($tif->{bitsPerSample} == 1) {
++                $buffer = sample_greya_to_a($buffer);
++            }
++            else {
++                warn "Don't know what to do with RGBA image\n";
+             }
+-            $self->{' stream'} .= $buf;
++        }
++        else {
++            warn "Don't know what to do with alpha layer in TIFF\n";
+         }
+     }
+-    else {
+-        $tif->{'fh'}->seek($tif->{'imageOffset'}, 0);
+-        $tif->{'fh'}->read($self->{' stream'}, $tif->{'imageLength'});
+-        $self->{' stream'} = deLZW(9, $self->{' stream'});
+-    }
++    $self->{' stream'} .= $buffer;
+ 
+     return $self;
+ }
+@@ -213,8 +105,10 @@ sub handle_ccitt {
+         die "chunked ccitt g4 tif not supported.";
+     }
+     else {
+-        $tif->{'fh'}->seek($tif->{'imageOffset'}, 0);
+-        $tif->{'fh'}->read($self->{' stream'}, $tif->{'imageLength'});
++        my $stripcount = $tif->{object}->NumberOfStrips();
++        for my $i ( 0 .. $stripcount - 1 ) {
++            $self->{' stream'} .= $tif->{object}->ReadRawStrip( $i, -1 );
++        }
+     }
+ 
+     return $self;
+@@ -257,61 +151,13 @@ sub read_tiff {
+     if (defined $tif->{'filter'} and $tif->{'filter'} eq 'CCITTFaxDecode') {
+         $self->handle_ccitt($pdf, $tif);
+     }
+-    elsif (defined $tif->{'filter'} and $tif->{'filter'} eq 'LZWDecode') {
+-        $self->handle_lzw($pdf, $tif);
+-    }
+-    elsif (defined $tif->{'filter'} and $tif->{filter} eq 'FlateDecode') {
+-        $self->handle_flate($pdf, $tif);
+-    }
+     else {
+         $self->handle_generic($pdf, $tif);
+     }
+ 
+-    if ($tif->{'fillOrder'} == 2) {
+-        my @bl = ();
+-        foreach my $n (0 .. 255) {
+-            my $b = $n;
+-            my $f = 0;
+-            foreach (0 .. 7) {
+-                my $bit = 0;
+-                if ($b & 0x1) {
+-                    $bit = 1;
+-                }
+-                $b >>= 1;
+-                $f <<= 1;
+-                $f |= $bit;
+-            }
+-            $bl[$n] = $f;
+-        }
+-        my $l = length($self->{' stream'}) - 1;
+-        foreach my $n (0 .. $l) {
+-            vec($self->{' stream'}, $n, 8) = $bl[vec($self->{' stream'}, $n, 8)];
+-        }
+-    }
+     $self->{' tiff'} = $tif;
+ 
+     return $self;
+ }
+ 
+-=item $value = $tif->tiffTag $tag
+-
+-returns the value of the internal tiff-tag.
+-
+-B<Useful Tags:>
+-
+-    imageDescription, imageId (strings)
+-    xRes, yRes (dpi; pixel/cm if resUnit==3)
+-    resUnit
+-
+-=cut
+-
+-sub tiffTag {
+-    my ($self, $tag) = @_;
+-    return $self->{' tiff'}->{$tag};
+-}
+-
+-=back
+-
+-=cut
+-
+ 1;
+diff --git a/lib/PDF/API2/Resource/XObject/Image/TIFF/File.pm b/lib/PDF/API2/Resource/XObject/Image/TIFF/File.pm
+index a3b5ef6..a45a4d8 100644
+--- a/lib/PDF/API2/Resource/XObject/Image/TIFF/File.pm
++++ b/lib/PDF/API2/Resource/XObject/Image/TIFF/File.pm
+@@ -6,43 +6,16 @@ use warnings;
+ our $VERSION = '2.048'; # VERSION
+ 
+ use IO::File;
++use Graphics::TIFF ':all';
+ 
+ sub new {
+     my ($class, $file) = @_;
+ 
+     my $self = {};
+     bless($self, $class);
+-    if (ref($file)) {
+-        $self->{'fh'} = $file;
+-        seek($self->{'fh'}, 0, 0);
+-    }
+-    else {
+-        $self->{'fh'} = IO::File->new();
+-        open($self->{'fh'}, '<', $file) or die "$!: $file";
+-    }
+-    binmode($self->{'fh'}, ':raw');
+-    my $fh = $self->{'fh'};
+-
+-    $self->{'offset'} = 0;
+-    $fh->seek($self->{'offset'}, 0);
+-
+-    # checking byte order of data
+-    $fh->read($self->{'byteOrder'}, 2);
+-    $self->{'byte'} = 'C';
+-    $self->{'short'} = (($self->{'byteOrder'} eq 'MM') ? 'n' : 'v' );
+-    $self->{'long'} = (($self->{'byteOrder'} eq 'MM') ? 'N' : 'V' );
+-    $self->{'rational'} = (($self->{'byteOrder'} eq 'MM') ? 'NN' : 'VV' );
+-
+-    # get/check version id
+-    $fh->read($self->{'version'}, 2);
+-    $self->{'version'} = unpack($self->{'short'}, $self->{'version'});
+-    die "Wrong TIFF Id '$self->{version}' (should be 42)." if $self->{'version'} != 42;
+-
+-    # get the offset to the first tag directory.
+-    $fh->read($self->{'ifdOffset'}, 4);
+-    $self->{'ifdOffset'} = unpack($self->{'long'}, $self->{'ifdOffset'});
+-
+-    $self->readTags();
++    die "Error: $file not found" unless (-r $file);
++    $self->{object} = Graphics::TIFF->Open( $file, 'r' );
++    $self->readTags;
+ 
+     return $self;
+ }
+@@ -81,199 +54,91 @@ sub readTag {
+ 
+ sub close { ## no critic
+     my $self = shift();
+-    return $self->{'fh'}->close();
++    $self->{object}->Close;
++    delete $self->{object};
+ }
+ 
+ sub readTags {
+     my $self = shift();
+-    my $fh = $self->{'fh'};
+-    $self->{'fillOrder'} = 1;
+-    $self->{'ifd'} = $self->{'ifdOffset'};
+ 
+-    while ($self->{'ifd'} > 0) {
+-        $fh->seek($self->{'ifd'}, 0);
+-        $fh->read($self->{'ifdNum'}, 2);
+-        $self->{'ifdNum'} = unpack($self->{'short'}, $self->{'ifdNum'});
+-        $self->{'bitsPerSample'} = 1;
+-        foreach (1 .. $self->{'ifdNum'}) {
+-            my ($valTag, $valType, $valCount, $valLen, $valOffset) = $self->readTag();
+-            # print "tag=$valTag type=$valType count=$valCount len=$valLen off=$valOffset\n";
+-            if ($valTag == 0) {
+-            }
+-            elsif ($valTag == 256) {
+-                $self->{'imageWidth'} = $valOffset;
+-            }
+-            elsif ($valTag == 257) {
+-                $self->{'imageHeight'} = $valOffset;
+-            }
+-            elsif ($valTag == 258) {
+-                # bits per sample
+-                if ($valCount > 1) {
+-                    my $here = $fh->tell();
+-                    my $val;
+-                    $fh->seek($valOffset, 0);
+-                    $fh->read($val, 2);
+-                    $self->{'bitsPerSample'} = unpack($self->{'short'}, $val);
+-                    $fh->seek($here, 0);
+-                }
+-                else {
+-                    $self->{'bitsPerSample'} = $valOffset;
+-                }
+-            }
+-            elsif ($valTag == 259) {
+-                # compression
+-                $self->{'filter'} = $valOffset;
+-                if ($valOffset == 1) {
+-                    delete $self->{'filter'};
+-                }
+-                elsif ($valOffset == 3 || $valOffset == 4) {
+-                    $self->{'filter'} = 'CCITTFaxDecode';
+-                    $self->{'ccitt'} = $valOffset;
+-                }
+-                elsif ($valOffset == 5) {
+-                    $self->{'filter'} = 'LZWDecode';
+-                }
+-                elsif ($valOffset == 6 || $valOffset == 7) {
+-                    $self->{'filter'} = 'DCTDecode';
+-                }
+-                elsif ($valOffset == 8 || $valOffset == 0x80b2) {
+-                    $self->{'filter'} = 'FlateDecode';
+-                }
+-                elsif ($valOffset == 32773) {
+-                    $self->{'filter'} = 'RunLengthDecode';
+-                }
+-                else {
+-                    die "unknown/unsupported TIFF compression method with id '$self->{filter}'.";
+-                }
+-            }
+-            elsif ($valTag == 262) {
+-                # photometric interpretation
+-                $self->{'colorSpace'} = $valOffset;
+-                if ($valOffset == 0) {
+-                    $self->{'colorSpace'} = 'DeviceGray';
+-                    $self->{'whiteIsZero'} = 1;
+-                }
+-                elsif ($valOffset == 1) {
+-                    $self->{'colorSpace'} = 'DeviceGray';
+-                    $self->{'blackIsZero'} = 1;
+-                }
+-                elsif ($valOffset == 2) {
+-                    $self->{'colorSpace'} = 'DeviceRGB';
+-                }
+-                elsif($valOffset == 3) {
+-                    $self->{'colorSpace'} = 'Indexed';
+-                }
+-                # elsif($valOffset == 4) {
+-                #     $self->{'colorSpace'} = 'TransMask';
+-                # }
+-                elsif ($valOffset == 5) {
+-                    $self->{'colorSpace'} = 'DeviceCMYK';
+-                }
+-                elsif($valOffset == 6) {
+-                    $self->{'colorSpace'} = 'DeviceRGB';
+-                }
+-                elsif ($valOffset == 8) {
+-                    $self->{'colorSpace'} = 'Lab';
+-                }
+-                else {
+-                    die "unknown/unsupported TIFF photometric interpretation with id '$self->{colorSpace}'.";
+-                }
+-            }
+-            elsif ($valTag == 266) {
+-                $self->{'fillOrder'} = $valOffset;
+-            }
+-            elsif ($valTag == 270) {
+-                # ImageDescription
+-                my $here = $fh->tell();
+-                $fh->seek($valOffset, 0);
+-                $fh->read($self->{'imageDescription'}, $valLen);
+-                $fh->seek($here, 0);
+-            }
+-            elsif($valTag == 282) {
+-                # xRes
+-                my $here = $fh->tell();
+-                $fh->seek($valOffset, 0);
+-                $fh->read($self->{'xRes'}, $valLen);
+-                $fh->seek($here, 0);
+-                $self->{'xRes'} = [unpack($self->{'rational'}, $self->{'xRes'})];
+-                $self->{'xRes'} = ($self->{'xRes'}->[0] / $self->{'xRes'}->[1]);
+-            }
+-            elsif($valTag == 283) {
+-                # yRes
+-                my $here = $fh->tell();
+-                $fh->seek($valOffset, 0);
+-                $fh->read($self->{'yRes'}, $valLen);
+-                $fh->seek($here, 0);
+-                $self->{'yRes'} = [unpack($self->{'rational'}, $self->{'yRes'})];
+-                $self->{'yRes'} = ($self->{'yRes'}->[0] / $self->{'yRes'}->[1]);
+-            }
+-            elsif ($valTag == 296) {
+-                # resolution Unit
+-                $self->{'resUnit'} = $valOffset;
+-            }
+-            elsif ($valTag == 273) {
+-                # image data offset/strip offsets
+-                if ($valCount == 1) {
+-                    $self->{'imageOffset'} = $valOffset;
+-                }
+-                else {
+-                    my $here =$fh->tell();
+-                    my $val;
+-                    $fh->seek($valOffset, 0);
+-                    $fh->read($val, $valLen);
+-                    $fh->seek($here, 0);
+-                    $self->{'imageOffset'} = [unpack($self->{'long'} . '*', $val)];
+-                }
+-            }
+-            elsif ($valTag == 277) {
+-                $self->{'samplesPerPixel'} = $valOffset;
+-            }
+-            elsif ($valTag == 278) {
+-                $self->{'RowsPerStrip'} = $valOffset;
+-            }
+-            elsif ($valTag == 279) {
+-                # image data length/strip lengths
+-                if ($valCount == 1) {
+-                    $self->{'imageLength'} = $valOffset;
+-                }
+-                else {
+-                    my $here = $fh->tell();
+-                    my $val;
+-                    $fh->seek($valOffset, 0);
+-                    $fh->read($val, $valLen);
+-                    $fh->seek($here, 0);
+-                    $self->{'imageLength'} = [unpack($self->{'long'} . '*', $val)];
+-                }
+-            }
+-            elsif ($valTag == 292) {
+-                $self->{'g3Options'} = $valOffset;
+-            }
+-            elsif ($valTag == 293) {
+-                $self->{'g4Options'} = $valOffset;
+-            }
+-            elsif ($valTag == 320) {
+-                # color map
+-                $self->{'colorMapOffset'} = $valOffset;
+-                $self->{'colorMapSamples'} = $valCount;
+-                $self->{'colorMapLength'} = $valCount * 2; # shorts!
+-            }
+-            elsif ($valTag == 317) {
+-                $self->{'lzwPredictor'} = $valOffset;
+-            }
+-            elsif ($valTag == 0x800d) {
+-                # imageID
+-                my $here = $fh->tell();
+-                $fh->seek($valOffset, 0);
+-                $fh->read($self->{'imageId'}, $valLen);
+-                $fh->seek($here, 0);
+-            }
+-            # else {
+-            #     print "tag=$valTag, type=$valType, len=$valLen\n";
+-            # }
+-        }
+-        $fh->read($self->{'ifd'}, 4);
+-        $self->{'ifd'} = unpack($self->{'long'}, $self->{'ifd'});
++    $self->{imageWidth}=$self->{object}->GetField(TIFFTAG_IMAGEWIDTH);
++    $self->{imageHeight}=$self->{object}->GetField(TIFFTAG_IMAGELENGTH);
++    $self->{bitsPerSample}=$self->{object}->GetField(TIFFTAG_BITSPERSAMPLE);
++    $self->{SamplesPerPixel}=$self->{object}->GetField(TIFFTAG_SAMPLESPERPIXEL);
++    $self->{ExtraSamples}=$self->{object}->GetField(TIFFTAG_EXTRASAMPLES);
++
++    $self->{filter}=$self->{object}->GetField(TIFFTAG_COMPRESSION);
++    if ($self->{filter}==COMPRESSION_NONE) {
++        delete $self->{filter};
++    }
++    elsif ($self->{filter}==COMPRESSION_CCITTFAX3 || $self->{filter}==COMPRESSION_CCITT_T4) {
++        $self->{filter}='CCITTFaxDecode';
++        $self->{ccitt}=$self->{filter};
++    }
++    elsif ($self->{filter}==COMPRESSION_LZW) {
++        $self->{filter}='LZWDecode';
++    }
++    elsif ($self->{filter}==COMPRESSION_OJPEG || $self->{filter}==COMPRESSION_JPEG) {
++        $self->{filter}='DCTDecode';
++    }
++    elsif ($self->{filter}==COMPRESSION_ADOBE_DEFLATE || $self->{filter}==COMPRESSION_DEFLATE) {
++        $self->{filter}='FlateDecode';
+     }
++    elsif ($self->{filter}==COMPRESSION_PACKBITS) {
++        $self->{filter}='RunLengthDecode';
++    }
++    else {
++        die "unknown/unsupported TIFF compression method with id '$self->{filter}'.";
++    }
++
++    $self->{colorSpace}=$self->{object}->GetField(TIFFTAG_PHOTOMETRIC);
++    if ($self->{colorSpace}==PHOTOMETRIC_MINISWHITE) {
++        $self->{colorSpace}='DeviceGray';
++        $self->{whiteIsZero}=1;
++    }
++    elsif ($self->{colorSpace}==PHOTOMETRIC_MINISBLACK) {
++        $self->{colorSpace}='DeviceGray';
++        $self->{blackIsZero}=1;
++    }
++    elsif ($self->{colorSpace}==PHOTOMETRIC_RGB) {
++        $self->{colorSpace}='DeviceRGB';
++    }
++    elsif ($self->{colorSpace}==PHOTOMETRIC_PALETTE) {
++        $self->{colorSpace}='Indexed';
++    }
++    #  elsif($self->{colorSpace}==PHOTOMETRIC_MASK) {
++    #    $self->{colorSpace}='TransMask';
++    elsif ($self->{colorSpace}==PHOTOMETRIC_SEPARATED) {
++        $self->{colorSpace}='DeviceCMYK';
++    }
++    elsif ($self->{colorSpace}==PHOTOMETRIC_YCBCR) {
++        $self->{colorSpace}='DeviceRGB';
++    }
++    elsif($self->{colorSpace}==PHOTOMETRIC_CIELAB) {
++        $self->{colorSpace}='Lab';
++    }
++    else {
++        die "unknown/unsupported TIFF photometric interpretation with id '$self->{colorSpace}'.";
++    }
++
++    $self->{fillOrder}=$self->{object}->GetField(TIFFTAG_FILLORDER);
++    $self->{imageDescription}=$self->{object}->GetField(TIFFTAG_IMAGEDESCRIPTION);
++    $self->{xRes}=$self->{object}->GetField(TIFFTAG_XRESOLUTION);
++    $self->{yRes}=$self->{object}->GetField(TIFFTAG_YRESOLUTION);
++    $self->{resUnit}=$self->{object}->GetField(TIFFTAG_RESOLUTIONUNIT);
++    $self->{imageOffset}=$self->{object}->GetField(TIFFTAG_STRIPOFFSETS);
++    $self->{samplesPerPixel}=$self->{object}->GetField(TIFFTAG_SAMPLESPERPIXEL);
++    $self->{RowsPerStrip}=$self->{object}->GetField(TIFFTAG_ROWSPERSTRIP);
++    $self->{imageLength}=$self->{object}->GetField(TIFFTAG_STRIPBYTECOUNTS);
++    $self->{g3Options}=$self->{object}->GetField(TIFFTAG_GROUP3OPTIONS);
++    $self->{g4Options}=$self->{object}->GetField(TIFFTAG_GROUP4OPTIONS);
++
++    $self->{colorMapOffset}=$self->{object}->GetField(TIFFTAG_COLORMAP);
++    $self->{colorMapSamples}=$#{$self->{colorMapOffset}}+1;
++    $self->{colorMapLength}=$self->{colorMapSamples}*2; # shorts!
++
++    $self->{lzwPredictor}=$self->{object}->GetField(TIFFTAG_PREDICTOR);
++    $self->{imageId}=$self->{object}->GetField(TIFFTAG_OPIIMAGEID);
+ 
+     return $self;
+ }
+diff --git a/t/tiff.t b/t/tiff.t
+index b39501c..1cb5fd8 100644
+--- a/t/tiff.t
++++ b/t/tiff.t
+@@ -1,4 +1,4 @@
+-use Test::More tests => 8;
++use Test::More tests => 9;
+ 
+ use warnings;
+ use strict;
+@@ -21,19 +21,6 @@ $gfx->image($tiff, 72, 144, 216, 288);
+ like($pdf->to_string(), qr/q 216 0 0 288 72 144 cm \S+ Do Q/,
+      q{Add TIFF to PDF});
+ 
+-# Filehandle
+-
+-$pdf = PDF::API2->new();
+-open my $fh, '<', 't/resources/1x1.tif';
+-$tiff = $pdf->image_tiff($fh);
+-isa_ok($tiff, 'PDF::API2::Resource::XObject::Image::TIFF',
+-       q{$pdf->image_tiff(filehandle)});
+-
+-is($tiff->width(), 1,
+-   q{Image from filehandle has a width});
+-
+-close $fh;
+-
+ # LZW Compression
+ 
+ $pdf = PDF::API2->new(-compress => 0);
+@@ -53,3 +40,72 @@ like($pdf->to_string(), qr/q 216 0 0 432 72 360 cm \S+ Do Q/,
+ $pdf = PDF::API2->new();
+ eval { $pdf->image_tiff('t/resources/this.file.does.not.exist') };
+ ok($@, q{Fail fast if the requested file doesn't exist});
++
++##############################################################
++
++my $width = 568;
++my $height = 1000;
++$tiff = 'test.tif';
++my $pdfout = 'test.pdf';
++
++SKIP: {
++    skip "tiff2pdf doesn't deal with the alpha layer properly either in this case", 1;
++system(sprintf"convert -depth 1 -gravity center -pointsize 78 -size %dx%d caption:'Lorem ipsum etc etc' %s", $width, $height, $tiff);
++$pdf = PDF::API2->new(-file => $pdfout);
++my $page = $pdf->page;
++$page->mediabox( $width, $height );
++$gfx = $page->gfx;
++my $img = $pdf->image_tiff($tiff);
++$gfx->image( $img, 0, 0, $width, $height );
++$pdf->save;
++$pdf->end;
++
++my $example = `convert $pdfout -depth 1 -resize 1x1 txt:-`;
++my $expected = `convert $tiff -depth 1 -resize 1x1 txt:-`;
++
++is($example, $expected, 'alpha');
++}
++
++##############################################################
++
++SKIP: {
++    skip "files created with tiffcp -c g3 previously produced the 'message chunked ccitt g4 tif not supported'", 1;
++system(sprintf"convert -depth 1 -gravity center -pointsize 78 -size %dx%d caption:'Lorem ipsum etc etc' -background white -alpha off %s", $width, $height, $tiff);
++system("tiffcp -c g3 $tiff tmp.tif && mv tmp.tif $tiff");
++$pdf = PDF::API2->new(-file => $pdfout);
++my $page = $pdf->page;
++$page->mediabox( $width, $height );
++$gfx = $page->gfx;
++my $img = $pdf->image_tiff($tiff);
++$gfx->image( $img, 0, 0, $width, $height );
++$pdf->save;
++$pdf->end;
++
++my $example = `convert $pdfout -depth 1 -resize 1x1 txt:-`;
++my $expected = `convert $tiff -depth 1 -resize 1x1 txt:-`;
++
++is($example, $expected, 'g3 (not converted to flate)');
++}
++##############################################################
++
++system(sprintf"convert -depth 1 -gravity center -pointsize 78 -size %dx%d caption:'Lorem ipsum etc etc' -background white -alpha off %s", $width, $height, $tiff);
++system("tiffcp -c lzw $tiff tmp.tif && mv tmp.tif $tiff");
++$pdf = PDF::API2->new(-file => $pdfout);
++my $page = $pdf->page;
++$page->mediabox( $width, $height );
++$gfx = $page->gfx;
++my $img = $pdf->image_tiff($tiff);
++$gfx->image( $img, 0, 0, $width, $height );
++$pdf->save;
++$pdf->end;
++
++my $example = `convert $pdfout -depth 1 -colorspace gray -alpha off -resize 1x1 txt:-`;
++my $expected = `convert $tiff -depth 1 -resize 1x1 txt:-`;
++
++is($example, $expected, 'lzw (converted to flate)');
++
++##############################################################
++
++unlink $pdfout, $tiff;
++
++##############################################################

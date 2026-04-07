@@ -1,0 +1,53 @@
+From b5c8dfe16456fbd9d360cec492f869f42f401053 Mon Sep 17 00:00:00 2001
+From: Viktor Ashirov <vashirov@redhat.com>
+Date: Fri, 30 Jan 2026 12:00:13 +0100
+Subject: [PATCH] Issue 7027 - (2nd) 389-ds-base OpenScanHub Leaks Detected
+ (#7211)
+
+Fix Description:
+Update coverity annotations.
+
+Relates: https://github.com/389ds/389-ds-base/issues/7027
+
+Reviewed by: @aadhikar (Thanks!)
+---
+ ldap/servers/slapd/log.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/ldap/servers/slapd/log.c b/ldap/servers/slapd/log.c
+index ea744ac1e..80c07382a 100644
+--- a/ldap/servers/slapd/log.c
++++ b/ldap/servers/slapd/log.c
+@@ -206,8 +206,8 @@ compress_log_file(char *log_name, int32_t mode)
+ 
+     if ((source = fopen(log_name, "r")) == NULL) {
+         /* Failed to open log file */
+-        /* coverity[leaked_storage] gzclose does close FD */
+         gzclose(outfile);
++        /* coverity[leaked_handle] gzclose does close FD */
+         return -1;
+     }
+ 
+@@ -217,17 +217,17 @@ compress_log_file(char *log_name, int32_t mode)
+         if (bytes_written == 0)
+         {
+             fclose(source);
+-            /* coverity[leaked_storage] gzclose does close FD */
+             gzclose(outfile);
++            /* coverity[leaked_handle] gzclose does close FD */
+             return -1;
+         }
+         bytes_read = fread(buf, 1, LOG_CHUNK, source);
+     }
+-    /* coverity[leaked_storage] gzclose does close FD */
+     gzclose(outfile);
+     fclose(source);
+     PR_Delete(log_name); /* remove the old uncompressed log */
+ 
++    /* coverity[leaked_handle] gzclose does close FD */
+     return 0;
+ }
+ 
+-- 
+2.52.0
+

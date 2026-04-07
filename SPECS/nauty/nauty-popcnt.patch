@@ -1,0 +1,2613 @@
+Description: enable runtime detection of popcnt-enabled CPU
+Origin: fedora
+Author: Jerry James <loganjerry@gmail.com>
+Last-Update: 2026-01-08
+
+--- a/addedgeg.c
++++ b/addedgeg.c
+@@ -75,6 +75,17 @@ no4path(graph *g, int m, int n, int v, i
+ 
+ /*************************************************************************/
+ 
++STATIC_POPCNTFUNC(int,
++compute_degree,(const graph *g, int m),
++{
++    int i, deg = 0;
++    for (i = 0; i < m; ++i)
++        deg += POPCOUNT(g[i]);
++    return deg;
++})
++
++/*************************************************************************/
++
+ int
+ main(int argc, char *argv[])
+ {
+@@ -210,9 +221,7 @@ main(int argc, char *argv[])
+         actmaxdeg = n;
+         for (v = 0, gv = g; v < n; ++v, gv += m)
+         {
+-            degv = 0;
+-            for (i = 0; i < m; ++i)
+-                degv += POPCOUNT(gv[i]);
++            degv = compute_degree(gv, m);
+             if (degv < actmaxdeg) actmaxdeg = degv;
+             deg[v] = degv;
+         }
+--- a/addptg.c
++++ b/addptg.c
+@@ -183,8 +183,8 @@ addvertices_dir(graph *g, set *forbidden
+ 
+ /*************************************************************************/
+ 
+-static long long
+-edgenumber(graph *g, boolean digraph, int m, int n)
++STATIC_POPCNTFUNC(long long,
++edgenumber,(graph *g, boolean digraph, int m, int n),
+ /* Find the number of edges */
+ {
+     long long loops,count;
+@@ -200,10 +200,10 @@ edgenumber(graph *g, boolean digraph, in
+ 
+     if (digraph) return count;
+     else         return (count + loops) / 2;
+-}
++})
+ 
+-static boolean
+-findforbidden(graph *g, int Dmax, set *forbidden, int m, int n)
++STATIC_POPCNTFUNC(boolean,
++findforbidden,(graph *g, int Dmax, set *forbidden, int m, int n),
+ /* If any out-degrees are >Dmax, return FALSE.  Otherwise, set
+    forbidden to those vertices with out-degree Dmax and return TRUE. */
+ {
+@@ -221,7 +221,7 @@ findforbidden(graph *g, int Dmax, set *f
+             ADDELEMENT(forbidden,i);
+     }
+     return TRUE;
+-}
++})
+ 
+ /*************************************************************************/
+ 
+--- a/complg.c
++++ b/complg.c
+@@ -54,6 +54,19 @@ compl(graph *g, int m, int n, graph *h,
+ 
+ /**************************************************************************/
+ 
++STATIC_POPCNTFUNC(size_t,
++num_edges,(const graph *g, size_t gwords),
++{
++    size_t i, ned;
++
++    ned = 0;
++    for (i = 0; i < gwords; ++i)
++        ned += POPCOUNT(g[i]);
++    return ned;
++})
++
++/**************************************************************************/
++
+ int
+ main(int argc, char *argv[])
+ {
+@@ -181,10 +194,10 @@ main(int argc, char *argv[])
+ 
+         if (selfcomp)
+         {
+-            ned = loops = 0;
++            loops = 0;
+             gwords = m * (size_t)n;
+             nn = n * (size_t)(n-1);
+-            for (ii = 0; ii < gwords; ++ii) ned += POPCOUNT(g[ii]);
++            ned = num_edges(g, gwords);
+             for (ii = 0; ii < n; ++ii) if (ISELEMENT(g+m*ii,ii)) ++loops;
+             if (Lswitch)
+             {
+--- a/configure.ac
++++ b/configure.ac
+@@ -101,6 +101,11 @@ AC_ARG_ENABLE([popcnt],
+    [enablearg=given], [enablearg=notgiven])
+ AS_IF([test $enablearg = notgiven || test "x$enable_popcnt" = xyes],[allow_popcnt=1],[allow_popcnt=0])
+ 
++dnl --enable-runtime-popcnt detects CPU support for popcnt at runtime
++AC_ARG_ENABLE([runtime-popcnt],
++   AS_HELP_STRING([--enable-runtime-popcnt], [Detect popcnt extensions at runtime]),
++      [runtime_popcnt=1;enable_popcnt=yes], [runtime_popcnt=0])
++
+ dnl --disable-clz disallows clz instructions, otherwise they are tested for
+ AC_ARG_ENABLE([clz],
+    AS_HELP_STRING([--disable-clz], [Disable clz extensions]),
+@@ -377,7 +382,7 @@ have_popcntll=0
+ have_mmpop32=0
+ have_mmpop64=0
+ 
+-AS_IF([test $have_hwpopcnt -eq 1],
++AS_IF([test $have_hwpopcnt -eq 1 -a $runtime_popcnt -eq 0],
+       [AS_IF([test "$CC" = "icc"],
+              [AC_MSG_CHECKING(if _mm_popcnt_u32() is supported)
+               AC_LINK_IFELSE([AC_LANG_SOURCE([#include <nmmintrin.h>
+@@ -412,6 +417,7 @@ AC_SUBST(have_popcntl)
+ AC_SUBST(have_popcntll)
+ AC_SUBST(have_mmpop32)
+ AC_SUBST(have_mmpop64)
++AC_SUBST(runtime_popcnt)
+ 
+ # Unless --enable-generic is given to configure, we try to use the -march=native compiler
+ #   switch.  However, it breaks some versions of gcc on MacOSX due to a compiler bug, so
+--- a/converseg.c
++++ b/converseg.c
+@@ -39,11 +39,22 @@ conv(graph *g, int m, int n)
+ 
+ /**************************************************************************/
+ 
++STATIC_POPCNTFUNC(int,
++compute_degree,(const graph *g, int m),
++{
++    int i, deg = 0;
++    for (i = 0; i < m; ++i)
++        deg += POPCOUNT(g[i]);
++    return deg;
++})
++
++/**************************************************************************/
++
+ static boolean
+ isselfconverse(graph *g, int m, int n)
+ /* Test if self-converse */
+ {
+-    int i,j,deg;
++    int i,deg;
+     size_t ij;
+     DYNALLSTAT(graph,gc,gc_sz);
+     DYNALLSTAT(graph,h,h_sz);
+@@ -64,16 +75,14 @@ isselfconverse(graph *g, int m, int n)
+     gcode = 0;
+     for (i = 0, gi = g; i < n; ++i, gi += m)
+     {
+-        deg = 0;
+-        for (j = 0; j < m; ++j) deg += POPCOUNT(gi[j]);
++        deg = compute_degree(gi, m);
+         gcode += (deg ^ fuzz[deg%5]);
+     }
+ 
+     gccode = 0;
+     for (i = 0, gi = gc; i < n; ++i, gi += m)
+     {
+-        deg = 0;
+-        for (j = 0; j < m; ++j) deg += POPCOUNT(gi[j]);
++        deg = compute_degree(gi, m);
+         gccode += (deg ^ fuzz[deg%5]);
+     }
+     
+--- a/deledgeg.c
++++ b/deledgeg.c
+@@ -19,6 +19,17 @@
+ 
+ /**************************************************************************/
+ 
++STATIC_POPCNTFUNC(int,
++compute_degree,(const graph *g, int m, int deg),
++{
++    int i;
++    for (i = 0; i < m; ++i)
++        deg += POPCOUNT(g[i]);
++    return deg;
++})
++
++/**************************************************************************/
++
+ int
+ main(int argc, char *argv[])
+ {
+@@ -26,7 +37,7 @@ main(int argc, char *argv[])
+     FILE *infile,*outfile;
+     boolean badargs,dolabel,quiet,dswitch,vswitch;
+     boolean digraph;
+-    int i,j,m,n,v,w,argnum;
++    int j,m,n,v,w,argnum;
+     int codetype,outcode;
+     graph *g,*gq;
+     nauty_counter nin,nout;
+@@ -142,8 +153,7 @@ main(int argc, char *argv[])
+         {
+             if (digraph) degv = 0;
+             else  degv = (ISELEMENT(gv,v) != 0);
+-            for (i = 0; i < m; ++i)
+-                degv += POPCOUNT(gv[i]);
++            degv = compute_degree(gv, m, degv);
+             if (degv < actmindeg) actmindeg = degv;
+             deg[v] = degv;
+         }
+--- a/delptg.c
++++ b/delptg.c
+@@ -39,6 +39,17 @@ static boolean digraph,dolabel;
+ 
+ /**************************************************************************/
+ 
++STATIC_POPCNTFUNC(int,
++compute_degree,(const set *s, int m, int deg),
++{
++    int i;
++    for (i = 0; i < m; ++i)
++        deg += POPCOUNT(s[i]);
++    return deg;
++})
++
++/**************************************************************************/
++
+ static void
+ writeone(graph *g, int m, int n, int *del, int ndel,
+                              int outmindeg, boolean isolates)
+@@ -120,7 +131,7 @@ writeone(graph *g, int m, int n, int *de
+         {
+             if (digraph) deg = 0;
+             else deg = (ISELEMENT(gxi,i) != 0);
+-            for (j = 0; j < mx; ++j) deg += POPCOUNT(gxi[j]);
++            deg = compute_degree(gxi, mx, deg);
+             if (deg < outmindeg) return;
+         }
+     }
+@@ -158,7 +169,7 @@ kcore(graph *g, int m, int n, int karg,
+     {
+         if (digraph) d = 0;
+         else d = (ISELEMENT(gi,i) != 0);
+-        for (j = 0; j < m; ++j) d += POPCOUNT(gi[j]);
++        d = compute_degree(gi, m, d);
+         if (d < karg)
+         {
+             queue[top++] = i;
+@@ -531,7 +542,7 @@ main(int argc, char *argv[])
+                 if (v < iminv) continue;
+                 if (digraph) degv = 0;
+                 else         degv = (ISELEMENT(gv,v) != 0);
+-                for (i = 0; i < m; ++i) degv += POPCOUNT(gv[i]);
++                degv = compute_degree(gv, m, degv);
+                 if (degv < mindeg || degv > maxdeg) continue;
+                 okverts[nvok++] = v;
+             }
+--- a/directg.c
++++ b/directg.c
+@@ -598,6 +598,19 @@ scan(int level, int ne, int minarcs, int
+ 
+ /**************************************************************************/
+ 
++STATIC_POPCNTFUNC(int,
++compute_degree,(const set *s, int m),
++{
++    int i, deg;
++
++    deg = 0;
++    for (i = 0; i < m; ++i)
++        deg += POPCOUNT(s[i]);
++    return deg;
++})
++
++/**************************************************************************/
++
+ static void
+ direct(graph *g, int nfixed, long minarcs, long maxarcs,
+        boolean oriented, boolean acyclic, int m, int n)
+@@ -625,8 +638,7 @@ direct(graph *g, int nfixed, long minarc
+     ne = 0;
+     for (i = 0, gi = g; i < n; ++i, gi += m)
+     {
+-        degg = 0;
+-        for (j = 0; j < m; ++j) degg += POPCOUNT(gi[j]);
++        degg = compute_degree(gi, m);
+ #ifdef DEGPRUNE2
+         deg[i] = degg;
+ #endif
+--- a/genbg.c
++++ b/genbg.c
+@@ -473,8 +473,8 @@ isconnected(graph *g, int n)
+ 
+ /**************************************************************************/
+ 
+-static boolean
+-distinvar(graph *g, int *invar, int n1, int n2)
++STATIC_POPCNTFUNC(boolean,
++distinvar,(graph *g, int *invar, int n1, int n2),
+  /* make distance invariant/
+     exit immediately FALSE if n-1 not maximal else exit TRUE
+     Note: only invar[n1..n1+n2-1] set */
+@@ -506,12 +506,12 @@ distinvar(graph *g, int *invar, int n1,
+         if (v < n-1 && inv > invar[n-1]) return FALSE;
+     }
+     return TRUE;
+-}
++})
+ 
+ /**************************************************************************/
+ 
+-static void
+-makeleveldata(void)
++STATIC_POPCNTFUNC(void,
++makeleveldata,(void),
+ /* make the level data for each level */
+ {
+     int i,j,h;
+@@ -602,7 +602,7 @@ makeleveldata(void)
+ 
+         d->ne = d->dmax = d->xlb = d->xub = -1;
+     }
+-}
++})
+ 
+ /**************************************************************************/
+ 
+@@ -662,10 +662,10 @@ userautomproc(int count, int *p, int *or
+ *                                                                            *
+ *****************************************************************************/
+ 
+-static void
+-refinex(graph *g, int *lab, int *ptn, int level, int *numcells,
++STATIC_POPCNTFUNC(void,
++refinex,(graph *g, int *lab, int *ptn, int level, int *numcells,
+     int *count, set *active, boolean goodret,
+-    int *code, int m, int n)
++    int *code, int m, int n),
+ {
+     int i,c1,c2,labc1;
+     setword x;
+@@ -798,7 +798,7 @@ refinex(graph *g, int *lab, int *ptn, in
+             }
+         }
+     }
+-}
++})
+ 
+ /**************************************************************************/
+ 
+@@ -947,6 +947,12 @@ accept1(graph *g, int n2, int x, graph *
+ 
+ /**************************************************************************/
+ 
++STATIC_POPCNTFUNC(int,
++my_popcount,(setword x),
++{
++    return POPCOUNT(x);
++})
++
+ static boolean
+ accept2(graph *g, int n2, int x, graph *gx, int *deg, boolean nuniq)
+ /* decide if n in theta(g+x) -- version for n+1 == maxn */
+@@ -1080,7 +1086,7 @@ accept2(graph *g, int n2, int x, graph *
+                 vmax |= bit[i];
+ 
+         gv = gx[n] & vmax;
+-        qn = POPCOUNT(gv);
++        qn = my_popcount(gv);
+ 
+         j0 = i1+1;
+         j1 = n;
+@@ -1088,7 +1094,7 @@ accept2(graph *g, int n2, int x, graph *
+         {
+             j = lab[j0];
+             gv = gx[j] & vmax;
+-            qv = POPCOUNT(gv);
++            qv = my_popcount(gv);
+             if (qv > qn)
+                 return FALSE;
+             else if (qv < qn)
+--- a/geng.c
++++ b/geng.c
+@@ -653,6 +653,15 @@ isconnected(graph *g, int n)
+     return  seen == allbits;
+ }
+ 
++STATIC_POPCNTFUNC(int,
++compute_degree,(const graph *g, int n),
++{
++    int i, ne = 0;
++    for (i = 0; i < n; ++i)
++        ne += POPCOUNT(g[i]);
++    return ne;
++})
++
+ static boolean
+ connpreprune(graph *g, int n, int maxn)
+ /* This function speeds up the generation of connected graphs
+@@ -663,9 +672,7 @@ connpreprune(graph *g, int n, int maxn)
+ 
+     if (n == maxn || maxe - maxn >= 5) return 0;
+ 
+-    ne = 0;
+-    for (i = 0; i < n; ++i) ne += POPCOUNT(g[i]);
+-    ne /= 2;
++    ne = compute_degree(g, n) / 2;
+ 
+     nc = 0;
+     notvisited = ALLMASK(n);
+@@ -755,6 +762,14 @@ gcomplement(graph *g, graph *gc, int n)
+ 
+ /**********************************************************************/
+ 
++STATIC_POPCNTFUNC(int,
++my_popcount,(setword x),
++{
++    return POPCOUNT(x);
++})
++
++/**********************************************************************/
++
+ static boolean
+ distinvar(graph *g, int *invar, int n)
+ /* make distance invariant
+@@ -772,7 +787,7 @@ distinvar(graph *g, int *invar, int n)
+         for (d = 1; frontier != 0; ++d)
+         {
+             workset = 0;
+-            inv += POPCOUNT(frontier) ^ (0x57 + d);
++            inv += my_popcount(frontier) ^ (0x57 + d);
+             while (frontier)
+             {
+                 w = FIRSTBITNZ(frontier);
+@@ -1132,7 +1147,7 @@ makeleveldata(boolean restricted)
+         ilast = (n == WORDSIZE ? ~(setword)0 : XBIT(n)-1);
+         for (i = 0;; ++i)
+         {
+-            if ((h = XPOPCOUNT(i)) <= maxdeg)
++            if ((h = my_popcount(i)) <= maxdeg)
+             {
+                 xset[j] = i;
+                 xcard[j] = h;
+@@ -1253,7 +1268,7 @@ userautomprocb(int count, int *p, int *o
+         for (i = 0; i < xlim; ++i)
+         {
+             x = xx[i];
+-            if (XPOPCOUNT(x) >= xlb)
++            if (my_popcount(x) >= xlb)
+             {
+                 xx[j1] = x;
+                 xorb[j1] = j1;
+@@ -1379,14 +1394,14 @@ refinex(graph *g, int *lab, int *ptn, in
+                 for (cell2 = cell1; ptn[cell2] > 0; ++cell2) {}
+                 if (cell1 == cell2) continue;
+                 i = cell1;
+-                if ((x = workset & g[lab[i]]) != 0) cnt = POPCOUNT(x);
++                if ((x = workset & g[lab[i]]) != 0) cnt = my_popcount(x);
+                 else                                cnt = 0;
+                 count[i] = bmin = bmax = cnt;
+                 bucket[cnt] = 1;
+                 while (++i <= cell2)
+                 {
+                     if ((x = workset & g[lab[i]]) != 0)
+-                        cnt = POPCOUNT(x);
++                        cnt = my_popcount(x);
+                     else
+                         cnt = 0;
+ 
+@@ -1729,7 +1744,7 @@ accept1(graph *g, int n, xword x, graph
+     nx = n + 1;
+     for (i = 0; i < n; ++i) gx[i] = g[i];
+     gx[n] = 0;
+-    deg[n] = degn = XPOPCOUNT(x);
++    deg[n] = degn = my_popcount(x);
+ 
+     xw = x;
+     while (xw)
+@@ -1832,7 +1847,7 @@ accept1b(graph *g, int n, xword x, graph
+     nx = n + 1;
+     for (i = 0; i < n; ++i) gx[i] = g[i];
+     gx[n] = 0;
+-    deg[n] = degn = XPOPCOUNT(x);
++    deg[n] = degn = my_popcount(x);
+ 
+     xw = x;
+     while (xw)
+@@ -1892,7 +1907,7 @@ accept1b(graph *g, int n, xword x, graph
+         if ((hv & xx[ixx]) == 0)
+         {
+             z = xx[ixx] | bitv;
+-            if (XPOPCOUNT(z) <= xubx) xx[kxx++] = z;
++            if (my_popcount(z) <= xubx) xx[kxx++] = z;
+         }
+     }
+     data[nx].xlim = kxx;
+@@ -1960,7 +1975,7 @@ accept2(graph *g, int n, xword x, graph
+         degx[i] = deg[i];
+     }
+     gx[n] = 0;
+-    degx[n] = degn = XPOPCOUNT(x);
++    degx[n] = degn = my_popcount(x);
+ 
+     xw = x;
+     while (xw)
+@@ -2046,7 +2061,7 @@ accept2(graph *g, int n, xword x, graph
+         for (i = i1+1; i < nx; ++i) vmax |= bit[lab[i]];
+ 
+         gv = gx[n] & vmax;
+-        qn = POPCOUNT(gv);
++        qn = my_popcount(gv);
+ 
+         j0 = i1+1;
+         j1 = n;
+@@ -2054,7 +2069,7 @@ accept2(graph *g, int n, xword x, graph
+         {
+             j = lab[j0];
+             gv = gx[j] & vmax;
+-            qv = POPCOUNT(gv);
++            qv = my_popcount(gv);
+             if (qv > qn)
+                 return FALSE;
+             else if (qv < qn)
+@@ -2214,7 +2229,7 @@ spaextend(graph *g, int n, int *deg, int
+         if (deg[i] == dcrit) dlow |= XBIT(i);
+     }
+ 
+-    if (xlb == dmax && XPOPCOUNT(d) + dmax > n) ++xlb;
++    if (xlb == dmax && my_popcount(d) + dmax > n) ++xlb;
+     if (nx == maxn && xlb < mindeg) xlb = mindeg;
+     if (xlb > xub) return;
+ 
+@@ -2235,7 +2250,7 @@ spaextend(graph *g, int n, int *deg, int
+         for (ixx = 0; ixx < xlim; ++ixx)
+         {
+             x = xx[ixx];
+-            xc = XPOPCOUNT(x);
++            xc = my_popcount(x);
+             if (xc < xlb || xc > xub) continue;
+             if ((rigid || xorb[ixx] == ixx) 
+                 && (xc > dmax || (xc == dmax && (x & d) == 0))
+@@ -2275,7 +2290,7 @@ spaextend(graph *g, int n, int *deg, int
+                 odometer = mod - 1;
+             }
+             x = xx[ixx];
+-            xc = XPOPCOUNT(x);
++            xc = my_popcount(x);
+             if (xc < xlb || xc > xub) continue;
+             if ((rigid || xorb[ixx] == ixx)
+                 && (xc > dmax || (xc == dmax && (x & d) == 0))
+@@ -2339,7 +2354,7 @@ genextend(graph *g, int n, int *deg, int
+         if (deg[i] == dcrit) dlow |= XBIT(i);
+     }
+ 
+-    if (xlb == dmax && XPOPCOUNT(d) + dmax > n) ++xlb;
++    if (xlb == dmax && my_popcount(d) + dmax > n) ++xlb;
+     if (nx == maxn && xlb < mindeg) xlb = mindeg;
+     if (xlb > xub) return;
+ 
+--- a/genktreeg.c
++++ b/genktreeg.c
+@@ -268,9 +268,9 @@ automproc(int count, int *p, int *orbits
+ *                                                                            *
+ *****************************************************************************/
+ 
+-static void
+-refinex(graph *g, int *lab, int *ptn, int *numcells,
+- int *count, set *active, boolean goodret, int *code, int n)
++STATIC_POPCNTFUNC(void,
++refinex,(graph *g, int *lab, int *ptn, int *numcells,
++ int *count, set *active, boolean goodret, int *code, int n),
+ {
+     int i,c1,c2,labc1;
+     setword x,lact;
+@@ -403,7 +403,7 @@ refinex(graph *g, int *lab, int *ptn, in
+             }
+         }
+     }
+-}
++})
+ 
+ /**************************************************************************/
+ 
+@@ -423,8 +423,8 @@ makecanon(graph *g, graph *gcan, int n)
+ 
+ /**************************************************************************/
+ 
+-static boolean
+-accept(graph *g, int n, int maxn, boolean rigid, boolean *newrigid)
++STATIC_POPCNTFUNC(boolean,
++accept,(graph *g, int n, int maxn, boolean rigid, boolean *newrigid),
+ /* Test if vertex n-1 is canonical.  If can be assumed that it has
+    degree kvalue. newrigid is not set for n = maxn */
+ {
+@@ -520,7 +520,7 @@ accept(graph *g, int n, int maxn, boolea
+     }
+     else
+         return TRUE;
+-}
++})
+ 
+ /**************************************************************************/
+ 
+--- a/genposetg.c
++++ b/genposetg.c
+@@ -365,8 +365,8 @@ options_final.tc_level = 0;
+ /**********************************************************************************/
+ 
+ 
+-static boolean refinex(graph *g, int *lab, int *ptn, int *numcells,
+-                int *count, set *active, setword good_vertices, int n)
++STATIC_POPCNTFUNC(boolean,refinex,(graph *g, int *lab, int *ptn, int *numcells,
++                  int *count, set *active, setword good_vertices, int n),
+ /*  custom version of refine1() which can exit quickly if required.
+ 
+   If good_vertices is not 0, a FALSE return is made if it can be determined
+@@ -502,7 +502,7 @@ static boolean refinex(graph *g, int *la
+     }
+ 
+     return TRUE;
+-}
++})
+ 
+ 
+ /*******************************************************************************
+@@ -861,7 +861,7 @@ static void aufschreiben()
+ 
+ /**********************************AUFSCHREIBEN_2***********************************/
+ 
+-static void aufschreiben_2(int last_level, graph maxpoints,int relationscounter)
++STATIC_POPCNTFUNC(void,aufschreiben_2,(int last_level, graph maxpoints,int relationscounter),
+ 
+      /* Hier werden die Graphen konstruiert, die mit einer Kette von
+         jeweils nur einem Knoten pro Level anfangen. Sie entstehen aus
+@@ -870,9 +870,6 @@ static void aufschreiben_2(int last_leve
+         entsprechender Laenge angehaengt wird. */
+ 
+ {
+-#if 0
+- graph puffer;
+-#endif
+  graph poset2[MAXN];
+  char *i2;
+  int i;
+@@ -892,20 +889,13 @@ static void aufschreiben_2(int last_leve
+ 
+   if (output)
+     {
+-#if 0
+-      puffer=maxpunktzahl;
+-      fwrite(&puffer,sizeof(graph),1,stdout);
+-#endif
+       memcpy(poset2,poset,sizeof(graph)*punktzahl);
+       poset2[maxpunktzahl-1]=0;
+       for (i=punktzahl; i<(maxpunktzahl-1); i++) poset2[i]=bit[i+1];
+       FOREACH(i2,all_points_up_to[0]) ADDELEMENT(poset2+(*i2),punktzahl);
+-#if 0
+-      fwrite(poset2,sizeof(graph),maxpunktzahl,stdout);
+-#endif
+       writeposet(poset2,maxpunktzahl);
+     }
+-}
++})
+ 
+ /**********************************AUFSCHREIBEN_3***********************************/
+ 
+@@ -1036,7 +1026,7 @@ static int compare_sets(const void *a, c
+ /* Fuegt den letzten Punkt hinzu -- wie add_point, nur dass Sachen, die der Weiterfuehrung
+    dienen nicht mehr gemacht werden. Darf nur fuer den letzten Punkt aufgerufen werden ! */
+ 
+-static void add_last_point (int level, int do_nauty, graph *last_nbs, graph maxpoints, int relationscounter)
++STATIC_POPCNTFUNC(void,add_last_point,(int level, int do_nauty, graph *last_nbs, graph maxpoints, int relationscounter),
+ 
+      /* do_nauty ist genau dann 0, wenn nauty gerade ausgefuehrt wurde, um die
+         Kanonizitaet des letzten Knotens zu testen, orbits, generators, etc 
+@@ -1431,7 +1421,7 @@ if (points_on_level[level]==0)
+  local_ptn[punktzahl-1]=0; 
+  } /* ende mindestens ein Punkt bereits auf dem Level */
+ 
+-}
++})
+ 
+ 
+ 
+@@ -1443,7 +1433,7 @@ if (points_on_level[level]==0)
+ 
+ /* Fuegt einen weiteren Punkt hinzu */
+ 
+-static void add_point (int level, int do_nauty, graph *last_nbs, graph maxpoints, int relationscounter)
++STATIC_POPCNTFUNC(void,add_point,(int level, int do_nauty, graph *last_nbs, graph maxpoints, int relationscounter),
+ 
+      /* do_nauty ist genau dann 0, wenn nauty gerade ausgefuehrt wurde, um die
+         Kanonizitaet des letzten Knotens zu testen, orbits, generators, etc 
+@@ -1865,7 +1855,7 @@ if (points_on_level[level]==0)
+  local_ptn[punktzahl-1]=0; 
+  } /* ende mindestens ein Punkt bereits auf dem Level */
+ 
+-}
++})
+ 
+ /***************************************MAIN*******************************************/
+ 
+--- a/genquarticg.c
++++ b/genquarticg.c
+@@ -221,9 +221,9 @@ isbiconnected(graph *g, int n)
+  *    of the graph reaches nmax after which it is written to outputfile      *
+  ****************************************************************************/
+ 
+-static void
+-extend(int n, graph *g, edgestruct *edge, pairstruct *epair, int numpair,
+-   int *epairorbit, int *multar, setword *zar, int *col00w, boolean connectflag)
++STATIC_POPCNTFUNC(void,
++extend,(int n, graph *g, edgestruct *edge, pairstruct *epair, int numpair,
++   int *epairorbit, int *multar, setword *zar, int *col00w, boolean connectflag),
+ {
+     int   vm1, vm2, vm3, vm4, vt1, vt2, vt3, vt4, c, b, mcol1=0,
+           tcol, got_one, i, j, numpair1, numdovi, maxdovi=0, i1, j1, i2, j2,
+@@ -898,7 +898,7 @@ extend(int n, graph *g, edgestruct *edge
+ 
+     } /*end for c.. */
+ 
+-}
++})
+ 
+ /*****************************************************************************
+  *                                                                            *
+@@ -1142,9 +1142,9 @@ init_refinex( int *clr, int *lb, int *p,
+  *  code := -1 for n-1 not max, 0 for maybe, 1 for definite                   *
+  *                                                                            *
+  *****************************************************************************/
+-static void
+-refinex(graph *g, int *lab, int *ptn, int level, int *numcells, int *count,
+-           set *active, boolean goodret, int *code, int m, int n)
++STATIC_POPCNTFUNC(void,
++refinex,(graph *g, int *lab, int *ptn, int level, int *numcells, int *count,
++           set *active, boolean goodret, int *code, int m, int n),
+ {
+     int     i, c1, c2, labc1, split1, split2, cell1, cell2, cnt, bmin, bmax;
+     int     workperm[MAXN], bucket[MAXN+2];
+@@ -1272,7 +1272,7 @@ refinex(graph *g, int *lab, int *ptn, in
+             }
+         }
+     }
+-}
++})
+ 
+ 
+ /*****************************************************************************/
+--- a/genrang.c
++++ b/genrang.c
+@@ -1118,8 +1118,8 @@ randombiptree(sparsegraph *sg, int n1, i
+ 
+ /**************************************************************************/
+ 
+-static long
+-getgroup(graph *g, int m, int n, boolean digraph, boolean doinv)
++STATIC_POPCNTFUNC(long,
++getgroup,(graph *g, int m, int n, boolean digraph, boolean doinv),
+ /* Return group size, 0 if 10^10 or more. */
+ {
+     DYNALLSTAT(int,lab,lab_sz);
+@@ -1158,11 +1158,11 @@ getgroup(graph *g, int m, int n, boolean
+ 
+     if (stats.grpsize2 > 0) return 0;
+     else                    return (long)(stats.grpsize1+0.1);
+-}
++})
+ 
+ 
+-static long
+-getgroup_sg(sparsegraph *sg, boolean digraph, boolean doinv)
++STATIC_POPCNTFUNC(long,
++getgroup_sg,(sparsegraph *sg, boolean digraph, boolean doinv),
+ /* Return group size, 0 if 10^10 or more. */
+ {
+     DYNALLSTAT(int,lab,lab_sz);
+@@ -1212,7 +1212,7 @@ getgroup_sg(sparsegraph *sg, boolean dig
+ 
+     if (stats.grpsize2 > 0) return 0;
+     else                    return (long)(stats.grpsize1+0.1);
+-}
++})
+ 
+ /**************************************************************************/
+ /**************************************************************************/
+--- a/genspecialg.c
++++ b/genspecialg.c
+@@ -737,8 +737,8 @@ makeJohnson(long n, long k, boolean digr
+     FREES(b);
+ }
+ 
+-static setword*
+-subsetlist(long n, long k)
++STATIC_POPCNTFUNC(setword*,
++subsetlist,(long n, long k),
+ /* Allocate binomial(n,k) setwords filled with right-adjusted subsets.
+    It is known that binomial(n,k) is small enough for an int. */
+ {
+@@ -779,12 +779,12 @@ subsetlist(long n, long k)
+     if (i != nv-1) gt_abort(">E something (1) wrong in subsetlist()\n");
+ 
+     return x;
+-}
++})
+     
+ /**************************************************************************/
+ 
+-static void
+-makeKneser(long n, long k, long t, boolean digraph, sparsegraph *sg)
++STATIC_POPCNTFUNC(void,
++makeKneser,(long n, long k, long t, boolean digraph, sparsegraph *sg),
+ /* Make generalized Kneser graphs.  The vertices are the k-subsets of
+    an n-set and two are adjacent if there intersection is exactly t. */
+ {
+@@ -833,7 +833,7 @@ makeKneser(long n, long k, long t, boole
+     if (d[0] != deg) gt_abort(">E something (2) wrong in makeKneser()\n");
+ 
+     FREES(x);
+-}
++})
+ 
+ /**************************************************************************/
+ 
+--- a/gentourng.c
++++ b/gentourng.c
+@@ -523,6 +523,12 @@ userautomproc(int count, int *p, int *or
+     }
+ }
+ 
++STATIC_POPCNTFUNC(int,
++my_popcount,(setword x),
++{
++    return POPCOUNT(x);
++})
++
+ /*****************************************************************************
+ *                                                                            *
+ *  refinex(g,lab,ptn,level,numcells,count,active,goodret,code,m,n) is a      *
+@@ -603,14 +609,14 @@ refinex(graph *g, int *lab, int *ptn, in
+                 for (cell2 = cell1; ptn[cell2] > 0; ++cell2) {}
+                 if (cell1 == cell2) continue;
+                 i = cell1;
+-                if ((x = workset & g[lab[i]]) != 0) cnt = POPCOUNT(x);
++                if ((x = workset & g[lab[i]]) != 0) cnt = my_popcount(x);
+                 else                                cnt = 0;
+                 count[i] = bmin = bmax = cnt;
+                 bucket[cnt] = 1;
+                 while (++i <= cell2)
+                 {
+                     if ((x = workset & g[lab[i]]) != 0)
+-                        cnt = POPCOUNT(x);
++                        cnt = my_popcount(x);
+                     else
+                         cnt = 0;
+ 
+@@ -806,7 +812,7 @@ hitinvar(graph *g, int *invar, int n)
+         {
+             TAKEBIT(i,y);
+             z = x & g[i];
+-            d = POPCOUNT(z);
++            d = my_popcount(z);
+             if (d > inv) inv = d;
+         }
+ 
+@@ -928,7 +934,7 @@ accept2(graph *g, int n, xword x, graph
+         for (i = i1+1; i < nx; ++i) vmax |= bit[lab[i]];
+ 
+         gv = gx[n] & vmax;
+-        qn = POPCOUNT(gv);
++        qn = my_popcount(gv);
+ 
+         j0 = i1+1;
+         j1 = n;
+@@ -936,7 +942,7 @@ accept2(graph *g, int n, xword x, graph
+         {
+             j = lab[j0];
+             gv = gx[j] & vmax;
+-            qv = POPCOUNT(gv);
++            qv = my_popcount(gv);
+             if (qv > qn)
+                 return FALSE;
+             else if (qv < qn)
+--- a/gtnauty.c
++++ b/gtnauty.c
+@@ -1052,6 +1052,17 @@ countorbits_sg(sparsegraph *sg, boolean
+     gt_abort(">E countorbits_sg is not implemented\n");
+ }
+ 
++STATIC_POPCNTFUNC(size_t,
++compute_degree,(const graph *g, size_t gwords),
++{
++    size_t i, ned;
++
++    ned = 0;
++    for (i = 0; i < gwords; ++i)
++        ned += POPCOUNT(g[i]);
++    return ned;
++})
++
+ void
+ countorbits(graph *g, int m, int n, boolean digraph,
+         double *grpsize1, int *grpsize2, int *vorbits,
+@@ -1066,7 +1077,6 @@ countorbits(graph *g, int m, int n, bool
+ */ 
+ {
+     graph *gi;
+-    size_t t;
+     int loops,i,fixed;
+     statsblk stats;
+     static DEFAULTOPTIONS_GRAPH(goptions);
+@@ -1076,8 +1086,7 @@ countorbits(graph *g, int m, int n, bool
+     DYNALLSTAT(int,orbits,orbits_sz);
+     DYNALLSTAT(setword,work,work_sz);
+ 
+-    numarcs = 0;
+-    for (t = 0; t < m*(size_t)n; ++t) numarcs += POPCOUNT(g[t]);
++    numarcs = compute_degree(g, m*(size_t)n);
+ 
+     if (numarcs == 0)
+     {
+--- a/gutil1.c
++++ b/gutil1.c
+@@ -5,6 +5,21 @@
+ 
+ /**************************************************************************/
+ 
++STATIC_POPCNTFUNC(size_t,
++compute_degree,(setword **g, int m, int d),
++{
++    int i;
++    setword *pg = *g;
++
++    for (i = 0; i < m; ++i, ++pg)
++        if (*pg)
++            d += POPCOUNT(*pg);
++    *g = pg;
++    return d;
++})
++
++/**************************************************************************/
++
+ void
+ degstats(graph *g, int m, int n, unsigned long *edges, int *mindeg,
+      int *mincount, int *maxdeg, int *maxcount, boolean *eulerian)
+@@ -16,7 +31,7 @@ degstats(graph *g, int m, int n, unsigne
+ */
+ {
+     setword *pg;
+-    int i,j,d,dor;
++    int i,d,dor;
+     int mind,mindc,maxd,maxdc;
+     unsigned long ned;
+ 
+@@ -30,9 +45,7 @@ degstats(graph *g, int m, int n, unsigne
+     pg = (setword*)g;
+     for (i = 0; i < n; ++i)
+     {
+-        d = 0;
+-        for (j = 0; j < m; ++j, ++pg)
+-            if (*pg) d += POPCOUNT(*pg);
++        d = compute_degree(&pg, m, 0);
+ 
+         if (d == mind)
+             ++mindc;
+@@ -75,7 +88,7 @@ degstats3(graph *g, int m, int n, unsign
+ */
+ {
+     setword *pg;
+-    int i,j,d,dodd;
++    int i,d,dodd;
+     int mind,mindc,maxd,maxdc;
+     unsigned long ned;
+ 
+@@ -89,9 +102,7 @@ degstats3(graph *g, int m, int n, unsign
+     pg = (setword*)g;
+     for (i = 0; i < n; ++i)
+     {
+-        d = 0;
+-        for (j = 0; j < m; ++j, ++pg)
+-            if (*pg) d += POPCOUNT(*pg);
++        d = compute_degree(&pg, m, 0);
+ 
+         if (d == mind)
+             ++mindc;
+@@ -190,8 +201,7 @@ degstats2(graph *g, boolean digraph, int
+                 ++d;
+                 ++nloops;
+             }
+-            for (j = 0; j < m; ++j, ++pg)
+-                if (*pg) d += POPCOUNT(*pg);
++            d = compute_degree(&pg, m, d);
+ 
+             if (d == mind)
+                 ++mindc;
+@@ -305,6 +315,14 @@ degstats2(graph *g, boolean digraph, int
+ 
+ /*********************************************************************/
+ 
++STATIC_POPCNTFUNC(int,
++my_popcount,(setword x),
++{
++    return POPCOUNT(x);
++})
++
++/*********************************************************************/
++
+ void
+ sources_sinks(graph *g, int m, int n, int *sources, int *sinks)
+ /* Count the sources and sinks. For an undirected graph, these
+@@ -338,7 +356,7 @@ sources_sinks(graph *g, int m, int n, in
+             wk |= g[i];
+         }
+         *sinks = nsink;
+-        *sources = n - POPCOUNT(wk);
++        *sources = n - my_popcount(wk);
+         return;
+     }
+ 
+@@ -357,7 +375,7 @@ sources_sinks(graph *g, int m, int n, in
+     *sinks = nsink;
+     nsource = n;
+     for (j = 0; j < m; ++j)
+-        nsource -= POPCOUNT(work[j]);
++        nsource -= my_popcount(work[j]);
+     *sources = nsource;
+ }
+ 
+@@ -382,7 +400,7 @@ isconnected1(graph *g, int n)
+         seen |= g[i];
+     }
+ 
+-    return  POPCOUNT(seen) == n;
++    return my_popcount(seen) == n;
+ }
+ 
+ /**************************************************************************/
+@@ -455,7 +473,7 @@ issubconnected(graph *g, set *sub, int m
+ #endif
+  
+     subsize = 0;
+-    for (i = 0; i < m; ++i) subsize += (sub[i] ? POPCOUNT(sub[i]) : 0);
++    for (i = 0; i < m; ++i) subsize += (sub[i] ? my_popcount(sub[i]) : 0);
+  
+     if (subsize <= 1) return TRUE;
+  
+@@ -1167,8 +1185,8 @@ maxcsnode1(int *best, graph *g, setword
+ 
+     w = cov & BITMASK(maxv);
+ 
+-    s = POPCOUNT(cliq);
+-    if (s + POPCOUNT(w) <= *best) return;
++    s = my_popcount(cliq);
++    if (s + my_popcount(w) <= *best) return;
+     if (w)
+     {
+         if (s + 1 > *best) *best = s + 1;
+--- a/gutil2.c
++++ b/gutil2.c
+@@ -58,8 +58,8 @@ loopcount(graph *g, int m, int n)
+ 
+ /**************************************************************************/
+ 
+-long
+-pathcount1(graph *g, int start, setword body, setword last)
++POPCNTFUNC(long,
++pathcount1,(graph *g, int start, setword body, setword last),
+ /* Number of paths in g starting at start, lying within body and
+    ending in last.  {start} and last should be disjoint subsets of body. */
+ {
+@@ -80,7 +80,7 @@ pathcount1(graph *g, int start, setword
+     }
+ 
+     return count;
+-}
++})
+ 
+ /**************************************************************************/
+ 
+@@ -167,8 +167,8 @@ cyclecountlim(graph *g, long lim, int m,
+ 
+ /**************************************************************************/
+ 
+-long
+-indpathcount1(graph *g, int start, setword body, setword last)
++POPCNTFUNC(long,
++indpathcount1,(graph *g, int start, setword body, setword last),
+ /* Number of induced paths in g starting at start, extravertices within
+  * body and ending in last.
+  * {start}, body and last should be disjoint. */
+@@ -189,7 +189,7 @@ indpathcount1(graph *g, int start, setwo
+     }
+ 
+     return count;
+-}
++})
+ 
+ /**************************************************************************/
+ 
+@@ -235,8 +235,8 @@ indcyclecount(graph *g, int m, int n)
+    
+ /**************************************************************************/
+ 
+-long
+-numind3sets1(graph *g, int n)
++POPCNTFUNC(long,
++numind3sets1,(graph *g, int n),
+ /* The number of triangles in g; undirected only */
+ {
+     int i,j;
+@@ -256,7 +256,7 @@ numind3sets1(graph *g, int n)
+     }
+ 
+     return total;
+-}
++})
+ 
+ /**************************************************************************/
+ 
+@@ -272,8 +272,8 @@ numind3sets(graph *g, int m, int n)
+ 
+ /**************************************************************************/
+ 
+-long
+-numtriangles1(graph *g, int n)
++POPCNTFUNC(long,
++numtriangles1,(graph *g, int n),
+ /* The number of triangles in g; undirected only */
+ {
+     int i,j;
+@@ -293,12 +293,12 @@ numtriangles1(graph *g, int n)
+     }
+ 
+     return total;
+-}
++})
+ 
+ /**************************************************************************/
+ 
+-long
+-numtriangles(graph *g, int m, int n)
++POPCNTFUNC(long,
++numtriangles,(graph *g, int m, int n),
+ /* The number of triangles in g; undirected only */
+ {
+     int i,j,k,kw;
+@@ -323,7 +323,7 @@ numtriangles(graph *g, int m, int n)
+         }
+ 
+     return total;
+-}    
++})
+ 
+ /**************************************************************************/
+ 
+@@ -382,9 +382,9 @@ numdirtriangles(graph *g, int m, int n)
+ 
+ /**************************************************************************/
+ 
+-void
+-commonnbrs(graph *g, int *minadj, int *maxadj, int *minnon, int *maxnon,
+-       int m, int n)
++POPCNTFUNC(void,
++commonnbrs,(graph *g, int *minadj, int *maxadj, int *minnon, int *maxnon,
++       int m, int n),
+ /* Count the common neighbours of pairs of vertices, and give the minimum
+    and maximum for adjacent and non-adjacent vertices.  Undirected only.
+    Null minimums are n+1 and null maximums are -1.
+@@ -431,7 +431,7 @@ commonnbrs(graph *g, int *minadj, int *m
+     *maxadj = maxa;
+     *minnon = minn;
+     *maxnon = maxn;
+-}
++})
+ 
+ /**************************************************************************/
+ 
+@@ -500,8 +500,8 @@ contract1(graph *g, graph *h, int v, int
+ static TLS_ATTR int knm[18][16];  /* knm[n,m] = conncontent(K_n - m*K_2) */
+ static TLS_ATTR boolean knm_computed = FALSE;
+ 
+-int
+-conncontent(graph *g, int m, int n)
++POPCNTFUNC(int,
++conncontent,(graph *g, int m, int n),
+ /* number of connected spanning subgraphs with an even number
+    of edges minus the number with an odd number of edges */
+ {
+@@ -653,7 +653,7 @@ conncontent(graph *g, int m, int n)
+     v2 = conncontent(h,m,n-1);
+ 
+     return v1 - v2;
+-}
++})
+ 
+ boolean
+ stronglyconnected(graph *g, int m, int n)
+@@ -719,8 +719,8 @@ stronglyconnected(graph *g, int m, int n
+ 
+ /**************************************************************************/
+ 
+-long
+-numsquares(graph *g, int m, int n)
++POPCNTFUNC(long,
++numsquares,(graph *g, int m, int n),
+ /* Number of 4-cycles. Undirected graphs only, loops ok. */
+ {
+     setword w;
+@@ -762,12 +762,12 @@ numsquares(graph *g, int m, int n)
+         }
+         return (long)(total / 2);
+     }
+-}
++})
+ 
+ /**************************************************************************/
+ 
+-long
+-numdiamonds(graph *g, int m, int n)
++POPCNTFUNC(long,
++numdiamonds,(graph *g, int m, int n),
+ /* Number of diamonds (squares with diagonal). Undirected only, no loops. */
+ {
+     int i,j,k;
+@@ -805,10 +805,10 @@ numdiamonds(graph *g, int m, int n)
+     }
+ 
+     return ans;
+-}
++})
+ 
+-long
+-numpentagons(graph *g, int m, int n)
++POPCNTFUNC(long,
++numpentagons,(graph *g, int m, int n),
+ /* Number of pentagons (undirected only, no loops) */
+ {
+     int i,j,k,s;
+@@ -861,10 +861,10 @@ numpentagons(graph *g, int m, int n)
+     }
+ 
+     return (long)(count/5);
+-}
++})
+ 
+-long
+-numhexagons1(graph *g, int n) 
++POPCNTFUNC(long,
++numhexagons1,(graph *g, int n),
+ /* Number of hexagons; version for m=1 only */
+ {
+     unsigned long ans;
+@@ -893,10 +893,10 @@ numhexagons1(graph *g, int n)
+     }
+ 
+     return (long)(ans/2);
+-}
++})
+ 
+-long
+-numhexagons(graph *g, int m, int n) 
++POPCNTFUNC(long,
++numhexagons,(graph *g, int m, int n),
+ /* Number of hexagons, undirected only, loops ok. */
+ {
+     unsigned long ans;
+@@ -952,12 +952,12 @@ numhexagons(graph *g, int m, int n)
+     }
+ 
+     return (long)(ans/2);
+-}
++})
+ 
+ /**************************************************************************/
+ 
+-int
+-ktreeness1(graph *g, int n)
++POPCNTFUNC(int,
++ktreeness1,(graph *g, int n),
+ /* Version of ktreeness() for m=1. */
+ {
+     int i,v,k,deg[WORDSIZE];
+@@ -999,10 +999,10 @@ ktreeness1(graph *g, int n)
+     if (degk == 0)                  return 0;
+     else if (POPCOUNT(left) == k+1) return k;
+     else                            return 0;
+-}
++})
+ 
+-int
+-ktreeness(graph *g, int m, int n)
++POPCNTFUNC(int,
++ktreeness,(graph *g, int m, int n),
+ /* Largest k for which g is a k-tree. The complete graph K_n
+    is both an (n-1)-tree and an n-tree. This function returns n. */
+ {
+@@ -1071,4 +1071,4 @@ ktreeness(graph *g, int m, int n)
+     if (ndegk == 0)        return 0;
+     else if (nleft == k+1) return k;
+     else                   return 0;
+-}
++})
+--- a/listg.c
++++ b/listg.c
+@@ -281,8 +281,8 @@ putcgraph(FILE *f, graph *g, int linelen
+ 
+ /**************************************************************************/
+ 
+-static void
+-putve(FILE *f, unsigned long id, graph *g, boolean digraph, int m, int n)
++STATIC_POPCNTFUNC(void,
++putve,(FILE *f, unsigned long id, graph *g, boolean digraph, int m, int n),
+ /* Write the numbers of vertices and edges */
+ {
+     unsigned long long ne;
+@@ -291,7 +291,7 @@ putve(FILE *f, unsigned long id, graph *
+ 
+     fprintf(f,"Graph %lu has %d vertices and %llu edges.\n",id,n,
+             (digraph?ne:ne/2));
+-}
++})
+ 
+ /**************************************************************************/
+ 
+@@ -351,8 +351,8 @@ putdotty(FILE *f, graph *g, unsigned lon
+ 
+ /**************************************************************************/
+ 
+-static void
+-putbliss(FILE *f, unsigned long id, boolean qswitch, graph *g, int m, int n)
++STATIC_POPCNTFUNC(void,
++putbliss,(FILE *f, unsigned long id, boolean qswitch, graph *g, int m, int n),
+ /* Write the graph in DIMACS format, according to
+  *      http://www.tcs.hut.fi/Software/bliss/fileformat.shtml */
+ {
+@@ -370,7 +370,7 @@ putbliss(FILE *f, unsigned long id, bool
+     for (i = 0, pg = g; i < n; ++i, pg += m)
+         for (j = nextelement(pg,m,i); j >= 0; j = nextelement(pg,m,j))
+             fprintf(f,"e %d %d\n",i+1,j+1);
+-}
++})
+ 
+ /**************************************************************************/
+ 
+@@ -496,6 +496,17 @@ putMaple(FILE *outfile, graph *g, int li
+ 
+ /**************************************************************************/
+ 
++STATIC_POPCNTFUNC(int,
++compute_degree,(const set *g, int m),
++{
++    int i, d = 0;
++    for (i = 0; i < m; ++i)
++        d += POPCOUNT(g[i]);
++    return d;
++})
++
++/**************************************************************************/
++
+ static void
+ putLaplacianMagma(FILE *outfile, graph *g, int linelength, boolean signless,
+          int m, int n, long index)
+@@ -509,8 +520,7 @@ putLaplacianMagma(FILE *outfile, graph *
+ 
+     for (i = 0, gi = (set*)g; i < n; ++i, gi += m)
+     {
+-        d = 0;
+-        for (j = 0; j < m; ++j) d += POPCOUNT(gi[j]);
++        d = compute_degree(gi, m);
+ 
+         for (j = 0; j < n; ++j)
+         {
+@@ -547,8 +557,7 @@ putLaplacianMaple(FILE *outfile, graph *
+ 
+     for (i = 0, gi = (set*)g; i < n; ++i, gi += m)
+     {
+-        d = 0;
+-        for (j = 0; j < m; ++j) d += POPCOUNT(gi[j]);
++        d = compute_degree(gi, m);
+ 
+         fprintf(outfile,"[");
+         first = TRUE;
+--- a/multig.c
++++ b/multig.c
+@@ -518,6 +518,19 @@ scan_reg(int level, int ne, long minedge
+ 
+ /**************************************************************************/
+ 
++STATIC_POPCNTFUNC(int,
++compute_degree,(const set *gi, int m),
++{
++    int i, thisdeg;
++
++    thisdeg = 0;
++    for (i = 0; i < m; ++i)
++        thisdeg += POPCOUNT(gi[i]);
++    return thisdeg;
++})
++
++/**************************************************************************/
++
+ static void
+ multi(graph *g, int nfixed, long minedges, long maxedges, long maxmult,
+       int maxdeg, boolean lswitch, int m, int n)
+@@ -545,9 +558,7 @@ multi(graph *g, int nfixed, long minedge
+     maxd = 0;
+     for (i = 0, gi = g; i < n; ++i, gi += m)
+     {
+-        thisdeg = 0;
+-        for (j = 0; j < m; ++j) thisdeg += POPCOUNT(gi[j]);
+-        deg[i] = thisdeg;
++        thisdeg = compute_degree(gi, m);
+         if (thisdeg > maxd) maxd = thisdeg;
+         if (thisdeg == 0) lab[++j0] = i;
+         else              lab[--j1] = i;
+@@ -701,7 +712,7 @@ vmulti(graph *g, int nfixed, long minedg
+     statsblk stats;
+     setword workspace[2*MAXNV];
+     grouprec *group;
+-    int i,j,k,thisdeg,maxd,x0,x1;
++    int i,k,thisdeg,maxd,x0,x1;
+     set *gi;
+     int lab[MAXNV],ptn[MAXNV],orbits[MAXNV],deg[MAXNV];
+     int delta[MAXNV],def[MAXNV];
+@@ -717,8 +728,7 @@ vmulti(graph *g, int nfixed, long minedg
+     maxd = 0;
+     for (i = 0, gi = g; i < n; ++i, gi += m)
+     {
+-        thisdeg = 0;
+-        for (j = 0; j < m; ++j) thisdeg += POPCOUNT(gi[j]);
++        thisdeg = compute_degree(gi, m);
+         deg[i] = thisdeg;
+         if (thisdeg > maxd) maxd = thisdeg;
+         if (thisdeg == 0)    weight[i] = -i-1;
+--- a/nauchromatic.c
++++ b/nauchromatic.c
+@@ -47,6 +47,29 @@ static TLS_ATTR set colours1[WORDSIZE];
+ static TLS_ATTR setword colourset1[WORDSIZE];
+ static TLS_ATTR setword numcols1[WORDSIZE];
+ 
++STATIC_POPCNTFUNC(int,
++compute_maxdegree,(const graph *g, int *jmax, int n),
++{
++    int i, imax = -1, maxdeg = -1;
++    for (i = 0; i < n; ++i)
++    {
++        int deg = POPCOUNT(g[i]);
++        if (deg > maxdeg)
++        {
++            maxdeg = deg;
++            imax = i;
++        }
++    }
++    *jmax = imax;
++    return maxdeg;
++})
++
++STATIC_POPCNTFUNC(int,
++mix_degree,(const graph *g, int i, setword used),
++{
++    return (POPCOUNT(g[i]&used) << 6) + POPCOUNT(g[i]);
++})
++
+ /*******************************************************************
+ * First we have code for n <= WORDSIZE. It is generally faster than
+ * the other functions for n <= 30 approximately.
+@@ -63,12 +86,7 @@ chromaticnumber1(graph *g, int n, int mi
+     setword w,left,used;
+     int deg,maxdeg,imax;
+ 
+-    maxdeg = -1;
+-    for (i = 0; i < n; ++i)
+-    {
+-        deg = POPCOUNT(g[i]);
+-        if (deg > maxdeg) { maxdeg = deg; imax = i; }
+-    }
++    maxdeg = compute_maxdegree(g, &imax, n);
+ 
+     if (maxdeg <= 1)
+     {
+@@ -90,7 +108,7 @@ chromaticnumber1(graph *g, int n, int mi
+         while (w)
+         {
+             TAKEBIT(j,w);
+-            deg = (POPCOUNT(g[j]&used) << 6) + POPCOUNT(g[j]);
++            deg = mix_degree(g, j, used);
+             if (deg > maxdeg) { maxdeg = deg; imax = j; }
+         }
+         v[i] = imax;
+@@ -182,6 +200,12 @@ updateA1(setword uncolnbr, int colour)
+     }
+ }
+ 
++STATIC_POPCNTFUNC(int,
++my_popcount,(setword x),
++{
++    return POPCOUNT(x);
++})
++
+ static void
+ colornext1(graph *g, int n, int numsofar, int numcolors, int *color1,
+           int *minsofar, setword *uncoloured, int minchi)
+@@ -216,7 +240,7 @@ if (maxnumcols > n-1 || maxnumcols > num
+     while (w)
+     {
+         TAKEBIT(j,w);
+-        numnay = POPCOUNT(g[j] & *uncoloured);
++        numnay = my_popcount(g[j] & *uncoloured);
+         if (numnay > maxnay)
+         {
+             vtocolour = j;
+@@ -285,16 +309,7 @@ chromaticnumber2(graph *g, int n, int mi
+     setword w;
+     int color1[WORDSIZE];
+ 
+-    maxdeg = -1;
+-    for (i = 0; i < n; ++i)
+-    {
+-        d = POPCOUNT(g[i]);
+-        if (d > maxdeg)
+-        {
+-            maxdeg = d;
+-            maxvert = i;
+-        }
+-    }
++    maxdeg = compute_maxdegree(g, &maxvert, n);
+ 
+     if (maxdeg <= 1)
+     {
+@@ -321,7 +336,7 @@ chromaticnumber2(graph *g, int n, int mi
+     while (w)
+     {
+         TAKEBIT(i,w);
+-        d = POPCOUNT(g[i]);
++        d = my_popcount(g[i]);
+         if (d > maxdeg2)
+         {
+             maxdeg2 = d;
+@@ -444,7 +459,7 @@ colornext(graph *g, int m, int n, int nu
+     {
+         numnay = 0;
+         gj = g + m*j;
+-        for (jj = 0; jj < m; ++jj) numnay += POPCOUNT(gj[jj]&uncoloured[jj]);
++        for (jj = 0; jj < m; ++jj) numnay += my_popcount(gj[jj]&uncoloured[jj]);
+         if (numnay > maxnay)
+         {
+             vtocolour = j;
+@@ -499,7 +514,7 @@ chromaticnumber3(graph *g, int m, int n,
+         d = 0;
+         for (j = 0; j < m; ++j)
+         {
+-            d += POPCOUNT(*gp);
++            d += my_popcount(*gp);
+             ++gp;
+         }
+         deg[i] = d;
+@@ -616,6 +631,15 @@ chromaticnumber(graph *g, int m, int n,
+ * but digraphs are not.
+ ****************************************************************/
+ 
++STATIC_POPCNTFUNC(int,
++compute_degree,(const graph *g, int m),
++{
++    int i, d = 0;
++    for (i = 0; i < m; ++i)
++        d += POPCOUNT(g[i]);
++    return d;
++})
++
+ int
+ chromaticindex(graph *g, int m, int n, int *maxdeg)
+ /* Return the chromatic index, also the maximum degree. */
+@@ -629,8 +653,7 @@ chromaticindex(graph *g, int m, int n, i
+     for (i = 0, gi = g; i < n; ++i, gi += m)
+     {
+         if (ISELEMENT(gi,i)) ++nloops;
+-        d = 0;
+-        for (j = 0; j < m; ++j) d += POPCOUNT(gi[j]);
++        d = compute_degree(gi, m);
+         totdeg += d;
+         if (d > maxd) maxd = d;
+     }
+--- a/nauconnect.c
++++ b/nauconnect.c
+@@ -97,6 +97,12 @@ vaugpath1(graph *g, graph *paths, int n,
+     return TRUE;
+ }
+ 
++STATIC_POPCNTFUNC(int, 
++my_popcount,(setword x),
++{
++    return POPCOUNT(x);
++})
++
+ int
+ maxvertexflow1(graph *g, int n, int s, int t, int maxneeded, boolean digraph)
+ /* Find the maximum number of vertex-disjoint paths from s to t.
+@@ -107,11 +113,11 @@ maxvertexflow1(graph *g, int n, int s, i
+     graph paths[WORDSIZE];
+     int i,k,d;
+ 
+-    d = POPCOUNT(g[s]);
++    d = my_popcount(g[s]);
+     if (d < maxneeded) maxneeded = d;
+     if (!digraph)
+     {
+-        d = POPCOUNT(g[t]);  /* here is where digraphs are not allowed */
++        d = my_popcount(g[t]);  /* here is where digraphs are not allowed */
+         if (d < maxneeded) maxneeded = d;
+     }
+ 
+@@ -123,27 +129,34 @@ maxvertexflow1(graph *g, int n, int s, i
+     return maxneeded;
+ }
+ 
++STATIC_POPCNTFUNC(int,
++compute_mindegree,(const graph *g, int *jmin, int n, int initdeg),
++{
++    int i, imin = -1, mindeg = initdeg;
++    for (i = 0; i < n; ++i)
++    {
++        int deg = POPCOUNT(g[i] & ~bit[i]);
++        if (deg < mindeg)
++        {
++            mindeg = deg;
++            imin = i;
++        }
++    }
++    *jmin = imin;
++    return mindeg;
++})
++
+ static int
+ connectivity1(graph *g, int n)
+ /* Find the vertex connectivity of g. Case of n <= WORDIZE.
+    Use diconnectivity1() instead for digraphs.
+    Algorithm: Even p126. */
+ {
+-    int c,j,k,i,v,d,mind,f;
++    int c,j,k,i,v,mind,f;
+     setword w;
+ 
+-    mind = n+1;
+     v = 0;
+-    for (i = 0; i < n; ++i)
+-    {
+-        d = POPCOUNT(g[i] & ~bit[i]);
+-        if (d < mind)
+-        {
+-            v = i;
+-            mind = d;
+-        }
+-    }
+-
++    mind = compute_mindegree(g, &v, n, n + 1);
+     if (mind == n-1) return n-1;  /* complete graph */
+ 
+     c = mind;
+@@ -183,21 +196,11 @@ diconnectivity1(graph *g, int n)
+ /* Find the vertex connectivity of g.  Digraphs are ok.
+    Algorithm: Even p126. */
+ {
+-    int c,j,k,i,v,d,mind,f;
++    int c,j,k,i,v,mind,f;
+     setword w;
+ 
+-    mind = n+1;
+     v = 0;
+-    for (i = 0; i < n; ++i)
+-    {
+-        d = POPCOUNT(g[i] & ~bit[i]);
+-        if (d < mind)
+-        {
+-            v = i;
+-            mind = d;
+-        }
+-    }
+-
++    mind = compute_mindegree(g, &v, n, n + 1);
+     if (mind == n-1) return n-1;  /* complete graph */
+ 
+     c = mind;
+@@ -348,6 +351,15 @@ vaugpath(graph *g, graph *paths, int m,
+     return TRUE;
+ }
+ 
++STATIC_POPCNTFUNC(int,
++compute_degree,(const graph *g, int m),
++{
++    int i, deg = 0;
++    for (i = 0; i < m; ++i)
++        deg += POPCOUNT(g[i]);
++    return deg;
++})
++
+ int
+ maxvertexflow(graph *g, graph *paths, set *visited, int *queue, int *parent,
+               int m, int n, int s, int t, int maxneeded, boolean digraph)
+@@ -359,20 +371,18 @@ maxvertexflow(graph *g, graph *paths, se
+    visited is work space of 2*m setwords.
+    queue and parent are work space of 2*n ints each. */
+ {
+-    int i,k,d;
++    int k,d;
+     graph *gs,*gt;
+ 
+     gs = g + s*m;
+-    d = 0;
+-    for (i = 0; i < m; ++i) d += POPCOUNT(gs[i]);
++    d = compute_degree(gs, m);
+ 
+     if (d < maxneeded) maxneeded = d;
+ 
+     if (!digraph)
+     {
+         gt = g + t*m;
+-        d = 0;
+-        for (i = 0; i < m; ++i) d += POPCOUNT(gt[i]);
++        d = compute_degree(gt, m);
+         if (d < maxneeded) maxneeded = d;
+     }
+ 
+@@ -409,8 +419,7 @@ connectivity(graph *g, int m, int n, boo
+     v = 0;
+     for (i = 0, gi = g; i < n; ++i, gi += m)
+     {
+-        d = 0;
+-        for (j = 0; j < m; ++j) d += POPCOUNT(gi[j]);
++        d = compute_degree(gi, m);
+         if (ISELEMENT(gi,i)) --d;
+         if (d < mind)
+         {
+@@ -694,7 +703,7 @@ maxedgeflow1(graph *g, int n, int s, int
+     graph paths[WORDSIZE];
+     int i,k,d;
+ 
+-    d = POPCOUNT(g[s]);
++    d = my_popcount(g[s]);
+     if (d < maxneeded) maxneeded = d;
+ 
+     if (d < maxneeded) maxneeded = d;
+@@ -711,20 +720,10 @@ edgeconnectivity1(graph *g, int n)
+ /* Find the edge connectivity. Digraphs are ok.
+    Algorithm: Even p131. */
+ {
+-    int d,i,u,v,c,f;
++    int i,u,v,c,f;
+     
+-    c = n;
+     u = 0;
+-    for (i = 0; i < n; ++i)
+-    {
+-        d = POPCOUNT(g[i] & ~bit[i]);
+-        if (d < c)
+-        {
+-            u = i;
+-            c = d;
+-        }
+-    }
+-
++    c = compute_mindegree(g, &u, n, n);
+     if (c == 0) return 0;
+ 
+     for (i = 0; i < n; ++i)
+@@ -812,12 +811,11 @@ maxedgeflow(graph *g, graph *paths, int
+    visited is work space of m setwords.
+    queue and parent are work space of n ints each. */
+ {
+-    int i,k,d;
++    int k,d;
+     set *gs;
+ 
+     gs = g + s*m;
+-    d = 0;
+-    for (i = 0; i < m; ++i) d += POPCOUNT(gs[i]);
++    d = compute_degree(gs, m);
+ 
+     if (d < maxneeded) maxneeded = d;
+ 
+@@ -838,7 +836,7 @@ edgeconnectivity(graph *g, int m, int n)
+     graph *paths,*gi;
+     int *parent_queue;
+     set *visited;
+-    int i,j,d,c,f,u,v;
++    int i,d,c,f,u,v;
+ 
+     if (m == 1) return edgeconnectivity1(g,n);
+ 
+@@ -846,8 +844,7 @@ edgeconnectivity(graph *g, int m, int n)
+     c = n+1;
+     for (i = 0, gi = g; i < n; ++i, gi += m)
+     {
+-        d = 0;
+-        for (j = 0; j < m; ++j) d += POPCOUNT(gi[j]);
++        d = compute_degree(gi, m);
+         if (ISELEMENT(gi,i)) --d;
+         if (d < c)
+         {
+@@ -887,20 +884,10 @@ isthisedgeconnected1(graph *g, int n, in
+ /* Test if g is c-edge connected, case of m=1. Digraphs are ok.
+    Algorithm: Even p131. */
+ {
+-    int d,i,mind,u,v;
++    int i,mind,u,v;
+     
+-    mind = n;
+     u = 0;
+-    for (i = 0; i < n; ++i)
+-    {
+-        d = POPCOUNT(g[i] & ~bit[i]);
+-        if (d < mind)
+-        {
+-            u = i;
+-            mind = d;
+-        }
+-    }
+-
++    mind = compute_mindegree(g, &u, n, n);
+     if (mind < c) return FALSE;
+ 
+     for (i = 0; i < n; ++i)
+@@ -925,7 +912,7 @@ isthisedgeconnected(graph *g, int m, int
+     graph *paths,*gi;
+     int *parent_queue;
+     set *visited;
+-    int i,j,d,mind,u,v;
++    int i,d,mind,u,v;
+     boolean ans;
+ 
+     if (m == 1) return isthisedgeconnected1(g,n,c);
+@@ -934,8 +921,7 @@ isthisedgeconnected(graph *g, int m, int
+     u = 0;
+     for (i = 0, gi = g; i < n; ++i, gi += m)
+     {
+-        d = 0;
+-        for (j = 0; j < m; ++j) d += POPCOUNT(gi[j]);
++        d = compute_degree(gi, m);
+         if (ISELEMENT(gi,i)) --d;
+         if (d < mind)
+         {
+--- a/naugraph.c
++++ b/naugraph.c
+@@ -57,6 +57,23 @@ static TLS_ATTR int bucket[MAXN+2];
+ static TLS_ATTR set dnwork[2*500*MAXM];
+ #endif
+ 
++STATIC_POPCNTFUNC(int, 
++my_popcount,(setword x),
++{
++    return POPCOUNT(x);
++})
++
++STATIC_POPCNTFUNC(int,
++compute_joint_degree,(set *set1, set *set2, int m),
++{
++    int i, deg = 0;
++    setword x;
++    for (i = m; --i >= 0; )
++        if ((x = ((*set1++) & (*set2++))) != 0)
++            deg += POPCOUNT(x);
++    return deg;
++})
++
+ /*****************************************************************************
+ *                                                                            *
+ *  isautom(g,perm,digraph,m,n) = TRUE iff perm is an automorphism of g       *
+@@ -185,7 +202,6 @@ refine(graph *g, int *lab, int *ptn, int
+ #else
+ 
+     int i,c1,c2,labc1;
+-    setword x;
+     set *set1,*set2;
+     int split1,split2,cell1,cell2;
+     int cnt,bmin,bmax;
+@@ -264,10 +280,7 @@ refine(graph *g, int *lab, int *ptn, int
+                 i = cell1;
+                 set1 = workset;
+                 set2 = GRAPHROW(g,lab[i],m);
+-                cnt = 0;
+-                for (c1 = m; --c1 >= 0;)
+-                    if ((x = ((*set1++) & (*set2++))) != 0)
+-                        cnt += POPCOUNT(x);
++                cnt = compute_joint_degree(set1, set2, m);
+ 
+                 count[i] = bmin = bmax = cnt;
+                 bucket[cnt] = 1;
+@@ -275,10 +288,7 @@ refine(graph *g, int *lab, int *ptn, int
+                 {
+                     set1 = workset;
+                     set2 = GRAPHROW(g,lab[i],m);
+-                    cnt = 0;
+-                    for (c1 = m; --c1 >= 0;)
+-                        if ((x = ((*set1++) & (*set2++))) != 0)
+-                            cnt += POPCOUNT(x);
++                    cnt = compute_joint_degree(set1, set2, m);
+ 
+                     while (bmin > cnt) bucket[--bmin] = 0;
+                     while (bmax < cnt) bucket[++bmax] = 0;
+@@ -420,7 +430,7 @@ refine1(graph *g, int *lab, int *ptn, in
+                 if (cell1 == cell2) continue;
+                 i = cell1;
+                 if ((x = workset0 & g[lab[i]]) != 0)
+-                    cnt = POPCOUNT(x);
++                    cnt = my_popcount(x);
+                 else
+                     cnt = 0;
+                 count[i] = bmin = bmax = cnt;
+@@ -428,7 +438,7 @@ refine1(graph *g, int *lab, int *ptn, in
+                 while (++i <= cell2)
+                 {
+                     if ((x = workset0 & g[lab[i]]) != 0)
+-                        cnt = POPCOUNT(x);
++                        cnt = my_popcount(x);
+                     else
+                         cnt = 0;
+                     while (bmin > cnt) bucket[--bmin] = 0;
+--- a/nausparse.c
++++ b/nausparse.c
+@@ -1486,8 +1486,8 @@ copy_sg(sparsegraph *sg1, sparsegraph *s
+ *                                                                            *
+ *****************************************************************************/
+ 
+-sparsegraph*
+-nauty_to_sg(graph *g, sparsegraph *sg, int m, int n)
++POPCNTFUNC(sparsegraph*,
++nauty_to_sg,(graph *g, sparsegraph *sg, int m, int n),
+ {
+     int *d,*e;
+     int i,k;
+@@ -1523,7 +1523,7 @@ nauty_to_sg(graph *g, sparsegraph *sg, i
+     }
+ 
+     return sg;
+-}
++})
+ 
+ /*****************************************************************************
+ *                                                                            *
+--- a/nautinv.c
++++ b/nautinv.c
+@@ -230,12 +230,24 @@ twopaths(graph *g, int *lab, int *ptn, i
+ *                                                                            *
+ *****************************************************************************/
+ 
++STATIC_POPCNTFUNC(int,
++disjoint_edges,(const set *g, const set *ws, int m),
++{
++    int i, pc = 0;
++    for (i = m; --i >= 0; )
++    {
++        setword sw = ws[i] ^ g[i];
++        if (sw != 0)
++            pc += POPCOUNT(sw);
++    }
++    return pc;
++})
++
+ void
+ quadruples(graph *g, int *lab, int *ptn, int level, int numcells, int tvpos,
+            int *invar, int invararg, boolean digraph, int m, int n)
+ {
+     int i,pc;
+-    setword sw;
+     set *gw;
+     int wt;
+     int v,iv,v1,v2,v3;
+@@ -283,9 +295,7 @@ quadruples(graph *g, int *lab, int *ptn,
+                     if (wv3 == wv && v3 <= v) continue;
+                     wv3 += wv2;
+                     gw = GRAPHROW(g,v3,m);
+-                    pc = 0;
+-                    for (i = M; --i >= 0;)
+-                        if ((sw = ws1[i] ^ gw[i]) != 0) pc += POPCOUNT(sw);
++                    pc = disjoint_edges(gw, ws1, M);
+                     wt = (FUZZ1(pc)+wv3) & 077777;
+                     wt = FUZZ2(wt);
+                     ACCUM(invar[v],wt);
+@@ -314,7 +324,6 @@ triples(graph *g, int *lab, int *ptn, in
+         int *invar, int invararg, boolean digraph, int m, int n)
+ {
+     int i,pc;
+-    setword sw;
+     set *gw;
+     int wt;
+     int v,iv,v1,v2;
+@@ -354,9 +363,7 @@ triples(graph *g, int *lab, int *ptn, in
+                 if (wv2 == wv && v2 <= v) continue;
+                 wv2 += wv1;
+                 gw = GRAPHROW(g,v2,m);
+-                pc = 0;
+-                for (i = M; --i >= 0;)
+-                    if ((sw = workset[i] ^ gw[i]) != 0) pc += POPCOUNT(sw);
++                pc = disjoint_edges(gw, workset, M);
+                 wt = (FUZZ1(pc)+wv2) & 077777;
+                 wt = FUZZ2(wt);
+                 ACCUM(invar[v],wt);
+@@ -381,8 +388,7 @@ void
+ adjtriang(graph *g, int *lab, int *ptn, int level, int numcells, int tvpos,
+           int *invar, int invararg, boolean digraph, int m, int n)
+ {
+-    int j,pc;
+-    setword sw;
++    int pc;
+     set *gi;
+     int wt;
+     int i,v1,v2;
+@@ -420,10 +426,8 @@ adjtriang(graph *g, int *lab, int *ptn,
+             i = -1;
+             while ((i = nextelement(workset,M,i)) >= 0)
+             {
+-                pc = 0;
+                 gi = GRAPHROW(g,i,m);
+-                for (j = M; --j >= 0;)
+-                    if ((sw = workset[j] & gi[j]) != 0) pc += POPCOUNT(sw);
++                pc = disjoint_edges(gi, workset, M);
+                 pc = (pc + wt) & 077777;
+                 ACCUM(invar[i],pc);
+             }
+@@ -508,7 +512,6 @@ celltrips(graph *g, int *lab, int *ptn,
+           int *invar, int invararg, boolean digraph, int m, int n)
+ {
+     int i,pc;
+-    setword sw;
+     set *gw;
+     int wt;
+     int v,iv,v1,iv1,v2,iv2;
+@@ -544,10 +547,7 @@ celltrips(graph *g, int *lab, int *ptn,
+                 {
+                     v2 = lab[iv2];
+                     gw = GRAPHROW(g,v2,m);
+-                    pc = 0;
+-                    for (i = M; --i >= 0;)
+-                        if ((sw = workset[i] ^ gw[i]) != 0)
+-                            pc += POPCOUNT(sw);
++                    pc = disjoint_edges(gw, workset, M);
+                     wt = FUZZ1(pc);
+                     ACCUM(invar[v],wt);
+                     ACCUM(invar[v1],wt);
+@@ -576,7 +576,6 @@ cellquads(graph *g, int *lab, int *ptn,
+           int *invar, int invararg, boolean digraph, int m, int n)
+ {
+     int i,pc;
+-    setword sw;
+     set *gw;
+     int wt;
+     int v,iv,v1,iv1,v2,iv2,v3,iv3;
+@@ -618,10 +617,7 @@ cellquads(graph *g, int *lab, int *ptn,
+                     {
+                         v3 = lab[iv3];
+                         gw = GRAPHROW(g,v3,m);
+-                        pc = 0;
+-                        for (i = M; --i >= 0;)
+-                            if ((sw = ws1[i] ^ gw[i]) != 0)
+-                                pc += POPCOUNT(sw);
++                        pc = disjoint_edges(gw, ws1, M);
+                         wt = FUZZ1(pc);
+                         ACCUM(invar[v],wt);
+                         ACCUM(invar[v1],wt);
+@@ -652,7 +648,6 @@ cellquins(graph *g, int *lab, int *ptn,
+           int *invar, int invararg, boolean digraph, int m, int n)
+ {
+     int i,pc;
+-    setword sw;
+     set *gw;
+     int wt;
+     int v,iv,v1,iv1,v2,iv2,v3,iv3,v4,iv4;
+@@ -700,10 +695,7 @@ cellquins(graph *g, int *lab, int *ptn,
+                         {
+                             v4 = lab[iv4];
+                             gw = GRAPHROW(g,v4,m);
+-                            pc = 0;
+-                            for (i = M; --i >= 0;)
+-                                if ((sw = ws2[i] ^ gw[i]) != 0)
+-                                    pc += POPCOUNT(sw);
++                            pc = disjoint_edges(gw, ws2, M);
+                             wt = FUZZ1(pc);
+                             ACCUM(invar[v],wt);
+                             ACCUM(invar[v1],wt);
+@@ -759,12 +751,24 @@ uniqinter(set *s1, set *s2, int m)
+ *                                                                            *
+ *****************************************************************************/
+ 
++STATIC_POPCNTFUNC(int,
++triedges,(const set *gp0, const set *gp1, const set *gp2, int m),
++{
++    int i, pc = 0;
++    for (i = m; --i >= 0; )
++    {
++        setword sw = gp0[i] & gp1[i] & gp2[i];
++        if (sw)
++            pc += POPCOUNT(sw);
++    }
++    return pc;
++})
++
+ void 
+ cellfano2(graph *g, int *lab, int *ptn, int level, int numcells, int tvpos,
+           int *invar, int invararg, boolean digraph, int m, int n)
+ {
+     int i,pc;
+-    setword sw;
+     int wt;
+     int v0,v1,v2,v3,iv0,iv1,iv2,iv3;
+     int icell,bigcells,cell1,cell2;
+@@ -846,12 +850,7 @@ cellfano2(graph *g, int *lab, int *ptn,
+                         gp1 = GRAPHROW(g,pnt1,m);
+                         gp2 = GRAPHROW(g,pnt2,m);
+ 
+-                        pc = 0;
+-                        for (i = M; --i >= 0;)
+-                        {
+-                            sw = gp0[i] & gp1[i] & gp2[i];
+-                            if (sw) pc += POPCOUNT(sw);
+-                        }
++                        pc = triedges(gp0, gp1, gp2, M);
+                         wt = FUZZ1(pc);
+                         ACCUM(invar[v0],wt);
+                         ACCUM(invar[v1],wt);
+@@ -913,7 +912,6 @@ cellfano(graph *g, int *lab, int *ptn, i
+          int *invar, int invararg, boolean digraph, int m, int n)
+ {
+     int i,pc;
+-    setword sw;
+     int wt;
+     int v0,v1,v2,v3,iv0,iv1,iv2,iv3;
+     int icell,bigcells,cell1,cell2;
+@@ -988,12 +986,7 @@ cellfano(graph *g, int *lab, int *ptn, i
+                         setnbhd(g,m,n,workset,pt1);
+                         for (i = M; --i >= 0;) workset[i] = w02[i] & w13[i];
+                         setnbhd(g,m,n,workset,pt2);
+-                        pc = 0;
+-                        for (i = M; --i >= 0;)
+-                        {
+-                            sw = pt0[i] & pt1[i] & pt2[i];
+-                            if (sw) pc += POPCOUNT(sw);
+-                        }
++                        pc = triedges(pt0, pt1, pt2, M);
+                         wt = FUZZ1(pc);
+                         ACCUM(invar[v0],wt);
+                         ACCUM(invar[v1],wt);
+@@ -1246,6 +1239,19 @@ cliques(graph *g, int *lab, int *ptn, in
+ *                                                                            *
+ *****************************************************************************/
+ 
++STATIC_POPCNTFUNC(int,
++common_edges,(const set *g, const set *ws, set *ns, int m),
++{
++    int i, pc = 0;
++    for (i = m; --i >= 0; )
++    {
++        ns[i] = g[i] & ws[i];
++        if (ns[i])
++            pc += POPCOUNT(ns[i]);
++    }
++    return pc;
++})
++
+ void
+ cellcliq(graph *g, int *lab, int *ptn, int level, int numcells, int tvpos,
+          int *invar, int invararg, boolean digraph, int m, int n)
+@@ -1259,7 +1265,6 @@ cellcliq(graph *g, int *lab, int *ptn, i
+     int *cellstart,*cellsize;
+     int iv,icell,bigcells,cell1,cell2;
+     int pc;
+-    setword sw;
+ 
+ #if !MAXN
+     DYNALLOC1(set,workset,workset_sz,m,"cellcliq");
+@@ -1292,13 +1297,7 @@ cellcliq(graph *g, int *lab, int *ptn, i
+             v[0] = lab[iv];
+             gv = GRAPHROW(g,v[0],m);
+             ns = (set*)wss;
+-            pc = 0;
+-
+-            for (i = M; --i >= 0;)
+-            {
+-                ns[i] = gv[i] & workset[i];
+-                if ((sw = ns[i]) != 0) pc += POPCOUNT(sw);
+-            }
++            pc = common_edges(gv, workset, ns, M);
+             if (pc <= 1 || pc >= cellsize[icell] - 2) continue;
+ 
+             ss = 1;
+@@ -1342,6 +1341,19 @@ cellcliq(graph *g, int *lab, int *ptn, i
+ *                                                                            *
+ *****************************************************************************/
+ 
++STATIC_POPCNTFUNC(int,
++not_common_edges,(const set *g, const set *ws, set *ns, int m),
++{
++    int i, pc = 0;
++    for (i = m; --i >= 0; )
++    {
++        ns[i] = ~g[i] & ws[i];
++        if (ns[i])
++            pc += POPCOUNT(ns[i]);
++    }
++    return pc;
++})
++
+ void
+ cellind(graph *g, int *lab, int *ptn, int level, int numcells, int tvpos,
+         int *invar, int invararg, boolean digraph, int m, int n)
+@@ -1355,7 +1367,6 @@ cellind(graph *g, int *lab, int *ptn, in
+     int *cellstart,*cellsize;
+     int iv,icell,bigcells,cell1,cell2;
+     int pc;
+-    setword sw;
+ 
+ #if !MAXN
+     DYNALLOC1(set,workset,workset_sz,m,"cellind");
+@@ -1388,13 +1399,7 @@ cellind(graph *g, int *lab, int *ptn, in
+             v[0] = lab[iv];
+             gv = GRAPHROW(g,v[0],m);
+             ns = (set*)wss;
+-            pc = 0;
+-
+-            for (i = M; --i >= 0;)
+-            {
+-                ns[i] = ~gv[i] & workset[i];
+-                if ((sw = ns[i]) != 0) pc += POPCOUNT(sw);
+-            }
++            pc = not_common_edges(gv, workset, ns, M);
+             if (pc <= 1 || pc >= cellsize[icell] - 2) continue;
+ 
+             ss = 1;
+@@ -1553,12 +1558,28 @@ nautinv_freedyn(void)
+ *                                                                            *
+ *****************************************************************************/
+ 
++STATIC_POPCNTFUNC(int,
++compute_joint_degree,(set **set1, set **set2, int m),
++{
++    set *s1 = *set1;
++    set *s2 = *set2;
++    int i, deg = 0;
++    for (i = m; --i >= 0; )
++    {
++        setword x = (*s1++) & (*s2++);
++        if (x != 0)
++            deg += POPCOUNT(x);
++    }
++    *set1 = s1;
++    *set2 = s2;
++    return deg;
++})
++
+ static int
+ semirefine(graph *g, int *lab, int *ptn, int level, int *numcells,
+            int strength, set *active, int m, int n)
+ {
+     int i,c1,c2,labc1;
+-    setword x;
+     set *set1,*set2;
+     int split1,split2,cell1,cell2;
+     int cnt,bmin,bmax;
+@@ -1636,10 +1657,7 @@ semirefine(graph *g, int *lab, int *ptn,
+                 i = cell1;
+                 set1 = workset;
+                 set2 = GRAPHROW(g,lab[i],m);
+-                cnt = 0;
+-                for (c1 = m; --c1 >= 0;)
+-                    if ((x = ((*set1++) & (*set2++))) != 0)
+-                        cnt += POPCOUNT(x);
++                cnt = compute_joint_degree(&set1, &set2, m);
+ 
+                 count[i] = bmin = bmax = cnt;
+                 bucket[cnt] = 1;
+@@ -1647,10 +1665,7 @@ semirefine(graph *g, int *lab, int *ptn,
+                 {
+                     set1 = workset;
+                     set2 = GRAPHROW(g,lab[i],m);
+-                    cnt = 0;
+-                    for (c1 = m; --c1 >= 0;)
+-                        if ((x = ((*set1++) & (*set2++))) != 0)
+-                            cnt += POPCOUNT(x);
++                    cnt = compute_joint_degree(&set1, &set2, m);
+ 
+                     while (bmin > cnt) bucket[--bmin] = 0;
+                     while (bmax < cnt) bucket[++bmax] = 0;
+--- a/naututil.c
++++ b/naututil.c
+@@ -139,8 +139,8 @@ static const long fuzz2[] = {2001381726L
+ *                                                                            *
+ *****************************************************************************/
+ 
+-long long
+-setinter(set *set1, set *set2, int m)
++POPCNTFUNC(long long,
++setinter,(set *set1, set *set2, int m),
+ {
+     setword x;
+     long long count;
+@@ -155,7 +155,7 @@ setinter(set *set1, set *set2, int m)
+     }
+ 
+     return count;
+-}
++})
+ 
+ /*****************************************************************************
+ *                                                                            *
+@@ -163,8 +163,8 @@ setinter(set *set1, set *set2, int m)
+ *                                                                            *
+ *****************************************************************************/
+ 
+-long long
+-setsize(set *set1, int m)
++POPCNTFUNC(long long,
++setsize,(set *set1, int m),
+ {
+     int i;
+     long long count;
+@@ -175,7 +175,7 @@ setsize(set *set1, int m)
+     for (i = m; --i >= 0;) count += POPCOUNT(set1[i]);
+ 
+     return count;
+-}
++})
+ 
+ /*****************************************************************************
+ *                                                                            *
+--- a/nauty.c
++++ b/nauty.c
+@@ -80,6 +80,10 @@
+ #define NAUTY_ABORTED (-11)
+ #define NAUTY_KILLED (-12)
+ 
++#if RUNTIME_POPCNT
++int nauty_have_popcnt = -1;
++#endif
++
+ typedef struct tcnode_struct
+ {
+     struct tcnode_struct *next;
+--- a/nauty-h.in
++++ b/nauty-h.in
+@@ -120,6 +120,7 @@ it is necessary to check they are correc
+ #define HAVE_POPCNTLL @have_popcntll@
+ #define HAVE_MMPOP32 @have_mmpop32@
+ #define HAVE_MMPOP64 @have_mmpop64@
++#define RUNTIME_POPCNT @runtime_popcnt@
+ 
+ #if defined(__unix) || defined(__unix__) || defined(unix)
+ #define SYS_UNIX
+@@ -929,6 +930,47 @@ typedef unsigned long long nauty_counter
+ #define ALLBITS C128(0xFFFFFFFFFFFFFFFFULL,0xFFFFFFFFFFFFFFFFULL)
+ #endif
+ 
++/* Determine popcount support at runtime */
++#if RUNTIME_POPCNT
++#if !defined(__x86_64__) && !defined(__i386__)
++#error Runtime popcount support is only available on x86 or x86_64.
++#endif
++#ifndef __GNUC__
++#error Runtime popcount support is only available with GCC.
++#endif
++#if !__clang__ && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 6))
++#error Runtime popcount support is only available with GCC 4.6 or later.
++#endif
++
++extern int nauty_have_popcnt;
++
++#define SLOWPOPCNT(type,name,params,...)                                \
++    static type slow_##name params __VA_ARGS__
++#define FASTPOPCNT(type,name,params,...)                                \
++    static type __attribute__((target ("popcnt"))) fast_##name params   \
++    __VA_ARGS__
++#define POPCNTHDR(type,name,params,...)                                 \
++    SLOWPOPCNT(type,name,params,__VA_ARGS__)                            \
++    FASTPOPCNT(type,name,params,__VA_ARGS__)                            \
++    static type (*resolve_##name (void)) params {                       \
++        if (__builtin_expect(nauty_have_popcnt, 0) < 0) {               \
++            __builtin_cpu_init();                                       \
++            nauty_have_popcnt = __builtin_cpu_supports("popcnt");       \
++        }                                                               \
++        return nauty_have_popcnt ? &fast_##name : &slow_##name;         \
++    }
++#define POPCNTFUNC(type,name,params,...)                                \
++    type __attribute__((ifunc ("resolve_" #name))) name params;         \
++    POPCNTHDR(type,name,params,__VA_ARGS__)
++#define STATIC_POPCNTFUNC(type,name,params,...)                         \
++    static type __attribute__((ifunc ("resolve_" #name))) name params;  \
++    POPCNTHDR(type,name,params,__VA_ARGS__)
++#else
++#define POPCNTFUNC(type,name,params,...) type name params __VA_ARGS__
++#define STATIC_POPCNTFUNC(type,name,params,...)                         \
++    static type name params __VA_ARGS__
++#endif
++
+ #define FIRSTBITNZMAC FIRSTBITMAC
+ 
+ /* Use clz instructions if available */
+@@ -1058,7 +1100,7 @@ static int msc_bsr_16(setword x) \
+ /* Note that, unlike icc, gcc will not use the POPCNT instruction
+    without permission, in which case it defines __POPCNT__
+    except on Apple M1 hardware. */
+-#elif defined(__POPCNT__) || IS_ARM64
++#elif defined(__POPCNT__) || IS_ARM64 || RUNTIME_POPCNT
+ #if defined(SETWORD_LONGLONG) && HAVE_POPCNTLL
+ #define POPCOUNT(x) __builtin_popcountll(x)
+ #elif defined(SETWORD_LONG) && HAVE_POPCNTL
+--- a/nbrhoodg.c
++++ b/nbrhoodg.c
+@@ -113,6 +113,17 @@ getsubgraph(graph *gin, int *perm, int n
+ 
+ /**************************************************************************/
+ 
++STATIC_POPCNTFUNC(int,
++compute_degree,(setword *gv, int m, int degv),
++{
++    int i;
++    for (i = 0; i < m; ++i)
++        degv += POPCOUNT(gv[i]);
++    return degv;
++})
++
++/**************************************************************************/
++
+ int
+ main(int argc, char *argv[])
+ {
+@@ -260,7 +271,7 @@ main(int argc, char *argv[])
+         {
+             if (digraph) degv = 0;
+             else degv = (ISELEMENT(gv,v) != 0);
+-            for (i = 0; i < m; ++i) degv += POPCOUNT(gv[i]);
++	    degv = compute_degree(gv, m, degv);
+             if (degv < mindeg || degv > maxdeg) continue;
+ 
+             if (Dswitch)
+--- a/productg.c
++++ b/productg.c
+@@ -116,6 +116,17 @@ arg_oct(char **ps, int *val, char *id)
+ 
+ /************************************************************************/
+ 
++STATIC_POPCNTFUNC(size_t,
++compute_degree,(const graph *g, size_t gwords),
++{
++    size_t i, deg = 0;
++    for (i = 0; i < gwords; ++i)
++        deg += POPCOUNT(g[i]);
++    return deg;
++})
++
++/************************************************************************/
++
+ int
+ main(int argc, char *argv[])
+ {
+@@ -133,7 +144,7 @@ main(int argc, char *argv[])
+     int adjcode;
+     SG_DECL(sg);
+     int *d,*e,xx,yy;
+-    size_t *v,t,twone,epos;
++    size_t *v,twone,epos;
+ 
+     uswitch = aswitch = cswitch = lswitch = FALSE;
+     Lswitch = tswitch = kswitch = quiet = FALSE;
+@@ -252,11 +263,8 @@ main(int argc, char *argv[])
+         }
+         else
+         {
+-            twone = 0;
+-            for (t = 0; t < (size_t)m1*(size_t)n1; ++t)
+-                twone += POPCOUNT(g1[t]);
+-            for (t = 0; t < (size_t)m2*(size_t)n2; ++t)
+-                twone += POPCOUNT(g2[t]);
++            twone = compute_degree(g1, (size_t)m1*(size_t)n1);
++            twone += compute_degree(g2, (size_t)m2*(size_t)n2);
+             SG_ALLOC(sg,nv,twone,"productg");
+ 
+             epos = 0;
+--- a/vcolg.c
++++ b/vcolg.c
+@@ -130,6 +130,16 @@ testmax(int *p, int n, int *abort)
+ 
+ /**************************************************************************/
+ 
++STATIC_POPCNTFUNC(size_t,
++compute_degree,(const graph *g, size_t gwords),
++{
++    size_t ne;
++    SETSIZE(ne, g, gwords);
++    return ne;
++})
++
++/**************************************************************************/
++
+ static void
+ writeone(FILE *outfile, graph *g, int *col, boolean digraph, int m, int n)
+ {
+@@ -212,7 +222,7 @@ trythisone(grouprec *group, graph *g, bo
+ #ifdef OUTPROC
+             OUTPROC(outfile,g,col,m,n);
+ #else
+-            SETSIZE(ne,g,(size_t)m*(size_t)n);
++            ne = compute_degree(g,(size_t)m*(size_t)n);
+             if (!digraph)
+             {
+                 for (i = 0, gi = g; i < n; ++i, gi += m)
+@@ -560,10 +570,26 @@ colourdigraph(graph *g, int nfixed, bool
+ 
+ /**************************************************************************/
+ 
++STATIC_POPCNTFUNC(void,
++update_degree,(graph *g, long *deg, int m, int n),
++{
++    graph *gi;
++    int i, j;
++
++    for (i = 0, gi = g; i < n; ++i, gi += m)
++    {
++        deg[i] = 0;
++        for (j = 0; j < m; ++j)
++       	    deg[i] += POPCOUNT(gi[j]);
++    }
++})
++
++/**************************************************************************/
++
+ int
+ main(int argc, char *argv[])
+ {
+-    graph *g,*gi;
++    graph *g;
+     int m,n,codetype;
+     int argnum,i,j,nfixed;
+     char *arg,sw;
+@@ -776,11 +802,7 @@ main(int argc, char *argv[])
+         if (oswitch && loopcount(g,m,n) > 0)
+             gt_abort(">E vcolg: loops in input are not allowed for -o\n");
+ 
+-        for (i = 0, gi = g; i < n; ++i, gi += m)
+-        {
+-            deg[i] = 0;
+-            for (j = 0; j < m; ++j) deg[i] += POPCOUNT(gi[j]);
+-        }
++        update_degree(g,deg,m,n);
+ 
+         if (!digraph)
+             colourgraph(g,nfixed,(Fswitch && nfixed>0),mincols,maxcols,
+--- a/watercluster2.c
++++ b/watercluster2.c
+@@ -432,6 +432,11 @@ void writelist(int list[])
+    fprintf(stderr,"---------------------------------------------------------\n");
+    }
+ 
++STATIC_POPCNTFUNC(int, 
++my_popcount,(setword x),
++{
++    return POPCOUNT(x);
++})
+ 
+ /**********************************************************************************/
+ 
+@@ -596,7 +601,7 @@ void decode_to_nauty(unsigned char *code
+ 
+ /****************************************INIT_FOR_G6*****************************/
+ 
+-void init_for_g6(graph g[],int aantal_toppen, int degree[])
++STATIC_POPCNTFUNC(void,init_for_g6,(graph g[],int aantal_toppen, int degree[]),
+ {
+   int i;
+ 
+@@ -608,7 +613,7 @@ void init_for_g6(graph g[],int aantal_to
+   aantal_gerichte_bogen=0;
+   return;
+ 
+-}
++})
+ 
+ 
+ /***************************FILL_EDGELIST**************************/
+@@ -1369,7 +1374,7 @@ for (number_operations=0; (top=(*still_o
+             // now freevertices is the set of vertices that will still be free after  the addition of top
+             for (lowerlimit_outdeg=mindouble=0, readyrun=readylist; !error && (top2= *readyrun)>=0; readyrun++)
+               { bufferg= freevertices & staticg[top2];
+-                if ((dummy=POPCOUNT(bufferg)))// will be a candidate afterwards
++                if ((dummy=my_popcount(bufferg)))// will be a candidate afterwards
+                   { if (dummy < tobedirected[top]) error=1;
+                     else
+                       { if (dummy == tobedirected[top])
+@@ -1582,7 +1587,7 @@ int canonical(unsigned char operation[],
+   for (i=0; (top=vertexorbit[i])>=0; i++) 
+     if (READY(top) && (bufferset=(staticg[top] & free)))
+       {
+-        buffer=POPCOUNT(bufferset);
++        buffer=my_popcount(bufferset);
+         if (buffer<min) { candidates= (graph)0; ADDELEMENT(&candidates,top); 
+                           candidatelist[0]=top; number_candidates=1; min=buffer; }
+         else
+@@ -3792,7 +3797,7 @@ void waterclusters (graph g[], int n)
+   group_up_to_date=1;
+ 
+   maxgraphdeg=0;
+-  for (i=aantal_bogen=0; i<n ; i++) { deg[i]=POPCOUNT(g[i]); if (deg[i]>maxgraphdeg) maxgraphdeg=deg[i];
++  for (i=aantal_bogen=0; i<n ; i++) { deg[i]=my_popcount(g[i]); if (deg[i]>maxgraphdeg) maxgraphdeg=deg[i];
+                                       aantal_bogen+=deg[i]; }
+   aantal_bogen /= 2;
+ 

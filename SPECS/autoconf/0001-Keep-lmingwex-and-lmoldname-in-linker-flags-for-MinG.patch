@@ -1,0 +1,35 @@
+From 9ff9c567b1a7a7e66fa6523d4ceff142b86bddaa Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Markus=20M=C3=BCtzel?= <markus.muetzel@gmx.de>
+Date: Sun, 5 Jan 2025 18:14:19 +0000
+Subject: [PATCH] Keep "-lmingwex" and "-lmoldname" in linker flags for MinGW
+
+It is needed when building Octave targeting Windows. Without it, the
+implementation of "casin" from the Windows runtime is used instead of
+the replacement from MinGW-w64.  That means that results for the
+"casin" function are wrong without that change.
+* lib/autoconf/fortran.m4: Do not remove "-lmingwex" or "-lmoldname"
+from the linker flags when targeting MinGW.  Removing "-lmingwex" causes
+an incorrect linker resolution for functions like "casin" for projects
+that consist of Fortran and C++ sources.  Removing "-lmoldname" causes
+issues for Fortran projects that try to use POSIX-like C functions
+without a '_' symbol prefix when targeting MinGW.
+---
+ lib/autoconf/fortran.m4 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/autoconf/fortran.m4 b/lib/autoconf/fortran.m4
+index cdc197bd..bd68ec3b 100644
+--- a/lib/autoconf/fortran.m4
++++ b/lib/autoconf/fortran.m4
+@@ -665,7 +665,7 @@ while test $[@%:@] != 1; do
+ 	-lang* | -lcrt*.o | -lc | -lgcc* | -lSystem | -libmil | -little \
+ 	  |-LANG:=* | -LIST:* | -LNO:* | -link)
+ 	  ;;
+-	-lkernel32 | -lmingw* | -lmoldname)
++	-lkernel32)
+ 	  # Ignore this library only on Windows-like systems.
+ 	  case $host_os in
+ 	  cygwin* | msys* | mingw* | windows*) ;;
+-- 
+2.47.0
+

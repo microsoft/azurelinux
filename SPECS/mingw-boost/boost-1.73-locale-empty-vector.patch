@@ -1,0 +1,37 @@
+From daf4ef50c88c2b9a6bf2c40b537eebc202caad6e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?S=C3=A9bastien=20Gonzalve?=
+ <sebastien.gonzalve@aliceadsl.fr>
+Date: Sat, 14 Nov 2020 10:39:47 +0100
+Subject: [PATCH] Do not try to access element when vector is empty
+
+Trying to access tmp[0] causes a crash on Fedora when assertion on STL
+are enabled.
+
+/usr/include/c++/10/bits/stl_vector.h:1045: std::vector<_Tp, _Alloc>::reference std::vector<_Tp, _Alloc>::operator[](std::vector<_Tp, _Alloc>::size_type) [with _Tp = unsigned char; _Alloc = std::allocator<unsigned char>; std::vector<_Tp, _Alloc>::reference = unsigned char&; std::vector<_Tp, _Alloc>::size_type = long unsigned int]: Assertion '__builtin_expect(__n < this->size(), true)' failed.
+
+This patch just passes nullptr as pointer to getSortKey() when tmp size
+is 0, preventing dereferencing elements in empty vector.
+
+I guess that &tmp[0] should be optimized as 'no real access' when
+disabling assertion, but actually leads to crash when assert are
+enabled.
+---
+ src/icu/collator.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libs/locale/src/icu/collator.cpp b/libs/locale/src/icu/collator.cpp
+index 7f1ea6a..dc59e8c 100644
+--- a/libs/locale/src/icu/collator.cpp
++++ b/libs/locale/src/icu/collator.cpp
+@@ -93,7 +93,7 @@ namespace boost {
+                     std::vector<uint8_t> tmp;
+                     tmp.resize(str.length());
+                     icu::Collator *collate = get_collator(level);
+-                    int len = collate->getSortKey(str,&tmp[0],tmp.size());
++                    int len = collate->getSortKey(str,tmp.empty()?nullptr:&tmp[0],tmp.size());
+                     if(len > int(tmp.size())) {
+                         tmp.resize(len);
+                         collate->getSortKey(str,&tmp[0],tmp.size());
+-- 
+2.26.2
+

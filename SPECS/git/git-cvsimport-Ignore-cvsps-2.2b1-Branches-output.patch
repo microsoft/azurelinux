@@ -1,0 +1,26 @@
+From 09891c65a5f7409ce0bd37daced0ff31fbb1b1c9 Mon Sep 17 00:00:00 2001
+From: Todd Zullinger <tmz@pobox.com>
+Date: Mon, 23 Mar 2009 00:03:36 -0400
+Subject: [PATCH] git-cvsimport: Ignore cvsps-2.2b1 Branches: output
+
+Signed-off-by: Todd Zullinger <tmz@pobox.com>
+---
+ git-cvsimport.perl |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/git-cvsimport.perl b/git-cvsimport.perl
+index e439202..d020f1a 100755
+--- a/git-cvsimport.perl
++++ b/git-cvsimport.perl
+@@ -952,7 +952,7 @@ while (<CVS>) {
+ 	} elsif (/^-+$/) { # end of unknown-line processing
+ 		$state = 1;
+ 	} elsif ($state != 11) { # ignore stuff when skipping
+-		print STDERR "* UNKNOWN LINE * $_\n";
++		print STDERR "* UNKNOWN LINE * $_\n" unless /^Branches: /;
+ 	}
+ }
+ commit() if $branch and $state != 11;
+-- 
+1.6.2.2
+

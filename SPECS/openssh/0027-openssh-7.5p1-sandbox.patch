@@ -1,0 +1,58 @@
+From 35205319dd71d8e61c1596b8f9479df91aff7756 Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:28 +0200
+Subject: [PATCH 27/50] openssh-7.5p1-sandbox
+
+---
+ sandbox-seccomp-filter.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/sandbox-seccomp-filter.c b/sandbox-seccomp-filter.c
+index b31062c2..1fabf99d 100644
+--- a/sandbox-seccomp-filter.c
++++ b/sandbox-seccomp-filter.c
+@@ -277,6 +277,9 @@ static const struct sock_filter preauth_insns[] = {
+ #ifdef __NR_exit_group
+ 	SC_ALLOW(__NR_exit_group),
+ #endif
++#if defined(__NR_flock) && defined(__s390__)
++	SC_ALLOW(__NR_flock),
++#endif
+ #ifdef __NR_futex
+ 	SC_FUTEX(__NR_futex),
+ #endif
+@@ -295,6 +298,21 @@ static const struct sock_filter preauth_insns[] = {
+ #ifdef __NR_getpid
+ 	SC_ALLOW(__NR_getpid),
+ #endif
++#ifdef __NR_getuid
++	SC_ALLOW(__NR_getuid),
++#endif
++#ifdef __NR_getuid32
++	SC_ALLOW(__NR_getuid32),
++#endif
++#ifdef __NR_geteuid
++	SC_ALLOW(__NR_geteuid),
++#endif
++#ifdef __NR_geteuid32
++	SC_ALLOW(__NR_geteuid32),
++#endif
++#ifdef __NR_gettid
++	SC_ALLOW(__NR_gettid),
++#endif
+ #ifdef __NR_getrandom
+ 	SC_ALLOW(__NR_getrandom),
+ #endif
+@@ -304,6 +322,9 @@ static const struct sock_filter preauth_insns[] = {
+ #ifdef __NR_gettimeofday
+ 	SC_ALLOW(__NR_gettimeofday),
+ #endif
++#if defined(__NR_ipc) && defined(__s390__)
++	SC_ALLOW(__NR_ipc),
++#endif
+ #ifdef __NR_getuid
+ 	SC_ALLOW(__NR_getuid),
+ #endif
+-- 
+2.49.0
+

@@ -1,0 +1,144 @@
+From cd653102f401f91748c3f038be4d38ddacc2d7db Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Wed, 3 Jul 2024 10:22:49 +0200
+Subject: [PATCH] findutils-4.4.2-xautofs.patch
+
+---
+ doc/find.texi  |  4 ++++
+ find/defs.h    |  3 +++
+ find/find.1    |  3 +++
+ find/ftsfind.c | 11 +++++++++--
+ find/parser.c  |  9 +++++++++
+ find/util.c    |  3 ++-
+ 6 files changed, 30 insertions(+), 3 deletions(-)
+
+diff --git a/doc/find.texi b/doc/find.texi
+index f58c060..21b4bf5 100644
+--- a/doc/find.texi
++++ b/doc/find.texi
+@@ -1605,6 +1605,10 @@ them.
+ There are two ways to avoid searching certain filesystems.  One way is
+ to tell @code{find} to only search one filesystem:
+ 
++@deffn Option -xautofs
++Don't descend directories on autofs filesystems.
++@end deffn
++
+ @deffn Option -xdev
+ @deffnx Option -mount
+ Don't descend directories on other filesystems.  These options are
+diff --git a/find/defs.h b/find/defs.h
+index 453dc27..9424168 100644
+--- a/find/defs.h
++++ b/find/defs.h
+@@ -557,6 +557,9 @@ struct options
+   /* If true, don't cross filesystem boundaries. */
+   bool stay_on_filesystem;
+ 
++  /* If true, don't descend directories on autofs filesystems. */
++  bool bypass_autofs;
++
+   /* If true, we ignore the problem where we find that a directory entry
+    * no longer exists by the time we get around to processing it.
+    */
+diff --git a/find/find.1 b/find/find.1
+index 319aa63..002fb16 100644
+--- a/find/find.1
++++ b/find/find.1
+@@ -654,6 +654,9 @@ to stat them; this gives a significant increase in search speed.
+ .IP "\-version, \-\-version"
+ Print the \fBfind\fR version number and exit.
+ 
++.IP \-xautofs
++Don't descend directories on autofs filesystems.
++
+ .IP \-xdev
+ Don't descend directories on other filesystems.
+ 
+diff --git a/find/ftsfind.c b/find/ftsfind.c
+index b7f69a0..aca856c 100644
+--- a/find/ftsfind.c
++++ b/find/ftsfind.c
+@@ -268,8 +268,8 @@ symlink_loop (const char *name)
+ static void
+ consider_visiting (FTS *p, FTSENT *ent)
+ {
+-  struct stat statbuf;
+-  mode_t mode;
++  struct stat statbuf = {0};
++  mode_t mode = 0;
+   int ignore, isdir;
+ 
+   if (options.debug_options & DebugSearch)
+@@ -433,6 +433,13 @@ consider_visiting (FTS *p, FTSENT *ent)
+ 	}
+     }
+ 
++  if (options.bypass_autofs
++        && 0 == get_statinfo (ent->fts_path, ent->fts_name, &statbuf)
++        && 0 == strcmp ("autofs", filesystem_type (&statbuf, ent->fts_name)))
++    {
++      fts_set(p, ent, FTS_SKIP); /* descend no further */
++    }
++
+   if ( (ent->fts_info == FTS_D) && !options.do_dir_first )
+     {
+       /* this is the preorder visit, but user said -depth */
+diff --git a/find/parser.c b/find/parser.c
+index b86e685..6d74d1e 100644
+--- a/find/parser.c
++++ b/find/parser.c
+@@ -150,6 +150,7 @@ static bool parse_used          (const struct parser_table*, char *argv[], int *
+ static bool parse_user          (const struct parser_table*, char *argv[], int *arg_ptr);
+ static bool parse_wholename     (const struct parser_table*, char *argv[], int *arg_ptr);
+ static bool parse_xdev          (const struct parser_table*, char *argv[], int *arg_ptr);
++static bool parse_xautofs       (const struct parser_table*, char *argv[], int *arg_ptr);
+ static bool parse_ignore_race   (const struct parser_table*, char *argv[], int *arg_ptr);
+ static bool parse_noignore_race (const struct parser_table*, char *argv[], int *arg_ptr);
+ static bool parse_warn          (const struct parser_table*, char *argv[], int *arg_ptr);
+@@ -309,6 +310,7 @@ static struct parser_table const parse_table[] =
+   PARSE_TEST_NP    ("wholename",             wholename), /* GNU, replaced -path, but now -path is standardized since POSIX 2008 */
+   {ARG_TEST,       "writable",               parse_accesscheck, pred_writable}, /* GNU, 4.3.0+ */
+   PARSE_OPTION     ("xdev",                  xdev), /* POSIX */
++  PARSE_OPTION     ("xautofs",               xautofs),
+   PARSE_TEST       ("xtype",                 xtype),	     /* GNU */
+ #ifdef UNIMPLEMENTED_UNIX
+   /* It's pretty ugly for find to know about archive formats.
+@@ -2489,6 +2491,13 @@ parse_xdev (const struct parser_table* entry, char **argv, int *arg_ptr)
+   return parse_noop (entry, argv, arg_ptr);
+ }
+ 
++static bool
++parse_xautofs (const struct parser_table* entry, char **argv, int *arg_ptr)
++{
++  options.bypass_autofs = true;
++  return parse_noop (entry, argv, arg_ptr);
++}
++
+ static bool
+ parse_ignore_race (const struct parser_table* entry, char **argv, int *arg_ptr)
+ {
+diff --git a/find/util.c b/find/util.c
+index 88dafd7..a592055 100644
+--- a/find/util.c
++++ b/find/util.c
+@@ -181,7 +181,7 @@ Positional options (always true):\n\
+   HTL (_("\n\
+ Normal options (always true, specified before other expressions):\n\
+       -depth -files0-from FILE -maxdepth LEVELS -mindepth LEVELS\n\
+-      -mount -noleaf -xdev -ignore_readdir_race -noignore_readdir_race\n"));
++      -mount -noleaf -xautofs -xdev -ignore_readdir_race -noignore_readdir_race\n"));
+   HTL (_("\n\
+ Tests (N can be +N or -N or N):\n\
+       -amin N -anewer FILE -atime N -cmin N -cnewer FILE -context CONTEXT\n\
+@@ -1027,6 +1027,7 @@ set_option_defaults (struct options *p)
+ 
+   p->full_days = false;
+   p->stay_on_filesystem = false;
++  p->bypass_autofs = false;
+   p->ignore_readdir_race = false;
+ 
+   if (p->posixly_correct)
+-- 
+2.45.2
+

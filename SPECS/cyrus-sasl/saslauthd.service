@@ -1,0 +1,12 @@
+[Unit]
+Description=SASL authentication daemon.
+
+[Service]
+Type=forking
+PIDFile=/run/saslauthd/saslauthd.pid
+EnvironmentFile=/etc/sysconfig/saslauthd
+ExecStart=/usr/sbin/saslauthd -m $SOCKETDIR -a $MECH $FLAGS
+RuntimeDirectory=saslauthd
+
+[Install]
+WantedBy=multi-user.target

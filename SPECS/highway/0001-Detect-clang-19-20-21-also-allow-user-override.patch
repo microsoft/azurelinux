@@ -1,0 +1,263 @@
+From 7b21be544ee1975dd0dd8fc1c4a0603c0d0e27cc Mon Sep 17 00:00:00 2001
+From: Jan Wassenberg <janwas@google.com>
+Date: Mon, 15 Sep 2025 05:18:23 -0700
+Subject: [PATCH 1/2] Detect clang 19/20/21, also allow user override
+
+The version governs HWY_BROKEN_AVX10_2 and HWY_TARGET_STR_AVX3_VL512
+
+Also print HWY_TARGETS_STR in list_targets.cc,
+update set_macros to remove _256 and prevent duplicate evex512 attribute,
+Delay AVX10.2 until Clang 22 due to attribute mismatch.
+
+PiperOrigin-RevId: 807197401
+(cherry picked from commit 4201022df1c66193863b7d58fea8ac899bd56c45)
+---
+ hwy/contrib/sort/shared-inl.h |  6 ++---
+ hwy/detect_compiler_arch.h    | 19 ++++++++++++----
+ hwy/detect_targets.h          |  8 +++----
+ hwy/ops/arm_sve-inl.h         |  2 +-
+ hwy/ops/set_macros-inl.h      | 43 +++++++++++++----------------------
+ hwy/print-inl.h               |  2 ++
+ hwy/tests/list_targets.cc     | 12 ++++++++--
+ 7 files changed, 51 insertions(+), 41 deletions(-)
+
+diff --git a/hwy/contrib/sort/shared-inl.h b/hwy/contrib/sort/shared-inl.h
+index da4143db..a4560f97 100644
+--- a/hwy/contrib/sort/shared-inl.h
++++ b/hwy/contrib/sort/shared-inl.h
+@@ -146,9 +146,9 @@ static_assert(SortConstants::MaxBufBytes<2>(64) <= 1664, "Unexpectedly high");
+ #undef VQSORT_ENABLED
+ #undef VQSORT_COMPILER_COMPATIBLE
+ 
+-#if (HWY_COMPILER_MSVC && !HWY_IS_DEBUG_BUILD) ||                   \
+-    (HWY_ARCH_ARM_V7 && HWY_IS_DEBUG_BUILD) ||                      \
+-    (HWY_ARCH_ARM_A64 && HWY_COMPILER_GCC_ACTUAL && HWY_IS_ASAN) || \
++#if (HWY_COMPILER_MSVC && !HWY_IS_DEBUG_BUILD) || \
++    (HWY_ARCH_ARM_V7 && HWY_IS_DEBUG_BUILD) ||    \
++    (HWY_ARCH_ARM_A64 && HWY_IS_ASAN) ||          \
+     (HWY_ARCH_RISCV)
+ #define VQSORT_COMPILER_COMPATIBLE 0
+ #else
+diff --git a/hwy/detect_compiler_arch.h b/hwy/detect_compiler_arch.h
+index 58b2b692..9735e2db 100644
+--- a/hwy/detect_compiler_arch.h
++++ b/hwy/detect_compiler_arch.h
+@@ -65,15 +65,21 @@
+ #define HWY_COMPILER_GCC 0
+ #endif
+ 
+-// Clang or clang-cl, not GCC.
+-#ifdef __clang__
++#ifndef HWY_COMPILER_CLANG  // Allow user override.
++#ifdef __clang__            // Clang or clang-cl, not GCC.
+ // In case of Apple LLVM (whose version number is unrelated to that of LLVM) or
+ // an invalid version number, deduce it from the presence of warnings.
+ // Originally based on
+ // https://github.com/simd-everywhere/simde/blob/47d6e603de9d04ee05cdfbc57cf282a02be1bf2a/simde/simde-detect-clang.h#L59.
+ // Please send updates below to them as well, thanks!
+ #if defined(__apple_build_version__) || __clang_major__ >= 999
+-#if __has_warning("-Woverriding-option")
++#if __has_builtin(__builtin_structured_binding_size)
++#define HWY_COMPILER_CLANG 2101
++#elif __has_builtin(__builtin_common_type)
++#define HWY_COMPILER_CLANG 2001
++#elif __has_warning("-Wreturn-mismatch")
++#define HWY_COMPILER_CLANG 1901
++#elif __has_warning("-Woverriding-option")
+ #define HWY_COMPILER_CLANG 1801
+ // No new warnings in 17.0, and Apple LLVM 15.3, which should be 1600, already
+ // has the unsafe_buffer_usage attribute, so we instead check for new builtins.
+@@ -108,7 +114,6 @@
+ #else  // Anything older than 7.0 is not recommended for Highway.
+ #define HWY_COMPILER_CLANG 600
+ #endif  // __has_warning chain
+-#define HWY_COMPILER3_CLANG (HWY_COMPILER_CLANG * 100)
+ #else  // use normal version
+ #define HWY_COMPILER_CLANG (__clang_major__ * 100 + __clang_minor__)
+ #define HWY_COMPILER3_CLANG \
+@@ -117,6 +122,12 @@
+ #else  // Not clang
+ #define HWY_COMPILER_CLANG 0
+ #define HWY_COMPILER3_CLANG 0
++#endif  // __clang__
++#endif  // HWY_COMPILER_CLANG
++
++// User-defined or deduced HWY_COMPILER_CLANG: derive HWY_COMPILER3_CLANG.
++#ifndef HWY_COMPILER3_CLANG
++#define HWY_COMPILER3_CLANG (HWY_COMPILER_CLANG * 100)
+ #endif
+ 
+ #if HWY_COMPILER_GCC && !HWY_COMPILER_CLANG && !HWY_COMPILER_ICC && \
+diff --git a/hwy/detect_targets.h b/hwy/detect_targets.h
+index 3fe21acf..82d98672 100644
+--- a/hwy/detect_targets.h
++++ b/hwy/detect_targets.h
+@@ -257,9 +257,9 @@
+ // SVE[2] require recent clang or gcc versions.
+ 
+ #ifndef HWY_BROKEN_SVE  // allow override
+-// GCC 10+. Clang 19 still has many test failures for SVE. No Apple CPU (at
++// GCC 10+. Clang 21 still has many test failures for SVE. No Apple CPU (at
+ // least up to and including M4 and A18) has SVE.
+-#if (HWY_COMPILER_CLANG && HWY_COMPILER_CLANG < 2000) ||           \
++#if (HWY_COMPILER_CLANG && HWY_COMPILER_CLANG < 2200) ||           \
+     (HWY_COMPILER_GCC_ACTUAL && HWY_COMPILER_GCC_ACTUAL < 1000) || \
+     HWY_OS_APPLE
+ #define HWY_BROKEN_SVE (HWY_SVE | HWY_SVE_256)
+@@ -269,8 +269,8 @@
+ #endif  // HWY_BROKEN_SVE
+ 
+ #ifndef HWY_BROKEN_SVE2  // allow override
+-// Clang 19 still has many test failures for SVE2.
+-#if (HWY_COMPILER_CLANG && HWY_COMPILER_CLANG < 2000) ||           \
++// Clang 21 still has many test failures for SVE2.
++#if (HWY_COMPILER_CLANG && HWY_COMPILER_CLANG < 2200) ||           \
+     (HWY_COMPILER_GCC_ACTUAL && HWY_COMPILER_GCC_ACTUAL < 1000) || \
+     HWY_OS_APPLE
+ #define HWY_BROKEN_SVE2 (HWY_SVE2 | HWY_SVE2_128)
+diff --git a/hwy/ops/arm_sve-inl.h b/hwy/ops/arm_sve-inl.h
+index f9206f94..18058406 100644
+--- a/hwy/ops/arm_sve-inl.h
++++ b/hwy/ops/arm_sve-inl.h
+@@ -5304,7 +5304,7 @@ HWY_API V AverageRound(const V a, const V b) {
+ // `p` points to at least 8 readable bytes, not all of which need be valid.
+ template <class D, HWY_IF_T_SIZE_D(D, 1)>
+ HWY_INLINE svbool_t LoadMaskBits(D d, const uint8_t* HWY_RESTRICT bits) {
+-#if HWY_COMPILER_CLANG >= 1901 || HWY_COMPILER_GCC_ACTUAL >= 1200
++#if HWY_COMPILER_CLANG >= 2200 || HWY_COMPILER_GCC_ACTUAL >= 1200
+   typedef svbool_t UnalignedSveMaskT
+       __attribute__((__aligned__(1), __may_alias__));
+   (void)d;
+diff --git a/hwy/ops/set_macros-inl.h b/hwy/ops/set_macros-inl.h
+index 852aa13c..aa41d1a3 100644
+--- a/hwy/ops/set_macros-inl.h
++++ b/hwy/ops/set_macros-inl.h
+@@ -141,27 +141,24 @@
+ #define HWY_TARGET_STR_AVX2 \
+   HWY_TARGET_STR_SSE4 ",avx,avx2" HWY_TARGET_STR_BMI2_FMA HWY_TARGET_STR_F16C
+ 
+-#if (HWY_COMPILER_GCC_ACTUAL >= 1400 && HWY_COMPILER_GCC_ACTUAL < 1600) || \
+-    HWY_COMPILER_CLANG >= 1800
++// evex512 has been removed from clang 22, see
++// https://github.com/llvm/llvm-project/pull/157034
++#if (1400 <= HWY_COMPILER_GCC_ACTUAL && HWY_COMPILER_GCC_ACTUAL < 1600) || \
++    (1800 <= HWY_COMPILER_CLANG && HWY_COMPILER_CLANG < 2200)
+ #define HWY_TARGET_STR_AVX3_VL512 ",evex512"
+ #else
+ #define HWY_TARGET_STR_AVX3_VL512
+ #endif
+ 
+-#define HWY_TARGET_STR_AVX3_256 \
+-  HWY_TARGET_STR_AVX2           \
++#define HWY_TARGET_STR_AVX3 \
++  HWY_TARGET_STR_AVX2       \
+   ",avx512f,avx512cd,avx512vl,avx512dq,avx512bw" HWY_TARGET_STR_AVX3_VL512
+ 
+-#define HWY_TARGET_STR_AVX3 HWY_TARGET_STR_AVX3_256 HWY_TARGET_STR_AVX3_VL512
+-
+-#define HWY_TARGET_STR_AVX3_DL_256                                   \
+-  HWY_TARGET_STR_AVX3_256                                            \
++#define HWY_TARGET_STR_AVX3_DL                                       \
++  HWY_TARGET_STR_AVX3                                                \
+   ",vpclmulqdq,avx512vbmi,avx512vbmi2,vaes,avx512vnni,avx512bitalg," \
+   "avx512vpopcntdq,gfni"
+ 
+-#define HWY_TARGET_STR_AVX3_DL \
+-  HWY_TARGET_STR_AVX3_DL_256 HWY_TARGET_STR_AVX3_VL512
+-
+ // Force-disable for compilers that do not properly support avx512bf16.
+ #if !defined(HWY_AVX3_DISABLE_AVX512BF16) &&                        \
+     (HWY_COMPILER_CLANGCL ||                                        \
+@@ -171,24 +168,18 @@
+ #endif
+ 
+ #if !defined(HWY_AVX3_DISABLE_AVX512BF16)
+-#define HWY_TARGET_STR_AVX3_ZEN4_256 HWY_TARGET_STR_AVX3_DL ",avx512bf16"
++#define HWY_TARGET_STR_AVX3_ZEN4 HWY_TARGET_STR_AVX3_DL ",avx512bf16"
+ #else
+-#define HWY_TARGET_STR_AVX3_ZEN4_256 HWY_TARGET_STR_AVX3_DL
++#define HWY_TARGET_STR_AVX3_ZEN4 HWY_TARGET_STR_AVX3_DL
+ #endif
+ 
+-#define HWY_TARGET_STR_AVX3_ZEN4 \
+-  HWY_TARGET_STR_AVX3_ZEN4_256 HWY_TARGET_STR_AVX3_VL512
+-
+ #if HWY_COMPILER_GCC_ACTUAL >= 1200 || HWY_COMPILER_CLANG >= 1400
+-#define HWY_TARGET_STR_AVX3_SPR_256 HWY_TARGET_STR_AVX3_ZEN4_256 ",avx512fp16"
++#define HWY_TARGET_STR_AVX3_SPR HWY_TARGET_STR_AVX3_ZEN4 ",avx512fp16"
+ #else
+-#define HWY_TARGET_STR_AVX3_SPR_256 HWY_TARGET_STR_AVX3_ZEN4_256
++#define HWY_TARGET_STR_AVX3_SPR HWY_TARGET_STR_AVX3_ZEN4
+ #endif
+ 
+-#define HWY_TARGET_STR_AVX3_SPR \
+-  HWY_TARGET_STR_AVX3_SPR_256 HWY_TARGET_STR_AVX3_VL512
+-
+-#if HWY_COMPILER_GCC_ACTUAL >= 1500
++#if HWY_COMPILER_GCC_ACTUAL >= 1500 || HWY_COMPILER_CLANG >= 2200
+ #define HWY_TARGET_STR_AVX10_2 HWY_TARGET_STR_AVX3_SPR ",avx10.2"
+ #elif HWY_COMPILER_CLANG >= 2000
+ #define HWY_TARGET_STR_AVX10_2 HWY_TARGET_STR_AVX3_SPR ",avx10.2-512"
+@@ -317,10 +308,8 @@
+ #define HWY_TARGET_STR HWY_TARGET_STR_AVX2
+ 
+ //-----------------------------------------------------------------------------
+-// AVX3[_DL]/AVX10
+-#elif HWY_TARGET == HWY_AVX3 || HWY_TARGET == HWY_AVX3_DL ||     \
+-    HWY_TARGET == HWY_AVX3_ZEN4 || HWY_TARGET == HWY_AVX3_SPR || \
+-    HWY_TARGET == HWY_AVX10_2
++// AVX3[_DL/ZEN4/SPR]/AVX10
++#elif HWY_TARGET <= HWY_AVX3
+ 
+ #define HWY_ALIGN alignas(64)
+ #define HWY_MAX_BYTES 64
+@@ -329,7 +318,7 @@
+ #define HWY_HAVE_SCALABLE 0
+ #define HWY_HAVE_INTEGER64 1
+ #if HWY_TARGET <= HWY_AVX3_SPR &&                              \
+-    (HWY_COMPILER_GCC_ACTUAL || HWY_COMPILER_CLANG >= 1901) && \
++    (HWY_COMPILER_GCC_ACTUAL || HWY_COMPILER_CLANG >= 2200) && \
+     HWY_HAVE_SCALAR_F16_TYPE
+ #define HWY_HAVE_FLOAT16 1
+ #else
+diff --git a/hwy/print-inl.h b/hwy/print-inl.h
+index 46881a29..48a9cce3 100644
+--- a/hwy/print-inl.h
++++ b/hwy/print-inl.h
+@@ -15,6 +15,8 @@
+ 
+ // Print() function
+ 
++#include <stddef.h>
++
+ #include "hwy/highway.h"
+ #include "hwy/print.h"
+ 
+diff --git a/hwy/tests/list_targets.cc b/hwy/tests/list_targets.cc
+index 3a574b1f..0334ca8d 100644
+--- a/hwy/tests/list_targets.cc
++++ b/hwy/tests/list_targets.cc
+@@ -73,10 +73,18 @@ void PrintConfig() {
+   const int is_test = 1;
+ #else
+   const int is_test = 0;
++#endif
++#ifdef HWY_TARGET_STR
++  const char* target_str = HWY_TARGET_STR;
++#else
++  const char* target_str = "";
+ #endif
+   fprintf(stderr,
+-          "Config: emu128:%d scalar:%d static:%d all_attain:%d is_test:%d\n",
+-          only_emu128, only_scalar, only_static, all_attain, is_test);
++          "Target attributes: %s\nConfig: emu128:%d scalar:%d static:%d "
++          "all_attain:%d "
++          "is_test:%d\n",
++          target_str, only_emu128, only_scalar, only_static, all_attain,
++          is_test);
+ }
+ 
+ void PrintHave() {
+-- 
+2.50.1
+

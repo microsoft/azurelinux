@@ -1,0 +1,138 @@
+From 6224ecc5ac209323baa775880c0602c3fde3590a Mon Sep 17 00:00:00 2001
+From: Martin Sehnoutka <msehnout@redhat.com>
+Date: Thu, 17 Nov 2016 13:10:41 +0100
+Subject: [PATCH 27/59] Delete files when upload fails.
+
+Previously the uploaded file wasn't removed when the network was
+disconnected. Now it is successfully deleted.
+---
+ ftpcodes.h  |  3 ++-
+ ftpdataio.c |  8 ++++++++
+ main.c      |  2 +-
+ postlogin.c |  9 ++++++++-
+ session.h   |  1 +
+ sysutil.c   | 10 ++++++++++
+ sysutil.h   |  1 +
+ 7 files changed, 31 insertions(+), 3 deletions(-)
+
+diff --git a/ftpcodes.h b/ftpcodes.h
+index 81e25c5..54dfae7 100644
+--- a/ftpcodes.h
++++ b/ftpcodes.h
+@@ -15,7 +15,8 @@
+ #define FTP_PBSZOK            200
+ #define FTP_PROTOK            200
+ #define FTP_OPTSOK            200
+-#define FTP_ALLOOK            202
++#define FTP_ALLOOK            200
++#define FTP_ALLOIGN           202
+ #define FTP_FEAT              211
+ #define FTP_STATOK            211
+ #define FTP_SIZEOK            213
+diff --git a/ftpdataio.c b/ftpdataio.c
+index 00f9021..c859d80 100644
+--- a/ftpdataio.c
++++ b/ftpdataio.c
+@@ -242,6 +242,10 @@ init_data_sock_params(struct vsf_session* p_sess, int sock_fd)
+   /* Start the timeout monitor */
+   vsf_sysutil_install_io_handler(handle_io, p_sess);
+   start_data_alarm(p_sess);
++  if(tunable_delete_failed_uploads)
++  {
++    vsf_sysutil_rcvtimeo(sock_fd);
++  }
+ }
+ 
+ static void
+@@ -615,6 +619,10 @@ do_file_recv(struct vsf_session* p_sess, int file_fd, int is_ascii)
+     else if (retval == 0 && !prev_cr)
+     {
+       /* Transfer done, nifty */
++      if (tunable_delete_failed_uploads &&
++          !is_ascii && p_sess->upload_size > 0 &&
++          p_sess->upload_size != ret_struct.transferred)
++        ret_struct.retval = -2;
+       return ret_struct;
+     }
+     num_to_write = (unsigned int) retval;
+diff --git a/main.c b/main.c
+index f1e2f69..f039081 100644
+--- a/main.c
++++ b/main.c
+@@ -44,7 +44,7 @@ main(int argc, const char* argv[])
+     /* Login */
+     1, 0, INIT_MYSTR, INIT_MYSTR,
+     /* Protocol state */
+-    0, 1, INIT_MYSTR, 0, 0,
++    0, 0, 1, INIT_MYSTR, 0, 0,
+     /* HTTP hacks */
+     0, INIT_MYSTR,
+     /* Session state */
+diff --git a/postlogin.c b/postlogin.c
+index 29958c0..e473c34 100644
+--- a/postlogin.c
++++ b/postlogin.c
+@@ -356,7 +356,14 @@ process_post_login(struct vsf_session* p_sess)
+     }
+     else if (str_equal_text(&p_sess->ftp_cmd_str, "ALLO"))
+     {
+-      vsf_cmdio_write(p_sess, FTP_ALLOOK, "ALLO command ignored.");
++      if (tunable_delete_failed_uploads && !p_sess->is_ascii)
++      {
++        p_sess->upload_size = (filesize_t)vsf_sysutil_atoi(str_getbuf(&p_sess->ftp_cmd_str)+5);
++        vsf_cmdio_write(p_sess, FTP_ALLOOK, "The filesize has been allocated.");
++      }
++      else {
++        vsf_cmdio_write(p_sess, FTP_ALLOIGN, "ALLO command ignored.");
++      }
+     }
+     else if (str_equal_text(&p_sess->ftp_cmd_str, "REIN"))
+     {
+diff --git a/session.h b/session.h
+index 3e8fdd5..4eccf46 100644
+--- a/session.h
++++ b/session.h
+@@ -41,6 +41,7 @@ struct vsf_session
+   struct mystr anon_pass_str;
+ 
+   /* Details of the FTP protocol state */
++  filesize_t upload_size;
+   filesize_t restart_pos;
+   int is_ascii;
+   struct mystr rnfr_filename_str;
+diff --git a/sysutil.c b/sysutil.c
+index 099748f..42bcdf8 100644
+--- a/sysutil.c
++++ b/sysutil.c
+@@ -680,6 +680,16 @@ vsf_sysutil_activate_keepalive(int fd)
+   }
+ }
+ 
++void
++vsf_sysutil_rcvtimeo(int fd)
++{
++  struct timeval tv;
++
++  tv.tv_sec = tunable_data_connection_timeout;
++  tv.tv_usec = 0;
++  setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(struct timeval));
++}
++
+ void
+ vsf_sysutil_activate_reuseaddr(int fd)
+ {
+diff --git a/sysutil.h b/sysutil.h
+index 13153cd..2886bbc 100644
+--- a/sysutil.h
++++ b/sysutil.h
+@@ -266,6 +266,7 @@ void vsf_sysutil_dns_resolve(struct vsf_sysutil_sockaddr** p_sockptr,
+                              const char* p_name);
+ /* Option setting on sockets */
+ void vsf_sysutil_activate_keepalive(int fd);
++void vsf_sysutil_rcvtimeo(int fd);
+ void vsf_sysutil_set_iptos_throughput(int fd);
+ void vsf_sysutil_activate_reuseaddr(int fd);
+ void vsf_sysutil_set_nodelay(int fd);
+-- 
+2.14.4
+

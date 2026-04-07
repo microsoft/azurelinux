@@ -1,0 +1,11 @@
+--- a/Tools/Makefile.orig.preamble	2024-05-27 08:57:03.000000000 +0200
++++ b/Tools/Makefile.preamble	2025-01-24 21:56:17.830762556 +0100
+@@ -46,7 +46,7 @@
+ #ADDITIONAL_OBJCFLAGS +=
+ 
+ # Additional flags to pass to the C compiler
+-#ADDITIONAL_CFLAGS += 
++ADDITIONAL_CFLAGS += -std=gnu17
+ 
+ # Additional include directories the compiler should search
+ ADDITIONAL_INCLUDE_DIRS += -I../Source/$(GNUSTEP_TARGET_DIR) -I../Source/

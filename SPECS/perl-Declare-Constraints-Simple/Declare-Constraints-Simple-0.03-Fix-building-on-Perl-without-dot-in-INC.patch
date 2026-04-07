@@ -1,0 +1,8 @@
+diff -up Declare-Constraints-Simple-0.03/Makefile.PL.orig Declare-Constraints-Simple-0.03/Makefile.PL
+--- Declare-Constraints-Simple-0.03/Makefile.PL.orig	2017-05-16 15:25:25.495090362 +0200
++++ Declare-Constraints-Simple-0.03/Makefile.PL	2017-05-16 15:25:39.848030454 +0200
+@@ -1,3 +1,4 @@
++BEGIN { push @INC, '.'; }
+ use inc::Module::Install;
+ use warnings;
+ use strict;

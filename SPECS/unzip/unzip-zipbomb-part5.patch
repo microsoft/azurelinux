@@ -1,0 +1,26 @@
+From 5c572555cf5d80309a07c30cf7a54b2501493720 Mon Sep 17 00:00:00 2001
+From: Mark Adler <madler@alumni.caltech.edu>
+Date: Sun, 9 Feb 2020 21:39:09 -0800
+Subject: [PATCH] Fix bug in UZinflate() that incorrectly updated G.incnt.
+
+The update assumed a full buffer, which is not always full. This
+could result in a false overlapped element detection when a small
+deflate-compressed file was unzipped using an old zlib. This
+commit remedies that.
+---
+ inflate.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/inflate.c b/inflate.c
+index 2f5a015..70e3cc0 100644
+--- a/inflate.c
++++ b/inflate.c
+@@ -700,7 +700,7 @@ int UZinflate(__G__ is_defl64)
+       G.dstrm.total_out));
+ 
+     G.inptr = (uch *)G.dstrm.next_in;
+-    G.incnt = (G.inbuf + INBUFSIZ) - G.inptr;  /* reset for other routines */
++    G.incnt -= G.inptr - G.inbuf;       /* reset for other routines */
+ 
+ uzinflate_cleanup_exit:
+     err = inflateReset(&G.dstrm);

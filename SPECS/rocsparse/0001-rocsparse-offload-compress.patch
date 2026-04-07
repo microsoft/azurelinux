@@ -1,0 +1,40 @@
+From a08805399cd5d50534e1a180aa937a2284682ded Mon Sep 17 00:00:00 2001
+From: Tom Rix <Tom.Rix@amd.com>
+Date: Mon, 14 Apr 2025 15:44:57 -0700
+Subject: [PATCH] rocsparse offload compress
+
+---
+ CMakeLists.txt         | 1 +
+ library/CMakeLists.txt | 4 ++++
+ 2 files changed, 5 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 5e268039d064..2d8f01a00fe8 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -77,6 +77,7 @@ option(BUILD_MEMSTAT "Build rocSPARSE with memory statistics enabled" OFF)
+ option(BUILD_ROCSPARSE_ILP64 "Build rocSPARSE with rocsparse_int equal to int64_t" OFF)
+ option(BUILD_COMPRESSED_DBG "Enable compressed debug symbols" ON)
+ option(BUILD_WITH_ROCBLAS "Enable building rocSPARSE with rocBLAS" ON)
++option( BUILD_OFFLOAD_COMPRESS "Build with offload compress?" OFF )
+ option(BUILD_WITH_OFFLOAD_COMPRESS
+        "Enable offload compression during compilation" ON)
+ 
+diff --git a/library/CMakeLists.txt b/library/CMakeLists.txt
+index 1932c191b96e..141bdb19982c 100644
+--- a/library/CMakeLists.txt
++++ b/library/CMakeLists.txt
+@@ -73,6 +73,10 @@ add_library(roc::rocsparse ALIAS rocsparse)
+ # Target compile options
+ target_compile_options(rocsparse PRIVATE -Wno-unused-command-line-argument -Wall)
+ 
++if ( BUILD_OFFLOAD_COMPRESS )
++  target_compile_options( rocsparse PRIVATE --offload-compress )
++endif ()
++
+ # Target include directories
+ target_include_directories(rocsparse
+                            PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/include>
+-- 
+2.48.1
+

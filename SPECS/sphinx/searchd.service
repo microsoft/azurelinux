@@ -1,0 +1,12 @@
+[Unit]
+Description=Sphinx - SQL Full Text Search Engine
+After=local-fs.target network.target
+
+[Service]
+User=sphinx
+Type=forking
+PIDFile=/run/sphinx/searchd.pid
+ExecStart=/usr/bin/searchd --config /etc/sphinx/sphinx.conf
+
+[Install]
+WantedBy=multi-user.target

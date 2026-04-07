@@ -1,0 +1,44 @@
+From a8337b5a5458a7d4f376721a32c1c410103bedf9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Do=C4=9Fukan=20=C3=87a=C4=9Fatay?=
+ <dogukan.cagatay@aiven.io>
+Date: Thu, 14 Nov 2024 20:40:04 +0100
+Subject: [PATCH] Fix test failure in Python 3.14a
+
+Due to recent changes in argparse error message construction the test
+that is checking for the non-existing split algorithm was failing.
+python/cpython#117766
+
+Fixed with a lenient error string check with additional dynamic algorithm
+check.
+---
+ tests/test_plugin.py | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/tests/test_plugin.py b/tests/test_plugin.py
+index 2dc6409..aaadab1 100644
+--- a/tests/test_plugin.py
++++ b/tests/test_plugin.py
+@@ -5,6 +5,7 @@
+ 
+ import pytest
+ from _pytest.main import ExitCode  # type: ignore[attr-defined]
++from pytest_split.algorithms import Algorithms
+ 
+ pytest_plugins = ["pytester"]
+ 
+@@ -353,10 +354,11 @@ def test_returns_nonzero_when_invalid_algorithm_name(self, example_suite, capsys
+         assert result.ret == ExitCode.USAGE_ERROR
+ 
+         outerr = capsys.readouterr()
+-        assert (
+-            "argument --splitting-algorithm: invalid choice: 'NON_EXISTENT' "
+-            "(choose from 'duration_based_chunks', 'least_duration')"
+-        ) in outerr.err
++        for err_content in [
++            "argument --splitting-algorithm: invalid choice: 'NON_EXISTENT' ",
++            *Algorithms.names(),
++        ]:
++            assert err_content in outerr.err
+ 
+ 
+ class TestHasExpectedOutput:

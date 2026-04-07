@@ -1,0 +1,13 @@
+diff --git a/cmake/QtToolchainHelpers.cmake b/cmake/QtToolchainHelpers.cmake
+index eaa3a4339..5693c4cc4 100644
+--- a/cmake/QtToolchainHelpers.cmake
++++ b/cmake/QtToolchainHelpers.cmake
+@@ -55,6 +55,8 @@ function(get_gn_arch result arch)
+         set(${result} "mips64el" PARENT_SCOPE)
+     elseif(arch STREQUAL "riscv64")
+         set(${result} "riscv64" PARENT_SCOPE)
++    elseif(arch STREQUAL "power64")
++        set(${result} "ppc64" PARENT_SCOPE)
+     else()
+         message(FATAL_ERROR "Unknown architecture: ${arch}")
+     endif()

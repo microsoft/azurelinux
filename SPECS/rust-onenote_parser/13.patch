@@ -1,0 +1,52 @@
+From 8b450447e58143004b68dd21c11b710fdb79be92 Mon Sep 17 00:00:00 2001
+From: Micah Snyder <micasnyd@cisco.com>
+Date: Mon, 3 Jul 2023 21:44:57 -0700
+Subject: [PATCH] Add ability to parse section from in memory buffer
+
+Resolves: https://github.com/msiemens/onenote.rs/issues/12
+---
+ src/onenote/mod.rs | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
+
+diff --git a/src/onenote/mod.rs b/src/onenote/mod.rs
+index de172c9..8bcb62b 100644
+--- a/src/onenote/mod.rs
++++ b/src/onenote/mod.rs
+@@ -6,8 +6,9 @@ use crate::onestore::parse_store;
+ use crate::reader::Reader;
+ use std::ffi::OsStr;
+ use std::fs::File;
+-use std::io::{BufReader, Read};
++use std::io::{BufReader, Read, Cursor};
+ use std::path::Path;
++use std::str::FromStr;
+ 
+ pub(crate) mod content;
+ pub(crate) mod embedded_file;
+@@ -76,6 +77,26 @@ impl Parser {
+         Ok(Notebook { entries: sections })
+     }
+ 
++    /// Parse a OneNote section buffer.
++    ///
++    /// The `data` argument must contain a OneNote section.
++    pub fn parse_section_buffer(&mut self, data: &[u8], file_name: &Path) -> Result<Section> {
++        let packaging = OneStorePackaging::parse(&mut Reader::new(data))?;
++        let store = parse_store(&packaging)?;
++
++        if store.schema_guid() != guid!({1F937CB4-B26F-445F-B9F8-17E20160E461}) {
++            return Err(ErrorKind::NotASectionFile {
++                file: file_name.to_string_lossy().into_owned(),
++            }
++            .into());
++        }
++
++        section::parse_section(
++            store,
++            file_name.to_string_lossy().into_owned(),
++        )
++    }
++
+     /// Parse a OneNote section file.
+     ///
+     /// The `path` argument must point to a `.one` file that contains a

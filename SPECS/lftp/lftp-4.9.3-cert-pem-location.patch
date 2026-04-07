@@ -1,0 +1,12 @@
+diff --git a/src/lftp_ssl.cc b/src/lftp_ssl.cc
+index f53edf2..3822bde 100644
+--- a/src/lftp_ssl.cc
++++ b/src/lftp_ssl.cc
+@@ -211,6 +211,7 @@ static const char *lftp_ssl_find_ca_file()
+ {
+    // a few possible locations of ca-bundle.crt
+    static const char *const ca_file_location[]={
++      "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem",
+       "/etc/pki/tls/certs/ca-bundle.crt",
+       "/etc/certs/ca-bundle.crt",
+       "/usr/share/ssl/certs/ca-bundle.crt",

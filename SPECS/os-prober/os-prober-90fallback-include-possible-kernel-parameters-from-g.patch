@@ -1,0 +1,53 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leo Sandoval <lsandova@redhat.com>
+Date: Thu, 27 Jun 2024 10:53:32 -0600
+Subject: [PATCH] 90fallback: include possible kernel parameters from grub's
+ default file
+
+Probed filesystems may include the GRUB's default
+file ($mpoint/etc/default/grub) so it desirable to source it and get
+and place either GRUB_CMDLINE_LINUX and/or GRUB_CMDLINE_LINUX_DEFAULT
+on the kernel parameters field, ultimately tools like grub2-mkconfig
+makes use of it and create menuentries with kernel parameters.
+
+Signed-off-by: Leo Sandoval <lsandova@redhat.com>
+---
+ linux-boot-probes/mounted/common/90fallback | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/linux-boot-probes/mounted/common/90fallback b/linux-boot-probes/mounted/common/90fallback
+index 6b2c125..e01a9e1 100755
+--- a/linux-boot-probes/mounted/common/90fallback
++++ b/linux-boot-probes/mounted/common/90fallback
+@@ -10,6 +10,22 @@ mpoint="$3"
+ type="$4"
+ 
+ mappedpartition=$(mapdevfs "$partition" 2>/dev/null) || mappedpartition="$partition"
++kernparams="root=$mappedpartition"
++
++# In case there is $mpoint/etc/default/grub, source it and take into account
++# relevant command line variables. This function must be run inside a subshell
++# otherwise grub default variable may be overriden
++get_cmdline_linux_params()
++{
++    local mpoint_sysconfdir="$mpoint/etc"
++    if test -f ${mpoint_sysconfdir}/default/grub ; then
++	unset GRUB_CMDLINE_LINUX GRUB_CMDLINE_LINUX_DEFAULT
++	. ${mpoint_sysconfdir}/default/grub
++	echo "${GRUB_CMDLINE_LINUX} ${GRUB_CMDLINE_LINUX_DEFAULT}"
++    fi
++}
++
++kernparams="$(echo $kernparams $(get_cmdline_linux_params) | sed 's/[[:space:]]\+$//')"
+ 
+ exitcode=1
+ for kernpat in /vmlinuz /vmlinux /boot/vmlinuz /boot/vmlinux "/boot/vmlinuz*" \
+@@ -40,7 +56,7 @@ for kernpat in /vmlinuz /vmlinux /boot/vmlinuz /boot/vmlinux "/boot/vmlinuz*" \
+ 			for initrd in $(eval ls "$initrdname" "$initrdname1" "$initrdname2" "$initrdname3" "$initrdname4" "$initrdname5" 2>/dev/null); do
+ 				if [ "$initrd" != "$kernfile" ] && [ -f "$initrd" ] && [ ! -L "$initrd" ]; then
+ 					initrd=$(echo "$initrd" | sed "s!^$mpoint!!")
+-					result "$partition:$kernbootpart::$kernbasefile:$initrd:root=$mappedpartition"
++					result "$partition:$kernbootpart::$kernbasefile:$initrd:$kernparams"
+ 					exitcode=0
+ 					foundinitrd=1
+ 				fi

@@ -1,0 +1,99 @@
+--- schemars-0.8.22/Cargo.toml	1970-01-01T00:00:01+00:00
++++ schemars-0.8.22/Cargo.toml	2025-06-26T10:18:50.116647+00:00
+@@ -81,14 +81,6 @@
+ path = "examples/validate.rs"
+ 
+ [[test]]
+-name = "arrayvec"
+-path = "tests/arrayvec.rs"
+-required-features = [
+-    "arrayvec05",
+-    "arrayvec07",
+-]
+-
+-[[test]]
+ name = "bound"
+ path = "tests/bound.rs"
+ 
+@@ -107,15 +99,6 @@
+ path = "tests/crate_alias.rs"
+ 
+ [[test]]
+-name = "decimal"
+-path = "tests/decimal.rs"
+-required-features = [
+-    "rust_decimal",
+-    "bigdecimal03",
+-    "bigdecimal04",
+-]
+-
+-[[test]]
+ name = "default"
+ path = "tests/default.rs"
+ 
+@@ -282,14 +265,6 @@
+ required-features = ["url"]
+ 
+ [[test]]
+-name = "uuid"
+-path = "tests/uuid.rs"
+-required-features = [
+-    "uuid08",
+-    "uuid1",
+-]
+-
+-[[test]]
+ name = "validate"
+ path = "tests/validate.rs"
+ 
+@@ -297,23 +272,11 @@
+ name = "validate_inner"
+ path = "tests/validate_inner.rs"
+ 
+-[dependencies.arrayvec05]
+-version = "0.5"
+-optional = true
+-default-features = false
+-package = "arrayvec"
+-
+ [dependencies.arrayvec07]
+ version = "0.7"
+ optional = true
+ default-features = false
+ package = "arrayvec"
+-
+-[dependencies.bigdecimal03]
+-version = "0.3"
+-optional = true
+-default-features = false
+-package = "bigdecimal"
+ 
+ [dependencies.bigdecimal04]
+ version = "0.4"
+@@ -387,12 +350,6 @@
+ optional = true
+ default-features = false
+ 
+-[dependencies.uuid08]
+-version = "0.8"
+-optional = true
+-default-features = false
+-package = "uuid"
+-
+ [dependencies.uuid1]
+ version = "1.0"
+ optional = true
+@@ -406,8 +363,6 @@
+ version = "1.0"
+ 
+ [features]
+-arrayvec = ["arrayvec05"]
+-bigdecimal = ["bigdecimal03"]
+ default = ["derive"]
+ derive = ["schemars_derive"]
+ derive_json_schema = ["impl_json_schema"]
+@@ -416,4 +371,3 @@
+ preserve_order = ["indexmap"]
+ raw_value = ["serde_json/raw_value"]
+ ui_test = []
+-uuid = ["uuid08"]

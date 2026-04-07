@@ -1,0 +1,85 @@
+From d50d515f1f9c2c87177457d85da5c441523d964a Mon Sep 17 00:00:00 2001
+From: David Edmundson <davidedmundson@kde.org>
+Date: Mon, 12 Sep 2022 13:28:08 +0100
+Subject: [PATCH 35/55] Hold surface read lock throughout
+ QWaylandEglWindow::updateSurface
+
+QWaylandEGLWindow::updateSurface is called from both the main and render
+threads. It is called on the render thread when making the surface
+current, which could be after the window is hidden if there are cleanup
+jobs to be done.
+
+Whilst the getter wlSurface() holds a read lock, it's not enough as we
+need the instance alive between the two calls and throughout the mesa
+code.
+
+This potentially fixes a crash seen in mesa where we crash creating a
+surface for an invalid wl_surface object.
+
+Change-Id: I497356e752ffaf3549d174f10c4c268234b02cbd
+Reviewed-by: Eskil Abrahamsen Blomfeldt <eskil.abrahamsen-blomfeldt@qt.io>
+(cherry picked from commit 50f1ccc66c68f9f4c0b08400747942109c16b2be)
+---
+ src/client/qwaylandwindow_p.h                               | 6 ++++--
+ .../client/wayland-egl/qwaylandeglwindow.cpp                | 6 ++++--
+ 2 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/src/client/qwaylandwindow_p.h b/src/client/qwaylandwindow_p.h
+index 2be87bc0..ea3d1995 100644
+--- a/src/client/qwaylandwindow_p.h
++++ b/src/client/qwaylandwindow_p.h
+@@ -220,7 +220,11 @@ signals:
+ 
+ protected:
+     QWaylandDisplay *mDisplay = nullptr;
++
++    // mSurface can be written by the main thread. Other threads should claim a read lock for access
++    mutable QReadWriteLock mSurfaceLock;
+     QScopedPointer<QWaylandSurface> mSurface;
++
+     QWaylandShellSurface *mShellSurface = nullptr;
+     QWaylandSubSurface *mSubSurfaceWindow = nullptr;
+     QVector<QWaylandSubSurface *> mChildren;
+@@ -294,8 +298,6 @@ private:
+ 
+     static QWaylandWindow *mMouseGrab;
+ 
+-    mutable QReadWriteLock mSurfaceLock;
+-
+     friend class QWaylandSubSurface;
+ };
+ 
+diff --git a/src/hardwareintegration/client/wayland-egl/qwaylandeglwindow.cpp b/src/hardwareintegration/client/wayland-egl/qwaylandeglwindow.cpp
+index 9971a9ff..95e8c666 100644
+--- a/src/hardwareintegration/client/wayland-egl/qwaylandeglwindow.cpp
++++ b/src/hardwareintegration/client/wayland-egl/qwaylandeglwindow.cpp
+@@ -40,6 +40,7 @@
+ #include "qwaylandeglwindow.h"
+ 
+ #include <QtWaylandClient/private/qwaylandscreen_p.h>
++#include <QtWaylandClient/private/qwaylandsurface_p.h>
+ #include "qwaylandglcontext.h"
+ 
+ #include <QtEglSupport/private/qeglconvenience_p.h>
+@@ -115,6 +116,7 @@ void QWaylandEglWindow::updateSurface(bool create)
+         }
+         mOffset = QPoint();
+     } else {
++        QReadLocker locker(&mSurfaceLock);
+         if (m_waylandEglWindow) {
+             int current_width = 0;
+             int current_height = 0;
+@@ -130,8 +132,8 @@ void QWaylandEglWindow::updateSurface(bool create)
+ 
+                 m_resize = true;
+             }
+-        } else if (create && wlSurface()) {
+-            m_waylandEglWindow = wl_egl_window_create(wlSurface(), sizeWithMargins.width(), sizeWithMargins.height());
++        } else if (create && mSurface) {
++            m_waylandEglWindow = wl_egl_window_create(mSurface->object(), sizeWithMargins.width(), sizeWithMargins.height());
+             m_requestedSize = sizeWithMargins;
+         }
+ 
+-- 
+2.51.1
+

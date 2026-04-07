@@ -1,0 +1,32 @@
+--- rspec-1.0.0/Cargo.toml	2021-02-06T15:09:51+00:00
++++ rspec-1.0.0/Cargo.toml	2024-10-05T21:05:59.148149+00:00
+@@ -25,26 +25,18 @@
+ version = "2.0"
+ 
+ [dependencies.derive-new]
+-version = "0.5"
++version = "0.6"
+ 
+ [dependencies.derive_builder]
+-version = "0.9"
+-
+-[dependencies.expectest]
+-version = "0.12"
+-optional = true
++version = "0.20"
+ 
+ [dependencies.rayon]
+ version = "1.5"
+ 
+ [dependencies.time]
+-version = "0.2"
+-[build-dependencies.clippy]
+-version = "0.0.153"
+-optional = true
++version = "0.3"
+ 
+ [features]
+ default = []
+-expectest_compat = ["expectest"]
+ [badges.maintenance]
+ status = "passively-maintained"

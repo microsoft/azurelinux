@@ -1,0 +1,135 @@
+diff -up openwsman-2.8.1/src/server/shttpd/compat_unix.h.orig openwsman-2.8.1/src/server/shttpd/compat_unix.h
+--- openwsman-2.8.1/src/server/shttpd/compat_unix.h.orig	2025-01-23 10:23:52.000000000 +0100
++++ openwsman-2.8.1/src/server/shttpd/compat_unix.h	2025-02-03 09:11:35.072818890 +0100
+@@ -27,10 +27,6 @@
+ 	pthread_create(&tid, NULL, (void *(*)(void *))a, c); } while (0)
+ #endif /* !NO_THREADS */
+ 
+-#ifndef SSL_LIB
+-#define	SSL_LIB				"libssl.so"
+-#endif
+-
+ #define	DIRSEP				'/'
+ #define	IS_DIRSEP_CHAR(c)		((c) == '/')
+ #define	O_BINARY			0
+diff -up openwsman-2.8.1/src/server/shttpd/io_ssl.c.orig openwsman-2.8.1/src/server/shttpd/io_ssl.c
+--- openwsman-2.8.1/src/server/shttpd/io_ssl.c.orig	2025-01-23 10:23:52.000000000 +0100
++++ openwsman-2.8.1/src/server/shttpd/io_ssl.c	2025-02-03 09:12:22.387355905 +0100
+@@ -11,28 +11,6 @@
+ #include "defs.h"
+ 
+ #if !defined(NO_SSL)
+-struct ssl_func	ssl_sw[] = {
+-	{"SSL_free",			{0}},
+-	{"SSL_accept",			{0}},
+-	{"SSL_connect",			{0}},
+-	{"SSL_read",			{0}},
+-	{"SSL_write",			{0}},
+-	{"SSL_get_error",		{0}},
+-	{"SSL_set_fd",			{0}},
+-	{"SSL_new",			{0}},
+-	{"SSL_CTX_new",			{0}},
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
+-	{"SSLv23_server_method",	{0}},
+-	{"SSL_library_init",		{0}},
+-#else
+-	{"TLS_server_method",	{0}},
+-	{"OPENSSL_init_ssl",		{0}},
+-#endif
+-	{"SSL_CTX_use_PrivateKey_file",	{0}},
+-	{"SSL_CTX_use_certificate_file",{0}},
+-	{NULL,				{0}}
+-};
+-
+ void
+ _shttpd_ssl_handshake(struct stream *stream)
+ {
+diff -up openwsman-2.8.1/src/server/shttpd/shttpd.c.orig openwsman-2.8.1/src/server/shttpd/shttpd.c
+--- openwsman-2.8.1/src/server/shttpd/shttpd.c.orig	2025-01-23 10:23:52.000000000 +0100
++++ openwsman-2.8.1/src/server/shttpd/shttpd.c	2025-02-03 09:13:43.415562784 +0100
+@@ -1510,25 +1510,13 @@ set_ssl(struct shttpd_ctx *ctx, const ch
+ 	int		retval = FALSE;
+ 	EC_KEY*		key;
+ 
+-	/* Load SSL library dynamically */
+-	if ((lib = dlopen(SSL_LIB, RTLD_LAZY)) == NULL) {
+-		_shttpd_elog(E_LOG, NULL, "set_ssl: cannot load %s", SSL_LIB);
+-		return (FALSE);
+-	}
+-
+-	for (fp = ssl_sw; fp->name != NULL; fp++)
+-		if ((fp->ptr.v_void = dlsym(lib, fp->name)) == NULL) {
+-			_shttpd_elog(E_LOG, NULL,"set_ssl: cannot find %s", fp->name);
+-			return (FALSE);
+-		}
+-
+ 	/* Initialize SSL crap */
+ 
+ #if OPENSSL_VERSION_NUMBER < 0x10100000L
+ 	SSL_library_init();
+ 	if ((CTX = SSL_CTX_new(SSLv23_server_method())) == NULL)
+ #else
+-        OPENSSL_init_ssl();
++        OPENSSL_init_ssl(0, NULL);
+ 	if ((CTX = SSL_CTX_new(TLS_server_method())) == NULL)
+ #endif
+ 	        _shttpd_report_ssl_error("SSL_CTX_new failed", NULL);
+diff -up openwsman-2.8.1/src/server/shttpd/ssl.h.orig openwsman-2.8.1/src/server/shttpd/ssl.h
+--- openwsman-2.8.1/src/server/shttpd/ssl.h.orig	2025-01-23 10:23:52.000000000 +0100
++++ openwsman-2.8.1/src/server/shttpd/ssl.h	2025-02-03 09:14:43.142975166 +0100
+@@ -12,55 +12,4 @@
+ 
+ #include <openssl/ssl.h>
+ 
+-#else
+-
+-/*
+- * Snatched from OpenSSL includes. I put the prototypes here to be independent
+- * from the OpenSSL source installation. Having this, shttpd + SSL can be
+- * built on any system with binary SSL libraries installed.
+- */
+-
+-typedef struct ssl_st SSL;
+-typedef struct ssl_method_st SSL_METHOD;
+-typedef struct ssl_ctx_st SSL_CTX;
+-
+-#define	SSL_ERROR_WANT_READ	2
+-#define	SSL_ERROR_WANT_WRITE	3
+-#define	SSL_ERROR_SYSCALL	5
+-#define	SSL_FILETYPE_PEM	1
+-
+-#endif
+-
+-/*
+- * Dynamically loaded SSL functionality
+- */
+-struct ssl_func {
+-	const char	*name;		/* SSL function name	*/
+-	union variant	ptr;		/* Function pointer	*/
+-};
+-
+-extern struct ssl_func	ssl_sw[];
+-
+-#define	FUNC(x)	ssl_sw[x].ptr.v_func
+-
+-#define	SSL_free(x)	(* (void (*)(SSL *)) FUNC(0))(x)
+-#define	SSL_accept(x)	(* (int (*)(SSL *)) FUNC(1))(x)
+-#define	SSL_connect(x)	(* (int (*)(SSL *)) FUNC(2))(x)
+-#define	SSL_read(x,y,z)	(* (int (*)(SSL *, void *, int)) FUNC(3))((x),(y),(z))
+-#define	SSL_write(x,y,z) \
+-	(* (int (*)(SSL *, const void *,int)) FUNC(4))((x), (y), (z))
+-#define	SSL_get_error(x,y)(* (int (*)(SSL *, int)) FUNC(5))((x), (y))
+-#define	SSL_set_fd(x,y)	(* (int (*)(SSL *, int)) FUNC(6))((x), (y))
+-#define	SSL_new(x)	(* (SSL * (*)(SSL_CTX *)) FUNC(7))(x)
+-#define	SSL_CTX_new(x)	(* (SSL_CTX * (*)(const SSL_METHOD *)) FUNC(8))(x)
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
+-#define	SSLv23_server_method()	(* (SSL_METHOD * (*)(void)) FUNC(9))()
+-#define	SSL_library_init() (* (int (*)(void)) FUNC(10))()
+-#else
+-#define	TLS_server_method()	(* (SSL_METHOD * (*)(void)) FUNC(9))()
+-#define	OPENSSL_init_ssl() (* (int (*)(void)) FUNC(10))()
+ #endif
+-#define	SSL_CTX_use_PrivateKey_file(x,y,z)	(* (int (*)(SSL_CTX *, \
+-		const char *, int)) FUNC(11))((x), (y), (z))
+-#define	SSL_CTX_use_certificate_file(x,y,z)	(* (int (*)(SSL_CTX *, \
+-		const char *, int)) FUNC(12))((x), (y), (z))

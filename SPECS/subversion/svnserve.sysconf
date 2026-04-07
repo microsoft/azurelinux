@@ -1,0 +1,4 @@
+# OPTIONS is used to pass command-line arguments to svnserve.
+# 
+# Specify the repository location in -r parameter:
+OPTIONS="-r /var/svn"

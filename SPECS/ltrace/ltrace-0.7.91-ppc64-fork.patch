@@ -1,0 +1,52 @@
+From 35742523e3daa0e59de0c1c3fdd8e5ff52891967 Mon Sep 17 00:00:00 2001
+From: Petr Machata <pmachata@redhat.com>
+Date: Thu, 9 Jan 2014 23:41:50 +0100
+Subject: [PATCH] Fix a problem in tracing across fork on PPC64
+
+In order to avoid single-stepping through large portions of the
+dynamic linker, ltrace remembers at which address the instruction that
+resolved a PLT slot is.  It then puts a breakpoint to this address so
+that it can fast-forward to that address next time it needs to catch a
+PLT slot being resolved.
+
+When a process is cloned, the pointer to this breakpoint is simply
+copied over to the new process, instead of being looked up in the new
+process structures.  This patches fixes this.
+---
+ sysdeps/linux-gnu/ppc/plt.c |   14 +++++++++++++-
+ 1 files changed, 13 insertions(+), 1 deletions(-)
+
+diff --git a/sysdeps/linux-gnu/ppc/plt.c b/sysdeps/linux-gnu/ppc/plt.c
+index 3ec1397..8715da6 100644
+--- a/sysdeps/linux-gnu/ppc/plt.c
++++ b/sysdeps/linux-gnu/ppc/plt.c
+@@ -1,6 +1,6 @@
+ /*
+  * This file is part of ltrace.
+- * Copyright (C) 2012,2013 Petr Machata, Red Hat Inc.
++ * Copyright (C) 2012,2013,2014 Petr Machata, Red Hat Inc.
+  * Copyright (C) 2004,2008,2009 Juan Cespedes
+  * Copyright (C) 2006 Paul Gilliam
+  *
+@@ -1157,6 +1157,18 @@ int
+ arch_process_clone(struct process *retp, struct process *proc)
+ {
+ 	retp->arch = proc->arch;
++
++	if (retp->arch.dl_plt_update_bp != NULL) {
++		/* Point it to the corresponding breakpoint in RETP.
++		 * It must be there, this part of PROC has already
++		 * been cloned to RETP.  */
++		retp->arch.dl_plt_update_bp
++			= address2bpstruct(retp,
++					   retp->arch.dl_plt_update_bp->addr);
++
++		assert(retp->arch.dl_plt_update_bp != NULL);
++	}
++
+ 	return 0;
+ }
+ 
+-- 
+1.7.6.5
+

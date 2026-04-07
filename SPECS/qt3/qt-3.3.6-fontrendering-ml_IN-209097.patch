@@ -1,0 +1,60 @@
+--- qt-x11-free-3.3.6/src/kernel/qscriptengine_x11.cpp.bak	2006-10-13 13:21:37.000000000 +0800
++++ qt-x11-free-3.3.6/src/kernel/qscriptengine_x11.cpp	2006-10-13 13:57:36.000000000 +0800
+@@ -868,7 +868,7 @@
+     None, None, None, None,
+     None, None, None, Post,
+ 
+-    Post, None, Below, None,
++    None, None, None, None,
+     None, Post, None, None,
+     None, None, None, None,
+     None, None, Post, Post,
+@@ -1271,6 +1271,16 @@
+     int base = 0;
+     int reph = -1;
+ 
++    //for the special conjuctions about Cons+0d4d+0d30 and Cons+0d40+0d31 of Malayalam
++    bool is_special_conjuction_malayalam = false;
++	
++    if ((len == 3) && 
++	((reordered[2] == 0x0d30) || (reordered[2] == 0x0d31)) && 
++	(reordered[1] == 0x0d4d) && 
++	((reordered[0] >= 0x0d15) && (reordered[0] <= 0x0d39))) {
++        is_special_conjuction_malayalam = true;
++    }
++
+ #ifdef INDIC_DEBUG
+     IDEBUG("original:");
+     for (i = 0; i < len; i++) {
+@@ -1547,6 +1557,15 @@
+                 reph = i;
+     }
+ 
++    //for the special conjuctions about Cons+0d4d+0d30 and Cons+0d40+0d31 of Malayalam
++    if (is_special_conjuction_malayalam) {
++        unsigned short temp;
++		
++	temp = reordered[0];		
++	reordered[0] = reordered[2];		
++	reordered[2] = temp;	
++    }
++
+     if (item->font->stringToCMap((const QChar *)reordered.data(), len, item->glyphs, item->advances,
+                                  &item->num_glyphs, item->flags & QTextEngine::RightToLeft) != QFontEngine::NoError)
+         return FALSE;
+@@ -1658,6 +1677,15 @@
+ 
+         // halant always applies
+ 
++        //for the special conjuctions about Cons+0d4d+0d30 and Cons+0d40+0d31 of Malayalam
++        if (is_special_conjuction_malayalam) {
++	    unsigned int temp;
++			
++	    temp = properties[0];
++	    properties[0] = ~PreSubstProperty;			
++	    properties[2] = temp; 
++	}
++
+ #ifdef INDIC_DEBUG
+         {
+             IDEBUG("OT properties:");

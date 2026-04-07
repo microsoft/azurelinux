@@ -1,0 +1,27 @@
+From 9404a58a871e0f2cb25b5a46ae4f0bc9ed614f09 Mon Sep 17 00:00:00 2001
+From: Jeremy Cline <jeremycline@linux.microsoft.com>
+Date: Sat, 14 Jun 2025 15:52:42 +0200
+Subject: [PATCH] Skip test_misc.TestCommonModule.test_debug
+
+Failure reported upstream: https://github.com/giampaolo/psutil/issues/2374
+
+Signed-off-by: Nils Philippsen <nils@redhat.com>
+---
+ psutil/tests/test_misc.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/psutil/tests/test_misc.py b/psutil/tests/test_misc.py
+index c484264..4b3ef52 100755
+--- a/psutil/tests/test_misc.py
++++ b/psutil/tests/test_misc.py
+@@ -597,6 +597,7 @@ class TestCommonModule(PsutilTestCase):
+         with mock.patch('psutil._common.stat.S_ISREG', return_value=False):
+             assert not isfile_strict(this_file)
+ 
++    @pytest.mark.skip(reason="https://github.com/giampaolo/psutil/issues/2374")
+     def test_debug(self):
+         with mock.patch.object(psutil._common, "PSUTIL_DEBUG", True):
+             with contextlib.redirect_stderr(io.StringIO()) as f:
+-- 
+2.49.0
+

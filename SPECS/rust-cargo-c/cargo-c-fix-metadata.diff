@@ -1,0 +1,10 @@
+--- cargo-c-0.10.19+cargo-0.93.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ cargo-c-0.10.19+cargo-0.93.0/Cargo.toml	2026-02-16T13:57:26.645255+00:00
+@@ -36,7 +36,6 @@
+ 
+ [features]
+ default = []
+-vendored-openssl = ["cargo/vendored-openssl"]
+ 
+ [lib]
+ name = "cargo_c"

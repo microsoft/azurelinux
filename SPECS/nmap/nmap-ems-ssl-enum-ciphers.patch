@@ -1,0 +1,40 @@
+commit fc5fc2a26877e241bf9f175832cc89f5ec1e6925
+Author: Clemens Lang <cllang@redhat.com>
+Date:   Mon Oct 16 13:44:40 2023 +0200
+
+    Support EMS in ssl-enum-ciphers
+    
+    The FIPS 140-3 Implementation Guidelines in section D.Q require
+    FIPS-certified cryptographic modules to use the RFC 7627 Extended Master
+    Secret for modules submitted after May 16th, 2023:
+    
+    > [a] new validation, […] submitted more than one year after [May 2022]
+    > shall use the extended master secret in the TLS 1.2 KDF.
+    
+    ssl-enum-ciphers was not sending this extension, causing some servers to
+    abort the handshake. This lead to no support for TLS 1.2 being reported,
+    even though support was available with the extended master secret. Add
+    the EMS extension to the set of base extensions that are always sent to
+    avoid this situation.
+    
+    Servers that do not support EMS should just ignore this extension
+    silently.
+    
+    Signed-off-by: Clemens Lang <cllang@redhat.com>
+
+diff --git a/scripts/ssl-enum-ciphers.nse b/scripts/ssl-enum-ciphers.nse
+index 881b6bdcb..bd441120c 100644
+--- a/scripts/ssl-enum-ciphers.nse
++++ b/scripts/ssl-enum-ciphers.nse
+@@ -528,6 +528,11 @@ local function base_extensions(host)
+     ["ec_point_formats"] = tls.EXTENSION_HELPERS["ec_point_formats"]({"uncompressed"}),
+     -- Enable SNI if a server name is available
+     ["server_name"] = tlsname and tls.EXTENSION_HELPERS["server_name"](tlsname),
++    -- Enable the Extended Master Secret extension, since FIPS 140-3 IG section
++    -- D.Q now requires it for servers in FIPS mode and some vendors may reject
++    -- handshakes without it. Not sending the extension would show those
++    -- servers as not supporting TLS 1.2 at all.
++    ["extended_master_secret"] = "",
+   }
+ end
+ 

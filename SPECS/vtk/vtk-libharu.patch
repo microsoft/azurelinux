@@ -1,0 +1,13 @@
+diff --git a/ThirdParty/libharu/CMakeLists.txt b/ThirdParty/libharu/CMakeLists.txt
+index b18b7a1..3793f4b 100644
+--- a/ThirdParty/libharu/CMakeLists.txt
++++ b/ThirdParty/libharu/CMakeLists.txt
+@@ -5,7 +5,7 @@ vtk_module_third_party(
+     STANDARD_INCLUDE_DIRS
+   EXTERNAL
+     PACKAGE LibHaru
+-    VERSION 2.4.0
++    VERSION 2.3.0
+     TARGETS LibHaru::LibHaru
+     STANDARD_INCLUDE_DIRS)
+ 

@@ -1,0 +1,26 @@
+From 1f185676f4c66edf434cfb95b5eafaea7789b174 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Mon, 30 Jun 2025 20:00:11 -0400
+Subject: [PATCH] Downstream-only: disable tests that create circular deps. on
+ the icu crate
+
+---
+ src/iterator_utils.rs | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/iterator_utils.rs b/src/iterator_utils.rs
+index 0701f32ffd..64808a5990 100644
+--- a/src/iterator_utils.rs
++++ b/src/iterator_utils.rs
+@@ -58,6 +58,8 @@ where
+     }
+ }
+ 
++// Downstream-only: disable to avoid circular dep. on icu crate
++#[cfg(any())]
+ #[cfg(test)]
+ mod tests {
+     use core::fmt::Debug;
+-- 
+2.50.0
+

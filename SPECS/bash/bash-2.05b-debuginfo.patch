@@ -1,0 +1,10 @@
+--- bash-2.05b/builtins/Makefile.in.debuginfo	2003-03-25 17:25:21.000000000 +0000
++++ bash-2.05b/builtins/Makefile.in	2003-03-25 17:25:49.000000000 +0000
+@@ -93,7 +93,6 @@
+ 	$(RM) $@
+ 	./$(MKBUILTINS) $(DIRECTDEFINE) $<
+ 	$(CC) -c $(CCFLAGS) $*.c || ( $(RM) $*.c ; exit 1 )
+-	$(RM) $*.c
+ 
+ # How to make a .c file from a .def file.
+ .def.c:

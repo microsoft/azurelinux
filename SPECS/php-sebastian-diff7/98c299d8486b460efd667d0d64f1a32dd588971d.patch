@@ -1,0 +1,45 @@
+From 98c299d8486b460efd667d0d64f1a32dd588971d Mon Sep 17 00:00:00 2001
+From: Sebastian Bergmann <sb@sebastian-bergmann.de>
+Date: Thu, 26 Jun 2025 13:32:07 +0200
+Subject: [PATCH] Closes #129
+
+---
+ .../StrictUnifiedDiffOutputBuilderIntegrationTest.php         | 4 ++--
+ .../Integration/UnifiedDiffOutputBuilderIntegrationTest.php   | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/tests/Output/Integration/StrictUnifiedDiffOutputBuilderIntegrationTest.php b/tests/Output/Integration/StrictUnifiedDiffOutputBuilderIntegrationTest.php
+index b51da5d6..aa324ca6 100644
+--- a/tests/Output/Integration/StrictUnifiedDiffOutputBuilderIntegrationTest.php
++++ b/tests/Output/Integration/StrictUnifiedDiffOutputBuilderIntegrationTest.php
+@@ -147,7 +147,7 @@ public function testIntegrationUsingPHPFileInVendorPatch(string $fileFrom, strin
+     #[DataProvider('provideBasicDiffGeneration')]
+     #[DataProvider('provideOutputBuildingCases')]
+     #[DataProvider('provideSample')]
+-    public function testIntegrationOfUnitTestCasesGitApply(string $expected, string $from, string $to): void
++    public function testIntegrationOfUnitTestCasesGitApply(string $expected, string $from, string $to, ?array $options = null): void
+     {
+         $this->doIntegrationTestGitApply($expected, $from);
+     }
+@@ -155,7 +155,7 @@ public function testIntegrationOfUnitTestCasesGitApply(string $expected, string
+     #[DataProvider('provideBasicDiffGeneration')]
+     #[DataProvider('provideOutputBuildingCases')]
+     #[DataProvider('provideSample')]
+-    public function testIntegrationOfUnitTestCasesPatch(string $expected, string $from, string $to): void
++    public function testIntegrationOfUnitTestCasesPatch(string $expected, string $from, string $to, ?array $options = null): void
+     {
+         $this->doIntegrationTestPatch($expected, $from, $to);
+     }
+diff --git a/tests/Output/Integration/UnifiedDiffOutputBuilderIntegrationTest.php b/tests/Output/Integration/UnifiedDiffOutputBuilderIntegrationTest.php
+index 7ae1da26..58bab66c 100644
+--- a/tests/Output/Integration/UnifiedDiffOutputBuilderIntegrationTest.php
++++ b/tests/Output/Integration/UnifiedDiffOutputBuilderIntegrationTest.php
+@@ -86,7 +86,7 @@ public function testDiffWithLineNumbersPath(string $expected, string $from, stri
+     }
+ 
+     #[DataProvider('provideDiffWithLineNumbers')]
+-    public function testDiffWithLineNumbersGitApply(string $expected, string $from): void
++    public function testDiffWithLineNumbersGitApply(string $expected, string $from, string $to): void
+     {
+         $this->doIntegrationTestGitApply($expected, $from);
+     }

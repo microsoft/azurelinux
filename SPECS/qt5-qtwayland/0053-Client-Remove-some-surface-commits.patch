@@ -1,0 +1,62 @@
+From 52b5484f430dc144ed90c3104878a3fce2a51d1d Mon Sep 17 00:00:00 2001
+From: Vlad Zahorodnii <vlad.zahorodnii@kde.org>
+Date: Fri, 25 Aug 2023 10:15:29 +0300
+Subject: [PATCH 53/55] Client: Remove some surface commits
+
+The buffer transform, input and opaque regions are double buffered
+state. They will be applied on the next surface commit.
+
+But the issue with them is that the relevant code makes surface commits
+too. It's undesired as it can lead to qtwayland committing partial
+state, for example it can break xdg surface window geometry.
+
+This change removes hidden surface commits. The relevant properties will
+be applied on the next frame.
+
+Change-Id: I1c40c9a5430fb6b91d7643b20d628f8a9a9d501a
+Reviewed-by: David Edmundson <davidedmundson@kde.org>
+(cherry picked from commit e8cff6fb39c0fd01548bce18542820a6612dbe49)
+---
+ src/client/qwaylandwindow.cpp                               | 4 ----
+ src/plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp | 3 ---
+ 2 files changed, 7 deletions(-)
+
+diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
+index 5eee0414..7a9bccc1 100644
+--- a/src/client/qwaylandwindow.cpp
++++ b/src/client/qwaylandwindow.cpp
+@@ -478,8 +478,6 @@ void QWaylandWindow::setMask(const QRegion &mask)
+         if (isOpaque())
+             setOpaqueArea(mMask);
+     }
+-
+-    mSurface->commit();
+ }
+ 
+ void QWaylandWindow::applyConfigureWhenPossible()
+@@ -794,8 +792,6 @@ void QWaylandWindow::handleContentOrientationChange(Qt::ScreenOrientation orient
+             Q_UNREACHABLE();
+     }
+     mSurface->set_buffer_transform(transform);
+-    // set_buffer_transform is double buffered, we need to commit.
+-    mSurface->commit();
+ }
+ 
+ void QWaylandWindow::setOrientationMask(Qt::ScreenOrientations mask)
+diff --git a/src/plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp b/src/plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp
+index 6ddcc410..9c6cbb81 100644
+--- a/src/plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp
++++ b/src/plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp
+@@ -370,9 +370,6 @@ bool QWaylandXdgSurface::wantsDecorations() const
+ void QWaylandXdgSurface::propagateSizeHints()
+ {
+     setSizeHints();
+-
+-    if (m_toplevel && m_window)
+-        m_window->commit();
+ }
+ 
+ void QWaylandXdgSurface::setWindowGeometry(const QRect &rect)
+-- 
+2.51.1
+

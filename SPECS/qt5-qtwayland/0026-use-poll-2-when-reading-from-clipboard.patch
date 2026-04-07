@@ -1,0 +1,48 @@
+From c822f22ef67e4c6d9b61412d4154db1321fea566 Mon Sep 17 00:00:00 2001
+From: Kenneth Topp <ken@bllue.org>
+Date: Mon, 4 Apr 2022 09:36:21 -0400
+Subject: [PATCH 26/55] use poll(2) when reading from clipboard
+
+change clipboard read away from select(2) call which can fail when
+an application has large number of open files
+
+Change-Id: I6d98c6bb11cdd5b6171b01cfeb0044dd41cf9fb5
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+(cherry picked from commit 829a9f62a96721c142f53e12a8812e8231b20317)
+---
+ src/client/qwaylanddataoffer.cpp | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/src/client/qwaylanddataoffer.cpp b/src/client/qwaylanddataoffer.cpp
+index 09e29973..0241a1df 100644
+--- a/src/client/qwaylanddataoffer.cpp
++++ b/src/client/qwaylanddataoffer.cpp
+@@ -195,17 +195,18 @@ QVariant QWaylandMimeData::retrieveData_sys(const QString &mimeType, QVariant::T
+ 
+ int QWaylandMimeData::readData(int fd, QByteArray &data) const
+ {
+-    fd_set readset;
+-    FD_ZERO(&readset);
+-    FD_SET(fd, &readset);
+-    struct timeval timeout;
++    struct pollfd readset;
++    readset.fd = fd;
++    readset.events = POLLIN;
++    struct timespec timeout;
+     timeout.tv_sec = 1;
+-    timeout.tv_usec = 0;
++    timeout.tv_nsec = 0;
++
+ 
+     Q_FOREVER {
+-        int ready = select(FD_SETSIZE, &readset, nullptr, nullptr, &timeout);
++        int ready = qt_safe_poll(&readset, 1, &timeout);
+         if (ready < 0) {
+-            qWarning() << "QWaylandDataOffer: select() failed";
++            qWarning() << "QWaylandDataOffer: qt_safe_poll() failed";
+             return -1;
+         } else if (ready == 0) {
+             qWarning("QWaylandDataOffer: timeout reading from pipe");
+-- 
+2.51.1
+

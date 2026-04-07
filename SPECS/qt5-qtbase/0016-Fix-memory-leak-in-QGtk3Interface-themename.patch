@@ -1,0 +1,52 @@
+From 233e7e6be35a5a455b6ecd7c15de8c9cfc70ca10 Mon Sep 17 00:00:00 2001
+From: Thorbjørn Lindeijer <bjorn@lindeijer.nl>
+Date: Thu, 3 Aug 2023 16:09:49 +0200
+Subject: Fix memory leak in QGtk3Interface::themeName
+
+Pick-to: 6.6 6.5
+Change-Id: Ib8c90f7ef66c095f0c1fc04f4cc72bf5eea72ddb
+Reviewed-by: Axel Spoerl <axel.spoerl@qt.io>
+
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3interface.cpp b/src/plugins/platformthemes/gtk3/qgtk3interface.cpp
+index 21abea81..8e8fefb6 100644
+--- a/src/plugins/platformthemes/gtk3/qgtk3interface.cpp
++++ b/src/plugins/platformthemes/gtk3/qgtk3interface.cpp
+@@ -477,15 +477,18 @@ QBrush QGtk3Interface::brush(QGtkWidget wtype, QGtkColorSource source, GtkStateF
+     \internal
+     \brief Returns the name of the current GTK theme.
+  */
+-const QString QGtk3Interface::themeName() const
++QString QGtk3Interface::themeName() const
+ {
+-    gchar *theme_name;
+-    GtkSettings *settings = gtk_settings_get_default();
+-    if (!settings)
+-        return QString();
++    QString name;
++
++    if (GtkSettings *settings = gtk_settings_get_default()) {
++        gchar *theme_name;
++        g_object_get(settings, "gtk-theme-name", &theme_name, nullptr);
++        name = QLatin1String(theme_name);
++        g_free(theme_name);
++    }
+
+-    g_object_get(settings, "gtk-theme-name", &theme_name, nullptr);
+-    return QLatin1String(theme_name);
++    return name;
+ }
+
+ /*!
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3interface_p.h b/src/plugins/platformthemes/gtk3/qgtk3interface_p.h
+index 42643e72..d9bf5c32 100644
+--- a/src/plugins/platformthemes/gtk3/qgtk3interface_p.h
++++ b/src/plugins/platformthemes/gtk3/qgtk3interface_p.h
+@@ -132,7 +132,7 @@ public:
+     QIcon fileIcon(const QFileInfo &fileInfo) const;
+
+     // Return current GTK theme name
+-    const QString themeName() const;
++    QString themeName() const;
+
+     // Derive appearance from default colors
+     Qt::Appearance appearanceByColors() const;

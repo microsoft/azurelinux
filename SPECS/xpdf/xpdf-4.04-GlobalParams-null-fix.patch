@@ -1,0 +1,12 @@
+diff -up xpdf-4.04/xpdf/GlobalParams.h.null-fix xpdf-4.04/xpdf/GlobalParams.h
+--- xpdf-4.04/xpdf/GlobalParams.h.null-fix	2023-01-30 14:10:42.286805370 -0500
++++ xpdf-4.04/xpdf/GlobalParams.h	2023-01-30 14:10:50.383895185 -0500
+@@ -237,7 +237,7 @@ public:
+ 
+   // Initialize the global parameters by attempting to read a config
+   // file.
+-  GlobalParams(const char *cfgFileName);
++  GlobalParams(const char *cfgFileName = NULL);
+ 
+   ~GlobalParams();
+ 

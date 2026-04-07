@@ -1,0 +1,42 @@
+--- ssmtp-2.64/ssmtp.conf.orig	2013-09-26 00:29:04.953690875 +0300
++++ ssmtp-2.64/ssmtp.conf	2013-09-26 00:53:53.627236000 +0300
+@@ -1,7 +1,9 @@
+ #
+ # /etc/ssmtp.conf -- a config file for sSMTP sendmail.
+ #
+-
++# See the ssmtp.conf(5) man page for a more verbose explanation of the
++# available options.
++#
+ # The person who gets all mail for userids < 1000
+ # Make this empty to disable rewriting.
+ root=postmaster
+@@ -19,10 +21,10 @@ mailhub=mail
+ # mailhub=mail.your.domain:465
+ 
+ # Where will the mail seem to come from?
+-rewriteDomain=
++#RewriteDomain=
+ 
+ # The full hostname
+-hostname=_HOSTNAME_
++#Hostname=
+ 
+ # Set this to never rewrite the "From:" line (unless not given) and to
+ # use that address in the "from line" of the envelope.
+@@ -30,12 +32,14 @@ hostname=_HOSTNAME_
+ 
+ # Use SSL/TLS to send secure messages to server.
+ #UseTLS=YES
++#IMPORTANT: The following line is mandatory for TLS authentication
++TLS_CA_File=/etc/pki/tls/certs/ca-bundle.crt
+ 
+ # Use SSL/TLS certificate to authenticate against smtp host.
+ #UseTLSCert=YES
+ 
+ # Use this RSA certificate.
+-#TLSCert=/etc/ssl/certs/ssmtp.pem
++#TLSCert=/etc/pki/tls/private/ssmtp.pem
+ 
+ # Get enhanced (*really* enhanced) debugging information in the logs
+ # If you want to have debugging of the config file parsing, move this option

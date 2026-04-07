@@ -1,0 +1,12 @@
+diff -rupN VTK-9.2.6/Utilities/octree/octree/octree_node.txx VTK-9.2.6-new/Utilities/octree/octree/octree_node.txx
+--- VTK-9.2.6/Utilities/octree/octree/octree_node.txx	2023-02-15 05:03:53.000000000 +0100
++++ VTK-9.2.6-new/Utilities/octree/octree/octree_node.txx	2025-01-24 14:12:16.855255487 +0100
+@@ -207,7 +207,7 @@ const octree_node<T_, d_, A_>& octree_no
+   {
+     throw std::domain_error("Attempt to access children of an octree leaf node.");
+   }
+-  return this->_M_chilren[child];
++  return this->m_children[child];
+ }
+ 
+ /**\brief Return a reference to a child node.

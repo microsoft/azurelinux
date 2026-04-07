@@ -1,0 +1,29 @@
+diff -Naupr libcaca-0.99.beta16.orig/caca-config.in libcaca-0.99.beta16/caca-config.in
+--- libcaca-0.99.beta16.orig/caca-config.in	2008-09-27 17:58:05.000000000 +0200
++++ libcaca-0.99.beta16/caca-config.in	2008-12-21 14:52:39.462372516 +0100
+@@ -6,7 +6,16 @@
+ prefix=@prefix@
+ exec_prefix=@exec_prefix@
+ 
+-lib_dir=@libdir@
++# Fedora specific hack to share the same script on all archs
++ARCH=$(uname -m)
++case ${ARCH} in
++x86_64|ia64|s390)
++  lib_dir=@prefix@/lib64
++  ;;
++*)
++  lib_dir=@prefix@/lib
++  ;;
++esac
+ include_dir=@includedir@
+ 
+ usage()
+@@ -114,6 +123,6 @@ fi
+ 
+ if test "$echo_libs" = "yes"
+ then
+-  echo -L@libdir@ $libs
++  echo -L$lib_dir $libs
+ fi
+ 

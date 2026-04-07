@@ -1,0 +1,41 @@
+.\" Process this file with
+.\" groff -man -Tascii iptunnel.8
+.\"
+.TH IPTUNNEL 8 "SEPTEMBER 2009" "" ""
+.\"
+.\" Man page written by Jiri Popelka <jpopelka AT redhat DOT com>
+.\"
+.SH NAME
+.B iptunnel
+\- creates, deletes, and displays configured tunnels
+
+.SH SYNOPSIS
+.B /usr/sbin/iptunnel
+.RB [< operation >]
+.RB [< args >]
+
+.SH NOTE
+.P 
+This program is obsolete. For replacement check \fBip tunnel\fR.
+
+.SH DESCRIPTION
+The \fBiptunnel\fR
+command creates configured tunnels for sending and receiving
+IPV6 or IPV4 packets that are encapsulated as the payload of an IPV4
+datagram.
+
+The
+.B iptunnel
+command can perform one of the following operations:
+
+.B create
+\- create a tunnel interface, which you must subsequently configure.
+
+.B delete
+\- delete a tunnel interface. You must disable the tunnel before you can delete it.
+
+.B show
+\- show the tunnel attributes (name, tunnel end points, next hop for tunneled packets).
+
+.SH SEE ALSO
+.BR ip (8).

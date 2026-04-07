@@ -1,0 +1,11 @@
+--- itertools-0.10.5/Cargo.toml	1970-01-01T00:00:00+00:00
++++ itertools-0.10.5/Cargo.toml	2023-07-07T15:48:01.421322+00:00
+@@ -66,8 +66,6 @@
+ [dependencies.either]
+ version = "1.0"
+ default-features = false
+-[dev-dependencies.criterion]
+-version = "=0"
+ 
+ [dev-dependencies.paste]
+ version = "1.0.0"

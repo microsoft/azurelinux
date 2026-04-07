@@ -1,0 +1,90 @@
+Description: Update cmakelists to prepare package with shared lib
+Author: Anton Gladky <gladk@debian.org>
+Last-Updated: 2018-09-30
+
+Index: wslay/CMakeLists.txt
+===================================================================
+--- wslay.orig/CMakeLists.txt
++++ wslay/CMakeLists.txt
+@@ -13,10 +13,10 @@ endif()
+ project(wslay)
+ 
+ option(WSLAY_CONFIGURE_INSTALL "Generate install target" ON)
+-option(WSLAY_STATIC "Build static version of the library" ON)
+-option(WSLAY_SHARED "Build shared version of the library" OFF)
+-option(WSLAY_EXAMPLES "Build examples" OFF)
+-option(WSLAY_TESTS "Build tests" OFF)
++option(WSLAY_STATIC "Build static version of the library" OFF)
++option(WSLAY_SHARED "Build shared version of the library" ON)
++option(WSLAY_EXAMPLES "Build examples" ON)
++option(WSLAY_TESTS "Build tests" ON)
+ 
+ add_subdirectory(lib)
+ if(WSLAY_EXAMPLES)
+Index: wslay/examples/CMakeLists.txt
+===================================================================
+--- wslay.orig/examples/CMakeLists.txt
++++ wslay/examples/CMakeLists.txt
+@@ -8,9 +8,9 @@ endif()
+ find_package(Nettle REQUIRED)
+ 
+ if(WSLAY_STATIC)
+-	set(WSLAY_TARGET "wslay")
++	set(WSLAY_TARGET "wslay_static")
+ else()
+-	set(WSLAY_TARGET "wslay_shared")
++	set(WSLAY_TARGET "wslay")
+ endif()
+ 
+ add_executable(echoserv echoserv.cc)
+Index: wslay/lib/CMakeLists.txt
+===================================================================
+--- wslay.orig/lib/CMakeLists.txt
++++ wslay/lib/CMakeLists.txt
+@@ -5,6 +5,8 @@ cmake_minimum_required(VERSION 2.8)
+ # - embedding wslay library into other projects
+ 
+ set(PACKAGE_VERSION "1.0.1-DEV")
++set(_VERSION "1.1.1")
++set(_SOVERSION "1")
+ set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/includes)
+ set(GEN_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/includes)
+ 
+@@ -38,12 +40,17 @@ set(SOURCES
+ 
+ set(WSLAY_TARGETS)
+ if(WSLAY_STATIC)
+-	add_library(wslay STATIC ${SOURCES} ${HEADERS})
+-	list(APPEND WSLAY_TARGETS wslay)
++	add_library(wslay_static STATIC ${SOURCES} ${HEADERS})
++	list(APPEND WSLAY_TARGETS wslay_static)
+ endif()
+ if(WSLAY_SHARED)
+-	add_library(wslay_shared SHARED ${SOURCES} ${HEADERS})
+-	list(APPEND WSLAY_TARGETS wslay_shared)
++	add_library(wslay SHARED ${SOURCES} ${HEADERS})
++  set_target_properties(wslay PROPERTIES
++     VERSION ${_VERSION}
++     SOVERSION ${_SOVERSION}
++     OUTPUT_NAME wslay
++  )
++	list(APPEND WSLAY_TARGETS wslay)
+ endif()
+ 
+ foreach(target ${WSLAY_TARGETS})
+Index: wslay/tests/CMakeLists.txt
+===================================================================
+--- wslay.orig/tests/CMakeLists.txt
++++ wslay/tests/CMakeLists.txt
+@@ -5,9 +5,9 @@ find_package(CUnit REQUIRED)
+ # Choose a wslay target to get build options from.
+ # That way we can avoid duplicating them here.
+ if(WSLAY_STATIC)
+-	set(WSLAY_TARGET "wslay")
++	set(WSLAY_TARGET "wslay_static")
+ else()
+-	set(WSLAY_TARGET "wslay_shared")
++	set(WSLAY_TARGET "wslay")
+ endif()
+ 
+ get_target_property(WSLAY_INCLUDE_DIRS

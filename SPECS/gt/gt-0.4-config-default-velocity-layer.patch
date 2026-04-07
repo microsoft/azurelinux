@@ -1,0 +1,114 @@
+diff -ur gt-0.4/utils/unsf.c gt-0.4.new/utils/unsf.c
+--- gt-0.4/utils/unsf.c	2004-11-07 22:41:05.000000000 +0100
++++ gt-0.4.new/utils/unsf.c	2008-01-27 19:55:30.000000000 +0100
+@@ -100,6 +100,11 @@
+    unsigned char other_patches[128];
+ } VelocityRangeList;
+ 
++/* allow the user to choose which velocity to write the first (as the first
++   one gets used by apps which do not know about the extended patch format) */
++static signed char melody_velocity_override[128][128];
++static signed char drum_velocity_override[128][128];
++
+ static int opt_8bit = FALSE;
+ static int opt_verbose = FALSE;
+ static int opt_veryverbose = FALSE;
+@@ -2980,6 +2988,8 @@
+ 						width = vlist->velmax[k] - vlist->velmin[k];
+ 					}
+ 				}
++				if (melody_velocity_override[i][j] != -1)
++					widest = melody_velocity_override[i][j];
+ 				if (widest) {
+ 					velmin = vlist->velmin[0];
+ 					velmax = vlist->velmax[0];
+@@ -3020,6 +3030,8 @@
+ 						width = vlist->velmax[k] - vlist->velmin[k];
+ 					}
+ 				}
++				if (drum_velocity_override[i][j] != -1)
++					widest = drum_velocity_override[i][j];
+ 				if (widest) {
+ 					velmin = vlist->velmin[0];
+ 					velmax = vlist->velmax[0];
+@@ -3663,8 +3675,12 @@
+ 	int i, c;
+ 	char cfgname[80];
+ 	char *inname;
++	char *sep1, *sep2;
++	
++	memset(melody_velocity_override, -1, 128*128);
++	memset(drum_velocity_override, -1, 128*128);
+ 
+-	while ((c = getopt (argc, argv, "FVvnsdm")) > 0)
++	while ((c = getopt (argc, argv, "FVvnsdmM:D:")) > 0)
+ 		switch (c) {
+ 			case 'v':
+ 	    			opt_verbose = 1;
+@@ -3687,13 +3703,35 @@
+ 			case 'V':
+ 	    			opt_adjust_volume = 0;
+ 	    			break;
++			case 'M':
++				sep1 = strchr(optarg, ':');
++				sep2 = strchr(optarg, '=');
++				if (sep1 && sep2)
++				{
++				  melody_velocity_override[atoi(optarg)]
++				    [atoi(sep1 + 1)] = atoi(sep2 + 1);
++				  break;
++				}
++				/* error fall through, check will fail again */
++			case 'D':
++				sep1 = strchr(optarg, ':');
++				sep2 = strchr(optarg, '=');
++				if (sep1 && sep2)
++				{
++				  drum_velocity_override[atoi(optarg)]
++				    [atoi(sep1 + 1)] = atoi(sep2 + 1);
++				  break;
++				}
++				/* error fall through */
+ 			default:
+-				fprintf(stderr, "usage: unsf [-v] [-n] [-s] [-d] [-m] [-F] [-V] filename\n");
++				fprintf(stderr, "usage: unsf [-v] [-n] [-s] [-d] [-m] [-F] [-V] [-M <bank>:<instrument>=<layer>]\n"
++						"  [-D <bank>:<instrument>=<layer>] <filename>\n");
+ 				return 1;
+ 		}
+ 
+ 	if (argc - optind != 1) {
+-		fprintf(stderr, "usage: unsf [-v] [-n] [-s] [-d] [-m] [-F] [-V] filename\n");
++		fprintf(stderr, "usage: unsf [-v] [-n] [-s] [-d] [-m] [-F] [-V] [-M <bank>:<instrument>=<layer>]\n"
++		                "  [-D <bank>:<instrument>=<layer>] <filename>\n");
+ 		exit(1);
+ 	}
+ 
+diff -ur gt-0.4/utils/unsf.man gt-0.4.new/utils/unsf.man
+--- gt-0.4/utils/unsf.man	2004-11-07 23:20:37.000000000 +0100
++++ gt-0.4.new/utils/unsf.man	2008-01-27 20:03:06.000000000 +0100
+@@ -6,7 +6,8 @@
+ 
+ 
+ .SH SYNOPSIS
+-.B unsf [-v|-s|-m|-d|-n|-V] \fBsoundfont-file\fR
++.B unsf
++[\fI-v|-s|-m|-d|-n|-V\fR] [\fI-M <bank>:<instrument>=<layer>\fR] [\fI-D <bank>:<instrument>=<layer>\fR] \fBsoundfont-file\fR
+ 
+ 
+ .SH DESCRIPTION
+@@ -135,6 +136,15 @@
+ .TP
+ .B \-v
+ Verbose.
++.TP
++.B \-M \fI<bank>:<instrument>=<layer>\fR
++Make the given velocity \fIlayer\fR the default for \fIbank:instrument\fR,
++this affects programs which do not know howto handle the extended GUS patch
++format, as they will always play the default layer, and this determines which
++layer gets written when using \fB-s\fR.  
++.TP
++.B \-D \fI<bank>:<instrument>=<layer>\fR
++Same as \fB-M\fR but then for drum banks.
+ 
+ .SH AUTHORS
+ 

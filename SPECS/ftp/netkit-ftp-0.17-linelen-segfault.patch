@@ -1,0 +1,23 @@
+diff -up netkit-ftp-0.17/ftp/ftp.c.orig netkit-ftp-0.17/ftp/ftp.c
+diff -up netkit-ftp-0.17/ftp/ftp_var.h.orig netkit-ftp-0.17/ftp/ftp_var.h
+diff -up netkit-ftp-0.17/ftp/main.c.orig netkit-ftp-0.17/ftp/main.c
+--- netkit-ftp-0.17/ftp/main.c.orig	2018-09-03 16:49:16.459000000 +0200
++++ netkit-ftp-0.17/ftp/main.c	2018-09-03 17:00:14.853452345 +0200
+@@ -399,7 +399,7 @@ int slrflag;
+ char **
+ makeargv(int *pargc, char **parg)
+ {
+-	static char *rargv[20];
++	static char *rargv[LINELEN];
+ 	int rargc = 0;
+ 	char **argp;
+ 
+@@ -407,7 +407,7 @@ makeargv(int *pargc, char **parg)
+ 	stringbase = line;		/* scan from first of buffer */
+ 	argbase = argbuf;		/* store from first of buffer */
+ 	slrflag = 0;
+-	while ((*argp++ = slurpstring())!=NULL)
++	while ((rargc < LINELEN) && (*argp++ = slurpstring())!=NULL)
+ 		rargc++;
+ 
+ 	*pargc = rargc;

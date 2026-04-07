@@ -1,0 +1,15 @@
+--- ceph-19.1.0/src/common/crc32c_ppc_asm.S.orig	2024-07-10 10:55:06.255480790 -0400
++++ ceph-19.1.0/src/common/crc32c_ppc_asm.S	2024-07-10 12:53:42.844075490 -0400
+@@ -54,11 +54,8 @@
+ 	/* byte reverse permute constant */
+ 	.octa 0x0F0E0D0C0B0A09080706050403020100
+ 
+-#ifdef CRC32_CONSTANTS_HEADER
+-#include CRC32_CONSTANTS_HEADER
+-#else
++#define __ASSEMBLY__
+ #include "crc32c_ppc_constants.h"
+-#endif
+ 
+ 	.text
+ 

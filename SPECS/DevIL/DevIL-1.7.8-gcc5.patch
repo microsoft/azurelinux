@@ -1,0 +1,12 @@
+diff -up devil-1.7.8/include/IL/il.h~ devil-1.7.8/include/IL/il.h
+--- devil-1.7.8/include/IL/il.h~	2009-03-08 08:10:08.000000000 +0100
++++ devil-1.7.8/include/IL/il.h	2015-06-18 12:34:38.656310094 +0200
+@@ -65,7 +65,7 @@ extern "C" {
+ 
+ #ifdef RESTRICT_KEYWORD
+ #define RESTRICT restrict
+-#define CONST_RESTRICT const restrict
++#define CONST_RESTRICT const __restrict
+ #else
+ #define RESTRICT
+ #define CONST_RESTRICT const

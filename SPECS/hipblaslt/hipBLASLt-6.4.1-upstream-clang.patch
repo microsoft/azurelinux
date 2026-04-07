@@ -1,0 +1,17 @@
+Fix detection of non-AMD clang. Without it, version is set to 0.0.0,
+and tensile produces incorrect LLVM code (LLVM<19 syntax for LLVM 20).
+
+Upstream bug: https://github.com/ROCm/hipBLASLt/issues/2060
+--- a/tensilelite/Tensile/Common.py
++++ b/tensilelite/Tensile/Common.py
+@@ -1753,8 +1753,8 @@ def assignGlobalParameters(config, cxxCompiler=None):
+       if 'HIP version' in line:
+         globalParameters['HipClangVersion'] = line.split()[2]
+         print1("# Found hipcc version " + globalParameters['HipClangVersion'])
+-      if 'AMD clang version' in line:
+-        globalParameters['AMDClangVersion'] = line.split()[3]
++      if 'clang version ' in line:
++        globalParameters['AMDClangVersion'] = line.split('clang version ')[1]
+         print1("# Found clang version " + globalParameters['AMDClangVersion'])
+ 
+   except (subprocess.CalledProcessError, OSError) as e:

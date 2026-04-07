@@ -1,0 +1,61 @@
+From 53d2ea9ad3cc20e1beac2e1c014082c25e221182 Mon Sep 17 00:00:00 2001
+From: Takatoshi Kondo <redboltz@gmail.com>
+Date: Sun, 26 Aug 2018 10:58:47 +0900
+Subject: [PATCH] Fixed #724.
+
+Fixed type mismatch in msgpack_timestamp.
+Added 64bit singed postfix.
+---
+ include/msgpack/timestamp.h                 | 8 ++++++--
+ include/msgpack/v1/adaptor/cpp11/chrono.hpp | 4 ++--
+ 2 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/include/msgpack/timestamp.h b/include/msgpack/timestamp.h
+index 4d7df83d..76139312 100644
+--- a/include/msgpack/timestamp.h
++++ b/include/msgpack/timestamp.h
+@@ -28,13 +28,17 @@ static inline bool msgpack_object_to_timestamp(const msgpack_object* obj, msgpac
+     switch (obj->via.ext.size) {
+     case 4:
+         ts->tv_nsec = 0;
+-        _msgpack_load32(uint32_t, obj->via.ext.ptr, &ts->tv_sec);
++        {
++            uint32_t v;
++            _msgpack_load32(uint32_t, obj->via.ext.ptr, &v);
++            ts->tv_sec = v;
++        }
+         return true;
+     case 8: {
+         uint64_t value;
+         _msgpack_load64(uint64_t, obj->via.ext.ptr, &value);
+         ts->tv_nsec = (uint32_t)(value >> 34);
+-        ts->tv_sec = value & 0x00000003ffffffffL;
++        ts->tv_sec = value & 0x00000003ffffffffLL;
+         return true;
+     }
+     case 12:
+diff --git a/include/msgpack/v1/adaptor/cpp11/chrono.hpp b/include/msgpack/v1/adaptor/cpp11/chrono.hpp
+index 1e08355e..db2035b7 100644
+--- a/include/msgpack/v1/adaptor/cpp11/chrono.hpp
++++ b/include/msgpack/v1/adaptor/cpp11/chrono.hpp
+@@ -41,7 +41,7 @@ struct as<std::chrono::system_clock::time_point> {
+             uint64_t value;
+             _msgpack_load64(uint64_t, o.via.ext.data(), &value);
+             uint32_t nanosec = static_cast<uint32_t>(value >> 34);
+-            uint64_t sec = value & 0x00000003ffffffffL;
++            uint64_t sec = value & 0x00000003ffffffffLL;
+             tp += std::chrono::duration_cast<std::chrono::system_clock::duration>(
+                 std::chrono::nanoseconds(nanosec));
+             tp += std::chrono::seconds(sec);
+@@ -79,7 +79,7 @@ struct convert<std::chrono::system_clock::time_point> {
+             uint64_t value;
+             _msgpack_load64(uint64_t, o.via.ext.data(), &value);
+             uint32_t nanosec = static_cast<uint32_t>(value >> 34);
+-            uint64_t sec = value & 0x00000003ffffffffL;
++            uint64_t sec = value & 0x00000003ffffffffLL;
+             tp += std::chrono::duration_cast<std::chrono::system_clock::duration>(
+                 std::chrono::nanoseconds(nanosec));
+             tp += std::chrono::seconds(sec);
+-- 
+2.17.1
+

@@ -1,0 +1,86 @@
+From 9ed09ef158a113e21be7b3fefa7c5f932632749b Mon Sep 17 00:00:00 2001
+From: Zoltan Fridrich <zfridric@redhat.com>
+Date: Mon, 5 May 2025 11:52:25 +0200
+Subject: [PATCH 52/53] Ignore bad hostkeys in known_hosts file
+
+Signed-off-by: Zoltan Fridrich <zfridric@redhat.com>
+---
+ hostfile.c | 15 +++++++++++++++
+ hostfile.h |  1 +
+ ssh.c      |  2 ++
+ 3 files changed, 18 insertions(+)
+
+diff --git a/hostfile.c b/hostfile.c
+index c5669c703..5c402f501 100644
+--- a/hostfile.c
++++ b/hostfile.c
+@@ -63,6 +63,14 @@
+ #include "hmac.h"
+ #include "sshbuf.h"
+ 
++static int required_rsa_size = SSH_RSA_MINIMUM_MODULUS_SIZE;
++
++void
++hostfile_set_minimum_rsa_size(int size)
++{
++	required_rsa_size = size;
++}
++
+ /* XXX hmac is too easy to dictionary attack; use bcrypt? */
+ 
+ static int
+@@ -233,6 +241,7 @@ record_hostkey(struct hostkey_foreach_line *l, void *_ctx)
+ 	struct load_callback_ctx *ctx = (struct load_callback_ctx *)_ctx;
+ 	struct hostkeys *hostkeys = ctx->hostkeys;
+ 	struct hostkey_entry *tmp;
++	int r = 0;
+ 
+ 	if (l->status == HKF_STATUS_INVALID) {
+ 		/* XXX make this verbose() in the future */
+@@ -241,6 +250,12 @@ record_hostkey(struct hostkey_foreach_line *l, void *_ctx)
+ 		return 0;
+ 	}
+ 
++	if ((r = sshkey_check_rsa_length(l->key, required_rsa_size)) != 0) {
++		debug2_f("%s:%ld: ignoring hostkey: %s",
++		    l->path, l->linenum, ssh_err(r));
++		return 0;
++	}
++
+ 	debug3_f("found %skey type %s in file %s:%lu",
+ 	    l->marker == MRK_NONE ? "" :
+ 	    (l->marker == MRK_CA ? "ca " : "revoked "),
+diff --git a/hostfile.h b/hostfile.h
+index a24a4e329..0e9b1a19a 100644
+--- a/hostfile.h
++++ b/hostfile.h
+@@ -119,5 +119,6 @@ int hostkeys_foreach_file(const char *path, FILE *f,
+     const char *host, const char *ip, u_int options, u_int note);
+ 
+ void hostfile_create_user_ssh_dir(const char *, int);
++void hostfile_set_minimum_rsa_size(int);
+ 
+ #endif
+diff --git a/ssh.c b/ssh.c
+index abc8b8439..33787a8d4 100644
+--- a/ssh.c
++++ b/ssh.c
+@@ -110,6 +110,7 @@
+ #include "ssherr.h"
+ #include "myproposal.h"
+ #include "utf8.h"
++#include "hostfile.h"
+ 
+ #ifdef ENABLE_PKCS11
+ #include "ssh-pkcs11.h"
+@@ -1397,6 +1398,7 @@ main(int ac, char **av)
+ 			options.update_hostkeys = 0;
+ 		}
+ 	}
++	hostfile_set_minimum_rsa_size(options.required_rsa_size);
+ 	if (options.connection_attempts <= 0)
+ 		fatal("Invalid number of ConnectionAttempts");
+ 
+-- 
+2.49.0
+

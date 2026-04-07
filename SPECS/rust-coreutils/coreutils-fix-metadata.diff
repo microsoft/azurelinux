@@ -1,0 +1,62 @@
+--- coreutils-0.0.27/Cargo.toml	1970-01-01T00:00:01+00:00
++++ coreutils-0.0.27/Cargo.toml	2026-01-05T09:34:07.355658+00:00
+@@ -30,6 +30,7 @@
+ categories = ["command-line-utilities"]
+ license = "MIT"
+ repository = "https://github.com/uutils/coreutils"
++autobins = false
+ 
+ [profile.release]
+ lto = true
+@@ -47,11 +48,6 @@
+ [[bin]]
+ name = "coreutils"
+ path = "src/bin/coreutils.rs"
+-
+-[[bin]]
+-name = "uudoc"
+-path = "src/bin/uudoc.rs"
+-required-features = ["uudoc"]
+ 
+ [dependencies.arch]
+ version = "0.0.27"
+@@ -620,7 +616,7 @@
+ version = "0.3.1"
+ 
+ [dev-dependencies.hex-literal]
+-version = "0.4.1"
++version = ">=0.4.1, <2.0"
+ 
+ [dev-dependencies.libc]
+ version = "0.2.153"
+@@ -639,7 +635,7 @@
+ version = "1.10.4"
+ 
+ [dev-dependencies.rstest]
+-version = "0.21.0"
++version = "0.26.0"
+ 
+ [dev-dependencies.sha1]
+ version = "0.10.6"
+@@ -673,7 +669,11 @@
+ version = "0.11.2"
+ 
+ [features]
+-default = ["feat_common_core"]
++default = [
++  "feat_acl",
++  "feat_common_core",
++  "feat_selinux",
++]
+ feat_Tier1 = [
+     "feat_common_core",
+     "arch",
+@@ -878,7 +878,7 @@
+ version = "0.5.1"
+ 
+ [target."cfg(any(target_os = \"linux\", target_os = \"android\"))".dev-dependencies.procfs]
+-version = "0.16"
++version = ">=0.16, <0.19"
+ default-features = false
+ 
+ [target."cfg(unix)".dev-dependencies.nix]

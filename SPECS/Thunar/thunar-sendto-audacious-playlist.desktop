@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Name=Audacious Playlist
+Name[de]=Audacious Wiedergabeliste
+GenericName=Audio Playlist
+GenericName[de]= Wiedergabeliste
+Comment=Enque files to playlist
+Comment[de]=Dateien zur Wiedergabeliste hinzufügen
+Exec=audacious -e %F
+TryExec=audacious
+Icon=audacious
+MimeType=audio/prs.sid;audio/x-flac;audio/x-it;audio/x-mod;audio/x-ms-wma;audio/x-musepack;audio/x-s3m;audio/x-stm;audio/x-xm;application/ogg;audio/x-vorbis+ogg;inode/directory;
+Terminal=false
+Type=Application

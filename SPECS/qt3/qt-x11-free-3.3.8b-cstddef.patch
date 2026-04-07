@@ -1,0 +1,33 @@
+diff -up qt-x11-free-3.3.8b/src/tools/qmap.h.cstddef qt-x11-free-3.3.8b/src/tools/qmap.h
+--- qt-x11-free-3.3.8b/src/tools/qmap.h.cstddef	2008-01-15 13:09:13.000000000 -0600
++++ qt-x11-free-3.3.8b/src/tools/qmap.h	2011-01-30 21:14:29.275088725 -0600
+@@ -49,6 +49,7 @@
+ #include "qvaluelist.h"
+ #endif // QT_H
+ 
++#include <cstddef>
+ #ifndef QT_NO_STL
+ #include <iterator>
+ #include <map>
+diff -up qt-x11-free-3.3.8b/src/tools/qvaluelist.h.cstddef qt-x11-free-3.3.8b/src/tools/qvaluelist.h
+--- qt-x11-free-3.3.8b/src/tools/qvaluelist.h.cstddef	2008-01-15 13:09:13.000000000 -0600
++++ qt-x11-free-3.3.8b/src/tools/qvaluelist.h	2011-01-30 21:14:01.765846592 -0600
+@@ -47,6 +47,7 @@
+ #include "qdatastream.h"
+ #endif // QT_H
+ 
++#include <cstddef>
+ #ifndef QT_NO_STL
+ #include <iterator>
+ #include <list>
+diff -up qt-x11-free-3.3.8b/src/tools/qvaluevector.h.cstddef qt-x11-free-3.3.8b/src/tools/qvaluevector.h
+--- qt-x11-free-3.3.8b/src/tools/qvaluevector.h.cstddef	2008-01-15 13:09:13.000000000 -0600
++++ qt-x11-free-3.3.8b/src/tools/qvaluevector.h	2011-01-30 21:14:01.765846592 -0600
+@@ -45,6 +45,7 @@
+ #include "qdatastream.h"
+ #endif // QT_H
+ 
++#include <cstddef>
+ #ifndef QT_NO_STL
+ #include <vector>
+ #endif

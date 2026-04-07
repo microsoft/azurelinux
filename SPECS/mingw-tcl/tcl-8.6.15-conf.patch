@@ -1,0 +1,21 @@
+diff -rupN --no-dereference tcl8.6.15/unix/tcl.m4 tcl8.6.15-new/unix/tcl.m4
+--- tcl8.6.15/unix/tcl.m4	2024-08-26 19:56:52.000000000 +0200
++++ tcl8.6.15-new/unix/tcl.m4	2024-10-18 11:19:05.013745682 +0200
+@@ -1378,7 +1378,7 @@ AC_DEFUN([SC_CONFIG_CFLAGS], [
+ 	    # get rid of the warnings.
+ 	    #CFLAGS_OPTIMIZE="${CFLAGS_OPTIMIZE} -D__NO_STRING_INLINES -D__NO_MATH_INLINES"
+ 
+-	    SHLIB_LD='${CC} ${CFLAGS} ${LDFLAGS} -shared'
++	    SHLIB_LD='${CC} ${CFLAGS} ${LDFLAGS} -shared -fPIC -Wl,-soname,${@}'
+ 	    DL_OBJS="tclLoadDl.o"
+ 	    DL_LIBS="-ldl"
+ 	    LDFLAGS="$LDFLAGS -Wl,--export-dynamic"
+@@ -1394,7 +1394,7 @@ AC_DEFUN([SC_CONFIG_CFLAGS], [
+ 	    esac
+ 
+ 	    AS_IF([test $doRpath = yes], [
+-		CC_SEARCH_FLAGS='"-Wl,-rpath,${LIB_RUNTIME_DIR}"'])
++		CC_SEARCH_FLAGS=''])
+ 	    LD_SEARCH_FLAGS=${CC_SEARCH_FLAGS}
+ 	    AS_IF([test "`uname -m`" = "alpha"], [CFLAGS="$CFLAGS -mieee"])
+ 	    AS_IF([test $do64bit = yes], [

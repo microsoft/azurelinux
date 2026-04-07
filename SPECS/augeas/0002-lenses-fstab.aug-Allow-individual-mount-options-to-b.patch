@@ -1,0 +1,77 @@
+From 80ae0fd68a33541483e21f871b83f9e3d78c9831 Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Tue, 4 Feb 2025 10:33:31 +0000
+Subject: [PATCH 2/2] lenses/fstab.aug: Allow individual mount options to be
+ empty
+
+Mount allows mount-option fields to be empty (I think it ignores
+them), but augeas gave an error.  Allow this to be parsed.  This does
+not preserve the empty option on write, but that should not change the
+meaning of the entry.
+
+Example:
+  /dev/mapper/vg00-vartmp /var/tmp xfs rw,,nodev,nosuid,noexec,relatime 0 0
+
+Fixes: https://issues.redhat.com/browse/RHEL-77279
+Fixes: https://github.com/hercules-team/augeas/issues/832
+Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
+---
+ lenses/fstab.aug            | 10 +++++-----
+ lenses/tests/test_fstab.aug | 12 ++++++++++++
+ 2 files changed, 17 insertions(+), 5 deletions(-)
+
+diff --git a/lenses/fstab.aug b/lenses/fstab.aug
+index 69c1b955..ad2ee106 100644
+--- a/lenses/fstab.aug
++++ b/lenses/fstab.aug
+@@ -25,19 +25,19 @@ module Fstab =
+          Build.opt_list lns comma
+ 
+   (* A mount option label can't contain comma, comment, equals, or space *)
+-  let optlabel = /[^,#= \n\t]+/
++  let mntoptlabel = /[^,#= \n\t]+/
+ 
+-  let comma_sep_list (l:string) =
++  let mntopt_list (l:string) =
+     let value = [ label "value" . Util.del_str "=" . ( store Rx.neg1 )? ] in
+-      let lns = [ label l . store optlabel . value? ] in
+-         Build.opt_list lns comma
++      let lns = [ label l . store mntoptlabel . value? ] in
++         Build.opt_list lns comma+
+ 
+   let record = [ seq "mntent" .
+                    Util.indent .
+                    [ label "spec" . store spec ] . sep_tab .
+                    [ label "file" . store file ] . sep_tab .
+                    vfstype_list "vfstype" .
+-                   (sep_tab . comma_sep_list "opt" .
++                   (sep_tab . mntopt_list "opt" .
+                     (sep_comma_tab . [ label "dump" . store /[0-9]+/ ] .
+                      ( sep_spc . [ label "passno" . store /[0-9]+/ ])? )? )?
+                  . Util.comment_or_eol ]
+diff --git a/lenses/tests/test_fstab.aug b/lenses/tests/test_fstab.aug
+index 4a912e59..b526c088 100644
+--- a/lenses/tests/test_fstab.aug
++++ b/lenses/tests/test_fstab.aug
+@@ -167,6 +167,18 @@ module Test_fstab =
+     { "passno" = "0" }
+   }
+ 
++  (* RHEL-77279 - Allow empty option *)
++  test Fstab.lns get "/dev/mapper/foo-bar / xfs rw,,nodev 0 0\n" =
++  { "1"
++    { "spec" = "/dev/mapper/foo-bar" }
++    { "file" = "/" }
++    { "vfstype" = "xfs" }
++    { "opt" = "rw" }
++    { "opt" = "nodev" }
++    { "dump" = "0" }
++    { "passno" = "0" }
++  }
++
+ (* Local Variables: *)
+ (* mode: caml       *)
+ (* End:             *)
+-- 
+2.49.0
+

@@ -1,0 +1,8 @@
+--- indicatif-0.18.3/Cargo.toml	1970-01-01T00:00:01+00:00
++++ indicatif-0.18.3/Cargo.toml	2025-12-12T19:38:19.809344+00:00
+@@ -202,5 +202,3 @@
+     "rt",
+ ]
+ 
+-[target.'cfg(target_arch = "wasm32")'.dependencies.web-time]
+-version = "1.1.0"

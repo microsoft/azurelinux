@@ -1,0 +1,11 @@
+--- qt-x11-free-3.3.6/src/kernel/qscriptengine_x11.cpp.bak	2006-10-18 17:55:23.000000000 +0800
++++ qt-x11-free-3.3.6/src/kernel/qscriptengine_x11.cpp	2006-10-19 16:42:31.641160984 +0800
+@@ -786,7 +786,7 @@
+     Below, None, Below, Below,
+     Below, Below, Below, Below,
+ 
+-    Below, None, Below, Below,
++    Below, Below, Below, Below,
+     None, Below, Below, Below,
+     Below, Below, None, None,
+     None, None, Post, Above,

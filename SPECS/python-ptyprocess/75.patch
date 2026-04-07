@@ -1,0 +1,32 @@
+From a44312974bd9084aa568d2e18ce5b2a7e0e45983 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Mon, 23 Oct 2023 15:18:02 +0200
+Subject: [PATCH] Remove unittest.makeSuite, gone from Python 3.13
+
+See https://docs.python.org/3.13/whatsnew/3.13.html
+
+"""
+Removed the following unittest functions, deprecated in Python 3.11:
+
+    unittest.findTestCases()
+    unittest.makeSuite()
+    unittest.getTestCaseNames()
+"""
+
+The removed call does not seem to have any effect when the file is executed
+directly, run trough unittest discover or pytest.
+---
+ tests/test_invalid_binary.py | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/tests/test_invalid_binary.py b/tests/test_invalid_binary.py
+index cf28098..545f9f7 100755
+--- a/tests/test_invalid_binary.py
++++ b/tests/test_invalid_binary.py
+@@ -69,6 +69,3 @@ def test_invalid_binary(self):
+ 
+ if __name__ == '__main__':
+     unittest.main()
+-
+-suite = unittest.makeSuite(InvalidBinaryChars,'test')
+-

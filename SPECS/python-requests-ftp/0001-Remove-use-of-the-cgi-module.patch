@@ -1,0 +1,106 @@
+From 641144341250d8943311cd3454b1d5696d55f573 Mon Sep 17 00:00:00 2001
+From: David Shea <reallylongword@gmail.com>
+Date: Tue, 8 Jul 2025 13:41:13 -0400
+Subject: [PATCH] Remove use of the cgi module
+
+---
+ requests_ftp/ftp.py | 56 ---------------------------------------------
+ 1 file changed, 56 deletions(-)
+
+diff --git a/requests_ftp/ftp.py b/requests_ftp/ftp.py
+index 5a9d571..9491ad9 100644
+--- a/requests_ftp/ftp.py
++++ b/requests_ftp/ftp.py
+@@ -1,6 +1,5 @@
+ # -*- encoding: utf-8 -*-
+ import base64
+-import cgi
+ import ftplib
+ from io import BytesIO
+ import os
+@@ -34,12 +33,6 @@ class FTPSession(requests.Session):
+         content field contains the binary data.'''
+         return self.request('RETR', url, **kwargs)
+ 
+-    def stor(self, url, files=None, **kwargs):
+-        '''Sends an FTP STOR to a given URL. Returns a Response object. Expects
+-        to be given one file by the standard Requests method. The remote
+-        filename will be given by the URL provided.'''
+-        return self.request('STOR', url, files=files, **kwargs)
+-
+     def nlst(self, url, **kwargs):
+         '''Sends an FTP NLST. Returns a Response object.'''
+         return self.request('NLST', url, **kwargs)
+@@ -61,30 +54,6 @@ def monkeypatch_session():
+     return
+ 
+ 
+-def parse_multipart_files(request):
+-    '''Given a prepared request, return a file-like object containing the
+-    original data. This is pretty hacky.'''
+-    # Start by grabbing the pdict.
+-    _, pdict = cgi.parse_header(request.headers['Content-Type'])
+-
+-    # Now, wrap the multipart data in a BytesIO buffer. This is annoying.
+-    buf = BytesIO()
+-    buf.write(request.body)
+-    buf.seek(0)
+-
+-    # Parse the data. Simply take the first file.
+-    data = cgi.parse_multipart(buf, pdict)
+-    _, filedata = data.popitem()
+-    buf.close()
+-
+-    # Get a BytesIO now, and write the file into it.
+-    buf = BytesIO()
+-    buf.write(''.join(filedata))
+-    buf.seek(0)
+-
+-    return buf
+-
+-
+ def data_callback_factory(variable):
+     '''Returns a callback suitable for use by the FTP library. This callback
+     will repeatedly save data into the variable provided to this function. This
+@@ -189,7 +158,6 @@ class FTPAdapter(requests.adapters.BaseAdapter):
+         self.func_table = {
+             'LIST': self.list,
+             'RETR': self.retr,
+-            'STOR': self.stor,
+             'NLST': self.nlst,
+             'SIZE': self.size,
+             'HEAD': self.head,
+@@ -393,30 +361,6 @@ class FTPAdapter(requests.adapters.BaseAdapter):
+         response.status_code = codes.ok
+         return response
+ 
+-    def stor(self, path, request):
+-        '''Executes the FTP STOR command on the given path.'''
+-
+-        # First, get the file handle. We assume (bravely)
+-        # that there is only one file to be sent to a given URL. We also
+-        # assume that the filename is sent as part of the URL, not as part of
+-        # the files argument. Both of these assumptions are rarely correct,
+-        # but they are easy.
+-        data = parse_multipart_files(request)
+-
+-        # Split into the path and the filename.
+-        path, filename = os.path.split(path)
+-
+-        # Switch directories and upload the data.
+-        self.conn.cwd(path)
+-        code = self.conn.storbinary('STOR ' + filename, data)
+-
+-        # Close the connection and build the response.
+-        self.conn.close()
+-
+-        response = build_binary_response(request, BytesIO(), code)
+-
+-        return response
+-
+     def nlst(self, path, request):
+         '''Executes the FTP NLST command on the given path.'''
+         data = BytesIO()
+-- 
+2.49.0
+

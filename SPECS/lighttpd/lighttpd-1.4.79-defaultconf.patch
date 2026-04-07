@@ -1,0 +1,33 @@
+--- doc/config/lighttpd.annotated.conf.orig	2025-01-10 12:38:45.338557175 -0600
++++ doc/config/lighttpd.annotated.conf	2025-01-10 12:39:45.326238702 -0600
+@@ -14,8 +14,8 @@
+ ## chroot example as well.
+ ##
+ var.log_root    = "/var/log/lighttpd"
+-var.server_root = "/srv/www"
+-var.state_dir   = "/run"
++var.server_root = "/var/www"
++var.state_dir   = "/run/lighttpd"
+ var.home_dir    = "/var/lib/lighttpd"
+ var.conf_dir    = "/etc/lighttpd"
+ 
+@@ -114,7 +114,7 @@
+ ##
+ ## Document root
+ ##
+-server.document-root = server_root + "/htdocs"
++server.document-root = server_root + "/lighttpd"
+ 
+ ##
+ ## The value for the "Server:" response field.
+--- doc/config/conf.d/tls.conf~	2025-04-04 00:28:20.000000000 -0500
++++ doc/config/conf.d/tls.conf	2025-04-04 14:04:56.934301289 -0500
+@@ -23,7 +23,7 @@
+ ## lighttpd TLS defaults are strict and compatible with modern clients.
+ ## If your organization requires use of system-managed TLS defaults to
+ ## override lighttpd TLS defaults, use "CipherString" => "PROFILE=SYSTEM"
+-#ssl.openssl.ssl-conf-cmd += ("CipherString" => "PROFILE=SYSTEM")
++ssl.openssl.ssl-conf-cmd += ("CipherString" => "PROFILE=SYSTEM")
+ 
+ ## enable TLS on specified listening addresses
+ #$SERVER["socket"] == "*:443" {

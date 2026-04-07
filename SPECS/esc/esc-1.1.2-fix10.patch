@@ -1,0 +1,291 @@
+diff -up ./esc/esc-1.1.2/esc/src/app/esc.js.fix10 ./esc/esc-1.1.2/esc/src/app/esc.js
+--- ./esc/src/app/esc.js.fix10	2020-12-02 15:47:00.688951279 -0800
++++ ./esc/src/app/esc.js	2020-12-02 15:47:00.690951273 -0800
+@@ -370,12 +370,20 @@ class ESC {
+          let nick = "";
+          if(certObj.token == null) 
+              token = "internal"; 
+-         else
++         else  {
+              token = certObj.token;
++	}
+ 
+          nick = certObj.nick;
+- 
+-         certDetail = this._execProgram(['/usr/bin/certutil','-L','-d', this._getConfigPath(), '-h', token, '-f' , pFileName, '-n', token + ":" + nick]);
++
++	 let tokenNick = '"' + token + ":" + nick + '"' ;
++	 token = '"' + token + '"';
++	 let argv1 = ['/usr/bin/certutil','-L','-d', this._getConfigPath(), '-h', token, '-f' , pFileName, '-n', tokenNick];
++	  
++         print("argv1: " + argv1);
++	 
++
++	 certDetail = this._execProgram(argv1);
+ 
+          return certDetail;
+      }
+@@ -475,7 +483,7 @@ class ESC {
+                result = -1;
+                return result;
+             }
+-
++		
+             result = stdoutb.toString();
+ 
+         } catch (e) {
+@@ -792,19 +800,18 @@ class ESC {
+         let status = this._selectedTokenInfo.status;
+ 
+         if(status == 4 /* enrolled */) {
+-            this._pinMgr = new PinDialog.pinDialog(this);
+-            this._pinMgr.launchPinPrompt(this._promptPinDone.bind(this));
++	    let coolkey_token = this._selectedTokenInfo;
++
++            this._tokenInfoBuffer.text +=
++                this.mgr.get_certs_info(coolkey_token);
++
+         }
+       
+     }
+-    _promptPinDone(tempFileName) {
+-
+-        let coolkey_token = this._selectedTokenInfo;
+-
+-        this._tokenInfoBuffer.text += 
+-              this._getCertList(coolkey_token,tempFileName)  + "\n";
+ 
++    _promptPinDone(tempFileName) {
+      }
++
+     _response_cb() {
+         if(this._messageDialog) {
+             this._messageDialog.destroy();
+diff -up ./esc/src/app/opensc.esc.conf.fix10 ./esc/src/app/opensc.esc.conf
+--- ./esc/src/app/opensc.esc.conf.fix10	2020-12-02 15:51:05.812283690 -0800
++++ ./esc/src/app/opensc.esc.conf	2020-12-02 15:51:30.835215539 -0800
+@@ -94,6 +94,7 @@ app default {
+         module_path = /usr/lib64;
+     }
+     framework pkcs15 {
++        use_file_caching = true;
+         builtin_emulators = coolkey, cac, cac1, PIV-II;
+     }
+ }
+diff -up ./esc/src/app/pinDialog.js.fix10 ./esc/src/app/pinDialog.js
+--- ./esc/src/app/pinDialog.js.fix10	2020-12-02 15:47:00.683951293 -0800
++++ ./esc/src/app/pinDialog.js	2020-12-02 15:47:00.691951271 -0800
+@@ -94,7 +94,6 @@ pinDialog.prototype = {
+             if(this.notify) {
+                 this.notify(this.tempFileName);
+             }
+-
+             this.clearTempFile();
+             this.dialog.destroy();
+             this.dialog = null;
+diff -up ./esc/src/lib/coolkey/CoolKeyHandler.cpp.fix10 ./esc/src/lib/coolkey/CoolKeyHandler.cpp
+--- ./esc/src/lib/coolkey/CoolKeyHandler.cpp.fix10	2020-12-02 16:25:29.075670723 -0800
++++ ./esc/src/lib/coolkey/CoolKeyHandler.cpp	2020-12-02 16:30:53.310789119 -0800
+@@ -46,6 +46,7 @@
+ 
+ static const char *cac_manu_id= "Common Access Card";
+ static const char *piv_manu_id= "piv II ";
++static const char *piv_manu_id_1=  "piv_II";
+ 
+ //static  char *test_extended_login = "s=325&msg_type=13&invalid_login=0&blocked=0&error=&required_parameter0=id%3DUSER%5FID%26name%3DUser+ID%26desc%3DUser+ID%26type%3Dstring%26option%3Doption1%2Coption2%2Coption3&required_parameter1=id%3DUSER%5FPWD%26name%3DUser+Password%26desc%3DUser+Password%26type%3Dpassword%26option%3D&required_parameter2=id%3DUSER%5FPIN%26name%3DPIN%26desc%3DOne+time+PIN+received+via+mail%26type%3Dpassword%26option%3D";
+ 
+@@ -2300,7 +2301,9 @@ CKHGetCoolKeyInfo(PK11SlotInfo *aSlot,Co
+     if(!memcmp( tokenInfo.manufacturerID,cac_manu_id,strlen(cac_manu_id ))) {
+         isACAC = 1;
+     } else if(!memcmp(tokenInfo.manufacturerID, piv_manu_id, strlen(piv_manu_id))) {
+-        isAPIV = 1;
++        isAPIV = 1; 
++    } else if(!memcmp(tokenInfo.manufacturerID, piv_manu_id_1, strlen(piv_manu_id_1))) {
++	isAPIV = 1;
+     } else {
+         isACOOLKey = 1;
+     }
+diff -up ./esc/src/lib/coolkey-mgr/coolkey-api.cpp.fix10 ./esc/src/lib/coolkey-mgr/coolkey-api.cpp
+--- ./esc/src/lib/coolkey-mgr/coolkey-api.cpp.fix10	2020-12-02 15:47:00.673951320 -0800
++++ ./esc/src/lib/coolkey-mgr/coolkey-api.cpp	2020-12-02 15:47:00.691951271 -0800
+@@ -17,6 +17,8 @@
+ 
+ #include "coolkey-api.h"
+ #include "rhCoolKey.h"
++#include <string>
++
+ 
+ static rhCoolKey *coolkey = NULL;
+ static const char * coolkeyDbusName = NULL;
+@@ -79,6 +81,54 @@ char *coolkey_get_phone_home(char *url)
+    } 
+ }
+ 
++/* get a string with all the certs detail for a token */
++
++char *coolkey_get_certs_info(int keyType, const char *keyID) {
++
++    string str_result;
++    if (coolkey == NULL) {
++	    return NULL;
++    }
++
++    char *result = NULL;
++    char **names = NULL;
++    PRUint32 count = 0;
++    HRESULT res =  coolkey->GetCoolKeyCertNicknames(keyType, keyID, &count, &names);
++
++    if(count > 0 && res == S_OK) {
++        for(int i = 0 ; i < count ; i++) {
++	    char *curName = names[i];
++
++	    if(curName) {
++	        char *certDetail = NULL;
++		str_result = str_result + curName + "\n" ;
++	        res = coolkey->GetCoolKeyCertInfo(keyType, keyID, curName, &certDetail);
++	        if(res == S_OK && certDetail != NULL) {
++		    str_result = str_result + certDetail + "\n";
++		    PL_strfree(certDetail);
++		    certDetail = NULL;
++	        }
++	    }
++	}
++    }
++
++    if(str_result.c_str()) {
++        result = PL_strdup((char *) str_result.c_str());
++    }
++
++    for(int i = 0 ; i < count ; i++) {
++        if(names[i]) {
++	    PL_strfree(names[i]);
++	    names[i] = NULL;
++	}
++    }
++
++    PR_Free(names);
++    names = NULL;
++
++    return result;
++}
++
+ 
+ /* get a block of data about a token in a structure format */
+ tokenInfo *coolkey_get_token_info(int keyType, const char *keyID) {
+diff -up ./esc/src/lib/coolkey-mgr/coolkey-api.h.fix10 ./esc/src/lib/coolkey-mgr/coolkey-api.h
+--- ./esc/src/lib/coolkey-mgr/coolkey-api.h.fix10	2020-12-02 15:47:00.673951320 -0800
++++ ./esc/src/lib/coolkey-mgr/coolkey-api.h	2020-12-02 15:47:00.691951271 -0800
+@@ -43,6 +43,8 @@ void coolkey_init(const char *db_dir, co
+ void coolkey_destroy();
+ 
+ char *coolkey_get_phone_home(char *url);
++char *coolkey_get_certs_info(int keyType, const char *keyID);
++
+ tokenInfo *coolkey_get_token_info(int keyType,const char *keyID);
+ void coolkey_free_token_info(tokenInfo *tInfo);
+ 
+diff -up ./esc/src/lib/coolkey-mgr/coolkey-mgr.c.fix10 ./esc/src/lib/coolkey-mgr/coolkey-mgr.c
+--- ./esc/src/lib/coolkey-mgr/coolkey-mgr.c.fix10	2020-12-02 15:47:00.673951320 -0800
++++ ./esc/src/lib/coolkey-mgr/coolkey-mgr.c	2020-12-02 15:47:00.691951271 -0800
+@@ -346,6 +346,36 @@ cleanup:
+ }
+ 
+ 
++gchar*
++coolkey_mgr_get_certs_info(CoolkeyMgr *self, CoolkeyToken* token) {
++
++    gchar *cuid = NULL;
++    gchar *keyType = NULL;
++    int keyTypeInt = 0;
++    gchar *certInfo = NULL;
++
++    g_object_get(token,"key_type", &keyType,NULL);
++    g_object_get(token,"cuid", &cuid, NULL);
++
++    if(keyType == NULL || cuid == NULL) {
++       goto cleanup;
++    }
++
++    keyTypeInt = atoi(keyType);
++
++    if(keyType == NULL || cuid == NULL) {
++       goto cleanup;
++    }
++
++    certInfo = coolkey_get_certs_info(keyTypeInt, cuid); 
++
++cleanup:
++
++    g_free (keyType);
++    g_free (cuid);
++    
++    return  certInfo;
++}
+ 
+ void 
+ coolkey_mgr_get_token_info(CoolkeyMgr* self, CoolkeyToken* token) {
+diff -up ./esc/src/lib/coolkey-mgr/coolkey-mgr.h.fix10 ./esc/src/lib/coolkey-mgr/coolkey-mgr.h
+--- ./esc/src/lib/coolkey-mgr/coolkey-mgr.h.fix10	2020-12-02 15:47:00.673951320 -0800
++++ ./esc/src/lib/coolkey-mgr/coolkey-mgr.h	2020-12-02 15:47:00.691951271 -0800
+@@ -46,6 +46,8 @@ int coolkey_mgr_cancel_token_operation(C
+ 
+ void  coolkey_mgr_get_token_info(CoolkeyMgr* self, CoolkeyToken* token);
+ 
++gchar * coolkey_mgr_get_certs_info(CoolkeyMgr*self, CoolkeyToken* token);
++
+ gchar * coolkey_mgr_phone_home(CoolkeyMgr* self, gchar *url);
+ 
+ gchar * coolkey_mgr_speak (CoolkeyMgr* self, gchar *words);
+diff -up ./esc/src/lib/coolkey/NSSManager.cpp.fix10 ./esc/src/lib/coolkey/NSSManager.cpp
+--- ./esc/src/lib/coolkey/NSSManager.cpp.fix10	2020-12-02 15:47:00.680951301 -0800
++++ ./esc/src/lib/coolkey/NSSManager.cpp	2020-12-02 15:47:00.691951271 -0800
+@@ -41,7 +41,7 @@
+ 
+ #include <iostream>
+ #include <sstream>
+-
++#include <algorithm>
+ #include "SlotUtils.h"
+ 
+ static PRLogModuleInfo *coolKeyLogNSS = PR_NewLogModule("coolKeyNSS");
+@@ -314,7 +314,10 @@ NSSManager::GetKeyCertNicknames( const C
+             CERTCertificate *cert = node->cert;
+             if(cert)
+             {
+-                if(cert->slot != slot)
++		char *certSlotName = PK11_GetSlotName(cert->slot);
++		char *slotName = PK11_GetSlotName(slot);
++
++                if(strcmp(certSlotName, slotName))
+                 {
+                     CERT_RemoveCertListNode(node);
+                 }
+@@ -346,7 +349,10 @@ NSSManager::GetKeyCertNicknames( const C
+             PR_LOG( coolKeyLogNSS, PR_LOG_DEBUG, ("%s NSSManager::GetCertKeyNicknames name %s \n",GetTStamp(tBuff,56),curName));
+ 
+             string str = curName;
+-            aStrings.push_back (str);
++
++	    if (find(aStrings.begin(), aStrings.end(), str) == aStrings.end()) {
++                aStrings.push_back (str);
++	    }
+         } 
+ 
+         CERT_FreeNicknames(nicknames);
+@@ -691,6 +697,16 @@ HRESULT NSSManager::GetKeyCertInfo(const
+                         aCertInfo = issuedToCNStr + "\n" + issuerCNStr + "\n"
+                             + notBeforeStr + "\n" + notAfterStr + "\n" + serialStr ;
+                         PR_LOG( coolKeyLogNSS, PR_LOG_DEBUG, ("%s NSSManager::GetKeyCertInfo issuerCN %s issuedToCN %s \n",GetTStamp(tBuff,56),issuerCN, issuedToCN)); 
++			
++			if(nBefore) {
++			    PORT_Free(nBefore);
++			    nBefore  = NULL;
++			}
++
++			if(nAfter) {
++			    PORT_Free(nAfter);
++			    nAfter = NULL;
++			}
+ 
+                         break;
+                     }               

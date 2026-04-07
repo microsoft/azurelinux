@@ -1,0 +1,47 @@
+From c5debba630bd8ffca77b71a9b94cd90cec94c566 Mon Sep 17 00:00:00 2001
+From: rfm <richardfrithmacdonald@gmail.com>
+Date: Sat, 22 Feb 2025 22:41:10 +0000
+Subject: [PATCH] Fix for s390x
+
+---
+ ChangeLog                 | 5 +++++
+ Source/ObjectiveC2/weak.m | 6 ++++++
+ 2 files changed, 11 insertions(+)
+
+diff --git a/ChangeLog b/ChangeLog
+index 8fd348e3f..d6a718923 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,8 @@
++2025-02-22 Richard Frith-Macdonald <rfm@gnu.org>
++
++	* Source/ObjectiveC2/weak.m: Comment out unnecessary code which does
++	not work on s390x machines (and broke weak references on them).
++
+ 2025-01-10 Richard Frith-Macdonald <rfm@gnu.org>
+ 
+ 	* ChangeLog: Update for new release
+diff --git a/Source/ObjectiveC2/weak.m b/Source/ObjectiveC2/weak.m
+index 3a3ffc35f..1aafd6590 100644
+--- a/Source/ObjectiveC2/weak.m
++++ b/Source/ObjectiveC2/weak.m
+@@ -30,6 +30,11 @@
+       return YES;
+     }
+ 
++/* Disabled check for addresses not matching alignment rules below.
++ * The test is broken for the s390x (which is a Debiam supported machine)
++ * and shouldn't actually be needed anyway.
++ */
++#if	0
+   /* If the alignment of the object does not match that needed for a
+    * pointer (to the class of the object) then the object must be a
+    * special one of some sort and we assume it's persistent.
+@@ -44,6 +49,7 @@
+     {
+       return YES;
+     }
++#endif
+ #endif
+ 
+   c = object_getClass(obj);

@@ -1,0 +1,40 @@
+From: =?UTF-8?q?Ond=C5=99ej=20Va=C5=A1=C3=ADk?= <ovasik@redhat.com>
+Date: Mon, 14 Sep 2015 09:47:05 +0200
+Subject: [PATCH 5/7] fix segfault with nonexisting file with patternnames
+ (#567022)
+
+diff --git a/src/copyin.c b/src/copyin.c
+index 5d88a23..f2babb7 100644
+--- a/src/copyin.c
++++ b/src/copyin.c
+@@ -948,21 +948,24 @@ read_pattern_file (void)
+ 
+   pattern_fp = fopen (pattern_file_name, "r");
+   if (pattern_fp == NULL)
+-    open_fatal (pattern_file_name);
+-  while (ds_fgetstr (pattern_fp, &pattern_name, '\n') != NULL)
++    open_error (pattern_file_name);
++  else
++  {
++    while (ds_fgetstr (pattern_fp, &pattern_name, '\n') != NULL)
+     {
+       if (new_num_patterns == max_new_patterns)
+-	new_save_patterns = x2nrealloc (new_save_patterns,
++        new_save_patterns = x2nrealloc (new_save_patterns,
+ 					&max_new_patterns,
+ 					sizeof (new_save_patterns[0]));
+       new_save_patterns[new_num_patterns] = xstrdup (pattern_name.ds_string);
+       ++new_num_patterns;
+     }
+ 
+-  ds_free (&pattern_name);
++    ds_free (&pattern_name);
+ 
+-  if (ferror (pattern_fp) || fclose (pattern_fp) == EOF)
+-    close_error (pattern_file_name);
++    if (ferror (pattern_fp) || fclose (pattern_fp) == EOF)
++      close_error (pattern_file_name);
++  }
+ 
+   for (i = 0; i < num_patterns; ++i)
+     new_save_patterns[i] = save_patterns[i];

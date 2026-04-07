@@ -1,0 +1,193 @@
+diff --git a/gold/i386.cc b/gold/i386.cc
+index bf209fe9a86..31161ff091c 100644
+--- a/gold/i386.cc
++++ b/gold/i386.cc
+@@ -360,7 +360,11 @@ class Target_i386 : public Sized_target<32, false>
+       got_(NULL), plt_(NULL), got_plt_(NULL), got_irelative_(NULL),
+       got_tlsdesc_(NULL), global_offset_table_(NULL), rel_dyn_(NULL),
+       rel_irelative_(NULL), copy_relocs_(elfcpp::R_386_COPY),
+-      got_mod_index_offset_(-1U), tls_base_symbol_defined_(false)
++      got_mod_index_offset_(-1U), tls_base_symbol_defined_(false),
++      isa_1_used_(0), isa_1_needed_(0),
++      feature_1_(0), feature_2_used_(0), feature_2_needed_(0),
++      object_isa_1_used_(0), object_feature_1_(0),
++      object_feature_2_used_(0), seen_first_object_(false)
+   { }
+ 
+   // Process the relocations to determine unreferenced sections for
+@@ -859,6 +863,21 @@ class Target_i386 : public Sized_target<32, false>
+ 				  this->rel_dyn_section(layout));
+   }
+ 
++  // Record a target-specific program property in the .note.gnu.property
++  // section.
++  void
++  record_gnu_property(unsigned int, unsigned int, size_t,
++		      const unsigned char*, const Object*);
++
++  // Merge the target-specific program properties from the current object.
++  void
++  merge_gnu_properties(const Object*);
++
++  // Finalize the target-specific program properties and add them back to
++  // the layout.
++  void
++  do_finalize_gnu_properties(Layout*) const;
++
+   // Information about this specific target which we pass to the
+   // general Target structure.
+   static const Target::Target_info i386_info;
+@@ -898,6 +917,26 @@ class Target_i386 : public Sized_target<32, false>
+   unsigned int got_mod_index_offset_;
+   // True if the _TLS_MODULE_BASE_ symbol has been defined.
+   bool tls_base_symbol_defined_;
++
++  // Target-specific program properties, from .note.gnu.property section.
++  // Each bit represents a specific feature.
++  uint32_t isa_1_used_;
++  uint32_t isa_1_needed_;
++  uint32_t feature_1_;
++  uint32_t feature_2_used_;
++  uint32_t feature_2_needed_;
++  // Target-specific properties from the current object.
++  // These bits get ORed into ISA_1_USED_ after all properties for the object
++  // have been processed. But if either is all zeroes (as when the property
++  // is absent from an object), the result should be all zeroes.
++  // (See PR ld/23486.)
++  uint32_t object_isa_1_used_;
++  // These bits get ANDed into FEATURE_1_ after all properties for the object
++  // have been processed.
++  uint32_t object_feature_1_;
++  uint32_t object_feature_2_used_;
++  // Whether we have seen our first object, for use in initializing FEATURE_1_.
++  bool seen_first_object_;
+ };
+ 
+ const Target::Target_info Target_i386::i386_info =
+@@ -1042,6 +1081,126 @@ Target_i386::rel_irelative_section(Layout* layout)
+   return this->rel_irelative_;
+ }
+ 
++// Record a target-specific program property from the .note.gnu.property
++// section.
++void
++Target_i386::record_gnu_property(
++    unsigned int, unsigned int pr_type,
++    size_t pr_datasz, const unsigned char* pr_data,
++    const Object* object)
++{
++  uint32_t val = 0;
++
++  switch (pr_type)
++    {
++    case elfcpp::GNU_PROPERTY_X86_COMPAT_ISA_1_USED:
++    case elfcpp::GNU_PROPERTY_X86_COMPAT_ISA_1_NEEDED:
++    case elfcpp::GNU_PROPERTY_X86_COMPAT_2_ISA_1_USED:
++    case elfcpp::GNU_PROPERTY_X86_COMPAT_2_ISA_1_NEEDED:
++    case elfcpp::GNU_PROPERTY_X86_ISA_1_USED:
++    case elfcpp::GNU_PROPERTY_X86_ISA_1_NEEDED:
++    case elfcpp::GNU_PROPERTY_X86_FEATURE_1_AND:
++    case elfcpp::GNU_PROPERTY_X86_FEATURE_2_USED:
++    case elfcpp::GNU_PROPERTY_X86_FEATURE_2_NEEDED:
++      if (pr_datasz != 4)
++	{
++	  gold_warning(_("%s: corrupt .note.gnu.property section "
++			 "(pr_datasz for property %d is not 4)"),
++		       object->name().c_str(), pr_type);
++	  return;
++	}
++      val = elfcpp::Swap<32, false>::readval(pr_data);
++      break;
++    default:
++      gold_warning(_("%s: unknown program property type 0x%x "
++		     "in .note.gnu.property section"),
++		   object->name().c_str(), pr_type);
++      break;
++    }
++
++  switch (pr_type)
++    {
++    case elfcpp::GNU_PROPERTY_X86_ISA_1_USED:
++      this->object_isa_1_used_ |= val;
++      break;
++    case elfcpp::GNU_PROPERTY_X86_ISA_1_NEEDED:
++      this->isa_1_needed_ |= val;
++      break;
++    case elfcpp::GNU_PROPERTY_X86_FEATURE_1_AND:
++      // If we see multiple feature props in one object, OR them together.
++      this->object_feature_1_ |= val;
++      break;
++    case elfcpp::GNU_PROPERTY_X86_FEATURE_2_USED:
++      this->object_feature_2_used_ |= val;
++      break;
++    case elfcpp::GNU_PROPERTY_X86_FEATURE_2_NEEDED:
++      this->feature_2_needed_ |= val;
++      break;
++    }
++}
++
++// Merge the target-specific program properties from the current object.
++void
++Target_i386::merge_gnu_properties(const Object*)
++{
++  if (this->seen_first_object_)
++    {
++      // If any object is missing the ISA_1_USED property, we must omit
++      // it from the output file.
++      if (this->object_isa_1_used_ == 0)
++	this->isa_1_used_ = 0;
++      else if (this->isa_1_used_ != 0)
++	this->isa_1_used_ |= this->object_isa_1_used_;
++      this->feature_1_ &= this->object_feature_1_;
++      // If any object is missing the FEATURE_2_USED property, we must
++      // omit it from the output file.
++      if (this->object_feature_2_used_ == 0)
++	this->feature_2_used_ = 0;
++      else if (this->feature_2_used_ != 0)
++	this->feature_2_used_ |= this->object_feature_2_used_;
++    }
++  else
++    {
++      this->isa_1_used_ = this->object_isa_1_used_;
++      this->feature_1_ = this->object_feature_1_;
++      this->feature_2_used_ = this->object_feature_2_used_;
++      this->seen_first_object_ = true;
++    }
++  this->object_isa_1_used_ = 0;
++  this->object_feature_1_ = 0;
++  this->object_feature_2_used_ = 0;
++}
++
++static inline void
++add_property(Layout* layout, unsigned int pr_type, uint32_t val)
++{
++  unsigned char buf[4];
++  elfcpp::Swap<32, false>::writeval(buf, val);
++  layout->add_gnu_property(elfcpp::NT_GNU_PROPERTY_TYPE_0, pr_type, 4, buf);
++}
++
++// Finalize the target-specific program properties and add them back to
++// the layout.
++void
++Target_i386::do_finalize_gnu_properties(Layout* layout) const
++{
++  if (this->isa_1_used_ != 0)
++    add_property(layout, elfcpp::GNU_PROPERTY_X86_ISA_1_USED,
++		 this->isa_1_used_);
++  if (this->isa_1_needed_ != 0)
++    add_property(layout, elfcpp::GNU_PROPERTY_X86_ISA_1_NEEDED,
++		 this->isa_1_needed_);
++  if (this->feature_1_ != 0)
++    add_property(layout, elfcpp::GNU_PROPERTY_X86_FEATURE_1_AND,
++		 this->feature_1_);
++  if (this->feature_2_used_ != 0)
++    add_property(layout, elfcpp::GNU_PROPERTY_X86_FEATURE_2_USED,
++		 this->feature_2_used_);
++  if (this->feature_2_needed_ != 0)
++    add_property(layout, elfcpp::GNU_PROPERTY_X86_FEATURE_2_NEEDED,
++		 this->feature_2_needed_);
++}
++
+ // Write the first three reserved words of the .got.plt section.
+ // The remainder of the section is written while writing the PLT
+ // in Output_data_plt_i386::do_write.

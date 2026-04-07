@@ -1,0 +1,16 @@
+diff -rup binutils.orig/gold/options.h binutils-2.41/gold/options.h
+--- binutils.orig/gold/options.h	2024-01-04 09:52:09.282002253 +0000
++++ binutils-2.41/gold/options.h	2024-01-04 09:52:51.890972630 +0000
+@@ -855,6 +855,12 @@ class General_options
+ 	      N_("(ARM only) Do not warn about objects with incompatible "
+ 		 "enum sizes"));
+ 
++  DEFINE_bool_ignore(error_execstack, options::TWO_DASHES, '\0',
++		     N_("Ignored"), N_("Ignored"));
++
++  DEFINE_bool_ignore(error_rwx_segments, options::TWO_DASHES, '\0',
++		     N_("Ignored"), N_("Ignored"));
++
+   DEFINE_special(exclude_libs, options::TWO_DASHES, '\0',
+ 		 N_("Exclude libraries from automatic export"),
+ 		 N_(("lib,lib ...")));

@@ -1,0 +1,26 @@
+From df181cd0ab060a17893f46c31e2876b332100e27 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Thu, 25 Sep 2025 12:00:09 +0100
+Subject: [PATCH] Downstream-only: ignore test that requires assert-dbg, not in
+ the crate
+
+---
+ src/macros.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/macros.rs b/src/macros.rs
+index a2030d1..4f41605 100644
+--- a/src/macros.rs
++++ b/src/macros.rs
+@@ -188,7 +188,7 @@ macro_rules! context {
+ 
+ /// Creates a list of formattable values, applying th specified traits, or
+ /// display if without a trait specifier.
+-/// ```
++/// ```ignore
+ /// # use assert_dbg::assert_dbg;
+ /// use interpolator::{iformat, list};
+ /// // a list implementing Display
+-- 
+2.51.0
+

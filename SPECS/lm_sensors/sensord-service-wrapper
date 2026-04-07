@@ -1,0 +1,13 @@
+#!/bin/sh
+
+. /etc/sysconfig/sensord
+
+ARGS=""
+[ "$INTERVAL" = "" ] || ARGS=`echo "$ARGS -i $INTERVAL"`
+[ "$LOG_INTERVAL" = "" ] || ARGS=`echo "$ARGS -l $LOG_INTERVAL"`
+[ "$RRD_INTERVAL" = "" ] || ARGS=`echo "$ARGS -t $RRD_INTERVAL"`
+[ "$RRD_LOGFILE" = "" ] || ARGS=`echo "$ARGS -r $RRD_LOGFILE"`
+[ "$RRD_NO_AVG" = "1" ] && ARGS=`echo "$ARGS -T"`
+[ "$LOAD_AVG" = "1" ] && ARGS=`echo "$ARGS -a"`
+
+/usr/sbin/sensord -f daemon $ARGS

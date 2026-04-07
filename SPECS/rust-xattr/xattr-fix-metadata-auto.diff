@@ -1,0 +1,8 @@
+--- xattr-1.6.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ xattr-1.6.1/Cargo.toml	2025-10-22T13:19:22.900427+00:00
+@@ -54,5 +54,3 @@
+ ]
+ default-features = false
+ 
+-[target.'cfg(any(target_os = "freebsd", target_os = "netbsd"))'.dependencies.libc]
+-version = "0.2.150"

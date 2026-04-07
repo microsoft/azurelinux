@@ -1,0 +1,40 @@
+--- sev-6.3.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ sev-6.3.1/Cargo.toml	2025-11-02T16:06:28.301849+00:00
+@@ -73,7 +73,6 @@
+ default = [
+     "sev",
+     "snp",
+-    "openssl?/vendored",
+ ]
+ hw_tests = []
+ openssl = [
+@@ -128,7 +127,7 @@
+ features = ["serde"]
+ 
+ [dependencies.bitfield]
+-version = "^0.19"
++version = ">=0.15, <0.20"
+ 
+ [dependencies.bitflags]
+ version = "2.9.0"
+@@ -140,7 +139,7 @@
+ version = "3.0"
+ 
+ [dependencies.dirs]
+-version = "^6.0"
++version = ">=5.0, <7.0"
+ 
+ [dependencies.hex]
+ version = "0.4.3"
+diff -rup ../rust-sev-6.3.1-build/sev-6.3.1/Cargo.toml sev-6.3.1/Cargo.toml
+--- sev-6.3.1/Cargo.toml	2025-11-07 10:31:59.849097446 -0500
++++ sev-6.3.1/Cargo.toml	2025-11-07 10:34:48.160757930 -0500
+@@ -208,7 +208,7 @@ version = "3.0"
+ version = "^0.1"
+ 
+ [target.'cfg(target_os = "linux")'.dev-dependencies.kvm-bindings]
+-version = "^0.11"
++version = "^0.13"
+ 
+ [target.'cfg(target_os = "linux")'.dev-dependencies.kvm-ioctls]
+ version = ">=0.16"

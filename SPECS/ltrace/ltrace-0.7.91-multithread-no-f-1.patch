@@ -1,0 +1,175 @@
+From 4724bd5a4a19db117a1d280b9d1a3508fd4e03fa Mon Sep 17 00:00:00 2001
+From: Petr Machata <pmachata@redhat.com>
+Date: Wed, 8 Apr 2015 07:11:52 -0400
+Subject: [PATCH 1/2] Convert main-threaded test case to new style
+
+---
+ testsuite/ltrace.main/Makefile.am       |   4 +-
+ testsuite/ltrace.main/main-threaded.c   |  30 ----------
+ testsuite/ltrace.main/main-threaded.exp | 103 ++++++++++++++++++++------------
+ 3 files changed, 66 insertions(+), 71 deletions(-)
+ delete mode 100644 testsuite/ltrace.main/main-threaded.c
+
+diff --git a/testsuite/ltrace.main/Makefile.am b/testsuite/ltrace.main/Makefile.am
+index 23ab8ab..06ad613 100644
+--- a/testsuite/ltrace.main/Makefile.am
++++ b/testsuite/ltrace.main/Makefile.am
+@@ -1,4 +1,4 @@
+-# Copyright (C) 1992 - 2001, 2012, 2013 Free Software Foundation, Inc.
++# Copyright (C) 1992 - 2001, 2012, 2013, 2015 Free Software Foundation, Inc.
+ #
+ # This program is free software; you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+@@ -17,7 +17,7 @@
+ 
+ EXTRA_DIST = branch_func.c branch_func.exp filters.exp hello-vfork.c	\
+ 	hello-vfork.exp main.c main.exp main-internal.exp main-lib.c	\
+-	main-threaded.c main-threaded.exp main-vfork.c main-vfork.exp	\
++	main-threaded.exp main-vfork.c main-vfork.exp			\
+ 	parameters.c parameters.conf parameters.exp parameters-lib.c	\
+ 	parameters2.exp parameters3.exp signals.c signals.exp		\
+ 	system_calls.c system_calls.exp system_call_params.exp
+diff --git a/testsuite/ltrace.main/main-threaded.c b/testsuite/ltrace.main/main-threaded.c
+deleted file mode 100644
+index 2992d1e..0000000
+--- a/testsuite/ltrace.main/main-threaded.c
++++ /dev/null
+@@ -1,29 +0,0 @@
+-#include <pthread.h>
+-
+-extern void print (char *);
+-
+-#define	PRINT_LOOP	10
+-
+-void *
+-th_main (void *arg)
+-{
+-  int i;
+-  for (i=0; i<PRINT_LOOP; i++)
+-    print (arg);
+-}
+-
+-int
+-main ()
+-{
+-  pthread_t thread1;
+-  pthread_t thread2;
+-  pthread_t thread3;
+-  pthread_create (&thread1, NULL, th_main, "aaa");
+-  pthread_create (&thread2, NULL, th_main, "bbb");
+-  pthread_create (&thread3, NULL, th_main, "ccc");
+-  pthread_join (thread1, NULL);
+-  pthread_join (thread2, NULL);
+-  pthread_join (thread3, NULL);
+-  return 0;
+-}
+-
+diff --git a/testsuite/ltrace.main/main-threaded.exp b/testsuite/ltrace.main/main-threaded.exp
+index 4d5f478..cead82d 100644
+--- a/testsuite/ltrace.main/main-threaded.exp
++++ b/testsuite/ltrace.main/main-threaded.exp
+@@ -1,39 +1,64 @@
+-# This file was written by Yao Qi <qiyao@cn.ibm.com>.
++# This file is part of ltrace.
++# Copyright (C) 2011, 2015 Petr Machata, Red Hat Inc.
++# Copyright (C) 2006 Yao Qi <qiyao@cn.ibm.com>.
++#
++# This program is free software; you can redistribute it and/or
++# modify it under the terms of the GNU General Public License as
++# published by the Free Software Foundation; either version 2 of the
++# License, or (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful, but
++# WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++# General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
++# 02110-1301 USA
++
++set libprint [ltraceCompile libprint.so [ltraceSource c {
++    #include<stdio.h>
++
++    void
++    print(char* s)
++    {
++	printf("%s\n",s);
++    }
++}]]
++
++set bin [ltraceCompile {} $libprint -lpthread [ltraceSource c {
++    #include <pthread.h>
++
++    extern void print (char *);
++
++    #define	PRINT_LOOP	10
++
++    void *
++    th_main (void *arg)
++    {
++	int i;
++	for (i=0; i<PRINT_LOOP; i++)
++	print (arg);
++	return NULL;
++    }
++
++    int
++    main (void)
++    {
++	pthread_t thread1;
++	pthread_t thread2;
++	pthread_t thread3;
++	pthread_create (&thread1, NULL, th_main, "aaa");
++	pthread_create (&thread2, NULL, th_main, "bbb");
++	pthread_create (&thread3, NULL, th_main, "ccc");
++	pthread_join (thread1, NULL);
++	pthread_join (thread2, NULL);
++	pthread_join (thread3, NULL);
++	return 0;
++    }
++}]]
+ 
+-set testfile "main-threaded"
+-set srcfile ${testfile}.c
+-set binfile ${testfile}
+-set libfile "main-lib"
+-set libsrc $srcdir/$subdir/$libfile.c
+-set lib_sl $objdir/$subdir/lib$testfile.so
+-
+-
+-if [get_compiler_info $binfile] {
+-  return -1
+-}
+-
+-verbose "compiling source file now....."
+-if { [ltrace_compile_shlib $libsrc $lib_sl debug ] != "" 
+-  || [ltrace_compile $srcdir/$subdir/$srcfile $objdir/$subdir/$binfile executable [list debug shlib=$lib_sl ldflags=-pthread] ] != ""} {
+-  send_user "Testcase compile failed, so all tests in this file will automatically fail.\n"
+-}
+-
+-# set options for ltrace.
+-ltrace_options "-l" "lib$testfile.so" "-f"
+-
+-# Run PUT for ltarce.
+-set exec_output [ltrace_runtest $objdir/$subdir $objdir/$subdir/$binfile]
+-
+-# Check the output of this program.
+-verbose "ltrace runtest output: $exec_output\n"
+-if [regexp {ELF from incompatible architecture} $exec_output] {
+-	fail "32-bit ltrace can not perform on 64-bit PUTs and rebuild ltrace in 64 bit mode!"
+-	return 
+-} elseif [ regexp {Couldn't get .hash data} $exec_output ] {
+-	fail "Couldn't get .hash data!"
+-	return
+-}
+-
+-# Verify the output by checking numbers of print in main-threaded.ltrace.
+-set pattern "print"
+-ltrace_verify_output ${objdir}/${subdir}/${testfile}.ltrace $pattern 30
++ltraceMatch1 [ltraceRun -f -l libprint.so -- $bin] {print\(} == 30
++
++ltraceDone
+Only in ltrace.main: main-threaded.exp~
+Only in ltrace.main: .main-threaded.exp.~undo-tree~

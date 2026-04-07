@@ -1,0 +1,21 @@
+diff -Nrup a/m4/mathfunc.m4 b/m4/mathfunc.m4
+--- a/m4/mathfunc.m4	2016-12-14 17:03:33.000000000 -0700
++++ b/m4/mathfunc.m4	2020-01-06 19:48:46.684158282 -0700
+@@ -60,7 +60,7 @@ AC_DEFUN([gl_MATHFUNC],
+              #endif
+              #include <math.h>
+              $4
+-             $2 (*funcptr) $3 = ]func[;
++             __attribute__ ((used)) $2 (*funcptr) $3 = ]func[;
+              int i_ret;
+              float f_ret;
+              double d_ret;
+@@ -85,7 +85,7 @@ AC_DEFUN([gl_MATHFUNC],
+                #endif
+                #include <math.h>
+                $4
+-               $2 (*funcptr) $3 = ]func[;
++               __attribute__ ((used)) $2 (*funcptr) $3 = ]func[;
+                int i_ret;
+                float f_ret;
+                double d_ret;

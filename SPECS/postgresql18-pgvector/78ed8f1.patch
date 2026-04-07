@@ -1,0 +1,40 @@
+From 78ed8f11576c77a0a6b5fc0ebf721a3dc4f4c954 Mon Sep 17 00:00:00 2001
+From: Andrew Kane <andrew@ankane.org>
+Date: Mon, 17 Feb 2025 16:38:14 -0800
+Subject: [PATCH] Fixed compilation error with Postgres 18 - fixes #779
+
+---
+ src/hnswvacuum.c | 4 ++++
+ src/ivfvacuum.c  | 4 ++++
+ 2 files changed, 8 insertions(+)
+
+diff --git a/src/hnswvacuum.c b/src/hnswvacuum.c
+index 251d9d9ad..2f7b2f372 100644
+--- a/src/hnswvacuum.c
++++ b/src/hnswvacuum.c
+@@ -9,6 +9,10 @@
+ #include "storage/lmgr.h"
+ #include "utils/memutils.h"
+ 
++#if PG_VERSION_NUM >= 180000
++#define vacuum_delay_point() vacuum_delay_point(false)
++#endif
++
+ /*
+  * Check if deleted list contains an index TID
+  */
+diff --git a/src/ivfvacuum.c b/src/ivfvacuum.c
+index 1272da831..750cdd65a 100644
+--- a/src/ivfvacuum.c
++++ b/src/ivfvacuum.c
+@@ -5,6 +5,10 @@
+ #include "ivfflat.h"
+ #include "storage/bufmgr.h"
+ 
++#if PG_VERSION_NUM >= 180000
++#define vacuum_delay_point() vacuum_delay_point(false)
++#endif
++
+ /*
+  * Bulk delete tuples from the index
+  */

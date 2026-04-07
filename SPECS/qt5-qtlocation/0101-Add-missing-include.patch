@@ -1,0 +1,26 @@
+From 5a07e1967dcc925d9def47accadae991436b9686 Mon Sep 17 00:00:00 2001
+From: Manuel Nickschas <sputnick@quassel-irc.org>
+Date: Tue, 11 Apr 2023 22:24:11 +0200
+Subject: [PATCH 101/104] Add missing include
+
+Fixes build with libcxx, see also:
+https://bugs.gentoo.org/903575
+---
+ include/mbgl/util/unique_any.hpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/3rdparty/mapbox-gl-native/include/mbgl/util/unique_any.hpp b/src/3rdparty/mapbox-gl-native/include/mbgl/util/unique_any.hpp
+index c7dc8b38e..0fb25b8b4 100644
+--- a/src/3rdparty/mapbox-gl-native/include/mbgl/util/unique_any.hpp
++++ b/src/3rdparty/mapbox-gl-native/include/mbgl/util/unique_any.hpp
+@@ -3,6 +3,7 @@
+ #include <typeinfo>
+ #include <type_traits>
+ #include <stdexcept>
++#include <utility>
+ namespace mbgl {
+ namespace util {
+ 
+-- 
+2.47.1
+

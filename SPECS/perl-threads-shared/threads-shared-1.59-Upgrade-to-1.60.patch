@@ -1,0 +1,110 @@
+From 2ec58402d05eb12d0b9387963941f1e445d9aa5b Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Fri, 26 Apr 2019 15:00:30 +0200
+Subject: [PATCH] Upgrade to 1.60
+
+---
+ lib/threads/shared.pm |  4 ++--
+ shared.xs             | 39 +++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 41 insertions(+), 2 deletions(-)
+
+diff --git a/lib/threads/shared.pm b/lib/threads/shared.pm
+index f7e5ff8..45ad154 100644
+--- a/lib/threads/shared.pm
++++ b/lib/threads/shared.pm
+@@ -8,7 +8,7 @@ use Config;
+ 
+ use Scalar::Util qw(reftype refaddr blessed);
+ 
+-our $VERSION = '1.59'; # Please update the pod, too.
++our $VERSION = '1.60'; # Please update the pod, too.
+ my $XS_VERSION = $VERSION;
+ $VERSION = eval $VERSION;
+ 
+@@ -196,7 +196,7 @@ threads::shared - Perl extension for sharing data structures between threads
+ 
+ =head1 VERSION
+ 
+-This document describes threads::shared version 1.59
++This document describes threads::shared version 1.60
+ 
+ =head1 SYNOPSIS
+ 
+diff --git a/shared.xs b/shared.xs
+index d0f7d1e..6cdf094 100644
+--- a/shared.xs
++++ b/shared.xs
+@@ -115,6 +115,17 @@
+  * without the prefix (e.g., sv, tmp or obj).
+  */
+ 
++/* this is lower overhead than warn() and less likely to interfere
++   with other parts of perl (like with the debugger.)
++*/
++#ifdef SHARED_TRACE_LOCKS
++#  define TRACE_LOCK(x) DEBUG_U(x)
++#  define TRACE_LOCKv(x) DEBUG_Uv(x)
++#else
++#  define TRACE_LOCK(x)
++#  define TRACE_LOCKv(x)
++#endif
++
+ #define PERL_NO_GET_CONTEXT
+ #include "EXTERN.h"
+ #include "perl.h"
+@@ -211,8 +222,24 @@ recursive_lock_release(pTHX_ recursive_lock_t *lock)
+         if (--lock->locks == 0) {
+             lock->owner = NULL;
+             COND_SIGNAL(&lock->cond);
++            TRACE_LOCK(
++                    PerlIO_printf(Perl_debug_log, "shared lock released %p for %p at %s:%d\n",
++                                  lock, aTHX, CopFILE(PL_curcop), CopLINE(PL_curcop))
++                    );
++        }
++        else {
++            TRACE_LOCKv(
++                    PerlIO_printf(Perl_debug_log, "shared lock unbump %p for %p at %s:%d\n",
++                                  lock, aTHX, CopFILE(PL_curcop), CopLINE(PL_curcop))
++                    );
+         }
+     }
++    else {
++        TRACE_LOCK(
++                PerlIO_printf(Perl_debug_log, "bad shared lock release %p for %p (owned by %p) at %s:%d\n",
++                               lock, aTHX, lock->owner, CopFILE(PL_curcop), CopLINE(PL_curcop))
++                 );
++    }
+     MUTEX_UNLOCK(&lock->mutex);
+ }
+ 
+@@ -224,8 +251,16 @@ recursive_lock_acquire(pTHX_ recursive_lock_t *lock, const char *file, int line)
+     assert(aTHX);
+     MUTEX_LOCK(&lock->mutex);
+     if (lock->owner == aTHX) {
++        TRACE_LOCKv(
++                 PerlIO_printf(Perl_debug_log, "shared lock bump %p (%p) at %s:%d\n",
++                               lock, lock->owner, CopFILE(PL_curcop), CopLINE(PL_curcop))
++                 );
+         lock->locks++;
+     } else {
++        TRACE_LOCK(
++                 PerlIO_printf(Perl_debug_log, "shared lock try %p for %p (owned by %p) at %s:%d\n",
++                               lock, aTHX, lock->owner, CopFILE(PL_curcop), CopLINE(PL_curcop))
++                 );
+         while (lock->owner) {
+ #ifdef DEBUG_LOCKS
+             Perl_warn(aTHX_ " %p waiting - owned by %p %s:%d\n",
+@@ -233,6 +268,10 @@ recursive_lock_acquire(pTHX_ recursive_lock_t *lock, const char *file, int line)
+ #endif
+             COND_WAIT(&lock->cond,&lock->mutex);
+         }
++        TRACE_LOCK(
++                 PerlIO_printf(Perl_debug_log, "shared lock got %p at %s:%d\n",
++                               lock, CopFILE(PL_curcop), CopLINE(PL_curcop))
++                 );
+         lock->locks = 1;
+         lock->owner = aTHX;
+ #ifdef DEBUG_LOCKS
+-- 
+2.20.1
+

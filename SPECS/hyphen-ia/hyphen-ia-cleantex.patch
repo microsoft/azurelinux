@@ -1,0 +1,28 @@
+--- iahyphen.tex.clean	2009-03-17 17:12:01.000000000 +0000
++++ iahyphen.tex	2009-03-17 17:12:20.000000000 +0000
+@@ -29,7 +29,7 @@
+ % information.
+ %
+ % \fi
+-\patterns{%
++
+ .ch2
+ .de4s
+ .in1
+@@ -668,16 +668,3 @@
+ 1zi
+ 1zu1
+ 2z1z
+-}
+-\hyphenation{
+-alc-un
+-alc-u-nis-si-me
+-alc-un-men-te
+-a-lic-un
+-a-lic-u-nis-si-me
+-a-lic-un-men-te
+-mos-lem
+-qualc-un
+-qualc-u-nis-si-me
+-qualc-un-men-te
+-}

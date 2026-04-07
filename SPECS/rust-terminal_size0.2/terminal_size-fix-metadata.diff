@@ -1,0 +1,11 @@
+--- terminal_size-0.2.6/Cargo.toml	1970-01-01T00:00:01+00:00
++++ terminal_size-0.2.6/Cargo.toml	2024-08-29T14:23:25.182709+00:00
+@@ -28,6 +28,6 @@
+ repository = "https://github.com/eminence/terminal-size"
+ 
+ [target."cfg(not(windows))".dependencies.rustix]
+-version = "0.37.0"
+-features = ["termios"]
++version = "0.38.0"
++features = ["stdio", "termios"]
+ 

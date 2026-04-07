@@ -1,0 +1,440 @@
+diff --git a/src/libopensc/card-epass2003.c b/src/libopensc/card-epass2003.c
+index 14d389a43..0650b1d48 100644
+--- a/src/libopensc/card-epass2003.c
++++ b/src/libopensc/card-epass2003.c
+@@ -3046,11 +3046,14 @@ epass2003_erase_card(struct sc_card *card)
+ {
+ 	static const unsigned char install_magic_pin[26] = {
+ 		/* compare install_secret_key */
+-		0x06,0x01,0x10,0x16, 0x16,0x16,0x00,0x0f, 0xff,0x66,
+-		0x31,0x32,0x33,0x34, 0x35,0x36,0x37,0x38,
+-		0x31,0x32,0x33,0x34, 0x35,0x36,0x37,0x38,
++			0x06, 0x01, 0x10, 0x16, 0x16, 0x16, 0x00, 0x0f, 0xff, 0x66,
++			0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38,
++			0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38,
++	};
++	static const unsigned char magic_pin[16] = {
++			0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38,
++			0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38,
+ 	};
+-	static const unsigned char magic_pin[16] = "1234567812345678";
+ 	static const unsigned char mf_path[2] = { 0x3f, 0x00 };
+ 	sc_apdu_t apdu;
+ 	int r;
+diff --git a/src/libopensc/card-piv.c b/src/libopensc/card-piv.c
+index 81a1ad541..573d0bae5 100644
+--- a/src/libopensc/card-piv.c
++++ b/src/libopensc/card-piv.c
+@@ -604,143 +604,143 @@ struct piv_object {
+ static const struct piv_object piv_objects[] = {
+ 	{ PIV_OBJ_CCC, "Card Capability Container",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.1.219.0", 3, "\x5F\xC1\x07", "\xDB\x00", PIV_OBJECT_NEEDS_VCI},
++			"2.16.840.1.101.3.7.1.219.0", 3, {0x5F, 0xC1, 0x07}, {0xDB, 0x00}, PIV_OBJECT_NEEDS_VCI},
+ 	{ PIV_OBJ_CHUI, "Card Holder Unique Identifier",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.48.0", 3, "\x5F\xC1\x02", "\x30\x00", 0},
++			"2.16.840.1.101.3.7.2.48.0", 3, {0x5F, 0xC1, 0x02}, {0x30, 0x00}, 0},
+ 	{ PIV_OBJ_X509_PIV_AUTH, "X.509 Certificate for PIV Authentication",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.1.1", 3, "\x5F\xC1\x05", "\x01\x01", PIV_OBJECT_TYPE_CERT | PIV_OBJECT_NEEDS_VCI} ,
++			"2.16.840.1.101.3.7.2.1.1", 3, {0x5F, 0xC1, 0x05}, {0x01, 0x01}, PIV_OBJECT_TYPE_CERT | PIV_OBJECT_NEEDS_VCI} ,
+ 	{ PIV_OBJ_CHF, "Card Holder Fingerprints",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.96.16", 3, "\x5F\xC1\x03", "\x60\x10", PIV_OBJECT_NEEDS_PIN | PIV_OBJECT_NEEDS_VCI},
++			"2.16.840.1.101.3.7.2.96.16", 3, {0x5F, 0xC1, 0x03}, {0x60, 0x10}, PIV_OBJECT_NEEDS_PIN | PIV_OBJECT_NEEDS_VCI},
+ 	{ PIV_OBJ_PI, "Printed Information",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.48.1", 3, "\x5F\xC1\x09", "\x30\x01", PIV_OBJECT_NEEDS_PIN | PIV_OBJECT_NEEDS_VCI},
++			"2.16.840.1.101.3.7.2.48.1", 3, {0x5F, 0xC1, 0x09}, {0x30, 0x01}, PIV_OBJECT_NEEDS_PIN | PIV_OBJECT_NEEDS_VCI},
+ 	{ PIV_OBJ_CHFI, "Cardholder Facial Images",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.96.48", 3, "\x5F\xC1\x08", "\x60\x30", PIV_OBJECT_NEEDS_PIN | PIV_OBJECT_NEEDS_VCI},
++			"2.16.840.1.101.3.7.2.96.48", 3, {0x5F, 0xC1, 0x08}, {0x60, 0x30}, PIV_OBJECT_NEEDS_PIN | PIV_OBJECT_NEEDS_VCI},
+ 	{ PIV_OBJ_X509_DS, "X.509 Certificate for Digital Signature",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.1.0", 3, "\x5F\xC1\x0A", "\x01\x00", PIV_OBJECT_TYPE_CERT | PIV_OBJECT_NEEDS_VCI},
++			"2.16.840.1.101.3.7.2.1.0", 3, {0x5F, 0xC1, 0x0A}, {0x01, 0x00}, PIV_OBJECT_TYPE_CERT | PIV_OBJECT_NEEDS_VCI},
+ 	{ PIV_OBJ_X509_KM, "X.509 Certificate for Key Management",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.1.2", 3, "\x5F\xC1\x0B", "\x01\x02", PIV_OBJECT_TYPE_CERT},
++			"2.16.840.1.101.3.7.2.1.2", 3, {0x5F, 0xC1, 0x0B}, {0x01, 0x02}, PIV_OBJECT_TYPE_CERT},
+ 	{ PIV_OBJ_X509_CARD_AUTH, "X.509 Certificate for Card Authentication",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.5.0", 3, "\x5F\xC1\x01", "\x05\x00", PIV_OBJECT_TYPE_CERT},
++			"2.16.840.1.101.3.7.2.5.0", 3, {0x5F, 0xC1, 0x01}, {0x05, 0x00}, PIV_OBJECT_TYPE_CERT},
+ 	{ PIV_OBJ_SEC_OBJ, "Security Object",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.144.0", 3, "\x5F\xC1\x06", "\x90\x00", PIV_OBJECT_NEEDS_VCI},
++			"2.16.840.1.101.3.7.2.144.0", 3, {0x5F, 0xC1, 0x06}, {0x90, 0x00}, PIV_OBJECT_NEEDS_VCI},
+ 	{ PIV_OBJ_DISCOVERY, "Discovery Object",
+ 			SC_ASN1_APP | SC_ASN1_CONS | 0x1E,
+-			"2.16.840.1.101.3.7.2.96.80", 1, "\x7E", "\x60\x50", 0},
++			"2.16.840.1.101.3.7.2.96.80", 1, {0x7E}, {0x60, 0x50}, 0},
+ 	{ PIV_OBJ_HISTORY, "Key History Object",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.96.96", 3, "\x5F\xC1\x0C", "\x60\x60", PIV_OBJECT_NEEDS_VCI},
++			"2.16.840.1.101.3.7.2.96.96", 3, {0x5F, 0xC1, 0x0C}, {0x60, 0x60}, PIV_OBJECT_NEEDS_VCI},
+ 
+ /* 800-73-3, 21 new objects, 20 history certificates */
+ 	{ PIV_OBJ_RETIRED_X509_1, "Retired X.509 Certificate for Key Management 1",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.16.1", 3, "\x5F\xC1\x0D", "\x10\x01",
++			"2.16.840.1.101.3.7.2.16.1", 3, {0x5F, 0xC1, 0x0D}, {0x10, 0x01},
+ 			PIV_OBJECT_NOT_PRESENT|PIV_OBJECT_TYPE_CERT | PIV_OBJECT_NEEDS_VCI},
+ 	{ PIV_OBJ_RETIRED_X509_2, "Retired X.509 Certificate for Key Management 2",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.16.2", 3, "\x5F\xC1\x0E", "\x10\x02",
++			"2.16.840.1.101.3.7.2.16.2", 3, {0x5F, 0xC1, 0x0E}, {0x10, 0x02},
+ 			PIV_OBJECT_NOT_PRESENT|PIV_OBJECT_TYPE_CERT | PIV_OBJECT_NEEDS_VCI},
+ 	{ PIV_OBJ_RETIRED_X509_3, "Retired X.509 Certificate for Key Management 3",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.16.3", 3, "\x5F\xC1\x0F", "\x10\x03",
++			"2.16.840.1.101.3.7.2.16.3", 3, {0x5F, 0xC1, 0x0F}, {0x10, 0x03},
+ 			PIV_OBJECT_NOT_PRESENT|PIV_OBJECT_TYPE_CERT | PIV_OBJECT_NEEDS_VCI},
+ 	{ PIV_OBJ_RETIRED_X509_4, "Retired X.509 Certificate for Key Management 4",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.16.4", 3, "\x5F\xC1\x10", "\x10\x04",
++			"2.16.840.1.101.3.7.2.16.4", 3, {0x5F, 0xC1, 0x10}, {0x10, 0x04},
+ 			PIV_OBJECT_NOT_PRESENT|PIV_OBJECT_TYPE_CERT | PIV_OBJECT_NEEDS_VCI},
+ 	{ PIV_OBJ_RETIRED_X509_5, "Retired X.509 Certificate for Key Management 5",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.16.5", 3, "\x5F\xC1\x11", "\x10\x05",
++			"2.16.840.1.101.3.7.2.16.5", 3, {0x5F, 0xC1, 0x11}, {0x10, 0x05},
+ 			PIV_OBJECT_NOT_PRESENT|PIV_OBJECT_TYPE_CERT | PIV_OBJECT_NEEDS_VCI},
+ 	{ PIV_OBJ_RETIRED_X509_6, "Retired X.509 Certificate for Key Management 6",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.16.6", 3, "\x5F\xC1\x12", "\x10\x06",
++			"2.16.840.1.101.3.7.2.16.6", 3, {0x5F, 0xC1, 0x12}, {0x10, 0x06},
+ 			PIV_OBJECT_NOT_PRESENT|PIV_OBJECT_TYPE_CERT | PIV_OBJECT_NEEDS_VCI},
+ 	{ PIV_OBJ_RETIRED_X509_7, "Retired X.509 Certificate for Key Management 7",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.16.7", 3, "\x5F\xC1\x13", "\x10\x07",
++			"2.16.840.1.101.3.7.2.16.7", 3, {0x5F, 0xC1, 0x13}, {0x10, 0x07},
+ 			PIV_OBJECT_NOT_PRESENT|PIV_OBJECT_TYPE_CERT | PIV_OBJECT_NEEDS_VCI},
+ 	{ PIV_OBJ_RETIRED_X509_8, "Retired X.509 Certificate for Key Management 8",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.16.8", 3, "\x5F\xC1\x14", "\x10\x08",
++			"2.16.840.1.101.3.7.2.16.8", 3, {0x5F, 0xC1, 0x14}, {0x10, 0x08},
+ 			PIV_OBJECT_NOT_PRESENT|PIV_OBJECT_TYPE_CERT | PIV_OBJECT_NEEDS_VCI},
+ 	{ PIV_OBJ_RETIRED_X509_9, "Retired X.509 Certificate for Key Management 9",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.16.9", 3, "\x5F\xC1\x15", "\x10\x09",
++			"2.16.840.1.101.3.7.2.16.9", 3, {0x5F, 0xC1, 0x15}, {0x10, 0x09},
+ 			PIV_OBJECT_NOT_PRESENT|PIV_OBJECT_TYPE_CERT | PIV_OBJECT_NEEDS_VCI},
+ 	{ PIV_OBJ_RETIRED_X509_10, "Retired X.509 Certificate for Key Management 10",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.16.10", 3, "\x5F\xC1\x16", "\x10\x0A",
++			"2.16.840.1.101.3.7.2.16.10", 3, {0x5F, 0xC1, 0x16}, {0x10, 0x0A},
+ 			PIV_OBJECT_NOT_PRESENT|PIV_OBJECT_TYPE_CERT | PIV_OBJECT_NEEDS_VCI},
+ 	{ PIV_OBJ_RETIRED_X509_11, "Retired X.509 Certificate for Key Management 11",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.16.11", 3, "\x5F\xC1\x17", "\x10\x0B",
++			"2.16.840.1.101.3.7.2.16.11", 3, {0x5F, 0xC1, 0x17}, {0x10, 0x0B},
+ 			PIV_OBJECT_NOT_PRESENT|PIV_OBJECT_TYPE_CERT | PIV_OBJECT_NEEDS_VCI},
+ 	{ PIV_OBJ_RETIRED_X509_12, "Retired X.509 Certificate for Key Management 12",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.16.12", 3, "\x5F\xC1\x18", "\x10\x0C",
++			"2.16.840.1.101.3.7.2.16.12", 3, {0x5F, 0xC1, 0x18}, {0x10, 0x0C},
+ 			PIV_OBJECT_NOT_PRESENT|PIV_OBJECT_TYPE_CERT | PIV_OBJECT_NEEDS_VCI},
+ 	{ PIV_OBJ_RETIRED_X509_13, "Retired X.509 Certificate for Key Management 13",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.16.13", 3, "\x5F\xC1\x19", "\x10\x0D",
++			"2.16.840.1.101.3.7.2.16.13", 3, {0x5F, 0xC1, 0x19}, {0x10, 0x0D},
+ 			PIV_OBJECT_NOT_PRESENT|PIV_OBJECT_TYPE_CERT | PIV_OBJECT_NEEDS_VCI},
+ 	{ PIV_OBJ_RETIRED_X509_14, "Retired X.509 Certificate for Key Management 14",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.16.14", 3, "\x5F\xC1\x1A", "\x10\x0E",
++			"2.16.840.1.101.3.7.2.16.14", 3, {0x5F, 0xC1, 0x1A}, {0x10, 0x0E},
+ 			PIV_OBJECT_NOT_PRESENT|PIV_OBJECT_TYPE_CERT | PIV_OBJECT_NEEDS_VCI},
+ 	{ PIV_OBJ_RETIRED_X509_15, "Retired X.509 Certificate for Key Management 15",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.16.15", 3, "\x5F\xC1\x1B", "\x10\x0F",
++			"2.16.840.1.101.3.7.2.16.15", 3, {0x5F, 0xC1, 0x1B}, {0x10, 0x0F},
+ 			PIV_OBJECT_NOT_PRESENT|PIV_OBJECT_TYPE_CERT | PIV_OBJECT_NEEDS_VCI},
+ 	{ PIV_OBJ_RETIRED_X509_16, "Retired X.509 Certificate for Key Management 16",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.16.16", 3, "\x5F\xC1\x1C", "\x10\x10",
++			"2.16.840.1.101.3.7.2.16.16", 3, {0x5F, 0xC1, 0x1C}, {0x10, 0x10},
+ 			PIV_OBJECT_NOT_PRESENT|PIV_OBJECT_TYPE_CERT | PIV_OBJECT_NEEDS_VCI},
+ 	{ PIV_OBJ_RETIRED_X509_17, "Retired X.509 Certificate for Key Management 17",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.16.17", 3, "\x5F\xC1\x1D", "\x10\x11",
++			"2.16.840.1.101.3.7.2.16.17", 3, {0x5F, 0xC1, 0x1D}, {0x10, 0x11},
+ 			PIV_OBJECT_NOT_PRESENT|PIV_OBJECT_TYPE_CERT | PIV_OBJECT_NEEDS_VCI},
+ 	{ PIV_OBJ_RETIRED_X509_18, "Retired X.509 Certificate for Key Management 18",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.16.18", 3, "\x5F\xC1\x1E", "\x10\x12",
++			"2.16.840.1.101.3.7.2.16.18", 3, {0x5F, 0xC1, 0x1E}, {0x10, 0x12},
+ 			PIV_OBJECT_NOT_PRESENT|PIV_OBJECT_TYPE_CERT | PIV_OBJECT_NEEDS_VCI},
+ 	{ PIV_OBJ_RETIRED_X509_19, "Retired X.509 Certificate for Key Management 19",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.16.19", 3, "\x5F\xC1\x1F", "\x10\x13",
++			"2.16.840.1.101.3.7.2.16.19", 3, {0x5F, 0xC1, 0x1F}, {0x10, 0x13},
+ 			PIV_OBJECT_NOT_PRESENT|PIV_OBJECT_TYPE_CERT | PIV_OBJECT_NEEDS_VCI},
+ 	{ PIV_OBJ_RETIRED_X509_20, "Retired X.509 Certificate for Key Management 20",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.16.20", 3, "\x5F\xC1\x20", "\x10\x14",
++			"2.16.840.1.101.3.7.2.16.20", 3, {0x5F, 0xC1, 0x20}, {0x10, 0x14},
+ 			PIV_OBJECT_NOT_PRESENT|PIV_OBJECT_TYPE_CERT | PIV_OBJECT_NEEDS_VCI},
+ 
+ 	{ PIV_OBJ_IRIS_IMAGE, "Cardholder Iris Images",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.16.21", 3, "\x5F\xC1\x21", "\x10\x15", PIV_OBJECT_NEEDS_PIN | PIV_OBJECT_NEEDS_VCI},
++			"2.16.840.1.101.3.7.2.16.21", 3, {0x5F, 0xC1, 0x21}, {0x10, 0x15}, PIV_OBJECT_NEEDS_PIN | PIV_OBJECT_NEEDS_VCI},
+ 
+ /* 800-73-4, 3 new objects */
+ 	{ PIV_OBJ_BITGT, "Biometric Information Templates Group Template",
+ 			 SC_ASN1_APP | SC_ASN1_CONS | 0x1F61,
+-			"2.16.840.1.101.3.7.2.16.22", 2, "\x7F\x61", "\x10\x16", 0},
++			"2.16.840.1.101.3.7.2.16.22", 2, {0x7F, 0x61}, {0x10, 0x16}, 0},
+ 	{ PIV_OBJ_SM_CERT_SIGNER, "Secure Messaging Certificate Signer",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.16.23", 3, "\x5F\xC1\x22", "\x10\x17",
++			"2.16.840.1.101.3.7.2.16.23", 3, {0x5F, 0xC1, 0x22}, {0x10, 0x17},
+ 			PIV_OBJECT_TYPE_CERT | PIV_OBJECT_TYPE_CVC},
+ 	{PIV_OBJ_PCRDCS, "Pairing Code Reference Data Container",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.16.24", 3, "\x5F\xC1\x23", "\x10\x18", PIV_OBJECT_NEEDS_PIN | PIV_OBJECT_NEEDS_VCI},
++			"2.16.840.1.101.3.7.2.16.24", 3, {0x5F, 0xC1, 0x23}, {0x10, 0x18}, PIV_OBJECT_NEEDS_PIN | PIV_OBJECT_NEEDS_VCI},
+ 
+ /* following not standard , to be used by piv-tool only for testing */
+ 	{ PIV_OBJ_9B03, "3DES-ECB ADM",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.9999.3", 2, "\x9B\x03", "\x9B\x03", 0},
++			"2.16.840.1.101.3.7.2.9999.3", 2, {0x9B, 0x03}, {0x9B, 0x03}, 0},
+ 	/* Only used when signing a cert req, usually from engine
+ 	 * after piv-tool generated the key and saved the pub key
+ 	 * to a file. Note RSA key can be 1024, 2048 or 3072
+@@ -748,77 +748,77 @@ static const struct piv_object piv_objects[] = {
+ 	 */
+ 	{ PIV_OBJ_9A06, "RSA 9A Pub key from last genkey",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.9999.20", 2, "\x9A\x06", "\x9A\x06", PIV_OBJECT_TYPE_PUBKEY},
++			"2.16.840.1.101.3.7.2.9999.20", 2, {0x9A, 0x06}, {0x9A, 0x06}, PIV_OBJECT_TYPE_PUBKEY},
+ 	{ PIV_OBJ_9C06, "Pub 9C key from last genkey",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.9999.21", 2, "\x9C\x06", "\x9C\x06", PIV_OBJECT_TYPE_PUBKEY},
++			"2.16.840.1.101.3.7.2.9999.21", 2, {0x9C, 0x06}, {0x9C, 0x06}, PIV_OBJECT_TYPE_PUBKEY},
+ 	{ PIV_OBJ_9D06, "Pub 9D key from last genkey",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.9999.22", 2, "\x9D\x06", "\x9D\x06", PIV_OBJECT_TYPE_PUBKEY},
++			"2.16.840.1.101.3.7.2.9999.22", 2, {0x9D, 0x06}, {0x9D, 0x06}, PIV_OBJECT_TYPE_PUBKEY},
+ 	{ PIV_OBJ_9E06, "Pub 9E key from last genkey",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.9999.23", 2, "\x9E\x06", "\x9E\x06", PIV_OBJECT_TYPE_PUBKEY},
++			"2.16.840.1.101.3.7.2.9999.23", 2, {0x9E, 0x06}, {0x9E, 0x06}, PIV_OBJECT_TYPE_PUBKEY},
+ 
+ 	{ PIV_OBJ_8206, "Pub 82 key ",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.9999.101", 2, "\x82\x06", "\x82\x06", PIV_OBJECT_TYPE_PUBKEY},
++			"2.16.840.1.101.3.7.2.9999.101", 2, {0x82, 0x06}, {0x82, 0x06}, PIV_OBJECT_TYPE_PUBKEY},
+ 	{ PIV_OBJ_8306, "Pub 83 key ",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.9999.102", 2, "\x83\x06", "\x83\x06", PIV_OBJECT_TYPE_PUBKEY},
++			"2.16.840.1.101.3.7.2.9999.102", 2, {0x83, 0x06}, {0x83, 0x06}, PIV_OBJECT_TYPE_PUBKEY},
+ 	{ PIV_OBJ_8406, "Pub 84 key ",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.9999.103", 2, "\x84\x06", "\x84\x06", PIV_OBJECT_TYPE_PUBKEY},
++			"2.16.840.1.101.3.7.2.9999.103", 2, {0x84, 0x06}, {0x84, 0x06}, PIV_OBJECT_TYPE_PUBKEY},
+ 	{ PIV_OBJ_8506, "Pub 85 key ",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.9999.104", 2, "\x85\x06", "\x85\x06", PIV_OBJECT_TYPE_PUBKEY},
++			"2.16.840.1.101.3.7.2.9999.104", 2, {0x85, 0x06}, {0x85, 0x06}, PIV_OBJECT_TYPE_PUBKEY},
+ 	{ PIV_OBJ_8606, "Pub 86 key ",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.9999.105", 2, "\x86\x06", "\x86\x06", PIV_OBJECT_TYPE_PUBKEY},
++			"2.16.840.1.101.3.7.2.9999.105", 2, {0x86, 0x06}, {0x86, 0x06}, PIV_OBJECT_TYPE_PUBKEY},
+ 	{ PIV_OBJ_8706, "Pub 87 key ",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.9999.106", 2, "\x87\x06", "\x87\x06", PIV_OBJECT_TYPE_PUBKEY},
++			"2.16.840.1.101.3.7.2.9999.106", 2, {0x87, 0x06}, {0x87, 0x06}, PIV_OBJECT_TYPE_PUBKEY},
+ 	{ PIV_OBJ_8806, "Pub 88 key ",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.9999.107", 2, "\x88\x06", "\x88\x06", PIV_OBJECT_TYPE_PUBKEY},
++			"2.16.840.1.101.3.7.2.9999.107", 2, {0x88, 0x06}, {0x88, 0x06}, PIV_OBJECT_TYPE_PUBKEY},
+ 	{ PIV_OBJ_8906, "Pub 89 key ",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.9999.108", 2, "\x89\x06", "\x89\x06", PIV_OBJECT_TYPE_PUBKEY},
++			"2.16.840.1.101.3.7.2.9999.108", 2, {0x89, 0x06}, {0x89, 0x06}, PIV_OBJECT_TYPE_PUBKEY},
+ 	{ PIV_OBJ_8A06, "Pub 8A key ",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.9999.109", 2, "\x8A\x06", "\x8A\x06", PIV_OBJECT_TYPE_PUBKEY},
++			"2.16.840.1.101.3.7.2.9999.109", 2, {0x8A, 0x06}, {0x8A, 0x06}, PIV_OBJECT_TYPE_PUBKEY},
+ 	{ PIV_OBJ_8B06, "Pub 8B key ",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.9999.110", 2, "\x8B\x06", "\x8B\x06", PIV_OBJECT_TYPE_PUBKEY},
++			"2.16.840.1.101.3.7.2.9999.110", 2, {0x8B, 0x06}, {0x8B, 0x06}, PIV_OBJECT_TYPE_PUBKEY},
+ 	{ PIV_OBJ_8C06, "Pub 8C key ",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.9999.111", 2, "\x8C\x06", "\x8C\x06", PIV_OBJECT_TYPE_PUBKEY},
++			"2.16.840.1.101.3.7.2.9999.111", 2, {0x8C, 0x06}, {0x8C, 0x06}, PIV_OBJECT_TYPE_PUBKEY},
+ 	{ PIV_OBJ_8D06, "Pub 8D key ",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.9999.112", 2, "\x8D\x06", "\x8D\x06", PIV_OBJECT_TYPE_PUBKEY},
++			"2.16.840.1.101.3.7.2.9999.112", 2, {0x8D, 0x06}, {0x8D, 0x06}, PIV_OBJECT_TYPE_PUBKEY},
+ 	{ PIV_OBJ_8E06, "Pub 8E key ",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.9999.113", 2, "\x8E\x06", "\x8E\x06", PIV_OBJECT_TYPE_PUBKEY},
++			"2.16.840.1.101.3.7.2.9999.113", 2, {0x8E, 0x06}, {0x8E, 0x06}, PIV_OBJECT_TYPE_PUBKEY},
+ 	{ PIV_OBJ_8F06, "Pub 8F key ",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.9999.114", 2, "\x8F\x06", "\x8F\x06", PIV_OBJECT_TYPE_PUBKEY},
++			"2.16.840.1.101.3.7.2.9999.114", 2, {0x8F, 0x06}, {0x8F, 0x06}, PIV_OBJECT_TYPE_PUBKEY},
+ 	{ PIV_OBJ_9006, "Pub 90 key ",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.9999.115", 2, "\x90\x06", "\x90\x06", PIV_OBJECT_TYPE_PUBKEY},
++			"2.16.840.1.101.3.7.2.9999.115", 2, {0x90, 0x06}, {0x90, 0x06}, PIV_OBJECT_TYPE_PUBKEY},
+ 	{ PIV_OBJ_9106, "Pub 91 key ",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.9999.116", 2, "\x91\x06", "\x91\x06", PIV_OBJECT_TYPE_PUBKEY},
++			"2.16.840.1.101.3.7.2.9999.116", 2, {0x91, 0x06}, {0x91, 0x06}, PIV_OBJECT_TYPE_PUBKEY},
+ 	{ PIV_OBJ_9206, "Pub 92 key ",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.9999.117", 2, "\x92\x06", "\x92\x06", PIV_OBJECT_TYPE_PUBKEY},
++			"2.16.840.1.101.3.7.2.9999.117", 2, {0x92, 0x06}, {0x92, 0x06}, PIV_OBJECT_TYPE_PUBKEY},
+ 	{ PIV_OBJ_9306, "Pub 93 key ",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.9999.118", 2, "\x93\x06", "\x93\x06", PIV_OBJECT_TYPE_PUBKEY},
++			"2.16.840.1.101.3.7.2.9999.118", 2, {0x93, 0x06}, {0x93, 0x06}, PIV_OBJECT_TYPE_PUBKEY},
+ 	{ PIV_OBJ_9406, "Pub 94 key ",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.9999.119", 2, "\x94\x06", "\x94\x06", PIV_OBJECT_TYPE_PUBKEY},
++			"2.16.840.1.101.3.7.2.9999.119", 2, {0x94, 0x06}, {0x94, 0x06}, PIV_OBJECT_TYPE_PUBKEY},
+ 	{ PIV_OBJ_9506, "Pub 95 key ",
+ 			SC_ASN1_APP | 0x13,
+-			"2.16.840.1.101.3.7.2.9999.120", 2, "\x95\x06", "\x95\x06", PIV_OBJECT_TYPE_PUBKEY},
++			"2.16.840.1.101.3.7.2.9999.120", 2, {0x95, 0x06}, {0x95, 0x06}, PIV_OBJECT_TYPE_PUBKEY},
+ 			/*
+ 			 * "Secure Messaging Certificate Signer" is just a certificate.
+ 			 * No pub or private key on the card.
+diff --git a/src/tests/p11test/p11test_case_wrap.c b/src/tests/p11test/p11test_case_wrap.c
+index ecb257b56..e9c503d7e 100644
+--- a/src/tests/p11test/p11test_case_wrap.c
++++ b/src/tests/p11test/p11test_case_wrap.c
+@@ -390,15 +390,15 @@ test_unwrap_aes(test_cert_t *o, token_info_t *info, test_mech_t *mech)
+ 	CK_ULONG key_padded_len = sizeof(key);
+ 	CK_OBJECT_CLASS keyClass = CKO_SECRET_KEY;
+ 	CK_KEY_TYPE keyType = CKK_AES;
+-	CK_BBOOL true = CK_TRUE;
++	CK_BBOOL _true = CK_TRUE;
+ 	CK_BYTE new_id[] = {0x00, 0xff, 0x42};
+ 	CK_BYTE new_label[] = "Unwrapped key";
+ 	CK_ATTRIBUTE template[] = {
+ 			{CKA_CLASS, &keyClass, sizeof(keyClass)},
+ 			{CKA_KEY_TYPE, &keyType, sizeof(keyType)},
+-			{CKA_ENCRYPT, &true, sizeof(true)},
+-			{CKA_DECRYPT, &true, sizeof(true)},
+-			{CKA_TOKEN, &true, sizeof(true)},
++			{CKA_ENCRYPT, &_true, sizeof(_true)},
++			{CKA_DECRYPT, &_true, sizeof(_true)},
++			{CKA_TOKEN, &_true, sizeof(_true)},
+ 			{CKA_ID, &new_id, sizeof(new_id)},
+ 			{CKA_LABEL, &new_label, sizeof(new_label)},
+ 			{CKA_VALUE_LEN, &key_len, sizeof(key_len)}, /* keep this one last! */
+-- 
+2.48.0
+
+From 6e06fd0f5c70c0f0276f034aa0eee2477e2733a7 Mon Sep 17 00:00:00 2001
+From: Jakub Jelen <jjelen@redhat.com>
+Date: Tue, 25 Nov 2025 16:30:14 +0100
+Subject: [PATCH] compat: Avoid const -> nonconst assignment
+
+compat_getopt_main.c:98:22: error: assignment discards 'const' qualifier from pointer target type [-Werror=discarded-qualifiers]
+   98 |           if ((match = strchr(letters, tolower(c))))
+      |                      ^
+
+Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+---
+ src/common/compat_getopt_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/common/compat_getopt_main.c b/src/common/compat_getopt_main.c
+index 3546be5a28..d4e91d1739 100644
+--- a/src/common/compat_getopt_main.c
++++ b/src/common/compat_getopt_main.c
+@@ -94,7 +94,7 @@ handle(char *progname,
+       if (rotate && isalpha(c))
+         {
+           const char *letters = "abcdefghijklmnopqrstuvwxyz";
+-          char *match;
++          const char *match;
+           if ((match = strchr(letters, tolower(c))))
+             {
+               char rc = letters[(match - letters + rotate) % 26];
+
+
+From 440c171d865c42f1dd7044c74f2dac767082a43a Mon Sep 17 00:00:00 2001
+From: Jakub Jelen <jjelen@redhat.com>
+Date: Tue, 25 Nov 2025 17:28:06 +0100
+Subject: [PATCH] opensc-explorer: Avoid assigning const to non-const pointer
+
+Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+---
+ src/tools/opensc-explorer.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/tools/opensc-explorer.c b/src/tools/opensc-explorer.c
+index 108e4f8764..d05ad5cace 100644
+--- a/src/tools/opensc-explorer.c
++++ b/src/tools/opensc-explorer.c
+@@ -477,7 +477,7 @@ static int pattern_match(const char *pattern, const char *string)
+ 		}
+ 		/* simple character class matching a single character */
+ 		else if (*pattern == '[') {
+-			char *end = strchr(pattern, ']');
++			const char *end = strchr(pattern, ']');
+ 			int match = 0;
+ 
+ 			for (pattern++; end != NULL && pattern != end; pattern++) {
+
+
+From 642282b9646e283fd730b90a2d521ee114e36436 Mon Sep 17 00:00:00 2001
+From: Jakub Jelen <jjelen@redhat.com>
+Date: Tue, 25 Nov 2025 17:03:46 +0100
+Subject: [PATCH] profile: Avoid discarting const on assignment
+
+profile.c:2091:41: error: assignment discards 'const' qualifier from pointer target type [-Werror=discarded-qualifiers]
+ 2091 |                         if ((macro_name = strchr(str, '$'))) {
+      |                                         ^
+
+Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+---
+ src/pkcs15init/profile.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/pkcs15init/profile.c b/src/pkcs15init/profile.c
+index 85bd8438b5..f4c744646c 100644
+--- a/src/pkcs15init/profile.c
++++ b/src/pkcs15init/profile.c
+@@ -2013,9 +2013,9 @@ is_macro_character(char c)
+ }
+ 
+ static int
+-get_inner_word(char *str, char word[WORD_SIZE])
++get_inner_word(const char *str, char word[WORD_SIZE])
+ {
+-	char *inner = NULL;
++	const char *inner = NULL;
+ 	size_t len = 0;
+ 
+ 	inner = str;
+@@ -2039,7 +2039,7 @@ static int
+ check_macro_reference_loop(const char *start_name, sc_macro_t *macro, sc_profile_t *profile, int depth)
+ {
+ 	scconf_list *value;
+-	char *name = NULL;
++	const char *name = NULL;
+ 	sc_macro_t	*m;
+ 	char word[WORD_SIZE];
+ 
+@@ -2087,7 +2087,7 @@ build_argv(struct state *cur, const char *cmdname,
+ 		str = list->data;
+ 		if (str[0] != '$') {
+ 			/* When str contains macro inside, macro reference loop needs to be checked */
+-			char *macro_name = NULL;
++			const char *macro_name = NULL;
+ 			if ((macro_name = strchr(str, '$'))) {
+ 				/* Macro does not to start at the first position */
+ 				char word[WORD_SIZE];
+

@@ -1,0 +1,26 @@
+--- demos/widget.orig	2008-01-02 13:24:14.000000000 +0100
++++ demos/widget	2008-01-02 13:27:10.000000000 +0100
+@@ -3,7 +3,8 @@
+ use 5.008;
+ use Config;
+ use Tk 804.000;
+-use lib Tk->findINC( 'demos/widget_lib' );
++#use lib Tk->findINC( 'demos/widget_lib' );
++use lib "@demopath@/widget_lib";
+ use Tk::widgets qw/ DialogBox ErrorDialog LabEntry ROText /;
+ use Tk::Config ();
+ use WidgetDemo;
+@@ -62,9 +63,11 @@
+     $l->destroy;
+ }
+ 
+-my $widget_lib = Tk->findINC('demos/widget_lib');
++#my $widget_lib = Tk->findINC('demos/widget_lib');
++my $widget_lib = "@demopath@/widget_lib";
+ my $wd = "$widget_lib/WidgetDemo.pm";
+-$WIDTRIB = Tk->findINC('demos/widtrib');
++#$WIDTRIB = Tk->findINC('demos/widtrib');
++$WIDTRIB = "@demopath@/widtrib";
+ unless (Tk::tainting) {
+     $WIDTRIB = $ENV{WIDTRIB} if defined $ENV{WIDTRIB};
+     $WIDTRIB = $ARGV[0] if defined $ARGV[0];

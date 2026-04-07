@@ -1,0 +1,50 @@
+From 2e6c0b94d01b572235e5c604620bd57e4c088333 Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Wed, 8 Sep 2021 04:47:08 -0400
+Subject: [PATCH] Loosen up build requirements
+
+And drop coverage dependencies.
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ pyproject.toml | 2 +-
+ setup.py       | 3 +--
+ 2 files changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 47c05c2c..ae0787cd 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -2,7 +2,7 @@
+ requires = [
+     "setuptools>=67.8",
+     "wheel",
+-    "cython~=3.1.0",
++    "cython>=3.0.2",
+     "numpy>=2"
+ ]
+ build-backend = "setuptools.build_meta"
+diff --git a/setup.py b/setup.py
+index dc51253a..d936c8d2 100755
+--- a/setup.py
++++ b/setup.py
+@@ -207,7 +207,7 @@ elif cpp11_flag not in eca:
+ cpp_ext_options['extra_compile_args'] = eca
+ 
+ # Configure optional Cython coverage.
+-cythonize_options = {"language_level": sys.version_info[0], "compiler_directives": {"freethreading_compatible": True}}
++cythonize_options = {"language_level": sys.version_info[0]}
+ if os.environ.get('CYTHON_COVERAGE'):
+     cythonize_options['compiler_directives'].update(linetrace=True)
+     cythonize_options['annotate'] = True
+@@ -273,7 +273,6 @@ extra_reqs = {
+         "fsspec",
+         "hypothesis",
+         "packaging",
+-        "pytest-cov>=2.2.0",
+         "pytest>=2.8.2",
+         "shapely",
+     ],
+-- 
+2.52.0
+

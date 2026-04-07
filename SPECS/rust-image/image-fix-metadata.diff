@@ -1,0 +1,53 @@
+--- image-0.25.9/Cargo.toml	1970-01-01T00:00:01+00:00
++++ image-0.25.9/Cargo.toml	2025-12-24T14:12:00.542598+00:00
+@@ -124,31 +124,6 @@
+ name = "image"
+ path = "src/lib.rs"
+ 
+-[[bench]]
+-name = "blur"
+-path = "benches/blur.rs"
+-harness = false
+-
+-[[bench]]
+-name = "copy_from"
+-path = "benches/copy_from.rs"
+-harness = false
+-
+-[[bench]]
+-name = "decode"
+-path = "benches/decode.rs"
+-harness = false
+-
+-[[bench]]
+-name = "encode"
+-path = "benches/encode.rs"
+-harness = false
+-
+-[[bench]]
+-name = "fast_blur"
+-path = "benches/fast_blur.rs"
+-harness = false
+-
+ [dependencies.bytemuck]
+ version = "1.8.0"
+ features = ["extern_crate_alloc"]
+@@ -161,7 +136,7 @@
+ optional = true
+ 
+ [dependencies.dav1d]
+-version = "0.10.3"
++version = ">=0.10.3,<0.12"
+ optional = true
+ 
+ [dependencies.exr]
+@@ -230,9 +205,6 @@
+ [dev-dependencies.crc32fast]
+ version = "1.2.0"
+ 
+-[dev-dependencies.criterion]
+-version = "0.5.0"
+-
+ [dev-dependencies.glob]
+ version = "0.3"
+ 

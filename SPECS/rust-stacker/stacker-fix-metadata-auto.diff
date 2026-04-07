@@ -1,0 +1,21 @@
+--- stacker-0.1.22/Cargo.toml	1970-01-01T00:00:01+00:00
++++ stacker-0.1.22/Cargo.toml	2025-10-17T19:50:48.752270+00:00
+@@ -60,18 +60,3 @@
+ [build-dependencies.cc]
+ version = "1.2.33"
+ 
+-[target.arm64ec-pc-windows-msvc.dependencies.windows-sys]
+-version = ">=0.59.0, <0.60.0"
+-features = [
+-    "Win32_System_Memory",
+-    "Win32_System_Threading",
+-    "Win32_Foundation",
+-]
+-
+-[target.'cfg(all(windows, not(target_arch = "arm64ec")))'.dependencies.windows-sys]
+-version = ">=0.52.0, <0.60.0"
+-features = [
+-    "Win32_System_Memory",
+-    "Win32_System_Threading",
+-    "Win32_Foundation",
+-]

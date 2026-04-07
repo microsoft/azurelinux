@@ -1,0 +1,28 @@
+diff -rupN --no-dereference assimp-6.0.4/doc/CMakeLists.txt assimp-6.0.4-new/doc/CMakeLists.txt
+--- assimp-6.0.4/doc/CMakeLists.txt	2026-01-24 21:57:37.000000000 +0100
++++ assimp-6.0.4-new/doc/CMakeLists.txt	2026-01-27 13:39:45.530538354 +0100
+@@ -33,9 +33,9 @@ if( DEFINED CMAKE_INSTALL_DOCDIR )
+         DESTINATION ${CMAKE_INSTALL_DOCDIR}
+     )
+     install(FILES
+-        ${CMAKE_CURRENT_SOURCE_DIR}/AssimpDoc_Html/AnimationOverview.png
+-        ${CMAKE_CURRENT_SOURCE_DIR}/AssimpDoc_Html/AnimationOverview.svg
+-        ${CMAKE_CURRENT_SOURCE_DIR}/AssimpDoc_Html/dragonsplash.png
++        ${CMAKE_CURRENT_SOURCE_DIR}/architecture/AnimationOverview.png
++        ${CMAKE_CURRENT_SOURCE_DIR}/architecture/AnimationOverview.svg
++        ${CMAKE_CURRENT_SOURCE_DIR}/images/dragonsplash.png
+         DESTINATION ${CMAKE_INSTALL_DOCDIR}/${HTML_OUTPUT}
+     )
+ endif()
+diff -rupN --no-dereference assimp-6.0.4/doc/Doxyfile.in assimp-6.0.4-new/doc/Doxyfile.in
+--- assimp-6.0.4/doc/Doxyfile.in	2026-01-24 21:57:37.000000000 +0100
++++ assimp-6.0.4-new/doc/Doxyfile.in	2026-01-27 13:39:45.530944282 +0100
+@@ -952,7 +952,7 @@ RECURSIVE              = NO
+ # Note that relative paths are relative to the directory from which doxygen is
+ # run.
+ 
+-EXCLUDE                =
++EXCLUDE                = @PROJECT_BINARY_DIR@
+ 
+ # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
+ # directories that are symbolic links (a Unix file system feature) are excluded

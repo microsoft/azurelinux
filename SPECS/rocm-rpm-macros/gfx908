@@ -1,0 +1,14 @@
+#%Module 1.0
+#
+#  ROCm module for use with 'environment-modules' package:
+# 
+
+conflict rocm
+
+setenv        ROCM_BIN      /usr/lib64/rocm/gfx908/bin
+setenv        ROCM_INCLUDE  /usr/lib64/rocm/gfx908/include
+setenv        ROCM_LIB      /usr/lib64/rocm/gfx908/lib
+setenv        ROCM_GPUS     gfx908:xnack-
+prepend-path  PATH          /usr/lib64/rocm/gfx908/bin:/usr/lib64/rocm/gfx9/bin
+prepend-path  LD_LIBRARY_PATH /usr/lib64/rocm/gfx908/lib:/usr/lib64/rocm/gfx9/lib
+prepend-path  PYTHONPATH    /usr/lib64/rocm/gfx908/lib64/python3.13/site-packages/

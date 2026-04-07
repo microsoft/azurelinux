@@ -1,0 +1,11 @@
+# Configuration file for the sshd service.
+
+# The server keys are automatically generated if they are missing.
+# To change the automatic creation, adjust sshd.service options for
+# example using  systemctl enable sshd-keygen@dsa.service  to allow creation
+# of DSA key or  systemctl mask sshd-keygen@rsa.service  to disable RSA key
+# creation.
+
+#SSH_RSA_BITS=3072
+#SSH_ECDSA_BITS=256
+OPTIONS=""

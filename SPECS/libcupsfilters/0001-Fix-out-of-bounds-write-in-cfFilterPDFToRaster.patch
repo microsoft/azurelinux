@@ -1,0 +1,44 @@
+From fd01543f372ca3ba1f1c27bd3427110fa0094e3f Mon Sep 17 00:00:00 2001
+From: Till Kamppeter <till.kamppeter@gmail.com>
+Date: Mon, 10 Nov 2025 21:10:56 +0100
+Subject: [PATCH] Fix out-of-bounds write in cfFilterPDFToRaster()
+
+PDFs with too large page dimensions could cause an integer overflow and then a too small buffer for the pixel line to be allocated.
+
+Fixed this by cropping the page size to the maximum allowed by the standard, 14400x14400pt, 200x200in, 5x5m
+
+https://community.adobe.com/t5/indesign-discussions/maximum-width-of-a-pdf/td-p/9217372
+
+Fixes CVE-2025-64503
+---
+ cupsfilters/pdftoraster.cxx | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/cupsfilters/pdftoraster.cxx b/cupsfilters/pdftoraster.cxx
+index fca1b486..56616c27 100644
+--- a/cupsfilters/pdftoraster.cxx
++++ b/cupsfilters/pdftoraster.cxx
+@@ -1814,6 +1814,20 @@ out_page(pdftoraster_doc_t *doc,
+     doc->header.cupsPageSize[0] = l;
+   else
+     doc->header.cupsPageSize[1] = l;
++
++  //
++  // Maximum allowed page size for PDF is 200x200 inches (~ 5x5 m), or 14400x14400 pt
++  // https://community.adobe.com/t5/indesign-discussions/maximum-width-of-a-pdf/td-p/9217372
++  //
++  if (doc->header.cupsPageSize[0] > 14400) {
++    fprintf(stderr, "ERROR: Page width is %.2fpt, too large, cropping to 14400pt\n", doc->header.cupsPageSize[0]);
++    doc->header.cupsPageSize[0] = 14400;
++  }
++  if (doc->header.cupsPageSize[1] > 14400) {
++    fprintf(stderr, "ERROR: Page height is %.2fpt, too large, cropping to 14400pt\n", doc->header.cupsPageSize[1]);
++    doc->header.cupsPageSize[1] = 14400;
++  }
++
+   if (rotate == 90 || rotate == 270)
+   {
+     doc->header.cupsImagingBBox[0] =
+-- 
+2.51.1
+

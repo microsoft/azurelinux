@@ -1,0 +1,66 @@
+--- cargo-0.93.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ cargo-0.93.0/Cargo.toml	2026-02-16T14:00:43.869907+00:00
+@@ -31,17 +31,9 @@
+ resolver = "2"
+ 
+ [features]
+-all-static = [
+-    "vendored-openssl",
+-    "curl/static-curl",
+-    "curl/force-system-lib-on-osx",
+-    "vendored-libgit2",
+-]
+ default = ["http-transport-curl"]
+ http-transport-curl = ["gix/blocking-http-transport-curl"]
+ http-transport-reqwest = ["gix/blocking-http-transport-reqwest"]
+-vendored-libgit2 = ["libgit2-sys/vendored"]
+-vendored-openssl = ["openssl/vendored"]
+ 
+ [lib]
+ name = "cargo"
+@@ -128,7 +120,7 @@
+ version = "0.21.0"
+ 
+ [dependencies.gix]
+-version = "0.73.0"
++version = "0.75.0"
+ features = [
+     "progress-tree",
+     "parallel",
+@@ -183,7 +175,7 @@
+ version = "2.7.6"
+ 
+ [dependencies.opener]
+-version = "0.8.3"
++version = ">=0.7,<0.9"
+ 
+ [dependencies.os_info]
+ version = "3.12.0"
+@@ -208,8 +200,7 @@
+ version = "1.11.3"
+ 
+ [dependencies.rusqlite]
+-version = "0.37.0"
+-features = ["bundled"]
++version = ">=0.31,<0.38"
+ 
+ [dependencies.rustc-hash]
+ version = "2.1.1"
+@@ -327,7 +318,7 @@
+ version = "0.9.0"
+ 
+ [dev-dependencies.gix]
+-version = "0.73.0"
++version = "0.75.0"
+ features = [
+     "progress-tree",
+     "parallel",
+@@ -338,7 +329,7 @@
+ default-features = false
+ 
+ [dev-dependencies.gix-transport]
+-version = "0.48.0"
++version = "0.50.0"
+ features = ["http-client-insecure-credentials"]
+ 
+ [dev-dependencies.same-file]

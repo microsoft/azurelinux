@@ -1,0 +1,67 @@
+From 45059f285be3e92f1b73047c9ca250aa98d2e669 Mon Sep 17 00:00:00 2001
+From: Xi Ruoyao <xry111@xry111.site>
+Date: Sun, 23 Mar 2025 15:59:37 +0800
+Subject: [PATCH] tests: Fix meson setup with pygobject >= 3.52.0
+
+With pygobject >= 3.52.0, importing GIRepository-2.0 is no longer
+supported.  So if both pygobject >= 3.52.0 and python-dbusmock are
+installed, meson setup will error out:
+
+    ../tests/meson.build:22:6: ERROR: Command `<PKGDIR>/gnome-bluetooth-47.1/tests/unittest_inspector.py <PKGDIR>/gnome-bluetooth-47.1/tests/integration-test.py` failed with status 1.
+
+And running tests/unittest_inspector.py gives:
+
+    Traceback (most recent call last):
+      File "<PKGDIR>/tests/integration-test.py", line 35, in <module>
+        gi.require_version('GIRepository', '2.0')
+        ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+      File "/usr/lib/python3.13/site-packages/gi/__init__.py", line 132, in require_version
+        raise ValueError('Namespace %s not available for version %s' %
+                         (namespace, version))
+    ValueError: Namespace GIRepository not available for version 2.0
+
+even though GIRepository-2.0.typelib is installed on the system.
+
+Instead of complicating the test code with conditionalizing between
+GIRepository-2.0 and GIRepository-3.0, we can drop the dependency on
+GIRepository and rely on GIRepository's own envvar GI_TYPELIB_PATH to
+help it find our freshly built typelib.
+
+Reported-by: Wayne Blaszczyk <wblaszcz@bigpond.net.au>
+Closes: https://lists.linuxfromscratch.org/sympa/arc/blfs-support/2025-03/msg00112.html
+---
+ tests/integration-test.py | 4 ----
+ tests/meson.build         | 1 +
+ 2 files changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/tests/integration-test.py b/tests/integration-test.py
+index 673579e8..6fc9a304 100755
+--- a/tests/integration-test.py
++++ b/tests/integration-test.py
+@@ -32,11 +32,7 @@ except ImportError as e:
+     sys.stderr.write('Skipping tests, PyGobject not available for Python 3, or missing GI typelibs: %s\n' % str(e))
+     sys.exit(77)
+ 
+-gi.require_version('GIRepository', '2.0')
+-from gi.repository import GIRepository
+ builddir = os.getenv('top_builddir', '.')
+-GIRepository.Repository.prepend_library_path(builddir + '/lib/')
+-GIRepository.Repository.prepend_search_path(builddir + '/lib/')
+ 
+ GNOME_BLUETOOTH_PRIV_UNAVAILABLE = False
+ try:
+diff --git a/tests/meson.build b/tests/meson.build
+index 70aeb72a..559f379b 100644
+--- a/tests/meson.build
++++ b/tests/meson.build
+@@ -14,6 +14,7 @@ if enable_gir and has_dbusmock
+   envs = environment()
+   envs.set ('top_builddir', meson.global_build_root())
+   envs.set ('top_srcdir', meson.global_source_root())
++  envs.set ('GI_TYPELIB_PATH', meson.global_build_root() / 'lib')
+ 
+   test_deps = [ gnomebt_priv_gir, c_exec ]
+ 
+-- 
+GitLab
+

@@ -1,0 +1,22 @@
+diff -rupN --no-dereference angle-57ea533/src/angle.gyp angle-57ea533-new/src/angle.gyp
+--- angle-57ea533/src/angle.gyp	2021-01-15 23:27:20.863586363 +0100
++++ angle-57ea533-new/src/angle.gyp	2021-01-15 23:27:20.865586363 +0100
+@@ -32,7 +32,7 @@
+                 'angle_enable_d3d9%': 1,
+                 'angle_enable_d3d11%': 1,
+                 'angle_enable_hlsl%': 1,
+-                'angle_enable_vulkan%': 1,
++                'angle_enable_vulkan%': 0,
+             }],
+             ['OS=="linux" and use_x11==1 and chromeos==0',
+             {
+@@ -57,8 +57,7 @@
+     [
+         'compiler.gypi',
+         'libGLESv2.gypi',
+-        'libEGL.gypi',
+-        'vulkan_support/vulkan.gypi',
++        'libEGL.gypi'
+     ],
+ 
+     'targets':

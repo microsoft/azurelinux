@@ -1,0 +1,30 @@
+From f2fcdc5171f0b3b0b94fe8b78b6282be078a4e81 Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Wed, 6 Mar 2024 19:17:14 +0100
+Subject: [PATCH 04/59] RH: apps ca fix md option help text.patch - DROP?
+
+Patch-name: 0005-apps-ca-fix-md-option-help-text.patch
+Patch-id: 5
+Patch-status: |
+    # # apps/ca: fix md option help text
+From-dist-git-commit: 4334bc837fbc64d14890fdc51679a80770d498ce
+---
+ apps/ca.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/apps/ca.c b/apps/ca.c
+index 6d1d1c0a6e..a7553ba609 100644
+--- a/apps/ca.c
++++ b/apps/ca.c
+@@ -216,7 +216,7 @@ const OPTIONS ca_options[] = {
+     {"noemailDN", OPT_NOEMAILDN, '-', "Don't add the EMAIL field to the DN"},
+ 
+     OPT_SECTION("Signing"),
+-    {"md", OPT_MD, 's', "Digest to use, such as sha256"},
++    {"md", OPT_MD, 's', "Digest to use, such as sha256; see openssl help for list"},
+     {"keyfile", OPT_KEYFILE, 's', "The CA private key"},
+     {"keyform", OPT_KEYFORM, 'f',
+      "Private key file format (ENGINE, other values ignored)"},
+-- 
+2.51.0
+

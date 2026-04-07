@@ -1,0 +1,21 @@
+From 847bdd7563be379a4754c0acd8c974cbb512f94a Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Tue, 19 Mar 2024 13:27:20 +0100
+Subject: [PATCH] compile and run large-file tests only on 64-bit architectures
+
+---
+ src/tests/write/mod.rs | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/tests/write/mod.rs b/src/tests/write/mod.rs
+index 6ca7571..b468e0d 100644
+--- a/src/tests/write/mod.rs
++++ b/src/tests/write/mod.rs
+@@ -7,6 +7,7 @@ use std::pin::Pin;
+ use std::task::{Context, Poll};
+ 
+ pub(crate) mod offset;
++#[cfg(target_pointer_width = "64")]
+ mod zip64;
+ 
+ /// /dev/null for AsyncWrite.

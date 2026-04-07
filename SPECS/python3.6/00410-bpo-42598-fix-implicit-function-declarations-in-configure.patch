@@ -1,0 +1,113 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Joshua Root <jmr@macports.org>
+Date: Mon, 14 Dec 2020 07:56:34 +1100
+Subject: 00410: bpo-42598: Fix implicit function declarations in configure
+
+This is invalid in C99 and later and is an error with some compilers
+(e.g. clang in Xcode 12), and can thus cause configure checks to
+produce incorrect results.
+---
+ .../Build/2020-12-13-14-43-10.bpo-42598.7ipr5H.rst  |  2 ++
+ configure                                           | 13 +++++++------
+ configure.ac                                        | 13 +++++++------
+ 3 files changed, 16 insertions(+), 12 deletions(-)
+ create mode 100644 Misc/NEWS.d/next/Build/2020-12-13-14-43-10.bpo-42598.7ipr5H.rst
+
+diff --git a/Misc/NEWS.d/next/Build/2020-12-13-14-43-10.bpo-42598.7ipr5H.rst b/Misc/NEWS.d/next/Build/2020-12-13-14-43-10.bpo-42598.7ipr5H.rst
+new file mode 100644
+index 0000000000..7dafc105c4
+--- /dev/null
++++ b/Misc/NEWS.d/next/Build/2020-12-13-14-43-10.bpo-42598.7ipr5H.rst
+@@ -0,0 +1,2 @@
++Fix implicit function declarations in configure which could have resulted in
++incorrect configuration checks.  Patch contributed by Joshua Root.
+diff --git a/configure b/configure
+index 32c27a468d..68a46deef5 100755
+--- a/configure
++++ b/configure
+@@ -10840,10 +10840,10 @@ else
+       int main() {
+         pthread_attr_t attr;
+         pthread_t id;
+-        if (pthread_attr_init(&attr)) exit(-1);
+-        if (pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM)) exit(-1);
+-        if (pthread_create(&id, &attr, foo, NULL)) exit(-1);
+-        exit(0);
++        if (pthread_attr_init(&attr)) return (-1);
++        if (pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM)) return (-1);
++        if (pthread_create(&id, &attr, foo, NULL)) return (-1);
++        return (0);
+       }
+ _ACEOF
+ if ac_fn_c_try_run "$LINENO"; then :
+@@ -14891,7 +14891,7 @@ else
+   int main()
+   {
+ 	/* Success: exit code 0 */
+-        exit((((wchar_t) -1) < ((wchar_t) 0)) ? 0 : 1);
++        return ((((wchar_t) -1) < ((wchar_t) 0)) ? 0 : 1);
+   }
+ 
+ _ACEOF
+@@ -15213,7 +15213,7 @@ else
+ 
+ int main()
+ {
+-	exit(((-1)>>3 == -1) ? 0 : 1);
++	return (((-1)>>3 == -1) ? 0 : 1);
+ }
+ 
+ _ACEOF
+@@ -15725,6 +15725,7 @@ else
+ /* end confdefs.h.  */
+ 
+ #include <poll.h>
++#include <unistd.h>
+ 
+ int main()
+ {
+diff --git a/configure.ac b/configure.ac
+index 2696661ab9..9d2ad9afba 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -3188,10 +3188,10 @@ if test "$posix_threads" = "yes"; then
+       int main() {
+         pthread_attr_t attr;
+         pthread_t id;
+-        if (pthread_attr_init(&attr)) exit(-1);
+-        if (pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM)) exit(-1);
+-        if (pthread_create(&id, &attr, foo, NULL)) exit(-1);
+-        exit(0);
++        if (pthread_attr_init(&attr)) return (-1);
++        if (pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM)) return (-1);
++        if (pthread_create(&id, &attr, foo, NULL)) return (-1);
++        return (0);
+       }]])],
+       [ac_cv_pthread_system_supported=yes],
+       [ac_cv_pthread_system_supported=no],
+@@ -4743,7 +4743,7 @@ then
+   int main()
+   {
+ 	/* Success: exit code 0 */
+-        exit((((wchar_t) -1) < ((wchar_t) 0)) ? 0 : 1);
++        return ((((wchar_t) -1) < ((wchar_t) 0)) ? 0 : 1);
+   }
+   ]])],
+   [ac_cv_wchar_t_signed=yes],
+@@ -4818,7 +4818,7 @@ AC_CACHE_VAL(ac_cv_rshift_extends_sign, [
+ AC_RUN_IFELSE([AC_LANG_SOURCE([[
+ int main()
+ {
+-	exit(((-1)>>3 == -1) ? 0 : 1);
++	return (((-1)>>3 == -1) ? 0 : 1);
+ }
+ ]])],
+ [ac_cv_rshift_extends_sign=yes],
+@@ -4970,6 +4970,7 @@ AC_MSG_CHECKING(for broken poll())
+ AC_CACHE_VAL(ac_cv_broken_poll,
+ AC_RUN_IFELSE([AC_LANG_SOURCE([[
+ #include <poll.h>
++#include <unistd.h>
+ 
+ int main()
+ {

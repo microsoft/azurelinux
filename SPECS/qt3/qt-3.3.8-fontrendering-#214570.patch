@@ -1,0 +1,23 @@
+--- qt-x11-free-3.3.8/src/kernel/qscriptengine_x11.cpp.orig	2007-04-11 15:05:34.000000000 +0200
++++ qt-x11-free-3.3.8/src/kernel/qscriptengine_x11.cpp	2007-04-11 15:22:19.000000000 +0200
+@@ -1240,7 +1240,7 @@
+     int script = item->script;
+     Q_ASSERT(script >= QFont::Devanagari && script <= QFont::Sinhala);
+     const unsigned short script_base = 0x0900 + 0x80*(script-QFont::Devanagari);
+-    const unsigned short ra = script_base + 0x30;
++    unsigned short ra = script_base + 0x30;            //it was const unsigned short ra before modification
+     const unsigned short halant = script_base + 0x4d;
+     const unsigned short nukta = script_base + 0x3c;
+ 
+@@ -1278,6 +1278,11 @@
+     }
+ #endif
+ 
++    unsigned short *chkAssamese=reordered.data();
++    if((script == QFont::Bengali) && (*chkAssamese==0x09F0)) //if it is assamese ra
++    {
++       ra  = script_base + 0x70;
++    }
+     if (len != 1) {
+         unsigned short *uc = reordered.data();
+         bool beginsWithRa = FALSE;

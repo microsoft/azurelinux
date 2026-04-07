@@ -1,0 +1,32 @@
+diff -up allegro-4.4.2/docs/CMakeLists.txt~ allegro-4.4.2/docs/CMakeLists.txt
+--- allegro-4.4.2/docs/CMakeLists.txt~	2009-10-31 00:05:30.000000000 +0100
++++ allegro-4.4.2/docs/CMakeLists.txt	2011-07-12 11:24:06.604309215 +0200
+@@ -8,8 +8,8 @@ if(NOT WANT_DOCS OR CMAKE_CROSSCOMPILING
+     return()
+ endif()
+ 
+-set(DOCDIR "doc" CACHE STRING "Install docs into $DOCDIR/allegro-$VERSION")
+-set(ACTUAL_DOC_DIR "${DOCDIR}/allegro-${ALLEGRO_VERSION}")
++set(DOCDIR "doc" CACHE STRING "Install docs into $DOCDIR")
++set(ACTUAL_DOC_DIR "${DOCDIR}")
+ 
+ add_executable(makedoc
+     src/makedoc/makedoc.c
+@@ -156,7 +156,7 @@ endif(UNIX)
+ #
+ 
+ option(WANT_DOCS_MAN "Generate man pages" on)
+-set(MANDIR "man" CACHE STRING "Install man pages into this directory")
++set(MANDIR "share/man" CACHE STRING "Install man pages into this directory")
+ 
+ if(WANT_DOCS_MAN)
+     set(man_out ${CMAKE_CURRENT_BINARY_DIR}/man/allegro_init.3)
+@@ -187,7 +187,7 @@ endif(WANT_DOCS_MAN)
+ option(WANT_DOCS_INFO "Generate Info document" on)
+ find_program(MAKEINFO NAMES makeinfo)
+ mark_as_advanced(MAKEINFO)
+-set(INFODIR "info" CACHE STRING "Install Info docs into this directory")
++set(INFODIR "share/info" CACHE STRING "Install Info docs into this directory")
+ 
+ if(WANT_DOCS_INFO AND MAKEINFO)
+     set(texi_out ${CMAKE_CURRENT_BINARY_DIR}/texi/allegro.texi)

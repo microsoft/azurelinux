@@ -1,0 +1,22 @@
+--- home-0.5.12/Cargo.toml	1970-01-01T00:00:01+00:00
++++ home-0.5.12/Cargo.toml	2026-01-05T19:33:50.908893+00:00
+@@ -40,14 +40,6 @@
+ name = "home"
+ path = "src/lib.rs"
+ 
+-[target."cfg(windows)".dependencies.windows-sys]
+-version = "0.61"
+-features = [
+-    "Win32_Foundation",
+-    "Win32_UI_Shell",
+-    "Win32_System_Com",
+-]
+-
+ [lints.clippy]
+ dbg_macro = "warn"
+ disallowed_methods = "warn"
+@@ -68,3 +60,4 @@
+ 
+ [lints.rustdoc]
+ private_intra_doc_links = "allow"
++

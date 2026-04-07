@@ -1,0 +1,31 @@
+From 04664fb41a3eaa5bc688c4095107486f8c6d2f4c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Mon, 27 Oct 2014 16:55:18 +0100
+Subject: [PATCH] Unbundle Encode::Locale
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ lib/ExtUtils/MakeMaker.pm | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/lib/ExtUtils/MakeMaker.pm b/lib/ExtUtils/MakeMaker.pm
+index 04ec5a3..759c079 100644
+--- a/lib/ExtUtils/MakeMaker.pm
++++ b/lib/ExtUtils/MakeMaker.pm
+@@ -11,8 +11,8 @@ use ExtUtils::MakeMaker::Config;
+ use version; # ensure we always have version.pm
+ use Carp;
+ use File::Path;
+-my $CAN_DECODE = eval { require ExtUtils::MakeMaker::Locale; }; # 2 birds, 1 stone
+-eval { ExtUtils::MakeMaker::Locale::reinit('UTF-8') }
++my $CAN_DECODE = eval { require Encode::Locale; }; # 2 birds, 1 stone
++eval { Encode::Locale::reinit('UTF-8') }
+   if $CAN_DECODE and Encode::find_encoding('locale')->name eq 'ascii';
+ 
+ our $Verbose = 0;       # exported
+-- 
+1.9.3
+

@@ -1,0 +1,43 @@
+From fbd15e9b4862d24a226a32bfd85b80e448d3f579 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jos=C3=A9=20Exp=C3=B3sito?= <jexposit@redhat.com>
+Date: Mon, 16 Feb 2026 16:22:44 +0100
+Subject: [PATCH] opt: Fix build issue with gcc 16
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Compiling with gcc 16 throws this error:
+
+    FAILED: [code=1] source/opt/CMakeFiles/SPIRV-Tools-opt.dir/decoration_manager.cpp.o
+    source/opt/decoration_manager.cpp: In member function
+      ‘spvtools::opt::analysis::DecorationManager::CloneDecorations(unsigned int, unsigned int)’:
+    source/opt/decoration_manager.cpp:546:27: error:
+      ‘MEM[(unsigned int &)&op + 24]’ may be used uninitialized [-Werror=maybe-uninitialized]
+
+      546 |           if (op.words[0] == from) {  // add new pair of operands: (to, literal)
+    source/opt/decoration_manager.cpp:545:19: note: ‘op’ declared here
+      545 |           Operand op = inst->GetOperand(i);
+          |                   ^~
+    cc1plus: all warnings being treated as errors
+
+Make sure that the vector is not empty before using it.
+---
+ source/opt/decoration_manager.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/source/opt/decoration_manager.cpp b/source/opt/decoration_manager.cpp
+index 3e95dbc3..3ff9f426 100644
+--- a/source/opt/decoration_manager.cpp
++++ b/source/opt/decoration_manager.cpp
+@@ -543,7 +543,7 @@ void DecorationManager::CloneDecorations(uint32_t from, uint32_t to) {
+         const uint32_t num_operands = inst->NumOperands();
+         for (uint32_t i = 1; i < num_operands; i += 2) {
+           Operand op = inst->GetOperand(i);
+-          if (op.words[0] == from) {  // add new pair of operands: (to, literal)
++          if (!op.words.empty() && op.words[0] == from) {  // add new pair of operands: (to, literal)
+             inst->AddOperand(
+                 Operand(spv_operand_type_t::SPV_OPERAND_TYPE_ID, {to}));
+             op = inst->GetOperand(i + 1);
+-- 
+2.53.0
+

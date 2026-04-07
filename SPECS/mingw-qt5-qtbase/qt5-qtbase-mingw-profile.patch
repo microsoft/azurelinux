@@ -1,0 +1,289 @@
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/mkspecs/mingw-w64-g++/qmake.conf qtbase-everywhere-src-5.15.18-new/mkspecs/mingw-w64-g++/qmake.conf
+--- qtbase-everywhere-src-5.15.18/mkspecs/mingw-w64-g++/qmake.conf	1970-01-01 01:00:00.000000000 +0100
++++ qtbase-everywhere-src-5.15.18-new/mkspecs/mingw-w64-g++/qmake.conf	2025-11-07 14:10:20.691607298 +0100
+@@ -0,0 +1,126 @@
++#
++# qmake configuration for i686-w64-mingw32-g++ and x86_64-w64-mingw32-g++
++#
++# Written for cross compilation with mingw-w64 under GNU/Linux
++#
++# Cross compile example for i686-w64-mingw32-g++:
++#   configure -xplatform mingw-w64-g++ -device-option CROSS_COMPILE=i686-w64-mingw32-
++#
++
++load(device_config)
++include(../common/angle.conf)
++
++MAKEFILE_GENERATOR      = MINGW
++QMAKE_PLATFORM          = win32 win32-g++ mingw
++CONFIG                 += debug_and_release debug_and_release_target precompile_header
++DEFINES                += UNICODE
++QMAKE_COMPILER_DEFINES += __GNUC__ WIN32
++
++QMAKE_EXT_OBJ           = .o
++QMAKE_EXT_RES           = _res.o
++
++QMAKE_COMPILER          = gcc
++
++QMAKE_CC                = $${CROSS_COMPILE}gcc
++QMAKE_LEX               = flex
++QMAKE_LEXFLAGS          =
++QMAKE_YACC              = bison -y
++QMAKE_YACCFLAGS         = -d
++QMAKE_CFLAGS            = -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4 -fno-keep-inline-dllexport $${CROSS_COMPILE_CFLAGS}
++QMAKE_CFLAGS_DEPS       = -M
++QMAKE_CFLAGS_WARN_ON    = -Wall -Wextra
++QMAKE_CFLAGS_WARN_OFF   = -w
++QMAKE_CFLAGS_RELEASE    = -O2
++QMAKE_CFLAGS_RELEASE_WITH_DEBUGINFO = -O2 -g
++QMAKE_CFLAGS_DEBUG      = -g
++QMAKE_CFLAGS_YACC       = -Wno-unused -Wno-parentheses
++QMAKE_CFLAGS_SPLIT_SECTIONS = -ffunction-sections
++QMAKE_CFLAGS_SSE2       = -msse2 -mstackrealign
++QMAKE_CFLAGS_SSE3       = -msse3
++QMAKE_CFLAGS_SSSE3      = -mssse3
++QMAKE_CFLAGS_SSE4_1     = -msse4.1
++QMAKE_CFLAGS_SSE4_2     = -msse4.2
++QMAKE_CFLAGS_AVX        = -mavx
++QMAKE_CFLAGS_AVX2       = -mavx2
++QMAKE_CFLAGS_NEON       = -mfpu=neon
++
++QMAKE_CXX               = $${CROSS_COMPILE}g++
++QMAKE_CXXFLAGS          = $$QMAKE_CFLAGS
++QMAKE_CXXFLAGS_DEPS     = $$QMAKE_CFLAGS_DEPS
++QMAKE_CXXFLAGS_WARN_ON  = $$QMAKE_CFLAGS_WARN_ON
++QMAKE_CXXFLAGS_WARN_OFF = $$QMAKE_CFLAGS_WARN_OFF
++QMAKE_CXXFLAGS_RELEASE  = $$QMAKE_CFLAGS_RELEASE
++QMAKE_CXXFLAGS_RELEASE_WITH_DEBUGINFO = $$QMAKE_CFLAGS_RELEASE_WITH_DEBUGINFO
++QMAKE_CXXFLAGS_DEBUG    = $$QMAKE_CFLAGS_DEBUG
++QMAKE_CXXFLAGS_YACC     = $$QMAKE_CFLAGS_YACC
++QMAKE_CXXFLAGS_THREAD   = $$QMAKE_CFLAGS_THREAD
++QMAKE_CXXFLAGS_RTTI_ON  = -frtti
++QMAKE_CXXFLAGS_RTTI_OFF = -fno-rtti
++QMAKE_CXXFLAGS_EXCEPTIONS_ON = -fexceptions -mthreads
++QMAKE_CXXFLAGS_EXCEPTIONS_OFF = -fno-exceptions
++QMAKE_CXXFLAGS_CXX11    = -std=c++11
++QMAKE_CXXFLAGS_CXX14    = -std=c++14
++QMAKE_CXXFLAGS_CXX17    = -std=c++17
++QMAKE_CXXFLAGS_CXX1Z    = -std=c++1z
++QMAKE_CXXFLAGS_GNUCXX11 = -std=gnu++11
++QMAKE_CXXFLAGS_GNUCXX14 = -std=gnu++14
++QMAKE_CXXFLAGS_GNUCXX17 = -std=gnu++17
++QMAKE_CXXFLAGS_GNUCXX1Z = -std=gnu++1z
++QMAKE_CXXFLAGS_SPLIT_SECTIONS = $$QMAKE_CFLAGS_SPLIT_SECTIONS
++
++QMAKE_INCDIR            =
++
++QMAKE_RUN_CC            = $(CC) -c $(CFLAGS) $(INCPATH) -o $obj $src
++QMAKE_RUN_CC_IMP        = $(CC) -c $(CFLAGS) $(INCPATH) -o $@ $<
++QMAKE_RUN_CXX           = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $obj $src
++QMAKE_RUN_CXX_IMP       = $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $<
++
++QMAKE_LINK              = $${CROSS_COMPILE}g++
++QMAKE_LINK_C            = $${CROSS_COMPILE}gcc
++QMAKE_LFLAGS            = -g -fstack-protector
++QMAKE_LFLAGS_EXCEPTIONS_ON = -mthreads
++QMAKE_LFLAGS_EXCEPTIONS_OFF =
++QMAKE_LFLAGS_RELEASE    =
++QMAKE_LFLAGS_DEBUG      =
++QMAKE_LFLAGS_CONSOLE    = -Wl,-subsystem,console
++QMAKE_LFLAGS_WINDOWS    = -Wl,-subsystem,windows
++QMAKE_LFLAGS_DLL        = -shared
++QMAKE_LFLAGS_CXX11      =
++QMAKE_LFLAGS_CXX14      =
++QMAKE_LFLAGS_CXX1Z      =
++QMAKE_LFLAGS_GCSECTIONS = -Wl,--gc-sections
++QMAKE_LINK_OBJECT_MAX   = 10
++QMAKE_LINK_OBJECT_SCRIPT = object_script
++QMAKE_PREFIX_SHLIB      =
++QMAKE_EXTENSION_SHLIB   = dll
++QMAKE_PREFIX_STATICLIB  = lib
++QMAKE_EXTENSION_STATICLIB = a
++QMAKE_EXTENSION_IMPORTLIB = dll.a
++
++QMAKE_IDL               = $${CROSS_COMPILE}widl
++QMAKE_LIB               = $${CROSS_COMPILE}ar -rc
++QMAKE_RC                = $${CROSS_COMPILE}windres
++QMAKE_DLLTOOL           = $${CROSS_COMPILE}dlltool
++QMAKE_LRELEASE          = $${CROSS_COMPILE}lrelease-qt5
++
++QMAKE_STRIP             = $${CROSS_COMPILE}strip
++QMAKE_STRIPFLAGS_LIB   += --strip-unneeded
++QMAKE_OBJCOPY           = $${CROSS_COMPILE}objcopy
++QMAKE_NM                = $${CROSS_COMPILE}nm -P
++
++PKG_CONFIG              = $${CROSS_COMPILE}pkg-config
++QMAKE_PKG_CONFIG        = $${CROSS_COMPILE}pkg-config
++
++QMAKE_LIBS              =
++QMAKE_LIBS_CORE         = -lz -lpcre2-16 -lversion -lole32 -luuid -lwinmm -lws2_32 -ladvapi32 -lshell32 -luser32 -lkernel32 -lnetapi32 -luserenv -liconv
++QMAKE_LIBS_GUI          = -lgdi32 -lcomdlg32 -loleaut32 -limm32 -lwinmm -lws2_32 -lole32 -luuid -luser32 -ladvapi32 -luxtheme -ljpeg -lpng -lharfbuzz
++QMAKE_LIBS_NETWORK      = -lws2_32 -lcrypt32 -ldnsapi -liphlpapi
++QMAKE_LIBS_DBUS         =
++QMAKE_LIBS_OPENGL       = -lglu32 -lopengl32 -lgdi32 -luser32
++QMAKE_LIBS_OPENGL_ES2   = -l$${LIBEGL_NAME} -l$${LIBGLESV2_NAME} -ld3d9 -ldxguid -lgdi32 -luser32
++QMAKE_LIBS_OPENGL_ES2_DEBUG = -l$${LIBEGL_NAME} -l$${LIBGLESV2_NAME} -ld3d9 -ldxguid -lgdi32 -luser32
++QMAKE_LIBS_COMPAT       = -ladvapi32 -lshell32 -lcomdlg32 -luser32 -lgdi32 -lws2_32
++QMAKE_LIBS_QT_ENTRY     = -lmingw32 -lqt5main
++QMAKE_LIBS_VULKAN       =
++
++load(qt_config)
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/mkspecs/mingw-w64-g++/qplatformdefs.h qtbase-everywhere-src-5.15.18-new/mkspecs/mingw-w64-g++/qplatformdefs.h
+--- qtbase-everywhere-src-5.15.18/mkspecs/mingw-w64-g++/qplatformdefs.h	1970-01-01 01:00:00.000000000 +0100
++++ qtbase-everywhere-src-5.15.18-new/mkspecs/mingw-w64-g++/qplatformdefs.h	2025-11-07 14:10:20.691700627 +0100
+@@ -0,0 +1,155 @@
++/****************************************************************************
++**
++** Copyright (C) 2016 The Qt Company Ltd.
++** Contact: https://www.qt.io/licensing/
++**
++** This file is part of the qmake spec of the Qt Toolkit.
++**
++** $QT_BEGIN_LICENSE:LGPL$
++** Commercial License Usage
++** Licensees holding valid commercial Qt licenses may use this file in
++** accordance with the commercial license agreement provided with the
++** Software or, alternatively, in accordance with the terms contained in
++** a written agreement between you and The Qt Company. For licensing terms
++** and conditions see https://www.qt.io/terms-conditions. For further
++** information use the contact form at https://www.qt.io/contact-us.
++**
++** GNU Lesser General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU Lesser
++** General Public License version 3 as published by the Free Software
++** Foundation and appearing in the file LICENSE.LGPL3 included in the
++** packaging of this file. Please review the following information to
++** ensure the GNU Lesser General Public License version 3 requirements
++** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU
++** General Public License version 2.0 or (at your option) the GNU General
++** Public license version 3 or any later version approved by the KDE Free
++** Qt Foundation. The licenses are as published by the Free Software
++** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
++** included in the packaging of this file. Please review the following
++** information to ensure the GNU General Public License requirements will
++** be met: https://www.gnu.org/licenses/gpl-2.0.html and
++** https://www.gnu.org/licenses/gpl-3.0.html.
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#ifndef QPLATFORMDEFS_H
++#define QPLATFORMDEFS_H
++
++#ifdef UNICODE
++#ifndef _UNICODE
++#define _UNICODE
++#endif
++#endif
++
++// Get Qt defines/settings
++
++#include "qglobal.h"
++
++#include <tchar.h>
++#include <io.h>
++#include <direct.h>
++#include <stdio.h>
++#include <fcntl.h>
++#include <errno.h>
++#include <sys/stat.h>
++#include <stdlib.h>
++#include <limits.h>
++
++#if !defined(_WIN32_WINNT) || (_WIN32_WINNT-0 < 0x0500)
++typedef enum {
++    NameUnknown           = 0,
++    NameFullyQualifiedDN  = 1,
++    NameSamCompatible     = 2,
++    NameDisplay           = 3,
++    NameUniqueId          = 6,
++    NameCanonical         = 7,
++    NameUserPrincipal     = 8,
++    NameCanonicalEx       = 9,
++    NameServicePrincipal  = 10,
++    NameDnsDomain         = 12
++} EXTENDED_NAME_FORMAT, *PEXTENDED_NAME_FORMAT;
++#endif
++
++#ifdef QT_LARGEFILE_SUPPORT
++#define QT_STATBUF              struct _stati64         // non-ANSI defs
++#define QT_STATBUF4TSTAT        struct _stati64         // non-ANSI defs
++#define QT_STAT                 ::_stati64
++#define QT_FSTAT                ::_fstati64
++#else
++#define QT_STATBUF              struct _stat            // non-ANSI defs
++#define QT_STATBUF4TSTAT        struct _stat            // non-ANSI defs
++#define QT_STAT                 ::_stat
++#define QT_FSTAT                ::_fstat
++#endif
++#define QT_STAT_REG             _S_IFREG
++#define QT_STAT_DIR             _S_IFDIR
++#define QT_STAT_MASK            _S_IFMT
++#if defined(_S_IFLNK)
++#  define QT_STAT_LNK           _S_IFLNK
++#endif
++#define QT_FILENO               _fileno
++#define QT_OPEN                 ::_open
++#define QT_CLOSE                ::_close
++#ifdef QT_LARGEFILE_SUPPORT
++#define QT_LSEEK                ::_lseeki64
++#ifndef UNICODE
++#define QT_TSTAT                ::_stati64
++#else
++#define QT_TSTAT                ::_wstati64
++#endif
++#else
++#define QT_LSEEK                ::_lseek
++#ifndef UNICODE
++#define QT_TSTAT                ::_stat
++#else
++#define QT_TSTAT                ::_wstat
++#endif
++#endif
++#define QT_READ                 ::_read
++#define QT_WRITE                ::_write
++#define QT_ACCESS               ::_access
++#define QT_GETCWD               ::_getcwd
++#define QT_CHDIR                ::_chdir
++#define QT_MKDIR                ::_mkdir
++#define QT_RMDIR                ::_rmdir
++#define QT_OPEN_LARGEFILE       0
++#define QT_OPEN_RDONLY          _O_RDONLY
++#define QT_OPEN_WRONLY          _O_WRONLY
++#define QT_OPEN_RDWR            _O_RDWR
++#define QT_OPEN_CREAT           _O_CREAT
++#define QT_OPEN_TRUNC           _O_TRUNC
++#define QT_OPEN_APPEND          _O_APPEND
++#if defined(O_TEXT)
++# define QT_OPEN_TEXT           _O_TEXT
++# define QT_OPEN_BINARY         _O_BINARY
++#endif
++
++#include "../common/c89/qplatformdefs.h"
++
++#ifdef QT_LARGEFILE_SUPPORT
++#undef QT_FSEEK
++#undef QT_FTELL
++#undef QT_OFF_T
++
++#define QT_FSEEK                ::fseeko64
++#define QT_FTELL                ::ftello64
++#define QT_OFF_T                off64_t
++#endif
++
++#define QT_SIGNAL_ARGS          int
++
++#define QT_VSNPRINTF            ::_vsnprintf
++#define QT_SNPRINTF             ::_snprintf
++
++# define F_OK   0
++# define X_OK   1
++# define W_OK   2
++# define R_OK   4
++
++
++#endif // QPLATFORMDEFS_H

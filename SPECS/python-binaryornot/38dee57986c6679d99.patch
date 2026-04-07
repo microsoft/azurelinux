@@ -1,0 +1,22 @@
+From 38dee57986c6679d9936a1da6f6c8182da3734f8 Mon Sep 17 00:00:00 2001
+From: Greg <gregobinna@gmail.com>
+Date: Sat, 10 Aug 2019 15:10:33 +0000
+Subject: [PATCH] fix failing test
+
+---
+ tests/test_check.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/test_check.py b/tests/test_check.py
+index 1ea31a4..f800583 100755
+--- a/tests/test_check.py
++++ b/tests/test_check.py
+@@ -216,7 +216,7 @@ def bytes_in_file(data):
+ 
+ 
+ class TestDetectionProperties(unittest.TestCase):
+-    @given(binary(average_size=512))
++    @given(binary(max_size=512))
+     def test_never_crashes(self, data):
+         with bytes_in_file(data) as f:
+             is_binary(f)

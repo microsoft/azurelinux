@@ -1,0 +1,16 @@
+--- a/src/cd-paranoia.c.org	2025-01-07 08:05:37.275257579 +0100
++++ b/src/cd-paranoia.c	2025-01-07 08:06:46.438460966 +0100
+@@ -655,11 +655,11 @@
+   free_and_null(force_cdrom_device);
+   free_and_null(span);
+   if(logfile_open) {
+-      fclose(logfile);
++      if (logfile) fclose(logfile);
+       logfile = NULL;
+     }
+   if(reportfile_open) {
+-      fclose(reportfile);
++      if (reportfile) fclose(reportfile);
+       reportfile = NULL;
+     }
+ }

@@ -1,0 +1,54 @@
+autofs-5.1.9 - fix ldap_parse_page_control() check
+
+From: David Disseldorp <ddiss@suse.de>
+
+The final @cookie parameter should be a struct berval ** type. The
+check currently fails when -Werror=incompatible-pointer-types is set:
+
+conftest.c: In function 'main':
+conftest.c:54:47: error: passing argument 4 of 'ldap_parse_page_control'
+from incompatible pointer type [-Werror=incompatible-pointer-types]
+   54 |       ret = ldap_parse_page_control(ld,clp,ct,c);
+      |                                               ^
+      |                                               |
+      |                                               struct berval *
+In file included from /usr/include/lber_types.h:24,
+                 from /usr/include/lber.h:29,
+                 from /usr/include/ldap.h:30,
+                 from conftest.c:45:
+/usr/include/ldap.h:2155:25: note: expected 'struct berval **' but
+argument is of type 'struct berval *'
+ 2155 | ldap_parse_page_control LDAP_P((
+
+Signed-off-by: David Disseldorp <ddiss@suse.de>
+---
+ aclocal.m4 |    2 +-
+ configure  |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/aclocal.m4 b/aclocal.m4
+index 1046d72b1..fa18eb1df 100644
+--- a/aclocal.m4
++++ b/aclocal.m4
+@@ -424,7 +424,7 @@ AC_LINK_IFELSE(
+       #include <ldap.h> ]],
+    [[ LDAP *ld;
+       ber_int_t *ct;
+-      struct berval *c;
++      struct berval **c;
+       int ret;
+       LDAPControl **clp;
+       ret = ldap_parse_page_control(ld,clp,ct,c); ]])],
+diff --git a/configure b/configure
+index 3dc07f638..22ac5e1b1 100755
+--- a/configure
++++ b/configure
+@@ -5653,7 +5653,7 @@ main (void)
+ {
+  LDAP *ld;
+       ber_int_t *ct;
+-      struct berval *c;
++      struct berval **c;
+       int ret;
+       LDAPControl **clp;
+       ret = ldap_parse_page_control(ld,clp,ct,c);

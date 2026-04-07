@@ -1,0 +1,35 @@
+From 0c9761de7413d949fc9b9324ddcded6cdc5da175 Mon Sep 17 00:00:00 2001
+From: Vlad Zahorodnii <vlad.zahorodnii@kde.org>
+Date: Fri, 15 Sep 2023 10:06:32 +0300
+Subject: [PATCH 52/55] tests: Fix tst_xdgshell::minMaxSize()
+
+Amends e8cff6fb39c0fd01548bce18542820a6612dbe49.
+
+The new size hints will be committed when the surface is committed.
+
+Change-Id: I94e944fee7dac63d5e9ac86fb348b5d24d54abfc
+Reviewed-by: Eskil Abrahamsen Blomfeldt <eskil.abrahamsen-blomfeldt@qt.io>
+(cherry picked from commit d8d3d6097afeac62f1b0285e3d5365c7cb580547)
+---
+ tests/auto/client/xdgshell/tst_xdgshell.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/tests/auto/client/xdgshell/tst_xdgshell.cpp b/tests/auto/client/xdgshell/tst_xdgshell.cpp
+index c5271f63..f2181fd6 100644
+--- a/tests/auto/client/xdgshell/tst_xdgshell.cpp
++++ b/tests/auto/client/xdgshell/tst_xdgshell.cpp
+@@ -604,9 +604,11 @@ void tst_xdgshell::minMaxSize()
+     QCOMPOSITOR_TRY_COMPARE(xdgToplevel()->m_committed.maxSize, QSize(1000, 1000));
+ 
+     window.setMaximumSize(QSize(500, 400));
++    window.update();
+     QCOMPOSITOR_TRY_COMPARE(xdgToplevel()->m_committed.maxSize, QSize(500, 400));
+ 
+     window.setMinimumSize(QSize(50, 40));
++    window.update();
+     QCOMPOSITOR_TRY_COMPARE(xdgToplevel()->m_committed.minSize, QSize(50, 40));
+ }
+ 
+-- 
+2.51.1
+

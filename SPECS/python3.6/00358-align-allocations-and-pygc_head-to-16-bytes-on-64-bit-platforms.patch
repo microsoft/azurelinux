@@ -1,0 +1,63 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Inada Naoki <songofacandy@gmail.com>
+Date: Mon, 3 Jun 2019 10:51:32 +0900
+Subject: 00358: align allocations and PyGC_Head to 16 bytes on 64-bit
+ platforms
+
+Upstream bug: https://bugs.python.org/issue27987
+Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1923658
+
+Combination of two upstream commits:
+- 1b85f4ec45a5d63188ee3866bd55eb29fdec7fbf
+- 8766cb74e186d3820db0a855ccd780d6d84461f7
+---
+ Include/objimpl.h                                           | 6 +++++-
+ .../2019-05-15-18-28-43.bpo-27987.FaxuLy.rst                | 2 ++
+ Objects/obmalloc.c                                          | 6 ++++++
+ 3 files changed, 13 insertions(+), 1 deletion(-)
+ create mode 100644 Misc/NEWS.d/next/Core and Builtins/2019-05-15-18-28-43.bpo-27987.FaxuLy.rst
+
+diff --git a/Include/objimpl.h b/Include/objimpl.h
+index e7a3696d7a..90d71b87ea 100644
+--- a/Include/objimpl.h
++++ b/Include/objimpl.h
+@@ -255,7 +255,11 @@ typedef union _gc_head {
+         union _gc_head *gc_prev;
+         Py_ssize_t gc_refs;
+     } gc;
+-    double dummy;  /* force worst-case alignment */
++    long double dummy;  /* force worst-case alignment */
++    // malloc returns memory block aligned for any built-in types and
++    // long double is the largest standard C type.
++    // On amd64 linux, long double requires 16 byte alignment.
++    // See bpo-27987 for more discussion.
+ } PyGC_Head;
+ 
+ extern PyGC_Head *_PyGC_generation0;
+diff --git a/Misc/NEWS.d/next/Core and Builtins/2019-05-15-18-28-43.bpo-27987.FaxuLy.rst b/Misc/NEWS.d/next/Core and Builtins/2019-05-15-18-28-43.bpo-27987.FaxuLy.rst
+new file mode 100644
+index 0000000000..98073471ca
+--- /dev/null
++++ b/Misc/NEWS.d/next/Core and Builtins/2019-05-15-18-28-43.bpo-27987.FaxuLy.rst	
+@@ -0,0 +1,2 @@
++``PyGC_Head`` structure is aligned to ``long double``.  This is needed to
++ensure GC-ed objects are aligned properly.  Patch by Inada Naoki.
+diff --git a/Objects/obmalloc.c b/Objects/obmalloc.c
+index d46d149311..47283354f4 100644
+--- a/Objects/obmalloc.c
++++ b/Objects/obmalloc.c
+@@ -650,8 +650,14 @@ static int running_on_valgrind = -1;
+  *
+  * You shouldn't change this unless you know what you are doing.
+  */
++
++#if SIZEOF_VOID_P > 4
++#define ALIGNMENT              16               /* must be 2^N */
++#define ALIGNMENT_SHIFT         4
++#else
+ #define ALIGNMENT               8               /* must be 2^N */
+ #define ALIGNMENT_SHIFT         3
++#endif
+ 
+ /* Return the number of bytes in size class I, as a uint. */
+ #define INDEX2SIZE(I) (((uint)(I) + 1) << ALIGNMENT_SHIFT)

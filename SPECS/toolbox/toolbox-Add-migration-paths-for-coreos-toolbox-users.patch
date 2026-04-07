@@ -1,0 +1,104 @@
+From 4649e50c28321185cbaa81a37efbd317b84ae840 Mon Sep 17 00:00:00 2001
+From: Debarshi Ray <rishi@fedoraproject.org>
+Date: Wed, 18 Aug 2021 17:55:21 +0200
+Subject: [PATCH 1/2] cmd/run: Make sosreport work by setting the HOST
+ environment variable
+
+https://bugzilla.redhat.com/show_bug.cgi?id=1940037
+---
+ src/cmd/run.go | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/cmd/run.go b/src/cmd/run.go
+index ceb277a3640a..72b673f506b3 100644
+--- a/src/cmd/run.go
++++ b/src/cmd/run.go
+@@ -576,6 +576,7 @@ func constructExecArgs(container, preserveFDs string,
+ 	execArgs = append(execArgs, envOptions...)
+ 
+ 	execArgs = append(execArgs, []string{
++		"--env", "HOST=/run/host",
+ 		"--interactive",
+ 		"--preserve-fds", preserveFDs,
+ 	}...)
+-- 
+2.51.0
+
+
+From b2ba8445bee988143d546bc15fa3a8a8c019aa2e Mon Sep 17 00:00:00 2001
+From: Debarshi Ray <rishi@fedoraproject.org>
+Date: Fri, 10 Dec 2021 13:42:15 +0100
+Subject: [PATCH 2/2] test/system: Update to test the migration path for
+ coreos/toolbox users
+
+This reverts the changes to the tests made in commit
+411147988b730dabf8b9e761a5426e12d648f008 by restoring commit
+ca899c8a561f357ae32c6ba6813520fd8b682abb and the parts of commit
+3aeb7cf288319e35eb9c5e26ea18d97452462c1e that were removed.
+---
+ test/system/002-help.bats | 14 --------------
+ test/system/100-root.bats | 27 +++++++++++++++++++++++++++
+ 2 files changed, 27 insertions(+), 14 deletions(-)
+ create mode 100644 test/system/100-root.bats
+
+diff --git a/test/system/002-help.bats b/test/system/002-help.bats
+index f7cd3f5480ab..7ad5f72e792f 100644
+--- a/test/system/002-help.bats
++++ b/test/system/002-help.bats
+@@ -33,20 +33,6 @@ teardown_file() {
+   cleanup_all
+ }
+ 
+-@test "help: Smoke test" {
+-  run --keep-empty-lines --separate-stderr "$TOOLBX"
+-
+-  assert_failure
+-  assert [ ${#lines[@]} -eq 0 ]
+-  lines=("${stderr_lines[@]}")
+-  assert_line --index 0 "Error: missing command"
+-  assert_line --index 2 "create    Create a new Toolbx container"
+-  assert_line --index 3 "enter     Enter an existing Toolbx container"
+-  assert_line --index 4 "list      List all existing Toolbx containers and images"
+-  assert_line --index 6 "Run 'toolbox --help' for usage."
+-  assert [ ${#stderr_lines[@]} -eq 7 ]
+-}
+-
+ @test "help: Command 'help'" {
+   if ! command -v man 2>/dev/null; then
+     skip "not found man(1)"
+diff --git a/test/system/100-root.bats b/test/system/100-root.bats
+new file mode 100644
+index 000000000000..cf35d60ac25c
+--- /dev/null
++++ b/test/system/100-root.bats
+@@ -0,0 +1,27 @@
++#!/usr/bin/env bats
++
++load 'libs/bats-support/load'
++load 'libs/bats-assert/load'
++load 'libs/helpers'
++
++setup() {
++  _setup_environment
++  cleanup_all
++}
++
++teardown() {
++  cleanup_all
++}
++
++@test "root: Try to enter the default container with no containers created" {
++  run "$TOOLBX" <<< "n"
++
++  assert_success
++  assert_line --index 0 "No toolbox containers found. Create now? [y/N] A container can be created later with the 'create' command."
++  assert_line --index 1 "Run 'toolbox --help' for usage."
++}
++
++# TODO: Write the test
++@test "root: Enter the default container when 1 non-default container is present" {
++  skip "Testing of entering toolboxes is not implemented"
++}
+-- 
+2.51.0
+

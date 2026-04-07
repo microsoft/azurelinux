@@ -1,0 +1,13 @@
+--- lsp-server-0.7.9/Cargo.toml	1970-01-01T00:00:01+00:00
++++ lsp-server-0.7.9/Cargo.toml	2025-08-17T13:03:45.634591+00:00
+@@ -28,10 +28,6 @@
+ [lib]
+ name = "lsp_server"
+ path = "src/lib.rs"
+-
+-[[example]]
+-name = "minimal_lsp"
+-path = "examples/minimal_lsp.rs"
+ 
+ [dependencies.crossbeam-channel]
+ version = "0.5.15"

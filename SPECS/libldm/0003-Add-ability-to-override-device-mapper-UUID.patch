@@ -1,0 +1,395 @@
+From 8023f57e851d6ef42368fa8f5e1f95f40adec57a Mon Sep 17 00:00:00 2001
+From: Takeshi Suzuki <takeshi.suzuki@rubrik.com>
+Date: Thu, 30 May 2024 01:25:39 +0000
+Subject: [PATCH 3/5] Add ability to override device mapper UUID
+
+---
+ docs/reference/ldmtool/ldmtool.xml | 13 ++++-
+ src/Makefile.am                    |  2 +-
+ src/ldm.c                          | 17 +++++-
+ src/ldm.h                          | 16 +++++-
+ src/ldmtool.c                      | 91 +++++++++++++++++++++---------
+ test/Makefile.am                   |  2 +-
+ 6 files changed, 108 insertions(+), 33 deletions(-)
+
+diff --git a/docs/reference/ldmtool/ldmtool.xml b/docs/reference/ldmtool/ldmtool.xml
+index 3d1631b..89049c9 100644
+--- a/docs/reference/ldmtool/ldmtool.xml
++++ b/docs/reference/ldmtool/ldmtool.xml
+@@ -94,6 +94,17 @@
+                 </para>
+             </listitem>
+         </varlistentry>
++        <varlistentry>
++            <term>
++                <option>--uuid_override</option> <replaceable>uuid</replaceable>
++            </term>
++            <listitem>
++                <para>
++                User specified UUID for use with device mapper. This can only be
++                used in single action mode for a single volume.
++                </para>
++            </listitem>
++        </varlistentry>
+     </variablelist>
+ </refsect1>
+ 
+@@ -151,7 +162,7 @@
+ 
+     <refsect2>
+         <title>Single action mode</title>
+-        
++
+         <para>
+         When invoked to run a single action all block devices will be scanned by
+         default. In this case, if any block devices are specified with the
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 06a5d44..2e21b15 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -32,7 +32,7 @@ bin_PROGRAMS = ldmtool
+ ldmtool_CFLAGS = $(AM_CFLAGS) $(GOBJECT_CFLAGS) $(JSON_CFLAGS) \
+ 		 $(GIO_UNIX_CFLAGS)
+ ldmtool_LDADD = -lreadline $(builddir)/$(libname) $(GOBJECT_LIBS) \
+-		$(JSON_LIBS) $(GIO_UNIX_LIBS)
++		$(JSON_LIBS) $(GIO_UNIX_LIBS) $(UUID_LIBS)
+ 
+ # GObject introspection fails. This seems to be because g-ir-scanner incorrectly
+ # guesses the symbol prefix as 'l_dm', although explicitly passing in the
+diff --git a/src/ldm.c b/src/ldm.c
+index 4766bb0..47f393f 100644
+--- a/src/ldm.c
++++ b/src/ldm.c
+@@ -524,6 +524,9 @@ struct _LDMVolumePrivate
+     _int_volume_type _int_type;
+     guint32 _n_comps;
+     guint32 _n_comps_i;
++
++    /* User specified UUID for device mapper */
++    uuid_t uuid_override;
+ };
+ 
+ G_DEFINE_TYPE_WITH_PRIVATE(LDMVolume, ldm_volume, G_TYPE_OBJECT)
+@@ -2441,7 +2444,11 @@ static GString *
+ _dm_vol_uuid(const LDMVolumePrivate * const vol)
+ {
+     char ldm_vol_uuid[37];
+-    uuid_unparse_lower(vol->guid, ldm_vol_uuid);
++    if (!uuid_is_null(vol->uuid_override)) {
++        uuid_unparse_lower(vol->uuid_override, ldm_vol_uuid);
++    } else {
++        uuid_unparse_lower(vol->guid, ldm_vol_uuid);
++    }
+ 
+     GString * dm_uuid = g_string_new("");
+     g_string_printf(dm_uuid, "%s%s-%s",
+@@ -3154,7 +3161,7 @@ ldm_volume_dm_create(const LDMVolume * const o, GString **created,
+     }
+ 
+     gboolean r = name != NULL;
+-    
++
+     if (created)
+         *created = name;
+     else if (name)
+@@ -3218,3 +3225,9 @@ out:
+ 
+     return r;
+ }
++
++void ldm_volume_override_uuid(LDMVolume * const o,
++                              const uuid_t uuid_override) {
++    LDMVolumePrivate * const vol = o->priv;
++    uuid_copy(vol->uuid_override, uuid_override);
++}
+diff --git a/src/ldm.h b/src/ldm.h
+index fd615b4..87fff7b 100644
+--- a/src/ldm.h
++++ b/src/ldm.h
+@@ -18,6 +18,8 @@
+ #ifndef LIBLDM_LDM_H__
+ #define LIBLDM_LDM_H__
+ 
++#include <uuid/uuid.h>
++
+ #include <glib-object.h>
+ 
+ G_BEGIN_DECLS
+@@ -259,7 +261,7 @@ LDM *ldm_new();
+ /**
+  * ldm_add:
+  * @o: An #LDM object
+- * @path: The path of the device 
++ * @path: The path of the device
+  * @err: A #GError to receive any generated errors
+  *
+  * Scan device @path and add its metadata to LDM object @o.
+@@ -303,7 +305,7 @@ GArray *ldm_get_disk_groups(LDM *o);
+  *
+  * Returns: (element-type LDMVolume)(transfer container):
+  *      An array of volumes
+- */ 
++ */
+ GArray *ldm_disk_group_get_volumes(LDMDiskGroup *o);
+ 
+ /**
+@@ -497,6 +499,16 @@ gboolean ldm_volume_dm_create(const LDMVolume *o, GString **created,
+ gboolean ldm_volume_dm_remove(const LDMVolume *o, GString **removed,
+                               GError **err);
+ 
++/**
++ * ldm_volume_override_uuid:
++ * @o: An #LDMVolume
++ * @uuid_override: User specified UUID for device mapper
++ *
++ * Set the UUID used for device mapper. If no override is set, the volume's
++ * GUID will be used.
++ */
++void ldm_volume_override_uuid(LDMVolume * const o, const uuid_t uuid_override);
++
+ /**
+  * ldm_partition_get_disk:
+  * @o: An #LDMPartition
+diff --git a/src/ldmtool.c b/src/ldmtool.c
+index dbe2c8c..7ccd072 100644
+--- a/src/ldmtool.c
++++ b/src/ldmtool.c
+@@ -25,6 +25,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
++#include <uuid/uuid.h>
+ #include <wordexp.h>
+ 
+ #include <glib-object.h>
+@@ -74,13 +75,22 @@ gboolean usage_remove(void)
+     return FALSE;
+ }
+ 
+-typedef gboolean (*_action_t) (LDM *ldm, gint argc, gchar **argv,
+-                               JsonBuilder *jb);
++typedef struct {
++    /* User specified UUID for device mapper */
++    uuid_t uuid_override;
++} _options_t;
+ 
+-gboolean ldm_scan(LDM *ldm, gint argc, gchar **argv, JsonBuilder *jb);
+-gboolean ldm_show(LDM *ldm, gint argc, gchar **argv, JsonBuilder *jb);
+-gboolean ldm_create(LDM *ldm, gint argc, gchar **argv, JsonBuilder *jb);
+-gboolean ldm_remove(LDM *ldm, gint argc, gchar **argv, JsonBuilder *jb);
++typedef gboolean (*_action_t) (LDM *ldm, const _options_t * const opts,
++                               gint argc, gchar **argv, JsonBuilder *jb);
++
++gboolean ldm_scan(LDM *ldm, const _options_t * const opts, gint argc,
++                  gchar **argv, JsonBuilder *jb);
++gboolean ldm_show(LDM *ldm, const _options_t * const opts, gint argc,
++                  gchar **argv, JsonBuilder *jb);
++gboolean ldm_create(LDM *ldm, const _options_t * const opts, gint argc,
++                    gchar **argv, JsonBuilder *jb);
++gboolean ldm_remove(LDM *ldm, const _options_t * const opts, gint argc,
++                    gchar **argv, JsonBuilder *jb);
+ 
+ typedef struct {
+     const char * name;
+@@ -96,14 +106,15 @@ static const _command_t commands[] = {
+ };
+ 
+ gboolean
+-do_command(LDM * const ldm, const int argc, char *argv[], gboolean *result,
++do_command(LDM * const ldm, const _options_t * const opts,
++           const int argc, char *argv[], gboolean *result,
+            GOutputStream * const out,
+            JsonGenerator * const jg, JsonBuilder * const jb)
+ {
+     const _command_t *i = commands;
+     while (i->name) {
+         if (g_strcmp0(i->name, argv[0]) == 0) {
+-            if ((i->action)(ldm, argc - 1, argv + 1, jb)) {
++            if ((i->action)(ldm, opts, argc - 1, argv + 1, jb)) {
+                 GError *err = NULL;
+                 json_generator_set_root(jg, json_builder_get_root(jb));
+                 if (!json_generator_to_stream(jg, out, NULL, &err)) {
+@@ -174,8 +185,8 @@ _scan(LDM *const ldm, gboolean ignore_errors,
+ }
+ 
+ gboolean
+-ldm_scan(LDM *const ldm, const gint argc, gchar ** const argv,
+-         JsonBuilder * const jb)
++ldm_scan(LDM *const ldm, const _options_t * const opts, const gint argc,
++         gchar ** const argv, JsonBuilder * const jb)
+ {
+     return _scan(ldm, FALSE, argc, argv, jb);
+ }
+@@ -477,8 +488,8 @@ show_disk(LDM *const ldm, const gint argc, gchar ** const argv,
+ }
+ 
+ gboolean
+-ldm_show(LDM *const ldm, const gint argc, gchar ** const argv,
+-         JsonBuilder * const jb)
++ldm_show(LDM *const ldm, const _options_t * const opts, const gint argc,
++         gchar ** const argv, JsonBuilder * const jb)
+ {
+     if (argc == 0) return usage_show();
+ 
+@@ -499,8 +510,8 @@ typedef gboolean (*_usage_t)();
+ typedef gboolean (*_vol_action_t)(const LDMVolume *, GString **, GError **);
+ 
+ static gboolean
+-_ldm_vol_action(LDM *const ldm, const gint argc, gchar ** const argv,
+-                JsonBuilder * const jb,
++_ldm_vol_action(LDM *const ldm, const _options_t * const opts, const gint argc,
++                gchar ** const argv, JsonBuilder * const jb,
+                 const gchar * const action_desc,
+                 _usage_t const usage, _vol_action_t const action)
+ {
+@@ -509,6 +520,11 @@ _ldm_vol_action(LDM *const ldm, const gint argc, gchar ** const argv,
+     if (argc == 1) {
+         if (g_strcmp0(argv[0], "all") != 0) return (*usage)();
+ 
++        if (!uuid_is_null(opts->uuid_override)) {
++            g_warning("UUID override cannot be used for multiple volumes");
++            return FALSE;
++        }
++
+         GArray *dgs = ldm_get_disk_groups(ldm);
+         for (guint i = 0; i < dgs->len; i++) {
+             LDMDiskGroup * const dg = g_array_index(dgs, LDMDiskGroup *, i);
+@@ -567,6 +583,10 @@ _ldm_vol_action(LDM *const ldm, const gint argc, gchar ** const argv,
+             return FALSE;
+         }
+ 
++        if (!uuid_is_null(opts->uuid_override)) {
++            ldm_volume_override_uuid(vol, opts->uuid_override);
++        }
++
+         GError *err = NULL;
+         GString *device = NULL;
+         if (!(*action)(vol, &device, &err)) {
+@@ -592,25 +612,30 @@ _ldm_vol_action(LDM *const ldm, const gint argc, gchar ** const argv,
+ }
+ 
+ gboolean
+-ldm_create(LDM *const ldm, const gint argc, gchar ** const argv,
+-           JsonBuilder * const jb)
++ldm_create(LDM *const ldm, const _options_t * const opts, const gint argc,
++           gchar ** const argv, JsonBuilder * const jb)
+ {
+-    return _ldm_vol_action(ldm, argc, argv, jb,
++    return _ldm_vol_action(ldm, opts, argc, argv, jb,
+                            "create", usage_create, ldm_volume_dm_create);
+ }
+ 
+ gboolean
+-ldm_remove(LDM *const ldm, const gint argc, gchar ** const argv,
+-           JsonBuilder * const jb)
++ldm_remove(LDM *const ldm, const _options_t * const opts, const gint argc,
++           gchar ** const argv, JsonBuilder * const jb)
+ {
+-    return _ldm_vol_action(ldm, argc, argv, jb,
++    return _ldm_vol_action(ldm, opts, argc, argv, jb,
+                            "remove", usage_remove, ldm_volume_dm_remove);
+ }
+ 
+ gboolean
+-shell(LDM * const ldm, gchar ** const devices,
++shell(LDM * const ldm, const _options_t * const opts, gchar ** const devices,
+       JsonGenerator * const jg, GOutputStream * const out)
+ {
++    if (!uuid_is_null(opts->uuid_override)) {
++        g_warning("UUID override cannot be used in shell mode");
++        return FALSE;
++    }
++
+     int history_len = 0;
+ 
+     rl_readline_name = "ldmtool";
+@@ -659,7 +684,7 @@ shell(LDM * const ldm, gchar ** const devices,
+         free(line);
+ 
+         gboolean result = FALSE;
+-        if (!do_command(ldm, argc, argv, &result, out, jg, jb)) {
++        if (!do_command(ldm, opts, argc, argv, &result, out, jg, jb)) {
+             if (g_strcmp0("quit", argv[0]) == 0 ||
+                 g_strcmp0("exit", argv[0]) == 0)
+             {
+@@ -739,7 +764,7 @@ get_devices(void)
+ }
+ 
+ gboolean
+-cmdline(LDM * const ldm, gchar **devices,
++cmdline(LDM * const ldm, const _options_t * const opts, gchar **devices,
+         JsonGenerator * const jg, GOutputStream * const out,
+         const int argc, char *argv[])
+ {
+@@ -757,7 +782,7 @@ cmdline(LDM * const ldm, gchar **devices,
+ 
+     jb = json_builder_new();
+     gboolean result;
+-    if (!do_command(ldm, argc, argv, &result, out, jg, jb)) {
++    if (!do_command(ldm, opts, argc, argv, &result, out, jg, jb)) {
+         g_warning("Unrecognised command: %s", argv[0]);
+         goto error;
+     }
+@@ -789,11 +814,14 @@ int
+ main(int argc, char *argv[])
+ {
+     static gchar **devices = NULL;
++    static gchar *uuid_override_str = NULL;
+ 
+     static const GOptionEntry entries[] =
+     {
+         { "device", 'd', 0, G_OPTION_ARG_FILENAME_ARRAY,
+           &devices, "Block device to scan for LDM metadata", NULL },
++        { "uuid_override", 0, 0, G_OPTION_ARG_STRING,
++          &uuid_override_str, "UUID override for device mapper", NULL },
+         { NULL }
+     };
+ 
+@@ -813,6 +841,17 @@ main(int argc, char *argv[])
+     }
+     g_option_context_free(context);
+ 
++    _options_t opts;
++    uuid_clear(opts.uuid_override);
++    if (uuid_override_str) {
++        if (uuid_parse(uuid_override_str, opts.uuid_override)) {
++            g_warning("Failed to parse %s as a UUID", uuid_override_str);
++            return 1;
++        }
++        g_free(uuid_override_str);
++        uuid_override_str = NULL;
++    }
++
+ #if !GLIB_CHECK_VERSION(2,35,0)
+     g_type_init();
+ #endif
+@@ -828,11 +867,11 @@ main(int argc, char *argv[])
+     json_generator_set_indent(jg, 2);
+ 
+     if (argc > 1) {
+-        if (!cmdline(ldm, devices, jg, out, argc - 1, argv + 1)) {
++        if (!cmdline(ldm, &opts, devices, jg, out, argc - 1, argv + 1)) {
+             ret = 1;
+         }
+     } else {
+-        if (!shell(ldm, devices, jg, out)) {
++        if (!shell(ldm, &opts, devices, jg, out)) {
+             ret = 1;
+         }
+     }
+diff --git a/test/Makefile.am b/test/Makefile.am
+index 423034f..ec80394 100644
+--- a/test/Makefile.am
++++ b/test/Makefile.am
+@@ -21,7 +21,7 @@ EXTRA_DIST = checkmount.pl data/ldm-data.tar.xz
+ check_PROGRAMS = partread ldmread
+ 
+ partread_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)/src
+-partread_LDADD = $(top_builddir)/src/libldm-1.0.la
++partread_LDADD = $(top_builddir)/src/libldm-1.0.la $(UUID_LIBS)
+ 
+ ldmread_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)/src $(GOBJECT_CFLAGS)
+ ldmread_LDADD = $(top_builddir)/src/libldm-1.0.la $(GOBJECT_LIBS)
+-- 
+2.48.1
+

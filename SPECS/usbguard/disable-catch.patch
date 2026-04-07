@@ -1,0 +1,153 @@
+diff --git a/configure.ac b/configure.ac
+index 617d3bcf..56bbe9e3 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -386,27 +386,38 @@ fi
+ #
+ # Catch C++ library
+ #
++AC_ARG_ENABLE([catch],
++  [AS_HELP_STRING([--enable-catch], [Enable Catch testing framework support (default=yes)])],
++  [enable_catch=$enableval], [enable_catch=yes])
++
+ AC_ARG_WITH([bundled-catch], AS_HELP_STRING([--with-bundled-catch], [Build using the bundled Catch library]), [with_bundled_catch=$withval], [with_bundled_catch=no])
+-if test "x$with_bundled_catch" = xyes; then
+-	catch_CFLAGS="-I\$(top_srcdir)/src/ThirdParty/Catch/single_include/catch2"
+-	catch_LIBS=""
+-	AC_MSG_NOTICE([Using bundled Catch library])
+-	catch_summary="bundled; $catch_CFLAGS $catch_LIBS"
++
++if test "x$enable_catch" = xyes; then
++  if test "x$with_bundled_catch" = xyes; then
++    catch_CFLAGS="-I\$(top_srcdir)/src/ThirdParty/Catch/single_include/catch2"
++    catch_LIBS=""
++    AC_MSG_NOTICE([Using bundled Catch library])
++    catch_summary="bundled; $catch_CFLAGS $catch_LIBS"
++  else
++    SAVE_CPPFLAGS=$CPPFLAGS
++    CPPFLAGS="-std=c++17 $CPPFLAGS -I/usr/include/catch2"
++    AC_LANG_PUSH([C++])
++    AC_CHECK_HEADER([catch_test_macros.hpp],
++    [catch_CFLAGS="-I/usr/include/catch2 -DHAVE_CATCH2_V3"
++    catch_LIBS="-lCatch2Main -lCatch2"],
++    [AC_CHECK_HEADER([catch.hpp],
++    [catch_CFLAGS="-I/usr/include/catch2"
++    catch_LIBS=""],
++    [AC_MSG_FAILURE(Catch2 not found or not usable. Re-run with --with-bundled-catch to use the bundled library.)]
++    )])
++    AC_LANG_POP
++    CPPFLAGS=$SAVE_CPPFLAGS
++    catch_summary="system-wide; $catch_CFLAGS $catch_LIBS"
++  fi
+ else
+-	SAVE_CPPFLAGS=$CPPFLAGS
+-	CPPFLAGS="-std=c++17 $CPPFLAGS -I/usr/include/catch2"
+-	AC_LANG_PUSH([C++])
+-	AC_CHECK_HEADER([catch_test_macros.hpp],
+-	[catch_CFLAGS="-I/usr/include/catch2 -DHAVE_CATCH2_V3"
+-	catch_LIBS="-lCatch2Main -lCatch2"],
+-        [AC_CHECK_HEADER([catch.hpp],
+-	[catch_CFLAGS="-I/usr/include/catch2"
+-	catch_LIBS=""],
+-        [AC_MSG_FAILURE(Catch2 not found or not usable. Re-run with --with-bundled-catch to use the bundled library.)]
+-        )])
+-	AC_LANG_POP
+-	CPPFLAGS=$SAVE_CPPFLAGS
+-	catch_summary="system-wide; $catch_CFLAGS $catch_LIBS"
++  catch_CFLAGS=""
++  catch_LIBS=""
++  catch_summary="disabled; not checking for Catch2"
+ fi
+ AC_SUBST([catch_CFLAGS])
+ AC_SUBST([catch_LIBS])
+@@ -798,6 +809,7 @@ AM_CONDITIONAL([POLICYKIT_ENABLED], [test "x$with_polkit" = xyes])
+ AM_CONDITIONAL([FULL_TEST_SUITE_ENABLED], [test "x$full_test_suite" = xyes])
+ AM_CONDITIONAL([WITH_LDAP], [test "x$with_ldap" = xyes])
+ AM_CONDITIONAL([BASH_COMPLETION_ENABLED], [test "x$bash_completion" != xno])
++AM_CONDITIONAL([CATCH_ENABLED], [test "x$enable_catch" = xyes ])
+ 
+ CXXFLAGS="$CXXFLAGS -fvisibility=hidden $COMMON_WARNING_FLAGS $WARNING_CXXFLAGS"
+ CFLAGS="$CFLAGS -fvisibility=hidden $COMMON_WARNING_FLAGS $WARNING_CFLAGS"
+diff --git a/src/Common/Utility.cpp b/src/Common/Utility.cpp
+index b84d2480..aa504bc9 100644
+--- a/src/Common/Utility.cpp
++++ b/src/Common/Utility.cpp
+@@ -583,7 +583,8 @@ namespace usbguard
+     return true;
+   }
+ 
+-  bool isValidNameOrUID(const std::string& input) {
++  bool isValidNameOrUID(const std::string& input)
++  {
+     return isValidName(input) || isValidUID(input);
+   }
+ 
+diff --git a/src/Library/public/usbguard/IPCServer.cpp b/src/Library/public/usbguard/IPCServer.cpp
+index b75df136..555d113e 100644
+--- a/src/Library/public/usbguard/IPCServer.cpp
++++ b/src/Library/public/usbguard/IPCServer.cpp
+@@ -36,7 +36,7 @@ namespace usbguard
+       throw Exception("IPC access control", "name too long", name);
+     }
+ 
+-	if (!isValidNameOrUID(name)) {
++    if (!isValidNameOrUID(name)) {
+       throw Exception("IPC access control", "invalid name or UID format", name);
+     }
+   }
+diff --git a/src/Tests/Makefile.am b/src/Tests/Makefile.am
+index 2efbb509..435a4264 100644
+--- a/src/Tests/Makefile.am
++++ b/src/Tests/Makefile.am
+@@ -74,11 +74,15 @@ TESTS_ENVIRONMENT=\
+ 
+ 
+ TESTS=\
+-	test-unit \
+-	test-regression \
+ 	USB/test-descriptor-parser.sh \
+ 	Rules/test-rules.sh
+ 
++if CATCH_ENABLED
++TESTS+=\
++	test-unit \
++	test-regression
++endif
++
+ if FULL_TEST_SUITE_ENABLED
+ TESTS+=\
+ 	Source/check-driver.sh \
+@@ -101,10 +105,15 @@ TESTS+=\
+ 
+ endif
+ 
+-check_PROGRAMS=\
++check_PROGRAMS=
++
++if CATCH_ENABLED
++check_PROGRAMS+=\
+ 	test-unit \
+ 	test-regression
++endif
+ 
++if CATCH_ENABLED
+ test_unit_SOURCES=\
+ 	main.cpp \
+ 	Unit/test_Rule.cpp \
+@@ -128,7 +137,9 @@ test_unit_LDADD=\
+ 
+ test_unit_LDFLAGS=\
+ 	-static
++endif
+ 
++if CATCH_ENABLED
+ test_regression_SOURCES=\
+ 	main.cpp \
+ 	Regression/test_Rule_ghi37.cpp \
+@@ -143,4 +154,4 @@ test_regression_LDADD=\
+ 	$(top_builddir)/libusbguard.la \
+ 	$(catch_LIBS) \
+ 	$(PTHREAD_LIBS)
+-
++endif
+\ No newline at end of file

@@ -1,0 +1,26 @@
+From: Lon Hohberger <lhh@redhat.com>
+Date: Tue, 29 Jan 2019 11:36:11 -0500
+Subject: [PATCH] force python3
+
+Signed-off-by: Lon Hohberger <lhh@redhat.com>
+
+diff --git a/deps/amqp10_common/codegen.py b/deps/amqp10_common/codegen.py
+index dc4480a181..cf93227177 100755
+--- a/deps/amqp10_common/codegen.py
++++ b/deps/amqp10_common/codegen.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/python3
+ 
+ from __future__ import print_function
+ 
+diff --git a/deps/rabbit_common/codegen.py b/deps/rabbit_common/codegen.py
+index 2e7bad69e9..8a02fcbb31 100755
+--- a/deps/rabbit_common/codegen.py
++++ b/deps/rabbit_common/codegen.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/python3
+ 
+ ##  This Source Code Form is subject to the terms of the Mozilla Public
+ ##  License, v. 2.0. If a copy of the MPL was not distributed with this

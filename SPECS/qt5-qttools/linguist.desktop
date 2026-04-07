@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Qt5 Linguist
+GenericName=Translation tool
+Comment=Add translations to Qt5 applications
+Exec=linguist-qt5
+Icon=linguist-qt5
+MimeType=text/vnd.trolltech.linguist;application/x-linguist;
+Terminal=false
+Type=Application
+Categories=Qt;Development;

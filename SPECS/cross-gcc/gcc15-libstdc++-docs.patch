@@ -1,0 +1,24 @@
+--- libstdc++-v3/doc/html/index.html.jj	2011-01-03 12:53:21.282829010 +0100
++++ libstdc++-v3/doc/html/index.html	2011-01-04 18:06:28.999851145 +0100
+@@ -5,6 +5,8 @@
+       <a class="link" href="https://www.fsf.org" target="_top">FSF
+       </a>
+     </p><p>
++      Release 15.2.1
++    </p><p>
+       Permission is granted to copy, distribute and/or modify this
+       document under the terms of the GNU Free Documentation
+       License, Version 1.2 or any later version published by the
+--- libstdc++-v3/doc/html/api.html.jj	2011-01-03 12:53:21.000000000 +0100
++++ libstdc++-v3/doc/html/api.html	2024-11-30 13:30:16.607594623 +0100
+@@ -20,7 +20,9 @@
+   member functions for the library classes, finding out what is in a
+   particular include file, looking at inheritance diagrams, etc.
+ </p><p>
+-  The API documentation, rendered into HTML, can be viewed online
++  The API documentation, rendered into HTML, can be viewed locally
++  <a class="link" href="api/index.html" target="_top">for the 15.2.1 release</a>,
++  online
+   <a class="link" href="https://gcc.gnu.org/onlinedocs/" target="_top">for each GCC release</a>
+   and
+   <a class="link" href="https://gcc.gnu.org/onlinedocs/libstdc++/latest-doxygen/index.html" target="_top">

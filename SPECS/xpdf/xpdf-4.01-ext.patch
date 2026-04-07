@@ -1,0 +1,37 @@
+diff -up xpdf-4.01/goo/gfile.cc.ext xpdf-4.01/goo/gfile.cc
+--- xpdf-4.01/goo/gfile.cc.ext	2019-02-18 13:24:19.000000000 -0500
++++ xpdf-4.01/goo/gfile.cc	2019-02-22 09:33:17.023259251 -0500
+@@ -473,24 +473,6 @@ GBool openTempFile(GString **name, FILE
+   char *s;
+   int fd;
+ 
+-  if (ext) {
+-#if HAVE_MKSTEMPS
+-    if ((s = getenv("TMPDIR"))) {
+-      *name = new GString(s);
+-    } else {
+-      *name = new GString("/tmp");
+-    }
+-    (*name)->append("/XXXXXX")->append(ext);
+-    fd = mkstemps((*name)->getCString(), (int)strlen(ext));
+-#else
+-    if (!(s = tmpnam(NULL))) {
+-      return gFalse;
+-    }
+-    *name = new GString(s);
+-    (*name)->append(ext);
+-    fd = open((*name)->getCString(), O_WRONLY | O_CREAT | O_EXCL, 0600);
+-#endif
+-  } else {
+ #if HAVE_MKSTEMP
+     if ((s = getenv("TMPDIR"))) {
+       *name = new GString(s);
+@@ -506,7 +488,7 @@ GBool openTempFile(GString **name, FILE
+     *name = new GString(s);
+     fd = open((*name)->getCString(), O_WRONLY | O_CREAT | O_EXCL, 0600);
+ #endif // HAVE_MKSTEMP
+-  }
++
+   if (fd < 0 || !(*f = fdopen(fd, mode))) {
+     delete *name;
+     *name = NULL;

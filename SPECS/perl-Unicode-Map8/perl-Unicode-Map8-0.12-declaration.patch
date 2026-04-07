@@ -1,0 +1,11 @@
+--- map8.h
++++ map8.h
+@@ -81,7 +81,7 @@
+ 
+ U16*  map8_to_str16(Map8*, U8*, U16*, int, int*);
+ U8*   map8_to_str8 (Map8*, U16*, U8*, int, int*);
+-U8*   map8_recode_8(Map8*, Map8*, U8*, U8*, int, int*);
++U8*   map8_recode8 (Map8*, Map8*, U8*, U8*, int, int*);
+ 
+ int   map8_empty_block(Map8*, U8);
+ 

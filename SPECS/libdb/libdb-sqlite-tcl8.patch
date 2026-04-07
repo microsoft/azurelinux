@@ -1,0 +1,12 @@
+diff -up ./lang/sql/sqlite/Makefile.in.orig ./lang/sql/sqlite/Makefile.in
+--- ./lang/sql/sqlite/Makefile.in.orig	2013-09-09 11:35:05.000000000 -0400
++++ ./lang/sql/sqlite/Makefile.in	2025-03-05 07:40:54.156535196 -0500
+@@ -803,7 +803,7 @@ parse.c:	$(TOP)/src/parse.y lemon$(BEXE)
+ 	$(NAWK) -f $(TOP)/addopcodes.awk parse.h.temp >parse.h
+ 
+ sqlite3.h:	$(TOP)/src/sqlite.h.in $(TOP)/manifest.uuid $(TOP)/VERSION
+-	tclsh $(TOP)/tool/mksqlite3h.tcl $(TOP) >sqlite3.h
++	$(TCLSH_CMD) $(TOP)/tool/mksqlite3h.tcl $(TOP) >sqlite3.h
+ 
+ keywordhash.h:	$(TOP)/tool/mkkeywordhash.c
+ 	$(BCC) -o mkkeywordhash$(BEXE) $(OPT_FEATURE_FLAGS) $(OPTS) $(TOP)/tool/mkkeywordhash.c

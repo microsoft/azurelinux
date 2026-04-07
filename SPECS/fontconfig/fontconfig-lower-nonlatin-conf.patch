@@ -1,0 +1,42 @@
+diff -pruN fontconfig-2.16.0.orig/conf.d/Makefile.am fontconfig-2.16.0/conf.d/Makefile.am
+--- fontconfig-2.16.0.orig/conf.d/Makefile.am	2025-01-18 00:15:05.000000000 +0900
++++ fontconfig-2.16.0/conf.d/Makefile.am	2025-01-18 00:38:32.245398277 +0900
+@@ -47,7 +47,7 @@ CONF_LINKS = \
+ 	60-generic.conf \
+ 	60-latin.conf \
+ 	65-fonts-persian.conf \
+-	65-nonlatin.conf \
++	69-nonlatin.conf \
+ 	69-unifont.conf \
+ 	80-delicious.conf \
+ 	90-synthetic.conf
+@@ -95,7 +95,7 @@ template_DATA =				\
+ 	60-latin.conf			\
+ 	65-fonts-persian.conf		\
+ 	65-khmer.conf			\
+-	65-nonlatin.conf		\
++	69-nonlatin.conf		\
+ 	69-unifont.conf			\
+ 	70-no-bitmaps.conf		\
+ 	70-no-bitmaps-and-emoji.conf	\
+diff -pruN fontconfig-2.16.0.orig/conf.d/meson.build fontconfig-2.16.0/conf.d/meson.build
+--- fontconfig-2.16.0.orig/conf.d/meson.build	2025-01-18 00:15:05.000000000 +0900
++++ fontconfig-2.16.0/conf.d/meson.build	2025-01-18 00:38:43.243595743 +0900
+@@ -33,7 +33,7 @@ conf_files = [
+   '60-latin.conf',
+   '65-fonts-persian.conf',
+   '65-khmer.conf',
+-  '65-nonlatin.conf',
++  '69-nonlatin.conf',
+   '69-unifont.conf',
+   '70-no-bitmaps.conf',
+   '70-no-bitmaps-and-emoji.conf',
+@@ -64,7 +64,7 @@ conf_links = [
+   '60-generic.conf',
+   '60-latin.conf',
+   '65-fonts-persian.conf',
+-  '65-nonlatin.conf',
++  '69-nonlatin.conf',
+   '69-unifont.conf',
+   '80-delicious.conf',
+   '90-synthetic.conf',

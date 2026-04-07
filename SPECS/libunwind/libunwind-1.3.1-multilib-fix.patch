@@ -1,0 +1,22 @@
+diff -up libunwind-1.3.1/include/libunwind.h.in.multilibfix libunwind-1.3.1/include/libunwind.h.in
+--- libunwind-1.3.1/include/libunwind.h.in.multilibfix	2020-08-13 10:06:03.275601460 -0400
++++ libunwind-1.3.1/include/libunwind.h.in	2020-08-13 10:06:29.579522623 -0400
+@@ -1,8 +1,6 @@
+ /* Provide a real file - not a symlink - as it would cause multiarch conflicts
+    when multiple different arch releases are installed simultaneously.  */
+ 
+-#ifndef UNW_REMOTE_ONLY
+-
+ #if defined __aarch64__
+ #include "libunwind-aarch64.h"
+ #elif defined __arm__
+@@ -28,9 +26,3 @@
+ #else
+ # error "Unsupported arch"
+ #endif
+-
+-#else /* UNW_REMOTE_ONLY */
+-
+-# include "libunwind-@arch@.h"
+-
+-#endif /* UNW_REMOTE_ONLY */

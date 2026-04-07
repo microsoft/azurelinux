@@ -1,0 +1,12 @@
+diff -up unzip60/zipinfo.c.attribs-overflow unzip60/zipinfo.c
+--- unzip60/zipinfo.c.attribs-overflow	2009-11-30 09:55:39.000000000 +0100
++++ unzip60/zipinfo.c	2009-11-30 09:56:42.844263244 +0100
+@@ -1881,7 +1881,7 @@ static int zi_short(__G)   /* return PK-
+ #endif
+     int         k, error, error_in_archive=PK_COOL;
+     unsigned    hostnum, hostver, methid, methnum, xattr;
+-    char        *p, workspace[12], attribs[16];
++    char        *p, workspace[12], attribs[17];
+     char        methbuf[5];
+     static ZCONST char dtype[5]="NXFS"; /* normal, maximum, fast, superfast */
+     static ZCONST char Far os[NUM_HOSTS+1][4] = {

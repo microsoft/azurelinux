@@ -1,0 +1,19 @@
+commit 018a4255624928fb7d951f1d1c89196fe77e8267
+Author: Cosimo Cecchi <cosimoc@gnome.org>
+Date:   Mon Feb 18 19:37:20 2013 -0500
+
+    immodule: fix a GCC warning
+
+diff --git a/gtk/gtkimmodule.c b/gtk/gtkimmodule.c
+index 1fcb17a7d87f197c..445b2be87f57742f 100644
+--- a/gtk/gtkimmodule.c
++++ b/gtk/gtkimmodule.c
+@@ -662,7 +662,7 @@ lookup_immodule (gchar **immodules_list)
+ 	  gboolean found;
+ 	  gchar *context_id;
+ 	  found = g_hash_table_lookup_extended (contexts_hash, *immodules_list,
+-						&context_id, NULL);
++						(gpointer *) &context_id, NULL);
+ 	  if (found)
+ 	    return context_id;
+ 	}

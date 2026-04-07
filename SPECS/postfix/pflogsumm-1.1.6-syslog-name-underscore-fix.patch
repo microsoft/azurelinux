@@ -1,0 +1,18 @@
+diff --git a/pflogsumm b/pflogsumm
+index cb3b8a9..35309f0 100755
+--- a/pflogsumm
++++ b/pflogsumm
+@@ -503,7 +503,12 @@ $usageMsg =
+ # Accept either "_"s or "-"s in --switches
+ foreach (@ARGV) {
+     last if($_ eq "--");
+-    tr/_/-/ if(/^--\w/);
++    if (/^--\w/)
++    {
++        my @argspl = split("=", $_, 2);
++        $argspl[0] =~ tr/_/-/;
++        $_ = join("=", @argspl);
++    }
+ }
+ 
+ # Some pre-inits for convenience

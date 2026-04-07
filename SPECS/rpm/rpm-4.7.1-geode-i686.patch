@@ -1,0 +1,14 @@
+diff --git a/rpmrc.in b/rpmrc.in
+index 4a6cca9..d62ddaf 100644
+--- a/rpmrc.in
++++ b/rpmrc.in
+@@ -281,7 +281,7 @@ arch_compat: alphaev5: alpha
+ arch_compat: alpha: axp noarch
+ 
+ arch_compat: athlon: i686
+-arch_compat: geode: i586
++arch_compat: geode: i686
+ arch_compat: pentium4: pentium3
+ arch_compat: pentium3: i686
+ arch_compat: i686: i586
+

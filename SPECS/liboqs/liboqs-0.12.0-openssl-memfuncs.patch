@@ -1,0 +1,278 @@
+From 21b0a7f55c495913b856cb4188de18c89aec7ee8 Mon Sep 17 00:00:00 2001
+From: Daiki Ueno <dueno@redhat.com>
+Date: Wed, 15 Jan 2025 15:11:30 +0900
+Subject: [PATCH 1/2] Do not assume OpenSSL memory functions when libcrypto is
+ dlopened
+
+Otherwise, when the OQS_DLOPEN_OPENSSL is defined but OpenSSL is
+used only partially, e.g., with OQS_USE_SHA3_OPENSSL=ON, there will be
+some unresolved symbols in the final artifact:
+
+```
+$ cmake -GNinja -DBUILD_SHARED_LIBS=ON -DOQS_USE_AES_OPENSSL=ON -DOQS_USE_AES_INSTRUCTIONS=OFF -DOQS_DIST_BUILD=ON -DOQS_USE_SHA3_OPENSSL=ON -DOQS_DLOPEN_OPENSSL=ON -DCMAKE_BUILD_TYPE=Debug -LAH ..
+$ ninja
+$ nm -g lib/liboqs.so.0.12.1-dev | grep '^[[:space:]]*U '
+                 U __assert_fail@GLIBC_2.2.5
+                 U CRYPTO_free
+                 U CRYPTO_malloc
+                 U dlopen@GLIBC_2.34
+                 U dlsym@GLIBC_2.34
+```
+
+Signed-off-by: Daiki Ueno <dueno@redhat.com>
+---
+ src/common/common.c | 2 +-
+ src/common/common.h | 3 +--
+ 2 files changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/src/common/common.c b/src/common/common.c
+index 795f3f97..6cfa0814 100644
+--- a/src/common/common.c
++++ b/src/common/common.c
+@@ -299,7 +299,7 @@ OQS_API void OQS_MEM_secure_free(void *ptr, size_t len) {
+ }
+ 
+ OQS_API void OQS_MEM_insecure_free(void *ptr) {
+-#if (defined(OQS_USE_OPENSSL) || defined(OQS_DLOPEN_OPENSSL)) && defined(OPENSSL_VERSION_NUMBER)
++#if defined(OQS_USE_OPENSSL) && defined(OPENSSL_VERSION_NUMBER)
+ 	OPENSSL_free(ptr);
+ #else
+ 	free(ptr); // IGNORE memory-check
+diff --git a/src/common/common.h b/src/common/common.h
+index e264db71..aebb1c20 100644
+--- a/src/common/common.h
++++ b/src/common/common.h
+@@ -26,8 +26,7 @@ extern "C" {
+  * using OpenSSL functions when OQS_USE_OPENSSL is defined, and
+  * standard C library functions otherwise.
+  */
+-#if (defined(OQS_USE_OPENSSL) || defined(OQS_DLOPEN_OPENSSL)) &&               \
+-    defined(OPENSSL_VERSION_NUMBER)
++#if defined(OQS_USE_OPENSSL) && defined(OPENSSL_VERSION_NUMBER)
+ #include <openssl/crypto.h>
+ 
+ /**
+-- 
+2.47.1
+
+
+From 185ea28636d14b97638404f53dea5b77d5dbe2f4 Mon Sep 17 00:00:00 2001
+From: Daiki Ueno <dueno@redhat.com>
+Date: Wed, 15 Jan 2025 16:28:59 +0900
+Subject: [PATCH 2/2] Wrap OpenSSL memory functions with OSSL_FUNC
+
+This enables those OpenSSL memory functions can be either resolved at
+build time or at run-time through dlopen. Note that we use CRYPTO_*
+functions instead of OPENSSL_* as the latter are defined as a macro
+and cannot be dynamically resolved.
+
+Signed-off-by: Daiki Ueno <dueno@redhat.com>
+---
+ src/common/common.c         | 33 ++++++++++++--
+ src/common/common.h         | 85 +++++++++++++------------------------
+ src/common/ossl_functions.h |  6 ++-
+ src/common/ossl_helpers.h   |  1 +
+ 4 files changed, 65 insertions(+), 60 deletions(-)
+
+diff --git a/src/common/common.c b/src/common/common.c
+index 6cfa0814..7f45e37b 100644
+--- a/src/common/common.c
++++ b/src/common/common.c
+@@ -300,7 +300,7 @@ OQS_API void OQS_MEM_secure_free(void *ptr, size_t len) {
+ 
+ OQS_API void OQS_MEM_insecure_free(void *ptr) {
+ #if defined(OQS_USE_OPENSSL) && defined(OPENSSL_VERSION_NUMBER)
+-	OPENSSL_free(ptr);
++	OSSL_FUNC(CRYPTO_free)(ptr, OPENSSL_FILE, OPENSSL_LINE);
+ #else
+ 	free(ptr); // IGNORE memory-check
+ #endif
+@@ -313,7 +313,7 @@ void *OQS_MEM_aligned_alloc(size_t alignment, size_t size) {
+ 		return NULL;
+ 	}
+ 	const size_t offset = alignment - 1 + sizeof(uint8_t);
+-	uint8_t *buffer = OPENSSL_malloc(size + offset);
++	uint8_t *buffer = OSSL_FUNC(CRYPTO_malloc)(size + offset, OPENSSL_FILE, OPENSSL_LINE);
+ 	if (!buffer) {
+ 		return NULL;
+ 	}
+@@ -321,7 +321,7 @@ void *OQS_MEM_aligned_alloc(size_t alignment, size_t size) {
+ 	ptrdiff_t diff = ptr - buffer;
+ 	if (diff > UINT8_MAX) {
+ 		// Free and return NULL if alignment is too large
+-		OPENSSL_free(buffer);
++		OSSL_FUNC(CRYPTO_free)(buffer, OPENSSL_FILE, OPENSSL_LINE);
+ 		errno = EINVAL;
+ 		return NULL;
+ 	}
+@@ -396,7 +396,7 @@ void OQS_MEM_aligned_free(void *ptr) {
+ #if defined(OQS_USE_OPENSSL)
+ 	// Use OpenSSL's free function
+ 	uint8_t *u8ptr = ptr;
+-	OPENSSL_free(u8ptr - u8ptr[-1]);
++	OSSL_FUNC(CRYPTO_free)(u8ptr - u8ptr[-1], OPENSSL_FILE, OPENSSL_LINE);
+ #elif defined(OQS_HAVE_ALIGNED_ALLOC) || defined(OQS_HAVE_POSIX_MEMALIGN) || defined(OQS_HAVE_MEMALIGN)
+ 	free(ptr); // IGNORE memory-check
+ #elif defined(__MINGW32__) || defined(__MINGW64__)
+@@ -410,3 +410,28 @@ void OQS_MEM_aligned_free(void *ptr) {
+ 	free(u8ptr - u8ptr[-1]); // IGNORE memory-check
+ #endif
+ }
++
++OQS_API void *OQS_MEM_malloc(size_t size) {
++#if defined(OQS_USE_OPENSSL)
++	return OSSL_FUNC(CRYPTO_malloc)(size, OPENSSL_FILE, OPENSSL_LINE);
++#else
++	return malloc(size); // IGNORE memory-check
++#endif
++}
++
++OQS_API void *OQS_MEM_calloc(size_t num_elements, size_t element_size) {
++#if defined(OQS_USE_OPENSSL)
++	return OSSL_FUNC(CRYPTO_zalloc)(num_elements * element_size,
++	                                OPENSSL_FILE, OPENSSL_LINE);
++#else
++	return calloc(num_elements, element_size); // IGNORE memory-check
++#endif
++}
++
++OQS_API char *OQS_MEM_strdup(const char *str) {
++#if defined(OQS_USE_OPENSSL)
++	return OSSL_FUNC(CRYPTO_strdup)(str, OPENSSL_FILE, OPENSSL_LINE);
++#else
++	return strdup(str); // IGNORE memory-check
++#endif
++}
+diff --git a/src/common/common.h b/src/common/common.h
+index aebb1c20..0dcf4489 100644
+--- a/src/common/common.h
++++ b/src/common/common.h
+@@ -19,61 +19,6 @@
+ extern "C" {
+ #endif
+ 
+-/**
+- * @brief Memory allocation and deallocation functions.
+- *
+- * These macros provide a unified interface for memory operations,
+- * using OpenSSL functions when OQS_USE_OPENSSL is defined, and
+- * standard C library functions otherwise.
+- */
+-#if defined(OQS_USE_OPENSSL) && defined(OPENSSL_VERSION_NUMBER)
+-#include <openssl/crypto.h>
+-
+-/**
+- * Allocates memory of a given size.
+- * @param size The size of the memory to be allocated in bytes.
+- * @return A pointer to the allocated memory.
+- */
+-#define OQS_MEM_malloc(size) OPENSSL_malloc(size)
+-
+-/**
+- * Allocates memory for an array of elements of a given size.
+- * @param num_elements The number of elements to allocate.
+- * @param element_size The size of each element in bytes.
+- * @return A pointer to the allocated memory.
+- */
+-#define OQS_MEM_calloc(num_elements, element_size)                             \
+-  OPENSSL_zalloc((num_elements) * (element_size))
+-/**
+- * Duplicates a string.
+- * @param str The string to be duplicated.
+- * @return A pointer to the newly allocated string.
+- */
+-#define OQS_MEM_strdup(str) OPENSSL_strdup(str)
+-#else
+-/**
+- * Allocates memory of a given size.
+- * @param size The size of the memory to be allocated in bytes.
+- * @return A pointer to the allocated memory.
+- */
+-#define OQS_MEM_malloc(size) malloc(size) // IGNORE memory-check
+-
+-/**
+- * Allocates memory for an array of elements of a given size.
+- * @param num_elements The number of elements to allocate.
+- * @param element_size The size of each element in bytes.
+- * @return A pointer to the allocated memory.
+- */
+-#define OQS_MEM_calloc(num_elements, element_size)                             \
+-  calloc(num_elements, element_size)    // IGNORE memory-check
+-/**
+- * Duplicates a string.
+- * @param str The string to be duplicated.
+- * @return A pointer to the newly allocated string.
+- */
+-#define OQS_MEM_strdup(str) strdup(str) // IGNORE memory-check
+-#endif
+-
+ /**
+  * Macro for terminating the program if x is
+  * a null pointer.
+@@ -235,6 +180,36 @@ OQS_API void OQS_destroy(void);
+  */
+ OQS_API const char *OQS_version(void);
+ 
++/**
++ * @brief Memory allocation and deallocation functions.
++ *
++ * These functions provide a unified interface for memory operations,
++ * using OpenSSL functions when OQS_USE_OPENSSL is defined, and
++ * standard C library functions otherwise.
++ */
++
++/**
++ * Allocates memory of a given size.
++ * @param size The size of the memory to be allocated in bytes.
++ * @return A pointer to the allocated memory.
++ */
++OQS_API void *OQS_MEM_malloc(size_t size);
++
++/**
++ * Allocates memory for an array of elements of a given size.
++ * @param num_elements The number of elements to allocate.
++ * @param element_size The size of each element in bytes.
++ * @return A pointer to the allocated memory.
++ */
++OQS_API void *OQS_MEM_calloc(size_t num_elements, size_t element_size);
++
++/**
++ * Duplicates a string.
++ * @param str The string to be duplicated.
++ * @return A pointer to the newly allocated string.
++ */
++OQS_API char *OQS_MEM_strdup(const char *str);
++
+ /**
+  * Constant time comparison of byte sequences `a` and `b` of length `len`.
+  * Returns 0 if the byte sequences are equal or if `len`=0.
+diff --git a/src/common/ossl_functions.h b/src/common/ossl_functions.h
+index 7e02898b..4779168c 100644
+--- a/src/common/ossl_functions.h
++++ b/src/common/ossl_functions.h
+@@ -60,4 +60,8 @@ VOID_FUNC(void, OPENSSL_cleanse, (void *ptr, size_t len), (ptr, len))
+ FUNC(int, RAND_bytes, (unsigned char *buf, int num), (buf, num))
+ FUNC(int, RAND_poll, (void), ())
+ FUNC(int, RAND_status, (void), ())
+-VOID_FUNC(void, OPENSSL_thread_stop, (void), ())
+\ No newline at end of file
++VOID_FUNC(void, OPENSSL_thread_stop, (void), ())
++FUNC(void *, CRYPTO_malloc, (size_t num, const char *file, int line), (num, file, line))
++FUNC(void *, CRYPTO_zalloc, (size_t num, const char *file, int line), (num, file, line))
++FUNC(char *, CRYPTO_strdup, (const char *str, const char *file, int line), (str, file, line))
++VOID_FUNC(void, CRYPTO_free, (void *ptr, const char *file, int line), (ptr, file, line))
+diff --git a/src/common/ossl_helpers.h b/src/common/ossl_helpers.h
+index 7587d80f..1abccea7 100644
+--- a/src/common/ossl_helpers.h
++++ b/src/common/ossl_helpers.h
+@@ -6,6 +6,7 @@
+ extern "C" {
+ #endif
+ 
++#include <openssl/crypto.h>
+ #include <openssl/err.h>
+ #include <openssl/evp.h>
+ #include <openssl/rand.h>
+-- 
+2.47.1
+

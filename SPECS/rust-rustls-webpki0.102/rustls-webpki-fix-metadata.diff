@@ -1,0 +1,23 @@
+--- rustls-webpki-0.102.8/Cargo.toml	1970-01-01T00:00:01+00:00
++++ rustls-webpki-0.102.8/Cargo.toml	2025-03-22T11:28:02.586833+00:00
+@@ -132,12 +132,6 @@
+ name = "tls_server_certs"
+ path = "tests/tls_server_certs.rs"
+ 
+-[dependencies.aws-lc-rs]
+-version = "1.9"
+-features = ["aws-lc-sys"]
+-optional = true
+-default-features = false
+-
+ [dependencies.pki-types]
+ version = "1.7"
+ default-features = false
+@@ -180,7 +174,6 @@
+     "ring?/alloc",
+     "pki-types/alloc",
+ ]
+-aws_lc_rs = ["dep:aws-lc-rs"]
+ default = [
+     "std",
+     "ring",

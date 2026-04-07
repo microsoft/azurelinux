@@ -1,0 +1,39 @@
+--- netkit-ftp-0.17/configure.volatile	2004-06-14 12:08:26.000000000 -0400
++++ netkit-ftp-0.17/configure	2004-06-14 12:52:41.000000000 -0400
+@@ -193,8 +193,8 @@
+ cat <<EOF >__conftest.c
+ #include <unistd.h>
+ #include <signal.h>
+-int count=0;
+-void handle(int foo) { count++; }
++volatile int count=0;
++void handle(int foo) { count++; write(1,"X",1);}
+ int main() {
+     int pid=getpid();
+     signal(SIGINT, handle);
+@@ -209,20 +209,20 @@
+ if (
+       $CC $CFLAGS  __conftest.c  -o __conftest || exit 1
+       ./__conftest || exit 1
+-   ) >/dev/null 2>&1; then
++   ); then
+     echo 'yes'
+ else
+     if (
+           $CC $CFLAGS -D__USE_BSD_SIGNAL __conftest.c  -o __conftest || exit 1
+           ./__conftest || exit 1
+-       ) >/dev/null 2>&1; then
++       ); then
+         echo '-D__USE_BSD_SIGNAL'
+         CFLAGS="$CFLAGS -D__USE_BSD_SIGNAL"
+     else
+         echo 'no'
+-        echo 'This package needs BSD signal semantics to run.'
+-        rm -f __conftest*
+-        exit
++        echo '***WARNING***: This package needs BSD signal semantics to run.'
++	echo '***WARNING***: Assuming its just ia64 buildroot breakage.'
++        CFLAGS="$CFLAGS -D__USE_BSD_SIGNAL"
+     fi
+ fi
+ rm -f __conftest*

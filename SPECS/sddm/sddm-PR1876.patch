@@ -1,0 +1,1018 @@
+From 6831a26862e15347296a48a9b7825c7db7b5b957 Mon Sep 17 00:00:00 2001
+From: Aleksei Bavshin <alebastr89@gmail.com>
+Date: Tue, 30 Jan 2024 20:16:25 -0800
+Subject: [PATCH 1/7] Mark keyboard backend as disabled on Wayland
+
+8c370d9 already cleared the list of layouts, but Num/Caps indicators
+are also not supported on Wayland. Let's communicate that clearly by
+marking the KeyboardModel as disabled.
+---
+ src/greeter/waylandkeyboardbackend.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/greeter/waylandkeyboardbackend.cpp b/src/greeter/waylandkeyboardbackend.cpp
+index fcea53614..c42bee6f2 100644
+--- a/src/greeter/waylandkeyboardbackend.cpp
++++ b/src/greeter/waylandkeyboardbackend.cpp
+@@ -95,6 +95,7 @@ void WaylandKeyboardBackend::init()
+     // TODO: We can't actually switch keyboard layout yet, so don't populate a list of layouts
+     // so that themes can know to not show the option to change layout
+     // d->layouts = parseRules(QStringLiteral("/usr/share/X11/xkb/rules/evdev.xml"), d->layout_id);
++    d->enabled = false;
+ }
+ 
+ void WaylandKeyboardBackend::disconnect()
+
+From e490bb994ada2a565e95fd32fb18818b1f05ff82 Mon Sep 17 00:00:00 2001
+From: Aleksei Bavshin <alebastr89@gmail.com>
+Date: Tue, 30 Jan 2024 21:10:15 -0800
+Subject: [PATCH 2/7] Themes: hide LayoutBox when keyboard model is empty or
+ disabled
+
+---
+ data/themes/elarun/Main.qml   | 4 ++++
+ data/themes/maldives/Main.qml | 2 ++
+ data/themes/maya/Main.qml     | 4 ++++
+ src/greeter/theme/Main.qml    | 4 ++++
+ 4 files changed, 14 insertions(+)
+
+diff --git a/data/themes/elarun/Main.qml b/data/themes/elarun/Main.qml
+index e559b741b..523dab7b3 100644
+--- a/data/themes/elarun/Main.qml
++++ b/data/themes/elarun/Main.qml
+@@ -270,6 +270,8 @@ Rectangle {
+                 height: parent.height
+                 anchors.verticalCenter: parent.verticalCenter
+ 
++                visible: layoutBox.visible
++
+                 text: textConstants.layout
+                 font.pixelSize: 14
+                 verticalAlignment: Text.AlignVCenter
+@@ -281,6 +283,8 @@ Rectangle {
+                 anchors.verticalCenter: parent.verticalCenter
+                 font.pixelSize: 14
+ 
++                visible: keyboard.enabled && keyboard.layouts.length > 0
++
+                 arrowIcon: "angle-down.png"
+ 
+                 KeyNavigation.backtab: session; KeyNavigation.tab: user_entry
+diff --git a/data/themes/maldives/Main.qml b/data/themes/maldives/Main.qml
+index 4fac9f3c5..7f1959a5f 100644
+--- a/data/themes/maldives/Main.qml
++++ b/data/themes/maldives/Main.qml
+@@ -201,6 +201,8 @@ Rectangle {
+                         spacing : 4
+                         anchors.bottom: parent.bottom
+ 
++                        visible: keyboard.enabled && keyboard.layouts.length > 0
++
+                         Text {
+                             id: lblLayout
+                             width: parent.width
+diff --git a/data/themes/maya/Main.qml b/data/themes/maya/Main.qml
+index d8e470b39..d166b718c 100644
+--- a/data/themes/maya/Main.qml
++++ b/data/themes/maya/Main.qml
+@@ -239,6 +239,8 @@ Rectangle {
+         width   : spUnit * 2
+         height  : parent.height
+ 
++        visible : keyboard.enabled && keyboard.layouts.length > 0
++
+         color       : primaryHue1
+         borderColor : primaryHue3
+         focusColor  : accentLight
+@@ -261,6 +263,8 @@ Rectangle {
+ 
+         text    : textConstants.layout
+ 
++        visible : maya_layout.visible
++
+         color   : normalText
+ 
+         font.family     : opensans_cond_light.name
+diff --git a/src/greeter/theme/Main.qml b/src/greeter/theme/Main.qml
+index 0a2ab9c84..2106f6004 100644
+--- a/src/greeter/theme/Main.qml
++++ b/src/greeter/theme/Main.qml
+@@ -236,6 +236,8 @@ Rectangle {
+                     height: parent.height
+                     anchors.verticalCenter: parent.verticalCenter
+ 
++                    visible: layoutBox.visible
++
+                     text: textConstants.layout
+                     font.pixelSize: 16
+                     verticalAlignment: Text.AlignVCenter
+@@ -247,6 +249,8 @@ Rectangle {
+                     anchors.verticalCenter: parent.verticalCenter
+                     font.pixelSize: 14
+ 
++                    visible: keyboard.enabled && keyboard.layouts.length > 0
++
+                     arrowIcon: "angle-down.png"
+ 
+                     KeyNavigation.backtab: session; KeyNavigation.tab: btnShutdown
+
+From a8dad084766a31d92252b2c2707c778dca1f30cc Mon Sep 17 00:00:00 2001
+From: Aleksei Bavshin <alebastr89@gmail.com>
+Date: Wed, 31 Jan 2024 02:08:47 -0800
+Subject: [PATCH 3/7] Themes: explicitly resolve image URLs
+
+Qt6 no longer resolves relative URLs on assignment to a property of type
+url[^1]. The resolution now happens late, in the context of the item that
+uses the URL. In our case, it would be a QML component containing Image.
+However, the themes shipped with SDDM contain resources in the theme
+directories and rely on the previous algorithm of the URL resolution.
+
+The only documented[^2] way to address that is to resolve the paths in
+advance with `Qt.resolvedUrl` to avoid any ambiguity. `Qt.resolvedUrl`
+is supported in Qt5, so that should be a safe, albeit a bit verbose,
+conversion.
+
+Fixes following error:
+```
+file:///usr/lib64/qt6/qml/SddmComponents/ComboBox.qml:105:9: QML Image: Cannot open: file:///usr/lib64/qt6/qml/SddmComponents/angle-down.png
+```
+
+[^1]: https://doc.qt.io/qt-6/qml-url.html
+[^2]: `QQmlAbstractUrlInterceptor` exists in Qt5, but
+  `QQmlEngine::setUrlInterceptor` is undocumented and has potential
+negative side-effects. It also receives already resolved absolute URLs.
+---
+ data/themes/elarun/Main.qml   | 29 +++++++++++++++--------------
+ data/themes/maldives/Main.qml | 13 +++++++------
+ data/themes/maya/Main.qml     | 10 +++++-----
+ docs/THEMING.md               |  2 +-
+ src/greeter/theme/Main.qml    | 14 +++++++-------
+ 5 files changed, 35 insertions(+), 33 deletions(-)
+
+diff --git a/data/themes/elarun/Main.qml b/data/themes/elarun/Main.qml
+index 523dab7b3..8151bb52a 100644
+--- a/data/themes/elarun/Main.qml
++++ b/data/themes/elarun/Main.qml
+@@ -50,11 +50,12 @@ Rectangle {
+ 
+     Background {
+         anchors.fill: parent
+-        source: config.background
++        source: Qt.resolvedUrl(config.background)
+         fillMode: Image.PreserveAspectCrop
+         onStatusChanged: {
+-            if (status == Image.Error && source != config.defaultBackground) {
+-                source = config.defaultBackground
++            var defaultBackground = Qt.resolvedUrl(config.defaultBackground)
++            if (status == Image.Error && source != defaultBackground) {
++                source = defaultBackground
+             }
+         }
+     }
+@@ -72,12 +73,12 @@ Rectangle {
+ 
+             Image {
+                 anchors.fill: parent
+-                source: "images/rectangle.png"
++                source: Qt.resolvedUrl("images/rectangle.png")
+             }
+ 
+             Image {
+                 anchors.fill: parent
+-                source: "images/rectangle_overlay.png"
++                source: Qt.resolvedUrl("images/rectangle_overlay.png")
+                 opacity: 0.1
+             }
+ 
+@@ -103,7 +104,7 @@ Rectangle {
+                     anchors.centerIn: parent
+ 
+                     Row {
+-                        Image { source: "images/user_icon.png" }
++                        Image { source: Qt.resolvedUrl("images/user_icon.png") }
+ 
+                         TextBox {
+                             id: user_entry
+@@ -121,7 +122,7 @@ Rectangle {
+ 
+                     Row {
+ 
+-                        Image { source: "images/lock.png" }
++                        Image { source: Qt.resolvedUrl("images/lock.png") }
+ 
+                         PasswordBox {
+                             id: pw_entry
+@@ -150,7 +151,7 @@ Rectangle {
+                     anchors.verticalCenter: parent.verticalCenter
+                     anchors.margins: 20
+ 
+-                    source: "images/login_normal.png"
++                    source: Qt.resolvedUrl("images/login_normal.png")
+ 
+                     onClicked: sddm.login(user_entry.text, pw_entry.text, sessionIndex)
+ 
+@@ -171,7 +172,7 @@ Rectangle {
+ 
+                         ImageButton {
+                             id: system_button
+-                            source: "images/system_shutdown.png"
++                            source: Qt.resolvedUrl("images/system_shutdown.png")
+                             onClicked: sddm.powerOff()
+ 
+ 			    KeyNavigation.backtab: session; KeyNavigation.tab: reboot_button
+@@ -179,7 +180,7 @@ Rectangle {
+ 
+                         ImageButton {
+                             id: reboot_button
+-                            source: "images/system_reboot.png"
++                            source: Qt.resolvedUrl("images/system_reboot.png")
+                             onClicked: sddm.reboot()
+ 
+                             KeyNavigation.backtab: system_button; KeyNavigation.tab: suspend_button
+@@ -187,7 +188,7 @@ Rectangle {
+ 
+                         ImageButton {
+                             id: suspend_button
+-                            source: "images/system_suspend.png"
++                            source: Qt.resolvedUrl("images/system_suspend.png")
+                             visible: sddm.canSuspend
+                             onClicked: sddm.suspend()
+ 
+@@ -196,7 +197,7 @@ Rectangle {
+ 
+                         ImageButton {
+                             id: hibernate_button
+-                            source: "images/system_hibernate.png"
++                            source: Qt.resolvedUrl("images/system_hibernate.png")
+                             visible: sddm.canHibernate
+                             onClicked: sddm.hibernate()
+ 
+@@ -256,7 +257,7 @@ Rectangle {
+                 width: 245
+                 anchors.verticalCenter: parent.verticalCenter
+ 
+-                arrowIcon: "angle-down.png"
++                arrowIcon: Qt.resolvedUrl("angle-down.png")
+ 
+                 model: sessionModel
+                 index: sessionModel.lastIndex
+@@ -285,7 +286,7 @@ Rectangle {
+ 
+                 visible: keyboard.enabled && keyboard.layouts.length > 0
+ 
+-                arrowIcon: "angle-down.png"
++                arrowIcon: Qt.resolvedUrl("angle-down.png")
+ 
+                 KeyNavigation.backtab: session; KeyNavigation.tab: user_entry
+             }
+diff --git a/data/themes/maldives/Main.qml b/data/themes/maldives/Main.qml
+index 7f1959a5f..f346829e8 100644
+--- a/data/themes/maldives/Main.qml
++++ b/data/themes/maldives/Main.qml
+@@ -58,11 +58,12 @@ Rectangle {
+ 
+     Background {
+         anchors.fill: parent
+-        source: config.background
++        source: Qt.resolvedUrl(config.background)
+         fillMode: Image.PreserveAspectCrop
+         onStatusChanged: {
+-            if (status == Image.Error && source != config.defaultBackground) {
+-                source = config.defaultBackground
++            var defaultBackground = Qt.resolvedUrl(config.defaultBackground)
++            if (status == Image.Error && source != defaultBackground) {
++                source = defaultBackground
+             }
+         }
+     }
+@@ -87,7 +88,7 @@ Rectangle {
+             width: Math.max(320, mainColumn.implicitWidth + 50)
+             height: Math.max(320, mainColumn.implicitHeight + 50)
+ 
+-            source: "rectangle.png"
++            source: Qt.resolvedUrl("rectangle.png")
+ 
+             Column {
+                 id: mainColumn
+@@ -186,7 +187,7 @@ Rectangle {
+                             width: parent.width; height: 30
+                             font.pixelSize: 14
+ 
+-                            arrowIcon: "angle-down.png"
++                            arrowIcon: Qt.resolvedUrl("angle-down.png")
+ 
+                             model: sessionModel
+                             index: sessionModel.lastIndex
+@@ -217,7 +218,7 @@ Rectangle {
+                             width: parent.width; height: 30
+                             font.pixelSize: 14
+ 
+-                            arrowIcon: "angle-down.png"
++                            arrowIcon: Qt.resolvedUrl("angle-down.png")
+ 
+                             KeyNavigation.backtab: session; KeyNavigation.tab: loginButton
+                         }
+diff --git a/data/themes/maya/Main.qml b/data/themes/maya/Main.qml
+index d166b718c..30bb530ca 100644
+--- a/data/themes/maya/Main.qml
++++ b/data/themes/maya/Main.qml
+@@ -251,7 +251,7 @@ Rectangle {
+         font.family     : opensans_cond_light.name
+         font.pixelSize  : spFontNormal
+ 
+-        arrowIcon: "images/ic_arrow_drop_down_white_24px.svg"
++        arrowIcon: Qt.resolvedUrl("images/ic_arrow_drop_down_white_24px.svg")
+         arrowColor: primaryHue3
+ 
+         KeyNavigation.tab     : maya_username
+@@ -296,7 +296,7 @@ Rectangle {
+         font.family     : opensans_cond_light.name
+         font.pixelSize  : spFontNormal
+ 
+-        arrowIcon: "images/ic_arrow_drop_down_white_24px.svg"
++        arrowIcon: Qt.resolvedUrl("images/ic_arrow_drop_down_white_24px.svg")
+         arrowColor: primaryHue3
+ 
+         KeyNavigation.tab     : maya_layout
+@@ -355,7 +355,7 @@ Rectangle {
+         label       : textConstants.shutdown
+         labelColor  : normalText
+ 
+-        icon        : "images/ic_power_settings_new_white_24px.svg"
++        icon        : Qt.resolvedUrl("images/ic_power_settings_new_white_24px.svg")
+         iconColor   : accentShade
+ 
+         hoverIconColor  : powerColor
+@@ -381,7 +381,7 @@ Rectangle {
+         label       : textConstants.reboot
+         labelColor  : normalText
+ 
+-        icon        : "images/ic_refresh_white_24px.svg"
++        icon        : Qt.resolvedUrl("images/ic_refresh_white_24px.svg")
+         iconColor   : accentLight
+ 
+         hoverIconColor  : rebootColor
+@@ -492,7 +492,7 @@ Rectangle {
+         hoverColor  : accentLight
+         textColor   : normalText
+ 
+-        image       : "images/ic_warning_white_24px.svg"
++        image       : Qt.resolvedUrl("images/ic_warning_white_24px.svg")
+ 
+         tooltipEnabled  : true
+         tooltipText     : textConstants.capslockWarning
+diff --git a/docs/THEMING.md b/docs/THEMING.md
+index bc69be003..873172192 100644
+--- a/docs/THEMING.md
++++ b/docs/THEMING.md
+@@ -8,7 +8,7 @@ We also provide models containing information about the screens, available sessi
+ 
+     ComboBox {
+     	id: session
+-    	arrowIcon: "angle-down.png"
++    	arrowIcon: Qt.resolvedPath("angle-down.png")
+     	model: sessionModel
+     	index: sessionModel.lastIndex
+     }
+diff --git a/src/greeter/theme/Main.qml b/src/greeter/theme/Main.qml
+index 2106f6004..b799670ac 100644
+--- a/src/greeter/theme/Main.qml
++++ b/src/greeter/theme/Main.qml
+@@ -55,7 +55,7 @@ Rectangle {
+ 
+     Background {
+         anchors.fill: parent
+-        source: "qrc:/theme/background.png"
++        source: "qrc:///theme/background.png"
+         fillMode: Image.PreserveAspectCrop
+         onStatusChanged: {
+             if (status == Image.Error && source != config.defaultBackground) {
+@@ -131,7 +131,7 @@ Rectangle {
+                         anchors.left: parent.left
+                         anchors.verticalCenter: parent.verticalCenter
+                         anchors.margins: 10
+-                        source: "angle-left.png"
++                        source: "qrc:///theme/angle-left.png"
+                         onClicked: listView.decrementCurrentIndex()
+ 
+                         KeyNavigation.backtab: btnShutdown; KeyNavigation.tab: listView
+@@ -162,7 +162,7 @@ Rectangle {
+                         anchors.right: parent.right
+                         anchors.verticalCenter: parent.verticalCenter
+                         anchors.margins: 10
+-                        source: "angle-right.png"
++                        source: "qrc:///theme/angle-right.png"
+                         onClicked: listView.incrementCurrentIndex()
+                         KeyNavigation.backtab: listView; KeyNavigation.tab: session
+                     }
+@@ -222,7 +222,7 @@ Rectangle {
+                     width: 245
+                     anchors.verticalCenter: parent.verticalCenter
+ 
+-                    arrowIcon: "angle-down.png"
++                    arrowIcon: "qrc:///theme/angle-down.png"
+ 
+                     model: sessionModel
+                     index: sessionModel.lastIndex
+@@ -251,7 +251,7 @@ Rectangle {
+ 
+                     visible: keyboard.enabled && keyboard.layouts.length > 0
+ 
+-                    arrowIcon: "angle-down.png"
++                    arrowIcon: "qrc:///theme/angle-down.png"
+ 
+                     KeyNavigation.backtab: session; KeyNavigation.tab: btnShutdown
+                 }
+@@ -266,7 +266,7 @@ Rectangle {
+                 ImageButton {
+                     id: btnReboot
+                     height: parent.height
+-                    source: "reboot.png"
++                    source: "qrc:///theme/reboot.png"
+ 
+                     visible: sddm.canReboot
+ 
+@@ -278,7 +278,7 @@ Rectangle {
+                 ImageButton {
+                     id: btnShutdown
+                     height: parent.height
+-                    source: "shutdown.png"
++                    source: "qrc:///theme/shutdown.png"
+ 
+                     visible: sddm.canPowerOff
+ 
+
+From fb6849312dd5eddf312b7bdb660162f23a2bdab8 Mon Sep 17 00:00:00 2001
+From: Aleksei Bavshin <alebastr89@gmail.com>
+Date: Mon, 26 Feb 2024 19:39:53 -0800
+Subject: [PATCH 4/7] Components: use Transitions instead of Behaviors
+
+It's not recommended[^1] to use Behaviors with States, but the specific
+examples in SDDM weren't causing any problems previously (on Qt5).
+
+Now, with Qt6 support, we can finally observe the promised bugs from the
+referenced article in the wild:
+
+* ComboBox can be closed only once. On a second activation it stays open
+* Button color transitions on focus out are abruptly stopped on a wrong
+  color
+* ... (this is where I noticed a pattern and decided to convert
+  everything else preemptively).
+
+This commit essentially reverts 930fa07bf24d391d42abcfb981f145117292d49d
+
+[^1]: https://doc.qt.io/qt-5/qtquick-statesanimations-behaviors.html
+---
+ components/2.0/Button.qml      |  4 +++-
+ components/2.0/ComboBox.qml    | 12 ++++++++----
+ components/2.0/ImageButton.qml |  4 +++-
+ components/2.0/Menu.qml        |  6 ++++--
+ components/2.0/PictureBox.qml  |  6 ++++--
+ components/2.0/TextBox.qml     |  6 ++++--
+ 6 files changed, 26 insertions(+), 12 deletions(-)
+
+diff --git a/components/2.0/Button.qml b/components/2.0/Button.qml
+index cedc8356e..7c74f1ded 100644
+--- a/components/2.0/Button.qml
++++ b/components/2.0/Button.qml
+@@ -67,7 +67,9 @@ Rectangle {
+         }
+     ]
+ 
+-    Behavior on color { NumberAnimation { duration: 200 } }
++    transitions: Transition {
++        ColorAnimation { duration: 200 }
++    }
+ 
+     clip: true
+     smooth: true
+diff --git a/components/2.0/ComboBox.qml b/components/2.0/ComboBox.qml
+index 26bbef35e..e7fdb3362 100644
+--- a/components/2.0/ComboBox.qml
++++ b/components/2.0/ComboBox.qml
+@@ -70,8 +70,6 @@ FocusScope {
+         border.color: container.borderColor
+         border.width: container.borderWidth
+ 
+-        Behavior on border.color { ColorAnimation { duration: 100 } }
+-
+         states: [
+             State {
+                 name: "hover"; when: mouseArea.containsMouse
+@@ -82,6 +80,10 @@ FocusScope {
+                 PropertyChanges { target: main; border.width: container.borderWidth; border.color: container.focusColor }
+             }
+         ]
++
++        transitions: Transition {
++            ColorAnimation { property: "border.color"; duration: 100 }
++        }
+     }
+ 
+     Loader {
+@@ -157,8 +159,6 @@ FocusScope {
+ 
+         clip: true
+ 
+-        Behavior on height { NumberAnimation { duration: 100 } }
+-
+         Component {
+             id: myDelegate
+ 
+@@ -214,6 +214,10 @@ FocusScope {
+                 PropertyChanges { target: dropDown; height: (container.height - 2*container.borderWidth) * listView.count + container.borderWidth}
+             }
+         ]
++
++        transitions: Transition {
++            NumberAnimation { property: "height"; duration: 100 }
++        }
+     }
+ 
+     function toggle() {
+diff --git a/components/2.0/ImageButton.qml b/components/2.0/ImageButton.qml
+index 6277148ab..28bc940be 100644
+--- a/components/2.0/ImageButton.qml
++++ b/components/2.0/ImageButton.qml
+@@ -53,7 +53,9 @@ Image {
+         }
+     ]
+ 
+-    Behavior on opacity { NumberAnimation { duration: 200 } }
++    transitions: Transition {
++        NumberAnimation { property: "opacity"; duration: 200 }
++    }
+ 
+     clip: true
+     smooth: true
+diff --git a/components/2.0/Menu.qml b/components/2.0/Menu.qml
+index 8ef29841e..9acecb9e2 100644
+--- a/components/2.0/Menu.qml
++++ b/components/2.0/Menu.qml
+@@ -34,8 +34,6 @@ Rectangle {
+     property alias model: menuList.model
+     property alias index: menuList.currentIndex
+ 
+-    Behavior on height { NumberAnimation { duration: 100 } }
+-
+     states: [
+         State {
+             name: "visible";
+@@ -43,6 +41,10 @@ Rectangle {
+         }
+     ]
+ 
++    transitions: Transition {
++        NumberAnimation { property: "height"; duration: 100 }
++    }
++
+     Component {
+         id: listViewItem
+ 
+diff --git a/components/2.0/PictureBox.qml b/components/2.0/PictureBox.qml
+index eb2fbfee8..b9571f04e 100644
+--- a/components/2.0/PictureBox.qml
++++ b/components/2.0/PictureBox.qml
+@@ -37,8 +37,6 @@ FocusScope {
+ 
+     signal login()
+ 
+-    Behavior on height { NumberAnimation { duration: 100 } }
+-
+     states: [
+         State {
+             name: ""
+@@ -50,6 +48,10 @@ FocusScope {
+         }
+     ]
+ 
++    transitions: Transition {
++        NumberAnimation { property: "height"; duration: 100 }
++    }
++
+     Rectangle {
+         id: shadow
+         anchors.fill: parent
+diff --git a/components/2.0/TextBox.qml b/components/2.0/TextBox.qml
+index a8d89afd5..0db8ce885 100644
+--- a/components/2.0/TextBox.qml
++++ b/components/2.0/TextBox.qml
+@@ -47,8 +47,6 @@ FocusScope {
+         border.color: container.borderColor
+         border.width: 1
+ 
+-        Behavior on border.color { ColorAnimation { duration: 100 } }
+-
+         states: [
+             State {
+                 name: "hover"; when: mouseArea.containsMouse
+@@ -59,6 +57,10 @@ FocusScope {
+                 PropertyChanges { target: main; border.width: 1; border.color: container.focusColor }
+             }
+         ]
++
++        transitions: Transition {
++            ColorAnimation { duration: 100 }
++        }
+     }
+ 
+     MouseArea {
+
+From 5c9a8b7d479f8bf019c5fa1a5d9a78ca12db5793 Mon Sep 17 00:00:00 2001
+From: Aleksei Bavshin <alebastr89@gmail.com>
+Date: Mon, 26 Feb 2024 21:11:01 -0800
+Subject: [PATCH 5/7] Themes: fix deprecated signal handler declarations
+
+Fixes following warnings:
+```
+QML Connections: Implicitly defined onFoo properties in Connections are deprecated. Use this syntax instead: function onFoo(<arguments>) { ... }
+Parameter "event" is not declared. Injection of parameters into signal handlers is deprecated. Use JavaScript functions with formal parameters instead.
+```
+---
+ components/2.0/Button.qml      |  4 ++--
+ components/2.0/ComboBox.qml    |  2 +-
+ components/2.0/ImageButton.qml |  4 ++--
+ components/2.0/LayoutBox.qml   |  8 ++++++--
+ components/2.0/PictureBox.qml  |  2 +-
+ data/themes/elarun/Main.qml    |  8 ++++----
+ data/themes/maldives/Main.qml  | 11 +++++------
+ data/themes/maya/Main.qml      | 10 +++++-----
+ src/greeter/theme/Main.qml     |  6 +++---
+ 9 files changed, 29 insertions(+), 26 deletions(-)
+
+diff --git a/components/2.0/Button.qml b/components/2.0/Button.qml
+index 7c74f1ded..4d6d40a76 100644
+--- a/components/2.0/Button.qml
++++ b/components/2.0/Button.qml
+@@ -111,7 +111,7 @@ Rectangle {
+         onReleased: { container.focus = true; container.released() }
+     }
+ 
+-    Keys.onPressed: {
++    Keys.onPressed: function (event) {
+         if (event.key === Qt.Key_Space) {
+             container.spaceDown = true;
+             container.pressed()
+@@ -122,7 +122,7 @@ Rectangle {
+         }
+     }
+ 
+-    Keys.onReleased: {
++    Keys.onReleased: function (event) {
+         if (event.key === Qt.Key_Space) {
+             container.spaceDown = false;
+             container.released()
+diff --git a/components/2.0/ComboBox.qml b/components/2.0/ComboBox.qml
+index e7fdb3362..997a3886e 100644
+--- a/components/2.0/ComboBox.qml
++++ b/components/2.0/ComboBox.qml
+@@ -134,7 +134,7 @@ FocusScope {
+         }
+     }
+ 
+-    Keys.onPressed: {
++    Keys.onPressed: function (event) {
+         if (event.key === Qt.Key_Up) {
+             listView.decrementCurrentIndex()
+         } else if (event.key === Qt.Key_Down) {
+diff --git a/components/2.0/ImageButton.qml b/components/2.0/ImageButton.qml
+index 28bc940be..b2c267d2b 100644
+--- a/components/2.0/ImageButton.qml
++++ b/components/2.0/ImageButton.qml
+@@ -77,7 +77,7 @@ Image {
+         onReleased: { container.focus = true; container.released() }
+     }
+ 
+-    Keys.onPressed: {
++    Keys.onPressed: function (event) {
+         if (event.key === Qt.Key_Space) {
+             container.spaceDown = true;
+             container.pressed()
+@@ -88,7 +88,7 @@ Image {
+         }
+     }
+ 
+-    Keys.onReleased: {
++    Keys.onReleased: function (event) {
+         if (event.key === Qt.Key_Space) {
+             container.spaceDown = false;
+             container.released()
+diff --git a/components/2.0/LayoutBox.qml b/components/2.0/LayoutBox.qml
+index b992f28de..5e62acd3f 100644
+--- a/components/2.0/LayoutBox.qml
++++ b/components/2.0/LayoutBox.qml
+@@ -30,12 +30,16 @@ ComboBox {
+     model: keyboard.layouts
+     index: keyboard.currentLayout
+ 
+-    onValueChanged: keyboard.currentLayout = id
++    function onValueChanged(id) {
++        keyboard.currentLayout = id
++    }
+ 
+     Connections {
+         target: keyboard
+ 
+-        onCurrentLayoutChanged: combo.index = keyboard.currentLayout
++        function onCurrentLayoutChanged() {
++            combo.index = keyboard.currentLayout
++        }
+     }
+ 
+     rowDelegate: Rectangle {
+diff --git a/components/2.0/PictureBox.qml b/components/2.0/PictureBox.qml
+index b9571f04e..560556e40 100644
+--- a/components/2.0/PictureBox.qml
++++ b/components/2.0/PictureBox.qml
+@@ -105,7 +105,7 @@ FocusScope {
+             focus: true
+             visible: showPassword
+ 
+-            Keys.onPressed: {
++            Keys.onPressed: function (event) {
+                 if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                     container.login();
+                     event.accepted = true
+diff --git a/data/themes/elarun/Main.qml b/data/themes/elarun/Main.qml
+index 8151bb52a..d0caadaea 100644
+--- a/data/themes/elarun/Main.qml
++++ b/data/themes/elarun/Main.qml
+@@ -39,11 +39,11 @@ Rectangle {
+ 
+     Connections {
+         target: sddm
+-        onLoginSucceeded: {
++        function onLoginSucceeded() {
+         }
+-        onInformationMessage: {
++        function onInformationMessage(message) {
+         }
+-        onLoginFailed: {
++        function onLoginFailed() {
+             pw_entry.text = ""
+         }
+     }
+@@ -135,7 +135,7 @@ Rectangle {
+ 
+                             KeyNavigation.backtab: user_entry; KeyNavigation.tab: login_button
+ 
+-                            Keys.onPressed: {
++                            Keys.onPressed: function (event) {
+                                 if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                                     sddm.login(user_entry.text, pw_entry.text, sessionIndex)
+                                     event.accepted = true
+diff --git a/data/themes/maldives/Main.qml b/data/themes/maldives/Main.qml
+index f346829e8..17b1b8aff 100644
+--- a/data/themes/maldives/Main.qml
++++ b/data/themes/maldives/Main.qml
+@@ -40,17 +40,16 @@ Rectangle {
+     Connections {
+         target: sddm
+ 
+-        onLoginSucceeded: {
++        function onLoginSucceeded() {
+             errorMessage.color = "steelblue"
+             errorMessage.text = textConstants.loginSucceeded
+         }
+-
+-        onLoginFailed: {
++        function onLoginFailed() {
+             password.text = ""
+             errorMessage.color = "red"
+             errorMessage.text = textConstants.loginFailed
+         }
+-        onInformationMessage: {
++        function onInformationMessage(message) {
+             errorMessage.color = "red"
+             errorMessage.text = message
+         }
+@@ -126,7 +125,7 @@ Rectangle {
+ 
+                         KeyNavigation.backtab: rebootButton; KeyNavigation.tab: password
+ 
+-                        Keys.onPressed: {
++                        Keys.onPressed: function (event) {
+                             if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                                 sddm.login(name.text, password.text, sessionIndex)
+                                 event.accepted = true
+@@ -153,7 +152,7 @@ Rectangle {
+ 
+                         KeyNavigation.backtab: name; KeyNavigation.tab: session
+ 
+-                        Keys.onPressed: {
++                        Keys.onPressed: function (event) {
+                             if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                                 sddm.login(name.text, password.text, sessionIndex)
+                                 event.accepted = true
+diff --git a/data/themes/maya/Main.qml b/data/themes/maya/Main.qml
+index 30bb530ca..60473a473 100644
+--- a/data/themes/maya/Main.qml
++++ b/data/themes/maya/Main.qml
+@@ -75,7 +75,7 @@ Rectangle {
+   Connections {
+     target: sddm
+ 
+-    onLoginSucceeded: {
++    function onLoginSucceeded() {
+       prompt_bg.color = successText
+       prompt_txt.text = textConstants.loginSucceeded
+ 
+@@ -84,7 +84,7 @@ Rectangle {
+ 
+       anim_success.start()
+     }
+-    onLoginFailed: {
++    function onLoginFailed() {
+       prompt_bg.color = failureText
+       prompt_txt.text = textConstants.loginFailed
+ 
+@@ -93,7 +93,7 @@ Rectangle {
+ 
+       anim_failure.start()
+     }
+-    onInformationMessage: {
++    function onInformationMessage(message) {
+       prompt_bg.color = failureText
+       prompt_txt.text = message
+ 
+@@ -505,7 +505,7 @@ Rectangle {
+         KeyNavigation.tab     : maya_login
+         KeyNavigation.backtab : maya_username
+ 
+-        Keys.onPressed: {
++        Keys.onPressed: function (event) {
+           if ((event.key === Qt.Key_Return) || (event.key === Qt.Key_Enter)) {
+             maya_root.tryLogin()
+ 
+@@ -546,7 +546,7 @@ Rectangle {
+ 
+         onClicked: maya_root.tryLogin()
+ 
+-        Keys.onPressed: {
++        Keys.onPressed: function (event) {
+           if ((event.key === Qt.Key_Return) || (event.key === Qt.Key_Enter)) {
+             maya_root.tryLogin()
+ 
+diff --git a/src/greeter/theme/Main.qml b/src/greeter/theme/Main.qml
+index b799670ac..257153b16 100644
+--- a/src/greeter/theme/Main.qml
++++ b/src/greeter/theme/Main.qml
+@@ -40,15 +40,15 @@ Rectangle {
+ 
+     Connections {
+         target: sddm
+-        onLoginSucceeded: {
++        function onLoginSucceeded() {
+         }
+ 
+-        onLoginFailed: {
++        function onLoginFailed() {
+             txtMessage.text = textConstants.loginFailed
+             listView.currentItem.password = ""
+         }
+ 
+-        onInformationMessage: {
++        function onInformationMessage(message) {
+             txtMessage.text = message
+         }
+     }
+
+From ae6313e7433acff4e8bbbfd431a44d715cb306a9 Mon Sep 17 00:00:00 2001
+From: Aleksei Bavshin <alebastr89@gmail.com>
+Date: Tue, 27 Feb 2024 00:00:04 -0800
+Subject: [PATCH 6/7] Themes: set QtVersion=@QT_MAJOR_VERSION@
+
+---
+ data/themes/CMakeLists.txt                           | 12 +++++++++---
+ .../elarun/{metadata.desktop => metadata.desktop.in} |  2 +-
+ .../{metadata.desktop => metadata.desktop.in}        |  1 +
+ .../maya/{metadata.desktop => metadata.desktop.in}   |  1 +
+ src/greeter/CMakeLists.txt                           |  1 +
+ src/greeter/theme.qrc                                |  2 +-
+ .../theme/{metadata.desktop => metadata.desktop.in}  |  1 +
+ 7 files changed, 15 insertions(+), 5 deletions(-)
+ rename data/themes/elarun/{metadata.desktop => metadata.desktop.in} (97%)
+ rename data/themes/maldives/{metadata.desktop => metadata.desktop.in} (92%)
+ rename data/themes/maya/{metadata.desktop => metadata.desktop.in} (92%)
+ rename src/greeter/theme/{metadata.desktop => metadata.desktop.in} (92%)
+
+diff --git a/data/themes/CMakeLists.txt b/data/themes/CMakeLists.txt
+index 60b29be2e..a18fe8926 100644
+--- a/data/themes/CMakeLists.txt
++++ b/data/themes/CMakeLists.txt
+@@ -10,9 +10,15 @@ foreach(THEME ${THEMES})
+ 
+     qt_add_translation(QM_FILES "${TRANSLATION_SOURCES}")
+ 
+-    install(DIRECTORY "${THEME}" DESTINATION "${DATA_INSTALL_DIR}/themes" PATTERN "${THEME}/*.ts"
+-            EXCLUDE PATTERN "${THEME}/.gitattributes"
+-            EXCLUDE)
++    configure_file("${THEME}/metadata.desktop.in" "${THEME}/metadata.desktop" @ONLY)
++
++    install(DIRECTORY "${THEME}" DESTINATION "${DATA_INSTALL_DIR}/themes"
++            PATTERN "${THEME}/*.in" EXCLUDE
++            PATTERN "${THEME}/*.ts" EXCLUDE
++            PATTERN "${THEME}/.gitattributes" EXCLUDE)
++
++    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${THEME}/metadata.desktop"
++            DESTINATION "${DATA_INSTALL_DIR}/themes/${THEME}/")
+ 
+     list(APPEND THEMES_QM_FILES ${QM_FILES})
+ endforeach(THEME)
+diff --git a/data/themes/elarun/metadata.desktop b/data/themes/elarun/metadata.desktop.in
+similarity index 97%
+rename from data/themes/elarun/metadata.desktop
+rename to data/themes/elarun/metadata.desktop.in
+index 50455880a..a992a6102 100644
+--- a/data/themes/elarun/metadata.desktop
++++ b/data/themes/elarun/metadata.desktop.in
+@@ -46,4 +46,4 @@ TranslationsDirectory=translations
+ Theme-Id=elarun
+ Theme-API=2.0
+ Website=https://github.com/sddm/sddm
+-
++QtVersion=@QT_MAJOR_VERSION@
+diff --git a/data/themes/maldives/metadata.desktop b/data/themes/maldives/metadata.desktop.in
+similarity index 92%
+rename from data/themes/maldives/metadata.desktop
+rename to data/themes/maldives/metadata.desktop.in
+index acd0fa47d..8931da6cd 100644
+--- a/data/themes/maldives/metadata.desktop
++++ b/data/themes/maldives/metadata.desktop.in
+@@ -14,3 +14,4 @@ TranslationsDirectory=translations
+ Email=abdurrahmanavci@gmail.com
+ Theme-Id=maldives
+ Theme-API=2.0
++QtVersion=@QT_MAJOR_VERSION@
+diff --git a/data/themes/maya/metadata.desktop b/data/themes/maya/metadata.desktop.in
+similarity index 92%
+rename from data/themes/maya/metadata.desktop
+rename to data/themes/maya/metadata.desktop.in
+index 0c2ab2623..ccda38bfb 100644
+--- a/data/themes/maya/metadata.desktop
++++ b/data/themes/maya/metadata.desktop.in
+@@ -14,3 +14,4 @@ TranslationsDirectory=translations
+ Email=spremi@ymail.com
+ Theme-Id=maya
+ Theme-API=2.0
++QtVersion=@QT_MAJOR_VERSION@
+diff --git a/src/greeter/CMakeLists.txt b/src/greeter/CMakeLists.txt
+index 72769e4d0..b9159c53d 100644
+--- a/src/greeter/CMakeLists.txt
++++ b/src/greeter/CMakeLists.txt
+@@ -36,6 +36,7 @@ set(GREETER_SOURCES
+ )
+ 
+ configure_file("theme.qrc" "theme.qrc")
++configure_file("theme/metadata.desktop.in" "theme/metadata.desktop" @ONLY)
+ 
+ qt_add_resources(RESOURCES ${CMAKE_CURRENT_BINARY_DIR}/theme.qrc)
+ 
+diff --git a/src/greeter/theme.qrc b/src/greeter/theme.qrc
+index efed01179..299169ec1 100644
+--- a/src/greeter/theme.qrc
++++ b/src/greeter/theme.qrc
+@@ -7,7 +7,7 @@
+     <file alias="Main.qml">${CMAKE_CURRENT_SOURCE_DIR}/theme/Main.qml</file>
+     <file alias="reboot.png">${CMAKE_CURRENT_SOURCE_DIR}/theme/reboot.png</file>
+     <file alias="shutdown.png">${CMAKE_CURRENT_SOURCE_DIR}/theme/shutdown.png</file>
+-    <file alias="metadata.desktop">${CMAKE_CURRENT_SOURCE_DIR}/theme/metadata.desktop</file>
++    <file alias="metadata.desktop">${CMAKE_CURRENT_BINARY_DIR}/theme/metadata.desktop</file>
+     <file alias="theme.conf">${CMAKE_CURRENT_SOURCE_DIR}/theme/theme.conf</file>
+ </qresource>
+ </RCC>
+diff --git a/src/greeter/theme/metadata.desktop b/src/greeter/theme/metadata.desktop.in
+similarity index 92%
+rename from src/greeter/theme/metadata.desktop
+rename to src/greeter/theme/metadata.desktop.in
+index a1c22ce93..0a4c9f349 100644
+--- a/src/greeter/theme/metadata.desktop
++++ b/src/greeter/theme/metadata.desktop.in
+@@ -14,3 +14,4 @@ TranslationsDirectory=translations
+ Email=abdurrahmanavci@gmail.com
+ Theme-Id=maui
+ Theme-API=2.0
++QtVersion=@QT_MAJOR_VERSION@
+
+From ed30ef9f3897dd14ef1d7d04674166171f646fce Mon Sep 17 00:00:00 2001
+From: Aleksei Bavshin <alebastr89@gmail.com>
+Date: Tue, 27 Feb 2024 07:07:26 -0800
+Subject: [PATCH 7/7] Docs: add QtVersion information to THEMING
+
+---
+ docs/THEMING.md | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/docs/THEMING.md b/docs/THEMING.md
+index 873172192..69997e88a 100644
+--- a/docs/THEMING.md
++++ b/docs/THEMING.md
+@@ -13,6 +13,8 @@ We also provide models containing information about the screens, available sessi
+     	index: sessionModel.lastIndex
+     }
+ 
++Themes are run by a Qt 5 built sddm-greeter, unless the `QtVersion` property in metadata.desktop specifies a different version, such as `QtVersion=6` for using `sddm-greeter-qt6`.
++
+ ## Proxy Object
+ 
+ We provide a proxy object, called as `sddm` to the themes as a context property. This object holds some useful properties about the host system. It also acts as a proxy between the greeter and the daemon. All of the methods called on this object will be transferred to the daemon through a local socket to be executed there.

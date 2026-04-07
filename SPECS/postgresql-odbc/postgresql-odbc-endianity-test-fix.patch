@@ -1,0 +1,76 @@
+diff -up psqlodbc-16.00.0000/test/src/wchar-char-test.c.be psqlodbc-16.00.0000/test/src/wchar-char-test.c
+--- psqlodbc-16.00.0000/test/src/wchar-char-test.c.be	2024-01-23 09:26:32.612651697 +0100
++++ psqlodbc-16.00.0000/test/src/wchar-char-test.c	2024-01-23 09:24:47.899833014 +0100
+@@ -21,7 +21,7 @@
+ #endif
+ 
+ static void
+-print_utf16_le(const SQLWCHAR *wdt)
++print_utf16_native(const SQLWCHAR *wdt)
+ {
+ 	int	i;
+ 	unsigned char *ucdt;
+@@ -29,7 +29,11 @@ print_utf16_le(const SQLWCHAR *wdt)
+ 	for (i = 0; wdt[i]; i++)
+ 	{
+ 		ucdt = (unsigned char *) &wdt[i];
++        #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+ 		printf("U+%02X%02X", ucdt[1], ucdt[0]);
++        #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
++        printf("U+%02X%02X", ucdt[0], ucdt[1]);
++        #endif
+ 	}
+ 	printf("\n");
+ 	fflush(stdout);
+diff -up psqlodbc-16.00.0000/test/src/wchar-char-test-eucjp.c.be psqlodbc-16.00.0000/test/src/wchar-char-test-eucjp.c
+--- psqlodbc-16.00.0000/test/src/wchar-char-test-eucjp.c.be	2024-01-23 09:25:40.050239174 +0100
++++ psqlodbc-16.00.0000/test/src/wchar-char-test-eucjp.c	2024-01-23 09:27:35.705172406 +0100
+@@ -50,7 +50,7 @@ static int eucjp_test(HSTMT hstmt)
+ 	CHECK_STMT_RESULT(rc, "SQLExecDirect failed to return SQL_C_WCHAR", hstmt);
+ 	while (SQL_SUCCEEDED(rc = SQLFetch(hstmt)))
+ 	{
+-		print_utf16_le(wchar);
++		print_utf16_native(wchar);
+ 	}
+ 
+ 	return rc;
+diff -up psqlodbc-16.00.0000/test/src/wchar-char-test-sjis.c.be psqlodbc-16.00.0000/test/src/wchar-char-test-sjis.c
+--- psqlodbc-16.00.0000/test/src/wchar-char-test-sjis.c.be	2024-01-23 09:25:51.985332122 +0100
++++ psqlodbc-16.00.0000/test/src/wchar-char-test-sjis.c	2024-01-23 09:27:54.498327508 +0100
+@@ -50,7 +50,7 @@ static int sjis_test(HSTMT hstmt)
+ 	CHECK_STMT_RESULT(rc, "SQLExecDirect failed to return SQL_C_WCHAR", hstmt);
+ 	while (SQL_SUCCEEDED(rc = SQLFetch(hstmt)))
+ 	{
+-		print_utf16_le(wchar);
++		print_utf16_native(wchar);
+ 	}
+ 
+ 	return rc;
+diff -up psqlodbc-16.00.0000/test/src/wchar-char-test-utf8.c.be psqlodbc-16.00.0000/test/src/wchar-char-test-utf8.c
+--- psqlodbc-16.00.0000/test/src/wchar-char-test-utf8.c.be	2024-01-23 09:26:03.492421736 +0100
++++ psqlodbc-16.00.0000/test/src/wchar-char-test-utf8.c	2024-01-23 09:33:05.932011563 +0100
+@@ -5,8 +5,15 @@ static int utf8_test_one(HSTMT hstmt)
+ 
+ 	SQLLEN		ind, cbParam, cbParam2;
+ 	SQLINTEGER	cbQueryLen;
++    // There doesn't seems to be a simple way to specify utf16 literal in the native endianity, this seems to be a best option.
++    // I expect the other encoding tests would need simillar treatment of the inline data.
++    #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+ 	unsigned char   lovedt[100] = {0x95, 0x4e, 0x0a, 0x4e, 0x5a, 0x53, 0xf2, 0x53, 0x0, 0x0};
+ 	unsigned char	lovedt2[100] = {0xf2, 0x53, 0x5a, 0x53, 0x0a, 0x4e, 0x95, 0x4e, 0x0, 0x0};
++    #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
++    unsigned char   lovedt[100] = {0x4e, 0x95, 0x4e, 0x0a, 0x53, 0x5a, 0x53, 0xf2, 0x0, 0x0};
++    unsigned char   lovedt2[100] = {0x53, 0xf2, 0x53, 0x5a, 0x4e, 0x0a, 0x4e, 0x95, 0x0, 0x0};
++    #endif
+ 	SQLWCHAR	wchar[100];
+ 	SQLCHAR		str[100];
+ 	SQLCHAR		chardt[100];
+@@ -51,7 +58,7 @@ static int utf8_test_one(HSTMT hstmt)
+ 	CHECK_STMT_RESULT(rc, "SQLExecDirect failed to return SQL_C_WCHAR", hstmt);
+ 	while (SQL_SUCCEEDED(rc = SQLFetch(hstmt)))
+ 	{
+-		print_utf16_le(wchar);
++		print_utf16_native(wchar);
+ 	}
+ 	SQLFreeStmt(hstmt, SQL_CLOSE);
+ 

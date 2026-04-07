@@ -1,0 +1,28 @@
+From 2e106d4cfc909e23e16104725706e4f9dda15974 Mon Sep 17 00:00:00 2001
+From: Nikita Popov <npopov@redhat.com>
+Date: Fri, 5 Aug 2022 08:57:18 +0200
+Subject: [PATCH] Install clang-tblgen
+
+---
+ llvm/cmake/modules/TableGen.cmake | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/llvm/cmake/modules/TableGen.cmake b/llvm/cmake/modules/TableGen.cmake
+index 4711456776c8..edcc9d0b607d 100644
+--- a/llvm/cmake/modules/TableGen.cmake
++++ b/llvm/cmake/modules/TableGen.cmake
+@@ -186,7 +186,10 @@ macro(add_tablegen target project)
+     endif()
+   endif()
+ 
+-  if ((${project} STREQUAL LLVM OR ${project} STREQUAL MLIR) AND NOT LLVM_INSTALL_TOOLCHAIN_ONLY AND LLVM_BUILD_UTILS)
++  # (llvm|mlir|clang)-tblgen may also be used outside the respective projects.
++  if ((${project} STREQUAL LLVM OR ${project} STREQUAL MLIR OR
++       ${project} STREQUAL CLANG) AND
++      NOT LLVM_INSTALL_TOOLCHAIN_ONLY AND LLVM_BUILD_UTILS)
+     set(export_to_llvmexports)
+     if(${target} IN_LIST LLVM_DISTRIBUTION_COMPONENTS OR
+         NOT LLVM_DISTRIBUTION_COMPONENTS)
+-- 
+2.37.1
+

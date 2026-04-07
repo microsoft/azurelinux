@@ -1,0 +1,6 @@
+%sgx_triplet x86_64-intel-sgx
+
+%sgx_prefix %{_prefix}/%{sgx_triplet}
+%sgx_libdir %{sgx_prefix}/%{_lib}
+%sgx_includedir %{sgx_prefix}/include
+

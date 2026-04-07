@@ -1,0 +1,153 @@
+#!/usr/bin/bash
+# This script can be invoked as follows:
+#
+# glibc-bench-compare [options] <BUILD> [BUILD]
+#
+# Options may be one of the following:
+#
+# -t		The BUILD arguments are task ids and not a version-release string
+# -a ARCH	Do comparison for ARCH architecture
+#
+# If any of the above options are given, both BUILD arguments must be given.
+# Otherwise, if only one BUILD is specified, then it is compared against the
+# installed glibc.
+
+# Silence the pushd/popd messages
+pushd() {
+	command pushd "$@" > /dev/null 2>&1
+}
+
+popd() {
+	command popd "$@" > /dev/null 2>&1
+}
+
+# Clean up any downloaded files before we exit
+trap "rm -rf /tmp/glibc-bench-compare.$BASHPID.*" EXIT
+
+task=0
+arch=$(uname -i)
+options=0
+path=0
+installed=
+
+# Look for any commandline options
+while getopts ":tpa:" opt; do
+	case $opt in
+		p)
+		path=1
+		;;
+		t)
+		task=1
+		options=1
+		echo "Not implemented."
+		exit 1
+		;;
+		a)
+		arch=$OPTARG
+		options=1
+		;;
+		*)
+		;;
+	esac
+done
+
+# Done, now shift all option arguments out.
+shift $((OPTIND-1))
+
+if [ $# -gt 2 ] || [ $# -eq 0 ] || [ $# -lt 2 -a $options -eq 1 ]; then
+	echo "Usage: $0 [OPTIONS] <old> [new]"
+	echo
+	echo "OPTIONS:"
+	echo -e "\t-t\tCompare two brew tasks"
+	echo -e "\t-a ARCH\tGet rpms for the ARCH architecture"
+	echo -e "\t-p\tCompare built rpms in two paths."
+	echo -e "\t\tThis minimally needs glibc, glibc-common and glibc-benchtests"
+	exit 1
+fi
+
+if [ -z $2 ]; then
+	new="$1"
+	old=$(rpm --queryformat "%{VERSION}-%{RELEASE}\n" -q glibc | head -1)
+	installed=$old
+else
+	new="$2"
+	old="$1"
+fi
+
+decompress_rpms() {
+	# We were given a path to the rpms.  Figure out the version-release and
+	# decompress the rpms.
+	if [ -n $1 ]; then
+		vr=$(rpm --queryformat="%{VERSION}-%{RELEASE}" -qp $1/glibc-2*.rpm | head -1)
+		mkdir $vr && pushd $vr
+	fi
+
+	for r in $1*.rpm; do
+		( rpm2cpio $r | cpio -di ) > /dev/null
+	done
+
+	if [ -n $1 ]; then
+		popd
+		echo $vr
+	fi
+}
+
+# Get rpms for a build and decompress them
+get_build() {
+	echo "Processing build $1"
+	mkdir $1 && pushd $1
+	brew buildinfo "glibc-$1" |
+	sed -n -e "s|/mnt/koji\(.\+$arch.\+\)|http://kojipkgs.fedoraproject.org\1|p" |
+	while read url; do
+		echo "Downloading $url"
+		wget -q $url
+	done
+	decompress_rpms
+
+	echo "Removing rpms"
+	rm -f $1/*.rpm
+
+	popd
+}
+
+# Run benchmarks for a build
+run_bench() {
+	if [ -z $1 ]; then
+		make DETAILED=1 ver=$installed prefix= -f /usr/libexec/glibc-benchtests/bench.mk bench
+	else
+		make DETAILED=1 ver=$1 prefix=$PWD -f $1/usr/libexec/glibc-benchtests/bench.mk bench
+	fi
+}
+
+# Get absolute paths if needed, since we will change into the working directory
+# next.
+if [ $path -eq 1 ]; then
+	old_path=$(realpath $old)/
+	new_path=$(realpath $new)/
+fi
+
+tmpdir=$(mktemp -p /tmp -d glibc-bench-compare.$$.XXXX)
+pushd $tmpdir
+
+# Get both builds.
+if [ $path -eq 0 ]; then
+	if [ -z $installed ]; then
+		get_build $old
+	fi
+	get_build $new
+else
+	old=$(decompress_rpms $old_path)
+	new=$(decompress_rpms $new_path)
+fi
+
+# make bench for each of those.
+if [ -z $installed ]; then
+	run_bench $old
+else
+	run_bench
+fi
+run_bench $new
+
+# Now run the comparison script.
+$old/usr/libexec/glibc-benchtests/compare_bench.py $old/usr/libexec/glibc-benchtests/benchout.schema.json \
+	bench.$old.out bench.$new.out

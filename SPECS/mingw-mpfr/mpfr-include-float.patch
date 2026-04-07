@@ -1,0 +1,44 @@
+diff -Naurd mpfr-4.0.2-a/PATCHES mpfr-4.0.2-b/PATCHES
+--- mpfr-4.0.2-a/PATCHES	2019-06-02 17:05:36.121226916 +0000
++++ mpfr-4.0.2-b/PATCHES	2019-06-02 17:05:36.157226621 +0000
+@@ -0,0 +1 @@
++include-float
+diff -Naurd mpfr-4.0.2-a/VERSION mpfr-4.0.2-b/VERSION
+--- mpfr-4.0.2-a/VERSION	2019-01-31 20:29:48.000000000 +0000
++++ mpfr-4.0.2-b/VERSION	2019-06-02 17:05:36.157226621 +0000
+@@ -1 +1 @@
+-4.0.2
++4.0.2-p1
+diff -Naurd mpfr-4.0.2-a/src/mpfr-impl.h mpfr-4.0.2-b/src/mpfr-impl.h
+--- mpfr-4.0.2-a/src/mpfr-impl.h	2019-01-27 18:30:16.000000000 +0000
++++ mpfr-4.0.2-b/src/mpfr-impl.h	2019-06-02 17:05:36.145226719 +0000
+@@ -57,6 +57,7 @@
+ 
+ #include <stdlib.h>
+ #include <limits.h>
++#include <float.h>  /* for FLT_RADIX, etc., tested below */
+ 
+ 
+ /******************************************************
+diff -Naurd mpfr-4.0.2-a/src/mpfr.h mpfr-4.0.2-b/src/mpfr.h
+--- mpfr-4.0.2-a/src/mpfr.h	2019-01-31 20:29:48.000000000 +0000
++++ mpfr-4.0.2-b/src/mpfr.h	2019-06-02 17:05:36.153226653 +0000
+@@ -27,7 +27,7 @@
+ #define MPFR_VERSION_MAJOR 4
+ #define MPFR_VERSION_MINOR 0
+ #define MPFR_VERSION_PATCHLEVEL 2
+-#define MPFR_VERSION_STRING "4.0.2"
++#define MPFR_VERSION_STRING "4.0.2-p1"
+ 
+ /* User macros:
+    MPFR_USE_FILE:        Define it to make MPFR define functions dealing
+diff -Naurd mpfr-4.0.2-a/src/version.c mpfr-4.0.2-b/src/version.c
+--- mpfr-4.0.2-a/src/version.c	2019-01-31 20:29:48.000000000 +0000
++++ mpfr-4.0.2-b/src/version.c	2019-06-02 17:05:36.153226653 +0000
+@@ -25,5 +25,5 @@
+ const char *
+ mpfr_get_version (void)
+ {
+-  return "4.0.2";
++  return "4.0.2-p1";
+ }

@@ -1,0 +1,11 @@
+--- strum-0.26.3/Cargo.toml	1970-01-01T00:00:01+00:00
++++ strum-0.26.3/Cargo.toml	2025-03-08T17:38:16.097880+00:00
+@@ -48,7 +48,7 @@
+ path = "src/lib.rs"
+ 
+ [dependencies.phf]
+-version = "0.10"
++version = "0.11"
+ features = ["macros"]
+ optional = true
+ 

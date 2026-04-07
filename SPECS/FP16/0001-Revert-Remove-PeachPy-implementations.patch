@@ -1,0 +1,392 @@
+From 8b02918a84b892e2809bb63cb74ff3bef897df40 Mon Sep 17 00:00:00 2001
+From: Tom Rix <Tom.Rix@amd.com>
+Date: Fri, 21 Mar 2025 06:54:10 -0700
+Subject: [PATCH] Revert: Remove PeachPy implementations
+
+PeachPy still needs these
+
+Signed-off-by: Tom Rix <Tom.Rix@amd.com>
+---
+ include/fp16/__init__.py                 |  0
+ include/fp16/avx.py                      | 50 ++++++++++++
+ include/fp16/avx2.py                     | 53 +++++++++++++
+ test/peachpy/alt-xmm-to-fp32-xmm-avx.cc  | 96 ++++++++++++++++++++++++
+ test/peachpy/alt-xmm-to-fp32-ymm-avx2.cc | 96 ++++++++++++++++++++++++
+ test/peachpy/stubs.py                    | 38 ++++++++++
+ 6 files changed, 333 insertions(+)
+ create mode 100644 include/fp16/__init__.py
+ create mode 100644 include/fp16/avx.py
+ create mode 100644 include/fp16/avx2.py
+ create mode 100644 test/peachpy/alt-xmm-to-fp32-xmm-avx.cc
+ create mode 100644 test/peachpy/alt-xmm-to-fp32-ymm-avx2.cc
+ create mode 100644 test/peachpy/stubs.py
+
+diff --git a/include/fp16/__init__.py b/include/fp16/__init__.py
+new file mode 100644
+index 000000000000..e69de29bb2d1
+diff --git a/include/fp16/avx.py b/include/fp16/avx.py
+new file mode 100644
+index 000000000000..6d1074a4191f
+--- /dev/null
++++ b/include/fp16/avx.py
+@@ -0,0 +1,50 @@
++from peachpy import *
++from peachpy.x86_64 import *
++
++
++def fp16_alt_xmm_to_fp32_xmm(xmm_half):
++	xmm_zero = XMMRegister()
++	VPXOR(xmm_zero, xmm_zero, xmm_zero)
++
++	xmm_word = XMMRegister()
++	VPUNPCKLWD(xmm_word, xmm_zero, xmm_half)
++
++	xmm_shl1_half = XMMRegister()
++	VPADDW(xmm_shl1_half, xmm_half, xmm_half)
++
++	xmm_shl1_nonsign = XMMRegister()
++	VPADDD(xmm_shl1_nonsign, xmm_word, xmm_word)
++
++	sign_mask = Constant.float32x4(-0.0)
++
++	xmm_sign = XMMRegister()
++	VANDPS(xmm_sign, xmm_word, sign_mask)
++
++	xmm_shr3_nonsign = XMMRegister()
++	VPSRLD(xmm_shr3_nonsign, xmm_shl1_nonsign, 4)
++
++	exp_offset = Constant.uint32x4(0x38000000)
++
++	xmm_norm_nonsign = XMMRegister()
++	VPADDD(xmm_norm_nonsign, xmm_shr3_nonsign, exp_offset)
++
++	magic_mask = Constant.uint16x8(0x3E80)
++	xmm_denorm_nonsign = XMMRegister()
++	VPUNPCKLWD(xmm_denorm_nonsign, xmm_shl1_half, magic_mask)
++
++	magic_bias = Constant.float32x4(0.25)
++	VSUBPS(xmm_denorm_nonsign, xmm_denorm_nonsign, magic_bias)
++
++	xmm_denorm_cutoff = XMMRegister()
++	VMOVDQA(xmm_denorm_cutoff, Constant.uint32x4(0x00800000))
++	
++	xmm_denorm_mask = XMMRegister()
++	VPCMPGTD(xmm_denorm_mask, xmm_denorm_cutoff, xmm_shr3_nonsign)
++
++	xmm_nonsign = XMMRegister()
++	VBLENDVPS(xmm_nonsign, xmm_norm_nonsign, xmm_denorm_nonsign, xmm_denorm_mask)
++
++	xmm_float = XMMRegister()
++	VORPS(xmm_float, xmm_nonsign, xmm_sign)
++
++	return xmm_float
+diff --git a/include/fp16/avx2.py b/include/fp16/avx2.py
+new file mode 100644
+index 000000000000..b0653e3ad200
+--- /dev/null
++++ b/include/fp16/avx2.py
+@@ -0,0 +1,53 @@
++from peachpy import *
++from peachpy.x86_64 import *
++
++
++def fp16_alt_xmm_to_fp32_ymm(xmm_half):
++	ymm_half = YMMRegister()
++	VPERMQ(ymm_half, xmm_half.as_ymm, 0b01010000)
++
++	ymm_zero = YMMRegister()
++	VPXOR(ymm_zero.as_xmm, ymm_zero.as_xmm, ymm_zero.as_xmm)
++
++	ymm_word = YMMRegister()
++	VPUNPCKLWD(ymm_word, ymm_zero, ymm_half)
++
++	ymm_shl1_half = YMMRegister()
++	VPADDW(ymm_shl1_half, ymm_half, ymm_half)
++
++	ymm_shl1_nonsign = YMMRegister()
++	VPADDD(ymm_shl1_nonsign, ymm_word, ymm_word)
++
++	sign_mask = Constant.float32x8(-0.0)
++
++	ymm_sign = YMMRegister()
++	VANDPS(ymm_sign, ymm_word, sign_mask)
++
++	ymm_shr3_nonsign = YMMRegister()
++	VPSRLD(ymm_shr3_nonsign, ymm_shl1_nonsign, 4)
++
++	exp_offset = Constant.uint32x8(0x38000000)
++
++	ymm_norm_nonsign = YMMRegister()
++	VPADDD(ymm_norm_nonsign, ymm_shr3_nonsign, exp_offset)
++
++	magic_mask = Constant.uint16x16(0x3E80)
++	ymm_denorm_nonsign = YMMRegister()
++	VPUNPCKLWD(ymm_denorm_nonsign, ymm_shl1_half, magic_mask)
++
++	magic_bias = Constant.float32x8(0.25)
++	VSUBPS(ymm_denorm_nonsign, ymm_denorm_nonsign, magic_bias)
++
++	ymm_denorm_cutoff = YMMRegister()
++	VMOVDQA(ymm_denorm_cutoff, Constant.uint32x8(0x00800000))
++	
++	ymm_denorm_mask = YMMRegister()
++	VPCMPGTD(ymm_denorm_mask, ymm_denorm_cutoff, ymm_shr3_nonsign)
++
++	ymm_nonsign = YMMRegister()
++	VBLENDVPS(ymm_nonsign, ymm_norm_nonsign, ymm_denorm_nonsign, ymm_denorm_mask)
++
++	ymm_float = YMMRegister()
++	VORPS(ymm_float, ymm_nonsign, ymm_sign)
++
++	return ymm_float
+diff --git a/test/peachpy/alt-xmm-to-fp32-xmm-avx.cc b/test/peachpy/alt-xmm-to-fp32-xmm-avx.cc
+new file mode 100644
+index 000000000000..ec9ee020744e
+--- /dev/null
++++ b/test/peachpy/alt-xmm-to-fp32-xmm-avx.cc
+@@ -0,0 +1,96 @@
++#include <gtest/gtest.h>
++
++#include <cstdint>
++
++#include <fp16.h>
++
++
++extern "C" void fp16_alt_xmm_to_fp32_xmm_peachpy__avx(const uint16_t* fp16, uint32_t* fp32);
++const size_t vector_elements = 4;
++
++
++TEST(FP16_ALT_XMM_TO_FP32_XMM, positive_normalized_values) {
++	const uint32_t exponentBias = 15;
++	for (int32_t e = -14; e <= 16; e++) {
++		for (uint16_t h = 0; h < 0x0400; h += vector_elements) {
++			uint16_t fp16[vector_elements];
++			for (size_t i = 0; i < vector_elements; i++) {
++				fp16[i] = h + ((e + exponentBias) << 10) + i;
++			}
++			uint32_t fp32[vector_elements];
++			fp16_alt_xmm_to_fp32_xmm_peachpy__avx(fp16, fp32);
++
++			for (size_t i = 0; i < vector_elements; i++) {
++				EXPECT_EQ(fp16_alt_to_fp32_bits(fp16[i]), fp32[i]) <<
++					std::hex << std::uppercase << std::setfill('0') <<
++					"F16 = 0x" << std::setw(4) << fp16[i] << ", " <<
++					"F32(F16) = 0x" << std::setw(8) << fp32[i] << ", " <<
++					"F32 = 0x" << std::setw(8) << fp16_alt_to_fp32_bits(fp16[i]) <<
++					", lane " << i << "/" << vector_elements;
++			}
++		}
++	}
++}
++
++TEST(FP16_ALT_XMM_TO_FP32_XMM, negative_normalized_values) {
++	const uint32_t exponentBias = 15;
++	for (int32_t e = -14; e <= 16; e++) {
++		for (uint16_t h = 0; h < 0x0400; h += vector_elements) {
++			uint16_t fp16[vector_elements];
++			for (size_t i = 0; i < vector_elements; i++) {
++				fp16[i] = 0x8000 + h + ((e + exponentBias) << 10) + i;
++			}
++			uint32_t fp32[vector_elements];
++			fp16_alt_xmm_to_fp32_xmm_peachpy__avx(fp16, fp32);
++
++			for (size_t i = 0; i < vector_elements; i++) {
++				EXPECT_EQ(fp16_alt_to_fp32_bits(fp16[i]), fp32[i]) <<
++					std::hex << std::uppercase << std::setfill('0') <<
++					"F16 = 0x" << std::setw(4) << fp16[i] << ", " <<
++					"F32(F16) = 0x" << std::setw(8) << fp32[i] << ", " <<
++					"F32 = 0x" << std::setw(8) << fp16_alt_to_fp32_bits(fp16[i]) <<
++					", lane " << i << "/" << vector_elements;
++			}
++		}
++	}
++}
++
++TEST(FP16_ALT_XMM_TO_FP32_XMM, positive_denormalized_values) {
++	for (uint16_t h = 0; h < 0x0400; h += vector_elements) {
++		uint16_t fp16[vector_elements];
++		for (size_t i = 0; i < vector_elements; i++) {
++			fp16[i] = h + i;
++		}
++		uint32_t fp32[vector_elements];
++		fp16_alt_xmm_to_fp32_xmm_peachpy__avx(fp16, fp32);
++
++		for (size_t i = 0; i < vector_elements; i++) {
++			EXPECT_EQ(fp16_alt_to_fp32_bits(fp16[i]), fp32[i]) <<
++				std::hex << std::uppercase << std::setfill('0') <<
++				"F16 = 0x" << std::setw(4) << fp16[i] << ", " <<
++				"F32(F16) = 0x" << std::setw(8) << fp32[i] << ", " <<
++				"F32 = 0x" << std::setw(8) << fp16_alt_to_fp32_bits(fp16[i]) <<
++				", lane " << i << "/" << vector_elements;
++		}
++	}
++}
++
++TEST(FP16_ALT_XMM_TO_FP32_XMM, negative_denormalized_values) {
++	for (uint16_t h = 0; h < 0x0400; h += vector_elements) {
++		uint16_t fp16[vector_elements];
++		for (size_t i = 0; i < vector_elements; i++) {
++			fp16[i] = 0x8000 + h + i;
++		}
++		uint32_t fp32[vector_elements];
++		fp16_alt_xmm_to_fp32_xmm_peachpy__avx(fp16, fp32);
++
++		for (size_t i = 0; i < vector_elements; i++) {
++			EXPECT_EQ(fp16_alt_to_fp32_bits(fp16[i]), fp32[i]) <<
++				std::hex << std::uppercase << std::setfill('0') <<
++				"F16 = 0x" << std::setw(4) << fp16[i] << ", " <<
++				"F32(F16) = 0x" << std::setw(8) << fp32[i] << ", " <<
++				"F32 = 0x" << std::setw(8) << fp16_alt_to_fp32_bits(fp16[i]) <<
++				", lane " << i << "/" << vector_elements;
++		}
++	}
++}
+diff --git a/test/peachpy/alt-xmm-to-fp32-ymm-avx2.cc b/test/peachpy/alt-xmm-to-fp32-ymm-avx2.cc
+new file mode 100644
+index 000000000000..b108cb5f4df5
+--- /dev/null
++++ b/test/peachpy/alt-xmm-to-fp32-ymm-avx2.cc
+@@ -0,0 +1,96 @@
++#include <gtest/gtest.h>
++
++#include <cstdint>
++
++#include <fp16.h>
++
++
++extern "C" void fp16_alt_xmm_to_fp32_ymm_peachpy__avx2(const uint16_t* fp16, uint32_t* fp32);
++const size_t vector_elements = 8;
++
++
++TEST(FP16_ALT_XMM_TO_FP32_YMM, positive_normalized_values) {
++	const uint32_t exponentBias = 15;
++	for (int32_t e = -14; e <= 16; e++) {
++		for (uint16_t h = 0; h < 0x0400; h += vector_elements) {
++			uint16_t fp16[vector_elements];
++			for (size_t i = 0; i < vector_elements; i++) {
++				fp16[i] = h + ((e + exponentBias) << 10) + i;
++			}
++			uint32_t fp32[vector_elements];
++			fp16_alt_xmm_to_fp32_ymm_peachpy__avx2(fp16, fp32);
++
++			for (size_t i = 0; i < vector_elements; i++) {
++				EXPECT_EQ(fp16_alt_to_fp32_bits(fp16[i]), fp32[i]) <<
++					std::hex << std::uppercase << std::setfill('0') <<
++					"F16 = 0x" << std::setw(4) << fp16[i] << ", " <<
++					"F32(F16) = 0x" << std::setw(8) << fp32[i] << ", " <<
++					"F32 = 0x" << std::setw(8) << fp16_alt_to_fp32_bits(fp16[i]) <<
++					", lane " << i << "/" << vector_elements;
++			}
++		}
++	}
++}
++
++TEST(FP16_ALT_XMM_TO_FP32_YMM, negative_normalized_values) {
++	const uint32_t exponentBias = 15;
++	for (int32_t e = -14; e <= 16; e++) {
++		for (uint16_t h = 0; h < 0x0400; h += vector_elements) {
++			uint16_t fp16[vector_elements];
++			for (size_t i = 0; i < vector_elements; i++) {
++				fp16[i] = 0x8000 + h + ((e + exponentBias) << 10) + i;
++			}
++			uint32_t fp32[vector_elements];
++			fp16_alt_xmm_to_fp32_ymm_peachpy__avx2(fp16, fp32);
++
++			for (size_t i = 0; i < vector_elements; i++) {
++				EXPECT_EQ(fp16_alt_to_fp32_bits(fp16[i]), fp32[i]) <<
++					std::hex << std::uppercase << std::setfill('0') <<
++					"F16 = 0x" << std::setw(4) << fp16[i] << ", " <<
++					"F32(F16) = 0x" << std::setw(8) << fp32[i] << ", " <<
++					"F32 = 0x" << std::setw(8) << fp16_alt_to_fp32_bits(fp16[i]) <<
++					", lane " << i << "/" << vector_elements;
++			}
++		}
++	}
++}
++
++TEST(FP16_ALT_XMM_TO_FP32_YMM, positive_denormalized_values) {
++	for (uint16_t h = 0; h < 0x0400; h += vector_elements) {
++		uint16_t fp16[vector_elements];
++		for (size_t i = 0; i < vector_elements; i++) {
++			fp16[i] = h + i;
++		}
++		uint32_t fp32[vector_elements];
++		fp16_alt_xmm_to_fp32_ymm_peachpy__avx2(fp16, fp32);
++
++		for (size_t i = 0; i < vector_elements; i++) {
++			EXPECT_EQ(fp16_alt_to_fp32_bits(fp16[i]), fp32[i]) <<
++				std::hex << std::uppercase << std::setfill('0') <<
++				"F16 = 0x" << std::setw(4) << fp16[i] << ", " <<
++				"F32(F16) = 0x" << std::setw(8) << fp32[i] << ", " <<
++				"F32 = 0x" << std::setw(8) << fp16_alt_to_fp32_bits(fp16[i]) <<
++				", lane " << i << "/" << vector_elements;
++		}
++	}
++}
++
++TEST(FP16_ALT_XMM_TO_FP32_YMM, negative_denormalized_values) {
++	for (uint16_t h = 0; h < 0x0400; h += vector_elements) {
++		uint16_t fp16[vector_elements];
++		for (size_t i = 0; i < vector_elements; i++) {
++			fp16[i] = 0x8000 + h + i;
++		}
++		uint32_t fp32[vector_elements];
++		fp16_alt_xmm_to_fp32_ymm_peachpy__avx2(fp16, fp32);
++
++		for (size_t i = 0; i < vector_elements; i++) {
++			EXPECT_EQ(fp16_alt_to_fp32_bits(fp16[i]), fp32[i]) <<
++				std::hex << std::uppercase << std::setfill('0') <<
++				"F16 = 0x" << std::setw(4) << fp16[i] << ", " <<
++				"F32(F16) = 0x" << std::setw(8) << fp32[i] << ", " <<
++				"F32 = 0x" << std::setw(8) << fp16_alt_to_fp32_bits(fp16[i]) <<
++				", lane " << i << "/" << vector_elements;
++		}
++	}
++}
+diff --git a/test/peachpy/stubs.py b/test/peachpy/stubs.py
+new file mode 100644
+index 000000000000..becd2eb045e4
+--- /dev/null
++++ b/test/peachpy/stubs.py
+@@ -0,0 +1,38 @@
++from peachpy import *
++from peachpy.x86_64 import *
++
++import fp16.avx, fp16.avx2
++
++
++arg_fp16 = Argument(ptr(const_uint16_t), name="fp16")
++arg_fp32 = Argument(ptr(uint32_t), name="fp32")
++
++with Function("fp16_alt_xmm_to_fp32_ymm_peachpy__avx2", (arg_fp16, arg_fp32), target=uarch.default + isa.avx2):
++
++    reg_fp16 = GeneralPurposeRegister64()
++    LOAD.ARGUMENT(reg_fp16, arg_fp16)
++
++    reg_fp32 = GeneralPurposeRegister64()
++    LOAD.ARGUMENT(reg_fp32, arg_fp32)
++
++    xmm_fp16 = XMMRegister()
++    VMOVUPS(xmm_fp16, [reg_fp16])
++    ymm_fp32 = fp16.avx2.fp16_alt_xmm_to_fp32_ymm(xmm_fp16)
++    VMOVUPS([reg_fp32], ymm_fp32)
++
++    RETURN()
++
++with Function("fp16_alt_xmm_to_fp32_xmm_peachpy__avx", (arg_fp16, arg_fp32), target=uarch.default + isa.avx):
++
++    reg_fp16 = GeneralPurposeRegister64()
++    LOAD.ARGUMENT(reg_fp16, arg_fp16)
++
++    reg_fp32 = GeneralPurposeRegister64()
++    LOAD.ARGUMENT(reg_fp32, arg_fp32)
++
++    xmm_fp16 = XMMRegister()
++    VMOVUPS(xmm_fp16, [reg_fp16])
++    xmm_fp32 = fp16.avx.fp16_alt_xmm_to_fp32_xmm(xmm_fp16)
++    VMOVUPS([reg_fp32], xmm_fp32)
++
++    RETURN()
+-- 
+2.48.1
+

@@ -1,0 +1,46 @@
+From d205297a10bf8d7f8846bf42f0ed618543a561a9 Mon Sep 17 00:00:00 2001
+From: fundawang <fundawang@yeah.net>
+Date: Sun, 26 Jan 2025 16:39:03 +0800
+Subject: [PATCH 1/2] move link against gnutls into main library, as it is
+ referenced by tls/libtls.la
+
+---
+ lib/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/Makefile.am b/lib/Makefile.am
+index 82376cb3..33be5e41 100644
+--- a/lib/Makefile.am
++++ b/lib/Makefile.am
+@@ -48,5 +48,5 @@ libnfs_la_LIBADD = \
+ 
+ if HAVE_TLS
+ libnfs_la_CPPFLAGS += -I$(abs_top_srcdir)/tls
+-libnfs_la_LIBADD += ../tls/libtls.la
++libnfs_la_LIBADD += ../tls/libtls.la -lgnutls
+ endif
+
+From 546c9ed8624403078ef993138b56dce4c3558523 Mon Sep 17 00:00:00 2001
+From: fundawang <fundawang@yeah.net>
+Date: Sun, 26 Jan 2025 16:39:59 +0800
+Subject: [PATCH 2/2] move link against gnutls into main library, as it is
+ referenced by tls/libtls.la
+
+---
+ utils/Makefile.am | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/utils/Makefile.am b/utils/Makefile.am
+index bd584b8d..2ae7636f 100644
+--- a/utils/Makefile.am
++++ b/utils/Makefile.am
+@@ -16,9 +16,6 @@ AM_CPPFLAGS = \
+ 	"-D_U_=__attribute__((unused))"
+ 
+ COMMON_LIBS = ../lib/libnfs.la $(LIBSOCKET)
+-if HAVE_TLS
+-COMMON_LIBS += -lgnutls
+-endif
+ 
+ nfs_cat_LDADD = $(COMMON_LIBS)
+ nfs_ls_LDADD = $(COMMON_LIBS)

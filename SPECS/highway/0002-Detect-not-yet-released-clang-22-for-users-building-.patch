@@ -1,0 +1,36 @@
+From 2cde2005d3f12c17fad2a28473a3538b6cdb85e1 Mon Sep 17 00:00:00 2001
+From: Highway <no-reply@google.com>
+Date: Thu, 18 Sep 2025 11:16:50 -0700
+Subject: [PATCH 2/2] Detect not-yet-released clang 22, for users building with
+ LLVM at HEAD.
+
+The new builtin used for the test was taken from the in-progress release notes
+for clang 22: https://clang.llvm.org/docs/ReleaseNotes.html. It was introduced
+at
+https://github.com/llvm/llvm-project/commit/c3bf73bc4ade26b8b9dd5080ce7bccd88037cfd0,
+commited approximately a month ago.
+
+PiperOrigin-RevId: 808660007
+(cherry picked from commit 54fc0d7eb59874d0fb03fc24e06c9c5e021d0071)
+---
+ hwy/detect_compiler_arch.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/hwy/detect_compiler_arch.h b/hwy/detect_compiler_arch.h
+index 9735e2db..5d08c61c 100644
+--- a/hwy/detect_compiler_arch.h
++++ b/hwy/detect_compiler_arch.h
+@@ -73,7 +73,9 @@
+ // https://github.com/simd-everywhere/simde/blob/47d6e603de9d04ee05cdfbc57cf282a02be1bf2a/simde/simde-detect-clang.h#L59.
+ // Please send updates below to them as well, thanks!
+ #if defined(__apple_build_version__) || __clang_major__ >= 999
+-#if __has_builtin(__builtin_structured_binding_size)
++#if __has_builtin(__builtin_elementwise_fshl)
++#define HWY_COMPILER_CLANG 2201
++#elif __has_builtin(__builtin_structured_binding_size)
+ #define HWY_COMPILER_CLANG 2101
+ #elif __has_builtin(__builtin_common_type)
+ #define HWY_COMPILER_CLANG 2001
+-- 
+2.50.1
+

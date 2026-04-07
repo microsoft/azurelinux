@@ -1,0 +1,12 @@
+diff --git a/runtests.sh.old b/runtests.sh
+index ecb383e..1cd1d1a 100755
+--- a/runtests.sh.old
++++ b/runtests.sh
+@@ -276,6 +276,7 @@ do
+ 
+     case "$testscript" in
+     *hardlinks*) TESTRUN_TIMEOUT=600 ;;
++    *default-acls*) continue ;;
+     *) TESTRUN_TIMEOUT=300 ;;
+     esac
+ 

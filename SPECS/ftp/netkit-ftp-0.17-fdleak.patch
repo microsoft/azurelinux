@@ -1,0 +1,11 @@
+diff -up netkit-ftp-0.17/ftp/cmds.c.old netkit-ftp-0.17/ftp/cmds.c
+--- netkit-ftp-0.17/ftp/cmds.c.old	2007-10-17 16:28:57.000000000 +0200
++++ netkit-ftp-0.17/ftp/cmds.c	2007-10-17 16:33:41.000000000 +0200
+@@ -764,6 +764,7 @@ usage:
+ 
+ 	recvrequest("RETR", argv[2], argv[1], modestr,
+ 		    argv[1] != oldargv1 || argv[2] != oldargv2);
++	(void) close(data), data = -1;
+ 	restart_point = 0;
+ 	return (0);
+ }

@@ -1,0 +1,10 @@
+--- bit-vec-0.6.3/Cargo.toml	1970-01-01T00:00:00+00:00
++++ bit-vec-0.6.3/Cargo.toml	2025-01-07T21:12:29.602109+00:00
+@@ -21,6 +21,7 @@
+ keywords = ["data-structures", "bitvec", "bitmask", "bitmap", "bit"]
+ license = "MIT/Apache-2.0"
+ repository = "https://github.com/contain-rs/bit-vec"
++exclude = ["/*.sh", "/.travis.yml"]
+ [dependencies.serde]
+ version = "1.0"
+ features = ["derive"]

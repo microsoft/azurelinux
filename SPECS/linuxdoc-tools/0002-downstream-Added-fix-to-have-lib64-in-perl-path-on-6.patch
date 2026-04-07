@@ -1,0 +1,25 @@
+From 453fa2fb9d10c2ded7a46d550592f79dd7653e39 Mon Sep 17 00:00:00 2001
+From: Julien Rische <jrische@redhat.com>
+Date: Sun, 5 Feb 2023 23:30:27 +0100
+Subject: [PATCH] [downstream] Added fix to have lib64 in perl path on
+ 64bit machine
+
+---
+ bin/linuxdoc.in | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/bin/linuxdoc.in b/bin/linuxdoc.in
+index 615ef06..3d3455f 100755
+--- a/bin/linuxdoc.in
++++ b/bin/linuxdoc.in
+@@ -12,6 +12,7 @@ use 5.006;
+ use strict;
+ 
+ use lib "@pkgdatadir@";
++use lib "@prefix@/lib64/perl5";
+ use lib "@perl5libdir@";
+ 
+ use LinuxDocTools::Utils qw{ldt_which};
+-- 
+2.39.1
+

@@ -1,0 +1,30 @@
+Avoid an int-conversion error by adding an explicit cast.
+
+Upstream ported this code to C# in:
+
+commit d7095d495c5188856b2c259ce4871f2c64ed0861
+Author: Christian Hoff <choff@mono-cvs.ximian.com>
+Date:   Tue Mar 17 18:40:35 2009 +0000
+
+    2009-03-17  Christian Hoff  <christian_hoff@gmx.net>
+    
+            * gdk/Property.custom: add new overloads to the Get method
+            for the most common property types
+            * gdk/Global.custom: Use the new overloads of Property.Get instead o
+f glue
+    
+    svn path=/trunk/gtk-sharp/; revision=129618
+
+diff --git a/gdk/glue/windowmanager.c b/gdk/glue/windowmanager.c
+index 484d713b7e2c9037..0ff11f97d26daa8b 100644
+--- a/gdk/glue/windowmanager.c
++++ b/gdk/glue/windowmanager.c
+@@ -110,7 +110,7 @@ gtksharp_get_gdk_net_client_list (int *count)
+ 	list = g_malloc (*count * sizeof (gpointer));
+ 	/* Put all of the windows into a GList to return */
+ 	for (i = 0; i < *count; i ++) {
+-		list [i] = data [i];
++		list [i] = (gpointer) data [i];
+ 		g_message ("WinID: %d", list [i]);
+ 	}
+ 

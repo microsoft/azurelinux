@@ -1,0 +1,111 @@
+From e050e4aa99818f7559ab48568ea6662dc4104317 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Bj=C3=B6rn=20Esser?= <besser82@fedoraproject.org>
+Date: Thu, 30 Jan 2025 12:36:21 +0100
+Subject: [PATCH 3/3] act-user: Use the reentrant interfaces of
+ crypt{,_gensalt}(3)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The crypt(3) function is known to clobber its static allocated internal
+buffer when called multiple times consecutively or (especially) when
+called in parallel (e.g. from independently operation threads), and
+should generally not be used if a reentrant implementation exists.
+
+The reentrant interface, named crypt_rn(3), operates in the same way as
+the well known crypt(3) function, but takes an extra parameter of
+'struct crypt_data' which includes space for its result (among other
+things), so applications can utilize the reentrant interface, in a way
+each invocation of the crypt_rn(3) function will freely operate on their
+own dedicated memory areas when hashing passphrases.
+
+The same applies for the crypt_gensalt(3) function, to which libxcrypt
+offers a variety of reentrant interfaces as well.
+
+Also ensure the buffers in use are properly zeroized.
+
+Signed-off-by: Björn Esser <besser82@fedoraproject.org>
+---
+ src/libaccountsservice/act-user.c | 53 ++++++++-----------------------
+ 1 file changed, 13 insertions(+), 40 deletions(-)
+
+diff --git a/src/libaccountsservice/act-user.c b/src/libaccountsservice/act-user.c
+index 77b7b2f..4fd2c62 100644
+--- a/src/libaccountsservice/act-user.c
++++ b/src/libaccountsservice/act-user.c
+@@ -1748,51 +1748,22 @@ act_user_set_account_type (ActUser           *user,
+         }
+ }
+ 
+-#ifdef HAVE_CRYPT_GENSALT
+ static gchar *
+-generate_salt_for_crypt_hash (void)
+-{
+-        return g_strdup (crypt_gensalt (NULL, 0, NULL, 0));
+-}
+-#else
+-static const gchar
+-salt_char (GRand *rand)
++make_crypted (const gchar *plain)
+ {
+-        const gchar salt[] = "ABCDEFGHIJKLMNOPQRSTUVXYZ"
+-                             "abcdefghijklmnopqrstuvxyz"
+-                             "./0123456789";
+-
+-        return salt[g_rand_int_range (rand, 0, G_N_ELEMENTS (salt))];
+-}
++        gchar *crypted = NULL;
++        g_autofree struct crypt_data *cd = NULL;
+ 
+-static gchar *
+-generate_salt_for_crypt_hash (void)
+-{
+-        g_autoptr (GString) salt = NULL;
+-        g_autoptr (GRand) rand = NULL;
+-        gint i;
++        cd = g_malloc0 (sizeof (struct crypt_data));
+ 
+-        rand = g_rand_new ();
+-        salt = g_string_sized_new (21);
++        crypt_gensalt_rn (NULL, 0, NULL, 0,
++                          cd->input, sizeof (cd->input));
++        crypted = g_strdup (crypt_rn (plain, cd->input,
++                            cd, sizeof (struct crypt_data)));
+ 
+-        /* sha512crypt */
+-        g_string_append (salt, "$6$");
+-        for (i = 0; i < 16; i++) {
+-                g_string_append_c (salt, salt_char (rand));
+-        }
+-        g_string_append_c (salt, '$');
++        explicit_bzero (cd, sizeof (struct crypt_data));
+ 
+-        return g_strdup (salt->str);
+-}
+-#endif
+-
+-static gchar *
+-make_crypted (const gchar *plain)
+-{
+-        g_autofree char *salt = NULL;
+-
+-        salt = generate_salt_for_crypt_hash ();
+-        return g_strdup (crypt (plain, salt));
++        return crypted;
+ }
+ 
+ /**
+@@ -1828,7 +1799,9 @@ act_user_set_password (ActUser     *user,
+                                                    &error)) {
+                 g_warning ("SetPassword call failed: %s", error->message);
+         }
+-        memset (crypted, 0, strlen (crypted));
++        if (crypted) {
++                explicit_bzero (crypted, strlen (crypted));
++        }
+ }
+ 
+ /**
+-- 
+2.48.1
+

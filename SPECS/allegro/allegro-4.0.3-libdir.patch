@@ -1,0 +1,20 @@
+diff -up allegro-4.4.2/misc/allegro-config.in~ allegro-4.4.2/misc/allegro-config.in
+--- allegro-4.4.2/misc/allegro-config.in~	2010-03-03 11:22:34.000000000 +0100
++++ allegro-4.4.2/misc/allegro-config.in	2011-07-12 10:42:05.231457514 +0200
+@@ -19,8 +19,15 @@ exec_prefix=$prefix
+ exec_prefix_set=no
+ include_prefix=@INCLUDE_PREFIX@
+ include_path=${prefix}/include
+-lib_path=${exec_prefix}/lib@LIB_SUFFIX@
+ bin_path=${exec_prefix}/bin
++arch=$(/bin/arch)
++if [ "$arch" = "x86_64" -o "$arch" = "s390x" -o "$arch" = "ppc64" \
++    -o "$arch" = "ia64" ];
++then
++    lib_path="/usr/lib64"
++else
++    lib_path="/usr/lib"
++fi
+ 
+ static_libs=@LINK_WITH_STATIC_LIBS@
+ lib_type=@LIB_TO_LINK@

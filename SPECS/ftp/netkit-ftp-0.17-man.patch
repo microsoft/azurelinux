@@ -1,0 +1,30 @@
+diff -up netkit-ftp-0.17/ftp/ftp.1.man netkit-ftp-0.17/ftp/ftp.1
+--- netkit-ftp-0.17/ftp/ftp.1.man	2011-03-29 09:35:52.588039000 +0200
++++ netkit-ftp-0.17/ftp/ftp.1	2011-03-29 09:36:45.365651621 +0200
+@@ -197,7 +197,7 @@ current remote machine working directory
+ Change the permission modes of the file
+ .Ar file-name
+ on the remote
+-sytem to
++system to
+ .Ar mode  .
+ .It Ic close
+ Terminate the
+@@ -342,7 +342,7 @@ Set the inactivity timer on the remote s
+ seconds.
+ If
+ .Ar seconds
+-is ommitted, the current inactivity timer is printed.
++is omitted, the current inactivity timer is printed.
+ .It Ic lcd Op Ar directory
+ Change the working directory on the local machine.
+ If
+@@ -850,7 +850,7 @@ Set the default umask on the remote serv
+ .Ar newmask  .
+ If
+ .Ar newmask
+-is ommitted, the current umask is printed.
++is omitted, the current umask is printed.
+ .It Xo
+ .Ic user Ar user-name
+ .Op Ar password

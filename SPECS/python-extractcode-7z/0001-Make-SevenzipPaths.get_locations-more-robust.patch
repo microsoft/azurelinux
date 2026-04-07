@@ -1,0 +1,68 @@
+From a37d91fdfc9d67a6608583bcde22082926b1181f Mon Sep 17 00:00:00 2001
+From: Nils Philippsen <nils@redhat.com>
+Date: Wed, 14 May 2025 12:10:33 +0200
+Subject: [PATCH] Make SevenzipPaths.get_locations() more robust
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Current Fedora Rawhide (which is to become version 43 eventually) has
+the proper 7zip package, which in turn doesn’t have the tool in the
+place expected for prior versions (with p7zip-plugins).
+
+To make the method more robust, try all known directories and binary
+names on Linux, but make the order in which they are checked dependent
+on the type of Linux distribution encountered.
+
+Signed-off-by: Nils Philippsen <nils@redhat.com>
+(cherry picked from commit 4568b4ca1205598ce94fefc8b602063ca8e0c7fa)
+---
+ .../src/extractcode_7z/__init__.py            | 25 +++++++++++++++----
+ 1 file changed, 20 insertions(+), 5 deletions(-)
+
+diff --git a/src/extractcode_7z/__init__.py b/src/extractcode_7z/__init__.py
+index 0e3523c..d219c7d 100755
+--- a/src/extractcode_7z/__init__.py
++++ b/src/extractcode_7z/__init__.py
+@@ -42,19 +42,28 @@ class SevenzipPaths(LocationProviderPlug
+                 debian_based_distro = ['ubuntu', 'mint', 'debian']
+                 rpm_based_distro = ['fedora', 'rhel']
+ 
++                dir_candidates = ("/usr/bin", "/usr/lib/p7zip", "/usr/libexec/p7zip")
++                bin_candidates = ("7z", "7zz", "7za")
++
+                 if any(dist in debian_based_distro for dist in distribution):
+-                    lib_dir = '/usr/bin'
+-                    for bin_name in ('7z', '7zz'):
+-                        lib_7z = path.join(lib_dir, bin_name)
++                    # take the defaults
++                    pass
++                elif any(dist in rpm_based_distro for dist in distribution):
++                    # Fedora >= 43 has 7zip proper, in /usr/bin
++                    dir_candidates = ("/usr/libexec/p7zip", "/usr/bin", "/usr/lib/p7zip")
++                    bin_candidates = ("7za", "7z", "7zz")
++
++                found = False
++                for lib_dir in dir_candidates:
++                    for bin_candidate in bin_candidates:
++                        lib_7z = path.join(lib_dir, bin_candidate)
+                         if path.exists(lib_7z):
++                            found = True
+                             break
+-                elif any(dist in rpm_based_distro for dist in distribution):
+-                    # 7zip proper is not available on dnf
+-                    lib_dir = '/usr/libexec/p7zip'
+-                    lib_7z = path.join(lib_dir, '7za')
+-                else:
+-                    raise Exception(
+-                        'Unsupported system: {}'.format(distribution))
++                    if found:
++                        break
++
++                # If none is found here, lib_7z won’t be found below either.
+             elif mainstream_system == 'freebsd':
+                 lib_dir = '/usr/local/bin'
+                 lib_7z = path.join(lib_dir, '7z')
+-- 
+2.49.0
+

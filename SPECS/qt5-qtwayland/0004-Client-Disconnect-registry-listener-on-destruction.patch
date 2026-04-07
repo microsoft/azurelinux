@@ -1,0 +1,49 @@
+From 19d8f71335668b7e84b2cb46b5e4199c2ec3295a Mon Sep 17 00:00:00 2001
+From: David Edmundson <davidedmundson@kde.org>
+Date: Fri, 14 May 2021 13:23:24 +0100
+Subject: [PATCH 04/55] Client: Disconnect registry listener on destruction
+
+If a display outlives a QWaylandClientExtension and a new global is
+announced we end up delivering an event to a now deleted extension which
+will crash.
+
+Change-Id: Idc0de40be61a2f7627ab4963e1fe29b22fbf3f04
+(cherry picked from commit c4ba37cd2f8cb81b9438b56ac604fc2f3e45083c)
+---
+ src/client/global/qwaylandclientextension.cpp | 7 +++++++
+ src/client/global/qwaylandclientextension.h   | 1 +
+ 2 files changed, 8 insertions(+)
+
+diff --git a/src/client/global/qwaylandclientextension.cpp b/src/client/global/qwaylandclientextension.cpp
+index 966096a8..2dc61b77 100644
+--- a/src/client/global/qwaylandclientextension.cpp
++++ b/src/client/global/qwaylandclientextension.cpp
+@@ -88,6 +88,13 @@ QWaylandClientExtension::QWaylandClientExtension(const int ver)
+     QMetaObject::invokeMethod(this, "addRegistryListener", Qt::QueuedConnection);
+ }
+ 
++QWaylandClientExtension::~QWaylandClientExtension()
++{
++    Q_D(QWaylandClientExtension);
++    if (d->registered && !QCoreApplication::closingDown())
++        d->waylandIntegration->display()->removeListener(&QWaylandClientExtensionPrivate::handleRegistryGlobal, this);
++}
++
+ QtWaylandClient::QWaylandIntegration *QWaylandClientExtension::integration() const
+ {
+     Q_D(const QWaylandClientExtension);
+diff --git a/src/client/global/qwaylandclientextension.h b/src/client/global/qwaylandclientextension.h
+index 98272e57..5bd28398 100644
+--- a/src/client/global/qwaylandclientextension.h
++++ b/src/client/global/qwaylandclientextension.h
+@@ -63,6 +63,7 @@ class Q_WAYLAND_CLIENT_EXPORT QWaylandClientExtension : public QObject
+     Q_PROPERTY(bool active READ isActive NOTIFY activeChanged)
+ public:
+     QWaylandClientExtension(const int version);
++    ~QWaylandClientExtension();
+ 
+     QtWaylandClient::QWaylandIntegration *integration() const;
+     int version() const;
+-- 
+2.51.1
+

@@ -1,0 +1,31 @@
+--- glib-1.2.10/glib-config.in.multilib	2007-01-11 10:00:48.000000000 -0500
++++ glib-1.2.10/glib-config.in	2007-01-11 10:13:25.000000000 -0500
+@@ -1,7 +1,10 @@
+ #!/bin/sh
+ 
+-prefix=@prefix@
+-exec_prefix=@exec_prefix@
++[ -z "$PKG_CONFIG" ] && PKG_CONFIG="pkg-config"
++prefix=`${PKG_CONFIG} --variable prefix glib`
++exec_prefix=`${PKG_CONFIG} --variable exec_prefix glib`
++libdir=`${PKG_CONFIG} --variable libdir glib`
++includedir=`${PKG_CONFIG} --variable includedir glib`
+ exec_prefix_set=no
+ 
+ usage()
+@@ -88,7 +91,7 @@
+ 	if test "$lib_gthread" = "yes"; then
+ 		cflags="$cflags @G_THREAD_CFLAGS@"
+ 	fi
+-	echo -I@includedir@/glib-1.2 -I@libdir@/glib/include $includes $cflags
++	echo -I${includedir}/glib-1.2 -I${libdir}/glib/include $includes $cflags
+ fi
+ if test "$echo_libs" = "yes"; then
+ 	libsp=""
+@@ -104,5 +107,5 @@
+ 		libsp="@G_MODULE_LDFLAGS@ -lgmodule $libsp"
+ 		libsa="$libsa @G_MODULE_LIBS@"
+ 	fi
+-	echo -L@libdir@ $libsp $libsa
++	echo -L${libdir} $libsp $libsa
+ fi

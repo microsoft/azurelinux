@@ -1,0 +1,30 @@
+From d5c84ea4595ea1fbb5b213621e0966ebe0fd3cc9 Mon Sep 17 00:00:00 2001
+From: Joseph Schuchart <joseph.schuchart@stonybrook.edu>
+Date: Wed, 28 May 2025 10:11:58 -0400
+Subject: [PATCH] Force alignment of opal_atomic_int128_t to be 16B
+
+Some architectures will align 128bit integer on 8B but require 16B alignment
+for 128bit CAS instructions and otherwise fall back to a lock-based
+atomicity model. By forcing 16bit alignment we can ensure that the variables
+are properly aligned and the fall-back is not triggered.
+
+Thanks to Ulrich Weigand for the analysis and proposed fix in https://github.com/open-mpi/ompi/issues/10988#issuecomment-2913388506.
+
+Signed-off-by: Joseph Schuchart <joseph.schuchart@stonybrook.edu>
+---
+ opal/include/opal_stdatomic.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/opal/include/opal_stdatomic.h b/opal/include/opal_stdatomic.h
+index 35437551208..f7dd8353d3b 100644
+--- a/opal/include/opal_stdatomic.h
++++ b/opal/include/opal_stdatomic.h
+@@ -72,7 +72,7 @@ typedef _Atomic opal_int128_t opal_atomic_int128_t;
+ 
+ #        else
+ 
+-typedef volatile opal_int128_t opal_atomic_int128_t;
++typedef volatile opal_int128_t opal_atomic_int128_t __opal_attribute_aligned__(16);
+ 
+ #        endif
+ 

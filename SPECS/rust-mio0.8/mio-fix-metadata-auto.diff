@@ -1,0 +1,29 @@
+--- mio-0.8.11/Cargo.toml	1970-01-01T00:00:01+00:00
++++ mio-0.8.11/Cargo.toml	2024-07-28T14:18:22.153794+00:00
+@@ -103,26 +103,9 @@
+ net = []
+ os-ext = [
+     "os-poll",
+-    "windows-sys/Win32_System_Pipes",
+-    "windows-sys/Win32_Security",
+ ]
+ os-poll = []
+-
+-[target."cfg(target_os = \"wasi\")".dependencies.libc]
+-version = "0.2.149"
+-
+-[target."cfg(target_os = \"wasi\")".dependencies.wasi]
+-version = "0.11.0"
+ 
+ [target."cfg(unix)".dependencies.libc]
+ version = "0.2.149"
+ 
+-[target."cfg(windows)".dependencies.windows-sys]
+-version = "0.48"
+-features = [
+-    "Win32_Foundation",
+-    "Win32_Networking_WinSock",
+-    "Win32_Storage_FileSystem",
+-    "Win32_System_IO",
+-    "Win32_System_WindowsProgramming",
+-]

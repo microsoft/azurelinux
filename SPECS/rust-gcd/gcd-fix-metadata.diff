@@ -1,0 +1,17 @@
+--- gcd-2.3.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ gcd-2.3.0/Cargo.toml	2024-01-09T20:23:35.329828+00:00
+@@ -21,14 +21,7 @@
+ license = "MIT/Apache-2.0"
+ repository = "https://github.com/frewsxcv/rust-gcd"
+ 
+-[[bench]]
+-name = "gcd_benchmark"
+-harness = false
+-
+ [dependencies]
+-
+-[dev-dependencies.criterion]
+-version = "0.3"
+ 
+ [dev-dependencies.rand]
+ version = "0.7"

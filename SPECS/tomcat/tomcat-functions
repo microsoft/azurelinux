@@ -1,0 +1,21 @@
+#!/bin/bash
+
+if [ -r /usr/share/java-utils/java-functions ]; then
+  . /usr/share/java-utils/java-functions
+else
+  echo "Can't read Java functions library, aborting"
+  exit 1
+fi
+
+_save_function() {
+    local ORIG_FUNC=$(declare -f $1)
+    local NEWNAME_FUNC="$2${ORIG_FUNC#$1}"
+    eval "$NEWNAME_FUNC"
+}
+
+_save_function run run_java
+
+run() {
+	run_java $@
+}
+

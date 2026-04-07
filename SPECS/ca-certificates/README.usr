@@ -1,0 +1,20 @@
+This directory /usr/share/pki/ca-trust-source/ contains CA certificates and 
+trust settings in the PEM file format. The trust settings found here will be
+interpreted with a low priority - lower than the ones found in 
+/etc/pki/ca-trust/source/ .
+
+=============================================================================
+QUICK HELP: To add a certificate in the simple PEM or DER file formats to the
+            list of CAs trusted on the system:
+
+            Copy it to the
+                    /usr/share/pki/ca-trust-source/anchors/
+            subdirectory, and run the
+                    update-ca-trust
+            command.
+
+            If your certificate is in the extended BEGIN TRUSTED file format,
+            then place it into the main source/ directory instead.
+=============================================================================
+
+Please refer to the update-ca-trust(8) manual page for additional information.

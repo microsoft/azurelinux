@@ -1,0 +1,33 @@
+From b0184fe96b1a07b57cb489eb87710dc33f070dc1 Mon Sep 17 00:00:00 2001
+From: Stephen Kelly <steveire@gmail.com>
+Date: Sun, 19 Jul 2015 21:24:18 +0200
+Subject: [PATCH 30/33] Don't attempt to read the DEFINITIONS property.
+
+It was replaced by COMPILE_DEFINITIONS long ago.
+---
+ Automoc4Config.cmake | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/Automoc4Config.cmake b/Automoc4Config.cmake
+index f0dc204..d048686 100644
+--- a/Automoc4Config.cmake
++++ b/Automoc4Config.cmake
+@@ -132,7 +132,6 @@ macro(AUTOMOC4 _target_NAME _SRCS)
+    if(_moc_files)
+       set(_automoc_source "${CMAKE_CURRENT_BINARY_DIR}/${_target_NAME}_automoc.cpp")
+       get_directory_property(_moc_incs INCLUDE_DIRECTORIES)
+-      get_directory_property(_moc_defs DEFINITIONS)
+       get_directory_property(_moc_cdefs COMPILE_DEFINITIONS)
+ 
+       # Assume CMAKE_INCLUDE_CURRENT_DIR is set
+@@ -198,7 +197,6 @@ macro(_ADD_AUTOMOC4_TARGET _target_NAME _SRCS)
+       set(_automoc_source "${CMAKE_CURRENT_BINARY_DIR}/${_target_NAME}.cpp")
+       set(_automoc_dotFiles "${CMAKE_CURRENT_BINARY_DIR}/${_target_NAME}.cpp.files")
+       get_directory_property(_moc_incs INCLUDE_DIRECTORIES)
+-      get_directory_property(_moc_defs DEFINITIONS)
+       get_directory_property(_moc_cdefs COMPILE_DEFINITIONS)
+ 
+       # Assume CMAKE_INCLUDE_CURRENT_DIR is set
+-- 
+2.4.3
+

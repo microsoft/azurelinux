@@ -1,0 +1,182 @@
+From 77002264edd31e64357a3008e6963e2c54ca1fdc Mon Sep 17 00:00:00 2001
+From: David Redondo <qt@david-redondo.de>
+Date: Mon, 19 Jul 2021 10:06:17 +0200
+Subject: [PATCH 1/5] Unset mouseGrabberPopup if it's removed from children
+
+The mouseGrabberPopup is supposed to be unset in handleRelease, however
+when the exit transition of the mouseGrabberPopup (that closed itself on
+button press) finishes before the release event is delivered, it
+unparents itself from the overlay (see
+QQuickPopupPrivate::finalizeExitTransition) and the overlay sets itself
+invisible if there is nothing else visible in it. Because the overlay
+is not visible it handles no events anymore and the release is missed
+and the grabber is never unset. When opening another non-modal popup
+the overlay then will continue forwarding the events to now invisible
+popup.
+So when the overlay loses the currently grabbing popup as a child we need
+to reset mouseGrabberPopup.
+
+Fixes: QTBUG-95259
+Change-Id: I3c832d47f3cee216b81ef1b5cb7dd77bf4149991
+Reviewed-by: Mitch Curtis <mitch.curtis@qt.io>
+(adapted from commit d07ee1345acd8100fa5cbb7f05c0aaf5f87f4cae)
+
+(cherry picked from commit 1a59ef4218658ffc476909ef4fca13d6cf86d04b)
+---
+ src/quicktemplates2/qquickoverlay.cpp         |  5 +-
+ .../data/releaseAfterExitTransition.qml       | 78 +++++++++++++++++++
+ tests/auto/qquickpopup/tst_qquickpopup.cpp    | 29 +++++++
+ 3 files changed, 111 insertions(+), 1 deletion(-)
+ create mode 100644 tests/auto/qquickpopup/data/releaseAfterExitTransition.qml
+
+diff --git a/src/quicktemplates2/qquickoverlay.cpp b/src/quicktemplates2/qquickoverlay.cpp
+index 91bd59184..0ce518f84 100644
+--- a/src/quicktemplates2/qquickoverlay.cpp
++++ b/src/quicktemplates2/qquickoverlay.cpp
+@@ -399,8 +399,11 @@ void QQuickOverlay::itemChange(ItemChange change, const ItemChangeData &data)
+     Q_D(QQuickOverlay);
+     QQuickItem::itemChange(change, data);
+ 
+-    if (change == ItemChildAddedChange || change == ItemChildRemovedChange)
++    if (change == ItemChildAddedChange || change == ItemChildRemovedChange) {
+         setVisible(!d->allDrawers.isEmpty() || !childItems().isEmpty());
++        if (data.item->parent() == d->mouseGrabberPopup)
++            d->setMouseGrabberPopup(nullptr);
++    }
+ }
+ 
+ void QQuickOverlay::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)
+diff --git a/tests/auto/qquickpopup/data/releaseAfterExitTransition.qml b/tests/auto/qquickpopup/data/releaseAfterExitTransition.qml
+new file mode 100644
+index 000000000..9e4598b9f
+--- /dev/null
++++ b/tests/auto/qquickpopup/data/releaseAfterExitTransition.qml
+@@ -0,0 +1,78 @@
++/****************************************************************************
++**
++** Copyright (C) 2021 The Qt Company Ltd.
++** Contact: https://www.qt.io/licensing/
++**
++** This file is part of the test suite of the Qt Toolkit.
++**
++** $QT_BEGIN_LICENSE:BSD$
++** Commercial License Usage
++** Licensees holding valid commercial Qt licenses may use this file in
++** accordance with the commercial license agreement provided with the
++** Software or, alternatively, in accordance with the terms contained in
++** a written agreement between you and The Qt Company. For licensing terms
++** and conditions see https://www.qt.io/terms-conditions. For further
++** information use the contact form at https://www.qt.io/contact-us.
++**
++** BSD License Usage
++** Alternatively, you may use this file under the terms of the BSD license
++** as follows:
++**
++** "Redistribution and use in source and binary forms, with or without
++** modification, are permitted provided that the following conditions are
++** met:
++**   * Redistributions of source code must retain the above copyright
++**     notice, this list of conditions and the following disclaimer.
++**   * Redistributions in binary form must reproduce the above copyright
++**     notice, this list of conditions and the following disclaimer in
++**     the documentation and/or other materials provided with the
++**     distribution.
++**   * Neither the name of The Qt Company Ltd nor the names of its
++**     contributors may be used to endorse or promote products derived
++**     from this software without specific prior written permission.
++**
++**
++** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++** "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++** LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++** A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++** OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++** LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++** DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++import QtQuick 2.15
++import QtQuick.Controls 2.15
++
++ApplicationWindow {
++    id: window
++    width: 400
++    height: 400
++    title: "releaseAfterExitTransition"
++
++    property alias popup: popup
++    property alias modalPopup: modalPopup
++
++    Popup {
++        id: popup
++        y: parent.height - height
++        width: 50
++        height: 50
++    }
++
++    Popup {
++        id: modalPopup
++        modal: true
++        y: parent.height - height
++        width: 50
++        height: 50
++        exit:  Transition { PauseAnimation { duration: 100 } }
++    }
++}
+diff --git a/tests/auto/qquickpopup/tst_qquickpopup.cpp b/tests/auto/qquickpopup/tst_qquickpopup.cpp
+index 54952d128..3d50e2dd4 100644
+--- a/tests/auto/qquickpopup/tst_qquickpopup.cpp
++++ b/tests/auto/qquickpopup/tst_qquickpopup.cpp
+@@ -100,6 +100,7 @@ private slots:
+     void invisibleToolTipOpen();
+     void centerInOverlayWithinStackViewItem();
+     void destroyDuringExitTransition();
++    void releaseAfterExitTransition();
+ };
+ 
+ void tst_QQuickPopup::initTestCase()
+@@ -1575,6 +1576,34 @@ void tst_QQuickPopup::destroyDuringExitTransition()
+     QVERIFY(!button->isDown());
+ }
+ 
++void tst_QQuickPopup::releaseAfterExitTransition()
++{
++    QQuickApplicationHelper helper(this, "releaseAfterExitTransition.qml");
++    QVERIFY2(helper.ready, helper.failureMessage());
++
++    QQuickWindow *window = helper.window;
++    window->show();
++    QVERIFY(QTest::qWaitForWindowActive(window));
++
++    QQuickOverlay *overlay = QQuickOverlay::overlay(window);
++    QQuickPopup *modalPopup = window->property("modalPopup").value<QQuickPopup *>();
++    QQuickPopup *popup = window->property("popup").value<QQuickPopup *>();
++
++    modalPopup->open();
++    QTRY_VERIFY(modalPopup->isOpened());
++
++    QTest::mousePress(window, Qt::LeftButton, Qt::NoModifier, QPoint(1, 1));
++    // wait until the transition is finished and the overlay hides itself
++    QTRY_VERIFY(!overlay->isVisible());
++    QTest::mouseRelease(window, Qt::LeftButton, Qt::NoModifier, QPoint(1, 1));
++
++    popup->open();
++    QTRY_VERIFY(popup->isOpened());
++    QTest::mouseClick(window, Qt::LeftButton, Qt::NoModifier, QPoint(1, 1));
++    QTRY_VERIFY(!popup->isOpened());
++}
++
++
+ QTEST_QUICKCONTROLS_MAIN(tst_QQuickPopup)
+ 
+ #include "tst_qquickpopup.moc"
+-- 
+2.51.1
+

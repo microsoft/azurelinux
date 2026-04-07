@@ -1,0 +1,564 @@
+From c97dd629215ff459df6240a5054f6f5e18b03644 Mon Sep 17 00:00:00 2001
+From: Chris Kelley <ckelley@redhat.com>
+Date: Mon, 17 Jun 2024 20:59:30 +0100
+Subject: [PATCH 2/2] Drop jboss-logmanager dependency
+
+---
+ pom.xml                                       |   7 -
+ .../jboss/logging/JBossLogManagerLogger.java  |  81 ---------
+ .../logging/JBossLogManagerProvider.java      | 163 ------------------
+ .../org/jboss/logging/LoggerProviders.java    |  30 +---
+ .../JBossLogManagerClassPathTestCase.java     |  30 ----
+ .../JBossLogManagerProviderTestCase.java      | 158 -----------------
+ 6 files changed, 1 insertion(+), 468 deletions(-)
+ delete mode 100644 src/main/java/org/jboss/logging/JBossLogManagerLogger.java
+ delete mode 100644 src/main/java/org/jboss/logging/JBossLogManagerProvider.java
+ delete mode 100644 src/test/java/org/jboss/logging/JBossLogManagerClassPathTestCase.java
+ delete mode 100644 src/test/java/org/jboss/logging/JBossLogManagerProviderTestCase.java
+
+diff --git a/pom.xml b/pom.xml
+index 76bcbfb..429a73f 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -56,7 +56,6 @@
+         <!-- Dependency versions -->
+         <version.ch.qos.logback>1.5.6</version.ch.qos.logback>
+         <version.module-info>2.1</version.module-info>
+-        <version.org.jboss.logmanager>3.0.6.Final</version.org.jboss.logmanager>
+         <version.org.junit>5.10.2</version.org.junit>
+         <version.org.sfl4j>2.0.12</version.org.sfl4j>
+ 
+@@ -80,12 +79,6 @@
+     </dependencyManagement>
+ 
+     <dependencies>
+-        <dependency>
+-            <groupId>org.jboss.logmanager</groupId>
+-            <artifactId>jboss-logmanager</artifactId>
+-            <version>${version.org.jboss.logmanager}</version>
+-            <scope>provided</scope>
+-        </dependency>
+         <dependency>
+             <groupId>org.slf4j</groupId>
+             <artifactId>slf4j-api</artifactId>
+diff --git a/src/main/java/org/jboss/logging/JBossLogManagerLogger.java b/src/main/java/org/jboss/logging/JBossLogManagerLogger.java
+deleted file mode 100644
+index bd4c9a0..0000000
+--- a/src/main/java/org/jboss/logging/JBossLogManagerLogger.java
++++ /dev/null
+@@ -1,81 +0,0 @@
+-/*
+- * JBoss, Home of Professional Open Source.
+- *
+- * Copyright 2023 Red Hat, Inc.
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *  http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-package org.jboss.logging;
+-
+-import org.jboss.logmanager.ExtLogRecord;
+-
+-final class JBossLogManagerLogger extends Logger {
+-
+-    private static final long serialVersionUID = 7429618317727584742L;
+-
+-    private final org.jboss.logmanager.Logger logger;
+-
+-    JBossLogManagerLogger(final String name, final org.jboss.logmanager.Logger logger) {
+-        super(name);
+-        this.logger = logger;
+-    }
+-
+-    public boolean isEnabled(final Level level) {
+-        return logger.isLoggable(translate(level));
+-    }
+-
+-    protected void doLog(final Level level, final String loggerClassName, final Object message, final Object[] parameters,
+-            final Throwable thrown) {
+-        java.util.logging.Level translatedLevel = translate(level);
+-        if (logger.isLoggable(translatedLevel)) {
+-            if (parameters == null) {
+-                logger.log(loggerClassName, translatedLevel, String.valueOf(message), thrown);
+-            } else {
+-                logger.log(loggerClassName, translatedLevel, String.valueOf(message), ExtLogRecord.FormatStyle.MESSAGE_FORMAT,
+-                        parameters, thrown);
+-            }
+-        }
+-    }
+-
+-    protected void doLogf(final Level level, final String loggerClassName, final String format, final Object[] parameters,
+-            final Throwable thrown) {
+-        if (parameters == null) {
+-            logger.log(loggerClassName, translate(level), format, thrown);
+-        } else {
+-            logger.log(loggerClassName, translate(level), format, ExtLogRecord.FormatStyle.PRINTF, parameters, thrown);
+-        }
+-    }
+-
+-    private static java.util.logging.Level translate(final Level level) {
+-        if (level == Level.TRACE) {
+-            return org.jboss.logmanager.Level.TRACE;
+-        } else if (level == Level.DEBUG) {
+-            return org.jboss.logmanager.Level.DEBUG;
+-        }
+-        return infoOrHigher(level);
+-    }
+-
+-    private static java.util.logging.Level infoOrHigher(final Level level) {
+-        if (level == Level.INFO) {
+-            return org.jboss.logmanager.Level.INFO;
+-        } else if (level == Level.WARN) {
+-            return org.jboss.logmanager.Level.WARN;
+-        } else if (level == Level.ERROR) {
+-            return org.jboss.logmanager.Level.ERROR;
+-        } else if (level == Level.FATAL) {
+-            return org.jboss.logmanager.Level.FATAL;
+-        }
+-        return org.jboss.logmanager.Level.ALL;
+-    }
+-}
+diff --git a/src/main/java/org/jboss/logging/JBossLogManagerProvider.java b/src/main/java/org/jboss/logging/JBossLogManagerProvider.java
+deleted file mode 100644
+index bdeac67..0000000
+--- a/src/main/java/org/jboss/logging/JBossLogManagerProvider.java
++++ /dev/null
+@@ -1,163 +0,0 @@
+-/*
+- * JBoss, Home of Professional Open Source.
+- *
+- * Copyright 2023 Red Hat, Inc.
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *  http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-package org.jboss.logging;
+-
+-import static org.jboss.logmanager.Logger.AttachmentKey;
+-
+-import java.security.AccessController;
+-import java.security.PrivilegedAction;
+-import java.util.Map;
+-import java.util.concurrent.ConcurrentHashMap;
+-import java.util.concurrent.ConcurrentMap;
+-
+-import org.jboss.logmanager.LogContext;
+-import org.jboss.logmanager.MDC;
+-import org.jboss.logmanager.NDC;
+-
+-/**
+- * An implementation of the {@linkplain LoggerProvider log provider} for the JBoss Log Manager.
+- */
+-public final class JBossLogManagerProvider implements LoggerProvider {
+-
+-    private static final AttachmentKey<Logger> KEY = new AttachmentKey<>();
+-    private static final AttachmentKey<ConcurrentMap<String, Logger>> LEGACY_KEY = new AttachmentKey<>();
+-
+-    @Override
+-    public Logger getLogger(final String name) {
+-        final SecurityManager sm = System.getSecurityManager();
+-        if (sm != null) {
+-            return AccessController.doPrivileged((PrivilegedAction<Logger>) () -> {
+-                try {
+-                    return doGetLogger(name);
+-                } catch (NoSuchMethodError ignore) {
+-                }
+-                // fallback
+-                return doLegacyGetLogger(name);
+-            });
+-        } else {
+-            try {
+-                return doGetLogger(name);
+-            } catch (NoSuchMethodError ignore) {
+-            }
+-            // fallback
+-            return doLegacyGetLogger(name);
+-        }
+-    }
+-
+-    private static Logger doLegacyGetLogger(final String name) {
+-        final org.jboss.logmanager.Logger lmLogger = LogContext.getLogContext().getLogger("");
+-        ConcurrentMap<String, Logger> loggers = lmLogger.getAttachment(LEGACY_KEY);
+-        if (loggers == null) {
+-            loggers = new ConcurrentHashMap<>();
+-            final ConcurrentMap<String, Logger> appearing = lmLogger.attachIfAbsent(LEGACY_KEY, loggers);
+-            if (appearing != null) {
+-                loggers = appearing;
+-            }
+-        }
+-
+-        Logger l = loggers.get(name);
+-        if (l != null) {
+-            return l;
+-        }
+-
+-        final org.jboss.logmanager.Logger logger = org.jboss.logmanager.Logger.getLogger(name);
+-        l = new JBossLogManagerLogger(name, logger);
+-        final Logger appearing = loggers.putIfAbsent(name, l);
+-        if (appearing == null) {
+-            return l;
+-        }
+-        return appearing;
+-    }
+-
+-    private static Logger doGetLogger(final String name) {
+-        Logger l = LogContext.getLogContext().getAttachment(name, KEY);
+-        if (l != null) {
+-            return l;
+-        }
+-        final org.jboss.logmanager.Logger logger = org.jboss.logmanager.Logger.getLogger(name);
+-        l = new JBossLogManagerLogger(name, logger);
+-        Logger a = logger.attachIfAbsent(KEY, l);
+-        if (a == null) {
+-            return l;
+-        } else {
+-            return a;
+-        }
+-    }
+-
+-    @Override
+-    public void clearMdc() {
+-        MDC.clear();
+-    }
+-
+-    @Override
+-    public Object putMdc(final String key, final Object value) {
+-        return MDC.putObject(key, value);
+-    }
+-
+-    @Override
+-    public Object getMdc(final String key) {
+-        return MDC.getObject(key);
+-    }
+-
+-    @Override
+-    public void removeMdc(final String key) {
+-        MDC.removeObject(key);
+-    }
+-
+-    @Override
+-    public Map<String, Object> getMdcMap() {
+-        // we can re-define the erasure of this map because MDC does not make further use of the copy
+-        return MDC.copyObject();
+-    }
+-
+-    @Override
+-    public void clearNdc() {
+-        NDC.clear();
+-    }
+-
+-    @Override
+-    public String getNdc() {
+-        return NDC.get();
+-    }
+-
+-    @Override
+-    public int getNdcDepth() {
+-        return NDC.getDepth();
+-    }
+-
+-    @Override
+-    public String popNdc() {
+-        return NDC.pop();
+-    }
+-
+-    @Override
+-    public String peekNdc() {
+-        return NDC.get();
+-    }
+-
+-    @Override
+-    public void pushNdc(final String message) {
+-        NDC.push(message);
+-    }
+-
+-    @Override
+-    public void setNdcMaxDepth(final int maxDepth) {
+-        NDC.trimTo(maxDepth);
+-    }
+-}
+diff --git a/src/main/java/org/jboss/logging/LoggerProviders.java b/src/main/java/org/jboss/logging/LoggerProviders.java
+index 584fa79..0154aea 100644
+--- a/src/main/java/org/jboss/logging/LoggerProviders.java
++++ b/src/main/java/org/jboss/logging/LoggerProviders.java
+@@ -21,7 +21,6 @@ package org.jboss.logging;
+ import java.util.Iterator;
+ import java.util.ServiceConfigurationError;
+ import java.util.ServiceLoader;
+-import java.util.logging.LogManager;
+ 
+ final class LoggerProviders {
+     static final String LOGGING_PROVIDER_KEY = "org.jboss.logging.provider";
+@@ -41,9 +40,7 @@ final class LoggerProviders {
+             // Check the system property
+             final String loggerProvider = SecurityActions.getSystemProperty(LOGGING_PROVIDER_KEY);
+             if (loggerProvider != null) {
+-                if ("jboss".equalsIgnoreCase(loggerProvider)) {
+-                    return tryJBossLogManager(cl, "system property");
+-                } else if ("jdk".equalsIgnoreCase(loggerProvider)) {
++                if ("jdk".equalsIgnoreCase(loggerProvider)) {
+                     return tryJDK("system property");
+                 } else if ("slf4j".equalsIgnoreCase(loggerProvider)) {
+                     return trySlf4j("system property");
+@@ -72,11 +69,6 @@ final class LoggerProviders {
+         }
+ 
+         // Finally search the class path
+-        try {
+-            return tryJBossLogManager(cl, null);
+-        } catch (Throwable t) {
+-            // nope...
+-        }
+         try {
+             // only use slf4j if Logback is in use
+             Class.forName("ch.qos.logback.classic.Logger", false, cl);
+@@ -99,26 +91,6 @@ final class LoggerProviders {
+         return provider;
+     }
+ 
+-    private static LoggerProvider tryJBossLogManager(final ClassLoader cl, final String via) throws ClassNotFoundException {
+-        final Class<? extends LogManager> logManagerClass = LogManager.getLogManager().getClass();
+-        final Class<?> jblLogManager = Class.forName("org.jboss.logmanager.LogManager", false,
+-                Logger.class.getClassLoader());
+-        if (logManagerClass == jblLogManager
+-                && Class.forName("org.jboss.logmanager.Logger$AttachmentKey", true, cl).getClassLoader() == logManagerClass
+-                        .getClassLoader()) {
+-            // We do not have an explicit dependency on org.jboss.logmanager as we could end up with cyclic dependencies.
+-            // Therefore, we check the modules are named, and if they are we add an explicit reads.
+-            final Module module = LoggerProviders.class.getModule();
+-            if (module.isNamed()) {
+-                module.addReads(jblLogManager.getModule());
+-            }
+-            final LoggerProvider provider = new JBossLogManagerProvider();
+-            logProvider(provider, via);
+-            return provider;
+-        }
+-        throw new IllegalStateException();
+-    }
+-
+     private static void logProvider(final LoggerProvider provider, final String via) {
+         // Log a debug message indicating which logger we are using
+         final Logger logger = provider.getLogger("org.jboss.logging");
+diff --git a/src/test/java/org/jboss/logging/JBossLogManagerClassPathTestCase.java b/src/test/java/org/jboss/logging/JBossLogManagerClassPathTestCase.java
+deleted file mode 100644
+index f574187..0000000
+--- a/src/test/java/org/jboss/logging/JBossLogManagerClassPathTestCase.java
++++ /dev/null
+@@ -1,30 +0,0 @@
+-/*
+- * JBoss, Home of Professional Open Source.
+- *
+- * Copyright 2023 Red Hat, Inc.
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *  http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-package org.jboss.logging;
+-
+-/**
+- * @author <a href="mailto:jperkins@redhat.com">James R. Perkins</a>
+- */
+-public class JBossLogManagerClassPathTestCase extends AbstractClassPathTestCase {
+-
+-    @Override
+-    Class<? extends Logger> getLoggerClass() {
+-        return JBossLogManagerLogger.class;
+-    }
+-}
+diff --git a/src/test/java/org/jboss/logging/JBossLogManagerProviderTestCase.java b/src/test/java/org/jboss/logging/JBossLogManagerProviderTestCase.java
+deleted file mode 100644
+index d96ddc3..0000000
+--- a/src/test/java/org/jboss/logging/JBossLogManagerProviderTestCase.java
++++ /dev/null
+@@ -1,158 +0,0 @@
+-/*
+- * JBoss, Home of Professional Open Source.
+- *
+- * Copyright 2023 Red Hat, Inc.
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *  http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-package org.jboss.logging;
+-
+-import java.util.concurrent.BlockingQueue;
+-import java.util.concurrent.LinkedBlockingQueue;
+-import java.util.concurrent.atomic.AtomicBoolean;
+-import java.util.logging.Handler;
+-import java.util.logging.Level;
+-import java.util.logging.LogRecord;
+-
+-import org.jboss.logmanager.LogContext;
+-import org.jboss.logmanager.LogContextSelector;
+-import org.junit.jupiter.api.AfterAll;
+-import org.junit.jupiter.api.AfterEach;
+-import org.junit.jupiter.api.Assertions;
+-import org.junit.jupiter.api.BeforeAll;
+-import org.junit.jupiter.api.BeforeEach;
+-import org.junit.jupiter.api.Test;
+-
+-/**
+- * @author <a href="mailto:jperkins@redhat.com">James R. Perkins</a>
+- */
+-public class JBossLogManagerProviderTestCase extends AbstractLoggerTestCase {
+-    private static final LogContextSelector DEFAULT_SELECTOR = LogContext.getLogContextSelector();
+-    private static final AtomicBoolean SET_LOG_MANAGER = new AtomicBoolean(true);
+-
+-    private LogContext logContext;
+-    private TestHandler handler;
+-    private Logger logger;
+-
+-    @BeforeAll
+-    public static void setup() {
+-        SET_LOG_MANAGER.set(System.getProperty("java.util.logging.manager") == null);
+-        if (SET_LOG_MANAGER.get()) {
+-            System.setProperty("java.util.logging.manager", "org.jboss.logmanager.LogManager");
+-        }
+-        System.setProperty("org.jboss.logging.provider", "jboss");
+-    }
+-
+-    @AfterAll
+-    public static void tearDown() {
+-        if (SET_LOG_MANAGER.get()) {
+-            System.clearProperty("java.util.logging.manager");
+-        }
+-    }
+-
+-    @BeforeEach
+-    public void setupLogContext() {
+-        logContext = LogContext.create();
+-        LogContext.setLogContextSelector(() -> logContext);
+-        logger = Logger.getLogger(getClass());
+-        handler = createHandler(logContext, logger.getName());
+-    }
+-
+-    @AfterEach
+-    public void closeLogContext() throws Exception {
+-        logContext.close();
+-        LogContext.setLogContextSelector(DEFAULT_SELECTOR);
+-    }
+-
+-    @Test
+-    public void testMdc() {
+-        MDC.put("test.key", "value");
+-        Assertions.assertEquals("value", MDC.get("test.key"));
+-        Assertions.assertEquals("value", org.jboss.logmanager.MDC.get("test.key"));
+-    }
+-
+-    @Test
+-    public void testNdc() {
+-        NDC.push("value1");
+-        NDC.push("value2");
+-        final String expectedValue = "value1.value2";
+-        Assertions.assertEquals(expectedValue, NDC.peek());
+-        Assertions.assertEquals(expectedValue, NDC.get());
+-        Assertions.assertEquals(2, NDC.getDepth());
+-
+-        // Test the log manager values
+-        Assertions.assertEquals(expectedValue, org.jboss.logmanager.NDC.get());
+-        Assertions.assertEquals(2, org.jboss.logmanager.NDC.getDepth());
+-
+-        // Pop the stack
+-        Assertions.assertEquals("value2", NDC.pop());
+-        Assertions.assertEquals(1, NDC.getDepth());
+-        Assertions.assertEquals("value1", NDC.get());
+-        Assertions.assertEquals("value1", org.jboss.logmanager.NDC.get());
+-        Assertions.assertEquals(1, org.jboss.logmanager.NDC.getDepth());
+-    }
+-
+-    @Override
+-    void testLog(final Logger.Level level) {
+-        final String msg = String.format("Test log message at %s", level);
+-        logger.log(level, msg);
+-
+-        Assertions.assertTrue(logger.isEnabled(level), String.format("Logger not enabled for level %s", level));
+-        testLog(msg, level);
+-    }
+-
+-    @Override
+-    void testLog(final String msg, final Logger.Level level) {
+-        final LogRecord logRecord = handler.queue.poll();
+-        Assertions.assertNotNull(logRecord, String.format("No record found for %s", level));
+-        Assertions.assertEquals(level.name(), logRecord.getLevel().getName());
+-        Assertions.assertEquals(msg, logRecord.getMessage());
+-    }
+-
+-    @Override
+-    Logger getLogger() {
+-        return logger;
+-    }
+-
+-    @Override
+-    Class<? extends Logger> getLoggerClass() {
+-        return JBossLogManagerLogger.class;
+-    }
+-
+-    private static TestHandler createHandler(final LogContext logContext, final String loggerName) {
+-        final TestHandler handler = new TestHandler();
+-        final java.util.logging.Logger julLogger = logContext.getLogger(loggerName);
+-        julLogger.addHandler(handler);
+-        julLogger.setLevel(Level.ALL);
+-        return handler;
+-    }
+-
+-    private static class TestHandler extends Handler {
+-        final BlockingQueue<LogRecord> queue = new LinkedBlockingQueue<>();
+-
+-        @Override
+-        public void publish(final LogRecord record) {
+-            queue.add(record);
+-        }
+-
+-        @Override
+-        public void flush() {
+-        }
+-
+-        @Override
+-        public void close() throws SecurityException {
+-            queue.clear();
+-        }
+-    }
+-}
+-- 
+2.44.0
+

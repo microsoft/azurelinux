@@ -1,0 +1,250 @@
+From dcaaf1e0dd3985e229a87de18b83f301d30b6ce9 Mon Sep 17 00:00:00 2001
+From: Martin Sehnoutka <msehnout@redhat.com>
+Date: Thu, 17 Nov 2016 10:31:39 +0100
+Subject: [PATCH 20/59] Use unsigned int for uid and gid representation.
+
+---
+ ls.c      |  4 ++--
+ privops.c |  3 +--
+ session.h |  6 +++---
+ sysutil.c | 44 ++++++++++++++------------------------------
+ sysutil.h | 20 ++++++++++----------
+ 5 files changed, 30 insertions(+), 47 deletions(-)
+
+diff --git a/ls.c b/ls.c
+index b840136..3c0988c 100644
+--- a/ls.c
++++ b/ls.c
+@@ -503,7 +503,7 @@ build_dir_line(struct mystr* p_str, const struct mystr* p_filename_str,
+   }
+   else
+   {
+-    int uid = vsf_sysutil_statbuf_get_uid(p_stat);
++    unsigned int uid = vsf_sysutil_statbuf_get_uid(p_stat);
+     struct vsf_sysutil_user* p_user = 0;
+     if (tunable_text_userdb_names)
+     {
+@@ -528,7 +528,7 @@ build_dir_line(struct mystr* p_str, const struct mystr* p_filename_str,
+   }
+   else
+   {
+-    int gid = vsf_sysutil_statbuf_get_gid(p_stat);
++    unsigned int gid = vsf_sysutil_statbuf_get_gid(p_stat);
+     struct vsf_sysutil_group* p_group = 0;
+     if (tunable_text_userdb_names)
+     {
+diff --git a/privops.c b/privops.c
+index 21d7267..f27c5c4 100644
+--- a/privops.c
++++ b/privops.c
+@@ -236,8 +236,7 @@ vsf_privop_do_file_chown(struct vsf_session* p_sess, int fd)
+   /* Drop it like a hot potato unless it's a regular file owned by
+    * the the anonymous ftp user
+    */
+-  if (p_sess->anon_upload_chown_uid == -1 ||
+-      !vsf_sysutil_statbuf_is_regfile(s_p_statbuf) ||
++  if (!vsf_sysutil_statbuf_is_regfile(s_p_statbuf) ||
+       (vsf_sysutil_statbuf_get_uid(s_p_statbuf) != p_sess->anon_ftp_uid &&
+        vsf_sysutil_statbuf_get_uid(s_p_statbuf) != p_sess->guest_user_uid))
+   {
+diff --git a/session.h b/session.h
+index 27a488f..956bfb7 100644
+--- a/session.h
++++ b/session.h
+@@ -54,9 +54,9 @@ struct vsf_session
+   struct mystr_list* p_visited_dir_list;
+ 
+   /* Details of userids which are interesting to us */
+-  int anon_ftp_uid;
+-  int guest_user_uid;
+-  int anon_upload_chown_uid;
++  unsigned int anon_ftp_uid;
++  unsigned int guest_user_uid;
++  unsigned int anon_upload_chown_uid;
+ 
+   /* Things we need to cache before we chroot() */
+   struct mystr banned_email_str;
+diff --git a/sysutil.c b/sysutil.c
+index 2abdd13..9881a66 100644
+--- a/sysutil.c
++++ b/sysutil.c
+@@ -1454,14 +1454,14 @@ vsf_sysutil_statbuf_get_size(const struct vsf_sysutil_statbuf* p_statbuf)
+   return p_stat->st_size;
+ }
+ 
+-int
++unsigned int
+ vsf_sysutil_statbuf_get_uid(const struct vsf_sysutil_statbuf* p_statbuf)
+ {
+   const struct stat* p_stat = (const struct stat*) p_statbuf;
+   return p_stat->st_uid;
+ }
+ 
+-int
++unsigned int
+ vsf_sysutil_statbuf_get_gid(const struct vsf_sysutil_statbuf* p_statbuf)
+ {
+   const struct stat* p_stat = (const struct stat*) p_statbuf;
+@@ -1502,7 +1502,7 @@ vsf_sysutil_statbuf_get_sortkey_mtime(
+ }
+ 
+ void
+-vsf_sysutil_fchown(const int fd, const int uid, const int gid)
++vsf_sysutil_fchown(const int fd, const unsigned int uid, const unsigned int gid)
+ {
+   if (fchown(fd, uid, gid) != 0)
+   {
+@@ -2320,13 +2320,9 @@ vsf_sysutil_dns_resolve(struct vsf_sysutil_sockaddr** p_sockptr,
+ }
+ 
+ struct vsf_sysutil_user*
+-vsf_sysutil_getpwuid(const int uid)
++vsf_sysutil_getpwuid(const unsigned int uid)
+ {
+-  if (uid < 0)
+-  {
+-    bug("negative uid in vsf_sysutil_getpwuid");
+-  }
+-  return (struct vsf_sysutil_user*) getpwuid((unsigned int) uid);
++  return (struct vsf_sysutil_user*) getpwuid(uid);
+ }
+ 
+ struct vsf_sysutil_user*
+@@ -2349,14 +2345,14 @@ vsf_sysutil_user_get_homedir(const struct vsf_sysutil_user* p_user)
+   return p_passwd->pw_dir;
+ }
+ 
+-int
++unsigned int
+ vsf_sysutil_user_getuid(const struct vsf_sysutil_user* p_user)
+ {
+   const struct passwd* p_passwd = (const struct passwd*) p_user;
+   return p_passwd->pw_uid;
+ }
+ 
+-int
++unsigned int
+ vsf_sysutil_user_getgid(const struct vsf_sysutil_user* p_user)
+ { 
+   const struct passwd* p_passwd = (const struct passwd*) p_user;
+@@ -2364,13 +2360,9 @@ vsf_sysutil_user_getgid(const struct vsf_sysutil_user* p_user)
+ }
+ 
+ struct vsf_sysutil_group*
+-vsf_sysutil_getgrgid(const int gid)
++vsf_sysutil_getgrgid(const unsigned int gid)
+ {
+-  if (gid < 0)
+-  {
+-    die("negative gid in vsf_sysutil_getgrgid");
+-  }
+-  return (struct vsf_sysutil_group*) getgrgid((unsigned int) gid);
++  return (struct vsf_sysutil_group*) getgrgid(gid);
+ }
+ 
+ const char*
+@@ -2445,25 +2437,17 @@ vsf_sysutil_setgid_numeric(int gid)
+   }
+ }
+ 
+-int
++unsigned int
+ vsf_sysutil_geteuid(void)
+ {
+-  int retval = geteuid();
+-  if (retval < 0)
+-  {
+-    die("geteuid");
+-  }
++  unsigned int retval = geteuid();
+   return retval;
+ }
+ 
+-int
++unsigned int
+ vsf_sysutil_getegid(void)
+ {
+-  int retval = getegid();
+-  if (retval < 0)
+-  {
+-    die("getegid");
+-  }
++  unsigned int retval = getegid();
+   return retval;
+ }
+ 
+@@ -2854,7 +2838,7 @@ vsf_sysutil_ftruncate(int fd)
+   }
+ }
+ 
+-int
++unsigned int
+ vsf_sysutil_getuid(void)
+ {
+   return getuid();
+diff --git a/sysutil.h b/sysutil.h
+index bfc92cb..79b5514 100644
+--- a/sysutil.h
++++ b/sysutil.h
+@@ -129,15 +129,15 @@ const char* vsf_sysutil_statbuf_get_numeric_date(
+   const struct vsf_sysutil_statbuf* p_stat, int use_localtime);
+ unsigned int vsf_sysutil_statbuf_get_links(
+   const struct vsf_sysutil_statbuf* p_stat);
+-int vsf_sysutil_statbuf_get_uid(const struct vsf_sysutil_statbuf* p_stat);
+-int vsf_sysutil_statbuf_get_gid(const struct vsf_sysutil_statbuf* p_stat);
++unsigned int vsf_sysutil_statbuf_get_uid(const struct vsf_sysutil_statbuf* p_stat);
++unsigned int vsf_sysutil_statbuf_get_gid(const struct vsf_sysutil_statbuf* p_stat);
+ int vsf_sysutil_statbuf_is_readable_other(
+   const struct vsf_sysutil_statbuf* p_stat);
+ const char* vsf_sysutil_statbuf_get_sortkey_mtime(
+   const struct vsf_sysutil_statbuf* p_stat);
+ 
+ int vsf_sysutil_chmod(const char* p_filename, unsigned int mode);
+-void vsf_sysutil_fchown(const int fd, const int uid, const int gid);
++void vsf_sysutil_fchown(const int fd, const unsigned int uid, const unsigned int gid);
+ void vsf_sysutil_fchmod(const int fd, unsigned int mode);
+ int vsf_sysutil_readlink(const char* p_filename, char* p_dest,
+                          unsigned int bufsiz);
+@@ -290,15 +290,15 @@ int vsf_sysutil_inet_aton(
+ struct vsf_sysutil_user;
+ struct vsf_sysutil_group;
+ 
+-struct vsf_sysutil_user* vsf_sysutil_getpwuid(const int uid);
++struct vsf_sysutil_user* vsf_sysutil_getpwuid(const unsigned int uid);
+ struct vsf_sysutil_user* vsf_sysutil_getpwnam(const char* p_user);
+ const char* vsf_sysutil_user_getname(const struct vsf_sysutil_user* p_user);
+ const char* vsf_sysutil_user_get_homedir(
+   const struct vsf_sysutil_user* p_user);
+-int vsf_sysutil_user_getuid(const struct vsf_sysutil_user* p_user);
+-int vsf_sysutil_user_getgid(const struct vsf_sysutil_user* p_user);
++unsigned int vsf_sysutil_user_getuid(const struct vsf_sysutil_user* p_user);
++unsigned int vsf_sysutil_user_getgid(const struct vsf_sysutil_user* p_user);
+ 
+-struct vsf_sysutil_group* vsf_sysutil_getgrgid(const int gid);
++struct vsf_sysutil_group* vsf_sysutil_getgrgid(const unsigned int gid);
+ const char* vsf_sysutil_group_getname(const struct vsf_sysutil_group* p_group);
+ 
+ /* More random things */
+@@ -316,7 +316,7 @@ void vsf_sysutil_qsort(void* p_base, unsigned int num_elem,
+ char* vsf_sysutil_getenv(const char* p_var);
+ typedef void (*exitfunc_t)(void);
+ void vsf_sysutil_set_exit_func(exitfunc_t exitfunc);
+-int vsf_sysutil_getuid(void);
++unsigned int vsf_sysutil_getuid(void);
+ 
+ /* Syslogging (bah) */
+ void vsf_sysutil_openlog(int force);
+@@ -329,8 +329,8 @@ void vsf_sysutil_setuid(const struct vsf_sysutil_user* p_user);
+ void vsf_sysutil_setgid(const struct vsf_sysutil_user* p_user);
+ void vsf_sysutil_setuid_numeric(int uid);
+ void vsf_sysutil_setgid_numeric(int gid);
+-int vsf_sysutil_geteuid(void);
+-int vsf_sysutil_getegid(void);
++unsigned int vsf_sysutil_geteuid(void);
++unsigned int vsf_sysutil_getegid(void);
+ void vsf_sysutil_seteuid(const struct vsf_sysutil_user* p_user);
+ void vsf_sysutil_setegid(const struct vsf_sysutil_user* p_user);
+ void vsf_sysutil_seteuid_numeric(int uid);
+-- 
+2.14.4
+

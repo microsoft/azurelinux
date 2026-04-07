@@ -1,0 +1,50 @@
+From f4bc1f5c26925548662946ed7cfa473c190a104a Mon Sep 17 00:00:00 2001
+From: Remi Collet <remi@remirepo.net>
+Date: Mon, 13 Sep 2021 14:57:52 +0200
+Subject: [PATCH 1/2] Revert "Fix #318, these macros are not used as planed, we
+ have separate functions for each"
+
+This reverts commit bdc281eadb1d58d5c0c7bbc1125ee4674256df08.
+---
+ src/gd.h | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/gd.h b/src/gd.h
+index 30560395..1ad9e637 100644
+--- a/src/gd.h
++++ b/src/gd.h
+@@ -1604,6 +1604,11 @@ BGD_DECLARE(void) gdImageFlipHorizontal(gdImagePtr im);
+ BGD_DECLARE(void) gdImageFlipVertical(gdImagePtr im);
+ BGD_DECLARE(void) gdImageFlipBoth(gdImagePtr im);
+ 
++#define GD_FLIP_HORINZONTAL 1 /* typo, kept for BC */
++#define GD_FLIP_HORIZONTAL 1
++#define GD_FLIP_VERTICAL 2
++#define GD_FLIP_BOTH 3
++
+ /**
+  * Group: Crop
+  *
+
+From e47c619d792455aad23708d2ec2947455394427e Mon Sep 17 00:00:00 2001
+From: Remi Collet <remi@remirepo.net>
+Date: Mon, 13 Sep 2021 14:59:47 +0200
+Subject: [PATCH 2/2] add comment to not remove these macros
+
+---
+ src/gd.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/gd.h b/src/gd.h
+index 1ad9e637..71f5a89c 100644
+--- a/src/gd.h
++++ b/src/gd.h
+@@ -1604,6 +1604,8 @@ BGD_DECLARE(void) gdImageFlipHorizontal(gdImagePtr im);
+ BGD_DECLARE(void) gdImageFlipVertical(gdImagePtr im);
+ BGD_DECLARE(void) gdImageFlipBoth(gdImagePtr im);
+ 
++/* Macros still used in gd extension up to PHP 8.0
++   so please keep these unused macros for now */
+ #define GD_FLIP_HORINZONTAL 1 /* typo, kept for BC */
+ #define GD_FLIP_HORIZONTAL 1
+ #define GD_FLIP_VERTICAL 2

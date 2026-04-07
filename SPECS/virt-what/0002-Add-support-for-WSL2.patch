@@ -1,0 +1,1172 @@
+From 7b5e2366f0af34c3e5a651aea3a6a6e8bdef3ca8 Mon Sep 17 00:00:00 2001
+From: Scott Herold <sherold@redhat.com>
+Date: Fri, 2 May 2025 21:01:35 +0100
+Subject: [PATCH 2/2] Add support for WSL2
+
+---
+ configure.ac                           |   2 +
+ tests/wsl2/Makefile.am                 |  28 +
+ tests/wsl2/proc/cpuinfo                | 896 +++++++++++++++++++++++++
+ tests/wsl2/proc/self/status            |  57 ++
+ tests/wsl2/sbin/dmidecode              |   7 +
+ tests/wsl2/sbin/uname                  |  11 +
+ tests/wsl2/sbin/virt-what-cpuid-helper |   3 +
+ tests/wsl2/test.sh                     |  32 +
+ virt-what.in                           |  11 +-
+ virt-what.pod                          |   6 +
+ 10 files changed, 1050 insertions(+), 3 deletions(-)
+ create mode 100644 tests/wsl2/Makefile.am
+ create mode 100644 tests/wsl2/proc/cpuinfo
+ create mode 100644 tests/wsl2/proc/self/status
+ create mode 100755 tests/wsl2/sbin/dmidecode
+ create mode 100755 tests/wsl2/sbin/uname
+ create mode 100755 tests/wsl2/sbin/virt-what-cpuid-helper
+ create mode 100755 tests/wsl2/test.sh
+
+diff --git a/configure.ac b/configure.ac
+index 2882db4..199bb9f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -79,6 +79,7 @@ tests="\
+ 	rhev \
+ 	upcloud \
+ 	vmm \
++	wsl2 \
+ 	xen-arm \
+ 	zvm \
+         "
+@@ -133,6 +134,7 @@ AC_CONFIG_FILES([Makefile
+ 	         tests/rhev/Makefile
+ 	         tests/upcloud/Makefile
+ 	         tests/vmm/Makefile
++	         tests/wsl2/Makefile
+ 	         tests/xen-arm/Makefile
+ 	         tests/zvm/Makefile
+                  ])
+diff --git a/tests/wsl2/Makefile.am b/tests/wsl2/Makefile.am
+new file mode 100644
+index 0000000..aa7f4ba
+--- /dev/null
++++ b/tests/wsl2/Makefile.am
+@@ -0,0 +1,28 @@
++# Makefile for virt-what
++# Copyright (C) 2008-2025 Red Hat Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++
++CLEANFILES = *~
++
++TESTS = test.sh
++
++EXTRA_DIST = \
++	test.sh \
++	proc/cpuinfo \
++	proc/self/status \
++	sbin/dmidecode \
++	sbin/uname \
++	sbin/virt-what-cpuid-helper
+diff --git a/tests/wsl2/proc/cpuinfo b/tests/wsl2/proc/cpuinfo
+new file mode 100644
+index 0000000..eb39d36
+--- /dev/null
++++ b/tests/wsl2/proc/cpuinfo
+@@ -0,0 +1,896 @@
++processor	: 0
++vendor_id	: AuthenticAMD
++cpu family	: 25
++model		: 97
++model name	: AMD Ryzen 9 7950X3D 16-Core Processor
++stepping	: 2
++microcode	: 0xffffffff
++cpu MHz		: 4199.785
++cache size	: 1024 KB
++physical id	: 0
++siblings	: 32
++core id		: 0
++cpu cores	: 16
++apicid		: 0
++initial apicid	: 0
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 13
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm
++bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso
++bogomips	: 8399.57
++TLB size	: 3584 4K pages
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 48 bits physical, 48 bits virtual
++power management:
++
++processor	: 1
++vendor_id	: AuthenticAMD
++cpu family	: 25
++model		: 97
++model name	: AMD Ryzen 9 7950X3D 16-Core Processor
++stepping	: 2
++microcode	: 0xffffffff
++cpu MHz		: 4199.785
++cache size	: 1024 KB
++physical id	: 0
++siblings	: 32
++core id		: 0
++cpu cores	: 16
++apicid		: 1
++initial apicid	: 1
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 13
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm
++bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso
++bogomips	: 8399.57
++TLB size	: 3584 4K pages
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 48 bits physical, 48 bits virtual
++power management:
++
++processor	: 2
++vendor_id	: AuthenticAMD
++cpu family	: 25
++model		: 97
++model name	: AMD Ryzen 9 7950X3D 16-Core Processor
++stepping	: 2
++microcode	: 0xffffffff
++cpu MHz		: 4199.785
++cache size	: 1024 KB
++physical id	: 0
++siblings	: 32
++core id		: 1
++cpu cores	: 16
++apicid		: 2
++initial apicid	: 2
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 13
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm
++bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso
++bogomips	: 8399.57
++TLB size	: 3584 4K pages
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 48 bits physical, 48 bits virtual
++power management:
++
++processor	: 3
++vendor_id	: AuthenticAMD
++cpu family	: 25
++model		: 97
++model name	: AMD Ryzen 9 7950X3D 16-Core Processor
++stepping	: 2
++microcode	: 0xffffffff
++cpu MHz		: 4199.785
++cache size	: 1024 KB
++physical id	: 0
++siblings	: 32
++core id		: 1
++cpu cores	: 16
++apicid		: 3
++initial apicid	: 3
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 13
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm
++bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso
++bogomips	: 8399.57
++TLB size	: 3584 4K pages
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 48 bits physical, 48 bits virtual
++power management:
++
++processor	: 4
++vendor_id	: AuthenticAMD
++cpu family	: 25
++model		: 97
++model name	: AMD Ryzen 9 7950X3D 16-Core Processor
++stepping	: 2
++microcode	: 0xffffffff
++cpu MHz		: 4199.785
++cache size	: 1024 KB
++physical id	: 0
++siblings	: 32
++core id		: 2
++cpu cores	: 16
++apicid		: 4
++initial apicid	: 4
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 13
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm
++bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso
++bogomips	: 8399.57
++TLB size	: 3584 4K pages
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 48 bits physical, 48 bits virtual
++power management:
++
++processor	: 5
++vendor_id	: AuthenticAMD
++cpu family	: 25
++model		: 97
++model name	: AMD Ryzen 9 7950X3D 16-Core Processor
++stepping	: 2
++microcode	: 0xffffffff
++cpu MHz		: 4199.785
++cache size	: 1024 KB
++physical id	: 0
++siblings	: 32
++core id		: 2
++cpu cores	: 16
++apicid		: 5
++initial apicid	: 5
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 13
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm
++bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso
++bogomips	: 8399.57
++TLB size	: 3584 4K pages
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 48 bits physical, 48 bits virtual
++power management:
++
++processor	: 6
++vendor_id	: AuthenticAMD
++cpu family	: 25
++model		: 97
++model name	: AMD Ryzen 9 7950X3D 16-Core Processor
++stepping	: 2
++microcode	: 0xffffffff
++cpu MHz		: 4199.785
++cache size	: 1024 KB
++physical id	: 0
++siblings	: 32
++core id		: 3
++cpu cores	: 16
++apicid		: 6
++initial apicid	: 6
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 13
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm
++bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso
++bogomips	: 8399.57
++TLB size	: 3584 4K pages
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 48 bits physical, 48 bits virtual
++power management:
++
++processor	: 7
++vendor_id	: AuthenticAMD
++cpu family	: 25
++model		: 97
++model name	: AMD Ryzen 9 7950X3D 16-Core Processor
++stepping	: 2
++microcode	: 0xffffffff
++cpu MHz		: 4199.785
++cache size	: 1024 KB
++physical id	: 0
++siblings	: 32
++core id		: 3
++cpu cores	: 16
++apicid		: 7
++initial apicid	: 7
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 13
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm
++bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso
++bogomips	: 8399.57
++TLB size	: 3584 4K pages
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 48 bits physical, 48 bits virtual
++power management:
++
++processor	: 8
++vendor_id	: AuthenticAMD
++cpu family	: 25
++model		: 97
++model name	: AMD Ryzen 9 7950X3D 16-Core Processor
++stepping	: 2
++microcode	: 0xffffffff
++cpu MHz		: 4199.785
++cache size	: 1024 KB
++physical id	: 0
++siblings	: 32
++core id		: 4
++cpu cores	: 16
++apicid		: 8
++initial apicid	: 8
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 13
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm
++bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso
++bogomips	: 8399.57
++TLB size	: 3584 4K pages
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 48 bits physical, 48 bits virtual
++power management:
++
++processor	: 9
++vendor_id	: AuthenticAMD
++cpu family	: 25
++model		: 97
++model name	: AMD Ryzen 9 7950X3D 16-Core Processor
++stepping	: 2
++microcode	: 0xffffffff
++cpu MHz		: 4199.785
++cache size	: 1024 KB
++physical id	: 0
++siblings	: 32
++core id		: 4
++cpu cores	: 16
++apicid		: 9
++initial apicid	: 9
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 13
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm
++bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso
++bogomips	: 8399.57
++TLB size	: 3584 4K pages
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 48 bits physical, 48 bits virtual
++power management:
++
++processor	: 10
++vendor_id	: AuthenticAMD
++cpu family	: 25
++model		: 97
++model name	: AMD Ryzen 9 7950X3D 16-Core Processor
++stepping	: 2
++microcode	: 0xffffffff
++cpu MHz		: 4199.785
++cache size	: 1024 KB
++physical id	: 0
++siblings	: 32
++core id		: 5
++cpu cores	: 16
++apicid		: 10
++initial apicid	: 10
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 13
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm
++bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso
++bogomips	: 8399.57
++TLB size	: 3584 4K pages
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 48 bits physical, 48 bits virtual
++power management:
++
++processor	: 11
++vendor_id	: AuthenticAMD
++cpu family	: 25
++model		: 97
++model name	: AMD Ryzen 9 7950X3D 16-Core Processor
++stepping	: 2
++microcode	: 0xffffffff
++cpu MHz		: 4199.785
++cache size	: 1024 KB
++physical id	: 0
++siblings	: 32
++core id		: 5
++cpu cores	: 16
++apicid		: 11
++initial apicid	: 11
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 13
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm
++bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso
++bogomips	: 8399.57
++TLB size	: 3584 4K pages
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 48 bits physical, 48 bits virtual
++power management:
++
++processor	: 12
++vendor_id	: AuthenticAMD
++cpu family	: 25
++model		: 97
++model name	: AMD Ryzen 9 7950X3D 16-Core Processor
++stepping	: 2
++microcode	: 0xffffffff
++cpu MHz		: 4199.785
++cache size	: 1024 KB
++physical id	: 0
++siblings	: 32
++core id		: 6
++cpu cores	: 16
++apicid		: 12
++initial apicid	: 12
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 13
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm
++bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso
++bogomips	: 8399.57
++TLB size	: 3584 4K pages
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 48 bits physical, 48 bits virtual
++power management:
++
++processor	: 13
++vendor_id	: AuthenticAMD
++cpu family	: 25
++model		: 97
++model name	: AMD Ryzen 9 7950X3D 16-Core Processor
++stepping	: 2
++microcode	: 0xffffffff
++cpu MHz		: 4199.785
++cache size	: 1024 KB
++physical id	: 0
++siblings	: 32
++core id		: 6
++cpu cores	: 16
++apicid		: 13
++initial apicid	: 13
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 13
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm
++bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso
++bogomips	: 8399.57
++TLB size	: 3584 4K pages
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 48 bits physical, 48 bits virtual
++power management:
++
++processor	: 14
++vendor_id	: AuthenticAMD
++cpu family	: 25
++model		: 97
++model name	: AMD Ryzen 9 7950X3D 16-Core Processor
++stepping	: 2
++microcode	: 0xffffffff
++cpu MHz		: 4199.785
++cache size	: 1024 KB
++physical id	: 0
++siblings	: 32
++core id		: 7
++cpu cores	: 16
++apicid		: 14
++initial apicid	: 14
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 13
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm
++bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso
++bogomips	: 8399.57
++TLB size	: 3584 4K pages
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 48 bits physical, 48 bits virtual
++power management:
++
++processor	: 15
++vendor_id	: AuthenticAMD
++cpu family	: 25
++model		: 97
++model name	: AMD Ryzen 9 7950X3D 16-Core Processor
++stepping	: 2
++microcode	: 0xffffffff
++cpu MHz		: 4199.785
++cache size	: 1024 KB
++physical id	: 0
++siblings	: 32
++core id		: 7
++cpu cores	: 16
++apicid		: 15
++initial apicid	: 15
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 13
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm
++bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso
++bogomips	: 8399.57
++TLB size	: 3584 4K pages
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 48 bits physical, 48 bits virtual
++power management:
++
++processor	: 16
++vendor_id	: AuthenticAMD
++cpu family	: 25
++model		: 97
++model name	: AMD Ryzen 9 7950X3D 16-Core Processor
++stepping	: 2
++microcode	: 0xffffffff
++cpu MHz		: 4199.785
++cache size	: 1024 KB
++physical id	: 0
++siblings	: 32
++core id		: 8
++cpu cores	: 16
++apicid		: 16
++initial apicid	: 16
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 13
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm
++bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso
++bogomips	: 8399.57
++TLB size	: 3584 4K pages
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 48 bits physical, 48 bits virtual
++power management:
++
++processor	: 17
++vendor_id	: AuthenticAMD
++cpu family	: 25
++model		: 97
++model name	: AMD Ryzen 9 7950X3D 16-Core Processor
++stepping	: 2
++microcode	: 0xffffffff
++cpu MHz		: 4199.785
++cache size	: 1024 KB
++physical id	: 0
++siblings	: 32
++core id		: 8
++cpu cores	: 16
++apicid		: 17
++initial apicid	: 17
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 13
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm
++bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso
++bogomips	: 8399.57
++TLB size	: 3584 4K pages
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 48 bits physical, 48 bits virtual
++power management:
++
++processor	: 18
++vendor_id	: AuthenticAMD
++cpu family	: 25
++model		: 97
++model name	: AMD Ryzen 9 7950X3D 16-Core Processor
++stepping	: 2
++microcode	: 0xffffffff
++cpu MHz		: 4199.785
++cache size	: 1024 KB
++physical id	: 0
++siblings	: 32
++core id		: 9
++cpu cores	: 16
++apicid		: 18
++initial apicid	: 18
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 13
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm
++bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso
++bogomips	: 8399.57
++TLB size	: 3584 4K pages
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 48 bits physical, 48 bits virtual
++power management:
++
++processor	: 19
++vendor_id	: AuthenticAMD
++cpu family	: 25
++model		: 97
++model name	: AMD Ryzen 9 7950X3D 16-Core Processor
++stepping	: 2
++microcode	: 0xffffffff
++cpu MHz		: 4199.785
++cache size	: 1024 KB
++physical id	: 0
++siblings	: 32
++core id		: 9
++cpu cores	: 16
++apicid		: 19
++initial apicid	: 19
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 13
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm
++bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso
++bogomips	: 8399.57
++TLB size	: 3584 4K pages
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 48 bits physical, 48 bits virtual
++power management:
++
++processor	: 20
++vendor_id	: AuthenticAMD
++cpu family	: 25
++model		: 97
++model name	: AMD Ryzen 9 7950X3D 16-Core Processor
++stepping	: 2
++microcode	: 0xffffffff
++cpu MHz		: 4199.785
++cache size	: 1024 KB
++physical id	: 0
++siblings	: 32
++core id		: 10
++cpu cores	: 16
++apicid		: 20
++initial apicid	: 20
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 13
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm
++bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso
++bogomips	: 8399.57
++TLB size	: 3584 4K pages
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 48 bits physical, 48 bits virtual
++power management:
++
++processor	: 21
++vendor_id	: AuthenticAMD
++cpu family	: 25
++model		: 97
++model name	: AMD Ryzen 9 7950X3D 16-Core Processor
++stepping	: 2
++microcode	: 0xffffffff
++cpu MHz		: 4199.785
++cache size	: 1024 KB
++physical id	: 0
++siblings	: 32
++core id		: 10
++cpu cores	: 16
++apicid		: 21
++initial apicid	: 21
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 13
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm
++bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso
++bogomips	: 8399.57
++TLB size	: 3584 4K pages
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 48 bits physical, 48 bits virtual
++power management:
++
++processor	: 22
++vendor_id	: AuthenticAMD
++cpu family	: 25
++model		: 97
++model name	: AMD Ryzen 9 7950X3D 16-Core Processor
++stepping	: 2
++microcode	: 0xffffffff
++cpu MHz		: 4199.785
++cache size	: 1024 KB
++physical id	: 0
++siblings	: 32
++core id		: 11
++cpu cores	: 16
++apicid		: 22
++initial apicid	: 22
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 13
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm
++bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso
++bogomips	: 8399.57
++TLB size	: 3584 4K pages
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 48 bits physical, 48 bits virtual
++power management:
++
++processor	: 23
++vendor_id	: AuthenticAMD
++cpu family	: 25
++model		: 97
++model name	: AMD Ryzen 9 7950X3D 16-Core Processor
++stepping	: 2
++microcode	: 0xffffffff
++cpu MHz		: 4199.785
++cache size	: 1024 KB
++physical id	: 0
++siblings	: 32
++core id		: 11
++cpu cores	: 16
++apicid		: 23
++initial apicid	: 23
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 13
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm
++bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso
++bogomips	: 8399.57
++TLB size	: 3584 4K pages
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 48 bits physical, 48 bits virtual
++power management:
++
++processor	: 24
++vendor_id	: AuthenticAMD
++cpu family	: 25
++model		: 97
++model name	: AMD Ryzen 9 7950X3D 16-Core Processor
++stepping	: 2
++microcode	: 0xffffffff
++cpu MHz		: 4199.785
++cache size	: 1024 KB
++physical id	: 0
++siblings	: 32
++core id		: 12
++cpu cores	: 16
++apicid		: 24
++initial apicid	: 24
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 13
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm
++bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso
++bogomips	: 8399.57
++TLB size	: 3584 4K pages
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 48 bits physical, 48 bits virtual
++power management:
++
++processor	: 25
++vendor_id	: AuthenticAMD
++cpu family	: 25
++model		: 97
++model name	: AMD Ryzen 9 7950X3D 16-Core Processor
++stepping	: 2
++microcode	: 0xffffffff
++cpu MHz		: 4199.785
++cache size	: 1024 KB
++physical id	: 0
++siblings	: 32
++core id		: 12
++cpu cores	: 16
++apicid		: 25
++initial apicid	: 25
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 13
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm
++bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso
++bogomips	: 8399.57
++TLB size	: 3584 4K pages
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 48 bits physical, 48 bits virtual
++power management:
++
++processor	: 26
++vendor_id	: AuthenticAMD
++cpu family	: 25
++model		: 97
++model name	: AMD Ryzen 9 7950X3D 16-Core Processor
++stepping	: 2
++microcode	: 0xffffffff
++cpu MHz		: 4199.785
++cache size	: 1024 KB
++physical id	: 0
++siblings	: 32
++core id		: 13
++cpu cores	: 16
++apicid		: 26
++initial apicid	: 26
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 13
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm
++bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso
++bogomips	: 8399.57
++TLB size	: 3584 4K pages
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 48 bits physical, 48 bits virtual
++power management:
++
++processor	: 27
++vendor_id	: AuthenticAMD
++cpu family	: 25
++model		: 97
++model name	: AMD Ryzen 9 7950X3D 16-Core Processor
++stepping	: 2
++microcode	: 0xffffffff
++cpu MHz		: 4199.785
++cache size	: 1024 KB
++physical id	: 0
++siblings	: 32
++core id		: 13
++cpu cores	: 16
++apicid		: 27
++initial apicid	: 27
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 13
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm
++bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso
++bogomips	: 8399.57
++TLB size	: 3584 4K pages
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 48 bits physical, 48 bits virtual
++power management:
++
++processor	: 28
++vendor_id	: AuthenticAMD
++cpu family	: 25
++model		: 97
++model name	: AMD Ryzen 9 7950X3D 16-Core Processor
++stepping	: 2
++microcode	: 0xffffffff
++cpu MHz		: 4199.785
++cache size	: 1024 KB
++physical id	: 0
++siblings	: 32
++core id		: 14
++cpu cores	: 16
++apicid		: 28
++initial apicid	: 28
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 13
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm
++bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso
++bogomips	: 8399.57
++TLB size	: 3584 4K pages
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 48 bits physical, 48 bits virtual
++power management:
++
++processor	: 29
++vendor_id	: AuthenticAMD
++cpu family	: 25
++model		: 97
++model name	: AMD Ryzen 9 7950X3D 16-Core Processor
++stepping	: 2
++microcode	: 0xffffffff
++cpu MHz		: 4199.785
++cache size	: 1024 KB
++physical id	: 0
++siblings	: 32
++core id		: 14
++cpu cores	: 16
++apicid		: 29
++initial apicid	: 29
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 13
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm
++bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso
++bogomips	: 8399.57
++TLB size	: 3584 4K pages
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 48 bits physical, 48 bits virtual
++power management:
++
++processor	: 30
++vendor_id	: AuthenticAMD
++cpu family	: 25
++model		: 97
++model name	: AMD Ryzen 9 7950X3D 16-Core Processor
++stepping	: 2
++microcode	: 0xffffffff
++cpu MHz		: 4199.785
++cache size	: 1024 KB
++physical id	: 0
++siblings	: 32
++core id		: 15
++cpu cores	: 16
++apicid		: 30
++initial apicid	: 30
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 13
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm
++bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso
++bogomips	: 8399.57
++TLB size	: 3584 4K pages
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 48 bits physical, 48 bits virtual
++power management:
++
++processor	: 31
++vendor_id	: AuthenticAMD
++cpu family	: 25
++model		: 97
++model name	: AMD Ryzen 9 7950X3D 16-Core Processor
++stepping	: 2
++microcode	: 0xffffffff
++cpu MHz		: 4199.785
++cache size	: 1024 KB
++physical id	: 0
++siblings	: 32
++core id		: 15
++cpu cores	: 16
++apicid		: 31
++initial apicid	: 31
++fpu		: yes
++fpu_exception	: yes
++cpuid level	: 13
++wp		: yes
++flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm
++bugs		: sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso
++bogomips	: 8399.57
++TLB size	: 3584 4K pages
++clflush size	: 64
++cache_alignment	: 64
++address sizes	: 48 bits physical, 48 bits virtual
++power management:
++
+diff --git a/tests/wsl2/proc/self/status b/tests/wsl2/proc/self/status
+new file mode 100644
+index 0000000..37a0a47
+--- /dev/null
++++ b/tests/wsl2/proc/self/status
+@@ -0,0 +1,57 @@
++Name:   cat
++Umask:  0022
++State:  R (running)
++Tgid:   16906
++Ngid:   0
++Pid:    16906
++PPid:   4346
++TracerPid:      0
++Uid:    1000    1000    1000    1000
++Gid:    1000    1000    1000    1000
++FDSize: 256
++Groups: 10 1000
++NStgid: 16906
++NSpid:  16906
++NSpgid: 16906
++NSsid:  4346
++VmPeak:     7976 kB
++VmSize:     7976 kB
++VmLck:         0 kB
++VmPin:         0 kB
++VmHWM:      1272 kB
++VmRSS:      1272 kB
++RssAnon:             168 kB
++RssFile:            1104 kB
++RssShmem:              0 kB
++VmData:      484 kB
++VmStk:       132 kB
++VmExe:       896 kB
++VmLib:      2244 kB
++VmPTE:        52 kB
++VmSwap:        0 kB
++HugetlbPages:          0 kB
++CoreDumping:    0
++THP_enabled:    1
++Threads:        1
++SigQ:   1/127571
++SigPnd: 0000000000000000
++ShdPnd: 0000000000000000
++SigBlk: 0000000000000000
++SigIgn: 0000000000000000
++SigCgt: 0000000000000000
++CapInh: 0000000000000000
++CapPrm: 0000000000000000
++CapEff: 0000000000000000
++CapBnd: 000001ffffffffff
++CapAmb: 0000000000000000
++NoNewPrivs:     0
++Seccomp:        0
++Seccomp_filters:        0
++Speculation_Store_Bypass:       thread vulnerable
++SpeculationIndirectBranch:      conditional enabled
++Cpus_allowed:   ffffffff
++Cpus_allowed_list:      0-31
++Mems_allowed:   1
++Mems_allowed_list:      0
++voluntary_ctxt_switches:        6
++nonvoluntary_ctxt_switches:     0
+\ No newline at end of file
+diff --git a/tests/wsl2/sbin/dmidecode b/tests/wsl2/sbin/dmidecode
+new file mode 100755
+index 0000000..5d09059
+--- /dev/null
++++ b/tests/wsl2/sbin/dmidecode
+@@ -0,0 +1,7 @@
++#!/bin/sh -
++cat <<'EOF'
++# dmidecode 3.6
++Scanning /dev/mem for entry point.
++# No SMBIOS nor DMI entry point found, sorry.
++EOF
++exit 1
+diff --git a/tests/wsl2/sbin/uname b/tests/wsl2/sbin/uname
+new file mode 100755
+index 0000000..47af99f
+--- /dev/null
++++ b/tests/wsl2/sbin/uname
+@@ -0,0 +1,11 @@
++#!/bin/sh -
++# Enable expected output for arch check as well as kernel release name
++# required to determine WSL2 with uname -r
++while getopts ":r" option; do
++    case $option in
++        r) # display kernel release name
++            echo microsoft-standard-WSL2
++            exit;;
++    esac
++done
++echo x86_64
+diff --git a/tests/wsl2/sbin/virt-what-cpuid-helper b/tests/wsl2/sbin/virt-what-cpuid-helper
+new file mode 100755
+index 0000000..1604462
+--- /dev/null
++++ b/tests/wsl2/sbin/virt-what-cpuid-helper
+@@ -0,0 +1,3 @@
++#!/bin/sh -
++echo "Microsoft Hv"
++
+diff --git a/tests/wsl2/test.sh b/tests/wsl2/test.sh
+new file mode 100755
+index 0000000..936a992
+--- /dev/null
++++ b/tests/wsl2/test.sh
+@@ -0,0 +1,32 @@
++# Test for Microsoft WSL2.
++# Copyright (C) 2008-2025 Red Hat Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++
++output="$(PATH=../..:$PATH virt-what --test-root=. 2>&1)"
++expected="wsl2"
++
++if [ "$output" != "$expected" ]; then
++    echo "$0: test failed because output did not match expected"
++    echo "Expected output was:"
++    echo "----------------------------------------"
++    echo "$expected"
++    echo "----------------------------------------"
++    echo "But the actual output of the program was:"
++    echo "----------------------------------------"
++    echo "$output"
++    echo "----------------------------------------"
++    exit 1
++fi
+diff --git a/virt-what.in b/virt-what.in
+index 39f0497..61481d3 100644
+--- a/virt-what.in
++++ b/virt-what.in
+@@ -109,7 +109,8 @@ cpuid=$(virt-what-cpuid-helper)
+ dmi=$(LANG=C dmidecode 2>&1)
+ 
+ # Architecture.
+-# Note for the purpose of testing, we only call uname with -m option.
++# Note for the purpose of testing, we only call uname with -m option
++# (except WSL2 which is weird).
+ 
+ arch=$(uname -m | sed -e 's/i.86/i386/' | sed -e 's/arm.*/arm/')
+ 
+@@ -150,9 +151,13 @@ elif echo "$dmi" | grep -q 'Manufacturer: VMware'; then
+     echo vmware
+ fi
+ 
+-# Check for Hyper-V.
++# Check for WSL2.
++kernel=$(uname -r)
++if echo "$kernel" | grep -q 'microsoft-standard-WSL2' ; then
++    echo wsl2
++# If not WSL2 based on the running kernel, check for native Hyper-V.
+ # http://blogs.msdn.com/b/sqlosteam/archive/2010/10/30/is-this-real-the-metaphysics-of-hardware-virtualization.aspx
+-if [ "$cpuid" = "Microsoft Hv" ]; then
++elif [ "$cpuid" = "Microsoft Hv" ]; then
+     echo hyperv
+ # Hyper-V on ARM doesn't have CPUID.  Use the information in dmidecode
+ # instead.  Note this is similar to VirtualPC below.
+diff --git a/virt-what.pod b/virt-what.pod
+index 0eb0b93..2b7d34c 100644
+--- a/virt-what.pod
++++ b/virt-what.pod
+@@ -328,6 +328,12 @@ The guest appears to be running on VMware hypervisor.
+ 
+ Status: confirmed by RWMJ
+ 
++=item B<wsl2>
++
++The guest appears to be running on Windows Subsystem for Linux 2 (WSL2).
++
++Status: contributed by Scott Herold
++
+ =item B<xen>
+ 
+ The guest appears to be running on Xen hypervisor.
+-- 
+2.49.0
+

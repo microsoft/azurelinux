@@ -1,0 +1,28 @@
+diff --git a/builds/posix/Makefile.in.plugins_examples b/builds/posix/Makefile.in.plugins_examples
+index 989e80d..344f487 100644
+--- a/builds/posix/Makefile.in.plugins_examples
++++ b/builds/posix/Makefile.in.plugins_examples
+@@ -101,7 +101,7 @@ AllObjects += $(CA_Objects)
+ crypt_app: $(CRYPT_APP)
+ 
+ $(CRYPT_APP):	$(CA_Objects)
+-	$(EXE_LINK) $(LSB_UNDEF) $^ -o $@ $(FIREBIRD_LIBRARY_LINK)
++	$(EXE_LINK) $(EXE_LINK_OPTIONS) $(LSB_UNDEF) $^ -o $@ $(FIREBIRD_LIBRARY_LINK)
+ 
+ 
+ include $(ROOT)/gen/make.shared.targets
+diff --git a/examples/extauth/Makefile b/examples/extauth/Makefile
+index 3c8b878..7de22a8 100644
+--- a/examples/extauth/Makefile
++++ b/examples/extauth/Makefile
+@@ -61,8 +61,8 @@ KEYGEN_objects=$(INTERMED)/keygen.o
+ TCWRAP_objects=$(INTERMED)/TcWrapper.o
+ KEY_AUTH_objects=$(INTERMED)/ExtAuth.o
+ 
+-CXXFLAGS=-std=c++17 -pthread -I$(ROOT)/include -fPIC $(TOMCRYPT_COMPILE)
+-LDFLAGS=-pthread -L$(LIB) -Wl,-rpath,'$$ORIGIN/../lib' $(TOMCRYPT_LINK)
++CXXFLAGS+=-std=c++17 -pthread -I$(ROOT)/include -fPIC $(TOMCRYPT_COMPILE)
++LDFLAGS+=-pthread -L$(LIB) -Wl,-rpath,'$$ORIGIN/../lib' $(TOMCRYPT_LINK)
+ 
+ LINK_LIBS=-lfbclient -ltomcrypt -ltommath
+ 

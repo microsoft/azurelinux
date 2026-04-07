@@ -1,0 +1,91 @@
+From fa40d5cc0f536297f675258eafe5c5d1fd1f4c34 Mon Sep 17 00:00:00 2001
+From: Yan Fu <yafu@redhat.com>
+Date: Tue, 21 Oct 2025 08:03:40 -0400
+Subject: [PATCH 02/15] Fedora: AA/deps/crypto: default to openssl
+
+Do not use "vendored" openssl
+
+Remove some rust-crypto dependencies
+
+Signed-off-by: Uri Lublin <uril@redhat.com>
+Signed-off-by: Yan Fu <yafu@redhat.com>
+---
+ Cargo.toml                               |  4 ----
+ attestation-agent/deps/crypto/Cargo.toml | 21 +++------------------
+ 2 files changed, 3 insertions(+), 22 deletions(-)
+
+diff --git a/Cargo.toml b/Cargo.toml
+index ed7da5d..ebed6be 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -8,8 +8,6 @@ members = [
+ ]
+ 
+ [workspace.dependencies]
+-aes = "0.8.3"
+-aes-gcm = "0.10.2"
+ anyhow = "1.0"
+ assert-json-diff = "2.0"
+ assert_cmd = "2"
+@@ -22,7 +20,6 @@ chrono = "0.4.41"
+ clap = "~4.5.46"
+ config = "0.14.1"
+ const_format = "0.2.34"
+-ctr = "0.9.2"
+ env_logger = "0.11.8"
+ hex = "0.4.3"
+ hmac = "0.12.1"
+@@ -39,7 +36,6 @@ rand = "0.9.2"
+ reqwest = { version = "0.12", default-features = false }
+ resource_uri = { path = "attestation-agent/deps/resource_uri" }
+ ring = "0.17"
+-rsa = "0.9.8"
+ rstest = "0.26"
+ serde = { version = "1.0", features = ["derive"] }
+ serde_with = { version = "3.14.0", features = ["base64"] }
+diff --git a/attestation-agent/deps/crypto/Cargo.toml b/attestation-agent/deps/crypto/Cargo.toml
+index a4bdab3..f12f283 100644
+--- a/attestation-agent/deps/crypto/Cargo.toml
++++ b/attestation-agent/deps/crypto/Cargo.toml
+@@ -7,20 +7,13 @@ edition = "2021"
+ license = "Apache-2.0"
+ 
+ [dependencies]
+-aes-gcm = { workspace = true, optional = true }
+-aes-kw = { version = "0.2.1", optional = true }
+ anyhow.workspace = true
+ base64.workspace = true
+-concat-kdf = { version = "0.1.0", optional = true }
+-ctr = { workspace = true, optional = true }
+ kbs-types.workspace = true
+-openssl = { workspace = true, features = ["vendored"], optional = true }
+-p256 = { version = "0.13.1", features = ["ecdh", "pem"], optional = true }
++openssl = { workspace = true, optional = true }
+ rand.workspace = true
+ 
+ # This is for API compability of p256 who is using the old version of `rand`
+-rand_08 = { package = "rand", version = "0.8", optional = true }
+-rsa = { workspace = true, optional = true }
+ serde.workspace = true
+ serde_json.workspace = true
+ sha2.workspace = true
+@@ -31,14 +24,6 @@ zeroize.workspace = true
+ rstest.workspace = true
+ 
+ [features]
+-default = ["rust-crypto"]
+-rust-crypto = [
+-    "dep:aes-gcm",
+-    "ctr",
+-    "rsa/sha2",
+-    "aes-kw",
+-    "concat-kdf",
+-    "p256",
+-    "rand_08",
+-]
++default = ["openssl"]
++rust-crypto = []
+ openssl = ["dep:openssl"]
+-- 
+2.51.1
+

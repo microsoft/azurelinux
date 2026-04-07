@@ -1,0 +1,41 @@
+diff --git a/src/espeak.cpp b/src/espeak.cpp
+index 17e64fa..813be50 100644
+--- a/src/espeak.cpp
++++ b/src/espeak.cpp
+@@ -726,8 +726,17 @@ int main (int argc, char **argv)
+ 	}
+ 	else
+ 	{
++		struct stat st;
++		if (stat(filename, &st) != 0) {
++			fprintf(stderr, "Failed to stat() file '%s'\n", filename);
++			exit(1);
++		}
+ 		filesize = GetFileLength(filename);
+ 		f_text = fopen(filename,"r");
++		if (S_ISFIFO(st.st_mode))
++		{
++			flag_stdin = 2;
++		}
+ 	}
+ 
+ 	if((f_text == NULL) && (p_text == NULL))
+@@ -751,13 +760,16 @@ int main (int argc, char **argv)
+ 
+ 		if(flag_stdin == 2)
+ 		{
+-			// line by line input on stdin
+-			while(fgets(p_text,max,stdin) != NULL)
++			// line by line input on stdin or from FIFO
++			while(fgets(p_text,max,f_text) != NULL)
+ 			{
+ 				p_text[max-1] = 0;
+ 				espeak_Synth(p_text,max,0,POS_CHARACTER,0,synth_flags,NULL,NULL);
+ 
+ 			}
++			if (f_text != stdin) {
++				fclose(f_text);
++			}
+ 		}
+ 		else
+ 		{

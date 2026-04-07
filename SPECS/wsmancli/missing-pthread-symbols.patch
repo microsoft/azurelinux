@@ -1,0 +1,11 @@
+diff -up wsmancli-2.3.1/examples/cpp/Makefile.am.orig wsmancli-2.3.1/examples/cpp/Makefile.am
+--- wsmancli-2.3.1/examples/cpp/Makefile.am.orig	2014-02-26 12:09:41.686906501 +0100
++++ wsmancli-2.3.1/examples/cpp/Makefile.am	2014-02-26 12:10:09.731982919 +0100
+@@ -1,6 +1,6 @@
+        
+ LDADD = \
+-       $(OPENWSMAN_LIBS) -lwsman_clientpp
++       $(OPENWSMAN_LIBS) -lpthread -lwsman_clientpp
+ 
+ CXXFLAGS = \
+        $(OPENWSMAN_CFLAGS) 

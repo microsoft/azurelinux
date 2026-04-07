@@ -1,0 +1,24 @@
+From 72202aab5e5b3602ece4e8748bcdeefe2d789ab5 Mon Sep 17 00:00:00 2001
+From: Jean Boussier <jean.boussier@gmail.com>
+Date: Fri, 13 Jan 2023 09:21:17 +0100
+Subject: [PATCH] Use `RbConfig::CONFIG["rubylibdir"]` to check for stdlib
+ files
+
+Ref: https://github.com/Shopify/bootsnap/issues/431
+---
+ test/load_path_cache/path_test.rb    | 2 +-
+ 1 file changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/test/load_path_cache/path_test.rb b/test/load_path_cache/path_test.rb
+index 5425ed9..2c1c289 100644
+--- a/test/load_path_cache/path_test.rb
++++ b/test/load_path_cache/path_test.rb
+@@ -16,7 +16,7 @@ def test_stability
+         volatile        = Path.new(__FILE__)
+         stable          = Path.new(time_file)
+         unknown         = Path.new("/who/knows")
+-        lib             = Path.new("#{RbConfig::CONFIG['libdir']}/a")
++        lib             = Path.new("#{RbConfig::CONFIG['rubylibdir']}/a")
+         site            = Path.new("#{RbConfig::CONFIG['sitedir']}/b")
+         absolute_prefix = RbConfig::CONFIG["host_os"] =~ /mswin|mingw|cygwin/ ? ENV["SystemDrive"] : ""
+         bundler         = Path.new("#{absolute_prefix}/bp/3")

@@ -1,0 +1,467 @@
+From 6a559d65522af8509a72818d2ef330f68d26711e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Tue, 18 Jun 2024 15:57:22 +0100
+Subject: [PATCH 05/17] disable openmp, protobuf & sample_crypto builds
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+These libraries are demoware, not known to be used for anything
+important, so skip them to reduce amount of bundled package code.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ linux/installer/common/sdk/BOMs/sdk_base.txt  | 298 ------------------
+ .../common/sdk/BOMs/sdk_cve_2020_0551_cf.txt  |   2 -
+ .../sdk/BOMs/sdk_cve_2020_0551_load.txt       |   2 -
+ linux/installer/common/sdk/BOMs/sdk_x64.txt   |   3 -
+ sdk/Makefile.source                           |  24 +-
+ 5 files changed, 1 insertion(+), 328 deletions(-)
+
+diff --git a/linux/installer/common/sdk/BOMs/sdk_base.txt b/linux/installer/common/sdk/BOMs/sdk_base.txt
+index d26ee825..ed585066 100644
+--- a/linux/installer/common/sdk/BOMs/sdk_base.txt
++++ b/linux/installer/common/sdk/BOMs/sdk_base.txt
+@@ -1,5 +1,4 @@
+ DeliveryName	InstallName	FileCheckSum	FileFeature	FileOwner
+-<deliverydir>/build/linux/libsample_libcrypto.so	<installdir>/package/SampleCode/RemoteAttestation/sample_libcrypto/libsample_libcrypto.so	0	main	STP
+ <deliverydir>/common/inc/sgx_attributes.h	<installdir>/package/include/sgx_attributes.h	0	main	STP
+ <deliverydir>/common/inc/sgx_capable.h	<installdir>/package/include/sgx_capable.h	0	main	STP
+ <deliverydir>/common/inc/sgx_cpuid.h	<installdir>/package/include/sgx_cpuid.h	0	main	STP
+@@ -391,16 +390,6 @@ DeliveryName	InstallName	FileCheckSum	FileFeature	FileOwner
+ <deliverydir>/SampleCode/SealUnseal/Enclave_Unseal/Enclave_Unseal.cpp	<installdir>/package/SampleCode/SealUnseal/Enclave_Unseal/Enclave_Unseal.cpp	0	N/A	N/A
+ <deliverydir>/SampleCode/SealUnseal/Enclave_Unseal/Enclave_Unseal.edl	<installdir>/package/SampleCode/SealUnseal/Enclave_Unseal/Enclave_Unseal.edl	0	N/A	N/A
+ <deliverydir>/SampleCode/SealUnseal/Enclave_Unseal/Enclave_Unseal.lds	<installdir>/package/SampleCode/SealUnseal/Enclave_Unseal/Enclave_Unseal.lds	0	N/A	N/A
+-<deliverydir>/SampleCode/ProtobufSGXDemo/App/App.h	<installdir>/package/SampleCode/ProtobufSGXDemo/App/App.h	0	N/A	N/A
+-<deliverydir>/SampleCode/ProtobufSGXDemo/App/App.cpp	<installdir>/package/SampleCode/ProtobufSGXDemo/App/App.cpp	0	N/A	N/A
+-<deliverydir>/SampleCode/ProtobufSGXDemo/Enclave/Enclave.config.xml	<installdir>/package/SampleCode/ProtobufSGXDemo/Enclave/Enclave.config.xml	0	N/A	N/A
+-<deliverydir>/SampleCode/ProtobufSGXDemo/Enclave/Enclave.cpp	<installdir>/package/SampleCode/ProtobufSGXDemo/Enclave/Enclave.cpp	0	N/A	N/A
+-<deliverydir>/SampleCode/ProtobufSGXDemo/Enclave/Enclave_debug.lds	<installdir>/package/SampleCode/ProtobufSGXDemo/Enclave/Enclave_debug.lds	0	N/A	N/A
+-<deliverydir>/SampleCode/ProtobufSGXDemo/Enclave/Enclave.edl	<installdir>/package/SampleCode/ProtobufSGXDemo/Enclave/Enclave.edl	0	N/A	N/A
+-<deliverydir>/SampleCode/ProtobufSGXDemo/Enclave/Enclave.h	<installdir>/package/SampleCode/ProtobufSGXDemo/Enclave/Enclave.h	0	N/A	N/A
+-<deliverydir>/SampleCode/ProtobufSGXDemo/Enclave/Enclave.lds	<installdir>/package/SampleCode/ProtobufSGXDemo/Enclave/Enclave.lds	0	N/A	N/A
+-<deliverydir>/SampleCode/ProtobufSGXDemo/Enclave/person.proto	<installdir>/package/SampleCode/ProtobufSGXDemo/Enclave/person.proto	0	N/A	N/A
+-<deliverydir>/SampleCode/ProtobufSGXDemo/Makefile	<installdir>/package/SampleCode/ProtobufSGXDemo/Makefile	0	N/A	N/A
+ <deliverydir>/SampleCode/SampleAEXNotify/Enclave/Enclave.config.xml	<installdir>/package/SampleCode/SampleAEXNotify/Enclave/Enclave.config.xml	0	N/A	N/A
+ <deliverydir>/SampleCode/SampleAEXNotify/Enclave/Enclave.cpp	<installdir>/package/SampleCode/SampleAEXNotify/Enclave/Enclave.cpp	0	N/A	N/A
+ <deliverydir>/SampleCode/SampleAEXNotify/Enclave/Enclave.edl	<installdir>/package/SampleCode/SampleAEXNotify/Enclave/Enclave.edl	0	N/A	N/A
+@@ -412,7 +401,6 @@ DeliveryName	InstallName	FileCheckSum	FileFeature	FileOwner
+ <deliverydir>/SampleCode/SampleAEXNotify/Makefile	<installdir>/package/SampleCode/SampleAEXNotify/Makefile	0	N/A	N/A
+ <deliverydir>/SampleCode/SampleAEXNotify/README.txt	<installdir>/package/SampleCode/SampleAEXNotify/README.txt	0	N/A	N/A
+ <deliverydir>/build/linux/gdb-sgx-plugin/sgx-gdb	<installdir>/package/bin/sgx-gdb	0	main	STP
+-<deliverydir>/sdk/sample_libcrypto/sample_libcrypto.h	<installdir>/package/SampleCode/RemoteAttestation/sample_libcrypto/sample_libcrypto.h	0	main	STP
+ <deliverydir>/sdk/tlibcxx/include/CMakeLists.txt	<installdir>/package/include/libcxx/CMakeLists.txt	0	main	STP
+ <deliverydir>/sdk/tlibcxx/include/__availability	<installdir>/package/include/libcxx/__availability	0	main	STP
+ <deliverydir>/sdk/tlibcxx/include/__bit_reference	<installdir>/package/include/libcxx/__bit_reference	0	main	STP
+@@ -597,290 +585,4 @@ DeliveryName	InstallName	FileCheckSum	FileFeature	FileOwner
+ <deliverydir>/sdk/tlibcxx/include/variant	<installdir>/package/include/libcxx/variant	0	main	STP
+ <deliverydir>/sdk/tlibcxx/include/vector	<installdir>/package/include/libcxx/vector	0	main	STP
+ <deliverydir>/sdk/tlibcxx/include/version	<installdir>/package/include/libcxx/version	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/any.h	<installdir>/package/include/tprotobuf/google/protobuf/any.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/any.pb.h	<installdir>/package/include/tprotobuf/google/protobuf/any.pb.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/any.proto	<installdir>/package/include/tprotobuf/google/protobuf/any.proto	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/api.pb.h	<installdir>/package/include/tprotobuf/google/protobuf/api.pb.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/api.proto	<installdir>/package/include/tprotobuf/google/protobuf/api.proto	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/arena.h	<installdir>/package/include/tprotobuf/google/protobuf/arena.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/arena_align.h	<installdir>/package/include/tprotobuf/google/protobuf/arena_align.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/arena_allocation_policy.h	<installdir>/package/include/tprotobuf/google/protobuf/arena_allocation_policy.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/arena_cleanup.h	<installdir>/package/include/tprotobuf/google/protobuf/arena_cleanup.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/arena_config.h	<installdir>/package/include/tprotobuf/google/protobuf/arena_config.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/arenastring.h	<installdir>/package/include/tprotobuf/google/protobuf/arenastring.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/arenaz_sampler.h	<installdir>/package/include/tprotobuf/google/protobuf/arenaz_sampler.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/descriptor.h	<installdir>/package/include/tprotobuf/google/protobuf/descriptor.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/descriptor.pb.h	<installdir>/package/include/tprotobuf/google/protobuf/descriptor.pb.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/descriptor.proto	<installdir>/package/include/tprotobuf/google/protobuf/descriptor.proto	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/descriptor_database.h	<installdir>/package/include/tprotobuf/google/protobuf/descriptor_database.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/descriptor_legacy.h	<installdir>/package/include/tprotobuf/google/protobuf/descriptor_legacy.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/dynamic_message.h	<installdir>/package/include/tprotobuf/google/protobuf/dynamic_message.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/empty.pb.h	<installdir>/package/include/tprotobuf/google/protobuf/empty.pb.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/empty.proto	<installdir>/package/include/tprotobuf/google/protobuf/empty.proto	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/endian.h	<installdir>/package/include/tprotobuf/google/protobuf/endian.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/explicitly_constructed.h	<installdir>/package/include/tprotobuf/google/protobuf/explicitly_constructed.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/extension_set.h	<installdir>/package/include/tprotobuf/google/protobuf/extension_set.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/extension_set_inl.h	<installdir>/package/include/tprotobuf/google/protobuf/extension_set_inl.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/field_access_listener.h	<installdir>/package/include/tprotobuf/google/protobuf/field_access_listener.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/field_mask.pb.h	<installdir>/package/include/tprotobuf/google/protobuf/field_mask.pb.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/field_mask.proto	<installdir>/package/include/tprotobuf/google/protobuf/field_mask.proto	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/generated_enum_reflection.h	<installdir>/package/include/tprotobuf/google/protobuf/generated_enum_reflection.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/generated_enum_util.h	<installdir>/package/include/tprotobuf/google/protobuf/generated_enum_util.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/generated_message_bases.h	<installdir>/package/include/tprotobuf/google/protobuf/generated_message_bases.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/generated_message_reflection.h	<installdir>/package/include/tprotobuf/google/protobuf/generated_message_reflection.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/generated_message_tctable_decl.h	<installdir>/package/include/tprotobuf/google/protobuf/generated_message_tctable_decl.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/generated_message_util.h	<installdir>/package/include/tprotobuf/google/protobuf/generated_message_util.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/has_bits.h	<installdir>/package/include/tprotobuf/google/protobuf/has_bits.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/implicit_weak_message.h	<installdir>/package/include/tprotobuf/google/protobuf/implicit_weak_message.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/inlined_string_field.h	<installdir>/package/include/tprotobuf/google/protobuf/inlined_string_field.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/io/coded_stream.h	<installdir>/package/include/tprotobuf/google/protobuf/io/coded_stream.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/io/printer.h	<installdir>/package/include/tprotobuf/google/protobuf/io/printer.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/io/strtod.h	<installdir>/package/include/tprotobuf/google/protobuf/io/strtod.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/io/tokenizer.h	<installdir>/package/include/tprotobuf/google/protobuf/io/tokenizer.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/io/zero_copy_stream.h	<installdir>/package/include/tprotobuf/google/protobuf/io/zero_copy_stream.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/io/zero_copy_stream_impl.h	<installdir>/package/include/tprotobuf/google/protobuf/io/zero_copy_stream_impl.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/io/zero_copy_stream_impl_lite.h	<installdir>/package/include/tprotobuf/google/protobuf/io/zero_copy_stream_impl_lite.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/map.h	<installdir>/package/include/tprotobuf/google/protobuf/map.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/map_entry.h	<installdir>/package/include/tprotobuf/google/protobuf/map_entry.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/map_entry_lite.h	<installdir>/package/include/tprotobuf/google/protobuf/map_entry_lite.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/map_field.h	<installdir>/package/include/tprotobuf/google/protobuf/map_field.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/map_field_inl.h	<installdir>/package/include/tprotobuf/google/protobuf/map_field_inl.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/map_field_lite.h	<installdir>/package/include/tprotobuf/google/protobuf/map_field_lite.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/map_type_handler.h	<installdir>/package/include/tprotobuf/google/protobuf/map_type_handler.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/message.h	<installdir>/package/include/tprotobuf/google/protobuf/message.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/message_lite.h	<installdir>/package/include/tprotobuf/google/protobuf/message_lite.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/metadata.h	<installdir>/package/include/tprotobuf/google/protobuf/metadata.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/metadata_lite.h	<installdir>/package/include/tprotobuf/google/protobuf/metadata_lite.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/parse_context.h	<installdir>/package/include/tprotobuf/google/protobuf/parse_context.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/port.h	<installdir>/package/include/tprotobuf/google/protobuf/port.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/port_def.inc	<installdir>/package/include/tprotobuf/google/protobuf/port_def.inc	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/port_undef.inc	<installdir>/package/include/tprotobuf/google/protobuf/port_undef.inc	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/reflection.h	<installdir>/package/include/tprotobuf/google/protobuf/reflection.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/reflection_mode.h	<installdir>/package/include/tprotobuf/google/protobuf/reflection_mode.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/reflection_ops.h	<installdir>/package/include/tprotobuf/google/protobuf/reflection_ops.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/repeated_field.h	<installdir>/package/include/tprotobuf/google/protobuf/repeated_field.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/repeated_ptr_field.h	<installdir>/package/include/tprotobuf/google/protobuf/repeated_ptr_field.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/serial_arena.h	<installdir>/package/include/tprotobuf/google/protobuf/serial_arena.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/service.h	<installdir>/package/include/tprotobuf/google/protobuf/service.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/source_context.pb.h	<installdir>/package/include/tprotobuf/google/protobuf/source_context.pb.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/source_context.proto	<installdir>/package/include/tprotobuf/google/protobuf/source_context.proto	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/string_block.h	<installdir>/package/include/tprotobuf/google/protobuf/string_block.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/string_member_robber.h	<installdir>/package/include/tprotobuf/google/protobuf/string_member_robber.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/struct.pb.h	<installdir>/package/include/tprotobuf/google/protobuf/struct.pb.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/struct.proto	<installdir>/package/include/tprotobuf/google/protobuf/struct.proto	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/stubs/callback.h	<installdir>/package/include/tprotobuf/google/protobuf/stubs/callback.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/stubs/common.h	<installdir>/package/include/tprotobuf/google/protobuf/stubs/common.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/stubs/platform_macros.h	<installdir>/package/include/tprotobuf/google/protobuf/stubs/platform_macros.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/stubs/port.h	<installdir>/package/include/tprotobuf/google/protobuf/stubs/port.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/stubs/status_macros.h	<installdir>/package/include/tprotobuf/google/protobuf/stubs/status_macros.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/text_format.h	<installdir>/package/include/tprotobuf/google/protobuf/text_format.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/thread_safe_arena.h	<installdir>/package/include/tprotobuf/google/protobuf/thread_safe_arena.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/type.pb.h	<installdir>/package/include/tprotobuf/google/protobuf/type.pb.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/type.proto	<installdir>/package/include/tprotobuf/google/protobuf/type.proto	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/unknown_field_set.h	<installdir>/package/include/tprotobuf/google/protobuf/unknown_field_set.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/varint_shuffle.h	<installdir>/package/include/tprotobuf/google/protobuf/varint_shuffle.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/wire_format.h	<installdir>/package/include/tprotobuf/google/protobuf/wire_format.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/wire_format_lite.h	<installdir>/package/include/tprotobuf/google/protobuf/wire_format_lite.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/wrappers.pb.h	<installdir>/package/include/tprotobuf/google/protobuf/wrappers.pb.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/src/google/protobuf/wrappers.proto	<installdir>/package/include/tprotobuf/google/protobuf/wrappers.proto	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/algorithm/algorithm.h	<installdir>/package/include/tprotobuf/absl/algorithm/algorithm.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/algorithm/container.h	<installdir>/package/include/tprotobuf/absl/algorithm/container.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/attributes.h	<installdir>/package/include/tprotobuf/absl/base/attributes.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/call_once.h	<installdir>/package/include/tprotobuf/absl/base/call_once.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/casts.h	<installdir>/package/include/tprotobuf/absl/base/casts.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/config.h	<installdir>/package/include/tprotobuf/absl/base/config.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/const_init.h	<installdir>/package/include/tprotobuf/absl/base/const_init.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/dynamic_annotations.h	<installdir>/package/include/tprotobuf/absl/base/dynamic_annotations.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/internal/atomic_hook.h	<installdir>/package/include/tprotobuf/absl/base/internal/atomic_hook.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/internal/dynamic_annotations.h	<installdir>/package/include/tprotobuf/absl/base/internal/dynamic_annotations.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/internal/endian.h	<installdir>/package/include/tprotobuf/absl/base/internal/endian.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/internal/errno_saver.h	<installdir>/package/include/tprotobuf/absl/base/internal/errno_saver.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/internal/identity.h	<installdir>/package/include/tprotobuf/absl/base/internal/identity.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/internal/inline_variable.h	<installdir>/package/include/tprotobuf/absl/base/internal/inline_variable.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/internal/invoke.h	<installdir>/package/include/tprotobuf/absl/base/internal/invoke.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/internal/low_level_alloc.h	<installdir>/package/include/tprotobuf/absl/base/internal/low_level_alloc.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/internal/low_level_scheduling.h	<installdir>/package/include/tprotobuf/absl/base/internal/low_level_scheduling.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/internal/per_thread_tls.h	<installdir>/package/include/tprotobuf/absl/base/internal/per_thread_tls.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/internal/prefetch.h	<installdir>/package/include/tprotobuf/absl/base/internal/prefetch.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/internal/raw_logging.h	<installdir>/package/include/tprotobuf/absl/base/internal/raw_logging.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/internal/scheduling_mode.h	<installdir>/package/include/tprotobuf/absl/base/internal/scheduling_mode.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/internal/spinlock.h	<installdir>/package/include/tprotobuf/absl/base/internal/spinlock.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/internal/spinlock_wait.h	<installdir>/package/include/tprotobuf/absl/base/internal/spinlock_wait.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/internal/thread_annotations.h	<installdir>/package/include/tprotobuf/absl/base/internal/thread_annotations.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/internal/thread_identity.h	<installdir>/package/include/tprotobuf/absl/base/internal/thread_identity.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/internal/throw_delegate.h	<installdir>/package/include/tprotobuf/absl/base/internal/throw_delegate.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/internal/tsan_mutex_interface.h	<installdir>/package/include/tprotobuf/absl/base/internal/tsan_mutex_interface.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/internal/unaligned_access.h	<installdir>/package/include/tprotobuf/absl/base/internal/unaligned_access.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/log_severity.h	<installdir>/package/include/tprotobuf/absl/base/log_severity.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/macros.h	<installdir>/package/include/tprotobuf/absl/base/macros.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/optimization.h	<installdir>/package/include/tprotobuf/absl/base/optimization.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/options.h	<installdir>/package/include/tprotobuf/absl/base/options.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/policy_checks.h	<installdir>/package/include/tprotobuf/absl/base/policy_checks.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/port.h	<installdir>/package/include/tprotobuf/absl/base/port.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/base/thread_annotations.h	<installdir>/package/include/tprotobuf/absl/base/thread_annotations.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/cleanup/cleanup.h	<installdir>/package/include/tprotobuf/absl/cleanup/cleanup.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/container/btree_map.h	<installdir>/package/include/tprotobuf/absl/container/btree_map.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/container/btree_set.h	<installdir>/package/include/tprotobuf/absl/container/btree_set.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/container/fixed_array.h	<installdir>/package/include/tprotobuf/absl/container/fixed_array.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/container/flat_hash_map.h	<installdir>/package/include/tprotobuf/absl/container/flat_hash_map.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/container/flat_hash_set.h	<installdir>/package/include/tprotobuf/absl/container/flat_hash_set.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/container/inlined_vector.h	<installdir>/package/include/tprotobuf/absl/container/inlined_vector.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/container/internal/btree.h	<installdir>/package/include/tprotobuf/absl/container/internal/btree.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/container/internal/btree_container.h	<installdir>/package/include/tprotobuf/absl/container/internal/btree_container.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/container/internal/common.h	<installdir>/package/include/tprotobuf/absl/container/internal/common.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/container/internal/common_policy_traits.h	<installdir>/package/include/tprotobuf/absl/container/internal/common_policy_traits.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/container/internal/compressed_tuple.h	<installdir>/package/include/tprotobuf/absl/container/internal/compressed_tuple.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/container/internal/container_memory.h	<installdir>/package/include/tprotobuf/absl/container/internal/container_memory.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/container/internal/hash_function_defaults.h	<installdir>/package/include/tprotobuf/absl/container/internal/hash_function_defaults.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/container/internal/hash_policy_traits.h	<installdir>/package/include/tprotobuf/absl/container/internal/hash_policy_traits.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/container/internal/hashtable_debug_hooks.h	<installdir>/package/include/tprotobuf/absl/container/internal/hashtable_debug_hooks.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/container/internal/hashtablez_sampler.h	<installdir>/package/include/tprotobuf/absl/container/internal/hashtablez_sampler.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/container/internal/inlined_vector.h	<installdir>/package/include/tprotobuf/absl/container/internal/inlined_vector.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/container/internal/layout.h	<installdir>/package/include/tprotobuf/absl/container/internal/layout.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/container/internal/raw_hash_map.h	<installdir>/package/include/tprotobuf/absl/container/internal/raw_hash_map.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/container/internal/raw_hash_set.h	<installdir>/package/include/tprotobuf/absl/container/internal/raw_hash_set.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/container/node_hash_map.h	<installdir>/package/include/tprotobuf/absl/container/node_hash_map.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/container/node_hash_set.h	<installdir>/package/include/tprotobuf/absl/container/node_hash_set.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/crc/crc32c.h	<installdir>/package/include/tprotobuf/absl/crc/crc32c.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/crc/internal/crc32_x86_arm_combined_simd.h	<installdir>/package/include/tprotobuf/absl/crc/internal/crc32_x86_arm_combined_simd.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/crc/internal/crc32c_inline.h	<installdir>/package/include/tprotobuf/absl/crc/internal/crc32c_inline.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/crc/internal/crc_cord_state.h	<installdir>/package/include/tprotobuf/absl/crc/internal/crc_cord_state.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/debugging/failure_signal_handler.h	<installdir>/package/include/tprotobuf/absl/debugging/failure_signal_handler.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/debugging/leak_check.h	<installdir>/package/include/tprotobuf/absl/debugging/leak_check.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/debugging/stacktrace.h	<installdir>/package/include/tprotobuf/absl/debugging/stacktrace.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/debugging/symbolize.h	<installdir>/package/include/tprotobuf/absl/debugging/symbolize.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/debugging/symbolize_darwin.inc	<installdir>/package/include/tprotobuf/absl/debugging/symbolize_darwin.inc	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/debugging/symbolize_elf.inc	<installdir>/package/include/tprotobuf/absl/debugging/symbolize_elf.inc	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/debugging/symbolize_emscripten.inc	<installdir>/package/include/tprotobuf/absl/debugging/symbolize_emscripten.inc	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/debugging/symbolize_unimplemented.inc	<installdir>/package/include/tprotobuf/absl/debugging/symbolize_unimplemented.inc	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/debugging/symbolize_win32.inc	<installdir>/package/include/tprotobuf/absl/debugging/symbolize_win32.inc	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/flags/commandlineflag.h	<installdir>/package/include/tprotobuf/absl/flags/commandlineflag.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/flags/config.h	<installdir>/package/include/tprotobuf/absl/flags/config.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/flags/declare.h	<installdir>/package/include/tprotobuf/absl/flags/declare.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/flags/flag.h	<installdir>/package/include/tprotobuf/absl/flags/flag.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/flags/flag_benchmark.lds	<installdir>/package/include/tprotobuf/absl/flags/flag_benchmark.lds	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/flags/marshalling.h	<installdir>/package/include/tprotobuf/absl/flags/marshalling.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/flags/parse.h	<installdir>/package/include/tprotobuf/absl/flags/parse.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/flags/reflection.h	<installdir>/package/include/tprotobuf/absl/flags/reflection.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/flags/usage.h	<installdir>/package/include/tprotobuf/absl/flags/usage.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/flags/usage_config.h	<installdir>/package/include/tprotobuf/absl/flags/usage_config.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/functional/any_invocable.h	<installdir>/package/include/tprotobuf/absl/functional/any_invocable.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/functional/bind_front.h	<installdir>/package/include/tprotobuf/absl/functional/bind_front.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/functional/function_ref.h	<installdir>/package/include/tprotobuf/absl/functional/function_ref.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/functional/internal/function_ref.h	<installdir>/package/include/tprotobuf/absl/functional/internal/function_ref.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/hash/hash.h	<installdir>/package/include/tprotobuf/absl/hash/hash.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/hash/internal/city.h	<installdir>/package/include/tprotobuf/absl/hash/internal/city.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/hash/internal/hash.h	<installdir>/package/include/tprotobuf/absl/hash/internal/hash.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/hash/internal/low_level_hash.h	<installdir>/package/include/tprotobuf/absl/hash/internal/low_level_hash.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/log/absl_check.h	<installdir>/package/include/tprotobuf/absl/log/absl_check.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/log/absl_log.h	<installdir>/package/include/tprotobuf/absl/log/absl_log.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/log/check.h	<installdir>/package/include/tprotobuf/absl/log/check.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/log/die_if_null.h	<installdir>/package/include/tprotobuf/absl/log/die_if_null.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/log/flags.h	<installdir>/package/include/tprotobuf/absl/log/flags.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/log/globals.h	<installdir>/package/include/tprotobuf/absl/log/globals.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/log/initialize.h	<installdir>/package/include/tprotobuf/absl/log/initialize.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/log/internal/check_impl.h	<installdir>/package/include/tprotobuf/absl/log/internal/check_impl.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/log/internal/check_op.h	<installdir>/package/include/tprotobuf/absl/log/internal/check_op.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/log/internal/conditions.h	<installdir>/package/include/tprotobuf/absl/log/internal/conditions.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/log/internal/config.h	<installdir>/package/include/tprotobuf/absl/log/internal/config.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/log/internal/log_impl.h	<installdir>/package/include/tprotobuf/absl/log/internal/log_impl.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/log/internal/log_message.h	<installdir>/package/include/tprotobuf/absl/log/internal/log_message.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/log/internal/nullguard.h	<installdir>/package/include/tprotobuf/absl/log/internal/nullguard.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/log/internal/nullstream.h	<installdir>/package/include/tprotobuf/absl/log/internal/nullstream.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/log/internal/strip.h	<installdir>/package/include/tprotobuf/absl/log/internal/strip.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/log/internal/voidify.h	<installdir>/package/include/tprotobuf/absl/log/internal/voidify.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/log/log.h	<installdir>/package/include/tprotobuf/absl/log/log.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/log/log_entry.h	<installdir>/package/include/tprotobuf/absl/log/log_entry.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/log/log_sink.h	<installdir>/package/include/tprotobuf/absl/log/log_sink.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/log/log_sink_registry.h	<installdir>/package/include/tprotobuf/absl/log/log_sink_registry.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/log/log_streamer.h	<installdir>/package/include/tprotobuf/absl/log/log_streamer.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/log/scoped_mock_log.h	<installdir>/package/include/tprotobuf/absl/log/scoped_mock_log.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/log/structured.h	<installdir>/package/include/tprotobuf/absl/log/structured.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/memory/memory.h	<installdir>/package/include/tprotobuf/absl/memory/memory.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/meta/type_traits.h	<installdir>/package/include/tprotobuf/absl/meta/type_traits.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/numeric/bits.h	<installdir>/package/include/tprotobuf/absl/numeric/bits.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/numeric/int128.h	<installdir>/package/include/tprotobuf/absl/numeric/int128.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/numeric/int128_have_intrinsic.inc	<installdir>/package/include/tprotobuf/absl/numeric/int128_have_intrinsic.inc	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/numeric/int128_no_intrinsic.inc	<installdir>/package/include/tprotobuf/absl/numeric/int128_no_intrinsic.inc	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/numeric/internal/bits.h	<installdir>/package/include/tprotobuf/absl/numeric/internal/bits.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/profiling/internal/sample_recorder.h	<installdir>/package/include/tprotobuf/absl/profiling/internal/sample_recorder.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/random/bernoulli_distribution.h	<installdir>/package/include/tprotobuf/absl/random/bernoulli_distribution.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/random/beta_distribution.h	<installdir>/package/include/tprotobuf/absl/random/beta_distribution.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/random/bit_gen_ref.h	<installdir>/package/include/tprotobuf/absl/random/bit_gen_ref.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/random/discrete_distribution.h	<installdir>/package/include/tprotobuf/absl/random/discrete_distribution.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/random/distributions.h	<installdir>/package/include/tprotobuf/absl/random/distributions.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/random/exponential_distribution.h	<installdir>/package/include/tprotobuf/absl/random/exponential_distribution.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/random/gaussian_distribution.h	<installdir>/package/include/tprotobuf/absl/random/gaussian_distribution.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/random/log_uniform_int_distribution.h	<installdir>/package/include/tprotobuf/absl/random/log_uniform_int_distribution.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/random/mock_distributions.h	<installdir>/package/include/tprotobuf/absl/random/mock_distributions.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/random/mocking_bit_gen.h	<installdir>/package/include/tprotobuf/absl/random/mocking_bit_gen.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/random/poisson_distribution.h	<installdir>/package/include/tprotobuf/absl/random/poisson_distribution.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/random/random.h	<installdir>/package/include/tprotobuf/absl/random/random.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/random/seed_gen_exception.h	<installdir>/package/include/tprotobuf/absl/random/seed_gen_exception.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/random/seed_sequences.h	<installdir>/package/include/tprotobuf/absl/random/seed_sequences.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/random/uniform_int_distribution.h	<installdir>/package/include/tprotobuf/absl/random/uniform_int_distribution.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/random/uniform_real_distribution.h	<installdir>/package/include/tprotobuf/absl/random/uniform_real_distribution.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/random/zipf_distribution.h	<installdir>/package/include/tprotobuf/absl/random/zipf_distribution.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/status/status.h	<installdir>/package/include/tprotobuf/absl/status/status.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/status/status_payload_printer.h	<installdir>/package/include/tprotobuf/absl/status/status_payload_printer.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/status/statusor.h	<installdir>/package/include/tprotobuf/absl/status/statusor.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/ascii.h	<installdir>/package/include/tprotobuf/absl/strings/ascii.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/charconv.h	<installdir>/package/include/tprotobuf/absl/strings/charconv.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/cord.h	<installdir>/package/include/tprotobuf/absl/strings/cord.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/cord_analysis.h	<installdir>/package/include/tprotobuf/absl/strings/cord_analysis.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/cord_buffer.h	<installdir>/package/include/tprotobuf/absl/strings/cord_buffer.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/escaping.h	<installdir>/package/include/tprotobuf/absl/strings/escaping.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/internal/cord_data_edge.h	<installdir>/package/include/tprotobuf/absl/strings/internal/cord_data_edge.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/internal/cord_internal.h	<installdir>/package/include/tprotobuf/absl/strings/internal/cord_internal.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/internal/cord_rep_btree.h	<installdir>/package/include/tprotobuf/absl/strings/internal/cord_rep_btree.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/internal/cord_rep_btree_navigator.h	<installdir>/package/include/tprotobuf/absl/strings/internal/cord_rep_btree_navigator.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/internal/cord_rep_btree_reader.h	<installdir>/package/include/tprotobuf/absl/strings/internal/cord_rep_btree_reader.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/internal/cord_rep_crc.h	<installdir>/package/include/tprotobuf/absl/strings/internal/cord_rep_crc.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/internal/cord_rep_flat.h	<installdir>/package/include/tprotobuf/absl/strings/internal/cord_rep_flat.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/internal/cord_rep_ring.h	<installdir>/package/include/tprotobuf/absl/strings/internal/cord_rep_ring.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/internal/cordz_functions.h	<installdir>/package/include/tprotobuf/absl/strings/internal/cordz_functions.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/internal/cordz_handle.h	<installdir>/package/include/tprotobuf/absl/strings/internal/cordz_handle.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/internal/cordz_info.h	<installdir>/package/include/tprotobuf/absl/strings/internal/cordz_info.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/internal/cordz_statistics.h	<installdir>/package/include/tprotobuf/absl/strings/internal/cordz_statistics.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/internal/cordz_update_scope.h	<installdir>/package/include/tprotobuf/absl/strings/internal/cordz_update_scope.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/internal/cordz_update_tracker.h	<installdir>/package/include/tprotobuf/absl/strings/internal/cordz_update_tracker.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/internal/has_absl_stringify.h	<installdir>/package/include/tprotobuf/absl/strings/internal/has_absl_stringify.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/internal/resize_uninitialized.h	<installdir>/package/include/tprotobuf/absl/strings/internal/resize_uninitialized.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/internal/string_constant.h	<installdir>/package/include/tprotobuf/absl/strings/internal/string_constant.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/internal/stringify_sink.h	<installdir>/package/include/tprotobuf/absl/strings/internal/stringify_sink.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/match.h	<installdir>/package/include/tprotobuf/absl/strings/match.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/numbers.h	<installdir>/package/include/tprotobuf/absl/strings/numbers.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/str_cat.h	<installdir>/package/include/tprotobuf/absl/strings/str_cat.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/str_format.h	<installdir>/package/include/tprotobuf/absl/strings/str_format.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/str_join.h	<installdir>/package/include/tprotobuf/absl/strings/str_join.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/str_replace.h	<installdir>/package/include/tprotobuf/absl/strings/str_replace.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/str_split.h	<installdir>/package/include/tprotobuf/absl/strings/str_split.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/string_view.h	<installdir>/package/include/tprotobuf/absl/strings/string_view.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/strip.h	<installdir>/package/include/tprotobuf/absl/strings/strip.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/strings/substitute.h	<installdir>/package/include/tprotobuf/absl/strings/substitute.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/synchronization/barrier.h	<installdir>/package/include/tprotobuf/absl/synchronization/barrier.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/synchronization/blocking_counter.h	<installdir>/package/include/tprotobuf/absl/synchronization/blocking_counter.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/synchronization/internal/create_thread_identity.h	<installdir>/package/include/tprotobuf/absl/synchronization/internal/create_thread_identity.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/synchronization/internal/kernel_timeout.h	<installdir>/package/include/tprotobuf/absl/synchronization/internal/kernel_timeout.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/synchronization/internal/per_thread_sem.h	<installdir>/package/include/tprotobuf/absl/synchronization/internal/per_thread_sem.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/synchronization/mutex.h	<installdir>/package/include/tprotobuf/absl/synchronization/mutex.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/synchronization/notification.h	<installdir>/package/include/tprotobuf/absl/synchronization/notification.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/time/civil_time.h	<installdir>/package/include/tprotobuf/absl/time/civil_time.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/time/clock.h	<installdir>/package/include/tprotobuf/absl/time/clock.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/time/internal/cctz/include/cctz/civil_time.h	<installdir>/package/include/tprotobuf/absl/time/internal/cctz/include/cctz/civil_time.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/time/internal/cctz/include/cctz/civil_time_detail.h	<installdir>/package/include/tprotobuf/absl/time/internal/cctz/include/cctz/civil_time_detail.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/time/internal/cctz/include/cctz/time_zone.h	<installdir>/package/include/tprotobuf/absl/time/internal/cctz/include/cctz/time_zone.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/time/time.h	<installdir>/package/include/tprotobuf/absl/time/time.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/types/any.h	<installdir>/package/include/tprotobuf/absl/types/any.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/types/bad_any_cast.h	<installdir>/package/include/tprotobuf/absl/types/bad_any_cast.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/types/bad_optional_access.h	<installdir>/package/include/tprotobuf/absl/types/bad_optional_access.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/types/bad_variant_access.h	<installdir>/package/include/tprotobuf/absl/types/bad_variant_access.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/types/compare.h	<installdir>/package/include/tprotobuf/absl/types/compare.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/types/internal/span.h	<installdir>/package/include/tprotobuf/absl/types/internal/span.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/types/internal/variant.h	<installdir>/package/include/tprotobuf/absl/types/internal/variant.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/types/internal/optional.h	<installdir>/package/include/tprotobuf/absl/types/internal/optional.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/types/optional.h	<installdir>/package/include/tprotobuf/absl/types/optional.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/types/span.h	<installdir>/package/include/tprotobuf/absl/types/span.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/types/variant.h	<installdir>/package/include/tprotobuf/absl/types/variant.h	0	main	STP
+-<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/utility/utility.h	<installdir>/package/include/tprotobuf/absl/utility/utility.h	0	main	STP
+ <deliverydir>/common/buildenv.mk	<installdir>/package/buildenv.mk	0	main	STP
+diff --git a/linux/installer/common/sdk/BOMs/sdk_cve_2020_0551_cf.txt b/linux/installer/common/sdk/BOMs/sdk_cve_2020_0551_cf.txt
+index 65d9dca0..086992f9 100644
+--- a/linux/installer/common/sdk/BOMs/sdk_cve_2020_0551_cf.txt
++++ b/linux/installer/common/sdk/BOMs/sdk_cve_2020_0551_cf.txt
+@@ -10,9 +10,7 @@ DeliveryName	InstallName	FileCheckSum	FileFeature	FileOwner
+ <deliverydir>/build/linuxCF/libsgx_tswitchless.a	<installdir>/package/lib64/cve_2020_0551_cf/libsgx_tswitchless.a	0	main	STP
+ <deliverydir>/build/linuxCF/libsgx_tprotected_fs.a	<installdir>/package/lib64/cve_2020_0551_cf/libsgx_tprotected_fs.a	0	main	STP
+ <deliverydir>/build/linuxCF/libsgx_pcl.a	<installdir>/package/lib64/cve_2020_0551_cf/libsgx_pcl.a	0	main	STP
+-<deliverydir>/build/linuxCF/libsgx_omp.a	<installdir>/package/lib64/cve_2020_0551_cf/libsgx_omp.a	0	main	STP
+ <deliverydir>/build/linuxCF/libsgx_pthread.a	<installdir>/package/lib64/cve_2020_0551_cf/libsgx_pthread.a	0	main	STP
+-<deliverydir>/build/linuxCF/libsgx_protobuf.a	<installdir>/package/lib64/cve_2020_0551_cf/libsgx_protobuf.a	0	main	STP
+ <deliverydir>/build/linuxCF/libsgx_ttls.a	<installdir>/package/lib64/cve_2020_0551_cf/libsgx_ttls.a	0	main	STP
+ <deliverydir>/build/linuxCF/libtdx_tls.a	<installdir>/package/lib64/cve_2020_0551_cf/libtdx_tls.a	0	main	STP
+ <deliverydir>/build/linuxCF/libsgx_utls.a	<installdir>/package/lib64/cve_2020_0551_cf/libsgx_utls.a	0	main	STP
+diff --git a/linux/installer/common/sdk/BOMs/sdk_cve_2020_0551_load.txt b/linux/installer/common/sdk/BOMs/sdk_cve_2020_0551_load.txt
+index 71684b38..c26c9e63 100644
+--- a/linux/installer/common/sdk/BOMs/sdk_cve_2020_0551_load.txt
++++ b/linux/installer/common/sdk/BOMs/sdk_cve_2020_0551_load.txt
+@@ -10,9 +10,7 @@ DeliveryName	InstallName	FileCheckSum	FileFeature	FileOwner
+ <deliverydir>/build/linuxLOAD/libsgx_tswitchless.a	<installdir>/package/lib64/cve_2020_0551_load/libsgx_tswitchless.a	0	main	STP
+ <deliverydir>/build/linuxLOAD/libsgx_tprotected_fs.a	<installdir>/package/lib64/cve_2020_0551_load/libsgx_tprotected_fs.a	0	main	STP
+ <deliverydir>/build/linuxLOAD/libsgx_pcl.a	<installdir>/package/lib64/cve_2020_0551_load/libsgx_pcl.a	0	main	STP
+-<deliverydir>/build/linuxLOAD/libsgx_omp.a	<installdir>/package/lib64/cve_2020_0551_load/libsgx_omp.a	0	main	STP
+ <deliverydir>/build/linuxLOAD/libsgx_pthread.a	<installdir>/package/lib64/cve_2020_0551_load/libsgx_pthread.a	0	main	STP
+-<deliverydir>/build/linuxLOAD/libsgx_protobuf.a	<installdir>/package/lib64/cve_2020_0551_load/libsgx_protobuf.a	0	main	STP
+ <deliverydir>/build/linuxLOAD/libsgx_ttls.a	<installdir>/package/lib64/cve_2020_0551_load/libsgx_ttls.a	0	main	STP
+ <deliverydir>/build/linuxLOAD/libtdx_tls.a	<installdir>/package/lib64/cve_2020_0551_load/libtdx_tls.a	0	main	STP
+ <deliverydir>/build/linuxLOAD/libsgx_utls.a	<installdir>/package/lib64/cve_2020_0551_load/libsgx_utls.a	0	main	STP
+diff --git a/linux/installer/common/sdk/BOMs/sdk_x64.txt b/linux/installer/common/sdk/BOMs/sdk_x64.txt
+index d713050b..111070ee 100644
+--- a/linux/installer/common/sdk/BOMs/sdk_x64.txt
++++ b/linux/installer/common/sdk/BOMs/sdk_x64.txt
+@@ -40,10 +40,7 @@ DeliveryName	InstallName	FileCheckSum	FileFeature	FileOwner
+ <deliverydir>/build/linux/sgx_edger8r	<installdir>/package/bin/x64/sgx_edger8r	0	main	STP
+ <deliverydir>/build/linux/sgx_sign	<installdir>/package/bin/x64/sgx_sign	0	main	STP
+ <deliverydir>/build/linux/sgx_encrypt	<installdir>/package/bin/x64/sgx_encrypt	0	main	STP
+-<deliverydir>/build/linux/sgx_protoc	<installdir>/package/bin/x64/sgx_protoc	0	main	STP
+ <deliverydir>/build/linux/libsgx_pthread.a	<installdir>/package/lib64/libsgx_pthread.a	0	main	STP
+-<deliverydir>/build/linux/libsgx_omp.a	<installdir>/package/lib64/libsgx_omp.a	0	main	STP
+-<deliverydir>/build/linux/libsgx_protobuf.a	<installdir>/package/lib64/libsgx_protobuf.a	0	main	STP
+ <deliverydir>/build/linux/libsgx_ttls.a	<installdir>/package/lib64/libsgx_ttls.a	0	main	STP
+ <deliverydir>/build/linux/libtdx_tls.a	<installdir>/package/lib64/libtdx_tls.a	0	main	STP
+ <deliverydir>/build/linux/libsgx_utls.a	<installdir>/package/lib64/libsgx_utls.a	0	main	STP
+diff --git a/sdk/Makefile.source b/sdk/Makefile.source
+index e3bac508..2d37b2d4 100644
+--- a/sdk/Makefile.source
++++ b/sdk/Makefile.source
+@@ -41,14 +41,11 @@
+ #        - tprotected_fs: libsgx_tprotected_fs.a
+ #        - tcmalloc:      libsgx_tcmalloc.a
+ #        - sgx_pcl:       libsgx_pcl.a
+-#        - openmp:        libsgx_omp.a
+-#        - protobuf:      libsgx_protobuf.a
+ #        - ttls:          libsgx_ttls.a
+ #  - Untrtusted libraries
+ #        - ukey_exchange: libsgx_ukey_exchange.a
+ #        - uprotected_fs: libsgx_uprotected_fs.a
+ #        - ptrace:        libsgx_ptrace.so, gdb-sgx-plugin
+-#        - sample_crypto: libsample_crypto.so (for sample code use)
+ #        - utls:          libsgx_utls.a
+ #  - Standalone, untrusted libraries
+ #        - libcapable:    libsgx_capable.a libsgx_capable.so
+@@ -66,7 +63,7 @@ LIBTCXX    := $(BUILD_DIR)/libsgx_tcxx.a
+ LIBTSE     := $(BUILD_DIR)/libsgx_tservice.a
+ 
+ .PHONY: components
+-components: tstdc tcxx tservice trts tcrypto tkey_exchange ukey_exchange tprotected_fs uprotected_fs ptrace sample_crypto libcapable simulation signtool edger8r tcmalloc sgx_pcl sgx_encrypt sgx_tswitchless sgx_uswitchless pthread openmp protobuf ttls utls
++components: tstdc tcxx tservice trts tcrypto tkey_exchange ukey_exchange tprotected_fs uprotected_fs ptrace libcapable simulation signtool edger8r tcmalloc sgx_pcl sgx_encrypt sgx_tswitchless sgx_uswitchless pthread ttls utls
+ 
+ # ---------------------------------------------------
+ #  tstdc
+@@ -220,18 +217,6 @@ tprotected_fs: edger8r
+ sgx_pcl:
+ 	$(MAKE) -C protected_code_loader
+ 
+-.PHONY: openmp
+-openmp:
+-	$(MAKE) -C $(LINUX_EXTERNAL_DIR)/openmp
+-
+-.PHONY: protobuf
+-protobuf:
+-ifeq ($(MITIGATION-CVE-2020-0551),)
+-	$(MAKE) -C $(LINUX_EXTERNAL_DIR)/protobuf BUILD_PROTOC=1
+-else
+-	$(MAKE) -C $(LINUX_EXTERNAL_DIR)/protobuf
+-endif
+-
+ .PHONY: cbor_untrusted
+ cbor_untrusted:
+ 	$(MAKE) -C $(LINUX_EXTERNAL_DIR)/cbor cbor_untrusted
+@@ -255,10 +240,6 @@ uprotected_fs: edger8r
+ ptrace:
+ 	$(MAKE) -C debugger_interface/linux/
+ 
+-.PHONY: sample_crypto
+-sample_crypto:
+-	$(MAKE) -C sample_libcrypto
+-
+ .PHONY: utls
+ utls: cbor_untrusted
+ 	$(MAKE) -C utls
+@@ -328,7 +309,6 @@ clean:
+ 	$(MAKE) -C protected_fs/sgx_tprotected_fs/     clean
+ 	$(MAKE) -C protected_fs/sgx_uprotected_fs/     clean
+ 	$(MAKE) -C debugger_interface/linux/           clean
+-	$(MAKE) -C sample_libcrypto/                   clean
+ 	$(MAKE) -C libcapable/linux/                   clean
+ 	$(MAKE) -C simulation/                         clean
+ 	$(MAKE) -C sign_tool/SignTool                  clean
+@@ -339,8 +319,6 @@ clean:
+ 	$(MAKE) -C switchless/sgx_uswitchless          clean
+ 	$(MAKE) -C tmm_rsrv/                           clean
+ 	$(MAKE) -C pthread                             clean
+-	$(MAKE) -C $(LINUX_EXTERNAL_DIR)/openmp        clean
+-	$(MAKE) -C $(LINUX_EXTERNAL_DIR)/protobuf      clean
+ 	$(MAKE) -C $(LINUX_EXTERNAL_DIR)/cbor          clean
+ 	$(MAKE) -C ttls						           clean
+ 	$(MAKE) -C utls						           clean
+-- 
+2.52.0
+

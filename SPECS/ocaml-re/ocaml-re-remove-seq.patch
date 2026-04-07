@@ -1,0 +1,20 @@
+diff -ur ocaml-re-1.13.0.old/lib/dune ocaml-re-1.13.0/lib/dune
+--- ocaml-re-1.13.0.old/lib/dune	2024-09-30 14:21:16.000000000 +0100
++++ ocaml-re-1.13.0/lib/dune	2024-10-02 09:57:12.936940425 +0100
+@@ -1,5 +1,4 @@
+ (library
+  (name re)
+  (synopsis "Pure OCaml regular expression library")
+- (libraries seq)
+  (public_name re))
+diff -ur ocaml-re-1.13.0.old/re.opam ocaml-re-1.13.0/re.opam
+--- ocaml-re-1.13.0.old/re.opam	2024-09-30 14:21:16.000000000 +0100
++++ ocaml-re-1.13.0/re.opam	2024-10-02 09:57:26.353862742 +0100
+@@ -24,7 +24,6 @@
+ depends: [
+   "dune" {>= "3.12"}
+   "ocaml" {>= "4.12.0"}
+-  "seq"
+   "ppx_expect" {with-test}
+   "ounit2" {with-test}
+   "odoc" {with-doc}

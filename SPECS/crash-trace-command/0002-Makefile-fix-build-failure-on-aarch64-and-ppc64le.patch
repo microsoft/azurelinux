@@ -1,0 +1,50 @@
+From 17c35d075f067d80fee112ae18365b8defa2ca5a Mon Sep 17 00:00:00 2001
+From: HATAYAMA Daisuke <d.hatayama@fujitsu.com>
+Date: Fri, 19 Feb 2021 11:38:59 +0900
+Subject: [PATCH 2/2] Makefile: fix build failure on aarch64 and ppc64le
+
+Currently, there is build failure on aarch64 and ppc64le as follows:
+
+    gcc -O2 -flto=auto -ffat-lto-objects -fexceptions -g -grecord-gcc-switches -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -fstack-protector-strong -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1  -m64 -mcpu=power8 -mtune=power8 -fasynchronous-unwind-tables -fstack-clash-protection -Wall -I/usr/include/crash -nostartfiles -shared -rdynamic -o trace.so trace.c -fPIC -D
+    gcc: error: macro name missing after '-D'
+
+The failure is caused by missing arguments for -D option because
+TARGET variable is empty.
+
+This commit fixes the issue by defining TARGET variable properly
+according to aarch64 and ppc64le.
+
+Signed-off-by: HATAYAMA Daisuke <d.hatayama@fujitsu.com>
+---
+ Makefile | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index b4573b4..0d35d4f 100755
+--- a/Makefile
++++ b/Makefile
+@@ -6,6 +6,10 @@ ifeq ($(shell arch), ppc64)
+   TARGET=PPC64
+   TARGET_CFLAGS=-m64
+ endif
++ifeq ($(shell arch), ppc64le)
++  TARGET=PPC64
++  TARGET_CFLAGS=-m64
++endif
+ ifeq ($(shell arch), ia64)
+   TARGET=IA64
+   TARGET_CFLAGS=
+@@ -22,6 +26,10 @@ ifeq ($(shell arch), s390)
+   TARGET=S390
+   TARGET_CFLAGS=
+ endif
++ifeq ($(shell arch), aarch64)
++  TARGET=ARM64
++  TARGET_CFLAGS=
++endif
+ 
+ INCDIR=/usr/include/crash
+ 
+-- 
+2.29.2
+

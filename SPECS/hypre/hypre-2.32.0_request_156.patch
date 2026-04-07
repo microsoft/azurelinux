@@ -1,0 +1,62 @@
+From 05c9e44d1bc8cb27dab3baeda80d7243ce5eb55c Mon Sep 17 00:00:00 2001
+From: Christoph Junghans <christoph.junghans@gmail.com>
+Date: Sun, 6 Oct 2024 09:38:09 -0600
+Subject: [PATCH] cmake: add so version to libhypre
+
+---
+ src/CMakeLists.txt | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 25286c438..6474a4317 100644
+@@ -13,6 +13,8 @@
+ 
+ # The version number.
+ set(HYPRE_VERSION 2.32.0)
++set(HYPRE_SOVERSION 2)
++set(HYPRE_SOVERSION_MINOR 2.1)
+ set(HYPRE_NUMBER  23200)
+ set(HYPRE_DATE    2024/10/08)
+ set(HYPRE_TIME    00:00:00)
+@@ -431,6 +433,7 @@
+ 
+ # Create the HYPRE library object
+ add_library(${PROJECT_NAME})
++set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION ${HYPRE_SOVERSION_MINOR} VERSION ${HYPRE_SOVERSION})
+ 
+ # Headers and sources
+ set(HYPRE_HEADERS "")
+@@ -731,11 +734,11 @@
+ include(GNUInstallDirs)
+ install(TARGETS ${PROJECT_NAME}
+   EXPORT HYPRETargets
+-  LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+-  ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
++  LIBRARY DESTINATION "${HYPRE_INSTALL_PREFIX}"
++  ARCHIVE DESTINATION "${HYPRE_INSTALL_PREFIX}"
+   RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+-  INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
+-install(FILES ${HYPRE_HEADERS} DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
++  INCLUDES DESTINATION "${HYPRE_INSTALL_INCLUDEDIR}")
++install(FILES ${HYPRE_HEADERS} DESTINATION "${HYPRE_INSTALL_INCLUDEDIR}")
+ 
+ include(CMakePackageConfigHelpers)
+ write_basic_package_version_file(
+@@ -747,7 +750,7 @@
+ install(EXPORT HYPRETargets
+   FILE HYPRETargets.cmake
+   NAMESPACE HYPRE::
+-  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/HYPRE"
++  DESTINATION "${HYPRE_INSTALL_PREFIX}/cmake/HYPRE"
+   )
+ 
+ configure_package_config_file(
+@@ -758,7 +761,7 @@
+   FILES
+       "${CMAKE_CURRENT_BINARY_DIR}/HYPREConfig.cmake"
+       "${CMAKE_CURRENT_BINARY_DIR}/HYPREConfigVersion.cmake"
+-  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/HYPRE"
++  DESTINATION "${HYPRE_INSTALL_PREFIX}/cmake/HYPRE"
+   )
+ 
+ export(EXPORT HYPRETargets

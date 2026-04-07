@@ -1,0 +1,11 @@
+diff --color -ruN time-1.9.orig/Makefile.am time-1.9/Makefile.am
+--- time-1.9.orig/Makefile.am	2017-11-08 16:31:54.000000000 -0500
++++ time-1.9/Makefile.am	2023-06-28 13:26:45.271212609 -0400
+@@ -74,7 +74,6 @@
+ 
+ 
+ TESTS = tests/help-version.sh \
+-	tests/time-max-rss.sh \
+ 	tests/time-exit-codes.sh \
+ 	tests/time-posix-quiet.sh
+ 

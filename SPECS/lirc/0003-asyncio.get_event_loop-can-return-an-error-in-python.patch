@@ -1,0 +1,34 @@
+From c9fe0e691a50854be864f6198906d245a855aa52 Mon Sep 17 00:00:00 2001
+From: Sean Young <sean@mess.org>
+Date: Thu, 26 Jun 2025 21:11:11 +0100
+Subject: [PATCH] asyncio.get_event_loop() can return an error in python 3.14
+
+---
+ python-pkg/tests/test_client.py | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/python-pkg/tests/test_client.py b/python-pkg/tests/test_client.py
+index cb47aa67..ed613d4f 100644
+--- a/python-pkg/tests/test_client.py
++++ b/python-pkg/tests/test_client.py
+@@ -54,10 +54,16 @@ def event_loop(suppress=[]):
+                 return
+         ex.append(context['exception'])
+ 
+-    loop = asyncio.get_event_loop()
++    try:
++        loop = asyncio.get_running_loop()
++    except RuntimeError:
++        loop = asyncio.new_event_loop()
++        asyncio.set_event_loop(loop)
++
+     if loop.is_closed():
+         loop = asyncio.new_event_loop()
+         asyncio.set_event_loop(loop)
++
+     loop.set_exception_handler(exception_handler)
+ 
+     try:
+-- 
+2.50.0
+

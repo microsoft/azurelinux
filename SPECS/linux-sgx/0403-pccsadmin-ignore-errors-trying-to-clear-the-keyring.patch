@@ -1,0 +1,85 @@
+From cfd679c70fbfd00a9be4233e8c6c6ca2c99988c4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Tue, 27 Jan 2026 11:51:25 +0000
+Subject: [PATCH 403/404] pccsadmin: ignore errors trying to clear the keyring
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+On authentication errors with PCS, an attempt is made to clear the
+keyring. This may fail if the user's login environment has no keyring
+configured. The user would have declined to store the key when first
+prompted, so there would be nothing to clear either in this case.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ PccsAdminTool/pccsadmin.py | 32 ++++++++++++++++++++++++++++----
+ 1 file changed, 28 insertions(+), 4 deletions(-)
+
+diff --git a/PccsAdminTool/pccsadmin.py b/PccsAdminTool/pccsadmin.py
+index f38d412..413fea8 100755
+--- a/PccsAdminTool/pccsadmin.py
++++ b/PccsAdminTool/pccsadmin.py
+@@ -119,7 +119,13 @@ class PccsClient:
+             if response.status_code == 200:
+                 self._write_output_file(output_file, response)
+             elif response.status_code == 401:  # Authentication error
+-                self.credentials.set_admin_token('')
++                try:
++                    self.credentials.set_admin_token('')
++                except:
++                    # If keyring is unavailable, we don't want to trigger
++                    # traceback, as the user may have declined to save
++                    # the key in the keyring earlier
++                    pass
+                 print("Authentication failed.")
+             else:
+                 self._handle_error(response)
+@@ -149,7 +155,13 @@ class PccsClient:
+                 if response.status_code == 200:
+                     print("Collaterals uploaded successfully.")
+                 elif response.status_code == 401:  # Authentication error
+-                    self.credentials.set_admin_token('')
++                    try:
++                        self.credentials.set_admin_token('')
++                    except:
++                        # If keyring is unavailable, we don't want to trigger
++                        # traceback, as the user may have declined to save
++                        # the key in the keyring earlier
++                        pass
+                     print("Authentication failed.")
+                 else:
+                     self._handle_error(response)
+@@ -165,7 +177,13 @@ class PccsClient:
+                 if response.status_code == 200:
+                     print("Policy uploaded successfully with policy ID :" + response.text)
+                 elif response.status_code == 401:  # Authentication error
+-                    self.credentials.set_admin_token('')
++                    try:
++                        self.credentials.set_admin_token('')
++                    except:
++                        # If keyring is unavailable, we don't want to trigger
++                        # traceback, as the user may have declined to save
++                        # the key in the keyring earlier
++                        pass
+                     print("Authentication failed.")
+                 else:
+                     self._handle_error(response)
+@@ -198,7 +216,13 @@ class PccsClient:
+             if response.status_code == 200:
+                 print("The cache database was refreshed successfully.")
+             elif response.status_code == 401:  # Authentication error
+-                self.credentials.set_admin_token('')
++                try:
++                    self.credentials.set_admin_token('')
++                except:
++                    # If keyring is unavailable, we don't want to trigger
++                    # traceback, as the user may have declined to save
++                    # the key in the keyring earlier
++                    pass
+                 print("Authentication failed.")
+             else:
+                 self._handle_error(response)
+-- 
+2.52.0
+

@@ -1,0 +1,40 @@
+From 4cffb3b5fbbad24fed26690c3e10c0332cb0b33f Mon Sep 17 00:00:00 2001
+From: Santhosh Kumar <santhosh.kumar.selvaraj@qt.io>
+Date: Mon, 9 Oct 2023 13:17:19 +0200
+Subject: Fix disabled button color in Linux (X11/Wayland)
+
+The palette mapping table (as read from gtk widget) maintained in
+QGtk3Storage misses information of QPalette::Button and
+QPalette::ButtonText role for QPalette::Disabled color group. This
+cause disabled button widget to be rendered with incorrect palette
+(such as in dark color scheme, light palette had been used).
+
+This patch fixes this issue by extending palette mapping in
+QGtk3Storage for disabled color group of button role.
+
+Fixes: QTBUG-113486
+Pick-to: 6.6.0 6.6 6.5
+Change-Id: Ied4b2650c92cc1cda58be69257945991013b276f
+Reviewed-by: Axel Spoerl <axel.spoerl@qt.io>
+
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3storage.cpp b/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
+index 1952ce278c..0017f55a45 100644
+--- a/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
++++ b/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
+@@ -531,6 +531,8 @@ void QGtk3Storage::createMapping()
+     ADD(Normal, Base);
+     ADD(Inactive, Base);
+     ADD(Inactive, Window);
++    ADD(Disabled, Button);
++    ADD(Disabled, Window);
+     LIGHTER(Normal, Window, 125);
+     ADD(Normal, Light);
+     LIGHTER(Normal, Window, 70);
+@@ -543,6 +545,7 @@ void QGtk3Storage::createMapping()
+     ADD(Disabled, Text);
+     ADD(Disabled, WindowText);
+     ADD(Inactive, ButtonText);
++    ADD(Disabled, ButtonText);
+     GTK(button, Text, NORMAL);
+     ADD(Disabled, ButtonText);
+     // special background colors

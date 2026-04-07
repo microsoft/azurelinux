@@ -1,0 +1,120 @@
+diff -uNr dejavu-fonts-version_2_37.orig/fontconfig/20-unhint-small-dejavu-lgc-sans.conf dejavu-fonts-version_2_37/fontconfig/20-unhint-small-dejavu-lgc-sans.conf
+--- dejavu-fonts-version_2_37.orig/fontconfig/20-unhint-small-dejavu-lgc-sans.conf	2016-07-30 11:52:54.000000000 +0200
++++ dejavu-fonts-version_2_37/fontconfig/20-unhint-small-dejavu-lgc-sans.conf	2020-04-02 20:56:06.341929827 +0200
+@@ -1,5 +1,5 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+-<!DOCTYPE fontconfig SYSTEM "../fonts.dtd">
++<!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
+ <fontconfig>
+   <!--  /etc/fonts/conf.d/20-unhint-small-dejavu-lgc-sans.conf
+ 
+diff -uNr dejavu-fonts-version_2_37.orig/fontconfig/20-unhint-small-dejavu-lgc-sans-mono.conf dejavu-fonts-version_2_37/fontconfig/20-unhint-small-dejavu-lgc-sans-mono.conf
+--- dejavu-fonts-version_2_37.orig/fontconfig/20-unhint-small-dejavu-lgc-sans-mono.conf	2016-07-30 11:52:54.000000000 +0200
++++ dejavu-fonts-version_2_37/fontconfig/20-unhint-small-dejavu-lgc-sans-mono.conf	2020-04-02 20:56:06.353930041 +0200
+@@ -1,5 +1,5 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+-<!DOCTYPE fontconfig SYSTEM "../fonts.dtd">
++<!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
+ <fontconfig>
+   <!--  /etc/fonts/conf.d/20-unhint-small-dejavu-lgc-sans-mono.conf
+ 
+diff -uNr dejavu-fonts-version_2_37.orig/fontconfig/20-unhint-small-dejavu-lgc-serif.conf dejavu-fonts-version_2_37/fontconfig/20-unhint-small-dejavu-lgc-serif.conf
+--- dejavu-fonts-version_2_37.orig/fontconfig/20-unhint-small-dejavu-lgc-serif.conf	2016-07-30 11:52:54.000000000 +0200
++++ dejavu-fonts-version_2_37/fontconfig/20-unhint-small-dejavu-lgc-serif.conf	2020-04-02 20:56:06.359930147 +0200
+@@ -1,5 +1,5 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+-<!DOCTYPE fontconfig SYSTEM "../fonts.dtd">
++<!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
+ <fontconfig>
+   <!--  /etc/fonts/conf.d/20-unhint-small-dejavu-lgc-serif.conf
+ 
+diff -uNr dejavu-fonts-version_2_37.orig/fontconfig/20-unhint-small-dejavu-sans.conf dejavu-fonts-version_2_37/fontconfig/20-unhint-small-dejavu-sans.conf
+--- dejavu-fonts-version_2_37.orig/fontconfig/20-unhint-small-dejavu-sans.conf	2016-07-30 11:52:54.000000000 +0200
++++ dejavu-fonts-version_2_37/fontconfig/20-unhint-small-dejavu-sans.conf	2020-04-02 20:56:06.367930290 +0200
+@@ -1,5 +1,5 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+-<!DOCTYPE fontconfig SYSTEM "../fonts.dtd">
++<!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
+ <fontconfig>
+   <!--  /etc/fonts/conf.d/20-unhint-small-dejavu-sans.conf
+ 
+diff -uNr dejavu-fonts-version_2_37.orig/fontconfig/20-unhint-small-dejavu-sans-mono.conf dejavu-fonts-version_2_37/fontconfig/20-unhint-small-dejavu-sans-mono.conf
+--- dejavu-fonts-version_2_37.orig/fontconfig/20-unhint-small-dejavu-sans-mono.conf	2016-07-30 11:52:54.000000000 +0200
++++ dejavu-fonts-version_2_37/fontconfig/20-unhint-small-dejavu-sans-mono.conf	2020-04-02 20:56:06.372930379 +0200
+@@ -1,5 +1,5 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+-<!DOCTYPE fontconfig SYSTEM "../fonts.dtd">
++<!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
+ <fontconfig>
+   <!--  /etc/fonts/conf.d/20-unhint-small-dejavu-sans-mono.conf
+ 
+diff -uNr dejavu-fonts-version_2_37.orig/fontconfig/20-unhint-small-dejavu-serif.conf dejavu-fonts-version_2_37/fontconfig/20-unhint-small-dejavu-serif.conf
+--- dejavu-fonts-version_2_37.orig/fontconfig/20-unhint-small-dejavu-serif.conf	2016-07-30 11:52:54.000000000 +0200
++++ dejavu-fonts-version_2_37/fontconfig/20-unhint-small-dejavu-serif.conf	2020-04-02 20:56:06.378930486 +0200
+@@ -1,5 +1,5 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+-<!DOCTYPE fontconfig SYSTEM "../fonts.dtd">
++<!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
+ <fontconfig>
+   <!--  /etc/fonts/conf.d/20-unhint-small-dejavu-serif.conf
+ 
+diff -uNr dejavu-fonts-version_2_37.orig/fontconfig/57-dejavu-sans.conf dejavu-fonts-version_2_37/fontconfig/57-dejavu-sans.conf
+--- dejavu-fonts-version_2_37.orig/fontconfig/57-dejavu-sans.conf	2016-07-30 11:52:54.000000000 +0200
++++ dejavu-fonts-version_2_37/fontconfig/57-dejavu-sans.conf	2020-04-02 20:56:06.384930592 +0200
+@@ -1,5 +1,5 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+-<!DOCTYPE fontconfig SYSTEM "../fonts.dtd">
++<!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
+ <!-- /etc/fonts/conf.d/57-dejavu-sans.conf
+ 
+      Define aliasing and other fontconfig settings for
+diff -uNr dejavu-fonts-version_2_37.orig/fontconfig/57-dejavu-sans-mono.conf dejavu-fonts-version_2_37/fontconfig/57-dejavu-sans-mono.conf
+--- dejavu-fonts-version_2_37.orig/fontconfig/57-dejavu-sans-mono.conf	2016-07-30 11:52:54.000000000 +0200
++++ dejavu-fonts-version_2_37/fontconfig/57-dejavu-sans-mono.conf	2020-04-02 20:56:06.390930699 +0200
+@@ -1,5 +1,5 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+-<!DOCTYPE fontconfig SYSTEM "../fonts.dtd">
++<!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
+ <!-- /etc/fonts/conf.d/57-dejavu-sans-mono.conf
+ 
+      Define aliasing and other fontconfig settings for
+diff -uNr dejavu-fonts-version_2_37.orig/fontconfig/57-dejavu-serif.conf dejavu-fonts-version_2_37/fontconfig/57-dejavu-serif.conf
+--- dejavu-fonts-version_2_37.orig/fontconfig/57-dejavu-serif.conf	2016-07-30 11:52:54.000000000 +0200
++++ dejavu-fonts-version_2_37/fontconfig/57-dejavu-serif.conf	2020-04-02 20:56:06.396930806 +0200
+@@ -1,5 +1,5 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+-<!DOCTYPE fontconfig SYSTEM "../fonts.dtd">
++<!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
+ <!-- /etc/fonts/conf.d/57-dejavu-serif.conf
+ 
+      Define aliasing and other fontconfig settings for
+diff -uNr dejavu-fonts-version_2_37.orig/fontconfig/58-dejavu-lgc-sans.conf dejavu-fonts-version_2_37/fontconfig/58-dejavu-lgc-sans.conf
+--- dejavu-fonts-version_2_37.orig/fontconfig/58-dejavu-lgc-sans.conf	2016-07-30 11:52:54.000000000 +0200
++++ dejavu-fonts-version_2_37/fontconfig/58-dejavu-lgc-sans.conf	2020-04-02 20:56:06.401930895 +0200
+@@ -1,5 +1,5 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+-<!DOCTYPE fontconfig SYSTEM "../fonts.dtd">
++<!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
+ <!-- /etc/fonts/conf.d/58-dejavu-lgc-sans.conf
+ 
+      Define aliasing and other fontconfig settings for
+diff -uNr dejavu-fonts-version_2_37.orig/fontconfig/58-dejavu-lgc-sans-mono.conf dejavu-fonts-version_2_37/fontconfig/58-dejavu-lgc-sans-mono.conf
+--- dejavu-fonts-version_2_37.orig/fontconfig/58-dejavu-lgc-sans-mono.conf	2016-07-30 11:52:54.000000000 +0200
++++ dejavu-fonts-version_2_37/fontconfig/58-dejavu-lgc-sans-mono.conf	2020-04-02 20:56:06.407931001 +0200
+@@ -1,5 +1,5 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+-<!DOCTYPE fontconfig SYSTEM "../fonts.dtd">
++<!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
+ <!-- /etc/fonts/conf.d/58-dejavu-lgc-sans-mono.conf
+ 
+      Define aliasing and other fontconfig settings for
+diff -uNr dejavu-fonts-version_2_37.orig/fontconfig/58-dejavu-lgc-serif.conf dejavu-fonts-version_2_37/fontconfig/58-dejavu-lgc-serif.conf
+--- dejavu-fonts-version_2_37.orig/fontconfig/58-dejavu-lgc-serif.conf	2016-07-30 11:52:54.000000000 +0200
++++ dejavu-fonts-version_2_37/fontconfig/58-dejavu-lgc-serif.conf	2020-04-02 20:56:06.412931090 +0200
+@@ -1,5 +1,5 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+-<!DOCTYPE fontconfig SYSTEM "../fonts.dtd">
++<!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
+ <!-- /etc/fonts/conf.d/58-dejavu-lgc-serif.conf
+ 
+      Define aliasing and other fontconfig settings for

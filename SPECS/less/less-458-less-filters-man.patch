@@ -1,0 +1,24 @@
+diff -up less-466/less.nro.filters-man less-466/less.nro
+--- less-466/less.nro.filters-man	2014-09-18 14:32:32.124111631 +0200
++++ less-466/less.nro	2014-09-18 14:32:39.548177152 +0200
+@@ -1323,7 +1323,19 @@ Similarly, if the first two characters of LESSOPEN are vertical bar and dash
+ the input pipe is used on standard input as well as other files.
+ Again, in this case the dash is not considered to be part of
+ the input pipe command.
+-.
++.PP
++There are used following files to set up default preprocessor:
++.br
++       /etc/profile.d/less.sh
++.br
++       /etc/profile.d/less.csh
++.br
++These files set up /usr/bin/lesspipe.sh as a default filter. An user defined
++filter can be specified in ~/.lessfilter. This file should have an execute bit
++set and accept only one parameter, which represents a filename. If
++the user defined filter process the file, zero should be returned. Otherwise
++~/.lessfilter tries to handle the file.
++
+ .SH "NATIONAL CHARACTER SETS"
+ There are five types of characters in the input file:
+ .IP "normal characters"

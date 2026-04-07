@@ -1,0 +1,32 @@
+--- axum-0.7.9/Cargo.toml	1970-01-01T00:00:01+00:00
++++ axum-0.7.9/Cargo.toml	2025-09-26T13:48:23.476884+00:00
+@@ -174,7 +174,7 @@
+ package = "tokio"
+ 
+ [dependencies.tokio-tungstenite]
+-version = "0.24.0"
++version = ">=0.23,<0.25"
+ optional = true
+ 
+ [dependencies.tower]
+@@ -275,7 +275,7 @@
+ version = "0.1"
+ 
+ [dev-dependencies.tokio-tungstenite]
+-version = "0.24.0"
++version = ">=0.23,<0.25"
+ 
+ [dev-dependencies.tower]
+ version = "0.5.1"
+@@ -336,11 +336,6 @@
+ ]
+ 
+ [features]
+-__private_docs = [
+-    "axum-core/__private_docs",
+-    "tower/full",
+-    "dep:tower-http",
+-]
+ default = [
+     "form",
+     "http1",

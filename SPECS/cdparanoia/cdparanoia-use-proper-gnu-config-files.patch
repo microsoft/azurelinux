@@ -1,0 +1,27 @@
+Index: cdparanoia-III-10.2/configure
+===================================================================
+--- cdparanoia-III-10.2.orig/configure
++++ cdparanoia-III-10.2/configure
+@@ -1289,9 +1289,6 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
+ 
+ 
+ 
+-cp $srcdir/configure.guess $srcdir/config.guess
+-cp $srcdir/configure.sub $srcdir/config.sub
+-
+ ac_aux_dir=
+ for ac_dir in $srcdir $srcdir/.. $srcdir/../..; do
+   if test -f $ac_dir/install-sh; then
+Index: cdparanoia-III-10.2/configure.in
+===================================================================
+--- cdparanoia-III-10.2.orig/configure.in
++++ cdparanoia-III-10.2/configure.in
+@@ -1,8 +1,5 @@
+ AC_INIT(interface/interface.c)
+ 
+-cp $srcdir/configure.guess $srcdir/config.guess
+-cp $srcdir/configure.sub $srcdir/config.sub
+-
+ AC_CANONICAL_HOST
+ 
+ if test -z "$CC"; then

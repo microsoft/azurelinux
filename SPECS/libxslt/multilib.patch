@@ -1,0 +1,24 @@
+*** XSLT/xslt-config.in.orig	2006-06-06 17:32:23.000000000 +0200
+--- XSLT/xslt-config.in	2006-06-06 17:32:48.000000000 +0200
+***************
+*** 4,10 ****
+  exec_prefix=@exec_prefix@
+  exec_prefix_set=no
+  includedir=@includedir@
+! libdir=@libdir@
+  
+  usage()
+  {
+--- 4,15 ----
+  exec_prefix=@exec_prefix@
+  exec_prefix_set=no
+  includedir=@includedir@
+! if [ "`ldd /bin/sh | grep lib64`" = "" ]
+! then
+!     libdir=${exec_prefix}/lib
+! else
+!     libdir=${exec_prefix}/lib64
+! fi
+  
+  usage()
+  {

@@ -1,0 +1,16 @@
+
+https://svn.apache.org/viewvc?view=revision&revision=1908586
+
+--- apr-util/dbd/apr_dbd_odbc.c
++++ apr-util/dbd/apr_dbd_odbc.c
+@@ -582,8 +582,8 @@
+                     (textmode ? atoi(args[*argp]) : *(short *)args[*argp]);
+                 break;
+             case SQL_INTEGER:
+-                ptr = apr_palloc(pool, sizeof(int));
+-                len = sizeof(int);
++                ptr = apr_palloc(pool, sizeof(long));
++                len = sizeof(long);
+                 *(long *)ptr =
+                     (textmode ? atol(args[*argp]) : *(long *)args[*argp]);
+                 break;

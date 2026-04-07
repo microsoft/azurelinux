@@ -1,0 +1,26 @@
+All uses of argv in rrdtool have been constified upstream:
+
+https://github.com/oetiker/rrdtool-1.x/pull/1242
+https://github.com/lm-sensors/lm-sensors/pull/483
+
+diff -up ./prog/sensord/rrd.c.orig ./prog/sensord/rrd.c
+--- ./prog/sensord/rrd.c.orig	2024-02-05 14:53:34.885969256 -0500
++++ ./prog/sensord/rrd.c	2024-02-05 14:55:09.337587596 -0500
+@@ -299,7 +299,7 @@ int rrdInit(void)
+ 		argv[argc++] = rraBuff;
+ 		argv[argc] = NULL;
+ 
+-		ret = rrd_create(argc, (char**) argv);
++		ret = rrd_create(argc, argv);
+ 		if (ret == -1) {
+ 			sensorLog(LOG_ERR, "Error creating RRD file: %s: %s",
+ 				  sensord_args.rrdFile, rrd_get_error());
+@@ -455,7 +455,7 @@ int rrdUpdate(void)
+ 		const char *argv[] = {
+ 			"sensord", sensord_args.rrdFile, rrdBuff, NULL
+ 		};
+-		if ((ret = rrd_update(3, (char **) /* WEAK */ argv))) {
++		if ((ret = rrd_update(3, /* WEAK */ argv))) {
+ 			sensorLog(LOG_ERR, "Error updating RRD file: %s: %s",
+ 				  sensord_args.rrdFile, rrd_get_error());
+ 		}

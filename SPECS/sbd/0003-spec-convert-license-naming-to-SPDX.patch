@@ -1,0 +1,34 @@
+From 0e4534ebdfe8d7a37beb0028e604e560a5674891 Mon Sep 17 00:00:00 2001
+From: Klaus Wenninger <klaus.wenninger@aon.at>
+Date: Fri, 3 Feb 2023 15:35:22 +0100
+Subject: [PATCH] spec: convert license naming to SPDX
+
+---
+ sbd.spec | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/sbd.spec b/sbd.spec
+index e9ff7bc..b9e7f72 100644
+--- a/sbd.spec
++++ b/sbd.spec
+@@ -49,7 +49,7 @@
+ 
+ Name:           sbd
+ Summary:        Storage-based death
+-License:        GPLv2+
++License:        GPL-2.0-or-later
+ Group:          System Environment/Daemons
+ Version:        1.5.2
+ Release:        99.%{buildnum}.%{shortcommit}.%{modified}git%{?dist}
+@@ -95,7 +95,7 @@ Available rpmbuild rebuild options:
+ 
+ %package tests
+ Summary:        Storage-based death environment for regression tests
+-License:        GPLv2+
++License:        GPL-2.0-or-later
+ Group:          System Environment/Daemons
+ 
+ %description tests
+-- 
+2.39.0
+

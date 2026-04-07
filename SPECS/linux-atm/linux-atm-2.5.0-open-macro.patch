@@ -1,0 +1,11 @@
+--- linux-atm/src/maint/atmtcp.c~	2007-08-22 14:59:21.000000000 +0100
++++ linux-atm/src/maint/atmtcp.c	2007-08-22 18:27:24.000000000 +0100
+@@ -109,7 +109,7 @@ static void control(int in_link,struct a
+ 	switch (msg->type) {
+ 	    case ATMTCP_CTRL_OPEN:
+ 		if (out->ops->open)
+-		    changed += out->ops->open(out,in_link,msg);
++		    changed += (out->ops->open)(out,in_link,msg);
+ 		break;
+ 	    case ATMTCP_CTRL_CLOSE:
+ 		if (out->ops->close)

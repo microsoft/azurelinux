@@ -1,0 +1,35 @@
+From dc9b299ea2c4fd4d79305df1e62073aac14fdb2e Mon Sep 17 00:00:00 2001
+From: Joel Uckelman <joel.uckelman@aon.com>
+Date: Fri, 1 Nov 2024 18:11:25 +0000
+Subject: [PATCH] Don't redefine bool. That causes collisions.
+
+---
+ tsk/base/crc.h | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/tsk/base/crc.h b/tsk/base/crc.h
+index f9f4617c3d04..1f9732771a0c 100644
+--- a/tsk/base/crc.h
++++ b/tsk/base/crc.h
+@@ -91,7 +91,6 @@ Status  : Copyright (C) Ross Williams, 1993. However, permission is
+ #ifndef DONE_STYLE
+ 
+ typedef unsigned long   ulong;
+-typedef unsigned        bool;
+ typedef unsigned char * p_ubyte_;
+ 
+ #ifndef TRUE
+@@ -120,8 +119,8 @@ typedef struct
+    int   cm_width;   /* Parameter: Width in bits [8,32].       */
+    ulong cm_poly;    /* Parameter: The algorithm's polynomial. */
+    ulong cm_init;    /* Parameter: Initial register value.     */
+-   bool  cm_refin;   /* Parameter: Reflect input bytes?        */
+-   bool  cm_refot;   /* Parameter: Reflect output CRC?         */
++   unsigned cm_refin;   /* Parameter: Reflect input bytes?        */
++   unsigned cm_refot;   /* Parameter: Reflect output CRC?         */
+    ulong cm_xorot;   /* Parameter: XOR this to output CRC.     */
+ 
+    ulong cm_reg;     /* Context: Context during execution.     */
+-- 
+2.49.0
+

@@ -1,0 +1,14 @@
+diff --git a/include/atlas_genparse.h b/include/atlas_genparse.h
+index 909a38e..1e6d153 100644
+--- a/include/atlas_genparse.h
++++ b/include/atlas_genparse.h
+@@ -163,7 +163,8 @@ static int GetDoubleArr(char *str, int N, double *d)
+       if (!str)
+          break;
+       str++;
+-      assert(sscanf(str, "%le", d+i) == 1);
++      if (sscanf(str, "%le", d+i) != 1)
++	break;
+       i++;
+    }
+    return(i);

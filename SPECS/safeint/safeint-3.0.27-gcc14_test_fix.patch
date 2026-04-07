@@ -1,0 +1,30 @@
+diff --git a/Test/ConstExpr.cpp b/Test/ConstExpr.cpp
+index ab624ea..ad2d8f1 100644
+--- a/Test/ConstExpr.cpp
++++ b/Test/ConstExpr.cpp
+@@ -9,25 +9,6 @@
+ #pragma GCC diagnostic ignored "-Wunused-variable"
+ #endif
+ 
+-#if !defined __clang__ && defined __GNUC__ && __cplusplus >= 201402L
+-// The gcc compiler isn't smart enough to sort out that the constexpr exception functions
+-// are never hit, so create a null exception handler. Nothing in this file is tested at runtime in any case.
+-class SafeIntGccCompileOnly
+-{
+-public:
+-	constexpr static void SafeIntOnOverflow()
+-	{
+-	}
+-
+-	constexpr static void SafeIntOnDivZero()
+-	{
+-	}
+-};
+-
+-#define SafeIntDefaultExceptionHandler SafeIntGccCompileOnly
+-
+-#endif
+-
+ #include "../SafeInt.hpp"
+ 
+ namespace TestConstExpr

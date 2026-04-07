@@ -1,0 +1,10 @@
+[Unit]
+Description=IPMI SEL syslog logging daemon
+After=network.target
+
+[Service]
+Type=forking
+ExecStart=/usr/sbin/ipmiseld 
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,27 @@
+From 7bd573d76e9c1996ad5a96f0289731a253a24301 Mon Sep 17 00:00:00 2001
+From: Martin Sehnoutka <msehnout@redhat.com>
+Date: Tue, 6 Sep 2016 13:35:51 +0200
+Subject: [PATCH 01/59] Don't use the provided script to locate libraries.
+
+This branch is Fedora (RHEL) specific, so we know what
+libraries we have and want to use.
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index c63ed1b..98118dc 100644
+--- a/Makefile
++++ b/Makefile
+@@ -8,7 +8,7 @@ CFLAGS	=	-O2 -fPIE -fstack-protector --param=ssp-buffer-size=4 \
+ 	-D_FORTIFY_SOURCE=2 \
+ 	#-pedantic -Wconversion
+ 
+-LIBS	=	`./vsf_findlibs.sh`
++LIBS	=	-lwrap -lnsl -lpam -lcap -ldl -lcrypto
+ LINK	=	-Wl,-s
+ LDFLAGS	=	-fPIE -pie -Wl,-z,relro -Wl,-z,now
+ 
+-- 
+2.14.4
+

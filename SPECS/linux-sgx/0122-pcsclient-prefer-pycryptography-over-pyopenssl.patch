@@ -1,0 +1,104 @@
+From 2f9bfe49cdaed0b61df1cb9b889eb827c2be26f9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Wed, 3 Dec 2025 17:59:09 +0000
+Subject: [PATCH 122/131] pcsclient: prefer pycryptography over pyopenssl
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The only part of pcsclient that still needs pyopenssl is certificate
+verification. As of pycryptography 45.0.0, there are sufficient APIs
+available to replace the remaining usage of pyopenssl.
+
+Since new pycryptography is still not widely available in distros,
+keep pyopenssl code as a fallback.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ tools/PcsClientTool/lib/intelsgx/pcs.py | 60 +++++++++++++++++++------
+ 1 file changed, 47 insertions(+), 13 deletions(-)
+
+diff --git a/tools/PcsClientTool/lib/intelsgx/pcs.py b/tools/PcsClientTool/lib/intelsgx/pcs.py
+index f6b58a6b..eeb29697 100644
+--- a/tools/PcsClientTool/lib/intelsgx/pcs.py
++++ b/tools/PcsClientTool/lib/intelsgx/pcs.py
+@@ -4,11 +4,28 @@ import requests
+ import json
+ import binascii
+ from urllib import parse
+-from OpenSSL import crypto
++
+ from cryptography import x509
+ from cryptography.exceptions import InvalidSignature
+-from cryptography.hazmat.primitives import hashes
++from cryptography.hazmat.primitives import hashes, serialization
+ from cryptography.hazmat.primitives.asymmetric import ec
++
++# Prefer pycryptography for cert verification if new
++# enough, but fallback to pyopenssl
++try:
++    # 'verification' module available from >= 42.0.0, but
++    # the required 'ExtensionPolicy' API is from >= 45.0.0
++    from cryptography.x509 import verification
++    if not hasattr(verification, 'ExtensionPolicy'):
++        verification = None
++    else:
++        crypto = None
++except ImportError:
++    verification = None
++
++if verification is None:
++    from OpenSSL import crypto
++
+ from platform import system
+ if system() == 'Windows':
+     from pypac import PACSession
+@@ -133,17 +150,34 @@ class PCS:
+         return True
+ 
+     def verify_cert_trust(self, pychain, pycerts):
+-        store= self.init_cert_store(pychain)
+-
+-        for pycert in pycerts:
+-            store_ctx= crypto.X509StoreContext(
+-                store, crypto.X509.from_cryptography(pycert))
+-            try:
+-                store_ctx.verify_certificate()
+-            except crypto.X509StoreContextError as e:
+-                # Printing or logging the error details
+-                print(e)
+-                return False
++        if verification is not None:
++            store= verification.Store(pychain)
++
++            builder= verification.PolicyBuilder().store(store)
++            builder= builder.extension_policies(
++                ee_policy=verification.ExtensionPolicy.permit_all(),
++                ca_policy=verification.ExtensionPolicy.webpki_defaults_ca())
++
++            verifier= builder.build_client_verifier()
++            for pycert in pycerts:
++                try:
++                    verifier.verify(pycert,[])
++                except verification.VerificationError as e:
++                    # Printing or logging the error details
++                    print(e)
++                    return False
++        else:
++            store= self.init_cert_store(pychain)
++
++            for pycert in pycerts:
++                store_ctx= crypto.X509StoreContext(
++                    store, crypto.X509.from_cryptography(pycert))
++                try:
++                    store_ctx.verify_certificate()
++                except crypto.X509StoreContextError as e:
++                    # Printing or logging the error details
++                    print(e)
++                    return False
+ 
+         return True
+ 
+-- 
+2.53.0
+

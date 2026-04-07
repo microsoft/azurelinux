@@ -1,0 +1,12 @@
+diff -pruN fontconfig-2.12.91.orig/fc-cache/fc-cache.c fontconfig-2.12.91/fc-cache/fc-cache.c
+--- fontconfig-2.12.91.orig/fc-cache/fc-cache.c	2017-11-20 21:02:20.000000000 +0900
++++ fontconfig-2.12.91/fc-cache/fc-cache.c	2017-12-14 16:59:19.002003145 +0900
+@@ -413,7 +413,7 @@ main (int argc, char **argv)
+      */
+     /* the resolution of mtime on FAT is 2 seconds */
+     if (changed)
+-	sleep (2);
++	sleep (1);
+     if (verbose)
+ 	printf ("%s: %s\n", argv[0], ret ? _("failed") : _("succeeded"));
+     return ret;

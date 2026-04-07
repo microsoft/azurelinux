@@ -1,0 +1,41 @@
+diff -up ./esc/src/app/esc.js.fix9 ./esc/src/app/esc.js
+--- ./esc/src/app/esc.js.fix9	2020-08-12 11:15:29.423093856 -0700
++++ ./esc/src/app/esc.js	2020-08-12 11:43:47.646556310 -0700
+@@ -271,7 +271,6 @@ class ESC {
+          if(!insertedToken && !doReset) {
+              return;
+          }
+-     
+          if(doReset) {
+              this._operationsGrid.remove(this._phoneHomeButton);
+              this._operationsGrid.remove(this._enrollButton);
+@@ -297,6 +296,12 @@ class ESC {
+              }
+ 
+              this._operationsGrid.show_all();
++         } else {
++             if(insertedToken.status == 4) {
++                 this._operationsGrid.add(this._certDetailButton);
++		 this._operationsGrid.show_all();
++
++	     }
+          }
+      }
+ 
+diff -up ./esc/src/lib/coolkey/CoolKeyHandler.cpp.fix9 ./esc/src/lib/coolkey/CoolKeyHandler.cpp
+--- ./esc/src/lib/coolkey/CoolKeyHandler.cpp.fix9	2020-08-12 10:59:24.844704399 -0700
++++ ./esc/src/lib/coolkey/CoolKeyHandler.cpp	2020-08-12 11:11:05.480713407 -0700
+@@ -2329,11 +2329,11 @@ CKHGetCoolKeyInfo(PK11SlotInfo *aSlot,Co
+     }
+ 
+     //Massage the tokenInfo so it adhered to when coolkey was doing it.
+-    if(hasApplet) {
++    if(hasApplet == 1 || isACAC == 1 || isAPIV == 1) {
+         tokenInfo.firmwareVersion.major = 1;    
+     }
+ 
+-    if(isPersonalized) {
++    if(isPersonalized == 1 || isACAC == 1 || isAPIV == 1) {
+         tokenInfo.flags |= CKF_TOKEN_INITIALIZED;
+     }
+ 

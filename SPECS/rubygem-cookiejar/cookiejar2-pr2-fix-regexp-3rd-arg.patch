@@ -1,0 +1,31 @@
+From d7c1ecc9584a00b81c4d41a462744dcfcda500ec Mon Sep 17 00:00:00 2001
+From: Mamoru TASAKA <mtasaka@fedoraproject.org>
+Date: Mon, 18 Sep 2023 16:49:09 +0900
+Subject: [PATCH] Fix Regexp.new deprecated third argument usage
+
+At least since ruby 2.7, passing 'n' code option to the third
+argument of Regexp.new is the same as specifying
+Regexp::NOENCODING to the second argument.
+
+Now with ruby 3.2, using third argument is declared deprecated,
+and with ruby 3.3, third argument support is removed:
+https://github.com/ruby/ruby/pull/7039
+
+To handle ruby 3.3, fix Regexp.new usage as above.
+---
+ lib/cookiejar/cookie_validation.rb | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/cookiejar/cookie_validation.rb b/lib/cookiejar/cookie_validation.rb
+index a64c607..b1f68ac 100644
+--- a/lib/cookiejar/cookie_validation.rb
++++ b/lib/cookiejar/cookie_validation.rb
+@@ -45,7 +45,7 @@ module PATTERN
+     HDN = /\A#{PATTERN::HOSTNAME}\Z/
+     TOKEN = /\A#{PATTERN::TOKEN}\Z/
+     PARAM1 = /\A(#{PATTERN::TOKEN})(?:=#{PATTERN::VALUE1})?\Z/
+-    PARAM2 = Regexp.new "(#{PATTERN::TOKEN})(?:=(#{PATTERN::VALUE2}))?(?:\\Z|;)", '', 'n'
++    PARAM2 = Regexp.new "(#{PATTERN::TOKEN})(?:=(#{PATTERN::VALUE2}))?(?:\\Z|;)", Regexp::NOENCODING
+     # TWO_DOT_DOMAINS = /\A\.(com|edu|net|mil|gov|int|org)\Z/
+ 
+     # Converts the input object to a URI (if not already a URI)

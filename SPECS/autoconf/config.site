@@ -1,0 +1,29 @@
+# This is the config.site file to satisfy FHS defaults when installing below
+# /usr.
+#
+# You may override this file by your config.site using the CONFIG_SITE env
+# variable.
+#
+# Note: This file includes also RHEL/Fedora fix for installing libraries into
+# "/lib/lib64" on 64bit systems.
+
+if test -n "$host"; then
+    # skip when cross-compiling
+    return 0
+fi
+
+if test "$prefix" = /usr \
+   || { test "$prefix" = NONE && test "$ac_default_prefix" = /usr ; }
+then
+    test "$sysconfdir" = '${prefix}/etc' && sysconfdir=/etc
+    test "$sharedstatedir" = '${prefix}/com' && sharedstatedir=/var
+    test "$localstatedir" = '${prefix}/var' && localstatedir=/var
+
+    ARCH=`uname -m`
+    for i in x86_64 ppc64 s390x aarch64; do
+        if test $ARCH = $i; then
+            test "$libdir" = '${exec_prefix}/lib' && libdir='${exec_prefix}/lib64'
+            break
+        fi
+    done
+fi

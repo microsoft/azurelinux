@@ -1,0 +1,59 @@
+Fixes a cascade of texinfo errors:
+
+check.texi:2329: no matching `@end verbatim'
+check.texi:2140: Next reference to nonexistent `Conclusion and References'
+check.texi:73: @menu reference to nonexistent node `Conclusion and References'
+check.texi:74: @menu reference to nonexistent node `Environment Variable Reference'
+check.texi:75: @menu reference to nonexistent node `Copying This Manual'
+check.texi:76: @menu reference to nonexistent node `Index'
+check.texi:124: @detailmenu reference to nonexistent node `GNU Free Documentation License'
+check.texi:1510: warning: node next pointer for `Selective Running of Tests' is `Testing Signal Handling and Exit Values' but next is `Selecting Tests by Suite or Test Case' in menu
+check.texi:1610: warning: node prev pointer for `Testing Signal Handling and Exit Values' is `Selective Running of Tests' but prev is `Selecting Tests Based on Arbitrary Tags' in menu
+check.texi:2051: warning: node prev pointer for `TAP Logging' is `Test Logging' but prev is `XML Logging' in menu
+
+And also fixes some broken next/prev links:
+
+check.texi:1510: warning: node next pointer for `Selective Running of Tests' is `Testing Signal Handling and Exit Values' but next is `Selecting Tests by Suite or Test Case' in menu
+check.texi:1610: warning: node prev pointer for `Testing Signal Handling and Exit Values' is `Selective Running of Tests' but prev is `Selecting Tests Based on Arbitrary Tags' in menu
+check.texi:2051: warning: node prev pointer for `TAP Logging' is `Test Logging' but prev is `XML Logging' in menu
+
+--- check-0.15.2/doc/check.texi.orig	2020-08-09 00:12:30.000000000 -0600
++++ check-0.15.2/doc/check.texi	2025-01-16 09:11:28.339494806 -0700
+@@ -112,6 +112,11 @@ Test Fixtures
+ * Test Fixture Examples::       
+ * Checked vs Unchecked Fixtures::  
+ 
++Selective Running of Tests
++
++* Selecting Tests by Suite or Test Case::
++* Selecting Tests Based on Arbitrary Tags::
++
+ Test Logging
+ 
+ * XML Logging::                 
+@@ -974,8 +979,6 @@ easier for the developer to write, run,
+ * Test Fixtures::               
+ * Multiple Suites in one SRunner::  
+ * Selective Running of Tests::
+-* Selecting Tests by Suite or Test Case::
+-* Selecting Tests Based on Arbitrary Tags::
+ * Testing Signal Handling and Exit Values::  
+ * Looping Tests::               
+ * Test Timeouts::               
+@@ -2048,7 +2051,7 @@ If both plain text and XML log files are
+ then check will log to both files. In other words logging in plain text and XML
+ format simultaneously is supported.
+ 
+-@node TAP Logging,  , Test Logging, Test Logging
++@node TAP Logging,  , XML Logging, Test Logging
+ @subsection TAP Logging
+ 
+ @findex srunner_set_tap
+@@ -2255,6 +2258,7 @@ your CMake build how to find it:
+ 
+ @verbatim
+ cmake -Dcheck_ROOT=${INSTALL_PREFIX}
++@end verbatim
+ 
+ Then use Check in your @file{CMakeLists.txt} like this:
+ 

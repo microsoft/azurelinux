@@ -1,0 +1,44 @@
+diff --git a/config/ag_macros.m4 b/config/ag_macros.m4
+index ccce347..ae36cf7 100644
+--- a/config/ag_macros.m4
++++ b/config/ag_macros.m4
+@@ -113,7 +113,7 @@ AC_DEFUN([INVOKE_AG_MACROS_LAST],[
+   fi
+ 
+   AC_CACHE_CHECK([for static inline], [snv_cv_static_inline], [
+-  AC_TRY_COMPILE([static inline foo(bar) int bar; { return bar; }],
++  AC_TRY_COMPILE([static inline int foo(bar) int bar; { return bar; }],
+     [return foo(0);],
+     [snv_cv_static_inline='static inline'],
+     [snv_cv_static_inline='static'])
+@@ -428,7 +428,7 @@ int main (int argc, char ** argv) {
+    char zRej@<:@@:>@ = reject;
+    char zAcc@<:@@:>@ = "a-ok-eject";
+    return strcspn( zAcc, zRej ) - 5;
+-}] )]
++}] )],
+     [ag_cv_run_strcspn=yes],[ag_cv_run_strcspn=no],[ag_cv_run_strcspn=no]
+   ) # end of RUN_IFELSE
+   ]) # end of AC_CACHE_VAL for ag_cv_run_strcspn
+diff --git a/configure b/configure
+index 518ac9c..5eacd76 100755
+--- a/configure
++++ b/configure
+@@ -17338,7 +17338,7 @@ int main (int argc, char ** argv) {
+    char zAcc[] = "a-ok-eject";
+    return strcspn( zAcc, zRej ) - 5;
+ }
+-    ag_cv_run_strcspn=yes
++#error
+ _ACEOF
+ if ac_fn_c_try_run "$LINENO"; then :
+   ag_cv_run_strcspn=no
+@@ -18406,7 +18405,7 @@ else
+ 
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+-static inline foo(bar) int bar; { return bar; }
++static inline int foo(bar) int bar; { return bar; }
+ int
+ main ()
+ {

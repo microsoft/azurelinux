@@ -1,0 +1,29 @@
+From f5d5ce34a0f7ef60a7321fd79a1477b32fc1e03b Mon Sep 17 00:00:00 2001
+From: Remi Collet <remi@remirepo.net>
+Date: Mon, 30 Sep 2024 08:05:42 +0200
+Subject: [PATCH] E_STRICT is deprecated in 8.4
+
+---
+ tests/igbinary_009b_php8.phpt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/igbinary_009b_php8.phpt b/tests/igbinary_009b_php8.phpt
+index 483576aa..33d24518 100644
+--- a/tests/igbinary_009b_php8.phpt
++++ b/tests/igbinary_009b_php8.phpt
+@@ -12,7 +12,7 @@ if (PHP_MAJOR_VERSION < 8) {
+ pcre.jit=0
+ --FILE--
+ <?php
+-error_reporting(E_ALL|E_STRICT);
++error_reporting(PHP_VERSION_ID < 80400 ?E_ALL|E_STRICT : E_ALL);
+ // Verify that $type[0] is the same zval as $type[0][0][0], but different from $type[0]
+ function test_cyclic2($type, $variable) {
+ 	$serialized = igbinary_serialize($variable);
+@@ -111,4 +111,4 @@ array(1) {
+   }
+ }
+ 
+-(Was normalized)
+\ No newline at end of file
++(Was normalized)

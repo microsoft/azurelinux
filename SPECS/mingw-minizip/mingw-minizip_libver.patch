@@ -1,0 +1,13 @@
+diff -rupN --no-dereference minizip-ng-4.0.10/CMakeLists.txt minizip-ng-4.0.10-new/CMakeLists.txt
+--- minizip-ng-4.0.10/CMakeLists.txt	2025-05-05 03:36:06.000000000 +0200
++++ minizip-ng-4.0.10-new/CMakeLists.txt	2025-06-09 23:23:37.563287615 +0200
+@@ -684,6 +684,9 @@ set_target_properties(${MINIZIP_TARGET}
+                       SOVERSION ${SOVERSION}
+                       LINKER_LANGUAGE C
+                       DEFINE_SYMBOL "MZ_EXPORTS")
++if(MINGW)
++    set_target_properties(${MINIZIP_TARGET} PROPERTIES SUFFIX "-${SOVERSION}${CMAKE_SHARED_LIBRARY_SUFFIX}")
++endif(MINGW)
+ 
+ if(MINIZIP_LFG)
+     set_target_properties(${MINIZIP_TARGET} PROPERTIES LINK_FLAGS ${MINIZIP_LFG})

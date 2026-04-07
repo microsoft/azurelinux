@@ -1,0 +1,89 @@
+[Toplevel top]
+expand=true
+orientation=top
+size=24
+
+[Toplevel bottom]
+expand=true
+orientation=bottom
+size=24
+
+[Object menu-bar]
+object-type=menu-bar
+toplevel-id=top
+position=0
+locked=true
+
+[Object file-browser]
+object-type=launcher
+launcher-location=/usr/share/applications/caja-browser.desktop
+toplevel-id=top
+position=10
+locked=true
+
+[Object terminal]
+object-type=launcher
+launcher-location=/usr/share/applications/mate-terminal.desktop
+toplevel-id=top
+position=20
+locked=true
+
+[Object web-browser]
+object-type=launcher
+launcher-location=/usr/share/applications/firefox.desktop
+toplevel-id=top
+position=30
+locked=true
+
+[Object email-client]
+object-type=launcher
+launcher-location=/usr/share/applications/mozilla-thunderbird.desktop
+toplevel-id=top
+position=40
+locked=true
+
+[Object volume-control]
+object-type=applet
+applet-iid=GvcAppletFactory::GvcApplet
+toplevel-id=top
+position=20
+panel-right-stick=true
+locked=true
+
+[Object notification-area]
+object-type=applet
+applet-iid=NotificationAreaAppletFactory::NotificationArea
+toplevel-id=top
+position=10
+panel-right-stick=true
+locked=true
+
+[Object clock]
+object-type=applet
+applet-iid=ClockAppletFactory::ClockApplet
+toplevel-id=top
+position=0
+panel-right-stick=true
+locked=true
+
+[Object show-desktop]
+object-type=applet
+applet-iid=WnckletFactory::ShowDesktopApplet
+toplevel-id=bottom
+position=0
+locked=true
+
+[Object window-list]
+object-type=applet
+applet-iid=WnckletFactory::WindowListApplet
+toplevel-id=bottom
+position=20
+locked=true
+
+[Object workspace-switcher]
+object-type=applet
+applet-iid=WnckletFactory::WorkspaceSwitcherApplet
+toplevel-id=bottom
+position=0
+panel-right-stick=true
+locked=true

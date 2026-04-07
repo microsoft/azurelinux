@@ -1,0 +1,77 @@
+--- zimpl-362/CMakeLists.txt.orig	2024-09-17 19:44:17.589497126 -0600
++++ zimpl-362/CMakeLists.txt	2024-09-17 19:55:30.619340046 -0600
+@@ -125,11 +125,11 @@ include_directories(${GMP_INCLUDE_DIRS})
+ set(libs ${libs} ${GMP_LIBRARIES})
+ 
+ if(ZLIB)
+-    find_package(ZLIB)
++    find_package(ZLIB-NG)
+ endif()
+-if(ZLIB_FOUND)
+-    set(libs ${libs} ${ZLIB_LIBRARIES})
+-    include_directories(${ZLIB_INCLUDE_DIRS})
++if(ZLIB-NG_FOUND)
++    set(libs ${libs} -lz-ng)
++    include_directories(/usr/include)
+ else()
+     add_definitions(-DWITHOUT_ZLIB)
+ endif()
+--- zimpl-362/src/zimpl/iread.c.orig	2024-09-17 19:44:29.886348077 -0600
++++ zimpl-362/src/zimpl/iread.c	2024-09-17 19:50:15.407160377 -0600
+@@ -38,7 +38,7 @@
+ #endif
+ 
+ #ifndef WITHOUT_ZLIB
+-#include <zlib.h>
++#include <zlib-ng.h>
+ #endif
+ 
+ #include "zimpl/lint.h"
+--- zimpl-362/src/zimpl/metaio.c.orig	2024-09-12 23:08:28.000000000 -0600
++++ zimpl-362/src/zimpl/metaio.c	2024-09-17 19:49:03.368033502 -0600
+@@ -34,7 +34,8 @@
+ #include <assert.h>
+ 
+ #ifndef WITHOUT_ZLIB
+-#include <zlib.h>
++#define WITH_GZFILEOP
++#include <zlib-ng.h>
+ #endif
+ 
+ #include "zimpl/lint.h"
+@@ -248,7 +249,7 @@ MFP* mio_open(char const* name, char con
+          {
+             mfp->type = MFP_ZLIB;
+          
+-            if (NULL == (mfp->fp.zlib = gzopen(filename, "r")))
++            if (NULL == (mfp->fp.zlib = zng_gzopen(filename, "r")))
+             {
+                perror(filename);
+                free(mfp);
+@@ -300,7 +301,7 @@ void mio_close(MFP* mfp)
+       break;
+ #ifndef WITHOUT_ZLIB
+    case MFP_ZLIB :
+-      gzclose(mfp->fp.zlib);
++      zng_gzclose(mfp->fp.zlib);
+       break;
+ #endif /* ! WITHOUT_ZLIB */
+    default :
+@@ -328,7 +329,7 @@ int mio_getc(MFP const* mfp)
+       break;
+ #ifndef WITHOUT_ZLIB
+    case MFP_ZLIB :
+-      c = gzgetc(mfp->fp.zlib);
++      c = zng_gzgetc(mfp->fp.zlib);
+       break;
+ #endif /* ! WITHOUT_ZLIB */
+    default :
+@@ -354,7 +355,7 @@ char* mio_gets(MFP const* mfp, char* buf
+       break;
+ #ifndef WITHOUT_ZLIB
+    case MFP_ZLIB :
+-      s = gzgets(mfp->fp.zlib, buf, len);
++      s = zng_gzgets(mfp->fp.zlib, buf, len);
+       break;
+ #endif /* ! WITHOUT_ZLIB */
+    default :

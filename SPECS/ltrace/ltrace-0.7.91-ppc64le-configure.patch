@@ -1,0 +1,44 @@
+From eea6091f8672b01f7f022b0fc367e0f568225ffc Mon Sep 17 00:00:00 2001
+From: Petr Machata <pmachata@redhat.com>
+Date: Fri, 8 Aug 2014 17:09:58 +0200
+Subject: [PATCH] Recognize powerpc64le in configure
+
+---
+ configure.ac | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 4f360c8..6fe5e3b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -43,7 +43,7 @@ case "${host_cpu}" in
+     arm*|sa110)		HOST_CPU="arm" ;;
+     cris*)		HOST_CPU="cris" ;;
+     mips*)		HOST_CPU="mips" ;;
+-    powerpc|powerpc64)	HOST_CPU="ppc" ;;
++    powerpc|powerpc64|powerpc64le)	HOST_CPU="ppc" ;;
+     sun4u|sparc64)	HOST_CPU="sparc" ;;
+     s390x)		HOST_CPU="s390" ;;
+     i?86|x86_64)	HOST_CPU="x86" ;;
+@@ -210,12 +210,12 @@ AC_MSG_RESULT([$enable_libunwind])
+ 
+ if test x"$enable_libunwind" = xyes; then
+   case "${host_cpu}" in
+-      arm*|sa110)         UNWIND_ARCH="arm" ;;
+-      i?86)               UNWIND_ARCH="x86" ;;
+-      powerpc)            UNWIND_ARCH="ppc32" ;;
+-      powerpc64)          UNWIND_ARCH="ppc64" ;;
+-      mips*)              UNWIND_ARCH="mips" ;;
+-      *)                  UNWIND_ARCH="${host_cpu}" ;;
++      arm*|sa110)	  UNWIND_ARCH="arm" ;;
++      i?86)		  UNWIND_ARCH="x86" ;;
++      powerpc)		  UNWIND_ARCH="ppc32" ;;
++      powerpc64|powerpc64le)	UNWIND_ARCH="ppc64" ;;
++      mips*)		  UNWIND_ARCH="mips" ;;
++      *)		  UNWIND_ARCH="${host_cpu}" ;;
+   esac
+ 
+   saved_LDFLAGS="${LDFLAGS}"
+-- 
+2.1.0
+

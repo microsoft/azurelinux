@@ -1,0 +1,47 @@
+From 65ae6ddb3720310eb7763abfcfc5a6a95353abd9 Mon Sep 17 00:00:00 2001
+From: Tomi Ollila <tomi.ollila@iki.fi>
+Date: Mon, 20 Dec 2021 20:11:33 +0200
+Subject: [PATCH] tests: support both *BSD and Linux ls -l permissions output
+
+Linux ls(1) adds trailing '.' to the first -- "drwxrwxrwx" output
+column -- a character that does not exist in *BSD ls -l output.
+
+The sed expression 's/[.]\? .*//' removes everything since first
+space -- and additionally trailing dot (.) before that if such
+a character exists there.
+---
+ tests/outperms.sh  | 2 +-
+ tests/overperms.sh | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/tests/outperms.sh b/tests/outperms.sh
+index 2583bf5..53c2f08 100644
+--- a/tests/outperms.sh
++++ b/tests/outperms.sh
+@@ -3,7 +3,7 @@ unifdef -DFOO=1 -DFOOB=42 -UBAR -ooutfile.c if1.c
+ e=$?
+ case ${BUILD_MINGW} in
+ (yes)	printf '%s\n' '-rw-r-----' 1>&2 ;;
+-(*)	ls -l outfile.c | cut -d' ' -f1 1>&2 ;;
++(*)	ls -l outfile.c | sed 's/[.]\? .*//' 1>&2 ;;
+ esac
+ cat outfile.c
+ rm outfile.c
+diff --git a/tests/overperms.sh b/tests/overperms.sh
+index fa15593..0ed5772 100644
+--- a/tests/overperms.sh
++++ b/tests/overperms.sh
+@@ -1,11 +1,11 @@
+ cp if1.c outfile.c
+ chmod 640 outfile.c
+-ls -l outfile.c | cut -d' ' -f1 1>&2
++ls -l outfile.c | sed 's/[.]\? .*//' 1>&2
+ unifdef -DFOO=1 -DFOOB=42 -UBAR -m outfile.c
+ e=$?
+ case ${BUILD_MINGW} in
+ (yes)	printf '%s\n' '-rw-r-----' 1>&2 ;;
+-(*)	ls -l outfile.c | cut -d' ' -f1 1>&2 ;;
++(*)	ls -l outfile.c | sed 's/[.]\? .*//' 1>&2 ;;
+ esac
+ cat outfile.c
+ rm outfile.c

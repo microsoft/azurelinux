@@ -1,0 +1,39 @@
+From 9f276d3dab71ba741107a5a7f4efc12fdda5cb0b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Randy=20D=C3=B6ring?=
+ <30527984+radoering@users.noreply.github.com>
+Date: Sat, 16 Aug 2025 16:38:00 +0200
+Subject: [PATCH] allow virtualenv >= 20.33.0 again (#10506)
+
+---
+ poetry.lock                         | 15 ++++++++-------
+ pyproject.toml                      |  3 +--
+ src/poetry/utils/env/env_manager.py |  2 +-
+ 3 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 29f57e17ae9..1f135913510 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -27,8 +27,7 @@ dependencies = [
+     "tomlkit (>=0.11.4,<1.0.0)",
+     # trove-classifiers uses calver, so version is unclamped
+     "trove-classifiers (>=2022.5.19)",
+-    # upper pin as quickfix for https://github.com/python-poetry/poetry/issues/10490
+-    "virtualenv (>=20.26.6,<20.33.0)",
++    "virtualenv (>=20.26.6)",
+     "xattr (>=1.0.0,<2.0.0) ; sys_platform == 'darwin'",
+     "findpython (>=0.6.2,<0.7.0)",
+     "pbs-installer[download,install] (>=2025.1.6,<2026.0.0)",
+diff --git a/src/poetry/utils/env/env_manager.py b/src/poetry/utils/env/env_manager.py
+index 557c0955d15..2456a958439 100644
+--- a/src/poetry/utils/env/env_manager.py
++++ b/src/poetry/utils/env/env_manager.py
+@@ -532,7 +532,7 @@ def build_venv(
+         args = [
+             "--no-download",
+             "--no-periodic-update",
+-            "--try-first-with",
++            "--python",
+             executable_str or sys.executable,
+         ]
+ 

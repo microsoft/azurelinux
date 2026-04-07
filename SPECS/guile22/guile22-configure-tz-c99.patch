@@ -1,0 +1,31 @@
+Avoid implicit ints in the guile_cv_localtime_cache check.  It cause
+the check to always fail with strict(er) C99 compilers that do not
+support implicit int.
+
+Submitted upstream:
+
+  <https://lists.gnu.org/archive/html/bug-guile/2022-12/msg00017.html>
+  <https://debbugs.gnu.org/cgi/bugreport.cgi?bug=60022>
+
+diff --git a/configure.ac b/configure.ac
+index 92966ce3432b11f4..ec542c1f58bd835e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1167,7 +1167,7 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[#include <time.h>
+ # include <stdlib.h>
+ #endif
+ extern char **environ;
+-unset_TZ ()
++int unset_TZ ()
+ {
+   char **from, **to;
+   for (to = from = environ; (*to = *from); from++)
+@@ -1176,7 +1176,7 @@ unset_TZ ()
+ }
+ char TZ_GMT0[] = "TZ=GMT0";
+ char TZ_PST8[] = "TZ=PST8";
+-main()
++int main()
+ {
+   time_t now = time ((time_t *) 0);
+   int hour_GMT0, hour_unset;

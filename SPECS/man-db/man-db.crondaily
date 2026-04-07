@@ -1,0 +1,27 @@
+#!/bin/bash
+
+if [ -e /etc/sysconfig/man-db ]; then
+    . /etc/sysconfig/man-db
+fi
+
+if [ "$CRON" = "no" ]; then
+   exit 0
+fi
+
+renice +19 -p $$ >/dev/null 2>&1
+ionice -c3 -p $$ >/dev/null 2>&1
+
+LOCKFILE=/var/lock/man-db.lock
+
+# the lockfile is not meant to be perfect, it's just in case the
+# two man-db cron scripts get run close to each other to keep
+# them from stepping on each other's toes.  The worst that will
+# happen is that they will temporarily corrupt the database
+[[ -f $LOCKFILE ]] && exit 0
+
+trap "{ rm -f $LOCKFILE ; exit 0; }" EXIT
+touch $LOCKFILE
+# create/update the mandb database
+mandb $OPTS
+
+exit 0

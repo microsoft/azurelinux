@@ -1,0 +1,33 @@
+From 4e997de806bdb48204cada63115d876acebadf25 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Fri, 1 Dec 2023 13:06:26 +0100
+Subject: [PATCH] Use `TestServlet.url` instead of external connectivity
+
+This test covers http verb conversion to string, which is not specifically related to any service.
+
+This also include fix of broken link.
+---
+ tests/tc_curl_easy.rb | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/tests/tc_curl_easy.rb b/tests/tc_curl_easy.rb
+index e7494c8..7718e31 100644
+--- a/tests/tc_curl_easy.rb
++++ b/tests/tc_curl_easy.rb
+@@ -1068,13 +1068,13 @@ def test_easy_http_verbs
+   end
+ 
+   def test_easy_http_verbs_must_respond_to_str
+-    # issue http://github.com/taf2/curb/issues#issue/45
++    # issue http://github.com/taf2/curb/issues/45
+     assert_nothing_raised do
+-      c = Curl::Easy.new ; c.url = 'http://example.com' ; c.http(:get)
++      c = Curl::Easy.new ; c.url = TestServlet.url ; c.http(:get)
+     end
+ 
+     assert_raise RuntimeError do
+-      c = Curl::Easy.new ; c.url = 'http://example.com' ; c.http(FooNoToS.new)
++      c = Curl::Easy.new ; c.url = TestServlet.url ; c.http(FooNoToS.new)
+     end
+ 
+   end

@@ -1,0 +1,47 @@
+From bd015ab1f56008f17404ac9511025812646e5e2d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Pavol=20=C5=BD=C3=A1=C4=8Dik?= <zacik.pa@gmail.com>
+Date: Mon, 11 Aug 2025 12:02:03 +0200
+Subject: [PATCH 56/59] apps/speed.c: Disable testing of composite signature
+ algorithms
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Creating public key context from name would always fail
+for composite signature algorithms (such as RSA-SHA256)
+because the public key algorithm name (e.g., RSA) does
+not match the name of the composite algorithm.
+
+Relates to #27855.
+
+Signed-off-by: Pavol Žáčik <zacik.pa@gmail.com>
+
+Reviewed-by: Tomas Mraz <tomas@openssl.org>
+Reviewed-by: Dmitry Belyavskiy <beldmit@gmail.com>
+(Merged from https://github.com/openssl/openssl/pull/28224)
+---
+ apps/speed.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/apps/speed.c b/apps/speed.c
+index ae2f166d24..a51d6a57d4 100644
+--- a/apps/speed.c
++++ b/apps/speed.c
+@@ -2275,9 +2275,11 @@ int speed_main(int argc, char **argv)
+         }
+ #endif /* OPENSSL_NO_DSA */
+         /* skipping these algs as tested elsewhere - and b/o setup is a pain */
+-        else if (strcmp(sig_name, "ED25519") &&
+-                 strcmp(sig_name, "ED448") &&
+-                 strcmp(sig_name, "ECDSA") &&
++        else if (strncmp(sig_name, "RSA", 3) &&
++                 strncmp(sig_name, "DSA", 3) &&
++                 strncmp(sig_name, "ED25519", 7) &&
++                 strncmp(sig_name, "ED448", 5) &&
++                 strncmp(sig_name, "ECDSA", 5) &&
+                  strcmp(sig_name, "HMAC") &&
+                  strcmp(sig_name, "SIPHASH") &&
+                  strcmp(sig_name, "POLY1305") &&
+-- 
+2.51.0
+

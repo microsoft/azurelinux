@@ -1,0 +1,48 @@
+From 3d6891eb63a60ac31ecbf83471a63821cf298d36 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Tue, 1 Jul 2025 00:55:23 -0400
+Subject: [PATCH] Downstream-only: omit doctests requiring circular dev-deps
+
+---
+ src/fallback.rs | 4 ++--
+ src/response.rs | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/fallback.rs b/src/fallback.rs
+index a279bbdf6a..0f3564eae0 100644
+--- a/src/fallback.rs
++++ b/src/fallback.rs
+@@ -51,7 +51,7 @@ pub struct LocaleFallbackConfig {
+     ///
+     /// Retain the language and script subtags until the final step:
+     ///
+-    /// ```
++    /// ```ignore
+     /// use icu::locale::fallback::LocaleFallbackConfig;
+     /// use icu::locale::fallback::LocaleFallbackPriority;
+     /// use icu::locale::locale;
+@@ -79,7 +79,7 @@ pub struct LocaleFallbackConfig {
+     ///
+     /// Retain the region subtag until the final step:
+     ///
+-    /// ```
++    /// ```ignore
+     /// use icu::locale::fallback::LocaleFallbackConfig;
+     /// use icu::locale::fallback::LocaleFallbackPriority;
+     /// use icu::locale::locale;
+diff --git a/src/response.rs b/src/response.rs
+index dcf0605b23..d7b087b1d0 100644
+--- a/src/response.rs
++++ b/src/response.rs
+@@ -764,7 +764,7 @@ where
+     /// Short-circuit a data request request based on the marker, returning
+     /// a result from a different data provider:
+     ///
+-    /// ```
++    /// ```ignore
+     /// use core::any::TypeId;
+     /// use icu_locale_core::locale;
+     /// use icu_provider::hello_world::*;
+-- 
+2.50.0
+

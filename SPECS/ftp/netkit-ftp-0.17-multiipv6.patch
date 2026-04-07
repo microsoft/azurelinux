@@ -1,0 +1,66 @@
+--- netkit-ftp-0.17/ftp/ftp.c.multiipv6	2006-08-02 15:03:26.000000000 +0200
++++ netkit-ftp-0.17/ftp/ftp.c	2006-08-02 15:06:19.000000000 +0200
+@@ -78,9 +78,7 @@
+ #include <netinet/in.h>
+ #include <netinet/ip.h>
+ #include <arpa/ftp.h>
+-#include <arpa/inet.h>
+ #include <arpa/telnet.h>
+-
+ #include <stdio.h>
+ #include <signal.h>
+ #include <string.h>
+@@ -132,7 +130,7 @@
+ static sigjmp_buf ptabort;
+ static int ptabflg = 0;
+ static int abrtflag = 0;
+-struct sockaddr_in source;
++struct sockaddr_storage source;
+ 
+ void lostpeer(int);
+ extern int connected;
+@@ -154,8 +152,8 @@
+ char *
+ hookup(const char *host, const char *port)
+ {
+-	int s, tos, error, alen;
+-	socklen_t len;
++	int s, tos, error;
++	socklen_t len, alen;
+ 	static char hostnamebuf[256];
+ 	struct addrinfo hints, *res, *res0;
+ 	char hbuf[MAXHOSTNAMELEN], pbuf[NI_MAXSERV];
+@@ -281,7 +279,15 @@
+ 		printf("Connected to %s (%s).\n", hostname, hbuf);
+ 	alen = sizeof(source);
+ 	getsockname(s,(struct sockaddr*)&source, &alen);
+-	source.sin_port = 0;    /* We just want the addr, not the port */
++	switch (source.ss_family) {
++	    /* We just want the addr, not the port */
++	    case AF_INET:
++		((struct sockaddr_in *) &source)->sin_port = 0;
++	        break;
++	    case AF_INET6:
++		((struct sockaddr_in6 *) &source)->sin6_port = 0;
++	        break;
++	}
+ 
+ 	if (getreply(0) > 2) { 	/* read startup message from server    */
+ 		if (cin)
+@@ -1260,11 +1266,11 @@
+ 			return(1);
+ 		}
+ 		if((multihome) &&
+-			bind(data, (struct sockaddr*)&source, sizeof(source)) == -1) {
+-			close(data);
+-			data = -1;
+-			perror("ftp multihome bind");
+-			return(1);
++                       bind(data, (struct sockaddr *)&source, sizeof(source)) == -1) {
++                       close(data);
++                       data = -1;
++                       perror("ftp multihome bind");
++                       return(1);
+                 }
+ 		if (options & SO_DEBUG &&
+ 		    setsockopt(data, SOL_SOCKET, SO_DEBUG, (char *)&on,

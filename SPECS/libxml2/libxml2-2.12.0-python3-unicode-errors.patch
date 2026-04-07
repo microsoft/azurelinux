@@ -1,0 +1,34 @@
+diff --git a/python/libxml.c b/python/libxml.c
+index bf048006..5f42e5b7 100644
+--- a/python/libxml.c
++++ b/python/libxml.c
+@@ -1505,6 +1505,7 @@ libxml_xmlErrorFuncHandler(ATTRIBUTE_UNUSED void *ctx, const char *msg,
+     PyObject *message;
+     PyObject *result;
+     char str[1000];
++    unsigned char *ptr = (unsigned char *)str;
+ 
+     if (libxml_xmlPythonErrorFuncHandler == NULL) {
+         va_start(ap, msg);
+@@ -1516,12 +1517,20 @@ libxml_xmlErrorFuncHandler(ATTRIBUTE_UNUSED void *ctx, const char *msg,
+ 	    str[999] = 0;
+         va_end(ap);
+ 
++#if PY_MAJOR_VERSION >= 3
++        /* Ensure the error string doesn't start at UTF8 continuation. */
++        while (*ptr && (*ptr & 0xc0) == 0x80)
++            ptr++;
++#endif
++
+         list = PyTuple_New(2);
+         PyTuple_SetItem(list, 0, libxml_xmlPythonErrorFuncCtxt);
+         Py_XINCREF(libxml_xmlPythonErrorFuncCtxt);
+-        message = libxml_charPtrConstWrap(str);
++        message = libxml_charPtrConstWrap(ptr);
+         PyTuple_SetItem(list, 1, message);
+         result = PyObject_CallObject(libxml_xmlPythonErrorFuncHandler, list);
++        /* Forget any errors caused in the error handler. */
++        PyErr_Clear();
+         Py_XDECREF(list);
+         Py_XDECREF(result);
+     }

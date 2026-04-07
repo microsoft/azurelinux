@@ -1,0 +1,25 @@
+From 0677666f65b988b2dd44d02966a08fea490d5883 Mon Sep 17 00:00:00 2001
+From: Petri Lehtinen <petri@digip.org>
+Date: Thu, 9 Sep 2021 21:53:11 +0300
+Subject: [PATCH] Fix the check-exports tests for versioned symbols
+
+---
+ test/suites/api/check-exports | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/suites/api/check-exports b/test/suites/api/check-exports
+index 2b6b3c7..5c82064 100755
+--- a/test/suites/api/check-exports
++++ b/test/suites/api/check-exports
+@@ -15,7 +15,7 @@ grep 'json_\|jansson_' $top_srcdir/src/jansson.def \
+ nm -D $SOFILE >/dev/null >$test_log/symbols 2>/dev/null \
+     || exit 77  # Skip if "nm -D" doesn't seem to work
+ 
+-grep ' [DT] ' $test_log/symbols | cut -d' ' -f3 | grep -v '^_' | sort >$test_log/output
++grep ' [DT] ' $test_log/symbols | cut -d' ' -f3 | grep -v '^_' | sed 's/@@libjansson.*//' | sort >$test_log/output
+ 
+ if ! cmp -s $test_log/exports $test_log/output; then
+     diff -u $test_log/exports $test_log/output >&2
+-- 
+2.46.0
+

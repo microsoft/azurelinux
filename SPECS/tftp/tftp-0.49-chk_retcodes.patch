@@ -1,0 +1,15 @@
+diff -up tftp-hpa-0.49/tftpd/tftpd.c.chk_retcodes tftp-hpa-0.49/tftpd/tftpd.c
+--- tftp-hpa-0.49/tftpd/tftpd.c.chk_retcodes	2009-01-15 15:28:50.000000000 +0100
++++ tftp-hpa-0.49/tftpd/tftpd.c	2009-01-15 15:31:36.000000000 +0100
+@@ -932,7 +932,10 @@ int main(int argc, char **argv)
+             exit(EX_OSERR);
+         }
+ #ifdef __CYGWIN__
+-        chdir("/");             /* Cygwin chroot() bug workaround */
++				if (chdir("/") < 0) {			/* Cygwin chroot() bug workaround */
++					syslog(LOG_ERR, "chroot: %m");
++					exit(EX_OSERR);
++				}
+ #endif
+     }
+ #ifdef HAVE_SETREGID

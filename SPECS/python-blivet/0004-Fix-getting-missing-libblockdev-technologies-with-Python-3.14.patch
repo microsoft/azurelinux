@@ -1,0 +1,30 @@
+From e231d01e62be2914d659df15e5adc78f0aa3ec34 Mon Sep 17 00:00:00 2001
+From: Vojtech Trefny <vtrefny@redhat.com>
+Date: Mon, 9 Jun 2025 20:59:32 +0200
+Subject: [PATCH] Fix getting missing libblockdev technologies with Python 3.14
+
+Hotfix for rhbz#2371256. Technologies in libblockdev are defined
+as enums and we are using 'value_name' to get the technology name/
+description in blivet. For some unknown reason the 'value_name'
+attribute from GLib.GEnumValue is not available with Python 3.14.
+This needs to be investigated more thoroughly, but for now we can
+just not include this information.
+
+Resolves: rhbz#2371256
+---
+ blivet/tasks/availability.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/blivet/tasks/availability.py b/blivet/tasks/availability.py
+index 388b199c1..e93687a97 100644
+--- a/blivet/tasks/availability.py
++++ b/blivet/tasks/availability.py
+@@ -225,7 +225,7 @@ def _check_technologies(self):
+             try:
+                 self._tech_info.check_fn(tech, mode)
+             except GLib.GError as e:
+-                errors.append("%s: %s" % (tech.value_name, e.message))
++                errors.append("%s" % e.message)
+         return errors
+ 
+     def availability_errors(self, resource):

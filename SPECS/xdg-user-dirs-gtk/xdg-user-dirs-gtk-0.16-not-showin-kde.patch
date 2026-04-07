@@ -1,0 +1,25 @@
+From 570692d0eba26ad8f448e77ce071634418be9d4d Mon Sep 17 00:00:00 2001
+From: Daniel Rusek <mail@asciiwolf.com>
+Date: Sun, 14 Dec 2025 13:08:09 +0000
+Subject: [PATCH] desktop: Run in all GTK desktops
+
+---
+ user-dirs-update-gtk.desktop.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/user-dirs-update-gtk.desktop.in b/user-dirs-update-gtk.desktop.in
+index b0a78aa..ec0b236 100644
+--- a/user-dirs-update-gtk.desktop.in
++++ b/user-dirs-update-gtk.desktop.in
+@@ -3,7 +3,7 @@ Exec=xdg-user-dirs-gtk-update
+ Name=User folders update
+ Comment=Update common folders names to match current locale
+ Terminal=false
+-OnlyShowIn=GNOME;LXDE;Unity;
++NotShowIn=KDE;LXQt;
+ NoDisplay=true
+ Type=Application
+ StartupNotify=false
+-- 
+GitLab
+

@@ -1,0 +1,3 @@
+%__mono_provides	%{_rpmconfigdir}/mono-find-provides %{_builddir}/%{?buildsubdir} %{buildroot} %{_prefix} %{_lib}
+%__mono_requires	%{_rpmconfigdir}/mono-find-requires %{_builddir}/%{?buildsubdir} %{buildroot} %{_prefix} %{_lib}
+%__mono_magic		Mono/.Net assembly

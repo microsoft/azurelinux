@@ -1,0 +1,8 @@
+# Fails since 10.11.15
+parts.partition_alter4_innodb           : BUG#0
+encryption.innodb_page_encryption_key_change    : BUG#0
+mariabackup.encrypted_page_corruption       : BUG#0
+stress.ddl_innodb                           : BUG#0
+innodb.table_flags                          : BUG#0
+mariabackup.incremental_backup              : BUG#0
+innodb_fts.misc_1                           : BUG#0

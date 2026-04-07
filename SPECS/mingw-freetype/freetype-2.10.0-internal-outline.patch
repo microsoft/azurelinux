@@ -1,0 +1,74 @@
+diff -rupN --no-dereference freetype-2.13.3/include/freetype/ftoutln.h freetype-2.13.3-new/include/freetype/ftoutln.h
+--- freetype-2.13.3/include/freetype/ftoutln.h	2024-07-18 09:14:58.000000000 +0200
++++ freetype-2.13.3-new/include/freetype/ftoutln.h	2024-10-10 09:57:06.931347640 +0200
+@@ -166,6 +166,15 @@ FT_BEGIN_HEADER
+                   FT_Int       numContours,
+                   FT_Outline  *anoutline );
+ 
++  /*
++   * Kept downstream for ABI compatibility only.
++   * It just throws error now. Remove once soname has been bumped.
++   */
++  FT_EXPORT( FT_Error )
++  FT_Outline_New_Internal( FT_Memory    memory,
++                           FT_UInt      numPoints,
++                           FT_Int       numContours,
++                           FT_Outline  *anoutline );
+ 
+   /**************************************************************************
+    *
+@@ -193,6 +202,13 @@ FT_BEGIN_HEADER
+   FT_Outline_Done( FT_Library   library,
+                    FT_Outline*  outline );
+ 
++  /*
++   * Kept downstream for ABI compatibility only.
++   * It just throws error now. Remove once soname has been bumped.
++   */
++  FT_EXPORT( FT_Error )
++  FT_Outline_Done_Internal( FT_Memory    memory,
++                            FT_Outline*  outline );
+ 
+   /**************************************************************************
+    *
+diff -rupN --no-dereference freetype-2.13.3/src/base/ftoutln.c freetype-2.13.3-new/src/base/ftoutln.c
+--- freetype-2.13.3/src/base/ftoutln.c	2024-07-18 09:48:43.000000000 +0200
++++ freetype-2.13.3-new/src/base/ftoutln.c	2024-10-10 09:57:06.931347640 +0200
+@@ -300,6 +300,19 @@
+ 
+   /* documentation is in ftoutln.h */
+ 
++  /*
++   * Kept downstream for ABI compatibility only.
++   * It just throws error now. Remove once soname has been bumped.
++   */
++  FT_EXPORT_DEF( FT_Error )
++  FT_Outline_New_Internal( FT_Memory    memory,
++                           FT_UInt      numPoints,
++                           FT_Int       numContours,
++                           FT_Outline  *anoutline )
++  {
++    return FT_THROW( Unimplemented_Feature );
++  }
++
+   FT_EXPORT_DEF( FT_Error )
+   FT_Outline_New( FT_Library   library,
+                   FT_UInt      numPoints,
+@@ -434,6 +447,17 @@
+ 
+   /* documentation is in ftoutln.h */
+ 
++  /*
++   * Kept downstream for ABI compatibility only.
++   * It just throws error now. Remove once soname has been bumped.
++   */
++  FT_EXPORT_DEF( FT_Error )
++  FT_Outline_Done_Internal( FT_Memory    memory,
++                            FT_Outline*  outline )
++  {
++    return FT_THROW( Unimplemented_Feature );
++  }
++
+   FT_EXPORT_DEF( FT_Error )
+   FT_Outline_Done( FT_Library   library,
+                    FT_Outline*  outline )

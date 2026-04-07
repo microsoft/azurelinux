@@ -1,0 +1,29 @@
+--- native-tls-0.2.15/Cargo.toml	2006-07-24T01:21:28+00:00
++++ native-tls-0.2.15/Cargo.toml	2026-02-12T21:17:26.757855+00:00
+@@ -34,7 +34,7 @@
+ ]
+ 
+ [features]
+-alpn = ["security-framework/alpn"]
++alpn = []
+ vendored = ["openssl/vendored"]
+ 
+ [lib]
+@@ -71,17 +71,3 @@
+ [target.'cfg(not(any(target_os = "windows", target_vendor = "apple")))'.dependencies.openssl-sys]
+ version = "0.9.106"
+ 
+-[target.'cfg(target_os = "macos")'.dependencies.tempfile]
+-version = "3.1.0"
+-
+-[target.'cfg(target_os = "windows")'.dependencies.schannel]
+-version = "0.1.26"
+-
+-[target.'cfg(target_vendor = "apple")'.dependencies.libc]
+-version = "0.2.170"
+-
+-[target.'cfg(target_vendor = "apple")'.dependencies.security-framework]
+-version = "2.11.1"
+-
+-[target.'cfg(target_vendor = "apple")'.dependencies.security-framework-sys]
+-version = "2.15.0"

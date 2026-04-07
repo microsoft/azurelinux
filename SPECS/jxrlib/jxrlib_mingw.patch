@@ -1,0 +1,94 @@
+diff -rupN jxrlib/common/include/wmspecstring.h jxrlib-new/common/include/wmspecstring.h
+--- jxrlib/common/include/wmspecstring.h	2013-03-21 18:58:18.000000000 +0100
++++ jxrlib-new/common/include/wmspecstring.h	2015-09-06 21:10:53.943039237 +0200
+@@ -334,7 +334,7 @@ void __pfx_assume(int, const char *);
+ 
+ // Some CE versions don't have specstrings.h, some have very old version without
+ // __specstrings defined. So we handle CE separately in wmasalce.h
+-#if defined(UNDER_CE) || defined(NO_WINDOWS)
++#if defined(UNDER_CE) || defined(NO_WINDOWS) || defined(MINGW)
+   #include "wmspecstringce.h"
+ #endif
+ 
+diff -rupN jxrlib/image/sys/ansi.h jxrlib-new/image/sys/ansi.h
+--- jxrlib/image/sys/ansi.h	2013-03-28 18:34:06.000000000 +0100
++++ jxrlib-new/image/sys/ansi.h	2015-09-06 21:18:54.051637086 +0200
+@@ -44,13 +44,9 @@
+ //================================
+ #define FORCE_INLINE
+ #define CDECL
+-#if __LP64__
+-#define UINTPTR_T unsigned long long
+-#define INTPTR_T long long
+-#else
+-#define UINTPTR_T unsigned int
+-#define INTPTR_T int
+-#endif
++#include <stdint.h>
++#define UINTPTR_T uintptr_t
++#define INTPTR_T intptr_t
+ 
+ 
+ //================================
+diff -rupN jxrlib/image/sys/strcodec.h jxrlib-new/image/sys/strcodec.h
+--- jxrlib/image/sys/strcodec.h	2015-09-06 02:21:20.337316724 +0200
++++ jxrlib-new/image/sys/strcodec.h	2015-09-06 21:18:44.335483326 +0200
+@@ -40,7 +40,7 @@
+ 
+ //================================================================
+ #ifdef ENABLE_OPTIMIZATIONS
+-#if defined(WIN32) && !defined(_WIN64)
++#if defined(_MSC_VER) && !defined(_WIN64)
+ #define WMP_OPT_SSE2
+ 
+ #define WMP_OPT_CC_ENC
+@@ -57,9 +57,9 @@
+ 
+ //================================================================
+ //#ifdef WIN32
+-#if defined(WIN32) && !defined(UNDER_CE)   // WIN32 seems to be defined always in VS2005 for ARM platform
++#if defined(_MSC_VER) && !defined(UNDER_CE)   // WIN32 seems to be defined always in VS2005 for ARM platform
+ #define PLATFORM_X86
+-#include "..\x86\x86.h"
++#include "../x86/x86.h"
+ #endif
+ 
+ #ifndef UNREFERENCED_PARAMETER
+@@ -89,6 +89,7 @@ typedef unsigned __int64 U64;
+ 
+ // The following macros depend on UINTPTR_T and INTPTR_T being properly defined
+ // so that they are equal to pointer width. Confirm and fail if our assumptions are wrong.
++
+ CT_ASSERT(sizeof(UINTPTR_T) == sizeof(void*), strcodec1);
+ CT_ASSERT(sizeof(INTPTR_T) == sizeof(void*), strcodec2);
+ 
+@@ -450,7 +451,7 @@ typedef struct CWMImageStrCodec {
+ 
+     struct WMPStream ** ppWStream;
+ 
+-#ifdef WIN32
++#ifdef _MSC_VER
+     TCHAR **ppTempFile;
+ #else
+     char **ppTempFile;
+diff -rupN jxrlib/jxrgluelib/JXRMeta.h jxrlib-new/jxrgluelib/JXRMeta.h
+--- jxrlib/jxrgluelib/JXRMeta.h	2015-09-06 02:21:20.340316728 +0200
++++ jxrlib-new/jxrgluelib/JXRMeta.h	2015-09-06 21:10:53.944039253 +0200
+@@ -28,7 +28,7 @@
+ #pragma once
+ 
+ #include <windowsmediaphoto.h>
+-#ifndef WIN32
++#ifndef _MSC_VER
+ #include <wmspecstring.h>
+ #endif
+ 
+@@ -106,7 +106,7 @@
+ #define WMP_valWMPhotoID WMP_valCompression
+ 
+ 
+-#ifdef WIN32
++#ifdef _MSC_VER
+ #define __in_win    __in
+ #define __out_win   __out
+ #endif

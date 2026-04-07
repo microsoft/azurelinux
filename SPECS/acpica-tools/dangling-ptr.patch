@@ -1,0 +1,25 @@
+Index: acpica-unix2-20240321/source/components/utilities/utdebug.c
+===================================================================
+--- acpica-unix2-20240321.orig/source/components/utilities/utdebug.c
++++ acpica-unix2-20240321/source/components/utilities/utdebug.c
+@@ -58,6 +58,10 @@ static const char           *AcpiGbl_Fun
+ static const char           *AcpiGbl_FunctionExitPrefix  = "----Exit-";
+ 
+ 
++#if defined(__GNUC__) && (__GNUC__ > 11)
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wdangling-pointer"
++#endif
+ /*******************************************************************************
+  *
+  * FUNCTION:    AcpiUtInitStackPtrTrace
+@@ -120,6 +124,9 @@ AcpiUtTrackStackPtr (
+         AcpiGbl_DeepestNesting = AcpiGbl_NestingLevel;
+     }
+ }
++#if defined(__GNUC__) && (__GNUC__ > 11)
++#pragma GCC diagnostic pop
++#endif
+ 
+ 
+ /*******************************************************************************

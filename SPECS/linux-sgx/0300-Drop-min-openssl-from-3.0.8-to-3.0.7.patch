@@ -1,0 +1,29 @@
+From 22a2f289d7e613e070e23897596ff8451402d680 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Tue, 3 Sep 2024 10:11:45 +0100
+Subject: [PATCH 300/301] Drop min openssl from 3.0.8 to 3.0.7
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ sources/ippcp/crypto_mb/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sources/ippcp/crypto_mb/CMakeLists.txt b/sources/ippcp/crypto_mb/CMakeLists.txt
+index 6e810567..d92f6c68 100644
+--- a/sources/ippcp/crypto_mb/CMakeLists.txt
++++ b/sources/ippcp/crypto_mb/CMakeLists.txt
+@@ -76,7 +76,7 @@ if(BORINGSSL OR BABASSL) # off by default
+     # by find_package(OpenSSL)
+     find_package(OpenSSL REQUIRED)
+ else()
+-    find_package(OpenSSL 3.0.8 REQUIRED) # set -DOPENSSL_INCLUDE_DIR= -DOPENSSL_LIBRARIES= -DOPENSSL_ROOT_DIR= to use patched
++    find_package(OpenSSL 3.0.7 REQUIRED) # set -DOPENSSL_INCLUDE_DIR= -DOPENSSL_LIBRARIES= -DOPENSSL_ROOT_DIR= to use patched
+ endif()
+ 
+ if(BN_OPENSSL_PATCH)
+-- 
+2.46.0
+

@@ -1,0 +1,43 @@
+diff -up allegro-4.4.2/src/x/xwin.c~ allegro-4.4.2/src/x/xwin.c
+--- allegro-4.4.2/src/x/xwin.c~	2015-06-23 11:04:53.000000000 +0200
++++ allegro-4.4.2/src/x/xwin.c	2015-06-23 11:09:33.010580738 +0200
+@@ -26,6 +26,7 @@
+ #include "xwin.h"
+ 
+ #include <string.h>
++#include <unistd.h>
+ #include <X11/Xlib.h>
+ #include <X11/Xutil.h>
+ #include <X11/cursorfont.h>
+@@ -736,6 +736,8 @@ static void _xwin_private_setup_driver_d
+ static BITMAP *_xwin_private_create_screen(GFX_DRIVER *drv, int w, int h,
+ 					   int vw, int vh, int depth, int fullscreen)
+ {
++   int i;
++
+    if (_xwin.window == None) {
+       ustrzcpy(allegro_error, ALLEGRO_ERROR_SIZE, get_config_text("No window"));
+       return 0;
+@@ -816,8 +818,20 @@ static BITMAP *_xwin_private_create_scre
+       XReparentWindow(_xwin.display, _xwin.window, _xwin.fs_window, 0, 0);
+ 
+       /* Grab the keyboard and mouse.  */
+-      if (XGrabKeyboard(_xwin.display, XDefaultRootWindow(_xwin.display), False,
+-			GrabModeAsync, GrabModeAsync, CurrentTime) != GrabSuccess) {
++
++      /*
++       * Sometimes the window-manager has grabbed the keyboard while it is
++       * starting an allegro app, so if grabing fails retry for 2 seconds
++       * before giving up.
++       */
++      for (i = 0; i < 20; i++) {
++         if (XGrabKeyboard(_xwin.display, XDefaultRootWindow(_xwin.display), False,
++			   GrabModeAsync, GrabModeAsync, CurrentTime) == GrabSuccess)
++            break;
++
++         usleep(100000); /* Sleep 100 ms before retrying */
++      }
++      if (i == 20) {
+ 	 ustrzcpy(allegro_error, ALLEGRO_ERROR_SIZE, get_config_text("Can not grab keyboard"));
+ 	 return 0;
+       }

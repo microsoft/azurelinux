@@ -1,0 +1,232 @@
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Fri, 4 Feb 2022 20:47:33 +0100
+Subject: [PATCH] Unbundle hex_core ver. 0.7.1
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+
+diff --git a/apps/rebar/src/rebar.app.src.script b/apps/rebar/src/rebar.app.src.script
+index 36186faa..7bd87b45 100644
+--- a/apps/rebar/src/rebar.app.src.script
++++ b/apps/rebar/src/rebar.app.src.script
+@@ -26,6 +26,7 @@
+                   ssl_verify_fun,
+                   certifi,
+                   cth_readable,
++                  hex_core,
+                   relx,
+                   cf,
+                   inets,
+diff --git a/apps/rebar/src/rebar_hex_repos.erl b/apps/rebar/src/rebar_hex_repos.erl
+index 04cdf687..9595ea58 100644
+--- a/apps/rebar/src/rebar_hex_repos.erl
++++ b/apps/rebar/src/rebar_hex_repos.erl
+@@ -95,7 +95,7 @@ repos(HexConfig) ->
+             merge_repos(RepoList ++ [HexDefaultConfig])
+     end.
+ 
+-%% merge repos must add a field repo_name to work with r3_hex_core 0.5.0
++%% merge repos must add a field repo_name to work with hex_core 0.5.0
+ -spec merge_repos([repo()]) -> [repo()].
+ merge_repos(Repos) ->
+     lists:foldl(fun(R = #{name := Name}, ReposAcc) ->
+@@ -147,7 +147,7 @@ update_repo_list(R, []) ->
+     [R].
+ 
+ default_repo() ->
+-    HexDefaultConfig = r3_hex_core:default_config(),
++    HexDefaultConfig = hex_core:default_config(),
+     HexDefaultConfig#{name => ?PUBLIC_HEX_REPO, repo_verify_origin => repo_verify_origin()}.
+ 
+ repo_verify_origin() ->
+diff --git a/apps/rebar/src/rebar_httpc_adapter.erl b/apps/rebar/src/rebar_httpc_adapter.erl
+index 26318d1b..7a8dc45e 100644
+--- a/apps/rebar/src/rebar_httpc_adapter.erl
++++ b/apps/rebar/src/rebar_httpc_adapter.erl
+@@ -1,7 +1,7 @@
+ %% Derived from hex_core v0.7.1 for extra flexibility.
+ 
+ -module(rebar_httpc_adapter).
+--behaviour(r3_hex_http).
++-behaviour(hex_http).
+ -export([request/5]).
+ 
+ %%====================================================================
+diff --git a/apps/rebar/src/rebar_packages.erl b/apps/rebar/src/rebar_packages.erl
+index 4f88e34f..a2024fdf 100644
+--- a/apps/rebar/src/rebar_packages.erl
++++ b/apps/rebar/src/rebar_packages.erl
+@@ -31,7 +31,7 @@ format_error({missing_package, Pkg}) ->
+ 
+ -spec get(rebar_hex_repos:repo(), binary()) -> {ok, map()} | {error, term()}.
+ get(Config, Name) ->
+-    try r3_hex_api_package:get(Config, Name) of
++    try hex_api_package:get(Config, Name) of
+         {ok, {200, _Headers, PkgInfo}} ->
+             {ok, PkgInfo};
+         {ok, {404, _, _}} ->
+@@ -221,7 +221,7 @@ update_package(Name, RepoConfig=#{name := Repo}, State) ->
+     ?MODULE:verify_table(State),
+     ?DEBUG("Getting definition for package ~ts from repo ~ts",
+            [Name, rebar_hex_repos:format_repo(RepoConfig)]),
+-    try r3_hex_repo:get_package(get_package_repo_config(RepoConfig), Name) of
++    try hex_repo:get_package(get_package_repo_config(RepoConfig), Name) of
+         {ok, {200, _Headers, Package}} ->
+             #{releases := Releases} = Package,
+             _ = insert_releases(Name, Releases, Repo, ?PACKAGE_TABLE),
+@@ -237,7 +237,7 @@ update_package(Name, RepoConfig=#{name := Repo}, State) ->
+             fail;
+         Error ->
+             ?DEBUG("Hex get_package request failed: ~p", [Error]),
+-            %% TODO: add better log message. r3_hex_core should export a format_error
++            %% TODO: add better log message. hex_core should export a format_error
+             ?WARN("Failed to update package ~ts from repo ~ts", [Name, Repo]),
+             fail
+     catch
+diff --git a/apps/rebar/src/rebar_pkg_resource.erl b/apps/rebar/src/rebar_pkg_resource.erl
+index d7d4f25a..4778cc30 100644
+--- a/apps/rebar/src/rebar_pkg_resource.erl
++++ b/apps/rebar/src/rebar_pkg_resource.erl
+@@ -142,7 +142,7 @@ format_error({bad_registry_checksum, Name, Vsn, Expected, Found}) ->
+              -> {ok, cached} | {ok, binary(), binary()} | error.
+ request(Config, Name, Version, ETag) ->
+     Config1 = Config#{http_etag => ETag},
+-    try r3_hex_repo:get_tarball(Config1, Name, Version) of
++    try hex_repo:get_tarball(Config1, Name, Version) of
+         {ok, {200, #{<<"etag">> := ETag1}, Tarball}} ->
+             {ok, Tarball, ETag1};
+         {ok, {304, _Headers, _}} ->
+@@ -247,7 +247,7 @@ serve_from_cache(TmpDir, CachePath, Pkg) ->
+ serve_from_memory(TmpDir, Binary, {pkg, _Name, _Vsn, OldHash, Hash, _RepoConfig}) ->
+     RegistryChecksum = list_to_integer(binary_to_list(Hash), 16),
+     OldRegistryChecksum =  maybe_old_registry_checksum(OldHash),
+-    case r3_hex_tarball:unpack(Binary, TmpDir) of
++    case hex_tarball:unpack(Binary, TmpDir) of
+         {ok, #{outer_checksum := <<Checksum:256/big-unsigned>>} = Res} when RegistryChecksum =/= Checksum ->
+             #{inner_checksum := <<OldChecksum:256/big-unsigned>>} = Res,
+             %% Not triggerable in tests, but code feels logically wrong without it since inner checksums are not hard
+diff --git a/apps/rebar/test/mock_pkg_resource.erl b/apps/rebar/test/mock_pkg_resource.erl
+index f609b5f3..e34d3e75 100644
+--- a/apps/rebar/test/mock_pkg_resource.erl
++++ b/apps/rebar/test/mock_pkg_resource.erl
+@@ -101,7 +101,7 @@ mock_download(Opts) ->
+                          <<"version">> => Vsn},
+ 
+             Files = all_files(rebar_app_info:dir(AppInfo1)),
+-            {ok, #{tarball := Tarball}} = r3_hex_tarball:create(Metadata, archive_names(Dir, Files)),
++            {ok, #{tarball := Tarball}} = hex_tarball:create(Metadata, archive_names(Dir, Files)),
+             Archive = filename:join([Dir, TarApp]),
+             file:write_file(Archive, Tarball),
+ 
+diff --git a/apps/rebar/test/rebar_pkg_SUITE.erl b/apps/rebar/test/rebar_pkg_SUITE.erl
+index 4c89073c..45d174bc 100644
+--- a/apps/rebar/test/rebar_pkg_SUITE.erl
++++ b/apps/rebar/test/rebar_pkg_SUITE.erl
+@@ -97,7 +97,7 @@ init_per_testcase(bad_disconnect=Name, Config0) ->
+                {pkg, Pkg}
+               | Config0],
+     Config = mock_config(Name, Config1),
+-    meck:expect(r3_hex_repo, get_tarball, fun(_, _, _) ->
++    meck:expect(hex_repo, get_tarball, fun(_, _, _) ->
+                                                {error, econnrefused}
+                                        end),
+     Config;
+@@ -289,8 +289,8 @@ mock_config(Name, Config) ->
+                   end, AllDeps),
+ 
+ 
+-    meck:new(r3_hex_repo, [passthrough]),
+-    meck:expect(r3_hex_repo, get_package,
++    meck:new(hex_repo, [passthrough]),
++    meck:expect(hex_repo, get_package,
+                 fun(_Config, PkgName) ->
+                         Matches = ets:match_object(Tid, {{PkgName,'_'}, '_'}),
+                         Releases =
+@@ -312,7 +312,7 @@ mock_config(Name, Config) ->
+                 end),
+     meck:expect(rebar_state, resources,
+                 fun(_State) ->
+-                        DefaultConfig = r3_hex_core:default_config(),
++                        DefaultConfig = hex_core:default_config(),
+                         [rebar_resource_v2:new(pkg, rebar_pkg_resource,
+                                                #{repos => [DefaultConfig#{name => <<"hexpm">>}],
+                                                  base_config => #{}})]
+@@ -334,7 +334,7 @@ mock_config(Name, Config) ->
+     PkgFile = <<Pkg/binary, "-", Vsn/binary, ".tar">>,
+     {ok, PkgContents} = file:read_file(filename:join(?config(data_dir, Config), PkgFile)),
+ 
+-    meck:expect(r3_hex_repo, get_tarball, fun(_, _, _) when GoodCache ->
++    meck:expect(hex_repo, get_tarball, fun(_, _, _) when GoodCache ->
+                                                {ok, {304, #{<<"etag">> => ?good_etag}, <<>>}};
+                                           (_, _, _) ->
+                                                {ok, {200, #{<<"etag">> => ?good_etag}, PkgContents}}
+diff --git a/apps/rebar/test/rebar_pkg_alias_SUITE.erl b/apps/rebar/test/rebar_pkg_alias_SUITE.erl
+index 6aaea9c6..d5b30d10 100644
+--- a/apps/rebar/test/rebar_pkg_alias_SUITE.erl
++++ b/apps/rebar/test/rebar_pkg_alias_SUITE.erl
+@@ -242,8 +242,8 @@ mock_config(Name, Config) ->
+ 
+                   end, AllDeps),
+ 
+-    meck:new(r3_hex_repo, [passthrough]),
+-    meck:expect(r3_hex_repo, get_package,
++    meck:new(hex_repo, [passthrough]),
++    meck:expect(hex_repo, get_package,
+                 fun(_Config, PkgName) ->
+                         Matches = ets:match_object(Tid, {{PkgName,'_'}, '_'}),
+                         Releases =
+@@ -255,7 +255,7 @@ mock_config(Name, Config) ->
+                         {ok, {200, #{}, Releases}}
+                 end),
+ 
+-    meck:expect(r3_hex_repo, get_tarball, fun(_, _, _) ->
++    meck:expect(hex_repo, get_tarball, fun(_, _, _) ->
+                                                {ok, {304, #{<<"etag">> => EtagGood}, <<>>}}
+                                        end),
+ 
+diff --git a/apps/rebar/test/rebar_test_utils.erl b/apps/rebar/test/rebar_test_utils.erl
+index 395698c9..e8042bc0 100644
+--- a/apps/rebar/test/rebar_test_utils.erl
++++ b/apps/rebar/test/rebar_test_utils.erl
+@@ -543,7 +543,7 @@ package_app(AppDir, DestDir, PkgName, PkgVsn) ->
+     Files = lists:zip([filename:join("src", F) || F <- Fs], [filename:join(AppSrc,F) || F <- Fs]),
+     Metadata = #{<<"app">> => list_to_binary(PkgName),
+                  <<"version">> => list_to_binary(PkgVsn)},
+-    {ok, #{tarball := Tarball, outer_checksum := <<Checksum:256/big-unsigned-integer>>}} = r3_hex_tarball:create(Metadata, Files),
++    {ok, #{tarball := Tarball, outer_checksum := <<Checksum:256/big-unsigned-integer>>}} = hex_tarball:create(Metadata, Files),
+ 
+     Name = PkgName++"-"++PkgVsn++".tar",
+     Archive = filename:join(DestDir, Name),
+diff --git a/bootstrap b/bootstrap
+index 6593654e..bf9df5ad 100755
+--- a/bootstrap
++++ b/bootstrap
+@@ -38,7 +38,6 @@ main(Args) ->
+     filelib:ensure_dir("_build/bootstrap/lib/rebar/ebin/"),
+ 
+     os:putenv("REBAR_PROFILE", "bootstrap"),
+-    compile_vendored(),
+ 
+     %% Build rebar3 modules with compile:file
+     bootstrap_rebar3(),
+@@ -137,14 +136,6 @@ maybe_set_ipfamily({ok, _}, Family) ->
+ maybe_set_ipfamily(_, _Family) ->
+     ok.
+ 
+-compile_vendored() ->
+-  compile_xrl_file("apps/rebar/src/vendored/r3_safe_erl_term.xrl"),
+-  Sources = filelib:wildcard(filename:join(["apps/rebar/src/vendored", "*.erl"])),
+-  OutDir =  filename:absname("_build/bootstrap/lib/rebar/ebin"),
+-  code:add_patha(OutDir),
+-  Opts = [debug_info,{outdir, OutDir}, return | additional_defines()],
+-  [compile_erl_file(X, Opts) || X <- Sources].
+-
+ compile(App, FirstFiles) ->
+     Dir = filename:join(filename:absname("_build/default/lib/"), App),
+     filelib:ensure_dir(filename:join([Dir, "ebin", "dummy.beam"])),
+diff --git a/systest/all_SUITE_data/compile_deps/rebar.config.script b/systest/all_SUITE_data/compile_deps/rebar.config.script
+index c0ebab17..fc8fc2a5 100644
+--- a/systest/all_SUITE_data/compile_deps/rebar.config.script
++++ b/systest/all_SUITE_data/compile_deps/rebar.config.script
+@@ -1,2 +1 @@
+-os:putenv("LOCALDEP_DIR", "./vendored/").
+ CONFIG.

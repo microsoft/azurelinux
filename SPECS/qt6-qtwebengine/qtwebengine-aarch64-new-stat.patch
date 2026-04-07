@@ -1,0 +1,12 @@
+diff -up qtwebengine-everywhere-src-5.11.3/src/3rdparty/chromium/sandbox/linux/system_headers/arm64_linux_syscalls.h.aarch64-new-stat qtwebengine-everywhere-src-5.11.3/src/3rdparty/chromium/sandbox/linux/system_headers/arm64_linux_syscalls.h
+--- qtwebengine-everywhere-src-5.11.3/src/3rdparty/chromium/sandbox/linux/system_headers/arm64_linux_syscalls.h.aarch64-new-stat	2018-11-19 12:55:45.000000000 -0600
++++ qtwebengine-everywhere-src-5.11.3/src/3rdparty/chromium/sandbox/linux/system_headers/arm64_linux_syscalls.h	2018-12-08 21:16:39.931896244 -0600
+@@ -5,6 +5,8 @@
+ #ifndef SANDBOX_LINUX_SYSTEM_HEADERS_ARM64_LINUX_SYSCALLS_H_
+ #define SANDBOX_LINUX_SYSTEM_HEADERS_ARM64_LINUX_SYSCALLS_H_
+ 
++#define __ARCH_WANT_NEW_STAT
++
+ #include <asm-generic/unistd.h>
+ 
+ #if !defined(__NR_io_setup)

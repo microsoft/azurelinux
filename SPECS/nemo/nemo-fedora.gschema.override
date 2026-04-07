@@ -1,0 +1,10 @@
+[org.nemo.desktop]
+computer-icon-visible=true
+font='Noto Sans 9'
+home-icon-visible=true
+trash-icon-visible=true
+
+[org.nemo.preferences]
+context-menus-show-all-actions=true
+show-location-entry=true
+show-reload-icon-toolbar=true

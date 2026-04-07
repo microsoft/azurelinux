@@ -1,0 +1,89 @@
+From 3b1b56c00b34e1d00349349a8a91d0add72ce97b Mon Sep 17 00:00:00 2001
+From: Karel Zak <kzak@redhat.com>
+Date: Tue, 24 Jun 2025 10:56:58 +0200
+Subject: [PATCH] libmount: disable EROFS backing file support
+
+Let's temporarily use the old reliable loop devices rather than directly
+mounting EROFS images. It seems some tools need to adapt to the change.
+See https://github.com/dracut-ng/dracut-ng/issues/1384
+
+Signed-off-by: Karel Zak <kzak@redhat.com>
+---
+ libmount/src/context_mount.c | 35 -----------------------------------
+ libmount/src/hook_loopdev.c  |  7 -------
+ 2 files changed, 42 deletions(-)
+
+diff --git a/libmount/src/context_mount.c b/libmount/src/context_mount.c
+index fbb200708..4d6d53194 100644
+--- a/libmount/src/context_mount.c
++++ b/libmount/src/context_mount.c
+@@ -961,24 +961,6 @@ int mnt_context_finalize_mount(struct libmnt_context *cxt)
+ 	return rc;
+ }
+ 
+-static int is_erofs_regfile(struct libmnt_context *cxt)
+-{
+-	const char *type = mnt_fs_get_fstype(cxt->fs);
+-	const char *src = mnt_fs_get_srcpath(cxt->fs);
+-	unsigned long flags = 0;
+-	struct stat st;
+-
+-	if (!type || strcmp(type, "erofs") != 0)
+-		return 0;
+-	if (mnt_context_get_user_mflags(cxt, &flags))
+-		return 0;
+-	if (flags & (MNT_MS_LOOP | MNT_MS_OFFSET | MNT_MS_SIZELIMIT))
+-		return 0;	/* it's already loopdev */
+-	if (!src || stat(src, &st) != 0 || !S_ISREG(st.st_mode))
+-		return 0;
+-	return 1;
+-}
+-
+ /**
+  * mnt_context_mount:
+  * @cxt: mount context
+@@ -1083,23 +1065,6 @@ again:
+ 		}
+ 	}
+ 
+-	/*
+-	 * Try mount EROFS image again with loop device.
+-	 * See hook_loopdev.c:is_loopdev_required() for more details.
+-	 */
+-	if (rc && mnt_context_get_syscall_errno(cxt) == ENOTBLK
+-	       && is_erofs_regfile(cxt)) {
+-		struct libmnt_optlist *ol = mnt_context_get_optlist(cxt);
+-
+-		mnt_context_reset_status(cxt);
+-		DBG(CXT, ul_debugobj(cxt, "enabling loop= for EROFS"));
+-		mnt_optlist_append_flags(ol, MNT_MS_LOOP, cxt->map_userspace);
+-
+-		rc = mnt_context_call_hooks(cxt, MNT_STAGE_PREP_SOURCE);
+-		if (!rc)
+-			goto again;
+-	}
+-
+ 	if (rc == 0)
+ 		rc = mnt_context_call_hooks(cxt, MNT_STAGE_POST);
+ 
+diff --git a/libmount/src/hook_loopdev.c b/libmount/src/hook_loopdev.c
+index 444d69d6f..29e181fe8 100644
+--- a/libmount/src/hook_loopdev.c
++++ b/libmount/src/hook_loopdev.c
+@@ -468,13 +468,6 @@ static int is_loopdev_required(struct libmnt_context *cxt, struct libmnt_optlist
+ 		}
+ 	}
+ 
+-	/* The EROFS kernel driver can be compiled with EROFS_FS_BACKED_BY_FILE,
+-	 * allowing for the mounting of a regular file as a filesystem without
+-	 * a loop device.
+-	 */
+-	if (type && strcmp(type, "erofs") == 0)
+-		return 0;
+-
+ 	/* Note that there is no restriction (on kernel side) that would
+ 	 * prevent a regular file as a mount(2) source argument. A filesystem
+ 	 * that is able to mount regular files could be implemented. For this
+-- 
+2.49.0
+

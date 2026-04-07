@@ -1,0 +1,35 @@
+From 1fa28a76f63822f144c055e259f7cd2dffa2e0da Mon Sep 17 00:00:00 2001
+From: James McCoy <jamessan@jamessan.com>
+Date: Tue, 7 May 2024 15:44:48 -0400
+Subject: [PATCH] Use core::mem::align_of to determine proper type aligment
+
+On i686, the u64 test sometimes fails because the required alignment is
+4-bytes, not 8-bytes.
+
+Closes #56
+Co-authored-by: Peter Michael Green <plugwash@debian.org>
+---
+ src/lib.rs | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index 6616514..861350b 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -2657,13 +2657,13 @@ mod tests {
+     #[test]
+     fn test_data_ptr_alignment() {
+         let v = ThinVec::<u16>::new();
+-        assert!(v.data_raw() as usize % 2 == 0);
++        assert!(v.data_raw() as usize % core::mem::align_of::<u16>() == 0);
+ 
+         let v = ThinVec::<u32>::new();
+-        assert!(v.data_raw() as usize % 4 == 0);
++        assert!(v.data_raw() as usize % core::mem::align_of::<u32>() == 0);
+ 
+         let v = ThinVec::<u64>::new();
+-        assert!(v.data_raw() as usize % 8 == 0);
++        assert!(v.data_raw() as usize % core::mem::align_of::<u64>() == 0);
+     }
+ 
+     #[test]

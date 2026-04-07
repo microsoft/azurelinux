@@ -1,0 +1,341 @@
+From 7a9b1b4d70a0ecf8b37d40c02a6b0d3dea0312c7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Thu, 15 May 2025 14:50:43 +0200
+Subject: [PATCH 1/3] Revert "Normalize how test dependencies are installed"
+
+This reverts commit 4cfc41797f942923859cf5ba70b70f7575f101e9.
+---
+ bundler/spec/spec_helper.rb                   |  6 ++
+ bundler/spec/support/builders.rb              |  9 ++-
+ bundler/spec/support/path.rb                  |  4 +-
+ bundler/spec/support/rubygems_ext.rb          | 73 ++++++++++---------
+ bundler/spec/support/setup.rb                 |  9 ---
+ 5 files changed, 54 insertions(+), 47 deletions(-)
+
+diff --git a/bundler/spec/spec_helper.rb b/bundler/spec/spec_helper.rb
+index 56f20999fd..470bf3e414 100644
+--- a/bundler/spec/spec_helper.rb
++++ b/bundler/spec/spec_helper.rb
+@@ -95,6 +95,8 @@ def self.ruby=(ruby)
+ 
+     extend(Spec::Builders)
+ 
++    check_test_gems!
++
+     build_repo1
+ 
+     reset_paths!
+@@ -117,4 +119,8 @@ def self.ruby=(ruby)
+   ensure
+     reset!
+   end
++
++  config.after :suite do
++    FileUtils.rm_r Spec::Path.pristine_system_gem_path
++  end
+ end
+diff --git a/bundler/spec/support/builders.rb b/bundler/spec/support/builders.rb
+index c566f87e56..dcd4dfe802 100644
+--- a/bundler/spec/support/builders.rb
++++ b/bundler/spec/support/builders.rb
+@@ -276,6 +276,14 @@ def build_repo(path, **kwargs, &blk)
+       update_repo(path,**kwargs, &blk)
+     end
+ 
++    def check_test_gems!
++      if rake_path.nil?
++        Spec::Rubygems.install_test_deps
++      end
++
++      Helpers.install_dev_bundler unless pristine_system_gem_path.exist?
++    end
++
+     def update_repo(path, build_compact_index: true)
+       exempted_caller = Gem.ruby_version >= Gem::Version.new("3.4.0.dev") ? "#{Module.nesting.first}#build_repo" : "build_repo"
+       if path == gem_repo1 && caller_locations(1, 1).first.label != exempted_caller
+@@ -445,7 +453,6 @@ def _build(options = {})
+         build_path = @context.tmp + full_name
+         bundler_path = build_path + "#{full_name}.gem"
+ 
+-        require "fileutils"
+         FileUtils.mkdir_p build_path
+ 
+         @context.shipped_files.each do |shipped_file|
+diff --git a/bundler/spec/support/path.rb b/bundler/spec/support/path.rb
+index cbfafd4575..1f2eb40a5a 100644
+--- a/bundler/spec/support/path.rb
++++ b/bundler/spec/support/path.rb
+@@ -223,7 +223,7 @@ def system_gem_path(*path)
+     end
+ 
+     def pristine_system_gem_path
+-      tmp_root.join("gems/pristine_system")
++      tmp("gems/base_system")
+     end
+ 
+     def local_gem_path(*path, base: bundled_app)
+@@ -277,7 +277,7 @@ def git_root
+     end
+ 
+     def rake_path
+-      Dir["#{base_system_gems}/*/*/**/rake*.gem"].first
++      Dir["#{base_system_gems}/#{Bundler.ruby_scope}/**/rake*.gem"].first
+     end
+ 
+     def sinatra_dependency_paths
+diff --git a/bundler/spec/support/rubygems_ext.rb b/bundler/spec/support/rubygems_ext.rb
+index 46261493db..ef40328d83 100644
+--- a/bundler/spec/support/rubygems_ext.rb
++++ b/bundler/spec/support/rubygems_ext.rb
+@@ -10,6 +10,10 @@ module Spec
+   module Rubygems
+     extend self
+ 
++    def dev_setup
++      install_gems(dev_gemfile)
++    end
++
+     def gem_load(gem_name, bin_container)
+       require_relative "switch_rubygems"
+ 
+@@ -53,12 +57,13 @@ def setup_test_paths
+     end
+ 
+     def install_test_deps
+-      dev_bundle("install", gemfile: test_gemfile, path: Path.base_system_gems.to_s)
+-      dev_bundle("install", gemfile: rubocop_gemfile, path: Path.rubocop_gems.to_s)
+-      dev_bundle("install", gemfile: standard_gemfile, path: Path.standard_gems.to_s)
++      install_gems(test_gemfile, Path.base_system_gems.to_s)
++      install_gems(rubocop_gemfile, Path.rubocop_gems.to_s)
++      install_gems(standard_gemfile, Path.standard_gems.to_s)
+ 
+-      require_relative "helpers"
+-      Helpers.install_dev_bundler
++      # For some reason, doing this here crashes on JRuby + Windows. So defer to
++      # when the test suite is running in that case.
++      Helpers.install_dev_bundler unless Gem.win_platform? && RUBY_ENGINE == "jruby"
+     end
+ 
+     def check_source_control_changes(success_message:, error_message:)
+@@ -81,36 +86,6 @@ def check_source_control_changes(success_message:, error_message:)
+       end
+     end
+ 
+-    def dev_bundle(*args, gemfile: dev_gemfile, path: nil)
+-      old_gemfile = ENV["BUNDLE_GEMFILE"]
+-      old_orig_gemfile = ENV["BUNDLER_ORIG_BUNDLE_GEMFILE"]
+-      ENV["BUNDLE_GEMFILE"] = gemfile.to_s
+-      ENV["BUNDLER_ORIG_BUNDLE_GEMFILE"] = nil
+-
+-      if path
+-        old_path = ENV["BUNDLE_PATH"]
+-        ENV["BUNDLE_PATH"] = path
+-      else
+-        old_path__system = ENV["BUNDLE_PATH__SYSTEM"]
+-        ENV["BUNDLE_PATH__SYSTEM"] = "true"
+-      end
+-
+-      require "shellwords"
+-      # We don't use `Open3` here because it does not work on JRuby + Windows
+-      output = `ruby #{File.expand_path("support/bundle.rb", Path.spec_dir)} #{args.shelljoin}`
+-      raise output unless $?.success?
+-      output
+-    ensure
+-      if path
+-        ENV["BUNDLE_PATH"] = old_path
+-      else
+-        ENV["BUNDLE_PATH__SYSTEM"] = old_path__system
+-      end
+-
+-      ENV["BUNDLER_ORIG_BUNDLE_GEMFILE"] = old_orig_gemfile
+-      ENV["BUNDLE_GEMFILE"] = old_gemfile
+-    end
+-
+     private
+ 
+     def gem_load_and_activate(gem_name, bin_container)
+@@ -139,6 +114,34 @@ def gem_activate(gem_name)
+       gem gem_name, gem_requirement
+     end
+ 
++    def install_gems(gemfile, path = nil)
++      old_gemfile = ENV["BUNDLE_GEMFILE"]
++      old_orig_gemfile = ENV["BUNDLER_ORIG_BUNDLE_GEMFILE"]
++      ENV["BUNDLE_GEMFILE"] = gemfile.to_s
++      ENV["BUNDLER_ORIG_BUNDLE_GEMFILE"] = nil
++
++      if path
++        old_path = ENV["BUNDLE_PATH"]
++        ENV["BUNDLE_PATH"] = path
++      else
++        old_path__system = ENV["BUNDLE_PATH__SYSTEM"]
++        ENV["BUNDLE_PATH__SYSTEM"] = "true"
++      end
++
++      # We don't use `Open3` here because it does not work on JRuby + Windows
++      output = `#{Gem.ruby} #{File.expand_path("support/bundle.rb", Path.spec_dir)} install`
++      raise output unless $?.success?
++    ensure
++      if path
++        ENV["BUNDLE_PATH"] = old_path
++      else
++        ENV["BUNDLE_PATH__SYSTEM"] = old_path__system
++      end
++
++      ENV["BUNDLER_ORIG_BUNDLE_GEMFILE"] = old_orig_gemfile
++      ENV["BUNDLE_GEMFILE"] = old_gemfile
++    end
++
+     def test_gemfile
+       Path.test_gemfile
+     end
+diff --git a/bundler/spec/support/setup.rb b/bundler/spec/support/setup.rb
+deleted file mode 100644
+index 4ac2e5b472..0000000000
+--- a/bundler/spec/support/setup.rb
++++ /dev/null
+@@ -1,9 +0,0 @@
+-# frozen_string_literal: true
+-
+-require_relative "switch_rubygems"
+-
+-require_relative "rubygems_ext"
+-Spec::Rubygems.install_test_deps
+-
+-require_relative "path"
+-$LOAD_PATH.unshift(File.expand_path("../../lib", __dir__)) if Spec::Path.ruby_core?
+From 3621a0b4c35dafef735bcccf31a8ba01a87eba79 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Thu, 15 May 2025 14:50:46 +0200
+Subject: [PATCH 2/3] Revert "Remove unused method"
+
+This reverts commit cbd01f8f6f05582cd0719c8e67e55757fad64eb8.
+---
+ bundler/spec/support/path.rb | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/bundler/spec/support/path.rb b/bundler/spec/support/path.rb
+index 1f2eb40a5a..a57e87ae4e 100644
+--- a/bundler/spec/support/path.rb
++++ b/bundler/spec/support/path.rb
+@@ -25,6 +25,10 @@ def relative_gemspec
+       @relative_gemspec ||= ruby_core? ? "lib/bundler/bundler.gemspec" : "bundler.gemspec"
+     end
+ 
++    def gemspec_dir
++      @gemspec_dir ||= gemspec.parent
++    end
++
+     def loaded_gemspec
+       @loaded_gemspec ||= Dir.chdir(source_root) { Gem::Specification.load(gemspec.to_s) }
+     end
+
+From 59f6cad84038160403385d4dd9ed72407160fce1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Thu, 15 May 2025 14:50:47 +0200
+Subject: [PATCH 3/3] Revert "Install test dependencies just once, in a common
+ place"
+
+This reverts commit 673afbeaae17990b1cbac38c56a2f97f55df32df.
+---
+ bundler/spec/support/builders.rb              |  2 +-
+ bundler/spec/support/path.rb                  | 14 +++++++-------
+ bundler/spec/support/rubygems_ext.rb          | 18 ++++++++++++++++++
+ 3 files changed, 26 insertions(+), 8 deletions(-)
+
+diff --git a/bundler/spec/support/builders.rb b/bundler/spec/support/builders.rb
+index dcd4dfe802..13c21bf5cc 100644
+--- a/bundler/spec/support/builders.rb
++++ b/bundler/spec/support/builders.rb
+@@ -461,7 +461,7 @@ def _build(options = {})
+           target_shipped_file = build_path + target_shipped_file
+           target_shipped_dir = File.dirname(target_shipped_file)
+           FileUtils.mkdir_p target_shipped_dir unless File.directory?(target_shipped_dir)
+-          FileUtils.cp File.expand_path(shipped_file, @context.source_root), target_shipped_file, preserve: true
++          FileUtils.cp shipped_file, target_shipped_file, preserve: true
+         end
+ 
+         @context.replace_version_file(@version, dir: build_path)
+diff --git a/bundler/spec/support/path.rb b/bundler/spec/support/path.rb
+index a57e87ae4e..b8e048dd23 100644
+--- a/bundler/spec/support/path.rb
++++ b/bundler/spec/support/path.rb
+@@ -30,7 +30,7 @@ def gemspec_dir
+     end
+ 
+     def loaded_gemspec
+-      @loaded_gemspec ||= Dir.chdir(source_root) { Gem::Specification.load(gemspec.to_s) }
++      @loaded_gemspec ||= Gem::Specification.load(gemspec.to_s)
+     end
+ 
+     def test_gemfile
+@@ -102,11 +102,11 @@ def man_tracked_files
+     end
+ 
+     def tmp(*path)
+-      tmp_root.join("#{test_env_version}.#{scope}").join(*path)
++      tmp_root(scope).join(*path)
+     end
+ 
+-    def tmp_root
+-      source_root.join("tmp")
++    def tmp_root(scope)
++      source_root.join("tmp", "#{test_env_version}.#{scope}")
+     end
+ 
+     # Bump this version whenever you make a breaking change to the spec setup
+@@ -180,15 +180,15 @@ def base_system_gem_path
+     end
+ 
+     def base_system_gems
+-      tmp_root.join("gems/base")
++      tmp("gems/base")
+     end
+ 
+     def rubocop_gems
+-      tmp_root.join("gems/rubocop")
++      tmp("gems/rubocop")
+     end
+ 
+     def standard_gems
+-      tmp_root.join("gems/standard")
++      tmp("gems/standard")
+     end
+ 
+     def file_uri_for(path)
+diff --git a/bundler/spec/support/rubygems_ext.rb b/bundler/spec/support/rubygems_ext.rb
+index ef40328d83..ba1dc976d1 100644
+--- a/bundler/spec/support/rubygems_ext.rb
++++ b/bundler/spec/support/rubygems_ext.rb
+@@ -50,6 +50,22 @@ def test_setup
+       Gem::DefaultUserInteraction.ui = Gem::SilentUI.new
+     end
+ 
++    def install_parallel_test_deps
++      Gem.clear_paths
++
++      require "parallel"
++      require "fileutils"
++
++      install_test_deps
++
++      (2..Parallel.processor_count).each do |n|
++        source = Path.tmp_root("1")
++        destination = Path.tmp_root(n.to_s)
++
++        FileUtils.cp_r source, destination, remove_destination: true
++      end
++    end
++
+     def setup_test_paths
+       ENV["BUNDLE_PATH"] = nil
+       ENV["PATH"] = [Path.system_gem_path("bin"), ENV["PATH"]].join(File::PATH_SEPARATOR)
+@@ -57,6 +73,8 @@ def setup_test_paths
+     end
+ 
+     def install_test_deps
++      Gem.clear_paths
++
+       install_gems(test_gemfile, Path.base_system_gems.to_s)
+       install_gems(rubocop_gemfile, Path.rubocop_gems.to_s)
+       install_gems(standard_gemfile, Path.standard_gems.to_s)

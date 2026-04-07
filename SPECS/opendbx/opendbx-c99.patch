@@ -1,0 +1,37 @@
+Avoid calling the dbpoll function if it is not declared in the
+<sybdb.h> header.  The freetds version does not declare it by
+default.  This prevents build failures with future compilers that
+do not support implicit function declarations.
+
+Submitted upstream:
+
+  <http://bugs.linuxnetworks.de/index.php?do=details&id=44&area=attachments>
+
+diff --git a/backends/mssql/mssql_basic.c b/backends/mssql/mssql_basic.c
+index 0506df8f4af3b90c..904a7411a0e3dc80 100644
+--- a/backends/mssql/mssql_basic.c
++++ b/backends/mssql/mssql_basic.c
+@@ -321,7 +321,9 @@ static int mssql_odbx_result( odbx_t* handle, odbx_result_t** result, struct tim
+ 		DBPROCESS* cdbproc;
+ 
+ 		if( timeout != NULL ) { ms = timeout->tv_sec * 1000 + timeout->tv_usec / 1000; }
++#ifdef HAVE_SYBDB_DBPOLL
+ 		if( dbpoll( dbproc, ms, &cdbproc, &reason ) == FAIL ) { return -ODBX_ERR_BACKEND; }
++#endif
+ 		if( reason != DBRESULT ) { return ODBX_RES_TIMEOUT; }   // timeout
+ 
+ 		caux->firstresult = 0;
+diff --git a/configure.ac b/configure.ac
+index 2f74bf8a649c7f4d..d568a3bd53114a40 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -168,6 +168,9 @@ int main() { isc_attach_database( NULL, 0, "", NULL, 0, NULL ); return 0; }
+ 				[AC_MSG_ERROR([mssql library (libsybdb) not found])]
+ 			)
+ 			AC_CHECK_MEMBER([struct dbdaterec.year], [AC_DEFINE([HAVE_LIBSYBDB_MSLIB], 1, [Have mslib type of "struct dbdaterec"])], [], [[#include <sybdb.h>]])
++			AC_TRY_COMPILE([#include <sybdb.h>],
++			[RETCODE (*dbpoll_ptr) (void) = ((RETCODE (*) (void)) dbpoll)],
++			[AC_DEFINE([HAVE_SYBDB_DBPOLL], 1, [dbpoll declared in <sybdb.h>])])
+ 			odbx_saved_libs=${LIBS}; LIBS=""
+ 			AC_SEARCH_LIBS([dgettext], [intl], [LIBMSSQL="$LIBMSSQL $LIBS"])
+ 			LIBS=${odbx_saved_libs}

@@ -1,0 +1,43 @@
+From a7e0d0095ff19aee8b32d25ccc52593c09112c56 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Thu, 29 Feb 2024 14:21:36 +0000
+Subject: [PATCH 105/131] Look for PCKRetrievalTool config file in /etc/
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Looking for config files in the same directory as the binary is
+inappropriate.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ tools/PCKRetrievalTool/App/linux/network_wrapper.cpp | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/tools/PCKRetrievalTool/App/linux/network_wrapper.cpp b/tools/PCKRetrievalTool/App/linux/network_wrapper.cpp
+index 65baf517..e4666896 100644
+--- a/tools/PCKRetrievalTool/App/linux/network_wrapper.cpp
++++ b/tools/PCKRetrievalTool/App/linux/network_wrapper.cpp
+@@ -192,7 +192,8 @@ static void network_configuration(string &url, string &proxy_type, string &proxy
+ {
+     //firstly read local configuration File
+     char local_configuration_file_path[MAX_PATH] = "";
+-    bool ret = get_program_path(local_configuration_file_path, MAX_PATH -1);
++    bool ret = true;
++    strcpy(local_configuration_file_path, "/etc/PCKIDRetrievalTool/");
+     if (ret) {
+         if(strnlen(local_configuration_file_path ,MAX_PATH)+strnlen(LOCAL_NETWORK_SETTING,MAX_PATH)+sizeof(char) > MAX_PATH) {
+             ret = false;
+@@ -351,7 +352,8 @@ network_post_error_t network_https_post(const uint8_t* raw_data, const uint64_t
+ 
+ bool is_server_url_available() {
+     char local_configuration_file_path[MAX_PATH] = "";
+-    bool ret = get_program_path(local_configuration_file_path, MAX_PATH -1);
++    bool ret = true;
++    strcpy(local_configuration_file_path, "/etc/PCKIDRetrievalTool/");
+     if (ret) {
+         if(strnlen(local_configuration_file_path ,MAX_PATH)+strnlen(LOCAL_NETWORK_SETTING,MAX_PATH)+sizeof(char) > MAX_PATH) {
+             return false;
+-- 
+2.53.0
+

@@ -1,0 +1,280 @@
+From: Robert Luberda <robert@debian.org>
+Date: Tue, 17 Apr 2007 20:48:31 +0200
+Subject: 024 man2html uncompress
+
+Add support for uncompressing gzipped man pages.
+If the requested page does not exist, try to serve gzipped one instead (closes: #418771).
+---
+ man2html/Makefile.in |   2 +-
+ man2html/man2html.c  | 174 +++++++++++++++++++++++++++++++++++----------------
+ 2 files changed, 121 insertions(+), 55 deletions(-)
+
+diff --git a/man2html/Makefile.in b/man2html/Makefile.in
+index be41984..44aad5b 100644
+--- a/man2html/Makefile.in
++++ b/man2html/Makefile.in
+@@ -1,5 +1,5 @@
+ CC = @CC@
+-CFLAGS += -Wall -Wstrict-prototypes -Wmissing-prototypes
++CFLAGS += -Wall -Wstrict-prototypes -Wmissing-prototypes -DGUNZIP='"@gunzip@"'
+ OBJECTS = man2html.o cgibase.o abbrev.o strdefs.o
+ EXEEXT = @EXEEXT@
+ bindir = $(DESTDIR)$(PREFIX)/usr/bin
+diff --git a/man2html/man2html.c b/man2html/man2html.c
+index 6396fff..552c3f0 100644
+--- a/man2html/man2html.c
++++ b/man2html/man2html.c
+@@ -15,6 +15,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <unistd.h>
++#include <errno.h>
+ #include <stdarg.h>
+ #include <string.h>
+ #include <ctype.h>
+@@ -57,6 +58,108 @@ static char **argument=NULL;
+ 
+ static char charb[3];
+ 
++#ifdef GUNZIP
++/* from src/utils.c */
++static int
++is_shell_safe(const char *ss, int quoted) {
++	char *bad = " ;'\\\"<>|";
++	char *p;
++
++	if (quoted)
++		bad++;			/* allow a space inside quotes */
++	for (p = bad; *p; p++)
++		if (strchr(ss, *p))
++			return 0;
++	return 1;
++}
++#endif
++
++/* reads the entire manpage into buffer *buf and returns number of chars read */
++static int
++read_manpage_into_buffer(char *path, char **buf) {
++	int compressed = 0;
++	FILE * f = NULL;
++	char * ext;
++	int l = 0;
++	struct stat stbuf;
++
++	*buf = NULL;
++	if (!path)
++		return -1;
++
++	if (!strcmp(path, "-"))
++		f = stdin;
++	else /* strcmp(path, "-") */
++	{
++		char * tmp = NULL;
++		char * command = NULL;
++		char * openpath = path;
++#ifdef GUNZIP
++
++		if (is_shell_safe(openpath, 1)) {
++			ext = strrchr(openpath, '.');
++			compressed = (ext && !strcmp(ext, ".gz"));
++
++			if (!compressed && stat(openpath, &stbuf)) {
++				tmp = (char*) xmalloc(strlen(path) + 4);
++				sprintf(tmp, "%s.gz", path);
++				if ((compressed = !stat(tmp, &stbuf)))
++					openpath = tmp;
++			}
++		}
++
++		if (compressed) {
++			command = (char*) xmalloc(strlen(openpath) + sizeof(GUNZIP) + 4);
++			sprintf(command, GUNZIP " '%s'", openpath);
++			f = popen(command, "r");
++		} else
++#endif
++			f = fopen(openpath, "r");
++
++		if (tmp) free(tmp);
++		if (command) free(command);
++
++		if (!f)
++			return -1;
++
++	} /* strcmp(path, "-") */
++
++
++    /* Read entire file into buf[1..l] */
++#define XTRA 5
++    /* buf has 1 extra byte at the start, and XTRA extra bytes at the end */
++    if (compressed || f == stdin) {
++	 int sz = 1024;
++	 int ct = 1, tot = 0;
++	 char *p = NULL;
++
++	 clearerr(f);
++	 while (ct > 0) {
++	      tot += ct;
++	      if (feof(f))
++		   break;
++	      sz = 2*sz+tot;
++	      p = xrealloc(p, sz);
++	      ct = fread(p+tot,1,sz-tot-XTRA,f);
++	 }
++
++	 *buf = p;
++	 l = tot-1;
++    } else {
++	 int ct;
++
++	 l = 0;
++	 if (fstat(fileno(f), &stbuf) != -1)
++	      l = stbuf.st_size;
++	 *buf = (char *) xmalloc((l+1+XTRA)*sizeof(char));
++	 ct = fread(*buf+1,1,l,f);
++	 if (ct < l)
++	      l = ct;
++    }
++   fclose(f);
++   return l;
++}
++
+ static char *
+ expand_char(int nr)
+ {
+@@ -1841,8 +1944,6 @@ scan_request(char *c) {
+ 	    break;
+ 	case V('s','o'):
+ 	    {
+-		FILE *f;
+-		struct stat stbuf;
+ 		int l; char *buf;
+ 		char *name = NULL;
+ 
+@@ -1850,21 +1951,21 @@ scan_request(char *c) {
+ 		c += j;			/* skip .so part and whitespace */
+ 		if (*c == '/') {
+ 		    h = c;
+-		} else {		/* .so man3/cpow.3 -> ../man3/cpow.3 */
+-		    h = c-3;
+-		    h[0] = '.';
+-		    h[1] = '.';
+-		    h[2] = '/';
+-		}
++               } else {                /* .so man3/cpow.3 -> ../man3/cpow.3 */
++/*                   h = c-3;
++                   h[0] = '.';
++                   h[1] = '.';
++                   h[2] = '/';
++*/
++		   h = c;
++               }
++
+ 		while (*c != '\n') c++;
+ 		while (c[-1] == ' ') c--;
+ 		while (*c != '\n') *c++ = 0;
+ 		*c = 0;
+ 		scan_troff(h,1, &name);
+ 		if (name[3] == '/') h=name+3; else h=name;
+-		l = 0;
+-		if (stat(h, &stbuf)!=-1) l=stbuf.st_size;
+-		buf = (char*) xmalloc((l+4)*sizeof(char));
+ #if NOCGI
+                 if (!out_length) {
+ 		    char *t,*s;
+@@ -1882,7 +1983,7 @@ scan_request(char *c) {
+ #endif
+                 {
+ 		    /* this works alright, except for section 3 */
+-		    if (!l || !(f = fopen(h,"r"))) {
++		    if ((l = read_manpage_into_buffer(h, &buf)) < 0) {
+ 			 fprintf(stderr,
+ 				"man2html: unable to open or read file %s\n", h);
+ 			 out_html("<BLOCKQUOTE>"
+@@ -1890,13 +1991,11 @@ scan_request(char *c) {
+ 			 out_html(h);
+ 			 out_html("</BLOCKQUOTE>\n");
+ 		    } else {
+-			i=fread(buf+1,1,l,f);
+-			fclose(f);
+ 			buf[0]=buf[l]='\n';
+ 			buf[l+1]=buf[l+2]=0;
+ 			scan_troff(buf+1,0,NULL);
++		    	if (buf) free(buf);
+ 		    }
+-		    if (buf) free(buf);
+ 		}
+ 		*c++='\n';
+ 		break;
+@@ -3140,6 +3239,8 @@ goto_dir(char *path, char **dir, char **name) {
+      }
+ }
+ 
++
++
+ /*
+  * Call:  man2html [-l] [filename]
+  *
+@@ -3150,8 +3251,6 @@ goto_dir(char *path, char **dir, char **name) {
+  */
+ int
+ main(int argc, char **argv) {
+-    FILE *f;
+-    struct stat stbuf;
+     int l, c;
+     char *buf, *filename, *fnam = NULL;
+ 
+@@ -3213,50 +3312,17 @@ main(int argc, char **argv) {
+ 
+     /* Open input file */
+     if (!fnam || !strcmp(fnam, "-")) {
+-	 f = stdin;
++	 fnam = "-";
+ 	 fname = "(stdin)";
+     } else {
+ 	 /* do a chdir() first, to get .so expansion right */
+ 	 goto_dir(fnam, &directory, &fnam);
+-
+-	 f = fopen(fnam, "r");
+-	 if (f == NULL)
+-	      error_page(404, "File not found", "Could not open %s\n", filename);
+ 	 fname = fnam;
+     }
+ 
+-    /* Read entire file into buf[1..l] */
+-#define XTRA 5
+-    /* buf has 1 extra byte at the start, and XTRA extra bytes at the end */
+-    if (f == stdin) {
+-	 int sz = 1024;
+-	 int ct = 1, tot = 0;
+-	 char *p = NULL;
+-
+-	 clearerr(stdin);
+-	 while (ct > 0) {
+-	      tot += ct;
+-	      if (feof(stdin))
+-		   break;
+-	      sz = 2*sz+tot;
+-	      p = xrealloc(p, sz);
+-	      ct = fread(p+tot,1,sz-tot-XTRA,stdin);
+-	 }
+-
+-	 buf = p;
+-	 l = tot-1;
+-    } else {
+-	 int ct;
+-
+-	 l = 0;
+-	 if (fstat(fileno(f), &stbuf) != -1)
+-	      l = stbuf.st_size;
+-	 buf = (char *) xmalloc((l+1+XTRA)*sizeof(char));
+-	 ct = fread(buf+1,1,l,f);
+-	 if (ct < l)
+-	      l = ct;
+-	 fclose(f);
+-    }
++    l = read_manpage_into_buffer(fnam, &buf);
++    if (l < 0)
++    	error_page(404, "File not found", "Could not open %s\n", fname);
+ 
+     buf[0] = '\n';
+     buf[l+1] = '\n';

@@ -1,0 +1,161 @@
+From f1e9a32ee7fad2263636a51536ce0f9f13f09949 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Wed, 23 Jan 2019 10:16:20 +0100
+Subject: [PATCH] Declare POSIX regex function names as macros to PCRE
+ functions
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+POSIX regex libraries differ in regex_t size. If a program includes
+<pcreposix.h>, but is not linked to pcreposix library at run-time
+(either in effect of --as-needed or a lazy binding in dlopen)
+other implementation touches memory out of the structure and the
+program can crash.
+
+That means once a program includes <pcreposix.h>, it must link to the
+pcreposix library.
+
+This patch replaces the POSIX regex declaration with macros to the
+PCRE uniqely-named function. This ensures that the PCRE's regex_t
+structure is always handled by the PCRE functions.
+
+This patch still preserves the POSIX regex definitions in order to
+preseve ABI with application compiled before this change. The
+definition can be removed in the future.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ pcreposix.c | 50 +++++++++++++++++++++++++++++++++++++++++++++-----
+ pcreposix.h | 20 ++++++++++++++------
+ 2 files changed, 59 insertions(+), 11 deletions(-)
+
+diff --git a/pcreposix.c b/pcreposix.c
+index a76d6bf..3f2f3ef 100644
+--- a/pcreposix.c
++++ b/pcreposix.c
+@@ -39,7 +39,10 @@ POSSIBILITY OF SUCH DAMAGE.
+ 
+ 
+ /* This module is a wrapper that provides a POSIX API to the underlying PCRE
+-functions. */
++functions. The operative functions are called pcre_regcomp(), etc., with
++wrappers that use the plain POSIX names. This makes it easier for an
++application to be sure it gets the PCRE versions in the presence of other
++POSIX regex libraries. */
+ 
+ 
+ #ifdef HAVE_CONFIG_H
+@@ -204,12 +207,49 @@ static const char *const pstring[] = {
+ 
+ 
+ /*************************************************
+-*          Translate error code to string        *
++*      Wrappers with traditional POSIX names     *
+ *************************************************/
+ 
++/* Keep defining them to preseve ABI with application linked to pcreposix
++ * library before they were changed into macros. */
++
++#undef regerror
+ PCREPOSIX_EXP_DEFN size_t PCRE_CALL_CONVENTION
+ regerror(int errcode, const regex_t *preg, char *errbuf, size_t errbuf_size)
+ {
++return pcre_regerror(errcode, preg, errbuf, errbuf_size);
++}
++
++#undef regfree
++PCREPOSIX_EXP_DEFN void PCRE_CALL_CONVENTION
++regfree(regex_t *preg)
++{
++pcre_regfree(preg);
++}
++
++#undef regcomp
++PCREPOSIX_EXP_DEFN int PCRE_CALL_CONVENTION
++regcomp(regex_t *preg, const char *pattern, int cflags)
++{
++return pcre_regcomp(preg, pattern, cflags);
++}
++
++#undef regexec
++PCREPOSIX_EXP_DEFN int PCRE_CALL_CONVENTION
++regexec(const regex_t *preg, const char *string, size_t nmatch,
++  regmatch_t pmatch[], int eflags)
++{
++return pcre_regexec(preg, string, nmatch, pmatch, eflags);
++}
++
++
++/*************************************************
++*          Translate error code to string        *
++*************************************************/
++
++PCREPOSIX_EXP_DEFN size_t PCRE_CALL_CONVENTION
++pcre_regerror(int errcode, const regex_t *preg, char *errbuf, size_t errbuf_size)
++{
+ const char *message, *addmessage;
+ size_t length, addlength;
+ 
+@@ -243,7 +283,7 @@ return length + addlength;
+ *************************************************/
+ 
+ PCREPOSIX_EXP_DEFN void PCRE_CALL_CONVENTION
+-regfree(regex_t *preg)
++pcre_regfree(regex_t *preg)
+ {
+ (PUBL(free))(preg->re_pcre);
+ }
+@@ -266,7 +306,7 @@ Returns:      0 on success
+ */
+ 
+ PCREPOSIX_EXP_DEFN int PCRE_CALL_CONVENTION
+-regcomp(regex_t *preg, const char *pattern, int cflags)
++pcre_regcomp(regex_t *preg, const char *pattern, int cflags)
+ {
+ const char *errorptr;
+ int erroffset;
+@@ -320,7 +360,7 @@ be set. When this is the case, the nmatch and pmatch arguments are ignored, and
+ the only result is yes/no/error. */
+ 
+ PCREPOSIX_EXP_DEFN int PCRE_CALL_CONVENTION
+-regexec(const regex_t *preg, const char *string, size_t nmatch,
++pcre_regexec(const regex_t *preg, const char *string, size_t nmatch,
+   regmatch_t pmatch[], int eflags)
+ {
+ int rc, so, eo;
+diff --git a/pcreposix.h b/pcreposix.h
+index c77c0b0..6f108b8 100644
+--- a/pcreposix.h
++++ b/pcreposix.h
+@@ -131,13 +131,21 @@ file. */
+ #  endif
+ #endif
+ 
+-/* The functions */
+-
+-PCREPOSIX_EXP_DECL int regcomp(regex_t *, const char *, int);
+-PCREPOSIX_EXP_DECL int regexec(const regex_t *, const char *, size_t,
++/* The functions. The actual code is in functions with pcre_xxx names for
++uniqueness. POSIX names are provided for API compatibility with POSIX regex
++functions. It's done this way to ensure to they are always get from the
++PCRE library and not by accident from elsewhere. (regex_t differs in size
++elsewhere.) */
++
++PCREPOSIX_EXP_DECL int pcre_regcomp(regex_t *, const char *, int);
++#define regcomp pcre_regcomp
++PCREPOSIX_EXP_DECL int pcre_regexec(const regex_t *, const char *, size_t,
+                      regmatch_t *, int);
+-PCREPOSIX_EXP_DECL size_t regerror(int, const regex_t *, char *, size_t);
+-PCREPOSIX_EXP_DECL void regfree(regex_t *);
++#define regexec pcre_regexec
++PCREPOSIX_EXP_DECL size_t pcre_regerror(int, const regex_t *, char *, size_t);
++#define regerror pcre_regerror
++PCREPOSIX_EXP_DECL void pcre_regfree(regex_t *);
++#define regfree pcre_regfree
+ 
+ #ifdef __cplusplus
+ }   /* extern "C" */
+-- 
+2.17.2
+

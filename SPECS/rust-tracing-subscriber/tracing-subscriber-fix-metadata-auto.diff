@@ -1,0 +1,34 @@
+--- tracing-subscriber-0.3.20/Cargo.toml	1970-01-01T00:00:01+00:00
++++ tracing-subscriber-0.3.20/Cargo.toml	2025-09-01T17:37:20.756316+00:00
+@@ -99,8 +99,6 @@
+ ]
+ valuable = [
+     "tracing-core/valuable",
+-    "valuable_crate",
+-    "valuable-serde",
+     "tracing-serde/valuable",
+ ]
+ 
+@@ -337,17 +335,6 @@
+ 
+ [dev-dependencies.tracing-log]
+ version = "0.2.0"
+-
+-[target."cfg(tracing_unstable)".dependencies.valuable-serde]
+-version = "0.1.0"
+-optional = true
+-default-features = false
+-
+-[target."cfg(tracing_unstable)".dependencies.valuable_crate]
+-version = "0.1.0"
+-optional = true
+-default-features = false
+-package = "valuable"
+ 
+ [lints.rust.unexpected_cfgs]
+ level = "warn"
+@@ -357,3 +344,4 @@
+     "cfg(tracing_unstable)",
+     "cfg(unsound_local_offset)",
+ ]
++

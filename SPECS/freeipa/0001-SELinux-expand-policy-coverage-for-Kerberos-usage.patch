@@ -1,0 +1,343 @@
+From 1ba343fbdfec2bbd5809363c8d1a7b2e2c09010b Mon Sep 17 00:00:00 2001
+From: Alexander Bokovoy <abokovoy@redhat.com>
+Date: Mon, 12 Jan 2026 10:54:35 +0200
+Subject: [PATCH 1/2] SELinux: expand policy coverage for Kerberos usage
+
+- Separate SSSD passwordless auth helpers to sssd_mfa_t context and
+  move rules defining network and resources access to it
+- Extract /var/lib/ipa/pki/* to ipa_public_pki_t file context
+- Allow ipa_otpd_t context to start sssd_mfa_t context executables
+
+Signed-off-by: Alexander Bokovoy <abokovoy@redhat.com>
+---
+ selinux/ipa.fc |   7 +--
+ selinux/ipa.if |  35 +++++++++++++--
+ selinux/ipa.te | 114 +++++++++++++++++++++++++++++++++++++++++++++++--
+ 3 files changed, 147 insertions(+), 9 deletions(-)
+
+diff --git a/selinux/ipa.fc b/selinux/ipa.fc
+index ffab59933..29aee2c28 100644
+--- a/selinux/ipa.fc
++++ b/selinux/ipa.fc
+@@ -8,8 +8,8 @@
+ 
+ /usr/libexec/ipa-otpd		--	gen_context(system_u:object_r:ipa_otpd_exec_t,s0)
+ /usr/libexec/ipa/ipa-otpd		--	gen_context(system_u:object_r:ipa_otpd_exec_t,s0)
+-/usr/libexec/sssd/oidc_child 	-- gen_context(system_u:object_r:ipa_otpd_exec_t,s0)
+-/usr/libexec/sssd/passkey_child 	-- gen_context(system_u:object_r:ipa_otpd_exec_t,s0)
++/usr/libexec/sssd/oidc_child 	-- gen_context(system_u:object_r:sssd_mfa_exec_t,s0)
++/usr/libexec/sssd/passkey_child 	-- gen_context(system_u:object_r:sssd_mfa_exec_t,s0)
+ 
+ /usr/libexec/ipa/ipa-ods-exporter	--	gen_context(system_u:object_r:ipa_ods_exporter_exec_t,s0)
+ 
+@@ -20,7 +20,8 @@
+ /usr/libexec/ipa/oddjob/org\.freeipa.*  --  gen_context(system_u:object_r:ipa_helper_exec_t,s0)
+ 
+ 
+-/var/lib/ipa(/.*)?              gen_context(system_u:object_r:ipa_var_lib_t,s0)
++/var/lib/ipa/pki(/.*)?        gen_context(system_u:object_r:ipa_public_pki_t,s0)
++/var/lib/ipa(/.*)?            gen_context(system_u:object_r:ipa_var_lib_t,s0)
+ 
+ /var/lib/ipa/gssproxy/http.keytab -- gen_context(system_u:object_r:ipa_http_keytab_t,s0)
+ 
+diff --git a/selinux/ipa.if b/selinux/ipa.if
+index 8f3147e10..0d263e1e0 100644
+--- a/selinux/ipa.if
++++ b/selinux/ipa.if
+@@ -12,11 +12,12 @@
+ #
+ interface(`ipa_domtrans_otpd',`
+ 	gen_require(`
+-		type ipa_otpd_t, ipa_otpd_exec_t;
++		type ipa_otpd_t, ipa_otpd_exec_t, sssd_mfa_exec_t;
+ 	')
+ 
+ 	corecmd_search_bin($1)
+ 	domtrans_pattern($1, ipa_otpd_exec_t, ipa_otpd_t)
++	domtrans_pattern($1, sssd_mfa_exec_t, ipa_otpd_t)
+ ')
+ 
+ ########################################
+@@ -108,10 +109,11 @@ interface(`ipa_run_helper',`
+ #
+ interface(`ipa_search_lib',`
+ 	gen_require(`
+-		type ipa_var_lib_t;
++		type ipa_var_lib_t, ipa_public_pki_t;
+ 	')
+ 
+     search_dirs_pattern($1, ipa_var_lib_t, ipa_var_lib_t)
++    search_dirs_pattern($1, ipa_public_pki_t, ipa_public_pki_t)
+ ')
+ 
+ ########################################
+@@ -126,11 +128,13 @@ interface(`ipa_search_lib',`
+ #
+ interface(`ipa_manage_lib',`
+ 	gen_require(`
+-		type ipa_var_lib_t;
++		type ipa_var_lib_t, ipa_public_pki_t;
+ 	')
+ 
+     manage_files_pattern($1, ipa_var_lib_t, ipa_var_lib_t)
+     manage_dirs_pattern($1, ipa_var_lib_t, ipa_var_lib_t)
++    manage_files_pattern($1, ipa_public_pki_t, ipa_public_pki_t)
++    manage_dirs_pattern($1, ipa_public_pki_t, ipa_public_pki_t)
+ ')
+ 
+ ########################################
+@@ -167,11 +171,14 @@ interface(`ipa_read_lib',`
+ 	gen_require(`
+ 		type ipa_http_keytab_t;
+ 		type ipa_var_lib_t;
++		type ipa_public_pki_t;
+ 	')
+ 
+     read_files_pattern($1, ipa_var_lib_t, ipa_var_lib_t)
++    read_files_pattern($1, ipa_public_pki_t, ipa_public_pki_t)
+     read_files_pattern($1, ipa_http_keytab_t, ipa_http_keytab_t)
+     list_dirs_pattern($1, ipa_var_lib_t, ipa_var_lib_t)
++    list_dirs_pattern($1, ipa_public_pki_t, ipa_public_pki_t)
+ ')
+ 
+ ########################################
+@@ -195,6 +202,28 @@ interface(`ipa_read_http_keytab',`
+     list_dirs_pattern($1, ipa_var_lib_t, ipa_var_lib_t)
+ ')
+ 
++########################################
++## <summary>
++##      Allow domain to read public PKI files
++##      Also give access to realmd_var_lib_t for upgrade
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`ipa_read_public_pki',`
++	gen_require(`
++		type ipa_public_pki_t, realmd_var_lib_t;
++	')
++
++    read_files_pattern($1, ipa_public_pki_t, ipa_public_pki_t)
++    list_dirs_pattern($1, ipa_public_pki_t, ipa_public_pki_t)
++    read_files_pattern($1, realmd_var_lib_t, realmd_var_lib_t)
++    list_dirs_pattern($1, realmd_var_lib_t, realmd_var_lib_t)
++')
++
+ ########################################
+ ## <summary>
+ ##	Allow domain to manage ipa run files/dirs.
+diff --git a/selinux/ipa.te b/selinux/ipa.te
+index b53540518..7ea771a11 100644
+--- a/selinux/ipa.te
++++ b/selinux/ipa.te
+@@ -14,12 +14,15 @@ type ipa_otpd_t, ipa_domain;
+ type ipa_otpd_exec_t;
+ init_daemon_domain(ipa_otpd_t, ipa_otpd_exec_t)
+ 
+-# for oidc_child communication with IdPs
+-corenet_tcp_connect_http_port(ipa_otpd_t)
++type sssd_mfa_t, ipa_domain;
++type sssd_mfa_exec_t;
++can_exec(sssd_mfa_t,sssd_mfa_exec_t)
++
+ kernel_dgram_send(ipa_otpd_t)
+ allow ipa_otpd_t self:unix_dgram_socket { create getopt setopt };
+ allow ipa_otpd_t ipa_otpd_exec_t:file execute_no_trans;
+ 
++
+ type ipa_dnskey_t, ipa_domain;
+ type ipa_dnskey_exec_t;
+ init_daemon_domain(ipa_dnskey_t, ipa_dnskey_exec_t)
+@@ -43,6 +46,9 @@ logging_log_file(ipa_log_t)
+ type ipa_var_lib_t;
+ files_type(ipa_var_lib_t)
+ 
++type ipa_public_pki_t;
++files_type(ipa_public_pki_t)
++
+ type ipa_http_keytab_t;
+ files_type(ipa_http_keytab_t)
+ 
+@@ -88,6 +94,28 @@ type ipa_pki_retrieve_key_t;
+ domain_type(ipa_pki_retrieve_key_t)
+ init_script_file(ipa_pki_retrieve_key_exec_t)
+ 
++# Allow dirsrv to operate with Anonymous PKINIT
++optional_policy(`
++  gen_require(`
++     type dirsrv_t;
++  ')
++   
++	ipa_read_lib(dirsrv_t)
++	ipa_search_lib(dirsrv_t)
++        ipa_read_public_pki(dirsrv_t)
++')
++
++# Allow certmonger to operate with Anonymous PKINIT
++optional_policy(`
++  gen_require(`
++     type certmonger_t;
++  ')
++   
++	ipa_read_lib(certmonger_t)
++	ipa_search_lib(certmonger_t)
++        ipa_read_public_pki(certmonger_t)
++')
++
+ ########################################
+ #
+ # ipa_otpd local policy
+@@ -99,6 +127,7 @@ allow ipa_otpd_t self:fifo_file rw_fifo_file_perms;
+ allow ipa_otpd_t self:unix_stream_socket create_stream_socket_perms;
+ 
+ read_files_pattern(ipa_otpd_t, ipa_cert_t, ipa_cert_t)
++read_files_pattern(ipa_otpd_t, ipa_public_pki_t, ipa_public_pki_t)
+ read_lnk_files_pattern(ipa_otpd_t, ipa_cert_t, ipa_cert_t)
+ 
+ manage_dirs_pattern(ipa_otpd_t, ipa_var_run_t, ipa_var_run_t)
+@@ -110,7 +139,6 @@ corenet_tcp_connect_radius_port(ipa_otpd_t)
+ dev_read_urand(ipa_otpd_t)
+ dev_read_rand(ipa_otpd_t)
+ dev_read_sysfs(ipa_otpd_t)
+-dev_rw_generic_usb_dev(ipa_otpd_t)
+ 
+ sysnet_dns_name_resolve(ipa_otpd_t)
+ 
+@@ -127,6 +155,75 @@ optional_policy(`
+ ')
+ 
+ logging_send_syslog_msg(ipa_otpd_t)
++
++########################################
++#
++# sssd_mfa local policy
++# applies to sssd's oidc_child and passkey_child
++#
++
++# for oidc_child communication with IdPs
++corenet_tcp_connect_http_port(sssd_mfa_t)
++kernel_dgram_send(sssd_mfa_t)
++allow sssd_mfa_t self:unix_dgram_socket { create getopt setopt };
++allow sssd_mfa_t sssd_mfa_exec_t:file execute_no_trans;
++allow sssd_mfa_exec_t fs_t:filesystem associate;
++#===========================
++# allow relabel of the older files during upgrade
++optional_policy(`
++  gen_require(`
++     type setfiles_t;
++     type rpm_t;
++     type unconfined_t;
++  ')
++    allow setfiles_t sssd_mfa_exec_t:file { getattr open read relabelto rename setattr unlink };
++    allow rpm_t sssd_mfa_exec_t:file { getattr open read relabelto rename setattr unlink };
++    allow unconfined_t sssd_mfa_exec_t:file { getattr open read relabelto rename setattr unlink };
++')
++
++dev_read_urand(sssd_mfa_t)
++dev_read_rand(sssd_mfa_t)
++dev_read_sysfs(sssd_mfa_t)
++dev_rw_generic_usb_dev(sssd_mfa_t)
++
++sysnet_dns_name_resolve(sssd_mfa_t)
++
++optional_policy(`
++    dirsrv_stream_connect(sssd_mfa_t)
++')
++
++optional_policy(`
++    kerberos_use(sssd_mfa_t)
++')
++
++optional_policy(`
++    sssd_stream_connect(sssd_mfa_t)
++')
++
++logging_send_syslog_msg(sssd_mfa_t)
++
++optional_policy(`
++	ipa_read_lib(sssd_mfa_t)
++	ipa_search_lib(sssd_mfa_t)
++        ipa_read_public_pki(sssd_mfa_t)
++')
++
++
++########################################
++#
++# samba local policy extensions
++#
++
++optional_policy(`
++    gen_require(`
++        type smbd_t, winbind_t, samba_net_t;
++    ')
++        ipa_read_public_pki(smbd_t)
++        ipa_read_public_pki(winbind_t)
++        ipa_read_public_pki(samba_net_t)
++')
++
++
+ ########################################
+ #
+ # password policy local policy
+@@ -196,6 +289,10 @@ ipa_read_lib(ipa_helper_t)
+ 
+ logging_send_syslog_msg(ipa_helper_t)
+ 
++optional_policy(`
++    ipa_read_public_pki(ipa_helper_t)
++')
++
+ optional_policy(`
+     dirsrv_stream_connect(ipa_helper_t)
+ ')
+@@ -298,6 +395,10 @@ miscfiles_read_generic_certs(ipa_dnskey_t)
+ 
+ sysnet_read_config(ipa_dnskey_t)
+ 
++optional_policy(`
++    ipa_read_public_pki(ipa_dnskey_t)
++')
++
+ optional_policy(`
+     apache_search_config(ipa_dnskey_t)
+ ')
+@@ -359,6 +460,10 @@ miscfiles_read_generic_certs(ipa_ods_exporter_t)
+ 
+ sysnet_read_config(ipa_ods_exporter_t)
+ 
++optional_policy(`
++    ipa_read_public_pki(ipa_ods_exporter_t)
++')
++
+ optional_policy(`
+     bind_search_cache(ipa_ods_exporter_t)
+ ')
+@@ -451,6 +556,7 @@ optional_policy(`
+ optional_policy(`
+ 	ipa_read_lib(ipa_custodia_t)
+ 	ipa_search_lib(ipa_custodia_t)
++        ipa_read_public_pki(ipa_custodia_t)
+ ')
+ 
+ optional_policy(`
+@@ -547,6 +653,7 @@ optional_policy(`
+         type gssproxy_t;
+     ')
+     ipa_read_http_keytab(gssproxy_t)
++    ipa_read_public_pki(gssproxy_t)
+ ')
+ 
+ # Allow Cockpit to use HTTP keytab on IPA servers for GSSAPI authentication
+@@ -555,4 +662,5 @@ optional_policy(`
+         type cockpit_session_t;
+     ')
+     ipa_read_http_keytab(cockpit_session_t)
++    ipa_read_public_pki(cockpit_session_t)
+ ')
+-- 
+2.52.0
+

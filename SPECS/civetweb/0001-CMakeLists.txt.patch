@@ -1,0 +1,9 @@
+--- civetweb-1.16/CMakeLists.txt.orig	2025-07-16 07:44:16.982762892 -0400
++++ civetweb-1.16/CMakeLists.txt	2025-07-16 07:44:32.894505768 -0400
+@@ -1,5 +1,5 @@
+ # Use at least CMake 3.3
+-cmake_minimum_required (VERSION 3.3.0)
++cmake_minimum_required (VERSION 3.3.0...4.0)
+ cmake_policy(VERSION 3.2.2)
+ cmake_policy(SET CMP0054 NEW)
+ cmake_policy(SET CMP0057 NEW)

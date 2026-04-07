@@ -1,0 +1,110 @@
+diff -urN glpk-5.0/doc/glpk11.tex.orig glpk-5.0/doc/glpk11.tex
+--- glpk-5.0/doc/glpk11.tex.orig	2020-12-16 02:00:00.000000000 -0700
++++ glpk-5.0/doc/glpk11.tex	2020-12-16 12:09:41.511487499 -0700
+@@ -158,50 +158,4 @@ WITH THE SOFTWARE OR THE USE OR OTHER DE
+ \noindent
+ \url{http://www.cs.chalmers.se/Cs/Research/FormalMethods/MiniSat}
+ 
+-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+-
+-\section{zlib}
+-
+-\noindent
+-zlib version 1.2.5, Copyright {\copyright} 1995--2010 Jean-loup Gailly
+-and Mark Adler.
+-
+-\para{Description}
+-
+-zlib is a general purpose data compression library. All the code is
+-thread safe. The data format used by the zlib library is described by
+-RFCs (Request for Comments) 1950 to 1952 in the files
+-\verb|rfc1950.txt| (zlib format), \verb|rfc1951.txt| (deflate format)
+-and \verb|rfc1952.txt| (gzip format).
+-
+-\para{License}
+-
+-This software is provided 'as-is', without any express or implied
+-warranty. In no event will the authors be held liable for any damages
+-arising from the use of this software.
+-
+-Permission is granted to anyone to use this software for any purpose,
+-including commercial applications, and to alter it and redistribute it
+-freely, subject to the following restrictions:
+-
+-1. The origin of this software must not be misrepresented; you must not
+-   claim that you wrote the original software. If you use this software
+-   in a product, an acknowledgment in the product documentation would
+-   be appreciated but is not required.
+-
+-2. Altered source versions must be plainly marked as such, and must not
+-   be misrepresented as being the original software.
+-
+-3. This notice may not be removed or altered from any source
+-   distribution.
+-
+-\hfill Jean-loup Gailly
+-
+-\hfill Mark Adler
+-
+-\para{Availability}
+-
+-\noindent
+-\url{http://www.zlib.net/}
+-
+ %* eof *%
+diff -urN glpk-5.0/src/env/stream.c.orig glpk-5.0/src/env/stream.c
+--- glpk-5.0/src/env/stream.c.orig	2020-12-16 02:00:00.000000000 -0700
++++ glpk-5.0/src/env/stream.c	2020-12-16 12:09:41.512487497 -0700
+@@ -20,7 +20,7 @@
+ ***********************************************************************/
+ 
+ #include "env.h"
+-#include "zlib.h"
++#include <zlib.h>
+ 
+ struct glp_file
+ {     /* sequential stream descriptor */
+diff -urN glpk-5.0/src/Makefile.am.orig glpk-5.0/src/Makefile.am
+--- glpk-5.0/src/Makefile.am.orig	2020-12-16 02:00:00.000000000 -0700
++++ glpk-5.0/src/Makefile.am	2020-12-16 12:10:39.371368555 -0700
+@@ -18,14 +18,15 @@ libglpk_la_CPPFLAGS = \
+ -I$(srcdir)/mpl \
+ -I$(srcdir)/npp \
+ -I$(srcdir)/proxy \
+--I$(srcdir)/simplex \
+--I$(srcdir)/zlib
++-I$(srcdir)/simplex
+ 
+ libglpk_la_LDFLAGS = \
+ -version-info 43:1:3 \
+ -export-symbols-regex '^glp_*' \
+ ${NOUNDEFINED}
+ 
++libglpk_la_LIBADD = -lz
++
+ libglpk_la_SOURCES = \
+ amd/amd_1.c \
+ amd/amd_2.c \
+@@ -202,21 +203,6 @@ simplex/spxprim.c \
+ simplex/spxprob.c \
+ simplex/spychuzc.c \
+ simplex/spychuzr.c \
+-simplex/spydual.c \
+-zlib/adler32.c \
+-zlib/compress.c \
+-zlib/crc32.c \
+-zlib/deflate.c \
+-zlib/gzclose.c \
+-zlib/gzlib.c \
+-zlib/gzread.c \
+-zlib/gzwrite.c \
+-zlib/inffast.c \
+-zlib/inflate.c \
+-zlib/inftrees.c \
+-zlib/trees.c \
+-zlib/uncompr.c \
+-zlib/zio.c \
+-zlib/zutil.c
++simplex/spydual.c
+ 
+ ## eof ##

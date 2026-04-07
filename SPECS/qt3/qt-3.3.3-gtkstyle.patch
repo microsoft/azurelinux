@@ -1,0 +1,114 @@
+--- qt-x11-free-3.3.3.orig/src/widgets/qmenubar.cpp	2004-08-05 16:42:21.000000000 +0200
++++ qt-x11-free-3.3.3/src/widgets/qmenubar.cpp	2004-12-03 17:26:43.000000000 +0100
+@@ -228,6 +228,10 @@
+ static const int motifItemHMargin	= 5;	// menu item hor text margin
+ static const int motifItemVMargin	= 4;	// menu item ver text margin
+ 
++// The others are 0
++static const int gtkItemHMargin = 8;
++static const int gtkItemVMargin = 8;
++
+ /*
+ 
+ +-----------------------------
+@@ -292,7 +296,14 @@
+     setFrameStyle( QFrame::MenuBarPanel | QFrame::Raised );
+ 
+     QFontMetrics fm = fontMetrics();
+-    int h = 2*motifBarVMargin + fm.height() + motifItemVMargin + 2*frameWidth() + 2*motifItemFrame;
++
++    int h;
++    int gs = style().styleHint(QStyle::SH_GUIStyle);
++    if (gs == GtkStyle) {
++        h = fm.height() + gtkItemVMargin;
++    } else {
++        h = 2*motifBarVMargin + fm.height() + motifItemVMargin + 2*frameWidth() + 2*motifItemFrame;
++    }
+ 
+     setGeometry( 0, 0, width(), h );
+ 
+@@ -944,12 +955,19 @@
+ 	    h = QMAX( mi->pixmap()->height() + 4, QApplication::globalStrut().height() );
+ 	} else if ( !mi->text().isNull() ) {	// text item
+ 	    QString s = mi->text();
+-	    w = fm.boundingRect( s ).width()
+-		+ 2*motifItemHMargin;
++        if ( gs == GtkStyle ) {
++            w = fm.boundingRect( s ).width() + 2*gtkItemHMargin;
++        } else {
++	        w = fm.boundingRect( s ).width() + 2*motifItemHMargin;
++        }
+ 	    w -= s.contains('&')*fm.width('&');
+ 	    w += s.contains("&&")*fm.width('&');
+ 	    w = QMAX( w, QApplication::globalStrut().width() );
+-	    h = QMAX( fm.height() + motifItemVMargin, QApplication::globalStrut().height() );
++        if (gs == GtkStyle ) {
++            h = QMAX( fm.height() + gtkItemVMargin, QApplication::globalStrut().height() );
++        } else {
++	        h = QMAX( fm.height() + motifItemVMargin, QApplication::globalStrut().height() );
++        }
+ 	} else if ( mi->isSeparator() ) {	// separator item
+ 	    if ( style().styleHint(QStyle::SH_GUIStyle) == MotifStyle )
+ 		separator = i; //### only motif?
+--- qt-x11-free-3.3.3.orig/src/widgets/qpopupmenu.cpp	2004-08-05 16:42:21.000000000 +0200
++++ qt-x11-free-3.3.3/src/widgets/qpopupmenu.cpp	2004-12-03 17:43:50.000000000 +0100
+@@ -65,6 +65,8 @@
+ static const int motifArrowHMargin	= 6;	// arrow horizontal margin
+ static const int motifArrowVMargin	= 2;	// arrow vertical margin
+ 
++static const int gtkArrowHMargin	= 0;	// arrow horizontal margin
++static const int gtkArrowVMargin	= 0;	// arrow vertical margin
+ 
+ /*
+ 
+@@ -2289,8 +2291,18 @@
+     QRect r( itemGeometry( actItem ) );
+     QPoint p;
+     QSize ps = popup->sizeHint();
++    // GUI Style
++    int gs = style().styleHint(QStyle::SH_GUIStyle);
++    int arrowHMargin, arrowVMargin;
++    if (gs == GtkStyle) {
++        arrowHMargin = gtkArrowHMargin;
++        arrowVMargin = gtkArrowVMargin;
++    } else {
++        arrowHMargin = motifArrowHMargin;
++        arrowVMargin = motifArrowVMargin;
++    }
+     if( QApplication::reverseLayout() ) {
+-	p = QPoint( r.left() + motifArrowHMargin - ps.width(), r.top() + motifArrowVMargin );
++	p = QPoint( r.left() + arrowHMargin - ps.width(), r.top() + arrowVMargin );
+ 	p = mapToGlobal( p );
+ 
+ 	bool right = FALSE;
+@@ -2303,7 +2315,7 @@
+ 	if ( right )
+ 	    p.setX( mapToGlobal( r.topRight() ).x() );
+     } else {
+-	p = QPoint( r.right() - motifArrowHMargin, r.top() + motifArrowVMargin );
++	p = QPoint( r.right() - arrowHMargin, r.top() + arrowVMargin );
+ 	p = mapToGlobal( p );
+ 
+ 	bool left = FALSE;
+--- qt-x11-free-3.3.3.orig/src/kernel/qnamespace.h	2004-08-05 16:42:10.000000000 +0200
++++ qt-x11-free-3.3.3/src/kernel/qnamespace.h	2004-11-29 22:22:26.000000000 +0100
+@@ -294,7 +294,8 @@
+ #ifdef QT_NO_COMPAT
+     enum GUIStyle {
+ 	WindowsStyle = 1,     // ### Qt 4.0: either remove the obsolete enums or clean up compat vs.
+-	MotifStyle = 4        // ### QT_NO_COMPAT by reordering or combination into one enum.
++	MotifStyle = 4,       // ### QT_NO_COMPAT by reordering or combination into one enum.
++    GtkStyle = 6          // Gtk compability mode
+     };
+ #else
+     enum GUIStyle {
+@@ -302,7 +303,8 @@
+ 	WindowsStyle,
+ 	Win3Style, // OBSOLETE
+ 	PMStyle, // OBSOLETE
+-	MotifStyle
++	MotifStyle,
++    GtkStyle = 6          // Gtk compability mode
+     };
+ #endif
+ 

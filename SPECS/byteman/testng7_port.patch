@@ -1,0 +1,22 @@
+diff --git a/byteman-4.0.15/contrib/bmunit/src/org/jboss/byteman/contrib/bmunit/BMNGListener.java b/byteman-4.0.15/contrib/bmunit/src/org/jboss/byteman/contrib/bmunit/BMNGListener.java
+index 2f784bc..9e4fec9 100644
+--- a/byteman-4.0.15/contrib/bmunit/src/org/jboss/byteman/contrib/bmunit/BMNGListener.java
++++ b/byteman-4.0.15/contrib/bmunit/src/org/jboss/byteman/contrib/bmunit/BMNGListener.java
+@@ -61,7 +61,7 @@ public class BMNGListener extends BMNGAbstractRunner implements IInvokedMethodLi
+     }
+ 
+     public void beforeInvocation(IInvokedMethod method, ITestResult testResult) {
+-        Method javaMethod = method.getTestMethod().getMethod();
++        Method javaMethod = method.getTestMethod().getConstructorOrMethod().getMethod();
+         Class clazz = javaMethod.getDeclaringClass();
+         if (!checkBMNGListener(clazz)) {
+             return;
+@@ -81,7 +81,7 @@ public class BMNGListener extends BMNGAbstractRunner implements IInvokedMethodLi
+     }
+ 
+     public void afterInvocation(IInvokedMethod method, ITestResult testResult) {
+-        Method javaMethod = method.getTestMethod().getMethod();
++        Method javaMethod = method.getTestMethod().getConstructorOrMethod().getMethod();
+         Class clazz = javaMethod.getDeclaringClass();
+         if (!checkBMNGListener(clazz)) {
+             return;

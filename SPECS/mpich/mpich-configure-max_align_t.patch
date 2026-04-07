@@ -1,0 +1,18 @@
+Remove spurious argument to AC_CHECK_ALIGNOF, which caused this
+configure test to fail.
+
+Submitted upstream: <https://github.com/pmodels/mpich/pull/6302>
+
+diff --git a/configure.ac b/configure.ac
+index 3e2aa2cb7e828675..f76eb49833bb358c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -2701,7 +2701,7 @@ if test "$MPID_NO_FLOAT16" != "yes" ; then
+ fi
+ 
+ # ----------------------------------------------------------------------------
+-AC_CHECK_ALIGNOF([max_align_t],[0],[#include <stddef.h>])
++AC_CHECK_ALIGNOF([max_align_t],[#include <stddef.h>])
+ 
+ if test "$ac_cv_alignof_max_align_t" != "0" ; then
+     AC_DEFINE_UNQUOTED(MAX_ALIGNMENT,$ac_cv_alignof_max_align_t,[Controls byte alignment of structures (for aligning allocated structures)])

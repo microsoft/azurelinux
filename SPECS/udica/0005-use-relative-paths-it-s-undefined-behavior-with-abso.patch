@@ -1,0 +1,30 @@
+From a9440c7de24e39084bc5f5970bd22eaf224a237f Mon Sep 17 00:00:00 2001
+From: Petr Lautrbach <lautrbach@redhat.com>
+Date: Fri, 11 Oct 2024 14:18:07 +0200
+Subject: [PATCH] use relative paths, it's undefined behavior with absolute
+Content-type: text/plain
+
+---
+ setup.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index d3f20f49bdb0..7a29a6f57d8c 100644
+--- a/setup.py
++++ b/setup.py
+@@ -35,9 +35,9 @@ setuptools.setup(
+     packages=["udica"],
+     python_requires=">=3.4, <4",
+     data_files=[
+-        ("/usr/share/licenses/udica", ["LICENSE"]),
+-        ("/usr/share/udica/ansible", ["udica/ansible/deploy-module.yml"]),
+-        ("/usr/share/udica/macros", ["udica/macros/confined_user_macros.cil"]),
++        ("share/licenses/udica", ["LICENSE"]),
++        ("share/udica/ansible", ["udica/ansible/deploy-module.yml"]),
++        ("share/udica/macros", ["udica/macros/confined_user_macros.cil"]),
+     ],
+     # scripts=["bin/udica"],
+     entry_points={"console_scripts": ["udica=udica.__main__:main"]},
+-- 
+2.47.0
+

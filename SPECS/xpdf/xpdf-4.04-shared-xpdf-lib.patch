@@ -1,0 +1,17 @@
+diff -up xpdf-4.04/xpdf/CMakeLists.txt.shared-xpdf-lib xpdf-4.04/xpdf/CMakeLists.txt
+--- xpdf-4.04/xpdf/CMakeLists.txt.shared-xpdf-lib	2023-01-30 14:30:07.185779720 -0500
++++ xpdf-4.04/xpdf/CMakeLists.txt	2023-01-30 14:31:41.942842314 -0500
+@@ -78,6 +78,13 @@ add_library(xpdf_objs OBJECT
+ set_property(TARGET xpdf_objs
+              PROPERTY POSITION_INDEPENDENT_CODE True)
+ 
++add_library(xpdfcore
++  $<TARGET_OBJECTS:xpdf_objs>
++)
++
++set_target_properties(xpdfcore PROPERTIES VERSION 4 SOVERSION 4)
++
++
+ #--- object files needed by XpdfWidget
+ 
+ if ((QT4_FOUND OR Qt5Widgets_FOUND OR Qt6Widgets_FOUND)

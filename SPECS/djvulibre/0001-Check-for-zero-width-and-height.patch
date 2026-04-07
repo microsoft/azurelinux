@@ -1,0 +1,35 @@
+From 3e7facdbcdab27143327b216cddb42a6dd1a50a7 Mon Sep 17 00:00:00 2001
+From: Petr Gajdos <pgajdos@suse.cz>
+Date: Mon, 6 May 2024 11:26:12 +0200
+Subject: [PATCH] Check for zero width and height
+
+Also check for positive number of gray levels.
+
+The patch was created by Petr Gajdos for
+https://sourceforge.net/p/djvu/bugs/345/ and pushed
+by Marek Kasik to Fedora/EPEL repositories.
+---
+ libdjvu/IW44EncodeCodec.cpp | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/libdjvu/IW44EncodeCodec.cpp b/libdjvu/IW44EncodeCodec.cpp
+index f81eaeb..7a402f7 100644
+--- a/libdjvu/IW44EncodeCodec.cpp
++++ b/libdjvu/IW44EncodeCodec.cpp
+@@ -1424,7 +1424,12 @@ IWBitmap::Encode::init(const GBitmap &bm, const GP<GBitmap> gmask)
+   int h = bm.rows();
+   int g = bm.get_grays()-1;
+   signed char *buffer;
+-  GPBuffer<signed char> gbuffer(buffer,w*h);
++  size_t sz = w * h;
++  if (sz == 0 || g <= 0) // w or h is zero or g is not positive
++    G_THROW("IWBitmap: zero size image (corrupted file?)");
++  if (sz / (size_t)w != (size_t)h) // multiplication overflow
++    G_THROW("IWBitmap: image size exceeds maximum (corrupted file?)");
++  GPBuffer<signed char> gbuffer(buffer,sz);
+   // Prepare gray level conversion table
+   signed char  bconv[256];
+   for (i=0; i<256; i++)
+-- 
+2.44.0
+

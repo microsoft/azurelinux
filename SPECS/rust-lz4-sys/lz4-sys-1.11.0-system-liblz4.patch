@@ -1,0 +1,31 @@
+diff --git a/build.rs b/build.rs
+index 025b708..885b631 100644
+--- a/build.rs
++++ b/build.rs
+@@ -15,6 +15,18 @@ fn main() {
+ }
+ 
+ fn run() -> Result<(), Box<dyn Error>> {
++    let target = get_from_env("TARGET")?;
++
++    if !target.contains("windows")
++        && pkg_config::Config::new()
++            .print_system_libs(false)
++            .cargo_metadata(true)
++            .probe("liblz4")
++            .is_ok()
++    {
++        return Ok(());
++    }
++
+     let mut compiler = cc::Build::new();
+     compiler
+         .file("liblz4/lib/lz4.c")
+@@ -24,7 +36,6 @@ fn run() -> Result<(), Box<dyn Error>> {
+         // We always compile the C with optimization, because otherwise it is 20x slower.
+         .opt_level(3);
+ 
+-    let target = get_from_env("TARGET")?;
+     if target.contains("windows") {
+         if target == "i686-pc-windows-gnu" {
+             // Disable auto-vectorization for 32-bit MinGW target.

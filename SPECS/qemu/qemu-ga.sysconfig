@@ -1,0 +1,20 @@
+# This is a systemd environment file, not a shell script.
+# It provides settings for "/lib/systemd/system/qemu-guest-agent.service".
+
+# Extra arguments to pass to the guest QEMU, for example, to filter our
+# RPC commands. See 'qemu-ga(8)' man page for permissible arguments.
+#
+# For example, to filter out a set of commands the --block-rpcs commands:
+#
+#QEMU_GA_ARGS=--block-rpcs=guest-file-open,guest-file-close,guest-file-read,guest-file-write,guest-file-seek,guest-file-flush,guest-exec,guest-exec-status
+
+# Fsfreeze hook script specification.
+#
+# FSFREEZE_HOOK_PATHNAME=/dev/null           : disables the feature.
+#
+# FSFREEZE_HOOK_PATHNAME=/path/to/executable : enables the feature with the
+# specified binary or shell script.
+#
+# FSFREEZE_HOOK_PATHNAME=                    : enables the feature with the
+# default value (invoke "qemu-ga --help" to interrogate).
+FSFREEZE_HOOK_PATHNAME=/etc/qemu-ga/fsfreeze-hook

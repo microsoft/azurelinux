@@ -1,0 +1,25 @@
+From f3a745be207831ebd07add16e66ac2b43a743dc1 Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Fri, 24 Jan 2025 11:42:39 +0100
+Subject: [PATCH] Correct the definition of setup_bio_callbacks() in ssl.c
+
+---
+ ssl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ssl.c b/ssl.c
+index e518097..02ed489 100644
+--- a/ssl.c
++++ b/ssl.c
+@@ -36,7 +36,7 @@
+ static char* get_ssl_error();
+ static SSL* get_ssl(struct vsf_session* p_sess, int fd);
+ static int ssl_session_init(struct vsf_session* p_sess);
+-static void setup_bio_callbacks();
++static void setup_bio_callbacks(SSL* p_ssl);
+ static long bio_callback(
+   BIO* p_bio, int oper, const char* p_arg, size_t len, int argi, long argl, int ret, size_t *processed);
+ static int ssl_verify_callback(int verify_ok, X509_STORE_CTX* p_ctx);
+-- 
+2.48.1
+

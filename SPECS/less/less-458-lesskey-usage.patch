@@ -1,0 +1,20 @@
+diff -upr less-458_orig/lesskey.c less-458_work/lesskey.c
+--- less-458_orig/lesskey.c	2013-05-07 14:03:52.062104533 +0200
++++ less-458_work/lesskey.c	2013-05-07 11:21:10.881991855 +0200
+@@ -217,7 +217,15 @@ extern char version[];
+ 
+ static void usage(void)
+ {
+-	fprintf(stderr, "usage: lesskey [-o output] [input]\n");
++	fprintf(stderr, "usage: lesskey [-o output] [input]\n\n");
++	fprintf(stderr,
++			"  -o output\t- specify output file, otherwise $HOME/.less is used\n");
++	fprintf(stderr,
++			"  -i input\t- specify input file, otherwise standard input is used\n");
++	fprintf(stderr,
++			"  -V\t\t- print lesskey version\n");
++	fprintf(stderr,
++			"  -h\t\t- print this help\n");
+ 	exit(1);
+ }
+ 

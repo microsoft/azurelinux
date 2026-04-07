@@ -1,0 +1,45 @@
+Include <unistd.h> for the setresuid and setresgid functions,
+to avoid an implicit function declaration.
+
+Submitted upstream: <https://github.com/opendnssec/opendnssec/pull/843>
+
+diff --git a/configure b/configure
+index bf515cde3d4fab71..52d2885d6a6ef546 100755
+--- a/configure
++++ b/configure
+@@ -21101,6 +21101,7 @@ else
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+ 
++#include <unistd.h>
+ #include <stdlib.h>
+ #include <errno.h>
+ int main(){errno=0; setresuid(0,0,0); if (errno==ENOSYS) exit(1); else exit(0);}
+@@ -21143,6 +21144,7 @@ else
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+ 
++#include <unistd.h>
+ #include <stdlib.h>
+ #include <errno.h>
+ int main(){errno=0; setresgid(0,0,0); if (errno==ENOSYS) exit(1); else exit(0);}
+diff --git a/m4/acx_broken_setres.m4 b/m4/acx_broken_setres.m4
+index 374cee0b0b8ef196..467db9170a319170 100644
+--- a/m4/acx_broken_setres.m4
++++ b/m4/acx_broken_setres.m4
+@@ -4,6 +4,7 @@ AC_DEFUN([ACX_BROKEN_SETRES],[
+ 		AC_MSG_CHECKING(if setresuid seems to work)
+ 		AC_RUN_IFELSE(
+ 			[AC_LANG_SOURCE([[
++#include <unistd.h>
+ #include <stdlib.h>
+ #include <errno.h>
+ int main(){errno=0; setresuid(0,0,0); if (errno==ENOSYS) exit(1); else exit(0);}
+@@ -20,6 +21,7 @@ int main(){errno=0; setresuid(0,0,0); if (errno==ENOSYS) exit(1); else exit(0);}
+ 		AC_MSG_CHECKING(if setresgid seems to work)
+ 		AC_RUN_IFELSE(
+ 			[AC_LANG_SOURCE([[
++#include <unistd.h>
+ #include <stdlib.h>
+ #include <errno.h>
+ int main(){errno=0; setresgid(0,0,0); if (errno==ENOSYS) exit(1); else exit(0);}

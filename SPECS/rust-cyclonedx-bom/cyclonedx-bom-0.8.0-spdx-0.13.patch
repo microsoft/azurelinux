@@ -1,0 +1,39 @@
+diff --git a/src/external_models/spdx.rs b/src/external_models/spdx.rs
+index c2926bb..b373521 100644
+--- a/src/external_models/spdx.rs
++++ b/src/external_models/spdx.rs
+@@ -166,7 +166,13 @@ impl TryFrom<String> for SpdxExpression {
+     type Error = SpdxExpressionError;
+ 
+     fn try_from(value: String) -> Result<Self, Self::Error> {
+-        match Expression::parse(&value) {
++        match Expression::parse_mode(
++            &value,
++            ParseMode {
++                allow_deprecated: true,
++                ..ParseMode::STRICT
++            },
++        ) {
+             Ok(_) => Ok(Self {
+                 bom_ref: None,
+                 expression: value,
+@@ -186,7 +192,15 @@ impl std::fmt::Display for SpdxExpression {
+ }
+ 
+ pub fn validate_spdx_expression(expression: &SpdxExpression) -> Result<(), ValidationError> {
+-    if Expression::parse(&expression.expression).is_err() {
++    if Expression::parse_mode(
++        &expression.expression,
++        ParseMode {
++            allow_deprecated: true,
++            ..ParseMode::STRICT
++        },
++    )
++    .is_err()
++    {
+         return Err(ValidationError::new("SPDX expression is not valid"));
+     }
+     Ok(())
+-- 
+2.52.0
+

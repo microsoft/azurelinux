@@ -1,0 +1,93 @@
+From 0707772eb689781e1e909723e1faec280554138f Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hansg@kernel.org>
+Date: Mon, 22 Sep 2025 13:27:00 +0200
+Subject: [PATCH 4/8] ipa: software_isp: AGC: Do not lower gain below 1.0
+
+At the moment when the overall image brightness is considered too high
+the AGC code will lower the gain all the way down to againMin before
+considering lowering the exposure.
+
+What should happen instead is lower the gain no lower than 1.0 and after
+that lower the exposure instead of lowering the gain.
+
+Otherwise there might be a heavily overexposed image (e.g. all white)
+which then is made less white by a gain < 1.0 which is no good.
+
+When there is no sensor-helper, assume the driver reported default-gain
+value is close to a gain of 1.0 .
+
+While at it also remove the weird limitation to only lower the gain
+when exposure is set to the maximum. As long as the gain is higher
+than the default gain, the gain should be lowered first.
+
+Reviewed-by: Milan Zamazal <mzamazal@redhat.com>
+Tested-by: Milan Zamazal <mzamazal@redhat.com>
+Tested-by: Kieran Bingham <kieran.bingham@ideasonboard.com>
+Reviewed-by: Kieran Bingham <kieran.bingham@ideasonboard.com>
+Reviewed-by: Isaac Scott <isaac.scott at ideasonboard.com>
+Signed-off-by: Hans de Goede <hansg@kernel.org>
+---
+Changes in v2:
+- Use a gain of 1.0 as low-limit instead of always using the default-gain,
+  falling back to the default if there is no sensor-helper for the sensor.
+---
+ src/ipa/simple/algorithms/agc.cpp | 3 +--
+ src/ipa/simple/ipa_context.h      | 2 +-
+ src/ipa/simple/soft_simple.cpp    | 3 +++
+ 3 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/src/ipa/simple/algorithms/agc.cpp b/src/ipa/simple/algorithms/agc.cpp
+index c46bb0ebe..1fc8d7f42 100644
+--- a/src/ipa/simple/algorithms/agc.cpp
++++ b/src/ipa/simple/algorithms/agc.cpp
+@@ -71,8 +71,7 @@ void Agc::updateExposure(IPAContext &context, IPAFrameContext &frameContext, dou
+ 	}
+ 
+ 	if (exposureMSV > kExposureOptimal + kExposureSatisfactory) {
+-		if (exposure == context.configuration.agc.exposureMax &&
+-		    again > context.configuration.agc.againMin) {
++		if (again > context.configuration.agc.again10) {
+ 			next = again * kExpNumeratorDown / kExpDenominator;
+ 			if (again - next < context.configuration.agc.againMinStep)
+ 				again -= context.configuration.agc.againMinStep;
+diff --git a/src/ipa/simple/ipa_context.h b/src/ipa/simple/ipa_context.h
+index a471b80ae..468fccabb 100644
+--- a/src/ipa/simple/ipa_context.h
++++ b/src/ipa/simple/ipa_context.h
+@@ -28,7 +28,7 @@ struct IPASessionConfiguration {
+ 	float gamma;
+ 	struct {
+ 		int32_t exposureMin, exposureMax;
+-		double againMin, againMax, againMinStep;
++		double againMin, againMax, again10, againMinStep;
+ 		utils::Duration lineDuration;
+ 	} agc;
+ 	struct {
+diff --git a/src/ipa/simple/soft_simple.cpp b/src/ipa/simple/soft_simple.cpp
+index e70439ee5..b147aca2e 100644
+--- a/src/ipa/simple/soft_simple.cpp
++++ b/src/ipa/simple/soft_simple.cpp
+@@ -216,10 +216,12 @@ int IPASoftSimple::configure(const IPAConfigInfo &configInfo)
+ 
+ 	int32_t againMin = gainInfo.min().get<int32_t>();
+ 	int32_t againMax = gainInfo.max().get<int32_t>();
++	int32_t againDef = gainInfo.def().get<int32_t>();
+ 
+ 	if (camHelper_) {
+ 		context_.configuration.agc.againMin = camHelper_->gain(againMin);
+ 		context_.configuration.agc.againMax = camHelper_->gain(againMax);
++		context_.configuration.agc.again10 = camHelper_->gain(1.0);
+ 		context_.configuration.agc.againMinStep =
+ 			(context_.configuration.agc.againMax -
+ 			 context_.configuration.agc.againMin) /
+@@ -246,6 +248,7 @@ int IPASoftSimple::configure(const IPAConfigInfo &configInfo)
+ 		 * other) we limit the range of the gain values used.
+ 		 */
+ 		context_.configuration.agc.againMax = againMax;
++		context_.configuration.agc.again10 = againDef;
+ 		if (againMin) {
+ 			context_.configuration.agc.againMin = againMin;
+ 		} else {
+-- 
+2.51.0
+

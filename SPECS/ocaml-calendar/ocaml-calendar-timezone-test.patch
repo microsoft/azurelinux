@@ -1,0 +1,33 @@
+When the tests are executed in Mountain Standard Time, the timezone test fails:
+
+ASSERT gap g6 Local = gap g6 UTC + gap UTC Local
+File "tests/test_timezone.ml", line 37, character 2:
+FAIL gap g6 Local = gap g6 UTC + gap UTC Local
+
+   Expected: `11'
+   Received: `-13'
+
+--- calendar-3.0.0/tests/test_timezone.ml.orig	2022-10-11 09:39:06.000000000 -0600
++++ calendar-3.0.0/tests/test_timezone.ml	2024-12-13 11:20:28.349298798 -0700
+@@ -27,6 +27,12 @@ open Time_Zone;;
+ 
+ let tz = Alcotest.testable (Fmt.always "timezone") (=) ;;
+ 
++let make_in_bounds x =
++  let y = x mod 24 in
++  if y < -12 then y + 24
++  else if y > 11 then y - 24
++  else y
++
+ let test () =
+   change UTC;
+   Alcotest.(check tz) "current () = UTC" UTC (current ());
+@@ -36,7 +42,7 @@ let test () =
+   let g6 = UTC_Plus 6 in
+   Alcotest.(check int)
+     "gap g6 Local = gap g6 UTC + gap UTC Local"
+-    (gap g6 Local) (gap g6 UTC + gap UTC Local);
++    (gap g6 Local) (make_in_bounds (gap g6 UTC + gap UTC Local));
+   Gen_test.test_exn (lazy (change (UTC_Plus 13))) "change 13";
+   Gen_test.test_exn (lazy (change (UTC_Plus (-15)))) "change (-15)";
+   change (UTC_Plus 4);

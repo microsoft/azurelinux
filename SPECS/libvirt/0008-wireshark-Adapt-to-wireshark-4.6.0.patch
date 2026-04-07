@@ -1,0 +1,493 @@
+From b42a12174c787b99cd6fcb29b44e4b13bd64ee58 Mon Sep 17 00:00:00 2001
+Message-ID: <b42a12174c787b99cd6fcb29b44e4b13bd64ee58.1760476767.git.crobinso@redhat.com>
+In-Reply-To: <b825bb556bd3967bf5422c243b77bd4038e317e2.1760476767.git.crobinso@redhat.com>
+References: <b825bb556bd3967bf5422c243b77bd4038e317e2.1760476767.git.crobinso@redhat.com>
+From: Michal Privoznik <mprivozn@redhat.com>
+Date: Fri, 10 Oct 2025 15:22:34 +0200
+Subject: [PATCH 8/8] wireshark: Adapt to wireshark-4.6.0
+Content-type: text/plain
+
+The main difference is that wmem_packet_scope() is gone [1] but
+the packet_info struct has 'pool` member which points to the
+allocator used for given packet.
+
+Unfortunately, while we were given pointer to packet_info at the
+entry level to our dissector (dissect_libvirt() ->
+tcp_dissect_pdus() -> dissect_libvirt_message()) it was never
+propagated to generated/primitive dissectors.
+
+But not all dissectors need to allocate memory, so mark the new
+argument as unused. And while our generator could be rewritten so
+that the argument is annotated as unused iff it's really unused,
+I couldn't bother rewriting it. It's generated code after all.
+Too much work for little gain.
+
+Another significant change is that val_to_str() now requires new
+argument: pointer to allocator to use because it always allocates
+new memory [2][3].
+
+1: https://gitlab.com/wireshark/wireshark/-/commit/5ca5c9ca372e06881b23ba9f4fdcb6b479886444
+2: https://gitlab.com/wireshark/wireshark/-/commit/b63599762468e4cf1783419a5556377604d344bb
+3: https://gitlab.com/wireshark/wireshark/-/commit/84799be215313e61b83a3eaf074f89d6ee349b8c
+Resolves: https://gitlab.com/libvirt/libvirt/-/issues/823
+Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
+Reviewed-by: Peter Krempa <pkrempa@redhat.com>
+Signed-off-by: Cole Robinson <crobinso@redhat.com>
+---
+ tools/wireshark/src/packet-libvirt.c | 157 +++++++++++++++++++--------
+ tools/wireshark/util/genxdrstub.pl   |  18 +--
+ 2 files changed, 119 insertions(+), 56 deletions(-)
+
+diff --git a/tools/wireshark/src/packet-libvirt.c b/tools/wireshark/src/packet-libvirt.c
+index 3178ac6f27..c5c8fb4756 100644
+--- a/tools/wireshark/src/packet-libvirt.c
++++ b/tools/wireshark/src/packet-libvirt.c
+@@ -63,7 +63,7 @@ static gint ett_libvirt_stream_hole = -1;
+ 
+ #define XDR_PRIMITIVE_DISSECTOR(xtype, ctype, ftype) \
+     static gboolean \
+-    dissect_xdr_##xtype(tvbuff_t *tvb, proto_tree *tree, XDR *xdrs, int hf) \
++    dissect_xdr_##xtype(tvbuff_t *tvb, packet_info *pinfo G_GNUC_UNUSED, proto_tree *tree, XDR *xdrs, int hf) \
+     { \
+         goffset start; \
+         ctype val; \
+@@ -93,7 +93,7 @@ XDR_PRIMITIVE_DISSECTOR(bool,    bool_t,   boolean)
+ 
+ VIR_WARNINGS_RESET
+ 
+-typedef gboolean (*vir_xdr_dissector_t)(tvbuff_t *tvb, proto_tree *tree, XDR *xdrs, int hf);
++typedef gboolean (*vir_xdr_dissector_t)(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, XDR *xdrs, int hf);
+ 
+ typedef struct vir_dissector_index vir_dissector_index_t;
+ struct vir_dissector_index {
+@@ -146,22 +146,32 @@ static const value_string status_strings[] = {
+ };
+ 
+ static char *
+-G_GNUC_PRINTF(3, 0)
+-vir_val_to_str(const uint32_t val,
++G_GNUC_PRINTF(4, 0)
++vir_val_to_str(packet_info *pinfo,
++               const uint32_t val,
+                const value_string *vs,
+                const char *fmt)
+ {
+-    return val_to_str_wmem(wmem_packet_scope(), val, vs, fmt);
++#if WIRESHARK_VERSION < 4006000
++    return val_to_str_wmem(pinfo->pool, val, vs, fmt);
++#else
++    return val_to_str(pinfo->pool, val, vs, fmt);
++#endif
+ }
+ 
+ static void
+-vir_wmem_free(void *ptr)
++vir_wmem_free(packet_info *pinfo,
++              void *ptr)
+ {
+-    wmem_free(wmem_packet_scope(), ptr);
++    wmem_free(pinfo->pool, ptr);
+ }
+ 
+ static gboolean
+-dissect_xdr_string(tvbuff_t *tvb, proto_tree *tree, XDR *xdrs, int hf,
++dissect_xdr_string(tvbuff_t *tvb,
++                   packet_info *pinfo G_GNUC_UNUSED,
++                   proto_tree *tree,
++                   XDR *xdrs,
++                   int hf,
+                    guint32 maxlen)
+ {
+     goffset start;
+@@ -179,7 +189,11 @@ dissect_xdr_string(tvbuff_t *tvb, proto_tree *tree, XDR *xdrs, int hf,
+ }
+ 
+ static gboolean
+-dissect_xdr_opaque(tvbuff_t *tvb, proto_tree *tree, XDR *xdrs, int hf,
++dissect_xdr_opaque(tvbuff_t *tvb,
++                   packet_info *pinfo,
++                   proto_tree *tree,
++                   XDR *xdrs,
++                   int hf,
+                    guint32 size)
+ {
+     goffset start;
+@@ -190,7 +204,7 @@ dissect_xdr_opaque(tvbuff_t *tvb, proto_tree *tree, XDR *xdrs, int hf,
+     start = xdr_getpos(xdrs);
+     if ((rc = xdr_opaque(xdrs, (caddr_t)val, size))) {
+         gint len = xdr_getpos(xdrs) - start;
+-        const char *s = tvb_bytes_to_str(wmem_packet_scope(), tvb, start, len);
++        const char *s = tvb_bytes_to_str(pinfo->pool, tvb, start, len);
+ 
+         proto_tree_add_bytes_format_value(tree, hf, tvb, start, len, NULL, "%s", s);
+     } else {
+@@ -202,7 +216,11 @@ dissect_xdr_opaque(tvbuff_t *tvb, proto_tree *tree, XDR *xdrs, int hf,
+ }
+ 
+ static gboolean
+-dissect_xdr_bytes(tvbuff_t *tvb, proto_tree *tree, XDR *xdrs, int hf,
++dissect_xdr_bytes(tvbuff_t *tvb,
++                  packet_info *pinfo,
++                  proto_tree *tree,
++                  XDR *xdrs,
++                  int hf,
+                   guint32 maxlen)
+ {
+     goffset start;
+@@ -212,7 +230,7 @@ dissect_xdr_bytes(tvbuff_t *tvb, proto_tree *tree, XDR *xdrs, int hf,
+     start = xdr_getpos(xdrs);
+     if (xdr_bytes(xdrs, (char **)&val, &length, maxlen)) {
+         gint len = xdr_getpos(xdrs) - start;
+-        const char *s = tvb_bytes_to_str(wmem_packet_scope(), tvb, start, len);
++        const char *s = tvb_bytes_to_str(pinfo->pool, tvb, start, len);
+ 
+         proto_tree_add_bytes_format_value(tree, hf, tvb, start, len, NULL, "%s", s);
+         free(val);
+@@ -224,7 +242,11 @@ dissect_xdr_bytes(tvbuff_t *tvb, proto_tree *tree, XDR *xdrs, int hf,
+ }
+ 
+ static gboolean
+-dissect_xdr_pointer(tvbuff_t *tvb, proto_tree *tree, XDR *xdrs, int hf,
++dissect_xdr_pointer(tvbuff_t *tvb,
++                    packet_info *pinfo,
++                    proto_tree *tree,
++                    XDR *xdrs,
++                    int hf,
+                     vir_xdr_dissector_t dissect)
+ {
+     goffset start;
+@@ -236,7 +258,7 @@ dissect_xdr_pointer(tvbuff_t *tvb, proto_tree *tree, XDR *xdrs, int hf,
+         return FALSE;
+     }
+     if (not_null) {
+-        return dissect(tvb, tree, xdrs, hf);
++        return dissect(tvb, pinfo, tree, xdrs, hf);
+     } else {
+         proto_item *ti;
+         ti = proto_tree_add_item(tree, hf, tvb, start, xdr_getpos(xdrs) - start, ENC_NA);
+@@ -246,15 +268,22 @@ dissect_xdr_pointer(tvbuff_t *tvb, proto_tree *tree, XDR *xdrs, int hf,
+ }
+ 
+ static gboolean
+-dissect_xdr_iterable(tvbuff_t *tvb, proto_item *ti, XDR *xdrs, gint ett, int rhf,
+-                     guint32 length, vir_xdr_dissector_t dissect, goffset start)
++dissect_xdr_iterable(tvbuff_t *tvb,
++                     packet_info *pinfo,
++                     proto_item *ti,
++                     XDR *xdrs,
++                     gint ett,
++                     int rhf,
++                     guint32 length,
++                     vir_xdr_dissector_t dissect,
++                     goffset start)
+ {
+     proto_tree *tree;
+     guint32 i;
+ 
+     tree = proto_item_add_subtree(ti, ett);
+     for (i = 0; i < length; i++) {
+-        if (!dissect(tvb, tree, xdrs, rhf))
++        if (!dissect(tvb, pinfo, tree, xdrs, rhf))
+             return FALSE;
+     }
+     proto_item_set_len(ti, xdr_getpos(xdrs) - start);
+@@ -262,8 +291,16 @@ dissect_xdr_iterable(tvbuff_t *tvb, proto_item *ti, XDR *xdrs, gint ett, int rhf
+ }
+ 
+ static gboolean
+-dissect_xdr_vector(tvbuff_t *tvb, proto_tree *tree, XDR *xdrs, int hf, gint ett,
+-                   int rhf, const gchar *rtype, guint32 size, vir_xdr_dissector_t dissect)
++dissect_xdr_vector(tvbuff_t *tvb,
++                   packet_info *pinfo,
++                   proto_tree *tree,
++                   XDR *xdrs,
++                   int hf,
++                   gint ett,
++                   int rhf,
++                   const gchar *rtype,
++                   guint32 size,
++                   vir_xdr_dissector_t dissect)
+ {
+     goffset start;
+     proto_item *ti;
+@@ -271,12 +308,20 @@ dissect_xdr_vector(tvbuff_t *tvb, proto_tree *tree, XDR *xdrs, int hf, gint ett,
+     start = xdr_getpos(xdrs);
+     ti = proto_tree_add_item(tree, hf, tvb, start, -1, ENC_NA);
+     proto_item_append_text(ti, " :: %s[%u]", rtype, size);
+-    return dissect_xdr_iterable(tvb, ti, xdrs, ett, rhf, size, dissect, start);
++    return dissect_xdr_iterable(tvb, pinfo, ti, xdrs, ett, rhf, size, dissect, start);
+ }
+ 
+ static gboolean
+-dissect_xdr_array(tvbuff_t *tvb, proto_tree *tree, XDR *xdrs, int hf, gint ett,
+-                  int rhf, const gchar *rtype, guint32 maxlen, vir_xdr_dissector_t dissect)
++dissect_xdr_array(tvbuff_t *tvb,
++                  packet_info *pinfo,
++                  proto_tree *tree,
++                  XDR *xdrs,
++                  int hf,
++                  gint ett,
++                  int rhf,
++                  const gchar *rtype,
++                  guint32 maxlen,
++                  vir_xdr_dissector_t dissect)
+ {
+     goffset start;
+     proto_item *ti;
+@@ -291,7 +336,7 @@ dissect_xdr_array(tvbuff_t *tvb, proto_tree *tree, XDR *xdrs, int hf, gint ett,
+ 
+     ti = proto_tree_add_item(tree, hf, tvb, start, -1, ENC_NA);
+     proto_item_append_text(ti, " :: %s<%u>", rtype, length);
+-    return dissect_xdr_iterable(tvb, ti, xdrs, ett, rhf, length, dissect, start);
++    return dissect_xdr_iterable(tvb, pinfo, ti, xdrs, ett, rhf, length, dissect, start);
+ }
+ 
+ static vir_xdr_dissector_t
+@@ -340,7 +385,10 @@ find_payload_dissector(int32_t proc,
+ }
+ 
+ static void
+-dissect_libvirt_stream(tvbuff_t *tvb, proto_tree *tree, gint payload_length)
++dissect_libvirt_stream(tvbuff_t *tvb,
++                       packet_info *pinfo G_GNUC_UNUSED,
++                       proto_tree *tree,
++                       gint payload_length)
+ {
+     proto_tree_add_item(tree, hf_libvirt_stream, tvb, VIR_HEADER_LEN,
+                         payload_length - VIR_HEADER_LEN, ENC_NA);
+@@ -357,6 +405,7 @@ dissect_libvirt_num_of_fds(tvbuff_t *tvb, proto_tree *tree)
+ 
+ static void
+ dissect_libvirt_fds(tvbuff_t *tvb G_GNUC_UNUSED,
++                    packet_info *pinfo G_GNUC_UNUSED,
+                     gint start G_GNUC_UNUSED,
+                     gint32 nfds G_GNUC_UNUSED)
+ {
+@@ -364,8 +413,12 @@ dissect_libvirt_fds(tvbuff_t *tvb G_GNUC_UNUSED,
+ }
+ 
+ static void
+-dissect_libvirt_payload_xdr_data(tvbuff_t *tvb, proto_tree *tree, gint payload_length,
+-                                 gint32 status, vir_xdr_dissector_t dissect)
++dissect_libvirt_payload_xdr_data(tvbuff_t *tvb,
++                                 packet_info *pinfo,
++                                 proto_tree *tree,
++                                 gint payload_length,
++                                 gint32 status,
++                                 vir_xdr_dissector_t dissect)
+ {
+     gint32 nfds = 0;
+     gint start = VIR_HEADER_LEN;
+@@ -384,17 +437,21 @@ dissect_libvirt_payload_xdr_data(tvbuff_t *tvb, proto_tree *tree, gint payload_l
+     payload_data = (caddr_t)tvb_memdup(NULL, payload_tvb, 0, payload_length);
+     xdrmem_create(&xdrs, payload_data, payload_length, XDR_DECODE);
+ 
+-    dissect(payload_tvb, tree, &xdrs, -1);
++    dissect(payload_tvb, pinfo, tree, &xdrs, -1);
+ 
+     xdr_destroy(&xdrs);
+     g_free(payload_data);
+ 
+     if (nfds != 0)
+-        dissect_libvirt_fds(tvb, start + payload_length, nfds);
++        dissect_libvirt_fds(tvb, pinfo, start + payload_length, nfds);
+ }
+ 
+ static gboolean
+-dissect_xdr_stream_hole(tvbuff_t *tvb, proto_tree *tree, XDR *xdrs, int hf)
++dissect_xdr_stream_hole(tvbuff_t *tvb,
++                        packet_info *pinfo,
++                        proto_tree *tree,
++                        XDR *xdrs,
++                        int hf)
+ {
+     goffset start;
+     proto_item *ti;
+@@ -411,10 +468,10 @@ dissect_xdr_stream_hole(tvbuff_t *tvb, proto_tree *tree, XDR *xdrs, int hf)
+     tree = proto_item_add_subtree(ti, ett_libvirt_stream_hole);
+ 
+     hf = hf_libvirt_stream_hole_length;
+-    if (!dissect_xdr_hyper(tvb, tree, xdrs, hf)) return FALSE;
++    if (!dissect_xdr_hyper(tvb, pinfo, tree, xdrs, hf)) return FALSE;
+ 
+     hf = hf_libvirt_stream_hole_flags;
+-    if (!dissect_xdr_u_int(tvb, tree, xdrs, hf)) return FALSE;
++    if (!dissect_xdr_u_int(tvb, pinfo, tree, xdrs, hf)) return FALSE;
+ 
+     proto_item_set_len(ti, xdr_getpos(xdrs) - start);
+     return TRUE;
+@@ -424,6 +481,7 @@ dissect_xdr_stream_hole(tvbuff_t *tvb, proto_tree *tree, XDR *xdrs, int hf)
+ 
+ static void
+ dissect_libvirt_payload(tvbuff_t *tvb,
++                        packet_info *pinfo,
+                         proto_tree *tree,
+                         uint32_t prog,
+                         int32_t proc,
+@@ -447,13 +505,13 @@ dissect_libvirt_payload(tvbuff_t *tvb,
+         xd = find_payload_dissector(proc, type, pds, *len);
+         if (xd == NULL)
+             goto unknown;
+-        dissect_libvirt_payload_xdr_data(tvb, tree, payload_length, status, xd);
++        dissect_libvirt_payload_xdr_data(tvb, pinfo, tree, payload_length, status, xd);
+     } else if (status == VIR_NET_ERROR) {
+-        dissect_libvirt_payload_xdr_data(tvb, tree, payload_length, status, dissect_xdr_remote_error);
++        dissect_libvirt_payload_xdr_data(tvb, pinfo, tree, payload_length, status, dissect_xdr_remote_error);
+     } else if (type == VIR_NET_STREAM) { /* implicitly, status == VIR_NET_CONTINUE */
+-        dissect_libvirt_stream(tvb, tree, payload_length);
++        dissect_libvirt_stream(tvb, pinfo, tree, payload_length);
+     } else if (type == VIR_NET_STREAM_HOLE) {
+-        dissect_libvirt_payload_xdr_data(tvb, tree, payload_length, status, dissect_xdr_stream_hole);
++        dissect_libvirt_payload_xdr_data(tvb, pinfo, tree, payload_length, status, dissect_xdr_stream_hole);
+     } else {
+         goto unknown;
+     }
+@@ -489,21 +547,21 @@ dissect_libvirt_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree,
+     serial = tvb_get_ntohl(tvb, offset); offset += 4;
+     status = tvb_get_ntohil(tvb, offset); offset += 4;
+ 
+-    prog_str = vir_val_to_str(prog, program_strings, "%x");
++    prog_str = vir_val_to_str(pinfo, prog, program_strings, "%x");
+     col_add_fstr(pinfo->cinfo, COL_INFO, "Prog=%s", prog_str);
+-    vir_wmem_free(prog_str);
++    vir_wmem_free(pinfo, prog_str);
+ 
+     vs = get_program_data(prog, VIR_PROGRAM_PROCSTRINGS);
+-    proc_str = vir_val_to_str(proc, vs, "%d");
++    proc_str = vir_val_to_str(pinfo, proc, vs, "%d");
+     col_append_fstr(pinfo->cinfo, COL_INFO, " Proc=%s", proc_str);
+-    vir_wmem_free(proc_str);
++    vir_wmem_free(pinfo, proc_str);
+ 
+-    type_str = vir_val_to_str(type, type_strings, "%d");
+-    status_str = vir_val_to_str(status, status_strings, "%d");
++    type_str = vir_val_to_str(pinfo, type, type_strings, "%d");
++    status_str = vir_val_to_str(pinfo, status, status_strings, "%d");
+     col_append_fstr(pinfo->cinfo, COL_INFO, " Type=%s Serial=%u Status=%s",
+                     type_str, serial, status_str);
+-    vir_wmem_free(status_str);
+-    vir_wmem_free(type_str);
++    vir_wmem_free(pinfo, status_str);
++    vir_wmem_free(pinfo, type_str);
+ 
+     if (tree) {
+         gint *hf_proc;
+@@ -532,21 +590,26 @@ dissect_libvirt_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree,
+         proto_tree_add_item(libvirt_tree, hf_libvirt_status,  tvb, offset, 4, ENC_NA); offset += 4;
+ 
+         /* Dissect payload remaining */
+-        dissect_libvirt_payload(tvb, libvirt_tree, prog, proc, type, status);
++        dissect_libvirt_payload(tvb, pinfo, libvirt_tree, prog, proc, type, status);
+     }
+ 
+     return 0;
+ }
+ 
+ static guint
+-get_message_len(packet_info *pinfo G_GNUC_UNUSED, tvbuff_t *tvb, int offset, void *data G_GNUC_UNUSED)
++get_message_len(packet_info *pinfo G_GNUC_UNUSED,
++                tvbuff_t *tvb,
++                int offset,
++                void *data G_GNUC_UNUSED)
+ {
+     return tvb_get_ntohl(tvb, offset);
+ }
+ 
+ static int
+-dissect_libvirt(tvbuff_t *tvb, packet_info *pinfo,
+-                proto_tree *tree, void *data G_GNUC_UNUSED)
++dissect_libvirt(tvbuff_t *tvb,
++                packet_info *pinfo,
++                proto_tree *tree,
++                void *data G_GNUC_UNUSED)
+ {
+     /* Another magic const - 4; simply, how much bytes
+      * is needed to tell the length of libvirt packet. */
+diff --git a/tools/wireshark/util/genxdrstub.pl b/tools/wireshark/util/genxdrstub.pl
+index 01b663a88c..f69695c091 100755
+--- a/tools/wireshark/util/genxdrstub.pl
++++ b/tools/wireshark/util/genxdrstub.pl
+@@ -250,7 +250,7 @@ sub xdr_type {
+ sub render_caller {
+     my ($self, $hfid) = @_;
+     my $name = $c->rinc( 'dissect_xdr_'.($self->idstrip || lc($self->xdr_type)) );
+-    "$name(tvb, tree, xdrs, hf)";
++    "$name(tvb, pinfo, tree, xdrs, hf)";
+ }
+ 
+ sub ft_type {
+@@ -345,7 +345,7 @@ BEGIN{::register_profile(
+ sub render_caller {
+     my ($self) = @_;
+     my ($klass) = ref($self) =~ /([^:]+)$/;
+-    sprintf '%s(tvb, tree, xdrs, hf, %s)',
++    sprintf '%s(tvb, pinfo, tree, xdrs, hf, %s)',
+         $c->rinc('dissect_xdr_'.lc($klass)),
+         $c->rinc('dissect_xdr_'.$self->reftype->idstrip);
+ }
+@@ -359,7 +359,7 @@ BEGIN{::register_profile(
+ sub render_caller {
+     my ($self, $hfid) = @_;
+     my ($klass) = ref($self) =~ /([^:]+)$/;
+-    sprintf '%s(tvb, tree, xdrs, hf, %s)',
++    sprintf '%s(tvb, pinfo, tree, xdrs, hf, %s)',
+         $c->rinc('dissect_xdr_'.lc($klass)), $self->length || '~0';
+ }
+ 
+@@ -447,7 +447,7 @@ BEGIN{::register_profile(
+ sub render_caller {
+     my ($self, $hfid) = @_;
+     my ($pname) = reverse split /__/, $hfid;
+-    sprintf 'dissect_xdr_array(tvb, tree, xdrs, hf, %s, %s, "%s", %s, %s)',
++    sprintf 'dissect_xdr_array(tvb, pinfo, tree, xdrs, hf, %s, %s, "%s", %s, %s)',
+         $c->rinc('ett_'.$self->idstrip),
+         $c->rinc("hf_$hfid\__$pname"),
+         $self->reftype->idstrip,
+@@ -476,7 +476,7 @@ BEGIN{::register_profile(
+ sub render_caller {
+     my ($self, $hfid) = @_;
+     my ($pname) = reverse split /__/, $hfid;
+-    sprintf 'dissect_xdr_vector(tvb, tree, xdrs, hf, %s, %s, "%s", %s, %s)',
++    sprintf 'dissect_xdr_vector(tvb, pinfo, tree, xdrs, hf, %s, %s, "%s", %s, %s)',
+         $c->rinc('ett_'.$self->idstrip),
+         $c->rinc("hf_$hfid\__$pname"),
+         $self->reftype->idstrip,
+@@ -857,7 +857,7 @@ __END__<<DUMMY # Dummy heredoc to disable perl syntax highlighting
+ my ($self, $ident) = @_;
+ return if $self->is_primitive;
+ %>
+-static gboolean dissect_xdr_<%= $ident %>(tvbuff_t *tvb, proto_tree *tree, XDR *xdrs, int hf)
++static gboolean dissect_xdr_<%= $ident %>(tvbuff_t *tvb, packet_info *pinfo G_GNUC_UNUSED, proto_tree *tree, XDR *xdrs, int hf)
+ {
+     return <%= $self->dealias->render_caller($self->ident eq $ident ? undef : $ident) %>;
+ }
+@@ -865,7 +865,7 @@ static gboolean dissect_xdr_<%= $ident %>(tvbuff_t *tvb, proto_tree *tree, XDR *
+ <% my ($self, $ident) = @_;
+    my $hfvar = $c->rinc('hf_'.$self->idstrip);
+ %>
+-static gboolean dissect_xdr_<%= $ident %>(tvbuff_t *tvb, proto_tree *tree, XDR *xdrs, int hf)
++static gboolean dissect_xdr_<%= $ident %>(tvbuff_t *tvb, packet_info *pinfo G_GNUC_UNUSED, proto_tree *tree, XDR *xdrs, int hf)
+ {
+     goffset start;
+     proto_item *ti;
+@@ -890,7 +890,7 @@ static gboolean dissect_xdr_<%= $ident %>(tvbuff_t *tvb, proto_tree *tree, XDR *
+ }
+ @@ Sym::Type::Enum#render_dissector
+ <% my ($self, $ident) = @_; %>
+-static gboolean dissect_xdr_<%= $ident %>(tvbuff_t *tvb, proto_tree *tree, XDR *xdrs, int hf)
++static gboolean dissect_xdr_<%= $ident %>(tvbuff_t *tvb, packet_info *pinfo G_GNUC_UNUSED, proto_tree *tree, XDR *xdrs, int hf)
+ {
+     goffset start;
+     enum { DUMMY } es;
+@@ -914,7 +914,7 @@ static gboolean dissect_xdr_<%= $ident %>(tvbuff_t *tvb, proto_tree *tree, XDR *
+ my ($self, $ident) = @_;
+ my $decl_type = $self->decl->type->idstrip;
+ %>
+-static gboolean dissect_xdr_<%= $ident %>(tvbuff_t *tvb, proto_tree *tree, XDR *xdrs, int hf)
++static gboolean dissect_xdr_<%= $ident %>(tvbuff_t *tvb, packet_info *pinfo G_GNUC_UNUSED, proto_tree *tree, XDR *xdrs, int hf)
+ {
+     gboolean rc = TRUE;
+     goffset start;
+-- 
+2.51.0
+

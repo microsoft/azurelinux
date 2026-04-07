@@ -1,0 +1,223 @@
+From cdd5082a9e3bdfc8de4aee4835dbdd607b4510be Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tom=C3=A1=C5=A1=20Mr=C3=A1z?= <tmraz@fedoraproject.org>
+Date: Tue, 5 Aug 2014 17:04:08 +0200
+Subject: [PATCH gnupg] add --file-is-digest option needed for copr
+
+---
+ g10/gpg.c     |  4 +++
+ g10/options.h |  1 +
+ g10/sign.c    | 93 ++++++++++++++++++++++++++++++++++++++++++++-------
+ 3 files changed, 85 insertions(+), 13 deletions(-)
+
+diff -up gnupg-2.4.7/g10/gpg.c.file-is-digest gnupg-2.4.7/g10/gpg.c
+--- gnupg-2.4.7/g10/gpg.c.file-is-digest	2025-01-23 18:11:50.417790048 +0100
++++ gnupg-2.4.7/g10/gpg.c	2025-01-23 18:11:50.419790035 +0100
+@@ -400,6 +400,7 @@ enum cmd_and_opt_values
+     oTTYtype,
+     oLCctype,
+     oLCmessages,
++    oFileIsDigest,
+     oXauthority,
+     oGroup,
+     oUnGroup,
+@@ -666,6 +667,7 @@ static gpgrt_opt_t opts[] = {
+   ARGPARSE_s_s (oTempDir,  "temp-directory", "@"),
+   ARGPARSE_s_s (oExecPath, "exec-path", "@"),
+   ARGPARSE_s_n (oExpert,      "expert", "@"),
++  ARGPARSE_s_n (oFileIsDigest, "file-is-digest", "@"),
+   ARGPARSE_s_n (oNoExpert, "no-expert", "@"),
+   ARGPARSE_s_n (oNoSecmemWarn, "no-secmem-warning", "@"),
+   ARGPARSE_s_n (oRequireSecmem, "require-secmem", "@"),
+@@ -2507,6 +2509,7 @@ main (int argc, char **argv)
+     opt.keyid_format = KF_NONE;
+     opt.def_sig_expire = "0";
+     opt.def_cert_expire = "0";
++    opt.file_is_digest = 0;
+     opt.passphrase_repeat = 1;
+     opt.emit_version = 0;
+     opt.weak_digests = NULL;
+@@ -3146,6 +3149,7 @@ main (int argc, char **argv)
+ 	  case oPhotoViewer: opt.photo_viewer = pargs.r.ret_str; break;
+ 
+ 	  case oForceAEAD: opt.force_aead = 1; break;
++	  case oFileIsDigest: opt.file_is_digest = 1; break;
+ 
+           case oDisableSignerUID: opt.flags.disable_signer_uid = 1; break;
+           case oIncludeKeyBlock:  opt.flags.include_key_block = 1; break;
+diff -up gnupg-2.4.7/g10/options.h.file-is-digest gnupg-2.4.7/g10/options.h
+--- gnupg-2.4.7/g10/options.h.file-is-digest	2024-09-20 12:07:25.000000000 +0200
++++ gnupg-2.4.7/g10/options.h	2025-01-23 18:11:50.419790035 +0100
+@@ -243,6 +243,7 @@ struct
+   int no_auto_check_trustdb;
+   int preserve_permissions;
+   int no_homedir_creation;
++  int file_is_digest;
+   struct groupitem *grouplist;
+   int mangle_dos_filenames;
+   int enable_progress_filter;
+diff -up gnupg-2.4.7/g10/sign.c.file-is-digest gnupg-2.4.7/g10/sign.c
+--- gnupg-2.4.7/g10/sign.c.file-is-digest	2024-05-15 12:33:38.000000000 +0200
++++ gnupg-2.4.7/g10/sign.c	2025-01-23 18:11:50.420790029 +0100
+@@ -40,6 +40,7 @@
+ #include "pkglue.h"
+ #include "../common/sysutils.h"
+ #include "call-agent.h"
++#include "../common/host2net.h"
+ #include "../common/mbox-util.h"
+ #include "../common/compliance.h"
+ 
+@@ -946,6 +947,8 @@ write_signature_packets (ctrl_t ctrl,
+ 
+       if (pk->version >= 5)
+         sig->version = 5;  /* Required for v5 keys.  */
++      else if (opt.file_is_digest)
++        sig->version = 3;
+       else
+         sig->version = 4;  /* Required.  */
+ 
+@@ -963,14 +966,22 @@ write_signature_packets (ctrl_t ctrl,
+       if (gcry_md_copy (&md, hash))
+         BUG ();
+ 
+-      build_sig_subpkt_from_sig (sig, pk, 0);
+-      mk_notation_policy_etc (ctrl, sig, NULL, pk);
+-      if (opt.flags.include_key_block && IS_SIG (sig))
+-        err = mk_sig_subpkt_key_block (ctrl, sig, pk);
+-      else
+-        err = 0;
+-      hash_sigversion_to_magic (md, sig, extrahash);
+-      gcry_md_final (md);
++      if (!opt.file_is_digest)
++        {
++          build_sig_subpkt_from_sig (sig, pk, 0);
++          mk_notation_policy_etc (ctrl, sig, NULL, pk);
++          if (opt.flags.include_key_block && IS_SIG (sig))
++            err = mk_sig_subpkt_key_block (ctrl, sig, pk);
++          else
++            err = 0;
++
++          hash_sigversion_to_magic (md, sig, extrahash);
++          gcry_md_final (md);
++        }
++      else if (sig->version >= 4)
++        {
++          log_bug("file-is-digest doesn't work with v4 sigs\n");
++        }
+ 
+       if (!err)
+         err = do_sign (ctrl, pk, sig, md, hash_for (pk), cache_nonce, 0);
+@@ -1035,6 +1046,8 @@ sign_file (ctrl_t ctrl, strlist_t filena
+   SK_LIST sk_rover = NULL;
+   int multifile = 0;
+   u32 duration=0;
++  int sigclass = 0x00;
++  u32 timestamp = 0;
+   pt_extra_hash_data_t extrahash = NULL;
+ 
+   pfx = new_progress_context ();
+@@ -1054,7 +1067,16 @@ sign_file (ctrl_t ctrl, strlist_t filena
+     fname = NULL;
+ 
+   if (fname && filenames->next && (!detached || encryptflag))
+-    log_bug ("multiple files can only be detached signed");
++    log_bug ("multiple files can only be detached signed\n");
++
++  if (opt.file_is_digest && (multifile || !fname))
++    log_bug ("file-is-digest only works with one file\n");
++  if (opt.file_is_digest && !detached)
++    log_bug ("file-is-digest can only write detached signatures\n");
++  if (opt.file_is_digest && !opt.def_digest_algo)
++    log_bug ("file-is-digest needs --digest-algo\n");
++  if (opt.file_is_digest && opt.textmode)
++    log_bug ("file-is-digest doesn't work with --textmode\n");
+ 
+   if (encryptflag == 2
+       && (rc = setup_symkey (&efx.symkey_s2k, &efx.symkey_dek)))
+@@ -1075,7 +1097,7 @@ sign_file (ctrl_t ctrl, strlist_t filena
+     goto leave;
+ 
+   /* Prepare iobufs. */
+-  if (multifile)    /* have list of filenames */
++  if (multifile || opt.file_is_digest)  /* have list of filenames */
+     inp = NULL;     /* we do it later */
+   else
+     {
+@@ -1230,7 +1252,7 @@ sign_file (ctrl_t ctrl, strlist_t filena
+   for (sk_rover = sk_list; sk_rover; sk_rover = sk_rover->next)
+     gcry_md_enable (mfx.md, hash_for (sk_rover->pk));
+ 
+-  if (!multifile)
++  if (!multifile && !opt.file_is_digest)
+     iobuf_push_filter (inp, md_filter, &mfx);
+ 
+   if (detached && !encryptflag)
+@@ -1296,6 +1318,8 @@ sign_file (ctrl_t ctrl, strlist_t filena
+ 
+   write_status_begin_signing (mfx.md);
+ 
++  sigclass = opt.textmode && !outfile? 0x01 : 0x00;
++
+   /* Setup the inner packet. */
+   if (detached)
+     {
+@@ -1343,6 +1367,49 @@ sign_file (ctrl_t ctrl, strlist_t filena
+           if (opt.verbose)
+             log_printf ("\n");
+ 	}
++      else if (opt.file_is_digest)
++        {
++          byte *mdb, ts[5] = {0};
++          size_t mdlen;
++          const char *fp;
++          int c, d;
++
++          gcry_md_final(mfx.md);
++          /* this assumes gcry_md_read returns the same buffer */
++          mdb = gcry_md_read(mfx.md, opt.def_digest_algo);
++          mdlen = gcry_md_get_algo_dlen(opt.def_digest_algo);
++          if (strlen(fname) != mdlen * 2 + 11)
++            log_bug("digests must be %zu + '@' + 5 bytes\n", mdlen);
++          d = -1;
++          for (fp = fname ; *fp; )
++            {
++               c = *fp++;
++               if (c >= '0' && c <= '9')
++                 c -= '0';
++               else if (c >= 'a' && c <= 'f')
++                 c -= 'a' - 10;
++               else if (c >= 'A' && c <= 'F')
++                 c -= 'A' - 10;
++               else
++                 log_bug("filename is not hex\n");
++               if (d >= 0)
++                {
++                   *mdb++ = d << 4 | c;
++                   c = -1;
++                   if (--mdlen == 0)
++                    {
++                       mdb = ts;
++                       if (*fp++ != '@')
++                         log_bug("missing time separator\n");
++                     }
++                 }
++               d = c;
++            }
++          sigclass = ts[0];
++          if (sigclass != 0x00 && sigclass != 0x01)
++            log_bug("bad cipher class\n");
++          timestamp = buf32_to_u32(ts + 1);
++        }
+       else
+         {
+           /* Read, so that the filter can calculate the digest. */
+@@ -1364,8 +1431,8 @@ sign_file (ctrl_t ctrl, strlist_t filena
+ 
+   /* Write the signatures. */
+   rc = write_signature_packets (ctrl, sk_list, out, mfx.md, extrahash,
+-                                opt.textmode && !outfile? 0x01 : 0x00,
+-                                0, duration, detached ? 'D':'S', NULL);
++                                sigclass,
++                                timestamp, duration, detached ? 'D':'S', NULL);
+   if (rc)
+     goto leave;
+ 

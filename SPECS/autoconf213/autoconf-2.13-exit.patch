@@ -1,0 +1,18 @@
+--- autoconf-2.13/acgeneral.m4.orig	Thu Jul 26 15:13:37 2001
++++ autoconf-2.13/acgeneral.m4	Thu Jul 26 15:14:00 2001
+@@ -1988,12 +1988,12 @@
+ AC_MSG_CHECKING(size of $1)
+ AC_CACHE_VAL(AC_CV_NAME,
+ [AC_TRY_RUN([#include <stdio.h>
+-main()
++int main()
+ {
+   FILE *f=fopen("conftestval", "w");
+-  if (!f) exit(1);
++  if (!f) return(1);
+   fprintf(f, "%d\n", sizeof($1));
+-  exit(0);
++  return(0);
+ }], AC_CV_NAME=`cat conftestval`, AC_CV_NAME=0, ifelse([$2], , , AC_CV_NAME=$2))])dnl
+ AC_MSG_RESULT($AC_CV_NAME)
+ AC_DEFINE_UNQUOTED(AC_TYPE_NAME, $AC_CV_NAME)

@@ -1,0 +1,53 @@
+From 720c41c9b1c58576b62c0367f917bdaedeec737c Mon Sep 17 00:00:00 2001
+From: Earlopain <14981592+Earlopain@users.noreply.github.com>
+Date: Sat, 16 Nov 2024 11:25:53 +0100
+Subject: [PATCH] Fix `net-http` adapter for Ruby 3.4
+
+This old constant was deprecated in 2001 and now finally removed
+
+It fixes this error:
+```
+/usr/local/bundle/bundler/gems/webmock-9ff63ac7c845/lib/webmock/http_lib_adapters/net_http.rb:25:in 'Module#remove_const': constant Net::HTTPSession not defined (NameError)
+
+        Net.send(:remove_const, :HTTPSession)
+           ^^^^^
+	from /usr/local/bundle/bundler/gems/webmock-9ff63ac7c845/lib/webmock/http_lib_adapters/net_http.rb:25:in 'WebMock::HttpLibAdapters::NetHttpAdapter.disable!'
+```
+---
+ lib/webmock/http_lib_adapters/net_http.rb | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/lib/webmock/http_lib_adapters/net_http.rb b/lib/webmock/http_lib_adapters/net_http.rb
+index fd2a4a6f..16b48bc2 100644
+--- a/lib/webmock/http_lib_adapters/net_http.rb
++++ b/lib/webmock/http_lib_adapters/net_http.rb
+@@ -12,19 +12,25 @@ class NetHttpAdapter < HttpLibAdapter
+       adapter_for :net_http
+ 
+       OriginalNetHTTP = Net::HTTP unless const_defined?(:OriginalNetHTTP)
++      # These were removed in https://github.com/ruby/net-http/pull/189
++      HAS_LEGACY_CONSTANTS = Net.const_defined?(:HTTPSession)
+ 
+       def self.enable!
+         Net.send(:remove_const, :HTTP)
+-        Net.send(:remove_const, :HTTPSession)
+         Net.send(:const_set, :HTTP, @webMockNetHTTP)
+-        Net.send(:const_set, :HTTPSession, @webMockNetHTTP)
++        if HAS_LEGACY_CONSTANTS
++          Net.send(:remove_const, :HTTPSession)
++          Net.send(:const_set, :HTTPSession, @webMockNetHTTP)
++        end
+       end
+ 
+       def self.disable!
+         Net.send(:remove_const, :HTTP)
+-        Net.send(:remove_const, :HTTPSession)
+         Net.send(:const_set, :HTTP, OriginalNetHTTP)
+-        Net.send(:const_set, :HTTPSession, OriginalNetHTTP)
++        if HAS_LEGACY_CONSTANTS
++          Net.send(:remove_const, :HTTPSession)
++          Net.send(:const_set, :HTTPSession, OriginalNetHTTP)
++        end
+ 
+         #copy all constants from @webMockNetHTTP to original Net::HTTP
+         #in case any constants were added to @webMockNetHTTP instead of Net::HTTP

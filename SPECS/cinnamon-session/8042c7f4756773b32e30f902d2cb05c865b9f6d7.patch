@@ -1,0 +1,24 @@
+From 8042c7f4756773b32e30f902d2cb05c865b9f6d7 Mon Sep 17 00:00:00 2001
+From: Michael Webster <miketwebster@gmail.com>
+Date: Wed, 3 Sep 2025 08:57:21 -0400
+Subject: [PATCH] csm-manager.c: Clear system inhibitors before attempting to
+ restart or shutdown using systemd.
+
+Fixes #186.
+---
+ cinnamon-session/csm-manager.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/cinnamon-session/csm-manager.c b/cinnamon-session/csm-manager.c
+index ed0d8b8..0958988 100644
+--- a/cinnamon-session/csm-manager.c
++++ b/cinnamon-session/csm-manager.c
+@@ -473,6 +473,8 @@ csm_manager_quit (CsmManager *manager)
+         /* See the comment in request_reboot() for some more details about how
+          * this works. */
+ 
++        csm_store_clear (manager->priv->inhibitors);
++
+         switch (manager->priv->logout_type) {
+         case CSM_MANAGER_LOGOUT_LOGOUT:
+                 csm_quit ();

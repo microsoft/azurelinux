@@ -1,0 +1,13 @@
+--- c-blosc-1.21.6/blosc/shuffle.c~	2024-06-24 17:56:17.000000000 +0200
++++ c-blosc-1.21.6/blosc/shuffle.c	2025-01-18 13:26:05.144968413 +0100
+@@ -22,8 +22,10 @@
+ 
+ /* Visual Studio < 2013 does not have stdbool.h so here it is a replacement: */
+ #if defined __STDC__ && defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L
++#if __STDC_VERSION__ < 202311L
+ /* have a C99 compiler */
+ typedef _Bool bool;
++#endif
+ #else
+ /* do not have a C99 compiler */
+ typedef unsigned char bool;

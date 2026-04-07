@@ -1,0 +1,26 @@
+From e935beaa73f30dd54253f96ca951a4b47fc9a3b7 Mon Sep 17 00:00:00 2001
+From: Mamoru TASAKA <mtasaka@fedoraproject.org>
+Date: Fri, 15 Aug 2025 15:35:58 +0900
+Subject: [PATCH] lxsession: workaround for setting ally bus
+
+---
+ lxsession/environement.vala | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/lxsession/environement.vala b/lxsession/environement.vala
+index a18f840..503f3f0 100644
+--- a/lxsession/environement.vala
++++ b/lxsession/environement.vala
+@@ -281,6 +281,9 @@ namespace Lxsession
+             }
+ */
+ 
++            /* Workaround: set up ally bus */
++            lxsession_spawn_command_line_async("gdbus call --session --dest org.a11y.Bus --object-path /org/a11y/bus --method org.a11y.Bus.GetAddress");
++
+             if (global_settings.get_item_string("Environment", "toolkit_integration", null) == "true")
+             {
+             /* Enable toolkit integration for OpenOffice.org / LibreOffice, if available. */
+-- 
+2.50.1
+

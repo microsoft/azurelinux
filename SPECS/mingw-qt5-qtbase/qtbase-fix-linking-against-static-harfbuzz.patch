@@ -1,0 +1,16 @@
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/src/gui/configure.json qtbase-everywhere-src-5.15.18-new/src/gui/configure.json
+--- qtbase-everywhere-src-5.15.18/src/gui/configure.json	2025-06-05 16:07:26.000000000 +0200
++++ qtbase-everywhere-src-5.15.18-new/src/gui/configure.json	2025-11-07 14:10:42.328435550 +0100
+@@ -303,7 +303,11 @@
+             },
+             "headers": "harfbuzz/hb.h",
+             "sources": [
+-                "-lharfbuzz"
++                { "type": "pkgConfig", "args": "--static --libs harfbuzz", "condition": "!features.shared" },
++                { "type": "pkgConfig", "args": "--libs harfbuzz", "condition": "features.shared" },
++                { "libs": "-lharfbuzz  -lfreetype -lharfbuzz -lglib-2.0 -lintl -lws2_32 -lole32 -lwinmm -lshlwapi -lpcre2-8 -lintl -lpcre2-8 -lintl -liconv -lgraphite2 -lbz2", "condition": "!features.shared" },
++                { "libs": "-Wl,-Bdynamic -lharfbuzz -Wl,-Bstatic", "condition": "!features.shared" },
++                { "libs": "-lharfbuzz", "condition": "features.shared" }
+             ]
+         },
+         "imf": {

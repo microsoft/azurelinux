@@ -1,0 +1,422 @@
+Common subdirectories: ltrace-0.7.91/config and ltrace-0.7.91-pm/config
+diff -u ltrace-0.7.91/configure.ac ltrace-0.7.91-pm/configure.ac
+--- ltrace-0.7.91/configure.ac	2015-01-09 00:38:17.977190726 +0100
++++ ltrace-0.7.91-pm/configure.ac	2015-01-09 00:37:40.261910548 +0100
+@@ -128,6 +128,51 @@
+ AC_CHECK_HEADERS(selinux/selinux.h)
+ AC_CHECK_LIB(selinux, security_get_boolean_active)
+ 
++dnl Whether (and which) elfutils libdw.so to use for unwinding.
++AC_ARG_WITH(elfutils,
++  AS_HELP_STRING([--with-elfutils], [Use elfutils libdwfl unwinding support]),
++  [case "${withval}" in
++  (yes|no) enable_elfutils=$withval;;
++  (*) enable_elfutils=yes
++    AM_CPPFLAGS="${AM_CPPFLAGS} -I${withval}/include"
++    AM_LDFLAGS="${AM_LDFLAGS} -L${withval}/lib"
++    elfutils_LD_LIBRARY_PATH="${withval}/lib:${withval}/lib/elfutils"
++    ;;
++esac],[enable_elfutils=maybe])
++
++dnl Check whether we have the elfutils libdwfl.h header installed.
++saved_CPPFLAGS="${CPPFLAGS}"
++CPPFLAGS="${CPPFLAGS} ${AM_CPPFLAGS}"
++AC_CHECK_HEADERS([elfutils/libdwfl.h],[have_libdwfl_h=yes])
++CPPFLAGS="${saved_CPPFLAGS}"
++
++dnl And whether libdw.so provides the unwinding functions.
++saved_LDFLAGS="${LDFLAGS}"
++LDFLAGS="${LDFLAGS} ${AM_LDFLAGS}"
++AC_CHECK_LIB([dw], [dwfl_getthread_frames], [have_libdw_dwfl_frames=yes])
++LDFLAGS="${saved_LDFLAGS}"
++
++AC_MSG_CHECKING([whether to use elfutils libdwfl unwinding support])
++case "${enable_elfutils}" in
++(yes|maybe)
++  if test x$have_libdwfl_h = xyes -a x$have_libdw_dwfl_frames = xyes; then
++    enable_elfutils=yes
++  elif test $enable_elfutils = maybe; then
++    enable_elfutils=no
++  else
++    AC_MSG_RESULT([$enable_elfutils])
++    AC_MSG_ERROR([Missing elfutils/libdwfl.h or dwfl_getthread_frames not in libdw.so])
++  fi
++  ;;
++(*) ;;
++esac
++AC_MSG_RESULT([$enable_elfutils])
++
++if test x"$enable_elfutils" = xyes; then
++  libdw_LIBS=-ldw
++  AC_SUBST(libdw_LIBS)
++  AC_DEFINE([HAVE_LIBDW], [1], [we have elfutils libdw])
++fi
+ 
+ # HAVE_LIBUNWIND
+ AC_ARG_WITH(libunwind,
+@@ -193,6 +238,13 @@
+   LDFLAGS="${saved_LDFLAGS}"
+ fi
+ 
++if test x"$enable_elfutils" = xyes -a x"$enable_libunwind" = xyes; then
++  AC_MSG_ERROR([Cannot enable both --with-libunwind and --with-elfutils])
++fi
++
++if test x"$enable_elfutils" = xyes -o x"$enable_libunwind" = xyes; then
++  AC_DEFINE([HAVE_UNWINDER], [1], [we have an unwinder available])
++fi
+ 
+ saved_CPPFLAGS="${CPPFLAGS}"
+ saved_LDFLAGS="${LDFLAGS}"
+@@ -340,6 +392,7 @@
+ AC_SUBST(AM_CFLAGS)
+ AC_SUBST(AM_LDFLAGS)
+ AC_SUBST(libelf_LD_LIBRARY_PATH)
++AC_SUBST(elfutils_LD_LIBRARY_PATH)
+ AC_SUBST(libunwind_LD_LIBRARY_PATH)
+ 
+ AC_CONFIG_FILES([
+Common subdirectories: ltrace-0.7.91/debian and ltrace-0.7.91-pm/debian
+Common subdirectories: ltrace-0.7.91/etc and ltrace-0.7.91-pm/etc
+diff -u ltrace-0.7.91/ltrace.1 ltrace-0.7.91-pm/ltrace.1
+--- ltrace-0.7.91/ltrace.1	2015-01-09 00:38:17.975190764 +0100
++++ ltrace-0.7.91-pm/ltrace.1	2015-01-09 00:37:40.261910548 +0100
+@@ -196,7 +196,8 @@
+ correct execution of setuid and/or setgid binaries.
+ .IP "\-w, --where \fInr"
+ Show backtrace of \fInr\fR stack frames for each traced function. This
+-option enabled only if libunwind support was enabled at compile time.
++option enabled only if elfutils or libunwind support was enabled at compile
++time.
+ .IP "\-x \fIfilter"
+ A qualifying expression which modifies which symbol table entry points
+ to trace.  The format of the filter expression is described in the
+Only in ltrace-0.7.91-pm/: ltrace.1.orig
+diff -u ltrace-0.7.91/Makefile.am ltrace-0.7.91-pm/Makefile.am
+--- ltrace-0.7.91/Makefile.am	2015-01-09 00:38:17.965190955 +0100
++++ ltrace-0.7.91-pm/Makefile.am	2015-01-09 00:37:40.260910568 +0100
+@@ -40,6 +40,7 @@
+ 	$(liberty_LIBS) \
+ 	$(libsupcxx_LIBS) \
+ 	$(libstdcxx_LIBS) \
++	$(libdw_LIBS) \
+ 	$(libunwind_LIBS) \
+ 	sysdeps/libos.la
+ 
+diff -u ltrace-0.7.91/options.c ltrace-0.7.91-pm/options.c
+--- ltrace-0.7.91/options.c	2015-01-09 00:38:17.974190783 +0100
++++ ltrace-0.7.91-pm/options.c	2015-01-09 00:37:40.261910548 +0100
+@@ -107,9 +107,9 @@
+ 		"  -T                  show the time spent inside each call.\n"
+ 		"  -u USERNAME         run command with the userid, groupid of username.\n"
+ 		"  -V, --version       output version information and exit.\n"
+-#if defined(HAVE_LIBUNWIND)
++#if defined(HAVE_UNWINDER)
+ 		"  -w, --where=NR      print backtrace showing NR stack frames at most.\n"
+-#endif /* defined(HAVE_LIBUNWIND) */
++#endif /* defined(HAVE_UNWINDER) */
+ 		"  -x FILTER           modify which static functions to trace.\n"
+ 		"\nReport bugs to ltrace-devel@lists.alioth.debian.org\n",
+ 		progname);
+@@ -519,9 +519,9 @@
+ 	progname = argv[0];
+ 	options.output = stderr;
+ 	options.no_signals = 0;
+-#if defined(HAVE_LIBUNWIND)
++#if defined(HAVE_UNWINDER)
+ 	options.bt_depth = -1;
+-#endif /* defined(HAVE_LIBUNWIND) */
++#endif /* defined(HAVE_UNWINDER) */
+ 
+ 	guess_cols();
+ 
+@@ -545,9 +545,9 @@
+ 			{"output", 1, 0, 'o'},
+ 			{"version", 0, 0, 'V'},
+ 			{"no-signals", 0, 0, 'b'},
+-# if defined(HAVE_LIBUNWIND)
++# if defined(HAVE_UNWINDER)
+ 			{"where", 1, 0, 'w'},
+-# endif /* defined(HAVE_LIBUNWIND) */
++# endif /* defined(HAVE_UNWINDER) */
+ 			{0, 0, 0, 0}
+ 		};
+ #endif
+@@ -556,7 +556,7 @@
+ #ifdef USE_DEMANGLE
+ 			"C"
+ #endif
+-#if defined(HAVE_LIBUNWIND)
++#if defined(HAVE_UNWINDER)
+ 			"w:"
+ #endif
+ 			"cfhiLrStTVba:A:D:e:F:l:n:o:p:s:u:x:X:";
+@@ -681,11 +681,11 @@
+ 			       "There is NO WARRANTY, to the extent permitted by law.\n");
+ 			exit(0);
+ 			break;
+-#if defined(HAVE_LIBUNWIND)
++#if defined(HAVE_UNWINDER)
+ 		case 'w':
+ 			options.bt_depth = parse_int(optarg, 'w', 1, 0);
+ 			break;
+-#endif /* defined(HAVE_LIBUNWIND) */
++#endif /* defined(HAVE_UNWINDER) */
+ 
+ 		case 'x':
+ 			parse_filter_chain(optarg, &options.static_filter);
+Only in ltrace-0.7.91-pm/: options.c.orig
+diff -u ltrace-0.7.91/options.h ltrace-0.7.91-pm/options.h
+--- ltrace-0.7.91/options.h	2015-01-09 00:38:17.966190936 +0100
++++ ltrace-0.7.91-pm/options.h	2015-01-09 00:37:40.261910548 +0100
+@@ -44,9 +44,9 @@
+ 	size_t strlen;     /* default maximum # of bytes printed in strings */
+ 	int follow;     /* trace child processes */
+ 	int no_signals; /* don't print signals */
+-#if defined(HAVE_LIBUNWIND)
++#if defined(HAVE_UNWINDER)
+ 	int bt_depth;	 /* how may levels of stack frames to show */
+-#endif /* defined(HAVE_LIBUNWIND) */
++#endif /* defined(HAVE_UNWINDER) */
+ 	struct filter *plt_filter;
+ 	struct filter *static_filter;
+ 
+diff -u ltrace-0.7.91/output.c ltrace-0.7.91-pm/output.c
+--- ltrace-0.7.91/output.c	2015-01-09 00:38:17.966190936 +0100
++++ ltrace-0.7.91-pm/output.c	2015-01-09 00:37:40.261910548 +0100
+@@ -33,6 +33,7 @@
+ #include <unistd.h>
+ #include <errno.h>
+ #include <assert.h>
++#include <inttypes.h>
+ 
+ #include "output.h"
+ #include "demangle.h"
+@@ -567,6 +568,73 @@
+ 	stel->out.need_delim = need_delim;
+ }
+ 
++#if defined(HAVE_LIBDW)
++/* Prints information about one frame of a thread.  Called by
++   dwfl_getthread_frames in output_right.  Returns 1 when done (max
++   number of frames reached).  Returns -1 on error.  Returns 0 on
++   success (if there are more frames in the thread, call us again).  */
++static int
++frame_callback (Dwfl_Frame *state, void *arg)
++{
++	Dwarf_Addr pc;
++	bool isactivation;
++
++	int *frames = (int *) arg;
++
++	if (!dwfl_frame_pc(state, &pc, &isactivation))
++		return -1;
++
++	if (!isactivation)
++		pc--;
++
++	Dwfl *dwfl = dwfl_thread_dwfl(dwfl_frame_thread(state));
++	Dwfl_Module *mod = dwfl_addrmodule(dwfl, pc);
++	const char *modname = NULL;
++	const char *symname = NULL;
++	GElf_Off off = 0;
++	if (mod != NULL) {
++		GElf_Sym sym;
++		modname = dwfl_module_info(mod, NULL, NULL, NULL, NULL,
++					   NULL, NULL, NULL);
++		symname = dwfl_module_addrinfo(mod, pc, &off, &sym,
++					       NULL, NULL, NULL);
++	}
++
++	/* This mimics the output produced by libunwind below.  */
++	fprintf(options.output, " > %s(%s+0x%" PRIx64 ") [%" PRIx64 "]\n",
++		modname, symname, off, pc);
++
++	/* See if we can extract the source line too and print it on
++	   the next line if we can find it.  */
++	if (mod != NULL) {
++		Dwfl_Line *l = dwfl_module_getsrc(mod, pc);
++		if (l != NULL) {
++			int line, col;
++			line = col = -1;
++			const char *src = dwfl_lineinfo(l, NULL, &line, &col,
++							NULL, NULL);
++			if (src != NULL) {
++				fprintf(options.output, "\t%s", src);
++				if (line > 0) {
++					fprintf(options.output, ":%d", line);
++					if (col > 0)
++			                        fprintf(options.output,
++							":%d", col);
++				}
++				fprintf(options.output, "\n");
++			}
++
++		}
++	}
++
++	/* Max number of frames to print reached? */
++	if ((*frames)-- == 0)
++		return 1;
++
++	return 0;
++}
++#endif /* defined(HAVE_LIBDW) */
++
+ void
+ output_right(enum tof type, struct process *proc, struct library_symbol *libsym,
+ 	     struct timedelta *spent)
+@@ -694,6 +762,24 @@
+ 	}
+ #endif /* defined(HAVE_LIBUNWIND) */
+ 
++#if defined(HAVE_LIBDW)
++	if (options.bt_depth > 0 && proc->leader->dwfl != NULL) {
++		int frames = options.bt_depth;
++		if (dwfl_getthread_frames(proc->leader->dwfl, proc->pid,
++					  frame_callback, &frames) < 0) {
++			// Only print an error if we couldn't show anything.
++			// Otherwise just show there might be more...
++			if (frames == options.bt_depth)
++				fprintf(stderr,
++					"dwfl_getthread_frames tid %d: %s\n",
++					proc->pid, dwfl_errmsg(-1));
++			else
++				fprintf(options.output, " > [...]\n");
++		}
++		fprintf(options.output, "\n");
++	  }
++#endif /* defined(HAVE_LIBDW) */
++
+ 	current_proc = NULL;
+ 	current_column = 0;
+ }
+Only in ltrace-0.7.91-pm/: output.c.orig
+diff -u ltrace-0.7.91/proc.c ltrace-0.7.91-pm/proc.c
+--- ltrace-0.7.91/proc.c	2015-01-09 00:38:17.981190650 +0100
++++ ltrace-0.7.91-pm/proc.c	2015-01-09 00:37:40.261910548 +0100
+@@ -111,6 +111,11 @@
+ 	if (proc->unwind_as != NULL)
+ 		unw_destroy_addr_space(proc->unwind_as);
+ #endif /* defined(HAVE_LIBUNWIND) */
++
++#if defined(HAVE_LIBDW)
++	if (proc->dwfl != NULL)
++		dwfl_end(proc->dwfl);
++#endif /* defined(HAVE_LIBDW) */
+ }
+ 
+ static int
+@@ -172,6 +177,10 @@
+ 	}
+ #endif /* defined(HAVE_LIBUNWIND) */
+ 
++#if defined(HAVE_LIBDW)
++	proc->dwfl = NULL; /* Initialize for leader only on first library.  */
++#endif /* defined(HAVE_LIBDW) */
++
+ 	return 0;
+ }
+ 
+@@ -887,6 +896,59 @@
+ 	debug(DEBUG_PROCESS, "added library %s@%p (%s) to %d",
+ 	      lib->soname, lib->base, lib->pathname, proc->pid);
+ 
++#if defined(HAVE_LIBDW)
++	if (options.bt_depth > 0) {
++		/* Setup module tracking for libdwfl unwinding.  */
++		struct process *leader = proc->leader;
++		Dwfl *dwfl = leader->dwfl;
++		if (dwfl == NULL) {
++			static const Dwfl_Callbacks proc_callbacks = {
++				.find_elf = dwfl_linux_proc_find_elf,
++				.find_debuginfo = dwfl_standard_find_debuginfo
++			};
++			dwfl = dwfl_begin(&proc_callbacks);
++			if (dwfl == NULL)
++				fprintf(stderr,
++					"Couldn't initialize libdwfl unwinding "
++					"for process %d: %s\n", leader->pid,
++					dwfl_errmsg (-1));
++		}
++
++		if (dwfl != NULL) {
++			dwfl_report_begin_add(dwfl);
++			if (dwfl_report_elf(dwfl, lib->soname,
++					    lib->pathname, -1,
++					    (GElf_Addr) lib->base,
++					    false) == NULL)
++				fprintf(stderr,
++					"dwfl_report_elf %s@%p (%s) %d: %s\n",
++					lib->soname, lib->base, lib->pathname,
++					proc->pid, dwfl_errmsg (-1));
++			dwfl_report_end(dwfl, NULL, NULL);
++
++			if (leader->dwfl == NULL) {
++				int r = dwfl_linux_proc_attach(dwfl,
++							       leader->pid,
++							       true);
++				if (r == 0)
++					leader->dwfl = dwfl;
++				else {
++					const char *msg;
++					dwfl_end(dwfl);
++					if (r < 0)
++						msg = dwfl_errmsg(-1);
++					else
++						msg = strerror(r);
++					fprintf(stderr, "Couldn't initialize "
++						"libdwfl unwinding for "
++						"process %d: %s\n",
++						leader->pid, msg);
++				}
++			}
++		}
++	}
++#endif /* defined(HAVE_LIBDW) */
++
+ 	/* Insert breakpoints for all active (non-latent) symbols.  */
+ 	struct library_symbol *libsym = NULL;
+ 	while ((libsym = library_each_symbol(lib, libsym,
+diff -u ltrace-0.7.91/proc.c.orig ltrace-0.7.91-pm/proc.c.orig
+--- ltrace-0.7.91/proc.h	2015-01-09 00:38:17.966190936 +0100
++++ ltrace-0.7.91-pm/proc.h	2015-01-09 00:37:40.261910548 +0100
+@@ -28,6 +28,10 @@
+ #include <sys/time.h>
+ #include <stdint.h>
+ 
++#if defined(HAVE_LIBDW)
++# include <elfutils/libdwfl.h>
++#endif
++
+ #if defined(HAVE_LIBUNWIND)
+ # include <libunwind.h>
+ #endif /* defined(HAVE_LIBUNWIND) */
+@@ -113,6 +117,11 @@
+ 	short e_machine;
+ 	char e_class;
+ 
++#if defined(HAVE_LIBDW)
++	/* Unwind info for leader, NULL for non-leader procs. */
++	Dwfl *dwfl;
++#endif /* defined(HAVE_LIBDW) */
++
+ #if defined(HAVE_LIBUNWIND)
+ 	/* libunwind address space */
+ 	unw_addr_space_t unwind_as;
+Only in ltrace-0.7.91-pm/: proc.h.orig
+Common subdirectories: ltrace-0.7.91/sysdeps and ltrace-0.7.91-pm/sysdeps
+Common subdirectories: ltrace-0.7.91/testsuite and ltrace-0.7.91-pm/testsuite
+diff -up ltrace-0.7.91/proc.c\~ ltrace-0.7.91/proc.c
+--- ltrace-0.7.91/proc.c~	2015-01-09 01:55:38.289864078 +0100
++++ ltrace-0.7.91/proc.c	2015-01-09 01:56:29.818881935 +0100
+@@ -918,7 +918,8 @@ proc_add_library(struct process *proc, s
+ 			dwfl_report_begin_add(dwfl);
+ 			if (dwfl_report_elf(dwfl, lib->soname,
+ 					    lib->pathname, -1,
+-					    (GElf_Addr) lib->base,
++					    /* XXX double cast */
++					    (GElf_Addr) (uintptr_t) lib->base,
+ 					    false) == NULL)
+ 				fprintf(stderr,
+ 					"dwfl_report_elf %s@%p (%s) %d: %s\n",

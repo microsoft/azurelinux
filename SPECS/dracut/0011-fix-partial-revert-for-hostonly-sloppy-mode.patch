@@ -1,0 +1,298 @@
+From 2edd43029a544d84a84f61a1d641f9578ca0a4a5 Mon Sep 17 00:00:00 2001
+From: Jo Zzsi <jozzsicsataban@gmail.com>
+Date: Wed, 17 Sep 2025 22:42:17 -0400
+Subject: [PATCH 11/11] fix: partial revert for hostonly sloppy mode
+
+This commit is a _partial_ revert of 8519dcd.
+
+The goal of this commit is to have the same dracut modules
+included in both sloppy and in strict mode, but the dracut
+modules themselves might install more kernel modules depending
+on the hostonly_mode value.
+
+Changes in other areas of the code (e.g. changes inside
+`installkernel`) were not reverted as they require
+more discussions and agreement by the community.
+
+As an example the crypt dracut module could potentially copy
+more kernel modules into the generated initramfs in sloppy
+hostonly_mode mode than in strict hostonly mode.
+
+(cherry picked from commit 34cc8aea8bf5b92accb93f513f1ed1a53adc2112)
+
+Resolves: rhbz#2394213
+---
+ modules.d/01systemd-cryptsetup/module-setup.sh | 2 +-
+ modules.d/90btrfs/module-setup.sh              | 2 +-
+ modules.d/90crypt/module-setup.sh              | 2 +-
+ modules.d/90dmraid/module-setup.sh             | 2 +-
+ modules.d/90lvm/module-setup.sh                | 2 +-
+ modules.d/90mdraid/module-setup.sh             | 2 +-
+ modules.d/90multipath/module-setup.sh          | 2 +-
+ modules.d/90qemu-net/module-setup.sh           | 2 +-
+ modules.d/90qemu/module-setup.sh               | 2 +-
+ modules.d/95cifs/module-setup.sh               | 2 +-
+ modules.d/95fcoe-uefi/module-setup.sh          | 2 +-
+ modules.d/95fcoe/module-setup.sh               | 2 +-
+ modules.d/95hwdb/module-setup.sh               | 2 +-
+ modules.d/95iscsi/module-setup.sh              | 4 ++--
+ modules.d/95lunmask/module-setup.sh            | 2 +-
+ modules.d/95nbd/module-setup.sh                | 2 +-
+ modules.d/95nfs/module-setup.sh                | 2 +-
+ modules.d/95nvmf/module-setup.sh               | 2 +-
+ modules.d/95virtiofs/module-setup.sh           | 2 +-
+ 19 files changed, 20 insertions(+), 20 deletions(-)
+
+diff --git a/modules.d/01systemd-cryptsetup/module-setup.sh b/modules.d/01systemd-cryptsetup/module-setup.sh
+index 0a89ef20..5dfe41f9 100755
+--- a/modules.d/01systemd-cryptsetup/module-setup.sh
++++ b/modules.d/01systemd-cryptsetup/module-setup.sh
+@@ -6,7 +6,7 @@ check() {
+     # if cryptsetup is not installed, then we cannot support encrypted devices.
+     require_binaries "$systemdutildir"/systemd-cryptsetup || return 1
+ 
+-    [[ $hostonly_mode == "strict" ]] || [[ $mount_needs ]] && {
++    [[ $hostonly ]] || [[ $mount_needs ]] && {
+         for fs in "${host_fs_types[@]}"; do
+             [[ $fs == "crypto_LUKS" ]] && return 0
+         done
+diff --git a/modules.d/90btrfs/module-setup.sh b/modules.d/90btrfs/module-setup.sh
+index 8cb77f19..320011ff 100755
+--- a/modules.d/90btrfs/module-setup.sh
++++ b/modules.d/90btrfs/module-setup.sh
+@@ -6,7 +6,7 @@ check() {
+     # no point in trying to support it in the initramfs.
+     require_binaries btrfs || return 1
+ 
+-    [[ $hostonly_mode == "strict" ]] || [[ $mount_needs ]] && {
++    [[ $hostonly ]] || [[ $mount_needs ]] && {
+         for fs in "${host_fs_types[@]}"; do
+             [[ $fs == "btrfs" ]] && return 0
+         done
+diff --git a/modules.d/90crypt/module-setup.sh b/modules.d/90crypt/module-setup.sh
+index e01e086e..941ebcf4 100755
+--- a/modules.d/90crypt/module-setup.sh
++++ b/modules.d/90crypt/module-setup.sh
+@@ -6,7 +6,7 @@ check() {
+     # if cryptsetup is not installed, then we cannot support encrypted devices.
+     require_any_binary "$systemdutildir"/systemd-cryptsetup cryptsetup || return 1
+ 
+-    [[ $hostonly_mode == "strict" ]] || [[ $mount_needs ]] && {
++    [[ $hostonly ]] || [[ $mount_needs ]] && {
+         for fs in "${host_fs_types[@]}"; do
+             [[ $fs == "crypto_LUKS" ]] && return 0
+         done
+diff --git a/modules.d/90dmraid/module-setup.sh b/modules.d/90dmraid/module-setup.sh
+index 1d2ab77b..e7c6be60 100755
+--- a/modules.d/90dmraid/module-setup.sh
++++ b/modules.d/90dmraid/module-setup.sh
+@@ -10,7 +10,7 @@ check() {
+     require_binaries dmraid || return 1
+     require_binaries kpartx || return 1
+ 
+-    [[ $hostonly_mode == "strict" ]] || [[ $mount_needs ]] && {
++    [[ $hostonly ]] || [[ $mount_needs ]] && {
+         for dev in "${!host_fs_types[@]}"; do
+             [[ ${host_fs_types[$dev]} != *_raid_member ]] && continue
+ 
+diff --git a/modules.d/90lvm/module-setup.sh b/modules.d/90lvm/module-setup.sh
+index 9f1a4b26..29363cda 100755
+--- a/modules.d/90lvm/module-setup.sh
++++ b/modules.d/90lvm/module-setup.sh
+@@ -5,7 +5,7 @@ check() {
+     # No point trying to support lvm if the binaries are missing
+     require_binaries lvm grep || return 1
+ 
+-    [[ $hostonly_mode == "strict" ]] || [[ $mount_needs ]] && {
++    [[ $hostonly ]] || [[ $mount_needs ]] && {
+         for fs in "${host_fs_types[@]}"; do
+             [[ $fs == LVM*_member ]] && return 0
+         done
+diff --git a/modules.d/90mdraid/module-setup.sh b/modules.d/90mdraid/module-setup.sh
+index 5f8f5100..5cf1bdc2 100755
+--- a/modules.d/90mdraid/module-setup.sh
++++ b/modules.d/90mdraid/module-setup.sh
+@@ -7,7 +7,7 @@ check() {
+     # No mdadm?  No mdraid support.
+     require_binaries mdadm expr || return 1
+ 
+-    [[ $hostonly_mode == "strict" ]] || [[ $mount_needs ]] && {
++    [[ $hostonly ]] || [[ $mount_needs ]] && {
+         for dev in "${!host_fs_types[@]}"; do
+             [[ ${host_fs_types[$dev]} != *_raid_member ]] && continue
+ 
+diff --git a/modules.d/90multipath/module-setup.sh b/modules.d/90multipath/module-setup.sh
+index 9ecbbeed..145fd08e 100755
+--- a/modules.d/90multipath/module-setup.sh
++++ b/modules.d/90multipath/module-setup.sh
+@@ -25,7 +25,7 @@ check() {
+     require_binaries multipath || return 1
+     require_binaries kpartx || return 1
+ 
+-    [[ $hostonly_mode == "strict" ]] || [[ $mount_needs ]] && {
++    [[ $hostonly ]] || [[ $mount_needs ]] && {
+         for_each_host_dev_and_slaves is_mpath || return 255
+     }
+ 
+diff --git a/modules.d/90qemu-net/module-setup.sh b/modules.d/90qemu-net/module-setup.sh
+index a05f5428..bf64ad9c 100755
+--- a/modules.d/90qemu-net/module-setup.sh
++++ b/modules.d/90qemu-net/module-setup.sh
+@@ -4,7 +4,7 @@
+ check() {
+     is_qemu_virtualized && return 0
+ 
+-    if [[ $hostonly_mode == "strict" ]] || [[ $mount_needs ]]; then
++    if [[ $hostonly ]] || [[ $mount_needs ]]; then
+         return 255
+     fi
+ 
+diff --git a/modules.d/90qemu/module-setup.sh b/modules.d/90qemu/module-setup.sh
+index fecaca61..06f4dcbb 100755
+--- a/modules.d/90qemu/module-setup.sh
++++ b/modules.d/90qemu/module-setup.sh
+@@ -4,7 +4,7 @@
+ check() {
+     is_qemu_virtualized && return 0
+ 
+-    if [[ $hostonly_mode == "strict" ]] || [[ $mount_needs ]]; then
++    if [[ $hostonly ]] || [[ $mount_needs ]]; then
+         return 255
+     fi
+ 
+diff --git a/modules.d/95cifs/module-setup.sh b/modules.d/95cifs/module-setup.sh
+index 3f422c90..5632b8c1 100755
+--- a/modules.d/95cifs/module-setup.sh
++++ b/modules.d/95cifs/module-setup.sh
+@@ -5,7 +5,7 @@ check() {
+     # If our prerequisites are not met, fail anyways.
+     require_binaries mount.cifs || return 1
+ 
+-    [[ $hostonly_mode == "strict" ]] || [[ $mount_needs ]] && {
++    [[ $hostonly ]] || [[ $mount_needs ]] && {
+         for fs in "${host_fs_types[@]}"; do
+             [[ $fs == "cifs" ]] && return 0
+         done
+diff --git a/modules.d/95fcoe-uefi/module-setup.sh b/modules.d/95fcoe-uefi/module-setup.sh
+index 5a9aa834..24acf998 100755
+--- a/modules.d/95fcoe-uefi/module-setup.sh
++++ b/modules.d/95fcoe-uefi/module-setup.sh
+@@ -7,7 +7,7 @@ check() {
+         block_is_fcoe "$1" || return 1
+     }
+ 
+-    [[ $hostonly_mode == "strict" ]] || [[ $mount_needs ]] && {
++    [[ $hostonly ]] || [[ $mount_needs ]] && {
+         for_each_host_dev_and_slaves is_fcoe || return 255
+         [ -d /sys/firmware/efi ] || return 255
+     }
+diff --git a/modules.d/95fcoe/module-setup.sh b/modules.d/95fcoe/module-setup.sh
+index 9937a22c..b18e9289 100755
+--- a/modules.d/95fcoe/module-setup.sh
++++ b/modules.d/95fcoe/module-setup.sh
+@@ -7,7 +7,7 @@ check() {
+         block_is_fcoe "$1" || return 1
+     }
+ 
+-    [[ $hostonly_mode == "strict" ]] || [[ $mount_needs ]] && {
++    [[ $hostonly ]] || [[ $mount_needs ]] && {
+         for_each_host_dev_and_slaves is_fcoe || return 255
+     }
+ 
+diff --git a/modules.d/95hwdb/module-setup.sh b/modules.d/95hwdb/module-setup.sh
+index 2713c92c..21f6f1ea 100644
+--- a/modules.d/95hwdb/module-setup.sh
++++ b/modules.d/95hwdb/module-setup.sh
+@@ -3,7 +3,7 @@
+ # SPDX-License-Identifier: GPL-2.0-or-later
+ 
+ check() {
+-    if [[ $hostonly_mode == "strict" ]]; then
++    if [[ $hostonly ]]; then
+         return 255
+     fi
+ 
+diff --git a/modules.d/95iscsi/module-setup.sh b/modules.d/95iscsi/module-setup.sh
+index c3860cf8..a18ef0cd 100755
+--- a/modules.d/95iscsi/module-setup.sh
++++ b/modules.d/95iscsi/module-setup.sh
+@@ -6,9 +6,9 @@ check() {
+     require_binaries iscsi-iname iscsiadm iscsid || return 1
+     require_kernel_modules iscsi_tcp || return 1
+ 
+-    # If hostonly strict was requested, fail the check if we are not actually
++    # If hostonly was requested, fail the check if we are not actually
+     # booting from root.
+-    [[ $hostonly_mode == "strict" ]] || [[ $mount_needs ]] && {
++    [[ $hostonly ]] || [[ $mount_needs ]] && {
+         pushd . > /dev/null
+         for_each_host_dev_and_slaves block_is_iscsi
+         local _is_iscsi=$?
+diff --git a/modules.d/95lunmask/module-setup.sh b/modules.d/95lunmask/module-setup.sh
+index 8bf06be7..ee85e6a1 100755
+--- a/modules.d/95lunmask/module-setup.sh
++++ b/modules.d/95lunmask/module-setup.sh
+@@ -45,7 +45,7 @@ cmdline() {
+ 
+ # called by dracut
+ check() {
+-    [[ $hostonly_mode == "strict" ]] || [[ $mount_needs ]] && {
++    [[ $hostonly ]] || [[ $mount_needs ]] && {
+         [ -w /sys/module/scsi_mod/parameters/scan ] || return 255
+         read -r scan_type < /sys/module/scsi_mod/parameters/scan
+         [ "$scan_type" = "manual" ] && return 0
+diff --git a/modules.d/95nbd/module-setup.sh b/modules.d/95nbd/module-setup.sh
+index 2ad45a0a..7340c679 100755
+--- a/modules.d/95nbd/module-setup.sh
++++ b/modules.d/95nbd/module-setup.sh
+@@ -6,7 +6,7 @@ check() {
+ 
+     # if an nbd device is not somewhere in the chain of devices root is
+     # mounted on, fail the hostonly check.
+-    [[ $hostonly_mode == "strict" ]] || [[ $mount_needs ]] && {
++    [[ $hostonly ]] || [[ $mount_needs ]] && {
+         _rootdev=$(find_root_block_device)
+         [[ -b /dev/block/$_rootdev ]] || return 1
+         check_block_and_slaves block_is_nbd "$_rootdev" || return 255
+diff --git a/modules.d/95nfs/module-setup.sh b/modules.d/95nfs/module-setup.sh
+index d9ce244a..b6f8ebbe 100755
+--- a/modules.d/95nfs/module-setup.sh
++++ b/modules.d/95nfs/module-setup.sh
+@@ -23,7 +23,7 @@ check() {
+     require_any_binary rpcbind portmap || return 1
+     require_binaries rpc.statd mount.nfs mount.nfs4 umount sed chmod chown || return 1
+ 
+-    [[ $hostonly_mode == "strict" ]] || [[ $mount_needs ]] && {
++    [[ $hostonly ]] || [[ $mount_needs ]] && {
+         [[ "$(get_nfs_type)" ]] && return 0
+         return 255
+     }
+diff --git a/modules.d/95nvmf/module-setup.sh b/modules.d/95nvmf/module-setup.sh
+index 54feffbb..6dedc5b3 100755
+--- a/modules.d/95nvmf/module-setup.sh
++++ b/modules.d/95nvmf/module-setup.sh
+@@ -42,7 +42,7 @@ check() {
+         [[ $found ]]
+     }
+ 
+-    [[ $hostonly_mode == "strict" ]] || [[ $mount_needs ]] && {
++    [[ $hostonly ]] || [[ $mount_needs ]] && {
+         [ -f /etc/nvme/hostnqn ] || return 255
+         [ -f /etc/nvme/hostid ] || return 255
+         pushd . > /dev/null
+diff --git a/modules.d/95virtiofs/module-setup.sh b/modules.d/95virtiofs/module-setup.sh
+index 238e52bc..1ef6c939 100755
+--- a/modules.d/95virtiofs/module-setup.sh
++++ b/modules.d/95virtiofs/module-setup.sh
+@@ -2,7 +2,7 @@
+ 
+ # called by dracut
+ check() {
+-    [[ $hostonly_mode == "strict" ]] || [[ $mount_needs ]] && {
++    [[ $hostonly ]] || [[ $mount_needs ]] && {
+         is_qemu_virtualized && return 0
+ 
+         for fs in "${host_fs_types[@]}"; do
+-- 
+2.50.1
+

@@ -1,0 +1,191 @@
+From 36e3430d1f81397d5f40600e075272a81f7effce Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:28 +0200
+Subject: [PATCH 25/50] openssh-7.3p1-x11-max-displays
+
+---
+ channels.c    |  9 ++++++---
+ channels.h    |  2 +-
+ servconf.c    | 12 +++++++++++-
+ servconf.h    |  2 ++
+ session.c     |  5 +++--
+ sshd_config.5 |  7 +++++++
+ 6 files changed, 30 insertions(+), 7 deletions(-)
+
+diff --git a/channels.c b/channels.c
+index d46531ce..7438c1a5 100644
+--- a/channels.c
++++ b/channels.c
+@@ -4996,7 +4996,7 @@ rdynamic_connect_finish(struct ssh *ssh, Channel *c)
+  */
+ int
+ x11_create_display_inet(struct ssh *ssh, int x11_display_offset,
+-    int x11_use_localhost, int single_connection,
++    int x11_use_localhost, int x11_max_displays, int single_connection,
+     u_int *display_numberp, int **chanids)
+ {
+ 	Channel *nc = NULL;
+@@ -5009,8 +5009,11 @@ x11_create_display_inet(struct ssh *ssh, int x11_display_offset,
+ 	    x11_display_offset > UINT16_MAX - X11_BASE_PORT - MAX_DISPLAYS)
+ 		return -1;
+ 
++	/* Try to bind ports starting at 6000+X11DisplayOffset */
++	x11_max_displays = x11_max_displays + x11_display_offset;
++
+ 	for (display_number = x11_display_offset;
+-	    display_number < MAX_DISPLAYS;
++	    display_number < x11_max_displays;
+ 	    display_number++) {
+ 		port = X11_BASE_PORT + display_number;
+ 		memset(&hints, 0, sizeof(hints));
+@@ -5065,7 +5068,7 @@ x11_create_display_inet(struct ssh *ssh, int x11_display_offset,
+ 		if (num_socks > 0)
+ 			break;
+ 	}
+-	if (display_number >= MAX_DISPLAYS) {
++	if (display_number >= x11_max_displays || port < X11_BASE_PORT ) {
+ 		error("Failed to allocate internet-domain X11 display socket.");
+ 		return -1;
+ 	}
+diff --git a/channels.h b/channels.h
+index 134528d5..8a09a820 100644
+--- a/channels.h
++++ b/channels.h
+@@ -379,7 +379,7 @@ int	 permitopen_port(const char *);
+ 
+ void	 channel_set_x11_refuse_time(struct ssh *, time_t);
+ int	 x11_connect_display(struct ssh *);
+-int	 x11_create_display_inet(struct ssh *, int, int, int, u_int *, int **);
++int	 x11_create_display_inet(struct ssh *, int, int, int, int, u_int *, int **);
+ void	 x11_request_forwarding_with_spoofing(struct ssh *, int,
+ 	    const char *, const char *, const char *, int);
+ int      x11_channel_used_recently(struct ssh *ssh);
+diff --git a/servconf.c b/servconf.c
+index 105e301d..15c99b30 100644
+--- a/servconf.c
++++ b/servconf.c
+@@ -117,6 +117,7 @@ initialize_server_options(ServerOptions *options)
+ 	options->print_lastlog = -1;
+ 	options->x11_forwarding = -1;
+ 	options->x11_display_offset = -1;
++	options->x11_max_displays = -1;
+ 	options->x11_use_localhost = -1;
+ 	options->permit_tty = -1;
+ 	options->permit_user_rc = -1;
+@@ -353,6 +354,8 @@ fill_default_server_options(ServerOptions *options)
+ 		options->x11_forwarding = 0;
+ 	if (options->x11_display_offset == -1)
+ 		options->x11_display_offset = 10;
++	if (options->x11_max_displays == -1)
++		options->x11_max_displays = DEFAULT_MAX_DISPLAYS;
+ 	if (options->x11_use_localhost == -1)
+ 		options->x11_use_localhost = 1;
+ 	if (options->xauth_location == NULL)
+@@ -576,7 +579,7 @@ typedef enum {
+ 	sKerberosGetAFSToken, sKerberosUniqueCCache, sKerberosUseKuserok, sPasswordAuthentication,
+ 	sKbdInteractiveAuthentication, sListenAddress, sAddressFamily,
+ 	sPrintMotd, sPrintLastLog, sIgnoreRhosts,
+-	sX11Forwarding, sX11DisplayOffset, sX11UseLocalhost,
++	sX11Forwarding, sX11DisplayOffset, sX11MaxDisplays, sX11UseLocalhost,
+ 	sPermitTTY, sStrictModes, sEmptyPasswd, sTCPKeepAlive,
+ 	sPermitUserEnvironment, sAllowTcpForwarding, sCompression,
+ 	sRekeyLimit, sAllowUsers, sDenyUsers, sAllowGroups, sDenyGroups,
+@@ -714,6 +717,7 @@ static struct {
+ 	{ "ignoreuserknownhosts", sIgnoreUserKnownHosts, SSHCFG_GLOBAL },
+ 	{ "x11forwarding", sX11Forwarding, SSHCFG_ALL },
+ 	{ "x11displayoffset", sX11DisplayOffset, SSHCFG_ALL },
++	{ "x11maxdisplays", sX11MaxDisplays, SSHCFG_ALL },
+ 	{ "x11uselocalhost", sX11UseLocalhost, SSHCFG_ALL },
+ 	{ "xauthlocation", sXAuthLocation, SSHCFG_GLOBAL },
+ 	{ "strictmodes", sStrictModes, SSHCFG_GLOBAL },
+@@ -1750,6 +1754,10 @@ process_server_config_line_depth(ServerOptions *options, char *line,
+ 			*intptr = value;
+ 		break;
+ 
++	case sX11MaxDisplays:
++		intptr = &options->x11_max_displays;
++		goto parse_int;
++
+ 	case sX11UseLocalhost:
+ 		intptr = &options->x11_use_localhost;
+ 		goto parse_flag;
+@@ -3004,6 +3012,7 @@ copy_set_server_options(ServerOptions *dst, ServerOptions *src, int preauth)
+ 	M_CP_INTOPT(fwd_opts.streamlocal_bind_unlink);
+ 	M_CP_INTOPT(x11_display_offset);
+ 	M_CP_INTOPT(x11_forwarding);
++	M_CP_INTOPT(x11_max_displays);
+ 	M_CP_INTOPT(x11_use_localhost);
+ 	M_CP_INTOPT(permit_tty);
+ 	M_CP_INTOPT(permit_user_rc);
+@@ -3299,6 +3308,7 @@ dump_config(ServerOptions *o)
+ #endif
+ 	dump_cfg_int(sLoginGraceTime, o->login_grace_time);
+ 	dump_cfg_int(sX11DisplayOffset, o->x11_display_offset);
++	dump_cfg_int(sX11MaxDisplays, o->x11_max_displays);
+ 	dump_cfg_int(sMaxAuthTries, o->max_authtries);
+ 	dump_cfg_int(sMaxSessions, o->max_sessions);
+ 	dump_cfg_int(sClientAliveInterval, o->client_alive_interval);
+diff --git a/servconf.h b/servconf.h
+index c08cf6a7..7c7e5d43 100644
+--- a/servconf.h
++++ b/servconf.h
+@@ -38,6 +38,7 @@
+ 
+ #define DEFAULT_AUTH_FAIL_MAX	6	/* Default for MaxAuthTries */
+ #define DEFAULT_SESSIONS_MAX	10	/* Default for MaxSessions */
++#define DEFAULT_MAX_DISPLAYS	1000 /* Maximum number of fake X11 displays to try. */
+ 
+ /* Magic name for internal sftp-server */
+ #define INTERNAL_SFTP_NAME	"internal-sftp"
+@@ -114,6 +115,7 @@ typedef struct {
+ 	int     x11_forwarding;	/* If true, permit inet (spoofing) X11 fwd. */
+ 	int     x11_display_offset;	/* What DISPLAY number to start
+ 					 * searching at */
++	int 	x11_max_displays; /* Number of displays to search */
+ 	int     x11_use_localhost;	/* If true, use localhost for fake X11 server. */
+ 	char   *xauth_location;	/* Location of xauth program */
+ 	int	permit_tty;	/* If false, deny pty allocation */
+diff --git a/session.c b/session.c
+index 54da09d5..28bbb8a7 100644
+--- a/session.c
++++ b/session.c
+@@ -2611,8 +2611,9 @@ session_setup_x11fwd(struct ssh *ssh, Session *s)
+ 		return 0;
+ 	}
+ 	if (x11_create_display_inet(ssh, options.x11_display_offset,
+-	    options.x11_use_localhost, s->single_connection,
+-	    &s->display_number, &s->x11_chanids) == -1) {
++	    options.x11_use_localhost, options.x11_max_displays,
++	    s->single_connection, &s->display_number,
++	    &s->x11_chanids) == -1) {
+ 		debug("x11_create_display_inet failed.");
+ 		return 0;
+ 	}
+diff --git a/sshd_config.5 b/sshd_config.5
+index fe246fc2..26fcdc84 100644
+--- a/sshd_config.5
++++ b/sshd_config.5
+@@ -1391,6 +1391,7 @@ Available keywords are
+ .Cm TrustedUserCAKeys ,
+ .Cm UnusedConnectionTimeout ,
+ .Cm X11DisplayOffset ,
++.Cm X11MaxDisplays ,
+ .Cm X11Forwarding
+ and
+ .Cm X11UseLocalhost .
+@@ -2111,6 +2112,12 @@ Specifies the first display number available for
+ X11 forwarding.
+ This prevents sshd from interfering with real X11 servers.
+ The default is 10.
++.It Cm X11MaxDisplays
++Specifies the maximum number of displays available for
++.Xr sshd 8 Ns 's
++X11 forwarding.
++This prevents sshd from exhausting local ports.
++The default is 1000.
+ .It Cm X11Forwarding
+ Specifies whether X11 forwarding is permitted.
+ The argument must be
+-- 
+2.49.0
+

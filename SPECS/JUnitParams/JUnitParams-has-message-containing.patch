@@ -1,0 +1,22 @@
+--- JUnitParams-JUnitParams-1.1.1/src/test/java/junitparams/BeforeAfterClassTest.java.orig	2017-11-03 02:05:01.000000000 -0600
++++ JUnitParams-JUnitParams-1.1.1/src/test/java/junitparams/BeforeAfterClassTest.java	2023-11-03 16:43:15.216295932 -0600
+@@ -41,7 +41,7 @@ public class BeforeAfterClassTest {
+ 
+         assertThat(result.getFailureCount()).isEqualTo(1);
+         assertThat(result.getFailures().get(0).getException())
+-                .hasMessage("Method fail() should be static");
++                .hasMessageContaining("Method fail() should be static");
+     }
+ 
+ 
+--- JUnitParams-JUnitParams-1.1.1/src/test/java/junitparams/RulesTest.java.orig	2017-11-03 02:05:01.000000000 -0600
++++ JUnitParams-JUnitParams-1.1.1/src/test/java/junitparams/RulesTest.java	2023-11-03 16:43:55.392655339 -0600
+@@ -45,7 +45,7 @@ public class RulesTest {
+ 
+         assertThat(result.getFailureCount()).isEqualTo(1);
+         assertThat(result.getFailures().get(0).getException())
+-                .hasMessage("The @Rule 'testRule' must be public.");
++                .hasMessageContaining("The @Rule 'testRule' must be public.");
+     }
+ 
+     public class ProtectedRuleTest {

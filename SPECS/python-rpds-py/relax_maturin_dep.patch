@@ -1,0 +1,10 @@
+diff -U 3 -dHrN b/pyproject.toml c/pyproject.toml
+--- b/pyproject.toml	2025-07-01 17:47:29.000000000 +0200
++++ c/pyproject.toml	2025-08-03 11:00:11.944922939 +0200
+@@ -1,5 +1,5 @@
+ [build-system]
+-requires = ["maturin>=1.9,<2.0"]
++requires = ["maturin>=1.8,<2.0"]
+ build-backend = "maturin"
+ 
+ [project]

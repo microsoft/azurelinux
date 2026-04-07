@@ -1,0 +1,11 @@
+--- unicode-width-0.1.14/Cargo.toml	1970-01-01T00:00:01+00:00
++++ unicode-width-0.1.14/Cargo.toml	2024-10-03T14:16:50.621877+00:00
+@@ -18,7 +18,7 @@
+     "Manish Goregaokar <manishsmail@gmail.com>",
+ ]
+ build = false
+-exclude = ["/.github/*"]
++exclude = ["/scripts/*"]
+ autobins = false
+ autoexamples = false
+ autotests = false

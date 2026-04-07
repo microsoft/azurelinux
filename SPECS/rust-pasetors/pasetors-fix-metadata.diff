@@ -1,0 +1,10 @@
+--- pasetors-0.7.7/Cargo.toml	1970-01-01T00:00:01+00:00
++++ pasetors-0.7.7/Cargo.toml	2025-07-22T14:41:33.179577+00:00
+@@ -91,7 +91,6 @@
+ 
+ [dependencies.getrandom]
+ version = "0.3"
+-features = ["wasm_js"]
+ 
+ [dependencies.orion]
+ version = "0.17.0"

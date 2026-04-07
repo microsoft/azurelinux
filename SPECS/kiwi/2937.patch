@@ -1,0 +1,68 @@
+From b522bae980d85fef7465d3943bcb616f7c213357 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marcus=20Sch=C3=A4fer?= <marcus.schaefer@gmail.com>
+Date: Mon, 26 Jan 2026 13:10:08 +0100
+Subject: [PATCH 1/2] Fix s390 unit test
+
+Forgot to mock the architecture properly. This commit fixes it
+---
+ test/unit/bootloader/config/zipl_test.py | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/test/unit/bootloader/config/zipl_test.py b/test/unit/bootloader/config/zipl_test.py
+index cba6da75d84..e624e12566c 100644
+--- a/test/unit/bootloader/config/zipl_test.py
++++ b/test/unit/bootloader/config/zipl_test.py
+@@ -54,6 +54,7 @@ def setup(self, mock_FirmWare):
+         self.bootloader.get_menu_entry_title = Mock(
+             return_value='title'
+         )
++        self.bootloader.arch = 's390x'
+ 
+     @patch('kiwi.bootloader.config.bootloader_spec_base.FirmWare')
+     def setup_method(self, cls, mock_FirmWare):
+@@ -177,17 +178,17 @@ def test_setup_loader(
+         assert mock_shutil_move.call_args_list == [
+             call(
+                 'system_root_mount/secure_execution_header.bin',
+-                'target_dir/image-name.x86_64-image-version.'
++                'target_dir/image-name.s390x-image-version.'
+                 'secure_execution_header.bin'
+             ),
+             call(
+                 'system_root_mount/attestation_request.bin',
+-                'target_dir/image-name.x86_64-image-version.'
++                'target_dir/image-name.s390x-image-version.'
+                 'attestation_request.bin'
+             ),
+             call(
+                 'system_root_mount/attestation_response.key',
+-                'target_dir/image-name.x86_64-image-version.'
++                'target_dir/image-name.s390x-image-version.'
+                 'attestation_response.key'
+             )
+         ]
+
+From 40f8da5f5b017a741430a3ab68f5bdcd7200dc0d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marcus=20Sch=C3=A4fer?= <marcus.schaefer@gmail.com>
+Date: Mon, 26 Jan 2026 14:14:13 +0100
+Subject: [PATCH 2/2] Fix platform mock for kis builder unit testing
+
+---
+ test/unit/builder/kis_test.py | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/test/unit/builder/kis_test.py b/test/unit/builder/kis_test.py
+index 0cd031591df..e5ca7a8f993 100644
+--- a/test/unit/builder/kis_test.py
++++ b/test/unit/builder/kis_test.py
+@@ -19,7 +19,9 @@ def inject_fixtures(self, caplog):
+ 
+     @patch('kiwi.builder.kis.FileSystemBuilder')
+     @patch('kiwi.builder.kis.BootImage')
+-    def setup(self, mock_boot, mock_filesystem):
++    @patch('kiwi.builder.kis.Defaults.get_platform_name')
++    def setup(self, mock_get_platform_name, mock_boot, mock_filesystem):
++        mock_get_platform_name.return_value = 'x86_64'
+         self.setup = Mock()
+         self.runtime_config = Mock()
+         self.runtime_config.get_max_size_constraint = Mock(

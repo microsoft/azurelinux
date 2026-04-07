@@ -1,0 +1,56 @@
+.\" Simple man page to ps_mem script
+.\" Contact fholec@redhat.com
+.TH ps_mem 1 "25 May 2018" "" ""
+.SH NAME
+ps_mem \- Memory profiling tool
+.SH SYNOPSIS
+.B ps_mem [OPTION]...
+.SH DESCRIPTION
+Display the core memory used per program (not per process)
+.br
+.PP
+In detail it reports:
+.br
+.PP
+.RS
+sum (private RAM for program processes) +
+.br
+sum (shared RAM for program processes)
+.br
+.RE
+.PP
+The shared RAM is problematic to calculate, and the tool automatically selects the most accurate method available for the running kernel.
+.SH OPTIONS
+.TP
+\-h \-\-help
+Show help message
+.TP
+\-\-version
+Show version info
+.TP
+\-p PID[,PID2,...PIDN]
+Show memory consumption for the specified processes
+.TP
+\-S \-\-swap
+Show swap information of each item
+(and Shared swap if the kernel supports SwapPss).
+.TP
+\-d \-\-discriminate-by-pid
+Show and separate memory usage entries by process
+rather than by program.
+.TP
+\-s \-\-split\-args
+Show and separate memory usage entries by command line arguments
+and not just the program name.
+.TP
+\-t \-\-total
+Only display the total number of bytes for the selected processes
+.TP
+\-w N
+Report memory consumption every N seconds
+.\".SH SEE ALSO
+.\"
+.\".SH BUGS
+.\"No known bugs for this template, except you might want to replace the quotes if you copy from my blog.
+.SH AUTHOR
+Pádraig Brady <P@draigBrady.com>

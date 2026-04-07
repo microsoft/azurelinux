@@ -1,0 +1,21 @@
+diff -up typecode_libmagic_system_provided-33.0.0/setup.cfg.orig typecode_libmagic_system_provided-33.0.0/setup.cfg
+--- typecode_libmagic_system_provided-33.0.0/setup.cfg.orig	2024-10-31 20:38:21.241047100 +0100
++++ typecode_libmagic_system_provided-33.0.0/setup.cfg	2025-09-14 11:07:23.711942751 +0200
+@@ -1,17 +1,7 @@
+ [metadata]
+ license_files = 
+-	bsd-new.LICENSE
+-	bsd-original.LICENSE
+ 	bsd-simplified.LICENSE
+-	bsd-simplified-darwin.LICENSE
+-	gpl-1.0.LICENSE
+-	gpl-1.0-plus.LICENSE
+-	isc.LICENSE
+-	libmagic.ABOUT
+-	libmagic.NOTICE
+-	public-domain.LICENSE
+ 	README.rst
+-	typecode-libmagic.ABOUT
+ 
+ [aliases]
+ release = clean --all sdist bdist_wheel --plat-name manylinux1_x86_64 --python-tag py3

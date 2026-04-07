@@ -1,0 +1,56 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Max R. Carrara" <m.carrara@proxmox.com>
+Date: Wed, 16 Jul 2025 16:31:43 +0200
+Subject: [PATCH 59/59] mgr: fix module import by making NOTIFY_TYPES in py
+ modules optional
+
+If NOTIFY_TYPES isn't an attribute of the passed class, the Python
+(sub-)interpreter raises an AttributeError that must be handled or cleared
+explicitly via the Python C-API. Unfortunately, this isn't done here,
+which means that the exception sticks around until handled.
+
+This caused a call to PyModule::load_subclass_of() to fail and
+incorrectly report the AttributeError as cause.
+
+Checking whether the class has NOTIFY_TYPES as attribute in the first
+place fixes this.
+
+Note that there's an upstream PR [0] that wasn't backported that aimed
+to fix this, but does so incorrectly, as the exception is still not
+cleared there. The warnings regarding NOTIFY_TYPES missing also occurs
+on Reef but doesn't cause any module imports to fail there. As the
+affected Ceph code has stayed mostly the same between bookworm and
+trixie releases, this suggests that some behavior between Python 3.11
+and 3.13 likely changed.
+
+Either way, avoiding the AttributeError altogether fixes this.
+
+[0]: https://github.com/ceph/ceph/pull/57106
+
+Signed-off-by: Max R. Carrara <m.carrara@proxmox.com>
+---
+ src/mgr/PyModule.cc | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/src/mgr/PyModule.cc b/src/mgr/PyModule.cc
+index 084cf3ffc1e..e6fd269dca5 100644
+--- a/src/mgr/PyModule.cc
++++ b/src/mgr/PyModule.cc
+@@ -513,11 +513,13 @@ int PyModule::register_options(PyObject *cls)
+ 
+ int PyModule::load_notify_types()
+ {
+-  PyObject *ls = PyObject_GetAttrString(pClass, "NOTIFY_TYPES");
+-  if (ls == nullptr) {
+-    derr << "Module " << get_name() << " has missing NOTIFY_TYPES member" << dendl;
+-    return -EINVAL;
++  if (!PyObject_HasAttrString(pClass, "NOTIFY_TYPES")) {
++    dout(10) << "Module " << get_name() << " has no NOTIFY_TYPES member" << dendl;
++    return 0;
+   }
++
++  PyObject *ls = PyObject_GetAttrString(pClass, "NOTIFY_TYPES");
++
+   if (!PyObject_TypeCheck(ls, &PyList_Type)) {
+     // Relatively easy mistake for human to make, e.g. defining COMMANDS
+     // as a {} instead of a []

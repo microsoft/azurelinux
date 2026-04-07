@@ -1,0 +1,18 @@
+diff -up tftp-hpa-0.49/tftpd/tftpd.c.tzfix tftp-hpa-0.49/tftpd/tftpd.c
+--- tftp-hpa-0.49/tftpd/tftpd.c.tzfix	2008-10-20 18:08:31.000000000 -0400
++++ tftp-hpa-0.49/tftpd/tftpd.c	2008-11-25 11:45:27.000000000 -0500
+@@ -350,6 +350,14 @@ int main(int argc, char **argv)
+     const char *pidfile = NULL;
+     u_short tp_opcode;
+ 
++    time_t my_time = 0;
++    struct tm* p_tm;
++    char envtz[10];
++    my_time = time(NULL);
++    p_tm = localtime(&my_time);
++    snprintf(envtz, sizeof(envtz) - 1, "UTC%+d", (p_tm->tm_gmtoff * -1)/3600);
++    setenv("TZ", envtz, 0);
++
+     /* basename() is way too much of a pain from a portability standpoint */
+ 
+     p = strrchr(argv[0], '/');

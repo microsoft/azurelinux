@@ -1,0 +1,30 @@
+--- event-listener-5.4.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ event-listener-5.4.1/Cargo.toml	2025-08-10T14:31:49.048432+00:00
+@@ -46,7 +46,6 @@
+ loom = [
+     "concurrent-queue/loom",
+     "parking?/loom",
+-    "dep:loom",
+ ]
+ portable-atomic = [
+     "portable-atomic-util",
+@@ -122,18 +121,12 @@
+ [dev-dependencies.waker-fn]
+ version = "1"
+ 
+-[target."cfg(loom)".dependencies.loom]
+-version = "0.7"
+-optional = true
+-
+ [target.'cfg(not(target_family = "wasm"))'.dependencies.parking]
+ version = "2.0.0"
+ optional = true
+-
+-[target.'cfg(target_family = "wasm")'.dev-dependencies.wasm-bindgen-test]
+-version = "0.3"
+ 
+ [lints.rust.unexpected_cfgs]
+ level = "warn"
+ priority = 0
+ check-cfg = ["cfg(loom)"]
++

@@ -1,0 +1,166 @@
+From fff98508b264a4bd770bd2115b0f73ef34361579 Mon Sep 17 00:00:00 2001
+From: Weng Xuetian <wengxt@gmail.com>
+Date: Sun, 27 Nov 2022 12:44:40 -0800
+Subject: [PATCH 40/55] Fix frame sync related to unprotected multithread
+ access
+
+There is a few crashes happens in real life that frame callback is
+double-free'd and hit an assertion in wayland-client. e.g.
+https://bugs.kde.org/show_bug.cgi?id=450003
+
+This is due to the WaylandEventThread and calls to QWaylandWindow::reset
+may free and unset the mFrameCallback at the same time. mFrameSyncMutex
+should be used to protect such access.
+
+Pick-to: 6.4
+Change-Id: Ie01d08d07a2f10f70606ed1935caac09cb4f0382
+(cherry picked from commit b6cbb5e323822d6e3ef5ed4dd5a4c4cc1ea85038)
+---
+ src/client/qwaylandwindow.cpp | 64 ++++++++++++++++++++---------------
+ src/client/qwaylandwindow_p.h | 11 +++---
+ 2 files changed, 43 insertions(+), 32 deletions(-)
+
+diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
+index 464441b1..96de798b 100644
+--- a/src/client/qwaylandwindow.cpp
++++ b/src/client/qwaylandwindow.cpp
+@@ -252,13 +252,16 @@ void QWaylandWindow::reset()
+         mSurface.reset();
+     }
+ 
+-    if (mFrameCallback) {
+-        wl_callback_destroy(mFrameCallback);
+-        mFrameCallback = nullptr;
+-    }
++    {
++        QMutexLocker lock(&mFrameSyncMutex);
++        if (mFrameCallback) {
++            wl_callback_destroy(mFrameCallback);
++            mFrameCallback = nullptr;
++        }
+ 
+-    mFrameCallbackElapsedTimer.invalidate();
+-    mWaitingForFrameCallback = false;
++        mFrameCallbackElapsedTimer.invalidate();
++        mWaitingForFrameCallback = false;
++    }
+     mFrameCallbackTimedOut = false;
+ 
+     mMask = QRegion();
+@@ -633,18 +636,21 @@ const wl_callback_listener QWaylandWindow::callbackListener = {
+     [](void *data, wl_callback *callback, uint32_t time) {
+         Q_UNUSED(time);
+         auto *window = static_cast<QWaylandWindow*>(data);
+-
+-        Q_ASSERT(callback == window->mFrameCallback);
+-        wl_callback_destroy(callback);
+-        window->mFrameCallback = nullptr;
+-
+-        window->handleFrameCallback();
++        window->handleFrameCallback(callback);
+     }
+ };
+ 
+-void QWaylandWindow::handleFrameCallback()
++void QWaylandWindow::handleFrameCallback(wl_callback* callback)
+ {
+     QMutexLocker locker(&mFrameSyncMutex);
++    if (!mFrameCallback) {
++        // This means the callback is already unset by QWaylandWindow::reset.
++        // The wl_callback object will be destroyed there too.
++        return;
++    }
++    Q_ASSERT(callback == mFrameCallback);
++    wl_callback_destroy(callback);
++    mFrameCallback = nullptr;
+ 
+     mWaitingForFrameCallback = false;
+     mFrameCallbackElapsedTimer.invalidate();
+@@ -1172,19 +1178,24 @@ void QWaylandWindow::timerEvent(QTimerEvent *event)
+     if (event->timerId() != mFrameCallbackCheckIntervalTimerId)
+         return;
+ 
+-    bool callbackTimerExpired = mFrameCallbackElapsedTimer.hasExpired(mFrameCallbackTimeout);
+-    if (!mFrameCallbackElapsedTimer.isValid() || callbackTimerExpired ) {
+-        killTimer(mFrameCallbackCheckIntervalTimerId);
+-        mFrameCallbackCheckIntervalTimerId = -1;
+-    }
+-    if (mFrameCallbackElapsedTimer.isValid() && callbackTimerExpired) {
+-        mFrameCallbackElapsedTimer.invalidate();
++    {
++        QMutexLocker lock(&mFrameSyncMutex);
+ 
+-        qCDebug(lcWaylandBackingstore) << "Didn't receive frame callback in time, window should now be inexposed";
+-        mFrameCallbackTimedOut = true;
+-        mWaitingForUpdate = false;
+-        sendExposeEvent(QRect());
++        bool callbackTimerExpired = mFrameCallbackElapsedTimer.hasExpired(mFrameCallbackTimeout);
++        if (!mFrameCallbackElapsedTimer.isValid() || callbackTimerExpired ) {
++            killTimer(mFrameCallbackCheckIntervalTimerId);
++            mFrameCallbackCheckIntervalTimerId = -1;
++        }
++        if (!mFrameCallbackElapsedTimer.isValid() || !callbackTimerExpired) {
++            return;
++        }
++        mFrameCallbackElapsedTimer.invalidate();
+     }
++
++    qCDebug(lcWaylandBackingstore) << "Didn't receive frame callback in time, window should now be inexposed";
++    mFrameCallbackTimedOut = true;
++    mWaitingForUpdate = false;
++    sendExposeEvent(QRect());
+ }
+ 
+ void QWaylandWindow::requestUpdate()
+@@ -1227,15 +1238,14 @@ void QWaylandWindow::handleUpdate()
+ {
+     qCDebug(lcWaylandBackingstore) << "handleUpdate" << QThread::currentThread();
+ 
+-    if (mWaitingForFrameCallback)
+-        return;
+-
+     // TODO: Should sync subsurfaces avoid requesting frame callbacks?
+     QReadLocker lock(&mSurfaceLock);
+     if (!mSurface)
+         return;
+ 
+     QMutexLocker locker(&mFrameSyncMutex);
++    if (mWaitingForFrameCallback)
++        return;
+ 
+     struct ::wl_surface *wrappedSurface = reinterpret_cast<struct ::wl_surface *>(wl_proxy_create_wrapper(mSurface->object()));
+     wl_proxy_set_queue(reinterpret_cast<wl_proxy *>(wrappedSurface), mDisplay->frameEventQueue());
+diff --git a/src/client/qwaylandwindow_p.h b/src/client/qwaylandwindow_p.h
+index 487a91a6..2f219d8c 100644
+--- a/src/client/qwaylandwindow_p.h
++++ b/src/client/qwaylandwindow_p.h
+@@ -237,12 +237,13 @@ protected:
+     Qt::MouseButtons mMousePressedInContentArea = Qt::NoButton;
+ 
+     WId mWindowId;
+-    bool mWaitingForFrameCallback = false;
+     bool mFrameCallbackTimedOut = false; // Whether the frame callback has timed out
+-    QAtomicInt mWaitingForUpdateDelivery = false;
+     int mFrameCallbackCheckIntervalTimerId = -1;
+-    QElapsedTimer mFrameCallbackElapsedTimer;
+-    struct ::wl_callback *mFrameCallback = nullptr;
++    QAtomicInt mWaitingForUpdateDelivery = false;
++
++    bool mWaitingForFrameCallback = false; // Protected by mFrameSyncMutex
++    QElapsedTimer mFrameCallbackElapsedTimer; // Protected by mFrameSyncMutex
++    struct ::wl_callback *mFrameCallback = nullptr; // Protected by mFrameSyncMutex
+     QMutex mFrameSyncMutex;
+     QWaitCondition mFrameSyncWait;
+ 
+@@ -297,7 +298,7 @@ private:
+     QRect mLastExposeGeometry;
+ 
+     static const wl_callback_listener callbackListener;
+-    void handleFrameCallback();
++    void handleFrameCallback(struct ::wl_callback* callback);
+ 
+     static QWaylandWindow *mMouseGrab;
+ 
+-- 
+2.51.1
+

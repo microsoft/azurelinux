@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<service>
+  <short>Munin-node</short>
+  <description>Munin-node is the agent process running on each node that the Munin server monitors. It listens on port 4949 and will respond to regular telnet communication as long as the querying host is listed in munin-node.conf.</description>
+  <port protocol="tcp" port="4949"/>
+</service>

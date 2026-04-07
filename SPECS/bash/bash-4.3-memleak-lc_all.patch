@@ -1,0 +1,13 @@
+diff --git a/locale.c b/locale.c
+index 17ccc58..a6c07a3 100644
+--- a/locale.c
++++ b/locale.c
+@@ -78,8 +78,6 @@ set_default_locale ()
+ {
+ #if defined (HAVE_SETLOCALE)
+   default_locale = setlocale (LC_ALL, "");
+-  if (default_locale)
+-    default_locale = savestring (default_locale);
+ #else
+   default_locale = savestring ("C");
+ #endif /* HAVE_SETLOCALE */

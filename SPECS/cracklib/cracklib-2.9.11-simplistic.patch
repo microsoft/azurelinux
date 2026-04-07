@@ -1,0 +1,111 @@
+diff -Naur cracklib-2.9.11-orig/lib/fascist.c cracklib-2.9.11/lib/fascist.c
+--- cracklib-2.9.11-orig/lib/fascist.c	2023-07-07 21:18:25.582821076 -0400
++++ cracklib-2.9.11/lib/fascist.c	2023-07-07 21:19:55.130234075 -0400
+@@ -55,7 +55,6 @@
+ 
+     "/?p@?p",                   /* purging out punctuation/symbols/junk */
+     "/?s@?s",
+-    "/?X@?X",
+ 
+     /* attempt reverse engineering of password strings */
+ 
+@@ -454,6 +453,12 @@
+ 	    continue;
+ 	}
+ 
++	if (len - strlen(mp) >= 3)
++	{
++	   /* purged too much */
++	   continue;
++	}
++
+ #ifdef DEBUG
+ 	printf("%-16s = %-16s (destruct %s)\n", mp, rawtext, r_destructors[i]);
+ #endif
+@@ -480,6 +485,12 @@
+ 	    continue;
+ 	}
+ 
++	if (len - strlen(mp) >= 3)
++	{
++	   /* purged too much */
++	   continue;
++	}
++
+ #ifdef DEBUG
+ 	printf("%-16s = %-16s (construct %s)\n", mp, password, r_constructors[i]);
+ #endif
+@@ -708,6 +719,7 @@
+     char rpassword[STRINGSIZE];
+     char area[STRINGSIZE];
+     uint32_t notfound;
++    int len;
+ 
+     notfound = PW_WORDS(pwp);
+     /* already truncated if from FascistCheck() */
+@@ -757,6 +769,7 @@
+ 	return _("it is all whitespace");
+     }
+ 
++    len = strlen(password);
+     i = 0;
+     ptr = password;
+     while (ptr[0] && ptr[1])
+@@ -768,10 +781,9 @@
+ 	ptr++;
+     }
+ 
+-    /*  Change by Ben Karsin from ITS at University of Hawaii at Manoa.  Static MAXSTEP
+-        would generate many false positives for long passwords. */
+-    maxrepeat = 3+(0.09*strlen(password));
+-    if (i > maxrepeat)
++    /*  We were still generating false positives for long passwords.
++	Just count systematic double as a single character. */
++    if (len - i < MINLEN)
+     {
+ 	return _("it is too simplistic/systematic");
+     }
+@@ -804,6 +816,12 @@
+ 	    continue;
+ 	}
+ 
++	if (len - strlen(a) >= 3)
++	{
++	   /* purged too much */
++	   continue;
++	}
++
+ #ifdef DEBUG
+ 	printf("%-16s (dict)\n", a);
+ #endif
+@@ -824,6 +842,13 @@
+ 	{
+ 	    continue;
+ 	}
++
++	if (len - strlen(a) >= 3)
++	{
++	   /* purged too much */
++	   continue;
++	}
++
+ #ifdef DEBUG
+ 	printf("%-16s (reversed dict)\n", a);
+ #endif
+diff -Naur cracklib-2.9.11-orig/util/cracklib-format cracklib-2.9.11/util/cracklib-format
+--- cracklib-2.9.11-orig/util/cracklib-format	2021-01-22 10:58:14.000000000 -0500
++++ cracklib-2.9.11/util/cracklib-format	2023-07-07 21:19:14.854048317 -0400
+@@ -10,10 +10,12 @@
+ # lines (possibly introduced by earlier parts of the pipeline) as
+ # cracklib-packer will generate "skipping line" warnings otherwise.
+ #
++LC_ALL=C
++export LC_ALL
+ gzip -cdf "$@" |
+     grep -a -v '^#' |
+     tr '[A-Z]' '[a-z]' |
+     tr -cd '\012[a-z][0-9]' |
+     cut -c 1-1022 |
+     grep -v '^$' |
+-    env LC_ALL=C sort -u
++    sort -u

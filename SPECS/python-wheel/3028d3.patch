@@ -1,0 +1,125 @@
+From 3028d38b5aec19f966660de8e24c45bb5c23f359 Mon Sep 17 00:00:00 2001
+From: shenxianpeng <xianpeng.shen@gmail.com>
+Date: Sun, 16 Mar 2025 01:35:32 +0800
+Subject: [PATCH] Fixed test failures (#651)
+
+---
+ tests/test_bdist_wheel.py            |  4 ++--
+ tests/test_tagopt.py                 | 18 +++++++++---------
+ tests/testdata/unicode.dist/setup.py |  2 +-
+ 3 files changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/tests/test_bdist_wheel.py b/tests/test_bdist_wheel.py
+index fcb2dfc4..21eddd02 100644
+--- a/tests/test_bdist_wheel.py
++++ b/tests/test_bdist_wheel.py
+@@ -79,9 +79,9 @@ def test_no_scripts(wheel_paths):
+ 
+ 
+ def test_unicode_record(wheel_paths):
+-    path = next(path for path in wheel_paths if "unicode.dist" in path)
++    path = next(path for path in wheel_paths if "unicode_dist" in path)
+     with ZipFile(path) as zf:
+-        record = zf.read("unicode.dist-0.1.dist-info/RECORD")
++        record = zf.read("unicode_dist-0.1.dist-info/RECORD")
+ 
+     assert "åäö_日本語.py".encode() in record
+ 
+diff --git a/tests/test_tagopt.py b/tests/test_tagopt.py
+index 5335af44..5733e1a9 100644
+--- a/tests/test_tagopt.py
++++ b/tests/test_tagopt.py
+@@ -14,7 +14,7 @@
+ from setuptools import setup, Extension
+ 
+ setup(
+-    name="Test",
++    name="test",
+     version="1.0",
+     author_email="author@example.com",
+     py_modules=["test"],
+@@ -63,7 +63,7 @@ def test_default_tag(temp_pkg):
+     assert dist_dir.is_dir()
+     wheels = list(dist_dir.iterdir())
+     assert len(wheels) == 1
+-    assert wheels[0].name == f"Test-1.0-py{sys.version_info[0]}-none-any.whl"
++    assert wheels[0].name == f"test-1.0-py{sys.version_info[0]}-none-any.whl"
+     assert wheels[0].suffix == ".whl"
+ 
+ 
+@@ -76,7 +76,7 @@ def test_build_number(temp_pkg):
+     assert dist_dir.is_dir()
+     wheels = list(dist_dir.iterdir())
+     assert len(wheels) == 1
+-    assert wheels[0].name == f"Test-1.0-1-py{sys.version_info[0]}-none-any.whl"
++    assert wheels[0].name == f"test-1.0-1-py{sys.version_info[0]}-none-any.whl"
+     assert wheels[0].suffix == ".whl"
+ 
+ 
+@@ -89,7 +89,7 @@ def test_explicit_tag(temp_pkg):
+     assert dist_dir.is_dir()
+     wheels = list(dist_dir.iterdir())
+     assert len(wheels) == 1
+-    assert wheels[0].name.startswith("Test-1.0-py32-")
++    assert wheels[0].name.startswith("test-1.0-py32-")
+     assert wheels[0].suffix == ".whl"
+ 
+ 
+@@ -101,7 +101,7 @@ def test_universal_tag(temp_pkg):
+     assert dist_dir.is_dir()
+     wheels = list(dist_dir.iterdir())
+     assert len(wheels) == 1
+-    assert wheels[0].name.startswith("Test-1.0-py2.py3-")
++    assert wheels[0].name.startswith("test-1.0-py2.py3-")
+     assert wheels[0].suffix == ".whl"
+ 
+ 
+@@ -114,7 +114,7 @@ def test_universal_beats_explicit_tag(temp_pkg):
+     assert dist_dir.is_dir()
+     wheels = list(dist_dir.iterdir())
+     assert len(wheels) == 1
+-    assert wheels[0].name.startswith("Test-1.0-py2.py3-")
++    assert wheels[0].name.startswith("test-1.0-py2.py3-")
+     assert wheels[0].suffix == ".whl"
+ 
+ 
+@@ -129,7 +129,7 @@ def test_universal_in_setup_cfg(temp_pkg):
+     assert dist_dir.is_dir()
+     wheels = list(dist_dir.iterdir())
+     assert len(wheels) == 1
+-    assert wheels[0].name.startswith("Test-1.0-py2.py3-")
++    assert wheels[0].name.startswith("test-1.0-py2.py3-")
+     assert wheels[0].suffix == ".whl"
+ 
+ 
+@@ -144,7 +144,7 @@ def test_pythontag_in_setup_cfg(temp_pkg):
+     assert dist_dir.is_dir()
+     wheels = list(dist_dir.iterdir())
+     assert len(wheels) == 1
+-    assert wheels[0].name.startswith("Test-1.0-py32-")
++    assert wheels[0].name.startswith("test-1.0-py32-")
+     assert wheels[0].suffix == ".whl"
+ 
+ 
+@@ -157,7 +157,7 @@ def test_legacy_wheel_section_in_setup_cfg(temp_pkg):
+     assert dist_dir.is_dir()
+     wheels = list(dist_dir.iterdir())
+     assert len(wheels) == 1
+-    assert wheels[0].name.startswith("Test-1.0-py2.py3-")
++    assert wheels[0].name.startswith("test-1.0-py2.py3-")
+     assert wheels[0].suffix == ".whl"
+ 
+ 
+diff --git a/tests/testdata/unicode.dist/setup.py b/tests/testdata/unicode.dist/setup.py
+index ec66d1e6..46ef0a10 100644
+--- a/tests/testdata/unicode.dist/setup.py
++++ b/tests/testdata/unicode.dist/setup.py
+@@ -3,7 +3,7 @@
+ from setuptools import setup
+ 
+ setup(
+-    name="unicode.dist",
++    name="unicode_dist",
+     version="0.1",
+     description="A testing distribution \N{SNOWMAN}",
+     packages=["unicodedist"],

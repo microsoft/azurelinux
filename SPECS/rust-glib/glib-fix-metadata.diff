@@ -1,0 +1,12 @@
+--- glib-0.21.5/Cargo.toml	1970-01-01T00:00:01+00:00
++++ glib-0.21.5/Cargo.toml	2025-12-13T15:28:19.311233+00:00
+@@ -225,9 +225,6 @@
+     "const_new",
+ ]
+ 
+-[dev-dependencies.criterion]
+-version = "0.7.0"
+-
+ [dev-dependencies.gir-format-check]
+ version = "^0.1"
+ 

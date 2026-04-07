@@ -1,0 +1,56 @@
+From a472b5792b8c144a9855deb2bf00dcc05429132b Mon Sep 17 00:00:00 2001
+From: Adam Williamson <awilliam@redhat.com>
+Date: Fri, 4 Jul 2025 11:23:34 -0700
+Subject: [PATCH] Don't ship pam.py in the module
+
+The comment at the top of this file says:
+"This is a legacy file, it is not used. Here for example."
+so it seems sensible to no longer ship it as part of the pam
+module itself. This moves it to an examples/ directory which
+will not be included in builds of the actual module, and updates
+the comment.
+
+Signed-off-by: Adam Williamson <awilliam@redhat.com>
+---
+ MANIFEST.in                  | 1 +
+ {src/pam => examples}/pam.py | 5 +++--
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+ rename {src/pam => examples}/pam.py (95%)
+
+diff --git a/MANIFEST.in b/MANIFEST.in
+index 04f196a..a57adff 100644
+--- a/MANIFEST.in
++++ b/MANIFEST.in
+@@ -1,2 +1,3 @@
+ include README.md
+ include LICENSE
++graft examples
+diff --git a/src/pam/pam.py b/examples/pam.py
+similarity index 95%
+rename from src/pam/pam.py
+rename to examples/pam.py
+index f16bf0c..fdb5e27 100644
+--- a/src/pam/pam.py
++++ b/examples/pam.py
+@@ -22,7 +22,8 @@
+ '''
+ PAM module for python
+ 
+-This is a legacy file, it is not used. Here for example.
++This is a legacy implementation of the real module, kept around as a usage
++example.
+ 
+ Provides an authenticate function that will allow the caller to authenticate
+ a user against the Pluggable Authentication Modules (PAM) on the system.
+@@ -31,7 +32,7 @@ Implemented using ctypes, so no compilation is necessary.
+ '''
+ 
+ import six
+-import __internals
++import pam.__internals
+ 
+ if __name__ == "__main__":  # pragma: no cover
+     import readline
+-- 
+2.50.0
+

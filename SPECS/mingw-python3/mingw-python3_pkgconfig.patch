@@ -1,0 +1,10 @@
+diff -rupN --no-dereference Python-3.11.14/Misc/python.pc.in Python-3.11.14-new/Misc/python.pc.in
+--- Python-3.11.14/Misc/python.pc.in	2025-10-09 18:16:55.000000000 +0200
++++ Python-3.11.14-new/Misc/python.pc.in	2025-10-09 23:07:51.169586596 +0200
+@@ -9,5 +9,5 @@ Description: Build a C extension for Pyt
+ Requires:
+ Version: @VERSION@
+ Libs.private: @LIBS@
+-Libs:
++Libs: -lpython@VERSION@@ABIFLAGS@
+ Cflags: -I${includedir}/python@VERSION@@ABIFLAGS@

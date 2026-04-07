@@ -1,0 +1,58 @@
+--- bc-1.06/dc/numeric.c.dc_ibase	2007-08-22 08:37:57.000000000 +0200
++++ bc-1.06/dc/numeric.c	2007-08-22 08:37:40.000000000 +0200
+@@ -285,6 +285,8 @@ dc_getnum DC_DECLARG((input, ibase, read
+ 	int		digit;
+ 	int		decimal;
+ 	int		c;
++	int		c_buff = 0;
++	int		multi = 0;
+ 
+ 	bc_init_num(&tmp);
+ 	bc_init_num(&build);
+@@ -302,6 +304,9 @@ dc_getnum DC_DECLARG((input, ibase, read
+ 	}
+ 	while (isspace(c))
+ 		c = (*input)();
++	c_buff = (*input)();	
++	if (isdigit(c_buff) || ('A' <= c_buff && c_buff <= 'F') || c_buff == '.')
++			multi = 1;		
+ 	for (;;){
+ 		if (isdigit(c))
+ 			digit = c - '0';
+@@ -309,10 +314,15 @@ dc_getnum DC_DECLARG((input, ibase, read
+ 			digit = 10 + c - 'A';
+ 		else
+ 			break;
+-		c = (*input)();
++		digit = multi ? (digit >= ibase ? ibase -1 : digit) : digit;
+ 		bc_int2num(&tmp, digit);
+ 		bc_multiply(result, base, &result, 0);
+ 		bc_add(result, tmp, &result, 0);
++		if (c_buff) {
++			c = c_buff;
++			c_buff = 0;
++		} else
++			c = (*input)();
+ 	}
+ 	if (c == '.'){
+ 		bc_free_num(&build);
+@@ -321,13 +331,18 @@ dc_getnum DC_DECLARG((input, ibase, read
+ 		build = bc_copy_num(_zero_);
+ 		decimal = 0;
+ 		for (;;){
+-			c = (*input)();
++			if (c_buff) {
++				c = c_buff;
++				c_buff = 0;
++			} else
++				c = (*input)();
+ 			if (isdigit(c))
+ 				digit = c - '0';
+ 			else if ('A' <= c && c <= 'F')
+ 				digit = 10 + c - 'A';
+ 			else
+ 				break;
++			digit = digit >= ibase ? ibase -1 : digit;
+ 			bc_int2num(&tmp, digit);
+ 			bc_multiply(build, base, &build, 0);
+ 			bc_add(build, tmp, &build, 0);

@@ -1,0 +1,41 @@
+commit 6064f826d551a9db0bd42e9cf928feaf272e8d17 (HEAD -> main, origin/main, origin/HEAD)
+Author: Miguel Martín <mmartinv@redhat.com>
+Date:   Thu Jan 30 08:05:03 2025 +0100
+
+    Make CoseError thread safe
+
+    Make it safe to send CoseErrors between threads
+
+    Fixes: #114
+
+    Signed-off-by: Miguel Martín <mmartinv@redhat.com>
+
+diff --git a/src/error.rs b/src/error.rs
+index dea9b2a..e31435c 100644
+--- a/src/error.rs
++++ b/src/error.rs
+@@ -15,11 +15,11 @@ use aws_sdk_kms::{
+ /// Aggregation of all error types returned by this library
+ pub enum CoseError {
+     /// Failed to generate random bytes
+-    EntropyError(Box<dyn Error>),
++    EntropyError(Box<dyn Error + Send + Sync>),
+     /// Computation of a cryptographic hash failed
+-    HashingError(Box<dyn Error>),
++    HashingError(Box<dyn Error + Send + Sync>),
+     /// Signature could not be performed due to OpenSSL error.
+-    SignatureError(Box<dyn Error>),
++    SignatureError(Box<dyn Error + Send + Sync>),
+     /// This feature is not yet fully implemented according
+     /// to the spec.
+     UnimplementedError,
+@@ -35,7 +35,7 @@ pub enum CoseError {
+     /// Tag is missing or incorrect.
+     TagError(Option<u64>),
+     /// Encryption could not be performed due to OpenSSL error.
+-    EncryptionError(Box<dyn Error>),
++    EncryptionError(Box<dyn Error + Send + Sync>),
+     /// TPM error occured
+     #[cfg(feature = "key_tpm")]
+     TpmError(tss_esapi::Error),
+

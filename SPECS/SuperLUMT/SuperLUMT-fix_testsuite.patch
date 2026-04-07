@@ -1,0 +1,32 @@
+--- TESTING/Makefile.orig	2016-03-26 08:56:10.347188385 -0400
++++ TESTING/Makefile	2016-03-26 08:58:39.763126530 -0400
+@@ -51,21 +51,21 @@
+ 
+ all: single double complex complex16
+ 
+-pstest: $(SLINTST) $(ALINTST) ../lib/$(SUPERLULIB) $(TMGLIB)
++pstest: $(SLINTST) $(ALINTST) $(TMGLIB)
+ 	$(LOADER) $(LOADOPTS) $(SLINTST) $(ALINTST) \
+-	$(TMGLIB) ../lib/$(SUPERLULIB) $(BLASLIB) -lm $(MPLIB) -o $@
++	$(TMGLIB) -Wl,-rpath,../SRC ../lib/libsuperlumt_s.so $(BLASLIB) $(MATHLIB) $(MPLIB) -lgomp -o $@
+ 
+-pdtest: $(DLINTST) $(ALINTST) ../lib/$(SUPERLULIB) $(TMGLIB)
++pdtest: $(DLINTST) $(ALINTST) $(TMGLIB)
+ 	$(LOADER) $(LOADOPTS) $(DLINTST) $(ALINTST) \
+-	$(TMGLIB) ../lib/$(SUPERLULIB) $(BLASLIB) -lm $(MPLIB) -o $@
++	$(TMGLIB) -Wl,-rpath,../SRC ../lib/libsuperlumt_d.so $(BLASLIB) $(MATHLIB) $(MPLIB) -lgomp -o $@
+ 
+-pctest: $(CLINTST) $(ALINTST) ../lib/$(SUPERLULIB) $(TMGLIB)
++pctest: $(CLINTST) $(ALINTST) $(TMGLIB)
+ 	$(LOADER) $(LOADOPTS) $(CLINTST) $(ALINTST) \
+-	$(TMGLIB) ../lib/$(SUPERLULIB) $(BLASLIB) -lm $(MPLIB) -o $@
++	$(TMGLIB) -Wl,-rpath,../SRC ../lib/libsuperlumt_c.so $(BLASLIB) $(MATHLIB) $(MPLIB) -lgomp -o $@
+ 
+-pztest: $(ZLINTST) $(ALINTST) ../lib/$(SUPERLULIB) $(TMGLIB)
++pztest: $(ZLINTST) $(ALINTST) $(TMGLIB)
+ 	$(LOADER) $(LOADOPTS) $(ZLINTST) $(ALINTST) \
+-	$(TMGLIB) ../lib/$(SUPERLULIB) $(BLASLIB) -lm $(MPLIB) -o $@
++	$(TMGLIB) -Wl,-rpath,../SRC ../lib/libsuperlumt_z.so $(BLASLIB) $(MATHLIB) $(MPLIB) -lgomp -o $@
+ 
+ single: pstest pstest.out
+ 

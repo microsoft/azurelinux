@@ -1,0 +1,33 @@
+From df80a5550b4504cbbb46e85125cd9b163b399097 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Tue, 7 Oct 2025 06:38:15 +0100
+Subject: [PATCH] Downstream: temporarily loosen version bounds on some test
+ dependencies
+
+---
+ pyproject.toml | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index f8f1a21..f0e85aa 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -7,12 +7,12 @@ lint = [
+     "ruff>=0.12.2",
+ ]
+ test = [
+-    "hypothesis>=6.135.26",
+-    "pytest>=8.4.1",
++    "hypothesis>=6.123.0",
++    "pytest>=8.3.5",
+     "pytest-benchmark>=5.1.0",
+     "immutables>=0.21",
+     "coverage>=7.9.2",
+-    "pytest-xdist>=3.8.0",
++    "pytest-xdist>=3.7.0",
+ ]
+ docs = [
+     "sphinx>=5.3.0",
+-- 
+2.51.0
+

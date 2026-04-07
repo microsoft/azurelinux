@@ -1,0 +1,22 @@
+commit f2bf4b1e81d46dc00e3d478dd88fd994a944d4d5
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Wed Apr 7 12:09:59 2021 +0200
+
+    tests: Avoid leaking file descriptors on errors
+    
+    --
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+
+diff --git a/tests/fdpassing.c b/tests/fdpassing.c
+index 3e1b71b..0e23ffc 100644
+--- a/tests/fdpassing.c
++++ b/tests/fdpassing.c
+@@ -176,6 +176,7 @@ client (assuan_context_t ctx, const char *fname)
+       rc = assuan_sendfd (ctx, fileno (fp));
+       if (rc)
+         {
++          fclose (fp);
+           log_error ("assuan_sendfd failed: %s\n", gpg_strerror (rc));
+           return -1;
+         }

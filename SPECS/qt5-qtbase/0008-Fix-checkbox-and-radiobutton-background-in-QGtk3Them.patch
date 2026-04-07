@@ -1,0 +1,48 @@
+From 99fd51406053e789b9e02dd5fdbf63d79cb4d7ff Mon Sep 17 00:00:00 2001
+From: Jan Grulich <jgrulich@redhat.com>
+Date: Thu, 27 Jul 2023 12:36:14 +0200
+Subject: [PATCH 08/15] Fix checkbox and radiobutton background in QGtk3Theme
+
+The background color for radio buttons and checkboxes was not
+correctly read from the current GTK3 theme in light mode.
+This has lead to identical colors for indicators and background of
+radio buttons and checkboxes for certain GTK themes (e.g. Breeze).
+
+This patch sets the GTK default foreground color to the base color of
+palettes for checkboxes and radio buttons.
+---
+ src/plugins/platformthemes/gtk3/qgtk3storage.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3storage.cpp b/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
+index 0a1fa6ef97..d5d0e2c8e6 100644
+--- a/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
++++ b/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
+@@ -377,7 +377,6 @@ void QGtk3Storage::createMapping()
+     ADD(Normal, Button);
+     ADD(Normal, Base);
+     ADD(Inactive, Base);
+-    ADD(Normal, Window); // redundant
+     ADD(Inactive, Window);
+     LIGHTER(Normal, Window, 125);
+     ADD(Normal, Light);
+@@ -391,7 +390,6 @@ void QGtk3Storage::createMapping()
+     LIGHTER(Normal, WindowText, 50);
+     ADD(Disabled, Text);
+     ADD(Disabled, WindowText);
+-    //ADD(Normal, ButtonText);
+     ADD(Inactive, ButtonText);
+     GTK(button, Text, NORMAL);
+     ADD(Disabled, ButtonText);
+@@ -427,6 +425,8 @@ void QGtk3Storage::createMapping()
+     // Checkbox and Radio Button
+     GTK(button, Text, ACTIVE);
+     ADD(Normal, Base, Dark);
++    GTK(Default, Background, NORMAL);
++    ADD(All, Base);
+     GTK(button, Text, NORMAL);
+     ADD(Normal, Base, Light);
+     SAVE(CheckBoxPalette);
+-- 
+2.41.0
+

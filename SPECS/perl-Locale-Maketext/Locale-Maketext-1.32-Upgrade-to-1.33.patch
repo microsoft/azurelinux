@@ -1,0 +1,98 @@
+From acce3c021f8f3e6fac1e39590169ffabc7d2b2b5 Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Wed, 17 May 2023 15:36:04 +0200
+Subject: [PATCH] Upgrade to 1.33
+
+---
+ Makefile.PL            | 15 +++++++++++----
+ lib/Locale/Maketext.pm |  2 +-
+ t/00_load.t            | 11 -----------
+ t/pod.t                |  8 --------
+ 4 files changed, 12 insertions(+), 24 deletions(-)
+ delete mode 100644 t/00_load.t
+ delete mode 100644 t/pod.t
+
+diff --git a/Makefile.PL b/Makefile.PL
+index e4a2717..212982d 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -1,4 +1,4 @@
+-require 5.004;
++require 5.006; # uses 'our'
+ use strict;
+ use ExtUtils::MakeMaker;
+ 
+@@ -14,7 +14,7 @@ WriteMakefile(
+     },
+     dist => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+     ( $ExtUtils::MakeMaker::VERSION >= 6.3002 ? ( 'LICENSE' => 'perl', ) : () ),
+-    ( $] >= 5.008 && $] < 5.011 ) ? ( INSTALLDIRS => 'perl' ) : (),
++    INSTALLDIRS => ( $] < 5.011 ? 'perl' : 'site' ),
+ 
+     # If under a version with Maketext in core, overwrite that core file.
+     META_MERGE => {
+@@ -28,8 +28,15 @@ WriteMakefile(
+ );
+ 
+ sub MY::postamble {
+-    return <<'MAKE_FRAG';
+-.PHONY: tags critic
++    # .PHONY is not portable
++    my $self = shift;
++    my $phony_line = $self->can('is_make_type')
++                     && ($self->is_make_type('gmake')
++                         || $self->is_make_type('bsdmake'))
++                     ? '.PHONY: tags critic'
++                     : '';
++
++    return "$phony_line\n\n" . <<'MAKE_FRAG';
+ 
+ tags:
+ 	ctags -f tags --recurse --totals \
+diff --git a/lib/Locale/Maketext.pm b/lib/Locale/Maketext.pm
+index 972f929..8979c20 100644
+--- a/lib/Locale/Maketext.pm
++++ b/lib/Locale/Maketext.pm
+@@ -25,7 +25,7 @@ BEGIN {
+ }
+ 
+ 
+-our $VERSION = '1.32';
++our $VERSION = '1.33';
+ our @ISA = ();
+ 
+ our $MATCH_SUPERS = 1;
+diff --git a/t/00_load.t b/t/00_load.t
+deleted file mode 100644
+index 19abdba..0000000
+--- a/t/00_load.t
++++ /dev/null
+@@ -1,11 +0,0 @@
+-#!perl -Tw
+-
+-use warnings;
+-use strict;
+-use Test::More tests => 3;
+-
+-use_ok( 'Locale::Maketext' );
+-use_ok( 'Locale::Maketext::Guts' );
+-use_ok( 'Locale::Maketext::GutsLoader' );
+-
+-diag( "Testing Locale::Maketext $Locale::Maketext::VERSION with Perl $], $^X" );
+diff --git a/t/pod.t b/t/pod.t
+deleted file mode 100644
+index a0f6a50..0000000
+--- a/t/pod.t
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#!perl -Tw
+-
+-use warnings;
+-use strict;
+-use Test::More;
+-eval 'use Test::Pod 1.14';
+-plan skip_all => 'Test::Pod 1.14 required for testing POD' if $@;
+-all_pod_files_ok();
+-- 
+2.40.1
+

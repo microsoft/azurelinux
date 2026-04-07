@@ -1,0 +1,10 @@
+--- serde_tuple_macros-0.5.0/Cargo.toml	2020-03-20T18:50:40+00:00
++++ serde_tuple_macros-0.5.0/Cargo.toml	2025-01-29T11:24:04.509027+00:00
+@@ -16,7 +16,6 @@
+ version = "0.5.0"
+ authors = ["Jacob Brown <kardeiz@gmail.com>"]
+ description = "De/serialize structs with named fields as array of values"
+-readme = "../README.md"
+ license = "MIT"
+ repository = "https://github.com/kardeiz/serde_tuple"
+ 

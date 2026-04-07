@@ -1,0 +1,25 @@
+From d991316f9ded539c9b6f0f1a8bfb95db197567ac Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Sat, 9 Mar 2019 20:38:45 +0100
+Subject: [PATCH 1/2] test/helper: remove shebang and executable bit
+
+---
+ test/test_helper.rb | 2 --
+ 1 file changed, 2 deletions(-)
+ mode change 100755 => 100644 test/test_helper.rb
+
+diff --git a/test/test_helper.rb b/test/test_helper.rb
+old mode 100755
+new mode 100644
+index ac5ab53..18e464a
+--- a/test/test_helper.rb
++++ b/test/test_helper.rb
+@@ -1,5 +1,3 @@
+-#!/usr/bin/env ruby
+-
+ ENV["MT_NO_EXPECTATIONS"] = "1"
+ require 'minitest/autorun'
+ 
+-- 
+2.24.1
+

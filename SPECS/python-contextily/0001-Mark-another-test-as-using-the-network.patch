@@ -1,0 +1,28 @@
+From fe95a3aafe8b100e8be1c40e54568a8aa98beabb Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Mon, 24 Nov 2025 22:19:13 -0500
+Subject: [PATCH] Mark another test as using the network
+
+cx.Place tries to geocode the search, which will try to reach out to
+OSM.
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ tests/test_cx.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tests/test_cx.py b/tests/test_cx.py
+index f1c5077..6c45313 100644
+--- a/tests/test_cx.py
++++ b/tests/test_cx.py
+@@ -333,6 +333,7 @@ def test_custom_user_agent_override():
+         assert not headers_used["user-agent"].startswith("contextily-")
+ 
+ 
++@pytest.mark.network
+ def test_place_with_custom_headers():
+     """Test that Place class properly passes custom headers through to bounds2img."""
+     # Create a mock image to return
+-- 
+2.50.0
+

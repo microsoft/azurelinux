@@ -1,0 +1,83 @@
+--- rrdtool-1.4.7/php4/rrdtool.c.orig	2013-03-22 14:54:18.520877577 +0100
++++ rrdtool-1.4.7/php4/rrdtool.c	2013-03-22 14:59:23.056303502 +0100
+@@ -20,13 +20,11 @@
+ 
+ /* PHP Includes */
+ #include "php.h"
+-#include "php_logos.h"
+ #include "ext/standard/info.h"
+ #include "SAPI.h"
+ 
+ /* rrdtool includes */
+ #include "php_rrdtool.h"
+-#include "rrdtool_logo.h"
+ #include <rrd.h>
+ 
+ #ifdef HAVE_CONFIG_H
+@@ -48,7 +46,6 @@
+ 	PHP_FE(rrd_last, NULL)
+ 	PHP_FE(rrd_create, NULL)
+ 	PHP_FE(rrdtool_info, NULL)
+-	PHP_FE(rrdtool_logo_guid, NULL)
+ 	{NULL, NULL, NULL}
+ };
+ 
+@@ -83,8 +80,6 @@
+ /* {{{ PHP_MINIT_FUNCTION */
+ PHP_MINIT_FUNCTION(rrdtool)
+ {
+-	php_register_info_logo(RRDTOOL_LOGO_GUID   , "image/gif", rrdtool_logo   , sizeof(rrdtool_logo));
+-	
+ 	return SUCCESS;
+ }
+ /* }}} */
+@@ -92,8 +87,6 @@
+ /* {{{ PHP_MSHUTDOWN_FUNCTION */
+ PHP_MSHUTDOWN_FUNCTION(rrdtool)
+ {
+-	php_unregister_info_logo(RRDTOOL_LOGO_GUID);
+-	
+ 	return SUCCESS;
+ }
+ /* }}} */
+@@ -102,11 +95,6 @@
+ PHP_MINFO_FUNCTION(rrdtool)
+ {
+ 	php_info_print_box_start(1);
+-	PUTS("<a href=\"http://people.ee.ethz.ch/~oetiker/webtools/rrdtool/\" target=\"rrdtool\"><img border=\"0\" src=\"");
+-	if (SG(request_info).request_uri) {
+-		PUTS(SG(request_info).request_uri);
+-	}
+-	PUTS("?="RRDTOOL_LOGO_GUID"\" alt=\"ClamAV logo\" /></a>\n");
+ 	php_printf("<h1 class=\"p\">rrdtool Version %s</h1>\n", PHP_RRD_VERSION_STRING);
+ 	php_info_print_box_end();
+ 	php_info_print_table_start();
+@@ -548,11 +536,6 @@
+ 	PUTS("<body><div class=\"center\">\n");
+ 
+ 	php_info_print_box_start(1);
+-	PUTS("<a href=\"http://people.ee.ethz.ch/~oetiker/webtools/rrdtool/\" target=\"rrdtool\"><img border=\"0\" src=\"");
+-	if (SG(request_info).request_uri) {
+-		PUTS(SG(request_info).request_uri);
+-	}
+-	PUTS("?="RRDTOOL_LOGO_GUID"\" alt=\"ClamAV logo\" /></a>\n");
+ 	php_printf("<h1 class=\"p\">rrdtool Version %s</h1>\n", PHP_RRD_VERSION_STRING);
+ 	php_info_print_box_end();
+ 	php_info_print_table_start();
+@@ -590,16 +573,6 @@
+ }
+ /* }}} */
+ 
+-PHP_FUNCTION(rrdtool_logo_guid)
+-{
+-	if (ZEND_NUM_ARGS() != 0) {
+-		WRONG_PARAM_COUNT;
+-	}
+-
+-	RETURN_STRINGL(RRDTOOL_LOGO_GUID, sizeof(RRDTOOL_LOGO_GUID)-1, 1);
+-}
+-/* }}} */
+-
+ #endif	/* HAVE_RRDTOOL */
+ 
+ /*

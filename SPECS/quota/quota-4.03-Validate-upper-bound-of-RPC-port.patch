@@ -1,0 +1,29 @@
+From c9a2a6fea0668579f5fb8d77cb219f51d104581f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Wed, 6 Jan 2016 17:58:22 +0100
+Subject: [PATCH] Validate upper bound of RPC port
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ rquota_svc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/rquota_svc.c b/rquota_svc.c
+index 338b70f..93472e0 100644
+--- a/rquota_svc.c
++++ b/rquota_svc.c
+@@ -142,7 +142,7 @@ static void parse_options(int argc, char **argv)
+ 				break;
+ 			case 'p': 
+ 				port = strtol(optarg, &endptr, 0);
+-				if (*endptr || port <= 0) {
++				if (*endptr || port <= 0 || port > 0xffff) {
+ 					errstr(_("Illegal port number: %s\n"), optarg);
+ 					show_help();
+ 					exit(1);
+-- 
+2.5.0
+

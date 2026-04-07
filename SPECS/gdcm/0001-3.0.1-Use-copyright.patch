@@ -1,0 +1,29 @@
+From 541353ba279245fb0297f50dcb23d2da0d45cdc4 Mon Sep 17 00:00:00 2001
+From: "Ankur Sinha (Ankur Sinha Gmail)" <sanjay.ankur@gmail.com>
+Date: Sun, 28 Jul 2019 16:38:52 +0100
+Subject: [PATCH] 3.0.1 Use copyright
+
+---
+ CMake/UseCopyright.cmake | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/CMake/UseCopyright.cmake b/CMake/UseCopyright.cmake
+index fb4fe1fad..d8bc8e8cb 100644
+--- a/CMake/UseCopyright.cmake
++++ b/CMake/UseCopyright.cmake
+@@ -18,8 +18,10 @@ macro(APPEND_COPYRIGHT)
+   # need to raise an error if COPYRIGHT_MODULE_FILENAME is not set...
+   if(EXISTS ${COPYRIGHT_MODULE_FILENAME} )
+     foreach(filename ${ARGN})
+-      file(READ ${filename} content)
+-      file(APPEND ${COPYRIGHT_MODULE_FILENAME} ${content})
++      if(EXISTS ${filename} )
++        file(READ ${filename} content)
++        file(APPEND ${COPYRIGHT_MODULE_FILENAME} ${content})
++    endif()
+     endforeach()
+   endif()
+ endmacro()
+-- 
+2.21.0
+

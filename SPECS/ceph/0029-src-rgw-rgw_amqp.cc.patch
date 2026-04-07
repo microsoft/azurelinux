@@ -1,0 +1,17 @@
+--- ceph-18.0.0-2726-g7cea3740/src/rgw/rgw_amqp.cc.orig	2023-03-14 18:22:35.636864260 -0400
++++ ceph-18.0.0-2726-g7cea3740/src/rgw/rgw_amqp.cc	2023-03-14 18:24:36.362756771 -0400
+@@ -2,10 +2,10 @@
+ // vim: ts=8 sw=2 smarttab ft=cpp
+ 
+ #include "rgw_amqp.h"
+-#include <amqp.h>
+-#include <amqp_ssl_socket.h>
+-#include <amqp_tcp_socket.h>
+-#include <amqp_framing.h>
++#include <rabbitmq-c/amqp.h>
++#include <rabbitmq-c/ssl_socket.h>
++#include <rabbitmq-c/tcp_socket.h>
++#include <rabbitmq-c/framing.h>
+ #include "include/ceph_assert.h"
+ #include <sstream>
+ #include <cstring>

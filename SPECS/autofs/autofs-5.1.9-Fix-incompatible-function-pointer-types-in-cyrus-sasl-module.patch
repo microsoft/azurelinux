@@ -1,0 +1,54 @@
+autofs-5.1.9 - Fix incompatible function pointer types in cyrus-sasl module
+
+From: Florian Weimer <fweimer@redhat.com>
+
+Add casts to SASL callbacks to avoid incompatible-pointer-types
+errors.  Avoids a build failure with stricter compilers.
+
+Signed-off-by: Florian Weimer <fweimer@redhat.com>
+Signed-off-by: Ian Kent <raven@themaw.net>
+---
+ CHANGELOG            |    2 ++
+ modules/cyrus-sasl.c |   14 +++++++-------
+ 2 files changed, 9 insertions(+), 7 deletions(-)
+
+diff --git a/CHANGELOG b/CHANGELOG
+index 3e47daa12..fd9d8614a 100644
+--- a/CHANGELOG
++++ b/CHANGELOG
+@@ -1,4 +1,6 @@
+ 
++- Fix incompatible function pointer types in cyrus-sasl module.
++
+ 02/11/2023 autofs-5.1.9
+ - fix kernel mount status notification.
+ - fix fedfs build flags.
+diff --git a/modules/cyrus-sasl.c b/modules/cyrus-sasl.c
+index e742eaf8e..78b77942b 100644
+--- a/modules/cyrus-sasl.c
++++ b/modules/cyrus-sasl.c
+@@ -109,17 +109,17 @@ static int getpass_func(sasl_conn_t *, void *, int, sasl_secret_t **);
+ static int getuser_func(void *, int, const char **, unsigned *);
+ 
+ static sasl_callback_t callbacks[] = {
+-	{ SASL_CB_USER, &getuser_func, NULL },
+-	{ SASL_CB_AUTHNAME, &getuser_func, NULL },
+-	{ SASL_CB_PASS, &getpass_func, NULL },
++	{ SASL_CB_USER, (int(*)(void)) &getuser_func, NULL },
++	{ SASL_CB_AUTHNAME, (int(*)(void)) &getuser_func, NULL },
++	{ SASL_CB_PASS, (int(*)(void)) &getpass_func, NULL },
+ 	{ SASL_CB_LIST_END, NULL, NULL },
+ };
+ 
+ static sasl_callback_t debug_callbacks[] = {
+-	{ SASL_CB_LOG, &sasl_log_func, NULL },
+-	{ SASL_CB_USER, &getuser_func, NULL },
+-	{ SASL_CB_AUTHNAME, &getuser_func, NULL },
+-	{ SASL_CB_PASS, &getpass_func, NULL },
++	{ SASL_CB_LOG, (int(*)(void)) &sasl_log_func, NULL },
++	{ SASL_CB_USER, (int(*)(void)) &getuser_func, NULL },
++	{ SASL_CB_AUTHNAME, (int(*)(void)) &getuser_func, NULL },
++	{ SASL_CB_PASS, (int(*)(void)) &getpass_func, NULL },
+ 	{ SASL_CB_LIST_END, NULL, NULL },
+ };
+ 

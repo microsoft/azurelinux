@@ -1,0 +1,11 @@
+--- crosstermion-0.14.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ crosstermion-0.14.0/Cargo.toml	2024-04-27T20:26:25.907508+00:00
+@@ -98,8 +98,3 @@
+     "crossterm",
+ ]
+ 
+-[target."cfg(windows)".dependencies.crossterm]
+-version = "0.27.0"
+-features = ["windows"]
+-optional = true
+-default-features = false

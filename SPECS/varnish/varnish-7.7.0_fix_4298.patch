@@ -1,0 +1,178 @@
+commit 95e41dfa584d108e444949534c7ce5801cffeacc
+Author: Poul-Henning Kamp <phk@FreeBSD.org>
+Date:   Wed Mar 26 09:25:43 2025 +0000
+
+    If the client sends NO_RFC7540_PRIORITIES, "rxprio" verbs become no-ops.
+    
+    Fixes: #4298
+    Tested by: @ingvarha
+
+
+
+commit 3a1eb57d8bd57205db7d2c766aed39cf73c4f578
+Author: Poul-Henning Kamp <phk@FreeBSD.org>
+Date:   Wed Mar 26 09:24:17 2025 +0000
+
+    Add more HTTP2 Settings to the table
+
+
+diff --git a/bin/varnishtest/vtc.h b/bin/varnishtest/vtc.h
+index 2e5d4161a..b765fe60a 100644
+--- a/bin/varnishtest/vtc.h
++++ b/bin/varnishtest/vtc.h
+@@ -148,7 +148,7 @@ struct http;
+ void cmd_stream(CMD_ARGS);
+ void start_h2(struct http *hp);
+ void stop_h2(struct http *hp);
+-void b64_settings(const struct http *hp, const char *s);
++void b64_settings(struct http *hp, const char *s);
+ 
+ /* vtc_gzip.c */
+ void vtc_gunzip(struct http *, char *, long *);
+diff --git a/bin/varnishtest/vtc_http.h b/bin/varnishtest/vtc_http.h
+index 7a86de8da..62c598a55 100644
+--- a/bin/varnishtest/vtc_http.h
++++ b/bin/varnishtest/vtc_http.h
+@@ -83,6 +83,7 @@ struct http {
+ 	/* H/2 */
+ 	unsigned		h2;
+ 	int			wf;
++	int			no_rfc7540_priorities;
+ 
+ 	pthread_t		tp;
+ 	VTAILQ_HEAD(, stream)   streams;
+diff --git a/bin/varnishtest/vtc_http2.c b/bin/varnishtest/vtc_http2.c
+index 822abbae1..7feeb42b0 100644
+--- a/bin/varnishtest/vtc_http2.c
++++ b/bin/varnishtest/vtc_http2.c
+@@ -629,7 +629,7 @@ parse_settings(const struct stream *s, struct frame *f)
+ 			buf = "unknown";
+ 		u += 4;
+ 
+-		if (t == 1) {
++		if (t == SETTINGS_HEADER_TABLE_SIZE) {
+ 			r = HPK_ResizeTbl(s->hp->encctx, v);
+ 			assert(r == hpk_done);
+ 		}
+@@ -2460,28 +2460,47 @@ cmd_rxsettings(CMD_ARGS)
+ 		hp->h2_win_peer->init = val;
+ 	}
+ }
++/* SECTION: stream.spec.prio_rxprio rxprio
++ *
++ * Receive a PRIORITY frame.
++ */
++static void
++cmd_rxprio (CMD_ARGS)
++{
++	struct stream *s;
++	(void)av;
++	CAST_OBJ_NOTNULL(s, priv, STREAM_MAGIC);
++        if (s->hp->no_rfc7540_priorities) {
++		vtc_log(vl, 4, "skipping rxprio: no_rfc7540_priorities is set");
++		return;
++	}
++	s->frame = rxstuff(s);
++	if (s->frame != NULL && s->frame->type != TYPE_PRIORITY) {
++		vtc_fatal(vl,
++		    "Wrong frame type %s (%d) wanted %s",
++		    s->frame->type < TYPE_MAX ?
++		    h2_types[s->frame->type] : "?",
++		    s->frame->type, "PRIORITY");
++	}
++}
+ 
+ #define RXFUNC(lctype, upctype) \
+ 	static void \
+-	cmd_rx ## lctype(CMD_ARGS) { \
++	cmd_rx ## lctype(CMD_ARGS) \
++	{ \
+ 		struct stream *s; \
+ 		(void)av; \
+ 		CAST_OBJ_NOTNULL(s, priv, STREAM_MAGIC); \
+ 		s->frame = rxstuff(s); \
+-		if (s->frame != NULL && s->frame->type != TYPE_ ## upctype) \
++		if (s->frame != NULL && s->frame->type != TYPE_ ## upctype) { \
+ 			vtc_fatal(vl, \
+ 			    "Wrong frame type %s (%d) wanted %s", \
+ 			    s->frame->type < TYPE_MAX ? \
+ 			    h2_types[s->frame->type] : "?", \
+ 			    s->frame->type, #upctype); \
++		} \
+ 	}
+ 
+-/* SECTION: stream.spec.prio_rxprio rxprio
+- *
+- * Receive a PRIORITY frame.
+- */
+-RXFUNC(prio,	PRIORITY)
+-
+ /* SECTION: stream.spec.reset_rxrst rxrst
+  *
+  * Receive a RST_STREAM frame.
+@@ -2857,7 +2876,7 @@ cmd_stream(CMD_ARGS)
+ }
+ 
+ void
+-b64_settings(const struct http *hp, const char *s)
++b64_settings(struct http *hp, const char *s)
+ {
+ 	uint16_t i;
+ 	uint64_t v, vv;
+@@ -2891,7 +2910,10 @@ b64_settings(const struct http *hp, const char *s)
+ 		else
+ 			buf = "unknown";
+ 
+-		if (v == 1) {
++		if (i == SETTINGS_NO_RFC7540_PRIORITIES) {
++			hp->no_rfc7540_priorities = v;
++		}
++		if (i == SETTINGS_HEADER_TABLE_SIZE) {
+ 			enum hpk_result hrs;
+ 			if (hp->sfd) {
+ 				AN(hp->encctx);
+diff --git a/include/tbl/h2_settings.h b/include/tbl/h2_settings.h
+index 2dbac671f..273f157fe 100644
+--- a/include/tbl/h2_settings.h
++++ b/include/tbl/h2_settings.h
+@@ -102,7 +102,39 @@ H2_SETTING(					// rfc7540,l,2159,2167
+ 	0xffffffff,
+ 	0
+ )
+-#endif
++
++H2_SETTING(					// rfc8441
++	ENABLE_CONNECT_PROTOCOL,
++	enable_connect_protocol,
++	0x8,
++	0,
++	0,
++	1,
++	H2CE_PROTOCOL_ERROR
++)
++
++H2_SETTING(					// rfc9218
++	NO_RFC7540_PRIORITIES,
++	no_rfc7540_priorities,
++	0x9,
++	0,
++	0,
++	1,
++	H2CE_PROTOCOL_ERROR
++)
++
++H2_SETTING(					// [MS-HTTP2E]
++						// [Gabriel_Montenegro]
++	TLS_RENEG_PERMITTED,
++	tls_reneg_permitted,
++	0x10,
++	0,
++	0,
++	3,
++	H2CE_PROTOCOL_ERROR
++)
++#endif /* !H2_SETTINGS_PARAM_ONLY */
++
+ #undef H2_SETTING
+ 
+ /*lint -restore */

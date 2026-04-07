@@ -1,0 +1,52 @@
+From 43c2b908396e8b7baa475e009f3f4dbf9b9beac7 Mon Sep 17 00:00:00 2001
+From: "Brian C. Lane" <bcl@redhat.com>
+Date: Wed, 28 May 2025 11:24:21 -0700
+Subject: [PATCH 09/12] tests: probing ext4 without journal should still
+ indicate ext4
+
+t1700 tests a fix for the ext filesystem probe code, it was previously
+returning ext2 when the filesystem is really ext4 without a journal.
+
+t3200 is updated to reflect the correct filesystem type -- it creates a
+fs too small for a journal so it used to identify it as ext2 but now
+correctly identifies it as ext4.
+---
+ tests/t1700-probe-fs.sh         | 10 ++++++++++
+ tests/t3200-resize-partition.sh |  2 +-
+ 2 files changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/tests/t1700-probe-fs.sh b/tests/t1700-probe-fs.sh
+index 7557f92..2bf2810 100755
+--- a/tests/t1700-probe-fs.sh
++++ b/tests/t1700-probe-fs.sh
+@@ -70,4 +70,14 @@ for feature in uninit_bg flex_bg; do
+   rm $dev
+ done
+ 
++# ext4 without a journal should still indicate ext4
++# create an ext3 file system
++dd if=/dev/null of=$dev bs=1024 seek=8192 >/dev/null || skip_ "dd failed"
++mkfs.ext4 -O ^has_journal -F $dev >/dev/null || skip_ "mkfs.ext4 failed"
++
++# probe the file system, which should still be ext4
++parted -m -s $dev u s print >out 2>&1 || fail=1
++grep '^1:.*:ext4::;$' out || fail=1
++rm $dev
++
+ Exit $fail
+diff --git a/tests/t3200-resize-partition.sh b/tests/t3200-resize-partition.sh
+index 846fbc3..c9decab 100755
+--- a/tests/t3200-resize-partition.sh
++++ b/tests/t3200-resize-partition.sh
+@@ -111,7 +111,7 @@ compare exp out || fail=1
+ parted -m -s $dev u s p > out 2>&1 || fail=1
+ 
+ sed -n 3p out > k && mv k out || fail=1
+-printf "1:$default_start:$new_end:3073s:ext2::$ms;\n" > exp || fail=1
++printf "1:$default_start:$new_end:3073s:ext4::$ms;\n" > exp || fail=1
+ compare exp out || fail=1
+ 
+ umount "${dev}1" || fail=1
+-- 
+2.49.0
+

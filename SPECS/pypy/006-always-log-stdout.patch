@@ -1,0 +1,12 @@
+diff -rup pypy-pypy-f66246c46ca3/rpython/translator/platform/__init__.py pypy-pypy-f66246c46ca3/rpython/translator/platform/__init__.py
+--- pypy-pypy-f66246c46ca3/rpython/translator/platform/__init__.py	2013-05-27 10:35:37.680237338 +0200
++++ pypy-pypy-f66246c46ca3/rpython/translator/platform/__init__.py	2013-05-27 10:41:04.113098738 +0200
+@@ -138,6 +138,8 @@ class Platform(object):
+         self._handle_error(returncode, stdout, stderr, outname)
+ 
+     def _handle_error(self, returncode, stdout, stderr, outname):
++        for line in stdout.splitlines():
++            log.message(line)
+         if returncode != 0:
+             errorfile = outname.new(ext='errors')
+             errorfile.write(stderr, 'wb')

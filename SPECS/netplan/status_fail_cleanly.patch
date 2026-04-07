@@ -1,0 +1,99 @@
+From d24771c9d6416afb38fca5a4818d7dab6d76845c Mon Sep 17 00:00:00 2001
+From: Jonathan Wright <jonathan@almalinux.org>
+Date: Thu, 10 Jul 2025 11:23:10 -0500
+Subject: [PATCH 1/2] cli:utils Fix systemctl_is_installed
+
+`systemctl status` uses the 1-4 exit statuses as defined at https://www.freedesktop.org/software/systemd/man/latest/systemctl.html#Exit%20status
+
+`systemctl is-enabled` only exits with 0/1
+---
+ netplan_cli/cli/utils.py | 2 +-
+ tests/test_utils.py      | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/netplan_cli/cli/utils.py b/netplan_cli/cli/utils.py
+index 105e998fa..c4d147768 100644
+--- a/netplan_cli/cli/utils.py
++++ b/netplan_cli/cli/utils.py
+@@ -156,7 +156,7 @@ def systemctl_is_masked(unit_pattern):
+ 
+ def systemctl_is_installed(unit_pattern):
+     '''Return True if returncode is other than "not-found" (4)'''
+-    res = subprocess.run(['systemctl', 'is-enabled', unit_pattern],
++    res = subprocess.run(['systemctl', 'status', unit_pattern],
+                          stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                          text=True)
+     if res.returncode != 4:
+diff --git a/tests/test_utils.py b/tests/test_utils.py
+index 48ef12e98..5389dd90f 100644
+--- a/tests/test_utils.py
++++ b/tests/test_utils.py
+@@ -402,7 +402,7 @@ def test_systemctl_is_installed(self):
+         os.environ['PATH'] = os.path.dirname(self.mock_cmd.path) + os.pathsep + path_env
+         self.assertTrue(utils.systemctl_is_installed('some.service'))
+         self.assertEqual(self.mock_cmd.calls(), [
+-            ['systemctl', 'is-enabled', 'some.service']
++            ['systemctl', 'status', 'some.service']
+         ])
+ 
+     def test_systemctl_is_installed_false(self):
+@@ -412,7 +412,7 @@ def test_systemctl_is_installed_false(self):
+         os.environ['PATH'] = os.path.dirname(self.mock_cmd.path) + os.pathsep + path_env
+         self.assertFalse(utils.systemctl_is_installed('some.service'))
+         self.assertEqual(self.mock_cmd.calls(), [
+-            ['systemctl', 'is-enabled', 'some.service']
++            ['systemctl', 'status', 'some.service']
+         ])
+ 
+     def test_systemctl_daemon_reload(self):
+
+From d20930a228e7164897cc83151bf5976927ea3380 Mon Sep 17 00:00:00 2001
+From: Jonathan Wright <jonathan@almalinux.org>
+Date: Thu, 10 Jul 2025 11:24:51 -0500
+Subject: [PATCH 2/2] cli:status fail cleanly if systemd-networkd is not
+ present
+
+This has a clean and clear error message instead of a python stack trace if systemd-networkd is not present on the system.
+---
+ netplan_cli/cli/state.py |  3 +++
+ tests/cli/test_status.py | 12 ++++++++++++
+ 2 files changed, 15 insertions(+)
+
+diff --git a/netplan_cli/cli/state.py b/netplan_cli/cli/state.py
+index ff5115940..ef3ee703d 100644
+--- a/netplan_cli/cli/state.py
++++ b/netplan_cli/cli/state.py
+@@ -434,6 +434,9 @@ def __init__(self, ifname=None, all=False):
+                               'Please start it.')
+                 sys.exit(1)
+             logging.debug('systemd-networkd.service is not active. Starting...')
++            if not utils.systemctl_is_installed('systemd-networkd.service'):
++                logging.error('systemd-networkd is required for \'netplan status\' functionality')
++                sys.exit(1)
+             utils.systemctl('start', ['systemd-networkd.service'], True)
+ 
+         # required data: iproute2 and sd-networkd can be expected to exist,
+diff --git a/tests/cli/test_status.py b/tests/cli/test_status.py
+index 4b0f53ee6..deafe9f6a 100644
+--- a/tests/cli/test_status.py
++++ b/tests/cli/test_status.py
+@@ -531,6 +531,18 @@ def test_call_cli_networkd_masked(self, is_masked_mock, is_active_mock):
+         self.assertEqual(1, e.exception.code)
+         self.assertIn('systemd-networkd.service is masked', cm.output[0])
+ 
++    @patch('netplan_cli.cli.utils.systemctl_is_installed')
++    @patch('netplan_cli.cli.utils.systemctl_is_active')
++    @patch('netplan_cli.cli.utils.systemctl_is_masked')
++    def test_call_cli_networkd_installed_false(self, is_installed_mock, is_active_mock, is_masked_mock):
++        is_active_mock.return_value = False
++        is_masked_mock.return_value = False
++        is_installed_mock.return_value = False
++        with self.assertLogs() as cm, self.assertRaises(SystemExit) as e:
++            self._call([])
++        self.assertEqual(1, e.exception.code)
++        self.assertIn('systemd-networkd is required for \'netplan status\' functionality', cm.output[0])
++
+     @patch('netplan_cli.cli.state.NetplanConfigState.__init__')
+     @patch('netplan_cli.cli.state_diff.NetplanDiffState.__init__')
+     @patch('netplan_cli.cli.state_diff.NetplanDiffState.get_diff')
+

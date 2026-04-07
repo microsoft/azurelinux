@@ -1,0 +1,8 @@
+--- data-url-0.3.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ data-url-0.3.2/Cargo.toml	2025-08-29T15:24:27.953678+00:00
+@@ -60,4 +60,4 @@
+ version = "0.9"
+ 
+ [dev-dependencies.unicode-width]
+-version = "=0.1.12"
++version = "0.1.12"

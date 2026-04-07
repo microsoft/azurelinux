@@ -1,0 +1,11 @@
+--- sequoia-directories-0.1.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ sequoia-directories-0.1.0/Cargo.toml	2025-11-07T11:19:18.433388+00:00
+@@ -29,7 +29,7 @@
+ version = "1"
+ 
+ [dependencies.directories]
+-version = "5"
++version = ">=5, <7"
+ 
+ [dependencies.same-file]
+ version = "1"

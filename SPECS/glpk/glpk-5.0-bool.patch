@@ -1,0 +1,14 @@
+--- glpk-5.0/src/minisat/minisat.h.orig	2020-12-16 02:00:00.000000000 -0700
++++ glpk-5.0/src/minisat/minisat.h	2025-01-16 17:02:56.517683296 -0700
+@@ -34,11 +34,6 @@
+ /*====================================================================*/
+ /* Simple types: */
+ 
+-typedef int bool;
+-
+-#define true  1
+-#define false 0
+-
+ typedef int  lit;
+ #if 0 /* by mao */
+ typedef char lbool;

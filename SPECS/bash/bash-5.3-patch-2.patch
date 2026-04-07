@@ -1,0 +1,87 @@
+diff --git a/lib/sh/anonfile.c b/lib/sh/anonfile.c
+--- a/lib/sh/anonfile.c
++++ b/lib/sh/anonfile.c
+@@ -25,7 +25,7 @@
+ #endif
+ #include <bashtypes.h>
+ 
+-#if defined (HAVE_MEMFD_CREATE) || defined (HAVE_SHM_OPEN) || defined (HAVE_SHM_MKSTEMP)
++#if defined (HAVE_MEMFD_CREATE) || defined (HAVE_SHM_MKSTEMP)
+ #  include <sys/mman.h>
+ #endif
+ #include <filecntl.h>
+@@ -41,17 +41,7 @@ static int anonunlink (const char *);
+ #  define MFD_NOEXEC_SEAL 0
+ #endif
+ 
+-#if defined (HAVE_SHM_OPEN)
+-#ifndef O_NOFOLLOW
+-#  define O_NOFOLLOW 0
+-#endif
+-
+-static int
+-anonshmunlink (const char *fn)
+-{
+-  return (shm_unlink (fn));
+-}
+-
++#if defined (HAVE_SHM_MKSTEMP)
+ static int
+ anonshmopen (const char *name, int flags, char **fn)
+ {
+@@ -62,35 +52,14 @@ anonshmopen (const char *name, int flags, char **fn)
+   if (fn)
+     *fn = 0;
+ 
+-#if defined (HAVE_SHM_MKSTEMP)
+   fname = savestring ("/shm-XXXXXXXXXX");
+   fd = shm_mkstemp (fname);
+-  if (fd < 0)
+-    free (fname);
+-#endif
+-
+-  if (fd < 0)
+-    {
+-      fname = sh_mktmpname (name, flags);
+-      fd = shm_open (fname, O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW, 0600);
+-    }
+-
+   if (fd < 0)
+     {
+       free (fname);
+       return fd;
+     }
+ 
+-  if (shm_unlink (fname) < 0)
+-    {
+-      int o;
+-      o = errno;
+-      free (fname);
+-      close (fd);
+-      errno = o;
+-      return -1;
+-    }
+-
+   if (fn)
+     *fn = fname;
+   else
+@@ -122,7 +91,7 @@ anonopen (const char *name, int flags, char **fn)
+   /* Heuristic */
+   flag = (name && *name == '/') ? MT_TEMPLATE : MT_USETMPDIR;
+ 
+-#if defined (HAVE_SHM_OPEN)
++#if defined (HAVE_SHM_MKSTEMP)
+   fd = anonshmopen (name, flag, fn);
+   if (fd >= 0)
+     return fd;		/* anonshmopen sets *FN appropriately */
+diff --git a/patchlevel.h b/patchlevel.h
+--- a/patchlevel.h
++++ b/patchlevel.h
+@@ -25,6 +25,6 @@
+    regexp `^#define[ 	]*PATCHLEVEL', since that's what support/mkversion.sh
+    looks for to find the patch level (for the sccs version string). */
+ 
+-#define PATCHLEVEL 1
++#define PATCHLEVEL 2
+ 
+ #endif /* _PATCHLEVEL_H_ */

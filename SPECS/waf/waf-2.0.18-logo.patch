@@ -1,0 +1,12 @@
+diff -up waf-2.0.18/docs/sphinx/conf.py.orig waf-2.0.18/docs/sphinx/conf.py
+--- waf-2.0.18/docs/sphinx/conf.py.orig	2019-04-20 19:06:49.000000000 +0200
++++ waf-2.0.18/docs/sphinx/conf.py	2019-10-05 17:58:58.380982949 +0200
+@@ -428,7 +428,7 @@ else:
+ 
+ # The name of an image file (relative to this directory) to place at the top
+ # of the sidebar.
+-html_logo = '_images/waf-64x64.png'
++#html_logo = '_images/waf-64x64.png'
+ 
+ # The name of an image file (within the static path) to use as favicon of the
+ # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32

@@ -1,0 +1,30 @@
+--- qt-x11-free-3.3.3/src/opengl/qgl_x11.cpp.orig	2004-08-18 14:55:20.629068213 +0200
++++ qt-x11-free-3.3.3/src/opengl/qgl_x11.cpp	2004-08-18 15:00:43.090260739 +0200
+@@ -125,7 +125,7 @@
+     if (gl_syms_resolved)
+ 	return TRUE;
+ 
+-    QLibrary gl("GL");
++    QLibrary gl("GL.so.1");
+     gl.setAutoUnload(FALSE);
+ 
+     qt_glCallLists = (_glCallLists) gl.resolve("glCallLists");
+@@ -283,7 +283,7 @@
+ 	typedef Status (*_XmuLookupStandardColormap)( Display *dpy, int screen, VisualID visualid, unsigned int depth,
+ 						      Atom property, Bool replace, Bool retain );
+ 	_XmuLookupStandardColormap qt_XmuLookupStandardColormap;
+-	qt_XmuLookupStandardColormap = (_XmuLookupStandardColormap) QLibrary::resolve("Xmu", "XmuLookupStandardColormap");
++	qt_XmuLookupStandardColormap = (_XmuLookupStandardColormap) QLibrary::resolve("Xmu.so.6", "XmuLookupStandardColormap");
+ 	if (!qt_XmuLookupStandardColormap)
+ 	    qFatal("Unable to resolve Xmu symbols - please check your Xmu library installation.");
+ #define XmuLookupStandardColormap qt_XmuLookupStandardColormap
+--- qt-x11-free-3.3.3/src/tools/qlibrary.cpp.orig	2004-08-18 14:56:00.322185890 +0200
++++ qt-x11-free-3.3.3/src/tools/qlibrary.cpp	2004-08-18 14:57:51.939637946 +0200
+@@ -425,6 +425,7 @@
+ 	    } else {
+ 		tmpfilename = QString( "lib%1" ).arg( filename );
+ 	    }
++	    if ( !filename.contains(".so") )
+ 	    tmpfilename += filter;
+ 	    if(QFile::exists(tmpfilename) || it == filters.end()) {
+ 		filename = tmpfilename;

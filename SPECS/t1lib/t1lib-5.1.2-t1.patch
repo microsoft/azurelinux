@@ -1,0 +1,18 @@
+--- t1lib-5.1.2/lib/t1lib/t1base.c.orig	2018-02-28 23:16:43.237398918 -0500
++++ t1lib-5.1.2/lib/t1lib/t1base.c	2018-02-28 23:18:07.204450279 -0500
+@@ -905,6 +905,14 @@
+     free(FullName);
+     return(0);
+   }
++  /* Fourth case: A Postscript Font t1 File */
++  buffer[i+1] = 't';
++  buffer[i+2] = '1';
++  buffer[i+3] = 0;
++  if ((FullName=intT1_Env_GetCompletePath(buffer,T1_PFAB_ptr))!=NULL) {
++    free(FullName);
++    return(0);
++  }
+   
+   /* If we get here no file was found => Set buffer
+      to an empty string and return -1 */
+

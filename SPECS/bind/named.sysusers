@@ -1,0 +1,3 @@
+#Type Name       ID                  GECOS              Home directory Shell
+u     named      25                 "Named"             /var/named     /sbin/nologin
+g     named      25

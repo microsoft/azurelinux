@@ -1,0 +1,36 @@
+From 9338ea7765dca10a1443305da2a2d359e34339ba Mon Sep 17 00:00:00 2001
+From: Michel Lind <salimma@fedoraproject.org>
+Date: Mon, 15 Dec 2025 19:36:37 +0000
+Subject: [PATCH] Revert "Fix setuptools deprecation warnings in
+ pyproject.toml"
+
+This reverts commit f8279237be41b63f4cf53eb1b7ba38bb265f777e.
+---
+ pyproject.toml | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 425f2d4..9ff5ce3 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,14 +1,15 @@
+ [build-system]
+-requires = ["setuptools>=77.0.0"]
++requires = ["setuptools>=61.2"]
+ build-backend = "setuptools.build_meta"
+ 
+ [project]
+ name = "merge3"
+ description = "Python implementation of 3-way merge"
+ maintainers = [{name = "Breezy Developers", email = "team@breezy-vcs.org"}]
+-license = "GPL-2.0-or-later"
++license = {text = "GNU GPLv2 or later"}
+ classifiers = [
+     "Development Status :: 4 - Beta",
++    "License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)",
+     "Programming Language :: Python :: 3.9",
+     "Programming Language :: Python :: 3.10",
+     "Programming Language :: Python :: 3.11",
+-- 
+2.52.0
+

@@ -1,0 +1,10 @@
+[Unit]
+Description=Update ReaR rescue image
+
+[Timer]
+OnCalendar=daily
+RandomizedDelaySec=1h
+Persistent=true
+
+[Install]
+WantedBy=timers.target

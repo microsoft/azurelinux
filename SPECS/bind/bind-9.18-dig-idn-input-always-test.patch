@@ -1,0 +1,76 @@
+From 12f50726b6bd8f6b3ed6709695e0f6893bc865c6 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20Men=C5=A1=C3=ADk?= <pemensik@redhat.com>
+Date: Tue, 16 Sep 2025 11:46:03 +0200
+Subject: [PATCH] Fix expectations on idna system test
+
+IDNA tests always redirect output into the file. That means its
+behaviour has changed and is now processing IDN input by default and
+just disables IDN output by default.
+
+New behaviour when redirected is the same as +idnin +noidnout, but does
+not fail hard on input errors.
+---
+ bin/tests/system/idna/tests.sh | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/bin/tests/system/idna/tests.sh b/bin/tests/system/idna/tests.sh
+index 398b7e1..37f02b1 100644
+--- a/bin/tests/system/idna/tests.sh
++++ b/bin/tests/system/idna/tests.sh
+@@ -194,7 +194,7 @@ idna_enabled_test() {
+   # Note that ASCII characters are converted to lower-case.
+ 
+   text="Checking valid non-ASCII label"
+-  idna_test "$text" "" "München" "M\195\188nchen."
++  idna_test "$text" "" "München" "xn--mnchen-3ya."
+   idna_test "$text" "+noidnin +noidnout" "München" "M\195\188nchen."
+   idna_test "$text" "+noidnin +idnout" "München" "M\195\188nchen."
+   idna_test "$text" "+idnin   +noidnout" "München" "xn--mnchen-3ya."
+@@ -218,7 +218,7 @@ idna_enabled_test() {
+   # for the valid U-label.
+ 
+   text="Checking that non-transitional IDNA processing is used"
+-  idna_test "$text" "" "faß.de" "fa\195\159.de."
++  idna_test "$text" "" "faß.de" "xn--fa-hia.de."
+   idna_test "$text" "+noidnin +noidnout" "faß.de" "fa\195\159.de."
+   idna_test "$text" "+noidnin +idnout" "faß.de" "fa\195\159.de."
+   idna_test "$text" "+idnin   +noidnout" "faß.de" "xn--fa-hia.de."
+@@ -228,7 +228,7 @@ idna_enabled_test() {
+   # onto the Greek sigma character ("σ") in IDNA2003.
+ 
+   text="Second check that non-transitional IDNA processing is used"
+-  idna_test "$text" "" "βόλος.com" "\206\178\207\140\206\187\206\191\207\130.com."
++  idna_test "$text" "" "βόλος.com"  "xn--nxasmm1c.com."
+   idna_test "$text" "+noidnin +noidnout" "βόλος.com" "\206\178\207\140\206\187\206\191\207\130.com."
+   idna_test "$text" "+noidnin +idnout" "βόλος.com" "\206\178\207\140\206\187\206\191\207\130.com."
+   idna_test "$text" "+idnin   +noidnout" "βόλος.com" "xn--nxasmm1c.com."
+@@ -288,7 +288,7 @@ idna_enabled_test() {
+   idna_test "$text" "" "xn--xx" "xn--xx."
+   idna_test "$text" "+noidnin +noidnout" "xn--xx" "xn--xx."
+   idna_fail "$text" "+noidnin   +idnout" "xn--xx"
+-  idna_fail "$text" "+idnin   +noidnout" "xn--xx"
++  idna_test "$text" "+idnin   +noidnout" "xn--xx" "xn--xx."
+   idna_fail "$text" "+idnin     +idnout" "xn--xx"
+ 
+   # Fake A-label - the string does not translate to anything.
+@@ -297,7 +297,7 @@ idna_enabled_test() {
+   idna_test "$text" "" "xn--ahahah" "xn--ahahah."
+   idna_test "$text" "+noidnin +noidnout" "xn--ahahah" "xn--ahahah."
+   idna_fail "$text" "+noidnin   +idnout" "xn--ahahah"
+-  idna_fail "$text" "+idnin   +noidnout" "xn--ahahah"
++  idna_test "$text" "+idnin   +noidnout" "xn--ahahah" "xn--ahahah."
+   idna_fail "$text" "+idnin     +idnout" "xn--ahahah"
+ 
+   # Too long a label. The punycode string is too long (at 64 characters).
+@@ -324,7 +324,7 @@ idna_enabled_test() {
+   # The +[no]idnout options should not have any effect on the test.
+ 
+   text="Checking invalid input U-label"
+-  idna_test "$text" "" "√.com" "\226\136\154.com."
++  idna_test "$text" "" "√.com" "xn--19g.com."
+   idna_test "$text" "+noidnin +noidnout" "√.com" "\226\136\154.com."
+   idna_test "$text" "+noidnin +idnout" "√.com" "\226\136\154.com."
+   idna_test "$text" "+idnin   +noidnout" "√.com" "xn--19g.com."
+-- 
+2.51.0
+

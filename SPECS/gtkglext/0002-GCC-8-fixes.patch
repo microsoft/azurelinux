@@ -1,0 +1,34 @@
+From 1fe275cd7dfa9f3a6db771b0cb945d96787e72cf Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ralf=20Cors=C3=A9pius?= <corsepiu@fedoraproject.org>
+Date: Thu, 15 Mar 2018 15:56:20 +0100
+Subject: [PATCH 2/2] GCC-8 fixes.
+
+---
+ gdk/gdkglshapes.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gdk/gdkglshapes.c b/gdk/gdkglshapes.c
+index f72abba..9d1197f 100644
+--- a/gdk/gdkglshapes.c
++++ b/gdk/gdkglshapes.c
+@@ -544,7 +544,7 @@ static GLfloat idata[12][3] =
+   {-Z, -X, 0}
+ };
+ 
+-static int index[20][3] =
++static int iindex[20][3] =
+ {
+   {0, 4, 1},
+   {0, 9, 4},
+@@ -574,7 +574,7 @@ icosahedron(GLenum shadeType)
+   int i;
+ 
+   for (i = 19; i >= 0; i--) {
+-    drawtriangle(i, idata, index, shadeType);
++    drawtriangle(i, idata, iindex, shadeType);
+   }
+ }
+ 
+-- 
+2.14.3
+

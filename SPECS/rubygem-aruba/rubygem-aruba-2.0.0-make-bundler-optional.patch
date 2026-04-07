@@ -1,0 +1,39 @@
+--- aruba-2.0.0/lib/aruba/api/bundler.rb.make_optional	2021-07-27 04:28:08.000000000 +0900
++++ aruba-2.0.0/lib/aruba/api/bundler.rb	2022-01-14 14:40:50.369324292 +0900
+@@ -1,7 +1,6 @@
+ # frozen_string_literal: true
+ 
+ require 'aruba/api/environment'
+-require 'bundler'
+ 
+ module Aruba
+   module Api
+@@ -8,6 +7,19 @@ module Aruba
+ 
+       # Unset variables used by bundler
+       def unset_bundler_env_vars
++        begin
++          require "bundler"
++          unset_bundler_env_vars_new
++        rescue LoadError
++          %w[RUBYOPT BUNDLE_PATH BUNDLE_BIN_PATH BUNDLE_GEMFILE].each do |key|
++            delete_environment_variable(key)
++          end
++        end
++      end
++
++      private
++
++      def unset_bundler_env_vars_new
+         empty_env = with_environment { with_unbundled_env { ENV.to_h } }
+         aruba_env = aruba.environment.to_h
+         (aruba_env.keys - empty_env.keys).each do |key|
+@@ -18,8 +30,6 @@ module Aruba
+         end
+       end
+ 
+-      private
+-
+       def with_unbundled_env(&block)
+         if ::Bundler.respond_to?(:with_unbundled_env)
+           ::Bundler.with_unbundled_env(&block)

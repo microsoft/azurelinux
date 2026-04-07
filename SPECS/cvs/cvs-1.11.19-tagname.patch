@@ -1,0 +1,11 @@
+--- cvs-1.11.19/src/rcs.c.old	2005-03-14 13:09:39.000000000 +0100
++++ cvs-1.11.19/src/rcs.c	2005-03-14 13:08:24.000000000 +0100
+@@ -3382,7 +3382,7 @@
+ RCS_check_tag (tag)
+     const char *tag;
+ {
+-    char *invalid = "$,.:;@";		/* invalid RCS tag characters */
++    char *invalid = "$,.:;@/";		/* invalid RCS tag characters */
+     const char *cp;
+ 
+     /*

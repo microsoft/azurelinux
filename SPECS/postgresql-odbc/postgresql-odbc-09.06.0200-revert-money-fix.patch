@@ -1,0 +1,95 @@
+From 56ca20671a9fb87d7c6ca011207e9628349c9301 Mon Sep 17 00:00:00 2001
+From: Pavel Raiskup <praiskup@redhat.com>
+Date: Mon, 13 Mar 2017 10:38:54 +0100
+Subject: [PATCH] Revert "Fix the bug about MONEY type."
+
+This reverts commit d5374bcc4d58556eb5cc70241c44dcad4d9b441e.
+
+Proposed upstream:
+http://www.postgresql.org/message-id/3259874.lgiBp3an9Y@nb.usersys.redhat.com
+---
+ convert.c | 45 ++++++++-------------------------------------
+ pgtypes.c |  4 ++++
+ 2 files changed, 12 insertions(+), 37 deletions(-)
+
+diff --git a/convert.c b/convert.c
+index f118e30..00904d8 100644
+--- a/convert.c
++++ b/convert.c
+@@ -5363,50 +5363,21 @@ cleanup:
+ static BOOL
+ convert_money(const char *s, char *sout, size_t soutmax)
+ {
+-	char		in, decp = 0;
+ 	size_t		i = 0,
+ 				out = 0;
+-	int	num_in = -1, period_in = -1, comma_in = -1;
+ 
+ 	for (i = 0; s[i]; i++)
+ 	{
+-		switch (in = s[i])
++		if (s[i] == '$' || s[i] == ',' || s[i] == ')')
++			;					/* skip these characters */
++		else
+ 		{
+-			case '.':
+-				if (period_in < 0)
+-					period_in = i;
+-				break;
+-			case ',':
+-				if (comma_in < 0)
+-					comma_in = i;
+-				break;
+-			default:
+-				if ('0' <= in && '9' >= in)
+-					num_in = i;
+-				break;
+-		}
+-	}
+-	if (period_in > comma_in)
+-	{
+-		if ( period_in >= num_in - 2)
+-			decp = '.';
+-	}
+-	else if (comma_in >= 0 &&
+-		 comma_in >= num_in - 2)
+-		decp = ',';
+-	for (i = 0; s[i] && out + 1 < soutmax; i++)
+-	{
+-		switch (in = s[i])
+-		{
+-			case '(':
+-			case '-':
++			if (out + 1 >= soutmax)
++				return FALSE;	/* sout is too short */
++			if (s[i] == '(')
+ 				sout[out++] = '-';
+-				break;
+-			default:
+-				if (in >= '0' && in <= '9')
+-					sout[out++] = in;
+-				else if (in == decp)
+-					sout[out++] = '.';
++			else
++				sout[out++] = s[i];
+ 		}
+ 	}
+ 	sout[out] = '\0';
+diff --git a/pgtypes.c b/pgtypes.c
+index a58925c..d42179c 100644
+--- a/pgtypes.c
++++ b/pgtypes.c
+@@ -1273,6 +1273,10 @@ sqltype_to_pgcast(const ConnectionClass *conn, SQLSMALLINT fSqlType)
+ 		case SQL_DATE:
+ 			pgCast = "::date";
+ 			break;
++		case SQL_DOUBLE:
++		case SQL_FLOAT:
++			pgCast = "::float8";
++			break;
+ 		case SQL_DECIMAL:
+ 		case SQL_NUMERIC:
+ 			pgCast = "::numeric";
+-- 
+2.9.3
+

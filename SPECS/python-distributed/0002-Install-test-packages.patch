@@ -1,0 +1,49 @@
+From 70c7a1dfe998ec50a5e6662ce97740547d2b5e4a Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Mon, 25 Jul 2022 19:18:50 -0400
+Subject: [PATCH 2/7] Install test packages
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ MANIFEST.in    | 4 +++-
+ pyproject.toml | 2 +-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/MANIFEST.in b/MANIFEST.in
+index 9608328f..8a0025be 100644
+--- a/MANIFEST.in
++++ b/MANIFEST.in
+@@ -9,7 +9,9 @@ recursive-include distributed *.svg
+ recursive-include distributed *.ico
+ recursive-include distributed *.yaml
+ recursive-include docs *.rst
+-recursive-exclude distributed **/tests/*
++recursive-include distributed/tests *.egg
++recursive-include distributed/tests *.pem
++recursive-include distributed/tests *.pyz
+ 
+ include setup.py
+ include README.rst
+diff --git a/pyproject.toml b/pyproject.toml
+index 67591340..9d6a2939 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -64,7 +64,6 @@ include-package-data = true
+ zip-safe = false
+ 
+ [tool.setuptools.packages.find]
+-exclude = ["*tests*"]
+ namespaces = false
+ 
+ [tool.setuptools.package-data]
+@@ -76,6 +75,7 @@ distributed = [
+     "http/templates/*.html",
+     "py.typed",
+ ]
++"distributed.tests" = ["*.pem"]
+ 
+ [tool.isort]
+ sections = ["FUTURE", "STDLIB", "THIRDPARTY", "DISTRIBUTED", "FIRSTPARTY", "LOCALFOLDER"]
+-- 
+2.50.0
+

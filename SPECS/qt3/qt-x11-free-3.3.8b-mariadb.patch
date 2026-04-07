@@ -1,0 +1,54 @@
+diff -up qt-x11-free-3.3.8b/src/sql/drivers/mysql/qsql_mysql.cpp.me qt-x11-free-3.3.8b/src/sql/drivers/mysql/qsql_mysql.cpp
+--- qt-x11-free-3.3.8b/src/sql/drivers/mysql/qsql_mysql.cpp.me	2017-11-10 18:08:22.850898663 +0100
++++ qt-x11-free-3.3.8b/src/sql/drivers/mysql/qsql_mysql.cpp	2017-11-13 15:02:41.565493236 +0100
+@@ -350,30 +350,38 @@ int QMYSQLResult::numRowsAffected()
+ static void qServerEnd()
+ {
+ #ifndef Q_NO_MYSQL_EMBEDDED
+-# if MYSQL_VERSION_ID >= 40000
++#if !defined(MARIADB_BASE_VERSION) && !defined(MARIADB_VERSION_ID)
++# if MYSQL_VERSION_ID > 40000
++#  if (MYSQL_VERSION_ID >= 40110 && MYSQL_VERSION_ID < 50000) || MYSQL_VERSION_ID >= 50003
++    mysql_library_end();
++#  else
+     mysql_server_end();
+-# endif // MYSQL_VERSION_ID
+-#endif // Q_NO_MYSQL_EMBEDDED
++#  endif
++# endif
++#endif
++#endif
+ }
+ 
+ static void qServerInit()
+ {
+ #ifndef Q_NO_MYSQL_EMBEDDED
+ # if MYSQL_VERSION_ID >= 40000
+-    if ( qMySqlInitHandledByUser || qMySqlConnectionCount > 1 )
++    if (qMySqlInitHandledByUser || qMySqlConnectionCount > 1)
+         return;
+ 
+-    // this should only be called once
+-    // has no effect on client/server library
+-    // but is vital for the embedded lib
+-    if ( mysql_server_init( 0, 0, 0 ) ) {
+-#  ifdef QT_CHECK_RANGE
+-	qWarning( "QMYSQLDriver::qServerInit: unable to start server." );
+-#  endif
++# if (MYSQL_VERSION_ID >= 40110 && MYSQL_VERSION_ID < 50000) || MYSQL_VERSION_ID >= 50003
++    if (mysql_library_init(0, 0, 0)) {
++# else
++    if (mysql_server_init(0, 0, 0)) {
++# endif
++        qWarning("QMYSQLDriver::qServerInit: unable to start server.");
+     }
+-    
+ # endif // MYSQL_VERSION_ID
+ #endif // Q_NO_MYSQL_EMBEDDED
++
++#if defined(MARIADB_BASE_VERSION) || defined(MARIADB_VERSION_ID)
++    qAddPostRoutine(mysql_server_end);
++#endif
+ }
+ 
+ QMYSQLDriver::QMYSQLDriver( QObject * parent, const char * name )

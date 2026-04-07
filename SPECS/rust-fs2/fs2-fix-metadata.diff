@@ -1,0 +1,13 @@
+--- fs2-0.4.3/Cargo.toml	1970-01-01T00:00:00+00:00
++++ fs2-0.4.3/Cargo.toml	2025-01-20T21:21:54.611508+00:00
+@@ -19,8 +19,8 @@
+ keywords = ["file", "file-system", "lock", "duplicate", "flock"]
+ license = "MIT/Apache-2.0"
+ repository = "https://github.com/danburkert/fs2-rs"
+-[dev-dependencies.tempdir]
+-version = "0.3"
++[dev-dependencies.tempfile]
++version = "3"
+ [target."cfg(unix)".dependencies.libc]
+ version = "0.2.30"
+ [badges.appveyor]

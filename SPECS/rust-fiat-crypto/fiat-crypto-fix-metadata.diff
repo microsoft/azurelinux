@@ -1,0 +1,11 @@
+--- fiat-crypto-0.3.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ fiat-crypto-0.3.0/Cargo.toml	2025-07-22T14:33:02.652551+00:00
+@@ -21,7 +21,7 @@
+ autoexamples = false
+ autotests = false
+ autobenches = false
+-description = "Fiat-crypto generated Rust"
++description = "Correct-by-Construction Code for Cryptographic Primitives"
+ homepage = "https://github.com/mit-plv/fiat-crypto"
+ readme = "README.md"
+ license = "MIT OR Apache-2.0 OR BSD-1-Clause"

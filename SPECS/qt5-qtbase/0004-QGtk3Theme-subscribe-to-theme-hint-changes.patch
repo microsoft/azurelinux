@@ -1,0 +1,47 @@
+From 24b6ad903ab2ed620f8c754aafb727e6aa342aca Mon Sep 17 00:00:00 2001
+From: Jan Grulich <jgrulich@redhat.com>
+Date: Wed, 26 Jul 2023 15:38:13 +0200
+Subject: [PATCH 04/15] QGtk3Theme: subscribe to theme hint changes
+
+---
+ .../platformthemes/gtk3/qgtk3theme.cpp        | 20 +++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3theme.cpp b/src/plugins/platformthemes/gtk3/qgtk3theme.cpp
+index 42cb0c7d..248ed9d8 100644
+--- a/src/plugins/platformthemes/gtk3/qgtk3theme.cpp
++++ b/src/plugins/platformthemes/gtk3/qgtk3theme.cpp
+@@ -40,6 +40,7 @@
+ #include "qgtk3theme.h"
+ #include "qgtk3dialoghelpers.h"
+ #include "qgtk3menu.h"
++#include "qpa/qwindowsysteminterface.h"
+ #include <QVariant>
+ #include <QGuiApplication>
+
+@@ -110,6 +111,25 @@ QGtk3Theme::QGtk3Theme()
+     /* Use our custom log handler. */
+     g_log_set_handler("Gtk", G_LOG_LEVEL_MESSAGE, gtkMessageHandler, nullptr);
+
++#define SETTING_CONNECT(setting) g_signal_connect(settings, "notify::" setting, G_CALLBACK(notifyThemeChanged), nullptr)
++    auto notifyThemeChanged = [] {
++        QWindowSystemInterface::handleThemeChange(nullptr);
++    };
++
++    GtkSettings *settings = gtk_settings_get_default();
++    SETTING_CONNECT("gtk-cursor-blink-time");
++    SETTING_CONNECT("gtk-double-click-distance");
++    SETTING_CONNECT("gtk-double-click-time");
++    SETTING_CONNECT("gtk-long-press-time");
++    SETTING_CONNECT("gtk-entry-password-hint-timeout");
++    SETTING_CONNECT("gtk-dnd-drag-threshold");
++    SETTING_CONNECT("gtk-icon-theme-name");
++    SETTING_CONNECT("gtk-fallback-icon-theme");
++    SETTING_CONNECT("gtk-font-name");
++    SETTING_CONNECT("gtk-application-prefer-dark-theme");
++    SETTING_CONNECT("gtk-theme-name");
++#undef SETTING_CONNECT
++
+     /* Set XCURSOR_SIZE and XCURSOR_THEME for Wayland sessions */
+     if (QGuiApplication::platformName().startsWith(QLatin1String("wayland"))) {
+         if (qEnvironmentVariableIsEmpty("XCURSOR_SIZE")) {

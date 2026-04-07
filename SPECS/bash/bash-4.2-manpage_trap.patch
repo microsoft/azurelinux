@@ -1,0 +1,12 @@
+diff --git a/doc/bash.1 b/doc/bash.1
+--- a/doc/bash.1
++++ b/doc/bash.1
+@@ -12621,7 +12621,7 @@ being inverted using
+ These are the same conditions obeyed by the \fBerrexit\fP (\fB\-e\fP) option.
+ .IP
+ When the shell is not interactive,
+-signals ignored upon entry to the shell cannot be trapped or reset.
++signals ignored upon entry to the shell cannot be trapped, reset or listed.
+ Interactive shells permit trapping signals ignored on entry.
+ Trapped signals that are not being ignored are reset to their original
+ values in a subshell or subshell environment when one is created.

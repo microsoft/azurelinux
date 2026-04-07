@@ -1,0 +1,76 @@
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Fri, 7 Jul 2023 10:13:31 +0200
+Subject: [PATCH] WIP don't update packages if IGNORE_MISSING_DEPS is set
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+
+diff --git a/apps/rebar/src/rebar_packages.erl b/apps/rebar/src/rebar_packages.erl
+index a2024fdf..31b7714c 100644
+--- a/apps/rebar/src/rebar_packages.erl
++++ b/apps/rebar/src/rebar_packages.erl
+@@ -218,33 +218,38 @@ parse_checksum(Checksum) ->
+     Checksum.
+ 
+ update_package(Name, RepoConfig=#{name := Repo}, State) ->
+-    ?MODULE:verify_table(State),
+-    ?DEBUG("Getting definition for package ~ts from repo ~ts",
+-           [Name, rebar_hex_repos:format_repo(RepoConfig)]),
+-    try hex_repo:get_package(get_package_repo_config(RepoConfig), Name) of
+-        {ok, {200, _Headers, Package}} ->
+-            #{releases := Releases} = Package,
+-            _ = insert_releases(Name, Releases, Repo, ?PACKAGE_TABLE),
+-            {ok, RegistryDir} = rebar_packages:registry_dir(State),
+-            PackageIndex = filename:join(RegistryDir, ?INDEX_FILE),
+-            case ets:tab2file(?PACKAGE_TABLE, PackageIndex) of
+-                ok -> ok;
+-                {error, Error} ->
+-                    ?WARN("Failed to update package index at ~p: ~p", [PackageIndex, Error])
+-            end;
+-        {error, unverified} ->
+-            ?WARN(unverified_repo_message(), [Repo]),
+-            fail;
+-        Error ->
+-            ?DEBUG("Hex get_package request failed: ~p", [Error]),
+-            %% TODO: add better log message. hex_core should export a format_error
+-            ?WARN("Failed to update package ~ts from repo ~ts", [Name, Repo]),
+-            fail
+-    catch
+-        _:Exception ->
+-            ?DEBUG("hex_repo:get_package failed for package ~p: ~p", [Name, Exception]),
+-            fail
+-    end.
++    case os:getenv("IGNORE_MISSING_DEPS") of
++	false ->
++	    ?MODULE:verify_table(State),
++	    ?DEBUG("Getting definition for package ~ts from repo ~ts",
++		   [Name, rebar_hex_repos:format_repo(RepoConfig)]),
++	    try hex_repo:get_package(get_package_repo_config(RepoConfig), Name) of
++		{ok, {200, _Headers, Package}} ->
++		    #{releases := Releases} = Package,
++		    _ = insert_releases(Name, Releases, Repo, ?PACKAGE_TABLE),
++		    {ok, RegistryDir} = rebar_packages:registry_dir(State),
++		    PackageIndex = filename:join(RegistryDir, ?INDEX_FILE),
++		    case ets:tab2file(?PACKAGE_TABLE, PackageIndex) of
++			ok -> ok;
++			{error, Error} ->
++			    ?WARN("Failed to update package index at ~p: ~p", [PackageIndex, Error])
++		    end;
++		{error, unverified} ->
++		    ?WARN(unverified_repo_message(), [Repo]),
++		    fail;
++		Error ->
++		    ?DEBUG("Hex get_package request failed: ~p", [Error]),
++		    %% TODO: add better log message. hex_core should export a format_error
++		    ?WARN("Failed to update package ~ts from repo ~ts", [Name, Repo]),
++		    fail
++	    catch
++		_:Exception ->
++		    ?DEBUG("hex_repo:get_package failed for package ~p: ~p", [Name, Exception]),
++		    fail
++	    end;
++	_ ->
++		ok
++	end.
+ 
+ get_package_repo_config(RepoConfig=#{mirror_of := _}) ->
+     get_package_repo_config(maps:remove(mirror_of, RepoConfig));

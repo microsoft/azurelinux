@@ -1,0 +1,45 @@
+From b2885fda8c6c74d8bb03a978ac29072fcfb13cb8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Fri, 21 Apr 2023 11:58:42 +0200
+Subject: [PATCH] tests: Call nonobsolete grep -F
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+basic2-27 fails with grep-3.9 because grep warns when called as fgrep:
+
+PASS: basic2-26c
+** expected:
+
+** got:
+fgrep: warning: fgrep is obsolescent; using grep -F
+fgrep: warning: fgrep is obsolescent; using grep -F
+FAIL: basic2-27
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ src/sanity.sh | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/sanity.sh b/src/sanity.sh
+index dbcae19..83eb956 100755
+--- a/src/sanity.sh
++++ b/src/sanity.sh
+@@ -1255,12 +1255,12 @@ directory_cmp ()
+ 	DIR_2=$2
+ 
+ 	cd $DIR_1
+-	find . -print | fgrep -v /CVS | sort > $TESTDIR/dc$$d1
++	find . -print | grep -F -v /CVS | sort > $TESTDIR/dc$$d1
+ 
+ 	# go back where we were to avoid symlink hell...
+ 	cd $OLDPWD
+ 	cd $DIR_2
+-	find . -print | fgrep -v /CVS | sort > $TESTDIR/dc$$d2
++	find . -print | grep -F -v /CVS | sort > $TESTDIR/dc$$d2
+ 
+ 	if diff $TESTDIR/dc$$d1 $TESTDIR/dc$$d2 >/dev/null 2>&1
+ 	then
+-- 
+2.40.0
+

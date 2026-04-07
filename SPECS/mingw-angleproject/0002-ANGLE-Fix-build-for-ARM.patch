@@ -1,0 +1,43 @@
+From 416fb93dae5009bb51da9f6720a95918a2c79e78 Mon Sep 17 00:00:00 2001
+From: Oliver Wolff <oliver.wolff@qt.io>
+Date: Fri, 17 Aug 2018 09:54:15 +0200
+Subject: [PATCH] ANGLE: Fix build for ARM
+
+__popcnt is not available when building for ARM. This patch uses the
+approach that is also used in Microsoft's ANGLE fork.
+
+Change-Id: I98bac36a3b36b0aa81f3b483d3d12cce9f6c5c87
+---
+ src/3rdparty/angle/src/common/mathutil.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/src/3rdparty/angle/src/common/mathutil.h b/src/3rdparty/angle/src/common/mathutil.h
+index ca6efc567f..372e432066 100644
+--- a/src/3rdparty/angle/src/common/mathutil.h
++++ b/src/3rdparty/angle/src/common/mathutil.h
+@@ -884,6 +884,14 @@ inline uint32_t BitfieldReverse(uint32_t value)
+ 
+ // Count the 1 bits.
+ #if defined(ANGLE_PLATFORM_WINDOWS)
++#if defined(_M_ARM)
++inline int BitCount(uint32_t bits)
++{
++    bits = bits - ((bits >> 1) & 0x55555555);
++    bits = (bits & 0x33333333) + ((bits >> 2) & 0x33333333);
++    return (((bits + (bits >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24;
++}
++#else // _M_ARM
+ inline int BitCount(uint32_t bits)
+ {
+     return static_cast<int>(__popcnt(bits));
+@@ -893,6 +901,7 @@ inline int BitCount(uint64_t bits)
+ {
+     return static_cast<int>(__popcnt64(bits));
+ }
++#endif // !_M_ARM
+ #endif  // defined(ANGLE_IS_64_BIT_CPU)
+ #endif  // defined(ANGLE_PLATFORM_WINDOWS)
+ 
+-- 
+2.15.0.windows.1
+

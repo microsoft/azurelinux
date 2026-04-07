@@ -1,0 +1,25 @@
+diff --git a/bench/CMakeLists.txt b/bench/CMakeLists.txt
+index 2fcee92..c51ce90 100644
+--- a/bench/CMakeLists.txt
++++ b/bench/CMakeLists.txt
+@@ -11,8 +11,6 @@ FetchContent_MakeAvailable(
+         googletest
+         googlebenchmark)
+ 
+-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+-
+ function(rapidfuzz_add_benchmark NAME SOURCE)
+     add_executable(bench_${NAME} ${SOURCE})
+     target_link_libraries(bench_${NAME} PRIVATE ${PROJECT_NAME})
+diff --git a/fuzzing/CMakeLists.txt b/fuzzing/CMakeLists.txt
+index 64a8819..7964ce7 100644
+--- a/fuzzing/CMakeLists.txt
++++ b/fuzzing/CMakeLists.txt
+@@ -3,7 +3,7 @@ function(create_fuzzer fuzzer)
+     target_compile_features(fuzz_${fuzzer} PUBLIC cxx_std_17)
+     target_link_libraries(fuzz_${fuzzer} PRIVATE rapidfuzz::rapidfuzz)
+ 
+-    target_compile_options(fuzz_${fuzzer} PRIVATE -g -O1 -fsanitize=fuzzer,address -march=native)
++    target_compile_options(fuzz_${fuzzer} PRIVATE -g -O1 -fsanitize=fuzzer,address)
+     target_link_libraries(fuzz_${fuzzer} PRIVATE -fsanitize=fuzzer,address)
+ endfunction(create_fuzzer)

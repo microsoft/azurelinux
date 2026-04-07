@@ -1,0 +1,38 @@
+From d328542bea50b9445c63cdf2454052392282a1ce Mon Sep 17 00:00:00 2001
+From: Colin Walters <walters@verbum.org>
+Date: Thu, 8 Oct 2015 16:25:47 -0400
+Subject: [PATCH] intltool-merge: Create cache file atomically
+
+It's going to be relatively common for build systems operating in
+parallel to run multiple copies of `intltool-merge`, yet the cache
+file is not created atomically (i.e. with the "open .tmp file and
+rename()" dance).
+
+I suspect (but have not yet determined conclusively) this is the cause
+of some systemd build issues where translations don't appear in the
+merged file.
+
+Regardless, this patch can't hurt.
+---
+ intltool-merge.in | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/intltool-merge.in b/intltool-merge.in
+index 1afa2a4..d1eba8f 100644
+--- a/intltool-merge.in
++++ b/intltool-merge.in
+@@ -371,9 +371,10 @@ sub create_cache
+ 
+     &create_translation_database;
+ 
+-    open CACHE, ">$cache_file" || die;
++    open CACHE, ">$cache_file" . ".tmp" || die;
+     print CACHE join "\x01", %translations;
+     close CACHE;
++    rename("$cache_file" . ".tmp", "$cache_file");
+ }
+ 
+ sub load_cache 
+-- 
+1.8.3.1
+

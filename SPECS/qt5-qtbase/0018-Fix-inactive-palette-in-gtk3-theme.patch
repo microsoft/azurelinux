@@ -1,0 +1,241 @@
+From a608a7c29886fd95ea8569776036673e6c7639f2 Mon Sep 17 00:00:00 2001
+From: Santhosh Kumar <santhosh.kumar.selvaraj@qt.io>
+Date: Tue, 10 Oct 2023 16:07:07 +0200
+Subject: Fix inactive palette in gtk3 theme
+
+In gtk3 theme, the inactive color group had been set with incorrect
+palette or not been set for some cases, which leads to glitch when
+moving application window. This is because inactive group palettes were
+applied during window movement and its expected to be set with correct
+palettes.
+
+This patch fixes this issue by setting correct palette for inactive
+color group.
+
+Fixes: QTBUG-112879
+Pick-to: 6.6 6.5
+Change-Id: I6658843626f322fee0ef99dfafb550956e3e0aee
+Reviewed-by: Jonas Karlsson <jonas.karlsson@qt.io>
+Reviewed-by: Axel Spoerl <axel.spoerl@qt.io>
+
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3storage.cpp b/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
+index 0017f55a45..bbc70c39a2 100644
+--- a/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
++++ b/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
+@@ -524,93 +524,129 @@ void QGtk3Storage::createMapping()
+ 
+ 
+     // System palette
+-    // background color and calculate derivates
+-    GTK(Default, Background, INSENSITIVE);
+-    ADD(Normal, Window);
+-    ADD(Normal, Button);
+-    ADD(Normal, Base);
+-    ADD(Inactive, Base);
+-    ADD(Inactive, Window);
+-    ADD(Disabled, Button);
+-    ADD(Disabled, Window);
+-    LIGHTER(Normal, Window, 125);
+-    ADD(Normal, Light);
+-    LIGHTER(Normal, Window, 70);
+-    ADD(Normal, Shadow);
+-    LIGHTER(Normal, Window, 80);
+-    ADD(Normal, Dark);
+-    GTK(button, Foreground, ACTIVE);
+-    ADD(Inactive, WindowText);
+-    LIGHTER(Normal, WindowText, 50);
+-    ADD(Disabled, Text);
+-    ADD(Disabled, WindowText);
+-    ADD(Inactive, ButtonText);
+-    ADD(Disabled, ButtonText);
+-    GTK(button, Text, NORMAL);
+-    ADD(Disabled, ButtonText);
+-    // special background colors
+-    GTK(Default, Background, SELECTED);
+-    ADD(Disabled, Highlight);
+-    ADD(Normal, Highlight);
+-    GTK(entry, Foreground, SELECTED);
+-    ADD(Normal, HighlightedText);
+-    GTK(entry, Background, ACTIVE);
+-    ADD(Inactive, HighlightedText);
+-    // text color and friends
+-    GTK(entry, Text, NORMAL);
+-    ADD(Normal, ButtonText);
+-    ADD(Normal, WindowText);
+-    ADD(Disabled, WindowText);
+-    ADD(Disabled, HighlightedText);
+-    GTK(Default, Text, NORMAL);
+-    ADD(Normal, Text);
+-    ADD(Normal, WindowText);
+-    ADD(Inactive, Text);
+-    ADD(Normal, HighlightedText);
+-    LIGHTER(Normal, Base, 93);
+-    ADD(All, AlternateBase);
+-    GTK(Default, Foreground, NORMAL);
+-    ADD(All, ToolTipText);
+-    MODIFY(Normal, Text, 100, 100, 100);
+-    ADD(All, PlaceholderText, Light);
+-    MODIFY(Normal, Text, -100, -100, -100);
+-    ADD(All, PlaceholderText, Dark);
+-    SAVE(SystemPalette);
+-    CLEAR;
+-
+-    // Checkbox and Radio Button
+-    GTK(button, Text, ACTIVE);
+-    ADD(Normal, Base, Dark);
+-    GTK(Default, Background, NORMAL);
+-    ADD(All, Base);
+-    GTK(button, Text, NORMAL);
+-    ADD(Normal, Base, Light);
+-    SAVE(CheckBoxPalette);
+-    SAVE(RadioButtonPalette);
+-    CLEAR;
+-
+-    // ComboBox, GroupBox, Frame
+-    GTK(combo_box, Text, NORMAL);
+-    ADD(Normal, ButtonText, Dark);
+-    ADD(Normal, Text, Dark);
+-    GTK(combo_box, Text, ACTIVE);
+-    ADD(Normal, ButtonText, Light);
+-    ADD(Normal, Text, Light);
+-    SAVE(ComboBoxPalette);
+-    SAVE(GroupBoxPalette);
+-    CLEAR;
+-
+-    // Menu bar
+-    GTK(Default, Text, ACTIVE);
+-    ADD(Normal, ButtonText);
+-    SAVE(MenuPalette);
+-    CLEAR;
+-
+-    // LineEdit
+-    GTK(Default, Background, NORMAL);
+-    ADD(All, Base);
+-    SAVE(TextLineEditPalette);
+-    CLEAR;
++    {
++        // background color and calculate derivates
++        GTK(Default, Background, INSENSITIVE);
++        ADD(All, Window);
++        ADD(All, Button);
++        ADD(All, Base);
++        LIGHTER(Normal, Window, 125);
++        ADD(Normal, Light);
++        ADD(Inactive, Light);
++        LIGHTER(Normal, Window, 70);
++        ADD(Normal, Shadow);
++        LIGHTER(Normal, Window, 80);
++        ADD(Normal, Dark);
++        ADD(Inactive, Dark)
++
++        GTK(button, Foreground, ACTIVE);
++        ADD(Inactive, WindowText);
++        LIGHTER(Normal, WindowText, 50);
++        ADD(Disabled, Text);
++        ADD(Disabled, WindowText);
++        ADD(Disabled, ButtonText);
++
++        GTK(button, Text, NORMAL);
++        ADD(Inactive, ButtonText);
++
++        // special background colors
++        GTK(Default, Background, SELECTED);
++        ADD(Disabled, Highlight);
++        ADD(Normal, Highlight);
++        ADD(Inactive, Highlight);
++
++        GTK(entry, Foreground, SELECTED);
++        ADD(Normal, HighlightedText);
++        ADD(Inactive, HighlightedText);
++
++        // text color and friends
++        GTK(entry, Text, NORMAL);
++        ADD(Normal, ButtonText);
++        ADD(Normal, WindowText);
++        ADD(Disabled, HighlightedText);
++
++        GTK(Default, Text, NORMAL);
++        ADD(Normal, Text);
++        ADD(Inactive, Text);
++        ADD(Normal, HighlightedText);
++        LIGHTER(Normal, Base, 93);
++        ADD(All, AlternateBase);
++
++        GTK(Default, Foreground, NORMAL);
++        ADD(All, ToolTipText);
++        MODIFY(Normal, Text, 100, 100, 100);
++        ADD(All, PlaceholderText, Light);
++        MODIFY(Normal, Text, -100, -100, -100);
++        ADD(All, PlaceholderText, Dark);
++
++        SAVE(SystemPalette);
++        CLEAR;
++    }
++
++    // Label and TabBar Palette
++    {
++        GTK(entry, Text, NORMAL);
++        ADD(Normal, WindowText);
++        ADD(Inactive, WindowText);
++
++        SAVE(LabelPalette);
++        SAVE(TabBarPalette);
++        CLEAR;
++    }
++
++    // Checkbox and RadioButton Palette
++    {
++        GTK(button, Text, ACTIVE);
++        ADD(Normal, Base, Dark);
++        ADD(Inactive, WindowText, Dark);
++
++        GTK(Default, Foreground, NORMAL);
++        ADD(All, Text);
++
++        GTK(Default, Background, NORMAL);
++        ADD(All, Base);
++
++        GTK(button, Text, NORMAL);
++        ADD(Normal, Base, Light);
++        ADD(Inactive, WindowText, Light);
++
++        SAVE(CheckBoxPalette);
++        SAVE(RadioButtonPalette);
++        CLEAR;
++    }
++
++    // ComboBox, GroupBox & Frame Palette
++    {
++        GTK(combo_box, Text, NORMAL);
++        ADD(Normal, ButtonText, Dark);
++        ADD(Normal, Text, Dark);
++        ADD(Inactive, WindowText, Dark);
++
++        GTK(combo_box, Text, ACTIVE);
++        ADD(Normal, ButtonText, Light);
++        ADD(Normal, Text, Light);
++        ADD(Inactive, WindowText, Light);
++
++        SAVE(ComboBoxPalette);
++        SAVE(GroupBoxPalette);
++        CLEAR;
++    }
++
++    // MenuBar Palette
++    {
++        GTK(Default, Text, ACTIVE);
++        ADD(Normal, ButtonText);
++        SAVE(MenuPalette);
++        CLEAR;
++    }
++
++    // LineEdit Palette
++    {
++        GTK(Default, Background, NORMAL);
++        ADD(All, Base);
++        SAVE(TextLineEditPalette);
++        CLEAR;
++    }
+ 
+ #undef GTK
+ #undef REC

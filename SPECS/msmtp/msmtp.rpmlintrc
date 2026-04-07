@@ -1,0 +1,4 @@
+# SPELLING ERRORS
+addFilter(r" strange-permission")
+addFilter(r" env-script-interpreter")
+addFilter(r" crypto-policy-non-compliance")

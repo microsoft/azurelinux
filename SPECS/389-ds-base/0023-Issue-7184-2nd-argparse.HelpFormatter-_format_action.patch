@@ -1,0 +1,41 @@
+From fcec1f00b99b227d44a2f0aef6e3a87ddb7e52a9 Mon Sep 17 00:00:00 2001
+From: Viktor Ashirov <vashirov@redhat.com>
+Date: Fri, 13 Feb 2026 15:38:52 +0100
+Subject: [PATCH] Issue 7184 - (2nd) argparse.HelpFormatter
+ _format_actions_usage() is deprecated (#7257)
+
+Description:
+`_format_actions_usage()` was also removed in Python 3.14.3.
+Replace version check with `isinstance()` to handle the return type of
+`_get_actions_usage_parts()` more robustly across Python versions.
+
+Relates: https://github.com/389ds/389-ds-base/issues/7184
+Fixes: https://github.com/389ds/389-ds-base/issues/7253
+
+Reviewed by: @progier389 (Thanks!)
+---
+ src/lib389/lib389/cli_base/__init__.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/lib389/lib389/cli_base/__init__.py b/src/lib389/lib389/cli_base/__init__.py
+index f1055aadc..3af8a46e6 100644
+--- a/src/lib389/lib389/cli_base/__init__.py
++++ b/src/lib389/lib389/cli_base/__init__.py
+@@ -420,11 +420,11 @@ class CustomHelpFormatter(argparse.HelpFormatter):
+         else:
+             # Use _get_actions_usage_parts() for Python 3.13 and later
+             action_parts = self._get_actions_usage_parts(parent_arguments, [])
+-            if sys.version_info >= (3, 15):
+-                # Python 3.15 returns a tuple (list of actions, count of actions)
++            if isinstance(action_parts, tuple):
++                # Python 3.14.3+ and 3.15+ return a tuple (list of actions, count of actions)
+                 formatted_options = ' '.join(action_parts[0])
+             else:
+-                # Python 3.13 and 3.14 return a list of actions
++                # Earlier versions return a list of actions
+                 formatted_options = ' '.join(action_parts)
+ 
+         # If formatted_options already in usage - remove them
+-- 
+2.52.0
+

@@ -1,0 +1,29 @@
+From e1a61fbf6fc13520b7874c87588b6a79f163d50f Mon Sep 17 00:00:00 2001
+From: Jan Rybar <jrybar@redhat.com>
+Date: Fri, 6 Jun 2025 13:25:55 +0200
+Subject: [PATCH] DELETE ME!
+
+---
+ src/polkitbackend/polkitbackendactionpool.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/polkitbackend/polkitbackendactionpool.c b/src/polkitbackend/polkitbackendactionpool.c
+index 43f89cb..f4acca9 100644
+--- a/src/polkitbackend/polkitbackendactionpool.c
++++ b/src/polkitbackend/polkitbackendactionpool.c
+@@ -739,6 +739,12 @@ _start (void *data, const char *el, const char **attr)
+   guint num_attr;
+   ParserData *pd = data;
+ 
++  if (pd->stack_depth < 0 || pd->stack_depth >= PARSER_MAX_DEPTH)
++    {
++      g_warning ("XML parsing reached max depth?");
++      goto error;
++    }
++
+   for (num_attr = 0; attr[num_attr] != NULL; num_attr++)
+     ;
+ 
+-- 
+2.49.0
+

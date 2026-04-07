@@ -1,0 +1,18 @@
+--- a/src/test.rs
++++ b/src/test.rs
+@@ -108,14 +108,7 @@ fn validate_bpf_o(path: &Path) {
+ 
+ /// Returns the path to the local libbpf-rs
+ fn get_libbpf_rs_path() -> PathBuf {
+-    // The `CARGO_MANIFEST_DIR` environment variable points to the
+-    // libbpf-cargo directory, at build time.
+-    let libcargo_dir = env!("CARGO_MANIFEST_DIR");
+-
+-    Path::new(&libcargo_dir)
+-        .parent()
+-        .expect("failed to get parent of libbpf-cargo directory")
+-        .join("libbpf-rs")
++    Path::new("/usr/share/cargo/registry/libbpf-rs-0.23.3")
+         .canonicalize()
+         .expect("failed to canonicalize libbpf-rs")
+ }

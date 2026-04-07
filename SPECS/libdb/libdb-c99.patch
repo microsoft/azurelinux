@@ -1,0 +1,26 @@
+Add additional header files to avoid implicit declaration of the flock
+and usleep functions.  Improves C99 compatibility.
+
+diff -ur db-5.3.28.orig/src/os/os_flock.c db-5.3.28/src/os/os_flock.c
+--- db-5.3.28.orig/src/os/os_flock.c	2022-12-10 12:29:48.614322281 +0100
++++ db-5.3.28/src/os/os_flock.c	2022-12-10 14:33:21.785814691 +0100
+@@ -10,6 +10,8 @@
+ 
+ #include "db_int.h"
+ 
++#include <sys/file.h>
++
+ #if !defined(HAVE_FCNTL) || !defined(HAVE_FLOCK)
+ static int __os_filelocking_notsup __P((ENV *));
+ #endif
+diff -ur db-5.3.28.orig/util/db_dump185.c db-5.3.28/util/db_dump185.c
+--- db-5.3.28.orig/util/db_dump185.c	2013-09-09 17:35:12.000000000 +0200
++++ db-5.3.28/util/db_dump185.c	2022-12-10 12:35:08.415288426 +0100
+@@ -19,6 +19,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <unistd.h>
+ 
+ #ifdef HAVE_DB_185_H
+ #include <db_185.h>

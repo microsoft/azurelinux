@@ -1,0 +1,40 @@
+diff -up rpcbind-1.2.7/configure.ac.orig rpcbind-1.2.7/configure.ac
+--- rpcbind-1.2.7/configure.ac.orig	2024-07-25 11:55:23.000000000 -0400
++++ rpcbind-1.2.7/configure.ac	2024-07-25 16:55:38.334208493 -0400
+@@ -73,6 +73,17 @@ AC_ARG_WITH([systemdsystemunitdir],
+   fi
+ AM_CONDITIONAL(SYSTEMD, [test -n "$with_systemdsystemunitdir" -a "x$with_systemdsystemunitdir" != xno ])
+ 
++AC_ARG_WITH([systemdtmpfilesdir],
++  AS_HELP_STRING([--with-systemdtmpfilesdir=DIR], [Directory for systemd tmp files]),
++  [], [with_systemdtmpfilesdir=$($PKG_CONFIG --variable=tmpfilesdir systemd)])
++  if test "x$with_systemdtmpfilesdir" != xno; then
++    AC_SUBST([systemdtmpfilesdir], [$with_systemdtmpfilesdir])
++     PKG_CHECK_MODULES([SYSTEMD], [libsystemd], [],
++	   [PKG_CHECK_MODULES([SYSTEMD], [libsystemd-daemon], [],
++	   AC_MSG_ERROR([libsystemd support requested but found]))])
++  fi
++AM_CONDITIONAL(SYSTEMD, [test -n "$with_systemdtmpfilesdir" -a "x$with_systemdtmpfilesdir" != xno ])
++
+ AS_IF([test x$enable_libwrap = xyes], [
+ 	AC_CHECK_LIB([wrap], [hosts_access], ,
+ 		AC_MSG_ERROR([libwrap support requested but unable to find libwrap]))
+diff -up rpcbind-1.2.7/Makefile.am.orig rpcbind-1.2.7/Makefile.am
+--- rpcbind-1.2.7/Makefile.am.orig	2024-07-25 11:55:23.000000000 -0400
++++ rpcbind-1.2.7/Makefile.am	2024-07-25 16:55:38.335208500 -0400
+@@ -59,6 +59,9 @@ rpcbind_LDADD += $(SYSTEMD_LIBS)
+ systemdsystemunit_DATA = \
+ 	systemd/rpcbind.service \
+ 	systemd/rpcbind.socket
++
++systemdtmpfiles_DATA = \
++	systemd/rpcbind.conf
+ endif
+ 
+ rpcinfo_SOURCES =       src/rpcinfo.c
+diff -up rpcbind-1.2.7/systemd/rpcbind.conf.orig rpcbind-1.2.7/systemd/rpcbind.conf
+--- rpcbind-1.2.7/systemd/rpcbind.conf.orig	2024-07-25 16:55:38.335208500 -0400
++++ rpcbind-1.2.7/systemd/rpcbind.conf	2024-07-25 16:55:38.335208500 -0400
+@@ -0,0 +1,2 @@
++#Type Path         Mode  UID  GID Age Argument
++D     /run/rpcbind 0700  rpc  rpc  -  -

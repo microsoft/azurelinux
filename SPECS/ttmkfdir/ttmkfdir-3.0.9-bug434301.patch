@@ -1,0 +1,11 @@
+--- ttmkfdir-3.0.9/directory.cpp.bak	2008-02-27 10:18:52.000000000 +0800
++++ ttmkfdir-3.0.9/directory.cpp	2008-02-27 10:20:24.000000000 +0800
+@@ -3,6 +3,8 @@
+ #include <stdio.h>
+ #include <sys/stat.h>
+ #include <unistd.h>
++#include <string.h>
++#include <stdlib.h>
+ 
+ #include "directory.h"
+ 

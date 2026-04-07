@@ -1,0 +1,49 @@
+From c2e67684ecbc9dbdb25573934d617a4c20d88b2d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tom=C3=A1=C5=A1=20Hrn=C4=8Diar?= <thrnciar@redhat.com>
+Date: Fri, 1 Sep 2023 14:50:23 +0200
+Subject: [PATCH] Patch get_embedded_wheel() to return system wheels from 
+ virtualenv instead of embedded wheels
+
+We don't ship embedded wheels in Fedora and they are being patched out
+from virtualenv (https://src.fedoraproject.org/rpms/python-virtualenv/blob/rawhide/f/rpm-wheels.patch#_110).
+Since poetry touches get_embedded_wheel() our patch breaks it as it
+retuns None instead of wheels.
+This temporary patch returns correct wheels by calling
+get_system_wheels_paths() from virtualenv.
+---
+ src/poetry/utils/env/base_env.py | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
+
+diff --git a/src/poetry/utils/env/base_env.py b/src/poetry/utils/env/base_env.py
+index 487a0aa..eacb2e1 100644
+--- a/src/poetry/utils/env/base_env.py
++++ b/src/poetry/utils/env/base_env.py
+@@ -138,11 +138,20 @@ class Env:
+         self._find_pip_executable()
+ 
+     def get_embedded_wheel(self, distribution: str) -> Path:
+-        wheel: Wheel = get_embed_wheel(
+-            distribution, f"{self.version_info[0]}.{self.version_info[1]}"
+-        )
+-        path: Path = wheel.path
+-        return path
++        from types import SimpleNamespace
++        from virtualenv.util.path._system_wheels import get_system_wheels_paths
++
++        interpreter = SimpleNamespace(executable=self.python,
++                                      version_info=self.version_info)
++        wheel_paths = get_system_wheels_paths(interpreter)
++
++        for wheel_dir in wheel_paths:
++            pip_wheels = sorted(wheel_dir.glob(f'{distribution}-*.whl'))
++            if not pip_wheels:
++                break
++            return pip_wheels[0]
++
++        raise RuntimeError("No wheels were found")
+ 
+     @property
+     def pip_embedded(self) -> Path:
+-- 
+2.41.0
+

@@ -1,0 +1,87 @@
+From 4306c538d4a00dd1aa46c55c3c4005c2b0bf7cd5 Mon Sep 17 00:00:00 2001
+From: Peter Robinson <pbrobinson@gmail.com>
+Date: Thu, 24 Nov 2022 12:57:55 +0000
+Subject: [PATCH] distro: load FDT from any partition on boot device
+
+In the EFI_LOADER boot path, we were only checking the FAT partition
+containing the EFI payload for dtb files.  But this is somewhat of a
+fiction.  In reality there will be one small (V)FAT partition containing
+grub (or whatever the payload may be), and a second boot partition
+containing kernel/initrd/fdt (typically ext4).  It is this second
+partition where we should be looking for a FDT to load.
+
+So instead scan all the partitions of the disk containing the EFI
+payload.  This matches where grub looks for kernel/initrd (barring
+custom grub.cfg, in which case the user can use grub's 'devicetree'
+command to load the correct FDT).
+
+The other option is somehow passing the ${fdtfile} to grub so that it
+can load the FDT based on selected kernel version location (which grub
+knows) and SoC/board specific ${fdtfile} (which grub does not know).
+
+Signed-off-by: Rob Clark <robdclark@gmail.com>
+Signed-off-by: Peter Robinson <pbrobinson@gmail.com>
+---
+ include/config_distro_bootcmd.h | 37 +++++++++++++++++++++------------
+ 1 file changed, 24 insertions(+), 13 deletions(-)
+
+diff --git a/include/config_distro_bootcmd.h b/include/config_distro_bootcmd.h
+index fcb319a20ae..e71004fad9c 100644
+--- a/include/config_distro_bootcmd.h
++++ b/include/config_distro_bootcmd.h
+@@ -155,28 +155,39 @@
+ 		"fi\0"                                                    \
+ 	\
+ 	"load_efi_dtb="                                                   \
+-		"load ${devtype} ${devnum}:${distro_bootpart} "           \
+-			"${fdt_addr_r} ${prefix}${efi_fdtfile}\0"         \
++		"load ${devtype} ${devnum}:${dtb_devp} "                  \
++			"${fdt_addr_r} ${prefix}${efi_fdtfile} && "       \
++		"run boot_efi_binary\0"                                   \
+ 	\
+ 	"efi_dtb_prefixes=/ /dtb/ /dtb/current/\0"                        \
+-	"scan_dev_for_efi="                                               \
++	"scan_dev_for_dtb="                                               \
+ 		"setenv efi_fdtfile ${fdtfile}; "                         \
+ 		BOOTENV_EFI_SET_FDTFILE_FALLBACK                          \
+ 		BOOTENV_RUN_EXTENSION_INIT                                \
+-		"for prefix in ${efi_dtb_prefixes}; do "                  \
+-			"if test -e ${devtype} "                          \
+-					"${devnum}:${distro_bootpart} "   \
+-					"${prefix}${efi_fdtfile}; then "  \
+-				"run load_efi_dtb; "                      \
+-				BOOTENV_RUN_EXTENSION_APPLY               \
+-			"fi;"                                             \
+-		"done;"                                                   \
+-		"run boot_efi_bootmgr;"                                   \
++		"part list ${devtype} ${devnum} dtb_devplist; "           \
++		"env exists dtb_devplist || setenv dtb_devplist "         \
++			"${distro_bootpart}; "                            \
++		"for dtb_devp in ${dtb_devplist}; do "                    \
++			"for prefix in ${efi_dtb_prefixes}; do "          \
++				"if test -e ${devtype} "                  \
++						"${devnum}:${dtb_devp} "  \
++						"${prefix}${efi_fdtfile};"\
++						" then "                  \
++					"echo Found DTB ${devtype} "      \
++						"${devnum}:${dtb_devp} "  \
++						"${prefix}${efi_fdtfile};"\
++					"run load_efi_dtb; "              \
++					BOOTENV_RUN_EXTENSION_APPLY       \
++				"fi;"                                     \
++			"done; "                                          \
++		"done; "                                                  \
++		"run boot_efi_binary\0"                                   \
++	"scan_dev_for_efi="                                               \
+ 		"if test -e ${devtype} ${devnum}:${distro_bootpart} "     \
+ 					"efi/boot/"BOOTEFI_NAME"; then "  \
+ 				"echo Found EFI removable media binary "  \
+ 					"efi/boot/"BOOTEFI_NAME"; "       \
+-				"run boot_efi_binary; "                   \
++				"run scan_dev_for_dtb; "                  \
+ 				"echo EFI LOAD FAILED: continuing...; "   \
+ 		"fi; "                                                    \
+ 		"setenv efi_fdtfile\0"
+-- 
+2.38.1
+

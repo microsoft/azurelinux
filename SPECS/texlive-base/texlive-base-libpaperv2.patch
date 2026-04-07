@@ -1,0 +1,102 @@
+diff -up texlive-base-20220321/source/texk/psutils/tests/playres.ps.libpaper2 texlive-base-20220321/source/texk/psutils/tests/playres.ps
+--- texlive-base-20220321/source/texk/psutils/tests/playres.ps.libpaper2	2023-01-08 23:22:46.519324804 -0500
++++ texlive-base-20220321/source/texk/psutils/tests/playres.ps	2023-01-08 23:22:56.824405896 -0500
+@@ -280,7 +280,7 @@ PStoPSmatrix setmatrix
+ 0.704762 dup scale
+ userdict/PStoPSmatrix matrix currentmatrix put
+ userdict/PStoPSclip{0 0 moveto
+- 595.275591 0 rlineto 0 844.647799 rlineto -595.275591 0 rlineto
++ 595.275591 0 rlineto 0 844.647797 rlineto -595.275591 0 rlineto
+  closepath}put initclip
+ PStoPSxform concat
+ TeXDict begin 15 4 bop 330 423 a Fb(5)2834 b(5)1622 3275
+@@ -293,7 +293,7 @@ PStoPSmatrix setmatrix
+ 0.704762 dup scale
+ userdict/PStoPSmatrix matrix currentmatrix put
+ userdict/PStoPSclip{0 0 moveto
+- 595.275591 0 rlineto 0 844.647799 rlineto -595.275591 0 rlineto
++ 595.275591 0 rlineto 0 844.647797 rlineto -595.275591 0 rlineto
+  closepath}put initclip
+ PStoPSxform concat
+ TeXDict begin 16 5 bop 330 419 a Fb(6)2834 b(6)1622 3264
+@@ -306,7 +306,7 @@ PStoPSmatrix setmatrix
+ 0.704762 dup scale
+ userdict/PStoPSmatrix matrix currentmatrix put
+ userdict/PStoPSclip{0 0 moveto
+- 595.275591 0 rlineto 0 844.647799 rlineto -595.275591 0 rlineto
++ 595.275591 0 rlineto 0 844.647797 rlineto -595.275591 0 rlineto
+  closepath}put initclip
+ PStoPSxform concat
+ TeXDict begin 17 6 bop 330 419 a Fb(7)2834 b(7)1622 3266
+@@ -319,7 +319,7 @@ PStoPSmatrix setmatrix
+ 0.704762 dup scale
+ userdict/PStoPSmatrix matrix currentmatrix put
+ userdict/PStoPSclip{0 0 moveto
+- 595.275591 0 rlineto 0 844.647799 rlineto -595.275591 0 rlineto
++ 595.275591 0 rlineto 0 844.647797 rlineto -595.275591 0 rlineto
+  closepath}put initclip
+ PStoPSxform concat
+ TeXDict begin 18 7 bop 330 419 a Fb(8)2834 b(8)1622 3264
+@@ -332,7 +332,7 @@ PStoPSmatrix setmatrix
+ 0.704762 dup scale
+ userdict/PStoPSmatrix matrix currentmatrix put
+ userdict/PStoPSclip{0 0 moveto
+- 595.275591 0 rlineto 0 844.647799 rlineto -595.275591 0 rlineto
++ 595.275591 0 rlineto 0 844.647797 rlineto -595.275591 0 rlineto
+  closepath}put initclip
+ PStoPSxform concat
+ TeXDict begin 19 8 bop 330 419 a Fb(9)2834 b(9)1622 3261
+@@ -345,7 +345,7 @@ PStoPSmatrix setmatrix
+ 0.704762 dup scale
+ userdict/PStoPSmatrix matrix currentmatrix put
+ userdict/PStoPSclip{0 0 moveto
+- 595.275591 0 rlineto 0 844.647799 rlineto -595.275591 0 rlineto
++ 595.275591 0 rlineto 0 844.647797 rlineto -595.275591 0 rlineto
+  closepath}put initclip
+ PStoPSxform concat
+ TeXDict begin 20 9 bop 330 419 a Fb(10)2668 b(10)1415
+@@ -358,7 +358,7 @@ PStoPSmatrix setmatrix
+ 0.704762 dup scale
+ userdict/PStoPSmatrix matrix currentmatrix put
+ userdict/PStoPSclip{0 0 moveto
+- 595.275591 0 rlineto 0 844.647799 rlineto -595.275591 0 rlineto
++ 595.275591 0 rlineto 0 844.647797 rlineto -595.275591 0 rlineto
+  closepath}put initclip
+ PStoPSxform concat
+ TeXDict begin 21 10 bop 330 419 a Fb(11)2668 b(11)1415
+@@ -371,7 +371,7 @@ PStoPSmatrix setmatrix
+ 0.704762 dup scale
+ userdict/PStoPSmatrix matrix currentmatrix put
+ userdict/PStoPSclip{0 0 moveto
+- 595.275591 0 rlineto 0 844.647799 rlineto -595.275591 0 rlineto
++ 595.275591 0 rlineto 0 844.647797 rlineto -595.275591 0 rlineto
+  closepath}put initclip
+ PStoPSxform concat
+ TeXDict begin 22 11 bop 330 419 a Fb(12)2668 b(12)1415
+@@ -384,7 +384,7 @@ PStoPSmatrix setmatrix
+ 0.704762 dup scale
+ userdict/PStoPSmatrix matrix currentmatrix put
+ userdict/PStoPSclip{0 0 moveto
+- 595.275591 0 rlineto 0 844.647799 rlineto -595.275591 0 rlineto
++ 595.275591 0 rlineto 0 844.647797 rlineto -595.275591 0 rlineto
+  closepath}put initclip
+ PStoPSxform concat
+ TeXDict begin 23 12 bop 330 419 a Fb(13)2668 b(13)1415
+@@ -397,7 +397,7 @@ PStoPSmatrix setmatrix
+ 0.704762 dup scale
+ userdict/PStoPSmatrix matrix currentmatrix put
+ userdict/PStoPSclip{0 0 moveto
+- 595.275591 0 rlineto 0 844.647799 rlineto -595.275591 0 rlineto
++ 595.275591 0 rlineto 0 844.647797 rlineto -595.275591 0 rlineto
+  closepath}put initclip
+ PStoPSxform concat
+ TeXDict begin 24 13 bop 330 419 a Fb(14)2668 b(14)1415
+@@ -410,7 +410,7 @@ PStoPSmatrix setmatrix
+ 0.704762 dup scale
+ userdict/PStoPSmatrix matrix currentmatrix put
+ userdict/PStoPSclip{0 0 moveto
+- 595.275591 0 rlineto 0 844.647799 rlineto -595.275591 0 rlineto
++ 595.275591 0 rlineto 0 844.647797 rlineto -595.275591 0 rlineto
+  closepath}put initclip
+ PStoPSxform concat
+ TeXDict begin 25 14 bop 330 423 a Fb(15)2668 b(15)1415

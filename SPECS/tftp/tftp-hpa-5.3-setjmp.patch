@@ -1,0 +1,43 @@
+From b9f2335e88dcb3939015843c7143f1533c755a46 Mon Sep 17 00:00:00 2001
+From: "H. Peter Anvin" <hpa@zytor.com>
+Date: Wed, 29 May 2024 17:35:14 -0700
+Subject: tftpd: shut up one more setjmp complaint
+
+One more place where the compiler complains about setjmp. Work around
+it by creating yet another static variable. Ugly, but it works.
+
+Signed-off-by: H. Peter Anvin <hpa@zytor.com>
+---
+ tftpd/tftpd.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/tftpd/tftpd.c b/tftpd/tftpd.c
+index 14182f3..d9b3f46 100644
+--- a/tftpd/tftpd.c
++++ b/tftpd/tftpd.c
+@@ -1660,17 +1660,21 @@ static void tftp_sendfile(const struct formats *pf, struct tftphdr *oap, int oac
+ /*
+  * Receive a file.
+  */
+-static void tftp_recvfile(const struct formats *pf, struct tftphdr *oap, int oacklen)
++static void tftp_recvfile(const struct formats *pf,
++			  struct tftphdr *oack, int oacklen)
+ {
+     struct tftphdr *dp;
+     int n, size;
+     /* These are "static" to avoid longjmp funnies */
++    static struct tftphdr *oap;
+     static struct tftphdr *ap;  /* ack buffer */
+     static u_short block = 0;
+     static int acksize;
+     u_short dp_opcode, dp_block;
+     unsigned long r_timeout;
+ 
++    oap = oack;
++
+     dp = w_init();
+     do {
+         timeout = rexmtval;
+-- 
+cgit 1.2.3-korg
+

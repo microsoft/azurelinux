@@ -1,0 +1,204 @@
+#!/usr/bin/bash
+#
+# The contents of this file are subject to the Netscape Public
+# License Version 1.1 (the "License"); you may not use this file
+# except in compliance with the License. You may obtain a copy of
+# the License at http://www.mozilla.org/NPL/
+#
+# Software distributed under the License is distributed on an "AS
+# IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+# implied. See the License for the specific language governing
+# rights and limitations under the License.
+#
+# The Original Code is mozilla.org code.
+#
+# The Initial Developer of the Original Code is Netscape
+# Communications Corporation.  Portions created by Netscape are
+# Copyright (C) 1998 Netscape Communications Corporation. All
+# Rights Reserved.
+#
+# Contributor(s):
+#
+
+##
+## Usage:
+##
+## $ firefox
+##
+## This script is meant to run a mozilla program from the mozilla
+## rpm installation.
+##
+## The script will setup all the environment voodoo needed to make
+## mozilla work.
+
+cmdname=`basename $0`
+
+##
+## Variables
+##
+MOZ_ARCH=$(uname -m)
+case $MOZ_ARCH in
+	x86_64 | s390x | sparc64)
+		MOZ_LIB_DIR="/__PREFIX__/lib64"
+		SECONDARY_LIB_DIR="/__PREFIX__/lib"
+		;;
+	* )
+		MOZ_LIB_DIR="/__PREFIX__/lib"
+		SECONDARY_LIB_DIR="/__PREFIX__/lib64"
+		;;
+esac
+
+MOZ_FIREFOX_FILE="firefox"
+
+if [ ! -r $MOZ_LIB_DIR/firefox/$MOZ_FIREFOX_FILE ]; then
+    if [ ! -r $SECONDARY_LIB_DIR/firefox/$MOZ_FIREFOX_FILE ]; then
+	echo "Error: $MOZ_LIB_DIR/firefox/$MOZ_FIREFOX_FILE not found"
+	if [ -d $SECONDARY_LIB_DIR ]; then
+	    echo "       $SECONDARY_LIB_DIR/firefox/$MOZ_FIREFOX_FILE not found"
+	fi
+	exit 1
+    fi
+    MOZ_LIB_DIR="$SECONDARY_LIB_DIR"
+fi
+MOZ_DIST_BIN="$MOZ_LIB_DIR/firefox"
+MOZ_LANGPACKS_DIR="$MOZ_DIST_BIN/langpacks"
+if [ -d "$HOME/.mozilla" ]; then
+  MOZ_CONFIG_DIR=".mozilla"
+else
+  MOZ_CONFIG_DIR=".config/mozilla"
+fi
+MOZ_EXTENSIONS_PROFILE_DIR="$HOME/$MOZ_CONFIG_DIR/extensions/{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
+MOZ_PROGRAM="$MOZ_DIST_BIN/$MOZ_FIREFOX_FILE"
+GETENFORCE_FILE="/usr/sbin/getenforce"
+
+##
+## Set MOZ_APP_LAUNCHER for gnome-session
+##
+export MOZ_APP_LAUNCHER="/__PREFIX__/bin/firefox"
+
+##
+## We want Firefox to use Openh264 provided by Fedora.
+##
+## We used to configure it here but It's set by /etc/profile.d/gmpopenh264.sh
+## script from mozilla-openh264 package now. Let's keep it here just
+## for the record.
+##
+## export MOZ_GMP_PATH=$MOZ_LIB_DIR/mozilla/plugins/gmp-gmpopenh264/system-installed
+##
+
+##
+## Enable Xinput2 (mozbz#1207973)
+##
+export MOZ_USE_XINPUT2=${MOZ_USE_XINPUT2-1}
+
+# OK, here's where all the real work gets done
+
+##
+## To disable the use of Firefox localization, set MOZ_DISABLE_LANGPACKS=1
+## in your environment before launching Firefox.
+##
+#
+# MOZ_DISABLE_LANGPACKS=1
+# export MOZ_DISABLE_LANGPACKS
+#
+
+##
+## Automatically installed langpacks are tracked by .fedora-langpack-install
+## config file.
+##
+FEDORA_LANGPACK_CONFIG="$MOZ_EXTENSIONS_PROFILE_DIR/.fedora-langpack-install"
+
+# MOZ_DISABLE_LANGPACKS disables language packs completely
+MOZILLA_DOWN=0
+if ! [ $MOZ_DISABLE_LANGPACKS ] || [ $MOZ_DISABLE_LANGPACKS -eq 0 ]; then
+    if [ -x $MOZ_DIST_BIN/$MOZ_FIREFOX_FILE ]; then
+        # Is firefox running?
+        /__PREFIX__/bin/pidof $MOZ_PROGRAM > /dev/null 2>&1
+        MOZILLA_DOWN=$?
+    fi
+fi
+
+# When Firefox is not running, restore SELinux labels for profile files
+# (rhbz#1731371)
+if [ $MOZILLA_DOWN -ne 0 ]; then
+  if [ -x $GETENFORCE_FILE ] && [ `$GETENFORCE_FILE` != "Disabled" ]; then
+    (restorecon -vr ~/$MOZ_CONFIG_DIR/firefox/*/gmp-widevinecdm/* &)
+  fi
+fi
+
+# Modify language pack configuration only when firefox is not running
+# and language packs are not disabled
+if [ $MOZILLA_DOWN -ne 0 ]; then
+
+    # Clear already installed langpacks
+    mkdir -p $MOZ_EXTENSIONS_PROFILE_DIR
+    if [ -f $FEDORA_LANGPACK_CONFIG ]; then
+        rm `cat $FEDORA_LANGPACK_CONFIG` > /dev/null 2>&1
+        rm $FEDORA_LANGPACK_CONFIG > /dev/null 2>&1
+        # remove all empty langpacks dirs while they block installation of langpacks
+        rmdir $MOZ_EXTENSIONS_PROFILE_DIR/langpack* > /dev/null 2>&1
+    fi
+
+    # Get locale from system
+    CURRENT_LOCALE=$LC_ALL
+    CURRENT_LOCALE=${CURRENT_LOCALE:-$LC_MESSAGES}
+    CURRENT_LOCALE=${CURRENT_LOCALE:-$LANG}
+
+    # Try with a local variant first, then without a local variant
+    SHORTMOZLOCALE=`echo $CURRENT_LOCALE | sed "s|_\([^.]*\).*||g" | sed "s|\..*||g"`
+    MOZLOCALE=`echo $CURRENT_LOCALE | sed "s|_\([^.]*\).*|-\1|g" | sed "s|\..*||g"`
+
+    function create_langpack_link() {
+        local language=$*
+        local langpack=langpack-${language}@firefox.mozilla.org.xpi
+        if [ -f $MOZ_LANGPACKS_DIR/$langpack ]; then
+            rm -rf $MOZ_EXTENSIONS_PROFILE_DIR/$langpack
+            # If the target file is a symlink (the fallback langpack),
+            # install the original file instead of the fallback one
+            if [ -h $MOZ_LANGPACKS_DIR/$langpack ]; then
+                langpack=`readlink $MOZ_LANGPACKS_DIR/$langpack`
+            fi
+            if [ -e "/run/ostree-booted" ]; then
+               # Files on Silverblue has file create time set to 0,
+               # so in case the langpack is updated Firefox does not
+               # check for changes because it compares the file
+               # creation date to do so.
+                cp -f $MOZ_LANGPACKS_DIR/$langpack \
+                      $MOZ_EXTENSIONS_PROFILE_DIR/$langpack
+            else
+                ln -s $MOZ_LANGPACKS_DIR/$langpack \
+                      $MOZ_EXTENSIONS_PROFILE_DIR/$langpack
+            fi
+            echo $MOZ_EXTENSIONS_PROFILE_DIR/$langpack > $FEDORA_LANGPACK_CONFIG
+            return 0
+        fi
+        return 1
+    }
+
+    create_langpack_link $MOZLOCALE || create_langpack_link $SHORTMOZLOCALE || true
+fi
+
+# BEAST fix (rhbz#1005611)
+NSS_SSL_CBC_RANDOM_IV=${NSS_SSL_CBC_RANDOM_IV-1}
+export NSS_SSL_CBC_RANDOM_IV
+
+# MOZ_APP_REMOTINGNAME links Firefox with desktop file name
+if [ -z "$MOZ_APP_REMOTINGNAME" ]
+then
+  export MOZ_APP_REMOTINGNAME=__APP_NAME__
+fi
+
+# Flatpak specific environment variables
+%FLATPAK_ENV_VARS%
+
+# Don't throw "old profile" dialog box.
+export MOZ_ALLOW_DOWNGRADE=1
+
+# Run the browser
+debugging=0
+if [ $debugging = 1 ]
+then
+  echo $MOZ_PROGRAM "$@"
+fi
+
+exec $MOZ_PROGRAM "$@"

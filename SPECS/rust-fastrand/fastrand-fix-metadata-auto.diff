@@ -1,0 +1,21 @@
+--- fastrand-2.3.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ fastrand-2.3.0/Cargo.toml	2024-12-09T19:46:08.343862+00:00
+@@ -72,18 +72,6 @@
+ default = ["std"]
+ js = [
+     "std",
+-    "getrandom",
+ ]
+ std = ["alloc"]
+ 
+-[target.'cfg(all(any(target_arch = "wasm32", target_arch = "wasm64"), target_os = "unknown"))'.dependencies.getrandom]
+-version = "0.2"
+-features = ["js"]
+-optional = true
+-
+-[target.'cfg(all(any(target_arch = "wasm32", target_arch = "wasm64"), target_os = "unknown"))'.dev-dependencies.getrandom]
+-version = "0.2"
+-features = ["js"]
+-
+-[target.'cfg(all(any(target_arch = "wasm32", target_arch = "wasm64"), target_os = "unknown"))'.dev-dependencies.wasm-bindgen-test]
+-version = "0.3"

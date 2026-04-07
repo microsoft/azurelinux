@@ -1,0 +1,126 @@
+From 187cd33cd500f5f25c0724a8280732827ea54e18 Mon Sep 17 00:00:00 2001
+From: Tom Rix <Tom.Rix@amd.com>
+Date: Sat, 8 Mar 2025 05:58:26 -0800
+Subject: [PATCH] onnxruntime convert gsl::byte to std::byte
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fix the build error
+
+builddir/build/BUILD/onnxruntime-1.20.1-build/onnxruntime-1.20.1/onnxruntime/core/providers/cpu/controlflow/loop.cc:247:18: error: ‘using gsl::byte = enum class std::byte’ is deprecated: Use std::byte instead. [-Werror=deprecated-declarations]
+  247 |   gsl::span<gsl::byte> output_span = gsl::make_span<gsl::byte>(static_cast<gsl::byte*>(output),
+      |                  ^~~~
+
+Signed-off-by: Tom Rix <Tom.Rix@amd.com>
+---
+ onnxruntime/core/providers/cpu/controlflow/loop.cc  | 4 ++--
+ onnxruntime/core/providers/cuda/controlflow/loop.cc | 4 ++--
+ onnxruntime/test/providers/base_tester.cc           | 6 +++---
+ onnxruntime/test/providers/base_tester.h            | 6 +++---
+ 4 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/onnxruntime/core/providers/cpu/controlflow/loop.cc b/onnxruntime/core/providers/cpu/controlflow/loop.cc
+index c65dd2a04bf5..b33b1f189594 100644
+--- a/onnxruntime/core/providers/cpu/controlflow/loop.cc
++++ b/onnxruntime/core/providers/cpu/controlflow/loop.cc
+@@ -244,7 +244,7 @@ static Status ConcatenateCpuOutput(void* /*stream*/,
+ 
+   // we can't easily use a C++ template for the tensor element type,
+   // so use a span for some protection but work in bytes
+-  gsl::span<gsl::byte> output_span = gsl::make_span<gsl::byte>(static_cast<gsl::byte*>(output),
++  gsl::span<std::byte> output_span = gsl::make_span<std::byte>(static_cast<std::byte*>(output),
+                                                                output_size_in_bytes);
+ 
+   for (size_t i = 0, num_iterations = per_iteration_output.size(); i < num_iterations; ++i) {
+@@ -257,7 +257,7 @@ static Status ConcatenateCpuOutput(void* /*stream*/,
+                              " Expected:", per_iteration_shape, " Got:", iteration_data.Shape());
+     }
+ 
+-    auto src = gsl::make_span<const gsl::byte>(static_cast<const gsl::byte*>(iteration_data.DataRaw()),
++    auto src = gsl::make_span<const std::byte>(static_cast<const std::byte*>(iteration_data.DataRaw()),
+                                                bytes_per_iteration);
+     auto dst = output_span.subspan(i * bytes_per_iteration, bytes_per_iteration);
+     gsl::copy(src, dst);
+diff --git a/onnxruntime/core/providers/cuda/controlflow/loop.cc b/onnxruntime/core/providers/cuda/controlflow/loop.cc
+index 3295b73a800c..d66de7c74e64 100644
+--- a/onnxruntime/core/providers/cuda/controlflow/loop.cc
++++ b/onnxruntime/core/providers/cuda/controlflow/loop.cc
+@@ -84,10 +84,10 @@ static Status ConcatenateGpuOutput(void* stream, std::vector<OrtValue>& per_iter
+     CUDA_RETURN_IF_ERROR(cudaMemcpyAsync(cur_output, iteration_data.DataRaw(), bytes_per_iteration,
+                                          cudaMemcpyDeviceToDevice, static_cast<cudaStream_t>(stream)));
+ 
+-    cur_output = static_cast<void*>((static_cast<gsl::byte*>(cur_output) + bytes_per_iteration));
++    cur_output = static_cast<void*>((static_cast<std::byte*>(cur_output) + bytes_per_iteration));
+   }
+ 
+-  ORT_ENFORCE(static_cast<gsl::byte*>(cur_output) - static_cast<gsl::byte*>(output) == output_size_in_bytes,
++  ORT_ENFORCE(static_cast<std::byte*>(cur_output) - static_cast<std::byte*>(output) == output_size_in_bytes,
+               "Concatenation did not fill output buffer as expected.");
+ 
+   return Status::OK();
+diff --git a/onnxruntime/test/providers/base_tester.cc b/onnxruntime/test/providers/base_tester.cc
+index dea39bc99d3e..f1fd2f25d71e 100644
+--- a/onnxruntime/test/providers/base_tester.cc
++++ b/onnxruntime/test/providers/base_tester.cc
+@@ -174,7 +174,7 @@ static std::unique_ptr<SparseTensor> MakeSparseTensor(MLDataType data_type, cons
+   return p_tensor;
+ }
+ 
+-void BaseTester::CopyDataToTensor(gsl::span<const gsl::byte> data, Tensor& dst) {
++void BaseTester::CopyDataToTensor(gsl::span<const std::byte> data, Tensor& dst) {
+   ORT_ENFORCE(dst.SizeInBytes() >= data.size_bytes(), "Not enough space in the destination tensor");
+   memcpy(dst.MutableDataRaw(), data.data(), data.size_bytes());
+ }
+@@ -203,7 +203,7 @@ void BaseTester::AddSparseCooTensorData(std::vector<Data>& data,
+                                         MLDataType data_type,
+                                         const char* name,
+                                         gsl::span<const int64_t> dims,
+-                                        gsl::span<const gsl::byte> values,
++                                        gsl::span<const std::byte> values,
+                                         gsl::span<const int64_t> indices,
+                                         const ValidateOutputParams& check_params,
+                                         const std::vector<std::string>* dim_params) {
+@@ -247,7 +247,7 @@ void BaseTester::AddSparseCsrTensorData(std::vector<Data>& data,
+                                         MLDataType data_type,
+                                         const char* name,
+                                         gsl::span<const int64_t> dims,
+-                                        gsl::span<const gsl::byte> values,
++                                        gsl::span<const std::byte> values,
+                                         gsl::span<const int64_t> inner_indices,
+                                         gsl::span<const int64_t> outer_indices,
+                                         const ValidateOutputParams& check_params,
+diff --git a/onnxruntime/test/providers/base_tester.h b/onnxruntime/test/providers/base_tester.h
+index 512b3402c598..d39cc3c750de 100644
+--- a/onnxruntime/test/providers/base_tester.h
++++ b/onnxruntime/test/providers/base_tester.h
+@@ -868,7 +868,7 @@ class BaseTester {
+   void AddShapeToTensorData(NodeArg& node_arg, gsl::span<const int64_t> dims,
+                             const std::vector<std::string>* dim_params);
+ 
+-  void CopyDataToTensor(gsl::span<const gsl::byte> data, Tensor& dst);
++  void CopyDataToTensor(gsl::span<const std::byte> data, Tensor& dst);
+ 
+ #if !defined(DISABLE_SPARSE_TENSORS)
+   NodeArg MakeSparseNodeArg(int32_t dtype, const char* name,
+@@ -879,7 +879,7 @@ class BaseTester {
+                               MLDataType data_type,
+                               const char* name,
+                               gsl::span<const int64_t> dims,
+-                              gsl::span<const gsl::byte> values,
++                              gsl::span<const std::byte> values,
+                               gsl::span<const int64_t> indices,
+                               const ValidateOutputParams& check_params,
+                               const std::vector<std::string>* dim_params = nullptr);
+@@ -895,7 +895,7 @@ class BaseTester {
+                               MLDataType data_type,
+                               const char* name,
+                               gsl::span<const int64_t> dims,
+-                              gsl::span<const gsl::byte> values,
++                              gsl::span<const std::byte> values,
+                               gsl::span<const int64_t> inner_indices,
+                               gsl::span<const int64_t> outer_indices,
+                               const ValidateOutputParams& check_params,
+-- 
+2.47.1
+

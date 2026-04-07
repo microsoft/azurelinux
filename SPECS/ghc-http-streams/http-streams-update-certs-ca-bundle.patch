@@ -1,0 +1,11 @@
+--- http-streams-0.8.9.9/lib/Network/Http/Inconvenience.hs~	2023-10-20 13:37:49.000000000 +0800
++++ http-streams-0.8.9.9/lib/Network/Http/Inconvenience.hs	2025-07-30 20:04:06.378592936 +0800
+@@ -276,7 +276,7 @@
+     fedora <- doesDirectoryExist "/etc/pki/tls"
+     if fedora
+         then do
+-            SSL.contextSetCAFile ctx "/etc/pki/tls/certs/ca-bundle.crt"
++            SSL.contextSetCAFile ctx "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem"
+         else do
+             SSL.contextSetCADirectory ctx "/etc/ssl/certs"
+     SSL.contextSetVerificationMode ctx $ SSL.VerifyPeer True True Nothing

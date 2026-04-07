@@ -1,0 +1,11 @@
+--- zvbi-0.2.25/src/chains.c.orig	2007-03-09 05:11:52.000000000 +0000
++++ zvbi-0.2.25/src/chains.c	2007-08-23 21:29:44.000000000 +0100
+@@ -168,7 +168,7 @@
+       return 0;
+ }
+ 
+-int open(const char *pathname, int flags, ...)
++int (open)(const char *pathname, int flags, ...)
+ {
+    va_list args;
+    mode_t mode = 0;

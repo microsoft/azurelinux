@@ -1,0 +1,76 @@
+diff --git llvm-project.orig/compiler-rt/lib/sanitizer_common/sanitizer_common_interceptors_ioctl.inc llvm-project/compiler-rt/lib/sanitizer_common/sanitizer_common_interceptors_ioctl.inc
+index 49ec4097c900..dda11daa77f4 100644
+--- llvm-project.orig/compiler-rt/lib/sanitizer_common/sanitizer_common_interceptors_ioctl.inc
++++ llvm-project/compiler-rt/lib/sanitizer_common/sanitizer_common_interceptors_ioctl.inc
+@@ -338,17 +338,9 @@ static void ioctl_table_fill() {
+   _(SOUND_PCM_WRITE_CHANNELS, WRITE, sizeof(int));
+   _(SOUND_PCM_WRITE_FILTER, WRITE, sizeof(int));
+   _(TCFLSH, NONE, 0);
+-#if SANITIZER_GLIBC
+-  _(TCGETA, WRITE, struct_termio_sz);
+-#endif
+   _(TCGETS, WRITE, struct_termios_sz);
+   _(TCSBRK, NONE, 0);
+   _(TCSBRKP, NONE, 0);
+-#if SANITIZER_GLIBC
+-  _(TCSETA, READ, struct_termio_sz);
+-  _(TCSETAF, READ, struct_termio_sz);
+-  _(TCSETAW, READ, struct_termio_sz);
+-#endif
+   _(TCSETS, READ, struct_termios_sz);
+   _(TCSETSF, READ, struct_termios_sz);
+   _(TCSETSW, READ, struct_termios_sz);
+diff --git llvm-project.orig/compiler-rt/lib/sanitizer_common/sanitizer_platform_limits_posix.cpp llvm-project/compiler-rt/lib/sanitizer_common/sanitizer_platform_limits_posix.cpp
+index 6d61d276d77e..3fb5a40ba852 100644
+--- llvm-project.orig/compiler-rt/lib/sanitizer_common/sanitizer_platform_limits_posix.cpp
++++ llvm-project/compiler-rt/lib/sanitizer_common/sanitizer_platform_limits_posix.cpp
+@@ -479,9 +479,6 @@ unsigned struct_ElfW_Phdr_sz = sizeof(Elf_Phdr);
+   unsigned struct_input_id_sz = sizeof(struct input_id);
+   unsigned struct_mtpos_sz = sizeof(struct mtpos);
+   unsigned struct_rtentry_sz = sizeof(struct rtentry);
+-#if SANITIZER_GLIBC || SANITIZER_ANDROID
+-  unsigned struct_termio_sz = sizeof(struct termio);
+-#endif
+   unsigned struct_vt_consize_sz = sizeof(struct vt_consize);
+   unsigned struct_vt_sizes_sz = sizeof(struct vt_sizes);
+   unsigned struct_vt_stat_sz = sizeof(struct vt_stat);
+@@ -758,13 +755,9 @@ unsigned struct_ElfW_Phdr_sz = sizeof(Elf_Phdr);
+   unsigned IOCTL_SOUND_PCM_WRITE_FILTER = SOUND_PCM_WRITE_FILTER;
+ #endif // SOUND_VERSION
+   unsigned IOCTL_TCFLSH = TCFLSH;
+-  unsigned IOCTL_TCGETA = TCGETA;
+   unsigned IOCTL_TCGETS = TCGETS;
+   unsigned IOCTL_TCSBRK = TCSBRK;
+   unsigned IOCTL_TCSBRKP = TCSBRKP;
+-  unsigned IOCTL_TCSETA = TCSETA;
+-  unsigned IOCTL_TCSETAF = TCSETAF;
+-  unsigned IOCTL_TCSETAW = TCSETAW;
+   unsigned IOCTL_TCSETS = TCSETS;
+   unsigned IOCTL_TCSETSF = TCSETSF;
+   unsigned IOCTL_TCSETSW = TCSETSW;
+diff --git llvm-project.orig/compiler-rt/lib/sanitizer_common/sanitizer_platform_limits_posix.h llvm-project/compiler-rt/lib/sanitizer_common/sanitizer_platform_limits_posix.h
+index 34bfef1f7ef4..62d553b18ef5 100644
+--- llvm-project.orig/compiler-rt/lib/sanitizer_common/sanitizer_platform_limits_posix.h
++++ llvm-project/compiler-rt/lib/sanitizer_common/sanitizer_platform_limits_posix.h
+@@ -1013,7 +1013,6 @@ extern unsigned struct_hd_geometry_sz;
+ extern unsigned struct_input_absinfo_sz;
+ extern unsigned struct_input_id_sz;
+ extern unsigned struct_mtpos_sz;
+-extern unsigned struct_termio_sz;
+ extern unsigned struct_vt_consize_sz;
+ extern unsigned struct_vt_sizes_sz;
+ extern unsigned struct_vt_stat_sz;
+@@ -1258,13 +1257,9 @@ extern unsigned IOCTL_SNDCTL_COPR_SENDMSG;
+ extern unsigned IOCTL_SNDCTL_COPR_WCODE;
+ extern unsigned IOCTL_SNDCTL_COPR_WDATA;
+ extern unsigned IOCTL_TCFLSH;
+-extern unsigned IOCTL_TCGETA;
+ extern unsigned IOCTL_TCGETS;
+ extern unsigned IOCTL_TCSBRK;
+ extern unsigned IOCTL_TCSBRKP;
+-extern unsigned IOCTL_TCSETA;
+-extern unsigned IOCTL_TCSETAF;
+-extern unsigned IOCTL_TCSETAW;
+ extern unsigned IOCTL_TCSETS;
+ extern unsigned IOCTL_TCSETSF;
+ extern unsigned IOCTL_TCSETSW;

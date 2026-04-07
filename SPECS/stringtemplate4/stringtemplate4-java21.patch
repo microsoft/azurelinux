@@ -1,0 +1,48 @@
+--- stringtemplate4-ST4-4.3.4/test/org/stringtemplate/v4/test/TestRenderers.java.orig	2022-09-02 15:19:52.000000000 -0600
++++ stringtemplate4-ST4-4.3.4/test/org/stringtemplate/v4/test/TestRenderers.java	2024-02-28 14:23:57.034251125 -0700
+@@ -77,6 +77,8 @@ public class TestRenderers extends BaseT
+         String expecting = "datetime: 7/5/05, 12:00 AM";
+         if ( javaVersion.startsWith("1.6") || javaVersion.startsWith("1.7") || javaVersion.startsWith("1.8") ) {
+             expecting = "datetime: 7/5/05 12:00 AM";
++        } else if (javaVersion.startsWith("21")) {
++            expecting = "datetime: 7/5/05, 12:00\u202FAM";
+         }
+         String result = st.render();
+         assertEquals(expecting, result);
+@@ -106,6 +108,8 @@ public class TestRenderers extends BaseT
+         String expecting = " datetime: 7/5/05, 12:00 AM ";
+         if ( javaVersion.startsWith("1.6") || javaVersion.startsWith("1.7") || javaVersion.startsWith("1.8") ) {
+             expecting = " datetime: 7/5/05 12:00 AM ";
++        } else if ( javaVersion.startsWith("21") ) {
++            expecting = " datetime: 7/5/05, 12:00\u202FAM ";
+         }
+         String result = st.render();
+         assertEquals(expecting, result);
+@@ -126,6 +130,8 @@ public class TestRenderers extends BaseT
+             String expecting = " datetime: Tuesday, July 5, 2005 at 12:00:00 AM Pacific Daylight Time ";
+             if ( javaVersion.startsWith("1.6") || javaVersion.startsWith("1.7") || javaVersion.startsWith("1.8") ) {
+                 expecting = " datetime: Tuesday, July 5, 2005 12:00:00 AM PDT ";
++            } else if (javaVersion.startsWith("21")) {
++                expecting = " datetime: Tuesday, July 5, 2005, 12:00:00\u202FAM Pacific Daylight Time ";
+             }
+             String result = st.render();
+             assertEquals(expecting, result);
+@@ -160,6 +166,9 @@ public class TestRenderers extends BaseT
+         ST st = group.getInstanceOf("dateThing");
+         st.add("created", new GregorianCalendar(2005, 7 - 1, 5));
+         String expecting = " time: 12:00:00 AM ";
++        if ( javaVersion.startsWith("21")) {
++            expecting = " time: 12:00:00\u202FAM ";
++        }
+         String result = st.render();
+         assertEquals(expecting, result);
+     }
+@@ -400,6 +409,8 @@ public class TestRenderers extends BaseT
+         String expected = "12 de junho de 2012";
+         if ( javaVersion.startsWith("1.6") || javaVersion.startsWith("1.7") || javaVersion.startsWith("1.8") ) {
+             expected = "12 de Junho de 2012";
++        } else if ( javaVersion.startsWith("21") ) {
++            expected = "12 de junho de 2012";
+         }
+         assertEquals(expected, st.render(new Locale("pt")));
+     }

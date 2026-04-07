@@ -1,0 +1,77 @@
+From c630436627732282b57a647745f39309dc0a53f6 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Wed, 12 Jan 2022 16:15:52 +0100
+Subject: [PATCH] Fix parallel tests
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+t/02.t creates a statefile in the current working directory. If the
+test is run in parallel with t/01.t, a sudden appearance of the file
+disturbs t/01.t
+
+This patch fixes it.
+
+CPAN RT#91854
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ Makefile.PL | 12 +++++++++++-
+ t/02.t      |  8 ++++++--
+ 2 files changed, 17 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile.PL b/Makefile.PL
+index 8472690..bf701fb 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -1,10 +1,20 @@
+ use ExtUtils::MakeMaker;
+ # See lib/ExtUtils/MakeMaker.pm for details of how to influence
+ # the contents of the Makefile that is written.
++my %deps = (
++    'PREREQ_PM'       => {'Storable' => 2.04, 'Class::Iterator' => 0.1}, # e.g., Module::Name => 1.1
++    'TEST_REQUIRES'   => {'File::Spec' => 0, 'File::Temp' => 0.19}
++);
++if ($ExtUtils::MakeMaker::VERSION < 6.64) {
++    for (keys %{$deps{'TEST_REQUIRES'}}) {
++        $deps{'PREREQ_PM'}{$_} = $deps{'TEST_REQUIRES'}{$_}
++    }
++    delete $deps{'TEST_REQUIRES'};
++}
+ WriteMakefile(
+               'NAME'            => 'File::Find::Iterator',
+               'VERSION_FROM'    => 'Iterator.pm', # finds $VERSION
+-              'PREREQ_PM'       => {Storable => 2.04, Class::Iterator => 0.1}, # e.g., Module::Name => 1.1
++              %deps,
+ 	      ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
+ 	       (AUTHOR     => 'Robert Silve <robert@silve.net>') : ()),
+ );
+diff --git a/t/02.t b/t/02.t
+index ed30c6c..bcce84a 100644
+--- a/t/02.t
++++ b/t/02.t
+@@ -3,6 +3,8 @@
+ use Test::More;
+ BEGIN { plan tests => 2 };
+ use File::Find::Iterator;
++use File::Temp 0.19;
++use File::Spec;
+ 
+ my $find = File::Find::Iterator->create(dir => ["."]);
+ 
+@@ -12,8 +14,10 @@ while (my $f =  $find->next) {
+ }
+ ok @res;
+ 
+-# test the statefile option
+-$find->statefile('statefile');
++# test the statefile option, save it out of current working directory not to
++# interfere with other test.
++my $tmpdir = File::Temp->newdir();
++$find->statefile(File::Spec->catfile($tmpdir, 'statefile'));
+ $find->first;
+ my @res2 = ();
+ push @res2, $find->next, $find->next;
+-- 
+2.34.1
+

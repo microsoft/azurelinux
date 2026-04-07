@@ -1,0 +1,100 @@
+diff -up rrdtool-1.4.4/php4/rrdtool.c.php54 rrdtool-1.4.4/php4/rrdtool.c
+--- rrdtool-1.4.4/php4/rrdtool.c.php54	2011-12-29 08:57:00.790784347 +0100
++++ rrdtool-1.4.4/php4/rrdtool.c	2011-12-29 09:00:55.960794927 +0100
+@@ -39,7 +39,7 @@
+ ZEND_DECLARE_MODULE_GLOBALS(rrdtool)
+  */
+ 
+-function_entry rrdtool_functions[] = {
++zend_function_entry rrdtool_functions[] = {
+ 	PHP_FE(rrd_graph, NULL)
+ 	PHP_FE(rrd_fetch, NULL)
+ 	PHP_FE(rrd_error, NULL)
+@@ -119,8 +119,8 @@ PHP_MINFO_FUNCTION(rrdtool)
+ 	Creates a graph based on options passed via an array */
+ PHP_FUNCTION(rrd_graph)
+ {
+-	pval *file, *args, *p_argc;
+-	pval *entry;
++	zval *file, *args, *p_argc;
++	zval *entry;
+ 	zval *p_calcpr;
+ 	HashTable *args_arr;
+ 	int i, xsize, ysize, argc;
+@@ -155,7 +155,7 @@ PHP_FUNCTION(rrd_graph)
+ 
+ 		for (i = 3; i < argc; i++) 
+ 		{
+-			pval **dataptr;
++			zval **dataptr;
+ 
+ 			if ( zend_hash_get_current_data(args_arr, (void *) &dataptr) == FAILURE )
+ 				continue;
+@@ -216,9 +216,8 @@ PHP_FUNCTION(rrd_graph)
+ 	Fetch info from an RRD file */
+ PHP_FUNCTION(rrd_fetch)
+ {
+-	pval *file, *args, *p_argc;
+-	pval *entry;
+-	pval *p_start, *p_end, *p_step, *p_ds_cnt;
++	zval *file, *args, *p_argc;
++	zval *entry;
+ 	HashTable *args_arr;
+ 	zval *p_ds_namv, *p_data;
+ 	int i, j, argc;
+@@ -254,7 +253,7 @@ PHP_FUNCTION(rrd_fetch)
+ 
+ 		for (i = 3; i < argc; i++) 
+ 		{
+-			pval **dataptr;
++			zval **dataptr;
+ 
+ 			if ( zend_hash_get_current_data(args_arr, (void *) &dataptr) == FAILURE )
+ 				continue;
+@@ -361,7 +360,7 @@ PHP_FUNCTION(rrd_clear_error)
+ 	Update an RRD file with values specified */
+ PHP_FUNCTION(rrd_update)
+ {
+-	pval *file, *opt;
++	zval *file, *opt;
+ 	char **argv;
+ 
+ 	if ( rrd_test_error() )
+@@ -404,7 +403,7 @@ PHP_FUNCTION(rrd_update)
+ 	Gets last update time of an RRD file */
+ PHP_FUNCTION(rrd_last)
+ {
+-	pval *file;
++	zval *file;
+ 	unsigned long retval;
+ 
+ 	char **argv = (char **) emalloc(3 * sizeof(char *));
+@@ -439,8 +438,8 @@ PHP_FUNCTION(rrd_last)
+ 	Create an RRD file with the options passed (passed via array) */ 
+ PHP_FUNCTION(rrd_create)
+ {
+-	pval *file, *args, *p_argc;
+-	pval *entry;
++	zval *file, *args, *p_argc;
++	zval *entry;
+ 	char **argv;
+ 	HashTable *args_arr;
+ 	int argc, i;
+@@ -449,7 +448,7 @@ PHP_FUNCTION(rrd_create)
+ 		rrd_clear_error();
+ 
+ 	if ( ZEND_NUM_ARGS() == 3 && 
+-		getParameters(ht, 3, &file, &args, &p_argc) == SUCCESS )
++		zend_get_parameters(ht, 3, &file, &args, &p_argc) == SUCCESS )
+ 	{
+ 		if ( args->type != IS_ARRAY )
+ 		{ 
+@@ -473,7 +472,7 @@ PHP_FUNCTION(rrd_create)
+ 
+ 		for (i = 3; i < argc; i++) 
+ 		{
+-			pval **dataptr;
++			zval **dataptr;
+ 
+ 			if ( zend_hash_get_current_data(args_arr, (void *) &dataptr) == FAILURE )
+ 				continue;

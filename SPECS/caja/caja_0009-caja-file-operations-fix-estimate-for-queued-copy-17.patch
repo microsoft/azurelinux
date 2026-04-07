@@ -1,0 +1,72 @@
+From bfa6b650c732ff9edddd1537b14bdab39819fc45 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Stefan=20P=C3=B6schel?=
+ <basicmaster@users.noreply.github.com>
+Date: Fri, 13 Dec 2024 05:44:28 +0100
+Subject: [PATCH 09/10] caja-file-operations: fix estimate for queued copy
+ (#1759)
+
+* caja-file-operations: fix estimate for queued copy
+
+Fixes the condition for showing an estimate of the remaining duration in
+case a copy operation is queued, correctly considering the current
+transfer rate.
+
+* caja-file-operations: fix division by 0 for delete
+
+Aligning to the copy operation case, this fixes the condition for
+showing an estimate of the remaining duration for delete operations,
+preventing a possible division by 0 due to a zero transfer rate.
+---
+ libcaja-private/caja-file-operations.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
+
+diff --git a/libcaja-private/caja-file-operations.c b/libcaja-private/caja-file-operations.c
+index edc595b1..6ab8697d 100644
+--- a/libcaja-private/caja-file-operations.c
++++ b/libcaja-private/caja-file-operations.c
+@@ -1497,7 +1497,7 @@ report_delete_progress (CommonJob *job,
+ 			TransferInfo *transfer_info)
+ {
+ 	int files_left;
+-	double elapsed;
++	double elapsed, transfer_rate;
+ 	gint64 now;
+ 	char *files_left_s;
+ 
+@@ -1524,15 +1524,19 @@ report_delete_progress (CommonJob *job,
+ 					    f (_("Deleting files")));
+ 
+ 	elapsed = g_timer_elapsed (job->time, NULL);
+-	if (elapsed < SECONDS_NEEDED_FOR_RELIABLE_TRANSFER_RATE) {
++	transfer_rate = 0;
++	if (elapsed > 0) {
++		transfer_rate = transfer_info->num_files / elapsed;
++	}
++
++	if (elapsed < SECONDS_NEEDED_FOR_RELIABLE_TRANSFER_RATE ||
++		transfer_rate <= 0) {
+ 
+ 		caja_progress_info_set_details (job->progress, files_left_s);
+ 	} else {
+ 		char *details, *time_left_s;
+ 		int remaining_time;
+-		double transfer_rate;
+ 
+-		transfer_rate = transfer_info->num_files / elapsed;
+ 		remaining_time = files_left / transfer_rate;
+ 
+ 		/* Translators: %T will expand to a time like "2 minutes".
+@@ -3109,8 +3113,8 @@ report_copy_progress (CopyMoveJob *copy_job,
+ 		transfer_rate = transfer_info->num_bytes / elapsed;
+ 	}
+ 
+-	if (elapsed < SECONDS_NEEDED_FOR_RELIABLE_TRANSFER_RATE &&
+-	    transfer_rate > 0) {
++	if (elapsed < SECONDS_NEEDED_FOR_RELIABLE_TRANSFER_RATE ||
++	    transfer_rate <= 0) {
+ 		char *s;
+ 		/* Translators: %S will expand to a size like "2 bytes" or "3 MB", so something like "4 kb of 4 MB" */
+ 		s = f (_("%S of %S"), transfer_info->num_bytes, total_size);
+-- 
+2.48.1
+

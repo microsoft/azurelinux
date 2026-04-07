@@ -1,0 +1,24 @@
+From ef7204ccf6d2fbf5b465d30d74dd2245ff3e2f6b Mon Sep 17 00:00:00 2001
+From: Karolina Surma <ksurma@redhat.com>
+Date: Thu, 27 Mar 2025 11:56:04 +0100
+Subject: [PATCH] Add compatibility with sphinx 8.2+
+
+---
+ numpydoc/tests/test_numpydoc.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/numpydoc/tests/test_numpydoc.py b/numpydoc/tests/test_numpydoc.py
+index 1bd71ed..ecb92e2 100644
+--- a/numpydoc/tests/test_numpydoc.py
++++ b/numpydoc/tests/test_numpydoc.py
+@@ -36,6 +36,7 @@ class MockConfig:
+ 
+ class MockBuilder:
+     config = MockConfig()
++    _translator = None
+ 
+ 
+ class MockApp:
+-- 
+2.48.1
+

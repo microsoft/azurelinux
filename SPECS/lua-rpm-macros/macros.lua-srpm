@@ -1,0 +1,10 @@
+%lua_version %{lua: print(string.sub(_VERSION, 5))}
+
+%lua_requires \
+%if 0%{?fedora} || 0%{?rhel} >= 7 \
+Requires: lua(abi) = %{lua_version} \
+%else \
+Requires: lua >= %{lua_version} \
+Requires: lua < %{lua: locale=os.setlocale(nil); os.setlocale('C.utf8'); print(string.sub(_VERSION, 5) + 0.1); os.setlocale(locale)} \
+%endif \
+%{nil}

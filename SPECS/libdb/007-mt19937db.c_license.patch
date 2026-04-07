@@ -1,0 +1,49 @@
+Description: mt19937db.c license should include the GPL
+ This file is distributed from upstream Berkeley DB under the Artistic
+ License (no version specified), althouth it was later released by the
+ original author under both GPL2+ and BSD.
+ .
+ References:
+ http://web.archive.org/web/20010806225716/http://www.math.keio.ac.jp/matumoto/mt19937int.c
+ http://web.archive.org/web/20130127064020/http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/MT2002/CODES/mt19937ar.c
+ https://bugzilla.redhat.com/show_bug.cgi?format=multiple&id=886838
+ https://lists.nongnu.org/archive/html/gnu-linux-libre/2010-05/msg00000.html
+ .
+Author: Ruben Rodriguez <ruben@trisquel.info>
+
+
+--- db-5.3.21/src/crypto/mersenne/mt19937db.c.licensefix
++++ db-5.3.21/src/crypto/mersenne/mt19937db.c
+@@ -16,16 +16,27 @@
+ /*   Coded by Takuji Nishimura, considering the suggestions by    */
+ /* Topher Cooper and Marc Rieffel in July-Aug. 1997.              */
+ 
+-/* This library is free software under the Artistic license:       */
+-/* see the file COPYING distributed together with this code.       */
+-/* For the verification of the code, its output sequence file      */
+-/* mt19937int.out is attached (2001/4/2)                           */
+-
+ /* Copyright (C) 1997, 1999 Makoto Matsumoto and Takuji Nishimura. */
+ /* Any feedback is very welcome. For any question, comments,       */
+ /* see http://www.math.keio.ac.jp/matumoto/emt.html or email       */
+ /* matumoto@math.keio.ac.jp                                        */
+ 
++/* This library is free software; you can redistribute it and/or   */
++/* modify it under the terms of the GNU Library General Public     */
++/* License as published by the Free Software Foundation; either    */
++/* version 2 of the License, or (at your option) any later         */
++/* version.                                                        */
++/* This library is distributed in the hope that it will be useful, */
++/* but WITHOUT ANY WARRANTY; without even the implied warranty of  */
++/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.            */
++/* See the GNU Library General Public License for more details.    */
++/* You should have received a copy of the GNU Library General      */
++/* Public License along with this library; if not, write to the    */
++/* Free Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA   */ 
++/* 02111-1307  USA                                                 */
++
++/* This library is free software under the Artistic license:       */
++
+ /* REFERENCE                                                       */
+ /* M. Matsumoto and T. Nishimura,                                  */
+ /* "Mersenne Twister: A 623-Dimensionally Equidistributed Uniform  */

@@ -1,0 +1,54 @@
+diff -up pegasus/src/Pegasus/Common/CIMName.h.orig pegasus/src/Pegasus/Common/CIMName.h
+--- pegasus/src/Pegasus/Common/CIMName.h.orig	2008-12-02 10:00:43.000000000 +0100
++++ pegasus/src/Pegasus/Common/CIMName.h	2021-06-23 09:32:06.900922384 +0200
+@@ -88,6 +88,8 @@ public:
+     */
+     CIMName(const char* name);
+ 
++    CIMName(const CIMName& other) : cimName(other.cimName) {}
++
+     /**
+         Assigns the value of the specified CIMName object to this object.
+         @param name The CIMName object from which to assign this
+@@ -279,6 +281,8 @@ public:
+     */
+     CIMNamespaceName(const char* name);
+ 
++    CIMNamespaceName(const CIMNamespaceName& other) : cimNamespaceName(other.cimNamespaceName) {}
++
+     /**
+         Assigns the value of the specified CIMNamespaceName object to this
+         object.
+diff -up pegasus/src/Pegasus/Common/Memory.h.orig pegasus/src/Pegasus/Common/Memory.h
+--- pegasus/src/Pegasus/Common/Memory.h.orig	2008-12-02 10:00:48.000000000 +0100
++++ pegasus/src/Pegasus/Common/Memory.h	2021-06-23 09:32:06.901922405 +0200
+@@ -59,7 +59,7 @@ PEGASUS_NAMESPACE_BEGIN
+ template<class T>
+ inline void Zeros(T* items, Uint32 size)
+ {
+-    memset(items, 0, sizeof(T) * size);
++    memset(static_cast<void*>(items), 0, sizeof(T) * size);
+ }
+ 
+ template<class T>
+@@ -157,7 +157,7 @@ inline void CopyToRaw(Real64* to, const
+ 
+ inline void CopyToRaw(Char16* to, const Char16* from, Uint32 size)
+ {
+-    memcpy(to, from, sizeof(Char16) * size);
++    memcpy(static_cast<void*>(to), from, sizeof(Char16) * size);
+ }
+ 
+ template<class T>
+diff -up pegasus/src/Pegasus/Common/Threads.h.orig pegasus/src/Pegasus/Common/Threads.h
+--- pegasus/src/Pegasus/Common/Threads.h.orig	2013-02-13 19:21:14.000000000 +0100
++++ pegasus/src/Pegasus/Common/Threads.h	2021-06-23 09:32:06.901922405 +0200
+@@ -245,7 +245,7 @@ inline bool Threads::null(const ThreadTy
+ 
+ inline void Threads::clear(ThreadType& x)
+ {
+-    memset(&x, 0, sizeof(x));
++    memset(static_cast<void*>(&x), 0, sizeof(x));
+ }
+ 
+ #endif /* defined(PEGASUS_HAVE_PTHREADS) */

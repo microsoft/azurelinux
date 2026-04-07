@@ -1,0 +1,21 @@
+--- argfile-0.2.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ argfile-0.2.1/Cargo.toml	2025-07-22T16:02:02.691551+00:00
+@@ -92,10 +92,6 @@
+ [dependencies.os_str_bytes]
+ version = "7.0"
+ 
+-[dependencies.winsplit]
+-version = "0.1.0"
+-optional = true
+-
+ [dev-dependencies.clap]
+ version = "4.5.4"
+ 
+@@ -104,7 +100,6 @@
+ 
+ [features]
+ default = []
+-response = ["dep:winsplit"]
+ 
+ [lints.clippy]
+ bool_assert_comparison = "allow"

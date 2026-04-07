@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Name=Quod Libet Playlist
+Name[de]=Quod Libet Wiedergabeliste
+GenericName=Audio Playlist
+GenericName[de]= Wiedergabeliste
+Comment=Enque files to playlist
+Comment[de]=Dateien zur Wiedergabeliste hinzufügen
+Exec=quodlibet --enqueue %F
+TryExec=quodlibet
+Icon=quodlibet
+MimeType=audio/prs.sid;audio/x-flac;audio/x-it;audio/x-mod;audio/x-ms-wma;audio/x-musepack;audio/x-s3m;audio/x-stm;audio/x-xm;application/ogg;audio/x-vorbis+ogg;inode/directory;
+Terminal=false
+Type=Application

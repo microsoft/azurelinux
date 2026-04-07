@@ -1,0 +1,359 @@
+--- lib/Exception/Assertion.pm
++++ lib/Exception/Assertion.pm
+@@ -128,7 +128,7 @@ class.
+             %ATTRS,
+         },
+     );
+-};
++}
+ 
+ 
+ 1;
+--- lib/Test/Assert.pm
++++ lib/Test/Assert.pm
+@@ -110,7 +110,7 @@ sub import {
+     if ($caller eq 'main') {
+         undef *ASSERT;
+         *ASSERT = sub () { TRUE; };
+-    };
++    }
+ 
+     my @export_ok = ( 'ASSERT', grep { /^(assert_|fail)/ } keys %{ stash(__PACKAGE__) } );
+     my %export_tags = (
+@@ -122,8 +122,9 @@ sub import {
+         OK   => \@export_ok,
+         TAGS => \%export_tags,
+     }, @names);
+-};
++}
+ 
++## no critic (ProhibitBuiltinHomonyms)
+ 
+ # Disable debug mode
+ sub unimport {
+@@ -134,10 +135,10 @@ sub unimport {
+     if ($caller eq 'main') {
+         undef *ASSERT;
+         *ASSERT = sub () { FALSE; };
+-    };
++    }
+ 
+     return unexport_package($caller, $package);
+-};
++}
+ 
+ 
+ ## no critic (ProhibitNegativeExpressionsInUnlessAndUntilConditions)
+@@ -158,7 +159,7 @@ sub fail (;$$) {
+ 
+     assert_false("Should never occured") if ASSERT;
+     return FALSE;
+-};
++}
+ 
+ 
+ # Asserts that a condition is true.
+@@ -170,7 +171,7 @@ sub assert_true ($;$) {
+     $self->fail($message, "Expected true value, got undef") unless defined $boolean;
+     $self->fail($message, "Expected true value, got '$boolean'") unless $boolean;
+     return TRUE;
+-};
++}
+ 
+ 
+ # Asserts that a condition is false.
+@@ -181,7 +182,7 @@ sub assert_false ($;$) {
+ 
+     $self->fail($message, "Expected false value, got '$boolean'") unless not $boolean;
+     return TRUE;
+-};
++}
+ 
+ 
+ # Asserts that a value is null.
+@@ -192,7 +193,7 @@ sub assert_null ($;$) {
+ 
+     $self->fail($message, "'$value' is defined") unless not defined $value;
+     return TRUE;
+-};
++}
+ 
+ 
+ # Asserts that a value is not null.
+@@ -203,7 +204,7 @@ sub assert_not_null ($;$) {
+ 
+     $self->fail($message, 'undef unexpected') unless defined $value;
+     return TRUE;
+-};
++}
+ 
+ 
+ # Assert that two values are equal
+@@ -225,9 +226,9 @@ sub assert_equals ($$;$) {
+     }
+     else {
+         $self->fail($message, "Expected '$value1', got '$value2'") unless $value1 eq $value2;
+-    };
++    }
+     return TRUE;
+-};
++}
+ 
+ 
+ # Assert that two values are not equal
+@@ -238,7 +239,7 @@ sub assert_not_equals ($$;$) {
+ 
+     if (not defined $value1 and not defined $value2) {
+         $self->fail($message, 'Both values were undefined');
+-    };
++    }
+     return TRUE if (not defined $value1 xor not defined $value2);
+     if ($value1 =~ /^[+-]?(\d+\.\d+|\d+\.|\.\d+|\d+)([eE][+-]?\d+)?$/ and
+            $value2 =~ /^[+-]?(\d+\.\d+|\d+\.|\.\d+|\d+)([eE][+-]?\d+)?$/)
+@@ -248,9 +249,9 @@ sub assert_not_equals ($$;$) {
+     }
+     else {
+         $self->fail($message, "'$value1' and '$value2' should differ") unless $value1 ne $value2;
+-    };
++    }
+     return TRUE;
+-};
++}
+ 
+ 
+ # Assert that two values are numerically equal
+@@ -265,7 +266,7 @@ sub assert_num_equals ($$;$) {
+     $self->fail($message, 'Expected ' . (0+$value1) . ', got undef') if not defined $value2;
+     $self->fail($message, 'Expected ' . (0+$value1) . ', got ' . (0+$value2)) unless $value1 == $value2;
+     return TRUE;
+-};
++}
+ 
+ 
+ # Assert that two values are numerically not equal
+@@ -276,12 +277,12 @@ sub assert_num_not_equals ($$;$) {
+     my ($value1, $value2, $message) = @_;
+     if (not defined $value1 and not defined $value2) {
+         $self->fail($message, 'Both values were undefined');
+-    };
++    }
+     return TRUE if (not defined $value1 xor not defined $value2);
+     no warnings 'numeric';
+     $self->fail($message, (0+$value1) . ' and ' . (0+$value2) . ' should differ') unless $value1 != $value2;
+     return TRUE;
+-};
++}
+ 
+ 
+ # Assert that two strings are equal
+@@ -297,7 +298,7 @@ sub assert_str_equals ($$;$) {
+     $self->fail($message, "Expected '$value1', got undef") unless defined $value2;
+     $self->fail($message, "Expected '$value1', got '$value2'") unless "$value1" eq "$value2";
+     return TRUE;
+-};
++}
+ 
+ 
+ # Assert that two strings are not equal
+@@ -308,11 +309,11 @@ sub assert_str_not_equals ($$;$) {
+     my ($value1, $value2, $message) = @_;
+     if (not defined $value1 and not defined $value2) {
+         $self->fail($message, 'Both values were undefined');
+-    };
++    }
+     return TRUE if (not defined $value1 xor not defined $value2);
+     $self->fail($message, "'$value1' and '$value2' should differ") unless "$value1" ne "$value2";
+     return TRUE;
+-};
++}
+ 
+ 
+ # Assert that string matches regexp
+@@ -330,7 +331,7 @@ sub assert_matches ($$;$) {
+     $self->fail($message, "Expected /$regexp/, got undef") unless defined $value;
+     $self->fail($message, "'$value' didn't match /$regexp/") unless $value =~ $regexp;
+     return TRUE;
+-};
++}
+ 
+ 
+ # Assert that string matches regexp
+@@ -348,7 +349,7 @@ sub assert_not_matches ($$;$) {
+     ) unless ref $regexp eq 'Regexp';
+     $self->fail($message, "'$value' matched /$regexp/") unless $value !~ $regexp;
+     return TRUE;
+-};
++}
+ 
+ 
+ # Assert that data structures are deeply equal
+@@ -369,7 +370,7 @@ sub assert_deep_equals ($$;$) {
+     ) unless $self->_deep_check($value1, $value2, $data_stack, $seen_refs);
+ 
+     return TRUE;
+-};
++}
+ 
+ 
+ # Assert that data structures are deeply equal
+@@ -390,7 +391,7 @@ sub assert_deep_not_equals ($$;$) {
+     ) unless not $self->_deep_check($value1, $value2, $data_stack, $seen_refs);
+ 
+     return TRUE;
+-};
++}
+ 
+ 
+ # Assert that object is a class
+@@ -407,9 +408,9 @@ sub assert_isa ($$;$) {
+     if (not __isa($value, $class)) {
+         $self->fail($message, "Expected '$class' object or class, got '" . ref($value) . "' reference") if ref $value;
+         $self->fail($message, "Expected '$class' object or class, got '$value' value");
+-    };
++    }
+     return TRUE;
+-};
++}
+ 
+ 
+ # Assert that object is not a class
+@@ -424,9 +425,9 @@ sub assert_not_isa ($$;$) {
+     ) unless defined $class;
+     if (__isa($value, $class)) {
+         $self->fail($message, "'$value' is a '$class' object or class");
+-    };
++    }
+     return TRUE;
+-};
++}
+ 
+ 
+ # Assert that code throws an exception
+@@ -456,8 +457,8 @@ sub assert_raises ($&;$) {
+                 while ($caught_message =~ s/\t\.\.\.propagated at (?!.*\bat\b.*).* line \d+( thread \d+)?\.\n$//s) { }
+                 $caught_message =~ s/( at (?!.*\bat\b.*).* line \d+( thread \d+)?\.)?\n$//s;
+                 return TRUE if $caught_message eq $expected;
+-            };
+-        };
++            }
++        }
+         # Rethrow an exception
+         ## no critic (RequireCarping)
+         die $e;
+@@ -466,9 +467,9 @@ sub assert_raises ($&;$) {
+         $self->fail(
+             $message, 'Expected exception was not raised'
+         );
+-    };
++    }
+     return TRUE;
+-};
++}
+ 
+ 
+ # Assert that Test::Builder method is ok
+@@ -503,9 +504,9 @@ sub assert_test (&;$) {
+         $self->fail(
+             $new_message, 'assert_test failed'
+         ) unless $ok_return;
+-    };
++    }
+     return TRUE;
+-};
++}
+ 
+ 
+ # Checks if deep structures are equal
+@@ -516,7 +517,7 @@ sub _deep_check {
+         return TRUE if !defined $e1 && !defined $e2;
+         push @$data_stack, { vals => [$e1, $e2] };
+         return FALSE;
+-    };
++    }
+ 
+     return TRUE if $e1 eq $e2;
+ 
+@@ -524,7 +525,7 @@ sub _deep_check {
+         my $e2_ref = "$e2";
+         return TRUE if defined $seen_refs->{$e1} && $seen_refs->{$e1} eq $e2_ref;
+         $seen_refs->{$e1} = $e2_ref;
+-    };
++    }
+ 
+     if (ref $e1 eq 'ARRAY' and ref $e2 eq 'ARRAY') {
+         return $self->_eq_array($e1, $e2, $data_stack, $seen_refs);
+@@ -544,10 +545,10 @@ sub _deep_check {
+     }
+     else {
+         push @$data_stack, { vals => [$e1, $e2] };
+-    };
++    }
+ 
+     return FALSE;
+-};
++}
+ 
+ 
+ # Checks if arrays are equal
+@@ -568,10 +569,10 @@ sub _eq_array  {
+         pop @$data_stack if $ok;
+ 
+         last unless $ok;
+-    };
++    }
+ 
+     return $ok;
+-};
++}
+ 
+ 
+ # Checks if hashes are equal
+@@ -591,10 +592,10 @@ sub _eq_hash {
+         pop @$data_stack if $ok;
+ 
+         last unless $ok;
+-    };
++    }
+ 
+     return $ok;
+-};
++}
+ 
+ 
+ # Dumps the differences for deep structures
+@@ -616,8 +617,8 @@ sub _format_stack {
+         }
+         elsif ($type eq 'REF') {
+             $var = "\${$var}";
+-        };
+-    };
++        }
++    }
+ 
+     my @vals = @{$data_stack->[-1]{vals}}[0,1];
+ 
+@@ -631,13 +632,13 @@ sub _format_stack {
+         $vals[$idx] = !defined $val ? 'undef' :
+                       $val eq $DNE  ? 'Does not exist'
+                                     : "'$val'";
+-    };
++    }
+ 
+     $out .= "$vars[0] = $vals[0]\n";
+     $out .= "$vars[1] = $vals[1]";
+ 
+     return $out;
+-};
++}
+ 
+ 
+ # Better, safe "isa" function
+@@ -646,7 +647,7 @@ sub __isa {
+     local $@ = '';
+     local $SIG{__DIE__} = '';
+     return eval { $object->isa($class) };
+-};
++}
+ 
+ 
+ no constant::boolean;

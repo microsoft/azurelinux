@@ -1,0 +1,22 @@
+diff --git a/linux-boot-probes/mounted/common/40grub2 b/linux-boot-probes/mounted/common/40grub2
+index 664505f..5895e45 100755
+--- a/linux-boot-probes/mounted/common/40grub2
++++ b/linux-boot-probes/mounted/common/40grub2
+@@ -77,7 +77,7 @@ parse_grub_menu () {
+ 					ignore_item=1
+ 				fi
+ 			;;
+-			linux)
++			linux*)
+ 				# Hack alert: sed off any (hdn,n) but
+ 				# assume the kernel is on the same
+ 				# partition.
+@@ -90,7 +90,7 @@ parse_grub_menu () {
+ 					kernel="/boot$kernel"
+ 				fi
+ 			;;
+-			initrd)
++			initrd*)
+ 				shift
+ 				initrd=""
+ 				for initrd_path in "$@"; do

@@ -1,0 +1,29 @@
+From 55d43f37444e4e4f089ea12432fcde076bbddb37 Mon Sep 17 00:00:00 2001
+From: yui-knk <spiketeika@gmail.com>
+Date: Sun, 25 Sep 2022 17:11:57 +0900
+Subject: [PATCH] Fix ruby script in "test_parse_method_bracket"
+
+Because it's syntax error.
+---
+ test/rdoc/test_rdoc_parser_ruby.rb | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/test/rdoc/test_rdoc_parser_ruby.rb b/test/rdoc/test_rdoc_parser_ruby.rb
+index ef8ad91668..76fb28808c 100644
+--- a/test/rdoc/test_rdoc_parser_ruby.rb
++++ b/test/rdoc/test_rdoc_parser_ruby.rb
+@@ -1960,10 +1960,10 @@ def meth_with_args_before
+   def test_parse_method_bracket
+     util_parser <<-RUBY
+ class C
+-  def [] end
+-  def self.[] end
+-  def []= end
+-  def self.[]= end
++  def []; end
++  def self.[]; end
++  def []=; end
++  def self.[]=; end
+ end
+     RUBY
+ 

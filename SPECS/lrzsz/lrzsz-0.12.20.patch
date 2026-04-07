@@ -1,0 +1,20 @@
+diff -urN lrzsz-0.12.20/src/zm.c lrzsz-0.12.20.new/src/zm.c
+--- lrzsz-0.12.20/src/zm.c	Tue Dec 29 09:48:38 1998
++++ lrzsz-0.12.20.new/src/zm.c	Tue Oct  8 12:46:58 2002
+@@ -431,10 +431,12 @@
+ 	VPRINTF(3,("zsdata: %lu %s", (unsigned long) length, 
+ 		Zendnames[(frameend-ZCRCE)&3]));
+ 	crc = 0;
+-	do {
+-		zsendline(*buf); crc = updcrc((0377 & *buf), crc);
+-		buf++;
+-	} while (--length>0);
++
++	for( ; length; length--) {
++	  zsendline(*buf); crc = updcrc((0377 & *buf), crc);
++	  buf++;
++	}
++
+ 	xsendline(ZDLE); xsendline(frameend);
+ 	crc = updcrc(frameend, crc);
+ 

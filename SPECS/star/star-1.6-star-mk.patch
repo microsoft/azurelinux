@@ -1,0 +1,66 @@
+diff --git a/star/Makefile b/star/Makefile
+index e868c62..c47e81d 100644
+--- a/star/all.mk
++++ b/star/all.mk
+@@ -12,7 +12,7 @@ include		$(SRCROOT)/$(RULESDIR)/rules.top
+ # and copy star_fat.mk to Makefile.
+ #
+ 
+-MK_FILES= star.mk pax.mk suntar.mk gnutar.mk cpio.mk 
++MK_FILES= star.mk pax.mk cpio.mk
+ 
+ ###########################################################################
+ include		$(SRCROOT)/$(RULESDIR)/rules.mks
+diff --git a/star/cpio.mk b/star/cpio.mk
+index 37a6dd2..0391239 100644
+--- a/star/cpio.mk
++++ b/star/cpio.mk
+@@ -22,15 +22,16 @@ CPPOPTS +=	-DUSE_FFLAGS
+ CPPOPTS +=	-DSCHILY_PRINT
+ CFILES=		cpio.c header.c cpiohdr.c xheader.c xattr.c \
+ 		list.c extract.c create.c append.c diff.c restore.c \
+-		remove.c star_unix.c acl_unix.c acltext.c fflags.c \
++		remove.c star_unix.c lpath_unix.c \
++		acl_unix.c acltext.c fflags.c \
+ 		buffer.c dirtime.c lhash.c \
+ 		hole.c longnames.c \
+ 		movearch.c table.c props.c \
+ 		unicode.c \
+ 		subst.c volhdr.c \
+ 		chdir.c match.c defaults.c dumpdate.c \
+-		fifo.c device.c checkerr.c \
+-		findinfo.c pathname.c
++		fifo.c device.c checkerr.c paxopts.c \
++		findinfo.c pathname.c version.c
+ HFILES=		star.h starsubs.h dirtime.h xtab.h xutimes.h \
+ 		movearch.h table.h props.h fifo.h diff.h \
+ 		checkerr.h dumpdate.h bitstring.h pathname.h
+diff --git a/star/pax.mk b/star/pax.mk
+index 73c6bc1..bd71e9b 100644
+--- a/star/pax.mk
++++ b/star/pax.mk
+@@ -23,18 +23,19 @@ CPPOPTS +=	-DPAX
+ CPPOPTS +=	-DSCHILY_PRINT
+ CFILES=		pax.c header.c cpiohdr.c xheader.c xattr.c \
+ 		list.c extract.c create.c append.c diff.c restore.c \
+-		remove.c star_unix.c acl_unix.c acltext.c fflags.c \
++		remove.c star_unix.c lpath_unix.c \
++		acl_unix.c acltext.c fflags.c \
+ 		buffer.c dirtime.c lhash.c \
+ 		hole.c longnames.c \
+ 		movearch.c table.c props.c \
+ 		unicode.c \
+ 		subst.c volhdr.c \
+ 		chdir.c match.c defaults.c dumpdate.c \
+-		fifo.c device.c checkerr.c \
+-		findinfo.c pathname.c
++		fifo.c device.c checkerr.c paxopts.c \
++		findinfo.c pathname.c version.c
+ HFILES=		star.h starsubs.h dirtime.h xtab.h xutimes.h \
+-		movearch.h table.h props.h fifo.h diff.h \
+-		checkerr.h dumpdate.h bitstring.h pathname.h
++		movearch.h table.h props.h fifo.h diff.h restore.h \
++		checkerr.h dumpdate.h bitstring.h
+ LIBS=		-ldeflt -lrmt -lfind -lschily $(LIB_ACL) $(LIB_ATTR) $(LIB_SOCKET) $(LIB_INTL) $(LIB_CAP)
+ XMK_FILE=	spaxman.mk
+ 

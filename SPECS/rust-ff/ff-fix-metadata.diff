@@ -1,0 +1,32 @@
+--- ff-0.13.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ ff-0.13.1/Cargo.toml	2025-04-28T21:18:31.155615+00:00
+@@ -26,9 +26,6 @@
+ all-features = true
+ rustdoc-args = ["--cfg", "docsrs"]
+ 
+-[[test]]
+-name = "derive"
+-required-features = ["derive"]
+ [dependencies.bitvec]
+ version = "1"
+ optional = true
+@@ -38,10 +35,6 @@
+ version = "1"
+ optional = true
+ default-features = false
+-
+-[dependencies.ff_derive]
+-version = "0.13.1"
+-optional = true
+ 
+ [dependencies.rand_core]
+ version = "0.6"
+@@ -61,8 +54,6 @@
+ alloc = []
+ bits = ["bitvec"]
+ default = ["bits", "std"]
+-derive = ["byteorder", "ff_derive"]
+-derive_bits = ["bits", "ff_derive/bits"]
+ std = ["alloc"]
+ [badges.maintenance]
+ status = "actively-developed"

@@ -1,0 +1,44 @@
+--- arrayvec-0.7.6/Cargo.toml	1970-01-01T00:00:01+00:00
++++ arrayvec-0.7.6/Cargo.toml	2024-08-29T16:41:42.028259+00:00
+@@ -59,31 +59,12 @@
+ path = "src/lib.rs"
+ 
+ [[test]]
+-name = "borsh"
+-path = "tests/borsh.rs"
+-
+-[[test]]
+ name = "serde"
+ path = "tests/serde.rs"
+ 
+ [[test]]
+ name = "tests"
+ path = "tests/tests.rs"
+-
+-[[bench]]
+-name = "arraystring"
+-path = "benches/arraystring.rs"
+-harness = false
+-
+-[[bench]]
+-name = "extend"
+-path = "benches/extend.rs"
+-harness = false
+-
+-[dependencies.borsh]
+-version = "1.2.0"
+-optional = true
+-default-features = false
+ 
+ [dependencies.serde]
+ version = "1.0"
+@@ -94,9 +75,6 @@
+ version = "1.4"
+ optional = true
+ default-features = false
+-
+-[dev-dependencies.bencher]
+-version = "0.1.4"
+ 
+ [dev-dependencies.matches]
+ version = "0.1"

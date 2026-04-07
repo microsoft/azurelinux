@@ -1,0 +1,26 @@
+--- nalgebra-0.33.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ nalgebra-0.33.2/Cargo.toml	2024-11-04T22:21:00.817649+00:00
+@@ -132,12 +132,6 @@
+ name = "lib"
+ path = "tests/lib.rs"
+ 
+-[[bench]]
+-name = "nalgebra_bench"
+-path = "benches/lib.rs"
+-harness = false
+-required-features = ["rand"]
+-
+ [dependencies.alga]
+ version = "0.9"
+ optional = true
+@@ -307,10 +301,6 @@
+ 
+ [dev-dependencies.cool_asserts]
+ version = "2.0.3"
+-
+-[dev-dependencies.criterion]
+-version = "0.4"
+-features = ["html_reports"]
+ 
+ [dev-dependencies.itertools]
+ version = "0.13"

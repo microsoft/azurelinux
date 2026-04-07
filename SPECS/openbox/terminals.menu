@@ -1,0 +1,16 @@
+<!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"
+ "http://www.freedesktop.org/standards/menu-spec/1.0/menu.dtd">
+
+<Menu>
+  <Name>Terminals</Name>
+
+  <!-- Read standard .desktop file locations -->
+  <DefaultAppDirs/>
+
+  <!-- Read in overrides and child menus from applications.d -->
+  <DefaultMergeDirs/>
+
+  <Include>
+    <Category>TerminalEmulator</Category>
+  </Include>
+</Menu>

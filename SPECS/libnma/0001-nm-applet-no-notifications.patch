@@ -1,0 +1,13 @@
+diff --git a/org.gnome.nm-applet.gschema.xml.in b/org.gnome.nm-applet.gschema.xml.in
+index 9e2887e..4f8c16a 100644
+--- a/org.gnome.nm-applet.gschema.xml.in
++++ b/org.gnome.nm-applet.gschema.xml.in
+@@ -17,7 +17,7 @@
+       <description>Set this to true to disable notifications when connecting to or disconnecting from a VPN.</description>
+     </key>
+     <key name="suppress-wireless-networks-available" type="b">
+-      <default>false</default>
++      <default>true</default>
+       <summary>Suppress networks available notifications</summary>
+       <description>Set this to true to disable notifications when Wi-Fi networks are available.</description>
+     </key>

@@ -1,0 +1,17 @@
+This fixes a generic C99 compatibility issue in autoconf-generated
+code.  No need to upstream this because the issue goes away if
+autoconf is re-run.
+
+diff --git a/configure b/configure
+index 9d6084aa38e5d6e8..4d948816e1112d13 100755
+--- a/configure
++++ b/configure
+@@ -689,7 +689,7 @@ cat > conftest.$ac_ext << EOF
+ #line 690 "configure"
+ #include "confdefs.h"
+ 
+-main(){return(0);}
++int main(){return(0);}
+ EOF
+ if { (eval echo configure:695: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+   ac_cv_prog_cc_works=yes

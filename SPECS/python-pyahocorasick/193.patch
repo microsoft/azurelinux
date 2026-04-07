@@ -1,0 +1,157 @@
+From 51463fd52428cba94c022c361d8242f0e5a51048 Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Fri, 18 Oct 2024 20:40:37 -0400
+Subject: [PATCH 1/2] Fix incorrect types passed to Py_BuildValue
+
+In all cases, these calls told Python it was getting ints (`i`), which
+are 4 bytes, but several cases passed either `Py_ssize_t` or
+`Py_uintptr_t`, which are 8 bytes.
+
+On little-endian machines, this will work, as the bytes align, but on
+big-endian machine, Python will most probably see 0, since the top bytes
+are more likely to be unfilled unless values are very large.
+---
+ src/Automaton.c               | 12 ++++++------
+ src/AutomatonItemsIter.c      |  2 +-
+ src/AutomatonSearchIter.c     |  4 ++--
+ src/AutomatonSearchIterLong.c |  2 +-
+ src/pycallfault/pycallfault.h |  2 ++
+ 5 files changed, 12 insertions(+), 10 deletions(-)
+
+diff --git a/src/Automaton.c b/src/Automaton.c
+index 3ec4e0a..0a1f7b6 100644
+--- a/src/Automaton.c
++++ b/src/Automaton.c
+@@ -525,7 +525,7 @@ automaton_get(PyObject* self, PyObject* args) {
+         switch (automaton->store) {
+             case STORE_INTS:
+             case STORE_LENGTH:
+-                return F(Py_BuildValue)("i", node->output.integer);
++                return F(PyLong_FromVoidPtr)((void *)node->output.integer);
+ 
+             case STORE_ANY:
+                 Py_INCREF(node->output.object);
+@@ -1084,7 +1084,7 @@ automaton_get_stats(PyObject* self, PyObject* args) {
+         get_stats(automaton);
+ 
+     dict = F(Py_BuildValue)(
+-        "{s:k,s:k,s:k,s:k,s:i,s:k}",
++        "{s:n,s:n,s:n,s:n,s:n,s:n}",
+         "nodes_count",  automaton->stats.nodes_count,
+         "words_count",  automaton->stats.words_count,
+         "longest_word", automaton->stats.longest_word,
+@@ -1123,19 +1123,19 @@ dump_aux(TrieNode* node, const int depth, void* extra) {
+ 
+ 
+     // 1.
+-    tuple = F(Py_BuildValue)("ii", node, (int)(node->eow));
++    tuple = F(Py_BuildValue)("Ni", PyLong_FromVoidPtr(node), (int)(node->eow));
+     append_tuple(Dump->nodes)
+ 
+     // 2.
+     for (i=0; i < node->n; i++) {
+         child = trienode_get_ith_unsafe(node, i);
+-        tuple = F(Py_BuildValue)("ici", node, trieletter_get_ith_unsafe(node, i), child);
++        tuple = F(Py_BuildValue)("NcN", PyLong_FromVoidPtr(node), (char)trieletter_get_ith_unsafe(node, i), PyLong_FromVoidPtr(child));
+         append_tuple(Dump->edges)
+     }
+ 
+     // 3.
+     if (node->fail) {
+-        tuple = F(Py_BuildValue)("ii", node, node->fail);
++        tuple = F(Py_BuildValue)("NN", PyLong_FromVoidPtr(node), PyLong_FromVoidPtr(node->fail));
+         append_tuple(Dump->fail);
+     }
+ 
+@@ -1193,7 +1193,7 @@ automaton___sizeof__(PyObject* self, PyObject* args) {
+         size += automaton->stats.total_size;
+     }
+ 
+-    return Py_BuildValue("i", size);
++    return PyLong_FromSsize_t(size);
+ #undef automaton
+ }
+ 
+diff --git a/src/AutomatonItemsIter.c b/src/AutomatonItemsIter.c
+index 6f5db60..ec764a9 100644
+--- a/src/AutomatonItemsIter.c
++++ b/src/AutomatonItemsIter.c
+@@ -238,7 +238,7 @@ automaton_items_iter_next(PyObject* self) {
+ 
+                         case STORE_LENGTH:
+                         case STORE_INTS:
+-                            return F(Py_BuildValue)("i", iter->state->output.integer);
++                            return F(PyLong_FromVoidPtr)((void *)iter->state->output.integer);
+ 
+                         default:
+                             PyErr_SetString(PyExc_SystemError, "Incorrect 'store' attribute.");
+diff --git a/src/AutomatonSearchIter.c b/src/AutomatonSearchIter.c
+index b6b7871..6bf2a6d 100644
+--- a/src/AutomatonSearchIter.c
++++ b/src/AutomatonSearchIter.c
+@@ -180,11 +180,11 @@ automaton_build_output(PyObject* self, PyObject** result) {
+         switch (iter->automaton->store) {
+             case STORE_LENGTH:
+             case STORE_INTS:
+-                *result = F(Py_BuildValue)("ii", idx, node->output.integer);
++                *result = F(Py_BuildValue)("nN", idx, PyLong_FromVoidPtr((void *)node->output.integer));
+                 return OutputValue;
+ 
+             case STORE_ANY:
+-                *result = F(Py_BuildValue)("iO", idx, node->output.object);
++                *result = F(Py_BuildValue)("nO", idx, node->output.object);
+                 return OutputValue;
+ 
+             default:
+diff --git a/src/AutomatonSearchIterLong.c b/src/AutomatonSearchIterLong.c
+index ef09ed6..f59e1c7 100644
+--- a/src/AutomatonSearchIterLong.c
++++ b/src/AutomatonSearchIterLong.c
+@@ -74,7 +74,7 @@ automaton_build_output_iter_long(PyObject* self) {
+     switch (iter->automaton->store) {
+         case STORE_LENGTH:
+         case STORE_INTS:
+-            return Py_BuildValue("ii", iter->shift + iter->last_index, iter->last_node->output.integer);
++            return Py_BuildValue("iN", iter->shift + iter->last_index, PyLong_FromVoidPtr((void *)iter->last_node->output.integer));
+ 
+         case STORE_ANY:
+             return Py_BuildValue("iO", iter->shift + iter->last_index, iter->last_node->output.object);
+diff --git a/src/pycallfault/pycallfault.h b/src/pycallfault/pycallfault.h
+index 1a9901a..b92e600 100644
+--- a/src/pycallfault/pycallfault.h
++++ b/src/pycallfault/pycallfault.h
+@@ -28,6 +28,8 @@ int check_and_set_error(void);
+ 
+ #define Py_BuildValue_custom(...) (check_and_set_error() ? NULL : Py_BuildValue(__VA_ARGS__))
+ 
++#define PyLong_FromVoidPtr_custom(arg) (check_and_set_error() ? NULL : PyLong_FromVoidPtr(arg))
++
+ #define PyCallable_Check_custom(arg) (check() ? 0 : PyCallable_Check(arg))
+ 
+ #define PyString_Check_custom(arg) (check() ? 0 : PyString_Check(arg))
+
+From 4875abb812fb1ecb2ccc869967e7797b0f6e7483 Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Fri, 18 Oct 2024 21:19:46 -0400
+Subject: [PATCH 2/2] Fix incorrect types passed to PyArg_ParseTupleAndKeywords
+
+For a similar reason as `Py_BuildValue`, telling Python to use a smaller
+sized value than actually passed may cause strange values to end up in
+the result.
+---
+ src/Automaton.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/Automaton.c b/src/Automaton.c
+index 0a1f7b6..8f620ee 100644
+--- a/src/Automaton.c
++++ b/src/Automaton.c
+@@ -890,7 +890,7 @@ automaton_iter(PyObject* self, PyObject* args, PyObject* keywds) {
+         return NULL;
+     }
+ 
+-    if (!F(PyArg_ParseTupleAndKeywords)(args, keywds, "O|iii", kwlist, &object, &start_tmp, &end_tmp, &ignore_white_space_tmp)) {
++    if (!F(PyArg_ParseTupleAndKeywords)(args, keywds, "O|nni", kwlist, &object, &start_tmp, &end_tmp, &ignore_white_space_tmp)) {
+         return NULL;
+     }
+ 

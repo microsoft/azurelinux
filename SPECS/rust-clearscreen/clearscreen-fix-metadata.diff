@@ -1,0 +1,12 @@
+--- clearscreen-4.0.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ clearscreen-4.0.2/Cargo.toml	2025-07-13T15:58:55.537246+00:00
+@@ -38,9 +38,6 @@
+ license = "Apache-2.0 OR MIT"
+ repository = "https://github.com/watchexec/clearscreen"
+ 
+-[features]
+-windows-console = []
+-
+ [lib]
+ name = "clearscreen"
+ path = "src/lib.rs"

@@ -1,0 +1,28 @@
+From eda20d48658333f0667893bd1203ff9ccaf70265 Mon Sep 17 00:00:00 2001
+From: Neal Gompa <ngompa@fedoraproject.org>
+Date: Sat, 8 Nov 2025 05:13:19 -0500
+Subject: [PATCH] tests: Raise the default timeout for pexpect tests
+
+The pexpect tests are randomly timing out on some architectures
+for Fedora package builds. Raising the timeout will hopefully
+avoid the issue.
+---
+ tests/pexpect_helper.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/pexpect_helper.py b/tests/pexpect_helper.py
+index fe9f30b9a..45bc702c6 100644
+--- a/tests/pexpect_helper.py
++++ b/tests/pexpect_helper.py
+@@ -25,7 +25,7 @@ import pexpect
+ from signal import Signals
+ 
+ # Default timeout for failing to match.
+-TIMEOUT_SECS = 5
++TIMEOUT_SECS = 20
+ 
+ UNEXPECTED_SUCCESS = object()
+ 
+-- 
+2.51.1
+

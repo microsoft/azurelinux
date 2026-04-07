@@ -1,0 +1,2095 @@
+diff -up dolby_vision-3.3.2/Cargo.lock.orig dolby_vision-3.3.2/Cargo.lock
+--- dolby_vision-3.3.2/Cargo.lock.orig	1970-01-01 01:00:01.000000000 +0100
++++ dolby_vision-3.3.2/Cargo.lock	2025-08-22 15:18:45.081840583 +0200
+@@ -19,9 +19,9 @@ checksum = "4b46cbb362ab8752921c97e041f5
+ 
+ [[package]]
+ name = "anstyle"
+-version = "1.0.10"
++version = "1.0.11"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "55cc3b69f167a1ef2e161439aa98aed94e6028e5f9a59be9a6ffb47aef1651f9"
++checksum = "862ed96ca487e809f1c8e5a8447f6ee2cf102f846893800b20cebdf541fc6bbd"
+ 
+ [[package]]
+ name = "anyhow"
+@@ -31,15 +31,18 @@ checksum = "e16d2d3311acee920a9eb8d33b8c
+ 
+ [[package]]
+ name = "autocfg"
+-version = "1.4.0"
++version = "1.5.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "ace50bade8e6234aa140d9a2f552bbee1db4d353f69b8217bc503490fc1a9f26"
++checksum = "c08606f8c3cbf4ce6ec8e28fb0014a2c086708fe954eaa885384a6165172e7e8"
+ 
+ [[package]]
+ name = "bitstream-io"
+-version = "2.6.0"
++version = "4.3.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "6099cdc01846bc367c4e7dd630dc5966dccf36b652fae7a74e17b640411a91b2"
++checksum = "1f30faa215941f112abe3f87ae44889e4596260602a1a2b82837c7860fdd56a0"
++dependencies = [
++ "core2",
++]
+ 
+ [[package]]
+ name = "bitvec"
+@@ -55,18 +58,18 @@ dependencies = [
+ 
+ [[package]]
+ name = "bitvec_helpers"
+-version = "3.1.6"
++version = "4.0.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "d9a6aff977a34114f146bd3379c9d170a8eafcffcdeecbb7cc3bd2470a39709a"
++checksum = "514cb00a8ce758dc6a8718723919145cefdd6306766936f62b3c117ef3393bd5"
+ dependencies = [
+  "bitstream-io",
+ ]
+ 
+ [[package]]
+ name = "bumpalo"
+-version = "3.17.0"
++version = "3.19.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "1628fb46dfa0b37568d12e5edd512553eccf6a22a78e8bde00bb4aed84d5bdbf"
++checksum = "46c5e41b57b8bba42a04676d81cb89e9ee8e859a1a66f80a5a72e1cb76b34d43"
+ 
+ [[package]]
+ name = "cast"
+@@ -76,9 +79,9 @@ checksum = "37b2a672a2cb129a2e41c10b1224
+ 
+ [[package]]
+ name = "cfg-if"
+-version = "1.0.0"
++version = "1.0.1"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
++checksum = "9555578bc9e57714c812a1f84e4fc5b4d21fcb063490c624de019f7464c91268"
+ 
+ [[package]]
+ name = "ciborium"
+@@ -109,18 +112,18 @@ dependencies = [
+ 
+ [[package]]
+ name = "clap"
+-version = "4.5.39"
++version = "4.5.41"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "fd60e63e9be68e5fb56422e397cf9baddded06dae1d2e523401542383bc72a9f"
++checksum = "be92d32e80243a54711e5d7ce823c35c41c9d929dc4ab58e1276f625841aadf9"
+ dependencies = [
+  "clap_builder",
+ ]
+ 
+ [[package]]
+ name = "clap_builder"
+-version = "4.5.39"
++version = "4.5.41"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "89cc6392a1f72bbeb820d71f32108f61fdaf18bc526e1d23954168a67759ef51"
++checksum = "707eab41e9622f9139419d573eca0900137718000c517d47da73045f54331c3d"
+ dependencies = [
+  "anstyle",
+  "clap_lex",
+@@ -128,9 +131,18 @@ dependencies = [
+ 
+ [[package]]
+ name = "clap_lex"
+-version = "0.7.4"
++version = "0.7.5"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "b94f61472cee1439c0b966b47e3aca9ae07e45d070759512cd390ea2bebc6675"
++
++[[package]]
++name = "core2"
++version = "0.4.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "f46ad14479a25103f283c0f10005961cf086d8dc42205bb44c46ac563475dca6"
++checksum = "b49ba7ef1ad6107f8824dbe97de947cbaac53c44e7f9756a1fba0d37c1eec505"
++dependencies = [
++ "memchr",
++]
+ 
+ [[package]]
+ name = "crc"
+@@ -207,9 +219,9 @@ checksum = "d0a5c400df2834b80a4c3327b3aa
+ 
+ [[package]]
+ name = "crunchy"
+-version = "0.2.3"
++version = "0.2.4"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "43da5946c66ffcc7745f48db692ffbb10a83bfe0afd96235c5c2a4fb23994929"
++checksum = "460fbee9c2c2f33933d720630a6a0bac33ba7053db5344fac858d4b8952d77d5"
+ 
+ [[package]]
+ name = "dolby_vision"
+@@ -257,15 +269,15 @@ dependencies = [
+ 
+ [[package]]
+ name = "hashbrown"
+-version = "0.15.3"
++version = "0.15.4"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "84b26c544d002229e640969970a2e74021aadf6e2f96372b9c58eff97de08eb3"
++checksum = "5971ac85611da7067dbfcabef3c70ebb5606018acd9e2a3903a0da507521e0d5"
+ 
+ [[package]]
+ name = "indexmap"
+-version = "2.9.0"
++version = "2.10.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "cea70ddb795996207ad57735b50c5982d8844f38ba9ee5f1aedcfb708a2aa11e"
++checksum = "fe4cd85333e22411419a0bcae1297d25e58c9443848b11dc6a86fefe8c78a661"
+ dependencies = [
+  "equivalent",
+  "hashbrown",
+@@ -307,9 +319,9 @@ dependencies = [
+ 
+ [[package]]
+ name = "libc"
+-version = "0.2.172"
++version = "0.2.174"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "d750af042f7ef4f724306de029d18836c26c1765a54a6a3f094cbd23a7267ffa"
++checksum = "1171693293099992e19cddea4e8b849964e9846f4acee11b3948bcc337be8776"
+ 
+ [[package]]
+ name = "log"
+@@ -319,9 +331,9 @@ checksum = "13dc2df351e3202783a1fe0d4437
+ 
+ [[package]]
+ name = "memchr"
+-version = "2.7.4"
++version = "2.7.5"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "78ca9ab1a0babb1e7d5695e3530886289c18cf2f87ec19a575a0abdce112e3a3"
++checksum = "32a282da65faaf38286cf3be983213fcf1d2e2a58700e808f83f4ea9a4804bc0"
+ 
+ [[package]]
+ name = "num-traits"
+@@ -507,9 +519,9 @@ dependencies = [
+ 
+ [[package]]
+ name = "syn"
+-version = "2.0.101"
++version = "2.0.104"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "8ce2b7fc941b3a24138a0a7cf8e858bfc6a992e7978a068a5c760deb0ed43caf"
++checksum = "17b6f705963418cdb9927482fa304bc562ece2fdd4f616084c50b7023b435a40"
+ dependencies = [
+  "proc-macro2",
+  "quote",
+diff -up dolby_vision-3.3.2/Cargo.toml.orig dolby_vision-3.3.2/Cargo.toml
+--- dolby_vision-3.3.2/Cargo.toml.orig	1970-01-01 01:00:01.000000000 +0100
++++ dolby_vision-3.3.2/Cargo.toml	2025-08-22 15:18:45.082208570 +0200
+@@ -69,7 +69,7 @@ version = "1.0.98"
+ version = "1.0.1"
+ 
+ [dependencies.bitvec_helpers]
+-version = "3.1.6"
++version = "4.0.0"
+ features = ["bitstream-io"]
+ default-features = false
+ 
+diff -up dolby_vision-3.3.2/CHANGELOG.md.orig dolby_vision-3.3.2/CHANGELOG.md
+--- dolby_vision-3.3.2/CHANGELOG.md.orig	2006-07-24 03:21:28.000000000 +0200
++++ dolby_vision-3.3.2/CHANGELOG.md	2025-08-22 15:18:45.082436990 +0200
+@@ -1,3 +1,7 @@
++## Unreleased
++
++- `ReservedExtMetadataBlock.data` was replaced by a regular `Vec`.
++
+ ## 3.3.2
+ - `rpu`: fix `write_rpu_data` allocated capacity. Now static and 512 bytes.
+ - `RpuDataNlq`: fixed incorrect written data for `linear_deadzone_threshold_int`.
+diff -up dolby_vision-3.3.2/src/av1/emdf.rs.orig dolby_vision-3.3.2/src/av1/emdf.rs
+--- dolby_vision-3.3.2/src/av1/emdf.rs.orig	2006-07-24 03:21:28.000000000 +0200
++++ dolby_vision-3.3.2/src/av1/emdf.rs	2025-08-22 15:18:45.082737426 +0200
+@@ -6,25 +6,25 @@ use bitvec_helpers::{
+ /// Parse the expected EMDF container with fixed values according to spec
+ /// Returns `emdf_payload_size`
+ pub(crate) fn parse_emdf_container(reader: &mut BsIoSliceReader) -> Result<usize> {
+-    let emdf_version = reader.get_n::<u8>(2)?;
++    let emdf_version = reader.read::<2, u8>()?;
+     ensure!(emdf_version == 0);
+ 
+-    let key_id = reader.get_n::<u8>(3)?;
++    let key_id = reader.read::<3, u8>()?;
+     ensure!(key_id == 6);
+ 
+-    let emdf_payload_id = reader.get_n::<u8>(5)?;
++    let emdf_payload_id = reader.read::<5, u8>()?;
+     ensure!(emdf_payload_id == 31);
+ 
+-    let emdf_payload_id_ext = parse_variable_bits(reader, 5)?;
++    let emdf_payload_id_ext = parse_variable_bits::<5>(reader)?;
+     ensure!(emdf_payload_id_ext == 225);
+ 
+-    ensure!(!reader.get()?); // smploffste = 0
+-    ensure!(!reader.get()?); // duratione = 0
+-    ensure!(!reader.get()?); // groupide = 0
+-    ensure!(!reader.get()?); // codecdatae = 0
+-    ensure!(reader.get()?); // discard_unknown_payload = 1
++    ensure!(!reader.read_bit()?); // smploffste = 0
++    ensure!(!reader.read_bit()?); // duratione = 0
++    ensure!(!reader.read_bit()?); // groupide = 0
++    ensure!(!reader.read_bit()?); // codecdatae = 0
++    ensure!(reader.read_bit()?); // discard_unknown_payload = 1
+ 
+-    let emdf_payload_size = parse_variable_bits(reader, 8)? as usize;
++    let emdf_payload_size = parse_variable_bits::<8>(reader)? as usize;
+     Ok(emdf_payload_size)
+ }
+ 
+@@ -36,66 +36,64 @@ pub(crate) fn write_emdf_container_with_
+     let emdf_payload_size = payload.len() as u32;
+ 
+     write_dovi_rpu_emdf_header(writer)?;
+-    write_variable_bits(writer, emdf_payload_size, 8)?;
++    write_variable_bits::<8>(writer, emdf_payload_size)?;
+ 
+-    for b in payload {
+-        writer.write_n(b, 8)?;
+-    }
++    writer.write_bytes(payload)?;
+ 
+     // emdf_payload_id and emdf_protection
+-    writer.write_n(&0, 5)?;
+-    writer.write_n(&1, 2)?;
+-    writer.write_n(&0, 2)?;
+-    writer.write_n(&0, 8)?;
++    writer.write_const::<5, 0>()?;
++    writer.write_const::<2, 1>()?;
++    writer.write_const::<2, 0>()?;
++    writer.write_const::<8, 0>()?;
+ 
+     Ok(())
+ }
+ 
+ fn write_dovi_rpu_emdf_header(writer: &mut BitstreamIoWriter) -> Result<()> {
+-    writer.write_n(&0, 2)?; // emdf_version
+-    writer.write_n(&6, 3)?; // key_id
+-    writer.write_n(&31, 5)?; // emdf_payload_id
+-    write_variable_bits(writer, 225, 5)?; // emdf_payload_id_ext
++    writer.write_const::<2, 0>()?; // emdf_version
++    writer.write_const::<3, 6>()?; // key_id
++    writer.write_const::<5, 31>()?; // emdf_payload_id
++    write_variable_bits::<5>(writer, 225)?; // emdf_payload_id_ext
+ 
+-    writer.write_n(&0, 4)?; // smploffste, duratione, groupide, codecdatae
+-    writer.write(true)?; // discard_unknown_payload
++    writer.write_const::<4, 0>()?; // smploffste, duratione, groupide, codecdatae
++    writer.write_bit(true)?; // discard_unknown_payload
+ 
+     Ok(())
+ }
+ 
+-fn parse_variable_bits(reader: &mut BsIoSliceReader, n: u32) -> Result<u32> {
++fn parse_variable_bits<const BITS: u32>(reader: &mut BsIoSliceReader) -> Result<u32> {
+     let mut value: u32 = 0;
+ 
+     loop {
+-        let tmp: u32 = reader.get_n(n)?;
++        let tmp = reader.read::<BITS, u32>()?;
+         value += tmp;
+ 
+         // read_more flag
+-        if !reader.get()? {
++        if !reader.read_bit()? {
+             break;
+         }
+ 
+-        value <<= n;
+-        value += 1 << n;
++        value <<= BITS;
++        value += 1 << BITS;
+     }
+ 
+     Ok(value)
+ }
+ 
+-fn write_variable_bits(writer: &mut BitstreamIoWriter, value: u32, n: u32) -> Result<()> {
+-    let max = 1 << n;
++fn write_variable_bits<const BITS: u32>(writer: &mut BitstreamIoWriter, value: u32) -> Result<()> {
++    let max = 1 << BITS;
+ 
+     if value > max {
+         let mut remaining = value;
+ 
+         loop {
+-            let tmp = remaining >> n;
+-            let clipped = tmp << n;
++            let tmp = remaining >> BITS;
++            let clipped = tmp << BITS;
+             remaining -= clipped;
+ 
+-            let byte = (clipped - max) >> n;
+-            writer.write_n(&byte, n)?;
+-            writer.write(true)?; // read_more
++            let byte = (clipped - max) >> BITS;
++            writer.write::<BITS, u32>(byte)?;
++            writer.write_bit(true)?; // read_more
+ 
+             // Stop once the remaining can be written in N bits
+             if remaining <= max {
+@@ -103,12 +101,12 @@ fn write_variable_bits(writer: &mut Bits
+             }
+         }
+ 
+-        writer.write_n(&remaining, n)?;
++        writer.write::<BITS, u32>(remaining)?;
+     } else {
+-        writer.write_n(&value, n)?;
++        writer.write::<BITS, u32>(value)?;
+     }
+ 
+-    writer.write(false)?;
++    writer.write_bit(false)?;
+ 
+     Ok(())
+ }
+diff -up dolby_vision-3.3.2/src/av1/mod.rs.orig dolby_vision-3.3.2/src/av1/mod.rs
+--- dolby_vision-3.3.2/src/av1/mod.rs.orig	2006-07-24 03:21:28.000000000 +0200
++++ dolby_vision-3.3.2/src/av1/mod.rs	2025-08-22 15:18:45.082977210 +0200
+@@ -52,19 +52,17 @@ pub(crate) fn av1_validated_trimmed_data
+ pub(crate) fn convert_av1_rpu_payload_to_regular(data: &[u8]) -> Result<Vec<u8>> {
+     let mut reader = BsIoSliceReader::from_slice(data);
+ 
+-    let itu_t_t35_terminal_provider_code = reader.get_n::<u16>(16)?;
++    let itu_t_t35_terminal_provider_code = reader.read::<16, u16>()?;
+     ensure!(itu_t_t35_terminal_provider_code == 0x3B);
+ 
+-    let itu_t_t35_terminal_provider_oriented_code = reader.get_n::<u32>(32)?;
++    let itu_t_t35_terminal_provider_oriented_code = reader.read::<32, u32>()?;
+     ensure!(itu_t_t35_terminal_provider_oriented_code == 0x800);
+ 
+     let emdf_payload_size = parse_emdf_container(&mut reader)?;
+-    let mut converted_buf = Vec::with_capacity(emdf_payload_size + 1);
+-    converted_buf.push(0x19);
++    let mut converted_buf = vec![0; emdf_payload_size + 1];
++    converted_buf[0] = 0x19;
+ 
+-    for _ in 0..emdf_payload_size {
+-        converted_buf.push(reader.get_n(8)?);
+-    }
++    reader.read_bytes(&mut converted_buf[1..])?;
+ 
+     Ok(converted_buf)
+ }
+@@ -92,13 +90,13 @@ pub fn convert_regular_rpu_to_av1_payloa
+ 
+     let mut writer = BitstreamIoWriter::with_capacity(capacity * 2);
+ 
+-    writer.write_n(&0x3B, 16)?; // itu_t_t35_terminal_provider_code
+-    writer.write_n(&0x800, 32)?; // itu_t_t35_terminal_provider_oriented_code
++    writer.write_const::<16, 0x003B>()?; // itu_t_t35_terminal_provider_code
++    writer.write_const::<32, 0x800>()?; // itu_t_t35_terminal_provider_oriented_code
+ 
+     write_emdf_container_with_dovi_rpu_payload(&mut writer, data)?;
+ 
+-    while !writer.is_aligned() {
+-        writer.write(true)?;
++    while !writer.byte_aligned() {
++        writer.write_bit(true)?;
+     }
+ 
+     Ok(writer.into_inner())
+diff -up dolby_vision-3.3.2/src/c_structs/buffers.rs.orig dolby_vision-3.3.2/src/c_structs/buffers.rs
+--- dolby_vision-3.3.2/src/c_structs/buffers.rs.orig	2006-07-24 03:21:28.000000000 +0200
++++ dolby_vision-3.3.2/src/c_structs/buffers.rs	2025-08-22 15:19:05.188280893 +0200
+@@ -47,15 +47,6 @@ pub struct I64Data {
+ 
+ /// Struct representing a 2D data buffer
+ #[repr(C)]
+-pub struct Data2D {
+-    /// Pointer to the list of Data structs
+-    pub list: *const *const Data,
+-    /// List length
+-    pub len: size_t,
+-}
+-
+-/// Struct representing a 2D data buffer
+-#[repr(C)]
+ pub struct U64Data2D {
+     /// Pointer to the list of Data structs
+     pub list: *const *const U64Data,
+@@ -75,7 +66,7 @@ pub struct I64Data2D {
+ /// Struct representing a 3D data buffer
+ #[repr(C)]
+ pub struct U64Data3D {
+-    /// Pointer to the list of Data2D structs
++    /// Pointer to the list of U64Data2D structs
+     pub list: *const *const U64Data2D,
+     /// List length
+     pub len: size_t,
+@@ -84,7 +75,7 @@ pub struct U64Data3D {
+ /// Struct representing a 3D data buffer
+ #[repr(C)]
+ pub struct I64Data3D {
+-    /// Pointer to the list of Data2D structs
++    /// Pointer to the list of I64Data2D structs
+     pub list: *const *const I64Data2D,
+     /// List length
+     pub len: size_t,
+@@ -309,19 +300,6 @@ impl Freeable for I64Data {
+         }
+     }
+ }
+-
+-impl Freeable for Data2D {
+-    unsafe fn free(&self) {
+-        unsafe {
+-            let list = Vec::from_raw_parts(self.list as *mut *const Data, self.len, self.len);
+-
+-            for data_ptr in list {
+-                let data = Box::from_raw(data_ptr as *mut Data);
+-                data.free();
+-            }
+-        }
+-    }
+-}
+ 
+ impl Freeable for U64Data2D {
+     unsafe fn free(&self) {
+diff -up dolby_vision-3.3.2/src/rpu/dovi_rpu.rs.orig dolby_vision-3.3.2/src/rpu/dovi_rpu.rs
+--- dolby_vision-3.3.2/src/rpu/dovi_rpu.rs.orig	2006-07-24 03:21:28.000000000 +0200
++++ dolby_vision-3.3.2/src/rpu/dovi_rpu.rs	2025-08-22 15:18:45.083212020 +0200
+@@ -150,7 +150,7 @@ impl DoviRpu {
+     fn read_rpu_data(bytes: &[u8]) -> Result<DoviRpu> {
+         let mut reader = BsIoSliceReader::from_slice(bytes);
+ 
+-        let rpu_prefix = reader.get_n(8)?;
++        let rpu_prefix = reader.read::<8, u8>()?;
+         ensure!(rpu_prefix == 25, "rpu_nal_prefix should be 25");
+ 
+         let mut header = RpuDataHeader::parse(&mut reader)?;
+@@ -183,8 +183,8 @@ impl DoviRpu {
+         };
+ 
+         // rpu_alignment_zero_bit
+-        while !reader.is_aligned() {
+-            ensure!(!reader.get()?, "rpu_alignment_zero_bit != 0");
++        while !reader.byte_aligned() {
++            ensure!(!reader.read_bit()?, "rpu_alignment_zero_bit != 0");
+         }
+ 
+         // CRC32 is at the end, there can be more data in between
+@@ -192,7 +192,7 @@ impl DoviRpu {
+             let mut remaining: BitVec<u8, Msb0> = BitVec::new();
+ 
+             while reader.available()? != CRC32_TERMINATOR_BITS {
+-                remaining.push(reader.get()?);
++                remaining.push(reader.read_bit()?);
+             }
+ 
+             Some(remaining)
+@@ -200,8 +200,8 @@ impl DoviRpu {
+             None
+         };
+ 
+-        let rpu_data_crc32 = reader.get_n(32)?;
+-        let last_byte: u8 = reader.get_n(8)?;
++        let rpu_data_crc32 = reader.read::<32, u32>()?;
++        let last_byte = reader.read::<8, u8>()?;
+         ensure!(last_byte == FINAL_BYTE, "last byte should be 0x80");
+ 
+         Ok(DoviRpu {
+@@ -251,7 +251,7 @@ impl DoviRpu {
+         self.validate()?;
+ 
+         // RPU prefix
+-        writer.write_n(&0x19, 8)?;
++        writer.write_const::<8, 0x19>()?;
+ 
+         let header = &self.header;
+         header.write_header(&mut writer)?;
+@@ -271,8 +271,8 @@ impl DoviRpu {
+         }
+ 
+         if let Some(remaining) = &self.remaining {
+-            for b in remaining {
+-                writer.write(*b)?;
++            for b in remaining.iter().by_vals() {
++                writer.write_bit(b)?;
+             }
+         }
+ 
+@@ -294,13 +294,13 @@ impl DoviRpu {
+         }
+ 
+         // Write crc32
+-        writer.write_n(&computed_crc32, 32)?;
+-        writer.write_n(&FINAL_BYTE, 8)?;
++        writer.write::<32, u32>(computed_crc32)?;
++        writer.write::<8, u8>(FINAL_BYTE)?;
+ 
+         // Trailing bytes
+         if self.trailing_zeroes > 0 {
+             for _ in 0..self.trailing_zeroes {
+-                writer.write_n(&0_u8, 8)?;
++                writer.write_const::<8, 0>()?;
+             }
+         }
+ 
+diff -up dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level10.rs.orig dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level10.rs
+--- dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level10.rs.orig	2006-07-24 03:21:28.000000000 +0200
++++ dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level10.rs	2025-08-22 15:18:45.083579260 +0200
+@@ -42,22 +42,22 @@ impl ExtMetadataBlockLevel10 {
+     pub(crate) fn parse(reader: &mut BsIoSliceReader, length: u64) -> Result<ExtMetadataBlock> {
+         let mut block = Self {
+             length,
+-            target_display_index: reader.get_n(8)?,
+-            target_max_pq: reader.get_n(12)?,
+-            target_min_pq: reader.get_n(12)?,
+-            target_primary_index: reader.get_n(8)?,
++            target_display_index: reader.read::<8, u8>()?,
++            target_max_pq: reader.read::<12, u16>()?,
++            target_min_pq: reader.read::<12, u16>()?,
++            target_primary_index: reader.read::<8, u8>()?,
+             ..Default::default()
+         };
+ 
+         if length > 5 {
+-            block.target_primary_red_x = reader.get_n(16)?;
+-            block.target_primary_red_y = reader.get_n(16)?;
+-            block.target_primary_green_x = reader.get_n(16)?;
+-            block.target_primary_green_y = reader.get_n(16)?;
+-            block.target_primary_blue_x = reader.get_n(16)?;
+-            block.target_primary_blue_y = reader.get_n(16)?;
+-            block.target_primary_white_x = reader.get_n(16)?;
+-            block.target_primary_white_y = reader.get_n(16)?;
++            block.target_primary_red_x = reader.read::<16, u16>()?;
++            block.target_primary_red_y = reader.read::<16, u16>()?;
++            block.target_primary_green_x = reader.read::<16, u16>()?;
++            block.target_primary_green_y = reader.read::<16, u16>()?;
++            block.target_primary_blue_x = reader.read::<16, u16>()?;
++            block.target_primary_blue_y = reader.read::<16, u16>()?;
++            block.target_primary_white_x = reader.read::<16, u16>()?;
++            block.target_primary_white_y = reader.read::<16, u16>()?;
+         }
+ 
+         Ok(ExtMetadataBlock::Level10(block))
+@@ -66,20 +66,20 @@ impl ExtMetadataBlockLevel10 {
+     pub fn write(&self, writer: &mut BitstreamIoWriter) -> Result<()> {
+         self.validate()?;
+ 
+-        writer.write_n(&self.target_display_index, 8)?;
+-        writer.write_n(&self.target_max_pq, 12)?;
+-        writer.write_n(&self.target_min_pq, 12)?;
+-        writer.write_n(&self.target_primary_index, 8)?;
++        writer.write::<8, u8>(self.target_display_index)?;
++        writer.write::<12, u16>(self.target_max_pq)?;
++        writer.write::<12, u16>(self.target_min_pq)?;
++        writer.write::<8, u8>(self.target_primary_index)?;
+ 
+         if self.length > 5 {
+-            writer.write_n(&self.target_primary_red_x, 16)?;
+-            writer.write_n(&self.target_primary_red_y, 16)?;
+-            writer.write_n(&self.target_primary_green_x, 16)?;
+-            writer.write_n(&self.target_primary_green_y, 16)?;
+-            writer.write_n(&self.target_primary_blue_x, 16)?;
+-            writer.write_n(&self.target_primary_blue_y, 16)?;
+-            writer.write_n(&self.target_primary_white_x, 16)?;
+-            writer.write_n(&self.target_primary_white_y, 16)?;
++            writer.write::<16, u16>(self.target_primary_red_x)?;
++            writer.write::<16, u16>(self.target_primary_red_y)?;
++            writer.write::<16, u16>(self.target_primary_green_x)?;
++            writer.write::<16, u16>(self.target_primary_green_y)?;
++            writer.write::<16, u16>(self.target_primary_blue_x)?;
++            writer.write::<16, u16>(self.target_primary_blue_y)?;
++            writer.write::<16, u16>(self.target_primary_white_x)?;
++            writer.write::<16, u16>(self.target_primary_white_y)?;
+         }
+ 
+         Ok(())
+diff -up dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level11.rs.orig dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level11.rs
+--- dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level11.rs.orig	2006-07-24 03:21:28.000000000 +0200
++++ dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level11.rs	2025-08-22 15:18:45.083761018 +0200
+@@ -28,10 +28,10 @@ pub struct ExtMetadataBlockLevel11 {
+ impl ExtMetadataBlockLevel11 {
+     pub(crate) fn parse(reader: &mut BsIoSliceReader) -> Result<ExtMetadataBlock> {
+         let mut l11 = Self {
+-            content_type: reader.get_n(8)?,
+-            whitepoint: reader.get_n(8)?,
+-            reserved_byte2: reader.get_n(8)?,
+-            reserved_byte3: reader.get_n(8)?,
++            content_type: reader.read::<8, u8>()?,
++            whitepoint: reader.read::<8, u8>()?,
++            reserved_byte2: reader.read::<8, u8>()?,
++            reserved_byte3: reader.read::<8, u8>()?,
+             ..Default::default()
+         };
+ 
+@@ -52,10 +52,10 @@ impl ExtMetadataBlockLevel11 {
+             wp += MAX_WHITEPOINT_VALUE + 1
+         }
+ 
+-        writer.write_n(&self.content_type, 8)?;
+-        writer.write_n(&wp, 8)?;
+-        writer.write_n(&self.reserved_byte2, 8)?;
+-        writer.write_n(&self.reserved_byte3, 8)?;
++        writer.write::<8, u8>(self.content_type)?;
++        writer.write::<8, u8>(wp)?;
++        writer.write::<8, u8>(self.reserved_byte2)?;
++        writer.write::<8, u8>(self.reserved_byte3)?;
+ 
+         Ok(())
+     }
+diff -up dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level1.rs.orig dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level1.rs
+--- dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level1.rs.orig	2006-07-24 03:21:28.000000000 +0200
++++ dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level1.rs	2025-08-22 15:18:45.083935462 +0200
+@@ -34,18 +34,18 @@ pub struct ExtMetadataBlockLevel1 {
+ impl ExtMetadataBlockLevel1 {
+     pub(crate) fn parse(reader: &mut BsIoSliceReader) -> Result<ExtMetadataBlock> {
+         Ok(ExtMetadataBlock::Level1(Self {
+-            min_pq: reader.get_n(12)?,
+-            max_pq: reader.get_n(12)?,
+-            avg_pq: reader.get_n(12)?,
++            min_pq: reader.read::<12, u16>()?,
++            max_pq: reader.read::<12, u16>()?,
++            avg_pq: reader.read::<12, u16>()?,
+         }))
+     }
+ 
+     pub fn write(&self, writer: &mut BitstreamIoWriter) -> Result<()> {
+         self.validate()?;
+ 
+-        writer.write_n(&self.min_pq, 12)?;
+-        writer.write_n(&self.max_pq, 12)?;
+-        writer.write_n(&self.avg_pq, 12)?;
++        writer.write::<12, u16>(self.min_pq)?;
++        writer.write::<12, u16>(self.max_pq)?;
++        writer.write::<12, u16>(self.avg_pq)?;
+ 
+         Ok(())
+     }
+diff -up dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level254.rs.orig dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level254.rs
+--- dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level254.rs.orig	2006-07-24 03:21:28.000000000 +0200
++++ dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level254.rs	2025-08-22 15:18:45.084102824 +0200
+@@ -21,14 +21,14 @@ pub struct ExtMetadataBlockLevel254 {
+ impl ExtMetadataBlockLevel254 {
+     pub(crate) fn parse(reader: &mut BsIoSliceReader) -> Result<ExtMetadataBlock> {
+         Ok(ExtMetadataBlock::Level254(Self {
+-            dm_mode: reader.get_n(8)?,
+-            dm_version_index: reader.get_n(8)?,
++            dm_mode: reader.read::<8, u8>()?,
++            dm_version_index: reader.read::<8, u8>()?,
+         }))
+     }
+ 
+     pub fn write(&self, writer: &mut BitstreamIoWriter) -> Result<()> {
+-        writer.write_n(&self.dm_mode, 8)?;
+-        writer.write_n(&self.dm_version_index, 8)?;
++        writer.write::<8, u8>(self.dm_mode)?;
++        writer.write::<8, u8>(self.dm_version_index)?;
+ 
+         Ok(())
+     }
+diff -up dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level255.rs.orig dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level255.rs
+--- dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level255.rs.orig	2006-07-24 03:21:28.000000000 +0200
++++ dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level255.rs	2025-08-22 15:18:45.084293447 +0200
+@@ -26,22 +26,22 @@ pub struct ExtMetadataBlockLevel255 {
+ impl ExtMetadataBlockLevel255 {
+     pub(crate) fn parse(reader: &mut BsIoSliceReader) -> Result<ExtMetadataBlock> {
+         Ok(ExtMetadataBlock::Level255(Self {
+-            dm_run_mode: reader.get_n(8)?,
+-            dm_run_version: reader.get_n(8)?,
+-            dm_debug0: reader.get_n(8)?,
+-            dm_debug1: reader.get_n(8)?,
+-            dm_debug2: reader.get_n(8)?,
+-            dm_debug3: reader.get_n(8)?,
++            dm_run_mode: reader.read::<8, u8>()?,
++            dm_run_version: reader.read::<8, u8>()?,
++            dm_debug0: reader.read::<8, u8>()?,
++            dm_debug1: reader.read::<8, u8>()?,
++            dm_debug2: reader.read::<8, u8>()?,
++            dm_debug3: reader.read::<8, u8>()?,
+         }))
+     }
+ 
+     pub fn write(&self, writer: &mut BitstreamIoWriter) -> Result<()> {
+-        writer.write_n(&self.dm_run_mode, 8)?;
+-        writer.write_n(&self.dm_run_version, 8)?;
+-        writer.write_n(&self.dm_debug0, 8)?;
+-        writer.write_n(&self.dm_debug1, 8)?;
+-        writer.write_n(&self.dm_debug2, 8)?;
+-        writer.write_n(&self.dm_debug3, 8)?;
++        writer.write::<8, u8>(self.dm_run_mode)?;
++        writer.write::<8, u8>(self.dm_run_version)?;
++        writer.write::<8, u8>(self.dm_debug0)?;
++        writer.write::<8, u8>(self.dm_debug1)?;
++        writer.write::<8, u8>(self.dm_debug2)?;
++        writer.write::<8, u8>(self.dm_debug3)?;
+ 
+         Ok(())
+     }
+diff -up dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level2.rs.orig dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level2.rs
+--- dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level2.rs.orig	2006-07-24 03:21:28.000000000 +0200
++++ dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level2.rs	2025-08-22 15:18:45.084469569 +0200
+@@ -29,13 +29,13 @@ pub struct ExtMetadataBlockLevel2 {
+ impl ExtMetadataBlockLevel2 {
+     pub(crate) fn parse(reader: &mut BsIoSliceReader) -> Result<ExtMetadataBlock> {
+         let mut level2 = Self {
+-            target_max_pq: reader.get_n(12)?,
+-            trim_slope: reader.get_n(12)?,
+-            trim_offset: reader.get_n(12)?,
+-            trim_power: reader.get_n(12)?,
+-            trim_chroma_weight: reader.get_n(12)?,
+-            trim_saturation_gain: reader.get_n(12)?,
+-            ms_weight: reader.get_n::<u16>(13)? as i16,
++            target_max_pq: reader.read::<12, u16>()?,
++            trim_slope: reader.read::<12, u16>()?,
++            trim_offset: reader.read::<12, u16>()?,
++            trim_power: reader.read::<12, u16>()?,
++            trim_chroma_weight: reader.read::<12, u16>()?,
++            trim_saturation_gain: reader.read::<12, u16>()?,
++            ms_weight: reader.read::<13, i16>()?,
+         };
+ 
+         if level2.ms_weight > MAX_12_BIT_VALUE as i16 {
+@@ -48,13 +48,13 @@ impl ExtMetadataBlockLevel2 {
+     pub fn write(&self, writer: &mut BitstreamIoWriter) -> Result<()> {
+         self.validate()?;
+ 
+-        writer.write_n(&self.target_max_pq, 12)?;
+-        writer.write_n(&self.trim_slope, 12)?;
+-        writer.write_n(&self.trim_offset, 12)?;
+-        writer.write_n(&self.trim_power, 12)?;
+-        writer.write_n(&self.trim_chroma_weight, 12)?;
+-        writer.write_n(&self.trim_saturation_gain, 12)?;
+-        writer.write_signed_n(&self.ms_weight, 13)?;
++        writer.write::<12, u16>(self.target_max_pq)?;
++        writer.write::<12, u16>(self.trim_slope)?;
++        writer.write::<12, u16>(self.trim_offset)?;
++        writer.write::<12, u16>(self.trim_power)?;
++        writer.write::<12, u16>(self.trim_chroma_weight)?;
++        writer.write::<12, u16>(self.trim_saturation_gain)?;
++        writer.write::<13, i16>(self.ms_weight)?;
+ 
+         Ok(())
+     }
+diff -up dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level3.rs.orig dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level3.rs
+--- dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level3.rs.orig	2006-07-24 03:21:28.000000000 +0200
++++ dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level3.rs	2025-08-22 15:18:45.084645717 +0200
+@@ -22,18 +22,18 @@ pub struct ExtMetadataBlockLevel3 {
+ impl ExtMetadataBlockLevel3 {
+     pub(crate) fn parse(reader: &mut BsIoSliceReader) -> Result<ExtMetadataBlock> {
+         Ok(ExtMetadataBlock::Level3(Self {
+-            min_pq_offset: reader.get_n(12)?,
+-            max_pq_offset: reader.get_n(12)?,
+-            avg_pq_offset: reader.get_n(12)?,
++            min_pq_offset: reader.read::<12, u16>()?,
++            max_pq_offset: reader.read::<12, u16>()?,
++            avg_pq_offset: reader.read::<12, u16>()?,
+         }))
+     }
+ 
+     pub fn write(&self, writer: &mut BitstreamIoWriter) -> Result<()> {
+         self.validate()?;
+ 
+-        writer.write_n(&self.min_pq_offset, 12)?;
+-        writer.write_n(&self.max_pq_offset, 12)?;
+-        writer.write_n(&self.avg_pq_offset, 12)?;
++        writer.write::<12, u16>(self.min_pq_offset)?;
++        writer.write::<12, u16>(self.max_pq_offset)?;
++        writer.write::<12, u16>(self.avg_pq_offset)?;
+ 
+         Ok(())
+     }
+diff -up dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level4.rs.orig dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level4.rs
+--- dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level4.rs.orig	2006-07-24 03:21:28.000000000 +0200
++++ dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level4.rs	2025-08-22 15:18:45.084811700 +0200
+@@ -20,16 +20,16 @@ pub struct ExtMetadataBlockLevel4 {
+ impl ExtMetadataBlockLevel4 {
+     pub(crate) fn parse(reader: &mut BsIoSliceReader) -> Result<ExtMetadataBlock> {
+         Ok(ExtMetadataBlock::Level4(Self {
+-            anchor_pq: reader.get_n(12)?,
+-            anchor_power: reader.get_n(12)?,
++            anchor_pq: reader.read::<12, u16>()?,
++            anchor_power: reader.read::<12, u16>()?,
+         }))
+     }
+ 
+     pub fn write(&self, writer: &mut BitstreamIoWriter) -> Result<()> {
+         self.validate()?;
+ 
+-        writer.write_n(&self.anchor_pq, 12)?;
+-        writer.write_n(&self.anchor_power, 12)?;
++        writer.write::<12, u16>(self.anchor_pq)?;
++        writer.write::<12, u16>(self.anchor_power)?;
+ 
+         Ok(())
+     }
+diff -up dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level5.rs.orig dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level5.rs
+--- dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level5.rs.orig	2006-07-24 03:21:28.000000000 +0200
++++ dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level5.rs	2025-08-22 15:18:45.084992347 +0200
+@@ -24,20 +24,20 @@ pub struct ExtMetadataBlockLevel5 {
+ impl ExtMetadataBlockLevel5 {
+     pub(crate) fn parse(reader: &mut BsIoSliceReader) -> Result<ExtMetadataBlock> {
+         Ok(ExtMetadataBlock::Level5(Self {
+-            active_area_left_offset: reader.get_n(13)?,
+-            active_area_right_offset: reader.get_n(13)?,
+-            active_area_top_offset: reader.get_n(13)?,
+-            active_area_bottom_offset: reader.get_n(13)?,
++            active_area_left_offset: reader.read::<13, u16>()?,
++            active_area_right_offset: reader.read::<13, u16>()?,
++            active_area_top_offset: reader.read::<13, u16>()?,
++            active_area_bottom_offset: reader.read::<13, u16>()?,
+         }))
+     }
+ 
+     pub fn write(&self, writer: &mut BitstreamIoWriter) -> Result<()> {
+         self.validate()?;
+ 
+-        writer.write_n(&self.active_area_left_offset, 13)?;
+-        writer.write_n(&self.active_area_right_offset, 13)?;
+-        writer.write_n(&self.active_area_top_offset, 13)?;
+-        writer.write_n(&self.active_area_bottom_offset, 13)?;
++        writer.write::<13, u16>(self.active_area_left_offset)?;
++        writer.write::<13, u16>(self.active_area_right_offset)?;
++        writer.write::<13, u16>(self.active_area_top_offset)?;
++        writer.write::<13, u16>(self.active_area_bottom_offset)?;
+ 
+         Ok(())
+     }
+diff -up dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level6.rs.orig dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level6.rs
+--- dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level6.rs.orig	2006-07-24 03:21:28.000000000 +0200
++++ dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level6.rs	2025-08-22 15:18:45.085167848 +0200
+@@ -25,20 +25,20 @@ pub struct ExtMetadataBlockLevel6 {
+ impl ExtMetadataBlockLevel6 {
+     pub(crate) fn parse(reader: &mut BsIoSliceReader) -> Result<ExtMetadataBlock> {
+         Ok(ExtMetadataBlock::Level6(Self {
+-            max_display_mastering_luminance: reader.get_n(16)?,
+-            min_display_mastering_luminance: reader.get_n(16)?,
+-            max_content_light_level: reader.get_n(16)?,
+-            max_frame_average_light_level: reader.get_n(16)?,
++            max_display_mastering_luminance: reader.read::<16, u16>()?,
++            min_display_mastering_luminance: reader.read::<16, u16>()?,
++            max_content_light_level: reader.read::<16, u16>()?,
++            max_frame_average_light_level: reader.read::<16, u16>()?,
+         }))
+     }
+ 
+     pub fn write(&self, writer: &mut BitstreamIoWriter) -> Result<()> {
+         self.validate()?;
+ 
+-        writer.write_n(&self.max_display_mastering_luminance, 16)?;
+-        writer.write_n(&self.min_display_mastering_luminance, 16)?;
+-        writer.write_n(&self.max_content_light_level, 16)?;
+-        writer.write_n(&self.max_frame_average_light_level, 16)?;
++        writer.write::<16, u16>(self.max_display_mastering_luminance)?;
++        writer.write::<16, u16>(self.min_display_mastering_luminance)?;
++        writer.write::<16, u16>(self.max_content_light_level)?;
++        writer.write::<16, u16>(self.max_frame_average_light_level)?;
+ 
+         Ok(())
+     }
+diff -up dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level8.rs.orig dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level8.rs
+--- dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level8.rs.orig	2006-07-24 03:21:28.000000000 +0200
++++ dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level8.rs	2025-08-22 15:18:45.085407828 +0200
+@@ -56,40 +56,40 @@ impl ExtMetadataBlockLevel8 {
+     pub(crate) fn parse(reader: &mut BsIoSliceReader, length: u64) -> Result<ExtMetadataBlock> {
+         let mut block = Self {
+             length,
+-            target_display_index: reader.get_n(8)?,
+-            trim_slope: reader.get_n(12)?,
+-            trim_offset: reader.get_n(12)?,
+-            trim_power: reader.get_n(12)?,
+-            trim_chroma_weight: reader.get_n(12)?,
+-            trim_saturation_gain: reader.get_n(12)?,
+-            ms_weight: reader.get_n(12)?,
++            target_display_index: reader.read::<8, u8>()?,
++            trim_slope: reader.read::<12, u16>()?,
++            trim_offset: reader.read::<12, u16>()?,
++            trim_power: reader.read::<12, u16>()?,
++            trim_chroma_weight: reader.read::<12, u16>()?,
++            trim_saturation_gain: reader.read::<12, u16>()?,
++            ms_weight: reader.read::<12, u16>()?,
+             ..Default::default()
+         };
+ 
+         if length > 10 {
+-            block.target_mid_contrast = reader.get_n(12)?;
++            block.target_mid_contrast = reader.read::<12, u16>()?;
+         }
+ 
+         if length > 12 {
+-            block.clip_trim = reader.get_n(12)?;
++            block.clip_trim = reader.read::<12, u16>()?;
+         }
+ 
+         if length > 13 {
+-            block.saturation_vector_field0 = reader.get_n(8)?;
+-            block.saturation_vector_field1 = reader.get_n(8)?;
+-            block.saturation_vector_field2 = reader.get_n(8)?;
+-            block.saturation_vector_field3 = reader.get_n(8)?;
+-            block.saturation_vector_field4 = reader.get_n(8)?;
+-            block.saturation_vector_field5 = reader.get_n(8)?;
++            block.saturation_vector_field0 = reader.read::<8, u8>()?;
++            block.saturation_vector_field1 = reader.read::<8, u8>()?;
++            block.saturation_vector_field2 = reader.read::<8, u8>()?;
++            block.saturation_vector_field3 = reader.read::<8, u8>()?;
++            block.saturation_vector_field4 = reader.read::<8, u8>()?;
++            block.saturation_vector_field5 = reader.read::<8, u8>()?;
+         }
+ 
+         if length > 19 {
+-            block.hue_vector_field0 = reader.get_n(8)?;
+-            block.hue_vector_field1 = reader.get_n(8)?;
+-            block.hue_vector_field2 = reader.get_n(8)?;
+-            block.hue_vector_field3 = reader.get_n(8)?;
+-            block.hue_vector_field4 = reader.get_n(8)?;
+-            block.hue_vector_field5 = reader.get_n(8)?;
++            block.hue_vector_field0 = reader.read::<8, u8>()?;
++            block.hue_vector_field1 = reader.read::<8, u8>()?;
++            block.hue_vector_field2 = reader.read::<8, u8>()?;
++            block.hue_vector_field3 = reader.read::<8, u8>()?;
++            block.hue_vector_field4 = reader.read::<8, u8>()?;
++            block.hue_vector_field5 = reader.read::<8, u8>()?;
+         }
+ 
+         Ok(ExtMetadataBlock::Level8(block))
+@@ -98,39 +98,39 @@ impl ExtMetadataBlockLevel8 {
+     pub fn write(&self, writer: &mut BitstreamIoWriter) -> Result<()> {
+         self.validate()?;
+ 
+-        writer.write_n(&self.target_display_index, 8)?;
+-        writer.write_n(&self.trim_slope, 12)?;
+-        writer.write_n(&self.trim_offset, 12)?;
+-        writer.write_n(&self.trim_power, 12)?;
+-        writer.write_n(&self.trim_chroma_weight, 12)?;
+-        writer.write_n(&self.trim_saturation_gain, 12)?;
+-        writer.write_n(&self.ms_weight, 12)?;
++        writer.write::<8, u8>(self.target_display_index)?;
++        writer.write::<12, u16>(self.trim_slope)?;
++        writer.write::<12, u16>(self.trim_offset)?;
++        writer.write::<12, u16>(self.trim_power)?;
++        writer.write::<12, u16>(self.trim_chroma_weight)?;
++        writer.write::<12, u16>(self.trim_saturation_gain)?;
++        writer.write::<12, u16>(self.ms_weight)?;
+ 
+         // Write default values when the fields can not be omitted
+         if self.length > 10 {
+-            writer.write_n(&self.target_mid_contrast, 12)?;
++            writer.write::<12, u16>(self.target_mid_contrast)?;
+         }
+ 
+         if self.length > 12 {
+-            writer.write_n(&self.clip_trim, 12)?;
++            writer.write::<12, u16>(self.clip_trim)?;
+         }
+ 
+         if self.length > 13 {
+-            writer.write_n(&self.saturation_vector_field0, 8)?;
+-            writer.write_n(&self.saturation_vector_field1, 8)?;
+-            writer.write_n(&self.saturation_vector_field2, 8)?;
+-            writer.write_n(&self.saturation_vector_field3, 8)?;
+-            writer.write_n(&self.saturation_vector_field4, 8)?;
+-            writer.write_n(&self.saturation_vector_field5, 8)?;
++            writer.write::<8, u8>(self.saturation_vector_field0)?;
++            writer.write::<8, u8>(self.saturation_vector_field1)?;
++            writer.write::<8, u8>(self.saturation_vector_field2)?;
++            writer.write::<8, u8>(self.saturation_vector_field3)?;
++            writer.write::<8, u8>(self.saturation_vector_field4)?;
++            writer.write::<8, u8>(self.saturation_vector_field5)?;
+         }
+ 
+         if self.length > 19 {
+-            writer.write_n(&self.hue_vector_field0, 8)?;
+-            writer.write_n(&self.hue_vector_field1, 8)?;
+-            writer.write_n(&self.hue_vector_field2, 8)?;
+-            writer.write_n(&self.hue_vector_field3, 8)?;
+-            writer.write_n(&self.hue_vector_field4, 8)?;
+-            writer.write_n(&self.hue_vector_field5, 8)?;
++            writer.write::<8, u8>(self.hue_vector_field0)?;
++            writer.write::<8, u8>(self.hue_vector_field1)?;
++            writer.write::<8, u8>(self.hue_vector_field2)?;
++            writer.write::<8, u8>(self.hue_vector_field3)?;
++            writer.write::<8, u8>(self.hue_vector_field4)?;
++            writer.write::<8, u8>(self.hue_vector_field5)?;
+         }
+ 
+         Ok(())
+diff -up dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level9.rs.orig dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level9.rs
+--- dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level9.rs.orig	2006-07-24 03:21:28.000000000 +0200
++++ dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/level9.rs	2025-08-22 15:18:45.085614467 +0200
+@@ -60,19 +60,19 @@ impl ExtMetadataBlockLevel9 {
+     pub(crate) fn parse(reader: &mut BsIoSliceReader, length: u64) -> Result<ExtMetadataBlock> {
+         let mut block = Self {
+             length,
+-            source_primary_index: reader.get_n(8)?,
++            source_primary_index: reader.read::<8, u8>()?,
+             ..Default::default()
+         };
+ 
+         if length > 1 {
+-            block.source_primary_red_x = reader.get_n(16)?;
+-            block.source_primary_red_y = reader.get_n(16)?;
+-            block.source_primary_green_x = reader.get_n(16)?;
+-            block.source_primary_green_y = reader.get_n(16)?;
+-            block.source_primary_blue_x = reader.get_n(16)?;
+-            block.source_primary_blue_y = reader.get_n(16)?;
+-            block.source_primary_white_x = reader.get_n(16)?;
+-            block.source_primary_white_y = reader.get_n(16)?;
++            block.source_primary_red_x = reader.read::<16, u16>()?;
++            block.source_primary_red_y = reader.read::<16, u16>()?;
++            block.source_primary_green_x = reader.read::<16, u16>()?;
++            block.source_primary_green_y = reader.read::<16, u16>()?;
++            block.source_primary_blue_x = reader.read::<16, u16>()?;
++            block.source_primary_blue_y = reader.read::<16, u16>()?;
++            block.source_primary_white_x = reader.read::<16, u16>()?;
++            block.source_primary_white_y = reader.read::<16, u16>()?;
+         }
+ 
+         Ok(ExtMetadataBlock::Level9(block))
+@@ -81,17 +81,17 @@ impl ExtMetadataBlockLevel9 {
+     pub fn write(&self, writer: &mut BitstreamIoWriter) -> Result<()> {
+         self.validate()?;
+ 
+-        writer.write_n(&self.source_primary_index, 8)?;
++        writer.write::<8, u8>(self.source_primary_index)?;
+ 
+         if self.length > 1 {
+-            writer.write_n(&self.source_primary_red_x, 16)?;
+-            writer.write_n(&self.source_primary_red_y, 16)?;
+-            writer.write_n(&self.source_primary_green_x, 16)?;
+-            writer.write_n(&self.source_primary_green_y, 16)?;
+-            writer.write_n(&self.source_primary_blue_x, 16)?;
+-            writer.write_n(&self.source_primary_blue_y, 16)?;
+-            writer.write_n(&self.source_primary_white_x, 16)?;
+-            writer.write_n(&self.source_primary_white_y, 16)?;
++            writer.write::<16, u16>(self.source_primary_red_x)?;
++            writer.write::<16, u16>(self.source_primary_red_y)?;
++            writer.write::<16, u16>(self.source_primary_green_x)?;
++            writer.write::<16, u16>(self.source_primary_green_y)?;
++            writer.write::<16, u16>(self.source_primary_blue_x)?;
++            writer.write::<16, u16>(self.source_primary_blue_y)?;
++            writer.write::<16, u16>(self.source_primary_white_x)?;
++            writer.write::<16, u16>(self.source_primary_white_y)?;
+         }
+ 
+         Ok(())
+diff -up dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/mod.rs.orig dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/mod.rs
+--- dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/mod.rs.orig	2006-07-24 03:21:28.000000000 +0200
++++ dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/mod.rs	2025-08-22 15:18:45.085782375 +0200
+@@ -216,7 +216,7 @@ impl ExtMetadataBlock {
+ 
+         for _ in 0..ext_block_use_bits {
+             ensure!(
+-                !reader.get()?,
++                !reader.read_bit()?,
+                 format!("{}: ext_dm_alignment_zero_bit != 0", T::VERSION)
+             );
+         }
+diff -up dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/reserved.rs.orig dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/reserved.rs
+--- dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/reserved.rs.orig	2006-07-24 03:21:28.000000000 +0200
++++ dolby_vision-3.3.2/src/rpu/extension_metadata/blocks/reserved.rs	2025-08-22 15:18:45.085990910 +0200
+@@ -1,6 +1,5 @@
+ use anyhow::{Result, bail};
+ 
+-use bitvec::{order::Msb0, prelude::BitVec};
+ use bitvec_helpers::{
+     bitstream_io_reader::BsIoSliceReader, bitstream_io_writer::BitstreamIoWriter,
+ };
+@@ -16,11 +15,8 @@ pub struct ReservedExtMetadataBlock {
+     pub ext_block_length: u64,
+     pub ext_block_level: u8,
+ 
+-    #[cfg_attr(
+-        feature = "serde",
+-        serde(serialize_with = "crate::utils::bitvec_ser_bits", skip_deserializing)
+-    )]
+-    pub data: BitVec<u8, Msb0>,
++    #[cfg_attr(feature = "serde", serde(skip_deserializing))]
++    pub data: Vec<u8>,
+ }
+ 
+ impl ReservedExtMetadataBlock {
+@@ -29,12 +25,8 @@ impl ReservedExtMetadataBlock {
+         ext_block_level: u8,
+         reader: &mut BsIoSliceReader,
+     ) -> Result<ExtMetadataBlock> {
+-        let bits = 8 * ext_block_length;
+-        let mut data = BitVec::new();
+-
+-        for _ in 0..bits {
+-            data.push(reader.get()?);
+-        }
++        let mut data = vec![0; ext_block_length as usize];
++        reader.read_bytes(&mut data)?;
+ 
+         Ok(ExtMetadataBlock::Reserved(Self {
+             ext_block_length,
+@@ -45,12 +37,10 @@ impl ReservedExtMetadataBlock {
+ 
+     pub fn write(&self, _writer: &mut BitstreamIoWriter) -> Result<()> {
+         bail!("Cannot write reserved block");
+-        // self.data.iter().for_each(|b| writer.write(*b))?;
+     }
+ }
+ 
+ impl ExtMetadataBlockInfo for ReservedExtMetadataBlock {
+-    // TODO: Level 255 is actually definded for DM debugging purposes, we may add it.
+     fn level(&self) -> u8 {
+         0
+     }
+@@ -60,6 +50,6 @@ impl ExtMetadataBlockInfo for ReservedEx
+     }
+ 
+     fn required_bits(&self) -> u64 {
+-        self.data.len() as u64
++        self.ext_block_length * 8
+     }
+ }
+diff -up dolby_vision-3.3.2/src/rpu/extension_metadata/cmv29.rs.orig dolby_vision-3.3.2/src/rpu/extension_metadata/cmv29.rs
+--- dolby_vision-3.3.2/src/rpu/extension_metadata/cmv29.rs.orig	2006-07-24 03:21:28.000000000 +0200
++++ dolby_vision-3.3.2/src/rpu/extension_metadata/cmv29.rs	2025-08-22 15:18:45.086161334 +0200
+@@ -42,8 +42,8 @@ impl WithExtMetadataBlocks for CmV29DmDa
+     }
+ 
+     fn parse_block(&mut self, reader: &mut BsIoSliceReader) -> Result<()> {
+-        let ext_block_length = reader.get_ue()?;
+-        let ext_block_level = reader.get_n(8)?;
++        let ext_block_length = reader.read_ue()?;
++        let ext_block_level = reader.read::<8, u8>()?;
+ 
+         let ext_metadata_block = match ext_block_level {
+             1 => level1::ExtMetadataBlockLevel1::parse(reader)?,
+diff -up dolby_vision-3.3.2/src/rpu/extension_metadata/cmv40.rs.orig dolby_vision-3.3.2/src/rpu/extension_metadata/cmv40.rs
+--- dolby_vision-3.3.2/src/rpu/extension_metadata/cmv40.rs.orig	2006-07-24 03:21:28.000000000 +0200
++++ dolby_vision-3.3.2/src/rpu/extension_metadata/cmv40.rs	2025-08-22 15:18:45.086353568 +0200
+@@ -42,8 +42,8 @@ impl WithExtMetadataBlocks for CmV40DmDa
+     }
+ 
+     fn parse_block(&mut self, reader: &mut BsIoSliceReader) -> Result<()> {
+-        let ext_block_length = reader.get_ue()?;
+-        let ext_block_level: u8 = reader.get_n(8)?;
++        let ext_block_length = reader.read_ue()?;
++        let ext_block_level: u8 = reader.read::<8, u8>()?;
+ 
+         let ext_metadata_block = match ext_block_level {
+             3 => level3::ExtMetadataBlockLevel3::parse(reader)?,
+diff -up dolby_vision-3.3.2/src/rpu/extension_metadata/mod.rs.orig dolby_vision-3.3.2/src/rpu/extension_metadata/mod.rs
+--- dolby_vision-3.3.2/src/rpu/extension_metadata/mod.rs.orig	2006-07-24 03:21:28.000000000 +0200
++++ dolby_vision-3.3.2/src/rpu/extension_metadata/mod.rs	2025-08-22 15:18:45.086578089 +0200
+@@ -82,7 +82,7 @@ pub trait WithExtMetadataBlocks {
+     fn write(&self, writer: &mut BitstreamIoWriter) -> Result<()> {
+         let num_ext_blocks = self.num_ext_blocks();
+ 
+-        writer.write_ue(&num_ext_blocks)?;
++        writer.write_ue(num_ext_blocks)?;
+ 
+         // dm_alignment_zero_bit
+         writer.byte_align()?;
+@@ -91,17 +91,15 @@ pub trait WithExtMetadataBlocks {
+ 
+         for ext_metadata_block in ext_metadata_blocks {
+             let remaining_bits =
+-                ext_metadata_block.length_bits() - ext_metadata_block.required_bits();
++                (ext_metadata_block.length_bits() - ext_metadata_block.required_bits()) as u32;
+ 
+-            writer.write_ue(&ext_metadata_block.length_bytes())?;
+-            writer.write_n(&ext_metadata_block.level(), 8)?;
++            writer.write_ue(ext_metadata_block.length_bytes())?;
++            writer.write::<8, u8>(ext_metadata_block.level())?;
+ 
+             ext_metadata_block.write(writer)?;
+ 
+             // ext_dm_alignment_zero_bit
+-            for _ in 0..remaining_bits {
+-                writer.write(false)?;
+-            }
++            writer.pad(remaining_bits)?;
+         }
+ 
+         Ok(())
+@@ -112,14 +110,14 @@ impl DmData {
+     pub(crate) fn parse<T: WithExtMetadataBlocks + Default>(
+         reader: &mut BsIoSliceReader,
+     ) -> Result<Option<T>> {
+-        let num_ext_blocks = reader.get_ue()?;
++        let num_ext_blocks = reader.read_ue()?;
+         let mut meta = T::with_blocks_allocation(num_ext_blocks);
+ 
+         meta.set_num_ext_blocks(num_ext_blocks);
+ 
+-        while !reader.is_aligned() {
++        while !reader.byte_aligned() {
+             ensure!(
+-                !reader.get()?,
++                !reader.read_bit()?,
+                 format!("{}: dm_alignment_zero_bit != 0", T::VERSION)
+             );
+         }
+diff -up dolby_vision-3.3.2/src/rpu/extension_metadata/primaries.rs.orig dolby_vision-3.3.2/src/rpu/extension_metadata/primaries.rs
+--- dolby_vision-3.3.2/src/rpu/extension_metadata/primaries.rs.orig	2006-07-24 03:21:28.000000000 +0200
++++ dolby_vision-3.3.2/src/rpu/extension_metadata/primaries.rs	2025-08-22 15:18:32.277822575 +0200
+@@ -80,7 +80,7 @@ impl std::fmt::Display for MasteringDisp
+             Self::SGamut => "S-Gamut",
+             Self::SGamut3Cine => "S-Gamut-3.Cine",
+         };
+-        write!(f, "{}", alias)
++        write!(f, "{alias}")
+     }
+ }
+ 
+diff -up dolby_vision-3.3.2/src/rpu/rpu_data_header.rs.orig dolby_vision-3.3.2/src/rpu/rpu_data_header.rs
+--- dolby_vision-3.3.2/src/rpu/rpu_data_header.rs.orig	2006-07-24 03:21:28.000000000 +0200
++++ dolby_vision-3.3.2/src/rpu/rpu_data_header.rs	2025-08-22 15:18:45.086771375 +0200
+@@ -55,15 +55,15 @@ pub struct RpuDataHeader {
+ 
+ impl RpuDataHeader {
+     pub(crate) fn parse(reader: &mut BsIoSliceReader) -> Result<RpuDataHeader> {
+-        let rpu_type = reader.get_n(6)?;
++        let rpu_type = reader.read::<6, u8>()?;
+         ensure!(rpu_type == 2);
+ 
+-        let rpu_format = reader.get_n(11)?;
++        let rpu_format = reader.read::<11, u16>()?;
+ 
+-        let vdr_rpu_profile = reader.get_n(4)?;
+-        let vdr_rpu_level = reader.get_n(4)?;
++        let vdr_rpu_profile = reader.read::<4, u8>()?;
++        let vdr_rpu_level = reader.read::<4, u8>()?;
+ 
+-        let vdr_seq_info_present_flag = reader.get()?;
++        let vdr_seq_info_present_flag = reader.read_bit()?;
+ 
+         let mut header = RpuDataHeader {
+             rpu_type,
+@@ -75,20 +75,20 @@ impl RpuDataHeader {
+         };
+ 
+         if vdr_seq_info_present_flag {
+-            header.chroma_resampling_explicit_filter_flag = reader.get()?;
+-            header.coefficient_data_type = reader.get_n(2)?;
++            header.chroma_resampling_explicit_filter_flag = reader.read_bit()?;
++            header.coefficient_data_type = reader.read::<2, u8>()?;
+ 
+             if header.coefficient_data_type == 0 {
+-                header.coefficient_log2_denom = reader.get_ue()?;
++                header.coefficient_log2_denom = reader.read_ue()?;
+             }
+ 
+-            header.vdr_rpu_normalized_idc = reader.get_n(2)?;
+-            header.bl_video_full_range_flag = reader.get()?;
++            header.vdr_rpu_normalized_idc = reader.read::<2, u8>()?;
++            header.bl_video_full_range_flag = reader.read_bit()?;
+ 
+             if header.rpu_format & 0x700 == 0 {
+-                header.bl_bit_depth_minus8 = reader.get_ue()?;
++                header.bl_bit_depth_minus8 = reader.read_ue()?;
+ 
+-                let el_bit_depth_minus8 = reader.get_ue()?;
++                let el_bit_depth_minus8 = reader.read_ue()?;
+                 // 8 lowest bits
+                 header.el_bit_depth_minus8 = el_bit_depth_minus8 & 0xFF;
+ 
+@@ -98,11 +98,11 @@ impl RpuDataHeader {
+                 header.ext_mapping_idc_0_4 = ext_mapping_idc & 0x1F;
+                 header.ext_mapping_idc_5_7 = ext_mapping_idc >> 5;
+ 
+-                header.vdr_bit_depth_minus8 = reader.get_ue()?;
+-                header.spatial_resampling_filter_flag = reader.get()?;
+-                header.reserved_zero_3bits = reader.get_n(3)?;
+-                header.el_spatial_resampling_filter_flag = reader.get()?;
+-                header.disable_residual_flag = reader.get()?;
++                header.vdr_bit_depth_minus8 = reader.read_ue()?;
++                header.spatial_resampling_filter_flag = reader.read_bit()?;
++                header.reserved_zero_3bits = reader.read::<3, u8>()?;
++                header.el_spatial_resampling_filter_flag = reader.read_bit()?;
++                header.disable_residual_flag = reader.read_bit()?;
+             }
+ 
+             header.coefficient_log2_denom_length = if header.coefficient_data_type == 0 {
+@@ -117,11 +117,11 @@ impl RpuDataHeader {
+             };
+         }
+ 
+-        header.vdr_dm_metadata_present_flag = reader.get()?;
++        header.vdr_dm_metadata_present_flag = reader.read_bit()?;
+ 
+-        header.use_prev_vdr_rpu_flag = reader.get()?;
++        header.use_prev_vdr_rpu_flag = reader.read_bit()?;
+         if header.use_prev_vdr_rpu_flag {
+-            header.prev_vdr_rpu_id = reader.get_ue()?;
++            header.prev_vdr_rpu_id = reader.read_ue()?;
+         }
+ 
+         Ok(header)
+@@ -194,45 +194,45 @@ impl RpuDataHeader {
+     }
+ 
+     pub fn write_header(&self, writer: &mut BitstreamIoWriter) -> Result<()> {
+-        writer.write_n(&self.rpu_type, 6)?;
+-        writer.write_n(&self.rpu_format, 11)?;
++        writer.write::<6, u8>(self.rpu_type)?;
++        writer.write::<11, u16>(self.rpu_format)?;
+ 
+-        writer.write_n(&self.vdr_rpu_profile, 4)?;
+-        writer.write_n(&self.vdr_rpu_level, 4)?;
+-        writer.write(self.vdr_seq_info_present_flag)?;
++        writer.write::<4, u8>(self.vdr_rpu_profile)?;
++        writer.write::<4, u8>(self.vdr_rpu_level)?;
++        writer.write_bit(self.vdr_seq_info_present_flag)?;
+ 
+         if self.vdr_seq_info_present_flag {
+-            writer.write(self.chroma_resampling_explicit_filter_flag)?;
+-            writer.write_n(&self.coefficient_data_type, 2)?;
++            writer.write_bit(self.chroma_resampling_explicit_filter_flag)?;
++            writer.write::<2, u8>(self.coefficient_data_type)?;
+ 
+             if self.coefficient_data_type == 0 {
+-                writer.write_ue(&self.coefficient_log2_denom)?;
++                writer.write_ue(self.coefficient_log2_denom)?;
+             }
+ 
+-            writer.write_n(&self.vdr_rpu_normalized_idc, 2)?;
+-            writer.write(self.bl_video_full_range_flag)?;
++            writer.write::<2, u8>(self.vdr_rpu_normalized_idc)?;
++            writer.write_bit(self.bl_video_full_range_flag)?;
+ 
+             if self.rpu_format & 0x700 == 0 {
+-                writer.write_ue(&self.bl_bit_depth_minus8)?;
++                writer.write_ue(self.bl_bit_depth_minus8)?;
+ 
+                 let ext_mapping_idc =
+                     ((self.ext_mapping_idc_5_7 << 5) | self.ext_mapping_idc_0_4) as u64;
+                 let el_bit_depth_minus8 = (ext_mapping_idc << 8) | self.el_bit_depth_minus8;
+-                writer.write_ue(&el_bit_depth_minus8)?;
++                writer.write_ue(el_bit_depth_minus8)?;
+ 
+-                writer.write_ue(&self.vdr_bit_depth_minus8)?;
+-                writer.write(self.spatial_resampling_filter_flag)?;
+-                writer.write_n(&self.reserved_zero_3bits, 3)?;
+-                writer.write(self.el_spatial_resampling_filter_flag)?;
+-                writer.write(self.disable_residual_flag)?;
++                writer.write_ue(self.vdr_bit_depth_minus8)?;
++                writer.write_bit(self.spatial_resampling_filter_flag)?;
++                writer.write::<3, u8>(self.reserved_zero_3bits)?;
++                writer.write_bit(self.el_spatial_resampling_filter_flag)?;
++                writer.write_bit(self.disable_residual_flag)?;
+             }
+         }
+ 
+-        writer.write(self.vdr_dm_metadata_present_flag)?;
+-        writer.write(self.use_prev_vdr_rpu_flag)?;
++        writer.write_bit(self.vdr_dm_metadata_present_flag)?;
++        writer.write_bit(self.use_prev_vdr_rpu_flag)?;
+ 
+         if self.use_prev_vdr_rpu_flag {
+-            writer.write_ue(&self.prev_vdr_rpu_id)?;
++            writer.write_ue(self.prev_vdr_rpu_id)?;
+         }
+ 
+         Ok(())
+diff -up dolby_vision-3.3.2/src/rpu/rpu_data_mapping.rs.orig dolby_vision-3.3.2/src/rpu/rpu_data_mapping.rs
+--- dolby_vision-3.3.2/src/rpu/rpu_data_mapping.rs.orig	2006-07-24 03:21:28.000000000 +0200
++++ dolby_vision-3.3.2/src/rpu/rpu_data_mapping.rs	2025-08-22 15:18:45.087004743 +0200
+@@ -102,9 +102,9 @@ impl RpuDataMapping {
+         header: &RpuDataHeader,
+     ) -> Result<RpuDataMapping> {
+         let mut mapping = RpuDataMapping {
+-            vdr_rpu_id: reader.get_ue()?,
+-            mapping_color_space: reader.get_ue()?,
+-            mapping_chroma_format_idc: reader.get_ue()?,
++            vdr_rpu_id: reader.read_ue()?,
++            mapping_color_space: reader.read_ue()?,
++            mapping_chroma_format_idc: reader.read_ue()?,
+             ..Default::default()
+         };
+ 
+@@ -113,19 +113,19 @@ impl RpuDataMapping {
+         for cmp in 0..NUM_COMPONENTS {
+             let curve = &mut mapping.curves[cmp];
+ 
+-            curve.num_pivots_minus2 = reader.get_ue()?;
++            curve.num_pivots_minus2 = reader.read_ue()?;
+             let num_pivots = (curve.num_pivots_minus2 + 2) as usize;
+ 
+             curve.pivots = vec![0; num_pivots];
+ 
+             for i in 0..num_pivots {
+-                curve.pivots[i] = reader.get_n(bl_bit_depth)?;
++                curve.pivots[i] = reader.read_var(bl_bit_depth)?;
+             }
+         }
+ 
+         // Profile 7 only
+         if header.rpu_format & 0x700 == 0 && !header.disable_residual_flag {
+-            let nlq_method_idc = reader.get_n::<u8>(3)?;
++            let nlq_method_idc = reader.read::<3, u8>()?;
+             ensure!(nlq_method_idc == 0);
+ 
+             mapping.nlq_method_idc = Some(DoviNlqMethod::from(nlq_method_idc));
+@@ -133,14 +133,14 @@ impl RpuDataMapping {
+ 
+             let mut nlq_pred_pivot_value = [0; NLQ_NUM_PIVOTS];
+             for pv in &mut nlq_pred_pivot_value {
+-                *pv = reader.get_n(bl_bit_depth)?;
++                *pv = reader.read_var(bl_bit_depth)?;
+             }
+ 
+             mapping.nlq_pred_pivot_value = Some(nlq_pred_pivot_value);
+         }
+ 
+-        mapping.num_x_partitions_minus1 = reader.get_ue()?;
+-        mapping.num_y_partitions_minus1 = reader.get_ue()?;
++        mapping.num_x_partitions_minus1 = reader.read_ue()?;
++        mapping.num_y_partitions_minus1 = reader.read_ue()?;
+ 
+         // rpu_data_mapping_param
+ 
+@@ -149,7 +149,7 @@ impl RpuDataMapping {
+             let num_pieces = (curve.num_pivots_minus2 + 1) as usize;
+ 
+             for _ in 0..num_pieces {
+-                let mapping_idc = DoviMappingMethod::from(reader.get_ue()?);
++                let mapping_idc = DoviMappingMethod::from(reader.read_ue()?);
+                 curve.mapping_idc = mapping_idc;
+ 
+                 // MAPPING_POLYNOMIAL
+@@ -181,48 +181,48 @@ impl RpuDataMapping {
+ 
+         let bl_bit_depth = (header.bl_bit_depth_minus8 + 8) as u32;
+ 
+-        writer.write_ue(&self.vdr_rpu_id)?;
+-        writer.write_ue(&self.mapping_color_space)?;
+-        writer.write_ue(&self.mapping_chroma_format_idc)?;
++        writer.write_ue(self.vdr_rpu_id)?;
++        writer.write_ue(self.mapping_color_space)?;
++        writer.write_ue(self.mapping_chroma_format_idc)?;
+ 
+         for cmp in 0..NUM_COMPONENTS {
+             let curve = &self.curves[cmp];
+-            writer.write_ue(&curve.num_pivots_minus2)?;
++            writer.write_ue(curve.num_pivots_minus2)?;
+ 
+-            for p in &curve.pivots {
+-                writer.write_n(p, bl_bit_depth)?;
++            for p in curve.pivots.iter().copied() {
++                writer.write_var(bl_bit_depth, p)?;
+             }
+         }
+ 
+         if header.rpu_format & 0x700 == 0 && !header.disable_residual_flag {
+             if let Some(nlq_method_idc) = self.nlq_method_idc {
+-                writer.write_n(&(nlq_method_idc as u8), 3)?;
++                writer.write::<3, u8>(nlq_method_idc as u8)?;
+             }
+ 
+             if let Some(nlq_pred_pivot_value) = &self.nlq_pred_pivot_value {
+-                for pv in nlq_pred_pivot_value {
+-                    writer.write_n(pv, bl_bit_depth)?;
++                for pv in nlq_pred_pivot_value.iter().copied() {
++                    writer.write_var(bl_bit_depth, pv)?;
+                 }
+             }
+         }
+ 
+-        writer.write_ue(&self.num_x_partitions_minus1)?;
+-        writer.write_ue(&self.num_y_partitions_minus1)?;
++        writer.write_ue(self.num_x_partitions_minus1)?;
++        writer.write_ue(self.num_y_partitions_minus1)?;
+ 
+         for cmp in 0..NUM_COMPONENTS {
+             let curve = &self.curves[cmp];
+             let num_pieces = (curve.num_pivots_minus2 + 1) as usize;
+ 
+             for i in 0..num_pieces {
+-                writer.write_ue(&(curve.mapping_idc as u64))?;
++                writer.write_ue(curve.mapping_idc as u64)?;
+ 
+                 // MAPPING_POLYNOMIAL
+                 if let Some(poly_curve) = &curve.polynomial {
+-                    writer.write_ue(&poly_curve.poly_order_minus1[i])?;
++                    writer.write_ue(poly_curve.poly_order_minus1[i])?;
+ 
+                     let poly_order_minus1 = poly_curve.poly_order_minus1[i];
+                     if poly_order_minus1 == 0 {
+-                        writer.write(poly_curve.linear_interp_flag[i])?;
++                        writer.write_bit(poly_curve.linear_interp_flag[i])?;
+                     }
+ 
+                     if poly_order_minus1 == 0 && poly_curve.linear_interp_flag[i] {
+@@ -259,34 +259,34 @@ impl RpuDataMapping {
+ 
+                         for j in 0..=poly_coef_count {
+                             if header.coefficient_data_type == 0 {
+-                                writer.write_se(&poly_curve.poly_coef_int[i][j])?;
++                                writer.write_se(poly_curve.poly_coef_int[i][j])?;
+                             }
+ 
+-                            writer.write_n(
+-                                &poly_curve.poly_coef[i][j],
++                            writer.write_var(
+                                 coefficient_log2_denom_length,
++                                poly_curve.poly_coef[i][j],
+                             )?;
+                         }
+                     }
+                 } else if let Some(mmr_curve) = &curve.mmr {
+                     // MAPPING_MMR
+-                    writer.write_n(&mmr_curve.mmr_order_minus1[i], 2)?;
++                    writer.write::<2, u8>(mmr_curve.mmr_order_minus1[i])?;
+ 
+                     if header.coefficient_data_type == 0 {
+-                        writer.write_se(&mmr_curve.mmr_constant_int[i])?;
++                        writer.write_se(mmr_curve.mmr_constant_int[i])?;
+                     }
+ 
+-                    writer.write_n(&mmr_curve.mmr_constant[i], coefficient_log2_denom_length)?;
++                    writer.write_var(coefficient_log2_denom_length, mmr_curve.mmr_constant[i])?;
+ 
+                     for j in 0..mmr_curve.mmr_order_minus1[i] as usize + 1 {
+                         for k in 0..MMR_MAX_COEFFS {
+                             if header.coefficient_data_type == 0 {
+-                                writer.write_se(&mmr_curve.mmr_coef_int[i][j][k])?;
++                                writer.write_se(mmr_curve.mmr_coef_int[i][j][k])?;
+                             }
+ 
+-                            writer.write_n(
+-                                &mmr_curve.mmr_coef[i][j][k],
++                            writer.write_var(
+                                 coefficient_log2_denom_length,
++                                mmr_curve.mmr_coef[i][j][k],
+                             )?;
+                         }
+                     }
+@@ -397,13 +397,13 @@ impl DoviPolynomialCurve {
+     fn parse(&mut self, reader: &mut BsIoSliceReader, header: &RpuDataHeader) -> Result<()> {
+         let coefficient_log2_denom_length = header.coefficient_log2_denom_length;
+ 
+-        let poly_order_minus1 = reader.get_ue()?;
++        let poly_order_minus1 = reader.read_ue()?;
+         ensure!(poly_order_minus1 <= 1);
+ 
+         self.poly_order_minus1.push(poly_order_minus1);
+ 
+         let linear_interp_flag = if poly_order_minus1 == 0 {
+-            reader.get()?
++            reader.read_bit()?
+         } else {
+             false
+         };
+@@ -414,7 +414,7 @@ impl DoviPolynomialCurve {
+             unimplemented!("parse: Polynomial interpolation: please open an issue");
+ 
+             /*if header.coefficient_data_type == 0 {
+-                self.pred_linear_interp_value_int[i] = reader.get_ue()?;
++                self.pred_linear_interp_value_int[i] = reader.read_ue()?;
+             }
+ 
+             self.pred_linear_interp_value[i] =
+@@ -423,7 +423,7 @@ impl DoviPolynomialCurve {
+             if pivot_idx as u64 == header.num_pivots_minus2[cmp] {
+                 if header.coefficient_data_type == 0 {
+                     self.pred_linear_interp_value_int[cmp][pivot_idx + 1] =
+-                        reader.get_ue()?;
++                        reader.read_ue()?;
+                 }
+ 
+                 self.pred_linear_interp_value[cmp][pivot_idx + 1] =
+@@ -436,10 +436,10 @@ impl DoviPolynomialCurve {
+ 
+             for _j in 0..poly_coef_count {
+                 if header.coefficient_data_type == 0 {
+-                    poly_coef_int.push(reader.get_se()?);
++                    poly_coef_int.push(reader.read_se()?);
+                 }
+ 
+-                poly_coef.push(reader.get_n(coefficient_log2_denom_length)?);
++                poly_coef.push(reader.read_var(coefficient_log2_denom_length)?);
+             }
+ 
+             self.poly_coef_int.push(poly_coef_int);
+@@ -485,7 +485,7 @@ impl DoviMMRCurve {
+     fn parse(&mut self, reader: &mut BsIoSliceReader, header: &RpuDataHeader) -> Result<()> {
+         let coefficient_log2_denom_length = header.coefficient_log2_denom_length;
+ 
+-        let mmr_order_minus1 = reader.get_n(2)?;
++        let mmr_order_minus1 = reader.read::<2, u8>()?;
+         ensure!(mmr_order_minus1 <= 2);
+ 
+         self.mmr_order_minus1.push(mmr_order_minus1);
+@@ -493,10 +493,10 @@ impl DoviMMRCurve {
+         let mmr_orders_count = mmr_order_minus1 as usize + 1;
+ 
+         if header.coefficient_data_type == 0 {
+-            self.mmr_constant_int.push(reader.get_se()?);
++            self.mmr_constant_int.push(reader.read_se()?);
+         }
+         self.mmr_constant
+-            .push(reader.get_n(coefficient_log2_denom_length)?);
++            .push(reader.read_var(coefficient_log2_denom_length)?);
+ 
+         let mut mmr_coef_int = array_vec!();
+         let mut mmr_coef = array_vec!();
+@@ -507,10 +507,10 @@ impl DoviMMRCurve {
+ 
+             for _k in 0..MMR_MAX_COEFFS {
+                 if header.coefficient_data_type == 0 {
+-                    mmr_coef_int2.push(reader.get_se()?);
++                    mmr_coef_int2.push(reader.read_se()?);
+                 }
+ 
+-                mmr_coef2.push(reader.get_n(coefficient_log2_denom_length)?);
++                mmr_coef2.push(reader.read_var(coefficient_log2_denom_length)?);
+             }
+ 
+             mmr_coef_int.push(mmr_coef_int2);
+diff -up dolby_vision-3.3.2/src/rpu/rpu_data_nlq.rs.orig dolby_vision-3.3.2/src/rpu/rpu_data_nlq.rs
+--- dolby_vision-3.3.2/src/rpu/rpu_data_nlq.rs.orig	2006-07-24 03:21:28.000000000 +0200
++++ dolby_vision-3.3.2/src/rpu/rpu_data_nlq.rs	2025-08-22 15:18:45.087343883 +0200
+@@ -57,30 +57,30 @@ impl RpuDataNlq {
+         for cmp in 0..NUM_COMPONENTS {
+             // rpu_data_nlq_param
+ 
+-            data.nlq_offset[cmp] = reader.get_n((header.el_bit_depth_minus8 + 8) as u32)?;
++            data.nlq_offset[cmp] = reader.read_var((header.el_bit_depth_minus8 + 8) as u32)?;
+ 
+             if header.coefficient_data_type == 0 {
+-                data.vdr_in_max_int[cmp] = reader.get_ue()?;
++                data.vdr_in_max_int[cmp] = reader.read_ue()?;
+             }
+ 
+-            data.vdr_in_max[cmp] = reader.get_n(coefficient_log2_denom_length)?;
++            data.vdr_in_max[cmp] = reader.read_var(coefficient_log2_denom_length)?;
+ 
+             // NLQ_LINEAR_DZ
+             if let Some(nlq_method_idc) = mapping.nlq_method_idc {
+                 if nlq_method_idc == DoviNlqMethod::LinearDeadzone {
+                     if header.coefficient_data_type == 0 {
+-                        data.linear_deadzone_slope_int[cmp] = reader.get_ue()?;
++                        data.linear_deadzone_slope_int[cmp] = reader.read_ue()?;
+                     }
+ 
+                     data.linear_deadzone_slope[cmp] =
+-                        reader.get_n(coefficient_log2_denom_length)?;
++                        reader.read_var(coefficient_log2_denom_length)?;
+ 
+                     if header.coefficient_data_type == 0 {
+-                        data.linear_deadzone_threshold_int[cmp] = reader.get_ue()?;
++                        data.linear_deadzone_threshold_int[cmp] = reader.read_ue()?;
+                     }
+ 
+                     data.linear_deadzone_threshold[cmp] =
+-                        reader.get_n(coefficient_log2_denom_length)?;
++                        reader.read_var(coefficient_log2_denom_length)?;
+                 }
+             }
+         }
+@@ -113,36 +113,36 @@ impl RpuDataNlq {
+         for cmp in 0..NUM_COMPONENTS {
+             // rpu_data_nlq_param
+ 
+-            writer.write_n(
+-                &self.nlq_offset[cmp],
++            writer.write_var(
+                 (header.el_bit_depth_minus8 + 8) as u32,
++                self.nlq_offset[cmp],
+             )?;
+ 
+             if header.coefficient_data_type == 0 {
+-                writer.write_ue(&self.vdr_in_max_int[cmp])?;
++                writer.write_ue(self.vdr_in_max_int[cmp])?;
+             }
+ 
+-            writer.write_n(&self.vdr_in_max[cmp], coefficient_log2_denom_length)?;
++            writer.write_var(coefficient_log2_denom_length, self.vdr_in_max[cmp])?;
+ 
+             if let Some(nlq_method_idc) = mapping.nlq_method_idc {
+                 if nlq_method_idc == DoviNlqMethod::LinearDeadzone {
+                     // NLQ_LINEAR_DZ
+                     if header.coefficient_data_type == 0 {
+-                        writer.write_ue(&self.linear_deadzone_slope_int[cmp])?;
++                        writer.write_ue(self.linear_deadzone_slope_int[cmp])?;
+                     }
+ 
+-                    writer.write_n(
+-                        &self.linear_deadzone_slope[cmp],
++                    writer.write_var(
+                         coefficient_log2_denom_length,
++                        self.linear_deadzone_slope[cmp],
+                     )?;
+ 
+                     if header.coefficient_data_type == 0 {
+-                        writer.write_ue(&self.linear_deadzone_threshold_int[cmp])?;
++                        writer.write_ue(self.linear_deadzone_threshold_int[cmp])?;
+                     }
+ 
+-                    writer.write_n(
+-                        &self.linear_deadzone_threshold[cmp],
++                    writer.write_var(
+                         coefficient_log2_denom_length,
++                        self.linear_deadzone_threshold[cmp],
+                     )?;
+                 }
+             }
+diff -up dolby_vision-3.3.2/src/rpu/vdr_dm_data.rs.orig dolby_vision-3.3.2/src/rpu/vdr_dm_data.rs
+--- dolby_vision-3.3.2/src/rpu/vdr_dm_data.rs.orig	2006-07-24 03:21:28.000000000 +0200
++++ dolby_vision-3.3.2/src/rpu/vdr_dm_data.rs	2025-08-22 15:18:45.087570679 +0200
+@@ -87,9 +87,9 @@ pub(crate) fn vdr_dm_data_payload(
+         VdrDmData {
+             compressed: true,
+ 
+-            affected_dm_metadata_id: reader.get_ue()?,
+-            current_dm_metadata_id: reader.get_ue()?,
+-            scene_refresh_flag: reader.get_ue()?,
++            affected_dm_metadata_id: reader.read_ue()?,
++            current_dm_metadata_id: reader.read_ue()?,
++            scene_refresh_flag: reader.read_ue()?,
+             ..Default::default()
+         }
+     } else {
+@@ -112,44 +112,44 @@ pub(crate) fn vdr_dm_data_payload(
+ impl VdrDmData {
+     pub(crate) fn parse(reader: &mut BsIoSliceReader) -> Result<VdrDmData> {
+         let data = VdrDmData {
+-            affected_dm_metadata_id: reader.get_ue()?,
+-            current_dm_metadata_id: reader.get_ue()?,
+-            scene_refresh_flag: reader.get_ue()?,
+-
+-            ycc_to_rgb_coef0: reader.get_n::<u16>(16)? as i16,
+-            ycc_to_rgb_coef1: reader.get_n::<u16>(16)? as i16,
+-            ycc_to_rgb_coef2: reader.get_n::<u16>(16)? as i16,
+-            ycc_to_rgb_coef3: reader.get_n::<u16>(16)? as i16,
+-            ycc_to_rgb_coef4: reader.get_n::<u16>(16)? as i16,
+-            ycc_to_rgb_coef5: reader.get_n::<u16>(16)? as i16,
+-            ycc_to_rgb_coef6: reader.get_n::<u16>(16)? as i16,
+-            ycc_to_rgb_coef7: reader.get_n::<u16>(16)? as i16,
+-            ycc_to_rgb_coef8: reader.get_n::<u16>(16)? as i16,
+-            ycc_to_rgb_offset0: reader.get_n(32)?,
+-            ycc_to_rgb_offset1: reader.get_n(32)?,
+-            ycc_to_rgb_offset2: reader.get_n(32)?,
+-
+-            rgb_to_lms_coef0: reader.get_n::<u16>(16)? as i16,
+-            rgb_to_lms_coef1: reader.get_n::<u16>(16)? as i16,
+-            rgb_to_lms_coef2: reader.get_n::<u16>(16)? as i16,
+-            rgb_to_lms_coef3: reader.get_n::<u16>(16)? as i16,
+-            rgb_to_lms_coef4: reader.get_n::<u16>(16)? as i16,
+-            rgb_to_lms_coef5: reader.get_n::<u16>(16)? as i16,
+-            rgb_to_lms_coef6: reader.get_n::<u16>(16)? as i16,
+-            rgb_to_lms_coef7: reader.get_n::<u16>(16)? as i16,
+-            rgb_to_lms_coef8: reader.get_n::<u16>(16)? as i16,
+-
+-            signal_eotf: reader.get_n(16)?,
+-            signal_eotf_param0: reader.get_n(16)?,
+-            signal_eotf_param1: reader.get_n(16)?,
+-            signal_eotf_param2: reader.get_n(32)?,
+-            signal_bit_depth: reader.get_n(5)?,
+-            signal_color_space: reader.get_n(2)?,
+-            signal_chroma_format: reader.get_n(2)?,
+-            signal_full_range_flag: reader.get_n(2)?,
+-            source_min_pq: reader.get_n(12)?,
+-            source_max_pq: reader.get_n(12)?,
+-            source_diagonal: reader.get_n(10)?,
++            affected_dm_metadata_id: reader.read_ue()?,
++            current_dm_metadata_id: reader.read_ue()?,
++            scene_refresh_flag: reader.read_ue()?,
++
++            ycc_to_rgb_coef0: reader.read::<16, i16>()?,
++            ycc_to_rgb_coef1: reader.read::<16, i16>()?,
++            ycc_to_rgb_coef2: reader.read::<16, i16>()?,
++            ycc_to_rgb_coef3: reader.read::<16, i16>()?,
++            ycc_to_rgb_coef4: reader.read::<16, i16>()?,
++            ycc_to_rgb_coef5: reader.read::<16, i16>()?,
++            ycc_to_rgb_coef6: reader.read::<16, i16>()?,
++            ycc_to_rgb_coef7: reader.read::<16, i16>()?,
++            ycc_to_rgb_coef8: reader.read::<16, i16>()?,
++            ycc_to_rgb_offset0: reader.read::<32, u32>()?,
++            ycc_to_rgb_offset1: reader.read::<32, u32>()?,
++            ycc_to_rgb_offset2: reader.read::<32, u32>()?,
++
++            rgb_to_lms_coef0: reader.read::<16, i16>()?,
++            rgb_to_lms_coef1: reader.read::<16, i16>()?,
++            rgb_to_lms_coef2: reader.read::<16, i16>()?,
++            rgb_to_lms_coef3: reader.read::<16, i16>()?,
++            rgb_to_lms_coef4: reader.read::<16, i16>()?,
++            rgb_to_lms_coef5: reader.read::<16, i16>()?,
++            rgb_to_lms_coef6: reader.read::<16, i16>()?,
++            rgb_to_lms_coef7: reader.read::<16, i16>()?,
++            rgb_to_lms_coef8: reader.read::<16, i16>()?,
++
++            signal_eotf: reader.read::<16, u16>()?,
++            signal_eotf_param0: reader.read::<16, u16>()?,
++            signal_eotf_param1: reader.read::<16, u16>()?,
++            signal_eotf_param2: reader.read::<32, u32>()?,
++            signal_bit_depth: reader.read::<5, u8>()?,
++            signal_color_space: reader.read::<2, u8>()?,
++            signal_chroma_format: reader.read::<2, u8>()?,
++            signal_full_range_flag: reader.read::<2, u8>()?,
++            source_min_pq: reader.read::<12, u16>()?,
++            source_max_pq: reader.read::<12, u16>()?,
++            source_diagonal: reader.read::<10, u16>()?,
+             ..Default::default()
+         };
+ 
+@@ -189,48 +189,48 @@ impl VdrDmData {
+     }
+ 
+     pub fn write(&self, writer: &mut BitstreamIoWriter) -> Result<()> {
+-        writer.write_ue(&self.affected_dm_metadata_id)?;
+-        writer.write_ue(&self.current_dm_metadata_id)?;
+-        writer.write_ue(&self.scene_refresh_flag)?;
++        writer.write_ue(self.affected_dm_metadata_id)?;
++        writer.write_ue(self.current_dm_metadata_id)?;
++        writer.write_ue(self.scene_refresh_flag)?;
+ 
+         if !self.compressed {
+-            writer.write_signed_n(&self.ycc_to_rgb_coef0, 16)?;
+-            writer.write_signed_n(&self.ycc_to_rgb_coef1, 16)?;
+-            writer.write_signed_n(&self.ycc_to_rgb_coef2, 16)?;
+-            writer.write_signed_n(&self.ycc_to_rgb_coef3, 16)?;
+-            writer.write_signed_n(&self.ycc_to_rgb_coef4, 16)?;
+-            writer.write_signed_n(&self.ycc_to_rgb_coef5, 16)?;
+-            writer.write_signed_n(&self.ycc_to_rgb_coef6, 16)?;
+-            writer.write_signed_n(&self.ycc_to_rgb_coef7, 16)?;
+-            writer.write_signed_n(&self.ycc_to_rgb_coef8, 16)?;
+-
+-            writer.write_n(&self.ycc_to_rgb_offset0, 32)?;
+-            writer.write_n(&self.ycc_to_rgb_offset1, 32)?;
+-            writer.write_n(&self.ycc_to_rgb_offset2, 32)?;
+-
+-            writer.write_signed_n(&self.rgb_to_lms_coef0, 16)?;
+-            writer.write_signed_n(&self.rgb_to_lms_coef1, 16)?;
+-            writer.write_signed_n(&self.rgb_to_lms_coef2, 16)?;
+-            writer.write_signed_n(&self.rgb_to_lms_coef3, 16)?;
+-            writer.write_signed_n(&self.rgb_to_lms_coef4, 16)?;
+-            writer.write_signed_n(&self.rgb_to_lms_coef5, 16)?;
+-            writer.write_signed_n(&self.rgb_to_lms_coef6, 16)?;
+-            writer.write_signed_n(&self.rgb_to_lms_coef7, 16)?;
+-            writer.write_signed_n(&self.rgb_to_lms_coef8, 16)?;
+-
+-            writer.write_n(&self.signal_eotf, 16)?;
+-            writer.write_n(&self.signal_eotf_param0, 16)?;
+-            writer.write_n(&self.signal_eotf_param1, 16)?;
+-            writer.write_n(&self.signal_eotf_param2, 32)?;
+-
+-            writer.write_n(&self.signal_bit_depth, 5)?;
+-            writer.write_n(&self.signal_color_space, 2)?;
+-            writer.write_n(&self.signal_chroma_format, 2)?;
+-            writer.write_n(&self.signal_full_range_flag, 2)?;
+-
+-            writer.write_n(&self.source_min_pq, 12)?;
+-            writer.write_n(&self.source_max_pq, 12)?;
+-            writer.write_n(&self.source_diagonal, 10)?;
++            writer.write::<16, i16>(self.ycc_to_rgb_coef0)?;
++            writer.write::<16, i16>(self.ycc_to_rgb_coef1)?;
++            writer.write::<16, i16>(self.ycc_to_rgb_coef2)?;
++            writer.write::<16, i16>(self.ycc_to_rgb_coef3)?;
++            writer.write::<16, i16>(self.ycc_to_rgb_coef4)?;
++            writer.write::<16, i16>(self.ycc_to_rgb_coef5)?;
++            writer.write::<16, i16>(self.ycc_to_rgb_coef6)?;
++            writer.write::<16, i16>(self.ycc_to_rgb_coef7)?;
++            writer.write::<16, i16>(self.ycc_to_rgb_coef8)?;
++
++            writer.write::<32, u32>(self.ycc_to_rgb_offset0)?;
++            writer.write::<32, u32>(self.ycc_to_rgb_offset1)?;
++            writer.write::<32, u32>(self.ycc_to_rgb_offset2)?;
++
++            writer.write::<16, i16>(self.rgb_to_lms_coef0)?;
++            writer.write::<16, i16>(self.rgb_to_lms_coef1)?;
++            writer.write::<16, i16>(self.rgb_to_lms_coef2)?;
++            writer.write::<16, i16>(self.rgb_to_lms_coef3)?;
++            writer.write::<16, i16>(self.rgb_to_lms_coef4)?;
++            writer.write::<16, i16>(self.rgb_to_lms_coef5)?;
++            writer.write::<16, i16>(self.rgb_to_lms_coef6)?;
++            writer.write::<16, i16>(self.rgb_to_lms_coef7)?;
++            writer.write::<16, i16>(self.rgb_to_lms_coef8)?;
++
++            writer.write::<16, u16>(self.signal_eotf)?;
++            writer.write::<16, u16>(self.signal_eotf_param0)?;
++            writer.write::<16, u16>(self.signal_eotf_param1)?;
++            writer.write::<32, u32>(self.signal_eotf_param2)?;
++
++            writer.write::<5, u8>(self.signal_bit_depth)?;
++            writer.write::<2, u8>(self.signal_color_space)?;
++            writer.write::<2, u8>(self.signal_chroma_format)?;
++            writer.write::<2, u8>(self.signal_full_range_flag)?;
++
++            writer.write::<12, u16>(self.source_min_pq)?;
++            writer.write::<12, u16>(self.source_max_pq)?;
++            writer.write::<10, u16>(self.source_diagonal)?;
+         }
+ 
+         if let Some(cmv29) = &self.cmv29_metadata {
+diff -up dolby_vision-3.3.2/src/st2094_10/itu_t35/cm_data.rs.orig dolby_vision-3.3.2/src/st2094_10/itu_t35/cm_data.rs
+--- dolby_vision-3.3.2/src/st2094_10/itu_t35/cm_data.rs.orig	2006-07-24 03:21:28.000000000 +0200
++++ dolby_vision-3.3.2/src/st2094_10/itu_t35/cm_data.rs	2025-08-22 15:18:45.087819042 +0200
+@@ -40,27 +40,27 @@ pub struct ST2094_10CmData {
+ impl ST2094_10CmData {
+     pub(crate) fn parse(reader: &mut BsIoSliceReader) -> Result<UserDataTypeStruct> {
+         let mut meta = ST2094_10CmData {
+-            ccm_profile: reader.get_n(4)?,
+-            ccm_level: reader.get_n(4)?,
+-            coefficient_log2_denom: reader.get_ue()?,
+-            bl_bit_depth_minus8: reader.get_ue()?,
+-            el_bit_depth_minus8: reader.get_ue()?,
+-            hdr_bit_depth_minus8: reader.get_ue()?,
+-            disable_residual_flag: reader.get()?,
++            ccm_profile: reader.read::<4, u8>()?,
++            ccm_level: reader.read::<4, u8>()?,
++            coefficient_log2_denom: reader.read_ue()?,
++            bl_bit_depth_minus8: reader.read_ue()?,
++            el_bit_depth_minus8: reader.read_ue()?,
++            hdr_bit_depth_minus8: reader.read_ue()?,
++            disable_residual_flag: reader.read_bit()?,
+             ..Default::default()
+         };
+ 
+         let coefficient_log2_denom_length = meta.coefficient_log2_denom as u32;
+ 
+         for cmp in 0..NUM_COMPONENTS {
+-            meta.num_pivots_minus2[cmp] = reader.get_ue()?;
++            meta.num_pivots_minus2[cmp] = reader.read_ue()?;
+ 
+             meta.pred_pivot_value[cmp]
+                 .resize_with((meta.num_pivots_minus2[cmp] as usize) + 2, Default::default);
+ 
+             for pivot_idx in 0..(meta.num_pivots_minus2[cmp] as usize) + 2 {
+                 meta.pred_pivot_value[cmp][pivot_idx] =
+-                    reader.get_n((meta.el_bit_depth_minus8 as u32) + 8)?;
++                    reader.read_var((meta.el_bit_depth_minus8 as u32) + 8)?;
+             }
+         }
+ 
+@@ -86,11 +86,11 @@ impl ST2094_10CmData {
+                 .resize_with((meta.num_pivots_minus2[cmp] as usize) + 1, Default::default);
+ 
+             for pivot_idx in 0..(meta.num_pivots_minus2[cmp] as usize) + 1 {
+-                meta.mapping_idc[cmp][pivot_idx] = reader.get_ue()?;
++                meta.mapping_idc[cmp][pivot_idx] = reader.read_ue()?;
+ 
+                 // MAPPING_POLYNOMIAL
+                 if meta.mapping_idc[cmp][pivot_idx] == 0 {
+-                    meta.poly_order_minus1[cmp][pivot_idx] = reader.get_ue()?;
++                    meta.poly_order_minus1[cmp][pivot_idx] = reader.read_ue()?;
+ 
+                     meta.poly_coef_int[cmp][pivot_idx].resize_with(
+                         (meta.poly_order_minus1[cmp][pivot_idx] as usize) + 2,
+@@ -102,17 +102,17 @@ impl ST2094_10CmData {
+                     );
+ 
+                     for i in 0..=(meta.poly_order_minus1[cmp][pivot_idx] as usize) + 1 {
+-                        meta.poly_coef_int[cmp][pivot_idx][i] = reader.get_se()?;
++                        meta.poly_coef_int[cmp][pivot_idx][i] = reader.read_se()?;
+                         meta.poly_coef[cmp][pivot_idx][i] =
+-                            reader.get_n(coefficient_log2_denom_length)?;
++                            reader.read_var(coefficient_log2_denom_length)?;
+                     }
+                 } else if meta.mapping_idc[cmp][pivot_idx] == 1 {
+                     // MAPPING_MMR
+ 
+-                    meta.mmr_order_minus1[cmp][pivot_idx] = reader.get_n(2)?;
+-                    meta.mmr_constant_int[cmp][pivot_idx] = reader.get_se()?;
++                    meta.mmr_order_minus1[cmp][pivot_idx] = reader.read::<2, u8>()?;
++                    meta.mmr_constant_int[cmp][pivot_idx] = reader.read_se()?;
+                     meta.mmr_constant[cmp][pivot_idx] =
+-                        reader.get_n(coefficient_log2_denom_length)?;
++                        reader.read_var(coefficient_log2_denom_length)?;
+ 
+                     meta.mmr_coef_int[cmp][pivot_idx].resize_with(
+                         (meta.mmr_order_minus1[cmp][pivot_idx] as usize) + 2,
+@@ -128,9 +128,9 @@ impl ST2094_10CmData {
+                         meta.mmr_coef[cmp][pivot_idx][i].resize_with(8, Default::default);
+ 
+                         for j in 0..7_usize {
+-                            meta.mmr_coef_int[cmp][pivot_idx][i][j] = reader.get_se()?;
++                            meta.mmr_coef_int[cmp][pivot_idx][i][j] = reader.read_se()?;
+                             meta.mmr_coef[cmp][pivot_idx][i][j] =
+-                                reader.get_n(coefficient_log2_denom_length)?;
++                                reader.read_var(coefficient_log2_denom_length)?;
+                         }
+                     }
+                 }
+@@ -139,14 +139,14 @@ impl ST2094_10CmData {
+ 
+         if !meta.disable_residual_flag {
+             for cmp in 0..NUM_COMPONENTS {
+-                meta.nlq_offset[cmp] = reader.get_n((meta.el_bit_depth_minus8 as u32) + 8)?;
+-                meta.hdr_in_max_int[cmp] = reader.get_ue()?;
+-                meta.hdr_in_max[cmp] = reader.get_n(coefficient_log2_denom_length)?;
+-                meta.linear_deadzone_slope_int[cmp] = reader.get_ue()?;
+-                meta.linear_deadzone_slope[cmp] = reader.get_n(coefficient_log2_denom_length)?;
+-                meta.linear_deadzone_threshold_int[cmp] = reader.get_ue()?;
++                meta.nlq_offset[cmp] = reader.read_var((meta.el_bit_depth_minus8 as u32) + 8)?;
++                meta.hdr_in_max_int[cmp] = reader.read_ue()?;
++                meta.hdr_in_max[cmp] = reader.read_var(coefficient_log2_denom_length)?;
++                meta.linear_deadzone_slope_int[cmp] = reader.read_ue()?;
++                meta.linear_deadzone_slope[cmp] = reader.read_var(coefficient_log2_denom_length)?;
++                meta.linear_deadzone_threshold_int[cmp] = reader.read_ue()?;
+                 meta.linear_deadzone_threshold[cmp] =
+-                    reader.get_n(coefficient_log2_denom_length)?;
++                    reader.read_var(coefficient_log2_denom_length)?;
+             }
+         }
+ 
+diff -up dolby_vision-3.3.2/src/st2094_10/itu_t35/dm_data.rs.orig dolby_vision-3.3.2/src/st2094_10/itu_t35/dm_data.rs
+--- dolby_vision-3.3.2/src/st2094_10/itu_t35/dm_data.rs.orig	2006-07-24 03:21:28.000000000 +0200
++++ dolby_vision-3.3.2/src/st2094_10/itu_t35/dm_data.rs	2025-08-22 15:18:45.087995394 +0200
+@@ -16,9 +16,9 @@ pub struct ST2094_10DmData {
+ impl ST2094_10DmData {
+     pub(crate) fn parse(reader: &mut BsIoSliceReader) -> Result<UserDataTypeStruct> {
+         let mut meta = ST2094_10DmData {
+-            app_identifier: reader.get_ue()?,
+-            app_version: reader.get_ue()?,
+-            metadata_refresh_flag: reader.get()?,
++            app_identifier: reader.read_ue()?,
++            app_version: reader.read_ue()?,
++            metadata_refresh_flag: reader.read_bit()?,
+             ..Default::default()
+         };
+ 
+diff -up dolby_vision-3.3.2/src/st2094_10/itu_t35/mod.rs.orig dolby_vision-3.3.2/src/st2094_10/itu_t35/mod.rs
+--- dolby_vision-3.3.2/src/st2094_10/itu_t35/mod.rs.orig	2006-07-24 03:21:28.000000000 +0200
++++ dolby_vision-3.3.2/src/st2094_10/itu_t35/mod.rs	2025-08-22 15:18:45.088155916 +0200
+@@ -29,20 +29,20 @@ impl ST2094_10ItuT35 {
+ 
+         let mut reader = BsIoSliceReader::from_slice(&bytes);
+ 
+-        let itu_t_t35_country_code: u8 = reader.get_n(8)?;
+-        let itu_t_t35_provider_code: u16 = reader.get_n(16)?;
++        let itu_t_t35_country_code = reader.read::<8, u8>()?;
++        let itu_t_t35_provider_code = reader.read::<16, u16>()?;
+ 
+         ensure!(itu_t_t35_country_code == 0xB5);
+         ensure!(itu_t_t35_provider_code == 0x31);
+ 
+-        let user_identifier: u32 = reader.get_n(32)?;
++        let user_identifier = reader.read::<32, u32>()?;
+         ensure!(
+             user_identifier == 0x47413934,
+             "invalid user_identifier: {}",
+             user_identifier
+         );
+ 
+-        let user_data_type_code: u8 = reader.get_n(8)?;
++        let user_data_type_code = reader.read::<8, u8>()?;
+ 
+         let meta = match user_data_type_code {
+             0x08 => ST2094_10CmData::parse(&mut reader)?,
+diff -up dolby_vision-3.3.2/src/utils.rs.orig dolby_vision-3.3.2/src/utils.rs
+--- dolby_vision-3.3.2/src/utils.rs.orig	2006-07-24 03:21:28.000000000 +0200
++++ dolby_vision-3.3.2/src/utils.rs	2025-08-22 15:18:45.088328869 +0200
+@@ -77,16 +77,6 @@ pub fn add_start_code_emulation_preventi
+     }
+ }
+ 
+-/// Serializing a bitvec as a vec of bits
+-#[cfg(feature = "serde")]
+-pub(crate) fn bitvec_ser_bits<S: Serializer>(
+-    bitvec: &BitVec<u8, Msb0>,
+-    s: S,
+-) -> Result<S::Ok, S::Error> {
+-    let bits: Vec<u8> = bitvec.iter().map(|b| *b as u8).collect();
+-    bits.serialize(s)
+-}
+-
+ /// Serializing an optional bitvec as a vec of bits
+ #[cfg(feature = "serde")]
+ pub(crate) fn opt_bitvec_ser_bits<S: Serializer>(

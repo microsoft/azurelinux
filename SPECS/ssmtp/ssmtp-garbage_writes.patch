@@ -1,0 +1,18 @@
+--- ssmtp-2.64/ssmtp.c.orig	2012-06-30 23:56:31.000000000 +0300
++++ ssmtp-2.64/ssmtp.c	2012-06-30 23:59:02.764119487 +0300
+@@ -1655,12 +1655,12 @@ int ssmtp(char *argv[])
+ 			outbytes += smtp_write(sock, "%s", leadingdot ? b : buf);
+ 		} else {
+ 			if (log_level > 0) {
+-				log_event(LOG_INFO, "Sent a very long line in chunks");
++				log_event(LOG_INFO, "Sending a partial line");
+ 			}
+ 			if (leadingdot) {
+-				outbytes += fd_puts(sock, b, sizeof(b));
++				outbytes += fd_puts(sock, b, strlen(b));
+ 			} else {
+-				outbytes += fd_puts(sock, buf, bufsize);
++				outbytes += fd_puts(sock, buf, strlen(buf));
+ 			}
+ 		}
+ 		(void)alarm((unsigned) MEDWAIT);

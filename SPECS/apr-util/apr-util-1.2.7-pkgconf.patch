@@ -1,0 +1,25 @@
+--- apr-util-1.2.7/Makefile.in.pkgconf
++++ apr-util-1.2.7/Makefile.in
+@@ -51,7 +51,7 @@
+ 
+ # Create apu-config script suitable for the install tree
+ apu-config.out: $(APU_CONFIG)
+-	sed 's,^\(location=\).*$$,\1installed,' < $(APU_CONFIG) > $@
++	sed 's,^\(location=\).*$$,\1installed,;s,^\(APR_.*_DIR\)=.*,\1="$${libdir}/build",' < $(APU_CONFIG) > $@
+ 
+ install: $(TARGETS) install-modules
+ 	$(APR_MKDIR) $(DESTDIR)$(includedir) $(DESTDIR)$(libdir)/pkgconfig \
+--- apr-util-1.2.7/apu-config.in.pkgconf
++++ apr-util-1.2.7/apu-config.in
+@@ -24,9 +24,10 @@
+ prefix="@prefix@"
+ exec_prefix="@exec_prefix@"
+ bindir="@bindir@"
+-libdir="@libdir@"
+ includedir="@includedir@"
+ 
++libdir=`pkg-config --variable=libdir apr-util-@APRUTIL_MAJOR_VERSION@`
++
+ LIBS="@APRUTIL_EXPORT_LIBS@"
+ INCLUDES="@APRUTIL_INCLUDES@"
+ LDFLAGS="@APRUTIL_LDFLAGS@"

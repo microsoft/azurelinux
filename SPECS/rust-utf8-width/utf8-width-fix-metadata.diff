@@ -1,0 +1,24 @@
+--- utf8-width-0.1.8/Cargo.toml	1970-01-01T00:00:01+00:00
++++ utf8-width-0.1.8/Cargo.toml	2025-11-24T14:11:44.034787+00:00
+@@ -21,7 +21,6 @@
+     "Cargo.toml",
+     "README.md",
+     "LICENSE",
+-    "benches/bench.rs",
+ ]
+ autolib = false
+ autobins = false
+@@ -47,13 +46,3 @@
+ [lib]
+ name = "utf8_width"
+ path = "src/lib.rs"
+-
+-[[bench]]
+-name = "bench"
+-path = "benches/bench.rs"
+-harness = false
+-
+-[dependencies]
+-
+-[dev-dependencies.bencher]
+-version = "0.1.5"

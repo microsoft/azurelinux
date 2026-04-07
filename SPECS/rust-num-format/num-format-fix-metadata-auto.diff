@@ -1,0 +1,29 @@
+--- num-format-0.4.4/Cargo.toml	1970-01-01T00:00:01+00:00
++++ num-format-0.4.4/Cargo.toml	1970-01-01T00:00:01+00:00
+@@ -86,10 +86,7 @@
+     "encoding_rs",
+     "lazy_static",
+     "libc",
+-    "num-format-windows",
+     "std",
+-    "widestring",
+-    "winapi/winnls",
+ ]
+ 
+ [target."cfg(unix)".dependencies.cfg-if]
+@@ -104,15 +101,3 @@
+ version = "0.2.134"
+ optional = true
+ 
+-[target."cfg(windows)".dependencies.num-format-windows]
+-version = "0.4.4"
+-optional = true
+-
+-[target."cfg(windows)".dependencies.widestring]
+-version = "1.0.2"
+-optional = true
+-
+-[target."cfg(windows)".dependencies.winapi]
+-version = "0.3.9"
+-features = ["winnls"]
+-optional = true

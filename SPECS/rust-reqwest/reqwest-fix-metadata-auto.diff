@@ -1,0 +1,60 @@
+--- reqwest-0.13.1/Cargo.toml	2006-07-24T01:21:28+00:00
++++ reqwest-0.13.1/Cargo.toml	2026-01-09T11:53:28.006595+00:00
+@@ -180,7 +180,6 @@
+     "tokio/fs",
+     "dep:futures-util",
+     "dep:tokio-util",
+-    "dep:wasm-streams",
+ ]
+ system-proxy = ["hyper-util/client-proxy-system"]
+ zstd = ["tower-http/decompression-zstd"]
+@@ -466,48 +465,8 @@
+ version = "0.13"
+ package = "zstd"
+ 
+-[target.'cfg(target_arch = "wasm32")'.dependencies.js-sys]
+-version = "0.3.77"
+-
+-[target.'cfg(target_arch = "wasm32")'.dependencies.wasm-bindgen]
+-version = "0.2.89"
+-
+-[target.'cfg(target_arch = "wasm32")'.dependencies.wasm-bindgen-futures]
+-version = "0.4.18"
+-
+-[target.'cfg(target_arch = "wasm32")'.dependencies.wasm-streams]
+-version = "0.4"
+-optional = true
+-
+-[target.'cfg(target_arch = "wasm32")'.dependencies.web-sys]
+-version = "0.3.28"
+-features = [
+-    "AbortController",
+-    "AbortSignal",
+-    "Headers",
+-    "Request",
+-    "RequestInit",
+-    "RequestMode",
+-    "Response",
+-    "Window",
+-    "FormData",
+-    "Blob",
+-    "BlobPropertyBag",
+-    "ServiceWorkerGlobalScope",
+-    "RequestCredentials",
+-    "File",
+-    "ReadableStream",
+-    "RequestCache",
+-]
+-
+-[target.'cfg(target_arch = "wasm32")'.dev-dependencies.wasm-bindgen]
+-version = "0.2.89"
+-features = ["serde-serialize"]
+-
+-[target.'cfg(target_arch = "wasm32")'.dev-dependencies.wasm-bindgen-test]
+-version = "0.3"
+-
+ [lints.rust.unexpected_cfgs]
+ level = "warn"
+ priority = 0
+ check-cfg = ["cfg(reqwest_unstable)"]
++

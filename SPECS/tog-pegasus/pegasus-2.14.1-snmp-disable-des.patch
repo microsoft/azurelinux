@@ -1,0 +1,52 @@
+diff -up pegasus/src/Pegasus/Handler/snmpIndicationHandler/snmpDeliverTrap_netsnmp.cpp.orig pegasus/src/Pegasus/Handler/snmpIndicationHandler/snmpDeliverTrap_netsnmp.cpp
+--- pegasus/src/Pegasus/Handler/snmpIndicationHandler/snmpDeliverTrap_netsnmp.cpp.orig	2021-06-23 09:57:12.052712533 +0200
++++ pegasus/src/Pegasus/Handler/snmpIndicationHandler/snmpDeliverTrap_netsnmp.cpp	2021-06-23 10:06:19.893857294 +0200
+@@ -247,6 +247,16 @@ void snmpDeliverTrap_netsnmp::_createSes
+ #ifdef PEGASUS_ENABLE_NET_SNMPV3 
+         case _SNMPv3_TRAP:
+         {
++            if(snmpSecPrivProto == 1)
++            {
++                //DES is no longer supported.
++                PEG_METHOD_EXIT();
++                throw PEGASUS_CIM_EXCEPTION_L(CIM_ERR_NOT_SUPPORTED,
++                    MessageLoaderParms(
++                        _MSG_DES_NOT_SUPPORTED_KEY,
++                        _MSG_DES_NOT_SUPPORTED));
++            }
++
+             snmpSession.version = SNMP_VERSION_3;
+             CString securityNameCStr = securityName.getCString();
+             size_t securityNameLen = strlen(securityNameCStr);
+@@ -321,14 +331,7 @@ void snmpDeliverTrap_netsnmp::_createSes
+ 
+             SNMP_FREE(snmpSession.securityPrivProto);
+             //Privacy
+-            if(snmpSecPrivProto == 1) //DES
+-            {
+-                snmpSession.securityPrivProto = snmp_duplicate_objid(
+-                    usmDESPrivProtocol,
+-                    USM_PRIV_PROTO_DES_LEN);
+-                snmpSession.securityPrivProtoLen = USM_PRIV_PROTO_DES_LEN;
+-            }
+-            else if(snmpSecPrivProto == 2) // AES
++            if(snmpSecPrivProto == 2) // AES
+             {
+                 snmpSession.securityPrivProto = snmp_duplicate_objid(
+                     usmAESPrivProtocol,
+diff -up pegasus/src/Pegasus/Handler/snmpIndicationHandler/snmpDeliverTrap_netsnmp.h.orig pegasus/src/Pegasus/Handler/snmpIndicationHandler/snmpDeliverTrap_netsnmp.h
+--- pegasus/src/Pegasus/Handler/snmpIndicationHandler/snmpDeliverTrap_netsnmp.h.orig	2021-06-23 09:57:54.014119384 +0200
++++ pegasus/src/Pegasus/Handler/snmpIndicationHandler/snmpDeliverTrap_netsnmp.h	2021-06-23 10:05:04.489320833 +0200
+@@ -64,6 +64,12 @@ static const char _MSG_VERSION_NOT_SUPPO
+     "Handler.snmpIndicationHandler.snmpDeliverTrap_netsnmp."
+         "_MSG_VERSION_NOT_SUPPORTED";
+ 
++static const char _MSG_DES_NOT_SUPPORTED[] =
++    "DES support is disabled in SNMP.";
++static const char _MSG_DES_NOT_SUPPORTED_KEY[] =
++    "Handler.snmpIndicationHandler.snmpDeliverTrap_netsnmp."
++        "_MSG_DES_NOT_SUPPORTED";
++
+ static const char _MSG_SESSION_SEND_FAILED[] =
+     "Snmp Indication Handler failed to send the trap: ";
+ static const char _MSG_SESSION_SEND_FAILED_KEY[] =

@@ -1,0 +1,12 @@
+diff --git a/test-suite/tests/threads.test b/test-suite/tests/threads.test
+index efdf36d..ff5ba2d 100644
+--- a/test-suite/tests/threads.test
++++ b/test-suite/tests/threads.test
+@@ -382,6 +382,7 @@
+ 
+ 	(pass-if "mutex with owner not retained (bug #27450)"
+           (let ((g (make-guardian)))
++            (throw 'unresolved)
+             (g (let ((m (make-mutex))) (lock-mutex m) m))
+ 
+             ;; Avoid false references to M on the stack.

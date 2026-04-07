@@ -1,0 +1,83 @@
+From 5703f2a26b0a183079beb7f1b176a3c24ede7309 Mon Sep 17 00:00:00 2001
+From: Rob Crittenden <rcritten@redhat.com>
+Date: Wed, 15 May 2024 14:17:46 -0400
+Subject: [PATCH] Fix some issues uncovered by a static analyzer
+
+A few possible overruns and a memory leak.
+
+Signed-off-by: Rob Crittenden <rcritten@redhat.com>
+---
+ lib/common.c              | 13 +++++++------
+ saslauthd/auth_krb5.c     |  1 +
+ saslauthd/testsaslauthd.c |  6 +++---
+ 3 files changed, 11 insertions(+), 9 deletions(-)
+
+diff --git a/lib/common.c b/lib/common.c
+index 6c5496a2..b9c8bf50 100644
+--- a/lib/common.c
++++ b/lib/common.c
+@@ -2395,18 +2395,19 @@ int _sasl_ipfromstring(const char *addr,
+ 
+     /* Parse the address */
+     for (i = 0; addr[i] != '\0' && addr[i] != ';'; i++) {
+-	if (i >= NI_MAXHOST)
++	if (i >= NI_MAXHOST - 1)
+ 	    return SASL_BADPARAM;
+ 	hbuf[i] = addr[i];
+     }
+     hbuf[i] = '\0';
+ 
+-    if (addr[i] == ';')
++    if (addr[i] == ';') {
+ 	i++;
+-    /* XXX: Do we need this check? */
+-    for (j = i; addr[j] != '\0'; j++)
+-	if (!isdigit((int)(addr[j])))
+-	    return SASL_BADPARAM;
++        /* XXX: Do we need this check? */
++        for (j = i; addr[j] != '\0'; j++)
++            if (!isdigit((int)(addr[j])))
++                return SASL_BADPARAM;
++    }
+ 
+     memset(&hints, 0, sizeof(hints));
+     hints.ai_family = PF_UNSPEC;
+diff --git a/saslauthd/auth_krb5.c b/saslauthd/auth_krb5.c
+index c7cceeec..7750b55e 100644
+--- a/saslauthd/auth_krb5.c
++++ b/saslauthd/auth_krb5.c
+@@ -203,6 +203,7 @@ auth_krb5 (
+ 
+     if (form_principal_name(user, service, realm, principalbuf, sizeof (principalbuf))) {
+         syslog(LOG_ERR, "auth_krb5: form_principal_name");
++        krb5_free_context(context);
+         return strdup("NO saslauthd principal name error");
+     }
+ 
+diff --git a/saslauthd/testsaslauthd.c b/saslauthd/testsaslauthd.c
+index 8a0e4d9c..9267c43d 100644
+--- a/saslauthd/testsaslauthd.c
++++ b/saslauthd/testsaslauthd.c
+@@ -70,8 +70,8 @@ int flags = LOG_USE_STDERR;
+  */
+ int retry_read(int fd, void *inbuf, unsigned nbyte)
+ {
+-    int n;
+-    int nread = 0;
++    ssize_t n;
++    size_t nread = 0;
+     char *buf = (char *)inbuf;
+ 
+     if (nbyte == 0) return 0;
+@@ -233,7 +233,7 @@ static int saslauthd_verify_password(const char *saslauthd_path,
+ 	return -1;
+     }
+   
+-    count = (int)sizeof(response) < count ? sizeof(response) : count;
++    count = (int)sizeof(response) <= count ? sizeof(response) - 1: count;
+     if (retry_read(s, response, count) < count) {
+ 	close(s);
+         fprintf(stderr,"read failed\n");
+-- 
+2.45.0
+

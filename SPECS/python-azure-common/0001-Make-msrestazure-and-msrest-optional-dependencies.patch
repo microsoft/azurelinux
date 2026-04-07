@@ -1,0 +1,54 @@
+From 8ba87c4a70afe1d0355724ef635983267cbbdce2 Mon Sep 17 00:00:00 2001
+From: Jeremy Cline <jeremycline@linux.microsoft.com>
+Date: Fri, 12 Sep 2025 10:43:47 -0400
+Subject: [PATCH] Make msrestazure and msrest optional dependencies
+
+azure-common does not declare either package as a dependency, and just
+imports them into an exceptions module, but does nothing else with them.
+Since both packages have been deprecated for years, switch this to
+silently fail.
+
+Signed-off-by: Jeremy Cline <jeremycline@linux.microsoft.com>
+---
+ sdk/core/azure-common/azure/common/credentials.py | 4 ++--
+ sdk/core/azure-common/azure/common/exceptions.py  | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/sdk/core/azure-common/azure/common/credentials.py b/sdk/core/azure-common/azure/common/credentials.py
+index b653a096c3..433f3ef3ec 100644
+--- a/sdk/core/azure-common/azure/common/credentials.py
++++ b/sdk/core/azure-common/azure/common/credentials.py
+@@ -159,7 +159,7 @@ try:
+         OAuthTokenAuthentication
+     )
+ except ImportError:
+-    raise ImportError("You need to install 'msrest' to use this feature")
++    pass
+ 
+ try:
+     from msrestazure.azure_active_directory import (
+@@ -168,4 +168,4 @@ try:
+         UserPassCredentials
+     )
+ except ImportError:
+-    raise ImportError("You need to install 'msrestazure' to use this feature")
++    pass
+diff --git a/sdk/core/azure-common/azure/common/exceptions.py b/sdk/core/azure-common/azure/common/exceptions.py
+index f4ef9c4900..ef9a832d68 100644
+--- a/sdk/core/azure-common/azure/common/exceptions.py
++++ b/sdk/core/azure-common/azure/common/exceptions.py
+@@ -14,9 +14,9 @@ try:
+         HttpOperationError,
+     )
+ except ImportError:
+-    raise ImportError("You need to install 'msrest' to use this feature")
++    pass
+ 
+ try:
+     from msrestazure.azure_exceptions import CloudError
+ except ImportError:
+-    raise ImportError("You need to install 'msrestazure' to use this feature")
++    pass
+-- 
+2.51.0
+

@@ -1,0 +1,11 @@
+--- cfg-expr-0.20.5/Cargo.toml	1970-01-01T00:00:01+00:00
++++ cfg-expr-0.20.5/Cargo.toml	2025-12-12T23:32:27.309202+00:00
+@@ -65,7 +65,7 @@
+ version = "1.15"
+ 
+ [dependencies.target-lexicon]
+-version = "=0.13.3"
++version = "0.13.3"
+ optional = true
+ 
+ [dev-dependencies.similar-asserts]

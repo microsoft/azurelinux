@@ -1,0 +1,29 @@
+From 0d04ee8ddedb2bf33d64f148f246a3b7ec4fef21 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Mon, 23 Jan 2017 12:35:41 +0100
+Subject: [PATCH] test-lock: disable the rwlock test
+
+It hangs indefinitely if the system rwlock implementation does not
+prevent writer starvation (and glibc does not implement it).
+
+Bug: http://www.mail-archive.com/bug-gnulib@gnu.org/msg33017.html
+---
+ gnulib-tests/test-lock.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gnulib-tests/test-lock.c b/gnulib-tests/test-lock.c
+index aa6de27..5af0a6c 100644
+--- a/gnulib-tests/test-lock.c
++++ b/gnulib-tests/test-lock.c
+@@ -42,7 +42,7 @@
+    Uncomment some of these, to verify that all tests crash if no locking
+    is enabled.  */
+ #define DO_TEST_LOCK 1
+-#define DO_TEST_RWLOCK 1
++#define DO_TEST_RWLOCK 0
+ #define DO_TEST_RECURSIVE_LOCK 1
+ #define DO_TEST_ONCE 1
+ 
+-- 
+2.7.4
+

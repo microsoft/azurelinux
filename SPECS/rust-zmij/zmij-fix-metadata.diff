@@ -1,0 +1,30 @@
+--- zmij-1.0.21/Cargo.toml	2006-07-24T01:21:28+00:00
++++ zmij-1.0.21/Cargo.toml	2026-02-15T11:34:05.917826+00:00
+@@ -58,11 +58,6 @@
+ name = "test"
+ path = "tests/test.rs"
+ 
+-[[bench]]
+-name = "bench"
+-path = "benches/bench.rs"
+-harness = false
+-
+ [dependencies.no-panic]
+ version = "0.1.36"
+ optional = true
+@@ -76,15 +71,8 @@
+ [dev-dependencies.num_cpus]
+ version = "1.8"
+ 
+-[dev-dependencies.opt-level]
+-version = "1"
+-
+ [dev-dependencies.rand]
+ version = "0.10"
+ 
+ [dev-dependencies.ryu]
+ version = "1"
+-
+-[target."cfg(not(miri))".dev-dependencies.criterion]
+-version = "0.8"
+-default-features = false

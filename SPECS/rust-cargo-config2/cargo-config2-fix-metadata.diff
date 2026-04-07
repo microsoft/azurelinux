@@ -1,0 +1,13 @@
+--- cargo-config2-0.1.42/Cargo.toml	2006-07-24T01:21:28+00:00
++++ cargo-config2-0.1.42/Cargo.toml	2026-02-15T16:32:21.669085+00:00
+@@ -53,10 +53,6 @@
+ name = "get"
+ path = "examples/get.rs"
+ 
+-[[test]]
+-name = "test"
+-path = "tests/test.rs"
+-
+ [dependencies.serde]
+ version = "1.0.225"
+ 

@@ -1,0 +1,11 @@
+# This is an example config only and is disabled by default
+# If you wish to use it, you'll need to update /etc/tomcat/logging.properties
+# to prevent catalina*.log from being rotated by Tomcat
+@@@TCLOG@@@/catalina*.log {
+    copytruncate
+    weekly
+    rotate 52
+    compress
+    missingok
+    create 0644 tomcat tomcat
+}

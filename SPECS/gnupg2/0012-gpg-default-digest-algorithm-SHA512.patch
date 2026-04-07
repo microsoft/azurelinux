@@ -1,0 +1,65 @@
+From: Daniel Kahn Gillmor <dkg@fifthhorseman.net>
+Date: Sun, 25 Dec 2022 12:08:27 +0100
+Subject: gpg: Always support and default to using SHA-512.
+
+* g10/main.h (DEFAULT_DIGEST_ALGO): Use SHA512 instead of SHA256 in
+  --gnupg mode (leave strict RFC and PGP modes alone).
+* configure.ac: Do not allow disabling sha512.
+* g10/misc.c (map_md_openpgp_to_gcry): Always support SHA512.
+
+--
+
+SHA512 is more performant on most 64-bit platforms than SHA256, and
+offers a better security margin.  It is also widely implemented.
+
+Signed-off-by: Daniel Kahn Gillmor <dkg@fifthhorseman.net>
+---
+ configure.ac | 2 +-
+ g10/main.h   | 2 +-
+ g10/misc.c   | 5 +----
+ 3 files changed, 3 insertions(+), 6 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index c80bce1..42ef43b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -339,7 +339,7 @@ GNUPG_GPG_DISABLE_ALGO([rmd160],[RIPE-MD160 hash])
+ GNUPG_GPG_DISABLE_ALGO([sha224],[SHA-224 hash])
+ # SHA256 is a MUST algorithm for GnuPG.
+ GNUPG_GPG_DISABLE_ALGO([sha384],[SHA-384 hash])
+-GNUPG_GPG_DISABLE_ALGO([sha512],[SHA-512 hash])
++# SHA512 is a MUST algorithm for GnuPG.
+ 
+ 
+ # Allow disabling of zip support.
+diff --git a/g10/main.h b/g10/main.h
+index 2482fbd..f15d90f 100644
+--- a/g10/main.h
++++ b/g10/main.h
+@@ -41,7 +41,7 @@
+ # define DEFAULT_CIPHER_ALGO     CIPHER_ALGO_3DES
+ #endif
+ 
+-#define DEFAULT_DIGEST_ALGO     ((GNUPG)? DIGEST_ALGO_SHA256:DIGEST_ALGO_SHA1)
++#define DEFAULT_DIGEST_ALGO     ((GNUPG)? DIGEST_ALGO_SHA512:DIGEST_ALGO_SHA1)
+ #define DEFAULT_S2K_DIGEST_ALGO  DEFAULT_DIGEST_ALGO
+ #ifdef HAVE_ZIP
+ # define DEFAULT_COMPRESS_ALGO   COMPRESS_ALGO_ZIP
+diff --git a/g10/misc.c b/g10/misc.c
+index 2f4b452..0e6d9d5 100644
+--- a/g10/misc.c
++++ b/g10/misc.c
+@@ -862,11 +862,8 @@ map_md_openpgp_to_gcry (digest_algo_t algo)
+     case DIGEST_ALGO_SHA384: return 0;
+ #endif
+ 
+-#ifdef GPG_USE_SHA512
+     case DIGEST_ALGO_SHA512: return GCRY_MD_SHA512;
+-#else
+-    case DIGEST_ALGO_SHA512: return 0;
+-#endif
++
+     default: return 0;
+     }
+ }
+

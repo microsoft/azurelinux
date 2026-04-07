@@ -1,0 +1,38 @@
+From 8c8b4eeac91b9525cfa80a63213a56269eeef19d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Robert=20L=C3=B6hning?= <robert.loehning@qt.io>
+Date: Wed, 17 Feb 2021 19:20:42 +0100
+Subject: [PATCH 1/5] Avoid buffer overflow in isSupportedSvgFeature
+
+Fixes oss-fuzz issue 29873.
+
+Pick-to: 6.0 6.1
+Change-Id: I382683aa2d7d3cf2d05a0b8c41ebf21d032fbd7c
+Reviewed-by: Eirik Aavitsland <eirik.aavitsland@qt.io>
+(cherry picked from commit afde7ca3a40f524e40052df696f74190452b22cb)
+---
+ src/svg/qsvgstructure.cpp | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/src/svg/qsvgstructure.cpp b/src/svg/qsvgstructure.cpp
+index b89608b5..89c9e4ec 100644
+--- a/src/svg/qsvgstructure.cpp
++++ b/src/svg/qsvgstructure.cpp
+@@ -255,9 +255,13 @@ inline static bool isSupportedSvgFeature(const QString &str)
+     };
+ 
+     if (str.length() <= MAX_WORD_LENGTH && str.length() >= MIN_WORD_LENGTH) {
++        const char16_t unicode44 = str.at(44).unicode();
++        const char16_t unicode45 = str.at(45).unicode();
++        if (unicode44 >= sizeof(asso_values) || unicode45 >= sizeof(asso_values))
++            return false;
+         const int key = str.length()
+-                        + asso_values[str.at(45).unicode()]
+-                        + asso_values[str.at(44).unicode()];
++                        + asso_values[unicode45]
++                        + asso_values[unicode44];
+         if (key <= MAX_HASH_VALUE && key >= 0)
+             return str == QLatin1String(wordlist[key]);
+     }
+-- 
+2.51.1
+

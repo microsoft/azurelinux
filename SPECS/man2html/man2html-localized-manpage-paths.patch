@@ -1,0 +1,78 @@
+diff -ru ../man-1.6g/man2html/locales/fr/man2html.1 ./man2html/locales/fr/man2html.1
+--- ../man-1.6g/man2html/locales/fr/man2html.1	2006-01-25 18:20:42.000000000 -0500
++++ ./man2html/locales/fr/man2html.1	2012-07-16 06:38:00.729431350 -0400
+@@ -45,7 +45,7 @@
+ .LP
+ .TS
+ l l.
+-foo(3x)	"http://localhost/cgi-bin/man/man2html?3x+foo"
++foo(3x)	"http://localhost/man/man2html?3x+foo"
+ method://string	"method://string"
+ www.host.name	"http://www.host.name"
+ ftp.host.name	"ftp://ftp.host.name"
+@@ -94,7 +94,7 @@
+ .TP
+ .B \-\^l
+ Positionner method:cgipath à
+-.RI lynxcgi: /home/httpd .
++.RI lynxcgi: /usr/lib/man2html .
+ .TP
+ .BI \-\^L " dir"
+ Positionner method:cgipath à
+@@ -102,7 +102,7 @@
+ .TP
+ .BI \-\^M " man2htmlpath"
+ Positionner le chemin vers man2html à utiliser. La valeur par défaut est
+-.IR /cgi-bin/man/man2html .
++.IR /man/man2html .
+ .TP
+ .B \-\^p
+ Positionner le séparateur à «\ /\ ».
+@@ -122,7 +122,7 @@
+ quel autre navigateur pour parcourir les pages de manuel en utilisant
+ la méthode http.
+ L'option \-l (pour «\ lynxcgi\ ») sélectionne ce fonctionnement.
+-Avec elle, le chemin cgi par défaut est \fI/home/httpd\fP.
++Avec elle, le chemin cgi par défaut est \fI/usr/lib/man2html\fP.
+ 
+ En général, un script cgi peut être appelé de la façon suivante
+ .IP
+diff -ru ../man-1.6g/man2html/locales/it/man2html.1 ./man2html/locales/it/man2html.1
+--- ../man-1.6g/man2html/locales/it/man2html.1	2006-08-02 14:33:41.000000000 -0400
++++ ./man2html/locales/it/man2html.1	2012-07-16 06:42:38.028418717 -0400
+@@ -44,7 +44,7 @@
+ .LP
+ .TS
+ l l.
+-foo(3x)	"http://localhost/cgi-bin/man/man2html?3x+foo"
++foo(3x)	"http://localhost/man/man2html?3x+foo"
+ method://string	"method://string"
+ www.host.name	"http://www.host.name"
+ ftp.host.name	"ftp://ftp.host.name"
+@@ -94,7 +94,7 @@
+ .TP
+ .B \-\^l
+ Set method:cgipath to
+-.RI lynxcgi: /home/httpd .
++.RI lynxcgi: /usr/lib/man2html .
+ .TP
+ .BI \-\^L " dir"
+ Set method:cgipath to
+@@ -102,7 +102,7 @@
+ .TP
+ .BI \-\^M " man2htmlpath"
+ Imposta il man2htmlpath da usare. Il valore predefinito è
+-.IR /cgi-bin/man/man2html .
++.IR /man/man2html .
+ .TP
+ .B \-\^p
+ Imposta '/' come separatore.
+@@ -121,7 +121,7 @@
+ Quando è attivo qualche demone http, lynx, o qualunque altro browser,
+ può essere usato per navigare le man page, usando il metodo http.
+ L'opzione \-l (per `lynxcgi') seleziona il comportamento precedente.
+-Con esso, il valore predefinito di cgipath è \fI/home/httpd\fP.
++Con esso, il valore predefinito di cgipath è \fI/usr/lib/man2html\fP.
+ 
+ In generale, uno script cgi può essere chiamato da
+ .IP

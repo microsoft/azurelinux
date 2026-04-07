@@ -1,0 +1,12 @@
+diff -up ./dev_hash.c.ori ./dev_hash.c
+--- ./dev_hash.c.ori	2023-05-02 10:40:45.509862165 +0200
++++ ./dev_hash.c	2023-05-02 10:40:48.266876499 +0200
+@@ -147,7 +147,7 @@ static void setup_devices(char *dirname)
+     {
+       char *fullname = (char *) alloca ((strlen (dirname)
+                                          + NAMLEN (dp)
+-                                         + 1) * sizeof (char));
++                                         + 2) * sizeof (char));  /* slash + null; Fedora BZ#2190057 */
+ 
+       (void)sprintf (fullname, "%s/%s", dirname, dp->d_name);
+       if (stat (fullname, &sp))

@@ -1,0 +1,25 @@
+--- tokio-native-tls-0.3.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ tokio-native-tls-0.3.1/Cargo.toml	1970-01-01T00:00:01+00:00
+@@ -74,22 +74,3 @@
+ [target."cfg(all(not(target_os = \"macos\"), not(windows), not(target_os = \"ios\")))".dev-dependencies.openssl]
+ version = "0.10"
+ 
+-[target."cfg(any(target_os = \"macos\", target_os = \"ios\"))".dev-dependencies.security-framework]
+-version = "0.2"
+-
+-[target."cfg(windows)".dev-dependencies.schannel]
+-version = "0.1"
+-
+-[target."cfg(windows)".dev-dependencies.winapi]
+-version = "0.3"
+-features = [
+-    "lmcons",
+-    "basetsd",
+-    "minwinbase",
+-    "minwindef",
+-    "ntdef",
+-    "sysinfoapi",
+-    "timezoneapi",
+-    "wincrypt",
+-    "winerror",
+-]

@@ -1,0 +1,81 @@
+From: Roger Pau Monné <roger.pau@citrix.com>
+Subject: x86/spec-ctrl: Fix incomplete IBPB flushing during context switch
+
+The previous logic attempted to skip an IBPB in the case of vCPU returning to
+a CPU on which it was the previous vCPU to run.  While safe for Xen's
+isolation between vCPUs, this prevents the guest kernel correctly isolation
+between tasks.  Consider:
+
+ 1) vCPU runs on CPU A, running task 1.
+ 2) vCPU moves to CPU B, idle gets scheduled on A.  Xen skips IBPB.
+ 3) On CPU B, guest kernel switches from task 1 to 2, issuing IBPB.
+ 4) vCPU moves back to CPU A.  Xen skips IBPB again.
+
+Now, task 2 is running on CPU A with task 1's training still in the BTB.
+
+Do the flush unconditionally when switching to a vCPU different than the
+idle one.  Note there's no need to explicitly gate the IBPB to next domain
+!= idle, as the context where the IBPB is issued is subject to that
+condition already unless the pCPU is going offline, at which point we don't
+really care to issue an extra IBPB.
+
+Also add a comment with the reasoning why the IBPB needs to be in
+context_switch() rather than __context_switch().
+
+This is XSA-479 / CVE-2026-23553.
+
+Fixes: a2ed643ed783 ("x86/ctxt: Issue a speculation barrier between vcpu contexts")
+Reported-by: David Kaplan <david.kaplan@amd.com>
+Signed-off-by: Roger Pau Monné <roger.pau@citrix.com>
+Reviewed-by: Jan Beulich <jbeulich@suse.com>
+---
+ xen/arch/x86/domain.c | 36 +++++++++---------------------------
+ 1 file changed, 9 insertions(+), 27 deletions(-)
+
+diff --git a/xen/arch/x86/domain.c b/xen/arch/x86/domain.c
+index c29a6b0decee..c1eded3eb604 100644
+--- a/xen/arch/x86/domain.c
++++ b/xen/arch/x86/domain.c
+@@ -2174,33 +2174,15 @@ void context_switch(struct vcpu *prev, struct vcpu *next)
+ 
+         ctxt_switch_levelling(next);
+ 
+-        if ( opt_ibpb_ctxt_switch && !is_idle_domain(nextd) )
+-        {
+-            static DEFINE_PER_CPU(unsigned int, last);
+-            unsigned int *last_id = &this_cpu(last);
+-
+-            /*
+-             * Squash the domid and vcpu id together for comparison
+-             * efficiency.  We could in principle stash and compare the struct
+-             * vcpu pointer, but this risks a false alias if a domain has died
+-             * and the same 4k page gets reused for a new vcpu.
+-             */
+-            unsigned int next_id = (((unsigned int)nextd->domain_id << 16) |
+-                                    (uint16_t)next->vcpu_id);
+-            BUILD_BUG_ON(MAX_VIRT_CPUS > 0xffff);
+-
+-            /*
+-             * When scheduling from a vcpu, to idle, and back to the same vcpu
+-             * (which might be common in a lightly loaded system, or when
+-             * using vcpu pinning), there is no need to issue IBPB, as we are
+-             * returning to the same security context.
+-             */
+-            if ( *last_id != next_id )
+-            {
+-                spec_ctrl_new_guest_context();
+-                *last_id = next_id;
+-            }
+-        }
++        /*
++         * Issue an IBPB when scheduling a different vCPU if required.
++         *
++         * IBPB clears the RSB/RAS/RAP, but that's fine as we leave this
++         * function via reset_stack_and_call_ind() rather than via a RET
++         * instruction.
++         */
++        if ( opt_ibpb_ctxt_switch )
++            spec_ctrl_new_guest_context();
+ 
+         /* Update the top-of-stack block with the new speculation settings. */
+         info->scf =

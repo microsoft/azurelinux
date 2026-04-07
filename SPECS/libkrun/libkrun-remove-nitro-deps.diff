@@ -1,0 +1,21 @@
+diff --git a/src/libkrun/Cargo.toml b/src/libkrun/Cargo.toml
+index a840c75..37d415d 100644
+--- a/src/libkrun/Cargo.toml
++++ b/src/libkrun/Cargo.toml
+@@ -16,7 +16,6 @@ gpu = ["krun_display"]
+ snd = []
+ input = ["krun_input", "vmm/input", "devices/input"]
+ virgl_resource_map2 = []
+-aws-nitro = [ "dep:aws-nitro", "dep:nitro-enclaves" ]
+ 
+ [dependencies]
+ crossbeam-channel = ">=0.5.15"
+@@ -40,8 +39,6 @@ hvf = { path = "../hvf" }
+ [target.'cfg(target_os = "linux")'.dependencies]
+ kvm-bindings = { version = ">=0.11", features = ["fam-wrappers"] }
+ kvm-ioctls = ">=0.21"
+-aws-nitro = { path = "../aws_nitro", optional = true }
+-nitro-enclaves = { version = "0.5.0", optional = true }
+ vm-memory = { version = ">=0.13", features = ["backend-mmap"] }
+ 
+ [lib]

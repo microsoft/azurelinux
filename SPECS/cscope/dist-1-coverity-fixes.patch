@@ -1,0 +1,26 @@
+diff -up ./src/egrep.c.coverity2 ./src/egrep.c
+--- ./src/egrep.c.coverity2	2018-10-11 15:22:40.481384312 -0400
++++ ./src/egrep.c	2018-10-11 15:23:31.152211589 -0400
+@@ -1205,6 +1205,7 @@ yyparse (void)
+ #  undef YYSTACK_RELOCATE
+         if (yyss1 != yyssa)
+           YYSTACK_FREE (yyss1);
++	/* coverity[leaked_storage] */
+       }
+ # endif
+ #endif /* no yyoverflow */
+diff -up ./src/logdir.c.coverity2 ./src/logdir.c
+--- ./src/logdir.c.coverity2	2018-10-11 15:23:50.009147309 -0400
++++ ./src/logdir.c	2018-10-11 15:24:26.279023664 -0400
+@@ -79,8 +79,10 @@ logdir(char *name)
+ 			if (line[j] == '\n')
+ 				break;
+ 		/* return a null pointer if the whole file has been read */
+-		if (j >= i)
++		if (j >= i) {
++			(void) close(pwf);
+ 			return(0);
++		}
+ 		line[++j] = 0;			/* terminate the line */
+ 		(void) lseek(pwf, (long) (j - i), 1);	/* point at the next line */
+ 		p = nextfield(line);		/* get the logname */

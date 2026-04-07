@@ -1,0 +1,10 @@
+--- apache-arrow-17.0.0/python/pyarrow/tests/test_ipc.py.orig	2024-07-22 10:22:12.901249012 -0400
++++ apache-arrow-17.0.0/python/pyarrow/tests/test_ipc.py	2024-07-22 10:25:41.747809663 -0400
+@@ -258,6 +258,7 @@
+             interval_array = pa.array([(1, 2, 3)], type=mdn_interval_type)
+             batch = pa.record_batch([interval_array], schema)
+             writer.write(batch)
++    print("invoking read_record_batch.py, path:", path)
+     invoke_script('read_record_batch.py', path)
+ 
+ 

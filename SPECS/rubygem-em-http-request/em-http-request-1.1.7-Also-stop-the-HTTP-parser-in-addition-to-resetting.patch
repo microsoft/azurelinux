@@ -1,0 +1,38 @@
+From fee4d949da89491f7c56e36fc44ed4ec438706cf Mon Sep 17 00:00:00 2001
+From: Jarek Prokop <jprokop@redhat.com>
+Date: Fri, 22 Sep 2023 15:59:52 +0200
+Subject: [PATCH] Also stop the HTTP parser in addition to resetting it.
+
+The behavior was depending on an exception raised later after resetting the parser
+and then this resulting in parser not calling any further callback.
+With http_parser.rb >= 0.6.1 this is no longer true.
+
+Stopping the parser at this point seems correct as it also stops firing
+additional callbacks from being called.
+
+Fixes failure in test suite:
+```
+Failure/Error: if !client.continue?
+     NoMethodError:
+       undefined method `continue?' for nil:NilClass
+```
+From `EventMachine::HttpRequest should close connection on invalid HTTP response'.
+---
+ lib/em-http/http_connection.rb | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lib/em-http/http_connection.rb b/lib/em-http/http_connection.rb
+index 755a042..d25c6d8 100644
+--- a/lib/em-http/http_connection.rb
++++ b/lib/em-http/http_connection.rb
+@@ -190,6 +190,7 @@ module EventMachine
+           # the connection because we're processing invalid HTTP
+           @p.reset!
+           unbind
++          :stop
+         end
+       end
+ 
+-- 
+2.41.0
+

@@ -1,0 +1,9 @@
+--- y4m-0.8.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ y4m-0.8.0/Cargo.toml	2024-10-01T19:09:44.116367+00:00
+@@ -26,6 +26,3 @@
+ ]
+ license = "MIT"
+ repository = "https://github.com/image-rs/y4m.git"
+-
+-[dev-dependencies.resize]
+-version = "0.4"

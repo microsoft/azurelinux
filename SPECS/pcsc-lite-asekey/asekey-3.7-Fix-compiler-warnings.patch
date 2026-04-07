@@ -1,0 +1,211 @@
+From 958ecb845ab0bbb2d1b56a1dcb20ff23053fd846 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 20 Feb 2018 17:19:58 +0100
+Subject: [PATCH] Fix compiler warnings
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Most important was:
+
+usb.c:79:50: warning: '%s' directive output may be truncated writing up to 4096 bytes into a region of size 32 [-Wformat-truncation=]
+        snprintf(bus_device, BUS_DEVICE_STRSIZE, "%s:%s", bus->dirname, dev->filename);
+                                                  ^~
+In file included from /usr/include/stdio.h:862,
+                 from usb.c:11:
+/usr/include/bits/stdio2.h:64:10: note: '__builtin___snprintf_chk' output between 2 and 8194 bytes into a destination of size 32
+
+I fixed by checking snprintf() return value and reporint it to syslog
+and skipping futher code.
+
+Other warnings about unused variables or improperly aligned "if"
+statments were fixed by removing them and reindenting the code.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ InitCardParams.c |  5 +++--
+ ifdhandler.c     | 42 +++++++++++++++++++++---------------------
+ usb.c            | 33 ++++++++++++++++++---------------
+ 3 files changed, 42 insertions(+), 38 deletions(-)
+
+diff --git a/InitCardParams.c b/InitCardParams.c
+index c4951e5..467df1f 100644
+--- a/InitCardParams.c
++++ b/InitCardParams.c
+@@ -15,8 +15,10 @@
+ *****************************************************************************/
+ #define EPSILON 0.001
+ 
++#ifdef ASE_DEBUG
+ static int fi[16] = { 372, 372, 558, 744, 1116, 1488, 1860, 1, 
+                       1, 512, 768, 1024, 1536, 2048, 1, 1 };
++#endif
+ static int di[16] = { 1, 1, 2, 4, 8, 16, 32, 1, 
+                       12, 20, 1, 1, 1, 1, 1, 1 };
+ static long fs[16] = {4000000, 5000000, 6000000, 8000000, 12000000, 16000000, 20000000, 0, 
+@@ -49,7 +51,7 @@ static void GetDefaultReaderParams (reader* globalData, struct card_params* para
+ static int MatchReaderParams(reader* globalData, char socket, struct card_params* params, ATR* atr,
+                       uchar Fi, uchar Di, uchar WI, uchar N, char protocol) {
+     uchar found = 0;
+-    int F, D, WWT;
++    int D, WWT;
+     float cardFToD = GetFToDFactor(Fi, Di);
+     float readerFToD;
+     int etuFactor;
+@@ -85,7 +87,6 @@ static int MatchReaderParams(reader* globalData, char socket, struct card_params
+     if ((readerFToD - EPSILON) <= cardFToD) {
+         found = 1;
+ 
+-        F = fi[Fi];
+         D = di[Di];
+ 
+         params->fTod = cardFToD;
+diff --git a/ifdhandler.c b/ifdhandler.c
+index 18ab0cd..05eda19 100644
+--- a/ifdhandler.c
++++ b/ifdhandler.c
+@@ -556,8 +556,8 @@ RESPONSECODE IFDHTransmitToICC ( DWORD Lun, SCARD_IO_HEADER SendPci,
+         syslog(LOG_INFO, "ASE IIIe USB Reader : IFDHTransmitToICC - Error - no data in command!!!\n");
+ #endif
+         if (RxLength)
+-	    	*RxLength = 0;
+-		return IFD_COMMUNICATION_ERROR;
++		    *RxLength = 0;
++        return IFD_COMMUNICATION_ERROR;
+     }
+ 
+     switch (SendPci.Protocol) {
+@@ -657,14 +657,14 @@ RESPONSECODE IFDHTransmitToICC ( DWORD Lun, SCARD_IO_HEADER SendPci,
+                 if (RecvPci)
+                     RecvPci->Protocol = ATR_PROTOCOL_TYPE_T1;
+     	        retVal = T1Command (&readerData[readerNum], socket, TxBuffer, TxLength, response, &actual);
+-		        if (retVal < 0 || *RxLength < (DWORD)actual) {
++                if (retVal < 0 || *RxLength < (DWORD)actual) {
+                     if (RxLength)
+-	    	            *RxLength = 0;
+-		            return IFD_COMMUNICATION_ERROR;
+-		        }
+-		        *RxLength = actual;
++                        *RxLength = 0;
++                    return IFD_COMMUNICATION_ERROR;
++                }
++                *RxLength = actual;
+                 if (*RxLength)
+-		            memcpy(RxBuffer, response, *RxLength);
++                    memcpy(RxBuffer, response, *RxLength);
+             }
+             break;
+         default:
+@@ -723,11 +723,11 @@ RESPONSECODE IFDHControl ( DWORD Lun,
+         struct card_params params = readerData[readerNum].cards[socket].cardParams;
+         params.protocol = 0x22;
+         retVal = SetCardParameters(&readerData[readerNum], socket, params);
+-	    if (retVal < 0) {
++        if (retVal < 0) {
+             if (RxLength)
+     	        *RxLength = 0;
+-	        return IFD_COMMUNICATION_ERROR;
+-	    }
++            return IFD_COMMUNICATION_ERROR;
++        }
+     }
+     else if (TxLength >= 4 && TxBuffer[0] == ASE_IOCTL_CLASS && TxBuffer[1] == ASE_IOCTL_CLOCK_INS) {
+         /* change clock in reader - not supported yet */
+@@ -737,14 +737,14 @@ RESPONSECODE IFDHControl ( DWORD Lun,
+     else if (TxLength >= 4 && TxBuffer[0] == ASE_IOCTL_RAW_CLASS && TxBuffer[1] == ASE_IOCTL_RAW_INS) {
+         actual = (RxLength ? *RxLength : 0);
+         retVal = SendIOCTL(&readerData[readerNum], socket, &TxBuffer[2], TxLength - 2, response, &actual);
+-	    if (retVal < 0 || *RxLength < (DWORD)actual) {
++        if (retVal < 0 || *RxLength < (DWORD)actual) {
+             if (RxLength)
+     	        *RxLength = 0;
+-	        return IFD_ICC_NOT_PRESENT; //IFD_COMMUNICATION_ERROR;
+-	    }
+-	    *RxLength = actual;
++            return IFD_ICC_NOT_PRESENT; //IFD_COMMUNICATION_ERROR;
++        }
++        *RxLength = actual;
+         if (*RxLength)
+-	        memcpy(RxBuffer, response, *RxLength);
++            memcpy(RxBuffer, response, *RxLength);
+     }
+ 
+     /* card eject */
+@@ -782,14 +782,14 @@ RESPONSECODE IFDHControl ( DWORD Lun,
+         }
+ 	
+         retVal = MemoryCardCommand (&readerData[readerNum], socket, TxBuffer, TxLength, response, &actual);
+-	    if (retVal < 0 || *RxLength < (DWORD)actual) {
++        if (retVal < 0 || *RxLength < (DWORD)actual) {
+             if (RxLength)
+     	        *RxLength = 0;
+-	        return IFD_COMMUNICATION_ERROR;
+-	    }
+-	    *RxLength = actual;
++            return IFD_COMMUNICATION_ERROR;
++        }
++        *RxLength = actual;
+         if (*RxLength)
+-	        memcpy(RxBuffer, response, *RxLength);
++            memcpy(RxBuffer, response, *RxLength);
+     }
+ 
+ #ifdef ASE_DEBUG
+diff --git a/usb.c b/usb.c
+index e196918..39c4ea0 100644
+--- a/usb.c
++++ b/usb.c
+@@ -73,21 +73,24 @@ void* Listener(void * theReaderData)
+ 				for (id = 0; id < id_number ; id++)	{
+ 					if (dev->descriptor.idVendor == UsbIDs[id].kMyVendorID &&
+ 						dev->descriptor.idProduct == UsbIDs[id].kMyProductID) {
+-							int newreader,j;
++							int newreader = FALSE;
++							int j;
+ 
+ 							/* A known device has been found */
+-							snprintf(bus_device, BUS_DEVICE_STRSIZE, "%s:%s", bus->dirname, dev->filename);
+-							bus_device[BUS_DEVICE_STRSIZE - 1] = '\0';
+-
+-							newreader = TRUE;
+-
+-							/* Check if the reader is a new one */
+-							for (j = 0 ; j < MAX_READER_NUM ; j++) {
+-								if (strcmp(readerData[j].io.bus_device, bus_device) == 0) {
+-									/* The reader is already known */
+-									readerData[j].io.tracked = 1;
+-									newreader = FALSE;
+-									break;
++							j = snprintf(bus_device, BUS_DEVICE_STRSIZE, "%s:%s", bus->dirname, dev->filename);
++							if (j >= BUS_DEVICE_STRSIZE) {
++								syslog(LOG_ERR, "Listener: buffer to small (%d) to format bus_device (%d)", BUS_DEVICE_STRSIZE, j);
++							} else {
++								newreader = TRUE;
++
++								/* Check if the reader is a new one */
++								for (j = 0 ; j < MAX_READER_NUM ; j++) {
++									if (strcmp(readerData[j].io.bus_device, bus_device) == 0) {
++										/* The reader is already known */
++										readerData[j].io.tracked = 1;
++										newreader = FALSE;
++										break;
++									}
+ 								}
+ 							}
+ 
+@@ -201,10 +204,10 @@ void* Listener(void * theReaderData)
+ 	for (i = 0 ; i < MAX_READER_NUM ; i++) {
+ 		if (readerData[i].io.handle != NULL) {
+ 			{
+-				int k, retVal;
++				int k;
+ 				for (k = 0 ; k < MAX_SOCKET_NUM ; ++k)
+ 					if (readerData[i].cards[k].status == 2) {
+-						retVal = CardPowerOff(&readerData[i], k);
++						CardPowerOff(&readerData[i], k);
+ 						readerData[i].cards[k].atr.length = 0;
+ 					}
+ 			}
+-- 
+2.13.6
+

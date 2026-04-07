@@ -1,0 +1,15 @@
+--- boxcar-0.2.14/Cargo.toml	1970-01-01T00:00:01+00:00
++++ boxcar-0.2.14/Cargo.toml	2026-02-23T17:02:57.901124+00:00
+@@ -66,11 +66,8 @@
+ [dev-dependencies.criterion]
+ version = "0.5"
+ 
+-[target."cfg(loom)".dependencies.loom]
+-version = "0.7"
+-optional = true
+-
+ [lints.rust.unexpected_cfgs]
+ level = "warn"
+ priority = 0
+ check-cfg = ["cfg(loom)"]
++

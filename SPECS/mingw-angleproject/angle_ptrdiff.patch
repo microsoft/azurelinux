@@ -1,0 +1,110 @@
+diff -rupN --no-dereference angle-57ea533/include/GLES2/gl2.h angle-57ea533-new/include/GLES2/gl2.h
+--- angle-57ea533/include/GLES2/gl2.h	2017-11-29 00:33:41.000000000 +0100
++++ angle-57ea533-new/include/GLES2/gl2.h	2021-01-15 23:27:20.697586354 +0100
+@@ -59,6 +59,7 @@ extern "C" {
+ #ifndef GL_ES_VERSION_2_0
+ #define GL_ES_VERSION_2_0 1
+ #include <KHR/khrplatform.h>
++#include <stddef.h>
+ typedef khronos_int8_t GLbyte;
+ typedef khronos_float_t GLclampf;
+ typedef khronos_int32_t GLfixed;
+@@ -72,8 +73,8 @@ typedef unsigned int GLenum;
+ typedef unsigned int GLuint;
+ typedef char GLchar;
+ typedef khronos_float_t GLfloat;
+-typedef khronos_ssize_t GLsizeiptr;
+-typedef khronos_intptr_t GLintptr;
++typedef ptrdiff_t GLsizeiptr;
++typedef ptrdiff_t GLintptr;
+ typedef unsigned int GLbitfield;
+ typedef int GLint;
+ typedef unsigned char GLboolean;
+diff -rupN --no-dereference angle-57ea533/include/GLES3/gl31.h angle-57ea533-new/include/GLES3/gl31.h
+--- angle-57ea533/include/GLES3/gl31.h	2017-11-29 00:33:41.000000000 +0100
++++ angle-57ea533-new/include/GLES3/gl31.h	2021-01-15 23:27:20.697586354 +0100
+@@ -57,6 +57,7 @@ extern "C" {
+ #ifndef GL_ES_VERSION_2_0
+ #define GL_ES_VERSION_2_0 1
+ #include <KHR/khrplatform.h>
++#include <stddef.h>
+ typedef khronos_int8_t GLbyte;
+ typedef khronos_float_t GLclampf;
+ typedef khronos_int32_t GLfixed;
+@@ -70,8 +71,8 @@ typedef unsigned int GLenum;
+ typedef unsigned int GLuint;
+ typedef char GLchar;
+ typedef khronos_float_t GLfloat;
+-typedef khronos_ssize_t GLsizeiptr;
+-typedef khronos_intptr_t GLintptr;
++typedef ptrdiff_t GLsizeiptr;
++typedef ptrdiff_t GLintptr;
+ typedef unsigned int GLbitfield;
+ typedef int GLint;
+ typedef unsigned char GLboolean;
+diff -rupN --no-dereference angle-57ea533/include/GLES3/gl32.h angle-57ea533-new/include/GLES3/gl32.h
+--- angle-57ea533/include/GLES3/gl32.h	2017-11-29 00:33:41.000000000 +0100
++++ angle-57ea533-new/include/GLES3/gl32.h	2021-01-15 23:27:20.698586354 +0100
+@@ -57,6 +57,7 @@ extern "C" {
+ #ifndef GL_ES_VERSION_2_0
+ #define GL_ES_VERSION_2_0 1
+ #include <KHR/khrplatform.h>
++#include <stddef.h>
+ typedef khronos_int8_t GLbyte;
+ typedef khronos_float_t GLclampf;
+ typedef khronos_int32_t GLfixed;
+@@ -70,8 +71,8 @@ typedef unsigned int GLenum;
+ typedef unsigned int GLuint;
+ typedef char GLchar;
+ typedef khronos_float_t GLfloat;
+-typedef khronos_ssize_t GLsizeiptr;
+-typedef khronos_intptr_t GLintptr;
++typedef ptrdiff_t GLsizeiptr;
++typedef ptrdiff_t GLintptr;
+ typedef unsigned int GLbitfield;
+ typedef int GLint;
+ typedef unsigned char GLboolean;
+diff -rupN --no-dereference angle-57ea533/include/GLES3/gl3.h angle-57ea533-new/include/GLES3/gl3.h
+--- angle-57ea533/include/GLES3/gl3.h	2017-11-29 00:33:41.000000000 +0100
++++ angle-57ea533-new/include/GLES3/gl3.h	2021-01-15 23:27:20.698586354 +0100
+@@ -57,6 +57,7 @@ extern "C" {
+ #ifndef GL_ES_VERSION_2_0
+ #define GL_ES_VERSION_2_0 1
+ #include <KHR/khrplatform.h>
++#include <stddef.h>
+ typedef khronos_int8_t GLbyte;
+ typedef khronos_float_t GLclampf;
+ typedef khronos_int32_t GLfixed;
+@@ -70,8 +71,8 @@ typedef unsigned int GLenum;
+ typedef unsigned int GLuint;
+ typedef char GLchar;
+ typedef khronos_float_t GLfloat;
+-typedef khronos_ssize_t GLsizeiptr;
+-typedef khronos_intptr_t GLintptr;
++typedef ptrdiff_t GLsizeiptr;
++typedef ptrdiff_t GLintptr;
+ typedef unsigned int GLbitfield;
+ typedef int GLint;
+ typedef unsigned char GLboolean;
+diff -rupN --no-dereference angle-57ea533/src/libANGLE/renderer/gl/functionsgl_typedefs.h angle-57ea533-new/src/libANGLE/renderer/gl/functionsgl_typedefs.h
+--- angle-57ea533/src/libANGLE/renderer/gl/functionsgl_typedefs.h	2017-11-29 00:33:41.000000000 +0100
++++ angle-57ea533-new/src/libANGLE/renderer/gl/functionsgl_typedefs.h	2021-01-15 23:27:20.698586354 +0100
+@@ -13,6 +13,7 @@
+ 
+ #include <KHR/khrplatform.h>
+ #include <stdint.h>
++#include <stddef.h>
+ 
+ #ifndef INTERNAL_GL_APIENTRY
+ #   ifdef ANGLE_PLATFORM_WINDOWS
+@@ -39,8 +40,8 @@ typedef khronos_float_t  GLclampf;
+ typedef double           GLdouble;
+ typedef double           GLclampd;
+ typedef khronos_int32_t  GLfixed;
+-typedef khronos_intptr_t GLintptr;
+-typedef khronos_ssize_t  GLsizeiptr;
++typedef ptrdiff_t GLintptr;
++typedef ptrdiff_t  GLsizeiptr;
+ typedef unsigned short   GLhalf;
+ typedef khronos_int64_t  GLint64;
+ typedef khronos_uint64_t GLuint64;

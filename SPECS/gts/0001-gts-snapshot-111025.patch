@@ -1,0 +1,1534 @@
+From 63a395751738c91f26cc5c3843b2bb60d0d2a1d1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ralf=20Cors=C3=A9pius?= <corsepiu@fedoraproject.org>
+Date: Tue, 26 Jan 2016 09:02:40 +0100
+Subject: [PATCH 1/2] gts-snapshot-111025
+
+---
+ Makefile.am                        |  31 +--
+ Makefile.in                        |  32 +--
+ acinclude.m4                       |   3 +-
+ aclocal.m4                         |  74 +++---
+ configure                          |  42 ++--
+ configure.ac                       |   9 +-
+ debian/Makefile.am                 |   6 -
+ debian/Makefile.in                 | 380 -----------------------------
+ debian/changelog.sh                |  11 -
+ debian/compat                      |   1 -
+ debian/control                     |  44 ----
+ debian/copyright                   |   4 -
+ debian/libgts-snapshot-dev.install |   7 -
+ debian/libgts-snapshot-doc.docs    |   1 -
+ debian/libgts-snapshot.install     |  22 --
+ debian/libgts-snapshot.symbols     |   1 -
+ debian/rules                       |  10 -
+ doc/Makefile.in                    |   2 +
+ doc/manpages/Makefile.in           |   2 +
+ examples/Makefile.am               |   2 +-
+ examples/Makefile.in               |   4 +-
+ gts.pc.in                          |   2 +-
+ ltmain.sh                          |   8 +-
+ src/Makefile.am                    |   2 +-
+ src/Makefile.in                    |   4 +-
+ src/gts-config.in                  |  67 ++---
+ test/Makefile.in                   |   2 +
+ test/boolean/Makefile.am           |   2 +-
+ test/boolean/Makefile.in           |   4 +-
+ test/boolean/test.sh               |   0
+ test/coarsen/Makefile.am           |   2 +-
+ test/coarsen/Makefile.in           |   4 +-
+ test/coarsen/flat.sh               |   0
+ test/coarsen/flat1.sh              |   0
+ test/delaunay/Makefile.am          |   2 +-
+ test/delaunay/Makefile.in          |   4 +-
+ test/delaunay/cartesian.sh         |   0
+ test/delaunay/cartesian_speed.sh   |   0
+ test/delaunay/random_speed.sh      |   0
+ test/delaunay/too_close.sh         |   0
+ test/delaunay/two_segments.sh      |   0
+ tools/Makefile.am                  |   2 +-
+ tools/Makefile.in                  |   4 +-
+ 43 files changed, 122 insertions(+), 675 deletions(-)
+ delete mode 100644 debian/Makefile.am
+ delete mode 100644 debian/Makefile.in
+ delete mode 100644 debian/changelog.sh
+ delete mode 100644 debian/compat
+ delete mode 100644 debian/control
+ delete mode 100644 debian/copyright
+ delete mode 100644 debian/libgts-snapshot-dev.install
+ delete mode 100644 debian/libgts-snapshot-doc.docs
+ delete mode 100644 debian/libgts-snapshot.install
+ delete mode 100644 debian/libgts-snapshot.symbols
+ delete mode 100644 debian/rules
+ mode change 100644 => 100755 test/boolean/test.sh
+ mode change 100644 => 100755 test/coarsen/flat.sh
+ mode change 100644 => 100755 test/coarsen/flat1.sh
+ mode change 100644 => 100755 test/delaunay/cartesian.sh
+ mode change 100644 => 100755 test/delaunay/cartesian_speed.sh
+ mode change 100644 => 100755 test/delaunay/random_speed.sh
+ mode change 100644 => 100755 test/delaunay/too_close.sh
+ mode change 100644 => 100755 test/delaunay/two_segments.sh
+
+diff --git a/Makefile.am b/Makefile.am
+index fb17f12..1902a81 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,38 +1,9 @@
+ ## Process this file with automake to produce Makefile.in
+ 
+-SUBDIRS = src tools examples doc test debian
+-
+-OSC_DIR=$(HOME)/local/src/osc/home:popinet/$(PACKAGE)-snapshot
++SUBDIRS = src tools examples doc test
+ 
+ pkgconfigdir = $(libdir)/pkgconfig
+ pkgconfig_DATA = gts.pc
+ 
+ ChangeLog:
+ 	darcs changes > ChangeLog
+-
+-debian-snapshot: config.h
+-	darcs changes > ChangeLog
+-	sh debian/changelog.sh
+-	dpkg-buildpackage -rfakeroot -b
+-	rm -f debian/repo/*
+-	mv -f ../*.changes ../*.deb debian/repo
+-	cd debian/repo && dpkg-scanpackages . /dev/null | gzip -9c > Packages.gz
+-
+-launchpad-snapshot: config.h dist
+-	tar xzf $(PACKAGE)-?.?.?.tar.gz
+-	cd $(PACKAGE)-?.?.? && ./configure && darcs changes > ChangeLog && sh debian/changelog.sh && dpkg-buildpackage -rfakeroot -k07AB22DC -S -sa
+-	rm -f $(PACKAGE)-?.?.?.tar.gz
+-	rm -r -f $(PACKAGE)-?.?.?
+-
+-buildservice-snapshot: config.h dist
+-	tar xzf $(PACKAGE)-?.?.?.tar.gz
+-	rm -f $(PACKAGE)-?.?.?.tar.gz
+-	mv -f $(PACKAGE)-?.?.? $(PACKAGE)-snapshot
+-	cd $(PACKAGE)-snapshot && ./configure && darcs changes > ChangeLog && sh debian/changelog.sh && chmod +x debian/rules && make distclean
+-	tar czvf $(PACKAGE)-snapshot.tar.gz $(PACKAGE)-snapshot
+-	dpkg-source -b $(PACKAGE)-snapshot
+-	rm -r -f $(PACKAGE)-snapshot
+-	cd $(OSC_DIR) && osc update && rm -f $(OSC_DIR)/*
+-	cp -f rpm/$(PACKAGE).spec $(OSC_DIR)
+-	mv -f $(PACKAGE)-snapshot.tar.gz $(PACKAGE)-snapshot_*.tar.gz $(PACKAGE)-snapshot_*.dsc $(OSC_DIR)
+-	cd $(OSC_DIR) && osc addremove && osc commit -m "snapshot release"
+diff --git a/Makefile.in b/Makefile.in
+index 1c38550..3eda5a3 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -199,6 +199,8 @@ PACKAGE_URL = @PACKAGE_URL@
+ PACKAGE_VERSION = @PACKAGE_VERSION@
+ PATH_SEPARATOR = @PATH_SEPARATOR@
+ PKG_CONFIG = @PKG_CONFIG@
++PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
++PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
+ RANLIB = @RANLIB@
+ SED = @SED@
+ SET_MAKE = @SET_MAKE@
+@@ -263,8 +265,7 @@ target_alias = @target_alias@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+-SUBDIRS = src tools examples doc test debian
+-OSC_DIR = $(HOME)/local/src/osc/home:popinet/$(PACKAGE)-snapshot
++SUBDIRS = src tools examples doc test
+ pkgconfigdir = $(libdir)/pkgconfig
+ pkgconfig_DATA = gts.pc
+ all: config.h
+@@ -791,33 +792,6 @@ uninstall-am: uninstall-pkgconfigDATA
+ ChangeLog:
+ 	darcs changes > ChangeLog
+ 
+-debian-snapshot: config.h
+-	darcs changes > ChangeLog
+-	sh debian/changelog.sh
+-	dpkg-buildpackage -rfakeroot -b
+-	rm -f debian/repo/*
+-	mv -f ../*.changes ../*.deb debian/repo
+-	cd debian/repo && dpkg-scanpackages . /dev/null | gzip -9c > Packages.gz
+-
+-launchpad-snapshot: config.h dist
+-	tar xzf $(PACKAGE)-?.?.?.tar.gz
+-	cd $(PACKAGE)-?.?.? && ./configure && darcs changes > ChangeLog && sh debian/changelog.sh && dpkg-buildpackage -rfakeroot -k07AB22DC -S -sa
+-	rm -f $(PACKAGE)-?.?.?.tar.gz
+-	rm -r -f $(PACKAGE)-?.?.?
+-
+-buildservice-snapshot: config.h dist
+-	tar xzf $(PACKAGE)-?.?.?.tar.gz
+-	rm -f $(PACKAGE)-?.?.?.tar.gz
+-	mv -f $(PACKAGE)-?.?.? $(PACKAGE)-snapshot
+-	cd $(PACKAGE)-snapshot && ./configure && darcs changes > ChangeLog && sh debian/changelog.sh && chmod +x debian/rules && make distclean
+-	tar czvf $(PACKAGE)-snapshot.tar.gz $(PACKAGE)-snapshot
+-	dpkg-source -b $(PACKAGE)-snapshot
+-	rm -r -f $(PACKAGE)-snapshot
+-	cd $(OSC_DIR) && osc update && rm -f $(OSC_DIR)/*
+-	cp -f rpm/$(PACKAGE).spec $(OSC_DIR)
+-	mv -f $(PACKAGE)-snapshot.tar.gz $(PACKAGE)-snapshot_*.tar.gz $(PACKAGE)-snapshot_*.dsc $(OSC_DIR)
+-	cd $(OSC_DIR) && osc addremove && osc commit -m "snapshot release"
+-
+ # Tell versions [3.59,3.63) of GNU make to not export all variables.
+ # Otherwise a system limit (for SysV at least) may be exceeded.
+ .NOEXPORT:
+diff --git a/acinclude.m4 b/acinclude.m4
+index c9761a5..b3c632b 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -5,7 +5,7 @@ dnl AM_PATH_GLIB([MINIMUM-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND [, MO
+ dnl Test for GLIB, and define GLIB_CFLAGS and GLIB_LIBS, if "gmodule" or 
+ dnl gthread is specified in MODULES, pass to glib-config
+ dnl
+-AC_DEFUN(AM_PATH_GLIB,
++AC_DEFUN([AM_PATH_GLIB],
+ [dnl 
+ dnl Get the cflags and libraries from the glib-config script
+ dnl
+@@ -194,4 +194,3 @@ main ()
+   AC_SUBST(GLIB_LIBS)
+   rm -f conf.glibtest
+ ])
+-
+diff --git a/aclocal.m4 b/aclocal.m4
+index 359a69d..fa0e99b 100644
+--- a/aclocal.m4
++++ b/aclocal.m4
+@@ -112,14 +112,14 @@ dnl
+ int 
+ main ()
+ {
+-  int major, minor, micro;
++  unsigned int major, minor, micro;
+   char *tmp_version;
+ 
+-  system ("touch conf.glibtest");
++  fclose (fopen ("conf.glibtest", "w"));
+ 
+   /* HP/UX 9 (%@#!) writes to sscanf strings */
+   tmp_version = g_strdup("$min_glib_version");
+-  if (sscanf(tmp_version, "%d.%d.%d", &major, &minor, &micro) != 3) {
++  if (sscanf(tmp_version, "%u.%u.%u", &major, &minor, &micro) != 3) {
+      printf("%s, bad version string\n", "$min_glib_version");
+      exit(1);
+    }
+@@ -158,9 +158,9 @@ main ()
+        }
+      else
+       {
+-        printf("\n*** An old version of GLIB (%d.%d.%d) was found.\n",
++        printf("\n*** An old version of GLIB (%u.%u.%u) was found.\n",
+                glib_major_version, glib_minor_version, glib_micro_version);
+-        printf("*** You need a version of GLIB newer than %d.%d.%d. The latest version of\n",
++        printf("*** You need a version of GLIB newer than %u.%u.%u. The latest version of\n",
+ 	       major, minor, micro);
+         printf("*** GLIB is always available from ftp://ftp.gtk.org.\n");
+         printf("***\n");
+@@ -2837,10 +2837,14 @@ linux* | k*bsd*-gnu | kopensolaris*-gnu)
+   # before this can be enabled.
+   hardcode_into_libs=yes
+ 
++  # Add ABI-specific directories to the system library path.
++  sys_lib_dlsearch_path_spec="/lib64 /usr/lib64 /lib /usr/lib"
++
+   # Append ld.so.conf contents to the search path
+   if test -f /etc/ld.so.conf; then
+     lt_ld_extra=`awk '/^include / { system(sprintf("cd /etc; cat %s 2>/dev/null", \[$]2)); skip = 1; } { if (!skip) print \[$]0; skip = 0; }' < /etc/ld.so.conf | $SED -e 's/#.*//;/^[	 ]*hwcap[	 ]/d;s/[:,	]/ /g;s/=[^=]*$//;s/=[^= ]* / /g;s/"//g;/^$/d' | tr '\n' ' '`
+-    sys_lib_dlsearch_path_spec="/lib /usr/lib $lt_ld_extra"
++    sys_lib_dlsearch_path_spec="$sys_lib_dlsearch_path_spec $lt_ld_extra"
++
+   fi
+ 
+   # We used to test for /lib/ld.so.1 and disable shared libraries on
+@@ -8659,6 +8663,7 @@ m4_ifndef([_LT_PROG_FC],		[AC_DEFUN([_LT_PROG_FC])])
+ m4_ifndef([_LT_PROG_CXX],		[AC_DEFUN([_LT_PROG_CXX])])
+ 
+ # pkg.m4 - Macros to locate and utilise pkg-config.            -*- Autoconf -*-
++# serial 1 (pkg-config-0.24)
+ # 
+ # Copyright © 2004 Scott James Remnant <scott@netsplit.com>.
+ #
+@@ -8686,7 +8691,10 @@ m4_ifndef([_LT_PROG_CXX],		[AC_DEFUN([_LT_PROG_CXX])])
+ AC_DEFUN([PKG_PROG_PKG_CONFIG],
+ [m4_pattern_forbid([^_?PKG_[A-Z_]+$])
+ m4_pattern_allow([^PKG_CONFIG(_PATH)?$])
+-AC_ARG_VAR([PKG_CONFIG], [path to pkg-config utility])dnl
++AC_ARG_VAR([PKG_CONFIG], [path to pkg-config utility])
++AC_ARG_VAR([PKG_CONFIG_PATH], [directories to add to pkg-config's search path])
++AC_ARG_VAR([PKG_CONFIG_LIBDIR], [path overriding pkg-config's built-in search path])
++
+ if test "x$ac_cv_env_PKG_CONFIG_set" != "xset"; then
+ 	AC_PATH_TOOL([PKG_CONFIG], [pkg-config])
+ fi
+@@ -8699,7 +8707,6 @@ if test -n "$PKG_CONFIG"; then
+ 		AC_MSG_RESULT([no])
+ 		PKG_CONFIG=""
+ 	fi
+-		
+ fi[]dnl
+ ])# PKG_PROG_PKG_CONFIG
+ 
+@@ -8708,34 +8715,31 @@ fi[]dnl
+ # Check to see whether a particular set of modules exists.  Similar
+ # to PKG_CHECK_MODULES(), but does not set variables or print errors.
+ #
+-#
+-# Similar to PKG_CHECK_MODULES, make sure that the first instance of
+-# this or PKG_CHECK_MODULES is called, or make sure to call
+-# PKG_CHECK_EXISTS manually
++# Please remember that m4 expands AC_REQUIRE([PKG_PROG_PKG_CONFIG])
++# only at the first occurence in configure.ac, so if the first place
++# it's called might be skipped (such as if it is within an "if", you
++# have to call PKG_CHECK_EXISTS manually
+ # --------------------------------------------------------------
+ AC_DEFUN([PKG_CHECK_EXISTS],
+ [AC_REQUIRE([PKG_PROG_PKG_CONFIG])dnl
+ if test -n "$PKG_CONFIG" && \
+     AC_RUN_LOG([$PKG_CONFIG --exists --print-errors "$1"]); then
+-  m4_ifval([$2], [$2], [:])
++  m4_default([$2], [:])
+ m4_ifvaln([$3], [else
+   $3])dnl
+ fi])
+ 
+-
+ # _PKG_CONFIG([VARIABLE], [COMMAND], [MODULES])
+ # ---------------------------------------------
+ m4_define([_PKG_CONFIG],
+-[if test -n "$PKG_CONFIG"; then
+-    if test -n "$$1"; then
+-        pkg_cv_[]$1="$$1"
+-    else
+-        PKG_CHECK_EXISTS([$3],
+-                         [pkg_cv_[]$1=`$PKG_CONFIG --[]$2 "$3" 2>/dev/null`],
+-			 [pkg_failed=yes])
+-    fi
+-else
+-	pkg_failed=untried
++[if test -n "$$1"; then
++    pkg_cv_[]$1="$$1"
++ elif test -n "$PKG_CONFIG"; then
++    PKG_CHECK_EXISTS([$3],
++                     [pkg_cv_[]$1=`$PKG_CONFIG --[]$2 "$3" 2>/dev/null`],
++		     [pkg_failed=yes])
++ else
++    pkg_failed=untried
+ fi[]dnl
+ ])# _PKG_CONFIG
+ 
+@@ -8777,16 +8781,17 @@ and $1[]_LIBS to avoid the need to call pkg-config.
+ See the pkg-config man page for more details.])
+ 
+ if test $pkg_failed = yes; then
++   	AC_MSG_RESULT([no])
+         _PKG_SHORT_ERRORS_SUPPORTED
+         if test $_pkg_short_errors_supported = yes; then
+-	        $1[]_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "$2"`
++	        $1[]_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors "$2" 2>&1`
+         else 
+-	        $1[]_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "$2"`
++	        $1[]_PKG_ERRORS=`$PKG_CONFIG --print-errors "$2" 2>&1`
+         fi
+ 	# Put the nasty error message in config.log where it belongs
+ 	echo "$$1[]_PKG_ERRORS" >&AS_MESSAGE_LOG_FD
+ 
+-	ifelse([$4], , [AC_MSG_ERROR(dnl
++	m4_default([$4], [AC_MSG_ERROR(
+ [Package requirements ($2) were not met:
+ 
+ $$1_PKG_ERRORS
+@@ -8794,25 +8799,24 @@ $$1_PKG_ERRORS
+ Consider adjusting the PKG_CONFIG_PATH environment variable if you
+ installed software in a non-standard prefix.
+ 
+-_PKG_TEXT
+-])],
+-		[AC_MSG_RESULT([no])
+-                $4])
++_PKG_TEXT])
++        ])
+ elif test $pkg_failed = untried; then
+-	ifelse([$4], , [AC_MSG_FAILURE(dnl
++     	AC_MSG_RESULT([no])
++	m4_default([$4], [AC_MSG_FAILURE(
+ [The pkg-config script could not be found or is too old.  Make sure it
+ is in your PATH or set the PKG_CONFIG environment variable to the full
+ path to pkg-config.
+ 
+ _PKG_TEXT
+ 
+-To get pkg-config, see <http://pkg-config.freedesktop.org/>.])],
+-		[$4])
++To get pkg-config, see <http://pkg-config.freedesktop.org/>.])
++        ])
+ else
+ 	$1[]_CFLAGS=$pkg_cv_[]$1[]_CFLAGS
+ 	$1[]_LIBS=$pkg_cv_[]$1[]_LIBS
+         AC_MSG_RESULT([yes])
+-	ifelse([$3], , :, [$3])
++	$3
+ fi[]dnl
+ ])# PKG_CHECK_MODULES
+ 
+diff --git a/configure b/configure
+index 52c0e9f..7eff12a 100755
+--- a/configure
++++ b/configure
+@@ -626,6 +626,8 @@ GOBJECT_QUERY
+ GLIB_GENMARSHAL
+ GLIB_LIBS
+ GLIB_CFLAGS
++PKG_CONFIG_LIBDIR
++PKG_CONFIG_PATH
+ PKG_CONFIG
+ HAS_NETPBM_FALSE
+ HAS_NETPBM_TRUE
+@@ -772,7 +774,9 @@ LDFLAGS
+ LIBS
+ CPPFLAGS
+ CPP
+-PKG_CONFIG'
++PKG_CONFIG
++PKG_CONFIG_PATH
++PKG_CONFIG_LIBDIR'
+ 
+ 
+ # Initialize some variables set by options.
+@@ -1424,6 +1428,10 @@ Some influential environment variables:
+               you have headers in a nonstandard directory <include dir>
+   CPP         C preprocessor
+   PKG_CONFIG  path to pkg-config utility
++  PKG_CONFIG_PATH
++              directories to add to pkg-config's search path
++  PKG_CONFIG_LIBDIR
++              path overriding pkg-config's built-in search path
+ 
+ Use these variables to override the choices made by `configure' or to help
+ it to find libraries and programs with nonstandard names/locations.
+@@ -10291,10 +10299,14 @@ fi
+   # before this can be enabled.
+   hardcode_into_libs=yes
+ 
++  # Add ABI-specific directories to the system library path.
++  sys_lib_dlsearch_path_spec="/lib64 /usr/lib64 /lib /usr/lib"
++
+   # Append ld.so.conf contents to the search path
+   if test -f /etc/ld.so.conf; then
+     lt_ld_extra=`awk '/^include / { system(sprintf("cd /etc; cat %s 2>/dev/null", \$2)); skip = 1; } { if (!skip) print \$0; skip = 0; }' < /etc/ld.so.conf | $SED -e 's/#.*//;/^[	 ]*hwcap[	 ]/d;s/[:,	]/ /g;s/=[^=]*$//;s/=[^= ]* / /g;s/"//g;/^$/d' | tr '\n' ' '`
+-    sys_lib_dlsearch_path_spec="/lib /usr/lib $lt_ld_extra"
++    sys_lib_dlsearch_path_spec="$sys_lib_dlsearch_path_spec $lt_ld_extra"
++
+   fi
+ 
+   # We used to test for /lib/ld.so.1 and disable shared libraries on
+@@ -11967,10 +11979,6 @@ fi
+ 
+ 
+ 
+-if test x$GCC = xyes ; then
+-  CFLAGS="$CFLAGS -Wall -Werror-implicit-function-declaration -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations"
+-fi
+-
+ for ac_prog in gawk mawk nawk awk
+ do
+   # Extract the first word of "$ac_prog", so it can be a program name with args.
+@@ -12292,6 +12300,10 @@ fi
+ 
+ 
+ 
++
++
++
++
+ if test "x$ac_cv_env_PKG_CONFIG_set" != "xset"; then
+ 	if test -n "$ac_tool_prefix"; then
+   # Extract the first word of "${ac_tool_prefix}pkg-config", so it can be a program name with args.
+@@ -12404,7 +12416,6 @@ $as_echo "yes" >&6; }
+ $as_echo "no" >&6; }
+ 		PKG_CONFIG=""
+ 	fi
+-
+ fi
+ 
+   no_glib=""
+@@ -12464,14 +12475,14 @@ else
+ int
+ main ()
+ {
+-  int major, minor, micro;
++  unsigned int major, minor, micro;
+   char *tmp_version;
+ 
+-  system ("touch conf.glibtest");
++  fclose (fopen ("conf.glibtest", "w"));
+ 
+   /* HP/UX 9 (%@#!) writes to sscanf strings */
+   tmp_version = g_strdup("$min_glib_version");
+-  if (sscanf(tmp_version, "%d.%d.%d", &major, &minor, &micro) != 3) {
++  if (sscanf(tmp_version, "%u.%u.%u", &major, &minor, &micro) != 3) {
+      printf("%s, bad version string\n", "$min_glib_version");
+      exit(1);
+    }
+@@ -12510,9 +12521,9 @@ main ()
+        }
+      else
+       {
+-        printf("\n*** An old version of GLIB (%d.%d.%d) was found.\n",
++        printf("\n*** An old version of GLIB (%u.%u.%u) was found.\n",
+                glib_major_version, glib_minor_version, glib_micro_version);
+-        printf("*** You need a version of GLIB newer than %d.%d.%d. The latest version of\n",
++        printf("*** You need a version of GLIB newer than %u.%u.%u. The latest version of\n",
+ 	       major, minor, micro);
+         printf("*** GLIB is always available from ftp://ftp.gtk.org.\n");
+         printf("***\n");
+@@ -12973,9 +12984,9 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ int
+ main ()
+ {
+-"{
++
+            #warning test
+-	}"
++
+   ;
+   return 0;
+ }
+@@ -13056,7 +13067,7 @@ fi
+ done
+ 
+ 
+-ac_config_files="$ac_config_files Makefile gts.pc src/Makefile src/gts-config tools/Makefile doc/Makefile doc/manpages/Makefile examples/Makefile test/Makefile test/boolean/Makefile test/delaunay/Makefile test/coarsen/Makefile debian/Makefile"
++ac_config_files="$ac_config_files Makefile gts.pc src/Makefile src/gts-config tools/Makefile doc/Makefile doc/manpages/Makefile examples/Makefile test/Makefile test/boolean/Makefile test/delaunay/Makefile test/coarsen/Makefile"
+ 
+ cat >confcache <<\_ACEOF
+ # This file is a shell script that caches the results of configure
+@@ -14099,7 +14110,6 @@ do
+     "test/boolean/Makefile") CONFIG_FILES="$CONFIG_FILES test/boolean/Makefile" ;;
+     "test/delaunay/Makefile") CONFIG_FILES="$CONFIG_FILES test/delaunay/Makefile" ;;
+     "test/coarsen/Makefile") CONFIG_FILES="$CONFIG_FILES test/coarsen/Makefile" ;;
+-    "debian/Makefile") CONFIG_FILES="$CONFIG_FILES debian/Makefile" ;;
+ 
+   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
+   esac
+diff --git a/configure.ac b/configure.ac
+index daf89df..783fea1 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -59,10 +59,6 @@ AM_MAINTAINER_MODE
+ 
+ AC_PROG_CC
+ 
+-if test x$GCC = xyes ; then
+-  CFLAGS="$CFLAGS -Wall -Werror-implicit-function-declaration -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations"
+-fi
+-
+ AC_PROG_AWK
+ AC_ISC_POSIX
+ AC_HEADER_STDC
+@@ -241,9 +237,9 @@ __EOF
+ 
+ dnl checking for #warning cpp directive
+ AC_TRY_COMPILE(,
+-       "{
++       [
+            #warning test
+-	}", 
++       ], 
+ 	AC_DEFINE(CPP_HAS_WARNING, 1, 
+ 	[Define if C preprocessor supports warning directive.]),
+ 	AC_MSG_WARN(["C preprocessor does not support warning directive."]))
+@@ -271,6 +267,5 @@ test/Makefile
+ test/boolean/Makefile
+ test/delaunay/Makefile
+ test/coarsen/Makefile
+-debian/Makefile
+ ])
+ AC_OUTPUT
+diff --git a/debian/Makefile.am b/debian/Makefile.am
+deleted file mode 100644
+index ae4a291..0000000
+--- a/debian/Makefile.am
++++ /dev/null
+@@ -1,6 +0,0 @@
+-EXTRA_DIST = changelog.sh compat control copyright \
+-	libgts-snapshot-dev.install \
+-	libgts-snapshot-doc.docs \
+-	libgts-snapshot.install \
+-	libgts-snapshot.symbols \
+-	rules
+diff --git a/debian/Makefile.in b/debian/Makefile.in
+deleted file mode 100644
+index b003f80..0000000
+--- a/debian/Makefile.in
++++ /dev/null
+@@ -1,380 +0,0 @@
+-# Makefile.in generated by automake 1.11.1 from Makefile.am.
+-# @configure_input@
+-
+-# Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
+-# 2003, 2004, 2005, 2006, 2007, 2008, 2009  Free Software Foundation,
+-# Inc.
+-# This Makefile.in is free software; the Free Software Foundation
+-# gives unlimited permission to copy and/or distribute it,
+-# with or without modifications, as long as this notice is preserved.
+-
+-# This program is distributed in the hope that it will be useful,
+-# but WITHOUT ANY WARRANTY, to the extent permitted by law; without
+-# even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+-# PARTICULAR PURPOSE.
+-
+-@SET_MAKE@
+-VPATH = @srcdir@
+-pkgdatadir = $(datadir)/@PACKAGE@
+-pkgincludedir = $(includedir)/@PACKAGE@
+-pkglibdir = $(libdir)/@PACKAGE@
+-pkglibexecdir = $(libexecdir)/@PACKAGE@
+-am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
+-install_sh_DATA = $(install_sh) -c -m 644
+-install_sh_PROGRAM = $(install_sh) -c
+-install_sh_SCRIPT = $(install_sh) -c
+-INSTALL_HEADER = $(INSTALL_DATA)
+-transform = $(program_transform_name)
+-NORMAL_INSTALL = :
+-PRE_INSTALL = :
+-POST_INSTALL = :
+-NORMAL_UNINSTALL = :
+-PRE_UNINSTALL = :
+-POST_UNINSTALL = :
+-build_triplet = @build@
+-host_triplet = @host@
+-subdir = debian
+-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
+-ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
+-am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
+-	$(top_srcdir)/configure.ac
+-am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
+-	$(ACLOCAL_M4)
+-mkinstalldirs = $(install_sh) -d
+-CONFIG_HEADER = $(top_builddir)/config.h
+-CONFIG_CLEAN_FILES =
+-CONFIG_CLEAN_VPATH_FILES =
+-SOURCES =
+-DIST_SOURCES =
+-DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
+-ACLOCAL = @ACLOCAL@
+-AMTAR = @AMTAR@
+-AR = @AR@
+-AUTOCONF = @AUTOCONF@
+-AUTOHEADER = @AUTOHEADER@
+-AUTOMAKE = @AUTOMAKE@
+-AWK = @AWK@
+-CC = @CC@
+-CCDEPMODE = @CCDEPMODE@
+-CFLAGS = @CFLAGS@
+-CPP = @CPP@
+-CPPFLAGS = @CPPFLAGS@
+-CYGPATH_W = @CYGPATH_W@
+-DEFS = @DEFS@
+-DEPDIR = @DEPDIR@
+-DLLTOOL = @DLLTOOL@
+-DSYMUTIL = @DSYMUTIL@
+-DUMPBIN = @DUMPBIN@
+-ECHO_C = @ECHO_C@
+-ECHO_N = @ECHO_N@
+-ECHO_T = @ECHO_T@
+-EGREP = @EGREP@
+-EXEEXT = @EXEEXT@
+-FGREP = @FGREP@
+-GLIB_CFLAGS = @GLIB_CFLAGS@
+-GLIB_CONFIG = @GLIB_CONFIG@
+-GLIB_DEPLIBS = @GLIB_DEPLIBS@
+-GLIB_GENMARSHAL = @GLIB_GENMARSHAL@
+-GLIB_LIBS = @GLIB_LIBS@
+-GLIB_MKENUMS = @GLIB_MKENUMS@
+-GOBJECT_QUERY = @GOBJECT_QUERY@
+-GREP = @GREP@
+-GTS_MAJOR_VERSION = @GTS_MAJOR_VERSION@
+-GTS_MICRO_VERSION = @GTS_MICRO_VERSION@
+-GTS_MINOR_VERSION = @GTS_MINOR_VERSION@
+-GTS_VERSION = @GTS_VERSION@
+-INSTALL = @INSTALL@
+-INSTALL_DATA = @INSTALL_DATA@
+-INSTALL_PROGRAM = @INSTALL_PROGRAM@
+-INSTALL_SCRIPT = @INSTALL_SCRIPT@
+-INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+-LD = @LD@
+-LDFLAGS = @LDFLAGS@
+-LIBOBJS = @LIBOBJS@
+-LIBS = @LIBS@
+-LIBTOOL = @LIBTOOL@
+-LIPO = @LIPO@
+-LN_S = @LN_S@
+-LTLIBOBJS = @LTLIBOBJS@
+-LT_AGE = @LT_AGE@
+-LT_CURRENT = @LT_CURRENT@
+-LT_RELEASE = @LT_RELEASE@
+-LT_REVISION = @LT_REVISION@
+-MAINT = @MAINT@
+-MAKEINFO = @MAKEINFO@
+-MANIFEST_TOOL = @MANIFEST_TOOL@
+-MKDIR_P = @MKDIR_P@
+-NM = @NM@
+-NMEDIT = @NMEDIT@
+-OBJDUMP = @OBJDUMP@
+-OBJEXT = @OBJEXT@
+-OTOOL = @OTOOL@
+-OTOOL64 = @OTOOL64@
+-PACKAGE = @PACKAGE@
+-PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
+-PACKAGE_NAME = @PACKAGE_NAME@
+-PACKAGE_STRING = @PACKAGE_STRING@
+-PACKAGE_TARNAME = @PACKAGE_TARNAME@
+-PACKAGE_URL = @PACKAGE_URL@
+-PACKAGE_VERSION = @PACKAGE_VERSION@
+-PATH_SEPARATOR = @PATH_SEPARATOR@
+-PKG_CONFIG = @PKG_CONFIG@
+-RANLIB = @RANLIB@
+-SED = @SED@
+-SET_MAKE = @SET_MAKE@
+-SHELL = @SHELL@
+-STRIP = @STRIP@
+-VERSION = @VERSION@
+-abs_builddir = @abs_builddir@
+-abs_srcdir = @abs_srcdir@
+-abs_top_builddir = @abs_top_builddir@
+-abs_top_srcdir = @abs_top_srcdir@
+-ac_ct_AR = @ac_ct_AR@
+-ac_ct_CC = @ac_ct_CC@
+-ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
+-am__include = @am__include@
+-am__leading_dot = @am__leading_dot@
+-am__quote = @am__quote@
+-am__tar = @am__tar@
+-am__untar = @am__untar@
+-bindir = @bindir@
+-build = @build@
+-build_alias = @build_alias@
+-build_cpu = @build_cpu@
+-build_os = @build_os@
+-build_vendor = @build_vendor@
+-builddir = @builddir@
+-datadir = @datadir@
+-datarootdir = @datarootdir@
+-docdir = @docdir@
+-dvidir = @dvidir@
+-exec_prefix = @exec_prefix@
+-glib_cflags = @glib_cflags@
+-glib_libs = @glib_libs@
+-glib_module_cflags = @glib_module_cflags@
+-glib_module_libs = @glib_module_libs@
+-glib_thread_cflags = @glib_thread_cflags@
+-glib_thread_libs = @glib_thread_libs@
+-host = @host@
+-host_alias = @host_alias@
+-host_cpu = @host_cpu@
+-host_os = @host_os@
+-host_vendor = @host_vendor@
+-htmldir = @htmldir@
+-includedir = @includedir@
+-infodir = @infodir@
+-install_sh = @install_sh@
+-libdir = @libdir@
+-libexecdir = @libexecdir@
+-localedir = @localedir@
+-localstatedir = @localstatedir@
+-mandir = @mandir@
+-mkdir_p = @mkdir_p@
+-oldincludedir = @oldincludedir@
+-pdfdir = @pdfdir@
+-prefix = @prefix@
+-program_transform_name = @program_transform_name@
+-psdir = @psdir@
+-sbindir = @sbindir@
+-sharedstatedir = @sharedstatedir@
+-srcdir = @srcdir@
+-sysconfdir = @sysconfdir@
+-target_alias = @target_alias@
+-top_build_prefix = @top_build_prefix@
+-top_builddir = @top_builddir@
+-top_srcdir = @top_srcdir@
+-EXTRA_DIST = changelog.sh compat control copyright \
+-	libgts-snapshot-dev.install \
+-	libgts-snapshot-doc.docs \
+-	libgts-snapshot.install \
+-	libgts-snapshot.symbols \
+-	rules
+-
+-all: all-am
+-
+-.SUFFIXES:
+-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
+-	@for dep in $?; do \
+-	  case '$(am__configure_deps)' in \
+-	    *$$dep*) \
+-	      ( cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh ) \
+-	        && { if test -f $@; then exit 0; else break; fi; }; \
+-	      exit 1;; \
+-	  esac; \
+-	done; \
+-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu debian/Makefile'; \
+-	$(am__cd) $(top_srcdir) && \
+-	  $(AUTOMAKE) --gnu debian/Makefile
+-.PRECIOUS: Makefile
+-Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
+-	@case '$?' in \
+-	  *config.status*) \
+-	    cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh;; \
+-	  *) \
+-	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)'; \
+-	    cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe);; \
+-	esac;
+-
+-$(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
+-	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+-
+-$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
+-	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+-$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
+-	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+-$(am__aclocal_m4_deps):
+-
+-mostlyclean-libtool:
+-	-rm -f *.lo
+-
+-clean-libtool:
+-	-rm -rf .libs _libs
+-tags: TAGS
+-TAGS:
+-
+-ctags: CTAGS
+-CTAGS:
+-
+-
+-distdir: $(DISTFILES)
+-	@srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*]/\\\\&/g'`; \
+-	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's/[].[^$$\\*]/\\\\&/g'`; \
+-	list='$(DISTFILES)'; \
+-	  dist_files=`for file in $$list; do echo $$file; done | \
+-	  sed -e "s|^$$srcdirstrip/||;t" \
+-	      -e "s|^$$topsrcdirstrip/|$(top_builddir)/|;t"`; \
+-	case $$dist_files in \
+-	  */*) $(MKDIR_P) `echo "$$dist_files" | \
+-			   sed '/\//!d;s|^|$(distdir)/|;s,/[^/]*$$,,' | \
+-			   sort -u` ;; \
+-	esac; \
+-	for file in $$dist_files; do \
+-	  if test -f $$file || test -d $$file; then d=.; else d=$(srcdir); fi; \
+-	  if test -d $$d/$$file; then \
+-	    dir=`echo "/$$file" | sed -e 's,/[^/]*$$,,'`; \
+-	    if test -d "$(distdir)/$$file"; then \
+-	      find "$(distdir)/$$file" -type d ! -perm -700 -exec chmod u+rwx {} \;; \
+-	    fi; \
+-	    if test -d $(srcdir)/$$file && test $$d != $(srcdir); then \
+-	      cp -fpR $(srcdir)/$$file "$(distdir)$$dir" || exit 1; \
+-	      find "$(distdir)/$$file" -type d ! -perm -700 -exec chmod u+rwx {} \;; \
+-	    fi; \
+-	    cp -fpR $$d/$$file "$(distdir)$$dir" || exit 1; \
+-	  else \
+-	    test -f "$(distdir)/$$file" \
+-	    || cp -p $$d/$$file "$(distdir)/$$file" \
+-	    || exit 1; \
+-	  fi; \
+-	done
+-check-am: all-am
+-check: check-am
+-all-am: Makefile
+-installdirs:
+-install: install-am
+-install-exec: install-exec-am
+-install-data: install-data-am
+-uninstall: uninstall-am
+-
+-install-am: all-am
+-	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
+-
+-installcheck: installcheck-am
+-install-strip:
+-	$(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM="$(INSTALL_STRIP_PROGRAM)" \
+-	  install_sh_PROGRAM="$(INSTALL_STRIP_PROGRAM)" INSTALL_STRIP_FLAG=-s \
+-	  `test -z '$(STRIP)' || \
+-	    echo "INSTALL_PROGRAM_ENV=STRIPPROG='$(STRIP)'"` install
+-mostlyclean-generic:
+-
+-clean-generic:
+-
+-distclean-generic:
+-	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
+-	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+-
+-maintainer-clean-generic:
+-	@echo "This command is intended for maintainers to use"
+-	@echo "it deletes files that may require special tools to rebuild."
+-clean: clean-am
+-
+-clean-am: clean-generic clean-libtool mostlyclean-am
+-
+-distclean: distclean-am
+-	-rm -f Makefile
+-distclean-am: clean-am distclean-generic
+-
+-dvi: dvi-am
+-
+-dvi-am:
+-
+-html: html-am
+-
+-html-am:
+-
+-info: info-am
+-
+-info-am:
+-
+-install-data-am:
+-
+-install-dvi: install-dvi-am
+-
+-install-dvi-am:
+-
+-install-exec-am:
+-
+-install-html: install-html-am
+-
+-install-html-am:
+-
+-install-info: install-info-am
+-
+-install-info-am:
+-
+-install-man:
+-
+-install-pdf: install-pdf-am
+-
+-install-pdf-am:
+-
+-install-ps: install-ps-am
+-
+-install-ps-am:
+-
+-installcheck-am:
+-
+-maintainer-clean: maintainer-clean-am
+-	-rm -f Makefile
+-maintainer-clean-am: distclean-am maintainer-clean-generic
+-
+-mostlyclean: mostlyclean-am
+-
+-mostlyclean-am: mostlyclean-generic mostlyclean-libtool
+-
+-pdf: pdf-am
+-
+-pdf-am:
+-
+-ps: ps-am
+-
+-ps-am:
+-
+-uninstall-am:
+-
+-.MAKE: install-am install-strip
+-
+-.PHONY: all all-am check check-am clean clean-generic clean-libtool \
+-	distclean distclean-generic distclean-libtool distdir dvi \
+-	dvi-am html html-am info info-am install install-am \
+-	install-data install-data-am install-dvi install-dvi-am \
+-	install-exec install-exec-am install-html install-html-am \
+-	install-info install-info-am install-man install-pdf \
+-	install-pdf-am install-ps install-ps-am install-strip \
+-	installcheck installcheck-am installdirs maintainer-clean \
+-	maintainer-clean-generic mostlyclean mostlyclean-generic \
+-	mostlyclean-libtool pdf pdf-am ps ps-am uninstall uninstall-am
+-
+-
+-# Tell versions [3.59,3.63) of GNU make to not export all variables.
+-# Otherwise a system limit (for SysV at least) may be exceeded.
+-.NOEXPORT:
+diff --git a/debian/changelog.sh b/debian/changelog.sh
+deleted file mode 100644
+index 9246cf7..0000000
+--- a/debian/changelog.sh
++++ /dev/null
+@@ -1,11 +0,0 @@
+-GTS_VERSION=`grep GTS_MAJOR_VERSION config.h | awk '{print $3;}'`.`grep GTS_MINOR_VERSION config.h | awk '{print $3;}'`.`grep GTS_MICRO_VERSION config.h | awk '{print $3;}'`
+-
+-version=`date +%y%m%d`
+-date=`date +"%a, %e %b %Y %T %z"`
+-cat <<EOF > debian/changelog
+-gts-snapshot ($GTS_VERSION-$version) jaunty; urgency=low
+-
+-  * gts-snapshot release (based on Ruben Molina's official debian)
+-
+- -- Stephane Popinet <popinet@users.sf.net>  $date
+-EOF
+diff --git a/debian/compat b/debian/compat
+deleted file mode 100644
+index 7ed6ff8..0000000
+--- a/debian/compat
++++ /dev/null
+@@ -1 +0,0 @@
+-5
+diff --git a/debian/control b/debian/control
+deleted file mode 100644
+index 1fd6b67..0000000
+--- a/debian/control
++++ /dev/null
+@@ -1,44 +0,0 @@
+-Source: gts-snapshot
+-Section: math
+-Priority: optional
+-Maintainer: Stephane Popinet <popinet@users.sf.net>
+-Build-Depends: cdbs, debhelper (>= 5), autotools-dev, libglib2.0-dev, libnetpbm10-dev, gtk-doc-tools (>= 1.3-4)
+-Homepage: http://gts.sourceforge.net/
+-
+-Package: libgts-snapshot-dev
+-Section: libdevel
+-Architecture: any
+-Depends: ${shlibs:Depends}, ${misc:Depends}, libglib2.0-dev, libgts-snapshot (= ${binary:Version})
+-Conflicts: libgts-dev, libgts-bin
+-Suggests: libgts-snapshot-doc
+-Description: GTS Library (development snapshot)
+- GTS includes a number of useful functions to deal with triangulated
+- surfaces including, but not limited to, multi-resolution models,
+- Delaunay and Constrained Delaunay triangulations, set operations on
+- surfaces (intersection, union etc ...), bounding-boxes trees for
+- efficient collision and intersection detection, triangle strips and
+- binary heaps.
+-
+-Package: libgts-snapshot
+-Section: libs
+-Architecture: any
+-Depends: ${shlibs:Depends}, ${misc:Depends}
+-Conflicts: libgts-0.7-1, libgts-0.7-5, libgts-bin
+-Description: GTS Library (development snapshot) -- runtime environment
+- GTS includes a number of useful functions to deal with triangulated
+- surfaces.  Refer to the libgts-dev package description for more
+- details.
+- .
+- This package provides runtime support for GTS
+-
+-Package: libgts-snapshot-doc
+-Section: doc
+-Architecture: all
+-Conflicts: libgts-doc
+-Depends: ${shlibs:Depends}, ${misc:Depends}
+-Description: GTS Library documentation (development snapshot)
+- GTS includes a number of useful functions to deal with triangulated
+- surfaces.  Refer to the libgts-dev package description for more
+- details.
+- .
+- This package contains the GTS Reference, in HTML format.
+diff --git a/debian/copyright b/debian/copyright
+deleted file mode 100644
+index 28f4856..0000000
+--- a/debian/copyright
++++ /dev/null
+@@ -1,4 +0,0 @@
+-Copyright: GNU Library General Public License, Version 2.
+-
+-On Debian systems, the complete text of the LGPL is located in
+-/usr/share/common-licenses/LGPL-2
+diff --git a/debian/libgts-snapshot-dev.install b/debian/libgts-snapshot-dev.install
+deleted file mode 100644
+index d7bd846..0000000
+--- a/debian/libgts-snapshot-dev.install
++++ /dev/null
+@@ -1,7 +0,0 @@
+-debian/tmp/usr/bin/gts-config
+-debian/tmp/usr/include
+-debian/tmp/usr/lib/*.so
+-debian/tmp/usr/lib/*.a
+-debian/tmp/usr/lib/*.la
+-debian/tmp/usr/share/aclocal
+-debian/tmp/usr/share/man/man1/gts-config.1
+diff --git a/debian/libgts-snapshot-doc.docs b/debian/libgts-snapshot-doc.docs
+deleted file mode 100644
+index 0bd3136..0000000
+--- a/debian/libgts-snapshot-doc.docs
++++ /dev/null
+@@ -1 +0,0 @@
+-doc/html
+diff --git a/debian/libgts-snapshot.install b/debian/libgts-snapshot.install
+deleted file mode 100644
+index c7346f0..0000000
+--- a/debian/libgts-snapshot.install
++++ /dev/null
+@@ -1,22 +0,0 @@
+-debian/tmp/usr/bin/gts2oogl
+-debian/tmp/usr/bin/gtscheck
+-debian/tmp/usr/bin/gtscompare
+-debian/tmp/usr/bin/gtstemplate
+-debian/tmp/usr/bin/stl2gts
+-debian/tmp/usr/bin/transform
+-debian/tmp/usr/bin/delaunay
+-debian/tmp/usr/bin/happrox
+-debian/tmp/usr/bin/gts2dxf
+-debian/tmp/usr/bin/gts2stl
+-debian/tmp/usr/lib/*.so.*
+-debian/tmp/usr/lib/pkgconfig/*.pc
+-debian/tmp/usr/share/man/man1/gts2oogl.1
+-debian/tmp/usr/share/man/man1/gtscheck.1
+-debian/tmp/usr/share/man/man1/gtscompare.1
+-debian/tmp/usr/share/man/man1/gtstemplate.1
+-debian/tmp/usr/share/man/man1/stl2gts.1
+-debian/tmp/usr/share/man/man1/transform.1
+-debian/tmp/usr/share/man/man1/delaunay.1
+-debian/tmp/usr/share/man/man1/happrox.1
+-debian/tmp/usr/share/man/man1/gts2dxf.1
+-debian/tmp/usr/share/man/man1/gts2stl.1
+diff --git a/debian/libgts-snapshot.symbols b/debian/libgts-snapshot.symbols
+deleted file mode 100644
+index 9a959a9..0000000
+--- a/debian/libgts-snapshot.symbols
++++ /dev/null
+@@ -1 +0,0 @@
+-# dummy file just here to force dh_makeshlibs to call dpkg-gensymbols
+diff --git a/debian/rules b/debian/rules
+deleted file mode 100644
+index f9ee6ad..0000000
+--- a/debian/rules
++++ /dev/null
+@@ -1,10 +0,0 @@
+-#!/usr/bin/make -f
+-
+-include /usr/share/cdbs/1/rules/debhelper.mk
+-include /usr/share/cdbs/1/class/autotools.mk
+-
+-GTS_VERSION = $(shell grep -o "[0-9]*\.[0-9]*\.[0-9]*" $(CURDIR)/debian/changelog)
+-DEB_DH_MAKESHLIBS_ARGS_libgts-snapshot = -- -v$(GTS_VERSION) -c0
+-
+-clean::
+-	rm -f src/predicates_init
+diff --git a/doc/Makefile.in b/doc/Makefile.in
+index 4b10090..b8221ac 100644
+--- a/doc/Makefile.in
++++ b/doc/Makefile.in
+@@ -159,6 +159,8 @@ PACKAGE_URL = @PACKAGE_URL@
+ PACKAGE_VERSION = @PACKAGE_VERSION@
+ PATH_SEPARATOR = @PATH_SEPARATOR@
+ PKG_CONFIG = @PKG_CONFIG@
++PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
++PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
+ RANLIB = @RANLIB@
+ SED = @SED@
+ SET_MAKE = @SET_MAKE@
+diff --git a/doc/manpages/Makefile.in b/doc/manpages/Makefile.in
+index ce258ce..69192e1 100644
+--- a/doc/manpages/Makefile.in
++++ b/doc/manpages/Makefile.in
+@@ -145,6 +145,8 @@ PACKAGE_URL = @PACKAGE_URL@
+ PACKAGE_VERSION = @PACKAGE_VERSION@
+ PATH_SEPARATOR = @PATH_SEPARATOR@
+ PKG_CONFIG = @PKG_CONFIG@
++PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
++PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
+ RANLIB = @RANLIB@
+ SED = @SED@
+ SET_MAKE = @SET_MAKE@
+diff --git a/examples/Makefile.am b/examples/Makefile.am
+index a4b2fc6..346cedb 100644
+--- a/examples/Makefile.am
++++ b/examples/Makefile.am
+@@ -1,6 +1,6 @@
+ ## Process this file with automake to produce Makefile.in
+ 
+-INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/src -I$(includedir)\
++INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/src \
+ 	 -DG_LOG_DOMAIN=\"Gts-examples\"
+ LDADD = $(top_builddir)/src/libgts.la -lm
+ DEPS = $(top_builddir)/src/libgts.la
+diff --git a/examples/Makefile.in b/examples/Makefile.in
+index 1b9d4ee..cd5fc74 100644
+--- a/examples/Makefile.in
++++ b/examples/Makefile.in
+@@ -232,6 +232,8 @@ PACKAGE_URL = @PACKAGE_URL@
+ PACKAGE_VERSION = @PACKAGE_VERSION@
+ PATH_SEPARATOR = @PATH_SEPARATOR@
+ PKG_CONFIG = @PKG_CONFIG@
++PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
++PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
+ RANLIB = @RANLIB@
+ SED = @SED@
+ SET_MAKE = @SET_MAKE@
+@@ -296,7 +298,7 @@ target_alias = @target_alias@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+-INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/src -I$(includedir)\
++INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/src \
+ 	 -DG_LOG_DOMAIN=\"Gts-examples\"
+ 
+ LDADD = $(top_builddir)/src/libgts.la -lm
+diff --git a/gts.pc.in b/gts.pc.in
+index 39626d7..f4fcdc5 100644
+--- a/gts.pc.in
++++ b/gts.pc.in
+@@ -6,6 +6,6 @@ includedir=@includedir@
+ Name: GTS
+ Description: GNU Triangulated Surface Library
+ Version: @VERSION@
+-Requires: glib-2.0,gthread-2.0,gmodule-2.0
++Requires: glib-2.0
+ Libs: -L${libdir} @LIBS@ -lgts -lm
+ Cflags: -I${includedir}
+diff --git a/ltmain.sh b/ltmain.sh
+index 3061e3c..aa5624c 100755
+--- a/ltmain.sh
++++ b/ltmain.sh
+@@ -136,15 +136,15 @@ progpath="$0"
+ 
+ : ${CP="cp -f"}
+ test "${ECHO+set}" = set || ECHO=${as_echo-'printf %s\n'}
+-: ${EGREP="grep -E"}
+-: ${FGREP="grep -F"}
+-: ${GREP="grep"}
++: ${EGREP="/bin/grep -E"}
++: ${FGREP="/bin/grep -F"}
++: ${GREP="/bin/grep"}
+ : ${LN_S="ln -s"}
+ : ${MAKE="make"}
+ : ${MKDIR="mkdir"}
+ : ${MV="mv -f"}
+ : ${RM="rm -f"}
+-: ${SED="sed"}
++: ${SED="/bin/sed"}
+ : ${SHELL="${CONFIG_SHELL-/bin/sh}"}
+ : ${Xsed="$SED -e 1s/^X//"}
+ 
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 3e3c5b3..e988e5b 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -1,6 +1,6 @@
+ ## Process this file with automake to produce Makefile.in
+ 
+-INCLUDES = -I$(top_srcdir) -I$(includedir) -DG_LOG_DOMAIN=\"Gts\"
++INCLUDES = -I$(top_srcdir) -DG_LOG_DOMAIN=\"Gts\"
+ 
+ bin_SCRIPTS=gts-config
+ 
+diff --git a/src/Makefile.in b/src/Makefile.in
+index a0d7fd5..4e0ed13 100644
+--- a/src/Makefile.in
++++ b/src/Makefile.in
+@@ -177,6 +177,8 @@ PACKAGE_URL = @PACKAGE_URL@
+ PACKAGE_VERSION = @PACKAGE_VERSION@
+ PATH_SEPARATOR = @PATH_SEPARATOR@
+ PKG_CONFIG = @PKG_CONFIG@
++PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
++PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
+ RANLIB = @RANLIB@
+ SED = @SED@
+ SET_MAKE = @SET_MAKE@
+@@ -241,7 +243,7 @@ target_alias = @target_alias@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+-INCLUDES = -I$(top_srcdir) -I$(includedir) -DG_LOG_DOMAIN=\"Gts\"
++INCLUDES = -I$(top_srcdir) -DG_LOG_DOMAIN=\"Gts\"
+ bin_SCRIPTS = gts-config
+ BUILT_SOURCES = \
+ 	gts-config \
+diff --git a/src/gts-config.in b/src/gts-config.in
+index 0eed417..4108242 100644
+--- a/src/gts-config.in
++++ b/src/gts-config.in
+@@ -1,14 +1,5 @@
+ #!/bin/sh
+ 
+-glib_libs="@glib_libs@"
+-glib_cflags="@glib_cflags@"
+-glib_thread_libs="@glib_thread_libs@"
+-glib_thread_cflags="@glib_thread_cflags@"
+-glib_module_libs="@glib_module_libs@"
+-glib_module_cflags="@glib_module_cflags@"
+-
+-prefix=@prefix@
+-exec_prefix=@exec_prefix@
+ exec_prefix_set=no
+ 
+ usage()
+@@ -30,24 +21,13 @@ EOF
+ 	exit $1
+ }
+ 
+-uniquify()
+-{
+-    echo $1 | awk '{
+-	for (i = 1; i <= NF; i++) {
+-	    unique = 1;
+-	    for (j = i + 1; j <= NF && unique; j++)
+-		if ($i == $j)
+-		    unique = 0;
+-            if (unique)
+-		printf ("%s ", $i);
+-	}
+-    }'
+-}
+-
+ if test $# -eq 0; then
+ 	usage 1 1>&2
+ fi
+ 
++PKG_CONFIG_ARGS=
++PKG_CONFIG_MODS=gts
++
+ while test $# -gt 0; do
+   case "$1" in
+   -*=*) optarg=`echo "$1" | sed 's/[-_a-zA-Z0-9]*=//'` ;;
+@@ -56,23 +36,23 @@ while test $# -gt 0; do
+ 
+   case $1 in
+     --prefix=*)
+-      prefix=$optarg
++      PKG_CONFIG_ARGS="$PKG_CONFIG_ARGS --define-variable=prefix=$optarg"
+       if test $exec_prefix_set = no ; then
+-        exec_prefix=$optarg
++        PKG_CONFIG_ARGS="$PKG_CONFIG_ARGS --define-variable=exec_prefix=$optarg"
+       fi
+       ;;
+     --prefix)
+       echo_prefix=yes
+       ;;
+     --exec-prefix=*)
+-      exec_prefix=$optarg
++      PKG_CONFIG_ARGS="$PKG_CONFIG_ARGS --define-variable=exec_prefix=$optarg"
+       exec_prefix_set=yes
+       ;;
+     --exec-prefix)
+       echo_exec_prefix=yes
+       ;;
+     --version)
+-      echo @GTS_VERSION@
++      pkg-config --modversion gts
+       exit 0
+       ;;
+     --cflags)
+@@ -85,13 +65,12 @@ while test $# -gt 0; do
+       echo_check=yes
+       ;;
+     gts)
+-      lib_gts=yes
+       ;;
+     gmodule)
+-      lib_gmodule=yes
++      PKG_CONFIG_MODS="$PKG_CONFIG_MODS gmodule-2.0"
+       ;;
+     gthread)
+-      lib_gthread=yes
++      PKG_CONFIG_MODS="$PKG_CONFIG_MODS gthread-2.0"
+       ;;
+     *)
+       usage 1 1>&2
+@@ -101,34 +80,18 @@ while test $# -gt 0; do
+ done
+ 
+ if test "$echo_prefix" = "yes"; then
+-	echo $prefix
++	pkg-config $PKG_CONFIG_ARGS --variable=prefix gts
+ fi
+ if test "$echo_exec_prefix" = "yes"; then
+-	echo $exec_prefix
++	pkg-config $PKG_CONFIG_ARGS --variable=exec_prefix gts
+ fi
+ if test "$echo_cflags" = "yes"; then
+-	if test "$lib_gmodule" = "yes"; then
+-	    glib_cflags="$glib_cflags $glib_module_cflags"
+-	fi
+-	if test "$lib_gthread" = "yes"; then
+-	    glib_cflags="$glib_cflags $glib_thread_cflags"
+-	fi
+-	glib_cflags="$glib_cflags -I${prefix}/include"
+-	glib_cflags=`uniquify "$glib_cflags"`
+         if test "$echo_check" = "yes"; then
+-	    echo -DGTS_CHECK_CASTS $glib_cflags
++           echo -DGTS_CHECK_CASTS `pkg-config $PKG_CONFIG_ARGS --cflags $PKG_CONFIG_MODS`
+         else
+-	    echo $glib_cflags
+-	fi
++           echo `pkg-config $PKG_CONFIG_ARGS --cflags $PKG_CONFIG_MODS`
++        fi
+ fi
+ if test "$echo_libs" = "yes"; then
+-	if test "$lib_gmodule" = "yes"; then
+-	    glib_libs="$glib_libs $glib_module_libs"
+-	fi
+-	if test "$lib_gthread" = "yes"; then
+-	    glib_libs="$glib_libs $glib_thread_libs"
+-	fi
+-	glib_libs="-L${exec_prefix}/lib -lgts $glib_libs -lm"
+-	glib_libs=`uniquify "$glib_libs"`
+-	echo $glib_libs
++	echo `pkg-config $PKG_CONFIG_ARGS --libs $PKG_CONFIG_MODS`
+ fi
+diff --git a/test/Makefile.in b/test/Makefile.in
+index c39a15e..1927948 100644
+--- a/test/Makefile.in
++++ b/test/Makefile.in
+@@ -159,6 +159,8 @@ PACKAGE_URL = @PACKAGE_URL@
+ PACKAGE_VERSION = @PACKAGE_VERSION@
+ PATH_SEPARATOR = @PATH_SEPARATOR@
+ PKG_CONFIG = @PKG_CONFIG@
++PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
++PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
+ RANLIB = @RANLIB@
+ SED = @SED@
+ SET_MAKE = @SET_MAKE@
+diff --git a/test/boolean/Makefile.am b/test/boolean/Makefile.am
+index fb6fd0c..65525ef 100644
+--- a/test/boolean/Makefile.am
++++ b/test/boolean/Makefile.am
+@@ -1,6 +1,6 @@
+ ## Process this file with automake to produce Makefile.in
+ 
+-INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/src -I$(includedir)\
++INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/src \
+ 	 -DG_LOG_DOMAIN=\"Gts-test\"
+ LDADD = $(top_builddir)/src/libgts.la -lm
+ DEPS = $(top_builddir)/src/libgts.la
+diff --git a/test/boolean/Makefile.in b/test/boolean/Makefile.in
+index c222a34..34f925e 100644
+--- a/test/boolean/Makefile.in
++++ b/test/boolean/Makefile.in
+@@ -149,6 +149,8 @@ PACKAGE_URL = @PACKAGE_URL@
+ PACKAGE_VERSION = @PACKAGE_VERSION@
+ PATH_SEPARATOR = @PATH_SEPARATOR@
+ PKG_CONFIG = @PKG_CONFIG@
++PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
++PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
+ RANLIB = @RANLIB@
+ SED = @SED@
+ SET_MAKE = @SET_MAKE@
+@@ -213,7 +215,7 @@ target_alias = @target_alias@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+-INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/src -I$(includedir)\
++INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/src \
+ 	 -DG_LOG_DOMAIN=\"Gts-test\"
+ 
+ LDADD = $(top_builddir)/src/libgts.la -lm
+diff --git a/test/boolean/test.sh b/test/boolean/test.sh
+old mode 100644
+new mode 100755
+diff --git a/test/coarsen/Makefile.am b/test/coarsen/Makefile.am
+index 3937c9e..6c9a174 100644
+--- a/test/coarsen/Makefile.am
++++ b/test/coarsen/Makefile.am
+@@ -1,6 +1,6 @@
+ ## Process this file with automake to produce Makefile.in
+ 
+-INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/src -I$(includedir)\
++INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/src \
+ 	 -DG_LOG_DOMAIN=\"Gts-test\"
+ LDADD = $(top_builddir)/src/libgts.la -lm
+ DEPS = $(top_builddir)/src/libgts.la
+diff --git a/test/coarsen/Makefile.in b/test/coarsen/Makefile.in
+index a430620..4cdcc3f 100644
+--- a/test/coarsen/Makefile.in
++++ b/test/coarsen/Makefile.in
+@@ -158,6 +158,8 @@ PACKAGE_URL = @PACKAGE_URL@
+ PACKAGE_VERSION = @PACKAGE_VERSION@
+ PATH_SEPARATOR = @PATH_SEPARATOR@
+ PKG_CONFIG = @PKG_CONFIG@
++PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
++PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
+ RANLIB = @RANLIB@
+ SED = @SED@
+ SET_MAKE = @SET_MAKE@
+@@ -222,7 +224,7 @@ target_alias = @target_alias@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+-INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/src -I$(includedir)\
++INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/src \
+ 	 -DG_LOG_DOMAIN=\"Gts-test\"
+ 
+ LDADD = $(top_builddir)/src/libgts.la -lm
+diff --git a/test/coarsen/flat.sh b/test/coarsen/flat.sh
+old mode 100644
+new mode 100755
+diff --git a/test/coarsen/flat1.sh b/test/coarsen/flat1.sh
+old mode 100644
+new mode 100755
+diff --git a/test/delaunay/Makefile.am b/test/delaunay/Makefile.am
+index 1a62a60..9efbadc 100644
+--- a/test/delaunay/Makefile.am
++++ b/test/delaunay/Makefile.am
+@@ -1,6 +1,6 @@
+ ## Process this file with automake to produce Makefile.in
+ 
+-INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/src -I$(includedir) \
++INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/src \
+ 	 -DG_LOG_DOMAIN=\"Gts-test\"
+ LDADD = $(top_builddir)/src/libgts.la -lm
+ DEPS = $(top_builddir)/src/libgts.la
+diff --git a/test/delaunay/Makefile.in b/test/delaunay/Makefile.in
+index 16c9468..856c77c 100644
+--- a/test/delaunay/Makefile.in
++++ b/test/delaunay/Makefile.in
+@@ -145,6 +145,8 @@ PACKAGE_URL = @PACKAGE_URL@
+ PACKAGE_VERSION = @PACKAGE_VERSION@
+ PATH_SEPARATOR = @PATH_SEPARATOR@
+ PKG_CONFIG = @PKG_CONFIG@
++PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
++PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
+ RANLIB = @RANLIB@
+ SED = @SED@
+ SET_MAKE = @SET_MAKE@
+@@ -209,7 +211,7 @@ target_alias = @target_alias@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+-INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/src -I$(includedir) \
++INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/src \
+ 	 -DG_LOG_DOMAIN=\"Gts-test\"
+ 
+ LDADD = $(top_builddir)/src/libgts.la -lm
+diff --git a/test/delaunay/cartesian.sh b/test/delaunay/cartesian.sh
+old mode 100644
+new mode 100755
+diff --git a/test/delaunay/cartesian_speed.sh b/test/delaunay/cartesian_speed.sh
+old mode 100644
+new mode 100755
+diff --git a/test/delaunay/random_speed.sh b/test/delaunay/random_speed.sh
+old mode 100644
+new mode 100755
+diff --git a/test/delaunay/too_close.sh b/test/delaunay/too_close.sh
+old mode 100644
+new mode 100755
+diff --git a/test/delaunay/two_segments.sh b/test/delaunay/two_segments.sh
+old mode 100644
+new mode 100755
+diff --git a/tools/Makefile.am b/tools/Makefile.am
+index 2559eee..157ed9d 100644
+--- a/tools/Makefile.am
++++ b/tools/Makefile.am
+@@ -1,6 +1,6 @@
+ ## Process this file with automake to produce Makefile.in
+ 
+-INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/src -I$(includedir)\
++INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/src \
+ 	 -DG_LOG_DOMAIN=\"Gts-tools\"
+ LDADD = $(top_builddir)/src/libgts.la -lm
+ DEPS = $(top_builddir)/src/libgts.la
+diff --git a/tools/Makefile.in b/tools/Makefile.in
+index 55c8e64..ca8d944 100644
+--- a/tools/Makefile.in
++++ b/tools/Makefile.in
+@@ -193,6 +193,8 @@ PACKAGE_URL = @PACKAGE_URL@
+ PACKAGE_VERSION = @PACKAGE_VERSION@
+ PATH_SEPARATOR = @PATH_SEPARATOR@
+ PKG_CONFIG = @PKG_CONFIG@
++PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
++PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
+ RANLIB = @RANLIB@
+ SED = @SED@
+ SET_MAKE = @SET_MAKE@
+@@ -257,7 +259,7 @@ target_alias = @target_alias@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+-INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/src -I$(includedir)\
++INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/src \
+ 	 -DG_LOG_DOMAIN=\"Gts-tools\"
+ 
+ LDADD = $(top_builddir)/src/libgts.la -lm
+-- 
+2.40.1
+

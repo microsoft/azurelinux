@@ -1,0 +1,33 @@
+From e5e5c7cc2a66902de6d9362482e9b3c526704a76 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Wed, 17 Jul 2024 08:40:13 -0400
+Subject: [PATCH] Downstream-only: restore hard dependency on pygobject
+
+Upstream omitted this dependency because they were not confident they
+could successfully "pip install" it, but we have no such difficulty with
+system packages. It is a real dependency for
+msal_extensions/libsecret.py.
+---
+ setup.py | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index 6d43f08..6455e43 100644
+--- a/setup.py
++++ b/setup.py
+@@ -22,7 +22,11 @@ setup(
+         'msal>=1.29,<2',  # Use TokenCache.search() from MSAL Python 1.29+
+ 
+         ## We choose to NOT define a hard dependency on this.
+-        # "pygobject>=3,<4;platform_system=='Linux'",
++        # Downstream-only: Upstream omitted this dependency because they were
++        # not confident they could successfully "pip install" it, but we have
++        # no such difficulty with system packages. It is a real dependency for
++        # msal_extensions/libsecret.py.
++        "pygobject>=3,<4;platform_system=='Linux'",
+     ],
+     extras_require={
+         "portalocker": [
+-- 
+2.48.1
+

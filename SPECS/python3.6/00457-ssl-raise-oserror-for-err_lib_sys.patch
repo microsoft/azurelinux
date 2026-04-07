@@ -1,0 +1,43 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Victor Stinner <vstinner@python.org>
+Date: Thu, 3 Apr 2025 18:26:17 +0200
+Subject: 00457: ssl: Raise OSError for ERR_LIB_SYS
+
+The patch resolves the flakiness of test_ftplib
+
+Backported from upstream 3.10+:
+https://github.com/python/cpython/pull/127361
+
+Co-authored-by: Petr Viktorin <encukou@gmail.com>
+---
+ Modules/_ssl.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/Modules/_ssl.c b/Modules/_ssl.c
+index 3375b2bf3f..ab8a327d10 100644
+--- a/Modules/_ssl.c
++++ b/Modules/_ssl.c
+@@ -638,6 +638,11 @@ PySSL_SetError(PySSLSocket *obj, int ret, const char *filename, int lineno)
+                     errstr = "Some I/O error occurred";
+                 }
+             } else {
++                if (ERR_GET_LIB(e) == ERR_LIB_SYS) {
++                    // A system error is being reported; reason is set to errno
++                    errno = ERR_GET_REASON(e);
++                    return PyErr_SetFromErrno(PyExc_OSError);
++                }
+                 p = PY_SSL_ERROR_SYSCALL;
+             }
+             break;
+@@ -648,6 +653,11 @@ PySSL_SetError(PySSLSocket *obj, int ret, const char *filename, int lineno)
+             if (e == 0)
+                 /* possible? */
+                 errstr = "A failure in the SSL library occurred";
++            if (ERR_GET_LIB(e) == ERR_LIB_SYS) {
++                // A system error is being reported; reason is set to errno
++                errno = ERR_GET_REASON(e);
++                return PyErr_SetFromErrno(PyExc_OSError);
++            }
+             break;
+         }
+         default:

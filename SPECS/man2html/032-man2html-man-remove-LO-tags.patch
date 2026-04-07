@@ -1,0 +1,214 @@
+From: Robert Luberda <robert@debian.org>
+Date: Sun, 7 Sep 2008 11:33:17 +0200
+Subject: 032 man2html man remove LO tags
+
+Remove `.LO 1' lines (lintian).
+---
+ man/el/hman.man                |  1 -
+ man/el/man2html.man            | 13 ++++++-------
+ man/ro/man2html.man            | 13 ++++++-------
+ man2html/hman.1                |  1 -
+ man2html/locales/en/hman.1     |  1 -
+ man2html/locales/en/man2html.1 |  1 -
+ man2html/locales/fr/man2html.1 | 13 ++++++-------
+ man2html/locales/it/hman.1     |  1 -
+ man2html/locales/it/man2html.1 | 13 ++++++-------
+ man2html/man2html.1            |  1 -
+ 10 files changed, 24 insertions(+), 34 deletions(-)
+
+diff --git a/man/el/hman.man b/man/el/hman.man
+index 294714f..101cfed 100644
+--- a/man/el/hman.man
++++ b/man/el/hman.man
+@@ -5,7 +5,6 @@
+ .\" distribution.
+ .\" Ελληνική μετάφραση από Λ. Δημητρουλάκη edimitro@tee.gr, Ιούλιος 2003  
+ .TH hman 1 "19 Ιανουαρίου 1998"
+-.LO 1
+ .SH ΟΝΟΜΑ
+ hman \- πλοήγηση στις ηλεκτρονικές σελίδες εγχειριδίου
+ .SH ΣΥΝΟΨΗ
+diff --git a/man/el/man2html.man b/man/el/man2html.man
+index e5529c4..b414f36 100644
+--- a/man/el/man2html.man
++++ b/man/el/man2html.man
+@@ -5,7 +5,6 @@
+ .\" Ελληνική μετάφραση από Λ. Δημητρουλάκη edimitro@tee.gr, Ιούλιος 2003
+ .\"
+ .TH man2html 1 "1 Ιανουαρίου 1998"
+-.LO 1
+ .SH ΟΝΟΜΑ
+ man2html \- μορφοποιεί μιά σελίδα εγχειριδίου σε html
+ .SH ΣΥΝΟΨΗ
+@@ -29,12 +28,12 @@ man2html [
+ .BR xmosaic (1)
+ ή
+ .BR netscape (1).
+-./" (Βλέπε
+-./" .BR man (1)
+-./" για πληροφορίες πλοήγησης στις σελίδες εγχειριδίου μέσω της
+-./" .BR man2html .
+-./" Συνήθως αρκεί να βάλλεις "MANHTMLPAGER=/usr/bin/lynx"
+-./" στο περιβάλλον σου.)
++.\" (Βλέπε
++.\" .BR man (1)
++.\" για πληροφορίες πλοήγησης στις σελίδες εγχειριδίου μέσω της
++.\" .BR man2html .
++.\" Συνήθως αρκεί να βάλλεις "MANHTMLPAGER=/usr/bin/lynx"
++.\" στο περιβάλλον σου.)
+ 
+ Το βασικό κομμάτι της
+ .B man2html
+diff --git a/man/ro/man2html.man b/man/ro/man2html.man
+index d510ae3..61388bb 100644
+--- a/man/ro/man2html.man
++++ b/man/ro/man2html.man
+@@ -4,7 +4,6 @@
+ .\"
+ .\" Traducere de Ovidiu Constantin <ovidiu.soft@xnet.ro>
+ .TH man2html 1 "1 Ianuarie 1998"
+-.LO 1
+ .SH NUME
+ man2html \- formateazγ o paginγ de manual ξn html
+ .SH SUMAR
+@@ -26,12 +25,12 @@ prin paginile de manual folosind un navigator html ca
+ .BR xmosaic (1)
+ sau
+ .BR netscape (1).
+-./" (Vezi
+-./" .BR man (1)
+-./" pentru informaώii despre cum sγ navighezi prin paginile de manual cu
+-./" .BR man2html .
+-./" De obicei este suficientγ adγugarea "MANHTMLPAGER=/usr/bin/lynx"
+-./" la mediu.)
++.\" (Vezi
++.\" .BR man (1)
++.\" pentru informaώii despre cum sγ navighezi prin paginile de manual cu
++.\" .BR man2html .
++.\" De obicei este suficientγ adγugarea "MANHTMLPAGER=/usr/bin/lynx"
++.\" la mediu.)
+ 
+ Partea principalγ a
+ .B man2html
+diff --git a/man2html/hman.1 b/man2html/hman.1
+index c0ee1ac..56bf10f 100644
+--- a/man2html/hman.1
++++ b/man2html/hman.1
+@@ -4,7 +4,6 @@
+ .\" License as specified in the README file that comes with the man 1.0
+ .\" distribution.  
+ .TH hman 1 "19 January 1998"
+-.LO 1
+ .SH NAME
+ hman \- browse the on-line manual pages
+ .SH SYNOPSIS
+diff --git a/man2html/locales/en/hman.1 b/man2html/locales/en/hman.1
+index 4676f55..9ba681d 100644
+--- a/man2html/locales/en/hman.1
++++ b/man2html/locales/en/hman.1
+@@ -4,7 +4,6 @@
+ .\" License as specified in the README file that comes with the man 1.0
+ .\" distribution.  
+ .TH hman 1 "19 January 1998"
+-.LO 1
+ .SH NAME
+ hman \- browse the on-line manual pages
+ .SH SYNOPSIS
+diff --git a/man2html/locales/en/man2html.1 b/man2html/locales/en/man2html.1
+index c1c25b3..d05e178 100644
+--- a/man2html/locales/en/man2html.1
++++ b/man2html/locales/en/man2html.1
+@@ -3,7 +3,6 @@
+ .\" aeb, 980101
+ .\"
+ .TH man2html 1 "1 January 1998"
+-.LO 1
+ .SH NAME
+ man2html \- format a manual page in html
+ .SH SYNOPSIS
+diff --git a/man2html/locales/fr/man2html.1 b/man2html/locales/fr/man2html.1
+index 9af7474..c548bf6 100644
+--- a/man2html/locales/fr/man2html.1
++++ b/man2html/locales/fr/man2html.1
+@@ -3,7 +3,6 @@
+ .\" aeb, 980101
+ .\"
+ .TH man2html 1 "1er janvier 1998" "Manuel Linux" "Commandes utilisateur"
+-.LO 1
+ .SH NOM
+ man2html \- formate une page de manuel en html
+ .SH SYNOPSIS
+@@ -31,12 +30,12 @@ de manuel avec un navigateur html comme
+ .BR xmosaic (1)
+ ou
+ .BR netscape (1).
+-./" (See
+-./" .BR man (1)
+-./" for info on how to browse man pages via
+-./" .BR man2html .
+-./" Usually it would suffice to put "MANHTMLPAGER=/usr/bin/lynx"
+-./" in the environment.)
++.\" (See
++.\" .BR man (1)
++.\" for info on how to browse man pages via
++.\" .BR man2html .
++.\" Usually it would suffice to put "MANHTMLPAGER=/usr/bin/lynx"
++.\" in the environment.)
+ 
+ La plus grande partie de
+ .B man2html
+diff --git a/man2html/locales/it/hman.1 b/man2html/locales/it/hman.1
+index e30806e..3cdd67b 100644
+--- a/man2html/locales/it/hman.1
++++ b/man2html/locales/it/hman.1
+@@ -8,7 +8,6 @@
+ .\" agosto 2006
+ .\"
+ .TH hman 1 "19 Gennaio 1998"
+-.LO 1
+ .SH NOME
+ hman \- naviga le pagine di manuale on-line
+ .SH SINTASSI
+diff --git a/man2html/locales/it/man2html.1 b/man2html/locales/it/man2html.1
+index 5348754..7cdae55 100644
+--- a/man2html/locales/it/man2html.1
++++ b/man2html/locales/it/man2html.1
+@@ -7,7 +7,6 @@
+ .\" giugno 2006
+ .\"
+ .TH man2html 1 "1 gennaio 1998"
+-.LO 1
+ .SH NOME
+ man2html \- formatta una pagina di manuale in html
+ .SH SINTASSI
+@@ -30,12 +29,12 @@ usando un browser html come
+ .BR xmosaic (1)
+ o
+ .BR netscape (1).
+-./" (See
+-./" .BR man (1)
+-./" for info on how to browse man pages via
+-./" .BR man2html .
+-./" Usually it would suffice to put "MANHTMLPAGER=/usr/bin/lynx"
+-./" in the environment.)
++.\" (See
++.\" .BR man (1)
++.\" for info on how to browse man pages via
++.\" .BR man2html .
++.\" Usually it would suffice to put "MANHTMLPAGER=/usr/bin/lynx"
++.\" in the environment.)
+ 
+ La parte principale di
+ .B man2html
+diff --git a/man2html/man2html.1 b/man2html/man2html.1
+index cee0ada..7368a37 100644
+--- a/man2html/man2html.1
++++ b/man2html/man2html.1
+@@ -3,7 +3,6 @@
+ .\" aeb, 980101
+ .\"
+ .TH man2html 1 "1 January 1998"
+-.LO 1
+ .SH NAME
+ man2html \- format a manual page in html
+ .SH SYNOPSIS

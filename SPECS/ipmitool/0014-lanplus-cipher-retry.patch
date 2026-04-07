@@ -1,0 +1,39 @@
+From 9d72def87ecc384d0a46525c766e755068fefe54 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=A1clav=20Dole=C5=BEal?= <vdolezal@redhat.com>
+Date: Thu, 28 May 2020 13:32:31 +0200
+Subject: [PATCH] lanplus: don't retry pre-session Get cipher suites
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Some BMCs are ignoring it, causing needless delay.
+
+Signed-off-by: Václav Doležal <vdolezal@redhat.com>
+---
+ src/plugins/lanplus/lanplus.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/src/plugins/lanplus/lanplus.c b/src/plugins/lanplus/lanplus.c
+index 3087348..c442c0e 100644
+--- a/src/plugins/lanplus/lanplus.c
++++ b/src/plugins/lanplus/lanplus.c
+@@ -3386,9 +3386,13 @@
+ 	};
+ 	const size_t nr_preferred = ARRAY_SIZE(cipher_order_preferred);
+ 	size_t ipref, i;
++	int rc;
++	int retry_old = intf->ssn_params.retry;
+ 
+-	if (ipmi_get_channel_cipher_suites(intf, "ipmi", IPMI_LAN_CHANNEL_E,
+-	                                   suites, &nr_suites) < 0)
++	ipmi_intf_session_set_retry(intf, 1);
++	rc = ipmi_get_channel_cipher_suites(intf, "ipmi", IPMI_LAN_CHANNEL_E, suites, &nr_suites);
++	ipmi_intf_session_set_retry(intf, retry_old);
++	if (rc < 0)
+ 	{
+ 		/* default legacy behavior - fall back to cipher suite 3 */
+ 		return IPMI_LANPLUS_CIPHER_SUITE_3;
+
+-- 
+2.25.4
+

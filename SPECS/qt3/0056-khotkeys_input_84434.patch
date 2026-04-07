@@ -1,0 +1,21 @@
+qt-bugs@ issue : 58251
+bugs.kde.org number : 84434
+applied: no
+author: Lubos Lunak <l.lunak@kde.org>
+
+Fixes keyboard input action in KHotKeys (see bug #84434).
+
+--- src/kernel/qapplication_x11.cpp.sav	2004-10-07 15:38:05.000000000 +0200
++++ src/kernel/qapplication_x11.cpp	2004-10-12 11:46:32.513137808 +0200
+@@ -5294,8 +5294,10 @@ static Bool qt_keypress_scanner(Display 
+     qt_auto_repeat_data *d = (qt_auto_repeat_data *) arg;
+     if (d->error ||
+         event->xkey.window  != d->window ||
+-        event->xkey.keycode != d->keycode)
++        event->xkey.keycode != d->keycode) {
++        d->error = TRUE;
+         return FALSE;
++    }
+ 
+     if (event->type == XKeyPress) {
+         d->error = (! d->release || event->xkey.time - d->timestamp > 10);

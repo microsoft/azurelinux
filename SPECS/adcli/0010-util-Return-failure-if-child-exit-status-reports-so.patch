@@ -1,0 +1,27 @@
+From 1d98352999e797f8f091064d0d3bd0627bccecb8 Mon Sep 17 00:00:00 2001
+From: Samuel Cabrero <scabrero@suse.de>
+Date: Wed, 6 Sep 2023 16:30:45 +0200
+Subject: [PATCH 10/17] util: Return failure if child exit status reports so
+
+Otherwise error string from stdout won't be printed.
+
+Signed-off-by: Samuel Cabrero <scabrero@suse.de>
+---
+ library/adutil.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/library/adutil.c b/library/adutil.c
+index 2947391..ea49607 100644
+--- a/library/adutil.c
++++ b/library/adutil.c
+@@ -749,6 +749,7 @@ done:
+ 			if (WIFEXITED (status) && WEXITSTATUS (status) != 0) {
+ 				_adcli_err ("net command failed with %d.",
+ 				            WEXITSTATUS (status));
++				ret = ADCLI_ERR_FAIL;
+ 			}
+ 		}
+ 	}
+-- 
+2.47.0
+

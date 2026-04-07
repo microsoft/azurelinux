@@ -1,0 +1,30 @@
+.TH TYPER\-UTILS\-DOCS "1" "April 2024" "" "User Commands"
+.SH NAME
+.B typer\-utils\-docs
+\(en generate Markdown docs for a Typer app
+.SH SYNOPSIS
+.B typer
+.RI [ PATH_OR_MODULE ]
+.B utils
+.B docs
+.RI [ OPTIONS ]
+.SS OPTIONS
+.TP
+.B \-\-name\ \fITEXT
+The name of the CLI program to use in docs.
+.TP
+.B \-\-output\ \fIFILE
+An output file to write docs to, like README.md.
+[default: None]
+.TP
+.B \-\-title\ \fITEXT
+The title for the documentation page.
+If not provided, the name of the program is used.
+[default: None]
+.TP
+.B \-\-help
+Show a help message and exit.
+.SH "SEE ALSO"
+.BR typer\-utils (1)
+.P
+.BR typer (1)

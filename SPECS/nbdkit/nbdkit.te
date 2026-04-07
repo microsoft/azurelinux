@@ -1,0 +1,100 @@
+policy_module(nbdkit, 1.0.0)
+
+########################################
+#
+# Declarations
+#
+
+gen_require(`
+    type unconfined_t;
+')
+
+type nbdkit_t;
+type nbdkit_exec_t;
+application_domain(nbdkit_t, nbdkit_exec_t)
+mcs_constrained(nbdkit_t)
+role system_r types nbdkit_t;
+
+type nbdkit_home_t;
+userdom_user_home_content(nbdkit_home_t)
+
+type nbdkit_tmp_t;
+files_tmp_file(nbdkit_tmp_t)
+
+type nbdkit_unit_file_t;
+systemd_unit_file(nbdkit_unit_file_t)
+
+permissive nbdkit_t;
+
+########################################
+#
+# nbdkit local policy
+#
+allow nbdkit_t self:capability { setgid setuid };
+allow nbdkit_t self:fifo_file rw_fifo_file_perms;
+allow nbdkit_t self:netlink_route_socket rw_netlink_socket_perms;
+allow nbdkit_t self:process { fork setsockcreate signal_perms };
+allow nbdkit_t self:tcp_socket create_stream_socket_perms;
+allow nbdkit_t self:udp_socket create_socket_perms;
+
+manage_dirs_pattern(nbdkit_t, nbdkit_tmp_t, nbdkit_tmp_t)
+manage_files_pattern(nbdkit_t, nbdkit_tmp_t, nbdkit_tmp_t) 
+userdom_user_tmp_filetrans(nbdkit_t, nbdkit_tmp_t, { dir file })
+
+manage_dirs_pattern(nbdkit_t, nbdkit_home_t, nbdkit_home_t)
+manage_files_pattern(nbdkit_t, nbdkit_home_t, nbdkit_home_t) 
+userdom_user_home_dir_filetrans(nbdkit_t, nbdkit_home_t, { dir file })
+
+corenet_tcp_connect_http_port(nbdkit_t)
+corenet_tcp_connect_ssh_port(nbdkit_t)
+corenet_tcp_connect_tftp_port(nbdkit_t)
+corenet_tcp_bind_generic_port(nbdkit_t)
+corenet_tcp_bind_generic_node(nbdkit_t)
+
+domain_use_interactive_fds(nbdkit_t)
+
+files_read_etc_files(nbdkit_t)
+
+init_abstract_socket_activation(nbdkit_t)
+init_ioctl_stream_sockets(nbdkit_t)
+init_rw_stream_sockets(nbdkit_t)
+
+optional_policy(`
+	auth_use_nsswitch(nbdkit_t)
+')
+
+optional_policy(`
+	logging_send_syslog_msg(nbdkit_t)
+')
+
+optional_policy(`
+	miscfiles_read_localization(nbdkit_t)
+	miscfiles_read_generic_certs(nbdkit_t)
+')
+
+optional_policy(`
+	sysnet_dns_name_resolve(nbdkit_t)
+	sysnet_read_config(nbdkit_t)
+')
+
+optional_policy(`
+	userdom_read_user_home_content_files(nbdkit_t)
+	userdom_use_inherited_user_ptys(nbdkit_t)
+')
+
+optional_policy(`
+	virt_create_svirt_image_sock_files(nbdkit_t)
+	virt_read_qemu_pid_files(nbdkit_t)
+	virtlogd_rw_pipes(nbdkit_t)
+	virt_rw_svirt_image(nbdkit_t)
+	virt_rw_svirt_image_dirs(nbdkit_t)
+	virt_search_lib(nbdkit_t)
+	virt_stream_connect_svirt(nbdkit_t)
+')
+
+
+# FIXME: It would be nice to allow libvirt to transition nbdkit_exec_t to 
+# nbdkit_t when libvirtd was started manually from the commandline (i.e. in 
+# unconfined_t), but we don't want this transition to happen automatically 
+# when starting directly from the shell. I'm not sure how to achieve this...  
+#nbdkit_domtrans(unconfined_t, nbdkit_exec_t, nbdkit_t)

@@ -1,0 +1,178 @@
+diff -up firefox-147.0.1/widget/gtk/WindowSurfaceWaylandMultiBuffer.cpp.1999029-2 firefox-147.0.1/widget/gtk/WindowSurfaceWaylandMultiBuffer.cpp
+--- firefox-147.0.1/widget/gtk/WindowSurfaceWaylandMultiBuffer.cpp.1999029-2	2026-01-16 10:22:08.000000000 +0100
++++ firefox-147.0.1/widget/gtk/WindowSurfaceWaylandMultiBuffer.cpp	2026-01-20 07:49:45.921278176 +0100
+@@ -154,8 +154,8 @@ using gfx::DataSourceSurface;
+ 
+ WindowSurfaceWaylandMB::WindowSurfaceWaylandMB(
+     RefPtr<nsWindow> aWindow, GtkCompositorWidget* aCompositorWidget)
+-    : mSurfaceLock("WindowSurfaceWayland lock"),
+-      mWindow(std::move(aWindow)),
++    : mWindow(std::move(aWindow)),
++      mWaylandSurface(mWindow->GetWaylandSurface()),
+       mCompositorWidget(aCompositorWidget) {}
+ 
+ bool WindowSurfaceWaylandMB::MaybeUpdateWindowSize() {
+@@ -175,7 +175,7 @@ bool WindowSurfaceWaylandMB::MaybeUpdate
+ 
+ already_AddRefed<DrawTarget> WindowSurfaceWaylandMB::Lock(
+     const LayoutDeviceIntRegion& aInvalidRegion) {
+-  MutexAutoLock lock(mSurfaceLock);
++  WaylandSurfaceLock lock(mWaylandSurface);
+ 
+ #ifdef MOZ_LOGGING
+   gfx::IntRect lockRect = aInvalidRegion.GetBounds().ToUnknownRect();
+@@ -205,7 +205,7 @@ already_AddRefed<DrawTarget> WindowSurfa
+   }
+ 
+   if (!mInProgressBuffer) {
+-    if (mFrontBuffer && !mFrontBuffer->IsAttached()) {
++    if (mFrontBuffer && !mFrontBuffer->IsAttached(lock)) {
+       mInProgressBuffer = mFrontBuffer;
+     } else {
+       mInProgressBuffer = ObtainBufferFromPool(lock, mWindowSize);
+@@ -226,7 +226,7 @@ already_AddRefed<DrawTarget> WindowSurfa
+ }
+ 
+ void WindowSurfaceWaylandMB::HandlePartialUpdate(
+-    const MutexAutoLock& aProofOfLock,
++    const WaylandSurfaceLock& aWaylandSurfaceLock,
+     const LayoutDeviceIntRegion& aInvalidRegion) {
+   LayoutDeviceIntRegion copyRegion;
+   if (mInProgressBuffer->GetBufferAge() == 2) {
+@@ -258,12 +258,12 @@ void WindowSurfaceWaylandMB::HandleParti
+ 
+ void WindowSurfaceWaylandMB::Commit(
+     const LayoutDeviceIntRegion& aInvalidRegion) {
+-  MutexAutoLock lock(mSurfaceLock);
++  WaylandSurfaceLock lock(mWaylandSurface);
+   Commit(lock, aInvalidRegion);
+ }
+ 
+ void WindowSurfaceWaylandMB::Commit(
+-    const MutexAutoLock& aProofOfLock,
++    const WaylandSurfaceLock& aWaylandSurfaceLock,
+     const LayoutDeviceIntRegion& aInvalidRegion) {
+ #ifdef MOZ_LOGGING
+   gfx::IntRect invalidRect = aInvalidRegion.GetBounds().ToUnknownRect();
+@@ -274,32 +274,30 @@ void WindowSurfaceWaylandMB::Commit(
+       invalidRect.height, mWindowSize.width, mWindowSize.height);
+ #endif
+ 
+-  if (!mInProgressBuffer) {
++  if (!mInProgressBuffer || !mWaylandSurface->IsMapped()) {
+     // invisible window
+     return;
+   }
+ 
+-  MozContainer* container = mWindow->GetMozContainer();
+-  WaylandSurface* waylandSurface = MOZ_WL_SURFACE(container);
+-  WaylandSurfaceLock lock(waylandSurface);
+-
+-  waylandSurface->InvalidateRegionLocked(lock,
++  auto waylandSurface = aWaylandSurfaceLock.GetWaylandSurface();
++  waylandSurface->InvalidateRegionLocked(aWaylandSurfaceLock,
+                                          aInvalidRegion.ToUnknownRegion());
+-  waylandSurface->AttachLocked(lock, mInProgressBuffer);
+-  waylandSurface->CommitLocked(lock, /* force commit */ true,
+-                               /* force flush */ true);
++  waylandSurface->AttachLocked(aWaylandSurfaceLock, mInProgressBuffer);
++  waylandSurface->CommitLocked(aWaylandSurfaceLock, /* force commit */ true,
++                                /* force flush */ true);
+ 
+   mInProgressBuffer->ResetBufferAge();
+   mFrontBuffer = mInProgressBuffer;
+   mFrontBufferInvalidRegion = aInvalidRegion;
+   mInProgressBuffer = nullptr;
+ 
+-  EnforcePoolSizeLimit(aProofOfLock);
+-  IncrementBufferAge(aProofOfLock);
++  EnforcePoolSizeLimit(aWaylandSurfaceLock);
++  IncrementBufferAge(aWaylandSurfaceLock);
+ }
+ 
+ RefPtr<WaylandBufferSHM> WindowSurfaceWaylandMB::ObtainBufferFromPool(
+-    const MutexAutoLock& aProofOfLock, const LayoutDeviceIntSize& aSize) {
++    const WaylandSurfaceLock& aWaylandSurfaceLock,
++    const LayoutDeviceIntSize& aSize) {
+   if (!mAvailableBuffers.IsEmpty()) {
+     RefPtr<WaylandBufferSHM> buffer = mAvailableBuffers.PopLastElement();
+     mInUseBuffers.AppendElement(buffer);
+@@ -315,9 +313,9 @@ RefPtr<WaylandBufferSHM> WindowSurfaceWa
+ }
+ 
+ void WindowSurfaceWaylandMB::ReturnBufferToPool(
+-    const MutexAutoLock& aProofOfLock,
++    const WaylandSurfaceLock& aWaylandSurfaceLock,
+     const RefPtr<WaylandBufferSHM>& aBuffer) {
+-  if (aBuffer->IsAttached()) {
++  if (aBuffer->IsAttached(aWaylandSurfaceLock)) {
+     mPendingBuffers.AppendElement(aBuffer);
+   } else if (aBuffer->IsMatchingSize(mWindowSize)) {
+     mAvailableBuffers.AppendElement(aBuffer);
+@@ -326,7 +324,7 @@ void WindowSurfaceWaylandMB::ReturnBuffe
+ }
+ 
+ void WindowSurfaceWaylandMB::EnforcePoolSizeLimit(
+-    const MutexAutoLock& aProofOfLock) {
++    const WaylandSurfaceLock& aWaylandSurfaceLock) {
+   // Enforce the pool size limit, removing least-recently-used entries as
+   // necessary.
+   while (mAvailableBuffers.Length() > BACK_BUFFER_NUM) {
+@@ -340,9 +338,9 @@ void WindowSurfaceWaylandMB::EnforcePool
+ }
+ 
+ void WindowSurfaceWaylandMB::CollectPendingSurfaces(
+-    const MutexAutoLock& aProofOfLock) {
++    const WaylandSurfaceLock& aWaylandSurfaceLock) {
+   mPendingBuffers.RemoveElementsBy([&](auto& buffer) {
+-    if (!buffer->IsAttached()) {
++    if (!buffer->IsAttached(aWaylandSurfaceLock)) {
+       if (buffer->IsMatchingSize(mWindowSize)) {
+         mAvailableBuffers.AppendElement(std::move(buffer));
+       }
+@@ -353,7 +351,7 @@ void WindowSurfaceWaylandMB::CollectPend
+ }
+ 
+ void WindowSurfaceWaylandMB::IncrementBufferAge(
+-    const MutexAutoLock& aProofOfLock) {
++    const WaylandSurfaceLock& aWaylandSurfaceLock) {
+   for (const RefPtr<WaylandBufferSHM>& buffer : mInUseBuffers) {
+     buffer->IncrementBufferAge();
+   }
+diff -up firefox-147.0.1/widget/gtk/WindowSurfaceWaylandMultiBuffer.h.1999029-2 firefox-147.0.1/widget/gtk/WindowSurfaceWaylandMultiBuffer.h
+--- firefox-147.0.1/widget/gtk/WindowSurfaceWaylandMultiBuffer.h.1999029-2	2026-01-16 09:55:42.000000000 +0100
++++ firefox-147.0.1/widget/gtk/WindowSurfaceWaylandMultiBuffer.h	2026-01-20 07:41:46.720127574 +0100
+@@ -43,23 +43,24 @@ class WindowSurfaceWaylandMB : public Wi
+   void Commit(const LayoutDeviceIntRegion& aInvalidRegion) final;
+ 
+  private:
+-  void Commit(const MutexAutoLock& aProofOfLock,
++  void Commit(const WaylandSurfaceLock& aWaylandSurfaceLock,
+               const LayoutDeviceIntRegion& aInvalidRegion);
+   RefPtr<WaylandBufferSHM> ObtainBufferFromPool(
+-      const MutexAutoLock& aProofOfLock, const LayoutDeviceIntSize& aSize);
+-  void ReturnBufferToPool(const MutexAutoLock& aProofOfLock,
++      const WaylandSurfaceLock& aWaylandSurfaceLock,
++      const LayoutDeviceIntSize& aSize);
++  void ReturnBufferToPool(const WaylandSurfaceLock& aWaylandSurfaceLock,
+                           const RefPtr<WaylandBufferSHM>& aBuffer);
+-  void EnforcePoolSizeLimit(const MutexAutoLock& aProofOfLock);
+-  void CollectPendingSurfaces(const MutexAutoLock& aProofOfLock);
+-  void HandlePartialUpdate(const MutexAutoLock& aProofOfLock,
++  void EnforcePoolSizeLimit(const WaylandSurfaceLock& aWaylandSurfaceLock);
++  void CollectPendingSurfaces(const WaylandSurfaceLock& aWaylandSurfaceLock);
++  void HandlePartialUpdate(const WaylandSurfaceLock& aWaylandSurfaceLock,
+                            const LayoutDeviceIntRegion& aInvalidRegion);
+-  void IncrementBufferAge(const MutexAutoLock& aProofOfLock);
++  void IncrementBufferAge(const WaylandSurfaceLock& aWaylandSurfaceLock);
+   // Return true if window size was updated.
+   bool MaybeUpdateWindowSize();
+ 
+-  mozilla::Mutex mSurfaceLock MOZ_UNANNOTATED;
+-
+   RefPtr<nsWindow> mWindow;
++  RefPtr<WaylandSurface> mWaylandSurface;
++
+   // WindowSurfaceWaylandMB is owned by GtkCompositorWidget so we can't
+   // reference it.
+   GtkCompositorWidget* mCompositorWidget;

@@ -1,0 +1,13 @@
+diff -up ssmtp-2.61/ssmtp.c.orig ssmtp-2.61/ssmtp.c
+--- ssmtp-2.61/ssmtp.c.orig	2008-11-26 17:27:29.000000000 +0200
++++ ssmtp-2.61/ssmtp.c	2008-11-26 17:25:36.000000000 +0200
+@@ -1051,7 +1051,8 @@ bool_t read_config()
+ 				}
+ 			}
+ 			else if(strcasecmp(p, "AuthPass") == 0 && !auth_pass) {
+-				if((auth_pass = strdup(q)) == (char *)NULL) {
++				auth_pass = firsttok(&rightside, " \n\t");
++				if(auth_pass  == (char *)NULL) {
+ 					die("parse_config() -- strdup() failed");
+ 				}
+ 

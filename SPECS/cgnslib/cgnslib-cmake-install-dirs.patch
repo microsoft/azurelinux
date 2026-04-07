@@ -1,0 +1,253 @@
+diff -rupN --no-dereference CGNS-4.5.1/src/cgnstools/cgnscalc/CMakeLists.txt CGNS-4.5.1-new/src/cgnstools/cgnscalc/CMakeLists.txt
+--- CGNS-4.5.1/src/cgnstools/cgnscalc/CMakeLists.txt	2025-12-29 19:02:10.000000000 +0100
++++ CGNS-4.5.1-new/src/cgnstools/cgnscalc/CMakeLists.txt	2025-12-30 09:38:23.053308760 +0100
+@@ -59,11 +59,11 @@ endif ()
+ if (WIN32)
+   install(TARGETS
+ 	calcwish
+-	RUNTIME DESTINATION bin)
++	RUNTIME DESTINATION ${BIN_INSTALL_DIR})
+   install(PROGRAMS
+ 	cgnscalc.bat
+ 	unitconv.bat
+-	DESTINATION bin)
++	DESTINATION ${BIN_INSTALL_DIR})
+   install(FILES
+ 	cgnscalc.tcl
+ 	unitconv.tcl
+@@ -78,21 +78,21 @@ if (WIN32)
+ else ()
+   install(TARGETS
+ 	calcwish
+-	RUNTIME DESTINATION bin/cgnstools)
++	RUNTIME DESTINATION ${BIN_INSTALL_DIR}/cgnstools)
+   install(PROGRAMS
+ 	cgnscalc.sh
+-	DESTINATION bin
++	DESTINATION ${BIN_INSTALL_DIR}
+ 	RENAME cgnscalc)
+   install(PROGRAMS
+ 	cgnscalc.desktop
+-	DESTINATION bin)
++	DESTINATION ${BIN_INSTALL_DIR})
+   install(PROGRAMS
+ 	unitconv.sh
+-	DESTINATION bin
++	DESTINATION ${BIN_INSTALL_DIR}
+ 	RENAME unitconv)
+   install(PROGRAMS
+ 	unitconv.desktop
+-	DESTINATION bin)
++	DESTINATION ${BIN_INSTALL_DIR})
+   install(FILES
+ 	cgnscalc.tcl
+ 	unitconv.tcl
+diff -rupN --no-dereference CGNS-4.5.1/src/cgnstools/cgnsplot/CMakeLists.txt CGNS-4.5.1-new/src/cgnstools/cgnsplot/CMakeLists.txt
+--- CGNS-4.5.1/src/cgnstools/cgnsplot/CMakeLists.txt	2025-12-29 19:02:10.000000000 +0100
++++ CGNS-4.5.1-new/src/cgnstools/cgnsplot/CMakeLists.txt	2025-12-30 09:38:23.053553462 +0100
+@@ -66,10 +66,10 @@ endif ()
+ if (WIN32)
+   install(TARGETS
+ 	plotwish
+-	RUNTIME DESTINATION bin)
++	RUNTIME DESTINATION ${BIN_INSTALL_DIR})
+   install(PROGRAMS
+ 	cgnsplot.bat
+-	DESTINATION bin)
++	DESTINATION ${BIN_INSTALL_DIR})
+   install(FILES
+ 	cgnsplot.tcl
+ 	cgnsplot.ico
+@@ -80,14 +80,14 @@ if (WIN32)
+ else ()
+   install(TARGETS
+ 	plotwish
+-	RUNTIME DESTINATION bin/cgnstools)
++	RUNTIME DESTINATION ${BIN_INSTALL_DIR}/cgnstools)
+   install(PROGRAMS
+ 	cgnsplot.sh
+-	DESTINATION bin
++	DESTINATION ${BIN_INSTALL_DIR}
+ 	RENAME cgnsplot)
+   install(PROGRAMS
+ 	cgnsplot.desktop
+-	DESTINATION bin)
++	DESTINATION ${BIN_INSTALL_DIR})
+   install(FILES
+ 	cgnsplot.tcl
+ 	cgnsplot.ico
+diff -rupN --no-dereference CGNS-4.5.1/src/cgnstools/cgnsview/CMakeLists.txt CGNS-4.5.1-new/src/cgnstools/cgnsview/CMakeLists.txt
+--- CGNS-4.5.1/src/cgnstools/cgnsview/CMakeLists.txt	2025-12-29 19:02:10.000000000 +0100
++++ CGNS-4.5.1-new/src/cgnstools/cgnsview/CMakeLists.txt	2025-12-30 09:38:23.053714319 +0100
+@@ -63,11 +63,11 @@ endif ()
+ if (WIN32)
+   install(TARGETS
+ 	cgiowish
+-	RUNTIME DESTINATION bin)
++	RUNTIME DESTINATION ${BIN_INSTALL_DIR})
+   install(PROGRAMS
+ 	cgnsview.bat
+ 	cgnsnodes.bat
+-	DESTINATION bin)
++	DESTINATION ${BIN_INSTALL_DIR})
+   install(FILES
+ 	cgnsview.tcl
+ 	cgns.tcl
+@@ -79,21 +79,21 @@ if (WIN32)
+ else ()
+   install(TARGETS
+ 	cgiowish
+-	RUNTIME DESTINATION bin/cgnstools)
++	RUNTIME DESTINATION ${BIN_INSTALL_DIR}/cgnstools)
+   install(PROGRAMS
+ 	cgnsview.sh
+-	DESTINATION bin
++	DESTINATION ${BIN_INSTALL_DIR}
+ 	RENAME cgnsview)
+   install(PROGRAMS
+ 	cgnsview.desktop
+-	DESTINATION bin)
++	DESTINATION ${BIN_INSTALL_DIR})
+   install(PROGRAMS
+ 	cgnsnodes.sh
+-	DESTINATION bin
++	DESTINATION ${BIN_INSTALL_DIR}
+ 	RENAME cgnsnodes)
+   install(PROGRAMS
+ 	cgnsnodes.desktop
+-	DESTINATION bin)
++	DESTINATION ${BIN_INSTALL_DIR})
+   install(FILES
+ 	cgnsview.tcl
+ 	cgns.tcl
+diff -rupN --no-dereference CGNS-4.5.1/src/cgnstools/CMakeLists.txt CGNS-4.5.1-new/src/cgnstools/CMakeLists.txt
+--- CGNS-4.5.1/src/cgnstools/CMakeLists.txt	2025-12-29 19:02:10.000000000 +0100
++++ CGNS-4.5.1-new/src/cgnstools/CMakeLists.txt	2025-12-30 09:38:23.054721448 +0100
+@@ -111,7 +111,7 @@ set CG_LIB_DIR=${WIN_INSTALL_DIR}\\share
+ 
+   install(PROGRAMS
+ 	${CMAKE_CURRENT_BINARY_DIR}/cgconfig.bat
+-	DESTINATION bin)
++	DESTINATION ${BIN_INSTALL_DIR})
+ else ()
+   file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/cgconfig
+ "CG_BIN_DIR=${CMAKE_INSTALL_PREFIX}/bin; export CG_BIN_DIR
+@@ -120,6 +120,6 @@ CG_LIB_DIR=${CMAKE_INSTALL_PREFIX}/share
+ 
+   install(PROGRAMS
+ 	${CMAKE_CURRENT_BINARY_DIR}/cgconfig
+-	DESTINATION bin)
++	DESTINATION ${BIN_INSTALL_DIR})
+ endif ()
+ 
+diff -rupN --no-dereference CGNS-4.5.1/src/cgnstools/utilities/CMakeLists.txt CGNS-4.5.1-new/src/cgnstools/utilities/CMakeLists.txt
+--- CGNS-4.5.1/src/cgnstools/utilities/CMakeLists.txt	2025-12-29 19:02:10.000000000 +0100
++++ CGNS-4.5.1-new/src/cgnstools/utilities/CMakeLists.txt	2025-12-30 09:38:23.055316487 +0100
+@@ -243,7 +243,7 @@ if (WIN32)
+ 	interpolate_cgns
+ 	update_ngon
+         cgns_info
+-	RUNTIME DESTINATION bin)
++	RUNTIME DESTINATION ${BIN_INSTALL_DIR})
+   install(FILES
+ 	conserved.cnv
+ 	convert.tcl
+@@ -281,7 +281,7 @@ else ()
+ 	interpolate_cgns
+ 	update_ngon
+         cgns_info
+-	RUNTIME DESTINATION bin/cgnstools)
++	RUNTIME DESTINATION ${BIN_INSTALL_DIR}/cgnstools)
+   install(FILES
+ 	conserved.cnv
+ 	convert.tcl
+diff -rupN --no-dereference CGNS-4.5.1/src/CMakeLists.txt CGNS-4.5.1-new/src/CMakeLists.txt
+--- CGNS-4.5.1/src/CMakeLists.txt	2025-12-29 19:02:10.000000000 +0100
++++ CGNS-4.5.1-new/src/CMakeLists.txt	2025-12-30 09:38:23.055514520 +0100
+@@ -53,7 +53,7 @@ set(SYSCFLAGS "")
+ set(CFGFLAGS "")
+ set(LIBS "")
+ 
+-file(TO_NATIVE_PATH ${CMAKE_INSTALL_PREFIX}/lib LIBDIR)
++file(TO_NATIVE_PATH ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR} LIBDIR)
+ file(TO_NATIVE_PATH ${CMAKE_INSTALL_PREFIX}/include INCLUDEDIR)
+ file(TO_NATIVE_PATH ${CMAKE_C_COMPILER} CC)
+ if (WIN32)
+@@ -703,10 +703,10 @@ endif ()
+ # for windows, need to install both cgnsdll.dll and cgnsdll.lib
+ install (TARGETS ${install_targets}
+          EXPORT cgns-targets
+-         LIBRARY DESTINATION lib COMPONENT libraries
+-         ARCHIVE DESTINATION lib COMPONENT libraries
+-         RUNTIME DESTINATION bin COMPONENT libraries
+-         INCLUDES DESTINATION include)
++         LIBRARY DESTINATION ${LIB_INSTALL_DIR} COMPONENT libraries
++         ARCHIVE DESTINATION ${LIB_INSTALL_DIR} COMPONENT libraries
++         RUNTIME DESTINATION ${BIN_INSTALL_DIR} COMPONENT libraries
++         INCLUDES DESTINATION ${INCLUDE_INSTALL_DIR})
+ 
+ # Set the install path of the header files
+ set(headers
+@@ -745,7 +745,7 @@ endif ()
+ 
+ # Set the install path of the header files
+ install(FILES ${headers}
+-	DESTINATION include)
++	DESTINATION ${INCLUDE_INSTALL_DIR})
+ 
+ #if (NOT CGNS_EXTERNALLY_CONFIGURE)
+ include(CMakePackageConfigHelpers)
+@@ -756,14 +756,14 @@ write_basic_package_version_file(
+ configure_package_config_file(
+   ${CMAKE_CURRENT_SOURCE_DIR}/cgns-config.cmake.in
+   ${CMAKE_CURRENT_BINARY_DIR}/cgns-config.cmake
+-  INSTALL_DESTINATION lib/cmake/cgns )
++  INSTALL_DESTINATION ${LIB_INSTALL_DIR}/cmake/cgns )
+ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cgns-config-version.cmake
+               ${CMAKE_CURRENT_BINARY_DIR}/cgns-config.cmake
+-	DESTINATION lib/cmake/cgns)
++	DESTINATION ${LIB_INSTALL_DIR}/cmake/cgns)
+ install(EXPORT cgns-targets
+ 	FILE cgns-targets.cmake
+ 	NAMESPACE CGNS::
+-	DESTINATION lib/cmake/cgns
++	DESTINATION ${LIB_INSTALL_DIR}/cmake/cgns
+ 	)
+ #endif()
+ 
+diff -rupN --no-dereference CGNS-4.5.1/src/tools/CMakeLists.txt CGNS-4.5.1-new/src/tools/CMakeLists.txt
+--- CGNS-4.5.1/src/tools/CMakeLists.txt	2025-12-29 19:02:10.000000000 +0100
++++ CGNS-4.5.1-new/src/tools/CMakeLists.txt	2025-12-30 09:38:23.055718340 +0100
+@@ -72,27 +72,27 @@ install(TARGETS
+ 	cgnslist
+ 	cgnsnames
+ 	cgnscompress
+-	RUNTIME DESTINATION bin)
++	RUNTIME DESTINATION ${BIN_INSTALL_DIR})
+ 
+ if (WIN32)
+   install(PROGRAMS
+         cgnsupdate.bat
+-	DESTINATION bin)
++	DESTINATION ${BIN_INSTALL_DIR})
+   if (CGNS_ENABLE_HDF5)
+     install(PROGRAMS
+         adf2hdf.bat
+         hdf2adf.bat
+-	DESTINATION bin)
++	DESTINATION ${BIN_INSTALL_DIR})
+   endif ()
+ else ()
+   install(PROGRAMS
+         cgnsupdate
+-	DESTINATION bin)
++	DESTINATION ${BIN_INSTALL_DIR})
+   if (CGNS_ENABLE_HDF5)
+     install(PROGRAMS
+         adf2hdf
+         hdf2adf
+-	DESTINATION bin)
++	DESTINATION ${BIN_INSTALL_DIR})
+   endif ()
+ endif ()
+ 

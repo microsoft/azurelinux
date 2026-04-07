@@ -1,0 +1,19 @@
+diff -up qt-x11-free-3.3.8/src/sql/drivers/odbc/qsql_odbc.cpp.orig qt-x11-free-3.3.8/src/sql/drivers/odbc/qsql_odbc.cpp
+--- qt-x11-free-3.3.8/src/sql/drivers/odbc/qsql_odbc.cpp.orig	2009-02-24 11:32:27.000000000 +0100
++++ qt-x11-free-3.3.8/src/sql/drivers/odbc/qsql_odbc.cpp	2009-02-24 11:33:43.000000000 +0100
+@@ -57,13 +57,13 @@
+ #endif
+ 
+ // newer platform SDKs use SQLLEN instead of SQLINTEGER
+-#ifdef SQLLEN
++#if defined(SQLLEN) || defined(Q_OS_WIN64) || defined(Q_OS_UNIX)
+ # define QSQLLEN SQLLEN
+ #else
+ # define QSQLLEN SQLINTEGER
+ #endif
+ 
+-#ifdef SQLULEN
++#if defined(SQLULEN) || defined(Q_OS_WIN64) || defined(Q_OS_UNIX)
+ # define QSQLULEN SQLULEN
+ #else
+ # define QSQLULEN SQLUINTEGER

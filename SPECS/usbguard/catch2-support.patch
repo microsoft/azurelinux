@@ -1,0 +1,281 @@
+diff --git a/configure.ac b/configure.ac
+index 1f5be3a3..617d3bcf 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -396,10 +396,15 @@ else
+ 	SAVE_CPPFLAGS=$CPPFLAGS
+ 	CPPFLAGS="-std=c++17 $CPPFLAGS -I/usr/include/catch2"
+ 	AC_LANG_PUSH([C++])
+-	AC_CHECK_HEADER([catch.hpp], [], [AC_MSG_FAILURE(catch.hpp not found or not usable. Re-run with --with-bundled-catch to use the bundled library.)])
++	AC_CHECK_HEADER([catch_test_macros.hpp],
++	[catch_CFLAGS="-I/usr/include/catch2 -DHAVE_CATCH2_V3"
++	catch_LIBS="-lCatch2Main -lCatch2"],
++        [AC_CHECK_HEADER([catch.hpp],
++	[catch_CFLAGS="-I/usr/include/catch2"
++	catch_LIBS=""],
++        [AC_MSG_FAILURE(Catch2 not found or not usable. Re-run with --with-bundled-catch to use the bundled library.)]
++        )])
+ 	AC_LANG_POP
+-	catch_CFLAGS="-I/usr/include/catch2"
+-	catch_LIBS=""
+ 	CPPFLAGS=$SAVE_CPPFLAGS
+ 	catch_summary="system-wide; $catch_CFLAGS $catch_LIBS"
+ fi
+diff --git a/src/Tests/Makefile.am b/src/Tests/Makefile.am
+index e10e8456..2efbb509 100644
+--- a/src/Tests/Makefile.am
++++ b/src/Tests/Makefile.am
+@@ -123,6 +123,7 @@ test_unit_CXXFLAGS=\
+ 
+ test_unit_LDADD=\
+ 	$(top_builddir)/libusbguard.la \
++	$(catch_LIBS) \
+ 	$(PTHREAD_LIBS)
+ 
+ test_unit_LDFLAGS=\
+@@ -140,5 +141,6 @@ test_regression_CXXFLAGS=\
+ 
+ test_regression_LDADD=\
+ 	$(top_builddir)/libusbguard.la \
++	$(catch_LIBS) \
+ 	$(PTHREAD_LIBS)
+ 
+diff --git a/src/Tests/Regression/github-PR209-config-parser.cpp b/src/Tests/Regression/github-PR209-config-parser.cpp
+index 73b536a3..6f6e350c 100644
+--- a/src/Tests/Regression/github-PR209-config-parser.cpp
++++ b/src/Tests/Regression/github-PR209-config-parser.cpp
+@@ -18,7 +18,11 @@
+ //
+ 
+ #include "usbguard/ConfigFile.hpp"
+-#include <catch.hpp>
++#ifdef HAVE_CATCH2_V3
++  #include <catch_test_macros.hpp>
++#else
++  #include <catch.hpp>
++#endif
+ 
+ #include <sys/stat.h>
+ #include <sys/types.h>
+diff --git a/src/Tests/Regression/test_Rule_ghi113.cpp b/src/Tests/Regression/test_Rule_ghi113.cpp
+index f3d9b82d..24b84935 100644
+--- a/src/Tests/Regression/test_Rule_ghi113.cpp
++++ b/src/Tests/Regression/test_Rule_ghi113.cpp
+@@ -18,7 +18,11 @@
+ //
+ #include "usbguard/Rule.hpp"
+ 
+-#include <catch.hpp>
++#ifdef HAVE_CATCH2_V3
++  #include <catch_test_macros.hpp>
++#else
++  #include <catch.hpp>
++#endif
+ 
+ using namespace usbguard;
+ 
+diff --git a/src/Tests/Regression/test_Rule_ghi247.cpp b/src/Tests/Regression/test_Rule_ghi247.cpp
+index 2056102d..72483bb1 100644
+--- a/src/Tests/Regression/test_Rule_ghi247.cpp
++++ b/src/Tests/Regression/test_Rule_ghi247.cpp
+@@ -19,7 +19,11 @@
+ #include "usbguard/Rule.hpp"
+ #include "usbguard/Rule.hpp"
+ 
+-#include <catch.hpp>
++#ifdef HAVE_CATCH2_V3
++  #include <catch_test_macros.hpp>
++#else
++  #include <catch.hpp>
++#endif
+ 
+ using namespace usbguard;
+ 
+diff --git a/src/Tests/Regression/test_Rule_ghi37.cpp b/src/Tests/Regression/test_Rule_ghi37.cpp
+index f240c8b5..df2ef637 100644
+--- a/src/Tests/Regression/test_Rule_ghi37.cpp
++++ b/src/Tests/Regression/test_Rule_ghi37.cpp
+@@ -18,7 +18,11 @@
+ //
+ #include "usbguard/Rule.hpp"
+ 
+-#include <catch.hpp>
++#ifdef HAVE_CATCH2_V3
++  #include <catch_test_macros.hpp>
++#else
++  #include <catch.hpp>
++#endif
+ 
+ using namespace usbguard;
+ 
+diff --git a/src/Tests/Unit/test_Base64.cpp b/src/Tests/Unit/test_Base64.cpp
+index 3f87093f..113b0633 100644
+--- a/src/Tests/Unit/test_Base64.cpp
++++ b/src/Tests/Unit/test_Base64.cpp
+@@ -16,7 +16,11 @@
+ //
+ // Authors: Daniel Kopecek <dkopecek@redhat.com>
+ //
+-#include <catch.hpp>
++#ifdef HAVE_CATCH2_V3
++  #include <catch_test_macros.hpp>
++#else
++  #include <catch.hpp>
++#endif
+ #include <Base64.cpp>
+ 
+ using namespace usbguard;
+diff --git a/src/Tests/Unit/test_IPCServer_AccessControl.cpp b/src/Tests/Unit/test_IPCServer_AccessControl.cpp
+index 4ed4167b..f85a4ccb 100644
+--- a/src/Tests/Unit/test_IPCServer_AccessControl.cpp
++++ b/src/Tests/Unit/test_IPCServer_AccessControl.cpp
+@@ -18,7 +18,11 @@
+ //
+ #include "usbguard/IPCServer.hpp"
+ 
+-#include <catch.hpp>
++#ifdef HAVE_CATCH2_V3
++  #include <catch_test_macros.hpp>
++#else
++  #include <catch.hpp>
++#endif
+ #include <sstream>
+ 
+ using namespace usbguard;
+diff --git a/src/Tests/Unit/test_Rule.cpp b/src/Tests/Unit/test_Rule.cpp
+index cafc8cca..015ce1bc 100644
+--- a/src/Tests/Unit/test_Rule.cpp
++++ b/src/Tests/Unit/test_Rule.cpp
+@@ -18,7 +18,11 @@
+ //
+ #include "usbguard/Rule.hpp"
+ 
+-#include <catch.hpp>
++#ifdef HAVE_CATCH2_V3
++  #include <catch_test_macros.hpp>
++#else
++  #include <catch.hpp>
++#endif
+ 
+ using namespace usbguard;
+ 
+diff --git a/src/Tests/Unit/test_RuleAttribute_id.cpp b/src/Tests/Unit/test_RuleAttribute_id.cpp
+index ddb93dec..2aff77b6 100644
+--- a/src/Tests/Unit/test_RuleAttribute_id.cpp
++++ b/src/Tests/Unit/test_RuleAttribute_id.cpp
+@@ -18,7 +18,11 @@
+ //
+ #include "usbguard/Rule.hpp"
+ 
+-#include <catch.hpp>
++#ifdef HAVE_CATCH2_V3
++  #include <catch_test_macros.hpp>
++#else
++  #include <catch.hpp>
++#endif
+ 
+ using namespace usbguard;
+ 
+diff --git a/src/Tests/Unit/test_RuleParser.cpp b/src/Tests/Unit/test_RuleParser.cpp
+index e9bc21e2..e310de81 100644
+--- a/src/Tests/Unit/test_RuleParser.cpp
++++ b/src/Tests/Unit/test_RuleParser.cpp
+@@ -18,7 +18,11 @@
+ //
+ #include "usbguard/Rule.hpp"
+ 
+-#include <catch.hpp>
++#ifdef HAVE_CATCH2_V3
++  #include <catch_test_macros.hpp>
++#else
++  #include <catch.hpp>
++#endif
+ 
+ using namespace usbguard;
+ 
+diff --git a/src/Tests/Unit/test_UEvent.cpp b/src/Tests/Unit/test_UEvent.cpp
+index 759ee2cd..cbfd554c 100644
+--- a/src/Tests/Unit/test_UEvent.cpp
++++ b/src/Tests/Unit/test_UEvent.cpp
+@@ -16,7 +16,11 @@
+ //
+ // Authors: Daniel Kopecek <dkopecek@redhat.com>
+ //
+-#include <catch.hpp>
++#ifdef HAVE_CATCH2_V3
++  #include <catch_test_macros.hpp>
++#else
++  #include <catch.hpp>
++#endif
+ #include <UEvent.cpp>
+ 
+ using namespace usbguard;
+diff --git a/src/Tests/Unit/test_UEventParser.cpp b/src/Tests/Unit/test_UEventParser.cpp
+index cefbc3bd..205a6885 100644
+--- a/src/Tests/Unit/test_UEventParser.cpp
++++ b/src/Tests/Unit/test_UEventParser.cpp
+@@ -16,7 +16,11 @@
+ //
+ // Authors: Daniel Kopecek <dkopecek@redhat.com>
+ //
+-#include <catch.hpp>
++#ifdef HAVE_CATCH2_V3
++  #include <catch_test_macros.hpp>
++#else
++  #include <catch.hpp>
++#endif
+ #include <UEventParser.cpp>
+ 
+ using namespace usbguard;
+diff --git a/src/Tests/Unit/test_UMockdevDeviceDefinition.cpp b/src/Tests/Unit/test_UMockdevDeviceDefinition.cpp
+index fbe8bbdc..4a2e9612 100644
+--- a/src/Tests/Unit/test_UMockdevDeviceDefinition.cpp
++++ b/src/Tests/Unit/test_UMockdevDeviceDefinition.cpp
+@@ -16,7 +16,11 @@
+ //
+ // Authors: Daniel Kopecek <dkopecek@redhat.com>
+ //
+-#include <catch.hpp>
++#ifdef HAVE_CATCH2_V3
++  #include <catch_test_macros.hpp>
++#else
++  #include <catch.hpp>
++#endif
+ #include <UMockdevDeviceDefinition.cpp>
+ 
+ #include "test_UMockdevDeviceDefinition.data.hpp"
+diff --git a/src/Tests/Unit/test_Utility.cpp b/src/Tests/Unit/test_Utility.cpp
+index 6d3e188f..a85fa362 100644
+--- a/src/Tests/Unit/test_Utility.cpp
++++ b/src/Tests/Unit/test_Utility.cpp
+@@ -16,7 +16,11 @@
+ //
+ // Authors: Daniel Kopecek <dkopecek@redhat.com>
+ //
+-#include <catch.hpp>
++#ifdef HAVE_CATCH2_V3
++  #include <catch_test_macros.hpp>
++#else
++  #include <catch.hpp>
++#endif
+ #include <Common/Utility.cpp>
+ 
+ using namespace usbguard;
+diff --git a/src/Tests/main.cpp b/src/Tests/main.cpp
+index 4e3e8760..1b001998 100644
+--- a/src/Tests/main.cpp
++++ b/src/Tests/main.cpp
+@@ -16,7 +16,11 @@
+ //
+ // Authors: Daniel Kopecek <dkopecek@redhat.com>
+ //
+-#define CATCH_CONFIG_MAIN
+-#include <catch.hpp>
++#ifdef HAVE_CATCH2_V3
++  #include <catch_test_macros.hpp>
++#else
++  #define CATCH_CONFIG_MAIN
++  #include <catch.hpp>
++#endif
+ 
+ /* vim: set ts=2 sw=2 et */

@@ -1,0 +1,33 @@
+From 41858b9da0b2b2946965ab988795c1b8a87ede82 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Tue, 27 Jan 2026 11:47:46 +0000
+Subject: [PATCH 401/404] pccsadmin: remove leftover debugging 'print(args)'
+ statement
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Dumping the python "Namespace" object to stdout after parsing argv
+serves no user purpose. Remove what is presumably a leftover
+debugging statement.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ PccsAdminTool/pccsadmin.py | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/PccsAdminTool/pccsadmin.py b/PccsAdminTool/pccsadmin.py
+index 01dc9b8..f38d412 100755
+--- a/PccsAdminTool/pccsadmin.py
++++ b/PccsAdminTool/pccsadmin.py
+@@ -56,7 +56,6 @@ def main():
+         parser.print_help()
+         parser.exit()
+ 
+-    print(args)
+     # Check mandatory arguments for appraisalpolicy
+     if args.command == 'put' and args.url and args.url.endswith("/appraisalpolicy"):
+         if not args.fmspc or not args.input_file:
+-- 
+2.52.0
+

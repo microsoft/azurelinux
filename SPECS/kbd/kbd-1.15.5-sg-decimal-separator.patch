@@ -1,0 +1,12 @@
+diff -up kbd-1.15.5/data/keymaps/i386/qwertz/sg.map.orig kbd-1.15.5/data/keymaps/i386/qwertz/sg.map
+--- kbd-1.15.5/data/keymaps/i386/qwertz/sg.map.orig	2013-02-21 15:54:39.362799094 +0100
++++ kbd-1.15.5/data/keymaps/i386/qwertz/sg.map	2013-02-21 15:54:46.448838554 +0100
+@@ -1,7 +1,7 @@
+ keymaps 0-2,4-6,8,12
+ include "qwertz-layout"
+ include "linux-with-alt-and-altgr.inc"
+-	plain keycode  83 = KP_Comma
++	plain keycode  83 = KP_Period
+ strings as usual
+ 
+ keycode   1 = Escape           Escape

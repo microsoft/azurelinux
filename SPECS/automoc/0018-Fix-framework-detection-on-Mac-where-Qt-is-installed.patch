@@ -1,0 +1,46 @@
+From 6b9597ff35170fa14ae333f6b2de73749353d3bc Mon Sep 17 00:00:00 2001
+From: Mike Arthur <mike@mikemcquaid.com>
+Date: Mon, 15 Mar 2010 22:07:33 +0000
+Subject: [PATCH 18/33] Fix framework detection on Mac where Qt is installed
+ outside /Library/Frameworks.
+
+svn path=/trunk/kdesupport/automoc/; revision=1103798
+---
+ kde4automoc.cpp | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
+
+diff --git a/kde4automoc.cpp b/kde4automoc.cpp
+index e85ec62..314ab96 100644
+--- a/kde4automoc.cpp
++++ b/kde4automoc.cpp
+@@ -179,16 +179,22 @@ void AutoMoc::lazyInit()
+     dotFilesCheck(line == "MOC_INCLUDES:\n");
+     line = dotFiles.readLine().trimmed();
+     const QStringList &incPaths = QString::fromUtf8(line).split(';', QString::SkipEmptyParts);
++    QSet<QString> frameworkPaths;
+     foreach (const QString &path, incPaths) {
+         Q_ASSERT(!path.isEmpty());
+         mocIncludes << "-I" + path;
++        if (path.endsWith(".framework/Headers")) {
++            QDir framework(path);
++            // Go up twice to get to the framework root
++            framework.cdUp();
++            framework.cdUp();
++            frameworkPaths << framework.path();
++        }
+     }
+ 
+-    // on the Mac, add -F always, otherwise headers in the frameworks won't be found
+-    // is it necessary to do this only optionally ? Alex
+-#if defined(Q_OS_DARWIN) || defined(Q_OS_MAC)
+-    mocIncludes << "-F/Library/Frameworks";
+-#endif
++    foreach (const QString &path, frameworkPaths) {
++        mocIncludes << "-F" << path;
++    }
+ 
+     line = dotFiles.readLine();
+     dotFilesCheck(line == "CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE:\n");
+-- 
+2.4.3
+

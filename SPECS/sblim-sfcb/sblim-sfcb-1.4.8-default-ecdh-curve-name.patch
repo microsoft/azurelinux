@@ -1,0 +1,26 @@
+diff -up sblim-sfcb-1.4.8/control.c.orig sblim-sfcb-1.4.8/control.c
+--- sblim-sfcb-1.4.8/control.c.orig	2014-03-27 00:46:28.000000000 +0100
++++ sblim-sfcb-1.4.8/control.c	2014-05-15 12:31:38.304169409 +0200
+@@ -170,7 +170,7 @@ static Control init[] = {
+   {"sslCertList", CTL_STRING, SFCB_CONFDIR "/clist.pem", {0}},
+   {"sslCiphers", CTL_STRING, "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH", {0}},
+   {"sslDhParamsFilePath", CTL_STRING, NULL, {0}},
+-  {"sslEcDhCurveName", CTL_STRING, "secp224r1", {0}},
++  {"sslEcDhCurveName", CTL_STRING, "secp384r1", {0}},
+   {"enableSslCipherServerPref", CTL_BOOL, NULL, {.b=0}},
+ 
+   {"registrationDir", CTL_STRING, SFCB_STATEDIR "/registration", {0}},
+diff -up sblim-sfcb-1.4.8/sfcb.cfg.pre.in.orig sblim-sfcb-1.4.8/sfcb.cfg.pre.in
+--- sblim-sfcb-1.4.8/sfcb.cfg.pre.in.orig	2014-05-15 12:31:59.188244865 +0200
++++ sblim-sfcb-1.4.8/sfcb.cfg.pre.in	2014-05-15 12:32:45.554408412 +0200
+@@ -293,8 +293,8 @@ sslCiphers: ALL:!ADH:!LOW:!EXP:!MD5:@STR
+ ## environment. If this value is not set, the indicated default is in effect.
+ ## If the value is set but the curve name is not recognized by the underlying
+ ## openssl implementation, SFCB will abort.
+-## Default is secp224r1
+-#sslEcDhCurveName: secp224r1
++## Default is secp384r1
++#sslEcDhCurveName: secp384r1
+ 
+ ## When set to true, sets the SSL_OP_CIPHER_SERVER_PREFERENCE flag for the ssl
+ ## context, to enforce server's preference instead of the client preference for

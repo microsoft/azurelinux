@@ -1,0 +1,134 @@
+From dd09ab8d3da5cf2d2da3da6aa13fc1ae3c46aae3 Mon Sep 17 00:00:00 2001
+From: Kevin Wurster <wursterk@gmail.com>
+Date: Sun, 8 Jun 2025 22:33:33 -0400
+Subject: [PATCH] Handle click v8.2.0 behavior change
+
+See inline comment in 'click_plugins_tests.py' for details. Closes #38.
+---
+ tests/test_plugins.py | 64 +++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 58 insertions(+), 6 deletions(-)
+
+diff --git a/tests/test_plugins.py b/tests/test_plugins.py
+index 935f37a..2a234e8 100644
+--- a/tests/test_plugins.py
++++ b/tests/test_plugins.py
+@@ -2,10 +2,62 @@ from pkg_resources import EntryPoint
+ from pkg_resources import iter_entry_points
+ from pkg_resources import working_set
+ 
++import importlib.metadata
++
+ import click
+ from click_plugins import with_plugins
+ import pytest
+ 
++###############################################################################
++# Version-Specific Behavior
++
++def _click_version():
++
++    """Attempt to parse :attr:`click.__version__` into a friendly construct.
++
++    Unfortunately, the Python standard library offers no method for comparing
++    version strings. The official recommended approach is to use the
++    `packaging <https://pypi.org/project/packaging/>`_ module, however
++    ``click-plugins`` strives to only use libraries available in the standard
++    library.
++
++    This implementation is incomplete. Only the major and minor components are
++    extracted and converted to integers. The idea is that we only have to
++    be aware of a specific version of :mod:`click`.
++    """
++
++    # 'click.__version__' will be removed in v9
++    click_version = importlib.metadata.version('click')
++
++    parsed = []
++    for part in click_version.split('.'):
++
++        if not part.isdigit():
++            raise RuntimeError(f'unexpected version: {click_version}')
++
++        elif part.isdigit():
++            parsed.append(int(part))
++
++        if len(parsed) >= 2:
++            break
++
++    return tuple(parsed)
++
++
++# In some configurations, executing a 'click' CLI will print help information
++# and exit if no arguments are given. 'click' v8.2.0 changed the behavior from
++# exit code 0 to 2.
++#
++#   https://github.com/pallets/click/blob/main/CHANGES.rst#version-820
++#
++if _click_version() < (8, 2):
++    EXIT_CODE_NO_ARGS_IS_HELP = 0
++else:
++    EXIT_CODE_NO_ARGS_IS_HELP = 2
++
++
++del _click_version
++
+ 
+ # Create a few CLI commands for testing
+ @click.command()
+@@ -78,7 +130,7 @@ def test_registered():
+ def test_register_and_run(runner):
+ 
+     result = runner.invoke(good_cli)
+-    assert result.exit_code == 0
++    assert result.exit_code == EXIT_CODE_NO_ARGS_IS_HELP
+ 
+     for ep in iter_entry_points('_test_click_plugins.test_plugins'):
+         cmd_result = runner.invoke(good_cli, [ep.name, 'something'])
+@@ -89,7 +141,7 @@ def test_register_and_run(runner):
+ def test_broken_register_and_run(runner):
+ 
+     result = runner.invoke(broken_cli)
+-    assert result.exit_code == 0
++    assert result.exit_code == EXIT_CODE_NO_ARGS_IS_HELP
+     assert u'\U0001F4A9' in result.output or u'\u2020' in result.output
+ 
+     for ep in iter_entry_points('_test_click_plugins.broken_plugins'):
+@@ -108,7 +160,7 @@ def test_group_chain(runner):
+         pass
+ 
+     result = runner.invoke(good_cli)
+-    assert result.exit_code == 0
++    assert result.exit_code == EXIT_CODE_NO_ARGS_IS_HELP
+     assert sub_cli.name in result.output
+     for ep in iter_entry_points('_test_click_plugins.test_plugins'):
+         assert ep.name in result.output
+@@ -121,7 +173,7 @@ def test_group_chain(runner):
+         pass
+ 
+     result = runner.invoke(good_cli, ['sub-cli-plugins'])
+-    assert result.exit_code == 0
++    assert result.exit_code == EXIT_CODE_NO_ARGS_IS_HELP
+     for ep in iter_entry_points('_test_click_plugins.test_plugins'):
+         assert ep.name in result.output
+ 
+@@ -142,7 +194,7 @@ def test_exception():
+ 
+ def test_broken_register_and_run_with_help(runner):
+     result = runner.invoke(broken_cli)
+-    assert result.exit_code == 0
++    assert result.exit_code == EXIT_CODE_NO_ARGS_IS_HELP
+     assert u'\U0001F4A9' in result.output or u'\u2020' in result.output
+ 
+     for ep in iter_entry_points('_test_click_plugins.broken_plugins'):
+@@ -153,7 +205,7 @@ def test_broken_register_and_run_with_help(runner):
+ 
+ def test_broken_register_and_run_with_args(runner):
+     result = runner.invoke(broken_cli)
+-    assert result.exit_code == 0
++    assert result.exit_code == EXIT_CODE_NO_ARGS_IS_HELP
+     assert u'\U0001F4A9' in result.output or u'\u2020' in result.output
+ 
+     for ep in iter_entry_points('_test_click_plugins.broken_plugins'):
+-- 
+2.50.1
+

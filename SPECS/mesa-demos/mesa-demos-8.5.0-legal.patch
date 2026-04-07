@@ -1,0 +1,28 @@
+diff --git a/src/demos/meson.build b/src/demos/meson.build
+index 8f01036b..929f5405 100644
+--- a/src/demos/meson.build
++++ b/src/demos/meson.build
+@@ -28,7 +28,6 @@ progs = [
+   'copypix',
+   'cubemap',
+   'cuberender',
+-  'dinoshade',
+   'dissolve',
+   'drawpix',
+   'engine',
+@@ -52,7 +51,6 @@ progs = [
+   'multiarb',
+   'paltex',
+   'pixeltest',
+-  'pointblast',
+   'projtex',
+   'ray',
+   'readpix',
+@@ -61,7 +59,6 @@ progs = [
+   'shadowtex',
+   'singlebuffer',
+   'spectex',
+-  'spriteblast',
+   'stex3d',
+   'teapot',
+   'terrain',

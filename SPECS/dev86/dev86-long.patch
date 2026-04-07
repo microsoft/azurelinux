@@ -1,0 +1,22 @@
+diff -up dev86-0.16.19/ld/x86_aout.h.long dev86-0.16.19/ld/x86_aout.h
+--- dev86-0.16.19/ld/x86_aout.h.long	2012-07-30 10:17:06.000000000 +0200
++++ dev86-0.16.19/ld/x86_aout.h	2012-11-15 15:19:12.215396644 +0100
+@@ -11,17 +11,11 @@
+ /* If the host isn't an x86 all bets are off, use chars. */
+ #if defined(i386) || defined(__BCC__) || defined(MSDOS)
+ typedef long Long;
+-#define __OUT_OK 1
+ #else
+-/* Beware: this will probably allow some BE hosts to generate broken files. */
+-#ifdef INT32_MAX
+ #include <stdint.h>
+ typedef int32_t Long;
+-#define __OUT_OK 1
+-#else
+-typedef char Long[4];
+-#endif
+ #endif
++#define __OUT_OK 1
+ 
+ struct	exec {			/* a.out header */
+   unsigned char	a_magic[2];	/* magic number */

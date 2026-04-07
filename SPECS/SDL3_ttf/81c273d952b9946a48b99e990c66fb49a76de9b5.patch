@@ -1,0 +1,23 @@
+From 81c273d952b9946a48b99e990c66fb49a76de9b5 Mon Sep 17 00:00:00 2001
+From: Anonymous Maarten <anonymous.maarten@gmail.com>
+Date: Tue, 8 Apr 2025 21:11:02 +0200
+Subject: [PATCH] cmake: install examples to
+ <prefix>/libexec/installed-tests/SDL3_ttf
+
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 85dd7e23..fbe12209 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -570,7 +570,7 @@ if(SDLTTF_SAMPLES)
+ 
+         if(SDLTTF_SAMPLES_INSTALL)
+             install(TARGETS ${prog}
+-                RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
++                RUNTIME DESTINATION "${CMAKE_INSTALL_LIBEXECDIR}/installed-tests/SDL3_ttf"
+             )
+         endif()
+     endforeach()

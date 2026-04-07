@@ -1,0 +1,23 @@
+--- ena-0.14.4/Cargo.toml	2006-07-24T01:21:28+00:00
++++ ena-0.14.4/Cargo.toml	2026-02-12T18:14:56.783618+00:00
+@@ -29,10 +29,6 @@
+ license = "MIT OR Apache-2.0"
+ repository = "https://github.com/rust-lang/ena"
+ 
+-[features]
+-bench = []
+-persistent = ["dogged"]
+-
+ [lib]
+ name = "ena"
+ path = "src/lib.rs"
+@@ -41,9 +37,5 @@
+ name = "external_undo_log"
+ path = "tests/external_undo_log.rs"
+ 
+-[dependencies.dogged]
+-version = "0.2.0"
+-optional = true
+-
+ [dependencies.log]
+ version = "0.4"

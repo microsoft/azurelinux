@@ -1,0 +1,69 @@
+https://bugs.gentoo.org/935754
+https://lists.gnu.org/archive/html/bison-patches/2024-07/msg00000.html
+
+* data/skeletons/glr2.cc (yyundeleteLastStack): Recover
+yylookaheadNeeds stack entry also, to prevent desyncing the sizes
+of yystates and yylookaheadNeeds.
+(class glr_state_set): New field yylookaheadNeedLastDeleted,
+tracks lookahead need of last deleted state.
+(yymarkStackDeleted): Save yylookaheadNeeds also.
+---
+Hi!
+
+GCC 15 has added bounds-checks to vector<bool> when assertions are
+enabled.  This has caught a bug in Bison.  See bug referenced above.
+
+Now, WRT the fix: I am not sure of its correctness, but it appears to
+pass tests and everything seems to indicate that the presumption it is
+based on is correct.  That presumption is that the two stacks mentioned
+above (yylookaheadNeeds and yystates) ought to be the same size.  I
+inferred this because all other locations that alter the size of the two
+vectors appear to do so in lock-step.
+
+TIA, have a lovely day.
+
+ data/skeletons/glr2.cc | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/data/skeletons/glr2.cc b/data/skeletons/glr2.cc
+index 970ccfdf..8b962d6f 100644
+--- a/data/skeletons/glr2.cc
++++ b/data/skeletons/glr2.cc
+@@ -1080,7 +1080,10 @@ namespace
+     {
+       size_t k = yyk.uget ();
+       if (yystates[k] != YY_NULLPTR)
+-        yylastDeleted = yystates[k];
++        {
++          yylastDeleted = yystates[k];
++          yylookaheadNeedLastDeleted = yylookaheadNeeds[k];
++        }
+       yystates[k] = YY_NULLPTR;
+     }
+ 
+@@ -1093,6 +1096,7 @@ namespace
+       if (yylastDeleted == YY_NULLPTR || !yystates.empty ())
+         return;
+       yystates.push_back (yylastDeleted);
++      yylookaheadNeeds.push_back (yylookaheadNeedLastDeleted);
+       YYCDEBUG << "Restoring last deleted stack as stack #0.\n";
+       clearLastDeleted ();
+     }
+@@ -1102,6 +1106,7 @@ namespace
+     void
+     yyremoveDeletes ()
+     {
++      YYASSERT(yystates.size () == yylookaheadNeeds.size ());
+       size_t newsize = yystates.size ();
+       /* j is the number of live stacks we have seen.  */
+       for (size_t i = 0, j = 0; j < newsize; ++i)
+@@ -1160,6 +1165,7 @@ namespace
+ 
+     /** The last stack we invalidated.  */
+     glr_state* yylastDeleted;
++    bool yylookaheadNeedLastDeleted;
+   }; // class glr_state_set
+ } // namespace
+ 
+-- 
+2.45.2

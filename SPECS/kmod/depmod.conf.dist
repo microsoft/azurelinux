@@ -1,0 +1,6 @@
+#
+# depmod.conf
+#
+
+# override default search ordering for kmod packaging
+search updates extra built-in weak-updates

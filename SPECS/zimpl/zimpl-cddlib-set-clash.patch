@@ -1,0 +1,385 @@
+--- zimpl/src/zimpl/code.c.orig	2023-08-08 06:33:23.000000000 -0600
++++ zimpl/src/zimpl/code.c	2023-11-15 21:12:10.344288104 -0700
+@@ -356,7 +356,7 @@ void code_free_value(CodeNode* node)
+       break;
+    case CODE_SET :
+       assert(node->value.set != NULL);
+-      set_free(node->value.set);      
++      set_free_zimpl(node->value.set);      
+       node->value.set = NULL;
+       node->type      = CODE_ERR;
+       break;
+@@ -922,7 +922,7 @@ void code_copy_value(CodeNode* dst, Code
+       dst->value.tuple = tuple_copy(src->value.tuple);
+       break;
+    case CODE_SET :
+-      dst->value.set = set_copy(src->value.set);
++      dst->value.set = set_copy_zimpl(src->value.set);
+       break;
+    case CODE_IDXSET :
+       dst->value.idxset = idxset_copy(src->value.idxset);
+--- zimpl/src/zimpl/entry.c.orig	2023-08-08 06:33:23.000000000 -0600
++++ zimpl/src/zimpl/entry.c	2023-11-15 21:07:48.148865479 -0700
+@@ -121,7 +121,7 @@ Entry* entry_new_set(
+    entry->refc      = 1;
+    entry->tuple     = tuple_copy(tuple);
+    entry->type      = SYM_SET;
+-   entry->value.set = set_copy(set);
++   entry->value.set = set_copy_zimpl(set);
+ 
+    SID_set(entry, ENTRY_SID);
+    assert(entry_is_valid(entry));
+@@ -168,7 +168,7 @@ void entry_free(Entry* const entry)
+       case SYM_STRG :
+          break;
+       case SYM_SET :
+-         set_free(entry->value.set);
++         set_free_zimpl(entry->value.set);
+          break;
+       case SYM_VAR :
+          break;
+--- zimpl/src/zimpl/idxset.c.orig	2023-08-08 06:33:23.000000000 -0600
++++ zimpl/src/zimpl/idxset.c	2023-11-15 21:06:46.125708311 -0700
+@@ -66,7 +66,7 @@ IdxSet* idxset_new(
+    assert(idxset != NULL);
+ 
+    idxset->tuple           = tuple_copy(tuple);
+-   idxset->set             = set_copy(set);
++   idxset->set             = set_copy_zimpl(set);
+    idxset->lexpr           = lexpr;
+    idxset->is_unrestricted = is_unrestricted;
+    
+@@ -83,7 +83,7 @@ void idxset_free(IdxSet* idxset)
+    SID_del(idxset);
+ 
+    tuple_free(idxset->tuple);
+-   set_free(idxset->set);
++   set_free_zimpl(idxset->set);
+    free(idxset);
+ }
+ 
+--- zimpl/src/zimpl/inst.c.orig	2023-08-08 06:33:23.000000000 -0600
++++ zimpl/src/zimpl/inst.c	2023-11-15 21:09:19.619621197 -0700
+@@ -2199,21 +2199,21 @@ CodeNode* i_set_union2(CodeNode* self)
+       if (code_get_bool(code_eval(lexpr)))
+       {
+          if (set_r == NULL)
+-            set_r = set_copy(code_eval_child_set(self, 1));
++            set_r = set_copy_zimpl(code_eval_child_set(self, 1));
+          else
+          {
+             assert(set_r != NULL);
+             
+-            set_old = set_copy(set_r);
++            set_old = set_copy_zimpl(set_r);
+             set_new = code_eval_child_set(self, 1);
+ 
+             check_sets_compatible(self, set_old, set_new, "Union");
+ 
+-            set_free(set_r);
++            set_free_zimpl(set_r);
+ 
+             set_r = set_union(set_old, set_new);
+ 
+-            set_free(set_old);
++            set_free_zimpl(set_old);
+          }
+       }
+       local_drop_frame();
+@@ -2300,19 +2300,19 @@ CodeNode* i_set_inter2(CodeNode* self)
+       if (code_get_bool(code_eval(lexpr)))
+       {
+          if (set_r == NULL)
+-            set_r = set_copy(code_eval_child_set(self, 1));
++            set_r = set_copy_zimpl(code_eval_child_set(self, 1));
+          else
+          {
+-            set_old = set_copy(set_r);
++            set_old = set_copy_zimpl(set_r);
+             set_new = code_eval_child_set(self, 1);
+ 
+             check_sets_compatible(self, set_old, set_new, "Intersection");
+ 
+-            set_free(set_r);
++            set_free_zimpl(set_r);
+ 
+             set_r = set_inter(set_old, set_new);
+ 
+-            set_free(set_old);
++            set_free_zimpl(set_old);
+          }
+       }
+       local_drop_frame();
+@@ -2649,7 +2649,7 @@ CodeNode* i_set_indexset(CodeNode* self)
+ 
+    assert(sym != NULL);
+ 
+-   code_value_set(self, set_copy(symbol_get_iset(sym)));
++   code_value_set(self, set_copy_zimpl(symbol_get_iset(sym)));
+ 
+    return self;
+ }
+@@ -2857,7 +2857,7 @@ static Set* set_from_idxset(IdxSet const
+    {
+       assert(code_get_bool(code_eval(lexpr)));
+ 
+-      newset = set_copy(set);
++      newset = set_copy_zimpl(set);
+    }
+    else
+    {
+@@ -2941,7 +2941,7 @@ CodeNode* i_newsym_set1(CodeNode* self)
+       tuple_free(tuple);
+    }
+    set_iter_exit(iter, iset);
+-   set_free(iset);
++   set_free_zimpl(iset);
+ 
+    code_value_void(self);
+ 
+@@ -2984,7 +2984,7 @@ CodeNode* i_newsym_set2(CodeNode* self)
+     */
+    if (set_get_dim(iset) == 0)
+    {
+-      set_free(iset);
++      set_free_zimpl(iset);
+ 
+       iset = set_new_from_list(list, SET_CHECK_WARN);
+    }
+@@ -3012,7 +3012,7 @@ CodeNode* i_newsym_set2(CodeNode* self)
+    }
+    code_value_void(self);
+ 
+-   set_free(iset);
++   set_free_zimpl(iset);
+    
+    return self;
+ }
+@@ -3223,7 +3223,7 @@ CodeNode* i_newsym_para1(CodeNode* self)
+    }
+    code_value_void(self);
+ 
+-   set_free(iset);
++   set_free_zimpl(iset);
+ 
+    return self;
+ }
+@@ -3312,7 +3312,7 @@ CodeNode* i_newsym_para2(CodeNode* self)
+ 
+    code_value_void(self);
+ 
+-   set_free(iset);
++   set_free_zimpl(iset);
+ 
+    return self;
+ }
+@@ -3450,7 +3450,7 @@ CodeNode* i_newsym_var(CodeNode* self)
+ 
+    code_value_void(self);
+ 
+-   set_free(iset);
++   set_free_zimpl(iset);
+ 
+    return self;
+ }
+@@ -3511,7 +3511,7 @@ CodeNode* i_symbol_deref(CodeNode* self)
+       code_value_strg(self, entry_get_strg(entry));
+       break;
+    case SYM_SET :
+-      code_value_set(self, set_copy(entry_get_set(entry)));
++      code_value_set(self, set_copy_zimpl(entry_get_set(entry)));
+       break;
+    case SYM_VAR :
+       term = term_new(1);
+@@ -3796,7 +3796,7 @@ CodeNode* i_idxset_pseudo_new(CodeNode*
+    
+    code_value_idxset(self, idxset_new(tuple, set, code_get_child(self, 0), true));
+ 
+-   set_free(set);
++   set_free_zimpl(set);
+    tuple_free(tuple);
+ 
+    return self;
+--- zimpl/src/zimpl/iread.c.orig	2023-08-08 06:33:23.000000000 -0600
++++ zimpl/src/zimpl/iread.c	2023-11-15 21:13:13.800420936 -0700
+@@ -839,7 +839,7 @@ CodeNode* i_read(CodeNode* self)
+          list = list_new_entry(entry);
+          
+          entry_free(entry);
+-         set_free(set);
++         set_free_zimpl(set);
+       }
+       tuple_free(tuple);
+ 
+--- zimpl/src/zimpl/set4.c.orig	2023-08-08 06:33:23.000000000 -0600
++++ zimpl/src/zimpl/set4.c	2023-11-15 21:07:21.804223477 -0700
+@@ -117,7 +117,7 @@ Set* set_new_from_list(List const* list,
+    return set;
+ }
+ 
+-void set_free(Set* set)
++void set_free_zimpl(Set* set)
+ {
+    set_vtab_global[set->head.type].set_free(set);
+ }
+@@ -127,7 +127,7 @@ bool set_is_valid(Set const* set)
+    return set != NULL && set_vtab_global[set->head.type].set_is_valid(set); //lint !e453
+ }
+ 
+-Set* set_copy(Set const* set)
++Set* set_copy_zimpl(Set const* set)
+ {
+    return set_vtab_global[set->head.type].set_copy(set);
+ }
+@@ -673,7 +673,7 @@ List* set_subsets_list(
+       numb_free(numb);
+       entry_free(entry);
+       tuple_free(tuple);
+-      set_free(subset);
++      set_free_zimpl(subset);
+ 
+       return list;
+    }
+@@ -720,7 +720,7 @@ List* set_subsets_list(
+       numb_free(numb);
+       entry_free(entry);
+       tuple_free(tuple);
+-      set_free(subset);
++      set_free_zimpl(subset);
+    }
+    while(!counter_inc(counter, set->head.members, subset_size, 0));
+ 
+--- zimpl/src/zimpl/set.h.orig	2023-08-08 06:33:23.000000000 -0600
++++ zimpl/src/zimpl/set.h	2023-11-15 21:10:28.898674423 -0700
+@@ -48,12 +48,12 @@ typedef union set_iter           SetIter
+ 
+ extern void         set_init(void);
+ extern void         set_exit(void);
+-//lint -sem(        set_free, custodial(1), inout(1), 1p == 1) 
+-extern void         set_free(Set* set) expects_NONNULL;
++//lint -sem(        set_free_zimpl, custodial(1), inout(1), 1p == 1) 
++extern void         set_free_zimpl(Set* set) expects_NONNULL;
+ //lint -sem(        set_is_valid, 1p == 1, pure) 
+ extern bool         set_is_valid(Set const* set) is_PURE;
+-//lint -sem(        set_copy, 1p == 1, @P >= malloc(1)) 
+-extern Set*         set_copy(Set const* set) expects_NONNULL returns_NONNULL;
++//lint -sem(        set_copy_zimpl, 1p == 1, @P >= malloc(1)) 
++extern Set*         set_copy_zimpl(Set const* set) expects_NONNULL returns_NONNULL;
+ //lint -sem(        set_lookup, 1p == 1, 2p == 1) 
+ extern bool         set_lookup(Set const* set, Tuple const* tuple) expects_NONNULL;
+ //lint -sem(        set_iter_init, 1p == 1, @P >= malloc(1)) 
+--- zimpl/src/zimpl/setmulti.c.orig	2023-08-08 06:33:23.000000000 -0600
++++ zimpl/src/zimpl/setmulti.c	2023-11-15 21:11:42.265671827 -0700
+@@ -293,7 +293,7 @@ static Set* set_multi_copy(Set const* so
+    set->head.refc++;
+ 
+    for(int i = 0; i < set->head.dim; i++)
+-      (void)set_copy(set->multi.set[i]);
++      (void)set_copy_zimpl(set->multi.set[i]);
+    
+    return set;
+ }
+@@ -310,7 +310,7 @@ static void set_multi_free(Set* set)
+    assert(set_multi_is_valid(set));
+ 
+    for(i = 0; i < set->head.dim; i++)
+-      set_free(set->multi.set[i]);
++      set_free_zimpl(set->multi.set[i]);
+ 
+    set->head.refc--;
+ 
+--- zimpl/src/zimpl/setprod.c.orig	2023-08-08 06:33:23.000000000 -0600
++++ zimpl/src/zimpl/setprod.c	2023-11-15 21:06:17.469097728 -0700
+@@ -94,8 +94,8 @@ Set* set_prod_new(Set const* a, Set cons
+    set->head.members = a->head.members * b->head.members;
+    set->head.type    = SET_PROD;
+ 
+-   set->prod.set_a   = set_copy(a);
+-   set->prod.set_b   = set_copy(b);
++   set->prod.set_a   = set_copy_zimpl(a);
++   set->prod.set_b   = set_copy_zimpl(b);
+ 
+    SID_set2(set->prod, SET_PROD_SID);
+ 
+@@ -119,8 +119,8 @@ static Set* set_prod_copy(Set const* sou
+       
+    set->head.refc++;
+ 
+-   (void)set_copy(set->prod.set_a);
+-   (void)set_copy(set->prod.set_b);
++   (void)set_copy_zimpl(set->prod.set_a);
++   (void)set_copy_zimpl(set->prod.set_b);
+    
+    return set;
+ }
+@@ -134,8 +134,8 @@ static void set_prod_free(Set* set)
+ {
+    assert(set_prod_is_valid(set));
+ 
+-   set_free(set->prod.set_a);
+-   set_free(set->prod.set_b);
++   set_free_zimpl(set->prod.set_a);
++   set_free_zimpl(set->prod.set_b);
+ 
+    set->head.refc--;
+ 
+--- zimpl/src/zimpl/symbol.c.orig	2023-08-08 06:33:23.000000000 -0600
++++ zimpl/src/zimpl/symbol.c	2023-11-15 21:09:49.706210018 -0700
+@@ -88,7 +88,7 @@ Symbol* symbol_new(
+    sym->size    = 1;
+    sym->used    = 0;
+    sym->extend  = SYMBOL_EXTEND_SIZE;
+-   sym->set     = set_copy(set);
++   sym->set     = set_copy_zimpl(set);
+    sym->hash    = hash_new(HASH_ENTRY, estimated_size);
+    sym->entry   = calloc(1, sizeof(*sym->entry));
+    sym->deflt   = (deflt != ENTRY_NULL) ? entry_copy(deflt) : ENTRY_NULL;
+@@ -121,7 +121,7 @@ void symbol_exit(void)
+          entry_free(p->entry[i]);
+ 
+       free(p->entry);
+-      set_free(p->set);
++      set_free_zimpl(p->set);
+       hash_free(p->hash);
+ 
+       if (p->deflt != NULL)
+--- zimpl/src/zimpl/zimpl.c.orig	2023-08-08 06:33:23.000000000 -0600
++++ zimpl/src/zimpl/zimpl.c	2023-11-15 21:13:34.808133825 -0700
+@@ -382,7 +382,7 @@ int main(int argc, char* const* argv)
+     */
+    Set* const set = set_pseudo_new();
+    (void)symbol_new(SYMBOL_NAME_INTERNAL, SYM_VAR, set, 100, ENTRY_NULL);
+-   set_free(set);
++   set_free_zimpl(set);
+    
+    /* Now store the param defines
+     */
+--- zimpl/src/zimpl/zimpllib.c.orig	2023-11-15 21:04:39.936423097 -0700
++++ zimpl/src/zimpl/zimpllib.c	2023-11-15 21:13:57.871818646 -0700
+@@ -206,7 +206,7 @@ void zpl_add_parameter(char const* def)
+    symbol_add_entry(sym, entry);
+    
+    tuple_free(tuple);
+-   set_free(set); 
++   set_free_zimpl(set); 
+    free(name); 
+ }
+ 
+@@ -240,7 +240,7 @@ bool zpl_read(char const* filename, bool
+       
+       Set* set = set_pseudo_new();
+       (void)symbol_new(SYMBOL_NAME_INTERNAL, SYM_VAR, set, 100, NULL);
+-      set_free(set);
++      set_free_zimpl(set);
+    
+       prog = prog_new();
+       prog_load(prog, NULL, filename);
+@@ -394,7 +394,7 @@ bool zpl_read_with_args(char** argv, int
+        */
+       Set* set = set_pseudo_new();
+       (void)symbol_new(SYMBOL_NAME_INTERNAL, SYM_VAR, set, 100, NULL);
+-      set_free(set);
++      set_free_zimpl(set);
+    
+       /* Now store the param defines
+        */

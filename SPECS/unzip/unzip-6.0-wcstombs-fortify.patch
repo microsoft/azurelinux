@@ -1,0 +1,11 @@
+--- unzip60/extract.c	2023-01-25 07:05:58.742254870 -0500
++++ unzip60.new/extract.c	2023-01-25 07:04:48.073435349 -0500
+@@ -2889,7 +2889,7 @@ char *fnfilter(raw, space, size)   /* co
+             strcpy( (char *)space, raw);
+             return (char *)space;
+         }
+-        woslen = wcstombs( newraw, wostring, (woslen * MB_CUR_MAX) + 1);
++        woslen = wcstombs( newraw, wostring, woslen + 1);
+ 
+         if (size > 0) {
+             slim = space + size - 4;

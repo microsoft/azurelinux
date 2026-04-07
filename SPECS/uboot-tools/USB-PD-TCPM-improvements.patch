@@ -1,0 +1,717 @@
+From patchwork Wed Feb 26 18:44:44 2025
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Sebastian Reichel <sebastian.reichel@collabora.com>
+X-Patchwork-Id: 2052544
+X-Patchwork-Delegate: marek.vasut@gmail.com
+Return-Path: <u-boot-bounces@lists.denx.de>
+X-Original-To: incoming@patchwork.ozlabs.org
+Delivered-To: patchwork-incoming@legolas.ozlabs.org
+Authentication-Results: legolas.ozlabs.org;
+	dkim=pass (2048-bit key;
+ unprotected) header.d=collabora.com header.i=@collabora.com
+ header.a=rsa-sha256 header.s=mail header.b=IthL1Z+m;
+	dkim-atps=neutral
+Authentication-Results: legolas.ozlabs.org;
+ spf=pass (sender SPF authorized) smtp.mailfrom=lists.denx.de
+ (client-ip=2a01:238:438b:c500:173d:9f52:ddab:ee01; helo=phobos.denx.de;
+ envelope-from=u-boot-bounces@lists.denx.de; receiver=patchwork.ozlabs.org)
+Received: from phobos.denx.de (phobos.denx.de
+ [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (secp384r1))
+	(No client certificate requested)
+	by legolas.ozlabs.org (Postfix) with ESMTPS id 4Z33M03Hhjz1yCp
+	for <incoming@patchwork.ozlabs.org>; Thu, 27 Feb 2025 05:45:32 +1100 (AEDT)
+Received: from h2850616.stratoserver.net (localhost [IPv6:::1])
+	by phobos.denx.de (Postfix) with ESMTP id BFF7680FF0;
+	Wed, 26 Feb 2025 19:45:16 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=u-boot-bounces@lists.denx.de
+Authentication-Results: phobos.denx.de;
+	dkim=pass (2048-bit key;
+ unprotected) header.d=collabora.com header.i=@collabora.com
+ header.b="IthL1Z+m";
+	dkim-atps=neutral
+Received: by phobos.denx.de (Postfix, from userid 109)
+ id 7614F810F9; Wed, 26 Feb 2025 19:45:13 +0100 (CET)
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on phobos.denx.de
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+ DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+ SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.2
+Received: from bali.collaboradmins.com (bali.collaboradmins.com
+ [IPv6:2a01:4f8:201:9162::2])
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+ (No client certificate requested)
+ by phobos.denx.de (Postfix) with ESMTPS id 2173180FDE
+ for <u-boot@lists.denx.de>; Wed, 26 Feb 2025 19:45:08 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=sebastian.reichel@collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+ s=mail; t=1740595507;
+ bh=Fnp6a8opSCXiH5NJdu5uivbBBZF3pe1CXyluh8+n8/c=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=IthL1Z+mDeIRy9MWEa0lGyJWuHk/Pu+yUpLly7RG6NIpC0lCgla3ssiy2x+8/G+bz
+ DWjrKUMxgWtqfjfffRiKEJZ6Z2sAXJ1ePvDmMtbGoolWSrzsV2+cWh0byYrEBuVBe9
+ Vp0ye7gJ4Wt610s4QHa4xoYcm7h9KGmE3IEjb+XYFv1HMJIOoACl04BwkLctza1KBr
+ XlIqC+snvRP/yQxa2+6RYGXgQD5JnJxCM1orXVIJxyyJxTzb3XgNir60Gb4HI9724H
+ LDZy0Hq7NQ1zF0h1yVUOklDotw17isbNoI4K3JCExR+r7GsdESsGY6cwAbZY71iWlf
+ OsSSrV6TZtAMg==
+Received: from jupiter.universe (dyndsl-091-249-076-032.ewe-ip-backbone.de
+ [91.249.76.32])
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+ key-exchange X25519 server-signature RSA-PSS (4096 bits))
+ (No client certificate requested) (Authenticated sender: sre)
+ by bali.collaboradmins.com (Postfix) with ESMTPSA id A18CC17E0881;
+ Wed, 26 Feb 2025 19:45:07 +0100 (CET)
+Received: by jupiter.universe (Postfix, from userid 1000)
+ id 32E35480034; Wed, 26 Feb 2025 19:45:07 +0100 (CET)
+From: Sebastian Reichel <sebastian.reichel@collabora.com>
+To: Marek Vasut <marex@denx.de>, u-boot@lists.denx.de,
+ Jonas Karlman <jonas@kwiboo.se>, Soeren Moch <smoch@web.de>
+Cc: Tim Harvey <tharvey@gateworks.com>,
+ Philipp Tomsich <philipp.tomsich@vrull.eu>,
+ Anand Moon <linux.amoon@gmail.com>, Maxim Kiselev <bigunclemax@gmail.com>,
+ Sebastian Reichel <sebastian.reichel@collabora.com>
+Subject: [PATCH v2 1/4] usb: tcpm: improve handling of some power-supplies
+Date: Wed, 26 Feb 2025 19:44:44 +0100
+Message-ID: <20250226184506.64114-2-sebastian.reichel@collabora.com>
+X-Mailer: git-send-email 2.47.2
+In-Reply-To: <20250226184506.64114-1-sebastian.reichel@collabora.com>
+References: <20250226184506.64114-1-sebastian.reichel@collabora.com>
+MIME-Version: 1.0
+X-BeenThere: u-boot@lists.denx.de
+X-Mailman-Version: 2.1.39
+Precedence: list
+List-Id: U-Boot discussion <u-boot.lists.denx.de>
+List-Unsubscribe: <https://lists.denx.de/options/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=unsubscribe>
+List-Archive: <https://lists.denx.de/pipermail/u-boot/>
+List-Post: <mailto:u-boot@lists.denx.de>
+List-Help: <mailto:u-boot-request@lists.denx.de?subject=help>
+List-Subscribe: <https://lists.denx.de/listinfo/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=subscribe>
+Errors-To: u-boot-bounces@lists.denx.de
+Sender: "U-Boot" <u-boot-bounces@lists.denx.de>
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+
+When the Rock 5B is booted with the current TCPM with its power supplied
+by a "Cambrionix PDSync-C4" port it reaches the power-supply ready state.
+Once that has happened the hub starts sending GetSinkCap messages, but
+U-Boot already stopped processing PD messages. After retrying a bunch of
+times the hub instead sends soft resets. Since U-Boot will also not
+react to them, the USB hub will follow-up with a hard reset and that
+cuts off the supply voltage.
+
+Since the state machine is already prepared to handle GetSinkCap
+messages, try to avoid this by handling incoming messages for another
+50ms after reaching the ready state.
+
+Fixes: 1db4c0ac77e3 ("usb: tcpm: add core framework")
+Signed-off-by: Sebastian Reichel <sebastian.reichel@collabora.com>
+---
+ drivers/usb/tcpm/tcpm.c | 31 ++++++++++++++++++++++++++-----
+ 1 file changed, 26 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/usb/tcpm/tcpm.c b/drivers/usb/tcpm/tcpm.c
+index 0aee57cb2f4a..b754b4dcd0b5 100644
+--- a/drivers/usb/tcpm/tcpm.c
++++ b/drivers/usb/tcpm/tcpm.c
+@@ -2229,6 +2229,17 @@ static int tcpm_port_init(struct udevice *dev)
+ 	return 0;
+ }
+ 
++static inline void tcpm_poll_one_event(struct udevice *dev)
++{
++	const struct dm_tcpm_ops *drvops = dev_get_driver_ops(dev);
++	struct tcpm_port *port = dev_get_uclass_plat(dev);
++
++	drvops->poll_event(dev);
++	port->poll_event_cnt++;
++	udelay(500);
++	tcpm_check_and_run_delayed_work(dev);
++}
++
+ static void tcpm_poll_event(struct udevice *dev)
+ {
+ 	const struct dm_tcpm_ops *drvops = dev_get_driver_ops(dev);
+@@ -2242,15 +2253,25 @@ static void tcpm_poll_event(struct udevice *dev)
+ 		    (port->state == SNK_READY || port->state == SRC_READY))
+ 			break;
+ 
+-		drvops->poll_event(dev);
+-		port->poll_event_cnt++;
+-		udelay(500);
+-		tcpm_check_and_run_delayed_work(dev);
++		tcpm_poll_one_event(dev);
+ 	}
+ 
+-	if (port->state != SNK_READY && port->state != SRC_READY)
++	/*
++	 * Some power-supplies send GetSinkCap shortly after they are ready.
++	 * If they do not receive a response after a few retries they will issue
++	 * a soft-reset followed by a hard reset, which kills the board power.
++	 * Let's poll for 50ms after reaching the ready state to check if the
++	 * power-supply wants something from us.
++	 */
++	if (port->state == SNK_READY) {
++		port->poll_event_cnt = 0;
++
++		while (port->poll_event_cnt < 100)
++			tcpm_poll_one_event(dev);
++	} else {
+ 		dev_warn(dev, "TCPM: exit in state %s\n",
+ 			 tcpm_states[port->state]);
++	}
+ 
+ 	/*
+ 	 * At this time, call the callback function of the respective pd chip
+
+From patchwork Wed Feb 26 18:44:45 2025
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Sebastian Reichel <sebastian.reichel@collabora.com>
+X-Patchwork-Id: 2052546
+X-Patchwork-Delegate: marek.vasut@gmail.com
+Return-Path: <u-boot-bounces@lists.denx.de>
+X-Original-To: incoming@patchwork.ozlabs.org
+Delivered-To: patchwork-incoming@legolas.ozlabs.org
+Authentication-Results: legolas.ozlabs.org;
+	dkim=pass (2048-bit key;
+ unprotected) header.d=collabora.com header.i=@collabora.com
+ header.a=rsa-sha256 header.s=mail header.b=hgX6o5vZ;
+	dkim-atps=neutral
+Authentication-Results: legolas.ozlabs.org;
+ spf=pass (sender SPF authorized) smtp.mailfrom=lists.denx.de
+ (client-ip=2a01:238:438b:c500:173d:9f52:ddab:ee01; helo=phobos.denx.de;
+ envelope-from=u-boot-bounces@lists.denx.de; receiver=patchwork.ozlabs.org)
+Received: from phobos.denx.de (phobos.denx.de
+ [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (secp384r1))
+	(No client certificate requested)
+	by legolas.ozlabs.org (Postfix) with ESMTPS id 4Z33MJ5sFGz1yCp
+	for <incoming@patchwork.ozlabs.org>; Thu, 27 Feb 2025 05:45:48 +1100 (AEDT)
+Received: from h2850616.stratoserver.net (localhost [IPv6:::1])
+	by phobos.denx.de (Postfix) with ESMTP id 69A29811C5;
+	Wed, 26 Feb 2025 19:45:17 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=u-boot-bounces@lists.denx.de
+Authentication-Results: phobos.denx.de;
+	dkim=pass (2048-bit key;
+ unprotected) header.d=collabora.com header.i=@collabora.com
+ header.b="hgX6o5vZ";
+	dkim-atps=neutral
+Received: by phobos.denx.de (Postfix, from userid 109)
+ id 832B180FB9; Wed, 26 Feb 2025 19:45:14 +0100 (CET)
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on phobos.denx.de
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+ DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+ RCVD_IN_VALIDITY_RPBL_BLOCKED,RCVD_IN_VALIDITY_SAFE_BLOCKED,
+ SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.2
+Received: from bali.collaboradmins.com (bali.collaboradmins.com
+ [148.251.105.195])
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+ (No client certificate requested)
+ by phobos.denx.de (Postfix) with ESMTPS id 2178380FF0
+ for <u-boot@lists.denx.de>; Wed, 26 Feb 2025 19:45:08 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=sebastian.reichel@collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+ s=mail; t=1740595507;
+ bh=H/gQCZCWVmLNRIaBLvWsE35SaDMWvta2+rTkymkHQJE=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=hgX6o5vZwM72CR2hgo76tgo2eE00qHM7oNja381ACl8gIUUVioy8RTeqXtum89tBf
+ aIwKm/oNQNvGxy92pX5/1Jg/MwYZKS8jDukz6ZgsLKu22rJXf58FFoV095AcEkUMB2
+ lrO4KJgFW/x1FK8GmSVSXXH+iUYJLkzsfZKgHKoQYHZcVXJRgFjHR5ytGKsA/fq4el
+ 7Wrx3lmLNjL7fYlDF5AyY+Wl6hqzjDq58nFedXHv8TEHx6fzfB0IBzOL/F8bGqVcyy
+ lal7bjJvMPoA9zfgIC77R1neWktg5FSro75YciSRSj9lmMNCmESnSPCgsZ4wBW0V6f
+ ppD77gOtjDfLQ==
+Received: from jupiter.universe (dyndsl-091-249-076-032.ewe-ip-backbone.de
+ [91.249.76.32])
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+ key-exchange X25519 server-signature RSA-PSS (4096 bits))
+ (No client certificate requested) (Authenticated sender: sre)
+ by bali.collaboradmins.com (Postfix) with ESMTPSA id 9725D17E087F;
+ Wed, 26 Feb 2025 19:45:07 +0100 (CET)
+Received: by jupiter.universe (Postfix, from userid 1000)
+ id 34511480037; Wed, 26 Feb 2025 19:45:07 +0100 (CET)
+From: Sebastian Reichel <sebastian.reichel@collabora.com>
+To: Marek Vasut <marex@denx.de>, u-boot@lists.denx.de,
+ Jonas Karlman <jonas@kwiboo.se>, Soeren Moch <smoch@web.de>
+Cc: Tim Harvey <tharvey@gateworks.com>,
+ Philipp Tomsich <philipp.tomsich@vrull.eu>,
+ Anand Moon <linux.amoon@gmail.com>, Maxim Kiselev <bigunclemax@gmail.com>,
+ Sebastian Reichel <sebastian.reichel@collabora.com>
+Subject: [PATCH v2 2/4] usb: tcpm: avoid resets for missing source capability
+ messages
+Date: Wed, 26 Feb 2025 19:44:45 +0100
+Message-ID: <20250226184506.64114-3-sebastian.reichel@collabora.com>
+X-Mailer: git-send-email 2.47.2
+In-Reply-To: <20250226184506.64114-1-sebastian.reichel@collabora.com>
+References: <20250226184506.64114-1-sebastian.reichel@collabora.com>
+MIME-Version: 1.0
+X-BeenThere: u-boot@lists.denx.de
+X-Mailman-Version: 2.1.39
+Precedence: list
+List-Id: U-Boot discussion <u-boot.lists.denx.de>
+List-Unsubscribe: <https://lists.denx.de/options/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=unsubscribe>
+List-Archive: <https://lists.denx.de/pipermail/u-boot/>
+List-Post: <mailto:u-boot@lists.denx.de>
+List-Help: <mailto:u-boot-request@lists.denx.de?subject=help>
+List-Subscribe: <https://lists.denx.de/listinfo/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=subscribe>
+Errors-To: u-boot-bounces@lists.denx.de
+Sender: "U-Boot" <u-boot-bounces@lists.denx.de>
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+
+The current TCPM code implements source capability message handling
+according to the USB-PD specification. Unfortunately some USB PD
+sources do not properly follow the specification and do not send
+source capability messages after a soft reset when they already
+negotiated a specific contract before. The currently implemented way
+(and what is described in the specificiation) to resolve this problem
+is triggering a hard reset.
+
+But a hard reset is fatal on batteryless platforms powered via USB-C PD,
+since that removes VBUS for some time. Since this is triggered at boot
+time, the system may get stuck in a boot loop.
+
+For example I noticed the following behaviour on a Radxa Rock 5B
+combined with an affected power-supply:
+
+1. The system is booted up with current code
+2. A reboot is requested
+3. U-Boot TCPM / fusb302 driver sends soft reset and waits for the
+   source capability message
+4. No new source capability message is send by the power-supply
+   after the soft reset
+5. U-Boot sends a hard reset
+6. The board resets, but the fusb302 registers are not reset. This
+   is because of a hardware glitch. The serial pins are high when
+   no data is exchanged. Apparently the RK3588 has protection diodes,
+   which leak some voltage into the power-domain. The Rock 5B serial
+   pins and the fusb302 are using the same 3.3V power domain and the
+   leaked voltage is enough to keep the fusb302 registers alive.
+7. After the hard reset the power-supply sends another source capability
+   message, which is auto-acked by fusb302 (because the register state
+   is kept) even though the U-Boot driver has not yet probed. Once the
+   U-Boot driver probes it sends another soft reset and waits for a new
+   source capability message, which never arrives.
+
+Fortunately the affected power-supplies (I have two setups showing this
+behaviour) support sending a source capability message when explicitly
+being asked. Thus an easy workaround to handle this is deviating from
+the USB-PD specification and sending a Get_Source_Cap message and
+waiting some time longer before doing the hard reset.
+
+Note, that I recently added the same workaround to the Linux kernel
+with a slightly different rationale (since it needs to take over from
+U-Boot).
+
+Fixes: 1db4c0ac77e3 ("usb: tcpm: add core framework")
+Signed-off-by: Sebastian Reichel <sebastian.reichel@collabora.com>
+---
+ drivers/usb/tcpm/tcpm-internal.h |  1 +
+ drivers/usb/tcpm/tcpm.c          | 32 +++++++++++++++++++++++++++++---
+ 2 files changed, 30 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/usb/tcpm/tcpm-internal.h b/drivers/usb/tcpm/tcpm-internal.h
+index 561442090027..4861f4d13866 100644
+--- a/drivers/usb/tcpm/tcpm-internal.h
++++ b/drivers/usb/tcpm/tcpm-internal.h
+@@ -30,6 +30,7 @@
+ 	S(SNK_DISCOVERY_DEBOUNCE),		\
+ 	S(SNK_DISCOVERY_DEBOUNCE_DONE),		\
+ 	S(SNK_WAIT_CAPABILITIES),		\
++	S(SNK_WAIT_CAPABILITIES_TIMEOUT),	\
+ 	S(SNK_NEGOTIATE_CAPABILITIES),		\
+ 	S(SNK_TRANSITION_SINK),			\
+ 	S(SNK_TRANSITION_SINK_VBUS),		\
+diff --git a/drivers/usb/tcpm/tcpm.c b/drivers/usb/tcpm/tcpm.c
+index b754b4dcd0b5..786d92fa4c6f 100644
+--- a/drivers/usb/tcpm/tcpm.c
++++ b/drivers/usb/tcpm/tcpm.c
+@@ -1424,7 +1424,8 @@ static inline enum tcpm_state hard_reset_state(struct tcpm_port *port)
+ 		return ERROR_RECOVERY;
+ 	if (port->pwr_role == TYPEC_SOURCE)
+ 		return SRC_UNATTACHED;
+-	if (port->state == SNK_WAIT_CAPABILITIES)
++	if (port->state == SNK_WAIT_CAPABILITIES ||
++	    port->state == SNK_WAIT_CAPABILITIES_TIMEOUT)
+ 		return SNK_READY;
+ 	return SNK_UNATTACHED;
+ }
+@@ -1650,10 +1651,35 @@ static void run_state_machine(struct udevice *dev)
+ 			tcpm_set_state(dev, SOFT_RESET_SEND,
+ 				       PD_T_SINK_WAIT_CAP);
+ 		} else {
+-			tcpm_set_state(dev, hard_reset_state(port),
+-				       PD_T_SINK_WAIT_CAP);
++			if (!port->self_powered)
++				tcpm_set_state(dev, SNK_WAIT_CAPABILITIES_TIMEOUT,
++					       PD_T_SINK_WAIT_CAP);
++			else
++				tcpm_set_state(dev, hard_reset_state(port),
++					       PD_T_SINK_WAIT_CAP);
+ 		}
+ 		break;
++	case SNK_WAIT_CAPABILITIES_TIMEOUT:
++		/*
++		 * There are some USB PD sources in the field, which do not
++		 * properly implement the specification and fail to start
++		 * sending Source Capability messages after a soft reset. The
++		 * specification suggests to do a hard reset when no Source
++		 * capability message is received within PD_T_SINK_WAIT_CAP,
++		 * but that might effectively kil the machine's power source.
++		 *
++		 * This slightly diverges from the specification and tries to
++		 * recover from this by explicitly asking for the capabilities
++		 * using the Get_Source_Cap control message before falling back
++		 * to a hard reset. The control message should also be supported
++		 * and handled by all USB PD source and dual role devices
++		 * according to the specification.
++		 */
++		if (tcpm_pd_send_control(dev, PD_CTRL_GET_SOURCE_CAP))
++			tcpm_set_state_cond(dev, hard_reset_state(port), 0);
++		else
++			tcpm_set_state(dev, hard_reset_state(port), PD_T_SINK_WAIT_CAP);
++		break;
+ 	case SNK_NEGOTIATE_CAPABILITIES:
+ 		port->pd_capable = true;
+ 		port->hard_reset_count = 0;
+
+From patchwork Wed Feb 26 18:44:46 2025
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Sebastian Reichel <sebastian.reichel@collabora.com>
+X-Patchwork-Id: 2052545
+X-Patchwork-Delegate: marek.vasut@gmail.com
+Return-Path: <u-boot-bounces@lists.denx.de>
+X-Original-To: incoming@patchwork.ozlabs.org
+Delivered-To: patchwork-incoming@legolas.ozlabs.org
+Authentication-Results: legolas.ozlabs.org;
+	dkim=pass (2048-bit key;
+ unprotected) header.d=collabora.com header.i=@collabora.com
+ header.a=rsa-sha256 header.s=mail header.b=BxTv7Lfo;
+	dkim-atps=neutral
+Authentication-Results: legolas.ozlabs.org;
+ spf=pass (sender SPF authorized) smtp.mailfrom=lists.denx.de
+ (client-ip=85.214.62.61; helo=phobos.denx.de;
+ envelope-from=u-boot-bounces@lists.denx.de; receiver=patchwork.ozlabs.org)
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (secp384r1) server-digest SHA384)
+	(No client certificate requested)
+	by legolas.ozlabs.org (Postfix) with ESMTPS id 4Z33M971h7z1yCp
+	for <incoming@patchwork.ozlabs.org>; Thu, 27 Feb 2025 05:45:41 +1100 (AEDT)
+Received: from h2850616.stratoserver.net (localhost [IPv6:::1])
+	by phobos.denx.de (Postfix) with ESMTP id 1B09C8118B;
+	Wed, 26 Feb 2025 19:45:17 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=u-boot-bounces@lists.denx.de
+Authentication-Results: phobos.denx.de;
+	dkim=pass (2048-bit key;
+ unprotected) header.d=collabora.com header.i=@collabora.com
+ header.b="BxTv7Lfo";
+	dkim-atps=neutral
+Received: by phobos.denx.de (Postfix, from userid 109)
+ id 4399E810F9; Wed, 26 Feb 2025 19:45:14 +0100 (CET)
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on phobos.denx.de
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+ DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+ SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.2
+Received: from bali.collaboradmins.com (bali.collaboradmins.com
+ [IPv6:2a01:4f8:201:9162::2])
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+ (No client certificate requested)
+ by phobos.denx.de (Postfix) with ESMTPS id 2163F80FB9
+ for <u-boot@lists.denx.de>; Wed, 26 Feb 2025 19:45:08 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=sebastian.reichel@collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+ s=mail; t=1740595507;
+ bh=7OaDpd2idE5ETWAiOZte0kuOU6ZYitEVWkDgDmqaQU8=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=BxTv7LfoAae43YSXPquVPmmwStgQirXCxaSBD0fo554R5O/si/Iif5L+zXXJocATJ
+ z7+I7ZKbknkTeVyzoRDCXvXIVz2bFdTRWQN4Z2iwJbVI1covAv/Gn4wIE2Q6hbNKbU
+ qV5AKg7gvrKkbztbo7N9bHNjkrlAbd8B4Ew3SR8FM46DMAOwNzVsoX3rLMcPtlWzHj
+ 4OBKCx22H/4ASIWjMbYoDE09DyQ+CPOf8JcX8OPwFcH9j6vW6cEWvyjiAyDj6LnwOq
+ KD+ZYVIkWhkIzAkE2NHB2IpA4xlxW8i18BJzNBD8N1eBx/HCgb0camb4KanY1Hta/d
+ 4ipLyuFaCkMog==
+Received: from jupiter.universe (dyndsl-091-249-076-032.ewe-ip-backbone.de
+ [91.249.76.32])
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+ key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest
+ SHA256)
+ (No client certificate requested) (Authenticated sender: sre)
+ by bali.collaboradmins.com (Postfix) with ESMTPSA id 816AA17E0861;
+ Wed, 26 Feb 2025 19:45:07 +0100 (CET)
+Received: by jupiter.universe (Postfix, from userid 1000)
+ id 361F2480038; Wed, 26 Feb 2025 19:45:07 +0100 (CET)
+From: Sebastian Reichel <sebastian.reichel@collabora.com>
+To: Marek Vasut <marex@denx.de>, u-boot@lists.denx.de,
+ Jonas Karlman <jonas@kwiboo.se>, Soeren Moch <smoch@web.de>
+Cc: Tim Harvey <tharvey@gateworks.com>,
+ Philipp Tomsich <philipp.tomsich@vrull.eu>,
+ Anand Moon <linux.amoon@gmail.com>, Maxim Kiselev <bigunclemax@gmail.com>,
+ Sebastian Reichel <sebastian.reichel@collabora.com>
+Subject: [PATCH v2 3/4] usb: tcpm: print error on hard reset
+Date: Wed, 26 Feb 2025 19:44:46 +0100
+Message-ID: <20250226184506.64114-4-sebastian.reichel@collabora.com>
+X-Mailer: git-send-email 2.47.2
+In-Reply-To: <20250226184506.64114-1-sebastian.reichel@collabora.com>
+References: <20250226184506.64114-1-sebastian.reichel@collabora.com>
+MIME-Version: 1.0
+X-BeenThere: u-boot@lists.denx.de
+X-Mailman-Version: 2.1.39
+Precedence: list
+List-Id: U-Boot discussion <u-boot.lists.denx.de>
+List-Unsubscribe: <https://lists.denx.de/options/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=unsubscribe>
+List-Archive: <https://lists.denx.de/pipermail/u-boot/>
+List-Post: <mailto:u-boot@lists.denx.de>
+List-Help: <mailto:u-boot-request@lists.denx.de?subject=help>
+List-Subscribe: <https://lists.denx.de/listinfo/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=subscribe>
+Errors-To: u-boot-bounces@lists.denx.de
+Sender: "U-Boot" <u-boot-bounces@lists.denx.de>
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+
+A USB-PD hard reset involves removing the voltage from VBUS for some
+time. So basically it has the same effect as removing the USB-C plug
+for a short moment. If the machine is powered from the USB-C port and
+does not have a fallback supply (e.g. a battery), this will result in
+a full machine reset due to power loss.
+
+Ideally we want to avoid triggering a hard reset on these boards. A
+non-working USB-C port is probably better than unplanned reboots. But
+boards with a backup supply should do the hard reset to get everything
+working again.
+
+In theory it would be enough to check the self_powered property, but
+it seems the property might not be configured consistently enough in
+system firmwares.
+
+USB-PD hard resets should happen rarely in general, so let's at least
+print an error message before the potential board reset happens. This
+is also useful, since it immediately gives away which device triggered
+the hard reset.
+
+Fixes: 1db4c0ac77e3 ("usb: tcpm: add core framework")
+Signed-off-by: Sebastian Reichel <sebastian.reichel@collabora.com>
+---
+ drivers/usb/tcpm/tcpm.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/usb/tcpm/tcpm.c b/drivers/usb/tcpm/tcpm.c
+index 786d92fa4c6f..909fe2ef4fcb 100644
+--- a/drivers/usb/tcpm/tcpm.c
++++ b/drivers/usb/tcpm/tcpm.c
+@@ -1711,6 +1711,8 @@ static void run_state_machine(struct udevice *dev)
+ 
+ 	/* Hard_Reset states */
+ 	case HARD_RESET_SEND:
++		if (!port->self_powered && port->port_type == TYPEC_PORT_SNK)
++			dev_err(dev, "Initiating hard-reset, which might result in machine power-loss.\n");
+ 		tcpm_pd_transmit(dev, TCPC_TX_HARD_RESET, NULL);
+ 		tcpm_set_state(dev, HARD_RESET_START, 0);
+ 		port->wait_dr_swap_message = false;
+
+From patchwork Wed Feb 26 18:44:47 2025
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Sebastian Reichel <sebastian.reichel@collabora.com>
+X-Patchwork-Id: 2052542
+X-Patchwork-Delegate: marek.vasut@gmail.com
+Return-Path: <u-boot-bounces@lists.denx.de>
+X-Original-To: incoming@patchwork.ozlabs.org
+Delivered-To: patchwork-incoming@legolas.ozlabs.org
+Authentication-Results: legolas.ozlabs.org;
+	dkim=pass (2048-bit key;
+ unprotected) header.d=collabora.com header.i=@collabora.com
+ header.a=rsa-sha256 header.s=mail header.b=K4mNmlOy;
+	dkim-atps=neutral
+Authentication-Results: legolas.ozlabs.org;
+ spf=pass (sender SPF authorized) smtp.mailfrom=lists.denx.de
+ (client-ip=2a01:238:438b:c500:173d:9f52:ddab:ee01; helo=phobos.denx.de;
+ envelope-from=u-boot-bounces@lists.denx.de; receiver=patchwork.ozlabs.org)
+Received: from phobos.denx.de (phobos.denx.de
+ [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (secp384r1))
+	(No client certificate requested)
+	by legolas.ozlabs.org (Postfix) with ESMTPS id 4Z33Lk40FPz1yCp
+	for <incoming@patchwork.ozlabs.org>; Thu, 27 Feb 2025 05:45:18 +1100 (AEDT)
+Received: from h2850616.stratoserver.net (localhost [IPv6:::1])
+	by phobos.denx.de (Postfix) with ESMTP id DAFC780FF2;
+	Wed, 26 Feb 2025 19:45:12 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=u-boot-bounces@lists.denx.de
+Authentication-Results: phobos.denx.de;
+	dkim=pass (2048-bit key;
+ unprotected) header.d=collabora.com header.i=@collabora.com
+ header.b="K4mNmlOy";
+	dkim-atps=neutral
+Received: by phobos.denx.de (Postfix, from userid 109)
+ id 56A22810F9; Wed, 26 Feb 2025 19:45:11 +0100 (CET)
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on phobos.denx.de
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+ DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+ SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.2
+Received: from bali.collaboradmins.com (bali.collaboradmins.com
+ [IPv6:2a01:4f8:201:9162::2])
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+ (No client certificate requested)
+ by phobos.denx.de (Postfix) with ESMTPS id 217E080FF2
+ for <u-boot@lists.denx.de>; Wed, 26 Feb 2025 19:45:08 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=sebastian.reichel@collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+ s=mail; t=1740595507;
+ bh=FeXZr6pfjIqGXvnsLHDigD702EmgVNH91IWVsD16udQ=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=K4mNmlOycXzLuJnNeDxyXLVCeZWNr//ycRqDt3ld9634ThDvJ0+y49X3z2nYW+fei
+ HCqH2AoFiXj7khjiFpwCA4xOlYaTrF9yb0M9ApRxJ8vGuslNIK2k9osj8IJMoWmY8S
+ fEez4H6Wso4VamCnXKCze2G5np5mhola5QxSnIJ2CXdFP9TM1x54P+XyeJMX6IZK0X
+ lpZ0R8mACHGgXnkBASRMbo0CnLfSVrUgA83A0FHT7UgxfW8399wHol/FBakg5WS8nt
+ 47154TDW4ikoGF4dHBeD0KemJSR7I4F+nnUVQfgg8sXZKVm4yilBT+yx3WWBVCjQDl
+ 3igqfexnaUKnA==
+Received: from jupiter.universe (dyndsl-091-249-076-032.ewe-ip-backbone.de
+ [91.249.76.32])
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+ key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest
+ SHA256)
+ (No client certificate requested) (Authenticated sender: sre)
+ by bali.collaboradmins.com (Postfix) with ESMTPSA id 7FBB317E065A;
+ Wed, 26 Feb 2025 19:45:07 +0100 (CET)
+Received: by jupiter.universe (Postfix, from userid 1000)
+ id 37B6A480039; Wed, 26 Feb 2025 19:45:07 +0100 (CET)
+From: Sebastian Reichel <sebastian.reichel@collabora.com>
+To: Marek Vasut <marex@denx.de>, u-boot@lists.denx.de,
+ Jonas Karlman <jonas@kwiboo.se>, Soeren Moch <smoch@web.de>
+Cc: Tim Harvey <tharvey@gateworks.com>,
+ Philipp Tomsich <philipp.tomsich@vrull.eu>,
+ Anand Moon <linux.amoon@gmail.com>, Maxim Kiselev <bigunclemax@gmail.com>,
+ Sebastian Reichel <sebastian.reichel@collabora.com>
+Subject: [PATCH v2 4/4] usb: tcpm: improve data role mismatch error recovery
+Date: Wed, 26 Feb 2025 19:44:47 +0100
+Message-ID: <20250226184506.64114-5-sebastian.reichel@collabora.com>
+X-Mailer: git-send-email 2.47.2
+In-Reply-To: <20250226184506.64114-1-sebastian.reichel@collabora.com>
+References: <20250226184506.64114-1-sebastian.reichel@collabora.com>
+MIME-Version: 1.0
+X-BeenThere: u-boot@lists.denx.de
+X-Mailman-Version: 2.1.39
+Precedence: list
+List-Id: U-Boot discussion <u-boot.lists.denx.de>
+List-Unsubscribe: <https://lists.denx.de/options/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=unsubscribe>
+List-Archive: <https://lists.denx.de/pipermail/u-boot/>
+List-Post: <mailto:u-boot@lists.denx.de>
+List-Help: <mailto:u-boot-request@lists.denx.de?subject=help>
+List-Subscribe: <https://lists.denx.de/listinfo/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=subscribe>
+Errors-To: u-boot-bounces@lists.denx.de
+Sender: "U-Boot" <u-boot-bounces@lists.denx.de>
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+
+On Radxa ROCK 5B I managed to get U-Boot into an endless loop of
+printing
+
+fusb302 usb-typec@22: TCPM: data role mismatch, initiating error recovery
+
+messages by changing the data role in Linux and then rebooting the
+system. This is happening because the external device (A cheap USB-C hub
+powered through a USB-C PD power-supply) kept its state and the error
+recovery path for non self-powered devices is not enough to change it.
+
+Avoid this by swapping our own data role when the error recovery stage
+is reached for a port, which is not self-powered. Right now data support
+is limited anyways and once proper support is added we can use the data
+role swap request to get the desired data direction after the initial
+negotiation completed.
+
+Fixes: 1db4c0ac77e3 ("usb: tcpm: add core framework")
+Signed-off-by: Sebastian Reichel <sebastian.reichel@collabora.com>
+---
+ drivers/usb/tcpm/tcpm.c | 30 +++++++++++++++++++++++++++---
+ 1 file changed, 27 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/usb/tcpm/tcpm.c b/drivers/usb/tcpm/tcpm.c
+index 909fe2ef4fcb..12d66d470f9a 100644
+--- a/drivers/usb/tcpm/tcpm.c
++++ b/drivers/usb/tcpm/tcpm.c
+@@ -833,6 +833,28 @@ static void tcpm_pd_ctrl_request(struct udevice *dev,
+ 	}
+ }
+ 
++static void tcpm_recover_data_role_mismatch(struct udevice *dev)
++{
++	struct tcpm_port *port = dev_get_uclass_plat(dev);
++
++	dev_err(dev, "TCPM: data role mismatch, initiating error recovery\n");
++	if (port->self_powered) {
++		tcpm_set_state(dev, ERROR_RECOVERY, 0);
++		return;
++	}
++
++	/*
++	 * The error recovery will not help for devices, which are not
++	 * self-powered because the error recovery avoids killing the board
++	 * power. Since this can happen early on sending
++	 * a DR_SWAP request is not sensible. Instead let's change our own
++	 * data role. It can be swapped back once USB-PD reached the ready
++	 * state.
++	 */
++	tcpm_set_roles(dev, true, port->pwr_role,
++		       port->data_role == TYPEC_HOST ? TYPEC_DEVICE : TYPEC_HOST);
++}
++
+ static void tcpm_pd_rx_handler(struct udevice *dev,
+ 			       const struct pd_message *msg)
+ {
+@@ -867,9 +889,11 @@ static void tcpm_pd_rx_handler(struct udevice *dev,
+ 		remote_is_host = !!(le16_to_cpu(msg->header) & PD_HEADER_DATA_ROLE);
+ 		local_is_host = port->data_role == TYPEC_HOST;
+ 		if (remote_is_host == local_is_host) {
+-			dev_err(dev, "TCPM: data role mismatch, initiating error recovery\n");
+-			tcpm_set_state(dev, ERROR_RECOVERY, 0);
+-		} else {
++			tcpm_recover_data_role_mismatch(dev);
++			local_is_host = port->data_role == TYPEC_HOST;
++		}
++
++		if (remote_is_host != local_is_host) {
+ 			if (cnt)
+ 				tcpm_pd_data_request(dev, msg);
+ 			else

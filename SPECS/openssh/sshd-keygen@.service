@@ -1,0 +1,14 @@
+[Unit]
+Description=OpenSSH %i Server Key Generation
+ConditionFileNotEmpty=|!/etc/ssh/ssh_host_%i_key
+
+[Service]
+Type=oneshot
+# Set option as empty variable to suppress warnings upon expanding the command line
+# when the config file under /etc does not exist or is empty.
+Environment=OPTIONS=
+EnvironmentFile=-/etc/sysconfig/sshd
+ExecStart=/usr/libexec/openssh/sshd-keygen %i
+
+[Install]
+WantedBy=sshd-keygen.target

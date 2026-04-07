@@ -1,0 +1,3 @@
+[org.gnome.login-screen]
+logo='/usr/share/pixmaps/fedora-gdm-logo.png'
+enable-smartcard-authentication=false

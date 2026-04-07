@@ -1,0 +1,11 @@
+--- autoconf-2.13/acspecific.m4.sopwith	Mon Feb 25 18:05:39 2002
++++ autoconf-2.13/acspecific.m4	Mon Feb 25 18:18:35 2002
+@@ -1419,6 +1419,8 @@
+   r.ru_majflt = r.ru_minflt = 0;
+   switch (fork()) {
+   case 0: /* Child.  */
++    /* Unless we actually _do_ something, the kernel sometimes doesn't chalk up any system time to this process. */
++    if(fork()) { i = 123; wait(NULL); } else { i = 234; exit(0); }
+     sleep(1); /* Give up the CPU.  */
+     _exit(0);
+   case -1: _exit(0); /* What can we do?  */

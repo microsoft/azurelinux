@@ -1,0 +1,108 @@
+#!/usr/bin/bash
+#
+# Manage memtest86+ install location and bootloader config.
+# Currently only manages GRUB with BLS support enabled.
+#
+
+# Sanity Checks
+if ! [[ $KERNEL_INSTALL_MACHINE_ID ]]; then
+    exit 0
+fi
+if ! [[ $KERNEL_INSTALL_BOOT_ROOT ]]; then
+    exit 0
+fi
+
+# Setup variables
+[[ -f /etc/default/grub ]] && . /etc/default/grub
+[[ -f /etc/os-release ]] && . /etc/os-release
+
+COMMAND="$1"
+MEMTEST_VERSION="$2"
+BOOT_DIR_ABS="$3"
+MEMTEST_IMAGE="$4"
+
+MEMTEST_DIR="${MEMTEST_IMAGE%/*}"
+BOOT_ROOT="${KERNEL_INSTALL_BOOT_ROOT}"
+MACHINE_ID="${KERNEL_INSTALL_MACHINE_ID}"
+BLS_DIR="${BOOT_ROOT}/loader/entries"
+# Fail back to /boot default if BLS_DIR
+# doesn't exist already, matching 20-grub.install
+if [[ ! -d "${BLS_DIR}" ]]; then
+    BOOT_ROOT="/boot"
+    BLS_DIR="/boot/loader/entries"
+fi
+BLS_ENTRY="${BLS_DIR}/${MACHINE_ID}-0-memtest86+.conf"
+
+# Setup functions
+mkbls_grub() {
+    local memtestver=$1 && shift
+    local memtestimg=$1 && shift
+
+    cat <<EOF
+title Memory test (${memtestimg})
+version 0-${memtestver}-memtest86+
+linux /${memtestimg}
+grub_users \$grub_users
+grub_arg --unrestricted
+grub_class memtest
+EOF
+}
+
+# If ${BOOT_DIR_ABS} exists, non-grub boot loader is active.
+[[ -d "${BOOT_DIR_ABS}" ]] && exit 0
+
+case "$COMMAND" in
+    add)
+	# Install into BOOT_ROOT, if not already there
+        if [[ "${MEMTEST_DIR}" != "${BOOT_ROOT}" ]]; then
+            for i in \
+                "$MEMTEST_IMAGE"
+            do
+                [[ -e "$i" ]] || continue
+                rm -f "${BOOT_ROOT}/${i##*/}"
+                cp -aT "$i" "${BOOT_ROOT}/${i##*/}"
+                command -v restorecon &>/dev/null && \
+                    restorecon -R "${BOOT_ROOT}/${i##*/}"
+            done
+        fi
+
+	# Generate GRUB BLS, if enabled
+        if [[ "x${GRUB_ENABLE_BLSCFG}" = "xtrue" ]]; then
+            [[ -d "$BLS_DIR" ]] || mkdir -m 0700 -p "$BLS_DIR"
+            mkbls_grub "${MEMTEST_VERSION}" "${MEMTEST_IMAGE##*/}" > "${BLS_ENTRY}"
+            command -v restorecon &>/dev/null && restorecon -R "${BLS_ENTRY}"
+
+            MEMTEST_LOC="$(grep '^linux[ \t]' "${BLS_ENTRY}" | sed -e 's,^linux[ \t]*,,')"
+            if [[ "$(grub2-probe --device $(grub2-probe --target=device /) --target=fs)" == "btrfs" &&
+		      "${SUSE_BTRFS_SNAPSHOT_BOOTING}" == "true" ]]; then
+                MEMTEST_RELPATH="$(grub2-mkrelpath -r ${BOOT_ROOT}${MEMTEST_LOC})"
+            else
+                MEMTEST_RELPATH="$(grub2-mkrelpath ${BOOT_ROOT}${MEMTEST_LOC})"
+            fi
+
+            BOOTPREFIX="$(dirname ${MEMTEST_RELPATH})"
+
+            if [[ "${MEMTEST_LOC}" != "${MEMTEST_RELPATH}" ]]; then
+                sed -i -e "s,^linux.*,linux ${BOOTPREFIX}${MEMTEST_LOC},g" "${BLS_ENTRY}"
+            fi
+
+            exit 77
+        fi
+        ;;
+    remove)
+        # Find MEMTEST_IMAGE location in BLS_ENTRY, delete both MEMTEST_IMAGE and BLS_ENTRY
+        if [[ "x${GRUB_ENABLE_BLSCFG}" = "xtrue" ]]; then
+	    if [[ -f "${BLS_ENTRY}" ]]; then
+	            MEMTEST_IMAGE="$(grep '^linux[ \t]' "${BLS_ENTRY}" | sed -e 's,^linux[ \t]*,,')"
+	            if [[ -f "${BOOT_ROOT}${MEMTEST_IMAGE}" ]]; then
+	                    rm -f "${BOOT_ROOT}${MEMTEST_IMAGE}"
+                    fi
+                    rm -f "${BLS_ENTRY}"
+            fi
+
+            exit 77
+        fi
+        ;;
+    *)
+        ;;
+esac

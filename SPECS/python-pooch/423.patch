@@ -1,0 +1,27 @@
+From 96bd5437947320d804e12047638dc333cf83c1f9 Mon Sep 17 00:00:00 2001
+From: Sandro <devel@penguinpee.nl>
+Date: Sat, 8 Jun 2024 11:26:23 +0200
+Subject: [PATCH] Exclude doc/ from wheel
+
+The automatic discovery adds doc/ to the wheel triggered by the
+presence of `conf.py` in that directory.
+---
+ pyproject.toml | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 1bfb3adb..997aa77f 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -45,8 +45,9 @@ xxhash = ["xxhash>=1.4.3"]
+ "Bug Tracker" = "https://github.com/fatiando/pooch/issues"
+ "Source Code" = "https://github.com/fatiando/pooch"
+ 
+-[tool.setuptools.packages]
+-find = {}  # Scanning implicit namespaces is active by default
++[tool.setuptools.packages.find]
++# Scanning implicit namespaces is active by default
++exclude = ["doc*"]
+ 
+ [tool.setuptools.package-data]
+ "pooch.tests.data" = ["*.txt", "*.zip", "*.gz", "*.xz", "*.bz2"]

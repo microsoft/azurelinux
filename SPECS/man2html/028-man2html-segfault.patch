@@ -1,0 +1,86 @@
+From: Robert Luberda <robert@debian.org>
+Date: Mon, 23 Apr 2007 20:10:47 +0200
+Subject: 028 man2html segfault
+
+Fix segfault when viewing groff(7) page.
+---
+ man2html/man2html.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
+
+diff --git a/man2html/man2html.c b/man2html/man2html.c
+index ae0d2d7..beb3494 100644
+--- a/man2html/man2html.c
++++ b/man2html/man2html.c
+@@ -1673,7 +1673,7 @@ scan_request(char *c) {
+ 
+     int i,j,mode = 0;
+     char *h;
+-    char *wordlist[20];
++    char *wordlist[30];
+     int words;
+     char *sl;
+     LONGSTRDEF *owndef;
+@@ -1713,7 +1713,7 @@ scan_request(char *c) {
+ 		    if (mandoc_command)
+ 			 scan_troff_mandoc(wordlist[i],1,&h);
+ 		    else
+-			 scan_troff(wordlist[i],1,&h);
++			 scan_troff(wordlist[i],2,&h);
+ 		    wordlist[i]=h;
+ 		}
+ 		for (i=words; i<SIZE(wordlist); i++)
+@@ -1731,6 +1731,7 @@ scan_request(char *c) {
+ 		newline_for_fun=onff;
+ 		argument=oldargument;
+ 		for (i=0; i<words; i++) if (wordlist[i]) free(wordlist[i]);
++		owndef->st[deflen+1]=0;
+ 		*sl='\n';
+ 	} else switch (i) {
+ 	case V('a','b'):
+@@ -2426,12 +2427,13 @@ scan_request(char *c) {
+ 		    j=3;
+ 		}
+ 		c=sl+1;
++		*sl=0;
+ 		sl=c;
+ 		while (*c && strncmp(c,wordlist[1],j)) c=skip_till_newline(c);
+ 		de = find_longstrdef(defdef, i, longname, &longname); 
+ 		if (mode && de) olen=strlen(de->st);
+ 		j=olen+c-sl;
+-		h= (char*) xmalloc((j*2+4)*sizeof(char));
++		h= (char*) xmalloc((j*2+5)*sizeof(char));
+ 		if (h) {
+ 		    for (j=0; j<olen; j++)
+ 			h[j]=de->st[j];
+@@ -2452,6 +2454,7 @@ scan_request(char *c) {
+ 			de = (LONGSTRDEF*) xmalloc(sizeof(LONGSTRDEF));
+ 			de->nr=i;
+ 			de->longname=longname;
++			de->slen=0;
+ 			de->next=defdef;
+ 			de->st=h;
+ 			defdef=de;
+@@ -2997,12 +3000,12 @@ scan_troff(char *c, int san, char **result) {   /* san : stop at newline */
+ 	    h++;
+ 	    FLUSHIBP;
+ 	    h = scan_escape(h);
+-	} else if (*h == controlsym && h[-1] == '\n') {
++	} else if (san != 2 && *h == controlsym && h[-1] == '\n') {
+ 	    h++;
+ 	    FLUSHIBP;
+ 	    h = scan_request(h);
+ 	    if (san && h[-1] == '\n') h--;
+-	} else if (mandoc_line
++	} else if (san != 2 && mandoc_line
+ 		   && *(h) && isupper(*(h))
+ 		   && *(h+1) && islower(*(h+1))
+ 		   && *(h+2) && isspace(*(h+2))) {
+@@ -3010,7 +3013,7 @@ scan_troff(char *c, int san, char **result) {   /* san : stop at newline */
+ 	     FLUSHIBP;
+ 	     h = scan_request(h);
+ 	     if (san && h[-1] == '\n') h--;
+-	} else if (*h == nobreaksym && h[-1] == '\n') {
++	} else if (san != 2 && *h == nobreaksym && h[-1] == '\n') {
+ 	    h++;
+ 	    FLUSHIBP;
+ 	    h = scan_request(h);

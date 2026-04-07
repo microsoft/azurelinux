@@ -1,0 +1,14 @@
+diff -up qt-x11-free-3.3.8b/src/sql/drivers/psql/qsql_psql.cpp.me qt-x11-free-3.3.8b/src/sql/drivers/psql/qsql_psql.cpp
+--- qt-x11-free-3.3.8b/src/sql/drivers/psql/qsql_psql.cpp.me	2020-07-16 10:21:41.403226592 +0200
++++ qt-x11-free-3.3.8b/src/sql/drivers/psql/qsql_psql.cpp	2020-07-16 10:23:00.754291164 +0200
+@@ -147,8 +147,10 @@ static QVariant::Type qDecodePSQLType( i
+     case FLOAT8OID      :
+ 	type = QVariant::Double;
+ 	break;
++#ifdef ABSTIMEOID
+     case ABSTIMEOID     :
+     case RELTIMEOID     :
++#endif
+     case DATEOID	:
+ 	type = QVariant::Date;
+ 	break;

@@ -1,0 +1,45 @@
+Index: Cinnamon-3.6.6/files/etc/xdg/menus/cinnamon-applications.menu
+===================================================================
+--- Cinnamon-3.6.6.orig/files/etc/xdg/menus/cinnamon-applications.menu
++++ Cinnamon-3.6.6/files/etc/xdg/menus/cinnamon-applications.menu
+@@ -26,6 +26,8 @@
+ 	     applications here -->
+         <Not><Category>Accessibility</Category></Not>
+         <Not><Category>System</Category></Not>
++        <Not><Filename>org.gnome.Nautilus.desktop</Filename></Not>
++        <Not><Filename>yelp.desktop</Filename></Not>
+       </And>
+     </Include>
+   </Menu> <!-- End Accessories -->
+@@ -136,6 +139,9 @@
+         <Not><Category>Core</Category></Not>
+         <Not><Category>Settings</Category></Not>
+         <Not><Category>Screensaver</Category></Not>
++        <Not><Filename>onboard.desktop</Filename></Not>
++        <Not><Filename>redhat-usermount.desktop</Filename></Not>
++        <Not><Filename>fedora-release-notes.webapp.desktop</Filename></Not>
+       </And>
+     </Include>
+   </Menu> <!-- End Other -->
+@@ -158,6 +164,11 @@
+       <And>
+         <Category>Settings</Category>
+         <Not><Category>System</Category></Not>
++        <Not><Filename>onboard-settings.desktop</Filename></Not>
++        <Not><Filename>redhat-userinfo.desktop</Filename></Not>
++        <Not><Filename>redhat-userpasswd.desktop</Filename></Not>
++        <Not><Filename>system-config-users.desktop</Filename></Not>
++        <Not><Filename>xscreensaver-properties.desktop</Filename></Not>
+       </And>
+     </Include>
+   </Menu>
+@@ -176,6 +187,9 @@
+       <And>
+         <Category>System</Category>
+         <Not><Category>Settings</Category></Not>
++        <Not><Filename>redhat-usermount.desktop</Filename></Not>
++        <Not><Filename>system-config-users.desktop</Filename></Not>
++        <Not><Filename>fedora-release-notes.webapp.desktop</Filename></Not>
+       </And>
+     </Include>
+   </Menu>     <!-- End System Settings -->

@@ -1,0 +1,493 @@
+From ba274ea9e03b5e58ae34e130f5fd1ea1b80e7d66 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Zaoral?= <lzaoral@redhat.com>
+Date: Tue, 25 Mar 2025 15:16:29 +0100
+Subject: [PATCH 01/11] USB: move USB_PREFIX creation to a separate script
+
+---
+ .../rear/output/USB/Linux-i386/300_create_extlinux.sh    | 5 -----
+ usr/share/rear/output/USB/Linux-i386/300_create_grub.sh  | 9 ---------
+ .../rear/output/USB/default/200_make_usb_prefix_dir.sh   | 8 ++++++++
+ 3 files changed, 8 insertions(+), 14 deletions(-)
+ create mode 100644 usr/share/rear/output/USB/default/200_make_usb_prefix_dir.sh
+
+diff --git a/usr/share/rear/output/USB/Linux-i386/300_create_extlinux.sh b/usr/share/rear/output/USB/Linux-i386/300_create_extlinux.sh
+index 15193078d1..2582e2019e 100644
+--- a/usr/share/rear/output/USB/Linux-i386/300_create_extlinux.sh
++++ b/usr/share/rear/output/USB/Linux-i386/300_create_extlinux.sh
+@@ -98,11 +98,6 @@ case "$WORKFLOW" in
+     (*) BugError "Workflow $WORKFLOW should not run this script."
+ esac
+ 
+-USB_REAR_DIR="$BUILD_DIR/outputfs/$USB_PREFIX"
+-if [ ! -d "$USB_REAR_DIR" ]; then
+-    mkdir -p $v "$USB_REAR_DIR" >/dev/null || Error "Could not create USB ReaR dir [$USB_REAR_DIR] !"
+-fi
+-
+ # We generate a single syslinux.cfg for the current system
+ Log "Creating $USB_PREFIX/syslinux.cfg"
+ # FIXME: # type -a time
+diff --git a/usr/share/rear/output/USB/Linux-i386/300_create_grub.sh b/usr/share/rear/output/USB/Linux-i386/300_create_grub.sh
+index 511ccb470f..07170a887f 100644
+--- a/usr/share/rear/output/USB/Linux-i386/300_create_grub.sh
++++ b/usr/share/rear/output/USB/Linux-i386/300_create_grub.sh
+@@ -36,15 +36,6 @@ local grub_version
+ grub_version=$( $grub_install_binary --version | awk '{print $NF}' | cut -c1 )
+ test "$grub_version" = "2" || Error "Cannot install GRUB as USB bootloader (only GRUB2 is supported, '$grub_install_binary --version' shows '$grub_version')"
+ 
+-# The $BUILD_DIR/outputfs/$USB_PREFIX directory is needed by subsequent scripts
+-# like output/USB/Linux-i386/830_copy_kernel_initrd.sh to store kernel and initrd
+-# and for parts of the syslinux config in 'syslinux.cfg' if syslinux/extlinux is used
+-# but output/USB/Linux-i386/300_create_extlinux.sh also creates it if missing:
+-local usb_rear_dir="$BUILD_DIR/outputfs/$USB_PREFIX"
+-if [ ! -d "$usb_rear_dir" ] ; then
+-    mkdir -p $v "$usb_rear_dir" || Error "Failed to create USB ReaR dir '$usb_rear_dir'"
+-fi
+-
+ # Install and configure GRUB2 as USB bootloader for legacy BIOS boot:
+ local usb_boot_dir="$BUILD_DIR/outputfs/boot"
+ if [ ! -d "$usb_boot_dir" ] ; then
+diff --git a/usr/share/rear/output/USB/default/200_make_usb_prefix_dir.sh b/usr/share/rear/output/USB/default/200_make_usb_prefix_dir.sh
+new file mode 100644
+index 0000000000..4ec8479d05
+--- /dev/null
++++ b/usr/share/rear/output/USB/default/200_make_usb_prefix_dir.sh
+@@ -0,0 +1,8 @@
++# The $BUILD_DIR/outputfs/$USB_PREFIX directory is needed by subsequent scripts
++# like output/USB/Linux-i386/830_copy_kernel_initrd.sh to store kernel and initrd
++# and for parts of the syslinux config in 'syslinux.cfg' if syslinux/extlinux is used
++
++USB_REAR_DIR="$BUILD_DIR/outputfs/$USB_PREFIX"
++if [ ! -d "$USB_REAR_DIR" ] ; then
++    mkdir -p $v "$USB_REAR_DIR" || Error "Failed to create USB ReaR dir '$usb_rear_dir'"
++fi
+
+From 62a541074af124b6597ddc2382a2dc6bf35c235a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Zaoral?= <lzaoral@redhat.com>
+Date: Tue, 25 Mar 2025 15:22:07 +0100
+Subject: [PATCH 02/11] output/USB: move 105_check_mounted_usb to USB/default
+
+... because this script is architecture agnostic.
+---
+ .../output/USB/{Linux-i386 => default}/105_check_mounted_usb.sh   | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ rename usr/share/rear/output/USB/{Linux-i386 => default}/105_check_mounted_usb.sh (100%)
+
+diff --git a/usr/share/rear/output/USB/Linux-i386/105_check_mounted_usb.sh b/usr/share/rear/output/USB/default/105_check_mounted_usb.sh
+similarity index 100%
+rename from usr/share/rear/output/USB/Linux-i386/105_check_mounted_usb.sh
+rename to usr/share/rear/output/USB/default/105_check_mounted_usb.sh
+
+From 62c898d81c7bc97b8c6138570dbb616c7ce59e2a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Zaoral?= <lzaoral@redhat.com>
+Date: Tue, 25 Mar 2025 15:25:16 +0100
+Subject: [PATCH 03/11] output/USB: move 830_copy_kernel_initrd to USB/default
+
+... because this script is architecture agnostic.
+---
+ usr/share/rear/output/USB/default/200_make_usb_prefix_dir.sh    | 2 +-
+ .../USB/{Linux-i386 => default}/830_copy_kernel_initrd.sh       | 0
+ 2 files changed, 1 insertion(+), 1 deletion(-)
+ rename usr/share/rear/output/USB/{Linux-i386 => default}/830_copy_kernel_initrd.sh (100%)
+
+diff --git a/usr/share/rear/output/USB/default/200_make_usb_prefix_dir.sh b/usr/share/rear/output/USB/default/200_make_usb_prefix_dir.sh
+index 4ec8479d05..3c8ff6e6c8 100644
+--- a/usr/share/rear/output/USB/default/200_make_usb_prefix_dir.sh
++++ b/usr/share/rear/output/USB/default/200_make_usb_prefix_dir.sh
+@@ -1,5 +1,5 @@
+ # The $BUILD_DIR/outputfs/$USB_PREFIX directory is needed by subsequent scripts
+-# like output/USB/Linux-i386/830_copy_kernel_initrd.sh to store kernel and initrd
++# like output/USB/default/830_copy_kernel_initrd.sh to store kernel and initrd
+ # and for parts of the syslinux config in 'syslinux.cfg' if syslinux/extlinux is used
+ 
+ USB_REAR_DIR="$BUILD_DIR/outputfs/$USB_PREFIX"
+diff --git a/usr/share/rear/output/USB/Linux-i386/830_copy_kernel_initrd.sh b/usr/share/rear/output/USB/default/830_copy_kernel_initrd.sh
+similarity index 100%
+rename from usr/share/rear/output/USB/Linux-i386/830_copy_kernel_initrd.sh
+rename to usr/share/rear/output/USB/default/830_copy_kernel_initrd.sh
+
+From 8c4aaa75bb6e5ea6052cef426b145b08212dc5e0 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Zaoral?= <lzaoral@redhat.com>
+Date: Tue, 25 Mar 2025 15:27:03 +0100
+Subject: [PATCH 04/11] finalize: support bootloader installation on
+ arm/aarch64 EFI machines
+
+---
+ usr/share/rear/finalize/Linux-arm/610_EFISTUB_run_efibootmgr.sh | 1 +
+ usr/share/rear/finalize/Linux-arm/670_run_efibootmgr.sh         | 1 +
+ 2 files changed, 2 insertions(+)
+ create mode 120000 usr/share/rear/finalize/Linux-arm/610_EFISTUB_run_efibootmgr.sh
+ create mode 120000 usr/share/rear/finalize/Linux-arm/670_run_efibootmgr.sh
+
+diff --git a/usr/share/rear/finalize/Linux-arm/610_EFISTUB_run_efibootmgr.sh b/usr/share/rear/finalize/Linux-arm/610_EFISTUB_run_efibootmgr.sh
+new file mode 120000
+index 0000000000..92f571a6b0
+--- /dev/null
++++ b/usr/share/rear/finalize/Linux-arm/610_EFISTUB_run_efibootmgr.sh
+@@ -0,0 +1 @@
++../Linux-i386/610_EFISTUB_run_efibootmgr.sh
+\ No newline at end of file
+diff --git a/usr/share/rear/finalize/Linux-arm/670_run_efibootmgr.sh b/usr/share/rear/finalize/Linux-arm/670_run_efibootmgr.sh
+new file mode 120000
+index 0000000000..5b967460ea
+--- /dev/null
++++ b/usr/share/rear/finalize/Linux-arm/670_run_efibootmgr.sh
+@@ -0,0 +1 @@
++../Linux-i386/670_run_efibootmgr.sh
+\ No newline at end of file
+
+From 39e5741f16f9bae8b8378f75cc3725e993a606b0 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Zaoral?= <lzaoral@redhat.com>
+Date: Tue, 25 Mar 2025 15:38:28 +0100
+Subject: [PATCH 05/11] output/USB: add support for arm/aarch64 EFI machines
+
+---
+ usr/share/rear/output/USB/Linux-arm/100_create_efiboot.sh | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 120000 usr/share/rear/output/USB/Linux-arm/100_create_efiboot.sh
+
+diff --git a/usr/share/rear/output/USB/Linux-arm/100_create_efiboot.sh b/usr/share/rear/output/USB/Linux-arm/100_create_efiboot.sh
+new file mode 120000
+index 0000000000..3846131fb2
+--- /dev/null
++++ b/usr/share/rear/output/USB/Linux-arm/100_create_efiboot.sh
+@@ -0,0 +1 @@
++../Linux-i386/100_create_efiboot.sh
+\ No newline at end of file
+
+From 5989f4cb71195847eb01f8d00e21a52c874215c1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Zaoral?= <lzaoral@redhat.com>
+Date: Tue, 25 Mar 2025 15:45:12 +0100
+Subject: [PATCH 06/11] output/USB: remove safeguard script on arm/aarch64
+
+---
+ usr/share/rear/conf/default.conf                              | 4 ++--
+ usr/share/rear/prep/USB/Linux-arm/350_safeguard_error_out.sh  | 1 -
+ .../rear/prep/USB/Linux-ppc64/350_safeguard_error_out.sh      | 4 ----
+ 3 files changed, 2 insertions(+), 7 deletions(-)
+ delete mode 120000 usr/share/rear/prep/USB/Linux-arm/350_safeguard_error_out.sh
+
+diff --git a/usr/share/rear/conf/default.conf b/usr/share/rear/conf/default.conf
+index 461b17a715..c62bbdb485 100644
+--- a/usr/share/rear/conf/default.conf
++++ b/usr/share/rear/conf/default.conf
+@@ -1158,9 +1158,9 @@ ISO_SYSLINUX_TIMEOUT=""
+ ##
+ #
+ # OUTPUT=USB is only supported on PC-compatible (Linux-i386/x86/x86_64) architecture
+-# see https://github.com/rear/rear/issues/2348
++# see https://github.com/rear/rear/issues/2348 and arm/aarch64 using EFI.
+ # Accordingly in case of false usage of OUTPUT=USB on non-PC-compatible architectures
+-# (i.e. the POWER architectures ppc64/ppc64le, IBM Z s390/s390x, and ARM)
++# (i.e. the POWER architectures ppc64/ppc64le, IBM Z s390/s390x)
+ # "rear mkrescue/mkbackup" errors out because on those architectures the USB medium cannot be booted
+ # because for non-PC-compatible architectures there are no scripts that install a USB bootloader.
+ # On non-PC-compatible architectures a possible alternative could be OUTPUT=RAMDISK (see above)
+diff --git a/usr/share/rear/prep/USB/Linux-arm/350_safeguard_error_out.sh b/usr/share/rear/prep/USB/Linux-arm/350_safeguard_error_out.sh
+deleted file mode 120000
+index 49a162aeb1..0000000000
+--- a/usr/share/rear/prep/USB/Linux-arm/350_safeguard_error_out.sh
++++ /dev/null
+@@ -1 +0,0 @@
+-../Linux-ppc64/350_safeguard_error_out.sh
+\ No newline at end of file
+diff --git a/usr/share/rear/prep/USB/Linux-ppc64/350_safeguard_error_out.sh b/usr/share/rear/prep/USB/Linux-ppc64/350_safeguard_error_out.sh
+index 412014ea35..6b56a5dee9 100644
+--- a/usr/share/rear/prep/USB/Linux-ppc64/350_safeguard_error_out.sh
++++ b/usr/share/rear/prep/USB/Linux-ppc64/350_safeguard_error_out.sh
+@@ -27,10 +27,6 @@
+ # OUTPUT=USB on IBM Z (s390/s390x) architecture:
+ # The symbolic link prep/USB/Linux-s390/350_safeguard_error_out.sh
+ # and its link target prep/USB/Linux-ppc64/350_safeguard_error_out.sh
+-#
+-# OUTPUT=USB on ARM architecture:
+-# The symbolic link prep/USB/Linux-arm/350_safeguard_error_out.sh
+-# and its link target prep/USB/Linux-ppc64/350_safeguard_error_out.sh
+ 
+ Error "OUTPUT=USB not supported on $ARCH (no support to install a bootloader)"
+ 
+
+From 6296d5041af5a786bfe75ffe1978a035664b5837 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Zaoral?= <lzaoral@redhat.com>
+Date: Tue, 25 Mar 2025 15:55:28 +0100
+Subject: [PATCH 07/11] Fix EFI bootloader detection on arm/aarch64
+
+The BOOTLOADER=ARM fallback should be the last option.
+---
+ .../save/default/445_guess_bootloader.sh       | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/usr/share/rear/layout/save/default/445_guess_bootloader.sh b/usr/share/rear/layout/save/default/445_guess_bootloader.sh
+index 7e32957547..81c230f146 100644
+--- a/usr/share/rear/layout/save/default/445_guess_bootloader.sh
++++ b/usr/share/rear/layout/save/default/445_guess_bootloader.sh
+@@ -38,15 +38,6 @@ if test -f /etc/sysconfig/bootloader ; then
+     fi
+ fi
+ 
+-# On ARM, guess the dummy bootloader:
+-if [ "$ARCH" = "Linux-arm" ] ; then
+-    BOOTLOADER=ARM
+-    # Inform the user that we do nothing:
+-    LogPrint "Using guessed bootloader 'ARM'. Skipping bootloader backup, see default.conf about 'BOOTLOADER'"
+-    echo "$BOOTLOADER" >$bootloader_file
+-    return
+-fi
+-
+ # Check if any disk contains a PPC PReP boot partition.
+ # Detection taken from usr/share/rear/finalize/Linux-ppc64/680_install_PPC_bootlist.sh
+ disk_device="$( awk -F ' ' '/^part / {if ($6 ~ /prep/) {print $2}}' $LAYOUT_FILE )"
+@@ -143,6 +134,15 @@ if is_true $USING_UEFI_BOOTLOADER ; then
+     return 0
+ fi
+ 
++# On ARM, guess the dummy bootloader:
++if [ "$ARCH" = "Linux-arm" ] ; then
++    BOOTLOADER=ARM
++    # Inform the user that we do nothing:
++    LogPrint "Using guessed bootloader 'ARM'. Skipping bootloader backup, see default.conf about 'BOOTLOADER'"
++    echo "$BOOTLOADER" >$bootloader_file
++    return
++fi
++
+ # Error out when no bootloader was specified or could be autodetected:
+ Error "Cannot autodetect what is used as bootloader, see default.conf about 'BOOTLOADER'"
+ 
+
+From ddd7c34d41caab0161a5ef60390f684f3bb1b9c4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Zaoral?= <lzaoral@redhat.com>
+Date: Tue, 25 Mar 2025 16:03:01 +0100
+Subject: [PATCH 08/11] Remove prep/Linux-arm/060_check_config.sh script
+
+We support OUTPUT=USB now and OUTPUT=RAMDISK should work out of the box as well.
+---
+ usr/share/rear/prep/Linux-arm/060_check_config.sh | 3 ---
+ 1 file changed, 3 deletions(-)
+ delete mode 100644 usr/share/rear/prep/Linux-arm/060_check_config.sh
+
+diff --git a/usr/share/rear/prep/Linux-arm/060_check_config.sh b/usr/share/rear/prep/Linux-arm/060_check_config.sh
+deleted file mode 100644
+index ca0978a125..0000000000
+--- a/usr/share/rear/prep/Linux-arm/060_check_config.sh
++++ /dev/null
+@@ -1,3 +0,0 @@
+-if [ "$OUTPUT" != "PXE" ] ; then
+-    Error "Currently only OUTPUT=PXE is supported on ARM"
+-fi
+
+From ac27a8174584d89c3983431d7d3cc2da3b5d2a06 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Zaoral?= <lzaoral@redhat.com>
+Date: Tue, 25 Mar 2025 16:38:29 +0100
+Subject: [PATCH 09/11] output/ISO: add support for arm/aarch64 on EFI machines
+
+---
+ .../ISO/Linux-arm/250_populate_efibootimg.sh  |  1 +
+ .../ISO/Linux-arm/260_EFISTUB_populate.sh     |  1 +
+ .../ISO/Linux-arm/700_create_efibootimg.sh    |  1 +
+ .../output/ISO/Linux-arm/800_create_isofs.sh  | 36 +++++++++++++++++
+ .../ISO/Linux-arm/810_prepare_multiple_iso.sh |  1 +
+ .../ISO/Linux-arm/820_create_iso_image.sh     | 40 +++++++++++++++++++
+ .../Linux-arm/830_create_iso_image_EFISTUB.sh | 25 ++++++++++++
+ 7 files changed, 105 insertions(+)
+ create mode 120000 usr/share/rear/output/ISO/Linux-arm/250_populate_efibootimg.sh
+ create mode 120000 usr/share/rear/output/ISO/Linux-arm/260_EFISTUB_populate.sh
+ create mode 120000 usr/share/rear/output/ISO/Linux-arm/700_create_efibootimg.sh
+ create mode 100644 usr/share/rear/output/ISO/Linux-arm/800_create_isofs.sh
+ create mode 120000 usr/share/rear/output/ISO/Linux-arm/810_prepare_multiple_iso.sh
+ create mode 100644 usr/share/rear/output/ISO/Linux-arm/820_create_iso_image.sh
+ create mode 100644 usr/share/rear/output/ISO/Linux-arm/830_create_iso_image_EFISTUB.sh
+
+diff --git a/usr/share/rear/output/ISO/Linux-arm/250_populate_efibootimg.sh b/usr/share/rear/output/ISO/Linux-arm/250_populate_efibootimg.sh
+new file mode 120000
+index 0000000000..847e8f465c
+--- /dev/null
++++ b/usr/share/rear/output/ISO/Linux-arm/250_populate_efibootimg.sh
+@@ -0,0 +1 @@
++../Linux-i386/250_populate_efibootimg.sh
+\ No newline at end of file
+diff --git a/usr/share/rear/output/ISO/Linux-arm/260_EFISTUB_populate.sh b/usr/share/rear/output/ISO/Linux-arm/260_EFISTUB_populate.sh
+new file mode 120000
+index 0000000000..93113f6636
+--- /dev/null
++++ b/usr/share/rear/output/ISO/Linux-arm/260_EFISTUB_populate.sh
+@@ -0,0 +1 @@
++../Linux-i386/260_EFISTUB_populate.sh
+\ No newline at end of file
+diff --git a/usr/share/rear/output/ISO/Linux-arm/700_create_efibootimg.sh b/usr/share/rear/output/ISO/Linux-arm/700_create_efibootimg.sh
+new file mode 120000
+index 0000000000..8aa6a84a3d
+--- /dev/null
++++ b/usr/share/rear/output/ISO/Linux-arm/700_create_efibootimg.sh
+@@ -0,0 +1 @@
++../Linux-i386/700_create_efibootimg.sh
+\ No newline at end of file
+diff --git a/usr/share/rear/output/ISO/Linux-arm/800_create_isofs.sh b/usr/share/rear/output/ISO/Linux-arm/800_create_isofs.sh
+new file mode 100644
+index 0000000000..0108dac05b
+--- /dev/null
++++ b/usr/share/rear/output/ISO/Linux-arm/800_create_isofs.sh
+@@ -0,0 +1,36 @@
++# 800_create_isofs.sh
++#
++# create initramfs for Relax-and-Recover
++#
++# This file is part of Relax-and-Recover, licensed under the GNU General
++# Public License. Refer to the included COPYING for full text of license.
++
++# Based on output/ISO/Linux-i386/800_create_isofs.sh with the creation of the
++# $TMP_DIR/isofs/isolinux directory added.  This allows us to share scripts
++# used on x86_64 EFI machines.
++
++# check that we have mkisofs
++test -x "$ISO_MKISOFS_BIN" || Error "No executable ISO_MKISOFS_BIN '$ISO_MKISOFS_BIN'"
++
++# create some sub-dirs under $TMP_DIR for booting
++# The isolinux directory is used so that the x86_64 EFI scripts can be symlinked directly.
++[[ ! -d $TMP_DIR/isofs/isolinux ]] && mkdir $v -m 755 $TMP_DIR/isofs/isolinux >&2
++
++# kernel and initrd are already included in virtual image of ISO if ebiso is used
++if [[ $(basename $ISO_MKISOFS_BIN) = "ebiso" && $(basename ${UEFI_BOOTLOADER}) = "elilo.efi" ]]; then
++    Log "ebiso is used where kernel and initrd are already included in virtual image of ISO, skipping copying kernel and initrd"
++else
++    Log "Copying kernel and initrd"
++    cp -pL $v $KERNEL_FILE $TMP_DIR/isofs/isolinux/kernel || Error "Failed to copy KERNEL_FILE '$KERNEL_FILE'"
++    cp $v $TMP_DIR/$REAR_INITRD_FILENAME $TMP_DIR/isofs/isolinux/$REAR_INITRD_FILENAME || Error "Failed to copy initrd '$REAR_INITRD_FILENAME'"
++fi
++
++#ISO_FILES+=( $TMP_DIR/kernel $TMP_DIR/$REAR_INITRD_FILENAME )
++# in case the user populates this array manually we must not forget to copy
++# these files to our temporary isofs
++if test "${#ISO_FILES[@]}" -gt 0 ; then
++    cp -pL $v "${ISO_FILES[@]}" $TMP_DIR/isofs/isolinux/ || Error "Failed to copy ISO_FILES ${ISO_FILES[*]}"
++fi
++
++mkdir -p $v "$ISO_DIR" || Error "Failed to create ISO_DIR '$ISO_DIR'"
++
+diff --git a/usr/share/rear/output/ISO/Linux-arm/810_prepare_multiple_iso.sh b/usr/share/rear/output/ISO/Linux-arm/810_prepare_multiple_iso.sh
+new file mode 120000
+index 0000000000..04f8a49556
+--- /dev/null
++++ b/usr/share/rear/output/ISO/Linux-arm/810_prepare_multiple_iso.sh
+@@ -0,0 +1 @@
++../Linux-i386/810_prepare_multiple_iso.sh
+\ No newline at end of file
+diff --git a/usr/share/rear/output/ISO/Linux-arm/820_create_iso_image.sh b/usr/share/rear/output/ISO/Linux-arm/820_create_iso_image.sh
+new file mode 100644
+index 0000000000..37842e0183
+--- /dev/null
++++ b/usr/share/rear/output/ISO/Linux-arm/820_create_iso_image.sh
+@@ -0,0 +1,40 @@
++# Based on output/ISO/Linux-i386/820_create_iso_image.sh with the support
++# for non-EFI machines removed.
++
++is_true $EFI_STUB && return 0
++
++Log "Starting '$ISO_MKISOFS_BIN'"
++LogPrint "Making ISO image"
++
++is_true $USING_UEFI_BOOTLOADER || Error "OUTPUT=ISO on Linux-arm works only with UEFI"
++if [ -f /etc/slackware-version ] ; then
++    # slackware mkisofs uses different command line options
++    EFIBOOT="-eltorito-alt-boot -no-emul-boot -eltorito-platform efi -eltorito-boot boot/efiboot.img"
++else
++    EFIBOOT="-eltorito-alt-boot -e boot/efiboot.img -no-emul-boot"
++fi
++
++pushd $TMP_DIR/isofs >/dev/null
++
++# Error out when files greater or equal ISO_FILE_SIZE_LIMIT should be included in the ISO (cf. default.conf).
++# Consider all regular files and follow symbolic links to also get regular files where symlinks point to:
++assert_ISO_FILE_SIZE_LIMIT $( find -L . -type f )
++
++# ebiso uses different command line options and parameters:
++if test "ebiso" = $( basename $ISO_MKISOFS_BIN ) ; then
++    $ISO_MKISOFS_BIN $ISO_MKISOFS_OPTS -R -o $ISO_DIR/$ISO_PREFIX.iso -e boot/efiboot.img .
++else
++    $ISO_MKISOFS_BIN $v $ISO_MKISOFS_OPTS -o "$ISO_DIR/$ISO_PREFIX.iso" -no-emul-boot \
++        -R -J -volid "$ISO_VOLID" $EFIBOOT -v -iso-level 3 .  >/dev/null
++        ##-R -J -volid "$ISO_VOLID" $EFIBOOT  "${ISO_FILES[@]}"  >/dev/null
++fi
++StopIfError "Could not create ISO image (with $ISO_MKISOFS_BIN)"
++popd >/dev/null
++
++iso_image_size=( $(du -h "$ISO_DIR/$ISO_PREFIX.iso") )
++LogPrint "Wrote ISO image: $ISO_DIR/$ISO_PREFIX.iso ($iso_image_size)"
++
++# Add ISO image to result files
++RESULT_FILES+=( "$ISO_DIR/$ISO_PREFIX.iso" )
++
++# vim: set et ts=4 sw=4:
+diff --git a/usr/share/rear/output/ISO/Linux-arm/830_create_iso_image_EFISTUB.sh b/usr/share/rear/output/ISO/Linux-arm/830_create_iso_image_EFISTUB.sh
+new file mode 100644
+index 0000000000..83c2d1eebf
+--- /dev/null
++++ b/usr/share/rear/output/ISO/Linux-arm/830_create_iso_image_EFISTUB.sh
+@@ -0,0 +1,25 @@
++# Based on output/ISO/Linux-i386/830_create_iso_image_EFISTUB.sh with the
++# support for non-EFI machines removed.
++
++is_true $EFI_STUB || return 0
++
++Log "EFI_STUB: Starting '$ISO_MKISOFS_BIN'"
++LogPrint "EFI_STUB: Making ISO image"
++
++pushd $TMP_DIR/isofs >/dev/null
++
++# Error out when files greater or equal ISO_FILE_SIZE_LIMIT should be included in the ISO (cf. default.conf).
++# Consider all regular files and follow symbolic links to also get regular files where symlinks point to:
++assert_ISO_FILE_SIZE_LIMIT $( find -L . -type f )
++
++$ISO_MKISOFS_BIN $v $ISO_MKISOFS_OPTS -o "$ISO_DIR/$ISO_PREFIX.iso" -no-emul-boot \
++    -R -J -volid "$ISO_VOLID" -v -iso-level 3 .  >/dev/null
++
++StopIfError "EFI_STUB: Could not create ISO image (with $ISO_MKISOFS_BIN)"
++popd >/dev/null
++
++iso_image_size=( $(du -h "$ISO_DIR/$ISO_PREFIX.iso") )
++LogPrint "EFI_STUB: Wrote ISO image: $ISO_DIR/$ISO_PREFIX.iso ($iso_image_size)"
++
++# Add ISO image to result files
++RESULT_FILES+=( "$ISO_DIR/$ISO_PREFIX.iso" )
+
+From b8ddf98755c54914aac771dab5cd12e3c580c29a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Zaoral?= <lzaoral@redhat.com>
+Date: Wed, 26 Mar 2025 08:38:44 +0100
+Subject: [PATCH 10/11] spec: enable building for arm/aarch64
+
+---
+ packaging/rpm/rear.spec | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/packaging/rpm/rear.spec b/packaging/rpm/rear.spec
+index 551639a815..4ad975a82b 100644
+--- a/packaging/rpm/rear.spec
++++ b/packaging/rpm/rear.spec
+@@ -28,8 +28,8 @@ BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
+ # Of course the rear bash scripts can be installed on any architecture just as any binaries can be installed on any architecture.
+ # But the meaning of architecture dependent packages should be on what architectures they will work.
+ # Therefore only those architectures that are actually supported are explicitly listed.
+-# This avoids that rear can be "just installed" on architectures that are actually not supported (e.g. ARM):
+-ExclusiveArch: %ix86 x86_64 ppc ppc64 ppc64le ia64 s390x
++# This avoids that rear can be "just installed" on architectures that are actually not supported:
++ExclusiveArch: %ix86 x86_64 ppc ppc64 ppc64le ia64 s390x %arm aarch64
+ # Furthermore for some architectures it requires architecture dependent packages (like syslinux for x86 and x86_64)
+ # so that rear must be architecture dependent because ifarch conditions never match in case of "BuildArch: noarch"
+ # see the GitHub issue https://github.com/rear/rear/issues/629
+
+From 59bc2822f182a34394de9eb7753024ebe8e144a7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Zaoral?= <lzaoral@redhat.com>
+Date: Fri, 28 Mar 2025 12:20:53 +0100
+Subject: [PATCH 11/11] Enable secure boot detection on arm/aarch64
+
+---
+ usr/share/rear/prep/Linux-arm/370_detect_secure_boot.sh | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 120000 usr/share/rear/prep/Linux-arm/370_detect_secure_boot.sh
+
+diff --git a/usr/share/rear/prep/Linux-arm/370_detect_secure_boot.sh b/usr/share/rear/prep/Linux-arm/370_detect_secure_boot.sh
+new file mode 120000
+index 0000000000..dae73a4904
+--- /dev/null
++++ b/usr/share/rear/prep/Linux-arm/370_detect_secure_boot.sh
+@@ -0,0 +1 @@
++../Linux-i386/370_detect_secure_boot.sh
+\ No newline at end of file

@@ -1,0 +1,58 @@
+From: Jan Engelhardt <jengelh@inai.de>
+
+Edit the default codec selection such that
+
+	ffmpeg -i youtube.blah.webm foobar.mkv
+
+without any further arguments can produce a result even on a
+reduced codec selection list.
+
+---
+ libavformat/matroskaenc.c |   20 ++++++++++++++------
+ 1 file changed, 14 insertions(+), 6 deletions(-)
+
+Index: ffmpeg-7.0/libavformat/matroskaenc.c
+===================================================================
+--- ffmpeg-7.0.orig/libavformat/matroskaenc.c
++++ ffmpeg-7.0/libavformat/matroskaenc.c
+@@ -3540,16 +3540,25 @@ static int mkv_query_codec(enum AVCodecI
+     return 0;
+ }
+
++#define PREFAUDIO \
++    CONFIG_LIBOPUS_ENCODER ? AV_CODEC_ID_OPUS : \
++    CONFIG_AAC_ENCODER ? AV_CODEC_ID_AAC : \
++    CONFIG_VORBIS_ENCODER ? AV_CODEC_ID_VORBIS : \
++    AV_CODEC_ID_AC3
++
+ const FFOutputFormat ff_matroska_muxer = {
+     .p.name            = "matroska",
+     .p.long_name       = NULL_IF_CONFIG_SMALL("Matroska"),
+     .p.mime_type       = "video/x-matroska",
+     .p.extensions      = "mkv",
+     .priv_data_size    = sizeof(MatroskaMuxContext),
+-    .p.audio_codec     = CONFIG_LIBVORBIS_ENCODER ?
+-                         AV_CODEC_ID_VORBIS : AV_CODEC_ID_AC3,
+-    .p.video_codec     = CONFIG_LIBX264_ENCODER ?
+-                         AV_CODEC_ID_H264 : AV_CODEC_ID_MPEG4,
++    .p.audio_codec     = PREFAUDIO,
++    .p.video_codec     =
++    CONFIG_LIBVPX_VP9_ENCODER ? AV_CODEC_ID_VP9 : \
++    CONFIG_LIBX264_ENCODER ? AV_CODEC_ID_H264 : \
++    CONFIG_LIBVPX_VP8_ENCODER ? AV_CODEC_ID_VP8 : \
++    CONFIG_MPEG4_ENCODER ? AV_CODEC_ID_MPEG4 : \
++    AV_CODEC_ID_THEORA,
+     .init              = mkv_init,
+     .deinit            = mkv_deinit,
+     .write_header      = mkv_write_header,
+@@ -3617,8 +3626,7 @@ const FFOutputFormat ff_matroska_audio_m
+     .p.mime_type       = "audio/x-matroska",
+     .p.extensions      = "mka",
+     .priv_data_size    = sizeof(MatroskaMuxContext),
+-    .p.audio_codec     = CONFIG_LIBVORBIS_ENCODER ?
+-                         AV_CODEC_ID_VORBIS : AV_CODEC_ID_AC3,
++    .p.audio_codec     = PREFAUDIO,
+     .p.video_codec     = AV_CODEC_ID_NONE,
+     .init              = mkv_init,
+     .deinit            = mkv_deinit,
+

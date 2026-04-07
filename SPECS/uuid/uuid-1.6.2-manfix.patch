@@ -1,0 +1,13 @@
+diff -up uuid-1.6.2/uuid.1.manfix uuid-1.6.2/uuid.1
+--- uuid-1.6.2/uuid.1.manfix	2013-05-30 15:56:38.630003125 +0200
++++ uuid-1.6.2/uuid.1	2013-05-30 16:00:57.145127756 +0200
+@@ -238,6 +238,9 @@ value representation of a \s-1UUID\s0. E
+ .IP "\fB\-o\fR \fIfilename\fR" 3
+ .IX Item "-o filename"
+ Write output to \fIfilename\fR instead of to \fIstdout\fR.
++.IP "\fB\-r\fR" 3
++.IX Item "-r"
++This is equivalent to \fB-F BIN\fR.
+ .IP "\fB\-d\fR" 3
+ .IX Item "-d"
+ Decode a given \s-1UUID\s0 (given as a command line argument or if the command

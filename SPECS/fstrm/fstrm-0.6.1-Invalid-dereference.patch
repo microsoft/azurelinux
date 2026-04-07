@@ -1,0 +1,83 @@
+From d6149aaad2a72a8f000283015f6e381bb2821ee2 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20Men=C5=A1=C3=ADk?= <pemensik@redhat.com>
+Date: Thu, 7 Jan 2021 16:08:40 +0100
+Subject: [PATCH 1/3] Invalid dereference
+
+libmy/argv.c:3212: var_deref_model: Passing null pointer "queue_list" to "do_list", which dereferences it
+libmy/argv.c:3204: var_deref_model: Passing null pointer "queue_list" to "do_list", which dereferences it.
+
+Workaround to possibility no arguments is received
+
+Usually at least one arg is always passed in argv - program name. Do not
+dereference null queue_list in unlikely case no parameter in argv.
+---
+ libmy/argv.c | 45 +++++++++++++++++++++++----------------------
+ 1 file changed, 23 insertions(+), 22 deletions(-)
+
+diff --git a/libmy/argv.c b/libmy/argv.c
+index 6c64906..c3aadfe 100644
+--- a/libmy/argv.c
++++ b/libmy/argv.c
+@@ -3197,28 +3197,29 @@ int	argv_process_no_env(argv_t *args, const int arg_n, char **argv)
+     }
+     queue_head = 0;
+     queue_tail = 0;
+-  }
+-  
+-  /* do the env args before? */
+-  if (argv_process_env_b && (! argv_env_after_b) && env_vect_p != NULL) {
+-    do_list(args, env_n, env_vect_p, queue_list, &queue_head, &queue_tail,
+-	    &okay_b);
+-    free(env_vect_p);
+-    free(environ_p);
+-    env_vect_p = NULL;
+-  }
+-  
+-  /* do the external args */
+-  do_list(args, arg_n - 1, argv + 1, queue_list, &queue_head, &queue_tail,
+-	  &okay_b);
++
++    /* do the env args before? */
++    if (argv_process_env_b && (! argv_env_after_b) && env_vect_p != NULL) {
++      do_list(args, env_n, env_vect_p, queue_list, &queue_head, &queue_tail,
++	      &okay_b);
++      free(env_vect_p);
++      free(environ_p);
++      env_vect_p = NULL;
++    }
++
++    /* do the external args */
++    if (arg_n > 0)
++      do_list(args, arg_n - 1, argv + 1, queue_list, &queue_head, &queue_tail,
++	      &okay_b);
+   
+-  /* DO the env args after? */
+-  if (argv_process_env_b && argv_env_after_b && env_vect_p != NULL) {
+-    do_list(args, env_n, env_vect_p, queue_list, &queue_head, &queue_tail,
+-	    &okay_b);
+-    free(env_vect_p);
+-    free(environ_p);
+-    env_vect_p = NULL;
++    /* DO the env args after? */
++    if (argv_process_env_b && argv_env_after_b && env_vect_p != NULL) {
++      do_list(args, env_n, env_vect_p, queue_list, &queue_head, &queue_tail,
++	      &okay_b);
++      free(env_vect_p);
++      free(environ_p);
++      env_vect_p = NULL;
++    }
+   }
+   
+   /* make sure the XOR and MAND args and argument-options are okay */
+@@ -3233,7 +3234,7 @@ int	argv_process_no_env(argv_t *args, const int arg_n, char **argv)
+   }
+   
+   /* if we allocated the space then free it */
+-  if (arg_n > 0) {
++  if (queue_list) {
+     free(queue_list);
+   }
+   
+-- 
+2.26.3
+

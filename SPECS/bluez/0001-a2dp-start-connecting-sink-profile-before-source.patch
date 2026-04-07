@@ -1,0 +1,37 @@
+From cb142c8832bd6b5359899cbfb636ab62fe68ba9d Mon Sep 17 00:00:00 2001
+From: Pauli Virtanen <pav@iki.fi>
+Date: Sun, 15 Feb 2026 14:54:28 +0200
+Subject: [PATCH] a2dp: start connecting sink profile before source
+
+Since cdcd845f87ee the order in which profiles with the same priority are
+connected is the same order as btd_profile_register() is called, instead
+of being the opposite order.
+
+When initiating connections, we want to prefer a2dp-sink profile over
+a2dp-source, as connecting both at the same time does not work
+currently.
+
+So swap the order of registration, to restore the previous behavior.
+
+Fixes: https://github.com/bluez/bluez/issues/1898
+---
+ profiles/audio/a2dp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index 7a37003a2b25..7216ed017102 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -3796,8 +3796,8 @@ static struct btd_adapter_driver media_driver = {
+ static int a2dp_init(void)
+ {
+ 	btd_register_adapter_driver(&media_driver);
+-	btd_profile_register(&a2dp_source_profile);
+ 	btd_profile_register(&a2dp_sink_profile);
++	btd_profile_register(&a2dp_source_profile);
+ 
+ 	return 0;
+ }
+-- 
+2.53.0
+

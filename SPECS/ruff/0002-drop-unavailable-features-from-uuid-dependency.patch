@@ -1,0 +1,25 @@
+From da1a6babc35565d290e09f51d4587d6e87e443e0 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Wed, 4 Dec 2024 17:21:47 +0100
+Subject: [PATCH 2/3] drop unavailable features from uuid dependency
+
+---
+ Cargo.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Cargo.toml b/Cargo.toml
+index f96b83f98f..8294d56b21 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -202,7 +202,7 @@ unicode-normalization = { version = "0.1.23" }
+ unicode-width = { version = "0.2.0" }
+ unicode_names2 = { version = "1.2.2" }
+ url = { version = "2.5.0" }
+-uuid = { version = "1.6.1", features = ["v4", "fast-rng", "macro-diagnostics"] }
++uuid = { version = "1.6.1", features = ["v4", "fast-rng"] }
+ walkdir = { version = "2.3.2" }
+ wasm-bindgen = { version = "0.2.92" }
+ wasm-bindgen-test = { version = "0.3.42" }
+-- 
+2.52.0
+

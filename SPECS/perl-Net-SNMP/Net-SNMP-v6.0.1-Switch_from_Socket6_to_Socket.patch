@@ -1,0 +1,220 @@
+diff -Naur A/Build.PL B/Build.PL
+--- A/Build.PL
++++ B/Build.PL
+@@ -33,6 +33,7 @@ Module::Build->new(
+       Exporter        => 0,
+       IO::Socket      => 0,
+       Math::BigInt    => 0,
++      Socket          => '2.000',
+    },
+    recommends         => {
+       Crypt::DES      => '2.03',  # SNMPv3
+@@ -40,7 +41,6 @@ Module::Build->new(
+       Digest::SHA1    => '1.02',  # SNMPv3
+       Digest::HMAC    => '1.00',  # SNMPv3
+       Crypt::Rijndael => '1.02',  # SNMPv3 - AES Cipher Algorithm 
+-      Socket6         => '0.23',  # UDP/IPv6 or TCP/IPv6 Transport Domain 
+    },
+    meta_merge         => {
+       resources       => {
+diff -Naur A/META.yml B/META.yml
+--- A/META.yml
++++ B/META.yml
+@@ -3,14 +3,15 @@ abstract: 'Object oriented interface to SNMP'
+ author:
+   - 'David M. Town <dtown@cpan.org>'
+ build_requires:
+-  Test: 0
++  Test: '0'
+ configure_requires:
+-  Module::Build: 0.36
+-generated_by: 'Module::Build version 0.3607'
++  Module::Build: '0.42'
++dynamic_config: 1
++generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+ license: perl
+ meta-spec:
+   url: http://module-build.sourceforge.net/META-spec-v1.4.html
+-  version: 1.4
++  version: '1.4'
+ name: Net-SNMP
+ provides:
+   Net::SNMP:
+@@ -59,21 +60,22 @@ provides:
+     file: lib/Net/SNMP/Transport/IPv6/UDP.pm
+     version: v3.0.0
+ recommends:
+-  Crypt::DES: 2.03
+-  Crypt::Rijndael: 1.02
+-  Digest::HMAC: 1.00
+-  Digest::MD5: 2.11
+-  Digest::SHA1: 1.02
+-  Socket6: 0.23
++  Crypt::DES: '2.03'
++  Crypt::Rijndael: '1.02'
++  Digest::HMAC: '1.00'
++  Digest::MD5: '2.11'
++  Digest::SHA1: '1.02'
+ requires:
+-  Carp: 0
+-  Errno: 0
+-  Exporter: 0
+-  IO::Socket: 0
+-  Math::BigInt: 0
+-  perl: 5.006
++  Carp: '0'
++  Errno: '0'
++  Exporter: '0'
++  IO::Socket: '0'
++  Math::BigInt: '0'
++  Socket: '2.000'
++  perl: '5.006'
+ resources:
+   CPANForum: http://www.cpanforum.com/dist/Net-SNMP
+   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Net-SNMP
+   license: http://dev.perl.org/licenses/
+ version: v6.0.1
++x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+diff -Naur A/Makefile.PL B/Makefile.PL
+index 4678c32..a15243b 100644
+--- A/Makefile.PL
++++ B/Makefile.PL
+@@ -42,6 +42,7 @@ WriteMakefile(
+       Digest::MD5  => '2.11',  # SNMPv3
+       Digest::SHA1 => '1.02',  # SNMPv3
+       Digest::HMAC => '1.00',  # SNMPv3
++      Socket       => '2.000',
+    },
+    dist          => {
+       CI           => 'ci -u -sRel -m\"Changes for $(VERSION)\"',
+diff -Naur A/README B/README
+--- A/README
++++ B/README
+@@ -60,7 +60,7 @@ REQUIREMENTS
+     protocol, the non-core module Crypt::Rijndael is needed.
+ 
+     To use UDP/IPv6 or TCP/IPv6 as a Transport Domain, the non-core 
+-    module Socket6 is needed.
++    module Socket is needed.
+ 
+ DOCUMENTATION
+ 
+diff -Naur A/lib/Net/SNMP.pm B/lib/Net/SNMP.pm
+--- A/lib/Net/SNMP.pm
++++ B/lib/Net/SNMP.pm
+@@ -3561,7 +3561,7 @@ non-core module F<Crypt::Rijndael> is needed.
+ =item *
+ 
+ To use UDP/IPv6 or TCP/IPv6 as a Transport Domain, the non-core module 
+-F<Socket6> is needed.
++F<Socket> is needed.
+ 
+ =back
+ 
+diff -Naur A/lib/Net/SNMP/Transport/IPv6.pm B/lib/Net/SNMP/Transport/IPv6.pm
+--- A/lib/Net/SNMP/Transport/IPv6.pm	2010-09-10 02:02:45.000000000 +0200
++++ B/lib/Net/SNMP/Transport/IPv6.pm	2023-06-14 09:27:57.736399948 +0200
+@@ -19,9 +19,9 @@
+ 
+ use Net::SNMP::Transport qw( DEBUG_INFO );
+ 
+-use Socket6 0.23 qw(
+-   PF_INET6 AF_INET6 in6addr_any in6addr_loopback getaddrinfo
+-   pack_sockaddr_in6_all unpack_sockaddr_in6_all inet_pton inet_ntop
++use Socket qw(
++   PF_INET6 AF_INET6 IN6ADDR_ANY IN6ADDR_LOOPBACK getaddrinfo
++   pack_sockaddr_in6 unpack_sockaddr_in6 inet_pton inet_ntop
+ );
+ 
+ ## Version of the Net::SNMP::Transport::IPv6 module
+@@ -89,12 +89,12 @@
+ 
+ sub _addr_any
+ {
+-   return in6addr_any;
++   return IN6ADDR_ANY;
+ }
+ 
+ sub _addr_loopback
+ {
+-   return in6addr_loopback;
++   return IN6ADDR_LOOPBACK;
+ }
+ 
+ sub _hostname_resolve
+@@ -117,23 +117,22 @@
+ 
+    # Resolve the address.
+ 
+-   my @info = getaddrinfo(($_[1] = $host), q{}, PF_INET6);
++   my ($err, @addrs) = getaddrinfo(($_[1] = $host), q{}, {'family' => PF_INET6});
+ 
+-   if (@info >= 5) {
++   if (! $err) {
+       if ($host =~ s/(.*)%.*$/$1/) { # <address>%<ifName>
+          $_[1] = $1;
+       }
+-      while (@info >= 5) {
+-         if ($info[0] == PF_INET6) {
+-            $nh->{flowinfo} = $this->_flowinfo($info[3]);
+-            $nh->{scope_id} ||= $this->_scope_id($info[3]);
+-            return $nh->{addr} = $this->_addr($info[3]);
++      while (my $addr = shift @addrs) {
++         if ($addr->{'family'} == PF_INET6) {
++            $nh->{flowinfo} = $this->_flowinfo($addr->{'addr'});
++            $nh->{scope_id} ||= $this->_scope_id($addr->{'addr'});
++            return $nh->{addr} = $this->_addr($addr->{'addr'});
+          }
+-         DEBUG_INFO('family = %d, sin = %s', $info[0], unpack 'H*', $info[3]);
+-         splice @info, 0, 5;
++         DEBUG_INFO('family = %d, sin = %s', $addr->{'family'}, unpack 'H*', $addr->{'addr'});
+       }
+    } else {
+-      DEBUG_INFO('getaddrinfo(): %s', $info[0]);
++      DEBUG_INFO('getaddrinfo(): %s', $err);
+       if ((my @host = split /:/, $host) == 2) { # <hostname>:<service>
+           $_[1] = sprintf '[%s]:%s', @host;
+           return $this->_hostname_resolve($_[1], $nh);
+@@ -156,9 +155,9 @@
+ 
+ sub _name_pack
+ {
+-   return pack_sockaddr_in6_all(
+-      $_[1]->{port}, $_[1]->{flowinfo} || 0,
+-      $_[1]->{addr}, $_[1]->{scope_id} || 0
++   return pack_sockaddr_in6(
++      $_[1]->{port},          $_[1]->{addr},
++      $_[1]->{scope_id} || 0, $_[1]->{flowinfo} || 0
+    );
+ }
+ 
+@@ -169,12 +168,12 @@
+ 
+ sub _addr
+ {
+-   return (unpack_sockaddr_in6_all($_[1]))[2];
++   return (unpack_sockaddr_in6($_[1]))[1];
+ }
+ 
+ sub _port
+ {
+-   return (unpack_sockaddr_in6_all($_[1]))[0];
++   return (unpack_sockaddr_in6($_[1]))[0];
+ }
+ 
+ sub _taddress
+@@ -193,12 +192,12 @@
+ 
+ sub _scope_id
+ {
+-   return (unpack_sockaddr_in6_all($_[1]))[3];
++   return (unpack_sockaddr_in6($_[1]))[2];
+ }
+ 
+ sub _flowinfo
+ {
+-   return (unpack_sockaddr_in6_all($_[1]))[1];
++   return (unpack_sockaddr_in6($_[1]))[3];
+ }
+ 
+ # ============================================================================

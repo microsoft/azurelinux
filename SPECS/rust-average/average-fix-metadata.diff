@@ -1,0 +1,44 @@
+--- average-0.15.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ average-0.15.1/Cargo.toml	2025-10-11T09:03:50.010181+00:00
+@@ -75,11 +75,11 @@
+ default-features = false
+ 
+ [dependencies.rayon]
+-version = "=1.7"
++version = "1.7"
+ optional = true
+ 
+ [dependencies.rayon-core]
+-version = "=1.11"
++version = "1.11"
+ optional = true
+ 
+ [dependencies.serde]
+@@ -95,27 +95,6 @@
+ [dependencies.serde_derive]
+ version = "1"
+ optional = true
+-
+-[dev-dependencies.bencher]
+-version = "0.1"
+-
+-[dev-dependencies.quantiles]
+-version = "0.7"
+-
+-[dev-dependencies.rand]
+-version = "0.8"
+-
+-[dev-dependencies.rand_distr]
+-version = "0.4"
+-
+-[dev-dependencies.rand_xoshiro]
+-version = "0.6"
+-
+-[dev-dependencies.serde_json]
+-version = "1"
+-
+-[dev-dependencies.streaming-stats]
+-version = "0.2"
+ 
+ [features]
+ default = ["libm"]

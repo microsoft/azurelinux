@@ -1,0 +1,2 @@
+#%PAM-1.0
+auth	include		system-auth

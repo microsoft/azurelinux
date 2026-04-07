@@ -1,0 +1,21 @@
+diff -rupN --no-dereference cfitsio-4.6.2/CMakeLists.txt cfitsio-4.6.2-new/CMakeLists.txt
+--- cfitsio-4.6.2/CMakeLists.txt	2025-03-26 19:19:36.000000000 +0100
++++ cfitsio-4.6.2-new/CMakeLists.txt	2025-07-17 17:02:13.511306152 +0200
+@@ -9,7 +9,7 @@ IF(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_
+ 		)
+ ENDIF()
+ 
+-CMAKE_MINIMUM_REQUIRED(VERSION 3.1)
++CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
+ 
+ # Suppress warning about WIN32 no longer being defined on Cygwin:
+ SET(CMAKE_LEGACY_CYGWIN_WIN32 0)
+@@ -299,7 +299,7 @@ install(TARGETS cfitsio EXPORT cfitsioTa
+ )
+ 
+ install(FILES ${H_FILES} "${CMAKE_CURRENT_BINARY_DIR}/cfitsio_export.h"
+-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT Devel)
++  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cfitsio COMPONENT Devel)
+ 
+ include(CMakePackageConfigHelpers)
+ write_basic_package_version_file(

@@ -1,0 +1,80 @@
+From 05f2d9486bd88dc0030e002e65cb7d91a67b3f5d Mon Sep 17 00:00:00 2001
+From: Koichi ITO <koic.ito@gmail.com>
+Date: Tue, 15 Aug 2023 13:18:31 +0900
+Subject: [PATCH] Fix a test failure using Ruby 3.3.0dev
+
+This PR fixes the following test failure using Ruby 3.3.0dev:
+
+```console
+$ ruby -v
+ruby 3.3.0dev (2023-08-14T15:48:39Z master 52837fcec2) [x86_64-darwin22]
+$ bundle exec rspec spec/faraday_spec.rb
+
+Randomized with seed 57031
+
+Faraday
+  has a version number
+  proxies to default_connection
+    uses method_missing on Faraday if there is no proxyable method (FAILED - 1)
+    proxies methods that exist on the default_connection
+    proxied methods can be accessed
+
+Failures:
+
+  1) Faraday proxies to default_connection uses method_missing on Faraday if there is no proxyable method
+     Failure/Error:
+       expect { Faraday.this_method_does_not_exist }.to raise_error(
+         NoMethodError, expected_message
+       )
+
+       expected NoMethodError with "undefined method `this_method_does_not_exist' for Faraday:Module",
+       got #<NoMethodError: undefined method `this_method_does_not_exist' for module Faraday> with backtrace:
+         # ./lib/faraday.rb:147:in `method_missing'
+         # ./spec/faraday_spec.rb:27:in `block (4 levels) in <top (required)>'
+         # ./spec/faraday_spec.rb:27:in `block (3 levels) in <top (required)>'
+     # ./spec/faraday_spec.rb:27:in `block (3 levels) in <top (required)>'
+```
+
+That error message has been changed by https://github.com/ruby/ruby/commit/e7b8d32e in Ruby 3.3.0dev.
+
+cf. https://bugs.ruby-lang.org/issues/18285
+
+So the test error message is changed:
+
+Ruby 3.2 or lower:
+
+```
+undefined method `this_method_does_not_exist' for Faraday:Module
+```
+
+Ruby 3.3.0dev:
+
+```
+NoMethodError: undefined method `this_method_does_not_exist' for module Faraday
+```
+---
+ spec/faraday_spec.rb | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/spec/faraday_spec.rb b/spec/faraday_spec.rb
+index 8b603ebbd..25d9d4fa9 100644
+--- a/spec/faraday_spec.rb
++++ b/spec/faraday_spec.rb
+@@ -18,10 +18,13 @@
+     end
+ 
+     it 'uses method_missing on Faraday if there is no proxyable method' do
+-      expect { Faraday.this_method_does_not_exist }.to raise_error(
+-        NoMethodError,
+-        "undefined method `this_method_does_not_exist' for Faraday:Module"
+-      )
++      expected_message = if RUBY_VERSION >= '3.3'
++                           "undefined method `this_method_does_not_exist' for module Faraday"
++                         else
++                           "undefined method `this_method_does_not_exist' for Faraday:Module"
++                         end
++
++      expect { Faraday.this_method_does_not_exist }.to raise_error(NoMethodError, expected_message)
+     end
+ 
+     it 'proxied methods can be accessed' do

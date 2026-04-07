@@ -1,0 +1,25 @@
+Index: os-prober/os-prober
+===================================================================
+--- os-prober.orig/os-prober
++++ os-prober/os-prober
+@@ -64,6 +64,11 @@ partitions () {
+ 		exit 0
+ 	fi
+ 
++	# Add MD RAID devices
++	if [ -f /proc/mdstat ] ; then
++		awk '/^md/ {printf "/dev/"$1"\n"}' /proc/mdstat
++	fi
++
+ 	# Also detect OSes on LVM volumes (assumes LVM is active)
+ 	if type lvs >/dev/null 2>&1; then
+ 		echo "$(LVM_SUPPRESS_FD_WARNINGS=1 log_output lvs --noheadings --separator : -o vg_name,lv_name |
+@@ -123,7 +128,7 @@ if [ -f /proc/swaps ]; then
+ fi
+ : >"$OS_PROBER_TMP/raided-map"
+ if [ -f /proc/mdstat ] ; then
+-	grep "^md" /proc/mdstat | parse_proc_mdstat >"$OS_PROBER_TMP/raided-map" || true
++	grep "^md" /proc/mdstat | cut -d: -f2- | parse_proc_mdstat >"$OS_PROBER_TMP/raided-map" || true
+ fi
+ 
+ for partition in $(partitions); do

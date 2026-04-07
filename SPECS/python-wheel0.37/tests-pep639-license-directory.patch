@@ -1,0 +1,43 @@
+From 42f67bcb67eeb172639c5cba511eea1747cf6d33 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Fri, 9 Jan 2026 14:34:45 +0100
+Subject: [PATCH] Adjust the tests for PEP 639 licenses directory
+
+---
+ tests/test_bdist_wheel.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/tests/test_bdist_wheel.py b/tests/test_bdist_wheel.py
+index 2020a7e..f3697cd 100644
+--- a/tests/test_bdist_wheel.py
++++ b/tests/test_bdist_wheel.py
+@@ -66,7 +66,7 @@ def test_licenses_default(dummy_dist, monkeypatch, tmpdir):
+     subprocess.check_call([sys.executable, 'setup.py', 'bdist_wheel', '-b', str(tmpdir),
+                            '--universal'])
+     with WheelFile('dist/dummy_dist-1.0-py2.py3-none-any.whl') as wf:
+-        license_files = {'dummy_dist-1.0.dist-info/' + fname for fname in DEFAULT_LICENSE_FILES}
++        license_files = {'dummy_dist-1.0.dist-info/licenses/' + fname for fname in DEFAULT_LICENSE_FILES}
+         assert set(wf.namelist()) == DEFAULT_FILES | license_files
+ 
+ 
+@@ -76,7 +76,7 @@ def test_licenses_deprecated(dummy_dist, monkeypatch, tmpdir):
+     subprocess.check_call([sys.executable, 'setup.py', 'bdist_wheel', '-b', str(tmpdir),
+                            '--universal'])
+     with WheelFile('dist/dummy_dist-1.0-py2.py3-none-any.whl') as wf:
+-        license_files = {'dummy_dist-1.0.dist-info/DUMMYFILE'}
++        license_files = {'dummy_dist-1.0.dist-info/licenses/licenses/DUMMYFILE'}
+         assert set(wf.namelist()) == DEFAULT_FILES | license_files
+ 
+ 
+@@ -86,7 +86,7 @@ def test_licenses_override(dummy_dist, monkeypatch, tmpdir):
+     subprocess.check_call([sys.executable, 'setup.py', 'bdist_wheel', '-b', str(tmpdir),
+                            '--universal'])
+     with WheelFile('dist/dummy_dist-1.0-py2.py3-none-any.whl') as wf:
+-        license_files = {'dummy_dist-1.0.dist-info/' + fname for fname in {'DUMMYFILE', 'LICENSE'}}
++        license_files = {'dummy_dist-1.0.dist-info/licenses/' + fname for fname in {'licenses/DUMMYFILE', 'LICENSE'}}
+         assert set(wf.namelist()) == DEFAULT_FILES | license_files
+ 
+ 
+-- 
+2.52.0
+

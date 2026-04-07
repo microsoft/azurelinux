@@ -1,0 +1,12 @@
+diff -up sblim-cmpi-base-1.6.4/OSBase_Common.c.orig sblim-cmpi-base-1.6.4/OSBase_Common.c
+--- sblim-cmpi-base-1.6.4/OSBase_Common.c.orig	2025-01-21 11:03:08.283417307 +0100
++++ sblim-cmpi-base-1.6.4/OSBase_Common.c	2025-01-21 11:13:07.269045085 +0100
+@@ -259,7 +259,7 @@ char *sse_to_cmpi_datetime_str(long sse,
+   char *dt = malloc(26);
+   char *dt2 = malloc(26);
+   struct tm bdtime;
+-  struct tm *(*func)();
++  struct tm *(*func)(const time_t *timer,  struct tm *tp);
+   int offset = 0;
+   
+   _OSBASE_TRACE(4,

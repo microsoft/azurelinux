@@ -1,0 +1,13 @@
+diff --git a/cassandane/Cassandane/BuildInfo.pm b/cassandane/Cassandane/BuildInfo.pm
+index f98bf2d..19720ec 100644
+--- a/cassandane/Cassandane/BuildInfo.pm
++++ b/cassandane/Cassandane/BuildInfo.pm
+@@ -71,7 +71,7 @@ sub _read_buildinfo
+     my ($destdir, $prefix) = @_;
+ 
+     my $cyr_buildinfo;
+-    foreach my $bindir (qw(sbin cyrus/bin)) {
++    foreach my $bindir (qw(bin sbin cyrus/bin)) {
+         my $p = "$destdir$prefix/$bindir/cyr_buildinfo";
+         if (-x $p) {
+             $cyr_buildinfo = $p;

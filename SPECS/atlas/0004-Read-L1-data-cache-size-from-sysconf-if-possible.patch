@@ -1,0 +1,46 @@
+From a45cebf11522b3112fba3d682224a232ae5e2e98 Mon Sep 17 00:00:00 2001
+From: Andreas Arnez <arnez@linux.ibm.com>
+Date: Wed, 12 Dec 2018 19:44:32 +0100
+Subject: [PATCH 4/8] Read L1 data cache size from sysconf if possible
+
+The probing of the L1 data cache size is sometimes not reliable.  This can
+cause the tuning to yield varying, sub-obtimal results.  But on Linux the
+L1 data cache size can usually be retrieved with sysconf instead, which is
+faster and more reliable.  Do this whenever possible.
+---
+ tune/sysinfo/L1CacheSize.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/tune/sysinfo/L1CacheSize.c b/tune/sysinfo/L1CacheSize.c
+index e62a273..dffa76e 100644
+--- a/tune/sysinfo/L1CacheSize.c
++++ b/tune/sysinfo/L1CacheSize.c
+@@ -30,6 +30,7 @@
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <unistd.h>
+ 
+ #define REPS 4096
+ 
+@@ -276,7 +277,16 @@ int main(int nargs, char *args[])
+       exit(-1);
+    }
+    if (nargs > 1) MaxSize = atoi(args[1]);
+-   L1Size = GetL1Size(MaxSize, 1.08);
++
++#ifdef _SC_LEVEL1_DCACHE_SIZE
++   {
++      long res = sysconf(_SC_LEVEL1_DCACHE_SIZE);
++      L1Size = res > 0 ? (int) (res / 1024) : 0;
++   }
++#endif
++
++   if (!L1Size)
++      L1Size = GetL1Size(MaxSize, 1.08);
+    if (!L1Size)
+       L1Size = GetL1Size(MaxSize, 1.08);
+    if (!L1Size)
+-- 
+2.23.0
+

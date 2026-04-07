@@ -1,0 +1,118 @@
+#!/bin/bash
+OUTPUT_DIR="$(rpm -E '%{_sourcedir}')"
+
+usage() {
+  echo "Usage `basename $0` <npm_name> [version] [tarball]" >&2
+  echo >&2
+  echo "  Given a npm module name, and optionally a version," >&2
+  echo "    download the npm, the prod and dev dependencies," >&2
+  echo "    each in their own tarball." >&2
+  echo "    Also finds licenses prod dependencies." >&2
+  echo "  All three tarballs and the license list are copied to ${OUTPUT_DIR}" >&2
+  echo "  If a tarball is passed, use that instead of downloading from npm" >&2
+  echo >&2
+  exit 1
+}
+
+if ! [ -f /usr/bin/npm ]; then 
+  echo >&2
+  echo "`basename $0` requires npm to run" >&2
+  echo >&2
+  echo "Run the following to fix this" >&2
+  echo "  sudo dnf install npm" >&2
+  echo >&2
+  exit 2
+fi 
+
+if [ $# -lt 1 ]; then 
+  usage
+else
+  case $1 in
+	  -h | --help )
+		  usage
+		;;
+		* )
+		  PACKAGE="$1"
+		;;
+	esac
+fi 
+
+if [ $# -ge 2 ]; then 
+  VERSION="$2"
+  if [ $# -ge 3 ]; then
+    TARBALL="$(realpath "$3")"
+  fi
+else
+  VERSION="$(npm view ${PACKAGE} version)"
+fi 
+# the package name might contain invalid characters, sanitize first
+PACKAGE_SAFE=$(echo $PACKAGE | sed -e 's|/|-|g')
+TMP_DIR=$(mktemp -d -t ci-XXXXXXXXXX)
+mkdir -p ${OUTPUT_DIR}
+mkdir -p ${TMP_DIR}
+pushd ${TMP_DIR}
+if [ -f "$TARBALL" ]; then
+  TARBALL_DIR=$(mktemp -d -t ci-XXXXXXXXXX)
+  pushd ${TARBALL_DIR}
+  tar xfz ${TARBALL} --strip-components 1
+  npm pack .
+  popd > /dev/null
+  mv ${TARBALL_DIR}/*.tgz .
+  rm -rf ${TARBALL_DIR}
+else
+  npm pack ${PACKAGE}@${VERSION}
+fi
+tar xfz *.tgz
+cd package
+for packagejson in $(find . -type d -name node_modules\* -prune -o -type f -name package.json -print); do
+  pushd $(dirname $packagejson)
+  echo " Downloading prod dependencies"
+  npm install --omit=dev --omit=optional
+  if [ $? -ge 1 ] ; then
+    echo "    ERROR WILL ROBINSON"
+    rm -rf node_modules
+  else
+    echo "    Successful prod dependencies download"
+    mv node_modules/ node_modules_prod
+  fi
+  popd
+done
+
+echo "LICENSES IN BUNDLE:"
+find . -name "package.json" -exec jq '.license | strings' {} \; >> ${TMP_DIR}/${PACKAGE_SAFE}-${VERSION}-bundled-licenses.txt
+find . -name "package.json" -exec jq '.license | objects | .type' {} \; >> ${TMP_DIR}/${PACKAGE_SAFE}-${VERSION}-bundled-licenses.txt 2>/dev/null
+find . -name "package.json" -exec jq '.licenses[] .type' {} \; >> ${TMP_DIR}/${PACKAGE_SAFE}-${VERSION}-bundled-licenses.txt 2>/dev/null
+sort -u -o ${TMP_DIR}/${PACKAGE_SAFE}-${VERSION}-bundled-licenses.txt ${TMP_DIR}/${PACKAGE_SAFE}-${VERSION}-bundled-licenses.txt
+
+# Locate any dependencies without a provided license
+find . -type f -name package.json -execdir jq 'if .license==null and .licenses==null then .name else null end' '{}' '+' | grep -vE '^null$' | sort -u > ${TMP_DIR}/nolicense.txt
+
+if [ -s ${TMP_DIR}/nolicense.txt ]; then
+  echo -e "\e[5m\e[41mSome dependencies do not list a license. Manual verification required!\e[0m"
+  cat ${TMP_DIR}/nolicense.txt
+  echo -e "\e[5m\e[41m======================================================================\e[0m"
+fi
+
+
+for packagejson in $(find . -type d -name node_modules\* -prune -o -type f -name package.json -print); do
+  pushd $(dirname $packagejson)
+  echo " Downloading dev dependencies"
+  npm install --omit=optional
+  if [ $? -ge 1 ] ; then
+    echo "    ERROR WILL ROBINSON"
+  else
+    echo "    Successful dev dependencies download"
+    mv node_modules/ node_modules_dev
+  fi
+  popd
+done
+if [ -d node_modules_prod ] ; then
+  tar cfz ../${PACKAGE_SAFE}-${VERSION}-nm-prod.tgz --sort=name $(find . -type d -name node_modules_prod)
+fi
+if [ -d node_modules_dev ] ; then
+  tar cfz ../${PACKAGE_SAFE}-${VERSION}-nm-dev.tgz --sort=name $(find . -type d -name node_modules_dev)
+fi
+cd ..
+cp -v ${PACKAGE_SAFE}-${VERSION}* "${OUTPUT_DIR}"
+popd > /dev/null
+rm -rf ${TMP_DIR}

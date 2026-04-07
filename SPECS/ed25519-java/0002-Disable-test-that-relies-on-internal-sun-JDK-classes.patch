@@ -1,0 +1,46 @@
+From 1ea7fb5ed949d8a458fda40b186868b7cffbb271 Mon Sep 17 00:00:00 2001
+From: Mat Booth <mat.booth@gmail.com>
+Date: Wed, 1 Dec 2021 09:35:10 +0000
+Subject: [PATCH 2/2] Disable test that relies on internal sun JDK classes
+
+---
+ test/net/i2p/crypto/eddsa/EdDSAEngineTest.java | 18 ------------------
+ 1 file changed, 18 deletions(-)
+
+diff --git a/test/net/i2p/crypto/eddsa/EdDSAEngineTest.java b/test/net/i2p/crypto/eddsa/EdDSAEngineTest.java
+index 2ed793b..adc46fd 100644
+--- a/test/net/i2p/crypto/eddsa/EdDSAEngineTest.java
++++ b/test/net/i2p/crypto/eddsa/EdDSAEngineTest.java
+@@ -31,8 +31,6 @@ import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
+ import org.junit.Rule;
+ import org.junit.Test;
+ import org.junit.rules.ExpectedException;
+-import sun.security.util.DerValue;
+-import sun.security.x509.X509Key;
+ 
+ /**
+  * @author str4d
+@@ -217,20 +215,4 @@ public class EdDSAEngineTest {
+         assertThat("verifyOneShot() failed", sgr.verifyOneShot(TEST_MSG, TEST_MSG_SIG), is(true));
+     }
+ 
+-    @Test
+-    public void testVerifyX509PublicKeyInfo() throws Exception {
+-        EdDSAParameterSpec spec = EdDSANamedCurveTable.getByName("Ed25519");
+-        Signature sgr = new EdDSAEngine(MessageDigest.getInstance(spec.getHashAlgorithm()));
+-        for (Ed25519TestVectors.TestTuple testCase : Ed25519TestVectors.testCases) {
+-            EdDSAPublicKeySpec pubKey = new EdDSAPublicKeySpec(testCase.pk, spec);
+-            PublicKey vKey = new EdDSAPublicKey(pubKey);
+-            PublicKey x509Key = X509Key.parse(new DerValue(vKey.getEncoded()));
+-            sgr.initVerify(x509Key);
+-
+-            sgr.update(testCase.message);
+-
+-            assertThat("Test case " + testCase.caseNum + " failed",
+-                    sgr.verify(testCase.sig), is(true));
+-        }
+-    }
+ }
+-- 
+2.33.1
+

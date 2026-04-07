@@ -1,0 +1,26 @@
+From 84323511d9558acb40614ca7cd19436901b02629 Mon Sep 17 00:00:00 2001
+From: Simo Sorce <simo@redhat.com>
+Date: Mon, 24 Mar 2025 11:03:45 -0400
+Subject: [PATCH 28/59] FIPS: RSA: Mark x931 as not approved by default
+
+Signed-off-by: Simo Sorce <simo@redhat.com>
+---
+ providers/fips/include/fips_indicator_params.inc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/providers/fips/include/fips_indicator_params.inc b/providers/fips/include/fips_indicator_params.inc
+index 6bd783eb0a..c1b029de86 100644
+--- a/providers/fips/include/fips_indicator_params.inc
++++ b/providers/fips/include/fips_indicator_params.inc
+@@ -15,7 +15,7 @@ OSSL_FIPS_PARAM(dsa_sign_disallowed, DSA_SIGN_DISABLED, 0)
+ OSSL_FIPS_PARAM(tdes_encrypt_disallowed, TDES_ENCRYPT_DISABLED, 0)
+ OSSL_FIPS_PARAM(rsa_pkcs15_padding_disabled, RSA_PKCS15_PAD_DISABLED, 1)
+ OSSL_FIPS_PARAM(rsa_pss_saltlen_check, RSA_PSS_SALTLEN_CHECK, 0)
+-OSSL_FIPS_PARAM(rsa_sign_x931_disallowed, RSA_SIGN_X931_PAD_DISABLED, 0)
++OSSL_FIPS_PARAM(rsa_sign_x931_disallowed, RSA_SIGN_X931_PAD_DISABLED, 1)
+ OSSL_FIPS_PARAM(hkdf_key_check, HKDF_KEY_CHECK, 0)
+ OSSL_FIPS_PARAM(kbkdf_key_check, KBKDF_KEY_CHECK, 0)
+ OSSL_FIPS_PARAM(tls13_kdf_key_check, TLS13_KDF_KEY_CHECK, 0)
+-- 
+2.51.0
+

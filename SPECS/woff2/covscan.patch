@@ -1,0 +1,164 @@
+diff --git a/src/font.cc b/src/font.cc
+index a45153e..0e9f5bf 100644
+--- a/src/font.cc
++++ b/src/font.cc
+@@ -66,7 +66,7 @@ bool ReadTrueTypeFont(Buffer* file, const uint8_t* data, size_t len,
+ 
+   std::map<uint32_t, uint32_t> intervals;
+   for (uint16_t i = 0; i < font->num_tables; ++i) {
+-    Font::Table table;
++    Font::Table table = {};
+     table.flag_byte = 0;
+     table.reuse_of = NULL;
+     if (!file->ReadU32(&table.tag) ||
+@@ -326,7 +326,7 @@ int NumGlyphs(const Font& font) {
+     return 0;
+   }
+   int index_fmt = IndexFormat(font);
+-  int loca_record_size = (index_fmt == 0 ? 2 : 4);
++  uint32_t loca_record_size = (index_fmt == 0 ? 2 : 4);
+   if (loca_table->length < loca_record_size) {
+     return 0;
+   }
+diff --git a/src/glyph.h b/src/glyph.h
+index f24056f..e870188 100644
+--- a/src/glyph.h
++++ b/src/glyph.h
+@@ -22,17 +22,17 @@ namespace woff2 {
+ // is around.
+ class Glyph {
+  public:
+-  Glyph() : instructions_size(0), composite_data_size(0) {}
++  Glyph() {}
+ 
+   // Bounding box.
+-  int16_t x_min;
+-  int16_t x_max;
+-  int16_t y_min;
+-  int16_t y_max;
++  int16_t x_min = 0;
++  int16_t x_max = 0;
++  int16_t y_min = 0;
++  int16_t y_max = 0;
+ 
+   // Instructions.
+-  uint16_t instructions_size;
+-  const uint8_t* instructions_data;
++  uint16_t instructions_size = 0;
++  const uint8_t* instructions_data = 0;
+ 
+   // Data model for simple glyphs.
+   struct Point {
+@@ -43,9 +43,9 @@ class Glyph {
+   std::vector<std::vector<Point> > contours;
+ 
+   // Data for composite glyphs.
+-  const uint8_t* composite_data;
+-  uint32_t composite_data_size;
+-  bool have_instructions;
++  const uint8_t* composite_data = 0;
++  uint32_t composite_data_size = 0;
++  bool have_instructions = false;
+ };
+ 
+ // Parses the glyph from the given data. Returns false on parsing failure or
+diff --git a/src/normalize.cc b/src/normalize.cc
+index 6685e08..a819074 100644
+--- a/src/normalize.cc
++++ b/src/normalize.cc
+@@ -97,7 +97,7 @@ bool MakeEditableBuffer(Font* font, int tableTag) {
+   table->buffer.resize(sz);
+   uint8_t* buf = &table->buffer[0];
+   memcpy(buf, table->data, table->length);
+-  if (PREDICT_FALSE(sz > table->length)) {
++  if (PREDICT_FALSE(static_cast<uint32_t>(sz) > table->length)) {
+     memset(buf + table->length, 0, sz - table->length);
+   }
+   table->data = buf;
+@@ -213,7 +213,6 @@ bool FixChecksums(Font* font) {
+   size_t offset = 8;
+   StoreU32(0, &offset, head_buf);
+   uint32_t file_checksum = 0;
+-  uint32_t head_checksum = 0;
+   for (auto& i : font->tables) {
+     Font::Table* table = &i.second;
+     if (table->IsReused()) {
+@@ -221,10 +220,6 @@ bool FixChecksums(Font* font) {
+     }
+     table->checksum = ComputeULongSum(table->data, table->length);
+     file_checksum += table->checksum;
+-
+-    if (table->tag == kHeadTableTag) {
+-      head_checksum = table->checksum;
+-    }
+   }
+ 
+   file_checksum += ComputeHeaderChecksum(*font);
+diff --git a/src/woff2_dec.cc b/src/woff2_dec.cc
+index 25e18c6..442baa5 100644
+--- a/src/woff2_dec.cc
++++ b/src/woff2_dec.cc
+@@ -316,7 +316,7 @@ void ComputeBbox(unsigned int n_points, const Point* points, uint8_t* dst) {
+   offset = Store16(dst, offset, x_min);
+   offset = Store16(dst, offset, y_min);
+   offset = Store16(dst, offset, x_max);
+-  offset = Store16(dst, offset, y_max);
++  Store16(dst, offset, y_max);
+ }
+ 
+ 
+diff --git a/src/woff2_enc.cc b/src/woff2_enc.cc
+index ec00878..c0598f8 100644
+--- a/src/woff2_enc.cc
++++ b/src/woff2_enc.cc
+@@ -331,20 +331,17 @@ bool ConvertTTFToWOFF2(const uint8_t *data, size_t length,
+         return false;
+       }
+ 
+-      Table table;
++      Table table = {};
+       table.tag = src_table.tag;
+       table.flags = src_table.flag_byte;
+       table.src_length = src_table.length;
+       table.transform_length = src_table.length;
+-      const uint8_t* transformed_data = src_table.data;
+       const Font::Table* transformed_table =
+           font.FindTable(src_table.tag ^ 0x80808080);
+       if (transformed_table != NULL) {
+         table.flags = transformed_table->flag_byte;
+         table.flags |= kWoff2FlagsTransform;
+         table.transform_length = transformed_table->length;
+-        transformed_data = transformed_table->data;
+-
+       }
+       tables.push_back(table);
+     }
+@@ -423,8 +420,6 @@ bool ConvertTTFToWOFF2(const uint8_t *data, size_t length,
+         // for reused tables, only the original has an updated offset
+         uint32_t table_offset =
+           table.IsReused() ? table.reuse_of->offset : table.offset;
+-        uint32_t table_length =
+-          table.IsReused() ? table.reuse_of->length : table.length;
+         std::pair<uint32_t, uint32_t> tag_offset(table.tag, table_offset);
+         if (index_by_tag_offset.find(tag_offset) == index_by_tag_offset.end()) {
+ #ifdef FONT_COMPRESSION_BIN
+diff --git a/src/woff2_info.cc b/src/woff2_info.cc
+index 2b51adc..8ec9d36 100644
+--- a/src/woff2_info.cc
++++ b/src/woff2_info.cc
+@@ -122,13 +122,13 @@ int main(int argc, char **argv) {
+     if (!woff2::Read255UShort(&file, &numFonts)) return 1;
+     printf("CollectionHeader 0x%08x %d fonts\n", version, numFonts);
+ 
+-    for (auto i = 0; i < numFonts; i++) {
++    for (auto i = 0u; i < numFonts; i++) {
+       uint32_t numTables, flavor;
+       if (!woff2::Read255UShort(&file, &numTables)) return 1;
+       if (!file.ReadU32(&flavor)) return 1;
+       printf("CollectionFontEntry %d flavor 0x%08x %d tables\n", i, flavor,
+           numTables);
+-      for (auto j = 0; j < numTables; j++) {
++      for (auto j = 0u; j < numTables; j++) {
+         uint32_t table_idx;
+         if (!woff2::Read255UShort(&file, &table_idx)) return 1;
+         if (table_idx >= table_tags.size()) return 1;

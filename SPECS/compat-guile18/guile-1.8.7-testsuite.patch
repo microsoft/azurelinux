@@ -1,0 +1,26 @@
+diff -up guile-1.8.7/test-suite/tests/popen.test.testsuite guile-1.8.7/test-suite/tests/popen.test
+--- guile-1.8.7/test-suite/tests/popen.test.testsuite	2009-07-04 00:19:00.000000000 +0200
++++ guile-1.8.7/test-suite/tests/popen.test	2009-07-16 17:09:57.000000000 +0200
+@@ -168,7 +168,7 @@
+ 	   (port (with-error-to-port (cdr c2p)
+ 		   (lambda ()
+ 		     (open-output-pipe
+-		      "exec 0</dev/null; while true; do echo closed 1>&2; done")))))
++		      "exec 0</dev/null; echo closed 1>&2; sleep 3")))))
+       (close-port (cdr c2p))   ;; write side
+       (with-epipe
+        (lambda ()
+diff -up guile-1.8.8/test-suite/tests/srfi-14.test.srfi14test guile-1.8.8/test-suite/tests/srfi-14.test
+--- guile-1.8.8/test-suite/tests/srfi-14.test.srfi14test	2010-12-13 18:24:40.000000000 +0100
++++ guile-1.8.8/test-suite/tests/srfi-14.test	2015-07-15 17:30:44.975307452 +0200
+@@ -281,7 +281,9 @@
+   (pass-if "char-set:lower-case (size)"
+      (if (not %latin1)
+ 	 (throw 'unresolved)
+-	 (= (char-set-size char-set:lower-case) (+ 26 33))))
++	 (let ((size (char-set-size char-set:lower-case)))
++	   (or (= size (+ 26 33))
++	       (= size (+ 26 35))))))
+ 
+   (pass-if "char-set:upper-case (size)"
+      (if (not %latin1)

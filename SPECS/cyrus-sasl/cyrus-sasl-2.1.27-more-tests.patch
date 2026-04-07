@@ -1,0 +1,761 @@
+From 10ac4d4822023b24734acde3c07186937ad52813 Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Wed, 6 Jan 2021 12:38:46 +0100
+Subject: [PATCH] Some basic PLAIN auth tests
+
+Signed-off-by: Dmitry Belyavskiy <beldmit@gmail.com>
+---
+ tests/runtests.py    | 91 +++++++++++++++++++++++++++++++++++++++++
+ tests/t_gssapi_cli.c | 97 +++++++++++++++++++++++++++++++++++++++-----
+ tests/t_gssapi_srv.c | 78 +++++++++++++++++++++++++++--------
+ 3 files changed, 239 insertions(+), 27 deletions(-)
+
+diff --git a/tests/runtests.py b/tests/runtests.py
+index fc9cf244..513ed3ff 100755
+--- a/tests/runtests.py
++++ b/tests/runtests.py
+@@ -239,6 +239,96 @@ def gssapi_tests(testdir):
+ 
+     os.killpg(kdc.pid, signal.SIGTERM)
+ 
++def setup_plain(testdir):
++    """ Create sasldb file """
++    sasldbfile = os.path.join(testdir, 'testsasldb.db')
++
++    sasldbenv = {'SASL_PATH': os.path.join(testdir, '../../plugins/.libs'),
++                 'LD_LIBRARY_PATH' : os.path.join(testdir, '../../lib/.libs')}
++
++    passwdprog = os.path.join(testdir, '../../utils/saslpasswd2')
++
++    echo = subprocess.Popen(('echo', '1234567'), stdout=subprocess.PIPE)
++    subprocess.check_call([
++        passwdprog, "-f", sasldbfile, "-c", "test",
++        "-u", "host.realm.test", "-p"
++        ], stdin=echo.stdout, env=sasldbenv, timeout=5)
++
++    return (sasldbfile, sasldbenv)
++
++def plain_test(sasldbfile, sasldbenv):
++    try:
++        srv = subprocess.Popen(["../tests/t_gssapi_srv", "-P", sasldbfile],
++                               stdout=subprocess.PIPE,
++                               stderr=subprocess.PIPE, env=sasldbenv)
++        srv.stdout.readline() # Wait for srv to say it is ready
++        cli = subprocess.Popen(["../tests/t_gssapi_cli", "-P", "1234567"],
++                               stdout=subprocess.PIPE,
++                               stderr=subprocess.PIPE, env=sasldbenv)
++        try:
++            cli.wait(timeout=5)
++            srv.wait(timeout=5)
++        except Exception as e:
++            print("Failed on {}".format(e));
++            cli.kill()
++            srv.kill()
++        if cli.returncode != 0 or srv.returncode != 0:
++            raise Exception("CLI ({}): {} --> SRV ({}): {}".format(
++                cli.returncode, cli.stderr.read().decode('utf-8'),
++                srv.returncode, srv.stderr.read().decode('utf-8')))
++    except Exception as e:
++        print("FAIL: {}".format(e))
++        return
++
++    print("PASS: PLAIN CLI({}) SRV({})".format(
++        cli.stdout.read().decode('utf-8').strip(),
++        srv.stdout.read().decode('utf-8').strip()))
++    return
++
++def plain_mismatch_test(sasldbfile, sasldbenv):
++    result = "FAIL"
++    try:
++        srv = subprocess.Popen(["../tests/t_gssapi_srv", "-P", sasldbfile],
++                               stdout=subprocess.PIPE,
++                               stderr=subprocess.PIPE, env=sasldbenv)
++        srv.stdout.readline() # Wait for srv to say it is ready
++        bindings = base64.b64encode("CLI CBS".encode('utf-8'))
++        cli = subprocess.Popen(["../tests/t_gssapi_cli", "-P", "12345678"],
++                               stdout=subprocess.PIPE,
++                               stderr=subprocess.PIPE, env=sasldbenv)
++        try:
++            cli.wait(timeout=5)
++            srv.wait(timeout=5)
++        except Exception as e:
++            print("Failed on {}".format(e));
++            cli.kill()
++            srv.kill()
++        if cli.returncode != 0 or srv.returncode != 0:
++            cli_err = cli.stderr.read().decode('utf-8').strip()
++            srv_err = srv.stderr.read().decode('utf-8').strip()
++            if "authentication failure" in srv_err:
++                result = "PASS"
++            raise Exception("CLI ({}): {} --> SRV ({}): {}".format(
++                cli.returncode, cli_err, srv.returncode, srv_err))
++    except Exception as e:
++        print("{}: {}".format(result, e))
++        return
++
++    print("FAIL: This test should fail [CLI({}) SRV({})]".format(
++        cli.stdout.read().decode('utf-8').strip(),
++        srv.stdout.read().decode('utf-8').strip()))
++    return
++
++def plain_tests(testdir):
++    sasldbfile, sasldbenv = setup_plain(testdir)
++    #print("DB file: {}, ENV: {}".format(sasldbfile, sasldbenv))
++    print('SASLDB PLAIN:')
++    print('    ', end='')
++    plain_test(sasldbfile, sasldbenv)
++
++    print('SASLDB PLAIN PASSWORD MISMATCH:')
++    print('    ', end='')
++    plain_mismatch_test(sasldbfile, sasldbenv)
+ 
+ if __name__ == "__main__":
+ 
+@@ -254,3 +344,4 @@ def gssapi_tests(testdir):
+     os.makedirs(T)
+ 
+     gssapi_tests(T)
++    plain_tests(T)
+diff --git a/tests/t_gssapi_cli.c b/tests/t_gssapi_cli.c
+index a44a3f58..20d22070 100644
+--- a/tests/t_gssapi_cli.c
++++ b/tests/t_gssapi_cli.c
+@@ -16,6 +16,8 @@
+ #include <saslplug.h>
+ #include <saslutil.h>
+ 
++const char *testpass = NULL;
++
+ static int setup_socket(void)
+ {
+     struct sockaddr_in addr;
+@@ -34,9 +36,60 @@ static int setup_socket(void)
+     return sock;
+ }
+ 
++static int get_user(void *context __attribute__((unused)),
++                  int id,
++                  const char **result,
++                  unsigned *len)
++{
++    const char *testuser = "test@host.realm.test";
++
++    if (! result)
++        return SASL_BADPARAM;
++
++    switch (id) {
++    case SASL_CB_USER:
++    case SASL_CB_AUTHNAME:
++        *result = testuser;
++        break;
++    default:
++        return SASL_BADPARAM;
++    }
++
++    if (len) *len = strlen(*result);
++
++    return SASL_OK;
++}
++
++static int get_pass(sasl_conn_t *conn __attribute__((unused)),
++          void *context __attribute__((unused)),
++          int id,
++          sasl_secret_t **psecret)
++{
++    size_t len;
++    static sasl_secret_t *x;
++
++    /* paranoia check */
++    if (! conn || ! psecret || id != SASL_CB_PASS)
++        return SASL_BADPARAM;
++
++    len = strlen(testpass);
++
++    x = (sasl_secret_t *) realloc(x, sizeof(sasl_secret_t) + len);
++
++    if (!x) {
++        return SASL_NOMEM;
++    }
++
++    x->len = len;
++    strcpy((char *)x->data, testpass);
++
++    *psecret = x;
++    return SASL_OK;
++}
++
+ int main(int argc, char *argv[])
+ {
+-    sasl_callback_t callbacks[2] = {};
++    sasl_callback_t callbacks[4] = {};
+     char buf[8192];
+     const char *chosenmech;
+     sasl_conn_t *conn;
+@@ -46,12 +99,18 @@ int main(int argc, char *argv[])
+     char cb_buf[256];
+     int sd;
+     int c, r;
++    const char *sasl_mech = "GSSAPI";
++    int plain = 0;
+ 
+-    while ((c = getopt(argc, argv, "c:")) != EOF) {
++    while ((c = getopt(argc, argv, "c:P:")) != EOF) {
+         switch (c) {
+         case 'c':
+             parse_cb(&cb, cb_buf, 256, optarg);
+             break;
++        case 'P':
++            plain = 1;
++            testpass = optarg;
++            break;
+         default:
+             break;
+         }
+@@ -64,6 +123,22 @@ int main(int argc, char *argv[])
+     callbacks[1].id = SASL_CB_LIST_END;
+     callbacks[1].proc = NULL;
+     callbacks[1].context = NULL;
++    callbacks[2].id = SASL_CB_LIST_END;
++    callbacks[2].proc = NULL;
++    callbacks[2].context = NULL;
++    callbacks[3].id = SASL_CB_LIST_END;
++    callbacks[3].proc = NULL;
++    callbacks[3].context = NULL;
++
++    if (plain) {
++        sasl_mech = "PLAIN";
++
++        callbacks[1].id = SASL_CB_AUTHNAME;
++        callbacks[1].proc = (sasl_callback_ft)&get_user;
++
++        callbacks[2].id = SASL_CB_PASS;
++        callbacks[2].proc = (sasl_callback_ft)&get_pass;
++    }
+ 
+     r = sasl_client_init(callbacks);
+     if (r != SASL_OK) exit(-1);
+@@ -78,11 +153,11 @@ int main(int argc, char *argv[])
+         sasl_setprop(conn, SASL_CHANNEL_BINDING, &cb);
+     }
+ 
+-    r = sasl_client_start(conn, "GSSAPI", NULL, &data, &len, &chosenmech);
++    r = sasl_client_start(conn, sasl_mech, NULL, &data, &len, &chosenmech);
+     if (r != SASL_OK && r != SASL_CONTINUE) {
+-	saslerr(r, "starting SASL negotiation");
+-	printf("\n%s\n", sasl_errdetail(conn));
+-	exit(-1);
++        saslerr(r, "starting SASL negotiation");
++        printf("\n%s\n", sasl_errdetail(conn));
++        exit(-1);
+     }
+ 
+     sd = setup_socket();
+@@ -92,11 +167,11 @@ int main(int argc, char *argv[])
+         len = 8192;
+         recv_string(sd, buf, &len);
+ 
+-	r = sasl_client_step(conn, buf, len, NULL, &data, &len);
+-	if (r != SASL_OK && r != SASL_CONTINUE) {
+-	    saslerr(r, "performing SASL negotiation");
+-	    printf("\n%s\n", sasl_errdetail(conn));
+-	    exit(-1);
++        r = sasl_client_step(conn, buf, len, NULL, &data, &len);
++        if (r != SASL_OK && r != SASL_CONTINUE) {
++            saslerr(r, "performing SASL negotiation");
++            printf("\n%s\n", sasl_errdetail(conn));
++            exit(-1);
+         }
+     }
+ 
+diff --git a/tests/t_gssapi_srv.c b/tests/t_gssapi_srv.c
+index ef1217f6..430cad65 100644
+--- a/tests/t_gssapi_srv.c
++++ b/tests/t_gssapi_srv.c
+@@ -1,4 +1,5 @@
+-/* Copyright (C) Simo Sorce <simo@redhat.com>
++/* Copyright (C) Simo Sorce <simo@redhat.com>,
++ * Dmitry Belyavskiy <dbelyavs@redhat.com>
+  * See COPYING file for License */
+ 
+ #include "t_common.h"
+@@ -15,6 +16,10 @@
+ #include <arpa/inet.h>
+ #include <saslplug.h>
+ 
++const char *sasldb_path = NULL,
++      *auxprop_plugin = "sasldb",
++      *pwcheck_method = "auxprop-hashed";
++
+ static int setup_socket(void)
+ {
+     struct sockaddr_in addr;
+@@ -45,9 +50,38 @@ static int setup_socket(void)
+     return sd;
+ }
+ 
++static int test_getopt(void *context __attribute__((unused)),
++                const char *plugin_name __attribute__((unused)),
++                const char *option,
++                const char **result,
++                unsigned *len)
++{
++    if (sasldb_path && !strcmp(option, "sasldb_path")) {
++        *result = sasldb_path;
++        if (len)
++            *len = (unsigned) strlen(sasldb_path);
++        return SASL_OK;
++    }
++
++    if (sasldb_path && !strcmp(option, "auxprop_plugin")) {
++        *result = auxprop_plugin;
++        if (len)
++            *len = (unsigned) strlen(auxprop_plugin);
++        return SASL_OK;
++    }
++
++    if (sasldb_path && !strcmp(option, "pwcheck_method")) {
++        *result = pwcheck_method;
++        if (len)
++            *len = (unsigned) strlen(pwcheck_method);
++        return SASL_OK;
++    }
++    return SASL_FAIL;
++}
++
+ int main(int argc, char *argv[])
+ {
+-    sasl_callback_t callbacks[2] = {};
++    sasl_callback_t callbacks[3] = {};
+     char buf[8192];
+     sasl_conn_t *conn;
+     const char *data;
+@@ -56,25 +90,33 @@ int main(int argc, char *argv[])
+     unsigned char cb_buf[256];
+     int sd;
+     int c, r;
++    const char *sasl_mech = "GSSAPI";
++    int plain = 0;
+ 
+-    while ((c = getopt(argc, argv, "c:")) != EOF) {
++    while ((c = getopt(argc, argv, "c:P:")) != EOF) {
+         switch (c) {
+         case 'c':
+             parse_cb(&cb, cb_buf, 256, optarg);
+             break;
++        case 'P':
++            plain = 1;
++            sasldb_path = optarg;
++            break;
+         default:
+             break;
+         }
+     }
+ 
+-
+     /* initialize the sasl library */
+     callbacks[0].id = SASL_CB_GETPATH;
+     callbacks[0].proc = (sasl_callback_ft)&getpath;
+     callbacks[0].context = NULL;
+-    callbacks[1].id = SASL_CB_LIST_END;
+-    callbacks[1].proc = NULL;
++    callbacks[1].id = SASL_CB_GETOPT;
++    callbacks[1].proc = (sasl_callback_ft)&test_getopt;
+     callbacks[1].context = NULL;
++    callbacks[2].id = SASL_CB_LIST_END;
++    callbacks[2].proc = NULL;
++    callbacks[2].context = NULL;
+ 
+     r = sasl_server_init(callbacks, "t_gssapi_srv");
+     if (r != SASL_OK) exit(-1);
+@@ -90,16 +132,20 @@ int main(int argc, char *argv[])
+         sasl_setprop(conn, SASL_CHANNEL_BINDING, &cb);
+     }
+ 
++    if (plain) {
++        sasl_mech = "PLAIN";
++    }
++
+     sd = setup_socket();
+ 
+     len = 8192;
+     recv_string(sd, buf, &len);
+ 
+-    r = sasl_server_start(conn, "GSSAPI", buf, len, &data, &len);
++    r = sasl_server_start(conn, sasl_mech, buf, len, &data, &len);
+     if (r != SASL_OK && r != SASL_CONTINUE) {
+-	saslerr(r, "starting SASL negotiation");
+-	printf("\n%s\n", sasl_errdetail(conn));
+-	exit(-1);
++        saslerr(r, "starting SASL negotiation");
++        printf("\n%s\n", sasl_errdetail(conn));
++        exit(-1);
+     }
+ 
+     while (r == SASL_CONTINUE) {
+@@ -107,12 +153,12 @@ int main(int argc, char *argv[])
+         len = 8192;
+         recv_string(sd, buf, &len);
+ 
+-	r = sasl_server_step(conn, buf, len, &data, &len);
+-	if (r != SASL_OK && r != SASL_CONTINUE) {
+-	    saslerr(r, "performing SASL negotiation");
+-	    printf("\n%s\n", sasl_errdetail(conn));
+-	    exit(-1);
+-	}
++        r = sasl_server_step(conn, buf, len, &data, &len);
++        if (r != SASL_OK && r != SASL_CONTINUE) {
++            saslerr(r, "performing SASL negotiation");
++            printf("\n%s\n", sasl_errdetail(conn));
++            exit(-1);
++        }
+ 
+     }
+ 
+From d95b0afef1289194148090874799428e9e4f4cff Mon Sep 17 00:00:00 2001
+From: Simo Sorce <idra@samba.org>
+Date: Wed, 15 Apr 2020 11:57:17 -0400
+Subject: [PATCH] Test GSS-SPNEGO as well
+
+Signed-off-by: Simo Sorce <simo@redhat.com>
+---
+ tests/runtests.py    | 91 ++++++++++++++++++++++++++++++++++++++++----
+ tests/t_common.c     | 13 ++++---
+ tests/t_common.h     |  3 +-
+ tests/t_gssapi_cli.c | 22 ++++++++++-
+ tests/t_gssapi_srv.c | 25 ++++++++++--
+ 5 files changed, 134 insertions(+), 20 deletions(-)
+
+diff --git a/tests/runtests.py b/tests/runtests.py
+index 513ed3ff..7be60745 100755
+--- a/tests/runtests.py
++++ b/tests/runtests.py
+@@ -6,6 +6,7 @@
+ import shutil
+ import signal
+ import subprocess
++import sys
+ import time
+ from string import Template
+ 
+@@ -149,11 +150,12 @@ def gssapi_basic_test(kenv):
+                 srv.returncode, srv.stderr.read().decode('utf-8')))
+     except Exception as e:
+         print("FAIL: {}".format(e))
+-        return
++        return 1
+ 
+     print("PASS: CLI({}) SRV({})".format(
+         cli.stdout.read().decode('utf-8').strip(),
+         srv.stdout.read().decode('utf-8').strip()))
++    return 0
+ 
+ def gssapi_channel_binding_test(kenv):
+     try:
+@@ -178,11 +180,12 @@ def gssapi_channel_binding_test(kenv):
+                 srv.returncode, srv.stderr.read().decode('utf-8')))
+     except Exception as e:
+         print("FAIL: {}".format(e))
+-        return
++        return 1
+ 
+     print("PASS: CLI({}) SRV({})".format(
+         cli.stdout.read().decode('utf-8').strip(),
+         srv.stdout.read().decode('utf-8').strip()))
++    return 0
+ 
+ def gssapi_channel_binding_mismatch_test(kenv):
+     result = "FAIL"
+@@ -212,11 +215,70 @@ def gssapi_channel_binding_mismatch_test(kenv):
+                 cli.returncode, cli_err, srv.returncode, srv_err))
+     except Exception as e:
+         print("{}: {}".format(result, e))
+-        return
++        return 0
+ 
+     print("FAIL: This test should fail [CLI({}) SRV({})]".format(
+         cli.stdout.read().decode('utf-8').strip(),
+         srv.stdout.read().decode('utf-8').strip()))
++    return 1
++
++def gss_spnego_basic_test(kenv):
++    try:
++        srv = subprocess.Popen(["../tests/t_gssapi_srv", "-N"],
++                               stdout=subprocess.PIPE,
++                               stderr=subprocess.PIPE, env=kenv)
++        srv.stdout.readline() # Wait for srv to say it is ready
++        cli = subprocess.Popen(["../tests/t_gssapi_cli", "-N"],
++                               stdout=subprocess.PIPE,
++                               stderr=subprocess.PIPE, env=kenv)
++        try:
++            cli.wait(timeout=5)
++            srv.wait(timeout=5)
++        except Exception as e:
++            print("Failed on {}".format(e));
++            cli.kill()
++            srv.kill()
++        if cli.returncode != 0 or srv.returncode != 0:
++            raise Exception("CLI ({}): {} --> SRV ({}): {}".format(
++                cli.returncode, cli.stderr.read().decode('utf-8'),
++                srv.returncode, srv.stderr.read().decode('utf-8')))
++    except Exception as e:
++        print("FAIL: {}".format(e))
++        return 1
++
++    print("PASS: CLI({}) SRV({})".format(
++        cli.stdout.read().decode('utf-8').strip(),
++        srv.stdout.read().decode('utf-8').strip()))
++    return 0
++
++def gss_spnego_zeromaxssf_test(kenv):
++    try:
++        srv = subprocess.Popen(["../tests/t_gssapi_srv", "-N", "-z"],
++                               stdout=subprocess.PIPE,
++                               stderr=subprocess.PIPE, env=kenv)
++        srv.stdout.readline() # Wait for srv to say it is ready
++        cli = subprocess.Popen(["../tests/t_gssapi_cli", "-N", "-z"],
++                               stdout=subprocess.PIPE,
++                               stderr=subprocess.PIPE, env=kenv)
++        try:
++            cli.wait(timeout=5)
++            srv.wait(timeout=5)
++        except Exception as e:
++            print("Failed on {}".format(e));
++            cli.kill()
++            srv.kill()
++        if cli.returncode != 0 or srv.returncode != 0:
++            raise Exception("CLI ({}): {} --> SRV ({}): {}".format(
++                cli.returncode, cli.stderr.read().decode('utf-8'),
++                srv.returncode, srv.stderr.read().decode('utf-8')))
++    except Exception as e:
++        print("FAIL: {}".format(e))
++        return 1
++
++    print("PASS: CLI({}) SRV({})".format(
++        cli.stdout.read().decode('utf-8').strip(),
++        srv.stdout.read().decode('utf-8').strip()))
++    return 0
+ 
+ def gssapi_tests(testdir):
+     """ SASL/GSSAPI Tests """
+@@ -225,19 +287,30 @@ def gssapi_tests(testdir):
+     #print("KDC: {}, ENV: {}".format(kdc, kenv))
+     kenv['KRB5_TRACE'] = os.path.join(testdir, 'trace.log')
+ 
++    err = 0
++
+     print('GSSAPI BASIC:')
+     print('    ', end='')
+-    gssapi_basic_test(kenv)
++    err += gssapi_basic_test(kenv)
+ 
+     print('GSSAPI CHANNEL BINDING:')
+     print('    ', end='')
+-    gssapi_channel_binding_test(kenv)
++    err += gssapi_channel_binding_test(kenv)
+ 
+     print('GSSAPI CHANNEL BINDING MISMTACH:')
+     print('    ', end='')
+-    gssapi_channel_binding_mismatch_test(kenv)
++    err += gssapi_channel_binding_mismatch_test(kenv)
++
++    print('GSS-SPNEGO BASIC:')
++    print('    ', end='')
++    err += gss_spnego_basic_test(kenv)
++
++    print('GSS-SPNEGO 0 MAXSSF:')
++    print('    ', end='')
++    err += gss_spnego_zeromaxssf_test(kenv)
+ 
+     os.killpg(kdc.pid, signal.SIGTERM)
++    return err
+ 
+ def setup_plain(testdir):
+     """ Create sasldb file """
+@@ -343,5 +416,9 @@ def plain_tests(testdir):
+         shutil.rmtree(T)
+     os.makedirs(T)
+ 
+-    gssapi_tests(T)
+     plain_tests(T)
++
++    err = gssapi_tests(T)
++    if err != 0:
++        print('{} test(s) FAILED'.format(err))
++        sys.exit(-1)
+diff --git a/tests/t_common.c b/tests/t_common.c
+index 478e6a1f..f56098ef 100644
+--- a/tests/t_common.c
++++ b/tests/t_common.c
+@@ -23,20 +23,21 @@ void send_string(int sd, const char *s, unsigned int l)
+     if (ret != l) s_error("send data", ret, l, errno);
+ }
+ 
+-void recv_string(int sd, char *buf, unsigned int *buflen)
++void recv_string(int sd, char *buf, unsigned int *buflen, bool allow_eof)
+ {
++    unsigned int bufsize = *buflen;
+     unsigned int l;
+     ssize_t ret;
+ 
++    *buflen = 0;
++
+     ret = recv(sd, &l, sizeof(l), MSG_WAITALL);
++    if (allow_eof && ret == 0) return;
+     if (ret != sizeof(l)) s_error("recv size", ret, sizeof(l), errno);
+ 
+-    if (l == 0) {
+-        *buflen = 0;
+-        return;
+-    }
++    if (l == 0) return;
+ 
+-    if (*buflen < l) s_error("recv len", l, *buflen, E2BIG);
++    if (bufsize < l) s_error("recv len", l, bufsize, E2BIG);
+ 
+     ret = recv(sd, buf, l, 0);
+     if (ret != l) s_error("recv data", ret, l, errno);
+diff --git a/tests/t_common.h b/tests/t_common.h
+index a10def17..be24a53d 100644
+--- a/tests/t_common.h
++++ b/tests/t_common.h
+@@ -4,6 +4,7 @@
+ #include "config.h"
+ 
+ #include <errno.h>
++#include <stdbool.h>
+ #include <stdio.h>
+ #include <sys/socket.h>
+ 
+@@ -12,7 +13,7 @@
+ 
+ void s_error(const char *hdr, ssize_t ret, ssize_t len, int err);
+ void send_string(int sd, const char *s, unsigned int l);
+-void recv_string(int sd, char *buf, unsigned int *buflen);
++void recv_string(int sd, char *buf, unsigned int *buflen, bool allow_eof);
+ void saslerr(int why, const char *what);
+ int getpath(void *context __attribute__((unused)), const char **path);
+ void parse_cb(sasl_channel_binding_t *cb, char *buf, unsigned max, char *in);
+diff --git a/tests/t_gssapi_cli.c b/tests/t_gssapi_cli.c
+index 20d22070..b1dd6ce0 100644
+--- a/tests/t_gssapi_cli.c
++++ b/tests/t_gssapi_cli.c
+@@ -101,8 +101,10 @@ int main(int argc, char *argv[])
+     int c, r;
+     const char *sasl_mech = "GSSAPI";
+     int plain = 0;
++    bool spnego = false;
++    bool zeromaxssf = false;
+ 
+-    while ((c = getopt(argc, argv, "c:P:")) != EOF) {
++    while ((c = getopt(argc, argv, "c:P:zN")) != EOF) {
+         switch (c) {
+         case 'c':
+             parse_cb(&cb, cb_buf, 256, optarg);
+@@ -111,6 +113,12 @@ int main(int argc, char *argv[])
+             plain = 1;
+             testpass = optarg;
+             break;
++        case 'z':
++            zeromaxssf = true;
++            break;
++        case 'N':
++            spnego = true;
++            break;
+         default:
+             break;
+         }
+@@ -153,6 +161,16 @@ int main(int argc, char *argv[])
+         sasl_setprop(conn, SASL_CHANNEL_BINDING, &cb);
+     }
+ 
++    if (spnego) {
++        sasl_mech = "GSS-SPNEGO";
++    }
++
++    if (zeromaxssf) {
++        /* set all security properties to 0 including maxssf */
++        sasl_security_properties_t secprops = { 0 };
++        sasl_setprop(conn, SASL_SEC_PROPS, &secprops);
++    }
++
+     r = sasl_client_start(conn, sasl_mech, NULL, &data, &len, &chosenmech);
+     if (r != SASL_OK && r != SASL_CONTINUE) {
+         saslerr(r, "starting SASL negotiation");
+@@ -165,7 +183,7 @@ int main(int argc, char *argv[])
+     while (r == SASL_CONTINUE) {
+         send_string(sd, data, len);
+         len = 8192;
+-        recv_string(sd, buf, &len);
++        recv_string(sd, buf, &len, false);
+ 
+         r = sasl_client_step(conn, buf, len, NULL, &data, &len);
+         if (r != SASL_OK && r != SASL_CONTINUE) {
+diff --git a/tests/t_gssapi_srv.c b/tests/t_gssapi_srv.c
+index 430cad65..0adbd12f 100644
+--- a/tests/t_gssapi_srv.c
++++ b/tests/t_gssapi_srv.c
+@@ -92,8 +92,10 @@ int main(int argc, char *argv[])
+     int c, r;
+     const char *sasl_mech = "GSSAPI";
+     int plain = 0;
++    bool spnego = false;
++    bool zeromaxssf = false;
+ 
+-    while ((c = getopt(argc, argv, "c:P:")) != EOF) {
++    while ((c = getopt(argc, argv, "c:P:zN")) != EOF) {
+         switch (c) {
+         case 'c':
+             parse_cb(&cb, cb_buf, 256, optarg);
+@@ -102,6 +104,12 @@ int main(int argc, char *argv[])
+             plain = 1;
+             sasldb_path = optarg;
+             break;
++        case 'z':
++            zeromaxssf = true;
++            break;
++        case 'N':
++            spnego = true;
++            break;
+         default:
+             break;
+         }
+@@ -136,10 +144,20 @@ int main(int argc, char *argv[])
+         sasl_mech = "PLAIN";
+     }
+ 
++    if (spnego) {
++        sasl_mech = "GSS-SPNEGO";
++    }
++
++    if (zeromaxssf) {
++        /* set all security properties to 0 including maxssf */
++        sasl_security_properties_t secprops = { 0 };
++        sasl_setprop(conn, SASL_SEC_PROPS, &secprops);
++    }
++
+     sd = setup_socket();
+ 
+     len = 8192;
+-    recv_string(sd, buf, &len);
++    recv_string(sd, buf, &len, false);
+ 
+     r = sasl_server_start(conn, sasl_mech, buf, len, &data, &len);
+     if (r != SASL_OK && r != SASL_CONTINUE) {
+@@ -151,7 +169,7 @@ int main(int argc, char *argv[])
+     while (r == SASL_CONTINUE) {
+         send_string(sd, data, len);
+         len = 8192;
+-        recv_string(sd, buf, &len);
++        recv_string(sd, buf, &len, true);
+ 
+         r = sasl_server_step(conn, buf, len, &data, &len);
+         if (r != SASL_OK && r != SASL_CONTINUE) {
+@@ -159,7 +177,6 @@ int main(int argc, char *argv[])
+             printf("\n%s\n", sasl_errdetail(conn));
+             exit(-1);
+         }
+-
+     }
+ 
+     if (r != SASL_OK) exit(-1);
+

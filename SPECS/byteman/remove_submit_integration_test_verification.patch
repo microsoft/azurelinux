@@ -1,0 +1,14 @@
+diff --git a/byteman-4.0.2/agent/verification.xml b/byteman-4.0.2/agent/verification.xml
+index f530cfe..52ece06 100644
+--- a/byteman-4.0.2/agent/verification.xml
++++ b/byteman-4.0.2/agent/verification.xml
+@@ -171,9 +171,5 @@
+       <location>target/failsafe-reports/org.jboss.byteman.tests.misc.TestThrowBinding.txt</location>
+       <exists/>
+     </file>
+-    <file>
+-      <location>target/failsafe-reports/org.jboss.byteman.tests.submit.TestSubmit.txt</location>
+-      <exists/>
+-    </file>
+   </files>
+ </verifications>

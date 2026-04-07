@@ -1,0 +1,144 @@
+From 254f80ad072dc9cb4e5c9d254fcbd90d4740b98b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Thu, 3 Aug 2023 15:21:57 +0200
+Subject: [PATCH] Fix compatibility with Minitest 5.19+
+
+The `MiniTest` was renamed to `Minitest`:
+
+https://github.com/minitest/minitest/commit/9a57c520ceac76abfe6105866f8548a94eb357b6
+
+And the `MiniTest` constant is now loaded just when `MT_COMPAT` environment variable is set:
+
+https://github.com/minitest/minitest/commit/a2c6c18570f6f0a1bf6af70fe3b6d9599a13fdd6
+---
+ test/helper_test.rb                                  | 2 +-
+ test/load_path_cache/cache_test.rb                   | 2 +-
+ test/load_path_cache/change_observer_test.rb         | 2 +-
+ test/load_path_cache/core_ext/kernel_require_test.rb | 2 +-
+ test/load_path_cache/loaded_features_index_test.rb   | 2 +-
+ test/load_path_cache/path_scanner_test.rb            | 2 +-
+ test/load_path_cache/path_test.rb                    | 2 +-
+ test/load_path_cache/store_test.rb                   | 2 +-
+ test/test_helper.rb                                  | 2 +-
+ 9 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/test/helper_test.rb b/test/helper_test.rb
+index 7c44732..322a83c 100644
+--- a/test/helper_test.rb
++++ b/test/helper_test.rb
+@@ -2,7 +2,7 @@
+ 
+ require("test_helper")
+ 
+-class HelperTest < MiniTest::Test
++class HelperTest < Minitest::Test
+   include(TmpdirHelper)
+ 
+   def test_validate_cache_path
+diff --git a/test/load_path_cache/cache_test.rb b/test/load_path_cache/cache_test.rb
+index 27c161d..bd83907 100644
+--- a/test/load_path_cache/cache_test.rb
++++ b/test/load_path_cache/cache_test.rb
+@@ -4,7 +4,7 @@ require("test_helper")
+ 
+ module Bootsnap
+   module LoadPathCache
+-    class CacheTest < MiniTest::Test
++    class CacheTest < Minitest::Test
+       def setup
+         @dir1 = File.realpath(Dir.mktmpdir)
+         @dir2 = File.realpath(Dir.mktmpdir)
+diff --git a/test/load_path_cache/change_observer_test.rb b/test/load_path_cache/change_observer_test.rb
+index e671bbe..4957fcc 100644
+--- a/test/load_path_cache/change_observer_test.rb
++++ b/test/load_path_cache/change_observer_test.rb
+@@ -4,7 +4,7 @@ require("test_helper")
+ 
+ module Bootsnap
+   module LoadPathCache
+-    class ChangeObserverTest < MiniTest::Test
++    class ChangeObserverTest < Minitest::Test
+       def setup
+         @observer = Object.new
+         @arr = []
+diff --git a/test/load_path_cache/core_ext/kernel_require_test.rb b/test/load_path_cache/core_ext/kernel_require_test.rb
+index c5f6f77..1a07725 100644
+--- a/test/load_path_cache/core_ext/kernel_require_test.rb
++++ b/test/load_path_cache/core_ext/kernel_require_test.rb
+@@ -31,7 +31,7 @@ module Bootsnap
+     end
+   end
+ 
+-  class KernelLoadTest < MiniTest::Test
++  class KernelLoadTest < Minitest::Test
+     def setup
+       @initial_dir = Dir.pwd
+       @dir1 = File.realpath(Dir.mktmpdir)
+diff --git a/test/load_path_cache/loaded_features_index_test.rb b/test/load_path_cache/loaded_features_index_test.rb
+index 6f869d8..47fbb5a 100644
+--- a/test/load_path_cache/loaded_features_index_test.rb
++++ b/test/load_path_cache/loaded_features_index_test.rb
+@@ -4,7 +4,7 @@ require("test_helper")
+ 
+ module Bootsnap
+   module LoadPathCache
+-    class LoadedFeaturesIndexTest < MiniTest::Test
++    class LoadedFeaturesIndexTest < Minitest::Test
+       def setup
+         @index = LoadedFeaturesIndex.new
+         # not really necessary but let's just make it a clean slate
+diff --git a/test/load_path_cache/path_scanner_test.rb b/test/load_path_cache/path_scanner_test.rb
+index b2ca1c8..1bd7935 100644
+--- a/test/load_path_cache/path_scanner_test.rb
++++ b/test/load_path_cache/path_scanner_test.rb
+@@ -4,7 +4,7 @@ require("test_helper")
+ 
+ module Bootsnap
+   module LoadPathCache
+-    class PathScannerTest < MiniTest::Test
++    class PathScannerTest < Minitest::Test
+       DLEXT = RbConfig::CONFIG["DLEXT"]
+       OTHER_DLEXT = DLEXT == "bundle" ? "so" : "bundle"
+ 
+diff --git a/test/load_path_cache/path_test.rb b/test/load_path_cache/path_test.rb
+index 1f4bd60..270eddc 100644
+--- a/test/load_path_cache/path_test.rb
++++ b/test/load_path_cache/path_test.rb
+@@ -5,7 +5,7 @@ require("bootsnap/load_path_cache")
+ 
+ module Bootsnap
+   module LoadPathCache
+-    class PathTest < MiniTest::Test
++    class PathTest < Minitest::Test
+       def setup
+         @cache = Object.new
+       end
+diff --git a/test/load_path_cache/store_test.rb b/test/load_path_cache/store_test.rb
+index 4d2ffa3..250208f 100644
+--- a/test/load_path_cache/store_test.rb
++++ b/test/load_path_cache/store_test.rb
+@@ -6,7 +6,7 @@ require("fileutils")
+ 
+ module Bootsnap
+   module LoadPathCache
+-    class StoreTest < MiniTest::Test
++    class StoreTest < Minitest::Test
+       def setup
+         @dir = Dir.mktmpdir
+         @path = "#{@dir}/store"
+diff --git a/test/test_helper.rb b/test/test_helper.rb
+index ec06d6c..5812417 100644
+--- a/test/test_helper.rb
++++ b/test/test_helper.rb
+@@ -60,7 +60,7 @@ module NullCache
+   end
+ end
+ 
+-module MiniTest
++module Minitest
+   class Test
+     module Help
+       class << self
+-- 
+2.41.0
+

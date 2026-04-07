@@ -1,0 +1,120 @@
+From 85d72b8bf0db7349dafce252d18ce17677eef46e Mon Sep 17 00:00:00 2001
+From: Jan Grulich <jgrulich@redhat.com>
+Date: Thu, 27 Jul 2023 12:41:06 +0200
+Subject: [PATCH 11/15] Change parsing log output in QGtk3Json from qCDebug to
+ qCInfo
+
+When a palette mapping is imported from a Json file, parsing errors are
+logged with qCDebug. This prevents errors from being logged in release
+builds.
+
+This patch replaces qCDebug with qCInfo for Json parsing to make errors
+visible when the logging category qt.qpa.gtk is activated.
+---
+ src/plugins/platformthemes/gtk3/qgtk3json.cpp | 23 +++++++++----------
+ 1 file changed, 11 insertions(+), 12 deletions(-)
+
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3json.cpp b/src/plugins/platformthemes/gtk3/qgtk3json.cpp
+index f4d5b50ec5..9db1ea3d20 100644
+--- a/src/plugins/platformthemes/gtk3/qgtk3json.cpp
++++ b/src/plugins/platformthemes/gtk3/qgtk3json.cpp
+@@ -331,7 +331,7 @@ bool QGtk3Json::load(QGtk3Storage::PaletteMap &map, const QJsonDocument &doc)
+ {
+ #define GETSTR(obj, key)\
+     if (!obj.contains(key)) {\
+-        qCDebug(lcQGtk3Interface) << key << "missing for palette" << paletteName\
++        qCInfo(lcQGtk3Interface) << key << "missing for palette" << paletteName\
+                                   << ", Brush" << colorRoleName;\
+         return false;\
+     }\
+@@ -339,7 +339,7 @@ bool QGtk3Json::load(QGtk3Storage::PaletteMap &map, const QJsonDocument &doc)
+ 
+ #define GETINT(obj, key, var) GETSTR(obj, key);\
+     if (!obj[key].isDouble()) {\
+-        qCDebug(lcQGtk3Interface) << key << "type mismatch" << value\
++        qCInfo(lcQGtk3Interface) << key << "type mismatch" << value\
+                                   << "is not an integer!"\
+                                   << "(Palette" << paletteName << "), Brush" << colorRoleName;\
+         return false;\
+@@ -349,7 +349,7 @@ bool QGtk3Json::load(QGtk3Storage::PaletteMap &map, const QJsonDocument &doc)
+     map.clear();
+     const QJsonObject top(doc.object());
+     if (doc.isEmpty() || top.isEmpty() || !top.contains(cePalettes)) {
+-        qCDebug(lcQGtk3Interface) << "Document does not contain Palettes.";
++        qCInfo(lcQGtk3Interface) << "Document does not contain Palettes.";
+         return false;
+     }
+ 
+@@ -358,13 +358,12 @@ bool QGtk3Json::load(QGtk3Storage::PaletteMap &map, const QJsonDocument &doc)
+         bool ok;
+         const QPlatformTheme::Palette paletteType = toPalette(paletteName);
+         if (paletteType == QPlatformTheme::NPalettes) {
+-            qCDebug(lcQGtk3Interface) << "Invalid Palette name:" << paletteName;
+-            return false;
++            qCInfo(lcQGtk3Interface) << "Invalid Palette name:" << paletteName;
+         }
+         const QJsonObject &paletteObject = top[cePalettes][paletteName].toObject();
+         const QStringList &brushList = paletteObject.keys();
+         if (brushList.isEmpty()) {
+-            qCDebug(lcQGtk3Interface) << "Palette" << paletteName << "does not contain brushes";
++            qCInfo(lcQGtk3Interface) << "Palette" << paletteName << "does not contain brushes";
+             return false;
+         }
+ 
+@@ -374,7 +373,7 @@ bool QGtk3Json::load(QGtk3Storage::PaletteMap &map, const QJsonDocument &doc)
+             const int intVal = QMetaEnum::fromType<QPalette::ColorRole>().keyToValue(colorRoleName
+                                                                     .toLatin1().constData(), &ok);
+             if (!ok) {
+-                qCDebug(lcQGtk3Interface) << "Palette" << paletteName
++                qCInfo(lcQGtk3Interface) << "Palette" << paletteName
+                                           << "contains invalid color role" << colorRoleName;
+                 return false;
+             }
+@@ -383,7 +382,7 @@ bool QGtk3Json::load(QGtk3Storage::PaletteMap &map, const QJsonDocument &doc)
+             for (int brushIndex = 0; brushIndex < brushArray.size(); ++brushIndex) {
+                 const QJsonObject brushObject = brushArray.at(brushIndex).toObject();
+                 if (brushObject.isEmpty()) {
+-                    qCDebug(lcQGtk3Interface) << "Brush specification missing at for palette"
++                    qCInfo(lcQGtk3Interface) << "Brush specification missing at for palette"
+                                               << paletteName << ", Brush" << colorRoleName;
+                     return false;
+                 }
+@@ -399,7 +398,7 @@ bool QGtk3Json::load(QGtk3Storage::PaletteMap &map, const QJsonDocument &doc)
+                 QGtk3Storage::Source s;
+ 
+                 if (!brushObject.contains(ceData) || !brushObject[ceData].isObject()) {
+-                    qCDebug(lcQGtk3Interface) << "Source specification missing for palette" << paletteName
++                    qCInfo(lcQGtk3Interface) << "Source specification missing for palette" << paletteName
+                                                   << "Brush" << colorRoleName;
+                     return false;
+                 }
+@@ -421,7 +420,7 @@ bool QGtk3Json::load(QGtk3Storage::PaletteMap &map, const QJsonDocument &doc)
+ 
+                 case QGtk3Storage::SourceType::Fixed: {
+                         if (!sourceObject.contains(ceBrush)) {
+-                            qCDebug(lcQGtk3Interface) << "Fixed brush specification missing for palette" << paletteName
++                            qCInfo(lcQGtk3Interface) << "Fixed brush specification missing for palette" << paletteName
+                                                       << "Brush" << colorRoleName;
+                             return false;
+                         }
+@@ -431,7 +430,7 @@ bool QGtk3Json::load(QGtk3Storage::PaletteMap &map, const QJsonDocument &doc)
+                         GETSTR(fixedSource, ceColor);
+                         const QColor color(value);
+                         if (!color.isValid()) {
+-                            qCDebug(lcQGtk3Interface) << "Color" << value << "can't be parsed for:" << paletteName
++                            qCInfo(lcQGtk3Interface) << "Color" << value << "can't be parsed for:" << paletteName
+                                                       << "Brush" << colorRoleName;
+                             return false;
+                         }
+@@ -459,7 +458,7 @@ bool QGtk3Json::load(QGtk3Storage::PaletteMap &map, const QJsonDocument &doc)
+                     break;
+ 
+                 case QGtk3Storage::SourceType::Invalid:
+-                    qCDebug(lcQGtk3Interface) << "Invalid source type for palette" << paletteName
++                    qInfo(lcQGtk3Interface) << "Invalid source type for palette" << paletteName
+                                               << "Brush." << colorRoleName;
+                     return false;
+                 }
+-- 
+2.41.0
+

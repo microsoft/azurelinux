@@ -1,0 +1,15 @@
+diff --git a/cmd/tools/Makefile.am b/cmd/tools/Makefile.am
+index e163e67..fecb2cd 100644
+--- a/cmd/tools/Makefile.am
++++ b/cmd/tools/Makefile.am
+@@ -133,7 +133,9 @@ gvpack_SOURCES = gvpack.cpp
+ gvpack_CPPFLAGS = $(AM_CPPFLAGS) -DDEMAND_LOADING=0
+ 
+ gvpack_LDADD = \
+-	$(top_builddir)/plugin/neato_layout/libgvplugin_neato_layout.la \
++	$(top_builddir)/plugin/neato_layout/libgvplugin_neato_layout_C.la \
++	$(top_builddir)/lib/pathplan/libpathplan_C.la \
++		$(EXPAT_LIBS) $(Z_LIBS) $(GTS_LIBS) $(IPSEPCOLA_LIBS) $(MATH_LIBS) \
+ 	$(top_builddir)/lib/gvc/libgvc.la \
+ 	$(top_builddir)/lib/cgraph/libcgraph.la \
+ 	$(top_builddir)/lib/cdt/libcdt.la

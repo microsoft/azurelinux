@@ -1,0 +1,22 @@
+--- itoap-1.0.1/Cargo.toml	2021-02-18T16:50:24+00:00
++++ itoap-1.0.1/Cargo.toml	2025-04-03T12:00:36.391610+00:00
+@@ -21,16 +21,15 @@
+ categories = ["value-formatting"]
+ license = "MIT"
+ repository = "https://github.com/Kogia-sima/itoap"
++exclude = ["/bench.png", "/codecov.yml", "/rustfmt.toml"]
+ [package.metadata.docs.rs]
+ all-features = true
+ rustdoc-args = ["--cfg", "docsrs"]
+ [dev-dependencies.itoa]
+-version = "0.4.6"
+-features = ["i128"]
+-default-features = false
++version = "1.0.2"
+ 
+ [dev-dependencies.rand]
+-version = "0.8.2"
++version = "0.8.5"
+ features = ["small_rng"]
+ default-features = false
+ 

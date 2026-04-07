@@ -1,0 +1,53 @@
+diff -ur qt-x11-free-3.3.8b/src/tools/qlocale.cpp qt-x11-free-3.3.8b-qlocale-aliasing/src/tools/qlocale.cpp
+--- qt-x11-free-3.3.8b/src/tools/qlocale.cpp	2008-01-15 20:09:13.000000000 +0100
++++ qt-x11-free-3.3.8b-qlocale-aliasing/src/tools/qlocale.cpp	2011-11-04 02:38:59.000000000 +0100
+@@ -101,37 +101,37 @@
+ #endif
+ 
+ #if !defined(INFINITY)
+-static const unsigned char be_inf_bytes[] = { 0x7f, 0xf0, 0, 0, 0, 0, 0, 0 };
+-static const unsigned char le_inf_bytes[] = { 0, 0, 0, 0, 0, 0, 0xf0, 0x7f };
++static const union { unsigned char c[8]; double d; } be_inf_bytes = {{ 0x7f, 0xf0, 0, 0, 0, 0, 0, 0 }};
++static const union { unsigned char c[8]; double d; } le_inf_bytes = {{ 0, 0, 0, 0, 0, 0, 0xf0, 0x7f }};
+ static inline double inf()
+ {
+     return (ByteOrder == BigEndian ?
+-            *((const double *) be_inf_bytes) :
+-            *((const double *) le_inf_bytes));
++            be_inf_bytes.d :
++            le_inf_bytes.d);
+ }
+ #   define INFINITY (::inf())
+ #endif
+ 
+ #if !defined(NAN)
+-static const unsigned char be_nan_bytes[] = { 0x7f, 0xf8, 0, 0, 0, 0, 0, 0 };
+-static const unsigned char le_nan_bytes[] = { 0, 0, 0, 0, 0, 0, 0xf8, 0x7f };
++static const union { unsigned char c[8]; double d; } be_nan_bytes = {{ 0x7f, 0xf8, 0, 0, 0, 0, 0, 0 }};
++static const union { unsigned char c[8]; double d; } le_nan_bytes = {{ 0, 0, 0, 0, 0, 0, 0xf8, 0x7f }};
+ static inline double nan()
+ {
+     return (ByteOrder == BigEndian ?
+-            *((const double *) be_nan_bytes) :
+-            *((const double *) le_nan_bytes));
++            be_nan_bytes.d :
++            le_nan_bytes.d);
+ }
+ #   define NAN (::nan())
+ #endif
+ 
+ // We can't rely on -NAN, since all operations on a NAN should return a NAN.
+-static const unsigned char be_neg_nan_bytes[] = { 0xff, 0xf8, 0, 0, 0, 0, 0, 0 };
+-static const unsigned char le_neg_nan_bytes[] = { 0, 0, 0, 0, 0, 0, 0xf8, 0xff };
++static const union { unsigned char c[8]; double d; } be_neg_nan_bytes = {{ 0xff, 0xf8, 0, 0, 0, 0, 0, 0 }};
++static const union { unsigned char c[8]; double d; } le_neg_nan_bytes = {{ 0, 0, 0, 0, 0, 0, 0xf8, 0xff }};
+ static inline double negNan()
+ {
+     return (ByteOrder == BigEndian ?
+-            *((const double *) be_neg_nan_bytes) :
+-            *((const double *) le_neg_nan_bytes));
++            be_neg_nan_bytes.d :
++            le_neg_nan_bytes.d);
+ }
+ 
+ // Sizes as defined by the ISO C99 standard - fallback

@@ -1,0 +1,26 @@
+From 9788427b7f4f8802ccc2d4de7fad02b19488c2c8 Mon Sep 17 00:00:00 2001
+From: Neal Gompa <ngompa@fedoraproject.org>
+Date: Sun, 25 Sep 2022 16:45:07 -0400
+Subject: [PATCH] containmentactions/contextmenu: Enable "Open Terminal" by
+ default
+
+Fedora users expect this item to exist in the desktop context menu
+by default unless it has been manually disabled or removed via the
+Kiosk mode.
+---
+ containmentactions/contextmenu/menu.cpp | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff -Naur plasma-workspace-6.0.0/containmentactions/contextmenu/menu.cpp plasma-workspace-6.0.0-b/containmentactions/contextmenu/menu.cpp
+--- plasma-workspace-6.0.0/containmentactions/contextmenu/menu.cpp      2024-02-21 16:42:07.000000000 +0100
++++ plasma-workspace-6.0.0-b/containmentactions/contextmenu/menu.cpp    2024-02-22 09:31:03.958663529 +0100
+@@ -80,7 +80,6 @@
+         disabled.insert(QStringLiteral("add widgets"));
+         disabled.insert(QStringLiteral("_add panel"));
+         disabled.insert(QStringLiteral("configure shortcuts"));
+-        disabled.insert(QStringLiteral("_open_terminal"));
+         disabled.insert(QStringLiteral("_run_command"));
+         disabled.insert(QStringLiteral("_lock_screen"));
+         disabled.insert(QStringLiteral("_logout"));
+-- 
+2.36.1

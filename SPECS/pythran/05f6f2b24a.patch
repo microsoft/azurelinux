@@ -1,0 +1,84 @@
+From 05f6f2b24a74f979111d422bba746560cde20008 Mon Sep 17 00:00:00 2001
+From: serge-sans-paille <serge.guelton@telecom-bretagne.eu>
+Date: Tue, 1 Jul 2025 16:29:07 +0200
+Subject: [PATCH] Gast is not doing its portability job for dumping
+
+Meanwhile, provide a small workaround
+---
+ docs/TUTORIAL.rst          | 10 +++-------
+ pythran/tests/test_xdoc.py |  2 +-
+ pythran/utils.py           |  4 ++--
+ 3 files changed, 6 insertions(+), 10 deletions(-)
+
+diff --git a/docs/TUTORIAL.rst b/docs/TUTORIAL.rst
+index 31ff4fffc..43ea453a3 100644
+--- a/docs/TUTORIAL.rst
++++ b/docs/TUTORIAL.rst
+@@ -19,8 +19,6 @@ Python ships a standard module, ``ast`` to turn Python code into an AST. For ins
+   >>> from __future__ import print_function
+   >>> code = "a=1"
+   >>> tree = ast.parse(code)  # turn the code into an AST
+-  >>> print(ast.dump(tree))  # view it as a string
+-  Module(body=[Assign(targets=[Name(id='a', ctx=Store())], value=Constant(value=1))])
+ 
+ Deciphering the above line, one learns that the single assignment is parsed as
+ a module containing a single statement, which is an assignment to a single
+@@ -32,11 +30,9 @@ Eventually, one needs to parse more complex codes, and things get a bit more cry
+   ... def fib(n):
+   ...     return n if n< 2 else fib(n-1) + fib(n-2)"""
+   >>> tree = ast.parse(fib_src)
+-  >>> print(ast.dump(tree))
+-  Module(body=[FunctionDef(name='fib', args=arguments(args=[Name(id='n', ctx=Param())]), body=[Return(value=IfExp(test=Compare(left=Name(id='n', ctx=Load()), ops=[Lt()], comparators=[Constant(value=2)]), body=Name(id='n', ctx=Load()), orelse=BinOp(left=Call(func=Name(id='fib', ctx=Load()), args=[BinOp(left=Name(id='n', ctx=Load()), op=Sub(), right=Constant(value=1))]), op=Add(), right=Call(func=Name(id='fib', ctx=Load()), args=[BinOp(left=Name(id='n', ctx=Load()), op=Sub(), right=Constant(value=2))]))))])])
+ 
+ The idea remains the same. The whole Python syntax is described in
+-http://docs.python.org/2/library/ast.html and is worth a glance, otherwise
++http://docs.python.org/3/library/ast.html and is worth a glance, otherwise
+ you'll be in serious trouble understanding the following.
+ 
+ Pythran Pass Manager
+@@ -199,7 +195,7 @@ constant expressions. In the previous code, there is only two constant
+ 
+   >>> ce = pm.gather(analyses.ConstantExpressions, tree)
+   >>> sorted(map(ast.dump, ce))
+-  ["Attribute(value=Name(id='math', ctx=Load()), attr='cos', ctx=Load())", 'Constant(value=3)']
++  ["Attribute(value=Name(id='math', ctx=Load(), annotation=None, type_comment=None), attr='cos', ctx=Load())", 'Constant(value=3, kind=None)']
+ 
+ One of the most critical analyse of Pythran is the points-to analysis. There
+ are two flavors of this analyse, one that computes an over-set of the aliased
+@@ -210,7 +206,7 @@ variable, and one that computes an under set. ``Aliases`` computes an over-set::
+   >>> al = pm.gather(analyses.Aliases, tree)
+   >>> returned = tree.body[-1].body[-1].value
+   >>> print(ast.dump(returned))
+-  Name(id='b', ctx=Load())
++  Name(id='b', ctx=Load(), annotation=None, type_comment=None)
+   >>> sorted(a.id for a in al[returned])
+   ['c', 'd']
+ 
+diff --git a/pythran/tests/test_xdoc.py b/pythran/tests/test_xdoc.py
+index 1dddf36ca..9eca676e1 100644
+--- a/pythran/tests/test_xdoc.py
++++ b/pythran/tests/test_xdoc.py
+@@ -36,7 +36,7 @@ def test_internal(self):
+ 
+     @pytest.mark.skipif(sys.platform == "win32",
+                         reason="We should create a file for windows.")
+-    @pytest.mark.skipif(sys.version_info <= (3, 12),
++    @pytest.mark.skipif(sys.version_info <= (3, 13, 4),
+                         reason="argparse output changed with 3.13")
+     def test_cli(self):
+         tmpfile = self.adapt_rst('../../docs/CLI.rst')
+diff --git a/pythran/utils.py b/pythran/utils.py
+index 55a7e8ad6..f60aec447 100644
+--- a/pythran/utils.py
++++ b/pythran/utils.py
+@@ -105,8 +105,8 @@ def get_variable(assignable):
+     ...         ctx=ast.Load()),
+     ...     slice=ast.Name('j', ast.Load(), None, None),
+     ...     ctx=ast.Load())
+-    >>> ast.dump(get_variable(ref))
+-    "Name(id='a', ctx=Load())"
++    >>> get_variable(ref).id
++    'a'
+     """
+     msg = "Only name and subscript can be assigned."
+     assert isinstance(assignable, (ast.Name, ast.Subscript)), msg

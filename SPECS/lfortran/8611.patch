@@ -1,0 +1,94 @@
+From 2f674c3cc9e37f1dc3377f378fdde128479a81fe Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20=C4=8Cert=C3=ADk?= <ondrej@certik.us>
+Date: Mon, 22 Sep 2025 19:25:11 -0600
+Subject: [PATCH] Fix the build for LLVM 21
+
+It builds locally for me and tests pass. This PR does not update any CI yet, if
+everything still works for LLVM 10-20, then we'll merge and in a subsequent PR
+we'll enable CI testing and fix any issues.
+---
+ src/libasr/codegen/KaleidoscopeJIT.h |  9 +++++++++
+ src/libasr/codegen/evaluator.cpp     | 16 ++++++++++++++++
+ 2 files changed, 25 insertions(+)
+
+diff --git a/src/libasr/codegen/KaleidoscopeJIT.h b/src/libasr/codegen/KaleidoscopeJIT.h
+index 250dd3dfce..1fc7da3020 100644
+--- a/src/libasr/codegen/KaleidoscopeJIT.h
++++ b/src/libasr/codegen/KaleidoscopeJIT.h
+@@ -30,6 +30,10 @@
+ #include "llvm/ExecutionEngine/Orc/ExecutorProcessControl.h"
+ #endif
+ 
++#if LLVM_VERSION_MAJOR >= 21
++#include "llvm/ExecutionEngine/Orc/SelfExecutorProcessControl.h"
++#endif
++
+ #if LLVM_VERSION_MAJOR >= 16
+ #    define RM_OPTIONAL_TYPE std::optional
+ #else
+@@ -53,8 +57,13 @@ class KaleidoscopeJIT {
+   KaleidoscopeJIT(std::unique_ptr<ExecutionSession> ES, JITTargetMachineBuilder JTMB, DataLayout DL)
+       :
+         ES(std::move(ES)),
++#if LLVM_VERSION_MAJOR >= 21
++        ObjectLayer(*this->ES,
++                    [](const llvm::MemoryBuffer &) { return std::make_unique<SectionMemoryManager>(); }),
++#else
+         ObjectLayer(*this->ES,
+                     []() { return std::make_unique<SectionMemoryManager>(); }),
++#endif
+         CompileLayer(*this->ES, ObjectLayer, std::make_unique<ConcurrentIRCompiler>(std::move(JTMB))),
+         DL(std::move(DL)), Mangle(*this->ES, this->DL),
+         JITDL(
+diff --git a/src/libasr/codegen/evaluator.cpp b/src/libasr/codegen/evaluator.cpp
+index b5fe0d2fa1..93a6b36048 100644
+--- a/src/libasr/codegen/evaluator.cpp
++++ b/src/libasr/codegen/evaluator.cpp
+@@ -272,7 +272,11 @@ std::unique_ptr<llvm::Module> LLVMEvaluator::parse_module(const std::string &sou
+     if (v) {
+         throw LCompilersException("parse_module(): module failed verification.");
+     };
++#if LLVM_VERSION_MAJOR >= 21
++    module->setTargetTriple(llvm::Triple(target_triple));
++#else
+     module->setTargetTriple(target_triple);
++#endif
+     module->setDataLayout(jit->getDataLayout());
+     return module;
+ }
+@@ -297,7 +301,11 @@ void LLVMEvaluator::add_module(const std::string &source) {
+ void LLVMEvaluator::add_module(std::unique_ptr<llvm::Module> mod) {
+     // These are already set in parse_module(), but we set it here again for
+     // cases when the Module was constructed directly, not via parse_module().
++#if LLVM_VERSION_MAJOR >= 21
++    mod->setTargetTriple(llvm::Triple(target_triple));
++#else
+     mod->setTargetTriple(target_triple);
++#endif
+     mod->setDataLayout(jit->getDataLayout());
+     llvm::Error err = jit->addModule(std::move(mod), context);
+     if (err) {
+@@ -379,7 +387,11 @@ void LLVMEvaluator::save_asm_file(llvm::Module &m, const std::string &filename)
+ }
+ 
+ void LLVMEvaluator::save_object_file(llvm::Module &m, const std::string &filename) {
++#if LLVM_VERSION_MAJOR >= 21
++    m.setTargetTriple(llvm::Triple(target_triple));
++#else
+     m.setTargetTriple(target_triple);
++#endif
+     m.setDataLayout(TM->createDataLayout());
+ 
+     llvm::legacy::PassManager pass;
+@@ -407,7 +419,11 @@ void LLVMEvaluator::create_empty_object_file(const std::string &filename) {
+ }
+ 
+ void LLVMEvaluator::opt(llvm::Module &m) {
++#if LLVM_VERSION_MAJOR >= 21
++    m.setTargetTriple(llvm::Triple(target_triple));
++#else
+     m.setTargetTriple(target_triple);
++#endif
+     m.setDataLayout(TM->createDataLayout());
+ 
+ #if LLVM_VERSION_MAJOR >= 17

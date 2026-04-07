@@ -1,0 +1,12 @@
+--- t/tlib/Exception/BaseTest.pm
++++ t/tlib/Exception/BaseTest.pm
+@@ -569,7 +569,8 @@
+     $self->assert_matches(qr/String at /, $obj);
+ 
+     # smart matching for Perl 5.10
+-    if ($] >= 5.010) {
++    # Deprecation warning added in 5.37.10
++    if ($] >= 5.010 && $] < 5.037010) {
+         no if $] >= 5.018, warnings => 'experimental::smartmatch';
+         eval q{
+             $self->assert_num_equals(1, 'String' ~~ $obj);

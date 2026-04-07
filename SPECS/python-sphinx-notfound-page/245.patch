@@ -1,0 +1,42 @@
+From 9586404d9f162ccb368c67340c99f72d8f56f5c7 Mon Sep 17 00:00:00 2001
+From: Dmitry Shachnev <mitya57@gmail.com>
+Date: Sat, 3 Aug 2024 15:30:10 +0300
+Subject: [PATCH] Make the tests pass with Sphinx 7.3.x
+
+Commit https://github.com/sphinx-doc/sphinx/commit/6471027d1936f0a0 was
+included in Sphinx 7.4, not 7.3.
+---
+ tests/test_urls.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/tests/test_urls.py b/tests/test_urls.py
+index d5a4031..d5a10a5 100644
+--- a/tests/test_urls.py
++++ b/tests/test_urls.py
+@@ -64,7 +64,7 @@ def test_default_settings(app, status, warning):
+     else:
+         cssclass = ""
+ 
+-    if sphinx.version_info < (7, 3):
++    if sphinx.version_info < (7, 4):
+         alt = "Logo"
+     else:
+         alt = "Logo of Python"
+@@ -144,7 +144,7 @@ def test_urls_prefix_setting(app, status, warning):
+     else:
+         cssclass = ""
+ 
+-    if sphinx.version_info < (7, 3):
++    if sphinx.version_info < (7, 4):
+         alt = "Logo"
+     else:
+         alt = "Logo of Python"
+@@ -187,7 +187,7 @@ def test_urls_prefix_setting_none(app, status, warning):
+     else:
+         cssclass = ""
+ 
+-    if sphinx.version_info < (7, 3):
++    if sphinx.version_info < (7, 4):
+         alt = "Logo"
+     else:
+         alt = "Logo of Python"

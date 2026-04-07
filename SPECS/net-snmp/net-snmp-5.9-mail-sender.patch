@@ -1,0 +1,24 @@
+diff -up ./local/checkbandwidth.orig ./local/checkbandwidth
+--- ./local/checkbandwidth.orig	2023-08-15 16:32:01.000000000 -0400
++++ ./local/checkbandwidth	2025-03-20 16:31:14.062432316 -0400
+@@ -326,7 +326,6 @@ See the Net-SNMP COPYING file for licens
+ 
+ use JSON;
+ use Data::Dumper;
+-use Mail::Sender;
+ use SNMP;
+ use Fcntl ':flock';
+ 
+@@ -744,6 +743,12 @@ sub send_rate_message($$$$$$) {
+ sub send_message($$$) {
+ 	my ($to, $subject, $text) = @_;
+ 
++	if (! eval {require Mail::Sender;}) {
++		Log("Failed to send mail with error code -1: Mail::Sender is not available");
++                return();
++        }
++
++	import Mail::Sender;
+ 	my $sender = new Mail::Sender { smtp => $opts{'S'} ,
+ 	                                port => $opts{'P'},
+ 	                                from => $opts{'F'},

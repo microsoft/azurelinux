@@ -1,0 +1,334 @@
+From cc4f099b45ba74ea566b0698ea43e4a4aa5a069f Mon Sep 17 00:00:00 2001
+From: Cristian Le <git@lecris.dev>
+Date: Thu, 17 Jul 2025 19:27:06 +0100
+Subject: [PATCH 1/2] CMake improvements
+
+---
+ CMakeLists.txt                  | 79 +++++++++++++--------------------
+ CMakeModules/FindGTestSrc.cmake | 30 -------------
+ RapidJSONConfig.cmake.in        |  4 +-
+ RapidJSONConfigVersion.cmake.in | 10 -----
+ example/CMakeLists.txt          |  2 +-
+ test/CMakeLists.txt             | 40 ++++++++++-------
+ test/perftest/CMakeLists.txt    |  2 +-
+ test/perftest/perftest.h        |  2 +-
+ test/unittest/CMakeLists.txt    |  3 +-
+ test/unittest/unittest.h        |  2 +-
+ 10 files changed, 62 insertions(+), 112 deletions(-)
+ delete mode 100644 CMakeModules/FindGTestSrc.cmake
+ delete mode 100644 RapidJSONConfigVersion.cmake.in
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index be860c93..062f6d80 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
++cmake_minimum_required(VERSION 3.5...4.0)
+ 
+ SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules)
+ 
+@@ -20,8 +20,6 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+ option(RAPIDJSON_BUILD_DOC "Build rapidjson documentation." ON)
+ option(RAPIDJSON_BUILD_EXAMPLES "Build rapidjson examples." ON)
+ option(RAPIDJSON_BUILD_TESTS "Build rapidjson perftests and unittests." ON)
+-option(RAPIDJSON_BUILD_THIRDPARTY_GTEST
+-    "Use gtest installation in `thirdparty/gtest` by default if available" OFF)
+ 
+ option(RAPIDJSON_BUILD_CXX11 "Build rapidjson with C++11" ON)
+ option(RAPIDJSON_BUILD_CXX17 "Build rapidjson with C++17" OFF)
+@@ -144,9 +142,11 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "XL")
+ endif()
+ 
+ #add extra search paths for libraries and includes
+-SET(INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include" CACHE PATH "The directory the headers are installed in")
+-SET(LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib" CACHE STRING "Directory where lib will install")
+-SET(DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/${PROJECT_NAME}" CACHE PATH "Path to the documentation")
++include(GNUInstallDirs)
++
++SET(INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}" CACHE PATH "The directory the headers are installed in")
++SET(LIB_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}" CACHE STRING "Directory where lib will install")
++SET(DOC_INSTALL_DIR "${CMAKE_INSTALL_DOCDIR}" CACHE PATH "Path to the documentation")
+ 
+ IF(UNIX OR CYGWIN)
+     SET(_CMAKE_INSTALL_DIR "${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME}")
+@@ -155,8 +155,6 @@ ELSEIF(WIN32)
+ ENDIF()
+ SET(CMAKE_INSTALL_DIR "${_CMAKE_INSTALL_DIR}" CACHE PATH "The directory cmake files are installed in")
+ 
+-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+-
+ if(RAPIDJSON_BUILD_DOC)
+     add_subdirectory(doc)
+ endif()
+@@ -170,6 +168,7 @@ if(RAPIDJSON_BUILD_EXAMPLES)
+ endif()
+ 
+ if(RAPIDJSON_BUILD_TESTS)
++    enable_testing()
+     if(MSVC11)
+         # required for VS2012 due to missing support for variadic templates
+         add_definitions(-D_VARIADIC_MAX=10)
+@@ -195,7 +194,10 @@ install(FILES readme.md
+ # Add an interface target to export it
+ add_library(RapidJSON INTERFACE)
+ 
+-target_include_directories(RapidJSON INTERFACE $<INSTALL_INTERFACE:include>)
++target_include_directories(RapidJSON INTERFACE
++    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
++    $<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}>
++)
+ 
+ install(DIRECTORY include/rapidjson
+     DESTINATION "${INCLUDE_INSTALL_DIR}"
+@@ -214,44 +216,25 @@ install(DIRECTORY example/
+ # ===============================
+ 
+ ################################################################################
+-# Export package for use from the build tree
+-EXPORT( PACKAGE ${PROJECT_NAME} )
+-
+-# Create the RapidJSONConfig.cmake file for other cmake projects.
+-# ... for the build tree
+-SET( CONFIG_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+-SET( CONFIG_DIR ${CMAKE_CURRENT_BINARY_DIR})
+-SET( ${PROJECT_NAME}_INCLUDE_DIR "\${${PROJECT_NAME}_SOURCE_DIR}/include" )
+-
+-INCLUDE(CMakePackageConfigHelpers)
+-CONFIGURE_FILE( ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
+-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake @ONLY )
+-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}ConfigVersion.cmake.in
+-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake @ONLY)
+-
+-# ... for the install tree
+-SET( CMAKECONFIG_INSTALL_DIR ${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME} )
+-FILE( RELATIVE_PATH REL_INCLUDE_DIR
+-    "${CMAKECONFIG_INSTALL_DIR}"
+-    "${CMAKE_INSTALL_PREFIX}/include" )
+-
+-SET( ${PROJECT_NAME}_INCLUDE_DIR "\${${PROJECT_NAME}_CMAKE_DIR}/${REL_INCLUDE_DIR}" )
+-SET( CONFIG_SOURCE_DIR )
+-SET( CONFIG_DIR )
+-CONFIGURE_FILE( ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
+-    ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake @ONLY )
+-
+-INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake"
+-        DESTINATION ${CMAKECONFIG_INSTALL_DIR} )
++include(CMakePackageConfigHelpers)
++write_basic_package_version_file(${PROJECT_NAME}ConfigVersion.cmake
++    COMPATIBILITY AnyNewerVersion
++)
++configure_package_config_file(
++    ${PROJECT_NAME}Config.cmake.in
++    ${PROJECT_NAME}Config.cmake
++    INSTALL_DESTINATION ${CMAKE_INSTALL_DIR}
++)
+ 
+ # Install files
+-IF(CMAKE_INSTALL_DIR)
+-    INSTALL(FILES
+-        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+-        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+-        DESTINATION "${CMAKE_INSTALL_DIR}"
+-        COMPONENT dev)
+-
+-    INSTALL(TARGETS RapidJSON EXPORT RapidJSON-targets)
+-    INSTALL(EXPORT RapidJSON-targets DESTINATION ${CMAKE_INSTALL_DIR})
+-ENDIF()
++install(FILES
++    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
++    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
++    DESTINATION ${CMAKE_INSTALL_DIR}
++    COMPONENT dev
++)
++install(TARGETS RapidJSON EXPORT RapidJSON-targets)
++export(TARGETS RapidJSON
++    FILE RapidJSON-targets.cmake
++)
++install(EXPORT RapidJSON-targets DESTINATION ${CMAKE_INSTALL_DIR})
+diff --git a/CMakeModules/FindGTestSrc.cmake b/CMakeModules/FindGTestSrc.cmake
+deleted file mode 100644
+index f3cb8c99..00000000
+--- a/CMakeModules/FindGTestSrc.cmake
++++ /dev/null
+@@ -1,30 +0,0 @@
+-
+-SET(GTEST_SEARCH_PATH
+-    "${GTEST_SOURCE_DIR}"
+-    "${CMAKE_CURRENT_LIST_DIR}/../thirdparty/gtest/googletest")
+-
+-IF(UNIX)
+-    IF(RAPIDJSON_BUILD_THIRDPARTY_GTEST)
+-        LIST(APPEND GTEST_SEARCH_PATH "/usr/src/gtest")
+-    ELSE()
+-        LIST(INSERT GTEST_SEARCH_PATH 1 "/usr/src/gtest")
+-    ENDIF()
+-ENDIF()
+-
+-FIND_PATH(GTEST_SOURCE_DIR
+-    NAMES CMakeLists.txt src/gtest_main.cc
+-    PATHS ${GTEST_SEARCH_PATH})
+-
+-
+-# Debian installs gtest include directory in /usr/include, thus need to look
+-# for include directory separately from source directory.
+-FIND_PATH(GTEST_INCLUDE_DIR
+-    NAMES gtest/gtest.h
+-    PATH_SUFFIXES include
+-    HINTS ${GTEST_SOURCE_DIR}
+-    PATHS ${GTEST_SEARCH_PATH})
+-
+-INCLUDE(FindPackageHandleStandardArgs)
+-find_package_handle_standard_args(GTestSrc DEFAULT_MSG
+-    GTEST_SOURCE_DIR
+-    GTEST_INCLUDE_DIR)
+diff --git a/RapidJSONConfig.cmake.in b/RapidJSONConfig.cmake.in
+index 0ee1d9d3..6a1e2939 100644
+--- a/RapidJSONConfig.cmake.in
++++ b/RapidJSONConfig.cmake.in
+@@ -4,11 +4,11 @@ include ("${CMAKE_CURRENT_LIST_DIR}/RapidJSON-targets.cmake")
+ 
+ ################################################################################
+ # RapidJSON source dir
+-set( RapidJSON_SOURCE_DIR "@CONFIG_SOURCE_DIR@")
++set( RapidJSON_SOURCE_DIR "RapidJSON_SOURCE_DIR-NOTFOUND")
+ 
+ ################################################################################
+ # RapidJSON build dir
+-set( RapidJSON_DIR "@CONFIG_DIR@")
++set( RapidJSON_DIR "RapidJSON_DIR-NOTFOUND")
+ 
+ ################################################################################
+ # Compute paths
+diff --git a/RapidJSONConfigVersion.cmake.in b/RapidJSONConfigVersion.cmake.in
+deleted file mode 100644
+index 25741fc0..00000000
+--- a/RapidJSONConfigVersion.cmake.in
++++ /dev/null
+@@ -1,10 +0,0 @@
+-SET(PACKAGE_VERSION "@LIB_VERSION_STRING@")
+-
+-IF (PACKAGE_FIND_VERSION VERSION_EQUAL PACKAGE_VERSION)
+-  SET(PACKAGE_VERSION_EXACT "true")
+-ENDIF (PACKAGE_FIND_VERSION VERSION_EQUAL PACKAGE_VERSION)
+-IF (NOT PACKAGE_FIND_VERSION VERSION_GREATER PACKAGE_VERSION)
+-  SET(PACKAGE_VERSION_COMPATIBLE "true")
+-ELSE (NOT PACKAGE_FIND_VERSION VERSION_GREATER PACKAGE_VERSION)
+-  SET(PACKAGE_VERSION_UNSUITABLE "true")
+-ENDIF (NOT PACKAGE_FIND_VERSION VERSION_GREATER PACKAGE_VERSION)
+diff --git a/example/CMakeLists.txt b/example/CMakeLists.txt
+index 9f53c9aa..67024d06 100644
+--- a/example/CMakeLists.txt
++++ b/example/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 2.8)
++cmake_minimum_required(VERSION 2.8...4.0)
+ 
+ if(POLICY CMP0054)
+   cmake_policy(SET CMP0054 NEW)
+diff --git a/test/CMakeLists.txt b/test/CMakeLists.txt
+index 11c1b04c..336dbb56 100644
+--- a/test/CMakeLists.txt
++++ b/test/CMakeLists.txt
+@@ -1,20 +1,26 @@
+-find_package(GTestSrc)
++cmake_minimum_required(VERSION 3.11...4.0)
+ 
+-IF(GTESTSRC_FOUND)
+-    enable_testing()
++include(FetchContent)
+ 
+-    if (WIN32 AND (NOT CYGWIN) AND (NOT MINGW))
+-        set(gtest_disable_pthreads ON)
+-        set(gtest_force_shared_crt ON)
+-    endif()
++set(BUILD_GMOCK OFF)
++set(INSTALL_GTEST OFF)
++if (WIN32 AND (NOT CYGWIN) AND (NOT MINGW))
++    set(gtest_disable_pthreads ON)
++    set(gtest_force_shared_crt ON)
++endif()
++set(fetchcontent_extra_args)
++if(CMAKE_VERSION GREATER_EQUAL 3.24)
++    list(APPEND fetchcontent_extra_args
++        FIND_PACKAGE_ARGS CONFIG
++    )
++endif()
++FetchContent_Declare(GTest
++    GIT_REPOSITORY https://github.com/google/googletest
++    GIT_TAG v1.17.0
++    ${fetchcontent_extra_args}
++)
++FetchContent_MakeAvailable(GTest)
+ 
+-    add_subdirectory(${GTEST_SOURCE_DIR} ${CMAKE_BINARY_DIR}/googletest)
+-    include_directories(SYSTEM ${GTEST_INCLUDE_DIR})
+-
+-    set(TEST_LIBRARIES gtest gtest_main)
+-
+-    add_custom_target(tests ALL)
+-    add_subdirectory(perftest)
+-    add_subdirectory(unittest)
+-
+-ENDIF(GTESTSRC_FOUND)
++add_custom_target(tests ALL)
++add_subdirectory(perftest)
++add_subdirectory(unittest)
+diff --git a/test/perftest/CMakeLists.txt b/test/perftest/CMakeLists.txt
+index 035e544d..e1677f86 100644
+--- a/test/perftest/CMakeLists.txt
++++ b/test/perftest/CMakeLists.txt
+@@ -6,7 +6,7 @@ set(PERFTEST_SOURCES
+     schematest.cpp)
+ 
+ add_executable(perftest ${PERFTEST_SOURCES})
+-target_link_libraries(perftest ${TEST_LIBRARIES})
++target_link_libraries(perftest PRIVATE RapidJSON GTest::gtest GTest::gtest_main)
+ 
+ add_dependencies(tests perftest)
+ 
+diff --git a/test/perftest/perftest.h b/test/perftest/perftest.h
+index 31e3ca63..8ceaebc7 100644
+--- a/test/perftest/perftest.h
++++ b/test/perftest/perftest.h
+@@ -52,7 +52,7 @@
+ #pragma GCC diagnostic ignored "-Weffc++"
+ #endif
+ 
+-#include "gtest/gtest.h"
++#include <gtest/gtest.h>
+ 
+ #if defined(__clang__) || defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6))
+ #pragma GCC diagnostic pop
+diff --git a/test/unittest/CMakeLists.txt b/test/unittest/CMakeLists.txt
+index 9a369d40..8a3c261c 100644
+--- a/test/unittest/CMakeLists.txt
++++ b/test/unittest/CMakeLists.txt
+@@ -70,9 +70,10 @@ endif()
+ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DRAPIDJSON_HAS_STDSTRING=1")
+ 
+ add_library(namespacetest STATIC namespacetest.cpp)
++target_link_libraries(namespacetest PUBLIC RapidJSON GTest::gtest GTest::gtest_main)
+ 
+ add_executable(unittest ${UNITTEST_SOURCES})
+-target_link_libraries(unittest ${TEST_LIBRARIES} namespacetest)
++target_link_libraries(unittest PRIVATE namespacetest)
+ 
+ add_dependencies(tests unittest)
+ 
+diff --git a/test/unittest/unittest.h b/test/unittest/unittest.h
+index 0e64d397..0db96174 100644
+--- a/test/unittest/unittest.h
++++ b/test/unittest/unittest.h
+@@ -44,7 +44,7 @@
+ #pragma GCC diagnostic ignored "-Weffc++"
+ #endif
+ 
+-#include "gtest/gtest.h"
++#include <gtest/gtest.h>
+ #include <stdexcept>
+ 
+ #if defined(__clang__) || defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6))
+-- 
+2.50.1
+

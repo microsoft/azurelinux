@@ -1,0 +1,12 @@
+diff -up texinfo-7.1/info/makedoc.c.orig texinfo-7.1/info/makedoc.c
+--- texinfo-7.1/info/makedoc.c.orig	2023-08-14 20:53:20.000000000 +0200
++++ texinfo-7.1/info/makedoc.c	2024-10-09 10:13:13.476369921 +0200
+@@ -296,7 +296,7 @@ process_one_file (char *filename, FILE *
+       char *func, *doc;
+       char *func_name;
+ 
+-      for (; offset < (file_size - decl_len); offset++)
++      for (; offset < (file_size - decl_len) && offset < (LONG_MAX - decl_len); offset++)
+         {
+           if (buffer[offset] == '\n')
+             {

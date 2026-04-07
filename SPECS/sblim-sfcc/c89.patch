@@ -1,0 +1,31 @@
+Add casts required for C89 compatibility.  This addresses a build
+failure with GCC 14.
+
+Submitted upstream: <https://sourceforge.net/p/sblim/bugs/2771/>
+
+diff --git a/TEST/v2test_ec.c b/TEST/v2test_ec.c
+index 940ca57638ceec79..042a9a0c4d5a7abf 100644
+--- a/TEST/v2test_ec.c
++++ b/TEST/v2test_ec.c
+@@ -83,7 +83,7 @@ int main()
+        count = enm->ft->hasNext(enm, NULL) ;
+        while (count > 0) {
+           data = enm->ft->getNext(enm, NULL);
+-          showClass(data.value.cls);          
++          showClass((CMPIConstClass *) data.value.cls);
+           /*
+            * see if we have any more
+            */
+diff --git a/TEST/v2test_ein.c b/TEST/v2test_ein.c
+index ede95c18a5b48ff8..712c204bd3aac357 100644
+--- a/TEST/v2test_ein.c
++++ b/TEST/v2test_ein.c
+@@ -93,7 +93,7 @@ int count = 0;
+        	  
+           data = enm->ft->getNext(enm, NULL);
+ 
+-          showObjectPath(data.value.ref);
++          showObjectPath((CMPIObjectPath *) data.value.ref);
+           /*
+            * see if we have any more
+            */

@@ -1,0 +1,46 @@
+diff -up hdparm-9.60/sgio.c.bak hdparm-9.60/sgio.c
+--- hdparm-9.60/sgio.c.bak	2019-01-03 23:37:54.000000000 +0100
++++ hdparm-9.60/sgio.c	2021-04-07 16:10:36.971836569 +0200
+@@ -17,6 +17,10 @@
+ 
+ #include <linux/hdreg.h>
+ 
++#ifndef DEMAND_SENSE_DATA
++	#define DEMAND_SENSE_DATA 0
++#endif
++
+ extern int verbose;
+ extern int prefer_ata12;
+ 
+@@ -193,7 +197,7 @@ int sg16 (int fd, int rw, int dma, struc
+ 	unsigned char cdb[SG_ATA_16_LEN];
+ 	unsigned char sb[32], *desc;
+ 	struct scsi_sg_io_hdr io_hdr;
+-	int prefer12 = prefer_ata12, demanded_sense = 0;
++	int prefer12 = prefer_ata12;
+ 
+ 	if (tf->command == ATA_OP_PIDENTIFY)
+ 		prefer12 = 0;
+@@ -306,14 +310,16 @@ int sg16 (int fd, int rw, int dma, struc
+ 
+ 	desc = sb + 8;
+ 	if (io_hdr.driver_status != SG_DRIVER_SENSE) {
+-		if (sb[0] | sb[1] | sb[2] | sb[3] | sb[4] | sb[5] | sb[6] | sb[7] | sb[8] | sb[9]) {
+-			static int second_try = 0;
+-			if (!second_try++)
++		static int second_try = 0;
++		if (!second_try++) {
++			if (sb[0] | sb[1] | sb[2] | sb[3] | sb[4] | sb[5] | sb[6] | sb[7] | sb[8] | sb[9]) {
+ 				fprintf(stderr, "SG_IO: questionable sense data, results may be incorrect\n");
+-		} else if (demanded_sense) {
+-			static int second_try = 0;
+-			if (!second_try++)
++			}
++#if DEMAND_SENSE_DATA
++			else {
+ 				fprintf(stderr, "SG_IO: missing sense data, results may be incorrect\n");
++			}
++#endif
+ 		}
+ 	} else if (sb[0] != 0x72 || sb[7] < 14 || desc[0] != 0x09 || desc[1] < 0x0c) {
+ 		if (verbose || tf->command != ATA_OP_IDENTIFY)

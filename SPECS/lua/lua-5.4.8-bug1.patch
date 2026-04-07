@@ -1,0 +1,38 @@
+diff -up lua-5.4.8/lua-5.4.8-tests/gc.lua.1b0f943 lua-5.4.8/lua-5.4.8-tests/gc.lua
+--- lua-5.4.8/lua-5.4.8-tests/gc.lua.1b0f943	2025-11-11 10:22:42.031813016 -0500
++++ lua-5.4.8/lua-5.4.8-tests/gc.lua	2025-11-11 10:22:47.922972537 -0500
+@@ -301,6 +301,16 @@ collectgarbage()
+ assert(next(a) == string.rep('$', 11))
+ 
+ 
++if T then   -- bug since 5.3: all-weak tables are not being revisited
++  T.gcstate("propagate")
++  local t = setmetatable({}, {__mode = "kv"})
++  T.gcstate("atomic")   -- 't' was visited
++  setmetatable(t, {__mode = "kv"})
++  T.gcstate("pause")  -- its new metatable is not being visited
++  assert(getmetatable(t).__mode == "kv")
++end
++
++
+ -- 'bug' in 5.1
+ a = {}
+ local t = {x = 10}
+diff -up lua-5.4.8/src/lgc.c.1b0f943 lua-5.4.8/src/lgc.c
+--- lua-5.4.8/src/lgc.c.1b0f943	2025-11-11 10:18:21.762294888 -0500
++++ lua-5.4.8/src/lgc.c	2025-11-11 10:20:47.426199165 -0500
+@@ -553,8 +553,12 @@ static lu_mem traversetable (global_Stat
+       traverseweakvalue(g, h);
+     else if (!weakvalue)  /* strong values? */
+       traverseephemeron(g, h, 0);
+-    else  /* all weak */
+-      linkgclist(h, g->allweak);  /* nothing to traverse now */
++    else {  /* all weak */
++      if (g->gcstate == GCSpropagate)
++        linkgclist(h, g->grayagain);  /* must visit again its metatable */
++      else
++        linkgclist(h, g->allweak);  /* must clear collected entries */
++    }
+   }
+   else  /* not weak */
+     traversestrongtable(g, h);

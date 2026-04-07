@@ -1,0 +1,7 @@
+# UID and GID 113 are reserved for this package:
+#  https://src.fedoraproject.org/rpms/usbmuxd/c/c204e89b56d7f889f13c707581ebe3f838a7c2a9
+#  https://pagure.io/setup/c/70e005798f1fb4c73b07f824ba8df518f32e5fc3
+#
+#Type Name     ID      GECOS           Home directory  Shell
+g     usbmuxd  113
+u     usbmuxd  113:113 "usbmuxd user"  -               -

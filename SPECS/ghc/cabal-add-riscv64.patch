@@ -1,0 +1,43 @@
+diff --git a/libraries/Cabal/Cabal-syntax/src/Distribution/System.hs b/libraries/Cabal/Cabal-syntax/src/Distribution/System.hs
+index 68bda63..6521464 100644
+--- a/libraries/Cabal/Cabal-syntax/src/Distribution/System.hs
++++ b/libraries/Cabal/Cabal-syntax/src/Distribution/System.hs
+@@ -159,7 +159,7 @@ buildOS = classifyOS Permissive System.Info.os
+ 
+ -- | These are the known Arches: I386, X86_64, PPC, PPC64, Sparc,
+ -- Arm, AArch64, Mips, SH, IA64, S390, S390X, Alpha, Hppa, Rs6000,
+--- M68k, Vax, JavaScript and Wasm32.
++-- M68k, Vax, RISCV64, JavaScript and Wasm32.
+ --
+ -- The following aliases can also be used:
+ --    * PPC alias: powerpc
+@@ -173,7 +173,7 @@ data Arch = I386  | X86_64  | PPC  | PPC64 | Sparc
+           | Arm   | AArch64 | Mips | SH
+           | IA64  | S390    | S390X
+           | Alpha | Hppa    | Rs6000
+-          | M68k  | Vax
++          | M68k  | Vax | RISCV64
+           | JavaScript
+           | Wasm32
+           | OtherArch String
+@@ -188,7 +188,7 @@ knownArches = [I386, X86_64, PPC, PPC64, Sparc
+               ,Arm, AArch64, Mips, SH
+               ,IA64, S390, S390X
+               ,Alpha, Hppa, Rs6000
+-              ,M68k, Vax
++              ,M68k, Vax, RISCV64
+               ,JavaScript
+               ,Wasm32]
+ 
+diff --git a/libraries/Cabal/Cabal/src/Distribution/Simple/PreProcess.hs b/libraries/Cabal/Cabal/src/Distribution/Simple/PreProcess.hs
+index fbe5710..a53b33d 100644
+--- a/libraries/Cabal/Cabal/src/Distribution/Simple/PreProcess.hs
++++ b/libraries/Cabal/Cabal/src/Distribution/Simple/PreProcess.hs
+@@ -729,6 +729,7 @@ platformDefines lbi =
+       Rs6000      -> ["rs6000"]
+       M68k        -> ["m68k"]
+       Vax         -> ["vax"]
++      RISCV64     -> ["riscv64"]
+       JavaScript  -> ["javascript"]
+       Wasm32      -> ["wasm32"]
+       OtherArch _ -> []

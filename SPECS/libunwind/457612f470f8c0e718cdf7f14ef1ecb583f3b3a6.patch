@@ -1,0 +1,252 @@
+From 457612f470f8c0e718cdf7f14ef1ecb583f3b3a6 Mon Sep 17 00:00:00 2001
+From: Stephen Webb <swebb@blackberry.com>
+Date: Wed, 12 Feb 2025 12:08:07 -0500
+Subject: [PATCH] Fix bad prototype for malloc() in test
+
+The unit test Gtest-nomalloc.c had an incorrect prototype for malloc()
+which caused newer compilers to fail compiling for newer C editions.
+
+Corrected the prototype and corrected a few other errors. The unit now
+compiles using GCC with `CFLAGS=-Wall -Wextra -pedantic -C11` with no
+warnings, which is the minimum requirement.
+
+Added the tests/unw_test.h header as a first step to cleaning up some
+unit tests further.
+---
+ tests/Gtest-nomalloc.c | 124 +++++++++++++++++++++++------------------
+ tests/Makefile.am      |   2 +-
+ tests/unw_test.h       |  47 ++++++++++++++++
+ 3 files changed, 117 insertions(+), 56 deletions(-)
+ create mode 100644 tests/unw_test.h
+
+diff --git a/tests/Gtest-nomalloc.c b/tests/Gtest-nomalloc.c
+index 5b97fc709..e770ff614 100644
+--- a/tests/Gtest-nomalloc.c
++++ b/tests/Gtest-nomalloc.c
+@@ -1,78 +1,92 @@
+-/* libunwind - a platform-independent unwind library
+-   Copyright (C) 2009 Google, Inc
+-	Contributed by Arun Sharma <arun.sharma@google.com>
++/**
++ * @file tests/Gtest-nomalloc.c
++ *
++ * Verify that @c malloc() is not called during an unwinding operation.
++ */
++/*
++ * This file is part of libunwind.
++ *   Copyright 2025 Stephen M. Webb <stephen.webb@bregmasoft.ca>
++ *   Copyright (C) 2009 Google, Inc
++ *   Contributed by Arun Sharma <arun.sharma@google.com>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to
++ * deal in the Software without restriction, including without limitation the
++ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
++ * sell copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
++ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
++ * IN THE SOFTWARE.
++ */
+ 
+-Permission is hereby granted, free of charge, to any person obtaining
+-a copy of this software and associated documentation files (the
+-"Software"), to deal in the Software without restriction, including
+-without limitation the rights to use, copy, modify, merge, publish,
+-distribute, sublicense, and/or sell copies of the Software, and to
+-permit persons to whom the Software is furnished to do so, subject to
+-the following conditions:
+-
+-The above copyright notice and this permission notice shall be
+-included in all copies or substantial portions of the Software.
+-
+-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+-LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+-OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
+-
+-#include <unistd.h>
+-#include <stdio.h>
+-#include <stdlib.h>
+ #include <dlfcn.h>
+ #include <libunwind.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
+ 
+-#define panic(args...)				\
+-	{ fprintf (stderr, args); exit (-1); }
++#include "unw_test.h"
+ 
+-int verbose;
+-int num_errors;
++int malloc_call_count;
+ int in_unwind;
+ 
++/**
++ * Intercepted malloc() call.
++ *
++ * If invoked during unwinding this call will increment the test error count
++ * and indicate a failure by returning NULL. Otherwise it just calls the real
++ * malloc().
++ */
+ void *
+-malloc(size_t s)
++malloc (size_t sz)
+ {
+-  static void * (*func)();
++  typedef void *(*malloc_t) (size_t);
+ 
+-  if(!func)
+-    func = (void *(*)()) dlsym(RTLD_NEXT, "malloc");
++  static malloc_t real_malloc = NULL;
++  if (real_malloc == NULL)
++    {
++      real_malloc = (malloc_t)(intptr_t)dlsym (RTLD_NEXT, "malloc");
++      if (real_malloc == NULL)
++        {
++          fprintf (stderr, "no malloc() found\n");
++          exit (UNW_TEST_EXIT_HARD_ERROR);                                          \
++        }
++    }
+ 
+-  if (in_unwind) {
+-    num_errors++;
+-    return NULL;
+-  } else {
+-    return func(s);
+-  }
++  if (in_unwind)
++    {
++      malloc_call_count++;
++    }
++  return real_malloc (sz);
+ }
+ 
+ static void
+ do_backtrace (void)
+ {
+-  unw_word_t ip, sp;
+-  unw_cursor_t cursor;
++  unw_cursor_t  cursor;
+   unw_context_t uc;
+-  int ret;
++  int           ret;
+ 
+   in_unwind = 1;
+   unw_getcontext (&uc);
+   if (unw_init_local (&cursor, &uc) < 0)
+-    panic ("unw_init_local failed!\n");
++    {
++      fprintf (stderr, "unw_init_local failed!\n");
++      exit (UNW_TEST_EXIT_HARD_ERROR);                                          \
++    }
+ 
+   do
+     {
+-      unw_get_reg (&cursor, UNW_REG_IP, &ip);
+-      unw_get_reg (&cursor, UNW_REG_SP, &sp);
+-
+       ret = unw_step (&cursor);
+-      if (ret < 0)
+-	{
+-	  ++num_errors;
+-	}
+     }
+   while (ret > 0);
+   in_unwind = 0;
+@@ -99,12 +113,12 @@ foo1 (void)
+ int
+ main (void)
+ {
+-  foo1();
++  foo1 ();
+ 
+-  if (num_errors > 0)
++  if (malloc_call_count > 0)
+     {
+-      fprintf (stderr, "FAILURE: detected %d errors\n", num_errors);
+-      exit (-1);
++      fprintf (stderr, "FAILURE: malloc called %d times, expected 0\n", malloc_call_count);
++      exit (UNW_TEST_EXIT_FAIL);
+     }
+-  return 0;
++  exit (UNW_TEST_EXIT_PASS);
+ }
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index adc34ac63..60f3f3adc 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -214,7 +214,7 @@ endif
+ 
+ noinst_PROGRAMS = $(noinst_PROGRAMS_common) $(noinst_PROGRAMS_cdep) \
+ 	$(noinst_PROGRAMS_arch)
+-noinst_HEADERS = ident.h
++noinst_HEADERS = ident.h unw_test.h
+ 
+ do_test_subst = sed -e 's,[@]TESTS[@],$(TESTS),g' \
+                     -e 's,[@]XFAIL_TESTS[@],$(XFAIL_TESTS),g' \
+diff --git a/tests/unw_test.h b/tests/unw_test.h
+new file mode 100644
+index 000000000..9ae86dce1
+--- /dev/null
++++ b/tests/unw_test.h
+@@ -0,0 +1,47 @@
++/**
++ * @file tests/unw_test.h
++ *
++ * Common unit test API for libunwind.
++ */
++/*
++ * This file is part of libunwind.
++ *   Copyright 2025 Stephen M. Webb <stephen.webb@bregmasoft.ca>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to
++ * deal in the Software without restriction, including without limitation the
++ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
++ * sell copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
++ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
++ * IN THE SOFTWARE.
++ */
++#ifndef LIBUNWIND_UNW_TEST_H
++#define LIBUNWIND_UNW_TEST_H 1
++
++/**
++ * Exit values for test programs.
++ * Based on https://www.gnu.org/software/automake/manual/html_node/Scripts_002dbased-Testsuites.html
++ *
++ * These are used to interact with the test harness (eg. a TAP-based harness,
++ * CTest, or automake).
++ */
++enum {
++  UNW_TEST_EXIT_PASS        =  0,  /* Item under test is a PASS */
++  UNW_TEST_EXIT_FAIL        =  1,  /* Item under test is a FAIL */
++  UNW_TEST_EXIT_BAD_COMMAND =  2,  /* Test program is invoked with invalid arguments */
++  UNW_TEST_EXIT_SKIP        = 77,  /* Test should be skipped */
++  UNW_TEST_EXIT_HARD_ERROR  = 99   /* Test program itself has failed */
++};
++
++#endif /* LIBUNWIND_UNW_TEST_H */
++

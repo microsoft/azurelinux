@@ -1,0 +1,156 @@
+@@ -, +, @@ 
+ relocation
+- In general they are.  But IRELATIVE relocations are sorted to come
+  last, and PLT entries are not sorted accordingly.
+---
+ sysdeps/linux-gnu/x86/arch.h |   11 +++++
+ sysdeps/linux-gnu/x86/plt.c  |  101 +++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 111 insertions(+), 1 deletions(-)
+--- a/sysdeps/linux-gnu/x86/arch.h	
++++ a/sysdeps/linux-gnu/x86/arch.h	
+@@ -19,6 +19,10 @@ 
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  * 02110-1301 USA
+  */
++#ifndef LTRACE_X86_ARCH_H
++#define LTRACE_X86_ARCH_H
++
++#include "vect.h"
+ 
+ #define BREAKPOINT_VALUE {0xcc}
+ #define BREAKPOINT_LENGTH 1
+@@ -30,9 +34,16 @@ 
+ 
+ #define ARCH_HAVE_ADD_PLT_ENTRY
+ 
++#define ARCH_HAVE_LTELF_DATA
++struct arch_ltelf_data {
++	struct vect plt_map;
++};
++
+ #ifdef __x86_64__
+ #define LT_ELFCLASS	ELFCLASS64
+ #define LT_ELF_MACHINE	EM_X86_64
+ #endif
+ #define LT_ELFCLASS2	ELFCLASS32
+ #define LT_ELF_MACHINE2	EM_386
++
++#endif /* LTRACE_X86_ARCH_H */
+--- a/sysdeps/linux-gnu/x86/plt.c	
++++ a/sysdeps/linux-gnu/x86/plt.c	
+@@ -27,10 +27,19 @@ 
+ #include "library.h"
+ #include "trace.h"
+ 
++static GElf_Addr
++x86_plt_offset(uint32_t i)
++{
++	/* Skip the first PLT entry, which contains a stub to call the
++	 * resolver.  */
++	return (i + 1) * 16;
++}
++
+ GElf_Addr
+ arch_plt_sym_val(struct ltelf *lte, size_t ndx, GElf_Rela *rela)
+ {
+-	return lte->plt_addr + (ndx + 1) * 16;
++	uint32_t i = *VECT_ELEMENT(&lte->arch.plt_map, uint32_t, ndx);
++	return x86_plt_offset(i) + lte->plt_addr;
+ }
+ 
+ void *
+@@ -62,3 +71,93 @@ arch_elf_add_plt_entry(struct process *proc, struct ltelf *lte,
+ 
+ 	return PLT_DEFAULT;
+ }
++
++int
++arch_elf_init(struct ltelf *lte, struct library *lib)
++{
++	VECT_INIT(&lte->arch.plt_map, unsigned int);
++
++	/* IRELATIVE slots may make the whole situation a fair deal
++	 * more complex.  On x86{,_64}, the PLT slots are not
++	 * presented in the order of the corresponding relocations,
++	 * but in the order it which these symbols are in the symbol
++	 * table.  That's static symbol table, which may be stripped
++	 * off, not dynsym--that doesn't contain IFUNC symbols at all.
++	 * So we have to decode each PLT entry to figure out what
++	 * entry it corresponds to.  We need to interpret the PLT
++	 * table to figure this out.
++	 *
++	 * On i386, the PLT entry format is as follows:
++	 *
++	 *	8048300:   ff 25 0c a0 04 08       jmp    *0x804a00c
++	 *	8048306:   68 20 00 00 00          push   $0x20
++	 *	804830b:   e9 e0 ff ff ff          jmp    80482f0 <_init+0x30>
++	 *
++	 * For PIE binaries it is the following:
++	 *
++	 *	    410:   ff a3 10 00 00 00       jmp    *0x10(%ebx)
++	 *	    416:   68 00 00 00 00          push   $0x0
++	 *	    41b:   e9 d0 ff ff ff          jmp    3f0 <_init+0x30>
++	 *
++	 * On x86_64, it is:
++	 *
++	 *	 400420:   ff 25 f2 0b 20 00       jmpq   *0x200bf2(%rip)        # 601018 <_GLOBAL_OFFSET_TABLE_+0x18>
++	 *	 400426:   68 00 00 00 00          pushq  $0x0
++	 *	 40042b:   e9 e0 ff ff ff          jmpq   400410 <_init+0x18>
++	 *
++         * On i386, the argument to push is an offset of relocation to
++	 * use.  The first PLT slot has an offset of 0x0, the second
++	 * 0x8, etc.  On x86_64, it's directly the index that we are
++	 * looking for.
++	 */
++
++	/* Here we scan the PLT table and initialize a map of
++	 * relocation->slot number in lte->arch.plt_map.  */
++
++	size_t i;
++	for (i = 0; i < vect_size(&lte->plt_relocs); ++i) {
++
++		GElf_Addr offset = x86_plt_offset(i);
++		uint32_t reloc_arg = 0;
++
++		uint8_t byte;
++		if (elf_read_next_u8(lte->plt_data, &offset, &byte) < 0
++		    || byte != 0xff
++		    || elf_read_next_u8(lte->plt_data, &offset, &byte) < 0
++		    || (byte != 0xa3 && byte != 0x25))
++			goto next;
++
++		/* Skip immediate argument in the instruction.  */
++		offset += 4;
++
++		if (elf_read_next_u8(lte->plt_data, &offset, &byte) < 0
++		    || byte != 0x68
++		    || elf_read_next_u32(lte->plt_data,
++					 &offset, &reloc_arg) < 0) {
++			reloc_arg = 0;
++			goto next;
++		}
++
++		if (lte->ehdr.e_machine == EM_386) {
++			if (reloc_arg % 8 != 0) {
++				reloc_arg = 0;
++				goto next;
++			}
++			reloc_arg /= 8;
++		}
++
++	next:
++		if (VECT_PUSHBACK(&lte->arch.plt_map, &reloc_arg) < 0) {
++			arch_elf_destroy(lte);
++			return -1;
++		}
++	}
++
++	return 0;
++}
++
++void
++arch_elf_destroy(struct ltelf *lte)
++{
++	VECT_DESTROY(&lte->arch.plt_map, uint32_t, NULL, NULL);
++}
+-- 

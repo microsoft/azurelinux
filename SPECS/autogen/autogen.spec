@@ -1,0 +1,504 @@
+## START: Set by rpmautospec
+## (rpmautospec version 0.8.4)
+## RPMAUTOSPEC: autorelease, autochangelog
+%define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
+    release_number = 33;
+    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
+    print(release_number + base_release_number - 1);
+}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
+## END: Set by rpmautospec
+
+# This spec file has been modified by azldev to include build configuration overlays.
+# Do not edit manually; changes may be overwritten.
+
+Summary:	Automated text file generator
+Name:		autogen
+Version:	5.18.16
+Release:	%autorelease
+# Some files are licensed under GPLv2+.
+# We redistribute them under GPLv3+.
+License:	GPL-3.0-or-later AND GPL-2.0-or-later AND LGPL-2.1-or-later AND LGPL-2.0-or-later AND BSD-2-Clause AND BSD-3-Clause AND GPL-1.0-or-later AND (LGPL-3.0-or-later OR BSD-3-Clause) AND GFDL-1.2-or-later
+URL:		http://www.gnu.org/software/autogen/
+Source0:	ftp://ftp.gnu.org/gnu/autogen/rel%{version}/%{name}-%{version}.tar.xz
+
+# Fix multilib conflicts
+Patch0:		autogen-multilib.patch
+# Fix gcc error on overlapping strings
+Patch1:		autogen-overlap.patch
+Patch2:		autogen-configure-c99.patch
+# https://sourceforge.net/p/autogen/bugs/212/
+Patch3:		autogen-fortify.patch
+
+Requires:	%{name}-libopts%{?_isa} = %{version}-%{release}
+
+BuildRequires:	gcc
+BuildRequires:	guile22-devel
+BuildRequires:	libtool
+BuildRequires:	libxml2-devel
+BuildRequires:	make
+BuildRequires:	perl-generators
+BuildRequires:	perl(Carp)
+BuildRequires:	perl(constant)
+BuildRequires:	perl(Exporter)
+BuildRequires:	perl(File::Basename)
+BuildRequires:	perl(lib)
+BuildRequires:	perl(List::Util)
+BuildRequires:	perl(strict)
+BuildRequires:	perl(Text::ParseWords)
+BuildRequires:	perl(warnings)
+BuildRequires:	chrpath
+BuildRequires:	sed
+BuildRequires:	automake autoconf
+
+%description
+AutoGen is a tool designed to simplify the creation and maintenance of
+programs that contain large amounts of repetitious text. It is especially
+valuable in programs that have several blocks of text that must be kept
+synchronised.
+
+%package libopts
+Summary:	Automated option processing library based on %{name}
+# Although sources are dual licensed with BSD, some autogen generated files
+# are only under LGPLv3+. We drop BSD to avoid multiple licensing scenario.
+License:	LGPL-3.0-or-later
+
+%description libopts
+Libopts is very powerful command line option parser consisting of a set of
+AutoGen templates and a run time library that nearly eliminates the hassle of
+parsing and documenting command line options.
+
+%package libopts-devel
+Summary:	Development files for libopts
+# Although sources are dual licensed with BSD, some autogen generated files
+# are only under LGPLv3+. We drop BSD to avoid multiple licensing scenario.
+License:	LGPL-3.0-or-later
+
+Requires:	automake
+Requires:	%{name} = %{version}-%{release}
+Requires:	%{name}-libopts%{?_isa} = %{version}-%{release}
+Requires:	pkgconfig
+
+%description libopts-devel
+This package contains development files for libopts.
+
+%prep
+%autosetup -p1
+
+# Disable failing test
+sed -i 's|errors.test||' autoopts/test/Makefile.in
+
+%build
+# Static libraries are needed to run test-suite.
+export CFLAGS="$RPM_OPT_FLAGS -Wno-implicit-fallthrough -Wno-format-overflow \
+		-Wno-format-truncation"
+autoreconf -fiv
+%configure
+
+# Omit unused direct shared library dependencies.
+sed --in-place --expression 's! -shared ! -Wl,--as-needed\0!g' ./libtool
+
+make %{?_smp_mflags}
+
+%check
+make check
+
+%install
+make install INSTALL="%{__install} -p" DESTDIR=$RPM_BUILD_ROOT
+find $RPM_BUILD_ROOT -type f -name "*.la" -delete
+find $RPM_BUILD_ROOT -type f -name "*.a" -delete
+
+# Remove time stamps from generated devel man pages to avoid multilib conflicts
+sed -i 's|\(It has been AutoGen-ed\).*.\(by AutoGen\)|\1 \2|' \
+	$RPM_BUILD_ROOT%{_mandir}/man3/*.3
+
+# Remove rpath.
+chrpath --delete $RPM_BUILD_ROOT%{_bindir}/{columns,getdefs,%{name},xml2ag}
+chrpath --delete $RPM_BUILD_ROOT%{_libdir}/lib*.so.*
+
+rm -f $RPM_BUILD_ROOT%{_infodir}/dir
+
+%ldconfig_scriptlets libopts
+
+%files
+%doc AUTHORS
+%doc ChangeLog
+%doc COPYING
+%doc NEWS
+%doc README
+%doc THANKS
+%doc TODO
+%doc pkg/libopts/COPYING.gplv3
+%{_bindir}/columns
+%{_bindir}/getdefs
+%{_bindir}/%{name}
+%{_bindir}/xml2ag
+%{_infodir}/%{name}.info*.gz
+%{_mandir}/man1/%{name}.1.gz
+%{_mandir}/man1/columns.1.gz
+%{_mandir}/man1/getdefs.1.gz
+%{_mandir}/man1/xml2ag.1.gz
+%dir %{_datadir}/%{name}
+%{_datadir}/%{name}/*
+%dir %{_libdir}/%{name}
+%{_libdir}/%{name}/*
+
+%files libopts
+%doc pkg/libopts/COPYING.mbsd
+%doc pkg/libopts/COPYING.lgplv3
+%{_libdir}/libopts.so.25*
+
+%files libopts-devel
+%{_bindir}/autoopts-config
+%{_datadir}/aclocal/autoopts.m4
+%{_libdir}/libopts.so
+%{_libdir}/pkgconfig/autoopts.pc
+%{_mandir}/man1/autoopts-config.1.gz
+%{_mandir}/man3/*
+
+%dir %{_includedir}/autoopts
+%{_includedir}/autoopts/options.h
+%{_includedir}/autoopts/usage-txt.h
+
+%changelog
+## START: Generated by rpmautospec
+* Mon Apr 06 2026 azldev <> - 5.18.16-33
+- Latest state for autogen
+
+* Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 5.18.16-32
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
+
+* Wed Jun 18 2025 Ondrej Mejzlik <omejzlik@redhat.com> - 5.18.16-31
+- add plan
+
+* Wed Jun 18 2025 Ondrej Mejzlik <omejzlik@redhat.com> - 5.18.16-30
+- Testing moves to RH gitlab centos-stream space
+
+* Tue Mar 04 2025 Tomas Korbar <tkorbar@redhat.com> - 5.18.16-29
+- Fix FTBFS
+
+* Thu Jan 16 2025 Fedora Release Engineering <releng@fedoraproject.org> - 5.18.16-28
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
+
+* Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5.18.16-27
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jul 17 2024 Miroslav Suchý <msuchy@redhat.com> - 5.18.16-26
+- convert LGPLv3+ license to SPDX
+
+* Thu May 30 2024 Software Management Team <packaging-team-maint@redhat.com> - 5.18.16-25
+- Eliminate use of obsolete %%patchN syntax (#2283636)
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5.18.16-24
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5.18.16-23
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Oct 30 2023 Tomas Korbar <tkorbar@redhat.com> - 5.18.16-22
+- Change the License tag so it contains all relevant SPDX licenses as shown
+  by scancode
+
+* Tue Oct 03 2023 Ondrej Mejzlik <omejzlik@redhat.com> - 5.18.16-21
+- Adding fmf plans and gating
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 5.18.16-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Mar 09 2023 Tomas Korbar <tkorbar@redhat.com> - 5.18.16-19
+- Change the License tag to the SPDX format
+
+* Tue Feb 28 2023 Tomas Korbar <tkorbar@redhat.com> - 5.18.16-18
+- Raise fortification level to 3
+
+* Mon Feb 27 2023 Tomas Korbar <tkorbar@redhat.com> - 5.18.16-17
+- Lower fortification level to 2
+
+* Wed Jan 18 2023 Fedora Release Engineering <releng@fedoraproject.org> - 5.18.16-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Dec 07 2022 Peter Fordham <peter.fordham@gmail.com> - 5.18.16-15
+- Port configure script to C99 preserving broken behavior for equivilence.
+
+* Wed Jul 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 5.18.16-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jan 19 2022 Fedora Release Engineering <releng@fedoraproject.org> - 5.18.16-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 5.18.16-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 5.18.16-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 5.18.16-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 5.18.16-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Wed Jul 01 2020 Tomas Korbar <tkorbar@redhat.com> - 5.18.16-8
+- Rebuild with guile-2.2
+
+* Wed Mar 25 2020 Jitka Plesnikova <jplesnik@redhat.com> - 5.18.16-7
+- Add perl dependencies needed for build
+
+* Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 5.18.16-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
+
+* Wed Jul 24 2019 Fedora Release Engineering <releng@fedoraproject.org> - 5.18.16-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
+
+* Wed Apr 24 2019 Björn Esser <besser82@fedoraproject.org> - 5.18.16-4
+- Remove hardcoded gzip suffix from GNU info pages
+
+* Tue Feb 05 2019 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.16-3
+- 5.18.16-1
+
+* Tue Feb 05 2019 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.16-2
+- fix building with new gcc
+
+* Tue Feb 05 2019 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.16-1
+- update to 5.18.16
+
+* Thu Jan 31 2019 Fedora Release Engineering <releng@fedoraproject.org> - 5.18.14-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
+
+* Mon Jan 28 2019 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 5.18.14-6
+- Remove obsolete Group tag
+
+* Tue Jul 31 2018 Florian Weimer <fweimer@redhat.com> - 5.18.14-5
+- Rebuild with fixed binutils
+
+* Mon Jul 30 2018 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.14-4
+- 5.18.14-1
+
+* Mon Jul 30 2018 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.14-3
+- disable format-truncation warnings
+
+* Fri Jul 27 2018 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.14-2
+- 5.18.14-1
+
+* Fri Jul 27 2018 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.14-1
+- update to 5.18.14
+
+* Thu Jul 12 2018 Fedora Release Engineering <releng@fedoraproject.org> - 5.18.12-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
+
+* Thu Jun 21 2018 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.12-16
+- 5.18.12-8
+
+* Thu Jun 21 2018 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.12-15
+- drop obsolete install-info scriptlets
+
+* Wed Feb 21 2018 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.12-14
+- fix rpath fix to allow building without installed libopts
+
+* Wed Feb 21 2018 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.12-13
+- 5.18.12-7
+
+* Wed Feb 21 2018 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.12-12
+- remove comment with macro
+
+* Wed Feb 21 2018 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.12-11
+- fix linking to use hardening flags (#1547522)
+
+* Wed Feb 21 2018 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.12-10
+- add gcc to build requirements
+
+* Wed Feb 21 2018 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.12-9
+- use macro for ldconfig scriptlets
+
+* Wed Feb 07 2018 Fedora Release Engineering <releng@fedoraproject.org> - 5.18.12-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
+
+* Wed Aug 02 2017 Fedora Release Engineering <releng@fedoraproject.org> - 5.18.12-7
+- Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
+
+* Wed Jul 26 2017 Fedora Release Engineering <releng@fedoraproject.org> - 5.18.12-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
+
+* Tue Mar 07 2017 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.12-5
+- 5.18.12-3
+
+* Tue Mar 07 2017 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.12-4
+- Include verify.h in libopts tear-off tarball (#1400907)
+
+* Fri Feb 10 2017 Fedora Release Engineering <releng@fedoraproject.org> - 5.18.12-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
+
+* Wed Sep 07 2016 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.12-2
+- 5.18.12-1
+
+* Wed Sep 07 2016 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.12-1
+- Update to 5.18.12
+
+* Fri Jun 24 2016 Petr Písař <ppisar@redhat.com> - 5.18.10-3
+- Mandatory Perl build-requires added
+  <https://fedoraproject.org/wiki/Changes/Build_Root_Without_Perl>
+
+* Fri May 27 2016 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.10-2
+- 5.18.10-1
+
+* Fri May 27 2016 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.10-1
+- Update to 5.18.10
+
+* Wed Feb 03 2016 Dennis Gilmore <dennis@ausil.us> - 5.18.6-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
+
+* Tue Sep 22 2015 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.6-2
+- 5.18.6-1
+
+* Tue Sep 22 2015 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.6-1
+- Update to 5.18.6
+
+* Wed Jun 17 2015 Dennis Gilmore <dennis@ausil.us> - 5.18.5-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
+
+* Fri May 15 2015 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.5-3
+- Add new source
+
+* Fri May 15 2015 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.5-2
+- 5.18.5-1
+
+* Fri May 15 2015 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.5-1
+- Update to 5.18.5
+
+* Tue Sep 02 2014 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.4-2
+- 5.18.4-1
+
+* Tue Sep 02 2014 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.4-1
+- Update to 5.18.4
+
+* Fri Aug 15 2014 Peter Robinson <pbrobinson@fedoraproject.org> - 5.18.3-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
+
+* Sat Jun 07 2014 Dennis Gilmore <dennis@ausil.us> - 5.18.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
+
+* Tue May 27 2014 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.3-2
+- 5.18.3-1
+
+* Tue May 27 2014 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.3-1
+- Update to 5.18.3
+
+* Tue May 27 2014 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.2-7
+- Compile with -Wno-format-contains-nul
+
+* Fri Mar 14 2014 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.2-6
+- Remove arch-specific dependency to avoid multilib conflict
+
+* Tue Feb 11 2014 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.2-5
+- use fully versioned dependency on base package
+
+* Tue Jan 28 2014 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.2-4
+- 5.18.2-2
+
+* Tue Jan 28 2014 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.2-3
+- Package libopts tear-off tarball (#441231)
+
+* Thu Oct 17 2013 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.2-2
+- 5.18.2-1
+
+* Thu Oct 17 2013 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.2-1
+- Update to 5.18.2
+
+* Thu Sep 19 2013 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.1-2
+- 5.18.1-1
+
+* Thu Sep 19 2013 Miroslav Lichvar <mlichvar@redhat.com> - 5.18.1-1
+- Update to 5.18.1
+
+* Thu Aug 08 2013 Miroslav Lichvar <mlichvar@redhat.com> - 5.18-3
+- 5.18-1
+
+* Thu Aug 08 2013 Miroslav Lichvar <mlichvar@redhat.com> - 5.18-2
+- Fix multilib conflicts (#831379)
+
+* Thu Aug 08 2013 Miroslav Lichvar <mlichvar@redhat.com> - 5.18-1
+- Update to 5.18
+
+* Thu Aug 08 2013 Miroslav Lichvar <mlichvar@redhat.com> - 5.12-9
+- Make some dependencies arch-specific
+
+* Thu Aug 08 2013 Miroslav Lichvar <mlichvar@redhat.com> - 5.12-8
+- Remove obsolete macros
+
+* Sat Aug 03 2013 Dennis Gilmore <dennis@ausil.us> - 5.12-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
+
+* Wed Jul 17 2013 Petr Písař <ppisar@redhat.com> - 5.12-6
+- Perl 5.18 rebuild
+
+* Thu Apr 18 2013 Debarshi Ray <debarshir@redhat.com> - 5.12-5
+- Fix build failure with guile2.
+
+* Wed Feb 13 2013 Dennis Gilmore <dennis@ausil.us> - 5.12-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
+
+* Wed Jul 18 2012 Dennis Gilmore <dennis@ausil.us> - 5.12-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
+
+* Thu Jan 12 2012 Dennis Gilmore <dennis@ausil.us> - 5.12-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
+
+* Fri Nov 25 2011 Anthony Green <green@moxielogic.com> - 5.12-1
+- Upgrade to autogen 5.12.
+
+* Tue Feb 08 2011 Dennis Gilmore <dennis@ausil.us> - 5.9.4-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
+
+* Wed Jul 28 2010 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 5.9.4-7
+- dist-git conversion
+
+* Wed Nov 25 2009 Bill Nottingham <notting@fedoraproject.org> - 5.9.4-6
+- Fix typo that causes a failure to update the common directory. (releng
+  #2781)
+
+* Mon Aug 10 2009 Ville Skyttä <scop@fedoraproject.org> - 5.9.4-5
+- Use bzipped upstream tarball. https://www.redhat.com/archives/fedora-
+  devel-list/2009-August/msg00563.html
+
+* Fri Jul 24 2009 Jesse Keating <jkeating@fedoraproject.org> - 5.9.4-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
+
+* Fri Feb 27 2009 Jesse Keating <jkeating@fedoraproject.org> - 5.9.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
+
+* Sun Mar 02 2008 Debarshi Ray <rishi@fedoraproject.org> - 5.9.4-2
+- Fixed Spec in devel. Modified Files: autogen.spec
+
+* Thu Feb 28 2008 Debarshi Ray <rishi@fedoraproject.org> - 5.9.4-1
+- Initial import into devel. Modified Files: devel/.cvsignore
+  devel/autogen.spec devel/sources Added Files:
+  devel/autogen-5.9.4-autoopts-config.patch
+  devel/autogen-5.9.4-pkgconfig.patch
+
+* Thu Feb 15 2007 Paul F. Johnson <pfj@fedoraproject.org> - 5.8.9-1
+- auto-import autogen-5.8.9-1 on branch devel from autogen-5.8.9-1.src.rpm
+
+* Sat Dec 23 2006 Paul F. Johnson <pfj@fedoraproject.org> - 5.8.8-1
+- auto-import autogen-5.8.8-1 on branch devel from autogen-5.8.8-1.src.rpm
+
+* Sun Dec 17 2006 Paul F. Johnson <pfj@fedoraproject.org> - 5.8.7-5
+- Ditched smp_mflags autogen.spec
+
+* Wed Dec 13 2006 Paul F. Johnson <pfj@fedoraproject.org> - 5.8.7-4
+- auto-import autogen-5.8.7-4 on branch devel from autogen-5.8.7-4.src.rpm
+
+* Thu Nov 02 2006 Paul F. Johnson <pfj@fedoraproject.org> - 5.8.7-3
+- auto-import autogen-5.8.7-3 on branch devel from autogen-5.8.7-3.src.rpm
+
+* Wed Oct 25 2006 Paul F. Johnson <pfj@fedoraproject.org> - 5.8.7-2
+- Rebuild against newer libopts autogen.spec
+
+* Sat Oct 21 2006 Paul F. Johnson <pfj@fedoraproject.org> - 5.8.7-1
+- auto-import autogen-5.8.7-1 on branch devel from autogen-5.8.7-1.src.rpm
+
+* Sun Sep 10 2006 Paul F. Johnson <pfj@fedoraproject.org> - 5.8.5-2
+- Updated spec file autogen.spec
+
+* Sun Sep 10 2006 Paul F. Johnson <pfj@fedoraproject.org> - 5.8.5-1
+- auto-import autogen-5.8.5-6 on branch devel from autogen-5.8.5-6.src.rpm
+## END: Generated by rpmautospec

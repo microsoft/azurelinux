@@ -1,0 +1,13 @@
+diff -rupN c-ares-1.13.0/m4/xc-val-flgs.m4 c-ares-1.13.0-new/m4/xc-val-flgs.m4
+--- c-ares-1.13.0/m4/xc-val-flgs.m4	2016-01-23 23:41:55.000000000 +0100
++++ c-ares-1.13.0-new/m4/xc-val-flgs.m4	2020-08-04 13:30:22.528846504 +0200
+@@ -61,9 +61,6 @@ AC_DEFUN([_XC_CHECK_VAR_LDFLAGS], [
+       -I*)
+         xc_bad_var_ldflags=yes
+         ;;
+-      -l* | --library=*)
+-        xc_bad_var_ldflags=yes
+-        ;;
+     esac
+   done
+   if test $xc_bad_var_ldflags = yes; then

@@ -1,0 +1,49 @@
+diff -urN netkit-ftp-0.17-pre20000412/ftp/ftp.1 netkit-ftp-0.17-pre20000412.new/ftp/ftp.1
+--- netkit-ftp-0.17-pre20000412/ftp/ftp.1	Thu Apr 13 03:56:03 2000
++++ netkit-ftp-0.17-pre20000412.new/ftp/ftp.1	Wed Aug 16 14:13:10 2000
+@@ -62,8 +62,10 @@
+ Use passive mode for data transfers. Allows use of ftp in environments
+ where a firewall prevents connections from the outside world back to
+ the client machine. Requires that the ftp server support the PASV
+-command. This is the default if invoked as
+-.Nm pftp.
++command. This is the default now for
++.Nm all
++clients (ftp and pftp) due to security concerns using the PORT transfer mode.
++The flag is kept for compatibility only and has no effect anymore.
+ .It Fl i
+ Turns off interactive prompting during multiple file transfers.
+ .It Fl n
+diff -urN netkit-ftp-0.17-pre20000412/ftp/ftp.c netkit-ftp-0.17-pre20000412.new/ftp/ftp.c
+--- netkit-ftp-0.17-pre20000412/ftp/ftp.c	Mon Dec 13 21:33:20 1999
++++ netkit-ftp-0.17-pre20000412.new/ftp/ftp.c	Wed Aug 16 14:12:50 2000
+@@ -883,7 +883,7 @@
+ 	}
+ 	if (fstat(fileno(fout), &st) < 0 || st.st_blksize == 0)
+ 		st.st_blksize = BUFSIZ;
+-	if (st.st_blksize > bufsize) {
++	if ((unsigned)st.st_blksize > bufsize) {
+ 		if (buf)
+ 			(void) free(buf);
+ 		buf = malloc((unsigned)st.st_blksize);
+diff -urN netkit-ftp-0.17-pre20000412/ftp/main.c netkit-ftp-0.17-pre20000412.new/ftp/main.c
+--- netkit-ftp-0.17-pre20000412/ftp/main.c	Sat Oct  2 15:25:23 1999
++++ netkit-ftp-0.17-pre20000412.new/ftp/main.c	Wed Aug 16 13:58:57 2000
+@@ -87,7 +87,7 @@
+ usage(void)
+ {
+ 	printf("\n\tUsage: { ftp | pftp } [-pinegvtd] [hostname]\n");
+-	printf("\t   -p: enable passive mode (default for pftp)\n");
++	printf("\t   -p: enable passive mode (default for ftp and pftp)\n");
+ 	printf("\t   -i: turn off prompting during mget\n");
+ 	printf("\t   -n: inhibit auto-login\n");
+ 	printf("\t   -e: disable readline support, if present\n");
+@@ -118,7 +118,7 @@
+ 	doglob = 1;
+ 	interactive = 1;
+ 	autologin = 1;
+-	passivemode = 0;
++	passivemode = 1;
+ 
+         cp = strrchr(argv[0], '/');
+         cp = (cp == NULL) ? argv[0] : cp+1;

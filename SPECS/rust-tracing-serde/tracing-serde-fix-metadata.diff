@@ -1,0 +1,14 @@
+--- tracing-serde-0.2.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ tracing-serde-0.2.0/Cargo.toml	2025-01-03T16:54:52.586700+00:00
+@@ -53,11 +53,6 @@
+ [dev-dependencies.serde_json]
+ version = "1"
+ 
+-[features]
+-valuable = [
+-    "tracing-core/valuable",
+-]
+-
+ [badges.maintenance]
+ status = "experimental"
+ 

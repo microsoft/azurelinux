@@ -1,0 +1,12 @@
+diff -up kservice-5.17.0/src/sycoca/vfolder_menu.cpp.vfolder_spam kservice-5.17.0/src/sycoca/vfolder_menu.cpp
+--- kservice-5.17.0/src/sycoca/vfolder_menu.cpp.vfolder_spam	2015-12-06 15:38:04.000000000 -0600
++++ kservice-5.17.0/src/sycoca/vfolder_menu.cpp	2015-12-09 08:51:46.339401871 -0600
+@@ -464,7 +464,7 @@ VFolderMenu::loadDoc()
+     int errorRow;
+     int errorCol;
+     if (!doc.setContent(&file, &errorMsg, &errorRow, &errorCol)) {
+-        qCWarning(SYCOCA) << "Parse error in " << m_docInfo.path << ", line " << errorRow << ", col " << errorCol << ": " << errorMsg;
++        qCDebug(SYCOCA) << "Parse error in " << m_docInfo.path << ", line " << errorRow << ", col " << errorCol << ": " << errorMsg;
+         file.close();
+         return doc;
+     }

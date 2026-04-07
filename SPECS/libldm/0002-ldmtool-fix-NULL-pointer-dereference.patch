@@ -1,0 +1,47 @@
+From 674da9bd4f482cd5e07e3f8f4b648d366b2c23bb Mon Sep 17 00:00:00 2001
+From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Date: Tue, 20 Jun 2023 17:00:24 +0900
+Subject: [PATCH 2/5] ldmtool: fix NULL pointer dereference
+
+If /sys/block can not be opened, get_devices() returns NULL.
+
+cmdline() does not check this result and below code snippet:
+
+          scanned = get_devices();
+          devices = (gchar **) scanned->data;
+
+results in a segmentation fault.
+
+Add a check on scanned.
+
+Relevant logs:
+
+  Unable to open /sys/block: No such file or directory
+  [    0.777352] ldmtool[164]: segfault at 0 ip 0000563a225cd6a5 sp 00007ffe54965a60 error 4 in ldmtool[563a225cb000+3000]
+  [    0.778278] Code: 18 64 48 33 1c 25 28 00 00 00 75 5e 48 83 c4 28 5b 5d 41 5c 41 5d 41 5e 41 5f c3 66 2e 0f 1f 84 00 00 00 00 00 e8 db fd ff ff <4c> 8b 20 48 89 44 24 08 4c 89 e7 e8 0b e1 ff ff 45 31 c0 4c 89 e1
+
+Fixes: 25d9635e4ee5 ("Add ldmtool")
+Signed-off-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Acked-by: Richard W.M. Jones <rjones@redhat.com>
+See: https://listman.redhat.com/archives/libguestfs/2023-June/031841.html
+---
+ src/ldmtool.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/ldmtool.c b/src/ldmtool.c
+index 6957c1a..dbe2c8c 100644
+--- a/src/ldmtool.c
++++ b/src/ldmtool.c
+@@ -746,6 +746,8 @@ cmdline(LDM * const ldm, gchar **devices,
+     GArray * scanned = NULL;
+     if (!devices) {
+         scanned = get_devices();
++        if (!scanned)
++            return FALSE;
+         devices = (gchar **) scanned->data;
+     }
+ 
+-- 
+2.48.1
+

@@ -1,0 +1,11 @@
+diff -up sddm-0.18.0/services/sddm.service.in.env sddm-0.18.0/services/sddm.service.in
+--- sddm-0.18.0/services/sddm.service.in.env	2018-07-18 05:31:40.000000000 -0500
++++ sddm-0.18.0/services/sddm.service.in	2019-03-14 08:23:22.095498405 -0500
+@@ -7,6 +7,7 @@ After=systemd-user-sessions.service gett
+ [Service]
+ ExecStart=@CMAKE_INSTALL_FULL_BINDIR@/sddm
+ Restart=always
++EnvironmentFile=-/etc/sysconfig/sddm
+ 
+ [Install]
+ Alias=display-manager.service

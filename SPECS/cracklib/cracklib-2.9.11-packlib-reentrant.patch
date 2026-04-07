@@ -1,0 +1,662 @@
+diff -Naur cracklib-2.9.11-orig/lib/fascist.c cracklib-2.9.11/lib/fascist.c
+--- cracklib-2.9.11-orig/lib/fascist.c	2019-02-13 20:54:41.000000000 -0500
++++ cracklib-2.9.11/lib/fascist.c	2023-07-07 18:20:42.239904964 -0400
+@@ -36,8 +36,8 @@
+ #undef DEBUG
+ #undef DEBUG2
+ 
+-extern char *Reverse(char *buf);
+-extern char *Lowercase(char *buf);
++extern char *Reverse(char *buf, char *area);
++extern char *Lowercase(char *buf, char *area);
+ 
+ static char *r_destructors[] = {
+     ":",                        /* noop - must do this to test raw word. */
+@@ -439,6 +439,8 @@
+     int i;
+     int len;
+     char *mp;
++    char area[STRINGSIZE];
++    char revarea[STRINGSIZE];
+ 
+     /* use destructors to turn password into rawtext */
+     /* note use of Reverse() to save duplicating all rules */
+@@ -447,7 +449,7 @@
+ 
+     for (i = 0; r_destructors[i]; i++)
+     {
+-	if (!(mp = Mangle(password, r_destructors[i])))
++	if (!(mp = Mangle(password, r_destructors[i], area)))
+ 	{
+ 	    continue;
+ 	}
+@@ -462,10 +464,10 @@
+ 	}
+ 
+ #ifdef DEBUG
+-	printf("%-16s = %-16s (destruct %s reversed)\n", Reverse(mp), rawtext, r_destructors[i]);
++	printf("%-16s = %-16s (destruct %s reversed)\n", Reverse(mp, revarea), rawtext, r_destructors[i]);
+ #endif
+ 
+-	if (!strncmp(Reverse(mp), rawtext, len))
++	if (!strncmp(Reverse(mp, revarea), rawtext, len))
+ 	{
+ 	    return (1);
+ 	}
+@@ -473,7 +475,7 @@
+ 
+     for (i = 0; r_constructors[i]; i++)
+     {
+-	if (!(mp = Mangle(rawtext, r_constructors[i])))
++	if (!(mp = Mangle(rawtext, r_constructors[i], area)))
+ 	{
+ 	    continue;
+ 	}
+@@ -520,7 +522,7 @@
+ 
+     strncpy(tbuffer, gecos, STRINGSIZE);
+     tbuffer[STRINGSIZE-1] = '\0';
+-    strcpy(gbuffer, Lowercase(tbuffer));
++    Lowercase(tbuffer, gbuffer);
+ 
+     wc = 0;
+     ptr = gbuffer;
+@@ -704,6 +706,7 @@
+     char junk[STRINGSIZE];
+     char *password;
+     char rpassword[STRINGSIZE];
++    char area[STRINGSIZE];
+     uint32_t notfound;
+ 
+     notfound = PW_WORDS(pwp);
+@@ -740,7 +743,7 @@
+ 	return _("it does not contain enough DIFFERENT characters");
+     }
+ 
+-    strcpy(password, (char *)Lowercase(password));
++    strcpy(password, (char *)Lowercase(password, area));
+ 
+     Trim(password);
+ 
+@@ -796,7 +799,7 @@
+     {
+ 	char *a;
+ 
+-	if (!(a = Mangle(password, r_destructors[i])))
++	if (!(a = Mangle(password, r_destructors[i], area)))
+ 	{
+ 	    continue;
+ 	}
+@@ -811,13 +814,13 @@
+ 	}
+     }
+ 
+-    strcpy(password, (char *)Reverse(password));
++    strcpy(password, (char *)Reverse(password, area));
+ 
+     for (i = 0; r_destructors[i]; i++)
+     {
+ 	char *a;
+ 
+-	if (!(a = Mangle(password, r_destructors[i])))
++	if (!(a = Mangle(password, r_destructors[i], area)))
+ 	{
+ 	    continue;
+ 	}
+diff -Naur cracklib-2.9.11-orig/lib/packer.h cracklib-2.9.11/lib/packer.h
+--- cracklib-2.9.11-orig/lib/packer.h	2023-03-04 11:00:49.000000000 -0500
++++ cracklib-2.9.11/lib/packer.h	2023-07-07 18:21:04.315119032 -0400
+@@ -82,7 +82,7 @@
+ extern unsigned int FindPW(PWDICT *pwp, char *string);
+ extern int PutPW(PWDICT *pwp, char *string);
+ extern int PMatch(char *control, char *string);
+-extern char *Mangle(char *input, char *control);
++extern char *Mangle(char *input, char *control, char *area);
+ extern char Chop(char *string);
+ extern char *Trim(char *string);
+ extern char *FascistLook(PWDICT *pwp, char *instring);
+diff -Naur cracklib-2.9.11-orig/lib/packlib.c cracklib-2.9.11/lib/packlib.c
+--- cracklib-2.9.11-orig/lib/packlib.c	2023-03-04 11:00:49.000000000 -0500
++++ cracklib-2.9.11/lib/packlib.c	2023-07-07 18:44:55.183214284 -0400
+@@ -65,8 +65,8 @@
+     char *mode;
+ {
+     int use64 = 0;
+-    static PWDICT pdesc;
+-    static PWDICT64 pdesc64;
++    PWDICT *pdesc;
++    PWDICT64 pdesc64;
+     char iname[STRINGSIZE];
+     char dname[STRINGSIZE];
+     char wname[STRINGSIZE];
+@@ -74,13 +74,11 @@
+     void *ifp;
+     void *wfp;
+ 
+-    if (pdesc.header.pih_magic == PIH_MAGIC)
+-    {
+-	fprintf(stderr, "%s: another dictionary already open\n", prefix);
++    pdesc = malloc(sizeof(*pdesc));
++    if (pdesc == NULL)
+ 	return NULL;
+-    }
+ 
+-    memset(&pdesc, '\0', sizeof(pdesc));
++    memset(pdesc, '\0', sizeof(*pdesc));
+     memset(&pdesc64, '\0', sizeof(pdesc64));
+ 
+     snprintf(iname, STRINGSIZE, "%s.pwi", prefix);
+@@ -89,77 +87,80 @@
+ 
+     if (mode[0] == 'r')
+     {
+-		pdesc.flags &= ~PFOR_USEZLIB;
++		pdesc->flags &= ~PFOR_USEZLIB;
+ 		/* first try the normal db file */
+-		if (!(pdesc.dfp = fopen(dname, mode)))
++		if (!(pdesc->dfp = fopen(dname, mode)))
+ 		{
+ #ifdef HAVE_ZLIB_H
+-			pdesc.flags |= PFOR_USEZLIB;
++			pdesc->flags |= PFOR_USEZLIB;
+ 			/* try extension .gz */
+ 			snprintf(dname, STRINGSIZE, "%s.pwd.gz", prefix);
+-			if (!(pdesc.dfp = gzopen(dname, mode)))
++			if (!(pdesc->dfp = gzopen(dname, mode)))
+ 			{
+ 				perror(dname);
++				free(pdesc);
+ 				return NULL;
+ 			}
+ #else
+ 		perror(dname);
++		free(pdesc);
+ 		return NULL;
+ #endif
+ 		}
+ 	}
+ 	else
+ 	{
+-		pdesc.flags &= ~PFOR_USEZLIB;
++		pdesc->flags &= ~PFOR_USEZLIB;
+ 		/* write mode: use fopen */
+-		if (!(pdesc.dfp = fopen(dname, mode)))
++		if (!(pdesc->dfp = fopen(dname, mode)))
+ 		{
+ 			perror(dname);
++			free(pdesc);
+ 			return NULL;
+ 		}
+ 	}
+ 
+-    if (!(pdesc.ifp = fopen(iname, mode)))
++    if (!(pdesc->ifp = fopen(iname, mode)))
+     {
+ #ifdef HAVE_ZLIB_H
+-		if (pdesc.flags & PFOR_USEZLIB)
+-			gzclose(pdesc.dfp);
++		if (pdesc->flags & PFOR_USEZLIB)
++			gzclose(pdesc->dfp);
+ 		else
+ #endif
+-			fclose(pdesc.dfp);
++			fclose(pdesc->dfp);
+ 	perror(iname);
++	free(pdesc);
+ 	return NULL;
+     }
+ 
+-    if ((pdesc.wfp = fopen(wname, mode)))
++    if ((pdesc->wfp = fopen(wname, mode)))
+     {
+-	pdesc.flags |= PFOR_USEHWMS;
++	pdesc->flags |= PFOR_USEHWMS;
+     }
+ 
+-    ifp = pdesc.ifp;
+-    dfp = pdesc.dfp;
+-    wfp = pdesc.wfp;
++    ifp = pdesc->ifp;
++    dfp = pdesc->dfp;
++    wfp = pdesc->wfp;
+ 
+     if (mode[0] == 'w')
+     {
+-	pdesc.flags |= PFOR_WRITE;
+-	pdesc.header.pih_magic = PIH_MAGIC;
+-	pdesc.header.pih_blocklen = NUMWORDS;
+-	pdesc.header.pih_numwords = 0;
++	pdesc->flags |= PFOR_WRITE;
++	pdesc->header.pih_magic = PIH_MAGIC;
++	pdesc->header.pih_blocklen = NUMWORDS;
++	pdesc->header.pih_numwords = 0;
+ 
+-	fwrite((char *) &pdesc.header, sizeof(pdesc.header), 1, ifp);
++	fwrite((char *) &pdesc->header, sizeof(pdesc->header), 1, ifp);
+     } else
+     {
+-	pdesc.flags &= ~PFOR_WRITE;
++	pdesc->flags &= ~PFOR_WRITE;
+ 
+-	if (!fread((char *) &pdesc.header, sizeof(pdesc.header), 1, ifp))
++	if (!fread((char *) &pdesc->header, sizeof(pdesc->header), 1, ifp))
+ 	{
+ 	    fprintf(stderr, "%s: error reading header\n", prefix);
+ 
+-	    pdesc.header.pih_magic = 0;
+ 	    fclose(ifp);
+ #ifdef HAVE_ZLIB_H
+-		if (pdesc.flags & PFOR_USEZLIB)
++		if (pdesc->flags & PFOR_USEZLIB)
+ 			gzclose(dfp);
+ 		else
+ #endif
+@@ -168,10 +169,11 @@
+ 	    {
+ 		fclose(wfp);
+ 	    }
++	    free(pdesc);
+ 	    return NULL;
+ 	}
+ 
+-        if ((pdesc.header.pih_magic == 0) || (pdesc.header.pih_numwords == 0))
++        if ((pdesc->header.pih_magic == 0) || (pdesc->header.pih_numwords == 0))
+         {
+             /* uh-oh. either a broken "64-bit" file or a garbage file. */
+             rewind (ifp);
+@@ -179,10 +181,9 @@
+             {
+                 fprintf(stderr, "%s: error reading header\n", prefix);
+ 
+-                pdesc.header.pih_magic = 0;
+                 fclose(ifp);
+ #ifdef HAVE_ZLIB_H
+-				if (pdesc.flags & PFOR_USEZLIB)
++				if (pdesc->flags & PFOR_USEZLIB)
+ 					gzclose(dfp);
+ 				else
+ #endif
+@@ -191,6 +192,7 @@
+ 		{
+ 			fclose(wfp);
+ 		}
++	        free(pdesc);
+                 return NULL;
+             }
+             if (pdesc64.header.pih_magic != PIH_MAGIC)
+@@ -198,10 +200,9 @@
+                 /* nope, not "64-bit" after all */
+                 fprintf(stderr, "%s: error reading header\n", prefix);
+ 
+-                pdesc.header.pih_magic = 0;
+                 fclose(ifp);
+ #ifdef HAVE_ZLIB_H
+-				if (pdesc.flags & PFOR_USEZLIB)
++				if (pdesc->flags & PFOR_USEZLIB)
+ 					gzclose(dfp);
+ 				else
+ #endif
+@@ -211,23 +212,23 @@
+ 		{
+ 			fclose(wfp);
+ 		}
++	        free(pdesc);
+                 return NULL;
+             }
+-            pdesc.header.pih_magic = pdesc64.header.pih_magic;
+-            pdesc.header.pih_numwords = pdesc64.header.pih_numwords;
+-            pdesc.header.pih_blocklen = pdesc64.header.pih_blocklen;
+-            pdesc.header.pih_pad = pdesc64.header.pih_pad;
++            pdesc->header.pih_magic = pdesc64.header.pih_magic;
++            pdesc->header.pih_numwords = pdesc64.header.pih_numwords;
++            pdesc->header.pih_blocklen = pdesc64.header.pih_blocklen;
++            pdesc->header.pih_pad = pdesc64.header.pih_pad;
+             use64 = 1;
+         }
+ 
+-	if (pdesc.header.pih_magic != PIH_MAGIC)
++	if (pdesc->header.pih_magic != PIH_MAGIC)
+ 	{
+ 	    fprintf(stderr, "%s: magic mismatch\n", prefix);
+ 
+-	    pdesc.header.pih_magic = 0;
+ 	    fclose(ifp);
+ #ifdef HAVE_ZLIB_H
+-		if (pdesc.flags & PFOR_USEZLIB)
++		if (pdesc->flags & PFOR_USEZLIB)
+ 			gzclose(dfp);
+ 		else
+ #endif
+@@ -237,17 +238,17 @@
+ 	    {
+ 		fclose(wfp);
+ 	    }
++	    free(pdesc);
+ 	    return NULL;
+ 	}
+ 
+-        if (pdesc.header.pih_numwords < 1)
++        if (pdesc->header.pih_numwords < 1)
+         {
+             fprintf(stderr, "%s: invalid word count\n", prefix);
+ 
+-            pdesc.header.pih_magic = 0;
+             fclose(ifp);
+ #ifdef HAVE_ZLIB_H
+-			if (pdesc.flags & PFOR_USEZLIB)
++			if (pdesc->flags & PFOR_USEZLIB)
+ 				gzclose(dfp);
+ 			else
+ #endif
+@@ -256,17 +257,17 @@
+ 	    {
+ 		fclose(wfp);
+ 	    }
++	    free(pdesc);
+             return NULL;
+         }
+ 
+-	if (pdesc.header.pih_blocklen != NUMWORDS)
++	if (pdesc->header.pih_blocklen != NUMWORDS)
+ 	{
+ 	    fprintf(stderr, "%s: size mismatch\n", prefix);
+ 
+-	    pdesc.header.pih_magic = 0;
+ 	    fclose(ifp);
+ #ifdef HAVE_ZLIB_H
+-		if (pdesc.flags & PFOR_USEZLIB)
++		if (pdesc->flags & PFOR_USEZLIB)
+ 			gzclose(dfp);
+ 		else
+ #endif
+@@ -275,10 +276,11 @@
+ 	    {
+ 		fclose(wfp);
+ 	    }
++	    free(pdesc);
+ 	    return NULL;
+ 	}
+ 
+-	if (pdesc.flags & PFOR_USEHWMS)
++	if (pdesc->flags & PFOR_USEHWMS)
+ 	{
+             int i;
+ 
+@@ -286,27 +288,27 @@
+             {
+                 if (fread(pdesc64.hwms, 1, sizeof(pdesc64.hwms), wfp) != sizeof(pdesc64.hwms))
+                 {
+-                    pdesc.flags &= ~PFOR_USEHWMS;
++                    pdesc->flags &= ~PFOR_USEHWMS;
+                 }
+-                for (i = 0; i < sizeof(pdesc.hwms) / sizeof(pdesc.hwms[0]); i++)
++                for (i = 0; i < sizeof(pdesc->hwms) / sizeof(pdesc->hwms[0]); i++)
+                 {
+-                    pdesc.hwms[i] = pdesc64.hwms[i];
++                    pdesc->hwms[i] = pdesc64.hwms[i];
+                 }
+             }
+-            else if (fread(pdesc.hwms, 1, sizeof(pdesc.hwms), wfp) != sizeof(pdesc.hwms))
++            else if (fread(pdesc->hwms, 1, sizeof(pdesc->hwms), wfp) != sizeof(pdesc->hwms))
+ 	    {
+-		pdesc.flags &= ~PFOR_USEHWMS;
++		pdesc->flags &= ~PFOR_USEHWMS;
+ 	    }
+ #if DEBUG
+             for (i=1; i<=0xff; i++)
+             {
+-                printf("hwm[%02x] = %d\n", i, pdesc.hwms[i]);
++                printf("hwm[%02x] = %d\n", i, pdesc->hwms[i]);
+             }
+ #endif
+ 	}
+     }
+ 
+-    return (&pdesc);
++    return (pdesc);
+ }
+ 
+ int
+@@ -327,12 +329,14 @@
+ 	if (fseek(pwp->ifp, 0L, 0))
+ 	{
+ 	    fprintf(stderr, "index magic fseek failed\n");
++	    free(pwp);
+ 	    return (-1);
+ 	}
+ 
+ 	if (!fwrite((char *) &pwp->header, sizeof(pwp->header), 1, pwp->ifp))
+ 	{
+ 	    fprintf(stderr, "index magic fwrite failed\n");
++	    free(pwp);
+ 	    return (-1);
+ 	}
+ 
+@@ -366,6 +370,7 @@
+     }
+ 
+     pwp->header.pih_magic = 0;
++    free(pwp);
+ 
+     return (0);
+ }
+diff -Naur cracklib-2.9.11-orig/lib/rules.c cracklib-2.9.11/lib/rules.c
+--- cracklib-2.9.11-orig/lib/rules.c	2023-04-02 14:15:05.000000000 -0400
++++ cracklib-2.9.11/lib/rules.c	2023-07-07 18:58:04.892943574 -0400
+@@ -80,12 +80,12 @@
+ }
+ 
+ char *
+-Reverse(str)			/* return a pointer to a reversal */
++Reverse(str, area)			/* return a pointer to a reversal */
+     char *str;
++    char *area;
+ {
+     int i;
+     int j;
+-    static char area[STRINGSIZE];
+     j = i = strlen(str);
+     while (*str)
+     {
+@@ -96,11 +96,11 @@
+ }
+ 
+ char *
+-Uppercase(str)			/* return a pointer to an uppercase */
++Uppercase(str, area)			/* return a pointer to an uppercase */
+     char *str;
++    char *area;
+ {
+     char *ptr;
+-    static char area[STRINGSIZE];
+     ptr = area;
+     while (*str)
+     {
+@@ -113,11 +113,11 @@
+ }
+ 
+ char *
+-Lowercase(str)			/* return a pointer to an lowercase */
++Lowercase(str, area)			/* return a pointer to an lowercase */
+     char *str;
++    char *area;
+ {
+     char *ptr;
+-    static char area[STRINGSIZE];
+     ptr = area;
+     while (*str)
+     {
+@@ -130,11 +130,11 @@
+ }
+ 
+ char *
+-Capitalise(str)			/* return a pointer to an capitalised */
++Capitalise(str, area)			/* return a pointer to an capitalised */
+     char *str;
++    char *area;
+ {
+     char *ptr;
+-    static char area[STRINGSIZE];
+     ptr = area;
+ 
+     while (*str)
+@@ -149,11 +149,11 @@
+ }
+ 
+ char *
+-Pluralise(string)		/* returns a pointer to a plural */
++Pluralise(string, area)		/* returns a pointer to a plural */
+     char *string;
++    char *area;
+ {
+     int length;
+-    static char area[STRINGSIZE];
+     length = strlen(string);
+     strcpy(area, string);
+ 
+@@ -190,13 +190,13 @@
+ }
+ 
+ char *
+-Substitute(string, old, new)	/* returns pointer to a swapped about copy */
++Substitute(string, old, new, area)	/* returns pointer to a swapped about copy */
+     char *string;
+     char old;
+     char new;
++    char *area;
+ {
+     char *ptr;
+-    static char area[STRINGSIZE];
+     ptr = area;
+     while (*string)
+     {
+@@ -208,12 +208,12 @@
+ }
+ 
+ char *
+-Purge(string, target)		/* returns pointer to a purged copy */
++Purge(string, target, area)		/* returns pointer to a purged copy */
+     char *string;
+     char target;
++    char *area;
+ {
+     char *ptr;
+-    static char area[STRINGSIZE];
+     ptr = area;
+     while (*string)
+     {
+@@ -370,13 +370,13 @@
+ }
+ 
+ char *
+-PolySubst(string, class, new)	/* returns pointer to a swapped about copy */
++PolySubst(string, class, new, area)	/* returns pointer to a swapped about copy */
+     char *string;
+     char class;
+     char new;
++    char *area;
+ {
+     char *ptr;
+-    static char area[STRINGSIZE];
+     ptr = area;
+     while (*string)
+     {
+@@ -388,12 +388,12 @@
+ }
+ 
+ char *
+-PolyPurge(string, class)	/* returns pointer to a purged copy */
++PolyPurge(string, class, area)	/* returns pointer to a purged copy */
+     char *string;
+     char class;
++    char *area;
+ {
+     char *ptr;
+-    static char area[STRINGSIZE];
+     ptr = area;
+     while (*string)
+     {
+@@ -426,39 +426,40 @@
+ }
+ 
+ char *
+-Mangle(input, control)		/* returns a pointer to a controlled Mangle */
++Mangle(input, control, area)		/* returns a pointer to a controlled Mangle */
+     char *input;
+     char *control;
++    char *area;
+ {
+     int limit;
+     char *ptr;
+-    static char area[STRINGSIZE * 2] = {0};
+     char area2[STRINGSIZE * 2] = {0};
+     strcpy(area, input);
+ 
+     for (ptr = control; *ptr; ptr++)
+     {
++	strcpy(area2, area);
+ 	switch (*ptr)
+ 	{
+ 	case RULE_NOOP:
+ 	    break;
+ 	case RULE_REVERSE:
+-	    strcpy(area, Reverse(area));
++	    Reverse(area2, area);
+ 	    break;
+ 	case RULE_UPPERCASE:
+-	    strcpy(area, Uppercase(area));
++	    Uppercase(area2, area);
+ 	    break;
+ 	case RULE_LOWERCASE:
+-	    strcpy(area, Lowercase(area));
++	    Lowercase(area2, area);
+ 	    break;
+ 	case RULE_CAPITALISE:
+-	    strcpy(area, Capitalise(area));
++	    Capitalise(area2, area);
+ 	    break;
+ 	case RULE_PLURALISE:
+-	    strcpy(area, Pluralise(area));
++	    Pluralise(area2, area);
+ 	    break;
+ 	case RULE_REFLECT:
+-	    strcat(area, Reverse(area));
++	    strcat(area, Reverse(area, area2));
+ 	    break;
+ 	case RULE_DUPLICATE:
+ 	    strcpy(area2, area);
+@@ -545,7 +546,6 @@
+ 		    Debug(1, "Mangle: extract: weird argument in '%s'\n", control);
+ 		    return NULL;
+ 		}
+-		strcpy(area2, area);
+ 		for (i = 0; length-- && area2[start + i]; i++)
+ 		{
+ 		    area[i] = area2[start + i];
+@@ -616,10 +616,10 @@
+ 		return NULL;
+ 	    } else if (ptr[1] != RULE_CLASS)
+ 	    {
+-		strcpy(area, Purge(area, *(++ptr)));
++		Purge(area2, *(++ptr), area);
+ 	    } else
+ 	    {
+-		strcpy(area, PolyPurge(area, ptr[2]));
++		PolyPurge(area2, ptr[2], area);
+ 		ptr += 2;
+ 	    }
+ 	    break;
+@@ -630,11 +630,11 @@
+ 		return NULL;
+ 	    } else if (ptr[1] != RULE_CLASS)
+ 	    {
+-		strcpy(area, Substitute(area, ptr[1], ptr[2]));
++		Substitute(area2, ptr[1], ptr[2], area);
+ 		ptr += 2;
+ 	    } else
+ 	    {
+-		strcpy(area, PolySubst(area, ptr[2], ptr[3]));
++		PolySubst(area2, ptr[2], ptr[3], area);
+ 		ptr += 3;
+ 	    }
+ 	    break;

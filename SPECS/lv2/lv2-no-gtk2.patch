@@ -1,0 +1,30 @@
+diff -Naur lv2-1.18.10.old/plugins/meson.build lv2-1.18.10/plugins/meson.build
+--- lv2-1.18.10.old/plugins/meson.build	2024-09-23 09:20:09.575701931 +0200
++++ lv2-1.18.10/plugins/meson.build	2024-09-23 09:25:32.321053448 +0200
+@@ -9,8 +9,6 @@
+   subdir('eg-metro.lv2')
+   subdir('eg-midigate.lv2')
+   subdir('eg-params.lv2')
+-  subdir('eg-sampler.lv2')
+-  subdir('eg-scope.lv2')
+ endif
+ 
+ if not get_option('docs').disabled()
+@@ -37,17 +35,6 @@
+       'eg-params.lv2/params.c',
+       'eg-params.lv2/params.ttl',
+       'eg-params.lv2/state_map.h',
+-      'eg-sampler.lv2/README.txt',
+-      'eg-sampler.lv2/atom_sink.h',
+-      'eg-sampler.lv2/peaks.h',
+-      'eg-sampler.lv2/sampler.c',
+-      'eg-sampler.lv2/sampler.ttl',
+-      'eg-sampler.lv2/sampler_ui.c',
+-      'eg-sampler.lv2/uris.h',
+-      'eg-scope.lv2/README.txt',
+-      'eg-scope.lv2/examploscope.c',
+-      'eg-scope.lv2/examploscope_ui.c',
+-      'eg-scope.lv2/uris.h',
+     )
+ 
+     # Compile book sources into book.txt asciidoc source

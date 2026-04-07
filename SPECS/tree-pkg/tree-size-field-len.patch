@@ -1,0 +1,18 @@
+ tree.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tree.c b/tree.c
+index 13e8c3d..4b30786 100644
+--- a/tree.c
++++ b/tree.c
+@@ -1444,8 +1444,8 @@ int psize(char *buf, off_t size)
+ 
+   if (hflag || siflag) {
+     for (idx=size<usize?0:1; size >= (usize*usize); idx++,size/=usize);
+-    if (!idx) return sprintf(buf, " %4d", (int)size);
+-    else return sprintf(buf, (((size+52)/usize) >= 10)? " %3.0f%c" : " %3.1f%c" , (float)size/(float)usize,unit[idx]);
++    if (!idx) return sprintf(buf, " %5d", (int)size);
++    else return sprintf(buf, (((size+52)/usize) >= 10)? " %4.0f%c" : " %4.1f%c" , (float)size/(float)usize,unit[idx]);
+   } else return sprintf(buf, sizeof(off_t) == sizeof(long long)? " %11lld" : " %9lld", (long long int)size);
+ }
+ 

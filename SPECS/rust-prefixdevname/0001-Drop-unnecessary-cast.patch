@@ -1,0 +1,25 @@
+From 27c6638477dc56d95469aa83ec47c839a23160fc Mon Sep 17 00:00:00 2001
+From: Michal Sekletar <msekleta@redhat.com>
+Date: Thu, 30 Mar 2023 10:56:15 +0200
+Subject: [PATCH] Drop unnecessary cast
+
+---
+ src/sema.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/sema.rs b/src/sema.rs
+index 9504970..e79e5d0 100644
+--- a/src/sema.rs
++++ b/src/sema.rs
+@@ -16,7 +16,7 @@ impl Semaphore {
+         let s;
+         unsafe {
+             s = libc::sem_open(
+-                raw_sema_name.as_ptr() as *const i8,
++                raw_sema_name.as_ptr(),
+                 libc::O_CREAT,
+                 libc::S_IRUSR | libc::S_IWUSR,
+                 1,
+-- 
+2.38.1
+

@@ -1,0 +1,37 @@
+From d5a66388fe5f076939136671449de057aaa3b44f Mon Sep 17 00:00:00 2001
+From: Luke from DC <lukefromdc@hushmail.com>
+Date: Tue, 30 Jul 2024 20:58:44 +0000
+Subject: [PATCH 03/10] wayland background: use mate-appearance-properties if
+ we can (#1771)
+
+*In the wayland session, we now have mate-settings-daemon with GDK_BACKEND=x11
+*We need it anyway to control theming in xwayland apps,so we can now use mate-appearance-properties to set the desktop background when it is running
+---
+ src/file-manager/fm-desktop-icon-view.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/src/file-manager/fm-desktop-icon-view.c b/src/file-manager/fm-desktop-icon-view.c
+index 0d0c034a..954c26de 100644
+--- a/src/file-manager/fm-desktop-icon-view.c
++++ b/src/file-manager/fm-desktop-icon-view.c
+@@ -717,7 +717,16 @@ action_change_background_callback (GtkAction *action,
+     /*Get the new background and switch to it in wayland*/
+     if (GDK_IS_WAYLAND_DISPLAY (gdk_display_get_default()))
+     {
+-        wayland_bg_dialog_new ();
++        /*We can use the appearance capplet with some versions of mate-control-center
++         *in which the appearance capplet works in wayland
++         *Try it first, and fall back to the standalone dialog if it fails
++         */
++        GError *error = NULL;
++
++        g_spawn_command_line_async ("mate-appearance-properties --show-page=background",
++                                          &error);
++        if (error != NULL)
++            wayland_bg_dialog_new ();
+     }
+     else
+ #endif
+-- 
+2.48.1
+

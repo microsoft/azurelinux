@@ -1,0 +1,11 @@
+--- fuzzy-matcher-0.3.7/Cargo.toml	2020-10-04T07:17:31+00:00
++++ fuzzy-matcher-0.3.7/Cargo.toml	2024-12-25T17:04:53.930286+00:00
+@@ -25,7 +25,7 @@
+ [dependencies.thread_local]
+ version = "1.0.0"
+ [dev-dependencies.termion]
+-version = "1.5.1"
++version = "4"
+ 
+ [features]
+ compact = []

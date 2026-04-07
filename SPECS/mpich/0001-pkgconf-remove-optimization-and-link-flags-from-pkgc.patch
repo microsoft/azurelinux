@@ -1,0 +1,44 @@
+From cb3e5715326c43779b51e1cab1519282c50199c1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Zbigniew=20J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>
+Date: Tue, 8 Feb 2022 10:19:12 +0100
+Subject: [PATCH 1/4] pkgconf: remove optimization and link flags from pkgconf
+ file
+
+Those flags are generally something "private" to a particular build. If we build
+mpich with -O2, it does not mean that some other program using the library should
+be built with -O2.
+
+In package builds in Fedora we ended up with:
+
+WRAPPER_LDFLAGS = -Wl,-z,relro -Wl,--as-needed  -Wl,-z,now -specs=/usr/lib/rpm/redhat/redhat-hardened-ld -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1  -Wl,--build-id=sha1 -Wl,-dT,/builddir/build/BUILD/mpich-3.4.1/.package_note-mpich-3.4.1-11.fc36.x86_64.ld -Lsystem/lib
+
+WRAPPER_CFLAGS = -O2 -flto=auto -ffat-lto-objects -fexceptions -g -grecord-gcc-switches -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -fstack-protector-strong -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1  -m64  -mtune=generic -fasynchronous-unwind-tables -fstack-clash-protection -fcf-protection
+
+None of those are appropriate to be exported to dependent projects.
+For https://fedoraproject.org/wiki/Changes/Package_information_on_ELF_objects.
+---
+ src/packaging/pkgconfig/mpich.pc.in | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/packaging/pkgconfig/mpich.pc.in b/src/packaging/pkgconfig/mpich.pc.in
+index e905ff2e20..ff6dc35807 100644
+--- a/src/packaging/pkgconfig/mpich.pc.in
++++ b/src/packaging/pkgconfig/mpich.pc.in
+@@ -9,12 +9,12 @@ Description: High Performance and portable MPI
+ Version: @MPICH_VERSION@
+ URL: http://www.mcs.anl.gov/research/projects/mpich
+ Requires:
+-Libs: @WRAPPER_C_DYNAMIC_LOADING_FLAGS@ @WRAPPER_LDFLAGS@ -L${libdir} -l@MPILIBNAME@ @LPMPILIBNAME@ @WRAPPER_LIBS@
+-Cflags: @WRAPPER_CPPFLAGS@ @WRAPPER_CFLAGS@ -I${includedir}
++Libs: @WRAPPER_C_DYNAMIC_LOADING_FLAGS@ -L${libdir} -l@MPILIBNAME@ @LPMPILIBNAME@
++Cflags: @WRAPPER_CPPFLAGS@ -I${includedir}
+ 
+ # pkg-config does not understand Cxxflags, etc. So we allow users to
+ # query them using the --variable option
+ 
+-cxxflags=@WRAPPER_CPPFLAGS@ @WRAPPER_CXXFLAGS@ -I${includedir}
+-fflags=@WRAPPER_FFLAGS@ -I${includedir}
+-fcflags=@WRAPPER_FCFLAGS@ -I${includedir}
++cxxflags=@WRAPPER_CPPFLAGS@ -I${includedir}
++fflags=-I${includedir}
++fcflags=-I${includedir}

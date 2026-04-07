@@ -1,0 +1,45 @@
+From 5da08f0aeb4fd4f30c5c4f8aac662d03883bbf1a Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Tue, 2 Aug 2022 11:07:49 +0200
+Subject: [PATCH 1/3] build: Build against new gcr-4 library
+
+Rather than the old gcr-base-3.
+---
+ gdata/gdata-service.c | 2 +-
+ meson.build           | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/gdata/gdata-service.c b/gdata/gdata-service.c
+index 6e1f0d40..a59a23be 100644
+--- a/gdata/gdata-service.c
++++ b/gdata/gdata-service.c
+@@ -46,7 +46,7 @@
+ 
+ #ifdef HAVE_GNOME
+ #define GCR_API_SUBJECT_TO_CHANGE
+-#include <gcr/gcr-base.h>
++#include <gcr/gcr.h>
+ #endif /* HAVE_GNOME */
+ 
+ #include "gdata-service.h"
+diff --git a/meson.build b/meson.build
+index 68eb0b1a..b860afd8 100644
+--- a/meson.build
++++ b/meson.build
+@@ -107,11 +107,11 @@ gtk_dep = dependency(
+   not_found_message: 'GTK+ support requested but gtk+-3.0 ' + gtk_dep_req_version + ' could not be found',
+ )
+ 
+-# GNOME support, which pulls in gcr-base-3 to provide non-pageable memory
+-gcr_dep = dependency('gcr-base-3', required: get_option('gnome'))
++# GNOME support, which pulls in gcr-4 to provide non-pageable memory
++gcr_dep = dependency('gcr-4', required: get_option('gnome'))
+ enable_gnome = gcr_dep.found()
+ if enable_gnome
+-  gdata_private_deps += dependency('gcr-base-3')
++  gdata_private_deps += dependency('gcr-4')
+ endif
+ config_h.set('HAVE_GNOME', enable_gnome)
+ 
+-- 
+GitLab

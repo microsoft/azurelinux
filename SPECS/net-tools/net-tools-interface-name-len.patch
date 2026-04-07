@@ -1,0 +1,59 @@
+diff --git a/netstat.c b/netstat.c
+index c084dfb..cfcfb78 100644
+--- a/netstat.c
++++ b/netstat.c
+@@ -743,6 +743,7 @@ static void igmp_do_one(int lnr, const char *line,const char *prot)
+     static int igmp6_flag = 0;
+     static char device[16];
+     int num, idx, refcnt;
++    char* offset;
+ 
+     if (lnr == 0) {
+ 	/* IPV6 ONLY */
+@@ -794,17 +795,21 @@ static void igmp_do_one(int lnr, const char *line,const char *prot)
+ #if HAVE_AFINET
+ 	if (line[0] != '\t') {
+ 	    if (idx_flag) {
+-		if ((num = sscanf( line, "%d\t%10c", &idx, device)) < 2) {
++		if ((num = sscanf( line, "%d\t%15c", &idx, device)) < 2) {
+ 		    fprintf(stderr, _("warning, got bogus igmp line %d.\n"), lnr);
+ 		    return;
+ 		}
+ 	    } else {
+-		if ( (num = sscanf( line, "%10c", device )) < 1 ) {
++		if ( (num = sscanf( line, "%15c", device )) < 1 ) {
+ 		    fprintf(stderr, _("warning, got bogus igmp line %d.\n"), lnr);
+ 		    return;
+ 		}
+ 	    }
+-	    device[10] = '\0';
++
++	    offset = strrchr(device, ':');
++	    if(offset)
++		*offset = 0;
++
+ 	    return;
+ 	} else if ( line[0] == '\t' ) {
+ 	    if ( (num = sscanf(line, "\t%8[0-9A-Fa-f] %d", mcast_addr, &refcnt)) < 2 ) {
+@@ -2037,7 +2037,7 @@ static int iface_info(void)
+     if (flag_exp < 2) {
+ 	ife_short = 1;
+ 	if(!(count % 8))
+-	    printf(_("Iface      MTU    RX-OK RX-ERR RX-DRP RX-OVR    TX-OK TX-ERR TX-DRP TX-OVR Flg\n"));
++	    printf(_("Iface             MTU    RX-OK RX-ERR RX-DRP RX-OVR    TX-OK TX-ERR TX-DRP TX-OVR Flg\n"));
+     }
+
+     if (flag_int_name) {
+diff --git a/lib/interface.c b/lib/interface.c
+index 3bd999f..97f3db5 100644
+--- a/lib/interface.c
++++ b/lib/interface.c
+@@ -655,7 +655,7 @@ int do_if_print(struct interface *ife, void *cookie)
+ 
+ void ife_print_short(struct interface *ptr)
+ {
+-    printf("%-8.8s ", ptr->name);
++    printf("%-15.15s ", ptr->name);
+     printf("%5d ", ptr->mtu);
+     /* If needed, display the interface statistics. */
+     if (ptr->statistics_valid) {

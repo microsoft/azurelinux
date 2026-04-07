@@ -1,0 +1,13 @@
+diff --git a/src/google/protobuf/port_def.inc b/src/google/protobuf/port_def.inc
+index 30af1cf..67caa6e 100644
+--- a/src/google/protobuf/port_def.inc
++++ b/src/google/protobuf/port_def.inc
+@@ -230,7 +230,7 @@
+ #error PROTOBUF_TAILCALL was previously defined
+ #endif
+ #if __has_cpp_attribute(clang::musttail) && \
+-  !defined(__arm__) && !defined(_ARCH_PPC) && !defined(__wasm__)
++  !defined(__arm__) && !defined(__i386__) && !defined(__s390x__) && !defined(_ARCH_PPC) && !defined(__wasm__)
+ #  ifndef PROTO2_OPENSOURCE
+ // Compilation fails on ARM32: b/195943306
+ // Compilation fails on powerpc64le: b/187985113

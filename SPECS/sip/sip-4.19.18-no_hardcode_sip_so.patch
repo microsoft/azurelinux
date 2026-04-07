@@ -1,0 +1,12 @@
+diff -rupN --no-dereference sip-4.19.25/configure.py sip-4.19.25-new/configure.py
+--- sip-4.19.25/configure.py	2021-02-26 16:28:41.621025600 +0100
++++ sip-4.19.25-new/configure.py	2021-10-21 13:45:54.845566597 +0200
+@@ -449,7 +449,7 @@ def create_makefiles(macros):
+         if sys.platform == 'win32':
+             mod = 'sip.lib' if opts.static else 'sip.pyd'
+         else:
+-            mod = 'libsip.a' if opts.static else 'sip.so'
++            mod = 'libsip.a' if opts.static else sip_module_name.split('.')[-1] + '.so'
+ 
+         all_installs.append((mod, sip_module_dest_dir))
+ 

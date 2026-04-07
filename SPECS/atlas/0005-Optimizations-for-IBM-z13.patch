@@ -1,0 +1,68 @@
+From ad278554860b0da7d5848262a7bf35e058266cb1 Mon Sep 17 00:00:00 2001
+From: Andreas Arnez <arnez@linux.ibm.com>
+Date: Wed, 12 Dec 2018 20:06:27 +0100
+Subject: [PATCH 5/8] Optimizations for IBM z13
+
+Perform some optimizations for IBM z13:
+- Compile with -O2 instead of -O.
+- Streamline vector loads/stores.
+- Define the vvrsum2 macro.
+
+Also, use the compile option -march=z13 instead of -march=native.
+---
+ CONFIG/src/atlcomp.txt |  8 +++-----
+ include/atlas_simd.h   | 11 +++++------
+ 2 files changed, 8 insertions(+), 11 deletions(-)
+
+diff --git a/CONFIG/src/atlcomp.txt b/CONFIG/src/atlcomp.txt
+index aa31604..2ac71cf 100644
+--- a/CONFIG/src/atlcomp.txt
++++ b/CONFIG/src/atlcomp.txt
+@@ -246,12 +246,10 @@ MACH=IBMz9,IBMz10,IBMz196 OS=ALL LVL=500 COMPS=f77
+    'gfortran' '-O3 -funroll-loops'
+ MACH=IBMz9,IBMz10,IBMz196,IBMz12 OS=ALL LVL=500 COMPS=smc,dmc,skc,dkc,icc,xcc,gcc
+    'gcc' '-O3 -funroll-loops'
+-MACH=IBMz13 OS=ALL LVL=1000 COMPS=dmc,skc,dkc,icc,xcc,gcc
+-   'gcc' '-march=native -O -mvx -mzvector'
+-MACH=IBMz13 OS=ALL LVL=1000 COMPS=smc
+-   'gcc' '-march=native -O -mvx -mzvector -fno-peephole -fno-peephole2'
++MACH=IBMz13 OS=ALL LVL=1000 COMPS=smc,dmc,skc,dkc,icc,xcc,gcc
++   'gcc' '-march=z13 -mtune=z13 -O2'
+ MACH=IBMz13 OS=ALL LVL=1000 COMPS=f77
+-   'gfortran' '-march=native -O -mvx -mzvector'
++   'gfortran' '-march=z13 -mtune=z13 -O2'
+ #
+ # Windows defaults ; need to make SSE/SSE2 arch dep.
+ #
+diff --git a/include/atlas_simd.h b/include/atlas_simd.h
+index 68daf79..f171933 100644
+--- a/include/atlas_simd.h
++++ b/include/atlas_simd.h
+@@ -384,8 +384,8 @@
+    #endif
+    #define ATL_VTYPE vector double
+    #if (defined(DREAL) || defined(DCPLX))
+-      #define ATL_vld(v_, p_) {v_[0] = *(p_); v_[1] = (p_)[1]; }
+-      #define ATL_vst(p_, v_)  {*(p_) = v_[0]; (p_)[1] = v_[1];}
++      #define ATL_vld(v_, p_) v_ = *(ATL_VTYPE *)(p_)
++      #define ATL_vst(p_, v_) *(ATL_VTYPE *)(p_) = v_
+    #else
+       #define ATL_vld(v_, p_) v_ = vec_ld2f(p_);
+       #define ATL_vst(p_, v_) vec_st2f(v_, p_);
+@@ -400,10 +400,9 @@
+    #define ATL_vmul(d_, s1_, s2_) d_ =  s1_ * s2_
+    #define ATL_vmac(d_, s1_, s2_) d_ = __builtin_s390_vec_madd(s1_, s2_, d_)
+    #define ATL_vvrsum1(s0_) \
+-   {  ATL_VTYPE t_;\
+-      t_ = vec_splat(s0_, 1); \
+-      s0_ += t_; \
+-   }
++   {  s0_ = vec_mergeh(s0_, s0_) + vec_mergel(s0_, s0_); }
++   #define ATL_vvrsum2(s0_, s1_) \
++   {  s0_ = vec_mergeh(s0_, s1_) + vec_mergel(s0_, s1_); }
+    #define ATL_vsplat0(d_, s_) d_ = vec_splat(s_, 0)
+    #define ATL_vsplat1(d_, s_) d_ = vec_splat(s_, 1)
+ #elif defined(ATL_NEON) && (defined(SREAL) || defined(SCPLX))
+-- 
+2.23.0
+

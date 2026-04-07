@@ -1,0 +1,100 @@
+From bca11e30e8a6281a8cbddc9fb196dd86ab09c955 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Fri, 17 Jun 2016 16:58:18 +0200
+Subject: [PATCH] downstream changes to default DIR_COLORS
+
+---
+ DIR_COLORS              |  9 ++++++++-
+ DIR_COLORS.lightbgcolor | 21 +++++++++++++++------
+ 2 files changed, 23 insertions(+), 7 deletions(-)
+
+diff --git a/DIR_COLORS b/DIR_COLORS
+index 540f6cd..b4785b6 100644
+--- a/DIR_COLORS
++++ b/DIR_COLORS
+@@ -1,3 +1,7 @@
++# This file goes in the /etc directory, and must be world readable.
++# You can override the system defaults by making a copy of this file
++# as ~/.dir_colors
++
+ # Configuration file for dircolors, a utility to help you set the
+ # LS_COLORS environment variable used by GNU ls with the --color option.
+ 
+@@ -11,6 +15,9 @@
+ 
+ # Global config options can be specified before TERM or COLORTERM entries
+ 
++# For compatibility, the pattern "^COLOR.*none" is recognized as a way to
++# disable colorization.  See https://bugzilla.redhat.com/1349579 for details.
++
+ # ===================================================================
+ # Terminal filters
+ # ===================================================================
+@@ -70,7 +77,7 @@ DOOR 01;35	# door
+ BLK 40;33;01	# block device driver
+ CHR 40;33;01	# character device driver
+ ORPHAN 40;31;01 # symlink to nonexistent file, or non-stat'able file ...
+-MISSING 00      # ... and the files they point to
++MISSING 01;37;41 # ... and the files they point to
+ SETUID 37;41	# regular file that is setuid (u+s)
+ SETGID 30;43	# regular file that is setgid (g+s)
+ CAPABILITY 00	# regular file with capability (very expensive to lookup)
+diff --git a/DIR_COLORS.lightbgcolor b/DIR_COLORS.lightbgcolor
+index e3b0ec3..39a0a4c 100644
+--- a/DIR_COLORS.lightbgcolor
++++ b/DIR_COLORS.lightbgcolor
+@@ -1,3 +1,9 @@
++# Configuration file for the color ls utility - modified for lighter backgrounds
++
++# This file goes in the /etc directory, and must be world readable.
++# You can override the system defaults by making a copy of this file
++# as ~/.dir_colors
++
+ # Configuration file for dircolors, a utility to help you set the
+ # LS_COLORS environment variable used by GNU ls with the --color option.
+ 
+@@ -11,6 +17,9 @@
+ 
+ # Global config options can be specified before TERM or COLORTERM entries
+ 
++# For compatibility, the pattern "^COLOR.*none" is recognized as a way to
++# disable colorization.  See https://bugzilla.redhat.com/1349579 for details.
++
+ # ===================================================================
+ # Terminal filters
+ # ===================================================================
+@@ -60,17 +69,17 @@ TERM xterm*
+ #NORMAL 00	# no color code at all
+ #FILE 00	# regular file: use no color at all
+ RESET 0		# reset to "normal" color
+-DIR 01;34	# directory
+-LINK 01;36	# symbolic link.  (If you set this to 'target' instead of a
++DIR 00;34	# directory
++LINK 00;36	# symbolic link.  (If you set this to 'target' instead of a
+                 # numerical value, the color is as for the file pointed to.)
+ MULTIHARDLINK 00	# regular file with more than one link
+ FIFO 40;33	# pipe
+-SOCK 01;35	# socket
+-DOOR 01;35	# door
++SOCK 00;35	# socket
++DOOR 00;35	# door
+ BLK 40;33;01	# block device driver
+ CHR 40;33;01	# character device driver
+ ORPHAN 40;31;01 # symlink to nonexistent file, or non-stat'able file ...
+-MISSING 00      # ... and the files they point to
++MISSING 01;37;41 # ... and the files they point to
+ SETUID 37;41	# regular file that is setuid (u+s)
+ SETGID 30;43	# regular file that is setgid (g+s)
+ CAPABILITY 00	# regular file with capability (very expensive to lookup)
+@@ -79,7 +88,7 @@ OTHER_WRITABLE 34;42 # dir that is other-writable (o+w) and not sticky
+ STICKY 37;44	# dir with the sticky bit set (+t) and not other-writable
+ 
+ # This is for regular files with execute permission:
+-EXEC 01;32
++EXEC 00;32
+ 
+ # ===================================================================
+ # File extension attributes
+-- 
+2.49.0
+

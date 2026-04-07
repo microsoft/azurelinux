@@ -1,0 +1,25 @@
+From b882f5622b158bce3a31d9837388e08d85d33f70 Mon Sep 17 00:00:00 2001
+From: Jerry James <loganjerry@gmail.com>
+Date: Tue, 31 Jan 2023 13:38:50 -0700
+Subject: [PATCH] Give zero a value before use in lu8mod
+
+---
+ src/lusol8b.f | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/lusol8b.f b/src/lusol8b.f
+index 69de3a7..d721f63 100644
+--- a/src/lusol8b.f
++++ b/src/lusol8b.f
+@@ -560,6 +560,8 @@
+ 
+       logical            singlr
+ 
++      parameter        ( zero = 0.0d+0 )
++
+       nout   = luparm(1)
+       lprint = luparm(2)
+       nrank  = luparm(16)
+-- 
+2.39.1
+

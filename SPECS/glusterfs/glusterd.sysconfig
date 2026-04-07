@@ -1,0 +1,6 @@
+# Change the glusterd service defaults here.
+# See "glusterd --help" outpout for defaults and possible values.
+
+#GLUSTERD_LOGFILE="/var/log/gluster/gluster.log"
+#GLUSTERD_LOGLEVEL="NORMAL"
+

@@ -1,0 +1,159 @@
+From 7659698f13d3aa5b2fc7dfea81c8c5c38e1316cd Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Thu, 3 Mar 2022 12:47:19 +0100
+Subject: [PATCH] Use File::Path for creating temporary directories in the
+ tests
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The tests used to create a temporary tree under a working directory.
+But that does not work if that location is read-only:
+
+$ perl t/01syntax.t
+Uncaught exception from user code:
+        _Inline_01syntax.17483: Permission denied
+        BEGIN failed--compilation aborted at /usr/libexec/perl-Inline-C/t/TestInlineSetup.pm line 30.
+        Compilation failed in require at t/01syntax.t line 6.
+        BEGIN failed--compilation aborted at t/01syntax.t line 6.
+
+Also the code tried hard to pick up a unique name to allow testing in
+parallel. And then cleaning up when exiting.
+
+This patch replaced that code with File::Temp. Not only it replaces
+complex code, it also enables testing from a read only location
+because File::Test utilizes a system-wide temporary path.
+
+I cannot test it on Win32 platform. But I believe it should correctly
+work there because the cleanup is performed when the File::Temp object
+goes out of scope which should be after END block.
+
+Petr Písař: Ported to 0.82 tar ball release.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ Makefile.PL          |  2 ++
+ t/03typemap.t        |  1 +
+ t/18quote_space.t    | 12 +++---------
+ t/27inline_maker.t   |  1 +
+ t/TestInlineSetup.pm | 12 ++----------
+ 5 files changed, 9 insertions(+), 19 deletions(-)
+
+diff --git a/Makefile.PL b/Makefile.PL
+index 71abe69..5ade319 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -33,6 +33,7 @@ my %WriteMakefileArgs = (
+   "TEST_REQUIRES" => {
+     "File::Copy::Recursive" => 0,
+     "File::Path" => 0,
++    "File::Temp" >= "0.19",
+     "Test::More" => "0.88",
+     "Test::Warn" => "0.23",
+     "YAML::XS" => 0,
+@@ -51,6 +52,7 @@ my %FallbackPrereqs = (
+   "File::Copy::Recursive" => 0,
+   "File::Path" => 0,
+   "File::Spec" => "0.8",
++  "File::Temp" >= "0.19",
+   "Inline" => "0.86",
+   "Parse::RecDescent" => "1.967009",
+   "Pegex" => "0.66",
+diff --git a/t/03typemap.t b/t/03typemap.t
+index 16e5ea2..6a07c30 100644
+--- a/t/03typemap.t
++++ b/t/03typemap.t
+@@ -8,6 +8,7 @@ BEGIN {
+ use Test::More;
+ use TestInlineSetup;
+ use Inline Config => DIRECTORY => $TestInlineSetup::DIR;
++use File::Spec;
+ 
+ use Inline C => DATA =>
+   TYPEMAPS => File::Spec->catfile($t, 'typemap');
+diff --git a/t/18quote_space.t b/t/18quote_space.t
+index be4e360..7b30526 100644
+--- a/t/18quote_space.t
++++ b/t/18quote_space.t
+@@ -1,6 +1,6 @@
+ use strict;
+ use warnings;
+-use Cwd;
++use File::Temp 0.19;
+ 
+ require Inline::C;
+ 
+@@ -126,8 +126,8 @@ else {
+ delete $ENV{NO_INSANE_DIRNAMES};
+ 
+ my $have_file_path;
+-my $newdir = Cwd::getcwd();
+-$newdir .= '/foo -I/';
++my $tempdir = File::Temp->newdir();
++my $newdir = $tempdir . '/foo -I/';
+ 
+ eval {require File::Path;};
+ if ($@) {
+@@ -159,9 +159,3 @@ else {
+     warn "\n\$\@: $@\n";
+     print "not ok 10\n";
+ }
+-
+-
+-END {
+-    File::Path::rmtree($newdir) if $have_file_path;
+-    warn "Failed to remove $newdir" if -d $newdir;
+-};
+diff --git a/t/27inline_maker.t b/t/27inline_maker.t
+index 67b1d7f..d989e95 100644
+--- a/t/27inline_maker.t
++++ b/t/27inline_maker.t
+@@ -7,6 +7,7 @@ use Config;
+ use IPC::Cmd qw/run/;
+ require version;
+ use File::Path;
++use File::Spec;
+ use Cwd;
+ use File::Copy::Recursive qw(rcopy);
+ use autodie;
+diff --git a/t/TestInlineSetup.pm b/t/TestInlineSetup.pm
+index 8c8c93d..fd1f753 100644
+--- a/t/TestInlineSetup.pm
++++ b/t/TestInlineSetup.pm
+@@ -1,8 +1,7 @@
+ use strict; use warnings; use diagnostics;
+ package TestInlineSetup;
+ 
+-use File::Path;
+-use File::Spec;
++use File::Temp 0.19;
+ use constant IS_WIN32 => $^O eq 'MSWin32' ;
+ 
+ sub import {
+@@ -22,14 +21,8 @@ BEGIN {
+ 
+ our $DIR;
+ BEGIN {
+-    ($_, $DIR) = caller(2);
+-    $DIR =~ s/.*?(\w+)\.t$/$1/ or die;
+-    $DIR = "_Inline_$DIR.$$";
+-    rmtree($DIR) if -d $DIR;
+-    mkdir($DIR) or die "$DIR: $!\n";
++    $DIR = File::Temp->newdir();
+ }
+-my $absdir = File::Spec->rel2abs($DIR);
+-($absdir) = $absdir =~ /(.*)/; # untaint
+ 
+ my $startpid = $$;
+ END {
+@@ -54,7 +47,6 @@ END {
+         }
+       }
+     }
+-    rmtree($absdir);
+   }
+ }
+ 
+-- 
+2.34.1
+

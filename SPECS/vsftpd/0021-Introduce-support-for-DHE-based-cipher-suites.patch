@@ -1,0 +1,164 @@
+From 4eac1dbb5f70a652d31847eec7c28d245f36cdbb Mon Sep 17 00:00:00 2001
+From: Martin Sehnoutka <msehnout@redhat.com>
+Date: Thu, 17 Nov 2016 10:48:28 +0100
+Subject: [PATCH 21/59] Introduce support for DHE based cipher suites.
+
+---
+ parseconf.c   |  1 +
+ ssl.c         | 93 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ tunables.c    |  5 +++-
+ tunables.h    |  1 +
+ vsftpd.conf.5 |  6 ++++
+ 5 files changed, 104 insertions(+), 2 deletions(-)
+
+diff --git a/parseconf.c b/parseconf.c
+index 3e0dba4..38e3182 100644
+--- a/parseconf.c
++++ b/parseconf.c
+@@ -176,6 +176,7 @@ parseconf_str_array[] =
+   { "email_password_file", &tunable_email_password_file },
+   { "rsa_cert_file", &tunable_rsa_cert_file },
+   { "dsa_cert_file", &tunable_dsa_cert_file },
++  { "dh_param_file", &tunable_dh_param_file },
+   { "ssl_ciphers", &tunable_ssl_ciphers },
+   { "rsa_private_key_file", &tunable_rsa_private_key_file },
+   { "dsa_private_key_file", &tunable_dsa_private_key_file },
+diff --git a/ssl.c b/ssl.c
+index c362983..22b69b3 100644
+--- a/ssl.c
++++ b/ssl.c
+@@ -28,6 +28,8 @@
+ #include <openssl/err.h>
+ #include <openssl/rand.h>
+ #include <openssl/bio.h>
++#include <openssl/bn.h>
++#include <openssl/param_build.h>
+ #include <errno.h>
+ #include <limits.h>
+ 
+@@ -58,6 +60,23 @@
+ static int ssl_inited;
+ static struct mystr debug_str;
+ 
++EVP_PKEY *
++DH_get_dh()
++{
++  OSSL_PARAM dh_params[2];
++  EVP_PKEY *dh_key = NULL;
++  EVP_PKEY_CTX *pctx = EVP_PKEY_CTX_new_from_name(NULL, "DH", NULL);
++
++  dh_params[0] = OSSL_PARAM_construct_utf8_string("group", "ffdhe2048", 0);
++  dh_params[1] = OSSL_PARAM_construct_end();
++
++  if (EVP_PKEY_keygen_init(pctx) <= 0 || EVP_PKEY_CTX_set_params(pctx, dh_params) <= 0)
++    return NULL;
++  EVP_PKEY_generate(pctx, &dh_key);
++  EVP_PKEY_CTX_free(pctx);
++  return dh_key;
++}
++
+ void
+ ssl_init(struct vsf_session* p_sess)
+ {
+@@ -72,7 +89,7 @@
+     {
+       die("SSL: could not allocate SSL context");
+     }
+-    options = SSL_OP_ALL;
++    options = SSL_OP_ALL | SSL_OP_SINGLE_DH_USE;
+     if (!tunable_sslv2)
+     {
+       options |= SSL_OP_NO_SSLv2;
+@@ -149,8 +166,27 @@
+         die("SSL: cannot load DSA private key");
+       }
+     }
++    if (tunable_dh_param_file)
++    {
++      BIO *bio;
++      EVP_PKEY *dh_params = NULL;
++      if ((bio = BIO_new_file(tunable_dh_param_file, "r")) == NULL)
++      {
++        die("SSL: cannot load custom DH params");
++      }
++      else
++      {
++        dh_params = PEM_read_bio_Parameters(bio, NULL);
++        BIO_free(bio);
++
++        if (!SSL_CTX_set0_tmp_dh_pkey(p_ctx, dh_params))
++	       {
++          die("SSL: setting custom DH params failed");
++        }
++      }
++    }
+     if (tunable_ssl_ciphers &&
+         SSL_CTX_set_cipher_list(p_ctx, tunable_ssl_ciphers) != 1)
+     {
+       die("SSL: could not set cipher list");
+     }
+@@ -184,6 +226,9 @@
+       /* Ensure cached session doesn't expire */
+       SSL_CTX_set_timeout(p_ctx, INT_MAX);
+     }
++
++    SSL_CTX_set0_tmp_dh_pkey(p_ctx, DH_get_dh());
++
+     /* Set up ALPN to check for FTP protocol intention of client. */
+     SSL_CTX_set_alpn_select_cb(p_ctx, ssl_alpn_callback, p_sess);
+     /* Set up SNI callback for an optional hostname check. */
+diff --git a/tunables.c b/tunables.c
+index c737465..1ea7227 100644
+--- a/tunables.c
++++ b/tunables.c
+@@ -140,6 +140,7 @@ const char* tunable_user_sub_token;
+ const char* tunable_email_password_file;
+ const char* tunable_rsa_cert_file;
+ const char* tunable_dsa_cert_file;
++const char* tunable_dh_param_file;
+ const char* tunable_ssl_ciphers;
+ const char* tunable_rsa_private_key_file;
+ const char* tunable_dsa_private_key_file;
+@@ -288,7 +289,9 @@ tunables_load_defaults()
+   install_str_setting("/usr/share/ssl/certs/vsftpd.pem",
+                       &tunable_rsa_cert_file);
+   install_str_setting(0, &tunable_dsa_cert_file);
+-  install_str_setting("ECDHE-RSA-AES256-GCM-SHA384", &tunable_ssl_ciphers);
++  install_str_setting(0, &tunable_dh_param_file);
++  install_str_setting("AES128-SHA:DES-CBC3-SHA:DHE-RSA-AES256-SHA",
++                      &tunable_ssl_ciphers);
+   install_str_setting(0, &tunable_rsa_private_key_file);
+   install_str_setting(0, &tunable_dsa_private_key_file);
+   install_str_setting(0, &tunable_ca_certs_file);
+diff --git a/tunables.h b/tunables.h
+index 9553038..3995472 100644
+--- a/tunables.h
++++ b/tunables.h
+@@ -142,6 +142,7 @@ extern const char* tunable_user_sub_token;
+ extern const char* tunable_email_password_file;
+ extern const char* tunable_rsa_cert_file;
+ extern const char* tunable_dsa_cert_file;
++extern const char* tunable_dh_param_file;
+ extern const char* tunable_ssl_ciphers;
+ extern const char* tunable_rsa_private_key_file;
+ extern const char* tunable_dsa_private_key_file;
+diff --git a/vsftpd.conf.5 b/vsftpd.conf.5
+index fb6324e..ff94eca 100644
+--- a/vsftpd.conf.5
++++ b/vsftpd.conf.5
+@@ -893,6 +893,12 @@ to be in the same file as the certificate.
+ 
+ Default: (none)
+ .TP
++.B dh_param_file
++This option specifies the location of the custom parameters used for
++ephemeral Diffie-Hellman key exchange in SSL.
++
++Default: (none - use built in parameters appropriate for certificate key size)
++.TP
+ .B email_password_file
+ This option can be used to provide an alternate file for usage by the
+ .BR secure_email_list_enable
+-- 
+2.14.4
+

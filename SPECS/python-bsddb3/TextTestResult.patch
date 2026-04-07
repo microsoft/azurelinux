@@ -1,0 +1,14 @@
+--- a/test3.py~	2020-11-26 09:38:58.000000000 -0600
++++ a/test3.py	2022-12-21 12:47:20.593405985 -0600
+@@ -150,9 +150,9 @@
+ 
+ try :  # Check in the future if this still necessary
+     # Python 2.7 and 3.2
+-    from unittest.runner import _TextTestResult
++    from unittest.runner import TextTestResult as _TextTestResult
+ except ImportError :
+-    from unittest import _TextTestResult
++    from unittest import TextTestResult as _TextTestResult
+ 
+ class ImmediateTestResult(_TextTestResult):
+ 

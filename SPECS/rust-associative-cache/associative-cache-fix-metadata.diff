@@ -1,0 +1,11 @@
+--- associative-cache-2.0.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ associative-cache-2.0.0/Cargo.toml	2023-10-10T19:11:36.242692+00:00
+@@ -31,6 +31,8 @@
+ ]
+ license = "MIT OR Apache-2.0"
+ repository = "https://github.com/fitzgen/associative-cache"
++exclude = ["/ci/", "/azure-pipelines.yaml"]
++
+ 
+ [package.metadata.docs.rs]
+ all-features = true

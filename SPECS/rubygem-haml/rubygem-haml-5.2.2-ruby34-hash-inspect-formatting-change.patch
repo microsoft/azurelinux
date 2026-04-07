@@ -1,0 +1,16 @@
+diff -urp haml-5.2.2.orig/test/parser_test.rb haml-5.2.2/test/parser_test.rb
+--- haml-5.2.2.orig/test/parser_test.rb	2021-07-28 02:11:01.000000000 +0900
++++ haml-5.2.2/test/parser_test.rb	2024-12-06 14:24:13.015571527 +0900
+@@ -101,7 +101,11 @@ module Haml
+       cond = "[cond]"
+       node = parse("/!#{cond} #{text}")
+ 
+-      assert_equal "(root nil\n  (comment {:conditional=>\"[cond]\", :text=>\"some revealed text\", :revealed=>true, :parse=>false}))", node.inspect
++      if RUBY_VERSION >= "3.4"
++        assert_equal "(root nil\n  (comment {conditional: \"[cond]\", text: \"some revealed text\", revealed: true, parse: false}))", node.inspect
++      else
++        assert_equal "(root nil\n  (comment {:conditional=>\"[cond]\", :text=>\"some revealed text\", :revealed=>true, :parse=>false}))", node.inspect
++      end
+     end
+ 
+     test "revealed conditional comments are detected" do

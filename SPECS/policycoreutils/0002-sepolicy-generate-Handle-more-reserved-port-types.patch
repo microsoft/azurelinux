@@ -1,0 +1,72 @@
+From 618ae48ebf1334f9380a9ae7460c553515f9c4ca Mon Sep 17 00:00:00 2001
+From: Masatake YAMATO <yamato@redhat.com>
+Date: Thu, 14 Dec 2017 15:57:58 +0900
+Subject: [PATCH] sepolicy-generate: Handle more reserved port types
+Content-type: text/plain
+
+Currently only reserved_port_t, port_t and hi_reserved_port_t are
+handled as special when making a ports-dictionary.  However, as fas as
+corenetwork.te.in of serefpolicy, unreserved_port_t and
+ephemeral_port_t should be handled in the same way, too.
+
+(Details) I found the need of this change when I was using
+selinux-polgengui.  Though tcp port 12345, which my application may
+use, was given to the gui, selinux-polgengui generates expected te
+file and sh file which didn't utilize the tcp port.
+
+selinux-polgengui checks whether a port given via gui is already typed
+or not.
+
+If it is already typed, selinux-polgengui generates a te file having
+rules to allow the application to use the port. (A)
+
+If not, it seems for me that selinux-polgengui is designed to generate
+a te file having rules to allow the application to own(?) the port;
+and a sh file having a command line to assign the application own type
+to the port. (B)
+
+As we can see the output of `semanage port -l' some of ports for
+specified purpose have types already.  The important point is that the
+rest of ports also have types already:
+
+    hi_reserved_port_t tcp 512-1023
+    hi_reserved_port_t udp 512-1023
+    unreserved_port_t tcp 1024-32767, 61001-65535
+    unreserved_port_t udp 1024-32767, 61001-65535
+    ephemeral_port_t tcp 32768-61000
+    ephemeral_port_t udp 32768-61000
+
+As my patch shows, the original selinux-polgengui ignored
+hi_reserved_port_t; though hi_reserved_port_t is assigned,
+selinux-polgengui considered ports 512-1023 are not used. As the
+result selinux-polgengui generates file sets of (B).
+
+For the purpose of selinux-polgengui, I think unreserved_port_t and
+ephemeral_port_t are treated as the same as hi_reserved_port_t.
+
+Signed-off-by: Masatake YAMATO <yamato@redhat.com>
+
+Fedora only patch:
+https://lore.kernel.org/selinux/20150610.190635.1866127952891120915.yamato@redhat.com/
+---
+ python/sepolicy/sepolicy/generate.py | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/python/sepolicy/sepolicy/generate.py b/python/sepolicy/sepolicy/generate.py
+index adf65f27a822..f726ad51b775 100644
+--- a/python/sepolicy/sepolicy/generate.py
++++ b/python/sepolicy/sepolicy/generate.py
+@@ -100,7 +100,9 @@ def get_all_ports():
+     for p in sepolicy.info(sepolicy.PORT):
+         if p['type'] == "reserved_port_t" or \
+                 p['type'] == "port_t" or \
+-                p['type'] == "hi_reserved_port_t":
++                p['type'] == "hi_reserved_port_t" or \
++                p['type'] == "ephemeral_port_t" or \
++                p['type'] == "unreserved_port_t":
+             continue
+         dict[(p['low'], p['high'], p['protocol'])] = (p['type'], p.get('range'))
+     return dict
+-- 
+2.50.1
+

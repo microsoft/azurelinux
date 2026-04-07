@@ -1,0 +1,25 @@
+commit ca640b37f8a50b18d76970fd6554e05801b7e81b
+Author: Tomas Korbar <tkorbar@redhat.com>
+Date:   Fri Jan 12 14:39:26 2024 +0100
+
+    Fix tests with zlib-ng
+
+diff --git a/subversion/tests/cmdline/patch_tests.py b/subversion/tests/cmdline/patch_tests.py
+index f52f12e..5950170 100755
+--- a/subversion/tests/cmdline/patch_tests.py
++++ b/subversion/tests/cmdline/patch_tests.py
+@@ -5797,11 +5797,11 @@ def patch_binary_file(sbox):
+     'diff --git a/iota b/iota\n',
+     'GIT binary patch\n',
+     'literal 48\n',
+-    'zc$^E#$ShU>qLPeMg|y6^R0Z|S{E|d<JuZf(=9bpB_PpZ!+|-hc%)E52)STkf{{Wp*\n',
+-    'B5)uFa\n',
++    'zc$^E#$ShXKELJGVNL5J7%t=*H&&)4LRM+ETXlib0ZEMdf&d*IP$;ix0=Ss~fPW=x6\n',
++    'Dol+7K\n',
+     '\n',
+     'literal 25\n',
+-    'ec$^E#$ShU>qLPeMg|y6^R0Z|S{E|d<JuU!m{s;*G\n',
++    'gc$^E#$ShXKELJGVNL5J7%t=*H&&)4LRM+DI0B`;X2><{9\n',
+     '\n',
+     'Property changes on: iota\n',
+     '___________________________________________________________________\n',

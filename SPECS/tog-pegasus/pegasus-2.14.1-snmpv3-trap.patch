@@ -1,0 +1,359 @@
+diff -up pegasus/src/Pegasus/Handler/snmpIndicationHandler/snmpDeliverTrap_netsnmp.cpp.orig pegasus/src/Pegasus/Handler/snmpIndicationHandler/snmpDeliverTrap_netsnmp.cpp
+--- pegasus/src/Pegasus/Handler/snmpIndicationHandler/snmpDeliverTrap_netsnmp.cpp.orig	2013-01-21 06:00:43.000000000 +0100
++++ pegasus/src/Pegasus/Handler/snmpIndicationHandler/snmpDeliverTrap_netsnmp.cpp	2015-05-25 15:11:02.368906571 +0200
+@@ -228,9 +228,138 @@ void snmpDeliverTrap_netsnmp::_createSes
+                 (const char*)targetHostCStr,
+                 portNumber);
+         }
++    }
++
++    switch (snmpVersion)
++    {
++        case _SNMPv1_TRAP:
++        {
++            snmpSession.version = SNMP_VERSION_1;
++            _addCommunity(snmpSession,securityName);
++           break;
++         }
++        case _SNMPv2C_TRAP:
++        {
++            snmpSession.version = SNMP_VERSION_2c;
++            _addCommunity(snmpSession,securityName);
++            break;
++        }
++#ifdef PEGASUS_ENABLE_NET_SNMPV3 
++        case _SNMPv3_TRAP:
++        {
++            snmpSession.version = SNMP_VERSION_3;
++            CString securityNameCStr = securityName.getCString();
++            size_t securityNameLen = strlen(securityNameCStr);
++            SNMP_FREE(snmpSession.securityName);
++            snmpSession.securityName = (char *)calloc(1,securityNameLen+1);
++            snmpSession.securityNameLen = securityNameLen;
++            memcpy(snmpSession.securityName, (const char*)securityNameCStr,
++                securityNameLen);
++
++            CString engineIdCStr = engineID.getCString();
++            size_t engineIdHexLen = strlen(engineIdCStr);
++            size_t engineIdBinLen = 0;
++            u_char *engineIdBin = (u_char *)calloc(1,engineIdHexLen);
++            free(snmpSession.securityEngineID);
++            if(!snmp_hex_to_binary(&engineIdBin, &engineIdHexLen, 
++                &engineIdBinLen, 1,engineIdCStr))
++            {
++                PEG_TRACE_CSTRING(TRC_DISCARDED_DATA, Tracer::LEVEL2,
++                    "Snmp Indication Handler failed to generate binary"
++                        " engine ID for sending the SNMPv3 trap.");
++                throw PEGASUS_CIM_EXCEPTION_L(CIM_ERR_FAILED, 
++                    MessageLoaderParms(
++                        "Handler.snmpIndicationHandler."
++                            "snmpIndicationHandler."
++                        "FAILED_TO_DELIVER_TRAP",
++                    "Failed to deliver trap."));
++            }
++            snmpSession.securityEngineIDLen = engineIdBinLen;
++            snmpSession.securityEngineID = engineIdBin; 
++
++            switch(snmpSecLevel)
++            {
++                case 1:
++                    snmpSession.securityLevel = SNMP_SEC_LEVEL_NOAUTH;
++                    break;
++                case 2:
++                    snmpSession.securityLevel = SNMP_SEC_LEVEL_AUTHNOPRIV;
++                    break;
++                case 3:
++                    snmpSession.securityLevel = SNMP_SEC_LEVEL_AUTHPRIV;
++                    break;
++                default:
++                    //use the dedault in the net-snmp conf file.
++                    break;
++            }
++ 
++            SNMP_FREE(snmpSession.securityAuthProto);
++            if(snmpSecAuthProto == 1) // MD5
++            {
++                snmpSession.securityAuthProto = snmp_duplicate_objid(
++                    usmHMACMD5AuthProtocol,
++                    USM_AUTH_PROTO_MD5_LEN);
++                snmpSession.securityAuthProtoLen = USM_AUTH_PROTO_MD5_LEN;
++            }
++            else if(snmpSecAuthProto == 2)// SHA
++            {
++                snmpSession.securityAuthProto = snmp_duplicate_objid(
++                    usmHMACSHA1AuthProtocol,
++                    USM_AUTH_PROTO_SHA_LEN);
++                snmpSession.securityAuthProtoLen = USM_AUTH_PROTO_SHA_LEN;
++            }
++            // use the default in net-snmp conf files.
+ 
+-        sessionHandle = snmp_sess_open(&snmpSession);
++            if(snmpSecAuthKey.size() > 0)
++            {
++                for(Uint32 i=0;i<snmpSecAuthKey.size();i++)
++                {
++                    snmpSession.securityAuthKey[i] = snmpSecAuthKey[i];
++                }
++                snmpSession.securityAuthKeyLen = snmpSecAuthKey.size();
++            }
++
++            SNMP_FREE(snmpSession.securityPrivProto);
++            //Privacy
++            if(snmpSecPrivProto == 1) //DES
++            {
++                snmpSession.securityPrivProto = snmp_duplicate_objid(
++                    usmDESPrivProtocol,
++                    USM_PRIV_PROTO_DES_LEN);
++                snmpSession.securityPrivProtoLen = USM_PRIV_PROTO_DES_LEN;
++            }
++            else if(snmpSecPrivProto == 2) // AES
++            {
++                snmpSession.securityPrivProto = snmp_duplicate_objid(
++                    usmAESPrivProtocol,
++                    USM_PRIV_PROTO_AES_LEN);
++                snmpSession.securityPrivProtoLen = USM_PRIV_PROTO_AES_LEN;
++            }
++            // use the defaults in net-snmp conf files
++ 
++            // Privacy Key
++            if(snmpSecPrivKey.size() > 0)
++            {
++                for(Uint32 j=0;j<snmpSecPrivKey.size();j++)
++                {
++                    snmpSession.securityPrivKey[j] = snmpSecPrivKey[j];
++                }
++                snmpSession.securityPrivKeyLen = snmpSecPrivKey.size();
++            }
++            break;
++        }
++#endif // ifdef PEGASUS_ENABLE_NET_SNMPV3 
++        default:
++        {
++            PEG_METHOD_EXIT();
++            throw PEGASUS_CIM_EXCEPTION_L(CIM_ERR_NOT_SUPPORTED,
++                MessageLoaderParms(
++                    _MSG_VERSION_NOT_SUPPORTED_KEY,
++                    _MSG_VERSION_NOT_SUPPORTED));
++        }
+     }
++ 
++    sessionHandle = snmp_sess_open(&snmpSession);
+ 
+     if (sessionHandle == NULL)
+     {
+@@ -244,6 +373,12 @@ void snmpDeliverTrap_netsnmp::_createSes
+         free(errStr);
+ 
+         free(snmpSession.peername);
++        free(snmpSession.community);
++
++#ifdef PEGASUS_ENABLE_NET_SNMPV3
++        free(snmpSession.securityName);
++        free(snmpSession.securityEngineID);
++#endif // ifdef PEGASUS_ENABLE_NET_SNMPV3 
+ 
+         PEG_METHOD_EXIT();
+ 
+@@ -267,6 +402,12 @@ void snmpDeliverTrap_netsnmp::_createSes
+             free(errStr);
+ 
+             free(snmpSession.peername);
++            free(snmpSession.community);
++
++#ifdef PEGASUS_ENABLE_NET_SNMPV3
++            free(snmpSession.securityName);
++            free(snmpSession.securityEngineID);
++#endif // ifdef PEGASUS_ENABLE_NET_SNMPV3 
+ 
+             throw PEGASUS_CIM_EXCEPTION_L(CIM_ERR_FAILED, MessageLoaderParms(
+                 _MSG_GET_SESSION_POINTER_FAILED_KEY,
+@@ -274,136 +415,12 @@ void snmpDeliverTrap_netsnmp::_createSes
+         }
+ 
+         free(snmpSession.peername);
++        free(snmpSession.community);
+ 
+-        switch (snmpVersion)
+-        {
+-            case _SNMPv1_TRAP:
+-            {
+-                sessionPtr->version = SNMP_VERSION_1;
+-                _addCommunity(sessionPtr,securityName);
+-               break;
+- 
+-            }
+-            case _SNMPv2C_TRAP:
+-            {
+-                sessionPtr->version = SNMP_VERSION_2c;
+-                _addCommunity(sessionPtr,securityName);
+-                break;
+-            }
+-#ifdef PEGASUS_ENABLE_NET_SNMPV3 
+-            case _SNMPv3_TRAP:
+-            {
+-                sessionPtr->version = SNMP_VERSION_3;
+-                CString securityNameCStr = securityName.getCString();
+-                size_t securityNameLen = strlen(securityNameCStr);
+-                SNMP_FREE(sessionPtr->securityName);
+-                sessionPtr->securityName = (char *)calloc(1,securityNameLen+1);
+-                sessionPtr->securityNameLen = securityNameLen;
+-                memcpy(sessionPtr->securityName, (const char*)securityNameCStr,
+-                    securityNameLen);
+-
+-                CString engineIdCStr = engineID.getCString();
+-                size_t engineIdHexLen = strlen(engineIdCStr);
+-                size_t engineIdBinLen = 0;
+-                u_char *engineIdBin = (u_char *)calloc(1,engineIdHexLen);
+-                free(sessionPtr->securityEngineID);
+-                if(!snmp_hex_to_binary(&engineIdBin, &engineIdHexLen, 
+-                    &engineIdBinLen, 1,engineIdCStr))
+-                {
+-                    PEG_TRACE_CSTRING(TRC_DISCARDED_DATA, Tracer::LEVEL2,
+-                        "Snmp Indication Handler failed to generate binary"
+-                            " engine ID for sending the SNMPv3 trap.");
+-                    throw PEGASUS_CIM_EXCEPTION_L(CIM_ERR_FAILED, 
+-                        MessageLoaderParms(
+-                            "Handler.snmpIndicationHandler."
+-                                "snmpIndicationHandler."
+-                            "FAILED_TO_DELIVER_TRAP",
+-                        "Failed to deliver trap."));
+-                }
+-                sessionPtr->securityEngineIDLen = engineIdBinLen;
+-                sessionPtr->securityEngineID = engineIdBin; 
+-
+-                switch(snmpSecLevel)
+-                {
+-                    case 1:
+-                        sessionPtr->securityLevel = SNMP_SEC_LEVEL_NOAUTH;
+-                        break;
+-                    case 2:
+-                        sessionPtr->securityLevel = SNMP_SEC_LEVEL_AUTHNOPRIV;
+-                        break;
+-                    case 3:
+-                        sessionPtr->securityLevel = SNMP_SEC_LEVEL_AUTHPRIV;
+-                        break;
+-                    default:
+-                        //use the dedault in the net-snmp conf file.
+-                        break;
+-                }
+- 
+-                SNMP_FREE(sessionPtr->securityAuthProto);
+-                if(snmpSecAuthProto == 1) // MD5
+-                {
+-                    sessionPtr->securityAuthProto = snmp_duplicate_objid(
+-                        usmHMACMD5AuthProtocol,
+-                        USM_AUTH_PROTO_MD5_LEN);
+-                    sessionPtr->securityAuthProtoLen = USM_AUTH_PROTO_MD5_LEN;
+-                }
+-                else if(snmpSecAuthProto == 2)// SHA
+-                {
+-                    sessionPtr->securityAuthProto = snmp_duplicate_objid(
+-                        usmHMACSHA1AuthProtocol,
+-                        USM_AUTH_PROTO_SHA_LEN);
+-                    sessionPtr->securityAuthProtoLen = USM_AUTH_PROTO_SHA_LEN;
+-                }
+-                // use the default in net-snmp conf files.
+-
+-                if(snmpSecAuthKey.size() > 0)
+-                {
+-                    for(Uint32 i=0;i<snmpSecAuthKey.size();i++)
+-                    {
+-                        sessionPtr->securityAuthKey[i] = snmpSecAuthKey[i];
+-                    }
+-                    sessionPtr->securityAuthKeyLen = snmpSecAuthKey.size();
+-                }
+-
+-                SNMP_FREE(sessionPtr->securityPrivProto);
+-                //Privacy
+-                if(snmpSecPrivProto == 1) //DES
+-                {
+-                    sessionPtr->securityPrivProto = snmp_duplicate_objid(
+-                        usmDESPrivProtocol,
+-                        USM_PRIV_PROTO_DES_LEN);
+-                    sessionPtr->securityPrivProtoLen = USM_PRIV_PROTO_DES_LEN;
+-                }
+-                else if(snmpSecPrivProto == 2) // AES
+-                {
+-                    sessionPtr->securityPrivProto = snmp_duplicate_objid(
+-                        usmAESPrivProtocol,
+-                        USM_PRIV_PROTO_AES_LEN);
+-                    sessionPtr->securityPrivProtoLen = USM_PRIV_PROTO_AES_LEN;
+-                }
+-                // use the defaults in net-snmp conf files
+- 
+-                // Privacy Key
+-                if(snmpSecPrivKey.size() > 0)
+-                {
+-                    for(Uint32 j=0;j<snmpSecPrivKey.size();j++)
+-                    {
+-                        sessionPtr->securityPrivKey[j] = snmpSecPrivKey[j];
+-                    }
+-                    sessionPtr->securityPrivKeyLen = snmpSecPrivKey.size();
+-                }
+-                break;
+-            }
++#ifdef PEGASUS_ENABLE_NET_SNMPV3
++        free(snmpSession.securityName);
++        free(snmpSession.securityEngineID);
+ #endif // ifdef PEGASUS_ENABLE_NET_SNMPV3 
+-            default:
+-            {
+-                PEG_METHOD_EXIT();
+-                throw PEGASUS_CIM_EXCEPTION_L(CIM_ERR_NOT_SUPPORTED,
+-                    MessageLoaderParms(
+-                        _MSG_VERSION_NOT_SUPPORTED_KEY,
+-                        _MSG_VERSION_NOT_SUPPORTED));
+-            }
+-        }
+ 
+     }
+     catch (...)
+@@ -418,7 +435,7 @@ void snmpDeliverTrap_netsnmp::_createSes
+ }
+ 
+ void snmpDeliverTrap_netsnmp::_addCommunity(
+-    struct snmp_session*& sessionPtr,
++    struct snmp_session& snmpSession,
+     const String& securityName)
+ {
+     PEG_METHOD_ENTER(TRC_IND_HANDLER,
+@@ -435,17 +452,17 @@ void snmpDeliverTrap_netsnmp::_addCommun
+         communityName = securityName;
+     }
+ 
+-    free(sessionPtr->community);
++    free(snmpSession.community);
+               
+     CString communityNameCStr = communityName.getCString();
+     size_t communityNameLen = strlen(communityNameCStr);
+ 
+-    sessionPtr->community = (u_char*)calloc(1,communityNameLen+1);
++    snmpSession.community = (u_char*)calloc(1,communityNameLen+1);
+ 
+-    memcpy(sessionPtr->community, (const char*)communityNameCStr,
++    memcpy(snmpSession.community, (const char*)communityNameCStr,
+         communityNameLen);
+ 
+-    sessionPtr->community_len = communityNameLen;
++    snmpSession.community_len = communityNameLen;
+     PEG_METHOD_EXIT();
+ } 
+ 
+diff -up pegasus/src/Pegasus/Handler/snmpIndicationHandler/snmpDeliverTrap_netsnmp.h.orig pegasus/src/Pegasus/Handler/snmpIndicationHandler/snmpDeliverTrap_netsnmp.h
+--- pegasus/src/Pegasus/Handler/snmpIndicationHandler/snmpDeliverTrap_netsnmp.h.orig	2010-12-22 13:19:06.000000000 +0100
++++ pegasus/src/Pegasus/Handler/snmpIndicationHandler/snmpDeliverTrap_netsnmp.h	2015-05-25 15:12:24.908290090 +0200
+@@ -200,12 +200,11 @@ private:
+     /**
+         Add the community string to the snmp session for V1 and V2C
+ 
+-        @param sessionPtr    the SNMP session pointer to its associated
+-                             struct snmp_session
++        @param snmpSession      struct snmp_session
+         @param securityName     the human readable community name
+     */
+     void _addCommunity(
+-        struct snmp_session*& sessionPtr,
++        struct snmp_session& snmpSession,
+         const String& securityName);
+ 
+     /**

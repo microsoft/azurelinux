@@ -1,0 +1,16 @@
+diff --git a/Source/WTF/wtf/Platform.h b/Source/WTF/wtf/Platform.h
+index 7aefa1ba..562fd449 100644
+--- a/Source/WTF/wtf/Platform.h
++++ b/Source/WTF/wtf/Platform.h
+@@ -566,6 +566,11 @@
+ 
+ #endif /* PLATFORM(MAC) */
+ 
++/* FIXME: This does not belong in Platform.h and should instead be included in another mechanism (compiler option, prefix header, config.h, etc) */
++/* ICU configuration. Some of these match ICU defaults on some platforms, but we would like them consistently set everywhere we build WebKit. */
++#define U_SHOW_CPLUSPLUS_API 0
++#define U_SHOW_CPLUSPLUS_HEADER_API 0
++
+ #if PLATFORM(IOS)
+ 
+ #define HAVE_NETWORK_EXTENSION 1

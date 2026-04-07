@@ -1,0 +1,45 @@
+From bc9e8da9bd11cdcca1ce998350088e79f5308c41 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 11 Jan 2022 11:15:18 +0100
+Subject: [PATCH] Fix formatting an IV variable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This patch fixes this compiler warning:
+
+gcc -I/usr/lib64/perl5/CORE -DVERSION="0.02" -DXS_VERSION="0.02" -fPIC -I. -Ihax -ggdb -I.
+ -c -D_REENTRANT -D_GNU_SOURCE -O2 -flto=auto -ffat-lto-objects -fexceptions -g -grecord-g
+cc-switches -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASS
+ERTIONS -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -fstack-protector-strong -specs=/us
+r/lib/rpm/redhat/redhat-annobin-cc1 -m64 -mtune=generic -fasynchronous-unwind-tables -fstack-clash-protection -fcf-protection -fwrapv -fno-strict-aliasing -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -g -o lib/Syntax/Keyword/MultiSub.o lib/Syntax/Keyword/MultiSub.c
+lib/Syntax/Keyword/MultiSub.xs: In function 'pp_dispatch_multisub':
+lib/Syntax/Keyword/MultiSub.xs:52:11: warning: format '%d' expects argument of type 'int', but argument 4 has type 'IV' {aka 'long int'} [-Wformat=]
+   52 |     croak("Unable to find a function body for a call to &%s::%s having %d arguments",
+      |           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   53 |       HvNAME(CvSTASH(runcv)), GvNAME(CvGV(runcv)), nargs);
+      |                                                    ~~~~~
+      |                                                    |
+      |                                                    IV {aka long int}
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ lib/Syntax/Keyword/MultiSub.xs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/Syntax/Keyword/MultiSub.xs b/lib/Syntax/Keyword/MultiSub.xs
+index 6d441ec..24f7199 100644
+--- a/lib/Syntax/Keyword/MultiSub.xs
++++ b/lib/Syntax/Keyword/MultiSub.xs
+@@ -49,7 +49,7 @@ static OP *pp_dispatch_multisub(pTHX)
+   }
+ 
+   if(!jumpcv)
+-    croak("Unable to find a function body for a call to &%s::%s having %d arguments",
++    croak("Unable to find a function body for a call to &%s::%s having %"IVdf" arguments",
+       HvNAME(CvSTASH(runcv)), GvNAME(CvGV(runcv)), nargs);
+ 
+   /* Now pretend to be  goto &$cv
+-- 
+2.34.1
+

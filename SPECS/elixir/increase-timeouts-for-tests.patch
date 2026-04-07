@@ -1,0 +1,84 @@
+Author: Bo YU <tsu.yubo@gmail.com>, Sergei Golovan <sgolovan@debian.org>
+Description: Patch increases timeouts in elixir tests.
+Last-Modified: Fri, 31 Jan 2025 16:15:17 +0300
+Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1093147
+
+Index: elixir-1.19.5/lib/elixir/test/elixir/base_test.exs
+===================================================================
+--- elixir-1.19.5.orig/lib/elixir/test/elixir/base_test.exs
++++ elixir-1.19.5/lib/elixir/test/elixir/base_test.exs
+@@ -1055,6 +1055,7 @@ defmodule BaseTest do
+   end
+ 
+   # TODO: add valid? tests
++  @tag timeout: 120_000
+   test "encode then decode is identity" do
+     for {encode, decode, valid?} <- [
+           {&encode16/2, &decode16!/2, &valid16?/2},
+Index: elixir-1.19.5/lib/mix/test/mix/tasks/compile_test.exs
+===================================================================
+--- elixir-1.19.5.orig/lib/mix/test/mix/tasks/compile_test.exs
++++ elixir-1.19.5/lib/mix/test/mix/tasks/compile_test.exs
+@@ -390,7 +390,7 @@ defmodule Mix.Tasks.CompileTest do
+   end
+ 
+   test "listening to concurrent compilations" do
+-    timeout = 2_000
++    timeout = 8_000
+ 
+     Mix.Project.pop()
+ 
+Index: elixir-1.19.5/lib/mix/test/mix/tasks/test_test.exs
+===================================================================
+--- elixir-1.19.5.orig/lib/mix/test/mix/tasks/test_test.exs
++++ elixir-1.19.5/lib/mix/test/mix/tasks/test_test.exs
+@@ -756,9 +756,9 @@ defmodule Mix.Tasks.TestTest do
+           receive_until_match(port, expected, acc)
+         end
+     after
+-      15_000 ->
++      45_000 ->
+         raise """
+-        nothing received from port after 15s.
++        nothing received from port after 45s.
+         Expected: #{inspect(expected)}
+         Got: #{inspect(acc)}
+         """
+Index: elixir-1.19.5/lib/mix/test/mix/tasks/release_test.exs
+===================================================================
+--- elixir-1.19.5.orig/lib/mix/test/mix/tasks/release_test.exs
++++ elixir-1.19.5/lib/mix/test/mix/tasks/release_test.exs
+@@ -717,6 +717,7 @@ defmodule Mix.Tasks.ReleaseTest do
+   end
+ 
+   @tag :unix
++  @tag timeout: 120_000
+   test "runs in daemon mode" do
+     in_fixture("release_test", fn ->
+       config = [releases: [permanent2: [include_erts: false, cookie: "abcdefghij"]]]
+Index: elixir-1.19.5/lib/ex_unit/mix.exs
+===================================================================
+--- elixir-1.19.5.orig/lib/ex_unit/mix.exs
++++ elixir-1.19.5/lib/ex_unit/mix.exs
+@@ -22,7 +22,7 @@ defmodule ExUnit.MixProject do
+         # max_cases: System.schedulers_online * 2,
+         # seed: rand(),
+ 
+-        assert_receive_timeout: 100,
++        assert_receive_timeout: 600,
+         autorun: true,
+         capture_log: false,
+         colors: [],
+Index: elixir-1.19.5/lib/elixir/test/elixir/kernel_test.exs
+===================================================================
+--- elixir-1.19.5.orig/lib/elixir/test/elixir/kernel_test.exs
++++ elixir-1.19.5/lib/elixir/test/elixir/kernel_test.exs
+@@ -483,7 +483,7 @@ defmodule KernelTest do
+ 
+   describe "in/2" do
+     # This test may take a long time on machine with low resources
+-    @tag timeout: 120_000
++    @tag timeout: 240_000
+     test "too large list in guards" do
+       defmodule TooLargeList do
+         @list Enum.map(1..1024, & &1)

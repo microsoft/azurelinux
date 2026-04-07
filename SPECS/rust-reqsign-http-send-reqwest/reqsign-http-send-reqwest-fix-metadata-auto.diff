@@ -1,0 +1,11 @@
+--- reqsign-http-send-reqwest-2.0.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ reqsign-http-send-reqwest-2.0.1/Cargo.toml	2025-11-05T11:46:18.472278+00:00
+@@ -82,8 +82,3 @@
+     "rt-multi-thread",
+ ]
+ 
+-[target.'cfg(target_arch = "wasm32")'.dependencies.futures-channel]
+-version = "0.3"
+-
+-[target.'cfg(target_arch = "wasm32")'.dependencies.wasm-bindgen-futures]
+-version = "0.4"

@@ -1,0 +1,11 @@
+diff -up VTK-9.2.5/IO/Image/vtkSEPReader.h.include VTK-9.2.5/IO/Image/vtkSEPReader.h
+--- VTK-9.2.5/IO/Image/vtkSEPReader.h.include	2023-01-05 08:51:35.000000000 -0700
++++ VTK-9.2.5/IO/Image/vtkSEPReader.h	2023-01-17 07:43:41.988095734 -0700
+@@ -26,6 +26,7 @@
+ #include "vtkNew.h" // for ivars
+ 
+ #include <array>  // for std::array
++#include <cstdint> // for std::uint8_t
+ #include <string> // for std::string
+ 
+ namespace details

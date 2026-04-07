@@ -1,0 +1,63 @@
+From a68f3741fdc01bf6823a69d2442caba7de9835f9 Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:29 +0200
+Subject: [PATCH 35/50] openssh-8.7p1-scp-kill-switch
+
+---
+ pathnames.h | 1 +
+ scp.1       | 7 +++++++
+ scp.c       | 8 ++++++++
+ 3 files changed, 16 insertions(+)
+
+diff --git a/pathnames.h b/pathnames.h
+index 1158bec9..43f0c570 100644
+--- a/pathnames.h
++++ b/pathnames.h
+@@ -42,6 +42,7 @@
+ #define _PATH_HOST_XMSS_KEY_FILE	SSHDIR "/ssh_host_xmss_key"
+ #define _PATH_HOST_RSA_KEY_FILE		SSHDIR "/ssh_host_rsa_key"
+ #define _PATH_DH_MODULI			SSHDIR "/moduli"
++#define _PATH_SCP_KILL_SWITCH		SSHDIR "/disable_scp"
+ 
+ #ifndef _PATH_SSH_PROGRAM
+ #define _PATH_SSH_PROGRAM		"/usr/bin/ssh"
+diff --git a/scp.1 b/scp.1
+index aa2e2d8b..373d7237 100644
+--- a/scp.1
++++ b/scp.1
+@@ -331,6 +331,13 @@ during download or upload.
+ By default a 32KB buffer is used.
+ .El
+ .El
++.Pp
++Usage of SCP protocol can be blocked by creating a world-readable
++.Ar /etc/ssh/disable_scp
++file. If this file exists, when SCP protocol is in use (either remotely or 
++via the
++.Fl O
++option), the program will exit.
+ .Sh EXIT STATUS
+ .Ex -std scp
+ .Sh SEE ALSO
+diff --git a/scp.c b/scp.c
+index 7f9795a5..7ed1a54c 100644
+--- a/scp.c
++++ b/scp.c
+@@ -649,6 +649,14 @@ main(int argc, char **argv)
+ 	if (iamremote)
+ 		mode = MODE_SCP;
+ 
++	if (mode == MODE_SCP) {
++		FILE *f = fopen(_PATH_SCP_KILL_SWITCH, "r");
++		if (f != NULL) {
++			fclose(f);
++			fatal("SCP protocol is forbidden via %s", _PATH_SCP_KILL_SWITCH);
++		}
++	}
++
+ 	if ((pwd = getpwuid(userid = getuid())) == NULL)
+ 		fatal("unknown user %u", (u_int) userid);
+ 
+-- 
+2.49.0
+

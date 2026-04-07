@@ -1,0 +1,10 @@
+--- ceph-15.1.0/src/common/bit_str.h.orig	2020-02-03 09:47:20.047149798 -0500
++++ ceph-15.1.0/src/common/bit_str.h	2020-02-03 09:47:50.213149798 -0500
+@@ -17,6 +17,7 @@
+ #include <cstdint>
+ #include <iosfwd>
+ #include <functional>
++#include <ostream>
+ 
+ namespace ceph {
+   class Formatter;

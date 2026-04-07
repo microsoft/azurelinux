@@ -1,0 +1,68 @@
+From 9809f77792517d0ace2874a84a181e8fe3766d8d Mon Sep 17 00:00:00 2001
+From: Alejandro Alvarez Ayllon <a.alvarezayllon@gmail.com>
+Date: Sat, 24 Feb 2024 14:53:33 +0100
+Subject: [PATCH 4/4] Add fixes for use with onnxruntime
+
+---
+ onnx/defs/schema.cc    | 14 ++++++++++++++
+ onnx/onnxruntime_fix.h | 14 ++++++++++++++
+ 2 files changed, 28 insertions(+)
+ create mode 100644 onnx/onnxruntime_fix.h
+
+diff --git a/onnx/defs/schema.cc b/onnx/defs/schema.cc
+index 74bd0a630..573d09018 100644
+--- a/onnx/defs/schema.cc
++++ b/onnx/defs/schema.cc
+@@ -21,8 +21,19 @@
+ 
+ #include "onnx/common/assertions.h"
+ #include "onnx/defs/parser.h"
++#include "onnx/onnxruntime_fix.h"
+ 
+ namespace ONNX_NAMESPACE {
++
++bool ONNXRuntimeFix::_static_registration_disabled = false;
++bool ONNXRuntimeFix::isStaticRegistrationDisabled() {
++  return _static_registration_disabled;
++}
++
++void ONNXRuntimeFix::disableStaticRegistration() {
++  _static_registration_disabled = true;
++}
++
+ // -1 means ONNX schema hasn't been loaded yet
+ // 0 means all versions of ONNX schema have been loaded
+ // Other positive integer means the ONNX schemas for the specified version have been loaded
+@@ -1091,6 +1102,9 @@ OpName_Domain_Version_Schema_Map& OpSchemaRegistry::map() {
+   class SchemasRegisterer {
+    public:
+     SchemasRegisterer() {
++      // Check if static registration is actually disabled
++      if(ONNXRuntimeFix::isStaticRegistrationDisabled()) return;
++
+       // In debug builds, the number of schema registered in this constructor
+       // is compared against the number of calls to schema registration macros.
+ #ifndef NDEBUG
+diff --git a/onnx/onnxruntime_fix.h b/onnx/onnxruntime_fix.h
+new file mode 100644
+index 000000000..2495b9310
+--- /dev/null
++++ b/onnx/onnxruntime_fix.h
+@@ -0,0 +1,14 @@
++#pragma once
++
++namespace ONNX_NAMESPACE {
++
++class ONNXRuntimeFix {
++public:
++  static bool isStaticRegistrationDisabled();
++  static void disableStaticRegistration();
++
++private:
++  static bool _static_registration_disabled;
++};
++
++} // namespace ONNX_NAMESPACE
+-- 
+2.52.0
+

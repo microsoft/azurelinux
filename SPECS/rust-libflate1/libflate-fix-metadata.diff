@@ -1,0 +1,27 @@
+--- libflate-1.4.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ libflate-1.4.0/Cargo.toml	2024-04-28T17:24:27.817631+00:00
+@@ -29,12 +29,6 @@
+ [dependencies.adler32]
+ version = "1"
+ 
+-[dependencies.core2]
+-version = "0.4"
+-features = ["alloc"]
+-optional = true
+-default_features = false
+-
+ [dependencies.crc32fast]
+ version = "1.1.1"
+ 
+@@ -45,11 +39,5 @@
+ [dev-dependencies.clap]
+ version = "2"
+ 
+-[features]
+-no_std = [
+-    "libflate_lz77/no_std",
+-    "core2",
+-]
+-
+ [badges.coveralls]
+ repository = "sile/libflate"

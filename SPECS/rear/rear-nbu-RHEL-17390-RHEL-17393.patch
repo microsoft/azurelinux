@@ -1,0 +1,117 @@
+diff --git a/usr/share/rear/conf/default.conf b/usr/share/rear/conf/default.conf
+index 17a764cba..a944114b3 100644
+--- a/usr/share/rear/conf/default.conf
++++ b/usr/share/rear/conf/default.conf
+@@ -2483,7 +2483,7 @@ OBDR_BLOCKSIZE=2048
+ # BACKUP=NBU (Symantec/Veritas NetBackup)
+ ##
+ #
+-COPY_AS_IS_NBU=( /usr/openv/bin/vnetd /usr/openv/bin/vopied /usr/openv/lib /usr/openv/netbackup /usr/openv/var/auth/[mn]*.txt  /usr/openv/var/vxss /usr/openv/var/webtruststore /usr/openv/resources/nbpxyhelper /opt/VRTSpbx /etc/vx/VxICS /etc/vx/vrtslog.conf /var/log/VRTSpbx )
++COPY_AS_IS_NBU=( /usr/openv/bin/vnetd /usr/openv/bin/vopied /usr/openv/lib /usr/openv/netbackup /usr/openv/var /usr/openv/resources/nbpxyhelper /opt/VRTSpbx /etc/vx/VxICS /etc/vx/vrtslog.conf /var/log/VRTSpbx )
+ COPY_AS_IS_EXCLUDE_NBU=( "/usr/openv/netbackup/logs/*" "/usr/openv/netbackup/bin/bpjava*" /usr/openv/netbackup/bin/xbp /usr/openv/netbackup/bin/private /usr/openv/lib/java "/usr/openv/lib/*-plugins" /usr/openv/lib/shared/vddk /usr/openv/netbackup/baremetal "/var/log/VRTSpbx/*" )
+ # See https://github.com/rear/rear/issues/2105 why /usr/openv/netbackup/sec/at/lib/ is needed:
+ NBU_LD_LIBRARY_PATH="/usr/openv/lib:/usr/openv/netbackup/sec/at/lib/:/usr/openv/lib/boost"
+diff --git a/usr/share/rear/finalize/NBU/default/990_copy_bplogrestorelog.sh b/usr/share/rear/finalize/NBU/default/990_copy_bplogrestorelog.sh
+index 60d9a222c..e326db612 100644
+--- a/usr/share/rear/finalize/NBU/default/990_copy_bplogrestorelog.sh
++++ b/usr/share/rear/finalize/NBU/default/990_copy_bplogrestorelog.sh
+@@ -1,5 +1,51 @@
+ # 990_copy_bprestorelog.sh
+-# copy the logfile to the recovered system, at least the part that has been written till now.
++# copy the logfiles to the recovered system, at least the part that has been written till now.
+ 
+-mkdir -p $TARGET_FS_ROOT/$ROOT_HOME_DIR
+-cp -f $TMP_DIR/bplog.restore* $TARGET_FS_ROOT/$ROOT_HOME_DIR/
++# $VAR_DIR/restore will be copied to $recovery_system_recover_log_dir in wrapup/default/990_copy_logfile.sh
++mkdir -p "$VAR_DIR/restore/netbackup"
++cp -pr /usr/openv/netbackup/logs/* "$VAR_DIR/restore/netbackup"
++
++# take care of $VAR_DIR/restore/bplog.restore* files (that used to be in /root before)
++function symlink_bprestore_logs ()
++{
++    # adapted from wrapup/default/990_copy_logfile.sh
++    local final_logfile_name_full
++    local final_logfile_name
++    local log_file_symlink_target
++    local log_file_symlink
++    local recover_log_dir=$LOG_DIR/recover
++    local recovery_system_recover_log_dir=$TARGET_FS_ROOT/$recover_log_dir
++    # Create the directories with mode 0700 (rwx------) so that only root can access files and subdirectories therein
++    # because in particular logfiles could contain security relevant information.
++
++    # To be backward compatible with where to the logfile was copied before
++    # have it as a symbolic link that points to where the logfile actually is:
++    # ( "roots" in recovery_system_roots_home_dir means root's but ' in a variable name is not so good ;-)
++    local recovery_system_roots_home_dir=$TARGET_FS_ROOT/$ROOT_HOME_DIR
++    test -d $recovery_system_roots_home_dir || mkdir $verbose -m 0700 $recovery_system_roots_home_dir
++
++    # Remove existing and now outdated symlinks that would falsely point to the same target
++    # The symlink name bplog.restore-$( date -Iseconds ).log is for example bplog.restore-2019-12-17T09:40:36+01:00.log or rear-2006-08-14T02:34:56-06:00.log
++    # so a matching globbing pattern is bplog.restore-[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9]*.log ('*' for the UTC offset):
++    for log_file_symlink in $recovery_system_roots_home_dir/bplog.restore*-[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9]*.log ; do
++        # Skip if a file that matches the globbing pattern is not a symlink (it could be even a directory full of user's sacrocanct files):
++        test -L $log_file_symlink || continue
++        # Remove also outdated dangling symlinks where their target does not exist by using 'readlink -m':
++        test "$log_file_symlink_target" = "$( readlink -m $log_file_symlink )" || continue
++        rm $verbose $log_file_symlink
++    done
++
++    # At the moment this function runs, $VAR_DIR/restore will have been already copied
++    # to $recovery_system_recover_log_dir in wrapup/default/990_copy_logfile.sh
++    # (exit tasks run in reverse order, so this task will run after the tasks defined in
++    # wrapup/default/990_copy_logfile.sh )
++    for final_logfile_name_full in $recovery_system_recover_log_dir/restore/bplog.restore* ; do
++        final_logfile_name="$( basename "$final_logfile_name_full" )"
++        log_file_symlink_target="$recover_log_dir/restore/$final_logfile_name"
++        # Create symlink with current timestamp that points to where the logfile actually is:
++        log_file_symlink=$recovery_system_roots_home_dir/$( basename "$final_logfile_name" .log )-$( date -Iseconds ).log
++        ln $verbose -s $log_file_symlink_target $log_file_symlink || true
++    done
++}
++
++AddExitTask "symlink_bprestore_logs"
+diff --git a/usr/share/rear/restore/NBU/default/400_restore_with_nbu.sh b/usr/share/rear/restore/NBU/default/400_restore_with_nbu.sh
+index 71f7359a1..4280cb021 100644
+--- a/usr/share/rear/restore/NBU/default/400_restore_with_nbu.sh
++++ b/usr/share/rear/restore/NBU/default/400_restore_with_nbu.sh
+@@ -2,6 +2,23 @@
+ # 400_restore_with_nbu.sh
+ # restore files with NBU
+ 
++# Unique log file name: adapted from restore/NETFS/default/400_restore_backup.sh
++# and restore/TSM/default/400_restore_with_tsm.sh
++local backup_restore_log_dir="$VAR_DIR/restore"
++mkdir -p $backup_restore_log_dir
++local backup_restore_log_file=""
++local backup_restore_log_prefix="bplog.restore"
++local backup_restore_log_suffix="log"
++# E.g. when "rear -C 'general.conf /path/to/special.conf' recover" was called CONFIG_APPEND_FILES is "general.conf /path/to/special.conf"
++# so that in particular '/' characters must be replaced in the backup restore log file (by a colon) and then
++# the backup restore log file name will be like .../restore/bplog.restore.generalconf_:path:to:specialconf.1234.log
++# It does not work with $( tr -d -c '[:alnum:]/[:space:]' <<<"$CONFIG_APPEND_FILES" | tr -s '/[:space:]' ':_' )
++# because the <<<"$CONFIG_APPEND_FILES" results a trailing newline that becomes a trailing '_' character so that
++# echo -n $CONFIG_APPEND_FILES (without double quotes) is used to avoid leading and trailing spaces and newlines:
++test "$CONFIG_APPEND_FILES" && backup_restore_log_prefix=$backup_restore_log_prefix.$( echo -n $CONFIG_APPEND_FILES | tr -d -c '[:alnum:]/[:space:]' | tr -s '/[:space:]' ':_' )
++
++backup_restore_log_file=$backup_restore_log_dir/$backup_restore_log_prefix.$MASTER_PID.$backup_restore_log_suffix
++
+ LogPrint "NetBackup: restoring / into $TARGET_FS_ROOT"
+ 
+ echo "change / to $TARGET_FS_ROOT" > $TMP_DIR/nbu_change_file
+@@ -10,13 +27,13 @@ echo "change / to $TARGET_FS_ROOT" > $TMP_DIR/nbu_change_file
+ # $TMP_DIR/restore_fs_list was made by 300_create_nbu_restore_fs_list.sh
+ if [ ${#NBU_ENDTIME[@]} -gt 0 ] ; then
+     edate="${NBU_ENDTIME[@]}"
+-    bprestore_args="-B -H -L $TMP_DIR/bplog.restore -8 -R $TMP_DIR/nbu_change_file -t 0 -w 0 -e ${edate} -C ${NBU_CLIENT_SOURCE} -D ${NBU_CLIENT_NAME} -f $TMP_DIR/restore_fs_list"
++    bprestore_args="-B -H -L $backup_restore_log_file -8 -R $TMP_DIR/nbu_change_file -t 0 -w 0 -e ${edate} -C ${NBU_CLIENT_SOURCE} -D ${NBU_CLIENT_NAME} -f $TMP_DIR/restore_fs_list"
+ else
+-    bprestore_args="-B -H -L $TMP_DIR/bplog.restore -8 -R $TMP_DIR/nbu_change_file -t 0 -w 0 -C ${NBU_CLIENT_SOURCE} -D ${NBU_CLIENT_NAME} -f $TMP_DIR/restore_fs_list"
++    bprestore_args="-B -H -L $backup_restore_log_file -8 -R $TMP_DIR/nbu_change_file -t 0 -w 0 -C ${NBU_CLIENT_SOURCE} -D ${NBU_CLIENT_NAME} -f $TMP_DIR/restore_fs_list"
+ fi
+ 
+ LogPrint "RUN: /usr/openv/netbackup/bin/bprestore $bprestore_args"
+-LogPrint "Restore progress: see $TMP_DIR/bplog.restore"
++LogPrint "Restore progress: see $backup_restore_log_file"
+ LANG=C /usr/openv/netbackup/bin/bprestore $bprestore_args
+ rc=$?
+ if (( $rc > 1 )) ; then

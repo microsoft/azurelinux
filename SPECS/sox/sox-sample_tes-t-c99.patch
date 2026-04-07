@@ -1,0 +1,32 @@
+Include <math.h> for the fabs function, to avoid an implicit function
+declaration.  Such implicit declarations are incompatible with strict
+C99 compilers because this feature was removed from C in 1999.
+
+Fixed slightly differently upstream via:
+
+commit 65c7a43ff357d20a375cbc0f2bbbb9184b1da10e
+Author: Mans Rullgard <mans@mansr.com>
+Date:   Mon Aug 3 11:04:30 2020 +0100
+
+    sox_sample_test: clean up nonsense
+    
+    Move code from pointless .h file to .c file.
+    Remove warning suppression pragmas.
+    Fix causes of warnings.
+    
+    See also bug #326.
+
+https://sourceforge.net/p/sox/code/ci/65c7a43ff357d20a375cbc0f2bbbb9184b1da10e
+
+diff --git a/src/sox_sample_test.h b/src/sox_sample_test.h
+index 62b55e4137a3aa7e..17f0069cd561b8c4 100644
+--- a/src/sox_sample_test.h
++++ b/src/sox_sample_test.h
+@@ -19,6 +19,7 @@
+ #undef NDEBUG /* Must undef above assert.h or other that might include it. */
+ #endif
+ #include <assert.h>
++#include <math.h>
+ #include "sox.h"
+ 
+ #define TEST_UINT(bits) \

@@ -1,0 +1,38 @@
+From 28f0a1a5ed9d33567353ec930cf4702c2bc86886 Mon Sep 17 00:00:00 2001
+From: Karolina Surma <ksurma@redhat.com>
+Date: Thu, 11 Jan 2024 10:33:54 +0100
+Subject: [PATCH] Fix removed importlib.resources.read_binary in Python 3.13
+
+---
+ src/installer/scripts.py | 14 ++++++++++++--
+ 1 files changed, 16 insertions(+), 2 deletions(-)
+
+diff --git a/src/installer/scripts.py b/src/installer/scripts.py
+index 7e3c8fc..a70c59f 100644
+--- a/src/installer/scripts.py
++++ b/src/installer/scripts.py
+@@ -2,9 +2,19 @@
+ 
+ import io
+ import shlex
++import sys
+ import zipfile
+-from importlib.resources import read_binary
+-from typing import TYPE_CHECKING, Mapping, Optional, Tuple
++from types import ModuleType
++from typing import TYPE_CHECKING, Mapping, Optional, Tuple, Union
++
++if sys.version_info >= (3, 9):  # pragma: no cover
++    from importlib.resources import files
++
++    def read_binary(package: Union[str, ModuleType], file_path: str) -> bytes:
++        return (files(package) / file_path).read_bytes()
++
++else:  # pragma: no cover
++    from importlib.resources import read_binary
+ 
+ from installer import _scripts
+ 
+-- 
+2.43.0
+

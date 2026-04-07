@@ -1,0 +1,5246 @@
+From 05038ec7044a274a004daf9002ac12ecc88e7758 Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Tue, 16 May 2023 14:12:09 +0200
+Subject: [PATCH] Upgrade to 3.71
+
+---
+ PPPort_pm.PL       |   4 +-
+ module3.c          |   2 +-
+ parts/base/5003007 |   4 +-
+ parts/embed.fnc    |   4 +-
+ parts/inc/magic    |   2 +-
+ parts/inc/mess     |  23 +-
+ parts/inc/misc     |  21 +-
+ t/01_test.t        |  57 ---
+ t/HvNAME.t         |  60 ---
+ t/MY_CXT.t         |  58 ---
+ t/SvPV.t           | 127 ------
+ t/SvREFCNT.t       |  58 ---
+ t/Sv_set.t         | 117 ------
+ t/call.t           | 165 --------
+ t/cop.t            | 108 ------
+ t/exception.t      |  71 ----
+ t/format.t         |  80 ----
+ t/grok.t           |  66 ----
+ t/gv.t             |  67 ----
+ t/limits.t         |  59 ---
+ t/locale.t         |  67 ----
+ t/mPUSH.t          |  66 ----
+ t/magic.t          | 229 -----------
+ t/memory.t         |  56 ---
+ t/mess.t           | 327 ----------------
+ t/misc.t           | 500 ------------------------
+ t/newCONSTSUB.t    |  63 ---
+ t/newRV.t          |  57 ---
+ t/newSV_type.t     |  56 ---
+ t/newSVpv.t        |  82 ----
+ t/podtest.t        |  87 -----
+ t/ppphtest.t       | 944 ---------------------------------------------
+ t/pv_tools.t       |  88 -----
+ t/pvs.t            |  77 ----
+ t/shared_pv.t      |  56 ---
+ t/snprintf.t       |  58 ---
+ t/sprintf.t        |  58 ---
+ t/strlfuncs.t      |  69 ----
+ t/sv_xpvf.t        |  82 ----
+ t/threads.t        |  58 ---
+ t/utf8.t           | 300 --------------
+ t/uv.t             |  68 ----
+ t/variables.t      | 111 ------
+ t/warn.t           | 106 -----
+ 44 files changed, 28 insertions(+), 4790 deletions(-)
+ delete mode 100644 t/01_test.t
+ delete mode 100644 t/HvNAME.t
+ delete mode 100644 t/MY_CXT.t
+ delete mode 100644 t/SvPV.t
+ delete mode 100644 t/SvREFCNT.t
+ delete mode 100644 t/Sv_set.t
+ delete mode 100644 t/call.t
+ delete mode 100644 t/cop.t
+ delete mode 100644 t/exception.t
+ delete mode 100644 t/format.t
+ delete mode 100644 t/grok.t
+ delete mode 100644 t/gv.t
+ delete mode 100644 t/limits.t
+ delete mode 100644 t/locale.t
+ delete mode 100644 t/mPUSH.t
+ delete mode 100644 t/magic.t
+ delete mode 100644 t/memory.t
+ delete mode 100644 t/mess.t
+ delete mode 100644 t/misc.t
+ delete mode 100644 t/newCONSTSUB.t
+ delete mode 100644 t/newRV.t
+ delete mode 100644 t/newSV_type.t
+ delete mode 100644 t/newSVpv.t
+ delete mode 100644 t/podtest.t
+ delete mode 100644 t/ppphtest.t
+ delete mode 100644 t/pv_tools.t
+ delete mode 100644 t/pvs.t
+ delete mode 100644 t/shared_pv.t
+ delete mode 100644 t/snprintf.t
+ delete mode 100644 t/sprintf.t
+ delete mode 100644 t/strlfuncs.t
+ delete mode 100644 t/sv_xpvf.t
+ delete mode 100644 t/threads.t
+ delete mode 100644 t/utf8.t
+ delete mode 100644 t/uv.t
+ delete mode 100644 t/variables.t
+ delete mode 100644 t/warn.t
+
+diff --git a/PPPort_pm.PL b/PPPort_pm.PL
+index cfbfaeb..00fd926 100644
+--- a/PPPort_pm.PL
++++ b/PPPort_pm.PL
+@@ -747,7 +747,7 @@ modify it under the same terms as Perl itself.
+ 
+ =head1 SEE ALSO
+ 
+-See L<h2xs>, L<ppport.h>.
++See L<h2xs>, F<ppport.h>.
+ 
+ =cut
+ 
+@@ -756,7 +756,7 @@ package Devel::PPPort;
+ use strict;
+ use vars qw($VERSION $data);
+ 
+-$VERSION = '3.68';
++$VERSION = '3.71';
+ 
+ sub _init_data
+ {
+diff --git a/module3.c b/module3.c
+index 417490e..2712b3c 100644
+--- a/module3.c
++++ b/module3.c
+@@ -67,5 +67,5 @@ int dummy_parser_warning(void)
+   my_p_bufptr = &PL_bufptr;
+   PL_bufptr = my_bufptr;
+   PL_bufptr = *my_p_bufptr;
+-  return &PL_bufptr != NULL;
++  return my_p_bufptr != NULL;
+ }
+diff --git a/parts/base/5003007 b/parts/base/5003007
+index 5b82727..18c38f6 100644
+--- a/parts/base/5003007
++++ b/parts/base/5003007
+@@ -962,7 +962,7 @@ newSVsv                        # T
+ newUNOP                        # T
+ Newz                           # Z added by devel/scanprov
+ nextargv                       # F added by devel/scanprov
+-NEXTOPER                       # Z added by devel/scanprov
++REGNODE_AFTER                       # Z added by devel/scanprov
+ ninstr                         # T
+ NofAMmeth                      # Z added by devel/scanprov
+ no_fh_allowed                  # F added by devel/scanprov
+@@ -1113,7 +1113,7 @@ pop_scope                      # T
+ PP                             # Z added by devel/scanprov
+ pregexec                       # T
+ pregfree                       # T
+-PREVOPER                       # Z added by devel/scanprov
++REGNODE_BEFORE                       # Z added by devel/scanprov
+ printf                         # Z added by devel/scanprov
+ PRIVLIB                        # K added by devel/scanprov
+ PRIVLIB_EXP                    # K added by devel/scanprov
+diff --git a/parts/embed.fnc b/parts/embed.fnc
+index 90d44b6..e4b9a31 100644
+--- a/parts/embed.fnc
++++ b/parts/embed.fnc
+@@ -523,7 +523,7 @@
+ :
+ :   U  autodoc.pl will not output a usage example
+ :
+-:   W  Add a _pDEPTH argument to function prototypes, and an _aDEPTH
++:   W  Add a comma_pDEPTH argument to function prototypes, and a comma_aDEPTH
+ :      argument to the function calls. This means that under DEBUGGING
+ :      a depth argument is added to the functions, which is used for
+ :      example by the regex engine for debugging and trace output.
+@@ -1943,7 +1943,7 @@ Apd	|bool	|sv_streq_flags	|NULLOK SV* sv1|NULLOK SV* sv2|const U32 flags
+ CpMdb	|void	|sv_taint	|NN SV* sv
+ CpdR	|bool	|sv_tainted	|NN SV *const sv
+ Apd	|int	|sv_unmagic	|NN SV *const sv|const int type
+-Apd	|int	|sv_unmagicext	|NN SV *const sv|const int type|NULLOK MGVTBL *vtbl
++Apd	|int	|sv_unmagicext	|NN SV *const sv|const int type|NULLOK const MGVTBL *vtbl
+ ApdMb	|void	|sv_unref	|NN SV* sv
+ Apd	|void	|sv_unref_flags	|NN SV *const ref|const U32 flags
+ Cpd	|void	|sv_untaint	|NN SV *const sv
+diff --git a/parts/inc/magic b/parts/inc/magic
+index 806aa18..4772ab3 100644
+--- a/parts/inc/magic
++++ b/parts/inc/magic
+@@ -211,7 +211,7 @@ mg_findext(const SV * sv, int type, const MGVTBL *vtbl) {
+ #if { NEED sv_unmagicext }
+ 
+ int
+-sv_unmagicext(pTHX_ SV *const sv, const int type, MGVTBL *vtbl)
++sv_unmagicext(pTHX_ SV *const sv, const int type, const MGVTBL *vtbl)
+ {
+     MAGIC* mg;
+     MAGIC** mgp;
+diff --git a/parts/inc/mess b/parts/inc/mess
+index 523480f..dbd41b0 100644
+--- a/parts/inc/mess
++++ b/parts/inc/mess
+@@ -58,17 +58,18 @@ NEED_vmess
+ #  else
+ #    define D_PPP_FIX_UTF8_ERRSV_FOR_SV(sv) STMT_START {} STMT_END
+ #  endif
+-#  define croak_sv(sv)                         \
+-    STMT_START {                               \
+-        SV *_sv = (sv);                        \
+-        if (SvROK(_sv)) {                      \
+-            sv_setsv(ERRSV, _sv);              \
+-            croak(NULL);                       \
+-        } else {                               \
+-            D_PPP_FIX_UTF8_ERRSV_FOR_SV(_sv);  \
+-            croak("%" SVf, SVfARG(_sv));       \
+-        }                                      \
+-    } STMT_END
++PERL_STATIC_INLINE void D_PPP_croak_sv(SV *sv) {
++    dTHX;
++    SV *_sv = (sv);
++    if (SvROK(_sv)) {
++        sv_setsv(ERRSV, _sv);
++        croak(NULL);
++    } else {
++        D_PPP_FIX_UTF8_ERRSV_FOR_SV(_sv);
++        croak("%" SVf, SVfARG(_sv));
++    }
++}
++#  define croak_sv(sv) D_PPP_croak_sv(sv)
+ #elif { VERSION >= 5.4.0 }
+ #  define croak_sv(sv) croak("%" SVf, SVfARG(sv))
+ #else
+diff --git a/parts/inc/misc b/parts/inc/misc
+index 72b7e72..86d7fde 100644
+--- a/parts/inc/misc
++++ b/parts/inc/misc
+@@ -299,17 +299,12 @@ __UNDEF_NOT_PROVIDED__  PERL_GCC_BRACE_GROUPS_FORBIDDEN
+ 
+ #undef STMT_START
+ #undef STMT_END
+-#if defined(VOIDFLAGS) && defined(PERL_USE_GCC_BRACE_GROUPS)
+-#  define STMT_START    (void)( /* gcc supports ``({ STATEMENTS; })'' */
+-#  define STMT_END      )
+-#else
+-#  if defined(VOIDFLAGS) && (VOIDFLAGS) && (defined(sun) || defined(__sun__)) && !defined(__GNUC__)
++#if defined(VOIDFLAGS) && (VOIDFLAGS) && (defined(sun) || defined(__sun__)) && !defined(__GNUC__)
+ #    define STMT_START  if (1)
+ #    define STMT_END    else (void)0
+-#  else
++#else
+ #    define STMT_START  do
+ #    define STMT_END    while (0)
+-#  endif
+ #endif
+ 
+ __UNDEFINED__  boolSV(b)    ((b) ? &PL_sv_yes : &PL_sv_no)
+@@ -1180,10 +1175,10 @@ newXS("Devel::PPPort::dAXMARK", XS_Devel__PPPort_dAXMARK, file);
+ int
+ OpSIBLING_tests()
+ 	PREINIT:
+-		OP *x;
+-		OP *kid;
+-		OP *middlekid;
+-		OP *lastkid;
++		OP *x = NULL;
++		OP *kid = NULL;
++		OP *middlekid = NULL;
++		OP *lastkid = NULL;
+ 		int count = 0;
+ 		int failures = 0;
+ 		int i;
+@@ -1439,8 +1434,8 @@ check_HeUTF8(utf8_key)
+                 hash = newHV();
+ 
+                 key = SvPV(utf8_key, klen);
+-                if (SvUTF8(utf8_key)) klen *= -1;
+-                hv_store(hash, key, klen, newSVpvs("string"), 0);
++                hv_store(hash, key, SvUTF8(utf8_key) ? -klen : klen,
++                    newSVpvs("string"), 0);
+                 hv_iterinit(hash);
+                 ent = hv_iternext(hash);
+                 assert(ent);
+diff --git a/t/01_test.t b/t/01_test.t
+deleted file mode 100644
+index cbf56df..0000000
+--- a/t/01_test.t
++++ /dev/null
+@@ -1,57 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/01_test instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (1) {
+-    load();
+-    plan(tests => 1);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-# This test file is used as target dependency for Makefile
+-ok 1;
+-
+diff --git a/t/HvNAME.t b/t/HvNAME.t
+deleted file mode 100644
+index e7ba851..0000000
+--- a/t/HvNAME.t
++++ /dev/null
+@@ -1,60 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/HvNAME instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (4) {
+-    load();
+-    plan(tests => 4);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-is(Devel::PPPort::HvNAME_get(\%Devel::PPPort::), 'Devel::PPPort');
+-ok(!defined Devel::PPPort::HvNAME_get({}));
+-
+-is(Devel::PPPort::HvNAMELEN_get(\%Devel::PPPort::), length('Devel::PPPort'));
+-is(Devel::PPPort::HvNAMELEN_get({}), 0);
+-
+diff --git a/t/MY_CXT.t b/t/MY_CXT.t
+deleted file mode 100644
+index 5555ee9..0000000
+--- a/t/MY_CXT.t
++++ /dev/null
+@@ -1,58 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/MY_CXT instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (3) {
+-    load();
+-    plan(tests => 3);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-ok(&Devel::PPPort::MY_CXT_1());
+-ok(&Devel::PPPort::MY_CXT_2());
+-ok(&Devel::PPPort::MY_CXT_CLONE());
+-
+diff --git a/t/SvPV.t b/t/SvPV.t
+deleted file mode 100644
+index dc65644..0000000
+--- a/t/SvPV.t
++++ /dev/null
+@@ -1,127 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/SvPV instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (50) {
+-    load();
+-    plan(tests => 50);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-my $mhx = "mhx";
+-
+-is(&Devel::PPPort::SvPVbyte($mhx), 3);
+-
+-my $i = 42;
+-
+-is(&Devel::PPPort::SvPV_nolen($mhx), $i++);
+-is(&Devel::PPPort::SvPV_const($mhx), $i++);
+-is(&Devel::PPPort::SvPV_mutable($mhx), $i++);
+-is(&Devel::PPPort::SvPV_flags($mhx), $i++);
+-is(&Devel::PPPort::SvPV_flags_const($mhx), $i++);
+-
+-is(&Devel::PPPort::SvPV_flags_const_nolen($mhx), $i++);
+-is(&Devel::PPPort::SvPV_flags_mutable($mhx), $i++);
+-is(&Devel::PPPort::SvPV_force($mhx), $i++);
+-is(&Devel::PPPort::SvPV_force_nolen($mhx), $i++);
+-is(&Devel::PPPort::SvPV_force_mutable($mhx), $i++);
+-
+-is(&Devel::PPPort::SvPV_force_nomg($mhx), $i++);
+-is(&Devel::PPPort::SvPV_force_nomg_nolen($mhx), $i++);
+-is(&Devel::PPPort::SvPV_force_flags($mhx), $i++);
+-is(&Devel::PPPort::SvPV_force_flags_nolen($mhx), $i++);
+-is(&Devel::PPPort::SvPV_force_flags_mutable($mhx), $i++);
+-
+-is(&Devel::PPPort::SvPV_nolen_const($mhx), $i++);
+-is(&Devel::PPPort::SvPV_nomg($mhx), $i++);
+-is(&Devel::PPPort::SvPV_nomg_const($mhx), $i++);
+-is(&Devel::PPPort::SvPV_nomg_const_nolen($mhx), $i++);
+-is(&Devel::PPPort::SvPV_nomg_nolen($mhx), $i++);
+-
+-$mhx = 42; is(&Devel::PPPort::SvPV_nolen($mhx), 0);
+-$mhx = 42; is(&Devel::PPPort::SvPV_const($mhx), 2);
+-$mhx = 42; is(&Devel::PPPort::SvPV_mutable($mhx), 2);
+-$mhx = 42; is(&Devel::PPPort::SvPV_flags($mhx), 2);
+-$mhx = 42; is(&Devel::PPPort::SvPV_flags_const($mhx), 2);
+-
+-$mhx = 42; is(&Devel::PPPort::SvPV_flags_const_nolen($mhx), 0);
+-$mhx = 42; is(&Devel::PPPort::SvPV_flags_mutable($mhx), 2);
+-$mhx = 42; is(&Devel::PPPort::SvPV_force($mhx), 2);
+-$mhx = 42; is(&Devel::PPPort::SvPV_force_nolen($mhx), 0);
+-$mhx = 42; is(&Devel::PPPort::SvPV_force_mutable($mhx), 2);
+-
+-$mhx = 42; is(&Devel::PPPort::SvPV_force_nomg($mhx), 2);
+-$mhx = 42; is(&Devel::PPPort::SvPV_force_nomg_nolen($mhx), 0);
+-$mhx = 42; is(&Devel::PPPort::SvPV_force_flags($mhx), 2);
+-$mhx = 42; is(&Devel::PPPort::SvPV_force_flags_nolen($mhx), 0);
+-$mhx = 42; is(&Devel::PPPort::SvPV_force_flags_mutable($mhx), 2);
+-
+-$mhx = 42; is(&Devel::PPPort::SvPV_nolen_const($mhx), 0);
+-$mhx = 42; is(&Devel::PPPort::SvPV_nomg($mhx), 2);
+-$mhx = 42; is(&Devel::PPPort::SvPV_nomg_const($mhx), 2);
+-$mhx = 42; is(&Devel::PPPort::SvPV_nomg_const_nolen($mhx), 0);
+-$mhx = 42; is(&Devel::PPPort::SvPV_nomg_nolen($mhx), 0);
+-
+-&Devel::PPPort::SvPVCLEAR($mhx);
+-is($mhx, "");
+-
+-my $str = "";
+-&Devel::PPPort::SvPV_force($str);
+-my($s2, $before, $after) = &Devel::PPPort::SvPV_renew($str, 81, "x"x80);
+-is($str, "x"x80);
+-is($s2, "x"x80);
+-ok($before < 81);
+-is($after, 81);
+-
+-$str = "x"x400;
+-&Devel::PPPort::SvPV_force($str);
+-($s2, $before, $after) = &Devel::PPPort::SvPV_renew($str, 41, "x"x40);
+-is($str, "x"x40);
+-is($s2, "x"x40);
+-ok($before > 41);
+-is($after, 41);
+-
+diff --git a/t/SvREFCNT.t b/t/SvREFCNT.t
+deleted file mode 100644
+index 44be76a..0000000
+--- a/t/SvREFCNT.t
++++ /dev/null
+@@ -1,58 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/SvREFCNT instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (14) {
+-    load();
+-    plan(tests => 14);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-for (Devel::PPPort::SvREFCNT()) {
+-  ok(defined $_ and $_);
+-}
+-
+diff --git a/t/Sv_set.t b/t/Sv_set.t
+deleted file mode 100644
+index 770f654..0000000
+--- a/t/Sv_set.t
++++ /dev/null
+@@ -1,117 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/Sv_set instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (15) {
+-    load();
+-    plan(tests => 15);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-my $foo = 5;
+-is(&Devel::PPPort::TestSvUV_set($foo, 12345), 42);
+-is(&Devel::PPPort::TestSvPVX_const("mhx"), 43);
+-is(&Devel::PPPort::TestSvPVX_mutable("mhx"), 44);
+-
+-my $bar = [];
+-
+-bless $bar, 'foo';
+-is($bar->x(), 'foobar');
+-
+-Devel::PPPort::TestSvSTASH_set($bar, 'bar');
+-is($bar->x(), 'hacker');
+-
+-    if (ivers($]) != ivers(5.7.2)) {
+-        ok(Devel::PPPort::Test_sv_setsv_SV_NOSTEAL());
+-    }
+-    else {
+-        skip("7.2 broken for NOSTEAL", 1);
+-    }
+-
+-    tie my $scalar, 'TieScalarCounter', 'string';
+-
+-    is tied($scalar)->{fetch}, 0;
+-    is tied($scalar)->{store}, 0;
+-    my $copy = Devel::PPPort::newSVsv_nomg($scalar);
+-    is tied($scalar)->{fetch}, 0;
+-    is tied($scalar)->{store}, 0;
+-
+-    my $fetch = $scalar;
+-    is tied($scalar)->{fetch}, 1;
+-    is tied($scalar)->{store}, 0;
+-    my $copy2 = Devel::PPPort::newSVsv_nomg($scalar);
+-    is tied($scalar)->{fetch}, 1;
+-    is tied($scalar)->{store}, 0;
+-    is $copy2, 'string';
+-
+-package TieScalarCounter;
+-
+-sub TIESCALAR {
+-    my ($class, $value) = @_;
+-    return bless { fetch => 0, store => 0, value => $value }, $class;
+-}
+-
+-sub FETCH {
+-    my ($self) = @_;
+-    $self->{fetch}++;
+-    return $self->{value};
+-}
+-
+-sub STORE {
+-    my ($self, $value) = @_;
+-    $self->{store}++;
+-    $self->{value} = $value;
+-}
+-
+-package foo;
+-
+-sub x { 'foobar' }
+-
+-package bar;
+-
+-sub x { 'hacker' }
+-
+diff --git a/t/call.t b/t/call.t
+deleted file mode 100644
+index aad892c..0000000
+--- a/t/call.t
++++ /dev/null
+@@ -1,165 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/call instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (88) {
+-    load();
+-    plan(tests => 88);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-sub f
+-{
+-  shift;
+-  unshift @_, 'b';
+-  pop @_;
+-  @_, defined wantarray ? wantarray ? 'x' : 'y' : 'z';
+-}
+-
+-my $obj = bless [], 'Foo';
+-
+-sub Foo::meth
+-{
+-  return 'bad_self' unless @_ && ref $_[0] && ref($_[0]) eq 'Foo';
+-  shift;
+-  shift;
+-  unshift @_, 'b';
+-  pop @_;
+-  @_, defined wantarray ? wantarray ? 'x' : 'y' : 'z';
+-}
+-
+-my $test;
+-
+-for $test (
+-    # flags                      args           expected         description
+-    [ &Devel::PPPort::G_SCALAR,  [ ],           [ qw(y 1) ],     '0 args, G_SCALAR'  ],
+-    [ &Devel::PPPort::G_SCALAR,  [ qw(a p q) ], [ qw(y 1) ],     '3 args, G_SCALAR'  ],
+-    [ &Devel::PPPort::G_ARRAY,   [ ],           [ qw(x 1) ],     '0 args, G_ARRAY'   ],
+-    [ &Devel::PPPort::G_ARRAY,   [ qw(a p q) ], [ qw(b p x 3) ], '3 args, G_ARRAY'   ],
+-    [ &Devel::PPPort::G_DISCARD, [ ],           [ qw(0) ],       '0 args, G_DISCARD' ],
+-    [ &Devel::PPPort::G_DISCARD, [ qw(a p q) ], [ qw(0) ],       '3 args, G_DISCARD' ],
+-)
+-{
+-    my ($flags, $args, $expected, $description) = @$test;
+-    print "# --- $description ---\n";
+-    ok(eq_array( [ &Devel::PPPort::call_sv(\&f, $flags, @$args) ], $expected));
+-    ok(eq_array( [ &Devel::PPPort::call_sv(*f,  $flags, @$args) ], $expected));
+-    ok(eq_array( [ &Devel::PPPort::call_sv('f', $flags, @$args) ], $expected));
+-    ok(eq_array( [ &Devel::PPPort::call_pv('f', $flags, @$args) ], $expected));
+-    ok(eq_array( [ &Devel::PPPort::call_argv('f', $flags, @$args) ], $expected));
+-    ok(eq_array( [ &Devel::PPPort::eval_sv("f(qw(@$args))", $flags) ], $expected));
+-    ok(eq_array( [ &Devel::PPPort::call_method('meth', $flags, $obj, @$args) ], $expected));
+-    ok(eq_array( [ &Devel::PPPort::call_sv_G_METHOD('meth', $flags, $obj, @$args) ], $expected));
+-};
+-
+-is(&Devel::PPPort::eval_pv('f()', 0), 'y');
+-is(&Devel::PPPort::eval_pv('f(qw(a b c))', 0), 'y');
+-
+-is(!defined $::{'less::'}, 1, "Hadn't loaded less yet");
+-Devel::PPPort::load_module(0, "less", undef);
+-is(defined $::{'less::'}, 1, "Have now loaded less");
+-
+-ok(eval { Devel::PPPort::eval_pv('die', 0); 1 });
+-ok(!eval { Devel::PPPort::eval_pv('die', 1); 1 });
+-ok($@ =~ /^Died at \(eval [0-9]+\) line 1\.\n$/);
+-ok(eval { $@ = 'string1'; Devel::PPPort::eval_pv('', 0); 1 });
+-ok(eval { $@ = 'string1'; Devel::PPPort::eval_pv('', 1); 1 });
+-ok(eval { $@ = 'string1'; Devel::PPPort::eval_pv('$@ = "string2"', 0); 1 });
+-ok(eval { $@ = 'string1'; Devel::PPPort::eval_pv('$@ = "string2"', 1); 1 });
+-ok(eval { $@ = 'string1'; Devel::PPPort::eval_pv('$@ = "string2"; die "string3"', 0); 1 });
+-ok(!eval { $@ = 'string1'; Devel::PPPort::eval_pv('$@ = "string2"; die "string3"', 1); 1 });
+-ok($@ =~ /^string3 at \(eval [0-9]+\) line 1\.\n$/);
+-ok(!eval { Devel::PPPort::eval_pv('die False->new', 1); 1 }, 'check false value is rethrown');
+-
+-if (ivers($]) >= ivers('5.007003') or (ivers($]) >= ivers('5.006001') and ivers($]) < ivers('5.007'))) {
+-    my $hashref = { key => 'value' };
+-    is(eval { Devel::PPPort::eval_pv('die $hashref', 1); 1 }, undef, 'check plain hashref is rethrown');
+-    is(ref($@), 'HASH', 'check $@ is hashref') and
+-        is($@->{key}, 'value', 'check $@ hashref has correct value');
+-
+-    my $false = False->new;
+-    ok(!$false);
+-    is(eval { Devel::PPPort::eval_pv('die $false', 1); 1 }, undef, 'check false objects are rethrown');
+-    is(ref($@), 'False', 'check that $@ contains False object');
+-    is("$@", "$false", 'check we got the expected object');
+-} else {
+-    skip 'skip: no support for references in $@', 7;
+-}
+-
+-ok(eval { Devel::PPPort::eval_sv('die', 0); 1 });
+-ok(!eval { Devel::PPPort::eval_sv('die', &Devel::PPPort::G_RETHROW); 1 });
+-ok($@ =~ /^Died at \(eval [0-9]+\) line 1\.\n$/);
+-ok(eval { $@ = 'string1'; Devel::PPPort::eval_sv('', 0); 1 });
+-ok(eval { $@ = 'string1'; Devel::PPPort::eval_sv('', &Devel::PPPort::G_RETHROW); 1 });
+-ok(eval { $@ = 'string1'; Devel::PPPort::eval_sv('$@ = "string2"', 0); 1 });
+-ok(eval { $@ = 'string1'; Devel::PPPort::eval_sv('$@ = "string2"', &Devel::PPPort::G_RETHROW); 1 });
+-ok(eval { $@ = 'string1'; Devel::PPPort::eval_sv('$@ = "string2"; die "string3"', 0); 1 });
+-ok(!eval { $@ = 'string1'; Devel::PPPort::eval_sv('$@ = "string2"; die "string3"', &Devel::PPPort::G_RETHROW); 1 });
+-ok($@ =~ /^string3 at \(eval [0-9]+\) line 1\.\n$/);
+-ok(!eval { Devel::PPPort::eval_sv('die False->new', &Devel::PPPort::G_RETHROW); 1 }, 'check false value is rethrown');
+-
+-if (ivers($]) >= ivers('5.007003') or (ivers($]) >= ivers('5.006001') and ivers($]) < ivers('5.007'))) {
+-    my $hashref = { key => 'value' };
+-    is(eval { Devel::PPPort::eval_sv('die $hashref', &Devel::PPPort::G_RETHROW); 1 }, undef, 'check plain hashref is rethrown');
+-    is(ref($@), 'HASH', 'check $@ is hashref') and
+-        is($@->{key}, 'value', 'check $@ hashref has correct value');
+-
+-    my $false = False->new;
+-    ok(!$false);
+-    is(eval { Devel::PPPort::eval_sv('die $false', &Devel::PPPort::G_RETHROW); 1 }, undef, 'check false objects are rethrown');
+-    is(ref($@), 'False', 'check that $@ contains False object');
+-    is("$@", "$false", 'check we got the expected object');
+-} else {
+-    skip 'skip: no support for references in $@', 7;
+-}
+-
+-{
+-    package False;
+-    use overload bool => sub { 0 }, '""' => sub { 'Foo' };
+-    sub new { bless {}, shift }
+-}
+-
+diff --git a/t/cop.t b/t/cop.t
+deleted file mode 100644
+index 62ed793..0000000
+--- a/t/cop.t
++++ /dev/null
+@@ -1,108 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/cop instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (8) {
+-    load();
+-    plan(tests => 8);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-my $package;
+-{
+-  package MyPackage;
+-  $package = &Devel::PPPort::CopSTASHPV();
+-}
+-print "# $package\n";
+-is($package, "MyPackage");
+-
+-my $file = &Devel::PPPort::CopFILE();
+-print "# $file\n";
+-ok($file =~ /cop/i);
+-
+-BEGIN {
+-  if (ivers($]) < ivers('5.006000')) {
+-    skip("Perl version too early", 8);
+-    exit;
+-  }
+-}
+-
+-BEGIN {
+-    package DB;
+-    no strict "refs";
+-    local $^P = 1;
+-    sub sub { &$DB::sub }
+-}
+-
+-{ package One; sub one { Devel::PPPort::caller_cx($_[0]) } }
+-{
+-    package Two;
+-    sub two { One::one(@_) }
+-    sub dbtwo {
+-        BEGIN { $^P = 1 }
+-        One::one(@_);
+-        BEGIN { $^P = 0 }
+-    }
+-}
+-
+-for (
+-    # This is rather confusing. The package is the package the call is
+-    # made *from*, the sub name is the sub the call is made *to*. When
+-    # DB::sub is involved the first call is to DB::sub from the calling
+-    # package, the second is to the real sub from package DB.
+-    [\&One::one, 0, qw/main one main one/],
+-    [\&One::one, 2, ],
+-    [\&Two::two, 0, qw/Two one Two one/],
+-    [\&Two::two, 1, qw/main two main two/],
+-    [\&Two::dbtwo, 0, qw/Two sub DB one/],
+-    [\&Two::dbtwo, 1, qw/main dbtwo main dbtwo/],
+-) {
+-    my ($sub, $arg, @want) = @$_;
+-    my @got = $sub->($arg);
+-    ok(eq_array(\@got, \@want));
+-}
+-
+diff --git a/t/exception.t b/t/exception.t
+deleted file mode 100644
+index 6e7434c..0000000
+--- a/t/exception.t
++++ /dev/null
+@@ -1,71 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/exception instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (7) {
+-    load();
+-    plan(tests => 7);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-my $rv;
+-
+-$Devel::PPPort::exception_caught = undef;
+-
+-$rv = eval { &Devel::PPPort::exception(0) };
+-is($@, '');
+-ok(defined $rv);
+-is($rv, 42);
+-is($Devel::PPPort::exception_caught, 0);
+-
+-$Devel::PPPort::exception_caught = undef;
+-
+-$rv = eval { &Devel::PPPort::exception(1) };
+-is($@, "boo\n");
+-ok(not defined $rv);
+-is($Devel::PPPort::exception_caught, 1);
+-
+diff --git a/t/format.t b/t/format.t
+deleted file mode 100644
+index 7c43c6f..0000000
+--- a/t/format.t
++++ /dev/null
+@@ -1,80 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/format instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (5) {
+-    load();
+-    plan(tests => 5);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-use Config;
+-
+-if (ivers($]) < ivers('5.004')) {
+-    skip 'skip: No newSVpvf support', 5;
+-    exit;
+-}
+-
+-my $num = 1.12345678901234567890;
+-
+-eval { Devel::PPPort::croak_NVgf($num) };
+-ok($@ =~ /^1.1234567890/);
+-
+-is(Devel::PPPort::sprintf_iv(-8), 'XX_-8_XX');
+-is(Devel::PPPort::sprintf_uv(15), 'XX_15_XX');
+-
+-my $ivsize = $Config::Config{ivsize};
+-if ($ivsize && ($ivsize == 4 || $ivsize == 8)) {
+-    my $ivmax = ($ivsize == 4) ? '2147483647' : '9223372036854775807';
+-    my $uvmax = ($ivsize == 4) ? '4294967295' : '18446744073709551615';
+-    is(Devel::PPPort::sprintf_ivmax(), $ivmax);
+-    is(Devel::PPPort::sprintf_uvmax(), $uvmax);
+-}
+-else {
+-    skip 'skip: unknown ivsize', 2;
+-}
+-
+diff --git a/t/grok.t b/t/grok.t
+deleted file mode 100644
+index 0755a42..0000000
+--- a/t/grok.t
++++ /dev/null
+@@ -1,66 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/grok instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (10) {
+-    load();
+-    plan(tests => 10);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-is(&Devel::PPPort::grok_number("42"), 42);
+-ok(!defined(&Devel::PPPort::grok_number("A")));
+-is(&Devel::PPPort::grok_bin("10000001"), 129);
+-is(&Devel::PPPort::grok_hex("deadbeef"), 0xdeadbeef);
+-is(&Devel::PPPort::grok_oct("377"), 255);
+-
+-is(&Devel::PPPort::Perl_grok_number("42"), 42);
+-ok(!defined(&Devel::PPPort::Perl_grok_number("A")));
+-is(&Devel::PPPort::Perl_grok_bin("10000001"), 129);
+-is(&Devel::PPPort::Perl_grok_hex("deadbeef"), 0xdeadbeef);
+-is(&Devel::PPPort::Perl_grok_oct("377"), 255);
+-
+diff --git a/t/gv.t b/t/gv.t
+deleted file mode 100644
+index f892fd1..0000000
+--- a/t/gv.t
++++ /dev/null
+@@ -1,67 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/gv instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (7) {
+-    load();
+-    plan(tests => 7);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-is(Devel::PPPort::GvSVn(), 1);
+-
+-is(Devel::PPPort::isGV_with_GP(), 2);
+-
+-is(Devel::PPPort::get_cvn_flags(), 3);
+-
+-is(Devel::PPPort::gv_fetchpvn_flags(), \*Devel::PPPort::VERSION);
+-
+-is(Devel::PPPort::gv_fetchsv("Devel::PPPort::VERSION"), \*Devel::PPPort::VERSION);
+-
+-is(Devel::PPPort::gv_init_type("sanity_check", 0, 0), "*main::sanity_check");
+-ok($::{sanity_check});
+-
+diff --git a/t/limits.t b/t/limits.t
+deleted file mode 100644
+index f29400a..0000000
+--- a/t/limits.t
++++ /dev/null
+@@ -1,59 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/limits instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (4) {
+-    load();
+-    plan(tests => 4);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-ok(&Devel::PPPort::iv_size());
+-ok(&Devel::PPPort::uv_size());
+-ok(&Devel::PPPort::iv_type());
+-ok(&Devel::PPPort::uv_type());
+-
+diff --git a/t/locale.t b/t/locale.t
+deleted file mode 100644
+index 7c400d0..0000000
+--- a/t/locale.t
++++ /dev/null
+@@ -1,67 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/locale instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (1) {
+-    load();
+-    plan(tests => 1);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-use Config;
+-
+-# We don't know for sure that we are in the global locale for testing.  But
+-# if this is unthreaded, it almost certainly is.  But Configure can be called
+-# to force POSIX locales on unthreaded systems.  If this becomes a problem
+-# this check could be beefed up.
+-if ($Config{usethreads}) {
+-    ok(1, "ironically we have to skip testing sync_locale under threads");
+-}
+-else {
+-    ok(&Devel::PPPort::sync_locale(), "sync_locale returns TRUE");
+-}
+-
+diff --git a/t/mPUSH.t b/t/mPUSH.t
+deleted file mode 100644
+index 00c6bba..0000000
+--- a/t/mPUSH.t
++++ /dev/null
+@@ -1,66 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/mPUSH instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (10) {
+-    load();
+-    plan(tests => 10);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-is(join(':', &Devel::PPPort::mPUSHs()), "foo:bar:42");
+-is(join(':', &Devel::PPPort::mPUSHp()), "one:two:three");
+-is(join(':', &Devel::PPPort::mPUSHn()), "0.5:-0.25:0.125");
+-is(join(':', &Devel::PPPort::mPUSHi()), "-1:2:-3");
+-is(join(':', &Devel::PPPort::mPUSHu()), "1:2:3");
+-
+-is(join(':', &Devel::PPPort::mXPUSHs()), "foo:bar:42");
+-is(join(':', &Devel::PPPort::mXPUSHp()), "one:two:three");
+-is(join(':', &Devel::PPPort::mXPUSHn()), "0.5:-0.25:0.125");
+-is(join(':', &Devel::PPPort::mXPUSHi()), "-1:2:-3");
+-is(join(':', &Devel::PPPort::mXPUSHu()), "1:2:3");
+-
+diff --git a/t/magic.t b/t/magic.t
+deleted file mode 100644
+index 743b418..0000000
+--- a/t/magic.t
++++ /dev/null
+@@ -1,229 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/magic instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (63) {
+-    load();
+-    plan(tests => 63);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-# Find proper magic
+-ok(my $obj1 = Devel::PPPort->new_with_mg());
+-is(Devel::PPPort::as_string($obj1), 'hello');
+-
+-# Find with no magic
+-my $obj = bless {}, 'Fake::Class';
+-is(Devel::PPPort::as_string($obj), "Sorry, your princess is in another castle.");
+-
+-# Find with other magic (not the magic we are looking for)
+-ok($obj = Devel::PPPort->new_with_other_mg());
+-is(Devel::PPPort::as_string($obj), "Sorry, your princess is in another castle.");
+-
+-# Okay, attempt to remove magic that isn't there
+-Devel::PPPort::remove_other_magic($obj1);
+-is(Devel::PPPort::as_string($obj1), 'hello');
+-
+-# Remove magic that IS there
+-Devel::PPPort::remove_null_magic($obj1);
+-is(Devel::PPPort::as_string($obj1), "Sorry, your princess is in another castle.");
+-
+-# Removing when no magic present
+-Devel::PPPort::remove_null_magic($obj1);
+-is(Devel::PPPort::as_string($obj1), "Sorry, your princess is in another castle.");
+-
+-use Tie::Hash;
+-my %h;
+-tie %h, 'Tie::StdHash';
+-$h{foo} = 'foo';
+-$h{bar} = '';
+-
+-&Devel::PPPort::sv_catpv_mg($h{foo}, 'bar');
+-is($h{foo}, 'foobar');
+-
+-&Devel::PPPort::sv_catpvn_mg($h{bar}, 'baz');
+-is($h{bar}, 'baz');
+-
+-&Devel::PPPort::sv_catsv_mg($h{foo}, '42');
+-is($h{foo}, 'foobar42');
+-
+-&Devel::PPPort::sv_setiv_mg($h{bar}, 42);
+-is($h{bar}, 42);
+-
+-&Devel::PPPort::sv_setnv_mg($h{PI}, 3.14159);
+-ok(abs($h{PI} - 3.14159) < 0.01);
+-
+-&Devel::PPPort::sv_setpv_mg($h{mhx}, 'mhx');
+-is($h{mhx}, 'mhx');
+-
+-&Devel::PPPort::sv_setpvn_mg($h{mhx}, 'Marcus');
+-is($h{mhx}, 'Marcus');
+-
+-&Devel::PPPort::sv_setsv_mg($h{sv}, 'SV');
+-is($h{sv}, 'SV');
+-
+-&Devel::PPPort::sv_setuv_mg($h{sv}, 4711);
+-is($h{sv}, 4711);
+-
+-&Devel::PPPort::sv_usepvn_mg($h{sv}, 'Perl');
+-is($h{sv}, 'Perl');
+-
+-# v1 is treated as a bareword in older perls...
+-my $ver = do { local $SIG{'__WARN__'} = sub {}; eval qq[v1.2.0] };
+-ok(ivers($]) < ivers("5.009") || $@ eq '');
+-ok(ivers($]) < ivers("5.009") || Devel::PPPort::SvVSTRING_mg($ver));
+-ok(!Devel::PPPort::SvVSTRING_mg(4711));
+-
+-my $foo = 'bar';
+-ok(Devel::PPPort::sv_magic_portable($foo));
+-ok($foo eq 'bar');
+-
+-    tie my $scalar, 'TieScalarCounter', 10;
+-    my $fetch = $scalar;
+-
+-    is tied($scalar)->{fetch}, 1;
+-    is tied($scalar)->{store}, 0;
+-    is Devel::PPPort::magic_SvIV_nomg($scalar), 10;
+-    is tied($scalar)->{fetch}, 1;
+-    is tied($scalar)->{store}, 0;
+-    is Devel::PPPort::magic_SvUV_nomg($scalar), 10;
+-    is tied($scalar)->{fetch}, 1;
+-    is tied($scalar)->{store}, 0;
+-    is Devel::PPPort::magic_SvNV_nomg($scalar), 10;
+-    is tied($scalar)->{fetch}, 1;
+-    is tied($scalar)->{store}, 0;
+-    is Devel::PPPort::magic_SvPV_nomg_nolen($scalar), 10;
+-    is tied($scalar)->{fetch}, 1;
+-    is tied($scalar)->{store}, 0;
+-    ok Devel::PPPort::magic_SvTRUE_nomg($scalar);
+-    is tied($scalar)->{fetch}, 1;
+-    is tied($scalar)->{store}, 0;
+-
+-    my $object = OverloadedObject->new('string', 5.5, 0);
+-
+-    is Devel::PPPort::magic_SvIV_nomg($object), 5;
+-    is Devel::PPPort::magic_SvUV_nomg($object), 5;
+-    is Devel::PPPort::magic_SvNV_nomg($object), 5.5;
+-    is Devel::PPPort::magic_SvPV_nomg_nolen($object), 'string';
+-    ok !Devel::PPPort::magic_SvTRUE_nomg($object);
+-
+-tie my $negative, 'TieScalarCounter', -1;
+-$fetch = $negative;
+-
+-is tied($negative)->{fetch}, 1;
+-is tied($negative)->{store}, 0;
+-is Devel::PPPort::magic_SvIV_nomg($negative), -1;
+-if (ivers($]) >= ivers("5.6")) {
+-    ok !Devel::PPPort::SVf_IVisUV($negative);
+-} else {
+-    skip 'SVf_IVisUV is unsupported', 1;
+-}
+-is tied($negative)->{fetch}, 1;
+-is tied($negative)->{store}, 0;
+-Devel::PPPort::magic_SvUV_nomg($negative);
+-if (ivers($]) >= ivers("5.6")) {
+-    ok !Devel::PPPort::SVf_IVisUV($negative);
+-} else {
+-    skip 'SVf_IVisUV is unsupported', 1;
+-}
+-is tied($negative)->{fetch}, 1;
+-is tied($negative)->{store}, 0;
+-
+-tie my $big, 'TieScalarCounter', Devel::PPPort::above_IV_MAX();
+-$fetch = $big;
+-
+-is tied($big)->{fetch}, 1;
+-is tied($big)->{store}, 0;
+-Devel::PPPort::magic_SvIV_nomg($big);
+-if (ivers($]) >= ivers("5.6")) {
+-    ok Devel::PPPort::SVf_IVisUV($big);
+-} else {
+-    skip 'SVf_IVisUV is unsupported', 1;
+-}
+-is tied($big)->{fetch}, 1;
+-is tied($big)->{store}, 0;
+-is Devel::PPPort::magic_SvUV_nomg($big), Devel::PPPort::above_IV_MAX();
+-if (ivers($]) >= ivers("5.6")) {
+-    ok Devel::PPPort::SVf_IVisUV($big);
+-} else {
+-    skip 'SVf_IVisUV is unsupported', 1;
+-}
+-is tied($big)->{fetch}, 1;
+-is tied($big)->{store}, 0;
+-
+-package TieScalarCounter;
+-
+-sub TIESCALAR {
+-    my ($class, $value) = @_;
+-    return bless { fetch => 0, store => 0, value => $value }, $class;
+-}
+-
+-sub FETCH {
+-    my ($self) = @_;
+-    $self->{fetch}++;
+-    return $self->{value};
+-}
+-
+-sub STORE {
+-    my ($self, $value) = @_;
+-    $self->{store}++;
+-    $self->{value} = $value;
+-}
+-
+-package OverloadedObject;
+-
+-sub new {
+-    my ($class, $str, $num, $bool) = @_;
+-    return bless { str => $str, num => $num, bool => $bool }, $class;
+-}
+-
+-use overload
+-    '""' => sub { $_[0]->{str} },
+-    '0+' => sub { $_[0]->{num} },
+-    'bool' => sub { $_[0]->{bool} },
+-    ;
+-
+diff --git a/t/memory.t b/t/memory.t
+deleted file mode 100644
+index fb42b21..0000000
+--- a/t/memory.t
++++ /dev/null
+@@ -1,56 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/memory instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (1) {
+-    load();
+-    plan(tests => 1);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-is(Devel::PPPort::checkmem(), 6);
+-
+diff --git a/t/mess.t b/t/mess.t
+deleted file mode 100644
+index 14a44b8..0000000
+--- a/t/mess.t
++++ /dev/null
+@@ -1,327 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/mess instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (102) {
+-    load();
+-    plan(tests => 102);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-BEGIN { if (ivers($]) < ivers('5.006')) { $^W = 0; } }
+-
+-my $warn;
+-my $die;
+-local $SIG{__WARN__} = sub { $warn = $_[0] };
+-local $SIG{__DIE__} = sub { $die = $_[0] };
+-
+-my $scalar_ref = \do {my $tmp = 10};
+-my $array_ref = [];
+-my $hash_ref = {};
+-my $obj = bless {}, 'Package';
+-
+-undef $die;
+-ok !defined eval { Devel::PPPort::croak_sv("\xE1\n") };
+-is $@, "\xE1\n";
+-is $die, "\xE1\n";
+-
+-undef $die;
+-ok !defined eval { Devel::PPPort::croak_sv(10) };
+-ok $@ =~ /^10 at \Q$0\E line /;
+-ok $die =~ /^10 at \Q$0\E line /;
+-
+-undef $die;
+-$@ = 'should not be visible (1)';
+-ok !defined eval {
+-    $@ = 'should not be visible (2)';
+-    Devel::PPPort::croak_sv('');
+-};
+-ok $@ =~ /^ at \Q$0\E line /;
+-ok $die =~ /^ at \Q$0\E line /;
+-
+-undef $die;
+-$@ = 'should not be visible';
+-ok !defined eval {
+-    $@ = 'this must be visible';
+-    Devel::PPPort::croak_sv($@)
+-};
+-ok $@ =~ /^this must be visible at \Q$0\E line /;
+-ok $die =~ /^this must be visible at \Q$0\E line /;
+-
+-undef $die;
+-$@ = 'should not be visible';
+-ok !defined eval {
+-    $@ = "this must be visible\n";
+-    Devel::PPPort::croak_sv($@)
+-};
+-is $@, "this must be visible\n";
+-is $die, "this must be visible\n";
+-
+-undef $die;
+-$@ = 'should not be visible';
+-ok !defined eval {
+-    $@ = 'this must be visible';
+-    Devel::PPPort::croak_sv_errsv()
+-};
+-ok $@ =~ /^this must be visible at \Q$0\E line /;
+-ok $die =~ /^this must be visible at \Q$0\E line /;
+-
+-undef $die;
+-$@ = 'should not be visible';
+-ok !defined eval {
+-    $@ = "this must be visible\n";
+-    Devel::PPPort::croak_sv_errsv()
+-};
+-is $@, "this must be visible\n";
+-is $die, "this must be visible\n";
+-
+-undef $die;
+-ok !defined eval { Devel::PPPort::croak_sv_with_counter("message\n") };
+-is $@, "message\n";
+-is Devel::PPPort::get_counter(), 1;
+-
+-undef $die;
+-ok !defined eval { Devel::PPPort::croak_sv('') };
+-ok $@ =~ /^ at \Q$0\E line /;
+-ok $die =~ /^ at \Q$0\E line /;
+-
+-undef $die;
+-ok !defined eval { Devel::PPPort::croak_sv("\xE1") };
+-ok $@ =~ /^\xE1 at \Q$0\E line /;
+-ok $die =~ /^\xE1 at \Q$0\E line /;
+-
+-undef $die;
+-ok !defined eval { Devel::PPPort::croak_sv("\xC3\xA1") };
+-ok $@ =~ /^\xC3\xA1 at \Q$0\E line /;
+-ok $die =~ /^\xC3\xA1 at \Q$0\E line /;
+-
+-undef $warn;
+-Devel::PPPort::warn_sv("\xE1\n");
+-is $warn, "\xE1\n";
+-
+-undef $warn;
+-Devel::PPPort::warn_sv(10);
+-ok $warn =~ /^10 at \Q$0\E line /;
+-
+-undef $warn;
+-Devel::PPPort::warn_sv('');
+-ok $warn =~ /^ at \Q$0\E line /;
+-
+-undef $warn;
+-Devel::PPPort::warn_sv("\xE1");
+-ok $warn =~ /^\xE1 at \Q$0\E line /;
+-
+-undef $warn;
+-Devel::PPPort::warn_sv("\xC3\xA1");
+-ok $warn =~ /^\xC3\xA1 at \Q$0\E line /;
+-
+-is Devel::PPPort::mess_sv("\xE1\n", 0), "\xE1\n";
+-is Devel::PPPort::mess_sv(do {my $tmp = "\xE1\n"}, 1), "\xE1\n";
+-
+-ok Devel::PPPort::mess_sv(10, 0) =~ /^10 at \Q$0\E line /;
+-ok Devel::PPPort::mess_sv(do {my $tmp = 10}, 1) =~ /^10 at \Q$0\E line /;
+-
+-ok Devel::PPPort::mess_sv('', 0) =~ /^ at \Q$0\E line /;
+-ok Devel::PPPort::mess_sv(do {my $tmp = ''}, 1) =~ /^ at \Q$0\E line /;
+-
+-ok Devel::PPPort::mess_sv("\xE1", 0) =~ /^\xE1 at \Q$0\E line /;
+-ok Devel::PPPort::mess_sv(do {my $tmp = "\xE1"}, 1) =~ /^\xE1 at \Q$0\E line /;
+-
+-ok Devel::PPPort::mess_sv("\xC3\xA1", 0) =~ /^\xC3\xA1 at \Q$0\E line /;
+-ok Devel::PPPort::mess_sv(do {my $tmp = "\xC3\xA1"}, 1) =~ /^\xC3\xA1 at \Q$0\E line /;
+-
+-if (ivers($]) >= ivers('5.006')) {
+-    BEGIN { if (ivers($]) >= ivers('5.006') && ivers($]) < ivers('5.008')) { require utf8; utf8->import(); } }
+-
+-    undef $die;
+-    ok !defined eval { Devel::PPPort::croak_sv("\x{100}\n") };
+-    if (ivers($]) < ivers('5.007001') || ivers($]) > ivers('5.007003')) {
+-        is $@, "\x{100}\n";
+-    } else {
+-        skip 'skip: broken utf8 support in die hook', 1;
+-    }
+-    if (ivers($]) < ivers('5.007001') || ivers($]) > ivers('5.008')) {
+-        is $die, "\x{100}\n";
+-    } else {
+-        skip 'skip: broken utf8 support in die hook', 1;
+-    }
+-
+-    undef $die;
+-    ok !defined eval { Devel::PPPort::croak_sv("\x{100}") };
+-    if (ivers($]) < ivers('5.007001') || ivers($]) > ivers('5.007003')) {
+-        ok $@ =~ /^\x{100} at \Q$0\E line /;
+-    } else {
+-        skip 'skip: broken utf8 support in die hook', 1;
+-    }
+-    if (ivers($]) < ivers('5.007001') || ivers($]) > ivers('5.008')) {
+-        ok $die =~ /^\x{100} at \Q$0\E line /;
+-    } else {
+-        skip 'skip: broken utf8 support in die hook', 1;
+-    }
+-
+-    if (ivers($]) < ivers('5.007001') || ivers($]) > ivers('5.008')) {
+-        undef $warn;
+-        Devel::PPPort::warn_sv("\x{100}\n");
+-        is $warn, "\x{100}\n";
+-
+-        undef $warn;
+-        Devel::PPPort::warn_sv("\x{100}");
+-        ok (my $tmp = $warn) =~ /^\x{100} at \Q$0\E line /;
+-    } else {
+-        skip 'skip: broken utf8 support in warn hook', 2;
+-    }
+-
+-    is Devel::PPPort::mess_sv("\x{100}\n", 0), "\x{100}\n";
+-    is Devel::PPPort::mess_sv(do {my $tmp = "\x{100}\n"}, 1), "\x{100}\n";
+-
+-    ok Devel::PPPort::mess_sv("\x{100}", 0) =~ /^\x{100} at \Q$0\E line /;
+-    ok Devel::PPPort::mess_sv(do {my $tmp = "\x{100}"}, 1) =~ /^\x{100} at \Q$0\E line /;
+-} else {
+-    skip 'skip: no utf8 support', 12;
+-}
+-
+-if (ord('A') != 65) {
+-    skip 'skip: no ASCII support', 24;
+-} elsif (      ivers($]) >= ivers('5.008')
+-         &&    ivers($]) != ivers('5.013000')     # Broken in these ranges
+-         && ! (ivers($]) >= ivers('5.011005') && ivers($]) <= ivers('5.012000')))
+-{
+-    undef $die;
+-    ok !defined eval { Devel::PPPort::croak_sv(eval '"\N{U+E1}\n"') };
+-    is $@, "\xE1\n";
+-    is $die, "\xE1\n";
+-
+-    undef $die;
+-    ok !defined eval { Devel::PPPort::croak_sv(eval '"\N{U+E1}"') };
+-    ok $@ =~ /^\xE1 at \Q$0\E line /;
+-    ok $die =~ /^\xE1 at \Q$0\E line /;
+-
+-    {
+-        undef $die;
+-        my $expect = eval '"\N{U+C3}\N{U+A1}\n"';
+-        ok !defined eval { Devel::PPPort::croak_sv("\xC3\xA1\n") };
+-        is $@, $expect;
+-        is $die, $expect;
+-    }
+-
+-    {
+-        undef $die;
+-        my $expect = eval 'qr/^\N{U+C3}\N{U+A1} at \Q$0\E line /';
+-        ok !defined eval { Devel::PPPort::croak_sv("\xC3\xA1") };
+-        ok $@ =~ $expect;
+-        ok $die =~ $expect;
+-    }
+-
+-    undef $warn;
+-    Devel::PPPort::warn_sv(eval '"\N{U+E1}\n"');
+-    is $warn, "\xE1\n";
+-
+-    undef $warn;
+-    Devel::PPPort::warn_sv(eval '"\N{U+E1}"');
+-    ok $warn =~ /^\xE1 at \Q$0\E line /;
+-
+-    undef $warn;
+-    Devel::PPPort::warn_sv("\xC3\xA1\n");
+-    is $warn, eval '"\N{U+C3}\N{U+A1}\n"';
+-
+-    undef $warn;
+-    Devel::PPPort::warn_sv("\xC3\xA1");
+-    ok $warn =~ eval 'qr/^\N{U+C3}\N{U+A1} at \Q$0\E line /';
+-
+-    if (ivers($]) < ivers('5.004')) {
+-        skip 'skip: no support for mess_sv', 8;
+-    }
+-    else {
+-      is Devel::PPPort::mess_sv(eval('"\N{U+E1}\n"'), 0), eval '"\N{U+E1}\n"';
+-      is Devel::PPPort::mess_sv(do {my $tmp = eval '"\N{U+E1}\n"'}, 1), eval '"\N{U+E1}\n"';
+-
+-      ok Devel::PPPort::mess_sv(eval('"\N{U+E1}"'), 0) =~ eval 'qr/^\N{U+E1} at \Q$0\E line /';
+-      ok Devel::PPPort::mess_sv(do {my $tmp = eval '"\N{U+E1}"'}, 1) =~ eval 'qr/^\N{U+E1} at \Q$0\E line /';
+-
+-      is Devel::PPPort::mess_sv("\xC3\xA1\n", 0), eval '"\N{U+C3}\N{U+A1}\n"';
+-      is Devel::PPPort::mess_sv(do {my $tmp = "\xC3\xA1\n"}, 1), eval '"\N{U+C3}\N{U+A1}\n"';
+-
+-      ok Devel::PPPort::mess_sv("\xC3\xA1", 0) =~ eval 'qr/^\N{U+C3}\N{U+A1} at \Q$0\E line /';
+-      ok Devel::PPPort::mess_sv(do {my $tmp = "\xC3\xA1"}, 1) =~ eval 'qr/^\N{U+C3}\N{U+A1} at \Q$0\E line /';
+-    }
+-} else {
+-    skip 'skip: no support for \N{U+..} syntax', 24;
+-}
+-
+-if (ivers($]) >= ivers('5.007003') or (ivers($]) >= ivers('5.006001') and ivers($]) < ivers('5.007'))) {
+-    undef $die;
+-    ok !defined eval { Devel::PPPort::croak_sv($scalar_ref) };
+-    ok $@ == $scalar_ref;
+-    ok $die == $scalar_ref;
+-
+-    undef $die;
+-    ok !defined eval { Devel::PPPort::croak_sv($array_ref) };
+-    ok $@ == $array_ref;
+-    ok $die == $array_ref;
+-
+-    undef $die;
+-    ok !defined eval { Devel::PPPort::croak_sv($hash_ref) };
+-    ok $@ == $hash_ref;
+-    ok $die == $hash_ref;
+-
+-    undef $die;
+-    ok !defined eval { Devel::PPPort::croak_sv($obj) };
+-    ok $@ == $obj;
+-    ok $die == $obj;
+-} else {
+-    skip 'skip: no support for exceptions', 12;
+-}
+-
+-ok !defined eval { Devel::PPPort::croak_no_modify() };
+-ok $@ =~ /^Modification of a read-only value attempted at \Q$0\E line /;
+-
+-ok !defined eval { Devel::PPPort::croak_memory_wrap() };
+-ok $@ =~ /^panic: memory wrap at \Q$0\E line /;
+-
+-ok !defined eval { Devel::PPPort::croak_xs_usage("params") };
+-ok $@ =~ /^Usage: Devel::PPPort::croak_xs_usage\(params\) at \Q$0\E line /;
+-
+diff --git a/t/misc.t b/t/misc.t
+deleted file mode 100644
+index e9d176a..0000000
+--- a/t/misc.t
++++ /dev/null
+@@ -1,500 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/misc instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (26827) {
+-    load();
+-    plan(tests => 26827);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-use vars qw($my_sv @my_av %my_hv);
+-
+-ok(&Devel::PPPort::boolSV(1), "Verify boolSV(1) is true");
+-ok(!&Devel::PPPort::boolSV(0), "Verify boolSV(0) is false");
+-
+-$_ = "Fred";
+-is(&Devel::PPPort::DEFSV(), "Fred", '$_ is FRED; Verify DEFSV is FRED');
+-is(&Devel::PPPort::UNDERBAR(), "Fred", 'And verify UNDERBAR is FRED');
+-
+-if (ivers($]) >= ivers(5.9.2) && ivers($]) < ivers(5.23)) {
+-  eval q{
+-    no warnings "deprecated";
+-    no if $^V >= v5.17.9, warnings => "experimental::lexical_topic";
+-    my $_ = "Tony";
+-    is(&Devel::PPPort::DEFSV(), "Fred", 'lexical_topic eval: $_ is Tony; Verify DEFSV is Fred');
+-    is(&Devel::PPPort::UNDERBAR(), "Tony", 'And verify UNDERBAR is Tony');
+-  };
+-  die __FILE__ . __LINE__ . ": $@" if $@;
+-}
+-else {
+-  skip("perl version outside testing range of lexical_topic", 2);
+-}
+-
+-my @r = &Devel::PPPort::DEFSV_modify();
+-
+-ok(@r == 3, "Verify got 3 elements");
+-is($r[0], 'Fred');
+-is($r[1], 'DEFSV');
+-is($r[2], 'Fred');
+-
+-is(&Devel::PPPort::DEFSV(), "Fred");
+-
+-eval { 1 };
+-ok(!&Devel::PPPort::ERRSV(), "Verify ERRSV on true is false");
+-eval { cannot_call_this_one() };
+-ok(&Devel::PPPort::ERRSV(), "Verify ERRSV on false is true");
+-
+-ok(&Devel::PPPort::gv_stashpvn('Devel::PPPort', 0));
+-ok(!&Devel::PPPort::gv_stashpvn('does::not::exist', 0));
+-ok(&Devel::PPPort::gv_stashpvn('does::not::exist', 1));
+-
+-$my_sv = 1;
+-ok(&Devel::PPPort::get_sv('my_sv', 0));
+-ok(!&Devel::PPPort::get_sv('not_my_sv', 0));
+-ok(&Devel::PPPort::get_sv('not_my_sv', 1));
+-
+-@my_av = (1);
+-ok(&Devel::PPPort::get_av('my_av', 0));
+-ok(!&Devel::PPPort::get_av('not_my_av', 0));
+-ok(&Devel::PPPort::get_av('not_my_av', 1));
+-
+-%my_hv = (a=>1);
+-ok(&Devel::PPPort::get_hv('my_hv', 0));
+-ok(!&Devel::PPPort::get_hv('not_my_hv', 0));
+-ok(&Devel::PPPort::get_hv('not_my_hv', 1));
+-
+-sub my_cv { 1 };
+-ok(&Devel::PPPort::get_cv('my_cv', 0));
+-ok(!&Devel::PPPort::get_cv('not_my_cv', 0));
+-ok(&Devel::PPPort::get_cv('not_my_cv', 1));
+-
+-is(Devel::PPPort::dXSTARG(42), 43);
+-is(Devel::PPPort::dAXMARK(4711), 4710);
+-
+-is(Devel::PPPort::prepush(), 42);
+-
+-is(join(':', Devel::PPPort::xsreturn(0)), 'test1');
+-is(join(':', Devel::PPPort::xsreturn(1)), 'test1:test2');
+-
+-is(Devel::PPPort::PERL_ABS(42), 42, "Verify PERL_ABS(42) is 42");
+-is(Devel::PPPort::PERL_ABS(-13), 13, "Verify PERL_ABS(-13) is 13");
+-
+-is(Devel::PPPort::SVf(42), ivers($]) >= ivers(5.4) ? '[42]' : '42');
+-is(Devel::PPPort::SVf('abc'), ivers($]) >= ivers(5.4) ? '[abc]' : 'abc');
+-
+-is(&Devel::PPPort::Perl_ppaddr_t("FOO"), "foo");
+-
+-is(&Devel::PPPort::ptrtests(), 63);
+-
+-is(&Devel::PPPort::OpSIBLING_tests(), 0);
+-
+-if (ivers($]) >= ivers(5.9)) {
+-  eval q{
+-    is(&Devel::PPPort::check_HeUTF8("hello"), "norm");
+-    is(&Devel::PPPort::check_HeUTF8("\N{U+263a}"), "utf8");
+-  };
+-} else {
+-  skip("Too early perl version", 2);
+-}
+-
+-@r = &Devel::PPPort::check_c_array();
+-is($r[0], 4);
+-is($r[1], "13");
+-
+-ok(!Devel::PPPort::SvRXOK(""));
+-ok(!Devel::PPPort::SvRXOK(bless [], "Regexp"));
+-
+-if (ivers($]) < ivers(5.5)) {
+-        skip 'no qr// objects in this perl', 2;
+-} else {
+-        my $qr = eval 'qr/./';
+-        ok(Devel::PPPort::SvRXOK($qr), "SVRXOK(qr) is true");
+-        ok(Devel::PPPort::SvRXOK(bless $qr, "Surprise"));
+-}
+-
+-ok( Devel::PPPort::NATIVE_TO_LATIN1(0xB6) == 0xB6);
+-ok( Devel::PPPort::NATIVE_TO_LATIN1(0x1) == 0x1);
+-ok( Devel::PPPort::NATIVE_TO_LATIN1(ord("A")) == 0x41);
+-ok( Devel::PPPort::NATIVE_TO_LATIN1(ord("0")) == 0x30);
+-
+-ok( Devel::PPPort::LATIN1_TO_NATIVE(0xB6) == 0xB6, "Verify LATIN1_TO_NATIVE(0xB6) is 0xB6");
+-if (ord("A") == 65) {
+-    ok( Devel::PPPort::LATIN1_TO_NATIVE(0x41) == 0x41);
+-    ok( Devel::PPPort::LATIN1_TO_NATIVE(0x30) == 0x30);
+-}
+-else {
+-    ok( Devel::PPPort::LATIN1_TO_NATIVE(0x41) == 0xC1);
+-    ok( Devel::PPPort::LATIN1_TO_NATIVE(0x30) == 0xF0);
+-}
+-
+-ok(  Devel::PPPort::isALNUMC_L1(ord("5")));
+-ok(  Devel::PPPort::isALNUMC_L1(0xFC));
+-ok(! Devel::PPPort::isALNUMC_L1(0xB6));
+-
+-ok(  Devel::PPPort::isOCTAL(ord("7")), "Verify '7' is OCTAL");
+-ok(! Devel::PPPort::isOCTAL(ord("8")), "Verify '8' isn't OCTAL");
+-
+-ok(  Devel::PPPort::isOCTAL_A(ord("0")), "Verify '0' is OCTAL_A");
+-ok(! Devel::PPPort::isOCTAL_A(ord("9")), "Verify '9' isn't OCTAL_A");
+-
+-ok(  Devel::PPPort::isOCTAL_L1(ord("2")), "Verify '2' is OCTAL_L1");
+-ok(! Devel::PPPort::isOCTAL_L1(ord("8")), "Verify '8' isn't OCTAL_L1");
+-
+-my $way_too_early_msg = 'UTF-8 not implemented on this perl';
+-
+-# For the other properties, we test every code point from 0.255, and a
+-# smattering of higher ones.  First populate a hash with keys like '65:ALPHA'
+-# to indicate that the code point there is alphabetic
+-my $i;
+-my %types;
+-for $i (0x41..0x5A, 0x61..0x7A, 0xAA, 0xB5, 0xBA, 0xC0..0xD6, 0xD8..0xF6,
+-        0xF8..0x101)
+-{
+-    my $native = Devel::PPPort::LATIN1_TO_NATIVE($i);
+-    $types{"$native:ALPHA"} = 1;
+-    $types{"$native:ALPHANUMERIC"} = 1;
+-    $types{"$native:IDFIRST"} = 1;
+-    $types{"$native:IDCONT"} = 1;
+-    $types{"$native:PRINT"} = 1;
+-    $types{"$native:WORDCHAR"} = 1;
+-}
+-for $i (0x30..0x39, 0x660, 0xFF19) {
+-    my $native = Devel::PPPort::LATIN1_TO_NATIVE($i);
+-    $types{"$native:ALPHANUMERIC"} = 1;
+-    $types{"$native:DIGIT"} = 1;
+-    $types{"$native:IDCONT"} = 1;
+-    $types{"$native:WORDCHAR"} = 1;
+-    $types{"$native:GRAPH"} = 1;
+-    $types{"$native:PRINT"} = 1;
+-    $types{"$native:XDIGIT"} = 1 if $i < 255 || ($i >= 0xFF10 && $i <= 0xFF19);
+-}
+-
+-for $i (0..0x7F) {
+-    my $native = Devel::PPPort::LATIN1_TO_NATIVE($i);
+-    $types{"$native:ASCII"} = 1;
+-}
+-for $i (0..0x1f, 0x7F..0x9F) {
+-    my $native = Devel::PPPort::LATIN1_TO_NATIVE($i);
+-    $types{"$native:CNTRL"} = 1;
+-}
+-for $i (0x21..0x7E, 0xA1..0x101, 0x660) {
+-    my $native = Devel::PPPort::LATIN1_TO_NATIVE($i);
+-    $types{"$native:GRAPH"} = 1;
+-    $types{"$native:PRINT"} = 1;
+-}
+-for $i (0x09, 0x20, 0xA0) {
+-    my $native = Devel::PPPort::LATIN1_TO_NATIVE($i);
+-    $types{"$native:BLANK"} = 1;
+-    $types{"$native:SPACE"} = 1;
+-    $types{"$native:PSXSPC"} = 1;
+-    $types{"$native:PRINT"} = 1 if $i > 0x09;
+-}
+-for $i (0x09..0x0D, 0x85, 0x2029) {
+-    my $native = Devel::PPPort::LATIN1_TO_NATIVE($i);
+-    $types{"$native:SPACE"} = 1;
+-    $types{"$native:PSXSPC"} = 1;
+-}
+-for $i (0x41..0x5A, 0xC0..0xD6, 0xD8..0xDE, 0x100) {
+-    my $native = Devel::PPPort::LATIN1_TO_NATIVE($i);
+-    $types{"$native:UPPER"} = 1;
+-    $types{"$native:XDIGIT"} = 1 if $i < 0x47;
+-}
+-for $i (0x61..0x7A, 0xAA, 0xB5, 0xBA, 0xDF..0xF6, 0xF8..0xFF, 0x101) {
+-    my $native = Devel::PPPort::LATIN1_TO_NATIVE($i);
+-    $types{"$native:LOWER"} = 1;
+-    $types{"$native:XDIGIT"} = 1 if $i < 0x67;
+-}
+-for $i (0x21..0x2F, 0x3A..0x40, 0x5B..0x60, 0x7B..0x7E, 0xB6, 0xA1, 0xA7, 0xAB,
+-        0xB7, 0xBB, 0xBF, 0x5BE)
+-{
+-    my $native = Devel::PPPort::LATIN1_TO_NATIVE($i);
+-    $types{"$native:PUNCT"} = 1;
+-    $types{"$native:GRAPH"} = 1;
+-    $types{"$native:PRINT"} = 1;
+-}
+-
+-$i = ord('_');
+-$types{"$i:WORDCHAR"} = 1;
+-$types{"$i:IDFIRST"} = 1;
+-$types{"$i:IDCONT"} = 1;
+-
+-# Now find all the unique code points included above.
+-my %code_points_to_test;
+-my $key;
+-for $key (keys %types) {
+-    $key =~ s/:.*//;
+-    $code_points_to_test{$key} = 1;
+-}
+-
+-# And test each one
+-for $i (sort { $a <=> $b } keys %code_points_to_test) {
+-    my $native = Devel::PPPort::LATIN1_TO_NATIVE($i);
+-    my $hex = sprintf("0x%02X", $native);
+-
+-    # And for each code point test each of the classes
+-    my $class;
+-    for $class (qw(ALPHA ALPHANUMERIC ASCII BLANK CNTRL DIGIT GRAPH IDCONT
+-                   IDFIRST LOWER PRINT PSXSPC PUNCT SPACE UPPER WORDCHAR
+-                   XDIGIT))
+-    {
+-        if ($i < 256) {  # For the ones that can fit in a byte, test each of
+-                         # three macros.
+-            my $suffix;
+-            for $suffix ("", "_A", "_L1", "_uvchr") {
+-                my $should_be = ($i > 0x7F && $suffix !~ /_(uvchr|L1)/)
+-                                ? 0     # Fail on non-ASCII unless unicode
+-                                : ($types{"$native:$class"} || 0);
+-                if (ivers($]) < ivers(5.6) && $suffix eq '_uvchr') {
+-                    skip("No UTF-8 on this perl", 1);
+-                    next;
+-                }
+-
+-                my $eval_string = "Devel::PPPort::is${class}$suffix($hex)";
+-                local $SIG{__WARN__} = sub {};
+-                my $is = eval $eval_string || 0;
+-                die "eval 'For $i: $eval_string' gave $@" if $@;
+-                is($is, $should_be, "'$eval_string'");
+-            }
+-        }
+-
+-        # For all code points, test the '_utf8' macros
+-        my $sub_fcn;
+-        for $sub_fcn ("", "_LC") {
+-            my $skip = "";
+-            if (ivers($]) < ivers(5.6)) {
+-                $skip = $way_too_early_msg;
+-            }
+-            elsif (ivers($]) < ivers(5.7) && $native > 255) {
+-                $skip = "Perls earlier than 5.7 give wrong answers for above Latin1 code points";
+-            }
+-            elsif (ivers($]) <= ivers(5.11.3) && $native == 0x2029 && ($class eq 'PRINT' || $class eq 'GRAPH')) {
+-                $skip = "Perls earlier than 5.11.3 considered high space characters as isPRINT and isGRAPH";
+-            }
+-            elsif ($sub_fcn eq '_LC' && $i < 256) {
+-                $skip = "Testing of code points whose results depend on locale is skipped ";
+-            }
+-            my $fcn = "Devel::PPPort::is${class}${sub_fcn}_utf8_safe";
+-            my $utf8;
+-
+-            if ($skip) {
+-                skip $skip, 1;
+-            }
+-            else {
+-                $utf8 = quotemeta Devel::PPPort::uvchr_to_utf8($native);
+-                my $should_be = $types{"$native:$class"} || 0;
+-                my $eval_string = "$fcn(\"$utf8\", 0)";
+-                local $SIG{__WARN__} = sub {};
+-                my $is = eval $eval_string || 0;
+-                die "eval 'For $i, $eval_string' gave $@" if $@;
+-                is($is, $should_be, sprintf("For U+%04X '%s'", $native, $eval_string));
+-            }
+-
+-            # And for the high code points, test that a too short malformation (the
+-            # -1) causes it to fail
+-            if ($i > 255) {
+-                if ($skip) {
+-                    skip $skip, 1;
+-                }
+-                elsif (ivers($]) >= ivers(5.25.9)) {
+-                    skip("Prints an annoying error message that khw doesn't know how to easily suppress", 1);
+-                }
+-                else {
+-                    my $eval_string = "$fcn(\"$utf8\", -1)";
+-                    local $SIG{__WARN__} = sub {};
+-                    my $is = eval "$eval_string" || 0;
+-                    die "eval '$eval_string' gave $@" if $@;
+-                    is($is, 0, sprintf("For U+%04X '%s'", $native, $eval_string));
+-                }
+-            }
+-        }
+-    }
+-}
+-
+-my %case_changing = ( 'LOWER' => [ [ ord('A'), ord('a') ],
+-                                   [ Devel::PPPort::LATIN1_TO_NATIVE(0xC0),
+-                                     Devel::PPPort::LATIN1_TO_NATIVE(0xE0) ],
+-                                   [ 0x100, 0x101 ],
+-                                 ],
+-                      'FOLD'  => [ [ ord('C'), ord('c') ],
+-                                   [ Devel::PPPort::LATIN1_TO_NATIVE(0xC0),
+-                                     Devel::PPPort::LATIN1_TO_NATIVE(0xE0) ],
+-                                   [ 0x104, 0x105 ],
+-                                   [ Devel::PPPort::LATIN1_TO_NATIVE(0xDF),
+-                                     'ss' ],
+-                                 ],
+-                      'UPPER' => [ [ ord('a'), ord('A'),  ],
+-                                   [ Devel::PPPort::LATIN1_TO_NATIVE(0xE0),
+-                                     Devel::PPPort::LATIN1_TO_NATIVE(0xC0) ],
+-                                   [ 0x101, 0x100 ],
+-                                   [ Devel::PPPort::LATIN1_TO_NATIVE(0xDF),
+-                                     'SS' ],
+-                                 ],
+-                      'TITLE' => [ [ ord('c'), ord('C'),  ],
+-                                   [ Devel::PPPort::LATIN1_TO_NATIVE(0xE2),
+-                                     Devel::PPPort::LATIN1_TO_NATIVE(0xC2) ],
+-                                   [ 0x103, 0x102 ],
+-                                   [ Devel::PPPort::LATIN1_TO_NATIVE(0xDF),
+-                                     'Ss' ],
+-                                 ],
+-                    );
+-
+-my $name;
+-for $name (keys %case_changing) {
+-    my @code_points_to_test = @{$case_changing{$name}};
+-    my $unchanged;
+-    for $unchanged (@code_points_to_test) {
+-        my @pair = @$unchanged;
+-        my $original = $pair[0];
+-        my $changed = $pair[1];
+-        my $utf8_changed = $changed;
+-        my $is_cp = $utf8_changed =~ /^\d+$/;
+-        my $should_be_bytes;
+-        if (ivers($]) >= ivers(5.6)) {
+-            if ($is_cp) {
+-                $utf8_changed = Devel::PPPort::uvchr_to_utf8($changed);
+-                $should_be_bytes = Devel::PPPort::UTF8_SAFE_SKIP($utf8_changed, 0);
+-            }
+-            else {
+-                die("Test currently doesn't work for non-ASCII multi-char case changes") if eval '$utf8_changed =~ /[[:^ascii:]]/';
+-                $should_be_bytes = length $utf8_changed;
+-            }
+-        }
+-
+-        my $fcn = "to${name}_uvchr";
+-        my $skip = "";
+-
+-        if (ivers($]) < ivers(5.6)) {
+-            $skip = $way_too_early_msg;
+-        }
+-        elsif (! $is_cp) {
+-            $skip = "Can't do uvchr on a multi-char string";
+-        }
+-        if ($skip) {
+-            skip $skip, 4;
+-        }
+-        else {
+-            if ($is_cp) {
+-                $utf8_changed = Devel::PPPort::uvchr_to_utf8($changed);
+-                $should_be_bytes = Devel::PPPort::UTF8_SAFE_SKIP($utf8_changed, 0);
+-            }
+-            else {
+-                my $non_ascii_re = (ivers($]) >= ivers(5.6)) ? '[[:^ascii:]]' : '[^\x00-\x7F]';
+-                die("Test currently doesn't work for non-ASCII multi-char case changes") if eval '$utf8_changed =~ /$non_ascii_re/';
+-                $should_be_bytes = length $utf8_changed;
+-            }
+-
+-            my $ret = eval "Devel::PPPort::$fcn($original)";
+-            my $fail = $@;  # Have to save $@, as it gets destroyed
+-            is ($fail, "", "$fcn($original) didn't fail");
+-            my $first = (ivers($]) != ivers(5.6))
+-                        ? substr($utf8_changed, 0, 1)
+-                        : $utf8_changed, 0, 1;
+-            is($ret->[0], ord $first,
+-               "ord of $fcn($original) is $changed");
+-            is($ret->[1], $utf8_changed,
+-               "UTF-8 of of $fcn($original) is correct");
+-            is($ret->[2], $should_be_bytes,
+-               "Length of $fcn($original) is $should_be_bytes");
+-        }
+-
+-        my $truncate;
+-        for $truncate (0..2) {
+-            my $skip;
+-            if (ivers($]) < ivers(5.6)) {
+-                $skip = $way_too_early_msg;
+-            }
+-            elsif (! $is_cp && ivers($]) < ivers(5.7.3)) {
+-                $skip = "Multi-character case change not implemented until 5.7.3";
+-            }
+-            elsif ($truncate == 2 && ivers($]) > ivers(5.25.8)) {
+-                $skip = "Zero length inputs cause assertion failure; test dies in modern perls";
+-            }
+-            elsif ($truncate > 0 && length $changed > 1) {
+-                $skip = "Don't test shortened multi-char case changes";
+-            }
+-            elsif ($truncate > 0 && Devel::PPPort::UVCHR_IS_INVARIANT($original)) {
+-                $skip = "Don't try to test shortened single bytes";
+-            }
+-            if ($skip) {
+-                skip $skip, 4;
+-            }
+-            else {
+-                my $fcn = "to${name}_utf8_safe";
+-                my $utf8 = quotemeta Devel::PPPort::uvchr_to_utf8($original);
+-                my $real_truncate = ($truncate < 2)
+-                                    ? $truncate : $should_be_bytes;
+-                my $eval_string = "Devel::PPPort::$fcn(\"$utf8\", $real_truncate)";
+-                my $ret = eval "no warnings; $eval_string" || 0;
+-                my $fail = $@;  # Have to save $@, as it gets destroyed
+-                if ($truncate == 0) {
+-                    is ($fail, "", "Didn't fail on full length input");
+-                    my $first = (ivers($]) != ivers(5.6))
+-                                ? substr($utf8_changed, 0, 1)
+-                                : $utf8_changed, 0, 1;
+-                    is($ret->[0], ord $first,
+-                       "ord of $fcn($original) is $changed");
+-                    is($ret->[1], $utf8_changed,
+-                       "UTF-8 of of $fcn($original) is correct");
+-                    is($ret->[2], $should_be_bytes,
+-                    "Length of $fcn($original) is $should_be_bytes");
+-                }
+-                else {
+-                    is ($fail, eval 'qr/Malformed UTF-8 character/',
+-                        "Gave appropriate error for short char: $original");
+-                    skip("Expected failure means remaining tests for"
+-                       . " this aren't relevant", 3);
+-                }
+-            }
+-        }
+-    }
+-}
+-
+-is(&Devel::PPPort::av_top_index([1,2,3]), 2);
+-is(&Devel::PPPort::av_tindex([1,2,3,4]), 3);
+-is(&Devel::PPPort::av_count([1,2,3,4]), 4);
+-
+diff --git a/t/newCONSTSUB.t b/t/newCONSTSUB.t
+deleted file mode 100644
+index 663dd01..0000000
+--- a/t/newCONSTSUB.t
++++ /dev/null
+@@ -1,63 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/newCONSTSUB instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (3) {
+-    load();
+-    plan(tests => 3);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-&Devel::PPPort::call_newCONSTSUB_1();
+-is(&Devel::PPPort::test_value_1(), 1);
+-
+-&Devel::PPPort::call_newCONSTSUB_2();
+-is(&Devel::PPPort::test_value_2(), 2);
+-
+-&Devel::PPPort::call_newCONSTSUB_3();
+-is(&Devel::PPPort::test_value_3(), 3);
+-
+diff --git a/t/newRV.t b/t/newRV.t
+deleted file mode 100644
+index 9a2091b..0000000
+--- a/t/newRV.t
++++ /dev/null
+@@ -1,57 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/newRV instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (2) {
+-    load();
+-    plan(tests => 2);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-is(&Devel::PPPort::newRV_inc_REFCNT, 1);
+-is(&Devel::PPPort::newRV_noinc_REFCNT, 1);
+-
+diff --git a/t/newSV_type.t b/t/newSV_type.t
+deleted file mode 100644
+index 10044f1..0000000
+--- a/t/newSV_type.t
++++ /dev/null
+@@ -1,56 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/newSV_type instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (1) {
+-    load();
+-    plan(tests => 1);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-is(Devel::PPPort::newSV_type(), 4);
+-
+diff --git a/t/newSVpv.t b/t/newSVpv.t
+deleted file mode 100644
+index a81992f..0000000
+--- a/t/newSVpv.t
++++ /dev/null
+@@ -1,82 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/newSVpv instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (15) {
+-    load();
+-    plan(tests => 15);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-my @s = &Devel::PPPort::newSVpvn();
+-ok(@s == 5);
+-is($s[0], "test");
+-is($s[1], "te");
+-is($s[2], "");
+-ok(!defined($s[3]));
+-ok(!defined($s[4]));
+-
+-@s = &Devel::PPPort::newSVpvn_flags();
+-ok(@s == 5);
+-is($s[0], "test");
+-is($s[1], "te");
+-is($s[2], "");
+-ok(!defined($s[3]));
+-ok(!defined($s[4]));
+-
+-@s = &Devel::PPPort::newSVpvn_utf8();
+-ok(@s == 1);
+-is($s[0], "test");
+-
+-if (ivers($]) >= ivers("5.008001")) {
+-  require utf8;
+-  ok(utf8::is_utf8($s[0]));
+-}
+-else {
+-  skip("skip: no is_utf8()", 1);
+-}
+-
+diff --git a/t/podtest.t b/t/podtest.t
+deleted file mode 100644
+index f02fba3..0000000
+--- a/t/podtest.t
++++ /dev/null
+@@ -1,87 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/podtest instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (0) {
+-    load();
+-    plan(tests => 0);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-my @pods = qw( HACKERS PPPort.pm ppport.h soak devel/regenerate devel/buildperl.pl );
+-
+-my $reason = '';
+-
+-if ($ENV{'SKIP_SLOW_TESTS'}) {
+-  $reason = 'SKIP_SLOW_TESTS';
+-}
+-else {
+-  # Try loading Test::Pod
+-  eval q{
+-    use Test::Pod;
+-    $Test::Pod::VERSION >= 1.41
+-        or die "Test::Pod version only $Test::Pod::VERSION";
+-    import Test::Pod tests => scalar @pods;
+-  };
+-  $reason = 'Test::Pod >= 1.41 required' if $@;
+-}
+-
+-if ($reason) {
+-  load();
+-  plan(tests => scalar @pods);
+-}
+-
+-for (@pods) {
+-  print "# checking $_\n";
+-  if ($reason) {
+-    skip("skip: $reason", 1);
+-  }
+-  else {
+-    pod_file_ok($_);
+-  }
+-}
+-
+diff --git a/t/ppphtest.t b/t/ppphtest.t
+deleted file mode 100644
+index 1aafb74..0000000
+--- a/t/ppphtest.t
++++ /dev/null
+@@ -1,944 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/ppphtest instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (235) {
+-    load();
+-    plan(tests => 235);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-# BEWARE: This number and SKIP_SLOW_TESTS must be the same!!!
+-
+-BEGIN {
+-  if ($ENV{'SKIP_SLOW_TESTS'}) {
+-    skip("skip: SKIP_SLOW_TESTS", 235);
+-    exit 0;
+-  }
+-}
+-
+-use File::Path qw/rmtree mkpath/;
+-use Config;
+-
+-my $tmp = 'ppptmp';
+-my $inc = '';
+-my $isVMS = $^O eq 'VMS';
+-my $isMAC = $^O eq 'MacOS';
+-my $perl = find_perl();
+-
+-rmtree($tmp) if -d $tmp;
+-mkpath($tmp) or die "mkpath $tmp: $!\n";
+-chdir($tmp) or die "chdir $tmp: $!\n";
+-
+-if ($ENV{'PERL_CORE'}) {
+-  if (-d '../../lib') {
+-    if ($isVMS) {
+-      $inc = '"-I../../lib"';
+-    }
+-    elsif ($isMAC) {
+-      $inc = '-I:::lib';
+-    }
+-    else {
+-      $inc = '-I../../lib';
+-    }
+-    unshift @INC, '../../lib';
+-  }
+-}
+-if ($perl =~ m!^\./!) {
+-  $perl = ".$perl";
+-}
+-
+-END {
+-  chdir('..') if !-d $tmp && -d "../$tmp";
+-  rmtree($tmp) if -d $tmp;
+-}
+-
+-ok(&Devel::PPPort::WriteFile("ppport.h"));
+-
+-# Check GetFileContents()
+-is(-e "ppport.h", 1);
+-
+-my $data;
+-
+-open(F, "<ppport.h") or die "Failed to open ppport.h: $!";
+-while(<F>) {
+-  $data .= $_;
+-}
+-close(F);
+-
+-is(Devel::PPPort::GetFileContents("ppport.h"), $data);
+-is(Devel::PPPort::GetFileContents(), $data);
+-
+-sub comment
+-{
+-  my $c = shift;
+-  my $x = 0;
+-  $c =~ s/^/sprintf("# %2d| ", ++$x)/meg;
+-  $c .= "\n" unless $c =~ /[\r\n]$/;
+-  print $c;
+-}
+-
+-sub ppport
+-{
+-  my @args = ('ppport.h', @_);
+-  unshift @args, $inc if $inc;
+-  my $run = $perl =~ m/\s/ ? qq("$perl") : $perl;
+-  $run .= ' -MMac::err=unix' if $isMAC;
+-  for (@args) {
+-    $_ = qq("$_") if $isVMS && /^[^"]/;
+-    $run .= " $_";
+-  }
+-  print "# *** running $run ***\n";
+-  $run .= ' 2>&1' unless $isMAC;
+-  my @out = `$run`;
+-  my $out = join '', @out;
+-  comment($out);
+-  return wantarray ? @out : $out;
+-}
+-
+-sub matches
+-{
+-  my($str, $re, $mod) = @_;
+-  my @n;
+-  eval "\@n = \$str =~ /$re/g$mod;";
+-  if ($@) {
+-    my $err = $@;
+-    $err =~ s/^/# *** /mg;
+-    print "# *** ERROR ***\n$err\n";
+-  }
+-  return $@ ? -42 : scalar @n;
+-}
+-
+-sub eq_files
+-{
+-  my($f1, $f2) = @_;
+-  return 0 unless -e $f1 && -e $f2;
+-  local *F;
+-  for ($f1, $f2) {
+-    print "# File: $_\n";
+-    unless (open F, $_) {
+-      print "# couldn't open $_: $!\n";
+-      return 0;
+-    }
+-    $_ = do { local $/; <F> };
+-    close F;
+-    comment($_);
+-  }
+-  return $f1 eq $f2;
+-}
+-
+-my @tests;
+-
+-for (split /\s*={70,}\s*/, do { local $/; <DATA> }) {
+-  s/^\s+//; s/\s+$//;
+-  my($c, %f);
+-  ($c, @f{m/-{20,}\s+(\S+)\s+-{20,}/g}) = split /\s*-{20,}\s+\S+\s+-{20,}\s*/;
+-  push @tests, { code => $c, files => \%f };
+-}
+-
+-my $t;
+-for $t (@tests) {
+-  print "#\n", ('# ', '-'x70, "\n")x3, "#\n";
+-  my $f;
+-  for $f (keys %{$t->{files}}) {
+-    my @f = split /\//, $f;
+-    if (@f > 1) {
+-      pop @f;
+-      my $path = join '/', @f;
+-      mkpath($path) or die "mkpath('$path'): $!\n";
+-    }
+-    my $txt = $t->{files}{$f};
+-    local *F;
+-    open F, ">$f" or die "open $f: $!\n";
+-    print F "$txt\n";
+-    close F;
+-    print "# *** writing $f ***\n";
+-    comment($txt);
+-  }
+-
+-  print "# *** evaluating test code ***\n";
+-  comment($t->{code});
+-
+-  eval $t->{code};
+-  if ($@) {
+-    my $err = $@;
+-    $err =~ s/^/# *** /mg;
+-    print "# *** ERROR ***\n$err\n";
+-  }
+-  is($@, '');
+-
+-  for (keys %{$t->{files}}) {
+-    unlink $_ or die "unlink('$_'): $!\n";
+-  }
+-}
+-
+-sub find_perl
+-{
+-  my $perl = $^X;
+-
+-  return $perl if $isVMS;
+-
+-  my $exe = $Config{'_exe'} || '';
+-
+-  if ($perl =~ /^perl\Q$exe\E$/i) {
+-    $perl = "perl$exe";
+-    eval "require File::Spec";
+-    if ($@) {
+-      $perl = "./$perl";
+-    } else {
+-      $perl = File::Spec->catfile(File::Spec->curdir(), $perl);
+-    }
+-  }
+-
+-  if ($perl !~ /\Q$exe\E$/i) {
+-    $perl .= $exe;
+-  }
+-
+-  warn "find_perl: cannot find $perl from $^X" unless -f $perl;
+-
+-  return $perl;
+-}
+-
+-__DATA__
+-
+-my $o = ppport(qw(--help));
+-ok($o =~ /^Usage:.*ppport\.h/m);
+-ok($o =~ /--help/m);
+-
+-$o = ppport(qw(--version));
+-ok($o =~ /^This is.*ppport.*\d+\.\d+(?:_?\d+)?\.$/);
+-
+-$o = ppport(qw(--nochanges));
+-ok($o =~ /^Scanning.*test\.xs/mi);
+-ok($o =~ /Analyzing.*test\.xs/mi);
+-is(matches($o, '^Scanning', 'm'), 1);
+-is(matches($o, 'Analyzing', 'm'), 1);
+-ok($o =~ /Uses Perl_newSViv instead of newSViv/);
+-
+-$o = ppport(qw(--quiet --nochanges));
+-ok($o =~ /^\s*$/);
+-
+----------------------------- test.xs ------------------------------------------
+-
+-Perl_newSViv();
+-
+-===============================================================================
+-
+-# check if C and C++ comments are filtered correctly
+-
+-my $o = ppport(qw(--copy=a));
+-ok($o =~ /^Scanning.*MyExt\.xs/mi);
+-ok($o =~ /Analyzing.*MyExt\.xs/mi);
+-is(matches($o, '^Scanning', 'm'), 1);
+-ok($o =~ /^Needs to include.*ppport\.h/m);
+-ok($o !~ /^Uses grok_bin/m);
+-ok($o !~ /^Uses newSVpv/m);
+-ok($o =~ /Uses 1 C\+\+ style comment/m);
+-ok(eq_files('MyExt.xsa', 'MyExt.ra'));
+-
+-# check if C++ are left untouched with --cplusplus
+-
+-$o = ppport(qw(--copy=b --cplusplus));
+-ok($o =~ /^Scanning.*MyExt\.xs/mi);
+-ok($o =~ /Analyzing.*MyExt\.xs/mi);
+-is(matches($o, '^Scanning', 'm'), 1);
+-ok($o =~ /^Needs to include.*ppport\.h/m);
+-ok($o !~ /^Uses grok_bin/m);
+-ok($o !~ /^Uses newSVpv/m);
+-ok($o !~ /Uses \d+ C\+\+ style comment/m);
+-ok(eq_files('MyExt.xsb', 'MyExt.rb'));
+-
+-unlink qw(MyExt.xsa MyExt.xsb);
+-
+----------------------------- MyExt.xs -----------------------------------------
+-
+-newSVuv();
+-    // newSVpv();
+-  XPUSHs(foo);
+-/* grok_bin(); */
+-
+----------------------------- MyExt.ra -----------------------------------------
+-
+-#include "ppport.h"
+-newSVuv();
+-    /* newSVpv(); */
+-  XPUSHs(foo);
+-/* grok_bin(); */
+-
+----------------------------- MyExt.rb -----------------------------------------
+-
+-#include "ppport.h"
+-newSVuv();
+-    // newSVpv();
+-  XPUSHs(foo);
+-/* grok_bin(); */
+-
+-===============================================================================
+-
+-my $o = ppport(qw(--nochanges file1.xs));
+-ok($o =~ /^Scanning.*file1\.xs/mi);
+-ok($o =~ /Analyzing.*file1\.xs/mi);
+-ok($o !~ /^Scanning.*file2\.xs/mi);
+-ok($o =~ /^Uses newCONSTSUB/m);
+-ok($o =~ /^Uses PL_expect/m);
+-ok($o =~ /^Uses SvPV_nolen.*depends.*sv_2pv_flags/m);
+-ok($o =~ /WARNING: PL_expect/m);
+-ok($o =~ /^Analysis completed \(1 warning\)/m);
+-ok($o =~ /^Looks good/m);
+-
+-$o = ppport(qw(--nochanges --nohints file1.xs));
+-ok($o =~ /^Scanning.*file1\.xs/mi);
+-ok($o =~ /Analyzing.*file1\.xs/mi);
+-ok($o !~ /^Scanning.*file2\.xs/mi);
+-ok($o =~ /^Uses newCONSTSUB/m);
+-ok($o =~ /^Uses PL_expect/m);
+-ok($o =~ /^Uses SvPV_nolen.*depends.*sv_2pv_flags/m);
+-ok($o =~ /WARNING: PL_expect/m);
+-ok($o =~ /^Analysis completed \(1 warning\)/m);
+-ok($o =~ /^Looks good/m);
+-
+-$o = ppport(qw(--nochanges --nohints --nodiag file1.xs));
+-ok($o =~ /^Scanning.*file1\.xs/mi);
+-ok($o =~ /Analyzing.*file1\.xs/mi);
+-ok($o !~ /^Scanning.*file2\.xs/mi);
+-ok($o !~ /^Uses newCONSTSUB/m);
+-ok($o !~ /^Uses PL_expect/m);
+-ok($o !~ /^Uses SvPV_nolen/m);
+-ok($o =~ /WARNING: PL_expect/m);
+-ok($o =~ /^Analysis completed \(1 warning\)/m);
+-ok($o =~ /^Looks good/m);
+-
+-$o = ppport(qw(--nochanges --quiet file1.xs));
+-ok($o =~ /^\s*$/);
+-
+-$o = ppport(qw(--nochanges file2.xs));
+-ok($o =~ /^Scanning.*file2\.xs/mi);
+-ok($o =~ /Analyzing.*file2\.xs/mi);
+-ok($o !~ /^Scanning.*file1\.xs/mi);
+-ok($o =~ /^Uses mXPUSHp/m);
+-ok($o =~ /^Needs to include.*ppport\.h/m);
+-ok($o !~ /^Looks good/m);
+-ok($o =~ /^1 potentially required change detected/m);
+-
+-$o = ppport(qw(--nochanges --nohints file2.xs));
+-ok($o =~ /^Scanning.*file2\.xs/mi);
+-ok($o =~ /Analyzing.*file2\.xs/mi);
+-ok($o !~ /^Scanning.*file1\.xs/mi);
+-ok($o =~ /^Uses mXPUSHp/m);
+-ok($o =~ /^Needs to include.*ppport\.h/m);
+-ok($o !~ /^Looks good/m);
+-ok($o =~ /^1 potentially required change detected/m);
+-
+-$o = ppport(qw(--nochanges --nohints --nodiag file2.xs));
+-ok($o =~ /^Scanning.*file2\.xs/mi);
+-ok($o =~ /Analyzing.*file2\.xs/mi);
+-ok($o !~ /^Scanning.*file1\.xs/mi);
+-ok($o !~ /^Uses mXPUSHp/m);
+-ok($o !~ /^Needs to include.*ppport\.h/m);
+-ok($o !~ /^Looks good/m);
+-ok($o =~ /^1 potentially required change detected/m);
+-
+-$o = ppport(qw(--nochanges --quiet file2.xs));
+-ok($o =~ /^\s*$/);
+-
+----------------------------- file1.xs -----------------------------------------
+-
+-#define NEED_newCONSTSUB
+-#define NEED_PL_parser
+-#include "ppport.h"
+-
+-newCONSTSUB();
+-SvPV_nolen();
+-PL_expect = 0;
+-
+----------------------------- file2.xs -----------------------------------------
+-
+-mXPUSHp(foo);
+-
+-===============================================================================
+-
+-my $o = ppport(qw(--nochanges));
+-ok($o =~ /^Scanning.*FooBar\.xs/mi);
+-ok($o =~ /Analyzing.*FooBar\.xs/mi);
+-is(matches($o, '^Scanning', 'm'), 1);
+-ok($o !~ /^Looks good/m);
+-ok($o =~ /^Uses grok_bin/m);
+-
+----------------------------- FooBar.xs ----------------------------------------
+-
+-newSViv();
+-XPUSHs(foo);
+-grok_bin();
+-
+-===============================================================================
+-
+-my $o = ppport(qw(--nochanges));
+-ok($o =~ /^Scanning.*First\.xs/mi);
+-ok($o =~ /Analyzing.*First\.xs/mi);
+-ok($o =~ /^Scanning.*second\.h/mi);
+-ok($o =~ /Analyzing.*second\.h/mi);
+-ok($o =~ /^Scanning.*sub.*third\.c/mi);
+-ok($o =~ /Analyzing.*sub.*third\.c/mi);
+-ok($o !~ /^Scanning.*foobar/mi);
+-is(matches($o, '^Scanning', 'm'), 3);
+-
+----------------------------- First.xs -----------------------------------------
+-
+-one
+-
+----------------------------- foobar.xyz ---------------------------------------
+-
+-two
+-
+----------------------------- second.h -----------------------------------------
+-
+-three
+-
+----------------------------- sub/third.c --------------------------------------
+-
+-four
+-
+-===============================================================================
+-
+-my $o = ppport(qw(--nochanges));
+-ok($o =~ /Possibly wrong #define NEED_foobar in.*test.xs/i);
+-
+----------------------------- test.xs ------------------------------------------
+-
+-#define NEED_foobar
+-
+-===============================================================================
+-
+-# And now some complex "real-world" example
+-
+-my $o = ppport(qw(--copy=f));
+-for (qw(main.xs mod1.c mod2.c mod3.c mod4.c mod5.c)) {
+-  ok($o =~ /^Scanning.*\Q$_\E/mi);
+-  ok($o =~ /Analyzing.*\Q$_\E/i);
+-}
+-is(matches($o, '^Scanning', 'm'), 6);
+-
+-is(matches($o, '^Writing copy of', 'm'), 5);
+-ok(!-e "mod5.cf");
+-
+-for (qw(main.xs mod1.c mod2.c mod3.c mod4.c)) {
+-  ok($o =~ /^Writing copy of.*\Q$_\E.*with changes/mi);
+-  ok(-e "${_}f");
+-  ok(eq_files("${_}f", "${_}r"));
+-  unlink "${_}f";
+-}
+-
+----------------------------- main.xs ------------------------------------------
+-
+-#include "EXTERN.h"
+-#include "perl.h"
+-#include "XSUB.h"
+-
+-#define NEED_newCONSTSUB
+-#define NEED_grok_hex_GLOBAL
+-#include "ppport.h"
+-
+-newCONSTSUB();
+-grok_hex();
+-Perl_grok_bin(aTHX_ foo, bar);
+-
+-/* some comment */
+-
+-perl_eval_pv();
+-grok_bin();
+-Perl_grok_bin(bar, sv_no);
+-
+----------------------------- mod1.c -------------------------------------------
+-
+-#include "EXTERN.h"
+-#include "perl.h"
+-#include "XSUB.h"
+-
+-#define NEED_grok_bin_GLOBAL
+-#define NEED_newCONSTSUB
+-#include "ppport.h"
+-
+-newCONSTSUB();
+-grok_bin();
+-{
+-  Perl_croak ("foo");
+-  Perl_sv_catpvf();  /* I know it's wrong ;-) */
+-}
+-
+----------------------------- mod2.c -------------------------------------------
+-
+-#include "EXTERN.h"
+-#include "perl.h"
+-#include "XSUB.h"
+-
+-#define NEED_eval_pv
+-#include "ppport.h"
+-
+-newSViv();
+-
+-/*
+-   eval_pv();
+-*/
+-
+----------------------------- mod3.c -------------------------------------------
+-
+-#include "EXTERN.h"
+-#include "perl.h"
+-#include "XSUB.h"
+-
+-grok_oct();
+-eval_pv();
+-
+----------------------------- mod4.c -------------------------------------------
+-
+-#include "EXTERN.h"
+-#include "perl.h"
+-#include "XSUB.h"
+-
+-START_MY_CXT;
+-
+----------------------------- mod5.c -------------------------------------------
+-
+-#include "EXTERN.h"
+-#include "perl.h"
+-#include "XSUB.h"
+-
+-#include "ppport.h"
+-call_pv();
+-
+----------------------------- main.xsr -----------------------------------------
+-
+-#include "EXTERN.h"
+-#include "perl.h"
+-#include "XSUB.h"
+-
+-#define NEED_eval_pv_GLOBAL
+-#define NEED_grok_hex
+-#define NEED_newCONSTSUB_GLOBAL
+-#include "ppport.h"
+-
+-newCONSTSUB();
+-grok_hex();
+-grok_bin(foo, bar);
+-
+-/* some comment */
+-
+-eval_pv();
+-grok_bin();
+-grok_bin(bar, PL_sv_no);
+-
+----------------------------- mod1.cr ------------------------------------------
+-
+-#include "EXTERN.h"
+-#include "perl.h"
+-#include "XSUB.h"
+-
+-#define NEED_grok_bin_GLOBAL
+-#include "ppport.h"
+-
+-newCONSTSUB();
+-grok_bin();
+-{
+-  Perl_croak (aTHX_ "foo");
+-  Perl_sv_catpvf(aTHX);  /* I know it's wrong ;-) */
+-}
+-
+----------------------------- mod2.cr ------------------------------------------
+-
+-#include "EXTERN.h"
+-#include "perl.h"
+-#include "XSUB.h"
+-
+-
+-newSViv();
+-
+-/*
+-   eval_pv();
+-*/
+-
+----------------------------- mod3.cr ------------------------------------------
+-
+-#include "EXTERN.h"
+-#include "perl.h"
+-#include "XSUB.h"
+-#define NEED_grok_oct
+-#include "ppport.h"
+-
+-grok_oct();
+-eval_pv();
+-
+----------------------------- mod4.cr ------------------------------------------
+-
+-#include "EXTERN.h"
+-#include "perl.h"
+-#include "XSUB.h"
+-#include "ppport.h"
+-
+-START_MY_CXT;
+-
+-===============================================================================
+-
+-my $o = ppport(qw(--nochanges));
+-ok($o =~ /Uses grok_hex/m);
+-ok($o !~ /Looks good/m);
+-
+-$o = ppport(qw(--nochanges --compat-version=5.8.0));
+-ok($o !~ /Uses grok_hex/m);
+-ok($o =~ /Looks good/m);
+-
+----------------------------- FooBar.xs ----------------------------------------
+-
+-grok_hex();
+-
+-===============================================================================
+-
+-my $o = ppport(qw(--nochanges));
+-ok($o =~ /Uses SvPVutf8_force, which may not be portable/m);
+-
+-$o = ppport(qw(--nochanges --compat-version=5.5.3));
+-ok($o =~ /Uses SvPVutf8_force, which may not be portable/m);
+-
+-$o = ppport(qw(--nochanges --compat-version=5.005_03));
+-ok($o =~ /Uses SvPVutf8_force, which may not be portable/m);
+-
+-$o = ppport(qw(--nochanges --compat-version=5.6.0));
+-ok($o !~ /Uses SvPVutf8_force/m);
+-
+-$o = ppport(qw(--nochanges --compat-version=5.006));
+-ok($o !~ /Uses SvPVutf8_force/m);
+-
+-$o = ppport(qw(--nochanges --compat-version=5.999.999));
+-ok($o !~ /Uses SvPVutf8_force/m);
+-
+-$o = ppport(qw(--nochanges --compat-version=8.0.0));
+-ok($o =~ /Only Perl \[57\] are supported/m);
+-
+-$o = ppport(qw(--nochanges --compat-version=5.1000.999));
+-ok($o =~ /Invalid version number: 5.1000.999/m);
+-
+-$o = ppport(qw(--nochanges --compat-version=5.999.1000));
+-ok($o =~ /Invalid version number: 5.999.1000/m);
+-
+----------------------------- FooBar.xs ----------------------------------------
+-
+-SvPVutf8_force();
+-
+-===============================================================================
+-
+-my $o = ppport(qw(--nochanges));
+-ok($o !~ /potentially required change/);
+-is(matches($o, '^Looks good', 'm'), 2);
+-
+----------------------------- FooBar.xs ----------------------------------------
+-
+-#define NEED_grok_numeric_radix
+-#define NEED_grok_number
+-#include "ppport.h"
+-
+-GROK_NUMERIC_RADIX();
+-grok_number();
+-
+----------------------------- foo.c --------------------------------------------
+-
+-#include "ppport.h"
+-
+-call_pv();
+-
+-===============================================================================
+-
+-# check --api-info option
+-
+-my $o = ppport(qw(--api-info=INT2PTR));
+-my %found = map {($_ => 1)} $o =~ /^===\s+(\w+)\s+===/mg;
+-is(scalar keys %found, 1, "found 1 key");
+-ok(exists $found{INT2PTR});
+-is(matches($o, '^Supported at least since perl-5\.6\.0', 'm'), 1, "INT2PTR supported without ppport.h to 5.6.0");
+-is(matches($o, '^ppport.h additionally provides support at least back to perl-5\.003', 'm'), 1, "INT2PTR supported with ppport.h to 5.003");
+-
+-$o = ppport(qw(--api-info=Zero));
+-%found = map {($_ => 1)} $o =~ /^===\s+(\w+)\s+===/mg;
+-is(scalar keys %found, 1, "found 1 key");
+-ok(exists $found{Zero});
+-is(matches($o, '^Supported at least since perl-5.003', 'm'), 1, "Zero supported to 5.003");
+-
+-$o = ppport(qw(--api-info=/Zero/));
+-%found = map {($_ => 1)} $o =~ /^===\s+(\w+)\s+===/mg;
+-is(scalar keys %found, 2, "found 2 keys");
+-ok(exists $found{Zero});
+-ok(exists $found{ZeroD});
+-
+-===============================================================================
+-
+-# check --list-provided option
+-
+-my @o = ppport(qw(--list-provided));
+-my %p;
+-my $fail = 0;
+-for (@o) {
+-  my($name, $flags) = /^(\w+)(?:\s+\[(\w+(?:,\s+\w+)*)\])?$/ or $fail++;
+-  {
+-    'warnings'->unimport('uninitialized') if ivers($]) > ivers('5.006');
+-    exists $p{$name} and $fail++;
+-  }
+-  $p{$name} = defined $flags ? { map { ($_ => 1) } $flags =~ /(\w+)/g } : '';
+-}
+-ok(@o > 100);
+-is($fail, 0);
+-
+-ok(exists $p{call_pv});
+-ok(not ref $p{call_pv});
+-
+-ok(exists $p{grok_bin});
+-is(ref $p{grok_bin}, 'HASH');
+-is(scalar keys %{$p{grok_bin}}, 2);
+-ok($p{grok_bin}{explicit});
+-ok($p{grok_bin}{depend});
+-
+-ok(exists $p{gv_stashpvn});
+-is(ref $p{gv_stashpvn}, 'HASH');
+-is(scalar keys %{$p{gv_stashpvn}}, 2);
+-ok($p{gv_stashpvn}{depend});
+-ok($p{gv_stashpvn}{hint});
+-
+-ok(exists $p{sv_catpvf_mg});
+-is(ref $p{sv_catpvf_mg}, 'HASH');
+-is(scalar keys %{$p{sv_catpvf_mg}}, 2);
+-ok($p{sv_catpvf_mg}{explicit});
+-ok($p{sv_catpvf_mg}{depend});
+-
+-ok(exists $p{PL_signals});
+-is(ref $p{PL_signals}, 'HASH');
+-is(scalar keys %{$p{PL_signals}}, 1);
+-ok($p{PL_signals}{explicit});
+-
+-===============================================================================
+-
+-# check --list-unsupported option
+-
+-my @o = ppport(qw(--list-unsupported));
+-my %p;
+-my $fail = 0;
+-for (@o) {
+-  my($name, $ver) = /^(\w+)\s*\.*\s*([\d._]+)$/ or $fail++;
+-  { exists $p{$name} and $fail++; }
+-  $p{$name} = $ver;
+-}
+-ok(@o > 100);
+-is($fail, 0);
+-
+-ok(exists $p{utf8_distance});
+-is($p{utf8_distance}, '5.6.0');
+-
+-ok(exists $p{save_generic_svref});
+-is($p{save_generic_svref}, '5.005_03');
+-
+-===============================================================================
+-
+-# check --nofilter option
+-
+-my $o = ppport(qw(--nochanges));
+-ok($o =~ /^Scanning.*foo\.cpp/mi);
+-ok($o =~ /Analyzing.*foo\.cpp/mi);
+-is(matches($o, '^Scanning', 'm'), 1);
+-is(matches($o, 'Analyzing', 'm'), 1);
+-
+-$o = ppport(qw(--nochanges foo.cpp foo.o Makefile.PL));
+-ok($o =~ /Skipping the following files \(use --nofilter to avoid this\):/m);
+-is(matches($o, '^\|\s+foo\.o', 'mi'), 1);
+-is(matches($o, '^\|\s+Makefile\.PL', 'mi'), 1);
+-ok($o =~ /^Scanning.*foo\.cpp/mi);
+-ok($o =~ /Analyzing.*foo\.cpp/mi);
+-is(matches($o, '^Scanning', 'm'), 1);
+-is(matches($o, 'Analyzing', 'm'), 1);
+-
+-$o = ppport(qw(--nochanges --nofilter foo.cpp foo.o Makefile.PL));
+-ok($o =~ /^Scanning.*foo\.cpp/mi);
+-ok($o =~ /Analyzing.*foo\.cpp/mi);
+-ok($o =~ /^Scanning.*foo\.o/mi);
+-ok($o =~ /Analyzing.*foo\.o/mi);
+-ok($o =~ /^Scanning.*Makefile/mi);
+-ok($o =~ /Analyzing.*Makefile/mi);
+-is(matches($o, '^Scanning', 'm'), 3);
+-is(matches($o, 'Analyzing', 'm'), 3);
+-
+----------------------------- foo.cpp ------------------------------------------
+-
+-newSViv();
+-
+----------------------------- foo.o --------------------------------------------
+-
+-newSViv();
+-
+----------------------------- Makefile.PL --------------------------------------
+-
+-newSViv();
+-
+-===============================================================================
+-
+-# check if explicit variables are handled propery
+-
+-my $o = ppport(qw(--copy=a));
+-ok($o =~ /^Needs to include.*ppport\.h/m);
+-ok($o =~ /^Uses PL_signals/m);
+-ok($o =~ /^File needs PL_signals, adding static request/m);
+-ok(eq_files('MyExt.xsa', 'MyExt.ra'));
+-
+-unlink qw(MyExt.xsa);
+-
+----------------------------- MyExt.xs -----------------------------------------
+-
+-PL_signals = 123;
+-if (PL_signals == 42)
+-  foo();
+-
+----------------------------- MyExt.ra -----------------------------------------
+-
+-#define NEED_PL_signals
+-#include "ppport.h"
+-PL_signals = 123;
+-if (PL_signals == 42)
+-  foo();
+-
+-===============================================================================
+-
+-my $o = ppport(qw(--nochanges file.xs));
+-ok($o =~ /^Uses PL_copline/m);
+-ok($o =~ /WARNING: PL_copline/m);
+-ok($o =~ /^Uses SvUOK/m);
+-ok($o =~ /WARNING: Uses SvUOK, which may not be portable/m);
+-ok($o =~ /^Analysis completed \(2 warnings\)/m);
+-ok($o =~ /^Looks good/m);
+-
+-$o = ppport(qw(--nochanges --compat-version=5.8.0 file.xs));
+-ok($o =~ /^Uses PL_copline/m);
+-ok($o =~ /WARNING: PL_copline/m);
+-ok($o !~ /WARNING: Uses SvUOK, which may not be portable/m);
+-ok($o =~ /^Analysis completed \(1 warning\)/m);
+-ok($o =~ /^Looks good/m);
+-
+----------------------------- file.xs -----------------------------------------
+-
+-#define NEED_PL_parser
+-#include "ppport.h"
+-SvUOK
+-PL_copline
+-
+-===============================================================================
+-
+-my $o = ppport(qw(--copy=f));
+-
+-for (qw(file.xs)) {
+-  ok($o =~ /^Writing copy of.*\Q$_\E.*with changes/mi);
+-  ok(-e "${_}f");
+-  ok(eq_files("${_}f", "${_}r"));
+-  unlink "${_}f";
+-}
+-
+----------------------------- file.xs -----------------------------------------
+-
+-a_string = "sv_undef"
+-a_char = 'sv_yes'
+-#define SOMETHING defgv
+-/* C-comment: sv_tainted */
+-#
+-# This is just a big XS comment using sv_no
+-#
+-/* The following, is NOT an XS comment! */
+-#  define SOMETHING_ELSE defgv + \
+-                         sv_undef
+-
+----------------------------- file.xsr -----------------------------------------
+-
+-#include "ppport.h"
+-a_string = "sv_undef"
+-a_char = 'sv_yes'
+-#define SOMETHING PL_defgv
+-/* C-comment: sv_tainted */
+-#
+-# This is just a big XS comment using sv_no
+-#
+-/* The following, is NOT an XS comment! */
+-#  define SOMETHING_ELSE PL_defgv + \
+-                         PL_sv_undef
+-
+-===============================================================================
+-
+-my $o = ppport(qw(--copy=f));
+-
+-for (qw(file.xs)) {
+-  ok($o =~ /^Writing copy of.*\Q$_\E.*with changes/mi);
+-  ok(-e "${_}f");
+-  ok(eq_files("${_}f", "${_}r"));
+-  unlink "${_}f";
+-}
+-
+----------------------------- file.xs -----------------------------------------
+-
+-#define NEED_warner
+-#include "ppport.h"
+-Perl_croak_nocontext("foo");
+-Perl_croak("bar");
+-croak("foo");
+-croak_nocontext("foo");
+-Perl_warner_nocontext("foo");
+-Perl_warner("foo");
+-warner_nocontext("foo");
+-warner("foo");
+-
+----------------------------- file.xsr -----------------------------------------
+-
+-#define NEED_warner
+-#include "ppport.h"
+-Perl_croak_nocontext("foo");
+-Perl_croak(aTHX_ "bar");
+-croak("foo");
+-croak_nocontext("foo");
+-Perl_warner_nocontext("foo");
+-Perl_warner(aTHX_ "foo");
+-warner_nocontext("foo");
+-warner("foo");
+-
+diff --git a/t/pv_tools.t b/t/pv_tools.t
+deleted file mode 100644
+index caad6d5..0000000
+--- a/t/pv_tools.t
++++ /dev/null
+@@ -1,88 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/pv_tools instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (13) {
+-    load();
+-    plan(tests => 13);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-my $uni = &Devel::PPPort::pv_escape_can_unicode();
+-
+-# sanity check
+-ok($uni ? ivers($]) >= ivers("5.006") : ivers($]) < ivers("5.008"));
+-
+-my @r;
+-
+-@r = &Devel::PPPort::pv_pretty();
+-is($r[0], $r[1]);
+-is($r[0], "foobarbaz");
+-is($r[2], $r[3]);
+-is($r[2], '<leftpv_p\retty\nright>');
+-is($r[4], $r[5]);
+-if(ord("A") == 65) {
+-    is($r[4], $uni ? 'N\375 Batter\355' : 'N\303\275 Batter\303');
+-}
+-else {
+-    skip("Skip for non-ASCII platform");
+-}
+-is($r[6], $r[7]);
+-if(ord("A") == 65) {
+-    is($r[6], $uni ? '\301g\346tis Byrju...' : '\303\201g\303\246t...');
+-}
+-else {
+-    skip("Skip for non-ASCII platform");
+-}
+-
+-@r = &Devel::PPPort::pv_display();
+-is($r[0], $r[1]);
+-is($r[0], '"foob\0rbaz"\0');
+-is($r[2], $r[3]);
+-ok($r[2] eq '"pv_di"...\0' ||
+-   $r[2] eq '"pv_d"...\0');  # some perl implementations are broken... :(
+-
+diff --git a/t/pvs.t b/t/pvs.t
+deleted file mode 100644
+index eacbc09..0000000
+--- a/t/pvs.t
++++ /dev/null
+@@ -1,77 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/pvs instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (12) {
+-    load();
+-    plan(tests => 12);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-my $x = 'foo';
+-
+-is(Devel::PPPort::newSVpvs(), "newSVpvs");
+-is(Devel::PPPort::newSVpvs_flags(), "newSVpvs_flags");
+-is(Devel::PPPort::newSVpvs_share(), 3);
+-
+-Devel::PPPort::sv_catpvs($x);
+-is($x, "foosv_catpvs");
+-
+-Devel::PPPort::sv_setpvs($x);
+-is($x, "sv_setpvs");
+-
+-my %h = ('hv_fetchs' => 42);
+-Devel::PPPort::hv_stores(\%h, 4711);
+-is(scalar keys %h, 2);
+-ok(exists $h{'hv_stores'});
+-is($h{'hv_stores'}, 4711);
+-is(Devel::PPPort::hv_fetchs(\%h), 42);
+-is(Devel::PPPort::gv_fetchpvs(), \*Devel::PPPort::VERSION);
+-is(Devel::PPPort::gv_stashpvs(), \%Devel::PPPort::);
+-
+-is(Devel::PPPort::get_cvs(), 3);
+-
+diff --git a/t/shared_pv.t b/t/shared_pv.t
+deleted file mode 100644
+index 38b55e1..0000000
+--- a/t/shared_pv.t
++++ /dev/null
+@@ -1,56 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/shared_pv instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (1) {
+-    load();
+-    plan(tests => 1);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-is(&Devel::PPPort::newSVpvn_share(), 6);
+-
+diff --git a/t/snprintf.t b/t/snprintf.t
+deleted file mode 100644
+index 513fc6b..0000000
+--- a/t/snprintf.t
++++ /dev/null
+@@ -1,58 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/snprintf instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (2) {
+-    load();
+-    plan(tests => 2);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-my($l, $s) = Devel::PPPort::my_snprintf();
+-is($l, 8);
+-is($s, "foobar42");
+-
+diff --git a/t/sprintf.t b/t/sprintf.t
+deleted file mode 100644
+index 50062d4..0000000
+--- a/t/sprintf.t
++++ /dev/null
+@@ -1,58 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/sprintf instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (2) {
+-    load();
+-    plan(tests => 2);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-my($l, $s) = Devel::PPPort::my_sprintf();
+-is($l, 8);
+-is($s, "foobar42");
+-
+diff --git a/t/strlfuncs.t b/t/strlfuncs.t
+deleted file mode 100644
+index 103c18f..0000000
+--- a/t/strlfuncs.t
++++ /dev/null
+@@ -1,69 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/strlfuncs instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (13) {
+-    load();
+-    plan(tests => 13);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-my @e = (3, 'foo',
+-         6, 'foobar',
+-         9, 'foobarb',
+-         10, '1234567',
+-         4, '1234',
+-         16, '1234567',
+-        );
+-my @r = Devel::PPPort::my_strlfunc();
+-
+-ok(@e == @r);
+-
+-for (0 .. $#e) {
+-  is($r[$_], $e[$_]);
+-}
+-
+diff --git a/t/sv_xpvf.t b/t/sv_xpvf.t
+deleted file mode 100644
+index e4a9ff2..0000000
+--- a/t/sv_xpvf.t
++++ /dev/null
+@@ -1,82 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/sv_xpvf instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (9) {
+-    load();
+-    plan(tests => 9);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-use Tie::Hash;
+-my %h;
+-tie %h, 'Tie::StdHash';
+-$h{foo} = 'foo-';
+-$h{bar} = '';
+-
+-is(&Devel::PPPort::vnewSVpvf(), ivers($]) >= ivers("5.004") ? 'Perl-42' : '%s-%d');
+-is(&Devel::PPPort::sv_vcatpvf('1-2-3-'), ivers($]) >= ivers("5.004") ? '1-2-3-Perl-42' : '1-2-3-%s-%d');
+-is(&Devel::PPPort::sv_vsetpvf('1-2-3-'), ivers($]) >= ivers("5.004") ? 'Perl-42' : '%s-%d');
+-
+-&Devel::PPPort::sv_catpvf_mg($h{foo});
+-is($h{foo}, ivers($]) >= ivers("5.004") ? 'foo-Perl-42' : 'foo-');
+-
+-&Devel::PPPort::Perl_sv_catpvf_mg($h{foo});
+-is($h{foo}, ivers($]) >= ivers("5.004") ? 'foo-Perl-42-Perl-43' : 'foo-');
+-
+-&Devel::PPPort::sv_catpvf_mg_nocontext($h{foo});
+-is($h{foo}, ivers($]) >= ivers("5.004") ? 'foo-Perl-42-Perl-43-Perl-44' : 'foo-');
+-
+-&Devel::PPPort::sv_setpvf_mg($h{bar});
+-is($h{bar}, ivers($]) >= ivers("5.004") ? 'mhx-42' : '');
+-
+-&Devel::PPPort::Perl_sv_setpvf_mg($h{bar});
+-is($h{bar}, ivers($]) >= ivers("5.004") ? 'foo-43' : '');
+-
+-&Devel::PPPort::sv_setpvf_mg_nocontext($h{bar});
+-is($h{bar}, ivers($]) >= ivers("5.004") ? 'bar-44' : '');
+-
+diff --git a/t/threads.t b/t/threads.t
+deleted file mode 100644
+index e0dce17..0000000
+--- a/t/threads.t
++++ /dev/null
+@@ -1,58 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/threads instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (2) {
+-    load();
+-    plan(tests => 2);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-is(&Devel::PPPort::no_THX_arg("42"), 43);
+-eval { &Devel::PPPort::with_THX_arg("yes\n"); };
+-ok($@ =~ /^yes/);
+-
+diff --git a/t/utf8.t b/t/utf8.t
+deleted file mode 100644
+index 957a089..0000000
+--- a/t/utf8.t
++++ /dev/null
+@@ -1,300 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/utf8 instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (98) {
+-    load();
+-    plan(tests => 98);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-BEGIN {
+-    # skip tests on 5.6.0 and earlier, plus 5.7.0
+-    if (ivers($]) <= ivers(5.6) || ivers($]) == ivers(5.7) ) {
+-        skip 'skip: broken utf8 support', 98;
+-        exit;
+-    }
+-    require warnings;
+-}
+-
+-is(Devel::PPPort::UTF8f(42), '[42]');
+-is(Devel::PPPort::UTF8f('abc'), '[abc]');
+-is(Devel::PPPort::UTF8f("\x{263a}"), "[\x{263a}]");
+-
+-my $str = "\x{A8}";
+-if (ivers($]) >= ivers(5.8)) { eval q{utf8::upgrade($str)} }
+-is(Devel::PPPort::UTF8f($str), "[\x{A8}]");
+-if (ivers($]) >= ivers(5.8)) { eval q{utf8::downgrade($str)} }
+-is(Devel::PPPort::UTF8f($str), "[\x{A8}]");
+-
+-is(&Devel::PPPort::UTF8_SAFE_SKIP("A", 0), 1);
+-is(&Devel::PPPort::UTF8_SAFE_SKIP("A", -1), 0);
+-
+-is(&Devel::PPPort::isUTF8_CHAR("A", -1), 0);
+-is(&Devel::PPPort::isUTF8_CHAR("A",  0), 1);
+-is(&Devel::PPPort::isUTF8_CHAR("\x{100}",  -1), 0);
+-is(&Devel::PPPort::isUTF8_CHAR("\x{100}",  0), 2);
+-
+-is(&Devel::PPPort::UVCHR_IS_INVARIANT(ord("A")), 1);
+-ok(! &Devel::PPPort::UVCHR_IS_INVARIANT(0xb6));
+-ok(! &Devel::PPPort::UVCHR_IS_INVARIANT(0x100));
+-
+-is(&Devel::PPPort::UVCHR_SKIP(ord("A")), 1);
+-is(&Devel::PPPort::UVCHR_SKIP(0xb6),     2, "This is a test");
+-is(&Devel::PPPort::UVCHR_SKIP(0x3FF),    2);
+-is(&Devel::PPPort::UVCHR_SKIP(0x3FFF),   3);
+-is(&Devel::PPPort::UVCHR_SKIP(0x3FFFF),  4);
+-is(&Devel::PPPort::UVCHR_SKIP(0x3FFFFF), 5);
+-is(&Devel::PPPort::UVCHR_SKIP(0x3FFFFFF), ord("A") == 65 ? 5 : 6);
+-is(&Devel::PPPort::UVCHR_SKIP(0x4000000), ord("A") == 65 ? 6 : 7);
+-if (ord("A") != 65) {
+-    skip("Test not valid on EBCDIC", 1)
+-}
+-else {
+-    is(&Devel::PPPort::UVCHR_SKIP(0xFFFFFFFF), 7);
+-}
+-
+-if (ivers($]) < ivers(5.8)) {
+-    skip("Perl version too early", 3);
+-}
+-else {
+-    is(&Devel::PPPort::foldEQ_utf8("A\x{100}", 3, 1, "a\x{101}", 3, 1), 1);
+-    is(&Devel::PPPort::foldEQ_utf8("A\x{100}", 3, 1, "a\x{102}", 3, 1), 0);
+-    is(&Devel::PPPort::foldEQ_utf8("A\x{100}", 3, 1, "b\x{101}", 3, 1), 0);
+-}
+-
+-my $ret = &Devel::PPPort::utf8_to_uvchr("A");
+-is($ret->[0], ord("A"));
+-is($ret->[1], 1);
+-
+-$ret = &Devel::PPPort::utf8_to_uvchr("\0");
+-is($ret->[0], 0);
+-is($ret->[1], 1);
+-
+-$ret = &Devel::PPPort::utf8_to_uvchr_buf("A", 0);
+-is($ret->[0], ord("A"));
+-is($ret->[1], 1);
+-
+-$ret = &Devel::PPPort::utf8_to_uvchr_buf("\0", 0);
+-is($ret->[0], 0);
+-is($ret->[1], 1);
+-
+-my @buf_tests = (
+-    {
+-        input      => "A",
+-        adjustment => -1,
+-        warning    => eval "qr/empty/",
+-        no_warnings_returned_length => 0,
+-    },
+-    {
+-        input      => "\xc4\xc5",
+-        adjustment => 0,
+-        warning    => eval "qr/non-continuation/",
+-        no_warnings_returned_length => 1,
+-    },
+-    {
+-        input      => "\xc4\x80",
+-        adjustment => -1,
+-        warning    => eval "qr/short|1 byte, need 2/",
+-        no_warnings_returned_length => 1,
+-    },
+-    {
+-        input      => "\xc0\x81",
+-        adjustment => 0,
+-        warning    => eval "qr/overlong|2 bytes, need 1/",
+-        no_warnings_returned_length => 2,
+-    },
+-    {
+-        input      => "\xe0\x80\x81",
+-        adjustment => 0,
+-        warning    => eval "qr/overlong|3 bytes, need 1/",
+-        no_warnings_returned_length => 3,
+-    },
+-    {
+-        input      => "\xf0\x80\x80\x81",
+-        adjustment => 0,
+-        warning    => eval "qr/overlong|4 bytes, need 1/",
+-        no_warnings_returned_length => 4,
+-    },
+-    {                 # Old algorithm failed to detect this
+-        input      => "\xff\x80\x90\x90\x90\xbf\xbf\xbf\xbf\xbf\xbf\xbf\xbf",
+-        adjustment => 0,
+-        warning    => eval "qr/overflow/",
+-        no_warnings_returned_length => 13,
+-    },
+-);
+-
+-if (ord("A") != 65) {   # tests not valid for EBCDIC
+-    skip("Perl version too early", 2 + 4 + (scalar @buf_tests * 5));
+-}
+-else {
+-    $ret = &Devel::PPPort::utf8_to_uvchr_buf("\xc4\x80", 0);
+-    is($ret->[0], 0x100);
+-    is($ret->[1], 2);
+-
+-    my @warnings;
+-    local $SIG{__WARN__} = sub { push @warnings, @_; };
+-
+-    {
+-        use warnings 'utf8';
+-        $ret = &Devel::PPPort::utf8_to_uvchr("\xe0\0\x80");
+-        is($ret->[0], 0);
+-        is($ret->[1], -1);
+-
+-        no warnings 'utf8';
+-        $ret = &Devel::PPPort::utf8_to_uvchr("\xe0\0\x80");
+-        is($ret->[0], 0xFFFD);
+-        is($ret->[1], 1);
+-    }
+-
+-
+-    # An empty input is an assertion failure on debugging builds.  It is
+-    # deliberately the first test.
+-    require Config; Config->import;
+-    use vars '%Config';
+-
+-    # VMS doesn't put DEBUGGING in ccflags, and Windows doesn't have
+-    # $Config{config_args}.  When 5.14 or later can be assumed, use
+-    # Config::non_bincompat_options(), but for now we're stuck with this.
+-    if (   $Config{ccflags} =~ /-DDEBUGGING/
+-        || $^O eq 'VMS' && $Config{config_args} =~ /\bDDEBUGGING\b/)
+-    {
+-        shift @buf_tests;
+-        skip("Test not valid on DEBUGGING builds", 5);
+-    }
+-
+-    my $test;
+-    for $test (@buf_tests) {
+-        my $input = $test->{'input'};
+-        my $adjustment = $test->{'adjustment'};
+-        my $display = 'utf8_to_uvchr_buf("';
+-        my $i;
+-        for ($i = 0; $i < length($input) + $adjustment; $i++) {
+-            $display .= sprintf "\\x%02x", ord substr($input, $i, 1);
+-        }
+-
+-        $display .= '")';
+-        my $warning = $test->{'warning'};
+-
+-        undef @warnings;
+-        use warnings 'utf8';
+-        $ret = &Devel::PPPort::utf8_to_uvchr_buf($input, $adjustment);
+-        is($ret->[0], 0,  "returned value $display; warnings enabled");
+-        is($ret->[1], -1, "returned length $display; warnings enabled");
+-        my $all_warnings = join "; ", @warnings;
+-        my $contains = grep { $_ =~ $warning } $all_warnings;
+-        is($contains, 1, $display
+-                    . "; Got: '$all_warnings', which should contain '$warning'");
+-
+-        undef @warnings;
+-        no warnings 'utf8';
+-        $ret = &Devel::PPPort::utf8_to_uvchr_buf($input, $adjustment);
+-        is($ret->[0], 0xFFFD,  "returned value $display; warnings disabled");
+-        is($ret->[1], $test->{'no_warnings_returned_length'},
+-                      "returned length $display; warnings disabled");
+-    }
+-}
+-
+-if (ivers($]) ge ivers(5.008)) {
+-    BEGIN { if (ivers($]) ge ivers(5.008)) { require utf8; "utf8"->import() } }
+-
+-    is(Devel::PPPort::sv_len_utf8("aščť"), 4);
+-    is(Devel::PPPort::sv_len_utf8_nomg("aščť"), 4);
+-
+-    my $str = "áíé";
+-    utf8::downgrade($str);
+-    is(Devel::PPPort::sv_len_utf8($str), 3);
+-    utf8::downgrade($str);
+-    is(Devel::PPPort::sv_len_utf8_nomg($str), 3);
+-    utf8::upgrade($str);
+-    is(Devel::PPPort::sv_len_utf8($str), 3);
+-    utf8::upgrade($str);
+-    is(Devel::PPPort::sv_len_utf8_nomg($str), 3);
+-
+-    tie my $scalar, 'TieScalarCounter', "é";
+-
+-    is(tied($scalar)->{fetch}, 0);
+-    is(tied($scalar)->{store}, 0);
+-    is(Devel::PPPort::sv_len_utf8($scalar), 2);
+-    is(tied($scalar)->{fetch}, 1);
+-    is(tied($scalar)->{store}, 0);
+-    is(Devel::PPPort::sv_len_utf8($scalar), 3);
+-    is(tied($scalar)->{fetch}, 2);
+-    is(tied($scalar)->{store}, 0);
+-    is(Devel::PPPort::sv_len_utf8($scalar), 4);
+-    is(tied($scalar)->{fetch}, 3);
+-    is(tied($scalar)->{store}, 0);
+-    is(Devel::PPPort::sv_len_utf8_nomg($scalar), 4);
+-    is(tied($scalar)->{fetch}, 3);
+-    is(tied($scalar)->{store}, 0);
+-    is(Devel::PPPort::sv_len_utf8_nomg($scalar), 4);
+-    is(tied($scalar)->{fetch}, 3);
+-    is(tied($scalar)->{store}, 0);
+-} else {
+-    skip 'skip: no utf8::downgrade/utf8::upgrade support', 23;
+-}
+-
+-package TieScalarCounter;
+-
+-sub TIESCALAR {
+-    my ($class, $value) = @_;
+-    return bless { fetch => 0, store => 0, value => $value }, $class;
+-}
+-
+-sub FETCH {
+-    BEGIN { if (main::ivers($]) ge main::ivers(5.008)) { require utf8; "utf8"->import() } }
+-    my ($self) = @_;
+-    $self->{fetch}++;
+-    return $self->{value} .= "é";
+-}
+-
+-sub STORE {
+-    my ($self, $value) = @_;
+-    $self->{store}++;
+-    $self->{value} = $value;
+-}
+-
+diff --git a/t/uv.t b/t/uv.t
+deleted file mode 100644
+index 049c819..0000000
+--- a/t/uv.t
++++ /dev/null
+@@ -1,68 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/uv instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (11) {
+-    load();
+-    plan(tests => 11);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-BEGIN { require warnings if ivers($]) > ivers('5.006') }
+-
+-is(&Devel::PPPort::sv_setuv(42), 42);
+-is(&Devel::PPPort::newSVuv(123), 123);
+-is(&Devel::PPPort::sv_2uv("4711"), 4711);
+-is(&Devel::PPPort::sv_2uv("1735928559"), 1735928559);
+-is(&Devel::PPPort::SvUVx("1735928559"), 1735928559);
+-is(&Devel::PPPort::SvUVx(1735928559), 1735928559);
+-is(&Devel::PPPort::SvUVx(0xdeadbeef), 0xdeadbeef);
+-is(&Devel::PPPort::XSRETURN_UV(), 42);
+-is(&Devel::PPPort::PUSHu(), 42);
+-is(&Devel::PPPort::XPUSHu(), 43);
+-is(&Devel::PPPort::my_strnlen("abc\0def", 7), 3);
+-
+diff --git a/t/variables.t b/t/variables.t
+deleted file mode 100644
+index eefc077..0000000
+--- a/t/variables.t
++++ /dev/null
+@@ -1,111 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/variables instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (52) {
+-    load();
+-    plan(tests => 52);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-ok(Devel::PPPort::compare_PL_signals());
+-
+-ok(!defined(&Devel::PPPort::PL_sv_undef()));
+-ok(&Devel::PPPort::PL_sv_yes());
+-ok(!&Devel::PPPort::PL_sv_no());
+-is(&Devel::PPPort::PL_na("abcd"), 4);
+-is(&Devel::PPPort::PL_Sv(), "mhx");
+-ok(defined &Devel::PPPort::PL_tokenbuf());
+-ok(ivers($]) >= ivers("5.009005") || &Devel::PPPort::PL_parser());
+-ok(&Devel::PPPort::PL_hexdigit() =~ /^[0-9a-zA-Z]+$/);
+-ok(defined &Devel::PPPort::PL_hints());
+-is(&Devel::PPPort::PL_ppaddr("mhx"), "MHX");
+-
+-for (&Devel::PPPort::other_variables()) {
+-  ok($_ != 0);
+-}
+-
+-{
+-  my @w;
+-  my $fail = 0;
+-  {
+-    local $SIG{'__WARN__'} = sub { push @w, @_ };
+-    ok(&Devel::PPPort::dummy_parser_warning());
+-  }
+-  if (ivers($]) >= ivers("5.009005")) {
+-    ok(@w >= 0);
+-    for (@w) {
+-      print "# $_";
+-      unless (/^warning: dummy PL_bufptr used in.*module3.*:\d+/i) {
+-        warn $_;
+-        $fail++;
+-      }
+-    }
+-  }
+-  else {
+-    ok(@w == 0);
+-  }
+-  is($fail, 0);
+-}
+-
+-ok(&Devel::PPPort::no_dummy_parser_vars(1) >= (ivers($]) < ivers("5.009005") ? 1 : 0));
+-
+-eval { &Devel::PPPort::no_dummy_parser_vars(0) };
+-
+-if (ivers($]) < ivers("5.009005")) {
+-  is($@, '');
+-}
+-else {
+-  if ($@) {
+-    print "# $@";
+-    ok($@ =~ /^panic: PL_parser == NULL in.*module2.*:\d+/i);
+-  }
+-  else {
+-    ok(1);
+-  }
+-}
+-
+diff --git a/t/warn.t b/t/warn.t
+deleted file mode 100644
+index 7e9d5e9..0000000
+--- a/t/warn.t
++++ /dev/null
+@@ -1,106 +0,0 @@
+-################################################################################
+-#
+-#            !!!!!   Do NOT edit this file directly!   !!!!!
+-#
+-#            Edit mktests.PL and/or parts/inc/warn instead.
+-#
+-#  This file was automatically generated from the definition files in the
+-#  parts/inc/ subdirectory by mktests.PL. To learn more about how all this
+-#  works, please read the F<HACKERS> file that came with this distribution.
+-#
+-################################################################################
+-
+-use FindBin ();
+-
+-BEGIN {
+-  if ($ENV{'PERL_CORE'}) {
+-    chdir 't' if -d 't';
+-    unshift @INC, '../lib' if -d '../lib' && -d '../ext';
+-    require Config; Config->import;
+-    use vars '%Config';
+-    if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
+-      print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
+-      exit 0;
+-    }
+-  }
+-
+-  use lib "$FindBin::Bin";
+-  use lib "$FindBin::Bin/../parts/inc";
+-
+-  die qq[Cannot find "$FindBin::Bin/../parts/inc"] unless -d "$FindBin::Bin/../parts/inc";
+-
+-  sub load {
+-    require 'testutil.pl';
+-    require 'inctools';
+-  }
+-
+-  if (11) {
+-    load();
+-    plan(tests => 11);
+-  }
+-}
+-
+-use Devel::PPPort;
+-use strict;
+-BEGIN { $^W = 1; }
+-
+-package Devel::PPPort;
+-use vars '@ISA';
+-require DynaLoader;
+-@ISA = qw(DynaLoader);
+-Devel::PPPort->bootstrap;
+-
+-package main;
+-
+-$^W = 0;
+-
+-my $warning;
+-
+-$SIG{'__WARN__'} = sub { $warning = $_[0] };
+-
+-$warning = '';
+-Devel::PPPort::warner();
+-ok(ivers($]) >= ivers("5.004") ? $warning =~ /^warner bar:42/ : $warning eq '');
+-
+-$warning = '';
+-Devel::PPPort::Perl_warner();
+-ok(ivers($]) >= ivers("5.004") ? $warning =~ /^Perl_warner bar:42/ : $warning eq '');
+-
+-$warning = '';
+-Devel::PPPort::Perl_warner_nocontext();
+-ok(ivers($]) >= ivers("5.004") ? $warning =~ /^Perl_warner_nocontext bar:42/ : $warning eq '');
+-
+-$warning = '';
+-Devel::PPPort::ckWARN();
+-is($warning, '');
+-
+-$warning = '';
+-Devel::PPPort::ckWARN_d();
+-ok(ivers($]) >= ivers("5.004") ? $warning =~ /^ckWARN_d bar:42/ : $warning eq '');
+-
+-$warning = '';
+-Devel::PPPort::Perl_ck_warner();
+-ok($warning eq '');
+-
+-$warning = '';
+-Devel::PPPort::Perl_ck_warner_d();
+-ok(ivers($]) >= ivers("5.004") ? $warning =~ /^Perl_ck_warner_d bar:42/ : $warning eq '');
+-
+-$^W = 1;
+-
+-$warning = '';
+-Devel::PPPort::ckWARN();
+-ok(ivers($]) >= ivers("5.004") ? $warning =~ /^ckWARN bar:42/ : $warning eq '');
+-
+-$warning = '';
+-Devel::PPPort::ckWARN_d();
+-ok(ivers($]) >= ivers("5.004") ? $warning =~ /^ckWARN_d bar:42/ : $warning eq '');
+-
+-$warning = '';
+-Devel::PPPort::Perl_ck_warner();
+-ok(ivers($]) >= ivers("5.004") ? $warning =~ /^Perl_ck_warner bar:42/ : $warning eq '');
+-
+-$warning = '';
+-Devel::PPPort::Perl_ck_warner_d();
+-ok(ivers($]) >= ivers("5.004") ? $warning =~ /^Perl_ck_warner_d bar:42/ : $warning eq '');
+-
+-- 
+2.40.1
+

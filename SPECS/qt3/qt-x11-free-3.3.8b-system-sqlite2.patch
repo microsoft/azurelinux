@@ -1,0 +1,136 @@
+diff -ur qt-x11-free-3.3.8b/configure qt-x11-free-3.3.8b-system-sqlite2/configure
+--- qt-x11-free-3.3.8b/configure	2008-01-15 20:09:15.000000000 +0100
++++ qt-x11-free-3.3.8b-system-sqlite2/configure	2011-11-04 03:14:22.000000000 +0100
+@@ -1626,6 +1626,7 @@
+     TDS_REQ="-lsybdb sybfront.h sybdb.h"
+     DB2_REQ="-ldb2 sqlcli.h sqlcli1.h"
+     IBASE_REQ="-lgds ibase.h"
++    SQLITE_REQ="-lsqlite sqlite.h"
+     for _SQLDR in $CFG_SQL_AVAILABLE; do
+ 	case $_SQLDR in
+ 	mysql)
+@@ -1650,9 +1651,7 @@
+ 	    $unixtests/checkavail "IBASE" $OPT_VERBOSE $IBASE_REQ $L_FLAGS $I_FLAGS && CFG_SQL_AUTODETECTED="$CFG_SQL_AUTODETECTED ibase"
+ 	    ;;
+ 	sqlite)
+-	    if [ -f $relpath/src/3rdparty/sqlite/sqlite.h ]; then
+-		CFG_SQL_AUTODETECTED="$CFG_SQL_AUTODETECTED sqlite"
+-	    fi
++	    $unixtests/checkavail "SQLite" $OPT_VERBOSE $SQLITE_REQ $L_FLAGS $I_FLAGS && CFG_SQL_AUTODETECTED="$CFG_SQL_AUTODETECTED sqlite"
+ 	    ;;
+ 	*)
+ 	    if [ "$OPT_VERBOSE" = "yes" ]; then
+diff -ur qt-x11-free-3.3.8b/plugins/src/sqldrivers/sqlite/sqlite.pro qt-x11-free-3.3.8b-system-sqlite2/plugins/src/sqldrivers/sqlite/sqlite.pro
+--- qt-x11-free-3.3.8b/plugins/src/sqldrivers/sqlite/sqlite.pro	2008-01-15 20:09:17.000000000 +0100
++++ qt-x11-free-3.3.8b-system-sqlite2/plugins/src/sqldrivers/sqlite/sqlite.pro	2011-11-04 03:13:17.000000000 +0100
+@@ -10,6 +10,9 @@
+ 
+ unix {
+ 	OBJECTS_DIR = .obj
++	!contains( LIBS, .*sqlite.* ) {
++	    LIBS	*= -lsqlite
++	}
+ }
+ 
+ win32 {
+@@ -21,54 +24,54 @@
+ #	win32-borland: {
+ #		QMAKE_LFLAGS += /dlibsqlite.dll
+ #	}
+-}
+ 
+-!contains( LIBS, .*sqlite.* ) {
+-    INCLUDEPATH += ../../../../src/3rdparty/sqlite
++	!contains( LIBS, .*sqlite.* ) {
++		INCLUDEPATH += ../../../../src/3rdparty/sqlite
+ 
+-    HEADERS += ../../../../src/3rdparty/sqlite/btree.h \
+-               ../../../../src/3rdparty/sqlite/config.h \
+-               ../../../../src/3rdparty/sqlite/hash.h \
+-               ../../../../src/3rdparty/sqlite/opcodes.h \
+-               ../../../../src/3rdparty/sqlite/os.h \
+-               ../../../../src/3rdparty/sqlite/pager.h \
+-               ../../../../src/3rdparty/sqlite/parse.h \
+-               ../../../../src/3rdparty/sqlite/sqlite.h \
+-               ../../../../src/3rdparty/sqlite/sqliteInt.h \
+-               ../../../../src/3rdparty/sqlite/vdbe.h \
+-	       ../../../../src/3rdparty/sqlite/vdbeInt.h
+-
+-    SOURCES += ../../../../src/3rdparty/sqlite/attach.c \
+-               ../../../../src/3rdparty/sqlite/auth.c \
+-               ../../../../src/3rdparty/sqlite/btree.c \
+-               ../../../../src/3rdparty/sqlite/btree_rb.c \
+-               ../../../../src/3rdparty/sqlite/build.c \
+-               ../../../../src/3rdparty/sqlite/copy.c \
+-	       ../../../../src/3rdparty/sqlite/date.c \
+-               ../../../../src/3rdparty/sqlite/delete.c \
+-               ../../../../src/3rdparty/sqlite/expr.c \
+-               ../../../../src/3rdparty/sqlite/func.c \
+-               ../../../../src/3rdparty/sqlite/hash.c \
+-               ../../../../src/3rdparty/sqlite/insert.c \
+-               ../../../../src/3rdparty/sqlite/main.c \
+-               ../../../../src/3rdparty/sqlite/opcodes.c \
+-               ../../../../src/3rdparty/sqlite/os.c \
+-               ../../../../src/3rdparty/sqlite/pager.c \
+-               ../../../../src/3rdparty/sqlite/parse.c \
+-               ../../../../src/3rdparty/sqlite/pragma.c \
+-               ../../../../src/3rdparty/sqlite/printf.c \
+-               ../../../../src/3rdparty/sqlite/random.c \
+-               ../../../../src/3rdparty/sqlite/select.c \
+-               ../../../../src/3rdparty/sqlite/shell.c \
+-               ../../../../src/3rdparty/sqlite/table.c \
+-               ../../../../src/3rdparty/sqlite/tokenize.c \
+-               ../../../../src/3rdparty/sqlite/trigger.c \
+-               ../../../../src/3rdparty/sqlite/update.c \
+-               ../../../../src/3rdparty/sqlite/util.c \
+-               ../../../../src/3rdparty/sqlite/vacuum.c \
+-               ../../../../src/3rdparty/sqlite/vdbe.c \
+-	       ../../../../src/3rdparty/sqlite/vdbeaux.c \
+-               ../../../../src/3rdparty/sqlite/where.c
++		HEADERS += ../../../../src/3rdparty/sqlite/btree.h \
++		           ../../../../src/3rdparty/sqlite/config.h \
++		           ../../../../src/3rdparty/sqlite/hash.h \
++		           ../../../../src/3rdparty/sqlite/opcodes.h \
++		           ../../../../src/3rdparty/sqlite/os.h \
++		           ../../../../src/3rdparty/sqlite/pager.h \
++		           ../../../../src/3rdparty/sqlite/parse.h \
++		           ../../../../src/3rdparty/sqlite/sqlite.h \
++		           ../../../../src/3rdparty/sqlite/sqliteInt.h \
++		           ../../../../src/3rdparty/sqlite/vdbe.h \
++		           ../../../../src/3rdparty/sqlite/vdbeInt.h
++
++		SOURCES += ../../../../src/3rdparty/sqlite/attach.c \
++		           ../../../../src/3rdparty/sqlite/auth.c \
++		           ../../../../src/3rdparty/sqlite/btree.c \
++		           ../../../../src/3rdparty/sqlite/btree_rb.c \
++		           ../../../../src/3rdparty/sqlite/build.c \
++		           ../../../../src/3rdparty/sqlite/copy.c \
++		           ../../../../src/3rdparty/sqlite/date.c \
++		           ../../../../src/3rdparty/sqlite/delete.c \
++		           ../../../../src/3rdparty/sqlite/expr.c \
++		           ../../../../src/3rdparty/sqlite/func.c \
++		           ../../../../src/3rdparty/sqlite/hash.c \
++		           ../../../../src/3rdparty/sqlite/insert.c \
++		           ../../../../src/3rdparty/sqlite/main.c \
++		           ../../../../src/3rdparty/sqlite/opcodes.c \
++		           ../../../../src/3rdparty/sqlite/os.c \
++		           ../../../../src/3rdparty/sqlite/pager.c \
++		           ../../../../src/3rdparty/sqlite/parse.c \
++		           ../../../../src/3rdparty/sqlite/pragma.c \
++		           ../../../../src/3rdparty/sqlite/printf.c \
++		           ../../../../src/3rdparty/sqlite/random.c \
++		           ../../../../src/3rdparty/sqlite/select.c \
++		           ../../../../src/3rdparty/sqlite/shell.c \
++		           ../../../../src/3rdparty/sqlite/table.c \
++		           ../../../../src/3rdparty/sqlite/tokenize.c \
++		           ../../../../src/3rdparty/sqlite/trigger.c \
++		           ../../../../src/3rdparty/sqlite/update.c \
++		           ../../../../src/3rdparty/sqlite/util.c \
++		           ../../../../src/3rdparty/sqlite/vacuum.c \
++		           ../../../../src/3rdparty/sqlite/vdbe.c \
++		           ../../../../src/3rdparty/sqlite/vdbeaux.c \
++		           ../../../../src/3rdparty/sqlite/where.c
++	}
+ }
+ 
+ REQUIRES	= sql

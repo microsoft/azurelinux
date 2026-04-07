@@ -1,0 +1,43 @@
+--- build.xml.orig	2009-09-22 23:00:17.000000000 +0200
++++ build.xml	2010-01-29 03:34:13.000000000 +0100
+@@ -94,6 +94,7 @@
+ 
+     <copy todir="${build.src}" filtering="true">
+       <fileset dir="${src.java}" excludes="${src.excludes}"/>
++      <fileset dir="${basedir}${file.separator}test" excludes="${src.excludes}"/>
+     </copy>
+   </target>
+ 
+@@ -110,7 +111,7 @@
+   <!-- =================================================================== -->
+   <!-- Compiles the source code                                            -->
+   <!-- =================================================================== -->
+-  <target name="compile" depends="init, prepare-sources, generator" description="Compiles the sources. (Default)">
++  <target name="compile" depends="init, generator, prepare-sources" description="Compiles the sources. (Default)">
+     <!-- Echo compilation properties -->
+     <echo level="info" message="Compiler    = ${build.compiler}"/>
+     <echo level="info" message="Optimize    = ${compile.optimize}"/>
+@@ -239,7 +240,22 @@
+   <!-- =================================================================== -->
+   <target name="clean-all" depends="clean-classes,clean-jars, clean-dist">
+     <echo message="Cleaned all."/>
++  </target>
++
++  <!-- =================================================================== -->
++  <!-- Unit tests                                                          -->
++  <!-- =================================================================== -->
++  <target name="test" depends="compile">
++    <junit printsummary="yes" fork="yes" haltonfailure="yes">
++      <classpath>
++        <pathelement location="${build.classes}"/>
++        <pathelement location="${build.src}"/>
++        <pathelement path="${java.class.path}"/>
++      </classpath>
++
++      <formatter type="plain"/>
++      <test name="org.antlr.stringtemplate.test.TestStringTemplate"/>
++    </junit>
+   </target>
+-
+ </project>
+ 

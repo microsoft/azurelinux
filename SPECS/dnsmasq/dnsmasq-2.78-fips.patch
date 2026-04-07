@@ -1,0 +1,37 @@
+From 7b1cce1d0bdb61c09946978d4bdeb05a3cd4202a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20Men=C5=A1=C3=ADk?= <pemensik@redhat.com>
+Date: Fri, 2 Mar 2018 13:17:04 +0100
+Subject: [PATCH] Print warning on FIPS machine with dnssec enabled. Dnsmasq
+ has no proper FIPS 140-2 compliant implementation.
+
+---
+ src/dnsmasq.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/src/dnsmasq.c b/src/dnsmasq.c
+index 480c5f9..5fd229e 100644
+--- a/src/dnsmasq.c
++++ b/src/dnsmasq.c
+@@ -187,6 +187,7 @@ int main (int argc, char **argv)
+       
+       if (daemon->cachesize < CACHESIZ)
+ 	die(_("cannot reduce cache size from default when DNSSEC enabled"), NULL, EC_BADCONF);
++           
+ #else 
+       die(_("DNSSEC not available: set HAVE_DNSSEC in src/config.h"), NULL, EC_BADCONF);
+ #endif
+@@ -786,7 +787,10 @@ int main (int argc, char **argv)
+ 	my_syslog(LOG_INFO, _("DNSSEC validation enabled but all unsigned answers are trusted"));
+       else
+ 	my_syslog(LOG_INFO, _("DNSSEC validation enabled"));
+-      
++
++      if (access("/etc/system-fips", F_OK) == 0)
++        my_syslog(LOG_WARNING, _("DNSSEC support is not FIPS 140-2 compliant"));
++
+       daemon->dnssec_no_time_check = option_bool(OPT_DNSSEC_TIME);
+       if (option_bool(OPT_DNSSEC_TIME) && !daemon->back_to_the_future)
+ 	my_syslog(LOG_INFO, _("DNSSEC signature timestamps not checked until receipt of SIGINT"));
+-- 
+2.14.4
+

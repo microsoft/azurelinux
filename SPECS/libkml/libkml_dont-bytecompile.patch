@@ -1,0 +1,24 @@
+diff -rupN libkml-1.3.0/src/swig/CMakeLists.txt libkml-1.3.0-new/src/swig/CMakeLists.txt
+--- libkml-1.3.0/src/swig/CMakeLists.txt	2015-12-21 18:23:05.000000000 +0100
++++ libkml-1.3.0-new/src/swig/CMakeLists.txt	2017-08-07 21:26:23.717928168 +0200
+@@ -23,12 +23,6 @@ if(WITH_PYTHON)
+     set_source_files_properties( ${CMAKE_CURRENT_BINARY_DIR}/${MODULE_NAME}PYTHON_wrap.cxx COMPILE_FLAGS "-Wno-long-long" )
+     swig_add_module(${MODULE_NAME} python ${INTERFACE_FILE})
+     swig_link_libraries(${MODULE_NAME} kmlbase kmlengine kmldom ${PYTHON_LIBRARIES})
+-    add_custom_command(
+-      TARGET _${MODULE_NAME}
+-      POST_BUILD
+-      COMMAND ${CMAKE_COMMAND} -E echo "Byte-compiling ${MODULE_NAME}.py"
+-      COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/cmake/pycompile.py ${CMAKE_CURRENT_BINARY_DIR}/${MODULE_NAME}.py
+-      DEPENDS kmlbase kmlengine kmldom)
+ 
+     install(TARGETS
+       _${MODULE_NAME}
+@@ -36,7 +30,6 @@ if(WITH_PYTHON)
+ 
+     install(FILES
+       ${CMAKE_CURRENT_BINARY_DIR}/${MODULE_NAME}.py
+-      ${CMAKE_CURRENT_BINARY_DIR}/${MODULE_NAME}.pyc
+       DESTINATION ${PYTHON_INSTALL_DIR})
+ 
+   endforeach()

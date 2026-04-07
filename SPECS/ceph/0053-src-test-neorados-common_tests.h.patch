@@ -1,0 +1,30 @@
+--- ceph-19.2.0/src/test/neorados/common_tests.h.orig	2024-09-18 12:27:51.000000000 -0400
++++ ceph-19.2.0/src/test/neorados/common_tests.h	2025-01-26 19:31:32.545762972 -0500
+@@ -47,6 +47,18 @@
+ 
+ #include "gtest/gtest.h"
+ 
++#if !defined(GTEST_DISALLOW_COPY_AND_ASSIGN_)
++#define GTEST_DISALLOW_COPY_AND_ASSIGN_(type) \
++  type(type const&) = delete;                 \
++  type& operator=(type const&) = delete
++#endif
++
++#if !defined(GTEST_DISALLOW_MOVE_AND_ASSIGN_)
++#define GTEST_DISALLOW_MOVE_AND_ASSIGN_(type) \
++  type(type&&) noexcept = delete;             \
++  type& operator=(type&&) noexcept = delete
++#endif
++
+ /// \file test/neorados/common_tests.h
+ ///
+ /// \brief Tools for testing neorados code
+@@ -398,7 +410,7 @@
+ 									       \
+   private:                                                                     \
+     boost::asio::awaitable<void> CoTestBody() override;                        \
+-    static ::testing::TestInfo *const test_info_ GTEST_ATTRIBUTE_UNUSED_;      \
++    static ::testing::TestInfo *const test_info_ __attribute__((unused));      \
+   };                                                                           \
+ 									       \
+   ::testing::TestInfo *const GTEST_TEST_CLASS_NAME_(test_suite_name,           \

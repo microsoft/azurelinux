@@ -1,0 +1,17 @@
+# Requires SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
+# set in environment, handled for example in plasma via
+# /etc/xdg/plasma-workspace/env/ssh-agent.sh
+[Unit]
+ConditionEnvironment=!SSH_AGENT_PID
+Description=OpenSSH key agent
+Documentation=man:ssh-agent(1) man:ssh-add(1) man:ssh(1)
+Requires=ssh-agent.socket
+
+[Service]
+ExecStart=/usr/bin/ssh-agent -D
+PassEnvironment=SSH_AGENT_PID
+SuccessExitStatus=2
+Type=simple
+
+[Install]
+Also=ssh-agent.socket

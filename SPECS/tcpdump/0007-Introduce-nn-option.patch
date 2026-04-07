@@ -1,0 +1,55 @@
+From 9ea43c6c97d3653cb58c1934f8770b951917bf9a Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Mon, 20 Oct 2014 13:26:38 +0200
+Subject: [PATCH 7/8] Introduce -nn option
+
+This changes the semantics on -n option so only namelookups are skipped. Port
+numbers *are* translated to their string representations. Option -nn then has
+the same semantics as -n had originally.
+---
+ addrtoname.c | 4 ++--
+ tcpdump.1.in | 6 +++++-
+ 2 files changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/addrtoname.c b/addrtoname.c
+index 949acb7..9dd78d8 100644
+--- a/addrtoname.c
++++ b/addrtoname.c
+@@ -810,7 +810,7 @@ init_servarray(netdissect_options *ndo)
+ 
+ 		while (table->name)
+ 			table = table->nxt;
+-		if (ndo->ndo_nflag) {
++		if (ndo->ndo_nflag > 1) {
+ 			(void)snprintf(buf, sizeof(buf), "%d", port);
+ 			table->name = strdup(buf);
+ 		} else
+@@ -1233,7 +1233,7 @@ init_addrtoname(netdissect_options *ndo, uint32_t localnet, uint32_t mask)
+ 		f_localnet = localnet;
+ 		f_netmask = mask;
+ 	}
+-	if (ndo->ndo_nflag)
++	if (ndo->ndo_nflag > 1)
+ 		/*
+ 		 * Simplest way to suppress names.
+ 		 */
+diff --git a/tcpdump.1.in b/tcpdump.1.in
+index ca5cff2..c711a24 100644
+--- a/tcpdump.1.in
++++ b/tcpdump.1.in
+@@ -547,7 +547,11 @@ Use \fIsecret\fP as a shared secret for validating the digests found in
+ TCP segments with the TCP-MD5 option (RFC 2385), if present.
+ .TP
+ .B \-n
+-Don't convert addresses (i.e., host addresses, port numbers, etc.) to names.
++Don't convert host addresses to names.  This can be used to avoid
++DNS lookups.
++.TP
++.B \-nn
++Don't convert protocol and port numbers etc. to names either.
+ .TP
+ .B \-N
+ Don't print domain name qualification of host names.
+-- 
+2.9.3
+

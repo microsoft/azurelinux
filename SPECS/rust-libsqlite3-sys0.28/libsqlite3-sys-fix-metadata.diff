@@ -1,0 +1,96 @@
+--- libsqlite3-sys-0.28.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ libsqlite3-sys-0.28.0/Cargo.toml	2026-01-12T23:26:59.915020+00:00
+@@ -26,84 +26,28 @@
+ categories = ["external-ffi-bindings"]
+ license = "MIT"
+ repository = "https://github.com/rusqlite/rusqlite"
+-
+-[dependencies.openssl-sys]
+-version = "0.9"
+-optional = true
++exclude = [
++    "/bindgen-bindings/",
++    "/upgrade.sh",
++    "/upgrade_sqlcipher.sh",
++    "/Upgrade.md",
++]
+ 
+ [build-dependencies.bindgen]
+-version = "0.69"
++version = "0.72"
+ features = ["runtime"]
+-optional = true
+ default-features = false
+-
+-[build-dependencies.cc]
+-version = "1.0"
+-optional = true
+ 
+ [build-dependencies.pkg-config]
+ version = "0.3.19"
+-optional = true
+-
+-[build-dependencies.prettyplease]
+-version = "0.2"
+-optional = true
+-
+-[build-dependencies.quote]
+-version = "1"
+-optional = true
+-default-features = false
+-
+-[build-dependencies.syn]
+-version = "2.0"
+-features = [
+-    "full",
+-    "extra-traits",
+-    "visit-mut",
+-]
+-optional = true
+-
+-[build-dependencies.vcpkg]
+-version = "0.2"
+-optional = true
+ 
+ [features]
+-buildtime_bindgen = [
+-    "bindgen",
+-    "pkg-config",
+-    "vcpkg",
+-]
+-bundled = [
+-    "cc",
+-    "bundled_bindings",
+-]
+-bundled-sqlcipher = ["bundled"]
+-bundled-sqlcipher-vendored-openssl = [
+-    "bundled-sqlcipher",
+-    "openssl-sys/vendored",
+-]
+-bundled-windows = [
+-    "cc",
+-    "bundled_bindings",
+-]
+-bundled_bindings = []
++buildtime_bindgen = []
+ default = ["min_sqlite_version_3_14_0"]
+-in_gecko = []
+-loadable_extension = [
+-    "prettyplease",
+-    "quote",
+-    "syn",
+-]
+-min_sqlite_version_3_14_0 = [
+-    "pkg-config",
+-    "vcpkg",
+-]
++min_sqlite_version_3_14_0 = []
+ preupdate_hook = ["buildtime_bindgen"]
+ session = [
+     "preupdate_hook",
+     "buildtime_bindgen",
+ ]
+-sqlcipher = []
+ unlock_notify = []
+-wasm32-wasi-vfs = []
+-with-asan = []

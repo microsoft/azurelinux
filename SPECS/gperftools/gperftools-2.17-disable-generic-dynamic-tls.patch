@@ -1,0 +1,33 @@
+diff -up gperftools-2.17/configure.ac.dynload gperftools-2.17/configure.ac
+--- gperftools-2.17/configure.ac.dynload	2025-08-05 13:05:50.390004596 -0400
++++ gperftools-2.17/configure.ac	2025-08-05 13:05:20.644258524 -0400
+@@ -506,6 +506,17 @@ AS_IF([test "x$enable_aggressive_decommi
+                  1,
+                  [enable aggressive decommit by default])])
+ 
++# Enable generic dynamic TLS model by default
++default_enable_generic_dynamic_tls=yes
++AC_ARG_ENABLE([general-dynamic-tls],
++              [AS_HELP_STRING([--disable-general-dynamic-tls],
++                              [Do not use the general dynamic TLS model])],
++              [],
++              [enable_generic_dynamic_tls="$default_enable_generic_dynamic_tls"])
++AS_IF([test "x$enable_generic_dynamic_tls" = xyes],
++      [AC_DEFINE([ENABLE_GENERIC_DYNAMIC_TLS], 1,
++                 [Use the generic dynamic TLS model])])
++
+ AC_PATH_PROG(PPROF_PATH, pprof)
+ AM_CONDITIONAL(SKIP_PPROF_TESTS, [test "x$PPROF_PATH" = "x"])
+ AS_IF([test "x$PPROF_PATH" = "x"],
+diff -up gperftools-2.17/src/base/basictypes.h.dynload gperftools-2.17/src/base/basictypes.h
+--- gperftools-2.17/src/base/basictypes.h.dynload	2025-08-05 13:05:59.341787961 -0400
++++ gperftools-2.17/src/base/basictypes.h	2025-08-05 13:06:52.289818648 -0400
+@@ -84,7 +84,7 @@
+ # define ATTRIBUTE_UNUSED
+ #endif
+ 
+-#if defined(HAVE___ATTRIBUTE__)
++#if defined(HAVE___ATTRIBUTE__) && defined(ENABLE_GENERIC_DYNAMIC_TLS)
+ #define ATTR_INITIAL_EXEC __attribute__ ((tls_model ("initial-exec")))
+ #else
+ #define ATTR_INITIAL_EXEC

@@ -1,0 +1,5 @@
+Name: Threading Building Blocks
+Description: The Threading Building Blocks library abstracts low-level threading details
+URL: http://www.threadingbuildingblocks.org/
+Version: _FEDORA_VERSION
+Libs: -ltbb

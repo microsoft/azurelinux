@@ -1,0 +1,151 @@
+From 9c75c175e3555377328fc5fc9b06e94f129b7cd7 Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:28 +0200
+Subject: [PATCH 21/50] openssh-6.6p1-GSSAPIEnablek5users
+
+---
+ gss-serv-krb5.c |  3 +--
+ servconf.c      | 13 ++++++++++++-
+ servconf.h      |  1 +
+ sshd_config     |  1 +
+ sshd_config.5   |  6 ++++++
+ 5 files changed, 21 insertions(+), 3 deletions(-)
+
+diff --git a/gss-serv-krb5.c b/gss-serv-krb5.c
+index 187faf92..03188d9b 100644
+--- a/gss-serv-krb5.c
++++ b/gss-serv-krb5.c
+@@ -278,7 +278,6 @@ ssh_gssapi_krb5_cmdok(krb5_principal principal, const char *name,
+ 	FILE *fp;
+ 	char file[MAXPATHLEN];
+ 	char *line = NULL;
+-	char kuser[65]; /* match krb5_kuserok() */
+ 	struct stat st;
+ 	struct passwd *pw = the_authctxt->pw;
+ 	int found_principal = 0;
+@@ -288,7 +287,7 @@ ssh_gssapi_krb5_cmdok(krb5_principal principal, const char *name,
+ 
+ 	snprintf(file, sizeof(file), "%s/.k5users", pw->pw_dir);
+ 	/* If both .k5login and .k5users DNE, self-login is ok. */
+-	if (!k5login_exists && (access(file, F_OK) == -1)) {
++	if ( !options.enable_k5users || (!k5login_exists && (access(file, F_OK) == -1))) {
+                 return ssh_krb5_kuserok(krb_context, principal, luser,
+                                         k5login_exists);
+ 	}
+diff --git a/servconf.c b/servconf.c
+index 5dd5ca21..c0de7110 100644
+--- a/servconf.c
++++ b/servconf.c
+@@ -146,6 +146,7 @@ initialize_server_options(ServerOptions *options)
+ 	options->gss_store_rekey = -1;
+ 	options->gss_kex_algorithms = NULL;
+ 	options->use_kuserok = -1;
++	options->enable_k5users = -1;
+ 	options->password_authentication = -1;
+ 	options->kbd_interactive_authentication = -1;
+ 	options->permit_empty_passwd = -1;
+@@ -402,6 +403,8 @@ fill_default_server_options(ServerOptions *options)
+ #endif
+ 	if (options->use_kuserok == -1)
+ 		options->use_kuserok = 1;
++	if (options->enable_k5users == -1)
++		options->enable_k5users = 0;
+ 	if (options->password_authentication == -1)
+ 		options->password_authentication = 1;
+ 	if (options->kbd_interactive_authentication == -1)
+@@ -585,7 +588,7 @@ typedef enum {
+ 	sHostKeyAlgorithms, sPerSourceMaxStartups, sPerSourceNetBlockSize,
+ 	sPerSourcePenalties, sPerSourcePenaltyExemptList,
+ 	sClientAliveInterval, sClientAliveCountMax, sAuthorizedKeysFile,
+-	sGssAuthentication, sGssCleanupCreds, sGssStrictAcceptor,
++	sGssAuthentication, sGssCleanupCreds, sGssEnablek5users, sGssStrictAcceptor,
+ 	sGssKeyEx, sGssKexAlgorithms, sGssStoreRekey,
+ 	sAcceptEnv, sSetEnv, sPermitTunnel,
+ 	sMatch, sPermitOpen, sPermitListen, sForceCommand, sChrootDirectory,
+@@ -681,6 +684,7 @@ static struct {
+ 	{ "gssapikeyexchange", sGssKeyEx, SSHCFG_GLOBAL },
+ 	{ "gssapistorecredentialsonrekey", sGssStoreRekey, SSHCFG_GLOBAL },
+ 	{ "gssapikexalgorithms", sGssKexAlgorithms, SSHCFG_GLOBAL },
++	{ "gssapienablek5users", sGssEnablek5users, SSHCFG_ALL },
+ #else
+ 	{ "gssapiauthentication", sUnsupported, SSHCFG_ALL },
+ 	{ "gssapicleanupcredentials", sUnsupported, SSHCFG_GLOBAL },
+@@ -689,6 +693,7 @@ static struct {
+ 	{ "gssapikeyexchange", sUnsupported, SSHCFG_GLOBAL },
+ 	{ "gssapistorecredentialsonrekey", sUnsupported, SSHCFG_GLOBAL },
+ 	{ "gssapikexalgorithms", sUnsupported, SSHCFG_GLOBAL },
++	{ "gssapienablek5users", sUnsupported, SSHCFG_ALL },
+ #endif
+ 	{ "gssusesessionccache", sUnsupported, SSHCFG_GLOBAL },
+ 	{ "gssapiusesessioncredcache", sUnsupported, SSHCFG_GLOBAL },
+@@ -2450,6 +2455,10 @@ process_server_config_line_depth(ServerOptions *options, char *line,
+ 		intptr = &options->use_kuserok;
+ 		goto parse_flag;
+ 
++	case sGssEnablek5users:
++		intptr = &options->enable_k5users;
++		goto parse_flag;
++
+ 	case sMatch:
+ 		if (cmdline)
+ 			fatal("Match directive not supported as a command-line "
+@@ -3005,6 +3014,7 @@ copy_set_server_options(ServerOptions *dst, ServerOptions *src, int preauth)
+ 	M_CP_INTOPT(ip_qos_interactive);
+ 	M_CP_INTOPT(ip_qos_bulk);
+ 	M_CP_INTOPT(use_kuserok);
++	M_CP_INTOPT(enable_k5users);
+ 	M_CP_INTOPT(rekey_limit);
+ 	M_CP_INTOPT(rekey_interval);
+ 	M_CP_INTOPT(log_level);
+@@ -3314,6 +3324,7 @@ dump_config(ServerOptions *o)
+ # endif
+ 	dump_cfg_fmtint(sKerberosUniqueCCache, o->kerberos_unique_ccache);
+ 	dump_cfg_fmtint(sKerberosUseKuserok, o->use_kuserok);
++	dump_cfg_fmtint(sGssEnablek5users, o->enable_k5users);
+ #endif
+ #ifdef GSSAPI
+ 	dump_cfg_fmtint(sGssAuthentication, o->gss_authentication);
+diff --git a/servconf.h b/servconf.h
+index 11de36a2..c08cf6a7 100644
+--- a/servconf.h
++++ b/servconf.h
+@@ -152,6 +152,7 @@ typedef struct {
+ 	int     kerberos_unique_ccache;		/* If true, the acquired ticket will
+ 						 * be stored in per-session ccache */
+ 	int	use_kuserok;
++	int		enable_k5users;
+ 	int     gss_authentication;	/* If true, permit GSSAPI authentication */
+ 	int     gss_keyex;		/* If true, permit GSSAPI key exchange */
+ 	int     gss_cleanup_creds;	/* If true, destroy cred cache on logout */
+diff --git a/sshd_config b/sshd_config
+index ea5a878e..33713c88 100644
+--- a/sshd_config
++++ b/sshd_config
+@@ -82,6 +82,7 @@ AuthorizedKeysFile	.ssh/authorized_keys
+ #GSSAPICleanupCredentials yes
+ #GSSAPIStrictAcceptorCheck yes
+ #GSSAPIKeyExchange no
++#GSSAPIEnablek5users no
+ 
+ # Set this to 'yes' to enable PAM authentication, account processing,
+ # and session processing. If this is enabled, PAM authentication will
+diff --git a/sshd_config.5 b/sshd_config.5
+index 0fcb409a..fe246fc2 100644
+--- a/sshd_config.5
++++ b/sshd_config.5
+@@ -739,6 +739,12 @@ Specifies whether to automatically destroy the user's credentials cache
+ on logout.
+ The default is
+ .Cm yes .
++.It Cm GSSAPIEnablek5users
++Specifies whether to look at .k5users file for GSSAPI authentication
++access control. Further details are described in
++.Xr ksu 1 .
++The default is
++.Cm no .
+ .It Cm GSSAPIKeyExchange
+ Specifies whether key exchange based on GSSAPI is allowed. GSSAPI key exchange
+ doesn't rely on ssh keys to verify host identity.
+-- 
+2.49.0
+

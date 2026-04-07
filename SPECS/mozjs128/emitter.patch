@@ -1,0 +1,67 @@
+From d1d785c169345b81c76213f6dd9be32b4db60294 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Franti=C5=A1ek=20Zatloukal?= <fzatlouk@redhat.com>
+Date: Wed, 15 Jul 2020 08:39:47 +0200
+Subject: [PATCH] Build: allow LOCAL_INCLUDES paths with topsrcdir or topobjdir
+
+---
+ python/mozbuild/mozbuild/frontend/emitter.py  | 10 ---------
+ .../mozbuild/test/frontend/test_emitter.py    | 22 -------------------
+ 2 files changed, 32 deletions(-)
+
+diff --git a/python/mozbuild/mozbuild/frontend/emitter.py b/python/mozbuild/mozbuild/frontend/emitter.py
+index 0b7ccef..a3c7f2f 100644
+--- a/python/mozbuild/mozbuild/frontend/emitter.py
++++ b/python/mozbuild/mozbuild/frontend/emitter.py
+@@ -1365,16 +1365,6 @@ class TreeMetadataEmitter(LoggingMixin):
+                         "(resolved to %s)" % (local_include, full_path),
+                         context,
+                     )
+-            if (
+-                full_path == context.config.topsrcdir
+-                or full_path == context.config.topobjdir
+-            ):
+-                raise SandboxValidationError(
+-                    "Path specified in LOCAL_INCLUDES "
+-                    "(%s) resolves to the topsrcdir or topobjdir (%s), which is "
+-                    "not allowed" % (local_include, full_path),
+-                    context,
+-                )
+             include_obj = LocalInclude(context, local_include)
+             local_includes.append(include_obj.path.full_path)
+             yield include_obj
+diff --git a/python/mozbuild/mozbuild/test/frontend/test_emitter.py b/python/mozbuild/mozbuild/test/frontend/test_emitter.py
+index 99507fc..821de22 100644
+--- a/python/mozbuild/mozbuild/test/frontend/test_emitter.py
++++ b/python/mozbuild/mozbuild/test/frontend/test_emitter.py
+@@ -1076,28 +1076,6 @@ class TestEmitterBasic(unittest.TestCase):
+
+         self.assertEqual(local_includes, expected)
+
+-    def test_local_includes_invalid(self):
+-        """Test that invalid LOCAL_INCLUDES are properly detected."""
+-        reader = self.reader("local_includes-invalid/srcdir")
+-
+-        with six.assertRaisesRegex(
+-            self,
+-            SandboxValidationError,
+-            "Path specified in LOCAL_INCLUDES.*resolves to the "
+-            "topsrcdir or topobjdir",
+-        ):
+-            self.read_topsrcdir(reader)
+-
+-        reader = self.reader("local_includes-invalid/objdir")
+-
+-        with six.assertRaisesRegex(
+-            self,
+-            SandboxValidationError,
+-            "Path specified in LOCAL_INCLUDES.*resolves to the "
+-            "topsrcdir or topobjdir",
+-        ):
+-            self.read_topsrcdir(reader)
+-
+     def test_local_includes_file(self):
+         """Test that a filename can't be used in LOCAL_INCLUDES."""
+         reader = self.reader("local_includes-filename")
+--
+2.37.1
+

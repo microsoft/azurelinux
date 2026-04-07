@@ -1,0 +1,3 @@
+#Type Name     ID             GECOS                   Home directory  Shell
+g     ldap     55
+u     ldap     55:55          "OpenLDAP server"       /var/lib/ldap   /sbin/nologin

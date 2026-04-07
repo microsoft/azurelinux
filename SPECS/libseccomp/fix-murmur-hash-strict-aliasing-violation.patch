@@ -1,0 +1,86 @@
+From b7d0f04e63c460638eeca970ba3bb784733e2e2e Mon Sep 17 00:00:00 2001
+From: Romain Geissler <romain.geissler@amadeus.com>
+Date: Tue, 18 Feb 2025 22:29:05 +0000
+Subject: [PATCH] Fix strict aliasing UB in MurMur hash implementation.
+
+This was spotted when trying to upgrade the libseccomp fedora package to
+version 2.6.0 in fedora rawhide. It comes with gcc 15 and LTO enabled by
+default. When running the test 61-sim-transactions we get plenty of such
+errors in valgrind:
+
+==265507== Use of uninitialised value of size 8
+==265507==    at 0x4096AD: _hsh_add (gen_bpf.c:599)
+==265507==    by 0x40A557: UnknownInlinedFun (gen_bpf.c:2016)
+==265507==    by 0x40A557: gen_bpf_generate (gen_bpf.c:2341)
+==265507==    by 0x400CDE: UnknownInlinedFun (db.c:2685)
+==265507==    by 0x400CDE: UnknownInlinedFun (db.c:2682)
+==265507==    by 0x400CDE: UnknownInlinedFun (api.c:756)
+==265507==    by 0x400CDE: UnknownInlinedFun (util.c:162)
+==265507==    by 0x400CDE: UnknownInlinedFun (util.c:153)
+==265507==    by 0x400CDE: main (61-sim-transactions.c:128)
+==265507==  Uninitialised value was created by a stack allocation
+==265507==    at 0x409590: _hsh_add (gen_bpf.c:573)
+
+Investigating this a bit, it seems that because of LTO the MurMur hash
+implementation is being inlined in _hsh_add. The two buffers data and
+blocks to point at the same underlying data, but via incompatible type,
+which is a strict aliasing violation. Instead, remove the getblock32
+function and inline the copy with memcpy.
+
+This is reproducible on a "fedora:rawhide" container (gcc 15) and using:
+export CFLAGS='-O2 -flto=auto -ffat-lto-objects -g'
+
+Signed-off-by: Romain Geissler <romain.geissler@amadeus.com>
+---
+ src/hash.c | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
+
+diff --git a/src/hash.c b/src/hash.c
+index 4435900f..01ff9399 100644
+--- a/src/hash.c
++++ b/src/hash.c
+@@ -12,15 +12,11 @@
+  */
+ 
+ #include <stdlib.h>
++#include <string.h>
+ #include <inttypes.h>
+ 
+ #include "hash.h"
+ 
+-static inline uint32_t getblock32(const uint32_t *p, int i)
+-{
+-	return p[i];
+-}
+-
+ static inline uint32_t rotl32(uint32_t x, int8_t r)
+ {
+ 	return (x << r) | (x >> (32 - r));
+@@ -41,7 +37,6 @@ static inline uint32_t fmix32(uint32_t h)
+ uint32_t hash(const void *key, size_t length)
+ {
+ 	const uint8_t *data = (const uint8_t *)key;
+-	const uint32_t *blocks;
+ 	const uint8_t *tail;
+ 	const int nblocks = length / 4;
+ 	const uint32_t c1 = 0xcc9e2d51;
+@@ -54,9 +49,8 @@ uint32_t hash(const void *key, size_t length)
+ 	uint32_t h1 = 0;
+ 
+ 	/* body */
+-	blocks = (const uint32_t *)(data + nblocks * 4);
+ 	for(i = -nblocks; i; i++) {
+-		k1 = getblock32(blocks, i);
++		memcpy(&k1, data + (nblocks + i) * sizeof(uint32_t), sizeof(uint32_t));
+ 
+ 		k1 *= c1;
+ 		k1 = rotl32(k1, 15);
+@@ -68,7 +62,7 @@ uint32_t hash(const void *key, size_t length)
+ 	}
+ 
+ 	/* tail */
+-	tail = (const uint8_t *)(data + nblocks * 4);
++	tail = data + nblocks * sizeof(uint32_t);
+ 	switch(length & 3) {
+ 	case 3:
+ 		k2 ^= tail[2] << 16;

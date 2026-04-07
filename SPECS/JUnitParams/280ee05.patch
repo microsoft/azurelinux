@@ -1,0 +1,31 @@
+From 280ee05666f151ebd1af4f390fd0ff659cce67e9 Mon Sep 17 00:00:00 2001
+From: Quang Nguyen <quangctkm9207@gmail.com>
+Date: Wed, 20 Dec 2017 16:27:41 +0900
+Subject: [PATCH] Add language identifier for syntax highlighting.
+
+---
+ README.md | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/README.md b/README.md
+index 4e793b0..bc7d713 100644
+--- a/README.md
++++ b/README.md
+@@ -44,7 +44,7 @@ Main differences to standard JUnit Parametrised runner:
+ ## Quickstart
+ 
+ JUnitParams is available as Maven artifact:
+-```
++```xml
+ <dependency>
+   <groupId>pl.pragmatists</groupId>
+   <artifactId>JUnitParams</artifactId>
+@@ -54,7 +54,7 @@ JUnitParams is available as Maven artifact:
+ ```
+ To use JUnitParams in a Gradle build add this to your dependencies:
+ 
+-```
++```groovy
+ testCompile 'pl.pragmatists:JUnitParams:1.1.1'
+ ```
+ 

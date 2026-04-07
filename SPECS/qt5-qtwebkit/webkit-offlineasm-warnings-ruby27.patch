@@ -1,0 +1,46 @@
+From c7d19a492d97f9282a546831beb918e03315f6ef Mon Sep 17 00:00:00 2001
+From: Adrian Perez de Castro <aperez@igalia.com>
+Date: Wed, 15 Jan 2020 22:15:38 +0000
+Subject: [PATCH] Offlineasm warnings with newer Ruby versions
+ https://bugs.webkit.org/show_bug.cgi?id=206233
+
+Reviewed by Yusuke Suzuki.
+
+Avoid a warning about using Object#=~ on Annotation instances, which
+has been deprecated in Ruby 2.7.
+
+* offlineasm/parser.rb: Swap checks to prevent applying the =~ operator
+to Annotation instances, which do not define it.
+
+
+Canonical link: https://commits.webkit.org/219400@main
+git-svn-id: https://svn.webkit.org/repository/webkit/trunk@254637 268f45cc-cd09-0410-ab3c-d52691b4dbfc
+---
+ Source/JavaScriptCore/ChangeLog            | 13 +++++++++++++
+ Source/JavaScriptCore/offlineasm/parser.rb |  6 +++---
+ 2 files changed, 16 insertions(+), 3 deletions(-)
+
+diff --git a/Source/JavaScriptCore/offlineasm/parser.rb b/Source/JavaScriptCore/offlineasm/parser.rb
+index 791c81a9868d..f14c873e2dbd 100644
+--- a/Source/JavaScriptCore/offlineasm/parser.rb
++++ b/Source/JavaScriptCore/offlineasm/parser.rb
+@@ -628,9 +628,7 @@ def parseSequence(final, comment)
+         firstCodeOrigin = @tokens[@idx].codeOrigin
+         list = []
+         loop {
+-            if (@idx == @tokens.length and not final) or (final and @tokens[@idx] =~ final)
+-                break
+-            elsif @tokens[@idx].is_a? Annotation
++            if @tokens[@idx].is_a? Annotation
+                 # This is the only place where we can encounter a global
+                 # annotation, and hence need to be able to distinguish between
+                 # them.
+@@ -644,6 +642,8 @@ def parseSequence(final, comment)
+                 list << Instruction.new(codeOrigin, annotationOpcode, [], @tokens[@idx].string)
+                 @annotation = nil
+                 @idx += 2 # Consume the newline as well.
++            elsif (@idx == @tokens.length and not final) or (final and @tokens[@idx] =~ final)
++                break
+             elsif @tokens[@idx] == "\n"
+                 # ignore
+                 @idx += 1

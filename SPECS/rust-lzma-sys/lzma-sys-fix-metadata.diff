@@ -1,0 +1,9 @@
+--- lzma-sys-0.1.20/Cargo.toml	1970-01-01T00:00:01+00:00
++++ lzma-sys-0.1.20/Cargo.toml	2022-12-12T22:25:47.846905+00:00
+@@ -36,6 +36,3 @@
+ 
+ [build-dependencies.pkg-config]
+ version = "0.3.14"
+-
+-[features]
+-static = []

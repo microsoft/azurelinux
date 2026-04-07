@@ -1,0 +1,15 @@
+Patch by Robert Scheck <robert@fedoraproject.org> for sqlite >= 2.8.17 which fixes
+the build failures if compiled with "-Werror=format-security". Further information
+can be found at https://bugzilla.redhat.com/show_bug.cgi?id=1037335
+
+--- sqlite-2.8.17/src/shell.c			2005-04-24 00:43:22.000000000 +0200
++++ sqlite-2.8.17/src/shell.c.format-security	2013-12-08 13:20:47.000000000 +0100
+@@ -692,7 +692,7 @@
+   }else
+ 
+   if( c=='h' && strncmp(azArg[0], "help", n)==0 ){
+-    fprintf(stderr,zHelp);
++    fprintf(stderr,"%s",zHelp);
+   }else
+ 
+   if( c=='i' && strncmp(azArg[0], "indices", n)==0 && nArg>1 ){

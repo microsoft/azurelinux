@@ -1,0 +1,13 @@
+diff --git a/src/bluetooth/lecmaccalculator.cpp b/src/bluetooth/lecmaccalculator.cpp
+index b150466..507603c 100644
+--- a/src/bluetooth/lecmaccalculator.cpp
++++ b/src/bluetooth/lecmaccalculator.cpp
+@@ -38,6 +38,8 @@
+ ****************************************************************************/
+ #include "lecmaccalculator_p.h"
+ 
++#include <limits>
++
+ #include "bluez/bluez_data_p.h"
+ 
+ #include <QtCore/qbytearray.h>

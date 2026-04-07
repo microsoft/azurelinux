@@ -1,0 +1,44 @@
+diff --git a/clients/tests/CMakeLists.txt b/clients/tests/CMakeLists.txt
+index 7051bf7..d2939fe 100644
+--- a/clients/tests/CMakeLists.txt
++++ b/clients/tests/CMakeLists.txt
+@@ -27,11 +27,13 @@ find_package(GTest REQUIRED)
+ #
+ # Client matrices.
+ #
++option(CMAKE_MATRICES_DIR "Directory containing test matrices" ${PROJECT_BINARY_DIR}/matrices)
++
+ if(NOT EXISTS "${CMAKE_MATRICES_DIR}")
+   #
+   # Download.
+   #
+-  set(CMAKE_MATRICES_DIR ${PROJECT_BINARY_DIR}/matrices CACHE STRING "Matrices directory.")
++
+   file(MAKE_DIRECTORY ${CMAKE_MATRICES_DIR})
+ 
+   if(NOT TARGET hipsparse)
+@@ -46,15 +48,15 @@ else()
+   #
+   # Copy.
+   #
+-  if(NOT CMAKE_MATRICES_DIR STREQUAL "${PROJECT_BINARY_DIR}/matrices")
+-    message("Copy matrix files from ${CMAKE_MATRICES_DIR} to ${PROJECT_BINARY_DIR}/matrices")
+-
+-    execute_process(COMMAND cp -r ${CMAKE_MATRICES_DIR} ${PROJECT_BINARY_DIR}/matrices RESULT_VARIABLE STATUS WORKING_DIRECTORY ${CMAKE_MATRICES_DIR})
+-
+-    if(STATUS AND NOT STATUS EQUAL 0)
+-      message(FATAL_ERROR "Failed to copy matrix .bin files, aborting.")
+-    endif()
+-  endif()
++  #  if(NOT CMAKE_MATRICES_DIR STREQUAL "${PROJECT_BINARY_DIR}/matrices")
++  #    message("Copy matrix files from ${CMAKE_MATRICES_DIR} to ${PROJECT_BINARY_DIR}/matrices")
++  #
++  #    execute_process(COMMAND cp -r ${CMAKE_MATRICES_DIR} ${PROJECT_BINARY_DIR}/matrices RESULT_VARIABLE STATUS WORKING_DIRECTORY ${CMAKE_MATRICES_DIR})
++  #
++  #    if(STATUS AND NOT STATUS EQUAL 0)
++  #      message(FATAL_ERROR "Failed to copy matrix .bin files, aborting.")
++  #    endif()
++  #  endif()
+ 
+ endif()
+ 

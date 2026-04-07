@@ -1,0 +1,24 @@
+From 5296f2af2e971ceb01494f020cdfec61c4392bcb Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Fri, 3 Jan 2025 13:11:04 +0100
+Subject: [PATCH] Support quote in backtrace for Ruby 3.4
+
+https://bugs.ruby-lang.org/issues/16495
+---
+ features/handle_unexpected_response.feature | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/features/handle_unexpected_response.feature b/features/handle_unexpected_response.feature
+index 2d7747e..d2ac6fc 100644
+--- a/features/handle_unexpected_response.feature
++++ b/features/handle_unexpected_response.feature
+@@ -27,7 +27,7 @@ Feature: Handle unexpected response
+       | ["begin_scenario"]                                   | ["yikes"]                           |
+       | ["step_matches",{"name_to_match":"we're all wired"}] | ["success",[{"id":"1", "args":[]}]] |
+     When I run `cucumber -f pretty`
+-    Then the output should contain:
++    Then the output should match:
+       """
+-      undefined method `handle_yikes'
++      undefined method [`']handle_yikes'
+       """

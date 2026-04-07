@@ -1,0 +1,34 @@
+From 2fc42c6939bbc1ea5ddba88414e902014d651532 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 11 Feb 2020 10:03:21 +0100
+Subject: [PATCH] Default OpenSSL cipher list is PROFILE=SYSTEM
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+"PROFILE=SYSTEM" is a Fedora extension to OpenSSL that enables to
+enforce a system-wide configured list of algorithms.
+
+<https://docs.fedoraproject.org/en-US/packaging-guidelines/CryptoPolicies/#_cc_applications>
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ src/shout_private.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/shout_private.h b/src/shout_private.h
+index aa18f21..6845cc6 100644
+--- a/src/shout_private.h
++++ b/src/shout_private.h
+@@ -52,7 +52,7 @@
+ #define LIBSHOUT_DEFAULT_PROTOCOL   SHOUT_PROTOCOL_HTTP
+ #define LIBSHOUT_DEFAULT_USER       "source"
+ #define LIBSHOUT_DEFAULT_USERAGENT  "libshout/" VERSION
+-#define LIBSHOUT_DEFAULT_ALLOWED_CIPHERS "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA" /* Mozilla's 'Intermediate' list as of 2015-04-19 */
++#define LIBSHOUT_DEFAULT_ALLOWED_CIPHERS "PROFILE=SYSTEM"
+ 
+ /* server capabilities.
+    0x000000XXUL -> Methods.
+-- 
+2.21.1
+

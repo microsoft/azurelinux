@@ -1,0 +1,14 @@
+Add missing parameter types for improved C99 compatibility: implicit
+ints are not part of C99.
+
+diff -ur t1lib-5.1.2.orig/lib/type1/regions.c t1lib-5.1.2/lib/type1/regions.c
+--- t1lib-5.1.2.orig/lib/type1/regions.c	2007-12-23 16:49:42.000000000 +0100
++++ t1lib-5.1.2/lib/type1/regions.c	2023-01-18 13:24:18.670386804 +0100
+@@ -604,6 +604,7 @@
+        register struct region *R;  /* region in which we are changing direction */
+        fractpel x,y;         /* current beginning x,y                        */
+        fractpel dy;          /* direction and magnitude of change in y       */
++       int x2, y2;
+ {
+        register fractpel ymin,ymax;  /* minimum and maximum Y since last call */
+        register fractpel x_at_ymin,x_at_ymax;  /* their respective X's       */

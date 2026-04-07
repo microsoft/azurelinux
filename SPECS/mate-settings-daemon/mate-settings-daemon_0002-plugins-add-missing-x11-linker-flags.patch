@@ -1,0 +1,103 @@
+From 1462391e13a746157924ce80b14d7fd68cd48430 Mon Sep 17 00:00:00 2001
+From: orbea <orbea@riseup.net>
+Date: Sun, 17 Mar 2024 10:14:22 -0700
+Subject: [PATCH 2/5] plugins: add missing x11 linker flags
+
+Many of the plugins depend on the libX11 and libXi linker flags, but
+they are missing.
+
+With GNU libtool the -no-undefined flag is silently ignored so the build
+succeeds, but with slibtool is correctly sets -Wl,--no-undefined in the
+linker flags.
+
+Gentoo issue: https://bugs.gentoo.org/922326
+---
+ plugins/a11y-keyboard/Makefile.am | 2 ++
+ plugins/background/Makefile.am    | 1 +
+ plugins/clipboard/Makefile.am     | 2 ++
+ plugins/keyboard/Makefile.am      | 2 ++
+ plugins/xrandr/Makefile.am        | 4 +++-
+ plugins/xsettings/Makefile.am     | 1 +
+ 6 files changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/plugins/a11y-keyboard/Makefile.am b/plugins/a11y-keyboard/Makefile.am
+index 0ea0e4a9..45078d7a 100644
+--- a/plugins/a11y-keyboard/Makefile.am
++++ b/plugins/a11y-keyboard/Makefile.am
+@@ -66,6 +66,8 @@ liba11y_keyboard_la_LDFLAGS = 		\
+ liba11y_keyboard_la_LIBADD  = 		\
+ 	$(SETTINGS_PLUGIN_LIBS)		\
+ 	$(LIBNOTIFY_LIBS)		\
++	$(X11_LIBS)			\
++	$(XINPUT_LIBS)			\
+ 	$(NULL)
+ 
+ if HAVE_LIBATSPI
+diff --git a/plugins/background/Makefile.am b/plugins/background/Makefile.am
+index ac32cebb..b2ab685a 100644
+--- a/plugins/background/Makefile.am
++++ b/plugins/background/Makefile.am
+@@ -58,6 +58,7 @@ libbackground_la_LDFLAGS = 		\
+ libbackground_la_LIBADD  = 		\
+ 	$(SETTINGS_PLUGIN_LIBS)		\
+ 	$(MATE_DESKTOP_LIBS)		\
++	$(X11_LIBS)			\
+ 	$(NULL)
+ 
+ plugin_in_files = 		\
+diff --git a/plugins/clipboard/Makefile.am b/plugins/clipboard/Makefile.am
+index d8baed94..414fff10 100644
+--- a/plugins/clipboard/Makefile.am
++++ b/plugins/clipboard/Makefile.am
+@@ -31,6 +31,8 @@ libclipboard_la_LDFLAGS = 	\
+ 
+ libclipboard_la_LIBADD  = 	\
+ 	$(SETTINGS_PLUGIN_LIBS)	\
++	$(X11_LIBS)		\
++	$(XINPUT_LIBS)		\
+ 	$(NULL)
+ 
+ plugin_in_files = 		\
+diff --git a/plugins/keyboard/Makefile.am b/plugins/keyboard/Makefile.am
+index 2e2b83ea..cc21f188 100644
+--- a/plugins/keyboard/Makefile.am
++++ b/plugins/keyboard/Makefile.am
+@@ -46,6 +46,8 @@ libkeyboard_la_LIBADD  = 	\
+ 	$(SETTINGS_PLUGIN_LIBS)	\
+ 	$(LIBMATEKBDUI_LIBS)	\
+ 	$(MATE_DESKTOP_LIBS)	\
++	$(X11_LIBS)		\
++	$(XINPUT_LIBS)		\
+ 	$(NULL)
+ 
+ plugin_in_files = 		\
+diff --git a/plugins/xrandr/Makefile.am b/plugins/xrandr/Makefile.am
+index ccf6f694..7316599a 100644
+--- a/plugins/xrandr/Makefile.am
++++ b/plugins/xrandr/Makefile.am
+@@ -70,7 +70,9 @@ libxrandr_la_LDFLAGS = 			\
+ libxrandr_la_LIBADD  =			\
+ 	$(SETTINGS_PLUGIN_LIBS)		\
+ 	$(LIBNOTIFY_LIBS)		\
+-	$(MATE_DESKTOP_LIBS)
++	$(MATE_DESKTOP_LIBS)		\
++	$(X11_LIBS)			\
++	$(NULL)
+ 
+ plugin_in_files =			\
+ 	xrandr.mate-settings-plugin.desktop.in
+diff --git a/plugins/xsettings/Makefile.am b/plugins/xsettings/Makefile.am
+index 6e8e50f1..e81842f9 100644
+--- a/plugins/xsettings/Makefile.am
++++ b/plugins/xsettings/Makefile.am
+@@ -38,6 +38,7 @@ libxsettings_la_LDFLAGS = 	\
+ libxsettings_la_LIBADD  = 	\
+ 	$(SETTINGS_PLUGIN_LIBS)	\
+ 	$(FONTCONFIG_LIBS)	\
++	$(X11_LIBS)		\
+ 	$(NULL)
+ 
+ plugin_in_files = 		\
+-- 
+2.49.0
+

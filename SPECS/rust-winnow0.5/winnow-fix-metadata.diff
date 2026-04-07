@@ -1,0 +1,137 @@
+--- winnow-0.5.40/Cargo.toml	1970-01-01T00:00:01+00:00
++++ winnow-0.5.40/Cargo.toml	2025-10-06T09:12:18.746767+00:00
+@@ -90,106 +90,8 @@
+ replace = "blob/v{{version}}/CHANGELOG.md"
+ search = 'blob/v.+\..+\..+/CHANGELOG.md'
+ 
+-[profile.bench]
+-lto = true
+-codegen-units = 1
+-debug = 2
+-
+-[[example]]
+-name = "arithmetic"
+-test = true
+-required-features = ["alloc"]
+-
+-[[example]]
+-name = "css"
+-test = true
+-required-features = ["alloc"]
+-
+-[[example]]
+-name = "custom_error"
+-test = true
+-required-features = ["alloc"]
+-
+-[[example]]
+-name = "http"
+-required-features = ["alloc"]
+-
+-[[example]]
+-name = "ini"
+-test = true
+-required-features = ["std"]
+-
+-[[example]]
+-name = "json"
+-test = true
+-required-features = ["std"]
+-
+-[[example]]
+-name = "ndjson"
+-test = true
+-required-features = ["std"]
+-
+-[[example]]
+-name = "json_iterator"
+-required-features = ["std"]
+-
+-[[example]]
+-name = "iterator"
+-
+-[[example]]
+-name = "s_expression"
+-required-features = ["alloc"]
+-
+-[[example]]
+-name = "string"
+-required-features = ["alloc"]
+-
+-[[bench]]
+-name = "arithmetic"
+-path = "examples/arithmetic/bench.rs"
+-harness = false
+-required-features = ["alloc"]
+-
+-[[bench]]
+-name = "contains_token"
+-harness = false
+-
+-[[bench]]
+-name = "find_slice"
+-harness = false
+-
+-[[bench]]
+-name = "iter"
+-harness = false
+-
+-[[bench]]
+-name = "next_slice"
+-harness = false
+-
+-[[bench]]
+-name = "number"
+-harness = false
+-
+-[[bench]]
+-name = "http"
+-path = "examples/http/bench.rs"
+-harness = false
+-required-features = ["alloc"]
+-
+-[[bench]]
+-name = "ini"
+-path = "examples/ini/bench.rs"
+-harness = false
+-required-features = ["std"]
+-
+-[[bench]]
+-name = "json"
+-path = "examples/json/bench.rs"
+-harness = false
+-required-features = ["std"]
+-
+ [dependencies.anstream]
+-version = "0.3.2"
++version = "0.6.15"
+ optional = true
+ 
+ [dependencies.anstyle]
+@@ -209,12 +111,6 @@
+ version = "0.2.6"
+ optional = true
+ 
+-[dev-dependencies.circular]
+-version = "0.3.0"
+-
+-[dev-dependencies.criterion]
+-version = "0.5.1"
+-
+ [dev-dependencies.doc-comment]
+ version = "0.3"
+ 
+@@ -229,13 +125,6 @@
+ 
+ [dev-dependencies.rustc-hash]
+ version = "1.1.0"
+-
+-[dev-dependencies.snapbox]
+-version = "0.4.11"
+-features = ["examples"]
+-
+-[dev-dependencies.term-transcript]
+-version = "0.2.0"
+ 
+ [features]
+ alloc = []

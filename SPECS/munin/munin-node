@@ -1,0 +1,5 @@
+# We moved the default config to file 00-default
+# as config files in this directory are read in alphabetical order.
+#
+# Documentation can be found in Munin-Guide:
+# http://guide.munin-monitoring.org/en/latest/plugin/use.html#configuring

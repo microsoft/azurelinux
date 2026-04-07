@@ -1,0 +1,53 @@
+diff -up gnupg-2.4.7/common/t-sexputil.c.fips gnupg-2.4.7/common/t-sexputil.c
+--- gnupg-2.4.7/common/t-sexputil.c.fips	2024-05-15 12:33:38.000000000 +0200
++++ gnupg-2.4.7/common/t-sexputil.c	2025-01-23 18:17:28.108631306 +0100
+@@ -291,36 +291,6 @@ test_ecc_uncompress (void)
+     const char *b;  /* Compressed.    */
+   }
+   tests[] = {
+-  {
+-    "(public-key"
+-    " (ecc"
+-    " (curve brainpoolP256r1)"
+-    " (q #042ECD8679930BE2DB4AD42B8600BA3F80"
+-    /*   */"2D4D539BFF2F69B83EC9B7BBAA7F3406"
+-    /*   */"436DD11A1756AFE56CD93408410FCDA9"
+-    /*   */"BA95024EB613BD481A14FCFEC27A448A#)))",
+-    /* The same in compressed form.  */
+-    "(public-key"
+-    " (ecc"
+-    " (curve brainpoolP256r1)"
+-    " (q #022ECD8679930BE2DB4AD42B8600BA3F80"
+-    /*   */"2D4D539BFF2F69B83EC9B7BBAA7F3406#)))"
+-  },
+-  {
+-    "(public-key"
+-    " (ecc"
+-    " (curve brainpoolP256r1)"
+-    " (q #045B784CA008EE64AB3D85017EE0D2BE87"
+-    /*   */"558762C7300E0C8E06B1F9AF7C031458"
+-    /*   */"9EBBA41915313417BA54218EB0569C59"
+-    /*   */"0B156C76DBCAB6E84575E6EF68CE7B87#)))",
+-    /* The same in compressed form.  */
+-    "(public-key"
+-    " (ecc"
+-    " (curve brainpoolP256r1)"
+-    " (q #035B784CA008EE64AB3D85017EE0D2BE87"
+-    /*   */"558762C7300E0C8E06B1F9AF7C031458#)))"
+-  },
+   { /* A key which does not require a conversion.  */
+     "(public-key"
+     " (ecdsa"
+diff -up gnupg-2.4.7/g10/mainproc.c.fips gnupg-2.4.7/g10/mainproc.c
+--- gnupg-2.4.7/g10/mainproc.c.fips	2024-09-20 12:07:25.000000000 +0200
++++ gnupg-2.4.7/g10/mainproc.c	2025-01-23 18:17:28.108631306 +0100
+@@ -1011,7 +1011,8 @@ proc_plaintext( CTX c, PACKET *pkt )
+          according to 2440, so hopefully it won't come up that often.
+          There is no good way to specify what algorithms to use in
+          that case, so these there are the historical answer. */
+-	gcry_md_enable (c->mfx.md, DIGEST_ALGO_RMD160);
++	if (!gcry_fips_mode_active())
++            gcry_md_enable (c->mfx.md, DIGEST_ALGO_RMD160);
+ 	gcry_md_enable (c->mfx.md, DIGEST_ALGO_SHA1);
+     }
+   if (DBG_HASHING)

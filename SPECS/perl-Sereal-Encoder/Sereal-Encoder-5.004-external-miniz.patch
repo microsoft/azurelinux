@@ -1,0 +1,12 @@
+--- inc/Sereal/BuildTools.pm
++++ inc/Sereal/BuildTools.pm
+@@ -108,6 +108,9 @@ sub check_external_libraries {
+            !$ENV{SEREAL_USE_BUNDLED_LIBS}
+         && !$ENV{SEREAL_USE_BUNDLED_MINIZ}
+         && Devel::CheckLib::check_lib(
++            # miniz 3.1.0 has static functions in miniz.h that reference functions in the miniz library
++            # so we need -lminiz even for the header check
++            ldflags => '-lminiz',
+             lib    => 'miniz',
+             header => 'miniz.h'
+         ) )

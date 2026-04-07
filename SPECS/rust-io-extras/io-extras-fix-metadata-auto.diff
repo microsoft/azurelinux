@@ -1,0 +1,22 @@
+--- io-extras-0.18.4/Cargo.toml	1970-01-01T00:00:01+00:00
++++ io-extras-0.18.4/Cargo.toml	2024-12-09T19:59:41.067271+00:00
+@@ -95,14 +95,6 @@
+ use_socket2 = ["socket2"]
+ use_tokio = ["tokio"]
+ 
+-[target."cfg(windows)".dependencies.windows-sys]
+-version = ">=0.52, <=0.59"
+-features = [
+-    "Win32_Foundation",
+-    "Win32_Networking_WinSock",
+-    "Win32_System_Console",
+-]
+-
+ [lints.rust.unexpected_cfgs]
+ level = "warn"
+ priority = 0
+@@ -110,3 +102,4 @@
+     "cfg(can_vector)",
+     "cfg(write_all_vectored)",
+ ]
++

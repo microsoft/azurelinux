@@ -1,0 +1,43 @@
+--- a/tests/test_values.py
++++ b/tests/test_values.py
+@@ -375,7 +375,6 @@ class ValueTests(TestCase):
+         with env(DATABASE_URL='sqlite://'):
+             self.assertEqual(value.setup('DATABASE_URL'), {
+                 'default': {
+-                    'CONN_HEALTH_CHECKS': False,
+                     'CONN_MAX_AGE': 0,
+                     'ENGINE': 'django.db.backends.sqlite3',
+                     'HOST': '',
+@@ -413,7 +412,6 @@ class ValueTests(TestCase):
+                 'EMAIL_HOST_PASSWORD': 'password',
+                 'EMAIL_HOST_USER': 'user@domain.com',
+                 'EMAIL_PORT': 587,
+-                'EMAIL_TIMEOUT': None,
+                 'EMAIL_USE_SSL': False,
+                 'EMAIL_USE_TLS': True})
+         with env(EMAIL_URL='console://'):
+@@ -424,7 +422,6 @@ class ValueTests(TestCase):
+                 'EMAIL_HOST_PASSWORD': None,
+                 'EMAIL_HOST_USER': None,
+                 'EMAIL_PORT': None,
+-                'EMAIL_TIMEOUT': None,
+                 'EMAIL_USE_SSL': False,
+                 'EMAIL_USE_TLS': False})
+         with env(EMAIL_URL='smtps://user@domain.com:password@smtp.example.com:wrong'):  # noqa: E501
+@@ -433,7 +430,7 @@ class ValueTests(TestCase):
+     def test_cache_url_value(self):
+         cache_setting = {
+             'default': {
+-                'BACKEND': 'django_redis.cache.RedisCache' if DJANGO_VERSION < (4,) else 'django.core.cache.backends.redis.RedisCache',  # noqa: E501
++                'BACKEND': 'django_redis.cache.RedisCache',  # noqa: E501
+                 'LOCATION': 'redis://host:6379/1',
+             }
+         }
+@@ -507,7 +504,6 @@ class ValueTests(TestCase):
+                 'EMAIL_HOST_PASSWORD': 'password',
+                 'EMAIL_HOST_USER': 'user@domain.com',
+                 'EMAIL_PORT': 587,
+-                'EMAIL_TIMEOUT': None,
+                 'EMAIL_USE_SSL': False,
+                 'EMAIL_USE_TLS': True
+             })

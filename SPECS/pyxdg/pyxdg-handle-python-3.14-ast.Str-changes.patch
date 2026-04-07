@@ -1,0 +1,43 @@
+From 9291d419017263c922869d79ac1fe8d423e5f929 Mon Sep 17 00:00:00 2001
+From: Sam James <sam@gentoo.org>
+Date: Sat, 31 May 2025 18:52:45 +0100
+Subject: Menu: handle Python 3.14 ast.Str changes
+
+ast.Str is gone and replaced by ast.Constant.
+---
+ xdg/Menu.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/xdg/Menu.py b/xdg/Menu.py
+index 1dd2af5..71f5e61 100644
+--- a/xdg/Menu.py
++++ b/xdg/Menu.py
+@@ -411,7 +411,7 @@ class Rule:
+     def fromFilename(cls, type, filename):
+         tree = ast.Expression(
+             body=ast.Compare(
+-                left=ast.Str(filename),
++                left=ast.Constant(filename),
+                 ops=[ast.Eq()],
+                 comparators=[ast.Attribute(
+                     value=ast.Name(id='menuentry', ctx=ast.Load()),
+@@ -799,7 +799,7 @@ class XMLMenuBuilder(object):
+         elif tag == 'Category':
+             category = node.text
+             return ast.Compare(
+-                left=ast.Str(category),
++                left=ast.Constant(category),
+                 ops=[ast.In()],
+                 comparators=[ast.Attribute(
+                     value=ast.Name(id='menuentry', ctx=ast.Load()),
+@@ -810,7 +810,7 @@ class XMLMenuBuilder(object):
+         elif tag == 'Filename':
+             filename = node.text
+             return ast.Compare(
+-                left=ast.Str(filename),
++                left=ast.Constant(filename),
+                 ops=[ast.Eq()],
+                 comparators=[ast.Attribute(
+                     value=ast.Name(id='menuentry', ctx=ast.Load()),
+-- 
+cgit v1.2.3

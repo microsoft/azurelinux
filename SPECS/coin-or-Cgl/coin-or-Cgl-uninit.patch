@@ -1,0 +1,24 @@
+diff -up Cgl-releases-0.60.3/Cgl/src/CglPreProcess/CglPreProcess.cpp.orig Cgl-releases-0.60.3/Cgl/src/CglPreProcess/CglPreProcess.cpp
+--- Cgl-releases-0.60.3/Cgl/src/CglPreProcess/CglPreProcess.cpp.orig	2020-01-31 04:11:21.000000000 -0700
++++ Cgl-releases-0.60.3/Cgl/src/CglPreProcess/CglPreProcess.cpp	2020-02-20 11:15:53.494050170 -0700
+@@ -4458,7 +4458,9 @@ CglPreProcess::modified(OsiSolverInterfa
+               rowNumber[0] = iRow1;
+               rowNumber[1] = iRow2;
+               colLower[0] = 0.0;
++              colLower[1] = 0.0;
+               colUpper[0] = 1.0;
++              colUpper[1] = 0.0;
+ #if CBC_USEFUL_PRINTING > 0
+               binary[0] = 1;
+               int nCol = nBits;
+diff -up Cgl-releases-0.60.3/Cgl/src/CglTwomir/CglTwomir.cpp.orig Cgl-releases-0.60.3/Cgl/src/CglTwomir/CglTwomir.cpp
+--- Cgl-releases-0.60.3/Cgl/src/CglTwomir/CglTwomir.cpp.orig	2020-01-31 04:11:21.000000000 -0700
++++ Cgl-releases-0.60.3/Cgl/src/CglTwomir/CglTwomir.cpp	2020-02-20 11:15:53.495050153 -0700
+@@ -117,6 +117,7 @@ void CglTwomir::generateCuts(const OsiSo
+ #endif
+       return;
+     }
++    numberOriginalRows = 0;
+ #ifdef COIN_HAS_CLP_TWOMIR
+   } else {
+     useSolver = originalSolver_;

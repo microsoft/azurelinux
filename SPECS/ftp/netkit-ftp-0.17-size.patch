@@ -1,0 +1,12 @@
+diff -up netkit-ftp-0.17/ftp/cmds.c.size netkit-ftp-0.17/ftp/cmds.c
+--- netkit-ftp-0.17/ftp/cmds.c.size	2007-10-10 14:17:18.000000000 +0200
++++ netkit-ftp-0.17/ftp/cmds.c	2007-10-10 14:17:18.000000000 +0200
+@@ -1650,6 +1650,8 @@ quote1(const char *initial, int argc, ch
+ 	register int i, len;
+ 	char buf[BUFSIZ];		/* must be >= sizeof(line) */
+ 
++	if (strncmp(argv[1],"size",4) == 0)
++	    changetype(TYPE_I, 1);
+ 	(void) strcpy(buf, initial);
+ 	if (argc > 1) {
+ 		len = strlen(buf);

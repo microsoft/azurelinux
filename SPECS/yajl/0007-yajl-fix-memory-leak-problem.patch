@@ -1,0 +1,41 @@
+From c4304a2c04a1b392eb1464a9da892a9e0dff7683 Mon Sep 17 00:00:00 2001
+From: wujing <wujing50@huawei.com>
+Date: Thu, 14 Feb 2019 03:12:30 +0800
+Subject: [PATCH 7/8] yajl: fix memory leak problem
+
+reason: fix memory leak problem
+(cherry picked from commit 3d65cb0c6db4d433e5e42ee7d91d8a04e21337cf
+ in https://github.com/openEuler-BaseService)
+
+Fixes: https://github.com/lloyd/yajl/issues/250  (CVE-2023-33460)
+---
+ src/yajl_tree.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/src/yajl_tree.c b/src/yajl_tree.c
+index 3d357a3..4b3cf2b 100644
+--- a/src/yajl_tree.c
++++ b/src/yajl_tree.c
+@@ -143,7 +143,7 @@ static yajl_val context_pop(context_t *ctx)
+     ctx->stack = stack->next;
+ 
+     v = stack->value;
+-
++    free (stack->key);
+     free (stack);
+ 
+     return (v);
+@@ -444,6 +444,10 @@ yajl_val yajl_tree_parse (const char *input,
+              snprintf(error_buffer, error_buffer_size, "%s", internal_err_str);
+              YA_FREE(&(handle->alloc), internal_err_str);
+         }
++        while(ctx.stack != NULL) {
++             yajl_val v = context_pop(&ctx);
++             yajl_tree_free(v);
++        }
+         yajl_free (handle);
+         return NULL;
+     }
+-- 
+2.41.0
+

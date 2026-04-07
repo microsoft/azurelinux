@@ -1,0 +1,266 @@
+From fe7182d15c93f46212781106b4b63503fcec713f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 15 Mar 2011 14:44:17 +0100
+Subject: [PATCH] Back-port KeywordExpand configuration keyword
+
+This is based on code from developemnt 1.12 branch.
+---
+ doc/cvs.texinfo |   93 ++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ src/mkmodules.c |    5 +++
+ src/parseinfo.c |    4 ++
+ src/rcs.c       |   51 ++++++++++++++++++++++++++++--
+ src/rcs.h       |    1 +
+ 5 files changed, 146 insertions(+), 8 deletions(-)
+
+diff --git a/doc/cvs.texinfo b/doc/cvs.texinfo
+index ad3a414..943af37 100644
+--- a/doc/cvs.texinfo
++++ b/doc/cvs.texinfo
+@@ -6847,11 +6847,12 @@ with strings of the form
+ a new revision of the file.
+ 
+ @menu
+-* Keyword list::                Keywords
+-* Using keywords::              Using keywords
+-* Avoiding substitution::       Avoiding substitution
+-* Substitution modes::          Substitution modes
+-* Log keyword::                 Problems with the $@splitrcskeyword{Log}$ keyword.
++* Keyword list::                   Keywords
++* Using keywords::                 Using keywords
++* Avoiding substitution::          Avoiding substitution
++* Substitution modes::             Substitution modes
++* Configuring keyword expansion::  Configuring keyword expansion
++* Log keyword::                    Problems with the $@splitrcskeyword{Log}$ keyword.
+ @end menu
+ 
+ @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+@@ -7032,6 +7033,12 @@ contains @samp{$@@asis@{@}Author$} whenever the text
+ and @code{troff} you can embed the null-character
+ @code{\&} inside the keyword for a similar effect.
+ 
++It is also possible to specify an explicit list of
++keywords to include or exclude using the
++@code{KeywordExpand} option in the
++@file{CVSROOT/config} file--see @ref{Configuring keyword expansion}
++for more details.
++
+ @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ @node Substitution modes
+ @section Substitution modes
+@@ -7124,6 +7131,74 @@ handle an export containing binary files correctly.
+ @end table
+ 
+ @c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
++@node Configuring keyword expansion
++@section Configuring Keyword Expansion
++@cindex Configuring keyword expansion
++
++The @code{KeywordExpand} option in the
++@file{CVSROOT/config} file is intended to allow for the
++either the explicit exclusion of a keyword or list of
++keywords, or for the explicit inclusion of a keyword or
++a list of keywords.
++
++The @code{KeywordExpand} option is followed by
++@code{=} and the next character may either be @code{i}
++to start an inclusion list or @code{e} to start an
++exclusion list. If the following lines were added to
++the @file{CVSROOT/config} file:
++
++@example
++        # Restrict keyword expansion to "Log" only
++        KeywordExpand=iLog
++@end example
++
++then only the $@splitrcskeyword{Log}$ keyword would be expanded.
++A list may be used. The this example:
++
++@example
++        # Restrict keyword expansion to the Name and Date keywords.
++        KeywordExpand=iName,Date
++@end example
++
++would allow $@splitrcskeyword{Name}$, and $@splitrcskeyword{Date}$
++to be expanded.
++
++It is also possible to configure an exclusion list
++using the following:
++
++@example
++        # Do not expand the keyword Date
++        KeywordExpand=eDate
++@end example
++
++This allows @sc{cvs} to ignore the 
++$@splitrcskeyword{CVSHeader}$ keyword and retain all of the
++others. This could be confusing
++to users that expect RCS keywords to be expanded, so
++care should be taken to properly set user expectations
++for a repository that is configured in that manner.
++
++If there is a desire to not have any RCS keywords
++expanded and not use the @code{-ko} flags everywhere,
++an administrator may disable all keyword expansion
++using the @file{CVSROOT/config} line:
++
++@example
++    # Do not expand any RCS keywords
++    KeywordExpand=i
++@end example
++
++this could be confusing to users that expect RCS
++keywords like $@splitrcskeyword{Id}$ to be expanded properly,
++so care should be taken to properly set user
++expectations for a repository so configured.
++
++It should be noted that a patch to provide the
++@code{KeywordExpand} feature has been around a long time.
++However, that patch implemented this feature using
++@code{tagexpand=} keyword and this keyword is NOT recognized.
++
++@c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ @node Log keyword
+ @section Problems with the $@splitrcskeyword{Log}$ keyword.
+ 
+@@ -13789,6 +13864,14 @@ each command.  It also provides a place for the
+ @file{CVS/Template} file (@pxref{Working directory
+ storage}).
+ 
++@cindex KeywordExpand, in @file{CVSROOT/config}
++@item KeywordExpand=@var{value}
++Specify @samp{i} followed by a list of keywords to be expanded
++(for example, @samp{KeywordExpand=iName,Date}),
++or @samp{e} followed by a list of keywords not to be expanded
++(for example, @samp{KeywordExpand=eName}).
++For more on keyword expansion, see @ref{Configuring keyword expansion}.
++
+ @cindex LockDir, in CVSROOT/config
+ @item LockDir=@var{directory}
+ Put @sc{cvs} lock files in @var{directory} rather than
+diff --git a/src/mkmodules.c b/src/mkmodules.c
+index 4bb9d74..3be9509 100644
+--- a/src/mkmodules.c
++++ b/src/mkmodules.c
+@@ -300,6 +300,11 @@ static const char *const config_contents[] = {
+     "# primary CVS repository.\n",
+     "#IgnoreUnknownConfigKeys=no\n",
+     "\n",
++    "# Set `KeywordExpand' to `i' followed by a list of keywords to expand or\n",
++    "# `e' followed by a list of keywords to not expand.\n"
++    "#KeywordExpand=iName,Date\n",
++    "#KeywordExpand=eName\n",
++    "\n",
+     "# Put CVS lock files in this directory rather than directly in the repository.\n",
+     "#LockDir=/var/lock/cvs\n",
+     "\n",
+diff --git a/src/parseinfo.c b/src/parseinfo.c
+index 86fc6d6..477740a 100644
+--- a/src/parseinfo.c
++++ b/src/parseinfo.c
+@@ -360,6 +360,10 @@ parse_config (cvsroot)
+ 		goto error_return;
+ 	    }
+ 	}
++	else if (strcmp (line, "KeywordExpand") == 0)
++	{
++	    RCS_setincexc (p);
++	}
+ 	else if (strcmp (line, "PreservePermissions") == 0)
+ 	{
+ 	    if (strcmp (p, "no") == 0)
+diff --git a/src/rcs.c b/src/rcs.c
+index 20c3162..ba255ce 100644
+--- a/src/rcs.c
++++ b/src/rcs.c
+@@ -15,6 +15,7 @@
+  */
+ 
+ #include <assert.h>
++#include <stdbool.h>
+ #include "cvs.h"
+ #include "edit.h"
+ #include "hardlink.h"
+@@ -3509,9 +3510,10 @@ struct rcs_keyword
+ {
+     const char *string;
+     size_t len;
++    bool expandit;
+ };
+-#define KEYWORD_INIT(s) (s), sizeof (s) - 1
+-static const struct rcs_keyword keywords[] =
++#define KEYWORD_INIT(s) (s), sizeof (s) - 1, true
++static struct rcs_keyword keywords[] =
+ {
+     { KEYWORD_INIT ("Author") },
+     { KEYWORD_INIT ("Date") },
+@@ -3717,7 +3719,8 @@ expand_keywords (rcs, ver, name, log, loglen, expand, buf, len, retbuf, retlen)
+ 	slen = s - srch;
+ 	for (keyword = keywords; keyword->string != NULL; keyword++)
+ 	{
+-	    if (keyword->len == slen
++	    if (keyword->expandit
++		&& keyword->len == slen
+ 		&& strncmp (keyword->string, srch, slen) == 0)
+ 	    {
+ 		break;
+@@ -8958,3 +8961,45 @@ make_file_label (path, rev, rcs)
+     }
+     return label;
+ }
++
++
++
++void
++RCS_setincexc (const char *arg)
++{
++    char *key;
++    char *copy, *next;
++    bool include = false;
++    struct rcs_keyword *keyword;
++
++    copy = xstrdup(arg);
++    next = copy;
++    switch (*next++) {
++	case 'e':
++	    include = false;
++	    break;
++	case 'i':
++	    include = true;
++	    break;
++	default:
++	    free(copy);
++	    return;
++    }
++
++    if (include)
++	for (keyword = keywords; keyword->string != NULL; keyword++)
++	{
++	    keyword->expandit = false;
++	}
++
++    key = strtok(next, ",");
++    while (key) {
++	for (keyword = keywords; keyword->string != NULL; keyword++) {
++	    if (strcmp (keyword->string, key) == 0)
++		keyword->expandit = include;
++	}
++	key = strtok(NULL, ",");
++    }
++    free(copy);
++    return;
++}
+diff --git a/src/rcs.h b/src/rcs.h
+index 3a66640..2126029 100644
+--- a/src/rcs.h
++++ b/src/rcs.h
+@@ -250,6 +250,7 @@ int rcs_change_text PROTO ((const char *, char *, size_t, const char *,
+ void RCS_deltas PROTO ((RCSNode *, FILE *, struct rcsbuffer *, const char *,
+ 			enum rcs_delta_op, char **, size_t *,
+ 			char **, size_t *));
++void RCS_setincexc (const char *arg);
+ char *make_file_label PROTO ((const char *, const char *, RCSNode *));
+ 
+ extern int preserve_perms;
+-- 
+1.7.4
+

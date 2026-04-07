@@ -1,0 +1,23 @@
+From c918fe77e255150938e83a6aec259f153d303573 Mon Sep 17 00:00:00 2001
+From: David Faure <faure@kde.org>
+Date: Sun, 19 Nov 2023 11:18:11 +0100
+Subject: [PATCH] Fix build with libxml2-2.12.0 and clang-17
+
+Fixes #219
+---
+ src/test-subclassing.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/test-subclassing.c b/src/test-subclassing.c
+index dd099e44..0758164f 100644
+--- a/src/test-subclassing.c
++++ b/src/test-subclassing.c
+@@ -1,4 +1,5 @@
+ #include <libxml/tree.h>
++#include <libxml/parser.h>
+ #include <stdio.h>
+ #include <string.h>
+ 
+-- 
+GitLab
+

@@ -1,0 +1,44 @@
+From f0bb9e8baf3157e0a84f484f194984295b2db23a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Mon, 19 Oct 2020 16:15:14 +0200
+Subject: [PATCH] Inicialize name table memory region
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Name table entry values are accessed past their ends in add_name()
+when comparing the values. Also a size of the entries could grow
+later. It's safer to initialize just after the allocation than to hunt
+the gaps later.
+
+Reproducer:
+
+pcre_compile2("(?<f>)(?<fir>)", PCRE_NO_AUTO_CAPTURE | PCRE_CASELESS, &ec, &eb, &eo, NULL);
+
+built with clang++ -fsanitize=memory -fsanitize=fuzzer-no-link.
+
+https://bugs.exim.org/show_bug.cgi?id=2661
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ pcre_compile.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/pcre_compile.c b/pcre_compile.c
+index 3be0fbf..75309e0 100644
+--- a/pcre_compile.c
++++ b/pcre_compile.c
+@@ -9423,6 +9423,11 @@ if (re == NULL)
+   goto PCRE_EARLY_ERROR_RETURN;
+   }
+ 
++/* Initialize the memory. Name table entry values are accessed past their ends
++ * (e.g. in add_name()) when comparing the values. Also a size of the entry can
++ * grow later. It's safer to initialize here than to hunt the gaps later. */
++memset(re, 0, size);
++
+ /* Put in the magic number, and save the sizes, initial options, internal
+ flags, and character table pointer. NULL is used for the default character
+ tables. The nullpad field is at the end; it's there to help in the case when a
+-- 
+2.25.4
+

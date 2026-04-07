@@ -1,0 +1,30 @@
+--- a/Source/GSTLS.orig.m	2016-03-09 14:16:16.000000000 +0100
++++ b/Source/GSTLS.m	2016-08-21 16:46:41.347996519 +0200
+@@ -1745,8 +1745,7 @@
+                 0 };
+               gnutls_protocol_set_priority(session, proto_prio);
+ #else
+-              gnutls_priority_set_direct(session,
+-                "NORMAL:-VERS-SSL3.0:+VERS-TLS-ALL", NULL);
++              gnutls_set_default_priority (session);
+ #endif
+             }
+           else
+@@ -1757,7 +1756,7 @@
+               /* By default we disable SSL3.0 as the 'POODLE' attack (Oct 2014)
+                * renders it insecure.
+                */
+-              gnutls_priority_set_direct(session, "NORMAL:-VERS-SSL3.0", NULL);
++              gnutls_set_default_priority (session);
+ #endif
+             }
+         }
+@@ -1774,7 +1773,7 @@
+             {
+               NSLog(@"Invalid GSTLSPriority: %s", err_pos);
+               NSLog(@"Falling back to NORMAL:-VERS-SSL3.0");
+-              gnutls_priority_set_direct(session, "NORMAL:-VERS-SSL3.0", NULL);
++              gnutls_set_default_priority (session);
+             }
+ #endif
+         }

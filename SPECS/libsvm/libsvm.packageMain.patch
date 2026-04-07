@@ -1,0 +1,107 @@
+diff -up Makefile.orig Makefile
+--- Makefile.orig	2024-08-21 07:13:25.000000000 -0600
++++ Makefile	2024-08-24 16:48:59.593744094 -0600
+@@ -1,7 +1,14 @@
+ CXX ?= g++
+-CFLAGS = -Wall -Wconversion -O3 -fPIC
++CFLAGS = ${RPM_CFLAGS} -Wconversion -fPIC
+ SHVER = 4
++export SHVER
+ OS = $(shell uname)
++DOT_LIBS = .
++LIBS = -L${DOT_LIBS} -lsvm
++export LIBSVM_VER
++IS_64 := $(shell /bin/uname -i | awk '/64/ {print 64}')
++PREFIXDIR ?= /usr
++export PREFIXDIR
+ ifeq ($(OS),Darwin)
+ 	SHARED_LIB_FLAG = -dynamiclib -Wl,-install_name,libsvm.so.$(SHVER)
+ else
+@@ -9,20 +16,80 @@ else
+ endif
+ 
+ # Uncomment the following lines to enable parallelization with OpenMP
+-# CFLAGS += -fopenmp
+-# SHARED_LIB_FLAG += -fopenmp
++CFLAGS += -fopenmp
++SHARED_LIB_FLAG += -fopenmp
+ 
+-all: svm-train svm-predict svm-scale
++LIBDIR ?= ${PREFIXDIR}/lib${IS_64}
++export LIBDIR
+ 
+-lib: svm.o
++DATADIR?=${PREFIXDIR}/share
++export DATADIR
++
++BINDIR?=${PREFIXDIR}/bin
++export BINDIR
++
++INCLUDEDIR_INSTALL:=${DESTDIR}/${PREFIXDIR}/include
++export INCLUDEDIR_INSTALL
++
++LIBDIR_INSTALL:=${DESTDIR}/${LIBDIR}
++export LIBDIR_INSTALL
++
++DATADIR_INSTALL:=${DESTDIR}/${DATADIR}
++export DATA_INSTALL
++
++BINDIR_INSTALL:=${DESTDIR}/${BINDIR}
++export BINDIR_INSTALL
++
++all: lib svm-train svm-predict svm-scale svm-python svm-toy-qt
++
++lib: libsvm.so.$(SHVER) libsvm.so
++
++libsvm.so: libsvm.so.$(SHVER)
++	ln -sf libsvm.so.$(SHVER) libsvm.so
++
++libsvm.so.$(SHVER): svm.o
+ 	$(CXX) $(SHARED_LIB_FLAG) svm.o -o libsvm.so.$(SHVER)
+ svm-predict: svm-predict.c svm.o
+-	$(CXX) $(CFLAGS) svm-predict.c svm.o -o svm-predict -lm
++	$(CXX) $(CFLAGS) svm-predict.c $(LIBS) -o svm-predict -lm
+ svm-train: svm-train.c svm.o
+-	$(CXX) $(CFLAGS) svm-train.c svm.o -o svm-train -lm
++	$(CXX) $(CFLAGS) svm-train.c $(LIBS) -o svm-train -lm
+ svm-scale: svm-scale.c
+ 	$(CXX) $(CFLAGS) svm-scale.c -o svm-scale
+ svm.o: svm.cpp svm.h
+ 	$(CXX) $(CFLAGS) -c svm.cpp
+ clean:
+-	rm -f *~ svm.o svm-train svm-predict svm-scale libsvm.so.$(SHVER)
++	rm -f *~ svm.o svm-train svm-predict svm-scale   svm-toy/qt/svm-toy-qt
++	${MAKE} -C python clean
++	${MAKE} -C java clean
++svm-python:
++	${MAKE} -C python
++
++svm-toy-qt:
++	${MAKE} -C svm-toy/qt
++
++install: all
++	mkdir -p ${BINDIR_INSTALL}
++	install -m 755 svm-train ${BINDIR_INSTALL}
++	install -m 755 svm-predict ${BINDIR_INSTALL}
++	install -m 755 svm-scale ${BINDIR_INSTALL}
++	mkdir -p ${LIBDIR_INSTALL}
++	install -m 755 libsvm.so.$(SHVER) ${LIBDIR_INSTALL}
++# install package libsvm-devel
++	mkdir -p ${INCLUDEDIR_INSTALL}/libsvm
++	install -m 644 svm.h ${INCLUDEDIR_INSTALL}/libsvm
++# install package svm-toy
++	install -m 755 svm-toy/qt/svm-toy-qt ${BINDIR_INSTALL}
++# install examples
++	mkdir -p ${DATADIR_INSTALL}/libsvm/examples
++	install -m 644 heart_scale ${DATADIR_INSTALL}/libsvm/examples
++uninstall:
++	rm -f ${BINDIR_INSTALL}/svm-train
++	rm -f ${BINDIR_INSTALL}/svm-predict
++	rm -f ${BINDIR_INSTALL}/svm-scale
++	rm -fr ${DATADIR_INSTALL}/libsvm
++	rm -f ${INCLUDEDIR_INSTALL}/libsvm/svm.h
++	rm -f ${LIBDIR_INSTALL}/libsvm.so*
++	${MAKE} -C python uninstall
++	${MAKE} -C java uninstall
++	rm -f ${BINDIR_INSTALL}/svm-toy-qt
++

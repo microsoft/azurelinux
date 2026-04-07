@@ -1,0 +1,49 @@
+From 3976c5bac1a5e7a4e9e0b8b12d8695ec6f8f00fb Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Sun, 22 Sep 2024 01:47:58 +0200
+Subject: [PATCH] port from match_cfg to cfg-if
+
+---
+ src/lib.rs | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index 1a817b3..7ac8fef 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -57,27 +57,25 @@ println!("{:?}", name);
+ #![allow(unknown_lints, unused_extern_crates)]
+ 
+ #[macro_use]
+-extern crate match_cfg;
++extern crate cfg_if;
+ 
+ #[cfg(feature = "set")]
+ use std::ffi::OsStr;
+ use std::ffi::OsString;
+ use std::io;
+ 
+-match_cfg! {
+-    #[cfg(any(unix, target_os = "redox"))] => {
++cfg_if! {
++    if #[cfg(any(unix, target_os = "redox"))] {
+         extern crate libc;
+ 
+         mod nix;
+         use ::nix as sys;
+-    }
+-    #[cfg(target_os = "windows")] => {
++    } else if #[cfg(target_os = "windows")] {
+         extern crate winapi;
+ 
+         mod windows;
+         use ::windows as sys;
+-    }
+-    _ => {
++    } else {
+         compile_error!("Unsupported target OS! Create an issue: https://github.com/svartalf/hostname/issues/new");
+     }
+ }
+-- 
+2.46.1
+

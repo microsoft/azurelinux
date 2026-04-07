@@ -1,0 +1,129 @@
+From 65c2f454e83f78d5ffdfc0a515d35c00fb1060ad Mon Sep 17 00:00:00 2001
+From: Clemens Lang <cllang@redhat.com>
+Date: Fri, 21 Nov 2025 16:00:08 +0100
+Subject: [PATCH] Do not make key share choice in tls1_set_groups()
+
+tls1_set_groups(), which is used by SSL_CTX_set1_groups() does not check
+whether the NIDs passed as argument actually have an implementation
+available in any of the currently loaded providers. It is not simple to
+add this check, either, because it would require access to the SSL_CTX,
+which this function does not receive. There are legacy callers that do
+not have an SSL_CTX pointer and are public API.
+
+This becomes a problem, when an application sets the first group to one
+that is not supported by the current configuration, and can trigger
+sending of an empty key share.
+
+Set the first entry of the key share list to 0 (and the key share list
+length to 1) to signal to tls1_construct_ctos_key_share that it should
+pick the first supported group and generate a key share for that. See
+also tls1_get_requested_keyshare_groups, which documents this special
+case.
+
+See: https://issues.redhat.com/browse/RHEL-128018
+Signed-off-by: Clemens Lang <cllang@redhat.com>
+
+Reviewed-by: Norbert Pocs <norbertp@openssl.org>
+Reviewed-by: Simo Sorce <simo@redhat.com>
+Reviewed-by: Tomas Mraz <tomas@openssl.org>
+(Merged from https://github.com/openssl/openssl/pull/29192)
+
+(cherry picked from commit 5375e940e22de80ad8c6e865a08db13762242eee)
+---
+ ssl/t1_lib.c      |  8 ++++++-
+ test/sslapitest.c | 53 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 60 insertions(+), 1 deletion(-)
+
+diff --git a/ssl/t1_lib.c b/ssl/t1_lib.c
+index 2f71f95438..3a4ebdeeea 100644
+--- a/ssl/t1_lib.c
++++ b/ssl/t1_lib.c
+@@ -1119,7 +1119,13 @@ int tls1_set_groups(uint16_t **grpext, size_t *grpextlen,
+     OPENSSL_free(*tplext);
+     *grpext = glist;
+     *grpextlen = ngroups;
+-    kslist[0] = glist[0];
++    /*
++     * No * prefix was used, let tls_construct_ctos_key_share choose a key
++     * share. This has the advantage that it will filter unsupported groups
++     * before choosing one, which this function does not do. See also the
++     * comment for tls1_get_requested_keyshare_groups.
++     */
++    kslist[0] = 0;
+     *ksext = kslist;
+     *ksextlen = 1;
+     tpllist[0] = ngroups;
+diff --git a/test/sslapitest.c b/test/sslapitest.c
+index b83dd6c552..ab1d08cf8b 100644
+--- a/test/sslapitest.c
++++ b/test/sslapitest.c
+@@ -13269,6 +13269,58 @@ static int test_no_renegotiation(int idx)
+     return testresult;
+ }
+ 
++/*
++ * Test that SSL_CTX_set1_groups() when called with a list where the first
++ * entry is unsupported, will send a key_share that uses the next usable entry.
++ */
++static int test_ssl_set_groups_unsupported_keyshare(void)
++{
++#if !defined(OPENSSL_NO_EC) || !defined(OPENSSL_NO_DH)
++    int testresult = 0;
++    SSL_CTX *sctx = NULL, *cctx = NULL;
++    SSL *serverssl = NULL, *clientssl = NULL;
++    int client_groups[] = {
++        NID_brainpoolP256r1tls13,
++        NID_sect163k1,
++        NID_secp384r1,
++        NID_ffdhe2048,
++    };
++
++    if (!TEST_true(create_ssl_ctx_pair(libctx,
++                                       TLS_server_method(),
++                                       TLS_client_method(),
++                                       0, 0,
++                                       &sctx,
++                                       &cctx,
++                                       cert,
++                                       privkey)))
++        goto end;
++
++    if (!TEST_true(SSL_CTX_set1_groups(cctx,
++                                       client_groups,
++                                       OSSL_NELEM(client_groups))))
++        goto end;
++
++    if (!TEST_true(create_ssl_objects(sctx, cctx, &serverssl, &clientssl, NULL,
++                                      NULL)))
++        goto end;
++
++    if (!TEST_true(create_ssl_connection(serverssl, clientssl, SSL_ERROR_NONE)))
++        goto end;
++
++    testresult = 1;
++ end:
++    SSL_free(serverssl);
++    SSL_free(clientssl);
++    SSL_CTX_free(sctx);
++    SSL_CTX_free(cctx);
++
++    return testresult;
++#else /* !defined(OPENSSL_NO_EC) || !defined(OPENSSL_NO_DH) */
++    return TEST_skip("No EC and DH support.");
++#endif /* !defined(OPENSSL_NO_EC) || !defined(OPENSSL_NO_DH) */
++}
++
+ #if defined(DO_SSL_TRACE_TEST)
+ /*
+  * Tests that the SSL_trace() msg_callback works as expected with a PQ Groups.
+@@ -13598,6 +13650,7 @@ int setup_tests(void)
+     ADD_TEST(test_quic_tls_early_data);
+ #endif
+     ADD_ALL_TESTS(test_no_renegotiation, 2);
++    ADD_TEST(test_ssl_set_groups_unsupported_keyshare);
+ #if defined(DO_SSL_TRACE_TEST)
+     if (datadir != NULL)
+         ADD_TEST(test_ssl_trace);
+-- 
+2.51.0
+

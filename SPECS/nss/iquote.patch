@@ -1,0 +1,13 @@
+diff -up nss/coreconf/location.mk.iquote nss/coreconf/location.mk
+--- nss/coreconf/location.mk.iquote	2017-07-27 16:09:32.000000000 +0200
++++ nss/coreconf/location.mk	2017-09-06 13:23:14.633611555 +0200
+@@ -75,4 +75,9 @@ ifndef SQLITE_LIB_NAME
+     SQLITE_LIB_NAME = sqlite3
+ endif
+ 
++# Prefer in-tree headers over system headers
++ifdef IN_TREE_FREEBL_HEADERS_FIRST
++    INCLUDES += -iquote $(DIST)/../public/nss -iquote $(DIST)/../private/nss
++endif
++
+ MK_LOCATION = included

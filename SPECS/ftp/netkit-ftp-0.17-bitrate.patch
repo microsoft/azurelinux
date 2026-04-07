@@ -1,0 +1,14 @@
+diff -up netkit-ftp-0.17/ftp/ftp.c.old netkit-ftp-0.17/ftp/ftp.c
+--- netkit-ftp-0.17/ftp/ftp.c.old	2008-01-28 10:23:17.000000000 +0100
++++ netkit-ftp-0.17/ftp/ftp.c	2008-01-28 10:32:01.000000000 +0100
+@@ -1609,8 +1609,8 @@ ptransfer(const char *direction, long lo
+ 		s = td.tv_sec + (td.tv_usec / 1000000.);
+ #define	nz(x)	((x) == 0 ? 1 : (x))
+ 		bs = bytes / nz(s);
+-		printf("%lld bytes %s in %.3g secs (%.2g Kbytes/sec)\n",
+-		    bytes, direction, s, bs / 1024.0);
++		printf("%lld bytes %s in %.3g secs (%.2f Kbytes/sec)\n",
++		    bytes, direction, s, bs / 1000.0);
+ 	}
+ }
+ 

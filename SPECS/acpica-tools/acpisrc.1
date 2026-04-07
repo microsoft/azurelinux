@@ -1,0 +1,72 @@
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH ACPISRC 1 "January 23, 2013"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+acpisrc \- ACPICA source code conversion utility
+.SH SYNOPSIS
+.B acpisrc
+.RI [ -c | -l | -u] [-d] [-s] [-v] [-y] <source-dir> <dest-dir>
+.RI <aml-file>
+
+.SH DESCRIPTION
+This manual page briefly documents the
+.B acpisrc
+command. The option list is taken from the acpisrc interactive help.
+.PP
+.\" TeX users may be more comfortable with the \fB<whatever>\fP and
+.\" \fI<whatever>\fP escape sequences to invode bold face and italics, 
+.\" respectively.
+.B acpisrc
+converts the ACPICA into various forms for use with different operating
+systems.
+Source for ACPICA may be obtained from http://www.acpica.org/source/.
+.PP
+Much more detailed documentation may be found at
+http://www.acpica.org/documentation/.
+
+.SH OPTIONS
+
+.PP
+.TP
+.B \-c
+Generate cleaned version of the source
+.TP
+.B \-h
+Insert dual-license header into all module
+.TP
+.B \-l
+Generate Linux version of the source
+.TP
+.B \-u
+Generate custom source translation
+.TP
+.B \-d
+Leave debug statements in code
+.TP
+.B \-s
+Generate source statistics only
+.TP
+.B \-v
+Verbose mode
+.TP
+.B \-y
+Suppress file overwrite prompts
+
+.SH AUTHOR
+acpisrc was written by Robert Moore <robert.moore@intel.com>.
+.PP
+This manual page was written by Al Stone <ahs3@redhat.com> for the
+Fedora project (but may be used by others).

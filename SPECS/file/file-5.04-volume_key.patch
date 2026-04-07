@@ -1,0 +1,10 @@
+diff --git a/magic/Magdir/securitycerts b/magic/Magdir/securitycerts
+index 8785dd8..1c340be 100644
+--- a/magic/Magdir/securitycerts
++++ b/magic/Magdir/securitycerts
+@@ -4,3 +4,5 @@
+ 0	search/1		-----BEGIN\ CERTIFICATE------	RFC1421 Security Certificate text
+ 0	search/1		-----BEGIN\ NEW\ CERTIFICATE	RFC1421 Security Certificate Signing Request text
+ 0	belong	0xedfeedfe	Sun 'jks' Java Keystore File data
++
++0	string \0volume_key	volume_key escrow packet

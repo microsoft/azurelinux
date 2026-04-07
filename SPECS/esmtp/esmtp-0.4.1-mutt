@@ -1,0 +1,25 @@
+/home/<user>/.muttrc:
+--- snipp ---
+# Default sendmail call
+set sendmail="/usr/bin/esmtp"
+set envelope_from=yes
+--- snapp ---
+
+
+Give .esmtprc only the permissions 600!
+/home/<user>/.esmtprc:
+--- snipp ---
+# Configuration file for ESMTP.
+
+# Set SMTP host and service (port)
+hostname = SMTPSERVER:25
+
+# Set the user name
+username = "USERNAME"
+
+# Set the password
+password = "PASSWORD"
+
+# Use the Starttls
+starttls = disabled
+--- snapp ---

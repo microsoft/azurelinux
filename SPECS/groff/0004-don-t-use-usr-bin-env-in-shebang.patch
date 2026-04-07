@@ -1,0 +1,26 @@
+From 6c997078a8f74429f58e4679b7630de7962e18b0 Mon Sep 17 00:00:00 2001
+From: Peter Schiffer <pschiffe@redhat.com>
+Date: Tue, 4 Nov 2014 14:49:57 +0100
+Subject: [PATCH 4/4] don't use /usr/bin/env in shebang
+
+There might be an issue that the script is executed with unwanted version of
+<lang> if that language is provided by enabled dynamic software collection.
+
+Resolves: #987069
+---
+ contrib/chem/chem.pl       | 2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/contrib/chem/chem.pl b/contrib/chem/chem.pl
+index 883907b..57e0216 100755
+--- a/contrib/chem/chem.pl
++++ b/contrib/chem/chem.pl
+@@ -1,4 +1,4 @@
+-#! /usr/bin/env perl
++#! /usr/bin/perl
+ 
+ # chem - a groff preprocessor for producing chemical structure diagrams
+ 
+-- 
+2.21.1
+

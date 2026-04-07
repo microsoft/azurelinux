@@ -1,0 +1,4 @@
+This directory /etc/pki/ca-trust is used by a system of consolidated
+CA certificates.
+
+Please refer to the update-ca-trust(8) manual page for additional information.

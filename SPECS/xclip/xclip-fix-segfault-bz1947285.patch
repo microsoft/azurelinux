@@ -1,0 +1,39 @@
+diff -up xclip-11cba613840b0d0e76dc2ea6d4ec7cc5f23daf88/xclip.c.1947285 xclip-11cba613840b0d0e76dc2ea6d4ec7cc5f23daf88/xclip.c
+--- xclip-11cba613840b0d0e76dc2ea6d4ec7cc5f23daf88/xclip.c.1947285	2020-11-08 09:01:39.000000000 -0500
++++ xclip-11cba613840b0d0e76dc2ea6d4ec7cc5f23daf88/xclip.c	2022-02-22 18:04:44.598444273 -0500
+@@ -353,7 +353,7 @@ doOptTarget(void)
+ static int
+ doIn(Window win, const char *progname)
+ {
+-    unsigned char *sel_buf;	/* buffer for selection data */
++    unsigned char *sel_buf = NULL;	/* buffer for selection data */
+     unsigned long sel_len = 0;	/* length of sel_buf */
+     unsigned long sel_all = 0;	/* allocated size of sel_buf */
+     XEvent evt;			/* X Event Structures */
+@@ -714,9 +714,9 @@ static int
+ doOut(Window win)
+ {
+     Atom sel_type = None;
+-    unsigned char *sel_buf;	/* buffer for selection data */
+-    unsigned long sel_len = 0;	/* length of sel_buf */
+-    XEvent evt;			/* X Event Structures */
++    unsigned char *sel_buf = NULL;	/* buffer for selection data */
++    unsigned long sel_len = 0;		/* length of sel_buf */
++    XEvent evt;				/* X Event Structures */
+     unsigned int context = XCLIB_XCOUT_NONE;
+ 
+     if (sseln == XA_STRING)
+@@ -743,9 +743,11 @@ doOut(Window win)
+ 			/* If user requested -sensitive, then prevent further pastes (even though we failed to paste) */
+ 			XSetSelectionOwner(dpy, sseln, None, CurrentTime);
+ 			/* Clear memory buffer */
+-			xcmemzero(sel_buf,sel_len);
++			if (sel_buf != NULL)
++			    xcmemzero(sel_buf,sel_len);
+ 		    }
+-		    free(sel_buf);
++		    if (sel_buf != NULL)
++			free(sel_buf);
+ 		    errconvsel(dpy, target, sseln);
+ 		    // errconvsel does not return but exits with EXIT_FAILURE
+ 		}

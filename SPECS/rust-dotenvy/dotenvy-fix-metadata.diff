@@ -1,0 +1,11 @@
+--- dotenvy-0.15.7/Cargo.toml	1970-01-01T00:00:01+00:00
++++ dotenvy-0.15.7/Cargo.toml	2024-12-21T13:12:38.053800+00:00
+@@ -42,7 +42,7 @@
+ required-features = ["cli"]
+ 
+ [dependencies.clap]
+-version = "3.2"
++version = "4.3.11"
+ optional = true
+ 
+ [dev-dependencies.once_cell]

@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# Simple wrapper to tell pkgconf to behave as a platform-specific version of pkg-config
+# Platform: @TARGET_PLATFORM@
+
+if [ -z "${RPM_BUILD_ROOT}" ]; then
+	export PKG_CONFIG_LIBDIR="${PKG_CONFIG_LIBDIR:-@PKGCONF_LIBDIRS_LOCAL@}"
+else
+	export PKG_CONFIG_LIBDIR="${PKG_CONFIG_LIBDIR:-@PKGCONF_LIBDIRS@}"
+fi
+export PKG_CONFIG_SYSTEM_LIBRARY_PATH="${PKG_CONFIG_SYSTEM_LIBRARY_PATH:-@PKGCONF_SYSLIBDIR@}"
+export PKG_CONFIG_SYSTEM_INCLUDE_PATH="${PKG_CONFIG_SYSTEM_INCLUDE_PATH:-@PKGCONF_SYSINCDIR@}"
+
+exec pkgconf "$@"

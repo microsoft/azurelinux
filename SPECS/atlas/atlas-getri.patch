@@ -1,0 +1,12 @@
+diff --git a/src/testing/ATL_f77getri.c b/src/testing/ATL_f77getri.c
+index 2cc576c..7ff8eba 100644
+--- a/src/testing/ATL_f77getri.c
++++ b/src/testing/ATL_f77getri.c
+@@ -97,7 +97,6 @@ int f77getri(const enum ATLAS_ORDER Order, const int N, TYPE *A, const int lda,
+    #ifdef ATL_FunkyInts
+       *lwork = F77lwork;
+       for (i=0; i < MN; i++) ipiv[i] = F77ipiv[i] + 1;
+-      free(F77ipiv);
+    #else
+       for (i=0; i < MN; i++) ipiv[i]++;
+    #endif

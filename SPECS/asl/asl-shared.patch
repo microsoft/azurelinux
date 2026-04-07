@@ -1,0 +1,30 @@
+--- asl-d5cfe298a3b91385ab387a2c6fbbdc64e921326e/CMakeLists.txt.orig	2024-11-15 06:40:35.000000000 -0700
++++ asl-d5cfe298a3b91385ab387a2c6fbbdc64e921326e/CMakeLists.txt	2024-11-25 10:39:56.688472457 -0700
+@@ -320,7 +320,7 @@ macro(createSingleASL name sourcedir sou
+   if (BUILD_SHARED_LIBS)
+     add_library(${name} SHARED ${${sources}} ${GENERATED_INCLUDE_DIR}/arith.h)
+     message("-- Building shared ${name} library")
+-    set_target_properties(${name} PROPERTIES POSITION_INDEPENDENT_CODE ${BUILD_SHARED_LIBS})
++    set_target_properties(${name} PROPERTIES POSITION_INDEPENDENT_CODE ${BUILD_SHARED_LIBS} VERSION 0.0.0 SOVERSION 0)
+   else()
+     add_library(${name} STATIC ${${sources}} ${GENERATED_INCLUDE_DIR}/arith.h)
+     message("-- Building static ${name} library")
+@@ -342,7 +342,7 @@ macro(createSingleASL name sourcedir sou
+   target_compile_definitions(${name} PUBLIC ${MY_COMPILE_DEFINITIONS})
+   
+   add_dependencies(${name} arith-h)
+-  target_link_libraries(${name} PUBLIC ${CMAKE_DL_LIBS})
++  target_link_libraries(${name} PUBLIC ${CMAKE_DL_LIBS} "-lgomp")
+   if(NOT WIN32)
+     target_link_libraries(${name} PRIVATE m)
+   endif()
+@@ -449,7 +449,8 @@ if(BUILD_CPP)
+     set(ASLCPP_SRCDIR ${SRCDIR}/cpp)
+     set(ASL_CPP_HEADERS ${ASLCPP_SRCDIR}/aslinterface.h)
+     set(ASL_CPP_SOURCES ${ASLCPP_SRCDIR}/aslinterface.cc)
+-    add_library(aslcpp STATIC ${ASL_CPP_SOURCES} ${ASL_CPP_HEADERS} ${ASL_HEADERS})
++    add_library(aslcpp SHARED ${ASL_CPP_SOURCES} ${ASL_CPP_HEADERS} ${ASL_HEADERS})
++    set_target_properties(aslcpp PROPERTIES POSITION_INDEPENDENT_CODE ON VERSION 0.0.0 SOVERSION 0)
+     target_link_libraries(aslcpp PUBLIC asl ${CMAKE_DL_LIBS})
+     if(NOT WIN32)
+       target_link_libraries(aslcpp PRIVATE m)

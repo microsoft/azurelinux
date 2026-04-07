@@ -1,0 +1,30 @@
+diff -up libffado-2.4.4/tests/SConscript.no-test-apps libffado-2.4.4/tests/SConscript
+--- libffado-2.4.4/tests/SConscript.no-test-apps	2018-03-04 07:12:18.000000000 +0100
++++ libffado-2.4.4/tests/SConscript	2021-01-05 16:26:04.561795120 +0100
+@@ -83,7 +83,7 @@ if env['ENABLE_DICE']:
+ 
+ for app in apps.keys():
+     env.Program( target=app, source = env.Split( apps[app] ) )
+-    env.Install( "$bindir", app )
++    # env.Install( "$bindir", app )
+ 
+ env.SConscript( dirs=["streaming", "systemtests"], exports="env" )
+ 
+diff -up libffado-2.4.4/tests/streaming/SConscript.no-test-apps libffado-2.4.4/tests/streaming/SConscript
+--- libffado-2.4.4/tests/streaming/SConscript.no-test-apps	2018-03-04 07:12:18.000000000 +0100
++++ libffado-2.4.4/tests/streaming/SConscript	2021-01-05 16:25:56.357813274 +0100
+@@ -38,4 +38,4 @@ apps = {
+ 
+ for app in apps.keys():
+     env.Program( target=app, source = env.Split( apps[app] ) )
+-    env.Install( "$bindir", app )
++    # env.Install( "$bindir", app )
+diff -up libffado-2.4.4/tests/systemtests/SConscript.no-test-apps libffado-2.4.4/tests/systemtests/SConscript
+--- libffado-2.4.4/tests/systemtests/SConscript.no-test-apps	2018-03-04 07:12:18.000000000 +0100
++++ libffado-2.4.4/tests/systemtests/SConscript	2021-01-05 16:26:07.104789496 +0100
+@@ -49,4 +49,4 @@ apps = {
+ 
+ for app in apps.keys():
+     env.Program( target=app, source = env.Split( apps[app] ) )
+-    env.Install( "$bindir", app )
++    # env.Install( "$bindir", app )

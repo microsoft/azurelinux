@@ -1,0 +1,15 @@
+diff --git a/CPP/7zip/UI/Common/ArchiveCommandLine.cpp b/CPP/7zip/UI/Common/ArchiveCommandLine.cpp
+index 7fe18fb..4b79e2d 100644
+--- a/CPP/7zip/UI/Common/ArchiveCommandLine.cpp
++++ b/CPP/7zip/UI/Common/ArchiveCommandLine.cpp
+@@ -1780,8 +1780,8 @@ FString GetModuleDirPrefix()
+   FString s;
+ 
+   s = fas2fs(g_ModuleDirPrefix);
+-  if (s.IsEmpty())
+-    s = FTEXT(".") FSTRING_PATH_SEPARATOR;
++  if (s.IsEmpty() || s.IsPrefixedBy("/usr/bin"))
++    s = FTEXT("/usr/libexec/7zip") FSTRING_PATH_SEPARATOR;
+   return s;
+   /*
+   setenv("_7ZIP_HOME_DIR", "/test/", 0);

@@ -1,0 +1,1645 @@
+From 64845ffd989313f9629bc1afe1052cfa0eef00b1 Mon Sep 17 00:00:00 2001
+From: Simon Pichugin <spichugi@redhat.com>
+Date: Tue, 3 Feb 2026 17:17:02 -0800
+Subject: [PATCH] Issue 7194 - Repl Log Analysis - Add CSN propagation details
+ (#7195)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Description: The replication log analyzer now shows per‑CSN propagation
+details and the console UI can drill into them from chart points. This
+adds CSN IDs to chart datapoints, builds detailed arrivals/hops data, and
+links replica IDs to origin servers for more accurate origin detection.
+
+The report JSON now includes csnDetails and sampling metadata; when
+sampling is active, CSN details are limited to sampled IDs to control
+memory use. A new originIncludedInArrivals flag is exposed and the UI
+shows an explicit note when origin records are outside the time range.
+The cockpit report modal gains an interactive CSN detail view and
+clickable chart points.
+
+Tests were expanded to cover CSN details, origin out‑of‑scope behavior,
+and partial replication, and include helper functions to reduce duplication.
+
+Fixes: https://github.com/389ds/389-ds-base/issues/7194
+
+Reviewed by: @progier389, @mreynolds389 (Thanks!!)
+---
+ .../replication/repl_log_monitoring_test.py   | 481 +++++++++++++++--
+ .../src/lib/monitor/monitorModals.jsx         | 484 +++++++++++++++++-
+ src/lib389/lib389/repltools.py                | 270 +++++++++-
+ 3 files changed, 1166 insertions(+), 69 deletions(-)
+
+diff --git a/dirsrvtests/tests/suites/replication/repl_log_monitoring_test.py b/dirsrvtests/tests/suites/replication/repl_log_monitoring_test.py
+index 665fcb96f..855005ff9 100644
+--- a/dirsrvtests/tests/suites/replication/repl_log_monitoring_test.py
++++ b/dirsrvtests/tests/suites/replication/repl_log_monitoring_test.py
+@@ -21,7 +21,7 @@ from lib389.backend import Backends
+ from lib389.topologies import topology_m4 as topo_m4
+ from lib389.idm.user import UserAccount
+ from lib389.replica import ReplicationManager
+-from lib389.repltools import ReplicationLogAnalyzer
++from lib389.repltools import ReplicationLogAnalyzer, DSLogParser
+ from lib389._constants import *
+ 
+ pytestmark = pytest.mark.tier0
+@@ -105,6 +105,101 @@ def _cleanup_multi_suffix_test(test_users_by_suffix, tmp_dir, suppliers, extra_s
+         log.error(f"Error cleaning up temporary directory: {e}")
+ 
+ 
++def _clear_access_logs(suppliers):
++    """Clear access logs for all suppliers and restart."""
++    for supplier in suppliers:
++        supplier.deleteAccessLogs(restart=True)
++
++
++def _restart_suppliers(suppliers):
++    """Restart all suppliers."""
++    for supplier in suppliers:
++        supplier.restart()
++
++
++def _get_log_dirs(suppliers):
++    """Return log directories for all suppliers."""
++    return [s.ds_paths.log_dir for s in suppliers]
++
++
++def _load_json(path):
++    """Load and return JSON from file."""
++    with open(path, 'r') as f:
++        return json.load(f)
++
++
++def _pause_agreements(supplier, suffix):
++    """Pause outbound agreements and return list of paused tuples."""
++    paused = []
++    for agmt in supplier.agreement.list(suffix=suffix):
++        supplier.agreement.pause(agmt.dn)
++        paused.append((supplier, agmt.dn))
++    return paused
++
++
++def _resume_agreements(paused_agreements):
++    """Resume paused replication agreements."""
++    for supplier_obj, dn in paused_agreements:
++        try:
++            supplier_obj.agreement.resume(dn)
++        except Exception as e:
++            log.warning(f"Failed to resume agreement {dn}: {e}")
++
++
++def _assert_csn_details_schema(json_data):
++    """Validate csnDetails presence and basic structure."""
++    assert 'csnDetails' in json_data, "Expected csnDetails in JSON output for drill-down"
++    csn_details = json_data['csnDetails']
++    if csn_details:
++        # Check structure of at least one CSN detail entry
++        first_csn = next(iter(csn_details.values()))
++        assert 'csn' in first_csn, "CSN detail should contain 'csn' field"
++        assert 'targetDn' in first_csn, "CSN detail should contain 'targetDn' field"
++        assert 'suffix' in first_csn, "CSN detail should contain 'suffix' field"
++        assert 'globalLag' in first_csn, "CSN detail should contain 'globalLag' field"
++        assert 'originServer' in first_csn, "CSN detail should contain 'originServer' field"
++        assert 'arrivals' in first_csn, "CSN detail should contain 'arrivals' list"
++        assert 'hops' in first_csn, "CSN detail should contain 'hops' list"
++        assert isinstance(first_csn['arrivals'], list), "arrivals should be a list"
++
++        # Verify arrivals structure
++        if first_csn['arrivals']:
++            first_arrival = first_csn['arrivals'][0]
++            assert 'server' in first_arrival, "Arrival should contain 'server' field"
++            assert 'timestamp' in first_arrival, "Arrival should contain 'timestamp' field"
++            assert 'relativeDelay' in first_arrival, "Arrival should contain 'relativeDelay' field"
++
++    # Verify csnId is included in datapoints for cross-reference
++    if 'replicationLags' in json_data and json_data['replicationLags'].get('series'):
++        for series in json_data['replicationLags']['series']:
++            for datapoint in series['datapoints']:
++                assert 'csnId' in datapoint, "Datapoint should contain 'csnId' for drill-down"
++
++    return csn_details
++
++
++def _find_latest_logtime_for_prefix(log_dir, suffix, start_time, end_time, user_prefix):
++    latest = None
++    for fname in os.listdir(log_dir):
++        if not fname.startswith('access'):
++            continue
++        full_path = os.path.join(log_dir, fname)
++        parser = DSLogParser(
++            logname=full_path,
++            suffixes=[suffix],
++            tz=timezone.utc,
++            start_time=start_time,
++            end_time=end_time
++        )
++        for record in parser.parse_file():
++            target_dn = record.get('target_dn') or ''
++            if user_prefix in target_dn:
++                ts = record.get('timestamp')
++                if ts and (latest is None or ts > latest):
++                    latest = ts
++    return latest
++
++
+ def test_replication_log_monitoring_basic(topo_m4):
+     """Test basic replication log monitoring functionality
+ 
+@@ -128,8 +223,7 @@ def test_replication_log_monitoring_basic(topo_m4):
+ 
+     try:
+         # Clear logs and restart servers
+-        for supplier in suppliers:
+-            supplier.deleteAccessLogs(restart=True)
++        _clear_access_logs(suppliers)
+ 
+         # Generate test data with known patterns
+         log.info('Creating test data...')
+@@ -140,11 +234,10 @@ def test_replication_log_monitoring_basic(topo_m4):
+         repl.test_replication_topology(topo_m4)
+ 
+         # Restart to flush logs
+-        for supplier in suppliers:
+-            supplier.restart()
++        _restart_suppliers(suppliers)
+ 
+         # Configure monitoring
+-        log_dirs = [s.ds_paths.log_dir for s in suppliers]
++        log_dirs = _get_log_dirs(suppliers)
+         repl_monitor = ReplicationLogAnalyzer(
+             log_dirs=log_dirs,
+             suffixes=[DEFAULT_SUFFIX],
+@@ -177,23 +270,23 @@ def test_replication_log_monitoring_basic(topo_m4):
+             assert DEFAULT_SUFFIX in csv_content
+ 
+         # Verify PatternFly JSON content
+-        with open(generated_files['json'], 'r') as f:
+-            json_data = json.load(f)
+-            assert 'replicationLags' in json_data
+-            assert json_data['replicationLags']['series'], "Expected replication lag series in JSON output"
++        json_data = _load_json(generated_files['json'])
++        assert 'replicationLags' in json_data
++        assert json_data['replicationLags']['series'], "Expected replication lag series in JSON output"
++
++        _assert_csn_details_schema(json_data)
+ 
+         # Verify JSON summary
+-        with open(generated_files['summary'], 'r') as f:
+-            summary = json.load(f)
+-            assert 'analysis_summary' in summary
+-            stats = summary['analysis_summary']
++        summary = _load_json(generated_files['summary'])
++        assert 'analysis_summary' in summary
++        stats = summary['analysis_summary']
+ 
+-            # Verify basic stats
+-            assert stats['total_servers'] == len(suppliers)
+-            assert stats['total_updates'] > 0
+-            assert stats['updates_by_suffix'][DEFAULT_SUFFIX] > 0
+-            assert 'average_lag' in stats
+-            assert 'maximum_lag' in stats
++        # Verify basic stats
++        assert stats['total_servers'] == len(suppliers)
++        assert stats['total_updates'] > 0
++        assert stats['updates_by_suffix'][DEFAULT_SUFFIX] > 0
++        assert 'average_lag' in stats
++        assert 'maximum_lag' in stats
+ 
+     finally:
+         _cleanup_test_data(test_users, tmp_dir)
+@@ -221,8 +314,7 @@ def test_replication_log_monitoring_advanced(topo_m4):
+ 
+     try:
+         # Clear logs and restart servers
+-        for supplier in suppliers:
+-            supplier.deleteAccessLogs(restart=True)
++        _clear_access_logs(suppliers)
+ 
+         # Generate test data
+         start_time = datetime.now(timezone.utc)
+@@ -240,10 +332,9 @@ def test_replication_log_monitoring_advanced(topo_m4):
+         end_time = datetime.now(timezone.utc)
+ 
+         # Restart to flush logs
+-        for supplier in suppliers:
+-            supplier.restart()
++        _restart_suppliers(suppliers)
+ 
+-        log_dirs = [s.ds_paths.log_dir for s in suppliers]
++        log_dirs = _get_log_dirs(suppliers)
+ 
+         # Test 1: Lag time filtering
+         repl_monitor = ReplicationLogAnalyzer(
+@@ -374,8 +465,7 @@ def test_replication_log_monitoring_multi_suffix(topo_m4):
+             repl = ReplicationManager(suffix)
+             repl.test_replication_topology(topo_m4)
+ 
+-        for supplier in suppliers:
+-            supplier.deleteAccessLogs(restart=True)
++        _clear_access_logs(suppliers)
+ 
+         start_time = datetime.now(timezone.utc)
+ 
+@@ -400,11 +490,10 @@ def test_replication_log_monitoring_multi_suffix(topo_m4):
+         end_time = datetime.now(timezone.utc)
+ 
+         # Restart to flush logs
+-        for supplier in suppliers:
+-            supplier.restart()
++        _restart_suppliers(suppliers)
+ 
+         # Monitor all suffixes
+-        log_dirs = [s.ds_paths.log_dir for s in suppliers]
++        log_dirs = _get_log_dirs(suppliers)
+         repl_monitor = ReplicationLogAnalyzer(
+             log_dirs=log_dirs,
+             suffixes=all_suffixes,
+@@ -466,8 +555,7 @@ def test_replication_log_monitoring_filter_combinations(topo_m4):
+ 
+     try:
+         # Clear logs and restart servers
+-        for supplier in suppliers:
+-            supplier.deleteAccessLogs(restart=True)
++        _clear_access_logs(suppliers)
+ 
+         # Generate varied test data
+         start_time = datetime.now(timezone.utc)
+@@ -475,9 +563,7 @@ def test_replication_log_monitoring_filter_combinations(topo_m4):
+ 
+         # Create different lag patterns
+         # Pause outbound agreements from supplier1 to build a replication backlog
+-        for agmt in suppliers[0].agreement.list(suffix=DEFAULT_SUFFIX):
+-            suppliers[0].agreement.pause(agmt.dn)
+-            paused_agreements.append((suppliers[0], agmt.dn))
++        paused_agreements = _pause_agreements(suppliers[0], DEFAULT_SUFFIX)
+ 
+         for i, user in enumerate(test_users):
+             if i % 3 == 0:
+@@ -502,10 +588,9 @@ def test_replication_log_monitoring_filter_combinations(topo_m4):
+         end_time = datetime.now(timezone.utc)
+ 
+         # Restart to flush logs
+-        for supplier in suppliers:
+-            supplier.restart()
++        _restart_suppliers(suppliers)
+ 
+-        log_dirs = [s.ds_paths.log_dir for s in suppliers]
++        log_dirs = _get_log_dirs(suppliers)
+ 
+         # Test combined filters
+         lag_threshold = 0.5
+@@ -543,11 +628,321 @@ def test_replication_log_monitoring_filter_combinations(topo_m4):
+                 dt = datetime.fromtimestamp(t, timezone.utc)
+                 assert start_time <= dt <= end_time, "Time range filter violated"
+     finally:
+-        for supplier_obj, dn in paused_agreements:
+-            try:
+-                supplier_obj.agreement.resume(dn)
+-            except Exception as e:
+-                log.warning(f"Failed to resume agreement {dn}: {e}")
++        _resume_agreements(paused_agreements)
++        _cleanup_test_data(test_users, tmp_dir)
++
++
++def test_replication_log_monitoring_csn_details_edge_cases(topo_m4):
++    """Test CSN details edge cases and structure validation
++
++    :id: f43dc473-4428-4971-be4c-169c4a78726e
++    :setup: Four suppliers replication setup
++    :steps:
++        1. Test CSN details structure with various replication patterns
++        2. Verify arrivals ordering and hop lag calculations
++        3. Test partial replication scenarios
++        4. Verify origin server detection
++    :expectedresults:
++        1. CSN details should have correct structure
++        2. Arrivals should be ordered by timestamp
++        3. Partial replication should be detected
++        4. Origin server should be correctly identified
++    """
++    tmp_dir = tempfile.mkdtemp(prefix='repl_csn_edge_')
++    test_users = []
++    suppliers = [topo_m4.ms[f"supplier{i}"] for i in range(1, 5)]
++
++    try:
++        _clear_access_logs(suppliers)
++
++        log.info('Creating test data for CSN details edge case testing...')
++        test_users = _generate_test_data(suppliers[0], DEFAULT_SUFFIX, 5)
++
++        repl = ReplicationManager(DEFAULT_SUFFIX)
++        repl.test_replication_topology(topo_m4)
++
++        _restart_suppliers(suppliers)
++
++        log_dirs = _get_log_dirs(suppliers)
++        repl_monitor = ReplicationLogAnalyzer(
++            log_dirs=log_dirs,
++            suffixes=[DEFAULT_SUFFIX],
++            anonymous=False,
++            only_fully_replicated=True
++        )
++
++        repl_monitor.parse_logs()
++        generated_files = repl_monitor.generate_report(
++            output_dir=tmp_dir,
++            formats=['json'],
++            report_name='csn_edge_test'
++        )
++
++        assert os.path.exists(generated_files['json'])
++
++        json_data = _load_json(generated_files['json'])
++
++        assert 'csnDetails' in json_data, "csnDetails should be present"
++        csn_details = json_data['csnDetails']
++
++        if csn_details:
++            for csn, details in csn_details.items():
++                arrivals = details.get('arrivals', [])
++                if len(arrivals) > 1:
++                    timestamps = [a['timestamp'] for a in arrivals]
++                    assert timestamps == sorted(timestamps), \
++                        f"Arrivals for CSN {csn} should be ordered by timestamp"
++
++                if arrivals:
++                    origin_arrival = next((a for a in arrivals if a.get('isOrigin')), None)
++                    assert origin_arrival is not None, "Expected an arrival marked as origin"
++                    assert origin_arrival.get('server') == details.get('originServer'), \
++                        "Origin arrival server should match originServer field"
++
++                    for i, arrival in enumerate(arrivals[1:], start=1):
++                        assert 'hopLag' in arrival, \
++                            f"Arrival {i} should have hopLag"
++                        assert arrival['hopLag'] >= 0, \
++                            "hopLag should be non-negative"
++
++                if len(arrivals) > 1:
++                    global_lag = details.get('globalLag', 0)
++                    assert global_lag >= 0, "globalLag should be non-negative"
++
++                    last_delay = arrivals[-1].get('relativeDelay', 0)
++                    assert abs(last_delay - global_lag) < 0.001, \
++                        "Last arrival's relativeDelay should match globalLag"
++
++                server_count = details.get('serverCount', 0)
++                assert server_count == len(arrivals), \
++                    "serverCount should match number of arrivals"
++
++                total_hops = details.get('totalHops', 0)
++                expected_hops = max(0, len(arrivals) - 1)
++                assert total_hops == expected_hops, \
++                    f"totalHops should be {expected_hops}, got {total_hops}"
++
++                hops = details.get('hops', [])
++                assert len(hops) == total_hops, \
++                    "hops list length should match totalHops"
++
++            if 'replicationLags' in json_data and json_data['replicationLags'].get('series'):
++                for series in json_data['replicationLags']['series']:
++                    for datapoint in series.get('datapoints', []):
++                        csn_id = datapoint.get('csnId')
++                        if csn_id:
++                            assert csn_id in csn_details, \
++                                f"csnId {csn_id} in datapoint should exist in csnDetails"
++
++    finally:
++        _cleanup_test_data(test_users, tmp_dir)
++
++
++def test_replication_log_monitoring_origin_out_of_scope(topo_m4):
++    """Test origin detection when origin server record is outside time range
++
++    :id: d73fd9c5-f930-47d6-ade4-ada1cf0d2c21
++    :setup: Four suppliers replication setup
++    :steps:
++        1. Pause outbound agreements from the origin supplier
++        2. Generate changes, then resume agreements to delay consumer arrivals
++        3. Use time range that excludes the origin log but includes consumer logs
++    :expectedresults:
++        1. Origin server should be identified from replica ID mapping
++        2. At least one CSN should have origin outside the selected time range
++        3. JSON report should include csnDetails entries for validation
++    """
++    tmp_dir = tempfile.mkdtemp(prefix='repl_origin_scope_')
++    test_users = []
++    suppliers = [topo_m4.ms[f"supplier{i}"] for i in range(1, 5)]
++    paused_agreements = []
++
++    try:
++        # Reset access logs to make time-range cuts easier to reason about
++        _clear_access_logs(suppliers)
++
++        # Pause outbound agreements so consumer logs won't see the pre-resume CSNs
++        paused_agreements = _pause_agreements(suppliers[0], DEFAULT_SUFFIX)
++
++        log.info('Creating pre-resume changes for origin out-of-scope test...')
++        # Create CSNs that originate on supplier1 but won't reach consumers yet
++        pre_start = datetime.now(timezone.utc)
++        test_users = _generate_test_data(
++            suppliers[0], DEFAULT_SUFFIX, 2, user_prefix="origin_scope_pre"
++        )
++        pre_end = datetime.now(timezone.utc)
++        # Locate the latest origin log time for these CSNs to set a deterministic cutoff
++        origin_log_time = _find_latest_logtime_for_prefix(
++            suppliers[0].ds_paths.log_dir,
++            DEFAULT_SUFFIX,
++            pre_start,
++            pre_end,
++            "origin_scope_pre_"
++        )
++        assert origin_log_time is not None, "Expected origin server log entries for pre-resume data"
++        # Cut the analysis window just after origin logging, excluding supplier1 entries
++        start_time = origin_log_time + timedelta(seconds=1)
++        time.sleep(1)
++
++        # Resume agreements so the pre-resume CSNs replicate to consumers after start_time
++        _resume_agreements(paused_agreements)
++        paused_agreements.clear()
++
++        log.info('Creating post-resume changes for origin mapping...')
++        # Additional CSNs after resume ensure normal replication continues
++        test_users += _generate_test_data(
++            suppliers[0], DEFAULT_SUFFIX, 2, user_prefix="origin_scope_post"
++        )
++
++        # Wait for replication to finish and capture the upper bound of the time window
++        repl = ReplicationManager(DEFAULT_SUFFIX)
++        repl.test_replication_topology(topo_m4)
++        end_time = datetime.now(timezone.utc)
++
++        # Restart to flush logs before analysis
++        _restart_suppliers(suppliers)
++
++        log_dirs = _get_log_dirs(suppliers)
++        repl_monitor = ReplicationLogAnalyzer(
++            log_dirs=log_dirs,
++            suffixes=[DEFAULT_SUFFIX],
++            time_range={'start': start_time, 'end': end_time}
++        )
++
++        # Parse logs within the time window and produce JSON details
++        repl_monitor.parse_logs()
++        generated_files = repl_monitor.generate_report(
++            output_dir=tmp_dir,
++            formats=['json'],
++            report_name='origin_scope_test'
++        )
++
++        json_data = _load_json(generated_files['json'])
++
++        csn_details = json_data.get('csnDetails', {})
++        origin_server = suppliers[0].serverid
++        found = False
++        if csn_details:
++            origin_counts = {}
++            for details in csn_details.values():
++                origin = details.get('originServer', 'unknown')
++                origin_counts[origin] = origin_counts.get(origin, 0) + 1
++            if origin_server not in origin_counts and f"slapd-{origin_server}" in origin_counts:
++                origin_server = f"slapd-{origin_server}"
++
++        # Focus on the pre-resume CSNs; these should have origin out of scope
++        pre_details = [
++            details for details in csn_details.values()
++            if "origin_scope_pre_" in (details.get('targetDn') or '')
++        ]
++        assert pre_details, "Expected pre-resume CSNs in csnDetails"
++        # Confirm at least one CSN shows origin server missing from arrivals
++        for details in pre_details:
++            if details.get('originServer') != origin_server:
++                continue
++            arrivals = details.get('arrivals', [])
++            arrival_servers = {a.get('server') for a in arrivals}
++            if arrival_servers and origin_server not in arrival_servers:
++                found = True
++                break
++            log.info(
++                "Origin out-of-scope candidate: csn=%s arrivals=%s",
++                details.get('csn'),
++                sorted(arrival_servers)
++            )
++
++        assert found, (
++            "Expected at least one CSN where the origin server is outside the time range "
++            "but still identified via replica ID mapping"
++        )
++
++    finally:
++        _resume_agreements(paused_agreements)
++        _cleanup_test_data(test_users, tmp_dir)
++
++
++def test_replication_log_monitoring_partial_replication(topo_m4):
++    """Test CSN details with partial replication (not all servers reached)
++
++    :id: d4026fd0-d83b-400e-8c2e-44fcf676368f
++    :setup: Four suppliers replication setup
++    :steps:
++        1. Pause replication agreements to create partial replication
++        2. Generate changes and verify partial replication detection
++        3. Verify replicatedToAll flag is correct
++    :expectedresults:
++        1. Partial replication should be detected
++        2. replicatedToAll should be False for partially replicated CSNs
++        3. serverCount should reflect actual servers reached
++    """
++    tmp_dir = tempfile.mkdtemp(prefix='repl_partial_')
++    test_users = []
++    suppliers = [topo_m4.ms[f"supplier{i}"] for i in range(1, 5)]
++    paused_agreements = []
++
++    try:
++        _clear_access_logs(suppliers)
++
++        log.info('Creating fully replicated test data...')
++        test_users = _generate_test_data(suppliers[0], DEFAULT_SUFFIX, 3)
++
++        repl = ReplicationManager(DEFAULT_SUFFIX)
++        repl.test_replication_topology(topo_m4)
++
++        _restart_suppliers(suppliers)
++
++        # Pause outbound agreements from supplier1 to create partial replication
++        paused_agreements = _pause_agreements(suppliers[0], DEFAULT_SUFFIX)
++
++        log.info('Creating partially replicated test data...')
++        test_users += _generate_test_data(suppliers[0], DEFAULT_SUFFIX, 3, user_prefix="partial_user")
++
++        # Allow some time for local logging; do not wait for full replication
++        time.sleep(2)
++
++        log_dirs = _get_log_dirs(suppliers)
++        repl_monitor = ReplicationLogAnalyzer(
++            log_dirs=log_dirs,
++            suffixes=[DEFAULT_SUFFIX],
++            anonymous=False,
++            only_fully_replicated=False,
++            only_not_replicated=False
++        )
++
++        repl_monitor.parse_logs()
++        generated_files = repl_monitor.generate_report(
++            output_dir=tmp_dir,
++            formats=['json'],
++            report_name='partial_repl_test'
++        )
++
++        json_data = _load_json(generated_files['json'])
++
++        assert 'csnDetails' in json_data
++        csn_details = json_data['csnDetails']
++
++        if csn_details:
++            fully_replicated_count = sum(
++                1 for details in csn_details.values()
++                if details.get('replicatedToAll', False)
++            )
++
++            assert fully_replicated_count > 0, \
++                "Should have some fully replicated CSNs"
++
++            total_servers = len(suppliers)
++            for csn, details in csn_details.items():
++                server_count = details.get('serverCount', 0)
++                assert server_count <= total_servers, \
++                    f"serverCount ({server_count}) should not exceed total servers ({total_servers})"
++
++                replicated_to_all = details.get('replicatedToAll', False)
++                if replicated_to_all:
++                    assert server_count == total_servers, \
++                        "replicatedToAll=True requires serverCount == total_servers"
++
++    finally:
++        _resume_agreements(paused_agreements)
+         _cleanup_test_data(test_users, tmp_dir)
+ 
+ 
+diff --git a/src/cockpit/389-console/src/lib/monitor/monitorModals.jsx b/src/cockpit/389-console/src/lib/monitor/monitorModals.jsx
+index facbd9f5f..3c5a46a5b 100644
+--- a/src/cockpit/389-console/src/lib/monitor/monitorModals.jsx
++++ b/src/cockpit/389-console/src/lib/monitor/monitorModals.jsx
+@@ -3,17 +3,22 @@ import React from "react";
+ import {
+     Button,
+     Checkbox,
++    ClipboardCopy,
++    ClipboardCopyVariant,
+     EmptyState,
+     EmptyStateIcon,
+     EmptyStateBody,
+     Grid,
+     GridItem,
+     Form,
++    Label,
+     Modal,
+     ModalVariant,
+     NumberInput,
+     Radio,
+     Spinner,
++    Split,
++    SplitItem,
+     Tab,
+     Tabs,
+     TabTitleText,
+@@ -36,9 +41,12 @@ import {
+     ListItem
+ } from "@patternfly/react-core";
+ import {
++    ArrowRightIcon,
++    CheckCircleIcon,
+     CopyIcon,
+     OutlinedQuestionCircleIcon,
+     DownloadIcon,
++    ServerIcon
+ } from '@patternfly/react-icons';
+ import PropTypes from "prop-types";
+ import { get_date_string } from "../tools.jsx";
+@@ -71,6 +79,19 @@ const MAX_REPORT_JSON_SIZE = 64 * 1024 * 1024; // 64 MiB
+ const MAX_BINARY_READ_SIZE = 64 * 1024 * 1024; // 64 MiB
+ const CSV_PREVIEW_LINES = 20;
+ 
++const formatLagSeconds = (seconds, precision = 3) => {
++    if (seconds === undefined || seconds === null) {
++        return null;
++    }
++    if (seconds >= 3600) {
++        return `${(seconds / 3600).toFixed(precision)}h`;
++    }
++    if (seconds >= 60) {
++        return `${(seconds / 60).toFixed(precision)}m`;
++    }
++    return `${seconds.toFixed(precision)}s`;
++};
++
+ class TaskLogModal extends React.Component {
+     render() {
+         const {
+@@ -1168,6 +1189,13 @@ class ScatterLineChart extends React.PureComponent {
+             }, 250);
+         };
+         this.toggleLegendItem = this.toggleLegendItem.bind(this);
++        this.handlePointClick = this.handlePointClick.bind(this);
++    }
++
++    handlePointClick(datum, seriesIndex) {
++        if (this.props.onPointClick && datum.csnId) {
++            this.props.onPointClick(datum);
++        }
+     }
+ 
+     componentDidMount() {
+@@ -1267,15 +1295,7 @@ class ScatterLineChart extends React.PureComponent {
+         const { series, yDomain } = this._getSeriesSnapshot();
+ 
+         // Helper function to format time values
+-        const formatTimeValue = (seconds) => {
+-            if (seconds >= 3600) {
+-                return `${(seconds / 3600).toFixed(3)}h`;
+-            } else if (seconds >= 60) {
+-                return `${(seconds / 60).toFixed(3)}m`;
+-            } else {
+-                return `${seconds.toFixed(3)}s`;
+-            }
+-        };
++        const formatTimeValue = (seconds) => formatLagSeconds(seconds, 3);
+ 
+         // Process tooltip HTML tags
+         const formatTooltip = (datum) => {
+@@ -1308,13 +1328,35 @@ class ScatterLineChart extends React.PureComponent {
+                                 labels={({ datum }) => formatTooltip(datum)}
+                                 constrainToVisibleArea
+                                 labelComponent={
+-                                    <ChartTooltip
+-                                        style={{
+-                                            fontSize: "12px",
+-                                            padding: 10,
+-                                            whiteSpace: "pre-line" // Important for newlines
+-                                        }}
+-                                    />
++                                <ChartTooltip
++                                    orientation={({ datum }) => {
++                                        // Position tooltip below for high points, above for low points
++                                        // This prevents the tooltip from blocking clicks on points near the top
++                                        const yMax = yDomain.max;
++                                        const yMin = yDomain.min;
++                                        const yRange = yMax - yMin;
++                                        const threshold = yMin + (yRange * 0.6);
++                                        return datum.y > threshold ? "bottom" : "top";
++                                    }}
++                                    style={{
++                                        fontSize: "12px",
++                                        padding: 10,
++                                        whiteSpace: "pre-line", // Important for newlines
++                                        pointerEvents: "none"
++                                    }}
++                                    flyoutStyle={{
++                                        pointerEvents: "none"
++                                    }}
++                                    dx={0}
++                                    dy={({ datum }) => {
++                                        // Add extra offset to keep tooltip away from the point
++                                        const yMax = yDomain.max;
++                                        const yMin = yDomain.min;
++                                        const yRange = yMax - yMin;
++                                        const threshold = yMin + (yRange * 0.6);
++                                        return datum.y > threshold ? 10 : -10;
++                                    }}
++                                />
+                                 }
+                             />
+                         }
+@@ -1410,6 +1452,7 @@ class ScatterLineChart extends React.PureComponent {
+                                 if (this.state.hiddenSeries[idx]) {
+                                     return null;
+                                 }
++                                const hasClickHandler = !!this.props.onPointClick;
+                                 return (
+                                     <ChartScatter
+                                         key={`scatter-${idx}`}
+@@ -1417,9 +1460,39 @@ class ScatterLineChart extends React.PureComponent {
+                                         data={s.datapoints}
+                                         style={{
+                                             data: {
+-                                                fill: s.color
++                                                fill: s.color,
++                                                cursor: hasClickHandler ? 'pointer' : 'default'
+                                             }
+                                         }}
++                                        events={hasClickHandler ? [{
++                                            target: "data",
++                                            eventHandlers: {
++                                                onClick: () => [{
++                                                    target: "data",
++                                                    mutation: (props) => {
++                                                        this.handlePointClick(props.datum, idx);
++                                                        return null;
++                                                    }
++                                                }],
++                                                onMouseOver: () => [{
++                                                    target: "data",
++                                                    mutation: (props) => ({
++                                                        style: {
++                                                            ...props.style,
++                                                            fill: s.color,
++                                                            cursor: 'pointer',
++                                                            strokeWidth: 2,
++                                                            stroke: 'var(--pf-v5-global--active-color--100, #0066cc)',
++                                                            r: 6
++                                                        }
++                                                    })
++                                                }],
++                                                onMouseOut: () => [{
++                                                    target: "data",
++                                                    mutation: () => null
++                                                }]
++                                            }
++                                        }] : undefined}
+                                     />
+                                 );
+                             })}
+@@ -1501,17 +1574,320 @@ class ScatterLineChart extends React.PureComponent {
+     }
+ }
+ 
++/**
++ * CSNDetailModal - Displays detailed CSN propagation path information
++ * Shows the hop-by-hop timing of how a change propagated through the replication topology
++ */
++class CSNDetailModal extends React.Component {
++    constructor(props) {
++        super(props);
++        this.formatTimestamp = this.formatTimestamp.bind(this);
++        this.formatLag = this.formatLag.bind(this);
++    }
++
++    formatTimestamp(isoString) {
++        if (!isoString) return _("Unknown");
++        try {
++            const date = new Date(isoString);
++            if (isNaN(date.getTime())) {
++                console.warn("Invalid timestamp format:", isoString);
++                return cockpit.format(_("Invalid: $0"), isoString);
++            }
++            return date.toLocaleString(undefined, {
++                year: 'numeric',
++                month: '2-digit',
++                day: '2-digit',
++                hour: '2-digit',
++                minute: '2-digit',
++                second: '2-digit',
++                fractionalSecondDigits: 3,
++                hour12: false
++            });
++        } catch (e) {
++            console.warn("Error formatting timestamp:", isoString, e);
++            return cockpit.format(_("Invalid: $0"), isoString);
++        }
++    }
++
++    formatLag(seconds) {
++        return formatLagSeconds(seconds, 3) || _("N/A");
++    }
++
++    render() {
++        const { csnData, onClose } = this.props;
++
++        if (!csnData) {
++            return null;
++        }
++
++        const arrivals = csnData.arrivals || [];
++        const pathJson = JSON.stringify(csnData, null, 2);
++
++        return (
++            <Modal
++                variant={ModalVariant.large}
++                title={_("CSN Propagation Details")}
++                isOpen={!!csnData}
++                onClose={onClose}
++                aria-label={_("CSN propagation details")}
++                actions={[
++                    <Button key="close" variant="primary" onClick={onClose}>
++                        {_("Close")}
++                    </Button>
++                ]}
++            >
++                        {/* CSN Summary Information */}
++                        <Card isFlat className="ds-margin-bottom-md">
++                            <CardBody>
++                                <Grid hasGutter>
++                                    <GridItem span={6}>
++                                        <DescriptionList isHorizontal isCompact>
++                                            <DescriptionListGroup>
++                                                <DescriptionListTerm>{_("CSN")}</DescriptionListTerm>
++                                                <DescriptionListDescription>
++                                                    <ClipboardCopy
++                                                        variant={ClipboardCopyVariant.inline}
++                                                    >
++                                                        {csnData.csn}
++                                                    </ClipboardCopy>
++                                                </DescriptionListDescription>
++                                            </DescriptionListGroup>
++                                            <DescriptionListGroup>
++                                                <DescriptionListTerm>{_("Entry DN")}</DescriptionListTerm>
++                                                <DescriptionListDescription>
++                                                    <Tooltip content={csnData.targetDn}>
++                                                        <span className="pf-v5-u-text-truncate" style={{ maxWidth: '300px', display: 'inline-block' }}>
++                                                            {csnData.targetDn}
++                                                        </span>
++                                                    </Tooltip>
++                                                </DescriptionListDescription>
++                                            </DescriptionListGroup>
++                                            <DescriptionListGroup>
++                                                <DescriptionListTerm>{_("Suffix")}</DescriptionListTerm>
++                                                <DescriptionListDescription>{csnData.suffix}</DescriptionListDescription>
++                                            </DescriptionListGroup>
++                                        </DescriptionList>
++                                    </GridItem>
++                                    <GridItem span={6}>
++                                        <DescriptionList isHorizontal isCompact>
++                                            <DescriptionListGroup>
++                                                <DescriptionListTerm>{_("Origin Server")}</DescriptionListTerm>
++                                                <DescriptionListDescription>
++                                                    <Label color="blue" icon={<ServerIcon />}>
++                                                        {csnData.originServer}
++                                                    </Label>
++                                                </DescriptionListDescription>
++                                            </DescriptionListGroup>
++                                            {csnData.originIncludedInArrivals === false && (
++                                                <DescriptionListGroup>
++                                                    <DescriptionListTerm>{_("Origin Note")}</DescriptionListTerm>
++                                                    <DescriptionListDescription>
++                                                        <Text component={TextVariants.small} style={{ color: 'var(--pf-v5-global--Color--200)' }}>
++                                                            {_("Origin server record is outside the selected time range; entry details reflect the earliest arrival.")}
++                                                        </Text>
++                                                    </DescriptionListDescription>
++                                                </DescriptionListGroup>
++                                            )}
++                                            <DescriptionListGroup>
++                                                <DescriptionListTerm>{_("Total Lag")}</DescriptionListTerm>
++                                                <DescriptionListDescription>
++                                                    <strong>{this.formatLag(csnData.globalLag)}</strong>
++                                                </DescriptionListDescription>
++                                            </DescriptionListGroup>
++                                            <DescriptionListGroup>
++                                                <DescriptionListTerm>{_("Servers Reached")}</DescriptionListTerm>
++                                                <DescriptionListDescription>
++                                                    {csnData.serverCount}
++                                                    {csnData.replicatedToAll && (
++                                                        <Label color="green" icon={<CheckCircleIcon />} className="ds-left-margin">
++                                                            {_("All")}
++                                                        </Label>
++                                                    )}
++                                                </DescriptionListDescription>
++                                            </DescriptionListGroup>
++                                        </DescriptionList>
++                                    </GridItem>
++                                </Grid>
++                            </CardBody>
++                        </Card>
++
++                        {/* Arrival Timeline Visualization */}
++                        <Card isFlat className="ds-margin-bottom-md">
++                            <CardTitle>{_("Arrival Timeline")}</CardTitle>
++                            <CardBody>
++                                <Text
++                                    component={TextVariants.small}
++                                    className="ds-margin-bottom"
++                                    style={{ color: 'var(--pf-v5-global--Color--200)', fontStyle: 'italic' }}
++                                >
++                                    {_("Note: Shows arrival order by time. Actual replication topology may differ in fan-out configurations.")}
++                                </Text>
++                                <div
++                                    role="list"
++                                    aria-label={_("CSN propagation timeline")}
++                                    style={{
++                                        display: 'flex',
++                                        flexWrap: 'wrap',
++                                        alignItems: 'center',
++                                        gap: 'var(--pf-v5-global--spacer--sm)',
++                                        padding: 'var(--pf-v5-global--spacer--sm)'
++                                    }}
++                                >
++                                    {arrivals.map((arrival, idx) => (
++                                        <React.Fragment key={idx}>
++                                            {/* Server Node */}
++                                            <div
++                                                role="listitem"
++                                                aria-label={cockpit.format(
++                                                    arrival.isOrigin
++                                                        ? _("Origin server: $0")
++                                                        : _("Server $0, delay: $1"),
++                                                    arrival.server,
++                                                    arrival.isOrigin ? "" : this.formatLag(arrival.relativeDelay)
++                                                )}
++                                                style={{
++                                                display: 'flex',
++                                                flexDirection: 'column',
++                                                alignItems: 'center',
++                                                padding: 'var(--pf-v5-global--spacer--sm)',
++                                                backgroundColor: arrival.isOrigin
++                                                    ? 'var(--pf-v5-global--palette--blue-50, #e7f1fa)'
++                                                    : 'var(--pf-v5-global--BackgroundColor--200, #f0f0f0)',
++                                                borderRadius: 'var(--pf-v5-global--BorderRadius--sm)',
++                                                border: arrival.isOrigin
++                                                    ? '2px solid var(--pf-v5-global--primary-color--100, #0066cc)'
++                                                    : '1px solid var(--pf-v5-global--BorderColor--100, #d2d2d2)',
++                                                minWidth: '120px'
++                                            }}>
++                                                <Text component={TextVariants.small} style={{ fontWeight: 'bold' }}>
++                                                    {arrival.server}
++                                                </Text>
++                                                <Text component={TextVariants.small} style={{ fontSize: '0.75rem', color: 'var(--pf-v5-global--Color--200)' }}>
++                                                    {this.formatTimestamp(arrival.timestamp)}
++                                                </Text>
++                                                {arrival.isOrigin && (
++                                                    <Label color="blue" isCompact style={{ marginTop: '4px' }}>
++                                                        {_("Origin")}
++                                                    </Label>
++                                                )}
++                                                {!arrival.isOrigin && (
++                                                    <Text component={TextVariants.small} style={{ marginTop: '4px', color: 'var(--pf-v5-global--success-color--100)' }}>
++                                                        +{this.formatLag(arrival.relativeDelay)}
++                                                    </Text>
++                                                )}
++                                            </div>
++
++                                            {/* Arrow between nodes */}
++                                            {idx < arrivals.length - 1 && (
++                                                <div
++                                                    role="presentation"
++                                                    aria-hidden="true"
++                                                    style={{
++                                                        display: 'flex',
++                                                        flexDirection: 'column',
++                                                        alignItems: 'center',
++                                                        padding: '0 var(--pf-v5-global--spacer--xs)'
++                                                    }}
++                                                >
++                                                    <ArrowRightIcon style={{ color: 'var(--pf-v5-global--Color--200)' }} />
++                                                    <Text component={TextVariants.small} style={{
++                                                        fontSize: '0.7rem',
++                                                        color: 'var(--pf-v5-global--Color--200)',
++                                                        whiteSpace: 'nowrap'
++                                                    }}>
++                                                        {arrivals[idx + 1].hopLag !== undefined
++                                                            ? this.formatLag(arrivals[idx + 1].hopLag)
++                                                            : ''}
++                                                    </Text>
++                                                </div>
++                                            )}
++                                        </React.Fragment>
++                                    ))}
++                                </div>
++                            </CardBody>
++                        </Card>
++
++                        {/* Detailed Arrivals Table */}
++                        <Card isFlat className="ds-margin-bottom-md">
++                            <CardTitle>{_("Arrival Details")}</CardTitle>
++                            <CardBody>
++                                <table className="pf-v5-c-table pf-m-compact" role="grid">
++                                    <thead>
++                                        <tr>
++                                            <th>{_("Server")}</th>
++                                            <th>{_("Arrival Time")}</th>
++                                            <th>{_("Hop Lag")}</th>
++                                            <th>{_("Cumulative Delay")}</th>
++                                            <th>{_("Duration")}</th>
++                                        </tr>
++                                    </thead>
++                                    <tbody>
++                                        {arrivals.map((arrival, idx) => (
++                                            <tr key={idx}>
++                                                <td>
++                                                    {arrival.server}
++                                                    {arrival.isOrigin && (
++                                                        <span style={{ color: 'var(--pf-v5-global--primary-color--100)', marginLeft: 'var(--pf-v5-global--spacer--xs)' }}>
++                                                            ({_("Origin")})
++                                                        </span>
++                                                    )}
++                                                </td>
++                                                <td>{this.formatTimestamp(arrival.timestamp)}</td>
++                                                <td>
++                                                    {arrival.isOrigin
++                                                        ? <em>{_("Origin")}</em>
++                                                        : this.formatLag(arrival.hopLag)}
++                                                </td>
++                                                <td>{this.formatLag(arrival.relativeDelay)}</td>
++                                                <td>{arrival.duration ? this.formatLag(arrival.duration) : _("N/A")}</td>
++                                            </tr>
++                                        ))}
++                                    </tbody>
++                                </table>
++                            </CardBody>
++                        </Card>
++
++                        {/* Copy Actions */}
++                        <Split hasGutter>
++                            <SplitItem>
++                                <ClipboardCopy
++                                    variant={ClipboardCopyVariant.expansion}
++                                    isExpanded={false}
++                                    isCode
++                                    isReadOnly
++                                    hoverTip={_("Copy full path JSON")}
++                                    clickTip={_("Copied!")}
++                                >
++                                    {pathJson}
++                                </ClipboardCopy>
++                            </SplitItem>
++                        </Split>
++            </Modal>
++        );
++    }
++}
++
++CSNDetailModal.propTypes = {
++    csnData: PropTypes.object,
++    onClose: PropTypes.func.isRequired
++};
++
++CSNDetailModal.defaultProps = {
++    csnData: null
++};
++
+ class LagReportModal extends React.Component {
+     constructor(props) {
+         super(props);
+ 
+         this.state = {
+-            activeTabKey: 0, // 0 = Summary, 1 = Charts, 2 = PNG Report, 3 = CSV Report, 4 = Report Files
++            activeTabKey: 0,
+             ...this._freshReportState(),
+             loadingSummary: false,
+             loadingJson: false,
+             loadingCsv: false,
+-            loadingPng: false
++            loadingPng: false,
++            selectedCsnId: null
+         };
+ 
+         this.handleTabClick = this.handleTabClick.bind(this);
+@@ -1524,6 +1900,8 @@ class LagReportModal extends React.Component {
+         this.renderPngTab = this.renderPngTab.bind(this);
+         this.renderCsvTab = this.renderCsvTab.bind(this);
+         this.renderReportFilesTab = this.renderReportFilesTab.bind(this);
++        this.handleCsnPointClick = this.handleCsnPointClick.bind(this);
++        this.handleCloseCsnDetails = this.handleCloseCsnDetails.bind(this);
+ 
+         this._activeLoadToken = 0;
+         this._isMounted = false;
+@@ -1543,10 +1921,26 @@ class LagReportModal extends React.Component {
+             summary: null,
+             suffixStats: {},
+             clientSamplingNotice: null,
++            selectedCsnId: null,
+             ...overrides
+         };
+     }
+ 
++    handleCsnPointClick(datum) {
++        if (datum && datum.csnId) {
++            const { jsonData } = this.state;
++            if (jsonData && jsonData.csnDetails && jsonData.csnDetails[datum.csnId]) {
++                this.setState({ selectedCsnId: datum.csnId });
++            } else {
++                console.warn("CSN details not available for:", datum.csnId);
++            }
++        }
++    }
++
++    handleCloseCsnDetails() {
++        this.setState({ selectedCsnId: null });
++    }
++
+     componentDidMount() {
+         this._isMounted = true;
+         this.loadData();
+@@ -2117,7 +2511,7 @@ class LagReportModal extends React.Component {
+ 
+     renderChartsTab() {
+         const { reportUrls } = this.props;
+-        const { loadingJson, jsonData, error, clientSamplingNotice } = this.state;
++        const { loadingJson, jsonData, error, clientSamplingNotice, selectedCsnId } = this.state;
+ 
+         if (loadingJson) {
+             return (
+@@ -2170,6 +2564,13 @@ class LagReportModal extends React.Component {
+                           jsonData.hopLags.series &&
+                           jsonData.hopLags.series.length > 0;
+ 
++        const hasCsnDetails = jsonData && jsonData.csnDetails &&
++                             Object.keys(jsonData.csnDetails).length > 0;
++
++        const selectedCsnData = selectedCsnId && hasCsnDetails
++            ? jsonData.csnDetails[selectedCsnId]
++            : null;
++
+         if (!jsonData || (!hasReplicationLags && !hasHopLags)) {
+             return (
+                 <EmptyState>
+@@ -2201,6 +2602,15 @@ class LagReportModal extends React.Component {
+                                         {clientSamplingNotice}
+                                     </Alert>
+                                 )}
++                                {hasCsnDetails && (
++                                    <Text
++                                        component={TextVariants.small}
++                                        className="ds-margin-bottom"
++                                        style={{ color: 'var(--pf-v5-global--Color--200)', fontStyle: 'italic' }}
++                                    >
++                                        {_("Tip: Click on any chart point to view detailed CSN propagation path.")}
++                                    </Text>
++                                )}
+                                 {hasReplicationLags && (
+                                     <div className="ds-margin-bottom">
+                                         <Title headingLevel="h3">
+@@ -2231,6 +2641,7 @@ class LagReportModal extends React.Component {
+                                             xAxisLabel={(jsonData.replicationLags.xAxisLabel || "").replace(/\s*Time\s*/g, "")}
+                                             yAxisLabel={jsonData.replicationLags.yAxisLabel || _("Lag Time (seconds)")}
+                                             defaultShowLegend={true}
++                                            onPointClick={hasCsnDetails ? this.handleCsnPointClick : undefined}
+                                         />
+                                     </div>
+                                 )}
+@@ -2250,9 +2661,17 @@ class LagReportModal extends React.Component {
+                                             xAxisLabel={(jsonData.hopLags.xAxisLabel || "").replace(/\s*Time\s*/g, "")}
+                                             yAxisLabel={jsonData.hopLags.yAxisLabel || _("Hop Lag Time (seconds)")}
+                                             defaultShowLegend={false}
++                                            onPointClick={hasCsnDetails ? this.handleCsnPointClick : undefined}
+                                         />
+                                     </div>
+                                 )}
++
++                                {/* CSN Detail Panel - shown when a point is clicked */}
++                                <CSNDetailModal
++                                    csnData={selectedCsnData}
++                                    onClose={this.handleCloseCsnDetails}
++                                />
++
+                                 <div className="ds-margin-top">
+                                     <Button
+                                         variant="secondary"
+@@ -2876,6 +3295,28 @@ class ChooseLagReportModal extends React.Component {
+ }
+ 
+ // Prototypes and defaultProps
++ScatterLineChart.propTypes = {
++    chartData: PropTypes.object,
++    title: PropTypes.string,
++    yAxisLabel: PropTypes.string,
++    xAxisLabel: PropTypes.string,
++    minY: PropTypes.number,
++    maxY: PropTypes.number,
++    defaultShowLegend: PropTypes.bool,
++    onPointClick: PropTypes.func
++};
++
++ScatterLineChart.defaultProps = {
++    chartData: null,
++    title: "",
++    yAxisLabel: "Value",
++    xAxisLabel: "",
++    minY: null,
++    maxY: null,
++    defaultShowLegend: true,
++    onPointClick: null
++};
++
+ AgmtDetailsModal.propTypes = {
+     showModal: PropTypes.bool,
+     closeHandler: PropTypes.func,
+@@ -3044,6 +3485,7 @@ export {
+     ReportLoginModal,
+     FullReportContent,
+     LagReportModal,
+-    ChooseLagReportModal
++    ChooseLagReportModal,
++    CSNDetailModal
+ };
+ 
+diff --git a/src/lib389/lib389/repltools.py b/src/lib389/lib389/repltools.py
+index 9d1aa4058..5ab8b3187 100644
+--- a/src/lib389/lib389/repltools.py
++++ b/src/lib389/lib389/repltools.py
+@@ -683,6 +683,7 @@ class ChartData(NamedTuple):
+     lags: List[float]
+     durations: List[float]
+     hover: List[str]
++    csn_ids: List[str]
+ 
+ class VisualizationHelper:
+     """Helper class for visualization-related functionality."""
+@@ -730,7 +731,7 @@ class VisualizationHelper:
+                           tz: tzinfo = timezone.utc) -> Dict[Tuple[str, str], ChartData]:
+         """Prepare data for visualization with timezone-aware timestamps."""
+         chart_data = defaultdict(lambda: {
+-            'times': [], 'lags': [], 'durations': [], 'hover': []
++            'times': [], 'lags': [], 'durations': [], 'hover': [], 'csn_ids': []
+         })
+ 
+         for csn, server_map in csns.items():
+@@ -766,6 +767,7 @@ class VisualizationHelper:
+                 data_slot['times'].append(ts_dt)
+                 data_slot['lags'].append(lag_val)  # The same global-lag for all servers
+                 data_slot['durations'].append(duration_val)
++                data_slot['csn_ids'].append(csn)
+                 # Format timestamp for hover display in the specified timezone
+                 timestamp_str = ts_dt.strftime('%Y-%m-%d %H:%M:%S')
+                 data_slot['hover'].append(
+@@ -784,7 +786,8 @@ class VisualizationHelper:
+                 times=value['times'],
+                 lags=value['lags'],
+                 durations=value['durations'],
+-                hover=value['hover']
++                hover=value['hover'],
++                csn_ids=value['csn_ids']
+             )
+             for key, value in chart_data.items()
+         }
+@@ -803,6 +806,14 @@ class ReplicationLogAnalyzer:
+     AUTO_SAMPLING_THRESHOLD = 4000  # Trigger auto sampling above this many CSN points
+     HOP_SERIES_BUDGET_RATIO = 0.25  # Allocate max 25% of chart points to hop lag series
+     MIN_POINTS_PER_SERIES = 2       # Minimum points to preserve series shape after sampling
++    MAX_CSN_DETAILS = 10000         # Maximum CSN details to include (prevents memory issues)
++
++    # CSN format: TTTTTTTTSSSSRRRRNNNN (20 hex chars)
++    # T=timestamp(8), S=sequence(4), R=replicaID(4), N=subseq(4)
++    CSN_TIMESTAMP_START = 0
++    CSN_TIMESTAMP_END = 8
++    CSN_REPLICA_ID_START = 12
++    CSN_REPLICA_ID_END = 16
+ 
+     # Precision preset configurations
+     PRECISION_PRESETS = {
+@@ -867,6 +878,54 @@ class ReplicationLogAnalyzer:
+         # Threshold to trigger auto sampling if lots of CSNs
+         self._auto_sampling_csn_threshold = self.AUTO_SAMPLING_THRESHOLD
+ 
++        # Mapping of (replica ID, suffix) to server name
++        # Built during log parsing to correctly identify origin servers
++        # Keyed by (replica_id, suffix) because replica IDs are per-suffix in multi-suffix deployments
++        self._replica_id_to_server: Dict[Tuple[str, str], str] = {}
++
++    @staticmethod
++    def _extract_replica_id_from_csn(csn: str) -> Optional[str]:
++        """Extract the replica ID from a CSN string.
++
++        CSN format: TTTTTTTTSSSSRRRRNNNN (20 hex characters)
++        - T = timestamp (8 chars)
++        - S = sequence (4 chars)
++        - R = replica ID (4 chars)
++        - N = subseq (4 chars)
++
++        :param csn: The CSN string
++        :returns: The replica ID as a string (4 hex chars), or None if invalid
++        """
++        if not csn or not isinstance(csn, str) or len(csn) < 16:
++            return None
++        try:
++            # Extract and validate replica ID is valid hex
++            replica_id = csn[ReplicationLogAnalyzer.CSN_REPLICA_ID_START:
++                            ReplicationLogAnalyzer.CSN_REPLICA_ID_END]
++            int(replica_id, 16)  # Validate it's valid hex
++            return replica_id
++        except (ValueError, IndexError):
++            return None
++
++    @staticmethod
++    def _extract_timestamp_from_csn(csn: str) -> Optional[float]:
++        """Extract the timestamp (epoch seconds) from a CSN string.
++
++        CSN format: TTTTTTTTSSSSRRRRNNNN (20 hex characters)
++        - T = timestamp (8 chars, hex, seconds since epoch)
++
++        :param csn: The CSN string
++        :returns: Timestamp as float (epoch seconds), or None if invalid
++        """
++        if not csn or not isinstance(csn, str) or len(csn) < 8:
++            return None
++        try:
++            ts_hex = csn[ReplicationLogAnalyzer.CSN_TIMESTAMP_START:
++                         ReplicationLogAnalyzer.CSN_TIMESTAMP_END]
++            return float(int(ts_hex, 16))
++        except (ValueError, IndexError):
++            return None
++
+     def _should_include_record(self, csn: str, server_map: Dict[Union[int, str], Dict[str, Any]]) -> bool:
+         """Determine if a record should be included based on filtering criteria."""
+         total_servers = self._active_server_count or len(self.log_dirs)
+@@ -990,6 +1049,148 @@ class ReplicationLogAnalyzer:
+ 
+         return hops
+ 
++    def _build_csn_details(self, csn_whitelist: Optional[set] = None) -> Dict[str, Dict[str, Any]]:
++        """Build detailed CSN propagation information for drill-down functionality.
++
++        Returns a dictionary keyed by CSN containing:
++        - csn: The CSN string
++        - targetDn: The target entry DN
++        - suffix: The replication suffix
++        - globalLag: Total propagation time (earliest to latest arrival)
++        - originServer: The server where the change originated (determined by CSN replica ID)
++        - originTime: ISO timestamp of origin
++        - arrivals: Ordered list of server arrivals with timing details
++        - hops: List of server-to-server hops with lag times
++        - totalHops: Number of hops in the propagation path
++        - replicatedToAll: Whether the change reached all servers
++
++        Note: Origin server is determined by the replica ID embedded in the CSN,
++        not by earliest log timestamp (which can be incorrect under clock skew).
++
++        :param csn_whitelist: Optional set of CSN IDs to include. If provided,
++                              only these CSNs will have details generated.
++                              This prevents memory bloat when chart data is sampled.
++        """
++        csn_details = {}
++        total_servers = self._active_server_count or len(self.log_dirs)
++
++        if csn_whitelist is not None:
++            csn_items = [(csn, sm) for csn, sm in self.csns.items() if csn in csn_whitelist]
++        else:
++            csn_items = list(self.csns.items())
++
++        if len(csn_items) > self.MAX_CSN_DETAILS:
++            self._logger.info(
++                f"CSN details limited to {self.MAX_CSN_DETAILS} entries "
++                f"(dataset has {len(csn_items)} CSNs). "
++                "Selecting CSNs with highest global lag for drill-down."
++            )
++            csn_lags = []
++            for csn, server_map in csn_items:
++                t_list = [
++                    rec.get('logtime', 0)
++                    for key, rec in server_map.items()
++                    if isinstance(rec, dict) and key != '__hop_lags__' and 'logtime' in rec
++                ]
++                if t_list:
++                    lag = max(t_list) - min(t_list)
++                    csn_lags.append((csn, server_map, lag))
++            csn_lags.sort(key=lambda x: x[2], reverse=True)
++            csn_items = [(csn, sm) for csn, sm, _ in csn_lags[:self.MAX_CSN_DETAILS]]
++
++        for csn, server_map in csn_items:
++            valid_records = []
++            for key, data in server_map.items():
++                if isinstance(data, dict) and key != '__hop_lags__' and 'logtime' in data:
++                    valid_records.append(data)
++
++            if not valid_records:
++                continue
++
++            valid_records.sort(key=lambda x: x['logtime'])
++
++            suffix = None
++            for rec in valid_records:
++                if rec.get('suffix'):
++                    suffix = rec['suffix']
++                    break
++
++            replica_id = self._extract_replica_id_from_csn(csn)
++            origin_server_name = None
++            origin_record = None
++
++            origin_in_arrivals = False
++            if replica_id and suffix:
++                map_key = (replica_id, suffix)
++                if map_key in self._replica_id_to_server:
++                    origin_server_name = self._replica_id_to_server[map_key]
++                    for rec in valid_records:
++                        if rec.get('server_name') == origin_server_name:
++                            origin_record = rec
++                            origin_in_arrivals = True
++                            break
++
++            if origin_record is None:
++                origin_record = valid_records[0]
++                if not origin_server_name:
++                    origin_server_name = origin_record.get('server_name', 'unknown')
++
++            csn_ts = self._extract_timestamp_from_csn(csn)
++            origin_time = csn_ts if csn_ts is not None else origin_record['logtime']
++            earliest_time = valid_records[0]['logtime']
++            latest_time = valid_records[-1]['logtime']
++            global_lag = latest_time - earliest_time
++
++            arrivals = []
++            for idx, rec in enumerate(valid_records):
++                server_name = rec.get('server_name', 'unknown')
++                is_origin = (server_name == origin_server_name)
++
++                arrival_entry = {
++                    'server': server_name,
++                    'timestamp': datetime.fromtimestamp(rec['logtime'], tz=self.tz).isoformat(),
++                    'relativeDelay': rec['logtime'] - earliest_time,
++                    'duration': float(rec.get('duration', 0.0)),
++                    'etime': rec.get('etime')
++                }
++
++                if is_origin:
++                    arrival_entry['isOrigin'] = True
++
++                if idx > 0:
++                    prev_rec = valid_records[idx - 1]
++                    arrival_entry['hopFrom'] = prev_rec.get('server_name', 'unknown')
++                    arrival_entry['hopLag'] = rec['logtime'] - prev_rec['logtime']
++
++                arrivals.append(arrival_entry)
++
++            hops = []
++            for i in range(1, len(valid_records)):
++                prev_rec = valid_records[i - 1]
++                curr_rec = valid_records[i]
++                hops.append({
++                    'from': prev_rec.get('server_name', 'unknown'),
++                    'to': curr_rec.get('server_name', 'unknown'),
++                    'lag': curr_rec['logtime'] - prev_rec['logtime']
++                })
++
++            csn_details[csn] = {
++                'csn': csn,
++                'targetDn': origin_record.get('target_dn', 'unknown') or 'unknown',
++                'suffix': origin_record.get('suffix', 'unknown') or 'unknown',
++                'globalLag': global_lag,
++                'originServer': origin_server_name,
++                'originIncludedInArrivals': origin_in_arrivals,
++                'originTime': datetime.fromtimestamp(origin_time, tz=self.tz).isoformat(),
++                'arrivals': arrivals,
++                'hops': hops,
++                'totalHops': len(hops),
++                'serverCount': len(valid_records),
++                'replicatedToAll': len(valid_records) == total_servers
++            }
++
++        return csn_details
++
+     def parse_logs(self) -> None:
+         """Parse logs from all directories. Each directory is treated as one server
+         unless anonymized, in which case we use 'server_{index}'.
+@@ -1044,6 +1245,41 @@ class ReplicationLogAnalyzer:
+                         'duration': record.get('duration', 0.0),
+                     }
+ 
++        # Build (replica ID, suffix) to server mapping based on closest CSN timestamp
++        # Keyed by (replica_id, suffix) because replica IDs are per-suffix in multi-suffix deployments
++        # For each (replica ID, suffix) pair, the server whose logtime is closest to the CSN
++        # timestamp is the best origin candidate under clock skew.
++        replica_id_best: Dict[Tuple[str, str], Tuple[bool, float, float, str]] = {}
++        for csn, server_map in self.csns.items():
++            replica_id = self._extract_replica_id_from_csn(csn)
++            if not replica_id:
++                continue
++            csn_ts = self._extract_timestamp_from_csn(csn)
++            for key, record in server_map.items():
++                if not isinstance(record, dict) or key == '__hop_lags__':
++                    continue
++                logtime = record.get('logtime')
++                server_name = record.get('server_name')
++                suffix = record.get('suffix')
++                if logtime is None or not server_name or not suffix:
++                    continue
++                # Prefer candidates where we can compare against CSN timestamp
++                has_csn_ts = csn_ts is not None
++                score = abs(logtime - csn_ts) if has_csn_ts else logtime
++                map_key = (replica_id, suffix)
++                if map_key not in replica_id_best:
++                    replica_id_best[map_key] = (has_csn_ts, score, logtime, server_name)
++                    continue
++                prev_has_ts, prev_score, prev_logtime, _ = replica_id_best[map_key]
++                if has_csn_ts and not prev_has_ts:
++                    replica_id_best[map_key] = (has_csn_ts, score, logtime, server_name)
++                elif has_csn_ts == prev_has_ts:
++                    if score < prev_score or (score == prev_score and logtime < prev_logtime):
++                        replica_id_best[map_key] = (has_csn_ts, score, logtime, server_name)
++
++        # Store the mapping ((replica ID, suffix) -> server name)
++        self._replica_id_to_server = {k: srv for k, (_, _, _, srv) in replica_id_best.items()}
++
+         # Apply filters after collecting all data
+         filtered_csns = {}
+         earliest_udt: Optional[float] = None
+@@ -1577,6 +1813,17 @@ class ReplicationLogAnalyzer:
+         except Exception as e:
+             raise IOError(f"Failed to write JSON summary to {outfile}: {e}")
+ 
++    @staticmethod
++    def _collect_csn_ids(series_list: List[Dict[str, Any]]) -> set:
++        """Collect CSN IDs from chart series datapoints."""
++        csn_ids = set()
++        for series in series_list:
++            for dp in series.get("datapoints", []):
++                csn_id = dp.get("csnId")
++                if csn_id:
++                    csn_ids.add(csn_id)
++        return csn_ids
++
+     def _generate_patternfly_json(self, results: Dict[str, Any], outfile: str) -> None:
+         """Generate JSON specifically formatted for PatternFly 5 charts."""
+         chart_data = VisualizationHelper.prepare_chart_data(self.csns, self.tz)
+@@ -1637,7 +1884,8 @@ class ReplicationLogAnalyzer:
+                 "x": data.times[i].isoformat(),
+                 "y": data.lags[i],
+                 "duration": data.durations[i],
+-                "hoverInfo": data.hover[i]
++                "hoverInfo": data.hover[i],
++                "csnId": data.csn_ids[i]
+             } for i in indices]
+             series_data.append({
+                 "datapoints": datapoints,
+@@ -1645,7 +1893,7 @@ class ReplicationLogAnalyzer:
+                 "color": color_palette[idx % len(color_palette)]
+             })
+ 
+-        hop_data: Dict[str, Dict[str, List[Any]]] = defaultdict(lambda: {"times": [], "lags": [], "hover": []})
++        hop_data: Dict[str, Dict[str, List[Any]]] = defaultdict(lambda: {"times": [], "lags": [], "hover": [], "csn_ids": []})
+         for csn, server_map in self.csns.items():
+             for hop in server_map.get('__hop_lags__', []):
+                 source = hop.get('supplier', 'unknown')
+@@ -1655,6 +1903,7 @@ class ReplicationLogAnalyzer:
+                 ts = datetime.fromtimestamp(hop.get('arrival_consumer', 0.0), tz=self.tz)
+                 entry["times"].append(ts)
+                 entry["lags"].append(hop.get('hop_lag', 0.0))
++                entry["csn_ids"].append(csn)
+                 ts_str = ts.strftime('%Y-%m-%d %H:%M:%S')
+                 entry["hover"].append(
+                     f"Timestamp: {ts_str}<br>"
+@@ -1689,7 +1938,10 @@ class ReplicationLogAnalyzer:
+                 "name": key,
+                 "x": entry["times"][i].isoformat(),
+                 "y": entry["lags"][i],
+-                "hoverInfo": entry["hover"][i].replace("Suffix: None", "Suffix: unknown").replace("Entry: None", "Entry: unknown")
++                "hoverInfo": (entry["hover"][i]
++                              .replace("Suffix: None", "Suffix: unknown")
++                              .replace("Entry: None", "Entry: unknown")),
++                "csnId": entry["csn_ids"][i]
+             } for i in indices]
+             hop_series.append({
+                 "datapoints": datapoints,
+@@ -1702,6 +1954,13 @@ class ReplicationLogAnalyzer:
+             reduced += sum(len(item["datapoints"]) for item in hop_series)
+             sampling_meta["reducedTotalPoints"] = reduced
+ 
++        sampled_csn_ids = None
++        if sampling_meta["applied"]:
++            sampled_csn_ids = self._collect_csn_ids(series_data)
++            sampled_csn_ids.update(self._collect_csn_ids(hop_series))
++
++        csn_details = self._build_csn_details(csn_whitelist=sampled_csn_ids)
++
+         pf_data = {
+             "replicationLags": {
+                 "title": "Global Replication Lag Over Time",
+@@ -1715,6 +1974,7 @@ class ReplicationLogAnalyzer:
+                 "xAxisLabel": "Time",
+                 "series": hop_series
+             },
++            "csnDetails": csn_details,
+             "metadata": {
+                 "totalServers": self._active_server_count or len(self.log_dirs),
+                 "configuredLogDirs": self.log_dirs,
+-- 
+2.52.0
+

@@ -1,0 +1,28 @@
+From b9bec06d73340f1b5727302d13ac3df307b7febc Mon Sep 17 00:00:00 2001
+From: Akira TAGOH <akira@tagoh.org>
+Date: Mon, 30 Jun 2025 09:05:18 +0900
+Subject: [PATCH] Fix a heap buffer overflow
+
+https://gitlab.freedesktop.org/fontconfig/fontconfig/-/issues/481
+
+Changelog: fixed
+---
+ src/fcfreetype.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/fcfreetype.c b/src/fcfreetype.c
+index 7a4d9811..0a87d27a 100644
+--- a/src/fcfreetype.c
++++ b/src/fcfreetype.c
+@@ -2661,7 +2661,7 @@ FcFontCapabilities (FT_Face face)
+ 	goto bail;
+ 
+     maxsize = (((FT_ULong)gpos_count + (FT_ULong)gsub_count) * OTLAYOUT_LEN +
+-               (issilgraphitefont ? strlen(fcSilfCapability) : 0));
++               (issilgraphitefont ? strlen(fcSilfCapability) + 1: 0));
+     complex_ = malloc (sizeof (FcChar8) * maxsize);
+     if (!complex_)
+ 	goto bail;
+-- 
+2.50.0
+

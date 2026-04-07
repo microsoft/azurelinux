@@ -1,0 +1,43 @@
+commit 003d658322df316a352af591a3d059ca22fc40a3
+Author: Ingo Franzki <ifranzki@linux.ibm.com>
+Date:   Mon Jul 21 11:02:42 2025 +0200
+
+    Fix covscan findings
+    
+    Closes: https://github.com/opencryptoki/opencryptoki/issues/879
+    
+    Reported-by: Than Ngo <than@redhat.com>
+    Signed-off-by: Ingo Franzki <ifranzki@linux.ibm.com>
+
+diff --git a/usr/lib/common/mech_aes.c b/usr/lib/common/mech_aes.c
+index 9195ff3c..383fb775 100644
+--- a/usr/lib/common/mech_aes.c
++++ b/usr/lib/common/mech_aes.c
+@@ -4561,6 +4561,11 @@ static CK_RV aeskw_wrap_pad(STDLL_TokData_t *tokdata, SESSION *sess,
+          * contains exactly eight octets, then prepend the AIV and encrypt
+          * the resulting 128-bit block using AES in ECB mode.
+          */
++        if (in_data_len > AES_KEY_WRAP_BLOCK_SIZE) {
++            TRACE_ERROR("%s\n", ock_err(ERR_DATA_LEN_RANGE));
++            return CKR_DATA_LEN_RANGE;
++        }
++
+         memmove(buff + AES_KEY_WRAP_BLOCK_SIZE, in_data, in_data_len);
+         memcpy(buff, aiv, AES_KEY_WRAP_IV_SIZE);
+         memset(buff + AES_KEY_WRAP_IV_SIZE + in_data_len, 0, padding_len);
+diff --git a/usr/sbin/p11sak/p11tool.c b/usr/sbin/p11sak/p11tool.c
+index da684f79..5b72b93b 100644
+--- a/usr/sbin/p11sak/p11tool.c
++++ b/usr/sbin/p11sak/p11tool.c
+@@ -567,6 +567,11 @@ static void p11tool_print_options_help(const struct p11tool_opt *opts,
+         else
+             len = snprintf(tmp, sizeof(tmp),"-%c", opt->short_opt);
+ 
++        if (len >= (int)sizeof(tmp) || len < 0) {
++            warnx("Error formatting option string. Skipping.\n");
++            continue;
++        }
++
+         if (opt->arg.type != ARG_TYPE_PLAIN) {
+             if (opt->arg.required)
+                 snprintf(&tmp[len], sizeof(tmp) - len, " %s", opt->arg.name);

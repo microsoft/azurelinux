@@ -1,0 +1,53 @@
+From cb75688d5cbdcecbca550d6661e4734a7121854f Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Mon, 16 Jul 2018 00:52:13 -0400
+Subject: [PATCH] Increase tolerance for new FreeType.
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ tests/test_pytest_mpl.py | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/tests/test_pytest_mpl.py b/tests/test_pytest_mpl.py
+index 146bc0a..1dc7bc1 100644
+--- a/tests/test_pytest_mpl.py
++++ b/tests/test_pytest_mpl.py
+@@ -54,7 +54,7 @@ def assert_pytest_fails_with(args, output_substring):
+ 
+ 
+ @pytest.mark.mpl_image_compare(baseline_dir=baseline_dir_local,
+-                               tolerance=DEFAULT_TOLERANCE)
++                               tolerance=7.1)
+ def test_succeeds():
+     fig = plt.figure()
+     ax = fig.add_subplot(1, 1, 1)
+@@ -86,7 +86,7 @@ def test_succeeds_faulty_mirror():
+ class TestClass(object):
+ 
+     @pytest.mark.mpl_image_compare(baseline_dir=baseline_dir_local,
+-                                   tolerance=DEFAULT_TOLERANCE)
++                                   tolerance=7.1)
+     def test_succeeds(self):
+         fig = plt.figure()
+         ax = fig.add_subplot(1, 1, 1)
+@@ -213,7 +213,7 @@ def test_nofigure():
+ 
+ @pytest.mark.mpl_image_compare(baseline_dir=baseline_dir_local,
+                                style='fivethirtyeight',
+-                               tolerance=DEFAULT_TOLERANCE)
++                               tolerance=7.5)
+ def test_base_style():
+     fig = plt.figure()
+     ax = fig.add_subplot(1, 1, 1)
+@@ -249,7 +249,7 @@ class TestClassWithSetup:
+ 
+     @pytest.mark.mpl_image_compare(baseline_dir=baseline_dir_local,
+                                    filename='test_succeeds.png',
+-                                   tolerance=DEFAULT_TOLERANCE)
++                                   tolerance=7.1)
+     def test_succeeds(self):
+         fig = plt.figure()
+         ax = fig.add_subplot(1, 1, 1)
+-- 
+2.26.2
+

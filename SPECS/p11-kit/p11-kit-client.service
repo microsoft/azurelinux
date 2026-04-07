@@ -1,0 +1,11 @@
+[Unit]
+Description=p11-kit client
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+RuntimeDirectory=p11-kit
+ExecStart=/usr/bin/true
+
+[Install]
+WantedBy=default.target

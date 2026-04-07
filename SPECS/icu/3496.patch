@@ -1,0 +1,23 @@
+From 4b3e6888c2aaba6465f1bc96f61b17a2513050f3 Mon Sep 17 00:00:00 2001
+From: David Seifert <soap@gentoo.org>
+Date: Sat, 21 Jun 2025 12:28:15 +0200
+Subject: [PATCH] ICU-23120 Mask UnicodeStringTest::TestLargeMemory on 32-bit
+ platforms
+
+---
+ source/test/intltest/ustrtest.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/source/test/intltest/ustrtest.cpp b/source/test/intltest/ustrtest.cpp
+index 56976b3e3d23..26225f5b5b56 100644
+--- a/source/test/intltest/ustrtest.cpp
++++ b/source/test/intltest/ustrtest.cpp
+@@ -2353,7 +2353,7 @@ void UnicodeStringTest::TestUnicodeStringInsertAppendToSelf() {
+ }
+
+ void UnicodeStringTest::TestLargeMemory() {
+-#if U_PLATFORM_IS_LINUX_BASED || U_PLATFORM_IS_DARWIN_BASED
++#if (U_PLATFORM_IS_LINUX_BASED || U_PLATFORM_IS_DARWIN_BASED) && (UINTPTR_MAX == 0xFFFFFFFFFFFFFFFF)
+     if(quick) { return; }
+     IcuTestErrorCode status(*this, "TestLargeMemory");
+     constexpr uint32_t len = 2147483643;

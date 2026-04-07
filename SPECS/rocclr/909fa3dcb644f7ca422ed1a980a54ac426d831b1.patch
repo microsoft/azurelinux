@@ -1,0 +1,29 @@
+From 909fa3dcb644f7ca422ed1a980a54ac426d831b1 Mon Sep 17 00:00:00 2001
+From: Jeremy Newton <Jeremy.Newton@amd.com>
+Date: Fri, 27 Sep 2024 13:29:12 -0400
+Subject: [PATCH] Fix gfx8 opencl
+
+This condition was added when we supported PAL openCL on gfx8, but when
+ROC_ENABLE_PRE_VEGA was dropped and PAL OpenCL on Linux was deprecated,
+this logic should have been dropped completely.
+
+Change-Id: I0a68ef4723d9ebde7d958c58dbb0b6991f69d817
+Signed-off-by: Jeremy Newton <Jeremy.Newton@amd.com>
+---
+ rocclr/device/device.hpp | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/rocclr/device/device.hpp b/rocclr/device/device.hpp
+index ef8263032..6409cebc9 100644
+--- a/rocclr/device/device.hpp
++++ b/rocclr/device/device.hpp
+@@ -1431,9 +1431,6 @@ class Isa {
+ 
+   /// @returns If the ROCm runtime supports the ISA.
+   bool runtimeRocSupported() const {
+-    if (!IS_HIP && (versionMajor_ == 8)) {
+-      return false;
+-    }
+     return runtimeRocSupported_;
+   }
+ 

@@ -1,0 +1,20 @@
+--- roff-0.2.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ roff-0.2.2/Cargo.toml	2026-02-16T17:31:55.698398+00:00
+@@ -83,17 +83,6 @@
+ name = "roff"
+ path = "src/lib.rs"
+ 
+-[dependencies]
+-
+-[dev-dependencies.automod]
+-version = "1.0.14"
+-
+-[dev-dependencies.duct]
+-version = "0.13"
+-
+-[dev-dependencies.pretty_assertions]
+-version = "1.4.0"
+-
+ [lints.clippy]
+ bool_assert_comparison = "allow"
+ branches_sharing_code = "allow"

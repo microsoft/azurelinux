@@ -1,0 +1,67 @@
+From 9e6a875e2c32e45cb264c1f45a025022fb2053d7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Thu, 31 Aug 2023 12:28:55 +0200
+Subject: [PATCH] Fix compatibility with Minitest 5.19+
+
+The `MiniTest` was renamed to `Minitest`:
+
+https://github.com/minitest/minitest/commit/9a57c520ceac76abfe6105866f8548a94eb357b6
+
+And the `MiniTest` constant is now loaded just when `MT_COMPAT` environment variable is set:
+
+https://github.com/minitest/minitest/commit/a2c6c18570f6f0a1bf6af70fe3b6d9599a13fdd6
+
+This fixes following test error:
+
+~~~
++ ruby -e 'Dir.glob "./test/**/test_*.rb", &method(:require)'
+/builddir/build/BUILD/crass-1.0.4/usr/share/gems/gems/crass-1.0.4/test/support/common.rb:11:in `<top (required)>': uninitialized constant MiniTest (NameError)
+MiniTest::Spec.class_eval do
+        ^^^^^^
+Did you mean?  Minitest
+	from /builddir/build/BUILD/crass-1.0.4/usr/share/gems/gems/crass-1.0.4/test/test_crass.rb:2:in `require_relative'
+	from /builddir/build/BUILD/crass-1.0.4/usr/share/gems/gems/crass-1.0.4/test/test_crass.rb:2:in `<top (required)>'
+	from <internal:/usr/share/rubygems/rubygems/core_ext/kernel_require.rb>:85:in `require'
+	from <internal:/usr/share/rubygems/rubygems/core_ext/kernel_require.rb>:85:in `require'
+	from <internal:dir>:220:in `glob'
+	from -e:1:in `<main>'
+~~~
+---
+ test/support/common.rb | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/test/support/common.rb b/test/support/common.rb
+index 4b6e41c..331ddf6 100644
+--- a/test/support/common.rb
++++ b/test/support/common.rb
+@@ -7,24 +7,24 @@ require_relative '../../lib/crass'
+ CP = Crass::Parser
+ CT = Crass::Tokenizer
+ 
+-# Hack shared test support into MiniTest.
+-MiniTest::Spec.class_eval do
++# Hack shared test support into Minitest.
++Minitest::Spec.class_eval do
+   def self.shared_tests
+     @shared_tests ||= {}
+   end
+ end
+ 
+-module MiniTest::Spec::SharedTests
++module Minitest::Spec::SharedTests
+   def behaves_like(desc)
+-    self.instance_eval(&MiniTest::Spec.shared_tests[desc])
++    self.instance_eval(&Minitest::Spec.shared_tests[desc])
+   end
+ 
+   def shared_tests_for(desc, &block)
+-    MiniTest::Spec.shared_tests[desc] = block
++    Minitest::Spec.shared_tests[desc] = block
+   end
+ end
+ 
+-Object.class_eval { include MiniTest::Spec::SharedTests }
++Object.class_eval { include Minitest::Spec::SharedTests }
+ 
+ # Custom assertions and helpers.
+ def assert_tokens(input, actual, offset = 0, options = {})

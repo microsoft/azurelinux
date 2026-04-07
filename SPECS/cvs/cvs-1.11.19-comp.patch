@@ -1,0 +1,11 @@
+--- cvs-1.11.19/src/rcs.c.old	2005-03-17 11:21:18.000000000 +0100
++++ cvs-1.11.19/src/rcs.c	2005-03-17 11:21:56.000000000 +0100
+@@ -138,7 +138,7 @@
+    string comparisons.  This macro speeds things up a bit by skipping
+    the function call when the first characters are different.  It
+    evaluates its arguments multiple times.  */
+-#define STREQ(a, b) (*(char *)(a) == *(char *)(b) && strcmp ((a), (b)) == 0)
++#define STREQ(a, b) ((a) != NULL && (b) != NULL && *(char *)(a) == *(char *)(b) && strcmp ((a), (b)) == 0)
+ 
+ /*
+  * We don't want to use isspace() from the C library because:

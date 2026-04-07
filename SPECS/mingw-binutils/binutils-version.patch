@@ -1,0 +1,46 @@
+diff -rupN --no-dereference binutils-2.45.1/bfd/Makefile.am binutils-2.45.1-new/bfd/Makefile.am
+--- binutils-2.45.1/bfd/Makefile.am	2025-11-10 01:00:00.000000000 +0100
++++ binutils-2.45.1-new/bfd/Makefile.am	2025-12-30 09:43:48.598420476 +0100
+@@ -985,8 +985,8 @@ DISTCLEANFILES += $(BUILD_CFILES) $(BUIL
+ bfdver.h: $(srcdir)/version.h $(srcdir)/development.sh $(srcdir)/Makefile.in
+ 	$(AM_V_GEN)\
+ 	bfd_version=`echo "$(VERSION)" | $(SED) -e 's/\([^\.]*\)\.*\([^\.]*\)\.*\([^\.]*\)\.*\([^\.]*\)\.*\([^\.]*\).*/\1.00\2.00\3.00\4.00\5/' -e 's/\([^\.]*\)\..*\(..\)\..*\(..\)\..*\(..\)\..*\(..\)$$/\1\2\3\4\5/'` ;\
+-	bfd_version_string="\"$(VERSION)\"" ;\
+-	bfd_soversion="$(VERSION)" ;\
++	bfd_version_string="\"$(VERSION)-%{release}\"" ;\
++	bfd_soversion="$(VERSION)-%{release}" ;\
+ 	bfd_version_package="\"$(PKGVERSION)\"" ;\
+ 	report_bugs_to="\"$(REPORT_BUGS_TO)\"" ;\
+ 	. $(srcdir)/development.sh ;\
+@@ -997,7 +997,7 @@ bfdver.h: $(srcdir)/version.h $(srcdir)/
+ 	fi ;\
+ 	$(SED) -e "s,@bfd_version@,$$bfd_version," \
+ 	    -e "s,@bfd_version_string@,$$bfd_version_string," \
+-	    -e "s,@bfd_version_package@,$$bfd_version_package," \
++	    -e "s,@bfd_version_package@,\"version \"," \
+ 	    -e "s,@report_bugs_to@,$$report_bugs_to," \
+ 	    < $(srcdir)/version.h > $@; \
+ 	echo "$${bfd_soversion}" > libtool-soversion
+diff -rupN --no-dereference binutils-2.45.1/bfd/Makefile.in binutils-2.45.1-new/bfd/Makefile.in
+--- binutils-2.45.1/bfd/Makefile.in	2025-11-10 01:00:00.000000000 +0100
++++ binutils-2.45.1-new/bfd/Makefile.in	2025-12-30 09:43:48.598810521 +0100
+@@ -2454,8 +2454,8 @@ stmp-lcoff-h: $(LIBCOFF_H_FILES) $(MKDOC
+ bfdver.h: $(srcdir)/version.h $(srcdir)/development.sh $(srcdir)/Makefile.in
+ 	$(AM_V_GEN)\
+ 	bfd_version=`echo "$(VERSION)" | $(SED) -e 's/\([^\.]*\)\.*\([^\.]*\)\.*\([^\.]*\)\.*\([^\.]*\)\.*\([^\.]*\).*/\1.00\2.00\3.00\4.00\5/' -e 's/\([^\.]*\)\..*\(..\)\..*\(..\)\..*\(..\)\..*\(..\)$$/\1\2\3\4\5/'` ;\
+-	bfd_version_string="\"$(VERSION)\"" ;\
+-	bfd_soversion="$(VERSION)" ;\
++	bfd_version_string="\"$(VERSION)-%{release}\"" ;\
++	bfd_soversion="$(VERSION)-%{release}" ;\
+ 	bfd_version_package="\"$(PKGVERSION)\"" ;\
+ 	report_bugs_to="\"$(REPORT_BUGS_TO)\"" ;\
+ 	. $(srcdir)/development.sh ;\
+@@ -2466,7 +2466,7 @@ bfdver.h: $(srcdir)/version.h $(srcdir)/
+ 	fi ;\
+ 	$(SED) -e "s,@bfd_version@,$$bfd_version," \
+ 	    -e "s,@bfd_version_string@,$$bfd_version_string," \
+-	    -e "s,@bfd_version_package@,$$bfd_version_package," \
++	    -e "s,@bfd_version_package@,\"version \"," \
+ 	    -e "s,@report_bugs_to@,$$report_bugs_to," \
+ 	    < $(srcdir)/version.h > $@; \
+ 	echo "$${bfd_soversion}" > libtool-soversion

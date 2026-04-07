@@ -1,0 +1,21 @@
+diff -rupN --no-dereference sip-4.19.25/siputils.py sip-4.19.25-new/siputils.py
+--- sip-4.19.25/siputils.py	2021-10-21 13:45:54.808566613 +0200
++++ sip-4.19.25-new/siputils.py	2021-10-21 13:45:54.812566611 +0200
+@@ -436,7 +436,7 @@ class Makefile:
+             if l_dir in ("", ".", ".."):
+                 continue
+ 
+-            rpaths.append(l)
++            #rpaths.append(l)
+ 
+         if self._python:
+             incdir.append(self.config.py_inc_dir)
+@@ -613,7 +613,7 @@ class Makefile:
+             # Handle library directories.
+             libdir_qt = self.optional_list("LIBDIR_QT")
+             libdir.extend(libdir_qt)
+-            rpaths.extend(libdir_qt)
++            #rpaths.extend(libdir_qt)
+ 
+             if qt_version >= 0x040000:
+                 # Try and read QT_LIBINFIX from qconfig.pri.

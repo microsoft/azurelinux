@@ -1,0 +1,84 @@
+		Red Hat Security Enhancements for tog-pegasus
+		~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ Access to the Pegasus services:
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   By default, with the configuration as shipped, the upstream Open Group Pegasus
+   release allowed any user with an account on the machine (including root) to
+   use the network HTTPS port 5989 (by default) and HTTP port 5988 services.
+   On authentication failures, though there was the standard PAM authentication
+   failure delay, no messages were logged to syslog. This meant that potentially
+   a long-running cracker process could try millions of root passwords over the
+   network and could possibly discover the root password .  If users were unwise
+   enough to enable the HTTP service on port 5988, then root passwords could be
+   sent unencrypted over the network.
+
+   This situation was deemed unacceptable by Red Hat RHEL QA test and Security
+   Response team engineers.
+ 
+   So for the Red Hat tog-pegasus release, PAM access control was enabled, to 
+   remove these vulnerabilities. There is now a "pegasus" user created during
+   install, and users are recommended to use only that user to invoke CIM 
+   operations over the network.
+
+   By default:
+
+   o root password authentication for CIM operations invoked over the network 
+     HTTPS/HTTP services is denied - the root user is unable to invoke pegasus
+     services over the network - only the "pegasus" user may do so.
+
+   o the root user may invoke CIM operations over the HTTPS/HTTP ports on the
+     local machine.
+ 
+   o any user other than "pegasus" or "root" may not invoke pegasus services
+     over the HTTPS/HTTP ports at all.
+     
+   o any PAM authentication failure will be logged to syslog 
+
+   NOTE: after installation, you must set the password for the pegasus user -
+         issue this command as root :
+         # passwd pegasus
+         - to enable CIM operation network service, if the pegasus user is 
+         a local system user.
+
+   Note also that even though a non-root user's password is used to authenticate
+   with the cimserver, the cimserver and all CIM Operation Providers run as root.
+   This was another reason to restrict use of CIM Operations to only one user.  
+
+   The "pegasus" user may of course be a NIS, Kerberos, or LDAP user, which
+   could be used as configured in /etc/nsswitch.conf or with the PAM stack.
+
+   You may configure this differently, and at your own risk, by modifying the
+   pam_access configuration file /etc/Pegasus/access.conf, or by removing the
+   line:
+       account required pam_access.so accessfile=/etc/Pegasus/access.conf
+   from /etc/pam.d/wbem - then tog-pegasus' authentication behaviour would
+   be the same as that of the upstream release.
+
+ SELinux
+ ~~~~~~~
+   There is an SELinux policy for tog-pegasus shipped in selinux-policy-targeted-1.17.30-2.110+ .
+   When SELinux is enabled in enforcing mode, the cimserver and providers are restricted to the
+   operations allowed to the 'pegasus_t' security context. Also only the pegasus_exec_t context
+   may modify the repository, and only the pegasus_exec_conf_t context may modify the pegasus 
+   configuration files which are of pegasus_conf_t file context.
+
+   It is also possible to have separate SELinux policy for each provider. Create wrapper
+   in '/usr/libexec/pegasus' with its own specific SELinux label for each confined provider.
+   The wrapper file name has to be in specific format '$MODULE-cimprovagt' (where $MODULE is
+   value of PG_ProviderModule.ModuleGroupName as set during registration of the provider).
+
+   Original Pegasus's cimprovagt binary was moved to '/usr/libexec/pegasus/cimprovagt',
+   '/usr/sbin/cimprovagt' is simple shell script now, which passes all arguments to provider specific
+   wrapper if it exists or directly to original cimprovagt in other cases.
+
+   See example wrapper for Operating System Provider from sblim-cmpi-base package (which instruments
+   Linux_OperatingSystem class):
+   cmpiOSBase_OperatingSystemProvider-cimprovagt.example
+
+ ExecShield
+ ~~~~~~~~~~
+   All tog-pegasus binary executables are compiled with ExecShield enabled, which make it nearly
+   impossible to modify them or to poke executable code into them.
+

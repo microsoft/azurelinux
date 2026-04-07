@@ -1,0 +1,252 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: David Malcolm <dmalcolm@redhat.com>
+Date: Wed, 13 Jan 2010 21:25:18 +0000
+Subject: 00102: Change the various install paths to use /usr/lib64/ instead or
+ /usr/lib/
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Only used when "%{_lib}" == "lib64".
+
+Co-authored-by: David Malcolm <dmalcolm@redhat.com>
+Co-authored-by: Thomas Spura <tomspur@fedoraproject.org>
+Co-authored-by: Slavek Kabrda <bkabrda@redhat.com>
+Co-authored-by: Matej Stuchlik <mstuchli@redhat.com>
+Co-authored-by: Tomas Orsava <torsava@redhat.com>
+Co-authored-by: Charalampos Stratakis <cstratak@redhat.com>
+Co-authored-by: Petr Viktorin <pviktori@redhat.com>
+Co-authored-by: Miro Hrončok <miro@hroncok.cz>
+Co-authored-by: Iryna Shcherbina <shcherbina.iryna@gmail.com>
+---
+ Lib/distutils/command/install.py    |  4 ++--
+ Lib/distutils/sysconfig.py          |  6 +++++-
+ Lib/distutils/tests/test_install.py |  3 ++-
+ Lib/site.py                         |  4 ++++
+ Lib/sysconfig.py                    | 12 ++++++------
+ Lib/test/test_site.py               |  4 ++--
+ Makefile.pre.in                     |  2 +-
+ Modules/getpath.c                   |  6 +++---
+ configure.ac                        |  4 ++--
+ setup.py                            | 10 +++++-----
+ 10 files changed, 32 insertions(+), 23 deletions(-)
+
+diff --git a/Lib/distutils/command/install.py b/Lib/distutils/command/install.py
+index 0258d3deae..4b969bf809 100644
+--- a/Lib/distutils/command/install.py
++++ b/Lib/distutils/command/install.py
+@@ -30,14 +30,14 @@ WINDOWS_SCHEME = {
+ INSTALL_SCHEMES = {
+     'unix_prefix': {
+         'purelib': '$base/lib/python$py_version_short/site-packages',
+-        'platlib': '$platbase/lib/python$py_version_short/site-packages',
++        'platlib': '$platbase/lib64/python$py_version_short/site-packages',
+         'headers': '$base/include/python$py_version_short$abiflags/$dist_name',
+         'scripts': '$base/bin',
+         'data'   : '$base',
+         },
+     'unix_home': {
+         'purelib': '$base/lib/python',
+-        'platlib': '$base/lib/python',
++        'platlib': '$base/lib64/python',
+         'headers': '$base/include/python/$dist_name',
+         'scripts': '$base/bin',
+         'data'   : '$base',
+diff --git a/Lib/distutils/sysconfig.py b/Lib/distutils/sysconfig.py
+index 2bcd1dd288..ff0b131df2 100644
+--- a/Lib/distutils/sysconfig.py
++++ b/Lib/distutils/sysconfig.py
+@@ -129,8 +129,12 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
+             prefix = plat_specific and EXEC_PREFIX or PREFIX
+ 
+     if os.name == "posix":
++        if plat_specific or standard_lib:
++            lib = "lib64"
++        else:
++            lib = "lib"
+         libpython = os.path.join(prefix,
+-                                 "lib", "python" + get_python_version())
++                                 lib, "python" + get_python_version())
+         if standard_lib:
+             return libpython
+         else:
+diff --git a/Lib/distutils/tests/test_install.py b/Lib/distutils/tests/test_install.py
+index 287ab1989e..d4c05e0ab1 100644
+--- a/Lib/distutils/tests/test_install.py
++++ b/Lib/distutils/tests/test_install.py
+@@ -57,8 +57,9 @@ class InstallTestCase(support.TempdirManager,
+             self.assertEqual(got, expected)
+ 
+         libdir = os.path.join(destination, "lib", "python")
++        platlibdir = os.path.join(destination, "lib64", "python")
+         check_path(cmd.install_lib, libdir)
+-        check_path(cmd.install_platlib, libdir)
++        check_path(cmd.install_platlib, platlibdir)
+         check_path(cmd.install_purelib, libdir)
+         check_path(cmd.install_headers,
+                    os.path.join(destination, "include", "python", "foopkg"))
+diff --git a/Lib/site.py b/Lib/site.py
+index 86ca2dba61..58115f1c08 100644
+--- a/Lib/site.py
++++ b/Lib/site.py
+@@ -304,11 +304,15 @@ def getsitepackages(prefixes=None):
+         seen.add(prefix)
+ 
+         if os.sep == '/':
++            sitepackages.append(os.path.join(prefix, "lib64",
++                                        "python" + sys.version[:3],
++                                        "site-packages"))
+             sitepackages.append(os.path.join(prefix, "lib",
+                                         "python%d.%d" % sys.version_info[:2],
+                                         "site-packages"))
+         else:
+             sitepackages.append(prefix)
++            sitepackages.append(os.path.join(prefix, "lib64", "site-packages"))
+             sitepackages.append(os.path.join(prefix, "lib", "site-packages"))
+         if sys.platform == "darwin":
+             # for framework builds *only* we add the standard Apple
+diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
+index 9314e71a2f..8168e9c5a9 100644
+--- a/Lib/sysconfig.py
++++ b/Lib/sysconfig.py
+@@ -20,10 +20,10 @@ __all__ = [
+ 
+ _INSTALL_SCHEMES = {
+     'posix_prefix': {
+-        'stdlib': '{installed_base}/lib/python{py_version_short}',
+-        'platstdlib': '{platbase}/lib/python{py_version_short}',
++        'stdlib': '{installed_base}/lib64/python{py_version_short}',
++        'platstdlib': '{platbase}/lib64/python{py_version_short}',
+         'purelib': '{base}/lib/python{py_version_short}/site-packages',
+-        'platlib': '{platbase}/lib/python{py_version_short}/site-packages',
++        'platlib': '{platbase}/lib64/python{py_version_short}/site-packages',
+         'include':
+             '{installed_base}/include/python{py_version_short}{abiflags}',
+         'platinclude':
+@@ -61,10 +61,10 @@ _INSTALL_SCHEMES = {
+         'data': '{userbase}',
+         },
+     'posix_user': {
+-        'stdlib': '{userbase}/lib/python{py_version_short}',
+-        'platstdlib': '{userbase}/lib/python{py_version_short}',
++        'stdlib': '{userbase}/lib64/python{py_version_short}',
++        'platstdlib': '{userbase}/lib64/python{py_version_short}',
+         'purelib': '{userbase}/lib/python{py_version_short}/site-packages',
+-        'platlib': '{userbase}/lib/python{py_version_short}/site-packages',
++        'platlib': '{userbase}/lib64/python{py_version_short}/site-packages',
+         'include': '{userbase}/include/python{py_version_short}',
+         'scripts': '{userbase}/bin',
+         'data': '{userbase}',
+diff --git a/Lib/test/test_site.py b/Lib/test/test_site.py
+index 6964a84933..d0cd84f1ae 100644
+--- a/Lib/test/test_site.py
++++ b/Lib/test/test_site.py
+@@ -264,8 +264,8 @@ class HelperFunctionsTests(unittest.TestCase):
+             self.assertEqual(dirs[1], wanted)
+         elif os.sep == '/':
+             # OS X non-framework builds, Linux, FreeBSD, etc
+-            self.assertEqual(len(dirs), 1)
+-            wanted = os.path.join('xoxo', 'lib',
++            self.assertEqual(len(dirs), 2)
++            wanted = os.path.join('xoxo', 'lib64',
+                                   'python%d.%d' % sys.version_info[:2],
+                                   'site-packages')
+             self.assertEqual(dirs[0], wanted)
+diff --git a/Makefile.pre.in b/Makefile.pre.in
+index d15d93509d..9cd482fc38 100644
+--- a/Makefile.pre.in
++++ b/Makefile.pre.in
+@@ -139,7 +139,7 @@ LIBDIR=		@libdir@
+ MANDIR=		@mandir@
+ INCLUDEDIR=	@includedir@
+ CONFINCLUDEDIR=	$(exec_prefix)/include
+-SCRIPTDIR=	$(prefix)/lib
++SCRIPTDIR=	$(prefix)/lib64
+ ABIFLAGS=	@ABIFLAGS@
+ 
+ # Detailed destination directories
+diff --git a/Modules/getpath.c b/Modules/getpath.c
+index dd3387a9d7..1258fcd395 100644
+--- a/Modules/getpath.c
++++ b/Modules/getpath.c
+@@ -494,7 +494,7 @@ calculate_path(void)
+     _pythonpath = Py_DecodeLocale(PYTHONPATH, NULL);
+     _prefix = Py_DecodeLocale(PREFIX, NULL);
+     _exec_prefix = Py_DecodeLocale(EXEC_PREFIX, NULL);
+-    lib_python = Py_DecodeLocale("lib/python" VERSION, NULL);
++    lib_python = Py_DecodeLocale("lib64/python" VERSION, NULL);
+ 
+     if (!_pythonpath || !_prefix || !_exec_prefix || !lib_python) {
+         Py_FatalError(
+@@ -683,7 +683,7 @@ calculate_path(void)
+     }
+     else
+         wcsncpy(zip_path, _prefix, MAXPATHLEN);
+-    joinpath(zip_path, L"lib/python00.zip");
++    joinpath(zip_path, L"lib64/python00.zip");
+     bufsz = wcslen(zip_path);   /* Replace "00" with version */
+     zip_path[bufsz - 6] = VERSION[0];
+     zip_path[bufsz - 5] = VERSION[2];
+@@ -695,7 +695,7 @@ calculate_path(void)
+             fprintf(stderr,
+                 "Could not find platform dependent libraries <exec_prefix>\n");
+         wcsncpy(exec_prefix, _exec_prefix, MAXPATHLEN);
+-        joinpath(exec_prefix, L"lib/lib-dynload");
++        joinpath(exec_prefix, L"lib64/lib-dynload");
+     }
+     /* If we found EXEC_PREFIX do *not* reduce it!  (Yet.) */
+ 
+diff --git a/configure.ac b/configure.ac
+index cf280506bd..7bf4c6fb4c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -4771,9 +4771,9 @@ AC_MSG_RESULT($LDVERSION)
+ dnl define LIBPL after ABIFLAGS and LDVERSION is defined.
+ AC_SUBST(PY_ENABLE_SHARED)
+ if test x$PLATFORM_TRIPLET = x; then
+-  LIBPL='$(prefix)'"/lib/python${VERSION}/config-${LDVERSION}"
++  LIBPL='$(prefix)'"/lib64/python${VERSION}/config-${LDVERSION}"
+ else
+-  LIBPL='$(prefix)'"/lib/python${VERSION}/config-${LDVERSION}-${PLATFORM_TRIPLET}"
++  LIBPL='$(prefix)'"/lib64/python${VERSION}/config-${LDVERSION}-${PLATFORM_TRIPLET}"
+ fi
+ AC_SUBST(LIBPL)
+ 
+diff --git a/setup.py b/setup.py
+index e2c1898253..64d948d79c 100644
+--- a/setup.py
++++ b/setup.py
+@@ -521,7 +521,7 @@ class PyBuildExt(build_ext):
+         # directories (i.e. '.' and 'Include') must be first.  See issue
+         # 10520.
+         if not cross_compiling:
+-            add_dir_to_list(self.compiler.library_dirs, '/usr/local/lib')
++            add_dir_to_list(self.compiler.library_dirs, '/usr/local/lib64')
+             add_dir_to_list(self.compiler.include_dirs, '/usr/local/include')
+         # only change this for cross builds for 3.3, issues on Mageia
+         if cross_compiling:
+@@ -818,11 +818,11 @@ class PyBuildExt(build_ext):
+             elif curses_library:
+                 readline_libs.append(curses_library)
+             elif self.compiler.find_library_file(lib_dirs +
+-                                                     ['/usr/lib/termcap'],
++                                                     ['/usr/lib64/termcap'],
+                                                      'termcap'):
+                 readline_libs.append('termcap')
+             exts.append( Extension('readline', ['readline.c'],
+-                                   library_dirs=['/usr/lib/termcap'],
++                                   library_dirs=['/usr/lib64/termcap'],
+                                    extra_link_args=readline_extra_link_args,
+                                    libraries=readline_libs) )
+         else:
+@@ -859,8 +859,8 @@ class PyBuildExt(build_ext):
+             if krb5_h:
+                 ssl_incs += krb5_h
+         ssl_libs = find_library_file(self.compiler, 'ssl',lib_dirs,
+-                                     ['/usr/local/ssl/lib',
+-                                      '/usr/contrib/ssl/lib/'
++                                     ['/usr/local/ssl/lib64',
++                                      '/usr/contrib/ssl/lib64/'
+                                      ] )
+ 
+         if (ssl_incs is not None and

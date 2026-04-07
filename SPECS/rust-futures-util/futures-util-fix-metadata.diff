@@ -1,0 +1,48 @@
+--- futures-util-0.3.31/Cargo.toml	1970-01-01T00:00:01+00:00
++++ futures-util-0.3.31/Cargo.toml	2024-10-13T12:18:31.343712+00:00
+@@ -84,11 +84,6 @@
+ version = "0.3.31"
+ default-features = false
+ 
+-[dependencies.futures_01]
+-version = "0.1.25"
+-optional = true
+-package = "futures"
+-
+ [dependencies.memchr]
+ version = "2.2"
+ optional = true
+@@ -101,10 +96,6 @@
+ 
+ [dependencies.slab]
+ version = "0.4.2"
+-optional = true
+-
+-[dependencies.tokio-io]
+-version = "0.1.9"
+ optional = true
+ 
+ [dev-dependencies.tokio]
+@@ -126,10 +117,6 @@
+     "std",
+     "futures-channel",
+ ]
+-compat = [
+-    "std",
+-    "futures_01",
+-]
+ default = [
+     "std",
+     "async-await",
+@@ -139,11 +126,6 @@
+     "std",
+     "futures-io",
+     "memchr",
+-]
+-io-compat = [
+-    "io",
+-    "compat",
+-    "tokio-io",
+ ]
+ portable-atomic = ["futures-core/portable-atomic"]
+ sink = ["futures-sink"]

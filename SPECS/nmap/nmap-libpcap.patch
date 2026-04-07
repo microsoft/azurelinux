@@ -1,0 +1,15 @@
+Adjust for https://github.com/the-tcpdump-group/libpcap/pull/1251
+
+diff -up nmap-7.92/nse_nsock.cc.orig nmap-7.92/nse_nsock.cc
+--- nmap-7.92/nse_nsock.cc.orig	2020-02-18 14:41:29.000000000 -0500
++++ nmap-7.92/nse_nsock.cc	2024-12-02 19:21:43.302913416 -0500
+@@ -29,6 +29,9 @@
+ 
+ #define DEFAULT_TIMEOUT 30000
+ 
++/* libpcap 1.10.5 changed SOCKET to PCAP_SOCKET, usage here is unrelated */
++#undef PCAP_SOCKET
++
+ /* Upvalues for library variables */
+ enum {
+   NSOCK_POOL = lua_upvalueindex(1),

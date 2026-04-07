@@ -1,0 +1,12 @@
+diff --git a/services/plasmalogin-tmpfiles.conf.in b/services/plasmalogin-tmpfiles.conf.in
+index 8cfd6b8..91bf536 100644
+--- a/services/plasmalogin-tmpfiles.conf.in
++++ b/services/plasmalogin-tmpfiles.conf.in
+@@ -1,5 +1,7 @@
+ # Home dir of the plasmalogin user, also contains state.conf
+ d	${STATE_DIR}	0750	plasmalogin	plasmalogin
++# Workaround for https://pagure.io/fedora-kde/SIG/issue/87
++Z	${STATE_DIR}	-	plasmalogin	plasmalogin
+ # This contains X11 auth files passed to Xorg and the greeter
+ d	${RUNTIME_DIR}	0711	root	root
+ # Sockets for IPC

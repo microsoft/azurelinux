@@ -1,0 +1,17 @@
+diff -u --recursive festival-vanilla/config/config.in festival/config/config.in
+--- festival-vanilla/config/config.in	2017-09-04 10:54:08.000000000 -0500
++++ festival/config/config.in	2022-09-11 12:34:23.352139541 -0500
+@@ -10,7 +10,12 @@
+ ###########################################################################
+ ## Which speech tools to use
+ 
+-EST=$(TOP)/../speech_tools
++## Select correct architecture; uname -p does not work in mock.
++ifneq ($(wildcard /usr/lib64/speech_tools/.*),)
++	EST=/usr/lib64/speech_tools
++else
++	EST=/usr/lib/speech_tools
++endif
+ 
+ ###########################################################################
+ ## Where the festival tree will be installed.

@@ -1,0 +1,11 @@
+--- argon2-0.5.3/Cargo.toml	1970-01-01T00:00:01+00:00
++++ argon2-0.5.3/Cargo.toml	2025-12-04T09:51:39.360477+00:00
+@@ -59,7 +59,7 @@
+ default-features = false
+ 
+ [dev-dependencies.hex-literal]
+-version = "0.4"
++version = ">=0.4, <2.0"
+ 
+ [dev-dependencies.password-hash]
+ version = "0.5"

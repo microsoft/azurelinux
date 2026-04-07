@@ -1,0 +1,4 @@
+Z /etc/valkey     ~0750 valkey root   -
+D /run/valkey      0755 valkey valkey -
+d /var/lib/valkey  0750 valkey valkey -
+d /var/log/valkey  0750 valkey valkey -

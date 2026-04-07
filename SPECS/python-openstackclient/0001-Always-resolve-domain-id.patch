@@ -1,0 +1,115 @@
+From c8326b55259378c7b6a57b7a708008ab3d57bea1 Mon Sep 17 00:00:00 2001
+From: Takashi Kajinami <kajinamit@oss.nttdata.com>
+Date: Wed, 2 Oct 2024 00:16:40 +0900
+Subject: [PATCH] Always resolve domain id
+
+The --user-domain option and the --project-domain option may take id or
+name. In case name is given it should be translated to id.
+
+Closes-Bug: 2083390
+Change-Id: Idf3f113a74452daabc80660574030cb9b24b1a15
+---
+ openstackclient/identity/common.py            |  3 +++
+ .../identity/v3/role_assignment.py            | 27 ++++++++++++++++---
+ 2 files changed, 27 insertions(+), 3 deletions(-)
+
+diff --git a/openstackclient/identity/common.py b/openstackclient/identity/common.py
+index 50ad2fed..b8a5b885 100644
+--- a/openstackclient/identity/common.py
++++ b/openstackclient/identity/common.py
+@@ -204,6 +204,7 @@ def find_group(identity_client, name_or_id, domain_name_or_id=None):
+             identity_client.groups, name_or_id, groups.Group
+         )
+     else:
++        domain_id = find_domain(identity_client, domain_id).id
+         return _find_identity_resource(
+             identity_client.groups,
+             name_or_id,
+@@ -219,6 +220,7 @@ def find_project(identity_client, name_or_id, domain_name_or_id=None):
+             identity_client.projects, name_or_id, projects.Project
+         )
+     else:
++        domain_id = find_domain(identity_client, domain_id).id
+         return _find_identity_resource(
+             identity_client.projects,
+             name_or_id,
+@@ -234,6 +236,7 @@ def find_user(identity_client, name_or_id, domain_name_or_id=None):
+             identity_client.users, name_or_id, users.User
+         )
+     else:
++        domain_id = find_domain(identity_client, domain_id).id
+         return _find_identity_resource(
+             identity_client.users, name_or_id, users.User, domain_id=domain_id
+         )
+diff --git a/openstackclient/identity/v3/role_assignment.py b/openstackclient/identity/v3/role_assignment.py
+index 97532979..7d4dfcdb 100644
+--- a/openstackclient/identity/v3/role_assignment.py
++++ b/openstackclient/identity/v3/role_assignment.py
+@@ -146,12 +146,19 @@ class ListRoleAssignment(command.Lister):
+                 domain_id=role_domain_id,
+             )
+ 
++        user_domain_id = None
++        if parsed_args.user_domain:
++            project_domain_id = _find_sdk_id(
++                identity_client.find_domain,
++                name_or_id=parsed_args.user_domain,
++            )
++
+         user_id = None
+         if parsed_args.user:
+             user_id = _find_sdk_id(
+                 identity_client.find_user,
+                 name_or_id=parsed_args.user,
+-                domain_id=parsed_args.user_domain,
++                domain_id=user_domain_id,
+             )
+         elif parsed_args.authuser:
+             if auth_ref:
+@@ -171,6 +178,13 @@ class ListRoleAssignment(command.Lister):
+                 name_or_id=parsed_args.domain,
+             )
+ 
++        project_domain_id = None
++        if parsed_args.project_domain:
++            project_domain_id = _find_sdk_id(
++                identity_client.find_domain,
++                name_or_id=parsed_args.project_domain,
++            )
++
+         project_id = None
+         if parsed_args.project:
+             project_id = _find_sdk_id(
+@@ -178,7 +192,7 @@ class ListRoleAssignment(command.Lister):
+                 name_or_id=common._get_token_resource(
+                     identity_client, 'project', parsed_args.project
+                 ),
+-                domain_id=parsed_args.project_domain,
++                domain_id=project_domain_id,
+             )
+         elif parsed_args.authproject:
+             if auth_ref:
+@@ -187,12 +201,19 @@ class ListRoleAssignment(command.Lister):
+                     name_or_id=auth_ref.project_id,
+                 )
+ 
++        group_domain_id = None
++        if parsed_args.group_domain:
++            group_domain_id = _find_sdk_id(
++                identity_client.find_domain,
++                name_or_id=parsed_args.group_domain,
++            )
++
+         group_id = None
+         if parsed_args.group:
+             group_id = _find_sdk_id(
+                 identity_client.find_group,
+                 name_or_id=parsed_args.group,
+-                domain_id=parsed_args.group_domain,
++                domain_id=group_domain_id,
+             )
+ 
+         include_names = True if parsed_args.names else None
+-- 
+2.46.0
+

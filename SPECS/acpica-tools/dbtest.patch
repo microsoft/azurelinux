@@ -1,0 +1,40 @@
+On s390, GCC does not like the string initialization in this case.  When
+ValueToWrite is initialized this way, GCC tries to copy the entire string
+into an ACPI_OBJECT instead of just the pointer (see the use in the call
+to memcpy()).  So, move the init so GCC recognizes that ValueToWrite is
+only a pointer, and not a whole string that needs to be moved.
+
+Index: acpica-unix2-20240321/source/components/debugger/dbtest.c
+===================================================================
+--- acpica-unix2-20240321.orig/source/components/debugger/dbtest.c
++++ acpica-unix2-20240321/source/components/debugger/dbtest.c
+@@ -719,9 +719,10 @@ AcpiDbTestStringType (
+     ACPI_OBJECT             *Temp1 = NULL;
+     ACPI_OBJECT             *Temp2 = NULL;
+     ACPI_OBJECT             *Temp3 = NULL;
+-    char                    *ValueToWrite = "Test String from AML Debugger";
++    char                    *ValueToWrite = NULL;
+     ACPI_OBJECT             WriteValue;
+     ACPI_STATUS             Status;
++    const char              *TestStr = "Test String from AML Debugger";
+ 
+ 
+     /* Read the original value */
+@@ -737,6 +738,9 @@ AcpiDbTestStringType (
+ 
+     /* Write a new value */
+ 
++    ValueToWrite = AcpiOsAllocateZeroed(strlen(TestStr)+1);
++    strncpy(ValueToWrite, TestStr, strlen(TestStr)+1);
++
+     WriteValue.Type = ACPI_TYPE_STRING;
+     WriteValue.String.Length = strlen (ValueToWrite);
+     WriteValue.String.Pointer = ValueToWrite;
+@@ -790,6 +794,7 @@ Exit:
+     if (Temp1) {AcpiOsFree (Temp1);}
+     if (Temp2) {AcpiOsFree (Temp2);}
+     if (Temp3) {AcpiOsFree (Temp3);}
++    if (ValueToWrite) {AcpiOsFree (ValueToWrite);}
+     return (Status);
+ }
+ 

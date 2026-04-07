@@ -1,0 +1,171 @@
+# -*- rpm-spec -*-
+
+## Reduce duplication in your Tree-sitter parser RPM spec by placing the
+## following lines in the preamble:
+#
+# BuildSystem: tree_sitter
+# %{tree_sitter -l language-name}
+
+# This file is provided under the MIT License.
+
+%tree_sitter_shortname() %{lua: \
+        print(({ \
+            string.gsub(rpm.expand('%name'), '^tree%-sitter%-', '', 1) \
+        })[1]) \
+    }
+
+
+%buildsystem_tree_sitter_conf() \
+    %{?with_rust:%cargo_prep}
+
+%buildsystem_tree_sitter_generate_buildrequires() \
+    if [[ $(grep --perl --only-matching '(?<=^#define LANGUAGE_VERSION )\\d+' src/parser.c) -ge 15 ]]; then \
+        echo '\
+            libtree-sitter-devel >= 0.25.0 \
+            tree-sitter-cli >= 0.25.0 \
+        ' \
+    elif [[ -f tree-sitter.json ]]; then \
+        echo '\
+            libtree-sitter-devel \
+            tree-sitter-cli >= 0.24.0 \
+        ' \
+    else \
+        echo '\
+            libtree-sitter-devel \
+            tree-sitter-cli \
+        ' \
+    fi \
+    if [[ -f tree-sitter.json ]]; then \
+        grep -oP '(?<=\"node_modules/)tree-sitter-[^/]+(?=/)' \\\
+                 tree-sitter.json \\\
+            | awk '{print "lib" $1}' \
+    fi \
+    echo '\
+        %{?with_rust:cargo-rpm-macros >= 24} \
+        gcc \
+        (gcc-c++ if tree-sitter-cli < 0.24.0) \
+        make \
+    ' \
+    %{?with_python:%pyproject_buildrequires} \
+    %{?with_rust:%cargo_generate_buildrequires}
+
+%buildsystem_tree_sitter_build() \
+    %make_build all PARSER_URL=%{url} %* \
+    %{?with_python:%pyproject_wheel} \
+    %{?with_rust:%cargo_build}
+
+%buildsystem_tree_sitter_install() \
+    %make_install \\\
+        PREFIX=%{_prefix} \\\
+        INCLUDEDIR=%{_includedir} \\\
+        LIBDIR=%{_libdir} %* \\\
+    \
+    install -d $RPM_BUILD_ROOT%{_datadir}/tree-sitter/queries/%{tree_sitter_shortname}/ \
+    find $RPM_BUILD_ROOT -name '*.a' -delete \
+    %{?with_python:%pyproject_install \
+    %pyproject_save_files %{lua: print(({string.gsub(rpm.expand('%name'), '-', '_')})[1])}} \
+    %{?with_rust:rm -f src/*.o \
+    %cargo_install}
+
+%buildsystem_tree_sitter_check() \
+    if [[ -f tree-sitter.json ]]; then \
+        sed -i -E 's#"node_modules/tree-sitter-([^/])/queries/#"%{_datadir}/tree-sitter/queries/\\1/#g' tree-sitter.json \
+    fi \
+    %{__make} test %* \
+    %{?with_python:%pyproject_check_import} \
+    %{?with_rust:%cargo_test}
+
+%tree_sitter(l:PR) \
+    %{tree_sitter_packages %{quote:%{-l}} %{-P} %{-R}} \
+    %{tree_sitter_files}
+
+
+%tree_sitter_packages(l:PR) \
+%bcond python %{!-P:0}%{-P:1} \
+%bcond rust %{!-R:0}%{-R:1} \
+%{tree_sitter_package_lib %{quote:%{-l}}} \
+%{?with_python:%{tree_sitter_package_python}} \
+%{?with_rust:%{tree_sitter_package_rust}}
+
+%tree_sitter_package_lib(l:) \
+%define tree_sitter_lang %{shrink:%{-l*}} \
+%global tree_sitter_summary %{tree_sitter_lang} grammar for Tree-sitter \
+%global tree_sitter_desc Add support for %{tree_sitter_lang} to Tree-sitter, an incremental parsing system \\\
+for programming tools. \
+Summary:        %{tree_sitter_summary} \
+%description \
+%{tree_sitter_desc} \
+%package -n lib%{name} \
+Summary:        %{tree_sitter_summary} \
+Enhances:       libtree-sitter \
+%description -n lib%{name} \
+%{tree_sitter_desc} \
+\
+%package -n lib%{name}-devel \
+Summary:        Development files for lib%{name} \
+Requires:       lib%{name}%{?_isa} = %{version}-%{release} \
+Requires:       libtree-sitter-devel \
+\
+%description -n lib%{name}-devel \
+Libraries and header files for developing applications that use \
+%{name}.
+
+%tree_sitter_package_python() \
+%package -n python3-%{name} \
+Summary:        %{tree_sitter_summary} (Python bindings) \
+\
+%description -n python3-%{name} \
+%{tree_sitter_desc} \
+\
+This subpackage is for the Python language.
+
+%tree_sitter_package_rust() \
+%global crate %{name} \
+%bcond_without check \
+\
+%package -n rust-%{name}-devel \
+Summary:        %{tree_sitter_summary} (Rust bindings) \
+BuildArch:      noarch \
+\
+%description -n rust-%{name}-devel \
+%{tree_sitter_desc} \
+\
+This package contains library source intended for building other Rust packages \
+which use the "%{name}" crate. \
+\
+%package -n rust-%{name}+default-devel \
+Summary:        %{tree_sitter_summary} (Rust bindings) \
+BuildArch:      noarch \
+\
+%description -n rust-%{name}+default-devel \
+%{tree_sitter_desc} \
+This package contains library source intended for building other Rust packages \
+which use the "default" feature of the "%{name}" crate.
+
+
+%tree_sitter_files() \
+%{tree_sitter_files_lib} \
+%{?with_python:%{tree_sitter_files_python}} \
+%{?with_rust:%{tree_sitter_files_rust}}
+
+%tree_sitter_files_lib() \
+%files -n lib%{name} \
+%%license LICENSE* \
+%doc README* \
+%{_datadir}/tree-sitter/queries/%{tree_sitter_shortname}/ \
+%{_libdir}/libtree-sitter-*.so.* \
+\
+%files -n lib%{name}-devel \
+%{_includedir}/tree_sitter/tree-sitter-*.h \
+%{_libdir}/libtree-sitter-*.so \
+%{_libdir}/pkgconfig/tree-sitter-*.pc
+
+%tree_sitter_files_python() \
+%files -n python3-%{name} -f %{pyproject_files}
+
+%tree_sitter_files_rust() \
+%files -n rust-%{name}-devel \
+%%license LICENSE* \
+%{crate_instdir}/ \
+%files -n rust-%{name}+default-devel \
+%ghost %{crate_instdir}/Cargo.toml

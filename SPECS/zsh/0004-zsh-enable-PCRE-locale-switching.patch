@@ -1,0 +1,64 @@
+From 1b421e4978440234fb73117c8505dad1ccc68d46 Mon Sep 17 00:00:00 2001
+From: Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+Date: Mon, 26 Sep 2022 10:52:50 +0900
+Subject: [PATCH] 50658 + test: Enable to switch between C/UTF-8 locales in
+ PCRE
+
+---
+ Src/Modules/pcre.c | 10 ++--------
+ Test/V07pcre.ztst  | 11 +++++++++++
+ 2 files changed, 13 insertions(+), 8 deletions(-)
+
+diff --git a/Src/Modules/pcre.c b/Src/Modules/pcre.c
+index 6289e003e..46875a59b 100644
+--- a/Src/Modules/pcre.c
++++ b/Src/Modules/pcre.c
+@@ -47,8 +47,6 @@ zpcre_utf8_enabled(void)
+ #if defined(MULTIBYTE_SUPPORT) && defined(HAVE_NL_LANGINFO) && defined(CODESET)
+     static int have_utf8_pcre = -1;
+ 
+-    /* value can toggle based on MULTIBYTE, so don't
+-     * be too eager with caching */
+     if (have_utf8_pcre < -1)
+ 	return 0;
+ 
+@@ -56,15 +54,11 @@ zpcre_utf8_enabled(void)
+ 	return 0;
+ 
+     if ((have_utf8_pcre == -1) &&
+-        (!strcmp(nl_langinfo(CODESET), "UTF-8"))) {
+-
+-	if (pcre_config(PCRE_CONFIG_UTF8, &have_utf8_pcre))
++	(pcre_config(PCRE_CONFIG_UTF8, &have_utf8_pcre))) {
+ 	    have_utf8_pcre = -2; /* erk, failed to ask */
+     }
+ 
+-    if (have_utf8_pcre < 0)
+-	return 0;
+-    return have_utf8_pcre;
++    return (have_utf8_pcre == 1) && (!strcmp(nl_langinfo(CODESET), "UTF-8"));
+ 
+ #else
+     return 0;
+diff --git a/Test/V07pcre.ztst b/Test/V07pcre.ztst
+index ca13419e5..22a0b64c7 100644
+--- a/Test/V07pcre.ztst
++++ b/Test/V07pcre.ztst
+@@ -162,3 +162,14 @@
+     echo $match[2] )
+ 0:regression for segmentation fault, workers/38307
+ >test
++
++  LANG_SAVE=$LANG
++  [[ é =~ '^.\z' ]]; echo $?
++  LANG=C
++  [[ é =~ '^..\z' ]]; echo $?
++  LANG=$LANG_SAVE
++  [[ é =~ '^.\z' ]]; echo $?
++0:swich between C/UTF-8 locales
++>0
++>0
++>0
+-- 
+2.41.0
+

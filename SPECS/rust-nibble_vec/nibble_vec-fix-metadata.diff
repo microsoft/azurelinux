@@ -1,0 +1,16 @@
+--- nibble_vec-0.1.0/Cargo.toml	2020-06-27T23:13:08+00:00
++++ nibble_vec-0.1.0/Cargo.toml	2023-03-12T21:44:31.773642+00:00
+@@ -26,13 +26,8 @@
+ [lib]
+ bench = false
+ 
+-[[bench]]
+-name = "nib_bench"
+-harness = false
+ [dependencies.smallvec]
+ version = "1.0"
+-[dev-dependencies.criterion]
+-version = "0.3"
+ [badges.maintenance]
+ status = "as-is"
+ 

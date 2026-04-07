@@ -1,0 +1,96 @@
+From 40e4f8818ecc78d0109a0b73d86ecf27ce067f2f Mon Sep 17 00:00:00 2001
+From: Fabian Vogt <fabian@ritter-vogt.de>
+Date: Fri, 4 Feb 2022 11:07:36 +0100
+Subject: [PATCH 23/55] Use proper dependencies in compile tests
+
+Use the dependencies as found by the "libraries" section instead of relying
+on them being available in the default location (e.g. "-ldrm").
+
+Additionally, VK_USE_PLATFORM_WAYLAND_KHR requires <wayland-client.h>, so
+add the wayland-client dependency.
+
+This fixes those tests if e.g. wayland-client headers need to be found through
+pkgconfig.
+
+This part of the code changed completely in Qt 6, so this is a totally
+different patch and not a cherry-pick of 5fc2e1915c3a
+("CMake: Fix qtwayland feature detection").
+
+Fixes: QTBUG-100475
+---
+ src/client/configure.json     |  5 +++--
+ src/compositor/configure.json | 28 +++++++++++++++++++++++++++-
+ 2 files changed, 30 insertions(+), 3 deletions(-)
+
+diff --git a/src/client/configure.json b/src/client/configure.json
+index 73f23362..6247f85e 100644
+--- a/src/client/configure.json
++++ b/src/client/configure.json
+@@ -167,7 +167,8 @@
+                     "exportAllocInfo.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHR;",
+                     "return 0;"
+                 ]
+-            }
++            },
++            "use": "wayland-client"
+         },
+         "egl_1_5-wayland": {
+             "label": "EGL 1.5 with Wayland Platform",
+@@ -182,7 +183,7 @@
+                     "eglGetPlatformDisplay(EGL_PLATFORM_WAYLAND_EXT, (struct wl_display *)(nullptr), nullptr);"
+                 ]
+             },
+-            "use": "egl"
++            "use": "egl wayland-client"
+         }
+     },
+ 
+diff --git a/src/compositor/configure.json b/src/compositor/configure.json
+index c5b0f03e..031e4cc3 100644
+--- a/src/compositor/configure.json
++++ b/src/compositor/configure.json
+@@ -7,6 +7,31 @@
+     "testDir": "../../config.tests",
+ 
+     "libraries": {
++        "wayland-client": {
++            "label": "Wayland client library",
++            "headers": "wayland-version.h",
++            "test": {
++                "main": [
++                    "#if WAYLAND_VERSION_MAJOR < 1",
++                    "# error Wayland 1.8.0 or higher required",
++                    "#endif",
++                    "#if WAYLAND_VERSION_MAJOR == 1",
++                    "# if WAYLAND_VERSION_MINOR < 8",
++                    "#  error Wayland 1.8.0 or higher required",
++                    "# endif",
++                    "# if WAYLAND_VERSION_MINOR == 8",
++                    "#  if WAYLAND_VERSION_MICRO < 0",
++                    "#   error Wayland 1.8.0 or higher required",
++                    "#  endif",
++                    "# endif",
++                    "#endif"
++                 ]
++            },
++            "sources": [
++                { "type": "pkgConfig", "args": "wayland-client" },
++                "-lwayland-client"
++            ]
++        },
+         "wayland-server": {
+             "label": "wayland-server",
+             "headers": "wayland-version.h",
+@@ -193,7 +218,8 @@
+                     "exportAllocInfo.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHR;",
+                     "return 0;"
+                 ]
+-            }
++            },
++            "use": "wayland-client"
+         }
+     },
+ 
+-- 
+2.51.1
+

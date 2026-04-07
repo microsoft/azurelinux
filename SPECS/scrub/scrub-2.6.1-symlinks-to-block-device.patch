@@ -1,0 +1,122 @@
+From 499a491c21b5a18be79334282dfa11fd4f408c49 Mon Sep 17 00:00:00 2001
+From: Sergio Correia <scorreia@redhat.com>
+Date: Wed, 27 Jan 2021 09:42:15 -0300
+Subject: [PATCH] scrub should work for symlinks pointing to block devices
+
+In [1] (add -L option to avoid scrubbing symlink target [Tim
+Boronczyk]), scrub introduced a -L (--no-link) option so that it would
+not scrub the target, if it was a link and this new option was set.
+
+A side-effect of that change is that scrub stopped working for links
+pointing to a block device, whereas it would still work for links
+pointing to regular files -- it is not clear from the commit changelog
+and the added documentation for this new option that this was an
+intended change.
+
+In this commit we fix this regression, and scrub works again for links
+pointing to block devices. -L/--no-link option also works for these
+links.
+
+[1] https://github.com/chaos/scrub/commit/01915c442288b4b274261fa07e42e116fb9d6b60
+---
+ src/scrub.c | 13 ++++++++-----
+ src/util.c  | 13 +++++++++----
+ src/util.h  |  2 +-
+ 3 files changed, 18 insertions(+), 10 deletions(-)
+
+diff --git a/src/scrub.c b/src/scrub.c
+index 1dada28..178dfe7 100644
+--- a/src/scrub.c
++++ b/src/scrub.c
+@@ -334,6 +334,10 @@ static int scrub_object(char *filename, const struct opt_struct *opt,
+                 fprintf(stderr, "%s: %s already scrubbed? (-f to force)\n",
+                         prog, filename);
+                 errcount++;
++            } else if (is_symlink(filename) && opt->nofollow) {
++                fprintf(stderr, "%s: skipping symlink %s because --no-link (-L) option was set\n",
++                        prog, filename);
++                errcount++;
+             } else if (!noexec) {
+                 if (dryrun) {
+                     printf("%s: (dryrun) scrub special file %s\n",
+@@ -343,8 +347,8 @@ static int scrub_object(char *filename, const struct opt_struct *opt,
+                 }
+             }
+             break;
+-        case FILE_LINK:
+-            if (opt->nofollow) {
++        case FILE_REGULAR:
++            if (is_symlink(filename) && opt->nofollow) {
+                 if (opt->remove && !noexec) {
+                     if (dryrun) {
+                         printf("%s: (dryrun) unlink %s\n", prog, filename);
+@@ -359,8 +363,7 @@ static int scrub_object(char *filename, const struct opt_struct *opt,
+                 }
+                 break;
+             }
+-            /* FALL THRU */
+-        case FILE_REGULAR:
++
+             if (access(filename, R_OK|W_OK) < 0) {
+                 fprintf(stderr, "%s: no rw access to %s\n", prog, filename);
+                 errcount++;
+@@ -670,7 +673,7 @@ scrub_file(char *path, const struct opt_struct *opt)
+     filetype_t ftype = filetype(path);
+     off_t size = opt->devsize;
+ 
+-    assert(ftype == FILE_REGULAR || ftype == FILE_LINK);
++    assert(ftype == FILE_REGULAR);
+ 
+     if (stat(path, &sb) < 0) {
+         fprintf(stderr, "%s: stat %s: %s\n", prog, path, strerror(errno));
+diff --git a/src/util.c b/src/util.c
+index 96dd59b..fb85368 100644
+--- a/src/util.c
++++ b/src/util.c
+@@ -71,6 +71,15 @@ write_all(int fd, const unsigned char *buf, int count)
+     return n;
+ }
+ 
++/* Indicates whether the file represented by 'path' is a symlink.
++ */
++int
++is_symlink(char *path)
++{
++    struct stat sb;
++    return lstat(path, &sb) == 0 && S_ISLNK(sb.st_mode);
++}
++
+ /* Return the type of file represented by 'path'.
+  */
+ filetype_t
+@@ -80,10 +89,6 @@ filetype(char *path)
+ 
+     filetype_t res = FILE_NOEXIST;
+ 
+-    if (lstat(path, &sb) == 0 && S_ISLNK(sb.st_mode)) {
+-        return FILE_LINK;
+-    }
+-
+     if (stat(path, &sb) == 0) {
+         if (S_ISREG(sb.st_mode))
+             res = FILE_REGULAR;
+diff --git a/src/util.h b/src/util.h
+index 513ae48..04246df 100644
+--- a/src/util.h
++++ b/src/util.h
+@@ -13,7 +13,6 @@ typedef enum {
+     FILE_REGULAR,
+     FILE_CHAR,
+     FILE_BLOCK,
+-    FILE_LINK,
+     FILE_OTHER,
+ } filetype_t;
+ 
+@@ -21,6 +20,7 @@ typedef enum { UP, DOWN } round_t;
+ 
+ int         read_all(int fd, unsigned char *buf, int count);
+ int         write_all(int fd, const unsigned char *buf, int count);
++int         is_symlink(char *path);
+ filetype_t  filetype(char *path);
+ off_t       blkalign(off_t offset, int blocksize, round_t rtype);
+ void *      alloc_buffer(int bufsize);

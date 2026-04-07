@@ -1,0 +1,11 @@
+--- Makefile.orig	2007-05-21 16:50:37.000000000 -0400
++++ Makefile	2007-09-21 14:39:29.000000000 -0400
+@@ -82,7 +82,7 @@
+ 	$(INSTALL) -d -m755 $(DESTDIR)$(BINDIR)
+ 	$(INSTALL) $(BIN) $(DESTDIR)$(BINDIR)
+ 	$(INSTALL) -d -m755 $(DESTDIR)$(MAN1DIR)
+-	$(INSTALL) $(MAN) $(DESTDIR)$(MAN1DIR)
++	$(INSTALL) -p -m644 $(MAN) $(DESTDIR)$(MAN1DIR)
+ 
+ odt2txt.html: $(MAN)
+ 	$(GROFF) -Thtml -man $(MAN) > $@

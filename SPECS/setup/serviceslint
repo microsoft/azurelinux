@@ -1,0 +1,119 @@
+#!/usr/bin/perl
+#
+# Perform sanity checks on the services file, supplied as argument.
+# Based on an earlier shell script of the same name, but much faster,
+# and it also detects actual errors in the current services file :)
+#
+# This program includes a manual, run "perldoc serviceslint" to see it.
+#
+
+use strict;
+use warnings;
+
+die "Usage: $0 /etc/services\n" unless $#ARGV == 0;
+
+# Build a hash of known protocols
+my %protocol;
+open FH, "protocols" or die "cannot open protocols: $!\n";
+while (<FH>) {
+	chomp;
+	s/#.*$//;
+	my ($name, $port) = m/([\S]+)\s+(\d+)/ or next;
+	$protocol{$name} = $port;
+}
+close FH;
+
+# Parse the supplied services file
+my $retval = 0;
+my $line = 0;
+my %service;
+open FH, $ARGV[0] or die "cannot open $ARGV[0]: $!\n";
+while (<FH>) {
+	$line++;				    # Keep a line count
+	chomp;					    # Remove CR/LF chars
+	if (m/^\s+/) {
+		print "Malformed line $line\n";     # No leading whitespace
+		$retval = 1;
+		next;
+	}
+	s/\s*#.*$//;                                # Strip out comments
+	next if m/^$/;				    # Skip empty lines
+	my ($name, $port, $proto, $aliases) =	    # Primary pattern match
+		m/^([\S]+)\s+(\d+)\/(\w+)\s*(.*)/
+		or die "Malformed line: $line\n";
+	if (not exists $protocol{$proto}) {
+		print "Bad protocol at line $line: $proto\n";
+		$retval = 1;
+	}
+	if (exists $service{$proto}{$port}) {
+		print "Duplicate port at line $line: $port/$proto\n";
+		$retval = 1;
+	}
+	$service{$proto}{$port} = $name;
+	foreach ($name, split /\s+/, $aliases) {
+		if (exists $service{$proto}{$_}) {
+			print "Duplicate name at line $line: $_/$proto\n";
+			$retval = 1;
+		}
+		$service{$proto}{$_} = $port;
+	};
+
+}
+close FH;
+exit $retval;
+
+__END__
+
+=head1 NAME
+
+serviceslint - perform verification on the /etc/services file
+
+=head1 SYNOPSIS
+
+B<serviceslint> I<filename>
+
+=head1 DESCRIPTION
+
+The B<serviceslint> command performs syntax and content checks on the
+given filename, normally a copy of the I</etc/services> file.
+
+Syntax checking consists of a regular expression applied to
+non-empty, non-comment lines.  If the syntax check fails, then
+the program prints a message and aborts with non-zero status code.
+
+Content checking detects various kinds of duplicate entries.
+Currently, warnings are printed for duplicate entries, but execution
+continues, and the program I<exits with status code zero> (eg. success).
+
+=over
+
+=item B<Malformed line> I<NNN>
+
+The specified line has invalid syntax.  Note that leading whitespace
+is not permitted.  Non-empty lines must begin with a comment, or with
+a service name followed by a port number / protocol pair.
+
+=item B<Duplicate port at line> I<NNN>
+
+Occurs when a port number / protocol pair is found more than once
+in the services file.  The warning is flagged on the second (and any
+subsequent) occurrences.  These entries will not be found via the
+B<getservbyport()> function.
+
+=item B<Duplicate name at line> I<NNN>
+
+Occurs when a service name, or alias, occurs more than once in the
+services file.  The warning is flagged on the second (and subsequent)
+occurrence.  These entries will not be returned by the B<getservbyname()>
+function.
+
+=back
+
+=head1 SEE ALSO
+
+The services(5) man page describes the file format.
+
+=head1 AUTHOR
+
+Ralph Siemsen & Phil Knirsch
+

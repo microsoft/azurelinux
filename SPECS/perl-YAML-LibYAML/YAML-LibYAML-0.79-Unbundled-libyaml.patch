@@ -1,0 +1,12 @@
+diff -up YAML-LibYAML-0.79/LibYAML/Makefile.PL.orig YAML-LibYAML-0.79/LibYAML/Makefile.PL
+--- YAML-LibYAML-0.79/LibYAML/Makefile.PL.orig	2019-06-11 21:35:34.000000000 +0200
++++ YAML-LibYAML-0.79/LibYAML/Makefile.PL	2019-06-12 08:53:09.437296055 +0200
+@@ -25,7 +25,7 @@ WriteMakefile(
+     # CCFLAGS => '-pedantic -Wall',
+     # CCFLAGS => '-Wall',
+     DEFINE => $DEFINE,
+-    LIBS => [''], # e.g., '-lm'
++    LIBS => ['-lyaml'], # e.g., '-lm'
+     INC => '-I.',
+     OBJECT => $obj_files,
+     ABSTRACT_FROM => 'lib/YAML/XS/LibYAML.pm',

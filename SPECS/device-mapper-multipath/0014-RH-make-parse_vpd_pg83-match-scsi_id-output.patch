@@ -1,0 +1,96 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Thu, 25 Mar 2021 13:05:10 -0500
+Subject: [PATCH] RH: make parse_vpd_pg83 match scsi_id output
+
+Red Hat sets ID_SERIAL based on the result of scsi_id, instead of using
+the result of sg_inq and 55-scsi-sg3_id.rules. Make parse_vpd_pg83 match
+that.
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libmultipath/discovery.c | 12 ++----------
+ tests/vpd.c              |  6 ++++++
+ 2 files changed, 8 insertions(+), 10 deletions(-)
+
+diff --git a/libmultipath/discovery.c b/libmultipath/discovery.c
+index b5851561..a3cc6e83 100644
+--- a/libmultipath/discovery.c
++++ b/libmultipath/discovery.c
+@@ -1219,13 +1219,9 @@ parse_vpd_pg83(const unsigned char *in, size_t in_len,
+ 				good_len = 8;
+ 				break;
+ 			case 2:
+-				/* IEEE Extended: Prio 6 */
+-				new_prio = 6;
+-				good_len = 8;
+-				break;
+ 			case 3:
+-				/* IEEE Locally assigned: Prio 1 */
+-				new_prio = 1;
++				/* IEEE Extended or Locally assigned: Prio 6 */
++				new_prio = 6;
+ 				good_len = 8;
+ 				break;
+ 			default:
+@@ -1243,10 +1239,6 @@ parse_vpd_pg83(const unsigned char *in, size_t in_len,
+ 			break;
+ 		case 0x8:
+ 			/* SCSI Name: Prio 3 */
+-			invalid = (d[3] < 4 || (memcmp(d + 4, "eui.", 4) &&
+-						memcmp(d + 4, "naa.", 4) &&
+-						memcmp(d + 4, "iqn.", 4)));
+-			new_prio = 3;
+ 			break;
+ 		case 0x1:
+ 			/* T-10 Vendor ID: Prio 2 */
+diff --git a/tests/vpd.c b/tests/vpd.c
+index e3212e61..cdb111bb 100644
+--- a/tests/vpd.c
++++ b/tests/vpd.c
+@@ -232,11 +232,13 @@ static const char * const str_prefix[] = {
+ 	[STR_IQN] = "iqn.",
+ };
+ 
++#if 0
+ static const char byte0[] = {
+ 	[STR_EUI] = '2',
+ 	[STR_NAA] = '3',
+ 	[STR_IQN] = '8',
+ };
++#endif
+ 
+ /**
+  * create_scsi_string_desc() - create a SCSI name string descriptor.
+@@ -767,6 +769,7 @@ make_test_vpd_naa(2, 18);
+ make_test_vpd_naa(2, 17);
+ make_test_vpd_naa(2, 16);
+ 
++#if 0
+ /* SCSI Name string: EUI64, WWID size: 17 */
+ make_test_vpd_str(0, 20, 18)
+ make_test_vpd_str(0, 20, 17)
+@@ -802,6 +805,7 @@ make_test_vpd_str(18, 20, 18)
+ make_test_vpd_str(18, 20, 17)
+ make_test_vpd_str(18, 20, 16)
+ make_test_vpd_str(18, 20, 15)
++#endif
+ 
+ static int test_vpd(void)
+ {
+@@ -910,6 +914,7 @@ static int test_vpd(void)
+ 		cmocka_unit_test(test_vpd_naa_2_18),
+ 		cmocka_unit_test(test_vpd_naa_2_17),
+ 		cmocka_unit_test(test_vpd_naa_2_16),
++/*
+ 		cmocka_unit_test(test_vpd_str_0_20_18),
+ 		cmocka_unit_test(test_vpd_str_0_20_17),
+ 		cmocka_unit_test(test_vpd_str_0_20_16),
+@@ -934,6 +939,7 @@ static int test_vpd(void)
+ 		cmocka_unit_test(test_vpd_str_18_20_17),
+ 		cmocka_unit_test(test_vpd_str_18_20_16),
+ 		cmocka_unit_test(test_vpd_str_18_20_15),
++*/
+ 	};
+ 	return cmocka_run_group_tests(tests, setup, teardown);
+ }

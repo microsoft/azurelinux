@@ -1,0 +1,20 @@
+--- a/zip.c	
++++ a/zip.c	
+@@ -1028,7 +1028,7 @@ local void help_extended()
+ 
+   for (i = 0; i < sizeof(text)/sizeof(char *); i++)
+   {
+-    printf(text[i]);
++    printf("%s", text[i]);
+     putchar('\n');
+   }
+ #ifdef DOS
+@@ -1225,7 +1225,7 @@ local void version_info()
+             CR_MAJORVER, CR_MINORVER, CR_BETA_VER, CR_VERSION_DATE);
+   for (i = 0; i < sizeof(cryptnote)/sizeof(char *); i++)
+   {
+-    printf(cryptnote[i]);
++    printf("%s", cryptnote[i]);
+     putchar('\n');
+   }
+   ++i;  /* crypt support means there IS at least one compilation option */

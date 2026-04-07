@@ -1,0 +1,17 @@
+--- anstream-0.6.21/Cargo.toml	1970-01-01T00:00:01+00:00
++++ anstream-0.6.21/Cargo.toml	2025-11-12T12:00:50.738807+00:00
+@@ -121,14 +121,8 @@
+ [dependencies.colorchoice]
+ version = "1.0.0"
+ 
+-[dependencies.is_terminal_polyfill]
+-version = "1.48"
+-
+ [dependencies.utf8parse]
+ version = "0.2.2"
+-
+-[dev-dependencies.divan]
+-version = "0.1.16"
+ 
+ [dev-dependencies.lexopt]
+ version = "0.3.1"

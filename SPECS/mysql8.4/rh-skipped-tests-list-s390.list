@@ -1,0 +1,10 @@
+# Fails since 8.4
+perfschema.error_log                          : BUG#0
+test_services.test_event_tracking_consumer    : BUG#0
+
+# Unstable since 8.4
+innodb_undo.truncate_xa     : BUG#0
+x.result_types              : BUG#0
+
+# Times out since 8.4.7
+rpl_gtid.rpl_perfschema_applier_status_by_worker_gtid_skipped_transaction_mts   : BUG#0

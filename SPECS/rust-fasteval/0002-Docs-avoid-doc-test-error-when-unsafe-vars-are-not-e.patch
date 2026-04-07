@@ -1,0 +1,66 @@
+From b48b4a3899f4a5d0ba59973b5874dbf6322a323d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Zbigniew=20J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>
+Date: Wed, 17 Nov 2021 10:45:49 +0100
+Subject: [PATCH 2/3] Docs: avoid doc test error when unsafe-vars are not
+ enabled
+
+'cargo test --doc' would fail:
+---- src/slab.rs - slab::ParseSlab (line 164) stdout ----
+error[E0599]: no method named `add_unsafe_var` found for struct `ParseSlab` in the current scope
+  --> src/slab.rs:173:26
+   |
+11 |     unsafe { slab_mut.ps.add_unsafe_var("bad".to_string(), &bad); }  // `add_unsafe_var()` only exists if the `un...
+   |                          ^^^^^^^^^^^^^^ method not found in `ParseSlab`
+...
+
+I checked that with the doc comment added, 'cargo test --doc' and
+'cargo test --doc --features unsafe-vars' passes, the doc output looks unchanged,
+and then when an error is introduced in the docs (e.g. a typo), they fail as
+expected with '--features unsafe-vars'.
+---
+ src/lib.rs  | 3 +++
+ src/slab.rs | 3 +++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index 5c752533e8..ac012293f1 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -298,6 +298,8 @@
+ //! feature is not enabled by default because it slightly slows down other
+ //! non-variable operations.
+ //! ```
++//! # #[cfg(feature="unsafe-vars")]
++//! # {
+ //! use fasteval::Evaler;    // use this trait so we can call eval().
+ //! use fasteval::Compiler;  // use this trait so we can call compile().
+ //! fn main() -> Result<(), fasteval::Error> {
+@@ -327,6 +329,7 @@
+ //!
+ //!     Ok(())
+ //! }
++//! # }
+ //! ```
+ //!
+ //! ## Let's Develop an Intuition of `fasteval` Internals
+diff --git a/src/slab.rs b/src/slab.rs
+index 40fdb65037..628a5d805a 100644
+--- a/src/slab.rs
++++ b/src/slab.rs
+@@ -162,6 +162,8 @@ pub struct Slab {
+ /// Here is an example of correct and incorrect use of unsafe variable pointers:
+ ///
+ /// ```
++/// # #[cfg(feature="unsafe-vars")]
++/// # {
+ /// use fasteval::Evaler;    // use this trait so we can call eval().
+ /// use fasteval::Compiler;  // use this trait so we can call compile().
+ ///
+@@ -208,6 +210,7 @@ pub struct Slab {
+ ///
+ ///     Ok(())
+ /// }
++/// # }
+ /// 
+ /// ```
+ pub struct ParseSlab {

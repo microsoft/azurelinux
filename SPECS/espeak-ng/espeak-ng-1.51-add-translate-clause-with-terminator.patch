@@ -1,0 +1,304 @@
+diff --git a/src/libespeak-ng/speech.h b/src/libespeak-ng/speech.h
+index 31a7aa9..c9325df 100644
+--- a/src/libespeak-ng/speech.h
++++ b/src/libespeak-ng/speech.h
+@@ -23,6 +23,21 @@
+ #include <endian.h>               // for BYTE_ORDER, BIG_ENDIAN
+ #include <espeak-ng/espeak_ng.h>
+ 
++#if defined(__has_feature)
++#  if __has_feature(memory_sanitizer)
++#    include <sanitizer/msan_interface.h>
++#    define MAKE_MEM_UNDEFINED(addr, len) __msan_unpoison(addr, len)
++#  endif
++#endif
++
++#ifndef MAKE_MEM_UNDEFINED
++#  if __has_include(<valgrind/memcheck.h>)
++#    include <valgrind/memcheck.h>
++#    define MAKE_MEM_UNDEFINED(addr, len) VALGRIND_MAKE_MEM_UNDEFINED(addr, len)
++#  else
++#    define MAKE_MEM_UNDEFINED(addr, len) ((void) ((void) addr, len))
++#  endif
++#endif
+ 
+ #ifdef __cplusplus
+ extern "C"
+diff --git a/src/libespeak-ng/translate.c b/src/libespeak-ng/translate.c
+index 9cf9503..6d29dd5 100644
+--- a/src/libespeak-ng/translate.c
++++ b/src/libespeak-ng/translate.c
+@@ -42,7 +42,9 @@
+ #include "synthesize.h"           // for PHONEME_LIST2, N_PHONEME_LIST, PHON...
+ #include "ucd/ucd.h"              // for ucd_toupper
+ #include "voice.h"                // for voice, voice_t
++#include "speech.h"               // for MAKE_MEM_UNDEFINED
+ 
++static int CalcWordLength(int source_index, int charix_top, short int *charix, WORD_TAB *words, int word_count);
+ Translator *translator = NULL; // the main translator
+ Translator *translator2 = NULL; // secondary translator for certain words
+ static char translator2_language[20] = { 0 };
+@@ -1937,17 +1939,17 @@ static int UpperCaseInWord(Translator *tr, char *word, int c)
+ 	return 0;
+ }
+ 
+-void TranslateClause(Translator *tr, int *tone_out, char **voice_change)
++// Same as TranslateClause except we also get the clause terminator used (full stop, comma, etc.).
++// Used by espeak_TextToPhonemesWithTerminator.
++void TranslateClauseWithTerminator(Translator *tr, int *tone_out, char **voice_change, int *terminator_out)
+ {
+ 	int ix;
+ 	int c;
+ 	int cc = 0;
+ 	unsigned int source_index = 0;
+-	unsigned int prev_source_index = 0;
+ 	int source_index_word = 0;
+ 	int prev_in;
+ 	int prev_out = ' ';
+-	int prev_out2;
+ 	int prev_in_save = 0;
+ 	int next_in;
+ 	int next_in_nbytes;
+@@ -1987,6 +1989,8 @@ void TranslateClause(Translator *tr, int *tone_out, char **voice_change)
+ 	if (tr == NULL)
+ 		return;
+ 
++	MAKE_MEM_UNDEFINED(&voice_change_name, sizeof(voice_change_name));
++
+ 	embedded_ix = 0;
+ 	embedded_read = 0;
+ 	pre_pause = 0;
+@@ -1998,8 +2002,13 @@ void TranslateClause(Translator *tr, int *tone_out, char **voice_change)
+ 
+ 	for (ix = 0; ix < N_TR_SOURCE; ix++)
+ 		charix[ix] = 0;
++	MAKE_MEM_UNDEFINED(&source, sizeof(source));
+ 	terminator = ReadClause(tr, source, charix, &charix_top, N_TR_SOURCE, &tone, voice_change_name);
+ 
++	if (terminator_out != NULL) {
++		*terminator_out = terminator;
++	}
++
+ 	if (tone_out != NULL) {
+ 		if (tone == 0)
+ 			*tone_out = (terminator & CLAUSE_INTONATION_TYPE) >> 12; // tone type not overridden in ReadClause, use default
+@@ -2045,6 +2054,7 @@ void TranslateClause(Translator *tr, int *tone_out, char **voice_change)
+ 		}
+ 	}
+ 
++	MAKE_MEM_UNDEFINED(&ph_list2, sizeof(ph_list2));
+ 	memset(&ph_list2[0], 0, sizeof(ph_list2[0]));
+ 	ph_list2[0].phcode = phonPAUSE_SHORT;
+ 
+@@ -2073,16 +2083,9 @@ void TranslateClause(Translator *tr, int *tone_out, char **voice_change)
+ 	words[0].start = ix;
+ 	words[0].flags = 0;
+ 
+-	for (j = 0; charix[j] <= 0; j++) ;
+-	words[0].sourceix = charix[j];
+-	k = 0;
+-	while (charix[j] != 0) {
+-		// count the number of characters (excluding multibyte continuation bytes)
+-		if (charix[j++] != -1)
+-			k++;
+-	}
+-	words[0].length = k;
++	words[0].length = CalcWordLength(source_index, charix_top, charix, words, 0);
+ 
++	int prev_out2;
+ 	while (!finished && (ix < (int)sizeof(sbuf) - 1)) {
+ 		prev_out2 = prev_out;
+ 		utf8_in2(&prev_out, &sbuf[ix-1], 1);
+@@ -2098,7 +2101,7 @@ void TranslateClause(Translator *tr, int *tone_out, char **voice_change)
+ 		} else if (source_index > 0)
+ 			utf8_in2(&prev_in, &source[source_index-1], 1);
+ 
+-		prev_source_index = source_index;
++		unsigned int prev_source_index = source_index;
+ 
+ 		if (char_inserted) {
+ 			c = char_inserted;
+@@ -2107,12 +2110,15 @@ void TranslateClause(Translator *tr, int *tone_out, char **voice_change)
+ 			source_index += utf8_in(&cc, &source[source_index]);
+ 			c = cc;
+ 		}
+-		next_in_nbytes = utf8_in(&next_in, &source[source_index]);
+ 
+ 		if (c == 0) {
+ 			finished = true;
+ 			c = ' ';
++			next_in = ' ';
++			next_in_nbytes = 0;
+ 		}
++		else
++			next_in_nbytes = utf8_in(&next_in, &source[source_index]);
+ 
+ 		if (c == CTRL_EMBEDDED) {
+ 			// start of embedded command in the text
+@@ -2285,7 +2291,8 @@ void TranslateClause(Translator *tr, int *tone_out, char **voice_change)
+ 					} else {
+ 						if (iswlower(prev_in)) {
+ 							// lower case followed by upper case, possibly CamelCase
+-							if (UpperCaseInWord(tr, &sbuf[ix], c) == 0) { // start a new word
++							if ((prev_out != ' ') && UpperCaseInWord(tr, &sbuf[ix], c) == 0)
++							{ // start a new word
+ 								c = ' ';
+ 								space_inserted = true;
+ 								prev_in_save = c;
+@@ -2296,7 +2303,7 @@ void TranslateClause(Translator *tr, int *tone_out, char **voice_change)
+ 
+ 							if ((tr->translator_name == L('n', 'l')) && (letter_count == 2) && (c == 'j') && (prev_in == 'I')) {
+ 								// Dutch words may capitalise initial IJ, don't split
+-							} else if (IsAlpha(next2_in)) {
++							} else if ((prev_out != ' ') && IsAlpha(next2_in)) {
+ 								// changing from upper to lower case, start new word at the last uppercase, if 3 or more letters
+ 								c = ' ';
+ 								space_inserted = true;
+@@ -2455,16 +2462,7 @@ void TranslateClause(Translator *tr, int *tone_out, char **voice_change)
+ 				words[word_count].start = ix;
+ 				words[word_count].flags = 0;
+ 
+-				for (j = source_index; j < charix_top && charix[j] <= 0; j++) // skip blanks
+-					;
+-				words[word_count].sourceix = charix[j];
+-				k = 0;
+-				while (charix[j] != 0) {
+-					// count the number of characters (excluding multibyte continuation bytes)
+-					if (charix[j++] != -1)
+-						k++;
+-				}
+-				words[word_count].length = k;
++				words[word_count].length = CalcWordLength(source_index, charix_top, charix, words, word_count);
+ 
+ 				word_flags = next_word_flags;
+ 				next_word_flags = 0;
+@@ -2518,9 +2516,8 @@ void TranslateClause(Translator *tr, int *tone_out, char **voice_change)
+ 		int c_temp;
+ 		char *pn;
+ 		char *pw;
+-		int nw;
+ 		char number_buf[150];
+-		WORD_TAB num_wtab[50]; // copy of 'words', when splitting numbers into parts
++		WORD_TAB num_wtab[N_CLAUSE_WORDS]; // copy of 'words', when splitting numbers into parts
+ 
+ 		// start speaking at a specified word position in the text?
+ 		count_words++;
+@@ -2561,25 +2558,26 @@ void TranslateClause(Translator *tr, int *tone_out, char **voice_change)
+ 		for (n_digits = 0; iswdigit(word[n_digits]); n_digits++) // count consecutive digits
+ 			;
+ 
+-		if (n_digits > 4) {
++		if (n_digits > 4 && n_digits <= 32) {
+ 			// word is entirely digits, insert commas and break into 3 digit "words"
++			int nw = 0;
++
+ 			number_buf[0] = ' ';
+ 			number_buf[1] = ' ';
+ 			number_buf[2] = ' ';
+ 			pn = &number_buf[3];
+ 			nx = n_digits;
+-			nw = 0;
+ 
+ 			if ((n_digits > tr->langopts.max_digits) || (word[0] == '0'))
+ 				words[ix].flags |= FLAG_INDIVIDUAL_DIGITS;
+ 
+-			while (pn < &number_buf[sizeof(number_buf)-20]) {
++			while (pn < &number_buf[sizeof(number_buf)-20] && nw < N_CLAUSE_WORDS-2) {
+ 				if (!IsDigit09(c = *pw++) && (c != tr->langopts.decimal_sep))
+ 					break;
+ 
+ 				*pn++ = c;
+ 				nx--;
+-				if ((nx > 0) && (tr->langopts.break_numbers & (1 << nx))) {
++				if ((nx > 0) && (tr->langopts.break_numbers & (1U << nx))) {
+ 					memcpy(&num_wtab[nw++], &words[ix], sizeof(WORD_TAB)); // copy the 'words' entry for each word of numbers
+ 
+ 					if (tr->langopts.thousands_sep != ' ')
+@@ -2606,14 +2604,14 @@ void TranslateClause(Translator *tr, int *tone_out, char **voice_change)
+ 				num_wtab[j].flags &= ~(FLAG_MULTIPLE_SPACES | FLAG_EMBEDDED); // don't use these flags for subsequent parts when splitting a number
+ 
+ 			// include the next few characters, in case there are an ordinal indicator or other suffix
+-			memcpy(pn, pw, 16);
++			strncpy(pn, pw, 16);
+ 			pn[16] = 0;
+ 			nw = 0;
+ 
+-			for (pw = &number_buf[3]; pw < pn;) {
++			for (pw = &number_buf[3]; pw < pn && nw < N_CLAUSE_WORDS;) {
+ 				// keep wflags for each part, for FLAG_HYPHEN_AFTER
+ 				dict_flags = TranslateWord2(tr, pw, &num_wtab[nw++], words[ix].pre_pause);
+-				while (*pw++ != ' ')
++				while (pw < pn && *pw++ != ' ')
+ 					;
+ 				words[ix].pre_pause = 0;
+ 			}
+@@ -2631,10 +2629,10 @@ void TranslateClause(Translator *tr, int *tone_out, char **voice_change)
+ 				// redo the word, speaking single letters
+ 				for (pw = word; *pw != ' ';) {
+ 					memset(number_buf, 0, sizeof(number_buf));
+-					memset(number_buf, ' ', 9);
++					memset(number_buf+1, ' ', 9);
+ 					nx = utf8_in(&c_temp, pw);
+-					memcpy(&number_buf[2], pw, nx);
+-					TranslateWord2(tr, &number_buf[2], &words[ix], 0);
++					memcpy(&number_buf[3], pw, nx);
++					TranslateWord2(tr, &number_buf[3], &words[ix], 0);
+ 					pw += nx;
+ 				}
+ 			}
+@@ -2672,8 +2670,6 @@ void TranslateClause(Translator *tr, int *tone_out, char **voice_change)
+ 	}
+ 	n_ph_list2 += 2;
+ 
+-	if (count_words == 0)
+-		clause_pause = 0;
+ 	if (Eof() && ((word_count == 0) || (option_endpause == 0)))
+ 		clause_pause = 10;
+ 
+@@ -2687,8 +2683,6 @@ void TranslateClause(Translator *tr, int *tone_out, char **voice_change)
+ 		embedded_list[embedded_ix] = 0x80;
+ 	}
+ 
+-	prev_clause_pause = clause_pause;
+-
+ 	new_sentence = false;
+ 	if (terminator & CLAUSE_TYPE_SENTENCE)
+ 		new_sentence = true; // next clause is a new sentence
+@@ -2702,6 +2696,26 @@ void TranslateClause(Translator *tr, int *tone_out, char **voice_change)
+ 	}
+ }
+ 
++void TranslateClause(Translator *tr, int *tone_out, char **voice_change)
++{
++	TranslateClauseWithTerminator(tr, tone_out, voice_change, NULL);
++}
++
++static int CalcWordLength(int source_index, int charix_top, short int *charix, WORD_TAB *words, int word_count) {
++	int j;
++	int k;
++
++	for (j = source_index; j < charix_top && charix[j] <= 0; j++); // skip blanks
++	words[word_count].sourceix = charix[j];
++	k = 0;
++	while (charix[j] != 0) {
++		// count the number of characters (excluding multibyte continuation bytes)
++		if (charix[j++] != -1)
++			k++;
++	}
++	return k;
++	}
++
+ void InitText(int control)
+ {
+ 	count_sentences = 0;
+diff --git a/src/libespeak-ng/translate.h b/src/libespeak-ng/translate.h
+--- a/src/libespeak-ng/translate.h
++++ b/src/libespeak-ng/translate.h
+@@ -669,6 +669,7 @@ void print_dictionary_flags(unsigned int *flags, char *buf, int buf_len);
+ 
+ int TranslateWord(Translator *tr, char *word1, WORD_TAB *wtab, char *word_out);
+ void TranslateClause(Translator *tr, int *tone, char **voice_change);
++void TranslateClauseWithTerminator(Translator *tr, int *tone_out, char **voice_change, int *terminator_out);
+ 
+ void SetVoiceStack(espeak_VOICE *v, const char *variant_name);
+ 

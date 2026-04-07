@@ -1,0 +1,30 @@
+diff -up setserial-2.17/setserial.c.hayesesp setserial-2.17/setserial.c
+--- setserial-2.17/setserial.c.hayesesp	2010-02-15 12:20:59.104048442 +0000
++++ setserial-2.17/setserial.c	2010-02-15 12:21:42.368924088 +0000
+@@ -356,7 +356,7 @@ void set_multiport(char *device, int fd,
+ }
+ #endif
+ 
+-#ifdef TIOCGHAYESESP
++#if defined(TIOCGHAYESESP) && defined(HAVE_LINUX_HAYESESP_H)
+ void print_hayesesp(int fd)
+ {
+ 	struct hayes_esp_config esp;
+@@ -453,7 +453,7 @@ void get_serial(char *device)
+ 		print_flags(&serinfo, "\tFlags: ", "");
+ 		printf("\n\n");
+ 
+-#ifdef TIOCGHAYESESP
++#if defined(TIOCGHAYESESP) && defined(HAVE_LINUX_HAYESESP_H)
+ 		print_hayesesp(fd);
+ #endif
+ 	} else if (verbosity==0) {
+@@ -593,7 +593,7 @@ void set_serial(char *device, char ** ar
+ 			}
+ 			set_multiport(device, fd, &arg);
+ 			break;
+-#ifdef TIOCGHAYESESP
++#if defined(TIOCGHAYESESP) && defined(HAVE_LINUX_HAYESESP_H)
+ 		case CMD_RX_TRIG:
+ 		case CMD_TX_TRIG:
+ 		case CMD_FLOW_OFF:

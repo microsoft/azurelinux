@@ -1,0 +1,94 @@
+From db0736a6156fd5e6e81e9f654a81f8c03f683e04 Mon Sep 17 00:00:00 2001
+From: Edouard CHIN <chin.edouard@gmail.com>
+Date: Fri, 11 Apr 2025 00:45:52 +0200
+Subject: [PATCH] Fix `polymorphic_url` and `polymorphic_path`:
+
+- Fix #54890
+- ### Problem
+
+  Calling `polyphormic_url` in a integration test or anywhere else
+  when routes may not be loaded yet will result in either crashing
+  or returning a wrong url.
+
+  ### Details
+
+  When the routes are not yet loaded, any `resolve` routes are not
+  taken in consideration when calling `polymorphic_url`.
+
+  ```ruby
+  # config/routes.rb
+  resolve("Post") { "https://example.org" }
+
+  # test.rb
+  polymorphic_url(@post) # Crash: `post_url` is not defined.
+  ```
+
+  ### Solution
+
+  Load the routes when `polymorphic_mappings` ultimately gets called
+  by `polymorphic_url`
+  https://github.com/rails/rails/blob/42a71a03a0adb465dc49b4e21dec8e0ea29e8e35/actionpack/lib/action_dispatch/routing/polymorphic_routes.rb#L179
+
+  ### Side note
+
+  It's worth to note that `polymorphic_url` was overriden to
+  load the routes, but it only worked if one attempted to call it on
+  the singleton route's url_helpers:
+
+  ```ruby
+    class MyTest << ActionDispatch::IntegrationTest
+      test "example" do
+        # Works correctly on main
+        Rails.application.routes.url_helpers.polymorphic_url(@post)
+
+        # Does not work without this patch
+        polymorphic_url(@post)
+      end
+    end
+  ```
+
+  I removed the previous implementation because it was at the wrong
+  level.
+---
+ railties/test/engine/lazy_route_set_test.rb | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/railties/test/engine/lazy_route_set_test.rb b/railties/test/engine/lazy_route_set_test.rb
+index bed4fd3350c7b..a26d79bc75fa2 100644
+--- a/railties/test/engine/lazy_route_set_test.rb
++++ b/railties/test/engine/lazy_route_set_test.rb
+@@ -52,6 +52,26 @@ class UsersController < ActionController::Base
+         assert_equal(200, response.first)
+       end
+ 
++      test "app lazily loads routes when polymorphic_url is called" do
++        app_file "test/integration/my_test.rb", <<~RUBY
++          require "test_helper"
++
++          class MyTest < ActionDispatch::IntegrationTest
++            test "polymorphic_url works" do
++              puts polymorphic_url(Comment.new)
++            end
++          end
++        RUBY
++
++        app_file "app/models/comment.rb", <<~RUBY
++          class Comment
++          end
++        RUBY
++
++        output = rails("test", "test/integration/my_test.rb")
++        assert_match("https://example.org", output)
++      end
++
+       test "engine lazily loads routes when making a request" do
+         require "#{app_path}/config/environment"
+ 
+@@ -137,6 +157,7 @@ class User < ActiveRecord::Base
+ 
+               resources :products
+               resources :users, module: "rails/engine/lazy_route_set_test"
++              resolve("Comment") { "https://example.org" }
+ 
+               mount Plugin::Engine, at: "/plugin"
+             end

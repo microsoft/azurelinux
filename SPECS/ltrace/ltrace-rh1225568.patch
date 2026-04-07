@@ -1,0 +1,12 @@
+diff -Nrup a/testsuite/ltrace.minor/trace-irelative.exp b/testsuite/ltrace.minor/trace-irelative.exp
+--- a/testsuite/ltrace.minor/trace-irelative.exp	2013-11-04 18:08:03.000000000 -0700
++++ b/testsuite/ltrace.minor/trace-irelative.exp	2015-06-01 12:30:59.737371166 -0600
+@@ -54,6 +54,8 @@ set src [ltraceSource c {
+ }]
+ 
+ foreach ext {{} .pie} {
++	# ltrace does not yet support AARCH64's ifuncs
++	setup_xfail aarch64*-*-*
+ 	set bin1 [ltraceCompile $ext $src]
+ 	do_tests $bin1 ""
+ }

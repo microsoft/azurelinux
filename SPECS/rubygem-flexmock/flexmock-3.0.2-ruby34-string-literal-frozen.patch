@@ -1,0 +1,33 @@
+diff -urp '--exclude=*~' flexmock-3.0.2.orig/lib/flexmock/spy_describers.rb flexmock-3.0.2/lib/flexmock/spy_describers.rb
+--- flexmock-3.0.2.orig/lib/flexmock/spy_describers.rb	2025-08-13 16:49:42.102930421 +0900
++++ flexmock-3.0.2/lib/flexmock/spy_describers.rb	2025-08-13 16:56:27.493387656 +0900
+@@ -18,7 +18,7 @@ class FlexMock
+       end
+ 
+       def describe_spy(spy, sym, args, kw, options, not_clause="")
+-        result = "expected "
++        result = "expected ".dup
+         result << FlexMock.format_call(sym, args, kw)
+         result << " to#{not_clause} be received by " << spy.inspect
+         result << times_description(options[:times])
+@@ -29,7 +29,7 @@ class FlexMock
+       end
+ 
+       def describe_calls(spy)
+-        result = ''
++        result = ''.dup
+         if spy.flexmock_calls.empty?
+           result << "No messages have been received\n"
+         else
+diff -urp '--exclude=*~' flexmock-3.0.2.orig/test/container_methods_test.rb flexmock-3.0.2/test/container_methods_test.rb
+--- flexmock-3.0.2.orig/test/container_methods_test.rb	2025-08-13 16:49:41.505249913 +0900
++++ flexmock-3.0.2/test/container_methods_test.rb	2025-08-13 18:12:33.787388043 +0900
+@@ -112,7 +112,7 @@ class TestFlexmockContainerMethods < Min
+   end
+ 
+   def test_stubbing_a_string
+-    s = "hello"
++    s = "hello".dup
+     flexmock(:base, s, :length => 2)
+     assert_equal 2, s.length
+   end

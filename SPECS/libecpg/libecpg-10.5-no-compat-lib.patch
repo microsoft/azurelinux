@@ -1,0 +1,15 @@
+Nothing ever depended on libecpg_compat.so.3 in Fedora, so don't build
+it now, at least till somebody explicitly requests that.
+
+diff -ur postgresql-14.2_original/src/interfaces/ecpg/Makefile postgresql-14.2/src/interfaces/ecpg/Makefile
+--- postgresql-14.2_original/src/interfaces/ecpg/Makefile	2022-02-23 09:31:24.000000000 +0100
++++ postgresql-14.2/src/interfaces/ecpg/Makefile	2022-02-23 10:30:19.000000000 +0100
+@@ -2,7 +2,7 @@
+ top_builddir = ../../..
+ include $(top_builddir)/src/Makefile.global
+ 
+-SUBDIRS = include pgtypeslib ecpglib compatlib preproc
++SUBDIRS = include pgtypeslib ecpglib preproc
+ 
+ # Suppress parallel build of subdirectories to avoid a bug in GNU make 3.82, cf
+ # https://savannah.gnu.org/bugs/?30653

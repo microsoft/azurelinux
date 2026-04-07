@@ -1,0 +1,39 @@
+diff -rupN --no-dereference giflib-5.2.2/gif2rgb.c giflib-5.2.2-new/gif2rgb.c
+--- giflib-5.2.2/gif2rgb.c	2024-02-19 04:01:28.000000000 +0100
++++ giflib-5.2.2-new/gif2rgb.c	2025-04-15 16:56:27.228197561 +0200
+@@ -165,6 +165,8 @@ static void SaveGif(GifByteType *OutputB
+ 	/* Open stdout for the output file: */
+ 	if ((GifFile = EGifOpenFileHandle(1, &Error)) == NULL) {
+ 		PrintGifError(Error);
++		free(OutputBuffer);
++		GifFreeMapObject(OutputColorMap);
+ 		exit(EXIT_FAILURE);
+ 	}
+ 
+@@ -173,6 +175,8 @@ static void SaveGif(GifByteType *OutputB
+ 	    EGifPutImageDesc(GifFile, 0, 0, Width, Height, false, NULL) ==
+ 	        GIF_ERROR) {
+ 		PrintGifError(Error);
++		free(OutputBuffer);
++		GifFreeMapObject(OutputColorMap);
+ 		exit(EXIT_FAILURE);
+ 	}
+ 
+@@ -182,6 +186,8 @@ static void SaveGif(GifByteType *OutputB
+ 
+ 	for (i = 0; i < Height; i++) {
+ 		if (EGifPutLine(GifFile, Ptr, Width) == GIF_ERROR) {
++			free(OutputBuffer);
++			GifFreeMapObject(OutputColorMap);
+ 			exit(EXIT_FAILURE);
+ 		}
+ 		GifQprintf("\b\b\b\b%-4d", Height - i - 1);
+@@ -191,6 +197,8 @@ static void SaveGif(GifByteType *OutputB
+ 
+ 	if (EGifCloseFile(GifFile, &Error) == GIF_ERROR) {
+ 		PrintGifError(Error);
++		free(OutputBuffer);
++		GifFreeMapObject(OutputColorMap);
+ 		exit(EXIT_FAILURE);
+ 	}
+ }

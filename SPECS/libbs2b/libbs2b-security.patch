@@ -1,0 +1,11 @@
+--- libbs2b-3.1.0/src/bs2bconvert.c.orig	2014-05-20 23:09:11.975876646 +0100
++++ libbs2b-3.1.0/src/bs2bconvert.c	2014-05-20 23:14:06.047076693 +0100
+@@ -153,7 +153,7 @@
+ 	if( ( infile = sf_open( infilename, SFM_READ, &sfinfo ) ) == NULL )
+ 	{
+ 		printf( "Not able to open input file %s.\n", infilename );
+-		printf( sf_strerror( NULL ) );
++		printf( "%s", sf_strerror( NULL ) );
+ 		return 1;
+ 	}
+ 

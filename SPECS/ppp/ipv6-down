@@ -1,0 +1,14 @@
+#!/bin/sh
+#
+# ipv6-down
+#
+# Called by pppd after IPV6CP/down was finished
+#
+# This file should not be modified -- make local changes to
+# /etc/ppp/ipv6-down.local instead
+
+[ -f /etc/sysconfig/network-scripts/network-functions-ipv6 ] && /etc/ppp/ipv6-down.initscripts "$@"
+
+[ -x /etc/ppp/ipv6-down.local ] && /etc/ppp/ipv6-down.local "$@"
+
+exit 0

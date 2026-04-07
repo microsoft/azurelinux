@@ -1,0 +1,10 @@
+--- event-listener-strategy-0.5.4/Cargo.toml	1970-01-01T00:00:01+00:00
++++ event-listener-strategy-0.5.4/Cargo.toml	2025-04-28T21:14:05.418480+00:00
+@@ -47,7 +47,6 @@
+ 
+ [features]
+ default = ["std"]
+-loom = ["event-listener/loom"]
+ portable-atomic = ["event-listener/portable-atomic"]
+ std = ["event-listener/std"]
+ 

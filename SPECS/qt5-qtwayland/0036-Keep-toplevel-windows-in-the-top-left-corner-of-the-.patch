@@ -1,0 +1,90 @@
+From fbe5448167e97624b8c4a096729cf988f69d2cd8 Mon Sep 17 00:00:00 2001
+From: David Redondo <qt@david-redondo.de>
+Date: Wed, 8 Jun 2022 11:25:59 +0200
+Subject: [PATCH 36/55] Keep toplevel windows in the top left corner of the
+ screen
+
+We can't know the actual position of a window on the screen. This causes
+an issue when Widgets try to position a popup/menu absolutely and keep
+it on the screen when the screen geometry doesn't include (0,0).
+Instead report their positions always as the top left corner of
+the screen that they are on.
+This new behavior can be disabled for qt-shell or via an environment
+variable by users that rely on the old behavior.
+
+Fixes: QTBUG-85297
+Change-Id: Iacb91cb03a0df87af950115760d2f41124ac06a3
+Reviewed-by: Qt CI Bot <qt_ci_bot@qt-project.org>
+Reviewed-by: David Edmundson <davidedmundson@kde.org>
+Reviewed-by: Aleix Pol Gonzalez <aleixpol@kde.org>
+(cherry picked from commit a46795a22e05722917c6ebc60ed01bebf49898ae)
+---
+ src/client/qwaylandintegration.cpp |  3 +++
+ src/client/qwaylandwindow.cpp      | 14 +++++++++++++-
+ src/client/qwaylandwindow_p.h      |  3 +++
+ 3 files changed, 19 insertions(+), 1 deletion(-)
+
+diff --git a/src/client/qwaylandintegration.cpp b/src/client/qwaylandintegration.cpp
+index fbf00c6b..54861600 100644
+--- a/src/client/qwaylandintegration.cpp
++++ b/src/client/qwaylandintegration.cpp
+@@ -125,6 +125,9 @@ QWaylandIntegration::QWaylandIntegration()
+ #endif
+ 
+     reconfigureInputContext();
++
++    QWaylandWindow::fixedToplevelPositions =
++            !qEnvironmentVariableIsSet("QT_WAYLAND_DISABLE_FIXED_POSITIONS");
+ }
+ 
+ QWaylandIntegration::~QWaylandIntegration()
+diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
+index e5d1a97d..464441b1 100644
+--- a/src/client/qwaylandwindow.cpp
++++ b/src/client/qwaylandwindow.cpp
+@@ -350,8 +350,13 @@ void QWaylandWindow::setGeometry_helper(const QRect &rect)
+     }
+ }
+ 
+-void QWaylandWindow::setGeometry(const QRect &rect)
++void QWaylandWindow::setGeometry(const QRect &r)
+ {
++    auto rect = r;
++    if (fixedToplevelPositions && !QPlatformWindow::parent() && window()->type() != Qt::Popup
++        && window()->type() != Qt::ToolTip) {
++        rect.moveTo(screen()->geometry().topLeft());
++    }
+     setGeometry_helper(rect);
+ 
+     if (window()->isVisible() && rect.isValid()) {
+@@ -1033,6 +1038,13 @@ void QWaylandWindow::handleScreensChanged()
+ 
+     QWindowSystemInterface::handleWindowScreenChanged(window(), newScreen->QPlatformScreen::screen());
+     mLastReportedScreen = newScreen;
++    if (fixedToplevelPositions && !QPlatformWindow::parent() && window()->type() != Qt::Popup
++        && window()->type() != Qt::ToolTip
++        && geometry().topLeft() != newScreen->geometry().topLeft()) {
++        auto geometry = this->geometry();
++        geometry.moveTo(newScreen->geometry().topLeft());
++        setGeometry(geometry);
++    }
+ 
+     int scale = newScreen->isPlaceholder() ? 1 : static_cast<QWaylandScreen *>(newScreen)->scale();
+     if (scale != mScale) {
+diff --git a/src/client/qwaylandwindow_p.h b/src/client/qwaylandwindow_p.h
+index ea3d1995..487a91a6 100644
+--- a/src/client/qwaylandwindow_p.h
++++ b/src/client/qwaylandwindow_p.h
+@@ -98,6 +98,9 @@ public:
+     QWaylandWindow(QWindow *window, QWaylandDisplay *display);
+     ~QWaylandWindow() override;
+ 
++    // Keep Toplevels position on the top left corner of their screen
++    static inline bool fixedToplevelPositions = true;
++
+     virtual WindowType windowType() const = 0;
+     virtual void ensureSize();
+     WId winId() const override;
+-- 
+2.51.1
+

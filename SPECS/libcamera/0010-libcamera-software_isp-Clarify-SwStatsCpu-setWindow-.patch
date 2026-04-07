@@ -1,0 +1,75 @@
+From 77f25209928e65d2e4703457354d21193a79e81a Mon Sep 17 00:00:00 2001
+From: Milan Zamazal <mzamazal@redhat.com>
+Date: Thu, 25 Sep 2025 21:28:51 +0200
+Subject: [PATCH 10/15] libcamera: software_isp: Clarify SwStatsCpu::setWindow
+ use
+
+The window coordinates passed to SwStatsCpu::setWindow are confusing.
+Let's clarify what the coordinates should be.
+
+A source of confusion is that the specified window is relative to the
+processed area.  Debayering adjusts line pointers for its processed area
+and this is what's also passed to stats processing.  The window passed
+to SwStatsCpu::setWindow should either specify the size of the whole
+processed (not image) area, or its cropping in case the stats shouldn't
+be gathered over the whole processed area.  This patch should clarify
+this in the code.
+
+Reviewed-by: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
+Signed-off-by: Milan Zamazal <mzamazal@redhat.com>
+Signed-off-by: Hans de Goede <hansg@kernel.org>
+---
+ src/libcamera/software_isp/debayer_cpu.cpp |  6 +++++-
+ src/libcamera/software_isp/swstats_cpu.cpp | 19 +++++++++++++++++++
+ 2 files changed, 24 insertions(+), 1 deletion(-)
+
+diff --git a/src/libcamera/software_isp/debayer_cpu.cpp b/src/libcamera/software_isp/debayer_cpu.cpp
+index d5fd0ae73..9af146e67 100644
+--- a/src/libcamera/software_isp/debayer_cpu.cpp
++++ b/src/libcamera/software_isp/debayer_cpu.cpp
+@@ -554,7 +554,11 @@ int DebayerCpu::configure(const StreamConfiguration &inputCfg,
+ 	window_.width = outputCfg.size.width;
+ 	window_.height = outputCfg.size.height;
+ 
+-	/* Don't pass x,y since process() already adjusts src before passing it */
++	/*
++	 * Set the stats window to the whole processed window. Its coordinates are
++	 * relative to the debayered area since debayering passes only the part of
++	 * data to be processed to the stats; see SwStatsCpu::setWindow.
++	 */
+ 	stats_->setWindow(Rectangle(window_.size()));
+ 
+ 	/* pad with patternSize.Width on both left and right side */
+diff --git a/src/libcamera/software_isp/swstats_cpu.cpp b/src/libcamera/software_isp/swstats_cpu.cpp
+index 43d8d79e5..0c049b4c1 100644
+--- a/src/libcamera/software_isp/swstats_cpu.cpp
++++ b/src/libcamera/software_isp/swstats_cpu.cpp
+@@ -428,6 +428,25 @@ int SwStatsCpu::configure(const StreamConfiguration &inputCfg)
+ /**
+  * \brief Specify window coordinates over which to gather statistics
+  * \param[in] window The window object.
++ *
++ * This method specifies the image area over which to gather the statistics.
++ * It must be called to set the area, otherwise the default zero-sized
++ * \a Rectangle is used and no statistics is gathered.
++ *
++ * The specified \a window is relative to what is passed to processLine*
++ * methods. Typically, this means processLine* methods get only data from the
++ * processed area and \a window is \a Rectangle with (0, 0) top-left point and
++ * of the same size as the processed area. But if statistics is gathered only
++ * from some part of the image, e.g. its centre, \a window should specify such a
++ * restriction accordingly.
++ *
++ * It is the responsibility of the callers to provide sensible \a window values,
++ * most notably not exceeding the original image boundaries.
++ *
++ * The method may adjust the window slightly if it is not aligned according to
++ * the bayer pattern determined in \a SwStatsCpu::configure(). If that happens,
++ * it is guaranteed that non-negative top-left point coordinates remain
++ * non-negative and that the window width and height don't get enlarged.
+  */
+ void SwStatsCpu::setWindow(const Rectangle &window)
+ {
+-- 
+2.51.0
+

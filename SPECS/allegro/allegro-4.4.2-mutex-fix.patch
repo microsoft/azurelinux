@@ -1,0 +1,91 @@
+diff -up allegro-4.4.2/src/unix/uthreads.c~ allegro-4.4.2/src/unix/uthreads.c
+--- allegro-4.4.2/src/unix/uthreads.c~	2009-11-22 02:17:42.000000000 +0100
++++ allegro-4.4.2/src/unix/uthreads.c	2014-10-29 15:00:24.977558559 +0100
+@@ -303,32 +303,27 @@ struct bg_manager _bg_man_pthreads = {
+ 
+ 
+ 
+-/* custom mutex that supports nested locking */
+-struct my_mutex {
+-   int lock_count;                /* level of nested locking     */
+-   pthread_t owner;               /* thread which owns the mutex */
+-   pthread_mutex_t actual_mutex;  /* underlying mutex object     */
+-};
+-
+-
+-
+ /* _unix_create_mutex:
+  *  Creates a mutex and returns a pointer to it.
+  */
+ void *_unix_create_mutex(void)
+ {
+-   struct my_mutex *mx;
++   pthread_mutex_t *mx;
++   pthread_mutexattr_t attr;
+ 
+-   mx = _AL_MALLOC(sizeof(struct my_mutex));
++   mx = _AL_MALLOC(sizeof(pthread_mutex_t));
+    if (!mx) {
+       *allegro_errno = ENOMEM;
+       return NULL;
+    }
+ 
+-   mx->lock_count = 0;
+-   mx->owner = (pthread_t) 0;
++   pthread_mutexattr_init(&attr);
++   if (pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE) != 0)
++       abort(); /* XXX */
+ 
+-   pthread_mutex_init(&mx->actual_mutex, NULL);
++   pthread_mutex_init(mx, &attr);
++
++   pthread_mutexattr_destroy(&attr);
+ 
+    return (void *)mx;
+ }
+@@ -340,11 +335,8 @@ void *_unix_create_mutex(void)
+  */
+ void _unix_destroy_mutex(void *handle)
+ {
+-   struct my_mutex *mx = (struct my_mutex *)handle;
+-
+-   pthread_mutex_destroy(&mx->actual_mutex);
+-
+-   _AL_FREE(mx);
++   pthread_mutex_destroy(handle);
++   _AL_FREE(handle);
+ }
+ 
+ 
+@@ -354,14 +346,7 @@ void _unix_destroy_mutex(void *handle)
+  */
+ void _unix_lock_mutex(void *handle)
+ {
+-   struct my_mutex *mx = (struct my_mutex *)handle;
+-
+-   if (mx->owner != pthread_self()) {
+-      pthread_mutex_lock(&mx->actual_mutex);
+-      mx->owner = pthread_self();      
+-   }
+-
+-   mx->lock_count++;
++   pthread_mutex_lock(handle);
+ }
+ 
+ 
+@@ -371,14 +356,7 @@ void _unix_lock_mutex(void *handle)
+  */
+ void _unix_unlock_mutex(void *handle)
+ {
+-   struct my_mutex *mx = (struct my_mutex *)handle;
+-
+-   mx->lock_count--;
+-
+-   if (mx->lock_count == 0) {
+-      mx->owner = (pthread_t) 0;
+-      pthread_mutex_unlock(&mx->actual_mutex);
+-   }
++   pthread_mutex_unlock(handle);
+ }
+ 
+ #endif	/* ALLEGRO_HAVE_LIBPTHREAD */

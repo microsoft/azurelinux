@@ -1,0 +1,43 @@
+From 1471564f555a01e2beb6e8f54823df983b254019 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Thu, 6 Mar 2025 11:40:22 -0500
+Subject: [PATCH] Support testing with a system/external copy of GTest
+
+Adds a `SYSTEM_GTEST` CMake option, which remains disabled by default.
+This is useful for Linux distribution packagers who would prefer not to
+use the bundled copy.
+---
+ CMakeLists.txt            | 1 +
+ test/gtest/CMakeLists.txt | 8 ++++++--
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index fd3c963f..e6dede75 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -41,6 +41,7 @@ message(STATUS
+ include(CTest)
+ option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+ option(BUILD_TESTING "Enables integrated test suites" OFF)
++option(SYSTEM_GTEST "Use an external/system copy of GoogleTest" OFF)
+ 
+ if(DEFINED SIDX_BUILD_TESTS)
+   message(DEPRECATION "SIDX_BUILD_TESTS has been replaced with BUILD_TESTING")
+diff --git a/test/gtest/CMakeLists.txt b/test/gtest/CMakeLists.txt
+index dc3d8357..2e93d00d 100644
+--- a/test/gtest/CMakeLists.txt
++++ b/test/gtest/CMakeLists.txt
+@@ -1,7 +1,11 @@
+ set(GOOGLETEST_VERSION "1.14.0")
+ 
+-add_subdirectory(gtest-1.14.0)
+-include_directories(./gtest-1.14.0/include)
++if (SYSTEM_GTEST)
++    find_package(GTest REQUIRED)
++else()
++    add_subdirectory(gtest-1.14.0)
++    include_directories(./gtest-1.14.0/include)
++endif()
+ 
+ set(SOURCES
+     test.h

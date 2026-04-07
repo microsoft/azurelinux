@@ -1,0 +1,13 @@
+--- tracing-subscriber-0.3.20/Cargo.toml	1970-01-01T00:00:01+00:00
++++ tracing-subscriber-0.3.20/Cargo.toml	2025-09-01T17:37:48.048515+00:00
+@@ -97,10 +97,6 @@
+     "alloc",
+     "tracing-core/std",
+ ]
+-valuable = [
+-    "tracing-core/valuable",
+-    "tracing-serde/valuable",
+-]
+ 
+ [lib]
+ name = "tracing_subscriber"

@@ -1,0 +1,91 @@
+From 5beb3983942ce92ea18a2a0f2e15f84fb25c27d8 Mon Sep 17 00:00:00 2001
+From: xiphmont <xiphmont@0101bb08-14d6-0310-b084-bc0e0c8e3800>
+Date: Fri, 11 Jun 2010 15:42:00 +0000
+Subject: [PATCH] Add pkgconfig file to cdparanoia; closes Trac #1706
+
+git-svn-id: https://svn.xiph.org/trunk/cdparanoia@17289 0101bb08-14d6-0310-b084-bc0e0c8e3800
+---
+ Makefile.in        |  7 +++++--
+ cdparanoia-3.pc.in | 12 ++++++++++++
+ configure.in       |  5 ++++-
+ 3 files changed, 21 insertions(+), 3 deletions(-)
+ create mode 100644 cdparanoia-3.pc.in
+
+diff --git a/Makefile.in b/Makefile.in
+index 25c91ce..bfef153 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -3,7 +3,7 @@
+ # DO NOT EDIT BELOW! ##########################################################
+ # (unless, of course, you know what you are doing :) ##########################
+ 
+-VERSION=10.2
++VERSION=@VERSION@
+ VPATH=@srcdir@
+ srcdir=@srcdir@
+ 
+@@ -23,6 +23,7 @@ BINDIR=@bindir@
+ MANDIR=@mandir@
+ INCLUDEDIR=@includedir@
+ LIBDIR=@libdir@
++PKGCONFIGDIR=@libdir@/pkgconfig
+ PWD = $(shell pwd)
+ 
+ OFILES = main.o report.o header.o buffering_write.o cachetest.o
+@@ -85,6 +86,8 @@ install:
+ 		$(DESTDIR)$(LIBDIR)/libcdda_paranoia.so.0
+ 	ln -fs libcdda_paranoia.so.0.$(VERSION) \
+ 		$(DESTDIR)$(LIBDIR)/libcdda_paranoia.so
++	$(INSTALL) -d -m 0755 $(DESTDIR)$(PKGCONFIGDIR) 
++	$(INSTALL) -m 0644 $(srcdir)/cdparanoia-3.pc $(DESTDIR)$(PKGCONFIGDIR) 
+ 
+ cdparanoia:	$(OFILES) $(LIBDEP)
+ 		$(LD) $(CFLAGS) $(LDFLAGS) $(OFILES) \
+@@ -104,6 +107,6 @@ distclean:
+ 	cd interface && $(MAKE) distclean
+ 	cd paranoia && $(MAKE) distclean
+ 	-rm -f cdparanoia *~ config.* *.o *.wav *.aifc *.raw test.file \
+-		Makefile verify_test core gmon.out
++		Makefile verify_test core gmon.out cdparanoia-3.pc
+ 
+ .PHONY: all debug test lib slib install clean distclean
+diff --git a/cdparanoia-3.pc.in b/cdparanoia-3.pc.in
+new file mode 100644
+index 0000000..3a15099
+--- /dev/null
++++ b/cdparanoia-3.pc.in
+@@ -0,0 +1,12 @@
++prefix=@prefix@ 
++exec_prefix=@exec_prefix@ 
++libdir=@libdir@ 
++includedir=@includedir@ 
++
++Name: Cdparanoia III 
++Description: Compact Disc Digital Audio (CDDA) Digital Audio Extraction (DAE) library 
++Requires: 
++Version: @VERSION@ 
++Libs: -L${libdir} -lcdda_interface -lcdda_paranoia 
++Cflags: -I${includedir} 
++
+diff --git a/configure.in b/configure.in
+index 3ad98ca..3ae6989 100644
+--- a/configure.in
++++ b/configure.in
+@@ -1,5 +1,8 @@
+ AC_INIT(interface/interface.c)
+ 
++VERSION="10.2" 
++AC_SUBST(VERSION) 
++
+ AC_CANONICAL_HOST
+ 
+ if test -z "$CC"; then
+@@ -67,4 +70,4 @@ AC_SUBST(OPT)
+ AC_SUBST(DEBUG)
+ AC_SUBST(CC)
+ 
+-AC_OUTPUT(Makefile interface/Makefile paranoia/Makefile)
++AC_OUTPUT(Makefile interface/Makefile paranoia/Makefile cdparanoia-3.pc)
+-- 
+2.26.2
+

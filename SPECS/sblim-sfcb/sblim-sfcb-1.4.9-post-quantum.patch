@@ -1,0 +1,77 @@
+diff -up sblim-sfcb-1.4.9/control.c.orig sblim-sfcb-1.4.9/control.c
+--- sblim-sfcb-1.4.9/control.c.orig	2025-05-28 10:39:14.751599855 +0200
++++ sblim-sfcb-1.4.9/control.c	2025-06-12 10:20:43.025624410 +0200
+@@ -171,10 +171,12 @@ static Control init[] = {
+ 
+   {"sslKeyFilePath", CTL_STRING, SFCB_CONFDIR "/file.pem", {0}},
+   {"sslCertificateFilePath", CTL_STRING, SFCB_CONFDIR "/server.pem", {0}},
++  {"sslKeyFallbackFilePath", CTL_STRING, NULL, {0}},
++  {"sslCertificateFallbackFilePath", CTL_STRING, NULL, {0}},
+   {"sslCertList", CTL_STRING, SFCB_CONFDIR "/clist.pem", {0}},
+   {"sslCiphers", CTL_STRING, "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH", {0}},
+   {"sslDhParamsFilePath", CTL_STRING, NULL, {0}},
+-  {"sslEcDhCurveName", CTL_STRING, "secp384r1", {0}},
++  {"sslEcDhCurveName", CTL_STRING, NULL, {0}},
+   {"enableSslCipherServerPref", CTL_BOOL, NULL, {.b=0}},
+ 
+   {"registrationDir", CTL_STRING, SFCB_STATEDIR "/registration", {0}},
+diff -up sblim-sfcb-1.4.9/httpAdapter.c.orig sblim-sfcb-1.4.9/httpAdapter.c
+--- sblim-sfcb-1.4.9/httpAdapter.c.orig	2025-05-21 10:41:30.727123823 +0200
++++ sblim-sfcb-1.4.9/httpAdapter.c	2025-06-12 11:14:32.906455875 +0200
+@@ -2053,6 +2053,24 @@ initSSL()
+   _SFCB_TRACE(1, ("---  sslKeyFilePath = %s", fnk));
+   if (SSL_CTX_use_PrivateKey_file(ctx, fnk, SSL_FILETYPE_PEM) != 1)
+     intSSLerror("Error loading private key from file");
++
++  /*
++   *  Add fall back certificate/key pair
++   */
++  getControlChars("sslCertificateFallbackFilePath", &fnc);
++  if (fnc) {
++    _SFCB_TRACE(1, ("---  sslCertificateFallbackFilePath = %s", fnc));
++    if (SSL_CTX_use_certificate_chain_file(ctx, fnc) != 1)
++      intSSLerror("Error loading certificate fall back from file");
++  }
++
++  getControlChars("sslKeyFallbackFilePath", &fnk);
++  if (fnk) {
++    _SFCB_TRACE(1, ("---  sslKeyFallbackFilePath = %s", fnk));
++    if (SSL_CTX_use_PrivateKey_file(ctx, fnk, SSL_FILETYPE_PEM) != 1)
++      intSSLerror("Error loading private key fall back from file");
++  }
++
+   getControlChars("sslClientCertificate", &fnl);
+   _SFCB_TRACE(1, ("---  sslClientCertificate = %s", fnl));
+   getControlChars("sslCertList", &fcert);
+diff -up sblim-sfcb-1.4.9/sfcb.cfg.pre.in.orig sblim-sfcb-1.4.9/sfcb.cfg.pre.in
+--- sblim-sfcb-1.4.9/sfcb.cfg.pre.in.orig	2025-05-28 10:05:42.359932525 +0200
++++ sblim-sfcb-1.4.9/sfcb.cfg.pre.in	2025-06-12 11:23:37.424277273 +0200
+@@ -244,6 +244,15 @@ sslKeyFilePath: @sysconfdir@/sfcb/file.p
+ ## Default is @sysconfdir@/sfcb/server.pem
+ sslCertificateFilePath: @sysconfdir@/sfcb/server.pem
+ 
++## Filename containing the fall back private key for the server's fall back certificate.
++## The file  must be in PEM format and may not be passphrase-protected. The file is
++## relevant for both client connect and indications sent via https.
++#sslKeyFallbackFilePath: @sysconfdir@/sfcb/file-fallback.pem
++
++## Filename containing the server's fall back certificate. Must be in PEM format.
++## The file is relevant for both client connect and indications sent via https.
++#sslCertificateFallbackFilePath: @sysconfdir@/sfcb/server-fallback.pem
++
+ ## Filename containing list of certificates server accepts.
+ ## The file is relevant client connect only.
+ ## Default is @sysconfdir@/sfcb/clist.pem
+@@ -302,10 +311,10 @@ sslCiphers: ALL:!ADH:!LOW:!EXP:!MD5:@STR
+ ## Configure a curve name for ECDH ephemeral key generation. See man
+ ## SSL_CTX_set_tmp_ecdh(3) for details. The value should be a curve name
+ ## listed by the "openssl ecparam -list_curves" command in the SFCB runtime
+-## environment. If this value is not set, the indicated default is in effect.
++## environment. If this value is not set, ECDH ephemeral key generation is not used.
+ ## If the value is set but the curve name is not recognized by the underlying
+ ## openssl implementation, SFCB will abort.
+-## Default is secp384r1
++## Default is: not set
+ #sslEcDhCurveName: secp384r1
+ 
+ ## When set to true, sets the SSL_OP_CIPHER_SERVER_PREFERENCE flag for the ssl

@@ -1,0 +1,16 @@
+diff -u --recursive festival-vanilla/config/project.mak festival/config/project.mak
+--- festival-vanilla/config/project.mak	2017-12-25 10:05:54.000000000 -0500
++++ festival/config/project.mak	2018-08-29 21:30:11.714031729 -0400
+@@ -86,9 +86,9 @@
+ # Libraries used from other projects
+ 
+ REQUIRED_LIBRARIES = estools estbase eststring
+-REQUIRED_LIBRARY_DIR_estools = $(EST)/lib
+-REQUIRED_LIBRARY_DIR_estbase = $(EST)/lib
+-REQUIRED_LIBRARY_DIR_eststring = $(EST)/lib
++REQUIRED_LIBRARY_DIR_estools = $(LIBDIR)
++REQUIRED_LIBRARY_DIR_estbase = $(LIBDIR)
++REQUIRED_LIBRARY_DIR_eststring = $(LIBDIR)
+ 
+ REQUIRED_MAKE_INCLUDE = $(EST)/make.include
+ 

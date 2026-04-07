@@ -1,0 +1,131 @@
+diff --git a/match.c b/match.c
+index 6cd656f..4e569f5 100644
+--- a/match.c
++++ b/match.c
+@@ -190,10 +190,10 @@ char *___tmp_ptr;
+ 
+ #endif
+ 
+-static int recmatch(p, s, cs)
++static int recmatch(p, s, ci)
+ ZCONST char *p;         /* sh pattern to match */
+ ZCONST char *s;         /* string to match it to */
+-int cs;                 /* flag: force case-sensitive matching */
++int ci;                 /* flag: force case-insensitive matching */
+ /* Recursively compare the sh pattern p with the string s and return 1 if
+    they match, and 0 or 2 if they don't or if there is a syntax error in the
+    pattern.  This routine recurses on itself no deeper than the number of
+@@ -214,7 +214,7 @@ int cs;                 /* flag: force case-sensitive matching */
+   if (CLEN(p) == 2) {
+     if (CLEN(s) == 2) {
+       return (*p == *s && *(p+1) == *(s+1)) ?
+-        recmatch(p + 2, s + 2, cs) : 0;
++        recmatch(p + 2, s + 2, ci) : 0;
+     } else {
+       return 0;
+     }
+@@ -230,9 +230,9 @@ int cs;                 /* flag: force case-sensitive matching */
+   /* '?' (or '%' or '#') matches any character (but not an empty string) */
+   if (c == WILDCHR_SINGLE) {
+     if (wild_stop_at_dir)
+-      return (*s && *s != DIRSEP_CHR) ? recmatch(p, s + CLEN(s), cs) : 0;
++      return (*s && *s != DIRSEP_CHR) ? recmatch(p, s + CLEN(s), ci) : 0;
+     else
+-      return *s ? recmatch(p, s + CLEN(s), cs) : 0;
++      return *s ? recmatch(p, s + CLEN(s), ci) : 0;
+   }
+ 
+   /* WILDCHR_MULTI ('*') matches any number of characters, including zero */
+@@ -253,14 +253,14 @@ int cs;                 /* flag: force case-sensitive matching */
+ # endif /* ?AMIGA */
+         /* Single WILDCHR_MULTI ('*'): this doesn't match slashes */
+         for (; *s && *s != DIRSEP_CHR; INCSTR(s))
+-          if ((c = recmatch(p, s, cs)) != 0)
++          if ((c = recmatch(p, s, ci)) != 0)
+             return c;
+         /* end of pattern: matched if at end of string, else continue */
+         if (*p == 0)
+           return (*s == 0);
+         /* continue to match if at DIRSEP_CHR in pattern, else give up */
+         return (*p == DIRSEP_CHR || (*p == '\\' && p[1] == DIRSEP_CHR))
+-               ? recmatch(p, s, cs) : 2;
++               ? recmatch(p, s, ci) : 2;
+       }
+       /* Two consecutive WILDCHR_MULTI ("**"): this matches DIRSEP_CHR ('/') */
+       p++;        /* move p past the second WILDCHR_MULTI */
+@@ -308,17 +308,17 @@ int cs;                 /* flag: force case-sensitive matching */
+          */
+         if (q != srest)
+           return 0;
+-        return ((cs ? strcmp(p, q) : namecmp(p, q)) == 0);
++        return ((!ci ? strcmp(p, q) : namecmp(p, q)) == 0);
+       }
+ #else /* !_MBCS */
+-        return ((cs ? strcmp(p, srest) : namecmp(p, srest)) == 0);
++        return ((!ci ? strcmp(p, srest) : namecmp(p, srest)) == 0);
+ #endif /* ?_MBCS */
+     }
+     else
+     {
+       /* pattern contains more wildcards, continue with recursion... */
+       for (; *s; INCSTR(s))
+-        if ((c = recmatch(p, s, cs)) != 0)
++        if ((c = recmatch(p, s, ci)) != 0)
+           return c;
+       return 2;           /* 2 means give up--shmatch will return false */
+     }
+@@ -353,17 +353,17 @@ int cs;                 /* flag: force case-sensitive matching */
+         c = *(p-1);
+       else
+       {
+-        uch cc = (cs ? (uch)*s : case_map((uch)*s));
++        uch cc = (!ci ? (uch)*s : to_up((uch)*s));
+         uch uc = (uch) c;
+         if (*(p+1) != '-')
+           for (uc = uc ? uc : (uch)*p; uc <= (uch)*p; uc++)
+             /* compare range */
+-            if ((cs ? uc : case_map(uc)) == cc)
+-              return r ? 0 : recmatch(q + CLEN(q), s + CLEN(s), cs);
++            if ((!ci ? uc : to_up(uc)) == cc)
++              return r ? 0 : recmatch(q + CLEN(q), s + CLEN(s), ci);
+         c = e = 0;                      /* clear range, escape flags */
+       }
+     }
+-    return r ? recmatch(q + CLEN(q), s + CLEN(s), cs) : 0;
++    return r ? recmatch(q + CLEN(q), s + CLEN(s), ci) : 0;
+                                         /* bracket match failed */
+   }
+ #endif /* !VMS */
+@@ -382,18 +382,18 @@ int cs;                 /* flag: force case-sensitive matching */
+   {
+     /* Match "...]" with "]".  Continue after "]" in both. */
+     if ((*(p+ 2* CLEN( p)) == ']') && (*s == ']'))
+-      return recmatch( (p+ 3* CLEN( p)), (s+ CLEN( s)), cs);
++      return recmatch( (p+ 3* CLEN( p)), (s+ CLEN( s)), ci);
+ 
+     /* Else, look for a reduced match in s, until "]" in or end of s. */
+     for (; *s && (*s != ']'); INCSTR(s))
+       if (*s == '.')
+         /* If reduced match, then continue after "..." in p, "." in s. */
+-        if ((c = recmatch( (p+ CLEN( p)), s, cs)) != 0)
++        if ((c = recmatch( (p+ CLEN( p)), s, ci)) != 0)
+           return (int)c;
+ 
+     /* Match "...]" with "]".  Continue after "]" in both. */
+     if ((*(p+ 2* CLEN( p)) == ']') && (*s == ']'))
+-      return recmatch( (p+ 3* CLEN( p)), (s+ CLEN( s)), cs);
++      return recmatch( (p+ 3* CLEN( p)), (s+ CLEN( s)), ci);
+ 
+     /* No reduced match.  Quit. */
+     return 2;
+@@ -402,8 +402,8 @@ int cs;                 /* flag: force case-sensitive matching */
+ #endif /* def VMS */
+ 
+   /* Just a character--compare it */
+-  return (cs ? c == *s : case_map((uch)c) == case_map((uch)*s)) ?
+-          recmatch(p, s + CLEN(s), cs) : 0;
++  return (!ci ? c == *s : to_up((uch)c) == to_up((uch)*s)) ?
++          recmatch(p, s + CLEN(s), ci) : 0;
+ }
+ 
+ 

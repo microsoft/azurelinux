@@ -1,0 +1,160 @@
+--- EXAMPLE64/Makefile.orig	2015-04-29 02:32:29.000000000 +0200
++++ EXAMPLE64/Makefile	2016-03-29 14:49:09.238904138 +0200
+@@ -70,107 +70,107 @@
+ ZREPOBJS	= pzrepeat.o
+ ZSPMDOBJS       = pzspmd.o
+ 
+-pslinsol: $(SLINOBJS) ../lib/$(SUPERLULIB)
++pslinsol: $(SLINOBJS) ../lib/libsuperlumt64_s.so
+ 	$(LOADER) $(LOADOPTS) $(SLINOBJS) \
+-	../lib/$(SUPERLULIB) $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
++	../lib/libsuperlumt64_s.so $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
+ 
+-pslinsolx: pslinsolx.o ../lib/$(SUPERLULIB)
++pslinsolx: pslinsolx.o ../lib/libsuperlumt64_s.so
+ 	$(LOADER) $(LOADOPTS) pslinsolx.o \
+-	../lib/$(SUPERLULIB) $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
++	../lib/libsuperlumt64_s.so $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
+ 
+-pslinsolx1: pslinsolx1.o ../lib/$(SUPERLULIB)
++pslinsolx1: pslinsolx1.o ../lib/libsuperlumt64_s.so
+ 	$(LOADER) $(LOADOPTS) pslinsolx1.o \
+-	../lib/$(SUPERLULIB) $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
++	../lib/libsuperlumt64_s.so $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
+ 
+-pslinsolx2: pslinsolx2.o ../lib/$(SUPERLULIB)
++pslinsolx2: pslinsolx2.o ../lib/libsuperlumt64_s.so
+ 	$(LOADER) $(LOADOPTS) pslinsolx2.o \
+-	../lib/$(SUPERLULIB) $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
++	../lib/libsuperlumt64_s.so $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
+ 
+-psrepeat: $(SREPOBJS) ../lib/$(SUPERLULIB)
++psrepeat: $(SREPOBJS) ../lib/libsuperlumt64_s.so
+ 	$(LOADER) $(LOADOPTS) $(SREPOBJS) \
+-	../lib/$(SUPERLULIB) $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
++	../lib/libsuperlumt64_s.so $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
+ 
+-psspmd: $(SSPMDOBJS) ../lib/$(SUPERLULIB)
++psspmd: $(SSPMDOBJS) ../lib/libsuperlumt64_s.so
+ 	$(LOADER) $(LOADOPTS) $(SSPMDOBJS) \
+-	../lib/$(SUPERLULIB) $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
++	../lib/libsuperlumt64_s.so $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
+ 
+-pdlinsol: $(DLINOBJS) ../lib/$(SUPERLULIB)
++pdlinsol: $(DLINOBJS) ../lib/libsuperlumt64_d.so
+ 	$(LOADER) $(LOADOPTS) $(DLINOBJS) \
+-	../lib/$(SUPERLULIB) $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
++	../lib/libsuperlumt64_d.so $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
+ 
+-pdlinsolx: pdlinsolx.o ../lib/$(SUPERLULIB)
++pdlinsolx: pdlinsolx.o ../lib/libsuperlumt64_d.so
+ 	$(LOADER) $(LOADOPTS) pdlinsolx.o \
+-	../lib/$(SUPERLULIB) $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
++	../lib/libsuperlumt64_d.so $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
+ 
+-pdlinsolx1: pdlinsolx1.o ../lib/$(SUPERLULIB)
++pdlinsolx1: pdlinsolx1.o ../lib/libsuperlumt64_d.so
+ 	$(LOADER) $(LOADOPTS) pdlinsolx1.o \
+-	../lib/$(SUPERLULIB) $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
++	../lib/libsuperlumt64_d.so $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
+ 
+-pdlinsolx2: pdlinsolx2.o ../lib/$(SUPERLULIB)
++pdlinsolx2: pdlinsolx2.o ../lib/libsuperlumt64_d.so
+ 	$(LOADER) $(LOADOPTS) pdlinsolx2.o \
+-	../lib/$(SUPERLULIB) $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
++	../lib/libsuperlumt64_d.so $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
+ 
+-pdrepeat: $(DREPOBJS) ../lib/$(SUPERLULIB)
++pdrepeat: $(DREPOBJS) ../lib/libsuperlumt64_d.so
+ 	$(LOADER) $(LOADOPTS) $(DREPOBJS) \
+-	../lib/$(SUPERLULIB) $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
++	../lib/libsuperlumt64_d.so $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
+ 
+-pdspmd: $(DSPMDOBJS) ../lib/$(SUPERLULIB)
++pdspmd: $(DSPMDOBJS) ../lib/libsuperlumt64_d.so
+ 	$(LOADER) $(LOADOPTS) $(DSPMDOBJS) \
+-	../lib/$(SUPERLULIB) $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
++	../lib/libsuperlumt64_d.so $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
+ 
+-pclinsol: $(CLINOBJS) ../lib/$(SUPERLULIB)
++pclinsol: $(CLINOBJS) ../lib/libsuperlumt64_c.so
+ 	$(LOADER) $(LOADOPTS) $(CLINOBJS) \
+-	../lib/$(SUPERLULIB) $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
++	../lib/libsuperlumt64_c.so $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
+ 
+-pclinsolx: pclinsolx.o ../lib/$(SUPERLULIB)
++pclinsolx: pclinsolx.o ../lib/libsuperlumt64_c.so
+ 	$(LOADER) $(LOADOPTS) pclinsolx.o \
+-	../lib/$(SUPERLULIB) $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
++	../lib/libsuperlumt64_c.so $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
+ 
+-pclinsolx1: pclinsolx1.o ../lib/$(SUPERLULIB)
++pclinsolx1: pclinsolx1.o ../lib/libsuperlumt64_c.so
+ 	$(LOADER) $(LOADOPTS) pclinsolx1.o \
+-	../lib/$(SUPERLULIB) $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
++	../lib/libsuperlumt64_c.so $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
+ 
+-pclinsolx2: pclinsolx2.o ../lib/$(SUPERLULIB)
++pclinsolx2: pclinsolx2.o ../lib/libsuperlumt64_c.so
+ 	$(LOADER) $(LOADOPTS) pclinsolx2.o \
+-	../lib/$(SUPERLULIB) $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
++	../lib/libsuperlumt64_c.so $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
+ 
+-pcrepeat: $(CREPOBJS) ../lib/$(SUPERLULIB)
++pcrepeat: $(CREPOBJS) ../lib/libsuperlumt64_c.so
+ 	$(LOADER) $(LOADOPTS) $(CREPOBJS) \
+-	../lib/$(SUPERLULIB) $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
++	../lib/libsuperlumt64_c.so $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
+ 
+-pcspmd: $(CSPMDOBJS) ../lib/$(SUPERLULIB)
++pcspmd: $(CSPMDOBJS) ../lib/libsuperlumt64_c.so
+ 	$(LOADER) $(LOADOPTS) $(CSPMDOBJS) \
+-	../lib/$(SUPERLULIB) $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
++	../lib/libsuperlumt64_c.so $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
+ 
+-pzlinsol: $(ZLINOBJS) ../lib/$(SUPERLULIB)
++pzlinsol: $(ZLINOBJS) ../lib/libsuperlumt64_z.so
+ 	$(LOADER) $(LOADOPTS) $(ZLINOBJS) \
+-	../lib/$(SUPERLULIB) $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
++	../lib/libsuperlumt64_z.so $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
+ 
+-pzlinsolx: pzlinsolx.o ../lib/$(SUPERLULIB)
++pzlinsolx: pzlinsolx.o ../lib/libsuperlumt64_z.so
+ 	$(LOADER) $(LOADOPTS) pzlinsolx.o \
+-	../lib/$(SUPERLULIB) $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
++	../lib/libsuperlumt64_z.so $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
+ 
+-pzlinsolx1: pzlinsolx1.o ../lib/$(SUPERLULIB)
++pzlinsolx1: pzlinsolx1.o ../lib/libsuperlumt64_z.so
+ 	$(LOADER) $(LOADOPTS) pzlinsolx1.o \
+-	../lib/$(SUPERLULIB) $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
++	../lib/libsuperlumt64_z.so $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
+ 
+-pzlinsolx2: pzlinsolx2.o ../lib/$(SUPERLULIB)
++pzlinsolx2: pzlinsolx2.o ../lib/libsuperlumt64_z.so
+ 	$(LOADER) $(LOADOPTS) pzlinsolx2.o \
+-	../lib/$(SUPERLULIB) $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
++	../lib/libsuperlumt64_z.so $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
+ 
+-pzrepeat: $(ZREPOBJS) ../lib/$(SUPERLULIB)
++pzrepeat: $(ZREPOBJS) ../lib/libsuperlumt64_z.so
+ 	$(LOADER) $(LOADOPTS) $(ZREPOBJS) \
+-	../lib/$(SUPERLULIB) $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
++	../lib/libsuperlumt64_z.so $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
+ 
+-pzspmd: $(ZSPMDOBJS) ../lib/$(SUPERLULIB)
++pzspmd: $(ZSPMDOBJS) ../lib/libsuperlumt64_z.so
+ 	$(LOADER) $(LOADOPTS) $(ZSPMDOBJS) \
+-	../lib/$(SUPERLULIB) $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
++	../lib/libsuperlumt64_z.so $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@ $(VERBOSE)
+ 
+ F77EXM	= f77_main.o hbcode1.o c_bridge_pdgssv.o
+ 
+-f77exm: $(F77EXM) ../lib/$(SUPERLULIB)
++f77exm: $(F77EXM) ../lib/libsuperlumt64_s.so
+ 	$(FORTRAN) $(LOADOPTS) $(F77EXM) \
+-	../lib/$(SUPERLULIB) $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@
++	../lib/libsuperlumt64_s.so $(BLASLIB) $(MATHLIB) $(MPLIB) -o $@
+ 
+ .c.o:
+ 	$(CC) $(CFLAGS) $(CDEFS) -I$(HEADER) -c $< $(VERBOSE)

@@ -1,0 +1,56 @@
+Avoid implicit int declarations, a feature removed from C language with C99.
+
+Submitted upstream: <https://sourceforge.net/p/tix/bugs/112/>
+
+diff --git a/generic/tixDiImg.c b/generic/tixDiImg.c
+index da20d53c16cca3c7..3fb9f800fcd9e52a 100644
+--- a/generic/tixDiImg.c
++++ b/generic/tixDiImg.c
+@@ -352,6 +352,8 @@ Tix_ImageItemDisplay(drawable, iPtr, x, y, width, height, xOffset, yOffset,
+     int y;
+     int width;
+     int height;
++    int xOffset;
++    int yOffset;
+     int flags;
+ {
+     TixImageItem *itPtr = (TixImageItem *)iPtr;
+diff --git a/generic/tixDiWin.c b/generic/tixDiWin.c
+index e62529ecd19a9790..a96cd287e11c34e3 100644
+--- a/generic/tixDiWin.c
++++ b/generic/tixDiWin.c
+@@ -458,6 +458,8 @@ Tix_WindowItemDisplay(drawable, iPtr, x, y, width, height, xOffset, yOffset,
+     int y;
+     int width;
+     int height;
++    int xOffset;
++    int yOffset;
+     int flags;
+ {
+     TixWindowItem *itPtr = (TixWindowItem *)iPtr;
+diff --git a/generic/tixForm.c b/generic/tixForm.c
+index 5ab21f15a99bfde9..ba56617e436f748b 100644
+--- a/generic/tixForm.c
++++ b/generic/tixForm.c
+@@ -150,7 +150,7 @@ static Tcl_HashTable masterInfoHashTable;
+ /*
+  * Have static variables in this module been initialized?
+  */
+-static initialized = 0;
++static int initialized = 0;
+ 
+ static int ReqSize(tkwin, axis)
+     Tk_Window tkwin;
+diff --git a/unix/tixUnixMwm.c b/unix/tixUnixMwm.c
+index 3c4ac4d83bc51c80..02b58c16311b2c54 100644
+--- a/unix/tixUnixMwm.c
++++ b/unix/tixUnixMwm.c
+@@ -768,7 +768,7 @@ GetMwmInfo(interp, tkwin)
+     Tcl_Interp * interp;
+     Tk_Window tkwin;
+ {
+-    static inited = 0;
++    static int inited = 0;
+     Tcl_HashEntry *hashPtr;
+     int isNew;
+ 

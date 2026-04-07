@@ -1,0 +1,74 @@
+From 64b77176e7c9684ef3dcd772bd35615011aedddf Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Thu, 8 Aug 2024 17:18:57 +0200
+Subject: [PATCH] Fix invalid code block attributes in docstrings
+
+---
+ src/lib.rs | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index 642b731..a1b49d9 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -32,18 +32,18 @@
+ //!
+ //! Assumes the binary is `main`:
+ //!
+-//! ```{.bash}
++//! ```console
+ //! $ RUST_LOG=error ./main
+ //! [2017-11-09T02:12:24Z ERROR main] this is printed by default
+ //! ```
+ //!
+-//! ```{.bash}
++//! ```console
+ //! $ RUST_LOG=info ./main
+ //! [2017-11-09T02:12:24Z ERROR main] this is printed by default
+ //! [2017-11-09T02:12:24Z INFO main] the answer was: 12
+ //! ```
+ //!
+-//! ```{.bash}
++//! ```console
+ //! $ RUST_LOG=debug ./main
+ //! [2017-11-09T02:12:24Z DEBUG main] this is a debug message
+ //! [2017-11-09T02:12:24Z ERROR main] this is printed by default
+@@ -52,7 +52,7 @@
+ //!
+ //! You can also set the log level on a per module basis:
+ //!
+-//! ```{.bash}
++//! ```console
+ //! $ RUST_LOG=main=info ./main
+ //! [2017-11-09T02:12:24Z ERROR main] this is printed by default
+ //! [2017-11-09T02:12:24Z INFO main] the answer was: 12
+@@ -60,7 +60,7 @@
+ //!
+ //! And enable all logging:
+ //!
+-//! ```{.bash}
++//! ```console
+ //! $ RUST_LOG=main ./main
+ //! [2017-11-09T02:12:24Z DEBUG main] this is a debug message
+ //! [2017-11-09T02:12:24Z ERROR main] this is printed by default
+@@ -70,7 +70,7 @@
+ //! If the binary name contains hyphens, you will need to replace
+ //! them with underscores:
+ //!
+-//! ```{.bash}
++//! ```console
+ //! $ RUST_LOG=my_app ./my-app
+ //! [2017-11-09T02:12:24Z DEBUG my_app] this is a debug message
+ //! [2017-11-09T02:12:24Z ERROR my_app] this is printed by default
+@@ -92,7 +92,7 @@
+ //! value of this environment variable is a comma-separated list of *logging
+ //! directives*. A logging directive is of the form:
+ //!
+-//! ```text
++//! ```console
+ //! example::log::target=level
+ //! ```
+ //!
+-- 
+2.46.0
+

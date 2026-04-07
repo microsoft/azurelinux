@@ -1,0 +1,23 @@
+[Unit]
+Description=Unbound recursive Domain Name Server
+After=network.target
+# Use ip-freebind: yes or add After=network-online.target, rhbz#2338429,
+# if interface: specifies exact address, not localhost nor wildcard
+#After=network-online.target
+After=unbound-keygen.service
+Wants=unbound-keygen.service
+After=unbound-anchor.service
+Wants=unbound-anchor.service
+Before=nss-lookup.target
+Wants=nss-lookup.target
+
+[Service]
+Type=notify
+EnvironmentFile=-/etc/sysconfig/unbound
+ExecStartPre=/usr/sbin/unbound-checkconf
+ExecStart=/usr/sbin/unbound -d $UNBOUND_OPTIONS
+ExecReload=/usr/sbin/unbound-control reload
+Restart=on-abnormal
+
+[Install]
+WantedBy=multi-user.target

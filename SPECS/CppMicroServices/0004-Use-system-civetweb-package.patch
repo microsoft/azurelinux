@@ -1,0 +1,166 @@
+From 5a937b6536d4ff66e327ee37cc5c9e3dd1b3c77d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Mon, 15 Jan 2024 19:24:16 +0000
+Subject: [PATCH 04/12] Use system civetweb package
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ httpservice/CMakeLists.txt                 | 25 +++-------------------
+ httpservice/src/HttpOutputStreamBuffer.cpp |  2 +-
+ httpservice/src/HttpServletRequest.cpp     |  4 ++--
+ httpservice/src/HttpServletResponse.cpp    |  2 +-
+ httpservice/src/ServletContainer.cpp       | 14 +++++++-----
+ 5 files changed, 16 insertions(+), 31 deletions(-)
+
+diff --git a/httpservice/CMakeLists.txt b/httpservice/CMakeLists.txt
+index 2c6b8133..7113ae68 100644
+--- a/httpservice/CMakeLists.txt
++++ b/httpservice/CMakeLists.txt
+@@ -1,7 +1,4 @@
+ set(_srcs
+-  ../third_party/civetweb/civetweb.c
+-  ../third_party/civetweb/CivetServer.cpp
+-
+   src/HttpConstants.cpp
+   src/HttpServlet.cpp
+   src/ServletContainer.cpp
+@@ -12,18 +9,6 @@ set(_srcs
+   src/ServletConfig.cpp
+ )
+ 
+-if(MSVC)
+-  set_property(
+-    SOURCE ../third_party/civetweb/civetweb.c APPEND_STRING
+-    PROPERTY COMPILE_FLAGS " /wd4267 /wd4311 /wd4312 /wd4996"
+-  )
+-else()
+-  set_property(
+-    SOURCE ../third_party/civetweb/CivetServer.cpp APPEND_STRING
+-    PROPERTY COMPILE_FLAGS " -Wno-old-style-cast"
+-  )
+-endif()
+-
+ set(_private_headers
+   src/HttpOutputStreamBuffer.h
+   src/HttpServletPrivate.h
+@@ -52,15 +37,9 @@ elseif(APPLE)
+   list(APPEND compile_definitions DARWIN)
+ endif()
+ 
+-set_property(SOURCE src/civetweb/civetweb.c src/civetweb/CivetServer.cpp
+-  APPEND PROPERTY COMPILE_DEFINITIONS ${compile_definitions})
+-set_property(SOURCE src/civetweb/civetweb.c src/civetweb/CivetServer.cpp
+-  APPEND PROPERTY COMPILE_DEFINITIONS_DEBUG DEBUG_ENABLED)
+-set_property(SOURCE src/civetweb/civetweb.c src/civetweb/CivetServer.cpp
+-  APPEND PROPERTY COMPILE_DEFINITIONS_RELEASE NDEBUG)
+-
+ set(THREADS_PREFER_PTHREAD_FLAG 1)
+ find_package(Threads REQUIRED)
++find_package(civetweb REQUIRED)
+ 
+ usMacroCreateBundle(HttpService
+   VERSION "0.1.0"
+@@ -76,6 +55,8 @@ if(CMAKE_THREAD_LIBS_INIT)
+   target_link_libraries(usHttpService PRIVATE ${CMAKE_THREAD_LIBS_INIT})
+ endif()
+ 
++target_link_libraries(usHttpService PRIVATE civetweb::civetweb-cpp)
++
+ if(MINGW)
+   target_link_libraries(usHttpService PRIVATE Ws2_32)
+ endif()
+diff --git a/httpservice/src/HttpOutputStreamBuffer.cpp b/httpservice/src/HttpOutputStreamBuffer.cpp
+index 45666ca4..61e981ea 100644
+--- a/httpservice/src/HttpOutputStreamBuffer.cpp
++++ b/httpservice/src/HttpOutputStreamBuffer.cpp
+@@ -24,7 +24,7 @@
+ 
+ #include "HttpServletResponsePrivate.h"
+ 
+-#include "civetweb/civetweb.h"
++#include "civetweb.h"
+ 
+ #include <cassert>
+ #include <functional>
+diff --git a/httpservice/src/HttpServletRequest.cpp b/httpservice/src/HttpServletRequest.cpp
+index 62233a58..8a7851bc 100644
+--- a/httpservice/src/HttpServletRequest.cpp
++++ b/httpservice/src/HttpServletRequest.cpp
+@@ -25,7 +25,7 @@
+ 
+ #include "cppmicroservices/httpservice/ServletContext.h"
+ 
+-#include "civetweb/civetweb.h"
++#include "civetweb.h"
+ 
+ #include <cassert>
+ #include <cstring>
+@@ -86,7 +86,7 @@ namespace cppmicroservices
+         }
+ 
+         // get the uri
+-        std::string uri = mg_get_request_info(m_Connection)->uri;
++        std::string uri = mg_get_request_info(m_Connection)->local_uri;
+         pos = uri.find_first_of('?');
+         m_Uri = uri.substr(0, pos);
+ 
+diff --git a/httpservice/src/HttpServletResponse.cpp b/httpservice/src/HttpServletResponse.cpp
+index 5f83901d..55830307 100644
+--- a/httpservice/src/HttpServletResponse.cpp
++++ b/httpservice/src/HttpServletResponse.cpp
+@@ -26,7 +26,7 @@
+ #include "cppmicroservices/httpservice/HttpServletRequest.h"
+ #include "cppmicroservices/httpservice/ServletContext.h"
+ 
+-#include "civetweb/civetweb.h"
++#include "civetweb.h"
+ 
+ #include <ctime>
+ #include <memory>
+diff --git a/httpservice/src/ServletContainer.cpp b/httpservice/src/ServletContainer.cpp
+index 820a98ed..86d64aad 100644
+--- a/httpservice/src/ServletContainer.cpp
++++ b/httpservice/src/ServletContainer.cpp
+@@ -37,7 +37,7 @@
+ #include "cppmicroservices/Bundle.h"
+ #include "cppmicroservices/BundleContext.h"
+ 
+-#include "civetweb/CivetServer.h"
++#include "CivetServer.h"
+ 
+ #include <cassert>
+ #include <memory>
+@@ -141,8 +141,8 @@ namespace cppmicroservices
+     void
+     ServletContainerPrivate::Start()
+     {
+-        int port = 0;
+-        int sslPort = 0;
++        struct mg_server_ports portinfo[4];
++        int nports;
+         {
+             Lock l(m_Mutex);
+             US_UNUSED(l);
+@@ -157,10 +157,14 @@ namespace cppmicroservices
+                 m_Server.reset();
+                 return;
+             }
+-            mg_get_ports(serverContext, 1, &port, &sslPort);
++            nports = mg_get_server_ports(serverContext, 4, portinfo);
+         }
+ 
+-        std::cout << "Servlet Container listening on http://localhost:" << port << std::endl;
++        for (int i = 0; i < nports; i++) {
++          std::cout << "Servlet Container listening on " <<
++            (portinfo[i].is_ssl ? "https": "http") << "://localhost:" <<
++            portinfo[i].port << std::endl;
++        }
+         m_ServletTracker.Open();
+     }
+ 
+-- 
+2.48.1
+

@@ -1,0 +1,55 @@
+From 28333f1dfe68b0ffc80c2a4799759587b4c32d3e Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:28 +0200
+Subject: [PATCH 04/50] openssh-6.6p1-allow-ip-opts
+
+---
+ sshd-session.c | 32 ++++++++++++++++++++++++++------
+ 1 file changed, 26 insertions(+), 6 deletions(-)
+
+diff --git a/sshd-session.c b/sshd-session.c
+index 4a148db4..a365f26f 100644
+--- a/sshd-session.c
++++ b/sshd-session.c
+@@ -778,12 +778,32 @@ check_ip_options(struct ssh *ssh)
+ 
+ 	if (getsockopt(sock_in, IPPROTO_IP, IP_OPTIONS, opts,
+ 	    &option_size) >= 0 && option_size != 0) {
+-		text[0] = '\0';
+-		for (i = 0; i < option_size; i++)
+-			snprintf(text + i*3, sizeof(text) - i*3,
+-			    " %2.2x", opts[i]);
+-		fatal("Connection from %.100s port %d with IP opts: %.800s",
+-		    ssh_remote_ipaddr(ssh), ssh_remote_port(ssh), text);
++		i = 0;
++		do {
++			switch (opts[i]) {
++				case 0:
++				case 1:
++					++i;
++					break;
++				case 130:
++				case 133:
++				case 134:
++					if (i + 1 < option_size && opts[i + 1] >= 2) {
++						i += opts[i + 1];
++						break;
++					}
++					/* FALLTHROUGH */
++				default:
++				/* Fail, fatally, if we detect either loose or strict
++			 	 * or incorrect source routing options. */
++					text[0] = '\0';
++					for (i = 0; i < option_size; i++)
++						snprintf(text + i*3, sizeof(text) - i*3,
++							" %2.2x", opts[i]);
++					fatal("Connection from %.100s port %d with IP options:%.800s",
++						ssh_remote_ipaddr(ssh), ssh_remote_port(ssh), text);
++			}
++		} while (i < option_size);
+ 	}
+ #endif /* IP_OPTIONS */
+ }
+-- 
+2.49.0
+

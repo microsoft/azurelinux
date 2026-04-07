@@ -1,0 +1,135 @@
+--- netkit-ftp-0.17/ftp/ftp.c.rasold	2005-08-22 14:22:50.000000000 +0200
++++ netkit-ftp-0.17/ftp/ftp.c	2005-08-22 14:23:02.000000000 +0200
+@@ -139,7 +139,7 @@
+ static char *gunique(char *);
+ static void proxtrans(const char *cmd, char *local, char *remote);
+ static int initconn(void);
+-static void ptransfer(const char *direction, long bytes, 
++static void ptransfer(const char *direction, long long bytes, 
+ 		      const struct timeval *t0, 
+ 		      const struct timeval *t1);
+ static void tvsub(struct timeval *tdiff, 
+@@ -579,7 +579,7 @@
+ 	int (*volatile closefunc)(FILE *);
+ 	void (*volatile oldintr)(int);
+ 	void (*volatile oldintp)(int);
+-	volatile long bytes = 0, hashbytes = HASHBYTES;
++	volatile long long bytes = 0, hashbytes = HASHBYTES;
+ 	char buf[BUFSIZ], *bufp;
+ 	const char *volatile lmode;
+ 
+@@ -713,14 +713,14 @@
+ 				if ((d = write(fileno(dout), bufp, c)) <= 0)
+ 					break;
+ 			if (hash) {
+-				while (bytes >= hashbytes) {
+-					(void) putchar('#');
+-					hashbytes += HASHBYTES;
+-				}
+-				(void) fflush(stdout);
+-			}
++				while (bytes >= hashbytes) {        /* <-- 'long long' signed overflow is  */
++					(void) putchar('#');        /* possible. In this case, we can      */
++					hashbytes += HASHBYTES;     /* 'cycle' there for very long time.   */
++				}                                   /* Search 'hasbytes' in file down,     */
++				(void) fflush(stdout);              /* there are similar parts.            */
++			}                                           /*           <praszyk@redhat.com>      */
+ 			if (tick && (bytes >= hashbytes)) {
+-				printf("\rBytes transferred: %ld", bytes);
++				printf("\rBytes transferred: %lld", bytes);
+ 				(void) fflush(stdout);
+ 				while (bytes >= hashbytes)
+ 					hashbytes += TICKBYTES;
+@@ -733,7 +733,7 @@
+ 			(void) fflush(stdout);
+ 		}
+ 		if (tick) {
+-			(void) printf("\rBytes transferred: %ld\n", bytes);
++			(void) printf("\rBytes transferred: %lld\n", bytes);
+ 			(void) fflush(stdout);
+ 		}
+ 		if (c < 0)
+@@ -755,7 +755,7 @@
+ 					hashbytes += HASHBYTES;
+ 				}
+ 				if (tick && (bytes >= hashbytes)) {
+-					(void) printf("\rBytes transferred: %ld",
++					(void) printf("\rBytes transferred: %lld",
+ 						bytes);
+ 					(void) fflush(stdout);
+ 					while (bytes >= hashbytes)
+@@ -780,7 +780,7 @@
+ 			(void) fflush(stdout);
+ 		}
+ 		if (tick) {
+-			(void) printf("\rBytes transferred: %ld\n", bytes);
++			(void) printf("\rBytes transferred: %lld\n", bytes);
+ 			(void) fflush(stdout);
+ 		}
+ 		if (ferror(fin))
+@@ -853,9 +853,9 @@
+ 	void (*volatile oldintp)(int);
+ 	void (*volatile oldintr)(int);
+ 	volatile int is_retr, tcrflag, bare_lfs = 0;
+-	static unsigned bufsize;
++	static unsigned bufsize=0;
+ 	static char *buf;
+-	volatile long bytes = 0, hashbytes = HASHBYTES;
++	volatile long long bytes = 0, hashbytes = HASHBYTES;
+ 	register int c, d;
+ 	struct timeval start, stop;
+ 	struct stat st;
+@@ -1031,7 +1031,7 @@
+ 				(void) fflush(stdout);
+ 			}
+ 			if (tick && (bytes >= hashbytes) && is_retr) {
+-				(void) printf("\rBytes transferred: %ld",
++				(void) printf("\rBytes transferred: %lld",
+ 					bytes);
+ 				(void) fflush(stdout);
+ 				while (bytes >= hashbytes)
+@@ -1045,7 +1045,7 @@
+ 			(void) fflush(stdout);
+ 		}
+ 		if (tick && is_retr) {
+-			(void) printf("\rBytes transferred: %ld\n", bytes);
++			(void) printf("\rBytes transferred: %lld\n", bytes);
+ 			(void) fflush(stdout);
+ 		}
+ 		if (c < 0) {
+@@ -1095,7 +1095,7 @@
+ 					hashbytes += HASHBYTES;
+ 				}
+ 				if (tick && (bytes >= hashbytes) && is_retr) {
+-					printf("\rBytes transferred: %ld",
++					printf("\rBytes transferred: %lld",
+ 						bytes);
+ 					fflush(stdout);
+ 					while (bytes >= hashbytes)
+@@ -1126,7 +1126,7 @@
+ 			(void) fflush(stdout);
+ 		}
+ 		if (tick && is_retr) {
+-			(void) printf("\rBytes transferred: %ld\n", bytes);
++			(void) printf("\rBytes transferred: %lld\n", bytes);
+ 			(void) fflush(stdout);
+ 		}
+ 		if (bare_lfs) {
+@@ -1540,7 +1540,7 @@
+ }
+ 
+ static void
+-ptransfer(const char *direction, long bytes, 
++ptransfer(const char *direction, long long bytes, 
+ 	  const struct timeval *t0, 
+ 	  const struct timeval *t1)
+ {
+@@ -1552,7 +1552,7 @@
+ 		s = td.tv_sec + (td.tv_usec / 1000000.);
+ #define	nz(x)	((x) == 0 ? 1 : (x))
+ 		bs = bytes / nz(s);
+-		printf("%ld bytes %s in %.3g secs (%.2g Kbytes/sec)\n",
++		printf("%lld bytes %s in %.3g secs (%.2g Kbytes/sec)\n",
+ 		    bytes, direction, s, bs / 1024.0);
+ 	}
+ }

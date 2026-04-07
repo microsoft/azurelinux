@@ -1,0 +1,15 @@
+diff -ur pandas-datareader-0.10.0/versioneer.py pandas-datareader-0.10.0.vn/versioneer.py
+--- pandas-datareader-0.10.0/versioneer.py	2020-07-07 11:56:46.000000000 +0200
++++ pandas-datareader-0.10.0.vn/versioneer.py	2023-07-10 12:50:51.047863256 +0200
+@@ -344,9 +344,9 @@
+     # configparser.NoOptionError (if it lacks "VCS="). See the docstring at
+     # the top of versioneer.py for instructions on writing your setup.cfg .
+     setup_cfg = os.path.join(root, "setup.cfg")
+-    parser = configparser.SafeConfigParser()
++    parser = configparser.ConfigParser()
+     with open(setup_cfg, "r") as f:
+-        parser.readfp(f)
++        parser.read_file(f)
+     VCS = parser.get("versioneer", "VCS")  # mandatory
+ 
+     def get(parser, name):

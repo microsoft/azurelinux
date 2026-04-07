@@ -1,0 +1,11 @@
+diff -ruN django-configurations-2.5.1/setup.py django-configurations-2.5.1-mod/setup.py
+--- django-configurations-2.5.1/setup.py	2023-11-30 13:00:33.000000000 +0300
++++ django-configurations-2.5.1-mod/setup.py	2025-06-22 14:31:32.341471612 +0300
+@@ -40,6 +40,7 @@
+         'search': ['dj-search-url'],
+         'testing': [
+             'django-cache-url>=1.0.0',
++            'django-redis',
+             'dj-database-url',
+             'dj-email-url',
+             'dj-search-url',

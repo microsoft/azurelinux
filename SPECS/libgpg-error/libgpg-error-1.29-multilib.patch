@@ -1,0 +1,122 @@
+diff -up libgpg-error-1.29/configure.ac.multilib libgpg-error-1.29/configure.ac
+--- libgpg-error-1.29/configure.ac.multilib	2018-04-11 14:41:10.479019981 +0200
++++ libgpg-error-1.29/configure.ac	2018-04-11 14:43:31.288394113 +0200
+@@ -215,13 +215,13 @@ GNUPG_FUNC_MKDIR_TAKES_ONE_ARG
+ 
+ 
+ # Find a 64 bit integer type to be used instead of off_t.  We prefer
+-# the standard integer types over int64_t and finally try long long.
+-if test "$ac_cv_sizeof_int" = "8"; then
++# int64_t and finally try long long.
++if test "$ac_cv_header_stdint_h" = yes; then
++   replacement_for_off_t="int64_t"
++elif test "$ac_cv_sizeof_int" = "8"; then
+    replacement_for_off_t="int"
+ elif test "$ac_cv_sizeof_long" = "8"; then
+    replacement_for_off_t="long"
+-elif test "$ac_cv_header_stdint_h" = yes; then
+-   replacement_for_off_t="int64_t"
+ elif test "$ac_cv_sizeof_long_long" = "8"; then
+    replacement_for_off_t="long long"
+ else
+diff -up libgpg-error-1.29/configure.multilib libgpg-error-1.29/configure
+--- libgpg-error-1.29/configure.multilib	2018-04-11 09:34:30.000000000 +0200
++++ libgpg-error-1.29/configure	2018-04-11 14:41:10.481020028 +0200
+@@ -11301,7 +11301,7 @@ shlibpath_var=
+ shlibpath_overrides_runpath=unknown
+ version_type=none
+ dynamic_linker="$host_os ld.so"
+-sys_lib_dlsearch_path_spec="/lib /usr/lib"
++sys_lib_dlsearch_path_spec="/lib /usr/lib /usr/lib64 /usr/lib64"
+ need_lib_prefix=unknown
+ hardcode_into_libs=no
+ 
+@@ -11775,7 +11775,7 @@ fi
+   # appending ld.so.conf contents (and includes) to the search path.
+   if test -f /etc/ld.so.conf; then
+     lt_ld_extra=`awk '/^include / { system(sprintf("cd /etc; cat %s 2>/dev/null", \$2)); skip = 1; } { if (!skip) print \$0; skip = 0; }' < /etc/ld.so.conf | $SED -e 's/#.*//;/^[	 ]*hwcap[	 ]/d;s/[:,	]/ /g;s/=[^=]*$//;s/=[^= ]* / /g;s/"//g;/^$/d' | tr '\n' ' '`
+-    sys_lib_dlsearch_path_spec="/lib /usr/lib $lt_ld_extra"
++    sys_lib_dlsearch_path_spec="/lib /usr/lib /usr/lib64 /usr/lib64 $lt_ld_extra"
+   fi
+ 
+   # We used to test for /lib/ld.so.1 and disable shared libraries on
+@@ -15879,12 +15879,12 @@ fi
+ 
+ # Find a 64 bit integer type to be used instead of off_t.  We prefer
+ # the standard integer types over int64_t and finally try long long.
+-if test "$ac_cv_sizeof_int" = "8"; then
++if test "$ac_cv_header_stdint_h" = yes; then
++   replacement_for_off_t="int64_t"
++elif test "$ac_cv_sizeof_int" = "8"; then
+    replacement_for_off_t="int"
+ elif test "$ac_cv_sizeof_long" = "8"; then
+    replacement_for_off_t="long"
+-elif test "$ac_cv_header_stdint_h" = yes; then
+-   replacement_for_off_t="int64_t"
+ elif test "$ac_cv_sizeof_long_long" = "8"; then
+    replacement_for_off_t="long long"
+ else
+diff -up libgpg-error-1.29/src/gen-posix-lock-obj.c.multilib libgpg-error-1.29/src/gen-posix-lock-obj.c
+--- libgpg-error-1.29/src/gen-posix-lock-obj.c.multilib	2016-11-16 13:22:03.000000000 +0100
++++ libgpg-error-1.29/src/gen-posix-lock-obj.c	2018-04-11 14:41:10.481020028 +0200
+@@ -72,6 +72,7 @@ main (void)
+ #ifdef USE_POSIX_THREADS
+   unsigned char *p;
+   int i;
++  int initidx = 0;
+ #endif
+   struct {
+     long vers;
+@@ -111,11 +112,12 @@ main (void)
+ 
+   /* To force a probably suitable alignment of the structure we use a
+      union and include a long and a pointer to a long.  */
+-  printf ("typedef struct\n"
++  printf ("#include <pthread.h>\n"
++          "typedef struct\n"
+           "{\n"
+           "  long _vers;\n"
+           "  union {\n"
+-          "    volatile char _priv[%d];\n"
++          "    volatile char _priv[sizeof(pthread_mutex_t)];\n"
+           "%s"
+           "    long _x_align;\n"
+           "    long *_xp_align;\n"
+@@ -123,7 +125,6 @@ main (void)
+           "} gpgrt_lock_t;\n"
+           "\n"
+           "#define GPGRT_LOCK_INITIALIZER {%d,{{",
+-          SIZEOF_PTHREAD_MUTEX_T,
+ # if USE_16BYTE_ALIGNMENT
+           "    int _x16_align __attribute__ ((aligned (16)));\n",
+ # elif USE_DOUBLE_FOR_ALIGNMENT
+@@ -137,10 +138,16 @@ main (void)
+   p = (unsigned char *)&mtx;
+   for (i=0; i < sizeof mtx; i++)
+     {
++      if (p[i] != 0)
++        initidx = i;
++    }
++
++  for (i=0; i <= initidx; i++)
++    {
+       if (i && !(i % 8))
+         printf (" \\\n%*s", 36, "");
+       printf ("%u", p[i]);
+-      if (i < sizeof mtx - 1)
++      if (i < initidx)
+         putchar (',');
+     }
+   fputs ("}}}\n", stdout);
+diff -up libgpg-error-1.29/src/gpg-error.h.in.multilib libgpg-error-1.29/src/gpg-error.h.in
+--- libgpg-error-1.29/src/gpg-error.h.in.multilib	2018-04-11 14:41:10.481020028 +0200
++++ libgpg-error-1.29/src/gpg-error.h.in	2018-04-11 14:45:28.184203566 +0200
+@@ -17,7 +17,7 @@
+  * License along with this program; if not, see <https://www.gnu.org/licenses/>.
+  * SPDX-License-Identifier: LGPL-2.1-or-later
+  *
+- * @configure_input@
++ * Do not edit.  Generated from gpg-error.h.in.
+  */
+ 
+ /* The GnuPG project consists of many components.  Error codes are

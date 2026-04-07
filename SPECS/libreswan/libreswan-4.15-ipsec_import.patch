@@ -1,0 +1,20 @@
+diff --git a/programs/ipsec/ipsec.in b/programs/ipsec/ipsec.in
+index 40ff9f4138..41813b5258 100755
+--- a/programs/ipsec/ipsec.in
++++ b/programs/ipsec/ipsec.in
+@@ -758,7 +758,14 @@ ipsec_import() {
+ 	    exit 1
+ 	fi
+ 
+-	pk12util -i "${pkcs12bundle}" -d "${IPSEC_NSSDIR_SQL}"
++	# First try blanc password to avoid uselessly prompting interactively
++	pk12util -i "${pkcs12bundle}" -d "${IPSEC_NSSDIR_SQL}" -W '' 2>/dev/null
++	# check for SEC_ERROR_BAD_PASSWORD
++	if [ $? -eq 18 ]; then
++	    # Not the empty password
++	    pk12util -i "${pkcs12bundle}" -d "${IPSEC_NSSDIR_SQL}"
++	fi
++
+ 	# check and correct trust bits
+ 	set_nss_db_trusts
+ 	exit 0

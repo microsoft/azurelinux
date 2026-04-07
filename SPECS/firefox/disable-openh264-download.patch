@@ -1,0 +1,36 @@
+diff -up firefox-121.0/toolkit/content/jar.mn.disable-openh264-download firefox-121.0/toolkit/content/jar.mn
+--- firefox-121.0/toolkit/content/jar.mn.disable-openh264-download	2023-12-18 20:15:04.352014249 +0100
++++ firefox-121.0/toolkit/content/jar.mn	2023-12-18 20:19:26.857929200 +0100
+@@ -130,7 +130,6 @@ toolkit.jar:
+ #ifdef XP_MACOSX
+    content/global/macWindowMenu.js
+ #endif
+-   content/global/gmp-sources/openh264.json    (gmp-sources/openh264.json)
+    content/global/gmp-sources/widevinecdm.json (gmp-sources/widevinecdm.json)
+    content/global/gmp-sources/widevinecdm_l1.json (gmp-sources/widevinecdm_l1.json)
+ 
+diff -up firefox-121.0/toolkit/modules/GMPInstallManager.sys.mjs.disable-openh264-download firefox-121.0/toolkit/modules/GMPInstallManager.sys.mjs
+--- firefox-121.0/toolkit/modules/GMPInstallManager.sys.mjs.disable-openh264-download	2023-12-11 21:42:21.000000000 +0100
++++ firefox-121.0/toolkit/modules/GMPInstallManager.sys.mjs	2023-12-18 20:18:52.665768579 +0100
+@@ -35,11 +35,6 @@ function getScopedLogger(prefix) {
+ 
+ const LOCAL_GMP_SOURCES = [
+   {
+-    id: "gmp-gmpopenh264",
+-    src: "chrome://global/content/gmp-sources/openh264.json",
+-    installByDefault: true,
+-  },
+-  {
+     id: "gmp-widevinecdm",
+     src: "chrome://global/content/gmp-sources/widevinecdm.json",
+     installByDefault: true,
+@@ -421,6 +416,9 @@ GMPInstallManager.prototype = {
+    *                 downloaderr, verifyerr or previouserrorencountered
+    */
+   installAddon(gmpAddon) {
++    if (gmpAddon.isOpenH264) {
++      return Promise.reject({ type: "disabled" });
++    }
+     if (this._deferred) {
+       let log = getScopedLogger("GMPInstallManager.installAddon");
+       log.error("previous error encountered");

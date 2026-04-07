@@ -1,0 +1,182 @@
+From 36c1e6ff0d889cef5c57af64d4f6fc08b455bada Mon Sep 17 00:00:00 2001
+From: Maxwell G <maxwell@gtmx.me>
+Date: Sat, 7 Jun 2025 15:42:53 -0500
+Subject: [PATCH 2/2] Initial support for Python 3.14
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This is a downstream Fedora patch to make ansible-core work with Python
+3.14 until it is properly supported upstream.
+Note that parts of ansible-test will not work properly until we update
+to an version that officially supports Python 3.14 due to missing
+upstream test infrastructure.
+
+Co-authored-by: Miro Hrončok <churchyard@fedoraproject.org>
+---
+ .../_data/requirements/ansible-test.txt       |  2 +-
+ .../ansible_test/_internal/coverage_util.py   |  2 +-
+ .../_util/target/common/constants.py          |  1 +
+ .../module_utils/common/test_collections.py   |  6 +-
+ .../test_check_required_arguments.py          |  7 +-
+ test/units/modules/test_copy.py               | 74 ++++++++++---------
+ 6 files changed, 54 insertions(+), 38 deletions(-)
+
+diff --git a/test/lib/ansible_test/_data/requirements/ansible-test.txt b/test/lib/ansible_test/_data/requirements/ansible-test.txt
+index 50f951c845..5edd5cc4de 100644
+--- a/test/lib/ansible_test/_data/requirements/ansible-test.txt
++++ b/test/lib/ansible_test/_data/requirements/ansible-test.txt
+@@ -1,2 +1,2 @@
+ # The test-constraints sanity test verifies this file, but changes must be made manually to keep it in up-to-date.
+-coverage == 7.6.1 ; python_version >= '3.8' and python_version <= '3.13'
++coverage == 7.6.1 ; python_version >= '3.8' and python_version <= '3.14'
+diff --git a/test/lib/ansible_test/_internal/coverage_util.py b/test/lib/ansible_test/_internal/coverage_util.py
+index 2bec9c791e..e900ddb801 100644
+--- a/test/lib/ansible_test/_internal/coverage_util.py
++++ b/test/lib/ansible_test/_internal/coverage_util.py
+@@ -69,7 +69,7 @@ class CoverageVersion:
+ 
+ COVERAGE_VERSIONS = (
+     # IMPORTANT: Keep this in sync with the ansible-test.txt requirements file.
+-    CoverageVersion('7.6.1', 7, (3, 8), (3, 13)),
++    CoverageVersion('7.6.1', 7, (3, 8), (3, 14)),
+ )
+ """
+ This tuple specifies the coverage version to use for Python version ranges.
+diff --git a/test/lib/ansible_test/_util/target/common/constants.py b/test/lib/ansible_test/_util/target/common/constants.py
+index 31f56adcda..4e4055462d 100644
+--- a/test/lib/ansible_test/_util/target/common/constants.py
++++ b/test/lib/ansible_test/_util/target/common/constants.py
+@@ -14,4 +14,5 @@ CONTROLLER_PYTHON_VERSIONS = (
+     '3.11',
+     '3.12',
+     '3.13',
++    '3.14',
+ )
+diff --git a/test/units/module_utils/common/test_collections.py b/test/units/module_utils/common/test_collections.py
+index 381d583004..78d7d19dde 100644
+--- a/test/units/module_utils/common/test_collections.py
++++ b/test/units/module_utils/common/test_collections.py
+@@ -5,6 +5,8 @@
+ 
+ from __future__ import annotations
+ 
++import re
++
+ import pytest
+ 
+ from collections.abc import Sequence
+@@ -143,7 +145,9 @@ class TestImmutableDict:
+         # ImmutableDict is unhashable when one of its values is unhashable
+         imdict = ImmutableDict({u'café': u'くらとみ', 1: [1, 2]})
+ 
+-        expected_reason = r"^unhashable type: 'list'$"
++        python314_reason = re.escape("cannot use 'tuple' as a set element (unhashable type: 'list')")
++        expected_reasons = (r"^unhashable type: 'list'$", rf"^{python314_reason}$")
++        expected_reason = "|".join(expected_reasons)
+ 
+         with pytest.raises(TypeError, match=expected_reason):
+             hash(imdict)
+diff --git a/test/units/module_utils/common/validation/test_check_required_arguments.py b/test/units/module_utils/common/validation/test_check_required_arguments.py
+index 16e79fe7dc..761cd0acd1 100644
+--- a/test/units/module_utils/common/validation/test_check_required_arguments.py
++++ b/test/units/module_utils/common/validation/test_check_required_arguments.py
+@@ -84,4 +84,9 @@ def test_check_required_arguments_missing_none():
+ def test_check_required_arguments_no_params(arguments_terms):
+     with pytest.raises(TypeError) as te:
+         check_required_arguments(arguments_terms, None)
+-    assert "'NoneType' is not iterable" in to_native(te.value)
++    value = to_native(te.value)
++    options = (
++        "'NoneType' is not iterable", # Python < 3.14
++        "argument of type 'NoneType' is not a container or iterable" # 3.14+
++    )
++    assert any(o in value for o in options)
+diff --git a/test/units/modules/test_copy.py b/test/units/modules/test_copy.py
+index 6f15bed122..799ba4b52f 100644
+--- a/test/units/modules/test_copy.py
++++ b/test/units/modules/test_copy.py
+@@ -95,40 +95,46 @@ ONE_DIR_DATA: tuple[tuple[str, tuple[str, list[str]] | None, tuple[str, list[str
+ ONE_DIR_DATA += tuple(item[:3] for item in TWO_DIRS_DATA)
+ 
+ 
+-@pytest.mark.parametrize('directory, expected', ((d[0], d[4]) for d in THREE_DIRS_DATA))
+-@pytest.mark.xfail(reason='broken test and/or code, original test missing assert', strict=False)
+-def test_split_pre_existing_dir_three_levels_exist(directory, expected, mocker):
+-    mocker.patch('os.path.exists', side_effect=[True, True, True])
+-    assert split_pre_existing_dir(directory) == expected
+-
+-
+-@pytest.mark.parametrize('directory, expected', ((d[0], d[3]) for d in TWO_DIRS_DATA))
+-@pytest.mark.xfail(reason='broken test and/or code, original test missing assert', strict=False)
+-def test_split_pre_existing_dir_two_levels_exist(directory, expected, mocker):
+-    mocker.patch('os.path.exists', side_effect=[True, True, False])
+-    assert split_pre_existing_dir(directory) == expected
+-
+-
+-@pytest.mark.parametrize('directory, expected', ((d[0], d[2]) for d in ONE_DIR_DATA))
+-@pytest.mark.xfail(reason='broken test and/or code, original test missing assert', strict=False)
+-def test_split_pre_existing_dir_one_level_exists(directory, expected, mocker):
+-    mocker.patch('os.path.exists', side_effect=[True, False, False])
+-    assert split_pre_existing_dir(directory) == expected
+-
+-
+-@pytest.mark.parametrize('directory', (d[0] for d in ONE_DIR_DATA if d[1] is None))
+-def test_split_pre_existing_dir_root_does_not_exist(directory, mocker):
+-    mocker.patch('os.path.exists', return_value=False)
+-    with pytest.raises(AnsibleModuleError) as excinfo:
+-        split_pre_existing_dir(directory)
+-    assert excinfo.value.results['msg'].startswith("The '/' directory doesn't exist on this machine.")
+-
+-
+-@pytest.mark.parametrize('directory, expected', ((d[0], d[1]) for d in ONE_DIR_DATA if not d[0].startswith('/')))
+-@pytest.mark.xfail(reason='broken test and/or code, original test missing assert', strict=False)
+-def test_split_pre_existing_dir_working_dir_exists(directory, expected, mocker):
+-    mocker.patch('os.path.exists', return_value=False)
+-    assert split_pre_existing_dir(directory) == expected
++# NOTE(gotmax23): These tests are all broken (marked with xfail) to begin with.
++# On Python 3.14, they also cause pytest to crash, as the os.path.exists patch
++# does not get cleaned up in time for some reason and other internal pytest
++# code calls the mock instead of the actual function.
++# Comment them out for now.
++
++# @pytest.mark.parametrize('directory, expected', ((d[0], d[4]) for d in THREE_DIRS_DATA))
++# @pytest.mark.xfail(reason='broken test and/or code, original test missing assert', strict=False)
++# def test_split_pre_existing_dir_three_levels_exist(directory, expected, mocker):
++#     mocker.patch('os.path.exists', side_effect=[True, True, True])
++#     assert split_pre_existing_dir(directory) == expected
++#
++#
++# @pytest.mark.parametrize('directory, expected', ((d[0], d[3]) for d in TWO_DIRS_DATA))
++# @pytest.mark.xfail(reason='broken test and/or code, original test missing assert', strict=False)
++# def test_split_pre_existing_dir_two_levels_exist(directory, expected, mocker):
++#     mocker.patch('os.path.exists', side_effect=[True, True, False])
++#     assert split_pre_existing_dir(directory) == expected
++#
++#
++# @pytest.mark.parametrize('directory, expected', ((d[0], d[2]) for d in ONE_DIR_DATA))
++# @pytest.mark.xfail(reason='broken test and/or code, original test missing assert', strict=False)
++# def test_split_pre_existing_dir_one_level_exists(directory, expected, mocker):
++#     mocker.patch('os.path.exists', side_effect=[True, False, False])
++#     assert split_pre_existing_dir(directory) == expected
++#
++#
++# @pytest.mark.parametrize('directory', (d[0] for d in ONE_DIR_DATA if d[1] is None))
++# def test_split_pre_existing_dir_root_does_not_exist(directory, mocker):
++#     mocker.patch('os.path.exists', return_value=False)
++#     with pytest.raises(AnsibleModuleError) as excinfo:
++#         split_pre_existing_dir(directory)
++#     assert excinfo.value.results['msg'].startswith("The '/' directory doesn't exist on this machine.")
++#
++#
++# @pytest.mark.parametrize('directory, expected', ((d[0], d[1]) for d in ONE_DIR_DATA if not d[0].startswith('/')))
++# @pytest.mark.xfail(reason='broken test and/or code, original test missing assert', strict=False)
++# def test_split_pre_existing_dir_working_dir_exists(directory, expected, mocker):
++#     mocker.patch('os.path.exists', return_value=False)
++#     assert split_pre_existing_dir(directory) == expected
+ 
+ 
+ #
+-- 
+2.50.1
+

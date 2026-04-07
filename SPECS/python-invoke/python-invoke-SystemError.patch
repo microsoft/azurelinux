@@ -1,0 +1,12 @@
+diff -up invoke-2.2.0/invoke/terminals.py.orig invoke-2.2.0/invoke/terminals.py
+--- invoke-2.2.0/invoke/terminals.py.orig	2023-07-12 20:04:56.000000000 +0200
++++ invoke-2.2.0/invoke/terminals.py	2025-06-21 19:18:50.336284736 +0200
+@@ -107,7 +107,7 @@ else:
+         # * termios not having a TIOCGWINSZ attribute (happens sometimes...)
+         # * other situations where ioctl doesn't explode but the result isn't
+         #   something unpack can deal with
+-        except (struct.error, TypeError, IOError, AttributeError):
++        except (struct.error, TypeError, IOError, AttributeError, SystemError):
+             pass
+         return size
+ 

@@ -1,0 +1,25 @@
+From 26af04432f6404eb03780265a5cce948ecfec8dc Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:29 +0200
+Subject: [PATCH 38/50] openssh-8.7p1-ibmca
+
+---
+ openbsd-compat/bsd-closefrom.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/openbsd-compat/bsd-closefrom.c b/openbsd-compat/bsd-closefrom.c
+index f6112458..417c2048 100644
+--- a/openbsd-compat/bsd-closefrom.c
++++ b/openbsd-compat/bsd-closefrom.c
+@@ -16,7 +16,7 @@
+ 
+ #include "includes.h"
+ 
+-#if !defined(HAVE_CLOSEFROM) || defined(BROKEN_CLOSEFROM)
++#if !defined(HAVE_CLOSEFROM) || defined(BROKEN_CLOSEFROM) || (defined __s390__)
+ 
+ #include <sys/types.h>
+ #include <unistd.h>
+-- 
+2.49.0
+

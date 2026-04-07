@@ -1,0 +1,12 @@
+diff -up zstandard-0.22.0/c-ext/backend_c.c.orig zstandard-0.22.0/c-ext/backend_c.c
+--- zstandard-0.22.0/c-ext/backend_c.c.orig	2023-11-01 07:04:15.000000000 +0100
++++ zstandard-0.22.0/c-ext/backend_c.c	2023-11-22 12:51:36.452480448 +0100
+@@ -17,6 +17,8 @@
+ 
+ #include <sys/sysctl.h>
+ 
++#elif defined(__linux__) && defined(HAVE_UNISTD_H)
++#include <unistd.h>
+ #endif
+ 
+ #include "python-zstandard.h"

@@ -1,0 +1,14 @@
+
+Fix intermittent failures when "svn add" guesses a near-empty file is binary and hence
+the output is different.
+
+--- subversion-1.14.1/subversion/tests/cmdline/svntest/main.py.testnoautoprops
++++ subversion-1.14.1/subversion/tests/cmdline/svntest/main.py
+@@ -691,6 +691,7 @@
+ 
+ [miscellany]
+ interactive-conflicts = false
++enable-magic-file = no
+ """
+     if exclusive_wc_locks:
+       config_contents += """

@@ -1,0 +1,46 @@
+From b0eabcaf4d4f371514891a52115c746815c2ff15 Mon Sep 17 00:00:00 2001
+From: Pycatchown <39068868+Pycatchown@users.noreply.github.com>
+Date: Tue, 8 Apr 2025 17:39:30 +0200
+Subject: [PATCH] Update fcgiapp.c
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fixing an integer overflow (CVE-2025-23016)
+
+<https://github.com/FastCGI-Archives/fcgi2/pull/74>
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ libfcgi/fcgiapp.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/fcgiapp.c b/fcgiapp.c
+index 4ffe318..99c3630 100644
+--- a/fcgiapp.c
++++ b/fcgiapp.c
+@@ -1175,6 +1175,10 @@ static int ReadParams(Params *paramsPtr, FCGX_Stream *stream)
+ 	    }
+             nameLen = ((nameLen & 0x7f) << 24) + (lenBuff[0] << 16)
+                     + (lenBuff[1] << 8) + lenBuff[2];
++	    if (nameLen >= INT_MAX) {
++                SetError(stream, FCGX_PARAMS_ERROR);
++                return -1;
++	    }
+         }
+         if((valueLen = FCGX_GetChar(stream)) == EOF) {
+             SetError(stream, FCGX_PARAMS_ERROR);
+@@ -1187,6 +1191,10 @@ static int ReadParams(Params *paramsPtr, FCGX_Stream *stream)
+ 	    }
+             valueLen = ((valueLen & 0x7f) << 24) + (lenBuff[0] << 16)
+                     + (lenBuff[1] << 8) + lenBuff[2];
++	    if (valueLen >= INT_MAX) {
++                SetError(stream, FCGX_PARAMS_ERROR);
++                return -1;
++	    }
+         }
+         /*
+          * nameLen and valueLen are now valid; read the name and value
+-- 
+2.49.0
+

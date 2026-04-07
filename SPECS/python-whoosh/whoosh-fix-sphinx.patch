@@ -1,0 +1,11 @@
+--- a/docs/source/conf.py	2016-04-04 03:53:04.000000000 +0300
++++ b/docs/source/conf.py	2024-12-02 14:00:01.556539274 +0200
+@@ -192,7 +192,7 @@
+ 
+ 
+ # Example configuration for intersphinx: refer to the Python standard library.
+-intersphinx_mapping = {'http://docs.python.org/': None}
++intersphinx_mapping = {'python': ('http://docs.python.org/3', None)}
+ 
+ # Autodoc config
+ autoclass_content = "both"

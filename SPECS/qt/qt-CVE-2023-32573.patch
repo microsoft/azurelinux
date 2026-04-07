@@ -1,0 +1,34 @@
+diff -up qt-everywhere-opensource-src-4.8.7/src/svg/qsvgfont_p.h.me qt-everywhere-opensource-src-4.8.7/src/svg/qsvgfont_p.h
+--- qt-everywhere-opensource-src-4.8.7/src/svg/qsvgfont_p.h.me	2023-05-18 14:45:36.239081107 +0200
++++ qt-everywhere-opensource-src-4.8.7/src/svg/qsvgfont_p.h	2023-05-18 14:47:11.440869275 +0200
+@@ -78,6 +78,7 @@ public:
+ class QSvgFont : public QSvgRefCounted
+ {
+ public:
++    static const qreal DEFAULT_UNITS_PER_EM = 1000;
+     QSvgFont(qreal horizAdvX);
+ 
+     void setFamilyName(const QString &name);
+@@ -90,9 +91,7 @@ public:
+     void draw(QPainter *p, const QPointF &point, const QString &str, qreal pixelSize, Qt::Alignment alignment) const;
+ public:
+     QString m_familyName;
+-    qreal m_unitsPerEm;
+-    qreal m_ascent;
+-    qreal m_descent;
++    qreal m_unitsPerEm = DEFAULT_UNITS_PER_EM;
+     qreal m_horizAdvX;
+     QHash<QChar, QSvgGlyph> m_glyphs;
+ };
+diff -up qt-everywhere-opensource-src-4.8.7/src/svg/qsvghandler.cpp.me qt-everywhere-opensource-src-4.8.7/src/svg/qsvghandler.cpp
+--- qt-everywhere-opensource-src-4.8.7/src/svg/qsvghandler.cpp.me	2023-05-18 14:45:24.569107055 +0200
++++ qt-everywhere-opensource-src-4.8.7/src/svg/qsvghandler.cpp	2023-05-18 14:45:10.885137479 +0200
+@@ -2571,7 +2571,7 @@ static bool parseFontFaceNode(QSvgStyleP
+ 
+     qreal unitsPerEm = toDouble(unitsPerEmStr);
+     if (!unitsPerEm)
+-        unitsPerEm = 1000;
++        unitsPerEm = QSvgFont::DEFAULT_UNITS_PER_EM;
+ 
+     if (!name.isEmpty())
+         font->setFamilyName(name);

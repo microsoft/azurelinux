@@ -1,0 +1,19 @@
+--- openssl-0.10.75/Cargo.toml	1970-01-01T00:00:01+00:00
++++ openssl-0.10.75/Cargo.toml	2025-12-08T05:14:55.451145+00:00
+@@ -37,16 +37,12 @@
+ repository = "https://github.com/rust-openssl/rust-openssl"
+ 
+ [features]
+-aws-lc = ["ffi/aws-lc"]
+-aws-lc-fips = ["ffi/aws-lc-fips"]
+ bindgen = ["ffi/bindgen"]
+ default = []
+-unstable_boringssl = ["ffi/unstable_boringssl"]
+ v101 = []
+ v102 = []
+ v110 = []
+ v111 = []
+-vendored = ["ffi/vendored"]
+ 
+ [lib]
+ name = "openssl"

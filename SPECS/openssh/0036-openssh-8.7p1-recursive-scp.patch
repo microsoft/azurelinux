@@ -1,0 +1,200 @@
+From 99e1e3af524376788e591ca73387f1ca37e6f5ef Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:29 +0200
+Subject: [PATCH 36/50] openssh-8.7p1-recursive-scp
+
+---
+ scp.c         |  2 +-
+ sftp-client.c | 60 +++++++++++++++++++++++++++++++++++++++------------
+ sftp-client.h |  4 ++--
+ sftp.c        |  6 +++---
+ 4 files changed, 52 insertions(+), 20 deletions(-)
+
+diff --git a/scp.c b/scp.c
+index 7ed1a54c..0c87dd0e 100644
+--- a/scp.c
++++ b/scp.c
+@@ -1388,7 +1388,7 @@ source_sftp(int argc, char *src, char *targ, struct sftp_conn *conn)
+ 
+ 	if (src_is_dir && iamrecursive) {
+ 		if (sftp_upload_dir(conn, src, abs_dst, pflag,
+-		    SFTP_PROGRESS_ONLY, 0, 0, 1, 1) != 0) {
++		    SFTP_PROGRESS_ONLY, 0, 0, 1, 1, 1) != 0) {
+ 			error("failed to upload directory %s to %s", src, targ);
+ 			errs = 1;
+ 		}
+diff --git a/sftp-client.c b/sftp-client.c
+index 9f8ab4af..873dec04 100644
+--- a/sftp-client.c
++++ b/sftp-client.c
+@@ -1003,7 +1003,7 @@ sftp_fsetstat(struct sftp_conn *conn, const u_char *handle, u_int handle_len,
+ 
+ /* Implements both the realpath and expand-path operations */
+ static char *
+-sftp_realpath_expand(struct sftp_conn *conn, const char *path, int expand)
++sftp_realpath_expand(struct sftp_conn *conn, const char *path, int expand, int create_dir)
+ {
+ 	struct sshbuf *msg;
+ 	u_int expected_id, count, id;
+@@ -1049,11 +1049,43 @@ sftp_realpath_expand(struct sftp_conn *conn, const char *path, int expand)
+ 		if ((r = sshbuf_get_u32(msg, &status)) != 0 ||
+ 		    (r = sshbuf_get_cstring(msg, &errmsg, NULL)) != 0)
+ 			fatal_fr(r, "parse status");
+-		error("%s %s: %s", expand ? "expand" : "realpath",
+-		    path, *errmsg == '\0' ? fx2txt(status) : errmsg);
+-		free(errmsg);
+-		sshbuf_free(msg);
+-		return NULL;
++		if ((status == SSH2_FX_NO_SUCH_FILE) && create_dir)  {
++			memset(&a, '\0', sizeof(a));
++			if ((r = sftp_mkdir(conn, path, &a, 0)) != 0) {
++				sshbuf_free(msg);
++				return NULL;
++			}
++			debug2("Sending SSH2_FXP_REALPATH \"%s\" - create dir", path);
++			send_string_request(conn, id, SSH2_FXP_REALPATH,
++					path, strlen(path));
++
++			get_msg(conn, msg);
++			if ((r = sshbuf_get_u8(msg, &type)) != 0 ||
++			    (r = sshbuf_get_u32(msg, &id)) != 0)
++				fatal_fr(r, "parse");
++
++			if (id != expected_id)
++				fatal("ID mismatch (%u != %u)", id, expected_id);
++
++			if (type == SSH2_FXP_STATUS) {
++				free(errmsg);
++
++				if ((r = sshbuf_get_u32(msg, &status)) != 0 ||
++				    (r = sshbuf_get_cstring(msg, &errmsg, NULL)) != 0)
++					fatal_fr(r, "parse status");
++				error("%s %s: %s", expand ? "expand" : "realpath",
++				    path, *errmsg == '\0' ? fx2txt(status) : errmsg);
++				free(errmsg);
++				sshbuf_free(msg);
++				return NULL;
++			}
++		} else {
++			error("%s %s: %s", expand ? "expand" : "realpath",
++			    path, *errmsg == '\0' ? fx2txt(status) : errmsg);
++			free(errmsg);
++			sshbuf_free(msg);
++			return NULL;
++		}
+ 	} else if (type != SSH2_FXP_NAME)
+ 		fatal("Expected SSH2_FXP_NAME(%u) packet, got %u",
+ 		    SSH2_FXP_NAME, type);
+@@ -1078,9 +1110,9 @@ sftp_realpath_expand(struct sftp_conn *conn, const char *path, int expand)
+ }
+ 
+ char *
+-sftp_realpath(struct sftp_conn *conn, const char *path)
++sftp_realpath(struct sftp_conn *conn, const char *path, int create_dir)
+ {
+-	return sftp_realpath_expand(conn, path, 0);
++	return sftp_realpath_expand(conn, path, 0, create_dir);
+ }
+ 
+ int
+@@ -1094,9 +1126,9 @@ sftp_expand_path(struct sftp_conn *conn, const char *path)
+ {
+ 	if (!sftp_can_expand_path(conn)) {
+ 		debug3_f("no server support, fallback to realpath");
+-		return sftp_realpath_expand(conn, path, 0);
++		return sftp_realpath_expand(conn, path, 0, 0);
+ 	}
+-	return sftp_realpath_expand(conn, path, 1);
++	return sftp_realpath_expand(conn, path, 1, 0);
+ }
+ 
+ int
+@@ -2016,7 +2048,7 @@ sftp_download_dir(struct sftp_conn *conn, const char *src, const char *dst,
+ 	char *src_canon;
+ 	int ret;
+ 
+-	if ((src_canon = sftp_realpath(conn, src)) == NULL) {
++	if ((src_canon = sftp_realpath(conn, src, 0)) == NULL) {
+ 		error("download \"%s\": path canonicalization failed", src);
+ 		return -1;
+ 	}
+@@ -2366,12 +2398,12 @@ upload_dir_internal(struct sftp_conn *conn, const char *src, const char *dst,
+ int
+ sftp_upload_dir(struct sftp_conn *conn, const char *src, const char *dst,
+     int preserve_flag, int print_flag, int resume, int fsync_flag,
+-    int follow_link_flag, int inplace_flag)
++    int follow_link_flag, int inplace_flag, int create_dir)
+ {
+ 	char *dst_canon;
+ 	int ret;
+ 
+-	if ((dst_canon = sftp_realpath(conn, dst)) == NULL) {
++	if ((dst_canon = sftp_realpath(conn, dst, create_dir)) == NULL) {
+ 		error("upload \"%s\": path canonicalization failed", dst);
+ 		return -1;
+ 	}
+@@ -2826,7 +2858,7 @@ sftp_crossload_dir(struct sftp_conn *from, struct sftp_conn *to,
+ 	char *from_path_canon;
+ 	int ret;
+ 
+-	if ((from_path_canon = sftp_realpath(from, from_path)) == NULL) {
++	if ((from_path_canon = sftp_realpath(from, from_path, 0)) == NULL) {
+ 		error("crossload \"%s\": path canonicalization failed",
+ 		    from_path);
+ 		return -1;
+diff --git a/sftp-client.h b/sftp-client.h
+index 74cdae7d..00ed6630 100644
+--- a/sftp-client.h
++++ b/sftp-client.h
+@@ -111,7 +111,7 @@ int sftp_fsetstat(struct sftp_conn *, const u_char *, u_int, Attrib *);
+ int sftp_lsetstat(struct sftp_conn *conn, const char *path, Attrib *a);
+ 
+ /* Canonicalise 'path' - caller must free result */
+-char *sftp_realpath(struct sftp_conn *, const char *);
++char *sftp_realpath(struct sftp_conn *, const char *, int);
+ 
+ /* Canonicalisation with tilde expansion (requires server extension) */
+ char *sftp_expand_path(struct sftp_conn *, const char *);
+@@ -163,7 +163,7 @@ int sftp_upload(struct sftp_conn *, const char *, const char *,
+  * times if 'pflag' is set
+  */
+ int sftp_upload_dir(struct sftp_conn *, const char *, const char *,
+-    int, int, int, int, int, int);
++    int, int, int, int, int, int, int);
+ 
+ /*
+  * Download a 'from_path' from the 'from' connection and upload it to
+diff --git a/sftp.c b/sftp.c
+index bdedd141..322e6d1f 100644
+--- a/sftp.c
++++ b/sftp.c
+@@ -809,7 +809,7 @@ process_put(struct sftp_conn *conn, const char *src, const char *dst,
+ 		    (rflag || global_rflag)) {
+ 			if (sftp_upload_dir(conn, g.gl_pathv[i], abs_dst,
+ 			    pflag || global_pflag, 1, resume,
+-			    fflag || global_fflag, 0, 0) == -1)
++			    fflag || global_fflag, 0, 0, 0) == -1)
+ 				err = -1;
+ 		} else {
+ 			if (sftp_upload(conn, g.gl_pathv[i], abs_dst,
+@@ -1644,7 +1644,7 @@ parse_dispatch_command(struct sftp_conn *conn, const char *cmd, char **pwd,
+ 		if (path1 == NULL || *path1 == '\0')
+ 			path1 = xstrdup(startdir);
+ 		path1 = sftp_make_absolute(path1, *pwd);
+-		if ((tmp = sftp_realpath(conn, path1)) == NULL) {
++		if ((tmp = sftp_realpath(conn, path1, 0)) == NULL) {
+ 			err = 1;
+ 			break;
+ 		}
+@@ -2249,7 +2249,7 @@ interactive_loop(struct sftp_conn *conn, char *file1, char *file2)
+ 	}
+ #endif /* USE_LIBEDIT */
+ 
+-	if ((remote_path = sftp_realpath(conn, ".")) == NULL)
++	if ((remote_path = sftp_realpath(conn, ".", 0)) == NULL)
+ 		fatal("Need cwd");
+ 	startdir = xstrdup(remote_path);
+ 
+-- 
+2.49.0
+

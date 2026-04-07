@@ -1,0 +1,13 @@
+--- gcc/intl.cc.orig	2023-06-08 12:18:17.789905811 +0100
++++ gcc/intl.cc	2023-06-08 12:18:40.946071321 +0100
+@@ -55,8 +55,8 @@
+   setlocale (LC_ALL, "");
+ #endif
+ 
+-  (void) bindtextdomain ("gcc", LOCALEDIR);
+-  (void) textdomain ("gcc");
++  (void) bindtextdomain ("cross-gcc", LOCALEDIR);
++  (void) textdomain ("cross-gcc");
+ 
+   /* Opening quotation mark.  */
+   open_quote = _("`");

@@ -1,0 +1,28 @@
+From a027043170603c360605dd2129dbf37b9fd820d8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Wed, 10 Dec 2014 13:12:47 +0100
+Subject: [PATCH] Do not sleep in Makefile.PL
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ Makefile.PL | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/Makefile.PL b/Makefile.PL
+index fe093bd..b9cd6ea 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -118,7 +118,6 @@ sub _scripts {
+ ###############################################################
+ 
+ WARNING
+-      sleep 10;
+     }
+   }
+   return @scripts;
+-- 
+1.9.3
+

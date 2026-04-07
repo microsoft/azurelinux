@@ -1,0 +1,131 @@
+From 06d1b08aef94984256cad3c5a54cedb10295681f Mon Sep 17 00:00:00 2001
+From: Jakub Martisko <jamartis@redhat.com>
+Date: Thu, 8 Nov 2018 09:31:18 +0100
+Subject: [PATCH] Possible unterminated string fix
+
+---
+ unix/unix.c   |  4 +++-
+ unix/unxcfg.h |  2 +-
+ unzip.c       | 12 ++++++++----
+ zipinfo.c     | 12 ++++++++----
+ 4 files changed, 20 insertions(+), 10 deletions(-)
+
+diff --git a/unix/unix.c b/unix/unix.c
+index 59b622d..cd57f80 100644
+--- a/unix/unix.c
++++ b/unix/unix.c
+@@ -1945,7 +1945,9 @@ void init_conversion_charsets()
+     	for(i = 0; i < sizeof(dos_charset_map)/sizeof(CHARSET_MAP); i++)
+     		if(!strcasecmp(local_charset, dos_charset_map[i].local_charset)) {
+     			strncpy(OEM_CP, dos_charset_map[i].archive_charset,
+-    					sizeof(OEM_CP));
++    					MAX_CP_NAME - 1);
++
++			OEM_CP[MAX_CP_NAME - 1] = '\0';
+     			break;
+     		}
+     }
+diff --git a/unix/unxcfg.h b/unix/unxcfg.h
+index 8729de2..9ee8cfe 100644
+--- a/unix/unxcfg.h
++++ b/unix/unxcfg.h
+@@ -228,7 +228,7 @@ typedef struct stat z_stat;
+ /*    and notfirstcall are used by do_wild().                          */
+ 
+ 
+-#define MAX_CP_NAME 25 
++#define MAX_CP_NAME 25 + 1 
+    
+ #ifdef SETLOCALE
+ #  undef SETLOCALE
+diff --git a/unzip.c b/unzip.c
+index 2d94a38..a485f2b 100644
+--- a/unzip.c
++++ b/unzip.c
+@@ -1561,7 +1561,8 @@ int uz_opts(__G__ pargc, pargv)
+         		                  "error:  a valid character encoding should follow the -I argument"));
+     	                        return(PK_PARAM); 
+     						}
+-    						strncpy(ISO_CP, s, sizeof(ISO_CP));
++    						strncpy(ISO_CP, s, MAX_CP_NAME - 1);
++                ISO_CP[MAX_CP_NAME - 1] = '\0';
+     					} else { /* -I charset */
+     						++argv;
+     						if(!(--argc > 0 && *argv != NULL && **argv != '-')) {
+@@ -1570,7 +1571,8 @@ int uz_opts(__G__ pargc, pargv)
+     	                        return(PK_PARAM); 
+     						}
+     						s = *argv;
+-    						strncpy(ISO_CP, s, sizeof(ISO_CP));
++    						strncpy(ISO_CP, s, MAX_CP_NAME - 1);
++                ISO_CP[MAX_CP_NAME - 1] = '\0';
+     					}
+     					while(*(++s)); /* No params straight after charset name */
+     				}
+@@ -1665,7 +1667,8 @@ int uz_opts(__G__ pargc, pargv)
+         		                  "error:  a valid character encoding should follow the -I argument"));
+     	                        return(PK_PARAM); 
+     						}
+-    						strncpy(OEM_CP, s, sizeof(OEM_CP));
++    						strncpy(OEM_CP, s, MAX_CP_NAME - 1);
++                OEM_CP[MAX_CP_NAME - 1] = '\0';
+     					} else { /* -O charset */
+     						++argv;
+     						if(!(--argc > 0 && *argv != NULL && **argv != '-')) {
+@@ -1674,7 +1677,8 @@ int uz_opts(__G__ pargc, pargv)
+     	                        return(PK_PARAM); 
+     						}
+     						s = *argv;
+-    						strncpy(OEM_CP, s, sizeof(OEM_CP));
++    						strncpy(OEM_CP, s, MAX_CP_NAME - 1);
++                OEM_CP[MAX_CP_NAME - 1] = '\0';
+     					}
+     					while(*(++s)); /* No params straight after charset name */
+     				}
+diff --git a/zipinfo.c b/zipinfo.c
+index accca2a..cb7e08d 100644
+--- a/zipinfo.c
++++ b/zipinfo.c
+@@ -519,7 +519,8 @@ int zi_opts(__G__ pargc, pargv)
+         		                  "error:  a valid character encoding should follow the -I argument"));
+     	                        return(PK_PARAM); 
+     						}
+-    						strncpy(ISO_CP, s, sizeof(ISO_CP));
++    						strncpy(ISO_CP, s, MAX_CP_NAME - 1);
++                ISO_CP[MAX_CP_NAME - 1] = '\0';
+     					} else { /* -I charset */
+     						++argv;
+     						if(!(--argc > 0 && *argv != NULL && **argv != '-')) {
+@@ -528,7 +529,8 @@ int zi_opts(__G__ pargc, pargv)
+     	                        return(PK_PARAM); 
+     						}
+     						s = *argv;
+-    						strncpy(ISO_CP, s, sizeof(ISO_CP));
++    						strncpy(ISO_CP, s, MAX_CP_NAME - 1);
++                ISO_CP[MAX_CP_NAME - 1] = '\0';
+     					}
+     					while(*(++s)); /* No params straight after charset name */
+     				}
+@@ -568,7 +570,8 @@ int zi_opts(__G__ pargc, pargv)
+         		                  "error:  a valid character encoding should follow the -I argument"));
+     	                        return(PK_PARAM); 
+     						}
+-    						strncpy(OEM_CP, s, sizeof(OEM_CP));
++    						strncpy(OEM_CP, s, MAX_CP_NAME - 1);
++                OEM_CP[MAX_CP_NAME - 1] = '\0';
+     					} else { /* -O charset */
+     						++argv;
+     						if(!(--argc > 0 && *argv != NULL && **argv != '-')) {
+@@ -577,7 +580,8 @@ int zi_opts(__G__ pargc, pargv)
+     	                        return(PK_PARAM); 
+     						}
+     						s = *argv;
+-    						strncpy(OEM_CP, s, sizeof(OEM_CP));
++    						strncpy(OEM_CP, s, MAX_CP_NAME - 1);
++                OEM_CP[MAX_CP_NAME - 1] = '\0';
+     					}
+     					while(*(++s)); /* No params straight after charset name */
+     				}
+-- 
+2.14.5
+

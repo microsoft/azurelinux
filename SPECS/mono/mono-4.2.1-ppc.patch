@@ -1,0 +1,11 @@
+--- a/mcs/class/corlib/System/TimeZoneInfo.cs	2016-08-23 16:24:24.658169558 +0200
++++ b/mcs/class/corlib/System/TimeZoneInfo.cs	2016-08-23 16:25:22.925434487 +0200
+@@ -1224,7 +1224,7 @@
+ 			} catch (InvalidTimeZoneException) {
+ 				throw;
+ 			} catch (Exception e) {
+-				throw new InvalidTimeZoneException ("Time zone information file contains invalid data", e);
++				return Utc; // throw new InvalidTimeZoneException ("Time zone information file contains invalid data", e);
+ 			}
+ 		}
+ 

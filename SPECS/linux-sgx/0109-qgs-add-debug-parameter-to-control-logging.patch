@@ -1,0 +1,129 @@
+From a6333110e96533ad82de21ab1c269791cfc64655 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Thu, 3 Oct 2024 16:57:35 +0100
+Subject: [PATCH 109/131] qgs: add --debug parameter to control logging
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Currently qgs prints all log messages to syslog or stderr
+unconditionally, even those at QGS_LOG_LEVEL_INFO. At the
+same time it hardcodes SGX_QL_LOG_ERROR for the quote
+provider library making it impossible to debug it.
+
+This adds a --debug flag to qgs with two effects:
+
+ * QGS_LOG_LEVEL_INFO is discarded unless --debug was set
+   making QGS quiet by default, only printing warnings/errors.
+
+ * The quote provider logging is increased to
+   QGS_LOG_LEVEL_DEBUG if --debug is set
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ QuoteGeneration/quote_wrapper/qgs/qgs_log.cpp      |  5 +++++
+ QuoteGeneration/quote_wrapper/qgs/qgs_log.h        |  2 ++
+ QuoteGeneration/quote_wrapper/qgs/qgs_ql_logic.cpp |  8 ++++----
+ QuoteGeneration/quote_wrapper/qgs/server_main.cpp  | 10 ++++++++--
+ 4 files changed, 19 insertions(+), 6 deletions(-)
+
+diff --git a/QuoteGeneration/quote_wrapper/qgs/qgs_log.cpp b/QuoteGeneration/quote_wrapper/qgs/qgs_log.cpp
+index 1cf1e40b..7ae9b750 100644
+--- a/QuoteGeneration/quote_wrapper/qgs/qgs_log.cpp
++++ b/QuoteGeneration/quote_wrapper/qgs/qgs_log.cpp
+@@ -36,6 +36,8 @@
+ #include "qgs_log.h"
+ 
+ static bool _nosyslog = false;
++bool qgs_debug = false;
++bool qgs_verbose = false;
+ 
+ void qgs_log_init(void)
+ {
+@@ -68,6 +70,9 @@ void sgx_proc_log_report(int level, const char *format, ...)
+     // so we can always add newline
+     if (!format || !(*format))
+         return;//ignore
++    if (!qgs_verbose &&
++	level == QGS_LOG_LEVEL_INFO)
++        return;//ignore
+     va_start(ap, format);
+     switch(level){
+         case QGS_LOG_LEVEL_FATAL:
+diff --git a/QuoteGeneration/quote_wrapper/qgs/qgs_log.h b/QuoteGeneration/quote_wrapper/qgs/qgs_log.h
+index 1d7fd747..05d41a44 100644
+--- a/QuoteGeneration/quote_wrapper/qgs/qgs_log.h
++++ b/QuoteGeneration/quote_wrapper/qgs/qgs_log.h
+@@ -40,6 +40,8 @@
+ #ifdef __cplusplus
+ extern "C" {
+ #endif/*__cplusplus*/
++    extern bool qgs_debug;
++    extern bool qgs_verbose;
+     void qgs_log_init(void);
+     void qgs_log_init_ex(bool nosyslog);
+     void qgs_log_fini(void);
+diff --git a/QuoteGeneration/quote_wrapper/qgs/qgs_ql_logic.cpp b/QuoteGeneration/quote_wrapper/qgs/qgs_ql_logic.cpp
+index 1e97b586..db642f70 100644
+--- a/QuoteGeneration/quote_wrapper/qgs/qgs_ql_logic.cpp
++++ b/QuoteGeneration/quote_wrapper/qgs/qgs_ql_logic.cpp
+@@ -113,8 +113,8 @@ namespace intel { namespace sgx { namespace dcap { namespace qgs {
+                 sgx_ql_set_logging_callback_t ql_set_logging_callback =
+                     (sgx_ql_set_logging_callback_t)dlsym(p_handle, "sgx_ql_set_logging_callback");
+                 if (dlerror() == NULL && ql_set_logging_callback) {
+-                    // Set log level to SGX_QL_LOG_ERROR
+-                    ql_set_logging_callback(sgx_ql_logging_callback, SGX_QL_LOG_ERROR);
++                    ql_set_logging_callback(sgx_ql_logging_callback,
++                                            qgs_debug ? SGX_QL_LOG_INFO : SGX_QL_LOG_ERROR);
+                 } else {
+                     QGS_LOG_WARN("Failed to set logging callback for the quote provider library.\n");
+                 }
+@@ -355,8 +355,8 @@ namespace intel { namespace sgx { namespace dcap { namespace qgs {
+                 sgx_ql_set_logging_callback_t ql_set_logging_callback =
+                     (sgx_ql_set_logging_callback_t)dlsym(p_handle, "sgx_ql_set_logging_callback");
+                 if (dlerror() == NULL && ql_set_logging_callback) {
+-                    // Set log level to SGX_QL_LOG_ERROR
+-                    ql_set_logging_callback(sgx_ql_logging_callback, SGX_QL_LOG_ERROR);
++                    ql_set_logging_callback(sgx_ql_logging_callback,
++                                            qgs_debug ? SGX_QL_LOG_INFO : SGX_QL_LOG_ERROR);
+                 } else {
+                     QGS_LOG_WARN("Failed to set logging callback for the quote provider library.\n");
+                 }
+diff --git a/QuoteGeneration/quote_wrapper/qgs/server_main.cpp b/QuoteGeneration/quote_wrapper/qgs/server_main.cpp
+index b9f3eed3..62764d04 100644
+--- a/QuoteGeneration/quote_wrapper/qgs/server_main.cpp
++++ b/QuoteGeneration/quote_wrapper/qgs/server_main.cpp
+@@ -85,7 +85,7 @@ int main(int argc, const char* argv[])
+     unsigned long int num_threads = 0;
+     char *endptr = NULL;
+     if (argc > 4) {
+-        cout << "Usage: " << argv[0] << " [--no-daemon] [-p=port_number] [-n=number_threads]"
++        cout << "Usage: " << argv[0] << " [--no-daemon] [-p=port_number] [-n=number_threads] [--verbose] [--debug]"
+              << endl;
+         exit(1);
+     }
+@@ -153,6 +153,12 @@ int main(int argc, const char* argv[])
+                  << endl;
+             no_daemon = true;
+             continue;
++        } else if (strcmp(argv[i], "--debug") == 0) {
++            qgs_verbose = qgs_debug = true;
++            continue;
++        } else if (strcmp(argv[i], "--verbose") == 0) {
++            qgs_verbose = true;
++            continue;
+         } else if (strncmp(argv[i], "-p=", 3 ) == 0) {
+             if (strspn(argv[i] + 3, "0123456789") != strlen(argv[i] + 3)) {
+                 cout << "Please input valid port number" << endl;
+@@ -181,7 +187,7 @@ int main(int argc, const char* argv[])
+             cout << "thread number [" << num_threads << "] found in cmdline" << endl;
+             continue;
+         } else {
+-            cout << "Usage: " << argv[0] << " [--no-daemon] [-p=port_number] [-n=number_threads]"
++            cout << "Usage: " << argv[0] << " [--no-daemon] [-p=port_number] [-n=number_threads] [--verbose] [--debug]"
+                 << endl;
+             exit(1);
+         }
+-- 
+2.53.0
+

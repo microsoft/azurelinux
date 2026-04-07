@@ -1,0 +1,27 @@
+--- tracing-core-0.1.36/Cargo.toml	1970-01-01T00:00:01+00:00
++++ tracing-core-0.1.36/Cargo.toml	2025-12-29T14:25:05.927131+00:00
+@@ -59,7 +59,6 @@
+ [features]
+ default = [
+     "std",
+-    "valuable?/std",
+ ]
+ std = ["once_cell"]
+ 
+@@ -91,11 +90,6 @@
+ version = "1.13.0"
+ optional = true
+ 
+-[target."cfg(tracing_unstable)".dependencies.valuable]
+-version = "0.1.0"
+-optional = true
+-default-features = false
+-
+ [lints.rust.unexpected_cfgs]
+ level = "warn"
+ priority = 0
+@@ -104,3 +98,4 @@
+     "cfg(tracing_unstable)",
+     "cfg(unsound_local_offset)",
+ ]
++

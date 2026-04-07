@@ -1,0 +1,24 @@
+diff -up flite-2.2/doc/flite.texi.ti7 flite-2.2/doc/flite.texi
+--- flite-2.2/doc/flite.texi.ti7	2020-08-13 02:17:09.000000000 +0200
++++ flite-2.2/doc/flite.texi	2024-12-30 21:13:02.014710350 +0100
+@@ -971,7 +971,7 @@ utterance.  Please note that the @file{i
+ is not set by anyone at all.  The previous sentence exists in the
+ documentation so that I can point at it, when user's fail to read it.
+ 
+-@node Converting FestVox Voices, , APIs, top
++@node Converting FestVox Voices, , APIs, Top
+ @chapter Converting FestVox Voices
+ 
+ As of 1.2 initial scripts have been added to aid the conversion of
+diff -up flite-2.2/doc/Makefile.ti7 flite-2.2/doc/Makefile
+--- flite-2.2/doc/Makefile.ti7	2020-08-13 02:17:09.000000000 +0200
++++ flite-2.2/doc/Makefile	2024-12-30 21:13:53.415511426 +0100
+@@ -50,7 +50,7 @@ doc: flite.html flite.pdf
+ flite.html: flite.texi
+ 	@ if [ ! -d html ] ; \
+           then mkdir -p html ; fi
+-	(cd html; texi2any --set-customization-variable TEXI2HTML=1  --split=chapter ../flite.texi)
++	(cd html; texi2any --set-customization-variable TEXI2HTML=1 --output=flite --split=chapter ../flite.texi)
+ 	@ if [ -d html/flite ] ; \
+ 	  then mv html/flite/*.html html ; \
+                rmdir html/flite; fi

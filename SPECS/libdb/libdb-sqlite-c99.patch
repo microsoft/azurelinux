@@ -1,0 +1,20 @@
+Avoid implicit function declarations due to missing prototypes for
+internal functions.
+
+diff -ur db-5.3.28.orig/lang/sql/sqlite/src/test_stat.c db-5.3.28/lang/sql/sqlite/src/test_stat.c
+--- db-5.3.28.orig/lang/sql/sqlite/src/test_stat.c	2013-09-09 17:35:06.000000000 +0200
++++ db-5.3.28/lang/sql/sqlite/src/test_stat.c	2022-12-10 14:40:10.362683745 +0100
+@@ -136,6 +136,13 @@
+ #endif
+ 
+ /*
++** Internal functions used by this test.
++*/
++int sqlite3PagerGet(Pager *pPager, Pgno pgno, DbPage **ppPage);
++void *sqlite3PagerGetData(DbPage *pPg);
++void sqlite3PagerUnref(DbPage *pPg);
++
++/*
+ ** Connect to or create a statvfs virtual table.
+ */
+ static int statConnect(

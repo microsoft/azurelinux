@@ -1,0 +1,44 @@
+Port package to C99.
+
+Reached out to upstream but no reply and no public bug tracker.
+https://fedoraproject.org/wiki/Toolchain/PortingToModernC
+Tracked at https://bugzilla.redhat.com/show_bug.cgi?id=2158327
+
+diff --git a/ruby/caca-canvas.c b/ruby/caca-canvas.c
+index 5dc66abbe1f84f68..6672313f277b981d 100644
+--- a/ruby/caca-canvas.c
++++ b/ruby/caca-canvas.c
+@@ -16,6 +16,7 @@
+ #include <errno.h>
+ #include "caca-dither.h"
+ #include "caca-font.h"
++#include "caca_internals.h"
+ #include "common.h"
+ 
+ VALUE cCanvas;
+diff --git a/ruby/caca-display.c b/ruby/caca-display.c
+index ac29dafd3995f46f..6e4cfa20b3fbf782 100644
+--- a/ruby/caca-display.c
++++ b/ruby/caca-display.c
+@@ -226,7 +226,7 @@ static VALUE get_event(VALUE self, VALUE event_mask, VALUE timeout)
+     return e;
+ }
+ 
+-static VALUE driver_list(void)
++static VALUE driver_list(VALUE unused)
+ {
+     VALUE ary;
+     char const* const* list;
+diff --git a/ruby/caca-font.c b/ruby/caca-font.c
+index 705f928c6da45fba..72b56298c0f82bf2 100644
+--- a/ruby/caca-font.c
++++ b/ruby/caca-font.c
+@@ -41,7 +41,7 @@ static VALUE font_initialize(VALUE self, VALUE name)
+     return self;
+ }
+ 
+-static VALUE font_list(void)
++static VALUE font_list(VALUE unused)
+ {
+     VALUE ary;
+     char const* const* list;

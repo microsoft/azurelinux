@@ -1,0 +1,60 @@
+commit 821fc34e224a4e82563f0561be2e60fd1d4ec92b
+Author: Tomas Korbar <tkorbar@redhat.com>
+Date:   Tue Nov 14 12:42:45 2023 +0100
+
+    Add gssapi linking
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 3f10eae..e435e29 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -51,7 +51,7 @@ option(DEBUG "Enable debugging info and strict compile warnings" OFF)
+ option(SKIP_SHARED "Disable building shared Serf libraries" OFF)
+ option(SKIP_STATIC "Disable building static Serf libraries" OFF)
+ option(LIBDIR "Install directory for architecture-dependent libraries" "")
+-option(GSSAPI "Path to GSSAPI's install area" "")
++option(GSSAPI "Use pkg-config to link with GSSAPI" OFF)
+ option(BROTLI "Path to Brotli's install area" "")
+ option(DISABLE_LOGGING "Disable the logging framework at compile time" OFF)
+ option(SKIP_TESTS "Disable building the unit tests and utilities" OFF)
+@@ -156,10 +156,14 @@ if(SERF_WINDOWS)
+   )
+ endif(SERF_WINDOWS)
+ 
+-
+ # Process build options for dependency search
+ if(GSSAPI)
+-  message(WARNING "option GSSAPI is not implemented")
++  find_package(PkgConfig REQUIRED)
++  pkg_check_modules(GSSAPI krb5-gssapi)
++  if (NOT GSSAPI_FOUND)
++    message(WARNING "GSSAPI pkgconfig module was not found")
++  endif()
++  add_definitions("-DSERF_HAVE_GSSAPI")
+ endif()
+ 
+ if(BROTLI)
+@@ -285,6 +289,11 @@ if(NOT SKIP_SHARED)
+                         PRIVATE ${SERF_PRIVATE_TARGETS}
+                                 ${SERF_STANDARD_LIBRARIES}
+                         PUBLIC ${SERF_PUBLIC_TARGETS})
++  if (GSSAPI_FOUND)
++    target_link_libraries(serf_shared PRIVATE ${GSSAPI_LIBRARIES})
++    target_include_directories(serf_shared PRIVATE ${GSSAPI_INCLUDE_DIRS})
++    target_compile_options(serf_shared PRIVATE ${GSSAPI_CFLAGS_OTHER})
++  endif (GSSAPI_FOUND)
+   set_target_properties(serf_shared PROPERTIES
+                         VERSION ${SERF_VERSION}
+                         SOVERSION ${SERF_SOVERSION})
+@@ -307,6 +316,11 @@ if(NOT SKIP_STATIC)
+                         ${SERF_PRIVATE_TARGETS}
+                         ${SERF_PUBLIC_TARGETS}
+                         ${SERF_STANDARD_LIBRARIES})
++  if (GSSAPI_FOUND)
++    target_link_libraries(serf_shared PRIVATE ${GSSAPI_LIBRARIES})
++    target_include_directories(serf_shared PRIVATE ${GSSAPI_INCLUDE_DIRS})
++    target_compile_options(serf_shared PRIVATE ${GSSAPI_CFLAGS_OTHER})
++  endif (GSSAPI_FOUND)
+   list(APPEND SERF_TARGETS "serf_static")
+ endif()
+ 

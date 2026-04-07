@@ -1,0 +1,13 @@
+diff --git swiftpm.orig/Sources/Build/BuildDescription/ClangModuleBuildDescription.swift swiftpm/Sources/Build/BuildDescription/ClangModuleBuildDescription.swift
+index 3aadda6b5..61c1c3532 100644
+--- swiftpm.orig/Sources/Build/BuildDescription/ClangModuleBuildDescription.swift
++++ swiftpm/Sources/Build/BuildDescription/ClangModuleBuildDescription.swift
+@@ -440,7 +440,7 @@ public final class ClangModuleBuildDescription {
+         case .debug:
+             return ["-O0"]
+         case .release:
+-            return ["-O2"]
++            return ["-O1"]
+         }
+     }
+ 

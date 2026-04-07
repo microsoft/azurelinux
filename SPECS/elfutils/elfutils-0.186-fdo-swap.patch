@@ -1,0 +1,35 @@
+diff --git a/libelf/gelf_getnote.c b/libelf/gelf_getnote.c
+index 0f7b9d68..6ef970c5 100644
+--- a/libelf/gelf_getnote.c
++++ b/libelf/gelf_getnote.c
+@@ -31,6 +31,7 @@
+ #endif
+ 
+ #include <assert.h>
++#include <byteswap.h>
+ #include <gelf.h>
+ #include <string.h>
+ 
+@@ -73,6 +74,22 @@ gelf_getnote (Elf_Data *data, size_t offset, GElf_Nhdr *result,
+ 	offset = 0;
+       else
+ 	{
++	  /* Workaround FDO package notes on big-endian systems,
++	     getting namesz and descsz wrong. Detect it by getting
++	     a bad namesz, descsz and byte swapped n_type for
++	     NT_FDO_PACKAGING_METADATA.  */
++	  if (unlikely (n->n_type == bswap_32 (NT_FDO_PACKAGING_METADATA)
++			&& n->n_namesz > data->d_size
++			&& n->n_descsz > data->d_size))
++	    {
++	      /* n might not be writable, use result and redirect n.  */
++	      *result = *n;
++	      result->n_type = bswap_32 (n->n_type);
++	      result->n_namesz = bswap_32 (n->n_namesz);
++	      result->n_descsz = bswap_32 (n->n_descsz);
++	      n = result;
++	    }
++
+ 	  /* This is slightly tricky, offset is guaranteed to be 4
+ 	     byte aligned, which is what we need for the name_offset.
+ 	     And normally desc_offset is also 4 byte aligned, but not

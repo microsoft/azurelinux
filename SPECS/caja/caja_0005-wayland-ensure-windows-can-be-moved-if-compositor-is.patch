@@ -1,0 +1,58 @@
+From d55e854dade057bb954778d12acdbdc77d8c0422 Mon Sep 17 00:00:00 2001
+From: Luke from DC <lukefromdc@hushmail.com>
+Date: Sun, 22 Sep 2024 06:07:42 +0000
+Subject: [PATCH 05/10] wayland: ensure windows can be moved if compositor is
+ using CSD (#1787)
+
+*Do not use G_OBJECT_CLASS (class)->constructed
+*We don't seem to need it anymore and it breaks dragging windows with the titlebar or resizing with the mouse in wayland
+---
+ src/caja-window.c | 18 ++++++------------
+ 1 file changed, 6 insertions(+), 12 deletions(-)
+
+diff --git a/src/caja-window.c b/src/caja-window.c
+index a67a5ee4..2191a7ed 100644
+--- a/src/caja-window.c
++++ b/src/caja-window.c
+@@ -631,17 +631,6 @@ caja_window_set_initial_window_geometry (CajaWindow *window)
+                                       max_height_for_screen));
+ }
+ 
+-static void
+-caja_window_constructed (GObject *self)
+-{
+-    CajaWindow *window;
+-
+-    window = CAJA_WINDOW (self);
+-
+-    caja_window_initialize_bookmarks_menu (window);
+-    caja_window_set_initial_window_geometry (window);
+-}
+-
+ static void
+ caja_window_set_property (GObject *object,
+                           guint arg_id,
+@@ -742,6 +731,12 @@ caja_window_constructor (GType type,
+ 
+     slot = caja_window_open_slot (window->details->active_pane, 0);
+     caja_window_set_active_slot (window, slot);
++    /*We can now do this here instead of in a separate constructed function
++     *and we need to because the separate constructed function causes the
++     *window to be un-draggable/un-resizable with the mouse in wayland
++     */
++    caja_window_initialize_bookmarks_menu (window);
++    caja_window_set_initial_window_geometry (window);
+ 
+     return object;
+ }
+@@ -2170,7 +2165,6 @@ caja_window_class_init (CajaWindowClass *class)
+     GtkBindingSet *binding_set;
+ 
+     G_OBJECT_CLASS (class)->constructor = caja_window_constructor;
+-    G_OBJECT_CLASS (class)->constructed = caja_window_constructed;
+     G_OBJECT_CLASS (class)->get_property = caja_window_get_property;
+     G_OBJECT_CLASS (class)->set_property = caja_window_set_property;
+     G_OBJECT_CLASS (class)->finalize = caja_window_finalize;
+-- 
+2.48.1
+

@@ -1,0 +1,21 @@
+--- actix-rt-2.11.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ actix-rt-2.11.0/Cargo.toml	2025-09-08T16:52:26.154909+00:00
+@@ -48,7 +48,6 @@
+ 
+ [features]
+ default = ["macros"]
+-io-uring = ["tokio-uring"]
+ macros = ["actix-macros"]
+ 
+ [lib]
+@@ -91,10 +90,6 @@
+ version = "1.44.2"
+ features = ["full"]
+ 
+-[target.'cfg(target_os = "linux")'.dependencies.tokio-uring]
+-version = "0.5"
+-optional = true
+-
+ [lints.clippy]
+ disallowed-names = "warn"
+ uninlined-format-args = "warn"

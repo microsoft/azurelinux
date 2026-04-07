@@ -1,0 +1,11 @@
+--- difflib-0.4.0/Cargo.toml	1970-01-01T00:00:00+00:00
++++ difflib-0.4.0/Cargo.toml	2023-06-13T15:10:27.417160+00:00
+@@ -14,7 +14,7 @@
+ name = "difflib"
+ version = "0.4.0"
+ authors = ["Dima Kudosh <dimakudosh@gmail.com>"]
+-include = ["**/*.rs", "Cargo.toml"]
++include = ["**/*.rs", "Cargo.toml", "LICENSE"]
+ description = "Port of Python's difflib library to Rust."
+ homepage = "https://github.com/DimaKudosh/difflib"
+ documentation = "https://github.com/DimaKudosh/difflib/wiki"

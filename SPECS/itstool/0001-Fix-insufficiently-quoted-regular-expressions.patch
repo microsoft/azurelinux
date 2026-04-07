@@ -1,0 +1,76 @@
+From 32c7d07664dc37765100285d1202d488cd6a27e8 Mon Sep 17 00:00:00 2001
+From: Nils Philippsen <nils@tiptoe.de>
+Date: Mon, 9 Oct 2023 14:26:43 +0200
+Subject: [PATCH] Fix insufficiently quoted regular expressions
+
+These went under the radar until Python 3.12 started warning about them.
+
+Signed-off-by: Nils Philippsen <nils@tiptoe.de>
+---
+ itstool.in | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/itstool.in b/itstool.in
+index c21ad4b..4452616 100755
+--- a/itstool.in
++++ b/itstool.in
+@@ -220,7 +220,7 @@ class Message (object):
+         if not isinstance(text, ustr_type):
+             text = ustr(text, 'utf-8')
+         self._message[-1] += text.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+-        if re.sub('\s+', ' ', text).strip() != '':
++        if re.sub(r'\s+', ' ', text).strip() != '':
+             self._empty = False
+ 
+     def add_entity_ref (self, name):
+@@ -318,7 +318,7 @@ class Message (object):
+                 message += '<_:%s-%i/>' % (msg.name, placeholder)
+                 placeholder += 1
+         if not self._preserve:
+-            message = re.sub('\s+', ' ', message).strip()
++            message = re.sub(r'\s+', ' ', message).strip()
+         return message
+ 
+     def get_preserve_space (self):
+@@ -456,9 +456,9 @@ class LocNote (object):
+             if self._preserve_space:
+                 return self.locnote
+             else:
+-                return re.sub('\s+', ' ', self.locnote).strip()
++                return re.sub(r'\s+', ' ', self.locnote).strip()
+         elif self.locnoteref is not None:
+-            return '(itstool) link: ' + re.sub('\s+', ' ', self.locnoteref).strip()
++            return '(itstool) link: ' + re.sub(r'\s+', ' ', self.locnoteref).strip()
+         return ''
+ 
+ 
+@@ -889,7 +889,7 @@ class Document (object):
+         trans = translations.ugettext('_\x04translator-credits')
+         if trans is None or trans == 'translator-credits':
+             return
+-        regex = re.compile('(.*) \<(.*)\>, (.*)')
++        regex = re.compile(r'(.*) \<(.*)\>, (.*)')
+         for credit in trans.split('\n'):
+             match = regex.match(credit)
+             if not match:
+@@ -924,7 +924,7 @@ class Document (object):
+             prevnode = None
+             if node.prev is not None and node.prev.type == 'text':
+                 prevtext = node.prev.content
+-                if re.sub('\s+', '', prevtext) == '':
++                if re.sub(r'\s+', '', prevtext) == '':
+                     prevnode = node.prev
+             for lang in sorted(list(translations.keys()), reverse=True):
+                 locale = self.get_its_locale_filter(node)
+@@ -1468,7 +1468,7 @@ def match_locale(extrange, locale):
+         localei += 1
+     return True
+ 
+-_locale_pattern = re.compile('([a-zA-Z0-9-]+)(_[A-Za-z0-9]+)?(@[A-Za-z0-9]+)?(\.[A-Za-z0-9]+)?')
++_locale_pattern = re.compile(r'([a-zA-Z0-9-]+)(_[A-Za-z0-9]+)?(@[A-Za-z0-9]+)?(\.[A-Za-z0-9]+)?')
+ def convert_locale (locale):
+     # Automatically convert POSIX-style locales to BCP47
+     match = _locale_pattern.match(locale)
+-- 
+2.41.0
+

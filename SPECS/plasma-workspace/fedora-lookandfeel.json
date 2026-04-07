@@ -1,0 +1,17 @@
+{
+    "KPackageStructure": "Plasma/LookAndFeel",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "kde@lists.fedoraproject.org",
+                "Name": "Fedora KDE SIG"
+            }
+        ],
+        "Category": "",
+        "Description": "Fedora theme by Fedora KDE SIG",
+        "Id": "org.fedoraproject.fedora.desktop",
+        "License": "GPLv2+",
+        "Name": "Fedora",
+        "Website": "https://fedoraproject.org/"
+    }
+}

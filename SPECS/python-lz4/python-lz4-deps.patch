@@ -1,0 +1,13 @@
+diff -up lz4-4.3.2/pyproject.toml.deps lz4-4.3.2/pyproject.toml
+--- lz4-4.3.2/pyproject.toml.deps	2022-12-30 15:39:59.000000000 -0700
++++ lz4-4.3.2/pyproject.toml	2023-01-02 20:50:14.039470428 -0700
+@@ -1,6 +1,6 @@
+ [build-system]
+-requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2", "pkgconfig"]
++requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6", "pkgconfig"]
+ build-backend = "setuptools.build_meta"
+ 
+ [tool.setuptools_scm]
+-write_to = "lz4/version.py"
+\ No newline at end of file
++write_to = "lz4/version.py"

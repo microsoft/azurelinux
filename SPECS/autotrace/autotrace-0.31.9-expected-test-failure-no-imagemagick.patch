@@ -1,0 +1,31 @@
+diff -up autotrace-0.31.9/tests/github-#70/run.expected-failure-no-imagemagick autotrace-0.31.9/tests/github-#70/run
+--- autotrace-0.31.9/tests/github-#70/run.expected-failure-no-imagemagick	2023-01-24 14:53:57.278820241 +0100
++++ autotrace-0.31.9/tests/github-#70/run	2023-01-24 14:54:05.026741994 +0100
+@@ -4,6 +4,16 @@
+ 
+ DIR=$1
+ 
++# Check whether ImageMagick support is enabled and hence we support XPM
++autotrace -list-input-formats 2>&1 | grep xpm
++RESULT=$?
++
++if [ $RESULT -ne 0 ] ; then
++    XPM=0
++else
++    XPM=1
++fi
++
+ autotrace -report-progress -centerline -input-format XPM $DIR/lego_5.xpm -output-format svg -output-file $DIR/lego_5.svg
+ RESULT=$?
+ 
+@@ -11,5 +21,9 @@ if [ $RESULT -eq 0 ] && [ -s $DIR/lego_5
+     rm -f $DIR/lego_5.svg
+     ok
+ else
+-    fail
++    if [ $XPM -eq 0 ] ; then
++        expected_fail
++    else
++        fail
++    fi
+ fi

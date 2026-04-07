@@ -1,0 +1,21 @@
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Tue, 1 Sep 2020 12:29:25 +0200
+Subject: [PATCH] Use default EPMD socket
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+
+diff --git a/deps/rabbit/docs/rabbitmq-server.service.example b/deps/rabbit/docs/rabbitmq-server.service.example
+index 69531b1ff6..9c12824a0e 100644
+--- a/deps/rabbit/docs/rabbitmq-server.service.example
++++ b/deps/rabbit/docs/rabbitmq-server.service.example
+@@ -1,8 +1,8 @@
+ # systemd unit example
+ [Unit]
+ Description=RabbitMQ broker
+-After=network.target epmd@0.0.0.0.socket
+-Wants=network.target epmd@0.0.0.0.socket
++After=network.target epmd.socket
++Wants=network.target epmd.socket
+ 
+ [Service]
+ # Note: You *may* wish to uncomment the following lines to apply systemd

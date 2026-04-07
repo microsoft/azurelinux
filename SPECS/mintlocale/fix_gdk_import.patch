@@ -1,0 +1,10 @@
+--- a/usr/lib/linuxmint/mintlocale/mintlocale.py
++++ b/usr/lib/linuxmint/mintlocale/mintlocale.py
+@@ -21,6 +21,7 @@ except ImportError as err:
+     import ConfigParser as configparser
+ 
+ import gi
++gi.require_version('GdkX11', '3.0')
+ gi.require_version('Gtk', '3.0')
+ gi.require_version('AccountsService', '1.0')
+ from gi.repository import GdkX11

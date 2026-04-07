@@ -1,0 +1,44 @@
+From c94b04037302a719dc9474d77cd458885f0f249d Mon Sep 17 00:00:00 2001
+From: Adam Williamson <awilliam@redhat.com>
+Date: Mon, 17 Jun 2024 10:36:38 -0700
+Subject: [PATCH 1/2] Adapt storage tests for changes in fsspec (#1819) (#1679)
+
+This is adapted from the fixes that were rolled into
+https://github.com/zarr-developers/zarr-python/pull/1785 for the
+v3 branch.
+
+Signed-off-by: Adam Williamson <awilliam@redhat.com>
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ zarr/tests/test_storage.py | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/zarr/tests/test_storage.py b/zarr/tests/test_storage.py
+index d72718d7..c1ffa49e 100644
+--- a/zarr/tests/test_storage.py
++++ b/zarr/tests/test_storage.py
+@@ -406,7 +406,9 @@ class StoreTests:
+             assert [] == store.listdir(self.root + "c/x/y")
+             assert [] == store.listdir(self.root + "c/d/y")
+             assert [] == store.listdir(self.root + "c/d/y/z")
+-            assert [] == store.listdir(self.root + "c/e/f")
++            # https://github.com/zarr-developers/zarr-python/issues/1819 and #1679
++            # fsspec changed from returning [] to returning ["f"] around 2024.3
++            assert store.listdir(self.root + "c/e/f") in ([], ["f"])
+ 
+         # test rename (optional)
+         if store.is_erasable():
+@@ -1152,9 +1154,8 @@ class TestFSStore(StoreTests):
+         store[self.root + "foo"] = b"hello"
+         assert "foo" in os.listdir(str(path1) + "/" + self.root)
+         assert self.root + "foo" in store
+-        assert not os.listdir(str(path2))
+-        assert store[self.root + "foo"] == b"hello"
+         assert "foo" in os.listdir(str(path2))
++        assert store[self.root + "foo"] == b"hello"
+ 
+     def test_deep_ndim(self):
+         import zarr
+-- 
+2.49.0
+

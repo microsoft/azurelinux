@@ -1,0 +1,10 @@
+--- xen-4.16.0/Config.mk.orig	2021-11-30 11:42:42.000000000 +0000
++++ xen-4.16.0/Config.mk	2022-01-24 20:25:16.687125822 +0000
+@@ -186,6 +186,7 @@
+ 
+ $(call cc-option-add,CFLAGS,CC,-Wno-unused-but-set-variable)
+ $(call cc-option-add,CFLAGS,CC,-Wno-unused-local-typedefs)
++$(call cc-option-add,CFLAGS,CC,-Wno-error=array-bounds)
+ 
+ LDFLAGS += $(foreach i, $(EXTRA_LIB), -L$(i)) 
+ CFLAGS += $(foreach i, $(EXTRA_INCLUDES), -I$(i))

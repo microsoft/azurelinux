@@ -1,0 +1,28 @@
+From c8b97342229354422f3ca1a443463f2728580765 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ralf=20Cors=C3=A9pius?= <corsepiu@fedoraproject.org>
+Date: Wed, 25 Dec 2024 02:17:36 +0100
+Subject: [PATCH 1/2] No solicitation No automatic phone home by default (RHBZ
+ 668865).
+
+---
+ gui/babeldata.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gui/babeldata.h b/gui/babeldata.h
+index b79cd1dc..5e7457e9 100644
+--- a/gui/babeldata.h
++++ b/gui/babeldata.h
+@@ -150,8 +150,8 @@ public:
+   int runCount_{0};
+ 
+   // Global preferences.
+-  bool startupVersionCheck_{true};
+-  bool reportStatistics_{true};
++  bool startupVersionCheck_{false};
++  bool reportStatistics_{false};
+   bool allowBetaUpgrades_{false};
+   bool ignoreVersionMismatch_{false};
+   bool disableDonateDialog_{false};
+-- 
+2.48.1
+

@@ -1,0 +1,40 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7a41914..2b4f4fb 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 2.8)
++cmake_minimum_required(VERSION 3.5...4.0)
+ 
+ # This CMakeLists.txt file intended for:
+ # - development of wslay library
+diff --git a/examples/CMakeLists.txt b/examples/CMakeLists.txt
+index 5d6aabf..468e8f4 100644
+--- a/examples/CMakeLists.txt
++++ b/examples/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 3.2)
++cmake_minimum_required(VERSION 3.5...4.0)
+ 
+ include(CheckIncludeFiles)
+ check_include_files("sys/epoll.h" HAVE_EPOLL)
+diff --git a/lib/CMakeLists.txt b/lib/CMakeLists.txt
+index 4af972e..741e4ab 100644
+--- a/lib/CMakeLists.txt
++++ b/lib/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 2.8)
++cmake_minimum_required(VERSION 3.5...4.0)
+ 
+ # This CMakeLists.txt file intended for:
+ # - include by master ../CMakeLists.txt
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 344680b..72917a1 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 3.2)
++cmake_minimum_required(VERSION 3.5...4.0)
+ 
+ find_package(CUnit REQUIRED)
+ 

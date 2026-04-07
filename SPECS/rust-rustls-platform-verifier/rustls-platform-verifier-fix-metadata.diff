@@ -1,0 +1,49 @@
+--- rustls-platform-verifier-0.6.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ rustls-platform-verifier-0.6.2/Cargo.toml	2025-11-30T10:09:15.050455+00:00
+@@ -45,10 +45,6 @@
+ [features]
+ cert-logging = ["base64"]
+ dbg = []
+-docsrs = [
+-    "jni",
+-    "once_cell",
+-]
+ ffi-testing = [
+     "rustls/ring",
+ ]
+@@ -57,25 +53,12 @@
+ name = "rustls_platform_verifier"
+ path = "src/lib.rs"
+ 
+-[[example]]
+-name = "update-certs"
+-path = "examples/update-certs.rs"
+-
+ [dependencies.base64]
+ version = "0.22"
+ optional = true
+ 
+-[dependencies.jni]
+-version = "0.21"
+-optional = true
+-default-features = false
+-
+ [dependencies.log]
+ version = "0.4"
+-
+-[dependencies.once_cell]
+-version = "1.9"
+-optional = true
+ 
+ [dependencies.rustls]
+ version = "0.23.27"
+@@ -87,9 +70,6 @@
+ features = ["ring"]
+ default-features = false
+ 
+-[dev-dependencies.webpki-root-certs]
+-version = "1"
+-
+ [target.'cfg(all(unix, not(target_os = "android"), not(target_vendor = "apple"), not(target_arch = "wasm32")))'.dependencies.rustls-native-certs]
+ version = "0.8"
+ 

@@ -1,0 +1,24 @@
+From 3c6c4ab9aac7734d57bbfa49cc413343ce819fc1 Mon Sep 17 00:00:00 2001
+From: Nicolas Fella <nicolas.fella@gmx.de>
+Date: Thu, 12 Feb 2026 18:58:09 +0100
+Subject: [PATCH] Add missing include for syscall()
+
+---
+ src/file/priority.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/file/priority.cpp b/src/file/priority.cpp
+index cc728fef..45cd216c 100644
+--- a/src/file/priority.cpp
++++ b/src/file/priority.cpp
+@@ -15,6 +15,7 @@
+ #include <sched.h>
+ #include <sys/resource.h>
+ #include <sys/syscall.h>
++#include <unistd.h>
+ 
+ #ifdef SYS_ioprio_set
+ #include <linux/ioprio.h>
+-- 
+GitLab
+

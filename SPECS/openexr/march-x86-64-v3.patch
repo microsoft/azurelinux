@@ -1,0 +1,14 @@
+Backport of https://github.com/AcademySoftwareFoundation/openexr/pull/1507
+
+diff -urNp a/src/lib/OpenEXRCore/internal_cpuid.h b/src/lib/OpenEXRCore/internal_cpuid.h
+--- a/src/lib/OpenEXRCore/internal_cpuid.h	2024-02-14 08:37:04.189748315 +0100
++++ b/src/lib/OpenEXRCore/internal_cpuid.h	2024-02-14 08:38:05.956400456 +0100
+@@ -51,7 +51,7 @@ check_for_x86_simd (int* f16c, int* avx,
+ 
+ #elif OPENEXR_ENABLE_X86_SIMD_CHECK
+ 
+-#   if defined(_WIN32)
++#   if defined(_MSC_VER) && defined(_WIN32)
+     int regs[4]={0}, osxsave;
+ 
+     __cpuid (regs, 0);

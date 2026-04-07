@@ -1,0 +1,38 @@
+From b7585617d7099b2afe7bc39c461c741b4c575cfb Mon Sep 17 00:00:00 2001
+From: Fushan Wen <qydwhotmail@gmail.com>
+Date: Sun, 18 Sep 2022 18:17:18 +0800
+Subject: [PATCH 34/55] Call `finishDrag()` in
+ `QWaylandDataDevice::dragSourceCancelled()`
+
+Drags can either get finished or cancelled. If a drag is finished
+successfully we call finish on the QBasicDrag instance, which quits
+the nested event loop. This patch adds the connection for cancelled
+drags.
+
+See also: https://bugs.kde.org/show_bug.cgi?id=446111
+
+Pick-to: 6.4 6.2 5.15
+Change-Id: Ib93040648da88a433d647c87adcb7a7fabcaef6c
+Reviewed-by: Liang Qi <liang.qi@qt.io>
+(cherry picked from commit c92282b865efcf8c571bb52b5f96d8ad260a1cda)
+
+BUG: 446111
+---
+ src/client/qwaylanddatadevice.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/client/qwaylanddatadevice.cpp b/src/client/qwaylanddatadevice.cpp
+index 89e4e372..5c5b8485 100644
+--- a/src/client/qwaylanddatadevice.cpp
++++ b/src/client/qwaylanddatadevice.cpp
+@@ -302,6 +302,7 @@ void QWaylandDataDevice::selectionSourceCancelled()
+ #if QT_CONFIG(draganddrop)
+ void QWaylandDataDevice::dragSourceCancelled()
+ {
++    static_cast<QWaylandDrag *>(QGuiApplicationPrivate::platformIntegration()->drag())->finishDrag();
+     m_dragSource.reset();
+ }
+ 
+-- 
+2.51.1
+

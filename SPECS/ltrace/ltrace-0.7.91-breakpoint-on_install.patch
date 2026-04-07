@@ -1,0 +1,81 @@
+From 56134ff5442bee4e128b189bb86cfc97dcb6f60a Mon Sep 17 00:00:00 2001
+From: Petr Machata <pmachata@redhat.com>
+Date: Fri, 10 Jan 2014 20:05:15 +0100
+Subject: [PATCH 1/2] Add a new per-breakpoint callback on_install
+
+---
+ breakpoint.h  |    9 ++++++++-
+ breakpoints.c |   11 ++++++++++-
+ 2 files changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/breakpoint.h b/breakpoint.h
+index 95964a8..c36f673 100644
+--- a/breakpoint.h
++++ b/breakpoint.h
+@@ -1,6 +1,6 @@
+ /*
+  * This file is part of ltrace.
+- * Copyright (C) 2012, 2013 Petr Machata, Red Hat Inc.
++ * Copyright (C) 2012,2013,2014 Petr Machata, Red Hat Inc.
+  * Copyright (C) 2009 Juan Cespedes
+  *
+  * This program is free software; you can redistribute it and/or
+@@ -46,6 +46,7 @@
+ struct bp_callbacks {
+ 	void (*on_hit)(struct breakpoint *bp, struct process *proc);
+ 	void (*on_continue)(struct breakpoint *bp, struct process *proc);
++	void (*on_install)(struct breakpoint *bp, struct process *proc);
+ 	void (*on_retract)(struct breakpoint *bp, struct process *proc);
+ 
+ 	/* Create a new breakpoint that should handle return from the
+@@ -84,6 +85,12 @@ void breakpoint_on_continue(struct breakpoint *bp, struct process *proc);
+  * the instruction underneath it).  */
+ void breakpoint_on_retract(struct breakpoint *bp, struct process *proc);
+ 
++/* Call ON_INSTALL handler of BP, if any is set.  This should be
++ * called after the breakpoint is enabled for the first time, not
++ * every time it's enabled (such as after stepping over a site of a
++ * temporarily disabled breakpoint).  */
++void breakpoint_on_install(struct breakpoint *bp, struct process *proc);
++
+ /* Call GET_RETURN_BP handler of BP, if any is set.  If none is set,
+  * call CREATE_DEFAULT_RETURN_BP to obtain one.  */
+ int breakpoint_get_return_bp(struct breakpoint **ret,
+diff --git a/breakpoints.c b/breakpoints.c
+index 947cb71..c3fa275 100644
+--- a/breakpoints.c
++++ b/breakpoints.c
+@@ -1,6 +1,6 @@
+ /*
+  * This file is part of ltrace.
+- * Copyright (C) 2006,2007,2011,2012,2013 Petr Machata, Red Hat Inc.
++ * Copyright (C) 2006,2007,2011,2012,2013,2014 Petr Machata, Red Hat Inc.
+  * Copyright (C) 2009 Juan Cespedes
+  * Copyright (C) 1998,2001,2002,2003,2007,2008,2009 Juan Cespedes
+  * Copyright (C) 2006 Ian Wienand
+@@ -85,6 +85,14 @@ breakpoint_on_retract(struct breakpoint *bp, struct process *proc)
+ 		(bp->cbs->on_retract)(bp, proc);
+ }
+ 
++void
++breakpoint_on_install(struct breakpoint *bp, struct process *proc)
++{
++	assert(bp != NULL);
++	if (bp->cbs != NULL && bp->cbs->on_install != NULL)
++		(bp->cbs->on_install)(bp, proc);
++}
++
+ int
+ breakpoint_get_return_bp(struct breakpoint **ret,
+ 			 struct breakpoint *bp, struct process *proc)
+@@ -229,6 +237,7 @@ breakpoint_turn_on(struct breakpoint *bp, struct process *proc)
+ 	if (bp->enabled == 1) {
+ 		assert(proc->pid != 0);
+ 		enable_breakpoint(proc, bp);
++		breakpoint_on_install(bp, proc);
+ 	}
+ 	return 0;
+ }
+-- 
+1.7.6.5
+

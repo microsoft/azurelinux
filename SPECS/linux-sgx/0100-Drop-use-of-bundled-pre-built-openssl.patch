@@ -1,0 +1,272 @@
+From 2ca3aeb67f3d1f2676b6f8004764b7d4be768ebf Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Mon, 26 Feb 2024 12:19:51 +0000
+Subject: [PATCH 100/131] Drop use of bundled pre-built openssl
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Use pkg-config to find the host distro libcrypto library.
+Tweaked rules to dynamically link to the distro library.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ QuoteGeneration/qcnl/linux/Makefile                      | 8 +++-----
+ QuoteGeneration/qpl/linux/Makefile                       | 8 +++-----
+ QuoteVerification/QvE/Test/Makefile                      | 4 ++--
+ QuoteVerification/appraisal/qal/Makefile                 | 5 ++---
+ QuoteVerification/appraisal/tee_appraisal_tool/Makefile  | 5 ++---
+ QuoteVerification/buildenv.mk                            | 1 -
+ QuoteVerification/dcap_quoteverify/linux/Makefile        | 8 ++++----
+ tools/PCKCertSelection/PCKCertSelectionLib/Makefile      | 9 +++------
+ .../PCKCertSelectionLib/Makefile.static_lib              | 5 +----
+ 9 files changed, 20 insertions(+), 33 deletions(-)
+
+diff --git a/QuoteGeneration/qcnl/linux/Makefile b/QuoteGeneration/qcnl/linux/Makefile
+index f5b7be90..860eb268 100644
+--- a/QuoteGeneration/qcnl/linux/Makefile
++++ b/QuoteGeneration/qcnl/linux/Makefile
+@@ -32,7 +32,6 @@
+ ######## SGX SDK Settings ########
+ TOP_DIR = ../..
+ include $(TOP_DIR)/buildenv.mk
+-PREBUILD_OPENSSL_PATH = ../../../prebuilt/openssl
+ 
+ ######## SGX CNL Library Settings ########
+ 
+@@ -45,10 +44,9 @@ CNL_Lib_Include_Paths := -I../../quote_wrapper/common/inc       \
+                          -I../../common/inc/internal            \
+                          -I../../pce_wrapper/inc                \
+                          -I../../../QuoteVerification/QVL/Src/ThirdParty/rapidjson/include/rapidjson	\
+-                         -I../../../tools/PCKCertSelection/include \
+-                         -I$(PREBUILD_OPENSSL_PATH)/inc
++                         -I../../../tools/PCKCertSelection/include
+ 
+-CNL_Lib_C_Flags := $(COMMON_FLAGS) -g -fPIC -Wno-attributes $(CNL_Lib_Include_Paths)
++CNL_Lib_C_Flags := $(COMMON_FLAGS) -g -fPIC -Wno-attributes $(CNL_Lib_Include_Paths) $(shell pkg-config --cflags libcrypto)
+ 
+ LDUFLAGS:= -pthread $(COMMON_LDFLAGS)
+ LDUFLAGS += -Wl,--version-script=sgx_default_qcnl.lds -Wl,--gc-sections
+@@ -60,7 +58,7 @@ CNL_Lib_Cpp_Flags+= -DSELF_SIGNED_CERT
+ endif
+ 
+ CNL_Lib_Link_Flags := $(SGX_COMMON_FLAGS) -g -L$(TOP_DIR)/build/linux -L$(SGX_SDK)/lib64 \
+-		-lpthread -ldl ../../../tools/PCKCertSelection/static_out/libPCKCertSelection.a
++		-lpthread -ldl ../../../tools/PCKCertSelection/static_out/libPCKCertSelection.a $(shell pkg-config --libs libcrypto)
+  
+ ifndef DEBUG
+ CNL_Lib_Cpp_Flags += -DDISABLE_TRACE
+diff --git a/QuoteGeneration/qpl/linux/Makefile b/QuoteGeneration/qpl/linux/Makefile
+index b675e729..b109a581 100644
+--- a/QuoteGeneration/qpl/linux/Makefile
++++ b/QuoteGeneration/qpl/linux/Makefile
+@@ -32,7 +32,6 @@
+ ######## SGX SDK Settings ########
+ TOP_DIR  = ../..
+ include $(TOP_DIR)/buildenv.mk
+-PREBUILD_OPENSSL_PATH  = ../../../prebuilt/openssl
+ 
+ ######## SGX QPL Library Settings ########
+ 
+@@ -42,17 +41,16 @@ QPL_Lib_Cpp_Files := $(wildcard *.cpp ../*.cpp)
+ QPL_Lib_Include_Paths := -I../../quote_wrapper/common/inc       \
+                          -I../inc -I$(SGX_SDK)/include          \
+                          -I../../common/inc/internal            \
+-                         -I../../qcnl/inc                       \
+-                         -I$(PREBUILD_OPENSSL_PATH)/inc
++                         -I../../qcnl/inc
+ 
+-QPL_Lib_C_Flags := $(COMMON_FLAGS) -g -fPIC -Wno-attributes $(QPL_Lib_Include_Paths)
++QPL_Lib_C_Flags := $(COMMON_FLAGS) -g -fPIC -Wno-attributes $(QPL_Lib_Include_Paths) $(shell pkg-config --cflags libcrypto)
+ 
+ LDUFLAGS:= -pthread $(COMMON_LDFLAGS)
+ LDUFLAGS += -Wl,--version-script=sgx_default_quote_provider.lds -Wl,--gc-sections
+ 
+ QPL_Lib_Cpp_Flags := $(QPL_Lib_C_Flags) -std=c++11
+ 
+-QPL_Lib_Link_Flags := $(SGX_COMMON_FLAGS) -g -L$(TOP_DIR)/build/linux -L$(SGX_SDK)/lib64 -L$(PREBUILD_OPENSSL_PATH)/lib/linux64 \
++QPL_Lib_Link_Flags := $(SGX_COMMON_FLAGS) -g -L$(TOP_DIR)/build/linux -L$(SGX_SDK)/lib64 \
+         -lcrypto -lsgx_default_qcnl_wrapper -lpthread -ldl
+  
+ ifndef DEBUG
+diff --git a/QuoteVerification/QvE/Test/Makefile b/QuoteVerification/QvE/Test/Makefile
+index 29f697ba..ce4b1eec 100644
+--- a/QuoteVerification/QvE/Test/Makefile
++++ b/QuoteVerification/QvE/Test/Makefile
+@@ -20,7 +20,7 @@ SRC_PATH := $(MKFILE_PATH)/../Enclave
+ TEST_PATH := $(MKFILE_PATH)/src
+ MOCK_PATH := $(MKFILE_PATH)/src/mock
+ 
+-INCLUDE := -I$(INCLUDE_PATH) -I$(SRC_PATH) -I$(MOCK_PATH) -I$(PREBUILD_OPENSSL_PATH)/inc\
++INCLUDE := -I$(INCLUDE_PATH) -I$(SRC_PATH) -I$(MOCK_PATH) $(shell pkg-config --cflags libcrypto) \
+ 					-I$(MKFILE_PATH)/../../QVL/Src/AttestationLibrary/src \
+                     -I$(MKFILE_PATH)/../../QVL/Src/AttestationLibrary/include \
+                     -I$(MKFILE_PATH)/../../QVL/Src/AttestationParsers/include \
+@@ -54,7 +54,7 @@ OBJ_SRC_PATH := $(OBJ_PATH)/qve
+ OBJS_SRC := $(OBJ_SRC_PATH)/$(notdir $(SRC_QVE_LOGIC:.cpp=.o))
+ 
+ LD_GTEST := -L$(GTEST_PATH)/lib -lgtest -lgmock_main -lgmock
+-LDFLAGS := -L$(PREBUILD_OPENSSL_PATH)/lib/linux64 -lcrypto -lpthread -ldl
++LDFLAGS := $(shell pkg-config --libs libcrypto) -lpthread -ldl
+ 
+ CXX_WARNINGS := -Wall -Wextra -Winit-self -Wpointer-arith -Wreturn-type -Waddress -Wsequence-point -Wformat-security -Wmissing-include-dirs -Wfloat-equal -Wundef -Wshadow -Wcast-align -Wconversion -Wredundant-decls
+ 
+diff --git a/QuoteVerification/appraisal/qal/Makefile b/QuoteVerification/appraisal/qal/Makefile
+index 7a7f2eb4..89c26de2 100644
+--- a/QuoteVerification/appraisal/qal/Makefile
++++ b/QuoteVerification/appraisal/qal/Makefile
+@@ -12,10 +12,9 @@ WARM_Lib_Path := $(WARM_Top_Path)/product-mini/platforms/linux/build/
+ 
+ JWT_CPP_Path := ../../../external/jwt-cpp/
+ RAPIDJSON_DIR :=  ../../QVL/Src/ThirdParty/rapidjson/include
+-PREBUILD_OPENSSL_PATH := ../../../prebuilt/openssl
+ QAL_Include_Path := -I./ \
+                 -I$(SGX_SDK)/include \
+-                -I$(PREBUILD_OPENSSL_PATH)/inc \
++                $(shell pkg-config --cflags libcrypto) \
+                 -I$(DCAP_QG_DIR)/common/inc/internal/linux \
+                 -I$(WARM_Top_Path)/core/iwasm/include \
+                 -I$(JWT_CPP_Path)/include   \
+@@ -28,7 +27,7 @@ QAL_Cpp_Flags := $(CXXFLAGS) -g -fPIC $(QAL_Include_Path)
+ QAL_C_Flags := $(CFLAGS) -g -fPIC $(QAL_Include_Path)
+ 
+ QAL_Link_Flags := $(COMMON_LDFLAGS) -L$(WARM_Lib_Path) -liwasm  -ldl -lm -lpthread \
+-                -L$(PREBUILD_OPENSSL_PATH)/lib/linux64 -lcrypto \
++                $(shell pkg-config --libs libcrypto) \
+                 -Wl,--gc-sections -Wl,--version-script=sgx_dcap_qal.lds
+ 
+ WASM_CONFIG ?= -DCMAKE_BUILD_TYPE=Release
+diff --git a/QuoteVerification/appraisal/tee_appraisal_tool/Makefile b/QuoteVerification/appraisal/tee_appraisal_tool/Makefile
+index b5b6e6c4..512a48d9 100644
+--- a/QuoteVerification/appraisal/tee_appraisal_tool/Makefile
++++ b/QuoteVerification/appraisal/tee_appraisal_tool/Makefile
+@@ -33,14 +33,13 @@
+ DCAP_TOPDIR = ../../..
+ include $(DCAP_TOPDIR)/QuoteGeneration/buildenv.mk
+ 
+-PREBUILD_OPENSSL_PATH := $(DCAP_TOPDIR)/prebuilt/openssl
+ FLAGS := -fpie -g -I./ \
+ 		-I$(SGX_SDK)/include \
+ 		-I$(DCAP_TOPDIR)/external/jwt-cpp/include \
+ 		-I../../QVL/Src/ThirdParty/rapidjson/include \
+ 		-I$(DCAP_TOPDIR)/QuoteGeneration/common/inc/internal/ \
+ 		-I$(DCAP_TOPDIR)/QuoteGeneration/common/inc/internal/linux/ \
+-		-I$(PREBUILD_OPENSSL_PATH)/inc \
++		$(shell pkg-config --cflags libcrypto) \
+ 		-I../common
+ 
+ ifdef DEBUG
+@@ -56,7 +55,7 @@ Cpp_Common_Obj_Files := file_util.o format_util.o
+ C_Obj_Files := se_trace.o
+ 
+ Obj_Files := $(Cpp_Files:.cpp=.o) $(C_Obj_Files) $(Cpp_Common_Obj_Files)
+-LDFLAGS += -L$(PREBUILD_OPENSSL_PATH)/lib/linux64 -lcrypto -lpthread -ldl
++LDFLAGS += $(shell pkg-config --libs libcrypto) -lpthread -ldl
+ 
+ 
+ TARGET_NAME := tee_appraisal_tool
+diff --git a/QuoteVerification/buildenv.mk b/QuoteVerification/buildenv.mk
+index a619f498..8ffd99cb 100644
+--- a/QuoteVerification/buildenv.mk
++++ b/QuoteVerification/buildenv.mk
+@@ -31,7 +31,6 @@ PREBUILD_PATH	        := $(DCAP_QG_DIR)/../prebuilt
+ DCAP_QV_DIR				:= $(DCAP_QG_DIR)/../QuoteVerification
+ QVL_SRC_PATH 			?= $(DCAP_QV_DIR)/QVL/Src
+ SGXSSL_PACKAGE_PATH 	?= $(DCAP_QV_DIR)/sgxssl/Linux/package
+-PREBUILD_OPENSSL_PATH	?= $(PREBUILD_PATH)/openssl
+ 
+ SGX_COMMON_CFLAGS := $(COMMON_FLAGS) -m64 -Wjump-misses-init -Wstrict-prototypes -Wunsuffixed-float-constants
+ SGX_COMMON_CXXFLAGS := $(COMMON_FLAGS) -m64 -Wnon-virtual-dtor -std=c++17
+diff --git a/QuoteVerification/dcap_quoteverify/linux/Makefile b/QuoteVerification/dcap_quoteverify/linux/Makefile
+index cbc24c1e..96ad3e56 100644
+--- a/QuoteVerification/dcap_quoteverify/linux/Makefile
++++ b/QuoteVerification/dcap_quoteverify/linux/Makefile
+@@ -10,8 +10,8 @@ INSTALL_PATH 		?= /usr/lib/x86_64-linux-gnu
+ QVE_SRC_PATH		:= $(DCAP_QV_DIR)/QvE
+ DCAP_QPL_DIR := $(DCAP_QG_DIR)/qpl
+ 
+-QVL_LIB_INC		+= -I$(PREBUILD_OPENSSL_PATH)/inc -I$(QVE_SRC_PATH)/Include
+-QVL_PARSER_INC  += -I$(PREBUILD_OPENSSL_PATH)/inc
++QVL_LIB_INC		+= $(shell pkg-config --cflags libcrypto) -I$(QVE_SRC_PATH)/Include
++QVL_PARSER_INC  += $(shell pkg-config --cflags libcrypto)
+ QVL_VERIFY_INC	:= -I$(QVE_SRC_PATH)/Include \
+                    -I../inc \
+                    -I$(DCAP_QG_DIR)/quote_wrapper/common/inc \
+@@ -19,7 +19,7 @@ QVL_VERIFY_INC	:= -I$(QVE_SRC_PATH)/Include \
+                    -I$(DCAP_QG_DIR)/common/inc/internal \
+                    -I$(DCAP_QG_DIR)/common/inc/internal/linux \
+                    -I$(DCAP_QG_DIR)/pce_wrapper/inc \
+-                   -I$(PREBUILD_OPENSSL_PATH)/inc \
++                   $(shell pkg-config --cflags libcrypto) \
+                    $(QVL_LIB_INC) \
+                    -I$(DCAP_QPL_DIR)/inc \
+                    -I$(DCAP_QV_DIR)/appraisal/common \
+@@ -38,7 +38,7 @@ QVL_PARSER := sgx_dcap_qvl_attestation
+ QVL_LIB_NAME := lib$(QVL_LIB).a
+ QVL_PARSER_NAME := lib$(QVL_PARSER).a
+ 
+-LDUFLAGS	:= -pthread -ldl -L. -l$(QVL_LIB) -l$(QVL_PARSER) $(COMMON_LDFLAGS) -L$(PREBUILD_OPENSSL_PATH)/lib/linux64 -lcrypto
++LDUFLAGS	:= -pthread -ldl -L. -l$(QVL_LIB) -l$(QVL_PARSER) $(COMMON_LDFLAGS) -lcrypto
+ LDUFLAGS	+= -Wl,--version-script=sgx_dcap_quoteverify.lds -Wl,--gc-sections
+ 
+ QVL_VERIFY_CPP_SRCS := $(wildcard ../*.cpp) $(wildcard *.cpp)
+diff --git a/tools/PCKCertSelection/PCKCertSelectionLib/Makefile b/tools/PCKCertSelection/PCKCertSelectionLib/Makefile
+index e0402e95..6e1c7876 100644
+--- a/tools/PCKCertSelection/PCKCertSelectionLib/Makefile
++++ b/tools/PCKCertSelection/PCKCertSelectionLib/Makefile
+@@ -63,10 +63,7 @@ ifndef QG_DIR
+ endif
+ 
+ # openssl include dir
+-OPENSSL_INC 		:= $(PROJ_ROOT_DIR)/../../prebuilt/openssl/inc
+-
+-# openssl lib dir
+-OPENSSL_LIB 		:= $(PROJ_ROOT_DIR)/../../prebuilt/openssl/lib/linux64
++OPENSSL_INC 		:= $(shell pkg-config --cflags libcrypto)
+ 
+ # JSON parser include dir
+ JSON_INC		:= $(QVL_DIR)/ThirdParty/rapidjson/include
+@@ -116,7 +113,7 @@ LIB_CPP_OBJECTS 	:= \
+ 	$(UTILS_CPP_FILES:.cpp=.o)
+ 
+ # include paths, local, parser and openssl
+-LIB_INCLUDE_PATHS	:= -I. -I$(PROJ_ROOT_DIR)/include -I$(OPENSSL_INC) -I$(JSON_INC) -I$(PARSERS_INC) -I$(PARSERS_COMM_INC) -I$(PARSERS_DIR) -I$(VER_DIR) -I$(PARSERS_UTIL_INC)
++LIB_INCLUDE_PATHS	:= -I. -I$(PROJ_ROOT_DIR)/include $(OPENSSL_INC) -I$(JSON_INC) -I$(PARSERS_INC) -I$(PARSERS_COMM_INC) -I$(PARSERS_DIR) -I$(VER_DIR) -I$(PARSERS_UTIL_INC)
+ 
+ # the library shared object name
+ LIB_NAME		:= libPCKCertSelection.so
+@@ -136,7 +133,7 @@ C_FLAGS	:= -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Werror -Wno-ov
+ C_FLAGS += -UPCK_CERT_SELECTION_WITH_COMPONENT
+ 
+ # link flags, link openssl crypto
+-LINK_FLAGS := -shared -L$(OPENSSL_LIB) -lcrypto -lpthread -ldl
++LINK_FLAGS := -shared -lcrypto -lpthread -ldl
+ LINK_FLAGS += -Wl,--version-script=pck_cert_selection.lds -Wl,--gc-sections
+ 
+ # debug/release switch
+diff --git a/tools/PCKCertSelection/PCKCertSelectionLib/Makefile.static_lib b/tools/PCKCertSelection/PCKCertSelectionLib/Makefile.static_lib
+index a20a3cd5..499ee94f 100644
+--- a/tools/PCKCertSelection/PCKCertSelectionLib/Makefile.static_lib
++++ b/tools/PCKCertSelection/PCKCertSelectionLib/Makefile.static_lib
+@@ -118,7 +118,7 @@ LIB_CPP_OBJECTS 	:= \
+ LIB_CPP_OBJECTS := $(addprefix $(BIN_DIR)/, $(LIB_CPP_OBJECTS))
+ 
+ # include paths, local, parser and openssl
+-LIB_INCLUDE_PATHS	:= -I. -I$(PROJ_ROOT_DIR)/include -I$(OPENSSL_INC) -I$(JSON_INC) -I$(PARSERS_INC) -I$(PARSERS_COMM_INC) -I$(PARSERS_DIR) -I$(VER_DIR) -I$(PARSERS_UTIL_INC)
++LIB_INCLUDE_PATHS	:= -I. -I$(PROJ_ROOT_DIR)/include $(shell pkg-config --cflags libcrypto) -I$(JSON_INC) -I$(PARSERS_INC) -I$(PARSERS_COMM_INC) -I$(PARSERS_DIR) -I$(VER_DIR) -I$(PARSERS_UTIL_INC)
+ 
+ # the library shared object name
+ LIB_NAME		:= libPCKCertSelection.a
+@@ -197,9 +197,6 @@ $(BIN_DIR)/%.o: $(UTILS_DIR)/%.cpp
+ $(LIB_NAME): $(LIB_CPP_OBJECTS)
+ 	$(PCKCERTSEL_VERBOSE)echo "Archiving..."
+ 	$(PCKCERTSEL_VERBOSE)$(AR) -rcs $(BIN_DIR)/$@ $^
+-	$(PCKCERTSEL_VERBOSE)@$(MKDIR) $(BIN_DIR)/.libcrypto
+-	$(PCKCERTSEL_VERBOSE)@$(RM) -f $(BIN_DIR)/.libcrypto/* && cd $(BIN_DIR)/.libcrypto && $(AR) x $(OPENSSL_LIB)/libcrypto.a
+-	$(PCKCERTSEL_VERBOSE)$(AR) qD $(BIN_DIR)/$@ $(BIN_DIR)/.libcrypto/*.o
+ 
+ debug:
+ 	$(PCKCERTSEL_VERBOSE)$(MAKE) DEBUG=1 all
+-- 
+2.53.0
+

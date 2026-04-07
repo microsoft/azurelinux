@@ -1,0 +1,61 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Michal Cyprian <m.cyprian@gmail.com>
+Date: Mon, 26 Jun 2017 16:32:56 +0200
+Subject: 00251: Change user install location
+
+Set values of prefix and exec_prefix in distutils install command
+to /usr/local if executable is /usr/bin/python* and RPM build
+is not detected to make pip and distutils install into separate location.
+
+Fedora Change: https://fedoraproject.org/wiki/Changes/Making_sudo_pip_safe
+---
+ Lib/distutils/command/install.py | 15 +++++++++++++--
+ Lib/site.py                      |  9 ++++++++-
+ 2 files changed, 21 insertions(+), 3 deletions(-)
+
+diff --git a/Lib/distutils/command/install.py b/Lib/distutils/command/install.py
+index 4b969bf809..fa0cde25e3 100644
+--- a/Lib/distutils/command/install.py
++++ b/Lib/distutils/command/install.py
+@@ -418,8 +418,19 @@ class install(Command):
+                     raise DistutilsOptionError(
+                           "must not supply exec-prefix without prefix")
+ 
+-                self.prefix = os.path.normpath(sys.prefix)
+-                self.exec_prefix = os.path.normpath(sys.exec_prefix)
++                # self.prefix is set to sys.prefix + /local/
++                # if neither RPM build nor virtual environment is
++                # detected to make pip and distutils install packages
++                # into the separate location.
++                if (not (hasattr(sys, 'real_prefix') or
++                    sys.prefix != sys.base_prefix) and
++                    'RPM_BUILD_ROOT' not in os.environ):
++                    addition = "/local"
++                else:
++                    addition = ""
++
++                self.prefix = os.path.normpath(sys.prefix) + addition
++                self.exec_prefix = os.path.normpath(sys.exec_prefix) + addition
+ 
+             else:
+                 if self.exec_prefix is None:
+diff --git a/Lib/site.py b/Lib/site.py
+index 58115f1c08..dca42616d8 100644
+--- a/Lib/site.py
++++ b/Lib/site.py
+@@ -326,7 +326,14 @@ def getsitepackages(prefixes=None):
+     return sitepackages
+ 
+ def addsitepackages(known_paths, prefixes=None):
+-    """Add site-packages to sys.path"""
++    """Add site-packages to sys.path
++
++    '/usr/local' is included in PREFIXES if RPM build is not detected
++    to make packages installed into this location visible.
++
++    """
++    if ENABLE_USER_SITE and 'RPM_BUILD_ROOT' not in os.environ:
++        PREFIXES.insert(0, "/usr/local")
+     for sitedir in getsitepackages(prefixes):
+         if os.path.isdir(sitedir):
+             addsitedir(sitedir, known_paths)

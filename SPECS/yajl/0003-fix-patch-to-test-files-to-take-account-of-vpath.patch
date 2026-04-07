@@ -1,0 +1,49 @@
+From 39b9c104275a5eac498f5d2a92b462d10381a9eb Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Mon, 10 Jul 2023 13:44:26 +0100
+Subject: [PATCH 3/8] fix patch to test files to take account of vpath
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ test/api/run_tests.sh     | 2 +-
+ test/parsing/run_tests.sh | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/test/api/run_tests.sh b/test/api/run_tests.sh
+index 6655152..88e43fb 100755
+--- a/test/api/run_tests.sh
++++ b/test/api/run_tests.sh
+@@ -5,7 +5,7 @@ echo Running api tests:
+ tests=0
+ passed=0
+ 
+-for file in `ls`; do
++for file in `ls ../../build/test/api`; do
+     [ ! -x $file -o -d $file ] && continue
+     tests=`expr 1 + $tests`
+     printf " test(%s): " $file
+diff --git a/test/parsing/run_tests.sh b/test/parsing/run_tests.sh
+index b37e4dd..ceb2e7a 100755
+--- a/test/parsing/run_tests.sh
++++ b/test/parsing/run_tests.sh
+@@ -16,11 +16,11 @@ fi
+ # find test binary on both platforms.  allow the caller to force a
+ # particular test binary (useful for non-cmake build systems).
+ if [ -z "$testBin" ]; then
+-    testBin="../build/test/parsing/Release/yajl_test.exe"
++    testBin="../../build/test/parsing/Release/yajl_test.exe"
+     if [ ! -x $testBin ] ; then
+-        testBin="../build/test/parsing/Debug/yajl_test.exe"
++        testBin="../../build/test/parsing/Debug/yajl_test.exe"
+         if [ ! -x $testBin ] ; then
+-            testBin="../build/test/parsing/yajl_test"
++            testBin="../../build/test/parsing/yajl_test"
+             if [  ! -x $testBin ] ; then
+                 ${ECHO} "cannot execute test binary: '$testBin'"
+                 exit 1;
+-- 
+2.41.0
+

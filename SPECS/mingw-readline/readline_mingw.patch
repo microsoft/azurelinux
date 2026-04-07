@@ -1,0 +1,13 @@
+diff -rupN --no-dereference readline-8.3/rlwinsize.h readline-8.3-new/rlwinsize.h
+--- readline-8.3/rlwinsize.h	2025-07-03 22:22:52.000000000 +0200
++++ readline-8.3-new/rlwinsize.h	2025-07-20 20:37:13.087292760 +0200
+@@ -55,7 +55,9 @@
+ #  define tcflow(fd, action)	ioctl(fd, TCXONC, action)
+ #endif
+ 
++#if defined (HAVE_TCGETWINSIZE)
+ extern int _rl_tcgetwinsize (int, struct winsize *);
+ extern void _rl_tcsetwinsize (int, struct winsize *);
++#endif
+ 
+ #endif /* _RL_WINSIZE_H */

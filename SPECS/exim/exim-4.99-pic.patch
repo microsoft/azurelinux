@@ -1,0 +1,13 @@
+diff --git a/src/lookups/Makefile b/src/lookups/Makefile
+index 74e705e..c63916b 100644
+--- a/src/lookups/Makefile
++++ b/src/lookups/Makefile
+@@ -26,7 +26,7 @@ lookups.a:       $(OBJ)
+ 		 $(FE)$(CC) -c $(CFLAGS) $(INCLUDE) $*.c
+ 
+ .c.so:;          @echo "$(CC) -shared $*.c"
+-		 $(FE)$(CC) $(LOOKUP_$*_INCLUDE) $(LOOKUP_$*_LIBS) -DDYNLOOKUP $(CFLAGS_DYNAMIC) $(CFLAGS) $(INCLUDE) $(DLFLAGS) $*.c -o $@
++		 $(FE)$(CC) $(LOOKUP_$*_INCLUDE) $(LOOKUP_$*_LIBS) -DDYNLOOKUP $(CFLAGS_DYNAMIC) $(CFLAGS) $(INCLUDE) $(DLFLAGS) $(PIC) $*.c -o $@
+ 
+ cdb.o cdb.so:           $(HDRS) cdb.c
+ dbmdb.o dbmdb.so:       $(HDRS) dbmdb.c

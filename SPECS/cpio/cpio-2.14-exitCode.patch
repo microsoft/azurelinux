@@ -1,0 +1,61 @@
+Subject: [PATCH 2/7] set exit code to 1 when cpio fails to store file > 4GB
+ (#183224)
+
+diff --git a/src/copyout.c b/src/copyout.c
+index fa999bd..6e82f4c 100644
+--- a/src/copyout.c
++++ b/src/copyout.c
+@@ -287,7 +287,7 @@ field_width_error (const char *filename, const char *fieldname,
+ {
+   char valbuf[UINTMAX_STRSIZE_BOUND + 1];
+   char maxbuf[UINTMAX_STRSIZE_BOUND + 1];
+-  error (0, 0, _("%s: value %s %s out of allowed range 0..%s"),
++  error (1, 0, _("%s: value %s %s out of allowed range 0..%s"),
+ 	 filename, fieldname,
+ 	 STRINGIFY_BIGINT (value, valbuf),
+ 	 STRINGIFY_BIGINT (MAX_VAL_WITH_DIGITS (width - nul, LG_8),
+diff --git a/tests/CVE-2019-14866.at b/tests/CVE-2019-14866.at
+index 530365a..5a4e15c 100644
+--- a/tests/CVE-2019-14866.at
++++ b/tests/CVE-2019-14866.at
+@@ -30,6 +30,5 @@ fi
+ [0],
+ [],
+ [cpio: file: value size 17179869184 out of allowed range 0..8589934591
+-2 blocks
+ ])
+ AT_CLEANUP
+diff --git a/tests/testsuite b/tests/testsuite
+index 10531d1..d69dad9 100755
+--- a/tests/testsuite
++++ b/tests/testsuite
+@@ -2927,7 +2927,6 @@ fi
+ at_status=$? at_failed=false
+ $at_check_filter
+ echo >>"$at_stderr"; printf "%s\n" "cpio: file: value size 17179869184 out of allowed range 0..8589934591
+-2 blocks
+ " | \
+   $at_diff - "$at_stderr" || at_failed=:
+ at_fn_diff_devnull "$at_stdout" || at_failed=:
+diff --git a/src/copyout.c b/src/copyout.c
+index 08f0e9e..882c834 100644
+--- a/src/copyout.c
++++ b/src/copyout.c
+@@ -496,7 +496,7 @@ write_out_binary_header (dev_t rdev,
+   if (short_hdr.c_namesize != file_hdr->c_namesize)
+     {
+       char maxbuf[UINTMAX_STRSIZE_BOUND + 1];
+-      error (0, 0, _("%s: value %s %s out of allowed range 0..%u"),
++      error (1, 0, _("%s: value %s %s out of allowed range 0..%u"),
+ 	     file_hdr->c_name, _("name size"),
+ 	     STRINGIFY_BIGINT (file_hdr->c_namesize, maxbuf), 0xFFFFu);
+       return 1;
+@@ -509,7 +509,7 @@ write_out_binary_header (dev_t rdev,
+        != file_hdr->c_filesize)
+     {
+       char maxbuf[UINTMAX_STRSIZE_BOUND + 1];
+-      error (0, 0, _("%s: value %s %s out of allowed range 0..%lu"),
++      error (1, 0, _("%s: value %s %s out of allowed range 0..%lu"),
+ 	     file_hdr->c_name, _("file size"),
+ 	     STRINGIFY_BIGINT (file_hdr->c_namesize, maxbuf), 0xFFFFFFFFlu);
+       return 1;

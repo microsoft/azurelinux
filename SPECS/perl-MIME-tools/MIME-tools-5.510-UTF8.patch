@@ -1,0 +1,11 @@
+--- ChangeLog
++++ ChangeLog
+@@ -330,7 +330,7 @@
+ 	* Added MIME::Parser->decode_bodies method.  This lets you force
+ 	MIME::Tools to store body parts WITHOUT decoding them.  Useful
+ 	if you need the exact unmangled message source (for example,
+-	for GPG-signing.)  Patch submitted by Jörn Reder.
++	for GPG-signing.)  Patch submitted by JÃ¶rn Reder.
+ 
+ 5.418     2005-09-29  Dianne Skoll  <dianne@skoll.ca>
+ 

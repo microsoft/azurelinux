@@ -1,0 +1,26 @@
+From 68d4750fdc0cd03a84a9a42e5dcd16b715f089d8 Mon Sep 17 00:00:00 2001
+From: Vojtech Trefny <vtrefny@redhat.com>
+Date: Tue, 17 Jun 2025 10:33:31 +0200
+Subject: [PATCH] tests: Skip test_detect_virt on systems without running DBus
+
+This will allow to run unit tests in %check during RPM build in
+Koji.
+---
+ tests/unit_tests/util_test.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tests/unit_tests/util_test.py b/tests/unit_tests/util_test.py
+index d4bddced..74268baf 100644
+--- a/tests/unit_tests/util_test.py
++++ b/tests/unit_tests/util_test.py
+@@ -40,6 +40,7 @@ class MiscTest(unittest.TestCase):
+         # real deduplication
+         self.assertEqual([1, 2, 3, 4, 5, 6], util.dedup_list([1, 2, 3, 4, 2, 2, 2, 1, 3, 5, 3, 6, 6, 2, 3, 1, 5]))
+ 
++    @unittest.skipIf(not os.path.exists("/run/dbus/system_bus_socket"), "system bus socket does not exist")
+     def test_detect_virt(self):
+         in_virt = not util.run_program(["systemd-detect-virt", "--vm"])
+         self.assertEqual(util.detect_virt(), in_virt)
+-- 
+2.49.0
+

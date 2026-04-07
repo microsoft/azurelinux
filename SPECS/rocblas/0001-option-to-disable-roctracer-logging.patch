@@ -1,0 +1,82 @@
+diff --git a/library/CMakeLists.txt b/library/CMakeLists.txt
+index 762580d7..f02d62e6 100644
+--- a/library/CMakeLists.txt
++++ b/library/CMakeLists.txt
+@@ -80,7 +80,7 @@ function( rocblas_library_settings lib_target_ )
+     target_link_libraries( ${lib_target_} PRIVATE hip::device )
+   else()
+     target_link_libraries( ${lib_target_} PRIVATE hip::device -lstdc++fs --rtlib=compiler-rt --unwindlib=libgcc)
+-    if (BUILD_SHARED_LIBS)
++    if (BUILD_SHARED_LIBS AND NOT DISABLE_ROCTRACER)
+       target_link_libraries(${lib_target_} PRIVATE -lroctx64)
+     endif()
+   endif()
+diff --git a/library/src/CMakeLists.txt b/library/src/CMakeLists.txt
+index 5deab888..f96c7e3e 100644
+--- a/library/src/CMakeLists.txt
++++ b/library/src/CMakeLists.txt
+@@ -28,6 +28,10 @@
+ # package_targets is used as a list of install target
+ set( package_targets rocblas )
+ 
++# we want to decrease the number of build deps for EPEL packages so patching in an option
++# to disable its use
++
++option( DISABLE_ROCTRACER "Disable use of rocTRACER for logging" ON )
+ 
+ # Set up Tensile Dependency
+ if( BUILD_WITH_TENSILE )
+@@ -688,7 +692,12 @@ if(BUILD_WITH_HIPBLASLT)
+   find_package( hipblaslt ${HIPBLASLT_VERSION} REQUIRED CONFIG PATHS ${hipblaslt_path} ${ROCM_PATH})
+ endif()
+ 
+-if( NOT BUILD_SHARED_LIBS )
++if ( DISABLE_ROCTRACER )
++    message( "roctracer is disabled for this build" )
++    target_compile_definitions( rocblas PRIVATE DISABLE_ROCTRACER )
++endif()
++
++if( NOT DISABLE_ROCTRACER AND NOT BUILD_SHARED_LIBS )
+   target_compile_definitions( rocblas PRIVATE ROCBLAS_STATIC_LIB )
+ endif()
+ 
+diff --git a/library/src/include/logging.hpp b/library/src/include/logging.hpp
+index 352e4e39..d222879a 100644
+--- a/library/src/include/logging.hpp
++++ b/library/src/include/logging.hpp
+@@ -40,7 +40,7 @@
+ #include <unordered_map>
+ #include <utility>
+ 
+-#if !defined(ROCBLAS_STATIC_LIB) && !defined(WIN32)
++#if !defined(DISABLE_ROCTRACER) && !defined(ROCBLAS_STATIC_LIB) && !defined(WIN32)
+ #include <roctracer/roctx.h>
+ #endif
+ 
+@@ -453,7 +453,7 @@ class Logger
+ public:
+     Logger() = default;
+ 
+-#if !defined(ROCBLAS_STATIC_LIB) && !defined(WIN32)
++#if !defined(DISABLE_ROCTRACER) && !defined(ROCBLAS_STATIC_LIB) && !defined(WIN32)
+     void log_range(const std::string& name)
+     {
+         if(!m_active)
+@@ -472,7 +472,7 @@ public:
+         // ((os << sep << std::forward<Ts>(xs)), ...);
+         (void)(int[]){(os << sep << std::forward<Ts>(xs), 0)...};
+ 
+-#if !defined(ROCBLAS_STATIC_LIB) && !defined(WIN32)
++#if !defined(DISABLE_ROCTRACER) && !defined(ROCBLAS_STATIC_LIB) && !defined(WIN32)
+         log_range(os.str());
+ #endif
+         os << std::endl;
+@@ -527,7 +527,7 @@ public:
+ 
+     ~Logger()
+     {
+-#if !defined(ROCBLAS_STATIC_LIB) && !defined(WIN32)
++#if !defined(DISABLE_ROCTRACER) && !defined(ROCBLAS_STATIC_LIB) && !defined(WIN32)
+         if(m_active)
+         {
+             roctxRangePop();

@@ -1,0 +1,12 @@
+diff -up postgresql-13.1/src/interfaces/Makefile.patch10 postgresql-13.1/src/interfaces/Makefile
+--- postgresql-13.1/src/interfaces/Makefile.patch10	2021-02-02 21:33:23.235292305 +0100
++++ postgresql-13.1/src/interfaces/Makefile	2021-02-02 21:33:30.281365440 +0100
+@@ -12,7 +12,7 @@ subdir = src/interfaces
+ top_builddir = ../..
+ include $(top_builddir)/src/Makefile.global
+ 
+-SUBDIRS = libpq ecpg
++SUBDIRS = libpq
+ 
+ $(recurse)
+ 

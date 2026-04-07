@@ -1,0 +1,50 @@
+From c10eb38c2abbfed73f87c3a37cad38f1c39bc13a Mon Sep 17 00:00:00 2001
+From: Tom Rix <trix@redhat.com>
+Date: Sun, 28 Jan 2024 08:32:06 -0500
+Subject: [PATCH] add link and compile pools for miopen
+
+---
+ CMakeLists.txt | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 32d9a2e5b04a..7fea8097edad 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -156,6 +156,33 @@ option(MIOPEN_EMBED_BINCACHE "Embed Binary Cache or KDB" Off)
+ option(MIOPEN_EMBED_BUILD "Build with the set of embed flags." Off)
+ option(MIOPEN_DISABLE_USERDB "Disable user database access" ${MIOPEN_EMBED_BUILD})
+ 
++#
++# Seperate linking jobs from compiling
++# Too many concurrent linking jobs can break the build
++# Copied from LLVM
++set(MIOPEN_PARALLEL_LINK_JOBS "" CACHE STRING
++  "Define the maximum number of concurrent link jobs (Ninja only).")
++if(CMAKE_GENERATOR MATCHES "Ninja")
++  if(MIOPEN_PARALLEL_LINK_JOBS)
++    set_property(GLOBAL APPEND PROPERTY JOB_POOLS link_job_pool=${MIOPEN_PARALLEL_LINK_JOBS})
++    set(CMAKE_JOB_POOL_LINK link_job_pool)
++  endif()
++elseif(MIOPEN_PARALLEL_LINK_JOBS)
++  message(WARNING "Job pooling is only available with Ninja generators.")
++endif()
++
++set(MIOPEN_PARALLEL_COMPILE_JOBS "" CACHE STRING
++  "Define the maximum number of concurrent compile jobs (Ninja only).")
++if(CMAKE_GENERATOR MATCHES "Ninja")
++  if(MIOPEN_PARALLEL_COMPILE_JOBS)
++    set_property(GLOBAL APPEND PROPERTY JOB_POOLS compile_job_pool=${MIOPEN_PARALLEL_COMPILE_JOBS})
++    set(CMAKE_JOB_POOL_COMPILE compile_job_pool)
++  endif()
++elseif(MIOPEN_PARALLEL_COMPILE_JOBS)
++  message(WARNING "Job pooling is only available with Ninja generators.")
++endif()
++
++
+ # MIOPEN_USE_HIP_KERNELS is a Workaround for COMgr issues
+ if(MIOPEN_EMBED_BUILD)
+     set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build as a shared library" FORCE)
+-- 
+2.45.1
+

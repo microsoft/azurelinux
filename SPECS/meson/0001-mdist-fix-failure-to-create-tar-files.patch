@@ -1,0 +1,75 @@
+From e59b7c1362a5b598fcf77051352f76779c432b1c Mon Sep 17 00:00:00 2001
+From: Eli Schwartz <eschwartz93@gmail.com>
+Date: Sun, 19 Oct 2025 11:47:00 -0400
+Subject: [PATCH] mdist: fix failure to create tar files the user asked to
+ create
+
+Python added a "feature" to assume tarfile extraction is meant solely
+for "data", i.e. it ignores many useful features of tar such as
+symlinks, ownership, or permission modes that are uncommon on Windows.
+Revert this entirely, as Meson is a "fully trusted" application. It can
+already execute arbitrary programs, tar files are not vulnerabilities.
+
+In theory "tar" mode exists and is not "data", but we are fully trusted
+so why split hairs?
+
+Fixes: https://github.com/mesonbuild/meson/issues/15142
+---
+ mesonbuild/mdist.py        | 3 +++
+ mesonbuild/msubprojects.py | 5 ++++-
+ mesonbuild/wrap/wrap.py    | 4 ++++
+ 3 files changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/mesonbuild/mdist.py b/mesonbuild/mdist.py
+index 5d99674203b3..15718d2aed43 100644
+--- a/mesonbuild/mdist.py
++++ b/mesonbuild/mdist.py
+@@ -41,6 +41,9 @@
+                      'xztar': '.tar.xz',
+                      'zip': '.zip'}
+ 
++if sys.version_info >= (3, 14):
++    tarfile.TarFile.extraction_filter = staticmethod(tarfile.fully_trusted_filter)
++
+ # Note: when adding arguments, please also add them to the completion
+ # scripts in $MESONSRC/data/shell-completions/
+ def add_arguments(parser: argparse.ArgumentParser) -> None:
+diff --git a/mesonbuild/msubprojects.py b/mesonbuild/msubprojects.py
+index d4549c0545ac..f4b4405634b2 100755
+--- a/mesonbuild/msubprojects.py
++++ b/mesonbuild/msubprojects.py
+@@ -1,7 +1,7 @@
+ from __future__ import annotations
+ 
+ from dataclasses import dataclass, InitVar
+-import os, subprocess
++import sys, os, subprocess
+ import argparse
+ import asyncio
+ import threading
+@@ -60,6 +60,9 @@ if T.TYPE_CHECKING:
+ 
+ ALL_TYPES_STRING = ', '.join(ALL_TYPES)
+ 
++if sys.version_info >= (3, 14):
++    tarfile.TarFile.extraction_filter = staticmethod(tarfile.fully_trusted_filter)
++
+ def read_archive_files(path: Path, base_path: Path) -> T.Set[Path]:
+     if path.suffix == '.zip':
+         with zipfile.ZipFile(path, 'r') as zip_archive:
+diff --git a/mesonbuild/wrap/wrap.py b/mesonbuild/wrap/wrap.py
+index e7bc4f62a93f..e6f390a5d410 100644
+--- a/mesonbuild/wrap/wrap.py
++++ b/mesonbuild/wrap/wrap.py
+@@ -57,6 +57,10 @@
+ 
+ ALL_TYPES = ['file', 'git', 'hg', 'svn', 'redirect']
+ 
++if sys.version_info >= (3, 14):
++    import tarfile
++    tarfile.TarFile.extraction_filter = staticmethod(tarfile.fully_trusted_filter)
++
+ if mesonlib.is_windows():
+     from ..programs import ExternalProgram
+     from ..mesonlib import version_compare
+

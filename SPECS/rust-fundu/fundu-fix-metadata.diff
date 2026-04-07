@@ -1,0 +1,29 @@
+--- fundu-2.0.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ fundu-2.0.1/Cargo.toml	2024-12-10T13:29:07.593553+00:00
+@@ -167,9 +167,6 @@
+     "derive",
+ ]
+ 
+-[dev-dependencies.criterion]
+-version = "0.5"
+-
+ [dev-dependencies.rstest]
+ version = ">=0.18"
+ 
+@@ -196,16 +193,3 @@
+ time = ["fundu-core/time"]
+ with-flamegraph = []
+ with-iai = []
+-
+-[target."cfg(unix)".dev-dependencies.iai-callgrind]
+-version = "0.13"
+-
+-[target."cfg(unix)".dev-dependencies.inferno]
+-version = "0.11"
+-
+-[target."cfg(unix)".dev-dependencies.pprof]
+-version = "0.13"
+-features = [
+-    "flamegraph",
+-    "criterion",
+-]

@@ -1,0 +1,23 @@
+diff --git a/src/Makefile b/src/Makefile
+index f04b4c4..b8d4b19 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -83,15 +83,15 @@ libespeak_SOURCES = speak_lib.cpp compiledict.cpp dictionary.cpp intonation.cpp
+ 
+ SRCS1=$(speak_SOURCES)
+ OBJS1=$(patsubst %.cpp,%.o,$(SRCS1))
+-LIBS1=-lstdc++ $(LIB_AUDIO) -lpthread $(EXTRA_LIBS)
++LIBS1=-lstdc++ -lm $(LIB_AUDIO) -lpthread $(EXTRA_LIBS)
+ 
+ SRCS2=$(libespeak_SOURCES)
+ OBJS2=$(patsubst %.cpp,x_%.o,$(SRCS2))
+-LIBS2=-lstdc++ $(LIB_AUDIO) -lpthread
++LIBS2=-lstdc++ -lm $(LIB_AUDIO) -lpthread
+ 
+ SRCS3 = espeak.cpp
+ OBJS3=$(patsubst %.cpp,%.o,$(SRCS3))
+-LIBS3=-lstdc++ -L . -lespeak
++LIBS3=-lstdc++ -lm -L . -lespeak
+ 
+ CXXFLAGS=-O2
+ 

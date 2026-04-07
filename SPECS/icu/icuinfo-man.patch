@@ -1,0 +1,145 @@
+Description: supply manual page for program that doesn't have one
+Author: Jay Berkenbilt <qjb@debian.org>
+Bug: http://bugs.icu-project.org/trac/ticket/7665
+erAck: adapted to ICU 56.1 icu/source/tools/icuinfo/Makefile.in
+
+diff -Nur orig.icu/source/tools/icuinfo/icuinfo.1.in icu/source/tools/icuinfo/icuinfo.1.in
+--- orig.icu/source/tools/icuinfo/icuinfo.1.in	1970-01-01 01:00:00.000000000 +0100
++++ icu/source/tools/icuinfo/icuinfo.1.in	2015-10-27 19:19:35.184056800 +0100
+@@ -0,0 +1,76 @@
++.\" Hey, Emacs! This is -*-nroff-*- you know...
++.\"
++.\" icuinfo.1: manual page for the icuinfo utility
++.\"
++.\" Copyright (C) 2005-2006 International Business Machines Corporation and others
++.\"
++.TH ICUINFO 1 "1 May 2010" "ICU MANPAGE" "ICU @VERSION@ Manual"
++.SH NAME
++.B icuinfo
++\- Shows some basic info about the current ICU
++.SH SYNOPSIS
++.B icuinfo
++[
++.BR "\-h\fP, \fB\-?\fP, \fB\-\-help"
++]
++[
++.BR "\-V\fP, \fB\-\-version"
++]
++[
++.BR "\-c\fP, \fB\-\-copyright"
++]
++[
++.BI "\-i\fP, \fB\-\-icudatadir" " directory"
++]
++[
++.BR "\-v\fP, \fB\-\-verbose"
++]
++[
++.BI "\-L\fP, \fB\-\-list-plugins"
++]
++[
++.BI "\-m\fP, \fB\-\-milisecond-time"
++]
++[
++.BI "\-K\fP, \fB\-\-cleanup"
++]
++.SH DESCRIPTION
++.B icuinfo
++prints basic information about the current version of ICU.
++.SH OPTIONS
++.TP
++.BR "\-h\fP, \fB\-?\fP, \fB\-\-help"
++Print help about usage and exit.
++.TP
++.BR "\-V\fP, \fB\-\-version"
++Print the version of
++.B icuinfo
++and exit.
++.TP
++.BR "\-c\fP, \fB\-\-copyright"
++Embeds the standard ICU copyright into the
++.IR output-file .
++.TP
++.BR "\-v\fP, \fB\-\-verbose"
++Display extra informative messages during execution.
++.TP
++.BI "\-i\fP, \fB\-\-icudatadir" " directory"
++Look for any necessary ICU data files in
++.IR directory .
++For example, the file
++.B pnames.icu
++must be located when ICU's data is not built as a shared library.
++The default ICU data directory is specified by the environment variable
++.BR ICU_DATA .
++Most configurations of ICU do not require this argument.
++.TP
++.BI "\-L\fP, \fB\-\-list-plugins"
++If specified, list and diagnose issues with ICU plugins.
++.TP
++.BI "\-K\fP, \fB\-\-cleanup"
++Attempt to unload plugins before exiting.
++.TP
++.BI "\-m\fP, \fB\-\-milisecond-time"
++Print the current UTC time in milliseconds.
++.SH COPYRIGHT
++Copyright (C) 2010 International Business Machines Corporation and others
+diff -Nur orig.icu/source/tools/icuinfo/Makefile.in icu/source/tools/icuinfo/Makefile.in
+--- orig.icu/source/tools/icuinfo/Makefile.in	2015-10-08 05:53:56.000000000 +0200
++++ icu/source/tools/icuinfo/Makefile.in	2015-10-27 19:23:19.115509906 +0100
+@@ -14,8 +14,15 @@
+ ## Build directory information
+ subdir = tools/icuinfo
+ 
++TARGET_STUB_NAME = icuinfo
++
++SECTION = 1
++
++MAN_FILES = $(TARGET_STUB_NAME).$(SECTION)
++
++
+ ## Extra files to remove for 'make clean'
+-CLEANFILES = *~ $(DEPS) $(PLUGIN_OBJECTS) $(PLUGINFILE) $(PLUGIN)
++CLEANFILES = *~ $(DEPS) $(PLUGIN_OBJECTS) $(PLUGINFILE) $(PLUGIN) $(MAN_FILES)
+ 
+ ## Target information
+ TARGET = icuinfo$(EXEEXT)
+@@ -35,7 +42,8 @@
+ 
+ ## List of phony targets
+ .PHONY : all all-local install install-local clean clean-local		\
+-distclean distclean-local dist dist-local check check-local plugin-check
++distclean distclean-local dist dist-local check check-local plugin-check \
++install-man
+ 
+ ## Clear suffix list
+ .SUFFIXES :
+@@ -48,12 +56,16 @@
+ dist: dist-local
+ check: all check-local
+ 
+-all-local: $(TARGET) 
++all-local: $(TARGET) $(MAN_FILES)
+ 
+-install-local: all-local
++install-local: all-local install-man
+ 	$(MKINSTALLDIRS) $(DESTDIR)$(bindir)
+ 	$(INSTALL) $(TARGET) $(DESTDIR)$(bindir)
+ 
++install-man: $(MAN_FILES)
++	$(MKINSTALLDIRS) $(DESTDIR)$(mandir)/man$(SECTION)
++	$(INSTALL_DATA) $? $(DESTDIR)$(mandir)/man$(SECTION)
++
+ dist-local:
+ 
+ clean-local:
+@@ -103,6 +115,10 @@
+ 	@echo "Plugins are disabled (use --enable-plugins to enable)"
+ endif
+ 
++%.$(SECTION): $(srcdir)/%.$(SECTION).in
++	cd $(top_builddir) \
++	 && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
++
+ ifeq (,$(MAKECMDGOALS))
+ -include $(DEPS)
+ else

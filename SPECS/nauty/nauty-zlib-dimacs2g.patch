@@ -1,0 +1,196 @@
+Invoke zlib functions rather than calling gunzip in a subprocess.
+Inspired by the debian nauty-zlib-blisstog patch.
+
+--- a/dimacs2g.c	2025-07-17 05:41:20.000000000 -0600
++++ b/dimacs2g.c	2025-07-28 16:37:35.836470543 -0600
+@@ -18,10 +18,11 @@
+ 
+ /*************************************************************************/
+ 
++#define WITH_GZFILEOP
++#include <zlib-ng.h>
+ #include "gtools.h" 
+ 
+-#define GUNZIP "gunzip -c"
+-
++#define BUFSIZE 1024
+ #define MAXCOMMENT 200
+ static char comment[MAXCOMMENT+3];
+ static int commentlen;
+@@ -31,39 +32,30 @@ typedef struct
+    int v,w;
+ } vpair;
+ 
+-static int
+-nextchar(FILE *f)
+-{
+-    char s[2];
+-
+-    if (fscanf(f,"%1s",s) != 1) return EOF;
+-    else                        return s[0];
+-}
+-
+ static boolean
+-readdimacsgraph(FILE *f, sparsegraph *g)
++readdimacsgraph(gzFile f, sparsegraph *g)
+ /* Reads a graph from Dimacs format into a sparse graph */
+ {
+-    int n,c;
++    int n;
+     unsigned long ne,j;
+     int haven;
+     int i,v,w;
+     DYNALLSTAT(vpair,elist,elist_sz);
++    char buffer[BUFSIZE];
+ 
++    memset(buffer, '\0', BUFSIZE);
+     commentlen = 0;
+     haven = 0;
+     j = 0;
+-    while ((c = nextchar(f)) >= 0)
++    while (zng_gzgets(f, buffer, BUFSIZE) != NULL && strlen(buffer) < BUFSIZE - 1)
+     {
+-        switch (c)
++        switch (*buffer)
+         {
+         case 'c':
+-            commentlen = 0;
+-            while ((c = getc(f)) != '\n' && c != EOF)
+-            {
+-                if (commentlen < MAXCOMMENT)
+-                    comment[commentlen++] = c;
+-            }
++            commentlen = strlen(buffer);
++            if (commentlen > MAXCOMMENT)
++                commentlen = MAXCOMMENT;
++            memcpy(comment, &buffer[1], commentlen);
+             comment[commentlen] = '\0';
+             break;
+ 
+@@ -73,7 +65,7 @@ readdimacsgraph(FILE *f, sparsegraph *g)
+                 fprintf(stderr,"Duplicate p line\n");
+                 exit(1);
+             }
+-            if (fscanf(f," edge %d %lu",&n,&ne) != 2)
++            if (sscanf(&buffer[1]," edge %d %lu",&n,&ne) != 2)
+             {
+                 fprintf(stderr,"Bad p line\n");
+                 return FALSE;
+@@ -88,7 +80,7 @@ readdimacsgraph(FILE *f, sparsegraph *g)
+                 fprintf(stderr,"Missing p line\n");
+                 return FALSE;
+             }  
+-            if (fscanf(f,"%d%d",&w,&v) != 2 || w < 1 || w > n)
++            if (sscanf(&buffer[1],"%d%d",&w,&v) != 2 || w < 1 || w > n)
+             {
+                 fprintf(stderr,"Bad n line\n");
+                 return FALSE;
+@@ -101,7 +93,7 @@ readdimacsgraph(FILE *f, sparsegraph *g)
+                 fprintf(stderr,"Missing p line or too many e lines\n");
+                 return FALSE;
+             }
+-            if (fscanf(f,"%d%d",&v,&w) != 2 || v < 1 || w < 1 || v > n || w > n)
++            if (sscanf(&buffer[1],"%d%d",&v,&w) != 2 || v < 1 || w < 1 || v > n || w > n)
+             {
+                 fprintf(stderr,"Bad e line\n");
+                 return FALSE;
+@@ -111,11 +103,22 @@ readdimacsgraph(FILE *f, sparsegraph *g)
+             break;
+ 
+         default:
+-            fprintf(stderr,"Unknown line %c\n",c);
++            fprintf(stderr,"Unknown line %c\n",*buffer);
+             return FALSE;
+         }
+     }
+ 
++    if (errno)
++    {
++        fputs("Corrupted data file\n", stderr);
++        return FALSE;
++    }
++    else if (strlen(buffer) == BUFSIZE - 1)
++    {
++        fputs("Corruped data line\n", stderr);
++        return FALSE;
++    }
++
+     if (j != ne)
+     {
+         fprintf(stderr,"Wrong number of e lines\n");
+@@ -152,13 +155,11 @@ readdimacsgraph(FILE *f, sparsegraph *g)
+ int
+ main(int argc, char *argv[])
+ {
+-    FILE *infile;
++    gzFile infile;
+     int j,firstarg;
+     SG_DECL(g);
+-    size_t flen;
+-    boolean nocomment,nofiles,nswitch,iszip,dreadnaut,badargs;
++    boolean nocomment,nofiles,nswitch,dreadnaut,badargs;
+     long nmin,nmax;
+-    char zcmd[550];
+     char *arg,sw;
+     char *prestring,*poststring;
+ 
+@@ -205,33 +206,20 @@ main(int argc, char *argv[])
+     for (j = firstarg; j < argc || nofiles; ++j)
+     {
+         if (nofiles)
+-            infile = stdin;
+-        else
+         {
+-            flen = strlen(argv[j]);
+-            if (flen >= 3 && strcmp(argv[j]+flen-3,".gz") == 0)
++            infile = zng_gzdopen(STDIN_FILENO,"r");
++            if (infile == NULL)
+             {
+-#if HAVE_GUNZIP && HAVE_POPEN
+-                if (strlen(argv[j]) > 500) gt_abort(">E file name too long\n");
+-                sprintf(zcmd,"%s \"%s\"",GUNZIP,argv[j]);
+-                if ((infile = popen(zcmd,"r")) == NULL)
+-                {
+-                    gt_abort_1(
+-                       ">E dimacs2g: cannot open gunzip pipe for \"%s\"\n",
+-                       argv[j]);
+-                }
+-                iszip = TRUE;
+-#else
+-                gt_abort(">E dimacs2g is not compiled with gunzip support\n");
+-#endif
++                fputs(">E Can't open stdin\n",stderr);
++                gt_abort(NULL);
+             }
+-            else
++        }
++        else
++        {
++            infile = zng_gzopen(argv[j],"r");
++            if (infile == NULL)
+             {
+-                if ((infile = fopen(argv[j],"r")) == NULL)
+-                {
+-                    gt_abort_1(">E Can't open file %s\n",argv[j]);
+-                }
+-                iszip = FALSE;
++                gt_abort_1(">E Can't open file %s\n",argv[j]);
+             }
+         }
+ 
+@@ -260,14 +248,8 @@ main(int argc, char *argv[])
+ 
+         if (nofiles)
+             nofiles = FALSE;
+-        else if (iszip)
+-        {
+-#if HAVE_GUNZIP && HAVE_POPEN
+-            pclose(infile);
+-#endif
+-        }
+         else
+-            fclose(infile);
++            zng_gzclose(infile);
+     }
+ 
+     exit(0);

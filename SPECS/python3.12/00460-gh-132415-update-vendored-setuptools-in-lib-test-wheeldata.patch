@@ -1,0 +1,96 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Adam Turner <9087854+AA-Turner@users.noreply.github.com>
+Date: Fri, 25 Apr 2025 00:46:20 +0100
+Subject: 00460: gh-132415: Update vendored setuptools in
+ ``Lib/test/wheeldata``
+
+(cherry picked from commit c9f3f5b4ed52d7bed6073ffa39717ece47202558)
+(actual changes in .whl files removed to make this patch smaller)
+
+gh-127906: Add missing sys import to test_cppext
+
+(cherry picked from commit 9cba14881b371b1e95d57877896169c4605f9b75)
+
+Co-Authored-By: Victor Stinner <vstinner@python.org>
+---
+ Lib/test/support/__init__.py                 | 5 ++---
+ Lib/test/test_cext/__init__.py               | 2 +-
+ Lib/test/test_cppext/__init__.py             | 2 +-
+ Lib/test/test_cppext/setup.py                | 1 +
+ Lib/test/test_peg_generator/test_c_parser.py | 2 +-
+ 5 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/Lib/test/support/__init__.py b/Lib/test/support/__init__.py
+index 4c22f131e3..e49e3668a3 100644
+--- a/Lib/test/support/__init__.py
++++ b/Lib/test/support/__init__.py
+@@ -2308,7 +2308,7 @@ def _findwheel(pkgname):
+ # Context manager that creates a virtual environment, install setuptools in it,
+ # and returns the paths to the venv directory and the python executable
+ @contextlib.contextmanager
+-def setup_venv_with_pip_setuptools_wheel(venv_dir):
++def setup_venv_with_pip_setuptools(venv_dir):
+     import subprocess
+     from .os_helper import temp_cwd
+ 
+@@ -2331,8 +2331,7 @@ def setup_venv_with_pip_setuptools_wheel(venv_dir):
+ 
+         cmd = (python, '-X', 'dev',
+                '-m', 'pip', 'install',
+-               _findwheel('setuptools'),
+-               _findwheel('wheel'))
++               _findwheel('setuptools'))
+         if verbose:
+             print()
+             print('Run:', ' '.join(cmd))
+diff --git a/Lib/test/test_cext/__init__.py b/Lib/test/test_cext/__init__.py
+index d5ea1dc660..04a6361ff3 100644
+--- a/Lib/test/test_cext/__init__.py
++++ b/Lib/test/test_cext/__init__.py
+@@ -53,7 +53,7 @@ def check_build(self, extension_name, std=None, limited=False):
+             self.skipTest('Py_LIMITED_API is incompatible with Py_TRACE_REFS')
+ 
+         venv_dir = 'env'
+-        with support.setup_venv_with_pip_setuptools_wheel(venv_dir) as python_exe:
++        with support.setup_venv_with_pip_setuptools(venv_dir) as python_exe:
+             self._check_build(extension_name, python_exe,
+                               std=std, limited=limited)
+ 
+diff --git a/Lib/test/test_cppext/__init__.py b/Lib/test/test_cppext/__init__.py
+index 2198b7b2c0..31ea4ac7a1 100644
+--- a/Lib/test/test_cppext/__init__.py
++++ b/Lib/test/test_cppext/__init__.py
+@@ -51,7 +51,7 @@ def check_build(self, extension_name, std=None, limited=False):
+             self.skipTest('Py_LIMITED_API is incompatible with Py_TRACE_REFS')
+ 
+         venv_dir = 'env'
+-        with support.setup_venv_with_pip_setuptools_wheel(venv_dir) as python_exe:
++        with support.setup_venv_with_pip_setuptools(venv_dir) as python_exe:
+             self._check_build(extension_name, python_exe,
+                               std=std, limited=limited)
+ 
+diff --git a/Lib/test/test_cppext/setup.py b/Lib/test/test_cppext/setup.py
+index 019ff18446..25d71cd9a2 100644
+--- a/Lib/test/test_cppext/setup.py
++++ b/Lib/test/test_cppext/setup.py
+@@ -3,6 +3,7 @@
+ import os
+ import platform
+ import shlex
++import sys
+ import sysconfig
+ from test import support
+ 
+diff --git a/Lib/test/test_peg_generator/test_c_parser.py b/Lib/test/test_peg_generator/test_c_parser.py
+index eb31569c03..2fe1367b51 100644
+--- a/Lib/test/test_peg_generator/test_c_parser.py
++++ b/Lib/test/test_peg_generator/test_c_parser.py
+@@ -99,7 +99,7 @@ def setUpClass(cls):
+         cls.addClassCleanup(shutil.rmtree, cls.library_dir)
+ 
+         with contextlib.ExitStack() as stack:
+-            python_exe = stack.enter_context(support.setup_venv_with_pip_setuptools_wheel("venv"))
++            python_exe = stack.enter_context(support.setup_venv_with_pip_setuptools("venv"))
+             sitepackages = subprocess.check_output(
+                 [python_exe, "-c", "import sysconfig; print(sysconfig.get_path('platlib'))"],
+                 text=True,

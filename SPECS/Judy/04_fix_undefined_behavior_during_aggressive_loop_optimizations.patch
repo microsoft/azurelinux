@@ -1,0 +1,82 @@
+Original author Doug Baskins: http://sourceforge.net/p/judy/patches/5/#ba53
+
+Andrey Gursky: removed trailing whitespaces and the doubled code line
+
+---
+ src/JudyCommon/JudyPrivateBranch.h |   33 +++++++++++++++++++++------------
+ 1 file changed, 21 insertions(+), 12 deletions(-)
+
+Index: b/src/JudyCommon/JudyPrivateBranch.h
+===================================================================
+--- a/src/JudyCommon/JudyPrivateBranch.h
++++ b/src/JudyCommon/JudyPrivateBranch.h
+@@ -19,7 +19,7 @@
+ // Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ // _________________
+ 
+-// @(#) $Revision: 4.57 $ $Source: /judy/src/JudyCommon/JudyPrivateBranch.h $
++// @(#) $Revision: 1.2 $ $Source: /home/doug/judy-1.0.5_min/test/../src/JudyCommon/RCS/JudyPrivateBranch.h,v $
+ //
+ // Header file for all Judy sources, for global but private (non-exported)
+ // declarations specific to branch support.
+@@ -55,7 +55,7 @@ typedef struct J_UDY_POINTER_OTHERS
+         {
+             Word_t      j_po_Addr;       // first word:  Pjp_t, Word_t, etc.
+             union {
+-//              Word_t  j_po_DcdPop0:cJU_BITSPERWORD-cJU_BITSPERBYTE;
++                Word_t  j_po_Addr1;
+                 uint8_t j_po_DcdP0[sizeof(Word_t) - 1];
+                 uint8_t j_po_Bytes[sizeof(Word_t)];     // last byte = jp_Type.
+             } jpo_u;
+@@ -78,13 +78,18 @@ typedef struct J_UDY_POINTER_OTHERS
+ // TBD:  Revise this structure to not overload j_po_DcdPopO this way?  The
+ // current arrangement works, its just confusing.
+ 
+-typedef struct _JUDY_POINTER_IMMED      // JPI.
++typedef struct _JUDY_POINTER_IMMEDL  
+         {
+-            uint8_t j_pi_1Index[sizeof(Word_t)];        // see above.
+-            uint8_t j_pi_LIndex[sizeof(Word_t) - 1];    // see above.
+-            uint8_t j_pi_Type;                  // JP type, 1 of cJ*_JPIMMED*.
+-        } jpi_t;
++            Word_t  j_pL_Addr;
++            uint8_t j_pL_LIndex[sizeof(Word_t) - 1];    // see above.
++            uint8_t j_pL_Type;
++        } jpL_t;
+ 
++typedef struct _JUDY_POINTER_IMMED1   
++        {
++            uint8_t j_p1_1Index[(2 * sizeof(Word_t)) - 1];
++            uint8_t j_p1_Type;
++        } jp1_t;
+ 
+ // UNION OF JP TYPES:
+ //
+@@ -96,18 +101,22 @@ typedef struct _JUDY_POINTER_IMMED
+ typedef union J_UDY_POINTER             // JP.
+         {
+             jpo_t j_po;                 // other than immediate indexes.
+-            jpi_t j_pi;                 // immediate indexes.
++            jpL_t j_pL;                 // immediate indexes.
++            jp1_t j_p1;                 // immediate indexes.
+         } jp_t, *Pjp_t;
+ 
+ // For coding convenience:
+ //
+-// Note, jp_Type has the same bits in jpo_t and jpi_t.
++// Note, jp_Type has the same bits in jpo_t jpL_t and jp1_t.
+ 
+-#define jp_1Index  j_pi.j_pi_1Index     // for storing Indexes in first  word.
+-#define jp_LIndex  j_pi.j_pi_LIndex     // for storing Indexes in second word.
++#define jp_1Index  j_p1.j_p1_1Index     // for storing Indexes in first  word.
++#define jp_LIndex  j_pL.j_pL_LIndex     // for storing Indexes in second word.
+ #define jp_Addr    j_po.j_po_Addr
++#define jp_Addr1   j_po.jpo_u.j_po_Addr1
+ //#define       jp_DcdPop0 j_po.jpo_u.j_po_DcdPop0
+-#define jp_Type    j_po.jpo_u.j_po_Bytes[sizeof(Word_t) - 1]
++#define jp_Addr1   j_po.jpo_u.j_po_Addr1
++//#define jp_Type    j_po.jpo_u.j_po_Bytes[sizeof(Word_t) - 1]
++#define jp_Type    j_p1.j_p1_Type
+ #define jp_DcdP0   j_po.jpo_u.j_po_DcdP0
+ 
+ 

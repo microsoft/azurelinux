@@ -1,0 +1,11 @@
+--- sqlite/Makefile.in.nos	2004-06-18 14:13:40.127066236 +0200
++++ sqlite/Makefile.in	2004-06-18 14:13:56.241098295 +0200
+@@ -192,7 +192,7 @@
+ 
+ libtclsqlite.la:	tclsqlite.lo libsqlite.la
+ 	$(LTLINK) -o libtclsqlite.la tclsqlite.lo \
+-		libsqlite.la $(LIBTCL) -rpath @exec_prefix@/lib/sqlite \
++		libsqlite.la $(LIBTCL) -rpath @exec_prefix@/lib/sqlite-__VERSION__ \
+ 		-version-info "8:6:8"
+ 
+ sqlite@TARGET_EXEEXT@:	$(TOP)/src/shell.c libsqlite.la sqlite.h

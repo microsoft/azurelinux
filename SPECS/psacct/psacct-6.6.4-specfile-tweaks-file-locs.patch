@@ -1,0 +1,43 @@
+From fcc034e5674dfedebcdace114d059a77d312c0de Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Tue, 2 May 2023 13:11:07 +0200
+Subject: [PATCH] files locates specfile tweak
+
+---
+ files.h.in     | 6 +++---
+ lib/stdio.in.h | 2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/files.h.in b/files.h.in
+index 900ad29..9800222 100644
+--- a/files.h.in
++++ b/files.h.in
+@@ -31,9 +31,9 @@
+ #include <utmp.h>
+ 
+ #define WTMP_FILE_LOC "@WTMP_FILE_LOC@"
+-#define ACCT_FILE_LOC "@ACCT_FILE_LOC@"
+-#define SAVACCT_FILE_LOC "@SAVACCT_FILE_LOC@"
+-#define USRACCT_FILE_LOC "@USRACCT_FILE_LOC@"
++#define ACCT_FILE_LOC "/var/account/pacct"
++#define SAVACCT_FILE_LOC "/var/account/savacct"
++#define USRACCT_FILE_LOC "/var/account/usracct"
+ 
+ /* Workaround for a kernel includes problem */
+ #if defined(__linux__) && defined(__alpha__)
+diff --git a/lib/stdio.in.h b/lib/stdio.in.h
+index d6af99c..e58d026 100644
+--- a/lib/stdio.in.h
++++ b/lib/stdio.in.h
+@@ -700,7 +700,7 @@ _GL_WARN_ON_USE (getline, "getline is unportable - "
+    removed it.  */
+ #undef gets
+ #if HAVE_RAW_DECL_GETS
+-_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");
++
+ #endif
+ 
+ 
+-- 
+2.40.0
+

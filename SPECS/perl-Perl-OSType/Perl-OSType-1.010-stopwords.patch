@@ -1,0 +1,11 @@
+--- lib/Perl/OSType.pm
++++ lib/Perl/OSType.pm
+@@ -108,6 +108,8 @@ version 1.008
+ 
+ =head1 DESCRIPTION
+ 
++=for :stopwords Unix Win32 Windows
++
+ Modules that provide OS-specific behaviors often need to know if
+ the current operating system matches a more generic type of
+ operating systems. For example, 'linux' is a type of 'Unix' operating system

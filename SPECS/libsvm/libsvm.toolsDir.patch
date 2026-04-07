@@ -1,0 +1,30 @@
+diff -up ./tools/easy.py.toolsDir ./tools/easy.py
+--- ./tools/easy.py.toolsDir	2021-04-14 09:22:41.387871661 -0600
++++ ./tools/easy.py	2021-04-14 09:23:39.967736875 -0600
+@@ -12,10 +12,10 @@ if len(sys.argv) <= 1:
+ 
+ is_win32 = (sys.platform == 'win32')
+ if not is_win32:
+-    svmscale_exe = "../svm-scale"
+-    svmtrain_exe = "../svm-train"
+-    svmpredict_exe = "../svm-predict"
+-    grid_py = "./grid.py"
++    svmscale_exe = "/usr/bin/svm-scale"
++    svmtrain_exe = "/usr/bin/svm-train"
++    svmpredict_exe = "/usr/bin/svm-predict"
++    grid_py = "/usr/bin/svm-grid.py"
+     gnuplot_exe = "/usr/bin/gnuplot"
+ else:
+         # example for windows
+diff -up ./tools/grid.py.toolsDir ./tools/grid.py
+--- ./tools/grid.py.toolsDir	2021-04-14 09:22:41.387871661 -0600
++++ ./tools/grid.py	2021-04-14 09:24:16.887651925 -0600
+@@ -18,7 +18,7 @@ class GridOption:
+     def __init__(self, dataset_pathname, options):
+         dirname = os.path.dirname(__file__)
+         if sys.platform != 'win32':
+-            self.svmtrain_pathname = os.path.join(dirname, '../svm-train')
++            self.svmtrain_pathname = '/usr/bin/svm-train'
+             self.gnuplot_pathname = '/usr/bin/gnuplot'
+         else:
+             # example for windows

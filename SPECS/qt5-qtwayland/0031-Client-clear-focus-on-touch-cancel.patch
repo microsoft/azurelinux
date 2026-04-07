@@ -1,0 +1,116 @@
+From e3ae6906a4145560d846e89e782f28c2372557dc Mon Sep 17 00:00:00 2001
+From: David Edmundson <davidedmundson@kde.org>
+Date: Fri, 5 Aug 2022 15:00:31 +0100
+Subject: [PATCH 31/55] Client: clear focus on touch cancel
+
+When we get a touch_cancel event all touches should be treated as
+lifted.
+
+The next frame call focus is set, with no pending touch points but
+without having gone through touch_up. We call mPendingTouchPoints.last()
+without guards even though it is potentially now empty.
+
+Change-Id: I3719f9507c5d397d8641692271d878076b7c23b8
+Reviewed-by: Shawn Rutledge <shawn.rutledge@qt.io>
+Reviewed-by: Liang Qi <liang.qi@qt.io>
+Reviewed-by: Eskil Abrahamsen Blomfeldt <eskil.abrahamsen-blomfeldt@qt.io>
+(cherry picked from commit dbdcd92363b44d89440dcb195d8cb9e6c34f0ddf)
+---
+ src/client/qwaylandinputdevice.cpp        |  1 +
+ tests/auto/client/seatv5/tst_seatv5.cpp   | 30 +++++++++++++++++++++++
+ tests/auto/client/shared/coreprotocol.cpp |  7 ++++++
+ tests/auto/client/shared/coreprotocol.h   |  1 +
+ 4 files changed, 39 insertions(+)
+
+diff --git a/src/client/qwaylandinputdevice.cpp b/src/client/qwaylandinputdevice.cpp
+index 2c396f35..9c764d80 100644
+--- a/src/client/qwaylandinputdevice.cpp
++++ b/src/client/qwaylandinputdevice.cpp
+@@ -1393,6 +1393,7 @@ void QWaylandInputDevice::Touch::touch_cancel()
+     if (touchExt)
+         touchExt->touchCanceled();
+ 
++    mFocus = nullptr;
+     QWindowSystemInterface::handleTouchCancelEvent(nullptr, mParent->mTouchDevice);
+ }
+ 
+diff --git a/tests/auto/client/seatv5/tst_seatv5.cpp b/tests/auto/client/seatv5/tst_seatv5.cpp
+index 9312c2e5..b063e0d9 100644
+--- a/tests/auto/client/seatv5/tst_seatv5.cpp
++++ b/tests/auto/client/seatv5/tst_seatv5.cpp
+@@ -73,6 +73,7 @@ private slots:
+     void multiTouch();
+     void multiTouchUpAndMotionFrame();
+     void tapAndMoveInSameFrame();
++    void cancelTouch();
+ };
+ 
+ void tst_seatv5::bindsToSeat()
+@@ -646,5 +647,34 @@ void tst_seatv5::tapAndMoveInSameFrame()
+     QTRY_COMPARE(window.m_events.last().touchPoints.first().state(), Qt::TouchPointState::TouchPointReleased);
+ }
+ 
++void tst_seatv5::cancelTouch()
++{
++    TouchWindow window;
++    QCOMPOSITOR_TRY_VERIFY(xdgSurface() && xdgSurface()->m_committedConfigureSerial);
++
++    exec([=] {
++        auto *t = touch();
++        auto *c = client();
++        t->sendDown(xdgToplevel()->surface(), {32, 32}, 1);
++        t->sendFrame(c);
++        t->sendCancel(c);
++        t->sendFrame(c);
++    });
++
++    QTRY_VERIFY(!window.m_events.empty());
++    {
++        auto e = window.m_events.takeFirst();
++        QCOMPARE(e.type, QEvent::TouchBegin);
++        QCOMPARE(e.touchPointStates, QEventPoint::State::Pressed);
++        QCOMPARE(e.touchPoints.length(), 1);
++        QCOMPARE(e.touchPoints.first().position(), QPointF(32-window.frameMargins().left(), 32-window.frameMargins().top()));
++    }
++    {
++        auto e = window.m_events.takeFirst();
++        QCOMPARE(e.type, QEvent::TouchCancel);
++        QCOMPARE(e.touchPoints.length(), 0);
++    }
++}
++
+ QCOMPOSITOR_TEST_MAIN(tst_seatv5)
+ #include "tst_seatv5.moc"
+diff --git a/tests/auto/client/shared/coreprotocol.cpp b/tests/auto/client/shared/coreprotocol.cpp
+index 0d988521..d1a2e7cb 100644
+--- a/tests/auto/client/shared/coreprotocol.cpp
++++ b/tests/auto/client/shared/coreprotocol.cpp
+@@ -451,6 +451,13 @@ void Touch::sendFrame(wl_client *client)
+         send_frame(r->handle);
+ }
+ 
++void Touch::sendCancel(wl_client *client)
++{
++    const auto touchResources = resourceMap().values(client);
++    for (auto *r : touchResources)
++        send_cancel(r->handle);
++}
++
+ uint Keyboard::sendEnter(Surface *surface)
+ {
+     auto serial = m_seat->m_compositor->nextSerial();
+diff --git a/tests/auto/client/shared/coreprotocol.h b/tests/auto/client/shared/coreprotocol.h
+index 296dbf47..210d8ddb 100644
+--- a/tests/auto/client/shared/coreprotocol.h
++++ b/tests/auto/client/shared/coreprotocol.h
+@@ -364,6 +364,7 @@ public:
+     uint sendUp(wl_client *client, int id);
+     void sendMotion(wl_client *client, const QPointF &position, int id);
+     void sendFrame(wl_client *client);
++    void sendCancel(wl_client *client);
+ 
+     Seat *m_seat = nullptr;
+ };
+-- 
+2.51.1
+

@@ -1,0 +1,10 @@
+--- brotli-8.0.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ brotli-8.0.2/Cargo.toml	2025-09-03T08:32:53.643647+00:00
+@@ -24,6 +24,7 @@
+     "/examples/**/*.rs",
+     "/Cargo.toml",
+     "/README.md",
++    "/LICENSE.BSD-3-Clause",
+     "/LICENSE.MIT",
+ ]
+ autolib = false

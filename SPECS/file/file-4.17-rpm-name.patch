@@ -1,0 +1,12 @@
+diff --git a/magic/Magdir/rpm b/magic/Magdir/rpm
+index e9dd8c8..99b6040 100644
+--- a/magic/Magdir/rpm
++++ b/magic/Magdir/rpm
+@@ -34,6 +34,7 @@
+ >>8	beshort		22		RISC-V64
+ >>8	beshort		23		LoongArch64
+ >>8	beshort		255		noarch
++>>10	string		x		%s
+ 
+ #delta RPM    Daniel Novotny (dnovotny@redhat.com)
+ 0	string		drpm		Delta RPM

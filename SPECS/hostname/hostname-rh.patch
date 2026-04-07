@@ -1,0 +1,43 @@
+diff --git a/hostname.1 b/hostname.1
+index 74dd306..02eefa7 100644
+--- a/hostname.1
++++ b/hostname.1
+@@ -80,6 +80,28 @@ complete FQDN of the system is returned with
+ .B THE FQDN
+ below).
+ 
++.LP
++The function 
++.BR gethostname(2)
++is used to get the hostname.  When the 
++.BR "hostname \-a, \-d, \-f or \-i" 
++is called will 
++.BR gethostbyname(3)
++be called.  The difference in 
++.BR gethostname(2)
++and
++.BR gethostbyname(3)
++is that
++.BR gethostbyname(5)
++is network aware, so it consults 
++.IR /etc/nsswitch.conf
++and
++.IR /etc/host.conf
++to decide whether to read information in
++.IR /etc/hostname
++or
++.IR /etc/hosts
++
+ .SS "SET NAME"
+ When called with one argument or with the
+ .B \-\-file
+@@ -105,8 +127,7 @@ command (see
+ .B THE FQDN
+ below).
+ .LP
+-The host name is usually set once at system startup in
+-.I /etc/init.d/hostname.sh
++The host name is usually set once at system startup
+ (normally by reading the contents of a file which contains
+ the host name, e.g.
+ .IR /etc/hostname ).

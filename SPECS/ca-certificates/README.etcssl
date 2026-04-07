@@ -1,0 +1,20 @@
+This directory (/etc/ssl) is provided as a courtesy attempt to provide
+compatibility with software which assumes its existence. It is not a
+supported or canonical location. Software which assumes and relies on
+the existence and layout of this directory is making a wrong assumption
+(this directory is not any kind of 'standard', it is a configuration
+detail of Debian and its derivatives) and should be improved. No
+software packaged in this distribution should use this directory.
+
+An attempt is made to make the layout of /etc/ssl/certs match that
+provided by Debian: it is an OpenSSL 'CApath'-style hashed directory
+of individual certificate files, and also contains a certificate bundle
+file named ca-certificates.crt, as Debian does. It also contains a
+bundle named ca-bundle.crt, as this distribution has long provided
+such a file, and it is possible some software has come to expect its
+existence.
+
+/etc/ssl/certs itself and the bundle files are in fact symlinks to
+some of the output of the 'update-ca-trust' script which forms a part
+of a system of consolidated CA certificates. Please refer to the
+update-ca-trust(8) manual page for additional information.

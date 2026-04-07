@@ -1,0 +1,14 @@
+--- peg-0.5.7/Cargo.toml	1970-01-01T00:00:00+00:00
++++ peg-0.5.7/Cargo.toml	2023-02-05T13:43:49.728396+00:00
+@@ -22,11 +22,6 @@
+ license = "MIT"
+ repository = "https://github.com/kevinmehall/rust-peg"
+ 
+-[[bin]]
+-name = "rust-peg"
+-path = "src/bin.rs"
+-test = false
+-bench = false
+ [dependencies.quote]
+ version = "0.3"
+ 

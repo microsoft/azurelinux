@@ -1,0 +1,57 @@
+From 2a63d3f0ffb76135790bb1168a3270a599904380 Mon Sep 17 00:00:00 2001
+From: David Redondo <kde@david-redondo.de>
+Date: Tue, 20 Sep 2022 10:37:51 +0200
+Subject: [PATCH 1/2] Add a systemd service to run xdg-user-dirs-update
+
+Recently GNOME and Plasma have been embracing systemd for handling
+their session startup. To enable autostart integration with this
+systemd includes systemd-xdg-autostart-generator which creates units
+from autostart desktop files. xdg-user-dirs installs such a desktop
+file (xdg-user-dirs.desktop). However because this file  contains
+X-GNOME-Autostart-Phase=Initialization systemd will skip it since
+it assumes it will be handles by GNOME itself. This a problem for
+Plasma and other desktop environments that do not handle this
+themselves, assuming that systemd takes care about autostart
+xdg-user-dirs-update will not be run.
+See https://github.com/systemd/systemd/issues/18791
+We can provide a systemd service file to make sure xdg-user-dirs-update
+is run during session startup. This ensures that the relevant
+directories of the user exist on login and during startup as
+specifying to be run before graphical-session-pre.target
+means that it runs sufficiently early in the startup process while
+using the generator would result in 'After=graphical-session.target'.
+---
+ xdg-user-dirs.desktop |  1 +
+ xdg-user-dirs.service | 11 +++++++++++
+ 2 files changed, 12 insertions(+)
+ create mode 100644 xdg-user-dirs.service
+
+diff --git a/xdg-user-dirs.desktop b/xdg-user-dirs.desktop
+index 6b969d4..b14a973 100644
+--- a/xdg-user-dirs.desktop
++++ b/xdg-user-dirs.desktop
+@@ -8,3 +8,4 @@ NoDisplay=true
+ 
+ X-GNOME-Autostart-Phase=Initialization
+ X-KDE-autostart-phase=1
++X-systemd-skip=true
+diff --git a/xdg-user-dirs.service b/xdg-user-dirs.service
+new file mode 100644
+index 0000000..6795045
+--- /dev/null
++++ b/xdg-user-dirs.service
+@@ -0,0 +1,11 @@
++[Unit]
++Description=User folders update
++Documentation=man:xdg-user-dirs-update(1)
++Before=graphical-session-pre.target
++
++[Service]
++Type=oneshot
++ExecStart=/usr/bin/xdg-user-dirs-update
++
++[Install]
++WantedBy=graphical-session-pre.target
+-- 
+2.48.1
+

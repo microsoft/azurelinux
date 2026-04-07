@@ -1,0 +1,40 @@
+From 63033ac306aa26d32e1439417e59ae8f8a4c9820 Mon Sep 17 00:00:00 2001
+From: Sam James <sam@gentoo.org>
+Date: Sat, 31 May 2025 18:54:51 +0100
+Subject: Menu: handle Python 3.15 deprecations
+
+* Unknown keyword args will be fatal, so drop lineno/col_offset that
+  is unused
+* Set body= immediately as a keyword
+---
+ xdg/Menu.py | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/xdg/Menu.py b/xdg/Menu.py
+index 71f5e61..8e1595c 100644
+--- a/xdg/Menu.py
++++ b/xdg/Menu.py
+@@ -419,7 +419,6 @@ class Rule:
+                     ctx=ast.Load()
+                 )]
+             ),
+-            lineno=1, col_offset=0
+         )
+         ast.fix_missing_locations(tree)
+         rule = Rule(type, tree)
+@@ -763,12 +762,10 @@ class XMLMenuBuilder(object):
+ 
+     def parse_rule(self, node):
+         type = Rule.TYPE_INCLUDE if node.tag == 'Include' else Rule.TYPE_EXCLUDE
+-        tree = ast.Expression(lineno=1, col_offset=0)
++        tree = ast.Expression(body=_ast_const('False'))
+         expr = self.parse_bool_op(node, ast.Or())
+         if expr:
+             tree.body = expr
+-        else:
+-            tree.body = _ast_const('False')
+         ast.fix_missing_locations(tree)
+         return Rule(type, tree)
+ 
+-- 
+cgit v1.2.3

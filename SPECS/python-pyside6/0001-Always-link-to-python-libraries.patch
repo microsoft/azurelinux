@@ -1,0 +1,33 @@
+From e9591e27db4ae3412d4504a69a8afebee9a1b83e Mon Sep 17 00:00:00 2001
+From: Christophe Giboudeaux <christophe@krop.fr>
+Date: Tue, 27 Jul 2021 14:54:00 +0200
+Subject: [PATCH] Always link to python libraries.
+
+Change-Id: I687191431adaff55927de353db8f81dfa30ba1b1
+---
+ sources/shiboken6/cmake/ShibokenHelpers.cmake | 10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
+
+diff --git a/sources/shiboken6/cmake/ShibokenHelpers.cmake b/sources/shiboken6/cmake/ShibokenHelpers.cmake
+index 27ee333..4be2ad1 100644
+--- a/sources/shiboken6/cmake/ShibokenHelpers.cmake
++++ b/sources/shiboken6/cmake/ShibokenHelpers.cmake
+@@ -425,13 +425,9 @@ macro(shiboken_compute_python_libraries)
+         "SHIBOKEN_COMPUTE_LIBS" "shiboken_compute_python_libraries"
+         "IS_CALLED_FROM_EXPORT" "" "" ${ARGN})
+ 
+-    if (NOT SHIBOKEN_PYTHON_LIBRARIES)
+-        set(SHIBOKEN_PYTHON_LIBRARIES "")
+-    endif()
+-
+-    if(WIN32 AND NOT SHIBOKEN_PYTHON_LIBRARIES)
+-        set(SHIBOKEN_PYTHON_LIBRARIES ${Python_LIBRARIES})
+-    endif()
++    # Always link to python libraries.
++    message(STATUS "Linking shiboken to ${Python_LIBRARIES}")
++    set(SHIBOKEN_PYTHON_LIBRARIES ${Python_LIBRARIES})
+ 
+     # If the resulting variable
+     # contains a "debug;X;optimized;Y" list like described in shiboken_check_if_limited_api,
+-- 
+2.46.1

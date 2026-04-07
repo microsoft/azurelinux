@@ -1,0 +1,48 @@
+From 3d0a9a040ecaa78ce2d39ec76ff5084ee7be6653 Mon Sep 17 00:00:00 2001
+From: Scott K Logan <logans@cottsay.net>
+Date: Wed, 16 Jul 2025 15:58:09 -0500
+Subject: [PATCH] Prefer multiprocessing 'fork' start method if available
+
+The default multiprocessing start method for Linux changed in Python
+3.14 from 'fork' to 'forkserver'. Because capturer relies on sharing
+file descriptors, only 'fork' can be used. Prefer that start method
+specifically (if the platform supports it).
+---
+ capturer/__init__.py | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/capturer/__init__.py b/capturer/__init__.py
+index 407ba26..9f98950 100644
+--- a/capturer/__init__.py
++++ b/capturer/__init__.py
+@@ -136,6 +136,10 @@ class MultiProcessHelper(object):
+     def __init__(self):
+         """Initialize a :class:`MultiProcessHelper` object."""
+         self.processes = []
++        try:
++            self.context = multiprocessing.get_context('fork')
++        except ValueError:
++            self.context = multiprocessing.get_context()
+ 
+     def start_child(self, target):
+         """
+@@ -146,8 +150,8 @@ def start_child(self, target):
+                        :class:`multiprocessing.Event` to be set when the child
+                        process has finished initialization.
+         """
+-        started_event = multiprocessing.Event()
+-        child_process = multiprocessing.Process(target=target, args=(started_event,))
++        started_event = self.context.Event()
++        child_process = self.context.Process(target=target, args=(started_event,))
+         self.processes.append(child_process)
+         child_process.daemon = True
+         child_process.start()
+@@ -309,7 +313,7 @@ def start_capture(self):
+             # Capture (and most likely relay) stdout/stderr as separate streams.
+             if self.relay:
+                 # Start the subprocess to relay output.
+-                self.output_queue = multiprocessing.Queue()
++                self.output_queue = self.context.Queue()
+                 self.start_child(self.merge_loop)
+             else:
+                 # Disable relaying of output.

@@ -1,0 +1,26 @@
+From 813e79e0147b7fbdea82dfe8927f01634f866aa5 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Fri, 14 Mar 2025 00:58:14 -0400
+Subject: [PATCH] Update CMake minimum version from 3.2 to 3.12
+
+Support CMake 4.0 (which drops support for CMake<3.5)
+---
+ buildsystems/cmake/GtkDocScanGObjWrapper.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/buildsystems/cmake/GtkDocScanGObjWrapper.cmake b/buildsystems/cmake/GtkDocScanGObjWrapper.cmake
+index b187ebb2..47b8d643 100644
+--- a/buildsystems/cmake/GtkDocScanGObjWrapper.cmake
++++ b/buildsystems/cmake/GtkDocScanGObjWrapper.cmake
+@@ -20,7 +20,7 @@
+ 
+ # This is needed for find_package(PkgConfig) to work correctly --
+ # CMAKE_MINIMUM_REQUIRED_VERSION needs to be defined.
+-cmake_minimum_required(VERSION 3.2)
++cmake_minimum_required(VERSION 3.12)
+ 
+ if(NOT APPLE)
+     # We use pkg-config to find glib et al
+-- 
+GitLab
+

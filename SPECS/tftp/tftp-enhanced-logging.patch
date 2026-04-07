@@ -1,0 +1,85 @@
+diff -up tftp-hpa-5.3/tftpd/tftpd.c.logging tftp-hpa-5.3/tftpd/tftpd.c
+--- tftp-hpa-5.3/tftpd/tftpd.c.logging	2025-12-26 22:35:01.117565067 +0100
++++ tftp-hpa-5.3/tftpd/tftpd.c	2025-12-26 22:36:09.040318780 +0100
+@@ -1053,14 +1053,14 @@ int main(int argc, char **argv)
+ 
+ static char *rewrite_access(char *, int, int, const char **);
+ static int validate_access(char *, int, const struct formats *, const char **);
+-static void tftp_sendfile(const struct formats *, struct tftphdr *, int);
++static void tftp_sendfile(const struct formats *, struct tftphdr *, int, char *);
+ static void tftp_recvfile(const struct formats *, struct tftphdr *, int);
+ 
+ struct formats {
+     const char *f_mode;
+     char *(*f_rewrite) (char *, int, int, const char **);
+     int (*f_validate) (char *, int, const struct formats *, const char **);
+-    void (*f_send) (const struct formats *, struct tftphdr *, int);
++    void (*f_send) (const struct formats *, struct tftphdr *, int, char *);
+     void (*f_recv) (const struct formats *, struct tftphdr *, int);
+     int f_convert;
+ };
+@@ -1125,6 +1125,9 @@ int tftp(struct tftphdr *tp, int size)
+                 nak(EACCESS, errmsgptr);        /* File denied by mapping rule */
+                 exit(0);
+             }
++	    ecode =
++                (*pf->f_validate) (filename, tp_opcode, pf, &errmsgptr);
++
+             if (verbosity >= 1) {
+                 tmp_p = (char *)inet_ntop(from.sa.sa_family, SOCKADDR_P(&from),
+                                           tmpbuf, INET6_ADDRSTRLEN);
+@@ -1143,9 +1146,14 @@ int tftp(struct tftphdr *tp, int size)
+                            tp_opcode == WRQ ? "WRQ" : "RRQ",
+                            tmp_p, origfilename,
+                            filename);
++
++                if (ecode == 1) {
++                    syslog(LOG_NOTICE, "Client %s File not found %s\n",
++                    tmp_p,filename);
++                }
++
+             }
+-            ecode =
+-                (*pf->f_validate) (filename, tp_opcode, pf, &errmsgptr);
++
+             if (ecode) {
+                 nak(ecode, errmsgptr);
+                 exit(0);
+@@ -1168,12 +1176,12 @@ int tftp(struct tftphdr *tp, int size)
+         if (tp_opcode == WRQ)
+             (*pf->f_recv) (pf, (struct tftphdr *)ackbuf, ap - ackbuf);
+         else
+-            (*pf->f_send) (pf, (struct tftphdr *)ackbuf, ap - ackbuf);
++            (*pf->f_send) (pf, (struct tftphdr *)ackbuf, ap - ackbuf, origfilename);
+     } else {
+         if (tp_opcode == WRQ)
+             (*pf->f_recv) (pf, NULL, 0);
+         else
+-            (*pf->f_send) (pf, NULL, 0);
++            (*pf->f_send) (pf, NULL, 0, origfilename);
+     }
+     exit(0);                    /* Request completed */
+ }
+@@ -1555,7 +1563,7 @@ static int validate_access(char *filenam
+ /*
+  * Send the requested file.
+  */
+-static void tftp_sendfile(const struct formats *pf, struct tftphdr *oap, int oacklen)
++static void tftp_sendfile(const struct formats *pf, struct tftphdr *oap, int oacklen, char *filename)
+ {
+     struct tftphdr *dp;
+     struct tftphdr *ap;         /* ack packet */
+@@ -1646,6 +1654,13 @@ static void tftp_sendfile(const struct f
+ 	if (!++block)
+ 	  block = rollover_val;
+     } while (size == segsize);
++    tmp_p = (char *)inet_ntop(from.sa.sa_family, SOCKADDR_P(&from),
++                                          tmpbuf, INET6_ADDRSTRLEN);
++    if (!tmp_p) {
++            tmp_p = tmpbuf;
++            strcpy(tmpbuf, "???");
++    }
++    syslog(LOG_NOTICE, "Client %s finished %s",tmp_p,filename);
+   abort:
+     (void)fclose(file);
+ }

@@ -1,0 +1,9 @@
+--- hyper-tls-0.5.0/Cargo.toml	1970-01-01T00:00:00+00:00
++++ hyper-tls-0.5.0/Cargo.toml	2024-04-19T20:04:59.808031+00:00
+@@ -45,6 +45,3 @@
+ [dev-dependencies.tokio]
+ version = "1.0.0"
+ features = ["io-std", "macros", "io-util"]
+-
+-[features]
+-vendored = ["native-tls/vendored"]

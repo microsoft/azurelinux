@@ -1,0 +1,16 @@
+--- glib-1.2.10/glib.h.isowarning	Mon Feb 26 22:44:38 2001
++++ glib-1.2.10/glib.h	Sat Jul 21 19:36:31 2001
+@@ -1291,6 +1291,13 @@
+ #ifndef	G_LOG_DOMAIN
+ #define	G_LOG_DOMAIN	((gchar*) 0)
+ #endif	/* G_LOG_DOMAIN */
++
++/* Suppress warnings when GCC is in -pedantic mode and not -std=c99
++ */
++#if (__GNUC__ >= 3 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 96))
++#pragma GCC system_header
++#endif
++
+ #if defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+ #define	g_error(...)	g_log (G_LOG_DOMAIN,         \
+ 			       G_LOG_LEVEL_ERROR,    \

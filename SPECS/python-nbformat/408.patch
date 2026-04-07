@@ -1,0 +1,45 @@
+From aad470e5952c6955c937dfb0b10a511368a63f20 Mon Sep 17 00:00:00 2001
+From: Cristian Le <git@lecris.dev>
+Date: Wed, 15 Jan 2025 11:04:57 +0100
+Subject: [PATCH] Drop pep440 dependency
+
+---
+ pyproject.toml    | 2 +-
+ tests/test_api.py | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 541c4db..f81498b 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -56,7 +56,7 @@ test = [
+     "testpath",
+     "pytest",
+     "pre-commit",
+-    "pep440"
++    "packaging"
+ ]
+ 
+ [project.scripts]
+diff --git a/tests/test_api.py b/tests/test_api.py
+index f2d76f3..c5b8b9a 100644
+--- a/tests/test_api.py
++++ b/tests/test_api.py
+@@ -11,7 +11,7 @@
+ from typing import Any
+ 
+ from jsonschema import ValidationError
+-from pep440 import is_canonical
++from packaging import version
+ 
+ from nbformat import __version__ as nbf_version
+ from nbformat import current_nbformat, read, write, writes
+@@ -22,7 +22,7 @@
+ 
+ 
+ def test_canonical_version():
+-    assert is_canonical(nbf_version)
++    assert str(version.parse(nbf_version)) == nbf_version
+ 
+ 
+ class TestAPI(TestsBase):

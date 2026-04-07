@@ -1,0 +1,178 @@
+From 6935aa4b515fe9b782507820c77ab681136470bc Mon Sep 17 00:00:00 2001
+From: Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+Date: Thu, 15 Sep 2022 18:56:20 +0900
+Subject: [PATCH] 50629: do not use egrep in tests
+
+Upstream-commit: 4fc5dc0292acd77f17281f451774ba2ca4203026
+Signed-off-by: Kamil Dudka <kdudka@redhat.com>
+---
+ Test/D07multibyte.ztst  | 16 ++--------------
+ Test/E01options.ztst    |  2 +-
+ Test/V07pcre.ztst       | 16 ++--------------
+ Test/X02zlevi.ztst      | 11 +----------
+ Test/X03zlebindkey.ztst | 11 +----------
+ Test/Y01completion.ztst | 11 +----------
+ Test/ztst.zsh           | 15 +++++++++++++++
+ 7 files changed, 23 insertions(+), 59 deletions(-)
+
+diff --git a/Test/D07multibyte.ztst b/Test/D07multibyte.ztst
+index e2e9a25..6909346 100644
+--- a/Test/D07multibyte.ztst
++++ b/Test/D07multibyte.ztst
+@@ -1,19 +1,7 @@
+ %prep
+ 
+-# Find a UTF-8 locale.
+-  setopt multibyte
+-# Don't let LC_* override our choice of locale.
+-  unset -m LC_\*
+-  mb_ok=
+-  langs=(en_{US,GB}.{UTF-,utf}8 en.UTF-8
+-	 $(locale -a 2>/dev/null | egrep 'utf8|UTF-8'))
+-  for LANG in $langs; do
+-    if [[ é = ? ]]; then
+-      mb_ok=1
+-      break;
+-    fi
+-  done
+-  if [[ -z $mb_ok ]]; then
++  LANG=$(ZTST_find_UTF8)
++  if [[ -z $LANG ]]; then
+     ZTST_unimplemented="no UTF-8 locale or multibyte mode is not implemented"
+   else
+     print -u $ZTST_fd Testing multibyte with locale $LANG
+diff --git a/Test/E01options.ztst b/Test/E01options.ztst
+index 2acbfd3..d38fbed 100644
+--- a/Test/E01options.ztst
++++ b/Test/E01options.ztst
+@@ -651,7 +651,7 @@
+ >noktarg1
+ >0 1
+ 
+-  showopt() { setopt | egrep 'localoptions|ksharrays'; }
++  showopt() { echo ${(FM)${(@f)"$(setopt)"}:#(localoptions|ksharrays)*} }
+   f1() { setopt localoptions ksharrays; showopt }
+   f2() { setopt ksharrays; showopt }
+   setopt kshoptionprint
+diff --git a/Test/V07pcre.ztst b/Test/V07pcre.ztst
+index c9c844d..ca13419 100644
+--- a/Test/V07pcre.ztst
++++ b/Test/V07pcre.ztst
+@@ -6,20 +6,8 @@
+     return 0
+   fi
+   setopt rematch_pcre
+-# Find a UTF-8 locale.
+-  setopt multibyte
+-# Don't let LC_* override our choice of locale.
+-  unset -m LC_\*
+-  mb_ok=
+-  langs=(en_{US,GB}.{UTF-,utf}8 en.UTF-8
+-	 $(locale -a 2>/dev/null | egrep 'utf8|UTF-8'))
+-  for LANG in $langs; do
+-    if [[ é = ? ]]; then
+-      mb_ok=1
+-      break;
+-    fi
+-  done
+-  if [[ -z $mb_ok ]]; then
++  LANG=$(ZTST_find_UTF8)
++  if [[ -z $LANG ]]; then
+     ZTST_unimplemented="no UTF-8 locale or multibyte mode is not implemented"
+   else
+     print -u $ZTST_fd Testing PCRE multibyte with locale $LANG
+diff --git a/Test/X02zlevi.ztst b/Test/X02zlevi.ztst
+index 8146d67..203c13c 100644
+--- a/Test/X02zlevi.ztst
++++ b/Test/X02zlevi.ztst
+@@ -1,16 +1,7 @@
+ # Tests of the vi mode of ZLE
+ 
+ %prep
+-  unset -m LC_\*
+-  ZSH_TEST_LANG=
+-  langs=(en_{US,GB}.{UTF-,utf}8 en.UTF-8
+-	 $(locale -a 2>/dev/null | egrep 'utf8|UTF-8'))
+-  for LANG in $langs; do
+-    if [[ é = ? ]]; then
+-      ZSH_TEST_LANG=$LANG 
+-      break;
+-    fi
+-  done
++  ZSH_TEST_LANG=$(ZTST_find_UTF8)
+   if ( zmodload zsh/zpty 2>/dev/null ); then
+     . $ZTST_srcdir/comptest
+     comptestinit -v -z $ZTST_testdir/../Src/zsh
+diff --git a/Test/X03zlebindkey.ztst b/Test/X03zlebindkey.ztst
+index 43692a8..5277332 100644
+--- a/Test/X03zlebindkey.ztst
++++ b/Test/X03zlebindkey.ztst
+@@ -3,16 +3,7 @@
+ # into bindings.  The latter is particularly tricky with multibyte sequences.
+ 
+ %prep
+-  unset -m LC_\*
+-  ZSH_TEST_LANG=
+-  langs=(en_{US,GB}.{UTF-,utf}8 en.UTF-8
+-	 $(locale -a 2>/dev/null | egrep 'utf8|UTF-8'))
+-  for LANG in $langs; do
+-    if [[ é = ? ]]; then
+-      ZSH_TEST_LANG=$LANG
+-      break;
+-    fi
+-  done
++  ZSH_TEST_LANG=$(ZTST_find_UTF8)
+   if ( zmodload zsh/zpty 2>/dev/null ); then
+     . $ZTST_srcdir/comptest
+     comptestinit -z $ZTST_testdir/../Src/zsh
+diff --git a/Test/Y01completion.ztst b/Test/Y01completion.ztst
+index 6af0efc..f976f9f 100644
+--- a/Test/Y01completion.ztst
++++ b/Test/Y01completion.ztst
+@@ -1,16 +1,7 @@
+ # Tests for completion system.
+ 
+ %prep
+-  unset -m LC_\*
+-  ZSH_TEST_LANG=
+-  langs=(en_{US,GB}.{UTF-,utf}8 en.UTF-8
+-         $(locale -a 2>/dev/null | egrep 'utf8|UTF-8'))
+-  for LANG in $langs; do
+-    if [[ é = ? ]]; then
+-      ZSH_TEST_LANG=$LANG
+-      break;
+-    fi
+-  done
++  ZSH_TEST_LANG=$(ZTST_find_UTF8)
+   if ( zmodload zsh/zpty 2>/dev/null ); then
+     . $ZTST_srcdir/comptest
+     mkdir comp.tmp
+diff --git a/Test/ztst.zsh b/Test/ztst.zsh
+index aca275c..d95b726 100755
+--- a/Test/ztst.zsh
++++ b/Test/ztst.zsh
+@@ -37,6 +37,21 @@ emulate -R zsh
+ # LANG must be passed to child zsh.
+ export LANG
+ 
++# find UTF-8 locale
++ZTST_find_UTF8 () {
++  setopt multibyte
++  # Don't let LC_* override our choice of locale.
++  unset -m LC_\*
++  local langs=(en_{US,GB}.{UTF-,utf}8 en.UTF-8
++               ${(M)$(locale -a 2>/dev/null):#*.(utf8|UTF-8)})
++  for LANG in $langs; do
++    if [[ é = ? ]]; then
++      echo $LANG
++      return
++    fi
++  done
++}
++
+ # Don't propagate variables that are set by default in the shell.
+ typeset +x WORDCHARS
+ 
+-- 
+2.39.0
+

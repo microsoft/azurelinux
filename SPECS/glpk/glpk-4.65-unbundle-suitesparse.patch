@@ -1,0 +1,178 @@
+diff -urN glpk-4.65.orig/doc/glpk11.tex glpk-4.65/doc/glpk11.tex
+--- glpk-4.65.orig/doc/glpk11.tex	2018-05-20 18:44:07.252528992 -0600
++++ glpk-4.65/doc/glpk11.tex	2018-05-20 18:50:00.647441783 -0600
+@@ -8,115 +8,6 @@ are used with GLPK and included in the d
+ 
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 
+-\section{AMD}
+-
+-\noindent
+-AMD Version 2.2, Copyright {\copyright} 2007 by Timothy A. Davis,
+-Patrick R. Amestoy, and Iain S. Duff.  All Rights Reserved.
+-
+-\para{Description}
+-
+-AMD is a set of routines for pre-ordering sparse matrices prior to
+-Cholesky or LU factorization, using the approximate minimum degree
+-ordering algorithm.
+-
+-\para{License}
+-
+-This library is free software; you can redistribute it and/or
+-modify it under the terms of the GNU Lesser General Public License
+-as published by the Free Software Foundation; either version 2.1 of
+-the License, or (at your option) any later version.
+-
+-This library is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+-Lesser General Public License for more details.
+-
+-You should have received a copy of the GNU Lesser General Public
+-License along with this library; if not, write to the Free Software
+-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
+-USA.
+-
+-Permission is hereby granted to use or copy this program under the
+-terms of the GNU LGPL, provided that the Copyright, this License,
+-and the Availability of the original version is retained on all
+-copies.  User documentation of any code that uses this code or any
+-modified version of this code must cite the Copyright, this License,
+-the Availability note, and ``Used by permission.''  Permission to
+-modify the code and to distribute modified code is granted, provided
+-the Copyright, this License, and the Availability note are retained,
+-and a notice that the code was modified is included.
+-
+-AMD is available under alternate licences; contact T. Davis for
+-details.
+-
+-\para{Availability}
+-
+-\noindent
+-\url{http://www.cise.ufl.edu/research/sparse/amd}
+-
+-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+-
+-\section{COLAMD/SYMAMD}
+-
+-\noindent
+-COLAMD/SYMAMD Version 2.7, Copyright {\copyright} 1998-2007, Timothy A.
+-Davis, All Rights Reserved.
+-
+-\para{Description}
+-
+-colamd: an approximate minimum degree column ordering algorithm, for
+-LU factorization of symmetric or unsymmetric matrices, QR factorization,
+-least squares, interior point methods for linear programming problems,
+-and other related problems.
+-
+-symamd: an approximate minimum degree ordering algorithm for Cholesky
+-factorization of symmetric matrices.
+-
+-\para{Authors}
+-
+-The authors of the code itself are Stefan I. Larimore and Timothy A.
+-Davis (davis at cise.ufl.edu), University of Florida.  The algorithm
+-was developed in collaboration with John Gilbert, Xerox PARC, and
+-Esmond Ng, Oak Ridge National Laboratory.
+-
+-\para{License}
+-
+-This library is free software; you can redistribute it and/or
+-modify it under the terms of the GNU Lesser General Public License
+-as published by the Free Software Foundation; either version 2.1 of
+-the License, or (at your option) any later version.
+-
+-This library is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+-Lesser General Public License for more details.
+-
+-You should have received a copy of the GNU Lesser General Public
+-License along with this library; if not, write to the Free Software
+-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
+-USA.
+-
+-Permission is hereby granted to use or copy this program under the
+-terms of the GNU LGPL, provided that the Copyright, this License,
+-and the Availability of the original version is retained on all
+-copies.  User documentation of any code that uses this code or any
+-modified version of this code must cite the Copyright, this License,
+-the Availability note, and ``Used by permission.''  Permission to
+-modify the code and to distribute modified code is granted, provided
+-the Copyright, this License, and the Availability note are retained,
+-and a notice that the code was modified is included.
+-
+-COLAMD is also available under alternate licenses, contact T. Davis for
+-details.
+-
+-\para{Availability}
+-
+-\noindent
+-\url{http://www.cise.ufl.edu/research/sparse/colamd}
+-
+-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+-
+ %\newpage
+ 
+ \section{MiniSat}
+diff -urN glpk-4.65.orig/src/draft/glpmat.c glpk-4.65/src/draft/glpmat.c
+--- glpk-4.65.orig/src/draft/glpmat.c	2018-02-16 00:00:00.000000000 -0700
++++ glpk-4.65/src/draft/glpmat.c	2018-05-20 18:51:01.912252756 -0600
+@@ -25,8 +25,8 @@
+ #include "env.h"
+ #include "glpmat.h"
+ #include "qmd.h"
+-#include "amd.h"
+-#include "colamd.h"
++#include <suitesparse/amd.h>
++#include <suitesparse/colamd.h>
+ 
+ /*----------------------------------------------------------------------
+ -- check_fvs - check sparse vector in full-vector storage format.
+diff -urN glpk-4.65.orig/src/Makefile.am glpk-4.65/src/Makefile.am
+--- glpk-4.65.orig/src/Makefile.am	2018-05-20 18:45:01.472363924 -0600
++++ glpk-4.65/src/Makefile.am	2018-05-20 18:52:01.576068667 -0600
+@@ -6,10 +6,8 @@ lib_LTLIBRARIES = libglpk.la
+ 
+ libglpk_la_CPPFLAGS = \
+ -I$(srcdir) \
+--I$(srcdir)/amd \
+ -I$(srcdir)/api \
+ -I$(srcdir)/bflib \
+--I$(srcdir)/colamd \
+ -I$(srcdir)/draft \
+ -I$(srcdir)/env \
+ -I$(srcdir)/intopt \
+@@ -25,21 +23,9 @@ libglpk_la_LDFLAGS = \
+ -export-symbols-regex '^glp_*' \
+ ${NOUNDEFINED}
+ 
+-libglpk_la_LIBADD = -lz
++libglpk_la_LIBADD = -lamd -lcolamd -lz
+ 
+ libglpk_la_SOURCES = \
+-amd/amd_1.c \
+-amd/amd_2.c \
+-amd/amd_aat.c \
+-amd/amd_control.c \
+-amd/amd_defaults.c \
+-amd/amd_dump.c \
+-amd/amd_info.c \
+-amd/amd_order.c \
+-amd/amd_post_tree.c \
+-amd/amd_postorder.c \
+-amd/amd_preprocess.c \
+-amd/amd_valid.c \
+ api/advbas.c \
+ api/asnhall.c \
+ api/asnlp.c \
+@@ -105,7 +91,6 @@ bflib/scf.c \
+ bflib/scfint.c \
+ bflib/sgf.c \
+ bflib/sva.c \
+-colamd/colamd.c \
+ draft/bfd.c \
+ draft/bfx.c \
+ draft/glpapi06.c \

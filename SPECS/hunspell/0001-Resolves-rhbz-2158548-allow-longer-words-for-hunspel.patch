@@ -1,0 +1,77 @@
+From e2fe9f86e1769b440972971240e9b8fb1cd53b97 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Caol=C3=A1n=20McNamara?= <caolanm@redhat.com>
+Date: Fri, 6 Jan 2023 16:20:45 +0000
+Subject: [PATCH] Resolves: rhbz#2158548 allow longer words for hunspell-ko
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+https://github.com/hunspell/hunspell/issues/903
+
+A problem since the sanity check added in:
+
+commit 05e44e069e4cfaa9ce1264bf13f23fc9abd7ed05
+Author: Caolán McNamara <caolanm@redhat.com>
+Date:   Thu Sep 1 13:46:40 2022 +0100
+
+    Check word limit (#813)
+
+    * check against hentry blen max
+---
+ src/hunspell/hashmgr.cxx | 6 +++---
+ src/hunspell/htypes.hxx  | 4 ++--
+ tests/korean.dic         | 3 ++-
+ 3 files changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/src/hunspell/hashmgr.cxx b/src/hunspell/hashmgr.cxx
+index 100916d..14201e9 100644
+--- a/src/hunspell/hashmgr.cxx
++++ b/src/hunspell/hashmgr.cxx
+@@ -209,7 +209,7 @@ int HashMgr::add_word(const std::string& in_word,
+   }
+ 
+   // limit of hp->blen
+-  if (word->size() > std::numeric_limits<unsigned char>::max()) {
++  if (word->size() > std::numeric_limits<unsigned short>::max()) {
+     HUNSPELL_WARNING(stderr, "error: word len %ld is over max limit\n", word->size());
+     delete desc_copy;
+     delete word_copy;
+@@ -235,8 +235,8 @@ int HashMgr::add_word(const std::string& in_word,
+ 
+   int i = hash(hpw, word->size());
+ 
+-  hp->blen = (unsigned char)word->size();
+-  hp->clen = (unsigned char)wcl;
++  hp->blen = (unsigned short)word->size();
++  hp->clen = (unsigned short)wcl;
+   hp->alen = (short)al;
+   hp->astr = aff;
+   hp->next = NULL;
+diff --git a/src/hunspell/htypes.hxx b/src/hunspell/htypes.hxx
+index 44366b1..2b896fb 100644
+--- a/src/hunspell/htypes.hxx
++++ b/src/hunspell/htypes.hxx
+@@ -62,8 +62,8 @@
+ #endif
+ 
+ struct hentry {
+-  unsigned char blen;    // word length in bytes
+-  unsigned char clen;    // word length in characters (different for UTF-8 enc.)
++  unsigned short blen;   // word length in bytes
++  unsigned short clen;   // word length in characters (different for UTF-8 enc.)
+   short alen;            // length of affix flag vector
+   unsigned short* astr;  // affix flag vector
+   struct hentry* next;   // next word with same hash code
+diff --git a/tests/korean.dic b/tests/korean.dic
+index 95cb450..d76ea05 100644
+--- a/tests/korean.dic
++++ b/tests/korean.dic
+@@ -1,3 +1,4 @@
+-2
++3
+ 들어오세요
+ 안녕하세요
++김수한무거북이와두루미삼천갑자동방삭치치카포사리사리세ᅡ워리워리세브리캉무드셀ᅡ구름위허ᅵ케ᅵᆫᅦ담벼락서생원에ᄀ양
+-- 
+2.38.1
+

@@ -1,0 +1,61 @@
+From 4a99479895e975274cd8f7704f3545f8c5e87ffd Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Fri, 23 Jan 2026 23:16:39 +0100
+Subject: [PATCH] Backport fixes for tests from upstream
+
+---
+ src/lib.rs | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index 7804d0c..9a99502 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -454,7 +454,7 @@ mod tests {
+                 impl ::zeroize::Zeroize for Z {
+                     fn zeroize(&mut self) {
+                         match self {
+-                            #[allow(unused_variables)]
++                            #[allow(unused_variables, unused_assignments)]
+                             Z { a, b, c } => {
+                                 a.zeroize();
+                                 b.zeroize();
+@@ -484,7 +484,7 @@ mod tests {
+                 impl ::zeroize::Zeroize for Z {
+                     fn zeroize(&mut self) {
+                         match self {
+-                            #[allow(unused_variables)]
++                            #[allow(unused_variables, unused_assignments)]
+                             Z { a, b, c } => {
+                                 a.zeroize();
+                                 b.zeroize();
+@@ -520,7 +520,7 @@ mod tests {
+                 impl ::zeroize::Zeroize for Z {
+                     fn zeroize(&mut self) {
+                         match self {
+-                            #[allow(unused_variables)]
++                            #[allow(unused_variables, unused_assignments)]
+                             Z { a, b, c } => {
+                                 a.zeroize();
+                                 b.zeroize()
+@@ -545,7 +545,7 @@ mod tests {
+                 impl<T> ::zeroize::Zeroize for Z<T> where T: MyTrait {
+                     fn zeroize(&mut self) {
+                         match self {
+-                            #[allow(unused_variables)]
++                            #[allow(unused_variables, unused_assignments)]
+                             Z(__zeroize_field_0) => {
+                                 __zeroize_field_0.zeroize()
+                             }
+@@ -574,7 +574,7 @@ mod tests {
+                         use ::zeroize::__internal::AssertZeroize;
+                         use ::zeroize::__internal::AssertZeroizeOnDrop;
+                         match self {
+-                            #[allow(unused_variables)]
++                            #[allow(unused_variables, unused_assignments)]
+                             Z { a, b, c } => {
+                                 a.zeroize_or_on_drop();
+                                 b.zeroize_or_on_drop();
+-- 
+2.52.0
+

@@ -1,0 +1,123 @@
+From 1c3da2baf4cc84aecd2f6610777d28ac69a47039 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Fri, 1 Mar 2024 13:25:14 +0000
+Subject: [PATCH 203/203] Disable sm2 and sm4 crypto algorithms
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Policy copied from Fedora 39 openssl package
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ Linux/build_openssl.sh                     | 2 +-
+ Linux/sgx/test_app/enclave/TestEnclave.cpp | 4 ++++
+ Linux/sgx/test_app/enclave/TestEnclave.h   | 4 ++++
+ Linux/sgx/test_app/enclave/tests/evp_smx.c | 4 ++++
+ 4 files changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/Linux/build_openssl.sh b/Linux/build_openssl.sh
+index cf8394b..fea2232 100755
+--- a/Linux/build_openssl.sh
++++ b/Linux/build_openssl.sh
+@@ -162,7 +162,7 @@ cp sgx_config.conf $OPENSSL_VERSION/ || exit 1
+ cp x86_64-xlate.pl $OPENSSL_VERSION/crypto/perlasm/ || exit 1
+ 
+ cd $SGXSSL_ROOT/../openssl_source/$OPENSSL_VERSION || exit 1
+-perl Configure --config=sgx_config.conf sgx-linux-x86_64 --with-rand-seed=none $ADDITIONAL_CONF $SPACE_OPT $MITIGATION_FLAGS $ENCLAVE_CFLAGS no-idea no-mdc2 no-rc5 no-rc4 no-bf no-ec2m no-camellia no-cast no-srp no-async no-padlockeng no-dso no-shared no-ssl3 no-md2 no-md4 no-ui-console no-stdio no-afalgeng -D_FORTIFY_SOURCE=2 -DGETPID_IS_MEANINGLESS -DOPENSSL_NO_POSIX_IO -include$SGXSSL_ROOT/../openssl_source/bypass_to_sgxssl.h || exit 1
++perl Configure --config=sgx_config.conf sgx-linux-x86_64 --with-rand-seed=none $ADDITIONAL_CONF $SPACE_OPT $MITIGATION_FLAGS $ENCLAVE_CFLAGS no-idea no-mdc2 no-rc5 no-rc4 no-bf no-ec2m no-camellia no-cast no-srp no-async no-padlockeng no-dso no-shared no-ssl3 no-md2 no-md4 no-sm2 no-sm4 no-ui-console no-stdio no-afalgeng -D_FORTIFY_SOURCE=2 -DGETPID_IS_MEANINGLESS -DOPENSSL_NO_POSIX_IO -include$SGXSSL_ROOT/../openssl_source/bypass_to_sgxssl.h || exit 1
+ 
+ sed -i 's/ENGINE_set_default_RAND/dummy_ENGINE_set_default_RAND/' crypto/engine/tb_rand.c || exit 1
+ sed -i 's/return RUN_ONCE(&locale_base, ossl_init_locale_base);/return 1;/' crypto/ctype.c || exit 1
+diff --git a/Linux/sgx/test_app/enclave/TestEnclave.cpp b/Linux/sgx/test_app/enclave/TestEnclave.cpp
+index 7b21dd2..65330d5 100644
+--- a/Linux/sgx/test_app/enclave/TestEnclave.cpp
++++ b/Linux/sgx/test_app/enclave/TestEnclave.cpp
+@@ -469,6 +469,7 @@ void t_sgxssl_call_apis()
+     }
+ 	printf("test threads_test completed\n");
+ #ifndef SGXSSL_FIPS
++#if 0
+     //GM SM2 - sign and verify
+     ret = ecall_sm2_sign_verify();
+     if (ret != 0)
+@@ -486,6 +487,7 @@ void t_sgxssl_call_apis()
+         goto end;
+     }
+     printf("test evp_sm2_encrypt_decrypt completed\n");
++#endif
+ 
+     //GM SM3 - compute digest of message
+     ret = ecall_sm3();
+@@ -496,6 +498,7 @@ void t_sgxssl_call_apis()
+     }
+     printf("test evp_sm3 completed\n");
+ 
++#if 0
+     //GM SM4 - cbc encrypt and decrypt
+     ret = ecall_sm4_cbc();
+     if (ret != 0)
+@@ -513,6 +516,7 @@ void t_sgxssl_call_apis()
+         goto end;
+     }
+     printf("test evp_sm4_ctr completed\n");
++#endif
+ #endif
+     printf("ALL tests in t_sgxssl_call_apis passed!\n");
+ end:
+diff --git a/Linux/sgx/test_app/enclave/TestEnclave.h b/Linux/sgx/test_app/enclave/TestEnclave.h
+index c2ca854..a989735 100644
+--- a/Linux/sgx/test_app/enclave/TestEnclave.h
++++ b/Linux/sgx/test_app/enclave/TestEnclave.h
+@@ -66,11 +66,15 @@ int sha256_test();
+ int sha1_test();
+ int hmac_tests();
+ int threads_test();
++#if 0
+ int ecall_sm2_sign_verify();
+ int ecall_sm2_encrypt_decrypt();
++#endif
+ int ecall_sm3();
++#if 0
+ int ecall_sm4_cbc();
+ int ecall_sm4_ctr();
++#endif
+ 
+ #if defined(__cplusplus)
+ }
+diff --git a/Linux/sgx/test_app/enclave/tests/evp_smx.c b/Linux/sgx/test_app/enclave/tests/evp_smx.c
+index a395ce8..f49e5b7 100644
+--- a/Linux/sgx/test_app/enclave/tests/evp_smx.c
++++ b/Linux/sgx/test_app/enclave/tests/evp_smx.c
+@@ -44,6 +44,7 @@
+ #define SAFE_FREE(ptr, size)  {if (NULL != (ptr)) {memset_s(ptr, size, 0, size); free(ptr); (ptr)=NULL;}}
+ #endif
+ 
++#if 0
+ // Default sm2_user_id and its length defined by openssl
+ unsigned char sm2_user_id[] = "1234567812345678";
+ unsigned int sm2_user_id_len = sizeof(sm2_user_id)-1;
+@@ -512,6 +513,7 @@ end:
+ 
+ 	return ret;
+ }
++#endif
+ 
+ /* Compute a SM3 digest of a message. */
+ int ecall_sm3(void)
+@@ -571,6 +573,7 @@ end:
+ 	return ret;
+ }
+ 
++#if 0
+ /* SM4 block cipher mode(cbc) of operation. */
+ int ecall_sm4_cbc(void)
+ {	
+@@ -743,3 +746,4 @@ end:
+ 
+ 	return ret;
+ }
++#endif
+-- 
+2.49.0
+

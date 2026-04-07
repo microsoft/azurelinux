@@ -1,0 +1,255 @@
+diff -up texmf-dist/scripts/pythontex/depythontex3.py.orig texmf-dist/scripts/pythontex/depythontex3.py
+--- texmf-dist/scripts/pythontex/depythontex3.py.orig	2025-07-15 15:33:41.682593752 +0200
++++ texmf-dist/scripts/pythontex/depythontex3.py	2025-07-15 15:41:16.346789065 +0200
+@@ -121,7 +121,7 @@ def replace_code_cmd(name, arglist, line
+ 
+     Usually, code from a command is also typeset with a command.  This
+     function primarily deals with that case.  In cases where code from a
+-    command is typeset with an environment (for example, `\inputpygments`),
++    command is typeset with an environment (for example, `\\inputpygments`),
+     this function performs some preprocessing and then uses
+     replace_code_env() to do the real work.  This approach prevents the two
+     functions from unnecessarily duplicating each other, while still giving
+@@ -161,7 +161,7 @@ def replace_code_cmd(name, arglist, line
+         # Make sure the introduction of an environment where a command was
+         # previously won't produce errors with following content; make sure
+         # that any following content is on a separate line
+-        if bool(match('[ \t]*\S', after)):
++        if bool(match(r'[ \t]*\S', after)):
+             after = '\n' + after
+         # Rather than duplicating much of replace_code_env(), just use it
+         return replace_code_env(name, arglist, linenum, code_replacement,
+@@ -333,7 +333,7 @@ def replace_print_cmd(name, arglist, lin
+                 break
+         print_replacement = r'\verb' + delim + print_replacement + delim
+     elif print_replacement_mode == 'verbatim':
+-        if bool(match('\s*?\n', after)):
++        if bool(match(r'\s*?\n', after)):
+             # Usually, we would end the verbatim environment with a newline.
+             # This is fine if there is content in `after` before the next
+             # newline---in fact, it's desirable, because the verbatim package
+@@ -405,11 +405,11 @@ def replace_print_cmd(name, arglist, lin
+                 # the `\input` content.
+                 print_replacement = print_replacement.rstrip(' \t\n')
+                 after = sub(r'^\\unskip\s+', '', after)
+-            elif bool(match('\S', after)):
++            elif bool(match(r'\S', after)):
+                 # If the next character is not whitespace, we can just leave
+                 # the `\n`, and it will yield a space.
+                 pass
+-            elif bool(match('\s*$', after)):
++            elif bool(match(r'\s*$', after)):
+                 # If the rest of the current line, and the next line, are
+                 # whitespace, we will get the correct spacing without needing
+                 # `\space{}`.  We could leave `\n`, but it would be
+@@ -421,14 +421,14 @@ def replace_print_cmd(name, arglist, lin
+                 # it's at the end of an environment, and thus is needed to
+                 # protect the following content
+                 print_replacement += '\\space{}'
+-                after = sub('^\s+', '', after)
++                after = sub(r'^\s+', '', after)
+                 forced_double_space_list.append((name, linenum))
+         else:
+-            if bool(match('\s+\S', after)):
++            if bool(match(r'\s+\S', after)):
+                 # If the following line starts with whitespace, replace it
+                 # with a newline, to protect in the event that the printed
+                 # content ended with an end-of-environment command
+-                after = sub('^\s+', '\n', after)
++                after = sub(r'^\s+', '\n', after)
+         # Issue warnings, if warranted
+         # Warn about `\endinput`
+         if (r'\endinput' in print_replacement and
+@@ -505,7 +505,7 @@ def replace_print_env(name, arglist, lin
+ 
+     #### The inlineverb and verb modes should work, but haven't been tested
+     since there are currently no environments that use them; they are only
+-    used by `\printpythontex`, which is a command.
++    used by `\\printpythontex`, which is a command.
+     '''
+     if print_replacement_mode == 'verb':
+         if print_replacement.count('\n') > 1:
+@@ -519,17 +519,17 @@ def replace_print_env(name, arglist, lin
+             if delim not in print_replacement:
+                 break
+         print_replacement = r'\verb' + delim + print_replacement + delim
+-        if not bool(match('[ \t]+\S', after)):
++        if not bool(match(r'[ \t]+\S', after)):
+             # If there is text on the same line as the end of the
+             # environment, we're fine (this is unusual).  Otherwise,
+             # we need to toss the newline at the end of the environment
+             # and gobble leading spaces.  Leading spaces need to be
+             # gobbled because previously they were at the beginning of a
+             # line, where they would have been discarded.
+-            if not bool(match('\s*$', after)):
+-                after = sub('^\s*?\n\s*', '', after)
++            if not bool(match(r'\s*$', after)):
++                after = sub(r'^\s*?\n\s*', '', after)
+     elif print_replacement_mode == 'verbatim':
+-        if bool(match('\s*?\n', after)):
++        if bool(match(r'\s*?\n', after)):
+             # Usually, we would end the verbatim environment with a newline.
+             # This is fine if there is content in `after` before the next
+             # newline---in fact, it's desirable, because the verbatim package
+@@ -570,15 +570,15 @@ def replace_print_env(name, arglist, lin
+             # printed content.  Later, we issue a warning in case it appears
+             # anywhere else.
+             print_replacement = print_replacement.rsplit(r'\endinput', 1)[0]
+-            if not bool(match('[ \t]+\S', after)):
++            if not bool(match(r'[ \t]+\S', after)):
+                 # If there is text on the same line as the end of the
+                 # environment, we're fine (this is unusual).  Otherwise,
+                 # we need to toss the newline at the end of the environment
+                 # and gobble leading spaces.  Leading spaces need to be
+                 # gobbled because previously they were at the beginning of a
+                 # line, where they would have been discarded.
+-                if not bool(match('\s*$', after)):
+-                    after = sub('^\s*?\n\s*', '', after)
++                if not bool(match(r'\s*$', after)):
++                    after = sub(r'^\s*?\n\s*', '', after)
+         elif (print_replacement.endswith('%\n') and
+                 not print_replacement.endswith('\\%\n') and
+                 not print_replacement.endswith('\\string%\n')):
+@@ -590,15 +590,15 @@ def replace_print_env(name, arglist, lin
+             # warning if there is reason to think that a percent character
+             # was active in the last line.
+             print_replacement = print_replacement.rsplit(r'%', 1)[0]
+-            if not bool(match('[ \t]+\S', after)):
++            if not bool(match(r'[ \t]+\S', after)):
+                 # If there is text on the same line as the end of the
+                 # environment, we're fine (this is unusual).  Otherwise,
+                 # we need to toss the newline at the end of the environment
+                 # and gobble leading spaces.  Leading spaces need to be
+                 # gobbled because previously they were at the beginning of a
+                 # line, where they would have been discarded.
+-                if not bool(match('\s*$', after)):
+-                    after = sub('^\s*?\n\s*', '', after)
++                if not bool(match(r'\s*$', after)):
++                    after = sub(r'^\s*?\n\s*', '', after)
+         else:
+             # By default, LaTeX strips newlines and adds a space at the end
+             # of each line of content that is brought in by `\input`.  This
+@@ -611,13 +611,13 @@ def replace_print_env(name, arglist, lin
+                 # `\unskip`
+                 print_replacement = print_replacement.rstrip(' \t\n')
+                 after = sub(r'^\s*\\unskip\s+', '', after)
+-            elif bool(match('[ \t]+\S', after)):
++            elif bool(match(r'[ \t]+\S', after)):
+                 # If the next character after the end of the environment is
+                 # not whitespace (usually not allowed), we can just leave
+                 # the `\n` in printed content, and it will yield a space.
+                 # So we need do nothing.  But if there is text on that line
+                 # we need `\space{}`.
+-                after = sub('^\s+', '\\space', after)
++                after = sub(r'^\s+', '\\space', after)
+                 forced_double_space_list.append((name, linenum))
+             else:
+                 # If the line at the end of the environment is blank,
+@@ -1080,7 +1080,7 @@ for n, depytxline in enumerate(depytx):
+                 else:
+                     if obeylines:
+                         # Take into account possible whitespace before arg
+-                        if bool(match('[ \t]*\[', after)):
++                        if bool(match(r'[ \t]*\[', after)):
+                             after = after.split('[', 1)[1]
+                             while ']' not in after:
+                                 texlinenum += 1
+@@ -1094,11 +1094,11 @@ for n, depytxline in enumerate(depytx):
+                                 after = sub('^[ \t]*', '', after)
+                     else:
+                         # Allow peeking ahead a line for the argument
+-                        if bool(match('\s*$', after)) and after.count('\n') < 2:
++                        if bool(match(r'\s*$', after)) and after.count('\n') < 2:
+                             texlinenum += 1
+                             after += tex[texlinenum]
+                         # Take into account possible whitespace before arg
+-                        if bool(match('\s*\[', after)):
++                        if bool(match(r'\s*\[', after)):
+                             after = after.split('[', 1)[1]
+                             while ']' not in after:
+                                 texlinenum += 1
+@@ -1108,11 +1108,11 @@ for n, depytxline in enumerate(depytx):
+                             optarg = None
+                             # Account for eating whitespace afterward, if arg not found
+                             if argindex == len(depy_args) - 1:
+-                                if bool(match('\s*$', after)) and after.count('\n') < 2:
++                                if bool(match(r'\s*$', after)) and after.count('\n') < 2:
+                                     texlinenum += 1
+                                     after += tex[texlinenum]
+-                                if not bool(match('\s*$', after)):
+-                                    after = sub('^\s*', '', after)
++                                if not bool(match(r'\s*$', after)):
++                                    after = sub(r'^\s*', '', after)
+                 arglist.append(optarg)
+             elif arg == 'm':
+                 # Account for possible line breaks or spaces before arg
+@@ -1121,7 +1121,7 @@ for n, depytxline in enumerate(depytx):
+                 else:
+                     if obeylines:
+                         # Account for possible leading whitespace
+-                        if bool(match('[ \t\f\v]*\{', after)):
++                        if bool(match(r'[ \t\f\v]*\{', after)):
+                             after = after.split('{', 1)[1]
+                         else:
+                             print('* DePythonTeX error:')
+@@ -1129,10 +1129,10 @@ for n, depytxline in enumerate(depytx):
+                             sys.exit(1)
+                     else:
+                         # Peek ahead a line if needed
+-                        if bool(match('\s*$', after)) and after.count('\n') < 2:
++                        if bool(match(r'\s*$', after)) and after.count('\n') < 2:
+                             texlinenum += 1
+                             after += tex[texlinenum]
+-                        if bool(match('\s*\{', after)):
++                        if bool(match(r'\s*\{', after)):
+                             after = after.split('{', 1)[1]
+                         else:
+                             print('* DePythonTeX error:')
+@@ -1338,7 +1338,7 @@ for n, depytxline in enumerate(depytx):
+                             after = tex[texlinenum]
+                             break
+                 after = after.split(end_environment, 1)[1]
+-                if bool(match('\s*\n', after)):
++                if bool(match(r'\s*\n', after)):
+                     # If the line following `after` is whitespace, it should
+                     # be stripped, since most environments throw away
+                     # anything after the end of the environment
+@@ -1389,7 +1389,7 @@ if preamble_additions:
+ # Take care of graphicspath
+ if args.graphicspath and settings['graphicx']:
+     for n, line in enumerate(texout):
+-        if '\\graphicspath' in line and not bool(match('\s*%', line)):
++        if '\\graphicspath' in line and not bool(match(r'\s*%', line)):
+             texout[n] = line.replace('\\graphicspath{', '\\graphicspath{{' + settings['outputdir'] +'/}')
+             break
+         elif line.startswith(r'\begin{document}'):
+diff -up texmf-dist/scripts/pythontex/pythontex3.py.orig texmf-dist/scripts/pythontex/pythontex3.py
+--- texmf-dist/scripts/pythontex/pythontex3.py.orig	2025-07-15 15:42:36.840317560 +0200
++++ texmf-dist/scripts/pythontex/pythontex3.py	2025-07-15 15:43:51.882856253 +0200
+@@ -554,7 +554,7 @@ def do_upgrade_compatibility(data, old_d
+                   It will continue to use the output directory for now.  To keep your
+                   current settings long-term and avoid seeing this message in the future,
+                   add the following command to the preamble of your document, right after
+-                  the "\\usepackage{pythontex}":  "\setpythontexworkingdir{<outputdir>}".
++                  the "\\usepackage{pythontex}":  "\\setpythontexworkingdir{<outputdir>}".
+                   If you wish to continue with the new settings instead, simply delete
+                   the file with extension .pkl in the output directory, and run PythonTeX.
+                   ****  End PythonTeX upgrade message  ****
+@@ -1807,7 +1807,7 @@ def run_code(encoding, outputdir, workin
+                     # Get the gobbleation.  This is used to determine if
+                     # other lines containing the basename are a continuation,
+                     # or separate messages.
+-                    errgobble = match('(\s*)', line).groups()[0]
++                    errgobble = match(r'(\s*)', line).groups()[0]
+                     if start_errgobble is None:
+                         start_errgobble = errgobble
+                     # Only issue a message and track down the line numer if
+@@ -2072,7 +2072,7 @@ def run_code(encoding, outputdir, workin
+                     # Get the gobbleation.  This is used to determine if
+                     # other lines containing the basename are a continuation,
+                     # or separate messages.
+-                    errgobble = match('(\s*)', line).groups()[0]
++                    errgobble = match(r'(\s*)', line).groups()[0]
+                     if start_errgobble is None:
+                         start_errgobble = errgobble
+                     # Only issue a message and track down the line numer if

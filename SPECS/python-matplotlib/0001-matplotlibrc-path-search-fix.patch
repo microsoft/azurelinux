@@ -1,0 +1,33 @@
+From 50c46d80a99b6bdbb61733b0eef69649f22701ab Mon Sep 17 00:00:00 2001
+From: Sandro Tosi <morph@debian.org>
+Date: Wed, 27 Sep 2017 19:35:59 -0400
+Subject: [PATCH 1/5] matplotlibrc path search fix
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ lib/matplotlib/__init__.py | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/lib/matplotlib/__init__.py b/lib/matplotlib/__init__.py
+index 2786f9b7b9..79cccf0892 100644
+--- a/lib/matplotlib/__init__.py
++++ b/lib/matplotlib/__init__.py
+@@ -613,6 +613,7 @@ def matplotlib_fname():
+           is not defined)
+     - On other platforms,
+       - ``$HOME/.matplotlib/matplotlibrc`` if ``$HOME`` is defined
++    - ``/etc/matplotlibrc``
+     - Lastly, it looks in ``$MATPLOTLIBDATA/matplotlibrc``, which should always
+       exist.
+     """
+@@ -631,6 +632,7 @@ def matplotlib_fname():
+             yield matplotlibrc
+             yield os.path.join(matplotlibrc, 'matplotlibrc')
+         yield os.path.join(get_configdir(), 'matplotlibrc')
++        yield '/etc/matplotlibrc'
+         yield os.path.join(get_data_path(), 'matplotlibrc')
+ 
+     for fname in gen_candidates():
+-- 
+2.52.0
+

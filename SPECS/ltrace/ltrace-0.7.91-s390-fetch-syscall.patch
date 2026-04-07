@@ -1,0 +1,69 @@
+@@ -, +, @@ 
+   exe->mount("source", "target", "filesystemtype", 0, nil <unfinished ...>
+   mount@SYS("", "target", "filesystemtype", 0, nil)                 = -2
+   <... mount resumed>                                               = -1
+---
+ sysdeps/linux-gnu/s390/fetch.c |   17 ++++++++++++-----
+ 1 files changed, 12 insertions(+), 5 deletions(-)
+--- a/sysdeps/linux-gnu/s390/fetch.c	
++++ a/sysdeps/linux-gnu/s390/fetch.c	
+@@ -23,6 +23,7 @@ 
+ #include <sys/ucontext.h>
+ #include <assert.h>
+ #include <errno.h>
++#include <stdbool.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+@@ -61,7 +62,8 @@ s390x(struct fetch_context *ctx)
+ }
+ 
+ static int
+-fetch_register_banks(struct process *proc, struct fetch_context *ctx)
++fetch_register_banks(struct process *proc, struct fetch_context *ctx,
++		     bool syscall_enter)
+ {
+ 	ptrace_area parea;
+ 	parea.len = sizeof(ctx->regs);
+@@ -72,15 +74,20 @@ fetch_register_banks(struct process *proc, struct fetch_context *ctx)
+ 			strerror(errno));
+ 		return -1;
+ 	}
++
++	if (syscall_enter)
++		ctx->regs.gprs[2] = ctx->regs.orig_gpr2;
++
+ 	return 0;
+ }
+ 
+ static int
+-fetch_context_init(struct process *proc, struct fetch_context *context)
++fetch_context_init(struct process *proc, struct fetch_context *context,
++		   bool syscall_enter)
+ {
+ 	context->greg = 2;
+ 	context->freg = 0;
+-	return fetch_register_banks(proc, context);
++	return fetch_register_banks(proc, context, syscall_enter);
+ }
+ 
+ struct fetch_context *
+@@ -89,7 +96,7 @@ arch_fetch_arg_init(enum tof type, struct process *proc,
+ {
+ 	struct fetch_context *context = malloc(sizeof(*context));
+ 	if (context == NULL
+-	    || fetch_context_init(proc, context) < 0) {
++	    || fetch_context_init(proc, context, type == LT_TOF_SYSCALL) < 0) {
+ 		fprintf(stderr, "arch_fetch_arg_init: %s\n",
+ 			strerror(errno));
+ 		free(context);
+@@ -277,7 +284,7 @@ arch_fetch_retval(struct fetch_context *ctx, enum tof type,
+ 		return 0;
+ 	}
+ 
+-	if (fetch_context_init(proc, ctx) < 0)
++	if (fetch_context_init(proc, ctx, false) < 0)
+ 		return -1;
+ 	return arch_fetch_arg_next(ctx, type, proc, info, valuep);
+ }
+-- 

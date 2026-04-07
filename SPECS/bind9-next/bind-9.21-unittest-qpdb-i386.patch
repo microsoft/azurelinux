@@ -1,0 +1,41 @@
+From af1e4bf375000fc532c55ff6df841661185a2451 Mon Sep 17 00:00:00 2001
+From: Petr Mensik <pemensik@redhat.com>
+Date: Wed, 28 May 2025 19:40:05 +0200
+Subject: [PATCH] Try rcu_barrier
+
+https://gitlab.isc.org/isc-projects/bind9/-/issues/5328
+---
+ tests/dns/qpdb_test.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/tests/dns/qpdb_test.c b/tests/dns/qpdb_test.c
+index 1c840e2..b6ad0f4 100644
+--- a/tests/dns/qpdb_test.c
++++ b/tests/dns/qpdb_test.c
+@@ -24,6 +24,7 @@
+ #include <cmocka.h>
+ 
+ #include <isc/lib.h>
++#include <isc/urcu.h>
+ #include <isc/util.h>
+ 
+ #include <dns/lib.h>
+@@ -170,6 +171,7 @@ ISC_LOOP_TEST_IMPL(overmempurge_bigrdata) {
+ 
+ 	dns_db_detach(&db);
+ 	isc_mem_detach(&mctx);
++	rcu_barrier();
+ 	isc_loopmgr_shutdown();
+ }
+ 
+@@ -221,6 +223,7 @@ ISC_LOOP_TEST_IMPL(overmempurge_longname) {
+ 
+ 	dns_db_detach(&db);
+ 	isc_mem_detach(&mctx);
++	rcu_barrier();
+ 	isc_loopmgr_shutdown();
+ }
+ 
+-- 
+2.51.0
+

@@ -1,0 +1,9 @@
+/SupportedUnicodeLocales = en_US.UTF-8
+/DefaultPanelProgram = scim-panel-gtk
+/DefaultConfigModule = simple
+/DefaultSocketFrontEndAddress = local:/tmp/scim-socket-frontend
+/DefaultSocketIMEngineAddress = local:/tmp/scim-socket-frontend
+/DefaultSocketConfigAddress = local:/tmp/scim-socket-frontend
+/DefaultPanelSocketAddress = local:/tmp/scim-panel-socket
+/DefaultHelperManagerSocketAddress = local:/tmp/scim-helper-manager-socket
+/DefaultSocketTimeout = 5000

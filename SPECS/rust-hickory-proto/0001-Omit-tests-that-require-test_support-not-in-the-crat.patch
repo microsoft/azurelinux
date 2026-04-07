@@ -1,0 +1,141 @@
+From 7b06f5f591a0362e467d491cd6d5e35eaa2b16d3 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Fri, 5 Sep 2025 06:43:56 +0100
+Subject: [PATCH] Omit tests that require test_support, not in the crate
+
+---
+ src/h2/h2_client_stream.rs   | 1 +
+ src/h2/h2_server.rs          | 1 +
+ src/h3/h3_client_stream.rs   | 1 +
+ src/multicast/mdns_stream.rs | 1 +
+ src/tcp/tcp_client_stream.rs | 1 +
+ src/tcp/tcp_stream.rs        | 1 +
+ src/udp/udp_client_stream.rs | 1 +
+ src/udp/udp_stream.rs        | 1 +
+ src/xfer/dns_multiplexer.rs  | 1 +
+ src/xfer/retry_dns_handle.rs | 1 +
+ 10 files changed, 10 insertions(+)
+
+diff --git a/src/h2/h2_client_stream.rs b/src/h2/h2_client_stream.rs
+index debac04fa..a62d441eb 100644
+--- a/src/h2/h2_client_stream.rs
++++ b/src/h2/h2_client_stream.rs
+@@ -575,6 +575,7 @@ impl Future for HttpsClientResponse {
+ 
+ #[cfg(any(feature = "webpki-roots", feature = "rustls-platform-verifier"))]
+ #[cfg(test)]
++#[cfg(any())]
+ mod tests {
+     use alloc::string::ToString;
+     use std::net::SocketAddr;
+diff --git a/src/h2/h2_server.rs b/src/h2/h2_server.rs
+index 6bfe32e24..f2d743a2e 100644
+--- a/src/h2/h2_server.rs
++++ b/src/h2/h2_server.rs
+@@ -99,6 +99,7 @@ where
+ }
+ 
+ #[cfg(test)]
++#[cfg(any())]
+ mod tests {
+     use alloc::vec::Vec;
+     use core::pin::Pin;
+diff --git a/src/h3/h3_client_stream.rs b/src/h3/h3_client_stream.rs
+index 77eda73bc..fac112990 100644
+--- a/src/h3/h3_client_stream.rs
++++ b/src/h3/h3_client_stream.rs
+@@ -471,6 +471,7 @@ impl Future for H3ClientResponse {
+     test,
+     any(feature = "rustls-platform-verifier", feature = "webpki-roots")
+ ))]
++#[cfg(any())]
+ mod tests {
+     use alloc::string::ToString;
+     use core::str::FromStr;
+diff --git a/src/multicast/mdns_stream.rs b/src/multicast/mdns_stream.rs
+index 277be8974..1106c29c6 100644
+--- a/src/multicast/mdns_stream.rs
++++ b/src/multicast/mdns_stream.rs
+@@ -417,6 +417,7 @@ impl Future for NextRandomUdpSocket {
+ }
+ 
+ #[cfg(test)]
++#[cfg(any())]
+ pub(crate) mod tests {
+     #![allow(clippy::dbg_macro, clippy::print_stdout)]
+ 
+diff --git a/src/tcp/tcp_client_stream.rs b/src/tcp/tcp_client_stream.rs
+index 0e376308b..5720cd4cd 100644
+--- a/src/tcp/tcp_client_stream.rs
++++ b/src/tcp/tcp_client_stream.rs
+@@ -110,6 +110,7 @@ where
+ 
+ #[cfg(test)]
+ #[cfg(feature = "tokio")]
++#[cfg(any())]
+ mod tests {
+     use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+ 
+diff --git a/src/tcp/tcp_stream.rs b/src/tcp/tcp_stream.rs
+index 3f9dfbbb7..8cfa125e5 100644
+--- a/src/tcp/tcp_stream.rs
++++ b/src/tcp/tcp_stream.rs
+@@ -383,6 +383,7 @@ impl<S: DnsTcpStream> Stream for TcpStream<S> {
+ 
+ #[cfg(test)]
+ #[cfg(feature = "tokio")]
++#[cfg(any())]
+ mod tests {
+     use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+ 
+diff --git a/src/udp/udp_client_stream.rs b/src/udp/udp_client_stream.rs
+index d6f21ff49..8f94bcfa9 100644
+--- a/src/udp/udp_client_stream.rs
++++ b/src/udp/udp_client_stream.rs
+@@ -418,6 +418,7 @@ async fn send_serial_message_inner<S: DnsUdpSocket + Send>(
+ 
+ #[cfg(test)]
+ #[cfg(feature = "tokio")]
++#[cfg(any())]
+ mod tests {
+     #![allow(clippy::dbg_macro, clippy::print_stdout)]
+     use crate::{runtime::TokioRuntimeProvider, tests::udp_client_stream_test};
+diff --git a/src/udp/udp_stream.rs b/src/udp/udp_stream.rs
+index 905c9b4fc..cdc502e90 100644
+--- a/src/udp/udp_stream.rs
++++ b/src/udp/udp_stream.rs
+@@ -399,6 +399,7 @@ impl DnsUdpSocket for tokio::net::UdpSocket {
+ 
+ #[cfg(test)]
+ #[cfg(feature = "tokio")]
++#[cfg(any())]
+ mod tests {
+     use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+ 
+diff --git a/src/xfer/dns_multiplexer.rs b/src/xfer/dns_multiplexer.rs
+index 0e29c75ab..c7c524630 100644
+--- a/src/xfer/dns_multiplexer.rs
++++ b/src/xfer/dns_multiplexer.rs
+@@ -430,6 +430,7 @@ where
+ }
+ 
+ #[cfg(test)]
++#[cfg(any())]
+ mod test {
+     use alloc::vec::Vec;
+     use std::net::{Ipv4Addr, Ipv6Addr, SocketAddr};
+diff --git a/src/xfer/retry_dns_handle.rs b/src/xfer/retry_dns_handle.rs
+index c7b87ff2c..7bf89f88d 100644
+--- a/src/xfer/retry_dns_handle.rs
++++ b/src/xfer/retry_dns_handle.rs
+@@ -140,6 +140,7 @@ impl RetryableError for ProtoError {
+ }
+ 
+ #[cfg(all(test, feature = "std"))]
++#[cfg(any())]
+ mod test {
+     use alloc::sync::Arc;
+     use core::sync::atomic::{AtomicU16, Ordering};
+-- 
+2.51.0
+

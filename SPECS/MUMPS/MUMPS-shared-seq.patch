@@ -1,0 +1,66 @@
+Create a shared version of the sequential library, MUST BE LAST IN SERIES
+
+--- a/libseq/Makefile
++++ b/libseq/Makefile
+@@ -9,7 +9,7 @@
+ topdir = ..
+ include $(topdir)/Makefile.inc
+ 
+-staticlibmpiseq: libmpiseq$(PLAT)$(LIBEXT)
++staticlibmpiseq: libmpiseq$(PLAT)$(LIBEXT) libmpiseq$(PLAT).so
+ 
+ libmpiseq$(PLAT)$(LIBEXT): mpi.o mpic.o elapse.o
+ 	$(AR)$@ mpi.o mpic.o elapse.o
+@@ -18,8 +18,9 @@
+ sharedlibmpiseq:
+ 	$(MAKE) FPIC="$(FPIC_OPT)" libmpiseq$(PLAT)$(LIBEXT_SHARED)
+ 
+-libmpiseq$(PLAT)$(LIBEXT_SHARED): mpi.o mpic.o elapse.o
+-	$(FC) $(SHARED_OPT) mpi.o mpic.o elapse.o -o libmpiseq$(PLAT)$(LIBEXT_SHARED)
++libmpiseq$(PLAT).so: mpi.o mpic.o elapse.o
++	$(FC) -shared $^ -Wl,-soname,libmpiseq$(PLAT)-$(SONAME_VERSION).so -o libmpiseq$(PLAT)-$(SONAME_VERSION).so
++	ln -fs libmpiseq$(PLAT)-$(SONAME_VERSION).so $@
+ 
+ .f.o:
+ 	$(FC) $(OPTF) $(FPIC)              -c $*.f $(OUTF)$*.o
+--- a/src/Makefile.mod1	2015-02-20 19:36:17.726477000 +0100
++++ b/src/Makefile	2015-02-20 19:49:59.847640480 +0100
+@@ -37,15 +37,15 @@
+ # Rules for shared libraries
+ allshared: $(incdir)/mumps_int_def.h libcommonshared sshared dshared cshared zshared
+ libcommonshared: $(incdir)/mumps_int_def.h
+-	$(MAKE) FPIC=$(FPIC_OPT) $(libdir)/libmumps_common$(PLAT)$(LIBEXT_SHARED)
++	$(MAKE) FPIC=$(FPIC_OPT) $(libdir)/libmumps_common$(PLAT).so
+ sshared: $(incdir)/mumps_int_def.h libcommonshared
+-	$(MAKE) ARITH=s FPIC=$(FPIC_OPT) $(libdir)/libsmumps$(PLAT)$(LIBEXT_SHARED)
++	$(MAKE) ARITH=s FPIC=$(FPIC_OPT) $(libdir)/libsmumps$(PLAT).so
+ dshared: $(incdir)/mumps_int_def.h libcommonshared
+-	$(MAKE) ARITH=d FPIC=$(FPIC_OPT) $(libdir)/libdmumps$(PLAT)$(LIBEXT_SHARED)
++	$(MAKE) ARITH=d FPIC=$(FPIC_OPT) $(libdir)/libdmumps$(PLAT).s0
+ cshared: $(incdir)/mumps_int_def.h libcommonshared
+-	$(MAKE) ARITH=c FPIC=$(FPIC_OPT) $(libdir)/libcmumps$(PLAT)$(LIBEXT_SHARED)
++	$(MAKE) ARITH=c FPIC=$(FPIC_OPT) $(libdir)/libcmumps$(PLAT).so
+ zshared: $(incdir)/mumps_int_def.h libcommonshared
+-	$(MAKE) ARITH=z FPIC=$(FPIC_OPT) $(libdir)/libzmumps$(PLAT)$(LIBEXT_SHARED)
++	$(MAKE) ARITH=z FPIC=$(FPIC_OPT) $(libdir)/libzmumps$(PLAT).so
+ 
+ 
+ 
+@@ -220,7 +220,7 @@
+ 	$(FC) $(OPTL) -shared $^ -Wl,-soname,libmumps_common$(PLAT).so -L$(libdir) $(RPATH_OPT) $(LORDERINGS) $(LIBS) $(LIBOTHERS) -o $@ 
+ 
+ $(libdir)/libmumps_common$(PLAT).so:	$(OBJS_COMMON_MOD) $(OBJS_COMMON_OTHER)
+-	$(FC) -shared $^ -Wl,-soname,libmumps_common$(PLAT)-$(SONAME_VERSION).so $(OPTL) -L$(libdir) $(LORDERINGS) -lpthread $(MUMPS_LIBF77) $(MPIFLIB) $(MPICLIB) $(METISLIB) -o $(libdir)/libmumps_common$(PLAT)-$(SONAME_VERSION).so $(OPTL) -Wl,-z,defs
++	$(FC) -shared $^ -Wl,-soname,libmumps_common$(PLAT)-$(SONAME_VERSION).so $(OPTL) -L$(libdir) $(LORDERINGS) -lpthread $(MUMPS_LIBF77) $(LIBSEQ) $(METISLIB) -o $(libdir)/libmumps_common$(PLAT)-$(SONAME_VERSION).so -Wl,-z,defs
+ 	ln -fs libmumps_common$(PLAT)-$(SONAME_VERSION).so $@
+ 
+ $(libdir)/lib$(ARITH)mumps$(PLAT).a:    $(OBJS_MOD) $(OBJS_OTHER)
+@@ -228,7 +228,7 @@
+ 	$(RANLIB) $@
+ 
+ $(libdir)/lib$(ARITH)mumps$(PLAT).so:    $(OBJS_MOD) $(OBJS_OTHER)
+-	$(FC) -shared $^ -Wl,-soname,lib$(ARITH)mumps$(PLAT)-$(SONAME_VERSION).so $(OPTL) -L$(libdir) -lmumps_common$(PLAT) $(MUMPS_LIBF77) $(LORDERINGS) $(MPIFLIB) $(METISLIB) $(SCALAP) -o $(libdir)/lib$(ARITH)mumps$(PLAT)-$(SONAME_VERSION).so $(OPTL) -Wl,-z,defs
++	$(FC) -shared $^ -Wl,-soname,lib$(ARITH)mumps$(PLAT)-$(SONAME_VERSION).so $(OPTL) -L$(libdir) -lmumps_common$(PLAT) $(LORDERINGS) $(MUMPS_LIBF77) $(LIBSEQ) $(METISLIB) $(SCALAP) -o $(libdir)/lib$(ARITH)mumps$(PLAT)-$(SONAME_VERSION).so -Wl,-z,defs
+ 	ln -fs lib$(ARITH)mumps$(PLAT)-$(SONAME_VERSION).so $@
+ 
+ 

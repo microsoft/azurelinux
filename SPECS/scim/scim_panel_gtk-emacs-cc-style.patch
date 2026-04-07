@@ -1,0 +1,15 @@
+diff -u scim-1.4.5/extras/panel/scim_panel_gtk.cpp.12-workarea-xprop scim-1.4.5/extras/panel/scim_panel_gtk.cpp
+--- scim-1.4.5/extras/panel/scim_panel_gtk.cpp.12-workarea-xprop	2006-11-15 11:25:48.000000000 +1000
++++ scim-1.4.5/extras/panel/scim_panel_gtk.cpp	2006-11-15 11:25:48.000000000 +1000
+@@ -3658,6 +3694,11 @@
+     return 0;
+ }
+ 
++// set Emacs cc-mode style
++// Local variables:
++// c-file-style: "cc-mode"
++// End:
++
+ /*
+ vi:ts=4:nowrap:expandtab
+ */

@@ -1,0 +1,62 @@
+--- png-0.18.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ png-0.18.1/Cargo.toml	2026-02-15T11:18:04.435673+00:00
+@@ -37,8 +37,6 @@
+ repository = "https://github.com/image-rs/image-png"
+ 
+ [features]
+-benchmarks = []
+-unstable = ["crc32fast/nightly"]
+ zlib-rs = ["flate2/zlib-rs"]
+ 
+ [lib]
+@@ -60,29 +58,6 @@
+ [[example]]
+ name = "pngcheck"
+ path = "examples/pngcheck.rs"
+-
+-[[bench]]
+-name = "adam7"
+-path = "benches/adam7.rs"
+-harness = false
+-required-features = ["benchmarks"]
+-
+-[[bench]]
+-name = "decoder"
+-path = "benches/decoder.rs"
+-harness = false
+-
+-[[bench]]
+-name = "expand_paletted"
+-path = "benches/expand_paletted.rs"
+-harness = false
+-required-features = ["benchmarks"]
+-
+-[[bench]]
+-name = "unfilter"
+-path = "benches/unfilter.rs"
+-harness = false
+-required-features = ["benchmarks"]
+ 
+ [dependencies.bitflags]
+ version = "2.0"
+@@ -110,20 +85,12 @@
+ version = "4.0"
+ features = ["derive"]
+ 
+-[dev-dependencies.criterion]
+-version = "0.7.0"
+-features = ["cargo_bench_support"]
+-default-features = false
+-
+ [dev-dependencies.glob]
+ version = "0.3"
+ 
+ [dev-dependencies.rand]
+ version = "0.9.2"
+ 
+-[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies.criterion]
+-version = "0.7.0"
+-
+ [lints.rust.unexpected_cfgs]
+ level = "warn"
+ priority = 0

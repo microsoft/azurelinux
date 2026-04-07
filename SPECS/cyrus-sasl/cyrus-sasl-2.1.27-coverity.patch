@@ -1,0 +1,56 @@
+diff -up cyrus-sasl-2.1.27/include/makemd5.c.coverity cyrus-sasl-2.1.27/include/makemd5.c
+--- cyrus-sasl-2.1.27/include/makemd5.c.coverity	2021-04-12 15:10:25.421431535 +0200
++++ cyrus-sasl-2.1.27/include/makemd5.c	2021-04-12 15:56:46.752827737 +0200
+@@ -107,7 +107,6 @@ my_strupr(char *s)
+     }	
+ }
+ 
+-
+ #define BITSIZE(TYPE)						\
+ {								\
+     int b = 0; TYPE x = 1, zero = 0; char *pre = "U";		\
+@@ -129,6 +128,8 @@ my_strupr(char *s)
+ static void
+ try_signed(FILE *f, int len)
+ {
++/* Local macros for not-installed program. No coverity/compiler issues! */
++#pragma GCC diagnostic ignored "-Wformat-overflow"
+ #ifdef HAVE_INT8_T
+     BITSIZE(int8_t);
+ #endif
+@@ -149,6 +150,7 @@ try_signed(FILE *f, int len)
+     BITSIZE(long long);
+ #endif
+     fprintf(f, "/* There is no %d bit type */\n", len);
++#pragma GCC pop
+ }
+ 
+ static void
+diff -up cyrus-sasl-2.1.27/saslauthd/lak.c.coverity cyrus-sasl-2.1.27/saslauthd/lak.c
+--- cyrus-sasl-2.1.27/saslauthd/lak.c.coverity	2018-11-08 18:29:57.000000000 +0100
++++ cyrus-sasl-2.1.27/saslauthd/lak.c	2021-04-12 15:10:25.433431630 +0200
+@@ -337,9 +337,9 @@ static int lak_config_read(
+          EMPTY(conf->group_search_base) )
+         strlcpy(conf->group_search_base, conf->search_base, LAK_DN_LEN);
+         
+-	fclose(infile);
++    fclose(infile);
+ 
+-	return LAK_OK;
++    return LAK_OK;
+ }
+ 
+ static int lak_config_int(
+diff -up cyrus-sasl-2.1.27/saslauthd/saslauthd-main.c.coverity cyrus-sasl-2.1.27/saslauthd/saslauthd-main.c
+--- cyrus-sasl-2.1.27/saslauthd/saslauthd-main.c.coverity	2018-01-19 15:13:40.000000000 +0100
++++ cyrus-sasl-2.1.27/saslauthd/saslauthd-main.c	2021-04-12 15:10:25.433431630 +0200
+@@ -833,7 +833,8 @@ void detach_tty() {
+     }
+     
+     logger(L_INFO, L_FUNC, "master pid is: %lu", (unsigned long)master_pid);
+-    
++    /* null_fd expected to be more than 2, so it is closed after dups, no leaks occur */
++    /* coverity[leaked_handle : FALSE]*/
+     return;
+ }
+ 

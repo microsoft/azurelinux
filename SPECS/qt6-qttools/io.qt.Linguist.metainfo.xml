@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='utf-8'?>
+<component type="desktop-application">
+  <!--Created with jdAppStreamEdit 8.0-->
+  <id>io.qt.Linguist</id>
+  <name>Qt Linguist</name>
+  <summary>Add translations to Qt applications</summary>
+  <summary xml:lang="de">Übersetzungen zu Qt Programmen hinzufügen</summary>
+  <developer id="io.qt">
+    <name>The Qt Company</name>
+  </developer>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>LGPL-3.0-only</project_license>
+  <project_group>Qt</project_group>
+  <description>
+    <p>Qt Linguist allows you to translate Qt applications</p>
+    <p xml:lang="de">Qt Linguist erlaubt dir Übersetzung von Qt Programmen</p>
+  </description>
+  <screenshots>
+    <screenshot type="default">
+      <caption>The main window</caption>
+      <caption xml:lang="de">Das Hauptfenster</caption>
+      <image type="source">https://raw.githubusercontent.com/flathub/io.qt.Linguist/78c853bd0488bf62e2042b2011d674e08dcf7b76/Screenshots/MainWindow.png</image>
+    </screenshot>
+  </screenshots>
+  <url type="homepage">https://www.qt.io/</url>
+  <url type="vcs-browser">https://code.qt.io/cgit/qt/qttools.git/tree/src/linguist/linguist</url>
+  <url type="contribute">https://www.qt.io/community/contribute-to-qt</url>
+  <categories>
+    <category>Translation</category>
+    <category>Qt</category>
+  </categories>
+  <requires>
+    <control>pointing</control>
+    <control>keyboard</control>
+  </requires>
+  <content_rating type="oars-1.1"/>
+  <launchable type="desktop-id">qt6-linguist.desktop</launchable>
+  <provides>
+    <binary>linguist</binary>
+    <mediatype>text/vnd.trolltech.linguist</mediatype>
+    <mediatype>application/x-linguist</mediatype>
+  </provides>
+</component>

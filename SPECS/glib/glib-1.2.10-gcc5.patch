@@ -1,0 +1,11 @@
+--- glib.h
++++ glib.h
+@@ -204,7 +204,7 @@ extern "C" {
+ #ifndef G_INLINE_FUNC
+ #  ifdef __GNUC__
+ #    ifdef __OPTIMIZE__
+-#      define G_INLINE_FUNC extern inline
++#      define G_INLINE_FUNC extern inline __attribute__ ((__gnu_inline__))
+ #    else
+ #      undef G_CAN_INLINE
+ #      define G_INLINE_FUNC extern

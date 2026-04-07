@@ -1,0 +1,60 @@
+#!/bin/bash
+#
+# Configuration file for /etc/cron.weekly/raid-check
+#
+# options:
+#	ENABLED - must be yes in order for the raid check to proceed
+#	CHECK - can be either check or repair depending on the type of
+#		operation the user desires.  A check operation will scan
+#		the drives looking for bad sectors and automatically
+#		repairing only bad sectors.  If it finds good sectors that
+#		contain bad data (meaning that the data in a sector does
+#		not agree with what the data from another disk indicates
+#		the data should be, for example the parity block + the other
+#		data blocks would cause us to think that this data block
+#		is incorrect), then it does nothing but increments the
+#		counter in the file /sys/block/$dev/md/mismatch_count.
+#		This allows the sysadmin to inspect the data in the sector
+#		and the data that would be produced by rebuilding the
+#		sector from redundant information and pick the correct
+#		data to keep.  The repair option does the same thing, but
+#		when it encounters a mismatch in the data, it automatically
+#		updates the data to be consistent.  However, since we really
+#		don't know whether it's the parity or the data block that's
+#		correct (or which data block in the case of raid1), it's
+#		luck of the draw whether or not the user gets the right
+#		data instead of the bad data.  This option is the default
+#		option for devices not listed in either CHECK_DEVS or
+#		REPAIR_DEVS.
+#	CHECK_DEVS - a space delimited list of devs that the user specifically
+#		wants to run a check operation on.
+#	REPAIR_DEVS - a space delimited list of devs that the user
+#		specifically wants to run a repair on.
+#	SKIP_DEVS - a space delimited list of devs that should be skipped
+#	NICE - Change the raid check CPU and IO priority in order to make
+#		the system more responsive during lengthy checks.  Valid
+#		values are high, normal, low, idle.
+#	MAXCONCURENT - Limit the number of devices to be checked at a time.
+#		By default all devices will be checked at the same time.
+#
+# Note: the raid-check script intentionaly runs last in the cron.weekly
+# sequence.  This is so we can wait for all the resync operations to complete
+# and then check the mismatch_count on each array without unduly delaying
+# other weekly cron jobs.  If any arrays have a non-0 mismatch_count after
+# the check completes, we echo a warning to stdout which will then me emailed
+# to the admin as long as mails from cron jobs have not been redirected to
+# /dev/null.  We do not wait for repair operations to complete as the
+# md stack will correct any mismatch_cnts automatically.
+#
+# Note2: you can not use symbolic names for the raid devices, such as you
+# /dev/md/root.  The names used in this file must match the names seen in
+# /proc/mdstat and in /sys/block.
+
+ENABLED=yes
+CHECK=check
+NICE=low
+# To check devs /dev/md0 and /dev/md3, use "md0 md3"
+CHECK_DEVS=""
+REPAIR_DEVS=""
+SKIP_DEVS=""
+MAXCONCURRENT=

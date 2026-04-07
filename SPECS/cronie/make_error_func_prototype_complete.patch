@@ -1,0 +1,37 @@
+From 09c630c654b2aeff06a90a412cce0a60ab4955a4 Mon Sep 17 00:00:00 2001
+From: Tomas Mraz <tmraz@fedoraproject.org>
+Date: Mon, 18 Nov 2024 21:02:30 +0100
+Subject: [PATCH] load_entry(): Make error_func prototype complete
+
+Fixes #193
+---
+ src/entry.c | 2 +-
+ src/funcs.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/entry.c b/src/entry.c
+index 586eb9d..a2077e8 100644
+--- a/src/entry.c
++++ b/src/entry.c
+@@ -90,7 +90,7 @@ void free_entry(entry * e) {
+ /* return NULL if eof or syntax error occurs;
+  * otherwise return a pointer to a new entry.
+  */
+-entry *load_entry(FILE * file, void (*error_func) (), struct passwd *pw,
++entry *load_entry(FILE * file, void (*error_func) (const char *), struct passwd *pw,
+ 	char **envp) {
+ 	/* this function reads one crontab entry -- the next -- from a file.
+ 	 * it skips any leading blank lines, ignores comments, and returns
+diff --git a/src/funcs.h b/src/funcs.h
+index 427e027..f28d634 100644
+--- a/src/funcs.h
++++ b/src/funcs.h
+@@ -89,7 +89,7 @@ char		*env_get(const char *, char **),
+ user		*load_user(int, struct passwd *, const char *, const char *, const char *),
+ 		*find_user(cron_db *, const char *, const char *);
+ 
+-entry		*load_entry(FILE *, void (*)(), struct passwd *, char **);
++entry		*load_entry(FILE *, void (*)(const char *), struct passwd *, char **);
+ 
+ FILE		*cron_popen(char *, const char *, struct passwd *, char **);
+ 

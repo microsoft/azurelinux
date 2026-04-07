@@ -1,0 +1,44 @@
+--- siod/editline.c.orig	2017-09-04 17:54:03.000000000 +0200
++++ siod/editline.c	2025-01-24 17:08:37.459495780 +0100
+@@ -176,7 +176,7 @@
+ STATIC STATUS h_prev();
+ STATIC STATUS h_first();
+ STATIC STATUS h_last();
+-STATIC int substrcmp(char *text, char *pat, int len);
++STATIC int substrcmp(const char *text, const char *pat, size_t len);
+ STATIC ECHAR *search_hist(ECHAR *search, ECHAR *(*move)());
+ STATIC STATUS h_search();
+ STATIC STATUS fd_char();
+@@ -224,10 +224,10 @@
+ */
+ STATIC ECHAR	*editinput();
+ #if	defined(USE_TERMCAP)
+-extern char	*getenv();
+-extern char	*tgetstr();
+-extern int	tgetent();
+-extern int	tgetnum();
++extern char	*getenv(const char *);
++extern char	*tgetstr(char *, char **);
++extern int	tgetent(char *, const char *);
++extern int	tgetnum(char *);
+ #endif	/* defined(USE_TERMCAP) */
+ 
+ /*
+@@ -798,7 +798,7 @@
+ /*
+ **  Return zero if pat appears as a substring in text.
+ */
+-STATIC int substrcmp(char *text, char *pat, int len)
++STATIC int substrcmp(const char *text, const char *pat, size_t len)
+ {
+     ECHAR	c;
+ 
+@@ -815,7 +815,7 @@
+     static ECHAR	*old_search;
+     int		len;
+     int		pos;
+-    int		(*match)();
++    int		(*match)(const char *, const char *, size_t);
+     char	*pat;
+ 
+     /* Save or get remembered search pattern. */

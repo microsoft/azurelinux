@@ -1,0 +1,63 @@
+From b3e1a72d0272c8dc26db8c11c61cd4fed6a6b95f Mon Sep 17 00:00:00 2001
+From: Christian Goeschel Ndjomouo <cgoesc2@wgu.edu>
+Date: Tue, 6 Jan 2026 10:43:45 -0500
+Subject: build-sys: (gcc) ignore -Wunused-but-set-variable for bison
+
+[kzak@redhat.com: - merge two Christian's patches to make it more portable]
+
+Signed-off-by: Christian Goeschel Ndjomouo <cgoesc2@wgu.edu>
+Signed-off-by: Karel Zak <kzak@redhat.com>
+(cherry picked from commit db9047892a45c06bceb5768e7bb8c887289b9859)
+(cherry picked from commit 718e4a76dd1262ce97f83dbc0c0fe9f97564ecbb)
+---
+ libsmartcols/src/filter-parser.y | 11 +++++++----
+ sys-utils/hwclock-parse-date.y   | 11 +++++++----
+ 2 files changed, 14 insertions(+), 8 deletions(-)
+
+diff --git a/libsmartcols/src/filter-parser.y b/libsmartcols/src/filter-parser.y
+index a7d41408e..23b05df33 100644
+--- a/libsmartcols/src/filter-parser.y
++++ b/libsmartcols/src/filter-parser.y
+@@ -1,9 +1,12 @@
+ %{
+-#ifdef __clang__
+-/* clang detects yynerrs as unused.
+- * Will be fixed in future versions of bison.
++/*
++ * Compilers detect yynerrs as unused. Let's hope it will be fixed in future
++ * versions of Bison.
+  */
+-#pragma clang diagnostic ignored "-Wunused-but-set-variable"
++#if defined(__GNUC__) && !defined(__clang__)
++# pragma GCC diagnostic ignored "-Wunused-but-set-variable"
++#elif defined(__clang__)
++# pragma clang diagnostic ignored "-Wunused-but-set-variable"
+ #endif
+ 
+ #include <stdio.h>
+diff --git a/sys-utils/hwclock-parse-date.y b/sys-utils/hwclock-parse-date.y
+index 0d996cc87..7d6c38268 100644
+--- a/sys-utils/hwclock-parse-date.y
++++ b/sys-utils/hwclock-parse-date.y
+@@ -34,11 +34,14 @@
+  * TZ strings in dates.
+  */
+ 
+-#ifdef __clang__
+-/* clang 15 detects yynerrs as unused.
+- * Will be fixed in future versions of bison.
++/*
++ * Compilers detect yynerrs as unused. Let's hope it will be fixed in future
++ * versions of Bison.
+  */
+-#pragma clang diagnostic ignored "-Wunused-but-set-variable"
++#if defined(__GNUC__) && !defined(__clang__)
++# pragma GCC diagnostic ignored "-Wunused-but-set-variable"
++#elif defined(__clang__)
++# pragma clang diagnostic ignored "-Wunused-but-set-variable"
+ #endif
+ 
+ /**
+-- 
+2.52.0
+

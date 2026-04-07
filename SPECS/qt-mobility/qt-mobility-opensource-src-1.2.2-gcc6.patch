@@ -1,0 +1,20 @@
+diff -up qt-mobility-opensource-src-1.2.2/plugins/multimedia/gstreamer/qvideosurfacegstsink.cpp.gcc6 qt-mobility-opensource-src-1.2.2/plugins/multimedia/gstreamer/qvideosurfacegstsink.cpp
+--- qt-mobility-opensource-src-1.2.2/plugins/multimedia/gstreamer/qvideosurfacegstsink.cpp.gcc6	2014-03-25 14:26:00.000000000 -0500
++++ qt-mobility-opensource-src-1.2.2/plugins/multimedia/gstreamer/qvideosurfacegstsink.cpp	2016-02-07 14:50:45.827775718 -0600
+@@ -342,12 +342,12 @@ struct RgbFormat
+ 
+ static const RgbFormat qt_rgbColorLookup[] =
+ {
+-    { QVideoFrame::Format_RGB32 , 32, 24, 4321, 0x0000FF00, 0x00FF0000, 0xFF000000, 0x00000000 },
++    { QVideoFrame::Format_RGB32 , 32, 24, 4321, 0x0000FF00, 0x00FF0000, (int)0xFF000000, 0x00000000 },
+     { QVideoFrame::Format_RGB32 , 32, 24, 1234, 0x00FF0000, 0x0000FF00, 0x000000FF, 0x00000000 },
+-    { QVideoFrame::Format_BGR32 , 32, 24, 4321, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x00000000 },
++    { QVideoFrame::Format_BGR32 , 32, 24, 4321, (int)0xFF000000, 0x00FF0000, 0x0000FF00, 0x00000000 },
+     { QVideoFrame::Format_BGR32 , 32, 24, 1234, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000 },
+-    { QVideoFrame::Format_ARGB32, 32, 24, 4321, 0x0000FF00, 0x00FF0000, 0xFF000000, 0x000000FF },
+-    { QVideoFrame::Format_ARGB32, 32, 24, 1234, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000 },
++    { QVideoFrame::Format_ARGB32, 32, 24, 4321, 0x0000FF00, 0x00FF0000, (int)0xFF000000, 0x000000FF },
++    { QVideoFrame::Format_ARGB32, 32, 24, 1234, 0x00FF0000, 0x0000FF00, 0x000000FF, (int)0xFF000000 },
+     { QVideoFrame::Format_RGB24 , 24, 24, 4321, 0x00FF0000, 0x0000FF00, 0x000000FF, 0x00000000 },
+     { QVideoFrame::Format_BGR24 , 24, 24, 4321, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000 },
+     { QVideoFrame::Format_RGB565, 16, 16, 1234, 0x0000F800, 0x000007E0, 0x0000001F, 0x00000000 }

@@ -1,0 +1,1297 @@
+diff -up Osi-releases-0.108.9/Osi/configure.orig Osi-releases-0.108.9/Osi/configure
+--- Osi-releases-0.108.9/Osi/configure.orig	2023-10-26 20:01:38.975289463 -0600
++++ Osi-releases-0.108.9/Osi/configure	2023-10-26 20:07:15.734807197 -0600
+@@ -21908,9 +21908,9 @@ if test $coin_has_soplex = notGiven; the
+ 
+ 
+ if test -n "$PKG_CONFIG" ; then
+-  if $PKG_CONFIG --exists "coinsoplex < 1.7"; then
+-    SOPLEX_VERSIONS=`$PKG_CONFIG --modversion "coinsoplex < 1.7" 2>/dev/null | tr '\n' ' '`
+-     cflags=`$PKG_CONFIG --cflags "coinsoplex < 1.7" 2>/dev/null`
++  if $PKG_CONFIG --exists "coinsoplex"; then
++    SOPLEX_VERSIONS=`$PKG_CONFIG --modversion "coinsoplex" 2>/dev/null | tr '\n' ' '`
++     cflags=`$PKG_CONFIG --cflags "coinsoplex" 2>/dev/null`
+     # pkg-config cannot handle spaces, so CYGPATH_W cannot be put into .pc files
+ 	# thus, we modify the cflags extracted from pkg-config by putting CYGPATH_W behind -I's
+ 	# but only do this if is not trivial
+@@ -21919,8 +21919,8 @@ if test -n "$PKG_CONFIG" ; then
+       cflags=`echo $cflags | sed -e 's/-I\([^ ]*\)/-I\`${CYGPATH_W} \1\`/g'`
+     fi
+     SOPLEX_CFLAGS="$cflags"
+-    SOPLEX_LIBS=`$PKG_CONFIG --libs "coinsoplex < 1.7" 2>/dev/null`
+-    SOPLEX_DATA=`$PKG_CONFIG --variable=datadir "coinsoplex < 1.7" 2>/dev/null`
++    SOPLEX_LIBS=`$PKG_CONFIG --libs "coinsoplex" 2>/dev/null`
++    SOPLEX_DATA=`$PKG_CONFIG --variable=datadir "coinsoplex" 2>/dev/null`
+      coin_has_soplex=yes
+         echo "$as_me:$LINENO: result: yes: $SOPLEX_VERSIONS" >&5
+ echo "${ECHO_T}yes: $SOPLEX_VERSIONS" >&6
+@@ -21931,18 +21931,18 @@ echo "${ECHO_T}yes: $SOPLEX_VERSIONS" >&
+         then
+           SOPLEX_LIBS=`echo " $SOPLEX_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
+         fi
+-        SOPLEX_PCREQUIRES="coinsoplex < 1.7"
++        SOPLEX_PCREQUIRES="coinsoplex"
+ 
+         # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in OsiSpxLib
+ 
+-          OSISPXLIB_PCREQUIRES="coinsoplex < 1.7 $OSISPXLIB_PCREQUIRES"
++          OSISPXLIB_PCREQUIRES="coinsoplex $OSISPXLIB_PCREQUIRES"
+           OSISPXLIB_CFLAGS="$SOPLEX_CFLAGS $OSISPXLIB_CFLAGS"
+           OSISPXLIB_LIBS="$SOPLEX_LIBS $OSISPXLIB_LIBS"
+ 
+ 
+ 
+   else
+-    SOPLEX_PKG_ERRORS=`$PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors "coinsoplex < 1.7"`
++    SOPLEX_PKG_ERRORS=`$PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors "coinsoplex"`
+       coin_has_soplex=notGiven
+         echo "$as_me:$LINENO: result: not given: $SOPLEX_PKG_ERRORS" >&5
+ echo "${ECHO_T}not given: $SOPLEX_PKG_ERRORS" >&6
+@@ -21978,8 +21978,8 @@ SOPLEX_DATA_INSTALLED=
+ SOPLEX_PCLIBS=
+ SOPLEX_PCREQUIRES=
+ 
+-# initial list of dependencies is "coinsoplex < 1.7", but we need to filter out version number specifications (= x, <= x, >= x, != x)
+-projtoprocess="coinsoplex < 1.7"
++# initial list of dependencies is "coinsoplex", but we need to filter out version number specifications (= x, <= x, >= x, != x)
++projtoprocess="coinsoplex"
+ 
+ # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
+ # further, we collect the list of corresponding .pc files, but do this in reverse order, because we need this order afterwards
+@@ -22180,9 +22180,9 @@ _ACEOF
+     SOPLEX_LIBS_INSTALLED=`echo " $SOPLEX_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g' -e 's/ -L\([^ ]*\)/ -libpath:\`$(CYGPATH_W) \1\`/g'`
+   fi
+ 
+-  SOPLEX_PCREQUIRES="coinsoplex < 1.7"
++  SOPLEX_PCREQUIRES="coinsoplex"
+ 
+-    OSISPXLIB_PCREQUIRES="coinsoplex < 1.7 $OSISPXLIB_PCREQUIRES"
++    OSISPXLIB_PCREQUIRES="coinsoplex $OSISPXLIB_PCREQUIRES"
+     OSISPXLIB_CFLAGS="$SOPLEX_CFLAGS $OSISPXLIB_CFLAGS"
+     OSISPXLIB_LIBS="$SOPLEX_LIBS $OSISPXLIB_LIBS"
+     OSISPXLIB_CFLAGS_INSTALLED="$SOPLEX_CFLAGS_INSTALLED $OSISPXLIB_CFLAGS_INSTALLED"
+diff -up Osi-releases-0.108.9/Osi/configure.ac.orig Osi-releases-0.108.9/Osi/configure.ac
+--- Osi-releases-0.108.9/Osi/configure.ac.orig	2023-10-25 08:08:56.000000000 -0600
++++ Osi-releases-0.108.9/Osi/configure.ac	2023-10-26 20:05:55.934869330 -0600
+@@ -58,7 +58,7 @@ if test $coin_has_coinutils != yes ; the
+   AC_MSG_ERROR([Required package CoinUtils not available.])
+ fi
+ AC_COIN_CHECK_PACKAGE(Glpk,      [coinglpk],  [OsiGlpkLib])
+-AC_COIN_CHECK_PACKAGE(SoPlex,    [coinsoplex < 1.7],[OsiSpxLib])
++AC_COIN_CHECK_PACKAGE(SoPlex,    [coinsoplex],[OsiSpxLib])
+ AC_COIN_CHECK_PACKAGE(Sample,    [coindatasample])
+ AC_COIN_CHECK_PACKAGE(Netlib,    [coindatanetlib])
+ 
+diff -up Osi-releases-0.108.9/Osi/src/OsiSpx/Makefile.am.orig Osi-releases-0.108.9/Osi/src/OsiSpx/Makefile.am
+--- Osi-releases-0.108.9/Osi/src/OsiSpx/Makefile.am.orig	2023-10-25 08:08:56.000000000 -0600
++++ Osi-releases-0.108.9/Osi/src/OsiSpx/Makefile.am	2023-10-26 20:08:19.724955484 -0600
+@@ -18,7 +18,7 @@ libOsiSpx_la_SOURCES = OsiSpxSolverInter
+ 
+ # List all additionally required libraries
+ if DEPENDENCY_LINKING
+-libOsiSpx_la_LIBADD = $(OSILIB_LIBS) ../Osi/libOsi.la
++libOsiSpx_la_LIBADD = $(OSILIB_LIBS) ../Osi/libOsi.la -lmpfr -lgmp -lz
+ endif
+ 
+ # This is for libtool
+diff -up Osi-releases-0.108.9/Osi/src/OsiSpx/Makefile.in.orig Osi-releases-0.108.9/Osi/src/OsiSpx/Makefile.in
+--- Osi-releases-0.108.9/Osi/src/OsiSpx/Makefile.in.orig	2023-10-25 08:08:56.000000000 -0600
++++ Osi-releases-0.108.9/Osi/src/OsiSpx/Makefile.in	2023-10-26 20:07:47.470384830 -0600
+@@ -192,7 +192,7 @@ INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_P
+ LDFLAGS = @LDFLAGS@
+ LIBEXT = @LIBEXT@
+ LIBOBJS = @LIBOBJS@
+-LIBS = @LIBS@
++LIBS = @LIBS@ -lmpfr -lgmp -lz
+ LIBTOOL = @LIBTOOL@
+ LIBTOOLM4 = @LIBTOOLM4@
+ LN_S = @LN_S@
+diff -up Osi-releases-0.108.9/Osi/src/OsiSpx/OsiSpxSolverInterface.cpp.orig Osi-releases-0.108.9/Osi/src/OsiSpx/OsiSpxSolverInterface.cpp
+--- Osi-releases-0.108.9/Osi/src/OsiSpx/OsiSpxSolverInterface.cpp.orig	2023-10-25 08:08:56.000000000 -0600
++++ Osi-releases-0.108.9/Osi/src/OsiSpx/OsiSpxSolverInterface.cpp	2023-10-26 21:43:20.666265398 -0600
+@@ -26,10 +26,6 @@
+ #include "CoinPackedMatrix.hpp"
+ #include "CoinWarmStartBasis.hpp"
+ 
+-#ifndef SOPLEX_LEGACY
+-#define SOPLEX_LEGACY
+-#endif
+-
+ #include "soplex.h"
+ 
+ // it's important to include this header after soplex.h
+@@ -86,16 +82,31 @@ void OsiSpxSolverInterface::initialSolve
+     dual = takeHint;
+ 
+   // always use column representation
++#if SOPLEX_VERSION < 200
+   if (soplex_->rep() != soplex::SPxSolver::COLUMN)
+     soplex_->setRep(soplex::SPxSolver::COLUMN);
++#else
++  if (soplex_->intParam(soplex::SoPlex::REPRESENTATION) != soplex::SoPlex::REPRESENTATION_COLUMN)
++    soplex_->setIntParam(soplex::SoPlex::REPRESENTATION, soplex::SoPlex::REPRESENTATION_COLUMN);
++#endif
+ 
+   // set algorithm type
+   if (dual) {
++#if SOPLEX_VERSION < 220
+     if (soplex_->type() != soplex::SPxSolver::LEAVE)
+       soplex_->setType(soplex::SPxSolver::LEAVE);
++#else
++    if (soplex_->intParam(soplex::SoPlex::ALGORITHM) != soplex::SoPlex::ALGORITHM_DUAL)
++      soplex_->setIntParam(soplex::SoPlex::ALGORITHM, soplex::SoPlex::ALGORITHM_DUAL);
++#endif
+   } else {
++#if SOPLEX_VERSION < 220
+     if (soplex_->type() != soplex::SPxSolver::ENTER)
+       soplex_->setType(soplex::SPxSolver::ENTER);
++#else
++    if (soplex_->intParam(soplex::SoPlex::ALGORITHM) != soplex::SoPlex::ALGORITHM_PRIMAL)
++      soplex_->setIntParam(soplex::SoPlex::ALGORITHM, soplex::SoPlex::ALGORITHM_PRIMAL);
++#endif
+   }
+ 
+   // set dual objective limit
+@@ -103,22 +114,43 @@ void OsiSpxSolverInterface::initialSolve
+   OsiSolverInterface::getDblParam(OsiDualObjectiveLimit, dualobjlimit);
+   if (fabs(dualobjlimit) < getInfinity()) {
+     double objoffset;
+-    OsiSolverInterface::getDblParam(OsiDualObjectiveLimit, objoffset);
++    OsiSolverInterface::getDblParam(OsiObjOffset, objoffset);
+     dualobjlimit += objoffset;
+   }
++#if SOPLEX_VERSION < 200
+   soplex_->setTerminationValue(dualobjlimit);
++#else
++  if (soplex_->intParam(soplex::SoPlex::OBJSENSE) == soplex::SoPlex::OBJSENSE_MINIMIZE) {
++    if (dualobjlimit > getInfinity())
++      dualobjlimit = getInfinity();
++    soplex_->setRealParam(soplex::SoPlex::OBJLIMIT_UPPER, dualobjlimit);
++  }
++  else {
++    if (dualobjlimit < -getInfinity())
++      dualobjlimit = -getInfinity();
++    soplex_->setRealParam(soplex::SoPlex::OBJLIMIT_LOWER, dualobjlimit);
++  }
++#endif
+ 
+   // solve
+   try {
++#if SOPLEX_VERSION < 300
+     soplex_->solve();
+-  } catch (soplex::SPxException e) {
++#else
++    soplex_->optimize();
++#endif
++  } catch (soplex::SPxException& e) {
+     *messageHandler() << "SoPlex initial solve failed with exception " << e.what() << CoinMessageEol;
+ #if (SOPLEX_VERSION >= 160) || (SOPLEX_SUBVERSION >= 7)
+     try {
+       *messageHandler() << "Retry with cleared basis" << CoinMessageEol;
+       soplex_->clearBasis();
++#if SOPLEX_VERSION < 300
+       soplex_->solve();
+-    } catch (soplex::SPxException e) {
++#else
++      soplex_->optimize();
++#endif
++    } catch (soplex::SPxException& e) {
+       *messageHandler() << "SoPlex initial solve with cleared basis failed with exception " << e.what() << CoinMessageEol;
+     }
+ #endif
+@@ -140,16 +172,31 @@ void OsiSpxSolverInterface::resolve()
+     dual = takeHint;
+ 
+   // always use column representation
++#if SOPLEX_VERSION < 200
+   if (soplex_->rep() != soplex::SPxSolver::COLUMN)
+     soplex_->setRep(soplex::SPxSolver::COLUMN);
++#else
++  if (soplex_->intParam(soplex::SoPlex::REPRESENTATION) != soplex::SoPlex::REPRESENTATION_COLUMN)
++    soplex_->setIntParam(soplex::SoPlex::REPRESENTATION, soplex::SoPlex::REPRESENTATION_COLUMN);
++#endif
+ 
+   // set algorithm type
+   if (dual) {
++#if SOPLEX_VERSION < 220
+     if (soplex_->type() != soplex::SPxSolver::LEAVE)
+       soplex_->setType(soplex::SPxSolver::LEAVE);
++#else
++    if (soplex_->intParam(soplex::SoPlex::ALGORITHM) != soplex::SoPlex::ALGORITHM_DUAL)
++      soplex_->setIntParam(soplex::SoPlex::ALGORITHM, soplex::SoPlex::ALGORITHM_DUAL);
++#endif
+   } else {
++#if SOPLEX_VERSION < 220
+     if (soplex_->type() != soplex::SPxSolver::ENTER)
+       soplex_->setType(soplex::SPxSolver::ENTER);
++#else
++    if (soplex_->intParam(soplex::SoPlex::ALGORITHM) != soplex::SoPlex::ALGORITHM_PRIMAL)
++      soplex_->setIntParam(soplex::SoPlex::ALGORITHM, soplex::SoPlex::ALGORITHM_PRIMAL);
++#endif
+   }
+ 
+   // set dual objective limit
+@@ -157,22 +204,37 @@ void OsiSpxSolverInterface::resolve()
+   OsiSolverInterface::getDblParam(OsiDualObjectiveLimit, dualobjlimit);
+   if (fabs(dualobjlimit) < getInfinity()) {
+     double objoffset;
+-    OsiSolverInterface::getDblParam(OsiDualObjectiveLimit, objoffset);
++    OsiSolverInterface::getDblParam(OsiObjOffset, objoffset);
+     dualobjlimit += objoffset;
+   }
++#if SOPLEX_VERSION < 200
+   soplex_->setTerminationValue(dualobjlimit);
++#else
++   if (soplex_->intParam(soplex::SoPlex::OBJSENSE) == soplex::SoPlex::OBJSENSE_MINIMIZE)
++    soplex_->setRealParam(soplex::SoPlex::OBJLIMIT_UPPER, dualobjlimit);
++  else
++    soplex_->setRealParam(soplex::SoPlex::OBJLIMIT_LOWER, dualobjlimit);
++#endif
+ 
+   // solve
+   try {
++#if SOPLEX_VERSION < 300
+     soplex_->solve();
+-  } catch (soplex::SPxException e) {
++#else
++    soplex_->optimize();
++#endif
++  } catch (soplex::SPxException& e) {
+     *messageHandler() << "SoPlex resolve failed with exception " << e.what() << CoinMessageEol;
+ #if (SOPLEX_VERSION >= 160) || (SOPLEX_SUBVERSION >= 7)
+     try {
+       *messageHandler() << "Retry with cleared basis" << CoinMessageEol;
+       soplex_->clearBasis();
++#if SOPLEX_VERSION < 300
+       soplex_->solve();
+-    } catch (soplex::SPxException e) {
++#else
++      soplex_->optimize();
++#endif
++    } catch (soplex::SPxException& e) {
+       *messageHandler() << "SoPlex resolve with cleared basis failed with exception " << e.what() << CoinMessageEol;
+     }
+ #endif
+@@ -197,8 +259,12 @@ bool OsiSpxSolverInterface::setIntParam(
+   try {
+     switch (key) {
+     case OsiMaxNumIteration:
++#if SOPLEX_VERSION < 200
+       soplex_->setTerminationIter(value);
+       retval = true;
++#else
++      retval = soplex_->setIntParam(soplex::SoPlex::ITERLIMIT, value);
++#endif
+       break;
+     case OsiMaxNumIterationHotStart:
+       if (value >= 0) {
+@@ -214,7 +280,7 @@ bool OsiSpxSolverInterface::setIntParam(
+       retval = OsiSolverInterface::setIntParam(key, value);
+       break;
+     }
+-  } catch (soplex::SPxException e) {
++  } catch (soplex::SPxException& e) {
+     *messageHandler() << "OsiSpx::setDblParam failed with exception " << e.what() << CoinMessageEol;
+     retval = false;
+   }
+@@ -236,14 +302,22 @@ bool OsiSpxSolverInterface::setDblParam(
+       retval = OsiSolverInterface::setDblParam(key, value);
+       break;
+     case OsiDualTolerance:
++#if SOPLEX_VERSION < 200
+       // SoPlex doesn't support different deltas for primal and dual
+       soplex_->setDelta(value);
+       retval = true;
++#else
++      retval = soplex_->setRealParam(soplex::SoPlex::OPTTOL, value);
++#endif
+       break;
+     case OsiPrimalTolerance:
++#if SOPLEX_VERSION < 200
+       // SoPlex doesn't support different deltas for primal and dual
+       soplex_->setDelta(value);
+       retval = true;
++#else
++      retval = soplex_->setRealParam(soplex::SoPlex::FEASTOL, value);
++#endif
+       break;
+     case OsiObjOffset:
+       retval = OsiSolverInterface::setDblParam(key, value);
+@@ -252,7 +326,7 @@ bool OsiSpxSolverInterface::setDblParam(
+       retval = false;
+       break;
+     }
+-  } catch (soplex::SPxException e) {
++  } catch (soplex::SPxException& e) {
+     *messageHandler() << "OsiSpx::setDblParam failed with exception " << e.what() << CoinMessageEol;
+     retval = false;
+   }
+@@ -262,7 +336,11 @@ bool OsiSpxSolverInterface::setDblParam(
+ 
+ void OsiSpxSolverInterface::setTimeLimit(double value)
+ {
++#if SOPLEX_VERSION < 200
+   soplex_->setTerminationTime(value);
++#else
++  soplex_->setRealParam(soplex::SoPlex::TIMELIMIT, value);
++#endif
+ }
+ 
+ //-----------------------------------------------------------------------------
+@@ -272,7 +350,11 @@ bool OsiSpxSolverInterface::getIntParam(
+   bool retval = false;
+   switch (key) {
+   case OsiMaxNumIteration:
++#if SOPLEX_VERSION < 200
+     value = soplex_->terminationIter();
++#else
++    value = soplex_->intParam(soplex::SoPlex::ITERLIMIT);
++#endif
+     retval = true;
+     break;
+   case OsiMaxNumIterationHotStart:
+@@ -302,11 +384,19 @@ bool OsiSpxSolverInterface::getDblParam(
+     retval = OsiSolverInterface::getDblParam(key, value);
+     break;
+   case OsiDualTolerance:
++#if SOPLEX_VERSION < 200
+     value = soplex_->delta();
++#else
++    value = soplex_->realParam(soplex::SoPlex::OPTTOL);
++#endif
+     retval = true;
+     break;
+   case OsiPrimalTolerance:
++#if SOPLEX_VERSION < 200
+     value = soplex_->delta();
++#else
++    value = soplex_->realParam(soplex::SoPlex::FEASTOL);
++#endif
+     retval = true;
+     break;
+   case OsiObjOffset:
+@@ -332,7 +422,11 @@ bool OsiSpxSolverInterface::getStrParam(
+ 
+ double OsiSpxSolverInterface::getTimeLimit() const
+ {
++#if SOPLEX_VERSION < 200
+   return soplex_->terminationTime();
++#else
++  return soplex_->realParam(soplex::SoPlex::TIMELIMIT);
++#endif
+ }
+ 
+ //#############################################################################
+@@ -404,7 +498,11 @@ CoinWarmStart *OsiSpxSolverInterface::ge
+   // The OSI standard assumes the artificial slack variables to have positive coefficients.  SoPlex uses the convention
+   // Ax - s = 0, lhs <= s <= rhs, so we have to invert the ON_LOWER and ON_UPPER statuses.
+   for (i = 0; i < numrows; ++i) {
++#if SOPLEX_VERSION < 200
+     switch (soplex_->getBasisRowStatus(i)) {
++#else
++    switch (soplex_->basisRowStatus(i)) {
++#endif
+     case soplex::SPxSolver::BASIC:
+       ws->setArtifStatus(i, CoinWarmStartBasis::basic);
+       break;
+@@ -425,7 +523,11 @@ CoinWarmStart *OsiSpxSolverInterface::ge
+   }
+ 
+   for (i = 0; i < numcols; ++i) {
++#if SOPLEX_VERSION < 200
+     switch (soplex_->getBasisColStatus(i)) {
++#else
++    switch (soplex_->basisColStatus(i)) {
++#endif
+     case soplex::SPxSolver::BASIC:
+       ws->setStructStatus(i, CoinWarmStartBasis::basic);
+       break;
+@@ -512,7 +614,7 @@ bool OsiSpxSolverInterface::setWarmStart
+ 
+   try {
+     soplex_->setBasis(rstat, cstat);
+-  } catch (soplex::SPxException e) {
++  } catch (soplex::SPxException& e) {
+     std::cerr << "SoPlex setting starting basis failed with exception " << e.what() << std::endl;
+     retval = false;
+     goto TERMINATE;
+@@ -558,12 +660,21 @@ void OsiSpxSolverInterface::solveFromHot
+   // @todo why the hotstart basis is not set here ?????
+   //soplex_->setBasis(  reinterpret_cast<soplex::SPxSolver::VarStatus*>(hotStartRStat_),  reinterpret_cast<soplex::SPxSolver::VarStatus*>(hotStartCStat_) );
+ 
++#if SOPLEX_VERSION < 200
+   maxiter = soplex_->terminationIter();
+   soplex_->setTerminationIter(hotStartMaxIteration_);
++#else
++  maxiter = soplex_->intParam(soplex::SoPlex::ITERLIMIT);
++  soplex_->setIntParam(soplex::SoPlex::ITERLIMIT, hotStartMaxIteration_);
++#endif
+ 
+   resolve();
+ 
++#if SOPLEX_VERSION < 200
+   soplex_->setTerminationIter(maxiter);
++#else
++  soplex_->setIntParam(soplex::SoPlex::ITERLIMIT, maxiter);
++#endif
+ }
+ 
+ void OsiSpxSolverInterface::unmarkHotStart()
+@@ -580,11 +691,19 @@ void OsiSpxSolverInterface::unmarkHotSta
+ //------------------------------------------------------------------
+ int OsiSpxSolverInterface::getNumCols() const
+ {
++#if SOPLEX_VERSION < 200
+   return soplex_->nCols();
++#else
++  return soplex_->numCols();
++#endif
+ }
+ int OsiSpxSolverInterface::getNumRows() const
+ {
++#if SOPLEX_VERSION < 200
+   return soplex_->nRows();
++#else
++  return soplex_->numRows();
++#endif
+ }
+ int OsiSpxSolverInterface::getNumElements() const
+ {
+@@ -595,7 +714,11 @@ int OsiSpxSolverInterface::getNumElement
+   int nrows = getNumRows();
+   int row;
+   for (row = 0; row < nrows; ++row) {
++#if SOPLEX_VERSION < 300
+     const soplex::SVector &rowvec = soplex_->rowVector(row);
++#else
++    const soplex::SVector &rowvec = soplex_->rowVectorRealInternal(row);
++#endif
+     retVal += rowvec.size();
+   }
+   return retVal;
+@@ -609,16 +732,36 @@ int OsiSpxSolverInterface::getNumElement
+ const double *OsiSpxSolverInterface::getColLower() const
+ {
+   const double *retVal = NULL;
++#if SOPLEX_VERSION < 300
+   if (getNumCols() != 0)
+     retVal = soplex_->lower().get_const_ptr();
++#else
++  if (getNumCols() != 0) {
++    if (lower_ != NULL)
++      delete lower_;
++    lower_ = new soplex::Vector(getNumCols());
++    soplex_->getLowerReal(*lower_);
++    retVal = lower_->get_const_ptr();
++  }
++#endif
+   return retVal;
+ }
+ //------------------------------------------------------------------
+ const double *OsiSpxSolverInterface::getColUpper() const
+ {
+   const double *retVal = NULL;
++#if SOPLEX_VERSION < 300
+   if (getNumCols() != 0)
+     retVal = soplex_->upper().get_const_ptr();
++#else
++  if (getNumCols() != 0) {
++    if (upper_ != NULL)
++      delete upper_;
++    upper_ = new soplex::Vector(getNumCols());
++    soplex_->getUpperReal(*upper_);
++    retVal = upper_->get_const_ptr();
++  }
++#endif
+   return retVal;
+ }
+ //------------------------------------------------------------------
+@@ -647,7 +790,11 @@ const double *OsiSpxSolverInterface::get
+       rowsense_ = new char[nrows];
+ 
+       for (row = 0; row < nrows; ++row)
++#if SOPLEX_VERSION < 200
+         convertBoundToSense(soplex_->lhs(row), soplex_->rhs(row),
++#else
++        convertBoundToSense(soplex_->lhsReal(row), soplex_->rhsReal(row),
++#endif
+           rowsense_[row], rhs_[row], rowrange_[row]);
+     }
+   }
+@@ -667,16 +814,36 @@ const double *OsiSpxSolverInterface::get
+ const double *OsiSpxSolverInterface::getRowLower() const
+ {
+   const double *retVal = NULL;
++#if SOPLEX_VERSION < 200
+   if (getNumRows() != 0)
+     retVal = soplex_->lhs().get_const_ptr();
++#else
++  if (getNumRows() != 0) {
++    if (lhsVector_ != NULL)
++      delete lhsVector_;
++    lhsVector_ = new soplex::Vector(getNumRows());
++    soplex_->getLhsReal(*lhsVector_);
++    retVal = lhsVector_->get_const_ptr();
++  }
++#endif
+   return retVal;
+ }
+ //------------------------------------------------------------------
+ const double *OsiSpxSolverInterface::getRowUpper() const
+ {
+   const double *retVal = NULL;
++#if SOPLEX_VERSION < 200
+   if (getNumRows() != 0)
+     retVal = soplex_->rhs().get_const_ptr();
++#else
++  if (getNumRows() != 0) {
++    if (rhsVector_ != NULL)
++      delete rhsVector_;
++    rhsVector_ = new soplex::Vector(getNumRows());
++    soplex_->getRhsReal(*rhsVector_);
++    retVal = rhsVector_->get_const_ptr();
++  }
++#endif
+   return retVal;
+ }
+ //------------------------------------------------------------------
+@@ -685,8 +852,13 @@ const double *OsiSpxSolverInterface::get
+   const double *retVal = NULL;
+   if (obj_ == NULL) {
+     if (getNumCols() != 0) {
++#if SOPLEX_VERSION < 200
+       obj_ = new soplex::DVector(getNumCols());
+       soplex_->getObj(*obj_);
++#else
++      obj_ = new soplex::Vector(getNumCols());
++      soplex_->getObjReal(*obj_);
++#endif
+       retVal = obj_->get_const_ptr();
+     }
+   } else {
+@@ -697,6 +869,7 @@ const double *OsiSpxSolverInterface::get
+ //------------------------------------------------------------------
+ double OsiSpxSolverInterface::getObjSense() const
+ {
++#if SOPLEX_VERSION < 200
+   switch (soplex_->spxSense()) {
+   case soplex::SPxLP::MINIMIZE:
+     return +1.0;
+@@ -706,6 +879,17 @@ double OsiSpxSolverInterface::getObjSens
+     throwSPXerror("invalid optimization sense", "getObjSense");
+     return 0.0;
+   }
++#else
++  switch (soplex_->intParam(soplex::SoPlex::OBJSENSE)) {
++  case soplex::SoPlex::OBJSENSE_MINIMIZE:
++    return +1.0;
++  case soplex::SoPlex::OBJSENSE_MAXIMIZE:
++    return -1.0;
++  default:
++    throwSPXerror("invalid optimization sense", "getObjSense");
++    return 0.0;
++  }
++#endif
+ }
+ 
+ //------------------------------------------------------------------
+@@ -739,7 +923,12 @@ const CoinPackedMatrix *OsiSpxSolverInte
+ 
+     elem = 0;
+     for (row = 0; row < nrows; ++row) {
++#if SOPLEX_VERSION < 300
+       const soplex::SVector &rowvec = soplex_->rowVector(row);
++#else
++      soplex::DSVector rowvec;
++      soplex_->getRowVectorReal(row, rowvec);
++#endif
+       starts[row] = elem;
+       len[row] = rowvec.size();
+       for (i = 0; i < len[row]; ++i, ++elem) {
+@@ -775,7 +964,12 @@ const CoinPackedMatrix *OsiSpxSolverInte
+ 
+     elem = 0;
+     for (col = 0; col < ncols; ++col) {
++#if SOPLEX_VERSION < 300
+       const soplex::SVector &colvec = soplex_->colVector(col);
++#else
++      soplex::DSVector colvec;
++      soplex_->getColVectorReal(col, colvec);
++#endif
+       starts[col] = elem;
+       len[col] = colvec.size();
+       for (i = 0; i < len[col]; ++i, ++elem) {
+@@ -814,11 +1008,19 @@ const double *OsiSpxSolverInterface::get
+   if (colsol_ == NULL) {
+     int ncols = getNumCols();
+     if (ncols > 0) {
++#if SOPLEX_VERSION < 200
+       colsol_ = new soplex::DVector(ncols);
++#else
++      colsol_ = new soplex::Vector(ncols);
++#endif
+       if (isProvenOptimal())
+         soplex_->getPrimal(*colsol_);
+       else
++#if SOPLEX_VERSION < 300
+         *colsol_ = soplex_->lower();
++#else
++        soplex_->getLowerReal(*colsol_);
++#endif
+     } else
+       return NULL;
+   }
+@@ -830,7 +1032,11 @@ const double *OsiSpxSolverInterface::get
+   if (rowsol_ == NULL) {
+     int nrows = getNumRows();
+     if (nrows > 0) {
++#if SOPLEX_VERSION < 200
+       rowsol_ = new soplex::DVector(nrows);
++#else
++      rowsol_ = new soplex::Vector(nrows);
++#endif
+       if (isProvenOptimal())
+         soplex_->getDual(*rowsol_);
+       else
+@@ -846,7 +1052,11 @@ const double *OsiSpxSolverInterface::get
+   if (redcost_ == NULL) {
+     int ncols = getNumCols();
+     if (ncols > 0) {
++#if SOPLEX_VERSION < 200
+       redcost_ = new soplex::DVector(ncols);
++#else
++      redcost_ = new soplex::Vector(ncols);
++#endif
+       if (isProvenOptimal())
+         soplex_->getRedCost(*redcost_);
+       else
+@@ -862,9 +1072,17 @@ const double *OsiSpxSolverInterface::get
+   if (rowact_ == NULL) {
+     int nrows = getNumRows();
+     if (nrows > 0) {
++#if SOPLEX_VERSION < 200
+       rowact_ = new soplex::DVector(nrows);
++#else
++      rowact_ = new soplex::Vector(nrows);
++#endif
+       if (isProvenOptimal())
++#if SOPLEX_VERSION < 200
+         soplex_->getSlacks(*rowact_);
++#else
++        soplex_->getSlacksReal(*rowact_);
++#endif
+       else
+         rowact_->clear();
+     } else
+@@ -881,7 +1099,11 @@ double OsiSpxSolverInterface::getObjValu
+   case soplex::SPxSolver::OPTIMAL:
+   case soplex::SPxSolver::UNBOUNDED:
+   case soplex::SPxSolver::INFEASIBLE:
++#if SOPLEX_VERSION < 200
+     objval = soplex_->objValue();
++#else
++    objval = soplex_->objValueReal();
++#endif
+     break;
+   default: {
+     const double *colsol = getColSolution();
+@@ -904,7 +1126,11 @@ double OsiSpxSolverInterface::getObjValu
+ //------------------------------------------------------------------
+ int OsiSpxSolverInterface::getIterationCount() const
+ {
++#if SOPLEX_VERSION < 200
+   return soplex_->iteration();
++#else
++  return soplex_->numIterations();
++#endif
+ }
+ //------------------------------------------------------------------
+ std::vector< double * > OsiSpxSolverInterface::getDualRays(int maxNumRays,
+@@ -920,7 +1146,12 @@ std::vector< double * > OsiSpxSolverInte
+   if (soplex_->status() == soplex::SPxSolver::INFEASIBLE && maxNumRays > 0) {
+     ret.push_back(new double[getNumRows()]);
+     soplex::Vector proof(getNumRows(), ret[0]);
++#if SOPLEX_VERSION < 200
+     soplex_->getDualfarkas(proof);
++#else
++    if (!soplex_->getDualFarkas(proof))
++      throw CoinError("getDualFarkas failed", "getDualRays", "OsiSpxSolverInterface");
++#endif
+ 
+     for (int i = 0; i < getNumRows(); ++i)
+       ret[0][i] *= -1.0;
+@@ -931,10 +1162,26 @@ std::vector< double * > OsiSpxSolverInte
+ //------------------------------------------------------------------
+ std::vector< double * > OsiSpxSolverInterface::getPrimalRays(int maxNumRays) const
+ {
++#if SOPLEX_VERSION < 200
+   // *FIXME* : must write the method
+   throw CoinError("method is not yet written", "getPrimalRays",
+     "OsiSpxSolverInterface");
+   return std::vector< double * >();
++#else
++  std::vector< double * > ret = std::vector< double * >();
++
++  if (soplex_->status() == soplex::SPxSolver::UNBOUNDED && maxNumRays > 0) {
++    ret.push_back(new double[getNumCols()]);
++    soplex::Vector primal(getNumCols(), ret[0]);
++    if (!soplex_->getPrimalRay(primal))
++      throw CoinError("getPrimalRay failed", "getPrimalRays", "OsiSpxSolverInterface");
++
++    for (int i = 0; i < getNumCols(); ++i)
++      ret[0][i] *= -1.0;
++  }
++
++  return ret;
++#endif
+ }
+ 
+ //#############################################################################
+@@ -943,43 +1190,71 @@ std::vector< double * > OsiSpxSolverInte
+ 
+ void OsiSpxSolverInterface::setObjCoeff(int elementIndex, double elementValue)
+ {
++#if SOPLEX_VERSION < 200
+   soplex_->changeObj(elementIndex, elementValue);
++#else
++  soplex_->changeObjReal(elementIndex, elementValue);
++#endif
+   freeCachedData(OsiSpxSolverInterface::FREECACHED_COLUMN);
+ }
+ 
+ void OsiSpxSolverInterface::setColLower(int elementIndex, double elementValue)
+ {
++#if SOPLEX_VERSION < 200
+   soplex_->changeLower(elementIndex, elementValue);
++#else
++  soplex_->changeLowerReal(elementIndex, elementValue);
++#endif
+   freeCachedData(OsiSpxSolverInterface::FREECACHED_COLUMN);
+ }
+ //-----------------------------------------------------------------------------
+ void OsiSpxSolverInterface::setColUpper(int elementIndex, double elementValue)
+ {
++#if SOPLEX_VERSION < 200
+   soplex_->changeUpper(elementIndex, elementValue);
++#else
++  soplex_->changeUpperReal(elementIndex, elementValue);
++#endif
+   freeCachedData(OsiSpxSolverInterface::FREECACHED_COLUMN);
+ }
+ //-----------------------------------------------------------------------------
+ void OsiSpxSolverInterface::setColBounds(int elementIndex, double lower, double upper)
+ {
++#if SOPLEX_VERSION < 200
+   soplex_->changeBounds(elementIndex, lower, upper);
++#else
++  soplex_->changeBoundsReal(elementIndex, lower, upper);
++#endif
+   freeCachedData(OsiSpxSolverInterface::FREECACHED_COLUMN);
+ }
+ //-----------------------------------------------------------------------------
+ void OsiSpxSolverInterface::setRowLower(int i, double elementValue)
+ {
++#if SOPLEX_VERSION < 200
+   soplex_->changeLhs(i, elementValue);
++#else
++  soplex_->changeLhsReal(i, elementValue);
++#endif
+   freeCachedData(OsiSpxSolverInterface::FREECACHED_ROW);
+ }
+ //-----------------------------------------------------------------------------
+ void OsiSpxSolverInterface::setRowUpper(int i, double elementValue)
+ {
++#if SOPLEX_VERSION < 200
+   soplex_->changeRhs(i, elementValue);
++#else
++  soplex_->changeRhsReal(i, elementValue);
++#endif
+   freeCachedData(OsiSpxSolverInterface::FREECACHED_ROW);
+ }
+ //-----------------------------------------------------------------------------
+ void OsiSpxSolverInterface::setRowBounds(int elementIndex, double lower, double upper)
+ {
++#if SOPLEX_VERSION < 200
+   soplex_->changeRange(elementIndex, lower, upper);
++#else
++  soplex_->changeRangeReal(elementIndex, lower, upper);
++#endif
+   freeCachedData(OsiSpxSolverInterface::FREECACHED_ROW);
+ }
+ //-----------------------------------------------------------------------------
+@@ -1023,10 +1298,17 @@ void OsiSpxSolverInterface::setInteger(i
+ void OsiSpxSolverInterface::setObjSense(double s)
+ {
+   if (s != getObjSense()) {
++#if SOPLEX_VERSION < 200
+     if (s == +1.0)
+       soplex_->changeSense(soplex::SPxLP::MINIMIZE);
+     else
+       soplex_->changeSense(soplex::SPxLP::MAXIMIZE);
++#else
++    if (s == +1.0)
++      soplex_->setIntParam(soplex::SoPlex::OBJSENSE, soplex::SoPlex::OBJSENSE_MINIMIZE);
++    else
++      soplex_->setIntParam(soplex::SoPlex::OBJSENSE, soplex::SoPlex::OBJSENSE_MAXIMIZE);
++#endif
+     freeCachedData(OsiSpxSolverInterface::FREECACHED_RESULTS);
+   }
+ }
+@@ -1042,7 +1324,11 @@ void OsiSpxSolverInterface::setColSoluti
+     delete colsol_;
+ 
+   if (ncols > 0 && cs != NULL) {
++#if SOPLEX_VERSION < 200
+     colsol_ = new soplex::DVector(ncols);
++#else
++    colsol_ = new soplex::Vector(ncols);
++#endif
+     for (col = 0; col < ncols; ++col)
+       (*colsol_)[col] = cs[col];
+   } else
+@@ -1060,7 +1346,11 @@ void OsiSpxSolverInterface::setRowPrice(
+     delete rowsol_;
+ 
+   if (nrows > 0 && rs != NULL) {
++#if SOPLEX_VERSION < 200
+     rowsol_ = new soplex::DVector(nrows);
++#else
++    rowsol_ = new soplex::Vector(nrows);
++#endif
+     for (row = 0; row < nrows; ++row)
+       (*rowsol_)[row] = rs[row];
+   } else
+@@ -1077,13 +1367,21 @@ void OsiSpxSolverInterface::addCol(const
+   soplex::DSVector colvec;
+ 
+   colvec.add(vec.getNumElements(), vec.getIndices(), vec.getElements());
++#if SOPLEX_VERSION < 200
+   soplex_->addCol(soplex::LPCol(obj, colvec, colub, collb));
++#else
++  soplex_->addColReal(soplex::LPCol(obj, colvec, colub, collb));
++#endif
+   freeCachedData(OsiSpxSolverInterface::KEEPCACHED_ROW);
+ }
+ //-----------------------------------------------------------------------------
+ void OsiSpxSolverInterface::deleteCols(const int num, const int *columnIndices)
+ {
++#if SOPLEX_VERSION < 200
+   soplex_->removeCols(const_cast< int * >(columnIndices), num);
++#else
++  soplex_->removeColsReal(const_cast< int * >(columnIndices), num);
++#endif
+   freeCachedData(OsiSpxSolverInterface::KEEPCACHED_ROW);
+ 
+   // took from OsiClp for updating names
+@@ -1120,7 +1418,11 @@ void OsiSpxSolverInterface::addRow(const
+   soplex::DSVector rowvec;
+ 
+   rowvec.add(vec.getNumElements(), vec.getIndices(), vec.getElements());
++#if SOPLEX_VERSION < 200
+   soplex_->addRow(soplex::LPRow(rowlb, rowvec, rowub));
++#else
++  soplex_->addRowReal(soplex::LPRow(rowlb, rowvec, rowub));
++#endif
+   freeCachedData(OsiSpxSolverInterface::KEEPCACHED_COLUMN);
+ }
+ //-----------------------------------------------------------------------------
+@@ -1137,7 +1439,11 @@ void OsiSpxSolverInterface::addRow(const
+ //-----------------------------------------------------------------------------
+ void OsiSpxSolverInterface::deleteRows(const int num, const int *rowIndices)
+ {
++#if SOPLEX_VERSION < 200
+   soplex_->removeRows(const_cast< int * >(rowIndices), num);
++#else
++  soplex_->removeRowsReal(const_cast< int * >(rowIndices), num);
++#endif
+   freeCachedData(OsiSpxSolverInterface::KEEPCACHED_COLUMN);
+ 
+   // took from OsiClp for updating names
+@@ -1184,7 +1490,11 @@ void OsiSpxSolverInterface::loadProblem(
+   const double *elem = matrix.getElements();
+   const int *index = matrix.getIndices();
+   double *thecollb, *thecolub, *theobj, *therowlb, *therowub;
++#if SOPLEX_VERSION < 200
+   soplex::SPxLP::SPxSense objsen = soplex_->spxSense();
++#else
++  int objsen = soplex_->intParam(soplex::SoPlex::OBJSENSE);
++#endif
+ 
+   // create defaults if parameter is NULL
+   if (collb == NULL) {
+@@ -1214,7 +1524,11 @@ void OsiSpxSolverInterface::loadProblem(
+     therowub = const_cast< double * >(rowub);
+ 
+   // copy problem into soplex_
++#if SOPLEX_VERSION < 200
+   soplex_->clear();
++#else
++  soplex_->clearLPReal();
++#endif
+   spxintvars_->clear();
+   freeCachedData(OsiSpxSolverInterface::KEEPCACHED_NONE);
+ 
+@@ -1229,7 +1543,11 @@ void OsiSpxSolverInterface::loadProblem(
+     rowvec.clear();
+     for (row = 0; row < nrows; ++row)
+       rowset.add(therowlb[row], rowvec, therowub[row]);
++#if SOPLEX_VERSION < 200
+     soplex_->addRows(rowset);
++#else
++    soplex_->addRowsReal(rowset);
++#endif
+ 
+     /* create columns */
+     for (col = 0; col < ncols; ++col) {
+@@ -1239,7 +1557,11 @@ void OsiSpxSolverInterface::loadProblem(
+       colset.add(theobj[col], thecollb[col], colvec, thecolub[col]);
+     }
+ 
++#if SOPLEX_VERSION < 200
+     soplex_->addCols(colset);
++#else
++    soplex_->addColsReal(colset);
++#endif
+     // soplex_->changeRange( soplex::Vector( nrows, therowlb ), soplex::Vector( nrows, therowub ) );
+   } else {
+     int row, col, pos;
+@@ -1252,7 +1574,11 @@ void OsiSpxSolverInterface::loadProblem(
+     colvec.clear();
+     for (col = 0; col < ncols; ++col)
+       colset.add(theobj[col], thecollb[col], colvec, thecolub[col]);
++#if SOPLEX_VERSION < 200
+     soplex_->addCols(colset);
++#else
++    soplex_->addColsReal(colset);
++#endif
+ 
+     /* create rows */
+     for (row = 0; row < nrows; ++row) {
+@@ -1262,13 +1588,21 @@ void OsiSpxSolverInterface::loadProblem(
+       rowset.add(therowlb[row], rowvec, therowub[row]);
+     }
+ 
++#if SOPLEX_VERSION < 200
+     soplex_->addRows(rowset);
++#else
++    soplex_->addRowsReal(rowset);
++#endif
+     // soplex_->changeObj( soplex::Vector( ncols, theobj ) );
+     // soplex_->changeBounds( soplex::Vector( ncols, thecollb ), soplex::Vector( ncols, thecolub ) );
+   }
+ 
+   // make sure original sense is preserved
++#if SOPLEX_VERSION < 200
+   soplex_->changeSense(objsen);
++#else
++  soplex_->setIntParam(soplex::SoPlex::OBJSENSE, objsen);
++#endif
+ 
+   // delete default arrays if neccessary
+   if (collb == NULL)
+@@ -1389,9 +1723,16 @@ void OsiSpxSolverInterface::loadProblem(
+   int col, pos;
+   soplex::LPColSet colset(numcols, start[numcols]);
+   soplex::DSVector colvec;
++#if SOPLEX_VERSION < 200
+   soplex::SPxLP::SPxSense objsen = soplex_->spxSense();
+ 
+   soplex_->clear();
++#else
++  int objsen = soplex_->intParam(soplex::SoPlex::OBJSENSE);
++
++  soplex_->clearLPReal();
++#endif
++
+   spxintvars_->clear();
+   freeCachedData(OsiSpxSolverInterface::KEEPCACHED_NONE);
+ 
+@@ -1402,9 +1743,15 @@ void OsiSpxSolverInterface::loadProblem(
+     colset.add(obj[col], collb[col], colvec, colub[col]);
+   }
+ 
++#if SOPLEX_VERSION < 200
+   soplex_->addCols(colset);
+   soplex_->changeRange(soplex::Vector(numrows, const_cast< double * >(rowlb)), soplex::Vector(numrows, const_cast< double * >(rowub)));
+   soplex_->changeSense(objsen);
++#else
++  soplex_->addColsReal(colset);
++  soplex_->changeRangeReal(soplex::Vector(numrows, const_cast< double * >(rowlb)), soplex::Vector(numrows, const_cast< double * >(rowub)));
++  soplex_->setIntParam(soplex::SoPlex::OBJSENSE, objsen);
++#endif
+ }
+ 
+ //-----------------------------------------------------------------------------
+@@ -1453,9 +1800,15 @@ int OsiSpxSolverInterface::readMps(const
+ #endif
+ 
+   // we preserve the objective sense independent of the problem which is read
++#if SOPLEX_VERSION < 200
+   soplex::SPxLP::SPxSense objsen = soplex_->spxSense();
+   int retval = OsiSolverInterface::readMps(filename, extension);
+   soplex_->changeSense(objsen);
++#else
++  int objsen = soplex_->intParam(soplex::SoPlex::OBJSENSE);
++  int retval = OsiSolverInterface::readMps(filename, extension);
++  soplex_->setIntParam(soplex::SoPlex::OBJSENSE, objsen);
++#endif
+   return retval;
+ }
+ 
+@@ -1468,17 +1821,28 @@ void OsiSpxSolverInterface::writeMps(con
+ {
+   std::string f(filename);
+   std::string e(extension);
++#if SOPLEX_VERSION < 200
+   std::string fullname = f + "." + e;
+   std::ofstream file(fullname.c_str());
+   if (!file.good()) {
+     std::cerr << "Error opening file " << fullname << " for writing!" << std::endl;
+     return;
+   }
++#else
++  std::string finalname = f + "." + e;
++  std::string fullname = finalname + ".mps";
++#endif
+   soplex::DIdxSet integers(getNumIntegers());
+   for (int i = 0; i < getNumCols(); ++i)
+     if (isInteger(i))
+       integers.addIdx(i);
++#if SOPLEX_VERSION < 200
+   soplex_->writeMPS(file, NULL, NULL, &integers);
++#else
++  // Write with the extension soplex expects, then rename
++  soplex_->writeFile(fullname.c_str(), NULL, NULL, &integers);
++  rename(fullname.c_str(), finalname.c_str());
++#endif
+ }
+ 
+ //#############################################################################
+@@ -1491,9 +1855,8 @@ void OsiSpxSolverInterface::writeMps(con
+ OsiSpxSolverInterface::OsiSpxSolverInterface()
+   : OsiSolverInterface()
+   ,
+-#if SOPLEX_VERSION >= 220
+-  spxout_(new soplex::SPxOut)
+-  , soplex_(new soplex::SoPlex(*spxout_, soplex::SPxSolver::ENTER, soplex::SPxSolver::COLUMN))
++#if SOPLEX_VERSION >= 200
++  soplex_(new soplex::SoPlex())
+   , // default is primal simplex algorithm
+ #else
+   spxout_(NULL)
+@@ -1517,13 +1880,22 @@ OsiSpxSolverInterface::OsiSpxSolverInter
+   , rowact_(NULL)
+   , matrixByRow_(NULL)
+   , matrixByCol_(NULL)
++#if SOPLEX_VERSION >= 200
++  , lower_(NULL)
++  , upper_(NULL)
++  , lhsVector_(NULL)
++  , rhsVector_(NULL)
++#endif
+ {
+-#if SOPLEX_VERSION >= 220
++#if SOPLEX_VERSION >= 200
++  spxout_ = &soplex_->spxout;
+ #ifndef NDEBUG
+-  spxout_->setVerbosity(soplex::SPxOut::INFO1);
++  soplex_->setIntParam(soplex::SoPlex::VERBOSITY, soplex::SoPlex::VERBOSITY_DEBUG);
+ #else
+-  spxout_->setVerbosity(soplex::SPxOut::DEBUG);
++  soplex_->setIntParam(soplex::SoPlex::VERBOSITY, soplex::SoPlex::VERBOSITY_NORMAL);
+ #endif
++  soplex_->setIntParam(soplex::SoPlex::ALGORITHM, soplex::SoPlex::ALGORITHM_PRIMAL);
++  soplex_->setIntParam(soplex::SoPlex::REPRESENTATION, soplex::SoPlex::REPRESENTATION_COLUMN);
+ #else
+ #ifndef NDEBUG
+   soplex::Param::setVerbose(3);
+@@ -1533,7 +1905,11 @@ OsiSpxSolverInterface::OsiSpxSolverInter
+ #endif
+ 
+   // SoPlex default objective sense is maximization, thus we explicitly set it to minimization
++#if SOPLEX_VERSION < 200
+   soplex_->changeSense(soplex::SPxLP::MINIMIZE);
++#else
++  soplex_->setIntParam(soplex::SoPlex::OBJSENSE, soplex::SoPlex::OBJSENSE_MINIMIZE);
++#endif
+ }
+ 
+ //----------------------------------------------------------------
+@@ -1549,9 +1925,8 @@ OsiSolverInterface *OsiSpxSolverInterfac
+ //-------------------------------------------------------------------
+ OsiSpxSolverInterface::OsiSpxSolverInterface(const OsiSpxSolverInterface &source)
+   : OsiSolverInterface(source)
+-#if SOPLEX_VERSION >= 220
+-  , spxout_(new soplex::SPxOut)
+-  , soplex_(new soplex::SoPlex(*spxout_, soplex::SPxSolver::ENTER, soplex::SPxSolver::COLUMN))
++#if SOPLEX_VERSION >= 200
++  , soplex_(new soplex::SoPlex())
+ #else
+   , spxout_(NULL)
+   , soplex_(new soplex::SoPlex(soplex::SPxSolver::ENTER, soplex::SPxSolver::COLUMN))
+@@ -1572,9 +1947,18 @@ OsiSpxSolverInterface::OsiSpxSolverInter
+   , rowact_(NULL)
+   , matrixByRow_(NULL)
+   , matrixByCol_(NULL)
++#if SOPLEX_VERSION >= 200
++  , lower_(NULL)
++  , upper_(NULL)
++  , lhsVector_(NULL)
++  , rhsVector_(NULL)
++#endif
+ {
+   // Using the copy-constructor of SoPlex did not work, see #113
+   *soplex_ = *source.soplex_;
++#if SOPLEX_VERSION >= 200
++  spxout_ = &soplex_->spxout;
++#endif
+   if (source.colsol_ != NULL)
+     setColSolution(source.getColSolution());
+   if (source.rowsol_ != NULL)
+@@ -1687,6 +2071,24 @@ void OsiSpxSolverInterface::freeCachedRe
+   rowsol_ = NULL;
+   redcost_ = NULL;
+   rowact_ = NULL;
++#if SOPLEX_VERSION >= 200
++  if (lower_ != NULL) {
++    delete lower_;
++    lower_ = NULL;
++  }
++  if (upper_ != NULL) {
++    delete upper_;
++    upper_ = NULL;
++  }
++  if (lhsVector_ != NULL) {
++    delete lhsVector_;
++    lhsVector_ = NULL;
++  }
++  if (rhsVector_ != NULL) {
++    delete rhsVector_;
++    rhsVector_ = NULL;
++  }
++#endif
+ }
+ 
+ void OsiSpxSolverInterface::freeCachedData(int keepCached)
+@@ -1711,9 +2113,6 @@ void OsiSpxSolverInterface::freeAllMemor
+   hotStartRStat_ = NULL;
+   hotStartRStatSize_ = 0;
+   delete soplex_;
+-#if SOPLEX_VERSION >= 220
+-  delete spxout_;
+-#endif
+   delete spxintvars_;
+ }
+ 
+diff -up Osi-releases-0.108.9/Osi/src/OsiSpx/OsiSpxSolverInterface.hpp.orig Osi-releases-0.108.9/Osi/src/OsiSpx/OsiSpxSolverInterface.hpp
+--- Osi-releases-0.108.9/Osi/src/OsiSpx/OsiSpxSolverInterface.hpp.orig	2023-10-25 08:08:56.000000000 -0600
++++ Osi-releases-0.108.9/Osi/src/OsiSpx/OsiSpxSolverInterface.hpp	2023-11-21 11:28:28.312759735 -0700
+@@ -18,18 +18,7 @@
+ #include <string>
+ #include "OsiSolverInterface.hpp"
+ #include "CoinWarmStartBasis.hpp"
+-
+-#ifndef _SOPLEX_H_
+-/* forward declarations so the header can be compiled without having to include soplex.h
+- * however, these declaration work only for SoPlex < 2.0, so we do them only if soplex.h hasn't been included already
+- */
+-namespace soplex {
+-class DIdxSet;
+-class DVector;
+-class SPxOut;
+-class SoPlex;
+-}
+-#endif
++#include <soplex.h>
+ 
+ /** SoPlex Solver Interface
+     Instantiation of OsiSpxSolverInterface for SoPlex
+@@ -473,7 +462,7 @@ public:
+   /** */
+   virtual void deleteRows(const int num, const int *rowIndices);
+ 
+-#if 0 // we are using the default implementation of OsiSolverInterface \
++#if 0 // we are using the default implementation of OsiSolverInterface
+   //-----------------------------------------------------------------------
+       /** Apply a collection of cuts.<br>
+     	  Only cuts which have an <code>effectiveness >= effectivenessLb</code>
+@@ -701,7 +690,11 @@ private:
+   /**@name Cached information derived from the SoPlex model */
+   //@{
+   /// Pointer to objective Vector
++#if SOPLEX_VERSION < 200
+   mutable soplex::DVector *obj_;
++#else
++  mutable soplex::Vector *obj_;
++#endif
+ 
+   /// Pointer to dense vector of row sense indicators
+   mutable char *rowsense_;
+@@ -712,6 +705,7 @@ private:
+   /// Pointer to dense vector of slack upper bounds for range constraints (undefined for non-range rows)
+   mutable double *rowrange_;
+ 
++#if SOPLEX_VERSION < 200
+   /// Pointer to primal solution vector
+   mutable soplex::DVector *colsol_;
+ 
+@@ -723,12 +717,39 @@ private:
+ 
+   /// Pointer to row activity (slack) vector
+   mutable soplex::DVector *rowact_;
++#else
++  /// Pointer to primal solution vector
++  mutable soplex::Vector *colsol_;
++
++  /// Pointer to dual solution vector
++  mutable soplex::Vector *rowsol_;
++
++  /// Pointer to reduced cost vector
++  mutable soplex::Vector *redcost_;
++
++  /// Pointer to row activity (slack) vector
++  mutable soplex::Vector *rowact_;
++#endif
+ 
+   /// Pointer to row-wise copy of problem matrix coefficients.
+   mutable CoinPackedMatrix *matrixByRow_;
+ 
+   /// Pointer to row-wise copy of problem matrix coefficients.
+   mutable CoinPackedMatrix *matrixByCol_;
++
++#if SOPLEX_VERSION >= 200
++  /// Lower vector (unscaled)
++  mutable soplex::Vector *lower_;
++
++  /// Upper vector (unscaled)
++  mutable soplex::Vector *upper_;
++
++  // Vector of row left-hand side values (unscaled)
++  mutable soplex::Vector *lhsVector_;
++
++  // Vector of row right-hand side values (unscaled)
++  mutable soplex::Vector *rhsVector_;
++#endif
+   //@}
+   //@}
+ };
+diff -up Osi-releases-0.108.9/Osi/test/OsiSpxSolverInterfaceTest.cpp.orig Osi-releases-0.108.9/Osi/test/OsiSpxSolverInterfaceTest.cpp
+--- Osi-releases-0.108.9/Osi/test/OsiSpxSolverInterfaceTest.cpp.orig	2023-10-25 08:08:56.000000000 -0600
++++ Osi-releases-0.108.9/Osi/test/OsiSpxSolverInterfaceTest.cpp	2023-10-26 21:28:06.862953274 -0600
+@@ -149,10 +149,16 @@ void OsiSpxSolverInterfaceUnitTest( cons
+ 
+       OSIUNITTEST_ASSERT_ERROR(!eq(cl[3],1.2345), {}, "SoPlex", "set col lower");
+       soplexSi.setColLower( 3, 1.2345 );
++#if SOPLEX_VERSION >= 200
++      cl = soplexSi.getColLower();
++#endif
+       OSIUNITTEST_ASSERT_ERROR( eq(cl[3],1.2345), {}, "SoPlex", "set col lower");
+       
+       OSIUNITTEST_ASSERT_ERROR(!eq(cu[4],10.2345), {}, "SoPlex", "set col upper");
+       soplexSi.setColUpper( 4, 10.2345 );
++#if SOPLEX_VERSION >= 200
++      cu = soplexSi.getColUpper();
++#endif
+       OSIUNITTEST_ASSERT_ERROR( eq(cu[4],10.2345), {}, "SoPlex", "set col upper");
+ 
+       OSIUNITTEST_ASSERT_ERROR(eq(soplexSi.getObjCoefficients()[0], 1.0), {}, "SoPlex", "read and copy exmip1");

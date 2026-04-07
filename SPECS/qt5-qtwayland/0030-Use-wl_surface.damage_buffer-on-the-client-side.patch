@@ -1,0 +1,131 @@
+From 30a03bf1e3d79e9ae2ba236499bb1844a4af2bc1 Mon Sep 17 00:00:00 2001
+From: Paul Olav Tvete <paul.tvete@qt.io>
+Date: Mon, 6 Jul 2020 14:37:35 +0200
+Subject: [PATCH 30/55] Use wl_surface.damage_buffer on the client side
+
+Prefer the newer, recommended damage_buffer when the compositor
+supports it.
+
+Fixes: QTBUG-74929
+Change-Id: I9107966910b616a666931404a7b41bfac14c22c0
+Reviewed-by: Eskil Abrahamsen Blomfeldt <eskil.abrahamsen-blomfeldt@qt.io>
+(cherry picked from commit 314fd6db51277224cdc799b039ef79db1101f5cd)
+---
+ src/client/qwaylanddisplay.cpp                  |  2 +-
+ src/client/qwaylandwindow.cpp                   | 16 +++++++++++++---
+ tests/auto/client/shared/coreprotocol.h         |  2 +-
+ tests/auto/client/shared_old/mockcompositor.cpp |  2 +-
+ tests/auto/client/shared_old/mocksurface.cpp    | 10 ++++++++++
+ tests/auto/client/shared_old/mocksurface.h      |  2 ++
+ 6 files changed, 28 insertions(+), 6 deletions(-)
+
+diff --git a/src/client/qwaylanddisplay.cpp b/src/client/qwaylanddisplay.cpp
+index 4a331a4c..f23c459d 100644
+--- a/src/client/qwaylanddisplay.cpp
++++ b/src/client/qwaylanddisplay.cpp
+@@ -493,7 +493,7 @@ void QWaylandDisplay::registry_global(uint32_t id, const QString &interface, uin
+     if (interface == QStringLiteral("wl_output")) {
+         mWaitingScreens << new QWaylandScreen(this, version, id);
+     } else if (interface == QStringLiteral("wl_compositor")) {
+-        mCompositorVersion = qMin((int)version, 3);
++        mCompositorVersion = qMin((int)version, 4);
+         mCompositor.init(registry, id, mCompositorVersion);
+     } else if (interface == QStringLiteral("wl_shm")) {
+         mShm.reset(new QWaylandShm(this, version, id));
+diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
+index d98a70e4..60665394 100644
+--- a/src/client/qwaylandwindow.cpp
++++ b/src/client/qwaylandwindow.cpp
+@@ -563,7 +563,11 @@ void QWaylandWindow::damage(const QRect &rect)
+     if (mSurface == nullptr)
+         return;
+ 
+-    mSurface->damage(rect.x(), rect.y(), rect.width(), rect.height());
++    const int s = scale();
++    if (mDisplay->compositorVersion() >= 4)
++        mSurface->damage_buffer(s * rect.x(), s * rect.y(), s * rect.width(), s * rect.height());
++    else
++        mSurface->damage(rect.x(), rect.y(), rect.width(), rect.height());
+ }
+ 
+ void QWaylandWindow::safeCommit(QWaylandBuffer *buffer, const QRegion &damage)
+@@ -599,8 +603,14 @@ void QWaylandWindow::commit(QWaylandBuffer *buffer, const QRegion &damage)
+         return;
+ 
+     attachOffset(buffer);
+-    for (const QRect &rect: damage)
+-        mSurface->damage(rect.x(), rect.y(), rect.width(), rect.height());
++    if (mDisplay->compositorVersion() >= 4) {
++        const int s = scale();
++        for (const QRect &rect: damage)
++            mSurface->damage_buffer(s * rect.x(), s * rect.y(), s * rect.width(), s * rect.height());
++    } else {
++        for (const QRect &rect: damage)
++            mSurface->damage(rect.x(), rect.y(), rect.width(), rect.height());
++    }
+     Q_ASSERT(!buffer->committed());
+     buffer->setCommitted();
+     mSurface->commit();
+diff --git a/tests/auto/client/shared/coreprotocol.h b/tests/auto/client/shared/coreprotocol.h
+index a1af137a..296dbf47 100644
+--- a/tests/auto/client/shared/coreprotocol.h
++++ b/tests/auto/client/shared/coreprotocol.h
+@@ -158,7 +158,7 @@ class WlCompositor : public Global, public QtWaylandServer::wl_compositor
+ {
+     Q_OBJECT
+ public:
+-    explicit WlCompositor(CoreCompositor *compositor, int version = 3)
++    explicit WlCompositor(CoreCompositor *compositor, int version = 4)
+         : QtWaylandServer::wl_compositor(compositor->m_display, version)
+         , m_compositor(compositor)
+     {}
+diff --git a/tests/auto/client/shared_old/mockcompositor.cpp b/tests/auto/client/shared_old/mockcompositor.cpp
+index a415cbf5..b1d3d07d 100644
+--- a/tests/auto/client/shared_old/mockcompositor.cpp
++++ b/tests/auto/client/shared_old/mockcompositor.cpp
+@@ -342,7 +342,7 @@ Compositor::Compositor(MockCompositor *mockCompositor)
+         exit(EXIT_FAILURE);
+     }
+ 
+-    wl_global_create(m_display, &wl_compositor_interface, 1, this, bindCompositor);
++    wl_global_create(m_display, &wl_compositor_interface, 4, this, bindCompositor);
+ 
+     m_data_device_manager.reset(new DataDeviceManager(this, m_display));
+ 
+diff --git a/tests/auto/client/shared_old/mocksurface.cpp b/tests/auto/client/shared_old/mocksurface.cpp
+index e9df5f90..c3246e4a 100644
+--- a/tests/auto/client/shared_old/mocksurface.cpp
++++ b/tests/auto/client/shared_old/mocksurface.cpp
+@@ -125,6 +125,16 @@ void Surface::surface_damage(Resource *resource,
+     Q_UNUSED(height);
+ }
+ 
++void Surface::surface_damage_buffer(Resource *resource,
++                                    int32_t x, int32_t y, int32_t width, int32_t height)
++{
++    Q_UNUSED(resource);
++    Q_UNUSED(x);
++    Q_UNUSED(y);
++    Q_UNUSED(width);
++    Q_UNUSED(height);
++}
++
+ void Surface::surface_frame(Resource *resource,
+                             uint32_t callback)
+ {
+diff --git a/tests/auto/client/shared_old/mocksurface.h b/tests/auto/client/shared_old/mocksurface.h
+index 949dc23d..d176837e 100644
+--- a/tests/auto/client/shared_old/mocksurface.h
++++ b/tests/auto/client/shared_old/mocksurface.h
+@@ -65,6 +65,8 @@ protected:
+                         struct wl_resource *buffer, int x, int y) override;
+     void surface_damage(Resource *resource,
+                         int32_t x, int32_t y, int32_t width, int32_t height) override;
++    void surface_damage_buffer(Resource *resource,
++                               int32_t x, int32_t y, int32_t width, int32_t height) override;
+     void surface_frame(Resource *resource,
+                        uint32_t callback) override;
+     void surface_commit(Resource *resource) override;
+-- 
+2.51.1
+

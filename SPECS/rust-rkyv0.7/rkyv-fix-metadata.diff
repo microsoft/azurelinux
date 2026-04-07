@@ -1,0 +1,82 @@
+--- rkyv-0.7.46/Cargo.toml	1970-01-01T00:00:01+00:00
++++ rkyv-0.7.46/Cargo.toml	2026-01-13T20:53:48.080135+00:00
+@@ -42,8 +42,6 @@
+ [features]
+ alloc = [
+     "hashbrown",
+-    "bitvec?/alloc",
+-    "tinyvec?/alloc",
+ ]
+ arbitrary_enum_discriminant = ["rkyv_derive/arbitrary_enum_discriminant"]
+ archive_be = [
+@@ -68,14 +66,8 @@
+     "bytecheck?/std",
+     "ptr_meta/std",
+     "rend?/std",
+-    "uuid?/std",
+-    "bytes?/std",
+ ]
+ strict = ["rkyv_derive/strict"]
+-uuid = [
+-    "dep:uuid",
+-    "bytecheck?/uuid",
+-]
+ validation = [
+     "alloc",
+     "bytecheck",
+@@ -91,29 +83,14 @@
+ optional = true
+ default-features = false
+ 
+-[dependencies.bitvec]
+-version = "1.0"
+-optional = true
+-default-features = false
+-
+ [dependencies.bytecheck]
+ version = "0.6.11"
+ optional = true
+ default-features = false
+ 
+-[dependencies.bytes]
+-version = "1.4.0"
++[dependencies.hashbrown]
++version = "0.14"
+ optional = true
+-default-features = false
+-
+-[dependencies.hashbrown]
+-version = "0.12"
+-optional = true
+-
+-[dependencies.indexmap]
+-version = "1.7"
+-optional = true
+-default-features = false
+ 
+ [dependencies.ptr_meta]
+ version = "~0.1.3"
+@@ -129,23 +106,3 @@
+ 
+ [dependencies.seahash]
+ version = "4.0"
+-
+-[dependencies.smallvec]
+-version = "1.7"
+-optional = true
+-default-features = false
+-
+-[dependencies.smol_str]
+-version = "0.2"
+-optional = true
+-default-features = false
+-
+-[dependencies.tinyvec]
+-version = "1.5"
+-optional = true
+-default-features = false
+-
+-[dependencies.uuid]
+-version = "1.3"
+-optional = true
+-default-features = false

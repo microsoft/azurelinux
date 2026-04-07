@@ -1,0 +1,65 @@
+From 0e834a8d37dfabd8fa4463f83c132478e50f8337 Mon Sep 17 00:00:00 2001
+From: Olivier Fourdan <ofourdan@redhat.com>
+Date: Thu, 21 Nov 2024 14:11:11 +0100
+Subject: [PATCH 4/7] Xm/DropDown: Use Xinerama for placement
+
+Signed-off-by: Olivier Fourdan <ofourdan@redhat.com>
+---
+ lib/Xm/DropDown.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/lib/Xm/DropDown.c b/lib/Xm/DropDown.c
+index a25d1092..665e0e26 100644
+--- a/lib/Xm/DropDown.c
++++ b/lib/Xm/DropDown.c
+@@ -13,7 +13,7 @@
+ #include "XmI.h"
+ #include <Xm/VaSimpleP.h>
+ #include <Xm/DrawP.h>
+-
++#include <Xm/ScreenP.h>
+ #include <Xm/DropDownP.h>
+ 
+ #include <X11/Shell.h>
+@@ -2169,8 +2169,9 @@ PopupList(Widget w)
+     XmDropDownWidget cbw = (XmDropDownWidget) w;
+     Widget shell = XmDropDown_popup_shell(cbw);
+     Position x, y, temp;
++    Position dispX, dispY, dispMaxX, dispMaxY;
+     Dimension width;
+-    int ret, scr_width, scr_height;
++    int ret;
+     Arg args[10];
+     Cardinal num_args;
+ 
+@@ -2209,21 +2210,20 @@ PopupList(Widget w)
+      *
+      * Lets start by getting the width and height of the screen.
+      */
+-    scr_width = WidthOfScreen(XtScreen(shell));
+-    scr_height = HeightOfScreen(XtScreen(shell));
++    _XmScreenGetBoundariesAtpoint(XtScreen(shell), x, y, &dispX, &dispY, &dispMaxX, &dispMaxY);
+ 
+-    if( (int)(y + XtHeight(shell)) > scr_height )
++    if( (int)(y + XtHeight(shell)) > dispMaxY )
+     {
+ 	Position tmp;
+ 	XtTranslateCoords(w, 0, 0, &tmp, &y);
+ 	y -= ((int)XtHeight(shell));
+     }
+-    if( y < 0 ) y = 0;
+-    if( (int)(x + width) > scr_width )
++    if( y < dispY ) y = dispY;
++    if( (int)(x + width) > dispMaxX )
+     {
+-	x = scr_width - ((int)width);
++	x = dispMaxX - ((int)width);
+     }
+-    if( x < 0 ) x = 0;
++    if( x < dispX ) x = dispX;
+ 
+     XtSetArg(args[num_args], XmNx, x); num_args++;
+     XtSetArg(args[num_args], XmNy, y); num_args++;
+-- 
+2.49.0
+

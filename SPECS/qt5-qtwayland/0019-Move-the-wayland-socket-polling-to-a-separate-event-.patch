@@ -1,0 +1,576 @@
+From 0be79f71ccc5c6a537be0db0103fc688383f41c3 Mon Sep 17 00:00:00 2001
+From: Adrien Faveraux <af@brain-networks.fr>
+Date: Fri, 26 Nov 2021 09:18:58 +0100
+Subject: [PATCH 19/55] Move the wayland socket polling to a separate event
+ thread
+
+New event threads is introduced which calls poll() on the wayland fd,
+instead of relying on the event dispatcher by using the QSocketNotifier.
+This allows to call in the proper order the wl_display_prepare_read(),
+poll() and wl_display_read_events() functions.
+
+One thread is responsible for the default queue; when needed, it emit
+a signal so that the main thread can dispatch the queue. Another thread
+is responsible for the dedicated queue for frame callbacks; this thread
+will dispatch events on the thread itself.
+
+QWaylandWindow is updated to, instead of each window's dedicated event
+queue, use this queue for frame callbacks.
+
+Co-authored-by: Ratchanan Srirattanamet <ratchanan@ubports.com>
+Task-number: QTBUG-66075
+Change-Id: Ibb33ad7f4193b866d1b8d7a0405a94d59dcad5eb
+Reviewed-by: Qt CI Bot <qt_ci_bot@qt-project.org>
+Reviewed-by: Eskil Abrahamsen Blomfeldt <eskil.abrahamsen-blomfeldt@qt.io>
+(cherry picked from commit 92a7904d9651348b0c307e84251c8440c6f75b22)
+---
+ src/client/qwaylanddisplay.cpp     | 302 +++++++++++++++++++++--------
+ src/client/qwaylanddisplay_p.h     |  21 +-
+ src/client/qwaylandintegration.cpp |   4 +-
+ src/client/qwaylandwindow.cpp      |  34 +++-
+ src/client/qwaylandwindow_p.h      |   2 +-
+ 5 files changed, 255 insertions(+), 108 deletions(-)
+
+diff --git a/src/client/qwaylanddisplay.cpp b/src/client/qwaylanddisplay.cpp
+index c2482030..c38f6f82 100644
+--- a/src/client/qwaylanddisplay.cpp
++++ b/src/client/qwaylanddisplay.cpp
+@@ -87,10 +87,203 @@
+ 
+ #include <errno.h>
+ 
++#include <tuple> // for std::tie
++
++static void checkWaylandError(struct wl_display *display)
++{
++    int ecode = wl_display_get_error(display);
++    if ((ecode == EPIPE || ecode == ECONNRESET)) {
++        // special case this to provide a nicer error
++        qWarning("The Wayland connection broke. Did the Wayland compositor die?");
++    } else {
++        qWarning("The Wayland connection experienced a fatal error: %s", strerror(ecode));
++    }
++    _exit(1);
++}
++
+ QT_BEGIN_NAMESPACE
+ 
+ namespace QtWaylandClient {
+ 
++class EventThread : public QThread
++{
++    Q_OBJECT
++public:
++    enum OperatingMode {
++        EmitToDispatch, // Emit the signal, allow dispatching in a differnt thread.
++        SelfDispatch, // Dispatch the events inside this thread.
++    };
++
++    EventThread(struct wl_display * wl, struct wl_event_queue * ev_queue,
++                OperatingMode mode)
++        : m_fd(wl_display_get_fd(wl))
++        , m_pipefd{ -1, -1 }
++        , m_wldisplay(wl)
++        , m_wlevqueue(ev_queue)
++        , m_mode(mode)
++        , m_reading(true)
++        , m_quitting(false)
++    {
++        setObjectName(QStringLiteral("WaylandEventThread"));
++    }
++
++    void readAndDispatchEvents()
++    {
++        /*
++         * Dispatch pending events and flush the requests at least once. If the event thread
++         * is not reading, try to call _prepare_read() to allow the event thread to poll().
++         * If that fails, re-try dispatch & flush again until _prepare_read() is successful.
++         *
++         * This allow any call to readAndDispatchEvents() to start event thread's polling,
++         * not only the one issued from event thread's waitForReading(), which means functions
++         * called from dispatch_pending() can safely spin an event loop.
++         */
++        for (;;) {
++            if (dispatchQueuePending() < 0) {
++                checkWaylandError(m_wldisplay);
++                return;
++            }
++
++            wl_display_flush(m_wldisplay);
++
++            // We have to check if event thread is reading every time we dispatch
++            // something, as that may recursively call this function.
++            if (m_reading.loadAcquire())
++                break;
++
++            if (prepareReadQueue() == 0) {
++                QMutexLocker l(&m_mutex);
++                m_reading.storeRelease(true);
++                m_cond.wakeOne();
++                break;
++            }
++        }
++    }
++
++    void stop()
++    {
++        // We have to both write to the pipe and set the flag, as the thread may be
++        // either in the poll() or waiting for _prepare_read().
++        if (m_pipefd[1] != -1 && write(m_pipefd[1], "\0", 1) == -1)
++            qWarning("Failed to write to the pipe: %s.", strerror(errno));
++
++        {
++            QMutexLocker l(&m_mutex);
++            m_quitting = true;
++            m_cond.wakeOne();
++        }
++
++        wait();
++    }
++
++Q_SIGNALS:
++    void needReadAndDispatch();
++
++protected:
++    void run() override
++    {
++        // we use this pipe to make the loop exit otherwise if we simply used a flag on the loop condition, if stop() gets
++        // called while poll() is blocking the thread will never quit since there are no wayland messages coming anymore.
++        struct Pipe
++        {
++            Pipe(int *fds)
++                : fds(fds)
++            {
++                if (qt_safe_pipe(fds) != 0)
++                    qWarning("Pipe creation failed. Quitting may hang.");
++            }
++            ~Pipe()
++            {
++                if (fds[0] != -1) {
++                    close(fds[0]);
++                    close(fds[1]);
++                }
++            }
++
++            int *fds;
++        } pipe(m_pipefd);
++
++        // Make the main thread call wl_prepare_read(), dispatch the pending messages and flush the
++        // outbound ones. Wait until it's done before proceeding, unless we're told to quit.
++        while (waitForReading()) {
++            pollfd fds[2] = { { m_fd, POLLIN, 0 }, { m_pipefd[0], POLLIN, 0 } };
++            poll(fds, 2, -1);
++
++            if (fds[1].revents & POLLIN) {
++                // we don't really care to read the byte that was written here since we're closing down
++                wl_display_cancel_read(m_wldisplay);
++                break;
++            }
++
++            if (fds[0].revents & POLLIN)
++                wl_display_read_events(m_wldisplay);
++                // The polll was succesfull and the event thread did the wl_display_read_events(). On the next iteration of the loop
++                // the event sent to the main thread will cause it to dispatch the messages just read, unless the loop exits in which
++                // case we don't care anymore about them.
++            else
++                wl_display_cancel_read(m_wldisplay);
++        }
++    }
++
++private:
++    bool waitForReading()
++    {
++        Q_ASSERT(QThread::currentThread() == this);
++
++        m_reading.storeRelease(false);
++
++        if (m_mode == SelfDispatch) {
++            readAndDispatchEvents();
++        } else {
++            Q_EMIT needReadAndDispatch();
++
++            QMutexLocker lock(&m_mutex);
++            // m_reading might be set from our emit or some other invocation of
++            // readAndDispatchEvents().
++            while (!m_reading.loadRelaxed() && !m_quitting)
++                m_cond.wait(&m_mutex);
++        }
++
++        return !m_quitting;
++    }
++
++    int dispatchQueuePending()
++    {
++        if (m_wlevqueue)
++            return wl_display_dispatch_queue_pending(m_wldisplay, m_wlevqueue);
++        else
++            return wl_display_dispatch_pending(m_wldisplay);
++    }
++
++    int prepareReadQueue()
++    {
++        if (m_wlevqueue)
++            return wl_display_prepare_read_queue(m_wldisplay, m_wlevqueue);
++        else
++            return wl_display_prepare_read(m_wldisplay);
++    }
++
++    int m_fd;
++    int m_pipefd[2];
++    wl_display *m_wldisplay;
++    wl_event_queue *m_wlevqueue;
++    OperatingMode m_mode;
++
++    /* Concurrency note when operating in EmitToDispatch mode:
++     * m_reading is set to false inside event thread's waitForReading(), and is
++     * set to true inside main thread's readAndDispatchEvents().
++     * The lock is not taken when setting m_reading to false, as the main thread
++     * is not actively waiting for it to turn false. However, the lock is taken
++     * inside readAndDispatchEvents() before setting m_reading to true,
++     * as the event thread is actively waiting for it under the wait condition.
++     */
++
++    QAtomicInteger<bool> m_reading;
++    bool m_quitting;
++    QMutex m_mutex;
++    QWaitCondition m_cond;
++};
++
+ Q_LOGGING_CATEGORY(lcQpaWayland, "qt.qpa.wayland"); // for general (uncategorized) Wayland platform logging
+ 
+ struct wl_surface *QWaylandDisplay::createSurface(void *handle)
+@@ -164,6 +357,12 @@ QWaylandDisplay::QWaylandDisplay(QWaylandIntegration *waylandIntegration)
+ 
+ QWaylandDisplay::~QWaylandDisplay(void)
+ {
++    if (m_eventThread)
++        m_eventThread->stop();
++
++    if (m_frameEventQueueThread)
++        m_frameEventQueueThread->stop();
++
+     if (mSyncCallback)
+         wl_callback_destroy(mSyncCallback);
+ 
+@@ -210,98 +409,37 @@ void QWaylandDisplay::ensureScreen()
+ 
+ void QWaylandDisplay::checkError() const
+ {
+-    int ecode = wl_display_get_error(mDisplay);
+-    if ((ecode == EPIPE || ecode == ECONNRESET)) {
+-        // special case this to provide a nicer error
+-        qWarning("The Wayland connection broke. Did the Wayland compositor die?");
+-    } else {
+-        qWarning("The Wayland connection experienced a fatal error: %s", strerror(ecode));
+-    }
+-    _exit(1);
++    checkWaylandError(mDisplay);
+ }
+ 
++// Called in main thread, either from queued signal or directly.
+ void QWaylandDisplay::flushRequests()
+ {
+-    if (wl_display_prepare_read(mDisplay) == 0) {
+-        wl_display_read_events(mDisplay);
+-    }
+-
+-    if (wl_display_dispatch_pending(mDisplay) < 0)
+-        checkError();
+-
+-    {
+-        QReadLocker locker(&m_frameQueueLock);
+-        for (const FrameQueue &q : mExternalQueues) {
+-            QMutexLocker locker(q.mutex);
+-            while (wl_display_prepare_read_queue(mDisplay, q.queue) != 0)
+-                wl_display_dispatch_queue_pending(mDisplay, q.queue);
+-            wl_display_read_events(mDisplay);
+-            wl_display_dispatch_queue_pending(mDisplay, q.queue);
+-        }
+-    }
+-
+-    wl_display_flush(mDisplay);
+-}
+-
+-void QWaylandDisplay::blockingReadEvents()
+-{
+-    if (wl_display_dispatch(mDisplay) < 0)
+-        checkError();
+-}
+-
+-void QWaylandDisplay::destroyFrameQueue(const QWaylandDisplay::FrameQueue &q)
+-{
+-    QWriteLocker locker(&m_frameQueueLock);
+-    auto it = std::find_if(mExternalQueues.begin(),
+-                           mExternalQueues.end(),
+-                           [&q] (const QWaylandDisplay::FrameQueue &other){ return other.queue == q.queue; });
+-    Q_ASSERT(it != mExternalQueues.end());
+-    mExternalQueues.erase(it);
+-    if (q.queue != nullptr)
+-        wl_event_queue_destroy(q.queue);
+-    delete q.mutex;
++    m_eventThread->readAndDispatchEvents();
+ }
+ 
+-QWaylandDisplay::FrameQueue QWaylandDisplay::createFrameQueue()
++// We have to wait until we have an eventDispatcher before creating the eventThread,
++// otherwise forceRoundTrip() may block inside _events_read() because eventThread is
++// polling.
++void QWaylandDisplay::initEventThread()
+ {
+-    QWriteLocker locker(&m_frameQueueLock);
+-    FrameQueue q{createEventQueue()};
+-    mExternalQueues.append(q);
+-    return q;
+-}
++    m_eventThread.reset(
++            new EventThread(mDisplay, /* default queue */ nullptr, EventThread::EmitToDispatch));
++    connect(m_eventThread.get(), &EventThread::needReadAndDispatch, this,
++            &QWaylandDisplay::flushRequests, Qt::QueuedConnection);
++    m_eventThread->start();
+ 
+-wl_event_queue *QWaylandDisplay::createEventQueue()
+-{
+-    return wl_display_create_queue(mDisplay);
++    // wl_display_disconnect() free this.
++    m_frameEventQueue = wl_display_create_queue(mDisplay);
++    m_frameEventQueueThread.reset(
++            new EventThread(mDisplay, m_frameEventQueue, EventThread::SelfDispatch));
++    m_frameEventQueueThread->start();
+ }
+ 
+-void QWaylandDisplay::dispatchQueueWhile(wl_event_queue *queue, std::function<bool ()> condition, int timeout)
++void QWaylandDisplay::blockingReadEvents()
+ {
+-    if (!condition())
+-        return;
+-
+-    QElapsedTimer timer;
+-    timer.start();
+-    struct pollfd pFd = qt_make_pollfd(wl_display_get_fd(mDisplay), POLLIN);
+-    while (timeout == -1 || timer.elapsed() < timeout) {
+-        while (wl_display_prepare_read_queue(mDisplay, queue) != 0)
+-            wl_display_dispatch_queue_pending(mDisplay, queue);
+-
+-        wl_display_flush(mDisplay);
+-
+-        const int remaining = qMax(timeout - timer.elapsed(), 0ll);
+-        const int pollTimeout = timeout == -1 ? -1 : remaining;
+-        if (qt_poll_msecs(&pFd, 1, pollTimeout) > 0)
+-            wl_display_read_events(mDisplay);
+-        else
+-            wl_display_cancel_read(mDisplay);
+-
+-        if (wl_display_dispatch_queue_pending(mDisplay, queue) < 0)
+-            checkError();
+-
+-        if (!condition())
+-            break;
+-    }
++    if (wl_display_dispatch(mDisplay) < 0)
++        checkWaylandError(mDisplay);
+ }
+ 
+ QWaylandScreen *QWaylandDisplay::screenForOutput(struct wl_output *output) const
+@@ -678,6 +816,8 @@ QWaylandCursorTheme *QWaylandDisplay::loadCursorTheme(const QString &name, int p
+ 
+ } // namespace QtWaylandClient
+ 
++#include "qwaylanddisplay.moc"
++
+ QT_END_NAMESPACE
+ 
+ #include "moc_qwaylanddisplay_p.cpp"
+diff --git a/src/client/qwaylanddisplay_p.h b/src/client/qwaylanddisplay_p.h
+index 49820255..cf91b924 100644
+--- a/src/client/qwaylanddisplay_p.h
++++ b/src/client/qwaylanddisplay_p.h
+@@ -111,6 +111,7 @@ class QWaylandSurface;
+ class QWaylandShellIntegration;
+ class QWaylandCursor;
+ class QWaylandCursorTheme;
++class EventThread;
+ 
+ typedef void (*RegistryListener)(void *data,
+                                  struct wl_registry *registry,
+@@ -122,12 +123,6 @@ class Q_WAYLAND_CLIENT_EXPORT QWaylandDisplay : public QObject, public QtWayland
+     Q_OBJECT
+ 
+ public:
+-    struct FrameQueue {
+-        FrameQueue(wl_event_queue *q = nullptr) : queue(q), mutex(new QMutex) {}
+-        wl_event_queue *queue;
+-        QMutex *mutex;
+-    };
+-
+     QWaylandDisplay(QWaylandIntegration *waylandIntegration);
+     ~QWaylandDisplay(void) override;
+ 
+@@ -216,12 +211,11 @@ public:
+     void handleKeyboardFocusChanged(QWaylandInputDevice *inputDevice);
+     void handleWindowDestroyed(QWaylandWindow *window);
+ 
+-    wl_event_queue *createEventQueue();
+-    FrameQueue createFrameQueue();
+-    void destroyFrameQueue(const FrameQueue &q);
+-    void dispatchQueueWhile(wl_event_queue *queue, std::function<bool()> condition, int timeout = -1);
++    wl_event_queue *frameEventQueue() { return m_frameEventQueue; };
+ 
+     bool isKeyboardAvailable() const;
++
++    void initEventThread();
+ public slots:
+     void blockingReadEvents();
+     void flushRequests();
+@@ -244,6 +238,9 @@ private:
+     };
+ 
+     struct wl_display *mDisplay = nullptr;
++    QScopedPointer<EventThread> m_eventThread;
++    wl_event_queue *m_frameEventQueue = nullptr;
++    QScopedPointer<EventThread> m_frameEventQueueThread;
+     QtWayland::wl_compositor mCompositor;
+     QScopedPointer<QWaylandShm> mShm;
+     QList<QWaylandScreen *> mWaitingScreens;
+@@ -282,11 +279,9 @@ private:
+     QWaylandInputDevice *mLastInputDevice = nullptr;
+     QPointer<QWaylandWindow> mLastInputWindow;
+     QPointer<QWaylandWindow> mLastKeyboardFocus;
+-    QVector<QWaylandWindow *> mActiveWindows;
+-    QVector<FrameQueue> mExternalQueues;
++    QList<QWaylandWindow *> mActiveWindows;
+     struct wl_callback *mSyncCallback = nullptr;
+     static const wl_callback_listener syncCallbackListener;
+-    QReadWriteLock m_frameQueueLock;
+ 
+     bool mClientSideInputContextRequested = !QPlatformInputContextFactory::requested().isNull();
+ 
+diff --git a/src/client/qwaylandintegration.cpp b/src/client/qwaylandintegration.cpp
+index 661cea53..fbf00c6b 100644
+--- a/src/client/qwaylandintegration.cpp
++++ b/src/client/qwaylandintegration.cpp
+@@ -192,9 +192,7 @@ QAbstractEventDispatcher *QWaylandIntegration::createEventDispatcher() const
+ 
+ void QWaylandIntegration::initialize()
+ {
+-    int fd = wl_display_get_fd(mDisplay->wl_display());
+-    QSocketNotifier *sn = new QSocketNotifier(fd, QSocketNotifier::Read, mDisplay.data());
+-    QObject::connect(sn, SIGNAL(activated(QSocketDescriptor)), mDisplay.data(), SLOT(flushRequests()));
++    mDisplay->initEventThread();
+ 
+     // Call after eventDispatcher is fully connected, for QWaylandDisplay::forceRoundTrip()
+     mDisplay->initialize();
+diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
+index 41e56d24..a38f7d55 100644
+--- a/src/client/qwaylandwindow.cpp
++++ b/src/client/qwaylandwindow.cpp
+@@ -76,7 +76,6 @@ QWaylandWindow *QWaylandWindow::mMouseGrab = nullptr;
+ QWaylandWindow::QWaylandWindow(QWindow *window, QWaylandDisplay *display)
+     : QPlatformWindow(window)
+     , mDisplay(display)
+-    , mFrameQueue(mDisplay->createFrameQueue())
+     , mResizeAfterSwap(qEnvironmentVariableIsSet("QT_WAYLAND_RESIZE_AFTER_SWAP"))
+ {
+     {
+@@ -95,8 +94,6 @@ QWaylandWindow::QWaylandWindow(QWindow *window, QWaylandDisplay *display)
+ 
+ QWaylandWindow::~QWaylandWindow()
+ {
+-    mDisplay->destroyFrameQueue(mFrameQueue);
+-
+     delete mWindowDecoration;
+ 
+     if (mSurface)
+@@ -648,6 +645,8 @@ const wl_callback_listener QWaylandWindow::callbackListener = {
+ 
+ void QWaylandWindow::handleFrameCallback()
+ {
++    QMutexLocker locker(&mFrameSyncMutex);
++
+     mWaitingForFrameCallback = false;
+     mFrameCallbackElapsedTimer.invalidate();
+ 
+@@ -669,12 +668,16 @@ void QWaylandWindow::handleFrameCallback()
+         mWaitingForUpdateDelivery = true;
+         QMetaObject::invokeMethod(this, doHandleExpose, Qt::QueuedConnection);
+     }
++
++    mFrameSyncWait.notify_all();
+ }
+ 
+ bool QWaylandWindow::waitForFrameSync(int timeout)
+ {
+-    QMutexLocker locker(mFrameQueue.mutex);
+-    mDisplay->dispatchQueueWhile(mFrameQueue.queue, [&]() { return mWaitingForFrameCallback; }, timeout);
++    QMutexLocker locker(&mFrameSyncMutex);
++
++    QDeadlineTimer deadline(timeout);
++    while (mWaitingForFrameCallback && mFrameSyncWait.wait(&mFrameSyncMutex, deadline)) { }
+ 
+     if (mWaitingForFrameCallback) {
+         qCDebug(lcWaylandBackingstore) << "Didn't receive frame callback in time, window should now be inexposed";
+@@ -1186,8 +1189,11 @@ void QWaylandWindow::requestUpdate()
+     Q_ASSERT(hasPendingUpdateRequest()); // should be set by QPA
+ 
+     // If we have a frame callback all is good and will be taken care of there
+-    if (mWaitingForFrameCallback)
+-        return;
++    {
++        QMutexLocker locker(&mFrameSyncMutex);
++        if (mWaitingForFrameCallback)
++            return;
++    }
+ 
+     // If we've already called deliverUpdateRequest(), but haven't seen any attach+commit/swap yet
+     // This is a somewhat redundant behavior and might indicate a bug in the calling code, so log
+@@ -1200,7 +1206,12 @@ void QWaylandWindow::requestUpdate()
+     // so use invokeMethod to delay the delivery a bit.
+     QMetaObject::invokeMethod(this, [this] {
+         // Things might have changed in the meantime
+-        if (hasPendingUpdateRequest() && !mWaitingForFrameCallback)
++        {
++            QMutexLocker locker(&mFrameSyncMutex);
++            if (mWaitingForFrameCallback)
++                return;
++        }
++        if (hasPendingUpdateRequest())
+             deliverUpdateRequest();
+     }, Qt::QueuedConnection);
+ }
+@@ -1220,9 +1231,10 @@ void QWaylandWindow::handleUpdate()
+     if (!mSurface)
+         return;
+ 
+-    QMutexLocker locker(mFrameQueue.mutex);
++    QMutexLocker locker(&mFrameSyncMutex);
++
+     struct ::wl_surface *wrappedSurface = reinterpret_cast<struct ::wl_surface *>(wl_proxy_create_wrapper(mSurface->object()));
+-    wl_proxy_set_queue(reinterpret_cast<wl_proxy *>(wrappedSurface), mFrameQueue.queue);
++    wl_proxy_set_queue(reinterpret_cast<wl_proxy *>(wrappedSurface), mDisplay->frameEventQueue());
+     mFrameCallback = wl_surface_frame(wrappedSurface);
+     wl_proxy_wrapper_destroy(wrappedSurface);
+     wl_callback_add_listener(mFrameCallback, &QWaylandWindow::callbackListener, this);
+@@ -1232,6 +1244,8 @@ void QWaylandWindow::handleUpdate()
+     // Start a timer for handling the case when the compositor stops sending frame callbacks.
+     if (mFrameCallbackTimeout > 0) {
+         QMetaObject::invokeMethod(this, [this] {
++            QMutexLocker locker(&mFrameSyncMutex);
++
+             if (mWaitingForFrameCallback) {
+                 if (mFrameCallbackCheckIntervalTimerId < 0)
+                     mFrameCallbackCheckIntervalTimerId = startTimer(mFrameCallbackTimeout);
+diff --git a/src/client/qwaylandwindow_p.h b/src/client/qwaylandwindow_p.h
+index fb3ed606..54ac67a9 100644
+--- a/src/client/qwaylandwindow_p.h
++++ b/src/client/qwaylandwindow_p.h
+@@ -232,7 +232,7 @@ protected:
+     int mFrameCallbackCheckIntervalTimerId = -1;
+     QElapsedTimer mFrameCallbackElapsedTimer;
+     struct ::wl_callback *mFrameCallback = nullptr;
+-    QWaylandDisplay::FrameQueue mFrameQueue;
++    QMutex mFrameSyncMutex;
+     QWaitCondition mFrameSyncWait;
+ 
+     // True when we have called deliverRequestUpdate, but the client has not yet attached a new buffer
+-- 
+2.51.1
+

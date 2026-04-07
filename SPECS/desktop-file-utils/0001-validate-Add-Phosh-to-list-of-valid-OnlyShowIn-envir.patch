@@ -1,0 +1,34 @@
+From 673ec76e881b8dd7f710b846ae0418c09e6f5439 Mon Sep 17 00:00:00 2001
+From: Sam Day <me@samcday.com>
+Date: Fri, 31 Jan 2025 14:50:21 +0100
+Subject: [PATCH] validate: Add Phosh to list of valid OnlyShowIn= environments
+
+Signed-off-by: Sam Day <me@samcday.com>
+---
+ src/validate.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/validate.c b/src/validate.c
+index 3ccf866..89a17de 100644
+--- a/src/validate.c
++++ b/src/validate.c
+@@ -386,7 +386,7 @@ static DesktopKeyDefinition registered_action_keys[] = {
+ 
+ /* This should be the same list as in xdg-specs/menu/menu-spec.xml */
+ static const char *show_in_registered[] = {
+-    "COSMIC", "GNOME", "GNOME-Classic", "GNOME-Flashback", "KDE", "LXDE", "LXQt", "MATE", "Razor", "ROX", "TDE", "Unity", "XFCE", "EDE", "Cinnamon", "Pantheon", "Budgie", "Enlightenment", "DDE", "Endless", "Old"
++    "COSMIC", "GNOME", "GNOME-Classic", "GNOME-Flashback", "KDE", "LXDE", "LXQt", "MATE", "Phosh", "Razor", "ROX", "TDE", "Unity", "XFCE", "EDE", "Cinnamon", "Pantheon", "Budgie", "Enlightenment", "DDE", "Endless", "Old"
+ };
+ 
+ static struct {
+@@ -543,6 +543,7 @@ static struct {
+   { "COSMIC",                 FALSE, FALSE, FALSE, { NULL }, { NULL } },
+   { "KDE",                    FALSE, FALSE, FALSE, { NULL }, { "Qt", NULL } },
+   { "GNOME",                  FALSE, FALSE, FALSE, { NULL }, { "GTK", NULL } },
++  { "Phosh",                  FALSE, FALSE, FALSE, { NULL }, { "GTK", NULL } },
+   { "XFCE",                   FALSE, FALSE, FALSE, { NULL }, { "GTK", NULL } },
+   { "DDE",                    FALSE, FALSE, FALSE, { NULL }, { "Qt", NULL } },
+   { "LXQt",                   FALSE, FALSE, FALSE, { NULL }, { "Qt", NULL } },
+-- 
+2.47.1
+

@@ -1,0 +1,10 @@
+# uncomment following line to skip anchor refresh before unbound start
+#DISABLE_UNBOUND_ANCHOR=yes
+# Better way is systemctl mask unbound-anchor.service
+UNBOUND_ANCHOR_OPTIONS="-f /etc/resolv.conf -R"
+
+# for extra debug, add "-v -v" or change verbosity: in unbound.conf
+UNBOUND_OPTIONS=""
+
+# Uncoment to validate SHA1 in any crypto policy
+# OPENSSL_CONF=/etc/unbound/openssl-sha1.conf

@@ -1,0 +1,28 @@
+From aa81d37f98c3322d535a7d0c8dd093870f0fb5ef Mon Sep 17 00:00:00 2001
+From: Jelle Zijlstra <jelle.zijlstra@gmail.com>
+Date: Thu, 18 Sep 2025 21:03:16 -0700
+Subject: [PATCH] fix test on 3.14
+
+---
+ src/test_typing_extensions.py | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/src/test_typing_extensions.py b/src/test_typing_extensions.py
+index 27f4059c..f07e1eb0 100644
+--- a/src/test_typing_extensions.py
++++ b/src/test_typing_extensions.py
+@@ -4508,8 +4508,12 @@ def _make_td(future, class_name, annos, base, extra_names=None):
+                     child = _make_td(
+                         child_future, "Child", {"child": "int"}, "Base", {"Base": base}
+                     )
+-                    base_anno = typing.ForwardRef("int", module="builtins") if base_future else int
+-                    child_anno = typing.ForwardRef("int", module="builtins") if child_future else int
++                    if sys.version_info >= (3, 14):
++                        base_anno = typing.ForwardRef("int", module="builtins", owner=base) if base_future else int
++                        child_anno = typing.ForwardRef("int", module="builtins", owner=child) if child_future else int
++                    else:
++                        base_anno = typing.ForwardRef("int", module="builtins") if base_future else int
++                        child_anno = typing.ForwardRef("int", module="builtins") if child_future else int
+                     self.assertEqual(base.__annotations__, {'base': base_anno})
+                     self.assertEqual(
+                         child.__annotations__, {'child': child_anno, 'base': base_anno}

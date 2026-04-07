@@ -1,0 +1,30 @@
+From 3500caaa55383393c64a7f46008bcf23eece2c8e Mon Sep 17 00:00:00 2001
+From: Mamoru TASAKA <mtasaka@fedoraproject.org>
+Date: Mon, 20 Nov 2023 23:39:29 +0900
+Subject: [PATCH] TEST: relax method invocation checking for KernelRequireTest
+
+With ruby3.3.0dev, "require" method may invoke :to_str or :to_path
+more than once in ruby internal. To rescue this, relax
+method invocation checking for KernelRequireTest.
+
+Closes #459 .
+---
+ test/load_path_cache/core_ext/kernel_require_test.rb | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/test/load_path_cache/core_ext/kernel_require_test.rb b/test/load_path_cache/core_ext/kernel_require_test.rb
+index 1a07725..8b212d6 100644
+--- a/test/load_path_cache/core_ext/kernel_require_test.rb
++++ b/test/load_path_cache/core_ext/kernel_require_test.rb
+@@ -17,9 +17,9 @@ def test_uses_the_same_duck_type_as_require
+           $LOAD_PATH.push(dir)
+           FileUtils.touch("#{dir}/a.rb")
+           stringish = mock
+-          stringish.expects(:to_str).returns("a").twice # bootsnap + ruby
++          stringish.expects(:to_str).returns("a").at_least(2) # bootsnap + ruby
+           pathish = mock
+-          pathish.expects(:to_path).returns(stringish).twice # bootsnap + ruby
++          pathish.expects(:to_path).returns(stringish).at_least(2) # bootsnap + ruby
+           assert pathish.respond_to?(:to_path)
+           require(pathish)
+           FileUtils.rm_rf(dir)

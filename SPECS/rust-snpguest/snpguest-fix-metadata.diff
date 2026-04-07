@@ -1,0 +1,47 @@
+--- snpguest-0.9.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ snpguest-0.9.2/Cargo.toml	2026-01-30T21:10:23.983090+00:00
+@@ -49,7 +49,7 @@
+ version = "1.0.69"
+ 
+ [dependencies.asn1-rs]
+-version = "=0.6.2"
++version = ">=0.6.2,<0.8"
+ 
+ [dependencies.base64]
+ version = "0.22.1"
+@@ -79,18 +79,14 @@
+ [dependencies.msru]
+ version = "0.2.0"
+ 
+-[dependencies.nix]
+-version = "^0.23"
+-
+ [dependencies.openssl]
+ version = "^0.10"
+-features = ["vendored"]
+ 
+ [dependencies.rand]
+ version = "0.8.5"
+ 
+ [dependencies.reqwest]
+-version = "=0.11.10"
++version = "0.11.10"
+ features = ["blocking"]
+ 
+ [dependencies.serde]
+@@ -98,7 +94,7 @@
+ features = ["derive"]
+ 
+ [dependencies.sev]
+-version = "=6.3.0"
++version = "6.3.0"
+ features = [
+     "openssl",
+     "snp",
+@@ -110,5 +106,5 @@
+ optional = true
+ 
+ [dependencies.x509-parser]
+-version = "=0.16.0"
++version = ">=0.16.0,<0.19.0"
+ features = ["verify"]

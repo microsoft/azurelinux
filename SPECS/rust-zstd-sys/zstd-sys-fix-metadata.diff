@@ -1,0 +1,44 @@
+--- zstd-sys-2.0.16+zstd.1.5.7/Cargo.toml	1970-01-01T00:00:01+00:00
++++ zstd-sys-2.0.16+zstd.1.5.7/Cargo.toml	2025-10-25T22:55:23.591583+00:00
+@@ -17,20 +17,11 @@
+ authors = ["Alexandre Bury <alexandre.bury@gmail.com>"]
+ build = "build.rs"
+ links = "zstd"
+-include = [
+-    "/LICENSE*",
+-    "!/*.sh",
+-    "/build.rs",
+-    "/*.h",
+-    "/src/",
+-    "/wasm-shim/**/*.h",
+-    "/zstd/LICENSE",
+-    "/zstd/COPYING",
+-    "/zstd/lib/**/*.c",
+-    "/zstd/lib/**/*.h",
+-    "/zstd/lib/**/*.S",
+-    "/zstd/contrib/seekable_format/*.c",
+-    "/zstd/contrib/seekable_format/*.h",
++exclude = [
++    "/test_it.sh",
++    "/update_bindings.sh",
++    "/update_zstd.sh",
++    "/wasm-shim/",
+ ]
+ autolib = false
+ autobins = false
+@@ -55,6 +46,7 @@
+ features = ["experimental"]
+ 
+ [features]
++bindgen = []
+ debug = []
+ default = [
+     "legacy",
+@@ -83,7 +75,6 @@
+ [build-dependencies.bindgen]
+ version = "0.72"
+ features = ["runtime"]
+-optional = true
+ default-features = false
+ 
+ [build-dependencies.cc]

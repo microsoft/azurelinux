@@ -1,0 +1,31 @@
+--- test-case-3.3.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ test-case-3.3.1/Cargo.toml	2025-01-20T17:42:48.340781+00:00
+@@ -19,7 +19,7 @@
+     "Wojciech Polak <frondeus@gmail.com>",
+     "Łukasz Biel <lukasz.p.biel@gmail.com>",
+ ]
+-exclude = ["tests/snapshots/**/*"]
++exclude = ["tests/snapshots/**/*", "/scripts", "README.tpl"]
+ description = "Provides #[test_case(...)] procedural macro attribute for generating parametrized test cases easily"
+ documentation = "https://docs.rs/test-case"
+ readme = "README.md"
+@@ -41,10 +41,6 @@
+ path = "src/lib.rs"
+ doctest = false
+ 
+-[[test]]
+-name = "acceptance"
+-path = "tests/acceptance_tests.rs"
+-
+ [dependencies.regex]
+ version = "1.5"
+ optional = true
+@@ -57,7 +53,7 @@
+ version = "1.12"
+ 
+ [dev-dependencies.itertools]
+-version = "0.11"
++version = ">=0.11, <0.15"
+ 
+ [dev-dependencies.regex]
+ version = "1.5"

@@ -1,0 +1,24 @@
+From f6334d9d32437ef13dc902f0a88a2be0063d9d1c Mon Sep 17 00:00:00 2001
+From: Marcus Meissner <marcus@jet.franken.de>
+Date: Thu, 25 Feb 2021 08:31:53 +0100
+Subject: [PATCH] added empty strign check, which would lead to NULL ptr
+ deref/crash in exif XML display. fixes
+ https://github.com/libexif/exif/issues/4
+
+---
+ exif/actions.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/exif/actions.c b/exif/actions.c
+index ed245df..123c064 100644
+--- a/exif/actions.c
++++ b/exif/actions.c
+@@ -661,6 +661,8 @@ escape_xml(const char *text)
+ 	char *out;
+ 	size_t len;
+ 
++	if (!strlen(text)) return "empty string";
++
+ 	for (out=escaped, len=0; *text; ++len, ++out, ++text) {
+ 		/* Make sure there's plenty of room for a quoted character */
+ 		if ((len + 8) > escaped_size) {

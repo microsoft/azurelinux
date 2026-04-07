@@ -1,0 +1,12 @@
+diff -Naur zip-2.1.4-original/src/read.rs zip-2.1.4/src/read.rs
+--- zip-2.1.4-original/src/read.rs	2006-07-23 21:21:28.000000000 -0400
++++ zip-2.1.4/src/read.rs	2025-03-13 14:43:54.173101323 -0400
+@@ -2170,6 +2170,8 @@
+ 
+     #[test]
+     #[cfg(feature = "_deflate-any")]
++    // Downstream patch: we do not include the test file needed for this test.
++    #[cfg(any())]
+     fn test_utf8_extra_field() {
+         let mut v = Vec::new();
+         v.extend_from_slice(include_bytes!("../tests/data/chinese.zip"));

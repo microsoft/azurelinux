@@ -1,0 +1,195 @@
+From 005bd4eea7a749b853f959900ecc2cc870579546 Mon Sep 17 00:00:00 2001
+From: Marc Mueller <30130371+cdce8p@users.noreply.github.com>
+Date: Tue, 20 May 2025 13:53:45 +0200
+Subject: [PATCH 1/2] Initial fixes for Python 3.14
+
+---
+ astroid/brain/brain_pathlib.py |  4 ++--
+ astroid/brain/brain_typing.py  | 19 +++++++++++++------
+ astroid/const.py               |  2 ++
+ tests/brain/test_brain.py      |  6 +++++-
+ tests/brain/test_pathlib.py    |  6 +++---
+ tests/test_inference.py        | 10 +++++++---
+ 6 files changed, 32 insertions(+), 15 deletions(-)
+
+diff --git a/astroid/brain/brain_pathlib.py b/astroid/brain/brain_pathlib.py
+index d0f5313..186a0c4 100644
+--- a/astroid/brain/brain_pathlib.py
++++ b/astroid/brain/brain_pathlib.py
+@@ -8,7 +8,7 @@ from collections.abc import Iterator
+ 
+ from astroid import bases, context, inference_tip, nodes
+ from astroid.builder import _extract_single_node
+-from astroid.const import PY313_PLUS
++from astroid.const import PY313
+ from astroid.exceptions import InferenceError, UseInferenceDefault
+ from astroid.manager import AstroidManager
+ 
+@@ -28,7 +28,7 @@ def _looks_like_parents_subscript(node: nodes.Subscript) -> bool:
+         value = next(node.value.infer())
+     except (InferenceError, StopIteration):
+         return False
+-    parents = "builtins.tuple" if PY313_PLUS else "pathlib._PathParents"
++    parents = "builtins.tuple" if PY313 else "pathlib._PathParents"
+     return (
+         isinstance(value, bases.Instance)
+         and isinstance(value._proxied, nodes.ClassDef)
+diff --git a/astroid/brain/brain_typing.py b/astroid/brain/brain_typing.py
+index 5e3a0c9..667dc08 100644
+--- a/astroid/brain/brain_typing.py
++++ b/astroid/brain/brain_typing.py
+@@ -15,7 +15,7 @@ from typing import Final
+ from astroid import context, extract_node, inference_tip
+ from astroid.brain.helpers import register_module_extender
+ from astroid.builder import AstroidBuilder, _extract_single_node
+-from astroid.const import PY312_PLUS, PY313_PLUS
++from astroid.const import PY312_PLUS, PY313_PLUS, PY314_PLUS
+ from astroid.exceptions import (
+     AstroidSyntaxError,
+     AttributeInferenceError,
+@@ -77,7 +77,7 @@ TYPING_ALIAS = frozenset(
+         "typing.MutableMapping",
+         "typing.Sequence",
+         "typing.MutableSequence",
+-        "typing.ByteString",
++        "typing.ByteString",  # removed in 3.14
+         "typing.Tuple",
+         "typing.List",
+         "typing.Deque",
+@@ -429,9 +429,8 @@ def infer_typing_cast(
+ 
+ 
+ def _typing_transform():
+-    return AstroidBuilder(AstroidManager()).string_build(
+-        textwrap.dedent(
+-            """
++    code = textwrap.dedent(
++        """
+     class Generic:
+         @classmethod
+         def __class_getitem__(cls, item):  return cls
+@@ -465,8 +464,16 @@ def _typing_transform():
+         @classmethod
+         def __class_getitem__(cls, item):  return cls
+     """
+-        )
+     )
++    if PY314_PLUS:
++        code += textwrap.dedent(
++            """
++    class Union:
++        @classmethod
++        def __class_getitem__(cls, item): return cls
++    """
++        )
++    return AstroidBuilder(AstroidManager()).string_build(code)
+ 
+ 
+ def register(manager: AstroidManager) -> None:
+diff --git a/astroid/const.py b/astroid/const.py
+index c010818..0bc98c2 100644
+--- a/astroid/const.py
++++ b/astroid/const.py
+@@ -8,7 +8,9 @@ import sys
+ PY310_PLUS = sys.version_info >= (3, 10)
+ PY311_PLUS = sys.version_info >= (3, 11)
+ PY312_PLUS = sys.version_info >= (3, 12)
++PY313 = sys.version_info[:2] == (3, 13)
+ PY313_PLUS = sys.version_info >= (3, 13)
++PY314_PLUS = sys.version_info >= (3, 14)
+ 
+ WIN32 = sys.platform == "win32"
+ 
+diff --git a/tests/brain/test_brain.py b/tests/brain/test_brain.py
+index bec2cf2..0b082ab 100644
+--- a/tests/brain/test_brain.py
++++ b/tests/brain/test_brain.py
+@@ -15,7 +15,7 @@ import astroid
+ from astroid import MANAGER, builder, nodes, objects, test_utils, util
+ from astroid.bases import Instance
+ from astroid.brain.brain_namedtuple_enum import _get_namedtuple_fields
+-from astroid.const import PY312_PLUS, PY313_PLUS
++from astroid.const import PY312_PLUS, PY313_PLUS, PY314_PLUS
+ from astroid.exceptions import (
+     AttributeInferenceError,
+     InferenceError,
+@@ -335,6 +335,9 @@ class CollectionsBrain(unittest.TestCase):
+         with self.assertRaises(InferenceError):
+             next(node.infer())
+ 
++    @pytest.mark.skipif(
++        PY314_PLUS, reason="collections.abc.ByteString was removed in 3.14"
++    )
+     def test_collections_object_subscriptable_3(self):
+         """With Python 3.9 the ByteString class of the collections module is subscriptable
+         (but not the same class from typing module)"""
+@@ -918,6 +921,7 @@ class TypingBrain(unittest.TestCase):
+             ],
+         )
+ 
++    @pytest.mark.skipif(PY314_PLUS, reason="typing.ByteString was removed in 3.14")
+     def test_typing_object_notsubscriptable_3(self):
+         """Until python39 ByteString class of the typing module is not
+         subscriptable (whereas it is in the collections' module)"""
+diff --git a/tests/brain/test_pathlib.py b/tests/brain/test_pathlib.py
+index 5aea8d3..b97b3e7 100644
+--- a/tests/brain/test_pathlib.py
++++ b/tests/brain/test_pathlib.py
+@@ -5,7 +5,7 @@
+ 
+ import astroid
+ from astroid import bases
+-from astroid.const import PY310_PLUS, PY313_PLUS
++from astroid.const import PY310_PLUS, PY313
+ from astroid.util import Uninferable
+ 
+ 
+@@ -23,7 +23,7 @@ def test_inference_parents() -> None:
+     inferred = name_node.inferred()
+     assert len(inferred) == 1
+     assert isinstance(inferred[0], bases.Instance)
+-    if PY313_PLUS:
++    if PY313:
+         assert inferred[0].qname() == "builtins.tuple"
+     else:
+         assert inferred[0].qname() == "pathlib._PathParents"
+@@ -43,7 +43,7 @@ def test_inference_parents_subscript_index() -> None:
+     inferred = path.inferred()
+     assert len(inferred) == 1
+     assert isinstance(inferred[0], bases.Instance)
+-    if PY313_PLUS:
++    if PY313:
+         assert inferred[0].qname() == "pathlib._local.Path"
+     else:
+         assert inferred[0].qname() == "pathlib.Path"
+diff --git a/tests/test_inference.py b/tests/test_inference.py
+index acc8a2b..f1e7192 100644
+--- a/tests/test_inference.py
++++ b/tests/test_inference.py
+@@ -34,7 +34,7 @@ from astroid import decorators as decoratorsmod
+ from astroid.arguments import CallSite
+ from astroid.bases import BoundMethod, Generator, Instance, UnboundMethod, UnionType
+ from astroid.builder import AstroidBuilder, _extract_single_node, extract_node, parse
+-from astroid.const import IS_PYPY, PY310_PLUS, PY312_PLUS
++from astroid.const import IS_PYPY, PY310_PLUS, PY312_PLUS, PY314_PLUS
+ from astroid.context import CallContext, InferenceContext
+ from astroid.exceptions import (
+     AstroidTypeError,
+@@ -1306,8 +1306,12 @@ class InferenceTest(resources.SysPathSetup, unittest.TestCase):
+             assert i0.bool_value() is True
+             assert i0.pytype() == "types.UnionType"
+             assert i0.display_type() == "UnionType"
+-            assert str(i0) == "UnionType(UnionType)"
+-            assert repr(i0) == f"<UnionType(UnionType) l.0 at 0x{id(i0)}>"
++            if PY314_PLUS:
++                assert str(i0) == "UnionType(Union)"
++                assert repr(i0) == f"<UnionType(Union) l.0 at 0x{id(i0)}>"
++            else:
++                assert str(i0) == "UnionType(UnionType)"
++                assert repr(i0) == f"<UnionType(UnionType) l.0 at 0x{id(i0)}>"
+ 
+             i1 = ast_nodes[1].inferred()[0]
+             assert isinstance(i1, UnionType)
+-- 
+2.49.0
+

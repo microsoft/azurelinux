@@ -1,0 +1,11 @@
+--- blake3-1.8.3/Cargo.toml	1970-01-01T00:00:01+00:00
++++ blake3-1.8.3/Cargo.toml	2026-01-08T20:42:12.662459+00:00
+@@ -26,7 +26,7 @@
+ description = "the BLAKE3 hash function"
+ documentation = "https://docs.rs/blake3"
+ readme = "README.md"
+-license = "CC0-1.0 OR Apache-2.0 OR Apache-2.0 WITH LLVM-exception"
++license = "Apache-2.0 OR Apache-2.0 WITH LLVM-exception"
+ repository = "https://github.com/BLAKE3-team/BLAKE3"
+ 
+ [package.metadata.docs.rs]

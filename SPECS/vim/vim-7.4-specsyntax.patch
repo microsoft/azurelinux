@@ -1,0 +1,21 @@
+diff -up vim91/runtime/syntax/spec.vim.spec-syntax vim91/runtime/syntax/spec.vim
+--- vim91/runtime/syntax/spec.vim.spec-syntax	2025-11-14 07:38:27.000000000 +0100
++++ vim91/runtime/syntax/spec.vim	2025-11-14 07:52:56.081212607 +0100
+@@ -38,7 +38,7 @@ syn match specNoNumberHilite 'X11\|X11R6
+ syn match specManpageFile '[a-zA-Z]\.1'
+ 
+ "Day, Month and most used license acronyms
+-syn keyword specLicense contained GPL LGPL BSD MIT GNU
++syn keyword specLicense contained GPL LGPL BSD MIT GNU distributable
+ syn keyword specWeekday contained Mon Tue Wed Thu Fri Sat Sun
+ syn keyword specMonth   contained Jan Feb Mar Apr Jun Jul Aug Sep Oct Nov Dec
+ syn keyword specMonth   contained January February March April May June July August September October November December
+@@ -105,7 +105,7 @@ syn case ignore
+ "%% PreAmble Section %%
+ "Copyright and Serial were deprecated by License and Epoch
+ syn region specPreAmbleDeprecated oneline matchgroup=specError start='^\(Copyright\|Serial\)' end='$' contains=specEmail,specURL,specURLMacro,specLicense,specColon,specVariables,specSpecialChar,specMacroIdentifier
+-syn region specPreAmble oneline matchgroup=specCommand start='^\(Prereq\|Summary\|Name\|Version\|Packager\|Requires\|Recommends\|Suggests\|Supplements\|Enhances\|Icon\|URL\|SourceLicense\|Source\d*\|Patch\d*\|Prefix\|Packager\|Group\|License\|Release\|BuildRoot\|Distribution\|DistTag\|Vendor\|Provides\|ExclusiveArch\|ExcludeArch\|ExclusiveOS\|Obsoletes\|BuildArch\|BuildArchitectures\|BuildRequires\|BuildConflicts\|BuildPreReq\|Conflicts\|AutoRequires\|AutoReq\|AutoReqProv\|AutoProv\|Epoch\|ModularityLabel\)' end='$' contains=specEmail,specURL,specURLMacro,specLicense,specColon,specVariables,specSpecialChar,specMacroIdentifier
++syn region specPreAmble oneline matchgroup=specCommand start='^\(Prereq\|Summary\|Name\|Version\|Packager\|Requires\|Recommends\|Suggests\|Supplements\|Enhances\|Icon\|URL\|SourceLicense\|Source\d*\|Patch\d*\|Prefix\|Packager\|Group\|License\|Release\|BuildRoot\|Distribution\|DistTag\|Vendor\|Provides\|ExclusiveArch\|ExcludeArch\|ExcludeOS\|ExclusiveOS\|Obsoletes\|BuildArch\|BuildArchitectures\|BuildRequires\|BuildConflicts\|BuildPreReq\|Conflicts\|AutoRequires\|AutoReq\|AutoReqProv\|AutoProv\|Epoch\|ModularityLabel\)' end='$' contains=specEmail,specURL,specURLMacro,specLicense,specColon,specVariables,specSpecialChar,specMacroIdentifier
+ 
+ "%% Description Section %%
+ syn region specDescriptionArea matchgroup=specSection start='^%description' end='^%'me=e-1 contains=specDescriptionOpts,specEmail,specURL,specNumber,specMacroIdentifier,specComment

@@ -1,0 +1,46 @@
+From 29fa42cee0f12333b9aae7841ef9606ab18f8a4c Mon Sep 17 00:00:00 2001
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 8 Dec 2025 10:28:50 +0100
+Subject: [PATCH 24/24] BaseTools/EfiRom: fix compiler warning
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+New warning after updating gcc:
+
+EfiRom.c: In function ‘main’:
+EfiRom.c:78:17: error: assignment discards ‘const’ qualifier from pointer target type [-Werror=discarded-qualifiers]
+
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ BaseTools/Source/C/EfiRom/EfiRom.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/BaseTools/Source/C/EfiRom/EfiRom.c b/BaseTools/Source/C/EfiRom/EfiRom.c
+index fa7bf0e62e6d..a8d1d7953453 100644
+--- a/BaseTools/Source/C/EfiRom/EfiRom.c
++++ b/BaseTools/Source/C/EfiRom/EfiRom.c
+@@ -38,13 +38,13 @@ Routine Description:
+ 
+ --*/
+ {
+-  CHAR8     *Ext;
+-  FILE      *FptrOut;
+-  UINT32    Status;
+-  FILE_LIST *FList;
+-  UINT32    TotalSize;
+-  UINT32    Size;
+-  CHAR8     *Ptr0;
++  CHAR8       *Ext;
++  FILE        *FptrOut;
++  UINT32      Status;
++  FILE_LIST   *FList;
++  UINT32      TotalSize;
++  UINT32      Size;
++  CONST CHAR8 *Ptr0;
+ 
+   SetUtilityName(UTILITY_NAME);
+ 
+-- 
+2.52.0
+

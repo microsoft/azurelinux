@@ -1,0 +1,154 @@
+From ff20adba57602ad3ae936eff6718f354d7352f1d Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Thu, 12 May 2022 14:53:08 +0200
+Subject: [PATCH] Upgrade to 1.64
+
+---
+ lib/threads/shared.pm |  4 +--
+ shared.xs             | 23 +++++++-------
+ t/pod.t               | 70 -------------------------------------------
+ 3 files changed, 13 insertions(+), 84 deletions(-)
+ delete mode 100644 t/pod.t
+
+diff --git a/lib/threads/shared.pm b/lib/threads/shared.pm
+index 3674d83..1fd2899 100644
+--- a/lib/threads/shared.pm
++++ b/lib/threads/shared.pm
+@@ -8,7 +8,7 @@ use Config;
+ 
+ use Scalar::Util qw(reftype refaddr blessed);
+ 
+-our $VERSION = '1.62'; # Please update the pod, too.
++our $VERSION = '1.64'; # Please update the pod, too.
+ my $XS_VERSION = $VERSION;
+ $VERSION = eval $VERSION;
+ 
+@@ -196,7 +196,7 @@ threads::shared - Perl extension for sharing data structures between threads
+ 
+ =head1 VERSION
+ 
+-This document describes threads::shared version 1.62
++This document describes threads::shared version 1.64
+ 
+ =head1 SYNOPSIS
+ 
+diff --git a/shared.xs b/shared.xs
+index 4931a61..6a7f03c 100644
+--- a/shared.xs
++++ b/shared.xs
+@@ -824,10 +824,7 @@ sharedsv_scalar_store(pTHX_ SV *sv, SV *ssv)
+              * that any previous contents of ssv are correctly freed
+              * by sv_setsv(). Not sure if there is a better, API-legal way
+              * to achieve this */
+-            tmpref = newSV_type(SVt_RV);
+-            SvRV_set(tmpref, sobj);
+-            SvROK_on(tmpref);
+-            SvREFCNT_inc_simple_NN(sobj);
++            tmpref = newRV_inc(sobj);
+             sv_setsv_nomg(ssv, tmpref);
+             SvREFCNT_dec_NN(tmpref);
+ 
+@@ -1296,14 +1293,16 @@ static void
+ Perl_sharedsv_init(pTHX)
+ {
+     dTHXc;
+-    PL_sharedsv_space = perl_alloc();
+-    perl_construct(PL_sharedsv_space);
+-    /* The pair above leaves us in shared context (what dTHX would get),
+-     * but aTHX still points to caller context */
+-    aTHX = PL_sharedsv_space;
+-    LEAVE; /* This balances the ENTER at the end of perl_construct.  */
+-    PERL_SET_CONTEXT((aTHX = caller_perl));
+-    recursive_lock_init(aTHX_ &PL_sharedsv_lock);
++    if (!PL_sharedsv_space) {
++        PL_sharedsv_space = perl_alloc();
++        perl_construct(PL_sharedsv_space);
++        /* The pair above leaves us in shared context (what dTHX would get),
++         * but aTHX still points to caller context */
++        aTHX = PL_sharedsv_space;
++        LEAVE; /* This balances the ENTER at the end of perl_construct.  */
++        PERL_SET_CONTEXT((aTHX = caller_perl));
++        recursive_lock_init(aTHX_ &PL_sharedsv_lock);
++    }
+     PL_lockhook = &Perl_sharedsv_locksv;
+     PL_sharehook = &Perl_sharedsv_share;
+ #ifdef PL_destroyhook
+diff --git a/t/pod.t b/t/pod.t
+deleted file mode 100644
+index 5d0cb42..0000000
+--- a/t/pod.t
++++ /dev/null
+@@ -1,70 +0,0 @@
+-use strict;
+-use warnings;
+-
+-use Test::More;
+-if ($ENV{RUN_MAINTAINER_TESTS}) {
+-    plan 'tests' => 3;
+-} else {
+-    plan 'skip_all' => 'Module maintainer tests';
+-}
+-
+-SKIP: {
+-    if (! eval 'use Test::Pod 1.26; 1') {
+-        skip('Test::Pod 1.26 required for testing POD', 1);
+-    }
+-
+-    pod_file_ok('lib/threads/shared.pm');
+-}
+-
+-SKIP: {
+-    if (! eval 'use Test::Pod::Coverage 1.08; 1') {
+-        skip('Test::Pod::Coverage 1.08 required for testing POD coverage', 1);
+-    }
+-
+-    pod_coverage_ok('threads::shared',
+-                    {
+-                        'trustme' => [
+-                        ],
+-                        'private' => [
+-                            qr/^import$/,
+-                        ]
+-                    }
+-    );
+-}
+-
+-SKIP: {
+-    if (! eval 'use Test::Spelling; 1') {
+-        skip('Test::Spelling required for testing POD spelling', 1);
+-    }
+-    if (system('aspell help >/dev/null 2>&1')) {
+-        skip("'aspell' required for testing POD spelling", 1);
+-    }
+-    set_spell_cmd('aspell list --lang=en');
+-    add_stopwords(<DATA>);
+-    pod_file_spelling_ok('lib/threads/shared.pm', 'shared.pm spelling');
+-    unlink("/home/$ENV{'USER'}/en.prepl", "/home/$ENV{'USER'}/en.pws");
+-}
+-
+-exit(0);
+-
+-__DATA__
+-
+-Artur
+-Hedden
+-
+-cpan
+-CPAN
+-CONDVAR
+-LOCKVAR
+-refcnt
+-variable's
+-destructor
+-destructors
+-Destructors
+-
+-perlfunc
+-dualvar
+-SV
+-
+-MetaCPAN
+-__END__
+-- 
+2.34.3
+

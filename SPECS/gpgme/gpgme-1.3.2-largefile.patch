@@ -1,0 +1,24 @@
+diff -up gpgme-1.3.2/src/gpgme-config.in.largefile gpgme-1.3.2/src/gpgme-config.in
+--- gpgme-1.3.2/src/gpgme-config.in.largefile	2012-09-26 10:10:37.882744198 +0200
++++ gpgme-1.3.2/src/gpgme-config.in	2012-09-26 10:16:02.558762827 +0200
+@@ -41,6 +41,10 @@ cflags_pthread=""
+ cflags_glib="@GLIB_CFLAGS@"
+ with_glib=
+ 
++if test "0@NEED__FILE_OFFSET_BITS@" -gt "0" ; then
++    cflags_lfs="-D_FILE_OFFSET_BITS=@NEED__FILE_OFFSET_BITS@"
++fi
++
+ output=""
+ 
+ usage()
+@@ -105,6 +109,9 @@ while test $# -gt 0; do
+ 	    exit 0
+ 	    ;;
+         --cflags)
++	    if test "x$cflags_lfs" != "x"; then
++		output="$output $cflags_lfs"
++	    fi
+             result=
+             tmp_c=
+             tmp_g=

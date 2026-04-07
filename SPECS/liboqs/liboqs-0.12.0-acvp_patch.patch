@@ -1,0 +1,47 @@
+diff -up liboqs-0.12.0/tests/test_acvp_vectors.py.xxx liboqs-0.12.0/tests/test_acvp_vectors.py
+--- liboqs-0.12.0/tests/test_acvp_vectors.py.xxx	2025-01-02 12:42:53.623845023 +0100
++++ liboqs-0.12.0/tests/test_acvp_vectors.py	2025-01-02 12:44:42.340435783 +0100
+@@ -121,8 +121,9 @@ def test_acvp_vec_sig_keygen(sig_name):
+                     pk = testCase["pk"]
+                     sk = testCase["sk"]
+                     
++                    build_dir = helpers.get_current_build_dir_name()
+                     helpers.run_subprocess(
+-                        ['build/tests/vectors_sig', sig_name, "keyGen", seed, pk, sk]
++                        [f'{build_dir}/tests/vectors_sig', sig_name, "keyGen", seed, pk, sk]
+                     )
+ 
+         assert(variantFound == True)
+@@ -146,8 +147,9 @@ def test_acvp_vec_sig_gen_deterministic(
+                     sk = testCase["sk"]
+                     message = testCase["message"]
+                     signature = testCase["signature"]
++                    build_dir = helpers.get_current_build_dir_name()
+                     helpers.run_subprocess(
+-                        ['build/tests/vectors_sig', sig_name, "sigGen_det", sk, message, signature]
++                        [f'{build_dir}/tests/vectors_sig', sig_name, "sigGen_det", sk, message, signature]
+                     )
+ 
+         assert(variantFound == True)
+@@ -173,8 +175,9 @@ def test_acvp_vec_sig_gen_randomized(sig
+                     signature = testCase["signature"]
+                     rnd = testCase["rnd"]
+                     
++                    build_dir = helpers.get_current_build_dir_name()
+                     helpers.run_subprocess(
+-                        ['build/tests/vectors_sig', sig_name, "sigGen_rnd", sk, message, signature, rnd]
++                        [f'{build_dir}/tests/vectors_sig', sig_name, "sigGen_rnd", sk, message, signature, rnd]
+                     )
+ 
+         assert(variantFound == True)
+@@ -200,8 +203,9 @@ def test_acvp_vec_sig_ver(sig_name):
+                     signature = testCase["signature"]
+                     testPassed = "1" if testCase["testPassed"] else "0"
+                     
++                    build_dir = helpers.get_current_build_dir_name()
+                     helpers.run_subprocess(
+-                        ['build/tests/vectors_sig', sig_name, "sigVer", pk, message, signature, testPassed]
++                        [f'{build_dir}/tests/vectors_sig', sig_name, "sigVer", pk, message, signature, testPassed]
+                     )
+ 
+         assert(variantFound == True)

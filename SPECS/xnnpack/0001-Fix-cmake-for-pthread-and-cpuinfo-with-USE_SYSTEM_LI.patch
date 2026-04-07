@@ -1,0 +1,64 @@
+From 38e76639a8a0064acb96805986ae2f9ab23e1161 Mon Sep 17 00:00:00 2001
+From: Tom Rix <trix@redhat.com>
+Date: Fri, 8 Mar 2024 08:41:44 -0500
+Subject: [PATCH] Fix cmake for pthread and cpuinfo with USE_SYSTEM_LIBS
+
+When -DUSE_SYSTEM_LIBS=ON is used this error is caused
+
+CMake Error in CMakeLists.txt:
+  Imported target "pthreadpool" includes non-existent path
+
+    "/include"
+
+...
+
+CMake Error in CMakeLists.txt:
+  Imported target "pthreadpool" includes non-existent path
+
+    "/include"
+
+In the USE_SYSTEM_LIBS=ON case, neither the CPUINFO_SOURCE_DIR nor
+the PTHREADPOLL_SOURCE_DIR variables are defined.
+
+Revert the logic back to what it was before the change in Fixes: tag.
+
+Fixes: e81b7f14eee7 ("Enable use of dependencies in arbitrary locations")
+Signed-off-by: Tom Rix <trix@redhat.com>
+---
+ CMakeLists.txt | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 03c80a99b0b0..7f31d4f87a42 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -963,11 +963,10 @@ IF(NOT TARGET cpuinfo)
+       "${CMAKE_BINARY_DIR}/cpuinfo")
+   ELSE()
+     ADD_LIBRARY(cpuinfo SHARED IMPORTED)
+-    FIND_LIBRARY(CPUINFO_LIBRARY cpuinfo PATHS "${CPUINFO_SOURCE_DIR}/lib")
++    FIND_LIBRARY(CPUINFO_LIBRARY cpuinfo)
+     IF(NOT CPUINFO_LIBRARY)
+       MESSAGE(FATAL_ERROR "Cannot find cpuinfo")
+     ENDIF()
+-    TARGET_INCLUDE_DIRECTORIES(cpuinfo INTERFACE "${CPUINFO_SOURCE_DIR}/include")
+     SET_PROPERTY(TARGET cpuinfo PROPERTY IMPORTED_LOCATION "${CPUINFO_LIBRARY}")
+     SET_PROPERTY(TARGET cpuinfo PROPERTY IMPORTED_IMPLIB "${CPUINFO_LIBRARY}")
+   ENDIF()
+@@ -988,12 +987,11 @@ IF(NOT TARGET pthreadpool)
+       "${CMAKE_BINARY_DIR}/pthreadpool")
+   ELSE()
+     ADD_LIBRARY(pthreadpool SHARED IMPORTED)
+-    FIND_LIBRARY(PTHREADPOOL_LIBRARY pthreadpool PATHS "${PTHREADPOOL_SOURCE_DIR}/lib")
++    FIND_LIBRARY(PTHREADPOOL_LIBRARY pthreadpool)
+     IF(NOT PTHREADPOOL_LIBRARY)
+       MESSAGE(FATAL_ERROR "Cannot find pthreadpool")
+     ENDIF()
+     FIND_PACKAGE(Threads REQUIRED)
+-    TARGET_INCLUDE_DIRECTORIES(pthreadpool INTERFACE "${PTHREADPOOL_SOURCE_DIR}/include")
+     TARGET_LINK_LIBRARIES(pthreadpool INTERFACE Threads::Threads)
+     SET_PROPERTY(TARGET pthreadpool PROPERTY IMPORTED_LOCATION "${PTHREADPOOL_LIBRARY}")
+     SET_PROPERTY(TARGET pthreadpool PROPERTY IMPORTED_IMPLIB "${PTHREADPOOL_LIBRARY}")
+-- 
+2.44.0
+

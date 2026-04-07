@@ -1,0 +1,117 @@
+From 5def43983de3ecfa38c805c02a1f0d6f1581160c Mon Sep 17 00:00:00 2001
+From: Martijn Dekker <martijn@inlv.org>
+Date: Thu, 31 Oct 2024 20:56:54 +0000
+Subject: [PATCH] Add forking workaround for block stdout redir (re: e373e8c1)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Reproducer:
+
+    ok=$({ true >&2; } >&2; echo OK); echo $ok
+
+This should output "OK" but currently outputs nothing.
+
+Looks like the sh_subfork() workaround must also be implemented for
+the TSETIO case in sh_exec(), as that is where redirections for
+blocks and compound commands are handled. This avoids inconsistent
+behaviour that happens if sh_subfork() is called later for the
+inside redirection.
+
+src/cmd/ksh93/sh/xec.c: sh_exec(): case TSETIO:
+- Also fork if standard output redirections attached to blocks are
+  executed within a non-subshare command substitution.
+
+Thanks to Vincent Mihalkovič (@vmihalko) for the report.
+Resolves: https://github.com/ksh93/ksh/issues/784
+---
+ NEWS                            |  8 ++++++++
+ src/cmd/ksh93/include/version.h |  2 +-
+ src/cmd/ksh93/sh/xec.c          | 15 ++++++++-------
+ src/cmd/ksh93/tests/io.sh       | 32 +++++++++++++++++++++++++++++++-
+ 4 files changed, 48 insertions(+), 9 deletions(-)
+
+diff --git a/src/cmd/ksh93/sh/xec.c b/src/cmd/ksh93/sh/xec.c
+index d48b72dc390b..c90b13b1f6d5 100644
+--- a/src/cmd/ksh93/sh/xec.c
++++ b/src/cmd/ksh93/sh/xec.c
+@@ -1712,21 +1712,22 @@ int sh_exec(const Shnode_t *t, int flags)
+ 			int 	jmpval, waitall = 0;
+ 			int 	simple = (t->fork.forktre->tre.tretyp&COMMSK)==TCOM;
+ 			struct checkpt *buffp = stkalloc(sh.stk,sizeof(struct checkpt));
+-			if(sh.subshell && !sh.subshare && t->fork.forkio)
++			if(sh.subshell && !sh.subshare)
+ 			{
+-				/* Subshell forking workaround for https://github.com/ksh93/ksh/issues/161
+-				 * Check each redirection for >&- or <&-
++				/* Subshell forking workaround for:
++				 * https://github.com/ksh93/ksh/issues/161 (check each redirection for >&- or <&-)
++				 * https://github.com/ksh93/ksh/issues/784 (check for stdout in a command substitution)
+ 				 * TODO: find the elusive real fix */
+-				struct ionod *i = t->fork.forkio;
+-				do
++				struct ionod *i;
++				for (i = t->fork.forkio; i; i = i->ionxt)
+ 				{
+-					if((i->iofile & ~(IOUFD|IOPUT)) == (IOMOV|IORAW) && !strcmp(i->ioname,"-"))
++					unsigned f = i->iofile;
++					if ((f & ~(IOUFD|IOPUT))==(IOMOV|IORAW) && !strcmp(i->ioname,"-") || (f & IOUFD)==1 && sh.comsub)
+ 					{
+ 						sh_subfork();
+ 						break;
+ 					}
+ 				}
+-				while(i = i->ionxt);
+ 			}
+ 			sh_pushcontext(buffp,SH_JMPIO);
+ 			if(type&FPIN)
+diff --git a/src/cmd/ksh93/tests/io.sh b/src/cmd/ksh93/tests/io.sh
+index 2b23a9d1d968..669c72529707 100755
+--- a/src/cmd/ksh93/tests/io.sh
++++ b/src/cmd/ksh93/tests/io.sh
+@@ -936,7 +936,6 @@ fi # can_close_stdout
+ # ======
+ # Command substitution hangs, writing infinite zero bytes, when redirecting standard output on a built-in that forks
+ # https://github.com/ksh93/ksh/issues/416
+-exp='line'
+ "$SHELL" -c 'echo "$(ulimit -t unlimited >/dev/null 2>&1; echo "ok $$")"' >out 2>&1 &
+ pid=$!
+ (sleep 1; kill -9 "$pid") 2>/dev/null &
+@@ -947,6 +946,37 @@ then	kill "$!"  # the sleep process
+ else	err_exit "comsub hangs after fork with stdout redirection"
+ fi
+ 
++# https://github.com/ksh93/ksh/issues/416#issuecomment-1008866883
++exp='line'
++"$SHELL" -c 'alias foo=bar; echo $(alias foo >/dev/null; echo "$1")' "$0" "$exp" >out 2>&1 &
++pid=$!
++(sleep 1; kill -9 "$pid") 2>/dev/null &
++if	wait "$pid" 2>/dev/null
++then	kill "$!"  # the sleep process
++	[[ $(<out) == "$exp" ]] || err_exit "comsub fails after stdout redirection" \
++		"(expected '$exp', got '$(<out)')"
++else	err_exit "comsub hangs after stdout redirection"
++fi
++
++# same bug for compound/block commands: https://github.com/ksh93/ksh/issues/784
++exp=$'funA\nA'
++"$SHELL" -c '
++	BugFunction() {
++	  { echo "funA" >&2; } >&2
++	  echo A
++	}
++	Result=$(BugFunction)
++	echo $Result
++' >out 2>&1 &
++pid=$!
++(sleep 1; kill -9 "$pid") 2>/dev/null &
++if	wait "$pid" 2>/dev/null
++then	kill "$!"  # the sleep process
++	[[ $(<out) == "$exp" ]] || err_exit "double redirection in command substitution" \
++		"(expected $(printf %q "$exp"), got $(printf %q "$(<out)"))"
++else	err_exit "double redirection in command substitution causes shell hang"
++fi
++
+ # ======
+ # https://github.com/ksh93/ksh/issues/161
+ got=$(

@@ -1,0 +1,182 @@
+From f0772e7bfde036d2cd66464866cb552a969ca33a Mon Sep 17 00:00:00 2001
+From: mlip <kiwaczki@gmail.com>
+Date: Fri, 11 May 2018 13:31:26 +0200
+Subject: [PATCH] Fix for #155 Better exception for missing parameters
+
+---
+ .../internal/InvokeParameterisedMethod.java   | 42 ++++++++--
+ .../missingparams/MissingParametersTest.java  | 82 +++++++++++++++++++
+ 2 files changed, 118 insertions(+), 6 deletions(-)
+ create mode 100644 src/test/java/junitparams/missingparams/MissingParametersTest.java
+
+diff --git a/src/main/java/junitparams/internal/InvokeParameterisedMethod.java b/src/main/java/junitparams/internal/InvokeParameterisedMethod.java
+index 599416a..6cbd051 100644
+--- a/src/main/java/junitparams/internal/InvokeParameterisedMethod.java
++++ b/src/main/java/junitparams/internal/InvokeParameterisedMethod.java
+@@ -1,5 +1,6 @@
+ package junitparams.internal;
+ 
++import junitparams.FileParameters;
+ import junitparams.converters.ConversionFailedException;
+ import junitparams.converters.ConvertParam;
+ import junitparams.converters.ParamAnnotation;
+@@ -62,13 +63,15 @@ private Object[] castParamsFromObjects(Object params) throws ConversionFailedExc
+         } catch (ConversionFailedException e) {
+             throw e;
+         } catch (Exception e) {
+-            Class<?>[] typesOfParameters = createArrayOfTypesOf(paramset);
+-            Object resultParam = createObjectOfExpectedTypeBasedOnParams(paramset, typesOfParameters);
+-            return new Object[]{resultParam};
++            return createObjectOfExpectedTypeBasedOnParams(paramset);
+         }
+     }
+ 
+-    private Object createObjectOfExpectedTypeBasedOnParams(Object[] paramset, Class<?>[] typesOfParameters) {
++    private Object[] createObjectOfExpectedTypeBasedOnParams(Object[] paramset) {
++
++        verifyNumberOfParameters(testMethod, paramset);
++
++        Class<?>[] typesOfParameters = createArrayOfTypesOf(paramset);
+         Object resultParam;
+ 
+         try {
+@@ -84,7 +87,7 @@ private Object createObjectOfExpectedTypeBasedOnParams(Object[] paramset, Class<
+             throw new IllegalStateException("While trying to create object of class " + testMethod.getMethod().getParameterTypes()[0]
+                     + " could not find constructor with arguments matching (type-wise) the ones given in parameters.", e);
+         }
+-        return resultParam;
++        return new Object[]{resultParam};
+     }
+ 
+     private Class<?>[] createArrayOfTypesOf(Object[] paramset) {
+@@ -217,7 +220,7 @@ private Object castParameterDirectly(Object object, Class clazz) {
+                 " Only primitive types, BigDecimals and Strings can be used.");
+     }
+ 
+-    private void verifySameSizeOfArrays(Object[] columns, Class<?>[] parameterTypes) {
++    private void verifySameSizeOfArrays(Object[] columns, Object[] parameterTypes) {
+         if (parameterTypes.length != columns.length)
+             throw new IllegalArgumentException(
+                     "Number of parameters inside @Parameters annotation doesn't match the number of test method parameters.\nThere are "
+@@ -225,6 +228,33 @@ private void verifySameSizeOfArrays(Object[] columns, Class<?>[] parameterTypes)
+                             + testMethod.getName() + " method.");
+     }
+ 
++    private void verifyNumberOfParameters(FrameworkMethod testMethod, Object[] providedParameters) {
++        if (isForFileParameters(testMethod) || isForSingleParameter(testMethod)) {
++            return;
++        }
++        int numberOftestParameters = testMethod.getMethod().getParameterTypes().length;
++        int NumberOfProvidedParameters = providedParameters.length;
++
++        if (numberOftestParameters != NumberOfProvidedParameters)
++            throw new IllegalArgumentException(
++                    "Number of parameters in data provider method doesn't match the number of test method parameters.\nThere are "
++                            + NumberOfProvidedParameters + " parameters in provider method, while there's " + numberOftestParameters + " parameters in the "
++                            + testMethod.getName() + " method.");
++    }
++
++    private boolean isForSingleParameter(FrameworkMethod testMethod) {
++        return testMethod.getMethod().getParameterTypes().length==1;
++    }
++
++    private boolean isForFileParameters(FrameworkMethod testMethod) {
++        for (int i = 0; i < testMethod.getAnnotations().length; i++) {
++            if (testMethod.getAnnotations()[i].annotationType().isAssignableFrom(FileParameters.class)) {
++                return true;
++            }
++        }
++        return false;
++    }
++
+     boolean matchesDescription(Description description) {
+         return description.hashCode() == uniqueMethodId.hashCode();
+     }
+diff --git a/src/test/java/junitparams/missingparams/MissingParametersTest.java b/src/test/java/junitparams/missingparams/MissingParametersTest.java
+new file mode 100644
+index 0000000..c09fcc6
+--- /dev/null
++++ b/src/test/java/junitparams/missingparams/MissingParametersTest.java
+@@ -0,0 +1,82 @@
++package junitparams.missingparams;
++
++import junitparams.JUnitParamsRunner;
++import junitparams.Parameters;
++import org.junit.Test;
++import org.junit.runner.JUnitCore;
++import org.junit.runner.Result;
++import org.junit.runner.RunWith;
++import org.junit.runner.notification.Failure;
++
++import static org.junit.Assert.assertEquals;
++
++public class MissingParametersTest {
++
++
++    @RunWith(JUnitParamsRunner.class)
++    public static class MissingParametersInMethodProvider {
++
++
++        @Test
++        @Parameters(method = "parametersProvider")
++        public void missingParameters(String param1, String param2) {
++            assertEquals(param1, param2);
++        }
++
++        public Object[][] parametersProvider() {
++            return new Object[][]{
++                    new Object[]{"pass", "pass"},
++                    new Object[]{"fail"}
++            };
++        }
++    }
++
++    @Test
++    public void missingParametersInMethodThrowsIllegalArgumentException() {
++        Result testResult = JUnitCore.runClasses(MissingParametersInMethodProvider.class);
++        Failure testFailure = testResult.getFailures().iterator().next();
++
++        assertEquals(1, testResult.getFailureCount());
++        assertEquals(IllegalArgumentException.class, testFailure.getException().getClass());
++        assertEquals("Number of parameters in data provider method doesn't match the number of test method parameters.\n" +
++                        "There are 1 parameters in provider method, while there's 2 parameters in the missingParameters method."
++                , testFailure.getException().getMessage());
++    }
++
++    @RunWith(JUnitParamsRunner.class)
++    public static class MissingNullParametersInMethodProvider {
++
++        public MissingNullParametersInMethodProvider() {
++        }
++
++        @Test
++        @Parameters(method = "withWrongNumberOfNullParams")
++        public void testWithValueAndMethodProviders(String param1, String param2, String param3) {
++            assertEquals(param1, param2, param3);
++        }
++
++        public Object[][] withWrongNumberOfNullParams() {
++            return new Object[][]{
++                    new Object[]{null, null}
++            };
++        }
++
++    }
++
++    @Test
++    public void missingNullParametersInMethodThrowsIllegalArgumentException() {
++        Result testResult = JUnitCore.runClasses(MissingNullParametersInMethodProvider.class);
++        Failure testFailure = testResult.getFailures().iterator().next();
++
++        assertEquals(1, testResult.getFailureCount());
++        assertEquals(IllegalArgumentException.class, testFailure.getException().getClass());
++        assertEquals("Number of parameters in data provider method doesn't match the number of test method parameters.\n" +
++                        "There are 2 parameters in provider method, while there's 3 parameters in the testWithValueAndMethodProviders method.",
++                testFailure.getException().getMessage());
++    }
++
++
++}
++
++
++

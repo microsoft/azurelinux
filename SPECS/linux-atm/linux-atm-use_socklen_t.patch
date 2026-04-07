@@ -1,0 +1,13 @@
+diff --git a/src/led/conn.c b/src/led/conn.c
+index 99da5e4..89639e1 100644
+--- a/src/led/conn.c
++++ b/src/led/conn.c
+@@ -405,7 +405,7 @@ Conn_t *accept_conn(Conn_t *conn)
+ {
+         Conn_t *new;
+         struct sockaddr_atmsvc addr;
+-        size_t len;
++        socklen_t len;
+         int fd;
+         char buff[MAX_ATM_ADDR_LEN+1];
+ 

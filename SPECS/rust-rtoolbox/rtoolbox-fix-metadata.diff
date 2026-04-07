@@ -1,0 +1,11 @@
+--- rtoolbox-0.0.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ rtoolbox-0.0.1/Cargo.toml	2023-03-12T13:42:20.485442+00:00
+@@ -16,7 +16,7 @@
+ authors = ["Conrad Kleinespel <conradk@conradk.com>"]
+ description = "Utility functions for other crates, no backwards compatibility guarantees."
+ readme = "README.md"
+-license = "Apache-2.0"
++license = "Apache-2.0 AND MIT"
+ 
+ [dependencies.serde]
+ version = "1.0"

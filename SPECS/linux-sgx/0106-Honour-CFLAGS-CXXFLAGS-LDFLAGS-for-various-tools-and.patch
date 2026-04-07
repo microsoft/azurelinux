@@ -1,0 +1,202 @@
+From f822ca390720dcfc20923c6778fdeb8b6127b149 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Fri, 28 Mar 2025 16:00:27 +0000
+Subject: [PATCH 106/131] Honour CFLAGS/CXXFLAGS/LDFLAGS for various tools and
+ libraries
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ QuoteGeneration/qcnl/linux/Makefile                 | 7 ++++---
+ QuoteGeneration/qpl/linux/Makefile                  | 4 ++--
+ QuoteGeneration/quote_wrapper/qgs/Makefile          | 2 +-
+ QuoteGeneration/quote_wrapper/ql/linux/Makefile     | 7 ++++---
+ QuoteGeneration/quote_wrapper/quote/linux/Makefile  | 2 +-
+ QuoteVerification/dcap_quoteverify/linux/Makefile   | 6 +++---
+ tools/PCKCertSelection/PCKCertSelectionLib/Makefile | 4 ++--
+ tools/PCKRetrievalTool/Makefile                     | 9 +++++----
+ tools/SGXPlatformRegistration/Makefile              | 8 ++++----
+ 9 files changed, 26 insertions(+), 23 deletions(-)
+
+diff --git a/QuoteGeneration/qcnl/linux/Makefile b/QuoteGeneration/qcnl/linux/Makefile
+index 7be0370d..f0f800ea 100644
+--- a/QuoteGeneration/qcnl/linux/Makefile
++++ b/QuoteGeneration/qcnl/linux/Makefile
+@@ -46,12 +46,13 @@ CNL_Lib_Include_Paths := -I../../quote_wrapper/common/inc       \
+                          -I../../../QuoteVerification/QVL/Src/ThirdParty/rapidjson/include/rapidjson	\
+                          -I../../../tools/PCKCertSelection/include
+ 
+-CNL_Lib_C_Flags := $(COMMON_FLAGS) -g -fPIC -Wno-attributes $(CNL_Lib_Include_Paths) $(shell pkg-config --cflags libcrypto)
++CNL_Lib_Common_Flags := $(COMMON_FLAGS) -g -fPIC -Wno-attributes $(CNL_Lib_Include_Paths) $(shell pkg-config --cflags libcrypto)
++CNL_Lib_C_Flags := $(CFLAGS) $(CNL_Lib_Common_Flags)
+ 
+-LDUFLAGS:= -pthread $(COMMON_LDFLAGS)
++LDUFLAGS:= $(LDFLAGS) -pthread $(COMMON_LDFLAGS)
+ LDUFLAGS += -Wl,--version-script=sgx_default_qcnl.lds -Wl,--gc-sections
+ 
+-CNL_Lib_Cpp_Flags := $(CNL_Lib_C_Flags) -std=c++11
++CNL_Lib_Cpp_Flags := $(CXXFLAGS) $(CNL_Lib_Common_Flags) -std=c++11
+ 
+ ifdef SELF_SIGNED_CERT
+ CNL_Lib_Cpp_Flags+= -DSELF_SIGNED_CERT
+diff --git a/QuoteGeneration/qpl/linux/Makefile b/QuoteGeneration/qpl/linux/Makefile
+index b109a581..e2865397 100644
+--- a/QuoteGeneration/qpl/linux/Makefile
++++ b/QuoteGeneration/qpl/linux/Makefile
+@@ -48,9 +48,9 @@ QPL_Lib_C_Flags := $(COMMON_FLAGS) -g -fPIC -Wno-attributes $(QPL_Lib_Include_Pa
+ LDUFLAGS:= -pthread $(COMMON_LDFLAGS)
+ LDUFLAGS += -Wl,--version-script=sgx_default_quote_provider.lds -Wl,--gc-sections
+ 
+-QPL_Lib_Cpp_Flags := $(QPL_Lib_C_Flags) -std=c++11
++QPL_Lib_Cpp_Flags := $(CXXFLAGS) $(QPL_Lib_C_Flags) -std=c++11
+ 
+-QPL_Lib_Link_Flags := $(SGX_COMMON_FLAGS) -g -L$(TOP_DIR)/build/linux -L$(SGX_SDK)/lib64 \
++QPL_Lib_Link_Flags := $(LDFLAGS) $(SGX_COMMON_FLAGS) -g -L$(TOP_DIR)/build/linux -L$(SGX_SDK)/lib64 \
+         -lcrypto -lsgx_default_qcnl_wrapper -lpthread -ldl
+  
+ ifndef DEBUG
+diff --git a/QuoteGeneration/quote_wrapper/qgs/Makefile b/QuoteGeneration/quote_wrapper/qgs/Makefile
+index 5d87e4d1..8228bdfc 100644
+--- a/QuoteGeneration/quote_wrapper/qgs/Makefile
++++ b/QuoteGeneration/quote_wrapper/qgs/Makefile
+@@ -51,7 +51,7 @@ endif
+ DEPENDS = ${QGS_OBJS test_client.o:.o=.d}
+ 
+ # SGX related libraries
+-QGS_LFLAGS = -L$(TOP_DIR)/build/linux -lsgx_tdx_logic -lsgx_pce_logic -ldl \
++QGS_LFLAGS = $(LDFLAGS) -L$(TOP_DIR)/build/linux -lsgx_tdx_logic -lsgx_pce_logic -ldl \
+              -L$(SGX_SDK)/lib64 -lsgx_urts -g
+ # add boost_system for link
+ QGS_LFLAGS += -lboost_system -lboost_thread -lpthread
+diff --git a/QuoteGeneration/quote_wrapper/ql/linux/Makefile b/QuoteGeneration/quote_wrapper/ql/linux/Makefile
+index c5d877b5..29836652 100644
+--- a/QuoteGeneration/quote_wrapper/ql/linux/Makefile
++++ b/QuoteGeneration/quote_wrapper/ql/linux/Makefile
+@@ -48,13 +48,14 @@ QL_Lib_C_Files := se_trace.c se_thread.c
+ QL_Lib_Include_Paths := -I../../common/inc -I./ -I$(SGX_SDK)/include -I../../../common/inc/internal 
+ QL_Lib_Include_Paths += -I../../quote/inc -I../../../pce_wrapper/inc -I../inc
+ 
+-QL_Lib_C_Flags := $(COMMON_FLAGS) -g -fPIC -Wno-attributes $(QL_Lib_Include_Paths)
++QL_Lib_Common_Flags := $(COMMON_FLAGS) -g -fPIC -Wno-attributes $(QL_Lib_Include_Paths)
++QL_Lib_C_Flags := $(CFLAGS) $(QL_Lib_Common_Flags)
+ 
+ LDUFLAGS:= -pthread $(COMMON_LDFLAGS)
+ LDUFLAGS += -Wl,--version-script=dcap_ql_wrapper.lds -Wl,--gc-sections
+ 
+-QL_Lib_Cpp_Flags := $(QL_Lib_C_Flags) -std=c++11
+-QL_Lib_Link_Flags := $(SGX_COMMON_FLAGS) -g -L$(Quote_Library_Dir) -lsgx_qe3_logic -L$(PCE_Library_Dir) -lsgx_pce_logic -L$(TOP_DIR)/build/linux -L$(SGX_SDK)/lib64 -lpthread -ldl
++QL_Lib_Cpp_Flags := $(CXXFLAGS) $(QL_Lib_Common_Flags) -std=c++11
++QL_Lib_Link_Flags := $(LDFLAGS) $(SGX_COMMON_FLAGS) -g -L$(Quote_Library_Dir) -lsgx_qe3_logic -L$(PCE_Library_Dir) -lsgx_pce_logic -L$(TOP_DIR)/build/linux -L$(SGX_SDK)/lib64 -lpthread -ldl
+ 
+ QL_Lib_Cpp_Flags += -DDISABLE_TRACE
+ QL_Lib_Link_Flags += -DDISABLE_TRACE
+diff --git a/QuoteGeneration/quote_wrapper/quote/linux/Makefile b/QuoteGeneration/quote_wrapper/quote/linux/Makefile
+index 7d0b398f..9b8c936c 100644
+--- a/QuoteGeneration/quote_wrapper/quote/linux/Makefile
++++ b/QuoteGeneration/quote_wrapper/quote/linux/Makefile
+@@ -52,7 +52,7 @@ Quote_Include_Paths := -I$(SGX_SDK)/include -I../inc -I../../common/inc -I./ -I.
+ Quote_C_Flags := $(COMMON_FLAGS) -g -fPIC -Wno-attributes $(Quote_Include_Paths)
+ 
+ Quote_Cpp_Flags := $(Quote_C_Flags) -std=c++11 -DSGX_ENCLAVE_PATH="\"$(SGX_ENCLAVE_PATH)\""
+-Quote_Link_Flags := $(COMMON_FLAGS) -g -L$(ROOT_DIR)/build/linux -L$(SGX_SDK)/lib64 -lsgx_urts -lpthread -ldl
++Quote_Link_Flags := $(COMMON_FLAGS) -g -L$(ROOT_DIR)/build/linux -L$(SGX_SDK)/lib64 -lsgx_urts -lpthread -ldl $(LDFLAGS)
+ 
+ ifndef DEBUG
+ Quote_Cpp_Flags += -DDISABLE_TRACE
+diff --git a/QuoteVerification/dcap_quoteverify/linux/Makefile b/QuoteVerification/dcap_quoteverify/linux/Makefile
+index e92cc2aa..4b9103fe 100644
+--- a/QuoteVerification/dcap_quoteverify/linux/Makefile
++++ b/QuoteVerification/dcap_quoteverify/linux/Makefile
+@@ -27,8 +27,8 @@ QVL_VERIFY_INC	:= -I$(QVE_SRC_PATH)/Include \
+ 
+ QPL_BASE64_CPP_DEP	:= $(DCAP_QPL_DIR)/sgx_base64.d
+ 
+-SGX_COMMON_CFLAGS	+= -g -fPIC -Wno-attributes -USGX_TRUSTED
+-SGX_COMMON_CXXFLAGS	+= -g -fPIC -USGX_TRUSTED -DSGX_ENCLAVE_PATH="\"$(SGX_ENCLAVE_PATH)\""
++SGX_COMMON_CFLAGS	+= $(CFLAGS) -g -fPIC -Wno-attributes -USGX_TRUSTED
++SGX_COMMON_CXXFLAGS	+= $(CXXFLAGS) -g -fPIC -USGX_TRUSTED -DSGX_ENCLAVE_PATH="\"$(SGX_ENCLAVE_PATH)\""
+ 
+ QVL_LIB_OBJS := $(QVL_LIB_FILES:.cpp=_untrusted.o)
+ QVL_PARSER_OBJS := $(QVL_PARSER_FILES:.cpp=_untrusted.o)
+@@ -38,7 +38,7 @@ QVL_PARSER := sgx_dcap_qvl_attestation
+ QVL_LIB_NAME := lib$(QVL_LIB).a
+ QVL_PARSER_NAME := lib$(QVL_PARSER).a
+ 
+-LDUFLAGS	:= -pthread -ldl -L. -l$(QVL_LIB) -l$(QVL_PARSER) $(COMMON_LDFLAGS) -lcrypto
++LDUFLAGS	:= $(LDFLAGS) -pthread -ldl -L. -l$(QVL_LIB) -l$(QVL_PARSER) $(COMMON_LDFLAGS) -lcrypto
+ LDUFLAGS	+= -Wl,--version-script=sgx_dcap_quoteverify.lds -Wl,--gc-sections
+ 
+ QVL_VERIFY_CPP_SRCS := $(wildcard ../*.cpp) $(wildcard *.cpp)
+diff --git a/tools/PCKCertSelection/PCKCertSelectionLib/Makefile b/tools/PCKCertSelection/PCKCertSelectionLib/Makefile
+index 6e1c7876..4b8ff9dc 100644
+--- a/tools/PCKCertSelection/PCKCertSelectionLib/Makefile
++++ b/tools/PCKCertSelection/PCKCertSelectionLib/Makefile
+@@ -129,11 +129,11 @@ DEBUG_FLAGS := -m64 -O0 -g
+ RELEASE_FLAGS := -m64 -O2 $(COMMON_FLAGS)
+ 
+ # basic library c build flags
+-C_FLAGS	:= -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Werror -Wno-overloaded-virtual $(LIB_INCLUDE_PATHS)
++C_FLAGS	:= $(CFLAGS) -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Werror -Wno-overloaded-virtual $(LIB_INCLUDE_PATHS)
+ C_FLAGS += -UPCK_CERT_SELECTION_WITH_COMPONENT
+ 
+ # link flags, link openssl crypto
+-LINK_FLAGS := -shared -lcrypto -lpthread -ldl
++LINK_FLAGS := $(LDFLAGS) -shared -lcrypto -lpthread -ldl
+ LINK_FLAGS += -Wl,--version-script=pck_cert_selection.lds -Wl,--gc-sections
+ 
+ # debug/release switch
+diff --git a/tools/PCKRetrievalTool/Makefile b/tools/PCKRetrievalTool/Makefile
+index d804ce9d..422f329a 100644
+--- a/tools/PCKRetrievalTool/Makefile
++++ b/tools/PCKRetrievalTool/Makefile
+@@ -83,8 +83,9 @@ App_Include_Paths += -I ../../QuoteGeneration/ae/inc/internal -I ../SGXPlatformR
+ 
+ App_C_Flags := $(COMMON_FLAGS) -fPIC -Wno-attributes $(App_Include_Paths)
+ 
+-App_Cpp_Flags := $(App_C_Flags) -std=c++11 -DSGX_ENCLAVE_PATH="\"$(SGX_ENCLAVE_PATH)\""
+-App_Link_Flags := $(SGX_COMMON_CFLAGS) -Wl,-z,relro,-z,now,-z,noexecstack
++App_Cpp_Flags := $(CXXFLAGS) $(App_C_Flags) -std=c++11 -DSGX_ENCLAVE_PATH="\"$(SGX_ENCLAVE_PATH)\""
++App_C_Flags += $(CFLAGS)
++App_Link_Flags := $(CXXFLAGS) $(LDFLAGS) $(SGX_COMMON_CFLAGS) -Wl,-z,relro,-z,now,-z,noexecstack
+ App_Link_Flags +=  -lcurl -ldl -lpthread
+ ifeq ($(STANDALONE), 1)
+ 	App_Link_Flags += '-Wl,-rpath,$$ORIGIN'
+@@ -114,11 +115,11 @@ App/id_enclave_u.c:
+ 	echo "GEN  =>  $@"
+ 
+ App/id_enclave_u.o: App/id_enclave_u.c
+-	@$(CC) $(App_C_Flags) -c $< -o $@
++	$(CC) $(App_C_Flags) -c $< -o $@
+ 	@echo "CC   <=  $<"
+ 
+ App/pce_u.o: App/pce_u.c
+-	@$(CC) $(App_C_Flags) -c $< -o $@
++	$(CC) $(App_C_Flags) -c $< -o $@
+ 	@echo "CC   <=  $<"
+ 
+ App/%.o: App/%.cpp
+diff --git a/tools/SGXPlatformRegistration/Makefile b/tools/SGXPlatformRegistration/Makefile
+index a4f54099..b5b8dcac 100644
+--- a/tools/SGXPlatformRegistration/Makefile
++++ b/tools/SGXPlatformRegistration/Makefile
+@@ -127,11 +127,11 @@ OBJS_MPA_MANAGE_APP := $(patsubst $(MPA_MANAGE_PATH)/src/%.cpp,$(OBJ_MPA_MANAGE_
+ OBJ_TEST_PATH := $(OBJ_PATH)/test
+ OBJS_TEST := $(patsubst $(TEST_PATH)/%.cpp,$(OBJ_TEST_PATH)/%.o, $(SRC_TEST))
+ 
+-LDFLAGS_SO := -shared -Wl,-z,relro,-z,now,-z,noexecstack
+-LD_REGI_APP := -L$(LIB_PATH) -Wl,-Bstatic -lmpa_registration -Wl,-Bdynamic -lmpa_network -lmpa_uefi
+-LD_MANAGE_APP := -L$(LIB_PATH) -Wl,-Bstatic -lmpa_management -lmpa_registration -Wl,-Bdynamic -lmpa_uefi
++LDFLAGS_SO := $(LDFLAGS) -shared -Wl,-z,relro,-z,now,-z,noexecstack
++LD_REGI_APP := $(LDFLAGS) -L$(LIB_PATH) -Wl,-Bstatic -lmpa_registration -Wl,-Bdynamic -lmpa_network -lmpa_uefi
++LD_MANAGE_APP := $(LDFLAGS) -L$(LIB_PATH) -Wl,-Bstatic -lmpa_management -lmpa_registration -Wl,-Bdynamic -lmpa_uefi
+ 
+-LD_GTEST := -L$(GTEST_PATH)/lib -lgtest -lgmock_main -lgmock -lpthread
++LD_GTEST := $(LDFLAGS) -L$(GTEST_PATH)/lib -lgtest -lgmock_main -lgmock -lpthread
+ 
+ CXX_WARNINGS := -Wall -Wextra -Winit-self -Wpointer-arith -Wreturn-type -Waddress -Wsequence-point -Wformat-security -Wmissing-include-dirs -Wfloat-equal -Wundef -Wshadow -Wcast-align -Wconversion -Wredundant-decls
+ CXXFLAGS := -std=c++17 -fPIC -Wnon-virtual-dtor -fstack-protector -ffunction-sections -DITT_ARCH_IA64 -fcf-protection $(CXX_WARNINGS)
+-- 
+2.53.0
+

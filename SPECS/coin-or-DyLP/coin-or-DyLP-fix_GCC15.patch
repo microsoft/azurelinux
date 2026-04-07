@@ -1,0 +1,19 @@
+--- a/src/DylpStdLib/dylib_std.orig.h	2010-12-31 21:48:48.000000000 +0100
++++ b/src/DylpStdLib/dylib_std.h	2025-01-19 10:34:19.633375426 +0100
+@@ -29,6 +29,7 @@
+ 
+ #include <stddef.h>
+ #include <stdlib.h>
++#include <stdbool.h>
+ 
+ #include "DylpConfig.h"
+ 
+@@ -65,7 +65,7 @@
+ #define FALSE 0
+ #define TRUE 1
+ # ifdef BOOL
+-  typedef BOOL bool ;
++  
+ # else
+ /*
+   You're in trouble. Normally a definition for BOOL is determined by the

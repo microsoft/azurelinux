@@ -1,0 +1,99 @@
+I. CHANGES FROM UPSTREAM
+
+Latexmk almost works out of the box.  Two changes have been made to
+conform to Fedora conventions.  First, the default DVI, PostScript, and
+PDF previewers have been changed to 'xdg-open'; see below for more
+information.
+
+II. PREVIEWERS
+
+The command xdg-open views a file using the viewer selected by the user
+for that type of file.  See the xdg-mime(1) command for more
+information.  Unfortunately, the use of xdg-open precludes the updating
+of the previewing application, as latexmk cannot know which application
+is doing the previewing.  It also breaks viewing of landscape documents
+for some previewers.  For best results, you should customize latexmk for
+the particular previewers you intend to use.  Following are the settings
+for some commonly used previewers, to be placed in the site, user, or
+project configuration file.  Note that an update method of 1 means that
+there is no way for latexmk to cause the program to refresh; you have to
+take some action of your own to see changes to the document.
+
+   A. DVI PREVIEWERS
+
+      1. xdvi
+
+         $dvi_previewer = 'start xdvi';
+         $dvi_previewer_landscape = 'start xdvi -paper usr';
+         $dvi_update_method = 2;
+
+      2. pxdvi
+
+         $dvi_previewer = 'start pxdvi';
+         $dvi_previewer_landscape = 'start pxdvi -paper usr';
+         $dvi_update_method = 2;
+
+      3. kdvi
+
+         $dvi_previewer = 'start kdvi';
+         $dvi_previewer_landscape = 'start kdvi';
+         $dvi_update_method = 0;
+
+   B. POSTSCRIPT PREVIEWERS
+
+      1. gv
+
+         $ps_previewer = 'start gv -watch';
+         $ps_previewer_landscape = 'start gv -swap -watch';
+         $ps_update_method = 0;
+
+      2. evince
+
+         $ps_previewer = 'start evince -w';
+         $ps_previewer_landscape = 'start evince -w';
+         $ps_update_method = 0;
+
+      3. kghostview
+
+         $ps_previewer = 'start kghostview';
+         $ps_previewer_landscape = 'start kghostview --orientation=landscape';
+         $ps_update_method = 1;
+
+         If you can remember to set the "Watch File" option in
+         kghostview, then instead set:
+
+         $ps_update_method = 0;
+
+         Unfortunately, there appears to be no command line argument to
+         set the "Watch File" option.
+
+   C. PDF PREVIEWERS
+
+      1. gv
+
+         $pdf_previewer = 'start gv -watch';
+         $pdf_update_method = 0;
+
+      2. evince
+
+         $pdf_previewer = 'start evince -w';
+         $pdf_update_method = 0;
+
+      3. kghostview
+
+         $pdf_previewer = 'start kghostview';
+         $pdf_update_method = 1;
+
+	 See the remark on the "Watch File" option above.
+
+      4. kpdf
+
+         $pdf_previewer = 'start kpdf;
+         $pdf_update_method = 1;
+
+	 The "Watch File" remark above for kghostview applies to kpdf also.
+
+      5. acroread
+
+         $pdf_previewer = 'start acroread';
+         $pdf_update_method = 1;

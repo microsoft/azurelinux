@@ -1,0 +1,68 @@
+From f88ec3114dfdb5f284367d7602a06dc021409616 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Fri, 26 Jan 2024 10:36:07 +0100
+Subject: [PATCH] Fix formatting a trailing backslash and a percent sign
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+There was a bug report that a trailing backslash leads to printing
+a nul byte and an commandline:
+
+$ /usr/bin/time -f 'abc\' sleep 1 2>&1 | hexdump -vC
+00000000  61 62 63 3f 5c 00 73 6c  65 65 70 0a              |abc?\.sleep.|
+0000000c
+
+This patch fixes it.
+
+A similar fix was already in place for a trailing percent sign, but it
+was missing printing an implicit newline as mandated by
+the documentation. This patch fixes it either.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ src/time.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/src/time.c b/src/time.c
+index 2f2b702..2184e4e 100644
+--- a/src/time.c
++++ b/src/time.c
+@@ -585,12 +585,13 @@ summarize (fp, fmt, command, resp)
+ 	      break;
+ 	    case '\0':
+ 	      putc ('?', fp);
+-	      return;
++	      break;
+ 	    default:
+ 	      putc ('?', fp);
+ 	      putc (*fmt, fp);
+ 	    }
+-	  ++fmt;
++	  if (*fmt != '\0')
++	    ++fmt;
+ 	  break;
+ 
+ 	case '\\':		/* Format escape.  */
+@@ -605,12 +606,17 @@ summarize (fp, fmt, command, resp)
+ 	    case '\\':
+ 	      putc ('\\', fp);
+ 	      break;
++	    case '\0':
++	      putc ('?', fp);
++	      putc ('\\', fp);
++	      break;
+ 	    default:
+ 	      putc ('?', fp);
+ 	      putc ('\\', fp);
+ 	      putc (*fmt, fp);
+ 	    }
+-	  ++fmt;
++	  if (*fmt != '\0')
++	    ++fmt;
+ 	  break;
+ 
+ 	default:
+-- 
+2.43.0
+

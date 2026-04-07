@@ -1,0 +1,27 @@
+From 84c682ba2939333418f86f13e7e2fae880b60ecf Mon Sep 17 00:00:00 2001
+From: Adam Williamson <awilliam@redhat.com>
+Date: Tue, 9 Mar 2021 17:21:59 -0800
+Subject: [PATCH] backends/native: Add tegra to the atomic deny list
+
+Related: https://bugzilla.redhat.com/show_bug.cgi?id=1936991
+Signed-off-by: Adam Williamson <awilliam@redhat.com>
+Signed-off-by: Debarshi Ray <debarshir@gnome.org>
+---
+ src/backends/native/meta-kms-impl-device-atomic.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/backends/native/meta-kms-impl-device-atomic.c b/src/backends/native/meta-kms-impl-device-atomic.c
+index 7860cc2c6bd1..e8f1cb79b72e 100644
+--- a/src/backends/native/meta-kms-impl-device-atomic.c
++++ b/src/backends/native/meta-kms-impl-device-atomic.c
+@@ -1411,6 +1411,7 @@ is_atomic_allowed (const char *driver_name)
+ {
+   const char *atomic_driver_deny_list[] = {
+     "xlnx",
++    "tegra",
+     NULL,
+   };
+ 
+-- 
+2.51.1
+

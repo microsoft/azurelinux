@@ -1,0 +1,12 @@
+diff --git a/src/3rdparty/chromium/base/strings/to_string.h b/src/3rdparty/chromium/base/strings/to_string.h
+index 96e61daa9e..5d097946f7 100644
+--- a/src/3rdparty/chromium/base/strings/to_string.h
++++ b/src/3rdparty/chromium/base/strings/to_string.h
+@@ -6,6 +6,7 @@
+ #define BASE_STRINGS_TO_STRING_H_
+ 
+ #include <concepts>
++#include <cstdint>
+ #include <iomanip>
+ #include <ios>
+ #include <memory>

@@ -1,0 +1,12 @@
+--- annotate-snippets-0.12.12/Cargo.toml	2006-07-24T01:21:28+00:00
++++ annotate-snippets-0.12.12/Cargo.toml	2026-02-18T17:14:05.308584+00:00
+@@ -162,9 +162,6 @@
+ 
+ [dev-dependencies.anstream]
+ version = "0.6.13"
+-
+-[dev-dependencies.divan]
+-version = "0.1.14"
+ 
+ [dev-dependencies.snapbox]
+ version = "0.6.0"

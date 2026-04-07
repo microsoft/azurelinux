@@ -1,0 +1,65 @@
+--- setserial-2.17/rc.serial.rc	Thu Jan 27 15:47:30 2000
++++ setserial-2.17/rc.serial	Tue Sep 11 17:54:26 2001
+@@ -19,7 +19,7 @@
+ #
+ 
+ RCLOCKFILE=/var/lock/subsys/serial
+-DIRS="/lib/modules/`uname -r`/misc /lib/modules /usr/lib/modules ."
++DIRS="/lib/modules/`uname -r`/kernel/drivers/char /lib/modules/`uname -r`/misc /lib/modules /usr/lib/modules ."
+ PATH=/bin:/sbin:/usr/bin
+ DRIVER=serial
+ DRIVER_NAME=serial
+@@ -79,10 +79,11 @@
+ 
+ if test $action  = stop ; then
+ 	if test -n ${SETSERIAL} -a "$LOADED" != "no" -a \
+-           `head -1 /etc/serial.conf`X = "###AUTOSAVE###X" ; then
++           "$(head -1 /etc/serial.conf 2>/dev/null)" = "###AUTOSAVE###" ; then
+ 		echo -n "Saving state of serial devices... "
+ 		grep "^#" /etc/serial.conf > /etc/.serial.conf.new
+-		${SETSERIAL} -G -g ${ALLDEVS} >> /etc/.serial.conf.new
++		${SETSERIAL} -G -g ${ALLDEVS} \
++			2>/dev/null >> /etc/.serial.conf.new
+ 		mv /etc/serial.conf /etc/.serial.conf.old
+ 		mv /etc/.serial.conf.new /etc/serial.conf
+ 		echo "done."
+@@ -108,22 +109,26 @@
+ # If not stop, it must be a start....
+ #
+ 
+-if test -n $MODULE -a "$LOADED" != "yes" ; then 
++if test -n "$MODULE" -a "$LOADED" != "yes" ; then 
++	MAPFILE=$(mktemp /tmp/$DRIVER.map.XXXXXX) \
++	 || { echo "Couldn't create secure temporary file"; exit 1; }
++	ERRORS=$(mktemp /tmp/$DRIVER.XXXXXX) \
++	 || { echo "Couldn't create secure temporary file"; exit 1; }
+ 	if insmod -fm $MODULE $DRIVER_ARG \
+-		> /tmp/$DRIVER.map 2> /tmp/$DRIVER.$$; then :; 
++		> "${MAPFILE}" 2> "${ERRORS}"; then :; 
+ 	else
+ 		echo "Couldn't load $DRIVER_NAME driver."
+-		echo "See error logs in /tmp/$DRIVER.$$"
++		echo "See error logs in ${ERRORS}"
+ 		exit 1
+ 	fi
+-	/bin/rm -f /tmp/$DRIVER.$$
++	/bin/rm -f "${ERRORS}"
+ fi
+ 
+-if test -f /etc/serial.conf ; then
+-        if test -n ${SETSERIAL} ; then
++if test -f "/etc/serial.conf" ; then
++        if test -n "${SETSERIAL}" ; then
+ 		grep -v ^# < /etc/serial.conf | while read device args
+ 		do
+-		    ${SETSERIAL} -z $device $args
++		    ${SETSERIAL} -z $device $args 2>/dev/null
+ 		done 
+ 	fi
+ else
+@@ -131,4 +136,4 @@
+ fi
+ 
+ touch ${RCLOCKFILE}
+-${SETSERIAL} -bg ${ALLDEVS}
++${SETSERIAL} -bg ${ALLDEVS} 2>/dev/null

@@ -1,0 +1,229 @@
+diff -up scrub-2.6.1/configure.ac.libgcrypt scrub-2.6.1/configure.ac
+--- scrub-2.6.1/configure.ac.libgcrypt	2014-08-26 14:15:12.000000000 -0400
++++ scrub-2.6.1/configure.ac	2021-02-22 13:42:48.489217200 -0500
+@@ -70,6 +70,25 @@ AC_CHECK_FUNCS( \
+ X_AC_CHECK_PTHREADS
+ 
+ ##
++# gcrypt library
++##
++have_libgcrypt=no
++AC_ARG_WITH(libgcrypt, AS_HELP_STRING([--without-libgcrypt], [build without libgcrypt;
++                                         fallback to custom AES implementation]))
++AS_IF([test "x$with_libgcrypt" != "xno"],
++  [AM_PATH_LIBGCRYPT([1.5.0],
++    [AC_DEFINE([HAVE_LIBGCRYPT], [1], [libgcrypt API available])
++      gcrypt_CFLAGS="$LIBGCRYPT_CFLAGS"
++      gcrypt_LIBS="$LIBGCRYPT_LIBS"
++      have_libgcrypt=yes
++    ]
++  )]
++)
++AM_CONDITIONAL([LIBGCRYPT], [test "$have_libgcrypt" = "yes"])
++AC_SUBST([gcrypt_CFLAGS])
++AC_SUBST([gcrypt_LIBS])
++
++##
+ # Arrange for large file support
+ ## 
+ AC_SYS_LARGEFILE
+diff -up scrub-2.6.1/src/genrand.c.libgcrypt scrub-2.6.1/src/genrand.c
+--- scrub-2.6.1/src/genrand.c.libgcrypt	2014-08-20 17:33:43.000000000 -0400
++++ scrub-2.6.1/src/genrand.c	2021-02-22 13:42:48.490217204 -0500
+@@ -37,21 +37,27 @@
+ #include <assert.h>
+ #include <libgen.h>
+ 
+-#include "aes.h"
+ #include "util.h"
+ #include "genrand.h"
+ #include "hwrand.h"
+ 
+-#define PATH_URANDOM    "/dev/urandom"
+-
+-#define PAYLOAD_SZ  16
+-#define KEY_SZ      16
++#ifdef HAVE_LIBGCRYPT
++#include <gcrypt.h>
++#else
++#include "aes.h"
++#endif /* HAVE_LIBGCRYPT. */
+ 
+ extern char *prog;
+ 
+ static bool no_hwrand = false;
+ static hwrand_t gen_hwrand;
+ 
++#ifndef HAVE_LIBGCRYPT
++#define PATH_URANDOM    "/dev/urandom"
++
++#define PAYLOAD_SZ  16
++#define KEY_SZ      16
++
+ static aes_context  ctx;
+ static unsigned char ctr[PAYLOAD_SZ];
+ 
+@@ -140,17 +146,26 @@ churnrand(void)
+ error:
+     return -1;
+ }
++#endif /* HAVE_LIBGCRYPT. */
+ 
+ /* Initialize the module.
+  */
+ int
+ initrand(void)
+ {
++#ifndef HAVE_LIBGCRYPT
+     struct timeval tv;
++#else
++    if (!gcry_check_version(GCRYPT_VERSION)) {
++        goto error;
++    }
++    gcry_control(GCRYCTL_INITIALIZATION_FINISHED, 0);
++#endif /* HAVE_LIBGCRYPT */
+ 
+     if (!no_hwrand)
+         gen_hwrand = init_hwrand();
+ 
++#ifndef HAVE_LIBGCRYPT
+     /* Always initialize the software random number generator as backup */
+ 
+     if (gettimeofday(&tv, NULL) < 0)
+@@ -163,6 +178,7 @@ initrand(void)
+ #endif
+     if (churnrand() < 0)
+         goto error;
++#endif /* HAVE_LIBGCRYPT. */
+     return 0;
+ error:
+     return -1;
+@@ -173,9 +189,11 @@ error:
+ void 
+ genrand(unsigned char *buf, int buflen)
+ {
++#ifndef HAVE_LIBGCRYPT
+     int i;
+     unsigned char out[PAYLOAD_SZ];
+     int cpylen = PAYLOAD_SZ;
++#endif /* HAVE_LIBGCRYPT. */
+ 
+     if (gen_hwrand) {
+         bool hwok = gen_hwrand(buf, buflen);
+@@ -183,6 +201,7 @@ genrand(unsigned char *buf, int buflen)
+             return;
+     }
+ 
++#ifndef HAVE_LIBGCRYPT
+     for (i = 0; i < buflen; i += cpylen) {
+         aes_encrypt(&ctx, ctr, out);
+         incr128(ctr);
+@@ -191,6 +210,9 @@ genrand(unsigned char *buf, int buflen)
+         memcpy(&buf[i], out, cpylen);
+     }
+     assert(i == buflen);
++#else
++    gcry_randomize(buf, buflen, GCRY_STRONG_RANDOM);
++#endif /* HAVE_LIBGCRYPT. */
+ }
+ 
+ /*
+diff -up scrub-2.6.1/src/genrand.h.libgcrypt scrub-2.6.1/src/genrand.h
+--- scrub-2.6.1/src/genrand.h.libgcrypt	2014-08-20 17:33:43.000000000 -0400
++++ scrub-2.6.1/src/genrand.h	2021-02-22 13:42:48.490217204 -0500
+@@ -1,8 +1,14 @@
++#include "config.h"
++
+ void disable_hwrand(void);
+ int initrand(void);
+-int churnrand(void);
+ void genrand(unsigned char *buf, int buflen);
+ 
++#ifndef HAVE_LIBGCRYPT
++int churnrand(void);
++#endif /* HAVE_LIBGCRYPT. */
++
++
+ /*
+  * vi:tabstop=4 shiftwidth=4 expandtab
+  */
+diff -up scrub-2.6.1/src/Makefile.am.libgcrypt scrub-2.6.1/src/Makefile.am
+--- scrub-2.6.1/src/Makefile.am.libgcrypt	2014-08-20 17:33:43.000000000 -0400
++++ scrub-2.6.1/src/Makefile.am	2021-02-22 13:43:47.008492696 -0500
+@@ -1,8 +1,6 @@
+ bin_PROGRAMS = scrub
+ 
+ scrub_SOURCES = \
+-	aes.c \
+-	aes.h \
+ 	filldentry.c \
+ 	filldentry.h \
+ 	fillfile.c \
+@@ -24,3 +22,9 @@ scrub_SOURCES = \
+ 	util.h
+ 
+ scrub_LDADD = $(LIBPTHREAD)
++
++if LIBGCRYPT
++scrub_LDADD += $(gcrypt_LIBS)
++else
++scrub_SOURCES += aes.c aes.h
++endif
+diff -up scrub-2.6.1/src/scrub.c.libgcrypt scrub-2.6.1/src/scrub.c
+--- scrub-2.6.1/src/scrub.c.libgcrypt	2021-02-22 13:42:48.488217195 -0500
++++ scrub-2.6.1/src/scrub.c	2021-02-22 13:42:48.490217204 -0500
+@@ -459,11 +459,13 @@ scrub(char *path, off_t size, const sequ
+             case PAT_RANDOM:
+                 printf("%s: %-8s", prog, "random");
+                 progress_create(&p, pcol);
++#ifndef HAVE_LIBGCRYPT
+                 if (churnrand() < 0) {
+                     fprintf(stderr, "%s: churnrand: %s\n", prog,
+                              strerror(errno));
+                     exit(1);
+                 }
++#endif /* HAVE_LIBGCRYPT. */
+                 written = fillfile(path, size, buf, bufsize, 
+                                    (progress_t)progress_update, p, 
+                                    (refill_t)genrand, sparse, enospc);
+diff -up scrub-2.6.1/test/Makefile.am.libgcrypt scrub-2.6.1/test/Makefile.am
+--- scrub-2.6.1/test/Makefile.am.libgcrypt	2014-08-26 14:11:14.000000000 -0400
++++ scrub-2.6.1/test/Makefile.am	2021-02-22 13:44:59.301833042 -0500
+@@ -1,8 +1,8 @@
+-check_PROGRAMS = pad trand aestest tprogress tgetsize tsig tsize pat
++check_PROGRAMS = pad trand tprogress tgetsize tsig tsize pat
+ 
+ TESTS_ENVIRONMENT = env 
+ TESTS_ENVIRONMENT += "PATH_SCRUB=$(top_builddir)/src/scrub"
+-TESTS = t00 t01 t02 t03 t04 t05 t06 t07 t08 t09 t10 t11 t12 t13 t14 t15 t16 \
++TESTS = t01 t02 t03 t04 t05 t06 t07 t08 t09 t10 t11 t12 t13 t14 t15 t16 \
+ 	t17 t18 t19 t20 t21 t22
+ 
+ CLEANFILES = *.out *.diff testfile
+@@ -13,17 +13,24 @@ common_sources = \
+ 	$(top_srcdir)/src/getsize.c \
+ 	$(top_srcdir)/src/genrand.c \
+ 	$(top_srcdir)/src/hwrand.c \
+-	$(top_srcdir)/src/aes.c \
+ 	$(top_srcdir)/src/util.c \
+ 	$(top_srcdir)/src/progress.c \
+ 	$(top_srcdir)/src/sig.c
+ 
+ pad_SOURCES = pad.c $(common_sources)
+ trand_SOURCES = trand.c $(common_sources)
+-aestest_SOURCES = aestest.c $(common_sources)
+ tprogress_SOURCES = tprogress.c $(common_sources)
+ tgetsize_SOURCES = tgetsize.c $(common_sources)
+ tsig_SOURCES = tsig.c $(common_sources)
+ pat_SOURCES = pat.c $(common_sources)
+ 
++if LIBGCRYPT
++AM_LDFLAGS = $(gcrypt_LIBS)
++else
++check_PROGRAMS += aestest
++TESTS += t00
++common_sources += $(top_srcdir)/src/aes.c
++aestest_SOURCES = aestest.c $(common_sources)
++endif
++
+ EXTRA_DIST = $(TESTS) $(TESTS:%=%.exp)

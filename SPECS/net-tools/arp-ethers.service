@@ -1,0 +1,14 @@
+[Unit]
+Description=Load static arp entries
+Documentation=man:arp(8) man:ethers(5)
+ConditionPathExists=/etc/ethers
+After=network.service
+Before=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/arp -f /etc/ethers
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

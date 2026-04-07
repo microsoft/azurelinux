@@ -1,0 +1,26 @@
+diff -rupN jack2-1.9.22.old/waflib/Context.py jack2-1.9.22/waflib/Context.py
+--- jack2-1.9.22.old/waflib/Context.py	2023-02-02 06:04:10.000000000 -0500
++++ jack2-1.9.22/waflib/Context.py	2023-07-25 22:30:59.255028763 -0400
+@@ -6,7 +6,9 @@
+ Classes and functions enabling the command system
+ """
+ 
+-import os, re, imp, sys
++import os, re, sys
++import importlib.util
++import importlib.machinery
+ from waflib import Utils, Errors, Logs
+ import waflib.Node
+ 
+@@ -660,7 +662,10 @@ def load_module(path, encoding=None):
+ 	except KeyError:
+ 		pass
+ 
+-	module = imp.new_module(WSCRIPT_FILE)
++	loader = importlib.machinery.SourceFileLoader(WSCRIPT_FILE, WSCRIPT_FILE)
++	spec = importlib.util.spec_from_loader(loader.name, loader)
++	module = importlib.util.module_from_spec(spec)
++	loader.exec_module(module)
+ 	try:
+ 		code = Utils.readf(path, m='r', encoding=encoding)
+ 	except EnvironmentError:

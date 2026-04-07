@@ -1,0 +1,8 @@
+--- pq-sys-0.4.8/Cargo.toml	1970-01-01T00:00:01+00:00
++++ pq-sys-0.4.8/Cargo.toml	2023-08-31T20:00:11.068121+00:00
+@@ -26,5 +26,3 @@
+ version = "0.3.0"
+ optional = true
+ 
+-[target."cfg(target_env = \"msvc\")".build-dependencies.vcpkg]
+-version = "0.2.6"

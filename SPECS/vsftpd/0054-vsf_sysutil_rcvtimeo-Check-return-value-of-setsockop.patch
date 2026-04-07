@@ -1,0 +1,33 @@
+From ca27e6e34d89fc247a164ed7330735644f97d7d8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Lyson=C4=9Bk?= <olysonek@redhat.com>
+Date: Wed, 9 May 2018 20:15:29 +0200
+Subject: [PATCH 54/59] vsf_sysutil_rcvtimeo: Check return value of setsockopt
+
+---
+ sysutil.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/sysutil.c b/sysutil.c
+index 3014c05..de5f876 100644
+--- a/sysutil.c
++++ b/sysutil.c
+@@ -684,10 +684,15 @@ void
+ vsf_sysutil_rcvtimeo(int fd)
+ {
+   struct timeval tv;
++  int retval;
+ 
+   tv.tv_sec = tunable_data_connection_timeout;
+   tv.tv_usec = 0;
+-  setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(struct timeval));
++  retval = setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(struct timeval));
++  if (retval != 0)
++  {
++    die("setsockopt: rcvtimeo");
++  }
+ }
+ 
+ void
+-- 
+2.14.4
+

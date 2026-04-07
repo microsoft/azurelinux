@@ -1,0 +1,36 @@
+diff --git a/src/testdir/test_channel.vim b/src/testdir/test_channel.vim
+index dcd0526..df85b41 100644
+--- a/src/testdir/test_channel.vim
++++ b/src/testdir/test_channel.vim
+@@ -24,7 +24,7 @@ func SetUp()
+     let s:localhost = 'unix:Xtestsocket'
+     let s:testscript = 'test_channel_unix.py'
+   else
+-    let s:localhost = 'localhost:'
++    let s:localhost = '127.0.0.1:'
+     let s:testscript = 'test_channel.py'
+   endif
+   let s:chopt = {}
+diff --git a/src/testdir/test_channel_lsp.py b/src/testdir/test_channel_lsp.py
+index 887f697..e856c30 100644
+--- a/src/testdir/test_channel_lsp.py
++++ b/src/testdir/test_channel_lsp.py
+@@ -358,4 +358,4 @@ def main(host, port, server_class=ThreadedTCPServer):
+         server.shutdown()
+ 
+ if __name__ == "__main__":
+-    main("localhost", 0)
++    main("127.0.0.1", 0)
+diff --git a/src/testdir/test_netbeans.py b/src/testdir/test_netbeans.py
+index 888a2d9..76bbf2d 100644
+--- a/src/testdir/test_netbeans.py
++++ b/src/testdir/test_netbeans.py
+@@ -182,7 +182,7 @@ def writePortInFile(port):
+     f.close()
+ 
+ if __name__ == "__main__":
+-    HOST, PORT = "localhost", 0
++    HOST, PORT = "127.0.0.1", 0
+ 
+     addrs = socket.getaddrinfo(HOST, PORT, 0, 0, socket.IPPROTO_TCP)
+     # Each addr is a (family, type, proto, canonname, sockaddr) tuple

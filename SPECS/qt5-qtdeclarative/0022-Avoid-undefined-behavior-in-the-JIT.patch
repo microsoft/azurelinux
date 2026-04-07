@@ -1,0 +1,124 @@
+From 1189557a50f11e7bc5716467a149cd09987a9f88 Mon Sep 17 00:00:00 2001
+From: Ulf Hermann <ulf.hermann@qt.io>
+Date: Wed, 16 Jun 2021 13:49:17 +0200
+Subject: [PATCH 22/22] Avoid undefined behavior in the JIT
+
+We need to add an entry to all the RegisterID enums, so that we can mark
+a RegisterID as invalid.
+
+Pick-to: 6.2
+Task-number: QTBUG-94068
+Change-Id: I5c13b271eade50fd63327612514ba7ebe33a5c39
+Reviewed-by: Fabian Kosmale <fabian.kosmale@qt.io>
+Reviewed-by: Andrei Golubev <andrei.golubev@qt.io>
+(cherry picked from commit 636481a31110f1819efaf6500b25fbc395854311)
+---
+ src/3rdparty/masm/assembler/ARM64Assembler.h |  1 +
+ src/3rdparty/masm/assembler/ARMv7Assembler.h |  1 +
+ src/3rdparty/masm/assembler/MIPSAssembler.h  |  3 ++-
+ src/3rdparty/masm/assembler/X86Assembler.h   |  1 +
+ src/qml/jit/qv4assemblercommon_p.h           | 10 +++++-----
+ 5 files changed, 10 insertions(+), 6 deletions(-)
+
+diff --git a/src/3rdparty/masm/assembler/ARM64Assembler.h b/src/3rdparty/masm/assembler/ARM64Assembler.h
+index 3e988a277c..f49af39682 100644
+--- a/src/3rdparty/masm/assembler/ARM64Assembler.h
++++ b/src/3rdparty/masm/assembler/ARM64Assembler.h
+@@ -517,6 +517,7 @@ typedef enum {
+     x29 = fp,
+     x30 = lr,
+     zr = 0x3f,
++    none = 0xff,
+ } RegisterID;
+ 
+ typedef enum {
+diff --git a/src/3rdparty/masm/assembler/ARMv7Assembler.h b/src/3rdparty/masm/assembler/ARMv7Assembler.h
+index 03cb9f42f8..330b6c3629 100644
+--- a/src/3rdparty/masm/assembler/ARMv7Assembler.h
++++ b/src/3rdparty/masm/assembler/ARMv7Assembler.h
+@@ -64,6 +64,7 @@ namespace ARMRegisters {
+         r13, sp = r13,
+         r14, lr = r14,
+         r15, pc = r15,
++        none = 0xff,
+     } RegisterID;
+ 
+     typedef enum {
+diff --git a/src/3rdparty/masm/assembler/MIPSAssembler.h b/src/3rdparty/masm/assembler/MIPSAssembler.h
+index 7f553bb9a1..0419ea0504 100644
+--- a/src/3rdparty/masm/assembler/MIPSAssembler.h
++++ b/src/3rdparty/masm/assembler/MIPSAssembler.h
+@@ -105,7 +105,8 @@ typedef enum {
+     gp = r28,
+     sp = r29,
+     fp = r30,
+-    ra = r31
++    ra = r31,
++    none = 0xff,
+ } RegisterID;
+ 
+ typedef enum {
+diff --git a/src/3rdparty/masm/assembler/X86Assembler.h b/src/3rdparty/masm/assembler/X86Assembler.h
+index 8f9ee29a4d..40282987a4 100644
+--- a/src/3rdparty/masm/assembler/X86Assembler.h
++++ b/src/3rdparty/masm/assembler/X86Assembler.h
+@@ -62,6 +62,7 @@ namespace X86Registers {
+         r14,
+         r15,
+ #endif
++        none = 0xff,
+     } RegisterID;
+ 
+     typedef enum {
+diff --git a/src/qml/jit/qv4assemblercommon_p.h b/src/qml/jit/qv4assemblercommon_p.h
+index c3b1eb34eb..a7028c437e 100644
+--- a/src/qml/jit/qv4assemblercommon_p.h
++++ b/src/qml/jit/qv4assemblercommon_p.h
+@@ -73,7 +73,7 @@ class PlatformAssembler_X86_64_SysV : public JSC::MacroAssembler<JSC::MacroAssem
+ public:
+     static constexpr int NativeStackAlignment = 16;
+ 
+-    static const RegisterID NoRegister = RegisterID(-1);
++    static const RegisterID NoRegister = RegisterID::none;
+ 
+     static const RegisterID ReturnValueRegister   = RegisterID::eax;
+     static const RegisterID ReturnValueRegisterValue = ReturnValueRegister;
+@@ -160,7 +160,7 @@ typedef PlatformAssembler_X86_64_SysV PlatformAssemblerBase;
+ class PlatformAssembler_Win64 : public JSC::MacroAssembler<JSC::MacroAssemblerX86_64>
+ {
+ public:
+-    static const RegisterID NoRegister = RegisterID(-1);
++    static const RegisterID NoRegister = RegisterID::none;
+ 
+     static const RegisterID ReturnValueRegister   = RegisterID::eax;
+     static const RegisterID ReturnValueRegisterValue = ReturnValueRegister;
+@@ -250,7 +250,7 @@ typedef PlatformAssembler_Win64 PlatformAssemblerBase;
+ class PlatformAssembler_X86_All : public JSC::MacroAssembler<JSC::MacroAssemblerX86>
+ {
+ public:
+-    static const RegisterID NoRegister = RegisterID(-1);
++    static const RegisterID NoRegister = RegisterID::none;
+ 
+     static const RegisterID ReturnValueRegisterValue = RegisterID::eax;
+     static const RegisterID ReturnValueRegisterTag   = RegisterID::edx;
+@@ -340,7 +340,7 @@ typedef PlatformAssembler_X86_All PlatformAssemblerBase;
+ class PlatformAssembler_ARM64 : public JSC::MacroAssembler<JSC::MacroAssemblerARM64>
+ {
+ public:
+-    static const RegisterID NoRegister = RegisterID(-1);
++    static const RegisterID NoRegister = RegisterID::none;
+ 
+     static const RegisterID ReturnValueRegister   = JSC::ARM64Registers::x0;
+     static const RegisterID ReturnValueRegisterValue = ReturnValueRegister;
+@@ -439,7 +439,7 @@ typedef PlatformAssembler_ARM64 PlatformAssemblerBase;
+ class PlatformAssembler_ARM32 : public JSC::MacroAssembler<JSC::MacroAssemblerARMv7>
+ {
+ public:
+-    static const RegisterID NoRegister = RegisterID(-1);
++    static const RegisterID NoRegister = RegisterID::none;
+ 
+     static const RegisterID ReturnValueRegisterValue = JSC::ARMRegisters::r0;
+     static const RegisterID ReturnValueRegisterTag   = JSC::ARMRegisters::r1;
+-- 
+2.51.1
+

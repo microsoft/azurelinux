@@ -1,0 +1,20 @@
+Another implicit declaration of exit in the -DXTHREADS check, which
+will go wrong with future compilers that do not support implicit
+function declarations.
+
+diff --git a/acinclude.m4 b/acinclude.m4
+index 61706f3e63d94d8a..88edfce3d169a267 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -22,9 +22,9 @@ int main() {
+ Boolean brc;
+ brc=XtToolkitThreadInitialize();
+ if (True==brc)
+-  exit(0);
++  return 0;
+ else
+-  exit(1);
++  return 1;
+ }
+ ],
+ lt_cv_xthreads=yes,

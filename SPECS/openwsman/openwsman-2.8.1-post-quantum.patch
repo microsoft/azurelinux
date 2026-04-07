@@ -1,0 +1,101 @@
+diff -up openwsman-2.7.2/etc/openwsman.conf.orig openwsman-2.7.2/etc/openwsman.conf
+--- openwsman-2.7.2/etc/openwsman.conf.orig	2022-12-28 16:43:03.000000000 +0100
++++ openwsman-2.7.2/etc/openwsman.conf	2025-05-27 08:03:57.890057721 +0200
+@@ -32,8 +32,12 @@ ipv6 = yes
+ 
+ # the openwsman server certificate file, in .pem format
+ ssl_cert_file = /etc/openwsman/servercert.pem
++# the openwsman server certificate fallback file, in .pem format
++#ssl_cert_fallback_file = /etc/openwsman/servercert-fallback.pem
+ # the openwsman server private key, in .pem format
+ ssl_key_file = /etc/openwsman/serverkey.pem
++# the openwsman server private key fallback, in .pem format
++#ssl_key_fallback_file = /etc/openwsman/serverkey-fallback.pem
+ 
+ # space-separated list of SSL protocols to *dis*able
+ # possible values: SSLv2 SSLv3 TLSv1 TLSv1_1 TLSv1_2
+diff -up openwsman-2.7.2/src/server/shttpd/shttpd.c.orig openwsman-2.7.2/src/server/shttpd/shttpd.c
+--- openwsman-2.7.2/src/server/shttpd/shttpd.c.orig	2025-05-21 10:07:40.404532496 +0200
++++ openwsman-2.7.2/src/server/shttpd/shttpd.c	2025-06-12 12:27:44.785904555 +0200
+@@ -1491,7 +1491,6 @@ set_ssl(struct shttpd_ctx *ctx, const ch
+ 	char *ssl_disabled_protocols = wsmand_options_get_ssl_disabled_protocols();
+ 	char *ssl_cipher_list = wsmand_options_get_ssl_cipher_list();
+ 	int		retval = FALSE;
+-	EC_KEY*		key;
+ 
+ 	/* Initialize SSL crap */
+ 
+@@ -1510,11 +1509,15 @@ set_ssl(struct shttpd_ctx *ctx, const ch
+ 	else
+ 		retval = TRUE;
+ 
+-	/* This enables ECDH Perfect Forward secrecy. Currently with just the most generic p256 prime curve */
+-	key = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1);
+-	if (key != NULL) {
+-		SSL_CTX_set_tmp_ecdh(CTX, key);
+-		EC_KEY_free(key);
++	/* Add fall back certificate/key pair */
++	if (wsmand_options_get_ssl_cert_fallback_file() &&
++                    wsmand_options_get_ssl_key_fallback_file()) {
++		if (SSL_CTX_use_certificate_file(CTX, wsmand_options_get_ssl_cert_fallback_file(), SSL_FILETYPE_PEM) != 1)
++			_shttpd_elog(E_LOG, NULL, "cannot open certificate fallback file %s", pem);
++		else if (SSL_CTX_use_PrivateKey_file(CTX, wsmand_options_get_ssl_key_fallback_file(), SSL_FILETYPE_PEM) != 1)
++			_shttpd_elog(E_LOG, NULL, "cannot open fallback PrivateKey %s", pem);
++		else
++			retval = TRUE;
+ 	}
+ 
+ 	while (ssl_disabled_protocols) {
+diff -up openwsman-2.7.2/src/server/wsmand-daemon.c.orig openwsman-2.7.2/src/server/wsmand-daemon.c
+--- openwsman-2.7.2/src/server/wsmand-daemon.c.orig	2025-05-27 07:18:16.878974761 +0200
++++ openwsman-2.7.2/src/server/wsmand-daemon.c	2025-05-27 07:22:06.832235764 +0200
+@@ -76,8 +76,10 @@ static int use_ipv6 = 0;
+ #endif
+ static int use_digest = 0;
+ static char *ssl_key_file = NULL;
++static char *ssl_key_fallback_file = NULL;
+ static char *service_path = DEFAULT_SERVICE_PATH;
+ static char *ssl_cert_file = NULL;
++static char *ssl_cert_fallback_file = NULL;
+ static char *ssl_disabled_protocols = NULL;
+ static char *ssl_cipher_list = NULL;
+ static char *pid_file = DEFAULT_PID_PATH;
+@@ -186,7 +188,9 @@ int wsmand_read_config(dictionary * ini)
+ 	service_path =
+ 	    iniparser_getstring(ini, "server:service_path", "/wsman");
+ 	ssl_key_file = iniparser_getstr(ini, "server:ssl_key_file");
++	ssl_key_fallback_file = iniparser_getstr(ini, "server:ssl_key_fallback_file");
+ 	ssl_cert_file = iniparser_getstr(ini, "server:ssl_cert_file");
++	ssl_cert_fallback_file = iniparser_getstr(ini, "server:ssl_cert_fallback_file");
+         ssl_disabled_protocols = iniparser_getstr(ini, "server:ssl_disabled_protocols");
+         ssl_cipher_list = iniparser_getstr(ini, "server:ssl_cipher_list");
+ 	use_ipv4 = iniparser_getboolean(ini, "server:ipv4", 1);
+@@ -364,6 +368,16 @@ char *wsmand_options_get_ssl_cert_file(v
+ 	return ssl_cert_file;
+ }
+ 
++char *wsmand_options_get_ssl_key_fallback_file(void)
++{
++	return ssl_key_fallback_file;
++}
++
++char *wsmand_options_get_ssl_cert_fallback_file(void)
++{
++	return ssl_cert_fallback_file;
++}
++
+ char *wsmand_options_get_ssl_disabled_protocols(void)
+ {
+ 	return ssl_disabled_protocols;
+diff -up openwsman-2.7.2/src/server/wsmand-daemon.h.orig openwsman-2.7.2/src/server/wsmand-daemon.h
+--- openwsman-2.7.2/src/server/wsmand-daemon.h.orig	2025-05-27 07:15:56.869002037 +0200
++++ openwsman-2.7.2/src/server/wsmand-daemon.h	2025-05-27 07:18:06.429846617 +0200
+@@ -76,6 +76,8 @@ int wsmand_options_get_server_port(void)
+ int wsmand_options_get_server_ssl_port(void);
+ char *wsmand_options_get_ssl_key_file(void);
+ char *wsmand_options_get_ssl_cert_file(void);
++char *wsmand_options_get_ssl_key_fallback_file(void);
++char *wsmand_options_get_ssl_cert_fallback_file(void);
+ char *wsmand_options_get_ssl_disabled_protocols(void);
+ char *wsmand_options_get_ssl_cipher_list(void);
+ int wsmand_options_get_digest(void);

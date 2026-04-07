@@ -1,0 +1,19 @@
+Author: Filip Januš <fjanus@redhat.com>
+Date: 6 Sep 2021
+Related: https://bugzilla.redhat.com/show_bug.cgi?id=1992402
+Patch was created based on the discussion in the previous link
+diff -ur db-5.3.28/src/os/os_map.c db_patch/src/os/os_map.c
+--- db-5.3.28/src/os/os_map.c	2013-09-09 17:35:09.000000000 +0200
++++ db_patch/src/os/os_map.c	2021-09-09 07:33:12.027328265 +0200
+@@ -213,7 +213,10 @@
+ 	if (rp->max < rp->size)
+ 		rp->max = rp->size;
+ 	if (ret == 0 && F_ISSET(infop, REGION_CREATE)) {
+-		if (F_ISSET(dbenv, DB_ENV_REGION_INIT))
++
++		rp->size = rp->max;
++
++        if (F_ISSET(dbenv, DB_ENV_REGION_INIT))
+ 			ret = __db_file_write(env, infop->fhp,
+ 			    rp->size / MEGABYTE, rp->size % MEGABYTE, 0x00);
+ 		else

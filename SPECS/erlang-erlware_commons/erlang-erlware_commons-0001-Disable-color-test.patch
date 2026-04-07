@@ -1,0 +1,25 @@
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Wed, 26 Jan 2022 21:42:21 +0100
+Subject: [PATCH] Disable color test
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+
+diff --git a/test/ec_cmd_log_tests.erl b/test/ec_cmd_log_tests.erl
+index f1d1181..30a4939 100644
+--- a/test/ec_cmd_log_tests.erl
++++ b/test/ec_cmd_log_tests.erl
+@@ -26,14 +26,3 @@ should_test() ->
+     ?assertMatch(true, ec_cmd_log:should(DebugLogState, ?EC_DEBUG)),
+     ?assertEqual(?EC_DEBUG, ec_cmd_log:log_level(DebugLogState)),
+     ?assertEqual(debug, ec_cmd_log:atom_log_level(DebugLogState)).
+-
+-
+-no_color_test() ->
+-    LogState = ec_cmd_log:new(debug, command_line, none),
+-    ?assertEqual("test",
+-                 ec_cmd_log:colorize(LogState, ?RED, true, "test")).
+-
+-color_test() ->
+-    LogState = ec_cmd_log:new(debug, command_line, high),
+-    ?assertEqual("\e[1;31m===> test\e[0m",
+-                 ec_cmd_log:colorize(LogState, ?RED, true, "test")).

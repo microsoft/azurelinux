@@ -1,0 +1,62 @@
+From db01806c94b109117683aecf4b1934f8ce2a3137 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Wed, 28 Aug 2019 10:31:26 +0200
+Subject: [PATCH] Use temporary output files for tests
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+I need to run the tests from a read-only directory. The t/07io.t fails
+because it creates a file in ./t directory. This patch uses File::Temp
+for creating the writable file.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ dist.ini |  1 +
+ t/07io.t | 11 ++++++-----
+ 2 files changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/dist.ini b/dist.ini
+index 167e3e2..6f2fb12 100644
+--- a/dist.ini
++++ b/dist.ini
+@@ -23,6 +23,7 @@ directory = examples
+ [PodVersion]
+ 
+ [Prereqs / TestRequires]
++File::Temp   = 0
+ Test::More   = 0.90
+ Math::BigInt = 1.997
+ 
+diff --git a/t/07io.t b/t/07io.t
+index 706cf51..cca31d7 100644
+--- a/t/07io.t
++++ b/t/07io.t
+@@ -2,6 +2,7 @@
+ 
+ use Convert::ASN1 qw(:io);
+ use IO::Socket;
++use File::Temp ();
+ 
+ print "1..11\n";
+ 
+@@ -14,11 +15,11 @@ my  $result = pack("C*", 0x30, 0x3D, 0x04, 0x04, 0x46, 0x72, 0x65, 0x64,
+ 			 0x73, 0x74, 0x04, 0x02, 0x6F, 0x66, 0x04, 0x07,
+ 			 0x73, 0x74, 0x72, 0x69, 0x6E, 0x67, 0x73);
+ 
+-($file = $0) =~ s/t$/dat/;
+-open(OUT,"> $file");
+-asn_write(*OUT, $result);
+-asn_write(*OUT, $result);
+-close(OUT);
++$fd = File::Temp->new('UNLINK' => 0);
++$file = $fd->filename;
++asn_write($fd, $result);
++asn_write($fd, $result);
++$fd->close;
+ 
+ open(IN,"< $file");
+ sysread(IN,$buffer,1024);
+-- 
+2.21.0
+

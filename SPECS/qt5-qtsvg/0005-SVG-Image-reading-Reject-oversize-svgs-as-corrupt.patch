@@ -1,0 +1,39 @@
+From b74f7291f343dcbcb487b020868f042d8fe83098 Mon Sep 17 00:00:00 2001
+From: Eirik Aavitsland <eirik.aavitsland@qt.io>
+Date: Mon, 25 Oct 2021 14:43:09 +0200
+Subject: [PATCH 5/5] SVG Image reading: Reject oversize svgs as corrupt
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Add an upper limit for height and width at 0xffff, same as jpeg.
+
+Fixes: QTBUG-95891
+Pick-to: 6.2 5.15 5.12
+Change-Id: I0dbc80dab3aab9b4743548772fb63fa69ea21f8a
+Reviewed-by: Robert Löhning <robert.loehning@qt.io>
+Reviewed-by: Allan Sandfeld Jensen <allan.jensen@qt.io>
+(cherry picked from commit e544d8e457d52b543cae5c988f81237c7d6608da)
+
+asturmlechner 2022-01-03: resolve conflict with preceding dev branch
+  commit 0003ec68e9925a8386eb055e0030fe7f270aa56f.
+---
+ src/plugins/imageformats/svg/qsvgiohandler.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/plugins/imageformats/svg/qsvgiohandler.cpp b/src/plugins/imageformats/svg/qsvgiohandler.cpp
+index 561e77e9..12e05748 100644
+--- a/src/plugins/imageformats/svg/qsvgiohandler.cpp
++++ b/src/plugins/imageformats/svg/qsvgiohandler.cpp
+@@ -191,6 +191,8 @@ bool QSvgIOHandler::read(QImage *image)
+             }
+         }
+         if (!finalSize.isEmpty()) {
++            if (qMax(finalSize.width(), finalSize.height()) > 0xffff)
++                return false; // Assume corrupted file
+             image->fill(d->backColor.rgba());
+             QPainter p(image);
+             d->r.render(&p, bounds);
+-- 
+2.51.1
+

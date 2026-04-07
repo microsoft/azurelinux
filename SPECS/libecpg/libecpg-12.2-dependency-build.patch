@@ -1,0 +1,12 @@
+diff -ur postgresql-14.4_original/src/interfaces/libpq/Makefile postgresql-14.4/src/interfaces/libpq/Makefile
+--- postgresql-14.4_original/src/interfaces/libpq/Makefile	2022-06-22 12:24:56.506658251 +0200
++++ postgresql-14.4/src/interfaces/libpq/Makefile	2022-06-22 12:25:46.222779323 +0200
+@@ -98,8 +98,6 @@
+ PKG_CONFIG_REQUIRES_PRIVATE = libssl, libcrypto
+ endif
+ 
+-all: all-lib libpq-refs-stamp
+-
+ # Shared library stuff
+ include $(top_srcdir)/src/Makefile.shlib
+ backend_src = $(top_srcdir)/src/backend

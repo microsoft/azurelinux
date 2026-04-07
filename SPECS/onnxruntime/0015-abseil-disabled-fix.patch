@@ -1,0 +1,46 @@
+From 65062053f3e52c75e782b7a3cd79fe460c72f26c Mon Sep 17 00:00:00 2001
+From: Diego Herrera <dherrera@redhat.com>
+Date: Mon, 30 Dec 2024 19:13:44 -0300
+Subject: [PATCH 15/20] abseil-disabled-fix
+
+---
+ onnxruntime/core/session/inference_session.cc | 5 +++++
+ onnxruntime/test/providers/base_tester.h      | 4 ++++
+ 2 files changed, 9 insertions(+)
+
+diff --git a/onnxruntime/core/session/inference_session.cc b/onnxruntime/core/session/inference_session.cc
+index 023cbcbe88..6729940994 100644
+--- a/onnxruntime/core/session/inference_session.cc
++++ b/onnxruntime/core/session/inference_session.cc
+@@ -464,7 +464,12 @@ void InferenceSession::ConstructorCommon(const SessionOptions& session_options,
+       const auto disabled_list = utils::SplitString(disabled_string, ";");
+       InlinedHashSet<std::string> disabled_rules_and_transformers;
+       disabled_rules_and_transformers.reserve(disabled_list.size());
++#ifndef DISABLE_ABSEIL
+       disabled_rules_and_transformers.insert(disabled_list.cbegin(), disabled_list.cend());
++#else
++      for (auto it = disabled_list.begin(); it != disabled_list.end(); ++it)
++        disabled_rules_and_transformers.insert(std::string(*it));
++#endif
+       ORT_THROW_IF_ERROR(FilterEnabledOptimizers(std::move(disabled_rules_and_transformers)));
+     }
+   }
+diff --git a/onnxruntime/test/providers/base_tester.h b/onnxruntime/test/providers/base_tester.h
+index 512b3402c5..a378b7e1b3 100644
+--- a/onnxruntime/test/providers/base_tester.h
++++ b/onnxruntime/test/providers/base_tester.h
+@@ -54,7 +54,11 @@ class BaseTester {
+ 
+   // Dims variant is needed to reduce the number of overloads
+   // MS compiler refuses to create a gsl::span from initializer_list especially if it contains a single element
++#ifndef DISABLE_ABSEIL
+   using DimsVariant = std::variant<std::vector<int64_t>, TensorShapeVector>;
++#else
++  using DimsVariant = std::variant<TensorShapeVector>;
++#endif
+ 
+   template <typename T>
+   void AddInput(const char* name, std::initializer_list<int64_t> dims, std::initializer_list<T> values,
+-- 
+2.47.1
+

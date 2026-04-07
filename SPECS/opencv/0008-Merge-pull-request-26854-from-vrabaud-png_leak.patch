@@ -1,0 +1,90 @@
+From 0d99c4283620671be3009ec00eb260e5a759cc39 Mon Sep 17 00:00:00 2001
+From: Vincent Rabaud <vrabaud@google.com>
+Date: Fri, 31 Jan 2025 09:00:23 +0100
+Subject: [PATCH 08/10] Merge pull request #26854 from vrabaud:png_leak
+
+Fix oss-fuzz bugs 391934081 and 392318892 #26854
+
+- fix a potential overflow in x0+w0
+- use the proper function to deal with background color to deal with all cases of the spec
+- use BGR layout for APNG background color
+
+### Pull Request Readiness Checklist
+
+See details at https://github.com/opencv/opencv/wiki/How_to_contribute#making-a-good-pull-request
+
+- [x] I agree to contribute to the project under Apache 2 License.
+- [x] To the best of my knowledge, the proposed patch is not based on a code under GPL or another license that is incompatible with OpenCV
+- [x] The PR is proposed to the proper branch
+- [x] There is a reference to the original bug report and related work
+- [ ] There is accuracy test, performance test and test data in opencv_extra repository, if applicable
+      Patch to opencv_extra has the same branch name.
+- [ ] The feature is well documented and sample code can be built with the project CMake
+---
+ .../imgcodecs/include/opencv2/imgcodecs.hpp   |  2 +-
+ modules/imgcodecs/src/grfmt_png.cpp           | 19 +++++++------------
+ 2 files changed, 8 insertions(+), 13 deletions(-)
+
+diff --git a/modules/imgcodecs/include/opencv2/imgcodecs.hpp b/modules/imgcodecs/include/opencv2/imgcodecs.hpp
+index cd648c2c6e..c802033e6b 100644
+--- a/modules/imgcodecs/include/opencv2/imgcodecs.hpp
++++ b/modules/imgcodecs/include/opencv2/imgcodecs.hpp
+@@ -263,7 +263,7 @@ struct CV_EXPORTS_W_SIMPLE Animation
+     - If a negative value or a value beyond the maximum of `0xffff` (65535) is provided, it is reset to `0`
+     (infinite looping) to maintain valid bounds.
+ 
+-    @param bgColor A `Scalar` object representing the background color in BGRA format:
++    @param bgColor A `Scalar` object representing the background color in BGR format:
+     - Defaults to `Scalar()`, indicating an empty color (usually transparent if supported).
+     - This background color provides a solid fill behind frames that have transparency, ensuring a consistent display appearance.
+     */
+diff --git a/modules/imgcodecs/src/grfmt_png.cpp b/modules/imgcodecs/src/grfmt_png.cpp
+index 909a9017b2..f7a19c2bf5 100644
+--- a/modules/imgcodecs/src/grfmt_png.cpp
++++ b/modules/imgcodecs/src/grfmt_png.cpp
+@@ -325,15 +325,6 @@ bool  PngDecoder::readHeader()
+             bop = chunk.p[33];
+         }
+ 
+-        if (id == id_bKGD)
+-        {
+-            // The spec is actually more complex: http://www.libpng.org/pub/png/spec/1.2/PNG-Chunks.html#C.bKGD
+-            m_animation.bgcolor[0] = png_get_uint_16(&chunk.p[8]);
+-            m_animation.bgcolor[1] = png_get_uint_16(&chunk.p[10]);
+-            m_animation.bgcolor[2] = png_get_uint_16(&chunk.p[12]);
+-            m_animation.bgcolor[3] = 0;
+-        }
+-
+         if (id == id_PLTE || id == id_tRNS)
+             m_chunksInfo.push_back(chunk);
+     }
+@@ -356,9 +347,13 @@ bool  PngDecoder::readHeader()
+     m_color_type = color_type;
+     m_bit_depth = bit_depth;
+ 
+-    if (m_is_fcTL_loaded && (int(x0 + w0) > m_width || int(y0 + h0) > m_height || dop > 2 || bop > 1))
++    if (m_is_fcTL_loaded && ((long long int)x0 + w0 > m_width || (long long int)y0 + h0 > m_height || dop > 2 || bop > 1))
+         return false;
+ 
++    png_color_16p background_color;
++    if (png_get_bKGD(m_png_ptr, m_info_ptr, &background_color))
++        m_animation.bgcolor = Scalar(background_color->blue, background_color->green, background_color->red);
++
+     if (bit_depth <= 8 || bit_depth == 16)
+     {
+         switch (color_type)
+@@ -1544,9 +1539,9 @@ bool PngEncoder::writeanimation(const Animation& animation, const std::vector<in
+         if ((animation.bgcolor != Scalar()) && coltype)
+         {
+             unsigned char bgvalue[6] = {};
+-            bgvalue[1] = animation.bgcolor[0];
++            bgvalue[1] = animation.bgcolor[2];
+             bgvalue[3] = animation.bgcolor[1];
+-            bgvalue[5] = animation.bgcolor[2];
++            bgvalue[5] = animation.bgcolor[0];
+             writeChunk(m_f, "bKGD", bgvalue, 6); //the bKGD chunk must precede the first IDAT chunk, and must follow the PLTE chunk.
+         }
+ 
+-- 
+2.48.1
+

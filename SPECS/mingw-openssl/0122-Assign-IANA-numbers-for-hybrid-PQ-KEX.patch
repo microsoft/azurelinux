@@ -1,0 +1,27 @@
+From 303b630a564aaf3dcb1e4e96d8fa396e7ad980e4 Mon Sep 17 00:00:00 2001
+From: Sahana Prasad <sahana@redhat.com>
+Date: Tue, 9 Jul 2024 12:29:04 +0200
+Subject: [PATCH 50/50] Assign IANA numbers for hybrid PQ KEX Porting the fix
+ in https://github.com/openssl/openssl/pull/22803
+
+Signed-off-by: Sahana Prasad <sahana@redhat.com>
+---
+ ssl/t1_trce.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/ssl/t1_trce.c b/ssl/t1_trce.c
+index b05012f74f..29dce65e4f 100644
+--- a/ssl/t1_trce.c
++++ b/ssl/t1_trce.c
+@@ -545,6 +545,8 @@ static const ssl_trace_tbl ssl_groups_tbl[] = {
+     {258, "ffdhe4096"},
+     {259, "ffdhe6144"},
+     {260, "ffdhe8192"},
++    {25497, "X25519Kyber768Draft00"},
++    {25498, "SecP256r1Kyber768Draft00"},
+     {0xFF01, "arbitrary_explicit_prime_curves"},
+     {0xFF02, "arbitrary_explicit_char2_curves"}
+ };
+-- 
+2.41.0
+

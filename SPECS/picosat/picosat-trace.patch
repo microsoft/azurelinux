@@ -1,0 +1,87 @@
+--- ./makefile.in.orig	2016-01-13 00:19:13.000000000 -0700
++++ ./makefile.in	2016-01-13 19:45:19.860821928 -0700
+@@ -12,16 +12,16 @@ clean:
+ analyze:
+ 	clang --analyze $(CFLAGS) *.c *.h
+ 
+-picosat: libpicosat.a app.o main.o
++picosat: libpicosat.so app.o main.o
+ 	$(CC) $(CFLAGS) -o $@ main.o app.o -L. -lpicosat
+ 
+-picomcs: libpicosat.a picomcs.o
++picomcs: libpicosat.so picomcs.o
+ 	$(CC) $(CFLAGS) -o $@ picomcs.o -L. -lpicosat
+ 
+-picomus: libpicosat.a picomus.o
++picomus: libpicosat.so picomus.o
+ 	$(CC) $(CFLAGS) -o $@ picomus.o -L. -lpicosat
+ 
+-picogcnf: libpicosat.a picogcnf.o
++picogcnf: libpicosat.so picogcnf.o
+ 	$(CC) $(CFLAGS) -o $@ picogcnf.o -L. -lpicosat
+ 
+ app.o: app.c picosat.h makefile
+@@ -40,10 +40,10 @@ main.o: main.c picosat.h makefile
+ 	$(CC) $(CFLAGS) -c $<
+ 
+ picosat.o: picosat.c picosat.h makefile
+-	$(CC) $(CFLAGS) -c $<
++	$(CC) $(CFLAGS) -fPIC -c $<
+ 
+ version.o: version.c config.h makefile
+-	$(CC) $(CFLAGS) -c $<
++	$(CC) $(CFLAGS) -fPIC -c $<
+ 
+ config.h: makefile VERSION mkconfig.sh # and actually picosat.c
+ 	rm -f $@; ./mkconfig.sh > $@
+@@ -54,6 +54,6 @@ libpicosat.a: picosat.o version.o
+ 
+ SONAME=-Xlinker -soname -Xlinker libpicosat.so
+ libpicosat.so: picosat.o version.o
+-	$(CC) $(CFLAGS) -shared -o $@ picosat.o version.o $(SONAME)
++	$(CC) $(CFLAGS) -fPIC -shared -o $@ picosat.o version.o $(SONAME)
+ 
+ .PHONY: all clean
+--- ./picomus.c.orig	2016-01-13 00:19:13.000000000 -0700
++++ ./picomus.c	2016-01-13 21:14:22.638231658 -0700
+@@ -193,9 +193,8 @@ static const char * USAGE =
+ "\n"
+ "This typically slows down this MUS extractor, since\n"
+ "it only relies on clause selector variables and\n"
+-"can not make use of core extraction.  To enable\n"
+-"trace generation use './configure.sh --trace' or\n"
+-"'./configure.sh -O --trace' when building PicoSAT.\n"
++"can not make use of core extraction.  To use trace\n"
++"support, run picomus.trace instead.\n"
+ #else
+ "Since trace generation code is included, this binary\n"
+ "uses also core extraction in addition to clause selector\n"
+--- ./picosat.c.orig	2016-01-13 00:19:13.000000000 -0700
++++ ./picosat.c	2016-01-13 19:45:19.879820386 -0700
+@@ -6547,7 +6547,7 @@ check_trace_support_and_execute (PS * ps
+   (void) file;
+   (void) fmt;
+   (void) f;
+-  ABORT ("compiled without trace support");
++  ABORT ("compiled without trace support; please use picosat.trace instead");
+ #endif
+ }
+ 
+@@ -7262,7 +7262,7 @@ picosat_corelit (PS * ps, int int_lit)
+     return res;
+   }
+ #else
+-  ABORT ("compiled without trace support");
++  ABORT ("compiled without trace support; please use picosat.trace instead");
+   return 0;
+ #endif
+ }
+@@ -7298,7 +7298,7 @@ picosat_coreclause (PS * ps, int ocls)
+     return res;
+   }
+ #else
+-  ABORT ("compiled without trace support");
++  ABORT ("compiled without trace support; please use picosat.trace instead");
+   return 0;
+ #endif
+ }

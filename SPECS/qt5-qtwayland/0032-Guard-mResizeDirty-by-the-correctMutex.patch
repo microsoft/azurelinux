@@ -1,0 +1,39 @@
+From 710d316d8a979b9991f4e7cb99388715bd04b628 Mon Sep 17 00:00:00 2001
+From: David Edmundson <davidedmundson@kde.org>
+Date: Thu, 3 Feb 2022 19:42:33 +0000
+Subject: [PATCH 32/55] Guard mResizeDirty by the correctMutex
+
+mResizeDirty is used in the GUI thread in setCanResize which can be
+called from the GUI thread. It is queried and set whilst the resizeLock
+is held. We need to guard our usage.
+
+Change-Id: I5f8dcf8aa2cb2c4bb6274103df1da9e3e268605a
+Reviewed-by: Eskil Abrahamsen Blomfeldt <eskil.abrahamsen-blomfeldt@qt.io>
+(cherry picked from commit 4ac96662c936821efff2875bbe555b40612caf8a)
+---
+ src/client/qwaylandwindow.cpp | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
+index 60665394..e5d1a97d 100644
+--- a/src/client/qwaylandwindow.cpp
++++ b/src/client/qwaylandwindow.cpp
+@@ -358,11 +358,12 @@ void QWaylandWindow::setGeometry(const QRect &rect)
+         if (mWindowDecoration)
+             mWindowDecoration->update();
+ 
+-        if (mResizeAfterSwap && windowType() == Egl && mSentInitialResize)
++        if (mResizeAfterSwap && windowType() == Egl && mSentInitialResize) {
++            QMutexLocker lock(&mResizeLock);
+             mResizeDirty = true;
+-        else
++        } else {
+             QWindowSystemInterface::handleGeometryChange(window(), geometry());
+-
++        }
+         mSentInitialResize = true;
+     }
+     QRect exposeGeometry(QPoint(), geometry().size());
+-- 
+2.51.1
+

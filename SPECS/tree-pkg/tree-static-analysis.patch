@@ -1,0 +1,39 @@
+From 33c865a7988a8c2e5a257ca407d02bfa94739cb4 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Tue, 6 Nov 2018 16:31:32 +0100
+Subject: [PATCH] tree: fix programming mistakes detected by static analysis
+
+---
+ list.c | 2 +-
+ tree.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/list.c b/list.c
+index 4db6e6e..0fd36a0 100644
+--- a/list.c
++++ b/list.c
+@@ -59,7 +59,7 @@ void emit_tree(char **dirname, bool needfulltree)
+   struct ignorefile *ig = NULL;
+   struct infofile *inf = NULL;
+   struct _info **dir = NULL, *info = NULL;
+-  char *err;
++  char *err = NULL;
+   ssize_t n;
+   int i, needsclosed;
+   size_t j;
+diff --git a/tree.c b/tree.c
+index 4b30786..cc0f3fa 100644
+--- a/tree.c
++++ b/tree.c
+@@ -1019,7 +1019,7 @@ struct _info **unix_getfulltree(char *d, u_long lev, dev_t dev, off_t *size, cha
+ 	    if (*(*dir)->lnk == '/')
+ 	      (*dir)->child = unix_getfulltree((*dir)->lnk,lev+1,dev,&((*dir)->size),&((*dir)->err));
+ 	    else {
+-	      if (strlen(d)+strlen((*dir)->lnk)+2 > pathsize) path=xrealloc(path,pathsize=(strlen(d)+strlen((*dir)->name)+1024));
++	      if (strlen(d)+strlen((*dir)->lnk)+2 > pathsize) path=xrealloc(path,pathsize=(strlen(d)+strlen((*dir)->lnk)+1024));
+ 	      if (fflag && !strcmp(d,"/")) sprintf(path,"%s%s",d,(*dir)->lnk);
+ 	      else sprintf(path,"%s/%s",d,(*dir)->lnk);
+ 	      (*dir)->child = unix_getfulltree(path,lev+1,dev,&((*dir)->size),&((*dir)->err));
+-- 
+2.47.0
+

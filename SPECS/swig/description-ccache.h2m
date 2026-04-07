@@ -1,0 +1,12 @@
+
+[name]
+ccache-swig - a fast compiler cache
+
+[description]
+ccache-swig  is a compiler cache. It speeds up re-compilation of C/C++/SWIG
+code by caching previous compiles and detecting when the same compile is
+being done again. ccache-swig is ccache plus support for SWIG.
+
+[notes]
+For more information, see @DOCDIR@/swig-doc/Doc/Manual/CCache.html from the
+swig-doc package.

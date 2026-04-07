@@ -1,0 +1,28 @@
+--- libxfce4kbd-private/xfce4-keyboard-shortcuts.xml.orig	2023-01-15 19:20:54.249419853 -0600
++++ libxfce4kbd-private/xfce4-keyboard-shortcuts.xml	2023-01-15 19:23:23.842789801 -0600
+@@ -10,6 +10,7 @@
+       <property name="&lt;Alt&gt;F3" type="string" value="xfce4-appfinder">
+         <property name="startup-notify" type="bool" value="true"/>
+       </property>
++      <property name="XF86LogOff" type="string" value="xfce4-session-logout"/>
+       <property name="&lt;Primary&gt;&lt;Alt&gt;Delete" type="string" value="xfce4-session-logout"/>
+       <property name="&lt;Primary&gt;&lt;Alt&gt;l" type="string" value="xflock4"/>
+       <property name="&lt;Primary&gt;&lt;Alt&gt;t" type="string" value="exo-open --launch TerminalEmulator"/>
+@@ -27,7 +28,16 @@
+       <property name="&lt;Primary&gt;&lt;Alt&gt;Escape" type="string" value="xkill"/>
+       <property name="&lt;Primary&gt;&lt;Shift&gt;Escape" type="string" value="xfce4-taskmanager"/>
+       <property name="&lt;Super&gt;r" type="string" value="xfce4-appfinder -c">
+-        <property name="startup-notify" type="bool" value="true"/>
++      <property name="XF86Calendar" type="string" value="orage"/>
++       <property name="XF86Memo" type="string" value="xfce4-notes"/>
++       <property name="XF86Terminal" type="string" value="xfce4-terminal"/>
++       <property name="XF86Explorer" type="string" value="Thunar"/>
++       <property name="XF86AudioMedia" type="string" value="pragha"/>
++       <property name="XF86AudioPlay" type="string" value="pragha --pause"/>
++       <property name="XF86AudioPrev" type="string" value="pragha --prev"/>
++       <property name="XF86AudioNext" type="string" value="pragha --next"/>
++       <property name="XF86Calculator" type="string" value="galculator"/> 
++       <property name="startup-notify" type="bool" value="true"/>
+       </property>
+       <property name="&lt;Alt&gt;&lt;Super&gt;s" type="string" value="orca"/>
+     </property>

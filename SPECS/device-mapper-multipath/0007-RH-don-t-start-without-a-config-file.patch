@@ -1,0 +1,137 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Wed, 15 Oct 2014 10:39:30 -0500
+Subject: [PATCH] RH: don't start without a config file
+
+If /etc/multipath.conf doesn't exist, don't start multipathd and blacklist
+all devices when running multipath.  A completely blank configuration file
+is almost never what users want.  Also, people may have the multipath
+packages installed but don't want to use them.  This patch provides a
+simple way to disable multipath.  Simply removing or renaming
+/etc/multipath.conf will keep multipath from doing anything.
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libmultipath/config.c            | 13 +++++++++++++
+ libmultipath/config.h            |  1 +
+ multipath/main.c                 |  6 ++++++
+ multipath/multipath.rules.in     |  1 +
+ multipathd/multipathd.8.in       |  2 ++
+ multipathd/multipathd.service.in |  1 +
+ multipathd/multipathd.socket     |  1 +
+ 7 files changed, 25 insertions(+)
+
+diff --git a/libmultipath/config.c b/libmultipath/config.c
+index 8b424d18..b8317f4d 100644
+--- a/libmultipath/config.c
++++ b/libmultipath/config.c
+@@ -937,6 +937,19 @@ int init_config__ (const char *file, struct config *conf)
+ 		}
+ 		factorize_hwtable(conf->hwtable, builtin_hwtable_size, file);
+ 		validate_pctable(conf->overrides, 0, file);
++	} else {
++		condlog(0, "/etc/multipath.conf does not exist, blacklisting all devices.");
++		if (conf->blist_devnode == NULL) {
++			conf->blist_devnode = vector_alloc();
++			if (!conf->blist_devnode) {
++				condlog(0, "cannot allocate blacklist\n");
++				goto out;
++			}
++		}
++		if (store_ble(conf->blist_devnode, ".*", ORIGIN_NO_CONFIG)) {
++			condlog(0, "cannot store default no-config blacklist\n");
++			goto out;
++		}
+ 	}
+ 
+ 	conf->processed_main_config = 1;
+diff --git a/libmultipath/config.h b/libmultipath/config.h
+index 5b4ebf8c..2302eacc 100644
+--- a/libmultipath/config.h
++++ b/libmultipath/config.h
+@@ -10,6 +10,7 @@
+ 
+ #define ORIGIN_DEFAULT 0
+ #define ORIGIN_CONFIG  1
++#define ORIGIN_NO_CONFIG 2
+ 
+ enum devtypes {
+ 	DEV_NONE,
+diff --git a/multipath/main.c b/multipath/main.c
+index 28e3a055..346acb61 100644
+--- a/multipath/main.c
++++ b/multipath/main.c
+@@ -843,11 +843,14 @@ main (int argc, char *argv[])
+ 	char *dev = NULL;
+ 	struct config *conf;
+ 	bool enable_foreign = false;
++	bool have_config;
++	struct stat buf;
+ 
+ 	libmultipath_init();
+ 	if (atexit(dm_lib_exit) || atexit(libmultipath_exit))
+ 		condlog(1, "failed to register cleanup handler for libmultipath: %m");
+ 	logsink = LOGSINK_STDERR_WITH_TIME;
++	have_config = (stat(DEFAULT_CONFIGFILE, &buf) == 0);
+ 	if (init_config(DEFAULT_CONFIGFILE))
+ 		exit(RTVL_FAIL);
+ 	if (atexit(uninit_config))
+@@ -1101,6 +1104,9 @@ main (int argc, char *argv[])
+ 	while ((r = configure(conf, cmd, dev_type, dev)) == RTVL_RETRY)
+ 		condlog(3, "restart multipath configuration process");
+ 
++	if (!have_config && r == RTVL_OK &&
++            (cmd == CMD_LIST_SHORT || cmd == CMD_LIST_LONG))
++		r = RTVL_FAIL;
+ out:
+ 	put_multipath_config(conf);
+ 	if (dev)
+diff --git a/multipath/multipath.rules.in b/multipath/multipath.rules.in
+index 2ac1972f..cc248231 100644
+--- a/multipath/multipath.rules.in
++++ b/multipath/multipath.rules.in
+@@ -9,6 +9,7 @@ IMPORT{cmdline}="nompath"
+ ENV{nompath}=="?*", GOTO="end_mpath"
+ IMPORT{cmdline}="multipath"
+ ENV{multipath}=="off", GOTO="end_mpath"
++TEST!="/etc/multipath.conf", GOTO="end_mpath"
+ 
+ ENV{DEVTYPE}!="partition", GOTO="test_dev"
+ IMPORT{parent}="DM_MULTIPATH_DEVICE_PATH"
+diff --git a/multipathd/multipathd.8.in b/multipathd/multipathd.8.in
+index 7bc8806e..315884eb 100644
+--- a/multipathd/multipathd.8.in
++++ b/multipathd/multipathd.8.in
+@@ -49,6 +49,8 @@ map regains its maximum performance and redundancy.
+ With the \fB-k\fR option, \fBmultipathd\fR acts as a client utility that
+ sends commands to a running instance of the multipathd daemon (see
+ \fBCOMMANDS\fR below).
++
++In this Linux distribution, multipathd does not run unless a /etc/multipath.conf file exists.
+ .
+ .
+ .\" ----------------------------------------------------------------------------
+diff --git a/multipathd/multipathd.service.in b/multipathd/multipathd.service.in
+index b6a25b31..3d957733 100644
+--- a/multipathd/multipathd.service.in
++++ b/multipathd/multipathd.service.in
+@@ -6,6 +6,7 @@ Wants=systemd-udevd-kernel.socket @MODPROBE_UNIT@
+ After=systemd-udevd-kernel.socket @MODPROBE_UNIT@
+ After=multipathd.socket systemd-remount-fs.service
+ Before=initrd-cleanup.service
++ConditionPathExists=/etc/multipath.conf
+ DefaultDependencies=no
+ Conflicts=shutdown.target
+ Conflicts=initrd-cleanup.service
+diff --git a/multipathd/multipathd.socket b/multipathd/multipathd.socket
+index 6a62f5fd..263b6b0c 100644
+--- a/multipathd/multipathd.socket
++++ b/multipathd/multipathd.socket
+@@ -1,6 +1,7 @@
+ [Unit]
+ Description=multipathd control socket
+ DefaultDependencies=no
++ConditionPathExists=/etc/multipath.conf
+ ConditionKernelCommandLine=!nompath
+ ConditionKernelCommandLine=!multipath=off
+ ConditionVirtualization=!container

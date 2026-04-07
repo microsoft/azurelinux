@@ -1,0 +1,32 @@
+From ea71cf9a8a4161ce6e19eacf5f0d86d40ab74f23 Mon Sep 17 00:00:00 2001
+Message-ID: <ea71cf9a8a4161ce6e19eacf5f0d86d40ab74f23.1767794644.git.phrdina@redhat.com>
+From: Pavel Hrdina <phrdina@redhat.com>
+Date: Mon, 29 Sep 2025 16:14:35 +0200
+Subject: [PATCH] virtinst: cloudinit: include empty meta-data file
+
+Refactor creation of cloud-init config files introduced a bug where we
+stopped including empty meta-data file.
+
+Introduced-by: 5b2d0997a1d2d213b17c227169da64e2fa7d09a6
+Fixes: https://github.com/virt-manager/virt-manager/issues/975
+Signed-off-by: Pavel Hrdina <phrdina@redhat.com>
+---
+ virtinst/install/cloudinit.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/virtinst/install/cloudinit.py b/virtinst/install/cloudinit.py
+index 3f565f399..b2378fbfa 100644
+--- a/virtinst/install/cloudinit.py
++++ b/virtinst/install/cloudinit.py
+@@ -36,7 +36,7 @@ class _CloudInitConfig:
+     def _create_file(self):
+         content = self._content()
+ 
+-        if not content:
++        if content is None:
+             return None
+ 
+         fileobj = tempfile.NamedTemporaryFile(
+-- 
+2.52.0
+

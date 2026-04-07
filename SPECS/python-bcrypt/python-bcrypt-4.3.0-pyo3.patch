@@ -1,0 +1,12 @@
+diff -Naur bcrypt-4.3.0-original/src/_bcrypt/Cargo.toml bcrypt-4.3.0/src/_bcrypt/Cargo.toml
+--- bcrypt-4.3.0-original/src/_bcrypt/Cargo.toml	2025-02-27 20:17:02.000000000 -0500
++++ bcrypt-4.3.0/src/_bcrypt/Cargo.toml	2025-06-21 11:39:31.510615224 -0400
+@@ -6,7 +6,7 @@
+ publish = false
+ 
+ [dependencies]
+-pyo3 = { version = "0.23.5", features = ["abi3"] }
++pyo3 = { version = "0.25.1", features = ["abi3"] }
+ bcrypt = "0.17"
+ bcrypt-pbkdf = "0.10.0"
+ base64 = "0.22.1"

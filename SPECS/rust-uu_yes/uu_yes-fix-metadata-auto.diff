@@ -1,0 +1,19 @@
+--- uu_yes-0.0.27/Cargo.toml	1970-01-01T00:00:01+00:00
++++ uu_yes-0.0.27/Cargo.toml	2024-08-01T22:48:20.983014+00:00
+@@ -44,11 +44,6 @@
+ [dependencies.itertools]
+ version = "0.13.0"
+ 
+-[target."cfg(not(unix))".dependencies.uucore]
+-version = ">=0.0.19"
+-features = ["pipes"]
+-package = "uucore"
+-
+ [target."cfg(unix)".dependencies.nix]
+ version = "0.28"
+ default-features = false
+@@ -60,3 +55,4 @@
+     "signals",
+ ]
+ package = "uucore"
++

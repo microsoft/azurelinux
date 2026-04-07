@@ -1,0 +1,55 @@
+diff -rupN --no-dereference CGNS-4.5.1/src/cgnstools/cgnscalc/cgnscalc.desktop CGNS-4.5.1-new/src/cgnstools/cgnscalc/cgnscalc.desktop
+--- CGNS-4.5.1/src/cgnstools/cgnscalc/cgnscalc.desktop	2025-12-29 19:02:10.000000000 +0100
++++ CGNS-4.5.1-new/src/cgnstools/cgnscalc/cgnscalc.desktop	2025-12-30 09:38:23.105684410 +0100
+@@ -6,5 +6,5 @@ Name=CGNScalc
+ GenericName=CGNS calculator
+ Terminal=false
+ Categories=Development;
+-Exec="./cgnscalc"
+-Icon=../share/cgnstools/cgnscalc.png
++Exec="cgnscalc"
++Icon=/usr/share/cgnstools/cgnscalc.png
+diff -rupN --no-dereference CGNS-4.5.1/src/cgnstools/cgnscalc/unitconv.desktop CGNS-4.5.1-new/src/cgnstools/cgnscalc/unitconv.desktop
+--- CGNS-4.5.1/src/cgnstools/cgnscalc/unitconv.desktop	2025-12-29 19:02:10.000000000 +0100
++++ CGNS-4.5.1-new/src/cgnstools/cgnscalc/unitconv.desktop	2025-12-30 09:38:23.105972237 +0100
+@@ -6,5 +6,5 @@ Name=CGNSunitconv
+ GenericName=Unit conversions tool
+ Terminal=false
+ Categories=Development;
+-Exec="./unitconv"
+-Icon=../share/cgnstools/unitconv.png
++Exec="unitconv"
++Icon=/usr/share/cgnstools/unitconv.png
+diff -rupN --no-dereference CGNS-4.5.1/src/cgnstools/cgnsplot/cgnsplot.desktop CGNS-4.5.1-new/src/cgnstools/cgnsplot/cgnsplot.desktop
+--- CGNS-4.5.1/src/cgnstools/cgnsplot/cgnsplot.desktop	2025-12-29 19:02:10.000000000 +0100
++++ CGNS-4.5.1-new/src/cgnstools/cgnsplot/cgnsplot.desktop	2025-12-30 09:38:23.106161953 +0100
+@@ -6,5 +6,5 @@ Name=CGNSplot
+ GenericName=CGNS plot
+ Terminal=false
+ Categories=Development;
+-Exec="./cgnsplot"
+-Icon=../share/cgnstools/cgnsplot.png
++Exec="cgnsplot"
++Icon=/usr/share/cgnstools/cgnsplot.png
+diff -rupN --no-dereference CGNS-4.5.1/src/cgnstools/cgnsview/cgnsnodes.desktop CGNS-4.5.1-new/src/cgnstools/cgnsview/cgnsnodes.desktop
+--- CGNS-4.5.1/src/cgnstools/cgnsview/cgnsnodes.desktop	2025-12-29 19:02:10.000000000 +0100
++++ CGNS-4.5.1-new/src/cgnstools/cgnsview/cgnsnodes.desktop	2025-12-30 09:38:23.106333404 +0100
+@@ -6,5 +6,5 @@ Name=CGNSnodes
+ GenericName=CGNS node reference
+ Terminal=false
+ Categories=Development;
+-Exec="./cgnsnodes"
+-Icon=../share/cgnstools/cgns.png
++Exec="cgnsnodes"
++Icon=/usr/share/cgnstools/cgns.png
+diff -rupN --no-dereference CGNS-4.5.1/src/cgnstools/cgnsview/cgnsview.desktop CGNS-4.5.1-new/src/cgnstools/cgnsview/cgnsview.desktop
+--- CGNS-4.5.1/src/cgnstools/cgnsview/cgnsview.desktop	2025-12-29 19:02:10.000000000 +0100
++++ CGNS-4.5.1-new/src/cgnstools/cgnsview/cgnsview.desktop	2025-12-30 09:38:23.106499618 +0100
+@@ -6,5 +6,5 @@ Name=CGNSview
+ GenericName=CGNS file structure viewer
+ Terminal=false
+ Categories=Development;
+-Exec="./cgnsview"
+-Icon=../share/cgnstools/cgns.png
++Exec="cgnsview"
++Icon=/usr/share/cgnstools/cgns.png

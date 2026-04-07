@@ -1,0 +1,12 @@
+diff -up src/base.php.rpm src/base.php
+--- src/base.php.rpm	2015-06-03 15:28:58.325040622 +0200
++++ src/base.php	2015-06-03 15:29:04.688069768 +0200
+@@ -57,7 +57,7 @@ class ezcBase
+      *
+      * @var string
+      */
+-    private static $libraryMode = "devel";
++    private static $libraryMode = "pear";
+ 
+     /**
+      * Contains the current working directory, which is used when the

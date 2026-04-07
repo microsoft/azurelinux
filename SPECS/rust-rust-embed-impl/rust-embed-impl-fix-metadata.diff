@@ -1,0 +1,15 @@
+--- rust-embed-impl-8.11.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ rust-embed-impl-8.11.0/Cargo.toml	2026-02-13T17:32:27.828311+00:00
+@@ -35,12 +35,10 @@
+ repository = "https://pyrossh.dev/repos/rust-embed"
+ 
+ [features]
+-compression = []
+ debug-embed = []
+ deterministic-timestamps = []
+ include-exclude = ["rust-embed-utils/include-exclude"]
+ interpolate-folder-path = ["shellexpand"]
+-mime-guess = ["rust-embed-utils/mime-guess"]
+ 
+ [lib]
+ name = "rust_embed_impl"

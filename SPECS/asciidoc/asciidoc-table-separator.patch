@@ -1,0 +1,24 @@
+From 34d5d9ffa005af9edbe8fde64b8fa6ccb33c8796 Mon Sep 17 00:00:00 2001
+From: Jerry James <loganjerry@gmail.com>
+Date: Fri, 7 Jul 2023 11:11:49 -0600
+Subject: [PATCH] Table separator may contain escapes
+
+Signed-off-by: Jerry James <loganjerry@gmail.com>
+---
+ asciidoc/asciidoc.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/asciidoc/asciidoc.py b/asciidoc/asciidoc.py
+index 0ccf24de..6d23a9de 100644
+--- a/asciidoc/asciidoc.py
++++ b/asciidoc/asciidoc.py
+@@ -2908,7 +2908,7 @@ def validate(self):
+                 self.error('missing section: [tabletags-%s]' % t, halt=True)
+         if self.separator:
+             # Evaluate escape characters.
+-            self.separator = ast.literal_eval('"' + self.separator + '"')
++            self.separator = ast.literal_eval('r"' + self.separator + '"')
+         # TODO: Move to class Tables
+         # Check global table parameters.
+         elif config.pagewidth is None:
+

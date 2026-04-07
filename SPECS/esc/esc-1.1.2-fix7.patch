@@ -1,0 +1,343 @@
+diff -up ./esc/src/app/esc.js.fix7 ./esc/src/app/esc.js
+--- ./esc/src/app/esc.js.fix7	2020-05-30 18:57:40.423388032 -0700
++++ ./esc/src/app/esc.js	2020-05-30 19:01:40.769955310 -0700
+@@ -30,6 +30,12 @@ const ESC_CONFIG_FILE_NAME = "esc.conf";
+ const ESC_CONFIG_GROUP = "ESC";
+ const ESC_PWORD_FILE = "pword";
+ 
++const STATUS_ENROLLED="Enrolled";
++const STATUS_FORMATTED="Formatted";
++const STATUS_UNFORMATTED="Unformatted";
++const STATUS_UNKNOWN="Unknown";
++const FORMATTED_CODE=2;
++
+ const UNKNOWN_LABEL = "unknown";
+ const CoolKeyNotifyIface = '<node> \
+ <interface name="com.jmagne.CoolKeyNotify"> \
+@@ -185,17 +191,17 @@ class ESC {
+     _getStatusString(intStatus) {
+         switch(intStatus) {
+             case 4:
+-                return "enrolled";
++                return STATUS_ENROLLED;
+             break;
+ 
+             case 2:
+-                return "uninitialized";
++                return STATUS_FORMATTED;
+             break;
+             case 1:
+-                return "unknown";
++                return STATUS_UNFORMATTED;
+             break;
+             default:
+-                return "unknown";
++                return STATUS_UNKNOWN;
+             break;
+         }
+      }
+@@ -216,14 +222,30 @@ class ESC {
+              let issuer = inserted.issuer;
+              let issuedTo = inserted.issued_to;
+ 
++             let cachedIssuer = null;
++
++             if(inserted.is_a_cool_key) {
++	         cachedIssuer = this._phoneHomeMgr.getCachedIssuer(aKeyID);
++	     }
++
++	     if(cachedIssuer != null) {
++                 issuer = cachedIssuer;
++	     }
++
+              if(issuer == null || issuer.length == 0) {
+-                 issuer = "unknown";
++                 issuer = STATUS_UNKNOWN;
+              }
+              if(issuedTo == null || issuedTo.length == 0) {
+-                 issuedTo = "unknown";
++                 issuedTo = STATUS_UNKNOWN;
+              }
++             let newStatus = inserted.status;
++             
++             if(newStatus == FORMATTED_CODE) {
++                 issuedTo = STATUS_UNKNOWN;
++             }
++
+              this._tokenStore.set (this._tokenStore.append(), [0, 1, 2, 3, 4],
+-                [issuer, issuedTo, this._getStatusString(inserted.status), aKeyID,aKeyType]);
++                [issuer, issuedTo, this._getStatusString(newStatus), aKeyID,aKeyType]);
+ 
+              let [ isSelected, iter]  = this._tokenStore.get_iter_first();
+ 
+diff -up ./esc/src/app/opensc.esc.conf.fix7 ./esc/src/app/opensc.esc.conf
+--- ./esc/src/app/opensc.esc.conf.fix7	2020-05-30 18:54:14.079618060 -0700
++++ ./esc/src/app/opensc.esc.conf	2020-05-30 19:02:16.191744158 -0700
+@@ -89,12 +89,12 @@ app default {
+     }
+     reader_driver openct {
+     };
+-    card_drivers = coolkey, cac, piv, default;
++    card_drivers = coolkey, cac,cac1, piv, default;
+     secure_messaging local_authentic  {
+         module_path = /usr/lib64;
+     }
+     framework pkcs15 {
+-        builtin_emulators = coolkey, cac, piv;
++        builtin_emulators = coolkey, cac, cac1, piv;
+     }
+ }
+ app opensc-pkcs11 {
+diff -up ./esc/src/app/operationDialog.js.fix7 ./esc/src/app/operationDialog.js
+--- ./esc/src/app/operationDialog.js.fix7	2020-05-30 18:54:48.700411683 -0700
++++ ./esc/src/app/operationDialog.js	2020-05-30 19:03:01.354474940 -0700
+@@ -47,34 +47,32 @@ operationDialog.prototype = {
+         if(tokenInfo == null) {
+             this.app_alert("Invalid Token!");
+         }
+-        this.dialog = new Gtk.Dialog ({ transient_for: this.app._window,
+-                         modal: true,deletable: false,
+-                         title: TOKEN_OPERATION, border_width: 10 });
+ 
+         this.operation = operation;
+         this.tokenInfo = tokenInfo;
+ 
+         let opMessage = "";
+         if(this.operation == OP_FORMAT) {
+-            opMessage = "Format Smart Card";
++            opMessage = "Format Smart Card:";
+ 
+         } else if(this.operation == OP_ENROLL)  {
+-            opMessage = "Enroll Smart Card";
++            opMessage = "Enroll Smart Card:";
+         } else if(this.operation == OP_PIN_RESET) {
+-            opMessage = "Reset Smart Card Pin";
++            opMessage = "Reset Smart Card Pin:";
+         } else {
+             this.app._alert("operationdDialog: Invalid operation!");
+             return;
+         }
+ 
++        this.dialog = new Gtk.Dialog ({ transient_for: this.app._window,
++                         modal: true,deletable: false,
++                         title: TOKEN_OPERATION, border_width: 10 });
++
+         this.area = this.dialog.get_content_area();
+         this.grid = new Gtk.Grid ({row_spacing: 20, column_spacing: 20});
+ 
+-        this.message = new Gtk.Label ({label: opMessage});
+-        this.area.add (this.message);
+-
+         //this.throbberImage = new Gtk.Image({file: this.app._currentDir + "/" + "throbber-anim5.gif"});
+-
++        this.label = new Gtk.Label({label: opMessage});
+         this.progressBar = new Gtk.ProgressBar ({ valign: Gtk.Align.CENTER });
+         this.progressBar.set_fraction(0.0);
+ 
+@@ -86,15 +84,16 @@ operationDialog.prototype = {
+         this.ldapUserLabel = new Gtk.Label({label: "Ldap User:"});
+         this.ldapUserBox =  new Gtk.Entry();
+ 
+-        this.grid.attach(this.ldapUserLabel, 0, 0, 1,1);
+-        this.grid.attach(this.ldapUserBox,1, 0,1,1);
++        this.grid.attach(this.label,0,0,1,1);
++        this.grid.attach(this.ldapUserLabel, 0, 1, 1,1);
++        this.grid.attach(this.ldapUserBox,1, 1,1,1);
+ 
+         this.ldapPasswordLabel = new Gtk.Label({label: "Ldap Password:"});
+         this.ldapPasswordBox = new Gtk.Entry();
+         this.ldapPasswordBox.set_visibility(false);
+ 
+-        this.grid.attach(this.ldapPasswordLabel,2,0,1,1);
+-        this.grid.attach(this.ldapPasswordBox,3,0,1,1);
++        this.grid.attach(this.ldapPasswordLabel,2,1,1,1);
++        this.grid.attach(this.ldapPasswordBox,3,1,1,1);
+ 
+         if(this.operation !=  OP_FORMAT ) {
+ 
+@@ -106,10 +105,10 @@ operationDialog.prototype = {
+             this.confirmPinBox = new Gtk.Entry();
+             this.confirmPinBox.set_visibility(false);
+ 
+-            this.grid.attach(this.newpinLabel, 0,1,1,1);
+-            this.grid.attach(this.newpinBox,1,1,1,1);
+-            this.grid.attach(this.confirmPinLabel,2,1,1,1);
+-            this.grid.attach(this.confirmPinBox,3,1,1,1);
++            this.grid.attach(this.newpinLabel, 0,2,1,1);
++            this.grid.attach(this.newpinBox,1,2,1,1);
++            this.grid.attach(this.confirmPinLabel,2,2,1,1);
++            this.grid.attach(this.confirmPinBox,3,2,1,1);
+         }
+ 
+         this.oKButton = new  Gtk.Button ({label: OpLabels[this.operation]}); 
+@@ -117,11 +116,11 @@ operationDialog.prototype = {
+         this.dismissButton = new Gtk.Button({label: "Cancel" });
+ 
+         //this.grid.attach(this.throbberImage,0,2,1,1);
+-        this.grid.attach(this.progressLabel, 0,2,1,1);
++        this.grid.attach(this.progressLabel, 0,3,1,1);
+         //this.throbberImage.hide();
+-        this.grid.attach(this.progressBar, 1,2,1,1);
+-        this.grid.attach (this.oKButton,2,2,1,1);
+-        this.grid.attach (this.dismissButton,3,2,1,1);
++        this.grid.attach(this.progressBar, 1,3,1,1);
++        this.grid.attach (this.oKButton,2,3,1,1);
++        this.grid.attach (this.dismissButton,3,3,1,1);
+ 
+         // Connect the button to the function that handles what it does
+         this.oKButton.connect ("clicked", this.oKHandler.bind(this));
+diff -up ./esc/src/app/phoneHome.js.fix7 ./esc/src/app/phoneHome.js
+--- ./esc/src/app/phoneHome.js.fix7	2020-05-30 18:55:43.223086670 -0700
++++ ./esc/src/app/phoneHome.js	2020-05-30 19:03:49.787186230 -0700
+@@ -93,7 +93,7 @@ phoneHome.prototype = {
+ 
+         this.phArea = this.phDialog.get_content_area();
+         this.phMessage = new Gtk.Label ({label: "Enter url: ex: http://test.host.com:8080/tps/phoneHome"});
+-        this.phArea.add (this.phMessage);
++        //this.phArea.add (this.phMessage);
+ 
+         this.phActionArea = this.phDialog.get_action_area();
+         this.phUrlBox =  new Gtk.Entry({width_chars: 35});
+@@ -108,9 +108,9 @@ phoneHome.prototype = {
+         this.phActionArea.add(this.phGrid);
+ 
+         this.phOKButton = Gtk.Button.new_from_stock (Gtk.STOCK_OK);
+-
+-        this.phGrid.attach(this.phUrlBox, 0, 0, 1,1);
+-        this.phGrid.attach(this.phOKButton,1, 0,1,1);
++        this.phGrid.add(this.phMessage);
++        this.phGrid.attach(this.phUrlBox, 0, 1, 1,1);
++        this.phGrid.attach(this.phOKButton,1, 1,1,1);
+ 
+         // Connect the button to the function that handles what it does
+         this.phOKButton.connect ("clicked", this.phoneHomeOKHandler.bind(this));
+@@ -228,9 +228,9 @@ phoneHome.prototype = {
+         if(!aKeyID)
+             return null;
+ 
+-        var issuerValue = this.app._configValueWithKeyID(aKeyID,KEY_ISSUER);
++        let issuerValue = this.app._configValueWithKeyID(aKeyID,KEY_ISSUER);
+ 
+-        if(!issuerValue)
++        if(issuerValue == null)
+             return null;
+ 
+         issuer = this.app._getConfigValue(issuerValue);
+diff -up ./esc/src/app/pinDialog.js.fix7 ./esc/src/app/pinDialog.js
+--- ./esc/src/app/pinDialog.js.fix7	2020-05-30 18:55:09.395288320 -0700
++++ ./esc/src/app/pinDialog.js	2020-05-30 19:04:51.380819066 -0700
+@@ -36,16 +36,15 @@ pinDialog.prototype = {
+     launchPinPrompt: function(notify) {
+ 
+         this.notify = notify;
++        this.message = "Token Pin Entry";
+         this.dialog = new Gtk.Dialog ({ transient_for: this.app._window,
+                          modal: true,
+                          expand: false,
+-                         title: PIN_OPERATION ,border_width: 20, deletable: false });
++                         title: this.message ,border_width: 20, deletable: false });
+ 
+         this.area = this.dialog.get_content_area();
+         this.grid = new Gtk.Grid ({row_spacing: 10, column_spacing: 20});
+ 
+-        this.message = new Gtk.Label ({label: "Enter Token Pin"});
+-        this.area.add (this.message);
+ 
+         this.actionArea = this.dialog.get_action_area();
+         this.pinBox =  new Gtk.Entry();
+diff -up ./esc/src/lib/coolkey/CoolKey.cpp.fix7 ./esc/src/lib/coolkey/CoolKey.cpp
+--- ./esc/src/lib/coolkey/CoolKey.cpp.fix7	2020-05-30 18:56:35.827773090 -0700
++++ ./esc/src/lib/coolkey/CoolKey.cpp	2020-05-30 19:05:30.561585507 -0700
+@@ -511,6 +511,11 @@ HRESULT CoolKeyGetCUIDDirectly(char *aBu
+ 
+     CKYCardConnection_BeginTransaction(conn);
+ 
++    status = CKYApplet_SelectCardManager(conn, &apduRC);
++    if (status != CKYSUCCESS) {
++        goto done;
++    }
++
+     status = CKYApplet_GetCUID(conn, &cuid, &apduRC);
+     if (status != CKYSUCCESS) {
+         goto done;
+@@ -764,7 +769,6 @@ HRESULT CoolKeyGetCPLCDataDirectly(CKYAp
+     }
+ 
+     CKYCardConnection_BeginTransaction(conn);
+-    unsigned long state;
+ 
+     status = CKYApplet_SelectCardManager(conn, &apduRC);
+     if (status != CKYSUCCESS) {
+diff -up ./esc/src/lib/coolkey/CoolKeyHandler.cpp.fix7 ./esc/src/lib/coolkey/CoolKeyHandler.cpp
+--- ./esc/src/lib/coolkey/CoolKeyHandler.cpp.fix7	2020-05-30 18:56:56.511649792 -0700
++++ ./esc/src/lib/coolkey/CoolKeyHandler.cpp	2020-05-30 19:06:21.955279145 -0700
+@@ -2157,11 +2157,22 @@ copySerialNumber(char *dest, const char
+ // it will probably have Dashes and store in lower case some time in the
+ // future.
+ //
+-static HRESULT
++static HRESULT 
+ getCUIDFromTokenInfo(CK_TOKEN_INFO *tokenInfo, char *tokenSerialNumber)
+ {
++    const int minCUIDLen = 18;
++
+     char *cp = tokenSerialNumber;
+ 
++    if( tokenSerialNumber == NULL) {
++        return E_FAIL;
++    }
++
++    if(tokenInfo == NULL) {
++        *cp = 0;
++	return E_FAIL;
++    }
++
+     if (isxdigit(tokenInfo->manufacturerID[0]) &&
+         isxdigit(tokenInfo->manufacturerID[1]) &&
+         isxdigit(tokenInfo->manufacturerID[2]) &&
+@@ -2181,6 +2192,10 @@ getCUIDFromTokenInfo(CK_TOKEN_INFO *toke
+     }
+     *cp=0;
+ 
++    if( strlen(tokenSerialNumber) < minCUIDLen) {
++        return E_FAIL;
++    }
++
+     return S_OK;
+ }
+ 
+@@ -2207,7 +2222,7 @@ CKHGetCoolKeyInfo(PK11SlotInfo *aSlot,Co
+     CK_TOKEN_INFO tokenInfo;
+     CoolKeyInfo *info = NULL;
+     SECStatus status;
+-    HRESULT hres,atrRes,cuidRes,cycleRes;
++    HRESULT hres,atrRes,cycleRes,cuidRes;
+ 
+     char *readerName =  PK11_GetSlotName(aSlot);
+ 
+@@ -2327,22 +2342,16 @@ CKHGetCoolKeyInfo(PK11SlotInfo *aSlot,Co
+       goto failed;
+     }
+ 
+-    hres = getCUIDFromTokenInfo(&tokenInfo, info->mCUID);
+-  /* shouldn't the be != S_SUCCESS? */
+-    if (hres == E_FAIL) {
+-        goto failed;
+-    }
+-
++    cuidRes = getCUIDFromTokenInfo(&tokenInfo, info->mCUID);
+     //Check for blank cuid and put something there
+ 
+-     if(isACOOLKey && strlen(info->mCUID) == 0 )
+-     {
++     if(isACOOLKey && cuidRes == E_FAIL) {
+         //Let's try to get the cuid directly from the token.
+ 
+         cuidRes = CoolKeyGetCUIDDirectly(cuidChar, 100, readerName);
+ 
+         if(cuidRes != S_OK) {
+-           strcpy(info->mCUID, "blank-token");
++           strcpy(info->mCUID, "unknown");
+         } else {
+            strcpy(info->mCUID, cuidChar);   
+         }

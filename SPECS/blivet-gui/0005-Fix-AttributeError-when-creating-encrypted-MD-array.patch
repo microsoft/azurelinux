@@ -1,0 +1,23 @@
+From 86e890b16467471f7e3c033a23f0374dcb27b79b Mon Sep 17 00:00:00 2001
+From: Vojtech Trefny <vtrefny@redhat.com>
+Date: Mon, 6 Oct 2025 14:33:12 +0200
+Subject: [PATCH] Fix AttributeError when creating encrypted MD array
+ (#2401870)
+
+See also https://github.com/storaged-project/blivet-gui/pull/466
+---
+ blivetgui/blivet_utils.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/blivetgui/blivet_utils.py b/blivetgui/blivet_utils.py
+index fd65e4f..eacd758 100644
+--- a/blivetgui/blivet_utils.py
++++ b/blivetgui/blivet_utils.py
+@@ -1294,6 +1294,7 @@ def _create_mdraid(self, user_input):
+                                                  luks_sector_size=user_input.encryption_sector_size,
+                                                  device=new_md.path)
+             actions.append(blivet.deviceaction.ActionCreateFormat(new_md, luks_fmt))
++            new_md.format = luks_fmt
+ 
+             luks_dev = LUKSDevice("luks-%s" % new_md.name, size=new_md.size, parents=[new_md])
+             actions.append(blivet.deviceaction.ActionCreateDevice(luks_dev))

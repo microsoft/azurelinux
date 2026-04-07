@@ -1,0 +1,25 @@
+From 5e350e07f489e0308b621ef0cf028ce1d1e06753 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Sun, 7 Sep 2025 23:56:56 +0100
+Subject: [PATCH 2/2] Omit doctests that require network access
+
+---
+ src/lib.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index 4e30537f6..0e9d5ead3 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -53,7 +53,7 @@
+ //!
+ //! ## Using the Tokio/Async Resolver
+ //!
+-//! ```rust
++//! ```rust,ignore
+ //! # fn main() {
+ //! # #[cfg(feature = "tokio")]
+ //! # {
+-- 
+2.51.0
+

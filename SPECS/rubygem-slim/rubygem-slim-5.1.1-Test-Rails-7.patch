@@ -1,0 +1,34 @@
+From fbc0c5081568c5232d8cae07afbef5d4b90edd79 Mon Sep 17 00:00:00 2001
+From: Daniel Mendler <mail@daniel-mendler.de>
+Date: Wed, 21 Jun 2023 19:12:57 +0200
+Subject: [PATCH] Test Rails 7 (Fix #920)
+
+---
+ .github/workflows/test.yml       | 3 +++
+ test/rails/config/application.rb | 2 +-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/.github/workflows/test.yml b/.github/workflows/test.yml
+index 50b03338..3856f191 100644
+--- a/.github/workflows/test.yml
++++ b/.github/workflows/test.yml
+@@ -49,3 +49,6 @@ jobs:
+       - run: bundle install && bundle exec rake test:rails
+         env:
+           RAILS: 6.1.7
++      - run: bundle install && bundle exec rake test:rails
++        env:
++          RAILS: 7.0.5
+diff --git a/test/rails/config/application.rb b/test/rails/config/application.rb
+index 620b6157..63fa69a2 100644
+--- a/test/rails/config/application.rb
++++ b/test/rails/config/application.rb
+@@ -5,7 +5,7 @@
+ require 'action_view/railtie'
+ #require 'active_record/railtie'
+ #require 'action_mailer/railtie'
+-require 'sprockets/railtie'
++#require 'sprockets/railtie'
+ require 'slim'
+ 
+ module Dummy

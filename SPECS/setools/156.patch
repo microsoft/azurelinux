@@ -1,0 +1,43 @@
+From 39f7c88251925463c38f5000f6178fe70b484f44 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Tue, 8 Apr 2025 11:22:47 +0200
+Subject: [PATCH] Remove redundant runtime requirement on setuptools
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The dependency was dropped in 99a1cf3b50cd8bf502b5070293c4d1bf792d1566
+
+Add a build time dependency for setup.py build_ext on Python 3.12+
+which no longer contains distutils.
+
+Signed-off-by: Miro Hrončok <miro@hroncok.cz>
+---
+ pyproject.toml | 2 +-
+ tox.ini        | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index f7815a15..28ae121a 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -39,7 +39,7 @@ classifiers = ["Development Status :: 5 - Production/Stable",
+ 
+ requires-python=">=3.10"
+ # also requires libsepol.so and libselinux.so.
+-dependencies = ["setuptools"]
++dependencies = []
+ 
+ optional-dependencies.analysis = ["networkx>=2.6",
+                                   "pygraphviz"]
+diff --git a/tox.ini b/tox.ini
+index 8fa6954f..b2a21d6b 100644
+--- a/tox.ini
++++ b/tox.ini
+@@ -56,5 +56,6 @@ deps            = networkx>=2.6
+                   pygraphviz
+                   pytest-qt
+                   pytest-xvfb
++                  setuptools;python_version>="3.12"
+ commands_pre    = {envpython} setup.py build_ext -i
+ commands        = {envpython} -m pytest tests

@@ -1,0 +1,33 @@
+%_qt4 @@NAME@@
+%_qt4_epoch @@EPOCH@@
+%_qt4_version @@VERSION@@
+%_qt4_evr @@EVR@@
+%_qt48 %{_qt4_version}
+%_qt4_prefix %{_libdir}/qt4
+%_qt4_bindir %{_qt4_prefix}/bin
+%_qt4_datadir %{_qt4_prefix}
+%_qt4_demosdir %{_qt4_prefix}/demos
+%_qt4_docdir %{_docdir}/qt4
+%_qt4_examples %{_qt4_prefix}/examples
+%_qt4_examplesdir %{_qt4_prefix}/examples
+%_qt4_headerdir %{_includedir}
+%_qt4_importdir %{_qt4_prefix}/imports
+%_qt4_libdir %{_libdir}
+%_qt4_plugindir %{_qt4_prefix}/plugins
+%_qt4_qmake %{_qt4_bindir}/qmake
+%_qt4_sysconfdir %{_sysconfdir}
+%_qt4_translationdir %{_datadir}/qt4/translations 
+
+%_qt4_ldflags %{?__global_ldflags}
+%_qt4_optflags %{optflags}
+
+%_qt4_qmake_flags \\\
+  QMAKE_CFLAGS_DEBUG="${CFLAGS:-%{_qt4_optflags}}" \\\
+  QMAKE_CFLAGS_RELEASE="${CFLAGS:-%{_qt4_optflags}}" \\\
+  QMAKE_CXXFLAGS_DEBUG="${CXXFLAGS:-%{_qt4_optflags}}" \\\
+  QMAKE_CXXFLAGS_RELEASE="${CXXFLAGS:-%{_qt4_optflags}}" \\\
+  QMAKE_LFLAGS_DEBUG="${LDFLAGS:-%{_qt4_ldflags}}" \\\
+  QMAKE_LFLAGS_RELEASE="${LDFLAGS:-%{_qt4_ldflags}}" \\\
+  QMAKE_STRIP=
+
+%qmake_qt4 %{_qt4_qmake} %{_qt4_qmake_flags}

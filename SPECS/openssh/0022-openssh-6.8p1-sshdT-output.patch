@@ -1,0 +1,25 @@
+From 05b09904f431333e19cd24528ef66d1fd15e9efe Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:28 +0200
+Subject: [PATCH 22/50] openssh-6.8p1-sshdT-output
+
+---
+ servconf.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/servconf.c b/servconf.c
+index c0de7110..105e301d 100644
+--- a/servconf.c
++++ b/servconf.c
+@@ -3366,7 +3366,7 @@ dump_config(ServerOptions *o)
+ 	dump_cfg_string(sXAuthLocation, o->xauth_location);
+ 	dump_cfg_string(sCiphers, o->ciphers);
+ 	dump_cfg_string(sMacs, o->macs);
+-	dump_cfg_string(sBanner, o->banner);
++	dump_cfg_string(sBanner, o->banner != NULL ? o->banner : "none");
+ 	dump_cfg_string(sForceCommand, o->adm_forced_command);
+ 	dump_cfg_string(sChrootDirectory, o->chroot_directory);
+ 	dump_cfg_string(sTrustedUserCAKeys, o->trusted_user_ca_keys);
+-- 
+2.49.0
+

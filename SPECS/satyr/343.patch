@@ -1,0 +1,62 @@
+From 70c43a41d270abb01b4ecc34da9447242f04cb2d Mon Sep 17 00:00:00 2001
+From: Karolina Surma <ksurma@redhat.com>
+Date: Tue, 25 Mar 2025 16:16:42 +0100
+Subject: [PATCH] Avoid the multiprocessing forkserver method
+
+What's new in Python 3.14 states:
+The default start method changed from fork to forkserver on platforms
+other than macOS and Windows where it was already spawn.
+
+If the threading incompatible fork method is required, you must
+explicitly request it via a context from multiprocessing.get_context()
+(preferred) or change the default via
+multiprocessing.set_start_method().
+Source:
+https://docs.python.org/dev/whatsnew/3.14.html#whatsnew314-multiprocessing-start-method
+
+This change is incompatible with the current test settings.
+The patch is backwards compatible.
+---
+ tests/python/metrics.py | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/tests/python/metrics.py b/tests/python/metrics.py
+index cdb27880..2a646616 100755
+--- a/tests/python/metrics.py
++++ b/tests/python/metrics.py
+@@ -1,7 +1,7 @@
+ #!/usr/bin/env python
+ 
+ import unittest
+-from multiprocessing import Process, Queue
++from multiprocessing import Process, Queue, get_start_method, get_context
+ 
+ from test_helpers import *
+ 
+@@ -142,6 +142,17 @@ def test_distances_part_pickle(self):
+         self.assert_correct_matrix(dist_from_parts, self.threads)
+ 
+     def test_distances_part_parallel(self):
++
++        # On macOS and newly non-macOS POSIX systems (since Python 3.14),
++        # the default method has been changed to forkserver.
++        # The code in this module does not work with it,
++        # hence the explicit change to 'fork'
++        # See https://github.com/python/cpython/issues/125714
++        if get_start_method() == "forkserver":
++            _mp_context = get_context(method="fork")
++        else:
++            _mp_context = get_context()
++
+         def do_test(threads, nparts):
+             parts = satyr.DistancesPart.create(len(threads), nparts)
+ 
+@@ -156,7 +167,7 @@ def compute_part(part, queue):
+             result_queue = Queue()
+             processes = []
+             for p in parts:
+-                processes.append(Process(target=compute_part, args=(p, result_queue)))
++                processes.append(_mp_context.Process(target=compute_part, args=(p, result_queue)))
+                 processes[-1].start()
+ 
+             parts = []

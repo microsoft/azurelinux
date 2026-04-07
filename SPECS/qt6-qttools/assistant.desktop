@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Qt6 Assistant
+GenericName=Documentation viewer
+Comment=Shows Qt5 documentation and examples
+Exec=assistant-qt6
+Icon=assistant-qt6
+Terminal=false
+Type=Application
+Categories=Qt;Development;Documentation;

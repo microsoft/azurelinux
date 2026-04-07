@@ -1,0 +1,44 @@
+From fdb9e24c5eb48d662dae58b6728fc36f2ffb90dc Mon Sep 17 00:00:00 2001
+From: Alexander Neundorf <neundorf@kde.org>
+Date: Sat, 18 Apr 2009 19:08:56 +0000
+Subject: [PATCH 09/33] -remove the warnings again
+
+Alex
+
+
+
+svn path=/trunk/kdesupport/automoc/; revision=955898
+---
+ Automoc4Nightly.cmake | 2 +-
+ kde4automoc.cpp       | 4 ----
+ 2 files changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/Automoc4Nightly.cmake b/Automoc4Nightly.cmake
+index 236f263..6b63d15 100644
+--- a/Automoc4Nightly.cmake
++++ b/Automoc4Nightly.cmake
+@@ -1,5 +1,5 @@
+ set(CTEST_VCS svn)
+-set(CTEST_VCS_REPOSITORY https://neundorf@svn.kde.org/home/kde/trunk/kdesupport/automoc)
++set(CTEST_VCS_REPOSITORY https://svn.kde.org/home/kde/trunk/kdesupport/automoc)
+ set(CTEST_CMAKE_GENERATOR "Unix Makefiles" )
+ 
+ # set(CTEST_AVOID_SPACES FALSE)
+diff --git a/kde4automoc.cpp b/kde4automoc.cpp
+index 34b2c74..e85ec62 100644
+--- a/kde4automoc.cpp
++++ b/kde4automoc.cpp
+@@ -23,10 +23,6 @@
+     THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+ 
+-// warnings just for testing cdash, will remove soon again, Alex
+-#warning "this is a test"
+-#warning "kdecore/network/k2socket.h blub blub test"
+-
+ #include <QtCore/QCoreApplication>
+ #include <QtCore/QDateTime>
+ #include <QtCore/QDir>
+-- 
+2.4.3
+

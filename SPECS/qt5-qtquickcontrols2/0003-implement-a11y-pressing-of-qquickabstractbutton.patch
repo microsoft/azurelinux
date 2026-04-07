@@ -1,0 +1,55 @@
+From 761b842432e3c476ec9d032349a8c6dc4a1cd81d Mon Sep 17 00:00:00 2001
+From: Harald Sitter <sitter@kde.org>
+Date: Wed, 2 Nov 2022 12:39:11 +0100
+Subject: [PATCH 3/5] implement a11y pressing of qquickabstractbutton
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+this adds a pressAction default implementation that simply calls trigger
+(which in turn either triggers the action or emits a click), allowing
+accessibility tools to issue a button press via a11y api.
+
+Change-Id: I75b4fb8680835093b1135fdbf4329aaa85dc3243
+Reviewed-by: Arjen Hiemstra <ahiemstra@heimr.nl>
+Reviewed-by: Aleix Pol Gonzalez <aleixpol@kde.org>
+Reviewed-by: Jan Arve Sæther <jan-arve.saether@qt.io>
+(cherry picked from commit 705659eaaf47af72eeb5f5c742e18a5c665a76eb in
+qtdeclarative)
+---
+ src/quicktemplates2/qquickabstractbutton.cpp | 6 ++++++
+ src/quicktemplates2/qquickabstractbutton_p.h | 1 +
+ 2 files changed, 7 insertions(+)
+
+diff --git a/src/quicktemplates2/qquickabstractbutton.cpp b/src/quicktemplates2/qquickabstractbutton.cpp
+index 20cf59c1a..43af47a94 100644
+--- a/src/quicktemplates2/qquickabstractbutton.cpp
++++ b/src/quicktemplates2/qquickabstractbutton.cpp
+@@ -1201,6 +1201,12 @@ QAccessible::Role QQuickAbstractButton::accessibleRole() const
+     }
+     return QAccessible::Button;
+ }
++
++void QQuickAbstractButton::accessiblePressAction()
++{
++    Q_D(QQuickAbstractButton);
++    d->trigger();
++}
+ #endif
+ 
+ QT_END_NAMESPACE
+diff --git a/src/quicktemplates2/qquickabstractbutton_p.h b/src/quicktemplates2/qquickabstractbutton_p.h
+index 0fa48980e..ab66220d0 100644
+--- a/src/quicktemplates2/qquickabstractbutton_p.h
++++ b/src/quicktemplates2/qquickabstractbutton_p.h
+@@ -209,6 +209,7 @@ protected:
+ #if QT_CONFIG(accessibility)
+     void accessibilityActiveChanged(bool active) override;
+     QAccessible::Role accessibleRole() const override;
++    Q_INVOKABLE void accessiblePressAction();
+ #endif
+ 
+ private:
+-- 
+2.51.1
+

@@ -1,0 +1,40 @@
+From 261bde57cd14776eb395c93e8d8352677e0722c2 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Fri, 30 May 2025 14:42:53 +0200
+Subject: [PATCH] Replace atty with std::io::IsTerminal
+
+---
+ src/output/fmt.rs | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/src/output/fmt.rs b/src/output/fmt.rs
+index dc1f46e..40411f4 100644
+--- a/src/output/fmt.rs
++++ b/src/output/fmt.rs
+@@ -2,7 +2,7 @@ use crate::util::color::ColorChoice;
+ 
+ use std::{
+     fmt::{self, Display, Formatter},
+-    io::{self, Write},
++    io::{self, IsTerminal, Write},
+ };
+ 
+ #[derive(Copy, Clone, Debug, PartialEq, Eq)]
+@@ -149,10 +149,8 @@ impl Default for Style {
+ 
+ #[cfg(feature = "color")]
+ fn is_a_tty(stream: Stream) -> bool {
+-    let stream = match stream {
+-        Stream::Stdout => atty::Stream::Stdout,
+-        Stream::Stderr => atty::Stream::Stderr,
+-    };
+-
+-    atty::is(stream)
++    match stream {
++        Stream::Stdout => std::io::stdout().is_terminal(),
++        Stream::Stderr => std::io::stderr().is_terminal(),
++    }
+ }
+-- 
+2.49.0
+

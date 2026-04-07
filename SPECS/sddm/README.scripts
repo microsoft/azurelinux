@@ -1,0 +1,2 @@
+This scripts dir contains only samples, but are generally not used directly.
+In practice, sddm runtime uses items under /etc/sddm by default

@@ -1,0 +1,12 @@
+diff --git a/services/sddm-tmpfiles.conf.in b/services/sddm-tmpfiles.conf.in
+index fb45553..6acfb6c 100644
+--- a/services/sddm-tmpfiles.conf.in
++++ b/services/sddm-tmpfiles.conf.in
+@@ -1,5 +1,7 @@
+ # Home dir of the sddm user, also contains state.conf
+ d	${STATE_DIR}	0750	sddm	sddm
++# Workaround for https://pagure.io/fedora-kde/SIG/issue/87
++Z	${STATE_DIR}	-	sddm	sddm
+ # This contains X11 auth files passed to Xorg and the greeter
+ d	${RUNTIME_DIR}	0711	root	root
+ # Sockets for IPC

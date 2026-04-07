@@ -1,0 +1,12 @@
+--- lzma-rs-0.3.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ lzma-rs-0.3.0/Cargo.toml	2025-05-12T23:32:39.750368+00:00
+@@ -56,9 +56,6 @@
+ version = "0.4.17"
+ optional = true
+ 
+-[dev-dependencies.rust-lzma]
+-version = "0.5"
+-
+ [features]
+ enable_logging = [
+     "env_logger",

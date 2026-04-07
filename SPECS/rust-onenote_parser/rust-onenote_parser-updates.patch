@@ -1,0 +1,92 @@
+From 8997279ec438ad838bf841d6cb15da00014aab4b Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Sun, 27 Oct 2024 18:00:00 -0600
+Subject: [PATCH 2/3] rust-onenote_parser-updates
+
+---
+ Cargo.lock      | 251 ------------------------------------------------
+ Cargo.toml      |   4 +-
+ Cargo.toml.orig |  28 ------
+ src/errors.rs   |   6 +-
+ src/reader.rs   |   2 +-
+ src/utils.rs    |   5 +-
+ 6 files changed, 8 insertions(+), 288 deletions(-)
+ delete mode 100644 Cargo.lock
+ delete mode 100644 Cargo.toml.orig
+
+diff --git a/Cargo.toml b/Cargo.toml
+index fc839d9..9a37954 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -25,7 +25,7 @@ license = "MPL-2.0"
+ repository = "https://github.com/msiemens/onenote.rs"
+ 
+ [dependencies.bytes]
+-version = "0.5"
++version = "1.2.0"
+ 
+ [dependencies.encoding_rs]
+ version = "0.8.31"
+@@ -46,7 +46,7 @@ version = "1.0"
+ version = "1.0"
+ 
+ [dependencies.uuid]
+-version = "0.8"
++version = "1.1.2"
+ 
+ [dependencies.widestring]
+ version = "1.1.0"
+diff --git a/src/errors.rs b/src/errors.rs
+index 91477b3..50079a3 100644
+--- a/src/errors.rs
++++ b/src/errors.rs
+@@ -51,8 +51,8 @@ impl From<std::string::FromUtf16Error> for Error {
+     }
+ }
+ 
+-impl From<widestring::MissingNulError<u16>> for Error {
+-    fn from(err: widestring::MissingNulError<u16>) -> Self {
++impl From<widestring::error::MissingNulTerminator> for Error {
++    fn from(err: widestring::error::MissingNulTerminator) -> Self {
+         ErrorKind::from(err).into()
+     }
+ }
+@@ -128,6 +128,6 @@ pub enum ErrorKind {
+     #[error("UTF-16 string is missing null terminator: {err}")]
+     Utf16MissingNull {
+         #[from]
+-        err: widestring::MissingNulError<u16>,
++        err: widestring::error::MissingNulTerminator,
+     },
+ }
+diff --git a/src/reader.rs b/src/reader.rs
+index 64730d0..318c280 100644
+--- a/src/reader.rs
++++ b/src/reader.rs
+@@ -40,7 +40,7 @@ impl<'a> Reader<'a> {
+     }
+ 
+     pub(crate) fn bytes(&self) -> &[u8] {
+-        self.0.bytes()
++        self.0.chunk()
+     }
+ 
+     pub(crate) fn remaining(&self) -> usize {
+diff --git a/src/utils.rs b/src/utils.rs
+index fd77181..074ff50 100644
+--- a/src/utils.rs
++++ b/src/utils.rs
+@@ -12,8 +12,7 @@ impl Utf16ToString for &[u8] {
+             .map(|v| u16::from_le_bytes([v[0], v[1]]))
+             .collect();
+ 
+-        let value = U16CString::from_vec_with_nul(data)?;
+-
+-        Ok(value.to_string()?)
++        let value = U16CString::from_vec_truncate(data);
++        Ok(value.to_string().unwrap())
+     }
+ }
+-- 
+2.47.0
+

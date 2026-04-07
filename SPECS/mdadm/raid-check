@@ -1,0 +1,135 @@
+#!/bin/bash
+#
+# This script reads it's configuration from /etc/sysconfig/raid-check
+# Please use that file to enable/disable this script or to set the
+# type of check you wish performed.
+
+# We might be on a kernel with no raid support at all, exit if so
+[ -f /proc/mdstat ] || exit 0
+
+# and exit if we haven't been set up properly
+[ -f /etc/sysconfig/raid-check ] || exit 0
+. /etc/sysconfig/raid-check
+
+# Wait until no more than arg1 arrays in arg2 list are busy
+waitbusy() {
+    local threshold=$(($1 + 1))
+    local dev_list="$2"
+    while true
+    do
+	local busy=0
+	local dev=""
+	for dev in $dev_list; do
+	    local sync_action=`cat /sys/block/$dev/md/sync_action`
+	    if [ "$sync_action" != "idle" ]; then
+		let busy++
+	    fi
+	done
+        [ $busy -lt $threshold ] && break
+	sleep 60
+    done
+}
+
+[ "$ENABLED" != "yes" ] && exit 0
+
+case "$CHECK" in
+    check) ;;
+    repair) ;;
+    *) exit 0;;
+esac
+
+ionice=""
+renice=""
+case $NICE in
+    high)
+	renice="-n -5"
+	;;
+    low)
+	renice="-n 5"
+	ionice="-c2 -n7"
+	;;
+    idle)
+	renice="-n 15"
+	ionice="-c3"
+	;;
+    *)
+	;;
+esac
+
+active_list=`grep "^md.*: active" /proc/mdstat | cut -f 1 -d ' '`
+[ -z "$active_list" ] && exit 0
+
+declare -A check
+dev_list=""
+check_list=""
+for dev in $active_list; do
+    echo $SKIP_DEVS | grep -w $dev >&/dev/null && continue
+    if [ -f /sys/block/$dev/md/sync_action ]; then
+	# Only perform the checks on idle, healthy arrays, but delay
+	# actually writing the check field until the next loop so we
+	# don't switch currently idle arrays to active, which happens
+	# when two or more arrays are on the same physical disk
+	array_state=`cat /sys/block/$dev/md/array_state`
+	if [ "$array_state" != "clean" -a "$array_state" != "active" ]; then
+	    continue
+	fi
+	sync_action=`cat /sys/block/$dev/md/sync_action`
+	if [ "$sync_action" != idle ]; then
+	    continue
+	fi
+	ck=""
+	echo $REPAIR_DEVS | grep -w $dev >&/dev/null && ck="repair"
+	echo $CHECK_DEVS | grep -w $dev >&/dev/null && ck="check"
+	[ -z "$ck" ] && ck=$CHECK
+	dev_list="$dev_list $dev"
+	check[$dev]=$ck
+	[ "$ck" = "check" ] && check_list="$check_list $dev"
+    fi
+done
+[ -z "$dev_list" ] && exit 0
+
+for dev in $dev_list; do
+    #Only run $MAXCONCURRENT checks at a time
+    if [ -n "$MAXCONCURRENT" ]; then
+	waitbusy $((MAXCONCURRENT - 1)) "$dev_list"
+    fi
+    echo "${check[$dev]}" > /sys/block/$dev/md/sync_action
+
+    resync_pid=""
+    wait=10
+    while [ $wait -gt 0 -a -z "$resync_pid" ]; do
+	sleep 6
+	let wait--
+	resync_pid=$(ps -ef | awk -v mddev=$dev 'BEGIN { pattern = "^\\[" mddev "_resync]$" } $8 ~ pattern { print $2 }')
+    done
+    [ -n "$resync_pid" -a -n "$renice" ] &&
+    	renice $renice -p $resync_pid >&/dev/null
+    [ -n "$resync_pid" -a -n "$ionice" ] &&
+    	ionice $ionice -p $resync_pid >&/dev/null
+done
+[ -z "$check_list" ] && exit 0
+
+waitbusy 0 "$check_list"
+
+for dev in $check_list; do
+	mismatch_cnt=`cat /sys/block/$dev/md/mismatch_cnt`
+	# Due to the fact that raid1/10 writes in the kernel are unbuffered,
+	# a raid1 array can have non-0 mismatch counts even when the
+	# array is healthy.  These non-0 counts will only exist in
+	# transient data areas where they don't pose a problem.  However,
+	# since we can't tell the difference between a non-0 count that
+	# is just in transient data or a non-0 count that signifies a
+	# real problem, simply don't check the mismatch_cnt on raid1
+	# devices as it's providing far too many false positives.  But by
+	# leaving the raid1 device in the check list and performing the
+	# check, we still catch and correct any bad sectors there might
+	# be in the device.
+	raid_lvl=`cat /sys/block/$dev/md/level`
+	if [ "$raid_lvl" = "raid1" -o "$raid_lvl" = "raid10" ]; then
+	    continue
+	fi
+	if [ "$mismatch_cnt" -ne 0 ]; then
+		echo "WARNING: mismatch_cnt is not 0 on /dev/$dev"
+	fi
+done
+

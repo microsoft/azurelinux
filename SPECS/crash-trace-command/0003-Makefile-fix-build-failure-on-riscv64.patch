@@ -1,0 +1,15 @@
+Index: crash-trace-3.0/Makefile
+===================================================================
+--- crash-trace-3.0.orig/Makefile
++++ crash-trace-3.0/Makefile
+@@ -30,6 +30,10 @@ ifeq ($(shell arch), aarch64)
+   TARGET=ARM64
+   TARGET_CFLAGS=
+ endif
++ifeq ($(shell arch), riscv64)
++  TARGET=RISCV64
++  TARGET_CFLAGS=
++endif
+ 
+ INCDIR=/usr/include/crash
+ 

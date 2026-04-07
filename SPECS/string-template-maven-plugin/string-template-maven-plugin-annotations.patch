@@ -1,0 +1,85 @@
+--- string-template-maven-plugin-string-template-maven-plugin-1.1/pom.xml.orig	2024-02-28 15:27:26.719999502 -0700
++++ string-template-maven-plugin-string-template-maven-plugin-1.1/pom.xml	2024-02-28 15:35:52.014863155 -0700
+@@ -109,6 +109,13 @@
+             <version>2.0</version>
+         </dependency>
+ 
++	<dependency>
++          <groupId>org.apache.maven.plugin-tools</groupId>
++          <artifactId>maven-plugin-annotations</artifactId>
++          <version>3.10.2</version>
++          <scope>provided</scope>
++        </dependency>
++
+     </dependencies>
+ 
+     <reporting>
+--- string-template-maven-plugin-string-template-maven-plugin-1.1/src/main/java/com/webguys/maven/plugin/st/StringTemplateMojo.java.orig	2013-01-24 10:10:12.000000000 -0700
++++ string-template-maven-plugin-string-template-maven-plugin-1.1/src/main/java/com/webguys/maven/plugin/st/StringTemplateMojo.java	2024-02-28 15:31:30.683595884 -0700
+@@ -32,6 +32,9 @@ import org.apache.maven.plugin.AbstractM
+ import org.apache.maven.plugin.BuildPluginManager;
+ import org.apache.maven.plugin.MojoExecutionException;
+ import org.apache.maven.plugin.MojoFailureException;
++import org.apache.maven.plugins.annotations.Component;
++import org.apache.maven.plugins.annotations.Mojo;
++import org.apache.maven.plugins.annotations.Parameter;
+ import org.apache.maven.project.MavenProject;
+ import org.stringtemplate.v4.ST;
+ import org.stringtemplate.v4.STGroup;
+@@ -46,50 +49,38 @@ import static org.twdata.maven.mojoexecu
+ 
+ /**
+  * Executes string template using a given controller.
+- *
+- * @goal render
+  */
++@Mojo(name = "render")
+ public class StringTemplateMojo extends AbstractMojo
+ {
+     /**
+      * The Maven Project Object
+-     *
+-     * @parameter property="project"
+-     * @required
+-     * @readonly
+      */
++    @Parameter(property = "project", required = true, readonly = true)
+     private MavenProject project;
+ 
+     /**
+      * The Maven Session Object
+-     *
+-     * @parameter property="session"
+-     * @required
+-     * @readonly
+      */
++    @Parameter(property = "session", required = true, readonly = true)
+     private MavenSession session;
+ 
+     /**
+      * The Maven PluginManager Object
+-     *
+-     * @component
+-     * @required
+      */
++    @Component
+     private BuildPluginManager pluginManager;
+ 
+     /**
+      * The Maven ProjectDependenciesResolver Object
+-     *
+-     * @component
+-     * @required
+      */
++    @Component
+     private ProjectDependenciesResolver dependenciesResolver;
+ 
+     /**
+      * The collection of templates to render.
+-     * @parameter
+-     * @required
+      */
++    @Parameter(required = true)
+     private List<Template> templates;
+ 
+     @Override

@@ -1,0 +1,11 @@
+--- netkit-telnet-0.17/telnetd/telnetd.c.cleanup_race	2005-01-11 18:39:49.578123000 -0500
++++ netkit-telnet-0.17/telnetd/telnetd.c	2005-01-11 18:42:45.909616000 -0500
+@@ -1081,6 +1081,8 @@
+ 	if (FD_ISSET(p, &obits) && (pfrontp - pbackp) > 0)
+ 	    ptyflush();
+     }
++    /* to avoid a race for wtmp lock */
++    signal(SIGCHLD, SIG_IGN);
+     cleanup(0);
+ }  /* end of telnet */
+ 	

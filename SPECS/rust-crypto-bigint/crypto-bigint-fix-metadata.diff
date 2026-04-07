@@ -1,0 +1,28 @@
+--- crypto-bigint-0.5.5/Cargo.toml	1970-01-01T00:00:01+00:00
++++ crypto-bigint-0.5.5/Cargo.toml	2025-12-04T07:30:43.759297+00:00
+@@ -63,11 +63,6 @@
+ version = "0.6.4"
+ optional = true
+ 
+-[dependencies.rlp]
+-version = "0.5"
+-optional = true
+-default-features = false
+-
+ [dependencies.serdect]
+ version = "0.2"
+ optional = true
+@@ -85,12 +80,8 @@
+ [dev-dependencies.bincode]
+ version = "1"
+ 
+-[dev-dependencies.criterion]
+-version = "0.5"
+-features = ["html_reports"]
+-
+ [dev-dependencies.hex-literal]
+-version = "0.4"
++version = ">=0.4, <2.0"
+ 
+ [dev-dependencies.num-bigint]
+ version = "0.4"

@@ -1,0 +1,175 @@
+diff -urNp a/man/net-snmp-config.1.def b/man/net-snmp-config.1.def
+--- a/man/net-snmp-config.1.def	2021-05-26 09:30:07.430790003 +0200
++++ b/man/net-snmp-config.1.def	2021-05-26 09:35:36.703673542 +0200
+@@ -30,7 +30,7 @@ code for a list of available debug token
+ SNMP Setup commands:
+ .TP
+ \fB\-\-create\-snmpv3\-user\fR [\-ro] [\-a authpass] [\-x privpass]
+-[\-X DES|AES] [\-A MD5|SHA|SHA-512|SHA-384|SHA-256|SHA-224] [username]
++[\-X AES] [\-A MD5|SHA|SHA-512|SHA-384|SHA-256|SHA-224] [username]
+ .PP
+ These options produce the various compilation flags needed when
+ building external SNMP applications:
+diff -urNp a/man/net-snmp-create-v3-user.1.def b/man/net-snmp-create-v3-user.1.def
+--- a/man/net-snmp-create-v3-user.1.def	2021-05-26 09:30:07.430790003 +0200
++++ b/man/net-snmp-create-v3-user.1.def	2021-05-26 09:34:23.702034230 +0200
+@@ -3,7 +3,7 @@
+ net-snmp-create-v3-user \- create a SNMPv3 user in net-snmp configuration file
+ .SH SYNOPSIS
+ .PP
+-.B net-snmp-create-v3-user [-ro] [-A authpass] [-a MD5|SHA] [-X privpass] [-x DES|AES]
++.B net-snmp-create-v3-user [-ro] [-A authpass] [-a MD5|SHA] [-X privpass] [-x AES]
+ .B [username]
+ .SH DESCRIPTION
+ .PP
+@@ -27,5 +27,5 @@ specifies the authentication password ha
+ \fB\-X privpass\fR
+ specifies the encryption password
+ .TP
+-\fB\-x DES|AES\fR
++\fB\-x AES\fR
+ specifies the encryption algorithm
+diff -urNp a/man/snmpcmd.1.def b/man/snmpcmd.1.def
+--- a/man/snmpcmd.1.def	2021-05-26 09:30:07.429789994 +0200
++++ b/man/snmpcmd.1.def	2021-05-26 09:37:51.104850500 +0200
+@@ -311,7 +311,7 @@ Overrides the \fIdefSecurityName\fR toke
+ file.
+ .TP
+ .BI \-x " privProtocol"
+-Set the privacy protocol (DES or AES) used for encrypted SNMPv3 messages. 
++Set the privacy protocol (AES) used for encrypted SNMPv3 messages. 
+ Overrides the \fIdefPrivType\fR token in the
+ .I snmp.conf
+ file. This option is only valid if the Net-SNMP software was build
+diff -urNp a/man/snmp.conf.5.def b/man/snmp.conf.5.def
+--- a/man/snmp.conf.5.def	2021-05-26 09:30:07.429789994 +0200
++++ b/man/snmp.conf.5.def	2021-05-26 09:40:03.730011937 +0200
+@@ -221,13 +221,13 @@ The
+ value will be used for the authentication and/or privacy pass phrases
+ if either of the other directives are not specified.
+ .IP "defAuthType MD5|SHA|SHA-512|SHA-384|SHA-256|SHA-224"
+-.IP "defPrivType DES|AES"
++.IP "defPrivType AES"
+ define the default authentication and privacy protocols to use for
+ SNMPv3 requests.
+ These can be overridden using the \fB\-a\fR and \fB\-x\fR options respectively.
+ .IP
+ If not specified, SNMPv3 requests will default to MD5 authentication
+-and DES encryption.
++and AES encryption.
+ .RS
+ .IP "Note:
+ If the software has not been compiled to use the OpenSSL libraries,
+@@ -262,8 +262,7 @@ master keys which have been converted to
+ suitable for on particular SNMP engine (agent).  The length of the key
+ needs to be appropriate for the authentication or encryption type
+ being used (auth keys: MD5=16 bytes, SHA1=20 bytes;
+-priv keys: DES=16 bytes (8
+-bytes of which is used as an IV and not a key), and AES=16 bytes).
++priv keys: AES=16 bytes).
+ .IP "sshtosnmpsocket PATH"
+ Sets the path of the \fBsshtosnmp\fR socket created by an application
+ (e.g. snmpd) listening for incoming ssh connections through the
+diff -urNp a/man/snmpd.examples.5.def b/man/snmpd.examples.5.def
+--- a/man/snmpd.examples.5.def	2021-05-26 09:30:07.429789994 +0200
++++ b/man/snmpd.examples.5.def	2021-05-26 09:41:29.170761436 +0200
+@@ -87,8 +87,8 @@ the same authentication and encryption s
+ .RS
+ .nf
+ createUser me     MD5 "single pass phrase"
+-createUser myself MD5 "single pass phrase" DES
+-createUser andI   MD5 "single pass phrase" DES "single pass phrase"
++createUser myself MD5 "single pass phrase" AES
++createUser andI   MD5 "single pass phrase" AES "single pass phrase"
+ .fi
+ .RE
+ Note that this defines three \fIdistinct\fR users, who could be granted
+diff -urNp a/man/snmptrapd.conf.5.def b/man/snmptrapd.conf.5.def
+--- a/man/snmptrapd.conf.5.def	2021-05-26 09:30:07.428789985 +0200
++++ b/man/snmptrapd.conf.5.def	2021-05-26 09:42:02.963064029 +0200
+@@ -117,7 +117,7 @@ to trigger the types of processing liste
+ See
+ .IR snmpd.conf (5)
+ for more details.
+-.IP "createUser [-e  ENGINEID] username (MD5|SHA|SHA-512|SHA-384|SHA-256|SHA-224) authpassphrase [DES|AES]"
++.IP "createUser [-e  ENGINEID] username (MD5|SHA|SHA-512|SHA-384|SHA-256|SHA-224) authpassphrase [AES]"
+ See the 
+ .IR snmpd.conf (5)
+ manual page for a description of how to create SNMPv3 users.  This
+diff -urNp a/man/snmpusm.1.def b/man/snmpusm.1.def
+--- a/man/snmpusm.1.def	2021-05-26 09:30:07.430790003 +0200
++++ b/man/snmpusm.1.def	2021-05-26 09:42:24.178253990 +0200
+@@ -216,7 +216,7 @@ rwuser initial
+ # lets add the new user we'll create too:
+ rwuser wes
+ # USM configuration entries
+-createUser initial MD5 setup_passphrase DES
++createUser initial MD5 setup_passphrase AES
+ .fi
+ .RE
+ .PP
+diff -urNp a/net-snmp-create-v3-user.in b/net-snmp-create-v3-user.in
+--- a/net-snmp-create-v3-user.in	2021-05-26 09:30:07.369789468 +0200
++++ b/net-snmp-create-v3-user.in	2021-05-26 09:33:23.966511123 +0200
+@@ -10,7 +10,7 @@ if @PSCMD@ | egrep ' snmpd *$' > /dev/nu
+ fi
+ 
+ Aalgorithm="MD5"
+-Xalgorithm="DES"
++Xalgorithm="AES"
+ token=rwuser
+ 
+ while test "x$done" = "x" -a "x$1" != "x" -a "x$usage" != "xyes"; do
+@@ -57,11 +57,11 @@ case $1 in
+ 	    exit 1
+ 	fi
+         case $1 in
+-            DES|AES|AES128|AES192|AES256)
++            AES|AES128|AES192|AES256)
+ 	    Xalgorithm=$1
+ 	    shift
+ 	    ;;
+-            des|aes|aes128|aes192|aes256)
++            aes|aes128|aes192|aes256)
+ 	    Xalgorithm=$(echo "$1" | tr a-z A-Z)
+ 	    shift
+ 	    ;;
+@@ -90,7 +90,7 @@ if test "x$usage" = "xyes"; then
+     echo ""
+     echo "Usage:"
+     echo "  net-snmp-create-v3-user [-ro] [-A authpass] [-X privpass]"
+-    echo "                          [-a MD5|SHA|SHA-512|SHA-384|SHA-256|SHA-224] [-x DES|AES] [username]"
++    echo "                          [-a MD5|SHA|SHA-512|SHA-384|SHA-256|SHA-224] [-x AES] [username]"
+     echo ""
+     exit
+ fi
+diff -urNp a/README.snmpv3 b/README.snmpv3
+--- a/README.snmpv3	2021-05-26 09:30:07.352789320 +0200
++++ b/README.snmpv3	2021-05-26 09:44:49.109551728 +0200
+@@ -4,7 +4,7 @@ How to setup SNMPv3, a very brief docume
+ do a better job on since I suck at writing documentation and he
+ doesn't ;-) --Wes:
+ 
+-Note: SHA authentication and DES/AES encryption support is only available
++Note: SHA authentication and AES encryption support is only available
+ if you have OpenSSL installed or if you've compiled using
+ --with-openssl=internal.  If you use --with-openssl=internal please
+ read the documentation in snmplib/openssl/README for important details.
+@@ -27,7 +27,7 @@ CREATING THE FIRST USER:
+   WARNING: SNMPv3 pass phrases must be at least 8 characters long!
+ 
+   The above line creates the user "myuser" with a password of
+-  "my_password" (and uses MD5 and DES for protection).  (Note that
++  "my_password" (and uses MD5 and AES for protection).  (Note that
+   encryption support isn't enabled in the binary releases downloadable
+   from the net-snmp web site.)  net-snmp-config will also add a line
+   to your snmpd.conf file to let that user have read/write access to
+@@ -44,7 +44,7 @@ CREATING THE FIRST USER:
+        [ this should return information about how long your agent has been up]
+   
+     snmpget -v 3 -u myuser -l authPriv   -a MD5 -A my_password
+-                                         -x DES -X my_password localhost sysUpTime.0
++                                         -x AES -X my_password localhost sysUpTime.0
+        [ this should return similar information, but encrypts the transmission ]
+ 
+ CREATING A SECOND USER:

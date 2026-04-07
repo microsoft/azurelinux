@@ -1,0 +1,282 @@
+diff -up doc/xelatex/xepersian/dkun-0.3.py.than doc/xelatex/xepersian/dkun-0.3.py
+--- doc/xelatex/xepersian/dkun-0.3.py.than	2018-05-07 11:52:01.795308478 +0200
++++ doc/xelatex/xepersian/dkun-0.3.py	2018-05-07 11:53:32.984620222 +0200
+@@ -1,4 +1,4 @@
+-#! /usr/bin/env python
++#! /usr/bin/python
+ 
+ #########################################
+ #	General Public License          #
+@@ -311,7 +311,7 @@ def dk_adjust_shaping(text, i):
+ 	try:
+ 		u = table_DK_UN[current][0]
+ 	except KeyError:
+-		print 'ERROR: unmapped character'
++		print('ERROR: unmapped character')
+ 		return u''
+ 
+ 	#if you don't want shaping remove the following comment
+@@ -407,7 +407,7 @@ def needs_english_wrapper(part):
+ 
+ # Main body of the program 
+ if len(sys.argv) <= 2:
+-	print 'usage: python dkun in_filename out_filename'
++	print('usage: python dkun in_filename out_filename')
+ 	exit(0)
+ 
+ filename = sys.argv[1]
+@@ -416,13 +416,13 @@ outfile = sys.argv[2]
+ try:
+ 	f = open(filename, 'r')
+ except IOError:
+-	print "Can not open the input file: " + filename
++	print("Can not open the input file: " + filename)
+ 	exit(0)
+ 
+ try:
+ 	of = codecs.open(outfile, encoding='utf-8', mode='w')
+ except IOError:
+-	print "Can not open the output file: " + outfile
++	print("Can not open the output file: " + outfile)
+ 	exit(0)
+ 
+ line_number = 0
+diff -up doc/xelatex/xepersian/dkun-0.4.py.than doc/xelatex/xepersian/dkun-0.4.py
+--- doc/xelatex/xepersian/dkun-0.4.py.than	2018-05-07 11:53:54.187692708 +0200
++++ doc/xelatex/xepersian/dkun-0.4.py	2018-05-07 11:54:32.272822907 +0200
+@@ -1,4 +1,4 @@
+-#! /usr/bin/env python
++#! /usr/bin/python
+ 
+ #########################################
+ #	General Public License          #
+@@ -311,7 +311,7 @@ def dk_adjust_shaping(text, i):
+ 	try:
+ 		u = table_DK_UN[current][0]
+ 	except KeyError:
+-		print 'ERROR: unmapped character'
++		print('ERROR: unmapped character')
+ 		return u''
+ 
+ 	#if you don't want shaping remove the following comment
+@@ -407,7 +407,7 @@ def needs_english_wrapper(part):
+ 
+ # Main body of the program 
+ if len(sys.argv) <= 2:
+-	print 'usage: python dkun in_filename out_filename'
++	print('usage: python dkun in_filename out_filename')
+ 	exit(0)
+ 
+ filename = sys.argv[1]
+@@ -416,13 +416,13 @@ outfile = sys.argv[2]
+ try:
+ 	f = open(filename, 'r')
+ except IOError:
+-	print "Can not open the input file: " + filename
++	print("Can not open the input file: " + filename)
+ 	exit(0)
+ 
+ try:
+ 	of = codecs.open(outfile, encoding='utf-8', mode='w')
+ except IOError:
+-	print "Can not open the output file: " + outfile
++	print("Can not open the output file: " + outfile)
+ 	exit(0)
+ 
+ line_number = 0
+diff -up doc/xelatex/xepersian/ftxe-0.12.py.than doc/xelatex/xepersian/ftxe-0.12.py
+--- doc/xelatex/xepersian/ftxe-0.12.py.than	2018-05-07 11:54:55.163901164 +0200
++++ doc/xelatex/xepersian/ftxe-0.12.py	2018-05-07 11:57:58.063526433 +0200
+@@ -1,3 +1,5 @@
++﻿#! /usr/bin/python
++
+ #  This program is free software: you can redistribute it and/or modify
+ #  it under the terms of the GNU General Public License as published by
+ #  the Free Software Foundation, either version 3 of the License, or
+@@ -488,7 +490,7 @@ def read_size(input,index,last_index):
+ 			dim_index = pt_index
+ 	next_cmd = input.find(u'\\', index)
+ 	if (next_cmd == -1 and dim_index == -1):
+-		print "Error in parsing \epsfxsize command at " + str(line_number) + "\n"
++		print("Error in parsing \epsfxsize command at " + str(line_number) + "\n")
+ 		return -1
+ 	elif (next_cmd == -1 or (dim_index != -1 and next_cmd > dim_index)):
+ 		epsfxsize = input[index:dim_index+2]
+@@ -499,7 +501,7 @@ def read_size(input,index,last_index):
+ 			end_cmd += 1
+ 		return end_cmd
+ 	else:
+-		print "Error in parsing \epsfxsize command at " + str(line_number) + "\n"
++		print("Error in parsing \epsfxsize command at " + str(line_number) + "\n")
+ 		return -1
+ 
+ 
+@@ -567,7 +569,7 @@ def generate_farsitex_cmds_file(helper_f
+ 	try:
+ 		of = codecs.open(helper_filename, encoding='utf-8', mode='w')
+ 	except IOError:
+-		print "Can not open the output file: " + helper_filename
++		print("Can not open the output file: " + helper_filename)
+ 		exit(0)
+ 	of.write(preamble)
+ 	of.close
+@@ -875,7 +877,7 @@ def convert_file(f, of, convert_cmds):
+ 
+ 	for line in f:
+ 		line_number += 1
+-		print line_number,
++		print (line_number)
+ 		output_line = u''
+ 		line_len = len(line)
+ 		
+@@ -888,7 +890,7 @@ def convert_file(f, of, convert_cmds):
+ 		# check line-direction character
+ 		line_direction_rtl = (line[0] == '<')
+ 		if (line[0] != '>') and (line[0] != '<'):
+-			print "FORMAT ERROR AT LINE: " + str(line_number)
++			print("FORMAT ERROR AT LINE: " + str(line_number))
+ 			exit(0)
+ 	
+ 		i = 1
+@@ -970,11 +972,11 @@ def convert_file(f, of, convert_cmds):
+ 	# end of file processing
+ 
+ def print_usage():
+-	print 'usage: python ftxe-0-11 [-r] [-s] [-x] [-u] in_filename1 in_filename2'
+-	print '-r: (DEFAULT) recursively consider files included in the given files'
+-	print '-s: do not recursively consider files'
+-	print '-x: (DEFAULT) insert xepersian related commands'
+-	print '-u: only convert to unicode'
++	print('usage: python ftxe-0-11 [-r] [-s] [-x] [-u] in_filename1 in_filename2')
++	print('-r: (DEFAULT) recursively consider files included in the given files')
++	print('-s: do not recursively consider files')
++	print('-x: (DEFAULT) insert xepersian related commands')
++	print('-u: only convert to unicode')
+ 
+ ###################################
+ # Begin of main body of the program
+@@ -1011,7 +1013,7 @@ while (options_index < len(sys.argv)):
+ 	options_index += 1
+ 
+ if (len(filenames) == 0):
+-	print 'error: no input filename is specified!'
++	print('error: no input filename is specified!')
+ 	print_usage()
+ 	exit(0)
+ 	
+@@ -1026,17 +1028,17 @@ while (index < len(filenames)):
+ 	else: 
+ 		outfile = filename + '.tex'
+ 
+-	print '\n\nConverting "' + filename + '" into "' + outfile + '"'
++	print('\n\nConverting "' + filename + '" into "' + outfile + '"')
+ 	try:
+ 		f = open(filename, 'r')
+ 	except IOError:
+-		print "Can not open the input file: " + filename
++		print("Can not open the input file: " + filename)
+ 		exit(0)
+ 
+ 	try:
+ 		of = codecs.open(outfile, encoding='utf-8', mode='w')
+ 	except IOError:
+-		print "Can not open the output file: " + outfile
++		print("Can not open the output file: " + outfile)
+ 		exit(0)
+ 
+ 	convert_file(f, of, convert_xepersian)
+diff -up doc/xelatex/xepersian/undk-0.6.py.than doc/xelatex/xepersian/undk-0.6.py
+--- doc/xelatex/xepersian/undk-0.6.py.than	2018-05-07 11:58:18.706597005 +0200
++++ doc/xelatex/xepersian/undk-0.6.py	2018-05-07 11:59:18.079799981 +0200
+@@ -1,4 +1,4 @@
+-#! /usr/bin/env python
++#! /usr/bin/python
+ #########################################
+ #	General Public License          #
+ #	Author:	Mostafa Vahedi          #
+@@ -328,7 +328,7 @@ def find_form(line, i):
+ def map_char_unicode_DK(c, form):
+ 	try:
+ 		n = table_UN_DK[c][0]
+-        except KeyError:
++	except KeyError:
+ 		return c.encode('latin-1')
+ 	if (n == 1):
+ 		return table_UN_DK[c][1]
+@@ -371,7 +371,7 @@ def is_farsi_numerical(c):
+ 
+ # Main body of the program 
+ if len(sys.argv) <= 2:
+-	print 'usage: python undk in_filename out_filename'
++	print('usage: python undk in_filename out_filename')
+ 	exit(0)
+ 
+ filename = sys.argv[1]
+@@ -380,13 +380,13 @@ outfile = sys.argv[2]
+ try:
+ 	f = codecs.open(filename, 'r', 'utf-8')
+ except IOError:
+-	print "Can not open the input file: " + filename
++	print("Can not open the input file: " + filename)
+ 	exit(0)
+ 
+ try:
+ 	of = open(outfile, 'w')
+ except IOError:
+-	print "Can not open the output file: " + outfile
++	print("Can not open the output file: " + outfile)
+ 	exit(0)
+ 
+ # this is an option
+@@ -425,7 +425,7 @@ for line in f:
+ 					this_line += auto_english_part[::-1]
+ 					auto_english_part = ''
+ 					inAutoEnglish = 0
+-					print 'Warning: mixed Auto-English and Forced-English'
++					print('Warning: mixed Auto-English and Forced-English')
+ 				if (inFarsiNumber == 1):
+ 					this_line += number_part[::-1]
+ 					number_part = ''
+diff -up doc/xelatex/xepersian/unldk-0.2.py.than doc/xelatex/xepersian/unldk-0.2.py
+--- doc/xelatex/xepersian/unldk-0.2.py.than	2018-05-07 11:59:41.522880125 +0200
++++ doc/xelatex/xepersian/unldk-0.2.py	2018-05-07 12:00:21.999018500 +0200
+@@ -1,4 +1,4 @@
+-#! /usr/bin/env python
++#! /usr/bin/python
+ #########################################
+ #	General Public License          #
+ #	Author:	Mostafa Vahedi          #
+@@ -328,7 +328,7 @@ def find_form(line, i):
+ def map_char_unicode_DK(c, form):
+ 	try:
+ 		n = table_UN_DK[c][0]
+-        except KeyError:
++	except KeyError:
+ 		return c.encode('latin-1')
+ 	if (n == 1):
+ 		return table_UN_DK[c][1]
+@@ -364,7 +364,7 @@ def is_farsi_numerical(c):
+ 
+ # Main body of the program 
+ if len(sys.argv) <= 2:
+-	print 'usage: python unldk in_filename out_filename'
++	print('usage: python unldk in_filename out_filename')
+ 	exit(0)
+ 
+ filename = sys.argv[1]
+@@ -373,13 +373,13 @@ outfile = sys.argv[2]
+ try:
+ 	f = codecs.open(filename, 'r', 'utf-8')
+ except IOError:
+-	print "Can not open the input file: " + filename
++	print("Can not open the input file: " + filename)
+ 	exit(0)
+ 
+ try:
+ 	of = open(outfile, 'w')
+ except IOError:
+-	print "Can not open the output file: " + outfile
++	print("Can not open the output file: " + outfile)
+ 	exit(0)
+ 
+ inFarsi = 0

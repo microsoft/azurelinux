@@ -1,0 +1,23 @@
+From d779e7b4e4f7bdfe352b0134c7eca6b11e6e1b3e Mon Sep 17 00:00:00 2001
+From: Peter Goldstein <peter.m.goldstein@gmail.com>
+Date: Thu, 27 Jan 2022 16:21:51 -0800
+Subject: [PATCH] Add Ruby 3.1 to CI
+
+---
+ .github/workflows/ruby.yml | 2 +-
+ lib/shindo/bin.rb          | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/shindo/bin.rb b/lib/shindo/bin.rb
+index a7396e8..9ddc6ed 100644
+--- a/lib/shindo/bin.rb
++++ b/lib/shindo/bin.rb
+@@ -29,7 +29,7 @@
+     if File.directory?(path)
+       tests ||= []
+       tests |= Dir.glob(File.join(path, '**', '*tests.rb'))
+-    elsif File.exists?(path)
++    elsif File.exist?(path)
+       tests ||= []
+       tests << path
+     else

@@ -1,0 +1,163 @@
+From 9511ba9c3772c2415ae6501f6d977bc4ba057c55 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ralf=20Cors=C3=A9pius?= <corsepiu@fedoraproject.org>
+Date: Thu, 15 Mar 2018 15:50:29 +0100
+Subject: [PATCH 1/2] gtkglext-1.2.0-bz677457
+
+---
+ gtk/gtkglwidget.c | 48 ++++++++++++++++++++++++++++--------------------
+ 1 file changed, 28 insertions(+), 20 deletions(-)
+
+diff --git a/gtk/gtkglwidget.c b/gtk/gtkglwidget.c
+index ecb41ef..7381739 100644
+--- a/gtk/gtkglwidget.c
++++ b/gtk/gtkglwidget.c
+@@ -16,7 +16,9 @@
+  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA.
+  */
+ 
+-#include <gtk/gtkmain.h>
++#ifdef HAVE_CONFIG_H
++#include "config.h"
++#endif /* HAVE_CONFIG_H */
+ 
+ #include "gtkglprivate.h"
+ #include "gtkglwidget.h"
+@@ -68,6 +70,7 @@ static void
+ gtk_gl_widget_realize (GtkWidget       *widget,
+                        GLWidgetPrivate *private)
+ {
++  GdkWindow *window;
+   GdkGLWindow *glwindow;
+ 
+   GTK_GL_NOTE_FUNC_PRIVATE ();
+@@ -77,9 +80,10 @@ gtk_gl_widget_realize (GtkWidget       *widget,
+    * handlers.
+    */
+ 
+-  if (!gdk_window_is_gl_capable (widget->window))
++  window = gtk_widget_get_window (widget);
++  if (!gdk_window_is_gl_capable (window))
+     {
+-      glwindow = gdk_window_set_gl_capability (widget->window,
++      glwindow = gdk_window_set_gl_capability (window,
+                                                private->glconfig,
+                                                NULL);
+       if (glwindow == NULL)
+@@ -127,9 +131,9 @@ gtk_gl_widget_size_allocate (GtkWidget       *widget,
+    * Synchronize OpenGL and window resizing request streams.
+    */
+ 
+-  if (GTK_WIDGET_REALIZED (widget) && private->is_realized)
++  if (gtk_widget_get_realized (widget) && private->is_realized)
+     {
+-      gldrawable = gdk_window_get_gl_drawable (widget->window);
++      gldrawable = gdk_window_get_gl_drawable (gtk_widget_get_window (widget));
+       gdk_gl_drawable_wait_gdk (gldrawable);
+     }
+ }
+@@ -146,7 +150,7 @@ gtk_gl_widget_unrealize (GtkWidget       *widget,
+ 
+   if (private->glcontext != NULL)
+     {
+-      gdk_gl_context_destroy (private->glcontext);
++      g_object_unref (private->glcontext);
+       private->glcontext = NULL;
+     }
+ 
+@@ -154,8 +158,8 @@ gtk_gl_widget_unrealize (GtkWidget       *widget,
+    * Remove OpenGL-capability from widget->window.
+    */
+ 
+-  if (GTK_WIDGET_REALIZED (widget))
+-    gdk_window_unset_gl_capability (widget->window);
++  if (gtk_widget_get_realized (widget))
++    gdk_window_unset_gl_capability (gtk_widget_get_window (widget));
+ 
+   private->is_realized = FALSE;
+ }
+@@ -174,7 +178,7 @@ gtk_gl_widget_parent_set (GtkWidget   *widget,
+    */
+ 
+   toplevel = gtk_widget_get_toplevel (widget);
+-  if (GTK_WIDGET_TOPLEVEL (toplevel) && !GTK_WIDGET_REALIZED (toplevel))
++  if (gtk_widget_is_toplevel (toplevel) && !gtk_widget_get_realized (toplevel))
+     {
+       GTK_GL_NOTE (MISC,
+         g_message (" - Install colormap to the top-level window."));
+@@ -188,23 +192,27 @@ gtk_gl_widget_style_set (GtkWidget *widget,
+                          GtkStyle  *previous_style,
+                          gpointer   user_data)
+ {
++  GdkWindow *window;
++
+   GTK_GL_NOTE_FUNC_PRIVATE ();
+ 
+   /* 
+    * Set a background of "None" on window to avoid AIX X server crash.
+    */
+ 
+-  if (GTK_WIDGET_REALIZED (widget))
++  if (gtk_widget_get_realized (widget))
+     {
++      window = gtk_widget_get_window (widget);
++
+       GTK_GL_NOTE (MISC,
+         g_message (" - window->bg_pixmap = %p",
+-                   ((GdkWindowObject *) (widget->window))->bg_pixmap));
++                   ((GdkWindowObject *) window)->bg_pixmap));
+ 
+-      gdk_window_set_back_pixmap (widget->window, NULL, FALSE);
++      gdk_window_set_back_pixmap (window, NULL, FALSE);
+ 
+       GTK_GL_NOTE (MISC,
+         g_message (" - window->bg_pixmap = %p",
+-                   ((GdkWindowObject *) (widget->window))->bg_pixmap));
++                   ((GdkWindowObject *) window)->bg_pixmap));
+     }
+ }
+ 
+@@ -250,8 +258,8 @@ gtk_widget_set_gl_capability (GtkWidget    *widget,
+   GTK_GL_NOTE_FUNC ();
+ 
+   g_return_val_if_fail (GTK_IS_WIDGET (widget), FALSE);
+-  g_return_val_if_fail (!GTK_WIDGET_NO_WINDOW (widget), FALSE);
+-  g_return_val_if_fail (!GTK_WIDGET_REALIZED (widget), FALSE);
++  g_return_val_if_fail (gtk_widget_get_has_window (widget), FALSE);
++  g_return_val_if_fail (!gtk_widget_get_realized (widget), FALSE);
+   g_return_val_if_fail (GDK_IS_GL_CONFIG (glconfig), FALSE);
+ 
+   /* 
+@@ -432,9 +440,9 @@ gtk_widget_create_gl_context (GtkWidget    *widget,
+   GTK_GL_NOTE_FUNC ();
+ 
+   g_return_val_if_fail (GTK_IS_WIDGET (widget), NULL);
+-  g_return_val_if_fail (GTK_WIDGET_REALIZED (widget), NULL);
++  g_return_val_if_fail (gtk_widget_get_realized (widget), NULL);
+ 
+-  gldrawable = gdk_window_get_gl_drawable (widget->window);
++  gldrawable = gdk_window_get_gl_drawable (gtk_widget_get_window (widget));
+   if (gldrawable == NULL)
+     return NULL;
+ 
+@@ -474,7 +482,7 @@ gtk_widget_get_gl_context (GtkWidget *widget)
+   GLWidgetPrivate *private;
+ 
+   g_return_val_if_fail (GTK_IS_WIDGET (widget), NULL);
+-  g_return_val_if_fail (GTK_WIDGET_REALIZED (widget), NULL);
++  g_return_val_if_fail (gtk_widget_get_realized (widget), NULL);
+ 
+   private = g_object_get_qdata (G_OBJECT (widget), quark_gl_private);
+   if (private == NULL)
+@@ -501,7 +509,7 @@ GdkGLWindow *
+ gtk_widget_get_gl_window (GtkWidget *widget)
+ {
+   g_return_val_if_fail (GTK_IS_WIDGET (widget), NULL);
+-  g_return_val_if_fail (GTK_WIDGET_REALIZED (widget), NULL);
++  g_return_val_if_fail (gtk_widget_get_realized (widget), NULL);
+ 
+-  return gdk_window_get_gl_window (widget->window);
++  return gdk_window_get_gl_window (gtk_widget_get_window (widget));
+ }
+-- 
+2.14.3
+

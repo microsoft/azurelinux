@@ -1,0 +1,35 @@
+From 9cd39b6120cdd16265ba5031d1200e5ef46f87a5 Mon Sep 17 00:00:00 2001
+From: MSP-Greg <greg.mpls@gmail.com>
+Date: Thu, 17 Jan 2019 17:25:16 -0600
+Subject: [PATCH] Fix intermittent tests
+
+test_iterator.rb - use relative time instead of absolute
+
+---
+ tests/test_iterator.rb                | 10 +++++++---
+ 1 files changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/tests/test_iterator.rb b/tests/test_iterator.rb
+index 3b7df982..ec7724db 100644
+--- a/tests/test_iterator.rb
++++ b/tests/test_iterator.rb
+@@ -2,12 +2,16 @@
+ 
+ class TestIterator < Test::Unit::TestCase
+ 
++  def setup
++    @time0 = nil
++  end
++
+   # By default, format the time with tenths-of-seconds.
+   # Some tests should ask for extra decimal places to ensure
+   # that delays between iterations will receive a changed time.
+-  def get_time(n=1)
+-    time = EM.current_time
+-    time.strftime('%H:%M:%S.') + time.tv_usec.to_s[0, n]
++  def get_time(n = 1)
++    @time0 = EM.current_time unless @time0
++    sprintf "%07.#{n}f", EM.current_time - @time0
+   end
+ 
+   def test_default_concurrency

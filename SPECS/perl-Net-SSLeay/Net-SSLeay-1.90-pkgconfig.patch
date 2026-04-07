@@ -1,0 +1,16 @@
+--- Makefile.PL
++++ Makefile.PL
+@@ -209,7 +209,12 @@ EOM
+         @{ $opts->{lib_links} } = map { $_ =~ s/32\b//g } @{ $opts->{lib_links} } if $Config{use64bitall};
+     }
+     else {
+-        push @{ $opts->{lib_links} }, qw( ssl crypto z );
++        if ( eval { require ExtUtils::PkgConfig; ExtUtils::PkgConfig->VERSION('1.16') } && ExtUtils::PkgConfig->exists('openssl') ) {
++            push @{ $opts->{lib_links} }, map { s/^-l//; $_ } split(' ', ExtUtils::PkgConfig->libs_only_l('openssl'));
++        }
++        else {
++             push @{ $opts->{lib_links} }, qw( ssl crypto z );
++        }
+ 
+         if (($Config{cc} =~ /aCC/i) && $^O eq 'hpux') {
+             print "*** Enabling HPUX aCC options (+e)\n";

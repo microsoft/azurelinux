@@ -1,0 +1,1758 @@
+diff -up tex/latex/proposal/base/pdata.sty.noworkaddress tex/latex/proposal/base/pdata.sty
+--- tex/latex/proposal/base/pdata.sty.noworkaddress	2022-12-31 12:19:13.710831748 -0500
++++ tex/latex/proposal/base/pdata.sty	2022-12-31 12:31:58.439831981 -0500
+@@ -7,22 +7,33 @@
+ %% proposal.dtx  (with options: `pdata')
+ %% 
+ \NeedsTeXFormat{LaTeX2e}[1999/12/01]
+-\ProvidesPackage{pdata}[2016/04/15 v1.5 Project Data]
+-\RequirePackage{workaddress}[2011/05/03]
++\ProvidesPackage{pdata}[2020/08/21 v1.7 Project Data]
+ \RequirePackage{eurosym}
+ \newif\if@sites\@sitesfalse\let\prop@gen@sites=\relax%
+ \newcounter{@site}%
+ \define@key{prop@gen}{site}{\@sitestrue\@dmp{site=#1}%
+ \stepcounter{@site}\pdata@def{site}{#1}{number}{\the@site}%
++\define@key{prop@gen}{#1name}{\pdata@def{site}{#1}{name}{##1}}
++\define@key{prop@gen}{#1acronym}{\pdata@def{site}{#1}{acronym}{##1}}
++\define@key{prop@gen}{#1country}{\pdata@def{site}{#1}{country}{##1}}
++\define@key{prop@gen}{#1countryshort}{\pdata@def{site}{#1}{countryshort}{##1}}
++\define@key{prop@gen}{#1streetaddress}{\pdata@def{site}{#1}{streetaddress}{##1}}
++\define@key{prop@gen}{#1townzip}{\pdata@def{site}{#1}{townzip}{##1}}
++\define@key{prop@gen}{#1url}{\pdata@def{site}{#1}{url}{##1}}
++\define@key{prop@gen}{#1logo}{\pdata@def{site}{#1}{logo}{##1}}
++\define@key{prop@gen}{#1type}{\pdata@def{site}{#1}{type}{##1}}
+ \@ifundefined{prop@gen@sites}{\xdef\prop@gen@sites{#1}}{\xdef\prop@gen@sites{\prop@gen@sites,#1}}%
+ \define@key{prop@gen}{#1RM}{\pdata@def{site}{#1}{intendedRM}{##1}}%
+-\define@key{prop@gen}{#1RAM}{\pdata@def{site}{#1}{intendedRAM}{##1}}
++\if@RAM\define@key{prop@gen}{#1RAM}{\pdata@def{site}{#1}{intendedRAM}{##1}}\fi
+ \define@key{workpackage}{#1RM}{\pdata@def\wp@id{#1}{RM}{##1}}%
+-\define@key{workpackage}{#1RAM}{\pdata@def\wp@id{#1}{RAM}{##1}}
+-\define@key{prop@gen}{#1employed}{{\let\tabularnewline\relax\let\hline\relax\let\wa@ref\relax%
++\if@RAM\define@key{workpackage}{#1RAM}{\pdata@def\wp@id{#1}{RAM}{##1}}\fi
++\define@key{task}{#1RM}{\pdata@def{\wp@id @\task@id}{#1}{RM}{##1}}%
++\if@RAM\define@key{task}{#1RAM}{\pdata@def{\wp@id @\task@id}{#1}{RAM}{##1}}\fi
++\define@key{prop@gen}{#1shortname}{\pdata@def{site}{#1}{shortname}{##1}}
++\define@key{prop@gen}{#1employed}{{\let\tabularnewline\relax\let\hline\relax\let%
+ \@ifundefined{prop@gen@employed@lines}%
+-{\xdef\prop@gen@employed@lines{\wa@ref{institution}{#1}{shortname} & ##1\tabularnewline\hline}}%
+-{\xdef\prop@gen@employed@lines{\prop@gen@employed@lines \wa@ref{institution}{#1}{shortname} & ##1\tabularnewline\hline}}}}}
++{\xdef\prop@gen@employed@lines{\pdataref{site}{#1}{shortname} & ##1\tabularnewline\hline}}%
++{\xdef\prop@gen@employed@lines{\prop@gen@employed@lines\ \pdataref{site}{#1}{shortname} & ##1\tabularnewline\hline}}}}}
+ \define@key{prop@gen}{RM}{\@dmp{RM=#1}\if@sites%
+ \PackageWarning{Do not use the RM key in the presence of sites}\else%
+ \pdata@def{all}{intended}{RM}{#1}\fi}
+@@ -30,10 +41,14 @@
+ \PackageWarning{Do not use the RAM key in the presence of sites}\else%
+ \pdata@def{all}{intended}{RAM}{#1}\fi}
+ \define@key{prop@gen}{PI}{\@dmp{PI=#1}%
++\define@key{prop@gen}{#1name}{\pdata@def{PI}{#1}{name}{##1}}%
++\define@key{prop@gen}{#1title}{\pdata@def{PI}{#1}{title}{##1}}%
++\define@key{prop@gen}{#1affiliation}{\pdata@def{PI}{#1}{affiliation}{##1}}%
++\define@key{prop@gen}{#1dept}{\pdata@def{PI}{#1}{dept}{##1}}%
+ \@ifundefined{prop@gen@PIs}{\xdef\prop@gen@PIs{#1}}{\xdef\prop@gen@PIs{\prop@gen@PIs,#1}}}
+ \define@key{prop@gen}{pubspage}{\@ifundefined{prop@gen@pubspages}%
+ {\xdef\prop@gen@pubspages{#1}}{\xdef\prop@gen@pubspages{\prop@gen@pubspages,#1}}}
+-\define@key{prop@gen}{importfrom}{\message{importing proposal data from #1.pdata}\readpdata{#1}}
++\define@key{prop@gen}{importfrom}{\readpdata{#1}}
+ \define@key{prop@gen}{instrument}{\def\prop@gen@instrument{#1}%
+ \pdata@def{prop}{gen}{instrument}{#1}\@dmp{inst=#1}}
+ \define@key{prop@gen}{title}{\def\prop@gen@title{#1}%
+@@ -81,9 +96,12 @@
+ \newwrite\pdata@out
+ \newcommand\pdata@open[1]{\immediate\openout\pdata@out=#1.pdata}
+ \newcommand\pdata@close{\closeout\pdata@out}
+-\newcommand\readpdata[1]{\IfFileExists{#1.pdata}
+-{\message{proposal: Reading Project Data}\makeatletter\input{#1.pdata}\makeatother}
+-{proposal: No Project Data found, (forward) references may be compromized}}
++\newcommand\readpdata[1]{\IfFileExists{./#1.pdata}
++  {\PackageInfo{pdata}{importing proposal data from #1.pdata}%
++    \makeatletter\input{./#1.pdata}\makeatother}
++{\PackageError{pdata}
++  {No project data file found at #1.pdata,\MessageBreak (forward) references may be compromized}
++  {You may have to re-format the original proposal to generate a new project data file #1.pdata}}}
+ \newcommand\pdata@target[3]{\hypertarget{#1@#2@target}{#3}}
+ \newcommand\pdata@def[4]{%\@pdata@def{#1}{#2}{#3}{#4}%
+   \protected@write\pdata@out{}{\string\@pdata@def{#1}{#2}{#3}{#4}}}
+@@ -121,9 +139,11 @@
+ \newcommand{\signatures}[1]{\section{#1}
+ \qquad\number\day. \number\month. \number\year\\[6ex]
+ \strut\qquad Date\hfill\@for\@p:=\prop@gen@PIs\do{%
+-\wa@ref{person}\@p{personaltitle}~\wa@ref{person}\@p{name}\hfill}}
+-\def\@dmp#1{\ifkeys\marginpar{#1}\fi}
++\pdataref{PI}\@p{title}~\pdataref{PI}\@p{name}\hfill}}
++\def\@dmp#1{\ifkeys\marginpar{\small #1}\fi}
+ \renewcommand\euro{\officialeuro\xspace}
++
++
+ \endinput
+ %%
+ %% End of file `pdata.sty'.
+diff -up tex/latex/proposal/base/proposal.cls.noworkaddress tex/latex/proposal/base/proposal.cls
+--- tex/latex/proposal/base/proposal.cls.noworkaddress	2016-04-15 17:38:41.000000000 -0400
++++ tex/latex/proposal/base/proposal.cls	2022-12-31 12:31:58.439831981 -0500
+@@ -7,7 +7,7 @@
+ %% proposal.dtx  (with options: `cls')
+ %% 
+ \NeedsTeXFormat{LaTeX2e}[1999/12/01]
+-\ProvidesClass{proposal}[2016/04/15 v1.5 Project Proposal]
++\ProvidesClass{proposal}[2020/08/21 v1.7 Project Proposal]
+ \newif\if@wpsubsection\@wpsubsectionfalse
+ \newif\ifsubmit\submitfalse
+ \newif\ifgrantagreement\grantagreementfalse
+@@ -18,11 +18,15 @@
+ \newif\if@RAM\@RAMfalse
+ \newif\if@svninfo\@svninfofalse
+ \newif\if@gitinfo\@gitinfofalse
++\newif\if@numericcites\@numericcitesfalse
++\newif\if@longtasklabels\@longtasklabelsfalse
++\newif\if@attachments\@attachmentsfalse
+ \def\proposal@class{article}
+ \DeclareOption{wpsubsection}{\@wpsubsectiontrue}
+ \DeclareOption{submit}{\submittrue}
+ \DeclareOption{grantagreement}{\grantagreementtrue}
+ \DeclareOption{gitinfo}{\@gitinfotrue}
++\DeclareOption{numericcites}{\@numericcitestrue}
+ \DeclareOption{svninfo}{\@svninfotrue}
+ \DeclareOption{public}{\publictrue}
+ \DeclareOption{noworkareas}{\work@areasfalse\PassOptionsToClass{\CurrentOption}{pdata}}
+@@ -30,995 +34,14 @@
+ \DeclareOption{report}{\def\proposal@class{report}}
+ \DeclareOption{keys}{\keystrue}
+ \DeclareOption{deliverables}{\delivstrue}
+-\DeclareOption*{\PassOptionsToClass{\CurrentOption}{article}}
++\DeclareOption{longtasklabels}{\@longtasklabelstrue}
++\DeclareOption{attachments}{\@attachmentsfalse}
++\DeclareOption*{\PassOptionsToClass{\CurrentOption}{\proposal@class}}
+ \ProcessOptions
+ \LoadClass[a4paper,twoside]{\proposal@class}
+-\RequirePackage{amssymb}
+-\RequirePackage{wasysym}
+-\RequirePackage{url}
+-\RequirePackage{graphicx}
+-\RequirePackage{colortbl}
+-\RequirePackage{xcolor}
+-\RequirePackage{rotating}
+-\RequirePackage{fancyhdr}
+-\RequirePackage{array}
+-\RequirePackage{xspace}
+-\RequirePackage{comment}
+-\AtBeginDocument{\ifpublic\excludecomment{private}\fi}
+-\RequirePackage{tikz}
+-\RequirePackage{paralist}
+-\RequirePackage[a4paper,margin=18mm]{geometry}
+-\RequirePackage{boxedminipage}
+-\renewcommand{\thempfootnote}{\roman{mpfootnote}}
+-\renewcommand{\familydefault}{\sfdefault}
+-\RequirePackage[scaled=.90]{helvet}
+-\RequirePackage{textcomp}
+-\RequirePackage[hyperref=auto,style=alphabetic,defernumbers=true,backend=bibtex,backref=true,firstinits=true,maxbibnames=6]{biblatex}[2010/11-19]
+-\RequirePackage{csquotes}
+-\RequirePackage{mdframed}
+-\RequirePackage{pdata}
+-\definecolor{darkblue}{rgb}{0,0,.7}
+-\ifsubmit\def\prop@link@color{darkblue}\else\def\prop@link@color{blue}\fi
+-\RequirePackage[bookmarks=true,linkcolor=\prop@link@color,
+- citecolor=\prop@link@color,urlcolor=\prop@link@color,colorlinks=true,
+- breaklinks=true, bookmarksopen=true]{hyperref}
+-\ifsubmit
+-\RequirePackage[hide]{ed}
+-\if@svninfo\RequirePackage[final,today]{svninfo}\fi
+-\else
+-\RequirePackage[show]{ed}
+-\if@svninfo\RequirePackage[eso-foot,today]{svninfo}\fi
+-\if@gitinfo\RequirePackage[mark]{gitinfo2}\fi
+-\fi
+-\renewcommand\ednoteshape{\sl\footnotesize}
+-\ifpublic\excludecomment{private}\else\includecomment{private}\fi
+-\setcounter{secnumdepth}{3}
+-\newif\ifofpage\ofpagefalse
+-\ifgrantagreement
+-\fancyhead{}
+-\renewcommand{\headrulewidth}{0pt}
+-\renewcommand{\footrulewidth}{0.4pt}
+-\else
+-\fancyhead[RE,LO]{\prop@gen@acronym}
+-\fancyhfoffset{0pt}
+-\fi
+-\fancyfoot[C]{}
+-\newcommand\prop@of@pages[2]{page~#1\ifofpage~of~#2\fi}
+-\ifgrantagreement
+-\fancyfoot[L]{\prop@gen@proposalnumber\quad \prop@gen@acronym\quad --\quad Part B}
+-\fancyfoot[R]{\thepage}
+-\else
+-\fancyhead[LE,RO]{\prop@of@pages\thepage{\pdataref@num{prop}{page}{last}}}
+-\fi
+-\pagestyle{fancyplain}
+-\newmdenv[settings=\large]{emphbox}
+-\newenvironment{prop@proposal}
+-{\thispagestyle{empty}%
+-\begin{center}
+-  {\LARGE \prop@gen@instrument}\\[.2cm]
+-  {\LARGE\textbf{\prop@gen@title}}\\[.3cm]
+-  {\LARGE Acronym: {\prop@gen@acronym}}\\[.2cm]
+-  {\large\today}\\[1em]
+-  \begin{tabular}{c*{\the@PIs}{c}}
+-    \prop@tl\prop@gen@PIs{\wa@ref{person}\tl@ext{name}}\\
+-    \prop@tl\prop@gen@PIs{\wa@ref{institution}{\wa@ref{person}\tl@ext{affiliation}}{name}}
+- \end{tabular}\\[2cm]
+-\end{center}
+-\setcounter{tocdepth}{2}\tableofcontents\newpage\setcounter{page}{1}}
+-{\section{List of Attachments}
+-\begin{itemize}
+-\@for\@I:=\prop@gen@PIs\do{%
+-\item Curriculum Vitae and list of publications for
+-  \wa@ref{person}\@I{personaltitle} \wa@ref{person}\@I{name}}
+-\end{itemize}\newpage
+-\printbibliography[heading=warnpubs]}
+-\newenvironment{proposal}[1][]{\readpdata\jobname
+-\ofpagetrue\setkeys{prop@gen}{#1}
+-\pdata@open\jobname
+-\if@sites\else
+-\define@key{workpackage}{RM}{\pdata@def{wp}\wp@id{RM}{##1}\@dmp{RM=##1}}
+-\define@key{workpackage}{RAM}{\pdata@def{wp}\wp@id{RAM}{##1}\@dmp{RAM=##1}}
+-\fi
+-\newcounter{@PIs}
+-\@ifundefined{prop@gen@PIs}{}{\@for\@I:=\prop@gen@PIs\do{\stepcounter{@PIs}}}
+-\newcounter{@sites}
+-\@ifundefined{prop@gen@sites}{}{\@for\@I:=\prop@gen@sites\do{\stepcounter{@sites}}}
+-\setcounter{page}{0}
+-\begin{prop@proposal}}
+-{\end{prop@proposal}
+-\pdata@def{prop}{page}{last}{\thepage}\ofpagefalse
+-\pdata@close}
+-\newcommand\site[1]{\hyperlink{site@#1@target}{\wa@ref{institution}{#1}{acronym}}}
+-\newcommand\sitename[1]{\hyperlink{site@#1@target}{\wa@ref{institution}{#1}{name}}}
+-\newcommand\objective@label[1]{O#1}
+-\define@key{obj}{id}{\def\obj@id{#1}\@dmp{id=#1}}
+-\define@key{obj}{title}{\def\obj@title{#1}\@dmp{title=#1}}
+-\define@key{obj}{short}{\def\obj@short{#1}\@dmp{short=#1}}
+-\newcounter{objective}
+-\newenvironment{objective}[1][]
+-{\let\obj@id\relax\let\obj@title\relax\let\obj@short\relax%
+-\setkeys{obj}{#1}\stepcounter{objective}%
+-\goodbreak\smallskip\par\noindent%
+-\textbf{\objective@label{\arabic{objective}}:%
+-~\pdata@target{obj}{\obj@id}{\pdataref{obj}{\obj@id}{title}}\ignorespaces}%
+-\pdata@def{obj}\obj@id{label}{\objective@label\theobjective}%
+-\@ifundefined{obj@title}{}{\pdata@def{obj}\obj@id{title}\obj@title}%
+-\@ifundefined{obj@short}{}{\pdata@def{obj}\obj@id{short}\obj@short}}
+-{}
+-\newcommand\OBJref[1]{\pdataRef{obj}{#1}{label}}
+-\newcommand\OBJtref[1]{\OBJref{#1}: \pdataRefFB{obj}{#1}{short}{title}}
+-\ifwork@areas
+-\define@key{workarea}{id}{\def\wa@id{#1}\@dmp{id=#1}}
+-\define@key{workarea}{title}{\pdata@def{wa}\wa@id{title}{#1}}
+-\define@key{workarea}{short}{\pdata@def{wa}\wa@id{short}{#1}}
+-\define@key{workarea}{lead}{\pdata@def{wa}\wa@id{lead}{#1}}
+-\fi
+-\define@key{workpackage}{id}{\def\wp@id{#1}\@dmp{id=#1}}
+-\define@key{workpackage}{title}{\pdata@def{wp}\wp@id{title}{#1}}
+-\define@key{workpackage}{short}{\pdata@def{wp}\wp@id{short}{#1}}
+-\define@key{workpackage}{lead}{\pdata@def{wp}\wp@id{lead}{#1}\def\wp@lead{#1}\@dmp{lead=#1}}
+-\define@key{workpackage}{type}{\def\wp@type{#1}\pdata@def{wp}\wp@id{type}{#1}}
+-\define@key{workpackage}{wphases}{\def\wp@wphases{#1}\pdata@def{wp}\wp@id{wphases}{#1}}
+-\define@key{workpackage}{swsites}[true]{\def\wp@swsites{#1}}
+-\newcommand\wp@mk@title[1]{Work Package {#1}}
+-\newcommand\wp@label[1]{WP{#1}}
+-\ifwork@areas
+-\newcommand\wa@label[1]{WA{#1}}
+-\newcommand\wa@mk@title[1]{Work Area {#1}}
+-\fi
+-\ifwork@areas\newcounter{wa}\newcounter{wp}[wa]\else\newcounter{wp}\fi
+-\ifdelivs\newcounter{deliv}[wp]\fi
+-\newcounter{allwp}
+-\newcommand\update@wps[1]{\@ifundefined{@wps}{\xdef\@wps{#1}}{\xdef\@wps{\@wps,#1}}}
+-\newcommand\update@tasks[1]{\@ifundefined{@tasks}{\xdef\@tasks{#1}}{\xdef\@tasks{\@tasks,#1}}}
+-\newcommand\update@deps[1]{\@ifundefined{task@deps}{\xdef\task@deps{#1}}{\xdef\task@deps{\task@deps,#1}}}
+-\ifwork@areas\def\update@was#1{\@ifundefined{@was}{\xdef\@was{#1}}{\xdef\@was{\@was,#1}}}\fi
+-\newcommand\decode@wphase[1]{\expandafter\decode@p@start#1@%
+-\local@count\wphase@end\advance\local@count by -\wphase@start%
+-\def\wphase@len{\the\local@count}}
+-\def\decode@p@start#1-#2@{\def\wphase@start{#1}\decode@p@end#2!@}
+-\def\decode@p@end#1!#2@{\def\wphase@end{#1}\def\@test{#2}%
+-\ifx\@test\@empty\def\wphase@force{1}\else\decode@p@force#2\fi}
+-\def\decode@p@force#1!{\def\wphase@force{#1}}
+-\def\wphases@start#1-#2@{\def\wphase@start{#1}}
+-\newcommand\startend@wphases[1]{\def\@test{#1}
+-\ifx\@test\@empty\def\wphase@start{0}\def\wphase@end{0}\else%
+-\@for\@I:=#1\do{\expandafter\decode@p@start\@I @}
+-\expandafter\wphases@start#1@\fi}
+-\newcounter{wp@RM}
+-\if@RAM\newcounter{wp@RAM}\fi
+-\newenvironment{work@package}[1][]%
+-{\def\wp@wphases{0-0}% default values
+-\def\wp@swsites{false}
+-\setkeys{workpackage}{#1}\stepcounter{wp}\stepcounter{allwp}%
+-\startend@wphases\wp@wphases%
+-\pdata@def{wp}\wp@id{start}\wphase@start\pdata@def{wp}\wp@id{end}\wphase@end%
+-\@ifundefined{wp@type}{}{\pdata@def{wp}\wp@id{type}\wp@type}%
+-\let\@tasks=\relax%
+-\edef\wp@num{\ifwork@areas\thewa.\fi\thewp}%
+-\pdata@def{wp}\wp@id{label}{\wp@label\wp@num}%
+-\pdata@def{wp}\wp@id{number}{\thewp}%
+-\pdata@def{wp}\wp@id{page}{\thepage}%
+-\update@wps\wp@id%
+-\edef\wp@num{\ifwork@areas\thewa.\fi\thewp}%
+-\pdata@def{wp}{\wp@id}{num}{\thewp}%
+-\if@sites%
+-\setcounter{wp@RM}{0}\if@RAM\setcounter{wp@RAM}{0}\fi%
+-\@for\@site:=\prop@gen@sites\do{%
+-\edef\@RM{\pdataref@num\wp@id\@site{RM}}\addtocounter{wp@RM}{\@RM}%
+-\if@RAM\edef\@RAM{\pdataref@num\wp@id\@site{RAM}}\addtocounter{wp@RAM}{\@RAM}\fi}
+-\pdata@def{wp}\wp@id{RM}{\thewp@RM}%
+-\if@RAM\pdata@def{wp}\wp@id{RAM}{\thewp@RAM}\fi%
+-\fi}% if@sites
+-{\@ifundefined{@tasks}{}{\pdata@def{\wp@id}{task}{ids}\@tasks}}
+-\newenvironment{workpackage}[1][]%
+-{\begin{work@package}[#1]%
+-\ifgrantagreement\else
+-\if@sites\goodbreak\medskip\wpheadertable%
+-\else\subsubsection*{{\wptitle} (\wprm)}\fi%
+-\addcontentsline{toc}{paragraph}{{\wp@mk@title\thewp}: \pdataref{wp}\wp@id{title}}%
+-\noindent\ignorespaces%
+-\fi}
+-{\end{work@package}}
+-\newcommand\wptitle{\wp@mk@title{\wp@num}: \pdata@target{wp}{\wp@id}{\pdataref{wp}\wp@id{title}}}
+-\newcommand\wprm{\pdataref@safe{wp}\wp@id{RM}\if@RAM\ RM+\pdataref{wp}\wp@id{RAM} RAM\fi}
+-\newcount\site@contribution%
+-\newcommand\if@site@contributes[2]{%
+-\ifx\prop@gen@compactht\@true
+-\if@RAM\ifnum\pdataref@num\wp@id{#1}{RM} > 0 \ifnum \pdataref@num\wp@id{#1}{RAM} > 0 #2\fi\fi
+-\else\ifnum\pdataref@num\wp@id{#1}{RM} > 0 #2\fi\fi
+-\else #2\fi}
+-\newcounter{wp@sites@num}
+-\newcommand\wp@sites@efforts@lines{%
+-\setcounter{wp@sites@num}{0}
+-{\let\G@refundefinedtrue=\relax\let\@latex@warning=\relax\let\@sw\relax%
+-\let\site\relax\let\textbf\relax\let\sum@style\relax\let\lead@style\relax%
+-\let\pn\relax\let\sys\relax%
+-\xdef\wp@sites@line{\wp@legend@site}\xdef\wp@efforts@line{\wp@legend@effort}%initialize lines
+-\@for\@site:=\prop@gen@sites\do{\if@site@contributes\@site{\stepcounter{wp@sites@num}}%
+-\xdef\wp@sites@line{\wp@sites@line%
+-\if@site@contributes\@site{&%
+-\ifx\wp@swsites\@true%
+-\@sw{\ifx\@site\wp@lead\lead@style{\site{\@site}}\else\site{\@site}\fi}%
+-\else\ifx\@site\wp@lead\lead@style{\site{\@site}}\else\site{\@site}\fi%
+-\fi}}%
+-\xdef\wp@efforts@line{\wp@efforts@line%
+-\if@site@contributes\@site{&%
+-\ifx\@site\wp@lead%
+-\lead@style{\pdataref@safe\wp@id\@site{RM}\if@RAM+\pdataref@safe\wp@id\@site{RAM}\fi}
+-\else\pdataref@safe\wp@id\@site{RM}\if@RAM+\pdataref@safe\wp@id\@site{RAM}\fi\fi}}%
+-}% do
+-\xdef\wp@sites@line{\wp@sites@line&\sum@style{\wp@legend@all}}%
+-\xdef\wp@efforts@line{\wp@efforts@line&
+-\sum@style{\textbf{\pdataref{wp}\wp@id{RM}\if@RAM+\pdataref{wp}\wp@id{RAM}\fi}}}}}
+-\newcommand\wpheadertable{%
+-\wp@sites@efforts@lines%
+-\par\noindent\begin{tabular}{|l||l|*{\thewp@sites@num}{c|}|c|}\hline%
+-\textbf{\wp@mk@title{\wp@num}}&\wp@sites@line\\\hline%
+-\textsf{\pdata@target{wp}{\wp@id}{\pdataref{wp}\wp@id{title}}} &\wp@efforts@line\\\hline%
+-\end{tabular}\smallskip\par\noindent\ignorespaces}
+-\newcommand\wp@legend@site{Site}
+-\newcommand\wp@legend@effort{Effort\if@RAM{ (RM+RAM)}\fi}
+-\newcommand\wp@legend@all{\textbf{all}}
+-\newcounter{prop@RM}\if@RAM\newcounter{prop@RAM}\fi
+-\ifwork@areas
+-\newcounter{wa@RM}\if@RAM\newcounter{wa@RAM}\fi\newcounter{wa@wps}
+-\newenvironment{workarea}[1][]
+-{\setkeys{workarea}{#1}
+-\let\@wps=\relax
+-\stepcounter{wa}
+-\pdata@def{wa}{\wa@id}{label}{\wa@label\thewa}
+-\pdata@def{wa}{\wa@id}{number}{\thewa}
+-\pdata@def{wa}{\wa@id}{page}{\thepage}
+-\update@was{\wa@id}
+-\pdata@def{wa}{\wa@id}{num}{\thewa}
+-\setcounter{wa@RM}{0}\if@RAM\setcounter{wa@RAM}{0}\fi\setcounter{wa@wps}{0}
+-\edef\@@wps{\pdataref@aux\wa@id{wp}{ids}}
+-\@for\@wp:=\@@wps\do{\stepcounter{wa@wps}%
+-\if@sites
+-\@for\@site:=\prop@gen@sites\do{%
+-  \edef\@RM{\pdataref@num\@wp\@site{RM}}
+-  \if@RAM\edef\@RAM{\pdataref@num\@wp\@site{RAM}}\fi
+-  \addtocounter{wa@RM}{\@RM}\addtocounter{prop@RM}{\@RM}
+-  \if@RAM\addtocounter{wa@RAM}{\@RAM}\addtocounter{prop@RAM}{\@RAM}\fi}
+-\else
+-\edef\@RM{\pdataref@num{wp}\@wp{RM}}
+-\if@RAM\edef\@RAM{\pdataref@num{wp}\@wp{RAM}}\fi
+-\addtocounter{wa@RM}{\@RM}\addtocounter{prop@RM}{\@RM}
+-\if@RAM\addtocounter{wa@RAM}{\@RAM}\addtocounter{prop@RAM}{\@RAM}\fi
+-\fi}
+-\pdata@def{wa}\wa@id{RM}\thewa@RM
+-\pdata@def{prop}{all}{RM}\theprop@RM
+-\if@RAM
+-\pdata@def{wa}\wa@id{RAM}\thewa@RAM
+-\pdata@def{prop}{all}{RAM}\theprop@RAM
+-\fi
+-\subsubsection*{{\wa@mk@title\thewa}: {\pdata@target{wa}\wa@id{\pdataref{wa}\wa@id{title}}}}
+-\addcontentsline{toc}{subsubsection}{{\wa@mk@title\thewa}: \pdataref{wa}\wa@id{title}}%
+-\ignorespaces}
+-{\@ifundefined{@wps}{}{\pdata@def\wa@id{wp}{ids}\@wps}\pdata@def\wa@id{wp}{count}\thewa@wps}\fi
+-\ifdelivs\newwrite\wpg@delivs\fi
+-\newenvironment{workplan}%
+-{\ifdelivs\immediate\openout\wpg@delivs=\jobname.delivs\fi
+-\ifwork@areas\let\@was=\relax\else\let\@wps=\relax\fi}%
+-{\@ifundefined{task@deps}{}{\pdata@def{all}{task}{deps}{\task@deps}}
+-\pdata@def{all}{task}{count}{\thealltasks}
+-\ifwork@areas
+-\@ifundefined{@was}{}{\pdata@def{all}{wa}{ids}\@was}
+-\else
+-\@ifundefined{@wps}{}{\pdata@def{all}{wp}{ids}\@wps}
+-\fi
+-\ifdelivs\@ifundefined{mile@stones}{}
+-{\@for\@I:=\mile@stones\do{%
+-\pdata@def{mile}\@I{delivs}{\@ifundefined{\@I delivs}{}{\csname\@I delivs\endcsname}}}}\fi
+-\ifwork@areas\pdata@def{all}{wa}{count}{\thewa}\fi
+-\pdata@def{all}{wp}{count}{\theallwp}
+-\ifdelivs
+-\pdata@def{all}{deliverables}{count}{\thedeliverable}
+-\pdata@def{all}{milestones}{count}{\themilestone}
+-\fi
+-\ifdelivs\closeout\wpg@delivs\fi}
+-\newcommand\deliv@error{\PackageError{proposal}
+-{To use use deliverables, you have to specify the option 'deliverables'}}
+-\newenvironment{wpdelivs}{\begin{wp@delivs}}{\end{wp@delivs}}
+-\newenvironment{wp@delivs}
+-{\ifdelivs\textbf\deliv@legend@delivs:\\[-3ex]%
+-\begin{compactdesc}\else\deliv@error\fi}
+-{\ifdelivs\end{compactdesc}\fi}
+-\newcommand\deliv@legend@delivs{Deliverables}
+-\newenvironment{wadelivs}
+-{\textbf\deliv@legend@delivs:\\[-3ex]\begin{wp@delivs}}
+-{\end{wp@delivs}}
+-\newcommand\lec[1]{\strut\hfil\strut\null\nobreak\hfill\hbox{$\leadsto$#1}\par}
+-\newcommand\deliv@label[1]{D{#1}}
+-\newcommand\delivref[2]{\pdataRef{deliv}{#1#2}{label}}
+-\newcommand\localdelivref[1]{\delivref{\wp@id}{#1}}
+-\newcommand\delivtref[2]{\delivref{#1}{#2}: \pdataRefFB{deliv}{#1#2}{short}{title}}
+-\newcommand\localdelivtref[1]{\delivtref{\wp@id}{#1}}
+-\define@key{deliv}{id}{\def\deliv@id{#1}}
+-\define@key{deliv}{due}{\def\deliv@due{#1}}
+-\define@key{deliv}{dissem}{\def\deliv@dissem{#1}}
+-\define@key{deliv}{nature}{\def\deliv@nature{#1}}
+-\define@key{deliv}{miles}{\def\deliv@miles{#1}}
+-\define@key{deliv}{short}{\def\deliv@short{#1}}
+-\define@key{deliv}{lead}{\def\deliv@lead{#1}}
+-\newcounter{deliverable}
+-\newcommand{\wpg@deliv}[3]{% keys, title, type
+-\stepcounter{deliverable}
+-\let\deliv@miles=\relax% clean state
+-\def\@type{#3}\def\@wp{wp}% set up ifx
+-\def\wpg@id{\csname #3@id\endcsname}
+-\setkeys{deliv}{#1}\stepcounter{deliv}% set state
+-\ifx\@type\@wp\def\current@label{\deliv@label{\ifwork@areas\thewa.\fi\thewp.\thedeliv}}
+-\else\def\current@label{\deliv@label{\thewa.\thedeliv}}\fi
+-\pdata@def{deliv}{\wpg@id\deliv@id}{label}{\current@label}
+-\pdata@def{deliv}{\wpg@id\deliv@id}{title}{#2}
+-\pdata@def{deliv}{\wpg@id\deliv@id}{page}{\thepage}%
+-\@ifundefined{deliv@short}
+-{\pdata@def{deliv}{\wpg@id\deliv@id}{short}{#2}}
+-{\pdata@def{deliv}{\wpg@id\deliv@id}{short}{\deliv@short}}
+-\@ifundefined{deliv@nature}
+-{\protect\G@refundefinedtrue\@latex@warning{key 'nature' for Deliv \wpg@id undefined}}
+-{\pdata@def{deliv}{\wpg@id\deliv@id}{nature}{\deliv@nature}}
+-\@ifundefined{deliv@dissem}
+-{\protect\G@refundefinedtrue\@latex@warning{key 'dissem' for Deliv \wpg@id undefined}}
+-{\pdata@def{deliv}{\wpg@id\deliv@id}{dissem}{\deliv@dissem}}
+-\@ifundefined{deliv@lead}
+-{\protect\G@refundefinedtrue\@latex@warning{key 'lead' for Deliv \wpg@id  undefined}}
+-{\pdata@def{deliv}{\wpg@id\deliv@id}{lead}{\deliv@lead}}
+-\@ifundefined{deliv@due}{}{%
+-\@for\@I:=\deliv@due\do{\protected@write\wpg@delivs{}{\string\deliverable%
+-{\ifnum\@I<10 0\@I\else\@I\fi}% sort key
+-{\@I}% due date
+-{\current@label}% label
+-{\@ifundefined{deliv@id}{??}{\wpg@id\deliv@id}}% id
+-{\@ifundefined{deliv@dissem}{??}{\deliv@dissem}}% dissemination level
+-{\@ifundefined{deliv@nature}{??}{\deliv@nature}}% nature
+-{#2}
+-{\ifx\@type\@wp{WP\ifwork@areas\thewa.\fi\thewp}\else{WA\thewa}\fi}%WP
+-{\@ifundefined{deliv@lead}{??}{\string\site{\deliv@lead}}}}}}% lead
+-\item[\current@label\ (%
+-\delivs@legend@due: \@ifundefined{deliv@due}{??}{\deliv@due},
+-\delivs@legend@nature: \@ifundefined{deliv@nature}{??}{\deliv@nature},
+-\delivs@legend@dissem: \@ifundefined{deliv@dissem}{??}{\deliv@dissem},
+-\delivs@legend@lead: \@ifundefined{deliv@lead}{??}{\site{\deliv@lead}})]
+- \pdata@target{deliv}{\wpg@id\deliv@id}{\textit{#2}}
+-\@ifundefined{deliv@miles}{}{% print the milestones and update their deliverables
+-\let\m@sep=\relax% do not print the separator the first time round
+-\lec{\@for\@I:=\deliv@miles\do{% Iterate over the milestones mentioned
+-\m@sep\pdataRef{mile}{\@I}{label}% print the milestone reference
+-\let\m@sep=,}}%set the separator for the next times
+-\def\d@sep{,}
+- \@for\@I:=\deliv@miles\do{% Iterate over the milestones mentioned
+- \expandafter\ifx\csname\@I delivs\endcsname\relax% Check that the miles@delivs is empty
+-  {\expandafter\xdef\csname\@I delivs\endcsname{\wpg@id\deliv@id}}% if so, skip the separator
+-   \else\expandafter\xdef\csname\@I delivs\endcsname%if not add it
+-      {\csname\@I delivs\endcsname\d@sep\wpg@id\deliv@id}\fi}}}
+-\newenvironment{wadeliv}[2][]{\ifdelivs\wpg@deliv{#1}{#2}{wa}\else\deliv@error\fi}{}
+-\newenvironment{wpdeliv}[2][]{\ifdelivs\wpg@deliv{#1}{#2}{wp}\else\deliv@error\fi}{}
+-\newcommand\milestone@label[1]{M{#1}}
+-\newcommand\mileref[1]{\pdataRef{mile}{#1}{label}}
+-\newcommand\miletref[1]{\mileref{#1}: \pdataRefFB{mile}{#1}{short}{title}}
+-\newcounter{milestone}
+-\define@key{milestone}{id}{\gdef\mile@id{#1}}
+-\define@key{milestone}{month}{\gdef\mile@month{#1}}
+-\define@key{milestone}{verif}{\gdef\mile@verif{#1}}
+-\newcommand\milestone[3][]{%
+-\ifdelivs%
+-\setkeys{milestone}{#1}\stepcounter{milestone}%
+-\pdata@def{mile}\mile@id{label}{\milestone@label{\themilestone}}%
+-\pdata@def{mile}\mile@id{month}{\mile@month}%
+-\pdata@def{mile}\mile@id{verif}{\mile@verif}%
+-\pdata@def{mile}\mile@id{title}{#2}%
+-\pdata@def{mile}\mile@id{description}{#3}%
+-\@ifundefined{mile@stones}{\xdef\mile@stones{\mile@id}}{\xdef\mile@stones{\mile@stones,\mile@id}}%
+-\@milestone{\mile@id}{#2}{#3}% presentation
+-\else\deliv@error\fi}
+-\newcommand\@milestone[3]{% id, title, description
+-\item \textbf{\miles@legend@milestone \pdataref{mile}{#1}{label} (\miles@legend@month \pdataref{mile}\mile@id{month})
+-\textbf{#2}} #3}
+-\newcommand\miles@legend@month{Month}
+-\newcommand\miles@legend@milestone{Milestone}
+-\newenvironment{milestones}%
+-{\ifdelivs\begin{@milestones}\else\deliv@error\fi}
+-{\ifdelivs\pdata@def{all}{mile}{ids}{\mile@stones}%
+-\pdata@def{all}{mile}{count}{\themilestone}%
+-\end{@milestones}\fi}
+-\newenvironment{@milestones}{\begin{enumerate}}{\end{enumerate}}
+-\newcommand{\deliverable}[9]{\pdataRef{deliv}{#4}{label}&#7&#8&#9&#6&#5&#2\\\hline}%sortkey,due,label,id,title,type,level,lead
+-\newenvironment{deliverables}[1]{\ifdelivs\begin{longtable}{|l|p{#1}|l|l|l|l|l|}\hline%
+-\#&\textbf{\delivs@legend@name}&%
+-\textbf{\delivs@legend@wp}&%
+-\textbf{\delivs@legend@lead}&%
+-\textbf{\delivs@legend@nature}&%
+-\textbf{\delivs@legend@level}&%
+-\textbf{\delivs@legend@due}\\\hline\hline%
+-\endhead%
+-\else\deliv@error\fi}
+-{\ifdelivs\end{longtable}\fi}
+-\newcommand\delivs@legend@name{Deliverable name}
+-\newcommand\delivs@legend@wp{WP}
+-\newcommand\delivs@legend@nature{Type}
+-\newcommand\delivs@legend@level{Level}
+-\newcommand\delivs@legend@due{Due}
+-\newcommand\delivs@legend@dissem{Dissem.}
+-\newcommand\delivs@legend@lead{Lead}
+-\newcommand{\inputdelivs}[1]{%
+-\begin{deliverables}{#1}%
+-\IfFileExists{\jobname.deliverables}%
+-{\input{\jobname.deliverables}}%
+-{\IfFileExists{\jobname.delivs}{\input{\jobname.delivs}}{}}
+-\end{deliverables}}
+-\newenvironment{tasklist}
+-{\begin{compactenum}}{\end{compactenum}}
+-\newcommand\task@label[2]{\textbf{T#1.#2}}
+-\define@key{task}{id}{\def\task@id{#1}\@dmp{id=#1}}
+-\define@key{task}{wphases}{\def\task@wphases{#1}\pdata@def{task}{\taskin\task@id\wp@id}{wphases}{#1}\@dmp{wphases=#1}}
+-\define@key{task}{requires}{\@requires\task@id{#1}\@dmp{req=#1}}
+-\define@key{task}{title}{\def\task@title{#1}\pdata@def{task}{\taskin\task@id\wp@id}{title}{#1}}
+-\define@key{task}{lead}{\def\task@lead{#1}\pdata@def{task}{\taskin\task@id\wp@id}{lead}{#1}}
+-\define@key{task}{partners}{\def\task@partners{#1}\pdata@def{task}{\taskin\task@id\wp@id}{partners}{#1}}
+-\define@key{task}{PM}{\def\task@PM{#1}\pdata@def{task}{\taskin\task@id\wp@id}{PM}{#1}}
+-\def\task@set#1{\edef\task@id{task\thetask@all}
+-\def\task@wphases{0-0}\def\task@partners{}\def\task@lead{}\def\task@PM{}
+-\setkeys{task}{#1}}
+-\def\task@post@title@space{\;}
+-\newcounter{alltasks}
+-\def\task@post@title@space{\quad}
+-\newcommand\task@legend@partners{Sites: }
+-\newcommand\task@legend@PM{PM}
+-\newenvironment{task}[1][]%
+-{\stepcounter{alltasks}%
+-\@task{#1}\item[\pdata@target{task}{\taskin\task@id\wp@id}{\task@label\thewp\thetask@wp}]%
+-\@ifundefined{task@title}{}{\textbf\task@title}\task@post@title@space%
+-\def\@initial{0-0}\ifx\task@wphases\@initial\else%
+-\let\@@sep=\relax\@for\@I:=\task@wphases%
+-\do{\decode@wphase\@I%
+-\@@sep\show@wphase\wphase@start\wphase@end\wphase@force%
+-\let\@@sep=\sep@wphases}%
+-\fi% initial
+-\hfill%
+-\ifsubmit\else\ifx\task@PM\@empty\else\task@PM~\task@legend@PM;\fi\fi%
+-\ifx\task@lead\@empty\else\ \task@legend@partners\site\task@lead~(\legend@lead)\fi%
+-\@for\@I:=\task@partners\do{, \site\@I}\\%
+-\ignorespaces}
+-{\medskip}
+-\newcommand\month@label[1]{M#1}
+-\newcommand\show@wphase[3]{\edef\@test{#3}\def\@one{1}%
+-\month@label{#1}-\month@label{#2}%
+-\ifx\@test\@empty\else\ifx\@test\@one\else @#3\fi\fi}
+-\newcommand\sep@wphases{; }
+-\newcommand\legend@partners{Partners}
+-\newcommand\legend@lead{lead}
+-\newcommand\task@label@long{Task}
+-\newcounter{task@all}\newcounter{task@wp}[wp]
+-\newcount\task@@end
+-\def\@task#1{\stepcounter{task@all}\stepcounter{task@wp}%
+-\task@set{#1}%
+-\pdata@def{task}{\taskin\task@id\wp@id}{wphases}\task@wphases
+-\pdata@def{task}{\taskin\task@id\wp@id}{label}{\task@label\thewp\thetask@wp}%
+-\pdata@def{task}{\taskin\task@id\wp@id}{number}{\thetask@wp}%
+-\pdata@def{task}{\taskin\task@id\wp@id}{page}{\thepage}%
+-\update@tasks{\taskin\task@id\wp@id}}
+-\newcommand\workphase[1]{\PackageError{proposal}
+-  {The \protect\workphase macro is deprecated,\MessageBreak
+-    use the attributes wphase on the workpackage environment instead!}}
+-\newcommand\taskin[2]{#2@#1}
+-\newcommand\taskref[2]{\pdataRef{task}{#1@#2}{label}}
+-\newcommand\taskreflong[2]{\pdataRef{task}{#2}{label}}
+-\newcommand\tasktref[2]{\taskref{#1}{#2}: \pdataRefFB{task}{#1@#2}{short}{title}}
+-\newcommand\localtaskref[1]{\taskref{\wp@id}{#1}}
+-\newcommand\localtasktref[1]{\tasktref{\wp@id}{#1}}
+-\newcounter{gantt@deps}
+-\def\@requires#1#2{\stepcounter{gantt@deps}%
+-\edef\dep@id{taskdep\thegantt@deps}%
+-\pdata@def{taskdep}\dep@id{from}{\taskin{#1}\wp@id}%
+-\pdata@def{taskdep}\dep@id{to}{#2}%
+-\update@deps\dep@id}
+-\newcommand\prop@lead[1]{\@ifundefined{wp@#1@lead}%
+-{\protect\G@refundefinedtrue\@latex@warning{lead for WP #1 undefined}??}%
+-{\csname wp@#1@lead\endcsname}}
+-\definecolorset{gray/rgb/hsb/cmyk}{}{}%
+-{leadgray,.90/.90,.90,.90/0,0,.90/0,0,0,.10;%
+-wagray,.70/.70,.70,.70/0,0,.70/0,0,0,.30;%
+-ganttgray,.60/.60,.60,.60/0,0,.60/0,0,0,.40}
+-\newcommand\sum@style[1]{\cellcolor{wagray}{\textbf{#1}}}
+-\newcommand\wa@style[1]{\cellcolor{wagray}{\textbf{#1}}}
+-\newcommand\wp@style[1]{#1}
+-\newcommand\lead@style[1]{\cellcolor{leadgray}{\textit{#1}}}
+-\newcommand\wp@lead@style@explained{light gray italicised}
+-\newcounter{wpfig@options}
+-\define@key{wpfig}{size}{\def\wpfig@size{#1}\@dmp{size=#1}}
+-\def\@true{true}
+-\def\wpfig@pages{false}
+-\define@key{wpfig}{pages}[true]{\def\wpfig@pages{#1}\stepcounter{wpfig@options}}
+-\def\wpfig@type{false}
+-\define@key{wpfig}{type}[true]{\def\wpfig@type{#1}\stepcounter{wpfig@options}}
+-\def\wpfig@start{false}
+-\define@key{wpfig}{start}[true]{\def\wpfig@start{#1}\stepcounter{wpfig@options}}
+-\def\wpfig@length{false}
+-\define@key{wpfig}{length}[true]{\def\wpfig@length{#1}\stepcounter{wpfig@options}}
+-\def\wpfig@end{false}
+-\define@key{wpfig}{end}[true]{\def\wpfig@end{#1}\stepcounter{wpfig@options}}
+-\define@key{wpfig}{label}{\def\wpfig@label{#1}}
+-\define@key{wpfig}{caption}{\def\wpfig@caption{#1}}
+-\def\@sw#1{\begin{sideways}#1\end{sideways}}
+-\newenvironment{wp@figure}{\begin{table}[ht]\wpfig@style\begin{center}
+-{\let\@sw\relax\let\textbf\relax\let\site\relax\let\pn\relax\let\sys\relax%
+-\gdef\wpfig@headline{\wpfig@legend@wap&\wpfig@legend@title%
+-\ifx\wpfig@type\@true&\wpfig@legend@type\fi%
+-\ifx\wpfig@pages\@true&\@sw{\wpfig@legend@page}\fi%
+-\ifx\wpfig@start\@true&\@sw{\wpfig@legend@start}\fi%
+-\ifx\wpfig@length\@true&\@sw{\wpfig@legend@length}\fi
+-\ifx\wpfig@end\@true&\@sw{\wpfig@legend@end}\fi}%
+-\if@sites%
+-\@for\@site:=\prop@gen@sites\do{%
+-\xdef\wpfig@headline{\wpfig@headline&\@sw{\wpfig@legend@siteRM{\@site}}}%
+-\if@RAM\xdef\wpfig@headline{\wpfig@headline&\@sw{\wpfig@legend@siteRAM{\@site}}}\fi}%
+-\xdef\wpfig@headline{\wpfig@headline&\@sw{\wpfig@legend@totalRM}}%
+-\if@RAM\xdef\wpfig@headline{\wpfig@headline&\@sw{\wpfig@legend@totalRAM}}\fi%
+-\else% if@sites
+-\xdef\wpfig@headline{\wpfig@headline &\@sw{\wpfig@legend@RM}\if@RAM&\@sw{\wpfig@legend@RAM}\fi}
+-\fi}%if@sites
+-\if@RAM\begin{tabular}{|l|l|*{\thewpfig@options}{r|}*{\the@sites}{r|r|}|r|r|}\hline
+-\else\begin{tabular}{|l|l|*{\thewpfig@options}{r|}|*{\the@sites}{r|}|r|}\hline\fi%|
+-\wpfig@headline\\\hline\hline}
+-{\end{tabular}\smallskip\\
+-\wpfig@legend@RAM@expl\if@sites; \wpfig@legend@lead@expl\fi
+-\@ifundefined{wpfig@label}{\caption{\wpfig@legend@caption}}{\caption{\wpfig@caption}}
+-\@ifundefined{wpfig@label}{\label{fig:wplist}}{\label{\wpfig@label}}
+-\end{center}\end{table}}
+-\newcommand\wpfig@legend@wap{\textbf{\ifwork@areas{WA/P}\else{WP}\fi}}
+-\newcommand\wpfig@legend@title{\textbf{Title}}
+-\newcommand\wpfig@legend@type{\textbf{type}}
+-\newcommand\wpfig@legend@page{\textbf{page}}
+-\newcommand\wpfig@legend@start{\textbf{start}}
+-\newcommand\wpfig@legend@length{\textbf{length}}
+-\newcommand\wpfig@legend@end{\textbf{end}}
+-\newcommand\wpfig@legend@siteRM[1]{\site{#1}\if@RAM\ RM\fi}
+-\newcommand\wpfig@legend@siteRAM[1]{\site{#1}\ RAM}
+-\newcommand\wpfig@legend@totalRM{total\if@RAM\ RM\fi}
+-\newcommand\wpfig@legend@totalRAM{total RAM}
+-\newcommand\wpfig@legend@RM{RM}
+-\newcommand\wpfig@legend@RAM{RAM}
+-\newcommand\wpfig@legend@RAM@expl{\if@RAM R(A)M $\widehat=$ Researcher (Assistant) Months\else\ Efforts in PM\fi}
+-\newcommand\wpfig@legend@lead@expl{WP lead efforts \wp@lead@style@explained}
+-\newcommand\wpfig@legend@caption{{\ifwork@areas Work Areas and \fi}Work Packages}
+-\def\wpfig@style{}
+-\newcommand\wpfigstyle[1]{\def\wpfig@style{#1}}
+-\newcount\local@count
+-\newcount\@@@RM\if@RAM\newcount\@@@RAM\fi
+-\newcount\all@@@RM\if@RAM\newcount\all@@@RAM\fi
+-\newcommand{\wpfig}[1][]{\setcounter{wpfig@options}{0}\setkeys{wpfig}{#1}
+-{\gdef\@wp@lines{}%initialize
+-\let\tabularnewline\relax\let\hline\relax\let\lead@style\relax% so they
+-\let\wa@style\relax\let\wp@style\relax \let\@sw\relax\let\textbf\relax% do not
+-\let\G@refundefinedtrue=\relax\let\@latex@warning=\relax\let\hyperlink=\relax% bother
+-\let\pn\relax\let\xspace\relax% us
+-\ifwork@areas
+-\edef\@@was{\pdataref@safe{all}{wa}{ids}}%
+-\@for\@@wa:=\@@was\do{% iterate over the work areas
+-\xdef\@@wa@line{\wa@style{\pdataRef{wa}\@@wa{label}}%
+-&\wa@style{\@ifundefined{wa@\@@wa @short}{\pdataref{wa}\@@wa{title}}{\pdataref{wa}\@@wa{short}}}%
+-\ifx\wpfig@type\@true&\wa@style{\pdataref{wa}\@@wa{type}}\fi%
+-\ifx\wpfig@pages\@true&\wa@style{\pdataref{wa}\@@wa{page}}\fi%
+-\ifx\wpfig@start\@true&\wa@style{\pdataref{wa}\@@wa{start}}\fi%
+-\ifx\wpfig@length\@true&\wa@style{\pdataref{wa}\@@wa{len}}\fi%
+-\ifx\wpfig@end\@true&\wa@style{\pdataref{wa}\@@wa{end}}\fi}
+-\if@sites
+-\@for\@site:=\prop@gen@sites\do{%
+-\edef\@@wps{\pdataref@safe\@@wa{wp}{ids}}%
+-\local@count 0%
+-\@for\@@wp:=\@@wps\do{\advance\local@count by \pdataref@num\@@wp\@site{RM}}%
+-\pdata@def\@@wa\@site{RM}{\the\local@count}%
+-\xdef\@@wa@line{\@@wa@line&\wa@style{\the\local@count}}%
+-\if@RAM
+-\local@count 0%
+-\@for\@@wp:=\@@wps\do{\advance\local@count by \pdataref@num\@@wp\@site{RAM}}
+-\pdata@def\@@wa\@site{RAM}{\the\local@count}%
+-\xdef\@@wa@line{\@@wa@line&\wa@style{\the\local@count}}%
+-\fi}
+-\local@count0\relax%
+-\@for\@site:=\prop@gen@sites\do{\global\advance\local@count by \pdataref@num\@@wa\@site{RM}}%
+-\xdef\@@wa@line{\@@wa@line &\wa@style{\textbf{\the\local@count}}}
+-\if@RAM
+-\local@count0\relax%
+-\@for\@site:=\prop@gen@sites\do{\global\advance\local@count by \pdataref@num\@@wa\@site{RAM}}%
+-\xdef\@@wa@line{\@@wa@line &\wa@style{\textbf{\the\local@count}}}
+-\fi
+-\else% if@sites
+-\edef\@@wps{\pdataref@safe{all}{wp}{ids}}%
+-\xdef\@@wa@line{\@@wa@line&\wa@style{\pdataref{wa}\@@wa{RM}}
+-\if@RAM&\wa@style{\pdataref{wa}\@@wa{RAM}}\fi}%
+-\fi% if@sites
+-\xdef\@wp@lines{\@wp@lines\@@wa@line\tabularnewline\hline}% add the line for the workarea
+-\edef\@@wps{\pdataref@safe\@@wa{wp}{ids}}%
+-\@for\@@wp:=\@@wps\do{% iterate over its work packages
+-\xdef\@@wp@line{\pdataRef{wp}\@@wp{label}%
+-&\@ifundefined{wp@\@@wp @short}{\pdataref{wp}\@@wp{title}}{\pdataref{wp}\@@wp{short}}%
+-\ifx\wpfig@type\@true&\pdataref{wp}\@@wp{type}\fi%
+-\ifx\wpfig@pages\@true&\pdataref{wp}\@@wp{page}\fi%
+-\ifx\wpfig@start\@true&\pdataref{wp}\@@wp{start}\fi%
+-\ifx\wpfig@length\@true&\pdataref{wp}\@@wp{len}\fi%
+-\ifx\wpfig@end\@true&\pdataref{wp}\@@wp{end}\fi}
+-\if@sites
+-\@for\@site:=\prop@gen@sites\do{%
+-\edef\@@lead{\pdataref@safe{wp}\@@wp{lead}}
+-\edef\@@RM{\ifx\@@lead\@site\lead@style{\pdataref@safe\@@wp\@site{RM}}\else\wp@style{\pdataref@safe\@@wp\@site{RM}}\fi}
+-\xdef\@@wp@line{\@@wp@line&\@@RM}
+-\if@RAM
+-\edef\@@RAM{\ifx\@@lead\@site\lead@style{\pdataref@safe\@@wp\@site{RAM}}\else\wp@style{\pdataref@safe\@@wp\@site{RAM}}\fi}
+-\xdef\@@wp@line{\@@wp@line&\@@RAM}
+-\fi}
+-\local@count0\relax%
+-\@for\@site:=\prop@gen@sites\do{\global\advance\local@count by \pdataref@num\@@wp\@site{RM}}%
+-\xdef\@@wp@line{\@@wp@line &\textbf{\the\local@count}}
+-\if@RAM
+-\global\local@count0\relax%
+-\@for\@site:=\prop@gen@sites\do{\global\advance\local@count by \pdataref@num\@@wp\@site{RAM}}%
+-\xdef\@@wp@line{\@@wp@line &\textbf{\the\local@count}}
+-\fi% if@sites
+-\else% if@sites
+-\xdef\@@wp@line{\@@wp@line&\wp@style{\pdataref@safe{wp}\@@wp{RM}}}
+-\if@RAM\xdef\@@wp@line{\@@wp@line&\wp@style{\pdataref@safe{wp}\@@wp{RAM}}}\fi
+-\fi% if@sites
+-\xdef\@wp@lines{\@wp@lines\@@wp@line\tabularnewline\hline}}}
+-\else% ifwork@areas
+-\edef\@@wps{\pdataref@safe{all}{wp}{ids}}%
+-\@for\@@wp:=\@@wps\do{% iterate over its work packages
+-\xdef\@@wp@line{\pdataRef{wp}\@@wp{label}%
+-&\@ifundefined{wp@\@@wp @short}{\pdataref{wp}\@@wp{title}}{\pdataref{wp}\@@wp{short}}
+-\ifx\wpfig@type\@true&\pdataref{wp}\@@wp{type}\fi%
+-\ifx\wpfig@pages\@true&\pdataref{wp}\@@wp{page}\fi%
+-\ifx\wpfig@start\@true&\pdataref{wp}\@@wp{start}\fi%
+-\ifx\wpfig@length\@true&\pdataref{wp}\@@wp{len}\fi%
+-\ifx\wpfig@end\@true&\pdataref{wp}\@@wp{end}\fi}
+-\if@sites
+-\@for\@site:=\prop@gen@sites\do{%
+-\edef\@@lead{\pdataref@safe{wp}\@@wp{lead}}
+-\edef\@@RM{\ifx\@@lead\@site\lead@style{\pdataref@safe\@@wp\@site{RM}}\else\wp@style{\pdataref@safe\@@wp\@site{RM}}\fi}
+-\xdef\@@wp@line{\@@wp@line&\@@RM}
+-\if@RAM
+-\edef\@@RAM{\ifx\@@lead\@site\lead@style{\pdataref@safe\@@wp\@site{RAM}}\else\wp@style{\pdataref@safe\@@wp\@site{RAM}}\fi}
+-\xdef\@@wp@line{\@@wp@line&\wp@style\@@RAM}
+-\fi}
+-\global\local@count0\relax%
+-\@for\@site:=\prop@gen@sites\do{\global\advance\local@count by \pdataref@num\@@wp\@site{RM}}%
+-\xdef\@@wp@line{\@@wp@line &\textbf{\the\local@count}}
+-\if@RAM
+-\global\local@count0\relax%
+-\@for\@site:=\prop@gen@sites\do{\global\advance\local@count by \pdataref@num{#1}\@site{RAM}}%
+-\xdef\@@wp@line{\@@wp@line &\textbf{\the\local@count}}
+-\fi
+-\else% if@sites
+-\xdef\@@wp@line{\@@wp@line&\wp@style{\pdataref@safe{wp}\@@wp{RM}}}
+-\if@RAM\xdef\@@wp@line{\@@wp@line&\wp@style{\pdataref@safe{wp}\@@wp{RAM}}\fi}
+-\fi% if@sites
+-\xdef\@wp@lines{\@wp@lines\@@wp@line\tabularnewline\hline}}
+-\fi%ifwork@areas
+-\gdef\@totals{}
+-\ifwork@areas
+-\if@sites
+-\@for\@site:=\prop@gen@sites\do{% iterate over the sites
+-\@@@RM=0\if@RAM\@@@RAM=0\fi
+-\edef\@@was{\pdataref@safe{all}{wa}{ids}}%
+-\@for\@@wa:=\@@was\do{% iterate over the work areas
+-\edef\@@wps{\pdataref@safe\@@wa{wp}{ids}}%
+-\@for\@@wp:=\@@wps\do{% iterate over the work packages
+-\advance\@@@RM by \pdataref@num\@@wp\@site{RM}%
+-\if@RAM\advance\@@@RAM by \pdataref@num\@@wp\@site{RAM}\fi}}
+-\pdata@def{all}\@site{RM}{\the\@@@RM}\if@RAM\pdata@def{all}\@site{RAM}{\the\@@@RAM}\fi
+-\advance\all@@@RM by \the\@@@RM\if@RAM\advance\all@@@RAM by \the\@@@RAM\fi
+-\xdef\@totals{\@totals & \textbf{\the\@@@RM}\if@RAM& \textbf{\the\@@@RAM}\fi}}
+-\xdef\@totals{\@totals & \textbf{\the\all@@@RM}\if@RAM&\textbf{\the\all@@@RAM}\fi}
+-\pdata@def{all}{total}{RM}{\the\all@@@RM}\if@RAM\pdata@def{all}{total}{RAM}{\the\all@@@RAM}\fi
+-\else% if@sites
+-\@@@RM=0\if@RAM\@@@RAM=0\fi
+-\edef\@@was{\pdataref@safe{all}{wa}{ids}}%
+-\@for\@@wa:=\@@was\do{\edef\@@wps{\pdataref@safe\@@wa{wp}{ids}}%
+-\@for\@@wp:=\@@wps\do{% iterate over the work packages
+-\advance\@@@RM by \pdataref@num{wp}\@@wp{RM}%
+-\if@RAM\advance\@@@RAM by \pdataref@num{wp}\@@wp{RAM}\fi}}
+-\pdata@def{all}{total}{RM}{\the\@@@RM}\if@RAM\pdata@def{all}{total}{RAM}{\the\@@@RAM}\fi
+-\xdef\@totals{&\the\@@@RM\if@RAM &\the\@@@RAM\fi}
+-\fi% if@sites
+-\else%i.e. no work@areas
+-\if@sites
+-\@for\@site:=\prop@gen@sites\do{%iterate over the sites
+-\@@@RM=0\if@RAM\@@@RAM=0\fi%
+-\edef\@@wps{\pdataref@safe{all}{wp}{ids}}%
+-\@for\@@wp:=\@@wps\do{% iterate over the work packages
+-\advance\@@@RM by \pdataref@num\@@wp\@site{RM}%
+-\if@RAM\advance\@@@RAM by \pdataref@num\@@wp\@site{RAM}\fi}
+-\pdata@def{all}\@site{RM}{\the\@@@RM}\if@RAM\pdata@def{all}\@site{RAM}{\the\@@@RAM}\fi
+-\xdef\@totals{\@totals & \textbf{\the\@@@RM}\if@RAM& \textbf{\the\@@@RAM}\fi}
+-\advance\all@@@RM by \the\@@@RM\if@RAM\advance\all@@@RAM by \the\@@@RAM\fi}
+-\xdef\@totals{\@totals &\textbf{\the\all@@@RM}\if@RAM&\textbf{\the\all@@@RAM}\fi}
+-\pdata@def{all}{total}{RM}{\the\all@@@RM}\if@RAM\pdata@def{all}{total}{RAM}{\the\all@@@RAM}\fi
+-\else% if@sites
+-\@@@RM=0\if@RAM\@@@RAM=0\fi
+-\edef\@@wps{\pdataref@safe{all}{wp}{ids}}%
+-\@for\@@wp:=\@@wps\do{% iterate over the work packages
+-\advance\@@@RM by \pdataref@num{wp}\@@wp{RM}%
+-\if@RAM\advance\@@@RAM by \pdataref@num{wp}\@@wp{RAM}\fi}
+-\pdata@def{all}{total}{RM}{\the\@@@RM}\if@RAM\pdata@def{all}{total}{RAM}{\the\@@@RAM}\fi
+-\xdef\@totals{&\the\@@@RM\if@RAM &\the\@@@RAM\fi}
+-\fi% if@sites
+-\fi
+-\gdef\intended@totals{}\gdef\requested@totals{}
+-\if@sites
+-\@for\@site:=\prop@gen@sites\do{
+-\xdef\intended@totals{\intended@totals&\textbf{\pdataref@safe{site}\@site{intendedRM}}}
+-\xdef\requested@totals{\requested@totals&\pdataref@safe{site}\@site{reqPM}}
+-\if@RAM\xdef\intended@totals{\intended@totals&\textbf{\pdataref@safe{site}\@site{intendedRAM}}}\fi}
+-\if@RAM\xdef\intended@totals{\intended@totals&&}\else%
+-\xdef\intended@totals{\intended@totals&}%
+-\xdef\requested@totals{\requested@totals&}%
+-\fi
+-\else% if@sites
+-\xdef\intended@totals{\intended@totals&\textbf{\pdataref@safe{all}{intended}{RM}}}
+-\if@RAM\xdef\intended@totals{\intended@totals&\textbf{\pdataref@safe{all}{intended}{RAM}}}\fi
+-\fi}% if@sites
+-\local@count\thewpfig@options\advance\local@count by 2
+-\begin{wp@figure}
+-\@wp@lines\hline%
+-\multicolumn{\the\local@count}{|c|}{\prop@legend@totals}\@totals\\\hline%
+-\ifsubmit\else%
+-\ifx\prop@gen@topdownPM\@true%
+-\multicolumn{\the\local@count}{|c|}{\prop@legend@intendedtotals}\intended@totals\\\hline%
+-\fi% topdownPM
+-\ifx\prop@gen@botupPM\@true%
+-\multicolumn{\the\local@count}{|c|}{\prop@legend@requestedtotals}\requested@totals\\\hline%
+-\fi% botupPM
+-\fi% submit
+-\end{wp@figure}}
+-\newcommand\prop@legend@totals{\textbf{totals}}
+-\newcommand\prop@legend@intendedtotals{\textbf{intended totals}}
+-\newcommand\prop@legend@requestedtotals{\textbf{requested totals}}
+-\newif\ifgantt@draft\gantt@draftfalse
+-\newif\ifgantt@miles\gantt@milesfalse
+-\define@key{gantt}{xscale}{\def\gantt@xscale{#1}}
+-\define@key{gantt}{yscale}{\def\gantt@yscale{#1}}
+-\define@key{gantt}{step}{\def\gantt@step{#1}}
+-\define@key{gantt}{size}{\def\gantt@size{#1}}
+-\define@key{gantt}{draft}[true]{\ifsubmit\else\gantt@drafttrue\fi}
+-\define@key{gantt}{milestones}[true]{\gantt@milestrue}
+-\def\gantt@set#1{\gantt@draftfalse\def\gantt@xscale{1}\def\gantt@yscale{.35}\def\gantt@step{3}
+-\setkeys{gantt}{#1}}
+-\newenvironment{gantt}[2][]
+-{\gantt@set{#1}\gdef\gantt@height{#2}
+-\def\@test{\prop@gen@months@default}
+-\ifx\@test\prop@gen@months
+-\ClassError{proposal}{Need overall project months to draw gantt
+-    chart - expect trouble;\MessageBreak specify
+-    \protect\begin{proposal}[...,months=??,...] to fix}\fi
+-\@ifundefined{gantt@size}{}{\csname\gantt@size\endcsname}
+-\newdimen\gantt@ymonths
+-\gantt@ymonths=\gantt@height cm
+-\advance\gantt@ymonths by .8cm
+-\begin{tikzpicture}[xscale=\gantt@xscale,yscale=\gantt@yscale]}
+-{\draw[xstep=\gantt@step,very thin] (0,0) grid (\prop@gen@months,\gantt@height);
+-\foreach \x in {0,\gantt@step,...,\prop@gen@months} \node at (\x,\gantt@ymonths) {\x};
+-\ifgantt@miles
+-\newdimen\gantt@ymiles\gantt@ymiles=\gantt@height cm
+-\advance\gantt@ymiles by 2cm
+-\newdimen\gantt@ymiles@top\gantt@ymiles@top=\gantt@height cm
+-\edef\@@miles{\pdataref@safe{all}{mile}{ids}}
+-\@for\@I:=\@@miles\do{%
+-\edef\@@month{\pdataref@safe{mile}{\@I}{month}}
+-\draw[very thick,blue] (\@@month,\gantt@ymiles@top) -- (\@@month,0);
+-\node[blue] at (\@@month,\gantt@ymiles) {\pdataref{mile}{\@I}{label}};}
+-\fi %gantt@miles
+-\end{tikzpicture}}
+-\newdimen\gantt@ymid\newdimen\gantt@yinc\newdimen\gantt@xend
+-\newcommand{\@action}[6][]{\def\@test{#1}%
+-\ifx\@test\@empty\def\@@color{ganttgray}\else\def\@@color{#1}\fi
+-\gantt@ymid=#3 cm\gantt@yinc=\gantt@yscale cm
+-\gantt@xend=#4 cm\advance\gantt@xend by #5 cm
+-\advance\gantt@ymid by \gantt@yinc
+-\fill[\@@color] (#4,#3) rectangle +(#5,#6);
+-\node (#2@left) at (#4,\gantt@ymid) {};
+-\node (#2@right) at (\gantt@xend,\gantt@ymid) {};}
+-\def\@dependency#1#2{\draw[->,line width=2pt,color=red] (#1@right) -- (#2@left);}
+-\newcommand\gantt@compute@effort[3]{% start, len, force
+-  \@@e=#1\advance\@@e by #2
+-  \ifnum\thegantt@month<#1\else
+-  \ifnum\thegantt@month<\@@e
+-  \gantt@plus=#3cm\advance\gantt@effort by \gantt@plus\fi\fi}
+-\newcommand{\ganttchart}[1][]{\begin{figure}[ht]\centering
+-\gantt@set{#1}
+-\def\gantt@wps{\pdataref@num{all}{wp}{count}}
+-\begin{gantt}[#1]{\gantt@wps}
+- \newcounter{taskwps}\newcount\@@line
+- \edef\@@was{\pdataref@safe{all}{wa}{ids}}
+- \ifwork@areas
+- \@for\@@wa:=\@@was\do{% iterate over work areas
+-   \edef\@@wps{\pdataref@safe\@@wa{wp}{ids}}
+-   \@for\@@wp:=\@@wps\do{% iterate over work packages
+-     \stepcounter{taskwps}
+-     \@@line=\gantt@wps\advance\@@line by -\thetaskwps
+-     \edef\@@tasks{\pdataref@safe\@@wp{task}{ids}}
+-     \node at (-1/\gantt@xscale,\@@line) [above=-2pt] {\pdataRef{wp}\@@wp{label}};
+-     \edef\@@wphases{\pdataref@safe{wp}\@@wp{wphases}}
+-     \@for\@@ft:=\@@wphases\do{%wp-level work phases
+-       \decode@wphase\@@ft
+-       \@action\@@wp\@@line\wphase@start\wphase@len\wphase@force}
+-     \@for\@@task:=\@@tasks\do{% tasks
+-       \edef\@@wphases{\pdataref@safe{task}\@@task{wphases}}
+-       \@for\@@ft:=\@@wphases\do{%task-level work phases
+-         \decode@wphase\@@ft
+-         \@action\@@task\@@line\wphase@start\wphase@len\wphase@force}}}}
+- \else% ifwork@areas false
+- \edef\@@wps{\pdataref@safe{all}{wp}{ids}}
+- \@for\@@wp:=\@@wps\do{% iterate over work packages
+-   \stepcounter{taskwps}
+-   \@@line=\gantt@wps\advance\@@line by -\thetaskwps
+-   \edef\@@tasks{\pdataref@safe\@@wp{task}{ids}}
+-   \node at (-1/\gantt@xscale,\@@line) [above=-2pt] {\pdataRef{wp}\@@wp{label}};
+-   \edef\@@wphases{\pdataref@safe{wp}\@@wp{wphases}}
+-   \@for\@@ft:=\@@wphases\do{%iterate over the wp-level work phases
+-     \decode@wphase\@@ft
+-     \@action\@@wp\@@line\wphase@start\wphase@len\wphase@force}
+-   \@for\@@task:=\@@tasks\do{% task-level work phases
+-     \edef\@@wphases{\pdataref@safe{task}\@@task{wphases}}
+-     \@for\@@ft:=\@@wphases\do{%iterate over the task-level work phases
+-       \decode@wphase\@@ft
+-       \@action\@@task\@@line\wphase@start\wphase@len\wphase@force}}}
+- \fi% ifwork@areas end
+- \edef\@@deps{\pdataref@safe{all}{task}{deps}}
+- \@for\@@dep:=\@@deps\do{%
+-   \@dependency{\pdataref@safe{taskdep}\@@dep{from}}{\pdataref@safe{taskdep}\@@dep{to}}}
+- \ifgantt@draft
+-    \newcounter{gantt@month}
+-    \newcount\@@e\newdimen\gantt@effort\newdimen\gantt@plus
+-    \@whilenum\thegantt@month<\prop@gen@months\do{% step over months
+-      \gantt@effort=0cm
+-      \ifwork@areas
+-      \edef\@@was{\pdataref@safe{all}{wa}{ids}}
+-      \@for\@@wa:=\@@was\do{% iterate over work areas
+-        \edef\@@wps{\pdataref@safe\@@wa{wp}{ids}}
+-        \@for\@@wp:=\@@wps\do{% iterate over work packages
+-          \edef\@@wphases{\pdataref@safe{wp}\@@wp{wphases}}
+-          \@for\@@ft:=\@@wphases\do{%iterate over the wp-level work phases
+-            \decode@wphase\@@ft
+-            \gantt@compute@effort\wphase@start\wphase@len\wphase@force}
+-          \edef\@@tasks{\pdataref@safe\@@wp{task}{ids}}
+-          \@for\@@task:=\@@tasks\do{% iterate over tasks
+-          \edef\@@wphases{\pdataref@safe{task}\@@task{wphases}}
+-          \@for\@@ft:=\@@wphases\do{%iterate over the wp-level work phases
+-            \decode@wphase\@@ft
+-            \gantt@compute@effort\wphase@start\wphase@len\wphase@force}}}}
+-      \fill[ganttgray]  (\thegantt@month,-5) rectangle +(1,\gantt@effort);
+-      \else% ifwork@areas
+-      \edef\@@wps{\pdataref@safe{all}{wp}{ids}}
+-      \@for\@@wp:=\@@wps\do{% iterate over work packages
+-          \edef\@@wphases{\pdataref@safe{wp}\@@wp{wphases}}
+-          \@for\@@ft:=\@@wphases\do{%iterate over the wp-level work phases
+-            \decode@wphase\@@ft
+-            \gantt@compute@effort\wphase@start\wphase@len\wphase@force}
+-          \edef\@@tasks{\pdataref@safe\@@wp{task}{ids}}
+-          \@for\@@task:=\@@tasks\do{% iterate over tasks
+-          \edef\@@wphases{\pdataref@safe{task}\@@task{wphases}}
+-          \@for\@@ft:=\@@wphases\do{%iterate over the wp-level work phases
+-            \decode@wphase\@@ft
+-            \gantt@compute@effort\wphase@start\wphase@len\wphase@force}}}
+-      \fill[ganttgray]  (\thegantt@month,-5) rectangle +(1,\gantt@effort);
+-      \fi% ifwork@areas
+-      \stepcounter{gantt@month}}
+-   \fi% ifgantt@draft
+-  \end{gantt}
+-  \caption{\gantt@caption}\label{fig:gantt}
+-\end{figure}\footnotetext\gantt@footnote}
+-\newcommand\gantt@caption@main{Gantt Chart: Overview Work Package Activities}
+-\newcommand\gantt@caption@lower{lower bar shows the overall effort \if@RAM (RAM only)\fi per month}
+-\newcommand\gantt@caption{\gantt@caption@main\ifgantt@draft\xspace
+-  (\gantt@caption@lower)\fi}
+-\newcommand\gantt@footnote{Bars shown at reduced height (e.g. 50\%) indicate reduced
+-  intensity during  that work phase  (e.g. to 50\%).}
+-\newcommand{\gantttaskchart}[1][]{\begin{figure}[hbtp]\centering\gantt@set{#1}
+-\newcounter{gantt@all@tasks}%
+-\setcounter{gantt@all@tasks}{\pdataref@num{all}{task}{count}}
+-\addtocounter{gantt@all@tasks}{\pdataref@num{all}{wp}{count}}
+-\begin{gantt}[#1]{\thegantt@all@tasks}
+-  \newcounter{gantt@tasks}\newcount\@@line
+-  \edef\@@wps{\pdataref@safe{all}{wp}{ids}}
+-   \@for\@@wp:=\@@wps\do{% iterate over work packages
+-     \stepcounter{gantt@tasks}
+-     \edef\@@tasks{\pdataref@safe\@@wp{task}{ids}}
+-     \@for\@@task:=\@@tasks\do{% iterate over the tasks
+-       \stepcounter{gantt@tasks}
+-       \@@line=\thegantt@all@tasks\advance\@@line by -\thegantt@tasks
+-       \node at (-.5/\gantt@xscale,\@@line) [above=-2pt] {{\footnotesize\taskreflong\@@wp\@@task}};
+-       \edef\@@wphases{\pdataref@safe{task}\@@task{wphases}}
+-       \@for\@@ft:=\@@wphases\do{%iterate over the task-level work phases
+-         \decode@wphase\@@ft
+-         \@action\@@task\@@line\wphase@start\wphase@len\wphase@force
+-      }}}% end all iterations
+-    \end{gantt}
+-    \caption{\gantt@caption@main{} -- \emph{\gantt@footnote}}\label{fig:gantt}
+-\end{figure}}
+-\newcommand\jpub{\textcolor{\prop@link@color}{\textbf{\Large{$\star$}}}}
+-\newcommand\jpro{\textcolor{\prop@link@color}{\textbf{\Large{$\bullet$}}}}
+-\newcommand\jsoft{\textcolor{\prop@link@color}{\textbf{@}}}
+-\newcommand\jorga{\textcolor{\prop@link@color}{\textbf{\Large{$\circ$}}}}
+-\newcommand\jsup{\textcolor{\prop@link@color}{\textbf{\smiley}}}
+-\newcommand\add@joint[3]{\@ifundefined{coherence@#1@#2}%
+-{\@namedef{coherence@#1@#2}{#3}}%
+-{\expandafter\g@addto@macro\csname coherence@#1@#2\endcsname{#3}}}
+-\newcommand\prop@joint[2]{\@for\@first:=#2\do{%
+-\@for\@second:=#2\do{\ifx\@first\@second\else\add@joint\@first\@second{#1}\fi}}}
+-\newcommand\jointproj[1]{\prop@joint\jpro{#1}}
+-\newcommand\jointpub[1]{\prop@joint\jpub{#1}}
+-\newcommand\jointorga[1]{\prop@joint\jorga{#1}}
+-\newcommand\jointsoft[1]{\prop@joint\jsoft{#1}}
+-\newcommand\jointsup[1]{\prop@joint\jsup{#1}}
+-\newcommand{\coherencematrix}{
+-{\let\tabularnewline\relax\let\hline\relax\let\site\relax% so they do
+- \let\@sw\relax\let\jpub\relax\let\jpro\relax\let\jorga\relax% not bother
+- \let\jsoft\relax\let\jsup\relax\let\cellcolor\relax% us
+-\gdef\@ct@head{}%
+-\@for\@site:=\prop@gen@sites\do{\xdef\@ct@head{\@ct@head%
+-&\ifx\cht@swsites\@true\@sw{\site{\@site}}\else\site{\@site}\fi}}%
+-\gdef\@ct@lines{\@ct@head\tabularnewline\hline\hline} %initialize with head line
+-\@for\@site:=\prop@gen@sites\do{\xdef\@ct@line{\site{\@site}}%
+-  \@for\@@site:=\prop@gen@sites\do{%
+-    \xdef\@ct@line{\@ct@line&\ifx\@site\@@site{\cellcolor{wagray}{}}\fi%
+-      \@ifundefined{coherence@\@site @\@@site}{}{\@nameuse{coherence@\@site @\@@site}}}}%
+-  \xdef\@ct@lines{\@ct@lines\@ct@line\tabularnewline\hline}}}%
+-\begin{tabular}{|l||*{\the@site}{c|}}\hline%
+-\@ct@lines\hline%
+-joint&\multicolumn{\the@site}{l|}{\jpub $\hat=$ publication, \jpro $\hat=$ project,
+-      \jorga $\hat=$ organization, \jsoft $\hat=$ software/resource dev,
+-       \jsup $\hat=$ supervision}\\\hline
+-\end{tabular}}
+-\define@key{coherencetable}{swsites}[true]{\def\cht@swsites{#1}}
+-\define@key{coherencetable}{stretch}{\def\cht@stretch{#1}}
+-\newcommand\coherencetable[1][]{%
+-\def\cht@swsites{false}%
+-\def\cht@stretch{1}%
+-\setkeys{coherencetable}{#1}%
+-\begin{table}[ht]\centering%
+-\small\setlength{\tabcolsep}{.5em}%
+-\renewcommand{\arraystretch}{\cht@stretch}%
+-\coherencematrix%
+-\caption{\coherence@caption}\label{tab:collaboration}
+-\end{table}}
+-\newcommand\coherence@caption{Previous Collaboration between {\pn} members}
+-\defbibheading{empty}{}
+-\newif\if@allpapers\@allpaperstrue
+-\newcommand\prop@ppl[3][]{\@allpapersfalse\message{ppl processing: #2}%
+-\printbibliography[heading=subbibliography,type=#2,title=#3#1]%
+-\@ifundefined{prop@rl}{\xdef\prop@rl{#2}}{\xdef\prop@rl{\prop@rl, #2}}}
+-\newcommand\prop@prl[1]{\message{unclassified: #1}%
+-\printbibliography[heading=subbibliography,title=Unclassified,#1]}%
+-\define@key{paperlist}{unclassified}[true]{\message{unclass: \prop@rl}\prop@prl\prop@rl}
+-\define@key{paperlist}{articles}[true]{\prop@ppl{article}{Articles}}
+-\define@key{paperlist}{chapters}[true]{\prop@ppl{inbook}{Book Chapters}}
+-\define@key{paperlist}{confpapers}[true]{\prop@ppl[,keyword=conference]{inproceedings}{Conference Papers}}
+-\define@key{paperlist}{wspapers}[true]{\prop@ppl[,notkeyword=conference]{inproceedings}{Workshop Papers}}
+-\define@key{paperlist}{theses}[true]{\prop@ppl{thesis}{Theses}}
+-\define@key{paperlist}{submitted}[true]{\prop@ppl[,keyword=submitted]{unpublished}{Submitted}}
+-\define@key{paperlist}{books}[true]{\prop@ppl{book}{Monographs}}
+-\define@key{paperlist}{techreports}[true]{\prop@ppl{techreport}{Technical Reports}}
+-\DeclareBibliographyCategory{featured}
+-\newcommand\prop@paperlist[2][]{%
+-\let\biboldfont\bibfont%
+-\renewcommand{\bibfont}{\footnotesize}%
+-\renewcommand{\baselinestretch}{.9}
+-\def\do##1{\addtocategory{featured}{##1}}\docsvlist{#2}%
+-\setkeys{paperlist}{#1}
+-\@ifundefined{prop@rl}{}{\@latex@warning{some papers are not classified!}}
+-\if@allpapers\printbibliography[category=featured,heading=empty]\fi%
+-\let\bibfont\biboldfont}
+-\def\prop@warnpubs@message{Many of the proposers' publications are online at one of the following URIs:}
+-\def\prop@warnpubs@title{References}
+-\defbibheading{warnpubs}{\section*{\prop@warnpubs@title}%
+-  \@ifundefined{prop@gen@pubspages}
+- {\@latex@warning{No publication pages specified;
+-                   use the pubspage key in the proposal environment!}}
+-  {\prop@warnpubs@message%
+- \@for\@I:=\prop@gen@pubspages\do{\par\noindent\csname\@I\endcsname}}}
+-\defbibheading{empty}{}
++\RequirePackage{proposal}
++
++
+ \endinput
+ %%
+ %% End of file `proposal.cls'.
+diff -up tex/latex/proposal/base/reporting.cls.noworkaddress tex/latex/proposal/base/reporting.cls
+--- tex/latex/proposal/base/reporting.cls.noworkaddress	2022-12-31 12:22:39.739994906 -0500
++++ tex/latex/proposal/base/reporting.cls	2022-12-31 12:31:58.440831980 -0500
+@@ -7,7 +7,7 @@
+ %% proposal.dtx  (with options: `reporting')
+ %% 
+ \NeedsTeXFormat{LaTeX2e}[1999/12/01]
+-\ProvidesPackage{reporting}[2016/04/15 v1.5 Project Reporting]
++\ProvidesPackage{reporting}[2020/08/21 v1.7 Project Reporting]
+ \newif\if@wpsubsection\@wpsubsectionfalse
+ \newif\ifsubmit\submitfalse
+ \newif\ifgrantagreement\grantagreementfalse
+@@ -18,11 +18,15 @@
+ \newif\if@RAM\@RAMfalse
+ \newif\if@svninfo\@svninfofalse
+ \newif\if@gitinfo\@gitinfofalse
++\newif\if@numericcites\@numericcitesfalse
++\newif\if@longtasklabels\@longtasklabelsfalse
++\newif\if@attachments\@attachmentsfalse
+ \def\proposal@class{article}
+ \DeclareOption{wpsubsection}{\@wpsubsectiontrue}
+ \DeclareOption{submit}{\submittrue}
+ \DeclareOption{grantagreement}{\grantagreementtrue}
+ \DeclareOption{gitinfo}{\@gitinfotrue}
++\DeclareOption{numericcites}{\@numericcitestrue}
+ \DeclareOption{svninfo}{\@svninfotrue}
+ \DeclareOption{public}{\publictrue}
+ \DeclareOption{noworkareas}{\work@areasfalse\PassOptionsToClass{\CurrentOption}{pdata}}
+@@ -30,67 +34,12 @@
+ \DeclareOption{report}{\def\proposal@class{report}}
+ \DeclareOption{keys}{\keystrue}
+ \DeclareOption{deliverables}{\delivstrue}
+-\DeclareOption*{\PassOptionsToClass{\CurrentOption}{article}}
++\DeclareOption{longtasklabels}{\@longtasklabelstrue}
++\DeclareOption{attachments}{\@attachmentsfalse}
++\DeclareOption*{\PassOptionsToClass{\CurrentOption}{\proposal@class}}
+ \ProcessOptions
+ \LoadClass[a4paper,twoside]{\proposal@class}
+-\RequirePackage{amssymb}
+-\RequirePackage{wasysym}
+-\RequirePackage{url}
+-\RequirePackage{graphicx}
+-\RequirePackage{colortbl}
+-\RequirePackage{xcolor}
+-\RequirePackage{rotating}
+-\RequirePackage{fancyhdr}
+-\RequirePackage{array}
+-\RequirePackage{xspace}
+-\RequirePackage{comment}
+-\AtBeginDocument{\ifpublic\excludecomment{private}\fi}
+-\RequirePackage{tikz}
+-\RequirePackage{paralist}
+-\RequirePackage[a4paper,margin=18mm]{geometry}
+-\RequirePackage{boxedminipage}
+-\renewcommand{\thempfootnote}{\roman{mpfootnote}}
+-\renewcommand{\familydefault}{\sfdefault}
+-\RequirePackage[scaled=.90]{helvet}
+-\RequirePackage{textcomp}
+-\RequirePackage[hyperref=auto,style=alphabetic,defernumbers=true,backend=bibtex,backref=true,firstinits=true,maxbibnames=6]{biblatex}[2010/11-19]
+-\RequirePackage{csquotes}
+-\RequirePackage{mdframed}
+-\RequirePackage{pdata}
+-\definecolor{darkblue}{rgb}{0,0,.7}
+-\ifsubmit\def\prop@link@color{darkblue}\else\def\prop@link@color{blue}\fi
+-\RequirePackage[bookmarks=true,linkcolor=\prop@link@color,
+- citecolor=\prop@link@color,urlcolor=\prop@link@color,colorlinks=true,
+- breaklinks=true, bookmarksopen=true]{hyperref}
+-\ifsubmit
+-\RequirePackage[hide]{ed}
+-\if@svninfo\RequirePackage[final,today]{svninfo}\fi
+-\else
+-\RequirePackage[show]{ed}
+-\if@svninfo\RequirePackage[eso-foot,today]{svninfo}\fi
+-\if@gitinfo\RequirePackage[mark]{gitinfo2}\fi
+-\fi
+-\renewcommand\ednoteshape{\sl\footnotesize}
+-\ifpublic\excludecomment{private}\else\includecomment{private}\fi
+-\setcounter{secnumdepth}{3}
+-\newif\ifofpage\ofpagefalse
+-\ifgrantagreement
+-\fancyhead{}
+-\renewcommand{\headrulewidth}{0pt}
+-\renewcommand{\footrulewidth}{0.4pt}
+-\else
+-\fancyhead[RE,LO]{\prop@gen@acronym}
+-\fancyhfoffset{0pt}
+-\fi
+-\fancyfoot[C]{}
+-\newcommand\prop@of@pages[2]{page~#1\ifofpage~of~#2\fi}
+-\ifgrantagreement
+-\fancyfoot[L]{\prop@gen@proposalnumber\quad \prop@gen@acronym\quad --\quad Part B}
+-\fancyfoot[R]{\thepage}
+-\else
+-\fancyhead[LE,RO]{\prop@of@pages\thepage{\pdataref@num{prop}{page}{last}}}
+-\fi
+-\pagestyle{fancyplain}
++\RequirePackage{proposal}
+ \newif\if@report\@reportfalse
+ \newenvironment{report}[1][]%
+ {\@reporttrue\readpdata\jobname%
+@@ -108,7 +57,7 @@
+ {\begin{center}
+   {\LARGE Final Project Report}\\[.2cm]
+   {\LARGE\textbf{\prop@gen@title}}\\[.3cm]
+-  {\LARGE Acronym: {\prop@gen@acronym}}\\[.2cm]
++  \ifx\prop@gen@acronym\@empty\else{\LARGE Acronym: {\prop@gen@acronym}}\\[.2cm]\fi
+   {\large\today}\\[1em]
+   \begin{tabular}{c*{\the@PIs}{c}}
+     \prop@tl\prop@gen@PIs{\pdataref{PI}\tl@ext{name}}\\
+@@ -118,41 +67,8 @@
+ \end{center}
+ \setcounter{tocdepth}{2}\tableofcontents\newpage\setcounter{page}{1}}
+ {}
+-\defbibheading{empty}{}
+-\newif\if@allpapers\@allpaperstrue
+-\newcommand\prop@ppl[3][]{\@allpapersfalse\message{ppl processing: #2}%
+-\printbibliography[heading=subbibliography,type=#2,title=#3#1]%
+-\@ifundefined{prop@rl}{\xdef\prop@rl{#2}}{\xdef\prop@rl{\prop@rl, #2}}}
+-\newcommand\prop@prl[1]{\message{unclassified: #1}%
+-\printbibliography[heading=subbibliography,title=Unclassified,#1]}%
+-\define@key{paperlist}{unclassified}[true]{\message{unclass: \prop@rl}\prop@prl\prop@rl}
+-\define@key{paperlist}{articles}[true]{\prop@ppl{article}{Articles}}
+-\define@key{paperlist}{chapters}[true]{\prop@ppl{inbook}{Book Chapters}}
+-\define@key{paperlist}{confpapers}[true]{\prop@ppl[,keyword=conference]{inproceedings}{Conference Papers}}
+-\define@key{paperlist}{wspapers}[true]{\prop@ppl[,notkeyword=conference]{inproceedings}{Workshop Papers}}
+-\define@key{paperlist}{theses}[true]{\prop@ppl{thesis}{Theses}}
+-\define@key{paperlist}{submitted}[true]{\prop@ppl[,keyword=submitted]{unpublished}{Submitted}}
+-\define@key{paperlist}{books}[true]{\prop@ppl{book}{Monographs}}
+-\define@key{paperlist}{techreports}[true]{\prop@ppl{techreport}{Technical Reports}}
+-\DeclareBibliographyCategory{featured}
+-\newcommand\prop@paperlist[2][]{%
+-\let\biboldfont\bibfont%
+-\renewcommand{\bibfont}{\footnotesize}%
+-\renewcommand{\baselinestretch}{.9}
+-\def\do##1{\addtocategory{featured}{##1}}\docsvlist{#2}%
+-\setkeys{paperlist}{#1}
+-\@ifundefined{prop@rl}{}{\@latex@warning{some papers are not classified!}}
+-\if@allpapers\printbibliography[category=featured,heading=empty]\fi%
+-\let\bibfont\biboldfont}
+-\def\prop@warnpubs@message{Many of the proposers' publications are online at one of the following URIs:}
+-\def\prop@warnpubs@title{References}
+-\defbibheading{warnpubs}{\section*{\prop@warnpubs@title}%
+-  \@ifundefined{prop@gen@pubspages}
+- {\@latex@warning{No publication pages specified;
+-                   use the pubspage key in the proposal environment!}}
+-  {\prop@warnpubs@message%
+- \@for\@I:=\prop@gen@pubspages\do{\par\noindent\csname\@I\endcsname}}}
+-\defbibheading{empty}{}
++
++
+ \endinput
+ %%
+ %% End of file `reporting.cls'.
+diff -up tex/latex/proposal/dfg/dfgpdata.sty.noworkaddress tex/latex/proposal/dfg/dfgpdata.sty
+--- tex/latex/proposal/dfg/dfgpdata.sty.noworkaddress	2016-04-15 17:38:41.000000000 -0400
++++ tex/latex/proposal/dfg/dfgpdata.sty	2022-12-31 12:32:42.674795973 -0500
+@@ -7,35 +7,21 @@
+ %% dfgproposal.dtx  (with options: `pdata')
+ %% 
+ \NeedsTeXFormat{LaTeX2e}[1999/12/01]
+-\ProvidesPackage{dfgpdata}[2016/04/15 v1.4 DFG Project Data]
++\ProvidesPackage{dfgpdata}[2020/08/21 v1.5 DFG Project Data]
+ \newif\ifdeutsch\deutschfalse
+ \DeclareOption{german}{\deutschtrue\message{Deutscher Antrag}}
+ \ProcessOptions
+ \define@key{prop@gen}{thema}{\def\prop@gen@thema{#1}\pdata@def{prop}{gen}{thema}{#1}}
++\def\prop@gen@Dkeywords{kommt noch}
++\def\prop@gen@keywords{to be added}
++\define@key{prop@gen}{Dkeywords}{\def\prop@gen@Dkeywords{#1}}
+ \renewcommand\prop@gen@instrument{Neuantrag auf Sachbeihilfe}
+ \newcommand\prop@gen@thema{??? Thema ???}
+ \newcommand\deu[1]{#1}
+-\newcommand\dfg@applicants@lines{%
+-\prop@tl\prop@gen@PIs{\wa@ref{person}\tl@ext{personaltitle} \wa@ref{person}\tl@ext{name}}\\
+-\prop@tl\prop@gen@PIs{\wa@ref{person}\tl@ext{academictitle}}\\
+-\prop@tl\prop@gen@PIs{\wa@ref{person}\tl@ext{birthdate}}\\}
+-\newcommand\dfg@applicants@institute@lines{%
+-\prop@tl\prop@gen@PIs{\wa@ref{institution}{\wa@ref{person}\tl@ext{affiliation}}{shortname}}\\
+-\prop@tl\prop@gen@PIs{\wa@ref{person}\tl@ext{workaddress}}\\
+-\prop@tl\prop@gen@PIs{Tel: \wa@ref{person}\tl@ext{worktel}}\\
+-\prop@tl\prop@gen@PIs{Fax: \wa@ref{person}\tl@ext{workfax}}\\
+-\prop@tl\prop@gen@PIs{\wa@ref{person}\tl@ext{email}}\\}
+-\newcommand\dfg@applicants@private@lines{%
+-\prop@tl\prop@gen@PIs{\wa@ref{person}\tl@ext{privaddress}}\\
+-\prop@tl\prop@gen@PIs{Tel: \wa@ref{person}\tl@ext{privtel}}\\}
+-\newcommand\dfg@applicants{%
+-\subsection{\if@sites\ifnum\the@sites>1 Joint Proposal; \fi\fi%
+-Applicant\if@sites\ifnum\the@PIs>1{s}\fi\fi\ \deu{(Antragsteller)}}%
+-\dfg@applicants@table}
+-\newcommand\dfg@topic{\subsection{\ifdeutsch Thema\else Topic \deu{(Thema)}\fi}\prop@gen@thema}
++\newcommand\dfg@topic{\subsection{\ifdeutsch Thema\else Topic\fi}\prop@gen@thema}
+ \newcommand\dfg@area@field{%
+ \ifdeutsch\subsection{Fachgebiet und Arbeitsrichtung}\else
+-\subsection{Research area and field of work \deu{(Fachgebiet und Arbeitsrichtung)}}\fi
++\subsection{Research area and field of work }\fi
+ \ifdeutsch Disziplin\else Scientific discipline\fi:  \prop@gen@discipline\\
+ \ifdeutsch Arbeitsgebiet\else Fields of work\fi:  \prop@gen@areas}
+ \newcommand\dfgprojpapers[2][]{\prop@paperlist[#1]{#2}}
+@@ -71,6 +57,8 @@ Applicant\if@sites\ifnum\the@PIs>1{s}\fi
+ \renewcommand\wp@legend@site{Partner}
+ \renewcommand\wp@legend@effort{Aufwand\if@RAM{ (PM+HM)}\fi}
+ \renewcommand\wp@legend@all{\textbf{Summe}}
++\renewcommand\wprm{\pdataref@safe{wp}\wp@id{RM}\if@RAM\ PM+\pdataref{wp}\wp@id{RAM} HM\fi}
++\renewcommand\gantt@footnote{Balken mit reduzierter H\"ohe (z.B. 50\%) bedeuten reduzierte Arbeitslast in dieser Phase (z.B. auf 50\%)}
+ \renewcommand\gantt@caption@main{Zeitliche Verteilung der Arbeitspakete}
+ \renewcommand\gantt@caption@lower{draft: unten die Lastverteilung}
+ \renewcommand\coherence@caption{Bisherige Kollaboration der {\pn} Partner}
+diff -up tex/latex/proposal/dfg/dfgproposal.cls.noworkaddress tex/latex/proposal/dfg/dfgproposal.cls
+--- tex/latex/proposal/dfg/dfgproposal.cls.noworkaddress	2016-04-15 17:38:41.000000000 -0400
++++ tex/latex/proposal/dfg/dfgproposal.cls	2022-12-31 12:32:42.674795973 -0500
+@@ -7,58 +7,54 @@
+ %% dfgproposal.dtx  (with options: `cls')
+ %% 
+ \NeedsTeXFormat{LaTeX2e}[1999/12/01]
+-\ProvidesClass{dfgproposal}[2016/04/15 v1.4 DFG Proposal]
++\ProvidesClass{dfgproposal}[2020/08/21 v1.5 DFG Proposal]
+ \newif\ifgeneral\generalfalse
+ \DeclareOption{general}{\generaltrue}
+ \DeclareOption{german}{\PassOptionsToPackage{\CurrentOption}{dfgpdata}}
++\PassOptionsToClass{11pt}{article}
+ \DeclareOption*{\PassOptionsToClass{\CurrentOption}{proposal}}
+ \ProcessOptions
+ \LoadClass{proposal}
+ \RequirePackage{eurosym}
+ \RequirePackage{dfgpdata}
+ \ifdeutsch\RequirePackage[ngerman]{babel}
+-\else\RequirePackage[ngerman,USenglish]{babel}\fi
++\else\RequirePackage[ngerman,english]{babel}\fi
++\RequirePackage[scaled=.90]{helvet}
++\renewcommand{\familydefault}{\sfdefault}
+ \newenvironment{sitedescription}[2][]%
+-{\def\@test{#1}\def\@@title{\ifx\@test\@empty\wa@ref{institution}{#2}{acronym}\else #1\fi:
+-\textsc{\wa@ref{institution}{#2}{name}}}
++{\def\@test{#1}\def\@@title{\ifx\@test\@empty\pdataref{site}{#2}{acronym}\else #1\fi:
++\textsc{\pdataref{site}{#2}{name}}}
+ \@for\@I:=#2\do{\pdata@target{site}\@I{}}\subsubsection\@@title}
+ {}
+-\newlength\applicants@table@columnwidth
+-\newcommand\dfg@applicants@table%
+-{\setlength\applicants@table@columnwidth\textwidth
+-\advance\applicants@table@columnwidth by -6em
+-\divide\applicants@table@columnwidth by \the@PIs
+-\ifnum\the@PIs>2\begin{tabular}{|l|*{\the@PIs}{p{\applicants@table@columnwidth}|}}
+-\else\begin{tabular}{|l|*{\the@PIs}{l|}}\fi
+-\hline
+-\dfg@applicants@lines\hline
+-&\multicolumn{\the@PIs}{|l|}{\textbf{Work Address\deu{ (Dienstanschrift)}:}}\\\hline
+-\dfg@applicants@institute@lines\hline
+-&\multicolumn{\the@PIs}{|l|}{\textbf{Private Address\deu{ (Privatanschrift)}:}}\\\hline
+-\dfg@applicants@private@lines\hline
+-\end{tabular}}
+ \renewenvironment{prop@proposal}
+-{\thispagestyle{empty}%
++{\ifsubmit\setcounter{page}{1}\else\thispagestyle{empty}\fi
+ \begin{center}
+ {\LARGE \prop@gen@instrument}\\[.2cm]
+ {\LARGE\textbf{\prop@gen@title}}\\[.3cm]
+-{\LARGE Acronym: {\prop@gen@acronym}}\\[.2cm]
++\ifx\prop@gen@acronym\@empty\else{\LARGE Acronym: {\prop@gen@acronym}}\\[.2cm]\fi
+ {\large\today}\\[1em]
+-\WAauthorblock[aff]\prop@gen@PIs\\[2cm]
++\edef\the@PIs{\pdataref{all}{PI}{count}}
++\edef\prop@gen@PIs{\pdataref{all}{PI}{ids}}
++\begin{tabular}{c*{\the@PIs}{c}}
++\prop@tl\prop@gen@PIs{\pdataref@safe{PI}\tl@ext{name}}\\
++\prop@tl\prop@gen@PIs{\pdataref@safe{PI}\tl@ext{affiliation}}\\
++\prop@tl\prop@gen@PIs{\pdataref@safe{PI}\tl@ext{dept}}\\
++\end{tabular}\\[2cm]
+ \end{center}
++\ifgeneral
++\ifsubmit\else
++\setcounter{section}{-1}
+ \edef\keep@tocdepth{\value{tocdepth}}
+ \setcounter{tocdepth}{2}\tableofcontents
+ \setcounter{tocdepth}{\keep@tocdepth}
+-\ifgeneral\setcounter{section}{-1}
+ \newpage\thispagestyle{empty}
+ \ifdeutsch\section{Allgemeine Angaben (nur f\"ur ELAN)}\else
+ \section{General Information (for the ELAN system only)}\fi
+-\dfg@applicants
+ \dfg@topic
+ \dfg@area@field
+ \ifdeutsch\subsection{Voraussichtliche Gesamtdauer}\else
+-\subsection{Anticipated total duration \deu{(Voraussichtliche Gesamtdauer)}}
+-\fi
++\subsection{Anticipated total duration}
++\fi% ifdeutsch
+ \@ifundefined{prop@gen@totalduration}{????}{\prop@gen@totalduration};
+ \ifdeutsch
+ \@ifundefined{prop@gen@since}{Erstantrag}{Fortsetungsantrag, das Project l\"auft seit
+@@ -66,34 +62,31 @@
+ \else
+ \@ifundefined{prop@gen@since}{initial proposal}{continuation proposal, the project started
+   \prop@gen@since.}
++\fi%ifdeutsch
++\ifdeutsch
++\subsection{Schl\"usselw\"orter}\prop@gen@Dkeywords
++\else\subsection{Keywords}\prop@gen@keywords
+ \fi
+ \ifdeutsch\subsection{Antragszeitraum}\else
+-\subsection{Application period \deu{(Antragszeitraum)}}\fi
++\subsection{Application period}\fi
+ \prop@gen@months\quad Months starting \prop@gen@start
+ \@ifundefined{prop@gen@fundsuntil}{}
+ { (\ifdeutsch Mittel reichen bis\else funds last until\fi\ \prop@gen@fundsuntil)}
+-\ifdeutsch\else\selectlanguage{USenglish}\fi
+-\newpage\fi%ifgeneral
+-\setcounter{page}{0}}
++\ifdeutsch\else\selectlanguage{english}\fi
++\newpage
++\setcounter{page}{0}%
++\fi\fi}% ifsubmit ifgeneral
+ {}
+ \ifdeutsch
+ \def\prop@warnpubs@message{Viele der Publikationen der Antragsteller sind verf\"ugbar unter folgenden URLs:}
+ \def\prop@warnpubs@title{Literatur}
+ \fi
+ \newcommand\attachments{\ifdeutsch\section{Verzeichnis der Anlagen}\else
+-\section{List of Attachments \deu{(Verzeichnis der Anlagen)}}\fi
++\section{List of Attachments}\fi
+ \begin{itemize}
+ \@for\@I:=\prop@gen@PIs\do{%
+- \item\ifdeutsch Lebenslauf und Publikatinsverzeichnis\else
+- Curriculum Vitae and list of publications for \fi
+-   \@nameuse{wa@person@\@I @personaltitle}
+-   \@nameuse{wa@person@\@I @name}
+-  (CD + \ifdeutsch Ausdruck\else printed version\fi)}
+-\ifdeutsch
+-\item Publications either cited in section~\ref{sec:ourpubs} or occurring in one of the
+-  curricula vitae (CD only)\else
+-\item Zitierte Publikationen aus Abschnitt~\ref{sec:ourpubs} oder einem der Lebensl\"aufe
+-  (nur CD)\fi
++ \item\ifdeutsch Lebenslauf und Publikatinsverzeichnis\else Curriculum Vitae and list of publications for \fi
++   \pdataref{PI}\@I{title}\pdataref{PI}\@I{name}}
+ \end{itemize}}
+ \ifgeneral
+ \newenvironment{Zusammenfassung}{\thispagestyle{empty}\subsection{Zusammenfassung}\begin{otherlanguage}{ngerman}}
+diff -up tex/latex/proposal/dfg/dfgreporting.cls.noworkaddress tex/latex/proposal/dfg/dfgreporting.cls
+--- tex/latex/proposal/dfg/dfgreporting.cls.noworkaddress	2016-04-15 17:38:41.000000000 -0400
++++ tex/latex/proposal/dfg/dfgreporting.cls	2022-12-31 12:32:42.674795973 -0500
+@@ -7,15 +7,18 @@
+ %% dfgproposal.dtx  (with options: `reporting')
+ %% 
+ \NeedsTeXFormat{LaTeX2e}[1999/12/01]
+-\ProvidesPackage{dfgreporting}[2016/04/15 v1.4 DFG Project Reporting]
++\ProvidesPackage{dfgreporting}[2020/08/21 v1.5 DFG Project Reporting]
+ \DeclareOption{german}{\PassOptionsToPackage{\CurrentOption}{dfgpdata}}
++\PassOptionsToClass{11pt}{article}
+ \DeclareOption*{\PassOptionsToClass{\CurrentOption}{reporting}}
+ \ProcessOptions
+ \LoadClass{reporting}
+ \RequirePackage{eurosym}
+ \RequirePackage{dfgpdata}
+ \ifdeutsch\RequirePackage[ngerman]{babel}
+-\else\RequirePackage[ngerman,USenglish]{babel}\fi
++\else\RequirePackage[ngerman,english]{babel}\fi
++\RequirePackage[scaled=.90]{helvet}
++\renewcommand{\familydefault}{\sfdefault}
+ \define@key{prop@gen}{reportperiod}{\def\prop@gen@reportperiod{#1}}
+ \define@key{prop@gen}{applareas}{\def\prop@gen@applareas{#1}}
+ \define@key{prop@gen}{key}{\@dmp{key=#1}%
+@@ -23,45 +26,38 @@
+ \define@key{prop@gen}{coop}{\@dmp{coop=#1}%
+ \@ifundefined{prop@gen@coops}{\xdef\prop@gen@coops{{#1}}}{\xdef\prop@gen@coops{\prop@gen@coops,{#1}}}}
+ \define@key{prop@gen}{projpapers}{\def\prop@gen@projpapers{#1}}
+-\newcommand\dfg@applicants@table%
+-{\begin{tabular}{|l|*{\the@PIs}{l|}}\hline
+-\dfg@applicants@lines\hline
+-&\multicolumn{\the@PIs}{|l|}{\textbf{Private Address\deu{ (Privatanschrift)}:}}\\\hline
+-\dfg@applicants@private@lines\hline
+-\end{tabular}}
+-\newcommand\dfg@institute@table%
+-{\begin{tabular}{|l|*{\the@PIs}{l|}}\hline
+-\dfg@applicants@institute@lines\hline
+-\end{tabular}}
+ \newcommand\prop@assoc[2]{\let\@tmpop=\relax\@for\@I:=#2\do{\@tmpop\@I\let\@tmpop=#1}}
+ \newcommand\show@prop@gen@keys{\def\@cb{, }\@ifundefined{prop@gen@keys}{??:???? ?/?}{\prop@assoc\@cb\prop@gen@keys}}
+ \renewenvironment{prop@report}
+-{\selectlanguage{USenglish}
+-\thispagestyle{empty}%
++{\ifsubmit\setcounter{page}{1}\else\thispagestyle{empty}\fi%
+ \begin{center}
+-  {\LARGE Final Project Report}\\[.2cm]
+-  {\LARGE\textbf{\prop@gen@title}}\\[.3cm]
+-  {\LARGE Acronym: {\prop@gen@acronym}}\\[.2cm]
+-  {\large Reference number(s): \show@prop@gen@keys}\\[.2cm]
+-  {\large\today}\\[1em]
+- \begin{tabular}{c*{\the@PIs}{c}}
+-   \prop@tl\prop@gen@PIs{\wa@ref{person}\tl@ext{name}}\\
+-   \prop@tl\prop@gen@PIs{\wa@ref{institution}{\wa@ref{person}\tl@ext{affiliation}}{name}}
+- \end{tabular}\\[2cm]
++{\LARGE \prop@gen@instrument}\\[.2cm]
++{\LARGE\textbf{\prop@gen@title}}\\[.3cm]
++\ifx\prop@gen@acronym\@empty\else{\LARGE Acronym: {\prop@gen@acronym}}\\[.2cm]\fi
++{\large\today}\\[1em]
++\edef\the@PIs{\pdataref{all}{PI}{count}}
++\edef\prop@gen@PIs{\pdataref{all}{PI}{ids}}
++\begin{tabular}{c*{\the@PIs}{c}}
++\prop@tl\prop@gen@PIs{\pdataref@safe{PI}\tl@ext{name}}\\
++\prop@tl\prop@gen@PIs{\pdataref@safe{PI}\tl@ext{affiliation}}\\
++\prop@tl\prop@gen@PIs{\pdataref@safe{PI}\tl@ext{dept}}\\
++\end{tabular}\\[2cm]
+ \end{center}
+-\setcounter{tocdepth}{1}\tableofcontents\newpage\setcounter{page}{1}
+-\section{General Information \deu{(Allgemeine Angaben)}}
+-\subsection{Reference Numbers \deu{(DFG Gesch\"aftszeichen)}}
++\setcounter{section}{-1}
++\edef\keep@tocdepth{\value{tocdepth}}
++\setcounter{tocdepth}{2}\tableofcontents
++\setcounter{tocdepth}{\keep@tocdepth}
++\newpage\thispagestyle{empty}
++\ifdeutsch\section{Allgemeine Angaben (nur f\"ur ELAN)}\else
++\section{General Information (for the ELAN system only)}\fi
++\subsection{Reference Numbers}
+ \show@prop@gen@keys
+-\dfg@applicants
+-\subsection{Institute/Chair \deu{(Institut/Lehrstuhl)}}\dfg@institute@table
+-\dfg@topic
+-\subsection{Report and Funding Period \deu{(Berichts- und F\"orderzeitraum)}}
++\subsection{Report and Funding Period}
+ \prop@gen@reportperiod
+ \dfg@area@field
+-\subsection{Application Areas \deu{(Verwertungsfelder)}}\prop@gen@applareas
++\subsection{Application Areas}\prop@gen@applareas
+ \dfgprojpapers\prop@gen@projpapers}
+-{\signatures{Signatures \deu{(Unterschriften)}}}
++{}
+ \endinput
+ %%
+ %% End of file `dfgreporting.cls'.
+diff -up tex/latex/proposal/eu/eupdata.sty.noworkaddress tex/latex/proposal/eu/eupdata.sty
+--- tex/latex/proposal/eu/eupdata.sty.noworkaddress	2016-04-15 17:38:41.000000000 -0400
++++ tex/latex/proposal/eu/eupdata.sty	2022-12-31 12:33:20.956764811 -0500
+@@ -7,9 +7,11 @@
+ %% euproposal.dtx  (with options: `pdata')
+ %% 
+ \NeedsTeXFormat{LaTeX2e}[1999/12/01]
+-\ProvidesPackage{eupdata}[2016/04/15 v1.5 EU Project Data]
++\ProvidesPackage{eupdata}[2020/08/21 v1.7 EU Project Data]
+ \define@key{prop@gen}{coordinator}{\def\prop@gen@coordinator{#1}\pdata@def{prop}{gen}{coordinator}{#1}}
+-\define@key{prop@gen}{coordinatorsite}{\def\prop@gen@coordinatorsite{#1}\pdata@def{prop}{gen}{coordinator}{#1}}
++\define@key{prop@gen}{Csite}{\def\prop@gen@Csite{#1}\pdata@def{prop}{gen}{Csite}{#1}}
++\define@key{prop@gen}{Cemail}{\def\prop@gen@Cemail{#1}\pdata@def{prop}{gen}{Cemail}{#1}}
++\define@key{prop@gen}{Ctelfax}{\def\prop@gen@Ctelfax{#1}\pdata@def{prop}{gen}{Ctelfax}{#1}}
+ \def\prop@gen@challenge{??}\def\prop@gen@challengeid{??}
+ \define@key{prop@gen}{challenge}{\def\prop@gen@challenge{#1}\pdata@def{prop}{gen}{challenge}{#1}}
+ \define@key{prop@gen}{challengeid}{\def\prop@gen@challengeid{#1}\pdata@def{prop}{gen}{challengeid}{#1}}
+@@ -19,8 +21,8 @@
+ \def\prop@gen@outcome{??}\def\prop@gen@outcomeid{??}
+ \define@key{prop@gen}{outcome}{\def\prop@gen@outcome{#1}\pdata@def{prop}{gen}{outcome}{#1}}
+ \define@key{prop@gen}{outcomeid}{\def\prop@gen@outcomeid{#1}\pdata@def{prop}{gen}{outcomeid}{#1}}
+-\define@key{prop@gen}{callname}{\def\prop@gen@call{#1}\pdata@def{prop}{gen}{callname}{#1}}
+-\define@key{prop@gen}{callid}{\def\prop@gen@call{#1}\pdata@def{prop}{gen}{callid}{#1}}
++\define@key{prop@gen}{callname}{\def\prop@gen@callname{#1}\pdata@def{prop}{gen}{callname}{#1}}
++\define@key{prop@gen}{callid}{\def\prop@gen@callid{#1}\pdata@def{prop}{gen}{callid}{#1}}
+ \define@key{prop@gen}{iconrowheight}{\def\prop@gen@iconrowheight{#1}}
+ \define@key{prop@gen}{topicsaddressed}{\def\prop@gen@topicsaddressed{#1}}
+ \endinput
+diff -up tex/latex/proposal/eu/euproposal.cls.noworkaddress tex/latex/proposal/eu/euproposal.cls
+--- tex/latex/proposal/eu/euproposal.cls.noworkaddress	2016-04-15 17:38:41.000000000 -0400
++++ tex/latex/proposal/eu/euproposal.cls	2022-12-31 12:33:20.956764811 -0500
+@@ -7,32 +7,35 @@
+ %% euproposal.dtx  (with options: `cls')
+ %% 
+ \NeedsTeXFormat{LaTeX2e}[1999/12/01]
+-\ProvidesClass{euproposal}[2016/04/15 v1.5 EU Proposal]
++\ProvidesClass{euproposal}[2020/08/21 v1.7 EU Proposal]
+ \newif\ifpartB\partBfalse
+ \DeclareOption{partB}{\partBtrue}
++\newif\if@split\@splitfalse
++\DeclareOption{split}{\@splittrue}
+ \DeclareOption*{\PassOptionsToClass{\CurrentOption}{proposal}}
+ \ProcessOptions
+-\ifpartB\LoadClass[report,noRAM]{proposal}\else\LoadClass[noRAM]{proposal}\fi
++\ifpartB\LoadClass[report]{proposal}\else\LoadClass{proposal}\fi
+ \RequirePackage{longtable}
+ \RequirePackage{eurosym}
+ \RequirePackage{wrapfig}
+ \RequirePackage{eupdata}
++\RequirePackage{datetime}
+ \RequirePackage{chngcntr}
+ \counterwithin{figure}{subsection}
+ \counterwithin{table}{subsection}
++\setcounter{secnumdepth}{4}
+ \ifpartB
+ \def\thepart{\Alph{part}}
+ \setcounter{part}{2}
+ \def\thechapter{\thepart.\arabic{chapter}}
+ \def\numberline#1{\hb@xt@\@tempdima{#1\hfil} }
+-\fi
++\fi% ifpartB
+ \newcommand\prop@sites@table{\def\@@table{}
+ {\let\tabularnewline\relax\let\hline\relax
+-\@for\@I:=\prop@gen@sites\do{\xdef\@@table{\@@table\pdataref{site}\@I{number}}
+-\xdef\@@table{\@@table&\@nameuse{wa@institution@\@I @name}
+-\ifx\@I\prop@gen@coordinatorsite (coordinator)\fi}
+-\xdef\@@table{\@@table&\@nameuse{wa@institution@\@I @acronym}}
+-\xdef\@@table{\@@table&\@nameuse{wa@institution@\@I @countryshort}\tabularnewline\hline}}}
++\@for\@I:=\prop@gen@sites\do{\xdef\@@table{\@@table\pdataref@safe{site}\@I{number}}
++\xdef\@@table{\@@table&\pdataref@safe{site}\@I{shortname}\ifx\@I\prop@gen@coordinatorsite (coordinator)\fi}
++\xdef\@@table{\@@table&\pdataref@safe{site}\@I{acronym}}
++\xdef\@@table{\@@table&\pdataref@safe{site}\@I{countryshort}\tabularnewline\hline}}}
+ \begin{tabular}{|l|p{8cm}|l|l|}\hline%|
+ \# & Participant organisation name & Short name &  Country\\\hline\hline
+ \@@table
+@@ -44,9 +47,9 @@
+   {\Large\textbf\prop@gen@callname}\\[.4cm]
+   {\LARGE \prop@gen@callid}\\[.8cm]
+   {\huge\textbf\prop@gen@title}\\[.4cm]
+-  {\LARGE Acronym: {\prop@gen@acronym}}\\[2cm]
++  \ifx\prop@gen@acronym\@empty\else{\LARGE Acronym: {\prop@gen@acronym}}\\[2cm]\fi
+ \end{center}
+-{\large\textbf{Date of Preparation: \today}}
++{\large\textbf{Date of Preparation: \today: \currenttime}}
+ \\[1em]
+ \begin{large}
+  \begin{description}
+@@ -56,9 +59,9 @@
+   %   \textbf{Objective \prop@gen@objectiveid}: \prop@gen@objective,
+   %   \textbf{target outcome \prop@gen@outcomeid}) \prop@gen@outcome.
+   %   {\prop@gen@topicsaddressed}\\[1em]
+-  \item[Coordinator:] \wa@ref{person}\prop@gen@coordinator{name}
+-  \item[e-mail:] \wa@ref{person}\prop@gen@coordinator{email}
+-  \item[tel/fax:] \wa@ref{person}\prop@gen@coordinator{worktelfax}
++  \item[Coordinator:] \prop@gen@coordinator
++  \item[e-mail:] \prop@gen@Cemail
++  \item[tel/fax:] \prop@gen@Ctelfax
+     \@ifundefined{prop@gen@keywords}{}{\item[Keywords:]  \prop@gen@keywords}
+   \end{description}
+ \end{large}
+@@ -66,12 +69,18 @@
+ \begin{center}
+ \prop@sites@table\vfill
+ \@ifundefined{prop@gen@iconrowheight}{}
+-{\@for\@site:=\prop@gen@sites\do{\wa@institution@logo[height=\prop@gen@iconrowheight]\@site\qquad}}
++{\@for\@site:=\prop@gen@sites\do{\includegraphics[height=\prop@gen@iconrowheight]{\pdataref@safe{site}\@site{logo}}\qquad}}
+ \end{center}
+ \newpage
+ \fi% ifgrantagreement
+ \setcounter{tocdepth}{2}\setcounter{part}{2}}
+-{\newpage\printbibliography[heading=warnpubs,maxnames=999]}
++{\newpage\printbibliography[heading=warnpubs]%
++\if@split
++\newwrite\@@SPLIT%
++\immediate\openout\@@SPLIT=SPLIT.at%
++\protected@write\@@SPLIT{}{\thepage}%
++\closeout\@@SPLIT%
++\fi}% if@split
+ \def\prop@gen@instrument{Proposal Instrument (e.g. IP)}
+ \define@key{site@desc}{box}[true]{\def\site@desc@box{#1}%
+ \pdata@def{sitedesc}{\@site}{box}{#1}}
+@@ -93,16 +102,16 @@
+ \begin{wrapfigure}{r}{\site@desc@width}\vspace{-2.5ex}%
+ \begin{tabular}{|p{\site@desc@width}|}\hline\vspace{1mm}%
+ \ifx\@site@desc@logo\@true% if we want a logo
+-\wa@institution@logo[height=\site@desc@width]{#2}\\[1ex]%
++\includegraphics[height=\site@desc@width]{#2}\\[1ex]%
+ \fi% end logo
+-\textbf{\wa@ref{institution}{#2}{type}.\hfill \wa@ref{institution}{#2}{country}}\\%
+-\small\wa@ref{institution}{#2}{streetaddress}, \wa@ref{institution}{#2}{townzip}\\\hline%
++\textbf{\pdataref@safe{site}{#2}{type}.\hfill \pdataref@safe{site}{#2}{country}}\\%
++\small\pdataref@safe{site}{#2}{streetaddress}, \pdataref@safe{site}{#2}{townzip}\\\hline%
+ \end{tabular}\vspace{-2.5ex}%
+ \end{wrapfigure}%
+ \fi% end box
+ \pdata@target{site}{#2}%
+-{\subsubsection{\wa@ref{institution}{#2}{acronym}: % space here
+-{\textsc{\wa@ref{institution}{#2}{name}}  (\wa@ref{institution}{#2}{countryshort})}}}%
++{\subsubsection{\pdataref@safe{site}{#2}{acronym}: % space here
++{\textsc{\pdataref@safe{site}{#2}{shortname}}  (\pdataref@safe{site}{#2}{countryshort})}}}%
+ \small%
+ \renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+                                     {0.25ex \@plus1ex \@minus.2ex}%
+@@ -148,6 +157,8 @@
+ \define@key{mst}{wdeliv}{\gdef\mst@wdeliv{#1}}
+ \define@key{mst}{wverif}{\gdef\mst@wverif{#1}}
+ \newcommand\milestonetable[1][]{%
++\IfFileExists{./\jobname.deliverables}{% to avoid errors
++\message{euproposal.cls: Generating Milestones Table}%
+ \def\mst@caption{Milestones, Deliverables, and Verification}%
+ \def\mst@wname{2.5cm}\def\mst@wdeliv{7cm}\def\mst@wverif{4cm}
+ \setkeys{mst}{#1}%
+@@ -174,14 +185,15 @@
+ &\textbf{\miles@legend@verif}\\\hline\hline
+ \mst@lines
+ \end{tabular}
+-\caption{\mst@caption}\label{tab:milestonetable}
+-\end{table}
+-\footnotetext\miles@legend@footnote}
++\caption{\mst@caption\ ($^\ast$\miles@legend)}\label{tab:milestonetable}
++\end{table}}
++{\ClassWarning{not formatting mile stones table yet, deliverables are
++  still missing; generate\jobname.deliverables\ to get it!}}}
+ \newcommand\miles@legend@name{Name}
+ \newcommand\miles@legend@mo{Mo}
+ \newcommand\miles@legend@verif{Means of Verif.}
+-\newcommand\miles@legend@involved{WPs\footnotemark/Deliverables involved}
+-\newcommand\miles@legend@footnote{The work package number is the first number in the deliverable number.}
++\newcommand\miles@legend@involved{WPs$^\ast$/Deliverables involved}
++\newcommand\miles@legend{WP is first number in deliverable label}
+ \newcommand\prop@milesfor[1]{\edef\@delivs{\pdataref@safe{mile}{#1}{delivs}}%
+ \let\m@sep=\relax\def\new@sep{,\ }%
+ \@for\@I:=\@delivs\do{\m@sep\pdataRef{deliv}\@I{label}\let\m@sep=\new@sep}}
+@@ -192,8 +204,7 @@
+ {\begin{risk}{#1}{#2}{#3}\textbf{Contingency:} }
+ {\end{risk}}
+ \newcommand\keypubs[1]{%
+-\paragraph{Key publications relevant to the project}%
+-{\renewcommand{\baselinestretch}{.9}\prop@paperlist{#1}}}
++\begin{refsection}\nocite{#1}\printbibliography[heading=empty]\end{refsection}}
+ \endinput
+ %%
+ %% End of file `euproposal.cls'.
+diff -up tex/latex/proposal/eu/eureporting.cls.noworkaddress tex/latex/proposal/eu/eureporting.cls
+--- tex/latex/proposal/eu/eureporting.cls.noworkaddress	2016-04-15 17:38:41.000000000 -0400
++++ tex/latex/proposal/eu/eureporting.cls	2022-12-31 12:33:20.956764811 -0500
+@@ -7,17 +7,19 @@
+ %% euproposal.dtx  (with options: `reporting')
+ %% 
+ \NeedsTeXFormat{LaTeX2e}[1999/12/01]
+-\ProvidesPackage{eureporting}[2016/04/15 v1.5 EU Project Reporting]
++\ProvidesPackage{eureporting}[2020/08/21 v1.7 EU Project Reporting]
+ \DeclareOption*{\PassOptionsToClass{\CurrentOption}{reporting}}
+ \ProcessOptions
+-\LoadClass[report,noRAM]{reporting}
++\LoadClass[report]{reporting}
+ \RequirePackage{longtable}
+ \RequirePackage{eurosym}
+ \RequirePackage{wrapfig}
+ \RequirePackage{eupdata}
++\RequirePackage{datetime}
+ \RequirePackage{chngcntr}
+ \counterwithin{figure}{subsection}
+ \counterwithin{table}{subsection}
++\setcounter{secnumdepth}{4}
+ \define@key{prop@gen}{reportperiod}{\def\prop@gen@reportperiod{#1}}
+ \define@key{prop@gen}{key}{\@dmp{key=#1}%
+ \@ifundefined{prop@gen@keys}{\xdef\prop@gen@keys{#1}}{\xdef\prop@gen@keys{\prop@gen@keys,#1}}}

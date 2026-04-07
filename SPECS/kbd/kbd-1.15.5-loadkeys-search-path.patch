@@ -1,0 +1,24 @@
+diff -up kbd-2.7-rc1/configure.ac.orig kbd-2.7-rc1/configure.ac
+--- kbd-2.7-rc1/configure.ac.orig	2024-10-28 16:18:31.000000000 +0100
++++ kbd-2.7-rc1/configure.ac	2024-10-29 12:15:12.915552224 +0100
+@@ -156,6 +156,8 @@ AC_DEFUN([KBD_SUBST_DEFINE], [
+ 
+ KBD_SUBST_DEFINE([OLDKEYMAPDIR],  ["keytables"],    [Subdirectory of DATADIR])
+ KBD_SUBST_DEFINE([KEYMAPDIR],     ["keymaps"],      [Subdirectory of DATADIR])
++KBD_SUBST_DEFINE([XKBKEYMAPDIR],  ["keymaps/xkb"],      [Subdirectory of DATADIR])
++KBD_SUBST_DEFINE([LEGACYKEYMAPDIR],  ["keymaps/legacy"],      [Subdirectory of DATADIR])
+ KBD_SUBST_DEFINE([UNIMAPDIR],     ["unimaps"],      [Subdirectory of DATADIR])
+ KBD_SUBST_DEFINE([TRANSDIR],      ["consoletrans"], [Subdirectory of DATADIR])
+ KBD_SUBST_DEFINE([VIDEOMODEDIR],  ["videomodes"],   [Subdirectory of DATADIR])
+diff -up kbd-2.7-rc1/src/loadkeys.c.orig kbd-2.7-rc1/src/loadkeys.c
+--- kbd-2.7-rc1/src/loadkeys.c.orig	2024-10-19 00:12:27.000000000 +0200
++++ kbd-2.7-rc1/src/loadkeys.c	2024-10-29 12:17:24.519755349 +0100
+@@ -26,6 +26,8 @@
+ 
+ static const char *const dirpath1[] = {
+ 	DATADIR "/" KEYMAPDIR "/**",
++	DATADIR "/" XKBKEYMAPDIR "/",
++	DATADIR "/" LEGACYKEYMAPDIR "/**",
+ 	KERNDIR "/",
+ 	NULL
+ };

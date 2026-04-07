@@ -1,0 +1,146 @@
+From 78a0cd5bdbe447bab807a09fae18d8a961366abc Mon Sep 17 00:00:00 2001
+From: Olivier Fourdan <ofourdan@redhat.com>
+Date: Mon, 16 Jun 2025 14:29:22 +0200
+Subject: [PATCH 1/2] Xm/Screen: Add _NET_WORKAREA support
+
+Add support for the extended window manager hint _NET_WORKAREA to
+prevent Motif from placing its widgets outside of the geometry
+advertised by the window manager.
+
+Support for _NET_WORKAREA depends on the Xinerama patches as it shares
+the same logic.
+
+Signed-off-by: Olivier Fourdan <ofourdan@redhat.com>
+---
+ lib/Xm/Screen.c | 108 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 108 insertions(+)
+
+diff --git a/lib/Xm/Screen.c b/lib/Xm/Screen.c
+index 44abcfb3..6269ffb3 100644
+--- a/lib/Xm/Screen.c
++++ b/lib/Xm/Screen.c
+@@ -1517,6 +1517,113 @@ XmGetXmScreen(
+ 	return widget;
+ }
+ 
++static int
++_XmScreenGetCurrentDesktop(Screen *screen)
++{
++    static Atom   XmA_NET_CURRENT_DESKTOP = None;
++    Atom          type;
++    Display       *dpy;
++    Window        rootwindow;
++    int           result = False;
++    int           desktop = 0;
++    int           format;
++    unsigned long lengthRtn;
++    unsigned long bytesAfter;
++    unsigned char *data;
++
++    dpy = DisplayOfScreen(screen);
++    rootwindow = RootWindowOfScreen(screen);
++
++    if (XmA_NET_CURRENT_DESKTOP == None)
++      XmA_NET_CURRENT_DESKTOP = XInternAtom(dpy, "_NET_CURRENT_DESKTOP", False);
++
++    result =XGetWindowProperty(dpy, rootwindow,
++                               XmA_NET_CURRENT_DESKTOP,
++                               0L, 100000L, False, XA_CARDINAL,
++                               &type, &format, &lengthRtn, &bytesAfter,
++                               &data);
++
++    if (type == XA_CARDINAL) {
++      desktop = *(int *)data;
++      XFree(data);
++    }
++#ifdef DEBUG_XINERAMA
++    printf("Current desktop is %i\n", desktop);
++#endif /* DEBUG_XINERAMA */
++
++  return desktop;
++}
++
++static void
++_XmCheckNetWorkarea(
++        Screen *screen,
++	Position *ret_x,
++	Position *ret_y,
++	Position *ret_max_x,
++	Position *ret_max_y )
++{
++    static Atom   XmA_NET_WORKAREA = None;
++    Atom          type;
++    Display       *dpy;
++    Window        rootwindow;
++    int           result = False;
++    int           desktop = 0;
++    int           format;
++    unsigned long lengthRtn;
++    unsigned long bytesAfter;
++    unsigned char *data;
++    long          *net_workarea;
++
++    dpy = DisplayOfScreen(screen);
++    rootwindow = RootWindowOfScreen(screen);
++    desktop = _XmScreenGetCurrentDesktop(screen);
++
++    if (XmA_NET_WORKAREA == None)
++      XmA_NET_WORKAREA = XInternAtom(dpy, "_NET_WORKAREA", False);
++
++    result =XGetWindowProperty(dpy, rootwindow,
++                               XmA_NET_WORKAREA,
++                               0L, 100000L, False, XA_CARDINAL,
++                               &type, &format, &lengthRtn, &bytesAfter,
++                               &data);
++
++    if (result != Success || type != XA_CARDINAL || format != 32 ||
++        bytesAfter != 0 || lengthRtn % 4 != 0 || desktop + 1 > lengthRtn / 4)
++      goto done;
++
++    net_workarea = (long *) data;
++
++#define NET_WORKAREA_X (desktop * 4)
++#define NET_WORKAREA_Y (desktop * 4 + 1)
++#define NET_WORKAREA_WIDTH (desktop * 4 + 2)
++#define NET_WORKAREA_HEIGHT (desktop * 4 + 3)
++
++    if (*ret_x < net_workarea[NET_WORKAREA_X])
++      *ret_x = net_workarea[NET_WORKAREA_X];
++
++    if (*ret_y < net_workarea[NET_WORKAREA_Y])
++      *ret_y = net_workarea[NET_WORKAREA_Y];
++
++    if (*ret_max_x > net_workarea[NET_WORKAREA_X] + net_workarea[NET_WORKAREA_WIDTH])
++      *ret_max_x = net_workarea[NET_WORKAREA_X] + net_workarea[NET_WORKAREA_WIDTH];
++
++    if (*ret_max_y > net_workarea[NET_WORKAREA_Y] + net_workarea[NET_WORKAREA_HEIGHT])
++      *ret_max_y = net_workarea[NET_WORKAREA_Y] + net_workarea[NET_WORKAREA_HEIGHT];
++
++#undef NET_WORKAREA_X
++#undef NET_WORKAREA_Y
++#undef NET_WORKAREA_WIDTH
++#undef NET_WORKAREA_HEIGHT
++
++#ifdef DEBUG_XINERAMA
++    printf("_NET_WORKAREA within (%i,%i) and (%i,%i)\n", *ret_x, *ret_y, *ret_max_x, *ret_max_y);
++#endif /* DEBUG_XINERAMA */
++
++done:
++    if (data)
++      XFree(data);
++}
++
+ void
+ _XmScreenGetBoundariesAtpoint(
+         Screen *screen,
+@@ -1561,6 +1668,7 @@ _XmScreenGetBoundariesAtpoint(
+       }
+     }
+ #endif /* HAVE_LIBXINERAMA */
++    _XmCheckNetWorkarea(screen, &screen_x, &screen_y, &screen_max_x, &screen_max_y);
+ out:
+ #ifdef DEBUG_XINERAMA
+     printf("Point (%i,%i) constrained within (%i,%i) and (%i,%i)\n",
+-- 
+2.50.0
+

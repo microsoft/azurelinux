@@ -1,0 +1,26 @@
+From ffaeebcfdb56ba75392af21c68c0bac78a226b55 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Lyson=C4=9Bk?= <olysonek@redhat.com>
+Date: Tue, 2 Jan 2018 09:54:43 +0100
+Subject: [PATCH 44/59] Disable anonymous_enable in default config file
+
+Resolves: rhbz#1338637
+---
+ vsftpd.conf | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/vsftpd.conf b/vsftpd.conf
+index 39d1955..4626c1b 100644
+--- a/vsftpd.conf
++++ b/vsftpd.conf
+@@ -9,7 +9,7 @@
+ # capabilities.
+ #
+ # Allow anonymous FTP? (Beware - allowed by default if you comment this out).
+-anonymous_enable=YES
++anonymous_enable=NO
+ #
+ # Uncomment this to allow local users to log in.
+ # When SELinux is enforcing check for SE bool ftp_home_dir
+-- 
+2.14.4
+

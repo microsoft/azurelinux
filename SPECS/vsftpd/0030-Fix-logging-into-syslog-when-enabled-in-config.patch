@@ -1,0 +1,25 @@
+From 03ff061f18f555d7bec62fa6a597a275b4b3f1c7 Mon Sep 17 00:00:00 2001
+From: Martin Sehnoutka <msehnout@redhat.com>
+Date: Thu, 17 Nov 2016 13:18:22 +0100
+Subject: [PATCH 30/59] Fix logging into syslog when enabled in config.
+
+---
+ logging.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/logging.c b/logging.c
+index 99671b4..c4461f7 100644
+--- a/logging.c
++++ b/logging.c
+@@ -32,7 +32,7 @@ vsf_log_init(struct vsf_session* p_sess)
+ {
+   if (tunable_syslog_enable || tunable_tcp_wrappers)
+   {
+-    vsf_sysutil_openlog(1);
++    vsf_sysutil_openlog(0);
+   }
+   if (!tunable_xferlog_enable && !tunable_dual_log_enable)
+   {
+-- 
+2.14.4
+

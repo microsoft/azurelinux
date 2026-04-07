@@ -1,0 +1,14 @@
+diff --git a/output.c b/output.c
+index 7cab383..18f9cf0 100644
+--- a/output.c
++++ b/output.c
+@@ -598,6 +598,9 @@ frame_callback (Dwfl_Frame *state, void *arg)
+ 					   NULL, NULL, NULL);
+ 		symname = dwfl_module_addrinfo(mod, pc, &off, &sym,
+ 					       NULL, NULL, NULL);
++	} else {
++		modname = "unknown";
++		symname = "unknown";
+ 	}
+ 
+ 	/* This mimics the output produced by libunwind below.  */

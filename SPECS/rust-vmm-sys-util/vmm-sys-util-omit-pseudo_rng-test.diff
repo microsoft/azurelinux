@@ -1,0 +1,12 @@
+diff --git a/src/rand.rs b/src/rand.rs
+index 7a9e3e7..05972fd 100644
+--- a/src/rand.rs
++++ b/src/rand.rs
+@@ -113,6 +113,7 @@ mod tests {
+     }
+ 
+     #[test]
++    #[cfg(not(target_arch = "aarch64"))]
+     fn test_xor_pseudo_rng_u32() {
+         for _ in 0..1000 {
+             assert_ne!(xor_pseudo_rng_u32(), xor_pseudo_rng_u32());

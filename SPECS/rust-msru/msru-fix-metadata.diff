@@ -1,0 +1,11 @@
+--- msru-0.2.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ msru-0.2.0/Cargo.toml	2023-07-25T10:53:36.573509+00:00
+@@ -15,7 +15,7 @@
+ name = "msru"
+ version = "0.2.0"
+ authors = ["Larry Dewey <larry.dewey@amd.com>"]
+-description = "A Rust-safe library for interracting with Model Specific Registers in user-space."
++description = "A Rust-safe library for interacting with Model Specific Registers in user-space."
+ homepage = "https://github.com/virtee/msru"
+ readme = "README.md"
+ keywords = [

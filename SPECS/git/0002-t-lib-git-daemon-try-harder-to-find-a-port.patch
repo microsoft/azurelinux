@@ -1,0 +1,88 @@
+From e90e1068ddc9cfa3badd23b16a46c57ed6d8308a Mon Sep 17 00:00:00 2001
+From: Todd Zullinger <tmz@pobox.com>
+Date: Fri, 26 Aug 2022 18:28:44 -0400
+Subject: [PATCH] t/lib-git-daemon: try harder to find a port
+
+As with the previous commit, try harder to find an open port to avoid
+intermittent failures on busy/shared build systems.
+
+By default, we make 3 attempts.  This may be overridden by setting
+GIT_TEST_START_GIT_DAEMON_TRIES to a different value.
+
+Signed-off-by: Todd Zullinger <tmz@pobox.com>
+---
+ t/lib-git-daemon.sh | 60 ++++++++++++++++++++++++++++-----------------
+ 1 file changed, 37 insertions(+), 23 deletions(-)
+
+diff --git a/t/lib-git-daemon.sh b/t/lib-git-daemon.sh
+index e62569222b..c3e8dda9ff 100644
+--- a/t/lib-git-daemon.sh
++++ b/t/lib-git-daemon.sh
+@@ -51,30 +51,44 @@ start_git_daemon() {
+ 		registered_stop_git_daemon_atexit_handler=AlreadyDone
+ 	fi
+ 
+-	say >&3 "Starting git daemon ..."
+-	mkfifo git_daemon_output
+-	${LIB_GIT_DAEMON_COMMAND:-git daemon} \
+-		--listen=127.0.0.1 --port="$LIB_GIT_DAEMON_PORT" \
+-		--reuseaddr --verbose --pid-file="$GIT_DAEMON_PIDFILE" \
+-		--base-path="$GIT_DAEMON_DOCUMENT_ROOT_PATH" \
+-		"$@" "$GIT_DAEMON_DOCUMENT_ROOT_PATH" \
+-		>&3 2>git_daemon_output &
+-	GIT_DAEMON_PID=$!
+-	{
+-		read -r line <&7
+-		printf "%s\n" "$line" >&4
+-		cat <&7 >&4 &
+-	} 7<git_daemon_output &&
++	i=0
++	while test $i -lt ${GIT_TEST_START_GIT_DAEMON_TRIES:-3}
++	do
++		say >&3 "Starting git daemon on port $LIB_GIT_DAEMON_PORT ..."
++		mkfifo git_daemon_output
++		${LIB_GIT_DAEMON_COMMAND:-git daemon} \
++			--listen=127.0.0.1 --port="$LIB_GIT_DAEMON_PORT" \
++			--reuseaddr --verbose --pid-file="$GIT_DAEMON_PIDFILE" \
++			--base-path="$GIT_DAEMON_DOCUMENT_ROOT_PATH" \
++			"$@" "$GIT_DAEMON_DOCUMENT_ROOT_PATH" \
++			>&3 2>git_daemon_output &
++		GIT_DAEMON_PID=$!
++		{
++			read -r line <&7
++			printf "%s\n" "$line" >&4
++			cat <&7 >&4 &
++		} 7<git_daemon_output &&
+ 
+-	# Check expected output
+-	if test x"$(expr "$line" : "\[[0-9]*\] \(.*\)")" != x"Ready to rumble"
+-	then
+-		kill "$GIT_DAEMON_PID"
+-		wait "$GIT_DAEMON_PID"
+-		unset GIT_DAEMON_PID
+-		test_skip_or_die GIT_TEST_GIT_DAEMON \
+-			"git daemon failed to start"
+-	fi
++		# Check expected output
++		output="$(expr "$line" : "\[[0-9]*\] \(.*\)")"
++		# Return if found
++		test x"$output" = x"Ready to rumble" && return
++		# Increment port for retry if not found
++		LIB_GIT_DAEMON_PORT=$(($LIB_GIT_DAEMON_PORT + 1))
++		export LIB_GIT_DAEMON_PORT
++		GIT_DAEMON_HOST_PORT=127.0.0.1:$LIB_GIT_DAEMON_PORT
++		GIT_DAEMON_URL=git://$GIT_DAEMON_HOST_PORT
++		# unset GIT_DAEMON_PID; remove the fifo & pid file
++		GIT_DAEMON_PID=
++		rm -f git_daemon_output "$GIT_DAEMON_PIDFILE"
++	done
++
++	# Clean up and return failure
++	kill "$GIT_DAEMON_PID"
++	wait "$GIT_DAEMON_PID"
++	unset GIT_DAEMON_PID
++	test_skip_or_die GIT_TEST_GIT_DAEMON \
++		"git daemon failed to start"
+ }
+ 
+ stop_git_daemon() {

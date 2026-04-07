@@ -1,0 +1,75 @@
+From 13d05b8057010121acd2a402a337ef4ee5834062 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Thu, 30 May 2024 23:05:14 -0400
+Subject: [PATCH] Replace pipes.quote with shlex.quote on Python 3
+
+The shlex.quote() API is available from Python 3.3 on; pipes.quote() was
+never documented, and is removed in Python 3.13.
+
+Fixes #73.
+---
+ humanfriendly/cli.py     | 8 ++++++--
+ humanfriendly/testing.py | 8 ++++++--
+ 2 files changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/humanfriendly/cli.py b/humanfriendly/cli.py
+index eb81db1..5dfc14a 100644
+--- a/humanfriendly/cli.py
++++ b/humanfriendly/cli.py
+@@ -79,10 +79,14 @@
+ # Standard library modules.
+ import functools
+ import getopt
+-import pipes
+ import subprocess
+ import sys
+ 
++try:
++    from shlex import quote  # Python 3
++except ImportError:
++    from pipes import quote  # Python 2 (removed in 3.13)
++
+ # Modules included in our package.
+ from humanfriendly import (
+     Timer,
+@@ -176,7 +180,7 @@ def main():
+ def run_command(command_line):
+     """Run an external command and show a spinner while the command is running."""
+     timer = Timer()
+-    spinner_label = "Waiting for command: %s" % " ".join(map(pipes.quote, command_line))
++    spinner_label = "Waiting for command: %s" % " ".join(map(quote, command_line))
+     with Spinner(label=spinner_label, timer=timer) as spinner:
+         process = subprocess.Popen(command_line)
+         while True:
+diff --git a/humanfriendly/testing.py b/humanfriendly/testing.py
+index f6abddf..f9d66e4 100644
+--- a/humanfriendly/testing.py
++++ b/humanfriendly/testing.py
+@@ -25,13 +25,17 @@
+ import functools
+ import logging
+ import os
+-import pipes
+ import shutil
+ import sys
+ import tempfile
+ import time
+ import unittest
+ 
++try:
++    from shlex import quote  # Python 3
++except ImportError:
++    from pipes import quote  # Python 2 (removed in 3.13)
++
+ # Modules included in our package.
+ from humanfriendly.compat import StringIO
+ from humanfriendly.text import random_string
+@@ -521,7 +525,7 @@ def __enter__(self):
+         pathname = os.path.join(directory, self.program_name)
+         with open(pathname, 'w') as handle:
+             handle.write('#!/bin/sh\n')
+-            handle.write('echo > %s\n' % pipes.quote(self.program_signal_file))
++            handle.write('echo > %s\n' % quote(self.program_signal_file))
+             if self.program_script:
+                 handle.write('%s\n' % self.program_script.strip())
+             handle.write('exit %i\n' % self.program_returncode)

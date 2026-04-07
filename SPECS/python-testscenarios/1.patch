@@ -1,0 +1,40 @@
+From 9e2c6ba88925700a42e46f554419fc1a31fc5f29 Mon Sep 17 00:00:00 2001
+From: Benedikt Morbach <benedikt.morbach@googlemail.com>
+Date: Sat, 18 Feb 2017 13:07:40 +0100
+Subject: [PATCH] fix load_tests interface
+
+see https://docs.python.org/3/library/unittest.html#load-tests-protocol
+---
+ testscenarios/__init__.py       | 2 +-
+ testscenarios/tests/__init__.py | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/testscenarios/__init__.py b/testscenarios/__init__.py
+index 43e24c6..d315236 100644
+--- a/testscenarios/__init__.py
++++ b/testscenarios/__init__.py
+@@ -70,6 +70,6 @@ def test_suite():
+     return testscenarios.tests.test_suite()
+ 
+ 
+-def load_tests(standard_tests, module, loader):
++def load_tests(loader, standard_tests, module):
+     standard_tests.addTests(loader.loadTestsFromNames(["testscenarios.tests"]))
+     return standard_tests
+diff --git a/testscenarios/tests/__init__.py b/testscenarios/tests/__init__.py
+index ecec6b1..d77d2e1 100644
+--- a/testscenarios/tests/__init__.py
++++ b/testscenarios/tests/__init__.py
+@@ -26,10 +26,10 @@ def test_suite():
+     standard_tests = unittest.TestSuite()
+     module = sys.modules['testscenarios.tests']
+     loader = unittest.TestLoader()
+-    return load_tests(standard_tests, module, loader)
++    return load_tests(loader, standard_tests, module)
+ 
+ 
+-def load_tests(standard_tests, module, loader):
++def load_tests(loader, standard_tests, module):
+     test_modules = [
+         'testcase',
+         'scenarios',

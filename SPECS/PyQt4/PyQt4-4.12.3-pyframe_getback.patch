@@ -1,0 +1,12 @@
+diff -up PyQt4_gpl_x11-4.12.3/qpy/QtCore/qpycore_classinfo.cpp.me PyQt4_gpl_x11-4.12.3/qpy/QtCore/qpycore_classinfo.cpp
+--- PyQt4_gpl_x11-4.12.3/qpy/QtCore/qpycore_classinfo.cpp.me	2022-06-21 15:04:28.885197054 +0200
++++ PyQt4_gpl_x11-4.12.3/qpy/QtCore/qpycore_classinfo.cpp	2022-06-21 15:04:51.654741730 +0200
+@@ -36,7 +36,7 @@ PyObject *qpycore_ClassInfo(const char *
+ 
+     // We need the frame we were called from, not the current one.
+     if (frame)
+-        frame = frame->f_back;
++        frame = PyFrame_GetBack(frame);
+ 
+     if (!frame)
+     {

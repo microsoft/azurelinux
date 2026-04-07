@@ -1,0 +1,95 @@
+From 03572f60d1546b139cfc600111fe2ff6fd9a9a1c Mon Sep 17 00:00:00 2001
+From: Jerry James <loganjerry@gmail.com>
+Date: Tue, 31 Jan 2023 13:29:48 -0700
+Subject: [PATCH] Add missing parameter to lu1rec calls
+
+---
+ src/lusol7b.f |  4 +++-
+ src/lusol8b.f | 14 ++++++++++----
+ 2 files changed, 13 insertions(+), 5 deletions(-)
+
+diff --git a/src/lusol7b.f b/src/lusol7b.f
+index 2d4e286..294e76b 100644
+--- a/src/lusol7b.f
++++ b/src/lusol7b.f
+@@ -149,6 +149,7 @@
+      $                   inform )
+ 
+       implicit           double precision (a-h,o-z)
++      integer            ilast
+       integer            luparm(30)
+       double precision   parmlu(30), a(lena), c(m)
+       integer            indc(lena), indr(lena), ip(m), iq(n), lenr(m)
+@@ -214,7 +215,8 @@
+          minfre = n + 1
+          nfree  = lfree - lrow
+          if (nfree .ge. minfre) go to 200
+-         call lu1rec( m, .true., luparm, lrow, lena, a,indr,lenr,locr )
++         call lu1rec( m, .true., luparm, lrow, ilast, lena,
++     &                a, indr, lenr, locr )
+          cmprss = .true.
+          nfree  = lfree - lrow
+          if (nfree .lt. minfre) go to 970
+diff --git a/src/lusol8b.f b/src/lusol8b.f
+index 69de3a7..050604e 100644
+--- a/src/lusol8b.f
++++ b/src/lusol8b.f
+@@ -96,6 +96,7 @@
+      $                   inform, diag )
+ 
+       implicit           double precision (a-h,o-z)
++      integer            ilast
+       integer            luparm(30)
+       double precision   parmlu(30), a(lena), w(n)
+       integer            indc(lena), indr(lena), ip(m), iq(n)
+@@ -139,7 +140,8 @@
+       minfre = n
+       nfree  = lena - lenl - lrow
+       if (nfree .ge. minfre) go to 100
+-      call lu1rec( m, .true., luparm, lrow, lena, a, indr, lenr, locr )
++      call lu1rec( m, .true., luparm, lrow, ilast, lena,
++     &             a, indr, lenr, locr )
+       nfree  = lena - lenl - lrow
+       if (nfree .lt. minfre) go to 970
+ 
+@@ -522,6 +524,7 @@
+      $                   inform )
+ 
+       implicit           double precision (a-h,o-z)
++      integer            ilast
+       integer            luparm(30)
+       double precision   parmlu(30), a(lena), v(m), w(n)
+       integer            indc(lena), indr(lena), ip(m), iq(n)
+@@ -640,7 +643,8 @@
+       minfre = n + 1 - kfirst
+       nfree  = lfree - lrow
+       if (nfree .ge. minfre) go to 310
+-      call lu1rec( m, .true., luparm, lrow, lena, a, indr, lenr, locr )
++      call lu1rec( m, .true., luparm, lrow, ilast, lena,
++     &             a, indr, lenr, locr )
+       nfree  = lfree - lrow
+       if (nfree .lt. minfre) go to 970
+ 
+@@ -678,7 +682,8 @@
+          minfre = n
+          nfree  = lfree - lrow
+          if (nfree .ge. minfre) go to 420
+-         call lu1rec( m, .true., luparm, lrow, lena, a,indr,lenr,locr )
++         call lu1rec( m, .true., luparm, lrow, ilast, lena,
++     &                a, indr, lenr, locr )
+          nfree  = lfree - lrow
+          if (nfree .lt. minfre) go to 970
+ 
+@@ -700,7 +705,8 @@
+          minfre = n
+          nfree  = lfree - lrow
+          if (nfree .ge. minfre) go to 500
+-         call lu1rec( m, .true., luparm, lrow, lena, a,indr,lenr,locr )
++         call lu1rec( m, .true., luparm, lrow, ilast, lena,
++     &                a, indr, lenr, locr )
+          nfree  = lfree - lrow
+          if (nfree .lt. minfre) go to 970
+ 
+-- 
+2.39.1
+

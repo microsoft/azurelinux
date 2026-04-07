@@ -1,0 +1,132 @@
+commit 9f03432308609644d633ed79aaa17bcf19b6060e
+Author: Tomas Korbar <tkorbar@redhat.com>
+Date:   Fri Jan 27 14:01:11 2023 +0100
+
+    Fix connection to multihome servers
+    
+    When libserfs connection is rejected, epoll socket receives EPOLLHUP
+    and its handling has to be suspended if the connection was never
+    set up, so we can check another address if the target server
+    is located on more ip addresses.
+
+diff --git a/outgoing.c b/outgoing.c
+index 5f5f6b5..313b6c9 100644
+--- a/outgoing.c
++++ b/outgoing.c
+@@ -153,6 +153,11 @@ apr_status_t serf__conn_update_pollset(serf_connection_t *conn)
+ 
+     /* Now put it back in with the correct read/write values. */
+     desc.reqevents = APR_POLLHUP | APR_POLLERR;
++
++    if (conn->wait_for_connect) {
++        desc.reqevents |= APR_POLLOUT;
++    }
++
+     if (conn->requests &&
+         conn->state != SERF_CONN_INIT) {
+         /* If there are any outstanding events, then we want to read. */
+@@ -391,6 +396,9 @@ apr_status_t serf__open_connections(serf_context_t *ctx)
+         if (status != APR_SUCCESS) {
+             if (!APR_STATUS_IS_EINPROGRESS(status))
+                 return status;
++
++            /* Keep track of when we really connect */
++            conn->wait_for_connect = true;
+         }
+ 
+         /* Flag our pollset as dirty now that we have a new socket. */
+@@ -1253,7 +1261,7 @@ apr_status_t serf__process_connection(serf_connection_t *conn,
+      * the like sitting on the connection, we give the app a chance to read
+      * it before we trigger a reset condition.
+      */
+-    if ((events & APR_POLLIN) != 0) {
++    if ((events & APR_POLLIN) != 0 && !conn->wait_for_connect) {
+         if ((status = read_from_connection(conn)) != APR_SUCCESS)
+             return status;
+ 
+@@ -1264,7 +1272,13 @@ apr_status_t serf__process_connection(serf_connection_t *conn,
+             return APR_SUCCESS;
+         }
+     }
+-    if ((events & APR_POLLHUP) != 0) {
++    /*
++     * Since new connection which is refused also creates HUP event,
++     * we need to suppress its handling until we are sure that connection
++     * was established, so we can eventually handle denial of connection
++     * by trying different server
++     */
++    if ((events & APR_POLLHUP) != 0 && !conn->wait_for_connect) {
+         /* The connection got reset by the server. On Windows this can happen
+            when all data is read, so just cleanup the connection and open
+            a new one.
+@@ -1292,11 +1306,16 @@ apr_status_t serf__process_connection(serf_connection_t *conn,
+         {
+             apr_os_sock_t osskt;
+             if (!apr_os_sock_get(&osskt, conn->skt)) {
+-                int error;
++                int error = 0;
++                int rv;
+                 apr_socklen_t l = sizeof(error);
+ 
+-                if (!getsockopt(osskt, SOL_SOCKET, SO_ERROR, (char*)&error,
+-                                &l)) {
++                rv = getsockopt(osskt, SOL_SOCKET, SO_ERROR, (char*)&error, &l);
++                /* The error is placed in errno on Solaris for SO_ERROR */
++                if(rv)
++                    error = errno;
++
++                if (error) {
+                     status = APR_FROM_OS_ERROR(error);
+ 
+                     /* Handle fallback for multi-homed servers.
+@@ -1310,7 +1329,8 @@ apr_status_t serf__process_connection(serf_connection_t *conn,
+                         && conn->address->next != NULL
+                         && (APR_STATUS_IS_ECONNREFUSED(status)
+                             || APR_STATUS_IS_TIMEUP(status)
+-                            || APR_STATUS_IS_ENETUNREACH(status))) {
++                            || APR_STATUS_IS_ENETUNREACH(status)
++                            || APR_STATUS_IS_EHOSTUNREACH(status))) {
+ 
+                         conn->address = conn->address->next;
+                         return reset_connection(conn, 1);
+@@ -1324,6 +1344,8 @@ apr_status_t serf__process_connection(serf_connection_t *conn,
+         return APR_EGENERAL;
+     }
+     if ((events & APR_POLLOUT) != 0) {
++        if (conn->wait_for_connect)
++            conn->wait_for_connect = false;
+         if ((status = write_to_connection(conn)) != APR_SUCCESS)
+             return status;
+     }
+@@ -1358,6 +1380,7 @@ serf_connection_t *serf_connection_create(
+     conn->baton.u.conn = conn;
+     conn->hit_eof = 0;
+     conn->state = SERF_CONN_INIT;
++    conn->wait_for_connect = false;
+     conn->latency = -1; /* unknown */
+ 
+     /* Create a subpool for our connection. */
+diff --git a/serf_private.h b/serf_private.h
+index f906379..b2da7df 100644
+--- a/serf_private.h
++++ b/serf_private.h
+@@ -21,6 +21,8 @@
+ #ifndef _SERF_PRIVATE_H_
+ #define _SERF_PRIVATE_H_
+ 
++#include <stdbool.h>
++
+ /* ### what the hell? why does the APR interface have a "size" ??
+    ### the implication is that, if we bust this limit, we'd need to
+    ### stop, rebuild a pollset, and repopulate it. what suckage.  */
+@@ -284,6 +286,10 @@ struct serf_connection_t {
+     /* Calculated connection latency. Negative value if latency is unknown. */
+     apr_interval_time_t latency;
+ 
++    /* Wait for connect: connect() returned APR_EINPROGRESS.
++       Socket not usable yet */
++    bool wait_for_connect;
++
+     /* Needs to read first before we can write again. */
+     int stop_writing;
+ };

@@ -1,0 +1,26 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Tue, 15 Nov 2022 18:03:33 -0600
+Subject: [PATCH] RH: compile with libreadline support
+
+Since the license issue has been resolved, and there are problems with
+the command completion with libedit, use libreadline.
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ Makefile.inc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.inc b/Makefile.inc
+index 0e836f0a..e1d3fcd1 100644
+--- a/Makefile.inc
++++ b/Makefile.inc
+@@ -12,7 +12,7 @@
+ # Readline library to use, libedit, libreadline, or empty
+ # Caution: Using libreadline may make the multipathd binary undistributable,
+ # see https://github.com/opensvc/multipath-tools/issues/36
+-READLINE :=
++READLINE := libreadline
+ 
+ # List of scsi device handler modules to load on boot, e.g.
+ # SCSI_DH_MODULES_PRELOAD := scsi_dh_alua scsi_dh_rdac

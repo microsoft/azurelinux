@@ -1,0 +1,44 @@
+--- av-metrics-0.9.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ av-metrics-0.9.1/Cargo.toml	2026-02-21T21:31:01.903934+00:00
+@@ -14,7 +14,7 @@
+ name = "av-metrics"
+ version = "0.9.1"
+ authors = ["Josh Holmer <jholmer.in@gmail.com>"]
+-include = ["src/**/*"]
++include = ["src/**/*", "LICENSE"]
+ description = "A collection of algorithms for measuring audio/video metrics"
+ license = "MIT"
+ repository = "https://github.com/rust-av/av-metrics"
+@@ -23,16 +23,11 @@
+ [lib]
+ bench = false
+ 
+-[[bench]]
+-name = "bench"
+-path = "benches/bench.rs"
+-harness = false
+-
+ [dependencies.crossbeam]
+ version = "0.8"
+ 
+ [dependencies.itertools]
+-version = "0.10.0"
++version = "0.14.0"
+ 
+ [dependencies.lab]
+ version = "0.11.0"
+@@ -49,13 +44,10 @@
+ optional = true
+ 
+ [dependencies.thiserror]
+-version = "1"
++version = "2"
+ 
+ [dependencies.v_frame]
+ version = "0.3.1"
+ 
+-[dev-dependencies.criterion]
+-version = "0.4"
+-
+ [dev-dependencies.y4m]
+ version = "0.8.0"

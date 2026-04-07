@@ -1,0 +1,84 @@
+From 030d7edb179235b7df65ada3a79837b01e682a5b Mon Sep 17 00:00:00 2001
+From: Klaus Wenninger <klaus.wenninger@aon.at>
+Date: Thu, 21 Jul 2022 10:48:21 +0200
+Subject: [PATCH] Fix: query-watchdog: avoid issues on heap allocation failing
+
+coverity is moaning either due to slight code rearangement
+or new version/settings.
+---
+ src/sbd-common.c | 27 ++++++++++++++++++++++++++-
+ 1 file changed, 26 insertions(+), 1 deletion(-)
+
+diff --git a/src/sbd-common.c b/src/sbd-common.c
+index f3f226a..3abf75f 100644
+--- a/src/sbd-common.c
++++ b/src/sbd-common.c
+@@ -385,8 +385,17 @@ watchdog_populate_list(void)
+                     struct link_list_item *lli =
+                         calloc(1, sizeof(struct link_list_item));
+ 
++                    if (lli == NULL) {
++                        break;
++                    }
+                     lli->dev_node = strdup(buf);
+                     lli->link_name = strdup(entry_name);
++                    if ((lli->dev_node == NULL) || (lli->link_name == NULL)) {
++                        free(lli->dev_node);
++                        free(lli->link_name);
++                        free(lli);
++                        break;
++                    }
+                     lli->next = link_list;
+                     link_list = lli;
+                 }
+@@ -404,18 +413,27 @@ watchdog_populate_list(void)
+                 if(!stat(entry_name, &statbuf) && S_ISCHR(statbuf.st_mode) &&
+                    is_watchdog(statbuf.st_rdev)) {
+ 
+-                    int wdfd = watchdog_init_fd(entry_name, -1);
++                    int wdfd;
+                     struct watchdog_list_item *wdg =
+                         calloc(1, sizeof(struct watchdog_list_item));
+                     int len;
+                     struct link_list_item *tmp_list = NULL;
+ 
++                    if (wdg == NULL) {
++                        break;
++                    }
++
+                     wdg->dev = statbuf.st_rdev;
+                     wdg->dev_node = strdup(entry_name);
++                    if (wdg->dev_node == NULL) {
++                        free(wdg);
++                        break;
++                    }
+                     wdg->next = watchdog_list;
+                     watchdog_list = wdg;
+                     watchdog_list_items++;
+ 
++                    wdfd = watchdog_init_fd(entry_name, -1);
+                     if (wdfd >= 0) {
+                         struct watchdog_info ident;
+ 
+@@ -450,11 +468,18 @@ watchdog_populate_list(void)
+                             struct watchdog_list_item *dupe_wdg =
+                                 calloc(1, sizeof(struct watchdog_list_item));
+ 
++                            if (dupe_wdg == NULL) {
++                                break;
++                            }
+                             /* as long as we never purge watchdog_list
+                              * there is no need to dupe strings
+                              */
+                             *dupe_wdg = *wdg;
+                             dupe_wdg->dev_node = strdup(tmp_list->link_name);
++                            if (dupe_wdg->dev_node == NULL) {
++                                free(dupe_wdg);
++                                break;
++                            }
+                             dupe_wdg->next = watchdog_list;
+                             watchdog_list = dupe_wdg;
+                             watchdog_list_items++;
+-- 
+2.39.0
+

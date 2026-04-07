@@ -1,0 +1,11 @@
+--- hdrhistogram-7.5.4/Cargo.toml	1970-01-01T00:00:01+00:00
++++ hdrhistogram-7.5.4/Cargo.toml	2024-09-21T21:16:07.891291+00:00
+@@ -47,7 +47,7 @@
+ required-features = ["serialization"]
+ 
+ [dependencies.base64]
+-version = "0.21"
++version = "0.22"
+ optional = true
+ 
+ [dependencies.byteorder]

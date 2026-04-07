@@ -1,0 +1,778 @@
+From bdb2b85daa1358a182cf53bf68bbe019db5f82c3 Mon Sep 17 00:00:00 2001
+From: Viktor Ashirov <vashirov@redhat.com>
+Date: Thu, 5 Feb 2026 12:17:06 +0100
+Subject: [PATCH] Issue 7223 - Revert index scan limits for system indexes
+
+This reverts changes introduced by the following commits:
+c6f458b42 Issue 7189 - DSBLE0007 generates incorrect remediation commands for scan limits
+8b6b3a9f9 Issue 6966 - On large DB, unlimited IDL scan limit reduce the SRCH performance
+
+Relates: https://github.com/389ds/389-ds-base/issues/7223
+
+Reviewed by: @progier389, @tbordaz, @droideck (Thanks!)
+---
+ .../tests/suites/config/config_test.py        |  27 +---
+ .../healthcheck/health_system_indexes_test.py | 136 +-----------------
+ .../paged_results/paged_results_test.py       |  25 +---
+ ldap/servers/slapd/back-ldbm/back-ldbm.h      |   1 -
+ ldap/servers/slapd/back-ldbm/index.c          |   2 -
+ ldap/servers/slapd/back-ldbm/instance.c       | 104 +++-----------
+ ldap/servers/slapd/back-ldbm/ldbm_config.c    |  30 ----
+ ldap/servers/slapd/back-ldbm/ldbm_config.h    |   1 -
+ .../slapd/back-ldbm/ldbm_index_config.c       |   8 --
+ src/lib389/lib389/backend.py                  |  50 ++-----
+ src/lib389/lib389/cli_conf/backend.py         |  20 ---
+ 11 files changed, 40 insertions(+), 364 deletions(-)
+
+diff --git a/dirsrvtests/tests/suites/config/config_test.py b/dirsrvtests/tests/suites/config/config_test.py
+index cbb8875fa..2c7d949d0 100644
+--- a/dirsrvtests/tests/suites/config/config_test.py
++++ b/dirsrvtests/tests/suites/config/config_test.py
+@@ -706,19 +706,17 @@ def test_ndn_cache_size_enforcement(topo, request):
+ 
+     request.addfinalizer(fin)
+ 
+-def test_require_index(topo, request):
++def test_require_index(topo):
+     """Validate that unindexed searches are rejected
+ 
+     :id: fb6e31f2-acc2-4e75-a195-5c356faeb803
+     :setup: Standalone instance
+     :steps:
+         1. Set "nsslapd-require-index" to "on"
+-        2. ancestorid/idlscanlimit to 100
+-        3. Test an unindexed search is rejected
++        2. Test an unindexed search is rejected
+     :expectedresults:
+         1. Success
+         2. Success
+-        3. Success
+     """
+ 
+     # Set the config
+@@ -729,10 +727,6 @@ def test_require_index(topo, request):
+ 
+     db_cfg = DatabaseConfig(topo.standalone)
+     db_cfg.set([('nsslapd-idlistscanlimit', '100')])
+-    backend = Backends(topo.standalone).get_backend(DEFAULT_SUFFIX)
+-    ancestorid_index = backend.get_index('ancestorid')
+-    ancestorid_index.replace("nsIndexIDListScanLimit", ensure_bytes("limit=100 type=eq flags=AND"))
+-    topo.standalone.restart()
+ 
+     users = UserAccounts(topo.standalone, DEFAULT_SUFFIX)
+     for i in range(101):
+@@ -743,15 +737,10 @@ def test_require_index(topo, request):
+     with pytest.raises(ldap.UNWILLING_TO_PERFORM):
+         raw_objects.filter("(description=test*)")
+ 
+-    def fin():
+-        ancestorid_index.replace("nsIndexIDListScanLimit", ensure_bytes("limit=5000 type=eq flags=AND"))
+-
+-    request.addfinalizer(fin)
+-
+ 
+ 
+ @pytest.mark.skipif(ds_is_older('1.4.2'), reason="The config setting only exists in 1.4.2 and higher")
+-def test_require_internal_index(topo, request):
++def test_require_internal_index(topo):
+     """Ensure internal operations require indexed attributes
+ 
+     :id: 22b94f30-59e3-4f27-89a1-c4f4be036f7f
+@@ -782,10 +771,6 @@ def test_require_internal_index(topo, request):
+     # Create a bunch of users
+     db_cfg = DatabaseConfig(topo.standalone)
+     db_cfg.set([('nsslapd-idlistscanlimit', '100')])
+-    backend = Backends(topo.standalone).get_backend(DEFAULT_SUFFIX)
+-    ancestorid_index = backend.get_index('ancestorid')
+-    ancestorid_index.replace("nsIndexIDListScanLimit", ensure_bytes("limit=100 type=eq flags=AND"))
+-    topo.standalone.restart()
+     users = UserAccounts(topo.standalone, DEFAULT_SUFFIX)
+     for i in range(102, 202):
+         users.create_test_user(uid=i)
+@@ -810,12 +795,6 @@ def test_require_internal_index(topo, request):
+     with pytest.raises(ldap.UNWILLING_TO_PERFORM):
+         user.delete()
+ 
+-    def fin():
+-        ancestorid_index.replace("nsIndexIDListScanLimit", ensure_bytes("limit=5000 type=eq flags=AND"))
+-
+-    request.addfinalizer(fin)
+-
+-
+ 
+ def get_pstack(pid):
+     """Get a pstack of the pid."""
+diff --git a/dirsrvtests/tests/suites/healthcheck/health_system_indexes_test.py b/dirsrvtests/tests/suites/healthcheck/health_system_indexes_test.py
+index 486fad44b..140845a33 100644
+--- a/dirsrvtests/tests/suites/healthcheck/health_system_indexes_test.py
++++ b/dirsrvtests/tests/suites/healthcheck/health_system_indexes_test.py
+@@ -172,9 +172,7 @@ def test_missing_parentid(topology_st, log_buffering_enabled):
+ 
+     log.info("Re-add the parentId index")
+     backend = Backends(standalone).get("userRoot")
+-    backend.add_index("parentid", ["eq"], matching_rules=["integerOrderingMatch"],
+-                      idlistscanlimit=['limit=5000 type=eq flags=AND'])
+-    standalone.restart()
++    backend.add_index("parentid", ["eq"], matching_rules=["integerOrderingMatch"])
+ 
+     run_healthcheck_and_flush_log(topology_st, standalone, json=False, searched_code=CMD_OUTPUT)
+     run_healthcheck_and_flush_log(topology_st, standalone, json=True, searched_code=JSON_OUTPUT)
+@@ -263,8 +261,7 @@ def test_usn_plugin_missing_entryusn(topology_st, usn_plugin_enabled, log_buffer
+ 
+     log.info("Re-add the entryusn index")
+     backend = Backends(standalone).get("userRoot")
+-    backend.add_index("entryusn", ["eq"], matching_rules=["integerOrderingMatch"],
+-                      idlistscanlimit=['limit=5000 type=eq flags=AND'])
++    backend.add_index("entryusn", ["eq"], matching_rules=["integerOrderingMatch"])
+ 
+     run_healthcheck_and_flush_log(topology_st, standalone, json=False, searched_code=CMD_OUTPUT)
+     run_healthcheck_and_flush_log(topology_st, standalone, json=True, searched_code=JSON_OUTPUT)
+@@ -408,132 +405,6 @@ def test_retrocl_plugin_missing_matching_rule(topology_st, retrocl_plugin_enable
+     run_healthcheck_and_flush_log(topology_st, standalone, json=True, searched_code=JSON_OUTPUT)
+ 
+ 
+-def test_missing_scanlimit(topology_st, log_buffering_enabled):
+-    """Check if healthcheck returns DSBLE0007 code when parentId index is missing scanlimit
+-
+-    :id: 40e1bf6a-2397-459b-bdf3-f787ca118b86
+-    :setup: Standalone instance
+-    :steps:
+-        1. Create DS instance
+-        2. Remove nsIndexIDListScanLimit from parentId index
+-        3. Use healthcheck without --json option
+-        4. Use healthcheck with --json option
+-        5. Verify the remediation command has properly quoted scanlimit
+-        6. Re-add the scanlimit
+-        7. Use healthcheck without --json option
+-        8. Use healthcheck with --json option
+-    :expectedresults:
+-        1. Success
+-        2. Success
+-        3. healthcheck reports DSBLE0007 code and related details
+-        4. healthcheck reports DSBLE0007 code and related details
+-        5. The scanlimit value is quoted in the remediation command
+-        6. Success
+-        7. healthcheck reports no issues found
+-        8. healthcheck reports no issues found
+-    """
+-
+-    RET_CODE = "DSBLE0007"
+-    PARENTID_DN = "cn=parentid,cn=index,cn=userroot,cn=ldbm database,cn=plugins,cn=config"
+-    SCANLIMIT_VALUE = "limit=5000 type=eq flags=AND"
+-
+-    standalone = topology_st.standalone
+-
+-    log.info("Remove nsIndexIDListScanLimit from parentId index")
+-    parentid_index = Index(standalone, PARENTID_DN)
+-    parentid_index.remove("nsIndexIDListScanLimit", SCANLIMIT_VALUE)
+-
+-    run_healthcheck_and_flush_log(topology_st, standalone, json=False, searched_code=RET_CODE)
+-
+-    # Verify the remediation command has properly quoted scanlimit
+-    args = FakeArgs()
+-    args.instance = standalone.serverid
+-    args.verbose = standalone.verbose
+-    args.list_errors = False
+-    args.list_checks = False
+-    args.exclude_check = []
+-    args.check = ["backends"]
+-    args.dry_run = False
+-    args.json = False
+-    health_check_run(standalone, topology_st.logcap.log, args)
+-    # Check that the scanlimit is quoted in the output
+-    assert topology_st.logcap.contains('--add-scanlimit "limit=5000 type=eq flags=AND"')
+-    log.info("Verified scanlimit is properly quoted in remediation command")
+-    topology_st.logcap.flush()
+-
+-    run_healthcheck_and_flush_log(topology_st, standalone, json=True, searched_code=RET_CODE)
+-
+-    log.info("Re-add the nsIndexIDListScanLimit")
+-    parentid_index = Index(standalone, PARENTID_DN)
+-    parentid_index.add("nsIndexIDListScanLimit", SCANLIMIT_VALUE)
+-
+-    run_healthcheck_and_flush_log(topology_st, standalone, json=False, searched_code=CMD_OUTPUT)
+-    run_healthcheck_and_flush_log(topology_st, standalone, json=True, searched_code=JSON_OUTPUT)
+-
+-
+-def test_missing_matching_rule_and_scanlimit(topology_st, log_buffering_enabled):
+-    """Check if healthcheck generates a single combined command when both matching rule and scanlimit are missing
+-
+-    :id: af8214ad-5e4c-422a-8f74-3e99227551df
+-    :setup: Standalone instance
+-    :steps:
+-        1. Create DS instance
+-        2. Remove both integerOrderingMatch and nsIndexIDListScanLimit from parentId index
+-        3. Use healthcheck and verify a single combined command is generated
+-        4. Re-add the matching rule and scanlimit
+-        5. Use healthcheck without --json option
+-        6. Use healthcheck with --json option
+-    :expectedresults:
+-        1. Success
+-        2. Success
+-        3. healthcheck reports DSBLE0007 and generates a single command with both --add-mr and --add-scanlimit
+-        4. Success
+-        5. healthcheck reports no issues found
+-        6. healthcheck reports no issues found
+-    """
+-
+-    RET_CODE = "DSBLE0007"
+-    PARENTID_DN = "cn=parentid,cn=index,cn=userroot,cn=ldbm database,cn=plugins,cn=config"
+-    SCANLIMIT_VALUE = "limit=5000 type=eq flags=AND"
+-
+-    standalone = topology_st.standalone
+-
+-    log.info("Remove both integerOrderingMatch and nsIndexIDListScanLimit from parentId index")
+-    parentid_index = Index(standalone, PARENTID_DN)
+-    parentid_index.remove("nsMatchingRule", "integerOrderingMatch")
+-    parentid_index.remove("nsIndexIDListScanLimit", SCANLIMIT_VALUE)
+-
+-    # Run healthcheck and verify combined command
+-    args = FakeArgs()
+-    args.instance = standalone.serverid
+-    args.verbose = standalone.verbose
+-    args.list_errors = False
+-    args.list_checks = False
+-    args.exclude_check = []
+-    args.check = ["backends"]
+-    args.dry_run = False
+-    args.json = False
+-    health_check_run(standalone, topology_st.logcap.log, args)
+-
+-    # Verify DSBLE0007 is reported
+-    assert topology_st.logcap.contains(RET_CODE)
+-    log.info("healthcheck returned code: %s" % RET_CODE)
+-
+-    # Verify a single combined command is generated with both --add-mr and --add-scanlimit
+-    assert topology_st.logcap.contains('--add-mr integerOrderingMatch --add-scanlimit "limit=5000 type=eq flags=AND"')
+-    log.info("Verified combined command with both --add-mr and --add-scanlimit")
+-
+-    topology_st.logcap.flush()
+-
+-    log.info("Re-add the integerOrderingMatch matching rule and scanlimit")
+-    parentid_index = Index(standalone, PARENTID_DN)
+-    parentid_index.add("nsMatchingRule", "integerOrderingMatch")
+-    parentid_index.add("nsIndexIDListScanLimit", SCANLIMIT_VALUE)
+-
+-    run_healthcheck_and_flush_log(topology_st, standalone, json=False, searched_code=CMD_OUTPUT)
+-    run_healthcheck_and_flush_log(topology_st, standalone, json=True, searched_code=JSON_OUTPUT)
+-
+-
+ def test_multiple_missing_indexes(topology_st, log_buffering_enabled):
+     """Check if healthcheck returns DSBLE0007 code when multiple system indexes are missing
+ 
+@@ -574,8 +445,7 @@ def test_multiple_missing_indexes(topology_st, log_buffering_enabled):
+ 
+     log.info("Re-add the missing system indexes")
+     backend = Backends(standalone).get("userRoot")
+-    backend.add_index("parentid", ["eq"], matching_rules=["integerOrderingMatch"],
+-                      idlistscanlimit=['limit=5000 type=eq flags=AND'])
++    backend.add_index("parentid", ["eq"], matching_rules=["integerOrderingMatch"])
+     backend.add_index("nsuniqueid", ["eq"])
+     standalone.restart()
+ 
+diff --git a/dirsrvtests/tests/suites/paged_results/paged_results_test.py b/dirsrvtests/tests/suites/paged_results/paged_results_test.py
+index 61d6702da..1bb94b53a 100644
+--- a/dirsrvtests/tests/suites/paged_results/paged_results_test.py
++++ b/dirsrvtests/tests/suites/paged_results/paged_results_test.py
+@@ -306,19 +306,19 @@ def test_search_success(topology_st, create_user, page_size, users_num):
+     del_users(users_list)
+ 
+ 
+-@pytest.mark.parametrize("page_size,users_num,suffix,attr_name,attr_value,expected_err, restart", [
++@pytest.mark.parametrize("page_size,users_num,suffix,attr_name,attr_value,expected_err", [
+     (50, 200, 'cn=config,%s' % DN_LDBM, 'nsslapd-idlistscanlimit', '100',
+-     ldap.UNWILLING_TO_PERFORM, True),
++     ldap.UNWILLING_TO_PERFORM),
+     (5, 15, DN_CONFIG, 'nsslapd-timelimit', '20',
+-     ldap.UNAVAILABLE_CRITICAL_EXTENSION, False),
++     ldap.UNAVAILABLE_CRITICAL_EXTENSION),
+     (21, 50, DN_CONFIG, 'nsslapd-sizelimit', '20',
+-     ldap.SIZELIMIT_EXCEEDED, False),
++     ldap.SIZELIMIT_EXCEEDED),
+     (21, 50, DN_CONFIG, 'nsslapd-pagedsizelimit', '5',
+-     ldap.SIZELIMIT_EXCEEDED, False),
++     ldap.SIZELIMIT_EXCEEDED),
+     (5, 50, 'cn=config,%s' % DN_LDBM, 'nsslapd-lookthroughlimit', '20',
+-     ldap.ADMINLIMIT_EXCEEDED, False)])
++     ldap.ADMINLIMIT_EXCEEDED)])
+ def test_search_limits_fail(topology_st, create_user, page_size, users_num,
+-                            suffix, attr_name, attr_value, expected_err, restart):
++                            suffix, attr_name, attr_value, expected_err):
+     """Verify that search with a simple paged results control
+     throws expected exceptoins when corresponding limits are
+     exceeded.
+@@ -341,15 +341,6 @@ def test_search_limits_fail(topology_st, create_user, page_size, users_num,
+ 
+     users_list = add_users(topology_st, users_num, DEFAULT_SUFFIX)
+     attr_value_bck = change_conf_attr(topology_st, suffix, attr_name, attr_value)
+-    ancestorid_index = None
+-    if attr_name == 'nsslapd-idlistscanlimit':
+-        backend = Backends(topology_st.standalone).get_backend(DEFAULT_SUFFIX)
+-        ancestorid_index = backend.get_index('ancestorid')
+-        ancestorid_index.replace("nsIndexIDListScanLimit", ensure_bytes("limit=100 type=eq flags=AND"))
+-
+-    if (restart):
+-        log.info('Instance restarted')
+-        topology_st.standalone.restart()
+     conf_param_dict = {attr_name: attr_value}
+     search_flt = r'(uid=test*)'
+     searchreq_attrlist = ['dn', 'sn']
+@@ -402,8 +393,6 @@ def test_search_limits_fail(topology_st, create_user, page_size, users_num,
+             else:
+                 break
+     finally:
+-        if ancestorid_index:
+-            ancestorid_index.replace("nsIndexIDListScanLimit", ensure_bytes("limit=5000 type=eq flags=AND"))
+         del_users(users_list)
+         change_conf_attr(topology_st, suffix, attr_name, attr_value_bck)
+ 
+diff --git a/ldap/servers/slapd/back-ldbm/back-ldbm.h b/ldap/servers/slapd/back-ldbm/back-ldbm.h
+index b187c26bc..e23e7ff43 100644
+--- a/ldap/servers/slapd/back-ldbm/back-ldbm.h
++++ b/ldap/servers/slapd/back-ldbm/back-ldbm.h
+@@ -583,7 +583,6 @@ struct ldbminfo
+     int li_mode;
+     int li_lookthroughlimit;
+     int li_allidsthreshold;
+-    int li_system_allidsthreshold;
+     char *li_directory;
+     int li_reslimit_lookthrough_handle;
+     uint64_t li_dbcachesize;
+diff --git a/ldap/servers/slapd/back-ldbm/index.c b/ldap/servers/slapd/back-ldbm/index.c
+index 0ab82948c..a5004be19 100644
+--- a/ldap/servers/slapd/back-ldbm/index.c
++++ b/ldap/servers/slapd/back-ldbm/index.c
+@@ -997,8 +997,6 @@ index_read_ext_allids(
+     }
+     if (pb) {
+         slapi_pblock_get(pb, SLAPI_SEARCH_IS_AND, &is_and);
+-    } else if (strcasecmp(type, LDBM_ANCESTORID_STR) == 0) {
+-        is_and = 1;
+     }
+     ai_flags = is_and ? INDEX_ALLIDS_FLAG_AND : 0;
+     /* the caller can pass in a value of 0 - just ignore those - but if the index
+diff --git a/ldap/servers/slapd/back-ldbm/instance.c b/ldap/servers/slapd/back-ldbm/instance.c
+index 2a6e8cbb8..2b71cd4f7 100644
+--- a/ldap/servers/slapd/back-ldbm/instance.c
++++ b/ldap/servers/slapd/back-ldbm/instance.c
+@@ -16,7 +16,7 @@
+ 
+ /* Forward declarations */
+ static void ldbm_instance_destructor(void **arg);
+-Slapi_Entry *ldbm_instance_init_config_entry(char *cn_val, char *v1, char *v2, char *v3, char *v4, char *mr, char *scanlimit);
++Slapi_Entry *ldbm_instance_init_config_entry(char *cn_val, char *v1, char *v2, char *v3, char *v4, char *mr);
+ 
+ 
+ /* Creates and initializes a new ldbm_instance structure.
+@@ -126,7 +126,7 @@ done:
+  * Take a bunch of strings, and create a index config entry
+  */
+ Slapi_Entry *
+-ldbm_instance_init_config_entry(char *cn_val, char *val1, char *val2, char *val3, char *val4, char *mr, char *scanlimit)
++ldbm_instance_init_config_entry(char *cn_val, char *val1, char *val2, char *val3, char *val4, char *mr)
+ {
+     Slapi_Entry *e = slapi_entry_alloc();
+     struct berval *vals[2];
+@@ -167,11 +167,6 @@ ldbm_instance_init_config_entry(char *cn_val, char *val1, char *val2, char *val3
+         slapi_entry_add_values(e, "nsMatchingRule", vals);
+     }
+ 
+-    if (scanlimit) {
+-        val.bv_val = scanlimit;
+-        val.bv_len = strlen(scanlimit);
+-        slapi_entry_add_values(e, "nsIndexIDListScanLimit", vals);
+-    }
+     return e;
+ }
+ 
+@@ -184,60 +179,8 @@ ldbm_instance_create_default_indexes(backend *be)
+ {
+     Slapi_Entry *e;
+     ldbm_instance *inst = (ldbm_instance *)be->be_instance_info;
+-    struct ldbminfo *li = (struct ldbminfo *)be->be_database->plg_private;
+     /* write the dse file only on the final index */
+     int flags = LDBM_INSTANCE_CONFIG_DONT_WRITE;
+-    char *ancestorid_indexes_limit = NULL;
+-    char *parentid_indexes_limit = NULL;
+-    struct attrinfo *ai = NULL;
+-    int index_already_configured = 0;
+-    struct index_idlistsizeinfo *iter;
+-    int cookie;
+-    int limit;
+-
+-    ainfo_get(be, (char *)LDBM_ANCESTORID_STR, &ai);
+-    if (ai && ai->ai_idlistinfo) {
+-        iter = (struct index_idlistsizeinfo *)dl_get_first(ai->ai_idlistinfo, &cookie);
+-        if (iter) {
+-            limit = iter->ai_idlistsizelimit;
+-            slapi_log_err(SLAPI_LOG_BACKLDBM, "ldbm_instance_create_default_indexes",
+-                      "set ancestorid limit to %d from attribute index\n",
+-                      limit);
+-        } else {
+-            limit = li->li_system_allidsthreshold;
+-            slapi_log_err(SLAPI_LOG_BACKLDBM, "ldbm_instance_create_default_indexes",
+-                      "set ancestorid limit to %d from default (fail to read limit)\n",
+-                      limit);
+-        }
+-        ancestorid_indexes_limit = slapi_ch_smprintf("limit=%d type=eq flags=AND", limit);
+-    } else {
+-        ancestorid_indexes_limit = slapi_ch_smprintf("limit=%d type=eq flags=AND", li->li_system_allidsthreshold);
+-        slapi_log_err(SLAPI_LOG_BACKLDBM, "ldbm_instance_create_default_indexes",
+-                      "set ancestorid limit to %d from default (no attribute or limit)\n",
+-                      li->li_system_allidsthreshold);
+-    }
+-
+-    ainfo_get(be, (char *)LDBM_PARENTID_STR, &ai);
+-    if (ai && ai->ai_idlistinfo) {
+-        iter = (struct index_idlistsizeinfo *)dl_get_first(ai->ai_idlistinfo, &cookie);
+-        if (iter) {
+-            limit = iter->ai_idlistsizelimit;
+-            slapi_log_err(SLAPI_LOG_BACKLDBM, "ldbm_instance_create_default_indexes",
+-                      "set parentid limit to %d from attribute index\n",
+-                      limit);
+-        } else {
+-            limit = li->li_system_allidsthreshold;
+-            slapi_log_err(SLAPI_LOG_BACKLDBM, "ldbm_instance_create_default_indexes",
+-                      "set parentid limit to %d from default (fail to read limit)\n",
+-                      limit);
+-        }
+-        parentid_indexes_limit = slapi_ch_smprintf("limit=%d type=eq flags=AND", limit);
+-    } else {
+-        parentid_indexes_limit = slapi_ch_smprintf("limit=%d type=eq flags=AND", li->li_system_allidsthreshold);
+-        slapi_log_err(SLAPI_LOG_BACKLDBM, "ldbm_instance_create_default_indexes",
+-                      "set parentid limit to %d from default (no attribute or limit)\n",
+-                      li->li_system_allidsthreshold);
+-    }
+ 
+     /*
+      * Always index (entrydn or entryrdn), parentid, objectclass,
+@@ -245,48 +188,42 @@ ldbm_instance_create_default_indexes(backend *be)
+      * since they are used by some searches, replication and the
+      * ACL routines.
+      */
+-    e = ldbm_instance_init_config_entry(LDBM_ENTRYRDN_STR, "subtree", 0, 0, 0, 0, 0);
++    e = ldbm_instance_init_config_entry(LDBM_ENTRYRDN_STR, "subtree", 0, 0, 0, 0);
+     ldbm_instance_config_add_index_entry(inst, e, flags);
+     slapi_entry_free(e);
+ 
+-    ainfo_get(be, (char *)LDBM_PARENTID_STR, &ai);
+-    /* Check if the attrinfo is actually for parentid, not a fallback to .default */
+-    index_already_configured = (ai != NULL && strcmp(ai->ai_type, LDBM_PARENTID_STR) == 0);
+-    if (!index_already_configured) {
+-        e = ldbm_instance_init_config_entry(LDBM_PARENTID_STR, "eq", 0, 0, 0, "integerOrderingMatch", parentid_indexes_limit);
+-        ldbm_instance_config_add_index_entry(inst, e, flags);
+-        attr_index_config(be, "ldbm index init", 0, e, 1, 0, NULL);
+-        slapi_entry_free(e);
+-    }
++    e = ldbm_instance_init_config_entry(LDBM_PARENTID_STR, "eq", 0, 0, 0, "integerOrderingMatch");
++    ldbm_instance_config_add_index_entry(inst, e, flags);
++    slapi_entry_free(e);
+ 
+-    e = ldbm_instance_init_config_entry("objectclass", "eq", 0, 0, 0, 0, 0);
++    e = ldbm_instance_init_config_entry("objectclass", "eq", 0, 0, 0, 0);
+     ldbm_instance_config_add_index_entry(inst, e, flags);
+     slapi_entry_free(e);
+ 
+-    e = ldbm_instance_init_config_entry("aci", "pres", 0, 0, 0, 0, 0);
++    e = ldbm_instance_init_config_entry("aci", "pres", 0, 0, 0, 0);
+     ldbm_instance_config_add_index_entry(inst, e, flags);
+     slapi_entry_free(e);
+ 
+-    e = ldbm_instance_init_config_entry(LDBM_NUMSUBORDINATES_STR, "pres", 0, 0, 0, 0, 0);
++    e = ldbm_instance_init_config_entry(LDBM_NUMSUBORDINATES_STR, "pres", 0, 0, 0, 0);
+     ldbm_instance_config_add_index_entry(inst, e, flags);
+     slapi_entry_free(e);
+ 
+-    e = ldbm_instance_init_config_entry(SLAPI_ATTR_UNIQUEID, "eq", 0, 0, 0, 0, 0);
++    e = ldbm_instance_init_config_entry(SLAPI_ATTR_UNIQUEID, "eq", 0, 0, 0, 0);
+     ldbm_instance_config_add_index_entry(inst, e, flags);
+     slapi_entry_free(e);
+ 
+     /* For MMR, we need this attribute (to replace use of dncomp in delete). */
+-    e = ldbm_instance_init_config_entry(ATTR_NSDS5_REPLCONFLICT, "eq", "pres", 0, 0, 0, 0);
++    e = ldbm_instance_init_config_entry(ATTR_NSDS5_REPLCONFLICT, "eq", "pres", 0, 0, 0);
+     ldbm_instance_config_add_index_entry(inst, e, flags);
+     slapi_entry_free(e);
+ 
+     /* write the dse file only on the final index */
+-    e = ldbm_instance_init_config_entry(SLAPI_ATTR_NSCP_ENTRYDN, "eq", 0, 0, 0, 0, 0);
++    e = ldbm_instance_init_config_entry(SLAPI_ATTR_NSCP_ENTRYDN, "eq", 0, 0, 0, 0);
+     ldbm_instance_config_add_index_entry(inst, e, flags);
+     slapi_entry_free(e);
+ 
+     /* ldbm_instance_config_add_index_entry(inst, 2, argv); */
+-    e = ldbm_instance_init_config_entry(LDBM_PSEUDO_ATTR_DEFAULT, "none", 0, 0, 0, 0, 0);
++    e = ldbm_instance_init_config_entry(LDBM_PSEUDO_ATTR_DEFAULT, "none", 0, 0, 0, 0);
+     attr_index_config(be, "ldbm index init", 0, e, 1, 0, NULL);
+     slapi_entry_free(e);
+ 
+@@ -294,18 +231,9 @@ ldbm_instance_create_default_indexes(backend *be)
+      * ancestorid is special, there is actually no such attr type
+      * but we still want to use the attr index file APIs.
+      */
+-    ainfo_get(be, (char *)LDBM_ANCESTORID_STR, &ai);
+-    /* Check if the attrinfo is actually for ancestorid, not a fallback to .default */
+-    index_already_configured = (ai != NULL && strcmp(ai->ai_type, LDBM_ANCESTORID_STR) == 0);
+-    if (!index_already_configured) {
+-        e = ldbm_instance_init_config_entry(LDBM_ANCESTORID_STR, "eq", 0, 0, 0, "integerOrderingMatch", ancestorid_indexes_limit);
+-        ldbm_instance_config_add_index_entry(inst, e, flags);
+-        attr_index_config(be, "ldbm index init", 0, e, 1, 0, NULL);
+-        slapi_entry_free(e);
+-    }
+-
+-    slapi_ch_free_string(&ancestorid_indexes_limit);
+-    slapi_ch_free_string(&parentid_indexes_limit);
++    e = ldbm_instance_init_config_entry(LDBM_ANCESTORID_STR, "eq", 0, 0, 0, "integerOrderingMatch");
++    attr_index_config(be, "ldbm index init", 0, e, 1, 0, NULL);
++    slapi_entry_free(e);
+ 
+     return 0;
+ }
+diff --git a/ldap/servers/slapd/back-ldbm/ldbm_config.c b/ldap/servers/slapd/back-ldbm/ldbm_config.c
+index c24e3d766..6a2ce4c27 100644
+--- a/ldap/servers/slapd/back-ldbm/ldbm_config.c
++++ b/ldap/servers/slapd/back-ldbm/ldbm_config.c
+@@ -385,35 +385,6 @@ ldbm_config_allidsthreshold_set(void *arg, void *value, char *errorbuf __attribu
+     return retval;
+ }
+ 
+-static void *
+-ldbm_config_system_allidsthreshold_get(void *arg)
+-{
+-    struct ldbminfo *li = (struct ldbminfo *)arg;
+-
+-    return (void *)((uintptr_t)(li->li_system_allidsthreshold));
+-}
+-
+-static int
+-ldbm_config_system_allidsthreshold_set(void *arg, void *value, char *errorbuf __attribute__((unused)), int phase __attribute__((unused)), int apply)
+-{
+-    struct ldbminfo *li = (struct ldbminfo *)arg;
+-    int retval = LDAP_SUCCESS;
+-    int val = (int)((uintptr_t)value);
+-
+-    /* Do whatever we can to make sure the data is ok. */
+-
+-    /* Catch attempts to configure a stupidly low ancestorid allidsthreshold */
+-    if ((val > -1) && (val < 5000)) {
+-        val = 5000;
+-    }
+-
+-    if (apply) {
+-        li->li_system_allidsthreshold = val;
+-    }
+-
+-    return retval;
+-}
+-
+ static void *
+ ldbm_config_pagedallidsthreshold_get(void *arg)
+ {
+@@ -1094,7 +1065,6 @@ static config_info ldbm_config[] = {
+     {CONFIG_LOOKTHROUGHLIMIT, CONFIG_TYPE_INT, "5000", &ldbm_config_lookthroughlimit_get, &ldbm_config_lookthroughlimit_set, CONFIG_FLAG_ALWAYS_SHOW | CONFIG_FLAG_ALLOW_RUNNING_CHANGE},
+     {CONFIG_MODE, CONFIG_TYPE_INT_OCTAL, "0600", &ldbm_config_mode_get, &ldbm_config_mode_set, CONFIG_FLAG_ALWAYS_SHOW | CONFIG_FLAG_ALLOW_RUNNING_CHANGE},
+     {CONFIG_IDLISTSCANLIMIT, CONFIG_TYPE_INT, "2147483646", &ldbm_config_allidsthreshold_get, &ldbm_config_allidsthreshold_set, CONFIG_FLAG_ALWAYS_SHOW | CONFIG_FLAG_ALLOW_RUNNING_CHANGE},
+-    {CONFIG_SYSTEMIDLISTSCANLIMIT, CONFIG_TYPE_INT, "5000", &ldbm_config_system_allidsthreshold_get, &ldbm_config_system_allidsthreshold_set, CONFIG_FLAG_ALWAYS_SHOW | CONFIG_FLAG_ALLOW_RUNNING_CHANGE},
+     {CONFIG_DIRECTORY, CONFIG_TYPE_STRING, "", &ldbm_config_directory_get, &ldbm_config_directory_set, CONFIG_FLAG_ALWAYS_SHOW | CONFIG_FLAG_ALLOW_RUNNING_CHANGE | CONFIG_FLAG_SKIP_DEFAULT_SETTING},
+     {CONFIG_MAXPASSBEFOREMERGE, CONFIG_TYPE_INT, "100", &ldbm_config_maxpassbeforemerge_get, &ldbm_config_maxpassbeforemerge_set, 0},
+ 
+diff --git a/ldap/servers/slapd/back-ldbm/ldbm_config.h b/ldap/servers/slapd/back-ldbm/ldbm_config.h
+index 29a3426ab..e69bfeedf 100644
+--- a/ldap/servers/slapd/back-ldbm/ldbm_config.h
++++ b/ldap/servers/slapd/back-ldbm/ldbm_config.h
+@@ -60,7 +60,6 @@ struct config_info
+ #define CONFIG_RANGELOOKTHROUGHLIMIT "nsslapd-rangelookthroughlimit"
+ #define CONFIG_PAGEDLOOKTHROUGHLIMIT "nsslapd-pagedlookthroughlimit"
+ #define CONFIG_IDLISTSCANLIMIT "nsslapd-idlistscanlimit"
+-#define CONFIG_SYSTEMIDLISTSCANLIMIT "nsslapd-systemidlistscanlimit"
+ #define CONFIG_PAGEDIDLISTSCANLIMIT "nsslapd-pagedidlistscanlimit"
+ #define CONFIG_DIRECTORY "nsslapd-directory"
+ #define CONFIG_MODE "nsslapd-mode"
+diff --git a/ldap/servers/slapd/back-ldbm/ldbm_index_config.c b/ldap/servers/slapd/back-ldbm/ldbm_index_config.c
+index bae2a64b9..38e7368e1 100644
+--- a/ldap/servers/slapd/back-ldbm/ldbm_index_config.c
++++ b/ldap/servers/slapd/back-ldbm/ldbm_index_config.c
+@@ -384,14 +384,6 @@ ldbm_instance_config_add_index_entry(
+         }
+     }
+ 
+-    /* get nsIndexIDListScanLimit and its values, and add them */
+-    if (0 == slapi_entry_attr_find(e, "nsIndexIDListScanLimit", &attr)) {
+-        for (j = slapi_attr_first_value(attr, &sval); j != -1; j = slapi_attr_next_value(attr, j, &sval)) {
+-            attrValue = slapi_value_get_berval(sval);
+-            eBuf = PR_sprintf_append(eBuf, "nsIndexIDListScanLimit: %s\n", attrValue->bv_val);
+-        }
+-    }
+-
+     ldbm_config_add_dse_entry(li, eBuf, flags);
+     if (eBuf) {
+         PR_smprintf_free(eBuf);
+diff --git a/src/lib389/lib389/backend.py b/src/lib389/lib389/backend.py
+index 274d45abe..f3dbe7c92 100644
+--- a/src/lib389/lib389/backend.py
++++ b/src/lib389/lib389/backend.py
+@@ -645,10 +645,11 @@ class Backend(DSLdapObject):
+         indexes = self.get_indexes()
+ 
+         # Default system indexes taken from ldap/servers/slapd/back-ldbm/instance.c
++        # Note: entryrdn and ancestorid are internal system indexes that are not
++        # exposed in cn=config - they are managed internally by the server.
++        # Only parentid has a DSE config entry (for the integerOrderingMatch rule).
+         expected_system_indexes = {
+-            'entryrdn': {'types': ['subtree'], 'matching_rule': None},
+-            'parentid': {'types': ['eq'], 'matching_rule': 'integerOrderingMatch', 'scanlimit': 'limit=5000 type=eq flags=AND'},
+-            'ancestorid': {'types': ['eq'], 'matching_rule': 'integerOrderingMatch', 'scanlimit': 'limit=5000 type=eq flags=AND'},
++            'parentid': {'types': ['eq'], 'matching_rule': 'integerOrderingMatch'},
+             'objectClass': {'types': ['eq'], 'matching_rule': None},
+             'aci': {'types': ['pres'], 'matching_rule': None},
+             'nscpEntryDN': {'types': ['eq'], 'matching_rule': None},
+@@ -705,17 +706,14 @@ class Backend(DSLdapObject):
+                     # Generate remediation command
+                     index_types = ' '.join([f"--index-type {t}" for t in expected_config['types']])
+                     cmd = f"dsconf YOUR_INSTANCE backend index add {bename} --attr {attr_name} {index_types}"
+-                    if expected_config.get('matching_rule'):
++                    if expected_config['matching_rule']:
+                         cmd += f" --matching-rule {expected_config['matching_rule']}"
+-                    if expected_config.get('scanlimit'):
+-                        cmd += f" --add-scanlimit \"{expected_config['scanlimit']}\""
+                     remediation_commands.append(cmd)
+                     reindex_attrs.add(attr_name)  # New index needs reindexing
+                 else:
+                     # Index exists, check configuration
+                     actual_types = index.get_attr_vals_utf8('nsIndexType') or []
+                     actual_mrs = index.get_attr_vals_utf8('nsMatchingRule') or []
+-                    actual_scanlimit = index.get_attr_vals_utf8('nsIndexIDListScanLimit') or []
+ 
+                     # Normalize to lowercase for comparison
+                     actual_types = [t.lower() for t in actual_types]
+@@ -730,31 +728,16 @@ class Backend(DSLdapObject):
+                         remediation_commands.append(cmd)
+                         reindex_attrs.add(attr_name)
+ 
+-                    # Check matching rules and scanlimit together to generate a single combined command
++                    # Check matching rules
+                     expected_mr = expected_config.get('matching_rule')
+-                    expected_scanlimit = expected_config.get('scanlimit')
+-
+-                    missing_mr = False
+                     if expected_mr:
+                         actual_mrs_lower = [mr.lower() for mr in actual_mrs]
+                         if expected_mr.lower() not in actual_mrs_lower:
+                             discrepancies.append(f"Index {attr_name} missing matching rule: {expected_mr}")
+-                            missing_mr = True
+-
+-                    missing_scanlimit = False
+-                    if expected_scanlimit and (len(actual_scanlimit) == 0):
+-                        discrepancies.append(f"Index {attr_name} missing fine grain definition of IDs limit: {expected_scanlimit}")
+-                        missing_scanlimit = True
+-
+-                    # Generate a single combined command for all missing items
+-                    if missing_mr or missing_scanlimit:
+-                        cmd = f"dsconf YOUR_INSTANCE backend index set {bename} --attr {attr_name}"
+-                        if missing_mr:
+-                            cmd += f" --add-mr {expected_mr}"
+-                        if missing_scanlimit:
+-                            cmd += f" --add-scanlimit \"{expected_scanlimit}\""
+-                        remediation_commands.append(cmd)
+-                        reindex_attrs.add(attr_name)
++                            # Add the missing matching rule
++                            cmd = f"dsconf YOUR_INSTANCE backend index set {bename} --attr {attr_name} --add-mr {expected_mr}"
++                            remediation_commands.append(cmd)
++                            reindex_attrs.add(attr_name)
+ 
+             except Exception as e:
+                 self._log.debug(f"_lint_system_indexes - Error checking index {attr_name}: {e}")
+@@ -993,13 +976,12 @@ class Backend(DSLdapObject):
+                 return
+         raise ValueError("Can not delete index because it does not exist")
+ 
+-    def add_index(self, attr_name, types, matching_rules=None, idlistscanlimit=None, reindex=False):
++    def add_index(self, attr_name, types, matching_rules=None, reindex=False):
+         """ Add an index.
+ 
+         :param attr_name - name of the attribute to index
+         :param types - a List of index types(eq, pres, sub, approx)
+         :param matching_rules - a List of matching rules for the index
+-        :param idlistscanlimit - a List of fine grain definitions for scanning limit
+         :param reindex - If set to True then index the attribute after creating it.
+         """
+ 
+@@ -1029,15 +1011,6 @@ class Backend(DSLdapObject):
+             # Only add if there are actually rules present in the list.
+             if len(mrs) > 0:
+                 props['nsMatchingRule'] = mrs
+-
+-        if idlistscanlimit is not None:
+-            scanlimits = []
+-            for scanlimit in idlistscanlimit:
+-                scanlimits.append(scanlimit)
+-            # Only add if there are actually limits in the list.
+-            if len(scanlimits) > 0:
+-                props['nsIndexIDListScanLimit'] = scanlimits
+-
+         new_index.create(properties=props, basedn="cn=index," + self._dn)
+ 
+         if reindex:
+@@ -1349,7 +1322,6 @@ class DatabaseConfig(DSLdapObject):
+             'nsslapd-lookthroughlimit',
+             'nsslapd-mode',
+             'nsslapd-idlistscanlimit',
+-            'nsslapd-systemidlistscanlimit',
+             'nsslapd-directory',
+             'nsslapd-import-cachesize',
+             'nsslapd-idl-switch',
+diff --git a/src/lib389/lib389/cli_conf/backend.py b/src/lib389/lib389/cli_conf/backend.py
+index 9772e39d4..68efa795c 100644
+--- a/src/lib389/lib389/cli_conf/backend.py
++++ b/src/lib389/lib389/cli_conf/backend.py
+@@ -39,7 +39,6 @@ arg_to_attr = {
+         'mode': 'nsslapd-mode',
+         'state': 'nsslapd-state',
+         'idlistscanlimit': 'nsslapd-idlistscanlimit',
+-        'systemidlistscanlimit': 'nsslapd-systemidlistscanlimit',
+         'directory': 'nsslapd-directory',
+         'dbcachesize': 'nsslapd-dbcachesize',
+         'logdirectory': 'nsslapd-db-logdirectory',
+@@ -626,21 +625,6 @@ def backend_set_index(inst, basedn, log, args):
+             except ldap.NO_SUCH_ATTRIBUTE:
+                 raise ValueError('Can not delete matching rule type because it does not exist')
+ 
+-    if args.replace_scanlimit is not None:
+-        for replace_scanlimit in args.replace_scanlimit:
+-            index.replace('nsIndexIDListScanLimit', replace_scanlimit)
+-
+-    if args.add_scanlimit is not None:
+-        for add_scanlimit in args.add_scanlimit:
+-            index.add('nsIndexIDListScanLimit', add_scanlimit)
+-
+-    if args.del_scanlimit is not None:
+-        for del_scanlimit in args.del_scanlimit:
+-            try:
+-                index.remove('nsIndexIDListScanLimit', del_scanlimit)
+-            except ldap.NO_SUCH_ATTRIBUTE:
+-                raise ValueError('Can not delete a fine grain limit definition because it does not exist')
+-
+     if args.reindex:
+         be.reindex(attrs=[args.attr])
+     log.info("Index successfully updated")
+@@ -963,9 +947,6 @@ def create_parser(subparsers):
+     edit_index_parser.add_argument('--del-type', action='append', help='Removes an index type from the index: (eq, sub, pres, or approx)')
+     edit_index_parser.add_argument('--add-mr', action='append', help='Adds a matching-rule to the index')
+     edit_index_parser.add_argument('--del-mr', action='append', help='Removes a matching-rule from the index')
+-    edit_index_parser.add_argument('--add-scanlimit', action='append', help='Adds a fine grain limit definiton to the index')
+-    edit_index_parser.add_argument('--replace-scanlimit', action='append', help='Replaces a fine grain limit definiton to the index')
+-    edit_index_parser.add_argument('--del-scanlimit', action='append', help='Removes a fine grain limit definiton to the index')
+     edit_index_parser.add_argument('--reindex', action='store_true', help='Re-indexes the database after editing the index')
+     edit_index_parser.add_argument('be_name', help='The backend name or suffix')
+ 
+@@ -1092,7 +1073,6 @@ def create_parser(subparsers):
+                                                                  'will check when examining candidate entries in response to a search request')
+     set_db_config_parser.add_argument('--mode', help='Specifies the permissions used for newly created index files')
+     set_db_config_parser.add_argument('--idlistscanlimit', help='Specifies the number of entry IDs that are searched during a search operation')
+-    set_db_config_parser.add_argument('--systemidlistscanlimit', help='Specifies the number of entry IDs that are fetch from ancestorid/parentid indexes')
+     set_db_config_parser.add_argument('--directory', help='Specifies absolute path to database instance')
+     set_db_config_parser.add_argument('--dbcachesize', help='Specifies the database index cache size in bytes')
+     set_db_config_parser.add_argument('--logdirectory', help='Specifies the path to the directory that contains the database transaction logs')
+-- 
+2.52.0
+

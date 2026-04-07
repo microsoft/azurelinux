@@ -1,0 +1,15 @@
+--- v_frame-0.3.9/Cargo.toml	1970-01-01T00:00:01+00:00
++++ v_frame-0.3.9/Cargo.toml	2026-01-28T20:27:15.543942+00:00
+@@ -69,12 +69,3 @@
+ [target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies.criterion]
+ version = "0.6"
+ 
+-[target.'cfg(target_arch = "wasm32")'.dev-dependencies.criterion]
+-version = "0.6"
+-default-features = false
+-
+-[target.wasm32-unknown-unknown.dependencies.wasm-bindgen]
+-version = "0.2"
+-
+-[target.wasm32-unknown-unknown.dev-dependencies.wasm-bindgen-test]
+-version = "0.3"

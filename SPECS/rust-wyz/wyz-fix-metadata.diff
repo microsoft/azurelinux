@@ -1,0 +1,25 @@
+--- wyz-0.5.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ wyz-0.5.1/Cargo.toml	2023-03-02T15:30:04.570364+00:00
+@@ -29,22 +29,10 @@
+ license = "MIT"
+ repository = "https://github.com/myrrlyn/wyz"
+ 
+-[dependencies.once_cell]
+-version = "1"
+-optional = true
+-
+ [dependencies.tap]
+ version = "1"
+-
+-[dependencies.typemap]
+-version = "0.3"
+-optional = true
+ 
+ [features]
+ alloc = []
+ default = ["std"]
+-garbage = [
+-    "once_cell",
+-    "typemap",
+-]
+ std = ["alloc"]

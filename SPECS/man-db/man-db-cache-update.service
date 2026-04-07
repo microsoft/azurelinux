@@ -1,0 +1,11 @@
+[Unit]
+After=local-fs.target
+
+[Service]
+Type=oneshot
+Environment=MAN_NO_LOCALE_WARNING=1
+EnvironmentFile=/etc/sysconfig/man-db
+ExecStart=/bin/sh -c '[ "$SERVICE" != "no" ] && /usr/bin/mandb $OPTS || true'
+ExecStopPost=/bin/sh -c '[ "$SERVICE_RESULT" == "signal" ] && /usr/bin/systemctl enable man-db-restart-cache-update.service || true'
+Nice=19
+IOWeight=20

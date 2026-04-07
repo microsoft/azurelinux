@@ -1,0 +1,24 @@
+diff -up utfcpp-4.0.4/CMakeLists.txt.orig utfcpp-4.0.4/CMakeLists.txt
+--- utfcpp-4.0.4/CMakeLists.txt.orig	2023-12-10 16:42:20.000000000 +0100
++++ utfcpp-4.0.4/CMakeLists.txt	2023-12-14 12:37:01.511860031 +0100
+@@ -35,17 +35,17 @@ install(TARGETS ${PROJECT_NAME}
+ configure_package_config_file(
+     "${PROJECT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in"
+     "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+-    INSTALL_DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME}/cmake
++    INSTALL_DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/cmake/${PROJECT_NAME}
+ )
+ 
+ install(EXPORT ${PROJECT_NAME}Targets
+         FILE ${PROJECT_NAME}Targets.cmake
+         NAMESPACE ${PROJECT_NAME}::
+-        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME}/cmake)
++        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/cmake/${PROJECT_NAME})
+ 
+ install(FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+               "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+-        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME}/cmake)
++        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/cmake/${PROJECT_NAME})
+ 
+ install(FILES ${PROJECT_SOURCE_DIR}/source/utf8.h DESTINATION include/utf8cpp)
+ install(DIRECTORY ${PROJECT_SOURCE_DIR}/source/utf8 DESTINATION

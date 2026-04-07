@@ -1,0 +1,22 @@
+diff -rupN flatbuffers-24.3.25/CMakeLists.txt flatbuffers-24.3.25-new/CMakeLists.txt
+--- flatbuffers-24.3.25/CMakeLists.txt	2024-03-26 06:18:07.000000000 +0100
++++ flatbuffers-24.3.25-new/CMakeLists.txt	2024-07-27 12:48:29.167611354 +0200
+@@ -483,6 +483,9 @@ if(FLATBUFFERS_BUILD_SHAREDLIB)
+                         OUTPUT_NAME flatbuffers
+                         SOVERSION "${FlatBuffers_Library_SONAME_FULL}"
+                         VERSION "${FlatBuffers_Library_SONAME_FULL}")
++  if(MINGW)
++    set_target_properties(flatbuffers_shared PROPERTIES SUFFIX "-${FlatBuffers_Library_SONAME_FULL}${CMAKE_SHARED_LIBRARY_SUFFIX}")
++  endif(MINGW)
+   if(FLATBUFFERS_ENABLE_PCH)
+     add_pch_to_target(flatbuffers_shared include/flatbuffers/pch/pch.h)
+   endif()
+@@ -656,7 +659,7 @@ if(FLATBUFFERS_INSTALL)
+     install(
+       TARGETS flatbuffers_shared EXPORT FlatBuffersSharedTargets
+       ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+-      RUNTIME DESTINATION ${CMAKE_INSTALL_LIBDIR}
++      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+       LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+       INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+     )

@@ -1,0 +1,2 @@
+*self_spec:
++ %{!fuse-ld*:%{!r:-Wl,--error-rwx-segments -Wl,--error-execstack}}

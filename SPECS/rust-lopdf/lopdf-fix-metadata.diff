@@ -1,0 +1,93 @@
+--- lopdf-0.36.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ lopdf-0.36.0/Cargo.toml	2025-08-19T10:33:01.973627+00:00
+@@ -37,6 +37,10 @@
+ categories = ["text-processing"]
+ license = "MIT"
+ repository = "https://github.com/J-F-Liu/lopdf.git"
++exclude = [
++    "/assets/",
++    "/examples/",
++]
+ 
+ [badges.travis-ci]
+ repository = "J-F-Liu/lopdf"
+@@ -62,45 +66,6 @@
+ name = "lopdf"
+ path = "src/lib.rs"
+ 
+-[[example]]
+-name = "add_barcode"
+-path = "examples/add_barcode.rs"
+-
+-[[example]]
+-name = "create"
+-path = "examples/create.rs"
+-
+-[[example]]
+-name = "decrypt"
+-path = "examples/decrypt.rs"
+-
+-[[example]]
+-name = "encrypt"
+-path = "examples/encrypt.rs"
+-
+-[[example]]
+-name = "extract_text"
+-path = "examples/extract_text.rs"
+-required-features = ["serde"]
+-
+-[[example]]
+-name = "extract_toc"
+-path = "examples/extract_toc.rs"
+-required-features = ["serde"]
+-
+-[[example]]
+-name = "merge"
+-path = "examples/merge.rs"
+-
+-[[example]]
+-name = "print_annotations"
+-path = "examples/print_annotations.rs"
+-required-features = ["default"]
+-
+-[[example]]
+-name = "rotate"
+-path = "examples/rotate.rs"
+-
+ [[test]]
+ name = "annotation"
+ path = "tests/annotation.rs"
+@@ -120,14 +85,6 @@
+ [[test]]
+ name = "utils"
+ path = "tests/utils.rs"
+-
+-[[bench]]
+-name = "datetime"
+-path = "benches/datetime.rs"
+-
+-[[bench]]
+-name = "parse"
+-path = "benches/parse.rs"
+ 
+ [dependencies.aes]
+ version = "0.8.4"
+@@ -225,18 +182,8 @@
+ [dependencies.weezl]
+ version = "0.1"
+ 
+-[dev-dependencies.clap]
+-version = "4.0"
+-features = ["derive"]
+-
+ [dev-dependencies.env_logger]
+ version = "0.11"
+ 
+-[dev-dependencies.serde_json]
+-version = "1.0"
+-
+-[dev-dependencies.shellexpand]
+-version = "3.0"
+-
+ [dev-dependencies.tempfile]
+ version = "3.3"

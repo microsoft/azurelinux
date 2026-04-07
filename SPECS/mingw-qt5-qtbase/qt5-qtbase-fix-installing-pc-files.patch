@@ -1,0 +1,49 @@
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/qmake/generators/makefile.cpp qtbase-everywhere-src-5.15.18-new/qmake/generators/makefile.cpp
+--- qtbase-everywhere-src-5.15.18/qmake/generators/makefile.cpp	2025-06-05 16:07:26.000000000 +0200
++++ qtbase-everywhere-src-5.15.18-new/qmake/generators/makefile.cpp	2025-11-07 14:10:33.382843967 +0100
+@@ -3242,7 +3242,7 @@ MakefileGenerator::openOutput(QFile &fil
+ }
+ 
+ QString
+-MakefileGenerator::pkgConfigFileName(bool fixify)
++MakefileGenerator::pkgConfigFileName(bool fixify, bool onlyPrependDestdir)
+ {
+     QString ret = project->first("QMAKE_PKGCONFIG_FILE").toQString();
+     if (ret.isEmpty()) {
+@@ -3267,7 +3267,11 @@ MakefileGenerator::pkgConfigFileName(boo
+     if(fixify) {
+         if(QDir::isRelativePath(ret) && !project->isEmpty("DESTDIR"))
+             ret.prepend(project->first("DESTDIR").toQString());
+-        ret = fileFixify(ret, FileFixifyBackwards);
++        if (onlyPrependDestdir) {
++            ret = Option::fixPathToLocalOS(ret);
++        } else {
++            ret = fileFixify(ret, FileFixifyBackwards);
++        }
+     }
+     return ret;
+ }
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/qmake/generators/makefile.h qtbase-everywhere-src-5.15.18-new/qmake/generators/makefile.h
+--- qtbase-everywhere-src-5.15.18/qmake/generators/makefile.h	2025-06-05 16:07:26.000000000 +0200
++++ qtbase-everywhere-src-5.15.18-new/qmake/generators/makefile.h	2025-11-07 14:10:33.383467688 +0100
+@@ -96,7 +96,7 @@ protected:
+     virtual void writeDefaultVariables(QTextStream &t);
+ 
+     QString pkgConfigPrefix() const;
+-    QString pkgConfigFileName(bool fixify=true);
++    QString pkgConfigFileName(bool fixify=true, bool onlyPrependDestdir = false);
+     QString pkgConfigFixPath(QString) const;
+     void writePkgConfigFile();   // for pkg-config
+ 
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/qmake/generators/win32/winmakefile.cpp qtbase-everywhere-src-5.15.18-new/qmake/generators/win32/winmakefile.cpp
+--- qtbase-everywhere-src-5.15.18/qmake/generators/win32/winmakefile.cpp	2025-11-07 14:10:26.538117402 +0100
++++ qtbase-everywhere-src-5.15.18-new/qmake/generators/win32/winmakefile.cpp	2025-11-07 14:10:33.383730373 +0100
+@@ -782,7 +782,7 @@ QString Win32MakefileGenerator::defaultI
+                 }
+                 if(!ret.isEmpty())
+                     ret += "\n\t";
+-                ret += installMetaFile(ProKey("QMAKE_PKGCONFIG_INSTALL_REPLACE"), pkgConfigFileName(true), dst_pc);
++                ret += installMetaFile(ProKey("QMAKE_PKGCONFIG_INSTALL_REPLACE"), pkgConfigFileName(true, true), dst_pc);
+                 if(!uninst.isEmpty())
+                     uninst.append("\n\t");
+                 uninst.append("-$(DEL_FILE) " + escapeFilePath(dst_pc));

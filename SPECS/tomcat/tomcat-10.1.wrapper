@@ -1,0 +1,24 @@
+#!/bin/bash
+
+if [ "$1" = "version" ]; then
+  . /usr/libexec/tomcat/preamble
+  exec ${JAVACMD} -classpath ${CATALINA_HOME}/lib/catalina.jar \
+    org.apache.catalina.util.ServerInfo
+fi
+
+SRV="tomcat"
+if [ -n "$2" ]; then
+  SRV="tomcat@$2"
+fi
+
+if [ "$1" = "start" ]; then
+  systemctl start ${SRV}.service
+elif [ "$1" = "stop" ]; then
+  systemctl stop ${SRV}.service
+elif [ "$1" = "version" ]; then
+  ${JAVACMD} -classpath ${CATALINA_HOME}/lib/catalina.jar \
+    org.apache.catalina.util.ServerInfo
+else
+  echo "Usage: $0 {start|stop|version} [server-id]"
+  exit 1
+fi

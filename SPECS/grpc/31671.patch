@@ -1,0 +1,28 @@
+From beb3d7c392c22517c5a91e2f13558bee379abb2a Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Wed, 16 Nov 2022 09:00:21 -0500
+Subject: [PATCH] Use CMake variables for paths in pkg-config files
+
+Use @gRPC_INSTALL_LIBDIR@ for libdir; this fixes an incorrect
+-L/usr/lib on multilib Linux systems where that is the 32-bit library
+path and the correct path is /usr/lib64.
+
+Use @gRPC_INSTALL_INCLUDEDIR@ for consistency.
+---
+ cmake/pkg-config-template.pc.in | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/cmake/pkg-config-template.pc.in b/cmake/pkg-config-template.pc.in
+index d56154bb3a53..5a56b4f88530 100644
+--- a/cmake/pkg-config-template.pc.in
++++ b/cmake/pkg-config-template.pc.in
+@@ -1,7 +1,7 @@
+ prefix=@CMAKE_INSTALL_PREFIX@
+ exec_prefix=${prefix}
+-includedir=${prefix}/include
+-libdir=${exec_prefix}/lib
++includedir=${prefix}/@gRPC_INSTALL_INCLUDEDIR@
++libdir=${exec_prefix}/@gRPC_INSTALL_LIBDIR@
+ 
+ Name: @PC_NAME@
+ Description: @PC_DESCRIPTION@

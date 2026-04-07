@@ -1,0 +1,55 @@
+From 18550cd9ad04913d50abfc88a6048b7cfaf80687 Mon Sep 17 00:00:00 2001
+From: Igor Khanin <igor@khanin.biz>
+Date: Mon, 13 Oct 2025 14:26:39 +0300
+Subject: [PATCH] wayland: Convey preference for server side decorations
+
+As discussed in the mailing list, Qt applications generally expect top
+level windows to be decorated by the windowing system - unless
+explicitly requested by the developer by marking a window as frameless.
+Furthermore, Qt's client side decorations for Wayland were only really
+intended as a fallback.
+
+However until now the Wayland xdg-shell integration conveyed to the
+compositor (if it supports decorations negotiations) that it didn't
+care whose responsibility it was to draw window decorations. This did
+not matter under KWin, which resolves such cases in favor of SSDs - but
+does matter under other SSD-capable compositors like cosmic-comp (which
+considers SSDs to be the fallback option).
+
+This changes the xdg-shell integration code to be explicit  about
+requesting SSDs.
+
+[ChangeLog][QtWaylandClient][Important Behavior Changes] The Wayland
+XDG shell integration now requests server side decorations with
+compositors supporting the zxdg_decoration_manager_v1 protocol.
+
+Change-Id: Ia025b1f6ff17248a5710f981a0cecd90c47b6cd8
+Reviewed-by: David Edmundson <davidedmundson@kde.org>
+---
+
+diff --git a/src/plugins/platforms/wayland/plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp b/src/plugins/platforms/wayland/plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp
+index a1a173f..8386b65 100644
+--- a/src/plugins/platforms/wayland/plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp
++++ b/src/plugins/platforms/wayland/plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp
+@@ -201,7 +201,7 @@
+             delete m_decoration;
+             m_decoration = nullptr;
+         } else {
+-            m_decoration->unsetMode();
++            m_decoration->requestMode(QWaylandXdgToplevelDecorationV1::mode_server_side);
+         }
+     }
+ }
+diff --git a/tests/auto/wayland/xdgdecorationv1/tst_xdgdecorationv1.cpp b/tests/auto/wayland/xdgdecorationv1/tst_xdgdecorationv1.cpp
+index 5ee8569..65ac08f 100644
+--- a/tests/auto/wayland/xdgdecorationv1/tst_xdgdecorationv1.cpp
++++ b/tests/auto/wayland/xdgdecorationv1/tst_xdgdecorationv1.cpp
+@@ -149,7 +149,7 @@
+     QVERIFY(window.frameMargins().isNull());
+ 
+     QCOMPOSITOR_TRY_VERIFY(xdgToplevel());
+-    QCOMPOSITOR_TRY_VERIFY(toplevelDecoration()->m_unsetModeRequested);
++    QCOMPOSITOR_TRY_VERIFY(toplevelDecoration()->m_requestedMode == XdgToplevelDecorationV1::mode_server_side);
+     QVERIFY(window.frameMargins().isNull()); // We're still waiting for a configure
+     exec([&] {
+         toplevelDecoration()->sendConfigure(XdgToplevelDecorationV1::mode_client_side);

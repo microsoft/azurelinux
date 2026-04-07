@@ -1,0 +1,20 @@
+--- pure-rust-locales-0.8.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ pure-rust-locales-0.8.2/Cargo.toml	2026-02-23T13:57:08.067850+00:00
+@@ -42,9 +42,6 @@
+ license = "MIT OR Apache-2.0"
+ repository = "https://github.com/cecton/pure-rust-locales"
+ 
+-[features]
+-defmt = ["dep:defmt"]
+-
+ [lib]
+ name = "pure_rust_locales"
+ path = "src/lib.rs"
+@@ -60,7 +57,3 @@
+ [[test]]
+ name = "simple_test"
+ path = "tests/simple_test.rs"
+-
+-[dependencies.defmt]
+-version = "1.0.1"
+-optional = true

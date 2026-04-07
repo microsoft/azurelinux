@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2013 Richard Hughes <richard@hughsie.com> -->
+<component type="codec">
+  <id>gstreamer-good</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <name>GStreamer Multimedia Codecs</name>
+  <summary>Multimedia playback for APE, AVI, DV, FLAC, FLX, Flash, MKV, MP4, Speex, VP8, VP9 and WAV</summary>
+  <description>
+    <p>
+      This addon includes several good quality codecs that are well tested.
+      These codecs can be used to encode and decode media files where the
+      format is not patent encumbered.
+    </p>
+    <p>
+      A codec decodes audio and video for for playback or editing and is also
+      used for transmission or storage.
+      Different codecs are used in video-conferencing, streaming media and
+      video editing applications.
+    </p>
+  </description>
+  <keywords>
+    <keyword>APE</keyword>
+    <keyword>AVI</keyword>
+    <keyword>DV</keyword>
+    <keyword>FLAC</keyword>
+    <keyword>FLX</keyword>
+    <keyword>Flash</keyword>
+    <keyword>MKV</keyword>
+    <keyword>MP4</keyword>
+    <keyword>Speex</keyword>
+    <keyword>VP8</keyword>
+    <keyword>VP9</keyword>
+    <keyword>WAV</keyword>
+  </keywords>
+  <url type="homepage">http://gstreamer.freedesktop.org/</url>
+  <url type="bugtracker">https://bugzilla.gnome.org/enter_bug.cgi?product=GStreamer</url>
+  <url type="donation">http://www.gnome.org/friends/</url>
+  <url type="help">http://gstreamer.freedesktop.org/documentation/</url>
+  <update_contact><!-- upstream-contact_at_email.com --></update_contact>
+</component>

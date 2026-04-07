@@ -1,0 +1,12 @@
+--- humantime-2.3.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ humantime-2.3.0/Cargo.toml	2025-09-12T13:01:48.770621+00:00
+@@ -51,9 +51,6 @@
+ path = "benches/datetime_parse.rs"
+ harness = false
+ 
+-[dev-dependencies.bencher]
+-version = "0.1.5"
+-
+ [dev-dependencies.chrono]
+ version = "0.4"
+ 

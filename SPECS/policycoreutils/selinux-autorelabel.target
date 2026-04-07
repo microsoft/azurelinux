@@ -1,0 +1,7 @@
+[Unit]
+Description=Relabel all filesystems and reboot
+DefaultDependencies=no
+Requires=sysinit.target selinux-autorelabel.service
+Conflicts=shutdown.target
+After=sysinit.target selinux-autorelabel.service
+ConditionSecurity=selinux

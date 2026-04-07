@@ -1,0 +1,88 @@
+## <summary>Network traffic graphing.</summary>
+
+########################################
+## <summary>
+##	Read mrtg lib files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`mrtg_read_lib_files',`
+	gen_require(`
+		type mrtg_var_lib_t;
+	')
+
+	files_search_var_lib($1)
+    read_files_pattern($1, mrtg_var_lib_t, mrtg_var_lib_t)
+')
+
+########################################
+## <summary>
+##	Create and append mrtg log files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`mrtg_append_create_logs',`
+	gen_require(`
+		type mrtg_log_t;
+	')
+
+	logging_search_logs($1)
+	append_files_pattern($1, mrtg_log_t, mrtg_log_t)
+	create_files_pattern($1, mrtg_log_t, mrtg_log_t)
+')
+
+########################################
+## <summary>
+##	All of the rules required to
+##	administrate an mrtg environment.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <param name="role">
+##	<summary>
+##	Role allowed access.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`mrtg_admin',`
+	gen_require(`
+		type mrtg_t, mrtg_var_run_t, mrtg_initrc_exec_t;
+		type mrtg_var_lib_t, mrtg_lock_t, mrtg_log_t;
+		type mrtg_etc_t;
+	')
+
+	allow $1 mrtg_t:process { ptrace signal_perms };
+	ps_process_pattern($1, mrtg_t)
+
+	init_labeled_script_domtrans($1, mrtg_initrc_exec_t)
+	domain_system_change_exemption($1)
+	role_transition $2 mrtg_initrc_exec_t system_r;
+	allow $2 system_r;
+
+	files_search_etc($1)
+	admin_pattern($1, mrtg_etc_t)
+
+	files_search_locks($1)
+	admin_pattern($1, mrtg_lock_t)
+
+	logging_search_logs($1)
+	admin_pattern($1, mrtg_log_t)
+
+	files_search_pids($1)
+	admin_pattern($1, mrtg_var_run_t)
+
+	files_search_var_lib($1)
+	admin_pattern($1, mrtg_var_lib_t)
+')

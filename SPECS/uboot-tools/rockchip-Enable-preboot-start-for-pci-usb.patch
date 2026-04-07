@@ -1,0 +1,783 @@
+From 020f67a37342b091c74dab93a133253401d4d899 Mon Sep 17 00:00:00 2001
+From: Peter Robinson <pbrobinson@gmail.com>
+Date: Tue, 31 Dec 2024 14:15:41 +0000
+Subject: [PATCH] rockchip: Enable preboot start for pci/usb
+
+Enable the preboot so nvme works OOTB
+
+Signed-off-by: Peter Robinson <pbrobinson@gmail.com>
+---
+ configs/anbernic-rgxx3-rk3566_defconfig   | 2 ++
+ configs/bpi-r2-pro-rk3568_defconfig       | 2 ++
+ configs/cm3588-nas-rk3588_defconfig       | 2 ++
+ configs/coolpi-4b-rk3588s_defconfig       | 2 ++
+ configs/coolpi-cm5-evb-rk3588_defconfig   | 2 ++
+ configs/evb-rk3568_defconfig              | 2 ++
+ configs/evb-rk3588_defconfig              | 2 ++
+ configs/firefly-rk3399_defconfig          | 2 ++
+ configs/generic-rk3568_defconfig          | 2 ++
+ configs/generic-rk3588_defconfig          | 2 ++
+ configs/jaguar-rk3588_defconfig           | 2 ++
+ configs/lubancat-2-rk3568_defconfig       | 2 ++
+ configs/nanopc-t4-rk3399_defconfig        | 2 ++
+ configs/nanopc-t6-rk3588_defconfig        | 2 ++
+ configs/nanopi-r5c-rk3568_defconfig       | 2 ++
+ configs/nanopi-r5s-rk3568_defconfig       | 2 ++
+ configs/nanopi-r6c-rk3588s_defconfig      | 2 ++
+ configs/nanopi-r6s-rk3588s_defconfig      | 2 ++
+ configs/neu6a-io-rk3588_defconfig         | 2 ++
+ configs/neu6b-io-rk3588_defconfig         | 2 ++
+ configs/nova-rk3588s_defconfig            | 2 ++
+ configs/odroid-m1-rk3568_defconfig        | 2 ++
+ configs/orangepi-3b-rk3566_defconfig      | 2 ++
+ configs/orangepi-5-plus-rk3588_defconfig  | 2 ++
+ configs/orangepi-5-rk3588s_defconfig      | 2 ++
+ configs/pinebook-pro-rk3399_defconfig     | 1 +
+ configs/pinetab2-rk3566_defconfig         | 2 ++
+ configs/powkiddy-x55-rk3566_defconfig     | 2 ++
+ configs/quartz64-a-rk3566_defconfig       | 2 ++
+ configs/quartz64-b-rk3566_defconfig       | 2 ++
+ configs/quartzpro64-rk3588_defconfig      | 2 ++
+ configs/radxa-cm3-io-rk3566_defconfig     | 2 ++
+ configs/radxa-e25-rk3568_defconfig        | 2 ++
+ configs/radxa-zero-3-rk3566_defconfig     | 2 ++
+ configs/roc-pc-mezzanine-rk3399_defconfig | 2 ++
+ configs/rock-3a-rk3568_defconfig          | 2 ++
+ configs/rock-3b-rk3568_defconfig          | 2 ++
+ configs/rock-3c-rk3566_defconfig          | 2 ++
+ configs/rock-4c-plus-rk3399_defconfig     | 2 ++
+ configs/rock-4se-rk3399_defconfig         | 2 ++
+ configs/rock-5-itx-rk3588_defconfig       | 2 ++
+ configs/rock-pi-4-rk3399_defconfig        | 2 ++
+ configs/rock-pi-4c-rk3399_defconfig       | 2 ++
+ configs/rock-pi-n10-rk3399pro_defconfig   | 2 ++
+ configs/rock5a-rk3588s_defconfig          | 2 ++
+ configs/rock5b-rk3588_defconfig           | 2 ++
+ configs/rock960-rk3399_defconfig          | 2 ++
+ configs/rockpro64-rk3399_defconfig        | 2 ++
+ configs/sige7-rk3588_defconfig            | 2 ++
+ configs/soquartz-blade-rk3566_defconfig   | 2 ++
+ configs/soquartz-cm4-rk3566_defconfig     | 2 ++
+ configs/soquartz-model-a-rk3566_defconfig | 2 ++
+ configs/tiger-rk3588_defconfig            | 2 ++
+ configs/toybrick-rk3588_defconfig         | 2 ++
+ configs/turing-rk1-rk3588_defconfig       | 2 ++
+ 55 files changed, 109 insertions(+)
+
+diff --git a/configs/anbernic-rgxx3-rk3566_defconfig b/configs/anbernic-rgxx3-rk3566_defconfig
+index 14c97b4c5bf..de92e1b4141 100644
+--- a/configs/anbernic-rgxx3-rk3566_defconfig
++++ b/configs/anbernic-rgxx3-rk3566_defconfig
+@@ -12,6 +12,8 @@ CONFIG_SYS_LOAD_ADDR=0xc00800
+ CONFIG_DEBUG_UART_BASE=0xFE660000
+ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ # CONFIG_EFI_LOADER is not set
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+diff --git a/configs/bpi-r2-pro-rk3568_defconfig b/configs/bpi-r2-pro-rk3568_defconfig
+index d84ea2f955f..de777817c37 100644
+--- a/configs/bpi-r2-pro-rk3568_defconfig
++++ b/configs/bpi-r2-pro-rk3568_defconfig
+@@ -9,6 +9,8 @@ CONFIG_SYS_LOAD_ADDR=0xc00800
+ CONFIG_DEBUG_UART_BASE=0xFE660000
+ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_AHCI=y
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+diff --git a/configs/cm3588-nas-rk3588_defconfig b/configs/cm3588-nas-rk3588_defconfig
+index fd0a32d6d79..e561be511d4 100644
+--- a/configs/cm3588-nas-rk3588_defconfig
++++ b/configs/cm3588-nas-rk3588_defconfig
+@@ -12,6 +12,8 @@ CONFIG_DEBUG_UART_BASE=0xFEB50000
+ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+ CONFIG_SPL_FIT_SIGNATURE=y
+diff --git a/configs/coolpi-4b-rk3588s_defconfig b/configs/coolpi-4b-rk3588s_defconfig
+index ea985b81670..96d7cffb075 100644
+--- a/configs/coolpi-4b-rk3588s_defconfig
++++ b/configs/coolpi-4b-rk3588s_defconfig
+@@ -17,6 +17,8 @@ CONFIG_SPL_SPI_FLASH_SUPPORT=y
+ CONFIG_SPL_SPI=y
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_AHCI=y
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+diff --git a/configs/coolpi-cm5-evb-rk3588_defconfig b/configs/coolpi-cm5-evb-rk3588_defconfig
+index 58ffe7baf5f..5eadc091242 100644
+--- a/configs/coolpi-cm5-evb-rk3588_defconfig
++++ b/configs/coolpi-cm5-evb-rk3588_defconfig
+@@ -17,6 +17,8 @@ CONFIG_SPL_SPI_FLASH_SUPPORT=y
+ CONFIG_SPL_SPI=y
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_AHCI=y
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+diff --git a/configs/evb-rk3568_defconfig b/configs/evb-rk3568_defconfig
+index a068bc6846c..8c94f7b21bc 100644
+--- a/configs/evb-rk3568_defconfig
++++ b/configs/evb-rk3568_defconfig
+@@ -9,6 +9,8 @@ CONFIG_SYS_LOAD_ADDR=0xc00800
+ CONFIG_DEBUG_UART_BASE=0xFE660000
+ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+ CONFIG_SPL_FIT_SIGNATURE=y
+diff --git a/configs/evb-rk3588_defconfig b/configs/evb-rk3588_defconfig
+index 3d4d2747145..051015fd811 100644
+--- a/configs/evb-rk3588_defconfig
++++ b/configs/evb-rk3588_defconfig
+@@ -10,6 +10,8 @@ CONFIG_SYS_LOAD_ADDR=0xc00800
+ CONFIG_DEBUG_UART_BASE=0xFEB50000
+ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+ CONFIG_SPL_FIT_SIGNATURE=y
+diff --git a/configs/firefly-rk3399_defconfig b/configs/firefly-rk3399_defconfig
+index 3871627318b..b96aadc78eb 100644
+--- a/configs/firefly-rk3399_defconfig
++++ b/configs/firefly-rk3399_defconfig
+@@ -14,6 +14,8 @@ CONFIG_DEBUG_UART_BASE=0xFF1A0000
+ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_DEFAULT_FDT_FILE="rockchip/rk3399-firefly.dtb"
+ CONFIG_DISPLAY_BOARDINFO_LATE=y
+ CONFIG_SPL_MAX_SIZE=0x40000
+diff --git a/configs/generic-rk3568_defconfig b/configs/generic-rk3568_defconfig
+index f79f0e84400..ba5339a004f 100644
+--- a/configs/generic-rk3568_defconfig
++++ b/configs/generic-rk3568_defconfig
+@@ -14,6 +14,8 @@ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_SPL_SPI_FLASH_SUPPORT=y
+ CONFIG_SPL_SPI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+ CONFIG_SPL_FIT_SIGNATURE=y
+diff --git a/configs/generic-rk3588_defconfig b/configs/generic-rk3588_defconfig
+index 51e31dce3a9..1c767caa06a 100644
+--- a/configs/generic-rk3588_defconfig
++++ b/configs/generic-rk3588_defconfig
+@@ -10,6 +10,8 @@ CONFIG_SYS_LOAD_ADDR=0xc00800
+ CONFIG_DEBUG_UART_BASE=0xFEB50000
+ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+ CONFIG_SPL_FIT_SIGNATURE=y
+diff --git a/configs/jaguar-rk3588_defconfig b/configs/jaguar-rk3588_defconfig
+index 6e853991d1d..a5a56a33d09 100644
+--- a/configs/jaguar-rk3588_defconfig
++++ b/configs/jaguar-rk3588_defconfig
+@@ -16,6 +16,8 @@ CONFIG_DEBUG_UART_BASE=0xfeb50000
+ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+ CONFIG_SPL_FIT_SIGNATURE=y
+diff --git a/configs/lubancat-2-rk3568_defconfig b/configs/lubancat-2-rk3568_defconfig
+index 46cc3c03fff..8915d5bfba9 100644
+--- a/configs/lubancat-2-rk3568_defconfig
++++ b/configs/lubancat-2-rk3568_defconfig
+@@ -9,6 +9,8 @@ CONFIG_SYS_LOAD_ADDR=0xc00800
+ CONFIG_DEBUG_UART_BASE=0xFE660000
+ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_EFI_VAR_BUF_SIZE=16384
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+diff --git a/configs/nanopc-t4-rk3399_defconfig b/configs/nanopc-t4-rk3399_defconfig
+index 26c12c51078..33f7e838c2c 100644
+--- a/configs/nanopc-t4-rk3399_defconfig
++++ b/configs/nanopc-t4-rk3399_defconfig
+@@ -14,6 +14,8 @@ CONFIG_DEBUG_UART_BASE=0xFF1A0000
+ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_DEFAULT_FDT_FILE="rockchip/rk3399-nanopc-t4.dtb"
+ CONFIG_DISPLAY_BOARDINFO_LATE=y
+ CONFIG_SPL_MAX_SIZE=0x40000
+diff --git a/configs/nanopc-t6-rk3588_defconfig b/configs/nanopc-t6-rk3588_defconfig
+index 772b7df1555..ba6cf48308c 100644
+--- a/configs/nanopc-t6-rk3588_defconfig
++++ b/configs/nanopc-t6-rk3588_defconfig
+@@ -18,6 +18,8 @@ CONFIG_SPL_SPI_FLASH_SUPPORT=y
+ CONFIG_SPL_SPI=y
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+ CONFIG_SPL_FIT_SIGNATURE=y
+diff --git a/configs/nanopi-r5c-rk3568_defconfig b/configs/nanopi-r5c-rk3568_defconfig
+index 4a43b17ccb1..91c95b491d5 100644
+--- a/configs/nanopi-r5c-rk3568_defconfig
++++ b/configs/nanopi-r5c-rk3568_defconfig
+@@ -11,6 +11,8 @@ CONFIG_DEBUG_UART_BASE=0xFE660000
+ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="usb start;"
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+ CONFIG_SPL_FIT_SIGNATURE=y
+diff --git a/configs/nanopi-r5s-rk3568_defconfig b/configs/nanopi-r5s-rk3568_defconfig
+index a60d229fbbf..355d8114a9b 100644
+--- a/configs/nanopi-r5s-rk3568_defconfig
++++ b/configs/nanopi-r5s-rk3568_defconfig
+@@ -11,6 +11,8 @@ CONFIG_DEBUG_UART_BASE=0xFE660000
+ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="usb start;"
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+ CONFIG_SPL_FIT_SIGNATURE=y
+diff --git a/configs/nanopi-r6c-rk3588s_defconfig b/configs/nanopi-r6c-rk3588s_defconfig
+index c4de5518a72..92697c536d9 100644
+--- a/configs/nanopi-r6c-rk3588s_defconfig
++++ b/configs/nanopi-r6c-rk3588s_defconfig
+@@ -12,6 +12,8 @@ CONFIG_DEBUG_UART_BASE=0xFEB50000
+ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+ CONFIG_SPL_FIT_SIGNATURE=y
+diff --git a/configs/nanopi-r6s-rk3588s_defconfig b/configs/nanopi-r6s-rk3588s_defconfig
+index 2726729b9ac..63a3690db8e 100644
+--- a/configs/nanopi-r6s-rk3588s_defconfig
++++ b/configs/nanopi-r6s-rk3588s_defconfig
+@@ -12,6 +12,8 @@ CONFIG_DEBUG_UART_BASE=0xFEB50000
+ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+ CONFIG_SPL_FIT_SIGNATURE=y
+diff --git a/configs/neu6a-io-rk3588_defconfig b/configs/neu6a-io-rk3588_defconfig
+index 291e0d26d42..e385aba7bc4 100644
+--- a/configs/neu6a-io-rk3588_defconfig
++++ b/configs/neu6a-io-rk3588_defconfig
+@@ -10,6 +10,8 @@ CONFIG_SYS_LOAD_ADDR=0xc00800
+ CONFIG_DEBUG_UART_BASE=0xFEB50000
+ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+ CONFIG_SPL_FIT_SIGNATURE=y
+diff --git a/configs/neu6b-io-rk3588_defconfig b/configs/neu6b-io-rk3588_defconfig
+index 4e22852f23c..79f4e66cb9b 100644
+--- a/configs/neu6b-io-rk3588_defconfig
++++ b/configs/neu6b-io-rk3588_defconfig
+@@ -10,6 +10,8 @@ CONFIG_SYS_LOAD_ADDR=0xc00800
+ CONFIG_DEBUG_UART_BASE=0xFEB50000
+ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+ CONFIG_SPL_FIT_SIGNATURE=y
+diff --git a/configs/nova-rk3588s_defconfig b/configs/nova-rk3588s_defconfig
+index fb30dfd1db8..e99898355e1 100644
+--- a/configs/nova-rk3588s_defconfig
++++ b/configs/nova-rk3588s_defconfig
+@@ -11,6 +11,8 @@ CONFIG_DEBUG_UART_BASE=0xFEB50000
+ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+ CONFIG_SPL_FIT_SIGNATURE=y
+diff --git a/configs/odroid-m1-rk3568_defconfig b/configs/odroid-m1-rk3568_defconfig
+index a8e8a8781e1..a3ea2e592b9 100644
+--- a/configs/odroid-m1-rk3568_defconfig
++++ b/configs/odroid-m1-rk3568_defconfig
+@@ -17,6 +17,8 @@ CONFIG_SPL_SPI_FLASH_SUPPORT=y
+ CONFIG_SPL_SPI=y
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_AHCI=y
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+diff --git a/configs/orangepi-3b-rk3566_defconfig b/configs/orangepi-3b-rk3566_defconfig
+index 2181c9caf58..fee0c719f25 100644
+--- a/configs/orangepi-3b-rk3566_defconfig
++++ b/configs/orangepi-3b-rk3566_defconfig
+@@ -18,6 +18,8 @@ CONFIG_SPL_SPI_FLASH_SUPPORT=y
+ CONFIG_SPL_SPI=y
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_AHCI=y
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+diff --git a/configs/orangepi-5-plus-rk3588_defconfig b/configs/orangepi-5-plus-rk3588_defconfig
+index 9050fceda45..2e1fe2c6dc5 100644
+--- a/configs/orangepi-5-plus-rk3588_defconfig
++++ b/configs/orangepi-5-plus-rk3588_defconfig
+@@ -18,6 +18,8 @@ CONFIG_SPL_SPI_FLASH_SUPPORT=y
+ CONFIG_SPL_SPI=y
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_AHCI=y
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+diff --git a/configs/orangepi-5-rk3588s_defconfig b/configs/orangepi-5-rk3588s_defconfig
+index 6e2ff7d338a..7ec7d13e1f9 100644
+--- a/configs/orangepi-5-rk3588s_defconfig
++++ b/configs/orangepi-5-rk3588s_defconfig
+@@ -17,6 +17,8 @@ CONFIG_SPL_SPI_FLASH_SUPPORT=y
+ CONFIG_SPL_SPI=y
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_AHCI=y
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+diff --git a/configs/pinebook-pro-rk3399_defconfig b/configs/pinebook-pro-rk3399_defconfig
+index dfa927ccb17..acc2a0a9fcd 100644
+--- a/configs/pinebook-pro-rk3399_defconfig
++++ b/configs/pinebook-pro-rk3399_defconfig
+@@ -22,6 +22,7 @@ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
+ CONFIG_BOOTDELAY=3
+ CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_DEFAULT_FDT_FILE="rockchip/rk3399-pinebook-pro.dtb"
+ CONFIG_DISPLAY_BOARDINFO_LATE=y
+ CONFIG_SPL_MAX_SIZE=0x40000
+diff --git a/configs/pinetab2-rk3566_defconfig b/configs/pinetab2-rk3566_defconfig
+index 45e63b42d19..3ef0ddbbe31 100644
+--- a/configs/pinetab2-rk3566_defconfig
++++ b/configs/pinetab2-rk3566_defconfig
+@@ -18,6 +18,8 @@ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_SPL_SPI_FLASH_SUPPORT=y
+ CONFIG_SPL_SPI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+ CONFIG_SPL_FIT_SIGNATURE=y
+diff --git a/configs/powkiddy-x55-rk3566_defconfig b/configs/powkiddy-x55-rk3566_defconfig
+index 85280839889..f93a463087b 100644
+--- a/configs/powkiddy-x55-rk3566_defconfig
++++ b/configs/powkiddy-x55-rk3566_defconfig
+@@ -9,6 +9,8 @@ CONFIG_SYS_LOAD_ADDR=0xc00800
+ CONFIG_DEBUG_UART_BASE=0xFE660000
+ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+ CONFIG_SPL_FIT_SIGNATURE=y
+diff --git a/configs/quartz64-a-rk3566_defconfig b/configs/quartz64-a-rk3566_defconfig
+index fe3fa37611a..60b1f8f1784 100644
+--- a/configs/quartz64-a-rk3566_defconfig
++++ b/configs/quartz64-a-rk3566_defconfig
+@@ -18,6 +18,8 @@ CONFIG_SPL_SPI_FLASH_SUPPORT=y
+ CONFIG_SPL_SPI=y
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_AHCI=y
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+diff --git a/configs/quartz64-b-rk3566_defconfig b/configs/quartz64-b-rk3566_defconfig
+index 929736f76af..c3155d9b835 100644
+--- a/configs/quartz64-b-rk3566_defconfig
++++ b/configs/quartz64-b-rk3566_defconfig
+@@ -17,6 +17,8 @@ CONFIG_SPL_SPI_FLASH_SUPPORT=y
+ CONFIG_SPL_SPI=y
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_AHCI=y
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+diff --git a/configs/quartzpro64-rk3588_defconfig b/configs/quartzpro64-rk3588_defconfig
+index ade7be27e92..263d21bee8b 100644
+--- a/configs/quartzpro64-rk3588_defconfig
++++ b/configs/quartzpro64-rk3588_defconfig
+@@ -12,6 +12,8 @@ CONFIG_DEBUG_UART_BASE=0xFEB50000
+ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_AHCI=y
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+diff --git a/configs/radxa-cm3-io-rk3566_defconfig b/configs/radxa-cm3-io-rk3566_defconfig
+index 2655fdc3170..c1a27f6e310 100644
+--- a/configs/radxa-cm3-io-rk3566_defconfig
++++ b/configs/radxa-cm3-io-rk3566_defconfig
+@@ -9,6 +9,8 @@ CONFIG_SYS_LOAD_ADDR=0xc00800
+ CONFIG_DEBUG_UART_BASE=0xFE660000
+ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+ CONFIG_SPL_FIT_SIGNATURE=y
+diff --git a/configs/radxa-e25-rk3568_defconfig b/configs/radxa-e25-rk3568_defconfig
+index 4df594ddc01..3830d27b264 100644
+--- a/configs/radxa-e25-rk3568_defconfig
++++ b/configs/radxa-e25-rk3568_defconfig
+@@ -11,6 +11,8 @@ CONFIG_DEBUG_UART_BASE=0xFE660000
+ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_AHCI=y
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+diff --git a/configs/radxa-zero-3-rk3566_defconfig b/configs/radxa-zero-3-rk3566_defconfig
+index 5989b07ad79..1b571ec3847 100644
+--- a/configs/radxa-zero-3-rk3566_defconfig
++++ b/configs/radxa-zero-3-rk3566_defconfig
+@@ -11,6 +11,8 @@ CONFIG_SYS_LOAD_ADDR=0xc00800
+ CONFIG_DEBUG_UART_BASE=0xFE660000
+ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+ CONFIG_SPL_FIT_SIGNATURE=y
+diff --git a/configs/roc-pc-mezzanine-rk3399_defconfig b/configs/roc-pc-mezzanine-rk3399_defconfig
+index 3ab5fd69c62..ba254d8f6c0 100644
+--- a/configs/roc-pc-mezzanine-rk3399_defconfig
++++ b/configs/roc-pc-mezzanine-rk3399_defconfig
+@@ -21,6 +21,8 @@ CONFIG_SPL_SPI_FLASH_SUPPORT=y
+ CONFIG_SPL_SPI=y
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ # CONFIG_ANDROID_BOOT_IMAGE is not set
+ CONFIG_DEFAULT_FDT_FILE="rockchip/rk3399-roc-pc-mezzanine.dtb"
+ CONFIG_DISPLAY_BOARDINFO_LATE=y
+diff --git a/configs/rock-3a-rk3568_defconfig b/configs/rock-3a-rk3568_defconfig
+index 733ce631457..3387796a0c5 100644
+--- a/configs/rock-3a-rk3568_defconfig
++++ b/configs/rock-3a-rk3568_defconfig
+@@ -16,6 +16,8 @@ CONFIG_SPL_SPI_FLASH_SUPPORT=y
+ CONFIG_SPL_SPI=y
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_AHCI=y
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+diff --git a/configs/rock-3b-rk3568_defconfig b/configs/rock-3b-rk3568_defconfig
+index 2023feb36c2..84c6aab6b33 100644
+--- a/configs/rock-3b-rk3568_defconfig
++++ b/configs/rock-3b-rk3568_defconfig
+@@ -16,6 +16,8 @@ CONFIG_SPL_SPI_FLASH_SUPPORT=y
+ CONFIG_SPL_SPI=y
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_AHCI=y
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+diff --git a/configs/rock-3c-rk3566_defconfig b/configs/rock-3c-rk3566_defconfig
+index 2528c7c639c..0a0010b1268 100644
+--- a/configs/rock-3c-rk3566_defconfig
++++ b/configs/rock-3c-rk3566_defconfig
+@@ -16,6 +16,8 @@ CONFIG_SPL_SPI_FLASH_SUPPORT=y
+ CONFIG_SPL_SPI=y
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_AHCI=y
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+diff --git a/configs/rock-4c-plus-rk3399_defconfig b/configs/rock-4c-plus-rk3399_defconfig
+index 0c73a212ea1..2ae2eff39e2 100644
+--- a/configs/rock-4c-plus-rk3399_defconfig
++++ b/configs/rock-4c-plus-rk3399_defconfig
+@@ -17,6 +17,8 @@ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_SPL_SPI_FLASH_SUPPORT=y
+ CONFIG_SPL_SPI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_EFI_CAPSULE_ON_DISK=y
+ CONFIG_EFI_CAPSULE_FIRMWARE_RAW=y
+ # CONFIG_ANDROID_BOOT_IMAGE is not set
+diff --git a/configs/rock-4se-rk3399_defconfig b/configs/rock-4se-rk3399_defconfig
+index 3ae19692155..12621b8a41b 100644
+--- a/configs/rock-4se-rk3399_defconfig
++++ b/configs/rock-4se-rk3399_defconfig
+@@ -18,6 +18,8 @@ CONFIG_SPL_SPI_FLASH_SUPPORT=y
+ CONFIG_SPL_SPI=y
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_AHCI=y
+ CONFIG_EFI_CAPSULE_ON_DISK=y
+ CONFIG_EFI_CAPSULE_FIRMWARE_RAW=y
+diff --git a/configs/rock-5-itx-rk3588_defconfig b/configs/rock-5-itx-rk3588_defconfig
+index d0dd1c20ece..b3a778907c8 100644
+--- a/configs/rock-5-itx-rk3588_defconfig
++++ b/configs/rock-5-itx-rk3588_defconfig
+@@ -18,6 +18,8 @@ CONFIG_SPL_SPI_FLASH_SUPPORT=y
+ CONFIG_SPL_SPI=y
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_AHCI=y
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+diff --git a/configs/rock-pi-4-rk3399_defconfig b/configs/rock-pi-4-rk3399_defconfig
+index f3a5c2c45f3..d95576e804a 100644
+--- a/configs/rock-pi-4-rk3399_defconfig
++++ b/configs/rock-pi-4-rk3399_defconfig
+@@ -18,6 +18,8 @@ CONFIG_SPL_SPI_FLASH_SUPPORT=y
+ CONFIG_SPL_SPI=y
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_AHCI=y
+ CONFIG_EFI_CAPSULE_ON_DISK=y
+ CONFIG_EFI_CAPSULE_FIRMWARE_RAW=y
+diff --git a/configs/rock-pi-4c-rk3399_defconfig b/configs/rock-pi-4c-rk3399_defconfig
+index 9bda50c8c77..d26eb3dcb44 100644
+--- a/configs/rock-pi-4c-rk3399_defconfig
++++ b/configs/rock-pi-4c-rk3399_defconfig
+@@ -18,6 +18,8 @@ CONFIG_SPL_SPI_FLASH_SUPPORT=y
+ CONFIG_SPL_SPI=y
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_AHCI=y
+ CONFIG_EFI_CAPSULE_ON_DISK=y
+ CONFIG_EFI_CAPSULE_FIRMWARE_RAW=y
+diff --git a/configs/rock-pi-n10-rk3399pro_defconfig b/configs/rock-pi-n10-rk3399pro_defconfig
+index a9c6d8a907a..1cde3859eef 100644
+--- a/configs/rock-pi-n10-rk3399pro_defconfig
++++ b/configs/rock-pi-n10-rk3399pro_defconfig
+@@ -13,6 +13,8 @@ CONFIG_DEBUG_UART_BASE=0xFF1A0000
+ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ # CONFIG_ANDROID_BOOT_IMAGE is not set
+ CONFIG_DEFAULT_FDT_FILE="rockchip/rk3399pro-rock-pi-n10.dtb"
+ # CONFIG_CONSOLE_MUX is not set
+diff --git a/configs/rock5a-rk3588s_defconfig b/configs/rock5a-rk3588s_defconfig
+index 9618d590009..9608f7e7e4c 100644
+--- a/configs/rock5a-rk3588s_defconfig
++++ b/configs/rock5a-rk3588s_defconfig
+@@ -10,6 +10,8 @@ CONFIG_SYS_LOAD_ADDR=0xc00800
+ CONFIG_DEBUG_UART_BASE=0xFEB50000
+ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+ CONFIG_SPL_FIT_SIGNATURE=y
+diff --git a/configs/rock5b-rk3588_defconfig b/configs/rock5b-rk3588_defconfig
+index 47ee2109f8e..e1c6961a3ab 100644
+--- a/configs/rock5b-rk3588_defconfig
++++ b/configs/rock5b-rk3588_defconfig
+@@ -18,6 +18,8 @@ CONFIG_SPL_SPI_FLASH_SUPPORT=y
+ CONFIG_SPL_SPI=y
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_AHCI=y
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+diff --git a/configs/rock960-rk3399_defconfig b/configs/rock960-rk3399_defconfig
+index aebfa73459c..8b60ad3bf00 100644
+--- a/configs/rock960-rk3399_defconfig
++++ b/configs/rock960-rk3399_defconfig
+@@ -12,6 +12,8 @@ CONFIG_DEBUG_UART_BASE=0xFF1A0000
+ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_DEFAULT_FDT_FILE="rockchip/rk3399-rock960.dtb"
+ CONFIG_SYS_PBSIZE=1052
+ CONFIG_DISPLAY_BOARDINFO_LATE=y
+diff --git a/configs/rockpro64-rk3399_defconfig b/configs/rockpro64-rk3399_defconfig
+index 08b7e2784e9..d80e120c66f 100644
+--- a/configs/rockpro64-rk3399_defconfig
++++ b/configs/rockpro64-rk3399_defconfig
+@@ -20,6 +20,8 @@ CONFIG_SPL_SPI_FLASH_SUPPORT=y
+ CONFIG_SPL_SPI=y
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_DEFAULT_FDT_FILE="rockchip/rk3399-rockpro64.dtb"
+ CONFIG_DISPLAY_BOARDINFO_LATE=y
+ CONFIG_SPL_MAX_SIZE=0x40000
+diff --git a/configs/sige7-rk3588_defconfig b/configs/sige7-rk3588_defconfig
+index 8b033e22b84..978df10442c 100644
+--- a/configs/sige7-rk3588_defconfig
++++ b/configs/sige7-rk3588_defconfig
+@@ -13,6 +13,8 @@ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_SPL_SPI=y
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_AHCI=y
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+diff --git a/configs/soquartz-blade-rk3566_defconfig b/configs/soquartz-blade-rk3566_defconfig
+index a1a51b2c657..4083f217c0b 100644
+--- a/configs/soquartz-blade-rk3566_defconfig
++++ b/configs/soquartz-blade-rk3566_defconfig
+@@ -11,6 +11,8 @@ CONFIG_DEBUG_UART_BASE=0xFE660000
+ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_AHCI=y
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+diff --git a/configs/soquartz-cm4-rk3566_defconfig b/configs/soquartz-cm4-rk3566_defconfig
+index a8bca0eaccc..c3dd48d9dc1 100644
+--- a/configs/soquartz-cm4-rk3566_defconfig
++++ b/configs/soquartz-cm4-rk3566_defconfig
+@@ -11,6 +11,8 @@ CONFIG_DEBUG_UART_BASE=0xFE660000
+ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_AHCI=y
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+diff --git a/configs/soquartz-model-a-rk3566_defconfig b/configs/soquartz-model-a-rk3566_defconfig
+index f080d2e36d2..f6f2f67b0a6 100644
+--- a/configs/soquartz-model-a-rk3566_defconfig
++++ b/configs/soquartz-model-a-rk3566_defconfig
+@@ -11,6 +11,8 @@ CONFIG_DEBUG_UART_BASE=0xFE660000
+ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_AHCI=y
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+diff --git a/configs/tiger-rk3588_defconfig b/configs/tiger-rk3588_defconfig
+index f962ac416f3..1fc7301f6ae 100644
+--- a/configs/tiger-rk3588_defconfig
++++ b/configs/tiger-rk3588_defconfig
+@@ -17,6 +17,8 @@ CONFIG_DEBUG_UART_CLOCK=24000000
+ # CONFIG_DEBUG_UART_BOARD_INIT is not set
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+ CONFIG_SPL_FIT_SIGNATURE=y
+diff --git a/configs/toybrick-rk3588_defconfig b/configs/toybrick-rk3588_defconfig
+index 5e70341c987..fd7e842f9e5 100644
+--- a/configs/toybrick-rk3588_defconfig
++++ b/configs/toybrick-rk3588_defconfig
+@@ -10,6 +10,8 @@ CONFIG_SYS_LOAD_ADDR=0xc00800
+ CONFIG_DEBUG_UART_BASE=0xFEB50000
+ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+ CONFIG_SPL_FIT_SIGNATURE=y
+diff --git a/configs/turing-rk1-rk3588_defconfig b/configs/turing-rk1-rk3588_defconfig
+index 0eddf15833c..1a9aacc7b5d 100644
+--- a/configs/turing-rk1-rk3588_defconfig
++++ b/configs/turing-rk1-rk3588_defconfig
+@@ -12,6 +12,8 @@ CONFIG_DEBUG_UART_BASE=0xFEBC0000
+ CONFIG_DEBUG_UART_CLOCK=24000000
+ CONFIG_PCI=y
+ CONFIG_DEBUG_UART=y
++CONFIG_USE_PREBOOT=y
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_AHCI=y
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+-- 
+2.47.1
+

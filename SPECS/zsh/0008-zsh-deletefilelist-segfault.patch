@@ -1,0 +1,42 @@
+From d3edf318306e37d2d96c4e4ea442d10207722e94 Mon Sep 17 00:00:00 2001
+From: Bart Schaefer <schaefer@zsh.org>
+Date: Sun, 12 Feb 2023 09:52:39 -0800
+Subject: [PATCH] 51404: Nullify filelist after deleting (fix segfault)
+
+Cherry-picked-by: Lukáš Zaoral <lzaoral@redhat.com>
+Upstream-commit: d3edf318306e37d2d96c4e4ea442d10207722e94
+---
+ Src/jobs.c | 8 ++++++--
+ 1 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/Src/jobs.c b/Src/jobs.c
+index 4863962b9..59ddd952e 100644
+--- a/Src/jobs.c
++++ b/Src/jobs.c
+@@ -1372,8 +1372,10 @@ cleanfilelists(void)
+ 
+     DPUTS(shell_exiting >= 0, "BUG: cleanfilelists() before exit");
+  
+-    for (i = 1; i <= maxjob; i++)
++    for (i = 1; i <= maxjob; i++) {
+ 	deletefilelist(jobtab[i].filelist, 0);
++	jobtab[i].filelist = 0;
++    }
+ }
+ 
+ /**/
+@@ -1531,8 +1533,10 @@ havefiles(void)
+     int i;
+ 
+     for (i = 1; i <= maxjob; i++)
+-	if (jobtab[i].stat && jobtab[i].filelist)
++	if (jobtab[i].stat && jobtab[i].filelist &&
++	    peekfirst(jobtab[i].filelist)) {
+ 	    return 1;
++	}
+     return 0;
+ 
+ }
+-- 
+2.43.0
+

@@ -1,0 +1,38 @@
+XIM=SCIM
+XIM_PROGRAM=/usr/bin/scim
+XIM_ARGS=""
+ICON="/usr/share/scim/icons/trademark.png"
+PREFERENCE_PROGRAM=/usr/bin/scim-setup
+SHORT_DESC="SCIM"
+
+gtkimm_exists () {
+	# check if any immodules installed
+	for dir in /usr/lib*/gtk-2.0/immodules; do
+		[ -x ${dir}/im-$1.so ] && return 0
+	done
+	return 1
+	}
+
+if gtkimm_exists scim-bridge; then
+  GTK_IM_MODULE=scim-bridge
+elif gtkimm_exists scim; then
+  GTK_IM_MODULE=scim
+else
+  GTK_IM_MODULE=xim
+fi
+
+qtimm_exists () {
+	# check if any immodule installed
+	for dir in /usr/lib*/qt4/plugins/inputmethods; do
+		[ -x ${dir}/$1.so ] && return 0
+	done
+	return 1
+	}
+
+if qtimm_exists im-scim-bridge; then
+  QT_IM_MODULE=scim-bridge
+elif qtimm_exists im-scim; then
+  QT_IM_MODULE=scim
+else
+  QT_IM_MODULE=xim
+fi

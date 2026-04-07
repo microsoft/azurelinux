@@ -1,0 +1,12 @@
+--- rmp-serde-1.3.1/Cargo.toml	2006-07-24T01:21:28+00:00
++++ rmp-serde-1.3.1/Cargo.toml	2025-12-29T17:00:24.040748+00:00
+@@ -75,6 +75,9 @@
+ [dependencies.serde]
+ version = "1.0.228"
+ 
++[dev-dependencies.rmpv]
++version = "1.0.0"
++
+ [dev-dependencies.serde]
+ version = "1.0.228"
+ features = ["derive"]

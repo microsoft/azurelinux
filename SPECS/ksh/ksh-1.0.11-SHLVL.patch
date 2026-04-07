@@ -1,0 +1,139 @@
+From 7c945bdd6ba44bbb490504f44904ac65d705dd17 Mon Sep 17 00:00:00 2001
+From: Martijn Dekker <martijn@inlv.org>
+Date: Sun, 27 Oct 2024 01:34:38 +0000
+Subject: [PATCH] Fix crash on 'exec' after 'unset SHLVL' (re: fa0f9796)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Vincent Mihalkovič (@vmihalko) reports:
+> If the user unsets the SHLVL variable and later replaces the
+> shell by executing a command, ksh will segfault.
+>
+> Reproducer
+>
+>     # unset -v SHLVL
+>     # exec bash
+>     Segmaentation fault (core dumped)
+>
+> Reason
+>
+> The reason for this is that the SHLVL variable is getting
+> decremented without any guard making sure it's still in the
+> environment, see:
+>
+> src/cmd/ksh93/bltins/misc.c:
+> 145: /* if the main shell is about to be replaced, decrease SHLVL
+> 	to cancel out a subsequent increase */
+> 146: if(!sh.realsubshell)
+> 147:         (*SHLVL->nvalue.ip)--;
+
+This should be fixed so that SHLVL can be unset safely and lose its
+special properties like other special variables do.
+
+src/cmd/ksh93/sh/init.c,
+src/cmd/ksh93/include/shell.h:
+- Move the static 'shlvl' in init.c to the sh state struct, so that
+  'sh.shlvl' can be accessed from the entire ksh93 code base.
+- Change its type from int to int32_t -- this is more correct as
+  nv_getval() uses this type to retrieve the value. In practice,
+  this makes no difference because sizeof(int) == sizeof(int32_t),
+  but this is not guaranteed by the standards.
+
+src/cmd/ksh93/bltins/misc.c:
+- Access sh.shlvl directly instead of dereferencing the SHLVL value
+  pointer, as this pointer is invalidated upon 'unset SHLVL'. This
+  fixes the bug.
+
+Resolves: https://github.com/ksh93/ksh/issues/788
+---
+ src/cmd/ksh93/bltins/misc.c      | 2 +-
+ src/cmd/ksh93/include/shell.h    | 1 +
+ src/cmd/ksh93/sh/init.c          | 7 +++----
+ src/cmd/ksh93/tests/variables.sh | 7 +++++++
+ 4 files changed, 12 insertions(+), 5 deletions(-)
+
+diff --git a/src/cmd/ksh93/bltins/misc.c b/src/cmd/ksh93/bltins/misc.c
+index cb7e883..1d49162 100644
+--- a/src/cmd/ksh93/bltins/misc.c
++++ b/src/cmd/ksh93/bltins/misc.c
+@@ -144,7 +144,7 @@ int    b_exec(int argc,char *argv[], Shbltin_t *context)
+ 			return 1;
+ 		/* if the main shell is about to be replaced, decrease SHLVL to cancel out a subsequent increase */
+ 		if(!sh.realsubshell)
+-			(*SHLVL->nvalue.ip)--;
++			sh.shlvl--;
+ 		sh_onstate(SH_EXEC);
+ 		if(sh.subshell && !sh.subshare)
+ 		{
+diff --git a/src/cmd/ksh93/include/shell.h b/src/cmd/ksh93/include/shell.h
+index c28b159..96d982a 100644
+--- a/src/cmd/ksh93/include/shell.h
++++ b/src/cmd/ksh93/include/shell.h
+@@ -270,6 +270,7 @@ struct Shell_s
+ 	 * Programs using libshell should not rely on them as they may change. */
+ 	int		subshell;	/* set for virtual subshell */
+ 	int		realsubshell;	/* ${.sh.subshell}, actual subshell level (including virtual and forked) */
++	int32_t		shlvl;		/* $SHLVL, non-subshell child shell level */
+ 	char		shcomp;		/* set when running shcomp */
+ 	unsigned char	trapnote;	/* set when trap/signal is pending */
+ 	struct sh_scoped st;		/* scoped information */
+diff --git a/src/cmd/ksh93/sh/init.c b/src/cmd/ksh93/sh/init.c
+index 1242789..1f1b71e 100644
+--- a/src/cmd/ksh93/sh/init.c
++++ b/src/cmd/ksh93/sh/init.c
+@@ -220,7 +220,6 @@ static Init_t		*nv_init(void);
+ #if SHOPT_STATS
+ static void		stat_init(void);
+ #endif
+-static int		shlvl;
+ static int		rand_shift;
+ 
+ /*
+@@ -1352,7 +1351,7 @@ Shell_t *sh_init(int argc,char *argv[], Shinit_f userinit)
+ 		nv_putval(ENVNOD,sfstruse(sh.strbuf),NV_RDONLY);
+ 	}
+ 	/* increase SHLVL */
+-	shlvl++;
++	sh.shlvl++;
+ #if SHOPT_SPAWN
+ 	{
+ 		/*
+@@ -1672,7 +1671,7 @@ void sh_reinit(void)
+ 	else
+ 		env_import_attributes(env_init());
+ 	/* Increase SHLVL */
+-	shlvl++;
++	sh.shlvl++;
+ 	/* call user init function, if any */
+ 	if(sh.userinit)
+ 		(*sh.userinit)(&sh, 1);
+@@ -1804,7 +1803,7 @@ static Init_t *nv_init(void)
+ 	sh.nvfun.last = (char*)&sh;
+ 	sh.nvfun.nofree = 1;
+ 	sh.var_base = sh.var_tree = sh_inittree(shtab_variables);
+-	SHLVL->nvalue.ip = &shlvl;
++	SHLVL->nvalue.lp = &sh.shlvl;
+ 	ip->IFS_init.hdr.disc = &IFS_disc;
+ 	ip->PATH_init.disc = &RESTRICTED_disc;
+ 	ip->PATH_init.nofree = 1;
+diff --git a/src/cmd/ksh93/tests/variables.sh b/src/cmd/ksh93/tests/variables.sh
+index 12a797a..5754085 100755
+--- a/src/cmd/ksh93/tests/variables.sh
++++ b/src/cmd/ksh93/tests/variables.sh
+@@ -1619,5 +1619,12 @@ got=$(set +x; { "$SHELL" -c '
+ 	"(expected status 0, $(printf %q "$exp");" \
+ 	"got status $e$( ((e>128)) && print -n /SIG && kill -l "$e"), $(printf %q "$got"))"
+ 
++# ======
++# exec after unset SHLVL
++# https://github.com/ksh93/ksh/issues/788
++{ "$SHELL" -c 'unset SHLVL; exec true'; } 2>/dev/null
++(((e=$?)==0)) || err_exit "crash after unsetting SHLVL" \
++	"(expected status 0, got status $e$( ((e>128)) && print -n /SIG && kill -l "$e"))"
++
+ # ======
+ exit $((Errors<125?Errors:125))
+-- 
+2.46.2
+

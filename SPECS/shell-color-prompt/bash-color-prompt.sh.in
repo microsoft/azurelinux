@@ -1,0 +1,204 @@
+# see /usr/share/doc/bash-color-prompt/README.md
+
+## to truncate \w dirpath set:
+# PROMPT_DIRTRIM=3
+
+# only for bash
+if [ -n "${BASH_VERSION}" -a -z "${bash_color_prompt_disable}" -a -z "${bash_prompt_color_disable}" ]; then
+
+    # enable only in interactive shell
+    case $- in
+        *i*) ;;
+        *) if [ -z "${bash_prompt_color_test}" ]; then return; fi;;
+    esac
+
+    # defines PS1 for color prompt
+    prompt_setup_color_ps1() {
+        PS1='${PROMPT_START@P}colorreset()colorvar(PROMPT_HIGHLIGHT)colorvar(PROMPT_COLOR)${PROMPT_CONTAINER}when(PROMPT_USERHOST,${PROMPT_USERHOST@P}when(PROMPT_SEPARATOR,colorreset()colorvar(PROMPT_SEPARATOR_COLOR)${PROMPT_SEPARATOR@P}when(PROMPT_SEPARATOR_COLOR,colorreset())colorvar(PROMPT_HIGHLIGHT)colorvar(PROMPT_COLOR)))colorvar(PROMPT_DIR_COLOR)${PROMPT_DIRECTORY@P}when(PROMPT_GIT_BRANCH,when(PROMPT_SEPARATOR,colorreset()colorvar(PROMPT_SEPARATOR_COLOR)${PROMPT_SEPARATOR@P}when(PROMPT_SEPARATOR_COLOR,colorreset())colorvar(PROMPT_HIGHLIGHT)colorvar(PROMPT_COLOR)colorvar(PROMPT_DIR_COLOR))colorvar(PROMPT_GIT_COLOR)${PROMPT_GIT_BRANCH@P})colorreset()${PROMPT_END@P}\$when(PROMPT_END,colorreset()) '
+    }
+
+    # sets default color or $1 can override
+    prompt_color() {
+        if [ -n "$1" ]; then
+            PROMPT_COLOR="$1"
+        else
+            if [ "$USER" = "root" ]; then
+                PROMPT_COLOR=35
+            else
+                PROMPT_COLOR=32
+            fi
+        fi
+    }
+
+    # sets prompt highlighting
+    prompt_highlight() {
+        PROMPT_HIGHLIGHT=${1:-1}
+    }
+
+    prompt_default_highlight() {
+        if [ "$DESKTOP_SESSION" = "gnome" ]; then
+            prompt_highlight "${1:-1}"
+        else
+            unset PROMPT_HIGHLIGHT
+        fi
+    }
+
+    prompt_separator_color() {
+        PROMPT_SEPARATOR_COLOR=$1
+    }
+
+    prompt_default_color() {
+        prompt_color "$1"
+        prompt_default_highlight
+        prompt_separator_color
+        unset PROMPT_DIR_COLOR
+        unset PROMPT_GIT_COLOR
+    }
+
+    prompt_dir_color() {
+        if [ -n "$1" ]; then
+            PROMPT_DIR_COLOR="$1"
+        else
+            unset PROMPT_DIR_COLOR
+        fi
+    }
+
+    # sets default prompt format
+    prompt_default_format() {
+        PROMPT_USERHOST='\u@\h'
+        PROMPT_SEPARATOR=':'
+        PROMPT_DIRECTORY='\w'
+        PROMPT_START=''
+        PROMPT_END=''
+    }
+
+    # sets default prompt color and format
+    prompt_default() {
+        prompt_default_color "$1"
+        prompt_default_format
+    }
+
+    # sets color to OS ANSI_COLOR
+    # $1 is appended to the (foreground) color
+    prompt_os_color() {
+        if [ -z "$ANSI_COLOR" ]; then
+            eval local $(grep ANSI_COLOR /etc/os-release)
+        fi
+        PROMPT_COLOR="${ANSI_COLOR:2}${1:+;$1}"
+    }
+
+    prompt_separator() {
+        PROMPT_SEPARATOR=$1
+    }
+
+    prompt_host_os() {
+        eval local $(grep "\(^ID=\|VERSION_ID\|VARIANT_ID\)" /etc/os-release)
+        case "$VARIANT_ID" in
+            eln)
+                PROMPT_USERHOST="$VARIANT_ID" ;;
+            *)
+                PROMPT_USERHOST="$ID$VERSION_ID" ;;
+        esac
+    }
+
+    prompt_no_userhost() {
+        unset PROMPT_USERHOST
+    }
+
+    prompt_container() {
+        if [ -n "$container" ]; then
+            PROMPT_CONTAINER="⬢ "
+        else
+            unset PROMPT_CONTAINER
+        fi
+        }
+
+    prompt_container_host() {
+        prompt_container
+        if [ -n "$container" ]; then
+            prompt_host_os
+        else
+            if [ "$HOSTNAME" = "${2:-fedora}" -a "$1" = "$USER" ]; then
+                prompt_no_userhost
+            fi
+        fi
+    }
+
+    prompt_git_color() {
+        PROMPT_GIT_COLOR=$1
+    }
+
+    # unsets colors
+    prompt_no_color() {
+        unset PROMPT_COLOR
+        unset PROMPT_DIR_COLOR
+        unset PROMPT_SEPARATOR_COLOR
+        unset PROMPT_GIT_COLOR
+    }
+
+    # unsets highlighting
+    prompt_no_highlight() {
+        unset PROMPT_HIGHLIGHT
+    }
+
+    # unsets color and highlighting
+    prompt_plain() {
+        prompt_no_color
+        prompt_no_highlight
+    }
+
+    # sets traditional Red Hat prompt style format
+    prompt_traditional_format() {
+        PROMPT_USERHOST='\u@\h'
+        PROMPT_SEPARATOR=' '
+        PROMPT_DIRECTORY='\W'
+        PROMPT_START='['
+        PROMPT_END=']'
+    }
+
+    # sets traditional Red Hat prompt style without color
+    prompt_traditional() {
+        prompt_plain
+        prompt_traditional_format
+    }
+
+    # revert to traditional Red Hat prompt
+    prompt_reset_traditional_ps1() {
+        PS1="[\u@\h \W]\\$ "
+    }
+
+    prompt_default_setup() {
+        prompt_color "$PROMPT_COLOR"
+        prompt_default_highlight "$PROMPT_HIGHLIGHT"
+        prompt_dir_color "$PROMPT_DIR_COLOR"
+        prompt_container
+        PROMPT_USERHOST="${PROMPT_USERHOST-\u@\h}"
+        prompt_separator "${PROMPT_SEPARATOR-:}"
+        prompt_separator_color "${PROMPT_SEPARATOR_COLOR}"
+        PROMPT_DIRECTORY="${PROMPT_DIRECTORY-\w}"
+        prompt_setup_color_ps1
+    }
+
+    prompt_default_setup_checked() {
+        # only activate for color terminals and if PS1 unchanged from bash or fedora defaults
+        if [ '(' "$PS1" = "[\u@\h \W]\\$ " -o "$PS1" = "\\s-\\v\\\$ " -o "${TOOLBOX_PATH}" = "/usr/bin/toolbox" ')' \
+                 -a '(' -n "${COLORTERM}" -o "${TERM: -5}" = "color" -o "${TERM}" = "linux" ')' \
+                 -o -n "${bash_color_prompt_force}" \
+                 -o -n "${bash_prompt_color_force}" ]; then
+            prompt_default_setup
+            if [ -n "${NO_COLOR}" -a -z "${BASH_PROMPT_USE_COLOR}" -o -n "${BASH_PROMPT_NO_COLOR}" ]; then
+                prompt_highlight
+                prompt_no_color
+            fi
+        fi
+    }
+
+    prompt_default_setup_checked
+
+    BASH_COLOR_PROMPT_VERSION=@BASHCOLORVERSION@
+
+    # user convenience
+    set_ansi() {
+        echo "\[\e[${1}m\]"
+    }
+fi

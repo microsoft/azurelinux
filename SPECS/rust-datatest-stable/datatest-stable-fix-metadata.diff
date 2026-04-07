@@ -1,0 +1,26 @@
+--- datatest-stable-0.3.3/Cargo.toml	1970-01-01T00:00:01+00:00
++++ datatest-stable-0.3.3/Cargo.toml	2026-02-03T12:56:40.846340+00:00
+@@ -31,6 +31,14 @@
+ categories = ["development-tools::testing"]
+ license = "MIT OR Apache-2.0"
+ repository = "https://github.com/nextest-rs/datatest-stable"
++exclude = [
++    ".cargo/**",
++    ".github/**",
++    ".gitignore",
++    "Justfile",
++    "release.toml",
++    "scripts/**",
++]
+ 
+ [package.metadata.cargo-sync-rdme.badge.badges]
+ maintenance = true
+@@ -67,7 +75,7 @@
+ version = "1.1.9"
+ 
+ [dependencies.fancy-regex]
+-version = "0.14.0"
++version = ">=0.13.0, <0.18.0"
+ 
+ [dependencies.include_dir]
+ version = "0.7.4"

@@ -1,0 +1,28 @@
+From 358250a2739c8fb0a4cdef1b372de3bc5ebb5ff6 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Mon, 3 Jun 2024 18:54:41 +0200
+Subject: [PATCH 1/2] remove references renamed or removed lints
+
+---
+ src/lib.rs | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index b2af1a8..fdf05dc 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -51,11 +51,9 @@
+ // this attribute, any unknown lint would cause a CI failure when testing with
+ // our MSRV.
+ #![allow(unknown_lints)]
+-#![deny(renamed_and_removed_lints)]
+ #![deny(
+     anonymous_parameters,
+     deprecated_in_future,
+-    illegal_floating_point_literal_pattern,
+     late_bound_lifetime_arguments,
+     missing_copy_implementations,
+     missing_debug_implementations,
+-- 
+2.52.0
+

@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=org.mozilla.firefox.SearchProvider
+Exec=/usr/lib64/firefox/firefox --dbus-service /usr/bin/firefox

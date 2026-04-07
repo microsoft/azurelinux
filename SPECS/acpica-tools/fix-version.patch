@@ -1,0 +1,50 @@
+The two changes that follow were inadvertently dropped by upstream
+when creating the source tarball; the G20240322 tag in github contains
+them.
+
+Signed-off-by: Al Stone <ahs3@fedoraproject.org>
+
+diff -Naur acpica-unix-20240321/changes.txt acpica-unix-20240808/changes.txt
+--- acpica-unix-20240321/changes.txt	2024-03-22 00:16:29.000000000 -0600
++++ acpica-unix-20240808/changes.txt	2024-08-08 10:54:25.000000000 -0600
+@@ -1,4 +1,28 @@
+ ----------------------------------------
++22 March 2024. Summary of changes for version 20240322:
++
++Major changes:
++
++Update all the license header year from 2023 to 2024.
++
++Fix table argument ordering to work properly with iasl.
++
++Get rid of the annoying repeated warning types in MSVC and Windows.
++
++Fix a test in ASLTS with edge case failure.
++
++Fix a couple of issues with how GPEs are counted and enabled.
++
++Add new tables for various architectures/OS, mainly RISC-V and also update many more.
++
++Add an option to either make the output deterministic or non-deterministic.
++
++Remove redundant checks, duplicated code and fix spellings in various files.
++
++Fix flex arrays for C++ compilers and also make ACPICA overall more compatible with different compilers which throw warnings related to memory sanitization etc.
++
++
++----------------------------------------
+ 28 June 2023. Summary of changes for version 20230628:
+ 
+ 0) Global changes:
+diff -Naur acpica-unix-20240321/source/include/acpixf.h acpica-unix-20240808/source/include/acpixf.h
+--- acpica-unix-20240321/source/include/acpixf.h	2024-03-22 00:16:32.000000000 -0600
++++ acpica-unix-20240808/source/include/acpixf.h	2024-08-08 10:54:25.000000000 -0600
+@@ -154,7 +154,7 @@
+ 
+ /* Current ACPICA subsystem version in YYYYMMDD format */
+ 
+-#define ACPI_CA_VERSION                 0x20230628
++#define ACPI_CA_VERSION                 0x20240322
+ 
+ #include "acconfig.h"
+ #include "actypes.h"

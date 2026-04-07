@@ -1,0 +1,39 @@
+--- bit-vec-0.8.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ bit-vec-0.8.0/Cargo.toml	2025-01-07T21:07:35.817652+00:00
+@@ -32,6 +32,7 @@
+ ]
+ license = "Apache-2.0 OR MIT"
+ repository = "https://github.com/contain-rs/bit-vec"
++exclude = ["/*.sh"]
+ 
+ [package.metadata.docs.rs]
+ features = [
+@@ -49,20 +50,6 @@
+ name = "bench"
+ path = "benches/bench.rs"
+ 
+-[dependencies.borsh]
+-version = "1.5"
+-features = ["derive"]
+-optional = true
+-default-features = false
+-
+-[dependencies.miniserde]
+-version = "0.1"
+-optional = true
+-
+-[dependencies.nanoserde]
+-version = "0.1"
+-optional = true
+-
+ [dependencies.serde]
+ version = "1.0"
+ features = ["derive"]
+@@ -79,7 +66,6 @@
+ version = "1.0"
+ 
+ [features]
+-borsh_std = ["borsh/std"]
+ default = ["std"]
+ serde_no_std = ["serde/alloc"]
+ serde_std = [

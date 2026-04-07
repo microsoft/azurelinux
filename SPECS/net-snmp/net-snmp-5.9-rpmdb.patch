@@ -1,0 +1,65 @@
+From ed4ee14af5b83fa4a86dfaa783f841d3e8545ce4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Josef=20=C5=98=C3=ADdk=C3=BD?= <jridky@redhat.com>
+Date: Wed, 9 Aug 2023 16:51:28 +0200
+Subject: [PATCH] Add support for RPM SQLite DB background.
+
+From RPM 4.16 the SQLite support is available for RPM DB.
+After https://fedoraproject.org/wiki/Changes/Sqlite_Rpmdb, rpm changed
+it's background DB from Berkeley to SQLite in Fedora.
+Net-SNMP is using hard coded paths to determine where RPM DB files are.
+
+This update is adding check for rpmdb.sqlite file in order to be able
+invalidate internal cache after system package change.
+
+Closes #596
+---
+ agent/mibgroup/host/data_access/swinst_rpm.c | 18 +++++++++++++-----
+ agent/mibgroup/host/hr_swinst.c              |  3 +++
+ 2 files changed, 16 insertions(+), 5 deletions(-)
+
+diff --git a/agent/mibgroup/host/data_access/swinst_rpm.c b/agent/mibgroup/host/data_access/swinst_rpm.c
+index 050edff307..7ad91a3194 100644
+--- a/agent/mibgroup/host/data_access/swinst_rpm.c
++++ b/agent/mibgroup/host/data_access/swinst_rpm.c
+@@ -73,15 +73,23 @@ netsnmp_swinst_arch_init(void)
+ #endif
+ 
+     snprintf( pkg_directory, SNMP_MAXPATH, "%s/Packages", dbpath );
++    
++    if (-1 == stat( pkg_directory, &stat_buf )) {
++
++        /* check for SQLite DB backend */
++        snprintf( pkg_directory, SNMP_MAXPATH, "%s/rpmdb.sqlite", dbpath );
++        
++        if (-1 == stat( pkg_directory, &stat_buf )) {
++            snmp_log(LOG_ERR, "Can't find directory of RPM packages\n");
++            pkg_directory[0] = '\0';
++        }
++    }
++
+     SNMP_FREE(rpmdbpath);
+     dbpath = NULL;
+ #ifdef HAVE_RPMGETPATH
+     rpmFreeRpmrc();
+-#endif
+-    if (-1 == stat( pkg_directory, &stat_buf )) {
+-        snmp_log(LOG_ERR, "Can't find directory of RPM packages\n");
+-        pkg_directory[0] = '\0';
+-    }
++#endif    
+ }
+ 
+ void
+diff -urNp a/agent/mibgroup/host/hr_swinst.c b/agent/mibgroup/host/hr_swinst.c
+--- a/agent/mibgroup/host/hr_swinst.c	2023-07-31 11:37:44.855071535 +0200
++++ b/agent/mibgroup/host/hr_swinst.c	2023-08-14 12:45:14.846357019 +0200
+@@ -229,6 +229,9 @@ init_hr_swinst(void)
+         snprintf(path, sizeof(path), "%s/Packages", swi->swi_dbpath);
+         if (stat(path, &stat_buf) == -1)
+             snprintf(path, sizeof(path), "%s/packages.rpm", swi->swi_dbpath);
++        /* check for SQLite DB backend */
++        if (stat(path, &stat_buf) == -1)
++            snprintf(path, sizeof(path), "%s/rpmdb.sqlite", swi->swi_dbpath);
+         path[ sizeof(path)-1 ] = 0;
+         swi->swi_directory = strdup(path);
+ #ifdef HAVE_RPMGETPATH

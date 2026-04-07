@@ -1,0 +1,56 @@
+From d0045e35674d64d166d17c3c079ae03e8c2e6361 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Lyson=C4=9Bk?= <olysonek@redhat.com>
+Date: Thu, 13 Feb 2020 17:29:06 +0100
+Subject: [PATCH 2/2] Drop an unused global variable
+
+The global variable `s_timezone` is not used anymore, so we can drop
+it.
+---
+ sysutil.c | 17 +++--------------
+ 1 file changed, 3 insertions(+), 14 deletions(-)
+
+diff --git a/sysutil.c b/sysutil.c
+index 66d4c5e..0ccf551 100644
+--- a/sysutil.c
++++ b/sysutil.c
+@@ -72,8 +72,6 @@ static struct timeval s_current_time;
+ static int s_current_pid = -1;
+ /* Exit function */
+ static exitfunc_t s_exit_func;
+-/* Difference in timezone from GMT in seconds */
+-static long s_timezone;
+ 
+ /* Our internal signal handling implementation details */
+ static struct vsf_sysutil_sig_details
+@@ -2661,7 +2659,6 @@ char* vsf_sysutil_get_tz()
+ void
+ vsf_sysutil_tzset(void)
+ {
+-  int retval;
+   char *tz=NULL, tzbuf[sizeof("+HHMM!")];
+   time_t the_time = time(NULL);
+   struct tm* p_tm;
+@@ -2681,17 +2678,9 @@ vsf_sysutil_tzset(void)
+   {
+     die("localtime");
+   }
+-  retval = strftime(tzbuf, sizeof(tzbuf), "%z", p_tm);
+-  tzbuf[sizeof(tzbuf) - 1] = '\0';
+-  if (retval == 5)
+-  {
+-    s_timezone = ((tzbuf[1] - '0') * 10 + (tzbuf[2] - '0')) * 60 * 60;
+-    s_timezone += ((tzbuf[3] - '0') * 10 + (tzbuf[4] - '0')) * 60;
+-    if (tzbuf[0] == '+')
+-    {
+-      s_timezone *= -1;
+-    }
+-  }
++  /* Not sure if the following call to strftime() has any desired side
++     effects, so I'm keeping it to be safe. */
++  (void) strftime(tzbuf, sizeof(tzbuf), "%z", p_tm);
+   /* Call in to the time subsystem again now that TZ is set, trying to force
+    * caching of the actual zoneinfo for the timezone.
+    */
+-- 
+2.24.1
+

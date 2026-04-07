@@ -1,0 +1,110 @@
+From 4ae2eb88fadc256ddf9862b2e72ed216ddbb919d Mon Sep 17 00:00:00 2001
+From: michael brey <michael.brey@oracle.com>
+Date: Tue, 20 May 2014 14:49:44 +0200
+Subject: [PATCH] Fix a CDB race
+
+Report and reproducer here:
+https://community.oracle.com/thread/3514381
+
+From: michael brey <michael.brey@oracle.com>
+To: Lubomir Rintel <lkundrak@v3.sk>
+Subject: Re: BDB crash
+Date: Tue, 13 May 2014 09:07:45 -0600 (05/13/2014 05:07:45 PM)
+Message-id: <53723541.7040203@oracle.com>
+
+  attached are patches for each release.  the 5.3.28 patch will apply on
+top of 5.3.21.
+
+thanks
+mike
+
+RHBZ: #1099509
+---
+ src/env/env_failchk.c | 24 ++++++++++++++++++++++++
+ src/mutex/mut_tas.c   | 18 +++++++++++++++++-
+ 2 files changed, 41 insertions(+), 1 deletion(-)
+
+diff --git a/src/env/env_failchk.c b/src/env/env_failchk.c
+index 05752f0..b09df96 100644
+--- a/src/env/env_failchk.c
++++ b/src/env/env_failchk.c
+@@ -312,6 +312,7 @@ __env_in_api(env)
+ 	REGINFO *infop;
+ 	THREAD_INFO *thread;
+ 	u_int32_t i;
++	pid_t pid;
+ 	int unpin, ret;
+ 
+ 	if ((htab = env->thr_hashtab) == NULL)
+@@ -325,6 +326,7 @@ __env_in_api(env)
+ 
+ 	for (i = 0; i < env->thr_nbucket; i++)
+ 		SH_TAILQ_FOREACH(ip, &htab[i], dbth_links, __db_thread_info) {
++			pid = ip->dbth_pid;
+ 			if (ip->dbth_state == THREAD_SLOT_NOT_IN_USE ||
+ 			    (ip->dbth_state == THREAD_OUT &&
+ 			    thread->thr_count <  thread->thr_max))
+@@ -341,6 +343,28 @@ __env_in_api(env)
+ 				ip->dbth_state = THREAD_SLOT_NOT_IN_USE;
+ 				continue;
+ 			}
++			/*
++			 * The above tests are not atomic, so it is possible that
++			 * the process pointed by ip has changed during the tests.
++			 * In particular, if the process pointed by ip when is_alive
++			 * was executed terminated normally, a new process may reuse
++			 * the same ip structure and change its dbth_state before the
++			 * next two tests were performed. Therefore, we need to test
++			 * here that all four tests above are done on the same process.
++			 * If the process pointed by ip changed, all tests are invalid
++			 * and can be ignored.
++			 * Similarly, it's also possible for two processes racing to
++			 * change the dbth_state of the same ip structure. For example,
++			 * both process A and B reach the above test for the same
++			 * terminated process C where C's dbth_state is THREAD_OUT.
++			 * If A goes into the 'if' block and changes C's dbth_state to
++			 * THREAD_SLOT_NOT_IN_USE before B checks the condition, B
++			 * would incorrectly fail the test and run into this line.
++			 * Therefore, we need to check C's dbth_state again and fail
++			 * the db only if C's dbth_state is indeed THREAD_ACTIVE.
++			 */
++			if (ip->dbth_state != THREAD_ACTIVE || ip->dbth_pid != pid)
++				continue;
+ 			return (__db_failed(env, DB_STR("1507",
+ 			    "Thread died in Berkeley DB library"),
+ 			    ip->dbth_pid, ip->dbth_tid));
+diff --git a/src/mutex/mut_tas.c b/src/mutex/mut_tas.c
+index 0899d23..db95030 100644
+--- a/src/mutex/mut_tas.c
++++ b/src/mutex/mut_tas.c
+@@ -151,10 +151,26 @@ loop:	/* Attempt to acquire the resource for N spins. */
+ 			if (F_ISSET(dbenv, DB_ENV_FAILCHK) &&
+ 			    ip == NULL && dbenv->is_alive(dbenv,
+ 			    mutexp->pid, mutexp->tid, 0) == 0) {
++				/*
++				 * The process owing the mutex is "dead" now, but it may
++				 * have already released the mutex. We need to check again
++				 * by going back to the top of the loop
++				 * if the mutex is still held by the "dead" process. We
++				 * yield 10 us to increase the likelyhood of mutexp fields
++				 * being up-to-date. Set spin so we spin one more time
++				 * because no need to spin more if dead process owns mutex.
++				 */                               
++				if (nspins > 1) {
++					nspins = 2;
++					__os_yield(env, 0, 10);
++					continue;
++				}
+ 				ret = __env_set_state(env, &ip, THREAD_VERIFY);
+ 				if (ret != 0 ||
+-				    ip->dbth_state == THREAD_FAILCHK)
++				    ip->dbth_state == THREAD_FAILCHK) {
++					printf("mut_tas:172, pid: %d, flag: %d\n", mutexp->pid, mutexp->flags);
+ 					return (DB_RUNRECOVERY);
++				}
+ 			}
+ 			if (nowait)
+ 				return (DB_LOCK_NOTGRANTED);
+-- 
+1.8.3.1
+

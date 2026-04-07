@@ -1,0 +1,13 @@
+--- impl-more-0.1.9/Cargo.toml	1970-01-01T00:00:01+00:00
++++ impl-more-0.1.9/Cargo.toml	2025-01-03T16:07:53.077536+00:00
+@@ -34,6 +34,10 @@
+ ]
+ license = "MIT OR Apache-2.0"
+ repository = "https://github.com/robjtede/impl-more"
++exclude = [
++    "/flake.*",
++    "/justfile",
++]
+ 
+ [lib]
+ name = "impl_more"

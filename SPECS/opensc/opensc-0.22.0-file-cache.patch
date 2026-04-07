@@ -1,0 +1,14 @@
+diff -up opensc-0.22.0/etc/opensc.conf.file-cache opensc-0.22.0/etc/opensc.conf
+--- opensc-0.22.0/etc/opensc.conf.file-cache	2021-10-08 13:14:44.091772071 +0200
++++ opensc-0.22.0/etc/opensc.conf	2021-10-08 13:19:27.339051951 +0200
+@@ -10,3 +10,10 @@ app default {
+ 		enable_pinpad = false;
+ 	}
+ }
++# the pkcs15-init is used for card initialization when the file caching
++# brings more trouble than use so disable that:
++app pkcs15-init {
++	framework pkcs15 {
++		use_file_caching = false;
++	}
++}

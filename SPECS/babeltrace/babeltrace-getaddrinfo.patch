@@ -1,0 +1,106 @@
+*** babeltrace-1.5.8.orig/configure.ac	2021-04-22 09:56:01.645909350 -0700
+--- babeltrace-1.5.8/configure.ac	2021-04-22 10:41:30.537328243 -0700
+*************** AC_CHECK_FUNCS([ \
+*** 102,108 ****
+  	dirfd \
+  	dup2 \
+  	ftruncate \
+! 	gethostbyname \
+  	gethostname \
+  	gettimeofday \
+  	localtime_r \
+--- 102,108 ----
+  	dirfd \
+  	dup2 \
+  	ftruncate \
+! 	getaddrinfo \
+  	gethostname \
+  	gettimeofday \
+  	localtime_r \
+*** babeltrace-1.5.8.orig/formats/lttng-live/lttng-live-comm.c	2021-04-22 09:56:01.662909278 -0700
+--- babeltrace-1.5.8/formats/lttng-live/lttng-live-comm.c	2021-04-22 11:01:13.166302197 -0700
+*************** ssize_t lttng_live_send(int fd, const vo
+*** 111,149 ****
+  
+  int lttng_live_connect_viewer(struct lttng_live_ctx *ctx)
+  {
+- 	struct hostent *host;
+- 	struct sockaddr_in server_addr;
+  	int ret;
+  
+  	if (lttng_live_should_quit()) {
+  		ret = -1;
+  		goto end;
+  	}
+  
+! 	host = gethostbyname(ctx->relay_hostname);
+! 	if (!host) {
+! 		fprintf(stderr, "[error] Cannot lookup hostname %s\n",
+! 			ctx->relay_hostname);
+  		goto error;
+  	}
+  
+! 	if ((ctx->control_sock = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+  		perror("Socket");
+  		goto error;
+  	}
+  
+! 	server_addr.sin_family = AF_INET;
+! 	server_addr.sin_port = htons(ctx->port);
+! 	server_addr.sin_addr = *((struct in_addr *) host->h_addr);
+! 	memset(&(server_addr.sin_zero), 0, 8);
+! 
+! 	if (connect(ctx->control_sock, (struct sockaddr *) &server_addr,
+! 				sizeof(struct sockaddr)) == -1) {
+  		perror("Connect");
+  		goto error;
+  	}
+  
+  	ret = 0;
+  
+  end:
+  	return ret;
+--- 111,153 ----
+  
+  int lttng_live_connect_viewer(struct lttng_live_ctx *ctx)
+  {
+  	int ret;
++ 	struct addrinfo hints, *res;
++ 	char port[16];
+  
+  	if (lttng_live_should_quit()) {
+  		ret = -1;
+  		goto end;
+  	}
+  
+! 	memset(&hints, 0, sizeof(hints));
+! 	hints.ai_family = AF_INET;
+! 	hints.ai_socktype = SOCK_STREAM;
+! 	sprintf(port, "%d", ctx->port);
+! 
+! 	ret = getaddrinfo(ctx->relay_hostname, port, &hints, &res);
+! 	if (ret != 0) {
+! 		fprintf(stderr, "[error] getaddrinfo: %s\n",
+! 			gai_strerror(ret));
+  		goto error;
+  	}
+  
+! 	ctx->control_sock = socket(res->ai_family, res->ai_socktype,
+! 				   res->ai_protocol);
+! 	if (ctx->control_sock == -1) {
+  		perror("Socket");
++ 		freeaddrinfo(res);
+  		goto error;
+  	}
+  
+! 	if (connect(ctx->control_sock, res->ai_addr, res->ai_addrlen) == -1) {
+  		perror("Connect");
++ 		freeaddrinfo(res);
+  		goto error;
+  	}
+  
+  	ret = 0;
++ 	freeaddrinfo(res);
+  
+  end:
+  	return ret;

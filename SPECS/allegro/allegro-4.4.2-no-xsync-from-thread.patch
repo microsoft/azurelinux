@@ -1,0 +1,17 @@
+Calling Xsync from the bg thread causes deadlock issues
+diff -up allegro-4.4.2/src/x/xwin.c~ allegro-4.4.2/src/x/xwin.c
+--- allegro-4.4.2/src/x/xwin.c~	2009-10-17 09:05:12.000000000 +0200
++++ allegro-4.4.2/src/x/xwin.c	2014-10-29 15:17:08.381148654 +0100
+@@ -2463,11 +2463,8 @@ void _xwin_private_handle_input(void)
+ 		   _mouse_y - (_xwin_mouse_extended_range ? _xwin.scroll_y : 0));
+    }
+ 
+-   /* Flush X-buffers.  */
+-   _xwin_private_flush_buffers();
+-
+    /* How much events are available in the queue.  */
+-   events = events_queued = XEventsQueued(_xwin.display, QueuedAlready);
++   events = events_queued = XPending(_xwin.display);
+    if (events <= 0)
+       return;
+ 

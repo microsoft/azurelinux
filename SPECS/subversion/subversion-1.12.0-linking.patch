@@ -1,0 +1,84 @@
+
+Fix the way libtool is used to match standard practice:
+
+a) link ONLY libraries using -rpath $(libdir), not executables
+   .. this avoids adding an RPATH for $libdir to executables
+b) link non-installable test binaries using -no-install
+   .. only for convenience but should speed up builds slightly(?)
+
+--- subversion-1.12.0/build.conf.linking
++++ subversion-1.12.0/build.conf
+@@ -572,7 +572,7 @@
+ path = subversion/bindings/swig/python/libsvn_swig_py
+ libs = libsvn_client libsvn_wc libsvn_ra libsvn_delta libsvn_subr
+        apriconv apr python swig
+-link-cmd = $(LINK)
++link-cmd = $(LINK_LIB)
+ install = swig-py-lib
+ # need special build rule to include -DSWIGPYTHON
+ compile-cmd = $(COMPILE_SWIG_PY)
+@@ -598,7 +598,7 @@
+ lang = ruby
+ path = subversion/bindings/swig/ruby/libsvn_swig_ruby
+ libs = libsvn_client libsvn_wc libsvn_delta libsvn_subr apriconv apr ruby swig
+-link-cmd = $(LINK) $(SWIG_RB_LIBS)
++link-cmd = $(LINK_LIB) $(SWIG_RB_LIBS)
+ install = swig-rb-lib
+ # need special build rule to include
+ compile-cmd = $(COMPILE_SWIG_RB)
+@@ -769,6 +769,7 @@
+ libs = libsvn_repos libsvn_fs libsvn_delta libsvn_subr aprutil apriconv apr
+ msvc-static = yes
+ undefined-lib-symbols = yes
++link-cmd = $(LINK_TEST_LIB)
+ 
+ # ----------------------------------------------------------------------------
+ # Tests for libsvn_fs_base
+--- subversion-1.12.0/build/generator/gen_base.py.linking
++++ subversion-1.12.0/build/generator/gen_base.py
+@@ -599,7 +599,7 @@
+     self.install = options.get('install')
+     self.compile_cmd = options.get('compile-cmd')
+     self.sources = options.get('sources', '*.c *.cpp')
+-    self.link_cmd = options.get('link-cmd', '$(LINK)')
++    self.link_cmd = options.get('link-cmd', '$(LINK_LIB)')
+ 
+     self.external_lib = options.get('external-lib')
+     self.external_project = options.get('external-project')
+@@ -659,6 +659,14 @@
+ 
+     self.msvc_force_static = options.get('msvc-force-static') == 'yes'
+ 
++    if self.install in ['test', 'bdb-test', 'sub-test', ]:
++      self.link_cmd = '$(LINK_TEST)'
++    elif self.install in ['bin', 'tools']:
++      self.link_cmd = '$(LINK_EXE)'
++    elif self.link_cmd == '$(LINK_LIB)':
++      raise GenError('ERROR: Unknown executable link type for ' + self.name + \
++                     ': ' + self.link_cmd + ' (' + self.install + ')')
++    
+   def add_dependencies(self):
+     TargetLinked.add_dependencies(self)
+ 
+--- subversion-1.12.0/Makefile.in.linking
++++ subversion-1.12.0/Makefile.in
+@@ -268,11 +268,14 @@
+ COMPILE_SVNXX = $(LT_COMPILE_CXX) $(SVNXX_INCLUDES) -o $@ -c
+ COMPILE_SVNXX_TEST = $(LT_COMPILE_CXX) $(SVNXX_INCLUDES) $(BOOST_TEST_CPPFLAGS) -o $@ -c
+ 
+-LINK = $(LIBTOOL) $(LTFLAGS) --mode=link $(CC) $(LT_LDFLAGS) $(CFLAGS) $(LDFLAGS) -rpath $(libdir)
+-LINK_LIB = $(LINK) $(LT_SO_VERSION)
+-LINK_CXX = $(LIBTOOL) $(LTCXXFLAGS) --mode=link $(CXX) $(LT_LDFLAGS) $(CXXFLAGS) $(LDFLAGS) -rpath $(libdir)
+-LINK_CXX_LIB = $(LINK_CXX) $(LT_SO_VERSION)
+-LINK_SVNXX_TEST = $(LINK_CXX) $(BOOST_TEST_LDFLAGS)
++LINK = $(LIBTOOL) $(LTFLAGS) --mode=link $(CC) $(LT_LDFLAGS) $(CFLAGS) $(LDFLAGS)
++LINK_LIB = $(LINK) $(LT_SO_VERSION) -rpath $(libdir)
++LINK_CXX = $(LIBTOOL) $(LTCXXFLAGS) --mode=link $(CXX) $(LT_LDFLAGS) $(CXXFLAGS) $(LDFLAGS)
++LINK_CXX_LIB = $(LINK_CXX) $(LT_SO_VERSION) -rpath $(libdir)
++LINK_SVNXX_TEST = $(LINK_CXX) $(BOOST_TEST_LDFLAGS) -no-install
++LINK_TEST = $(LINK) -no-install
++LINK_TEST_LIB = $(LINK_TEST) -avoid-version
++LINK_EXE = $(LINK)
+ 
+ # special link rule for mod_dav_svn
+ LINK_APACHE_MOD = $(LIBTOOL) $(LTFLAGS) --mode=link $(CC) $(LT_LDFLAGS) $(CFLAGS) $(LDFLAGS) -rpath $(APACHE_LIBEXECDIR) -avoid-version -module $(APACHE_LDFLAGS) -shared

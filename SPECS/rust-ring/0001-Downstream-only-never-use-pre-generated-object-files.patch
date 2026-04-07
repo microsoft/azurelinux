@@ -1,0 +1,77 @@
+From d72ca6a16d3fd82bb77fcf81dc9e78607d75d2b1 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Thu, 27 Mar 2025 21:14:32 +0100
+Subject: [PATCH] Downstream-only: never use pre-generated object files
+
+---
+ build.rs | 33 +++++++--------------------------
+ 1 file changed, 7 insertions(+), 26 deletions(-)
+
+diff --git a/build.rs b/build.rs
+index 786808e..bfccfd1 100644
+--- a/build.rs
++++ b/build.rs
+@@ -121,8 +121,6 @@ const SHA512_ARMV8: &str = "crypto/fipsmodule/sha/asm/sha512-armv8.pl";
+ 
+ const RING_TEST_SRCS: &[&str] = &[("crypto/constant_time_test.c")];
+ 
+-const PREGENERATED: &str = "pregenerated";
+-
+ fn cpp_flags(compiler: &cc::Tool) -> &'static [&'static str] {
+     if !compiler.is_like_msvc() {
+         static NON_MSVC_FLAGS: &[&str] = &[
+@@ -287,16 +285,7 @@ fn main() {
+         &core_name_and_version
+     );
+ 
+-    const RING_PREGENERATE_ASM: &str = "RING_PREGENERATE_ASM";
+-    match env::var_os(RING_PREGENERATE_ASM).as_deref() {
+-        Some(s) if s == "1" => {
+-            pregenerate_asm_main(&c_root_dir, &core_name_and_version);
+-        }
+-        None => ring_build_rs_main(&c_root_dir, &core_name_and_version),
+-        _ => {
+-            panic!("${} has an invalid value", RING_PREGENERATE_ASM);
+-        }
+-    }
++    ring_build_rs_main(&c_root_dir, &core_name_and_version)
+ }
+ 
+ fn ring_build_rs_main(c_root_dir: &Path, core_name_and_version: &str) {
+@@ -344,9 +333,12 @@ fn ring_build_rs_main(c_root_dir: &Path, core_name_and_version: &str) {
+     // If `.git` doesn't exist then assume that this is a packaged build where
+     // we want to optimize for minimizing the build tools required: No Perl,
+     // no nasm, etc.
+-    let generated_dir = if !is_git {
+-        c_root_dir.join(PREGENERATED)
+-    } else {
++
++    // Downstream-only: we do not want to package or use pre-generated object
++    // files, even by rebuilding them ourselves rather than using the ones
++    // shipped in the crate.
++    // let use_pregenerated = !is_git;
++    let generated_dir = {
+         generate_sources_and_preassemble(
+             &out_dir,
+             asm_target.into_iter(),
+@@ -367,17 +359,6 @@ fn ring_build_rs_main(c_root_dir: &Path, core_name_and_version: &str) {
+     emit_rerun_if_changed()
+ }
+ 
+-fn pregenerate_asm_main(c_root_dir: &Path, core_name_and_version: &str) {
+-    let pregenerated = c_root_dir.join(PREGENERATED);
+-    fs::create_dir(&pregenerated).unwrap();
+-    generate_sources_and_preassemble(
+-        &pregenerated,
+-        ASM_TARGETS.iter(),
+-        c_root_dir,
+-        core_name_and_version,
+-    );
+-}
+-
+ fn generate_sources_and_preassemble<'a>(
+     out_dir: &Path,
+     asm_targets: impl Iterator<Item = &'a AsmTarget>,
+-- 
+2.49.0
+

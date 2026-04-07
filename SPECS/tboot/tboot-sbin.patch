@@ -1,0 +1,85 @@
+diff -up tboot-1.11.7/deprecated/lcptools/Makefile.orig tboot-1.11.7/deprecated/lcptools/Makefile
+--- tboot-1.11.7/deprecated/lcptools/Makefile.orig	2024-09-25 09:05:53.000000000 -0400
++++ tboot-1.11.7/deprecated/lcptools/Makefile	2025-01-23 11:15:33.287843724 -0500
+@@ -38,15 +38,15 @@ dist : install
+ install :
+ 	@set -e; for i in $(TPMNV_TARGETS) $(LCP_TARGETS);\
+ 	do \
+-		$(MAKE) DISTDIR=$(DISTDIR) INST_TARGET=$(DISTDIR)/usr/sbin/$$i do_install; \
++		$(MAKE) DISTDIR=$(DISTDIR) INST_TARGET=$(DISTDIR)/usr/bin/$$i do_install; \
+ 	done
+ 
+ .PHONY: do_install
+ do_install : $(INST_TARGET)
+ 
+ $(INST_TARGET) : $(notdir $(INST_TARGET))
+-	[ -d $(DISTDIR)/usr/sbin ] || $(INSTALL_DIR) $(DISTDIR)/usr/sbin
+-	$(INSTALL_PROG) -t $(DISTDIR)/usr/sbin $^
++	[ -d $(DISTDIR)/usr/bin ] || $(INSTALL_DIR) $(DISTDIR)/usr/bin
++	$(INSTALL_PROG) -t $(DISTDIR)/usr/bin $^
+ 
+ 
+ clean :
+diff -up tboot-1.11.7/lcptools-v2/Makefile.orig tboot-1.11.7/lcptools-v2/Makefile
+--- tboot-1.11.7/lcptools-v2/Makefile.orig	2024-09-25 09:05:53.000000000 -0400
++++ tboot-1.11.7/lcptools-v2/Makefile	2025-01-23 11:14:17.686056274 -0500
+@@ -34,15 +34,15 @@ dist : install
+ install :
+ 	@set -e; for i in  $(LCP2_TARGETS);\
+ 	do \
+-		$(MAKE) DISTDIR=$(DISTDIR) INST_TARGET=$(DISTDIR)/usr/sbin/$$i do_install; \
++		$(MAKE) DISTDIR=$(DISTDIR) INST_TARGET=$(DISTDIR)/usr/bin/$$i do_install; \
+ 	done
+ 
+ .PHONY: do_install
+ do_install : $(INST_TARGET)
+ 
+ $(INST_TARGET) : $(notdir $(INST_TARGET))
+-	[ -d $(DISTDIR)/usr/sbin ] || $(INSTALL_DIR) $(DISTDIR)/usr/sbin
+-	$(INSTALL_PROG) -t $(DISTDIR)/usr/sbin $^
++	[ -d $(DISTDIR)/usr/bin ] || $(INSTALL_DIR) $(DISTDIR)/usr/bin
++	$(INSTALL_PROG) -t $(DISTDIR)/usr/bin $^
+ 
+ 
+ clean :
+diff -up tboot-1.11.7/tb_polgen/Makefile.orig tboot-1.11.7/tb_polgen/Makefile
+--- tboot-1.11.7/tb_polgen/Makefile.orig	2024-09-25 09:05:53.000000000 -0400
++++ tboot-1.11.7/tb_polgen/Makefile	2025-01-23 11:14:43.418983928 -0500
+@@ -29,11 +29,11 @@ build : $(TARGET)
+ dist : install
+ 
+ 
+-install : $(DISTDIR)/usr/sbin/$(TARGET)
++install : $(DISTDIR)/usr/bin/$(TARGET)
+ 
+-$(DISTDIR)/usr/sbin/$(TARGET) : $(TARGET)
+-	[ -d $(DISTDIR)/usr/sbin ] || $(INSTALL_DIR) $(DISTDIR)/usr/sbin
+-	$(INSTALL_PROG) -t $(DISTDIR)/usr/sbin $(TARGET)
++$(DISTDIR)/usr/bin/$(TARGET) : $(TARGET)
++	[ -d $(DISTDIR)/usr/bin ] || $(INSTALL_DIR) $(DISTDIR)/usr/bin
++	$(INSTALL_PROG) -t $(DISTDIR)/usr/bin $(TARGET)
+ 
+ 
+ clean :
+diff -up tboot-1.11.7/utils/Makefile.orig tboot-1.11.7/utils/Makefile
+--- tboot-1.11.7/utils/Makefile.orig	2024-09-25 09:05:53.000000000 -0400
++++ tboot-1.11.7/utils/Makefile	2025-01-23 11:15:13.724898724 -0500
+@@ -28,15 +28,15 @@ dist : install
+ install :
+ 	@set -e; for i in $(TARGETS);\
+ 	do \
+-		$(MAKE) DISTDIR=$(DISTDIR) INST_TARGET=$(DISTDIR)/usr/sbin/$$i do_install; \
++		$(MAKE) DISTDIR=$(DISTDIR) INST_TARGET=$(DISTDIR)/usr/bin/$$i do_install; \
+ 	done
+ 
+ .PHONY: do_install
+ do_install : $(INST_TARGET)
+ 
+ $(INST_TARGET) : $(notdir $(INST_TARGET))
+-	[ -d $(DISTDIR)/usr/sbin ] || $(INSTALL_DIR) $(DISTDIR)/usr/sbin
+-	$(INSTALL_PROG) -t $(DISTDIR)/usr/sbin $^
++	[ -d $(DISTDIR)/usr/bin ] || $(INSTALL_DIR) $(DISTDIR)/usr/bin
++	$(INSTALL_PROG) -t $(DISTDIR)/usr/bin $^
+ 
+ 
+ clean :

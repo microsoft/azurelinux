@@ -1,0 +1,52 @@
+From 37cc9fa19bd23edbbdaa9252059b17f191fa4d17 Mon Sep 17 00:00:00 2001
+From: YiYing He <yiying@secondstate.io>
+Date: Wed, 17 Dec 2025 20:27:38 +0800
+Subject: [PATCH] fix(runtime): refine the overflow detection when wrapping
+ memory instance
+
+Signed-off-by: YiYing He <yiying@secondstate.io>
+---
+ include/runtime/instance/memory.h | 24 +++++++++++++++++++-----
+ 1 file changed, 19 insertions(+), 5 deletions(-)
+
+diff --git a/include/runtime/instance/memory.h b/include/runtime/instance/memory.h
+index ce511a7b..9d849598 100644
+--- a/include/runtime/instance/memory.h
++++ b/include/runtime/instance/memory.h
+@@ -241,14 +241,28 @@ public:
+     return reinterpret_cast<T>(&DataPtr[Offset]);
+   }
+ 
+-  /// Get array of object at specific offset of memory.
++  /// Get array of object with count at specific offset of memory.
+   template <typename T>
+-  Span<T> getSpan(uint32_t Offset, uint32_t Size) const noexcept {
+-    uint32_t ByteSize = static_cast<uint32_t>(sizeof(T) * Size);
+-    if (unlikely(!checkAccessBound(Offset, ByteSize))) {
++  Span<T> getSpan(uint32_t Offset, uint32_t Count) const noexcept {
++    uint32_t Size;
++#if defined(_MSC_VER) && !defined(__clang__) // MSVC
++    // Should extend for memory64 proposal.
++    uint64_t Num =
++        static_cast<uint64_t>(sizeof(T)) * static_cast<uint64_t>(Count);
++    if ((Num >> 32) != 0) {
++      return Span<T>();
++    }
++    Size = static_cast<uint32_t>(Num);
++#else
++    if (unlikely(__builtin_mul_overflow(static_cast<uint32_t>(sizeof(T)), Count,
++                                        &Size))) {
++      return Span<T>();
++    }
++#endif
++    if (unlikely(!checkAccessBound(Offset, Size))) {
+       return Span<T>();
+     }
+-    return Span<T>(reinterpret_cast<T *>(&DataPtr[Offset]), Size);
++    return Span<T>(reinterpret_cast<T *>(&DataPtr[Offset]), Count);
+   }
+ 
+   /// Get array of object at specific offset of memory.
+-- 
+2.43.0
+

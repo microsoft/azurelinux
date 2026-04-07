@@ -1,0 +1,53 @@
+--- a/Makefile
++++ b/Makefile
+@@ -21,6 +21,9 @@ KEYUPDATEAUTH = $(ALLKEYS:=-update.auth)
+ KEYBLACKLISTAUTH = $(ALLKEYS:=-blacklist.auth)
+ KEYHASHBLACKLISTAUTH = $(ALLKEYS:=-hash-blacklist.auth)
+ 
++OLD_CFLAGS:=$(CFLAGS)
++OLD_LDFLAGS:=$(LDFLAGS)
++
+ export TOPDIR	:= $(shell pwd)/
+ 
+ include Make.rules
+@@ -88,31 +91,31 @@ HelloWorld.so: lib/lib-efi.a
+ ShimReplace.so: lib/lib-efi.a
+ 
+ cert-to-efi-sig-list: cert-to-efi-sig-list.o lib/lib.a
+-	$(CC) $(ARCH3264) -o $@ $< lib/lib.a -lcrypto
++	$(CC) $(ARCH3264) -o $@ $< $(OLD_CFLAGS) $(OLD_LDFLAGS) lib/lib.a -lcrypto
+ 
+ sig-list-to-certs: sig-list-to-certs.o lib/lib.a
+-	$(CC) $(ARCH3264) -o $@ $< lib/lib.a -lcrypto
++	$(CC) $(ARCH3264) -o $@ $< $(OLD_CFLAGS) $(OLD_LDFLAGS) lib/lib.a -lcrypto
+ 
+ sign-efi-sig-list: sign-efi-sig-list.o lib/lib.a
+-	$(CC) $(ARCH3264) -o $@ $< lib/lib.a -lcrypto
++	$(CC) $(ARCH3264) -o $@ $< $(OLD_CFLAGS) $(OLD_LDFLAGS) lib/lib.a -lcrypto
+ 
+ hash-to-efi-sig-list: hash-to-efi-sig-list.o lib/lib.a
+-	$(CC) $(ARCH3264) -o $@ $< lib/lib.a
++	$(CC) $(ARCH3264) -o $@ $< $(OLD_CFLAGS) $(OLD_LDFLAGS) lib/lib.a
+ 
+ cert-to-efi-hash-list: cert-to-efi-hash-list.o lib/lib.a
+-	$(CC) $(ARCH3264) -o $@ $< lib/lib.a -lcrypto
++	$(CC) $(ARCH3264) -o $@ $< $(OLD_CFLAGS) $(OLD_LDFLAGS) lib/lib.a -lcrypto
+ 
+ efi-keytool: efi-keytool.o lib/lib.a
+-	$(CC) $(ARCH3264) -o $@ $< lib/lib.a
++	$(CC) $(ARCH3264) -o $@ $< $(OLD_CFLAGS) $(OLD_LDFLAGS) lib/lib.a
+ 
+ efi-readvar: efi-readvar.o lib/lib.a
+-	$(CC) $(ARCH3264) -o $@ $< lib/lib.a -lcrypto
++	$(CC) $(ARCH3264) -o $@ $< $(OLD_CFLAGS) $(OLD_LDFLAGS) lib/lib.a -lcrypto
+ 
+ efi-updatevar: efi-updatevar.o lib/lib.a
+-	$(CC) $(ARCH3264) -o $@ $< lib/lib.a -lcrypto
++	$(CC) $(ARCH3264) -o $@ $< $(OLD_CFLAGS) $(OLD_LDFLAGS) lib/lib.a -lcrypto
+ 
+ flash-var: flash-var.o lib/lib.a
+-	$(CC) $(ARCH3264) -o $@ $< lib/lib.a
++	$(CC) $(ARCH3264) -o $@ $< $(OLD_CFLAGS) $(OLD_LDFLAGS) lib/lib.a
+ 
+ clean:
+ 	rm -f PK.* KEK.* DB.* $(EFIFILES) $(EFISIGNED) $(BINARIES) *.o *.so

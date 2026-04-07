@@ -1,0 +1,13 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e6095ac..71a04e8 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -4309,8 +4309,6 @@ endif()
+ cmake_path(SET TMP_DST_PATH NORMALIZE "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+ install(FILES "${CMAKE_BINARY_DIR}/resources/wireshark.pc"
+ 	DESTINATION ${TMP_DST_PATH}
+-	COMPONENT "Development"
+-	EXCLUDE_FROM_ALL
+ )
+ 
+ cmake_path(SET TMP_DST_PATH NORMALIZE "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}")

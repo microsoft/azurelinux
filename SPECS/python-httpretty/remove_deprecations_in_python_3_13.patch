@@ -1,0 +1,62 @@
+diff --git a/httpretty/core.py b/httpretty/core.py
+index 6968645..9a01802 100644
+--- a/httpretty/core.py
++++ b/httpretty/core.py
+@@ -39,6 +39,7 @@ import tempfile
+ import threading
+ import traceback
+ import warnings
++import datetime
+ 
+ from functools import partial
+ from typing import Callable
+@@ -69,7 +70,6 @@ from .utils import (
+ 
+ from .errors import HTTPrettyError, UnmockedError
+ 
+-from datetime import datetime
+ from datetime import timedelta
+ from errno import EAGAIN
+ 
+@@ -555,7 +555,7 @@ class fakesock(object):
+             return old_socket(self.socket_family, self.socket_type, self.socket_proto)
+ 
+         def getpeercert(self, *a, **kw):
+-            now = datetime.now()
++            now = datetime.datetime.now(datetime.UTC)
+             shift = now + timedelta(days=30 * 12)
+             return {
+                 'notAfter': shift.strftime('%b %d %H:%M:%S GMT'),
+@@ -1074,7 +1074,7 @@ class Entry(BaseClass):
+ 
+         .. warning:: **side-effect:** this method moves the cursor of the given file object to zero
+         """
+-        now = datetime.utcnow()
++        now = datetime.datetime.now(datetime.UTC)
+ 
+         headers = {
+             'status': self.status,
+@@ -1852,7 +1852,7 @@ def apply_patch_socket():
+         extract_into_urllib3()
+ 
+     if requests_urllib3_connection is not None:
+-        urllib3_wrap = partial(fake_wrap_socket, old_requests_ssl_wrap_socket)
++        urllib3_wrap = staticmethod(partial(fake_wrap_socket, old_requests_ssl_wrap_socket))
+         requests_urllib3_connection.ssl_wrap_socket = urllib3_wrap
+         requests_urllib3_connection.__dict__['ssl_wrap_socket'] = urllib3_wrap
+ 
+@@ -1867,12 +1867,12 @@ def apply_patch_socket():
+         socks.__dict__['socksocket'] = fakesock.socket
+ 
+     if ssl:
+-        new_wrap = partial(fake_wrap_socket, old_ssl_wrap_socket)
++        new_wrap = staticmethod(partial(fake_wrap_socket, old_ssl_wrap_socket))
+         ssl.wrap_socket = new_wrap
+         ssl.SSLSocket = FakeSSLSocket
+         ssl.SSLContext = old_sslcontext_class
+         try:
+-            ssl.SSLContext.wrap_socket = partial(fake_wrap_socket, old_ssl_wrap_socket)
++            ssl.SSLContext.wrap_socket = staticmethod(partial(fake_wrap_socket, old_ssl_wrap_socket))
+         except AttributeError:
+             pass
+ 

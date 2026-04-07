@@ -1,0 +1,14 @@
+diff --git a/src/client/qwaylandintegration.cpp b/src/client/qwaylandintegration.cpp
+index 13bacc9b..7c35003d 100644
+--- a/src/client/qwaylandintegration.cpp
++++ b/src/client/qwaylandintegration.cpp
+@@ -88,6 +88,9 @@ QWaylandIntegration::QWaylandIntegration()
+ 
+     QWaylandWindow::fixedToplevelPositions =
+             !qEnvironmentVariableIsSet("QT_WAYLAND_DISABLE_FIXED_POSITIONS");
++
++    if (!qEnvironmentVariableIsSet("QT_WAYLAND_DECORATION"))
++        qputenv("QT_WAYLAND_DECORATION", "adwaita");
+ }
+ 
+ QWaylandIntegration::~QWaylandIntegration()

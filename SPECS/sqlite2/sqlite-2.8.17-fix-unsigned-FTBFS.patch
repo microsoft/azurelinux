@@ -1,0 +1,12 @@
+diff -up sqlite-2.8.17/tool/lemon.c.crashfix sqlite-2.8.17/tool/lemon.c
+--- sqlite-2.8.17/tool/lemon.c.crashfix	2019-04-10 15:03:23.464811085 -0400
++++ sqlite-2.8.17/tool/lemon.c	2019-04-10 15:04:02.767018417 -0400
+@@ -3018,7 +3018,7 @@ int mhflag;                 /* True if g
+   int maxdtlength;          /* Maximum length of any ".datatype" field. */
+   char *stddt;              /* Standardized name for a datatype */
+   int i,j;                  /* Loop counters */
+-  int hash;                 /* For hashing the name of a type */
++  unsigned int hash;        /* For hashing the name of a type */
+   char *name;               /* Name of the parser */
+ 
+   /* Allocate and initialize types[] and allocate stddt[] */

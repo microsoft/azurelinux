@@ -1,0 +1,18 @@
+--- trunk/matchbox-window-manager/src/keys.c	2006/07/19 16:55:26	1361
++++ trunk/matchbox-window-manager/src/keys.c	2007/11/01 12:43:20	1761
+@@ -35,10 +35,12 @@
+ 
+   for (keycode = min_kc; keycode <= max_kc; keycode++) {
+     for (col = 0; (k = XKeycodeToKeysym (w->dpy, keycode, col))
+-           != NoSymbol; col++)
+-      if (k == keysym && col == 1) {
++           != NoSymbol; col++) {
++      if (k == keysym && col == 1)
+         return True;
+-      }
++      if (k == keysym)
++	break;
++    }
+   }  
+   return False;
+ }

@@ -1,0 +1,54 @@
+From 50cb216be8d2a441023425feca268f95578ecb5f Mon Sep 17 00:00:00 2001
+From: Alexander Bokovoy <abokovoy@redhat.com>
+Date: Thu, 23 Jan 2025 19:03:35 +0200
+Subject: [PATCH 1/2] Fix compatibility with C23
+
+Resolves: rhbz#2341357
+
+Signed-off-by: Alexander Bokovoy <abokovoy@redhat.com>
+---
+ src/back-sch.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/back-sch.h b/src/back-sch.h
+index 2d73f34..172c447 100644
+--- a/src/back-sch.h
++++ b/src/back-sch.h
+@@ -136,7 +136,7 @@ struct backend_search_filter_config {
+ #define LDAP_EXTOP_PASSMOD_TAG_OLDPWD	0x81U
+ #define LDAP_EXTOP_PASSMOD_TAG_NEWPWD	0x82U
+ 
+-typedef int (*IFP)();
++typedef int (*IFP)(Slapi_PBlock *pb);
+ typedef struct backend_extop_handlers {
+     char *oid;
+     IFP extop_fct;
+-- 
+2.48.1
+
+
+From aae2b22b6b6709687a4b066d347e67eaec178e05 Mon Sep 17 00:00:00 2001
+From: Alexander Bokovoy <abokovoy@redhat.com>
+Date: Thu, 23 Jan 2025 19:04:13 +0200
+Subject: [PATCH 2/2] popen requires use of pclose
+
+Signed-off-by: Alexander Bokovoy <abokovoy@redhat.com>
+---
+ tests/clients/yp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/clients/yp.c b/tests/clients/yp.c
+index 88d2b81..a53347f 100644
+--- a/tests/clients/yp.c
++++ b/tests/clients/yp.c
+@@ -413,6 +413,6 @@ main(int argc, char **argv)
+ 		return 1;
+ 	}
+ 	ret = dispatch(client, output, argc - optind, argv + optind);
+-	fclose(output);
++	pclose(output);
+ 	return ret;
+ }
+-- 
+2.48.1
+

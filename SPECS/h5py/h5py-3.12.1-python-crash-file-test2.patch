@@ -1,0 +1,38 @@
+diff --git a/h5py/tests/test_file2.py b/h5py/tests/test_file2.py
+index f755154..0592d60 100644
+--- a/h5py/tests/test_file2.py
++++ b/h5py/tests/test_file2.py
+@@ -202,6 +202,7 @@ class TestFileObj(TestCase):
+         self.assertRaises(Exception, h5py.File, self,
+                           driver='fileobj', mode='x')
+ 
++    @ut.skip("Incompletely closed files can cause segfaults")
+     def test_exception_read(self):
+ 
+         class BrokenBytesIO(io.BytesIO):
+@@ -212,6 +213,7 @@ class TestFileObj(TestCase):
+         f.create_dataset('test', data=list(range(12)))
+         self.assertRaises(Exception, list, f['test'])
+ 
++    @ut.skip("Incompletely closed files can cause segfaults")
+     def test_exception_write(self):
+ 
+         class BrokenBytesIO(io.BytesIO):
+@@ -238,7 +240,7 @@ class TestFileObj(TestCase):
+         f = h5py.File(fileobj, 'w')
+         fileobj.close()
+         self.assertRaises(Exception, f.close)
+-
++    @ut.skip("Incompletely closed files can cause segfaults")
+     def test_exception_writeonly(self):
+         # HDF5 expects read & write access to a file it's writing;
+         # check that we get the correct exception on a write-only file object.
+@@ -250,7 +252,7 @@ class TestFileObj(TestCase):
+         f.close()
+         fileobj.close()
+ 
+-
++    @ut.skip("Incompletely closed files can cause segfaults")
+     def test_method_vanish(self):
+         fileobj = io.BytesIO()
+         f = h5py.File(fileobj, 'w')

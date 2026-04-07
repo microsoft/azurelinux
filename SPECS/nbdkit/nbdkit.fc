@@ -1,0 +1,3 @@
+/usr/sbin/nbdkit	 --    gen_context(system_u:object_r:nbdkit_exec_t,s0)
+
+/usr/lib/systemd/system/nbdkit.*	gen_context(system_u:object_r:nbdkit_unit_file_t,s0)

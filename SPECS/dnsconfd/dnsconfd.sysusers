@@ -1,0 +1,2 @@
+#Type Name      ID  GECOS                                    Home directory  Shell
+u     dnsconfd  -   "Dnsconfd local DNS cache configurator"  -               /sbin/nologin

@@ -1,0 +1,49 @@
+--- openssl-sys-0.9.111/Cargo.toml	1970-01-01T00:00:01+00:00
++++ openssl-sys-0.9.111/Cargo.toml	2025-12-08T04:59:55.858478+00:00
+@@ -37,32 +37,9 @@
+ [package.metadata.pkg-config]
+ openssl = "1.0.1"
+ 
+-[features]
+-aws-lc = ["dep:aws-lc-sys"]
+-aws-lc-fips = ["dep:aws-lc-fips-sys"]
+-unstable_boringssl = ["bssl-sys"]
+-vendored = ["openssl-src"]
+-
+ [lib]
+ name = "openssl_sys"
+ path = "src/lib.rs"
+-
+-[dependencies.aws-lc-fips-sys]
+-version = "0.13"
+-features = [
+-    "ssl",
+-    "bindgen",
+-]
+-optional = true
+-
+-[dependencies.aws-lc-sys]
+-version = "0.27"
+-features = ["ssl"]
+-optional = true
+-
+-[dependencies.bssl-sys]
+-version = "0.1.0"
+-optional = true
+ 
+ [dependencies.libc]
+ version = "0.2"
+@@ -75,13 +52,5 @@
+ [build-dependencies.cc]
+ version = "1.0.61"
+ 
+-[build-dependencies.openssl-src]
+-version = "300.2.0"
+-features = ["legacy"]
+-optional = true
+-
+ [build-dependencies.pkg-config]
+ version = "0.3.9"
+-
+-[build-dependencies.vcpkg]
+-version = "0.2.8"

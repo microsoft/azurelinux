@@ -1,0 +1,30 @@
+From 5d2b5a58e0b294e2adfc923ac4baddfd270eb5a8 Mon Sep 17 00:00:00 2001
+From: Luigi Leonardi <leonardi@redhat.com>
+Date: Mon, 13 Oct 2025 16:30:01 +0200
+Subject: [PATCH] igvm_c/dump_igvm: add missing device tree directive (#98)
+
+`IGVM_VHT_DEVICE_TREE` was missing from the list of directives and was
+not being dumped.
+
+Add it to the list.
+
+Signed-off-by: Luigi Leonardi <leonardi@redhat.com>
+---
+ igvm_c/sample/dump_igvm.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/igvm_c/sample/dump_igvm.c b/igvm_c/sample/dump_igvm.c
+index 8da6d27..7dd4748 100644
+--- a/igvm_c/sample/dump_igvm.c
++++ b/igvm_c/sample/dump_igvm.c
+@@ -212,6 +212,7 @@ static void igvm_dump_variable_header(IGVM_VHS_VARIABLE_HEADER *header)
+     case IGVM_VHT_VP_COUNT_PARAMETER:
+     case IGVM_VHT_SRAT:
+     case IGVM_VHT_MADT:
++    case IGVM_VHT_DEVICE_TREE:
+     case IGVM_VHT_MMIO_RANGES:
+     case IGVM_VHT_MEMORY_MAP:
+     case IGVM_VHT_COMMAND_LINE:
+-- 
+2.51.0
+

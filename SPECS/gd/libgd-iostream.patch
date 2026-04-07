@@ -1,0 +1,35 @@
+From 01bcbdcae35b90de082012e639094c711a7aa2b3 Mon Sep 17 00:00:00 2001
+From: Remi Collet <remi@remirepo.net>
+Date: Mon, 13 Sep 2021 15:05:18 +0200
+Subject: [PATCH] install missing header, used by gdpp.h
+
+---
+ src/CMakeLists.txt | 1 +
+ src/Makefile.am    | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 3839bc78..c1eea100 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -194,6 +194,7 @@ install(FILES
+ 	gdfontt.h
+ 	gdfx.h
+ 	gdpp.h
++	gd_io_stream.h
+ 	DESTINATION include)
+ 
+ CONFIGURE_FILE(../config/gdlib.pc.cmake gdlib.pc @ONLY)
+diff --git a/src/Makefile.am b/src/Makefile.am
+index dbe9243c..c8c779f1 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -52,7 +52,7 @@ EXTRA_DIST = \
+ 	msinttypes/inttypes.h \
+ 	msinttypes/stdint.h
+ 
+-include_HEADERS = gd.h gdfx.h gd_io.h gdcache.h gdfontg.h gdfontl.h gdfontmb.h gdfonts.h gdfontt.h gd_color_map.h gd_errors.h gdpp.h
++include_HEADERS = gd.h gdfx.h gd_io.h gdcache.h gdfontg.h gdfontl.h gdfontmb.h gdfonts.h gdfontt.h gd_color_map.h gd_errors.h gdpp.h gd_io_stream.h
+ 
+ lib_LTLIBRARIES = libgd.la
+ 

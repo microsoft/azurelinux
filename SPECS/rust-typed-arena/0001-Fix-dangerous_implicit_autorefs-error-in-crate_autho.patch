@@ -1,0 +1,41 @@
+From 6475b4e452e1f778866c6b800cc663382e7d80c3 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Sun, 24 Aug 2025 16:18:45 +0200
+Subject: [PATCH] Fix dangerous_implicit_autorefs error in crate_authors macro
+
+---
+ src/lib.rs  | 4 ++--
+ src/test.rs | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index ec5ff32..9d17e36 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -337,8 +337,8 @@ impl<T> Arena<T> {
+     /// unsafe {
+     ///     // Perform initialization before we claim the memory.
+     ///     let uninitialized = arena.uninitialized_array();
+-    ///     assert!((*uninitialized).len() >= COUNT); // Ensured by the reserve_extend
+-    ///     for elem in &mut (*uninitialized)[..COUNT] {
++    ///     assert!(uninitialized.len() >= COUNT); // Ensured by the reserve_extend
++    ///     for elem in &mut (&mut (*uninitialized))[..COUNT] {
+     ///         ptr::write(elem.as_mut_ptr(), "Hello".to_owned());
+     ///     }
+     ///     let addr = (*uninitialized).as_ptr() as usize;
+diff --git a/src/test.rs b/src/test.rs
+index 4ee8002..910d059 100644
+--- a/src/test.rs
++++ b/src/test.rs
+@@ -167,7 +167,7 @@ fn alloc_uninitialized_with_panic() {
+         let arena: Arena<Dropper> = Arena::new();
+         arena.reserve_extend(2);
+         let uninitialized = arena.uninitialized_array();
+-        assert!((*uninitialized).len() >= 2);
++        assert!(uninitialized.len() >= 2);
+         ptr::write((*uninitialized)[0].as_mut_ptr(), Dropper(false));
+         reached_first_init = true;
+         panic!("To drop the arena");
+-- 
+2.51.0
+

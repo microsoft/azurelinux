@@ -1,0 +1,15 @@
+Fixes this UBSAN error:
+
+runtime error: variable length array bound evaluates to non-positive value 0
+
+--- src/io.d.orig	2024-12-28 00:47:59.000000000 -0700
++++ src/io.d	2025-02-10 09:50:29.262067759 -0700
+@@ -8158,7 +8158,7 @@ local maygc void pr_array (const gcv_obj
+     LEVEL_CHECK;
+     {         /* determine rank and fetch dimensions and sub-product: */
+       var uintL r = (uintL)Iarray_rank(obj); /* rank */
+-      var DYNAMIC_ARRAY(dims_sizes,array_dim_size_t,r); /* dynamically allocated array */
++      var DYNAMIC_ARRAY(dims_sizes,array_dim_size_t,r?r:1); /* dynamically allocated array */
+       iarray_dims_sizes(obj,dims_sizes);                /* fill */
+       var uintL depth = r;          /* depth of recursion */
+       var pr_array_locals_t locals; /* local variables */

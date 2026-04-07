@@ -1,0 +1,43 @@
+--- getrandom-0.2.16/Cargo.toml	1970-01-01T00:00:01+00:00
++++ getrandom-0.2.16/Cargo.toml	2025-05-01T13:06:08.825562+00:00
+@@ -54,8 +54,6 @@
+ [features]
+ custom = []
+ js = [
+-    "wasm-bindgen",
+-    "js-sys",
+ ]
+ linux_disable_fallback = []
+ rdrand = []
+@@ -63,7 +61,6 @@
+     "compiler_builtins",
+     "core",
+     "libc/rustc-dep-of-std",
+-    "wasi/rustc-dep-of-std",
+ ]
+ std = []
+ test-in-browser = []
+@@ -100,22 +97,7 @@
+ optional = true
+ package = "rustc-std-workspace-core"
+ 
+-[target.'cfg(all(any(target_arch = "wasm32", target_arch = "wasm64"), target_os = "unknown"))'.dependencies.js-sys]
+-version = "0.3"
+-optional = true
+-
+-[target.'cfg(all(any(target_arch = "wasm32", target_arch = "wasm64"), target_os = "unknown"))'.dependencies.wasm-bindgen]
+-version = "0.2.62"
+-optional = true
+-default-features = false
+-
+-[target.'cfg(all(any(target_arch = "wasm32", target_arch = "wasm64"), target_os = "unknown"))'.dev-dependencies.wasm-bindgen-test]
+-version = "0.3.18"
+-
+-[target.'cfg(target_os = "wasi")'.dependencies.wasi]
+-version = "0.11"
+-default-features = false
+-
+ [target."cfg(unix)".dependencies.libc]
+ version = "0.2.154"
+ default-features = false
++

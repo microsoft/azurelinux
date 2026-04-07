@@ -1,0 +1,29 @@
+--- lib/IO/Socket/SSL.pm
++++ lib/IO/Socket/SSL.pm
+@@ -209,8 +209,10 @@ my %DEFAULT_SSL_ARGS = (
+     SSL_npn_protocols => undef,    # meaning depends whether on server or client side
+     SSL_alpn_protocols => undef,   # list of protocols we'll accept/send, for example ['http/1.1','spdy/3.1']
+ 
+-    # rely on system default but be sure to disable some definitely bad ones
+-    SSL_cipher_list => 'DEFAULT !EXP !MEDIUM !LOW !eNULL !aNULL !RC4 !DES !MD5 !PSK !SRP',
++    # Use system-wide default cipher list to support use of system-wide
++    # crypto policy (#1076390, #1127577, CPAN RT#97816)
++    # https://fedoraproject.org/wiki/Changes/CryptoPolicy
++    SSL_cipher_list => 'PROFILE=SYSTEM',
+ );
+ 
+ my %DEFAULT_SSL_CLIENT_ARGS = (
+--- lib/IO/Socket/SSL.pod
++++ lib/IO/Socket/SSL.pod
+@@ -1088,9 +1088,8 @@ ciphers for TLS 1.2 and lower. See the O
+ for more details.
+ 
+ Unless you fail to contact your peer because of no shared ciphers it is
+-recommended to leave this option at the default setting, which uses the system
+-default but disables some insecure ciphers which might still be enabled on older
+-systems.
++recommended to leave this option at the default setting, which honors the
++system-wide PROFILE=SYSTEM cipher list.
+ 
+ In case different cipher lists are needed for different SNI hosts a hash can be
+ given with the host as key and the cipher suite as value, similar to

@@ -1,0 +1,10 @@
+--- ./apt-pkg/contrib/mmap.cc.orig	2023-01-25 15:38:18.773604489 +0000
++++ ./apt-pkg/contrib/mmap.cc	2023-01-25 15:38:39.196535088 +0000
+@@ -30,6 +30,7 @@
+ #include <unistd.h>
+ 
+ #include <apti18n.h>
++#include <cstdint>
+ 									/*}}}*/
+ 
+ // MMap::MMap - Constructor						/*{{{*/

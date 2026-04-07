@@ -1,0 +1,27 @@
+--- anstream-0.6.21/Cargo.toml	1970-01-01T00:00:01+00:00
++++ anstream-0.6.21/Cargo.toml	2025-11-12T12:00:50.737058+00:00
+@@ -92,7 +92,7 @@
+     "wincon",
+ ]
+ test = []
+-wincon = ["dep:anstyle-wincon"]
++wincon = []
+ 
+ [lib]
+ name = "anstream"
+@@ -141,10 +141,6 @@
+ 
+ [dev-dependencies.strip-ansi-escapes]
+ version = "0.2.1"
+-
+-[target."cfg(windows)".dependencies.anstyle-wincon]
+-version = "3.0.5"
+-optional = true
+ 
+ [lints.clippy]
+ bool_assert_comparison = "allow"
+@@ -218,3 +214,4 @@
+ [lints.rust.rust_2018_idioms]
+ level = "warn"
+ priority = -1
++

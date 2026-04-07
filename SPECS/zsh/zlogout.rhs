@@ -1,0 +1,7 @@
+#
+#
+# /etc/zlogout and ~/.zlogout are run when an interactive session ends
+#
+#
+
+command -v clear &> /dev/null && clear

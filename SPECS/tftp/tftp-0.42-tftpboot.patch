@@ -1,0 +1,54 @@
+diff -up tftp-hpa-0.48/tftp-xinetd.tftpboot tftp-hpa-0.48/tftp-xinetd
+--- tftp-hpa-0.48/tftp-xinetd.tftpboot	2007-01-31 00:51:05.000000000 +0100
++++ tftp-hpa-0.48/tftp-xinetd	2008-05-20 12:05:53.000000000 +0200
+@@ -10,7 +10,7 @@ service tftp
+ 	wait			= yes
+ 	user			= root
+ 	server			= /usr/sbin/in.tftpd
+-	server_args		= -s /tftpboot
++	server_args		= -s /var/lib/tftpboot
+ 	disable			= yes
+ 	per_source		= 11
+ 	cps			= 100 2
+diff -up tftp-hpa-0.48/README.security.tftpboot tftp-hpa-0.48/README.security
+--- tftp-hpa-0.48/README.security.tftpboot	2008-05-29 17:36:32.000000000 +0200
++++ tftp-hpa-0.48/README.security	2008-05-29 17:37:21.000000000 +0200
+@@ -17,10 +17,10 @@ probably the following:
+ 
+ 1. Create a separate "tftpd" user and group only used for tftpd;
+ 2. Have all your boot files in a single directory tree (usually called 
+-   /tftpboot).
+-3. Specify "-p -u tftpd -s /tftpboot" on the tftpd command line; if
++   /var/lib/tftpboot).
++3. Specify "-p -u tftpd -s /var/lib/tftpboot" on the tftpd command line; if
+    you want clients to be able to create files use
+-   "-p -c -U 002 -u tftpd -s /tftpboot" (replace 002 with whatever
++   "-p -c -U 002 -u tftpd -s /var/lib/tftpboot" (replace 002 with whatever
+    umask is appropriate for your setup.)
+ 
+ 	       =======================================
+@@ -40,12 +40,12 @@ directly.  Thus, if your /etc/inetd.conf
+ line):
+ 
+ tftp	dgram	udp	wait	root	/usr/sbin/tcpd
+-/usr/sbin/in.tftpd -s /tftpboot -r blksize
++/usr/sbin/in.tftpd -s /var/lib/tftpboot -r blksize
+ 
+ ... it's better to change to ...
+ 
+ tftp	dgram	udp	wait	root	/usr/sbin/in.tftpd
+-in.tftpd -s /tftpboot -r blksize
++in.tftpd -s /var/lib/tftpboot -r blksize
+ 
+ You should make sure that you are using "wait" option in tftpd; you
+ also need to have tftpd spawned as root in order for chroot (-s) to
+diff -up tftp-hpa-0.48/tftpd/sample.rules.tftpboot tftp-hpa-0.48/tftpd/sample.rules
+--- tftp-hpa-0.48/tftpd/sample.rules.tftpboot	2008-05-29 17:38:46.000000000 +0200
++++ tftp-hpa-0.48/tftpd/sample.rules	2008-05-29 17:38:05.000000000 +0200
+@@ -30,5 +30,5 @@ rg	\\		/		# Convert backslashes to slash
+ rg	\#		@		# Convert hash marks to @ signs
+ rg	/../		/..no../	# Convert /../ to /..no../
+ e	^ok/				# These are always ok
+-r	^[^/]		/tftpboot/\0	# Convert non-absolute files
++r	^[^/]		/var/lib/tftpboot/\0	# Convert non-absolute files
+ a	\.pvt$				# Reject requests for private files

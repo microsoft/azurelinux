@@ -1,0 +1,12 @@
+diff -up netcdf4-python-1.5.8rel/setup.py.norpath netcdf4-python-1.5.8rel/setup.py
+--- netcdf4-python-1.5.8rel/setup.py.norpath	2021-10-31 07:25:17.000000000 -0600
++++ netcdf4-python-1.5.8rel/setup.py	2022-01-19 19:37:47.204865578 -0700
+@@ -493,7 +493,7 @@ NETCDF4_DIR environment variable not set
+ if sys.platform == 'win32':
+     runtime_lib_dirs = []
+ else:
+-    runtime_lib_dirs = lib_dirs
++    runtime_lib_dirs = []
+ 
+ # Do not require numpy for just querying the package
+ # Taken from the h5py setup file.

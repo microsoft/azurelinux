@@ -1,0 +1,235 @@
+From f4a899a7b7764059da56be2835d0b3e93b4a84b4 Mon Sep 17 00:00:00 2001
+From: Viktor Ashirov <vashirov@redhat.com>
+Date: Tue, 20 Jan 2026 09:52:47 +0100
+Subject: [PATCH] Issue 7189 - DSBLE0007 generates incorrect remediation
+ commands for scan limits
+
+Bug Description:
+
+The generated dsconf commands for fixing missing system indexes had two issues:
+
+1. The --add-scanlimit value was not quoted, causing the shell to interpret
+   "limit=5000 type=eq flags=AND" as multiple arguments instead of a single
+   value, resulting in "unrecognized arguments: type=eq flags=AND" error.
+
+2. When both matching rule and scanlimit were missing, two separate commands
+   were generated where the second would fail because the matching rule was
+   already added by the first command.
+
+Fix Description:
+
+1. Quote the scanlimit value in all remediation commands
+
+2. Combine matching rule and scanlimit fixes into a single command when
+   both are missing for the same index instead of expected_scanlimit)
+
+Fixes: https://github.com/389ds/389-ds-base/issues/7189
+
+Reviewed by: @progier389, @droideck (Thanks!)
+---
+ .../healthcheck/health_system_indexes_test.py | 126 ++++++++++++++++++
+ src/lib389/lib389/backend.py                  |  39 +++---
+ 2 files changed, 147 insertions(+), 18 deletions(-)
+
+diff --git a/dirsrvtests/tests/suites/healthcheck/health_system_indexes_test.py b/dirsrvtests/tests/suites/healthcheck/health_system_indexes_test.py
+index a977b71d1..486fad44b 100644
+--- a/dirsrvtests/tests/suites/healthcheck/health_system_indexes_test.py
++++ b/dirsrvtests/tests/suites/healthcheck/health_system_indexes_test.py
+@@ -408,6 +408,132 @@ def test_retrocl_plugin_missing_matching_rule(topology_st, retrocl_plugin_enable
+     run_healthcheck_and_flush_log(topology_st, standalone, json=True, searched_code=JSON_OUTPUT)
+ 
+ 
++def test_missing_scanlimit(topology_st, log_buffering_enabled):
++    """Check if healthcheck returns DSBLE0007 code when parentId index is missing scanlimit
++
++    :id: 40e1bf6a-2397-459b-bdf3-f787ca118b86
++    :setup: Standalone instance
++    :steps:
++        1. Create DS instance
++        2. Remove nsIndexIDListScanLimit from parentId index
++        3. Use healthcheck without --json option
++        4. Use healthcheck with --json option
++        5. Verify the remediation command has properly quoted scanlimit
++        6. Re-add the scanlimit
++        7. Use healthcheck without --json option
++        8. Use healthcheck with --json option
++    :expectedresults:
++        1. Success
++        2. Success
++        3. healthcheck reports DSBLE0007 code and related details
++        4. healthcheck reports DSBLE0007 code and related details
++        5. The scanlimit value is quoted in the remediation command
++        6. Success
++        7. healthcheck reports no issues found
++        8. healthcheck reports no issues found
++    """
++
++    RET_CODE = "DSBLE0007"
++    PARENTID_DN = "cn=parentid,cn=index,cn=userroot,cn=ldbm database,cn=plugins,cn=config"
++    SCANLIMIT_VALUE = "limit=5000 type=eq flags=AND"
++
++    standalone = topology_st.standalone
++
++    log.info("Remove nsIndexIDListScanLimit from parentId index")
++    parentid_index = Index(standalone, PARENTID_DN)
++    parentid_index.remove("nsIndexIDListScanLimit", SCANLIMIT_VALUE)
++
++    run_healthcheck_and_flush_log(topology_st, standalone, json=False, searched_code=RET_CODE)
++
++    # Verify the remediation command has properly quoted scanlimit
++    args = FakeArgs()
++    args.instance = standalone.serverid
++    args.verbose = standalone.verbose
++    args.list_errors = False
++    args.list_checks = False
++    args.exclude_check = []
++    args.check = ["backends"]
++    args.dry_run = False
++    args.json = False
++    health_check_run(standalone, topology_st.logcap.log, args)
++    # Check that the scanlimit is quoted in the output
++    assert topology_st.logcap.contains('--add-scanlimit "limit=5000 type=eq flags=AND"')
++    log.info("Verified scanlimit is properly quoted in remediation command")
++    topology_st.logcap.flush()
++
++    run_healthcheck_and_flush_log(topology_st, standalone, json=True, searched_code=RET_CODE)
++
++    log.info("Re-add the nsIndexIDListScanLimit")
++    parentid_index = Index(standalone, PARENTID_DN)
++    parentid_index.add("nsIndexIDListScanLimit", SCANLIMIT_VALUE)
++
++    run_healthcheck_and_flush_log(topology_st, standalone, json=False, searched_code=CMD_OUTPUT)
++    run_healthcheck_and_flush_log(topology_st, standalone, json=True, searched_code=JSON_OUTPUT)
++
++
++def test_missing_matching_rule_and_scanlimit(topology_st, log_buffering_enabled):
++    """Check if healthcheck generates a single combined command when both matching rule and scanlimit are missing
++
++    :id: af8214ad-5e4c-422a-8f74-3e99227551df
++    :setup: Standalone instance
++    :steps:
++        1. Create DS instance
++        2. Remove both integerOrderingMatch and nsIndexIDListScanLimit from parentId index
++        3. Use healthcheck and verify a single combined command is generated
++        4. Re-add the matching rule and scanlimit
++        5. Use healthcheck without --json option
++        6. Use healthcheck with --json option
++    :expectedresults:
++        1. Success
++        2. Success
++        3. healthcheck reports DSBLE0007 and generates a single command with both --add-mr and --add-scanlimit
++        4. Success
++        5. healthcheck reports no issues found
++        6. healthcheck reports no issues found
++    """
++
++    RET_CODE = "DSBLE0007"
++    PARENTID_DN = "cn=parentid,cn=index,cn=userroot,cn=ldbm database,cn=plugins,cn=config"
++    SCANLIMIT_VALUE = "limit=5000 type=eq flags=AND"
++
++    standalone = topology_st.standalone
++
++    log.info("Remove both integerOrderingMatch and nsIndexIDListScanLimit from parentId index")
++    parentid_index = Index(standalone, PARENTID_DN)
++    parentid_index.remove("nsMatchingRule", "integerOrderingMatch")
++    parentid_index.remove("nsIndexIDListScanLimit", SCANLIMIT_VALUE)
++
++    # Run healthcheck and verify combined command
++    args = FakeArgs()
++    args.instance = standalone.serverid
++    args.verbose = standalone.verbose
++    args.list_errors = False
++    args.list_checks = False
++    args.exclude_check = []
++    args.check = ["backends"]
++    args.dry_run = False
++    args.json = False
++    health_check_run(standalone, topology_st.logcap.log, args)
++
++    # Verify DSBLE0007 is reported
++    assert topology_st.logcap.contains(RET_CODE)
++    log.info("healthcheck returned code: %s" % RET_CODE)
++
++    # Verify a single combined command is generated with both --add-mr and --add-scanlimit
++    assert topology_st.logcap.contains('--add-mr integerOrderingMatch --add-scanlimit "limit=5000 type=eq flags=AND"')
++    log.info("Verified combined command with both --add-mr and --add-scanlimit")
++
++    topology_st.logcap.flush()
++
++    log.info("Re-add the integerOrderingMatch matching rule and scanlimit")
++    parentid_index = Index(standalone, PARENTID_DN)
++    parentid_index.add("nsMatchingRule", "integerOrderingMatch")
++    parentid_index.add("nsIndexIDListScanLimit", SCANLIMIT_VALUE)
++
++    run_healthcheck_and_flush_log(topology_st, standalone, json=False, searched_code=CMD_OUTPUT)
++    run_healthcheck_and_flush_log(topology_st, standalone, json=True, searched_code=JSON_OUTPUT)
++
++
+ def test_multiple_missing_indexes(topology_st, log_buffering_enabled):
+     """Check if healthcheck returns DSBLE0007 code when multiple system indexes are missing
+ 
+diff --git a/src/lib389/lib389/backend.py b/src/lib389/lib389/backend.py
+index fba95987b..db464b43a 100644
+--- a/src/lib389/lib389/backend.py
++++ b/src/lib389/lib389/backend.py
+@@ -678,7 +678,7 @@ class Backend(DSLdapObject):
+                     if expected_config.get('matching_rule'):
+                         cmd += f" --matching-rule {expected_config['matching_rule']}"
+                     if expected_config.get('scanlimit'):
+-                        cmd += f" --add-scanlimit {expected_config['scanlimit']}"
++                        cmd += f" --add-scanlimit \"{expected_config['scanlimit']}\""
+                     remediation_commands.append(cmd)
+                     reindex_attrs.add(attr_name)  # New index needs reindexing
+                 else:
+@@ -700,28 +700,31 @@ class Backend(DSLdapObject):
+                         remediation_commands.append(cmd)
+                         reindex_attrs.add(attr_name)
+ 
+-                    # Check matching rules
++                    # Check matching rules and scanlimit together to generate a single combined command
+                     expected_mr = expected_config.get('matching_rule')
++                    expected_scanlimit = expected_config.get('scanlimit')
++
++                    missing_mr = False
+                     if expected_mr:
+                         actual_mrs_lower = [mr.lower() for mr in actual_mrs]
+                         if expected_mr.lower() not in actual_mrs_lower:
+                             discrepancies.append(f"Index {attr_name} missing matching rule: {expected_mr}")
+-                            # Add the missing matching rule
+-                            cmd = f"dsconf YOUR_INSTANCE backend index set {bename} --attr {attr_name} --add-mr {expected_mr}"
+-                            remediation_commands.append(cmd)
+-                            reindex_attrs.add(attr_name)
+-
+-                    # Check fine grain definitions for parentid ONLY
+-                    expected_scanlimit = expected_config.get('scanlimit')
+-                    if (attr_name.lower() == "parentid") and expected_scanlimit and (len(actual_scanlimit) == 0):
+-                            discrepancies.append(f"Index {attr_name} missing fine grain definition of IDs limit: {expected_mr}")
+-                            # Add the missing scanlimit
+-                            if expected_mr:
+-                                cmd = f"dsconf YOUR_INSTANCE backend index set {bename} --attr {attr_name} --add-mr {expected_mr} --add-scanlimit {expected_scanlimit}"
+-                            else:
+-                                cmd = f"dsconf YOUR_INSTANCE backend index set {bename} --attr {attr_name} --add-scanlimit {expected_scanlimit}"
+-                            remediation_commands.append(cmd)
+-                            reindex_attrs.add(attr_name)
++                            missing_mr = True
++
++                    missing_scanlimit = False
++                    if expected_scanlimit and (len(actual_scanlimit) == 0):
++                        discrepancies.append(f"Index {attr_name} missing fine grain definition of IDs limit: {expected_scanlimit}")
++                        missing_scanlimit = True
++
++                    # Generate a single combined command for all missing items
++                    if missing_mr or missing_scanlimit:
++                        cmd = f"dsconf YOUR_INSTANCE backend index set {bename} --attr {attr_name}"
++                        if missing_mr:
++                            cmd += f" --add-mr {expected_mr}"
++                        if missing_scanlimit:
++                            cmd += f" --add-scanlimit \"{expected_scanlimit}\""
++                        remediation_commands.append(cmd)
++                        reindex_attrs.add(attr_name)
+ 
+             except Exception as e:
+                 self._log.debug(f"_lint_system_indexes - Error checking index {attr_name}: {e}")
+-- 
+2.52.0
+

@@ -1,0 +1,41 @@
+From d974c99e98f9f826b6a5c3c9a3ec4ab40255c798 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Thu, 31 Aug 2023 12:09:15 +0200
+Subject: [PATCH] Fix compatibility with Minitest 5.19+.
+
+However, this also means that the test suite now requires Mintest 5+. It
+should have no impact on runtime support of older Minitests.
+---
+ test/test_stub_const.rb | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/test/test_stub_const.rb b/test/test_stub_const.rb
+index 326306d..ef4af90 100644
+--- a/test/test_stub_const.rb
++++ b/test/test_stub_const.rb
+@@ -19,7 +19,7 @@ end
+ describe 'Object' do
+   describe '#stub_const' do
+     before do
+-      @mock = MiniTest::Mock.new
++      @mock = Minitest::Mock.new
+       @mock.expect(:what, :new)
+     end
+ 
+@@ -74,13 +74,13 @@ describe 'Object' do
+ 
+   describe '#stub_consts' do
+     before do
+-      @mock = MiniTest::Mock.new
++      @mock = Minitest::Mock.new
+       @mock.expect(:what, :new)
+ 
+-      @mock2 = MiniTest::Mock.new
++      @mock2 = Minitest::Mock.new
+       @mock2.expect(:who, :me)
+ 
+-      @mock3 = MiniTest::Mock.new
++      @mock3 = Minitest::Mock.new
+       @mock3.expect(:where, :there)
+     end
+ 

@@ -1,0 +1,1233 @@
+From d681f2e619caa2efddae83abc7d13860641a90cd Mon Sep 17 00:00:00 2001
+From: Viktor Ashirov <vashirov@redhat.com>
+Date: Thu, 5 Feb 2026 12:17:06 +0100
+Subject: [PATCH] Issue 7223 - Add dsctl index-check command for offline index
+ repair
+
+Description:
+Add `dsctl <instance> index-check [backend] [--fix]` command for offline
+detection and repair of index ordering mismatches. This is needed after
+upgrade from versions that didn't use integerOrderingMatch for
+parentid/ancestorid system indexes.
+
+It's automatically executed as part of RPM %post scriptlet during
+upgrade.
+
+Relates: https://github.com/389ds/389-ds-base/issues/7223
+
+Reviewed by: @progier389, @tbordaz, @droideck (Thanks!)
+---
+ .../healthcheck/health_system_indexes_test.py | 593 ++++++++++++++++++
+ rpm/389-ds-base.spec.in                       |  51 +-
+ src/lib389/lib389/cli_ctl/dbtasks.py          | 402 ++++++++++++
+ src/lib389/lib389/dseldif.py                  |  51 +-
+ 4 files changed, 1068 insertions(+), 29 deletions(-)
+
+diff --git a/dirsrvtests/tests/suites/healthcheck/health_system_indexes_test.py b/dirsrvtests/tests/suites/healthcheck/health_system_indexes_test.py
+index eb727b902..dd42cd197 100644
+--- a/dirsrvtests/tests/suites/healthcheck/health_system_indexes_test.py
++++ b/dirsrvtests/tests/suites/healthcheck/health_system_indexes_test.py
+@@ -590,6 +590,599 @@ def test_upgrade_removes_ancestorid_index_config(topology_st):
+         log.info(f"Idempotency verified - ancestorid still absent after second restart (got exception: {e})")
+ 
+ 
++def test_index_check_basic(topology_st):
++    """Check if dsctl index-check works correctly
++
++    :id: 8a4e5c2d-1f3b-4a7c-9e8d-2b6f0c4a5d3e
++    :setup: Standalone instance
++    :steps:
++        1. Create DS instance
++        2. Run dsctl index-check while server is running (should fail)
++        3. Stop the server
++        4. Run dsctl index-check (should pass)
++        5. Start the server
++    :expectedresults:
++        1. Success
++        2. index-check returns False and logs error
++        3. Success
++        4. index-check returns True (no mismatches)
++        5. Success
++    """
++    from lib389.cli_ctl.dbtasks import dbtasks_index_check
++
++    standalone = topology_st.standalone
++
++    log.info("Run index-check while server is running")
++    args = FakeArgs()
++    args.backend = None
++    args.fix = False
++
++    # Server should be running, index-check should fail
++    assert standalone.status()
++    result = dbtasks_index_check(standalone, topology_st.logcap.log, args)
++    assert result is False
++    assert topology_st.logcap.contains("index-check requires the instance to be stopped")
++    topology_st.logcap.flush()
++
++    log.info("Stop the server")
++    standalone.stop()
++
++    log.info("Run index-check with server stopped")
++    result = dbtasks_index_check(standalone, topology_st.logcap.log, args)
++    assert result is True
++    assert topology_st.logcap.contains("All checks passed")
++    topology_st.logcap.flush()
++
++    log.info("Start the server")
++    standalone.start()
++
++
++def test_index_check_specific_backend(topology_st):
++    """Check if dsctl index-check works with a specific backend
++
++    :id: 407d8fcc-62e0-43dd-90fa-70e7090a5cfd
++    :setup: Standalone instance
++    :steps:
++        1. Create DS instance
++        2. Stop the server
++        3. Run dsctl index-check with specific backend (userRoot)
++        4. Run dsctl index-check with non-existent backend
++        5. Start the server
++    :expectedresults:
++        1. Success
++        2. Success
++        3. index-check returns True for userRoot
++        4. index-check returns False for non-existent backend
++        5. Success
++    """
++    from lib389.cli_ctl.dbtasks import dbtasks_index_check
++
++    standalone = topology_st.standalone
++
++    log.info("Stop the server")
++    standalone.stop()
++
++    log.info("Run index-check for userRoot backend")
++    args = FakeArgs()
++    args.backend = "userRoot"
++    args.fix = False
++
++    result = dbtasks_index_check(standalone, topology_st.logcap.log, args)
++    assert result is True
++    # Check for backend name in any case
++    assert topology_st.logcap.contains("Checking backend:")
++    topology_st.logcap.flush()
++
++    log.info("Run index-check for non-existent backend")
++    args.backend = "nonExistentBackend"
++    result = dbtasks_index_check(standalone, topology_st.logcap.log, args)
++    assert result is False
++    assert topology_st.logcap.contains("not found")
++    topology_st.logcap.flush()
++
++    log.info("Start the server")
++    standalone.start()
++
++
++def test_index_check_mismatch_detection(topology_st):
++    """Check if dsctl index-check detects ordering mismatch
++
++    :id: 50d14520-b0bf-4243-9fe6-b097928d4351
++    :setup: Standalone instance
++    :steps:
++        1. Create DS instance
++        2. Stop the server
++        3. Run dsctl index-check (without --fix)
++        4. Verify output format
++        5. Start the server
++    :expectedresults:
++        1. Success
++        2. Success
++        3. index-check returns True (no mismatch on fresh instance)
++        4. Log contains expected format
++        5. Success
++    """
++    from lib389.cli_ctl.dbtasks import dbtasks_index_check
++
++    standalone = topology_st.standalone
++
++    log.info("Stop the server")
++    standalone.stop()
++
++    log.info("Run index-check to verify detection logic")
++    args = FakeArgs()
++    args.backend = "userRoot"
++    args.fix = False
++
++    # On a fresh instance, there should be no mismatch
++    result = dbtasks_index_check(standalone, topology_st.logcap.log, args)
++    # Fresh instance should have matching config and disk ordering
++    assert result is True
++    # Check that the backend was checked (may skip indexes if ordering can't be determined)
++    assert topology_st.logcap.contains("Checking backend:")
++    topology_st.logcap.flush()
++
++    log.info("Start the server")
++    standalone.start()
++
++
++def test_index_check_with_fix(topology_st):
++    """Check if dsctl index-check --fix triggers reindexing
++
++    :id: 38ae36e4-c861-4771-ae7d-354370376a2f
++    :setup: Standalone instance
++    :steps:
++        1. Create DS instance
++        2. Stop the server
++        3. Run dsctl index-check --fix (should pass since no mismatch)
++        4. Verify output indicates check passed
++        5. Start the server
++    :expectedresults:
++        1. Success
++        2. Success
++        3. index-check returns True
++        4. Log contains "All checks passed"
++        5. Success
++    """
++    from lib389.cli_ctl.dbtasks import dbtasks_index_check
++
++    standalone = topology_st.standalone
++
++    log.info("Stop the server")
++    standalone.stop()
++
++    log.info("Run index-check with --fix option")
++    args = FakeArgs()
++    args.backend = None
++    args.fix = True
++
++    result = dbtasks_index_check(standalone, topology_st.logcap.log, args)
++    # On a fresh instance, there should be no mismatch, so no reindexing needed
++    assert result is True
++    assert topology_st.logcap.contains("All checks passed")
++    topology_st.logcap.flush()
++
++    log.info("Start the server")
++    standalone.start()
++
++
++def test_index_check_fixes_scanlimit(topology_st):
++    """Check if dsctl index-check --fix removes nsIndexIDListScanLimit
++
++    :id: 4a9b2c7d-8e1f-4b3a-9c5d-6e7f8a0b1c2d
++    :setup: Standalone instance
++    :steps:
++        1. Create DS instance
++        2. Stop the server
++        3. Add nsIndexIDListScanLimit to parentid index using DSEldif
++        4. Run dsctl index-check (should detect issue)
++        5. Run dsctl index-check --fix
++        6. Verify nsIndexIDListScanLimit was removed
++        7. Start the server
++    :expectedresults:
++        1. Success
++        2. Success
++        3. Success
++        4. index-check returns False and detects scanlimit
++        5. index-check returns True after fix
++        6. nsIndexIDListScanLimit no longer present
++        7. Success
++    """
++    from lib389.cli_ctl.dbtasks import dbtasks_index_check
++    from lib389.dseldif import DSEldif
++
++    standalone = topology_st.standalone
++
++    log.info("Stop the server")
++    standalone.stop()
++
++    log.info("Add nsIndexIDListScanLimit to parentid index using DSEldif")
++    dse_ldif = DSEldif(standalone)
++    parentid_dn = "cn=parentid,cn=index,cn=userRoot,cn=ldbm database,cn=plugins,cn=config"
++    dse_ldif.add(parentid_dn, "nsIndexIDListScanLimit", "4000")
++
++    # Verify it was added
++    scanlimit = dse_ldif.get(parentid_dn, "nsIndexIDListScanLimit", single=True)
++    assert scanlimit == "4000", f"Failed to add nsIndexIDListScanLimit, got: {scanlimit}"
++    log.info("Added nsIndexIDListScanLimit to parentid index")
++
++    log.info("Run index-check without --fix (should detect issue)")
++    args = FakeArgs()
++    args.backend = "userRoot"
++    args.fix = False
++
++    result = dbtasks_index_check(standalone, topology_st.logcap.log, args)
++    assert result is False, "index-check should detect scanlimit issue"
++    assert topology_st.logcap.contains("nsIndexIDListScanLimit")
++    topology_st.logcap.flush()
++
++    log.info("Run index-check with --fix")
++    args.fix = True
++    result = dbtasks_index_check(standalone, topology_st.logcap.log, args)
++    assert result is True, "index-check --fix should succeed"
++    assert topology_st.logcap.contains("Removed nsIndexIDListScanLimit")
++    topology_st.logcap.flush()
++
++    log.info("Verify nsIndexIDListScanLimit was removed")
++    dse_ldif = DSEldif(standalone)  # Reload to get fresh data
++    scanlimit = dse_ldif.get(parentid_dn, "nsIndexIDListScanLimit", single=True)
++    assert scanlimit is None, f"nsIndexIDListScanLimit should be removed, but got: {scanlimit}"
++    log.info("nsIndexIDListScanLimit successfully removed")
++
++    log.info("Start the server")
++    standalone.start()
++
++
++def test_index_check_fixes_ancestorid_config(topology_st):
++    """Check if dsctl index-check --fix removes ancestorid config entries
++
++    :id: 5b0c3d8e-9f2a-4c4b-0d6e-7f8a9b1c2d3e
++    :setup: Standalone instance
++    :steps:
++        1. Create DS instance
++        2. Stop the server
++        3. Add ancestorid index config entry using DSEldif
++        4. Run dsctl index-check (should detect issue)
++        5. Run dsctl index-check --fix
++        6. Verify ancestorid config entry was removed
++        7. Start the server
++    :expectedresults:
++        1. Success
++        2. Success
++        3. Success
++        4. index-check returns False and detects ancestorid config
++        5. index-check returns True after fix
++        6. ancestorid config entry no longer present
++        7. Success
++    """
++    from lib389.cli_ctl.dbtasks import dbtasks_index_check
++    from lib389.dseldif import DSEldif
++
++    standalone = topology_st.standalone
++
++    log.info("Stop the server")
++    standalone.stop()
++
++    log.info("Add ancestorid index config entry using DSEldif")
++    dse_ldif = DSEldif(standalone)
++    ancestorid_entry = [
++        "dn: cn=ancestorid,cn=index,cn=userRoot,cn=ldbm database,cn=plugins,cn=config\n",
++        "objectClass: top\n",
++        "objectClass: nsIndex\n",
++        "cn: ancestorid\n",
++        "nsSystemIndex: true\n",
++        "nsIndexType: eq\n",
++    ]
++    dse_ldif.add_entry(ancestorid_entry)
++
++    # Verify it was added
++    ancestorid_dn = "cn=ancestorid,cn=index,cn=userRoot,cn=ldbm database,cn=plugins,cn=config"
++    dse_ldif = DSEldif(standalone)  # Reload
++    cn_value = dse_ldif.get(ancestorid_dn, "cn", single=True)
++    assert cn_value is not None, "Failed to add ancestorid index config entry"
++    log.info(f"Added ancestorid index entry with cn: {cn_value}")
++
++    log.info("Run index-check without --fix (should detect issue)")
++    args = FakeArgs()
++    args.backend = "userRoot"
++    args.fix = False
++
++    result = dbtasks_index_check(standalone, topology_st.logcap.log, args)
++    assert result is False, "index-check should detect ancestorid config issue"
++    assert topology_st.logcap.contains("ancestorid") and topology_st.logcap.contains("config entry exists")
++    topology_st.logcap.flush()
++
++    log.info("Run index-check with --fix")
++    args.fix = True
++    result = dbtasks_index_check(standalone, topology_st.logcap.log, args)
++    assert result is True, "index-check --fix should succeed"
++    assert topology_st.logcap.contains("Removed ancestorid config entry")
++    topology_st.logcap.flush()
++
++    log.info("Verify ancestorid config entry was removed")
++    dse_ldif = DSEldif(standalone)  # Reload to get fresh data
++    cn_value = dse_ldif.get(ancestorid_dn, "cn", single=True)
++    assert cn_value is None, f"ancestorid config entry should be removed, but got: {cn_value}"
++    log.info("ancestorid config entry successfully removed")
++
++    log.info("Start the server")
++    standalone.start()
++
++
++def test_index_check_fixes_missing_matching_rule(topology_st):
++    """Check if dsctl index-check --fix adds missing integerOrderingMatch
++
++    :id: 6c1d4e9f-0a3b-4d5c-1e7f-8a9b0c2d3e4f
++    :setup: Standalone instance
++    :steps:
++        1. Create DS instance
++        2. Stop the server
++        3. Remove integerOrderingMatch from parentid index using DSEldif
++        4. Run dsctl index-check (should detect issue)
++        5. Run dsctl index-check --fix
++        6. Verify integerOrderingMatch was added back
++        7. Start the server
++    :expectedresults:
++        1. Success
++        2. Success
++        3. Success
++        4. index-check returns False and detects missing matching rule
++        5. index-check returns True after fix
++        6. integerOrderingMatch is present
++        7. Success
++    """
++    from lib389.cli_ctl.dbtasks import dbtasks_index_check
++    from lib389.dseldif import DSEldif
++
++    standalone = topology_st.standalone
++
++    log.info("Stop the server")
++    standalone.stop()
++
++    log.info("Remove integerOrderingMatch from parentid index using DSEldif")
++    dse_ldif = DSEldif(standalone)
++    parentid_dn = "cn=parentid,cn=index,cn=userRoot,cn=ldbm database,cn=plugins,cn=config"
++
++    # Check current matching rules
++    matching_rules = dse_ldif.get(parentid_dn, "nsMatchingRule")
++    log.info(f"Current matching rules: {matching_rules}")
++
++    # Remove integerOrderingMatch if present
++    if matching_rules:
++        for mr in matching_rules:
++            if "integerorderingmatch" in mr.lower():
++                dse_ldif.delete(parentid_dn, "nsMatchingRule", mr)
++                log.info(f"Removed matching rule: {mr}")
++
++    # Verify it was removed
++    dse_ldif = DSEldif(standalone)  # Reload
++    matching_rules = dse_ldif.get(parentid_dn, "nsMatchingRule")
++    if matching_rules:
++        for mr in matching_rules:
++            assert "integerorderingmatch" not in mr.lower(), \
++                f"integerOrderingMatch should be removed, but found: {mr}"
++    log.info("integerOrderingMatch removed from parentid index")
++
++    log.info("Run index-check without --fix (should detect issue)")
++    args = FakeArgs()
++    args.backend = "userRoot"
++    args.fix = False
++
++    result = dbtasks_index_check(standalone, topology_st.logcap.log, args)
++    assert result is False, "index-check should detect missing matching rule"
++    assert topology_st.logcap.contains("missing integerOrderingMatch")
++    topology_st.logcap.flush()
++
++    log.info("Run index-check with --fix")
++    args.fix = True
++    result = dbtasks_index_check(standalone, topology_st.logcap.log, args)
++    assert result is True, "index-check --fix should succeed"
++    assert topology_st.logcap.contains("integerOrderingMatch")
++    topology_st.logcap.flush()
++
++    log.info("Verify integerOrderingMatch was added back")
++    dse_ldif = DSEldif(standalone)  # Reload to get fresh data
++    matching_rules = dse_ldif.get(parentid_dn, "nsMatchingRule")
++    assert matching_rules is not None, "nsMatchingRule should be present"
++    found_int_order = False
++    for mr in matching_rules:
++        if "integerorderingmatch" in mr.lower():
++            found_int_order = True
++            break
++    assert found_int_order, f"integerOrderingMatch should be present, got: {matching_rules}"
++    log.info("integerOrderingMatch successfully added back")
++
++    log.info("Start the server")
++    standalone.start()
++
++
++def test_index_check_fixes_default_ancestorid(topology_st):
++    """Check if dsctl index-check --fix removes ancestorid from default indexes
++
++    :id: 7d2e5f0a-1b4c-4e6d-2f8a-9b0c1d3e4f5a
++    :setup: Standalone instance
++    :steps:
++        1. Create DS instance
++        2. Stop the server
++        3. Add ancestorid to cn=default indexes using DSEldif
++        4. Run dsctl index-check (should detect issue)
++        5. Run dsctl index-check --fix
++        6. Verify ancestorid was removed from default indexes
++        7. Start the server
++    :expectedresults:
++        1. Success
++        2. Success
++        3. Success
++        4. index-check returns False and detects ancestorid in default indexes
++        5. index-check returns True after fix
++        6. ancestorid no longer in default indexes
++        7. Success
++    """
++    from lib389.cli_ctl.dbtasks import dbtasks_index_check
++    from lib389.dseldif import DSEldif
++
++    standalone = topology_st.standalone
++
++    log.info("Stop the server")
++    standalone.stop()
++
++    log.info("Add ancestorid to cn=default indexes using DSEldif")
++    dse_ldif = DSEldif(standalone)
++    ancestorid_default_entry = [
++        "dn: cn=ancestorid,cn=default indexes,cn=config,cn=ldbm database,cn=plugins,cn=config\n",
++        "objectClass: top\n",
++        "objectClass: nsIndex\n",
++        "cn: ancestorid\n",
++        "nsSystemIndex: true\n",
++        "nsIndexType: eq\n",
++    ]
++    dse_ldif.add_entry(ancestorid_default_entry)
++
++    # Verify it was added
++    ancestorid_default_dn = "cn=ancestorid,cn=default indexes,cn=config,cn=ldbm database,cn=plugins,cn=config"
++    dse_ldif = DSEldif(standalone)  # Reload
++    cn_value = dse_ldif.get(ancestorid_default_dn, "cn", single=True)
++    assert cn_value is not None, "Failed to add ancestorid to default indexes"
++    log.info(f"Added ancestorid to default indexes with cn: {cn_value}")
++
++    log.info("Run index-check without --fix (should detect issue)")
++    args = FakeArgs()
++    args.backend = None  # Check all backends including default indexes
++    args.fix = False
++
++    result = dbtasks_index_check(standalone, topology_st.logcap.log, args)
++    assert result is False, "index-check should detect ancestorid in default indexes"
++    assert topology_st.logcap.contains("ancestorid found in cn=default indexes")
++    topology_st.logcap.flush()
++
++    log.info("Run index-check with --fix")
++    args.fix = True
++    result = dbtasks_index_check(standalone, topology_st.logcap.log, args)
++    assert result is True, "index-check --fix should succeed"
++    assert topology_st.logcap.contains("Removed ancestorid from default indexes")
++    topology_st.logcap.flush()
++
++    log.info("Verify ancestorid was removed from default indexes")
++    dse_ldif = DSEldif(standalone)  # Reload to get fresh data
++    cn_value = dse_ldif.get(ancestorid_default_dn, "cn", single=True)
++    assert cn_value is None, f"ancestorid should be removed from default indexes, but got: {cn_value}"
++    log.info("ancestorid successfully removed from default indexes")
++
++    log.info("Start the server")
++    standalone.start()
++
++
++def test_index_check_fixes_multiple_issues(topology_st):
++    """Check if dsctl index-check --fix handles multiple issues at once
++
++    :id: 8e3f6a1b-2c5d-4f7e-3a9b-0c1d2e4f5a6b
++    :setup: Standalone instance
++    :steps:
++        1. Create DS instance
++        2. Stop the server
++        3. Add multiple issues: scanlimit, ancestorid config, missing matching rule
++        4. Run dsctl index-check (should detect all issues)
++        5. Run dsctl index-check --fix
++        6. Verify all issues were fixed
++        7. Run dsctl index-check again (should pass)
++        8. Start the server
++    :expectedresults:
++        1. Success
++        2. Success
++        3. Success
++        4. index-check returns False and detects all issues
++        5. index-check returns True after fix
++        6. All issues resolved
++        7. index-check returns True (no issues)
++        8. Success
++    """
++    from lib389.cli_ctl.dbtasks import dbtasks_index_check
++    from lib389.dseldif import DSEldif
++
++    standalone = topology_st.standalone
++
++    log.info("Stop the server")
++    standalone.stop()
++
++    dse_ldif = DSEldif(standalone)
++    parentid_dn = "cn=parentid,cn=index,cn=userRoot,cn=ldbm database,cn=plugins,cn=config"
++    ancestorid_dn = "cn=ancestorid,cn=index,cn=userRoot,cn=ldbm database,cn=plugins,cn=config"
++
++    log.info("Add issue 1: nsIndexIDListScanLimit to parentid")
++    dse_ldif.add(parentid_dn, "nsIndexIDListScanLimit", "4000")
++
++    log.info("Add issue 2: ancestorid index config entry")
++    ancestorid_entry = [
++        f"dn: {ancestorid_dn}\n",
++        "objectClass: top\n",
++        "objectClass: nsIndex\n",
++        "cn: ancestorid\n",
++        "nsSystemIndex: true\n",
++        "nsIndexType: eq\n",
++    ]
++    dse_ldif.add_entry(ancestorid_entry)
++
++    log.info("Add issue 3: Remove integerOrderingMatch from parentid")
++    dse_ldif = DSEldif(standalone)  # Reload
++    matching_rules = dse_ldif.get(parentid_dn, "nsMatchingRule")
++    if matching_rules:
++        for mr in matching_rules:
++            if "integerorderingmatch" in mr.lower():
++                dse_ldif.delete(parentid_dn, "nsMatchingRule", mr)
++
++    log.info("Run index-check without --fix (should detect all issues)")
++    args = FakeArgs()
++    args.backend = "userRoot"
++    args.fix = False
++
++    result = dbtasks_index_check(standalone, topology_st.logcap.log, args)
++    assert result is False, "index-check should detect multiple issues"
++    # Check that multiple issues were detected
++    assert topology_st.logcap.contains("nsIndexIDListScanLimit")
++    assert topology_st.logcap.contains("ancestorid")
++    topology_st.logcap.flush()
++
++    log.info("Run index-check with --fix")
++    args.fix = True
++    result = dbtasks_index_check(standalone, topology_st.logcap.log, args)
++    assert result is True, "index-check --fix should succeed"
++    assert topology_st.logcap.contains("All issues fixed")
++    topology_st.logcap.flush()
++
++    log.info("Verify all issues were fixed")
++    dse_ldif = DSEldif(standalone)  # Reload
++
++    # Check scanlimit removed
++    scanlimit = dse_ldif.get(parentid_dn, "nsIndexIDListScanLimit", single=True)
++    assert scanlimit is None, f"nsIndexIDListScanLimit should be removed, got: {scanlimit}"
++
++    # Check ancestorid config removed
++    cn_value = dse_ldif.get(ancestorid_dn, "cn", single=True)
++    assert cn_value is None, f"ancestorid config should be removed, got: {cn_value}"
++
++    # Check matching rule added back
++    matching_rules = dse_ldif.get(parentid_dn, "nsMatchingRule")
++    found_int_order = False
++    if matching_rules:
++        for mr in matching_rules:
++            if "integerorderingmatch" in mr.lower():
++                found_int_order = True
++                break
++    assert found_int_order, f"integerOrderingMatch should be present, got: {matching_rules}"
++
++    log.info("All issues verified as fixed")
++
++    log.info("Run index-check again to confirm all clear")
++    args.fix = False
++    result = dbtasks_index_check(standalone, topology_st.logcap.log, args)
++    assert result is True, "index-check should pass after fix"
++    assert topology_st.logcap.contains("All checks passed")
++    topology_st.logcap.flush()
++
++    log.info("Start the server")
++    standalone.start()
++
++
+ if __name__ == "__main__":
+     # Run isolated
+     # -s for DEBUG mode
+diff --git a/rpm/389-ds-base.spec.in b/rpm/389-ds-base.spec.in
+index 51bfd7e77..ae359ab6b 100644
+--- a/rpm/389-ds-base.spec.in
++++ b/rpm/389-ds-base.spec.in
+@@ -628,42 +628,45 @@ if ! getent passwd $USERNAME >/dev/null ; then
+ fi
+ 
+ # Reload our sysctl before we restart (if we can)
+-sysctl --system &> $output; true
++sysctl --system &> "$output"; true
+ 
+-# Gather the running instances so we can restart them
++# Gather running instances, stop them, run index-check, then restart
+ instbase="%{_sysconfdir}/%{pkgname}"
++instances=""
+ ninst=0
+-for dir in $instbase/slapd-* ; do
+-    echo dir = $dir >> $output 2>&1 || :
++
++for dir in "$instbase"/slapd-* ; do
++    echo "dir = $dir" >> "$output" 2>&1 || :
+     if [ ! -d "$dir" ] ; then continue ; fi
+     case "$dir" in *.removed) continue ;; esac
+-    basename=`basename $dir`
+-    inst="%{pkgname}@`echo $basename | sed -e 's/slapd-//g'`"
+-    echo found instance $inst - getting status  >> $output 2>&1 || :
+-    if /bin/systemctl -q is-active $inst ; then
+-       echo instance $inst is running >> $output 2>&1 || :
++    basename=$(basename "$dir")
++    inst="%{pkgname}@${basename#slapd-}"
++    inst_name="${basename#slapd-}"
++    echo "found instance $inst - getting status" >> "$output" 2>&1 || :
++    if /bin/systemctl -q is-active "$inst" ; then
++       echo "instance $inst is running - stopping for upgrade" >> "$output" 2>&1 || :
+        instances="$instances $inst"
++       /bin/systemctl stop "$inst" >> "$output" 2>&1 || :
+     else
+-       echo instance $inst is not running >> $output 2>&1 || :
++       echo "instance $inst is not running" >> "$output" 2>&1 || :
+     fi
+-    ninst=`expr $ninst + 1`
++    # Run index-check on all instances (running or not)
++    # This fixes index ordering mismatches from older versions
++    dsctl "$inst_name" index-check --fix >> "$output2" 2>&1 || :
++    ninst=$((ninst + 1))
+ done
++
+ if [ $ninst -eq 0 ] ; then
+-    echo no instances to upgrade >> $output 2>&1 || :
+-    exit 0 # have no instances to upgrade - just skip the rest
+-else
+-    # restart running instances
+-    echo shutting down all instances . . . >> $output 2>&1 || :
+-    for inst in $instances ; do
+-        echo stopping instance $inst >> $output 2>&1 || :
+-        /bin/systemctl stop $inst >> $output 2>&1 || :
+-    done
+-    for inst in $instances ; do
+-        echo starting instance $inst >> $output 2>&1 || :
+-        /bin/systemctl start $inst >> $output 2>&1 || :
+-    done
++    echo "no instances to upgrade" >> "$output" 2>&1 || :
++    exit 0
+ fi
+ 
++# Restart previously running instances
++for inst in $instances ; do
++    echo "starting instance $inst" >> "$output" 2>&1 || :
++    /bin/systemctl start "$inst" >> "$output" 2>&1 || :
++done
++
+ 
+ %preun
+ if [ $1 -eq 0 ]; then # Final removal
+diff --git a/src/lib389/lib389/cli_ctl/dbtasks.py b/src/lib389/lib389/cli_ctl/dbtasks.py
+index 856639672..16da966d1 100644
+--- a/src/lib389/lib389/cli_ctl/dbtasks.py
++++ b/src/lib389/lib389/cli_ctl/dbtasks.py
+@@ -7,12 +7,24 @@
+ # See LICENSE for details.
+ # --- END COPYRIGHT BLOCK ---
+ 
++import glob
+ import os
++import re
++import subprocess
++from enum import Enum
+ from lib389._constants import TaskWarning
+ from lib389.cli_base import CustomHelpFormatter
++from lib389.dseldif import DSEldif
+ from pathlib import Path
+ 
+ 
++class IndexOrdering(Enum):
++    """Represents the ordering type of an index."""
++    INTEGER = "integer"
++    LEXICOGRAPHIC = "lexicographic"
++    UNKNOWN = "unknown"
++
++
+ def dbtasks_db2index(inst, log, args):
+     rtn = False
+     if not args.backend:
+@@ -126,6 +138,387 @@ def dbtasks_verify(inst, log, args):
+         log.info("dbverify successful")
+ 
+ 
++def _get_db_dir(dse_ldif):
++    """Get the database directory.
++
++    Args:
++        dse_ldif: DSEldif instance.
++
++    Returns:
++        Path to the database directory, or None if not found.
++    """
++    try:
++        db_dir = dse_ldif.get(
++            "cn=config,cn=ldbm database,cn=plugins,cn=config",
++            "nsslapd-directory",
++            single=True,
++        )
++        return db_dir
++    except (ValueError, TypeError):
++        pass
++    return None
++
++
++
++def _has_integer_ordering_match(dse_ldif, backend, index_name):
++    """Check if an index has integerOrderingMatch configured in DSE.
++
++    Args:
++        dse_ldif: DSEldif instance.
++        backend: Backend name.
++        index_name: Name of the index to check.
++
++    Returns:
++        True if integerOrderingMatch is configured, False otherwise.
++    """
++    index_dn = "cn={},cn=index,cn={},cn=ldbm database,cn=plugins,cn=config".format(
++        index_name, backend
++    )
++    matching_rules = dse_ldif.get(index_dn, "nsMatchingRule", lower=True)
++    if matching_rules:
++        return any(mr.lower() == "integerorderingmatch" for mr in matching_rules)
++    return False
++
++
++def _has_index_scan_limit(dse_ldif, backend, index_name):
++    """Check if an index has nsIndexIDListScanLimit configured.
++
++    Args:
++        dse_ldif: DSEldif instance.
++        backend: Backend name.
++        index_name: Name of the index to check.
++
++    Returns:
++        True if nsIndexIDListScanLimit is configured, False otherwise.
++    """
++    index_dn = "cn={},cn=index,cn={},cn=ldbm database,cn=plugins,cn=config".format(
++        index_name, backend
++    )
++    scan_limit = dse_ldif.get(index_dn, "nsIndexIDListScanLimit")
++    return scan_limit is not None
++
++
++def _index_config_exists(dse_ldif, backend, index_name):
++    """Check if an index configuration entry exists in DSE.
++
++    Args:
++        dse_ldif: DSEldif instance.
++        backend: Backend name.
++        index_name: Name of the index to check.
++
++    Returns:
++        True if the index config entry exists, False otherwise.
++    """
++    index_dn = "cn={},cn=index,cn={},cn=ldbm database,cn=plugins,cn=config".format(
++        index_name, backend
++    )
++    try:
++        cn = dse_ldif.get(index_dn, "cn")
++        return cn is not None
++    except (ValueError, KeyError):
++        return False
++
++
++def _default_index_exists(dse_ldif, index_name):
++    """Check if an index exists in cn=default indexes.
++
++    Args:
++        dse_ldif: DSEldif instance.
++        index_name: Name of the index to check.
++
++    Returns:
++        True if the index exists in default indexes, False otherwise.
++    """
++    index_dn = "cn={},cn=default indexes,cn=config,cn=ldbm database,cn=plugins,cn=config".format(
++        index_name
++    )
++    try:
++        cn = dse_ldif.get(index_dn, "cn")
++        return cn is not None
++    except (ValueError, KeyError):
++        return False
++
++
++def _check_disk_ordering(db_dir, backend, index_name, dbscan_path, is_mdb, log):
++    """Check if index on disk uses lexicographic or integer ordering.
++
++    Args:
++        db_dir: Path to the database directory.
++        backend: Backend name.
++        index_name: Name of the index to check.
++        dbscan_path: Path to the dbscan binary.
++        is_mdb: True if using MDB backend.
++        log: Logger instance.
++
++    Returns:
++        IndexOrdering: The detected ordering type.
++    """
++    if is_mdb:
++        # MDB uses pseudo-paths: db_dir/backend/index.db
++        # dbscan accesses indexes via paths like: /var/lib/dirsrv/slapd-xxx/db/userroot/parentid.db
++        index_file = os.path.join(db_dir, backend, "{}.db".format(index_name))
++    else:
++        # BDB has separate directories per backend with actual index files
++        backend_dir = os.path.join(db_dir, backend)
++        if not os.path.exists(backend_dir):
++            return IndexOrdering.UNKNOWN
++        index_file = None
++        pattern = os.path.join(backend_dir, "{}.db*".format(index_name))
++        for f in glob.glob(pattern):
++            if os.path.isfile(f):
++                index_file = f
++                break
++        if not index_file:
++            return IndexOrdering.UNKNOWN
++
++    try:
++        result = subprocess.run(
++            [dbscan_path, "-f", index_file],
++            stdout=subprocess.PIPE,
++            stderr=subprocess.PIPE,
++            universal_newlines=True,
++            timeout=60,
++        )
++
++        if result.returncode != 0:
++            log.warning("  dbscan returned non-zero exit code for %s", index_file)
++            return IndexOrdering.UNKNOWN
++
++        # Parse keys from dbscan output
++        keys = []
++        for line in result.stdout.split("\n"):
++            line = line.strip()
++            if line.startswith("="):
++                match = re.match(r"^=(\d+)", line)
++                if match:
++                    keys.append(int(match.group(1)))
++
++        if len(keys) < 2:
++            return IndexOrdering.UNKNOWN
++
++        # Check if keys are in integer order by looking for decreasing numeric values
++        # (which would indicate lexicographic ordering, e.g., "3" < "30" < "4")
++        prev_id = keys[0]
++        for i in range(1, min(len(keys), 100)):
++            current_id = keys[i]
++            if prev_id > current_id:
++                return IndexOrdering.LEXICOGRAPHIC
++            prev_id = current_id
++
++        return IndexOrdering.INTEGER
++
++    except subprocess.TimeoutExpired:
++        log.warning("  dbscan timed out for %s", index_file)
++        return IndexOrdering.UNKNOWN
++    except OSError as e:
++        log.warning("  Error running dbscan: %s", e)
++        return IndexOrdering.UNKNOWN
++
++
++def dbtasks_index_check(inst, log, args):
++    """Check and optionally fix index ordering mismatches.
++
++    This function detects mismatches between the configured ordering
++    (integerOrderingMatch in DSE) and the actual on-disk ordering of
++    parentid and ancestorid indexes.
++
++    Args:
++        inst: DirSrv instance.
++        log: Logger instance.
++        args: Parsed command line arguments.
++
++    Returns:
++        True if all checks passed, False if mismatches were detected.
++    """
++    # Server must be stopped
++    if inst.status():
++        log.error("index-check requires the instance to be stopped")
++        return False
++
++    # Check for dbscan binary
++    dbscan_path = os.path.join(inst.ds_paths.bin_dir, "dbscan")
++    if not os.path.exists(dbscan_path):
++        log.error("dbscan utility not found at %s", dbscan_path)
++        return False
++
++    # Load DSE
++    try:
++        dse_ldif = DSEldif(inst)
++    except Exception as e:
++        log.error("Failed to read dse.ldif: %s", e)
++        return False
++
++    # Get backends to check
++    all_backends = dse_ldif.get_backends()
++    if not all_backends:
++        log.info("No backends found")
++        return True
++
++    # Filter to specific backend if requested
++    if args.backend:
++        # Case-insensitive backend lookup
++        backend_lower = args.backend.lower()
++        matching_backend = None
++        for be in all_backends:
++            if be.lower() == backend_lower:
++                matching_backend = be
++                break
++        if matching_backend is None:
++            log.error("Backend '%s' not found. Available backends: %s",
++                      args.backend, ", ".join(all_backends))
++            return False
++        backends_to_check = [matching_backend]
++    else:
++        backends_to_check = all_backends
++
++    # Get database directory and check database type
++    db_dir = _get_db_dir(dse_ldif)
++    if not db_dir or not os.path.exists(db_dir):
++        log.error("Database directory not found")
++        return False
++
++    db_lib = inst.get_db_lib()
++    is_mdb = (db_lib == "mdb")
++    log.info("Database type: %s", db_lib.upper())
++
++    # Track all issues found
++    all_ok = True
++    mismatches = []  # (backend, index_name) tuples needing reindex
++    missing_matching_rules = []  # (backend, index_name) tuples missing integerOrderingMatch
++    scan_limits_to_remove = []  # (backend, index_name) tuples with nsIndexIDListScanLimit
++    ancestorid_configs_to_remove = []  # backend names with ancestorid config entries
++    remove_ancestorid_from_defaults = False  # Flag to remove from cn=default indexes
++
++    # Check if ancestorid exists in cn=default indexes (should be removed)
++    if _default_index_exists(dse_ldif, "ancestorid"):
++        log.warning("ancestorid found in cn=default indexes - should be removed")
++        remove_ancestorid_from_defaults = True
++        all_ok = False
++
++    for backend in backends_to_check:
++        log.info("Checking backend: %s", backend)
++
++        # Check for ancestorid config entry (should not exist)
++        if _index_config_exists(dse_ldif, backend, "ancestorid"):
++            log.warning("  ancestorid - config entry exists (should be removed)")
++            ancestorid_configs_to_remove.append(backend)
++            all_ok = False
++
++        # Check parentid and ancestorid indexes
++        for index_name in ["parentid", "ancestorid"]:
++            # Check for scan limits (should be removed)
++            if _has_index_scan_limit(dse_ldif, backend, index_name):
++                log.warning("  %s - has nsIndexIDListScanLimit (should be removed)", index_name)
++                scan_limits_to_remove.append((backend, index_name))
++                all_ok = False
++
++            # Check disk ordering
++            disk_ordering = _check_disk_ordering(db_dir, backend, index_name, dbscan_path, is_mdb, log)
++
++            if disk_ordering == IndexOrdering.UNKNOWN:
++                log.info("  %s - could not determine disk ordering, skipping", index_name)
++                # For parentid, still check if matching rule is missing
++                if index_name == "parentid":
++                    config_has_int_order = _has_integer_ordering_match(dse_ldif, backend, index_name)
++                    if not config_has_int_order:
++                        log.warning("  %s - missing integerOrderingMatch in config", index_name)
++                        missing_matching_rules.append((backend, index_name))
++                        all_ok = False
++                continue
++
++            config_has_int_order = _has_integer_ordering_match(dse_ldif, backend, index_name)
++            config_desc = "integer" if config_has_int_order else "lexicographic"
++            log.info("  %s - config: %s, disk: %s",
++                     index_name, config_desc, disk_ordering.value)
++
++            # For parentid, the desired state is always integer ordering
++            if index_name == "parentid":
++                if not config_has_int_order:
++                    log.warning("  %s - missing integerOrderingMatch in config", index_name)
++                    if (backend, index_name) not in missing_matching_rules:
++                        missing_matching_rules.append((backend, index_name))
++                    all_ok = False
++
++                if disk_ordering == IndexOrdering.LEXICOGRAPHIC:
++                    log.warning("  %s - disk ordering is lexicographic, needs reindex", index_name)
++                    if (backend, index_name) not in mismatches:
++                        mismatches.append((backend, index_name))
++                    all_ok = False
++
++    # Handle issues
++    if not all_ok:
++        if args.fix:
++            log.info("Fixing issues...")
++
++            # Remove ancestorid from cn=default indexes
++            if remove_ancestorid_from_defaults:
++                default_idx_dn = "cn=ancestorid,cn=default indexes,cn=config,cn=ldbm database,cn=plugins,cn=config"
++                log.info("  Removing ancestorid from default indexes...")
++                try:
++                    dse_ldif.delete_dn(default_idx_dn)
++                    log.info("  Removed ancestorid from default indexes")
++                except Exception as e:
++                    log.error("  Failed to remove ancestorid from default indexes: %s", e)
++                    return False
++
++            # Remove scan limits (only for indexes that won't be deleted)
++            for backend, index_name in scan_limits_to_remove:
++                # Skip ancestorid if we're going to delete the whole entry anyway
++                if index_name == "ancestorid" and backend in ancestorid_configs_to_remove:
++                    continue
++                index_dn = "cn={},cn=index,cn={},cn=ldbm database,cn=plugins,cn=config".format(
++                    index_name, backend
++                )
++                log.info("  Removing nsIndexIDListScanLimit from %s in backend %s...", index_name, backend)
++                try:
++                    dse_ldif.delete(index_dn, "nsIndexIDListScanLimit")
++                    log.info("  Removed nsIndexIDListScanLimit from %s", index_name)
++                except Exception as e:
++                    log.error("  Failed to remove nsIndexIDListScanLimit from %s: %s", index_name, e)
++                    return False
++
++            # Remove ancestorid config entries from backends
++            for backend in ancestorid_configs_to_remove:
++                index_dn = "cn=ancestorid,cn=index,cn={},cn=ldbm database,cn=plugins,cn=config".format(backend)
++                log.info("  Removing ancestorid config entry from backend %s...", backend)
++                try:
++                    dse_ldif.delete_dn(index_dn)
++                    log.info("  Removed ancestorid config entry from backend %s", backend)
++                except Exception as e:
++                    log.error("  Failed to remove ancestorid config from backend %s: %s", backend, e)
++                    return False
++
++            # Add missing matching rules to dse.ldif
++            for backend, index_name in missing_matching_rules:
++                index_dn = "cn={},cn=index,cn={},cn=ldbm database,cn=plugins,cn=config".format(
++                    index_name, backend
++                )
++                log.info("  Adding integerOrderingMatch to %s in backend %s...", index_name, backend)
++                try:
++                    dse_ldif.add(index_dn, "nsMatchingRule", "integerOrderingMatch")
++                    log.info("  Updated dse.ldif with integerOrderingMatch for %s", index_name)
++                except Exception as e:
++                    log.error("  Failed to update dse.ldif for %s: %s", index_name, e)
++                    return False
++
++            # Reindex indexes with disk ordering issues
++            for backend, index_name in mismatches:
++                log.info("  Reindexing %s in backend %s...", index_name, backend)
++                if not inst.db2index(bename=backend, attrs=[index_name]):
++                    log.error("  Failed to reindex %s", index_name)
++                    return False
++                log.info("  Reindex of %s completed successfully", index_name)
++
++            log.info("All issues fixed")
++            return True
++        else:
++            log.info("Issues detected. Run with --fix to repair.")
++            return False
++    else:
++        log.info("All checks passed - no issues found")
++        return True
++
++
+ def create_parser(subcommands):
+     db2index_parser = subcommands.add_parser('db2index', help="Initialise a reindex of the server database. The server must be stopped for this to proceed.", formatter_class=CustomHelpFormatter)
+     # db2index_parser.add_argument('suffix', help="The suffix to reindex. IE dc=example,dc=com.")
+@@ -172,3 +565,12 @@ def create_parser(subcommands):
+     ldifs_parser = subcommands.add_parser('ldifs', help="List all the LDIF files located in the server's LDIF directory", formatter_class=CustomHelpFormatter)
+     ldifs_parser.add_argument('--delete', nargs=1, help="Delete LDIF file")
+     ldifs_parser.set_defaults(func=dbtasks_ldifs)
++
++    index_check_parser = subcommands.add_parser('index-check',
++        help="Check for index ordering mismatches (parentid/ancestorid). The server must be stopped.",
++        formatter_class=CustomHelpFormatter)
++    index_check_parser.add_argument('backend', nargs='?', default=None,
++        help="Backend to check. If not specified, all backends are checked.")
++    index_check_parser.add_argument('--fix', action='store_true', default=False,
++        help="Fix mismatches by reindexing affected indexes")
++    index_check_parser.set_defaults(func=dbtasks_index_check)
+diff --git a/src/lib389/lib389/dseldif.py b/src/lib389/lib389/dseldif.py
+index d12c6424c..7834d9468 100644
+--- a/src/lib389/lib389/dseldif.py
++++ b/src/lib389/lib389/dseldif.py
+@@ -125,11 +125,14 @@ class DSEldif(DSLint):
+             self._contents[i] = self._contents[i].replace(strfrom, strto)
+         self._update()
+ 
+-    def _find_attr(self, entry_dn, attr):
++    def _find_attr(self, entry_dn, attr, lower=False):
+         """Find all attribute values and indexes under a given entry
+ 
+         Returns entry dn index and attribute data dict:
+         relative attribute indexes and the attribute value
++
++        :param lower: Use case-insensitive matching for attribute name
++        :type lower: boolean
+         """
+ 
+         entry_dn_i = self._contents.index("dn: {}\n".format(entry_dn.lower()))
+@@ -146,7 +149,11 @@ class DSEldif(DSLint):
+ 
+         # Find the attribute
+         for line in entry_slice:
+-            if line.startswith("{}:".format(attr)):
++            if lower:
++                match = line.lower().startswith("{}:".format(attr.lower()))
++            else:
++                match = line.startswith("{}:".format(attr))
++            if match:
+                 attr_value = line.split(" ", 1)[1][:-1]
+                 attr_data.update({entry_slice.index(line): attr_value})
+ 
+@@ -155,7 +162,7 @@ class DSEldif(DSLint):
+ 
+         return entry_dn_i, attr_data
+ 
+-    def get(self, entry_dn, attr, single=False):
++    def get(self, entry_dn, attr, single=False, lower=False):
+         """Return attribute values under a given entry
+ 
+         :param entry_dn: a DN of entry we want to get attribute from
+@@ -163,11 +170,13 @@ class DSEldif(DSLint):
+         :param attr: an attribute name
+         :type attr: str
+         :param single: Return a single value instead of a list
+-        :type sigle: boolean
++        :type single: boolean
++        :param lower: Use case-insensitive matching for attribute name
++        :type lower: boolean
+         """
+ 
+         try:
+-            _, attr_data = self._find_attr(entry_dn, attr)
++            _, attr_data = self._find_attr(entry_dn, attr, lower=lower)
+         except ValueError:
+             return None
+ 
+@@ -190,6 +199,38 @@ class DSEldif(DSLint):
+ 
+         return indexes
+ 
++    def get_backends(self):
++        """Return a list of backend names from DSE.
++
++        Returns backend names preserving their original case, as the
++        database directory names on disk use the original case.
++
++        Note: DSEldif lowercases DN lines, so we read the 'cn' attribute
++        from each entry to get the original case.
++
++        :returns: List of backend names
++        """
++        backends = []
++        excluded = ("config", "monitor", "index", "encrypted attributes")
++
++        for entry in self._contents:
++            if (entry.startswith("dn: cn=") and
++                    ",cn=ldbm database,cn=plugins,cn=config" in entry):
++                parts = entry.split(",")
++                if len(parts) > 1:
++                    cn_lower = parts[0].replace("dn: cn=", "")
++                    if cn_lower not in excluded:
++                        dn = entry.strip()[4:].strip()
++                        try:
++                            suffix = self.get(dn, "nsslapd-suffix")
++                            if suffix:
++                                cn_values = self.get(dn, "cn")
++                                if cn_values:
++                                    backends.append(cn_values[0])
++                        except (ValueError, IndexError):
++                            pass
++
++        return list(set(backends))
+ 
+     def add_entry(self, entry):
+         """Add a new entry
+-- 
+2.52.0
+

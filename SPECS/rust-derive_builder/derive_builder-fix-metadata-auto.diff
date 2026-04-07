@@ -1,0 +1,14 @@
+--- derive_builder-0.20.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ derive_builder-0.20.2/Cargo.toml	2024-10-23T13:48:52.573975+00:00
+@@ -196,10 +196,8 @@
+ default = ["std"]
+ std = ["derive_builder_macro/lib_has_std"]
+ 
+-[target."cfg(compiletests)".dev-dependencies.trybuild]
+-version = "1.0.38"
+-
+ [lints.rust.unexpected_cfgs]
+ level = "warn"
+ priority = 0
+ check-cfg = ["cfg(compiletests)"]
++

@@ -1,0 +1,35 @@
+From ed68c250b8589663601aa7dd88177697d0b37ec9 Mon Sep 17 00:00:00 2001
+From: jo-oe <38652639+jo-oe@users.noreply.github.com>
+Date: Tue, 9 Apr 2024 16:57:39 +0200
+Subject: [PATCH] Correct the selection of alloc/free functions for zlib.
+
+Avoids segfault when working with zlib-ng.
+See:
+https://github.com/zlib-ng/zlib-ng/issues/1708
+---
+ support/zlib-helper.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/support/zlib-helper.c b/support/zlib-helper.c
+index 76d8951ad8a8a..a5fbc0138822d 100644
+--- a/support/zlib-helper.c
++++ b/support/zlib-helper.c
+@@ -76,6 +76,8 @@ CreateZStream (gint compress, guchar gzip, read_write_func func, void *gchandle)
+ 		return NULL;
+ 
+ 	z = z_new0 (z_stream);
++	z->zalloc = z_alloc;
++	z->zfree = z_free;
+ 	if (compress) {
+ 		retval = deflateInit2 (z, Z_DEFAULT_COMPRESSION, Z_DEFLATED, gzip ? 31 : -15, 8, Z_DEFAULT_STRATEGY);
+ 	} else {
+@@ -86,8 +88,6 @@ CreateZStream (gint compress, guchar gzip, read_write_func func, void *gchandle)
+ 		free (z);
+ 		return NULL;
+ 	}
+-	z->zalloc = z_alloc;
+-	z->zfree = z_free;
+ 	result = z_new0 (ZStream);
+ 	result->stream = z;
+ 	result->func = func;
+

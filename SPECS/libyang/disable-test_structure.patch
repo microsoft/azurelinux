@@ -1,0 +1,10 @@
+diff --git a/tests/utests/CMakeLists.txt b/tests/utests/CMakeLists.txt
+index ac47611b..50f12e55 100644
+--- a/tests/utests/CMakeLists.txt
++++ b/tests/utests/CMakeLists.txt
+@@ -74,4 +74,4 @@ ly_add_utest(NAME metadata SOURCES extensions/test_metadata.c)
+ ly_add_utest(NAME nacm SOURCES extensions/test_nacm.c)
+ ly_add_utest(NAME yangdata SOURCES extensions/test_yangdata.c)
+ ly_add_utest(NAME schema_mount SOURCES extensions/test_schema_mount.c)
+-ly_add_utest(NAME structure SOURCES extensions/test_structure.c)
++#ly_add_utest(NAME structure SOURCES extensions/test_structure.c)

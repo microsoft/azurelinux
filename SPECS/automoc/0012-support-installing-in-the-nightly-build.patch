@@ -1,0 +1,33 @@
+From 301c01d7dd9028980d2febb5f743f70aaa048847 Mon Sep 17 00:00:00 2001
+From: Alexander Neundorf <neundorf@kde.org>
+Date: Fri, 8 May 2009 23:16:07 +0000
+Subject: [PATCH 12/33] -support installing in the nightly build
+
+Alex
+
+
+
+svn path=/trunk/kdesupport/automoc/; revision=965459
+---
+ Automoc4Nightly.cmake | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/Automoc4Nightly.cmake b/Automoc4Nightly.cmake
+index 8504f98..a4cd5a8 100644
+--- a/Automoc4Nightly.cmake
++++ b/Automoc4Nightly.cmake
+@@ -23,8 +23,11 @@ ctest_update(SOURCE "${CTEST_SOURCE_DIRECTORY}" )
+ include("${CTEST_SOURCE_DIRECTORY}/CTestConfig.cmake")
+ include("${CTEST_SOURCE_DIRECTORY}/CTestCustom.cmake" OPTIONAL)
+ 
++kde_ctest_write_initial_cache("${CTEST_BINARY_DIRECTORY}" CMAKE_INSTALL_PREFIX )
++
+ ctest_configure(BUILD "${CTEST_BINARY_DIRECTORY}" )
+ ctest_build(BUILD "${CTEST_BINARY_DIRECTORY}" )
+ ctest_test(BUILD "${CTEST_BINARY_DIRECTORY}" )
+ ctest_submit()
+ 
++kde_ctest_install( "${CTEST_BINARY_DIRECTORY}" )
+-- 
+2.4.3
+

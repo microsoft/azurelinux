@@ -1,0 +1,56 @@
+diff --git a/joblib/externals/loky/backend/reduction.py b/joblib/externals/loky/backend/reduction.py
+index c6f9297..6084157 100644
+--- a/joblib/externals/loky/backend/reduction.py
++++ b/joblib/externals/loky/backend/reduction.py
+@@ -79,7 +79,7 @@ else:
+ 
+ # global variable to change the pickler behavior
+ try:
+-    from joblib.externals import cloudpickle  # noqa: F401
++    import cloudpickle  # noqa: F401
+ 
+     DEFAULT_ENV = "cloudpickle"
+ except ImportError:
+@@ -107,7 +107,7 @@ def set_loky_pickler(loky_pickler=None):
+         return
+ 
+     if loky_pickler == "cloudpickle":
+-        from joblib.externals.cloudpickle import CloudPickler as loky_pickler_cls
++        from cloudpickle import CloudPickler as loky_pickler_cls
+     else:
+         try:
+             from importlib import import_module
+diff --git a/joblib/externals/loky/cloudpickle_wrapper.py b/joblib/externals/loky/cloudpickle_wrapper.py
+index 90e5d10..bdeac65 100644
+--- a/joblib/externals/loky/cloudpickle_wrapper.py
++++ b/joblib/externals/loky/cloudpickle_wrapper.py
+@@ -1,6 +1,6 @@
+ import inspect
+ from functools import partial
+-from joblib.externals.cloudpickle import dumps, loads
++from cloudpickle import dumps, loads
+ 
+ 
+ WRAP_CACHE = {}
+diff --git a/pyproject.toml b/pyproject.toml
+index 332f59b..9cd8835 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -27,6 +27,9 @@ classifiers = [
+ ]
+ requires-python = ">=3.9"
+ dynamic = ["version"]
++dependencies = [
++  "cloudpickle>=2.2.0",
++]
+ 
+ [project.readme]
+ file = "README.rst"
+@@ -42,7 +45,6 @@ packages = [
+     "joblib.test",
+     "joblib.test.data",
+     "joblib.externals",
+-    "joblib.externals.cloudpickle",
+     "joblib.externals.loky",
+     "joblib.externals.loky.backend",
+ ]

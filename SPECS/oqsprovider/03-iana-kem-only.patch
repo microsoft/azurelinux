@@ -1,0 +1,110 @@
+diff -up oqs-provider-0.8.0/oqsprov/oqsprov_capabilities.c.xxx oqs-provider-0.8.0/oqsprov/oqsprov_capabilities.c
+--- oqs-provider-0.8.0/oqsprov/oqsprov_capabilities.c.xxx	2025-01-03 15:30:19.819210897 +0100
++++ oqs-provider-0.8.0/oqsprov/oqsprov_capabilities.c	2025-01-03 15:31:47.066334577 +0100
+@@ -128,106 +128,11 @@ static OQS_GROUP_CONSTANTS oqs_group_lis
+     }
+ 
+ static const OSSL_PARAM oqs_param_group_list[][11] = {
+-///// OQS_TEMPLATE_FRAGMENT_GROUP_NAMES_START
+-
+-#ifdef OQS_ENABLE_KEM_frodokem_640_aes
+-    OQS_GROUP_ENTRY(frodo640aes, frodo640aes, frodo640aes, 0),
+-
+-    OQS_GROUP_ENTRY(p256_frodo640aes, p256_frodo640aes, p256_frodo640aes, 1),
+-    OQS_GROUP_ENTRY(x25519_frodo640aes, x25519_frodo640aes, x25519_frodo640aes,
+-                    2),
+-#endif
+-#ifdef OQS_ENABLE_KEM_frodokem_640_shake
+-    OQS_GROUP_ENTRY(frodo640shake, frodo640shake, frodo640shake, 3),
+-
+-    OQS_GROUP_ENTRY(p256_frodo640shake, p256_frodo640shake, p256_frodo640shake,
+-                    4),
+-    OQS_GROUP_ENTRY(x25519_frodo640shake, x25519_frodo640shake,
+-                    x25519_frodo640shake, 5),
+-#endif
+-#ifdef OQS_ENABLE_KEM_frodokem_976_aes
+-    OQS_GROUP_ENTRY(frodo976aes, frodo976aes, frodo976aes, 6),
+-
+-    OQS_GROUP_ENTRY(p384_frodo976aes, p384_frodo976aes, p384_frodo976aes, 7),
+-    OQS_GROUP_ENTRY(x448_frodo976aes, x448_frodo976aes, x448_frodo976aes, 8),
+-#endif
+-#ifdef OQS_ENABLE_KEM_frodokem_976_shake
+-    OQS_GROUP_ENTRY(frodo976shake, frodo976shake, frodo976shake, 9),
+-
+-    OQS_GROUP_ENTRY(p384_frodo976shake, p384_frodo976shake, p384_frodo976shake,
+-                    10),
+-    OQS_GROUP_ENTRY(x448_frodo976shake, x448_frodo976shake, x448_frodo976shake,
+-                    11),
+-#endif
+-#ifdef OQS_ENABLE_KEM_frodokem_1344_aes
+-    OQS_GROUP_ENTRY(frodo1344aes, frodo1344aes, frodo1344aes, 12),
+-
+-    OQS_GROUP_ENTRY(p521_frodo1344aes, p521_frodo1344aes, p521_frodo1344aes,
+-                    13),
+-#endif
+-#ifdef OQS_ENABLE_KEM_frodokem_1344_shake
+-    OQS_GROUP_ENTRY(frodo1344shake, frodo1344shake, frodo1344shake, 14),
+-
+-    OQS_GROUP_ENTRY(p521_frodo1344shake, p521_frodo1344shake,
+-                    p521_frodo1344shake, 15),
+-#endif
+-#ifdef OQS_ENABLE_KEM_ml_kem_512
+-    OQS_GROUP_ENTRY(mlkem512, mlkem512, mlkem512, 16),
+-
+-    OQS_GROUP_ENTRY(p256_mlkem512, p256_mlkem512, p256_mlkem512, 17),
+-    OQS_GROUP_ENTRY(x25519_mlkem512, x25519_mlkem512, x25519_mlkem512, 18),
+-#endif
+-#ifdef OQS_ENABLE_KEM_ml_kem_768
+-    OQS_GROUP_ENTRY(mlkem768, mlkem768, mlkem768, 19),
+-
+-    OQS_GROUP_ENTRY(p384_mlkem768, p384_mlkem768, p384_mlkem768, 20),
+-    OQS_GROUP_ENTRY(x448_mlkem768, x448_mlkem768, x448_mlkem768, 21),
+     OQS_GROUP_ENTRY(X25519MLKEM768, X25519MLKEM768, X25519MLKEM768, 22),
+     OQS_GROUP_ENTRY(SecP256r1MLKEM768, SecP256r1MLKEM768, SecP256r1MLKEM768,
+                     23),
+-#endif
+-#ifdef OQS_ENABLE_KEM_ml_kem_1024
+-    OQS_GROUP_ENTRY(mlkem1024, mlkem1024, mlkem1024, 24),
+-
+-    OQS_GROUP_ENTRY(p521_mlkem1024, p521_mlkem1024, p521_mlkem1024, 25),
+     OQS_GROUP_ENTRY(SecP384r1MLKEM1024, SecP384r1MLKEM1024, SecP384r1MLKEM1024,
+                     26),
+-#endif
+-#ifdef OQS_ENABLE_KEM_bike_l1
+-    OQS_GROUP_ENTRY(bikel1, bikel1, bikel1, 27),
+-
+-    OQS_GROUP_ENTRY(p256_bikel1, p256_bikel1, p256_bikel1, 28),
+-    OQS_GROUP_ENTRY(x25519_bikel1, x25519_bikel1, x25519_bikel1, 29),
+-#endif
+-#ifdef OQS_ENABLE_KEM_bike_l3
+-    OQS_GROUP_ENTRY(bikel3, bikel3, bikel3, 30),
+-
+-    OQS_GROUP_ENTRY(p384_bikel3, p384_bikel3, p384_bikel3, 31),
+-    OQS_GROUP_ENTRY(x448_bikel3, x448_bikel3, x448_bikel3, 32),
+-#endif
+-#ifdef OQS_ENABLE_KEM_bike_l5
+-    OQS_GROUP_ENTRY(bikel5, bikel5, bikel5, 33),
+-
+-    OQS_GROUP_ENTRY(p521_bikel5, p521_bikel5, p521_bikel5, 34),
+-#endif
+-#ifdef OQS_ENABLE_KEM_hqc_128
+-    OQS_GROUP_ENTRY(hqc128, hqc128, hqc128, 35),
+-
+-    OQS_GROUP_ENTRY(p256_hqc128, p256_hqc128, p256_hqc128, 36),
+-    OQS_GROUP_ENTRY(x25519_hqc128, x25519_hqc128, x25519_hqc128, 37),
+-#endif
+-#ifdef OQS_ENABLE_KEM_hqc_192
+-    OQS_GROUP_ENTRY(hqc192, hqc192, hqc192, 38),
+-
+-    OQS_GROUP_ENTRY(p384_hqc192, p384_hqc192, p384_hqc192, 39),
+-    OQS_GROUP_ENTRY(x448_hqc192, x448_hqc192, x448_hqc192, 40),
+-#endif
+-#ifdef OQS_ENABLE_KEM_hqc_256
+-    OQS_GROUP_ENTRY(hqc256, hqc256, hqc256, 41),
+-
+-    OQS_GROUP_ENTRY(p521_hqc256, p521_hqc256, p521_hqc256, 42),
+-#endif
+-    ///// OQS_TEMPLATE_FRAGMENT_GROUP_NAMES_END
+ };
+ 
+ typedef struct oqs_sigalg_constants_st {

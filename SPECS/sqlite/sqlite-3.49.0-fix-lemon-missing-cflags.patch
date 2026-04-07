@@ -1,0 +1,25 @@
+From 0d7a62843abaa422130c78f6f69b996ee71a3c10 Mon Sep 17 00:00:00 2001
+From: Ales Nezbeda <anezbeda@redhat.com>
+Date: Thu, 27 Feb 2025 14:04:22 +0100
+Subject: [PATCH] Fix lemon not using CFLAGS
+
+---
+ main.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/main.mk b/main.mk
+index 808f925..38749c8 100644
+--- a/main.mk
++++ b/main.mk
+@@ -1058,7 +1058,7 @@ libsqlite3.SO = libsqlite3$(T.dll)
+ # Rules to build the LEMON compiler generator
+ #
+ lemon$(B.exe): $(MAKE_SANITY_CHECK) $(TOP)/tool/lemon.c $(TOP)/tool/lempar.c
+-	$(B.cc) -o $@ $(TOP)/tool/lemon.c
++	$(T.cc) -o $@ $(TOP)/tool/lemon.c
+ 	cp $(TOP)/tool/lempar.c .
+ 
+ # Rules to build the program that generates the source-id
+-- 
+2.48.1
+

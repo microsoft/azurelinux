@@ -1,0 +1,141 @@
+diff --git a/igvm/Cargo.toml b/igvm/Cargo.toml
+index 350d0a3..974300b 100644
+--- a/igvm/Cargo.toml
++++ b/igvm/Cargo.toml
+@@ -12,6 +12,10 @@ repository = "https://github.com/microsoft/igvm"
+ keywords = ["virtualization"]
+ categories = ["virtualization", "parser-implementations"]
+ 
++[package.metadata.capi.header]
++# cbindgen is handled from igvm_c/Makefile
++enabled = false
++
+ [package.metadata.docs.rs]
+ # Document all features
+ all-features = true
+@@ -40,4 +44,5 @@ static_assertions.workspace = true
+ 
+ [features]
+ default = []
++capi = ["igvm-c"]
+ igvm-c = [] # Add exports that allow the library to be used from C
+diff --git a/igvm_c/Makefile b/igvm_c/Makefile
+index ace990e..1796e07 100644
+--- a/igvm_c/Makefile
++++ b/igvm_c/Makefile
+@@ -7,24 +7,27 @@
+ API_DIR:=$(realpath $(shell dirname $(firstword $(MAKEFILE_LIST))))
+ IGVM_DIR := $(API_DIR)/..
+ TARGET_DIR ?= target_c
+-
+-ifdef RELEASE
+-TARGET_PATH="$(IGVM_DIR)/$(TARGET_DIR)/$(CARGO_BUILD_TARGET)/release"
+-else
+-TARGET_PATH="$(IGVM_DIR)/$(TARGET_DIR)/$(CARGO_BUILD_TARGET)/debug"
+-endif
++EXE =
+ 
+ PREFIX ?= /usr
+ DESTDIR ?=
+ 
+ CFLAGS ?= -g3 -O0
+-LDFLAGS += -L $(TARGET_PATH)
+ 
+ CARGO=CARGO_TARGET_DIR=$(IGVM_DIR)/$(TARGET_DIR) cargo
++CARGO_BUILD_HOST := $(shell $(CARGO) -Vv | sed -n 's,^host: ,,p')
+ 
+ FEATURES = "igvm-c"
++PROFILE = $(if $(RELEASE),release,debug)
++
++TARGET_PATH = "$(IGVM_DIR)/$(TARGET_DIR)/$(CARGO_BUILD_TARGET)/$(PROFILE)"
++LIB_PATH = "$(IGVM_DIR)/$(TARGET_DIR)/$(or $(CARGO_BUILD_TARGET),$(CARGO_BUILD_HOST))/$(PROFILE)"
+ 
+ RUST_SOURCE := $(IGVM_DIR)/igvm/src/c_api.rs $(IGVM_DIR)/igvm/src/lib.rs $(IGVM_DIR)/igvm_defs/src/lib.rs
++LIBIGVM = $(LIB_PATH)/libigvm.a
++UNINSTALLED_PC = $(LIB_PATH)/igvm-uninstalled.pc
++IGVM_LIBS = $(shell pkg-config --libs --static $(UNINSTALLED_PC))
++IGVM_LIBS_STATIC = $(subst $(IGVM_LIBS), -ligvm, $(LIBIGVM))
+ 
+ # Determine igvm crate version from Cargo.toml
+ VERSION = $(shell grep -oP "(?<=version = \").+(?=\")" $(IGVM_DIR)/igvm/Cargo.toml)
+@@ -33,15 +36,15 @@ VERSION = $(shell grep -oP "(?<=version = \").+(?=\")" $(IGVM_DIR)/igvm/Cargo.to
+ 
+ all: build test
+ 
+-build: $(API_DIR)/include/igvm.h $(TARGET_PATH)/dump_igvm
++build: $(API_DIR)/include/igvm.h $(TARGET_PATH)/dump_igvm$(EXE)
+ 
+-$(TARGET_PATH)/libigvm.a:
+-	$(CARGO) build --features $(FEATURES) $(EXTRA_PARAMS) --manifest-path=$(IGVM_DIR)/igvm/Cargo.toml
++$(LIBIGVM):
++	$(CARGO) cbuild --prefix $(PREFIX) --features $(FEATURES) $(EXTRA_PARAMS) --manifest-path=$(IGVM_DIR)/igvm/Cargo.toml
+ 
+ $(TARGET_PATH)/libigvm_defs.rlib:
+ 	$(CARGO) build $(EXTRA_PARAMS) --manifest-path=$(IGVM_DIR)/igvm_defs/Cargo.toml
+ 
+-$(TARGET_PATH)/test_data:
++$(TARGET_PATH)/test_data$(EXE):
+ 	$(CARGO) build $(EXTRA_PARAMS) --manifest-path=$(IGVM_DIR)/igvm_c/test_data/Cargo.toml
+ 
+ $(API_DIR)/include/igvm.h: $(RUST_SOURCE)
+@@ -49,31 +52,27 @@ $(API_DIR)/include/igvm.h: $(RUST_SOURCE)
+ 	cbindgen -q -c $(API_DIR)/cbindgen_igvm_defs.toml $(IGVM_DIR)/igvm_defs -o "$(API_DIR)/include/igvm_defs.h"
+ 	$(API_DIR)/scripts/post_process.sh "$(API_DIR)/include"
+ 
+-$(TARGET_PATH)/dump_igvm: $(API_DIR)/include/igvm.h $(API_DIR)/sample/dump_igvm.c $(TARGET_PATH)/libigvm.a
+-	$(CC) $(CFLAGS) -I $(API_DIR) -o $@ $^ -ligvm -ldl -pthread -lutil -lrt $(LDFLAGS)
++$(TARGET_PATH)/dump_igvm$(EXE): $(API_DIR)/sample/dump_igvm.c $(API_DIR)/include/igvm.h $(LIBIGVM)
++	$(CC) $(CFLAGS) -I $(API_DIR) -o $@ $< $(IGVM_LIBS) $(LDFLAGS)
+ 
+-$(TARGET_PATH)/igvm_test: $(API_DIR)/include/igvm.h $(API_DIR)/tests/igvm_test.c $(TARGET_PATH)/libigvm.a
+-	$(CC) $(CFLAGS) -I $(API_DIR) -o $@ $^ -ligvm -lcunit -ldl -pthread -lm -lutil -lrt $(LDFLAGS)
++$(TARGET_PATH)/igvm_test$(EXE): $(API_DIR)/tests/igvm_test.c $(API_DIR)/include/igvm.h $(LIBIGVM)
++	$(CC) $(CFLAGS) -I $(API_DIR) -o $@ $< -lcunit $(IGVM_LIBS_STATIC) $(LDFLAGS)
+ 
+-$(TARGET_PATH)/igvm.bin: $(TARGET_PATH)/test_data
++$(TARGET_PATH)/igvm.bin: $(TARGET_PATH)/test_data$(EXE)
+ 	$(TARGET_PATH)/test_data $(TARGET_PATH)/igvm.bin
+ 
+-test: $(TARGET_PATH)/igvm_test $(TARGET_PATH)/igvm.bin
++test: $(TARGET_PATH)/igvm_test$(EXE) $(TARGET_PATH)/igvm.bin
+ 	$(TARGET_PATH)/igvm_test $(TARGET_PATH)/igvm.bin
+ 	$(CARGO) test --features $(FEATURES) $(EXTRA_PARAMS) --manifest-path=$(IGVM_DIR)/igvm/Cargo.toml
+ 
+ clean:
+ 	$(CARGO) clean $(EXTRA_PARAMS) --manifest-path=$(IGVM_DIR)/igvm/Cargo.toml
+ 	$(CARGO) clean $(EXTRA_PARAMS) --manifest-path=$(IGVM_DIR)/igvm_defs/Cargo.toml
+-	rm -f $(API_DIR)/include/igvm.h $(API_DIR)/include/igvm_defs.h $(TARGET_PATH)/dump_igvm $(TARGET_PATH)/test_data $(TARGET_PATH)/igvm.bin
++	rm -f $(API_DIR)/include/igvm.h $(API_DIR)/include/igvm_defs.h $(TARGET_PATH)/dump_igvm$(EXE) $(TARGET_PATH)/test_data$(EXE) $(TARGET_PATH)/igvm.bin
+ 
+-install:
++install: build
+ 	mkdir -p $(DESTDIR)/$(PREFIX)/include/igvm
+-	mkdir -p $(DESTDIR)/$(PREFIX)/lib64/pkgconfig
+-	install -m 644 $(TARGET_PATH)/libigvm.a $(DESTDIR)/$(PREFIX)/lib64
+ 	install -m 644 $(IGVM_DIR)/igvm_c/include/* $(DESTDIR)/$(PREFIX)/include/igvm
++	$(CARGO) cinstall --destdir "$(DESTDIR)" --prefix "$(PREFIX)" --features $(FEATURES) $(EXTRA_PARAMS) --manifest-path=$(IGVM_DIR)/igvm/Cargo.toml
+ 	mkdir -p $(DESTDIR)/$(PREFIX)/bin/
+-	install -m 755 $(TARGET_PATH)/dump_igvm $(DESTDIR)/$(PREFIX)/bin/
+-	VERSION=$(VERSION) PREFIX=$(PREFIX) envsubst '$$VERSION $$PREFIX' \
+-				< $(IGVM_DIR)/igvm_c/igvm.pc.in \
+-				> $(DESTDIR)/$(PREFIX)/lib64/pkgconfig/igvm.pc
++	install -m 755 $(TARGET_PATH)/dump_igvm$(EXE) $(DESTDIR)/$(PREFIX)/bin/
+diff --git a/igvm_c/igvm.pc.in b/igvm_c/igvm.pc.in
+deleted file mode 100644
+index 2f92404..0000000
+--- a/igvm_c/igvm.pc.in
++++ /dev/null
+@@ -1,13 +0,0 @@
+-prefix=$PREFIX
+-exec_prefix=${prefix}
+-libdir=${prefix}/lib64
+-sharedlibdir=${libdir}
+-includedir=${prefix}/include
+-
+-Name: igvm
+-Description: igvm library
+-Version: $VERSION
+-
+-Requires:
+-Libs: -L${libdir} -L${sharedlibdir} -ligvm
+-Cflags: -I${includedir}

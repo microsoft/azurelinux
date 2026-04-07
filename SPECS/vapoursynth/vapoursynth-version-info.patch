@@ -1,0 +1,12 @@
+diff -Naur vapoursynth-R65.old/Makefile.am vapoursynth-R65/Makefile.am
+--- vapoursynth-R65.old/Makefile.am	2023-11-02 09:22:50.859928603 +0100
++++ vapoursynth-R65/Makefile.am	2023-11-02 09:23:43.376805703 +0100
+@@ -89,7 +89,7 @@
+ 
+ pkgconfig_DATA += pc/vapoursynth.pc
+ 
+-libvapoursynth_la_LDFLAGS = -no-undefined -avoid-version $(UNDEFINEDLDFLAGS)
++libvapoursynth_la_LDFLAGS = -no-undefined -version-info $(PACKAGE_VERSION) $(UNDEFINEDLDFLAGS)
+ libvapoursynth_la_CPPFLAGS = $(PTHREAD_CFLAGS) $(ZIMG_CFLAGS) -DVS_PATH_PLUGINDIR='"$(PLUGINDIR)"' -DVS_CURRENT_RELEASE='$(VSCURRENTRELEASE)'
+ libvapoursynth_la_LIBADD = $(PTHREAD_LIBS) $(ZIMG_LIBS) $(DLOPENLIB)
+ 

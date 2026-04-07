@@ -1,0 +1,30 @@
+From ed3998803650bec0666c3ca458df76fcd9293417 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Zbigniew=20J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>
+Date: Fri, 31 Oct 2025 12:33:57 +0100
+Subject: [PATCH] docs: update example for newer numpy
+
+File ".../usr/lib64/python3.14/site-packages/blosc/toplevel.py", line 515, in blosc.toplevel.compress_ptr
+Failed example:
+    np_ans = numpy.fromstring(d, dtype=np_array.dtype)
+Exception raised:
+    Traceback (most recent call last):
+    File "<doctest blosc.toplevel.compress_ptr[5]>", line 1, in <module>
+        np_ans = numpy.fromstring(d, dtype=np_array.dtype)
+    ValueError: The binary mode of fromstring is removed, use frombuffer instead
+---
+ blosc/toplevel.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/blosc/toplevel.py b/blosc/toplevel.py
+index 4d2d4139af..3ef2327618 100644
+--- a/blosc/toplevel.py
++++ b/blosc/toplevel.py
+@@ -513,7 +513,7 @@ def compress_ptr(address, items, typesize=8, clevel=9, shuffle=blosc.SHUFFLE,
+     >>> c = blosc.compress_ptr(np_array.__array_interface__['data'][0], \
+         items, np_array.dtype.itemsize)
+     >>> d = blosc.decompress(c)
+-    >>> np_ans = numpy.fromstring(d, dtype=np_array.dtype)
++    >>> np_ans = numpy.frombuffer(d, dtype=np_array.dtype)
+     >>> bool((np_array == np_ans).all())
+     True
+ 

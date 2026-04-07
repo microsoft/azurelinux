@@ -1,0 +1,39 @@
+From 4a4693c842b6da5d66e3a6bdb1eb7914d2402f7f Mon Sep 17 00:00:00 2001
+From: Neal Gompa <ngompa13@gmail.com>
+Date: Wed, 20 Jan 2021 06:50:03 -0500
+Subject: [PATCH] Force legacy datestamp while RHBZ#1715412 is still an issue
+
+---
+ rpmdev-bumpspec   | 2 +-
+ rpmdev-newspec.in | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/rpmdev-bumpspec b/rpmdev-bumpspec
+index dc4eb05..3e18b41 100755
+--- a/rpmdev-bumpspec
++++ b/rpmdev-bumpspec
+@@ -300,7 +300,7 @@ the Free Software Foundation; either version 2 of the License, or
+     parser.add_option("-n", "--new",
+                       help="set new version and reset/set release "
+                       "(simple spec files only)")
+-    parser.add_option("-D", "--legacy-datestamp", default=False, action='store_true',
++    parser.add_option("-D", "--legacy-datestamp", default=True, action='store_true',
+                       help="use legacy datestamp for changelog entries")
+     parser.add_option("-d", "--datestamp",
+                       help="changelog date string (default: today)")
+diff --git a/rpmdev-newspec.in b/rpmdev-newspec.in
+index 27af10f..a083dd9 100644
+--- a/rpmdev-newspec.in
++++ b/rpmdev-newspec.in
+@@ -293,7 +293,7 @@ if [[ $NEWSPEC_PREFER_MACROS ]] ; then
+ "
+ fi
+ 
+-if [[ $rpmver -ge 41400 ]] && [[ -z $NEWSPEC_LEGACY_DATESTAMP ]] ; then # >= 4.14 (RHEL >= 8, Fedora >= 27)
++if [[ $rpmver -ge 41400 ]] && [[ $(/bin/false) ]] ; then # >= 4.14 (RHEL >= 8, Fedora >= 27)
+     chlog="s|^%changelog\\s*|%changelog\\n* $(LC_ALL=C date +'%a %b %d %T %Z %Y') $(rpmdev-packager)\\n- |Mg"
+ else
+     chlog="s|^%changelog\\s*|%changelog\\n* $(LC_ALL=C date --utc +'%a %b %d %Y') $(rpmdev-packager)\\n- |Mg"
+-- 
+2.29.2
+

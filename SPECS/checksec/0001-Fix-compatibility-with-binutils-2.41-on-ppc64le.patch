@@ -1,0 +1,37 @@
+From b99fd5b91909082fa6b3a476d9340da0926ba690 Mon Sep 17 00:00:00 2001
+From: Qiyu Yan <yanqiyu@fedoraproject.org>
+Date: Fri, 8 Sep 2023 14:26:46 +0100
+Subject: [PATCH] Fix compatibility with binutils-2.41+ on ppc64le
+
+---
+ checksec | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/checksec b/checksec
+index 2bc3210..2772ada 100755
+--- a/checksec
++++ b/checksec
+@@ -147,6 +147,11 @@ if [[ -z ${readelf} ]]; then
+   exit
+ fi
+ 
++if (! command_exists nm); then
++  echo -e "\n\e[31mERROR: nm is a required tool for almost all tests. Aborting...\e[0m\n"
++  exit
++fi
++
+ sysarch=$(uname -m)
+ if [[ "${sysarch}" == "x86_64" ]]; then
+   arch="64"
+@@ -829,7 +834,7 @@ filecheck() {
+   fi
+   FS_filechk_func_libc="$(${readelf} -s "${use_dynamic}" "${FS_libc}" 2> /dev/null | sed -ne 's/.*__\(.*_chk\)@@.*/\1/p')"
+   FS_func_libc="${FS_filechk_func_libc//_chk/}"
+-  FS_func="$(${readelf} -s "${use_dynamic}" "${1}" 2> /dev/null | awk '{ print $8 }' | sed -e 's/_*//' -e 's/@.*//' -e '/^$/d')"
++  FS_func="$(nm --dynamic --just-symbols "${1}" 2> /dev/null | sed -e 's/_*//' -e 's/@.*//' -e '/^$/d')"
+   FS_cnt_checked=$(grep -cFxf <(sort -u <<< "${FS_filechk_func_libc}") <(sort -u <<< "${FS_func}"))
+   FS_cnt_unchecked=$(grep -cFxf <(sort -u <<< "${FS_func_libc}") <(sort -u <<< "${FS_func}"))
+   FS_cnt_total=$((FS_cnt_unchecked + FS_cnt_checked))
+-- 
+2.45.1
+

@@ -1,0 +1,36 @@
+From ddda87fb08ca523115be1ffd6dec8442e47bc20b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Wed, 27 Nov 2013 10:45:39 +0100
+Subject: [PATCH] Croak on failed write into a file
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The mirror() method saves a document into a file. Any error while
+writing to the file, e.g. no disk space, was ignored. This patch fixes
+it by croaking on such I/O error.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ lib/HTTP/Tiny.pm | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/lib/HTTP/Tiny.pm b/lib/HTTP/Tiny.pm
+index 541befe..b3fffd0 100644
+--- a/lib/HTTP/Tiny.pm
++++ b/lib/HTTP/Tiny.pm
+@@ -300,7 +300,10 @@ sub mirror {
+     sysopen my $fh, $tempfile, Fcntl::O_CREAT()|Fcntl::O_EXCL()|Fcntl::O_WRONLY()
+        or _croak(qq/Error: Could not create temporary file $tempfile for downloading: $!\n/);
+     binmode $fh;
+-    $args->{data_callback} = sub { print {$fh} $_[0] };
++    $args->{data_callback} = sub {
++        print {$fh} $_[0]
++        or _croak(qq/Error: Could not write into temporary file $tempfile: $!\n/);
++    };
+     my $response = $self->request('GET', $url, $args);
+     close $fh
+         or _croak(qq/Error: Caught error closing temporary file $tempfile: $!\n/);
+-- 
+2.7.4
+

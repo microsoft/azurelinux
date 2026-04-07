@@ -1,0 +1,31 @@
+diff --git a/misc.c b/misc.c
+index 9f443ea..a4bb3db 100644
+--- a/misc.c
++++ b/misc.c
+@@ -58,7 +58,7 @@ _PROTOTYPE(static void closePipes,(void));
+ _PROTOTYPE(static int dolstat,(char *path, char *buf, int len));
+ _PROTOTYPE(static int dostat,(char *path, char *buf, int len));
+ _PROTOTYPE(static int doreadlink,(char *path, char *buf, int len));
+-_PROTOTYPE(static int doinchild,(int (*fn)(), char *fp, char *rbuf, int rbln));
++_PROTOTYPE(static int doinchild,(int (*fn)(char *, char *, int), char *fp, char *rbuf, int rbln));
+ 
+ #if	defined(HASINTSIGNAL)
+ _PROTOTYPE(static int handleint,(int sig));
+@@ -234,7 +234,7 @@ compdev(a1, a2)
+ 
+ static int
+ doinchild(fn, fp, rbuf, rbln)
+-	int (*fn)();			/* function to perform */
++	int (*fn)(char *, char *, int);			/* function to perform */
+ 	char *fp;			/* function parameter */
+ 	char *rbuf;			/* response buffer */
+ 	int rbln;			/* response buffer length */
+@@ -296,7 +296,7 @@ doinchild(fn, fp, rbuf, rbln)
+ 			     */
+ 			    struct stat _;
+ 		    } r;
+-		    int (*r_fn)();
++		    int (*r_fn)(char *, char *, int);
+ 		/*
+ 		 * Close sufficient open file descriptors except Pipes[0] and
+ 		 * Pipes[3].

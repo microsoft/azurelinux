@@ -1,0 +1,10 @@
+--- bash-3.0/builtins/setattr.def.setlocale	2005-08-08 12:22:42.000000000 +0100
++++ bash-3.0/builtins/setattr.def	2005-08-08 12:25:16.000000000 +0100
+@@ -423,4 +423,7 @@
+ 
+   if (var && (exported_p (var) || (attribute & att_exported)))
+     array_needs_making++;	/* XXX */
++
++  if (var)
++    stupidly_hack_special_variables (name);
+ }

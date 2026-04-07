@@ -1,0 +1,38 @@
+--- chkrootkit~	2019-02-25 16:04:16.000000000 -0600
++++ chkrootkit	2019-02-25 16:05:27.264784138 -0600
+@@ -104,7 +104,7 @@
+    ${ROOTDIR}tmp/update ${ROOTDIR}tmp/.cinik ${ROOTDIR}tmp/.b"
+    SLAPPER_PORT="0.0:2002 |0.0:4156 |0.0:1978 |0.0:1812 |0.0:2015 "
+    _chk_netstat_or_ss; 
+-   OPT="-an" 
++   OPT="-an46" 
+    [ "${netstat}" = "ss" ] && OPT="-a" 
+    STATUS=0
+    file_port=
+@@ -132,7 +132,7 @@
+ scalper (){
+    SCALPER_FILES="${ROOTDIR}tmp/.uua ${ROOTDIR}tmp/.a"
+    SCALPER_PORT=2001
+-   OPT="-an" 
++   OPT="-an46" 
+    _chk_netstat_or_ss; 
+    [ "$netstat" = "ss" ] && OPT="-a" 
+    STATUS=0
+@@ -278,7 +278,7 @@
+ }
+ bindshell () {
+ PORT="114|145|465|511|600|1008|1524|1999|1978|2881|3049|3133|3879|4000|4369|5190|5665|6667|10008|12321|23132|27374|29364|30999|31336|31337|37998|45454|47017|47889|60001|7222"
+-   OPT="-an" 
++   OPT="-an46" 
+    _chk_netstat_or_ss; 
+    [ "$netstat" = "ss" ] && OPT="-a"  
+    PI=""
+@@ -2527,7 +2527,7 @@
+    STATUS=${NOT_INFECTED}
+    TCPDUMP_I_L="212.146.0.34:1963";
+    _chk_netstat_or_ss; 
+-   OPT="-an" 
++   OPT="-an46" 
+    [ "${netstat}" = "ss" ] && OPT="-a"  
+    if ${netstat} "${OPT}" | ${egrep} "${TCPDUMP_I_L}"> /dev/null 2>&1; then
+       STATUS=${INFECTED}

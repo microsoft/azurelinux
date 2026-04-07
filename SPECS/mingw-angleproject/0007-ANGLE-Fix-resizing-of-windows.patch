@@ -1,0 +1,48 @@
+From f1568e10c2bd46450adebbd838bd32e4833a0a5c Mon Sep 17 00:00:00 2001
+From: Oliver Wolff <oliver.wolff@qt.io>
+Date: Wed, 22 Aug 2018 13:32:44 +0200
+Subject: [PATCH 7/8] ANGLE: Fix resizing of windows
+
+Use the correct height/width values when calculating
+the vector for resizing the window content and the
+new size as viewport size.
+
+Task-number: QTBUG-62475
+Change-Id: I33a8dc1379a908e991b04bc31dfc6254a6d005c9
+---
+ .../src/libANGLE/renderer/d3d/d3d11/SwapChain11.cpp   | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
+
+diff --git a/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/SwapChain11.cpp b/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/SwapChain11.cpp
+index 05bb5d9863..dcfd06484d 100644
+--- a/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/SwapChain11.cpp
++++ b/src/3rdparty/angle/src/libANGLE/renderer/d3d/d3d11/SwapChain11.cpp
+@@ -796,16 +796,15 @@ EGLint SwapChain11::copyOffscreenToBackbuffer(const gl::Context *context,
+     d3d11::PositionTexCoordVertex *vertices = static_cast<d3d11::PositionTexCoordVertex*>(mappedResource.pData);
+ 
+     // Create a quad in homogeneous coordinates
+-    float x1 = (x / float(mWidth)) * 2.0f - 1.0f;
+-    float y1 = (y / float(mHeight)) * 2.0f - 1.0f;
+-    float x2 = ((x + width) / float(mWidth)) * 2.0f - 1.0f;
+-    float y2 = ((y + height) / float(mHeight)) * 2.0f - 1.0f;
+-
+-    float u1 = x / float(mWidth);
+-    float v1 = y / float(mHeight);
+-    float u2 = (x + width) / float(mWidth);
+-    float v2 = (y + height) / float(mHeight);
+-
++    float x1 = (x / float(width)) * 2.0f - 1.0f;
++    float y1 = (y / float(height)) * 2.0f - 1.0f;
++    float x2 = ((x + width) / float(width)) * 2.0f - 1.0f;
++    float y2 = ((y + height) / float(height)) * 2.0f - 1.0f;
++
++    float u1 = x / float(width);
++    float v1 = y / float(height);
++    float u2 = (x + width) / float(width);
++    float v2 = (y + height) / float(height);
+     // Invert the quad vertices depending on the surface orientation.
+     if ((mOrientation & EGL_SURFACE_ORIENTATION_INVERT_X_ANGLE) != 0)
+     {
+-- 
+2.15.0.windows.1
+

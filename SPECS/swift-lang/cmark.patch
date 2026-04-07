@@ -1,0 +1,13 @@
+diff --git cmark.orig/CMakeLists.txt cmark/CMakeLists.txt
+index 23eca3c5..beba0702 100755
+--- cmark.orig/CMakeLists.txt
++++ cmark/CMakeLists.txt
+@@ -22,6 +22,8 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
+ 
+ set(CMAKE_INCLUDE_CURRENT_DIR YES)
+ 
++set(CMAKE_POSITION_INDEPENDENT_CODE YES)
++
+ option(CMARK_FUZZ_QUADRATIC "Build quadratic fuzzing harness" OFF)
+ option(CMARK_LIB_FUZZER "Build libFuzzer fuzzing harness" OFF)
+ option(CMARK_THREADING "Add locks around static accesses" OFF)

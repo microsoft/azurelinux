@@ -1,0 +1,12 @@
+diff -Naur procfs-0.17.0-original/src/process/tests.rs procfs-0.17.0/src/process/tests.rs
+--- procfs-0.17.0-original/src/process/tests.rs	2006-07-23 21:21:28.000000000 -0400
++++ procfs-0.17.0/src/process/tests.rs	2024-12-01 13:22:43.210385024 -0500
+@@ -490,6 +490,8 @@
+     assert!(inner().is_err());
+ }
+ 
++// Downstream patch: disable this test so we do not have to package procinfo
++#[cfg(any())]
+ #[test]
+ fn test_procinfo() {
+     // test to see that this crate and procinfo give mostly the same results

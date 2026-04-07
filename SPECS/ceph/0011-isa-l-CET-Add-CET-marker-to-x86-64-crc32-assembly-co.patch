@@ -1,0 +1,172 @@
+From bbcc1a69f787881f16156f3c789052942a564103 Mon Sep 17 00:00:00 2001
+From: "H.J. Lu" <hjl.tools@gmail.com>
+Date: Thu, 20 Jan 2022 05:35:49 -0800
+Subject: [PATCH] isa-l/CET: Add CET marker to x86-64 crc32 assembly codes
+
+Add .note.gnu.property section to x86-64 crc32 assembly codes to mark
+for IBT and SHSTK compatibility.
+---
+ crc/crc32_gzip_refl_by16_10.asm | 9 +++++++++
+ crc/crc32_gzip_refl_by8.asm     | 9 +++++++++
+ crc/crc32_gzip_refl_by8_02.asm  | 9 +++++++++
+ crc/crc32_ieee_01.asm           | 8 ++++++++
+ crc/crc32_ieee_02.asm           | 9 +++++++++
+ crc/crc32_ieee_by16_10.asm      | 9 +++++++++
+ crc/crc32_ieee_by4.asm          | 9 +++++++++
+ crc/crc32_iscsi_00.asm          | 8 ++++++++
+ crc/crc32_iscsi_01.asm          | 8 ++++++++
+ 9 files changed, 78 insertions(+)
+
+diff --git a/src/isa-l/crc/crc32_gzip_refl_by16_10.asm b/src/isa-l/crc/crc32_gzip_refl_by16_10.asm
+index 40236f6..b16874d 100644
+--- a/src/isa-l/crc/crc32_gzip_refl_by16_10.asm
++++ b/src/isa-l/crc/crc32_gzip_refl_by16_10.asm
+@@ -566,3 +566,12 @@ global no_ %+ FUNCTION_NAME
+ no_ %+ FUNCTION_NAME %+ :
+ %endif
+ %endif ; (AS_FEATURE_LEVEL) >= 10
++
++%ifidn __OUTPUT_FORMAT__, elf64
++; inform linker that this doesn't require executable stack
++section .note.GNU-stack noalloc noexec nowrite progbits
++; inform linker that this is compatible with IBT and SHSTK
++section .note.gnu.property  note  alloc noexec align=8
++DD 0x00000004,0x00000010,0x00000005,0x00554e47
++DD 0xc0000002,0x00000004,0x00000003,0x00000000
++%endif
+diff --git a/src/isa-l/crc/crc32_gzip_refl_by8.asm b/src/isa-l/crc/crc32_gzip_refl_by8.asm
+index 62f7e7d..97b0c4a 100644
+--- a/src/isa-l/crc/crc32_gzip_refl_by8.asm
++++ b/src/isa-l/crc/crc32_gzip_refl_by8.asm
+@@ -622,3 +622,12 @@ dq 0x0706050403020100, 0x000e0d0c0b0a0908
+ 
+ ;;;       func        core, ver, snum
+ slversion crc32_gzip_refl_by8, 01,   00,  002c
++
++%ifidn __OUTPUT_FORMAT__, elf64
++; inform linker that this doesn't require executable stack
++section .note.GNU-stack noalloc noexec nowrite progbits
++; inform linker that this is compatible with IBT and SHSTK
++section .note.gnu.property  note  alloc noexec align=8
++DD 0x00000004,0x00000010,0x00000005,0x00554e47
++DD 0xc0000002,0x00000004,0x00000003,0x00000000
++%endif
+diff --git a/src/isa-l/crc/crc32_gzip_refl_by8_02.asm b/src/isa-l/crc/crc32_gzip_refl_by8_02.asm
+index 80d849e..1d5a75f 100644
+--- a/src/isa-l/crc/crc32_gzip_refl_by8_02.asm
++++ b/src/isa-l/crc/crc32_gzip_refl_by8_02.asm
+@@ -553,3 +553,12 @@ pshufb_shf_table:
+ ;       dq 0x060504030201008f, 0x0e0d0c0b0a090807 ; shl 1  (16-15) / shr15
+ dq 0x8786858483828100, 0x8f8e8d8c8b8a8988
+ dq 0x0706050403020100, 0x000e0d0c0b0a0908
++
++%ifidn __OUTPUT_FORMAT__, elf64
++; inform linker that this doesn't require executable stack
++section .note.GNU-stack noalloc noexec nowrite progbits
++; inform linker that this is compatible with IBT and SHSTK
++section .note.gnu.property  note  alloc noexec align=8
++DD 0x00000004,0x00000010,0x00000005,0x00554e47
++DD 0xc0000002,0x00000004,0x00000003,0x00000000
++%endif
+diff --git a/src/isa-l/crc/crc32_ieee_01.asm b/src/isa-l/crc/crc32_ieee_01.asm
+index 32495ed..cfc443b 100644
+--- a/src/isa-l/crc/crc32_ieee_01.asm
++++ b/src/isa-l/crc/crc32_ieee_01.asm
+@@ -653,3 +653,11 @@ dq 0x0706050403020100, 0x000e0d0c0b0a0908
+ ;;;       func        core, ver, snum
+ slversion crc32_ieee_01, 01,   06,  0011
+ 
++%ifidn __OUTPUT_FORMAT__, elf64
++; inform linker that this doesn't require executable stack
++section .note.GNU-stack noalloc noexec nowrite progbits
++; inform linker that this is compatible with IBT and SHSTK
++section .note.gnu.property  note  alloc noexec align=8
++DD 0x00000004,0x00000010,0x00000005,0x00554e47
++DD 0xc0000002,0x00000004,0x00000003,0x00000000
++%endif
+diff --git a/src/isa-l/crc/crc32_ieee_02.asm b/src/isa-l/crc/crc32_ieee_02.asm
+index 8a472b0..dd7096a 100644
+--- a/src/isa-l/crc/crc32_ieee_02.asm
++++ b/src/isa-l/crc/crc32_ieee_02.asm
+@@ -649,3 +649,12 @@ pshufb_shf_table:
+ ;	dq 0x060504030201008f, 0x0e0d0c0b0a090807 ; shl 1  (16-15) / shr15
+ dq 0x8786858483828100, 0x8f8e8d8c8b8a8988
+ dq 0x0706050403020100, 0x000e0d0c0b0a0908
++
++%ifidn __OUTPUT_FORMAT__, elf64
++; inform linker that this doesn't require executable stack
++section .note.GNU-stack noalloc noexec nowrite progbits
++; inform linker that this is compatible with IBT and SHSTK
++section .note.gnu.property  note  alloc noexec align=8
++DD 0x00000004,0x00000010,0x00000005,0x00554e47
++DD 0xc0000002,0x00000004,0x00000003,0x00000000
++%endif
+diff --git a/src/isa-l/crc/crc32_ieee_by16_10.asm b/src/isa-l/crc/crc32_ieee_by16_10.asm
+index 200fd93..2afd597 100644
+--- a/src/isa-l/crc/crc32_ieee_by16_10.asm
++++ b/src/isa-l/crc/crc32_ieee_by16_10.asm
+@@ -582,3 +582,12 @@ global no_ %+ FUNCTION_NAME
+ no_ %+ FUNCTION_NAME %+ :
+ %endif
+ %endif ; (AS_FEATURE_LEVEL) >= 10
++
++%ifidn __OUTPUT_FORMAT__, elf64
++; inform linker that this doesn't require executable stack
++section .note.GNU-stack noalloc noexec nowrite progbits
++; inform linker that this is compatible with IBT and SHSTK
++section .note.gnu.property  note  alloc noexec align=8
++DD 0x00000004,0x00000010,0x00000005,0x00554e47
++DD 0xc0000002,0x00000004,0x00000003,0x00000000
++%endif
+diff --git a/src/isa-l/crc/crc32_ieee_by4.asm b/src/isa-l/crc/crc32_ieee_by4.asm
+index 39bed5a..847d0bd 100644
+--- a/src/isa-l/crc/crc32_ieee_by4.asm
++++ b/src/isa-l/crc/crc32_ieee_by4.asm
+@@ -563,3 +563,12 @@ SHUF_MASK	dq 0x08090A0B0C0D0E0F, 0x0001020304050607
+ 
+ ;;;       func             core, ver, snum
+ slversion crc32_ieee_by4, 05,   02,  0017
++
++%ifidn __OUTPUT_FORMAT__, elf64
++; inform linker that this doesn't require executable stack
++section .note.GNU-stack noalloc noexec nowrite progbits
++; inform linker that this is compatible with IBT and SHSTK
++section .note.gnu.property  note  alloc noexec align=8
++DD 0x00000004,0x00000010,0x00000005,0x00554e47
++DD 0xc0000002,0x00000004,0x00000003,0x00000000
++%endif
+diff --git a/src/isa-l/crc/crc32_iscsi_00.asm b/src/isa-l/crc/crc32_iscsi_00.asm
+index 4f81e3a..3d6b2d1 100644
+--- a/src/isa-l/crc/crc32_iscsi_00.asm
++++ b/src/isa-l/crc/crc32_iscsi_00.asm
+@@ -669,3 +669,11 @@ DD 0x54851c7f,0x89e3d7c4,0xeba4fdf8,0x36c23643
+ ;;;       func            core, ver, snum
+ slversion crc32_iscsi_00, 00,   04,  0014
+ 
++%ifidn __OUTPUT_FORMAT__, elf64
++; inform linker that this doesn't require executable stack
++section .note.GNU-stack noalloc noexec nowrite progbits
++; inform linker that this is compatible with IBT and SHSTK
++section .note.gnu.property  note  alloc noexec align=8
++DD 0x00000004,0x00000010,0x00000005,0x00554e47
++DD 0xc0000002,0x00000004,0x00000003,0x00000000
++%endif
+diff --git a/src/isa-l/crc/crc32_iscsi_01.asm b/src/isa-l/crc/crc32_iscsi_01.asm
+index 2a81517..c048413 100644
+--- a/src/isa-l/crc/crc32_iscsi_01.asm
++++ b/src/isa-l/crc/crc32_iscsi_01.asm
+@@ -588,3 +588,11 @@ K_table:
+ ;;;       func            core, ver, snum
+ slversion crc32_iscsi_01, 01,   04,  0015
+ 
++%ifidn __OUTPUT_FORMAT__, elf64
++; inform linker that this doesn't require executable stack
++section .note.GNU-stack noalloc noexec nowrite progbits
++; inform linker that this is compatible with IBT and SHSTK
++section .note.gnu.property  note  alloc noexec align=8
++DD 0x00000004,0x00000010,0x00000005,0x00554e47
++DD 0xc0000002,0x00000004,0x00000003,0x00000000
++%endif
+-- 
+2.34.1
+

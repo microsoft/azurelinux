@@ -1,0 +1,250 @@
+diff -up ./esc/src/app/opensc.esc.conf.fix6 ./esc/src/app/opensc.esc.conf
+--- ./esc/src/app/opensc.esc.conf.fix6	2019-11-14 18:19:13.343923930 -0800
++++ ./esc/src/app/opensc.esc.conf	2019-11-15 11:30:01.967034720 -0800
+@@ -26,6 +26,11 @@ app default {
+         # Default: stderr
+         #
+     #debug_file = /tmp/opensc.log;
++    # sc650 scp01 (older version)
++    card_atr
++      3B:FF:14:00:FF:81:31:FE:45:80:25:A0:00:00:00:56:57:53:43:36:35:30:03:02:39 {
++                pkcs11_enable_InitToken = yes;
++        }
+ 
+     card_atr
+       3B:FF:14:00:FF:81:31:FE:45:80:25:A0:00:00:00:56:57:53:43:36:35:30:03:03:38 {
+@@ -52,12 +57,31 @@ app default {
+                 pkcs11_enable_InitToken = yes;
+     }
+ 
++    card_atr
++      3B:95:95:40:FF:AE:01:03:00:00 {
++                pkcs11_enable_InitToken = yes;
++    }
++
++
++   #g&d 6.0 smart cafe scp03
+ 
+     card_atr
+       3B:FE:18:00:00:80:31:FE:45:53:43:45:36:30:2D:43:44:30:38:31:2D:6E:46:A9 {
+                pkcs11_enable_InitToken = yes;
+     }
+ 
++    #g&d 7.0 smart cafe scp03
++    card_atr
++      3B:F9:96:00:00:80:31:FE:45:53:43:45:37:20:03:00:20:46:42 {
++                pkcs11_enable_InitToken = yes;
++    }
++
++    #sc650 scp03
++
++    card_atr 
++      3B:FF:14:00:FF:81:31:FE:45:80:25:A0:00:00:00:56:57:53:43:36:35:30:04:02:3E {
++                pkcs11_enable_InitToken = yes;
++    }
+ 
+     reader_driver ctapi {
+     }
+diff -up ./esc/src/lib/coolkey/CoolKey.cpp.fix6 ./esc/src/lib/coolkey/CoolKey.cpp
+--- ./esc/src/lib/coolkey/CoolKey.cpp.fix6	2019-11-13 18:30:45.454938214 -0800
++++ ./esc/src/lib/coolkey/CoolKey.cpp	2019-11-14 18:16:49.078377331 -0800
+@@ -542,6 +542,67 @@ done:
+ 
+ 
+ }
++/* Return the full reader name since nss can't seem to give us the whole name
++ * when the length is longer than 65 chars.
++ * Caller has to free the returned string.
++ */
++char *CoolKeyGetFullReaderName(const char *nssReaderName)
++{
++    char* fullReaderName = NULL;
++    CKYReaderNameList readerNames;
++    CKYCardContext *cardCtxt = NULL;
++    CKYStatus ret = CKYSCARDERR;
++    int readerCount = 0;
++    char tBuff[56];
++    PR_LOG( coolKeyLog, PR_LOG_DEBUG, ("%s CoolKeyGetFullReaderName entering:\n",GetTStamp(tBuff,56)));
++
++    if(nssReaderName == NULL) {
++       goto done;
++    }
++
++    cardCtxt = CKYCardContext_Create(SCARD_SCOPE_USER);
++    if (!cardCtxt) {
++         goto done;
++    }
++
++    ret = CKYCardContext_ListReaders(cardCtxt, &readerNames);
++    if (ret != CKYSUCCESS) {
++         goto done;
++    }
++
++    readerCount = CKYReaderNameList_GetCount(readerNames);
++
++    /* none found, return success */
++    if (readerCount == 0) {
++        goto done;
++    }
++
++    /* step through reader list to match to our possible partial reader name from nss. */
++    for (int i=0; i < readerCount ; i++) {
++        const char *thisReader = CKYReaderNameList_GetValue(readerNames, i);
++
++        const char *match = strstr(thisReader, nssReaderName );
++	if(match == NULL) {
++            PR_LOG( coolKeyLog, PR_LOG_DEBUG, ("%s CoolKeyGetFullReaderName reader: %s not the one. \n",thisReader,GetTStamp(tBuff,56)));
++
++	} else {
++            fullReaderName = strdup(thisReader);
++            PR_LOG( coolKeyLog, PR_LOG_DEBUG, ("%s CoolKeyGetFullReaderName correct full name:  %s \n",fullReaderName,GetTStamp(tBuff,56)));
++        }
++    }
++
++done:
++
++    if (cardCtxt) {
++        CKYCardContext_Destroy(cardCtxt);
++    }
++
++    if(readerNames) {
++        CKYReaderNameList_Destroy(readerNames);
++    }
++    return fullReaderName;
++
++}
+ 
+ HRESULT CoolKeyGetATRDirectly(char *aBuff, int aBuffLen,const char *readerName) {
+ 
+diff -up ./esc/src/lib/coolkey/CoolKeyHandler.cpp.fix6 ./esc/src/lib/coolkey/CoolKeyHandler.cpp
+--- ./esc/src/lib/coolkey/CoolKeyHandler.cpp.fix6	2019-11-13 18:30:59.934918507 -0800
++++ ./esc/src/lib/coolkey/CoolKeyHandler.cpp	2019-11-14 17:16:03.946077277 -0800
+@@ -2209,10 +2209,10 @@ CKHGetCoolKeyInfo(PK11SlotInfo *aSlot,Co
+     SECStatus status;
+     HRESULT hres,atrRes,cuidRes,cycleRes;
+ 
+-    CKYBuffer cardATR;
+-    CKYBuffer_InitEmpty(&cardATR);
+     char *readerName =  PK11_GetSlotName(aSlot);
+-    
++
++    char *actualReaderName = CoolKeyGetFullReaderName(readerName);
++
+     memset((void *) &tokenInfo,0,sizeof(tokenInfo));
+     ATR.data = NULL; // initialize for error processing
+     label.data = NULL; // initialize for error processing
+@@ -2233,6 +2233,11 @@ CKHGetCoolKeyInfo(PK11SlotInfo *aSlot,Co
+     char cuidChar[100];
+     memset((void*) cuidChar,0 ,sizeof(cuidChar));
+ 
++    if(actualReaderName == NULL) {
++        goto failed;
++    }
++
++
+   // get the CUID/Serial number (we *WILL* continue to need it )
+     status = PK11_GetTokenInfo(aSlot,&tokenInfo);
+     if (status != SECSuccess) {
+@@ -2242,7 +2247,7 @@ CKHGetCoolKeyInfo(PK11SlotInfo *aSlot,Co
+     tokenInfo.flags=0; //Ignore what opensc says, get the info ourselves later.
+     //Get the life cycle state:
+ 
+-    cycleRes = CoolKeyGetLifeCycleDirectly(&lifeCycle,readerName);
++    cycleRes = CoolKeyGetLifeCycleDirectly(&lifeCycle,actualReaderName);
+ 
+     if(lifeCycle == 0x7) { // applet only
+        hasApplet = 1; 
+@@ -2255,7 +2260,7 @@ CKHGetCoolKeyInfo(PK11SlotInfo *aSlot,Co
+ 
+     //Let's see if we can get the ATR by force explicitly
+    
+-    atrRes = CoolKeyGetATRDirectly(atrChar,100,readerName);
++    atrRes = CoolKeyGetATRDirectly(atrChar,100,actualReaderName);
+ 
+     if(atrRes == E_FAIL) {
+         goto failed;
+@@ -2310,7 +2315,7 @@ CKHGetCoolKeyInfo(PK11SlotInfo *aSlot,Co
+ 
+     info->mInfoFlags = MapGetFlags(&tokenInfo);
+ 
+-    info->mReaderName = strdup(readerName);
++    info->mReaderName = strdup(actualReaderName);
+ 
+     info->mCUID = (char *)malloc(35); /* should be a define ! */
+ 
+@@ -2361,6 +2366,9 @@ CKHGetCoolKeyInfo(PK11SlotInfo *aSlot,Co
+ 
+     SECITEM_FreeItem(&label,PR_FALSE);
+ 
++    if(actualReaderName) {
++        free(actualReaderName);
++    }
+     info->mSlot = PK11_ReferenceSlot(aSlot);
+     info->mSeries = PK11_GetSlotSeries(aSlot);
+     return info;
+@@ -2372,7 +2380,9 @@ failed:
+     if (info) {
+       delete info;
+     }
+-
+-    CKYBuffer_FreeData(&cardATR);
++    if (actualReaderName) {
++        free(actualReaderName);
++    }
++    
+     return NULL;
+ }
+diff -up ./esc/src/lib/coolkey/CoolKey.h.fix6 ./esc/src/lib/coolkey/CoolKey.h
+--- ./esc/src/lib/coolkey/CoolKey.h.fix6	2019-11-13 18:30:37.263949374 -0800
++++ ./esc/src/lib/coolkey/CoolKey.h	2019-11-14 17:15:23.216143691 -0800
+@@ -300,6 +300,7 @@ HRESULT CoolKeyGetATRDirectly(char *aBuf
+ HRESULT CoolKeyGetCUIDDirectly(char *aBuff, int aBuffLen, const char *readerName);
+ HRESULT CoolKeyGetCPLCDataDirectly(CKYAppletRespGetCPLCData *cplc,const char *readerName);
+ HRESULT CoolKeyGetLifeCycleDirectly(CKYByte *personalized,const char *readerName);
++char *CoolKeyGetFullReaderName(const char *nssReaderName);
+ 
+ }
+ 
+diff -up ./esc/src/lib/coolkey/NSSManager.cpp.fix6 ./esc/src/lib/coolkey/NSSManager.cpp
+--- ./esc/src/lib/coolkey/NSSManager.cpp.fix6	2019-11-14 17:21:14.596622085 -0800
++++ ./esc/src/lib/coolkey/NSSManager.cpp	2019-11-14 18:24:25.461109006 -0800
+@@ -402,7 +402,8 @@ HRESULT NSSManager::GetKeyIssuer(const C
+ 
+             if(cert)
+             {
+-                if(cert->slot == slot)
++                int not_equal = strncmp(PK11_GetSlotName(slot), PK11_GetSlotName(cert->slot),65);
++                if(not_equal == 0)
+                 {
+                     if(IsCACert(cert))
+                     {
+@@ -478,7 +479,8 @@ HRESULT NSSManager::GetKeyUID(const Cool
+ 
+             if(cert)
+             {
+-                if(cert->slot == slot)
++                int not_equal = strncmp(PK11_GetSlotName(slot), PK11_GetSlotName(cert->slot),65);
++                if(not_equal == 0)
+                 {
+                     if(IsCACert(cert))
+                     {
+@@ -557,7 +559,8 @@ HRESULT NSSManager::GetKeyIssuedTo(const
+ 
+             if(cert)
+             {
+-                if(cert->slot == slot)
++                int not_equal = strncmp(PK11_GetSlotName(slot), PK11_GetSlotName(cert->slot),65);
++                if(not_equal == 0)
+                 {
+                     if(IsCACert(cert))
+                     {
+@@ -643,7 +646,8 @@ HRESULT NSSManager::GetKeyCertInfo(const
+             CERTCertificate *cert = node->cert;
+             if(cert)
+             {
+-                if(cert->slot == slot)
++                int not_equal = strncmp(PK11_GetSlotName(slot), PK11_GetSlotName(cert->slot),65);
++                if(not_equal == 0)
+                 {
+                     if(!strcmp(cert->nickname,aCertNickname))
+                     {

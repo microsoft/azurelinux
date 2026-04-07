@@ -1,0 +1,13 @@
+! This is the global resources file that is loaded when
+! all users log in, as well as for the login screen
+
+! Fix the Xft dpi to 96; this prevents tiny fonts
+! or HUGE fonts depending on the screen size.
+Xft.dpi: 96
+
+! hintstyle: medium means that (for Postscript fonts) we
+! position the stems for maximum constrast and consistency
+! but do not force the stems to integral widths. hintnone,
+! hintslight, and hintfull are the other possibilities.
+Xft.hintstyle: hintmedium
+Xft.hinting: true

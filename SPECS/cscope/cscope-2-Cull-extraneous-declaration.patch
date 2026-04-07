@@ -1,0 +1,26 @@
+From 6a6998ecd0392ea643c4c4b317af9af8270761aa Mon Sep 17 00:00:00 2001
+From: Hans-Bernhard Broeker <HBBroeker@T-Online.de>
+Date: Thu, 9 Aug 2018 16:25:31 +0200
+Subject: [PATCH 3/9] Cull extraneous declaration
+
+Signed-off-by: Vladis Dronov <vdronov@redhat.com>
+---
+ src/global.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/global.h b/src/global.h
+index dbc8a43..a6f1486 100644
+--- a/src/global.h
++++ b/src/global.h
+@@ -224,7 +224,7 @@ extern	char	dicode2[];	/* digraph second character code */
+    + dicode2[(unsigned char)(inchar2)])
+ 
+ /* main.c global data */
+-extern	char	*editor, *home, *shell, *lineflag;	/* environment variables */
++extern	char	*editor, *shell, *lineflag;	/* environment variables */
+ extern	char	*home;		/* Home directory */
+ extern 	BOOL	lineflagafterfile;
+ extern	char	*argv0;		/* command name */
+-- 
+2.26.2
+

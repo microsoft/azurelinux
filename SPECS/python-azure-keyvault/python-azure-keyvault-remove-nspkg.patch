@@ -1,0 +1,10 @@
+diff -up ./setup.cfg.orig ./setup.cfg
+--- ./setup.cfg.orig	2021-07-22 16:00:13.432319673 -0500
++++ ./setup.cfg	2021-07-22 16:00:18.392291420 -0500
+@@ -1,6 +1,5 @@
+ [bdist_wheel]
+ universal = 1
+-azure-namespace-package = azure-nspkg
+ 
+ [egg_info]
+ tag_build = 

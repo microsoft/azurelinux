@@ -1,0 +1,13 @@
+diff --git a/test-requirements.txt b/test-requirements.txt
+index bf069b79..983a7a97 100644
+--- a/test-requirements.txt
++++ b/test-requirements.txt
+@@ -95,7 +95,7 @@ lxml>=4.6.2; python_version == '3.8' and sys_platform != 'darwin'
+ lxml>=4.6.2; python_version == '3.9'
+ lxml>=4.6.4; python_version == '3.10'
+ lxml>=4.9.2; python_version == '3.11'
+-lxml>=4.9.3; python_version == '3.12'
++lxml>=4.9.3; python_version >= '3.12'
+ 
+ virtualenv>=16.1.0,!=20.0.19,!=20.0.32; python_version <= '3.7'
+ virtualenv>=20.15.0; python_version >= '3.8' and python_version <= '3.11'  # requires six<2,>=1.12.0

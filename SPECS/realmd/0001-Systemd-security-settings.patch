@@ -1,0 +1,38 @@
+From 83b8eba4f9aa0ce8a5e22ef1829df167f9bfd027 Mon Sep 17 00:00:00 2001
+From: Rahul Sundaram <sundaram@fedoraproject.org>
+Date: Thu, 29 Feb 2024 21:27:03 -0500
+Subject: [PATCH 1/7] Systemd security settings
+
+---
+ dbus/realmd.service.in | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/dbus/realmd.service.in b/dbus/realmd.service.in
+index f0e8973..8fce139 100644
+--- a/dbus/realmd.service.in
++++ b/dbus/realmd.service.in
+@@ -6,3 +6,21 @@ Documentation=man:realm(8) man:realmd.conf(5)
+ Type=dbus
+ BusName=org.freedesktop.realmd
+ ExecStart=@libexecdir@/realmd
++DevicePolicy=closed
++KeyringMode=private
++LockPersonality=yes
++MemoryDenyWriteExecute=yes
++NoNewPrivileges=yes
++PrivateDevices=yes
++ProtectClock=yes
++ProtectControlGroups=yes
++ProtectHome=yes
++ProtectHostname=yes
++ProtectKernelLogs=yes
++ProtectKernelModules=yes
++ProtectKernelTunables=yes
++ProtectProc=invisible
++ProtectSystem=no
++RestrictRealtime=yes
++RestrictSUIDSGID=yes
++SystemCallArchitectures=native
+-- 
+2.47.1
+

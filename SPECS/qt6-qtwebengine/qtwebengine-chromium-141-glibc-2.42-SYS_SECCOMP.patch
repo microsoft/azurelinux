@@ -1,0 +1,29 @@
+Fix FTBFS
+
+/usr/include/bits/siginfo-consts.h:219:3: error: expected identifier
+  219 |   SYS_SECCOMP = 1,              /* Seccomp triggered.  */
+      |   ^
+../../sandbox/linux/system_headers/linux_seccomp.h:220:39: note: expanded from macro 'SYS_SECCOMP'
+  220 | #define SYS_SECCOMP                   1
+      |                                       ^
+../../sandbox/linux/seccomp-bpf/trap.cc:159:46: error: use of undeclared identifier 'SYS_SECCOMP'
+  159 |   if (nr != LINUX_SIGSYS || info->si_code != SYS_SECCOMP || !ctx ||
+      |                                              ^~~~~~~~~~~
+/usr/include/bits/siginfo-consts.h:220:23: note: expanded from macro 'SYS_SECCOMP'
+  220 | #  define SYS_SECCOMP   SYS_SECCOMP
+
+diff -up chromium-141.0.7390.122/src/3rdparty/chromium/sandbox/linux/system_headers/linux_seccomp.h.me chromium-141.0.7390.122/src/3rdparty/chromium/sandbox/linux/system_headers/linux_seccomp.h
+--- chromium-141.0.7390.122/src/3rdparty/chromium/sandbox/linux/system_headers/linux_seccomp.h.me	2025-10-28 10:05:44.970248151 +0100
++++ chromium-141.0.7390.122/src/3rdparty/chromium/sandbox/linux/system_headers/linux_seccomp.h	2025-10-28 10:05:52.291345772 +0100
+@@ -214,8 +214,11 @@ struct seccomp_notif_addfd {
+ #define SECCOMP_RET_INVALID 0x00010000U  // Illegal return value
+ #endif
+ 
++// check glibc version < 2.42
++#if (__GLIBC__ < 2) || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 42)
+ #ifndef SYS_SECCOMP
+ #define SYS_SECCOMP                   1
+ #endif
++#endif
+ 
+ #endif  // SANDBOX_LINUX_SYSTEM_HEADERS_LINUX_SECCOMP_H_

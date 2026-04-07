@@ -1,0 +1,28 @@
+diff -rupN --no-dereference assimp-6.0.4/CMakeLists.txt assimp-6.0.4-new/CMakeLists.txt
+--- assimp-6.0.4/CMakeLists.txt	2026-01-24 21:57:37.000000000 +0100
++++ assimp-6.0.4-new/CMakeLists.txt	2026-01-27 13:39:45.836457790 +0100
+@@ -823,6 +823,7 @@ IF ( ASSIMP_BUILD_SAMPLES )
+ ENDIF ()
+ 
+ IF ( ASSIMP_BUILD_TESTS )
++  ENABLE_TESTING()
+   ADD_SUBDIRECTORY( test/ )
+ ENDIF ()
+ 
+diff -rupN --no-dereference assimp-6.0.4/test/CMakeLists.txt assimp-6.0.4-new/test/CMakeLists.txt
+--- assimp-6.0.4/test/CMakeLists.txt	2026-01-27 13:39:44.887952805 +0100
++++ assimp-6.0.4-new/test/CMakeLists.txt	2026-01-27 13:39:45.836809190 +0100
+@@ -36,6 +36,7 @@
+ #
+ #----------------------------------------------------------------------
+ cmake_minimum_required( VERSION 3.10 )
++include(GoogleTest)
+ 
+ INCLUDE_DIRECTORIES(
+     ${Assimp_SOURCE_DIR}/test/unit
+@@ -283,4 +284,4 @@ target_link_libraries( unit assimp ${pla
+ 
+ add_subdirectory(headercheck)
+ 
+-add_test( unittests unit )
++gtest_discover_tests(unit)

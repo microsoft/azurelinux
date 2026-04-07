@@ -1,0 +1,200 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alynx Zhou <alynx.zhou@gmail.com>
+Date: Fri, 30 Jan 2026 21:02:50 +0800
+Subject: [PATCH 1/4] mixer-control: Check whether we are handling new device
+ in sync_devices()
+
+Previously sync_devices() is only called when there is a new device, but
+with [1] we always call it, and create duplicated new devices. Fix it by
+check whether we are handling new devices before creating.
+
+Closes: https://gitlab.gnome.org/GNOME/libgnome-volume-control/-/issues/39
+
+[1]: https://gitlab.gnome.org/GNOME/libgnome-volume-control/-/commit/b9d0b120c6022cc2d1a728820a81beacc9360366
+---
+ gvc-mixer-control.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/gvc-mixer-control.c b/gvc-mixer-control.c
+index a8c75a06287e..51e389fd55aa 100644
+--- a/gvc-mixer-control.c
++++ b/gvc-mixer-control.c
+@@ -1336,6 +1336,7 @@ clear_stream_from_devices (GvcMixerControl    *control,
+ static void
+ sync_devices (GvcMixerControl *control,
+               GvcMixerStream*  stream,
++              gboolean         is_new,
+               gboolean         is_bluetooth)
+ {
+         /* Go through ports to see what outputs can be created. */
+@@ -1350,7 +1351,7 @@ sync_devices (GvcMixerControl *control,
+                 return;
+         }
+ 
+-        if (stream_ports == NULL) {
++        if (stream_ports == NULL && is_new) {
+                 GvcMixerUIDevice *device;
+                 GObject *object;
+ 
+@@ -1547,7 +1548,7 @@ update_sink (GvcMixerControl    *control,
+         is_bt = is_bluetooth (info->proplist);
+         /* Sync devices as the port on the stream might have changed */
+         if (!is_new)
+-                sync_devices (control, stream, is_bt);
++                sync_devices (control, stream, is_new, is_bt);
+ 
+         /* Messy I know but to set the port everytime regardless of whether it has changed will cost us a
+          * port change notify signal which causes the frontend to resync.
+@@ -1576,7 +1577,7 @@ update_sink (GvcMixerControl    *control,
+                 add_stream (control, stream);
+                 /* Always sync on a new stream to able to assign the right stream id
+                  * to the appropriate outputs (multiple potential outputs per stream). */
+-                sync_devices (control, stream, is_bt);
++                sync_devices (control, stream, is_new, is_bt);
+         } else {
+                 g_signal_emit (G_OBJECT (control),
+                                signals[STREAM_CHANGED],
+@@ -1685,7 +1686,7 @@ update_source (GvcMixerControl      *control,
+         is_bt = is_bluetooth (info->proplist);
+         /* Sync devices as the port on the stream might have changed */
+         if (!is_new)
+-                sync_devices (control, stream, is_bt);
++                sync_devices (control, stream, is_new, is_bt);
+ 
+         if (info->active_port != NULL) {
+                 if (is_new)
+@@ -1707,7 +1708,7 @@ update_source (GvcMixerControl      *control,
+                                      GUINT_TO_POINTER (info->index),
+                                      g_object_ref (stream));
+                 add_stream (control, stream);
+-                sync_devices (control, stream, is_bt);
++                sync_devices (control, stream, is_new, is_bt);
+         } else {
+                 g_signal_emit (G_OBJECT (control),
+                                signals[STREAM_CHANGED],
+-- 
+2.53.0
+
+
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Guido=20G=C3=BCnther?= <agx@sigxcpu.org>
+Date: Wed, 31 Dec 2025 11:55:41 +0100
+Subject: [PATCH 2/4] mixer-control: Don't leak ui device
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+We have a ref when creating the `device` object, use that for inserting
+into the hash table as otherwise we leak that reference.
+
+Signed-off-by: Guido Günther <agx@sigxcpu.org>
+---
+ gvc-mixer-control.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gvc-mixer-control.c b/gvc-mixer-control.c
+index 51e389fd55aa..c7f961349686 100644
+--- a/gvc-mixer-control.c
++++ b/gvc-mixer-control.c
+@@ -1367,7 +1367,7 @@ sync_devices (GvcMixerControl *control,
+ 
+                 g_hash_table_insert (is_output ? control->priv->ui_outputs : control->priv->ui_inputs,
+                                      GUINT_TO_POINTER (gvc_mixer_ui_device_get_id (device)),
+-                                     g_object_ref (device));
++                                     device);
+ 
+                 g_signal_emit (G_OBJECT (control),
+                                signals[is_output ? OUTPUT_ADDED : INPUT_ADDED],
+-- 
+2.53.0
+
+
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Guido=20G=C3=BCnther?= <agx@sigxcpu.org>
+Date: Wed, 31 Dec 2025 15:09:19 +0100
+Subject: [PATCH 3/4] mixer-control: Document that add_stream is transfer full
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Guido Günther <agx@sigxcpu.org>
+---
+ gvc-mixer-control.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/gvc-mixer-control.c b/gvc-mixer-control.c
+index c7f961349686..45764849bb2e 100644
+--- a/gvc-mixer-control.c
++++ b/gvc-mixer-control.c
+@@ -1189,6 +1189,13 @@ remove_stream (GvcMixerControl *control,
+         g_object_unref (stream);
+ }
+ 
++/**
++ * add_stream: (skip)
++ * @control: The control to add the stream to
++ * @stream:(transfer full): The stream to add
++ *
++ * Add a stream to the hash table of all known streams
++ */
+ static void
+ add_stream (GvcMixerControl *control,
+             GvcMixerStream  *stream)
+-- 
+2.53.0
+
+
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Guido=20G=C3=BCnther?= <agx@sigxcpu.org>
+Date: Fri, 6 Feb 2026 18:24:26 +0100
+Subject: [PATCH 4/4] mixer-control: Only stream-id for bluetooth devices only
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+They're the only ones that merely flip ports and clearing it for
+other devices breaks e.g. lineout and headphone combinations.
+
+Fixes: 8bf60ee ("mixer-control: Reset `stream-id`s on UI devices")
+
+Closes: #40
+Signed-off-by: Guido Günther <agx@sigxcpu.org>
+---
+ gvc-mixer-control.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/gvc-mixer-control.c b/gvc-mixer-control.c
+index 45764849bb2e..57dc2d4f2ccd 100644
+--- a/gvc-mixer-control.c
++++ b/gvc-mixer-control.c
+@@ -1218,7 +1218,8 @@ add_stream (GvcMixerControl *control,
+ static gboolean
+ match_stream_with_devices (GvcMixerControl    *control,
+                            GvcMixerStreamPort *stream_port,
+-                           GvcMixerStream     *stream)
++                           GvcMixerStream     *stream,
++                           gboolean            is_bluetooth)
+ {
+         g_autoptr (GList)        devices = NULL;
+         guint                    stream_card_id;
+@@ -1279,7 +1280,7 @@ match_stream_with_devices (GvcMixerControl    *control,
+                                         in_possession = TRUE;
+                                 } else {
+                                         /* Other UI devices on that card that match the stream can't be valid */
+-                                        if (device_stream_id == stream_id) {
++                                        if (device_stream_id == stream_id && is_bluetooth) {
+                                                 g_object_set (G_OBJECT (device),
+                                                               "stream-id", GVC_MIXER_UI_DEVICE_INVALID,
+                                                               NULL);
+@@ -1390,7 +1391,7 @@ sync_devices (GvcMixerControl *control,
+                 GvcMixerStreamPort *stream_port;
+                 stream_port = n->data;
+ 
+-                if (match_stream_with_devices (control, stream_port, stream))
++                if (match_stream_with_devices (control, stream_port, stream, is_bluetooth))
+                         continue;
+ 
+                 g_warning ("Sync_devices: Failed to match stream id: %u, description: '%s', origin: '%s'",
+-- 
+2.53.0
+

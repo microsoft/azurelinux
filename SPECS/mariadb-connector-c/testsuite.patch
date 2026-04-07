@@ -1,0 +1,9 @@
+--- mariadb-connector-c-3.4.1-src/unittest/libmariadb/CMakeLists.txt	2024-08-03 16:38:02.000000000 +0200
++++ mariadb-connector-c-3.4.1-src/unittest/libmariadb/CMakeLists.txt_patched	2024-08-22 23:52:11.773978003 +0200
+@@ -95,3 +95,6 @@ FOREACH(FILE ${ADDITIONAL_FILES})
+                  COPYONLY)
+ ENDFOREACH()
+ 
++INSTALL(TARGETS ${API_TESTS} DESTINATION ${SHAREDIR}/mariadb-connector-c/tests COMPONENT Tests)
++INSTALL(FILES ${CC_BINARY_DIR}/unittest/mytap/libcctap.so PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE DESTINATION ${INSTALL_LIBDIR}/mariadb/connector-c/tests COMPONENT Tests)
++INSTALL(FILES ${CC_BINARY_DIR}/unittest/libmariadb/CTestTestfile.cmake DESTINATION ${SHAREDIR}/mariadb-connector-c/tests COMPONENT Tests)

@@ -1,0 +1,67 @@
+@@ -, +, @@ 
+---
+ sysdeps/linux-gnu/s390/arch.h |  2 ++
+ sysdeps/linux-gnu/s390/plt.c  | 22 ++++++++++++++++++++++
+ 2 files changed, 24 insertions(+)
+--- a/sysdeps/linux-gnu/s390/arch.h	
++++ a/sysdeps/linux-gnu/s390/arch.h	
+@@ -1,5 +1,6 @@ 
+ /*
+  * This file is part of ltrace.
++ * Copyright (C) 2013 Petr Machata, Red Hat Inc.
+  * Copyright (C) 2001 IBM Poughkeepsie, IBM Corporation
+  *
+  * This program is free software; you can redistribute it and/or
+@@ -25,6 +26,7 @@ 
+ #define ARCH_HAVE_FETCH_ARG
+ #define ARCH_HAVE_SIZEOF
+ #define ARCH_HAVE_ALIGNOF
++#define ARCH_HAVE_ADD_PLT_ENTRY
+ 
+ #define LT_ELFCLASS	ELFCLASS32
+ #define LT_ELF_MACHINE	EM_S390
+--- a/sysdeps/linux-gnu/s390/plt.c	
++++ a/sysdeps/linux-gnu/s390/plt.c	
+@@ -1,5 +1,6 @@ 
+ /*
+  * This file is part of ltrace.
++ * Copyright (C) 2013 Petr Machata, Red Hat Inc.
+  * Copyright (C) 2004,2008,2009 Juan Cespedes
+  *
+  * This program is free software; you can redistribute it and/or
+@@ -19,9 +20,12 @@ 
+  */
+ 
+ #include <gelf.h>
++#include <stdbool.h>
++
+ #include "proc.h"
+ #include "common.h"
+ #include "library.h"
++#include "trace.h"
+ 
+ GElf_Addr
+ arch_plt_sym_val(struct ltelf *lte, size_t ndx, GElf_Rela * rela) {
+@@ -33,3 +37,21 @@ sym2addr(struct process *proc, struct library_symbol *sym)
+ {
+ 	return sym->enter_addr;
+ }
++
++enum plt_status
++arch_elf_add_plt_entry(struct process *proc, struct ltelf *lte,
++		       const char *a_name, GElf_Rela *rela, size_t ndx,
++		       struct library_symbol **ret)
++{
++#ifdef R_390_IRELATIVE
++	bool irelative = GELF_R_TYPE(rela->r_info) == R_390_IRELATIVE;
++#else
++	bool irelative = false;
++#endif
++
++	if (irelative)
++		return linux_elf_add_plt_entry_irelative(proc, lte, rela,
++							 ndx, ret);
++
++	return PLT_DEFAULT;
++}
+-- 

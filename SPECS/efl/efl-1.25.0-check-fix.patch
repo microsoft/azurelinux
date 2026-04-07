@@ -1,0 +1,17 @@
+diff -up efl-1.25.0/src/tests/eldbus/eldbus_fake_server.c.checkfix efl-1.25.0/src/tests/eldbus/eldbus_fake_server.c
+--- efl-1.25.0/src/tests/eldbus/eldbus_fake_server.c.checkfix	2020-09-22 13:54:51.000000000 -0400
++++ efl-1.25.0/src/tests/eldbus/eldbus_fake_server.c	2020-09-22 15:24:41.384828189 -0400
+@@ -170,11 +170,11 @@ _fake_server_name_request_cb(void *data
+ {
+    const char *name, *text;
+    if (eldbus_message_error_get(msg, &name, &text))
+-     ck_abort_msg("error on _fake_server_name_request_cb: %s %s", name, text);
++     fail("error on _fake_server_name_request_cb: %s %s", name, text);
+ 
+    unsigned int reply;
+    if (!eldbus_message_arguments_get(msg, "u", &reply))
+-     ck_abort_msg("error geting arguments on _fake_server_name_request_cb");
++     fail("error geting arguments on _fake_server_name_request_cb");
+ 
+    if (ELDBUS_NAME_REQUEST_REPLY_PRIMARY_OWNER != reply)
+      {

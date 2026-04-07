@@ -1,0 +1,25 @@
+--- gix-path-0.10.22/Cargo.toml	1970-01-01T00:00:01+00:00
++++ gix-path-0.10.22/Cargo.toml	2025-12-02T22:26:02.945137+00:00
+@@ -52,17 +52,6 @@
+ [dev-dependencies.serial_test]
+ version = "3.1.0"
+ default-features = false
+-
+-[target."cfg(windows)".dev-dependencies.windows]
+-version = "0.62.1"
+-features = [
+-    "Win32_System_Com",
+-    "Win32_System_Threading",
+-    "Win32_UI_Shell",
+-]
+-
+-[target."cfg(windows)".dev-dependencies.winreg]
+-version = "0.55.0"
+ 
+ [lints.clippy]
+ bool_to_int_with_if = "allow"
+@@ -142,3 +131,4 @@
+ priority = -1
+ 
+ [lints.rust]
++

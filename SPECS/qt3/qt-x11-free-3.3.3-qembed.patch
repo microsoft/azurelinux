@@ -1,0 +1,20 @@
+--- qt-x11-free-3.3.3/tools/tools.pro.qembed	2004-06-08 10:05:03.000000000 +0200
++++ qt-x11-free-3.3.3/tools/tools.pro	2004-08-11 15:47:35.393118498 +0200
+@@ -5,6 +5,7 @@
+     SUBDIRS		= assistant/lib \
+ 		      designer \
+ 		      assistant \
++		      qembed \
+ 		      linguist
+     unix:SUBDIRS	+= qtconfig
+ }
+--- qt-x11-free-3.3.3/tools/qembed/qembed.pro.qembed	2004-06-08 10:08:40.000000000 +0200
++++ qt-x11-free-3.3.3/tools/qembed/qembed.pro	2004-08-11 15:51:12.008859486 +0200
+@@ -2,3 +2,7 @@
+ SOURCES = qembed.cpp
+ TARGET  = qembed
+ REQUIRES=full-config nocrosscompiler
++DESTDIR = ../../bin
++target.path=$$bins.path
++INSTALLS += target
++

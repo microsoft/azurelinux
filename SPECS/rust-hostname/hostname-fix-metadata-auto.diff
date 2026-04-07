@@ -1,0 +1,10 @@
+--- hostname-0.3.1/Cargo.toml	2020-02-28T16:58:01+00:00
++++ hostname-0.3.1/Cargo.toml	2024-09-21T23:41:05.031544+00:00
+@@ -33,6 +33,4 @@
+ set = []
+ [target."cfg(any(unix, target_os = \"redox\"))".dependencies.libc]
+ version = "^0.2"
+-[target."cfg(target_os = \"windows\")".dependencies.winapi]
+-version = "^0.3"
+-features = ["sysinfoapi"]
++

@@ -1,0 +1,74 @@
+From 18904b9f33fccdc9e1bc606ad266c8287131de19 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Fri, 1 Mar 2024 12:53:26 +0000
+Subject: [PATCH 03/17] Improve make debuggability
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Stop discarding stderr output
+Stop hardcoding parallelism to 'nproc' value and allow user
+specified setting to propagate to sub-make invocations.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ sdk/Makefile.source | 8 ++++----
+ sdk/cpprt/Makefile  | 2 +-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/sdk/Makefile.source b/sdk/Makefile.source
+index 0a84726c..e3bac508 100644
+--- a/sdk/Makefile.source
++++ b/sdk/Makefile.source
+@@ -77,7 +77,7 @@ tstdc: $(LIBTLIBC)
+ 
+ ifndef SERVTD_ATTEST
+ $(LIBTLIBC): tlibthread compiler-rt tsafecrt tsetjmp tmm_rsrv
+-	$(MAKE) -C tlibc/ -j$(shell nproc) 2> /dev/null
++	$(MAKE) -C tlibc/
+ 	@$(MKDIR) $(BUILD_DIR)/.compiler-rt $(BUILD_DIR)/.tlibthread $(BUILD_DIR)/.tsafecrt $(BUILD_DIR)/.tsetjmp $(BUILD_DIR)/.tmm_rsrv
+ 	@$(RM) -f $(BUILD_DIR)/.compiler-rt/*   && cd $(BUILD_DIR)/.compiler-rt && $(AR) x $(LINUX_SDK_DIR)/compiler-rt/libcompiler-rt.a
+ 	@$(RM) -f $(BUILD_DIR)/.tlibthread/*    && cd $(BUILD_DIR)/.tlibthread && $(AR) x $(LINUX_SDK_DIR)/tlibthread/libtlibthread.a
+@@ -95,7 +95,7 @@ $(LIBTLIBC): tlibthread compiler-rt tsafecrt tsetjmp tmm_rsrv
+ 	@$(RM) -rf $(BUILD_DIR)/.tsetjmp $(BUILD_DIR)/.tmm_rsrv
+ else
+ $(LIBTLIBC): tlibthread tsafecrt tsetjmp tmm_rsrv
+-	$(MAKE) -C tlibc/ SERVTD_ATTEST=1 -j$(shell nproc) 2> /dev/null
++	$(MAKE) -C tlibc/ SERVTD_ATTEST=1
+ 	@$(MKDIR) $(BUILD_DIR)/.tlibthread $(BUILD_DIR)/.tsafecrt $(BUILD_DIR)/.tsetjmp  $(BUILD_DIR)/.tmm_rsrv
+ 	@$(RM) -f $(BUILD_DIR)/.tlibthread/*    && cd $(BUILD_DIR)/.tlibthread && $(AR) x $(LINUX_SDK_DIR)/tlibthread/libtlibthread.a
+ 	@$(RM) -f $(BUILD_DIR)/.tsafecrt/*      && cd $(BUILD_DIR)/.tsafecrt   && $(AR) x $(LINUX_SDK_DIR)/tsafecrt/libsgx_tsafecrt.a
+@@ -118,7 +118,7 @@ tsafecrt:
+ 
+ .PHONY: compiler-rt
+ compiler-rt:
+-	$(MAKE) -C compiler-rt/ 2> /dev/null
++	$(MAKE) -C compiler-rt/
+ 
+ .PHONY: tsetjmp
+ tsetjmp:
+@@ -162,7 +162,7 @@ cpprt:
+ 
+ .PHONY: tlibcxx
+ tlibcxx: $(BUILD_DIR)
+-	$(MAKE) -C tlibcxx/ 2> /dev/null
++	$(MAKE) -C tlibcxx/
+ 	$(CP) tlibcxx/README.sgx $(BUILD_DIR)/libc++_Changes_SGX.txt
+ 
+ # ---------------------------------------------------
+diff --git a/sdk/cpprt/Makefile b/sdk/cpprt/Makefile
+index d1ac38a1..5fb90c21 100644
+--- a/sdk/cpprt/Makefile
++++ b/sdk/cpprt/Makefile
+@@ -83,7 +83,7 @@ $(CPPRT): $(OBJS) prepare-libunwind libunwind
+ libunwind:
+ 	cd $(LIBUNWIND_DIR)/ && \
+ 		( test -f Makefile || CFLAGS="$(CFLAGS)" ./autogen.sh ) && \
+-		$(MAKE) -j$(shell nproc)
++		$(MAKE)
+ 
+ 
+ .PHONY: clean
+-- 
+2.52.0
+

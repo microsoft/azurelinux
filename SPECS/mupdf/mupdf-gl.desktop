@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Mupdf-GL
+GenericName=PDF file viewer
+Comment=Lightweight PDF file viewer written on portable C
+Exec=mupdf-gl %f
+Icon=mupdf-gl
+Terminal=false
+Type=Application
+Categories=Viewer;Graphics;
+MimeType=application/pdf;application/x-pdf;

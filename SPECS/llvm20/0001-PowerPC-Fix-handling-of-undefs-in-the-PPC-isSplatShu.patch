@@ -1,0 +1,67 @@
+From 735d721de451067c3a618b309703d0b8beb9cacc Mon Sep 17 00:00:00 2001
+From: Wael Yehia <wmyehia2001@yahoo.com>
+Date: Mon, 23 Jun 2025 13:22:33 -0400
+Subject: [PATCH] [PowerPC] Fix handling of undefs in the
+ PPC::isSplatShuffleMask query (#145149)
+
+Currently, the query assumes that a single undef byte implies the rest of
+the `EltSize - 1` bytes are undefs, but that's not always true.
+e.g. isSplatShuffleMask(
+<0,1,2,3,4,5,6,7,undef,undef,undef,undef,0,1,2,3>, 8) should return
+false.
+
+---------
+
+Co-authored-by: Wael Yehia <wyehia@ca.ibm.com>
+---
+ llvm/lib/Target/PowerPC/PPCISelLowering.cpp | 13 +++++++++----
+ llvm/test/CodeGen/PowerPC/pr141642.ll       | 13 +++++++++++++
+ 2 files changed, 22 insertions(+), 4 deletions(-)
+ create mode 100644 llvm/test/CodeGen/PowerPC/pr141642.ll
+
+diff --git a/llvm/lib/Target/PowerPC/PPCISelLowering.cpp b/llvm/lib/Target/PowerPC/PPCISelLowering.cpp
+index 421a808de667..88c6fe632d26 100644
+--- a/llvm/lib/Target/PowerPC/PPCISelLowering.cpp
++++ b/llvm/lib/Target/PowerPC/PPCISelLowering.cpp
+@@ -2242,10 +2242,15 @@ bool PPC::isSplatShuffleMask(ShuffleVectorSDNode *N, unsigned EltSize) {
+       return false;
+ 
+   for (unsigned i = EltSize, e = 16; i != e; i += EltSize) {
+-    if (N->getMaskElt(i) < 0) continue;
+-    for (unsigned j = 0; j != EltSize; ++j)
+-      if (N->getMaskElt(i+j) != N->getMaskElt(j))
+-        return false;
++    // An UNDEF element is a sequence of UNDEF bytes.
++    if (N->getMaskElt(i) < 0) {
++      for (unsigned j = 1; j != EltSize; ++j)
++        if (N->getMaskElt(i + j) >= 0)
++          return false;
++    } else
++      for (unsigned j = 0; j != EltSize; ++j)
++        if (N->getMaskElt(i + j) != N->getMaskElt(j))
++          return false;
+   }
+   return true;
+ }
+diff --git a/llvm/test/CodeGen/PowerPC/pr141642.ll b/llvm/test/CodeGen/PowerPC/pr141642.ll
+new file mode 100644
+index 000000000000..38a706574786
+--- /dev/null
++++ b/llvm/test/CodeGen/PowerPC/pr141642.ll
+@@ -0,0 +1,13 @@
++; RUN: llc -mcpu=pwr8 -mtriple=powerpc64le-unknown-linux-gnu -O0 -debug-only=selectiondag -o - < %s 2>&1 | \
++; RUN:  FileCheck %s
++; CHECK-NOT: lxvdsx
++; CHECK-NOT: LD_SPLAT
++
++define weak_odr dso_local void @unpack(ptr noalias noundef %packed_in) local_unnamed_addr {
++entry:
++  %ld = load <2 x i32>, ptr %packed_in, align 2
++  %shuf = shufflevector <2 x i32> %ld, <2 x i32> poison, <4 x i32> <i32 0, i32 1, i32 poison, i32 0>
++  %ie = insertelement <4 x i32> %shuf, i32 7, i32 2
++  store <4 x i32> %shuf, ptr %packed_in, align 2
++  ret void
++}
+-- 
+2.49.0
+

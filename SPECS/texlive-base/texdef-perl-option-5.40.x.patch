@@ -1,0 +1,18 @@
+diff -up texmf-dist/scripts/texdef/texdef.pl.orig texmf-dist/scripts/texdef/texdef.pl
+--- texmf-dist/scripts/texdef/texdef.pl.orig	2025-07-18 14:43:22.865503978 +0200
++++ texmf-dist/scripts/texdef/texdef.pl	2025-07-18 14:46:49.871203706 +0200
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env perl
++texmf-dist/scripts/texdef/texdef.pl#!/usr/bin/env perl
+ ################################################################################
+ #  texdef -- Show definitions of TeX commands
+ #  Copyright (c) 2011-2020 Martin Scharrer <martin@scharrer-online.de>
+@@ -222,7 +222,7 @@ sub envcode {
+ }
+ 
+ ## Define and process options
+-Getopt::Long::Configure ("bundling");
++Getopt::Long::Configure ("bundling","no_ignore_case");
+ GetOptions (
+    'value|v!' => \$SHOWVALUE,
+    'Environment|E!' => \$ISENVIRONMENT,

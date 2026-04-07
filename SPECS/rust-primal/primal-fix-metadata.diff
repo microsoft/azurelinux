@@ -1,0 +1,13 @@
+--- primal-0.3.3/Cargo.toml	1970-01-01T00:00:01+00:00
++++ primal-0.3.3/Cargo.toml	2024-06-10T16:29:21.798060+00:00
+@@ -53,10 +53,6 @@
+ [dependencies.primal-sieve]
+ version = "0.3"
+ 
+-[dev-dependencies.criterion]
+-version = "0.3.4"
+-features = ["html_reports"]
+-
+ [dev-dependencies.primal-slowsieve]
+ version = "0.3"
+ 

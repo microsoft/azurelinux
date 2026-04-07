@@ -1,0 +1,27 @@
+From 4f98eeaac5395dca9ac9c5066f2ba85083826464 Mon Sep 17 00:00:00 2001
+From: Tom Stellard <tstellar@redhat.com>
+Date: Thu, 27 Jun 2024 19:27:19 +0000
+Subject: [PATCH] llvm_gtest: Only install once
+
+llvm_gtest and its dependencies were being installed twice (and
+into two different locations depending on the cmake options).
+---
+ third-party/unittest/CMakeLists.txt | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/third-party/unittest/CMakeLists.txt b/third-party/unittest/CMakeLists.txt
+index bf6ef5455514..8b38791629a4 100644
+--- a/third-party/unittest/CMakeLists.txt
++++ b/third-party/unittest/CMakeLists.txt
+@@ -85,8 +85,6 @@ target_include_directories(llvm_gtest
+ add_subdirectory(UnitTestMain)
+ 
+ if (LLVM_INSTALL_GTEST)
+-  install(TARGETS llvm_gtest llvm_gtest_main LLVMTestingSupport LLVMTestingAnnotations
+-	  ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}" COMPONENT llvm_gtest)
+   install(DIRECTORY googletest/include/gtest/ DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/llvm-gtest/gtest/" COMPONENT llvm_gtest)
+   install(DIRECTORY googlemock/include/gmock/ DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/llvm-gmock/gmock/" COMPONENT llvm_gtest)
+ endif()
+-- 
+2.42.0
+

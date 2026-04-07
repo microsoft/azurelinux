@@ -1,0 +1,35 @@
+From b205fbbf2fa4faef3bedd484128b6b9619d3e10d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tom=C3=A1=C5=A1=20Hrn=C4=8Diar?= <thrnciar@redhat.com>
+Date: Tue, 21 Feb 2023 14:11:43 +0100
+Subject: [PATCH] Set mandatory name attribute in Command class to make
+ pytzdata compatible with cleo 2.0.0+
+
+---
+ pytzdata/commands/make.py  | 1 +
+ pytzdata/commands/zones.py | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/pytzdata/commands/make.py b/pytzdata/commands/make.py
+index e0a7b4b..78822d1 100644
+--- a/pytzdata/commands/make.py
++++ b/pytzdata/commands/make.py
+@@ -20,6 +20,7 @@ class MakeCommand(Command):
+         {version? : The version to make.}
+         {--path= : The destination directory.}
+     """
++    name = "make"
+ 
+     FILES = ["tzcode-latest.tar.gz", "tzdata-latest.tar.gz"]
+ 
+diff --git a/pytzdata/commands/zones.py b/pytzdata/commands/zones.py
+index ef3e33a..9ac7c2e 100644
+--- a/pytzdata/commands/zones.py
++++ b/pytzdata/commands/zones.py
+@@ -13,6 +13,7 @@ class ZonesCommand(Command):
+ 
+     zones:dump
+     """
++    name = "zones"
+ 
+     TEMPLATE = """# -*- coding: utf-8 -*-
+ 

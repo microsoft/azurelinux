@@ -1,0 +1,21 @@
+[Unit]
+Description=SGX Architectural Enclave Service Manager 
+After=syslog.target auditd.service
+ConditionPathExists=/dev/sgx_enclave
+
+[Service]
+Type=simple
+User=aesmd
+ExecStart=/usr/bin/aesmd --no-daemon
+ExecReload=/bin/kill -SIGHUP $MAINPID
+Restart=on-failure
+RestartSec=15s
+
+WorkingDirectory=/var/lib/aesmd
+InaccessibleDirectories=/home
+DevicePolicy=closed
+DeviceAllow=/dev/sgx_enclave rw
+DeviceAllow=/dev/sgx_provision rw
+
+[Install]
+WantedBy=multi-user.target

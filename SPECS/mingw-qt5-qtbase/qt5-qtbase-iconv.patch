@@ -1,0 +1,12 @@
+diff -rupN --no-dereference qtbase-everywhere-src-5.15.18/src/corelib/configure.json qtbase-everywhere-src-5.15.18-new/src/corelib/configure.json
+--- qtbase-everywhere-src-5.15.18/src/corelib/configure.json	2025-06-05 16:07:26.000000000 +0200
++++ qtbase-everywhere-src-5.15.18-new/src/corelib/configure.json	2025-11-07 14:10:29.994714554 +0100
+@@ -675,7 +675,7 @@
+             "label": "GNU iconv",
+             "enable": "input.iconv == 'gnu'",
+             "disable": "input.iconv == 'posix' || input.iconv == 'sun' || input.iconv == 'no'",
+-            "condition": "!config.win32 && !config.qnx && !config.android && !config.darwin && !features.posix-libiconv && !features.sun-libiconv && libs.gnu_iconv",
++            "condition": "!config.qnx && !config.android && !config.darwin && !features.posix-libiconv && !features.sun-libiconv && libs.gnu_iconv",
+             "output": [ "privateFeature" ]
+         },
+         "icu": {

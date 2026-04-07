@@ -1,0 +1,21 @@
+permit autolinking manual pages with textual suffixes (e.g. "3p" for perl)
+(resolves RHBZ#1077297)
+replaces 021-man2html-perl_modules.patch
+
+diff -up man-1.6f/man2html/man2html.c.pom man-1.6f/man2html/man2html.c
+--- man-1.6f/man2html/man2html.c.pom	2009-10-12 09:56:00.000000000 +0200
++++ man-1.6f/man2html/man2html.c	2009-10-12 09:59:35.000000000 +0200
+@@ -171,7 +171,12 @@ add_links(char *c)
+                                 /* section is n or l or starts with a digit */
+ 		  && strchr("123456789nl", f[1])
+ 		  && (g-f == 2 || (g-f == 3 && isdigit(f[1]) && isalpha(f[2]))
+-		               || (f[2] == 'X' && isdigit(f[1])))
++		               || (g-f == 4 && isdigit(f[1]) && isalpha(f[2]) && 
++		                   isalpha(f[3]))
++		               || (g-f == 5 && isdigit(f[1]) && isalpha(f[2]) &&
++		                   isalpha(f[3]) && isalpha(f[4]))
++		               || (g-f == 6 && isdigit(f[1]) && isalpha(f[2]) &&
++		                   isalpha(f[3]) && isalpha(f[4]) && isalpha(f[5])))
+ 	       ) {
+ 		/* this might be a link */
+ 		h=f-1;

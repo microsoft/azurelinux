@@ -1,0 +1,62 @@
+From 3c1fc07ee28a25f32978c6e85af06edc0095593d Mon Sep 17 00:00:00 2001
+From: NIIBE Yutaka <gniibe@fsij.org>
+Date: Tue, 22 Aug 2023 15:20:54 +0900
+Subject: Add keyboxd systemd support
+
+Forwarded: not-needed
+Last-Update: 2023-08-22
+---
+ doc/Makefile.am                           |  2 ++
+ doc/examples/systemd-user/keyboxd.service |  8 ++++++++
+ doc/examples/systemd-user/keyboxd.socket  | 11 +++++++++++
+ 3 files changed, 21 insertions(+)
+ create mode 100644 doc/examples/systemd-user/keyboxd.service
+ create mode 100644 doc/examples/systemd-user/keyboxd.socket
+
+diff --git a/doc/Makefile.am b/doc/Makefile.am
+index 15127859f..db5847e2e 100644
+--- a/doc/Makefile.am
++++ b/doc/Makefile.am
+@@ -33,6 +33,8 @@ examples = examples/README examples/scd-event examples/trustlist.txt	\
+ 	   examples/systemd-user/gpg-agent-ssh.socket 			\
+ 	   examples/systemd-user/gpg-agent-browser.socket		\
+ 	   examples/systemd-user/gpg-agent-extra.socket 		\
++	   examples/systemd-user/keyboxd.service			\
++	   examples/systemd-user/keyboxd.socket				\
+ 	   examples/pwpattern.list
+ 
+ helpfiles = help.txt help.be.txt help.ca.txt help.cs.txt		\
+diff --git a/doc/examples/systemd-user/keyboxd.service b/doc/examples/systemd-user/keyboxd.service
+new file mode 100644
+index 000000000..0adc40703
+--- /dev/null
++++ b/doc/examples/systemd-user/keyboxd.service
+@@ -0,0 +1,8 @@
++[Unit]
++Description=GnuPG public key management service
++Documentation=man:keyboxd(8)
++Requires=keyboxd.socket
++
++[Service]
++ExecStart=/usr/lib/gnupg/keyboxd --supervised
++ExecReload=/usr/bin/gpgconf --reload keyboxd
+diff --git a/doc/examples/systemd-user/keyboxd.socket b/doc/examples/systemd-user/keyboxd.socket
+new file mode 100644
+index 000000000..d4572f1b6
+--- /dev/null
++++ b/doc/examples/systemd-user/keyboxd.socket
+@@ -0,0 +1,11 @@
++[Unit]
++Description=GnuPG public key management service
++Documentation=man:keyboxd(8)
++
++[Socket]
++ListenStream=%t/gnupg/S.keyboxd
++SocketMode=0600
++DirectoryMode=0700
++
++[Install]
++WantedBy=sockets.target
+-- 
+2.47.2
+

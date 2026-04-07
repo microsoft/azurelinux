@@ -1,0 +1,24 @@
+From 01b9bddc0c2165baa46abe7562550ef4e8c2752b Mon Sep 17 00:00:00 2001
+From: Erik Larsson <erik@tuxera.com>
+Date: Wed, 3 May 2023 09:57:34 +0200
+Subject: [PATCH] attrib.c: Fix errno not being set on NULL character in
+ attribute name.
+
+This is an error condition as we jump to err_out, but there's no errno
+value set to accompany it. Fixed by setting EIO.
+---
+ libntfs-3g/attrib.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/libntfs-3g/attrib.c b/libntfs-3g/attrib.c
+index efb91943..652a60f8 100644
+--- a/libntfs-3g/attrib.c
++++ b/libntfs-3g/attrib.c
+@@ -433,6 +433,7 @@ ntfs_attr *ntfs_attr_open(ntfs_inode *ni, const ATTR_TYPES type,
+ 		if (ntfs_ucsnlen(name, name_len) != name_len) {
+ 			ntfs_log_error("Null character in attribute name"
+ 				" of inode %lld\n",(long long)ni->mft_no);
++			errno = EIO;
+ 			goto err_out;
+ 		}
+ 		name = ntfs_ucsndup(name, name_len);

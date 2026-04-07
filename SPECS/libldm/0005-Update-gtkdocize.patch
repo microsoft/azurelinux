@@ -1,0 +1,88 @@
+From 1eafb653ac6347a9d4281848c8295f9daffb1613 Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Thu, 6 Feb 2025 13:44:14 +0000
+Subject: [PATCH 5/5] Update gtkdocize
+
+---
+ gtk-doc.make  | 15 ++++++++-------
+ m4/gtk-doc.m4 |  0
+ 2 files changed, 8 insertions(+), 7 deletions(-)
+ mode change 100755 => 100644 gtk-doc.make
+ mode change 100755 => 100644 m4/gtk-doc.m4
+
+diff --git a/gtk-doc.make b/gtk-doc.make
+old mode 100755
+new mode 100644
+index 7d9a27f..fb2e7e2
+--- a/gtk-doc.make
++++ b/gtk-doc.make
+@@ -57,6 +57,7 @@ DOC_STAMPS=setup-build.stamp scan-build.stamp sgml-build.stamp \
+ 	sgml.stamp html.stamp pdf.stamp
+ 
+ SCANOBJ_FILES = 		 \
++	$(DOC_MODULE).actions	 \
+ 	$(DOC_MODULE).args 	 \
+ 	$(DOC_MODULE).hierarchy  \
+ 	$(DOC_MODULE).interfaces \
+@@ -135,7 +136,7 @@ scan-build.stamp: setup-build.stamp $(HFILE_GLOB) $(CFILE_GLOB)
+ 	gtkdoc-scan --module=$(DOC_MODULE) --ignore-headers="$(IGNORE_HFILES)" $${_source_dir} $(SCAN_OPTIONS) $(EXTRA_HFILES)
+ 	$(GTK_DOC_V_INTROSPECT)if grep -l '^..*$$' $(DOC_MODULE).types > /dev/null 2>&1 ; then \
+ 	  scanobj_options=""; \
+-	  gtkdoc-scangobj 2>&1 --help | grep  >/dev/null "\-\-verbose"; \
++	  gtkdoc-scangobj 2>&1 --help | grep  >/dev/null "\--verbose"; \
+ 	  if test "$$?" = "0"; then \
+ 	    if test "x$(V)" = "x1"; then \
+ 	      scanobj_options="--verbose"; \
+@@ -197,13 +198,13 @@ GTK_DOC_V_XREF_0=@echo "  DOC   Fixing cross-references";
+ html-build.stamp: sgml.stamp $(DOC_MAIN_SGML_FILE) $(content_files) $(expand_content_files)
+ 	$(GTK_DOC_V_HTML)rm -rf html && mkdir html && \
+ 	mkhtml_options=""; \
+-	gtkdoc-mkhtml 2>&1 --help | grep  >/dev/null "\-\-verbose"; \
++	gtkdoc-mkhtml 2>&1 --help | grep  >/dev/null "\--verbose"; \
+ 	if test "$$?" = "0"; then \
+ 	  if test "x$(V)" = "x1"; then \
+ 	    mkhtml_options="$$mkhtml_options --verbose"; \
+ 	  fi; \
+ 	fi; \
+-	gtkdoc-mkhtml 2>&1 --help | grep  >/dev/null "\-\-path"; \
++	gtkdoc-mkhtml 2>&1 --help | grep  >/dev/null "\--path"; \
+ 	if test "$$?" = "0"; then \
+ 	  mkhtml_options="$$mkhtml_options --path=\"$(abs_srcdir)\""; \
+ 	fi; \
+@@ -226,7 +227,7 @@ GTK_DOC_V_PDF_0=@echo "  DOC   Building PDF";
+ pdf-build.stamp: sgml.stamp $(DOC_MAIN_SGML_FILE) $(content_files) $(expand_content_files)
+ 	$(GTK_DOC_V_PDF)rm -f $(DOC_MODULE).pdf && \
+ 	mkpdf_options=""; \
+-	gtkdoc-mkpdf 2>&1 --help | grep  >/dev/null "\-\-verbose"; \
++	gtkdoc-mkpdf 2>&1 --help | grep  >/dev/null "\--verbose"; \
+ 	if test "$$?" = "0"; then \
+ 	  if test "x$(V)" = "x1"; then \
+ 	    mkpdf_options="$$mkpdf_options --verbose"; \
+@@ -235,7 +236,7 @@ pdf-build.stamp: sgml.stamp $(DOC_MAIN_SGML_FILE) $(content_files) $(expand_cont
+ 	if test "x$(HTML_IMAGES)" != "x"; then \
+ 	  for img in $(HTML_IMAGES); do \
+ 	    part=`dirname $$img`; \
+-	    echo $$mkpdf_options | grep >/dev/null "\-\-imgdir=$$part "; \
++	    echo $$mkpdf_options | grep >/dev/null "\--imgdir=$$part "; \
+ 	    if test $$? != 0; then \
+ 	      mkpdf_options="$$mkpdf_options --imgdir=$$part"; \
+ 	    fi; \
+@@ -249,10 +250,10 @@ pdf-build.stamp: sgml.stamp $(DOC_MAIN_SGML_FILE) $(content_files) $(expand_cont
+ clean-local:
+ 	@rm -f *~ *.bak
+ 	@rm -rf .libs
+-	@if echo $(SCAN_OPTIONS) | grep -q "\-\-rebuild-types" ; then \
++	@if echo $(SCAN_OPTIONS) | grep -q "\--rebuild-types" ; then \
+ 	  rm -f $(DOC_MODULE).types; \
+ 	fi
+-	@if echo $(SCAN_OPTIONS) | grep -q "\-\-rebuild-sections" ; then \
++	@if echo $(SCAN_OPTIONS) | grep -q "\--rebuild-sections" ; then \
+ 	  rm -f $(DOC_MODULE)-sections.txt; \
+ 	fi
+ 
+diff --git a/m4/gtk-doc.m4 b/m4/gtk-doc.m4
+old mode 100755
+new mode 100644
+-- 
+2.48.1
+

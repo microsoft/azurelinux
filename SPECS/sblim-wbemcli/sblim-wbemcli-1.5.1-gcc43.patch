@@ -1,0 +1,12 @@
+diff -up sblim-wbemcli-1.5.1/CimXml.h.BAD sblim-wbemcli-1.5.1/CimXml.h
+--- sblim-wbemcli-1.5.1/CimXml.h.BAD	2008-06-20 10:10:54.000000000 -0500
++++ sblim-wbemcli-1.5.1/CimXml.h	2008-06-20 10:11:07.000000000 -0500
+@@ -26,7 +26,7 @@
+ 
+ #include <cstdio>
+ #include <cstdlib>
+-#include <string>
++#include <cstring>
+ #include <vector>
+ #include <iostream>
+ 
