@@ -13,9 +13,13 @@ Patch0:         CVE-2024-8176.patch
 Patch1:         CVE-2025-59375.patch
 Patch2:         CVE-2026-24515.patch
 Patch3:         CVE-2026-25210.patch
+<<<<<<< HEAD
 Patch4:         CVE-2026-32776.patch
 Patch5:         CVE-2026-32777.patch
 Patch6:         CVE-2026-32778.patch
+=======
+Patch4:         Stop-updating-event-pointer-on-exit-for-reentry.patch 
+>>>>>>> d5be4a7af ([AutoPR- Security] Patch perl-XML-Parser for CVE-2006-10003, CVE-2006-10002 [HIGH] (#16241))
 Requires:       %{name}-libs = %{version}-%{release}
 
 %description
@@ -73,8 +77,14 @@ rm -rf %{buildroot}/%{_docdir}/%{name}
 %{_libdir}/libexpat.so.1*
 
 %changelog
+<<<<<<< HEAD
 * Wed Mar 18 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.6.4-5
 - Patch for CVE-2026-32778, CVE-2026-32777, CVE-2026-32776
+=======
+* Tue Mar 31 2026 Aditya Singh <v-aditysing@microsoft.com> - 2.6.4-5
+- Patch to restore event pointer behavior from Expat 2.6.4
+- which was changed due to fix for CVE-2024-8176.
+>>>>>>> d5be4a7af ([AutoPR- Security] Patch perl-XML-Parser for CVE-2006-10003, CVE-2006-10002 [HIGH] (#16241))
 
 * Mon Feb 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.6.4-4
 - Patch for CVE-2026-25210
