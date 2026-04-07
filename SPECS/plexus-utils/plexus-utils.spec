@@ -16,7 +16,7 @@ Summary:        Plexus Common Utilities
 #
 Name:           plexus-utils
 Version:        3.3.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -24,6 +24,7 @@ Group:          Development/Libraries/Java
 URL:            https://codehaus-plexus.github.io/plexus-utils/
 Source0:        https://github.com/codehaus-plexus/%{name}/archive/%{name}-%{version}.tar.gz
 Source1:        http://apache.org/licenses/LICENSE-2.0.txt
+Patch0:         CVE-2025-67030.patch
 BuildRequires:  javapackages-bootstrap
 BuildRequires:  fdupes
 BuildRequires:  javapackages-local-bootstrap
@@ -44,7 +45,7 @@ Group:          Documentation/HTML
 Javadoc for %{name}.
 
 %prep
-%setup -q -n %{name}-%{name}-%{version}
+%autosetup -p1 -n %{name}-%{name}-%{version}
 
 cp %{SOURCE1} .
 
@@ -60,15 +61,21 @@ cp %{SOURCE1} .
  
 %install
 %mvn_install
+# Remove embedded legal files from javadoc; license is covered by top-level %license files
+rm -f %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO
+rm -f %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE
 
 %files -f .mfiles
-%doc NOTICE.txt LICENSE-2.0.txt
+%license NOTICE.txt LICENSE-2.0.txt
 
 %files javadoc
-%doc NOTICE.txt LICENSE-2.0.txt
+%license NOTICE.txt LICENSE-2.0.txt
 %{_javadocdir}/%{name}
 
 %changelog
+* Mon Mar 30 2026 Jyoti kanase <v-jykanase@microsoft.com> - 3.3.0-5
+- Patch for CVE-2025-67030
+
 * Fri Feb 23 2024 Riken Maharjan <rmaharjan@microsoft.com> - 3.3.0-4
 - Rebuilt with msopenjdk-17 and maven
 - change source, target
