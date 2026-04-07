@@ -43,7 +43,13 @@ BuildRequires: python%{python3_pkgversion}-setuptools
 BuildRequires: make
 BuildRequires: python3-pip
 BuildRequires: python3-wheel
- 
+Requires: python%{python3_pkgversion}-rpm
+Requires: python%{python3_pkgversion}-requests
+Requires: python%{python3_pkgversion}-requests-gssapi
+Requires: python%{python3_pkgversion}-dateutil
+Requires: python%{python3_pkgversion}-six
+Requires: python%{python3_pkgversion}-defusedxml
+
 %description -n python%{python3_pkgversion}-%{name}
 Koji is a system for building and tracking RPMS.
 This subpackage provides python functions and libraries.
@@ -74,6 +80,8 @@ Summary: Koji XMLRPC interface
 License: LGPL-2.1-only
 # rpmdiff lib (from rpmlint) is GPLv2 (only)
 Requires: httpd
+Requires: python%{python3_pkgversion}-mod_wsgi
+Requires: mod_auth_gssapi
 Requires: python%{python3_pkgversion}-psycopg2
 Requires: python%{python3_pkgversion}-%{name} = %{version}-%{release}
 Provides: %{name}-hub-code = %{version}-%{release}
@@ -96,6 +104,7 @@ Plugins to the koji XMLRPC interface
 Summary: Koji hub plugins
 License: LGPL-2.1-only
 Requires: python%{python3_pkgversion}-%{name}-hub = %{version}-%{release}
+Requires: python%{python3_pkgversion}-qpid-proton
 Requires: cpio
 Provides: %{name}-hub-plugins-code = %{version}-%{release}
  
@@ -124,8 +133,10 @@ Requires: /usr/bin/git
 Requires: createrepo_c >= 0.10.0
 Requires: python%{python3_pkgversion}-%{name} = %{version}-%{release}
 Requires: python%{python3_pkgversion}-librepo
+Requires: python%{python3_pkgversion}-multilib
 Requires: python%{python3_pkgversion}-cheetah
- 
+Requires: python%{python3_pkgversion}-pycdio
+
 %description builder
 koji-builder is the daemon that runs on build machines and executes
 tasks that come through the Koji system.
@@ -139,6 +150,7 @@ Requires(preun): systemd
 Requires(postun): systemd
 Requires: python%{python3_pkgversion}-libvirt
 Requires: python%{python3_pkgversion}-libxml2
+Requires: /usr/bin/virt-clone
 Requires: qemu-img
  
 %description vm
@@ -175,7 +187,10 @@ Summary: Koji Web UI
 License: LGPL-2.1-only
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{name}-web}
 Requires: httpd
+Requires: python%{python3_pkgversion}-mod_wsgi
+Requires: mod_auth_gssapi
 Requires: python%{python3_pkgversion}-psycopg2
+Requires: python%{python3_pkgversion}-cheetah
 Requires: python%{python3_pkgversion}-%{name} = %{version}-%{release}
 Provides: %{name}-web-code = %{version}-%{release}
  

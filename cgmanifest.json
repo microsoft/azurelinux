@@ -22352,6 +22352,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-build",
+          "version": "1.4.2",
+          "downloadUrl": "https://github.com/pypa/build/archive/1.4.2/build-1.4.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-boto3",
           "version": "1.10.21",
           "downloadUrl": "https://github.com/boto/boto3/archive/1.10.21.tar.gz"
@@ -23862,6 +23872,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-multilib",
+          "version": "1.3",
+          "downloadUrl": "https://releases.pagure.org/releng/python-multilib/python-multilib-1.3.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-mutagen",
           "version": "1.47.0",
           "downloadUrl": "https://github.com/quodlibet/mutagen/releases/download/release-1.47.0/mutagen-1.47.0.tar.gz"
@@ -24302,6 +24322,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-pycdio",
+          "version": "2.1.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/73/02/e482cd03681c641aba3863216029814443c023ac772ea5c638b3ff8e699f/pycdio-2.1.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-pycdlib",
           "version": "1.9.0",
           "downloadUrl": "https://github.com/clalancette/pycdlib/archive/v1.9.0/pycdlib-1.9.0.tar.gz"
@@ -24415,6 +24445,16 @@
           "name": "python-pyproject-api",
           "version": "1.6.1",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pyproject-api/pyproject_api-1.6.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-pyproject-hooks",
+          "version": "1.2.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pyproject_hooks/pyproject_hooks-1.2.0.tar.gz"
         }
       }
     },
@@ -24685,6 +24725,16 @@
           "name": "python-requests-ftp",
           "version": "0.3.1",
           "downloadUrl": "https://pypi.python.org/packages/source/r/requests-ftp/requests-ftp-0.3.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-requests-gssapi",
+          "version": "1.4.0",
+          "downloadUrl": "https://github.com/pythongssapi/requests-gssapi/archive/v1.4.0/requests-gssapi-1.4.0.tar.gz"
         }
       }
     },
@@ -25965,6 +26015,16 @@
           "name": "qperf",
           "version": "0.4.9",
           "downloadUrl": "http://www.openfabrics.org/downloads/qperf/qperf-0.4.9.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "qpid-proton",
+          "version": "0.40.0",
+          "downloadUrl": "https://archive.apache.org/dist/qpid/proton/0.40.0/qpid-proton-0.40.0.tar.gz"
         }
       }
     },
@@ -30018,6 +30078,16 @@
           "name": "virglrenderer",
           "version": "1.0.1",
           "downloadUrl": "https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/1.0.1/virglrenderer-1.0.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "virt-manager",
+          "version": "5.1.0",
+          "downloadUrl": "https://releases.pagure.org/virt-manager/virt-manager-5.1.0.tar.xz"
         }
       }
     },
