@@ -14,6 +14,7 @@ components = [
     "glib2",
     "git",
     "gnutls",
+    "golang-cloud-google",
     "golang-cloud-google-storage",
     "golang-dario-mergo",
     "golang-github-aws-smithy",

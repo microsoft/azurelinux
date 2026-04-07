@@ -1,0 +1,3 @@
+[components.golang-cloud-google]
+# Pin to an older commit with matching sources file hash.
+spec = { type = "upstream", upstream-commit = "d385b6877ca9ed6b771cb54f4d0765c5b04d4366" }
