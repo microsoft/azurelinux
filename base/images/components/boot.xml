@@ -2,48 +2,7 @@
 	<profiles>
 		<profile name="BootCore" description="Boot core packages"/>
 		<profile name="BootCoreUKI" description="Boot core packages for UKI"/>
-		<profile name="BootDiskCore" description="Boot disk core configuration">
-			<requires profile="BaseCommon"/>
-			<requires profile="HardwareCommon"/>
-			<requires profile="BootCore"/>
-		</profile>
 	</profiles>
-	<preferences profiles="BootDiskCore" arch="x86_64">
-		<type image="oem"
-		      filesystem="ext4"
-		      kernelcmdline="rhgb quiet" devicepersistency="by-uuid"
-		      bootpartition="true" bootpartsize="2000" bootfilesystem="ext4" efipartsize="500" firmware="uefi"
-		      rootfs_label="azurelinux"
-		      >
-			<bootloader name="grub2" bls="true" console="console" timeout="5"/>
-			<systemdisk name="azurelinux">
-				<volume name="@root=root"/>
-				<volume name="home" parent="/"/>
-				<volume name="var" parent="/"/>
-			</systemdisk>
-			<oemconfig>
-				<oem-resize>false</oem-resize>
-			</oemconfig>
-		</type>
-	</preferences>
-	<preferences profiles="BootDiskCore" arch="aarch64">
-		<type image="oem"
-		      filesystem="ext4"
-		      kernelcmdline="rhgb quiet" devicepersistency="by-uuid" force_mbr="true" editbootinstall="editbootinstall_rpilegacy.sh"
-		      bootpartition="true" bootpartsize="2000" bootfilesystem="ext4" efipartsize="500" disk_start_sector="34816" firmware="uefi"
-		      rootfs_label="azurelinux"
-		      >
-			<bootloader name="grub2" bls="true" console="console" timeout="5"/>
-			<systemdisk name="azurelinux">
-				<volume name="@root=root"/>
-				<volume name="home" parent="/"/>
-				<volume name="var" parent="/"/>
-			</systemdisk>
-			<oemconfig>
-				<oem-resize>false</oem-resize>
-			</oemconfig>
-		</type>
-	</preferences>
 	<packages type="bootstrap" patternType="plusRecommended" profiles="BootCore,BootCoreUKI">
 		<package name="grubby"/>
 	</packages>
@@ -73,14 +32,5 @@
 	<packages type="iso" patternType="plusRecommended" profiles="BootCore">
 		<package name="grub2-efi-aa64-cdboot" arch="aarch64"/>
 		<package name="grub2-efi-x64-cdboot" arch="x86_64"/>
-	</packages>
-	<packages type="image" patternType="plusRecommended" profiles="BootDiskCore">
-		<ignore name="kernel-*debug*"/>
-		<package name="arm-image-installer" arch="aarch64"/>
-		<package name="glibc-all-langpacks"/>
-		<package name="kernel"/>
-		<package name="kernel-modules"/>
-		<package name="kernel-modules-extra"/>
-		<package name="uboot-images-armv8" arch="aarch64"/>
 	</packages>
 </image>
