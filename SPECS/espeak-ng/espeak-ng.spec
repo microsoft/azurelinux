@@ -1,7 +1,7 @@
 Summary:        Compact text-to-speech synthesizer
 Name:           espeak-ng
 Version:        1.52.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 # Apache2 license applies only to Android APK code- does not apply here
 # BSD license applies only to Windows code- does not apply here
 License:        GPLv3 AND Unicode
@@ -61,7 +61,8 @@ mv %{buildroot}%{_datadir}/vim/addons %{buildroot}%{_datadir}/vim/vimfiles
 rm -vrf %{buildroot}%{_datadir}/vim/registry
 
 %check
-%make_build check
+# Disable parallel build
+%make_build -j1 check
 
 %ldconfig_scriptlets
 
@@ -89,6 +90,9 @@ rm -vrf %{buildroot}%{_datadir}/vim/registry
 %{_datadir}/vim/vimfiles/syntax/espeakrules.vim
 
 %changelog
+* Wed Feb 25 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.52.0-2
+- Disabled parallel build in check section to resolve ptest failures.
+
 * Thu Apr 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.52.0-1
 - Auto-upgrade to 1.52.0 - remove chrome extension which used unverified function
 - Removing patch file for CVE-2023-49990 as it is fixed in newest version.
