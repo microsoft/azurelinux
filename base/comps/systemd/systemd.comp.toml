@@ -27,3 +27,10 @@ description = "Disable Xen in meson — set have_xen to 0 so -Dxenctrl=disabled 
 type = "spec-search-replace"
 regex = '%global have_xen 1'
 replacement = "%global have_xen 0"
+
+[[components.systemd.overlays]]
+description = "Disable udev rule that sets default io scheduler to bfq"
+type = "file-search-replace"
+file = "60-block-scheduler.rules"
+regex = "(?m)^"
+replacement = "#"
