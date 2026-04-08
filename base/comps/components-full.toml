@@ -3607,7 +3607,6 @@
 [components.plasma-desktop]
 [components.plasma-integration]
 [components.plasma-keyboard]
-[components.plasma-login-manager]
 [components.plasma-systemsettings]
 [components.plasma-wayland-protocols]
 [components.plasma-workspace]
