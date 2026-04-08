@@ -73,7 +73,7 @@ os:
     mode: permissive
 
   uki:
-    kernels: auto
+    mode: create
   
   kernelCommandLine:
     extraCommandLine:
