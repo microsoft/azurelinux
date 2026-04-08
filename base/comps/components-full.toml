@@ -230,7 +230,6 @@
 [components.GitPython]
 [components.GraphicsMagick]
 [components.HdrHistogram_c]
-[components.ImageMagick]
 [components.JUnitParams]
 [components.Judy]
 [components.LibRaw]
