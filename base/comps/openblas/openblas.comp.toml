@@ -1,0 +1,13 @@
+[components.openblas]
+
+# The openblas %build section runs `make ... lapack-test`, which invokes
+# lapack_testing.py (a Python 3 script). Upstream Fedora doesn't declare
+# BuildRequires: python3 either, but python3 gets pulled in transitively
+# through perl-devel → systemtap-sdt-devel → python3. AZL builds perl
+# without systemtap (build.without = ["perl_enables_systemtap"]), breaking
+# that chain and leaving python3 unavailable in the buildroot.
+[[components.openblas.overlays]]
+description = "Add missing BuildRequires on python3 needed by lapack_testing.py during %build"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "python3"
