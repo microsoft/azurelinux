@@ -1,0 +1,16 @@
+# WORKAROUND: Bootstrap tag contamination causes SONAME mismatch for libplasma.
+# The bootstrap tag was seeded with fc43's libplasma-6.6.3 (provides .so.7), but
+# the AZL snapshot selects 6.6.0 (provides .so.6). The bootstrap kscreenlocker
+# linked against .so.7 and its NVR (~bootstrap.20260405) sorts higher than the
+# non-bootstrap rebuild (~20260407), so the stale bootstrap version wins.
+# This overlay pins BuildRequires to libplasma-devel < 6.6.1 to force building
+# against libplasma 6.6.0 from Fedora. Remove this once bootstrap builds are
+# done.
+
+[components.kscreenlocker]
+
+[[components.kscreenlocker.overlays]]
+description = "Workaround: pin libplasma to 6.6.0 to avoid SONAME mismatch from bootstrap contamination. Remove once bootstrap builds are done ."
+type = "spec-search-replace"
+regex = "^BuildRequires:\\s+cmake\\(PlasmaQuick\\)$"
+replacement = "BuildRequires:  cmake(PlasmaQuick)\nBuildRequires:  libplasma-devel < 6.6.1"
