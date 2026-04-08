@@ -4223,6 +4223,7 @@
 [components.python-mypy_extensions]
 [components.python-mysqlclient]
 [components.python-myst-parser]
+[components.python-nanobind]
 [components.python-natsort]
 [components.python-nbclient]
 [components.python-nbconvert]
