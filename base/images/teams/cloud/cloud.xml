@@ -21,19 +21,11 @@
 		      filesystem="ext4"
 		      kernelcmdline="no_timer_check console=tty1 console=ttyS0,115200n8 earlyprintk=ttyS0 systemd.firstboot=off"
 		      devicepersistency="by-uuid"
-		      bootpartition="true" bootpartsize="2000" bootfilesystem="ext4" efipartsize="100" firmware="uefi"
+		      bootpartition="false" efipartsize="100" firmware="uefi"
 		      rootfs_label="azurelinux"
 		      >
 			<bootloader name="grub2" bls="true" console="serial" timeout="0"/>
-			<systemdisk>
-				<volume name="@root=root"/>
-				<volume name="home" parent="/"/>
-				<volume name="var" parent="/"/>
-			</systemdisk>
 			<size unit="G">5</size>
-			<oemconfig>
-				<oem-resize>false</oem-resize>
-			</oemconfig>
 		</type>
 	</preferences>
 	<preferences profiles="Cloud-Base-Azure" arch="aarch64">
@@ -41,19 +33,11 @@
 		      filesystem="ext4"
 		      kernelcmdline="no_timer_check console=tty1 console=ttyAMA0,115200n8 earlyprintk=ttyAMA0 systemd.firstboot=off"
 		      devicepersistency="by-uuid"
-		      bootpartition="true" bootpartsize="2000" bootfilesystem="ext4" efipartsize="100" firmware="uefi"
+		      bootpartition="false" efipartsize="100" firmware="uefi"
 		      rootfs_label="azurelinux"
 		      >
 			<bootloader name="grub2" console="serial" timeout="0"/>
-			<systemdisk>
-				<volume name="@root=root"/>
-				<volume name="home" parent="/"/>
-				<volume name="var" parent="/"/>
-			</systemdisk>
 			<size unit="G">5</size>
-			<oemconfig>
-				<oem-resize>false</oem-resize>
-			</oemconfig>
 		</type>
 	</preferences>
 	<preferences profiles="Cloud-Base-Generic" arch="x86_64">
@@ -61,19 +45,11 @@
 		      filesystem="ext4"
 		      kernelcmdline="no_timer_check console=tty1 console=ttyS0,115200n8 systemd.firstboot=off"
 		      devicepersistency="by-uuid"
-		      bootpartition="true" bootpartsize="2000" bootfilesystem="ext4" efipartsize="100" firmware="uefi"
+		      bootpartition="false" efipartsize="100" firmware="uefi"
 		      rootfs_label="azurelinux"
 		      >
 			<bootloader name="grub2" bls="true" console="serial" timeout="0"/>
 			<size unit="G">5</size>
-			<systemdisk>
-				<volume name="@root=root"/>
-				<volume name="home" parent="/"/>
-				<volume name="var" parent="/"/>
-			</systemdisk>
-			<oemconfig>
-				<oem-resize>false</oem-resize>
-			</oemconfig>
 		</type>
 	</preferences>
 	<preferences profiles="Cloud-Base-Generic" arch="aarch64">
@@ -81,19 +57,11 @@
 		      filesystem="ext4"
 		      kernelcmdline="no_timer_check console=tty1 console=ttyAMA0,115200n8 systemd.firstboot=off"
 		      devicepersistency="by-uuid"
-		      bootpartition="true" bootpartsize="2000" bootfilesystem="ext4" efipartsize="100" firmware="uefi"
+		      bootpartition="false" efipartsize="100" firmware="uefi"
 		      rootfs_label="azurelinux"
 		      >
 			<bootloader name="grub2" bls="true" console="serial" timeout="0"/>
 			<size unit="G">5</size>
-			<systemdisk>
-				<volume name="@root=root"/>
-				<volume name="home" parent="/"/>
-				<volume name="var" parent="/"/>
-			</systemdisk>
-			<oemconfig>
-				<oem-resize>false</oem-resize>
-			</oemconfig>
 		</type>
 	</preferences>
 	<preferences profiles="Cloud-Base-UEFI-UKI" arch="x86_64,aarch64">
@@ -109,14 +77,6 @@
 		      >
 			<bootloader name="custom"/>
 			<size unit="G">5</size>
-			<systemdisk>
-				<volume name="@root=root"/>
-				<volume name="home" parent="/"/>
-				<volume name="var" parent="/"/>
-			</systemdisk>
-			<oemconfig>
-				<oem-resize>false</oem-resize>
-			</oemconfig>
 		</type>
 	</preferences>
 	<packages type="bootstrap" patternType="plusRecommended" profiles="CloudCore,CloudCoreUKI">
@@ -132,6 +92,7 @@
 		<ignore name="geolite2-city"/>
 		<ignore name="geolite2-country"/>
 		<ignore name="plymouth"/>
+		<package name="dracut-kiwi-oem-repart"/>
 		<package name="python3-dnf-plugin-tracer"/>
 		<package name="glibc-langpack-en"/>
 	</packages>
@@ -145,6 +106,7 @@
 		<ignore name="geolite2-city"/>
 		<ignore name="geolite2-country"/>
 		<ignore name="plymouth"/>
+		<package name="dracut-kiwi-oem-repart"/>
 		<package name="python3-dnf-plugin-tracer"/>
 		<package name="glibc-langpack-en"/>
 	</packages>
