@@ -1,0 +1,19 @@
+[components.chrony]
+
+[[components.chrony.overlays]]
+description = "Enable use of confdir at /etc/chrony.d"
+type = "spec-search-replace"
+regex = "^touch -r examples/chrony.conf.example2 chrony.conf"
+replacement = "echo -e '\\n# Use confdir\\nconfdir /etc/chrony.d' >> chrony.conf\n\ntouch -r examples/chrony.conf.example2 chrony.conf"
+
+[[components.chrony.overlays]]
+description = "Create /etc/chrony.d dir"
+type = "spec-search-replace"
+regex = '\$RPM_BUILD_ROOT%\{_sysconfdir\}/\{sysconfig,logrotate.d\}'
+replacement = '$RPM_BUILD_ROOT%{_sysconfdir}/{sysconfig,logrotate.d,chrony.d}'
+
+[[components.chrony.overlays]]
+description = "Add /etc/chrony.d dir to package"
+type = "spec-append-lines"
+section = "%files"
+lines = ["%dir %{_sysconfdir}/chrony.d"]
