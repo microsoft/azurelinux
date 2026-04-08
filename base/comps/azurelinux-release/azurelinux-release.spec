@@ -36,7 +36,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -51,6 +51,7 @@ Source16:       20-azurelinux-defaults.conf
 Source17:       20-azure.conf
 Source18:       proc-version-override.service
 Source19:       proc-version-override.sh
+Source20:       chrony-azure.conf
 
 BuildArch:      noarch
 
@@ -331,6 +332,7 @@ sed -i -e "s|(%{release_name}%{?prerelease})|(Cloud Variant%{?prerelease})|g" %{
 sed -e "s#\$version#%{bug_version}#g" -e 's/$variant/Cloud/;s/<!--.*-->//;/^$/d' %{SOURCE15} > %{buildroot}%{_swidtagdir}/com.microsoft.AzureLinux-variant.swidtag.cloud
 sed -i -e "/^DEFAULT_HOSTNAME=/d" %{buildroot}%{_prefix}/lib/os-release.cloud
 install -Dm0644 %{SOURCE17} -t %{buildroot}%{_prefix}/lib/sysctl.d/
+install -Dm0644 %{SOURCE20} -t %{buildroot}%{_sysconfdir}/chrony.d/
 %endif
 
 %if %{with container}
@@ -442,6 +444,7 @@ install -Dm0755 %{SOURCE19} %{buildroot}%{_libexecdir}/proc-version-override
 %{_prefix}/lib/os-release.cloud
 %attr(0644,root,root) %{_swidtagdir}/com.microsoft.AzureLinux-variant.swidtag.cloud
 %{_prefix}/lib/sysctl.d/20-azure.conf
+%{_sysconfdir}/chrony.d/chrony-azure.conf
 %endif
 
 
@@ -463,6 +466,9 @@ install -Dm0755 %{SOURCE19} %{buildroot}%{_libexecdir}/proc-version-override
 
 
 %changelog
+* Wed Apr 08 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-4
+- Configure chrony to use Azure PTP timesource
+
 * Tue Apr 01 2026 Rachel Menge <rachelmenge@microsoft.com> - 4.0-3
 - Add proc-version-override service for Guest-Configuration-Extension compat
 
