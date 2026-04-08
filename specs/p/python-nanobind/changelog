@@ -1,0 +1,36 @@
+* Fri Mar 28 2025 Konrad Kleine <kkleine@redhat.com> - 2.6.1-1
+- Update to nanobind 2.6.1
+
+* Tue Mar 18 2025 Konrad Kleine <kkleine@redhat.com> - 2.5.0-1
+- Update to nanobind 2.5.0
+
+* Sat Jan 18 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.0-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
+
+* Thu Dec 19 2024 Konrad Kleine <kkleine@redhat.com> - 2.4.0-9
+- Add python3-devel
+- Fix shebang in src/stubgen.py
+
+* Sat Dec 14 2024 Konrad Kleine <kkleine@redhat.com> - 2.4.0-8
+- Requirement and %%autosetup cleanup
+
+* Fri Dec 13 2024 Konrad Kleine <kkleine@redhat.com> - 2.4.0-7
+- Fix: Empty %%files file ... debugsourcefiles.list
+
+* Fri Dec 13 2024 Konrad Kleine <kkleine@redhat.com> - 2.4.0-6
+- Make main package arched and sub-packages noarch.
+
+* Fri Dec 13 2024 Konrad Kleine <kkleine@redhat.com> - 2.4.0-5
+- Better license and files section handling
+
+* Fri Dec 13 2024 Konrad Kleine <kkleine@redhat.com> - 2.4.0-4
+- No more manual cmake invocation and proper use of %%pyproject_save_files
+
+* Fri Dec 13 2024 Konrad Kleine <kkleine@redhat.com> - 2.4.0-3
+- License and patch cleanup
+
+* Fri Dec 13 2024 Konrad Kleine <kkleine@redhat.com> - 2.4.0-2
+- Do not vendor robin-map but use system package robin-map-devel
+
+* Fri Dec 13 2024 Konrad Kleine <kkleine@redhat.com> - 2.4.0-1
+- First release of python-nanobind

@@ -1,0 +1,37 @@
+
+# We want to use the following Packit functions in the python-nanobind package:
+# koji_build, bodhi_update, pull_from_upstream
+
+# See the documentation for more information:
+# https://packit.dev/docs/configuration/
+
+specfile_path: python-nanobind.spec
+
+# name in upstream package repository or registry (e.g. in PyPI)
+upstream_package_name: nanobind
+upstream_project_url: https://github.com/wjakob/nanobind
+upstream_tag_template: v{version}
+# downstream (Fedora) RPM package name
+downstream_package_name: python-nanobind
+
+# Do not create README.packit.
+create_sync_note: false
+
+jobs:
+  - job: pull_from_upstream
+    trigger: release
+    dist_git_branches:
+      - fedora-rawhide
+
+  - job: koji_build
+    trigger: commit
+    allowed_pr_authors: ["jcheck", "jistone", "kkleine", "nikic", "tbaeder", "tstellar", "tuliom", "packit"]
+    allowed_committers: ["jcheck", "jistone", "kkleine", "nikic", "tbaeder", "tstellar", "tuliom", "packit"]
+    dist_git_branches:
+      - fedora-latest
+      - fedora-rawhide
+
+  - job: bodhi_update
+    trigger: commit
+    dist_git_branches:
+      - fedora-latest # rawhide updates are created automatically
