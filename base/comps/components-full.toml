@@ -4817,7 +4817,6 @@
 [components.redfish-finder]
 [components.redhat-fonts]
 [components.redhat-menus]
-[components.redhat-rpm-config]
 [components.reflections]
 [components.regexp]
 [components.relaxng-datatype-java]
