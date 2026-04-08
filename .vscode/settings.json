@@ -1,9 +1,9 @@
 {
-    // SPECS/ contains auto-generated specs rendered from TOML component definitions.
+    // specs/ contains auto-generated specs rendered from TOML component definitions.
     // These files should not be manually edited — modify the TOML sources instead.
     // Prevent accidental edits to rendered specs.
     "files.readonlyInclude": {
-        "SPECS/**": true
+        "specs/**": true
     },
     // Suppress diagnostics from rendered specs — they are not source files.
     // Unfortunately, vscode does not provide a way to exclude all problem
@@ -11,10 +11,10 @@
     //
     // Add additional linters here as needed, following the same pattern.
     "shellcheck.ignorePatterns": {
-        "SPECS/**": true
+        "specs/**": true
     },
     "python.analysis.exclude": [
-        "SPECS",
+        "specs",
         "**/node_modules",
         "**/__pycache__",
         "**/.*"
