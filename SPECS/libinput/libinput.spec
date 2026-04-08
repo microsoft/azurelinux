@@ -3,12 +3,13 @@
 Summary:        Input device library
 Name:           libinput
 Version:        1.25.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.freedesktop.org/wiki/Software/libinput/
 Source0:        https://gitlab.freedesktop.org/libinput/libinput/-/archive/%{version}/%{name}-%{version}.tar.bz2
+Patch0:         CVE-2026-35093.patch
 
 BuildRequires:  check
 BuildRequires:  gcc
@@ -104,6 +105,9 @@ find %{buildroot}/%{_mandir}/man1 -type f -regextype posix-egrep -regex "$UTILS_
 %{_mandir}/man1/libinput-test-suite.1*
 
 %changelog
+* Wed Apr 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.25.0-2
+- Patch for CVE-2026-35093
+
 * Thu Feb 08 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.25.0-1
 - Upgrade to 1.25.0
 
