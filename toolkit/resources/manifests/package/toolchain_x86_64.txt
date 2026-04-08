@@ -99,10 +99,10 @@ elfutils-libelf-0.189-6.azl3.x86_64.rpm
 elfutils-libelf-devel-0.189-6.azl3.x86_64.rpm
 elfutils-libelf-devel-static-0.189-6.azl3.x86_64.rpm
 elfutils-libelf-lang-0.189-6.azl3.x86_64.rpm
-expat-2.6.4-5.azl3.x86_64.rpm
-expat-debuginfo-2.6.4-5.azl3.x86_64.rpm
-expat-devel-2.6.4-5.azl3.x86_64.rpm
-expat-libs-2.6.4-5.azl3.x86_64.rpm
+expat-2.6.4-4.azl3.x86_64.rpm
+expat-debuginfo-2.6.4-4.azl3.x86_64.rpm
+expat-devel-2.6.4-4.azl3.x86_64.rpm
+expat-libs-2.6.4-4.azl3.x86_64.rpm
 file-5.45-1.azl3.x86_64.rpm
 file-debuginfo-5.45-1.azl3.x86_64.rpm
 file-devel-5.45-1.azl3.x86_64.rpm
@@ -519,8 +519,8 @@ perl-utils-5.38.2-509.azl3.noarch.rpm
 perl-vars-1.05-509.azl3.noarch.rpm
 perl-version-0.99.29-509.azl3.noarch.rpm
 perl-vmsish-1.04-509.azl3.noarch.rpm
-perl-XML-Parser-2.47-2.azl3.x86_64.rpm
-perl-XML-Parser-debuginfo-2.47-2.azl3.x86_64.rpm
+perl-XML-Parser-2.47-1.azl3.x86_64.rpm
+perl-XML-Parser-debuginfo-2.47-1.azl3.x86_64.rpm
 pinentry-1.2.1-1.azl3.x86_64.rpm
 pinentry-debuginfo-1.2.1-1.azl3.x86_64.rpm
 pkgconf-2.0.2-1.azl3.x86_64.rpm
