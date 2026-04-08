@@ -1,0 +1,9 @@
+[components.'python3.14']
+
+[components.'python3.14'.build]
+# Disable the experimental JIT compiler (PEP 744).
+# This matches RHEL, which also disables JIT: https://src.fedoraproject.org/rpms/python3.14/pull-request/76
+# The upstream spec requires clang(major) = 19 / llvm(major) = 19 to build JIT stencils,
+# but AZL ships LLVM 21. JIT is experimental, off-by-default, and has minimal impact
+# on server workloads.
+without = ["jit"]
