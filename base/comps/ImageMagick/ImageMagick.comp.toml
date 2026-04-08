@@ -1,0 +1,3 @@
+[components.ImageMagick]
+# Pin to 1:7.1.1.47-6, before uhdr support was added in -7 (libuhdr not available in AZL4).
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "d19ffa4ff6561de088a5d92bfe95950591aa82f8" }
