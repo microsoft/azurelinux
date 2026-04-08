@@ -278,7 +278,6 @@ includes = ["**/*.comp.toml", "components-full.toml", "component-check-disableme
 [components.python-systemd]
 [components.python-urllib3]
 [components.python-wcwidth]
-[components.'python3.14']
 [components.pytz]
 [components.PyYAML]
 [components.quota]
