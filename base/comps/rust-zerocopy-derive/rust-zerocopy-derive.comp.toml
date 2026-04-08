@@ -1,0 +1,4 @@
+# Pin to commit that bumps version to 0.8.42, keeping it in sync with rust-zerocopy.
+# https://src.fedoraproject.org/rpms/rust-zerocopy-derive/c/079ba44c4ab6757eb34625c8a9483c514cd9c748
+[components.rust-zerocopy-derive]
+spec = { type = "upstream", upstream-commit = "079ba44c4ab6757eb34625c8a9483c514cd9c748" }
