@@ -53,6 +53,7 @@ Patch8:         CVE-2026-25727.patch
 Patch9:         CVE-2026-27171.patch
 Patch10:        CVE-2026-33056.patch
 Patch11:        CVE-2026-33055.patch
+Patch12:        CVE-2026-34743.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -189,8 +190,8 @@ rm %{buildroot}%{_bindir}/*.old
 %{_mandir}/man1/*
 
 %changelog
-* Tue Mar 31 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.72.0-16
-- Patch for CVE-2026-33056 & CVE-2026-33055
+* Wed Apr 08 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.72.0-16
+- Patch for CVE-2026-33056, CVE-2026-33055 & CVE-2026-34743
 
 * Tue Mar 03 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.72.0-15
 - Patch for CVE-2025-58160, CVE-2026-25541, CVE-2026-25727 and CVE-2026-27171
