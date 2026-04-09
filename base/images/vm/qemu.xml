@@ -1,0 +1,38 @@
+<image>
+	<profiles>
+		<profile name="QemuVM" description="Qemu Base Guest Image">
+			<requires profile="CoreQemuVM"/>
+			<requires profile="BaseVM"/>
+		</profile>
+	</profiles>
+	<packages type="bootstrap" patternType="plusRecommended" profiles="QemuVM">
+		<package name="azurelinux-release"/>
+	</packages>
+	<packages type="image" patternType="plusRecommended" profiles="QemuVM">
+		<package name="azurelinux-release"/>
+	</packages>
+	<preferences profiles="QemuVM" arch="x86_64">
+		<type image="oem" format="qcow2"
+		      filesystem="ext4"
+		      kernelcmdline="no_timer_check console=tty1 console=ttyS0,115200n8 systemd.firstboot=off"
+		      devicepersistency="by-uuid"
+		      bootpartition="false" efipartsize="100" firmware="uefi"
+		      rootfs_label="azurelinux"
+		      >
+			<bootloader name="grub2" bls="true" console="serial" timeout="0"/>
+			<size unit="G">5</size>
+		</type>
+	</preferences>
+	<preferences profiles="QemuVM" arch="aarch64">
+		<type image="oem" format="qcow2"
+		      filesystem="ext4"
+		      kernelcmdline="no_timer_check console=tty1 console=ttyAMA0,115200n8 systemd.firstboot=off"
+		      devicepersistency="by-uuid"
+		      bootpartition="false" efipartsize="100" firmware="uefi"
+		      rootfs_label="azurelinux"
+		      >
+			<bootloader name="grub2" bls="true" console="serial" timeout="0"/>
+			<size unit="G">5</size>
+		</type>
+	</preferences>
+</image>
