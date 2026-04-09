@@ -3,16 +3,24 @@
 		<profile name="CoreCommon" description="Core common packages"/>
 	</profiles>
 	<packages type="image" patternType="plusRecommended" profiles="CoreCommon">
+		<package name="NetworkManager"/>
 		<package name="audit"/>
 		<package name="bash"/>
 		<package name="coreutils"/>
 		<package name="curl"/>
 		<package name="dhcp-client"/>
 		<package name="dnf5"/>
+		<package name="dnf5-plugins"/>
+		<package name="dracut-config-generic"/>
+		<package name="dracut-config-rescue"/>
 		<package name="e2fsprogs"/>
 		<package name="filesystem"/>
+		<package name="firewalld"/>
+		<package name="fwupd"/>
 		<package name="glibc"/>
 		<package name="hostname"/>
+		<package name="initial-setup"/>
+		<package name="initscripts"/>
 		<package name="iproute"/>
 		<package name="iputils"/>
 		<package name="kbd"/>
@@ -22,7 +30,9 @@
 		<package name="openssh-clients"/>
 		<package name="openssh-server"/>
 		<package name="parted"/>
+		<package name="plymouth"/>
 		<package name="policycoreutils"/>
+		<package name="prefixdevname"/>
 		<package name="procps-ng"/>
 		<package name="rootfiles"/>
 		<package name="rpm"/>
@@ -33,21 +43,11 @@
 		<package name="sssd-kcm"/>
 		<package name="sudo"/>
 		<package name="systemd"/>
-		<package name="util-linux"/>
-		<package name="vim-minimal"/>
-		<package name="dnf5-plugins"/>
-		<package name="dracut-config-rescue"/>
-		<package name="firewalld"/>
-		<package name="fwupd"/>
-		<package name="NetworkManager"/>
-		<package name="plymouth"/>
-		<package name="prefixdevname"/>
 		<package name="systemd-resolved"/>
-		<package name="zram-generator-defaults"/>
-		<package name="dracut-config-generic"/>
-		<package name="initial-setup"/>
-		<package name="initscripts"/>
 		<package name="uboot-images-armv8" arch="aarch64"/>
 		<package name="uboot-tools" arch="aarch64"/>
+		<package name="util-linux"/>
+		<package name="vim-minimal"/>
+		<package name="zram-generator-defaults"/>
 	</packages>
 </image>
