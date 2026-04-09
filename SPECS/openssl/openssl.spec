@@ -359,7 +359,7 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
-* Wed 08 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 3.3.7
+* Wed Apr 08 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 3.3.7-1
 - Upgrade to 3.3.7
 - remove unused patches
 
