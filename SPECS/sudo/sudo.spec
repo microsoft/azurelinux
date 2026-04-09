@@ -98,6 +98,7 @@ fi
 %{_mandir}/man5/*
 %{_mandir}/man8/*
 %{_docdir}/%{name}-%{version}/*
+%exclude %{_docdir}/%{name}-%{version}/LICENSE.md
 %attr(0644,root,root) %{_libdir}/tmpfiles.d/sudo.conf
 %exclude  /etc/sudoers.dist
 
