@@ -1,7 +1,7 @@
 Summary:        Sudo
 Name:           sudo
 Version:        1.9.17
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ISC
 URL:            https://www.sudo.ws/
 Group:          System Environment/Security
@@ -10,6 +10,7 @@ Distribution:   Azure Linux
 Source0:        https://www.sudo.ws/sudo/dist/%{name}-%{version}.tar.gz
 Patch0:         CVE-2025-32462.patch
 Patch1:         CVE-2025-32463.patch
+Patch2:         CVE-2026-35535.patch
 BuildRequires:  audit-devel
 BuildRequires:  man-db
 BuildRequires:  openssl-devel
@@ -101,6 +102,9 @@ fi
 %exclude  /etc/sudoers.dist
 
 %changelog
+* Thu Apr 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.9.17-2
+- Patch for CVE-2026-35535
+
 * Fri Jun 27 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.17-1
 - Upgrade to version 1.9.17.
 - Patching CVEs: 2025-32462 and 2025-32463.
