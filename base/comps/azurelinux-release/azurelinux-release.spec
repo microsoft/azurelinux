@@ -36,7 +36,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -284,6 +284,7 @@ NAME="%{dist_name}"
 VERSION="%{dist_version} (%{release_name}%{?prerelease})"
 RELEASE_TYPE=development
 ID=azurelinux
+ID_LIKE=fedora
 VERSION_ID=%{dist_version}
 VERSION_CODENAME=""
 PRETTY_NAME="Azure Linux %{dist_version} (%{release_name}%{?prerelease})"
@@ -466,6 +467,9 @@ install -Dm0755 %{SOURCE19} %{buildroot}%{_libexecdir}/proc-version-override
 
 
 %changelog
+* Thu Apr 09 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-5
+- Add ID_LIKE tag to os-release.
+
 * Wed Apr 08 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-4
 - Configure chrony to use Azure PTP timesource
 
