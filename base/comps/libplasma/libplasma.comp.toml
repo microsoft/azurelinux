@@ -1,0 +1,6 @@
+[components.libplasma]
+# Pin to 6.6.3 to fix SONAME mismatch (.so.6 -> .so.7) caused by bootstrap tag
+# contamination. The snapshot date (2026-02-24) picks 6.6.0 which provides
+# libPlasma.so.6, but bootstrap builds linked against fc43's 6.6.3 which provides
+# libPlasma.so.7. Pinning to 6.6.3 aligns the SONAME across all KDE Plasma packages.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "241b8128bc736cee78460f23d3bc23ada9e809c7" }
