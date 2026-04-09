@@ -1,0 +1,3 @@
+[components.selinux-policy]
+# Pin to commit that has version 43.4, which was used in the 0405 stage 1 build.
+spec = { type = "upstream", upstream-commit = "332e840f1bfe14fc1638dc38dccdf3f701a54bfd" }
