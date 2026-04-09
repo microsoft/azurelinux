@@ -1,7 +1,6 @@
 <image>
 	<profiles>
 		<profile name="CoreCommon" description="Core common packages"/>
-		<profile name="BaseCommon" description="Base common packages"/>
 	</profiles>
 	<packages type="image" patternType="plusRecommended" profiles="CoreCommon">
 		<package name="audit"/>
@@ -50,9 +49,5 @@
 		<package name="initscripts"/>
 		<package name="uboot-images-armv8" arch="aarch64"/>
 		<package name="uboot-tools" arch="aarch64"/>
-	</packages>
-	<packages type="image" patternType="plusRecommended" profiles="BaseCommon">
-		<namedCollection name="standard"/>
-		<ignore name="qemu-user-static"/> <!-- Saves ~100MB -->
 	</packages>
 </image>
