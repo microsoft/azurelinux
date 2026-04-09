@@ -1,10 +1,9 @@
 <image>
 	<profiles>
-		<profile name="CloudBoot" description="Bootloader packages for Cloud images"/>
 		<profile name="CloudServer" description="Server packages for Cloud images"/>
 		<profile name="CloudCore" description="Cloud spin core packages">
 			<requires profile="BootCore"/>
-			<requires profile="CloudBoot"/>
+			<requires profile="BootVM"/>
 			<requires profile="CloudServer"/>
 			<requires profile="Core"/>
 		</profile>
@@ -78,19 +77,6 @@
 		<package name="dracut-kiwi-oem-repart"/>
 		<package name="python3-dnf-plugin-tracer"/>
 		<package name="glibc-langpack-en"/>
-	</packages>
-	<packages type="image" patternType="plusRecommended" profiles="CloudBoot">
-		<package name="efibootmgr" arch="aarch64,x86_64"/>
-		<package name="grub2-efi-aa64" arch="aarch64"/>
-		<package name="grub2-efi-ia32" arch="x86_64"/>
-		<package name="grub2-efi-x64" arch="x86_64"/>
-		<package name="grub2-pc" arch="x86_64"/>
-		<package name="grub2-tools" arch="aarch64,x86_64"/>
-		<package name="grub2-tools-efi" arch="x86_64"/>
-		<package name="grub2-tools-extra" arch="aarch64,x86_64"/>
-		<package name="shim-aa64" arch="aarch64"/>
-		<package name="shim-ia32" arch="x86_64"/>
-		<package name="shim-x64" arch="x86_64"/>
 	</packages>
 	<packages type="image" patternType="plusRecommended" profiles="CloudServer">
 		<package name="cloud-init"/>
