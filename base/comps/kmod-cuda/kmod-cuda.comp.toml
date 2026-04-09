@@ -1,0 +1,22 @@
+[component-templates.kmod-cuda]
+description = "Out-of-tree driver built against multiple kernel versions and toolchains"
+
+[component-templates.kmod-cuda.default-component-config]
+spec = { type = "local", path = "kmod-cuda.spec" }
+
+[[component-templates.kmod-cuda.default-component-config.source-files]]
+filename = "open-gpu-kernel-modules-595.58.03.tar.gz"
+hash-type = "SHA256"
+hash = "e0c4659ddf15e4f4e19cee05b49f88c9ba08ef3add0dfe08249798f58d0fe75e"
+origin = { type = "download", uri = "https://github.com/NVIDIA/open-gpu-kernel-modules/archive/refs/tags/595.58.03.tar.gz" }
+
+[[component-templates.kmod-cuda.matrix]]
+axis = "kernel"
+
+[component-templates.kmod-cuda.matrix.values.6-18]
+
+[[component-templates.kmod-cuda.matrix.values.6-18.overlays]]
+type = "spec-set-tag"
+description = "Set kernel version to 6.18"
+tag = "kernel_version"
+value = "6.18.5"
