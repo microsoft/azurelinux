@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/gim-home/azldev-preview/internal/projectconfig/config-file",
+  "$id": "https://github.com/microsoft/azure-linux-dev-tools/internal/projectconfig/config-file",
   "$ref": "#/$defs/ConfigFile",
   "$defs": {
     "CheckConfig": {
@@ -57,6 +57,43 @@
           "$ref": "#/$defs/CheckConfig",
           "title": "Check configuration",
           "description": "Configuration for the %check section"
+        },
+        "failure": {
+          "$ref": "#/$defs/ComponentBuildFailureConfig",
+          "title": "Build failure configuration",
+          "description": "Configuration and policy regarding build failures for this component."
+        },
+        "hints": {
+          "$ref": "#/$defs/ComponentBuildHints",
+          "title": "Build hints",
+          "description": "Non-essential hints for how or when to build the component."
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "ComponentBuildFailureConfig": {
+      "properties": {
+        "expected": {
+          "type": "boolean",
+          "title": "Expected failure",
+          "description": "Indicates that this component is expected to fail building."
+        },
+        "expected-reason": {
+          "type": "string",
+          "title": "Expected failure reason",
+          "description": "Required justification for why this component is expected to fail building."
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "ComponentBuildHints": {
+      "properties": {
+        "expensive": {
+          "type": "boolean",
+          "title": "Expensive to build",
+          "description": "Indicates that building this component is expensive and should be carefully considered when scheduling."
         }
       },
       "additionalProperties": false,
@@ -89,6 +126,19 @@
           "type": "array",
           "title": "Source files",
           "description": "Source files to download for this component"
+        },
+        "default-package-config": {
+          "$ref": "#/$defs/PackageConfig",
+          "title": "Default package config",
+          "description": "Default configuration applied to all binary packages produced by this component"
+        },
+        "packages": {
+          "additionalProperties": {
+            "$ref": "#/$defs/PackageConfig"
+          },
+          "type": "object",
+          "title": "Package overrides",
+          "description": "Per-package configuration overrides keyed by exact binary package name"
         }
       },
       "additionalProperties": false,
@@ -153,6 +203,7 @@
             "spec-prepend-lines",
             "spec-append-lines",
             "spec-search-replace",
+            "spec-remove-section",
             "patch-add",
             "patch-remove",
             "file-prepend-lines",
@@ -278,6 +329,19 @@
           "$ref": "#/$defs/ToolsConfig",
           "title": "Tools configuration",
           "description": "Configuration for tools used by azldev"
+        },
+        "default-package-config": {
+          "$ref": "#/$defs/PackageConfig",
+          "title": "Default package config",
+          "description": "Project-wide default applied to all binary packages before group and component overrides"
+        },
+        "package-groups": {
+          "additionalProperties": {
+            "$ref": "#/$defs/PackageGroupConfig"
+          },
+          "type": "object",
+          "title": "Package groups",
+          "description": "Definitions of package groups for shared binary package configuration"
         }
       },
       "additionalProperties": false,
@@ -314,6 +378,11 @@
           "type": "array",
           "title": "Package Repositories",
           "description": "List of package repository definitions"
+        },
+        "disable-origins": {
+          "type": "boolean",
+          "title": "Disable origins",
+          "description": "When true only allow source files from the lookaside cache and do not fall back to configured origins"
         },
         "versions": {
           "additionalProperties": {
@@ -469,6 +538,52 @@
         "type"
       ]
     },
+    "PackageConfig": {
+      "properties": {
+        "publish": {
+          "$ref": "#/$defs/PackagePublishConfig",
+          "title": "Publish settings",
+          "description": "Publishing settings for this binary package"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "PackageGroupConfig": {
+      "properties": {
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "Human-readable description of this package group"
+        },
+        "packages": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Packages",
+          "description": "Explicit list of binary package names that are members of this group"
+        },
+        "default-package-config": {
+          "$ref": "#/$defs/PackageConfig",
+          "title": "Default package config",
+          "description": "Configuration inherited by all packages in this group"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "PackagePublishConfig": {
+      "properties": {
+        "channel": {
+          "type": "string",
+          "title": "Channel",
+          "description": "Publish channel for this package; use 'none' to signal to downstream tooling that this package should not be published"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "PackageRepository": {
       "properties": {
         "base-uri": {
@@ -485,15 +600,6 @@
     },
     "ProjectInfo": {
       "properties": {
-        "type": {
-          "type": "string",
-          "enum": [
-            "classic-toolkit",
-            ""
-          ],
-          "title": "Project Type",
-          "description": "Type of the project"
-        },
         "description": {
           "type": "string",
           "title": "Description",
@@ -523,10 +629,23 @@
             "out"
           ]
         },
+        "rendered-specs-dir": {
+          "type": "string",
+          "title": "Rendered Specs Directory",
+          "description": "Output directory for rendered specs",
+          "examples": [
+            "SPECS"
+          ]
+        },
         "default-distro": {
           "$ref": "#/$defs/DistroReference",
           "title": "Default Distro",
           "description": "Default selected distro reference"
+        },
+        "default-author-email": {
+          "type": "string",
+          "title": "Default Author Email",
+          "description": "Default email for synthetic changelog entries and commits"
         }
       },
       "additionalProperties": false,
@@ -541,7 +660,13 @@
           "type": "string"
         },
         "hash-type": {
-          "type": "string"
+          "type": "string",
+          "enum": [
+            "SHA256",
+            "SHA512"
+          ],
+          "title": "Hash type",
+          "description": "Hash algorithm used for the hash value (e.g."
         },
         "origin": {
           "$ref": "#/$defs/Origin"
@@ -550,8 +675,7 @@
       "additionalProperties": false,
       "type": "object",
       "required": [
-        "filename",
-        "origin"
+        "filename"
       ]
     },
     "SpecSource": {
