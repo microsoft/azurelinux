@@ -20,6 +20,7 @@
 	<include from="this://./vm/base.xml"/>
 	<include from="this://./vm/boot.xml"/>
 	<include from="this://./vm/cloud.xml"/>
+	<include from="this://./vm/hyperv.xml"/>
 	<include from="this://./vm/qemu.xml"/>
 	<packages type="bootstrap">
 		<package name="filesystem"/>
