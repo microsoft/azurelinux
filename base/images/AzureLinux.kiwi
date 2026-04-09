@@ -23,7 +23,11 @@
 	<include from="this://./container/wsl.xml"/>
 	<include from="this://./iso/liveinstall.xml"/>
 	<include from="this://./repositories/core.xml"/>
-	<include from="this://./vm/cloud.xml"/>
+	<include from="this://./vm/azure.xml"/>
+	<include from="this://./vm/base.xml"/>
+	<include from="this://./vm/boot.xml"/>
+	<include from="this://./vm/hyperv.xml"/>
+	<include from="this://./vm/qemu.xml"/>
 	<packages type="bootstrap">
 		<package name="filesystem"/>
 	</packages>
