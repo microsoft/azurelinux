@@ -8,20 +8,11 @@
 			<requires profile="CloudServer"/>
 			<requires profile="Core"/>
 		</profile>
-		<profile name="CloudCoreUKI" description="Cloud spin core packages for UKI">
-			<requires profile="BootCoreUKI"/>
-			<requires profile="CloudBoot"/>
-			<requires profile="CloudServer"/>
-			<requires profile="Core"/>
-		</profile>
 		<profile name="Cloud-Base-Azure" description="Azure Base Guest Image">
 			<requires profile="CloudCore"/>
 		</profile>
 		<profile name="Cloud-Base-Generic" description="Generic Base Guest Image">
 			<requires profile="CloudCore"/>
-		</profile>
-		<profile name="Cloud-Base-UEFI-UKI" description="UEFI Base Guest Image using UKIs">
-			<requires profile="CloudCoreUKI"/>
 		</profile>
 	</profiles>
 	<preferences profiles="Cloud-Base-Azure" arch="x86_64">
@@ -72,22 +63,7 @@
 			<size unit="G">5</size>
 		</type>
 	</preferences>
-	<preferences profiles="Cloud-Base-UEFI-UKI" arch="x86_64,aarch64">
-		<type image="oem" format="qcow2"
-		      firmware="uefi" efipartsize="1000"
-		      bootpartition="false"
-		      filesystem="ext4"
-		      kernelcmdline="systemd.firstboot=off"
-		      devicepersistency="by-uuid"
-		      rootfs_label="azurelinux"
-		      initrd_system="none"
-		      editbootconfig="uki-editbootconfig.sh"
-		      >
-			<bootloader name="custom"/>
-			<size unit="G">5</size>
-		</type>
-	</preferences>
-	<packages type="bootstrap" patternType="plusRecommended" profiles="CloudCore,CloudCoreUKI">
+	<packages type="bootstrap" patternType="plusRecommended" profiles="CloudCore">
 		<package name="azurelinux-release-cloud"/>
 	</packages>
 	<packages type="image" patternType="plusRecommended" profiles="CloudCore">
@@ -96,19 +72,6 @@
 		<ignore name="fwupd"/>
 		<ignore name="kernel"/>
 		<ignore name="*-firmware"/>
-		<ignore name="geolite2-city"/>
-		<ignore name="geolite2-country"/>
-		<ignore name="plymouth"/>
-		<package name="dracut-kiwi-oem-repart"/>
-		<package name="python3-dnf-plugin-tracer"/>
-		<package name="glibc-langpack-en"/>
-	</packages>
-	<packages type="image" patternType="plusRecommended" profiles="CloudCoreUKI">
-		<ignore name="dracut-config-rescue"/>
-		<ignore name="firewalld"/>
-		<ignore name="fwupd"/>
-		<ignore name="kernel"/>
-		<ignore name="[a-oq-z]*-firmware"/>
 		<ignore name="geolite2-city"/>
 		<ignore name="geolite2-country"/>
 		<ignore name="plymouth"/>
@@ -150,9 +113,6 @@
 		<package name="hyperv-daemons"/>
 	</packages>
 	<packages type="image" patternType="plusRecommended" profiles="Cloud-Base-Generic">
-		<package name="qemu-guest-agent"/>
-	</packages>
-	<packages type="image" patternType="plusRecommended" profiles="Cloud-Base-UEFI-UKI">
 		<package name="qemu-guest-agent"/>
 	</packages>
 </image>
