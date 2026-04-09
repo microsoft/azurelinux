@@ -15,25 +15,23 @@ permissions:
 
 jobs:
   lint:
-    name: "Lint TOML files"
+    name: "Validate TOML config"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           persist-credentials: false
-    
-      - name: Set up rust toolchain
-        uses: dtolnay/rust-toolchain@e97e2d8cc328f1b50210efc529dca0028893a2d9 # v1
+
+      - name: Set up Go
+        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
         with:
-          toolchain: stable
+          go-version: stable
+          cache: false
 
-      - name: Enable cargo cache
-        uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2.8.2
+      - name: Install azldev
+        run: go install github.com/microsoft/azure-linux-dev-tools/cmd/azldev@0590d38b32c0a414e0969e85aca8542c3d339079
 
-      - name: "Install linter (taplo)"
-        run: cargo install --locked taplo-cli
-
-      - name: "Run linter"
-        run: taplo lint --colors=always
+      - name: "Validate config (strict)"
+        run: azldev config dump > /dev/null
    
