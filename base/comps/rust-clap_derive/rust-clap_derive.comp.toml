@@ -1,0 +1,5 @@
+# Pin to 4.6.0 to be in sync with rust-clap and rust-clap_builder.
+# Fedora dist-git commit: https://src.fedoraproject.org/rpms/rust-clap_derive/c/4642814e3f5307a37456f620624af14c0beec70e
+# Remove this pin once the Koji builders resolve these from prior completed builds.
+[components.rust-clap_derive]
+spec = { type = "upstream", upstream-commit = "4642814e3f5307a37456f620624af14c0beec70e" }
