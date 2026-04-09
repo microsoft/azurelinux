@@ -17,6 +17,7 @@
 	<include from="this://./common/base.xml"/>
 	<include from="this://./common/boot.xml"/>
 	<include from="this://./repositories/core.xml"/>
+	<include from="this://./vm/boot.xml"/>
 	<include from="this://./vm/cloud.xml"/>
 	<packages type="bootstrap">
 		<package name="filesystem"/>
