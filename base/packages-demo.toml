@@ -1,0 +1,71 @@
+#
+# packages-demo.toml — Example of packages.toml with a small subset of packages.
+#
+# This file demonstrates how azldev splits binary packages across publish
+# repositories using package groups. Each [package-groups.<name>] section
+# assigns a set of packages to a publish channel.
+
+# The real packages.toml will be added in the future.
+#
+# Package publish configuration
+#
+
+# Project-wide baseline — unpublished unless overridden by a package group
+[default-package-config]
+publish = { channel = "none" }
+
+# Packages published to rpm-base
+[package-groups.base-packages]
+description = "base packages"
+packages = [
+    "kernel",
+    "kernel-core",
+    "kernel-cross-headers",
+    "kernel-debug",
+    "kernel-debug-core",
+    "kernel-debug-devel",
+    "kernel-debug-devel-matched",
+    "kernel-debug-modules",
+    "kernel-debug-modules-core",
+    "kernel-debug-modules-extra",
+    "kernel-debug-uki-virt",
+    "kernel-devel",
+    "kernel-devel-matched",
+    "kernel-doc",
+    "kernel-headers",
+    "kernel-modules",
+    "kernel-modules-core",
+    "kernel-modules-extra",
+    "kernel-modules-extra-matched",
+    "kernel-rpm-macros",
+    "kernel-srpm-macros",
+    "kernel-tools",
+    "kernel-tools-libs",
+    "kernel-tools-libs-devel",
+    "kernel-uki-virt",
+    "kernel-uki-virt-addons",
+    "libcurl",
+    "libcurl-devel",
+    "libcurl-minimal",
+    "wget2",
+    "wget2-libs",
+    "which",
+    "whois"
+]
+
+[package-groups.base-packages.default-package-config.publish]
+channel = "rpm-base"
+
+# Packages published to rpm-build-only
+[package-groups.build-only-packages]
+description = "build-only packages"
+packages = [
+    "kernel-debug-modules-internal",
+    "kernel-debug-uki-virt-addons",
+    "kernel-modules-internal",
+    "kernel-selftests-internal",
+    "wget2-devel"
+]
+
+[package-groups.build-only-packages.default-package-config.publish]
+channel = "rpm-build-only"

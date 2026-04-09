@@ -3,3 +3,7 @@
 [components.wget2.build]
 # Supply the wget compatibility package.
 with = ["as_wget"]
+
+# Component level configuration
+[components.wget2.packages.wget2-wget.publish]
+channel = "rpm-base"
