@@ -14,13 +14,13 @@
 		<timezone>UTC</timezone>
 		<release-version>4</release-version>
 	</preferences>
+	<include from="this://./common/base.xml"/>
+	<include from="this://./common/boot.xml"/>
+	<include from="this://./container/container.xml"/>
+	<include from="this://./container/wsl.xml"/>
+	<include from="this://./iso/liveinstall.xml"/>
 	<include from="this://./repositories/core.xml"/>
-	<include from="this://./components/common.xml"/>
-	<include from="this://./components/boot.xml"/>
-	<include from="this://./components/liveinstall.xml"/>
-	<include from="this://./teams/cloud/cloud.xml"/>
-	<include from="this://./teams/cloud/container.xml"/>
-	<include from="this://./teams/cloud/wsl.xml"/>
+	<include from="this://./vm/cloud.xml"/>
 	<packages type="bootstrap">
 		<package name="filesystem"/>
 	</packages>
