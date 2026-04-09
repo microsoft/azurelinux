@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/gim-home/azldev-preview/internal/projectconfig/config-file",
+  "$id": "https://github.com/microsoft/azure-linux-dev-tools/internal/projectconfig/config-file",
   "$ref": "#/$defs/ConfigFile",
   "$defs": {
     "CheckConfig": {
@@ -57,6 +57,43 @@
           "$ref": "#/$defs/CheckConfig",
           "title": "Check configuration",
           "description": "Configuration for the %check section"
+        },
+        "failure": {
+          "$ref": "#/$defs/ComponentBuildFailureConfig",
+          "title": "Build failure configuration",
+          "description": "Configuration and policy regarding build failures for this component."
+        },
+        "hints": {
+          "$ref": "#/$defs/ComponentBuildHints",
+          "title": "Build hints",
+          "description": "Non-essential hints for how or when to build the component."
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "ComponentBuildFailureConfig": {
+      "properties": {
+        "expected": {
+          "type": "boolean",
+          "title": "Expected failure",
+          "description": "Indicates that this component is expected to fail building."
+        },
+        "expected-reason": {
+          "type": "string",
+          "title": "Expected failure reason",
+          "description": "Required justification for why this component is expected to fail building."
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "ComponentBuildHints": {
+      "properties": {
+        "expensive": {
+          "type": "boolean",
+          "title": "Expensive to build",
+          "description": "Indicates that building this component is expensive and should be carefully considered when scheduling."
         }
       },
       "additionalProperties": false,
@@ -81,6 +118,11 @@
           "$ref": "#/$defs/ComponentBuildConfig",
           "title": "Build configuration",
           "description": "Configuration for building the component"
+        },
+        "vm-tests": {
+          "$ref": "#/$defs/ComponentVMTestsConfig",
+          "title": "VM tests",
+          "description": "VM test metadata associated with this component"
         },
         "source-files": {
           "items": {
@@ -224,6 +266,28 @@
         "type"
       ]
     },
+    "ComponentVMTestsConfig": {
+      "properties": {
+        "test_lables": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Test labels",
+          "description": "List of VM test labels associated with this component"
+        },
+        "testcase_names": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Test case names",
+          "description": "List of VM test case names associated with this component"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "ConfigFile": {
       "properties": {
         "$schema": {
@@ -314,6 +378,11 @@
           "type": "array",
           "title": "Package Repositories",
           "description": "List of package repository definitions"
+        },
+        "disable-origins": {
+          "type": "boolean",
+          "title": "Disable origins",
+          "description": "When true only allow source files from the lookaside cache and do not fall back to configured origins"
         },
         "versions": {
           "additionalProperties": {
@@ -485,15 +554,6 @@
     },
     "ProjectInfo": {
       "properties": {
-        "type": {
-          "type": "string",
-          "enum": [
-            "classic-toolkit",
-            ""
-          ],
-          "title": "Project Type",
-          "description": "Type of the project"
-        },
         "description": {
           "type": "string",
           "title": "Description",
@@ -550,8 +610,7 @@
       "additionalProperties": false,
       "type": "object",
       "required": [
-        "filename",
-        "origin"
+        "filename"
       ]
     },
     "SpecSource": {

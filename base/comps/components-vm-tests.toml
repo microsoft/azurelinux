@@ -1,0 +1,13 @@
+[components.moby-engine.vm-tests]
+test_lables = ["container"]
+testcase_names = [
+    "verify_docker_compose_wordpress_app",
+    "verify_docker_dotnet31_app",
+    "verify_docker_dotnet50_app",
+    "verify_docker_java_app",
+    "verify_docker_python_app",
+    "verify_docker_seccomp_profile"
+]
+
+[components.containerd.vm-tests]
+test_lables = ["container"]

@@ -1,4 +1,4 @@
-includes = ["**/*.comp.toml", "components-full.toml", "component-check-disablement.toml"]
+includes = ["**/*.comp.toml", "components-full.toml", "component-check-disablement.toml", "components-vm-tests.toml"]
 
 #
 # Components imported from Fedora with no per-component modifications.
