@@ -1,0 +1,313 @@
+--- a/webrtc/common_audio/wav_file.cc
++++ b/webrtc/common_audio/wav_file.cc
+@@ -10,6 +10,7 @@
+ 
+ #include "common_audio/wav_file.h"
+ 
++#include <byteswap.h>
+ #include <errno.h>
+ 
+ #include <algorithm>
+@@ -34,6 +35,38 @@ bool FormatSupported(WavFormat format) {
+          format == WavFormat::kWavFormatIeeeFloat;
+ }
+ 
++template <typename T>
++void TranslateEndianness(T* destination, const T* source, size_t length) {
++  static_assert(sizeof(T) == 2 || sizeof(T) == 4 || sizeof(T) == 8,
++                "no converter, use integral types");
++  if (sizeof(T) == 2) {
++    const uint16_t* src = reinterpret_cast<const uint16_t*>(source);
++    uint16_t* dst = reinterpret_cast<uint16_t*>(destination);
++    for (size_t index = 0; index < length; index++) {
++      dst[index] = bswap_16(src[index]);
++    }
++  }
++  if (sizeof(T) == 4) {
++    const uint32_t* src = reinterpret_cast<const uint32_t*>(source);
++    uint32_t* dst = reinterpret_cast<uint32_t*>(destination);
++    for (size_t index = 0; index < length; index++) {
++      dst[index] = bswap_32(src[index]);
++    }
++  }
++  if (sizeof(T) == 8) {
++    const uint64_t* src = reinterpret_cast<const uint64_t*>(source);
++    uint64_t* dst = reinterpret_cast<uint64_t*>(destination);
++    for (size_t index = 0; index < length; index++) {
++      dst[index] = bswap_64(src[index]);
++    }
++  }
++}
++
++template <typename T>
++void TranslateEndianness(T* buffer, size_t length) {
++  TranslateEndianness(buffer, buffer, length);
++}
++
+ // Doesn't take ownership of the file handle and won't close it.
+ class WavHeaderFileReader : public WavHeaderReader {
+  public:
+@@ -89,10 +122,6 @@ void WavReader::Reset() {
+ 
+ size_t WavReader::ReadSamples(const size_t num_samples,
+                               int16_t* const samples) {
+-#ifndef WEBRTC_ARCH_LITTLE_ENDIAN
+-#error "Need to convert samples to big-endian when reading from WAV file"
+-#endif
+-
+   size_t num_samples_left_to_read = num_samples;
+   size_t next_chunk_start = 0;
+   while (num_samples_left_to_read > 0 && num_unread_samples_ > 0) {
+@@ -105,6 +134,9 @@ size_t WavReader::ReadSamples(const size_t num_samples,
+       num_bytes_read = file_.Read(samples_to_convert.data(),
+                                   chunk_size * sizeof(samples_to_convert[0]));
+       num_samples_read = num_bytes_read / sizeof(samples_to_convert[0]);
++#ifdef WEBRTC_ARCH_BIG_ENDIAN
++      TranslateEndianness(samples_to_convert.data(), num_samples_read);
++#endif
+ 
+       for (size_t j = 0; j < num_samples_read; ++j) {
+         samples[next_chunk_start + j] = FloatToS16(samples_to_convert[j]);
+@@ -114,6 +146,10 @@ size_t WavReader::ReadSamples(const size_t num_samples,
+       num_bytes_read = file_.Read(&samples[next_chunk_start],
+                                   chunk_size * sizeof(samples[0]));
+       num_samples_read = num_bytes_read / sizeof(samples[0]);
++
++#ifdef WEBRTC_ARCH_BIG_ENDIAN
++      TranslateEndianness(&samples[next_chunk_start], num_samples_read);
++#endif
+     }
+     RTC_CHECK(num_samples_read == 0 || (num_bytes_read % num_samples_read) == 0)
+         << "Corrupt file: file ended in the middle of a sample.";
+@@ -129,10 +165,6 @@ size_t WavReader::ReadSamples(const size_t num_samples,
+ }
+ 
+ size_t WavReader::ReadSamples(const size_t num_samples, float* const samples) {
+-#ifndef WEBRTC_ARCH_LITTLE_ENDIAN
+-#error "Need to convert samples to big-endian when reading from WAV file"
+-#endif
+-
+   size_t num_samples_left_to_read = num_samples;
+   size_t next_chunk_start = 0;
+   while (num_samples_left_to_read > 0 && num_unread_samples_ > 0) {
+@@ -145,6 +177,9 @@ size_t WavReader::ReadSamples(const size_t num_samples, float* const samples) {
+       num_bytes_read = file_.Read(samples_to_convert.data(),
+                                   chunk_size * sizeof(samples_to_convert[0]));
+       num_samples_read = num_bytes_read / sizeof(samples_to_convert[0]);
++#ifdef WEBRTC_ARCH_BIG_ENDIAN
++      TranslateEndianness(samples_to_convert.data(), num_samples_read);
++#endif
+ 
+       for (size_t j = 0; j < num_samples_read; ++j) {
+         samples[next_chunk_start + j] =
+@@ -155,6 +190,9 @@ size_t WavReader::ReadSamples(const size_t num_samples, float* const samples) {
+       num_bytes_read = file_.Read(&samples[next_chunk_start],
+                                   chunk_size * sizeof(samples[0]));
+       num_samples_read = num_bytes_read / sizeof(samples[0]);
++#ifdef WEBRTC_ARCH_BIG_ENDIAN
++      TranslateEndianness(&samples[next_chunk_start], num_samples_read);
++#endif
+ 
+       for (size_t j = 0; j < num_samples_read; ++j) {
+         samples[next_chunk_start + j] =
+@@ -213,24 +251,32 @@ WavWriter::WavWriter(FileWrapper file,
+ }
+ 
+ void WavWriter::WriteSamples(const int16_t* samples, size_t num_samples) {
+-#ifndef WEBRTC_ARCH_LITTLE_ENDIAN
+-#error "Need to convert samples to little-endian when writing to WAV file"
+-#endif
+-
+   for (size_t i = 0; i < num_samples; i += kMaxChunksize) {
+     const size_t num_remaining_samples = num_samples - i;
+     const size_t num_samples_to_write =
+         std::min(kMaxChunksize, num_remaining_samples);
+ 
+     if (format_ == WavFormat::kWavFormatPcm) {
++#ifndef WEBRTC_ARCH_BIG_ENDIAN
+       RTC_CHECK(
+           file_.Write(&samples[i], num_samples_to_write * sizeof(samples[0])));
++#else
++      std::array<int16_t, kMaxChunksize> converted_samples;
++      TranslateEndianness(converted_samples.data(), &samples[i],
++                          num_samples_to_write);
++      RTC_CHECK(
++          file_.Write(converted_samples.data(),
++                      num_samples_to_write * sizeof(converted_samples[0])));
++#endif
+     } else {
+       RTC_CHECK_EQ(format_, WavFormat::kWavFormatIeeeFloat);
+       std::array<float, kMaxChunksize> converted_samples;
+       for (size_t j = 0; j < num_samples_to_write; ++j) {
+         converted_samples[j] = S16ToFloat(samples[i + j]);
+       }
++#ifdef WEBRTC_ARCH_BIG_ENDIAN
++      TranslateEndianness(converted_samples.data(), num_samples_to_write);
++#endif
+       RTC_CHECK(
+           file_.Write(converted_samples.data(),
+                       num_samples_to_write * sizeof(converted_samples[0])));
+@@ -243,10 +289,6 @@ void WavWriter::WriteSamples(const int16_t* samples, size_t num_samples) {
+ }
+ 
+ void WavWriter::WriteSamples(const float* samples, size_t num_samples) {
+-#ifndef WEBRTC_ARCH_LITTLE_ENDIAN
+-#error "Need to convert samples to little-endian when writing to WAV file"
+-#endif
+-
+   for (size_t i = 0; i < num_samples; i += kMaxChunksize) {
+     const size_t num_remaining_samples = num_samples - i;
+     const size_t num_samples_to_write =
+@@ -257,6 +299,9 @@ void WavWriter::WriteSamples(const float* samples, size_t num_samples) {
+       for (size_t j = 0; j < num_samples_to_write; ++j) {
+         converted_samples[j] = FloatS16ToS16(samples[i + j]);
+       }
++#ifdef WEBRTC_ARCH_BIG_ENDIAN
++      TranslateEndianness(converted_samples.data(), num_samples_to_write);
++#endif
+       RTC_CHECK(
+           file_.Write(converted_samples.data(),
+                       num_samples_to_write * sizeof(converted_samples[0])));
+@@ -266,6 +311,9 @@ void WavWriter::WriteSamples(const float* samples, size_t num_samples) {
+       for (size_t j = 0; j < num_samples_to_write; ++j) {
+         converted_samples[j] = FloatS16ToFloat(samples[i + j]);
+       }
++#ifdef WEBRTC_ARCH_BIG_ENDIAN
++      TranslateEndianness(converted_samples.data(), num_samples_to_write);
++#endif
+       RTC_CHECK(
+           file_.Write(converted_samples.data(),
+                       num_samples_to_write * sizeof(converted_samples[0])));
+--- a/webrtc/common_audio/wav_header.cc
++++ b/webrtc/common_audio/wav_header.cc
+@@ -14,6 +14,8 @@
+ 
+ #include "common_audio/wav_header.h"
+ 
++#include <endian.h>
++
+ #include <cstring>
+ #include <limits>
+ #include <string>
+@@ -26,10 +28,6 @@
+ namespace webrtc {
+ namespace {
+ 
+-#ifndef WEBRTC_ARCH_LITTLE_ENDIAN
+-#error "Code not working properly for big endian platforms."
+-#endif
+-
+ #pragma pack(2)
+ struct ChunkHeader {
+   uint32_t ID;
+@@ -174,6 +172,8 @@ bool FindWaveChunk(ChunkHeader* chunk_header,
+     if (readable->Read(chunk_header, sizeof(*chunk_header)) !=
+         sizeof(*chunk_header))
+       return false;  // EOF.
++    chunk_header->Size = le32toh(chunk_header->Size);
++
+     if (ReadFourCC(chunk_header->ID) == sought_chunk_id)
+       return true;  // Sought chunk found.
+     // Ignore current chunk by skipping its payload.
+@@ -187,6 +187,13 @@ bool ReadFmtChunkData(FmtPcmSubchunk* fmt_subchunk, WavHeaderReader* readable) {
+   if (readable->Read(&(fmt_subchunk->AudioFormat), kFmtPcmSubchunkSize) !=
+       kFmtPcmSubchunkSize)
+     return false;
++  fmt_subchunk->AudioFormat = le16toh(fmt_subchunk->AudioFormat);
++  fmt_subchunk->NumChannels = le16toh(fmt_subchunk->NumChannels);
++  fmt_subchunk->SampleRate = le32toh(fmt_subchunk->SampleRate);
++  fmt_subchunk->ByteRate = le32toh(fmt_subchunk->ByteRate);
++  fmt_subchunk->BlockAlign = le16toh(fmt_subchunk->BlockAlign);
++  fmt_subchunk->BitsPerSample = le16toh(fmt_subchunk->BitsPerSample);
++
+   const uint32_t fmt_size = fmt_subchunk->header.Size;
+   if (fmt_size != kFmtPcmSubchunkSize) {
+     // There is an optional two-byte extension field permitted to be present
+@@ -214,19 +221,22 @@ void WritePcmWavHeader(size_t num_channels,
+   auto header = rtc::MsanUninitialized<WavHeaderPcm>({});
+   const size_t bytes_in_payload = bytes_per_sample * num_samples;
+ 
+-  header.riff.header.ID = PackFourCC('R', 'I', 'F', 'F');
+-  header.riff.header.Size = RiffChunkSize(bytes_in_payload, *header_size);
+-  header.riff.Format = PackFourCC('W', 'A', 'V', 'E');
+-  header.fmt.header.ID = PackFourCC('f', 'm', 't', ' ');
+-  header.fmt.header.Size = kFmtPcmSubchunkSize;
+-  header.fmt.AudioFormat = MapWavFormatToHeaderField(WavFormat::kWavFormatPcm);
+-  header.fmt.NumChannels = static_cast<uint16_t>(num_channels);
+-  header.fmt.SampleRate = sample_rate;
+-  header.fmt.ByteRate = ByteRate(num_channels, sample_rate, bytes_per_sample);
+-  header.fmt.BlockAlign = BlockAlign(num_channels, bytes_per_sample);
+-  header.fmt.BitsPerSample = static_cast<uint16_t>(8 * bytes_per_sample);
+-  header.data.header.ID = PackFourCC('d', 'a', 't', 'a');
+-  header.data.header.Size = static_cast<uint32_t>(bytes_in_payload);
++  header.riff.header.ID = htole32(PackFourCC('R', 'I', 'F', 'F'));
++  header.riff.header.Size =
++      htole32(RiffChunkSize(bytes_in_payload, *header_size));
++  header.riff.Format = htole32(PackFourCC('W', 'A', 'V', 'E'));
++  header.fmt.header.ID = htole32(PackFourCC('f', 'm', 't', ' '));
++  header.fmt.header.Size = htole32(kFmtPcmSubchunkSize);
++  header.fmt.AudioFormat =
++      htole16(MapWavFormatToHeaderField(WavFormat::kWavFormatPcm));
++  header.fmt.NumChannels = htole16(num_channels);
++  header.fmt.SampleRate = htole32(sample_rate);
++  header.fmt.ByteRate =
++      htole32(ByteRate(num_channels, sample_rate, bytes_per_sample));
++  header.fmt.BlockAlign = htole16(BlockAlign(num_channels, bytes_per_sample));
++  header.fmt.BitsPerSample = htole16(8 * bytes_per_sample);
++  header.data.header.ID = htole32(PackFourCC('d', 'a', 't', 'a'));
++  header.data.header.Size = htole32(bytes_in_payload);
+ 
+   // Do an extra copy rather than writing everything to buf directly, since buf
+   // might not be correctly aligned.
+@@ -245,24 +255,26 @@ void WriteIeeeFloatWavHeader(size_t num_channels,
+   auto header = rtc::MsanUninitialized<WavHeaderIeeeFloat>({});
+   const size_t bytes_in_payload = bytes_per_sample * num_samples;
+ 
+-  header.riff.header.ID = PackFourCC('R', 'I', 'F', 'F');
+-  header.riff.header.Size = RiffChunkSize(bytes_in_payload, *header_size);
+-  header.riff.Format = PackFourCC('W', 'A', 'V', 'E');
+-  header.fmt.header.ID = PackFourCC('f', 'm', 't', ' ');
+-  header.fmt.header.Size = kFmtIeeeFloatSubchunkSize;
++  header.riff.header.ID = htole32(PackFourCC('R', 'I', 'F', 'F'));
++  header.riff.header.Size =
++      htole32(RiffChunkSize(bytes_in_payload, *header_size));
++  header.riff.Format = htole32(PackFourCC('W', 'A', 'V', 'E'));
++  header.fmt.header.ID = htole32(PackFourCC('f', 'm', 't', ' '));
++  header.fmt.header.Size = htole32(kFmtIeeeFloatSubchunkSize);
+   header.fmt.AudioFormat =
+-      MapWavFormatToHeaderField(WavFormat::kWavFormatIeeeFloat);
+-  header.fmt.NumChannels = static_cast<uint16_t>(num_channels);
+-  header.fmt.SampleRate = sample_rate;
+-  header.fmt.ByteRate = ByteRate(num_channels, sample_rate, bytes_per_sample);
+-  header.fmt.BlockAlign = BlockAlign(num_channels, bytes_per_sample);
+-  header.fmt.BitsPerSample = static_cast<uint16_t>(8 * bytes_per_sample);
+-  header.fmt.ExtensionSize = 0;
+-  header.fact.header.ID = PackFourCC('f', 'a', 'c', 't');
+-  header.fact.header.Size = 4;
+-  header.fact.SampleLength = static_cast<uint32_t>(num_channels * num_samples);
+-  header.data.header.ID = PackFourCC('d', 'a', 't', 'a');
+-  header.data.header.Size = static_cast<uint32_t>(bytes_in_payload);
++      htole16(MapWavFormatToHeaderField(WavFormat::kWavFormatIeeeFloat));
++  header.fmt.NumChannels = htole16(num_channels);
++  header.fmt.SampleRate = htole32(sample_rate);
++  header.fmt.ByteRate =
++      htole32(ByteRate(num_channels, sample_rate, bytes_per_sample));
++  header.fmt.BlockAlign = htole16(BlockAlign(num_channels, bytes_per_sample));
++  header.fmt.BitsPerSample = htole16(8 * bytes_per_sample);
++  header.fmt.ExtensionSize = htole16(0);
++  header.fact.header.ID = htole32(PackFourCC('f', 'a', 'c', 't'));
++  header.fact.header.Size = htole32(4);
++  header.fact.SampleLength = htole32(num_channels * num_samples);
++  header.data.header.ID = htole32(PackFourCC('d', 'a', 't', 'a'));
++  header.data.header.Size = htole32(bytes_in_payload);
+ 
+   // Do an extra copy rather than writing everything to buf directly, since buf
+   // might not be correctly aligned.
+@@ -391,6 +403,7 @@ bool ReadWavHeader(WavHeaderReader* readable,
+     return false;
+   if (ReadFourCC(header.riff.Format) != "WAVE")
+     return false;
++  header.riff.header.Size = le32toh(header.riff.header.Size);
+ 
+   // Find "fmt " and "data" chunks. While the official Wave file specification
+   // does not put requirements on the chunks order, it is uncommon to find the
