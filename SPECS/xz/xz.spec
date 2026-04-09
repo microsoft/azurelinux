@@ -37,8 +37,8 @@ Group:      System Environment/Libraries
 This package contains minimal set of shared xz libraries.
 
 %prep
-%setup -q
-%patch 0 -p1
+%autosetup -p1
+
 %build
 ./configure \
     --prefix=%{_prefix} \
