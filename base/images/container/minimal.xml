@@ -1,0 +1,49 @@
+<image>
+	<profiles>
+		<profile name="Container-Base-Generic-Minimal" description="Generic Minimal Base Container Image">
+			<requires profile="ContainerCore"/>
+		</profile>
+	</profiles>
+	<packages type="bootstrap" profiles="Container-Base-Generic-Minimal">
+		<ignore name="glibc-langpack-en"/>
+		<ignore name="langpacks-en"/>
+		<ignore name="tzdata"/>
+		<package name="dnf5"/>
+		<package name="glibc-minimal-langpack"/>
+		<package name="systemd-standalone-sysusers"/>
+		<package name="systemd-standalone-tmpfiles"/>
+	</packages>
+	<preferences profiles="Container-Base-Generic-Minimal">
+		<type image="oci">
+			<containerconfig
+			  name="azurelinux-minimal"
+			  tag="4"
+			  maintainer="Microsoft &lt;azurelinux@microsoft.com&gt;"
+			>
+				<subcommand execute="/bin/bash"/>
+				<labels>
+					<label name="org.opencontainers.image.vendor" value="Microsoft"/>
+					<label name="org.opencontainers.image.url" value="https://aka.ms/azurelinux/"/>
+					<label name="org.opencontainers.image.license" value="MIT"/>
+					<label name="org.opencontainers.image.licenses" value="MIT"/>
+					<label name="org.opencontainers.image.name" value="azurelinux"/>
+					<label name="org.opencontainers.image.title" value="azurelinux"/>
+					<label name="org.opencontainers.image.version" value="4"/>
+					<!-- Legacy attributes for backward compatibility -->
+					<label name="vendor" value="Microsoft"/>
+					<label name="license" value="MIT"/>
+					<label name="name" value="azurelinux-minimal"/>
+					<label name="version" value="4"/>
+				</labels>
+				<environment>
+					<env name="container" value="oci"/>
+					<env name="PATH" value="/usr/local/bin:/usr/bin"/>
+				</environment>
+			</containerconfig>
+		</type>
+		<timezone>Etc/UTC</timezone>
+		<locale>en_US</locale>
+		<rpm-locale-filtering>true</rpm-locale-filtering>
+		<rpm-excludedocs>true</rpm-excludedocs>
+	</preferences>
+</image>

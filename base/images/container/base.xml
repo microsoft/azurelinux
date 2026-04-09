@@ -1,0 +1,32 @@
+<image>
+	<profiles>
+		<profile name="ContainerCore" description="Container core packages"/>
+	</profiles>
+	<packages type="bootstrap" profiles="ContainerCore">
+		<ignore name="dosfstools"/>
+		<ignore name="e2fsprogs"/>
+		<ignore name="fuse-libs"/>
+		<ignore name="gnupg2-smime"/>
+		<ignore name="libss"/> <!-- used by e2fsprogs -->
+		<ignore name="kernel"/>
+		<ignore name="*-firmware"/>
+		<ignore name="geolite2-city"/>
+		<ignore name="geolite2-country"/>
+		<ignore name="pinentry"/>
+		<ignore name="shared-mime-info"/>
+		<ignore name="pinentry"/>
+		<ignore name="trousers"/>
+		<ignore name="xkeyboard-config"/>
+		<ignore name="grubby"/>
+		<ignore name="langpacks-en_GB"/>
+		<!-- https://bugzilla.redhat.com/show_bug.cgi?id=1951111 -->
+		<ignore name="sssd-client"/>
+		<package name="azurelinux-release-container"/>
+		<package name="bash"/>
+		<package name="coreutils"/>
+		<package name="rpm"/>
+		<package name="shadow-utils"/>
+		<package name="util-linux-core"/>
+		<package name="gawk"/>
+	</packages>
+</image>

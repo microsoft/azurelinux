@@ -1,0 +1,63 @@
+<image>
+	<profiles>
+		<profile name="Container-Base-Generic" description="Generic Base Container Image">
+			<requires profile="ContainerCore"/>
+		</profile>
+	</profiles>
+	<packages type="bootstrap" profiles="Container-Base-Generic">
+		<ignore name="glibc-langpack-en"/>
+		<ignore name="langpacks-en"/>
+		<package name="bzip2"/>
+		<package name="gzip"/>
+		<package name="sudo"/>
+		<package name="rootfiles"/>
+		<package name="tar"/> <!-- https://bugzilla.redhat.com/show_bug.cgi?id=1409920 -->
+		<package name="vim-minimal"/>
+		<package name="dnf5"/>
+		<package name="dnf5-plugins"/>
+		<package name="glibc-minimal-langpack"/>
+		<package name="systemd-standalone-sysusers"/>
+		<package name="tzdata"/>
+		<package name="xz"/>
+		<package name="zstd"/>
+	</packages>
+	<packages type="bootstrap" profiles="Container-Base-Generic">
+		<package name="systemd-standalone-tmpfiles"/>
+	</packages>
+	<packages type="uninstall" profiles="Container-Base-Generic">
+		<package name="systemd-standalone-tmpfiles"/>
+	</packages>
+	<preferences profiles="Container-Base-Generic">
+		<type image="oci">
+			<containerconfig
+			  name="azurelinux"
+			  tag="4"
+			  maintainer="Microsoft &lt;azurelinux@microsoft.com&gt;"
+			>
+				<subcommand execute="/bin/bash"/>
+				<labels>
+					<label name="org.opencontainers.image.vendor" value="Microsoft"/>
+					<label name="org.opencontainers.image.url" value="https://aka.ms/azurelinux/"/>
+					<label name="org.opencontainers.image.license" value="MIT"/>
+					<label name="org.opencontainers.image.licenses" value="MIT"/>
+					<label name="org.opencontainers.image.name" value="azurelinux"/>
+					<label name="org.opencontainers.image.title" value="azurelinux"/>
+					<label name="org.opencontainers.image.version" value="4"/>
+					<!-- Legacy attributes for backward compatibility -->
+					<label name="vendor" value="Microsoft"/>
+					<label name="license" value="MIT"/>
+					<label name="name" value="azurelinux"/>
+					<label name="version" value="4"/>
+				</labels>
+				<environment>
+					<env name="container" value="oci"/>
+					<env name="PATH" value="/usr/local/bin:/usr/bin"/>
+				</environment>
+			</containerconfig>
+		</type>
+		<timezone>Etc/UTC</timezone>
+		<locale>en_US</locale>
+		<rpm-locale-filtering>true</rpm-locale-filtering>
+		<rpm-excludedocs>true</rpm-excludedocs>
+	</preferences>
+</image>
