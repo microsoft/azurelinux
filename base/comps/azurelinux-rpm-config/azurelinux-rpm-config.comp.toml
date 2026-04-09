@@ -27,6 +27,14 @@ overlays = [
     { type = "spec-prepend-lines", section = "%install", lines = ["mkdir -p %{buildroot}/usr/lib/rpm", "ln -sf redhat %{buildroot}/usr/lib/rpm/azurelinux"] },
     { type = "spec-prepend-lines", section = "%files", lines = ["/usr/lib/rpm/azurelinux"] },
 
+    # Create Lua module symlink: %{_rpmluadir}/azurelinux -> %{_rpmluadir}/fedora
+    # The [Ff]edora → azurelinux overlay below rewrites Lua require statements in
+    # macros (e.g., require "fedora.common" → require "azurelinux.common"), but the
+    # Lua modules are installed under fedora/. This symlink ensures the renamed
+    # require paths resolve correctly.
+    { type = "spec-append-lines", section = "%install", lines = ["ln -sf fedora %{buildroot}%{_rpmluadir}/azurelinux"] },
+    { type = "spec-prepend-lines", section = "%files", lines = ["%{_rpmluadir}/azurelinux"] },
+
     #
     # Overlays for non-spec files.
     #
