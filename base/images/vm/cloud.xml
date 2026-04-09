@@ -1,17 +1,10 @@
 <image>
 	<profiles>
-		<profile name="CloudServer" description="Server packages for Cloud images"/>
-		<profile name="CloudCore" description="Cloud spin core packages">
-			<requires profile="BootCore"/>
-			<requires profile="BootVM"/>
-			<requires profile="CloudServer"/>
-			<requires profile="Core"/>
-		</profile>
 		<profile name="Cloud-Base-Azure" description="Azure Base Guest Image">
-			<requires profile="CloudCore"/>
+			<requires profile="CoreHypervVM"/>
 		</profile>
 		<profile name="Cloud-Base-Generic" description="Generic Base Guest Image">
-			<requires profile="CloudCore"/>
+			<requires profile="CoreQemuVM"/>
 		</profile>
 	</profiles>
 	<preferences profiles="Cloud-Base-Azure" arch="x86_64">
@@ -62,43 +55,12 @@
 			<size unit="G">5</size>
 		</type>
 	</preferences>
-	<packages type="bootstrap" patternType="plusRecommended" profiles="CloudCore">
+	<packages type="bootstrap" patternType="plusRecommended" profiles="Cloud-Base-Azure,Cloud-Base-Generic">
 		<package name="azurelinux-release-cloud"/>
-	</packages>
-	<packages type="image" patternType="plusRecommended" profiles="CloudCore">
-		<ignore name="dracut-config-rescue"/>
-		<ignore name="firewalld"/>
-		<ignore name="fwupd"/>
-		<ignore name="kernel"/>
-		<ignore name="*-firmware"/>
-		<ignore name="geolite2-city"/>
-		<ignore name="geolite2-country"/>
-		<ignore name="plymouth"/>
-		<package name="dracut-kiwi-oem-repart"/>
-		<package name="python3-dnf-plugin-tracer"/>
-		<package name="glibc-langpack-en"/>
-	</packages>
-	<packages type="image" patternType="plusRecommended" profiles="CloudServer">
-		<package name="cloud-init"/>
-		<package name="cloud-utils-growpart"/>
-		<package name="dracut-config-generic"/>
-		<package name="grubby"/>
-		<package name="rsync"/>
-		<package name="tar"/>
-		<package name="chrony"/>
-		<package name="console-login-helper-messages-issuegen"/>
-		<package name="console-login-helper-messages-motdgen"/>
-		<package name="console-login-helper-messages-profile"/>
-		<package name="fedora-release-cloud"/>
-		<package name="systemd-oomd-defaults"/>
 	</packages>
 	<packages type="image" patternType="plusRecommended" profiles="Cloud-Base-Azure">
 		<package name="WALinuxAgent"/>
 		<package name="azure-vm-utils"/>
 		<package name="kernel-modules"/>
-		<package name="hyperv-daemons"/>
-	</packages>
-	<packages type="image" patternType="plusRecommended" profiles="Cloud-Base-Generic">
-		<package name="qemu-guest-agent"/>
 	</packages>
 </image>
