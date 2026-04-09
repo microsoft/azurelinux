@@ -10,16 +10,16 @@
 		<rpm-excludedocs>false</rpm-excludedocs>
 	</preferences>
 	<packages type="bootstrap" profiles="WSL-Base">
+		<package name="azurelinux-release-wsl"/>
 		<package name="bash"/>
 		<package name="coreutils"/>
 		<package name="dnf5"/>
 		<package name="dnf5-plugins"/>
-		<package name="azurelinux-release-wsl"/>
 		<package name="rpm"/>
 	</packages>
 	<packages type="image" patternType="plusRecommended" profiles="WSL-Base">
-		<package name="attr"/>
 		<package name="acl"/>
+		<package name="attr"/>
 		<package name="bash-color-prompt"/>
 		<package name="bash-completion"/>
 		<package name="bind-utils"/>
@@ -62,6 +62,5 @@
 		<package name="whois"/>
 		<package name="wsl-setup"/>
 		<package name="zip"/>
-		<package name="zram-generator-defaults"/>
 	</packages>
 </image>

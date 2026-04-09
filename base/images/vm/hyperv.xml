@@ -1,0 +1,38 @@
+<image>
+	<profiles>
+		<profile name="HypervVM" description="Hyperv Base Guest Image">
+			<requires profile="CoreHypervVM"/>
+			<requires profile="BaseVM"/>
+		</profile>
+	</profiles>
+	<packages type="bootstrap" patternType="plusRecommended" profiles="HypervVM">
+		<package name="azurelinux-release-basic"/>
+	</packages>
+	<packages type="image" patternType="plusRecommended" profiles="HypervVM">
+		<package name="azurelinux-release-basic"/>
+	</packages>
+	<preferences profiles="HypervVM" arch="x86_64">
+		<type image="oem" format="vhdx"
+		      filesystem="ext4"
+		      kernelcmdline="no_timer_check console=tty1 console=ttyS0,115200n8 systemd.firstboot=off"
+		      devicepersistency="by-uuid"
+		      bootpartition="false" efipartsize="100" firmware="uefi"
+		      rootfs_label="azurelinux"
+		      >
+			<bootloader name="grub2" bls="true" console="serial" timeout="0"/>
+			<size unit="G">5</size>
+		</type>
+	</preferences>
+	<preferences profiles="HypervVM" arch="aarch64">
+		<type image="oem" format="vhdx"
+		      filesystem="ext4"
+		      kernelcmdline="no_timer_check console=tty1 console=ttyAMA0,115200n8 systemd.firstboot=off"
+		      devicepersistency="by-uuid"
+		      bootpartition="false" efipartsize="100" firmware="uefi"
+		      rootfs_label="azurelinux"
+		      >
+			<bootloader name="grub2" bls="true" console="serial" timeout="0"/>
+			<size unit="G">5</size>
+		</type>
+	</preferences>
+</image>

@@ -1,0 +1,58 @@
+<image>
+	<profiles>
+		<profile name="Container-Base-Generic-Init" description="Generic Init Base Container Image">
+			<requires profile="ContainerCore"/>
+		</profile>
+	</profiles>
+	<packages type="bootstrap" profiles="Container-Base-Generic-Init">
+		<ignore name="glibc-langpack-en"/>
+		<ignore name="langpacks-en"/>
+		<package name="bzip2"/>
+		<package name="gzip"/>
+		<package name="sudo"/>
+		<package name="rootfiles"/>
+		<package name="tar"/> <!-- https://bugzilla.redhat.com/show_bug.cgi?id=1409920 -->
+		<package name="vim-minimal"/>
+		<package name="dnf5"/>
+		<package name="dnf5-plugins"/>
+		<package name="glibc-minimal-langpack"/>
+		<package name="tzdata"/>
+		<package name="xz"/>
+		<package name="zstd"/>
+	</packages>
+	<packages type="image" profiles="Container-Base-Generic-Init">
+		<package name="glibc-langpack-en"/>
+		<package name="kbd"/>
+		<package name="systemd"/>
+	</packages>
+	<preferences profiles="Container-Base-Generic-Init">
+		<type image="oci">
+			<containerconfig
+			  name="azurelinux-init"
+			  tag="4"
+			  maintainer="Microsoft &lt;azurelinux@microsoft.com&gt;"
+			>
+				<subcommand execute="/sbin/init"/>
+				<labels>
+					<label name="org.opencontainers.image.vendor" value="Microsoft"/>
+					<label name="org.opencontainers.image.url" value="https://aka.ms/azurelinux/"/>
+					<label name="org.opencontainers.image.license" value="MIT"/>
+					<label name="org.opencontainers.image.licenses" value="MIT"/>
+					<label name="org.opencontainers.image.name" value="azurelinux"/>
+					<label name="org.opencontainers.image.title" value="azurelinux"/>
+					<label name="org.opencontainers.image.version" value="4"/>
+					<!-- Legacy attributes for backward compatibility -->
+					<label name="vendor" value="Microsoft"/>
+					<label name="license" value="MIT"/>
+					<label name="name" value="azurelinux-init"/>
+					<label name="version" value="4"/>
+				</labels>
+				<stopsignal>SIGRTMIN+3</stopsignal>
+			</containerconfig>
+		</type>
+		<timezone>Etc/UTC</timezone>
+		<locale>en_US</locale>
+		<rpm-locale-filtering>true</rpm-locale-filtering>
+		<rpm-excludedocs>true</rpm-excludedocs>
+	</preferences>
+</image>
