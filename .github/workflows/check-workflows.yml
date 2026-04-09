@@ -31,9 +31,7 @@ jobs:
           persist-credentials: false
 
       - name: Set up rust toolchain
-        uses: dtolnay/rust-toolchain@e97e2d8cc328f1b50210efc529dca0028893a2d9 # v1
-        with:
-          toolchain: stable
+        run: rustup default stable
 
       - name: Enable cargo cache
         uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2.8.2
