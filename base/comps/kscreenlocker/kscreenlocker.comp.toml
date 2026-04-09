@@ -1,0 +1,5 @@
+# Pin to 6.6.3 to match libplasma 6.6.3 SONAME (.so.7). The snapshot date
+# (2026-02-24) picks 6.6.0 which links against libPlasma.so.6, but bootstrap
+# builds linked against fc43's .so.7. Pinning keeps the cascade consistent.
+[components.kscreenlocker]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "b74610232988b4eb2553db363fbb6f3793ea4ad8" }
