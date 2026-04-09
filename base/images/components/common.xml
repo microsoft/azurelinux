@@ -52,7 +52,79 @@
 		<package name="uboot-tools" arch="aarch64"/>
 	</packages>
 	<packages type="image" patternType="plusRecommended" profiles="BaseCommon">
-		<namedCollection name="standard"/>
-		<ignore name="qemu-user-static"/> <!-- Saves ~100MB -->
+		<package name="abrt-cli"/>
+		<package name="acl"/>
+		<package name="amd-ucode-firmware" arch="x86_64"/>
+		<package name="at"/>
+		<package name="attr"/>
+		<package name="bash-color-prompt"/>
+		<package name="bash-completion"/>
+		<package name="bc"/>
+		<package name="bind-utils"/>
+		<package name="btrfs-progs"/>
+		<package name="bzip2"/>
+		<package name="chrony"/>
+		<package name="cifs-utils"/>
+		<package name="compsize"/>
+		<package name="cpio"/>
+		<package name="crontabs"/>
+		<package name="cryptsetup"/>
+		<package name="cyrus-sasl-plain"/>
+		<package name="dbus"/>
+		<package name="default-editor"/>
+		<package name="deltarpm"/>
+		<package name="dos2unix"/>
+		<package name="dosfstools"/>
+		<package name="ed"/>
+		<package name="ethtool"/>
+		<package name="exfatprogs"/>
+		<package name="file"/>
+		<package name="fpaste"/>
+		<package name="fprintd-pam" arch="aarch64,x86_64"/>
+		<package name="gnupg2"/>
+		<package name="hunspell"/>
+		<package name="iptstate"/>
+		<package name="irqbalance" arch="aarch64,x86_64"/>
+		<package name="logrotate"/>
+		<package name="lsof"/>
+		<package name="mailcap"/>
+		<package name="man-pages"/>
+		<package name="mcelog" arch="x86_64"/>
+		<package name="mdadm"/>
+		<package name="microcode_ctl" arch="x86_64"/>
+		<package name="mtr"/>
+		<package name="net-tools"/>
+		<package name="nfs-utils"/>
+		<package name="nmap-ncat"/>
+		<package name="ntfs-3g"/>
+		<package name="ntfsprogs"/>
+		<package name="opensc"/>
+		<package name="passwdqc"/>
+		<package name="pciutils"/>
+		<package name="pinfo"/>
+		<package name="plocate"/>
+		<package name="psacct"/>
+		<package name="quota"/>
+		<package name="realmd"/>
+		<package name="rsync"/>
+		<package name="rsyslog"/>
+		<package name="smartmontools"/>
+		<package name="sos"/>
+		<package name="sssd-proxy"/>
+		<package name="sudo"/>
+		<package name="symlinks"/>
+		<package name="systemd-udev"/>
+		<package name="tar"/>
+		<package name="tcpdump"/>
+		<package name="time"/>
+		<package name="traceroute"/>
+		<package name="tree"/>
+		<package name="unzip"/>
+		<package name="usbutils"/>
+		<package name="wget2-wget"/>
+		<package name="which"/>
+		<package name="whois"/>
+		<package name="words"/>
+		<package name="zip"/>
 	</packages>
 </image>
