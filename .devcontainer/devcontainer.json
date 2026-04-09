@@ -1,0 +1,28 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/docker-outside-of-docker
+// List of images https://github.com/devcontainers/images/tree/main/src/base-ubuntu
+{
+	"name": "Azure linux building ubuntu",
+	"image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
+
+	// Allows to use docker from the host machine inside the container.
+	"features": {
+		"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+			"version": "latest",
+			"enableNonRootDocker": "true",
+			"moby": "true"
+		}
+	},
+
+	// Use this environment variable if you need to bind mount your local source code into a new container.
+	"remoteEnv": {
+		"LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}"
+	},
+
+	// This mode is required for chroot to work correctly.
+	"runArgs": ["--privileged"],
+
+	// Use 'postCreateCommand' to run commands after the container is created
+	// Installing prerequisites as defined in toolkit/docs/building/prerequisites-ubuntu.md
+	 "postCreateCommand": "sudo ./toolkit/docs/building/prerequisites-ubuntu.sh --fix-go-links"
+}
