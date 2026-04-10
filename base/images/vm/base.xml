@@ -45,7 +45,6 @@
 		<ignore name="geolite2-city"/>
 		<ignore name="geolite2-country"/>
 		<package name="dracut-kiwi-oem-repart"/>
-		<package name="python3-dnf-plugin-tracer"/>
 		<package name="glibc-langpack-en"/>
 		<package name="kernel-modules"/>
 	</packages>
