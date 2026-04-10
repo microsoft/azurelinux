@@ -16,8 +16,6 @@
 		<package name="shim-signed-aa64" arch="aarch64"/>
 		<package name="shim-signed-x64" arch="x86_64"/>
 		<package name="kernel-core"/>
-		<package name="systemd-oomd-defaults"/>
-		<package name="systemd-resolved"/>
 	</packages>
 	<packages type="iso" patternType="plusRecommended" profiles="BootCore">
 		<package name="grub2-efi-aa64-cdboot" arch="aarch64"/>

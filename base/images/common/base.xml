@@ -43,6 +43,7 @@
 		<package name="sssd-kcm"/>
 		<package name="sudo"/>
 		<package name="systemd"/>
+		<package name="systemd-oomd-defaults"/>
 		<package name="systemd-resolved"/>
 		<package name="uboot-images-armv8" arch="aarch64"/>
 		<package name="uboot-tools" arch="aarch64"/>
