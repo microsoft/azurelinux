@@ -42,8 +42,6 @@
 		<package name="systemd-networkd"/>
 		<package name="systemd-oomd-defaults"/>
 		<package name="systemd-resolved"/>
-		<package name="uboot-images-armv8" arch="aarch64"/>
-		<package name="uboot-tools" arch="aarch64"/>
 		<package name="util-linux"/>
 		<package name="vim-minimal"/>
 		<package name="zram-generator-defaults"/>
