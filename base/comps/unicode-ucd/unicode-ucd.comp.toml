@@ -14,3 +14,12 @@ type = "spec-search-replace"
 section = "%install"
 regex = 'cp -p %\{SOURCE1\} %\{buildroot\}%\{ucddir\}'
 replacement = 'install -m 0644 %{SOURCE1} %{buildroot}%{ucddir}'
+
+# WORKAROUND: Manually bump the Release on this package to aid with Stage2
+# bring-up.
+[[components.unicode-ucd.overlays]]
+description = "Manually bump release"
+type = "spec-update-tag"
+tag = "Release"
+value = "2%{?dist}"
+
