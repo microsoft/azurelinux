@@ -1,0 +1,10 @@
+[components.python-pyside6]
+
+# The spec hardcodes "redhat-linux-build" in %build and %install, assuming the CMake build
+# directory follows Fedora's naming (%{_vendor}=redhat). On AZL, _vendor=azurelinux so the
+# directory is azurelinux-linux-build. Replace with the standard %{_vpath_builddir} RPM macro.
+[[components.python-pyside6.overlays]]
+description = "Replace hardcoded redhat-linux-build with %{_vpath_builddir} so the spec finds the CMake build dir on AZL"
+type = "spec-search-replace"
+regex = 'redhat-linux-build'
+replacement = '%{_vpath_builddir}'
