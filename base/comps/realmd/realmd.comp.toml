@@ -1,0 +1,11 @@
+[components.realmd]
+
+# realmd uses --with-distro to select distro-specific behavior (e.g., package names,
+# default client). Without this, it falls back to generic defaults that may not match
+# Azure Linux's package set which aligns closely with RHEL.
+[[components.realmd.overlays]]
+description = "Set --with-distro=redhat so realmd uses RHEL-aligned packages and defaults"
+type = "spec-search-replace"
+section = "%build"
+regex = '%configure'
+replacement = '%configure --with-distro=redhat'
