@@ -57,7 +57,7 @@ extends:
               - task: AzureCLI@2
                 displayName: "Acquire Entra ID Bearer Token"
                 inputs:
-                  azureSubscription: $(ServiceConnection)
+                  azureSubscription: ${{ variables.ServiceConnection }}
                   scriptType: bash
                   scriptLocation: inlineScript
                   inlineScript: |
