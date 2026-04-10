@@ -42,7 +42,6 @@
 		<ignore name="*-firmware"/>
 		<ignore name="geolite2-city"/>
 		<ignore name="geolite2-country"/>
-		<ignore name="plymouth"/>
 		<package name="dracut-kiwi-oem-repart"/>
 		<package name="python3-dnf-plugin-tracer"/>
 		<package name="glibc-langpack-en"/>

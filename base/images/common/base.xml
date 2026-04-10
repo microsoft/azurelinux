@@ -29,7 +29,6 @@
 		<package name="openssh-clients"/>
 		<package name="openssh-server"/>
 		<package name="parted"/>
-		<package name="plymouth"/>
 		<package name="policycoreutils"/>
 		<package name="prefixdevname"/>
 		<package name="procps-ng"/>
