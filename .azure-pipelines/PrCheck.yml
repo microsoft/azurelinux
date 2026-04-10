@@ -54,9 +54,8 @@ extends:
               - name: LinuxContainerImage
                 value: mcr.microsoft.com/onebranch/azurelinux/build:3.0
             steps:
-              # ── Step 1: Acquire an Entra ID bearer token ─────────────
               - task: AzureCLI@2
-                displayName: 'Acquire Entra ID Bearer Token'
+                displayName: "Acquire Entra ID Bearer Token"
                 inputs:
                   azureSubscription: $(ServiceConnection)
                   scriptType: bash
@@ -64,38 +63,36 @@ extends:
                   inlineScript: |
                     set -euo pipefail
 
-                    echo "Authenticating via Workload Identity Federation..."
+                    RESPONSE=$(az account get-access-token --resource "$API_AUDIENCE" -o json)
 
-                    TOKEN=$(az account get-access-token \
-                      --resource "$(ApiAudience)" \
-                      --query accessToken \
-                      -o tsv)
+                    TOKEN=$(jq -r .accessToken <<< "$RESPONSE")
+                    EXPIRES=$(jq -r .expiresOn <<< "$RESPONSE")
 
-                    if [[ -z "$TOKEN" ]]; then
-                      echo "##vso[task.logissue type=error]Failed to acquire bearer token."
+                    if [[ -z "$TOKEN" || "$TOKEN" == "null" ]]; then
+                      echo "##[error]Failed to acquire bearer token."
                       exit 1
                     fi
 
                     # Store as a secret pipeline variable for subsequent steps.
                     echo "##vso[task.setvariable variable=API_TOKEN;issecret=true]$TOKEN"
-                    echo "Bearer token acquired (expires: $(az account get-access-token \
-                      --resource "$(ApiAudience)" --query expiresOn -o tsv))"
+                    echo "Bearer token acquired (expires: $EXPIRES)"
+                env:
+                  API_AUDIENCE: $(ApiAudience)
 
-              # ── Step 2: Call the Control Tower prcheck API ───────────
               - script: |
                   set -euo pipefail
 
                   # Construct the repo URI from ADO predefined variables.
-                  REPO_URI="$(System.CollectionUri)$(System.TeamProject)/_git/$(Build.Repository.Name)"
+                  REPO_URI="${COLLECTION_URI}${TEAM_PROJECT}/_git/${REPO_NAME}"
 
                   # Build the JSON payload matching the Control Tower schema.
                   PAYLOAD=$(jq -n \
                     --arg repoUri        "$REPO_URI" \
-                    --argjson prNumber    "$(System.PullRequest.PullRequestNumber)" \
-                    --arg sourceBranch    "$(System.PullRequest.SourceBranch)" \
-                    --arg sourceCommitSha "$(System.PullRequest.SourceCommitId)" \
-                    --arg targetBranch    "$(System.PullRequest.TargetBranch)" \
-                    --arg targetCommitSha "$(Build.SourceVersion)" \
+                    --argjson prNumber    "$PR_NUMBER" \
+                    --arg sourceBranch    "$PR_SOURCE_BRANCH" \
+                    --arg sourceCommitSha "$PR_SOURCE_COMMIT" \
+                    --arg targetBranch    "$PR_TARGET_BRANCH" \
+                    --arg targetCommitSha "$TARGET_COMMIT" \
                     '{
                       repoUri:         $repoUri,
                       prNumber:        $prNumber,
@@ -105,12 +102,13 @@ extends:
                       targetCommitSha: $targetCommitSha
                     }')
 
-                  echo "Calling Control Tower prcheck for PR #$(System.PullRequest.PullRequestNumber)..."
+                  echo "Calling Control Tower prcheck for PR #${PR_NUMBER}..."
                   echo "Payload:"
                   echo "$PAYLOAD" | jq .
 
                   HTTP_CODE=$(curl -s -o response.json -w "%{http_code}" \
-                    -X POST "$(ApiBaseUrl)/api/Scenario/prcheck" \
+                    --connect-timeout 10 --max-time 60 \
+                    -X POST "${API_BASE_URL}/api/Scenario/prcheck" \
                     -H "Authorization: Bearer $API_TOKEN" \
                     -H "Content-Type: application/json" \
                     -d "$PAYLOAD")
@@ -118,13 +116,22 @@ extends:
                   echo "HTTP status: $HTTP_CODE"
 
                   if [[ "$HTTP_CODE" -lt 200 || "$HTTP_CODE" -ge 300 ]]; then
-                    echo "##vso[task.logissue type=error]Control Tower returned HTTP $HTTP_CODE"
-                    cat response.json
+                    echo "##[error]Control Tower returned HTTP $HTTP_CODE"
+                    jq . response.json 2>/dev/null || echo "(non-JSON response body omitted)"
                     exit 1
                   fi
 
                   echo "Service response:"
-                  cat response.json | jq .
+                  jq . response.json
                 env:
                   API_TOKEN: $(API_TOKEN)
-                displayName: 'Call Control Tower prcheck API'
+                  COLLECTION_URI: $(System.CollectionUri)
+                  TEAM_PROJECT: $(System.TeamProject)
+                  REPO_NAME: $(Build.Repository.Name)
+                  PR_NUMBER: $(System.PullRequest.PullRequestNumber)
+                  PR_SOURCE_BRANCH: $(System.PullRequest.SourceBranch)
+                  PR_SOURCE_COMMIT: $(System.PullRequest.SourceCommitId)
+                  PR_TARGET_BRANCH: $(System.PullRequest.TargetBranch)
+                  TARGET_COMMIT: $(Build.SourceVersion)
+                  API_BASE_URL: $(ApiBaseUrl)
+                displayName: 'Call Control Tower "prcheck" API'
