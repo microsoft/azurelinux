@@ -7,7 +7,6 @@
 		<package name="bash"/>
 		<package name="coreutils"/>
 		<package name="curl"/>
-		<package name="dhcp-client"/>
 		<package name="dnf5"/>
 		<package name="dnf5-plugins"/>
 		<package name="dracut-config-generic"/>
