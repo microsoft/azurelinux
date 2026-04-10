@@ -1,0 +1,5 @@
+# Pin to 1.0.45 to satisfy rust-clap_derive 4.6.0 dependency.
+# Fedora dist-git commit: https://src.fedoraproject.org/rpms/rust-quote/c/6be9a6b5095f96e699c852b704230c45816f6510
+# Remove this pin once the snapshot date advances past 2026-03-04.
+[components.rust-quote]
+spec = { type = "upstream", upstream-commit = "6be9a6b5095f96e699c852b704230c45816f6510" }
