@@ -1,0 +1,22 @@
+[components.onnx]
+
+# Fedora's 0002-Let-pyproject_wheel-use-binaries-from-cmake_build.patch hardcodes
+# "redhat-linux-build" as the CMake build directory name in setup.py. On AZL,
+# %{_vpath_builddir} = azurelinux-linux-build, so %pyproject_wheel can't find the
+# CMake build output. Fix by parameterizing via an environment variable (the Python
+# equivalent of the Make variable approach used for iscsi-initiator-utils).
+
+[[components.onnx.overlays]]
+description = "Replace hardcoded redhat-linux-build with VPATH_BUILDDIR env var lookup in setup.py patch"
+type = "file-search-replace"
+file = "0002-Let-pyproject_wheel-use-binaries-from-cmake_build.patch"
+regex = '"redhat-linux-build"'
+replacement = 'os.environ.get("VPATH_BUILDDIR", "redhat-linux-build")'
+
+[[components.onnx.overlays]]
+description = "Export VPATH_BUILDDIR=%{_vpath_builddir} so setup.py finds the CMake build dir"
+type = "spec-prepend-lines"
+section = "%build"
+lines = [
+    "export VPATH_BUILDDIR=%{_vpath_builddir}",
+]
