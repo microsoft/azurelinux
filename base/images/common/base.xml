@@ -17,7 +17,6 @@
 		<package name="firewalld"/>
 		<package name="glibc"/>
 		<package name="hostname"/>
-		<package name="initial-setup"/>
 		<package name="initscripts"/>
 		<package name="iproute"/>
 		<package name="iputils"/>
