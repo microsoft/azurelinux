@@ -1,0 +1,6 @@
+[components.erlang]
+
+# Disable doc generation: doc generation pulls in fop/fog as build deps.
+# Neither is available in AZL4, so disable docs explicitly.
+[components.erlang.build]
+without = ["doc"]
