@@ -37,7 +37,6 @@
 	<packages type="image" patternType="plusRecommended" profiles="BaseVM">
 		<ignore name="dracut-config-rescue"/>
 		<ignore name="firewalld"/>
-		<ignore name="fwupd"/>
 		<ignore name="kernel"/>
 		<ignore name="*-firmware"/>
 		<ignore name="geolite2-city"/>
