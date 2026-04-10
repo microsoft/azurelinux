@@ -38,7 +38,6 @@
 		<package name="qemu-guest-agent"/>
 	</packages>
 	<packages type="image" patternType="plusRecommended" profiles="BaseVM">
-		<ignore name="firewalld"/>
 		<ignore name="kernel"/>
 		<ignore name="*-firmware"/>
 		<ignore name="geolite2-city"/>
