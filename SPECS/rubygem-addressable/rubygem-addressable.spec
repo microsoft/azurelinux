@@ -2,8 +2,8 @@
 %global gem_name addressable
 Summary:        an alternative implementation to the URI implementation that is part of Ruby's standard library
 Name:           rubygem-%{gem_name}
-Version:        2.8.5
-Release:        2%{?dist}
+Version:        2.8.10
+Release:        1%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -34,6 +34,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Fri Apr 10 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.8.10-1
+- Auto-upgrade to 2.8.10 - for CVE-2026-35611
+
 * Wed Apr 17 2024 Andrew Phelps <anphel@microsoft.com> - 2.8.5-2
 - Update runtime rubygem required version
 
