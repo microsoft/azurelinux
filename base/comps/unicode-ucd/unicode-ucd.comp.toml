@@ -1,0 +1,16 @@
+[components.unicode-ucd]
+
+# The upstream spec uses `cp -p` to install Unihan.zip (Source1) into the UCD
+# directory. The `-p` flag preserves the source file's original permissions.
+# Fedora's lookaside cache delivers files with 0644, but azldev's downloader
+# stores them with 0600 — so the installed Unihan.zip ends up owner-only
+# readable instead of world-readable.
+#
+# Fix: replace `cp -p` with `install -m 0644` to set permissions explicitly,
+# making the result independent of the downloader's behavior.
+[[components.unicode-ucd.overlays]]
+description = "Use install -m 0644 for Unihan.zip to ensure correct permissions regardless of source file mode"
+type = "spec-search-replace"
+section = "%install"
+regex = 'cp -p %\{SOURCE1\} %\{buildroot\}%\{ucddir\}'
+replacement = 'install -m 0644 %{SOURCE1} %{buildroot}%{ucddir}'
