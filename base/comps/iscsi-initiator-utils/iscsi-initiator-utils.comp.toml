@@ -1,0 +1,22 @@
+[components.iscsi-initiator-utils]
+
+# Fedora's 0104-libiscsi-build-fixes.patch hardcodes -L../redhat-linux-build in the libiscsi
+# Makefile, assuming the meson build directory is named redhat-linux-build (from Fedora's
+# %{_vpath_builddir} = %{_vendor}-%{_target_os}-build where _vendor=redhat). On AZL,
+# _vendor=azurelinux, so the directory is azurelinux-linux-build and the linker can't find
+# libopeniscsiusr.so. Fix by parameterizing the path via a MESON_BUILDDIR make variable,
+# passed from the spec using the standard %{_vpath_builddir} RPM macro.
+
+[[components.iscsi-initiator-utils.overlays]]
+description = "Replace hardcoded redhat-linux-build with $(MESON_BUILDDIR) make variable in libiscsi Makefile patch"
+type = "file-search-replace"
+file = "0104-libiscsi-build-fixes.patch"
+regex = 'redhat-linux-build'
+replacement = '$(MESON_BUILDDIR)'
+
+[[components.iscsi-initiator-utils.overlays]]
+description = "Pass MESON_BUILDDIR=%{_vpath_builddir} to make so libiscsi finds libopeniscsiusr.so in the correct meson build dir"
+type = "spec-search-replace"
+section = "%build"
+regex = '%make_build LDFLAGS'
+replacement = '%make_build MESON_BUILDDIR=%{_vpath_builddir} LDFLAGS'
