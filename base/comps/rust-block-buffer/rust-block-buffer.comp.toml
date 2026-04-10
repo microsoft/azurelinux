@@ -1,0 +1,5 @@
+# Pin to 0.12.0 — required by rust-cipher 0.5.1 (part of Fedora side tag f43-build-side-130933).
+# Remove this pin once the default F43 snapshot includes block-buffer 0.12.0.
+# https://src.fedoraproject.org/rpms/rust-block-buffer/c/91724fe35aac6d4b47be546b4461fcafa0682993
+[components.rust-block-buffer]
+spec = { type = "upstream", upstream-commit = "91724fe35aac6d4b47be546b4461fcafa0682993" }
