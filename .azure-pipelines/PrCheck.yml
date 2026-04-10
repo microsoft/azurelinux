@@ -61,10 +61,6 @@ extends:
                   azureSubscription: $(ServiceConnection)
                   scriptType: bash
                   scriptLocation: inlineScript
-                  # Exposes $servicePrincipalId, $idToken, $tenantId in the
-                  # script environment — useful for debugging or manual OIDC
-                  # exchange if needed.
-                  addSpnToEnvironment: true
                   inlineScript: |
                     set -euo pipefail
 
