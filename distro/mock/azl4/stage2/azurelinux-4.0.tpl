@@ -81,8 +81,7 @@ user_agent={{ user_agent }}
 
 [koji]
 name=koji
-baseurl=http://20.88.251.114/kojifiles/repos-dist/azl4-bootstrap-rpms-tag-20260227/latest/$basearch/
-cost=1
+baseurl=http://20.88.251.114/kojifiles/repos-dist/azl4-bootstrap-rpms-tag-20260405/latest/$basearch/
 enabled=1
 skip_if_unavailable=False
 """
