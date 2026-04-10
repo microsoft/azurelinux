@@ -35,6 +35,9 @@ resources:
 extends:
   template: v2/OneBranch.Official.CrossPlat.yml@templates
   parameters:
+    featureFlags:
+      LinuxHostVersion:
+        Network: R1
     stages:
       - stage: PRCheck
         # variables:
