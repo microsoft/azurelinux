@@ -1,0 +1,8 @@
+[components.sssd]
+
+# Fix sourcing /etc/os-release overwriting VERSION variable in platform.m4
+# Upstream PR: https://github.com/SSSD/sssd/pull/8397
+[[components.sssd.overlays]]
+description = "Fix platform.m4 sourcing /etc/os-release overwriting VERSION shell variable, which breaks @VERSION@ substitutions in .in files"
+type = "patch-add"
+source = "fix-platform-m4-version-overwrite.patch"
