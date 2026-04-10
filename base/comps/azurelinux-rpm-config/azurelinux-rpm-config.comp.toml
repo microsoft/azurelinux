@@ -27,6 +27,12 @@ overlays = [
     { type = "spec-prepend-lines", section = "%install", lines = ["mkdir -p %{buildroot}/usr/lib/rpm", "ln -sf redhat %{buildroot}/usr/lib/rpm/azurelinux"] },
     { type = "spec-prepend-lines", section = "%files", lines = ["/usr/lib/rpm/azurelinux"] },
 
+    # Create symlink for lua dir: /usr/lib/rpm/lua/azurelinux -> /usr/lib/rpm/lua/fedora
+    # This allows the distro-specific name to be used with minimal required churn to
+    # spread references to the standard path in Fedora.
+    { type = "spec-append-lines", section = "%install", lines = ["ln -sf fedora %{buildroot}%{_rpmluadir}/azurelinux"] },
+    { type = "spec-append-lines", section = "%files", lines = ["%{_rpmluadir}/azurelinux"] },
+
     #
     # Overlays for non-spec files.
     #
