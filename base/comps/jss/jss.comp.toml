@@ -1,0 +1,11 @@
+[components.jss]
+
+# AZL builds NSS 3.120+ which includes PQC auth defs (ML-DSA) in ssl_auth_size.
+# JSS's SSLCipher.c has a PR_STATIC_ASSERT that auth_alg_defs[] matches ssl_auth_size,
+# but the PQC entries in auth_alg_defs[] are gated on NSS_VERSION_PQC_DEF, which the
+# spec only enables for RHEL >= 10.  Since AZL's NSS always has PQC defs, we
+# unconditionally supply the flag the spec expects — matching what Fedora rawhide
+# (jss 5.9.0) now does.
+# See: https://src.fedoraproject.org/rpms/jss/blob/rawhide/f/jss.spec (line ~28)
+[components.jss.build]
+defines = { enable_nss_version_pqc_def_flag = "-DENABLE_NSS_VERSION_PQC_DEF=ON" }
