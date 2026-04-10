@@ -141,8 +141,9 @@ Resulting component name: `kmod-nvidia-open`
 To add a new kernel version, add a new matrix value:
 
 ```toml
-[component-templates.kmod-nvidia-open.matrix.values.6-12]
+[component-templates.kmod-nvidia-open.matrix.values.64k]
 ```
+Resulting component name: `kmod-nvidia-open-64k` (or `kmod-64k-nvidia-open`?)
 
 ### User-space: standard `components`
 
