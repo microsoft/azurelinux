@@ -29,6 +29,19 @@ libraries/tools.
      Azure licensing.
    
    All three variants conflict — only one can be installed at a time.
+5. **Two user-space packages** — Each driver branch has a matching
+   user-space package:
+   - **`nvidia-cuda-driver`** — User-space libraries and tools for the
+     CUDA/datacenter branch. Pairs with either `kmod-nvidia-open` or
+     `kmod-nvidia-closed` (same branch, different kernel module source).
+     Extracted from the NVIDIA datacenter `.run` installer.
+   - **`nvidia-grid-driver`** — User-space libraries and tools for the
+     GRID/vGPU branch. Pairs only with `kmod-nvidia-grid`. Extracted from
+     the same GRID `-grid-azure.run` file as the kmod, includes Azure
+     licensing and vGPU manager components.
+   
+   The two user-space packages conflict — a system runs either dedicated
+   GPU compute or GRID/vGPU, not both.
 
 ## Package Naming Conventions
 
@@ -106,7 +119,7 @@ Key points:
 ### Kernel modules: `component-templates` with matrix
 
 The kmod uses `component-templates` with a `kernel` matrix axis. This causes
-azldev to generate one component per kernel version:
+azldev to generate one component per kernel flavours:
 
 ```toml
 [component-templates.kmod-nvidia-open]
@@ -118,12 +131,12 @@ spec = { type = "local", path = "kmod-nvidia-open.spec" }
 [[component-templates.kmod-nvidia-open.matrix]]
 axis = "kernel"
 
-[component-templates.kmod-nvidia-open.matrix.values.6-18]
+[component-templates.kmod-nvidia-open.matrix.values.default]
 # No overlays needed — spec auto-detects kernel_uname_r from
 # the installed kernel-devel headers at build time.
 ```
 
-Resulting component name: `kmod-nvidia-open-6-18`
+Resulting component name: `kmod-nvidia-open`
 
 To add a new kernel version, add a new matrix value:
 
@@ -152,21 +165,11 @@ filename = "NVIDIA-Linux-aarch64-595.58.03.run"
 Both x86_64 and aarch64 source files are listed; the spec uses `%ifarch`
 to select the correct one at build time.
 
-## Architecture Support
-
-| Package | x86_64 | aarch64 |
-|---------|--------|---------|
-| `kmod-nvidia-open` | ✅ | ✅ |
-| `nvidia-cuda-driver` | ✅ | ✅ |
-
-The kernel module spec builds natively on both architectures using the
-same source (NVIDIA's open-gpu-kernel-modules supports both).
-
 ## Kernel Version Auto-Detection
 
 The `component-templates` matrix in the kmod TOML file defines which kernel
 flavours to build against. When azldev expands the template, each matrix
-value produces a distinct component (e.g., `kmod-nvidia-open-6-18`) whose
+value produces a distinct component (e.g., `kmod-nvidia-open-hwe`) whose
 build configuration can specify the matching `kernel-<flavour>-devel`
 package as a `BuildRequires`. This ensures the correct kernel headers are
 pulled into the mock chroot for each flavour.
@@ -207,8 +210,9 @@ listing it after ensures the kmod RPM is available for integration testing).
 ## GRID / vGPU Packages
 
 The open-source packages (`kmod-nvidia-open` + `nvidia-cuda-driver`) are for
-**bare-metal GPU compute** (physical GPU or full GPU passthrough). They are
-**not compatible** with NVIDIA GRID/vGPU workloads.
+**dedicated GPU compute** — the VM (or host) has exclusive access to the full
+physical GPU, whether on bare metal or via GPU passthrough. They are **not
+compatible** with NVIDIA GRID/vGPU workloads where a GPU is shared across VMs.
 
 GRID/vGPU requires a separate set of packages built from proprietary `.run`
 files redistributed by Microsoft. These `.run` files include Azure-specific
@@ -234,9 +238,9 @@ and are specific to Azure N-series VM families.
   different workloads. All three kmod variants conflict with each other.
 - **`nvidia-grid-driver`** — the user-space companion. Named `grid-driver`
   (not `cuda-driver`) to clearly indicate the GRID/vGPU purpose and avoid
-  confusion with the bare-metal `nvidia-cuda-driver` package. These two
-  user-space packages also conflict — a system runs either bare-metal compute
-  or GRID, not both.
+  confusion with the dedicated-GPU `nvidia-cuda-driver` package. These two
+  user-space packages also conflict — a system runs either dedicated GPU
+  compute or GRID/vGPU, not both.
 
 ### Dependency graph (GRID)
 
@@ -265,8 +269,8 @@ kmod-nvidia-grid (per kernel version)
 | `nvidia-grid-driver` | ❌ Conflicts | ❌ Conflicts | ✅ | ❌ Conflicts | — |
 
 A system installs **one** of three kmod variants and its matching user-space package:
-- **`kmod-nvidia-open`** + `nvidia-cuda-driver` — open-source, bare-metal compute
-- **`kmod-nvidia-closed`** + `nvidia-cuda-driver` — proprietary, bare-metal compute
+- **`kmod-nvidia-open`** + `nvidia-cuda-driver` — open-source, dedicated GPU compute
+- **`kmod-nvidia-closed`** + `nvidia-cuda-driver` — proprietary, dedicated GPU compute
 - **`kmod-nvidia-grid`** + `nvidia-grid-driver` — proprietary, GRID/vGPU
 
 Note that `nvidia-cuda-driver` pairs with **either** `kmod-nvidia-open` or
