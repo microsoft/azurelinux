@@ -99,7 +99,7 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./dist/flanneld
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.14.0-16
 - Bump release to rebuild with go 1.19.12
 
-* Wed Jul 14 2023 Andrew Phelps <anphel@microsoft.com> - 0.14.0-15
+* Fri Jul 14 2023 Andrew Phelps <anphel@microsoft.com> - 0.14.0-15
 - Bump release to rebuild against glibc 2.35-4
 
 * Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.14.0-14
