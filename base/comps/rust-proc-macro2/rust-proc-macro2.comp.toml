@@ -1,0 +1,5 @@
+# Pin to 1.0.106 to satisfy rust-clap_derive 4.6.0 dependency.
+# Fedora dist-git commit: https://src.fedoraproject.org/rpms/rust-proc-macro2/c/07e0d3feb1b8191ba8486f4795d0f4135053f949
+# Remove this pin once the snapshot date advances past 2026-03-18.
+[components.rust-proc-macro2]
+spec = { type = "upstream", upstream-commit = "07e0d3feb1b8191ba8486f4795d0f4135053f949" }
