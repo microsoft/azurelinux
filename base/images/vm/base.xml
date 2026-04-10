@@ -23,7 +23,10 @@
 		<package name="rsync"/>
 		<package name="tar"/>
 		<package name="chrony"/>
-		<package name="console-login-helper-messages-issuegen"/>
+		<!-- console-login-helper-messages-issuegen requires
+		     NetworkManager; it may be useful to re-include
+		     once it can work for systemd-networkd also -->
+		<!-- <package name="console-login-helper-messages-issuegen"/> -->
 		<package name="console-login-helper-messages-motdgen"/>
 		<package name="console-login-helper-messages-profile"/>
 		<package name="systemd-oomd-defaults"/>
