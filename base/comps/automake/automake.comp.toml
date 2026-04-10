@@ -1,0 +1,6 @@
+[components.automake]
+
+[components.automake.build]
+# Treat AZL like RHEL: skip Fedora-only test deps (gcc-objc, gcc-objc++, imake,
+# lzip, ncompress) that are gated behind %{?rhel} in the upstream spec.
+defines = { rhel = "10" }
