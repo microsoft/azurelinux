@@ -1,0 +1,6 @@
+[components.meson]
+
+[components.meson.build]
+# Treat AZL like RHEL: skip Fedora-only test deps (gcc-objc, gnustep, mono,
+# qt5, wx, etc.) that are gated behind %{undefined rhel} in the upstream spec.
+defines = { rhel = "10" }
