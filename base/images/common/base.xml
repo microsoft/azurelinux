@@ -3,7 +3,6 @@
 		<profile name="CoreCommon" description="Core common packages"/>
 	</profiles>
 	<packages type="image" patternType="plusRecommended" profiles="CoreCommon">
-		<package name="NetworkManager"/>
 		<package name="audit"/>
 		<package name="bash"/>
 		<package name="coreutils"/>
@@ -43,6 +42,7 @@
 		<package name="sssd-kcm"/>
 		<package name="sudo"/>
 		<package name="systemd"/>
+		<package name="systemd-networkd"/>
 		<package name="systemd-oomd-defaults"/>
 		<package name="systemd-resolved"/>
 		<package name="uboot-images-armv8" arch="aarch64"/>
