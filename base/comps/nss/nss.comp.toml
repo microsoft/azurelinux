@@ -1,0 +1,4 @@
+[components.nss]
+# Pin to 3.121.0 (commit f97da13) — required by 389-ds-base-libs 3.1.4 which
+# has a runtime dependency on nss >= 3.121.0.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "f97da13cbff826185fa4896bf6529cc44094056d" }
