@@ -1,0 +1,9 @@
+[components.'python3.13']
+
+[components.'python3.13'.build]
+# Disable the experimental JIT compiler (PEP 744).
+# This matches the python3.14 component and RHEL behavior.
+# The upstream spec requires clang(major) = 18 to build JIT stencils,
+# but AZL does not ship that specific clang version. JIT is experimental,
+# off-by-default, and has minimal impact on server workloads.
+without = ["jit"]
