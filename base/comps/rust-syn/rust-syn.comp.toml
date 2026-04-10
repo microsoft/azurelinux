@@ -1,0 +1,5 @@
+# Pin to 2.0.117 to satisfy rust-clap_derive 4.6.0 dependency.
+# Fedora dist-git commit: https://src.fedoraproject.org/rpms/rust-syn/c/00455d4a3940dfb76f92b4d027b6dd792dccc89c
+# Remove this pin once the snapshot date advances past 2026-02-24.
+[components.rust-syn]
+spec = { type = "upstream", upstream-commit = "00455d4a3940dfb76f92b4d027b6dd792dccc89c" }
