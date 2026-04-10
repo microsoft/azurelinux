@@ -5,14 +5,19 @@
 # so automatic debuginfo extraction fails with empty debugsourcefiles.list.
 %global debug_package %{nil}
 
-%{!?kernel_devel_package: %global kernel_devel_package kernel-devel}
-%global kernel_devel_package kernel-devel
-%global kernel_uname_r %{kernel_version}.1-3.azl4.%{_arch}
+# Auto-detect the kernel version from the installed kernel-devel package.
+# The kernel-devel package installs headers to /usr/src/kernels/<uname-r>.
+# This is resolved at RPM build time (inside mock), after BuildRequires
+# are installed — so the directory will exist.
+#
+# To override: rpmbuild --define 'kernel_uname_r 6.18.5-1.4.azl4.x86_64'
+%{!?kernel_uname_r: %global kernel_uname_r %(ls -1 /usr/src/kernels/ 2>/dev/null | sort -V | tail -1)}
+
 %global kmod_install_dir /lib/modules/%{kernel_uname_r}/extra/nvidia
 
-Name:           kmod-cuda
+Name:           kmod-nvidia-open
 Version:        595.58.03
-Release:        2%{?dist}
+Release:        3_%{kernel_uname_r}%{?dist}
 Summary:        NVIDIA open GPU kernel modules for CUDA workloads
 License:        MIT AND GPLv2
 URL:            https://github.com/NVIDIA/open-gpu-kernel-modules
@@ -21,10 +26,9 @@ Distribution:   Azure Linux
 ExclusiveArch:  x86_64 aarch64
 
 Source0:        https://github.com/NVIDIA/open-gpu-kernel-modules/archive/refs/tags/%{version}.tar.gz#/open-gpu-kernel-modules-%{version}.tar.gz
-Source1:        kmod-cuda-modprobe.conf
+Source1:        kmod-nvidia-open-modprobe.conf
 
-BuildRequires:  %{kernel_devel_package}
-BuildRequires:  kernel-devel-uname-r = %{kernel_uname_r}
+BuildRequires:  kernel-devel
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  make
@@ -35,9 +39,9 @@ Requires:       kernel-uname-r = %{kernel_uname_r}
 Requires(post): kmod
 Requires(postun): kmod
 
-Provides:       nvidia-kmod = %{version}-%{release}
-Provides:       kmod-nvidia = %{version}-%{release}
-Provides:       kmod-cuda-%{kernel_uname_r} = %{version}-%{release}
+Provides:       nvidia-open-kmod = %{version}-%{release}
+Provides:       kmod-nvidia-open = %{version}-%{release}
+Provides:       kmod-nvidia-open-%{kernel_uname_r} = %{version}-%{release}
 
 # Prevent conflicting NVIDIA driver packages from being installed
 Conflicts:      nvidia-driver-cuda
@@ -90,11 +94,11 @@ for mod in nvidia nvidia-modeset nvidia-drm nvidia-uvm nvidia-peermem; do
 done
 
 # Install modprobe configuration to blacklist conflicting modules
-install -D -m 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/modprobe.d/kmod-cuda.conf
+install -D -m 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/modprobe.d/kmod-nvidia-open.conf
 
 # Generate modules.dep metadata at build time (weak-modules support)
 install -d %{buildroot}%{_sysconfdir}/depmod.d
-cat > %{buildroot}%{_sysconfdir}/depmod.d/kmod-cuda.conf << 'EOF'
+cat > %{buildroot}%{_sysconfdir}/depmod.d/kmod-nvidia-open.conf << 'EOF'
 # Ensure NVIDIA modules in extra/ override any in-tree modules
 override nvidia %{kernel_uname_r} extra/nvidia
 override nvidia-modeset %{kernel_uname_r} extra/nvidia
@@ -116,10 +120,14 @@ EOF
 %{kmod_install_dir}/nvidia-drm.ko
 %{kmod_install_dir}/nvidia-uvm.ko
 %{kmod_install_dir}/nvidia-peermem.ko
-%config(noreplace) %{_sysconfdir}/modprobe.d/kmod-cuda.conf
-%{_sysconfdir}/depmod.d/kmod-cuda.conf
+%config(noreplace) %{_sysconfdir}/modprobe.d/kmod-nvidia-open.conf
+%{_sysconfdir}/depmod.d/kmod-nvidia-open.conf
 
 %changelog
+* Thu Apr 10 2026 Elaheh Dehghani <edehghani@microsoft.com> - 595.58.03-2
+- Auto-detect kernel version from installed kernel-devel package
+- Remove hardcoded kernel_version macro dependency
+
 * Thu Apr 09 2026 Elaheh Dehghani <edehghani@microsoft.com> - 595.58.03-1
 - Initial Azure Linux 4.0 package
 - Built from NVIDIA/open-gpu-kernel-modules upstream source

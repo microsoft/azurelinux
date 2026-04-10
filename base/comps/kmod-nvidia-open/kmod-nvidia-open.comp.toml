@@ -1,0 +1,16 @@
+[component-templates.kmod-nvidia-open]
+description = "Out-of-tree driver built against multiple kernel versions and toolchains"
+
+[component-templates.kmod-nvidia-open.default-component-config]
+spec = { type = "local", path = "kmod-nvidia-open.spec" }
+
+[[component-templates.kmod-nvidia-open.default-component-config.source-files]]
+filename = "open-gpu-kernel-modules-595.58.03.tar.gz"
+hash-type = "SHA256"
+hash = "e0c4659ddf15e4f4e19cee05b49f88c9ba08ef3add0dfe08249798f58d0fe75e"
+origin = { type = "download", uri = "https://github.com/NVIDIA/open-gpu-kernel-modules/archive/refs/tags/595.58.03.tar.gz" }
+
+[[component-templates.kmod-nvidia-open.matrix]]
+axis = "kernel"
+
+[component-templates.kmod-nvidia-open.matrix.values.6-18]
