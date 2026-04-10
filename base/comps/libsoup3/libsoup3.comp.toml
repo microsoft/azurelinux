@@ -1,0 +1,10 @@
+[components.libsoup3]
+
+# Azure Linux does not ship mingw cross-compilation toolchains.
+# The upstream spec conditionally enables mingw when %fedora is defined,
+# which is true in our build environment. Force it off.
+[[components.libsoup3.overlays]]
+description = "Disable mingw sub-packages — Azure Linux does not ship mingw toolchains"
+type = "spec-search-replace"
+regex = '%global with_mingw 1'
+replacement = '%global with_mingw 0'
