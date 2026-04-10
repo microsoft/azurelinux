@@ -22183,8 +22183,8 @@
         "type": "other",
         "other": {
           "name": "python-argcomplete",
-          "version": "1.10.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/a/argcomplete/argcomplete-1.10.0.tar.gz"
+          "version": "3.6.3",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/a/argcomplete/argcomplete-3.6.3.tar.gz"
         }
       }
     },
