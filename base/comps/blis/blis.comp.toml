@@ -1,0 +1,7 @@
+[components.blis]
+
+[[components.blis.overlays]]
+description = "Remove %{?fedora} from the arch-limiting condition — memkind is not available in AZL4."
+type = "spec-search-replace"
+regex = '%if 0%\{\?el8\}%\{\?el9\}%\{\?fedora\}'
+replacement = "%if 0%{?el8}%{?el9}"
