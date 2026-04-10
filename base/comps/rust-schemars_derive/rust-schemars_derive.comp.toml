@@ -1,0 +1,5 @@
+# Pin to 1.2.1 to stay in sync with rust-schemars (also pinned).
+# Remove this pin once Koji builders can see prior completed builds as deps.
+# https://src.fedoraproject.org/rpms/rust-schemars_derive/c/3f18fd4f26305683dd171e3bf1fb07178cd92282
+[components.rust-schemars_derive]
+spec = { type = "upstream", upstream-commit = "3f18fd4f26305683dd171e3bf1fb07178cd92282" }
