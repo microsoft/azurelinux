@@ -1,0 +1,12 @@
+[components.oneapi-level-zero]
+
+# The spec hardcodes "./redhat-linux-build/bin/zello_world" in %install, assuming the CMake
+# build directory is named redhat-linux-build (Fedora's %{_vpath_builddir} where
+# _vendor=redhat). On AZL, _vendor=azurelinux so the directory is azurelinux-linux-build.
+# Replace with the standard %{_vpath_builddir} RPM macro.
+[[components.oneapi-level-zero.overlays]]
+description = "Replace hardcoded redhat-linux-build with %{_vpath_builddir} in %install so zello_world binary is found on AZL"
+type = "spec-search-replace"
+section = "%install"
+regex = 'redhat-linux-build'
+replacement = '%{_vpath_builddir}'
