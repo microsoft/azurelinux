@@ -1,0 +1,12 @@
+[components.libyang]
+
+# The spec hardcodes "pushd redhat-linux-build" in %check, assuming the CMake build directory
+# is named redhat-linux-build (Fedora's %{_vpath_builddir} where _vendor=redhat). On AZL,
+# _vendor=azurelinux, so the directory is azurelinux-linux-build. Replace with the standard
+# %{_vpath_builddir} RPM macro.
+[[components.libyang.overlays]]
+description = "Replace hardcoded redhat-linux-build with %{_vpath_builddir} in %check so ctest finds the CMake build dir on AZL"
+type = "spec-search-replace"
+section = "%check"
+regex = 'redhat-linux-build'
+replacement = '%{_vpath_builddir}'
