@@ -37,20 +37,22 @@ extends:
   parameters:
     stages:
       - stage: PRCheck
-        variables:
-          - group: "Agent pools (DEV)"
+        # variables:
+        #   - group: "Agent pools (DEV)"
         jobs:
           - job: CallControlTowerAPI
             pool:
               type: linux
-              isCustom: true
-              name: $(DEV_AMD64_Managed_AZL3)
+              # isCustom: true
+              # name: $(DEV_AMD64_Managed_AZL3)
             variables:
               - group: ControlTower-PRCheck
               - name: ob_outputDirectory
                 value: $(Build.ArtifactStagingDirectory)/output
               - name: ob_artifactBaseName
                 value: prcheck
+              - name: LinuxContainerImage
+                value: mcr.microsoft.com/onebranch/azurelinux/build:3.0
             steps:
               # ── Step 1: Acquire an Entra ID bearer token ─────────────
               - task: AzureCLI@2
