@@ -1,0 +1,6 @@
+[components.llvm]
+
+# Workaround: Disable MLIR until python-nanobind (and its dep robin-map)
+# are imported into Azure Linux. MLIR is gated on %{with mlir} in the
+# upstream spec and pulls in python3-nanobind-devel which doesn't exist yet.
+build.without = ["mlir"]
