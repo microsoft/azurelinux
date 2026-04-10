@@ -35,9 +35,6 @@ resources:
 extends:
   template: v2/OneBranch.Official.CrossPlat.yml@templates
   parameters:
-    globalVariables:
-      - group: ControlTower-PRCheck
-
     stages:
       - stage: PRCheck
         jobs:
@@ -45,8 +42,11 @@ extends:
             pool:
               type: linux
             variables:
-              ob_outputDirectory: $(Build.ArtifactStagingDirectory)/output
-              ob_artifactBaseName: prcheck
+              - group: ControlTower-PRCheck
+              - name: ob_outputDirectory
+                value: $(Build.ArtifactStagingDirectory)/output
+              - name: ob_artifactBaseName
+                value: prcheck
             steps:
               # ── Step 1: Acquire an Entra ID bearer token ─────────────
               - task: AzureCLI@2
