@@ -1,13 +1,14 @@
 Summary:        Programs for compressing and decompressing files
 Name:           xz
 Version:        5.2.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 URL:            https://tukaani.org/xz
 License:        GPLv2+ and GPLv3+ and LGPLv2+
 Group:          Applications/File
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://tukaani.org/xz/%{name}-%{version}.tar.xz
+Patch0:         CVE-2026-34743.patch
 Provides:       xz-lzma-compat = %{version}-%{release}
 Provides:       lzma = %{version}-%{release}
 Requires:       xz-libs = %{version}-%{release}
@@ -36,7 +37,8 @@ Group:      System Environment/Libraries
 This package contains minimal set of shared xz libraries.
 
 %prep
-%setup -q
+%autosetup -p1
+
 %build
 ./configure \
     --prefix=%{_prefix} \
@@ -100,6 +102,9 @@ make  %{?_smp_mflags}  check
 %defattr(-,root,root)
 
 %changelog
+*   Tue Apr 07 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 5.2.5-2
+-   Patch for CVE-2026-34743
+
 *   Fri Nov 05 2021 Andrew Phelps <anphel@microsoft.com> 5.2.5-1
 -   Update to version 5.2.5
 -   License verified
