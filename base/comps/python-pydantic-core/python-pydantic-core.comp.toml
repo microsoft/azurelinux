@@ -1,0 +1,5 @@
+[components.python-pydantic-core]
+# Pin to commit 0d6908f which fixes a single %check test failure introduced
+# after the snapshot date. Fix landed upstream at:
+# https://src.fedoraproject.org/rpms/python-pydantic-core/c/0d6908f34fb212599f387d5c36c44dd195a72a54?branch=f43
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "0d6908f34fb212599f387d5c36c44dd195a72a54" }
