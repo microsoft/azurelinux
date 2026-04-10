@@ -1,0 +1,5 @@
+# Pin to 0.6.0 — must stay in sync with rust-equator (also pinned to 0.6.0).
+# Remove this pin once Koji builders can see prior completed builds as deps.
+# https://src.fedoraproject.org/rpms/rust-equator-macro/c/6f308d8f8e02fe4780ea1dd9958886e1b97ef10b
+[components.rust-equator-macro]
+spec = { type = "upstream", upstream-commit = "6f308d8f8e02fe4780ea1dd9958886e1b97ef10b" }
