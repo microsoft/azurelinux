@@ -304,7 +304,7 @@ fi
 %endif
 
 %changelog
-* Thu Mar 26 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.1.4.90mlnx3-23
+* Fri Apr 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.1.4.90mlnx3-23
 - Tweak specs to use dynamic versioning for kernel
 
 * Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.1.4.90mlnx3-22

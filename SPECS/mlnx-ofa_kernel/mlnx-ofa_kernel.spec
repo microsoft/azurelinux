@@ -765,7 +765,7 @@ update-alternatives --remove \
 %{_prefix}/src/mlnx-ofa_kernel-%version
 
 %changelog
-* Thu Mar 26 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.07-2
+* Fri Apr 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.07-2
 - Tweak specs to use dynamic versioning for kernel.
 
 * Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-1

@@ -230,7 +230,7 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 %endif
 
 %changelog
-* Thu Mar 26 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 4.33.0-2
+* Fri Apr 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 4.33.0-2
 - Tweak specs to use dynamic versioning for kernel
 
 * Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.33.0-1
