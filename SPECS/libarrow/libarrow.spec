@@ -13,7 +13,7 @@
  
 Name:	libarrow
 Version:	15.0.0
-Release:	7%{?dist}
+Release:	8%{?dist}
 Summary:	A toolbox for accelerated data interchange and in-memory processing
 License:	Apache-2.0
 URL:		https://arrow.apache.org/
@@ -24,7 +24,8 @@ Distribution:   Azure Linux
 Source0:       https://github.com/apache/arrow/archive/refs/tags/apache-arrow-%{version}.tar.gz#/libarrow-%{version}.tar.gz
 Patch0001: 0001-python-pyproject.toml.patch
 Patch0002: CVE-2024-52338.patch
- 
+Patch0003: CVE-2026-25087.patch
+
 # Apache ORC (liborc) has numerous compile errors and apparently assumes
 # a 64-bit build and runtime environment. This is only consumer of the liborc
 # package, and in turn the only consumer of this and liborc is Ceph, which
@@ -178,7 +179,7 @@ pushd cpp
   -DPythonInterp_FIND_VERSION:BOOL=ON \
   -DPythonInterp_FIND_VERSION_MAJOR=3 \
 
- 
+
 export VERBOSE=1
 export GCC_COLORS=
 %cmake_build
@@ -198,29 +199,19 @@ popd
 
 %files doc
 %license LICENSE.txt
-%doc README.md NOTICE.txt
+%license NOTICE.txt
+%doc README.md
 %exclude %{_docdir}/arrow/
  
 %files devel
 %dir %{_includedir}/arrow/
      %{_includedir}/arrow/*
-%exclude %{_includedir}/arrow/dataset/
-%if %{with use_flight}
-%exclude %{_includedir}/arrow/flight/
-%exclude %{_includedir}/arrow-flight-glib
-%endif
 %exclude %{_libdir}/cmake/Arrow/FindBrotliAlt.cmake
 %exclude %{_libdir}/cmake/Arrow/Findlz4Alt.cmake
-%exclude %{_libdir}/cmake/Arrow/FindORC.cmake
-%exclude %{_libdir}/cmake/Arrow/FindorcAlt.cmake
 %exclude %{_libdir}/cmake/Arrow/FindSnappyAlt.cmake
-%exclude %{_libdir}/cmake/Arrow/FindgRPCAlt.cmake
 %exclude %{_libdir}/cmake/Arrow/Findre2Alt.cmake
 %exclude %{_libdir}/cmake/Arrow/Findutf8proc.cmake
-%exclude %{_libdir}/cmake/Arrow/FindzstdAlt.cmake
-%exclude %{_libdir}/cmake/Arrow/FindThriftAlt.cmake
 %exclude %{_libdir}/cmake/Arrow/FindOpenSSLAlt.cmake
-%exclude %{_libdir}/cmake/Arrow/FindProtobufAlt.cmake
 %dir %{_libdir}/cmake/Arrow/
      %{_libdir}/cmake/Arrow/ArrowConfig*.cmake
      %{_libdir}/cmake/Arrow/ArrowOptions.cmake
@@ -245,8 +236,18 @@ popd
 %{_libdir}/cmake/Parquet/*.cmake
 %{_libdir}/libparquet.so
 %{_libdir}/pkgconfig/parquet*.pc
- 
+%exclude %{_libdir}/cmake/ArrowAcero/*
+%exclude %{_libdir}/cmake/ArrowDataset/*
+%exclude %{_libdir}/pkgconfig/arrow-acero.pc
+%exclude %{_libdir}/pkgconfig/arrow-dataset.pc
+%exclude %{_libdir}/libarrow_acero.so*
+%exclude %{_libdir}/libarrow_dataset.so*
+%exclude %{_datadir}/gdb/auto-load%{_libdir}/libarrow.so.*-gdb.py
+
 %changelog
+* Mon Mar 09 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 15.0.0-8
+- Patch to fix CVE-2026-25087.
+
 * Wed Dec 4 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 15.0.0-7
 - Patch to fix CVE-2024-52338
 

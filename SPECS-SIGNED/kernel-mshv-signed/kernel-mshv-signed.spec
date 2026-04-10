@@ -10,7 +10,7 @@
 Summary:        Signed MSHV-enabled Linux Kernel for %{buildarch} systems
 Name:           kernel-mshv-signed-%{buildarch}
 Version:        6.6.121.mshv1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -140,6 +140,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /lib/modules/%{uname_r}/build
 
 %changelog
+* Mon Mar 30 2026 Cameron Baird <cameronbaird@microsoft.com> - 6.6.121.mshv1-2
+- Enable CONFIG_WIREGUARD in kernel config
+
 * Thu Feb 26 2026 Saul Paredes <saulparedes@microsoft.com> - 6.6.121.mshv1-1
 - Upgrade to 6.6.121.mshv1
 

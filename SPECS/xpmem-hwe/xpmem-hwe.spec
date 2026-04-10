@@ -44,7 +44,7 @@
 Summary:	 Cross-partition memory
 Name:		 xpmem-hwe
 Version:	 2.7.4
-Release:	 31%{release_suffix}%{?dist}
+Release:	 32%{release_suffix}%{?dist}
 License:	 GPLv2 and LGPLv2.1
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
@@ -207,8 +207,11 @@ fi
 %endif
 
 %changelog
-* Thu Mar 26 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.7.4-31_6.12.57.1.6
+* Fri Apr 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.7.4-32_6.12.57.1.6
 - Tweak specs to use dynamic versioning for kernel and mlnx_ofa
+
+* Fri Mar 27 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.7.4-31_6.12.78.2.1
+- Bump release to rebuild for new kernel release
 
 * Fri Mar 06 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.7.4-30_6.12.57.1.6
 - Bump to match kernel-hwe.
