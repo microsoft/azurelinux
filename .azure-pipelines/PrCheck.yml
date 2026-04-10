@@ -47,6 +47,8 @@ extends:
                 value: $(Build.ArtifactStagingDirectory)/output
               - name: ob_artifactBaseName
                 value: prcheck
+              - name: ob_container
+                value: mcr.microsoft.com/onebranch/azurelinux/build:3.0
             steps:
               # ── Step 1: Acquire an Entra ID bearer token ─────────────
               - task: AzureCLI@2
