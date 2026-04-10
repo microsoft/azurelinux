@@ -1,0 +1,14 @@
+[components.fcode-utils]
+
+# GCC 15 defaults to C23 where `bool` is a keyword, conflicting with the
+# project's `typedef enum boolean { FALSE = 0, TRUE = -1 } bool;` in
+# shared/types.h. Force C17 (with GNU extensions) as a conservative workaround
+# until a new upstream release includes the fix.
+# Upstream fix: https://github.com/openbios/fcode-utils/issues/20
+# TODO: Remove this overlay once a new upstream release (> 1.0.3) is available.
+[[components.fcode-utils.overlays]]
+description = "Force -std=gnu17 to work around GCC 15 C23 bool keyword conflict (openbios/fcode-utils#20)"
+type = "spec-search-replace"
+section = "%build"
+regex = 'CFLAGS="%\{optflags\}"'
+replacement = 'CFLAGS="%{optflags} -std=gnu17"'
