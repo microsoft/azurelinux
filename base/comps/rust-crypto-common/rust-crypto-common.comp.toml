@@ -1,0 +1,5 @@
+# Pin to 0.2.1 — required by rust-cipher 0.5.1 (BlockSizes trait bounds changed in 0.2.1).
+# Remove this pin once the default F43 snapshot includes crypto-common 0.2.1.
+# https://src.fedoraproject.org/rpms/rust-crypto-common/c/62160bb0364dfe439089e46f4c267b7bfa8629c4
+[components.rust-crypto-common]
+spec = { type = "upstream", upstream-commit = "62160bb0364dfe439089e46f4c267b7bfa8629c4" }
