@@ -33,6 +33,9 @@ resources:
       name: OneBranch.Pipelines/GovernedTemplates
       ref: refs/heads/main
 
+variables:
+  - group: ControlTower-PRCheck
+
 extends:
   template: v2/OneBranch.Official.CrossPlat.yml@templates
   parameters:
@@ -47,13 +50,13 @@ extends:
         # variables:
         #   - group: "Agent pools (DEV)"
         jobs:
-          - job: CallControlTowerAPI
+          - job: CallControlTowerAPI_${{ variables.ServiceConnection }}
             pool:
               type: linux
               # isCustom: true
               # name: $(DEV_AMD64_Managed_AZL3)
             variables:
-              - group: ControlTower-PRCheck
+              # - group: ControlTower-PRCheck
               - name: ob_outputDirectory
                 value: $(Build.ArtifactStagingDirectory)/output
               - name: ob_artifactBaseName
