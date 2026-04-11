@@ -1,5 +1,20 @@
 [components.sssd]
 
+# Remove gdm-pam-extensions-devel build dependency — GDM desktop features are not needed.
+# Upstream SSSD guards all GDM code behind #ifdef HAVE_GDM_PAM_EXTENSIONS and
+# HAVE_GDM_CUSTOM_JSON_PAM_EXTENSION, which are set by AC_CHECK_HEADERS at configure time.
+# When the headers are absent the macros are simply not defined and the GDM code is compiled out.
+# The only effect is that two GDM-specific PAM UI features are disabled:
+#   - prompt_multi_cert_gdm(): smartcard certificate selection via GDM's choice list
+#   - auth_selection_conversation_gdm(): auth mechanism selection via GDM's JSON protocol
+# See: https://github.com/SSSD/sssd/blob/master/src/sss_client/pam_sss.c (search for HAVE_GDM_PAM_EXTENSIONS)
+# Both have text-based fallbacks that are used automatically (return ENOTSUP -> caller uses fallback).
+[[components.sssd.overlays]]
+description = "Remove gdm-pam-extensions-devel BuildRequires (GDM desktop features not needed)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "gdm-pam-extensions-devel"
+
 # Fix sourcing /etc/os-release overwriting VERSION variable in platform.m4
 # Upstream PR: https://github.com/SSSD/sssd/pull/8397
 [[components.sssd.overlays]]
