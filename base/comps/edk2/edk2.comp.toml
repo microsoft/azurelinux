@@ -29,3 +29,33 @@ description = "Remove %files ovmf-xen"
 type = "spec-remove-section"
 section = "%files"
 package = "ovmf-xen"
+
+# WORKAROUND: Disable IGVM/confidential VM build support until virt-firmware-rs
+# is imported into AZL4. The upstream edk2 spec uses igvm-wrap (from
+# virt-firmware-rs) to generate OVMF.igvm for SEV-SNP confidential VMs.
+# Remove these overlays once virt-firmware-rs is available.
+
+# 3. Remove BuildRequires for virt-firmware-rs (not yet available in AZL4).
+[[components.edk2.overlays]]
+description = "WORKAROUND: Remove virt-firmware-rs BuildRequires — not yet in AZL4. Provides igvm-wrap for IGVM/confidential VM support. Remove overlay when virt-firmware-rs is imported."
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "virt-firmware-rs >= 25.8"
+
+# 4. Disable the igvm-wrap invocation in %build by prefixing with ':'
+#    (POSIX null command). The ':' absorbs the multi-line continuation args.
+[[components.edk2.overlays]]
+description = "WORKAROUND: Disable igvm-wrap invocation — virt-firmware-rs not available."
+type = "spec-search-replace"
+section = "%build"
+regex = 'igvm-wrap --input'
+replacement = ': igvm-wrap --input'
+
+# 5. Remove OVMF.igvm from %files ovmf (not built without igvm-wrap).
+[[components.edk2.overlays]]
+description = "WORKAROUND: Remove OVMF.igvm from files list — not built without virt-firmware-rs."
+type = "spec-search-replace"
+section = "%files"
+package = "ovmf"
+regex = '%\{_datadir\}/%\{name\}/ovmf/OVMF\.igvm'
+replacement = '# %{_datadir}/%{name}/ovmf/OVMF.igvm — disabled, no virt-firmware-rs'
