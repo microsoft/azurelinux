@@ -1,0 +1,8 @@
+[components.hivex]
+
+# Disable OCaml bindings — OCaml libraries have ABI mismatches in the
+# bootstrap build tag. The upstream spec uses %bcond_without ocaml, so
+# --without ocaml cleanly disables the ocaml-hivex subpackages.
+# Core hivex C library is unaffected.
+[components.hivex.build]
+without = ["ocaml"]
