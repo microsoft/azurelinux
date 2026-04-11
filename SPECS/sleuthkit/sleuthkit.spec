@@ -1,12 +1,15 @@
 Summary:        The Sleuth Kit (TSK)
 Name:           sleuthkit
 Version:        4.9.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD AND CPL AND GPLv2+ AND IBM AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.sleuthkit.org
 Source0:        https://github.com/sleuthkit/sleuthkit/releases/download/sleuthkit-%{version}/sleuthkit-%{version}.tar.gz
+Patch0:         CVE-2026-40024.patch
+Patch1:         CVE-2026-40025.patch
+Patch2:         CVE-2026-40026.patch
 
 BuildRequires:  gcc-c++
 BuildRequires:  libewf-devel
@@ -40,6 +43,9 @@ developing applications that use %{name}.
 
 %prep
 %setup -q
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1
 
 %build
 %configure --disable-static \
@@ -140,6 +146,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/*.so
 
 %changelog
+* Sat Apr 11 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4.9.0-5
+- Patch for CVE-2026-40026, CVE-2026-40025, CVE-2026-40024
+
 * Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.9.0-4
 - Cleaning-up spec. License verified.
 
