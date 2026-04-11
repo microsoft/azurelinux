@@ -37,6 +37,9 @@ extends:
   template: v2/OneBranch.Official.CrossPlat.yml@templates
   parameters:
     featureFlags:
+      golang:
+        internalModuleProxy:
+          enabled: true
       LinuxHostVersion:
         Network: R1
     stages:
