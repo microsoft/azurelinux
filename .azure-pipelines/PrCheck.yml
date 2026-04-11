@@ -10,13 +10,12 @@
 #      service connection (issuer: https://vstoken.dev.azure.com/<org-id>,
 #      subject: sc://<org>/<project>/<service-connection-name>).
 #   3. ARM service connection in ADO project settings using Workload Identity
-#      Federation (manual), named to match $(ServiceConnection).
+#      Federation (manual).
 #   4. ADO branch policy or pipeline PR trigger configured to fire on PRs.
 #
 # Variable Group (ADO Pipelines > Library):
 #   Name: "ControlTower-PRCheck"
 #   Required variables:
-#     - ServiceConnection   : Name of the ARM/WIF service connection
 #     - ApiAudience          : Entra ID audience URI for the Control Tower app
 #     - ApiBaseUrl           : Base URL of the Control Tower service
 #     - AzldevCommit         : Commit hash for azldev (go install ...@<commit>)
@@ -61,18 +60,6 @@ extends:
               - name: LinuxContainerImage
                 value: mcr.microsoft.com/onebranch/azurelinux/build:3.0
             steps:
-
-              - script: |
-                  set -euo pipefail
-                  if [[ -z "${SERVICE_CONNECTION:-}" ]]; then
-                    echo "ServiceConnection variable is not set."
-                  else
-                    echo "Service connection variable is set to '$SERVICE_CONNECTION'."
-                  fi
-                displayName: "Check if service connection is set"
-                env:
-                  SERVICE_CONNECTION: ${{ variables.ServiceConnection }}
-
               - task: AzureCLI@2
                 displayName: "Acquire Entra ID Bearer Token"
                 inputs:
