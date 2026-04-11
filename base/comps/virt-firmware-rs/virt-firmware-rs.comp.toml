@@ -1,0 +1,2 @@
+[components.virt-firmware-rs]
+spec = { type = "upstream", upstream-commit = "11939f3731b04b646bf72fb824ca7c9732dc148e" }

@@ -1,0 +1,2 @@
+[components.GeoIP]
+spec = { type = "upstream", upstream-commit = "8fd8b7ef701a836354a8b36d30188e9e20c1fe8a" }

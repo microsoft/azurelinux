@@ -1,0 +1,2 @@
+[components.golang-github-tidwall-pretty]
+spec = { type = "upstream", upstream-commit = "d94f2af2d28a4eb109ef0348b73f09a7ab765635" }

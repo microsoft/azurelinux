@@ -1,0 +1,2 @@
+[components.rust-uefi-macros]
+spec = { type = "upstream", upstream-commit = "1dda8d42cf00f280d099d29fa6482b1d4df06fe2" }

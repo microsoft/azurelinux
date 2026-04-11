@@ -1,0 +1,2 @@
+[components.GeoIP-GeoLite-data]
+spec = { type = "upstream", upstream-commit = "90cb11df7896b89afdb66d3517680751d4a5e79f" }

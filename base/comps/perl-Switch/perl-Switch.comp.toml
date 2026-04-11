@@ -1,0 +1,2 @@
+[components.perl-Switch]
+spec = { type = "upstream", upstream-commit = "b2f7123b188afd0bfde6858f7d586a2c5f9b8a5b" }

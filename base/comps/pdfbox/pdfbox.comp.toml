@@ -1,0 +1,2 @@
+[components.pdfbox]
+spec = { type = "upstream", upstream-commit = "369873ccb291059c7d364cd36f561535f3c44687" }

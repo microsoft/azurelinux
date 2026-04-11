@@ -1,0 +1,2 @@
+[components.rust-x509-cert]
+spec = { type = "upstream", upstream-commit = "ec9634ace0550a0ff04688c0d3c8503ad0c668e8" }

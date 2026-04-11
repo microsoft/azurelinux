@@ -1,0 +1,2 @@
+[components.rust-udev]
+spec = { type = "upstream", upstream-commit = "dbeb5dd6489ed2873621751551aec8c466601f2e" }

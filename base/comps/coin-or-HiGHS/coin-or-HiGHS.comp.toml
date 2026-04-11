@@ -1,0 +1,2 @@
+[components.coin-or-HiGHS]
+spec = { type = "upstream", upstream-commit = "30dafe31f9633ef8f84c24360c137ed66bf17cd0" }

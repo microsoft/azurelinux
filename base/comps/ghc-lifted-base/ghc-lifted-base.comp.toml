@@ -1,0 +1,2 @@
+[components.ghc-lifted-base]
+spec = { type = "upstream", upstream-commit = "86470993c6a915eac679d6b2d69fe835f2c016be" }

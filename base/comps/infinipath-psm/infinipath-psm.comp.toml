@@ -1,0 +1,2 @@
+[components.infinipath-psm]
+spec = { type = "upstream", upstream-commit = "dad9ceb68f162f85c42453de00cc1ce6b6cfbbfa" }

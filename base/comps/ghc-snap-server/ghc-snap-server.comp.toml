@@ -1,0 +1,2 @@
+[components.ghc-snap-server]
+spec = { type = "upstream", upstream-commit = "a676a84a7a2abf3c6a62e3bbcdebac9f78535983" }

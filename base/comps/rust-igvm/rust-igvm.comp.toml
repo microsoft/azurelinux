@@ -1,0 +1,2 @@
+[components.rust-igvm]
+spec = { type = "upstream", upstream-commit = "2db95f12aebc6dfe50f1d7d42b4dd8f1775040ea" }

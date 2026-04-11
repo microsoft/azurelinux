@@ -1,0 +1,2 @@
+[components.rust-uguid]
+spec = { type = "upstream", upstream-commit = "ddaaa290c8746b775d8dc0c42699e8be164558a6" }

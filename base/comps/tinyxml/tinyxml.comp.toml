@@ -1,0 +1,2 @@
+[components.tinyxml]
+spec = { type = "upstream", upstream-commit = "ea777b3f06e58d4ca78ba1eb41d228ed1db96e80" }

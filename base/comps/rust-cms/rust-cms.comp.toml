@@ -1,0 +1,2 @@
+[components.rust-cms]
+spec = { type = "upstream", upstream-commit = "9e882cd7790c5eea49f63e323c36b7d21807c76a" }

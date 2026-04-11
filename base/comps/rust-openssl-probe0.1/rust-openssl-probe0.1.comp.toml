@@ -1,0 +1,2 @@
+["components"."rust-openssl-probe0.1"]
+spec = { type = "upstream", upstream-commit = "991e04f4ef5833ed7488f21375815f3b2d040385" }

@@ -1,0 +1,2 @@
+[components.fop]
+spec = { type = "upstream", upstream-commit = "e640d3a33add6a171b428ab21a85552b1379f624" }

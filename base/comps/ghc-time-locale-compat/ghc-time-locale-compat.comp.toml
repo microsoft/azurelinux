@@ -1,0 +1,2 @@
+[components.ghc-time-locale-compat]
+spec = { type = "upstream", upstream-commit = "a246b4ccbf6d7aa18ebc63ab1eae08be31b3a9d4" }
