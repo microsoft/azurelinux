@@ -61,6 +61,31 @@ extends:
               - name: LinuxContainerImage
                 value: mcr.microsoft.com/onebranch/azurelinux/build:3.0
             steps:
+              - task: AzureCLI@2
+                displayName: "Acquire Entra ID Bearer Token"
+                inputs:
+                  azureSubscription: ${{ variables.ServiceConnection }}
+                  scriptType: bash
+                  scriptLocation: inlineScript
+                  inlineScript: |
+                    set -euo pipefail
+
+                    RESPONSE=$(az account get-access-token --resource "$API_AUDIENCE" -o json)
+
+                    TOKEN=$(jq -r .accessToken <<< "$RESPONSE")
+                    EXPIRES=$(jq -r .expiresOn <<< "$RESPONSE")
+
+                    if [[ -z "$TOKEN" || "$TOKEN" == "null" ]]; then
+                      echo "##[error]Failed to acquire bearer token."
+                      exit 1
+                    fi
+
+                    # Store as a secret pipeline variable for subsequent steps.
+                    echo "##vso[task.setvariable variable=API_TOKEN;issecret=true]$TOKEN"
+                    echo "Bearer token acquired (expires: $EXPIRES)"
+                env:
+                  API_AUDIENCE: $(ApiAudience)
+
               - script: |
                   set -euo pipefail
                   echo "Installing azldev@${AZLDEV_COMMIT}..."
@@ -88,31 +113,6 @@ extends:
                   fi
                   echo "Rendered specs are up to date."
                 displayName: "Verify rendered specs are up to date"
-
-              - task: AzureCLI@2
-                displayName: "Acquire Entra ID Bearer Token"
-                inputs:
-                  azureSubscription: ${{ variables.ServiceConnection }}
-                  scriptType: bash
-                  scriptLocation: inlineScript
-                  inlineScript: |
-                    set -euo pipefail
-
-                    RESPONSE=$(az account get-access-token --resource "$API_AUDIENCE" -o json)
-
-                    TOKEN=$(jq -r .accessToken <<< "$RESPONSE")
-                    EXPIRES=$(jq -r .expiresOn <<< "$RESPONSE")
-
-                    if [[ -z "$TOKEN" || "$TOKEN" == "null" ]]; then
-                      echo "##[error]Failed to acquire bearer token."
-                      exit 1
-                    fi
-
-                    # Store as a secret pipeline variable for subsequent steps.
-                    echo "##vso[task.setvariable variable=API_TOKEN;issecret=true]$TOKEN"
-                    echo "Bearer token acquired (expires: $EXPIRES)"
-                env:
-                  API_AUDIENCE: $(ApiAudience)
 
               - script: |
                   set -euo pipefail
