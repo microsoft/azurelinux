@@ -1,0 +1,19 @@
+[components.nbdkit]
+
+# Disable libguestfs plugin — libguestfs is not yet building due to
+# bootstrap QEMU having Xen enabled (missing xen libs in build tag).
+# The upstream spec already gates this behind !rhel, so this mirrors
+# the RHEL build configuration.
+[[components.nbdkit.overlays]]
+description = "Disable libguestfs plugin until libguestfs is buildable"
+type = "spec-search-replace"
+regex = '%global have_libguestfs 1'
+replacement = '%global have_libguestfs 0'
+
+# Disable OCaml plugin — OCaml libraries have ABI mismatches in the
+# bootstrap build tag. Also gated behind !rhel upstream.
+[[components.nbdkit.overlays]]
+description = "Disable OCaml plugin until OCaml bootstrap is resolved"
+type = "spec-search-replace"
+regex = '%global have_ocaml 1'
+replacement = '%global have_ocaml 0'
