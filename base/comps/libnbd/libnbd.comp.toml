@@ -1,0 +1,10 @@
+[components.libnbd]
+
+# Disable OCaml bindings — OCaml libraries have ABI mismatches in the
+# bootstrap build tag (ocaml-findlib-devel requires ocamlx() hashes
+# that don't match the available OCaml packages).
+[[components.libnbd.overlays]]
+description = "Disable OCaml bindings until OCaml bootstrap is resolved"
+type = "spec-search-replace"
+regex = '%global have_ocaml 1'
+replacement = '%global have_ocaml 0'
