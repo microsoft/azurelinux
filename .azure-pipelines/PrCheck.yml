@@ -61,10 +61,22 @@ extends:
               - name: LinuxContainerImage
                 value: mcr.microsoft.com/onebranch/azurelinux/build:3.0
             steps:
+
+              - script: |
+                  set -euo pipefail
+                  if [[ -z "${SERVICE_CONNECTION:-}" ]]; then
+                    echo "ServiceConnection variable is not set."
+                  else
+                    echo "Service connection variable is set to '$SERVICE_CONNECTION'."
+                  fi
+                displayName: "Check if service connection is set"
+                env:
+                  SERVICE_CONNECTION: ${{ variables.ServiceConnection }}
+
               - task: AzureCLI@2
                 displayName: "Acquire Entra ID Bearer Token"
                 inputs:
-                  azureSubscription: ${{ variables.ServiceConnection }}
+                  azureSubscription: CT-PR-Checks-ServiceConnection
                   scriptType: bash
                   scriptLocation: inlineScript
                   inlineScript: |
