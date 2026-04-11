@@ -76,7 +76,7 @@ extends:
                   set -euo pipefail
 
                   echo "Rendering specs..."
-                  azldev component render -a
+                  azldev component render -a -o specs
 
                   # Check for any new or modified files under specs/.
                   CHANGED=$(git status --porcelain -- specs/ || true)
