@@ -1,0 +1,11 @@
+# infinipath-psm is a legacy Intel TrueScale PSM library, discontinued and
+# removed from RHEL 8+. The Fedora spec conditionally requires it on x86_64
+# when %{fedora} is set, which is truthy in AZL. AZL does not package
+# infinipath-psm since it's for obsolete hardware. Remove the BuildRequires.
+[components.libfabric]
+
+[[components.libfabric.overlays]]
+description = "Remove infinipath-psm-devel BuildRequires — legacy hardware, not packaged in Azure Linux"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "infinipath-psm-devel"
