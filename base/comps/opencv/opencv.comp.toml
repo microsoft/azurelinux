@@ -1,5 +1,10 @@
 [components.opencv]
 
+# OpenNI is an old (v1.5.7) Kinect/PrimeSense depth sensor library not available
+# in Azure Linux and not relevant for a cloud/server distro.
+[components.opencv.build]
+without = ["openni"]
+
 # CVE-2025-53644 patch targets bundled 3rdparty/openjpeg, which Fedora's spec
 # deletes during %prep (it uses system openjpeg2-devel instead). The patch
 # can't find the file and fails. Remove both the patch declaration and its
