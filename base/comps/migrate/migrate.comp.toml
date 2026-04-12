@@ -1,0 +1,140 @@
+# AWS SDK (github.com/aws/aws-sdk-go) and Google Cloud Storage dependencies
+# are not available in Azure Linux. Remove the aws_s3 and google_cloud_storage
+# drivers from the build tags, remove their source dirs, and fix README handling.
+#
+# AZL's go-rpm-macros resolves %godocs (via realpath) inside %gopkginstall,
+# so all README mv commands must run BEFORE %gopkginstall.
+[components.migrate]
+
+# --- Build tag removal ---
+[[components.migrate.overlays]]
+description = "Remove aws_s3 from build tags — AWS SDK not available in Azure Linux"
+type = "spec-search-replace"
+regex = ' aws_s3'
+replacement = ''
+
+[[components.migrate.overlays]]
+description = "Remove google_cloud_storage from build tags — GCS deps not available in Azure Linux"
+type = "spec-search-replace"
+regex = 'google_cloud_storage '
+replacement = ''
+
+# --- Remove source dirs in %prep ---
+[[components.migrate.overlays]]
+description = "Remove aws_s3 and google_cloud_storage source dirs — deps not available"
+type = "spec-search-replace"
+section = "%prep"
+regex = 'rm -rf %_remove_drivers'
+replacement = 'rm -rf %_remove_drivers source/aws_s3 source/google_cloud_storage'
+
+# --- Remove AWS/GCS BuildRequires ---
+[[components.migrate.overlays]]
+description = "Remove AWS SDK BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "golang(github.com/aws/aws-sdk-go/aws)"
+
+[[components.migrate.overlays]]
+description = "Remove AWS SDK BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "golang(github.com/aws/aws-sdk-go/aws/session)"
+
+[[components.migrate.overlays]]
+description = "Remove AWS SDK BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "golang(github.com/aws/aws-sdk-go/service/s3)"
+
+[[components.migrate.overlays]]
+description = "Remove AWS SDK BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "golang(github.com/aws/aws-sdk-go/service/s3/s3iface)"
+
+[[components.migrate.overlays]]
+description = "Remove GCS BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "golang(cloud.google.com/go/storage)"
+
+[[components.migrate.overlays]]
+description = "Remove GCS BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "golang(google.golang.org/api/iterator)"
+
+# --- Remove AWS/GCS %doc entries ---
+[[components.migrate.overlays]]
+description = "Remove s3-README.md from %doc"
+type = "spec-search-replace"
+section = "%files"
+regex = '%doc s3-README.md'
+replacement = ''
+
+[[components.migrate.overlays]]
+description = "Remove gcs-README.md from %doc"
+type = "spec-search-replace"
+section = "%files"
+regex = '%doc gcs-README.md'
+replacement = ''
+
+# --- Remove AWS/GCS from %godocs listing ---
+[[components.migrate.overlays]]
+description = "Remove s3-README.md from godocs"
+type = "spec-search-replace"
+regex = '                       s3-README.md'
+replacement = ''
+
+[[components.migrate.overlays]]
+description = "Remove gcs-README.md from godocs"
+type = "spec-search-replace"
+regex = '                       gcs-README.md \\\\'
+replacement = ''
+
+# --- Remove ALL original mv commands from %install (full line match) ---
+[[components.migrate.overlays]]
+description = "Remove original mv cmd/migrate"
+type = "spec-search-replace"
+section = "%install"
+regex = '^mv cmd/migrate/README\.md.*'
+replacement = ''
+
+[[components.migrate.overlays]]
+description = "Remove original mv database/*"
+type = "spec-search-replace"
+section = "%install"
+regex = '^mv database/.*'
+replacement = ''
+
+[[components.migrate.overlays]]
+description = "Remove original mv source/*"
+type = "spec-search-replace"
+section = "%install"
+regex = '^mv source/.*'
+replacement = ''
+
+# --- Replace %gopkginstall with mv commands + %gopkginstall ---
+# Use function wrappers so the ^ anchor regex above won't match these lines.
+[[components.migrate.overlays]]
+description = "Insert README renames before %gopkginstall — AZL go-rpm-macros resolves %godocs early"
+type = "spec-search-replace"
+section = "%install"
+regex = '^%gopkginstall'
+replacement = """mv_f() { mv "$1" "$2"; }
+mv_f cmd/migrate/README.md migrate-README.md
+mv_f database/cassandra/README.md cassandra-README.md
+mv_f database/cockroachdb/README.md cockroachdb-README.md
+mv_f database/mongodb/README.md mongodb-README.md
+mv_f database/mysql/README.md mysql-README.md
+mv_f database/postgres/README.md postgres-README.md
+mv_f database/redshift/README.md redshift-README.md
+mv_f database/sqlite3/README.md sqlite3-README.md
+mv_f database/sqlite/README.md sqlite-README.md
+mv_f source/file/README.md file-README.md
+mv_f source/github/README.md github-README.md
+mv_f source/gitlab/README.md gitlab-README.md
+mv_f source/go_bindata/README.md go-bindata-README.md
+mv_f source/iofs/README.md iofs-README.md
+mv_f source/pkger/README.md pkger-README.md
+%gopkginstall"""
