@@ -1,0 +1,43 @@
+From 4905c95118b3203f1117116cba8c8529763e8593 Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@ieee.org>
+Date: Fri, 13 Mar 2026 14:13:04 -0400
+Subject: [PATCH] Prevent corruption from stale alias state on daemon-reload
+
+Avoid incorrect systemd service unit state in certain conditions, to avoid pid1
+assert. Taken from unmerged upstream PR.
+
+Upstream PR: #39703
+https://github.com/systemd/systemd/pull/39703
+
+Fixes: #38817
+https://github.com/systemd/systemd/issues/38817
+
+All credit for identifying and debugging this problem goes to
+Balakumaran Kannan <balakumaran.kannan@microsoft.com>
+
+---
+ src/core/manager-serialize.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/src/core/manager-serialize.c b/src/core/manager-serialize.c
+index e9d567a97b..4f7c315b4b 100644
+--- a/src/core/manager-serialize.c
++++ b/src/core/manager-serialize.c
+@@ -204,6 +204,14 @@ static int manager_deserialize_one_unit(Manager *m, const char *name, FILE *f, F
+                 return log_notice_errno(r, "Failed to load unit \"%s\", skipping deserialization: %m", name);
+         }
+ 
++        if (!streq(u->id, name)) {
++                log_warning("Unit file for '%s' was overridden by a symlink to '%s'. Skipping stale state of old unit. Any processes from the overridden unit are now abandoned!",
++                            name,
++                            u->id);
++
++                return unit_deserialize_state_skip(f);
++        }
++
+         r = unit_deserialize_state(u, f, fds);
+         if (r < 0) {
+                 if (r == -ENOMEM)
+-- 
+2.51.0
+
