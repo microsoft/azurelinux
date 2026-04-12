@@ -1,0 +1,12 @@
+# The sigv4 subpackage depends on the AWS SDK (github.com/aws/aws-sdk-go)
+# which pulls in github.com/jmespath/go-jmespath. Neither is available in
+# the Azure Linux build tag since AWS packages are not included. Skip the
+# sigv4 tests to avoid the missing dependency.
+[components.golang-github-prometheus-common]
+
+[[components.golang-github-prometheus-common.overlays]]
+description = "Skip sigv4 tests — requires AWS SDK packages not available in Azure Linux"
+type = "spec-search-replace"
+section = "%check"
+regex = '%gocheck'
+replacement = '%gocheck -d sigv4'
