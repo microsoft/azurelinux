@@ -1,0 +1,11 @@
+# golang-github-aws-sdk is built in bootstrap mode, which suppresses all
+# golang(...) Requires from its -devel RPM. The sigv4 subpackage imports
+# aws-sdk-go, which transitively needs github.com/jmespath/go-jmespath.
+# Add an explicit BuildRequires so the sigv4 tests can compile.
+[components.golang-github-prometheus-common]
+
+[[components.golang-github-prometheus-common.overlays]]
+description = "Add missing jmespath BuildRequires — transitive dep of aws-sdk-go, not pulled in due to bootstrap mode"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "golang(github.com/jmespath/go-jmespath)"
