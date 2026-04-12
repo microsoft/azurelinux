@@ -1,0 +1,33 @@
+# Pin to pypy 7.3.21-3 (Fedora f43 commit 6ef55d47).
+# The default snapshot (2026-02-24) pulls pypy 7.3.20, but the bootstrap build
+# tag provides pypy2 7.3.21-3.fc43 as the BuildRequires interpreter. Using
+# pypy2 7.3.21 to translate the older 7.3.20 RPython source causes a segfault
+# during the rtype_lltype phase — a version mismatch Fedora never tested.
+# Pinning to 7.3.21 aligns the source with the bootstrap interpreter.
+[components.pypy]
+spec = { type = "upstream", upstream-commit = "6ef55d476cac416ee815b087f6328f8104201c88" }
+
+# The RPython rtype_lltype phase does deeply recursive type specialization that
+# requires a large call stack. Fedora builds on bare VMs with default 8MB stack.
+# AZL Koji builders run in Kubernetes pods where the container runtime may impose
+# a smaller stack limit, causing pypy2 to segfault at the start of rtype_lltype.
+# Raise to unlimited before the translation begins.
+[[components.pypy.overlays]]
+description = "Raise stack size limit to prevent segfault during RPython translation"
+type = "spec-prepend-lines"
+section = "%build"
+lines = [
+    "# RPython translation requires deep recursion; raise stack limit to avoid segfault",
+    "ulimit -s unlimited",
+]
+
+# Exclude aarch64 for now. The Fedora-built pypy2 bootstrap binary segfaults
+# during RPython translation on AZL's aarch64 builders (kernel 6.6), likely due
+# to kernel version or mock isolation differences vs Fedora (kernel 6.18,
+# systemd-nspawn). Needs further investigation with interactive access to the
+# builder (strace, dmesg, /proc mount checks).
+[[components.pypy.overlays]]
+description = "Exclude aarch64 — bootstrap pypy2 segfaults on AZL aarch64 builders"
+type = "spec-set-tag"
+tag = "ExclusiveArch"
+value = "x86_64"
