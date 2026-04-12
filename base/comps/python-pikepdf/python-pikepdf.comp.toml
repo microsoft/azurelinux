@@ -1,0 +1,12 @@
+[components.python-pikepdf]
+
+# python-xmp-toolkit is not packaged in Azure Linux and is only a test
+# dependency for XMP metadata tests on x86_64. Strip it from the pyproject.toml
+# test extras so %pyproject_buildrequires doesn't pull in the missing package.
+[[components.python-pikepdf.overlays]]
+description = "Remove python-xmp-toolkit from test dependencies (not available in Azure Linux)"
+type = "spec-append-lines"
+section = "%prep"
+lines = [
+    "tomcli set pyproject.toml arrays delitem 'project.optional-dependencies.test' 'python-xmp-toolkit.*'",
+]
