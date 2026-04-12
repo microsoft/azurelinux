@@ -1,0 +1,25 @@
+[components.yggdrasil]
+
+# The 0.4.9 spec dropped %gopkginstall/%gopkgfiles when switching to go-vendor-tools,
+# but golang-github-redhatinsights-yggdrasil-devel (which provides golang(github.com/
+# redhatinsights/yggdrasil/...) symbols) is still needed by yggdrasil-worker-package-manager.
+# In Fedora, a leftover 0.4.4 build of this subpackage remains in the tag. We re-add
+# the macros to produce it from the current spec.
+
+[[components.yggdrasil.overlays]]
+description = "Add %gopkginstall to %install so the Go devel subpackage content is installed."
+type = "spec-append-lines"
+section = "%install"
+lines = [
+    "%gopkginstall",
+]
+
+[[components.yggdrasil.overlays]]
+description = "Add %gopkgfiles after last %files section to produce golang-github-redhatinsights-yggdrasil-devel with golang() Provides."
+type = "spec-append-lines"
+section = "%files"
+package = "examples"
+lines = [
+    "",
+    "%gopkgfiles",
+]
