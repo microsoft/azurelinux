@@ -1,0 +1,5 @@
+# Pin to 45.0.4 because 46.x requires crate(asn1) >= 0.22.0, which is not yet
+# available — rust-asn1 is pinned to 0.21.3 due to Koji chain-build limitations.
+# Remove this pin when rust-asn1/rust-asn1_derive are updated to 0.22.0.
+[components.python-cryptography]
+spec = { type = "upstream", upstream-commit = "8034f94f7793712d41c2a2b2b3c55ea6a1c85da1" }
