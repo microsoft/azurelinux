@@ -1,0 +1,19 @@
+[components.p7zip]
+
+# yasm is deprecated in Fedora 43 (https://fedoraproject.org/wiki/Changes/DeprecateYASM)
+# and not available in Azure Linux. Remove the yasm BuildRequires and switch to
+# the non-asm makefile on x86_64. This loses asm-optimized CRC32/AES but is
+# functionally identical.
+
+[[components.p7zip.overlays]]
+description = "Remove yasm BuildRequires — yasm is not available in Azure Linux"
+type = "spec-search-replace"
+regex = 'BuildRequires: yasm'
+replacement = "# BuildRequires: yasm — removed, not available in Azure Linux"
+
+[[components.p7zip.overlays]]
+description = "Use non-asm makefile on x86_64 to avoid yasm dependency"
+type = "spec-search-replace"
+section = "%build"
+regex = 'makefile.linux_amd64_asm'
+replacement = "makefile.linux_amd64"
