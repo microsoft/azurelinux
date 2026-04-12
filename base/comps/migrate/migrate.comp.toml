@@ -1,0 +1,12 @@
+# golang-github-aws-sdk is built in bootstrap mode, which suppresses
+# golang(...) Requires. This means its transitive Go imports (like jmespath)
+# are not automatically pulled into the buildroot via RPM dependencies.
+# Add explicit BuildRequires for the missing transitive deps so the aws_s3
+# source driver can compile.
+[components.migrate]
+
+[[components.migrate.overlays]]
+description = "Add missing jmespath BuildRequires — transitive dep of aws-sdk-go, not pulled in due to bootstrap mode"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "golang(github.com/jmespath/go-jmespath)"
