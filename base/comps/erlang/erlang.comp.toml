@@ -1,0 +1,6 @@
+# fop (Apache FOP) is not packaged in Azure Linux. It's only needed to build
+# the erlang-doc subpackage (PDF documentation). Disable doc generation.
+[components.erlang]
+
+[components.erlang.build]
+without = ["doc"]
