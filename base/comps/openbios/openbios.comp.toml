@@ -1,0 +1,13 @@
+# The forthstrap Forth interpreter segfaults on aarch64 due to pointer
+# truncation in cell2pointer() — mmap returns addresses above 4 GiB that
+# don't fit in a 32-bit cell. Known upstream bug with no fix:
+# https://github.com/openbios/openbios/issues/18
+# https://github.com/openbios/openbios/issues/25
+# Restrict to x86_64 builders where the address space layout avoids the bug.
+[components.openbios]
+
+[[components.openbios.overlays]]
+description = "Restrict build to x86_64 — forthstrap segfaults on aarch64 (upstream bug #18/#25)"
+type = "spec-add-tag"
+tag = "ExclusiveArch"
+value = "x86_64"
