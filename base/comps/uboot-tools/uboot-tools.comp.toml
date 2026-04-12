@@ -1,0 +1,16 @@
+[components.uboot-tools]
+
+# TODO: Remove this overlay once automatic incremental release bumping is available.
+[[components.uboot-tools.overlays]]
+description = "Bump release for Azure Linux rebuild with toolsonly disabled"
+type = "spec-update-tag"
+tag = "Release"
+value = "2%{?candidate:.%{candidate}}%{?dist}"
+
+[components.uboot-tools.build]
+# Disable the "toolsonly" bcond to skip building firmware images for ARM dev
+# boards (Raspberry Pi, Rockchip, Allwinner, etc.). These require
+# arm-trusted-firmware-armv8 and crust-firmware which are not available in
+# Azure Linux. The core U-Boot CLI tools (mkimage, fw_printenv, etc.) are
+# still built on all architectures.
+without = ["toolsonly"]
