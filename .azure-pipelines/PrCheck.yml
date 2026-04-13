@@ -129,7 +129,8 @@ extends:
                   else
                     # CI/merge-queue trigger: extract the base branch from the merge-queue branch name.
                     # Branch format: refs/heads/gh-readonly-queue/{base_branch}/pr-{pr_number}-{head_sha}
-                    base_branch=$(grep -oP '(?<=gh-readonly-queue/)[^/]+' <<< "$SOURCE_BRANCH")
+                    # Using 'test/' branches until ready with the merge queue, but the parsing logic is the same.
+                    base_branch=$(grep -oP '(?<=test/gh-readonly-queue/).+(?=/pr-[^/]+$)' <<< "$SOURCE_BRANCH")
                     target_hash=$(git ls-remote "$UPSTREAM_REPO_URL" "refs/heads/$base_branch" | cut -f1)
                   fi
 
