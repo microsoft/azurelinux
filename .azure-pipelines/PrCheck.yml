@@ -200,9 +200,10 @@ extends:
                     -H "Content-Type: application/json" \
                     -d "$payload")
 
-                  echo "HTTP status: $http_code"
                   echo "Service response:"
                   jq . response.json
+
+                  echo "HTTP status: $http_code"
 
                   if [[ "$http_code" -lt 200 || "$http_code" -ge 300 ]]; then
                     echo "##[error]Control Tower returned HTTP $http_code"
