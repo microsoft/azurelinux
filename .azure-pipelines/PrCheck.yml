@@ -123,14 +123,12 @@ extends:
                   # Build the JSON payload matching the Control Tower schema.
                   PAYLOAD=$(jq -n \
                     --arg repoUri        "$REPO_URI" \
-                    --argjson prNumber    "$PR_NUMBER" \
                     --arg sourceBranch    "$PR_SOURCE_BRANCH" \
                     --arg sourceCommitSha "$PR_SOURCE_COMMIT" \
                     --arg targetBranch    "$PR_TARGET_BRANCH" \
                     --arg targetCommitSha "$TARGET_COMMIT" \
                     '{
                       repoUri:         $repoUri,
-                      prNumber:        $prNumber,
                       sourceBranch:    $sourceBranch,
                       sourceCommitSha: $sourceCommitSha,
                       targetBranch:    $targetBranch,
@@ -139,7 +137,7 @@ extends:
 
                   # azldev component render -a
 
-                  echo "Calling Control Tower prcheck for PR #${PR_NUMBER}..."
+                  echo "Calling Control Tower 'prcheck' endpoint..."
                   echo "Payload:"
                   echo "$PAYLOAD" | jq .
 
@@ -165,7 +163,6 @@ extends:
                   COLLECTION_URI: $(System.CollectionUri)
                   TEAM_PROJECT: $(System.TeamProject)
                   REPO_NAME: $(Build.Repository.Name)
-                  PR_NUMBER: $(System.PullRequest.PullRequestNumber)
                   PR_SOURCE_BRANCH: $(System.PullRequest.SourceBranch)
                   PR_SOURCE_COMMIT: $(System.PullRequest.SourceCommitId)
                   PR_TARGET_BRANCH: $(System.PullRequest.TargetBranch)
