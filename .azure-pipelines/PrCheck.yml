@@ -129,9 +129,7 @@ extends:
                   else
                     # CI/merge-queue trigger: extract the base branch from the merge-queue branch name.
                     # Branch format: refs/heads/gh-readonly-queue/{base_branch}/pr-{pr_number}-{head_sha}
-                    base_branch=$(echo "$SOURCE_BRANCH" \
-                      | sed 's|refs/heads/gh-readonly-queue/||' \
-                      | sed 's|/pr-[0-9]*-[0-9a-f]*$||')
+                    base_branch=$(grep -oP '(?<=gh-readonly-queue/)[^/]+' <<< "$SOURCE_BRANCH")
                     target_hash=$(git ls-remote "$UPSTREAM_REPO_URL" "refs/heads/$base_branch" | cut -f1)
                   fi
 
@@ -146,16 +144,20 @@ extends:
                   SOURCE_BRANCH: $(Build.SourceBranch)
                   SOURCE_COMMIT: $(Build.SourceVersion)
                   UPSTREAM_REPO_URL: $(Build.Repository.Uri)
-                displayName: 'Determine source and target commit hashes'
+                displayName: "Determine source and target commit hashes"
 
               - script: |
                   set -euo pipefail
 
-                  raw_components=$(azldev component changes "$SOURCE_COMMIT" "$TARGET_COMMIT")
+                  # Disabling until azldev component changes output format is finalized and we can implement proper parsing.
+                    # raw_components=$(azldev component changes "$SOURCE_COMMIT" "$TARGET_COMMIT")
 
-                  # TODO: azldev component changes output format is TBD.
-                  #       Adjust the parsing below once the format is confirmed.
-                  components=$(echo "$raw_components" | tr '\n' ',' | sed 's/,$//')
+                    # TODO: azldev component changes output format is TBD.
+                    #       Adjust the parsing below once the format is confirmed.
+                    # components=$(echo "$raw_components" | tr '\n' ',' | sed 's/,$//')
+
+                  # Dummy input for now:
+                  components="componentA,componentB,componentC"
 
                   echo "Affected components: $components"
 
@@ -163,7 +165,7 @@ extends:
                 env:
                   SOURCE_COMMIT: $(sourceCommit)
                   TARGET_COMMIT: $(targetCommit)
-                displayName: 'Determine affected components'
+                displayName: "Determine affected components"
 
               - script: |
                   set -euo pipefail
@@ -208,4 +210,4 @@ extends:
                   COMPONENTS: $(components)
                   SOURCE_COMMIT: $(sourceCommit)
                   UPSTREAM_REPO_URL: $(Build.Repository.Uri)
-                displayName: 'Call Control Tower "prcheck" API'
+                displayName: "Call Control Tower 'prcheck' API"
