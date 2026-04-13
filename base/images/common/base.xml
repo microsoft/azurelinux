@@ -35,8 +35,6 @@
 		<package name="selinux-policy-targeted"/>
 		<package name="setup"/>
 		<package name="shadow-utils"/>
-		<package name="sssd-common"/>
-		<package name="sssd-kcm"/>
 		<package name="sudo"/>
 		<package name="systemd"/>
 		<package name="systemd-networkd"/>
