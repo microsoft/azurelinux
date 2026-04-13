@@ -91,6 +91,110 @@
     </packagelist>
   </group>
   <group>
+    <id>c-development</id>
+    <name>C Development Tools and Libraries</name>
+    <name xml:lang="af">C-ontwikkeling, gereedskap en biblioteke</name>
+    <name xml:lang="bg">C Инструменти и библиотеки за разработка</name>
+    <name xml:lang="ca">Eines i biblioteques de desenvolupament amb C</name>
+    <name xml:lang="cs">Vývojářské nástroje a knihovny C</name>
+    <name xml:lang="da">C udviklingsværktøjer og -biblioteker</name>
+    <name xml:lang="de">C-Entwicklungswerkzeuge und -bibliotheken</name>
+    <name xml:lang="el">Εργαλεία ανάπτυξης και βιβλιοθήκες C</name>
+    <name xml:lang="en_GB">C Development Tools and Libraries</name>
+    <name xml:lang="es">Herramientas y Librerías de Desarrollo en C</name>
+    <name xml:lang="fi">C-kehitystyökalut ja -kirjastot</name>
+    <name xml:lang="fr">Outils de développement et bibliothèques pour C</name>
+    <name xml:lang="fur">Librariis e struments di disvilup in C</name>
+    <name xml:lang="he">ספריות וכלי פיתוח עבור שפת C.</name>
+    <name xml:lang="hu">C nyelv fejlesztői eszközök és könyvtárak</name>
+    <name xml:lang="hy">C լեզվով ծրագրավորման գործիքներ ու գրադարաններ</name>
+    <name xml:lang="ia">Instrumentos de disveloppamento C e bibliothecas</name>
+    <name xml:lang="id">Perkakas Pengembangan dan Pustaka C</name>
+    <name xml:lang="it">Librerie e strumenti di sviluppo in C</name>
+    <name xml:lang="ja">C 開発ツールとライブラリー</name>
+    <name xml:lang="ka">C-ის ხელსაწყოები და ბიბლიოთეკები</name>
+    <name xml:lang="kk">C тілінде әзірлеу құралдары мен кітапханалар</name>
+    <name xml:lang="ko">C 개발 도구 및 라이브러리</name>
+    <name xml:lang="nb">Utviklingsverktøy og biblioteker for C</name>
+    <name xml:lang="nl">C Ontwikkelgereedschappen en bibliotheken</name>
+    <name xml:lang="pa">ਡਿਵੈਲਪਮੈਂਟ ਟੂਲ ਅਤੇ ਲਾਇਬਰੇਰੀਆਂ</name>
+    <name xml:lang="pl">Narzędzia i biblioteki programistyczne języka C</name>
+    <name xml:lang="pt">Ferramentas de Programação C e Bibliotecas</name>
+    <name xml:lang="pt_BR">Ferramentas de Desenvolvimento C e Bibliotecas</name>
+    <name xml:lang="ru">Средства разработки на C и библиотеки</name>
+    <name xml:lang="sk">Vývojové nástroje a knižnice C</name>
+    <name xml:lang="sq">Libraritë dhe Mjetet për Zhvillim në gjuhën C</name>
+    <name xml:lang="sr">Развојни алати и библиотеке за C</name>
+    <name xml:lang="sv">C-utvecklingsverktyg och -bibliotek</name>
+    <name xml:lang="tr">C Geliştirme Araçları ve Kütüphaneleri</name>
+    <name xml:lang="uk">Програми та бібліотеки для розробки мовою C</name>
+    <name xml:lang="zh_CN">C 语言开发工具和库</name>
+    <name xml:lang="zh_TW">C 開發工具和函式庫</name>
+    <description>These tools include core development tools such as automake, gcc and debuggers.</description>
+    <description xml:lang="af">Hierdie gereedskap sluit die belangrikste ontwikkelingsgereedskap soos automake, gcc en ontfouters in.</description>
+    <description xml:lang="bg">Тези инструменти включват базови инструменти за разработка като automake, gcc и дебъгери.</description>
+    <description xml:lang="ca">Aquestes eines inclouen les eines imprescindibles per al desenvolupament, com ara automake, gcc i els depuradors.</description>
+    <description xml:lang="cs">Tyto nástroje zahrnují základní vývojářské nástroje jako jsou automake, gcc a debuggers.</description>
+    <description xml:lang="da">Disse værktøjer inkluderer grundlæggende udviklingsværktøjer, såsom automake, gcc og fejlsøgningsprogrammer.</description>
+    <description xml:lang="de">Diese Werkzeuge beinhalten Kern-Entwicklungswerkzeuge wie Automake, GCC und Debugger.</description>
+    <description xml:lang="en_GB">These tools include core development tools such as automake, gcc and debuggers.</description>
+    <description xml:lang="es">Estas herramientas incluyen herramientas clave de desarrollo como automake, gcc y debuggers.</description>
+    <description xml:lang="fi">Nämä työkalut sisältävät keskeisiä kehitystyökaluja, kuten automaken, gcc:n ja vianjäljitysohjelmia.</description>
+    <description xml:lang="fr">Cet ensemble d'outils comprend des outils de développement essentiels tels que automake, gcc et des débogueurs.</description>
+    <description xml:lang="fur">Chescj struments a includin i struments di disvilup principâi come automake, gcc e i debugger.</description>
+    <description xml:lang="he">חבילות הליבה של כלי הפיתוח הכוללות בין השאר את automake, gcc, perl, python ומנפי שגיאות.</description>
+    <description xml:lang="hu">Ezek a legfontosabb fejlesztőeszközöket tartalmazzák, mint az automake, gcc és a különböző hibakeresők.</description>
+    <description xml:lang="hy">Այս գործիքները ներառում են հիմնական ծրագրավորման գործիքներ, ինչպիսիք են automake, gcc և debugger-ներ։</description>
+    <description xml:lang="ia">Iste instrumentos contine utensiles de disveloppamento tal como automake, gcc e medios pro eliminar defectos.</description>
+    <description xml:lang="id">Perkakas ini termasuk perkakas pengembangan inti seperti automake, gcc, dan debugger.</description>
+    <description xml:lang="it">Questi strumenti comprendono i principali strumenti di sviluppo come automake, gcc e debugger.</description>
+    <description xml:lang="ja">これらのツールには、automake、gcc、デバッガーなどのコア開発ツールが含まれています。</description>
+    <description xml:lang="kk">Бұл құралдарға automake, gcc және жөндегіш сияқты негізгі әзірлеу құралдары кіреді.</description>
+    <description xml:lang="ko">이들 도구에는 automake, gcc, perl와 디버거와 같은 핵심 개발 도구를 포함하고 있습니다.</description>
+    <description xml:lang="nb">Disse verktøyene inneholder kjerneutviklingsverktøy, som automake, GCC og avlusere.</description>
+    <description xml:lang="nl">Deze gereedschappen omvatten kernontwikkelgereedschappen zoals automake, gcc en debuggers.</description>
+    <description xml:lang="pl">Te narzędzia zawierają podstawowe narzędzia programistyczne, takie jak Automake, GCC i debugery.</description>
+    <description xml:lang="pt">Estas ferramentas incluem as ferramentas de programação principais, tais como automake, gcc e depuradores.</description>
+    <description xml:lang="pt_BR">Estas ferramentas incluem ferramentas básicas de desenvolvimento como automake, gcc e depuradores.</description>
+    <description xml:lang="ru">В эти инструменты входят такие основные средства разработки, как automake, gcc и отладчики.</description>
+    <description xml:lang="sk">Tieto nástroje obsahujú základné vývojové nástroje ako sú automake, gcc a ladiace nástroje.</description>
+    <description xml:lang="sr">Ови алати садрже основне развојне алате као што су automake, gcc и алати за отклањање буба.</description>
+    <description xml:lang="sv">Dessa verktyg innehåller grundläggande utvecklingsverktyg såsom automake, gcc och felsökare.</description>
+    <description xml:lang="tr">Bu araçlar; automake, gcc ve hata ayıklayıcılar gibi çekirdek geliştirme araçlarını içerir.</description>
+    <description xml:lang="uk">До списку цих засобів включено основні засоби для розробки, зокрема automake, gcc і засоби діагностики.</description>
+    <description xml:lang="zh_CN">这些工具包括了核心开发工具，如 automake，gcc 和 debuggers 等。</description>
+    <description xml:lang="zh_TW">這些工具包括一些核心開發工具，例如 automake, gcc 以及 debuggers。</description>
+    <default>false</default>
+    <uservisible>true</uservisible>
+    <packagelist>
+      <packagereq type="mandatory">autoconf</packagereq>
+      <packagereq type="mandatory">automake</packagereq>
+      <packagereq type="mandatory">binutils</packagereq>
+      <packagereq type="mandatory">bison</packagereq>
+      <packagereq type="mandatory">flex</packagereq>
+      <packagereq type="mandatory" basearchonly="true">gcc</packagereq>
+      <packagereq type="mandatory" basearchonly="true">gcc-c++</packagereq>
+      <packagereq type="mandatory" basearchonly="true">gdb</packagereq>
+      <packagereq type="mandatory">glibc-devel</packagereq>
+      <packagereq type="mandatory">libtool</packagereq>
+      <packagereq type="mandatory">make</packagereq>
+      <packagereq type="mandatory">pkgconf</packagereq>
+      <packagereq type="mandatory">strace</packagereq>
+      <packagereq type="default">byacc</packagereq>
+      <packagereq type="default">ccache</packagereq>
+      <packagereq type="default">cscope</packagereq>
+      <packagereq type="default">ctags</packagereq>
+      <packagereq type="default">elfutils</packagereq>
+      <packagereq type="default" basearchonly="true">ltrace</packagereq>
+      <packagereq type="default" basearchonly="true">perf</packagereq>
+      <packagereq type="default">valgrind</packagereq>
+      <packagereq type="optional">check</packagereq>
+      <packagereq type="optional">cmake</packagereq>
+      <packagereq type="optional">nasm</packagereq>
+      <packagereq type="optional">python3-scons</packagereq>
+    </packagelist>
+  </group>
+  <group>
     <id>development-libs</id>
     <name>Development Libraries</name>
     <name xml:lang="af">Ontwikkelingsbiblioteke</name>
