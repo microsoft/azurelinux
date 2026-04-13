@@ -95,6 +95,7 @@ extends:
                 displayName: "Install azldev"
                 env:
                   AZLDEV_COMMIT: $(AzldevCommit)
+                condition: false # Disable for now to test the rest of the pipeline.
 
               - script: |
                   set -euo pipefail
@@ -114,25 +115,68 @@ extends:
                 displayName: "Verify rendered specs are up to date"
                 condition: false # Disable for now to test the rest of the pipeline without needing to update specs.
 
+                # TODO: Must work for both pull request and continuous integration scenarios. The latter is triggered by GitHub's merge queus,
+                #       so we should be able to extract the target branch name from the source branch name (e.g. "refs/heads/ gh-readonly-queue/{base_branch}/pr-{pr_number}-{head_sha}")
+                #       and then use 'git rev-parse' to get the commit hashes.
               - script: |
                   set -euo pipefail
 
+                  echo "TODO"
+
+                  source_hash="FIND_ME"
+                  target_hash="FIND_ME"
+
+                  echo "##vso[task.setvariable variable=sourceCommit]$source_hash"
+                  echo "##vso[task.setvariable variable=targetCommit]$target_hash"
+                env:
+                  UPSTREAM_REPO_URL: $(Build.Repository.Uri)
+                  PR_TARGET_BRANCH: $(System.PullRequest.TargetBranch)
+                  REPO_NAME: $(Build.Repository.Name)
+                  SOURCE_BRANCH: $(Build.SourceBranch)
+                  SOURCE_COMMIT: $(Build.SourceVersion)
+                  TEAM_PROJECT: $(System.TeamProject)
+                displayName: 'Determine source and target commit hashes'
+
+                # TODO: Requires the source and target commit hashes to be passed to 'azldev component changes $sourceCommit $targetCommit' to get the list of affected components.
+                #       Must work for both pull request and continuous integration scenarios. The latter is triggered by GitHub's merge queus,
+                #       so we should be able to extract the target branch name from the source branch name (e.g. "refs/heads/ gh-readonly-queue/{base_branch}/pr-{pr_number}-{head_sha}")
+                #       and then use 'git rev-parse' to get the commit hashes.
+              - script: |
+                  set -euo pipefail
+
+                  echo "TODO"
+
+                  COMPONENTS="ComponentA,ComponentB" # Placeholder for actual component list from API response.
+
+                  echo "##vso[task.setvariable variable=components]$COMPONENTS"
+                env:
+                  UPSTREAM_REPO_URL: $(Build.Repository.Uri)
+                  PR_TARGET_BRANCH: $(System.PullRequest.TargetBranch)
+                  REPO_NAME: $(Build.Repository.Name)
+                  SOURCE_BRANCH: $(Build.SourceBranch)
+                  SOURCE_COMMIT: $(sourceCommit)
+                  TARGET_COMMIT: $(targetCommit)
+                  TEAM_PROJECT: $(System.TeamProject)
+                displayName: 'Determine affected components'
+
+                # TODO: Clean-up unused environment variables in the above steps and this step once the commit hash extraction logic is implemented.
+              - script: |
+                  set -euo pipefail
+
+                  echo "Token length: ${#API_TOKEN}"
+
                   # Construct the repo URI from ADO predefined variables.
-                  REPO_URI="${COLLECTION_URI}${TEAM_PROJECT}/_git/${REPO_NAME}"
+                  REPO_URI="${UPSTREAM_REPO_URL}${TEAM_PROJECT}/_git/${REPO_NAME}"
 
                   # Build the JSON payload matching the Control Tower schema.
                   PAYLOAD=$(jq -n \
-                    --arg repoUri        "$REPO_URI" \
-                    --arg sourceBranch    "$PR_SOURCE_BRANCH" \
-                    --arg sourceCommitSha "$PR_SOURCE_COMMIT" \
-                    --arg targetBranch    "$PR_TARGET_BRANCH" \
-                    --arg targetCommitSha "$TARGET_COMMIT" \
+                    --arg components      "$COMPONENTS" \
+                    --arg repoUri         "$REPO_URI" \
+                    --arg sourceCommitSha "$SOURCE_COMMIT" \
                     '{
+                      components:       ($components | split(",") | map(. | trim)),
                       repoUri:         $repoUri,
-                      sourceBranch:    $sourceBranch,
-                      sourceCommitSha: $sourceCommitSha,
-                      targetBranch:    $targetBranch,
-                      targetCommitSha: $targetCommitSha
+                      sourceCommitSha: $sourceCommitSha
                     }')
 
                   # azldev component render -a
@@ -159,13 +203,13 @@ extends:
                   echo "Service response:"
                   jq . response.json
                 env:
-                  API_TOKEN: $(API_TOKEN)
-                  COLLECTION_URI: $(System.CollectionUri)
-                  TEAM_PROJECT: $(System.TeamProject)
-                  REPO_NAME: $(Build.Repository.Name)
-                  PR_SOURCE_BRANCH: $(System.PullRequest.SourceBranch)
-                  PR_SOURCE_COMMIT: $(System.PullRequest.SourceCommitId)
-                  PR_TARGET_BRANCH: $(System.PullRequest.TargetBranch)
-                  TARGET_COMMIT: $(Build.SourceVersion)
                   API_BASE_URL: $(ApiBaseUrl)
+                  API_TOKEN: $(API_TOKEN)
+                  COMPONENTS: $(components)
+                  UPSTREAM_REPO_URL: $(Build.Repository.Uri)
+                  PR_TARGET_BRANCH: $(System.PullRequest.TargetBranch)
+                  REPO_NAME: $(Build.Repository.Name)
+                  SOURCE_BRANCH: $(Build.SourceBranch)
+                  SOURCE_COMMIT: $(Build.SourceVersion)
+                  TEAM_PROJECT: $(System.TeamProject)
                 displayName: 'Call Control Tower "prcheck" API'
