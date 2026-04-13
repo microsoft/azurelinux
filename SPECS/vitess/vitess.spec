@@ -3,7 +3,7 @@
 
 Name:           vitess
 Version:        19.0.4
-Release:        9%{?dist}
+Release:        10%{?dist}
 Summary:        Database clustering system for horizontal scaling of MySQL
 # Upstream license specification: MIT and Apache-2.0
 License:        MIT and ASL 2.0
@@ -35,6 +35,7 @@ Patch5:         CVE-2026-27965.patch
 Patch6:         CVE-2026-27969.patch
 Patch7:         CVE-2025-11065.patch
 BuildRequires: golang < 1.23
+BuildRequires: hostname
 
 %description
 Vitess is a database clustering system for horizontal scaling of MySQL through
@@ -97,6 +98,20 @@ install -m 0755 -vp ./bin/*             %{buildroot}%{_bindir}/
 #   go/vt/vttablet/tabletserver/vstreamer - needs mysqlctl binary
 #   go/vt/wrangler/testlib            - needs mysqld (VT_MYSQL_ROOT)
 #   go/vt/zkctl                       - needs /usr/local/vitess/bin (zookeeper)
+export ZONEINFO=/usr/share/zoneinfo
+export TZ=UTC
+
+echo "127.0.0.1 localhost $(hostname)" >> /etc/hosts
+
+export TMPDIR=$PWD/tmp
+mkdir -p $TMPDIR
+
+export VTDATAROOT=$PWD/vtdataroot
+mkdir -p $VTDATAROOT
+
+export VT_MYSQL_ROOT=/usr
+export VTROOT=$PWD
+
 go test -mod=vendor \
        ./go/mysql/binlog/... \
        ./go/mysql/capabilities/... \
@@ -149,6 +164,9 @@ go test -mod=vendor \
 %{_bindir}/*
 
 %changelog
+* Mon Apr 13 2026 Sumit Jena <v-sumitjena@microsoft.com> - 19.0.4-10
+- Update check section to fix ptests failures
+
 * Thu Feb 26 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 19.0.4-9
 - Patch for CVE-2025-11065
 
