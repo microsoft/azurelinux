@@ -1,0 +1,43 @@
+[components.gdm]
+
+# Azure Linux only needs gdm-pam-extensions-devel (for sssd). The main gdm
+# binary is a display manager that requires a full GNOME desktop stack. Strip
+# the heavy GNOME runtime Requires so repoclosure passes — the main gdm
+# package won't function as a display manager, but the pam-extensions-devel
+# subpackage (the only consumer) is unaffected.
+
+[[components.gdm.overlays]]
+description = "Remove gnome-shell Requires — not needed, display manager not used"
+type = "spec-remove-tag"
+tag = "Requires"
+value = "gnome-shell"
+
+[[components.gdm.overlays]]
+description = "Remove gnome-session Requires — not needed, display manager not used"
+type = "spec-remove-tag"
+tag = "Requires"
+value = "gnome-session >= 49~beta"
+
+[[components.gdm.overlays]]
+description = "Remove gnome-session-wayland-session Requires — not needed"
+type = "spec-remove-tag"
+tag = "Requires"
+value = "gnome-session-wayland-session >= 49~beta"
+
+[[components.gdm.overlays]]
+description = "Remove gnome-settings-daemon Requires — not needed"
+type = "spec-remove-tag"
+tag = "Requires"
+value = "gnome-settings-daemon >= 3.27.90"
+
+[[components.gdm.overlays]]
+description = "Remove gnome-keyring-pam Requires — not needed"
+type = "spec-remove-tag"
+tag = "Requires"
+value = "gnome-keyring-pam"
+
+[[components.gdm.overlays]]
+description = "Remove system-logos Requires — not available in Azure Linux"
+type = "spec-remove-tag"
+tag = "Requires"
+value = "system-logos"
