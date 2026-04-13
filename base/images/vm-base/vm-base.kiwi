@@ -55,7 +55,6 @@
         <package name="bc" />
         <package name="binutils" />
         <package name="bind-utils" />
-        <package name="brotli" />
         <package name="bzip2" />
         <package name="chkconfig" />
         <package name="chrony" />
@@ -85,7 +84,6 @@
         <package name="kernel" />
         <package name="kernel-tools" />
         <package name="lvm2" />
-        <package name="lz4" />
         <package name="man-db" />
         <package name="nano" />
         <package name="ncurses-term" />
@@ -106,13 +104,10 @@
         <package name="systemd-rpm-macros" />
         <package name="tar" />
         <package name="tpm2-tss" />
-        <package name="unzip" />
         <package name="util-linux" />
         <package name="vim-minimal" />
         <package name="wget" />
         <package name="which" />
-        <package name="zchunk" />
-        <package name="zlib" />
 
         <!-- Azure-specific packages -->
         <package name="WALinuxAgent" />
