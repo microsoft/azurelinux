@@ -98,7 +98,6 @@
         <package name="selinux-policy-targeted" />
         <package name="setup" />
         <package name="shadow-utils" />
-        <package name="shadow-utils-subid" />
         <package name="sudo" />
         <package name="systemd" />
         <package name="systemd-networkd" />
