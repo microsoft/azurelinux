@@ -1,0 +1,25 @@
+[components.coin-or-Cbc]
+
+# coin-or-HiGHS is not available in Azure Linux. Disable HiGHS support by
+# removing the HiGHS BuildRequires entry and stripping the configure flags.
+# HiGHS is an optional LP solver backend; Cbc's primary solver (Clp) is unaffected.
+
+[[components.coin-or-Cbc.overlays]]
+description = "Disable HiGHS BuildRequires — coin-or-HiGHS not available in Azure Linux"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(highs)"
+
+[[components.coin-or-Cbc.overlays]]
+description = "Remove HiGHS --with-highs-incdir configure flag"
+type = "spec-search-replace"
+section = "%build"
+regex = '  --with-highs-incdir=%\{_includedir\}/highs \\'
+replacement = "  \\"
+
+[[components.coin-or-Cbc.overlays]]
+description = "Remove HiGHS --with-highs-lib configure flag"
+type = "spec-search-replace"
+section = "%build"
+regex = '  --with-highs-lib=-lhighs \\'
+replacement = "  \\"
