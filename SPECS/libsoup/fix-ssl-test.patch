@@ -1,0 +1,88 @@
+From f74f956ed1e09767d605c68baaf6615f63e41205 Mon Sep 17 00:00:00 2001
+From: Patrick Griffis <pgriffis@igalia.com>
+Date: Mon, 13 Jan 2025 12:22:02 -0600
+Subject: [PATCH] ssl-test: Respect pkcs11_tests build option
+
+Closes #304
+
+Upstream Patch reference: https://gitlab.gnome.org/GNOME/libsoup/-/commit/f74f956ed1e09767d605c68baaf6615f63e41205.patch
+---
+ tests/meson.build | 16 ++++++++++++++--
+ tests/ssl-test.c  |  6 +++---
+ 2 files changed, 17 insertions(+), 5 deletions(-)
+
+diff --git a/tests/meson.build b/tests/meson.build
+index bf85f2b..23fdf98 100644
+--- a/tests/meson.build
++++ b/tests/meson.build
+@@ -5,6 +5,15 @@ installed_tests_enabled = get_option('installed_tests')
+ installed_tests_template_tap = files('template-tap.test.in')
+ abs_installed_tests_execdir = join_paths(prefix, installed_tests_execdir)
+ 
++if get_option('pkcs11_tests').enabled()
++  assert(gnutls_dep.found()) # Required earlier.
++  enable_pkcs11_tests = true
++elif get_option('pkcs11_tests').auto()
++  enable_pkcs11_tests = gnutls_dep.found()
++else
++  enable_pkcs11_tests = false
++endif
++
+ if cc.get_id() == 'msvc'
+   test_utils = static_library(test_utils_name, test_utils_name + '.c',
+     dependencies : [ libsoup_static_dep, unix_socket_dep ])
+@@ -23,7 +32,7 @@ test_resources = gnome.compile_resources('soup-tests',
+   install_dir : installed_tests_execdir,
+ )
+ 
+-if gnutls_dep.found()
++if enable_pkcs11_tests
+   mock_pkcs11_module = shared_module('mock-pkcs11',
+       sources: 'mock-pkcs11.c',
+       name_prefix: '',
+@@ -98,7 +107,10 @@ tests = [
+   {'name': 'ssl',
+    'dependencies': [gnutls_dep],
+    'depends': mock_pkcs11_module,
+-   'c_args': '-DHAVE_GNUTLS=@0@'.format(gnutls_dep.found() ? 1 : 0),
++   'c_args': [
++      '-DHAVE_GNUTLS=@0@'.format(gnutls_dep.found() ? 1 : 0),
++      '-DENABLE_PKCS11_TESTS=@0@'.format(enable_pkcs11_tests ? 1 : 0),
++   ]
+   },
+   {'name': 'streaming'},
+   {'name': 'timeout'},
+diff --git a/tests/ssl-test.c b/tests/ssl-test.c
+index 12f81af..7ebc17e 100644
+--- a/tests/ssl-test.c
++++ b/tests/ssl-test.c
+@@ -450,7 +450,7 @@ do_tls_interaction_msg_test (gconstpointer data)
+         g_object_unref (msg);
+ 
+         /* Currently on the gnutls backend supports pkcs#11 */
+-        if (g_strcmp0 (g_type_name (G_TYPE_FROM_INSTANCE (g_tls_backend_get_default ())), "GTlsBackendGnutls") == 0) {
++        if (ENABLE_PKCS11_TESTS && g_strcmp0 (g_type_name (G_TYPE_FROM_INSTANCE (g_tls_backend_get_default ())), "GTlsBackendGnutls") == 0) {
+                 g_test_message ("Running PKCS#11 tests");
+ 
+                 /* Using PKCS#11 works, and asks for a PIN */
+@@ -646,7 +646,7 @@ do_tls_interaction_preconnect_test (gconstpointer data)
+         soup_session_abort (session);
+ 
+         /* Currently on the gnutls backend supports pkcs#11 */
+-        if (g_strcmp0 (g_type_name (G_TYPE_FROM_INSTANCE (g_tls_backend_get_default ())), "GTlsBackendGnutls") == 0) {
++        if (ENABLE_PKCS11_TESTS && g_strcmp0 (g_type_name (G_TYPE_FROM_INSTANCE (g_tls_backend_get_default ())), "GTlsBackendGnutls") == 0) {
+                 GTlsCertificate *pkcs11_certificate;
+ 
+                 pkcs11_certificate = g_tls_certificate_new_from_pkcs11_uris (
+@@ -710,7 +710,7 @@ main (int argc, char **argv)
+ 
+ 	test_init (argc, argv, NULL);
+ 
+-#if HAVE_GNUTLS
++#if HAVE_GNUTLS && ENABLE_PKCS11_TESTS
+         char *module_path = soup_test_build_filename_abs (G_TEST_BUILT, "mock-pkcs11.so", NULL);
+         g_assert_true (g_file_test (module_path, G_FILE_TEST_EXISTS));
+ 
+-- 
+2.45.4
+

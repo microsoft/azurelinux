@@ -42,9 +42,10 @@ Patch23:         CVE-2026-0716.patch
 Patch24:         CVE-2026-1467.patch
 Patch25:         CVE-2026-1761.patch
 Patch26:         CVE-2026-1801.patch
-Patch27:         CVE-2026-1760.patch
-Patch28:         CVE-2026-2443.patch
-Patch29:         CVE-2026-2369.patch
+Patch27:         fix-ssl-test.patch
+Patch28:         CVE-2026-1760.patch
+Patch29:         CVE-2026-2443.patch
+Patch30:         CVE-2026-2369.patch
 
 
 BuildRequires:  meson
@@ -116,7 +117,13 @@ These are the additional language files of libsoup.
     -Dautobahn=disabled \
     -Dhttp2_tests=disabled \
     -Dntlm=disabled \
+%if 0%{?with_check}
+    -Dtests=true \
+    -Dgssapi=disabled \
+    -Dpkcs11_tests=disabled
+%else
     -Dtests=false
+%endif
 %meson_build
 
 %install
@@ -159,6 +166,8 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %changelog
 * Tue Feb 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.0.4-14
 - Patch for CVE-2026-1760, CVE-2026-2443, CVE-2026-2369
+- Enable ptests and fix ssl-test
+- Modified existing patches
 
 * Mon Feb 16 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.0.4-13
 - Patch for CVE-2026-1801, CVE-2026-1761, CVE-2026-1467
