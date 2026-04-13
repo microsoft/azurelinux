@@ -124,7 +124,7 @@ Development files for %{name}
 * Tue Dec 10 2024 Sudipta Pandit <sudpandit@microsoft.com> - 3.1.9-2
 - Backport fixes for CVE-2024-27532
 
-* Tue Nov 23 2024 Paul Meyer <paul.meyer@microsoft.com> - 3.1.9-1
+* Sat Nov 23 2024 Paul Meyer <paul.meyer@microsoft.com> - 3.1.9-1
 - Update to 3.1.9 to enable Lua filter plugin using system luajit library.
 - Remove patches for CVE-2024-25629 and CVE-2024-28182 as they are fixed in 3.1.9.
 - [Jon Slobodzian] Reconciled with Fasttrack/3.0 on 11/23, updated Changelog date from 11/5.
