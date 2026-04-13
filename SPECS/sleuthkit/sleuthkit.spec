@@ -42,10 +42,7 @@ The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
 %prep
-%setup -q
-%patch 0 -p1
-%patch 1 -p1
-%patch 2 -p1
+%autosetup -p1
 
 %build
 %configure --disable-static \
