@@ -6,6 +6,9 @@
         <contact>user@example.com</contact>
         <specification>Azure Linux Container Image Example</specification>
     </description>
+    <profiles>
+        <profile name="core" description="Core Container" import="true" />
+    </profiles>
     <preferences>
         <version>0.1</version>
         <packagemanager>dnf5</packagemanager>
@@ -26,8 +29,7 @@
             path="https://fedora.mirrorservice.org/fedora/linux/releases/43/Everything/x86_64/os/" />
     </repository>
 
-    <packages type="image">
-        <!-- Core group -->
+    <packages type="image" profiles="core">
         <package name="filesystem" />
         <package name="bash" />
         <package name="system-release" />
