@@ -8,6 +8,7 @@
     </description>
     <profiles>
         <profile name="core" description="Core Container" import="true" />
+        <profile name="distroless-minimal" description="Distroless Minimal Container" import="true" />
     </profiles>
     <preferences>
         <version>0.1</version>
@@ -35,8 +36,21 @@
         <package name="system-release" />
     </packages>
 
-    <packages type="bootstrap">
+    <!-- For distroless profiles ALL packages that should be included in
+         the final image must be listed in the "image" packages section.
+         Packages from bootstrap may be removed by config.sh. -->
+    <packages type="image" profiles="distroless-minimal">
         <package name="filesystem" />
         <package name="system-release" />
+        <package name="tzdata" />
+    </packages>
+
+    <packages type="bootstrap" profiles="core,distroless-minimal">
+        <package name="filesystem" />
+        <package name="system-release" />
+    </packages>
+
+    <packages type="bootstrap" profiles="distroless-minimal">
+        <package name="busybox" />
     </packages>
 </image>
