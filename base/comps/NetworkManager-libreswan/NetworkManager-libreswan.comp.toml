@@ -1,0 +1,7 @@
+# gtk4 4.20.3 in the build tag is one patch version below the 4.20.4
+# required by libnma-gtk4. Disable the gtk4 VPN editor plugin until
+# gtk4 is updated. The GTK3 editor plugin is still built.
+[components.NetworkManager-libreswan]
+
+[components.NetworkManager-libreswan.build]
+without = ["gtk4"]
