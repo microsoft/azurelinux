@@ -28,13 +28,12 @@
 
     <packages type="image">
         <!-- Core group -->
-        <package name="basesystem" />
+        <package name="filesystem" />
         <package name="bash" />
         <package name="system-release" />
     </packages>
 
     <packages type="bootstrap">
-        <package name="basesystem" />
         <package name="filesystem" />
         <package name="system-release" />
     </packages>
