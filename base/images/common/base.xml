@@ -41,6 +41,7 @@
 		<package name="util-linux"/>
 		<package name="vim-minimal"/>
 		<package name="zram-generator-defaults"/>
+		<ignore name="7zip"/>
 		<ignore name="libsecret"/>
 		<ignore name="memstrack"/>
 		<ignore name="mkpasswd"/>
