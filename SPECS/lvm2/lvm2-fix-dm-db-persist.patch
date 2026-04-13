@@ -1,0 +1,34 @@
+From eb4f744820832aff3d6da1bba14f12e91a5b3535 Mon Sep 17 00:00:00 2001
+From: Marian Csontos <mcsontos@redhat.com>
+Date: Wed, 19 Feb 2025 12:00:00 +0000
+Subject: [PATCH] udev: persist DM device state across initrd switch-root
+
+Without OPTIONS+="db_persist", the udev database entries for device-mapper
+devices (including LUKS/cryptsetup) are wiped when udev cleans up on
+switch-root. This causes device symlinks (/dev/disk/by-uuid/, by-partuuid/)
+to disappear, and systemd cannot find the root device, triggering a
+dracut-initqueue timeout and emergency shell.
+
+This is the fix from upstream LVM2 commit eb4f744 which landed in 2.03.24.
+
+Upstream: https://github.com/lvmteam/lvm2/commit/eb4f744820832aff3d6da1bba14f12e91a5b3535
+---
+ udev/10-dm.rules.in | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/udev/10-dm.rules.in b/udev/10-dm.rules.in
+index 94c4140c0..db4ee771d 100644
+--- a/udev/10-dm.rules.in
++++ b/udev/10-dm.rules.in
+@@ -51,6 +51,11 @@ KERNEL!="dm-[0-9]*", GOTO="dm_end"
+ # is not recommended.
+ ACTION=="remove", GOTO="dm_end"
+ 
++# Persist device state on transition from the initrd. This means all udev device
++# properties are kept in the udev database even when it is cleaned up on
++# switch-root.
++OPTIONS+="db_persist"
++
+ # Decode udev control flags and set environment variables appropriately.
+ # These flags are encoded in DM_COOKIE variable that was introduced in
+ # kernel version 2.6.31. Therefore, we can use this feature with

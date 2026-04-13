@@ -3,7 +3,7 @@
 Summary:        Userland logical volume management tools
 Name:           lvm2
 Version:        2.03.23
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2 AND BSD 2-Clause AND LGPLv2.1
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,6 +12,7 @@ URL:            https://sourceware.org/lvm2/
 Source0:        https://sourceware.org/pub/lvm2/LVM2.%{version}.tgz
 Source1:        lvm2-activate.service
 Patch0:         lvm2-set-default-preferred_names.patch
+Patch1:         lvm2-fix-dm-db-persist.patch
 BuildRequires:  libaio-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  libsepol-devel
@@ -166,6 +167,7 @@ the device-mapper event library.
 %prep
 %setup -q -n LVM2.%{version}
 %patch 0 -p1 -b .preferred_names
+%patch 1 -p1 -b .dm-db-persist
 
 %build
 %define _default_pid_dir /run
@@ -336,6 +338,12 @@ echo "disable lvm2-monitor.service" >> %{buildroot}%{_libdir}/systemd/system-pre
 %ghost %{_sysconfdir}/lvm/cache/.cache
 
 %changelog
+* Sun Apr 13 2025 Sindhu Karri <lakarri@microsoft.com> - 2.03.23-2
+- Backport upstream fix for DM device udev DB not persisting across initrd
+  switch-root (OPTIONS+="db_persist" in 10-dm.rules.in).
+- Fixes ISO install failure with disk encryption (dracut-initqueue timeout).
+- Upstream commit: eb4f744820832aff3d6da1bba14f12e91a5b3535 (lvm2 2.03.24)
+
 * Fri Jan 05 2024 Alberto Perez <aperezguevar@microsoft.com> - 2.03.23-1
 - Upgrading to newest version 2.03.23
 
