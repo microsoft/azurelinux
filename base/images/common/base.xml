@@ -41,5 +41,7 @@
 		<package name="util-linux"/>
 		<package name="vim-minimal"/>
 		<package name="zram-generator-defaults"/>
+		<ignore name="libsecret"/>
+		<ignore name="pinentry"/>
 	</packages>
 </image>
