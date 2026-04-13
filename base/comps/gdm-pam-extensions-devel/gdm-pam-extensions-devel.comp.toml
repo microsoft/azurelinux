@@ -1,0 +1,5 @@
+# Standalone extraction of gdm-pam-extensions-devel from the gdm source.
+# Replaces the full gdm component — Azure Linux only needs the PAM extension
+# headers (for sssd), not the display manager and its GNOME desktop stack.
+[components.gdm-pam-extensions-devel]
+spec = { type = "local", path = "gdm-pam-extensions-devel.spec" }
