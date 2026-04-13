@@ -171,15 +171,13 @@ extends:
               - script: |
                   set -euo pipefail
 
-                  echo "Token length: ${#API_TOKEN}"
-
                   # Build the JSON payload matching the Control Tower schema.
                   payload=$(jq -n \
                     --arg components      "$COMPONENTS" \
                     --arg repoUri         "$UPSTREAM_REPO_URL" \
                     --arg sourceCommitSha "$SOURCE_COMMIT" \
                     '{
-                      components:       ($components | split(",") | map(. | trim)),
+                      components:       ($components | split(",") | map(gsub("^\\s+|\\s+$"; ""))),
                       repoUri:         $repoUri,
                       sourceCommitSha: $sourceCommitSha
                     }')
