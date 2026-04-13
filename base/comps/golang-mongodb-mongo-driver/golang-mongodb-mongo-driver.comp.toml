@@ -1,0 +1,10 @@
+[components.golang-mongodb-mongo-driver]
+
+# The aws-sdk-go-devel bootstrap build has auto-generated Requires stripped,
+# so it doesn't transitively pull in golang-github-jmespath-devel. Add the
+# missing build dependency explicitly until a non-bootstrap aws-sdk-go is available.
+[[components.golang-mongodb-mongo-driver.overlays]]
+description = "Add missing transitive BuildRequires on go-jmespath (needed by aws-sdk-go, missing in bootstrap builds)"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "golang(github.com/jmespath/go-jmespath)"
