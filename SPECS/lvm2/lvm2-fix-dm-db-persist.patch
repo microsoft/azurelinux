@@ -17,12 +17,11 @@ Upstream: https://github.com/lvmteam/lvm2/commit/eb4f744820832aff3d6da1bba14f12e
  1 file changed, 5 insertions(+)
 
 diff --git a/udev/10-dm.rules.in b/udev/10-dm.rules.in
-index 94c4140c0..db4ee771d 100644
 --- a/udev/10-dm.rules.in
 +++ b/udev/10-dm.rules.in
-@@ -51,6 +51,11 @@ KERNEL!="dm-[0-9]*", GOTO="dm_end"
+@@ -44,6 +44,11 @@ KERNEL!="dm-[0-9]*", GOTO="dm_end"
  # is not recommended.
- ACTION=="remove", GOTO="dm_end"
+ ACTION!="add|change", GOTO="dm_end"
  
 +# Persist device state on transition from the initrd. This means all udev device
 +# properties are kept in the udev database even when it is cleaned up on
