@@ -11,3 +11,18 @@ description = "Add the CPE parsing bug fix patch file"
 type = "file-add"
 source = "fix-avoid-incorrect-CPE-parsing-on-Azure-Linux.patch"
 file = "fix-avoid-incorrect-CPE-parsing-on-Azure-Linux.patch"
+
+# The upstream spec does not pass --distro to setup.py install, so the Jinja2
+# template for cloud-init-generator renders with no variant and falls through to
+# the default path /usr/lib/cloud-init/ds-identify. However, ds-identify is
+# installed to /usr/libexec/cloud-init/ (because /etc/redhat-release exists in
+# the build chroot). This mismatch causes cloud-init-generator to fail with
+# exit status 3 at boot, preventing cloud-init from running.
+# Fix by adding --distro=fedora so the generator template picks the correct
+# /usr/libexec/cloud-init/ds-identify path.
+[[components.cloud-init.overlays]]
+description = "Fix ds-identify path mismatch: pass --distro=fedora to setup.py so cloud-init-generator uses /usr/libexec/cloud-init/ds-identify"
+type = "spec-search-replace"
+section = "%install"
+regex = '%py3_install -- --init-system=systemd'
+replacement = '%py3_install -- --init-system=systemd --distro=fedora'
