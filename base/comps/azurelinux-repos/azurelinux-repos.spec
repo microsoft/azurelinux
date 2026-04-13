@@ -4,7 +4,7 @@
 Summary:        Azure Linux package repositories
 Name:           azurelinux-repos
 Version:        4.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -114,10 +114,11 @@ for repo in $RPM_BUILD_ROOT/etc/yum.repos.d/azurelinux.repo; do
 done
 
 # Update BASE_REPO_URI in azurelinux.repo; compute based on dist tag.
-# Extract the last dot-delimited segment from %%dist (e.g. "20260303" from ".azl4~bootstrap.20260303").
-# If the segment doesn't contain an 8-digit date, fall back to a hard-coded URI.
-date_segment=$(echo '%{dist}' | awk -F. '{print $NF}')
-if echo "$date_segment" | grep -qE '[0-9]{8}'; then
+# Extract an 8-digit date stamp from %%dist.
+# Handles both dotted forms (e.g. ".azl4~bootstrap.20260303") and tilde-only forms (e.g. ".azl4~20260412").
+# If no 8-digit date is found, fall back to a hard-coded URI.
+date_segment=$(echo '%{dist}' | grep -oE '[0-9]{8}')
+if [ -n "$date_segment" ]; then
     base_repo_uri="https://stcontroltowerdevjwisitg.blob.core.windows.net/daily-repo-dev/${date_segment}"
 else
     base_repo_uri='https://packages.microsoft.com/azurelinux/$releasever/prod/base'
@@ -258,6 +259,9 @@ rm -f "$TMPRING"
 
 
 %changelog
+* Mon Apr 13 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-5
+- Fix dist tag date extraction to handle tilde-only forms (e.g. ".azl4~20260412").
+
 * Wed Mar 25 2026 Sam Meluch <sammeluch@microsoft.com> - 4.0-4
 - Update .repo files for daily repo publishing to dev blob storage.
 
