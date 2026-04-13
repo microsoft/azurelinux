@@ -2207,7 +2207,6 @@ packages = [
     "gnome-online-accounts-libs", # srpm: gnome-online-accounts
     "gnome-remote-desktop", # srpm: gnome-remote-desktop
     "gnome-session", # srpm: gnome-session
-    "gnome-session-wayland-session", # srpm: gnome-session
     "gnome-settings-daemon", # srpm: gnome-settings-daemon
     "gnome-settings-daemon-devel", # srpm: gnome-settings-daemon
     "gnome-shell-extension-no-overview", # srpm: gnome-shell-extension-no-overview

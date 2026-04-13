@@ -1,0 +1,35 @@
+[components.gnome-session]
+
+# Remove the wayland-session subpackage — it provides a .desktop file for
+# display managers to offer "GNOME on Wayland" as a session choice. Only gdm
+# depends on it (and gdm is being removed). Removing it also drops the
+# transitive Requires on gnome-shell.
+
+[[components.gnome-session.overlays]]
+description = "Remove %package wayland-session"
+type = "spec-remove-section"
+section = "%package"
+package = "wayland-session"
+
+[[components.gnome-session.overlays]]
+description = "Remove %description wayland-session"
+type = "spec-remove-section"
+section = "%description"
+package = "wayland-session"
+
+[[components.gnome-session.overlays]]
+description = "Remove %files wayland-session"
+type = "spec-remove-section"
+section = "%files"
+package = "wayland-session"
+
+# Delete installed wayland-session files to avoid unpackaged file errors
+[[components.gnome-session.overlays]]
+description = "Delete wayland-session files from buildroot"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+    "",
+    "# Remove wayland-session files (subpackage removed for Azure Linux)",
+    "rm -rf %{buildroot}%{_datadir}/wayland-sessions",
+]
