@@ -864,9 +864,6 @@ packages = [
     "gdk-pixbuf2-modules-extra", # srpm: gdk-pixbuf2-modules-extra
     "gdk-pixbuf2-xlib", # srpm: gdk-pixbuf2-xlib
     "gdk-pixbuf2-xlib-devel", # srpm: gdk-pixbuf2-xlib
-    "gdm", # srpm: gdm
-    "gdm-devel", # srpm: gdm
-    "gdm-pam-extensions-devel", # srpm: gdm
     "gengetopt", # srpm: gengetopt
     "geoclue2", # srpm: geoclue2
     "geoclue2-demos", # srpm: geoclue2
