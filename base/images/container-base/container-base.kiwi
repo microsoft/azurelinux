@@ -9,6 +9,9 @@
     <profiles>
         <profile name="core" description="Core Container" import="true" />
         <profile name="distroless-minimal" description="Distroless Minimal Container" import="true" />
+        <profile name="distroless-base" description="Distroless Base Container" import="true">
+            <requires profile="distroless-minimal" />
+        </profile>
     </profiles>
     <preferences>
         <version>0.1</version>
@@ -43,6 +46,13 @@
         <package name="filesystem" />
         <package name="system-release" />
         <package name="tzdata" />
+    </packages>
+
+    <packages type="image" profiles="distroless-base">
+        <package name="glibc" />
+        <package name="libgcc" />
+        <package name="openssl-libs" />
+        <package name="setup" />
     </packages>
 
     <packages type="bootstrap" profiles="core,distroless-minimal">

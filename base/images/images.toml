@@ -10,6 +10,10 @@ definition = { type = "kiwi", path = "container-base/container-base.kiwi", profi
 description = "Container Distroless Minimal Image"
 definition = { type = "kiwi", path = "container-base/container-base.kiwi", profile = "distroless-minimal" }
 
+[images.container-distroless-base]
+description = "Container Distroless Base Image"
+definition = { type = "kiwi", path = "container-base/container-base.kiwi", profile = "distroless-base" }
+
 # NOTE:
 # sudo dnf install -y kiwi-cli
 # sudo kiwi --loglevel 10 \
