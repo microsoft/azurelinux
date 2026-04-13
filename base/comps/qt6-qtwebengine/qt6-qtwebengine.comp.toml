@@ -1,0 +1,13 @@
+# Chromium's ninja build generates response (.rsp) filenames that embed the
+# full build directory path. The RPM %_vpath_builddir macro controls this
+# directory name, and on AZL it defaults to "azurelinux-linux-build" (22
+# chars) vs Fedora's "fedora-linux-build" (18 chars). The extra 4 characters
+# push the longest .rsp filename to exactly 256 bytes — one over the Linux
+# NAME_MAX limit of 255. Fedora doesn't hit this because its shorter distro
+# name keeps the filename at 252 bytes.
+#
+# Override _vpath_builddir to "build" (5 chars) to give comfortable headroom.
+[components.qt6-qtwebengine]
+
+[components.qt6-qtwebengine.build]
+defines = { _vpath_builddir = "build" }
