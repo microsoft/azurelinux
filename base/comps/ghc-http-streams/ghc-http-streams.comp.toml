@@ -1,0 +1,6 @@
+# ghc-lifted-base, ghc-snap-core, and ghc-snap-server are not packaged in
+# Azure Linux. They are only needed for tests. Disable test suite.
+[components.ghc-http-streams]
+
+[components.ghc-http-streams.build]
+without = ["tests"]
