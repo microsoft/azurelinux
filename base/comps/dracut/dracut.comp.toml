@@ -1,0 +1,60 @@
+[components.dracut]
+
+# Add a Hyper-V subpackage similar to Azure Linux 3.0 — ships a dracut conf
+# that pulls in Hyper-V guest kernel modules (hv_utils, hv_vmbus, hv_storvsc,
+# hv_netvsc, hv_sock, hv_balloon) into the initramfs.
+
+# Add the 00-hyperv.conf source file.
+[[components.dracut.overlays]]
+description = "Add 00-hyperv.conf source file for Hyper-V guest drivers"
+type = "file-add"
+file = "00-hyperv.conf"
+source = "00-hyperv.conf"
+
+# Add a Source tag for the hyperv conf file.
+[[components.dracut.overlays]]
+description = "Add Source tag for 00-hyperv.conf"
+type = "spec-insert-tag"
+tag = "Source9999"
+value = "00-hyperv.conf"
+
+# Add the %package hyperv and %description hyperv blocks after %description squash
+# (which is the last subpackage definition before %prep in the upstream spec).
+[[components.dracut.overlays]]
+description = "Add %package hyperv subpackage definition"
+type = "spec-append-lines"
+section = "%description"
+package = "squash"
+lines = [
+    "",
+    "%package hyperv",
+    "Summary:        dracut configuration to build an initramfs with Hyper-V guest drivers",
+    "Requires:       %{name} = %{version}-%{release}",
+    "",
+    "%description hyperv",
+    "This package contains dracut configuration needed to build an initramfs with",
+    "Hyper-V guest drivers.",
+]
+
+# Install the 00-hyperv.conf file in %install.
+[[components.dracut.overlays]]
+description = "Install 00-hyperv.conf into dracut.conf.d"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+    "",
+    "install -m 0644 %{SOURCE9999} $RPM_BUILD_ROOT%{_sysconfdir}/dracut.conf.d/00-hyperv.conf",
+]
+
+# Add %files hyperv section after %files config-rescue
+# (which is the last %files section before %changelog in the upstream spec).
+[[components.dracut.overlays]]
+description = "Add %files hyperv section"
+type = "spec-append-lines"
+section = "%files"
+package = "config-rescue"
+lines = [
+    "",
+    "%files hyperv",
+    "%{_sysconfdir}/dracut.conf.d/00-hyperv.conf",
+]

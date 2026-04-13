@@ -117,6 +117,7 @@
         <!-- Azure-specific packages -->
         <package name="WALinuxAgent" />
         <package name="azure-vm-utils" />
+        <package name="dracut-hyperv" />
         <package name="hyperv-daemons" />
         <package name="kernel-modules" />
     </packages>
