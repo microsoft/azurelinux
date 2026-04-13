@@ -174,10 +174,12 @@ extends:
                   # Build the JSON payload matching the Control Tower schema.
                   payload=$(jq -n \
                     --arg components      "$COMPONENTS" \
+                    --arg buildReason      "$BUILD_REASON" \
                     --arg repoUri         "$UPSTREAM_REPO_URL" \
                     --arg sourceCommitSha "$SOURCE_COMMIT" \
                     '{
-                      components:       ($components | split(",") | map(gsub("^\\s+|\\s+$"; ""))),
+                      components:      ($components | split(",") | map(gsub("^\\s+|\\s+$"; ""))),
+                      buildReason:     $buildReason,
                       repoUri:         $repoUri,
                       sourceCommitSha: $sourceCommitSha
                     }')
@@ -185,6 +187,11 @@ extends:
                   echo "Calling Control Tower 'prcheck' endpoint..."
                   echo "Payload:"
                   echo "$payload" | jq .
+
+                  if [[ "$BUILD_REASON" == "PullRequest" ]]; then
+                    echo "Skipping Control Tower call - pull request triggers are not supported, yet."
+                    exit 0
+                  fi
 
                   http_code=$(curl -s -o response.json -w "%{http_code}" \
                     --connect-timeout 10 --max-time 60 \
@@ -206,6 +213,7 @@ extends:
                 env:
                   API_BASE_URL: $(ApiBaseUrl)
                   API_TOKEN: $(apiToken)
+                  BUILD_REASON: $(Build.Reason)
                   COMPONENTS: $(components)
                   SOURCE_COMMIT: $(sourceCommit)
                   UPSTREAM_REPO_URL: $(Build.Repository.Uri)
