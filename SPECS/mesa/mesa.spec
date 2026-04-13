@@ -67,7 +67,7 @@
 Name:           mesa
 Summary:        Mesa graphics libraries
 Version:        24.0.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -82,6 +82,7 @@ Source1:        Mesa-MLAA-License-Clarification-Email.txt
 Source2:        LICENSE.PTR
 
 Patch10:        gnome-shell-glthread-disable.patch
+Patch11:        CVE-2026-40393.patch
 
 BuildRequires:  meson >= 1.3.0
 BuildRequires:  gcc
@@ -741,6 +742,9 @@ popd
 %endif
 
 %changelog
+* Mon Apr 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 24.0.1-7
+- Patch for CVE-2026-40393
+
 * Wed Feb 11 2026 BinduSri Adabala <v-badabala@microsoft.com> - 24.0.1-6
 - Bump release to rebuild with rust
 
