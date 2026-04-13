@@ -12,7 +12,10 @@
         <profile name="distroless-base" description="Distroless Base Container" import="true">
             <requires profile="distroless-minimal" />
         </profile>
-    </profiles>
+        <profile name="distroless-debug" description="Distroless Debug Container" import="true">
+            <requires profile="distroless-base" />
+        </profile>
+        </profiles>
     <preferences>
         <version>0.1</version>
         <packagemanager>dnf5</packagemanager>
@@ -53,6 +56,10 @@
         <package name="libgcc" />
         <package name="openssl-libs" />
         <package name="setup" />
+    </packages>
+
+    <packages type="image" profiles="distroless-debug">
+        <package name="busybox" />
     </packages>
 
     <packages type="bootstrap" profiles="core,distroless-minimal">
