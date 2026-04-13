@@ -43,6 +43,8 @@
 		<package name="zram-generator-defaults"/>
 		<ignore name="libsecret"/>
 		<ignore name="memstrack"/>
+		<ignore name="mkpasswd"/>
 		<ignore name="pinentry"/>
+		<ignore name="whois-nls"/>
 	</packages>
 </image>
