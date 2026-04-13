@@ -82,7 +82,6 @@
         <package name="iproute" />
         <package name="iputils" />
         <package name="irqbalance" />
-        <package name="kernel" />
         <package name="kernel-tools" />
         <package name="lvm2" />
         <package name="lz4" />
