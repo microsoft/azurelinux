@@ -63,7 +63,7 @@ extends:
               - task: AzureCLI@2
                 displayName: "Acquire Entra ID Bearer Token"
                 inputs:
-                  azureSubscription: CT-PR-Checks-ServiceConnection
+                  azureSubscription: CT-Endpoints-Access-ServiceConnection-DEV
                   scriptType: bash
                   scriptLocation: inlineScript
                   inlineScript: |
