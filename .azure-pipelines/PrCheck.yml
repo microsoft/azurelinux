@@ -201,6 +201,8 @@ extends:
                     -d "$payload")
 
                   echo "HTTP status: $http_code"
+                  echo "Service response:"
+                  jq . response.json
 
                   if [[ "$http_code" -lt 200 || "$http_code" -ge 300 ]]; then
                     echo "##[error]Control Tower returned HTTP $http_code"
@@ -208,8 +210,6 @@ extends:
                     exit 1
                   fi
 
-                  echo "Service response:"
-                  jq . response.json
                 env:
                   API_BASE_URL: $(ApiBaseUrl)
                   API_TOKEN: $(apiToken)
