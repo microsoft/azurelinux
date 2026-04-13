@@ -25,7 +25,7 @@
 
 # gdm-hooks moved to gdm packaging f28+
 %if 0%{?fedora} < 28 && 0%{?rhel} < 8
-%global gdm_hooks 1
+%global gdm_hooks 0
 %endif
 
 ## comment to disable tests
