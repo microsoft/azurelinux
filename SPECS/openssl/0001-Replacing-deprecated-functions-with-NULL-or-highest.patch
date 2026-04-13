@@ -75,7 +75,7 @@ index 0709883..38cb033 100644
  const SSL_METHOD *DTLSv1_client_method(void)
  {
 -    return dtlsv1_client_method();
-+    return DTLS_server_method();
++    return DTLS_client_method();
  }
  #endif
  
