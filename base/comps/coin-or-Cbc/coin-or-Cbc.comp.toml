@@ -1,0 +1,11 @@
+[components.coin-or-Cbc]
+
+# coin-or-HiGHS is not available in Azure Linux. Disable HiGHS support by
+# making the %ifnarch guards always-false. HiGHS is an optional LP solver
+# backend; Cbc's primary solver (Clp) is unaffected.
+
+[[components.coin-or-Cbc.overlays]]
+description = "Disable HiGHS support — coin-or-HiGHS not available in Azure Linux"
+type = "spec-search-replace"
+regex = '%ifnarch %\{ix86\}'
+replacement = "%if 0 # HiGHS disabled — coin-or-HiGHS not available in Azure Linux"
