@@ -1,0 +1,28 @@
+[components.mutter]
+
+# gnome-control-center is not in Azure Linux (cloud/server distro, no GNOME
+# settings UI). The control-center-filesystem virtual Provides is only supplied
+# by gnome-control-center's %package filesystem subpackage — no other package
+# provides it. Remove the runtime dep, the keybinding XML files that only
+# gnome-control-center would consume, and clean them up in %install.
+
+[[components.mutter.overlays]]
+description = "Drop control-center-filesystem Requires — gnome-control-center removed"
+type = "spec-remove-tag"
+tag = "Requires"
+value = "control-center-filesystem"
+
+[[components.mutter.overlays]]
+description = "Remove gnome-control-center keybinding files from %files — no consumer"
+type = "spec-search-replace"
+section = "%files"
+regex = '%\{_datadir\}/gnome-control-center/keybindings/50-mutter-\*\.xml'
+replacement = ""
+
+[[components.mutter.overlays]]
+description = "Delete installed gnome-control-center keybinding files to avoid unpackaged file errors"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+    "rm -rf %{buildroot}%{_datadir}/gnome-control-center",
+]
