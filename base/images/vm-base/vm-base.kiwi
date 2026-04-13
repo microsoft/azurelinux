@@ -94,7 +94,6 @@
         <package name="openssh-clients" />
         <package name="openssh-server" />
         <package name="rsync" />
-        <package name="rsyslog" />
         <package name="selinux-policy-targeted" />
         <package name="setup" />
         <package name="shadow-utils" />
