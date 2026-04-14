@@ -29,7 +29,7 @@
 #   "Performing autoremove"  — dnf's own transaction log
 
 test -f /.profile && . /.profile
-set -uo pipefail
+set -xuo pipefail
 
 echo "config.sh: building profile(s): ${kiwi_profiles:-<none>}"
 
