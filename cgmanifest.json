@@ -8251,8 +8251,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers-preview",
-          "version": "3.27.0~preview1",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.27.0.preview1.tar.gz"
+          "version": "3.27.0~preview2",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.27.0.preview2.tar.gz"
         }
       }
     },
