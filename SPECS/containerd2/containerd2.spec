@@ -18,6 +18,7 @@ Source2: containerd.toml
 
 Patch0:	multi-snapshotters-support.patch
 Patch1:	tardev-support.patch
+Patch2:	fix-credential-leak-in-cri-errors.patch
 %{?systemd_requires}
 
 BuildRequires: golang < 1.25
