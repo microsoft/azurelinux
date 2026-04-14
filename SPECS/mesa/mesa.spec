@@ -67,7 +67,7 @@
 Name:           mesa
 Summary:        Mesa graphics libraries
 Version:        24.0.1
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -741,8 +741,11 @@ popd
 %endif
 
 %changelog
-* Mon Apr 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 24.0.1-7
+* Mon Apr 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 24.0.1-8
 - Patch for CVE-2026-40393
+
+* Tue Apr 07 2026 BinduSri Adabala <v-badabala@microsoft.com> - 24.0.1-7
+- Bump release to rebuild with rust
 
 * Wed Feb 11 2026 BinduSri Adabala <v-badabala@microsoft.com> - 24.0.1-6
 - Bump release to rebuild with rust
