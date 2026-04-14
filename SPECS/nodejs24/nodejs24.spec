@@ -35,9 +35,8 @@ Patch2:         CVE-2024-22195.patch
 Patch3:         CVE-2020-28493.patch
 Patch4:         CVE-2024-34064.patch
 Patch5:         CVE-2025-27516.patch
-Patch6:         CVE-2025-15504.patch
-Patch7:         CVE-2026-33671.patch
-Patch8:         CVE-2026-33672.patch
+Patch6:         CVE-2026-33671.patch
+Patch7:         CVE-2026-33672.patch
 BuildRequires:  brotli-devel
 BuildRequires:  c-ares-devel
 BuildRequires:  coreutils >= 8.22
@@ -184,7 +183,7 @@ make cctest
 
 %changelog
 * Mon Apr 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 24.14.1-2
-- Patch for CVE-2026-33672, CVE-2026-33671, CVE-2025-15504
+- Patch for CVE-2026-33672, CVE-2026-33671
 
 * Wed Apr 01 2026 Ratiranjan Behera <v-ratbehera@microsoft.com> - 24.14.1-1
 - Upgrade to 24.14.1
