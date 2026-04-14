@@ -18,8 +18,7 @@ BuildRequires: ruby
 RDiscount converts documents in Markdown syntax to HTML.
 
 %prep
-%setup -q -n %{gem_name}-%{version}
-%patch 0 -p1
+%autosetup -p1 -n %{gem_name}-%{version}
 
 %build
 gem build %{gem_name}
