@@ -15,7 +15,7 @@
         <profile name="distroless-debug" description="Distroless Debug Container" import="true">
             <requires profile="distroless-base" />
         </profile>
-        </profiles>
+    </profiles>
     <preferences>
         <version>0.1</version>
         <packagemanager>dnf5</packagemanager>
