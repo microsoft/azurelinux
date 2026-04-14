@@ -87,6 +87,7 @@ your node programs. It manages dependencies and does other cool stuff.
 
 %prep
 %autosetup -p1 -n node-v%{version}
+rm -f deps/LIEF/src/ELF/Parser.tcc
 
 %build
 # remove unsupported TLSv1.3 cipher:
