@@ -1,12 +1,15 @@
 Summary:        The Sleuth Kit (TSK)
 Name:           sleuthkit
 Version:        4.12.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD AND CPL AND GPLv2+ AND IBM AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.sleuthkit.org
 Source0:        https://github.com/sleuthkit/sleuthkit/releases/download/sleuthkit-%{version}/sleuthkit-%{version}.tar.gz
+Patch0:         CVE-2026-40024.patch
+Patch1:         CVE-2026-40025.patch
+Patch2:         CVE-2026-40026.patch
 BuildRequires:  gcc-c++
 BuildRequires:  perl-generators
 BuildRequires:  sqlite-devel
@@ -37,6 +40,9 @@ developing applications that use %{name}.
 
 %prep
 %setup -q
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1
 
 %build
 %configure --disable-static \
@@ -139,6 +145,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/tsk.pc
 
 %changelog
+* Thu Apr 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4.12.1-2
+- Patch for CVE-2026-40026, CVE-2026-40025, CVE-2026-40024
+
 * Mon Jan 22 2024 Andrew Phelps <anphel@microsoft.com> - 4.12.1-1
 - Upgrade to version 4.12.1
 
