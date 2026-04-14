@@ -1,6 +1,6 @@
 %global debug_package %{nil}
 %define upstream_name containerd
-%define commit_hash 207ad711eabd375a01713109a8a197d197ff6542
+%define commit_hash c74fd8780002eb26bd5940ae339d690d891221c2
 
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
@@ -96,7 +96,11 @@ fi
 %changelog
 * Tue Apr 14 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 2.1.6-1
 - Upgrade to 2.1.6
-- Remove unused patches
+- Remove CVE patches fixed in upstream: CVE-2024-25621, CVE-2024-40635,
+  CVE-2024-45338, CVE-2025-22872, CVE-2025-27144, CVE-2025-47291,
+  CVE-2025-47911, CVE-2025-58190, CVE-2025-64329
+- Modify fix-credential-leak-in-cri-errors patch to keep only 2/2 not yet merged upstream
+- Rebase multi-snapshotters-support patch for 2.1.6
 
 * Thu Feb 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.0.0-18
 - Patch for CVE-2025-58190, CVE-2025-47911
