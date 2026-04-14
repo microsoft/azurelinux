@@ -36,7 +36,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -52,6 +52,7 @@ Source17:       20-azure.conf
 Source18:       proc-version-override.service
 Source19:       proc-version-override.sh
 Source20:       chrony-azure.conf
+Source21:       50-azure-cloud.conf
 
 BuildArch:      noarch
 
@@ -334,6 +335,7 @@ sed -e "s#\$version#%{bug_version}#g" -e 's/$variant/Cloud/;s/<!--.*-->//;/^$/d'
 sed -i -e "/^DEFAULT_HOSTNAME=/d" %{buildroot}%{_prefix}/lib/os-release.cloud
 install -Dm0644 %{SOURCE17} -t %{buildroot}%{_prefix}/lib/sysctl.d/
 install -Dm0644 %{SOURCE20} -t %{buildroot}%{_sysconfdir}/chrony.d/
+install -Dm0644 %{SOURCE21} -t %{buildroot}%{_prefix}/lib/systemd/networkd.conf.d/
 %endif
 
 %if %{with container}
@@ -446,6 +448,7 @@ install -Dm0755 %{SOURCE19} %{buildroot}%{_libexecdir}/proc-version-override
 %attr(0644,root,root) %{_swidtagdir}/com.microsoft.AzureLinux-variant.swidtag.cloud
 %{_prefix}/lib/sysctl.d/20-azure.conf
 %{_sysconfdir}/chrony.d/chrony-azure.conf
+%{_prefix}/lib/systemd/networkd.conf.d/50-azure-cloud.conf
 %endif
 
 
@@ -467,6 +470,9 @@ install -Dm0755 %{SOURCE19} %{buildroot}%{_libexecdir}/proc-version-override
 
 
 %changelog
+* Tue Apr 14 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-6
+- Enable networkd UseDomains= for cloud images
+
 * Thu Apr 09 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-5
 - Add ID_LIKE tag to os-release.
 
