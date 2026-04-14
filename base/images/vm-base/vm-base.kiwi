@@ -88,6 +88,7 @@
         <package name="lz4" />
         <package name="man-db" />
         <package name="nano" />
+        <package name="ncurses" />
         <package name="ncurses-term" />
         <package name="net-tools" />
         <package name="nftables" />
