@@ -71,7 +71,6 @@
         <package name="dracut-kiwi-oem-repart" />
         <package name="elfutils" />
         <package name="elfutils-default-yama-scope" />
-        <package name="file" />
         <package name="firewalld" />
         <package name="glibc" />
         <package name="glibc-langpack-en" />
