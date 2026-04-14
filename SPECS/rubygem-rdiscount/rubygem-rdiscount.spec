@@ -5,12 +5,13 @@
 Summary:       Converts documents in Markdown syntax to HTML
 Name:          rubygem-%{gem_name}
 Version:       2.2.0.2
-Release:       3%{?dist}
+Release:       4%{?dist}
 License:       MIT
 Vendor:	       Microsoft Corporation
 Distribution:  Mariner
 URL:           http://github.com/rtomayko/rdiscount
 Source0:       https://github.com/davidfstr/rdiscount/archive/refs/tags/%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
+Patch0:        CVE-2026-35201.patch
 BuildRequires: ruby
 
 %description
@@ -18,6 +19,7 @@ RDiscount converts documents in Markdown syntax to HTML.
 
 %prep
 %setup -q -n %{gem_name}-%{version}
+%patch 0 -p1
 
 %build
 gem build %{gem_name}
@@ -31,6 +33,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Tue Apr 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.2.0.2-4
+- Patch for CVE-2026-35201
+
 * Wed Sep 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.2.0.2-3
 - Move to SPECS directory from Extended.
 
