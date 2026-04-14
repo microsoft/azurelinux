@@ -495,8 +495,7 @@ done
 popd
 
 %files filesystem
-%license LICENSE.PTR
-%doc docs/Mesa-MLAA-License-Clarification-Email.txt
+%license LICENSE.PTR docs/Mesa-MLAA-License-Clarification-Email.txt
 %dir %{_libdir}/dri
 %if 0%{?with_hardware}
 %if 0%{?with_vdpau}
