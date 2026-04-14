@@ -102,7 +102,6 @@
         <package name="systemd" />
         <package name="systemd-networkd" />
         <package name="systemd-resolved" />
-        <package name="systemd-rpm-macros" />
         <package name="tar" />
         <package name="tpm2-tss" />
         <package name="unzip" />
