@@ -27,9 +27,6 @@
 #   "Force-removing ..."     — disallowed packages stripped before autoremove
 #   "All installed packages" — full list before stripping
 #   "Performing autoremove"  — dnf's own transaction log
-#
-# To investigate why a dependency survived, rebuild with the debug
-# profile and use: dnf repoquery --whatrequires <pkg>
 
 test -f /.profile && . /.profile
 set -uo pipefail
