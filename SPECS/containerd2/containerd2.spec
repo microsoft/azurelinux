@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.1.6
-Release: 3%{?dist}
+Release: 1%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -16,8 +16,8 @@ Source0: https://github.com/containerd/containerd/archive/v%{version}.tar.gz#/%{
 Source1: containerd.service
 Source2: containerd.toml
 
-Patch1:	multi-snapshotters-support.patch
-Patch2:	tardev-support.patch
+Patch0:	multi-snapshotters-support.patch
+Patch1:	tardev-support.patch
 %{?systemd_requires}
 
 BuildRequires: golang < 1.25
