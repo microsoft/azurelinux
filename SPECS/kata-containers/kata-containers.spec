@@ -118,6 +118,7 @@ popd
 %changelog
 * Mon Apr 13 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.19.1.kata3-1
 - Auto-upgrade to 3.19.1.kata3
+- Remove CVE-2025-65637.patch that no longer applies
 
 * Mon Mar 09 2026 BinduSri Adabala <v-badabala@microsoft.com> - 3.19.1.kata2-7
 - Bump release to rebuild with rust
