@@ -10,6 +10,7 @@ Source0:        https://github.com/mtrojnar/%{name}/archive/refs/tags/%{version}
 Patch0:         CVE-2025-70888.patch
 Patch1:         CVE-2026-39853.patch
 Patch2:         CVE-2026-39855.patch
+Patch3:         CVE-2026-39856.patch
 BuildRequires:  python3
 BuildRequires:  cmake
 BuildRequires:  openssl-devel
@@ -38,7 +39,7 @@ install -D -m 755 ./build/osslsigncode %{buildroot}%{_bindir}/osslsigncode
 
 %changelog
 *   Mon Apr 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.7-2
--   Patch for CVE-2026-39855, CVE-2026-39853, CVE-2025-70888
+-   Patch for CVE-2026-39855, CVE-2026-39853, CVE-2025-70888, CVE-2026-39855
 
 *   Tue Feb 13 2024 Cameron Baird <cameronbaird@microsoft.com.com> 2.7-1
 -   Original version for CBL-Mariner (license: MIT).
