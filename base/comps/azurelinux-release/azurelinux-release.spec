@@ -1,4 +1,4 @@
-%define release_name Alpha1
+%define release_name Alpha2
 %define is_evergreen 0
 
 # Define this to 1 for Branched releases prior to RC
@@ -6,7 +6,7 @@
 %define is_development 1
 
 # TODO(azl): review
-%define eol_date 2026-03-01
+%define eol_date 2026-05-15
 
 %define dist_version_major 4
 %define dist_version_minor 0
@@ -36,7 +36,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -470,6 +470,9 @@ install -Dm0755 %{SOURCE19} %{buildroot}%{_libexecdir}/proc-version-override
 
 
 %changelog
+* Tue Apr 14 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-7
+- Update release name to Alpha2 and extend EOL date
+
 * Tue Apr 14 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-6
 - Enable networkd UseDomains= for cloud images
 
