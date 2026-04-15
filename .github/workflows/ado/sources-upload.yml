@@ -126,8 +126,12 @@ extends:
                   changed=$(git status --porcelain -- specs/ || true)
                   if [[ -n "$changed" ]]; then
                     echo "##[error]Rendered specs are out of date. Run 'azldev component render -a' locally and commit the results."
-                    echo "Changed files:"
+                    echo "##[group]Changed files"
                     echo "$changed"
+                    echo "##[endgroup]"
+                    echo "##[group]Git diff"
+                    git diff "$SOURCE_COMMIT" "$TARGET_COMMIT" -- specs/
+                    echo "##[endgroup]"
                     exit 1
                   fi
                   echo "Rendered specs are up to date."
