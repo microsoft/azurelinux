@@ -1,4 +1,7 @@
-%define release_name Alpha2
+%define release_name Four
+# Let's remove this prerelease_name before release, and next time we
+# can use the built-in prerelease logic (based on release number < 1)
+%define prerelease_name Alpha2
 %define is_evergreen 0
 
 # Define this to 1 for Branched releases prior to RC
@@ -36,7 +39,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -246,6 +249,8 @@ ln -s azurelinux-release %{buildroot}%{_sysconfdir}/system-release
 %define starts_with(str,prefix) (%{expand:%%{lua:print(starts_with(%1, %2) and "1" or "0")}})
 %if %{starts_with "a%{release}" "a0"}
   %global prerelease \ Prerelease
+%elif "0%{?prerelease_name}" != "0"
+  %global prerelease \ %{prerelease_name}
 %endif
 
 # -------------------------------------------------------------------------
@@ -466,6 +471,9 @@ install -Dm0755 %{SOURCE19} %{buildroot}%{_libexecdir}/proc-version-override
 
 
 %changelog
+* Wed Apr 15 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-8
+- Set prerelease name
+
 * Tue Apr 14 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-7
 - Update release name to Alpha2 and extend EOL date
 
