@@ -79,6 +79,13 @@ You can reuse your favorite Python packages such as NumPy, SciPy and Cython to e
 export MAX_JOBS=8
 export USE_CUDA=0
 export BUILD_CAFFE2=0
+# The following flags are required to fix build failure due to missing std::filesystem symbols in gcc 9 and 10.
+export CXXFLAGS="%{optflags} -std=gnu++17"
+export LDFLAGS="$LDFLAGS -lstdc++fs"
+export CMAKE_EXE_LINKER_FLAGS="$CMAKE_EXE_LINKER_FLAGS -lstdc++fs"
+export CMAKE_SHARED_LINKER_FLAGS="$CMAKE_SHARED_LINKER_FLAGS -lstdc++fs"
+export CMAKE_MODULE_LINKER_FLAGS="$CMAKE_MODULE_LINKER_FLAGS -lstdc++fs"
+
 %py3_build
 
 %install
