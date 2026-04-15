@@ -113,6 +113,9 @@ extends:
               - script: |
                   set -euo pipefail
 
+                  # Workaround for an ADO git config error:
+                  git config --unset extensions.worktreeConfig
+
                   echo "Rendering specs..."
                   azldev component render -a -o specs
 
