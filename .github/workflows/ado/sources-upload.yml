@@ -67,7 +67,6 @@ extends:
 
                   tdnf install -y mock mock-rpmautospec python3-chardet
                   sudo usermod -aG mock "$(whoami)"
-                  mock -r fedora-42-x86_64 --init
                 displayName: "Set-up 'mock'"
 
               - task: AzureCLI@2
