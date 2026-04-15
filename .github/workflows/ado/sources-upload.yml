@@ -65,6 +65,7 @@ extends:
 
                   tdnf install -y mock mock-rpmautospec python3-chardet
                   sudo usermod -aG mock "$(whoami)"
+                  mock --init
                 displayName: "Set-up 'mock'"
 
               - task: AzureCLI@2
