@@ -28,7 +28,7 @@ ExclusiveArch:  x86_64 aarch64
 Source0:        https://github.com/NVIDIA/open-gpu-kernel-modules/archive/refs/tags/%{version}.tar.gz#/open-gpu-kernel-modules-%{version}.tar.gz
 Source1:        kmod-nvidia-open-modprobe.conf
 
-BuildRequires:  kernel-devel
+BuildRequires:  kernel-%{kernel_flavour-}devel # macro expands by azldev. if not set it falls back to the default kernel
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  make
@@ -44,8 +44,8 @@ Provides:       kmod-nvidia-open = %{version}-%{release}
 Provides:       kmod-nvidia-open-%{kernel_uname_r} = %{version}-%{release}
 
 # Prevent conflicting NVIDIA driver packages from being installed
-Conflicts:      nvidia-driver-cuda
-Conflicts:      kmod-nvidia-open-dkms
+Conflicts:      nvidia-closed-kmod # provided by Azure Linux
+Conflicts:      nvidia-open # provided by Nvidia
 
 %description
 Open-source NVIDIA GPU kernel modules built from the official
