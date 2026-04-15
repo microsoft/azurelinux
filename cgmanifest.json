@@ -12871,8 +12871,8 @@
         "type": "other",
         "other": {
           "name": "mariadb",
-          "version": "10.6.24",
-          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.6.24.tar.gz"
+          "version": "10.6.25",
+          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.6.25.tar.gz"
         }
       }
     },
@@ -29447,8 +29447,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.2.0088",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.2.0088.tar.gz"
+          "version": "9.2.0240",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.2.0240.tar.gz"
         }
       }
     },
