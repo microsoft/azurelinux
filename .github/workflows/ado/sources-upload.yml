@@ -66,6 +66,9 @@ extends:
                   cat /etc/os-release
                   tdnf install -y mock mock-rpmautospec
 
+                  # Add current user to the 'mock' group to allow running mock without sudo.
+                  sudo usermod -aG mock "$(whoami)"
+
                   mock --init
                 displayName: "Test 'mock' installation"
 
