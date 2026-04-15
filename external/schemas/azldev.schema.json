@@ -287,6 +287,14 @@
           "title": "Custom images",
           "description": "Definitions of custom images for this project"
         },
+        "test-suites": {
+          "items": {
+            "$ref": "#/$defs/TestSuiteDefinition"
+          },
+          "type": "array",
+          "title": "Test suites",
+          "description": "Centralized test suite definitions with selector criteria, referenced by images and components"
+        },
         "tools": {
           "$ref": "#/$defs/ToolsConfig",
           "title": "Tools configuration",
@@ -457,11 +465,11 @@
         },
         "test-suites": {
           "items": {
-            "type": "string"
+            "$ref": "#/$defs/TestSuiteRef"
           },
           "type": "array",
           "title": "Test suites",
-          "description": "List of test suite names enabled for this target"
+          "description": "Test suite references, each with a name and optional selector overrides"
         },
         "tests_selectors": {
           "additionalProperties": {
@@ -601,6 +609,107 @@
             "testcase_names"
           ]
         }
+      ],
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "TestSuiteDefinition": {
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "Unique name identifying this test suite"
+        },
+        "area": {
+          "type": "string",
+          "title": "Area",
+          "description": "Functional area that this test suite targets"
+        },
+        "category": {
+          "type": "string",
+          "title": "Category",
+          "description": "Category of tests such as smoke or functional"
+        },
+        "priority": {
+          "items": {
+            "type": "integer"
+          },
+          "type": "array",
+          "title": "Priority",
+          "description": "Priority levels for this test suite"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Tags",
+          "description": "Tags for selecting or filtering this test suite"
+        },
+        "testcase_names": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Test case names",
+          "description": "Explicit list of test case names in this suite"
+        },
+        "requirements": {
+          "$ref": "#/$defs/TestSuiteRequirements",
+          "title": "Requirements",
+          "description": "Optional environment requirements for this test suite"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "TestSuiteRef": {
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "Name of the test suite to reference (must match a test-suites definition)"
+        },
+        "area": {
+          "type": "string",
+          "title": "Area",
+          "description": "Override: functional area filter for this reference"
+        },
+        "category": {
+          "type": "string",
+          "title": "Category",
+          "description": "Override: category filter for this reference"
+        },
+        "priority": {
+          "items": {
+            "type": "integer"
+          },
+          "type": "array",
+          "title": "Priority",
+          "description": "Override: priority levels for this reference"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Tags",
+          "description": "Override: tags for this reference"
+        },
+        "testcase_names": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Test case names",
+          "description": "Override: explicit list of test case names to run from this suite"
+        }
+      },
+      "required": [
+        "name"
       ],
       "additionalProperties": false,
       "type": "object"

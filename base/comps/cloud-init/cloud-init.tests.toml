@@ -1,17 +1,14 @@
 [components.cloud-init.tests]
 skus = ["NCv3-series", "Standard_F72s_v2", "PremiumV2_ZRS", "VpnGw4"]
-test-suites = ["component-smoke", "component-network-functional"]
 
-[components.cloud-init.tests.tests_selectors.component-smoke]
-area = "core"
-category = "smoke"
-priority = [0]
-tags = ["baseline"]
+[[components.cloud-init.tests.test-suites]]
+name = "component-smoke"
 testcase_names = ["verify_cloud_init_bootstrap"]
 
-[components.cloud-init.tests.tests_selectors.component-network-functional]
-area = "network"
-category = "functional"
-priority = [0, 1]
-tags = ["sriov"]
+[[components.cloud-init.tests.test-suites]]
+name = "component-network-functional"
 testcase_names = ["verify_sriov_basic", "verify_sriov_failover"]
+
+# Run the full component-bvt suite (inherits all selectors from tests.toml, no overrides)
+[[components.cloud-init.tests.test-suites]]
+name = "component-bvt"

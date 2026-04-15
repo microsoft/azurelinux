@@ -1,30 +1,14 @@
 [components.kernel.tests]
 skus = ["NCv3-series", "Standard_F72s_v2", "PremiumV2_ZRS", "VpnGw4"]
-test-frameworks = ["LISA", "bvt"]
 
-[components.kernel.tests.test_suites_by_framework.LISA]
-test-suites = ["component-smoke", "component-network-functional"]
-
-[components.kernel.tests.test_suites_by_framework.LISA.tests_selectors.component-smoke]
-area = "core"
-category = "smoke"
-priority = [0]
-tags = ["baseline"]
+[[components.kernel.tests.test-suites]]
+name = "component-smoke"
 testcase_names = ["verify_kernel_boot"]
 
-[components.kernel.tests.test_suites_by_framework.LISA.tests_selectors.component-network-functional]
-area = "network"
-category = "functional"
-priority = [0, 1]
-tags = ["sriov"]
+[[components.kernel.tests.test-suites]]
+name = "component-network-functional"
 testcase_names = ["verify_sriov_basic", "verify_sriov_failover"]
 
-[components.kernel.tests.test_suites_by_framework.bvt]
-test-suites = ["component-bvt"]
-
-[components.kernel.tests.test_suites_by_framework.bvt.tests_selectors.component-bvt]
-area = "core"
-category = "smoke"
-priority = [0]
-tags = ["baseline", "bvt"]
+[[components.kernel.tests.test-suites]]
+name = "component-bvt"
 testcase_names = ["verify_kernel_boot"]

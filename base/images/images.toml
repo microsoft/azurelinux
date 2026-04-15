@@ -1,4 +1,4 @@
-includes = ["image-tests.toml"]
+includes = ["tests.toml", "image-tests.toml"]
 
 [images.vm-base]
 description = "VM Base Image"

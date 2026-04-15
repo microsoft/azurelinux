@@ -1,74 +1,34 @@
+# Image Test References
+#
+# Images reference centralized test suites from tests.toml by name.
+# Selector criteria live in tests.toml; images can override selectors inline
+# (e.g., narrow to specific test cases) using fields on each entry.
+
 [images.vm-base.tests]
 skus = ["NCv3-series", "PremiumV2_ZRS"]
-test-frameworks = ["LISA", "bvt"]
 
-[images.vm-base.tests.test_suites_by_framework.LISA]
-test-suites = ["vm-smoke", "vm-network-functional", "vm-trident-crypto-functional"]
+[[images.vm-base.tests.test-suites]]
+name = "vm-smoke"
 
-[images.vm-base.tests.test_suites_by_framework.LISA.tests_selectors.vm-smoke]
-area = "core"
-# category = "smoke"
-# priority = [0]
-# tags = ["baseline"]
-# testcase_names = ["verify_vm_boot"]
+[[images.vm-base.tests.test-suites]]
+name = "vm-network-functional"
 
-[images.vm-base.tests.test_suites_by_framework.LISA.tests_selectors.vm-network-functional]
-# area = "network"
-# category = "functional"
-# priority = [0, 1]
-tags = ["sriov"]
-# testcase_names = ["verify_sriov_basic", "verify_sriov_failover"]
+[[images.vm-base.tests.test-suites]]
+name = "vm-trident-crypto-functional"
 
-[images.vm-base.tests.test_suites_by_framework.LISA.tests_selectors.vm-trident-crypto-functional]
-# area = "core"
-# category = "functional"
-# priority = [0]
-# tags = ["trident", "crypto"]
-testcase_names = ["verify_openssl_basic", "verify_golang_sys_crypto", "verify_openssl_speed_test"]
-
-[images.vm-base.tests.test_suites_by_framework.LISA.tests_selectors.vm-trident-crypto-functional.requirements]
-image = "custom-images.trident-vm-testimage"
-image-type = "test-only"
-distro = "azurelinux-custom"
-delivery-type = "SharedImageGallery"
-
-[images.vm-base.tests.test_suites_by_framework.bvt]
-test-suites = ["vm-bvt-smoke"]
-
-[images.vm-base.tests.test_suites_by_framework.bvt.tests_selectors.vm-bvt-smoke]
-# area = "core"
-category = "smoke"
-# priority = [0]
-# tags = ["baseline", "bvt"]
-# testcase_names = ["verify_vm_boot"]
+[[images.vm-base.tests.test-suites]]
+name = "vm-bvt-smoke"
 
 [images.container-base.tests]
 skus = ["Standard_F72s_v2", "VpnGw4"]
-test-frameworks = ["LISA", "bvt"]
 
-[images.container-base.tests.test_suites_by_framework.LISA]
-test-suites = ["container-smoke", "container-network-functional"]
+[[images.container-base.tests.test-suites]]
+name = "container-smoke"
 
-[images.container-base.tests.test_suites_by_framework.LISA.tests_selectors.container-smoke]
-# area = "core"
-# category = "smoke"
-priority = [0]
-# tags = ["baseline"]
-# testcase_names = ["verify_container_start"]
+# Override: run only specific test cases from container-network-functional
+[[images.container-base.tests.test-suites]]
+name = "container-network-functional"
+testcase_names = ["verify_sriov_basic"]
 
-[images.container-base.tests.test_suites_by_framework.LISA.tests_selectors.container-network-functional]
-area = "network"
-# category = "functional"
-# priority = [0, 1]
-# tags = ["sriov"]
-# testcase_names = ["verify_sriov_basic", "verify_sriov_failover"]
-
-[images.container-base.tests.test_suites_by_framework.bvt]
-test-suites = ["container-bvt-smoke"]
-
-[images.container-base.tests.test_suites_by_framework.bvt.tests_selectors.container-bvt-smoke]
-# area = "core"
-# category = "smoke"
-# priority = [0]
-tags = ["baseline", "bvt"]
-# testcase_names = ["verify_container_start"]
+[[images.container-base.tests.test-suites]]
+name = "container-bvt-smoke"

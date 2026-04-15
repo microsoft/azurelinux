@@ -1,0 +1,74 @@
+# Centralized Test Suite Definitions
+#
+# Each test suite is defined once with its selector criteria (area, tags,
+# testcase_names, etc.) and optional requirements. Images and components
+# reference suites by name and can override selectors inline.
+#
+# Uses [[test-suites]] array-of-tables so each suite is a discrete entry.
+
+# =============================================================================
+# VM Test Suites
+# =============================================================================
+
+[[test-suites]]
+name = "vm-smoke"
+area = "core"
+
+[[test-suites]]
+name = "vm-network-functional"
+tags = ["sriov"]
+
+[[test-suites]]
+name = "vm-trident-crypto-functional"
+testcase_names = ["verify_openssl_basic", "verify_golang_sys_crypto", "verify_openssl_speed_test"]
+
+[test-suites.requirements]
+image = "custom-images.trident-vm-testimage"
+image-type = "test-only"
+distro = "azurelinux-custom"
+delivery-type = "SharedImageGallery"
+
+[[test-suites]]
+name = "vm-bvt-smoke"
+category = "smoke"
+
+# =============================================================================
+# Container Test Suites
+# =============================================================================
+
+[[test-suites]]
+name = "container-smoke"
+priority = [0]
+
+[[test-suites]]
+name = "container-network-functional"
+area = "network"
+
+[[test-suites]]
+name = "container-bvt-smoke"
+tags = ["baseline", "bvt"]
+
+# =============================================================================
+# Component Test Suites
+# =============================================================================
+
+[[test-suites]]
+name = "component-smoke"
+area = "core"
+category = "smoke"
+priority = [0]
+tags = ["baseline"]
+
+[[test-suites]]
+name = "component-network-functional"
+area = "network"
+category = "functional"
+priority = [0, 1]
+tags = ["sriov"]
+
+[[test-suites]]
+name = "component-bvt"
+area = "core"
+category = "smoke"
+priority = [0]
+tags = ["baseline"]
