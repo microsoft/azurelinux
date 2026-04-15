@@ -120,7 +120,7 @@ extends:
                   git fetch --unshallow
 
                   echo "Rendering specs..."
-                  azldev component render -q -o specs --force words kernel-headers
+                  azldev component render -q -o specs --force atlas words kernel-headers
 
                   # Check for any new or modified files under specs/.
                   changed=$(git status --porcelain -- specs/ || true)
