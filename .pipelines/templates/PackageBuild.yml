@@ -145,6 +145,19 @@ parameters:
     type: string
     default: "Package test"
 
+  # Dummy parameters required to support calls from pipelines working with 3.0+ AZL.
+  - name: extraMacrosFiles
+    type: object
+    default: []
+
+  - name: outputArtifactsMacrosSubfolder
+    type: string
+    default: ""
+
+  - name: outputReleaseVersionsMacrosFileName
+    type: string
+    default: ""
+
 steps:
   - template: ToolkitCheck.yml@${{ parameters.selfRepoName }}
     parameters:
@@ -154,7 +167,7 @@ steps:
       - script: |
           toolchain_archive="$(find "${{ parameters.inputArtifactsFolder }}" -name "${{ parameters.customToolchainTarballName }}" -print -quit)"
           if [[ ! -f "$toolchain_archive" ]]; then
-            echo "ERROR: toolchain archive not found!" >&2
+            echo "##[error]Toolchain archive not found!" >&2
             exit 1
           fi
           echo "##vso[task.setvariable variable=toolchainArchive]$toolchain_archive"
@@ -166,7 +179,7 @@ steps:
       - script: |
           rpms_archive="$(find "${{ parameters.inputArtifactsFolder }}" -name "${{ inputCacheRPMsTarball }}" -print -quit)"
           if [[ ! -f "$rpms_archive" ]]; then
-            echo "ERROR: cache RPMs archive '${{ inputCacheRPMsTarball }}' not found!" >&2
+            echo "##[error]Cache RPMs archive '${{ inputCacheRPMsTarball }}' not found!" >&2
             exit 1
           fi
 
