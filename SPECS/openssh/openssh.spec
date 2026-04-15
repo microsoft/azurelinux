@@ -142,10 +142,10 @@ popd
 %patch351 -p1 -b .cve-2024-6387
 %patch352 -p1 -b .cve-2025-26465
 %patch353 -p1 -b .cve-2025-32728
-%patch 355 -p1
-%patch 356 -p1
-%patch 357 -p1
 %patch354 -p1 -b .CVE-2025-61985
+%patch 355 -p1 -b .cve-2026-35385
+%patch 356 -p1 -b .cve-2026-35386
+%patch 357 -p1 -b .cve-2026-35388
 
 %build
 export CFLAGS="$CFLAGS -fpic"
