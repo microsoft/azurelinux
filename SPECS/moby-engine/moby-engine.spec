@@ -130,7 +130,7 @@ fi
 * Wed Apr 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 25.0.3-16
 - Patch for CVE-2026-39882
 
-* Wed Jan 21 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 25.0.3-15
+* Tue Jan 21 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 25.0.3-15
 - Fix multiarch image push tag
 
 * Sat Nov 15 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 25.0.3-14
