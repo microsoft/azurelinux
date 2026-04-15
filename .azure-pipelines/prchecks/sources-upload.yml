@@ -62,7 +62,7 @@ extends:
             steps:
               - script: |
                   set -euo pipefail
-                  
+
                   cat /etc/os-release
                   tdnf install -y mock mock-rpmautospec
 
@@ -96,11 +96,15 @@ extends:
 
               - script: |
                   set -euo pipefail
+
                   echo "Installing azldev@${AZLDEV_COMMIT}..."
                   go install "github.com/microsoft/azure-linux-dev-tools/cmd/azldev@${AZLDEV_COMMIT}"
-                  echo "##vso[task.prependpath]$(go env GOPATH)/bin"
-                  export PATH="$(go env GOPATH)/bin:$PATH"
-                  azldev --version
+
+                  go_bin_path="$(go env GOPATH)/bin"
+
+                  echo "##vso[task.prependpath]$go_bin_path"
+
+                  "$go_bin_path/azldev" --version
                 displayName: "Install azldev"
                 env:
                   AZLDEV_COMMIT: $(AzldevCommit)
