@@ -6,7 +6,7 @@ without = ["debug"]
 
 [components.kernel.build.defines]
 # RPM release number for the Azure Linux kernel package
-azl_pkgrelease = "6"
+azl_pkgrelease = "7"
 # 4th version component from the AZL kernel source (6.18.5.1). Included in specrelease so it appears
 # in the RPM Release tag, uname -r, and /lib/modules/ path (e.g. 6.18.5-1.3.azl4.aarch64).
 kextraversion = "1"
