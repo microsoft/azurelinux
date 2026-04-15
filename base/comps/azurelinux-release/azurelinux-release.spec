@@ -235,8 +235,6 @@ echo "cpe:/o:microsoft:azurelinux:%{version}" > %{buildroot}%{_prefix}/lib/syste
 install -d %{buildroot}%{_sysconfdir}
 ln -s ../usr/lib/azurelinux-release %{buildroot}%{_sysconfdir}/azurelinux-release
 ln -s ../usr/lib/system-release-cpe %{buildroot}%{_sysconfdir}/system-release-cpe
-# TODO(azl): validate
-# ln -s azurelinux-release %{buildroot}%{_sysconfdir}/azurelinux-release
 ln -s azurelinux-release %{buildroot}%{_sysconfdir}/system-release
 
 # Create the common os-release file
@@ -409,8 +407,6 @@ install -Dm0755 %{SOURCE19} %{buildroot}%{_libexecdir}/proc-version-override
 %{_prefix}/lib/system-release-cpe
 %{_sysconfdir}/os-release
 %{_sysconfdir}/azurelinux-release
-# TODO(azl): review
-# %{_sysconfdir}/azurelinux-release
 %{_sysconfdir}/system-release
 %{_sysconfdir}/system-release-cpe
 %attr(0644,root,root) %{_prefix}/lib/issue
