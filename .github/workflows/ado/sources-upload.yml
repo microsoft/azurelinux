@@ -41,6 +41,8 @@ extends:
           enabled: true
       LinuxHostVersion:
         Network: R1
+      runOnHost: true
+      EnableCDPxPAT: false
     stages:
       - stage: PRCheck
         # variables:
@@ -182,7 +184,7 @@ extends:
                   # Build the JSON payload matching the Control Tower schema.
                   payload=$(jq -n \
                     --arg components      "$COMPONENTS" \
-                    --arg buildReason      "$BUILD_REASON" \
+                    --arg buildReason     "$BUILD_REASON" \
                     --arg repoUri         "$UPSTREAM_REPO_URL" \
                     --arg sourceCommitSha "$SOURCE_COMMIT" \
                     '{
