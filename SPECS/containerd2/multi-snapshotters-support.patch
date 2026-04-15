@@ -27,7 +27,7 @@ index f53fb1a..0063ac0 100644
  }
  
 diff --git a/internal/cri/server/images/image_pull.go b/internal/cri/server/images/image_pull.go
-index 113de6e..680c205 100644
+index f6e623f..6a7f402 100644
 --- a/internal/cri/server/images/image_pull.go
 +++ b/internal/cri/server/images/image_pull.go
 @@ -99,6 +99,15 @@ import (
@@ -75,7 +75,7 @@ index 113de6e..680c205 100644
  	span.SetAttributes(
  		tracing.Attribute("image.ref", ref),
  		tracing.Attribute("snapshotter.name", snapshotter),
-@@ -828,17 +832,19 @@ func (rt *pullRequestReporterRoundTripper) RoundTrip(req *http.Request) (*http.R
+@@ -826,17 +830,19 @@ func (rt *pullRequestReporterRoundTripper) RoundTrip(req *http.Request) (*http.R
  // Once we know the runtime, try to override default snapshotter if it is set for this runtime.
  // See https://github.com/containerd/containerd/issues/6657
  func (c *CRIImageService) snapshotterFromPodSandboxConfig(ctx context.Context, imageRef string,
@@ -202,10 +202,10 @@ index d850a3a..0d261f9 100644
  		return nil, fmt.Errorf("failed to pull image %q: %w", ref, err)
  	}
 diff --git a/internal/cri/server/service.go b/internal/cri/server/service.go
-index 8b65b14..2ccf355 100644
+index fa1ef5b..606fe1e 100644
 --- a/internal/cri/server/service.go
 +++ b/internal/cri/server/service.go
-@@ -97,7 +97,7 @@ type RuntimeService interface {
+@@ -96,7 +96,7 @@ type RuntimeService interface {
  type ImageService interface {
  	RuntimeSnapshotter(ctx context.Context, ociRuntime criconfig.Runtime) string
  
