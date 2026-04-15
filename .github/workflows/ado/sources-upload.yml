@@ -115,6 +115,7 @@ extends:
 
                   # Workaround for an ADO git config error:
                   git config --unset extensions.worktreeConfig
+                  git fetch --unshallow
 
                   echo "Rendering specs..."
                   azldev component render -a -o specs
