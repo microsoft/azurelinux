@@ -482,7 +482,7 @@ install -Dm0755 %{SOURCE19} %{buildroot}%{_libexecdir}/proc-version-override
 * Wed Apr 08 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-4
 - Configure chrony to use Azure PTP timesource
 
-* Tue Apr 01 2026 Rachel Menge <rachelmenge@microsoft.com> - 4.0-3
+* Wed Apr 01 2026 Rachel Menge <rachelmenge@microsoft.com> - 4.0-3
 - Add proc-version-override service for Guest-Configuration-Extension compat
 
 * Fri Feb 27 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-2
