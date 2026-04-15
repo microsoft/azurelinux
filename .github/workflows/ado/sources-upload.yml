@@ -63,14 +63,9 @@ extends:
               - script: |
                   set -euo pipefail
 
-                  cat /etc/os-release
-                  tdnf install -y mock mock-rpmautospec
-
-                  # Add current user to the 'mock' group to allow running mock without sudo.
+                  tdnf install -y mock mock-rpmautospec python3-chardet
                   sudo usermod -aG mock "$(whoami)"
-
-                  mock --init
-                displayName: "Test 'mock' installation"
+                displayName: "Set-up 'mock'"
 
               - task: AzureCLI@2
                 displayName: "Acquire Entra ID Bearer Token"
