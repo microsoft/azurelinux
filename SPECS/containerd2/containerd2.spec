@@ -58,8 +58,7 @@ make VERSION="%{version}" REVISION="%{commit_hash}" binaries man
 
 %check
 export BUILDTAGS="-mod=vendor"
-#skipping the test "TestCgroupNamespace" because the kernel doesn’t support cgroup namespaces.
-make VERSION="%{version}" REVISION="%{commit_hash}" test TESTFLAGS='-run ^Test.* -skip TestCgroupNamespace'
+make VERSION="%{version}" REVISION="%{commit_hash}" test
 
 %install
 make VERSION="%{version}" REVISION="%{commit_hash}" DESTDIR="%{buildroot}" PREFIX="/usr" install install-man
