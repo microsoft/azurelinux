@@ -107,7 +107,7 @@ extends:
                 displayName: "Install azldev"
                 env:
                   AZLDEV_COMMIT: $(AzldevCommit)
-                condition: false # Disable for now to test the rest of the pipeline.
+                # condition: false # Disable for now to test the rest of the pipeline.
 
               - script: |
                   set -euo pipefail
@@ -125,7 +125,7 @@ extends:
                   fi
                   echo "Rendered specs are up to date."
                 displayName: "Verify rendered specs are up to date"
-                condition: false # Disable for now to test the rest of the pipeline without needing to update specs.
+                # condition: false # Disable for now to test the rest of the pipeline without needing to update specs.
 
               - script: |
                   set -euo pipefail
