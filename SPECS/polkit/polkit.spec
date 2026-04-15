@@ -1,7 +1,7 @@
 Summary:           A toolkit for defining and handling authorizations.
 Name:              polkit
 Version:           0.119
-Release:           4%{?dist}
+Release:           5%{?dist}
 Group:             Applications/System
 Vendor:            Microsoft Corporation
 License:           GPLv2+
@@ -9,6 +9,7 @@ URL:               https://www.freedesktop.org/software/polkit/docs/latest/polki
 Source0:           https://www.freedesktop.org/software/polkit/releases/%{name}-%{version}.tar.gz
 Patch0:            CVE-2021-4034.patch
 Patch1:            CVE-2025-7519.patch
+Patch2:            CVE-2026-4897.patch
 Distribution:      Mariner
 BuildRequires:     autoconf
 BuildRequires:     expat-devel
@@ -112,6 +113,9 @@ fi
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+*   Thu Apr 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.119-5
+-   Patch for CVE-2026-4897
+
 *   Thu Jul 17 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.119-4
 -   Patch for CVE-2025-7519
 
