@@ -166,15 +166,11 @@ extends:
               - script: |
                   set -euo pipefail
 
-                  # Disabling until azldev component changes output format is finalized and we can implement proper parsing.
-                    # raw_components=$(azldev component changes "$SOURCE_COMMIT" "$TARGET_COMMIT")
-
-                    # TODO: azldev component changes output format is TBD.
-                    #       Adjust the parsing below once the format is confirmed.
-                    # components=$(echo "$raw_components" | tr '\n' ',' | sed 's/,$//')
-
-                  # Dummy input for now:
-                  components="componentA,componentB,componentC"
+                  components=()
+                  while IFS= read -r line; do
+                    components+=("$(basename "$(dirname "$line")")")
+                  done < <(git diff "$SOURCE_COMMIT" "$TARGET_COMMIT" --name-only | grep 'sources$' | sort -u)
+                  components="$(IFS=, ; echo "${components[*]}")"
 
                   echo "Affected components: $components"
 
