@@ -15,8 +15,8 @@ Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs24
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
-Version:        24.13.0
-Release:        3%{?dist}
+Version:        24.14.1
+Release:        2%{?dist}
 License:        BSD AND MIT AND Public Domain AND NAIST-2003 AND Artistic-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -35,7 +35,8 @@ Patch2:         CVE-2024-22195.patch
 Patch3:         CVE-2020-28493.patch
 Patch4:         CVE-2024-34064.patch
 Patch5:         CVE-2025-27516.patch
-Patch6:         CVE-2025-69418.patch
+Patch6:         CVE-2026-33671.patch
+Patch7:         CVE-2026-33672.patch
 BuildRequires:  brotli-devel
 BuildRequires:  c-ares-devel
 BuildRequires:  coreutils >= 8.22
@@ -46,6 +47,7 @@ BuildRequires:  openssl-devel >= 1.1.1
 BuildRequires:  python3
 BuildRequires:  which
 BuildRequires:  zlib-devel
+BuildRequires:  perl-WWW-Curl
 Requires:       brotli
 Requires:       c-ares
 Requires:       coreutils >= 8.22
@@ -180,6 +182,21 @@ make cctest
 %{_prefix}/lib/node_modules/*
 
 %changelog
+* Mon Apr 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 24.14.1-2
+- Patch for CVE-2026-33672, CVE-2026-33671
+
+* Wed Apr 01 2026 Ratiranjan Behera <v-ratbehera@microsoft.com> - 24.14.1-1
+- Upgrade to 24.14.1
+- Security fixes included:
+  CVE-2026-21710: use null prototype for headersDistinct/trailersDistinct (Matteo Collina) - High
+  CVE-2026-21637: wrap SNICallback invocation in try/catch (Matteo Collina) - High
+  CVE-2026-21717: test array index hash collision (Joyee Cheung) - Medium
+  CVE-2026-21713: use timing-safe comparison in Web Cryptography HMAC and KMAC (Filip Skokan) - Medium
+  CVE-2026-21714: handle NGHTTP2_ERR_FLOW_CONTROL error code (RafaelGSS) - Medium
+  CVE-2026-21712: handle url crash on different url formats (RafaelGSS) - Medium
+  CVE-2026-21716: include permission check on lib/fs/promises (RafaelGSS) - Low
+  CVE-2026-21715: add permission check to realpath.native (RafaelGSS) - Low
+
 * Fri Feb 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 24.13.0-3
 - Patch for CVE-2025-69418
 

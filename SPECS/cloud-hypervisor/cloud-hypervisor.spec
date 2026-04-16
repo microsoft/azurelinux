@@ -137,9 +137,12 @@ cargo build --release --target=%{rust_musl_target} %{cargo_pkg_feature_opts} %{c
 %license LICENSES/CC-BY-4.0.txt
 
 %changelog
-* Wed Apr 01 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 51.1.56-1
+* Wed Apr 16 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 51.1.56-1
 - Auto-upgrade to 51.1.56
 - Remove CVE-2026-27211.patch that no longer applies
+
+* Tue Apr 07 2026 BinduSri Adabala <v-badabala@microsoft.com> - 48.0.246-5
+- Bump release to rebuild with rust
 
 * Mon Mar 09 2026 BinduSri Adabala <v-badabala@microsoft.com> - 48.0.246-4
 - Bump release to rebuild with rust

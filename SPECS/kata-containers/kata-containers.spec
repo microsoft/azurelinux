@@ -116,9 +116,12 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
-* Mon Apr 13 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.19.1.kata3-1
+* Mon Apr 16 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.19.1.kata3-1
 - Auto-upgrade to 3.19.1.kata3
 - Remove CVE-2025-65637.patch that no longer applies
+
+* Tue Apr 07 2026 BinduSri Adabala <v-badabala@microsoft.com> - 3.19.1.kata2-8
+- Bump release to rebuild with rust
 
 * Mon Mar 09 2026 BinduSri Adabala <v-badabala@microsoft.com> - 3.19.1.kata2-7
 - Bump release to rebuild with rust
