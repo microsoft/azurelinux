@@ -1,7 +1,7 @@
 Summary:        Systemd-250
 Name:           systemd
 Version:        250.3
-Release:        23%{?dist}
+Release:        24%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -33,6 +33,10 @@ Patch10:        mariner-2-force-use-of-lz4-for-coredump.patch
 Patch11:        networkd-default-use-domains.patch
 Patch12:	CVE-2023-7008.patch
 Patch13:        CVE-2025-4598.patch
+Patch14:        ipc-0001-path-util-add-flavour-of-path_startswith-that-leaves.patch
+Patch15:        ipc-0002-path-util-invert-PATH_STARTSWITH_ACCEPT_DOT_DOT-flag.patch
+Patch16:        ipc-0003-core-cgroup-avoid-one-unnecessary-strjoina.patch
+Patch17:        ipc-0004-core-validate-input-cgroup-path-more-prudently.patch
 BuildRequires:  audit-devel
 BuildRequires:  cryptsetup-devel
 BuildRequires:  docbook-dtd-xml
@@ -291,6 +295,9 @@ fi
 %files lang -f %{name}.lang
 
 %changelog
+* Thu Mar 05 2026 Dan Streetman <ddstreet@ieee.org> - 250.3-24
+- add patches to fix ipc dbus communication issue
+
 * Tue Sep 16 2025 Akhila Guruju <v-guakhila@microsoft.com> - 250.3-23
 - Patch CVE-2025-4598
 

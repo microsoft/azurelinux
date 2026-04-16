@@ -3,7 +3,7 @@
 Summary:        Routing daemon
 Name:           frr
 Version:        8.5.5
-Release:        3%{?dist}
+Release:        6%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,7 +18,11 @@ Patch3:         0003-fips-mode.patch
 Patch4:         0004-remove-grpc-test.patch
 Patch5:         CVE-2024-44070.patch
 Patch6:         CVE-2024-55553.patch
-
+Patch7:         0001-Fix-frr-c90-complaint-error.patch
+# Following CVE fixes CVE-2025-61100, CVE-2025-61101, CVE-2025-61102, CVE-2025-61103,
+# CVE-2025-61104, CVE-2025-61105, CVE-2025-61106 and CVE-2025-61107.
+Patch8:         CVE-2025-61099.patch
+Patch9:         CVE-2026-5107.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bison
@@ -200,6 +204,16 @@ rm tests/lib/*grpc*
 %{_sysusersdir}/%{name}.conf
 
 %changelog
+* Thu Apr 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.5.5-6
+- Patch for CVE-2026-5107
+
+* Wed Jan 21 2026 Archana Shettigar <v-shettigara@microsoft.com> - 8.5.5-5
+- Patch CVE-2025-61099, CVE-2025-61100, CVE-2025-61101, CVE-2025-61102,
+  CVE-2025-61103, CVE-2025-61104, CVE-2025-61105, CVE-2025-61106 and CVE-2025-61107
+
+* Mon Dec 29 2025 Archana Shettigar <v-shettigara@microsoft.com> - 8.5.5-4
+- Rebuilt for net-snmp version up with c90 fix
+
 * Fri Jun 13 2025 Kanishk Bansal <kanbansal@microsoft.com> - 8.5.5-3
 - Backport Patch CVE-2024-55553
 

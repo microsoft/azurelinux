@@ -1,0 +1,37 @@
+Commit 00a87a8e: Add NULL check to PKCS12_item_decrypt_d2i_ex
+
+Address CVE-2025-69421
+
+Add NULL check for oct parameter
+
+Reviewed-by: Saša Nedvědický <sashan@openssl.org>
+Reviewed-by: Eugene Syromiatnikov <esyr@openssl.org>
+Reviewed-by: Norbert Pocs <norbertp@openssl.org>
+Reviewed-by: Nikola Pajkovsky <nikolap@openssl.org>
+Reviewed-by: Neil Horman <nhorman@openssl.org>
+(Merged from https://github.com/openssl/premium/pull/12)
+
+---
+ crypto/pkcs12/p12_decr.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/crypto/pkcs12/p12_decr.c b/crypto/pkcs12/p12_decr.c
+index 3c86058..da2133d 100644
+--- a/crypto/pkcs12/p12_decr.c
++++ b/crypto/pkcs12/p12_decr.c
+@@ -88,6 +88,12 @@ void *PKCS12_item_decrypt_d2i(const X509_ALGOR *algor, const ASN1_ITEM *it,
+     void *ret;
+     int outlen;
+ 
++    if (oct == NULL) {
++        PKCS12err(PKCS12_F_PKCS12_ITEM_DECRYPT_D2I,
++                  PKCS12_R_INVALID_NULL_ARGUMENT);
++        return NULL;
++    }
++
+     if (!PKCS12_pbe_crypt(algor, pass, passlen, oct->data, oct->length,
+                           &out, &outlen, 0)) {
+         PKCS12err(PKCS12_F_PKCS12_ITEM_DECRYPT_D2I,
+-- 
+2.45.4
+

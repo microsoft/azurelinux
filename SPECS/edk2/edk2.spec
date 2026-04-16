@@ -45,7 +45,7 @@ ExclusiveArch: x86_64
 
 Name:       edk2
 Version:    %{GITDATE}git%{GITCOMMIT}
-Release:    43%{?dist}
+Release:    47%{?dist}
 Summary:    UEFI firmware for 64-bit virtual machines
 License:    BSD-2-Clause-Patent and OpenSSL and MIT
 URL:        http://www.tianocore.org
@@ -123,6 +123,7 @@ Patch0027: CVE-2023-45236.patch
 Patch0028: CVE-2024-38796.patch
 Patch0029: CVE-2023-45231.patch
 Patch0030: CVE-2023-45229.patch
+Patch0031: CVE-2025-2296.patch
 
 # Patches for the vendored OpenSSL are in the range from 1000 to 1999 (inclusive).
 Patch1000: CVE-2023-0464.patch
@@ -133,6 +134,14 @@ Patch1004: improve-safety-of-DH.patch
 Patch1005: vendored-openssl-1.1.1-Only-free-the-read-buffers-if-we-re-not-using-them.patch
 Patch1006: CVE-2022-4304.patch
 Patch1007: CVE-2025-3770.patch
+Patch1008: CVE-2025-2295.patch
+Patch1009: CVE-2025-69419.patch
+Patch1010: CVE-2025-69420.patch
+Patch1011: CVE-2025-69421.patch
+Patch1012: CVE-2026-22795.patch
+Patch1013: CVE-2025-68160.patch
+Patch1014: CVE-2025-69418.patch
+Patch1015: CVE-2026-22796.nopatch
 
 # python3-devel and libuuid-devel are required for building tools.
 # python3-devel is also needed for varstore template generation and
@@ -716,6 +725,19 @@ $tests_ok
 
 
 %changelog
+* Thu Feb 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20230301gitf80f052277c8-47
+- Patch for CVE-2025-69418, CVE-2025-68160
+- Add nopatch for CVE-2026-22796 (fixed with CVE-2026-22795)
+
+* Mon Feb 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20230301gitf80f052277c8-46
+- Patch for CVE-2026-22795, CVE-2025-69421, CVE-2025-69419, CVE-2025-69420
+
+* Tue Jan 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20230301gitf80f052277c8-45
+- Patch for CVE-2025-2295
+
+* Wed Nov 19 2025 Jyoti kanase <v-jykanase@microsoft.com> - 20230301gitf80f052277c8-44
+- Patch for CVE-2025-2296
+
 * Mon Aug 11 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20230301gitf80f052277c8-43
 - Patch for CVE-2025-3770
 

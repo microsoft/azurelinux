@@ -12,7 +12,7 @@
 Summary:        CUPS printing system
 Name:           cups
 Version:        2.3.3%{OP_VER}
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        ASL 2.0 with exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -67,6 +67,8 @@ Patch17:        CVE-2022-26691.patch
 Patch18:	CVE-2024-35235.patch
 Patch19:	CVE-2025-58060.patch
 Patch20:	CVE-2025-58364.patch
+Patch21:	CVE-2025-61915.patch
+Patch22:	CVE-2025-58436.patch
 #### UPSTREAM PATCHES (starts with 1000) ####
 ##### Patches removed because IMHO they aren't no longer needed
 ##### but still I'll leave them in git in case their removal
@@ -272,6 +274,8 @@ to CUPS daemon. This solution will substitute printer drivers and raw queues in 
 %patch18 -p1
 %patch19 -p1
 %patch20 -p1
+%patch21 -p1
+%patch22 -p1
 
 # LSPP support.
 %patch100 -p1 -b .lspp
@@ -663,6 +667,9 @@ rm -f %{cups_serverbin}/backend/smb
 %{_mandir}/man7/ippeveps.7.gz
 
 %changelog
+* Wed Dec 17 2025 BinduSri Adabala <v-badabala@microsoft.com> - 2.3.3op2-11
+- Patch for CVE-2025-61915 and CVE-2025-58436
+
 * Sat Sep 13 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.3.3op2-10
 - Patch for CVE-2025-58364, CVE-2025-58060
 - Fix patch of CVE-2024-35235

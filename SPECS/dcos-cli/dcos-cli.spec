@@ -1,7 +1,7 @@
 Summary:        The command line for DC/OS
 Name:           dcos-cli
 Version:        1.2.0
-Release:        23%{?dist}
+Release:        24%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,6 +12,7 @@ Patch0:         CVE-2024-28180.patch
 Patch1:         CVE-2025-27144.patch
 Patch2:         CVE-2024-51744.patch
 Patch3:         CVE-2025-65637.patch
+Patch4:         CVE-2025-30204.patch
 BuildRequires:  golang
 BuildRequires:  git
 %global debug_package %{nil}
@@ -48,6 +49,9 @@ go test -mod=vendor
 %{_bindir}/dcos
 
 %changelog
+* Wed Feb 18 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.2.0-24
+- Patch for CVE-2025-30204
+
 * Mon Dec 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.2.0-23
 - Patch for CVE-2025-65637
 

@@ -3348,8 +3348,8 @@
         "type": "other",
         "other": {
           "name": "etcd",
-          "version": "3.5.21",
-          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.5.21.tar.gz"
+          "version": "3.5.28",
+          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.5.28.tar.gz"
         }
       }
     },
@@ -5190,8 +5190,8 @@
         "type": "other",
         "other": {
           "name": "hdf5",
-          "version": "1.14.4",
-          "downloadUrl": "https://github.com/hdfgroup/hdf5/releases/download/hdf5_1.14.4.2/hdf5-1.14.4-2.tar.gz"
+          "version": "1.14.6",
+          "downloadUrl": "https://support.hdfgroup.org/releases/hdf5/v1_14/v1_14_6/downloads/hdf5-1.14.6.tar.gz"
         }
       }
     },
@@ -6520,8 +6520,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.186.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.186.1.tar.gz"
+          "version": "5.15.202.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.202.1.tar.gz"
         }
       }
     },
@@ -8101,8 +8101,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.186.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.186.1.tar.gz"
+          "version": "5.15.202.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.202.1.tar.gz"
         }
       }
     },
@@ -8111,8 +8111,8 @@
         "type": "other",
         "other": {
           "name": "kernel-azure",
-          "version": "5.15.186.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.186.1.tar.gz"
+          "version": "5.15.202.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.202.1.tar.gz"
         }
       }
     },
@@ -8121,8 +8121,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.186.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.186.1.tar.gz"
+          "version": "5.15.202.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.202.1.tar.gz"
         }
       }
     },
@@ -8131,8 +8131,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.186.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.186.1.tar.gz"
+          "version": "5.15.202.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.202.1.tar.gz"
         }
       }
     },
@@ -10571,8 +10571,8 @@
         "type": "other",
         "other": {
           "name": "libpng",
-          "version": "1.6.52",
-          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.52.tar.xz"
+          "version": "1.6.56",
+          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.56.tar.xz"
         }
       }
     },
@@ -10972,7 +10972,7 @@
         "other": {
           "name": "libsodium",
           "version": "1.0.18",
-          "downloadUrl": "https://download.libsodium.org/libsodium/releases/libsodium-1.0.18.tar.gz"
+          "downloadUrl": "https://github.com/jedisct1/libsodium/archive/refs/tags/1.0.18-FINAL.tar.gz"
         }
       }
     },
@@ -12310,16 +12310,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "local-path-provisioner",
-          "version": "0.0.21",
-          "downloadUrl": "https://github.com/rancher/local-path-provisioner/archive/refs/tags/v0.0.21.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "lockdev",
           "version": "1.0.4",
           "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/lockdev-1.0.4.20111007git.tar.gz"
@@ -12881,8 +12871,8 @@
         "type": "other",
         "other": {
           "name": "mariadb",
-          "version": "10.6.21",
-          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.6.21.tar.gz"
+          "version": "10.6.25",
+          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.6.25.tar.gz"
         }
       }
     },
@@ -13653,8 +13643,8 @@
         "type": "other",
         "other": {
           "name": "msft-golang",
-          "version": "1.24.11",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.11-1/go1.24.11-20251202.3.src.tar.gz"
+          "version": "1.25.8",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.25.8-1/go1.25.8-20260306.2.src.tar.gz"
         }
       }
     },
@@ -13773,8 +13763,8 @@
         "type": "other",
         "other": {
           "name": "munge",
-          "version": "0.5.13",
-          "downloadUrl": "https://github.com/dun/munge/releases/download/munge-0.5.13/munge-0.5.13.tar.xz"
+          "version": "0.5.18",
+          "downloadUrl": "https://github.com/dun/munge/releases/download/munge-0.5.18/munge-0.5.18.tar.xz"
         }
       }
     },
@@ -13793,8 +13783,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.44",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.44.tar.gz"
+          "version": "8.0.45",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.45.tar.gz"
         }
       }
     },
@@ -14133,8 +14123,8 @@
         "type": "other",
         "other": {
           "name": "net-snmp",
-          "version": "5.9.4",
-          "downloadUrl": "https://sourceforge.net/projects/net-snmp/files/net-snmp/5.9.4/net-snmp-5.9.4.tar.gz"
+          "version": "5.9.5.2",
+          "downloadUrl": "https://sourceforge.net/projects/net-snmp/files/net-snmp/5.9.5.2/net-snmp-5.9.5.2.tar.gz"
         }
       }
     },
@@ -14684,7 +14674,7 @@
         "other": {
           "name": "ocaml",
           "version": "4.13.1",
-          "downloadUrl": "https://caml.inria.fr/pub/distrib/ocaml-4.13.1/ocaml-4.13.1.tar.xz"
+          "downloadUrl": "https://caml.inria.fr/pub/distrib/ocaml-4.13/ocaml-4.13.1.tar.xz"
         }
       }
     },
@@ -21054,8 +21044,8 @@
         "type": "other",
         "other": {
           "name": "pgbouncer",
-          "version": "1.24.1",
-          "downloadUrl": "https://pgbouncer.github.io/downloads/files/1.24.1/pgbouncer-1.24.1.tar.gz"
+          "version": "1.25.1",
+          "downloadUrl": "https://pgbouncer.github.io/downloads/files/1.25.1/pgbouncer-1.25.1.tar.gz"
         }
       }
     },
@@ -21074,8 +21064,8 @@
         "type": "other",
         "other": {
           "name": "php",
-          "version": "8.1.33",
-          "downloadUrl": "https://www.php.net/distributions/php-8.1.33.tar.xz"
+          "version": "8.1.34",
+          "downloadUrl": "https://www.php.net/distributions/php-8.1.34.tar.xz"
         }
       }
     },
@@ -21434,8 +21424,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "14.20",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.20/postgresql-14.20.tar.bz2"
+          "version": "14.21",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.21/postgresql-14.21.tar.bz2"
         }
       }
     },
@@ -29007,8 +28997,8 @@
         "type": "other",
         "other": {
           "name": "tzdata",
-          "version": "2025b",
-          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2025b.tar.gz"
+          "version": "2025c",
+          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2025c.tar.gz"
         }
       }
     },
@@ -29457,8 +29447,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.1.1616",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.1.1616.tar.gz"
+          "version": "9.2.0240",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.2.0240.tar.gz"
         }
       }
     },

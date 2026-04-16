@@ -83,7 +83,7 @@ Name:           ruby
 # provides should be versioned according to the ruby version.
 # More info: https://stdgems.org/
 Version:        3.1.7
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -101,6 +101,7 @@ Source7:        macros.rubygems
 Patch0:         CVE-2023-36617.patch
 Patch1:         CVE-2025-6442.patch
 Patch2:         CVE-2025-24294.patch
+Patch3:         CVE-2025-61594.patch
 BuildRequires:  openssl-devel
 BuildRequires:  readline
 BuildRequires:  readline-devel
@@ -403,6 +404,9 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.con
 
 %changelog
+* Mon Jan 05 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.1.7-4
+- Patch for CVE-2025-61594
+
 * Tue Jul 15 2025 BinduSri Adabala <v-badabala@microsoft.com> - 3.1.7-3
 - Patch CVE-2025-24294
 

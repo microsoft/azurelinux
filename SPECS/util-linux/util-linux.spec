@@ -1,7 +1,7 @@
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
 Version:        2.37.4
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,6 +14,8 @@ Source3:        su
 Source4:        su-l
 Patch0:         libblkid-src-probe-check-for-ENOMEDIUM.patch
 Patch1:         0001-wall-fix-escape-sequence-Injection-CVE-2024-28085.patch
+Patch2:         CVE-2025-14104.patch
+Patch3:         skip-lsns-ioctl_ns-test-if-unshare-fails.patch
 BuildRequires:  audit-devel
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libselinux-devel
@@ -27,6 +29,7 @@ Provides:       hardlink = 1.3-9
 Provides:       uuidd = %{version}-%{release}
 %if %{with_check}
 BuildRequires:  ncurses-term
+BuildRequires:  sudo
 %endif
 
 %description
@@ -103,7 +106,7 @@ install -vm644 %{SOURCE4} %{buildroot}%{_sysconfdir}/pam.d/
 
 %check
 chown -Rv nobody .
-sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
+sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check" || exit 1
 rm -rf %{buildroot}/lib/systemd/system
 
 %post   -p /sbin/ldconfig
@@ -152,6 +155,9 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
+* Wed Dec 17 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.37.4-10
+- Patch for CVE-2025-14104
+
 * Thu Apr 18 2024 Bala <balakumaran.kannan@microsoft.com> - 2.37.4-9
 - Patch CVE-2024-28085 in wall command
 

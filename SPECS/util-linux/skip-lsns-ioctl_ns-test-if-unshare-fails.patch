@@ -1,0 +1,53 @@
+From 597ccb7bf564f65bb059bfe420224cab0fba46ac Mon Sep 17 00:00:00 2001
+From: Chris Hofstaedtler <zeha@debian.org>
+Date: Fri, 20 Aug 2021 10:30:50 +0000
+Subject: [PATCH] tests: Skip lsns/ioctl_ns test if unshare fails
+
+Some parts of the Debian build infrastructure uses unshare to run the
+package build, and that appears to cause a "nested" unshare in the
+lsns/ioctl_ns test to fail. Unfortunately the tests then hang at this
+point.
+
+Try running unshare before the actual test, and skip the test if unshare
+already fails.
+
+[kzak@redhat.com: - add --fork to the test
+                  - don't write to stdout/err]
+
+Signed-off-by: Chris Hofstaedtler <zeha@debian.org>
+Signed-off-by: Karel Zak <kzak@redhat.com>
+
+Upstream Patch Reference: https://github.com/util-linux/util-linux/commit/597ccb7bf564f65bb059bfe420224cab0fba46ac
+---
+ tests/ts/column/invalid-multibyte | 2 +-
+ tests/ts/lsns/ioctl_ns            | 2 ++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/tests/ts/column/invalid-multibyte b/tests/ts/column/invalid-multibyte
+index f3d643e..03695cf 100755
+--- a/tests/ts/column/invalid-multibyte
++++ b/tests/ts/column/invalid-multibyte
+@@ -25,6 +25,6 @@ ts_check_test_command "$TS_CMD_COLUMN"
+ 
+ ts_cd "$TS_OUTDIR"
+ 
+-printf "\x94\x7e\n" | LC_ALL=C.UTF-8 $TS_CMD_COLUMN >> $TS_OUTPUT 2>> $TS_ERRLOG
++printf "\x94\x7e\n" | LC_ALL=C $TS_CMD_COLUMN >> $TS_OUTPUT 2>> $TS_ERRLOG
+ 
+ ts_finalize
+diff --git a/tests/ts/lsns/ioctl_ns b/tests/ts/lsns/ioctl_ns
+index ef63606..fa626bf 100755
+--- a/tests/ts/lsns/ioctl_ns
++++ b/tests/ts/lsns/ioctl_ns
+@@ -34,6 +34,8 @@ ts_check_prog "mkfifo"
+ ts_check_prog "touch"
+ ts_check_prog "uniq"
+ 
++$TS_CMD_UNSHARE --user --pid --mount-proc --fork true &> /dev/null || ts_skip "no namespace support"
++
+ ts_cd "$TS_OUTDIR"
+ 
+ # The parent process receives namespaces ids via FIFO_DATA from bash
+-- 
+2.45.4
+

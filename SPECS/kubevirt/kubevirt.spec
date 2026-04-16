@@ -19,7 +19,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        0.59.0
-Release:        32%{?dist}
+Release:        38%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -48,10 +48,17 @@ Patch15:        CVE-2025-22872.patch
 Patch16:        CVE-2024-33394.patch
 Patch17:        CVE-2025-64324.patch
 Patch18:        CVE-2025-65637.patch
+Patch19:        CVE-2025-64432.patch
+Patch20:        CVE-2025-64433.patch
+Patch21:        CVE-2025-64435.patch
+Patch22:        CVE-2025-64437.patch
+Patch23:        CVE-2025-11065.patch
+Patch24:        CVE-2025-30204.patch
+Patch25:        CVE-2025-47911.patch
 
 %global debug_package %{nil}
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.35-7%{?dist}
+BuildRequires:  glibc-static >= 2.35-10%{?dist}
 BuildRequires:  golang
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
@@ -228,6 +235,24 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 %{_bindir}/virt-tests
 
 %changelog
+* Wed Feb 18 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.59.0-38
+- Patch for CVE-2025-47911, CVE-2025-30204
+
+* Wed Feb 04 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.59.0-37
+- Patch for CVE-2025-11065
+
+* Tue Feb 03 2026 Aditya Singh <v-aditysing@microsoft.com> - 0.59.0-36
+- Bump to rebuild with updated glibc
+
+* Wed Jan 28 2026 Kanishk Bansal <kanbansal@microsoft.com> - 0.59.0-35
+- Bump to rebuild with updated glibc
+
+* Mon Jan 19 2026 Kanishk Bansal <kanbansal@microsoft.com> - 0.59.0-34
+- Bump to rebuild with updated glibc
+
+* Wed Dec 17 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.59.0-33
+- Patch for CVE-2025-64432, CVE-2025-64433, CVE-2025-64435, CVE-2025-64437
+
 * Mon Dec 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.59.0-32
 - Patch for CVE-2025-65637
 
@@ -243,10 +268,10 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 * Tue Apr 22 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 0.59.0-28
 - Patch CVE-2025-22872
 
-* Thu Mar 27 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 0.59.0-27
+* Tue Apr 15 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 0.59.0-27
 - Fix CVE-2024-51744
 
-* Fri Apr 04 2025 Sumedh Sharma <sumsharma@microsoft.com> - 0.59.0-26
+* Tue Apr 08 2025 Sumedh Sharma <sumsharma@microsoft.com> - 0.59.0-26
 - Add patch to resolve CVE-2023-48795
 
 * Mon Mar 10 2025 Sudipta Pandit <sudpandit@microsoft.com> - 0.59.0-25
@@ -258,10 +283,10 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 * Fri Jan 03 2025 Sumedh Sharma <sumsharma@microsoft.com> - 0.59.0-23
 - Add patch to fix CVE-2024-45338
 
-* Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.59.0-22
+* Sat Oct 12 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.59.0-22
 - Bump release to rebuild with go 1.22.7
 
-* Wed Sep 11 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 0.59.0-21
+* Fri Sep 13 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 0.59.0-21
 - Remove hotplug detach patch since it is no longer required.
 
 * Thu Aug 22 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 0.59.0-20

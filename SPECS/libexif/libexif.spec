@@ -1,12 +1,15 @@
 Summary:        Library for extracting extra information from image files
 Name:           libexif
 Version:        0.6.24
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://libexif.github.io/
 Source0:        https://github.com/libexif/libexif/releases/download/v%{version}/%{name}-%{version}.tar.bz2
+Patch0:         CVE-2026-32775.patch
+Patch1:         CVE-2026-40385.patch
+Patch2:         CVE-2026-40386.patch
 BuildRequires:  doxygen
 BuildRequires:  gcc
 BuildRequires:  gettext-devel
@@ -70,6 +73,12 @@ iconv -f latin1 -t utf-8 < README > README.utf8; cp README.utf8 README
 %doc libexif-api.html
 
 %changelog
+* Tue Apr 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.6.24-3
+- Patch for CVE-2026-40386, CVE-2026-40385
+
+* Thu Mar 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.6.24-2
+- Patch for CVE-2026-32775
+
 * Mon Jul 11 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.6.24-1
 - Upgrade to latest upstream version
 - Promote to mariner-official-base repo
