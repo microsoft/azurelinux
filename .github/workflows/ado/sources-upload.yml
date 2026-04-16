@@ -119,22 +119,13 @@ extends:
                   # Needed for spec rendering to work.
                   git fetch --unshallow
 
-                  echo "Rendering specs..."
-                  azldev component render -q -o specs --force atlas words kernel-headers
+                  specs_dir="specs"
 
-                  # Check for any new or modified files under specs/.
-                  changed=$(git status --porcelain -- specs/ || true)
-                  if [[ -n "$changed" ]]; then
-                    echo "##[error]Rendered specs are out of date. Run 'azldev component render -a' locally and commit the results."
-                    echo "##[group]Changed files"
-                    echo "$changed"
-                    echo "##[endgroup]"
-                    echo "##[group]Git diff"
-                    git diff "$SOURCE_COMMIT" "$TARGET_COMMIT" -- specs/
-                    echo "##[endgroup]"
-                    exit 1
-                  fi
-                  echo "Rendered specs are up to date."
+                  echo "Rendering specs..."
+                  azldev component render -q -o "$specs_dir" --force atlas words kernel-headers
+
+                  # Check for any new or modified files under the specs directory.
+                  python3 .github/workflows/scripts/check_rendered_specs.py --specs-dir "$specs_dir"
                 displayName: "Verify rendered specs are up to date"
                 # condition: false # Disable for now to test the rest of the pipeline without needing to update specs.
 
