@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.0.0
-Release: 18%{?dist}
+Release: 19%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -28,6 +28,8 @@ Patch8: CVE-2025-64329.patch
 Patch9: fix-credential-leak-in-cri-errors.patch
 Patch10:CVE-2025-47911.patch
 Patch11:CVE-2025-58190.patch
+Patch12:CVE-2026-35469.patch
+
 %{?systemd_requires}
 
 BuildRequires: golang < 1.25
@@ -103,6 +105,9 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Tue Apr 07 2026 Kanishk Bansal <kanbansal@microsoft.com> - 2.0.0-19
+- Patch CVE-2026-35469
+
 * Thu Feb 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.0.0-18
 - Patch for CVE-2025-58190, CVE-2025-47911
 
