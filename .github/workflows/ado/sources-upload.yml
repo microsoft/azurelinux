@@ -125,7 +125,11 @@ extends:
                   azldev component render -q -o "$specs_dir" --force atlas words kernel-headers
 
                   # Check for any new or modified files under the specs directory.
-                  python3 .github/workflows/scripts/check_rendered_specs.py --specs-dir "$specs_dir"
+                  if ! python3 .github/workflows/scripts/check_rendered_specs.py --specs-dir "$specs_dir";
+                    echo "##[group]Git diff"
+                    git --no-pager diff -- "$specs_dir"
+                    echo "##[endgroup]"
+                  fi
                 displayName: "Verify rendered specs are up to date"
                 # condition: false # Disable for now to test the rest of the pipeline without needing to update specs.
 
