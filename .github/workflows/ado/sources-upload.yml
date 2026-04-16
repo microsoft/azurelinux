@@ -129,6 +129,7 @@ extends:
                     echo "##[group]Git diff"
                     git --no-pager diff -- "$specs_dir"
                     echo "##[endgroup]"
+                    exit 1
                   fi
                 displayName: "Verify rendered specs are up to date"
                 # condition: false # Disable for now to test the rest of the pipeline without needing to update specs.
