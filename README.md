@@ -4,6 +4,25 @@ This branch contains:
 
 * [Distro-wide configuration](distro/)
 * [Base project: components, images, etc.](base/)
+* [Rendered specs](specs/)
+
+## Getting Started
+
+### Install azldev
+
+The [`azldev`](https://github.com/microsoft/azure-linux-dev-tools) CLI tool drives all component, image, and build workflows. Install it from source (requires Go):
+
+```bash
+go install github.com/microsoft/azure-linux-dev-tools/cmd/azldev@main
+```
+
+> **Note:** azldev is still in active development, using the latest commit from the `main` branch is recommended for the most up-to-date features and fixes.
+
+### Render specs
+
+The `specs/` directory (as specified by `rendered-specs-dir` config) contains "rendered" spec files created by `azldev`. They are a read-only snapshot of the final spec files after all overlays and modifications have been applied. They are the canonical source for what will be built and packaged.
+
+They can be updated at any time by running `azldev component render -a`, or a single component can be rendered with `azldev component render <name>`.
 
 ## AI-Assisted Development (VSCode + GitHub Copilot CLI)
 
@@ -96,9 +115,9 @@ scripts/batch-triage/triage.sh --results /path/to/results.json 'only triage one 
 
 Requirements:
 
-- Docker (buildx recommended)
-- GitHub auth ([copilot env var](https://docs.github.com/en/copilot/how-tos/copilot-cli/set-up-copilot-cli/authenticate-copilot-cli), `copilot` logged in, or `gh` logged in)
-- a `.env` file (see above).
+* Docker (buildx recommended)
+* GitHub auth ([copilot env var](https://docs.github.com/en/copilot/how-tos/copilot-cli/set-up-copilot-cli/authenticate-copilot-cli), `copilot` logged in, or `gh` logged in)
+* a `.env` file (see above).
 
 Output lands in `out/triage/`.
 

@@ -27,7 +27,13 @@ First, determine the error category:
    - Follow the `skill-mock` workflow: install RPMs in a mock chroot, verify contents, check dependencies
    - Common causes: missing Requires, wrong file paths, permission issues
 
-**When in doubt**, start with a `prep-sources` pre/post diff to determine if the issue is overlay-related:
+**When in doubt**, start with a render to determine if the issue is overlay-related:
+
+```bash
+azldev comp render -p ${input:component_name}
+```
+
+If `render` fails, the issue is overlay-related (category 1). For deeper debugging, diff pre/post overlay output:
 
 ```bash
 azldev comp prep-sources -p ${input:component_name} --skip-overlays -o base/build/work/scratch/${input:component_name}-pre --force
@@ -35,7 +41,7 @@ azldev comp prep-sources -p ${input:component_name} -o base/build/work/scratch/$
 diff -r base/build/work/scratch/${input:component_name}-pre base/build/work/scratch/${input:component_name}-post
 ```
 
-If `prep-sources` itself fails, the issue is overlay-related (category 1). If it succeeds but `comp build` fails, it's a build issue (category 2).
+If both render and `prep-sources` succeed but `comp build` fails, it's a build issue (category 2).
 
 ## Fix
 

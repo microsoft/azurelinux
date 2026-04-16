@@ -1,5 +1,6 @@
 ---
-applyTo: "**/*.spec"
+applyTo: "base/**/*.spec"
+description: Read this when working with spec files (`*.spec`) that are hand-maintained in the Azure Linux repo (not rendered).
 ---
 
 # RPM Spec Files (`*.spec`)

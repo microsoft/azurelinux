@@ -69,6 +69,16 @@ Overlays are vastly preferable to maintaining a forked spec, they get automatic 
 
 ## Validate
 
+After adding overlays or customizations, render the spec to verify:
+
+```bash
+azldev comp render -p <name>
+# Inspect the result
+cat specs/<first-char>/<name>/<name>.spec
+```
+
+For deeper debugging (diffing pre/post overlay output with full sources):
+
 > Use a temp dir for `prep-sources` output. Use `--force` to overwrite an existing output dir.
 
 `prep-sources -o <dir>` writes to a user-specified directory (NOT `base/out/` — that's for `comp build` output).
@@ -77,9 +87,11 @@ Overlays are vastly preferable to maintaining a forked spec, they get automatic 
 azldev comp prep-sources -p <name> --skip-overlays --force -o base/build/work/scratch/<name>-pre -q
 azldev comp prep-sources -p <name> --force -o base/build/work/scratch/<name>-post -q
 diff -r base/build/work/scratch/<name>-pre base/build/work/scratch/<name>-post
+```
 
+```bash
 # Test build (RPMs land in base/out/ per project.toml output-dir)
 azldev comp build -p <name> -q
 ```
 
-For testing the built RPMs, see the [`skill-mock`](../skill-mock/SKILL.md) skill. New components always need a smoke-test. For the full inner loop cycle (investigate → modify → verify → build → test → inspect), see [`skill-build-component`](../skill-build-component/SKILL.md).
+For testing the built RPMs, see the [`skill-mock`](../skill-mock/SKILL.md) skill. New components always need a smoke-test. For the full inner loop cycle (investigate → modify → render → build → test → inspect), see [`skill-build-component`](../skill-build-component/SKILL.md).
