@@ -1,0 +1,21 @@
+[components.gnutls]
+
+# gnutls-fips sub-package generates runtime dep on "gmp" and "nettle" based on
+# whether built-in version is used and platform the rpm is being compiled for. These
+# are static decisions for azl4. Instead of making the macro underatand azl4 we make
+# the dependency statically versioned as well.
+[[components.gnutls.overlays]]
+description = "Replace fips_requires macro for nettle with explicit versioned dependency"
+type = "spec-search-replace"
+section = "%package"
+package = "fips"
+regex = '%\{fips_requires nettle\}'
+replacement = "Requires: nettle = 3.10.1-2"
+
+[[components.gnutls.overlays]]
+description = "Replace fips_requires macro for gmp with explicit versioned dependency"
+type = "spec-search-replace"
+section = "%package"
+package = "fips"
+regex = '%\{fips_requires gmp\}'
+replacement = "Requires: gmp = 1:6.3.0-4"
