@@ -122,7 +122,7 @@ extends:
                   specs_dir="specs"
 
                   echo "Rendering specs..."
-                  azldev component render -q -o "$specs_dir" --force atlas words kernel-headers
+                  azldev component render -q -o "$specs_dir" --force words kernel-headers
 
                   # Check for any new or modified files under the specs directory.
                   if ! python3 .github/workflows/scripts/check_rendered_specs.py --specs-dir "$specs_dir"; then
