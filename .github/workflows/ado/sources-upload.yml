@@ -125,7 +125,7 @@ extends:
                   azldev component render -q -o "$specs_dir" --force atlas words kernel-headers
 
                   # Check for any new or modified files under the specs directory.
-                  if ! python3 .github/workflows/scripts/check_rendered_specs.py --specs-dir "$specs_dir";
+                  if ! python3 .github/workflows/scripts/check_rendered_specs.py --specs-dir "$specs_dir"; then
                     echo "##[group]Git diff"
                     git --no-pager diff -- "$specs_dir"
                     echo "##[endgroup]"
