@@ -30,8 +30,7 @@ Patch14:        CVE-2025-11065.patch
 Patch15:        CVE-2025-47911.patch
 Patch16:        CVE-2025-58190.patch
 Patch17:        CVE-2026-24117.patch
-Patch18:        CVE-2026-29181.patch
-Patch19:        CVE-2026-32288.patch
+Patch18:        CVE-2026-32288.patch
 
 BuildRequires:  golang < 1.24
 BuildRequires:  git
@@ -77,7 +76,7 @@ make test
 
 %changelog
 * Wed Apr 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.62.0-14
-- Patch for CVE-2026-32288, CVE-2026-29181
+- Patch for CVE-2026-32288
 
 * Fri Feb 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.62.0-13
 - Patch for CVE-2026-24117, CVE-2025-58190, CVE-2025-47911
