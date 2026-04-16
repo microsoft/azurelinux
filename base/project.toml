@@ -10,3 +10,4 @@ log-dir = 'build/logs'
 work-dir = 'build/work'
 output-dir = 'out'
 default-distro = { name = "azurelinux" }
+rendered-specs-dir = '../specs'
