@@ -4,3 +4,4 @@ __pycache__/
 .spec_review/
 spec_review_kb.md
 .env
+.hyenas/

@@ -1,0 +1,200 @@
+# Reusable workflow — renders specs from a PR and checks for drift.
+#
+# Called by the stub on the default branch (check-rendered-specs-stub.yml) via
+# pull_request_target. The stub provides the PR details; this workflow does all
+# the real work:
+#   1. Checks out base branch (trusted tools/scripts)
+#   2. Checks out PR head into pr-head/ (untrusted data — TOML configs, specs)
+#   3. Renders specs inside a privileged container using azldev -C pr-head/
+#   4. Checks for drift (compares rendered output against PR's committed specs)
+#   5. Posts a PR comment with results + downloadable fix patch
+#
+# Security: the PR checkout is data-only. We never execute code from the PR —
+# azldev is installed from upstream, scripts come from the base branch checkout.
+name: "Check Rendered Specs"
+
+on:
+  workflow_call:
+    inputs:
+      pr-head-sha:
+        required: true
+        type: string
+      pr-head-repo:
+        required: true
+        type: string
+      pr-number:
+        required: true
+        type: string
+      repo:
+        required: true
+        type: string
+
+permissions: {}
+
+# Belt-and-suspenders: the stub also sets concurrency, but keep it here so the
+# contract survives refactoring / direct invocation.
+concurrency:
+  group: render-check-${{ inputs.repo }}-${{ inputs.pr-number }}
+  cancel-in-progress: true
+
+jobs:
+  # Render PR's specs + check for drift. Runs PR-derived data through the
+  # container; deliberately has NO pull-requests write (and no secrets beyond
+  # the default read-only token) so that even if the container somehow leaks
+  # into the host, it can't touch the PR. All output flows to the next job via
+  # artifacts + job outputs only.
+  render:
+    name: Render + drift check
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    outputs:
+      patch-url: ${{ steps.upload-patch.outputs.artifact-url }}
+    steps:
+      # --- Trusted base branch (tools, scripts, container config) ---
+      - name: Checkout base (trusted)
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: ${{ inputs.repo }}
+          ref: tomls/base/main
+          persist-credentials: false
+
+      # --- PR head (untrusted data — TOML configs, overlays, specs) ---
+      - name: Checkout PR head (data)
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: ${{ inputs.pr-head-repo }}
+          ref: ${{ inputs.pr-head-sha }}
+          path: pr-head
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Build azldev runner container
+        run: |
+          docker build \
+            --build-arg UID=$(id -u) \
+            -t localhost/azldev-runner \
+            -f .github/workflows/containers/azldev-runner.Dockerfile \
+            .github/workflows/containers/
+
+      # Render + drift-check run entirely inside the container. The host never
+      # invokes git against PR data: all git operations happen in the sandboxed
+      # environment, and the host only reads trusted-shape outputs
+      # (report.json, rendered-specs.patch) from a dedicated output volume.
+      # This dodges the whole class of poisoned-.git/config attacks
+      # (diff.external, diff drivers, filter drivers, hooks, etc.).
+      #
+      # Sandbox knobs:
+      #   --cap-add=SYS_ADMIN      mock needs mount namespaces for chroot
+      #   seccomp=unconfined       mock uses syscalls filtered by the default profile
+      #   apparmor=unconfined      ubuntu-latest ships docker-default AppArmor which
+      #                            blocks `mount -t tmpfs` on paths under /var/lib/mock
+      #                            even with SYS_ADMIN granted
+      # We still avoid --privileged (broader blast radius).
+      # --security-opt no-new-privileges would be nice but mock's userhelper
+      # requires setuid, which that flag blocks.
+      - name: Render + check for drift
+        id: check
+        continue-on-error: true # TODO: flip off once check stabilizes (see PR #16674)
+        env:
+          WORKSPACE: ${{ github.workspace }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$WORKSPACE/render-output"
+          docker run --rm \
+            --cap-add=SYS_ADMIN \
+            --security-opt seccomp=unconfined \
+            --security-opt apparmor=unconfined \
+            -v "$WORKSPACE/pr-head:/workdir" \
+            -v "$WORKSPACE/render-output:/output" \
+            -v "$WORKSPACE/.github/workflows/scripts:/scripts:ro" \
+            localhost/azldev-runner \
+            bash -eu -o pipefail -c '
+              azldev component render -q -a --clean-stale -O json \
+                > /output/render-output.json
+              SPECS_DIR=$(azldev config dump -q -f json \
+                | python3 -c "import json,sys; print(json.load(sys.stdin)[\"project\"][\"renderedSpecsDir\"])")
+              python3 /scripts/check_rendered_specs.py \
+                --specs-dir "$SPECS_DIR" \
+                --report /output/render-check-report.json \
+                --patch /output/rendered-specs.patch
+            '
+
+      # Dual upload: `archive: false` (v7 feature) gives browser users a direct
+      # download of the raw patch (artifact name is derived from the filename,
+      # so `name:` is ignored here — that's why we need the second upload).
+      # The zipped `rendered-specs-patch` artifact is for `gh run download`,
+      # which only works with named artifacts.
+      - name: Upload fix patch (unzipped, for browser download)
+        id: upload-patch
+        if: hashFiles('render-output/rendered-specs.patch') != ''
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          path: render-output/rendered-specs.patch
+          archive: false
+
+      # See: https://github.com/cli/cli/issues/13012 for why this is needed.
+      - name: Upload fix patch (zipped, for gh run download)
+        if: hashFiles('render-output/rendered-specs.patch') != ''
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: rendered-specs-patch
+          path: render-output/rendered-specs.patch
+
+      - name: Upload render output
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: render-output
+          path: |
+            render-output/render-output.json
+            render-output/render-check-report.json
+
+  # Post the PR comment. Runs in a separate job so the `pull-requests: write`
+  # token is only granted to a job that does NOT execute any PR-derived code:
+  # it only checks out the trusted base branch (for the poster script) and
+  # consumes the trusted-shape report artifact from the render job.
+  comment:
+    name: Post drift comment
+    needs: render
+    if: always() && needs.render.result != 'cancelled'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write # Post/update/delete drift comments on PRs
+    steps:
+      - name: Checkout base (trusted)
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: ${{ inputs.repo }}
+          ref: tomls/base/main
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+
+      - name: Download render report
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
+        with:
+          name: render-output
+          path: render-output
+
+      - name: Post PR comment
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_REPO: ${{ inputs.repo }}
+          PR_NUMBER: ${{ inputs.pr-number }}
+          PATCH_URL: ${{ needs.render.outputs.patch-url }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          python .github/workflows/scripts/post_render_comment.py \
+            --repo "$PR_REPO" \
+            --pr "$PR_NUMBER" \
+            --report render-output/render-check-report.json \
+            --artifacts-url "$PATCH_URL" \
+            --run-id "$RUN_ID"
