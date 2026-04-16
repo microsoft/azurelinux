@@ -1,0 +1,7 @@
+[components.kata-containers]
+
+[[components.kata-containers.overlays]]
+description = "Add missing runtime dependency on dbus-daemon — the %post scriptlet runs dracut which requires the dbus-daemon module (via the dbus module dependency chain). Without this, install fails with: dracut[E]: Module 'dbus' depends on module 'dbus-daemon', which can't be installed."
+type = "spec-insert-tag"
+tag = "Requires"
+value = "dbus-daemon"
