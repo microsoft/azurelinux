@@ -113,10 +113,10 @@ extends:
               - script: |
                   set -euo pipefail
 
-                  # Workaround for an ADO git config error.
+                  # Workaround for an ADO git config error during spec rendering.
                   git config --unset extensions.worktreeConfig
 
-                  # Needed for spec rendering to work.
+                  # Full history is needed for spec rendering to work.
                   git fetch --unshallow
 
                   specs_dir="specs"
