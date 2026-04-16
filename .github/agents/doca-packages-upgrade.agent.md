@@ -20,6 +20,24 @@ Each DOCA version (e.g., `3.2.2`) contains `SOURCES/mlnx_ofed/` with two tarball
 
 Inside the non-debian tarball, individual component SRPMs are in the `SRPMS/` directory.
 
+## HWE (Hardware Enablement) Packages
+
+Many kernel module packages have a corresponding **HWE variant** that lives in `SPECS/<package>-hwe/`. HWE packages build the **same source code** against a different (newer) kernel — the HWE kernel. Key differences from the non-HWE package:
+
+- **Name**: `<package>-hwe` (e.g., `mlnx-ofa_kernel-hwe`, `iser-hwe`)
+- **Kernel macros**: Use `%azl_kernel_hwe_version` / `%azl_kernel_hwe_release` instead of `%azl_kernel_version` / `%azl_kernel_release`
+- **BuildRequires**: `kernel-hwe-devel` (not `kernel-devel`), `mlnx-ofa_kernel-hwe-devel` (not `mlnx-ofa_kernel-devel`)
+- **Requires**: `kernel-hwe`, `mlnx-ofa_kernel-hwe-modules` (not `kernel`, `mlnx-ofa_kernel-modules`)
+- **Conflicts**: `Conflicts: <non-hwe-package>` (e.g., `Conflicts: iser`)
+- **No ExclusiveArch**: HWE packages support both x86_64 and aarch64 (no `ExclusiveArch: x86_64`)
+- **No %ifarch x86_64 guards**: HWE packages build kernel modules for all architectures
+- **Shared source tarball**: HWE packages use `%{_distro_sources_url}` to reference the **same tarball** as the non-HWE package — they do NOT have their own copy of the tarball. The `signatures.json` references the same tarball filename and hash.
+- **Minimal packaging**: HWE packages typically only ship kernel modules (no userspace tools, scripts, or library subpackages)
+
+Known HWE packages: `mlnx-ofa_kernel-hwe`, `iser-hwe`, `isert-hwe`, `knem-hwe`, `mft_kernel-hwe`, `mlnx-nfsrdma-hwe`, `srp-hwe`, `xpmem-hwe`
+
+**When upgrading a kernel module package, ALWAYS also upgrade its `-hwe` variant if one exists.** Use the already-upgraded non-HWE SPEC as a reference for what the final result should look like — then adapt the HWE SPEC with the HWE-specific differences listed above.
+
 ## Upgrade Workflow
 
 When asked to upgrade a DOCA package, follow these steps:
@@ -62,7 +80,7 @@ When asked to upgrade a DOCA package, follow these steps:
 
 7. **Determine the package type** first. DOCA OFED packages fall into two categories:
 
-   **Kernel module packages** build `.ko` files and install to `/lib/modules/`. Examples: `mlnx-ofa_kernel`, `iser`, `isert`, `srp`, `knem`, `mlnx-nfsrdma`, `mlnx-nvme`, `virtiofs`. Look for `make install_modules`, `/lib/modules/` in `%files`, or `depmod` in `%post`.
+   **Kernel module packages** build `.ko` files and install to `/lib/modules/`. Examples: `mlnx-ofa_kernel`, `iser`, `isert`, `srp`, `knem`, `mlnx-nfsrdma`, `mlnx-nvme`, `virtiofs`. Look for `make install_modules`, `/lib/modules/` in `%files`, or `depmod` in `%post`. Each kernel module package may also have an `-hwe` variant (see **HWE Packages** section above).
 
    **Userspace packages** install tools, libraries, or scripts. Examples: `mlnx-tools`, `ofed-scripts`, `rdma-core`, `perftest`, `mlnx-ethtool`, `mlnx-iproute2`, `ibsim`, `sockperf`, `rshim`, `multiperf`, `openmpi`, `ucx`, `libvma`, `libxlio`.
 
@@ -128,6 +146,21 @@ When asked to upgrade a DOCA package, follow these steps:
     ```
     Preserve all existing AzureLinux changelog entries below.
 
+### Phase 3b: Upgrade HWE Variant (if applicable)
+
+If the package being upgraded is a kernel module and has a corresponding `SPECS/<package>-hwe/` directory:
+
+1. **Read the current HWE SPEC** (`SPECS/<package>-hwe/<package>-hwe.spec`) and the **already-upgraded non-HWE SPEC** (`SPECS/<package>/<package>.spec`).
+2. **Apply the same version/release updates** to the HWE SPEC:
+   - Update `_release` macro to the new OFED release string
+   - Update `Version:` to the new version
+   - Reset `Release:` to `1%{release_suffix}%{?dist}`
+   - Update the DOCA source URL comment
+3. **Preserve all HWE-specific differences** (see HWE Packages section above).
+4. **Update `<package>-hwe.signatures.json`** to reference the new tarball name and hash — use the **same hash** as the non-HWE package since they share the source tarball.
+5. **Add a changelog entry** matching the non-HWE package.
+6. **Do NOT copy a source tarball** into the HWE directory — HWE packages share the tarball via `%{_distro_sources_url}`.
+
 ### Phase 4: Install and Verify
 
 11. **Copy files** to `SPECS/<package>/`:
@@ -176,10 +209,17 @@ When asked to upgrade a DOCA package, follow these steps:
 
 ### Phase 5: Build Validation
 
-14. **Build the package locally** to verify it compiles successfully:
+14. **Prepare the toolchain** (once per session):
     ```bash
     cd /space/azurelinux/toolkit
-    sudo make build-packages -j$(nproc) REBUILD_TOOLS=y SRPM_PACK_LIST="<package-name>"
+    sudo make toolchain -j$(nproc) REBUILD_TOOLCHAIN=n REBUILD_TOOLS=y DAILY_BUILD_ID=lkg
+    ```
+    This downloads pre-built toolchain RPMs. Only needs to run once; skip on subsequent package builds.
+
+15. **Build the package locally** to verify it compiles successfully:
+    ```bash
+    cd /space/azurelinux/toolkit
+    sudo make build-packages -j$(nproc) REBUILD_TOOLS=y DAILY_BUILD_ID=lkg SRPM_PACK_LIST="<package-name>"
     ```
     - On subsequent builds in the same session, add `REFRESH_WORKER_CHROOT=n` to skip chroot refresh and speed things up.
     - If the build fails, read the build log to diagnose. Common issues:
@@ -190,14 +230,17 @@ When asked to upgrade a DOCA package, follow these steps:
     - Fix the SPEC and rebuild until it passes.
     - Built RPMs appear in `../out/RPMS/`.
 
-15. For **batch upgrades**, build all upgraded/added packages. You can build multiple at once:
+16. For **batch upgrades**, build all upgraded/added packages. You can build multiple at once:
     ```bash
-    sudo make build-packages -j$(nproc) REBUILD_TOOLS=y SRPM_PACK_LIST="pkg1 pkg2 pkg3" REFRESH_WORKER_CHROOT=n
+    sudo make build-packages -j$(nproc) REBUILD_TOOLS=y DAILY_BUILD_ID=lkg SRPM_PACK_LIST="pkg1 pkg2 pkg3" REFRESH_WORKER_CHROOT=n
     ```
     However, it is recommended to build kernel-module packages one at a time since they share build dependencies. Build order suggestion:
     1. `mlnx-ofa_kernel` (base kernel modules — others depend on this)
     2. Other kernel module packages: `iser`, `isert`, `srp`, `knem`, `mlnx-nfsrdma`, `mlnx-nvme`, `virtiofs`
-    3. Userspace packages: `ofed-scripts`, `mlnx-tools`, `rdma-core`, `perftest`, etc.
+    3. HWE kernel module packages: `mlnx-ofa_kernel-hwe`, then `iser-hwe`, `isert-hwe`, `srp-hwe`, `knem-hwe`, `mlnx-nfsrdma-hwe`, `mft_kernel-hwe`, `xpmem-hwe`
+    4. Userspace packages: `ofed-scripts`, `mlnx-tools`, `rdma-core`, `perftest`, etc.
+
+    Note: HWE packages require `kernel-hwe-devel` and `mlnx-ofa_kernel-hwe-devel` which may not be available in the local build environment. They are expected to build in full CI.
 
 ## Constraints
 
@@ -241,9 +284,17 @@ When asked to upgrade **all** DOCA OFED packages (or upgrade "the whole DOCA rel
    | **Removed** | SRPM in old but NOT in new | Remove: delete `SPECS/<pkg>/` (confirm with user) |
    | **New** | SRPM in new but NOT in old, OR in new but no `SPECS/<pkg>/` | Add: create new package with AzureLinux conventions |
 
-5. **Present the inventory** to the user and ask for confirmation before proceeding. Example:
+5. **Identify HWE packages**: For each kernel module package in the upgrade list, check if `SPECS/<pkg>-hwe/` exists. If so, add its HWE variant to the upgrade list.
+   ```bash
+   for pkg in <kernel-module-packages>; do
+     [ -d "SPECS/${pkg}-hwe" ] && echo "HWE: ${pkg}-hwe"
+   done
+   ```
+
+6. **Present the inventory** to the user and ask for confirmation before proceeding. Example:
    ```
    Packages to UPGRADE (22): mlnx-ofa_kernel, ofed-scripts, mlnx-tools, ...
+   HWE packages to UPGRADE (8): mlnx-ofa_kernel-hwe, iser-hwe, isert-hwe, ...
    Packages to ADD (5): clusterkit, dpcp, ibutils2, mlnx-dpdk, sharp
    Packages to REMOVE (2): xpmem-lib, mpitests
    Packages SKIPPED (in repo but not from DOCA): opensm, ...
@@ -258,6 +309,19 @@ For each package that exists in both tarballs and in the AzureLinux repo:
 3. Read the AzureLinux repo SPEC.
 4. Follow the **single-package upgrade workflow** (Phases 2-4 above).
 5. Process packages one at a time, marking progress with the todo list.
+
+### Batch Phase 1b: Upgrade HWE Packages
+
+After upgrading all non-HWE kernel module packages, upgrade their HWE variants:
+
+1. For each upgraded kernel module package, check if `SPECS/<pkg>-hwe/` exists.
+2. Read the HWE SPEC and the already-upgraded non-HWE SPEC as reference.
+3. Apply version/release updates to the HWE SPEC, preserving HWE-specific differences.
+4. Update `<pkg>-hwe.signatures.json` (same tarball hash as non-HWE).
+5. Add changelog entry.
+6. Do NOT copy a source tarball — HWE shares via `%{_distro_sources_url}`.
+
+Process order: `mlnx-ofa_kernel-hwe` first (base), then all others.
 
 ### Batch Phase 2: Add New Packages
 
@@ -319,6 +383,7 @@ After completing a batch upgrade, report a summary table:
 | Package | Action | Old Version | New Version | Notes |
 |---------|--------|-------------|-------------|-------|
 | mlnx-ofa_kernel | Upgraded | 25.07 | 25.10 | |
+| mlnx-ofa_kernel-hwe | Upgraded | 25.07 | 25.10 | HWE variant |
 | clusterkit | Added | - | 1.15.472 | New in DOCA 3.2.2 |
 | xpmem-lib | Removed | 2.7 | - | Gone from DOCA 3.2.2 |
 | ... | | | | |
