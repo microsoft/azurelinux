@@ -67,32 +67,7 @@ extends:
 
                   tdnf install -y mock mock-rpmautospec python3-chardet
                   sudo usermod -aG mock "$(whoami)"
-                displayName: "Set-up 'mock'"
-
-              - task: AzureCLI@2
-                displayName: "Acquire Entra ID Bearer Token"
-                inputs:
-                  azureSubscription: CT-Endpoints-Access-ServiceConnection-DEV
-                  scriptType: bash
-                  scriptLocation: inlineScript
-                  inlineScript: |
-                    set -euo pipefail
-
-                    response=$(az account get-access-token --resource "$API_AUDIENCE" -o json)
-
-                    token=$(jq -r .accessToken <<< "$response")
-                    expires=$(jq -r .expiresOn <<< "$response")
-
-                    if [[ -z "$token" || "$token" == "null" ]]; then
-                      echo "##[error]Failed to acquire bearer token."
-                      exit 1
-                    fi
-
-                    # Store as a secret pipeline variable for subsequent steps.
-                    echo "##vso[task.setvariable variable=apiToken;issecret=true]$token"
-                    echo "Bearer token acquired (expires: $expires)"
-                env:
-                  API_AUDIENCE: $(ApiAudience)
+                displayName: "Install 'mock'"
 
               - script: |
                   set -euo pipefail
@@ -105,10 +80,9 @@ extends:
                   echo "##vso[task.prependpath]$go_bin_path"
 
                   "$go_bin_path/azldev" --version
-                displayName: "Install azldev"
+                displayName: "Install 'azldev'"
                 env:
                   AZLDEV_COMMIT: $(AzldevCommit)
-                # condition: false # Disable for now to test the rest of the pipeline.
 
               - script: |
                   set -euo pipefail
@@ -132,7 +106,6 @@ extends:
                     exit 1
                   fi
                 displayName: "Verify rendered specs are up to date"
-                # condition: false # Disable for now to test the rest of the pipeline without needing to update specs.
 
               - script: |
                   set -euo pipefail
@@ -186,6 +159,31 @@ extends:
                   SOURCE_COMMIT: $(sourceCommit)
                   TARGET_COMMIT: $(targetCommit)
                 displayName: "Determine affected components"
+
+              - task: AzureCLI@2
+                displayName: "Acquire Entra ID Bearer Token"
+                inputs:
+                  azureSubscription: CT-Endpoints-Access-ServiceConnection-DEV
+                  scriptType: bash
+                  scriptLocation: inlineScript
+                  inlineScript: |
+                    set -euo pipefail
+
+                    response=$(az account get-access-token --resource "$API_AUDIENCE" -o json)
+
+                    token=$(jq -r .accessToken <<< "$response")
+                    expires=$(jq -r .expiresOn <<< "$response")
+
+                    if [[ -z "$token" || "$token" == "null" ]]; then
+                      echo "##[error]Failed to acquire bearer token."
+                      exit 1
+                    fi
+
+                    # Store as a secret pipeline variable for subsequent steps.
+                    echo "##vso[task.setvariable variable=apiToken;issecret=true]$token"
+                    echo "Bearer token acquired (expires: $expires)"
+                env:
+                  API_AUDIENCE: $(ApiAudience)
 
               - script: |
                   set -euo pipefail
