@@ -9,7 +9,7 @@ For project context and architecture, see [`.github/copilot-instructions.md`](.g
 ### Examples of changes that should trigger a final test prior to sign-off (not an exhaustive list)
 
 - Version bumps or pinning a new upstream version
-- Adding, modifying, or removing overlays (trivial edits may only require `prep-sources` verification, but when in doubt, do a full build + smoke-test)
+- Adding, modifying, or removing overlays (trivial edits may only require `render` verification, but when in doubt, do a full build + smoke-test)
 - Changing build config (`build.defines`, `build.with`, `build.without`)
 - Modifying local spec files or source files (again, trivial edits may not require a full rebuild, but when in doubt, test)
 - Adding a new component (first build)
@@ -33,9 +33,11 @@ Do NOT skip testing for changes that affect RPM output. Do NOT tell the user "th
 
 - Always run `azldev comp list -p <name> -q -O json` before modifying a component.
 - Prefer overlays over forking/local specs when customizing upstream packages.
-- Use `azldev comp prep-sources -p <name> --force -o <dir> -q` to verify overlays apply cleanly before building. Always use `--force` to overwrite an existing output dir, `rm -rf` requires user confirmation which is disruptive.
-- Follow the inner loop cycle: investigate → modify → verify → build → test → inspect. See [`skill-build-component`](.github/skills/skill-build-component/SKILL.md).
-  - Note: Use your best judgement, some packages are VERY slow to build (e.g., `kernel`), in those cases you may want to do multiple iterations of investigate → modify → verify with `prep-sources` before doing a full build + test.
+- After modifying overlays or component config, re-render with `azldev comp render -p <name>` and inspect `specs/<first-char>/<name>/` to verify the result. This is the fastest verification path.
+  - Note: Changing a global snapshot time may affect all components that depend on it, potentially causing widespread rebuilds. Full re-render is time-consuming, but may be done by `azldev comp render -a --clean-stale`.
+- Use `prep-sources` for deeper debugging: `azldev comp prep-sources -p <name> --skip-overlays --force -o <pre-dir> -q` and `azldev comp prep-sources -p <name> --force -o <post-dir> -q` to diff pre/post overlay output when you need to understand what upstream provides vs. what overlays change. Always use `--force` to overwrite an existing output dir, `rm -rf` requires user confirmation which is disruptive.
+- Follow the inner loop cycle: investigate → modify → render → build → test → inspect. See [`skill-build-component`](.github/skills/skill-build-component/SKILL.md).
+  - Note: Use your best judgement, some packages are VERY slow to build (e.g., `kernel`), in those cases you may want to do multiple iterations of investigate → modify → verify with `render` before doing a full build + test.
 - `prep-sources -o <dir>` output is ad-hoc (user-chosen dir). `comp build` output goes to project-configured dirs (`base/out/`, `base/build/`). Don't conflate them.
 - For temporary files, ensure they are all placed inside the project's defined work directory (`azldev config dump -q -f json 2>&1 | grep 'workDir'`). Example commands use `base/build/work/scratch/`, and all temp directories should be inside it unless there's a specific reason not to be.
 

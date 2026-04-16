@@ -19,6 +19,6 @@ Follow the workflow in the [skill-add-component skill](../skills/skill-add-compo
    - Needs overlays or customizations → create `${input:component_name}/${input:component_name}.comp.toml`
    - Needs extensive changes overlays can't handle → forked local spec (**last resort**, requires explicit user sign-off)
 6. Add overlays with meaningful `description` fields explaining *why* each change is needed
-7. Validate: `azldev comp prep-sources -p ${input:component_name} --force -o base/build/work/scratch/${input:component_name}-post -q` (with overlays) and diff against the skip-overlays output
+7. Render and verify: `azldev comp render -p ${input:component_name}` and inspect `specs/` (as specified by `rendered-specs-dir` config) output. For deeper debugging, diff pre/post overlay output with `prep-sources`.
 8. Build: `azldev comp build -p ${input:component_name} -q`
 9. Smoke-test the built RPMs in a mock chroot

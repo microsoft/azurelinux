@@ -7,7 +7,21 @@ description: "[Skill] Diagnose and fix overlay issues in Azure Linux components.
 
 ## Diagnosis Workflow
 
-### 1. Reproduce and inspect
+### 1. Render and inspect
+
+The fastest way to check if overlays apply cleanly:
+
+```bash
+azldev comp render -p <name>
+# Inspect the result
+cat specs/<first-char>/<name>/<name>.spec
+```
+
+If `render` fails, the error message will identify which overlay failed and why.
+
+### 2. Diff pre/post overlay (deep debug)
+
+When you need to understand exactly what upstream provides vs. what overlays change:
 
 > Use a temp dir for `prep-sources` output. Use `--force` to overwrite an existing output dir.
 
@@ -19,9 +33,7 @@ azldev comp prep-sources -p <name> --force -o base/build/work/scratch/<name>-pos
 diff -r base/build/work/scratch/<name>-pre base/build/work/scratch/<name>-post
 ```
 
-If `prep-sources` fails, the error message will identify which overlay failed and why.
-
-### 2. Inspect the upstream spec/sources
+### 3. Inspect the upstream spec/sources
 
 Look at the pre-overlay output dir — this is what the overlay is trying to modify. Common root cause: upstream changed and the overlay's assumptions no longer hold.
 
@@ -61,5 +73,5 @@ For overlay type reference (all 12 types with key fields), see [`comp-toml.instr
 - **Test incrementally.** Apply one overlay at a time and verify with `prep-sources`. Debugging 10 overlays at once is painful.
 - **Minimize overlays.** Each is a potential failure point. Prefer the smallest delta from upstream.
 - **Verify in chroot.** If overlays apply but the build still fails, use [`skill-mock`](../skill-mock/SKILL.md) to inspect the build environment.
-- **Follow the inner loop.** The full cycle is: investigate → modify → verify → build → test → inspect. See [`skill-build-component`](../skill-build-component/SKILL.md) for details.
+- **Follow the inner loop.** The full cycle is: investigate → modify → render → build → test → inspect. See [`skill-build-component`](../skill-build-component/SKILL.md) for details.
 - **Smoke-test after fixing overlays.** A clean apply and successful build don't guarantee working RPMs. See [`skill-mock`](../skill-mock/SKILL.md).

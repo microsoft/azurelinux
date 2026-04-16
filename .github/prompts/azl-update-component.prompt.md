@@ -19,6 +19,10 @@ Use structural patterns from [comp-toml.instructions.md](../instructions/comp-to
 3. **Apply changes** to the `.comp.toml` file
 4. **Verify overlays still apply:**
    ```bash
+   azldev comp render -p ${input:component_name}
+   ```
+   Inspect `specs/`  (as specified by `rendered-specs-dir` config) output. For deeper debugging, diff pre/post overlay output:
+   ```bash
    azldev comp prep-sources -p ${input:component_name} --skip-overlays -o base/build/work/scratch/${input:component_name}-pre --force
    azldev comp prep-sources -p ${input:component_name} -o base/build/work/scratch/${input:component_name}-post --force
    diff -r base/build/work/scratch/${input:component_name}-pre base/build/work/scratch/${input:component_name}-post

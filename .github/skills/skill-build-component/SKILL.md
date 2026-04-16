@@ -49,18 +49,20 @@ Build foundational packages first (e.g., `azurelinux-rpm-config`), then dependen
 The standard cycle for investigating, modifying, and verifying components:
 
 ```
-investigate → modify → verify → build → test → inspect
+investigate → modify → render → build → test → inspect
 ```
 
 | Step | Command | What to check |
 |------|---------|---------------|
-| **Investigate** | `prep-sources --skip-overlays --force -o base/build/work/scratch/<name>-pre` | Upstream spec/sources as-is |
-| **Compare** | `prep-sources --force -o base/build/work/scratch/<name>-post` + `diff -r ...-pre ...-post` | Current overlay effect |
+| **Investigate** | Read `specs/<first-char>/<name>/<name>.spec` or `prep-sources --skip-overlays --force -o base/build/work/scratch/<name>-pre` | Upstream spec/sources as-is |
+| **Compare** | `prep-sources --force -o base/build/work/scratch/<name>-post` + `diff -r ...-pre ...-post` | Current overlay effect (deep debug) |
 | **Modify** | Edit `*.comp.toml` (overlays, defines, without) | — |
-| **Verify** | `prep-sources --force -o base/build/work/scratch/<name>-post` | Overlay applies cleanly |
+| **Verify** | `comp render -p <name>` + inspect `specs/<first-char>/<name>/` | Overlay applies cleanly (fast path) |
 | **Build** | `comp build -p <name>` | RPMs appear in `base/out/` |
 | **Test** | `adv mock shell --add-package base/out/<name>*.rpm` | Package installs, binary runs, basic functionality works |
 | **Inspect** | `comp build --preserve-buildenv always` + `adv mock shell` | BUILDROOT contents, file lists |
+
+> **Prefer `comp render` for quick verification.** It's faster than `prep-sources` since it skips downloading source tarballs. Use `prep-sources` when you need the full source tree or want to diff pre/post overlay output for debugging.
 
 > Use a temp dir for `prep-sources` output. Use `--force` to overwrite an existing output dir.
 
@@ -68,7 +70,19 @@ investigate → modify → verify → build → test → inspect
 
 ## Debugging Build Failures
 
-### 1. Diff sources pre/post overlay
+### 1. Render and inspect the spec
+
+The fastest way to verify overlays applied correctly:
+
+```bash
+azldev comp render -p <name>
+# Inspect the result
+cat specs/<first-char>/<name>/<name>.spec
+```
+
+### 2. Diff sources pre/post overlay (deep debug)
+
+When you need to understand exactly what upstream provides vs. what overlays change:
 
 ```bash
 azldev comp prep-sources -p <name> --skip-overlays --force -o base/build/work/scratch/<name>-pre -q
@@ -78,14 +92,14 @@ diff -r base/build/work/scratch/<name>-pre base/build/work/scratch/<name>-post
 
 This reveals whether overlays apply as intended or whether upstream changed.
 
-### 2. Preserve build environment on failure
+### 3. Preserve build environment on failure
 
 ```bash
 azldev comp build -p <name> --preserve-buildenv on-failure -q
 # Use `always` to inspect even successful builds
 ```
 
-### 3. Enter mock shell (deep debug)
+### 4. Enter mock shell (deep debug)
 
 For testing built RPMs or inspecting the chroot, see the [`skill-mock`](../skill-mock/SKILL.md) skill. Quick reference:
 
