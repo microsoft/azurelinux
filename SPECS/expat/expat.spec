@@ -76,9 +76,11 @@ rm -rf %{buildroot}/%{_docdir}/%{name}
 %changelog
 * Wed Apr 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.6.4-6
 - Patch for CVE-2026-32778, CVE-2026-32777, CVE-2026-32776
+
 * Tue Mar 31 2026 Aditya Singh <v-aditysing@microsoft.com> - 2.6.4-5
 - Patch to restore event pointer behavior from Expat 2.6.4
 - which was changed due to fix for CVE-2024-8176.
+
 * Mon Feb 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.6.4-4
 - Patch for CVE-2026-25210
 
