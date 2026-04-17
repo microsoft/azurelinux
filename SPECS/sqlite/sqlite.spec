@@ -2,7 +2,7 @@
 Summary:        A portable, high level programming interface to various calling conventions
 Name:           sqlite
 Version:        3.44.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,6 +12,7 @@ Source0:        https://www.sqlite.org/2023/%{name}-autoconf-%{sourcever}.tar.gz
 # CVE-2015-3717 applies to versions shipped in iOS and OS X
 Patch0:         CVE-2015-3717.nopatch
 Patch1:         CVE-2025-6965.patch
+Patch2:         CVE-2025-70873.patch
 Requires:       sqlite-libs = %{version}-%{release}
 Provides:       sqlite3
 
@@ -82,6 +83,9 @@ make %{?_smp_mflags} check
 %{_libdir}/libsqlite3.so.0.8.6
 
 %changelog
+* Fri Apr 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.44.0-3
+- Patch for CVE-2025-70873
+
 * Thu Jul 24 2025 Madhur Aggarwal <madaggarwal@microsoft.com> - 3.44.0-2
 - Patch CVE-2025-6965
 - remove unused patch file from SPEC folder.
