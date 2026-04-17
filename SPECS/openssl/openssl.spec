@@ -66,6 +66,7 @@ Patch80:  0001-Replacing-deprecated-functions-with-NULL-or-highest.patch
 # algorithms that are used in the speed tests. This patch skips those tests.
 # If OpenSSL updates speed to be FIPS-tolerant, remove this patch.
 Patch82:  filter-unsupported-algs-key-lengths-dynamically.patch
+Patch100: CVE-2026-31791.patch
 
 License: Apache-2.0
 URL: http://www.openssl.org/
@@ -362,6 +363,9 @@ install -m644 %{SOURCE9} \
 * Wed Apr 08 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 3.3.7-1
 - Upgrade to 3.3.7
 - remove unused patches
+
+* Tue Mar 31 2026 Kanishk Bansal <kanbansal@microsoft.com> - 3.3.5-5
+- Patch CVE-2026-28388, CVE-2026-28389, CVE-2026-28390, CVE-2026-31789, CVE-2026-31790, CVE-2026-31791
 
 * Tue Feb 3 2026 Tobias Brick <tobiasb@microsoft.com> - 3.3.5-4
 - Enable switching between SymCrypt-OpenSSL and openssl-fips-provider.
