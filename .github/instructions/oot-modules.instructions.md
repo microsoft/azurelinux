@@ -220,9 +220,17 @@ For GPU drivers, also add:
 Requires:       kernel-drivers-gpu = %{target_kernel_version_full}
 ```
 
-For **HWE kernel** variants, replace `kernel`/`kernel-devel`/`kernel-headers`
-with `kernel-hwe`/`kernel-hwe-devel`/`kernel-hwe-headers`, and
+For **HWE kernel** variants, replace `kernel`/`kernel-devel`
+with `kernel-hwe`/`kernel-hwe-devel`, and
 `kernel-drivers-gpu` with `kernel-hwe-drivers-gpu`.
+
+> **⚠ BUILD-SYSTEM LIMITATION — `kernel-headers`:**
+> Only the default `kernel-headers` package may appear as a `BuildRequires`.
+> Flavored variants (e.g., `kernel-hwe-headers`) **must not** be used because
+> `kernel-headers` is always pre-installed in the build chroot and conflicts
+> with any other flavor of the headers package. This restriction does **not**
+> apply to `kernel-devel` — using `kernel-hwe-devel` is correct and required
+> for HWE builds.
 
 ### 5.2 MOFED Dependencies
 
@@ -276,7 +284,7 @@ throughout the entire spec:
 | `%azl_mlnx_ofa_kernel_release` | `%azl_mlnx_ofa_kernel_hwe_release` |
 | `kernel` (package name) | `kernel-hwe` |
 | `kernel-devel` | `kernel-hwe-devel` |
-| `kernel-headers` | `kernel-hwe-headers` |
+| `kernel-headers` | ~~`kernel-hwe-headers`~~ — **do not substitute for `BuildRequires`** (see §5.1 limitation) |
 | `kernel-drivers-gpu` | `kernel-hwe-drivers-gpu` |
 | `mlnx-ofa_kernel-*` | `mlnx-ofa_kernel-hwe-*` |
 | `_mofed_full_version` | `_mofed_hwe_full_version` |
