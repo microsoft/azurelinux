@@ -39,7 +39,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -56,6 +56,7 @@ Source18:       proc-version-override.service
 Source19:       proc-version-override.sh
 Source20:       chrony-azure.conf
 Source21:       50-azure-cloud.conf
+Source22:       70-azurelinux-hardening.conf
 
 BuildArch:      noarch
 
@@ -405,6 +406,9 @@ install -Dm0644 %{SOURCE16} -t %{buildroot}%{_prefix}/share/dnf5/libdnf.conf.d/
 install -Dm0644 %{SOURCE18} -t %{buildroot}%{_unitdir}/
 install -Dm0755 %{SOURCE19} %{buildroot}%{_libexecdir}/proc-version-override
 
+# Install sysctl configuration
+install -Dm0644 %{SOURCE22} -t %{buildroot}%{_sysctldir}/
+
 
 %files common
 %license licenses/LICENSE
@@ -433,6 +437,7 @@ install -Dm0755 %{SOURCE19} %{buildroot}%{_libexecdir}/proc-version-override
 %{_prefix}/share/dnf5/libdnf.conf.d/20-azurelinux-defaults.conf
 %{_unitdir}/proc-version-override.service
 %{_libexecdir}/proc-version-override
+%{_sysctldir}/70-azurelinux-hardening.conf
 
 
 %if %{with basic}
@@ -471,6 +476,9 @@ install -Dm0755 %{SOURCE19} %{buildroot}%{_libexecdir}/proc-version-override
 
 
 %changelog
+* Fri Apr 17 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-9
+- Add sysctl config for system hardening
+
 * Wed Apr 15 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-8
 - Set prerelease name
 
