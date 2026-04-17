@@ -49,6 +49,9 @@ extends:
         #   - group: "Agent pools (DEV)"
         jobs:
           - job: CallControlTowerAPI
+            # Must exceed the script's --poll-timeout-seconds (default 7200s = 120m)
+            # with enough headroom for setup steps and the final API call.
+            timeoutInMinutes: 150
             pool:
               type: linux
               # isCustom: true
@@ -91,7 +94,8 @@ extends:
                   set -euo pipefail
 
                   # Workaround for an ADO git config error during spec rendering.
-                  git config --unset extensions.worktreeConfig
+                  # The config key may not be present on every agent image, so tolerate its absence.
+                  git config --unset extensions.worktreeConfig || true
 
                   # Full history is needed for spec rendering to work.
                   git fetch --unshallow
@@ -125,7 +129,10 @@ extends:
                     # CI/merge-queue trigger: extract the base branch from the merge-queue branch name.
                     # Branch format: refs/heads/gh-readonly-queue/{base_branch}/pr-{pr_number}-{head_sha}
                     # Using 'test/' branches until ready with the merge queue, but the parsing logic is the same.
-                    base_branch=$(grep -oP '(?<=test/gh-readonly-queue/).+(?=/pr-[^/]+$)' <<< "$SOURCE_BRANCH")
+                    if ! base_branch=$(grep -oP '(?<=test/gh-readonly-queue/).+(?=/pr-[^/]+$)' <<< "$SOURCE_BRANCH"); then
+                      echo "##[error]Unsupported SOURCE_BRANCH '$SOURCE_BRANCH' for non-PullRequest build. Expected 'refs/heads/test/gh-readonly-queue/<base>/pr-<n>-<sha>'."
+                      exit 1
+                    fi
                     target_hash=$(git ls-remote "$UPSTREAM_REPO_URL" "refs/heads/$base_branch" | cut -f1)
                   fi
 
@@ -153,7 +160,7 @@ extends:
                   components=()
                   while IFS= read -r line; do
                     components+=("$(basename "$(dirname "$line")")")
-                  done < <(git diff "$SOURCE_COMMIT" "$TARGET_COMMIT" --name-only | grep 'sources$' | sort -u)
+                  done < <(git diff "$SOURCE_COMMIT" "$TARGET_COMMIT" --name-only | grep '/sources$' | sort -u)
 
                   components="$(IFS=, ; echo "${components[*]}")"
                   echo "Affected components: $components"
@@ -178,6 +185,7 @@ extends:
                       --build-reason "$BUILD_REASON" \
                       --components "$COMPONENTS" \
                       --source-commit "$SOURCE_COMMIT" \
+                      --target-commit "$TARGET_COMMIT" \
                       --repo-uri "$UPSTREAM_REPO_URL"
                 env:
                   API_AUDIENCE: $(ApiAudience)
@@ -185,4 +193,5 @@ extends:
                   BUILD_REASON: $(Build.Reason)
                   COMPONENTS: $(components)
                   SOURCE_COMMIT: $(sourceCommit)
+                  TARGET_COMMIT: $(targetCommit)
                   UPSTREAM_REPO_URL: $(Build.Repository.Uri)
