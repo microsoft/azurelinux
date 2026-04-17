@@ -52,7 +52,7 @@
 Summary:        Mesa graphics libraries
 Name:           mesa
 Version:        21.0.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -65,6 +65,7 @@ Source0:        https://mesa.freedesktop.org/archive/%{name}-%{version}.tar.xz
 # CBL-Mariner is taking the same approach.
 Source1:        Mesa-MLAA-License-Clarification-Email.txt
 Source2:        LICENSE.PTR
+Patch0:         CVE-2026-40393.patch
 
 # We only check for the minimum version of pkgconfig(libdrm) needed so that the
 # SRPMs for each arch still have the same build dependencies. See:
@@ -588,6 +589,9 @@ popd
 %endif
 
 %changelog
+* Fri Apr 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 21.0.0-5
+- Patch for CVE-2026-40393
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 21.0.0-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
