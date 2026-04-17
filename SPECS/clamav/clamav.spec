@@ -146,6 +146,12 @@ fi
 * Fri Mar 20 2026 Mayank Singh <mayansingh@microsoft.com> - 1.5.2-1
 - upgrade to 1.5.2
 
+* Tue Apr 07 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.0.9-5
+- Bump release to rebuild with rust
+
+* Wed Feb 11 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.0.9-4
+- Bump release to rebuild with rust
+
 * Mon Feb 02 2026 Archana Shettigar <v-shettigara@microsoft.com> - 1.0.9-3
 - Bump release to rebuild with rust
 
