@@ -28,8 +28,8 @@
 
 %if 0%{azl}
 
-%global target_azl_build_kernel_version %azl_kernel_hwe_version
-%global target_kernel_release %azl_kernel_hwe_release
+%global target_azl_build_kernel_version 6.18.21.1
+%global target_kernel_release 1
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
@@ -102,7 +102,7 @@
 Summary:	 Infiniband HCA Driver
 Name:		 mlnx-ofa_kernel-hwe
 Version:	 25.07
-Release:	 8%{release_suffix}%{?dist}
+Release:	 9%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
@@ -449,6 +449,9 @@ update-alternatives --remove \
 %{_prefix}/src/ofa_kernel/%{_arch}/[0-9]*
 
 %changelog
+* Fri Apr 17 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 25.07-9_6.18.21.1.1
+- Bump release to rebuild for new kernel release
+
 * Fri Apr 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.07-8_6.12.57.1.6
 - Tweak specs to use dynamic versioning for kernel
 

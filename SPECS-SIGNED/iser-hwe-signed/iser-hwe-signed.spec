@@ -31,8 +31,8 @@
 %define __os_install_post %{__os_install_post_leave_signatures} %{nil}
 
 
-%global target_azl_build_kernel_version %azl_kernel_hwe_version
-%global target_kernel_release %azl_kernel_hwe_release
+%global target_azl_build_kernel_version 6.18.21.1
+%global target_kernel_release 1
 %global target_mlnx_ofa_kernel_version %azl_mlnx_ofa_kernel_hwe_version
 %global target_mlnx_ofa_kernel_release %azl_mlnx_ofa_kernel_hwe_release
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
@@ -41,12 +41,12 @@
 %global KVERSION %{target_kernel_version_full}
 
 %{!?_name: %define _name iser-hwe}
-%{!?_mofed_full_version: %define _mofed_full_version %{target_mlnx_ofa_kernel_version}-%{target_mlnx_ofa_kernel_release}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version 25.07-9%{?dist}}
 
 Summary:	 %{_name} Driver
 Name:		 %{_name}-signed
 Version:	 25.07
-Release:	 8%{release_suffix}%{?dist}
+Release:	 9%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -113,6 +113,9 @@ fi # 1 : closed
 %config(noreplace) %{_sysconfdir}/depmod.d/zz02-iser-*.conf
 
 %changelog
+* Fri Apr 17 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 25.07-9_6.18.21.1.1
+- Bump release to rebuild for new kernel release
+
 * Fri Apr 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.07-8_6.12.57.1.6
 - Tweak specs to use dynamic versioning for kernel
 

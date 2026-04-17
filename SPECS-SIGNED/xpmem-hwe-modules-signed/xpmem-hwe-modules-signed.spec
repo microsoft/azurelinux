@@ -5,8 +5,8 @@
 %define __os_install_post %{__os_install_post_leave_signatures} %{nil}
 
 
-%global target_azl_build_kernel_version %azl_kernel_hwe_version
-%global target_kernel_release %azl_kernel_hwe_release
+%global target_azl_build_kernel_version 6.18.21.1
+%global target_kernel_release 1
 %global target_mlnx_ofa_kernel_version %azl_mlnx_ofa_kernel_hwe_version
 %global target_mlnx_ofa_kernel_release %azl_mlnx_ofa_kernel_hwe_release
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
@@ -15,7 +15,7 @@
 %global KVERSION %{target_kernel_version_full}
 
 %define _name xpmem-hwe-modules
-%{!?_mofed_full_version: %define _mofed_full_version %{target_mlnx_ofa_kernel_version}-%{target_mlnx_ofa_kernel_release}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version 25.07-9%{?dist}}
 
 # xpmem-modules is a sub-package in SPECS/xpmem.
 # We are making that into a main package for signing.
@@ -23,7 +23,7 @@
 Summary:	 Cross-partition memory
 Name:		 %{_name}-signed
 Version:	 2.7.4
-Release:	 32%{release_suffix}%{?dist}
+Release:	 33%{release_suffix}%{?dist}
 License:	 GPLv2 and LGPLv2.1
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
@@ -95,6 +95,9 @@ if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
 fi
 
 %changelog
+* Fri Apr 17 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.7.4-33_6.18.21.1.1
+- Bump release to rebuild for new kernel release
+
 * Fri Apr 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.7.4-32_6.12.57.1.6
 - Tweak specs to use dynamic versioning for kernel and mlnx_ofa
 

@@ -1,7 +1,7 @@
 %if 0%{azl}
 
-%global target_azl_build_kernel_version %azl_kernel_hwe_version
-%global target_kernel_release %azl_kernel_hwe_release
+%global target_azl_build_kernel_version 6.18.21.1
+%global target_kernel_release 1
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
@@ -35,7 +35,7 @@
 Name:		 mft_kernel-hwe
 Summary:	 %{name} Kernel Module for the %{KVERSION} kernel
 Version:	 4.33.0
-Release:	 8%{release_suffix}%{?dist}
+Release:	 9%{release_suffix}%{?dist}
 License:	 Dual BSD/GPLv2
 Group:		 System Environment/Kernel
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
@@ -213,6 +213,9 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 %endif
 
 %changelog
+* Fri Apr 17 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.33.0-9_6.18.21.1.1
+- Bump release to rebuild for new kernel release
+
 * Fri Apr 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 4.33.0-8_6.12.57.1.6
 - Tweak specs to use dynamic versioning for kernel
 
