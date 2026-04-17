@@ -98,8 +98,11 @@ fi
 - Upgrade to 2.1.7
 - Remove patches fixed in upstream: CVE-2024-25621, CVE-2024-40635,
   CVE-2024-45338, CVE-2025-22872, CVE-2025-27144, CVE-2025-47291,
-  CVE-2025-47911, CVE-2025-58190, CVE-2025-64329, fix-credential-leak-in-cri-errors
+  CVE-2025-47911, CVE-2025-58190, CVE-2025-64329, CVE-2026-35469, fix-credential-leak-in-cri-errors
 - Rebase multi-snapshotters-support patch for 2.1.7
+
+* Tue Apr 07 2026 Kanishk Bansal <kanbansal@microsoft.com> - 2.0.0-19
+- Patch CVE-2026-35469
 
 * Thu Feb 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.0.0-18
 - Patch for CVE-2025-58190, CVE-2025-47911
