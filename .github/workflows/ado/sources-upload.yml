@@ -62,25 +62,33 @@ extends:
               - name: LinuxContainerImage
                 value: mcr.microsoft.com/onebranch/azurelinux/build:3.0
             steps:
+              - task: PipAuthenticate@1
+                displayName: "Authenticate pip"
+                inputs:
+                  artifactFeeds: "MarinerFeed"
+
               - script: |
                   set -euo pipefail
 
+                  echo "##[group]Mock"
                   tdnf install -y mock mock-rpmautospec python3-chardet
                   sudo usermod -aG mock "$(whoami)"
-                displayName: "Install 'mock'"
+                  echo "##[endgroup]"
 
-              - script: |
-                  set -euo pipefail
-
+                  echo "##[group]Azldev"
                   echo "Installing azldev@${AZLDEV_COMMIT}..."
                   go install "github.com/microsoft/azure-linux-dev-tools/cmd/azldev@${AZLDEV_COMMIT}"
 
                   go_bin_path="$(go env GOPATH)/bin"
-
                   echo "##vso[task.prependpath]$go_bin_path"
 
                   "$go_bin_path/azldev" --version
-                displayName: "Install 'azldev'"
+                  echo "##[endgroup]"
+
+                  echo "##[group]Python dependencies"
+                  pip install -r .github/workflows/scripts/control-tower/requirements.txt
+                  echo "##[endgroup]"
+                displayName: "Install dependencies"
                 env:
                   AZLDEV_COMMIT: $(AzldevCommit)
 
@@ -96,7 +104,7 @@ extends:
                   specs_dir="specs"
 
                   echo "Rendering specs..."
-                  azldev component render -q -o "$specs_dir" --force
+                  azldev component render -q -a -o "$specs_dir" --force
 
                   # Check for any new or modified files under the specs directory.
                   if ! python3 .github/workflows/scripts/check_rendered_specs.py --specs-dir "$specs_dir"; then
@@ -161,78 +169,24 @@ extends:
                 displayName: "Determine affected components"
 
               - task: AzureCLI@2
-                displayName: "Acquire Entra ID Bearer Token"
+                displayName: "Call Control Tower 'prcheck' API"
                 inputs:
                   azureSubscription: CT-Endpoints-Access-ServiceConnection-DEV
                   scriptType: bash
                   scriptLocation: inlineScript
                   inlineScript: |
                     set -euo pipefail
-
-                    response=$(az account get-access-token --resource "$API_AUDIENCE" -o json)
-
-                    token=$(jq -r .accessToken <<< "$response")
-                    expires=$(jq -r .expiresOn <<< "$response")
-
-                    if [[ -z "$token" || "$token" == "null" ]]; then
-                      echo "##[error]Failed to acquire bearer token."
-                      exit 1
-                    fi
-
-                    # Store as a secret pipeline variable for subsequent steps.
-                    echo "##vso[task.setvariable variable=apiToken;issecret=true]$token"
-                    echo "Bearer token acquired (expires: $expires)"
+                    python3 .github/workflows/scripts/control-tower/call_control_tower.py \
+                      --api-audience "$API_AUDIENCE" \
+                      --api-base-url "$API_BASE_URL" \
+                      --build-reason "$BUILD_REASON" \
+                      --components "$COMPONENTS" \
+                      --source-commit "$SOURCE_COMMIT" \
+                      --repo-uri "$UPSTREAM_REPO_URL"
                 env:
                   API_AUDIENCE: $(ApiAudience)
-
-              - script: |
-                  set -euo pipefail
-
-                  # Build the JSON payload matching the Control Tower schema.
-                  payload=$(jq -n \
-                    --arg components      "$COMPONENTS" \
-                    --arg buildReason     "$BUILD_REASON" \
-                    --arg repoUri         "$UPSTREAM_REPO_URL" \
-                    --arg sourceCommitSha "$SOURCE_COMMIT" \
-                    '{
-                      components:      ($components | split(",") | map(gsub("^\\s+|\\s+$"; ""))),
-                      buildReason:     $buildReason,
-                      repoUri:         $repoUri,
-                      sourceCommitSha: $sourceCommitSha
-                    }')
-
-                  echo "Calling Control Tower 'prcheck' endpoint..."
-                  echo "Payload:"
-                  echo "$payload" | jq .
-
-                  if [[ "$BUILD_REASON" == "PullRequest" ]]; then
-                    echo "Skipping Control Tower call - pull request triggers are not supported, yet."
-                    exit 0
-                  fi
-
-                  http_code=$(curl -s -o response.json -w "%{http_code}" \
-                    --connect-timeout 10 --max-time 60 \
-                    -X POST "${API_BASE_URL}/api/Scenario/prcheck" \
-                    -H "Authorization: Bearer $API_TOKEN" \
-                    -H "Content-Type: application/json" \
-                    -d "$payload")
-
-                  echo "Service response:"
-                  jq . response.json
-
-                  echo "HTTP status: $http_code"
-
-                  if [[ "$http_code" -lt 200 || "$http_code" -ge 300 ]]; then
-                    echo "##[error]Control Tower returned HTTP $http_code"
-                    jq . response.json 2>/dev/null || echo "(non-JSON response body omitted)"
-                    exit 1
-                  fi
-
-                env:
                   API_BASE_URL: $(ApiBaseUrl)
-                  API_TOKEN: $(apiToken)
                   BUILD_REASON: $(Build.Reason)
                   COMPONENTS: $(components)
                   SOURCE_COMMIT: $(sourceCommit)
                   UPSTREAM_REPO_URL: $(Build.Repository.Uri)
-                displayName: "Call Control Tower 'prcheck' API"
