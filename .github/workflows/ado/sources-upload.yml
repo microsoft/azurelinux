@@ -81,7 +81,7 @@ extends:
                   echo "##[endgroup]"
 
                   echo "##[group]Python dependencies"
-                  pip install -r .github/workflows/scripts/control-tower/requirements.txt
+                  pip install -r .github/workflows/scripts/control-tower-prcheck/requirements.txt
                   echo "##[endgroup]"
                 displayName: "Install dependencies"
                 env:
@@ -171,7 +171,8 @@ extends:
                   scriptLocation: inlineScript
                   inlineScript: |
                     set -euo pipefail
-                    python3 .github/workflows/scripts/control-tower/call_control_tower.py \
+
+                    python3 .github/workflows/scripts/control-tower-prcheck/run_control_tower_prcheck.py \
                       --api-audience "$API_AUDIENCE" \
                       --api-base-url "$API_BASE_URL" \
                       --build-reason "$BUILD_REASON" \
