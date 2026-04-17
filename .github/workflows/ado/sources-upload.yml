@@ -62,11 +62,6 @@ extends:
               - name: LinuxContainerImage
                 value: mcr.microsoft.com/onebranch/azurelinux/build:3.0
             steps:
-              - task: PipAuthenticate@1
-                displayName: "Authenticate pip"
-                inputs:
-                  artifactFeeds: "MarinerFeed"
-
               - script: |
                   set -euo pipefail
 
