@@ -68,7 +68,7 @@ extends:
               - task: PipAuthenticate@1
                 displayName: "Authenticate pip"
                 inputs:
-                  artifactFeeds: "ControlTowerFeed"
+                  artifactFeeds: "azl/ControlTowerFeed"
 
               - script: |
                   set -euo pipefail
