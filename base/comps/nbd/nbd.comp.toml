@@ -1,0 +1,8 @@
+[components.nbd]
+
+[[components.nbd.overlays]]
+description = "Mark tls and tlshuge tests as expected failures — shipped test certificates expired on 2026-04-17 (10-year certs generated 2016-04-19). Fixed upstream in nbd 3.27.0 (commit 58b356b) but not backported to 3.25."
+type = "spec-search-replace"
+section = "%check"
+regex = 'make check'
+replacement = 'make check XFAIL_TESTS="tls tlshuge"'
