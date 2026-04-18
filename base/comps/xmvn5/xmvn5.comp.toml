@@ -6,15 +6,8 @@
 # xmvn5-toolchain-openjdk21 subpackage has an unsatisfiable dependency.
 
 [[components.xmvn5.overlays]]
-description = "Remove openjdk21 toolchain install — AZL does not ship java-21-openjdk"
+description = "Remove openjdk21 toolchain lines — AZL does not ship java-21-openjdk"
 type = "spec-search-replace"
 section = "%install"
-regex = "install -p -m 644 %\\{SOURCE21\\} .*toolchains-openjdk21\\.xml"
-replacement = "# openjdk21 toolchain install removed — AZL does not ship java-21-openjdk"
-
-[[components.xmvn5.overlays]]
-description = "Remove openjdk21 toolchain %jp_binding invocation"
-type = "spec-search-replace"
-section = "%install"
-regex = "%jp_binding --verbose.*toolchain-openjdk21[^\\n]*"
-replacement = "# (openjdk21 toolchain jp_binding removed)"
+regex = '.*openjdk21.*'
+replacement = ''

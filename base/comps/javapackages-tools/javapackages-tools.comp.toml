@@ -1,0 +1,79 @@
+[components.javapackages-tools]
+
+# Backport of upstream Fedora rawhide commits to remove openjdk21 support:
+# - 62dfe8f: https://src.fedoraproject.org/rpms/javapackages-tools/c/62dfe8f
+# - 7debb9d: https://src.fedoraproject.org/rpms/javapackages-tools/c/7debb9d
+# - 83cd9c8: https://src.fedoraproject.org/rpms/javapackages-tools/c/83cd9c8
+# AZL only ships java-25-openjdk; there is no java-21-openjdk, so
+# maven-local-openjdk21 and javapackages-local-openjdk21 have unsatisfiable deps.
+
+# --- Remove maven-local-openjdk21 subpackage ---
+
+[[components.javapackages-tools.overlays]]
+description = "Remove maven-local-openjdk21 %package section"
+type = "spec-remove-section"
+section = "%package"
+package = "maven-local-openjdk21"
+
+[[components.javapackages-tools.overlays]]
+description = "Remove maven-local-openjdk21 %description section"
+type = "spec-remove-section"
+section = "%description"
+package = "maven-local-openjdk21"
+
+[[components.javapackages-tools.overlays]]
+description = "Remove maven-local-openjdk21 %files section"
+type = "spec-remove-section"
+section = "%files"
+package = "maven-local-openjdk21"
+
+# --- Remove javapackages-local-openjdk21 subpackage ---
+
+[[components.javapackages-tools.overlays]]
+description = "Remove javapackages-local-openjdk21 %package section"
+type = "spec-remove-section"
+section = "%package"
+package = "javapackages-local-openjdk21"
+
+[[components.javapackages-tools.overlays]]
+description = "Remove javapackages-local-openjdk21 %description section"
+type = "spec-remove-section"
+section = "%description"
+package = "javapackages-local-openjdk21"
+
+[[components.javapackages-tools.overlays]]
+description = "Remove javapackages-local-openjdk21 %files section"
+type = "spec-remove-section"
+section = "%files"
+package = "javapackages-local-openjdk21"
+
+# --- Remove --jvm=openjdk21 configure flag ---
+
+[[components.javapackages-tools.overlays]]
+description = "Remove --jvm=openjdk21 from configure — keep backslash continuation for openjdk25 line"
+type = "spec-search-replace"
+section = "%build"
+regex = "    --jvm=openjdk21=.*openjdk .+"
+replacement = "    \\"
+
+# --- Fix broken Requires that reference the virtual 'javapackages-local' provide ---
+# Backports of upstream Fedora rawhide commits 7debb9d and 83cd9c8.
+# After removing the openjdk21 subpackages, the virtual provide
+# 'javapackages-local' only comes from openjdk25. Use explicit names
+# to match upstream's fix.
+
+[[components.javapackages-tools.overlays]]
+description = "Fix ivy-local Requires to use explicit openjdk25 (upstream 7debb9d)"
+type = "spec-search-replace"
+section = "%package"
+package = "ivy-local"
+regex = 'Requires:       javapackages-local = %\{version\}-%\{release\}'
+replacement = "Requires:       javapackages-local-openjdk25 = %{version}-%{release}"
+
+[[components.javapackages-tools.overlays]]
+description = "Fix javapackages-compat Requires to use javapackages-tools (upstream 83cd9c8)"
+type = "spec-search-replace"
+section = "%package"
+package = "javapackages-compat"
+regex = 'Requires:       javapackages-local = %\{version\}-%\{release\}'
+replacement = "Requires:       javapackages-tools = %{version}-%{release}"
