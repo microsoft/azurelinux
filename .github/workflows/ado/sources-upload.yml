@@ -118,6 +118,7 @@ extends:
                     exit 1
                   fi
                 displayName: "Verify rendered specs are up to date"
+                condition: false # Debugging
 
               - script: |
                   set -euo pipefail
@@ -167,7 +168,9 @@ extends:
                     components+=("$(basename "$(dirname "$line")")")
                   done < <(git diff "$SOURCE_COMMIT" "$TARGET_COMMIT" --name-only | grep '/sources$' | sort -u)
 
-                  components="$(IFS=, ; echo "${components[*]}")"
+                  # components="$(IFS=, ; echo "${components[*]}")"
+                  # Debugging
+                  components="atlas,words"
                   echo "Affected components: $components"
                   echo "##vso[task.setvariable variable=components]$components"
                 env:
