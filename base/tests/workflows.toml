@@ -1,0 +1,20 @@
+# Azure Linux Test Workflows Configuration
+# Defines testing workflows and their associated test label mappings
+
+[workflows]
+
+[workflows.pr_validation]
+description = "Fast validation for pull request gates"
+purpose = "Quick developer feedback"
+test_labels = ["openqa_install_smoke", "quick_smoke_tests"]
+
+[workflows.nightly_validation]
+description = "Comprehensive nightly testing"
+max_duration_minutes = 480
+purpose = "Full regression testing"
+test_labels = ["tmt_tier2", "lisa_priority2", "comprehensive_tests"]
+
+[workflows.release_validation]
+description = "Complete testing before release"
+purpose = "Production readiness validation"
+test_labels = ["full_validation", "security_tests", "compatibility_tests"]
