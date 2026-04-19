@@ -1,0 +1,19 @@
+[components.vmaf]
+
+# The vmaf spec has ExclusiveArch: x86_64, so libvmaf is only built for
+# x86_64. However, the vmaf-models subpackage is BuildArch: noarch, which
+# causes it to appear in all arch repos (including aarch64). Since
+# vmaf-models requires libvmaf, this creates a repoclosure failure on
+# aarch64 where libvmaf doesn't exist.
+#
+# Fix by removing BuildArch: noarch from the models subpackage so it is
+# only available in the x86_64 repo alongside libvmaf.
+# TODO(AB#18935): Drop this overlay once publishing is ExclusiveArch-aware
+# for noarch subpackages and no longer publishes vmaf-models into arches
+# where libvmaf is unavailable.
+[[components.vmaf.overlays]]
+description = "Make vmaf-models arch-specific to avoid repoclosure failure on aarch64"
+type = "spec-remove-tag"
+tag = "BuildArch"
+value = "noarch"
+package = "models"
