@@ -85,7 +85,6 @@ export LDFLAGS="$LDFLAGS -lstdc++fs"
 export CMAKE_EXE_LINKER_FLAGS="$CMAKE_EXE_LINKER_FLAGS -lstdc++fs"
 export CMAKE_SHARED_LINKER_FLAGS="$CMAKE_SHARED_LINKER_FLAGS -lstdc++fs"
 export CMAKE_MODULE_LINKER_FLAGS="$CMAKE_MODULE_LINKER_FLAGS -lstdc++fs"
-
 %py3_build
 
 %install
