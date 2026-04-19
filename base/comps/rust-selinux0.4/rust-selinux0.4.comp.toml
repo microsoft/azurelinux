@@ -1,0 +1,14 @@
+[components.'rust-selinux0.4']
+
+# Temporary workaround: policy::tests::root_path races with
+# policy::tests::make_and_load (which calls selinux_set_policy_root()) when tests
+# run in parallel, causing root_path to see corrupted state and panic with
+# InvalidData from selinux_policy_root().
+# TODO: Drop this overlay once the upstream selinux crate fixes the test race
+#       (AB#18936) and policy::tests::root_path passes reliably in Koji.
+[[components.'rust-selinux0.4'.overlays]]
+description = "Skip policy::tests::root_path test - races with make_and_load modifying global SELinux state"
+type = "spec-search-replace"
+section = "%check"
+regex = '%\{cargo_test -- -- %\{shrink:'
+replacement = '%{cargo_test -- -- --skip policy::tests::root_path %{shrink:'
