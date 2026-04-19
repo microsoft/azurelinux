@@ -1,0 +1,6 @@
+# Disable the gnutls-fips subpackage build.
+# The fips subpackage has dependency issues in the current build tag.
+# Re-enable once the underlying fips dependency chain is resolved.
+[components.gnutls]
+[components.gnutls.build]
+without = ["fips"]
