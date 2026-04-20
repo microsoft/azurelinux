@@ -6,12 +6,12 @@
 Name:           perl-Crypt-PasswdMD5
 # Keep 1-digit version because of history
 Version:        %(echo '%{cpan_version}' | sed 's/\.\(.\)/.\1./')
-Release:        10%{?dist}
+Release: 11%{?dist}
 Summary:        Provides interoperable MD5-based crypt() functions
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Crypt-PasswdMD5
 Source0:        https://cpan.metacpan.org/modules/by-module/Crypt/Crypt-PasswdMD5-%{cpan_version}.tgz
-Patch0:         Crypt-PasswdMD5-1.42-d:md5-version.patch
+Patch0: Crypt-PasswdMD5-1.42-d-md5-version.patch
 BuildArch:      noarch
 # Build:
 BuildRequires:  coreutils

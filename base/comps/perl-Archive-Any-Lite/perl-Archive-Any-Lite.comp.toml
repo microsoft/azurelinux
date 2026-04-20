@@ -1,0 +1,15 @@
+[components.perl-Archive-Any-Lite]
+
+# Rename patch to remove ':' so the repo can be checked out on Windows for
+# compliance scanning. ':' is reserved on Windows filesystems.
+[[components.perl-Archive-Any-Lite.overlays]]
+description = "Rename patch file to remove ':' (invalid on Windows filesystems)"
+type = "file-rename"
+file = "Archive-Any-Lite-0.08-EU:MM.patch"
+replacement = "Archive-Any-Lite-0.08-EUMM.patch"
+
+[[components.perl-Archive-Any-Lite.overlays]]
+description = "Update Patch0 reference to match renamed file"
+type = "spec-update-tag"
+tag = "Patch0"
+value = "Archive-Any-Lite-0.08-EUMM.patch"
