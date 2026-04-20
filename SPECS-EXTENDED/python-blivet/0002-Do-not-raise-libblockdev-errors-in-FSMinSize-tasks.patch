@@ -1,0 +1,44 @@
+From f86a9666cfb0b8dc9bb8908d44d1b2537cac19a7 Mon Sep 17 00:00:00 2001
+From: Vojtech Trefny <vtrefny@redhat.com>
+Date: Wed, 25 Sep 2024 15:00:26 +0200
+Subject: [PATCH] Do not raise libblockdev errors in FSMinSize tasks (#2314637)
+
+Follow up for #1255. We need to raise FSError in case of errors
+because libblockdev errors are not caught in FS.update_size_info.
+---
+ blivet/tasks/fsminsize.py | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/blivet/tasks/fsminsize.py b/blivet/tasks/fsminsize.py
+index 0556b330..74e02ef8 100644
+--- a/blivet/tasks/fsminsize.py
++++ b/blivet/tasks/fsminsize.py
+@@ -58,7 +58,11 @@ class Ext2FSMinSize(FSMinSize):
+         if error_msgs:
+             raise FSError("\n".join(error_msgs))
+ 
+-        return Size(BlockDev.fs.ext2_get_min_size(self.fs.device))
++        try:
++            min_size = Size(BlockDev.fs.ext2_get_min_size(self.fs.device))
++        except BlockDev.FSError as e:
++            raise FSError("failed to get fs min size: %s" % e)
++        return min_size
+ 
+ 
+ class NTFSMinSize(FSMinSize):
+@@ -69,7 +73,11 @@ class NTFSMinSize(FSMinSize):
+         if error_msgs:
+             raise FSError("\n".join(error_msgs))
+ 
+-        return Size(BlockDev.fs.ntfs_get_min_size(self.fs.device))
++        try:
++            min_size = Size(BlockDev.fs.ntfs_get_min_size(self.fs.device))
++        except BlockDev.FSError as e:
++            raise FSError("failed to get fs min size: %s" % e)
++        return min_size
+ 
+ 
+ class UnimplementedFSMinSize(fstask.UnimplementedFSTask):
+-- 
+2.46.1
+
