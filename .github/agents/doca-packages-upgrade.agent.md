@@ -128,9 +128,9 @@ When asked to upgrade a DOCA package, follow these steps:
 
 ### Phase 3: Build New SPEC
 
-8. **Start from the new upstream SPEC** as the base — do NOT use diff3/merge. Apply customizations programmatically or manually, checking each one against the new upstream context.
+9. **Start from the new upstream SPEC** as the base — do NOT use diff3/merge. Apply customizations programmatically or manually, checking each one against the new upstream context.
 
-9. **Version updates**:
+10. **Version updates**:
    - Remove `%{!?_version: %global _version ...}` (AzureLinux uses literal `Version:`)
    - Update `%{!?_release: ...}` to new OFED release string
    - Update `%global MLNX_OFA_DRV_SRC` to match new version
@@ -140,7 +140,7 @@ When asked to upgrade a DOCA package, follow these steps:
    - Use `%setup -n %{_name}-%{version}` (not `%{_version}`)
    - **Source-filename macros**: Some packages (e.g., `perftest`) use macros like `%global extended_release` that appear in the `Source0:` URL and must match the actual tarball filename. After copying the new tarball, always verify the tarball filename matches what the SPEC's `Source0:` expands to. Compare the actual tarball name (`ls SPECS/<pkg>/*.tar.gz`) against the SPEC's source macros and update any stale macros accordingly.
 
-10. **Add changelog entry** at the top:
+11. **Add changelog entry** at the top:
     ```
     * <date> Azure Linux Team - <version>-1
     - Upgrade to DOCA <doca_version> (OFED <ofed_version>)
@@ -164,11 +164,11 @@ If the package being upgraded is a kernel module and has a corresponding `SPECS/
 
 ### Phase 4: Install and Verify
 
-11. **Copy files** to `SPECS/<package>/`:
+12. **Copy files** to `SPECS/<package>/`:
     - New SPEC file → `<package>.spec`
     - Source tarball from new SRPM → `<package>-<version>.tgz`
 
-12. **Generate signatures file**:
+13. **Generate signatures file**:
     Do NOT edit the existing signatures file with string replacement — it causes duplicate braces if the file lacks a trailing newline. Instead, **overwrite the entire file**:
     ```bash
     HASH=$(sha256sum SPECS/<pkg>/<tarball> | awk '{print $1}')
@@ -185,13 +185,13 @@ If the package being upgraded is a kernel module and has a corresponding `SPECS/
     python3 -c "import json; json.load(open('SPECS/<pkg>/<pkg>.signatures.json'))"
     ```
 
-13. **Verify the SPEC**:
+14. **Verify the SPEC**:
     - Check `%if`/`%endif` balance
     - Verify no conflict markers remain
     - Verify all major RPM sections exist (`%description`, `%prep`, `%build`, `%install`, `%files`, `%changelog`)
     - Check no `dkms` or `building_kmods` references remain
 
-14. **Diff review — catch dropped customizations**:
+15. **Diff review — catch dropped customizations**:
     After generating the new SPEC, diff it against the **old AzureLinux repo SPEC** (not the old upstream):
     ```bash
     diff -u SPECS/<package>/<package>.spec.old /tmp/doca-ofed/<package>-final.spec
@@ -210,14 +210,14 @@ If the package being upgraded is a kernel module and has a corresponding `SPECS/
 
 ### Phase 5: Build Validation
 
-14. **Prepare the toolchain** (once per session):
+16. **Prepare the toolchain** (once per session):
     ```bash
     cd /space/azurelinux/toolkit
     sudo make toolchain -j$(nproc) REBUILD_TOOLCHAIN=n REBUILD_TOOLS=y DAILY_BUILD_ID=lkg
     ```
     This downloads pre-built toolchain RPMs. Only needs to run once; skip on subsequent package builds.
 
-15. **Build the package locally** to verify it compiles successfully:
+17. **Build the package locally** to verify it compiles successfully:
     ```bash
     cd /space/azurelinux/toolkit
     sudo make build-packages -j$(nproc) REBUILD_TOOLS=y DAILY_BUILD_ID=lkg SRPM_PACK_LIST="<package-name>"
@@ -231,7 +231,7 @@ If the package being upgraded is a kernel module and has a corresponding `SPECS/
     - Fix the SPEC and rebuild until it passes.
     - Built RPMs appear in `../out/RPMS/`.
 
-16. For **batch upgrades**, build all upgraded/added packages. You can build multiple at once:
+18. For **batch upgrades**, build all upgraded/added packages. You can build multiple at once:
     ```bash
     sudo make build-packages -j$(nproc) REBUILD_TOOLS=y DAILY_BUILD_ID=lkg SRPM_PACK_LIST="pkg1 pkg2 pkg3" REFRESH_WORKER_CHROOT=n
     ```
@@ -388,7 +388,7 @@ After completing a batch upgrade, report a summary table:
 | clusterkit | Added | - | 1.15.472 | New in DOCA 3.2.2 |
 | xpmem-lib | Removed | 2.7 | - | Gone from DOCA 3.2.2 |
 | ... | | | | |
-  ```
+```
 
 ---
 
@@ -446,7 +446,7 @@ Fix the SPEC (or add patches), then rebuild. Common patterns:
 | `./configure: No such file or directory` | Tarball ships `autogen.sh` but no pre-built `configure` | Add `./autogen.sh` or `autoreconf -fiv` before `./configure` in `%build`; add `BuildRequires: autoconf automake libtool` |
 | `Installed (but unpackaged) file(s) found` | New version installs files not listed in `%files` | Compare new upstream `%files` with AzureLinux spec; add missing entries to appropriate `%files` sections |
 | `No matching package: <pkg>` or `Unresolved` in workplan | BuildRequires references a package that doesn't exist in AzureLinux | Check actual RPM name (e.g., `python3-pyelftools` not `pyelftools`); check if the package has subpackages |
-| `configure: error: ...not found` | Missing development library | Add the appropriate `-devel` package to BuildRequires; check distro conditionals (e.g., `%if 0%{?rhel}`) that may skip AzureLinux — add `\|\| 0%{?azl}` |
+| `configure: error: ...not found` | Missing development library | Add the appropriate `-devel` package to BuildRequires; check distro conditionals (e.g., `%if 0%{?rhel}`) that may skip AzureLinux — add `|| 0%{?azl}` |
 | `fatal error: <header>.h: No such file or directory` | Missing header from a dependency | Identify which package provides the header; add it to BuildRequires |
 | `exported twice. Previous export was in vmlinux` | Kernel module exports symbols already built into the kernel | Kernel config incompatibility — cannot fix in SPEC. May need kernel config change or package exclusion. |
 | `conflicting declaration of C function` | C vs C++ linkage mismatch (e.g., `const` correctness) | Generate a patch to fix the configure check or source code (see "Generating Patches" below) |
