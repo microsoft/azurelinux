@@ -1,14 +1,14 @@
 Summary:        Irqbalance daemon
 Name:           irqbalance
-Version:        1.9.3
-Release:        2%{?dist}
+Version:        1.9.5
+Release:        1%{?dist}
 License:        GPLv2
 URL:            https://github.com/Irqbalance/irqbalance
 Group:          System Environment/Services
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/Irqbalance/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         0001-define-IRQBALANCE_ARGS-as-empty-string.patch
+Patch0:         0001-Backport-irqbalance-ENOSPC-slot-aware-placement-and-fallback.patch
 BuildRequires:  systemd-devel
 BuildRequires:  glib-devel
 Requires:       systemd
@@ -33,6 +33,7 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
+rm -rf %{buildroot}%{_prefix}/etc
 install -D -m 0644 misc/irqbalance.env %{buildroot}/etc/sysconfig/irqbalance
 sed -i 's#/path/to/irqbalance.env#/etc/sysconfig/irqbalance#' misc/irqbalance.service
 install -D -m 0644 misc/irqbalance.service %{buildroot}%{_prefix}/lib/systemd/system/irqbalance.service
@@ -57,6 +58,12 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_datadir}/*
 
 %changelog
+* Wed Apr 15 2026 Suresh Thelkar <sthelkar@microsoft.com> - 1.9.5-1
+- Upgrade to version 1.9.5
+- Remove IRQBALANCE_ARGS patch (now upstream)
+- Add ENOSPC handling with slot-aware placement and fallback
+- Honor balance_level policy for domain-assigned IRQs
+
 * Mon Jul 01 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.9.3-2
 - Define IRQBALANCE_ARGS variable in EnvironmentFile for irqbalance.service
     to squelch systemd warning. 
