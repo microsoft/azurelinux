@@ -40,7 +40,8 @@ install -p -m 0644 -D txt2man.1 $RPM_BUILD_ROOT%{_mandir}/man1/txt2man.1
 
 
 %files
-%doc COPYING Changelog README
+%doc Changelog README
+%license COPYING
 %{_bindir}/*
 %{_mandir}/man?/*
 
