@@ -1,4 +1,3 @@
-# TODO(azl): review this file
 
 # We deviate from some upstream defaults
 disable systemd-timesyncd.service
