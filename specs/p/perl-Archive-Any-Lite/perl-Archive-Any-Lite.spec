@@ -10,12 +10,12 @@
 
 Name:		perl-Archive-Any-Lite
 Version:	0.11
-Release:	29%{?dist}
+Release: 30%{?dist}
 Summary:	Simple CPAN package extractor 
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Archive-Any-Lite
 Source0:	https://cpan.metacpan.org/modules/by-module/Archive/Archive-Any-Lite-%{version}.tar.gz
-Patch0:		Archive-Any-Lite-0.08-EU:MM.patch
+Patch0: Archive-Any-Lite-0.08-EUMM.patch
 BuildArch:	noarch
 # Build
 BuildRequires:	coreutils
