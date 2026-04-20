@@ -7,7 +7,7 @@
 ######## QUICK_REBUILD AUTO CONFIGURE ########
 
 # The QUICK_REBUILD* flags are special flags that will try to build the toolchain and packages as quickly as possible. They will
-# automatically set REBUILD_TOOLS, REBUILD_TOOLCHAIN, DELTA_BUILD, INCREMENTAL_TOOLCHAIN, and ALLOW_TOOLCHAIN_DOWNLOAD_FAIL to 'y'.
+# automatically set REBUILD_TOOLS, REBUILD_TOOLCHAIN, DELTA_BUILD, NO_TOOLCHAIN_CONTAINER, INCREMENTAL_TOOLCHAIN, and ALLOW_TOOLCHAIN_DOWNLOAD_FAIL to 'y'.
 ##help:var:QUICK_REBUILD:{y,n}=Optimize the build for speed by using existing published components and optimizing unimpactful package rebuilds (Implies QUICK_REBUILD_PACKAGES=y, QUICK_REBUILD_TOOLCHAIN=y).
 QUICK_REBUILD           ?= n
 ##help:var:QUICK_REBUILD_TOOLCHAIN:{y,n}=Rebuild the toolchain, but attempt to download components where possible.
@@ -71,6 +71,7 @@ endif
 
 REBUILD_TOOLCHAIN               ?= n
 ALLOW_TOOLCHAIN_DOWNLOAD_FAIL   ?= n
+NO_TOOLCHAIN_CONTAINER          ?= n
 ##help:var:REBUILD_TOOLS:{y,n}=Build the go tools locally instead of taking them from the SDK.
 REBUILD_TOOLS                   ?= n
 DELTA_BUILD                     ?= n
