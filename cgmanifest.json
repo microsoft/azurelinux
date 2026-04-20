@@ -1787,8 +1787,8 @@
         "type": "other",
         "other": {
           "name": "clamav",
-          "version": "1.0.9",
-          "downloadUrl": "https://github.com/Cisco-Talos/clamav/archive/refs/tags/clamav-1.0.9.tar.gz"
+          "version": "1.5.2",
+          "downloadUrl": "https://github.com/Cisco-Talos/clamav/archive/refs/tags/clamav-1.5.2.tar.gz"
         }
       }
     },
@@ -2067,8 +2067,8 @@
         "type": "other",
         "other": {
           "name": "containerd2",
-          "version": "2.0.0",
-          "downloadUrl": "https://github.com/containerd/containerd/archive/v2.0.0.tar.gz"
+          "version": "2.1.6",
+          "downloadUrl": "https://github.com/containerd/containerd/archive/v2.1.6.tar.gz"
         }
       }
     },
@@ -2427,8 +2427,8 @@
         "type": "other",
         "other": {
           "name": "cups",
-          "version": "2.4.16",
-          "downloadUrl": "https://github.com/OpenPrinting/cups/releases/download/v2.4.16/cups-2.4.16-source.tar.gz"
+          "version": "2.4.17",
+          "downloadUrl": "https://github.com/OpenPrinting/cups/releases/download/v2.4.17/cups-2.4.17-source.tar.gz"
         }
       }
     },
@@ -8240,6 +8240,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "kata-containers-preview",
+          "version": "3.27.0~preview1",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.27.0.preview1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "kata-containers-cc",
           "version": "3.15.0.aks0",
           "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.15.0.aks0.tar.gz"
@@ -8251,8 +8261,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers-preview",
-          "version": "3.27.0~preview1",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.27.0.preview1.tar.gz"
+          "version": "3.27.0-preview1",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.27.0-preview1.tar.gz"
         }
       }
     },
@@ -10901,8 +10911,8 @@
         "type": "other",
         "other": {
           "name": "libpng",
-          "version": "1.6.56",
-          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.56.tar.xz"
+          "version": "1.6.57",
+          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.57.tar.xz"
         }
       }
     },
@@ -26594,8 +26604,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-addressable",
-          "version": "2.8.5",
-          "downloadUrl": "https://github.com/sporkmonger/addressable/archive/refs/tags/addressable-2.8.5.tar.gz"
+          "version": "2.9.0",
+          "downloadUrl": "https://github.com/sporkmonger/addressable/archive/refs/tags/addressable-2.9.0.tar.gz"
         }
       }
     },
