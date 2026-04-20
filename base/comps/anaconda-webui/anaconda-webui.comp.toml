@@ -1,0 +1,19 @@
+[components.anaconda-webui]
+
+# The upstream Fedora spec requires fedora-logos (gated behind %if 0%{?fedora}).
+# AZL uses generic-logos for branding; fedora-logos is not shipped and breaks
+# repoclosure. Replace with system-logos, the distro-neutral virtual provide.
+# Ref: https://github.com/microsoft/azurelinux/pull/16413 removed fedora-logos
+# from the component list; this patches the consumer side.
+
+[[components.anaconda-webui.overlays]]
+description = "Remove Requires: fedora-logos (Fedora-specific)"
+type = "spec-remove-tag"
+tag = "Requires"
+value = "fedora-logos"
+
+[[components.anaconda-webui.overlays]]
+description = "Add Requires: system-logos (distro-neutral virtual provide)"
+type = "spec-add-tag"
+tag = "Requires"
+value = "system-logos"
