@@ -4,7 +4,19 @@ definition = { type = "kiwi", path = "vm-base/vm-base.kiwi" }
 
 [images.container-base]
 description = "Container Base Image"
-definition = { type = "kiwi", path = "container-base/container-base.kiwi" }
+definition = { type = "kiwi", path = "container-base/container-base.kiwi", profile = "core" }
+
+[images.container-distroless-minimal]
+description = "Container Distroless Minimal Image"
+definition = { type = "kiwi", path = "container-base/container-base.kiwi", profile = "distroless-minimal" }
+
+[images.container-distroless-base]
+description = "Container Distroless Base Image"
+definition = { type = "kiwi", path = "container-base/container-base.kiwi", profile = "distroless-base" }
+
+[images.container-distroless-debug]
+description = "Container Distroless Debug Image"
+definition = { type = "kiwi", path = "container-base/container-base.kiwi", profile = "distroless-debug" }
 
 # NOTE:
 # sudo dnf install -y kiwi-cli

@@ -41,7 +41,6 @@
     <packages type="image">
         <!-- Core group -->
         <package name="azurelinux-release-cloud" />
-        <package name="azurelinux-rpm-config" />
         <package name="azurelinux-repos" />
         <package name="bash" />
         <package name="ca-certificates" />
@@ -87,17 +86,16 @@
         <package name="lz4" />
         <package name="man-db" />
         <package name="nano" />
+        <package name="ncurses" />
         <package name="ncurses-term" />
         <package name="net-tools" />
         <package name="nftables" />
         <package name="openssh-clients" />
         <package name="openssh-server" />
         <package name="rsync" />
-        <package name="rsyslog" />
         <package name="selinux-policy-targeted" />
         <package name="setup" />
         <package name="shadow-utils" />
-        <package name="shadow-utils-subid" />
         <package name="sudo" />
         <package name="systemd" />
         <package name="systemd-networkd" />
@@ -121,7 +119,6 @@
 
     <packages type="bootstrap">
         <package name="azurelinux-release-cloud" />
-        <package name="dracut-network" />
         <package name="filesystem" />
         <package name="grub2-efi-x64-modules" arch="x86_64" />
         <package name="grub2-efi-x64" arch="x86_64" />

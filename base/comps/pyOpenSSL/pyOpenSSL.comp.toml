@@ -1,0 +1,19 @@
+# Pin to 25.1.0 because 25.2.0+ requires cryptography >= 45.0.7, but we ship
+# python-cryptography 45.0.4 (pinned because 46.x needs crate(asn1) >= 0.22.0,
+# not yet available). 25.1.0 requires cryptography >= 41.0.5, < 46 which is
+# compatible with our 45.0.4.
+# Re-align to latest when python-cryptography is updated to >= 45.0.7.
+[components.pyOpenSSL]
+spec = { type = "upstream", upstream-commit = "8ac54d517e6d9db673dc83b4e2b12b83d1f99724" }
+
+[[components.pyOpenSSL.overlays]]
+description = "Pin python3-cryptography to 45.x to match the version we ship (python-cryptography is pinned to 45.0.4)"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "python3-cryptography >= 45.0.4"
+
+[[components.pyOpenSSL.overlays]]
+description = "Prevent building against cryptography 46.x which we do not ship"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "python3-cryptography < 46"

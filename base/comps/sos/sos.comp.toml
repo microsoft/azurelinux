@@ -1,0 +1,7 @@
+[components.sos]
+
+[[components.sos.overlays]]
+description = "Fix os_release_name value to match os-release NAME"
+type = "patch-add"
+file = "Policy-Fix-os_release_name-value.patch"
+source = "Policy-Fix-os_release_name-value.patch"

@@ -57,7 +57,7 @@ fi
 
 # Ensure the "build_target" image-definition exists
 # Note: We publish only the VHD from the secure-prod the SIG
-if ! az sig image-definition show -r "$GALLERY_NAME" -g "$RESOURCE_GROUP_NAME" -n "$GALLERY_IMAGE_DEFINITION"; then
+if ! az sig image-definition show --gallery-name "$GALLERY_NAME" --resource-group "$RESOURCE_GROUP_NAME" --gallery-image-definition "$GALLERY_IMAGE_DEFINITION"; then
     echo "Could not find image-definition \"$GALLERY_IMAGE_DEFINITION\". Creating definition \"$GALLERY_IMAGE_DEFINITION\" in gallery \"$GALLERY_NAME\"..."
     az sig image-definition create \
         --gallery-image-definition "$GALLERY_IMAGE_DEFINITION" \
@@ -67,7 +67,8 @@ if ! az sig image-definition show -r "$GALLERY_NAME" -g "$RESOURCE_GROUP_NAME" -
         --gallery-name "$GALLERY_NAME" \
         --resource-group "$RESOURCE_GROUP_NAME" \
         --location "$LOCATION" \
-        --os-type Linux
+        --os-type Linux \
+        --features "DiskControllerTypes=SCSI,NVMe"
 fi
 
 image_version="$(increment-version "$(get-image-version)")"

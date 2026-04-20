@@ -1,0 +1,15 @@
+[components.perl-Crypt-PasswdMD5]
+
+# Rename patch to remove ':' so the repo can be checked out on Windows for
+# compliance scanning. ':' is reserved on Windows filesystems.
+[[components.perl-Crypt-PasswdMD5.overlays]]
+description = "Rename patch file to remove ':' (invalid on Windows filesystems)"
+type = "file-rename"
+file = "Crypt-PasswdMD5-1.42-d:md5-version.patch"
+replacement = "Crypt-PasswdMD5-1.42-d-md5-version.patch"
+
+[[components.perl-Crypt-PasswdMD5.overlays]]
+description = "Update Patch0 reference to match renamed file"
+type = "spec-update-tag"
+tag = "Patch0"
+value = "Crypt-PasswdMD5-1.42-d-md5-version.patch"

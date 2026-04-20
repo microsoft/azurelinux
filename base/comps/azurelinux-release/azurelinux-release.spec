@@ -1,4 +1,7 @@
-%define release_name Alpha1
+%define release_name Four
+# Let's remove this prerelease_name before release, and next time we
+# can use the built-in prerelease logic (based on release number < 1)
+%define prerelease_name Alpha2
 %define is_evergreen 0
 
 # Define this to 1 for Branched releases prior to RC
@@ -6,7 +9,7 @@
 %define is_development 1
 
 # TODO(azl): review
-%define eol_date 2026-03-01
+%define eol_date 2026-05-15
 
 %define dist_version_major 4
 %define dist_version_minor 0
@@ -36,7 +39,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        5%{?dist}
+Release:        9%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -52,6 +55,8 @@ Source17:       20-azure.conf
 Source18:       proc-version-override.service
 Source19:       proc-version-override.sh
 Source20:       chrony-azure.conf
+Source21:       50-azure-cloud.conf
+Source22:       70-azurelinux-hardening.conf
 
 BuildArch:      noarch
 
@@ -234,8 +239,6 @@ echo "cpe:/o:microsoft:azurelinux:%{version}" > %{buildroot}%{_prefix}/lib/syste
 install -d %{buildroot}%{_sysconfdir}
 ln -s ../usr/lib/azurelinux-release %{buildroot}%{_sysconfdir}/azurelinux-release
 ln -s ../usr/lib/system-release-cpe %{buildroot}%{_sysconfdir}/system-release-cpe
-# TODO(azl): validate
-# ln -s azurelinux-release %{buildroot}%{_sysconfdir}/azurelinux-release
 ln -s azurelinux-release %{buildroot}%{_sysconfdir}/system-release
 
 # Create the common os-release file
@@ -247,6 +250,8 @@ ln -s azurelinux-release %{buildroot}%{_sysconfdir}/system-release
 %define starts_with(str,prefix) (%{expand:%%{lua:print(starts_with(%1, %2) and "1" or "0")}})
 %if %{starts_with "a%{release}" "a0"}
   %global prerelease \ Prerelease
+%elif "0%{?prerelease_name}" != "0"
+  %global prerelease \ %{prerelease_name}
 %endif
 
 # -------------------------------------------------------------------------
@@ -334,6 +339,7 @@ sed -e "s#\$version#%{bug_version}#g" -e 's/$variant/Cloud/;s/<!--.*-->//;/^$/d'
 sed -i -e "/^DEFAULT_HOSTNAME=/d" %{buildroot}%{_prefix}/lib/os-release.cloud
 install -Dm0644 %{SOURCE17} -t %{buildroot}%{_prefix}/lib/sysctl.d/
 install -Dm0644 %{SOURCE20} -t %{buildroot}%{_sysconfdir}/chrony.d/
+install -Dm0644 %{SOURCE21} -t %{buildroot}%{_prefix}/lib/systemd/networkd.conf.d/
 %endif
 
 %if %{with container}
@@ -400,6 +406,9 @@ install -Dm0644 %{SOURCE16} -t %{buildroot}%{_prefix}/share/dnf5/libdnf.conf.d/
 install -Dm0644 %{SOURCE18} -t %{buildroot}%{_unitdir}/
 install -Dm0755 %{SOURCE19} %{buildroot}%{_libexecdir}/proc-version-override
 
+# Install sysctl configuration
+install -Dm0644 %{SOURCE22} -t %{buildroot}%{_sysctldir}/
+
 
 %files common
 %license licenses/LICENSE
@@ -407,8 +416,6 @@ install -Dm0755 %{SOURCE19} %{buildroot}%{_libexecdir}/proc-version-override
 %{_prefix}/lib/system-release-cpe
 %{_sysconfdir}/os-release
 %{_sysconfdir}/azurelinux-release
-# TODO(azl): review
-# %{_sysconfdir}/azurelinux-release
 %{_sysconfdir}/system-release
 %{_sysconfdir}/system-release-cpe
 %attr(0644,root,root) %{_prefix}/lib/issue
@@ -430,6 +437,7 @@ install -Dm0755 %{SOURCE19} %{buildroot}%{_libexecdir}/proc-version-override
 %{_prefix}/share/dnf5/libdnf.conf.d/20-azurelinux-defaults.conf
 %{_unitdir}/proc-version-override.service
 %{_libexecdir}/proc-version-override
+%{_sysctldir}/70-azurelinux-hardening.conf
 
 
 %if %{with basic}
@@ -446,6 +454,7 @@ install -Dm0755 %{SOURCE19} %{buildroot}%{_libexecdir}/proc-version-override
 %attr(0644,root,root) %{_swidtagdir}/com.microsoft.AzureLinux-variant.swidtag.cloud
 %{_prefix}/lib/sysctl.d/20-azure.conf
 %{_sysconfdir}/chrony.d/chrony-azure.conf
+%{_prefix}/lib/systemd/networkd.conf.d/50-azure-cloud.conf
 %endif
 
 
@@ -467,13 +476,25 @@ install -Dm0755 %{SOURCE19} %{buildroot}%{_libexecdir}/proc-version-override
 
 
 %changelog
+* Fri Apr 17 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-9
+- Add sysctl config for system hardening
+
+* Wed Apr 15 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-8
+- Set prerelease name
+
+* Tue Apr 14 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-7
+- Update release name to Alpha2 and extend EOL date
+
+* Tue Apr 14 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-6
+- Enable networkd UseDomains= for cloud images
+
 * Thu Apr 09 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-5
 - Add ID_LIKE tag to os-release.
 
 * Wed Apr 08 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-4
 - Configure chrony to use Azure PTP timesource
 
-* Tue Apr 01 2026 Rachel Menge <rachelmenge@microsoft.com> - 4.0-3
+* Wed Apr 01 2026 Rachel Menge <rachelmenge@microsoft.com> - 4.0-3
 - Add proc-version-override service for Guest-Configuration-Extension compat
 
 * Fri Feb 27 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-2

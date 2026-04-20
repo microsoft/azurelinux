@@ -1,0 +1,18 @@
+[components.open-vm-tools]
+
+# Rename the source file to remove the literal '\' character so the repo can
+# be checked out on Windows for compliance scanning. '\' is invalid in file
+# names on Windows. The systemd unit name installed in the buildroot keeps
+# the '\x2d' escape (which systemd decodes to '-' inside a path segment) --
+# only the source filename in our git tree changes.
+[[components.open-vm-tools.overlays]]
+description = "Rename source file to remove '\\' (invalid on Windows filesystems)"
+type = "file-rename"
+file = 'run-vmblock\x2dfuse.mount'
+replacement = "run-vmblock-fuse.mount.in"
+
+[[components.open-vm-tools.overlays]]
+description = "Update Source3 reference to match renamed file"
+type = "spec-update-tag"
+tag = "Source3"
+value = "run-vmblock-fuse.mount.in"

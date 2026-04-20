@@ -4,8 +4,9 @@
 # for a cloud/server distro (teflon, opencl, asahi, d3d12, embedded ARM GPUs,
 # old AMD/Intel drivers, etc.). Keeps llvmpipe (SW raster), virgl (virtio-gpu),
 # radeonsi, iris/crocus, vmware (svga), and basic Vulkan.
+# Re-enable with_va (disabled by RHEL profile) for rocdecode/rocjpeg.
 [components.mesa.build]
-defines = { rhel = "10" }
+defines = { rhel = "10", with_va = "1" }
 
 # RHEL uses rust-toolset (a meta-package) instead of cargo-rpm-macros for Rust
 # builds. AZL doesn't have rust-toolset — use cargo-rpm-macros like Fedora.
