@@ -1787,8 +1787,8 @@
         "type": "other",
         "other": {
           "name": "clamav",
-          "version": "1.0.9",
-          "downloadUrl": "https://github.com/Cisco-Talos/clamav/archive/refs/tags/clamav-1.0.9.tar.gz"
+          "version": "1.5.2",
+          "downloadUrl": "https://github.com/Cisco-Talos/clamav/archive/refs/tags/clamav-1.5.2.tar.gz"
         }
       }
     },
@@ -2067,8 +2067,8 @@
         "type": "other",
         "other": {
           "name": "containerd2",
-          "version": "2.0.0",
-          "downloadUrl": "https://github.com/containerd/containerd/archive/v2.0.0.tar.gz"
+          "version": "2.1.6",
+          "downloadUrl": "https://github.com/containerd/containerd/archive/v2.1.6.tar.gz"
         }
       }
     },
@@ -2427,8 +2427,8 @@
         "type": "other",
         "other": {
           "name": "cups",
-          "version": "2.4.16",
-          "downloadUrl": "https://github.com/OpenPrinting/cups/releases/download/v2.4.16/cups-2.4.16-source.tar.gz"
+          "version": "2.4.17",
+          "downloadUrl": "https://github.com/OpenPrinting/cups/releases/download/v2.4.17/cups-2.4.17-source.tar.gz"
         }
       }
     },
