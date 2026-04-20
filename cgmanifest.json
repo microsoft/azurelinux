@@ -844,6 +844,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "axel",
+          "version": "2.17.14",
+          "downloadUrl": "https://github.com/axel-download-accelerator/axel/archive/v2.17.14/axel-2.17.14.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "azcopy",
           "version": "10.25.1",
           "downloadUrl": "https://github.com/Azure/azure-storage-azcopy/archive/refs/tags/v10.25.1.tar.gz"
@@ -29488,6 +29498,16 @@
           "name": "twolame",
           "version": "0.4.0",
           "downloadUrl": "https://downloads.sourceforge.net/twolame/twolame-0.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "txt2man",
+          "version": "1.7.1",
+          "downloadUrl": "https://github.com/mvertes/txt2man/archive/txt2man-1.7.1.tar.gz"
         }
       }
     },

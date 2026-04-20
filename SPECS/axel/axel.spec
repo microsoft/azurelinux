@@ -50,7 +50,7 @@ install -m 644 -p -T doc/axelrc.example %{buildroot}%{_sysconfdir}/axelrc
 
 %changelog
 * Sun Apr 20 2026 Zhichun Wan <zhichunwan@microsoft.com> - 2.17.14-4
-- Initial Azure Linux import from Fedora 42 (license: GPL-2.0-or-later).
+- Initial Azure Linux import from Fedora 45 (license: MIT).
 - License verified.
 
 * Thu Jan 16 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.17.14-3

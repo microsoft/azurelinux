@@ -48,7 +48,7 @@ install -p -m 0644 -D txt2man.1 $RPM_BUILD_ROOT%{_mandir}/man1/txt2man.1
 
 %changelog
 * Sun Apr 20 2026 Zhichun Wan <zhichunwan@microsoft.com> - 1.7.1-12
-- Initial Azure Linux import from Fedora 44 (license: GPL-2.0-or-later).
+- Initial Azure Linux import from Fedora 45 (license: MIT).
 - License verified.
 
 * Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.7.1-11
