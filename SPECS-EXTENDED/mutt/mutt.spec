@@ -1,3 +1,5 @@
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 %bcond_without debug
 %bcond_without imap
 %bcond_without pop
@@ -14,102 +16,105 @@
 %bcond_with gdbm
 %bcond_without gpgme
 %bcond_without sidebar
+ 
+%{!?_pkgdocdir: %global _pkgdocdir %{_docdir}/%{name}-%{version}}
+ 
+Summary: A text mode mail user agent
+Name: mutt
+Version: 2.2.13
+Release: 1%{?dist}
+Epoch: 5
+# The entire source code is GPLv2+ except
+# pgpewrap.c setenv.c sha1.c wcwidth.c which are Public Domain
+License: GPL-2.0-or-later AND LicenseRef-Fedora-Public-Domain
+# hg snapshot created from http://dev.mutt.org/hg/mutt
+Source: ftp://ftp.mutt.org/pub/%{name}/%{name}-%{version}.tar.gz
+Source1: mutt_ldap_query
+Patch1: mutt-1.10.0-muttrc.patch             
+Patch2: mutt-1.8.0-cabundle.patch
+# https://dev.mutt.org/trac/ticket/3569
+Patch3: mutt-1.7.0-syncdebug.patch
+# FIXME make it to upstream
+Patch8: mutt-1.5.23-system_certs.patch
+Patch9: mutt-1.9.0-ssl_ciphers.patch
+Patch10: mutt-1.9.4-lynx_no_backscapes.patch
+Patch12: mutt-1.9.5-nodotlock.patch
+Patch13: mutt-1.12.1-optusegpgagent.patch
+Patch14: mutt-configure-c99.patch
+ 
+Url: http://www.mutt.org
+Requires: mailcap, urlview
+BuildRequires: make
+BuildRequires: gcc
+BuildRequires: ncurses-devel, gettext, automake
+# manual generation
+BuildRequires: /usr/bin/xsltproc, docbook-style-xsl, perl-interpreter
+BuildRequires: perl-generators
+BuildRequires: lynx
+BuildRequires: perl(Digest::MD5)
+ 
 %if %{with hcache}
 %{?with_tokyocabinet:BuildRequires: tokyocabinet-devel}
 %{?with_bdb:BuildRequires: db4-devel}
 %{?with_qdbm:BuildRequires: qdbm-devel}
 %{?with_gdbm:BuildRequires: gdbm-devel}
 %endif
+ 
 %if %{with imap} || %{with pop} || %{with smtp}
 %{?with_gnutls:BuildRequires: gnutls-devel}
 %{?with_sasl:BuildRequires: cyrus-sasl-devel}
 %endif
+ 
 %if %{with imap}
 %{?with_gss:BuildRequires: krb5-devel}
 %endif
-Summary:        A text mode mail user agent
-Name:           mutt
-Version:        2.2.12
-Release:        1%{?dist}
-# The entire source code is GPLv2+ except
-# pgpewrap.c setenv.c sha1.c wcwidth.c which are Public Domain
-License:        GPLv2+ AND Public Domain
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            https://www.mutt.org
-# hg snapshot created from http://dev.mutt.org/hg/mutt
-Source:         ftp://ftp.mutt.org/pub/%{name}/%{name}-%{version}.tar.gz
-Source1:        mutt_ldap_query
-Patch1:         mutt-1.10.0-muttrc.patch
-Patch2:         mutt-1.8.0-cabundle.patch
-# https://dev.mutt.org/trac/ticket/3569
-Patch3:         mutt-1.7.0-syncdebug.patch
-# FIXME make it to upstream
-Patch8:         mutt-2.2.12-system_certs.patch
-Patch9:         mutt-1.9.0-ssl_ciphers.patch
-Patch10:        mutt-2.2.12-lynx_no_backscapes.patch
-Patch12:        mutt-1.9.5-nodotlock.patch
-Patch13:        mutt-1.12.1-optusegpgagent.patch
-Patch14:        mutt_disable_ssl_enforce.patch
-%{!?_pkgdocdir: %global _pkgdocdir %{_docdir}/%{name}-%{version}}
+ 
 %{?with_idn:BuildRequires: libidn-devel}
 %{?with_idn2:BuildRequires: libidn2-devel}
 %{?with_gpgme:BuildRequires: gpgme-devel}
-# manual generation
-BuildRequires:  %{_bindir}/xsltproc
-BuildRequires:  automake
-BuildRequires:  docbook-style-xsl
-BuildRequires:  docbook2X
-BuildRequires:  gcc
-BuildRequires:  gettext
-BuildRequires:  lynx
-BuildRequires:  make
-BuildRequires:  ncurses-devel
-BuildRequires:  perl-generators
-BuildRequires:  perl-interpreter
-Requires:       mailcap
-Requires:       urlview
-
+ 
+ 
 %description
 Mutt is a small but very powerful text-based MIME mail client.  Mutt
 is highly configurable, and is well suited to the mail power user with
 advanced features like key bindings, keyboard macros, mail threading,
 regular expression searches and a powerful pattern matching language
 for selecting groups of messages.
-
+ 
+ 
 %prep
 # unpack; cd
 %setup -q
 # do not run ./prepare -V, because it also runs ./configure
-
-%patch 10 -p1 -b .lynx_no_backscapes
-%patch 12 -p1 -b .nodotlock
-
+ 
+%patch -P10 -p1 -b .lynx_no_backscapes
+%patch -P12 -p1 -b .nodotlock
+%patch -P14 -p1
+ 
 autoreconf --install
-%patch 1 -p1 -b .muttrc
-%patch 2 -p1 -b .cabundle
-%patch 3 -p1 -b .syncdebug
-%patch 8 -p1 -b .system_certs
-%patch 9 -p1 -b .ssl_ciphers
-%patch 13 -p1 -b .optusegpgagent
-%patch 14 -p1
-
+%patch -P1 -p1 -b .muttrc
+%patch -P2 -p1 -b .cabundle
+%patch -P3 -p1 -b .syncdebug
+%patch -P8 -p1 -b .system_certs
+%patch -P9 -p1 -b .ssl_ciphers
+%patch -P13 -p1 -b .optusegpgagent
+ 
 sed -i -r 's/`$GPGME_CONFIG --libs`/"\0 -lgpg-error"/' configure
-
+ 
 install -p -m644 %{SOURCE1} mutt_ldap_query
-
+ 
 %global hgreldate \\.(201[0-9])([0-1][0-9])([0-3][0-9])hg
 if echo %{release} | grep -E -q '%{hgreldate}'; then
   echo -n 'const char *ReleaseDate = ' > reldate.h
   echo %{release} | sed -r 's/.*%{hgreldate}.*/"\1-\2-\3";/' >> reldate.h
 fi
-
+ 
 # remove mutt_ssl.c to be sure it won't be used because it violates
 # Packaging:CryptoPolicies
 # https://fedoraproject.org/wiki/Packaging:CryptoPolicies
 rm -f mutt_ssl.c
-
-
+ 
+ 
 %build
 %configure \
     SENDMAIL=%{_sbindir}/sendmail \
@@ -143,30 +148,33 @@ rm -f mutt_ssl.c
     %{?with_gpgme:	--enable-gpgme} \
     %{?with_sidebar: --enable-sidebar} \
     --with-docdir=%{_pkgdocdir}
-
+ 
 %make_build
-
 # remove unique id in manual.html because multilib conflicts
 sed -i -r 's/<a id="id[a-z0-9]\+">/<a id="id">/g' doc/manual.html
-
-
+ 
+# fix the shebang in mutt_oauth2.py & preserve the time stamp
+oauth2_script="contrib/mutt_oauth2.py"
+t=$(stat -c %y "${oauth2_script}")
+sed -i "s:^#\!/usr/bin/env\s\+python3\s\?$:#!%{python3}:" "${oauth2_script}"
+touch -d "$t" "${oauth2_script}"
+ 
 %install
 %make_install
-
 # we like GPG here
 cat contrib/gpg.rc >> \
       %{buildroot}%{_sysconfdir}/Muttrc
-
+ 
 grep -5 "^color" contrib/sample.muttrc >> \
       %{buildroot}%{_sysconfdir}/Muttrc
-
+ 
 cat >> %{buildroot}%{_sysconfdir}/Muttrc <<\EOF
 source %{_sysconfdir}/Muttrc.local
 EOF
-
+ 
 echo "# Local configuration for Mutt." > \
       %{buildroot}%{_sysconfdir}/Muttrc.local
-
+ 
 # remove unpackaged files from the buildroot
 rm -f %{buildroot}%{_sysconfdir}/*.dist
 rm -f %{buildroot}%{_sysconfdir}/mime.types
@@ -180,20 +188,21 @@ rm -f %{buildroot}%{_mandir}/man1/flea.1*
 rm -f %{buildroot}%{_mandir}/man5/mbox.5*
 rm -f %{buildroot}%{_mandir}/man5/mmdf.5*
 rm -rf %{buildroot}%{_pkgdocdir}
-
+ 
 # remove /usr/share/info/dir
 rm %{buildroot}%{_infodir}/dir
-
+ 
 # provide muttrc.local(5): the same as muttrc(5)
 ln -sf ./muttrc.5 %{buildroot}%{_mandir}/man5/muttrc.local.5
-
+ 
 %find_lang %{name}
-
-
+ 
+ 
 %files -f %{name}.lang
 %{!?_licensedir:%global license %doc}
 %license COPYRIGHT GPL
 %doc ChangeLog NEWS README* UPDATING mutt_ldap_query
+%doc contrib/mutt_oauth2.py contrib/mutt_oauth2.py.README
 %doc contrib/*.rc contrib/sample.* contrib/colors.*
 %doc doc/manual.html doc/manual.txt doc/smime-notes.txt
 %config(noreplace) %{_sysconfdir}/Muttrc
@@ -210,6 +219,10 @@ ln -sf ./muttrc.5 %{buildroot}%{_mandir}/man5/muttrc.local.5
 %{_infodir}/mutt.info.*
 
 %changelog
+* Mon Feb 24 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 2.2.13
+- Upgrade to version 2.2.13
+- License verified
+
 * Wed Sep 20 2023 Archana Choudhary <archana1@microsoft.com> - 2.2.12-1
 - Upgrade to 2.2.12 -  CVE-2022-1328 CVE-2023-4875  CVE-2023-4874
 - Update Patches
