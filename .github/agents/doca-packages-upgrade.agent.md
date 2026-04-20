@@ -138,6 +138,7 @@ When asked to upgrade a DOCA package, follow these steps:
    - Set `Release: 1%{release_suffix}%{?dist}` (reset to 1 for new version)
    - Update source URL comment
    - Use `%setup -n %{_name}-%{version}` (not `%{_version}`)
+   - **Source-filename macros**: Some packages (e.g., `perftest`) use macros like `%global extended_release` that appear in the `Source0:` URL and must match the actual tarball filename. After copying the new tarball, always verify the tarball filename matches what the SPEC's `Source0:` expands to. Compare the actual tarball name (`ls SPECS/<pkg>/*.tar.gz`) against the SPEC's source macros and update any stale macros accordingly.
 
 10. **Add changelog entry** at the top:
     ```
@@ -387,4 +388,136 @@ After completing a batch upgrade, report a summary table:
 | clusterkit | Added | - | 1.15.472 | New in DOCA 3.2.2 |
 | xpmem-lib | Removed | 2.7 | - | Gone from DOCA 3.2.2 |
 | ... | | | | |
+  ```
+
+---
+
+## Build Validation and Error Resolution
+
+After generating all SPECs, tarballs, and signatures, **build all packages locally** and iterate on failures. This is a critical loop — expect multiple rounds. Ask the user if they want you to proceed with building and iterating on errors.
+
+### Step 1: Run the Build
+
+Build all DOCA packages in one command:
+```bash
+cd /space/azurelinux/toolkit
+sudo make build-packages -j$(nproc) REBUILD_TOOLS=y DAILY_BUILD_ID=lkg \
+  SRPM_PACK_LIST="pkg1 pkg2 pkg3 ..."
+```
+On subsequent iterations, add `REFRESH_WORKER_CHROOT=n` to speed things up.
+
+### Step 2: Identify Failures
+
+Check which packages failed:
+```bash
+for f in build/logs/pkggen/rpmbuilding/*.log; do
+  if grep -q 'RPM build errors\|exit 1' "$f" 2>/dev/null; then
+    echo "FAILED: $(basename $f)"
+  fi
+done
+```
+
+Also check the SRPM packer log for dependency resolution failures (packages that never attempted to build):
+```bash
+grep -E 'Unresolved|Failed to resolve' build/logs/pkggen/workplan/cached_graph.dot.log
+```
+
+### Step 3: Analyze Each Failure
+
+For each failed package, extract the **root cause** from the build log:
+```bash
+grep -E 'error:|Error|fatal|FAILED|No such file|cannot find|undefined' \
+  build/logs/pkggen/rpmbuilding/<package>*.log | grep -v 'macros.release' | tail -10
+```
+
+For deeper context, look **before** the `RPM build errors` line:
+```bash
+grep -B20 'RPM build errors' build/logs/pkggen/rpmbuilding/<package>*.log | tail -25
+```
+
+### Step 4: Apply Fixes and Iterate
+
+Fix the SPEC (or add patches), then rebuild. Common patterns:
+
+#### Common Build Errors and Fixes
+
+| Error Pattern | Root Cause | Fix |
+|--------------|------------|-----|
+| `./configure: No such file or directory` | Tarball ships `autogen.sh` but no pre-built `configure` | Add `./autogen.sh` or `autoreconf -fiv` before `./configure` in `%build`; add `BuildRequires: autoconf automake libtool` |
+| `Installed (but unpackaged) file(s) found` | New version installs files not listed in `%files` | Compare new upstream `%files` with AzureLinux spec; add missing entries to appropriate `%files` sections |
+| `No matching package: <pkg>` or `Unresolved` in workplan | BuildRequires references a package that doesn't exist in AzureLinux | Check actual RPM name (e.g., `python3-pyelftools` not `pyelftools`); check if the package has subpackages |
+| `configure: error: ...not found` | Missing development library | Add the appropriate `-devel` package to BuildRequires; check distro conditionals (e.g., `%if 0%{?rhel}`) that may skip AzureLinux — add `\|\| 0%{?azl}` |
+| `fatal error: <header>.h: No such file or directory` | Missing header from a dependency | Identify which package provides the header; add it to BuildRequires |
+| `exported twice. Previous export was in vmlinux` | Kernel module exports symbols already built into the kernel | Kernel config incompatibility — cannot fix in SPEC. May need kernel config change or package exclusion. |
+| `conflicting declaration of C function` | C vs C++ linkage mismatch (e.g., `const` correctness) | Generate a patch to fix the configure check or source code (see "Generating Patches" below) |
+| `CC` empty / `DHAVE_CONFIG_H: command not found` | Makefile uses `$(MPICC)` or similar that's undefined | Pass `CC=%{__cc}` in make, or add the required compiler wrapper (e.g., `openmpi-devel`) |
+| `Compiler doesn't support link time optimization` | Configure checks for LTO which isn't available | Add `--disable-lto` to configure options |
+| `install: cannot stat '<file>'` | File was removed/renamed in new upstream version | Compare new upstream `%install` section and remove the stale install line |
+
+#### Distro Conditional Gaps
+
+DOCA upstream SPECs often gate dependencies behind `%if 0%{?rhel} || 0%{?fedora} || 0%{?suse_version}` which **does not match AzureLinux**. When you see a missing dependency that IS available in AzureLinux but the BuildRequires is inside such a conditional, add `|| 0%{?azl}` to the condition:
+```
+%if 0%{?rhel} >= 7 || 0%{?fedora} >= 24 || 0%{?suse_version} >= 1500 || 0%{?azl}
+BuildRequires: pkgconfig(libnl-3.0)
+%endif
+```
+
+#### Proprietary / Unavailable Dependencies
+
+Some DOCA packages depend on NVIDIA proprietary tools not available in AzureLinux:
+- **`mft`** (Mellanox Firmware Tools) — remove `BuildRequires: mft` and pass `WITHOUT_FW_TOOLS=yes` to make if the Makefile defaults to `WITH_MFT=yes`
+- **NVIDIA custom `rdma-core`** — some packages (e.g., `mlnx-dpdk`) expect NVIDIA's forked rdma-core with MLX5 extensions. These may not build against upstream rdma-core.
+
+#### Stale SRPM Cache
+
+If a SPEC fix doesn't take effect, the build system may be reusing a cached SRPM. Clear it:
+```bash
+sudo rm -rf ../build/SRPM_packaging/ ../build/INTERMEDIATE_SRPMS/
+```
+
+### Generating Patches
+
+When the source code itself needs fixing (not just the SPEC), generate a patch:
+
+1. **Extract the tarball** to `/tmp/`:
+   ```bash
+   cd /tmp && tar xzf /space/azurelinux/SPECS/<pkg>/<tarball>
+   ```
+
+2. **Make a backup**, apply the fix, then generate the diff:
+   ```bash
+   cp <file> <file>.orig
+   # ... edit <file> ...
+   diff -u <file>.orig <file> > /space/azurelinux/SPECS/<pkg>/fix-description.patch
+   ```
+
+3. **Add the patch to the SPEC**:
+   ```
+   Source0: ...
+   Patch0:  fix-description.patch
+   ```
+   In `%prep`:
+   ```
+   %setup -q
+   %patch0 -p0
+   ```
+   Use `-p0` if the diff paths are bare filenames, `-p1` if prefixed with `a/`/`b/`.
+
+4. **Patches do NOT need signatures** — only source tarballs go in `signatures.json`.
+
+### Iteration Checklist
+
+After each build-fix cycle:
+- [ ] Check total pass/fail count — are we making progress?
+- [ ] Verify new builds actually ran (check log timestamps, not stale cached logs)
+- [ ] For "Unresolved" dependencies, check the workplan log, not the build log
+- [ ] Report a summary table to the user after each iteration:
+
+```
+| Package | Status | Error | Fix Applied |
+|---------|--------|-------|-------------|
+| sockperf | FIXED | missing ./configure | Added autogen.sh + autotools BuildRequires |
+| libxlio | FIXED | recvmmsg const mismatch | Patch to use C++ in configure check |
+| mlnx-nvme | BLOCKED | kernel NVMe built-in | Cannot fix in SPEC |
 ```
