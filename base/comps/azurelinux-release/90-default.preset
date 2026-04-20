@@ -365,8 +365,8 @@ enable cloud-init-local.service
 enable kernel-bootcfg-boot-successful.service
 
 # Enable lvm-devices-import
-enable /usr/lib/systemd/system/lvm-devices-import.path
-enable /usr/lib/systemd/system/lvm-devices-import.service
+enable lvm-devices-import.path
+enable lvm-devices-import.service
 
 # Enable fips-crypto-policy-overlay
 enable fips-crypto-policy-overlay.service
