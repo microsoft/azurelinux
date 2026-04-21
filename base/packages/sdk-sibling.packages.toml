@@ -6582,7 +6582,6 @@ packages = [
     "xfce4-about",
     "xine-lib-extras",
     "xmvn5",
-    "xmvn5-toolchain-openjdk21",
     "xorg-x11-drv-evdev",
     "xorg-x11-drv-libinput-devel",
     "xorg-x11-server-Xwayland-devel",
