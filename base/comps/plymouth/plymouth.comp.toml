@@ -1,0 +1,17 @@
+[components.plymouth]
+
+# Drop the plymouth-theme-charge subpackage — it requires fedora-logos-classic,
+# which does not exist in Azure Linux. The theme is Fedora-specific branding
+# ("shadowy hull of a Fedora logo") with no AZL equivalent needed.
+# The upstream spec gates it behind %if ! 0%{?rhel}, which excludes it on RHEL
+# but not on AZL (since %rhel is undefined on our builders).
+# Upstream: https://src.fedoraproject.org/rpms/plymouth
+# Ref: microsoft/azurelinux#18865
+#
+# Intentionally unscoped — the same guard appears in 4 spec sections
+# (%package, %install, %postun, %files) and all must be disabled.
+[[components.plymouth.overlays]]
+description = "Disable Fedora-specific charge theme subpackage (plymouth-theme-charge) — requires fedora-logos-classic which AZL does not ship"
+type = "spec-search-replace"
+regex = '^%if ! 0%\{\?rhel\}$'
+replacement = '%if 0'
