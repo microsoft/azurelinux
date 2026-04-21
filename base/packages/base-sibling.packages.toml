@@ -1768,7 +1768,6 @@ packages = [
     "maven-reporting-api-javadoc",
     "maven-reporting-impl-javadoc",
     "maven4",
-    "maven4-openjdk21",
     "maven4-openjdk25",
     "maven4-unbound",
     "mbedtls-devel",
