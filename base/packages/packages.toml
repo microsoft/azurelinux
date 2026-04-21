@@ -1,14 +1,17 @@
 #
 # Package publish configuration
 #
-# Project-wide default: all packages publish to rpm-sdk-debuginfo unless
-# overridden by a package group (base, sdk, base-debuginfo).
+# Project-wide default: unless otherwise specified, packages are published to sdk.
 #
 # Group overrides are split into separate files:
-#   base.packages.toml           -> rpm-base
-#   sdk.packages.toml            -> rpm-sdk
-#   base-debuginfo.packages.toml -> rpm-base-debuginfo
+#   base.packages.toml            -> rpm-base
+#   base-sibling.packages.toml    -> rpm-sdk
+#   sdk.packages.toml             -> rpm-sdk
+#   sdk-sibling.packages.toml     -> rpm-sdk
+#   todo.packages.toml            -> rpm-sdk
 #
 
+includes = ["*.packages.toml"]
+
 [default-package-config]
-publish = { channel = "rpm-sdk-debuginfo" }
+publish = { channel = "rpm-sdk" }

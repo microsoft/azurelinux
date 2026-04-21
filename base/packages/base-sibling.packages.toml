@@ -1,9 +1,15 @@
 #
-# base-debuginfo-packages publish configuration
+# base-sibling-packages publish configuration
 #
 
-[package-groups.base-debuginfo-packages]
-description = "base-debuginfo packages"
+# This group contains sub-packages that are "siblings" to packages
+# in `base`. In other words, none of these packages were intentionally
+# selected for inclusion in `base`, but they were produced by building
+# source components that also produced packages that *were* intentionally
+# selected for inclusion in `base`.
+[package-groups.base-sibling-packages]
+description = "base sibling packages"
+default-package-config.publish.channel = "rpm-sdk"
 packages = [
     "DevIL-ILUT",
     "DevIL-ILUT-devel",
@@ -3575,6 +3581,3 @@ packages = [
     "zypp-tools",
     "zypper",
 ]
-
-[package-groups.base-debuginfo-packages.default-package-config.publish]
-channel = "rpm-base-debuginfo"

@@ -2,8 +2,14 @@
 # sdk-packages publish configuration
 #
 
+# This group includes the set of packages that are not already in `base` but
+# required to *build* the packages present in `base`. This set of packages is
+# also recursively closed under build and runtime dependencies. In other words,
+# the packages present here along with the packages in `base` are sufficient
+# to build all packages in `base` and all packages here.
 [package-groups.sdk-packages]
 description = "sdk packages"
+default-package-config.publish.channel = "rpm-sdk"
 packages = [
     "7zip",
     "AMF-devel",
@@ -8951,6 +8957,3 @@ packages = [
     "zopfli",
     "zstr-devel",
 ]
-
-[package-groups.sdk-packages.default-package-config.publish]
-channel = "rpm-sdk"
