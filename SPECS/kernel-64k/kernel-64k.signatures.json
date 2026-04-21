@@ -1,10 +1,10 @@
 {
   "Signatures": {
     "azurelinux-ca-20230216.pem": "d545401163c75878319f01470455e6bc18a5968e39dd964323225e3fe308849b",
-    "config_aarch64": "e38e4c32ed2139f7e10fe023a52b2b611a0a633f9ee5245876827fe0fa76c9c8",
+    "config_aarch64": "1db1da67daeff6e00d0add8c1bbb7514a64792c708663ba306806e9fd2cb369e",
     "cpupower": "d7518767bf2b1110d146a49c7d42e76b803f45eb8bd14d931aa6d0d346fae985",
     "cpupower.service": "b057fe9e5d0e8c36f485818286b80e3eba8ff66ff44797940e99b1fd5361bb98",
     "sha512hmac-openssl.sh": "02ab91329c4be09ee66d759e4d23ac875037c3b56e5a598e32fd1206da06a27f",
-    "kernel-6.6.130.1.tar.gz": "a70e6b9e45f8adf8c6b0b67032f43b682fa2f60c39845e7256278234c69b171e"
+    "kernel-6.6.135.1.tar.gz": "8c413d7fa0cd4da1ad4dd7613b9863a8850ac128d35f7d9e9eae3fe26c38cf32"
   }
 }
