@@ -13,11 +13,5 @@ origin = { type = "download", uri = "https://github.com/NVIDIA/open-gpu-kernel-m
 [[component-templates.kmod-nvidia-open.matrix]]
 axis = "kernel"
 
-# Each value represents a kernel flavour. The key becomes part of the
-# expanded component name (e.g. kmod-nvidia-open-default).
-# The spec uses %{kernel_flavour-} in BuildRequires — when empty it
-# resolves to "kernel-devel" (the default unsuffixed kernel).
-# To add a new flavour, add a new entry here (e.g. [....values.hci.build]
-# defines = { kernel_flavour = "hci" }).
 [component-templates.kmod-nvidia-open.matrix.values.default.build]
-defines = { kernel_flavour = "" }
+defines = { kernel_devel_pkg_name = "kernel-devel" }

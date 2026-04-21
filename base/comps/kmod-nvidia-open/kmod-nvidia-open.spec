@@ -5,19 +5,23 @@
 # so automatic debuginfo extraction fails with empty debugsourcefiles.list.
 %global debug_package %{nil}
 
-# Auto-detect the kernel version from the installed kernel-devel package.
-# The kernel-devel package installs headers to /usr/src/kernels/<uname-r>.
-# This is resolved at RPM build time (inside mock), after BuildRequires
-# are installed — so the directory will exist.
-#
-# To override: rpmbuild --define 'kernel_uname_r 6.18.5-1.4.azl4.x86_64'
-%{!?kernel_uname_r: %global kernel_uname_r %(ls -1 /usr/src/kernels/ 2>/dev/null | sort -V | tail -1)}
+# Detect the kernel version from the installed kernel-devel package at
+# RPM build time. Uses Lua to suppress errors during SRPM build when
+# kernel-devel is not yet installed.
+%{!?kernel_uname_r: %{lua:
+  local handle = io.popen("rpm -q --qf '%{VERSION}-%{RELEASE}.%{ARCH}' " .. rpm.expand("%{kernel_devel_pkg_name}") .. " 2>/dev/null")
+  local result = handle:read("*a")
+  handle:close()
+  if result and result ~= "" and not result:match("^package") then
+    rpm.define("kernel_uname_r " .. result)
+  end
+}}
 
 %global kmod_install_dir /lib/modules/%{kernel_uname_r}/extra/nvidia
 
 Name:           kmod-nvidia-open
 Version:        595.58.03
-Release:        3_%{kernel_uname_r}%{?dist}
+Release:        3%{?dist}
 Summary:        NVIDIA open GPU kernel modules for CUDA workloads
 License:        MIT AND GPLv2
 URL:            https://github.com/NVIDIA/open-gpu-kernel-modules
@@ -28,24 +32,25 @@ ExclusiveArch:  x86_64 aarch64
 Source0:        https://github.com/NVIDIA/open-gpu-kernel-modules/archive/refs/tags/%{version}.tar.gz#/open-gpu-kernel-modules-%{version}.tar.gz
 Source1:        kmod-nvidia-open-modprobe.conf
 
-BuildRequires:  kernel-%{kernel_flavour-}devel # macro expands by azldev. if not set it falls back to the default kernel
+BuildRequires:  %{kernel_devel_pkg_name}
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  make
 BuildRequires:  elfutils-libelf-devel
 BuildRequires:  binutils
 
-Requires:       kernel-uname-r = %{kernel_uname_r}
+%{?kernel_uname_r:Requires:       kernel-uname-r = %{kernel_uname_r}}
 Requires(post): kmod
 Requires(postun): kmod
 
 Provides:       nvidia-open-kmod = %{version}-%{release}
 Provides:       kmod-nvidia-open = %{version}-%{release}
-Provides:       kmod-nvidia-open-%{kernel_uname_r} = %{version}-%{release}
+%{?kernel_uname_r:Provides:       kmod-nvidia-open-%{kernel_uname_r} = %{version}-%{release}}
 
 # Prevent conflicting NVIDIA driver packages from being installed
-Conflicts:      nvidia-closed-kmod # provided by Azure Linux
-Conflicts:      nvidia-open # provided by Nvidia
+# nvidia-closed-kmod is provided by Azure Linux; nvidia-open is provided by Nvidia
+Conflicts:      nvidia-closed-kmod
+Conflicts:      nvidia-open
 
 %description
 Open-source NVIDIA GPU kernel modules built from the official
