@@ -96,7 +96,6 @@ stages:
                 echo "##[endgroup]"
                 echo "##[warning]Specs are not up to date. Ignoring until main branch is updated and stable."
                 # TODO: Re-enabled failing once specs in the main branch are updated and stable.
-                #       ADO task: 
                 # exit 1
               fi
             displayName: "Verify rendered specs are up to date"
@@ -174,7 +173,6 @@ stages:
                   --build-reason "$BUILD_REASON" \
                   --components "$COMPONENTS" \
                   --source-commit "$SOURCE_COMMIT" \
-                  --target-commit "$TARGET_COMMIT" \
                   --repo-uri "$UPSTREAM_REPO_URL"
             env:
               API_AUDIENCE: $(ApiAudience)
@@ -182,5 +180,7 @@ stages:
               BUILD_REASON: $(Build.Reason)
               COMPONENTS: $(components)
               SOURCE_COMMIT: $(sourceCommit)
+              # Target commit is not used. Will be needed once we move detection of affected components to CT.
+              # ADO task: https://dev.azure.com/mariner-org/mariner/_workitems/edit/18816
               TARGET_COMMIT: $(targetCommit)
               UPSTREAM_REPO_URL: $(Build.Repository.Uri)
