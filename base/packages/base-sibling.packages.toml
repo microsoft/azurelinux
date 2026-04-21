@@ -2569,7 +2569,6 @@ packages = [
     "python3-rados",
     "python3-rbd",
     "python3-requests+security",
-    "python3-requests+socks",
     "python3-rfc3987",
     "python3-rgw",
     "python3-sanlock",
