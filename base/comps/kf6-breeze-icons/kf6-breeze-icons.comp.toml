@@ -1,0 +1,18 @@
+[components.kf6-breeze-icons]
+
+# Drop the breeze-icon-theme-fedora subpackage — it requires fedora-release-common,
+# which does not exist in Azure Linux. The upstream spec gates this subpackage behind
+# %if 0%{?fedora}, but %fedora is set on our builders, so we must force the guard off.
+# The base breeze-icon-theme package is unaffected.
+# Upstream package context: https://src.fedoraproject.org/rpms/kf6-breeze-icons
+# Ref: microsoft/azurelinux#18865
+#
+# spec-remove-section cannot be used here because each fedora-specific block is
+# wrapped in %if 0%{?fedora} / %endif — removing the section eats the %endif,
+# leaving an unclosed %if. Intentionally unscoped — the same guard appears in 4
+# locations (%package, %install, %files x2) and all must be disabled.
+[[components.kf6-breeze-icons.overlays]]
+description = "Disable Fedora-specific icon subpackage (breeze-icon-theme-fedora) — requires fedora-release-common which AZL does not ship"
+type = "spec-search-replace"
+regex = '^%if\s+0%\{\?fedora\}\s*$'
+replacement = '%if 0'
