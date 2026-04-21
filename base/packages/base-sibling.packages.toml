@@ -1778,6 +1778,7 @@ packages = [
     "mesa-demos",
     "mesa-libEGL-devel",
     "mesa-libgbm-devel",
+    "mesa-va-drivers",
     "mesa-vulkan-drivers",
     "mingw32-check",
     "mingw32-eigen3",
