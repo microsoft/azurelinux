@@ -71,7 +71,7 @@ def _parse_args() -> argparse.Namespace:
         type=_parse_components,
         help="Comma-separated list of affected component names",
     )
-    parser.add_argument("--source-commit", required=True, help="Source commit SHA")
+    parser.add_argument("--source-commit", default=None, help="Source commit SHA")
     parser.add_argument(
         "--source-branch",
         default=None,
@@ -410,8 +410,9 @@ def main() -> None:
         "components": args.components,
         "buildReason": args.build_reason,
         "repoUri": args.repo_uri,
-        "sourceCommitSha": args.source_commit,
     }
+    if args.source_commit is not None:
+        payload["sourceCommitSha"] = args.source_commit
     if args.source_branch is not None:
         payload["sourceBranch"] = args.source_branch
     if args.target_commit is not None:
