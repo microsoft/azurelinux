@@ -6,10 +6,10 @@ spec = { type = "local", path = "nvidia-cuda-driver.spec" }
 filename = "NVIDIA-Linux-x86_64-595.58.03-no-compat32.run"
 hash-type = "SHA256"
 hash = "b66c59b9bebc191b9c21bad7476da1486dd390198223a548892110bca5fb91f9"
-origin = { type = "download", uri = "https://us.download.nvidia.com/XFree86/Linux-x86_64/595.58.03/NVIDIA-Linux-x86_64-595.58.03-no-compat32.run" }
+origin = { type = "download", uri = "https://download.nvidia.com/XFree86/Linux-x86_64/595.58.03/NVIDIA-Linux-x86_64-595.58.03-no-compat32.run" }
 
 [[components.nvidia-cuda-driver.source-files]]
 filename = "NVIDIA-Linux-aarch64-595.58.03.run"
 hash-type = "SHA256"
 hash = "873cc8298d537bc424081591f87e64d4507f1cad5480685a8ba725df011a3d3f"
-origin = { type = "download", uri = "https://us.download.nvidia.com/XFree86/Linux-aarch64/595.58.03/NVIDIA-Linux-aarch64-595.58.03.run" }
+origin = { type = "download", uri = "https://download.nvidia.com/XFree86/Linux-aarch64/595.58.03/NVIDIA-Linux-aarch64-595.58.03.run" }

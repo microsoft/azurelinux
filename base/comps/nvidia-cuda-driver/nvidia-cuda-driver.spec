@@ -19,6 +19,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 ExclusiveArch:  x86_64 aarch64
 
+BuildRequires:  systemd-rpm-macros
+
 # Architecture-specific .run installer
 # x86_64: use no-compat32 variant (64-bit only, smaller download)
 # aarch64: single variant (no 32-bit compat layer on ARM)
@@ -139,7 +141,7 @@ for lib in \
     libcuda.so.%{version} \
     libnvidia-ml.so.%{version} \
     libnvidia-ptxjitcompiler.so.%{version} \
-    libnvidia-nvvm.so.4.0.0 \
+    libnvidia-nvvm.so.%{version} \
     libnvidia-opencl.so.%{version} \
     libnvidia-cfg.so.%{version} \
     libnvidia-tls.so.%{version} \
@@ -168,7 +170,7 @@ done
 ln -sf libcuda.so.%{version}                    %{buildroot}%{nvidia_libdir}/libcuda.so.1
 ln -sf libnvidia-ml.so.%{version}               %{buildroot}%{nvidia_libdir}/libnvidia-ml.so.1
 ln -sf libnvidia-ptxjitcompiler.so.%{version}   %{buildroot}%{nvidia_libdir}/libnvidia-ptxjitcompiler.so.1
-ln -sf libnvidia-nvvm.so.4.0.0                  %{buildroot}%{nvidia_libdir}/libnvidia-nvvm.so.4
+ln -sf libnvidia-nvvm.so.%{version}               %{buildroot}%{nvidia_libdir}/libnvidia-nvvm.so.4
 ln -sf libnvidia-opencl.so.%{version}           %{buildroot}%{nvidia_libdir}/libnvidia-opencl.so.1
 ln -sf libnvidia-cfg.so.%{version}              %{buildroot}%{nvidia_libdir}/libnvidia-cfg.so.1
 ln -sf libcudadebugger.so.%{version}            %{buildroot}%{nvidia_libdir}/libcudadebugger.so.1
@@ -247,6 +249,9 @@ install -m 0644 %{SOURCE2} %{buildroot}%{_tmpfilesdir}/nvidia.conf
 %license nvidia-installer/LICENSE
 %doc nvidia-installer/README.txt
 %{_sysconfdir}/OpenCL/vendors/nvidia.icd
+%dir %{_datadir}/nvidia
+%dir %{_datadir}/nvidia/files.d
+%{_datadir}/nvidia/files.d/sandboxutils-filelist.json
 
 %files libs
 # Core CUDA / compute libraries
@@ -256,7 +261,7 @@ install -m 0644 %{SOURCE2} %{buildroot}%{_tmpfilesdir}/nvidia.conf
 %{nvidia_libdir}/libnvidia-ml.so.1
 %{nvidia_libdir}/libnvidia-ptxjitcompiler.so.%{version}
 %{nvidia_libdir}/libnvidia-ptxjitcompiler.so.1
-%{nvidia_libdir}/libnvidia-nvvm.so.4.0.0
+%{nvidia_libdir}/libnvidia-nvvm.so.%{version}
 %{nvidia_libdir}/libnvidia-nvvm.so.4
 %{nvidia_libdir}/libnvidia-opencl.so.%{version}
 %{nvidia_libdir}/libnvidia-opencl.so.1
@@ -303,7 +308,7 @@ install -m 0644 %{SOURCE2} %{buildroot}%{_tmpfilesdir}/nvidia.conf
 %{nvidia_libdir}/libnvidia-opticalflow.so
 
 %changelog
-* Thu Apr 10 2026 Elaheh Dehghani <edehghani@microsoft.com> - 595.58.03-1
+* Fri Apr 10 2026 Elaheh Dehghani <edehghani@microsoft.com> - 595.58.03-1
 - Initial Azure Linux 4.0 package (headless / compute-only)
 - User-space NVIDIA GPU driver components for CUDA workloads
 - Companion to kmod-nvidia-open (open-source kernel modules)

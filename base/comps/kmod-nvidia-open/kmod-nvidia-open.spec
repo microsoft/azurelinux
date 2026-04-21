@@ -5,23 +5,19 @@
 # so automatic debuginfo extraction fails with empty debugsourcefiles.list.
 %global debug_package %{nil}
 
-# Detect the kernel version from the installed kernel-devel package at
-# RPM build time. Uses Lua to suppress errors during SRPM build when
-# kernel-devel is not yet installed.
-%{!?kernel_uname_r: %{lua:
-  local handle = io.popen("rpm -q --qf '%{VERSION}-%{RELEASE}.%{ARCH}' " .. rpm.expand("%{kernel_devel_pkg_name}") .. " 2>/dev/null")
-  local result = handle:read("*a")
-  handle:close()
-  if result and result ~= "" and not result:match("^package") then
-    rpm.define("kernel_uname_r " .. result)
-  end
-}}
+# kernel_uname_r is provided as a build define from the comp.toml
+# as version-release without arch (e.g. "6.18.5.1-3.azl4").
+# The full uname-r (with arch) is constructed by appending %{_arch}.
+%global kernel_uname_r_full %{kernel_uname_r}.%{_arch}
 
-%global kmod_install_dir /lib/modules/%{kernel_uname_r}/extra/nvidia
+# Sanitize kernel version for the Release tag (hyphens are illegal in Release).
+%global kernel_rel_suffix %(echo %{kernel_uname_r} | sed 's/-/./g')
+
+%global kmod_install_dir /lib/modules/%{kernel_uname_r_full}/extra/nvidia
 
 Name:           kmod-nvidia-open
 Version:        595.58.03
-Release:        3%{?dist}
+Release:        1.%{kernel_rel_suffix}%{?dist}
 Summary:        NVIDIA open GPU kernel modules for CUDA workloads
 License:        MIT AND GPLv2
 URL:            https://github.com/NVIDIA/open-gpu-kernel-modules
@@ -32,20 +28,20 @@ ExclusiveArch:  x86_64 aarch64
 Source0:        https://github.com/NVIDIA/open-gpu-kernel-modules/archive/refs/tags/%{version}.tar.gz#/open-gpu-kernel-modules-%{version}.tar.gz
 Source1:        kmod-nvidia-open-modprobe.conf
 
-BuildRequires:  %{kernel_devel_pkg_name}
+BuildRequires:  %{kernel_devel_pkg_name} = %{kernel_uname_r}
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  make
 BuildRequires:  elfutils-libelf-devel
 BuildRequires:  binutils
 
-%{?kernel_uname_r:Requires:       kernel-uname-r = %{kernel_uname_r}}
+%{?kernel_uname_r:Requires:       kernel-uname-r = %{kernel_uname_r_full}}
 Requires(post): kmod
 Requires(postun): kmod
 
 Provides:       nvidia-open-kmod = %{version}-%{release}
 Provides:       kmod-nvidia-open = %{version}-%{release}
-%{?kernel_uname_r:Provides:       kmod-nvidia-open-%{kernel_uname_r} = %{version}-%{release}}
+%{?kernel_uname_r:Provides:       kmod-nvidia-open-%{kernel_uname_r_full} = %{version}-%{release}}
 
 # Prevent conflicting NVIDIA driver packages from being installed
 # nvidia-closed-kmod is provided by Azure Linux; nvidia-open is provided by Nvidia
@@ -54,7 +50,7 @@ Conflicts:      nvidia-open
 
 %description
 Open-source NVIDIA GPU kernel modules built from the official
-NVIDIA/open-gpu-kernel-modules repository for kernel %{kernel_uname_r}.
+NVIDIA/open-gpu-kernel-modules repository for kernel %{kernel_uname_r_full}.
 
 These modules support CUDA workloads on NVIDIA GPUs with compute
 capability 5.0 and later. The modules are built using the open-source
@@ -78,9 +74,9 @@ unset LDFLAGS
 # Build the open kernel modules
 # KERNEL_UNAME must match the target kernel exactly
 make %{?_smp_mflags} modules -j$(nproc) \
-    KERNEL_UNAME="%{kernel_uname_r}" \
-    SYSSRC="/usr/src/kernels/%{kernel_uname_r}" \
-    SYSOUT="/usr/src/kernels/%{kernel_uname_r}" \
+    KERNEL_UNAME="%{kernel_uname_r_full}" \
+    SYSSRC="/usr/src/kernels/%{kernel_uname_r_full}" \
+    SYSOUT="/usr/src/kernels/%{kernel_uname_r_full}" \
     IGNORE_CC_MISMATCH=1 \
     IGNORE_XEN_PRESENCE=1 \
     IGNORE_PREEMPT_RT_PRESENCE=1 \
@@ -105,18 +101,18 @@ install -D -m 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/modprobe.d/kmod-nvidia-
 install -d %{buildroot}%{_sysconfdir}/depmod.d
 cat > %{buildroot}%{_sysconfdir}/depmod.d/kmod-nvidia-open.conf << 'EOF'
 # Ensure NVIDIA modules in extra/ override any in-tree modules
-override nvidia %{kernel_uname_r} extra/nvidia
-override nvidia-modeset %{kernel_uname_r} extra/nvidia
-override nvidia-drm %{kernel_uname_r} extra/nvidia
-override nvidia-uvm %{kernel_uname_r} extra/nvidia
-override nvidia-peermem %{kernel_uname_r} extra/nvidia
+override nvidia %{kernel_uname_r_full} extra/nvidia
+override nvidia-modeset %{kernel_uname_r_full} extra/nvidia
+override nvidia-drm %{kernel_uname_r_full} extra/nvidia
+override nvidia-uvm %{kernel_uname_r_full} extra/nvidia
+override nvidia-peermem %{kernel_uname_r_full} extra/nvidia
 EOF
 
 %post
-/usr/sbin/depmod -a %{kernel_uname_r} || :
+/usr/sbin/depmod -a %{kernel_uname_r_full} || :
 
 %postun
-/usr/sbin/depmod -a %{kernel_uname_r} || :
+/usr/sbin/depmod -a %{kernel_uname_r_full} || :
 
 %files
 %license COPYING
@@ -129,11 +125,7 @@ EOF
 %{_sysconfdir}/depmod.d/kmod-nvidia-open.conf
 
 %changelog
-* Thu Apr 10 2026 Elaheh Dehghani <edehghani@microsoft.com> - 595.58.03-2
-- Auto-detect kernel version from installed kernel-devel package
-- Remove hardcoded kernel_version macro dependency
-
-* Thu Apr 09 2026 Elaheh Dehghani <edehghani@microsoft.com> - 595.58.03-1
+* Fri Apr 10 2026 Elaheh Dehghani <edehghani@microsoft.com> - 595.58.03-1
 - Initial Azure Linux 4.0 package
 - Built from NVIDIA/open-gpu-kernel-modules upstream source
 - Open-source kernel modules for CUDA workloads
