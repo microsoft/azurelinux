@@ -1,0 +1,7 @@
+[components.kdump-utils]
+
+# Upstream (currently unmerged) PR: https://github.com/rhkdump/kdump-utils/pull/153
+[[components.kdump-utils.overlays]]
+description = "Use only first match in _find_kernel_path_by_release()"
+type = "patch-add"
+source = "kdumpctl-Use-only-first-match-in-_find_kernel_path_b.patch"
