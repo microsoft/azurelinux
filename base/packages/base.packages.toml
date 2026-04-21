@@ -2,8 +2,11 @@
 # base-packages publish configuration
 #
 
+# This group includes packages intentionally included in `base`, along with
+# the transitive closure of their *runtime* dependencies.
 [package-groups.base-packages]
 description = "base packages"
+default-package-config.publish.channel = "rpm-base"
 packages = [
     "389-ds-base",
     "389-ds-base-devel",
@@ -6056,6 +6059,3 @@ packages = [
     "zziplib-devel",
     "zziplib-utils",
 ]
-
-[package-groups.base-packages.default-package-config.publish]
-channel = "rpm-base"
