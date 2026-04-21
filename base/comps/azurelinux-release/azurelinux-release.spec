@@ -39,7 +39,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -373,7 +373,7 @@ cat >> %{buildroot}%{_rpmconfigdir}/macros.d/macros.dist << EOF
 %%azurelinux          %{dist_version}
 %%azl4                1
 %%fedora              %{upstream_fedora_version}
-%%distcore            .azl%%{dist_version_major}
+%%distcore            .azl%{dist_version_major}
 %%dist                %%{!?distprefix0:%%{?distprefix}}%%{expand:%%{lua:for i=0,9999 do print("%%{?distprefix" .. i .."}") end}}%%{distcore}%%{?with_bootstrap:%%{__bootstrap}}%%{?buildrelease:+build%%{buildrelease}}
 %%dist_vendor         %{dist_vendor}
 %%dist_name           %{dist_name}
@@ -476,6 +476,9 @@ install -Dm0644 %{SOURCE22} -t %{buildroot}%{_sysctldir}/
 
 
 %changelog
+* Tue Apr 21 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-10
+- Fix distcore macro definition
+
 * Fri Apr 17 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-9
 - Add sysctl config for system hardening
 
