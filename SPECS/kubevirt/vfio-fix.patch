@@ -1,0 +1,272 @@
+From a18c9d28ab7ed63a0e7b49e0b14f482497964cb5 Mon Sep 17 00:00:00 2001
+From: Michael Henriksen <mhenriks@redhat.com>
+Date: Fri, 17 Apr 2026 23:29:54 -0400
+Subject: [PATCH] Fix VM with PCI hostdev failing to restart after hotplug
+ block volume
+
+When a hotplug block volume is mounted into the virt-launcher pod,
+allowBlockMajorMinor() calls cgroupManager.Set() to add the block
+device to the cgroup allowlist. On cgroups v2, this replaces the
+entire eBPF device filter program. The v2Manager rebuilds the program
+from its in-memory rule cache, which is initialized from
+generateDeviceRulesForVMI() and does not include devices provisioned
+by device plugins. This wipes access to device-plugin-provided nodes
+such as /dev/vfio/* (PCI/MDEV/GPU/SR-IOV passthrough) and
+/dev/bus/usb/* (USB passthrough), causing libvirt to fail with
+"pci backend driver type 'default' is not supported" when starting
+the domain.
+
+Fix by recursively scanning /dev/vfio/ and /dev/bus/usb/ inside the
+container and including all discovered device rules in the initial
+cache so they are preserved when the eBPF program is rebuilt.
+
+Fixes: https://github.com/kubevirt/kubevirt/issues/17124
+
+Signed-off-by: Michael Henriksen <mhenriks@redhat.com>
+Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>
+Signed-off-by: Michael Henriksen <mhenriks@redhat.com>
+---
+ pkg/virt-handler/cgroup/cgroup_test.go | 50 +++++++++++++++++
+ pkg/virt-handler/cgroup/util.go        | 63 +++++++++++++++++++++
+ tests/storage/hotplug.go               | 77 ++++++++++++++++++++++++++
+ 3 files changed, 190 insertions(+)
+
+diff --git a/pkg/virt-handler/cgroup/cgroup_test.go b/pkg/virt-handler/cgroup/cgroup_test.go
+index 50b5198e2a..53450e2a06 100644
+--- a/pkg/virt-handler/cgroup/cgroup_test.go
++++ b/pkg/virt-handler/cgroup/cgroup_test.go
+@@ -20,12 +20,20 @@
+ package cgroup
+ 
+ import (
++	"os"
++	"path/filepath"
++
+ 	. "github.com/onsi/ginkgo/v2"
+ 	. "github.com/onsi/gomega"
+ 	runc_cgroups "github.com/opencontainers/runc/libcontainer/cgroups"
+ 	runc_configs "github.com/opencontainers/runc/libcontainer/configs"
+ 	"github.com/opencontainers/runc/libcontainer/devices"
+ 	"go.uber.org/mock/gomock"
++
++	v1 "kubevirt.io/api/core/v1"
++
++	"kubevirt.io/kubevirt/pkg/safepath"
++	"kubevirt.io/kubevirt/pkg/virt-handler/isolation"
+ )
+ 
+ var _ = Describe("cgroup manager", func() {
+@@ -195,3 +203,45 @@ var _ = Describe("cgroup manager", func() {
+ 		),
+ 	)
+ })
++
++var _ = Describe("generateDeviceRulesForVMI", func() {
++	var (
++		ctrl    *gomock.Controller
++		tempDir string
++	)
++
++	BeforeEach(func() {
++		ctrl = gomock.NewController(GinkgoT())
++		tempDir = GinkgoT().TempDir()
++		Expect(os.MkdirAll(filepath.Join(tempDir, "dev"), 0755)).To(Succeed())
++	})
++
++	newMockIsolationWithMountRoot := func() isolation.IsolationResult {
++		mountRoot, err := safepath.NewPathNoFollow(tempDir)
++		Expect(err).ToNot(HaveOccurred())
++
++		mockIso := isolation.NewMockIsolationResult(ctrl)
++		mockIso.EXPECT().MountRoot().Return(mountRoot, nil)
++		return mockIso
++	}
++
++	It("should not fail when /dev/vfio does not exist", func() {
++		rules, err := generateDeviceRulesForVMI(&v1.VirtualMachineInstance{}, newMockIsolationWithMountRoot(), "")
++		Expect(err).ToNot(HaveOccurred())
++		Expect(rules).To(BeEmpty())
++	})
++
++	It("should not fail when /dev/vfio exists but is empty", func() {
++		Expect(os.MkdirAll(filepath.Join(tempDir, "dev", "vfio"), 0755)).To(Succeed())
++		rules, err := generateDeviceRulesForVMI(&v1.VirtualMachineInstance{}, newMockIsolationWithMountRoot(), "")
++		Expect(err).ToNot(HaveOccurred())
++		Expect(rules).To(BeEmpty())
++	})
++
++	It("should not fail when /dev/bus/usb exists but is empty", func() {
++		Expect(os.MkdirAll(filepath.Join(tempDir, "dev", "bus", "usb"), 0755)).To(Succeed())
++		rules, err := generateDeviceRulesForVMI(&v1.VirtualMachineInstance{}, newMockIsolationWithMountRoot(), "")
++		Expect(err).ToNot(HaveOccurred())
++		Expect(rules).To(BeEmpty())
++	})
++})
+diff --git a/pkg/virt-handler/cgroup/util.go b/pkg/virt-handler/cgroup/util.go
+index 892113c83d..cce3ebfcac 100644
+--- a/pkg/virt-handler/cgroup/util.go
++++ b/pkg/virt-handler/cgroup/util.go
+@@ -191,9 +191,72 @@ func generateDeviceRulesForVMI(vmi *v1.VirtualMachineInstance, isolationRes isol
+ 		}
+ 	}
+ 
++	// Device-plugin-provisioned devices (VFIO, USB) must be in the cgroup
++	// rule cache so they survive eBPF program rebuilds during hotplug.
++	for _, devDir := range []string{
++		filepath.Join("dev", "vfio"),
++		filepath.Join("dev", "bus", "usb"),
++	} {
++		rules, err := discoverDeviceRulesInDir(mountRoot, devDir)
++		if err != nil {
++			return nil, fmt.Errorf("failed to discover device rules in %s: %v", devDir, err)
++		}
++		vmiDeviceRules = append(vmiDeviceRules, rules...)
++	}
++
+ 	return vmiDeviceRules, nil
+ }
+ 
++// discoverDeviceRulesInDir recursively scans a directory under the
++// container's filesystem and creates allow rules for all device nodes
++// found. These devices are provisioned by device plugins or the container
++// runtime and must be preserved in the v2 cgroup manager's rule cache so
++// they are not lost when the eBPF device filter is rebuilt by subsequent
++// Set() calls (e.g. during hotplug volume mounting).
++func discoverDeviceRulesInDir(mountRoot *safepath.Path, relPath string) ([]*devices.Rule, error) {
++	dirPath, err := safepath.JoinNoFollow(mountRoot, relPath)
++	if err != nil {
++		if errors.Is(err, os.ErrNotExist) {
++			return nil, nil
++		}
++		return nil, err
++	}
++
++	var entries []os.DirEntry
++	err = dirPath.ExecuteNoFollow(func(path string) (err error) {
++		entries, err = os.ReadDir(path)
++		return err
++	})
++	if err != nil {
++		return nil, err
++	}
++
++	var rules []*devices.Rule
++	for _, entry := range entries {
++		if entry.IsDir() {
++			subRules, err := discoverDeviceRulesInDir(mountRoot, filepath.Join(relPath, entry.Name()))
++			if err != nil {
++				return nil, err
++			}
++			rules = append(rules, subRules...)
++			continue
++		}
++		devPath, err := safepath.JoinNoFollow(dirPath, entry.Name())
++		if err != nil {
++			return nil, err
++		}
++		rule, err := newAllowedDeviceRule(devPath)
++		if err != nil {
++			return nil, fmt.Errorf("failed to create device rule for %s/%s: %v", relPath, entry.Name(), err)
++		}
++		if rule != nil {
++			log.Log.V(loggingVerbosity).Infof("device rule for %s/%s: %v", relPath, entry.Name(), rule)
++			rules = append(rules, rule)
++		}
++	}
++	return rules, nil
++}
++
+ func newAllowedDeviceRule(devicePath *safepath.Path) (*devices.Rule, error) {
+ 	fileInfo, err := safepath.StatAtNoFollow(devicePath)
+ 	if err != nil {
+diff --git a/tests/storage/hotplug.go b/tests/storage/hotplug.go
+index 2a40430c29..b892a03f7c 100644
+--- a/tests/storage/hotplug.go
++++ b/tests/storage/hotplug.go
+@@ -2275,6 +2275,83 @@ var _ = Describe(SIG("Hotplug", func() {
+ 			verifyVolumeNolongerAccessible(vmi, targets[0])
+ 		})
+ 	})
++
++	// Regression test for https://github.com/kubevirt/kubevirt/issues/17124
++	Context("with PCI hostdev", Serial, func() {
++		const deviceName = "example.org/soundcard"
++
++		BeforeEach(func() {
++			kvconfig.EnableFeatureGate(featuregate.HostDevicesGate)
++
++			kv := libkubevirt.GetCurrentKv(virtClient)
++			config := kv.Spec.Configuration
++			config.PermittedHostDevices = &v1.PermittedHostDevices{
++				PciHostDevices: []v1.PciHostDevice{
++					{
++						PCIVendorSelector: "8086:2668",
++						ResourceName:      deviceName,
++					},
++				},
++			}
++			kvconfig.UpdateKubeVirtConfigValueAndWait(config)
++		})
++
++		AfterEach(func() {
++			kv := libkubevirt.GetCurrentKv(virtClient)
++			config := kv.Spec.Configuration
++			config.PermittedHostDevices = &v1.PermittedHostDevices{}
++			kvconfig.UpdateKubeVirtConfigValueAndWait(config)
++			kvconfig.DisableFeatureGate(featuregate.HostDevicesGate)
++		})
++
++		It("should restart a VM after hotplugging a block volume", func() {
++			sc, exists := libstorage.GetRWOBlockStorageClass()
++			if !exists {
++				Skip("no RWO block storage class available")
++			}
++
++			vmiSpec := libvmifact.NewAlpineWithTestTooling()
++			vmiSpec.Spec.Domain.Devices.HostDevices = []v1.HostDevice{
++				{Name: "sound0", DeviceName: deviceName},
++			}
++			vm, err := virtClient.VirtualMachine(testsuite.GetTestNamespace(nil)).Create(
++				context.Background(),
++				libvmi.NewVirtualMachine(vmiSpec, libvmi.WithRunStrategy(v1.RunStrategyAlways)),
++				metav1.CreateOptions{},
++			)
++			Expect(err).ToNot(HaveOccurred())
++			Eventually(matcher.ThisVM(vm)).WithTimeout(300 * time.Second).WithPolling(time.Second).Should(matcher.BeReady())
++
++			vmi, err := virtClient.VirtualMachineInstance(vm.Namespace).Get(context.Background(), vm.Name, metav1.GetOptions{})
++			Expect(err).ToNot(HaveOccurred())
++			libwait.WaitForSuccessfulVMIStart(vmi, libwait.WithTimeout(240))
++
++			dvBuilder := libdv.NewDataVolume(
++				libdv.WithBlankImageSource(),
++				libdv.WithStorage(
++					libdv.StorageWithStorageClass(sc),
++					libdv.StorageWithVolumeSize(cd.BlankVolumeSize),
++					libdv.StorageWithVolumeMode(k8sv1.PersistentVolumeBlock),
++				),
++			)
++			dv, err := virtClient.CdiClient().CdiV1beta1().DataVolumes(testsuite.GetTestNamespace(nil)).Create(
++				context.Background(), dvBuilder, metav1.CreateOptions{})
++			Expect(err).ToNot(HaveOccurred())
++			libstorage.EventuallyDV(dv, 240, Or(matcher.HaveSucceeded(), matcher.WaitForFirstConsumer()))
++
++			By("Hotplugging a block volume to the running VM")
++			addVolumeVMWithSource(vm.Name, vm.Namespace, getAddVolumeOptions("hotplug-vol", v1.DiskBusSCSI, &v1.HotplugVolumeSource{
++				DataVolume: &v1.DataVolumeSource{Name: dv.Name},
++			}, false, false, ""))
++			libstorage.VerifyVolumeStatus(virtClient, vmi, v1.VolumeReady, "", true, "hotplug-vol")
++
++			By("Restarting the VM")
++			vm = libvmops.StopVirtualMachine(vm)
++			err = virtClient.VirtualMachine(vm.Namespace).Start(context.Background(), vm.Name, &v1.StartOptions{})
++			Expect(err).ToNot(HaveOccurred())
++			Eventually(matcher.ThisVM(vm), 300*time.Second, time.Second).Should(matcher.BeReady())
++		})
++	})
+ }))
+ 
+ func verifyVolumeAndDiskVMAdded(virtClient kubecli.KubevirtClient, vm *v1.VirtualMachine, volumeNames ...string) {
+-- 
+2.50.1 (Apple Git-155)
+
