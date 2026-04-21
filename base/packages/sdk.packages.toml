@@ -5340,7 +5340,6 @@ packages = [
     "plymouth-plugin-two-step", # srpm: plymouth
     "plymouth-scripts", # srpm: plymouth
     "plymouth-system-theme", # srpm: plymouth
-    "plymouth-theme-charge", # srpm: plymouth
     "plymouth-theme-fade-in", # srpm: plymouth
     "plymouth-theme-script", # srpm: plymouth
     "plymouth-theme-solar", # srpm: plymouth
