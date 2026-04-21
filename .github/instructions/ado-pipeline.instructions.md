@@ -1,6 +1,6 @@
 ---
-applyTo: ".github/workflows/ado/*.yml,.github/workflows/scripts/**"
-description: "Authoring and maintenance rules for Azure DevOps YAML pipelines under .github/workflows/ado/ (and their helper scripts under .github/workflows/scripts/) that run as GitHub PR checks or in the merge queue. Apply when creating or modifying any pipeline in that folder, or any script invoked by one — covers required OneBranch templates (Official vs NonOfficial), Workload Identity Federation service connections, Control Tower audience URIs, internal-only dependency sources (Go / Python / container images), Python-over-shell scripting, and security hardening."
+applyTo: ".github/workflows/ado/*.yml,.github/workflows/ado/templates/*.yml,.github/workflows/scripts/**"
+description: "Authoring and maintenance rules for Azure DevOps YAML pipelines under .github/workflows/ado/ (wrappers + raw stage templates under templates/) and their helper scripts under .github/workflows/scripts/ that run as GitHub PR checks or in the merge queue. Apply when creating or modifying any pipeline in that folder, or any script invoked by one — covers the wrapper/raw split, required OneBranch templates (Official vs NonOfficial), Workload Identity Federation service connections, Control Tower audience URIs, internal-only dependency sources (Go / Python / container images), Python-over-shell scripting, and security hardening."
 ---
 
 # Azure DevOps Pipelines (PR check & merge queue)
@@ -11,9 +11,34 @@ Helper scripts invoked from these pipelines MUST live under `.github/workflows/s
 
 > If anything below conflicts with what the user is asking for, **stop and ask the user** rather than guessing — especially for the Official vs NonOfficial template choice.
 
-## OneBranch templates (MANDATORY)
+## Pipeline structure: wrapper + raw stages (MANDATORY)
 
-To comply with internal policy, every pipeline in this folder MUST extend a OneBranch governed template:
+Every ADO pipeline in this repo is split into **two YAML files**:
+
+1. **Wrapper** — `.github/workflows/ado/<name>.yml`. This is the file passed to ADO as the pipeline definition. It is the *only* place that knows about OneBranch:
+   - declares `resources.repositories` for `OneBranch.Pipelines/GovernedTemplates`,
+   - picks the OneBranch variant via `extends:` (`Official` vs `NonOfficial` — see next section),
+   - configures the OneBranch `parameters.featureFlags`,
+   - injects the raw stages template via `parameters.stages: - template: …@self` and supplies concrete values for its `parameters:`.
+
+   The wrapper MUST NOT contain `stages:`, `jobs:`, or `steps:` directly. If you find yourself adding a `script:` block to a wrapper, stop — it belongs in the raw stages template.
+
+2. **Raw stages template** — `.github/workflows/ado/templates/<name>-stages.yml`. This file declares `parameters:` + `stages:` and contains the actual jobs/steps. It MUST be OneBranch-agnostic:
+   - no `resources:`, no `extends:`, no `featureFlags:`,
+   - no string mentions of `OneBranch` or `GovernedTemplates`,
+   - any value coupled to the OneBranch contract (output dir, artifact base name, container image, pool type, service connection, variable group, timeout) is exposed as a **parameter with a neutral name** and bound by the wrapper.
+
+   `ob_*` job-scope variables and `LinuxContainerImage` still appear here (ADO requires them at job scope), but they are set from `${{ parameters.* }}`, so the raw author never has to know which OneBranch convention they satisfy.
+
+File-pairing convention: a wrapper at `.github/workflows/ado/<name>.yml` pairs with a raw stages template at `.github/workflows/ado/templates/<stem>-stages.yml`. **Multiple wrappers MAY share a single raw stages template** — that is in fact a primary motivation for the split: define several ADO pipelines (e.g. a DEV NonOfficial wrapper and a PROD Official wrapper, or per-environment variants) that all run the same stages/jobs/steps but differ in OneBranch variant, `featureFlags`, service connection, variable group, container image, etc. When wrappers share a raw template, name them so the relationship is obvious (e.g. `sources-upload-dev.yml` + `sources-upload-prod.yml` both pointing at `templates/sources-upload-stages.yml`). The variant choice cannot be hoisted into a shared sub-template because ADO requires `extends:` at the root of the entry pipeline — that is exactly why each wrapper exists.
+
+See [.github/workflows/ado/sources-upload.yml](.github/workflows/ado/sources-upload.yml) and [.github/workflows/ado/templates/sources-upload-stages.yml](.github/workflows/ado/templates/sources-upload-stages.yml) for the canonical example.
+
+## OneBranch templates (MANDATORY — wrapper only)
+
+The rules in this section apply to the **wrapper** file. The raw stages template MUST NOT reference OneBranch at all.
+
+To comply with internal policy, every wrapper MUST extend a OneBranch governed template:
 
 ```yaml
 resources:
@@ -38,19 +63,19 @@ Production-classified pipelines MUST use `Official` even if the current YAML onl
 
 ### Required / recommended OneBranch variables
 
-OneBranch templates require these per job:
+OneBranch templates require these per job. In the wrapper/raw split, the raw stages template declares them in its `variables:` block but binds them from `${{ parameters.* }}`; the **wrapper** supplies the concrete values when invoking the raw template.
 
-| Variable | Required? | Purpose |
-|----------|-----------|---------|
-| `ob_outputDirectory` | **Required** | Where build outputs are staged (typically `$(Build.ArtifactStagingDirectory)/output`). |
-| `ob_artifactBaseName` | Recommended | Base name for the published artifact; helps when multiple jobs publish artifacts. |
-| `LinuxContainerImage` | Required when `pool.type: linux` with a container | Must come from `mcr.microsoft.com` (see Container images below). |
+| Variable | Required? | Purpose | Suggested raw parameter name |
+|----------|-----------|---------|------------------------------|
+| `ob_outputDirectory` | **Required** | Where build outputs are staged (typically `$(Build.ArtifactStagingDirectory)/output`). | `outputDirectory` |
+| `ob_artifactBaseName` | Recommended | Base name for the published artifact; helps when multiple jobs publish artifacts. | `artifactBaseName` |
+| `LinuxContainerImage` | Required when `pool.type: linux` with a container | Must come from `mcr.microsoft.com` (see Container images below). | `containerImage` |
 
 > Consult the **1ES MCP** at `https://eschat.microsoft.com/mcp` for the most current OneBranch guidance and feature flags. If it is not configured in this workspace, follow the setup notes at https://eng.ms/docs/coreai/devdiv/one-engineering-system-1es/1es-docs/es-chat/askeschat-mcp-vscode and surface that link to the user. Do not block on its absence.
 
 ## Triggers
 
-Always set both triggers off in YAML — pipeline wiring (PR check / merge queue) is configured in the ADO pipeline settings, outside the YAML, and is out of scope here:
+Always set both triggers off in the **wrapper** YAML — pipeline wiring (PR check / merge queue) is configured in the ADO pipeline settings, outside the YAML, and is out of scope here. Raw stage templates do not declare triggers (they are not entry points):
 
 ```yaml
 trigger: none
@@ -164,9 +189,11 @@ Apply all of these unless there is a documented reason not to:
 - Never `echo` secret values or write them to files. Use `##[group]` / `##[endgroup]` to keep logs structured and reviewable.
 - Keep the pipeline definition self-contained — avoid sourcing arbitrary scripts fetched at runtime from the internet.
 
-## Minimal skeleton
+## Minimal skeletons
 
-Use this as a starting point for a new PR-check pipeline (NonOfficial variant — switch to Official if it touches production):
+Use these as a starting point for a new pipeline. Two files: a wrapper (NonOfficial variant — switch to Official if it touches production) and a raw stages template.
+
+### Wrapper — `.github/workflows/ado/<name>.yml`
 
 ```yaml
 trigger: none
@@ -187,40 +214,72 @@ extends:
         internalModuleProxy:
           enabled: true
     stages:
-      - stage: <StageName>
-        jobs:
-          - job: <JobName>
-            timeoutInMinutes: <int>   # explicit, conservative
-            pool:
-              type: linux
-            variables:
-              - group: <variable-group-name>      # audience URI, base URL, etc.
-              - name: ob_outputDirectory
-                value: $(Build.ArtifactStagingDirectory)/output
-              - name: ob_artifactBaseName
-                value: <artifact-base-name>
-              - name: LinuxContainerImage
-                value: mcr.microsoft.com/onebranch/azurelinux/build:3.0
-            steps:
-              - task: PipAuthenticate@1
-                displayName: "Authenticate pip"
-                inputs:
-                  artifactFeeds: "<internal-feed>"
+      - template: /.github/workflows/ado/templates/<name>-stages.yml@self
+        parameters:
+          outputDirectory: $(Build.ArtifactStagingDirectory)/output
+          artifactBaseName: <artifact-base-name>
+          containerImage: mcr.microsoft.com/onebranch/azurelinux/build:3.0
+          poolType: linux
+          serviceConnection: <service-connection-name>
+          variableGroup: <variable-group-name>
+          timeoutInMinutes: <int>   # explicit, conservative
+```
 
-              - task: AzureCLI@2
-                displayName: "<what this step does>"
-                inputs:
-                  azureSubscription: <service-connection-name>
-                  scriptType: bash
-                  scriptLocation: inlineScript
-                  inlineScript: |
-                    set -euo pipefail
-                    python3 .github/workflows/scripts/<area>/<script>.py \
-                      --api-audience "$API_AUDIENCE" \
-                      --api-base-url "$API_BASE_URL"
-                env:
-                  API_AUDIENCE: $(ApiAudience)
-                  API_BASE_URL: $(ApiBaseUrl)
+### Raw stages — `.github/workflows/ado/templates/<name>-stages.yml`
+
+```yaml
+parameters:
+  - name: outputDirectory
+    type: string
+  - name: artifactBaseName
+    type: string
+  - name: containerImage
+    type: string
+  - name: poolType
+    type: string
+    default: linux
+  - name: serviceConnection
+    type: string
+  - name: variableGroup
+    type: string
+  - name: timeoutInMinutes
+    type: number
+
+stages:
+  - stage: <StageName>
+    jobs:
+      - job: <JobName>
+        timeoutInMinutes: ${{ parameters.timeoutInMinutes }}
+        pool:
+          type: ${{ parameters.poolType }}
+        variables:
+          - group: ${{ parameters.variableGroup }}      # audience URI, base URL, etc.
+          - name: ob_outputDirectory
+            value: ${{ parameters.outputDirectory }}
+          - name: ob_artifactBaseName
+            value: ${{ parameters.artifactBaseName }}
+          - name: LinuxContainerImage
+            value: ${{ parameters.containerImage }}
+        steps:
+          - task: PipAuthenticate@1
+            displayName: "Authenticate pip"
+            inputs:
+              artifactFeeds: "<internal-feed>"
+
+          - task: AzureCLI@2
+            displayName: "<what this step does>"
+            inputs:
+              azureSubscription: ${{ parameters.serviceConnection }}
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                set -euo pipefail
+                python3 .github/workflows/scripts/<area>/<script>.py \
+                  --api-audience "$API_AUDIENCE" \
+                  --api-base-url "$API_BASE_URL"
+            env:
+              API_AUDIENCE: $(ApiAudience)
+              API_BASE_URL: $(ApiBaseUrl)
 ```
 
 Replace every `<...>` placeholder.
@@ -229,8 +288,11 @@ Replace every `<...>` placeholder.
 
 Run through this list whenever you add or modify a pipeline in `.github/workflows/ado/`:
 
-- [ ] Extends a OneBranch governed template; **Official** vs **NonOfficial** matches whether it touches production.
-- [ ] `trigger: none` and `pr: none` set in YAML.
+- [ ] Pipeline is split into a **wrapper** (`.github/workflows/ado/<name>.yml`) and a **raw stages template** (`.github/workflows/ado/templates/<stem>-stages.yml`). A raw stages template MAY be shared by multiple wrappers (e.g. DEV vs PROD variants).
+- [ ] Wrapper is the *only* place that names OneBranch — extends a governed template; **Official** vs **NonOfficial** matches whether it touches production.
+- [ ] Wrapper has no `stages:` / `jobs:` / `steps:` / `script:` of its own; it only invokes the raw stages template via `parameters.stages: - template: …@self` and supplies its parameters.
+- [ ] Raw stages template is OneBranch-agnostic: no `resources:`, no `extends:`, no `featureFlags:`, no string mentions of `OneBranch` / `GovernedTemplates`. OneBranch-coupled values (`ob_outputDirectory`, `ob_artifactBaseName`, `LinuxContainerImage`, pool type, service connection, variable group, timeout) are exposed as neutral-named `parameters:` and bound from the wrapper.
+- [ ] `trigger: none` and `pr: none` set in the wrapper YAML.
 - [ ] `ob_outputDirectory` set on every job; `ob_artifactBaseName` set when artifacts are published.
 - [ ] All Azure / Control Tower access goes through `AzureCLI@2` with a least-privilege Service Connection (WIF/OIDC). No PATs or password logins.
 - [ ] Control Tower calls use the correct **per-environment audience URI** sourced from a variable group; nothing hardcoded.
