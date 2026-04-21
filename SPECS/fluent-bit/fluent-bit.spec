@@ -95,7 +95,7 @@ Development files for %{name}
 
 %changelog
 * Mon Apr 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.0.6-7
-- Patch for CVE-2025-63657
+- Patch for CVE-2025-63649, CVE-2025-63656 and CVE-2025-63657
 
 * Tue Dec 02 2025 BinduSri Adabala <v-badabala@microsoft.com> - 3.0.6-6
 - Patch for CVE-2025-12977 and CVE-2025-12969
