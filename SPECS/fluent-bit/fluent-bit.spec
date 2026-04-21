@@ -95,7 +95,7 @@ Development files for %{name}
 
 %changelog
 * Mon Apr 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.1.10-5
-- Patch for CVE-2025-63657
+- Patch for CVE-2025-63649, CVE-2025-63656 and CVE-2025-63657
 
 * Wed Dec 17 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.1.10-4
 - Patch for CVE-2025-62408
@@ -124,7 +124,7 @@ Development files for %{name}
 * Tue Dec 10 2024 Sudipta Pandit <sudpandit@microsoft.com> - 3.1.9-2
 - Backport fixes for CVE-2024-27532
 
-* Tue Nov 23 2024 Paul Meyer <paul.meyer@microsoft.com> - 3.1.9-1
+* Sat Nov 23 2024 Paul Meyer <paul.meyer@microsoft.com> - 3.1.9-1
 - Update to 3.1.9 to enable Lua filter plugin using system luajit library.
 - Remove patches for CVE-2024-25629 and CVE-2024-28182 as they are fixed in 3.1.9.
 - [Jon Slobodzian] Reconciled with Fasttrack/3.0 on 11/23, updated Changelog date from 11/5.
