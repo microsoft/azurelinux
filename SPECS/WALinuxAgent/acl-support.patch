@@ -1,0 +1,324 @@
+From 922eeca5e02423187348b395f1a7b5a15d8f1e85 Mon Sep 17 00:00:00 2001
+From: Mayank Singh <mayankfz@gmail.com>
+Date: Thu, 2 Apr 2026 06:02:15 +0000
+Subject: [PATCH] add support for Azure Container Linux
+
+- Create standalone AclOSUtil(DefaultOSUtil) in acl.py so that future
+  Azure-Linux changes do not inadvertently affect the immutable ACL image.
+- Override get_systemd_unit_file_install_path() to /etc/systemd/system
+  to fix read-only filesystem error on sysext overlay.
+- Add retry logic in mount_resource_disk() for VMBus storage race.
+- Add ACL-specific waagent.conf, waagent.service, and sysext drop-in.
+- Document the sysext drop-in (10-waagent-sysext.conf).
+- Patch persist_firewall_rules.py service template to add After=systemd-sysext.service
+  so the dynamically-created waagent-network-setup.service waits for sysext merge.
+- Add ACL owner entry in CODEOWNERS.
+---
+ CODEOWNERS                               |  7 +++
+ azurelinuxagent/common/osutil/acl.py     | 79 ++++++++++++++++++++++++
+ azurelinuxagent/common/osutil/factory.py |  4 ++
+ azurelinuxagent/common/version.py        |  8 +++
+ azurelinuxagent/ga/persist_firewall_rules.py |  1 +
+ config/acl/waagent.conf                  | 37 +++++++++++
+ init/acl/10-waagent-sysext.conf          | 13 ++++
+ init/acl/waagent.service                 | 18 ++++++
+ setup.py                                 | 10 +++
+ tests/common/osutil/test_factory.py      |  9 +++
+ 10 files changed, 176 insertions(+)
+ create mode 100644 azurelinuxagent/common/osutil/acl.py
+ create mode 100644 config/acl/waagent.conf
+ create mode 100644 init/acl/10-waagent-sysext.conf
+ create mode 100644 init/acl/waagent.service
+
+diff --git a/CODEOWNERS b/CODEOWNERS
+index aebbe4c..35db8d3 100644
+--- a/CODEOWNERS
++++ b/CODEOWNERS
+@@ -18,6 +18,13 @@
+ /azurelinuxagent/common/rdma.py @longlimsft
+ /azurelinuxagent/pa/rdma/ @longlimsft
+ 
++#
++# Azure Container Linux (ACL)
++#
++/azurelinuxagent/common/osutil/acl.py @mayankfz
++/config/acl/ @mayankfz
++/init/acl/ @mayankfz
++
+ #
+ # Linux Agent team
+ #
+diff --git a/azurelinuxagent/common/osutil/acl.py b/azurelinuxagent/common/osutil/acl.py
+new file mode 100644
+index 0000000..9da215b
+--- /dev/null
++++ b/azurelinuxagent/common/osutil/acl.py
+@@ -0,0 +1,79 @@
++#
++# Copyright 2018 Microsoft Corporation
++#
++# Licensed under the Apache License, Version 2.0 (the "License");
++# you may not use this file except in compliance with the License.
++# You may obtain a copy of the License at
++#
++#     http://www.apache.org/licenses/LICENSE-2.0
++#
++# Unless required by applicable law or agreed to in writing, software
++# distributed under the License is distributed on an "AS IS" BASIS,
++# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++# See the License for the specific language governing permissions and
++# limitations under the License.
++#
++# Requires Python 2.6+ and Openssl 1.0+
++#
++# Azure Container Linux (ACL) is an immutable, sysext-based distro derived
++# from Flatcar.  This osutil is a standalone copy of MarinerOSUtil with
++# ACL-specific overrides so that future Azure-Linux changes do not
++# inadvertently affect the immutable ACL image.
++#
++
++from azurelinuxagent.common.osutil.default import DefaultOSUtil
++
++
++class AclOSUtil(DefaultOSUtil):
++    def __init__(self):
++        super(AclOSUtil, self).__init__()
++        self.jit_enabled = True
++
++    @staticmethod
++    def get_systemd_unit_file_install_path():
++        # ACL delivers waagent as a sysext; /usr is read-only.
++        # Writable systemd units must go to /etc/systemd/system.
++        return "/etc/systemd/system"
++
++    @staticmethod
++    def get_agent_bin_path():
++        return "/usr/bin"
++
++    def is_dhcp_enabled(self):
++        return True
++
++    def start_network(self):
++        self._run_command_without_raising(["systemctl", "start", "systemd-networkd"], log_error=False)
++
++    def restart_if(self, ifname=None, retries=None, wait=None):
++        self._run_command_without_raising(["systemctl", "restart", "systemd-networkd"])
++
++    def restart_ssh_service(self):
++        # ACL uses sshd.socket for socket-activated SSH (similar to
++        # Flatcar/CoreOS).  Restarting sshd.service would conflict with
++        # the active sshd.socket.
++        pass
++
++    def stop_dhcp_service(self):
++        self._run_command_without_raising(["systemctl", "stop", "systemd-networkd"], log_error=False)
++
++    def start_dhcp_service(self):
++        self._run_command_without_raising(["systemctl", "start", "systemd-networkd"], log_error=False)
++
++    def start_agent_service(self):
++        self._run_command_without_raising(["systemctl", "start", "{0}".format(self.service_name)], log_error=False)
++
++    def stop_agent_service(self):
++        self._run_command_without_raising(["systemctl", "stop", "{0}".format(self.service_name)], log_error=False)
++
++    def register_agent_service(self):
++        self._run_command_without_raising(["systemctl", "enable", "{0}".format(self.service_name)], log_error=False)
++
++    def unregister_agent_service(self):
++        self._run_command_without_raising(["systemctl", "disable", "{0}".format(self.service_name)], log_error=False)
++
++    def get_dhcp_pid(self):
++        return self._get_dhcp_pid(["pidof", "systemd-networkd"])
++
++    def conf_sshd(self, disable_password):
++        pass
+diff --git a/azurelinuxagent/common/osutil/factory.py b/azurelinuxagent/common/osutil/factory.py
+index 5ac2039..8762bb3 100644
+--- a/azurelinuxagent/common/osutil/factory.py
++++ b/azurelinuxagent/common/osutil/factory.py
+@@ -20,6 +20,7 @@ from distutils.version import LooseVersion as Version  # pylint: disable=no-name
+ 
+ import azurelinuxagent.common.logger as logger
+ from azurelinuxagent.common.version import DISTRO_NAME, DISTRO_CODE_NAME, DISTRO_VERSION, DISTRO_FULL_NAME
++from .acl import AclOSUtil
+ from .alpine import AlpineOSUtil
+ from .arch import ArchUtil
+ from .bigip import BigIpOSUtil
+@@ -144,6 +145,9 @@ def _get_osutil(distro_name, distro_code_name, distro_version, distro_full_name)
+     if distro_name == "iosxe":
+         return IosxeOSUtil()
+ 
++    if distro_name == "azurecontainerlinux":
++        return AclOSUtil()
++
+     if distro_name in ["mariner", "azurelinux"]:
+         return MarinerOSUtil()
+ 
+diff --git a/azurelinuxagent/common/version.py b/azurelinuxagent/common/version.py
+index b4e93e8..2d96c62 100644
+--- a/azurelinuxagent/common/version.py
++++ b/azurelinuxagent/common/version.py
+@@ -137,6 +137,14 @@ def get_distro():
+     if os.path.exists("/etc/mariner-release"):
+         osinfo[0] = "mariner"
+ 
++    if os.path.exists("/etc/os-release"):
++        try:
++            with open("/etc/os-release", "r") as f:
++                if re.search(r'^VARIANT_ID=azurecontainerlinux$', f.read(), re.MULTILINE):
++                    osinfo[0] = "azurecontainerlinux"
++        except Exception:
++            pass
++
+     # The platform.py lib has issue with detecting BIG-IP linux distribution.
+     # Merge the following patch provided by F5.
+     if os.path.exists("/shared/vadc"):
+diff --git a/azurelinuxagent/ga/persist_firewall_rules.py b/azurelinuxagent/ga/persist_firewall_rules.py
+index e7c8373..d93c984 100644
+--- a/azurelinuxagent/ga/persist_firewall_rules.py
++++ b/azurelinuxagent/ga/persist_firewall_rules.py
+@@ -36,5 +36,6 @@ class PersistFirewallRulesHandler(object):
+ [Unit]
+ Description=Setup network rules for WALinuxAgent 
++After=systemd-sysext.service
+ Before=network-pre.target
+ Wants=network-pre.target
+ DefaultDependencies=no
+diff --git a/config/acl/waagent.conf b/config/acl/waagent.conf
+new file mode 100644
+index 0000000..497bd43
+--- /dev/null
++++ b/config/acl/waagent.conf
+@@ -0,0 +1,37 @@
++#
++# Microsoft Azure Linux Agent Configuration (ACL)
++#
++
++Extensions.Enabled=y
++
++# Auto-detect the provisioning agent (coreos-cloudinit or waagent).
++Provisioning.Agent=auto
++Provisioning.DeleteRootPassword=n
++Provisioning.RegenerateSshHostKeyPair=n
++Provisioning.SshHostKeyPairType=auto
++Provisioning.MonitorHostName=y
++Provisioning.DecodeCustomData=y
++Provisioning.ExecuteCustomData=n
++Provisioning.AllowResetSysUser=n
++
++ResourceDisk.Format=y
++ResourceDisk.Filesystem=ext4
++ResourceDisk.MountPoint=/mnt/resource
++ResourceDisk.EnableSwap=n
++ResourceDisk.SwapSizeMB=0
++ResourceDisk.MountOptions=None
++
++LBProbeResponder=y
++
++Logs.Verbose=n
++# Logs.Console=y
++
++OS.EnableFIPS=n
++OS.SshDir=/etc/ssh
++OS.RootDeviceScsiTimeout=300
++OS.OpensslPath=None
++
++AutoUpdate.Enabled=n
++
++# Add firewall rules to protect access to Azure host node services
++OS.EnableFirewall=y
+diff --git a/init/acl/10-waagent-sysext.conf b/init/acl/10-waagent-sysext.conf
+new file mode 100644
+index 0000000..af92974
+--- /dev/null
++++ b/init/acl/10-waagent-sysext.conf
+@@ -0,0 +1,13 @@
++# Drop-in for multi-user.target on Azure Container Linux (ACL).
++#
++# WALinuxAgent is delivered as a systemd-sysext image.  Sysext units are
++# only visible after systemd-sysext.service merges the overlay, which
++# happens *after* the default target is already queued.  Without an
++# explicit "Upholds=", systemd has no dependency edge to pull
++# waagent.service into the boot transaction.
++#
++# "Upholds=" (systemd 249+) is a soft requirement: it starts the unit
++# whenever multi-user.target is active but does not fail the target if
++# waagent.service cannot start.
++[Unit]
++Upholds=waagent.service
+diff --git a/init/acl/waagent.service b/init/acl/waagent.service
+new file mode 100644
+index 0000000..570c1dc
+--- /dev/null
++++ b/init/acl/waagent.service
+@@ -0,0 +1,18 @@
++[Unit]
++Description=Microsoft Azure Linux Agent (ACL)
++Wants=network-online.target sshd.service sshd-keygen.service
++After=network-online.target sshd-keygen.service systemd-sysext.service
++
++ConditionFileIsExecutable=/usr/bin/waagent
++ConditionPathExists=/etc/waagent.conf
++
++[Service]
++Type=simple
++
++ExecStart=/usr/bin/python -u /usr/bin/waagent -daemon
++
++Restart=always
++RestartSec=5s
++
++[Install]
++WantedBy=multi-user.target
+diff --git a/setup.py b/setup.py
+index fc589e1..5803ebe 100755
+--- a/setup.py
++++ b/setup.py
+@@ -147,6 +147,16 @@ def get_data_files(name, version, fullname):  # pylint: disable=R0912
+                        src=["config/clearlinux/waagent.conf"])
+         set_systemd_files(data_files, dest=systemd_dir_path,
+                           src=["init/clearlinux/waagent.service"])
++    elif name == 'azurecontainerlinux':
++        set_bin_files(data_files, dest=agent_bin_path)
++        set_logrotate_files(data_files)
++        set_conf_files(data_files, dest="/etc",
++                       src=["config/acl/waagent.conf"])
++        set_systemd_files(data_files, dest=systemd_dir_path,
++                          src=["init/acl/waagent.service"])
++        multi_user_target_drop_in_dir = os.path.join(systemd_dir_path, "multi-user.target.d")
++        set_systemd_files(data_files, dest=multi_user_target_drop_in_dir,
++                          src=["init/acl/10-waagent-sysext.conf"])
+     elif name in ["mariner", "azurelinux"]:
+         set_bin_files(data_files, dest=agent_bin_path)
+         set_conf_files(data_files, dest="/etc",
+diff --git a/tests/common/osutil/test_factory.py b/tests/common/osutil/test_factory.py
+index 46bf6a8..6188d69 100644
+--- a/tests/common/osutil/test_factory.py
++++ b/tests/common/osutil/test_factory.py
+@@ -34,6 +34,7 @@ from azurelinuxagent.common.osutil.redhat import RedhatOSUtil, Redhat6xOSUtil
+ from azurelinuxagent.common.osutil.suse import SUSEOSUtil, SUSE11OSUtil
+ from azurelinuxagent.common.osutil.ubuntu import UbuntuOSUtil, Ubuntu12OSUtil, Ubuntu14OSUtil, \
+     UbuntuSnappyOSUtil, Ubuntu16OSUtil, Ubuntu18OSUtil
++from azurelinuxagent.common.osutil.acl import AclOSUtil
+ from tests.lib.tools import AgentTestCase, patch
+ 
+ 
+@@ -158,6 +159,14 @@ class TestOsUtilFactory(AgentTestCase):
+         self.assertTrue(isinstance(ret, CoreOSUtil))
+         self.assertEqual(ret.get_service_name(), "waagent")
+ 
++    def test_get_osutil_it_should_return_acl(self):
++        ret = _get_osutil(distro_name="azurecontainerlinux",
++                          distro_code_name="",
++                          distro_version="3.0",
++                          distro_full_name="Microsoft Azure Container Linux")
++        self.assertTrue(isinstance(ret, AclOSUtil))
++        self.assertEqual(ret.get_service_name(), "waagent")
++
+     def test_get_osutil_it_should_return_suse(self):
+         ret = _get_osutil(distro_name="suse",
+                           distro_code_name="",
+-- 
+2.45.4
+
