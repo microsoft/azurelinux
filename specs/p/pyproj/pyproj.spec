@@ -10,7 +10,7 @@
 
 Name:           pyproj
 Version:        3.7.2
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Cython wrapper to provide python interfaces to Proj
 # this software uses the "MIT:Modern Style with sublicense" license
 License:        MIT

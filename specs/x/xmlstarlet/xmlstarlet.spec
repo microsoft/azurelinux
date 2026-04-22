@@ -5,7 +5,7 @@
 
 Name: xmlstarlet
 Version: 1.6.1
-Release: 28%{?dist}
+Release: 29%{?dist}
 Summary: Command Line XML Toolkit
 License: MIT
 URL: http://xmlstar.sourceforge.net/

@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 0.9.10
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: Provides a unified method to mock Time.now, Date.today in a single call
 License: MIT
 URL: https://github.com/travisjeffery/timecop

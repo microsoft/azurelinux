@@ -6,7 +6,7 @@
 
 Name:           python-%{upstream_name}
 Version:        1.8.1
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        Sphinx domain for documenting HTTP APIs
 License:        BSD-2-Clause
 URL:            http://packages.python.org/sphinxcontrib-httpdomain/

@@ -1,0 +1,25 @@
+From 3ea0507a56392311aa1e8ab3f837e494e2c88872 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Sat, 12 Jul 2025 14:16:11 +0200
+Subject: [PATCH 2/3] Ensure os_install_post commands are NL-terminated
+
+---
+ dola-generator/src/main/lua/dola-generator.lua | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dola-generator/src/main/lua/dola-generator.lua b/dola-generator/src/main/lua/dola-generator.lua
+index 531b3e9..41600bd 100644
+--- a/dola-generator/src/main/lua/dola-generator.lua
++++ b/dola-generator/src/main/lua/dola-generator.lua
+@@ -34,7 +34,7 @@ local function os_install_post()
+       "io.kojan.dola.generator.stub.CallbackStub",
+       "postInstall"
+    )
+-   print(command)
++   print(command .. "\n")
+    rpm.undefine("__os_install_post")
+    print(rpm.expand("%{__os_install_post}"))
+ end
+-- 
+2.50.1
+

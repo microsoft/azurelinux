@@ -1,0 +1,83 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 4 Apr 2024 11:57:54 -0600
+Subject: [PATCH] Make a "gdb" dprintf that tells us load addresses.
+
+This makes a grub_dprintf() call during platform init and during module
+loading that tells us the virtual addresses of the .text and .data
+sections of grub-core/kernel.exec and any modules it loads.
+
+Specifically, it displays them in the gdb "add-symbol-file" syntax, with
+the presumption that there's a variable $grubdir that reflects the path
+to any such binaries.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/kern/dl.c       | 34 ++++++++++++++++++++++++++++++++++
+ grub-core/kern/efi/init.c |  1 +
+ 2 files changed, 35 insertions(+)
+
+diff --git a/grub-core/kern/dl.c b/grub-core/kern/dl.c
+index 2a9ae9fc894..2eaef7150ed 100644
+--- a/grub-core/kern/dl.c
++++ b/grub-core/kern/dl.c
+@@ -690,6 +690,38 @@ grub_dl_relocate_symbols (grub_dl_t mod, void *ehdr)
+   return GRUB_ERR_NONE;
+ }
+ 
++static void
++grub_dl_print_gdb_info (grub_dl_t mod, Elf_Ehdr *e)
++{
++  void *text, *data = NULL;
++  long idx;
++
++  idx = grub_dl_find_section_index (e, ".text");
++  if (idx < 0)
++    return;
++
++  text = grub_dl_get_section_addr (mod, idx);
++  if (!text)
++    return;
++
++  idx = grub_dl_find_section_index (e, ".data");
++  if (idx >= 0)
++    data = grub_dl_get_section_addr (mod, idx);
++
++  if (data)
++    grub_qdprintf ("gdb", "add-symbol-file \\\n"
++		          "/usr/lib/debug/usr/lib/grub/%s-%s/%s.debug "
++			  "\\\n %p -s .data %p\n",
++		  GRUB_TARGET_CPU, GRUB_PLATFORM,
++		  mod->name, text, data);
++  else
++    grub_qdprintf ("gdb", "add-symbol-file \\\n"
++			   "/usr/lib/debug/usr/lib/grub/%s-%s/%s.debug "
++			   "\\\n%p\n",
++		  GRUB_TARGET_CPU, GRUB_PLATFORM,
++		  mod->name, text);
++}
++
+ static grub_err_t
+ grub_dl_set_mem_attrs (grub_dl_t mod, void *ehdr)
+ {
+@@ -833,6 +865,8 @@ grub_dl_load_core_noinit (void *addr, grub_size_t size)
+   grub_dprintf ("modules", "module name: %s\n", mod->name);
+   grub_dprintf ("modules", "init function: %p\n", mod->init);
+ 
++  grub_dl_print_gdb_info (mod, e);
++
+   if (grub_dl_add (mod))
+     {
+       grub_dl_unload (mod);
+diff --git a/grub-core/kern/efi/init.c b/grub-core/kern/efi/init.c
+index dee3918fd35..d35d6974734 100644
+--- a/grub-core/kern/efi/init.c
++++ b/grub-core/kern/efi/init.c
+@@ -157,6 +157,7 @@ grub_efi_init (void)
+   grub_efi_system_table->boot_services->set_watchdog_timer (0, 0, 0, NULL);
+ 
+   grub_efi_env_init ();
++  grub_efi_print_gdb_info ();
+   grub_efidisk_init ();
+ 
+   grub_efi_register_debug_commands ();

@@ -1,0 +1,52 @@
+From 8bf8c358307fc08e15a23c36fa95853c259de78d Mon Sep 17 00:00:00 2001
+From: Alfredo Moralejo <amoralej@redhat.com>
+Date: Mon, 21 Nov 2022 15:25:14 +0100
+Subject: [PATCH] Revert "Add OSprofiler support for Aodh client"
+
+This reverts commit fb22e9826256ef090b8ae043583fee0a4cb481fc.
+---
+ aodhclient/client.py | 2 --
+ requirements.txt     | 3 +--
+ 2 files changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/aodhclient/client.py b/aodhclient/client.py
+index bb2ec09..662bde9 100644
+--- a/aodhclient/client.py
++++ b/aodhclient/client.py
+@@ -12,7 +12,6 @@
+ 
+ from keystoneauth1 import adapter
+ from oslo_utils import importutils
+-from osprofiler import web
+ 
+ from aodhclient import exceptions
+ 
+@@ -30,7 +29,6 @@ class SessionClient(adapter.Adapter):
+         # NOTE(sileht): The standard call raises errors from
+         # keystoneauth, where we need to raise the aodhclient errors.
+         raise_exc = kwargs.pop('raise_exc', True)
+-        kwargs['headers'].update(web.get_trace_id_headers())
+         resp = super(SessionClient, self).request(url,
+                                                   method,
+                                                   raise_exc=False,
+diff --git a/requirements.txt b/requirements.txt
+-index f2b84d9..ed9eff0 100644
++index 80d0aca..e2ac44c 100644
+ --- a/requirements.txt
+ +++ b/requirements.txt
+-@@ -8,6 +8,5 @@ osc-lib>=1.0.1 # Apache-2.0
++@@ -8,7 +8,6 @@ osc-lib>=1.0.1 # Apache-2.0
+  oslo.i18n>=1.5.0 # Apache-2.0
+  oslo.serialization>=1.4.0 # Apache-2.0
+  oslo.utils>=2.0.0 # Apache-2.0
+ -osprofiler>=1.4.0 # Apache-2.0
+  keystoneauth1>=1.0.0
+--pyparsing
+-\ No newline at end of file
+-+pyparsing
+--- 
+-2.34.1
+-
++ pyparsing
++ SQLAlchemy-Utils<=0.38.3
+

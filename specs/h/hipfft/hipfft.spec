@@ -43,7 +43,7 @@
 
 Name:           %{hipfft_name}
 Version:        %{rocm_version}
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        ROCm FFT marshalling library
 Url:            https://github.com/ROCm/%{upstreamname}
 License:        MIT

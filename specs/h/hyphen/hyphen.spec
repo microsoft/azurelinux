@@ -4,7 +4,7 @@
 Name:      hyphen
 Summary:   A text hyphenation library
 Version:   2.8.8
-Release:   27%{?dist}
+Release: 28%{?dist}
 Source:    http://downloads.sourceforge.net/hunspell/hyphen-%{version}.tar.gz
 URL:       http://hunspell.sf.net
 License:   GPL-2.0-only OR LGPL-2.1-or-later OR MPL-1.1

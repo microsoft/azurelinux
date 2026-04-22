@@ -13,7 +13,7 @@
 
 Name:       python-%{library}
 Version:    0.9.0
-Release:    17%{?dist}
+Release: 18%{?dist}
 Summary:    Dictdiffer is a module that helps you to diff and patch dictionaries
 License:    MIT
 URL:        https://github.com/inveniosoftware/dictdiffer

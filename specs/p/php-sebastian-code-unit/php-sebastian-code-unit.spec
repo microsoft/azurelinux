@@ -28,7 +28,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
 Version:        1.0.8
-Release:        13%{?dist}
+Release: 14%{?dist}
 Summary:        Collection of value objects that represent the PHP code units, version 1
 
 License:        BSD-3-Clause

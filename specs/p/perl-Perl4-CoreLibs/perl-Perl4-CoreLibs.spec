@@ -3,7 +3,7 @@
 
 Name:           perl-Perl4-CoreLibs
 Version:        0.005
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        Libraries historically supplied with Perl 4
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Perl4-CoreLibs

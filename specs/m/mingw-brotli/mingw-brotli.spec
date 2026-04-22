@@ -5,7 +5,7 @@
 
 Name: mingw-brotli
 Version: 1.0.7
-Release: 15%{?dist}
+Release: 16%{?dist}
 Summary: MinGW port of Lossless compression algorithm
 
 License: MIT

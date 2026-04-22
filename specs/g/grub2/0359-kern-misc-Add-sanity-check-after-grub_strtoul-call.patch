@@ -1,0 +1,57 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Lidong Chen <lidong.chen@oracle.com>
+Date: Thu, 6 Feb 2025 18:16:57 +0000
+Subject: [PATCH] kern/misc: Add sanity check after grub_strtoul() call
+
+When the format string, fmt0, includes a positional argument
+grub_strtoul() or grub_strtoull() is called to extract the argument
+position. However, the returned argument position isn't fully validated.
+If the format is something like "%0$x" then these functions return
+0 which leads to an underflow in the calculation of the args index, curn.
+The fix is to add a check to ensure the extracted argument position is
+greater than 0 before computing curn. Additionally, replace one
+grub_strtoull() with grub_strtoul() and change curn type to make code
+more correct.
+
+Fixes: CID 473841
+
+Signed-off-by: Lidong Chen <lidong.chen@oracle.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/kern/misc.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/kern/misc.c b/grub-core/kern/misc.c
+index 98700423d..69bd655f3 100644
+--- a/grub-core/kern/misc.c
++++ b/grub-core/kern/misc.c
+@@ -912,7 +912,7 @@ parse_printf_arg_fmt (const char *fmt0, struct printf_args *args,
+   while ((c = *fmt++) != 0)
+     {
+       int longfmt = 0;
+-      grub_size_t curn;
++      unsigned long curn;
+       const char *p;
+ 
+       if (c != '%')
+@@ -930,7 +930,10 @@ parse_printf_arg_fmt (const char *fmt0, struct printf_args *args,
+ 
+       if (*fmt == '$')
+ 	{
+-	  curn = grub_strtoull (p, 0, 10) - 1;
++	  curn = grub_strtoul (p, 0, 10);
++	  if (curn == 0)
++	    continue;
++	  curn--;
+ 	  fmt++;
+ 	}
+ 
+@@ -1116,6 +1119,8 @@ grub_vsnprintf_real (char *str, grub_size_t max_len, const char *fmt0,
+ 
+       if (*fmt == '$')
+ 	{
++	  if (format1 == 0)
++	    continue;
+ 	  curn = format1 - 1;
+ 	  fmt++;
+ 	  format1 = 0;

@@ -3,7 +3,7 @@
 
 Name:           perl-Locale-US
 Version:        3.04
-Release:        30%{?dist}
+Release: 31%{?dist}
 Summary:        Two letter codes for state identification in the United States and vice versa
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Locale-US

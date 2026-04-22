@@ -4,7 +4,7 @@
 Summary:	A sophisticated file transfer program
 Name:		lftp
 Version:	4.9.3
-Release:	5%{?dist}
+Release: 6%{?dist}
 License:	GPL-3.0-or-later
 Source0:	http://lftp.yar.ru/ftp/%{name}-%{version}.tar.xz
 URL:		http://lftp.yar.ru/

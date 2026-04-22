@@ -11,7 +11,7 @@
 Name:		perl-CPAN-Meta-Check
 Summary:	Verify requirements in a CPAN::Meta object
 Version:	0.018
-Release:	6%{?dist}
+Release: 7%{?dist}
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/CPAN-Meta-Check
 Source0:	https://cpan.metacpan.org/modules/by-module/CPAN/CPAN-Meta-Check-%{version}.tar.gz

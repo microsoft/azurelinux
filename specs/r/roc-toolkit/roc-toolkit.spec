@@ -11,7 +11,7 @@
 Name:		roc-toolkit
 #Version:	0.2.1^%%{git_suffix}
 Version:	0.4.0
-Release:	3%{?dist}
+Release: 4%{?dist}
 Summary:	Real-time audio streaming
 License:	MPL-2.0 AND LGPL-2.1-or-later AND CECILL-C
 URL:		https://github.com/roc-streaming/roc-toolkit

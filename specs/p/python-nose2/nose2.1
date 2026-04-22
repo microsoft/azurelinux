@@ -1,0 +1,143 @@
+.TH NOSE2 "1" "June 2022" "" "User Commands"
+.SH NAME
+.B nose2
+\(en The successor to
+.BR nose ,
+based on
+.B unittest2
+.SH SYNOPSIS
+.B nose2
+.RB [ \-s\ \fISTART_DIR ]
+.RB [ \-t\ \fITOP_LEVEL_DIRECTORY ]
+.RB [ \-\-config\  [ \fICONFIG ]]
+.RB [ \-\-no\-user\-config ]
+.RB [ \-\-no\-plugins ]
+.RB [ \-\-plugin\ \fIPLUGINS ]
+.RB [ \-\-exclude-plugin\ \fIEXCLUDE_PLUGINS ]
+.RB [ \-\-verbosity\ \fIVERBOSITY ]
+.RB [ \-\-verbose ]
+.RB [ \-\-quiet ]
+.RB [ \-\-log-level\ \fILOG_LEVEL ]
+.RB [ \-B ]
+.RB [ \--coverage\ \fIPATH ]
+.RB [ \--coverage-report\ \fITYPE ]
+.RB [ \--coverage-config\ \fIFILE ]
+.RB [ \-C ]
+.RB [ \-D ]
+.RB [ \-F ]
+.RB [ \-\-log\-capture ]
+.RB [ \-\-pretty\-assert ]
+.RB [ \-h ]
+.RI [ testNames \ ...]
+.SH OPTIONS
+.SS "POSITIONAL\ ARGUMENTS"
+.TP
+.I testNames
+.SS "OPTIONAL\ ARGUMENTS"
+.TP
+.B \-s\ \fISTART_DIR\fR, \-\-start\-dir\ \fISTART_DIR
+Directory to start discovery
+(\fB.\fR default)
+.TP
+.B \-t\ \fITOP_LEVEL_DIRECTORY\fR, \-\-top\-level\-directory\ \fITOP_LEVEL_DIRECTORY\fR, \-\-project\-directory\ \fITOP_LEVEL_DIRECTORY
+Top level directory of project (defaults to start dir)
+.TP
+.B \-\-config\ \fR[\fICONFIG\fR], \-c\ \fR[\fICONFIG\fR]
+Config files to load, if they exist.
+.RB ( unittest.cfg
+and
+.B nose2.cfg
+in start directory default)
+.TP
+.B \-\-no\-user\-config
+Do not load user config files
+.TP
+.B \-\-no\-plugins
+Do not load any plugins.
+.IR Warning :
+.B nose2
+does not do anything if no plugins are loaded
+.TP
+.B \-\-plugin\ \fIPLUGINS
+Load this plugin module.
+.TP
+.B \-\-exclude\-plugin\ \fIEXCLUDE_PLUGINS
+Do not load this plugin module
+.TP
+.B \-\-verbosity\ \fIVERBOSITY
+Set starting verbosity level
+.RI ( int ).
+Applies before
+.B \-v
+and
+.B \-q
+.TP
+.B \-\-verbose\fR, \fB\-v
+Print test case names and statuses.
+Use multiple
+.BR \-v \(cqs
+for higher verbosity.
+.TP
+.B \-\-quiet\fR, \fB\-q
+Reduce verbosity.
+Multiple
+.BR \-q \(cqs
+result in lower verbosity.
+.TP
+.B \-\-log\-level\ \fILOG_LEVEL
+Set logging level for message logged to console.
+.TP
+.B \-h\fR, \fB\-\-help
+Show a help message and exit
+.SS "PLUGIN\ ARGUMENTS"
+Command-line arguments added by plugins:
+.TP
+.B \-B\fR, \fB\-\-output\-buffer
+Enable output buffer
+.TP
+.B \-\-coverage\ \fIPATH
+Measure coverage for filesystem path (multi-allowed)
+.TP
+.B \-\-coverage\-report\ \fITYPE
+Generate selected reports, available types:
+.BR term ,
+.BR term-missing ,
+.BR annotate ,
+.BR html ,
+.B xml
+(multi-allowed)
+.TP
+.B \-\-coverage\-config\ \fIFILE
+Config file for coverage, default:
+.B .coveragerc
+.TP
+.B \-C\fR, \fB\-\-with\-coverage
+Turn on coverage reporting
+.TP
+.B \-D\fR, \fB\-\-debugger
+Enter
+.B pdb
+on test fail or error
+.TP
+.B \-F\fR, \fB\-\-fail\-fast
+Stop the test run after the first error or failure
+.TP
+.B \-\-log\-capture
+Enable log capture
+.TP
+.B \-\-pretty\-assert
+Add pretty output for
+.RB \(lq assert \(rq
+statements
+.SH FILES
+.TP
+.B unittest.cfg\fR and \fBnose2.cfg
+Default config files loaded from the start directory; see
+.BR \-\-config / \-c ,
+.BR \-\-start\-dir / \-s ,
+and
+.BR \-\-no\-user\-config .
+.TP
+.B .coveragerc
+Default config file for coverage; see
+.BR \-\-coverage\-config .

@@ -16,7 +16,7 @@
 
 Name:           perl-Scalar-Properties
 Version:        1.100860
-Release:        40%{?dist}
+Release: 41%{?dist}
 Summary:        Run-time properties on scalar variables
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Scalar-Properties

@@ -4,7 +4,7 @@
 Summary:	The PBKDF2 password hashing algorithm
 Name:		perl-Crypt-PBKDF2
 Version:	0.161520
-Release:	24%{?dist}
+Release: 25%{?dist}
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Crypt-PBKDF2
 Source0:	https://cpan.metacpan.org/modules/by-module/Crypt/Crypt-PBKDF2-%{version}.tar.gz

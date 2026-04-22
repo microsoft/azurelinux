@@ -31,7 +31,7 @@
 Name:           pandoc-cli
 Version:        3.6.4
 # can only be reset when all subpkgs bumped
-Release:        38%{?dist}
+Release: 39%{?dist}
 Summary:        Markup conversion between documentation formats
 
 License:        GPL-2.0-or-later

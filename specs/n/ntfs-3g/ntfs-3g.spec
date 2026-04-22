@@ -11,7 +11,7 @@
 Name:           ntfs-3g
 Epoch:          2
 Version:        2022.10.3
-Release:        10%{?dist}
+Release: 11%{?dist}
 Summary:        Linux NTFS userspace driver
 # Automatically converted from old format: GPLv2+ - review is highly recommended.
 License:        GPL-2.0-or-later

@@ -1,0 +1,11 @@
+--- nbdime-4.0.3/package.json.orig	2026-01-15 09:43:29.000000000 -0700
++++ nbdime-4.0.3/package.json	2026-01-16 10:07:27.076212669 -0700
+@@ -28,5 +28,8 @@
+     "npm-run-all": "^4.1.5",
+     "npm-which": "^3.0.1",
+     "prettier": "^3.0.0"
++  },
++  "resolutions": {
++    "@types/d3-dispatch": "3.0.6"
+   }
+ }

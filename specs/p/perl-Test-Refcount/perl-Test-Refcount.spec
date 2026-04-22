@@ -3,7 +3,7 @@
 
 Name:           perl-Test-Refcount
 Version:        0.10
-Release:        19%{?dist}
+Release: 20%{?dist}
 Summary:        Assert reference counts on objects
 
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

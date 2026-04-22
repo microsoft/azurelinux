@@ -1,0 +1,50 @@
+From c4a222ed94be260d8b8647dcc60b5e4f6f29290e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Robert-Andr=C3=A9=20Mauchin?= <zebob.m@gmail.com>
+Date: Sat, 2 Jan 2021 21:01:13 +0100
+Subject: [PATCH] Fix int overflow
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Robert-André Mauchin <zebob.m@gmail.com>
+---
+ bytesource/bytesource_test.go | 4 ++--
+ fuzz_test.go                  | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/bytesource/bytesource_test.go b/bytesource/bytesource_test.go
+index 609cf5e..e1a8f54 100644
+--- a/bytesource/bytesource_test.go
++++ b/bytesource/bytesource_test.go
+@@ -91,9 +91,9 @@ func TestByteSourceValues(t *testing.T) {
+ 
+ 	r := rand.New(New(data))
+ 
+-	got := []int{r.Int(), r.Int(), r.Int(), r.Int(), r.Int()}
++	got := []int64{r.Int63(), r.Int63(), r.Int63(), r.Int63(), r.Int63()}
+ 
+-	want := []int{
++	want := []int64{
+ 		3568552425102051206,
+ 		3568552489526560135,
+ 		3568569467532292485,
+diff --git a/fuzz_test.go b/fuzz_test.go
+index 6188c2b..d4a9279 100644
+--- a/fuzz_test.go
++++ b/fuzz_test.go
+@@ -632,10 +632,10 @@ func TestNewFromGoFuzz(t *testing.T) {
+ 
+ 	input := []byte{1, 2, 3}
+ 
+-	var got int
++	var got int64
+ 	NewFromGoFuzz(input).Fuzz(&got)
+ 
+-	if want := 5563767293437588600; want != got {
++	if want := int64(5563767293437588600); want != got {
+ 		t.Errorf("Fuzz(%q) = %d, want: %d", input, got, want)
+ 	}
+ }
+-- 
+2.29.2
+

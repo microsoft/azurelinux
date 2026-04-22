@@ -8,7 +8,7 @@
 
 Name:           lorax
 Version:        43.11
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Tool for creating the anaconda install images
 License:        GPL-2.0-or-later
 

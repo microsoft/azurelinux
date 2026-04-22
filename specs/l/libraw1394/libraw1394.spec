@@ -4,7 +4,7 @@
 Summary:        Library providing low-level IEEE-1394 access - 2.1.2-
 Name:           libraw1394
 Version:        2.1.2
-Release:        24%{?dist}
+Release: 25%{?dist}
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.
 License:        LicenseRef-Callaway-LGPLv2+
 Source:         http://www.kernel.org/pub/linux/libs/ieee1394/%{name}-%{version}.tar.xz

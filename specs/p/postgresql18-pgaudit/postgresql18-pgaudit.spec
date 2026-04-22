@@ -7,7 +7,7 @@
 %global pgversion 18
 Name:		postgresql%{pgversion}-%{majorname}
 Version:	18.0
-Release:	1%{?dist}
+Release: 2%{?dist}
 Summary:	PostgreSQL Audit Extension
 
 License:	PostgreSQL

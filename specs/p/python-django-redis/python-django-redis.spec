@@ -6,7 +6,7 @@
 
 Name:           python-%{pypi_name}
 Version:        4.5.0
-Release:        31%{?dist}
+Release: 32%{?dist}
 Summary:        Full featured redis cache backend for Django
 
 # Automatically converted from old format: BSD - review is highly recommended.

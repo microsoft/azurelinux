@@ -3,7 +3,7 @@
 
 Name:           perl-Text-Diff
 Version:        1.45
-Release:        24%{?dist}
+Release: 25%{?dist}
 Summary:        Perform diffs on files and record sets
 # lib/Text/Diff.pm - GPL-2.0-or-later OR Artistic-1.0-Perl
 # lib/Text/Diff/Config.pm - MIT

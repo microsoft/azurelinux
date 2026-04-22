@@ -10,7 +10,7 @@
 Name: hunspell-yi
 Summary: Yiddish hunspell dictionaries
 Version: 1.1
-Release: 33%{?dist}
+Release: 34%{?dist}
 Source: https://downloads.sourceforge.net/project/aoo-extensions/3975/1/%{name}-%{version}.oxt
 URL: http://extensions.services.openoffice.org/en/project/dict-yi
 License: LGPL-2.1-or-later OR GPL-2.0-or-later OR MPL-1.1

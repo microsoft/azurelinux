@@ -3,7 +3,7 @@
 
 Name:           libgudev
 Version:        238
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        GObject-based wrapper library for libudev
 
 License:        LGPL-2.1-or-later

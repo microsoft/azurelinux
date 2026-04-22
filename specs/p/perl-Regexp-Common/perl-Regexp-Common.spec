@@ -3,7 +3,7 @@
 
 Name:		perl-Regexp-Common
 Version:	2024080801
-Release:	3%{?dist}
+Release: 4%{?dist}
 Summary:	Regexp::Common Perl module
 # Old Artistic 1.0 is also valid, but we won't list it here since it is non-free.
 # Also, it would throw off the automated license check and flag this package.

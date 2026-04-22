@@ -1,0 +1,85 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leo Sandoval <lsandova@redhat.com>
+Date: Mon, 8 Apr 2024 10:59:25 -0600
+Subject: [PATCH] grub-core/loader/efi/linux.c: drop now unused
+ grub_linuxefi_secure_validate
+
+Drop the now unused grub_linuxefi_secure_validate() as all prior users
+of this API now rely on the shim-lock-verifier codepath instead.
+
+This patch must not be ported to older editions of grub code bases
+that do not have verifiers framework, or it is not builtin, or
+shim-lock-verifier is an optional module.
+
+Signed-off-by: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
+---
+ grub-core/loader/efi/linux.c | 42 ------------------------------------------
+ include/grub/efi/linux.h     |  2 --
+ 2 files changed, 44 deletions(-)
+
+diff --git a/grub-core/loader/efi/linux.c b/grub-core/loader/efi/linux.c
+index ecb6d593cef..f5ab0128991 100644
+--- a/grub-core/loader/efi/linux.c
++++ b/grub-core/loader/efi/linux.c
+@@ -89,48 +89,6 @@ static grub_efi_load_file2_t initrd_lf2 = {
+   grub_efi_initrd_load_file2
+ };
+ 
+-#define SHIM_LOCK_GUID \
+- { 0x605dab50, 0xe046, 0x4300, {0xab, 0xb6, 0x3d, 0xd8, 0x10, 0xdd, 0x8b, 0x23} }
+-
+-struct grub_efi_shim_lock
+-{
+-  grub_efi_status_t (*verify) (void *buffer, grub_uint32_t size);
+-};
+-typedef struct grub_efi_shim_lock grub_efi_shim_lock_t;
+-
+-// Returns 1 on success, -1 on error, 0 when not available
+-int
+-grub_linuxefi_secure_validate (void *data, grub_uint32_t size)
+-{
+-  grub_guid_t guid = SHIM_LOCK_GUID;
+-  grub_efi_shim_lock_t *shim_lock;
+-  grub_efi_status_t status;
+-
+-  shim_lock = grub_efi_locate_protocol(&guid, NULL);
+-
+-  grub_dprintf ("secureboot", "shim_lock: %p\n", shim_lock);
+-  if (!shim_lock)
+-    {
+-      grub_dprintf ("secureboot", "shim not available\n");
+-      return 0;
+-    }
+-
+-  grub_dprintf ("secureboot", "Asking shim to verify kernel signature\n");
+-  status = shim_lock->verify (data, size);
+-  grub_dprintf ("secureboot", "shim_lock->verify(): %ld\n", (long int)status);
+-  if (status == GRUB_EFI_SUCCESS)
+-    {
+-      grub_dprintf ("secureboot", "Kernel signature verification passed\n");
+-      return 1;
+-    }
+-
+-  grub_dprintf ("secureboot", "Kernel signature verification failed (0x%lx)\n",
+-		(unsigned long) status);
+-
+-  return -1;
+-
+-}
+-
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wcast-align"
+ 
+diff --git a/include/grub/efi/linux.h b/include/grub/efi/linux.h
+index b2cfd8c1f44..c806a7757f3 100644
+--- a/include/grub/efi/linux.h
++++ b/include/grub/efi/linux.h
+@@ -22,8 +22,6 @@
+ #include <grub/err.h>
+ #include <grub/symbol.h>
+ 
+-int
+-EXPORT_FUNC(grub_linuxefi_secure_validate) (void *data, grub_uint32_t size);
+ grub_err_t
+ EXPORT_FUNC(grub_efi_linux_boot) (void *kernel_address, grub_off_t offset,
+                                   void *kernel_param);

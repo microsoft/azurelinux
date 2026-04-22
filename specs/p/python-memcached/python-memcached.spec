@@ -3,7 +3,7 @@
 
 Name:           python-memcached
 Version:        1.62
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        A Python memcached client library
 
 # Automatically converted from old format: Python - review is highly recommended.

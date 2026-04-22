@@ -15,7 +15,7 @@
 Summary:        Random number generator related utilities
 Name:           rng-tools
 Version:        6.17
-Release:        7%{?dist}
+Release: 8%{?dist}
 License:        GPL-2.0-or-later
 URL:            https://github.com/nhorman/rng-tools
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz

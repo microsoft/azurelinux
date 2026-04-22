@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Lidong Chen <lidong.chen@oracle.com>
+Date: Wed, 29 Jan 2025 06:48:38 +0000
+Subject: [PATCH] osdep/unix/getroot: Fix potential underflow
+
+The entry_len is initialized in grub_find_root_devices_from_mountinfo()
+to 0 before the while loop iterates through /proc/self/mountinfo. If the
+file is empty or contains only invalid entries entry_len remains
+0 causing entry_len - 1 in the subsequent for loop initialization
+to underflow. To prevent this add a check to ensure entry_len > 0 before
+entering the for loop.
+
+Fixes: CID 473877
+
+Signed-off-by: Lidong Chen <lidong.chen@oracle.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+Reviewed-by: Ross Philipson <ross.philipson@oracle.com>
+---
+ grub-core/osdep/linux/getroot.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/grub-core/osdep/linux/getroot.c b/grub-core/osdep/linux/getroot.c
+index b32582eb3..b83259321 100644
+--- a/grub-core/osdep/linux/getroot.c
++++ b/grub-core/osdep/linux/getroot.c
+@@ -596,6 +596,9 @@ again:
+ 	}
+     }
+ 
++  if (!entry_len)
++    goto out;
++
+   /* Now scan visible mounts for the ones we're interested in.  */
+   for (i = entry_len - 1; i >= 0; i--)
+     {

@@ -1,0 +1,25 @@
+From 085b289c17f7047f4350d52bf594313392ae0caa Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Thu, 31 Oct 2019 12:30:12 +0100
+Subject: [PATCH] Port to OpenJDK 11
+
+---
+ .../commons/collections/collection/AbstractTestCollection.java  | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/test/org/apache/commons/collections/collection/AbstractTestCollection.java b/src/test/org/apache/commons/collections/collection/AbstractTestCollection.java
+index dfde362..8287f33 100644
+--- a/src/test/org/apache/commons/collections/collection/AbstractTestCollection.java
++++ b/src/test/org/apache/commons/collections/collection/AbstractTestCollection.java
+@@ -1116,7 +1116,7 @@ public abstract class AbstractTestCollection extends AbstractTestObject {
+         verify();
+ 
+         try {
+-            array = collection.toArray(null);
++            array = collection.toArray((Object[]) null);
+             fail("toArray(null) should raise NPE");
+         } catch (NullPointerException e) {
+             // expected
+-- 
+2.21.0
+

@@ -16,7 +16,7 @@ index 7d2cb9e50..af9049a1e 100644
  
  TOP_DIR = os.path.realpath(os.path.dirname(__file__))
 -CMAKE_BUILD_DIR = os.path.join(TOP_DIR, ".setuptools-cmake-build")
-+CMAKE_BUILD_DIR = os.path.join(TOP_DIR, "redhat-linux-build")
++CMAKE_BUILD_DIR = os.path.join(TOP_DIR, os.environ.get("VPATH_BUILDDIR", "redhat-linux-build"))
  
  WINDOWS = os.name == "nt"
  

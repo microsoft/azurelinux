@@ -1,0 +1,56 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Nicolas Frayer <nfrayer@redhat.com>
+Date: Wed, 29 Jan 2025 17:37:36 +0100
+Subject: [PATCH] mokutil: remove unused int_to_b64()
+
+static const char b64t[64] triggers compiler warning
+which in turn makes the build fail with
+-Werror=unterminated-string-initialization, so removing
+this string with the the unused int_to_b64() function
+which is the only function using this array.
+
+Signed-off-by: Nicolas Frayer <nfrayer@redhat.com>
+---
+ src/password-crypt.c | 9 ---------
+ src/password-crypt.h | 1 -
+ 2 files changed, 10 deletions(-)
+
+diff --git a/src/password-crypt.c b/src/password-crypt.c
+index db69b88ca6f7..bdbf784f923e 100644
+--- a/src/password-crypt.c
++++ b/src/password-crypt.c
+@@ -46,9 +46,6 @@
+ #define SHA256_DEFAULT_ROUNDS 5000
+ #define SHA512_DEFAULT_ROUNDS 5000
+ 
+-static const char b64t[64] =
+-"./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+-
+ static const char md5_prefix[] = "$1$";
+ 
+ static const char sha256_prefix[] = "$5$";
+@@ -357,12 +354,6 @@ decode_pass (const char *crypt_pass, pw_crypt_t *pw_crypt)
+ 	return -1;
+ }
+ 
+-char
+-int_to_b64 (const int i)
+-{
+-	return b64t[i & 0x3f];
+-}
+-
+ int
+ b64_to_int (const char c)
+ {
+diff --git a/src/password-crypt.h b/src/password-crypt.h
+index 214a65bf5f14..999e036e76d9 100644
+--- a/src/password-crypt.h
++++ b/src/password-crypt.h
+@@ -68,7 +68,6 @@ uint16_t get_pw_salt_size (const HashMethod method);
+ int get_pw_hash_size (const HashMethod method);
+ const char *get_crypt_prefix (const HashMethod method);
+ int decode_pass (const char *crypt_pass, pw_crypt_t *pw_crypt);
+-char int_to_b64 (const int i);
+ int b64_to_int (const char c);
+ 
+ #endif /* __PASSWORD_CRYPT_H__ */

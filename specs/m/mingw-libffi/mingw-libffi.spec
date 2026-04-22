@@ -5,7 +5,7 @@
 
 Name:		mingw-libffi
 Version:	3.5.1
-Release:	2%{?dist}
+Release: 3%{?dist}
 Summary:	A portable foreign function interface library for MinGW
 
 License:	MIT

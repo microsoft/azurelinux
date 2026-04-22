@@ -1,0 +1,40 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Nicolas Frayer <nfrayer@redhat.com>
+Date: Tue, 16 Jul 2024 11:11:43 +0200
+Subject: [PATCH] grub2-mkconfig: Ensure grub cfg stub is not overwritten
+
+/boot/efi/EFI/$os_name/grub.cfg contains a grub cfg stub
+that should not be overwritten by grub2-mkconfig.
+Ensure that we prevent this from happening.
+
+Signed-off-by: Marta Lewandowska <mlewando@redhat.com>
+Signed-off-by: Nicolas Frayer <nfrayer@redhat.com>
+---
+ util/grub-mkconfig.in | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/util/grub-mkconfig.in b/util/grub-mkconfig.in
+index 461df7f09..b560aae6c 100644
+--- a/util/grub-mkconfig.in
++++ b/util/grub-mkconfig.in
+@@ -109,6 +109,20 @@ do
+     esac
+ done
+ 
++os_name=$(grep '^ID=' /etc/os-release | sed 's/ID=//')
++if test "$os_name" = '"rhel"'; then
++  os_name=redhat
++elif test "$os_name" = '"centos"'; then
++  os_name=centos
++fi
++if test "x${grub_cfg}" = "x/boot/efi/EFI/$os_name/grub.cfg" &&\
++        mountpoint -q /boot/efi; then
++  gettext_printf "Running \`grub2-mkconfig -o %s' will overwrite the GRUB wrapper.\n" "$grub_cfg" 1>&2
++  gettext_printf "Please run \`grub2-mkconfig -o /boot/grub2/grub.cfg' instead to update grub.cfg.\n" 1>&2
++  gettext_printf "GRUB configuration file was not updated.\n" 1>&2
++  exit 1
++fi
++
+ if [ "x$EUID" = "x" ] ; then
+   EUID=`id -u`
+ fi

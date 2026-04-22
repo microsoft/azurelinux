@@ -10,7 +10,7 @@
 
 Name:           perl-Test-CPAN-Meta
 Version:        0.25
-Release:        39%{?dist}
+Release: 40%{?dist}
 Summary:        Validation of the META.yml file in a CPAN distribution
 License:        Artistic-2.0
 URL:            https://metacpan.org/release/Test-CPAN-Meta

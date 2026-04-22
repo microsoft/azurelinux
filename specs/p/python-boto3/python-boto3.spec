@@ -11,7 +11,7 @@
 
 Name:           python-boto3
 Version:        1.42.52
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        The AWS SDK for Python
 
 License:        Apache-2.0

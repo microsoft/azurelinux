@@ -1,0 +1,59 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Nicolas Frayer <nfrayer@redhat.com>
+Date: Wed, 16 Oct 2024 15:50:32 +0200
+Subject: [PATCH] cmd/search: Fix a possible NULL ptr dereference
+
+When querying about a partition UUID, we're not checking
+for get_device_uuid() return value, which can possibly
+result in dereferencing a NULL pointer.
+
+Signed-off-by: Nicolas Frayer <nfrayer@redhat.com>
+Co-authored-by: Chuong Tran <anhchuong89@gmail.com>
+---
+ grub-core/commands/search.c | 28 +++++++++++++++-------------
+ 1 file changed, 15 insertions(+), 13 deletions(-)
+
+diff --git a/grub-core/commands/search.c b/grub-core/commands/search.c
+index 9dd937e6df4e..d538b36219fb 100644
+--- a/grub-core/commands/search.c
++++ b/grub-core/commands/search.c
+@@ -212,24 +212,26 @@ iterate_device (const char *name, void *data)
+                     struct uuid_context uuid_ctx;
+                     int ret = 0;
+ 
+-                    get_device_uuid(name, &quid_name);
+-                    if (!grub_strcmp(quid_name, ctx->key))
++                    if (get_device_uuid(name, &quid_name))
+                       {
+-                        uuid_ctx.name = name;
+-                        uuid_ctx.uuid = quid_name;
++                      if (!grub_strcmp(quid_name, ctx->key))
++                        {
++                          uuid_ctx.name = name;
++                          uuid_ctx.uuid = quid_name;
+ 
+-                        ret = grub_device_iterate (check_for_duplicate, &uuid_ctx);
++                          ret = grub_device_iterate (check_for_duplicate, &uuid_ctx);
+ 
+-                        if (ret)
+-                          {
+-                            grub_printf("Duplicated media UUID found, rebooting ...\n");
+-                            grub_sleep(10);
+-                            grub_reboot();
+-                          }
+-                      }
++                          if (ret)
++                            {
++                              grub_printf("Duplicated media UUID found, rebooting ...\n");
++                              grub_sleep(10);
++                              grub_reboot();
++                            }
++                        }
+ 
+-                    if (quid_name) grub_free (quid_name);
++                      if (quid_name) grub_free (quid_name);
+ 
++                    }
+                   }
+               }
+ 	  }

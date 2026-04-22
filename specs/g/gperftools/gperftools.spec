@@ -7,7 +7,7 @@
 
 Name:		gperftools
 Version:	2.17.2
-Release:	1%{?dist}
+Release: 2%{?dist}
 License:	BSD-3-Clause
 Summary:	Very fast malloc and performance analysis tools
 URL:		https://github.com/gperftools/gperftools

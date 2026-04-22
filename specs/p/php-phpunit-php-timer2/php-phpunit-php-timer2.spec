@@ -32,7 +32,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
 Version:        2.1.4
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        PHP Utility class for timing
 
 License:        BSD-3-Clause

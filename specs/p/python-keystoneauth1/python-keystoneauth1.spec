@@ -19,7 +19,7 @@ new clients.
 
 Name:       python-%{pypi_name}
 Version:    5.8.0
-Release:    6%{?dist}
+Release: 7%{?dist}
 Summary:    Authentication Library for OpenStack Clients
 License:    Apache-2.0
 URL:        https://pypi.io/pypi/%{pypi_name}

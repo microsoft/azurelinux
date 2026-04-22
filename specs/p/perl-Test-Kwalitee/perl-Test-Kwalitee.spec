@@ -3,7 +3,7 @@
 
 Name:		perl-Test-Kwalitee
 Version:	1.28
-Release:	19%{?dist}
+Release: 20%{?dist}
 Summary:	Test the Kwalitee of a distribution before you release it
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		http://metacpan.org/module/Test::Kwalitee

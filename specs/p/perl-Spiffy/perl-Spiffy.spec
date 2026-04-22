@@ -6,7 +6,7 @@
 
 Name:           perl-Spiffy
 Version:        0.46
-Release:        33%{?dist}
+Release: 34%{?dist}
 Summary:        Framework for doing object oriented (OO) programming in Perl
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Spiffy

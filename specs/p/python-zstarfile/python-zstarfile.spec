@@ -7,7 +7,7 @@
 
 Name:           python-zstarfile
 Version:        0.3.0
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Tarfile extension with additional compression algorithms and PEP 706 by default
 
 

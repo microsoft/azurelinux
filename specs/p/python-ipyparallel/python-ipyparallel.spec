@@ -3,7 +3,7 @@
 
 Name:		python-ipyparallel
 Version:	9.0.2
-Release:	2%{?dist}
+Release: 3%{?dist}
 Summary:	Interactive Parallel Computing with IPython
 
 License:	BSD-3-Clause

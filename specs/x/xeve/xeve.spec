@@ -3,7 +3,7 @@
 
 Name:           xeve
 Version:        0.5.1
-Release:        5%{?dist}
+Release: 6%{?dist}
 Summary:        Reference MPEG-5 Part 1 (EVC) encoder
 
 License:        BSD-3-Clause

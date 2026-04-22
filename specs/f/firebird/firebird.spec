@@ -13,7 +13,7 @@
 
 Name:           firebird
 Version:        %{upversion}
-Release:        1%{?dist}
+Release: 2%{?dist}
 
 Summary:        SQL relational database management system
 # Automatically converted from old format: Interbase - review is highly recommended.

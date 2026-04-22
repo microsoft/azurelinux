@@ -4,7 +4,7 @@
 %global oqs_version 0.12.0
 Name:       liboqs
 Version:    %{oqs_version}
-Release:    5%{?dist}
+Release: 6%{?dist}
 Summary:    liboqs is an open source C library for quantum-safe cryptographic algorithms.
 
 #liboqs uses MIT license by itself but includes several files licensed under different terms.

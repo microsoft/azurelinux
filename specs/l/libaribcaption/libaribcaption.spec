@@ -3,7 +3,7 @@
 
 Name:           libaribcaption
 Version:        1.1.1
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Portable ARIB STD-B24 Caption Decoder/Renderer
 License:        MIT
 URL:            https://github.com/xqq/libaribcaption

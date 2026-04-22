@@ -17,7 +17,7 @@
 Name:           ghc-%{pkg_name}
 Version:        0.12.9
 # can only be reset when subpkg bumped
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Conversion between math formats
 
 License:        GPL-2.0-or-later

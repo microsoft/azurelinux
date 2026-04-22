@@ -1,0 +1,56 @@
+From 07bedc8f93277f705622625f440a1f56ccff1cd0 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Zbigniew=20J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>
+Date: Tue, 9 Jan 2024 11:28:04 +0100
+Subject: [PATCH] journal: again create user journals for users with high uids
+
+This effectively reverts a change in 115d5145a257c1a27330acf9f063b5f4d910ca4d
+'journald: move uid_for_system_journal() to uid-alloc-range.h', which slipped
+in an additional check of uid_is_container(uid). The problem is that that change
+is not backwards-compatible at all and very hard for users to handle.
+There is no common agreement on mappings of high-range uids. Systemd declares
+ownership of a large range for container uids in https://systemd.io/UIDS-GIDS/,
+but this is only a recent change and various sites allocated those ranges
+in a different way, in particular FreeIPA uses (used?) uids from this range
+for human users. On big sites with lots of users changing uids is obviously a
+hard problem. We generally assume that uids cannot be "freed" and/or changed
+and/or reused safely, so we shouldn't demand the same from others.
+
+This is somewhat similar to the situation with SYSTEM_ALLOC_UID_MIN /
+SYSTEM_UID_MAX, which we tried to define to a fixed value in our code, causing
+huge problems for existing systems with were created with a different
+definition and couldn't be easily updated. For that case, we added a
+configuration time switch and we now parse /etc/login.defs to actually use the
+value that is appropriate for the local system.
+
+Unfortunately, login.defs doesn't have a concept of container allocation ranges
+(and we don't have code to parse and use those nonexistent names either), so we
+can't tell users to adjust logind.defs to work around the changed definition.
+
+login.defs has SUB_UID_{MIN,MAX}, but those aren't really the same thing,
+because they are used to define where the add allocations for subuids, which is
+generally a much smaller range. Maybe we should talk with other folks about
+the appropriate allocation ranges and define some new settings in login.defs.
+But this would require discussion and coordination with other projects first.
+
+Actualy, it seems that this change was needed at all. The code in the container
+does not log to the outside journal. It talks to its own journald, which does
+journal splitting using its internal logic based on shifted uids. So let's
+revert the change to fix user systems.
+
+Fixes https://bugzilla.redhat.com/show_bug.cgi?id=2251843.
+---
+ src/basic/uid-classification.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/basic/uid-classification.c b/src/basic/uid-classification.c
+index 203ce2c68a..2eb384395d 100644
+--- a/src/basic/uid-classification.c
++++ b/src/basic/uid-classification.c
+@@ -129,5 +129,6 @@ bool uid_for_system_journal(uid_t uid) {
+ 
+         /* Returns true if the specified UID shall get its data stored in the system journal. */
+ 
+-        return uid_is_system(uid) || uid_is_dynamic(uid) || uid_is_greeter(uid) || uid == UID_NOBODY || uid_is_container(uid) || uid_is_foreign(uid);
++        return uid_is_system(uid) || uid_is_dynamic(uid) || uid_is_greeter(uid) || uid == UID_NOBODY || uid_is_foreign(uid);
++
+ }

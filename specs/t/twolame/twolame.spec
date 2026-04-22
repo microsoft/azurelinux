@@ -3,7 +3,7 @@
 
 Name:       twolame
 Version:    0.4.0
-Release:    8%{?dist}
+Release: 9%{?dist}
 Summary:    Optimized MPEG Audio Layer 2 encoding library based on tooLAME
 # build-scripts/install-sh is MIT/X11, build-scripts/{libtool.m4, ltmain.sh} are GPLv2+
 License:    LGPL-2.1-or-later

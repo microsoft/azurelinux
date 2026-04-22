@@ -3,7 +3,7 @@
 
 Name:          gpsbabel
 Version:       1.10.0
-Release:       2%{?dist}
+Release: 3%{?dist}
 Summary:       A tool to convert between various formats used by GPS devices
 
 License:       GPL-2.0-or-later

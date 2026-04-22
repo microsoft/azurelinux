@@ -3,7 +3,7 @@
 
 Name:           perl-Test-Needs
 Version:        0.002010
-Release:        9%{?dist}
+Release: 10%{?dist}
 Summary:        Skip tests when modules not available
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 

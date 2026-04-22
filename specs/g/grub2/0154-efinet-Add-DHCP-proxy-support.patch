@@ -1,0 +1,53 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Ian Page Hands <iphands@gmail.com>
+Date: Tue, 8 Jun 2021 13:48:56 -0400
+Subject: [PATCH] efinet: Add DHCP proxy support
+
+If a proxyDHCP configuration is used, the server name, server IP and boot
+file values should be taken from the DHCP proxy offer instead of the DHCP
+server ack packet. Currently that case is not handled, add support for it.
+
+Signed-off-by: Ian Page Hands <iphands@gmail.com>
+Signed-off-by: Robbie Harwood <rharwood@redhat.com>
+---
+ grub-core/net/drivers/efi/efinet.c | 22 +++++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/net/drivers/efi/efinet.c b/grub-core/net/drivers/efi/efinet.c
+index 225dc896da0..83005ea9f88 100644
+--- a/grub-core/net/drivers/efi/efinet.c
++++ b/grub-core/net/drivers/efi/efinet.c
+@@ -871,12 +871,32 @@ grub_efi_net_config_real (grub_efi_handle_t hnd, char **device,
+     else
+       {
+ 	grub_dprintf ("efinet", "using ipv4 and dhcp\n");
++
++        struct grub_net_bootp_packet *dhcp_ack = &pxe_mode->dhcp_ack;
++
++        if (pxe_mode->proxy_offer_received)
++          {
++            grub_dprintf ("efinet", "proxy offer receive");
++            struct grub_net_bootp_packet *proxy_offer = &pxe_mode->proxy_offer;
++
++            if (proxy_offer && dhcp_ack->boot_file[0] == '\0')
++              {
++                grub_dprintf ("efinet", "setting values from proxy offer");
++                /* Here we got a proxy offer and the dhcp_ack has a nil boot_file
++                 * Copy the proxy DHCP offer details into the bootp_packet we are
++                 * sending forward as they are the deatils we need.
++                 */
++                *dhcp_ack->server_name = *proxy_offer->server_name;
++                *dhcp_ack->boot_file   = *proxy_offer->boot_file;
++                dhcp_ack->server_ip    = proxy_offer->server_ip;
++              }
++          }
++
+ 	inter = grub_net_configure_by_dhcp_ack (card->name, card, 0,
+ 						(struct grub_net_bootp_packet *)
+ 						packet_buf,
+ 						packet_bufsz,
+ 						1, device, path);
+-
+ 	grub_dprintf ("efinet", "device: `%s' path: `%s'\n", *device, *path);
+ 	if (inter != NULL)
+ 	  {

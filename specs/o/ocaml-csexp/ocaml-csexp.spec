@@ -20,7 +20,7 @@ ExcludeArch: %{ix86}
 
 Name:           ocaml-csexp
 Version:        1.5.2
-Release:        16%{?dist}
+Release: 17%{?dist}
 Summary:        Parsing and printing of S-expressions in canonical form
 
 License:        MIT

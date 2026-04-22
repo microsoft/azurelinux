@@ -1,0 +1,10 @@
+diff --git a/test-requirements.txt b/test-requirements.txt
+index dd21ce5..00a6d49 100644
+--- a/test-requirements.txt
++++ b/test-requirements.txt
+@@ -14,4 +14,4 @@ ddt>=1.2.1 # MIT
+ # virtualenv, so importing things like 'nova.hacking.checks.factory' will just
+ # work.
+ # See https://bugs.launchpad.net/hacking/+bug/1403270
+-eventlet!=0.18.3,!=0.20.1,>=0.18.2 # MIT
++# eventlet!=0.18.3,!=0.20.1,>=0.18.2 # MIT

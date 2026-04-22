@@ -1,0 +1,7 @@
+import:
+- package: github.com/golang/protobuf
+  subpackages:
+  - proto
+  version: 1643683e1b54a9e88ad26d98f81400c8c9d9f4f9
+package: github.com/golang/groupcache
+

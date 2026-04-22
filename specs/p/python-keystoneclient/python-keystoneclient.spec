@@ -21,7 +21,7 @@ Identity API.
 Name:       python-keystoneclient
 Epoch:      1
 Version:    5.5.0
-Release:    5%{?dist}
+Release: 6%{?dist}
 Summary:    Client library for OpenStack Identity API
 License:    Apache-2.0
 URL:        https://launchpad.net/python-keystoneclient

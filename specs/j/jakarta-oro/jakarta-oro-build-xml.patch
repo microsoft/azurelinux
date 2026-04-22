@@ -1,0 +1,29 @@
+diff -up ./build.xml.fix ./build.xml
+--- ./build.xml.fix	2009-06-23 13:51:46.000000000 -0400
++++ ./build.xml	2009-06-23 13:52:21.000000000 -0400
+@@ -126,23 +126,8 @@ Run ant -projecthelp for complete list o
+         <jar jarfile="${top.dir}/${final.name}.jar"
+             basedir="${build.dest}"
+             includes="org/**,META-INF/**"
+-            excludes="**/package.html,**/overview.html">
+-          <manifest>
+-            <section name="org/apache/oro">
+-             <attribute name="Specification-Title"
+-                     value="Jakarta ORO" />
+-             <attribute name="Specification-Version"
+-                     value="${version}" />
+-             <attribute name="Specification-Vendor"
+-                     value="Apache Software Foundation" />
+-             <attribute name="Implementation-Title"
+-                     value="org.apache.oro" />
+-             <attribute name="Implementation-Version"
+-                     value="${version} ${DATE}" />
+-             <attribute name="Implementation-Vendor"
+-                     value="Apache Software Foundation" />
+-            </section>
+-           </manifest>
++            excludes="**/package.html,**/overview.html"
++            manifest="MANIFEST.MF">
+         </jar>
+     </target>
+ 

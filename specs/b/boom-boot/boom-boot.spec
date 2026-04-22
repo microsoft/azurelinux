@@ -6,7 +6,7 @@
 
 Name:		boom-boot
 Version:	1.6.8
-Release:	2%{?dist}
+Release: 3%{?dist}
 Summary:	%{summary}
 
 License:	Apache-2.0

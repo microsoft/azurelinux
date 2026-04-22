@@ -10,7 +10,7 @@
 
 Name:		perl-Package-Stash
 Version:	0.40
-Release:	10%{?dist}
+Release: 11%{?dist}
 Summary:	Routines for manipulating stashes
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Package-Stash

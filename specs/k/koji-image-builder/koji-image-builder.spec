@@ -8,7 +8,7 @@ Version:        8
 %forgemeta
 
 Name:           koji-image-builder
-Release:        3%{?dist}
+Release: 4%{?dist}
 License:        Apache-2.0
 
 URL:            %{forgeurl}

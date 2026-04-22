@@ -8,7 +8,7 @@
 
 Name:          mingw-dlfcn
 Version:       1.4.2
-Release:       2%{?dist}
+Release: 3%{?dist}
 Summary:       Implements a wrapper for dlfcn (dlopen dlclose dlsym dlerror)
 
 License:       MIT

@@ -7,7 +7,7 @@
 %global libusdm_soversion 0
 Name:             qatlib
 Version:          25.08.0
-Release:          4%{?dist}
+Release: 5%{?dist}
 Summary:          Intel QuickAssist user space library
 # The entire source code is released under BSD.
 # For a breakdown of inbound licenses see the INSTALL file.

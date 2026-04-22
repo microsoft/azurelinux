@@ -8,7 +8,7 @@
 
 Name:		linux-firmware
 Version:	20260221
-Release:	1%{?dist}
+Release: 2%{?dist}
 Summary:	Firmware files used by the Linux kernel
 License:	GPL-1.0-or-later AND GPL-2.0-or-later AND MIT AND LicenseRef-Callaway-Redistributable-no-modification-permitted
 URL:		http://www.kernel.org/

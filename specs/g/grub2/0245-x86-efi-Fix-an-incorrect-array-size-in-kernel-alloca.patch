@@ -1,0 +1,36 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 11 Oct 2022 17:00:50 -0400
+Subject: [PATCH] x86-efi: Fix an incorrect array size in kernel allocation
+
+In 81a6ebf62bbe166ddc968463df2e8bd481bf697c ("efi: split allocation
+policy for kernel vs initrd memories."), I introduced a split in the
+kernel allocator to allow for different dynamic policies for the kernel
+and the initrd allocations.
+
+Unfortunately, that change increased the size of the policy data used to
+make decisions, but did not change the size of the temporary storage we
+use to back it up and restore.  This results in some of .data getting
+clobbered at runtime, and hilarity ensues.
+
+This patch makes the size of the backup storage be based on the size of
+the initial policy data.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/loader/i386/efi/linux.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/grub-core/loader/i386/efi/linux.c b/grub-core/loader/i386/efi/linux.c
+index 03d27c81fd3..f97b123a51e 100644
+--- a/grub-core/loader/i386/efi/linux.c
++++ b/grub-core/loader/i386/efi/linux.c
+@@ -92,7 +92,7 @@ static struct allocation_choice max_addresses[] =
+       { INITRD_MEM, GRUB_EFI_MAX_ALLOCATION_ADDRESS, GRUB_EFI_ALLOCATE_MAX_ADDRESS },
+     { NO_MEM, 0, 0 }
+   };
+-static struct allocation_choice saved_addresses[4];
++static struct allocation_choice saved_addresses[sizeof(max_addresses) / sizeof(max_addresses[0])];
+ 
+ #define save_addresses() grub_memcpy(saved_addresses, max_addresses, sizeof(max_addresses))
+ #define restore_addresses() grub_memcpy(max_addresses, saved_addresses, sizeof(max_addresses))

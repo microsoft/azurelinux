@@ -3,7 +3,7 @@
 
 Name:           perl-Test-Pod-No404s
 Version:        0.02
-Release:        40%{?dist}
+Release: 41%{?dist}
 Summary:        Checks POD for HTTP 404 links
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Test-Pod-No404s

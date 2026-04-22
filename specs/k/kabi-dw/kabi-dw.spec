@@ -10,7 +10,7 @@
 
 Name:           kabi-dw
 Version:        0
-Release:        0.29%{?dist}
+Release: 1.29%{?dist}
 Summary:        Detect changes in the ABI between kernel builds
 License:        GPL-3.0-or-later
 URL:            %{forgeurl}

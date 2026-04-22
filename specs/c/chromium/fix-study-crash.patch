@@ -1,0 +1,28 @@
+Index: chromium-144.0.7559.59/components/variations/proto/study.proto
+===================================================================
+--- chromium-144.0.7559.59.orig/components/variations/proto/study.proto
++++ chromium-144.0.7559.59/components/variations/proto/study.proto
+@@ -293,6 +293,9 @@ message Study {
+     // A Mac-only value, indicating an x86-64 binary running on an arm64 host
+     // via "Rosetta 2" binary translation.
+     TRANSLATED_X86_64 = 4;
++
++    // A POSIX-only value, indicating an OpenPOWER host
++    PPC64 = 5;
+   }
+ 
+   // Enum to pass as optional bool.
+Index: chromium-144.0.7559.59/components/variations/service/variations_field_trial_creator.cc
+===================================================================
+--- chromium-144.0.7559.59.orig/components/variations/service/variations_field_trial_creator.cc
++++ chromium-144.0.7559.59/components/variations/service/variations_field_trial_creator.cc
+@@ -108,6 +108,9 @@ Study::CpuArchitecture GetCurrentCpuArch
+   if (process_arch == "x86") {
+     return Study::X86_32;
+   }
++  if (process_arch == "PPC_64") {
++    return Study::PPC64;
++  }
+   if (process_arch == "x86_64") {
+     std::string os_arch = base::SysInfo::OperatingSystemArchitecture();
+     if (base::StartsWith(os_arch, "arm",

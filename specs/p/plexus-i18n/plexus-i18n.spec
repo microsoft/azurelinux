@@ -3,7 +3,7 @@
 
 Name:           plexus-i18n
 Version:        1.0
-Release:        0.36.b10.4%{?dist}
+Release: 1.36.b10.4%{?dist}
 Summary:        Plexus I18N Component
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.
 License:        Apache-2.0

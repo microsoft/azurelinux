@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Nicolas Frayer <nfrayer@redhat.com>
+Date: Thu, 1 Aug 2024 11:13:20 +0200
+Subject: [PATCH] grub/mkconfig: Remove check for mount point for grub cfg stub
+
+Remove mountpoint when checking whether or not the grub cfg stub
+exists and add -s to the test. This should cover scenarios where
+the ESP doesn't have a seperate partition but still uses a grub
+cfg stub
+
+Signed-off-by: Nicolas Frayer <nfrayer@redhat.com>
+---
+ util/grub-mkconfig.in | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/util/grub-mkconfig.in b/util/grub-mkconfig.in
+index 8b7883072e46..31a72a39e0cf 100644
+--- a/util/grub-mkconfig.in
++++ b/util/grub-mkconfig.in
+@@ -110,8 +110,7 @@ do
+ done
+ 
+ os_name=$(grep ^ID= /etc/os-release | sed -e 's/^ID=//' -e 's/rhel/redhat/' -e 's/\"//g')
+-if test "x${grub_cfg}" = "x/boot/efi/EFI/$os_name/grub.cfg" &&\
+-        mountpoint -q /boot/efi; then
++if test -s "${grub_cfg}" && test "x${grub_cfg}" = "x/boot/efi/EFI/$os_name/grub.cfg"; then
+   gettext_printf "Running \`grub2-mkconfig -o %s' will overwrite the GRUB wrapper.\n" "$grub_cfg" 1>&2
+   gettext_printf "Please run \`grub2-mkconfig -o /boot/grub2/grub.cfg' instead to update grub.cfg.\n" 1>&2
+   gettext_printf "GRUB configuration file was not updated.\n" 1>&2

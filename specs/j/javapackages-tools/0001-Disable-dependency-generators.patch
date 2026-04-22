@@ -1,0 +1,39 @@
+From 465528c42586eadccbd77a675147bc1b13724943 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Tue, 24 Sep 2024 12:34:22 +0200
+Subject: [PATCH] Disable dependency generators
+
+---
+ install | 16 ----------------
+ 1 file changed, 16 deletions(-)
+
+diff --git a/install b/install
+index 25502a03..cc060af9 100755
+--- a/install
++++ b/install
+@@ -202,22 +202,6 @@ inst_data java-utils/maven_depmap.py "${javadir}-utils"
+ 
+ inst_data target/macros.javapackages-compat "${rpmmacrodir}"
+ 
+-exec >files-generators
+-
+-dir "${rpmconfigdir}/fileattrs"
+-
+-inst_exec target/maven.prov "${rpmconfigdir}" maven.prov
+-inst_exec target/maven.req "${rpmconfigdir}" maven.req
+-inst_exec target/osgi.prov "${rpmconfigdir}" osgi.prov
+-inst_exec target/osgi.req "${rpmconfigdir}" osgi.req
+-inst_exec target/javadoc.req "${rpmconfigdir}" javadoc.req
+-
+-inst_data target/maven.attr "${rpmconfigdir}/fileattrs" maven.attr
+-inst_data target/osgi.attr "${rpmconfigdir}/fileattrs" osgi.attr
+-inst_data target/javadoc.attr "${rpmconfigdir}/fileattrs" javadoc.attr
+-
+-inst_config etc/javapackages-config.json "${javaconfdir}"
+-
+ 
+ exec >files-maven
+ 
+-- 
+2.47.0
+

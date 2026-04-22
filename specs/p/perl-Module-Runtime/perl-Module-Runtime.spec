@@ -4,7 +4,7 @@
 # This file is licensed under the terms of GNU GPLv2+.
 Name:           perl-Module-Runtime
 Version:        0.018
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Runtime module handling
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Module-Runtime

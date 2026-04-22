@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 2.0.6
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary: Time Zone Library
 License: MIT
 URL: https://tzinfo.github.io

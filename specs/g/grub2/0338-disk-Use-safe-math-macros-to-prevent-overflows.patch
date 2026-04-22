@@ -1,0 +1,543 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alec Brown <alec.r.brown@oracle.com>
+Date: Tue, 11 Feb 2025 17:59:04 -0600
+Subject: [PATCH] disk: Use safe math macros to prevent overflows
+
+Replace direct arithmetic operations with macros from include/grub/safemath.h
+to prevent potential overflow issues when calculating the memory sizes.
+
+Signed-off-by: Alec Brown <alec.r.brown@oracle.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/disk/cryptodisk.c      | 36 ++++++++++++++++++------
+ grub-core/disk/diskfilter.c      |  9 ++++--
+ grub-core/disk/ieee1275/obdisk.c | 43 ++++++++++++++++++++++++----
+ grub-core/disk/ieee1275/ofdisk.c | 60 ++++++++++++++++++++++++++++++++++------
+ grub-core/disk/ldm.c             | 36 ++++++++++++++++++++----
+ grub-core/disk/luks2.c           |  7 ++++-
+ grub-core/disk/memdisk.c         |  7 ++++-
+ grub-core/disk/plainmount.c      |  9 ++++--
+ 8 files changed, 172 insertions(+), 35 deletions(-)
+
+diff --git a/grub-core/disk/cryptodisk.c b/grub-core/disk/cryptodisk.c
+index 06a42b2d7..872776010 100644
+--- a/grub-core/disk/cryptodisk.c
++++ b/grub-core/disk/cryptodisk.c
+@@ -26,6 +26,7 @@
+ #include <grub/file.h>
+ #include <grub/procfs.h>
+ #include <grub/partition.h>
++#include <grub/safemath.h>
+ 
+ #ifdef GRUB_UTIL
+ #include <grub/emu/hostdisk.h>
+@@ -1475,7 +1476,7 @@ static char *
+ luks_script_get (grub_size_t *sz)
+ {
+   grub_cryptodisk_t i;
+-  grub_size_t size = 0;
++  grub_size_t size = 0, mul;
+   char *ptr, *ret;
+ 
+   *sz = 0;
+@@ -1484,10 +1485,6 @@ luks_script_get (grub_size_t *sz)
+     if (grub_strcmp (i->modname, "luks") == 0 ||
+ 	grub_strcmp (i->modname, "luks2") == 0)
+       {
+-	size += grub_strlen (i->modname);
+-	size += sizeof ("_mount");
+-	size += grub_strlen (i->uuid);
+-	size += grub_strlen (i->cipher->cipher->name);
+ 	/*
+ 	 * Add space in the line for (in order) spaces, cipher mode, cipher IV
+ 	 * mode, sector offset, sector size and the trailing newline. This is
+@@ -1495,14 +1492,35 @@ luks_script_get (grub_size_t *sz)
+ 	 * in an earlier version of this code that are unaccounted for. It is
+ 	 * left in the calculations in case it is needed. At worst, its short-
+ 	 * lived wasted space.
++	 *
++	 * 60 = 5 + 5 + 8 + 20 + 6 + 1 + 15
+ 	 */
+-	size += 5 + 5 + 8 + 20 + 6 + 1 + 15;
++	if (grub_add (size, grub_strlen (i->modname), &size) ||
++	    grub_add (size, sizeof ("_mount") + 60, &size) ||
++	    grub_add (size, grub_strlen (i->uuid), &size) ||
++	    grub_add (size, grub_strlen (i->cipher->cipher->name), &size) ||
++	    grub_mul (i->keysize, 2, &mul) ||
++	    grub_add (size, mul, &size))
++	  {
++	    grub_error (GRUB_ERR_OUT_OF_RANGE, "overflow detected while obtaining size of luks script");
++	    return 0;
++	  }
+ 	if (i->essiv_hash)
+-	  size += grub_strlen (i->essiv_hash->name);
+-	size += i->keysize * 2;
++	  {
++	    if (grub_add (size, grub_strlen (i->essiv_hash->name), &size))
++	      {
++		grub_error (GRUB_ERR_OUT_OF_RANGE, "overflow detected while obtaining size of luks script");
++		return 0;
++	      }
++	  }
+       }
++  if (grub_add (size, 1, &size))
++    {
++      grub_error (GRUB_ERR_OUT_OF_RANGE, "overflow detected while obtaining size of luks script");
++      return 0;
++    }
+ 
+-  ret = grub_malloc (size + 1);
++  ret = grub_malloc (size);
+   if (!ret)
+     return 0;
+ 
+diff --git a/grub-core/disk/diskfilter.c b/grub-core/disk/diskfilter.c
+index c35ce8915..fef0b815a 100644
+--- a/grub-core/disk/diskfilter.c
++++ b/grub-core/disk/diskfilter.c
+@@ -24,6 +24,7 @@
+ #include <grub/misc.h>
+ #include <grub/diskfilter.h>
+ #include <grub/partition.h>
++#include <grub/safemath.h>
+ #ifdef GRUB_UTIL
+ #include <grub/i18n.h>
+ #include <grub/util/misc.h>
+@@ -1041,7 +1042,7 @@ grub_diskfilter_make_raid (grub_size_t uuidlen, char *uuid, int nmemb,
+ {
+   struct grub_diskfilter_vg *array;
+   int i;
+-  grub_size_t j;
++  grub_size_t j, sz;
+   grub_uint64_t totsize;
+   struct grub_diskfilter_pv *pv;
+   grub_err_t err;
+@@ -1142,7 +1143,11 @@ grub_diskfilter_make_raid (grub_size_t uuidlen, char *uuid, int nmemb,
+     }
+   array->lvs->vg = array;
+ 
+-  array->lvs->idname = grub_malloc (sizeof ("mduuid/") + 2 * uuidlen);
++  if (grub_mul (uuidlen, 2, &sz) ||
++      grub_add (sz, sizeof ("mduuid/"), &sz))
++    goto fail;
++
++  array->lvs->idname = grub_malloc (sz);
+   if (!array->lvs->idname)
+     goto fail;
+ 
+diff --git a/grub-core/disk/ieee1275/obdisk.c b/grub-core/disk/ieee1275/obdisk.c
+index cd923b90f..9d4c42665 100644
+--- a/grub-core/disk/ieee1275/obdisk.c
++++ b/grub-core/disk/ieee1275/obdisk.c
+@@ -26,6 +26,7 @@
+ #include <grub/mm.h>
+ #include <grub/scsicmd.h>
+ #include <grub/time.h>
++#include <grub/safemath.h>
+ #include <grub/ieee1275/ieee1275.h>
+ #include <grub/ieee1275/obdisk.h>
+ 
+@@ -128,9 +129,17 @@ count_commas (const char *src)
+ static char *
+ decode_grub_devname (const char *name)
+ {
+-  char *devpath = grub_malloc (grub_strlen (name) + 1);
++  char *devpath;
+   char *p, c;
++  grub_size_t sz;
+ 
++  if (grub_add (grub_strlen (name), 1, &sz))
++    {
++      grub_error (GRUB_ERR_OUT_OF_RANGE, N_("overflow detected while obtaining size of device name"));
++      return NULL;
++    }
++
++  devpath = grub_malloc (sz);
+   if (devpath == NULL)
+     return NULL;
+ 
+@@ -156,12 +165,20 @@ static char *
+ encode_grub_devname (const char *path)
+ {
+   char *encoding, *optr;
++  grub_size_t sz;
+ 
+   if (path == NULL)
+     return NULL;
+ 
+-  encoding = grub_malloc (sizeof (IEEE1275_DEV) + count_commas (path) +
+-                          grub_strlen (path) + 1);
++  if (grub_add (sizeof (IEEE1275_DEV) + 1, count_commas (path), &sz) ||
++      grub_add (sz, grub_strlen (path), &sz))
++    {
++      grub_error (GRUB_ERR_OUT_OF_RANGE, N_("overflow detected while obtaining encoding size"));
++      grub_print_error ();
++      return NULL;
++    }
++
++  encoding = grub_malloc (sz);
+ 
+   if (encoding == NULL)
+     {
+@@ -396,6 +413,14 @@ canonicalise_disk (const char *devname)
+ 
+       real_unit_str_len = grub_strlen (op->name) + sizeof (IEEE1275_DISK_ALIAS)
+                           + grub_strlen (real_unit_address);
++      if (grub_add (grub_strlen (op->name), sizeof (IEEE1275_DISK_ALIAS), &real_unit_str_len) ||
++	  grub_add (real_unit_str_len, grub_strlen (real_unit_address), &real_unit_str_len))
++	{
++	  grub_free (parent);
++	  grub_error (GRUB_ERR_OUT_OF_RANGE, N_("overflow detected while obtaining size of canonical name"));
++	  grub_print_error ();
++	  return NULL;
++	}
+ 
+       real_canon = grub_malloc (real_unit_str_len);
+ 
+@@ -413,6 +438,7 @@ canonicalise_disk (const char *devname)
+ static struct disk_dev *
+ add_canon_disk (const char *cname)
+ {
++  grub_size_t sz;
+   struct disk_dev *dev;
+ 
+   dev = grub_zalloc (sizeof (struct disk_dev));
+@@ -428,13 +454,18 @@ add_canon_disk (const char *cname)
+        * arguments and allows a client program to open
+        * the entire (raw) disk. Any disk label is ignored.
+        */
+-      dev->raw_name = grub_malloc (grub_strlen (cname) + sizeof (":nolabel"));
++      if (grub_add (grub_strlen (cname), sizeof (":nolabel"), &sz))
++	{
++	  grub_error (GRUB_ERR_OUT_OF_RANGE, "overflow detected while appending :nolabel to end of canonical name");
++	  goto failed;
++	}
++
++      dev->raw_name = grub_malloc (sz);
+ 
+       if (dev->raw_name == NULL)
+         goto failed;
+ 
+-      grub_snprintf (dev->raw_name, grub_strlen (cname) + sizeof (":nolabel"),
+-                     "%s:nolabel", cname);
++      grub_snprintf (dev->raw_name, sz, "%s:nolabel", cname);
+     }
+ 
+   /*
+diff --git a/grub-core/disk/ieee1275/ofdisk.c b/grub-core/disk/ieee1275/ofdisk.c
+index 57624fde5..6c628635f 100644
+--- a/grub-core/disk/ieee1275/ofdisk.c
++++ b/grub-core/disk/ieee1275/ofdisk.c
+@@ -25,6 +25,7 @@
+ #include <grub/i18n.h>
+ #include <grub/time.h>
+ #include <grub/env.h>
++#include <grub/safemath.h>
+ 
+ static char *last_devpath;
+ static grub_ieee1275_ihandle_t last_ihandle;
+@@ -81,6 +82,7 @@ ofdisk_hash_add_real (char *devpath)
+   struct ofdisk_hash_ent **head = &ofdisk_hash[ofdisk_hash_fn(devpath)];
+   const char *iptr;
+   char *optr;
++  grub_size_t sz;
+ 
+   p = grub_zalloc (sizeof (*p));
+   if (!p)
+@@ -88,8 +90,14 @@ ofdisk_hash_add_real (char *devpath)
+ 
+   p->devpath = devpath;
+ 
+-  p->grub_devpath = grub_malloc (sizeof ("ieee1275/")
+-				 + 2 * grub_strlen (p->devpath));
++  if (grub_mul (grub_strlen (p->devpath), 2, &sz) ||
++      grub_add (sz, sizeof ("ieee1275/"), &sz))
++    {
++      grub_error (GRUB_ERR_OUT_OF_RANGE, N_("overflow detected while obtaining size of device path"));
++      return NULL;
++    }
++
++  p->grub_devpath = grub_malloc (sz);
+ 
+   if (!p->grub_devpath)
+     {
+@@ -99,7 +107,13 @@ ofdisk_hash_add_real (char *devpath)
+ 
+   if (! grub_ieee1275_test_flag (GRUB_IEEE1275_FLAG_NO_PARTITION_0))
+     {
+-      p->open_path = grub_malloc (grub_strlen (p->devpath) + 3);
++      if (grub_add (grub_strlen (p->devpath), 3, &sz))
++	{
++	  grub_error (GRUB_ERR_OUT_OF_RANGE, N_("overflow detected while obtaining size of an open path"));
++	  return NULL;
++	}
++
++      p->open_path = grub_malloc (sz);
+       if (!p->open_path)
+ 	{
+ 	  grub_free (p->grub_devpath);
+@@ -225,7 +239,7 @@ dev_iterate (const struct grub_ieee1275_devalias *alias)
+       args;
+       char *buf, *bufptr;
+       unsigned i;
+-
++      grub_size_t sz;
+ 
+       RETRY_IEEE1275_OFDISK_OPEN(alias->path, &ihandle)
+       if (! ihandle)
+@@ -246,7 +260,14 @@ dev_iterate (const struct grub_ieee1275_devalias *alias)
+ 	  return;
+ 	}
+ 
+-      buf = grub_malloc (grub_strlen (alias->path) + 32);
++      if (grub_add (grub_strlen (alias->path), 32, &sz))
++	{
++	  grub_error (GRUB_ERR_OUT_OF_RANGE, "overflow detected while creating buffer for vscsi");
++	  grub_ieee1275_close (ihandle);
++	  return;
++	}
++
++      buf = grub_malloc (sz);
+       if (!buf)
+ 	return;
+       bufptr = grub_stpcpy (buf, alias->path);
+@@ -290,9 +311,15 @@ dev_iterate (const struct grub_ieee1275_devalias *alias)
+       grub_uint64_t *table;
+       grub_uint16_t table_size;
+       grub_ieee1275_ihandle_t ihandle;
++      grub_size_t sz;
+ 
+-      buf = grub_malloc (grub_strlen (alias->path) +
+-                         sizeof ("/disk@7766554433221100"));
++      if (grub_add (grub_strlen (alias->path), sizeof ("/disk@7766554433221100"), &sz))
++	{
++	  grub_error (GRUB_ERR_OUT_OF_RANGE, "overflow detected while creating buffer for sas_ioa");
++	  return;
++	}
++
++      buf = grub_malloc (sz);
+       if (!buf)
+         return;
+       bufptr = grub_stpcpy (buf, alias->path);
+@@ -432,9 +459,17 @@ grub_ofdisk_iterate (grub_disk_dev_iterate_hook_t hook, void *hook_data,
+ static char *
+ compute_dev_path (const char *name)
+ {
+-  char *devpath = grub_malloc (grub_strlen (name) + 3);
++  char *devpath;
+   char *p, c;
++  grub_size_t sz;
+ 
++  if (grub_add (grub_strlen (name), 3, &sz))
++    {
++      grub_error (GRUB_ERR_OUT_OF_RANGE, N_("overflow detected while obtaining size of device path"));
++      return NULL;
++    }
++
++  devpath = grub_malloc (sz);
+   if (!devpath)
+     return NULL;
+ 
+@@ -657,6 +692,7 @@ insert_bootpath (void)
+   char *bootpath;
+   grub_ssize_t bootpath_size;
+   char *type;
++  grub_size_t sz;
+ 
+   if (grub_ieee1275_get_property_length (grub_ieee1275_chosen, "bootpath",
+ 					 &bootpath_size)
+@@ -667,7 +703,13 @@ insert_bootpath (void)
+       return;
+     }
+ 
+-  bootpath = (char *) grub_malloc ((grub_size_t) bootpath_size + 64);
++  if (grub_add (bootpath_size, 64, &sz))
++    {
++      grub_error (GRUB_ERR_OUT_OF_RANGE, N_("overflow detected while obtaining bootpath size"));
++      return;
++    }
++
++  bootpath = (char *) grub_malloc (sz);
+   if (! bootpath)
+     {
+       grub_print_error ();
+diff --git a/grub-core/disk/ldm.c b/grub-core/disk/ldm.c
+index 34bfe6bd1..4101b15d8 100644
+--- a/grub-core/disk/ldm.c
++++ b/grub-core/disk/ldm.c
+@@ -220,6 +220,7 @@ make_vg (grub_disk_t disk,
+       struct grub_ldm_vblk vblk[GRUB_DISK_SECTOR_SIZE
+ 				/ sizeof (struct grub_ldm_vblk)];
+       unsigned i;
++      grub_size_t sz;
+       err = grub_disk_read (disk, cursec, 0,
+ 			    sizeof(vblk), &vblk);
+       if (err)
+@@ -251,7 +252,13 @@ make_vg (grub_disk_t disk,
+ 	      grub_free (pv);
+ 	      goto fail2;
+ 	    }
+-	  pv->internal_id = grub_malloc (ptr[0] + 2);
++	  if (grub_add (ptr[0], 2, &sz))
++	    {
++	      grub_free (pv);
++	      goto fail2;
++	    }
++
++	  pv->internal_id = grub_malloc (sz);
+ 	  if (!pv->internal_id)
+ 	    {
+ 	      grub_free (pv);
+@@ -276,7 +283,15 @@ make_vg (grub_disk_t disk,
+ 	      goto fail2;
+ 	    }
+ 	  pv->id.uuidlen = *ptr;
+-	  pv->id.uuid = grub_malloc (pv->id.uuidlen + 1);
++
++	  if (grub_add (pv->id.uuidlen, 1, &sz))
++	    {
++	      grub_free (pv->internal_id);
++	      grub_free (pv);
++	      goto fail2;
++	    }
++
++	  pv->id.uuid = grub_malloc (sz);
+ 	  grub_memcpy (pv->id.uuid, ptr + 1, pv->id.uuidlen);
+ 	  pv->id.uuid[pv->id.uuidlen] = 0;
+ 
+@@ -343,7 +358,13 @@ make_vg (grub_disk_t disk,
+ 	      grub_free (lv);
+ 	      goto fail2;
+ 	    }
+-	  lv->internal_id = grub_malloc ((grub_size_t) ptr[0] + 2);
++	  if (grub_add (ptr[0], 2, &sz))
++	    {
++	      grub_free (lv->segments);
++	      grub_free (lv);
++	      goto fail2;
++	    }
++	  lv->internal_id = grub_malloc (sz);
+ 	  if (!lv->internal_id)
+ 	    {
+ 	      grub_free (lv);
+@@ -455,6 +476,7 @@ make_vg (grub_disk_t disk,
+       struct grub_ldm_vblk vblk[GRUB_DISK_SECTOR_SIZE
+ 				/ sizeof (struct grub_ldm_vblk)];
+       unsigned i;
++      grub_size_t sz;
+       err = grub_disk_read (disk, cursec, 0,
+ 			    sizeof(vblk), &vblk);
+       if (err)
+@@ -490,7 +512,12 @@ make_vg (grub_disk_t disk,
+ 	      grub_free (comp);
+ 	      goto fail2;
+ 	    }
+-	  comp->internal_id = grub_malloc ((grub_size_t) ptr[0] + 2);
++	  if (grub_add (ptr[0], 2, &sz))
++	    {
++	      grub_free (comp);
++	      goto fail2;
++	    }
++	  comp->internal_id = grub_malloc (sz);
+ 	  if (!comp->internal_id)
+ 	    {
+ 	      grub_free (comp);
+@@ -640,7 +667,6 @@ make_vg (grub_disk_t disk,
+ 	  if (lv->segments->node_alloc == lv->segments->node_count)
+ 	    {
+ 	      void *t;
+-	      grub_size_t sz;
+ 
+ 	      if (grub_mul (lv->segments->node_alloc, 2, &lv->segments->node_alloc) ||
+ 		  grub_mul (lv->segments->node_alloc, sizeof (*lv->segments->nodes), &sz))
+diff --git a/grub-core/disk/luks2.c b/grub-core/disk/luks2.c
+index d5106402f..8036d76ff 100644
+--- a/grub-core/disk/luks2.c
++++ b/grub-core/disk/luks2.c
+@@ -26,6 +26,7 @@
+ #include <grub/crypto.h>
+ #include <grub/partition.h>
+ #include <grub/i18n.h>
++#include <grub/safemath.h>
+ 
+ #include <base64.h>
+ #include <json.h>
+@@ -569,6 +570,7 @@ luks2_recover_key (grub_disk_t source,
+   gcry_err_code_t gcry_ret;
+   grub_json_t *json = NULL, keyslots;
+   grub_err_t ret;
++  grub_size_t sz;
+ 
+   if (cargs->key_data == NULL || cargs->key_len == 0)
+     return grub_error (GRUB_ERR_BAD_ARGUMENT, "no key data");
+@@ -577,7 +579,10 @@ luks2_recover_key (grub_disk_t source,
+   if (ret)
+     return ret;
+ 
+-  json_header = grub_zalloc (grub_be_to_cpu64 (header.hdr_size) - sizeof (header));
++  if (grub_sub (grub_be_to_cpu64 (header.hdr_size), sizeof (header), &sz))
++    return grub_error (GRUB_ERR_OUT_OF_RANGE, "underflow detected while calculating json header size");
++
++  json_header = grub_zalloc (sz);
+   if (!json_header)
+       return GRUB_ERR_OUT_OF_MEMORY;
+ 
+diff --git a/grub-core/disk/memdisk.c b/grub-core/disk/memdisk.c
+index 613779cf3..36de3bfab 100644
+--- a/grub-core/disk/memdisk.c
++++ b/grub-core/disk/memdisk.c
+@@ -23,6 +23,7 @@
+ #include <grub/misc.h>
+ #include <grub/mm.h>
+ #include <grub/types.h>
++#include <grub/safemath.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -96,7 +97,11 @@ GRUB_MOD_INIT(memdisk)
+ 
+ 	grub_dprintf ("memdisk", "Found memdisk image at %p\n", memdisk_orig_addr);
+ 
+-	memdisk_size = header->size - sizeof (struct grub_module_header);
++	if (grub_sub (header->size, sizeof (struct grub_module_header), &memdisk_size))
++	  {
++	    grub_error (GRUB_ERR_OUT_OF_RANGE, "underflow detected while obtaining memdisk size");
++	    return;
++	  }
+ 	memdisk_addr = grub_malloc (memdisk_size);
+ 
+ 	grub_dprintf ("memdisk", "Copying memdisk image to dynamic memory\n");
+diff --git a/grub-core/disk/plainmount.c b/grub-core/disk/plainmount.c
+index 47e64805f..21ec4072c 100644
+--- a/grub-core/disk/plainmount.c
++++ b/grub-core/disk/plainmount.c
+@@ -24,6 +24,7 @@
+ #include <grub/extcmd.h>
+ #include <grub/partition.h>
+ #include <grub/file.h>
++#include <grub/safemath.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -126,7 +127,7 @@ plainmount_configure_password (grub_cryptodisk_t dev, const char *hash,
+   grub_uint8_t *derived_hash, *dh;
+   char *p;
+   unsigned int round, i, len, size;
+-  grub_size_t alloc_size;
++  grub_size_t alloc_size, sz;
+   grub_err_t err = GRUB_ERR_NONE;
+ 
+   /* Support none (plain) hash */
+@@ -145,7 +146,11 @@ plainmount_configure_password (grub_cryptodisk_t dev, const char *hash,
+    * Allocate buffer for the password and for an added prefix character
+    * for each hash round ('alloc_size' may not be a multiple of 'len').
+    */
+-  p = grub_zalloc (alloc_size + (alloc_size / len) + 1);
++  if (grub_add (alloc_size, (alloc_size / len), &sz) ||
++      grub_add (sz, 1, &sz))
++    return grub_error (GRUB_ERR_OUT_OF_RANGE, N_("overflow detected while allocating size of password buffer"));
++
++  p = grub_zalloc (sz);
+   derived_hash = grub_zalloc (GRUB_CRYPTODISK_MAX_KEYLEN * 2);
+   if (p == NULL || derived_hash == NULL)
+     {

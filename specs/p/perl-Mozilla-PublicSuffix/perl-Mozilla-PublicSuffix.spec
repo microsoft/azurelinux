@@ -3,7 +3,7 @@
 
 Name:           perl-Mozilla-PublicSuffix
 Version:        1.0.7
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Get a domain name's public suffix via the Mozilla Public Suffix List
 License:        MIT
 URL:            https://metacpan.org/release/Mozilla-PublicSuffix

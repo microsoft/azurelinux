@@ -11,7 +11,7 @@
 Name:    qt-mobility
 Summary: Qt Mobility Framework
 Version: 1.2.2
-Release: 0.50.%{snap}git%{git_short}%{?dist}
+Release: 1.50.%{snap}git%{git_short}%{?dist}
 
 License: LGPL-2.1-only WITH Digia-Qt-LGPL-exception-1.1
 URL:     https://code.qt.io/cgit/qt-mobility/qt-mobility.git

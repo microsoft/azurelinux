@@ -3,7 +3,7 @@
 
 Name:           perl-Test-Warn
 Version:        0.37
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        Perl extension to test methods for warnings
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Test-Warn

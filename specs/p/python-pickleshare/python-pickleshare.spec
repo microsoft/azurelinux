@@ -3,7 +3,7 @@
 
 Name:           python-pickleshare
 Version:        0.7.5
-Release:        23%{?dist}
+Release: 24%{?dist}
 Summary:        Tiny 'shelve'-like database with concurrency support
 
 License:        MIT

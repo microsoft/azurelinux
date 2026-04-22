@@ -4,7 +4,7 @@
 Name:           libcerf
 Version:        3.1
 %global         sover 3
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        A library that provides complex error functions
 
 License:        MIT

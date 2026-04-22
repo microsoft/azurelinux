@@ -5,7 +5,7 @@
 
 Name:           mingw-readline
 Version:        8.3
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        MinGW port of readline for editing typed command lines
 
 License:        GPL-2.0-or-later

@@ -1,0 +1,24 @@
+From 23e6685282c4bf891921d62fdb4fff54fe10c5ef Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Sun, 17 Aug 2025 06:04:50 -0400
+Subject: [PATCH 2/2] Downstream-only: patch out pytest-sugar
+
+---
+ tox.ini | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/tox.ini b/tox.ini
+index 80acbea..dec210c 100644
+--- a/tox.ini
++++ b/tox.ini
+@@ -5,7 +5,6 @@ isolated_build = True
+ [testenv]
+ deps =
+     pytest
+-    pytest-sugar
+     pytest-trio
+ commands = pytest {posargs}
+ 
+-- 
+2.50.1
+

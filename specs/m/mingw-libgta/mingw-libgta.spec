@@ -7,7 +7,7 @@
 
 Name:          mingw-%{pkgname}
 Version:       1.2.1
-Release:       13%{?dist}
+Release: 14%{?dist}
 Summary:       MinGW Windows GTA library
 
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.

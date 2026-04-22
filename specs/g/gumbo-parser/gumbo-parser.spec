@@ -4,7 +4,7 @@
 Name:           gumbo-parser
 Epoch:          1
 Version:        0.12.1
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        A HTML5 parser
 
 License:        Apache-2.0

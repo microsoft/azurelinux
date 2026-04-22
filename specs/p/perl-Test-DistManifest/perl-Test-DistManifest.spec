@@ -11,7 +11,7 @@
 
 Name:           perl-Test-DistManifest
 Version:        1.014
-Release:        33%{?dist}
+Release: 34%{?dist}
 Summary:        Author test that validates a package MANIFEST
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Test-DistManifest

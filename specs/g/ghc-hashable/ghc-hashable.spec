@@ -18,7 +18,7 @@
 Name:           ghc-%{pkg_name}
 Version:        1.4.7.0
 # can only be reset when subpkg bumped
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        A class for types that can be converted to a hash value
 
 License:        BSD-3-Clause

@@ -6,7 +6,7 @@
 
 Name:           python-%{modname}_2
 Version:        3.4.4
-Release:        10%{?dist}
+Release: 11%{?dist}
 Summary:        Python implementation of Markdown
 
 License:        BSD-3-Clause

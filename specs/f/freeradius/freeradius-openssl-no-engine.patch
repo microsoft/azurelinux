@@ -1,0 +1,54 @@
+diff --git a/configure b/configure
+index 1e6d228..40a26f5 100755
+--- a/configure
++++ b/configure
+@@ -10518,7 +10518,7 @@ smart_prefix=
+ printf "%s\n" "#define HAVE_OPENSSL_SSL_H 1" >>confdefs.h
+ 
+ 
+-           for ac_header in openssl/asn1.h openssl/conf.h openssl/crypto.h openssl/err.h openssl/evp.h openssl/hmac.h openssl/md5.h openssl/md4.h openssl/rand.h openssl/sha.h openssl/ssl.h openssl/ocsp.h openssl/engine.h
++           for ac_header in openssl/asn1.h openssl/conf.h openssl/crypto.h openssl/err.h openssl/evp.h openssl/hmac.h openssl/md5.h openssl/md4.h openssl/rand.h openssl/sha.h openssl/ssl.h openssl/ocsp.h
+ do :
+   as_ac_Header=`printf "%s\n" "ac_cv_header_$ac_header" | $as_tr_sh`
+ ac_fn_c_check_header_compile "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
+diff --git a/configure.ac b/configure.ac
+index 6a68971..4a95148 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1449,8 +1449,7 @@ if test "x$WITH_OPENSSL" = xyes; then
+       openssl/rand.h \
+       openssl/sha.h \
+       openssl/ssl.h \
+-      openssl/ocsp.h \
+-      openssl/engine.h,
++      openssl/ocsp.h,
+       [ OPENSSL_CPPFLAGS="$smart_include" ],
+       [
+         AC_MSG_FAILURE([failed locating OpenSSL headers. Use --with-openssl-include-dir=<path>, or --with-openssl=no (builds without OpenSSL)])
+diff --git a/src/include/autoconf.h.in b/src/include/autoconf.h.in
+index 4774482..21d5cea 100644
+--- a/src/include/autoconf.h.in
++++ b/src/include/autoconf.h.in
+@@ -285,9 +285,6 @@
+ /* Define to 1 if you have the <openssl/crypto.h> header file. */
+ #undef HAVE_OPENSSL_CRYPTO_H
+ 
+-/* Define to 1 if you have the <openssl/engine.h> header file. */
+-#undef HAVE_OPENSSL_ENGINE_H
+-
+ /* Define to 1 if you have the <openssl/err.h> header file. */
+ #undef HAVE_OPENSSL_ERR_H
+ 
+diff --git a/src/include/tls-h b/src/include/tls-h
+index 506fb19..514e03a 100644
+--- a/src/include/tls-h
++++ b/src/include/tls-h
+@@ -37,7 +37,7 @@ RCSIDH(tls_h, "$Id$")
+ #  define OPENSSL_NO_KRB5
+ #endif
+ #include <openssl/err.h>
+-#ifdef HAVE_OPENSSL_ENGINE_H
++#ifndef OPENSSL_NO_ENGINE
+ #  include <openssl/engine.h>
+ #endif
+ #include <openssl/ssl.h>

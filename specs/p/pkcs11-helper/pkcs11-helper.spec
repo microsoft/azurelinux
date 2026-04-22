@@ -3,7 +3,7 @@
 
 Name:           pkcs11-helper
 Version:        1.30.0
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        A library for using PKCS#11 providers
 
 License:        GPL-2.0-only OR BSD-3-Clause

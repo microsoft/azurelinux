@@ -4,7 +4,7 @@
 Summary: A C programming language indexing and/or cross-reference tool
 Name: ctags
 Version: 6.2.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPL-2.0-or-later
 URL: https://ctags.io/
 Source0: https://github.com/universal-ctags/ctags/releases/download/v%{version}/universal-%{name}-%{version}.tar.gz

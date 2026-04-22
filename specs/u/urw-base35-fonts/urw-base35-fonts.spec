@@ -141,7 +141,7 @@ by (URW)++ company, and are mainly utilized by applications using Ghostscript.
 Name:             %{fontname}-fonts
 Summary:          Core Font Set containing 35 freely distributable fonts from (URW)++
 Version:          20200910
-Release:          26%{?dist}
+Release: 27%{?dist}
 
 # NOTE: (URW)++ holds the copyright, but Artifex Software has obtained rights to
 #       release these fonts under GNU Affero General Public License (version 3).

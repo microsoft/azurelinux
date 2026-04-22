@@ -4,7 +4,7 @@
 Name: ipvsadm
 Summary: Utility to administer the Linux Virtual Server
 Version: 1.31
-Release: 16%{?dist}
+Release: 17%{?dist}
 License: GPL-2.0-or-later
 URL: https://kernel.org/pub/linux/utils/kernel/ipvsadm/
 

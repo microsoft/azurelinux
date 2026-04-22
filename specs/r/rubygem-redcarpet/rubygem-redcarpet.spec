@@ -5,7 +5,7 @@
 
 Name:		rubygem-%{gem_name}
 Version:	3.6.1
-Release:	2%{?dist}
+Release: 3%{?dist}
 
 Summary:	A fast, safe and extensible Markdown to (X)HTML parser
 # SPDX confirmed

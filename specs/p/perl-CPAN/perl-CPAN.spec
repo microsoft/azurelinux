@@ -13,7 +13,7 @@
 
 Name:           perl-CPAN
 Version:        2.38
-Release:        521%{?dist}
+Release: 522%{?dist}
 Summary:        Query, download and build perl modules from CPAN sites
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/CPAN

@@ -4,7 +4,7 @@
 Summary: Basic desktop integration functions
 Name:    xdg-utils
 Version: 1.2.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 URL:     https://www.freedesktop.org/wiki/Software/xdg-utils/
 %if 0%{?snap:1}

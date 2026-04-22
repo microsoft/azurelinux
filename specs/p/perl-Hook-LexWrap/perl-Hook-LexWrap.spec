@@ -3,7 +3,7 @@
 
 Name:           perl-Hook-LexWrap
 Version:        0.26
-Release:        25%{?dist}
+Release: 26%{?dist}
 Summary:        Lexically scoped subroutine wrappers
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Hook-LexWrap

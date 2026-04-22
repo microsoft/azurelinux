@@ -1,0 +1,30 @@
+From ea104a841fca1ff4d5430915f1b7c52c6a642f13 Mon Sep 17 00:00:00 2001
+From: Timothy Pearson <tpearson@raptorengineering.com>
+Date: Fri, 21 Sep 2018 21:44:17 -0500
+Subject: [PATCH] Force baseline POWER8 / AltiVec / VSX CPU features when on a
+ PPC64 platform in LE mode
+
+---
+ BUILD.gn | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+Index: chromium-145.0.7632.45/v8/BUILD.gn
+===================================================================
+--- chromium-145.0.7632.45.orig/v8/BUILD.gn
++++ chromium-145.0.7632.45/v8/BUILD.gn
+@@ -1607,7 +1607,14 @@ config("toolchain") {
+   if (v8_current_cpu == "ppc64") {
+     defines += [ "V8_TARGET_ARCH_PPC64" ]
+     cflags += [ "-ffp-contract=off" ]
+-    if (current_os == "aix" && !is_clang) {
++    if (current_os == "linux") {
++        cflags += [
++        # Enable usage of AltiVec, VSX, and other POWER8 and higher features
++        "-mcpu=power8",
++        "-maltivec",
++        "-mvsx",
++      ]
++    } else if (current_os == "aix" && !is_clang) {
+       cflags += [
+         # Work around AIX ceil, trunc and round oddities.
+         "-mcpu=power5+",

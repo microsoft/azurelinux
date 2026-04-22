@@ -17,7 +17,7 @@
 
 Name:           lttng-ust
 Version:        2.14.0
-Release:        4%{?dist}
+Release: 5%{?dist}
 
 License:        LGPL-2.1-only AND MIT AND GPL-2.0-only AND BSD-3-Clause AND BSD-2-Clause
 Summary:        LTTng Userspace Tracer library

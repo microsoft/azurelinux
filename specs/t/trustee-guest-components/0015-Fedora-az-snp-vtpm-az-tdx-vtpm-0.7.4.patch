@@ -1,0 +1,29 @@
+From b4ec19a2726795db7179373fc267669d9f692fa5 Mon Sep 17 00:00:00 2001
+From: Yan Fu <yafu@redhat.com>
+Date: Wed, 30 Jul 2025 23:33:37 -0400
+Subject: [PATCH 15/15] Fedora: az-snp-vtpm/az-tdx-vtpm: 0.7.4
+
+Signed-off-by: Yan Fu <yafu@redhat.com>
+Signed-off-by: Benjamin A. Beasley <code@musicinmybrain.net>
+---
+ attestation-agent/attester/Cargo.toml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/attestation-agent/attester/Cargo.toml b/attestation-agent/attester/Cargo.toml
+index 59f7b7a..04f22f7 100644
+--- a/attestation-agent/attester/Cargo.toml
++++ b/attestation-agent/attester/Cargo.toml
+@@ -9,8 +9,8 @@ license = "Apache-2.0"
+ [dependencies]
+ anyhow.workspace = true
+ async-trait.workspace = true
+-az-snp-vtpm = { version = "0.7.1", default-features = false, features = ["attester"], optional = true }
+-az-tdx-vtpm = { version = "0.7.0", default-features = false, features = ["attester"], optional = true }
++az-snp-vtpm = { version = "0.7.4", default-features = false, features = ["attester"], optional = true }
++az-tdx-vtpm = { version = "0.7.4", default-features = false, features = ["attester"], optional = true }
+ base64.workspace = true
+ clap = { workspace = true, features = ["derive"], optional = true }
+ cfg-if.workspace = true
+-- 
+2.50.1
+

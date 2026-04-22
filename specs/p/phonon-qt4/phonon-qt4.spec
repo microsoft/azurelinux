@@ -4,7 +4,7 @@
 Summary: Multimedia framework api for Qt4
 Name:    phonon-qt4
 Version: 4.10.3
-Release: 28%{?dist}
+Release: 29%{?dist}
 License: LGPL-2.0-or-later
 URL:     https://community.kde.org/Phonon
 

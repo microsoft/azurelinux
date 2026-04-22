@@ -1,0 +1,85 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 14 Mar 2011 14:27:42 -0400
+Subject: [PATCH] Don't say "GNU/Linux" in generated menus.
+
+[rharwood: say it even less]
+---
+ grub-core/normal/main.c         | 2 +-
+ tests/util/grub-shell-tester.in | 2 +-
+ tests/util/grub-shell.in        | 2 +-
+ util/grub.d/10_linux.in         | 4 ++--
+ util/grub.d/20_linux_xen.in     | 4 ++--
+ 5 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/grub-core/normal/main.c b/grub-core/normal/main.c
+index 1317279c081..568c2adfa16 100644
+--- a/grub-core/normal/main.c
++++ b/grub-core/normal/main.c
+@@ -218,7 +218,7 @@ grub_normal_init_page (struct grub_term_output *term,
+ 
+   grub_term_cls (term);
+ 
+-  msg_formatted = grub_xasprintf (_("GNU GRUB  version %s"), PACKAGE_VERSION);
++  msg_formatted = grub_xasprintf (_("GRUB version %s"), PACKAGE_VERSION);
+   if (!msg_formatted)
+     return;
+ 
+diff --git a/tests/util/grub-shell-tester.in b/tests/util/grub-shell-tester.in
+index 8a87109b152..9a4319d4f4f 100644
+--- a/tests/util/grub-shell-tester.in
++++ b/tests/util/grub-shell-tester.in
+@@ -56,7 +56,7 @@ for option in "$@"; do
+ 	usage
+ 	exit 0 ;;
+     -v | --version)
+-	echo "$0 (GNU GRUB ${PACKAGE_VERSION})"
++	echo "$0 (GRUB ${PACKAGE_VERSION})"
+ 	exit 0 ;;
+     --modules=*)
+ 	ms=`echo "$option" | sed -e 's/--modules=//'`
+diff --git a/tests/util/grub-shell.in b/tests/util/grub-shell.in
+index 496e1bab33c..e0570c88e15 100644
+--- a/tests/util/grub-shell.in
++++ b/tests/util/grub-shell.in
+@@ -243,7 +243,7 @@ for option in "$@"; do
+ 	usage
+ 	exit 0 ;;
+     -v | --version)
+-	echo "$0 (GNU GRUB ${PACKAGE_VERSION})"
++	echo "$0 (GRUB ${PACKAGE_VERSION})"
+ 	exit 0 ;;
+     --trim)
+ 	trim=1 ;;
+diff --git a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
+index 00d4b220ccb..901745707f1 100644
+--- a/util/grub.d/10_linux.in
++++ b/util/grub.d/10_linux.in
+@@ -29,9 +29,9 @@ export TEXTDOMAINDIR="@localedir@"
+ CLASS="--class gnu-linux --class gnu --class os"
+ 
+ if [ "x${GRUB_DISTRIBUTOR}" = "x" ] ; then
+-  OS=GNU/Linux
++  OS="$(sed 's, release .*$,,g' /etc/system-release)"
+ else
+-  OS="${GRUB_DISTRIBUTOR} GNU/Linux"
++  OS="${GRUB_DISTRIBUTOR}"
+   CLASS="--class $(echo ${GRUB_DISTRIBUTOR} | tr 'A-Z' 'a-z' | cut -d' ' -f1|LC_ALL=C sed 's,[^[:alnum:]_],_,g') ${CLASS}"
+ fi
+ 
+diff --git a/util/grub.d/20_linux_xen.in b/util/grub.d/20_linux_xen.in
+index 94dd8be1342..98ee5bc58dc 100644
+--- a/util/grub.d/20_linux_xen.in
++++ b/util/grub.d/20_linux_xen.in
+@@ -29,9 +29,9 @@ export TEXTDOMAINDIR="@localedir@"
+ CLASS="--class gnu-linux --class gnu --class os --class xen"
+ 
+ if [ "x${GRUB_DISTRIBUTOR}" = "x" ] ; then
+-  OS=GNU/Linux
++  OS="$(sed 's, release .*$,,g' /etc/system-release)"
+ else
+-  OS="${GRUB_DISTRIBUTOR} GNU/Linux"
++  OS="${GRUB_DISTRIBUTOR}"
+   CLASS="--class $(echo ${GRUB_DISTRIBUTOR} | tr 'A-Z' 'a-z' | cut -d' ' -f1|LC_ALL=C sed 's,[^[:alnum:]_],_,g') ${CLASS}"
+ fi
+ 

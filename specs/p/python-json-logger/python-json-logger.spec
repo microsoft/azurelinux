@@ -5,7 +5,7 @@
 
 Name:           python-json-logger
 Version:        3.3.0
-Release:        5%{?dist}
+Release: 6%{?dist}
 Summary:        A python library adding a json log formatter
 
 # Automatically converted from old format: BSD - review is highly recommended.

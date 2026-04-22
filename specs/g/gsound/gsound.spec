@@ -3,7 +3,7 @@
 
 Name:           gsound
 Version:        1.0.3
-Release:        11%{?dist}
+Release: 12%{?dist}
 Summary:        Small gobject library for playing system sounds
 
 License:        LGPL-2.1-or-later

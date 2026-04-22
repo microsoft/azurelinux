@@ -6,7 +6,7 @@
 
 Name:          libgpiod
 Version:       2.2.3
-Release:       1%{?candidate:.%{candidate}}%{?dist}
+Release: 2%{?candidate:.%{candidate}}%{?dist}
 Summary:       C library and tools for interacting with linux GPIO char device
 
 License:       LGPL-2.1-or-later

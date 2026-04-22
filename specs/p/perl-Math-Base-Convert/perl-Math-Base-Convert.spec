@@ -3,7 +3,7 @@
 
 Name:           perl-Math-Base-Convert
 Version:        0.13
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Very fast base to base conversion
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Math-Base-Convert

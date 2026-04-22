@@ -1,0 +1,31 @@
+From decdb0fc8303e8e449d60f03123440758707dd5b Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Fri, 11 Jul 2025 19:16:28 +0200
+Subject: [PATCH 2/2] Make I/O errors during test cleanup non-fatal
+
+---
+ .../aether/internal/impl/DefaultArtifactResolverTest.java | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/maven-resolver-impl/src/test/java/org/eclipse/aether/internal/impl/DefaultArtifactResolverTest.java b/maven-resolver-impl/src/test/java/org/eclipse/aether/internal/impl/DefaultArtifactResolverTest.java
+index f286f13a..5a2b2c74 100644
+--- a/maven-resolver-impl/src/test/java/org/eclipse/aether/internal/impl/DefaultArtifactResolverTest.java
++++ b/maven-resolver-impl/src/test/java/org/eclipse/aether/internal/impl/DefaultArtifactResolverTest.java
+@@ -122,8 +122,12 @@ public class DefaultArtifactResolverTest {
+ 
+     @After
+     public void teardown() throws Exception {
+-        if (session.getLocalRepository() != null) {
+-            TestFileUtils.deleteFile(session.getLocalRepository().getBasedir());
++        try {
++            if (session.getLocalRepository() != null) {
++                TestFileUtils.deleteFile(session.getLocalRepository().getBasedir());
++            }
++        } catch (IOException e) {
++            // Ignore
+         }
+     }
+ 
+-- 
+2.50.1
+

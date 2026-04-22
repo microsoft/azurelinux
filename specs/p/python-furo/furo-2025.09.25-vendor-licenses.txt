@@ -1,0 +1,15 @@
+yarn run v1.22.22
+$ /tmp/node_modules/.bin/license-checker --summary
+├─ MIT: 233
+├─ ISC: 31
+├─ BSD-2-Clause: 14
+├─ BSD-3-Clause: 7
+├─ Apache-2.0: 6
+├─ CC0-1.0: 3
+├─ Python-2.0: 1
+├─ CC-BY-4.0: 1
+├─ BlueOak-1.0.0: 1
+├─ CC-BY-3.0: 1
+└─ (MIT AND CC-BY-3.0): 1
+
+Done in 0.47s.

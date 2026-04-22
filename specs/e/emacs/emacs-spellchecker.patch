@@ -1,0 +1,22 @@
+diff --git a/lisp/textmodes/ispell.el b/lisp/textmodes/ispell.el
+index 0a3a49d868..b6c0975857 100644
+--- a/lisp/textmodes/ispell.el
++++ b/lisp/textmodes/ispell.el
+@@ -191,12 +191,12 @@ Must be greater than 1."
+   :type 'integer)
+ 
+ (defcustom ispell-program-name
+-  (or (executable-find "aspell")
+-      (executable-find "ispell")
++  ;; Enchant is commonly installed as `enchant-2', so use this
++  ;; name and avoid old versions of `enchant'.
++  (or (executable-find "enchant-2")
+       (executable-find "hunspell")
+-      ;; Enchant is commonly installed as `enchant-2', so use this
+-      ;; name and avoid old versions of `enchant'.
+-      (executable-find "enchant-2")
++      (executable-find "aspell")
++      (executable-find "ispell")
+       "ispell")
+   "Program invoked by \\[ispell-word] and \\[ispell-region] commands."
+   :type 'string

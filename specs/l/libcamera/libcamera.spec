@@ -6,7 +6,7 @@
 
 Name:    libcamera
 Version: 0.5.2
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: A library to support complex camera ISPs
 # see .reuse/dep5 and COPYING for details
 License: LGPL-2.1-or-later

@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 2.4.3
-Release: 20%{?dist}
+Release: 21%{?dist}
 Summary: Helper class for cross-platform launching of applications
 License: ISC
 URL: http://github.com/copiousfreetime/launchy

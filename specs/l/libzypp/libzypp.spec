@@ -21,7 +21,7 @@ Requires:       %{_bindir}/%{1}
 
 Name:           libzypp
 Version:        17.38.1
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        A package management library
 
 # Automatically converted from old format: GPLv2+ - review is highly recommended.

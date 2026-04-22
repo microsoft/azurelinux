@@ -1,0 +1,38 @@
+From caa701915f1ef6a940d9589f91ff0853f930084f Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Tue, 6 May 2025 10:02:24 -0400
+Subject: [PATCH] Remove test dependency on PyPI mock
+
+Use `unittest.mock` from the Python standard library instead.
+---
+ parameterized/test.py | 3 +--
+ tox.ini               | 1 -
+ 2 files changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/parameterized/test.py b/parameterized/test.py
+index 6c71f79..abdf86f 100644
+--- a/parameterized/test.py
++++ b/parameterized/test.py
+@@ -2,9 +2,8 @@
+ 
+ import inspect
+ import sys
+-import mock
+ from functools import wraps
+-from unittest import TestCase
++from unittest import TestCase, mock
+ try:
+     from nose.tools import assert_equal, assert_raises
+ except ImportError:
+diff --git a/tox.ini b/tox.ini
+index f109b95..66dbbb7 100644
+--- a/tox.ini
++++ b/tox.ini
+@@ -5,7 +5,6 @@ envlist=pypy3-{nose,nose2,pytest3,unit,unit2},py{37,38,39}-{nose,nose2,pytest3,u
+ [testenv]
+ deps=
+     nose
+-    mock
+     nose2: nose2
+     pytest2: pytest>=2,<3
+     pytest3: pytest>=3,<4

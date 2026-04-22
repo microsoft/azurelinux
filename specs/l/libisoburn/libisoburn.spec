@@ -10,7 +10,7 @@
 Summary:         Library to enable creation and expansion of ISO-9660 filesystems
 Name:            libisoburn
 Version:         1.5.6
-Release:         9%{?dist}
+Release: 10%{?dist}
 License:         GPL-2.0-or-later
 URL:             https://libburnia-project.org/
 Source0:         https://files.libburnia-project.org/releases/%{pkgname}-%{version}.tar.gz

@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 8 Jan 2024 19:12:15 -0500
+Subject: [PATCH] normal: Fix a discarded const.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/normal/main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/grub-core/normal/main.c b/grub-core/normal/main.c
+index e903f291732..803b9656d36 100644
+--- a/grub-core/normal/main.c
++++ b/grub-core/normal/main.c
+@@ -406,7 +406,7 @@ grub_try_normal_dev (const char *name, void *data)
+ static grub_err_t
+ grub_try_normal_discover (void)
+ {
+-  char *prefix = grub_env_get ("prefix");
++  const char *prefix = grub_env_get ("prefix");
+   grub_err_t err = GRUB_ERR_FILE_NOT_FOUND;
+ 
+   if (!prefix)

@@ -8,7 +8,7 @@
 
 Name:		rubygem-%{gem_name}
 Version:	3.5.1
-Release:	3%{?dist}
+Release: 4%{?dist}
 Summary:	RubyGem of Localization Library and Tools for Ruby
 
 # Ruby OR LGPL-3.0-or-later:	gemspec

@@ -6,7 +6,7 @@
 Summary: Library for reading RAW files obtained from digital photo cameras
 Name: LibRaw
 Version: 0.21.5
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: BSD-3-Clause and (CDDL-1.0 or LGPL-2.1-only)
 URL: https://www.libraw.org
 Source0: %{url}/data/%{name}-%{version}.tar.gz

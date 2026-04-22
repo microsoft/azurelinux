@@ -6,7 +6,7 @@
 
 Name:           python-%{pypi_name}
 Version:        0.1.9
-Release:        11%{?dist}
+Release: 12%{?dist}
 Summary:        Sphinx extension for documenting CLI programs
 
 License:        LicenseRef-Callaway-BSD

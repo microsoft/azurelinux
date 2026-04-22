@@ -3,7 +3,7 @@
 
 Name:           libklvanc
 Version:        1.6.0
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        VANC Processing Framework
 License:        LGPL-2.1
 URL:            https://github.com/stoth68000/libklvanc

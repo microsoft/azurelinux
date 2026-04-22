@@ -1,0 +1,26 @@
+From eaaf4883aee50974eeb03e529a29585f8ddc1d9d Mon Sep 17 00:00:00 2001
+From: Bhavin Gandhi <bhavin192@geeksocket.in>
+Date: Wed, 31 May 2023 22:44:54 +0530
+Subject: [PATCH] Add package names to PGTK on X error message
+
+---
+ src/pgtkterm.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/pgtkterm.c b/src/pgtkterm.c
+index c00e13550bd..ce51bff5947 100644
+--- a/src/pgtkterm.c
++++ b/src/pgtkterm.c
+@@ -6680,7 +6680,8 @@ pgtk_display_x_warning (GdkDisplay *display)
+ 			  " System.  That configuration is unsupported and\n"
+ 			  " will lead to sporadic crashes during transfer of\n"
+ 			  " large selection data.  It will also lead to\n"
+-			  " various problems with keyboard input.\n");
++			  " various problems with keyboard input.\n"
++			  "\nInstall emacs-gtk+x11 or emacs-lucid package.\n");
+   gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
+   gtk_container_add (GTK_CONTAINER (content_area), label);
+   gtk_widget_show (label);
+-- 
+2.40.1
+

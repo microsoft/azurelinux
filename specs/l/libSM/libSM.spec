@@ -4,7 +4,7 @@
 Summary: X.Org X11 SM runtime library
 Name: libSM
 Version: 1.2.5
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: MIT AND MIT-open-group
 URL: http://www.x.org
 

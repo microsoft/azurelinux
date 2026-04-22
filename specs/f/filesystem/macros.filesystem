@@ -1,0 +1,15 @@
+# Convenience macro for the transition to merged-sbin
+# (https://fedoraproject.org/wiki/Changes/Unify_bin_and_sbin)
+# Usage:
+#   List all files listed in %%files as %%_sbindir/foo.
+# Example:
+#   %%sbin_merge_compat /usr/sbin/foobar
+#   %%{sbin_merge_compat /usr/sbin/bar1
+#                        /usr/sbin/bar2
+#   }
+
+%sbin_merge_compat() \
+%if "%{_sbindir}" == "%{_bindir}" \
+Requires: filesystem(unmerged-sbin-symlinks) \
+Provides: %{shrink:%{?*}} \
+%endif

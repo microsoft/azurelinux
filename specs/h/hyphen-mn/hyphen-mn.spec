@@ -5,7 +5,7 @@ Name: hyphen-mn
 Summary: Mongolian hyphenation rules
 %global upstreamid 20100531
 Version: 0.%{upstreamid}
-Release: 30%{?dist}
+Release: 31%{?dist}
 Source: http://tug.org/svn/texhyphen/trunk/hyph-utf8/tex/generic/hyph-utf8/patterns/tex/hyph-mn-cyrl.tex?view=co#/hyph-mn-cyrl.tex
 URL: http://www.ctan.org/tex-archive/help/Catalogue/entries/mnhyphn.html
 License: LPPL-1.3a

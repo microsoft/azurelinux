@@ -12,7 +12,7 @@
 
 Name: koji
 Version: 1.35.3
-Release: 8%{?dist}
+Release: 9%{?dist}
 # the included arch lib from yum's rpmUtils is GPLv2+
 License: LGPL-2.1-only AND GPL-2.0-or-later
 Summary: Build system tools

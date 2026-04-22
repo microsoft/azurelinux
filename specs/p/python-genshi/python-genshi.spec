@@ -3,7 +3,7 @@
 
 Name:           python-genshi
 Version:        0.7.10
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Toolkit for stream-based generation of output for the web
 
 License:        BSD-3-Clause

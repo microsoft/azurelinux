@@ -1,0 +1,733 @@
+From 993e877cdbd5cc12dcee563e6f4a004c6beac95a Mon Sep 17 00:00:00 2001
+From: gvenugo3 <gvenugo3@asu.edu>
+Date: Tue, 23 Sep 2025 21:16:24 -0700
+Subject: [PATCH 1/7] json: add JSON_BUILD_PAIR_VARIANT_NON_EMPTY macro and fix
+ typos
+
+- Add JSON_BUILD_PAIR_VARIANT_NON_EMPTY macro to skip empty JSON objects in output
+- Fix comment typos changing "two item" to "two items" throughout
+---
+ src/libsystemd/sd-json/json-util.h |  2 +
+ src/libsystemd/sd-json/sd-json.c   | 60 +++++++++++++++++++++---------
+ 2 files changed, 45 insertions(+), 17 deletions(-)
+
+diff --git a/src/libsystemd/sd-json/json-util.h b/src/libsystemd/sd-json/json-util.h
+index 1b244722b8a3d..47eb7401fef83 100644
+--- a/src/libsystemd/sd-json/json-util.h
++++ b/src/libsystemd/sd-json/json-util.h
+@@ -167,6 +167,7 @@ enum {
+         _JSON_BUILD_PAIR_STRV_NON_EMPTY,
+         _JSON_BUILD_PAIR_STRV_ENV_PAIR_NON_EMPTY,
+         _JSON_BUILD_PAIR_VARIANT_NON_NULL,
++        _JSON_BUILD_PAIR_VARIANT_NON_EMPTY,
+         /* _SD_JSON_BUILD_PAIR_VARIANT_ARRAY_NON_EMPTY, */
+         _JSON_BUILD_PAIR_BYTE_ARRAY_NON_EMPTY,
+         _JSON_BUILD_PAIR_IN4_ADDR_NON_NULL,
+@@ -215,6 +216,7 @@ enum {
+ #define JSON_BUILD_PAIR_STRV_NON_EMPTY(name, l) _JSON_BUILD_PAIR_STRV_NON_EMPTY, (const char*) { name }, (char**) { l }
+ #define JSON_BUILD_PAIR_STRV_ENV_PAIR_NON_EMPTY(name, l) _JSON_BUILD_PAIR_STRV_ENV_PAIR_NON_EMPTY, (const char*) { name }, (char**) { l }
+ #define JSON_BUILD_PAIR_VARIANT_NON_NULL(name, v) _JSON_BUILD_PAIR_VARIANT_NON_NULL, (const char*) { name }, (sd_json_variant*) { v }
++#define JSON_BUILD_PAIR_VARIANT_NON_EMPTY(name, v) _JSON_BUILD_PAIR_VARIANT_NON_EMPTY, (const char*) { name }, (sd_json_variant*) { v }
+ #define JSON_BUILD_PAIR_BYTE_ARRAY_NON_EMPTY(name, v, n) _JSON_BUILD_PAIR_BYTE_ARRAY_NON_EMPTY, (const char*) { name }, (const void*) { v }, (size_t) { n }
+ #define JSON_BUILD_PAIR_IN4_ADDR_NON_NULL(name, v) _JSON_BUILD_PAIR_IN4_ADDR_NON_NULL, (const char*) { name }, (const struct in_addr*) { v }
+ #define JSON_BUILD_PAIR_IN6_ADDR_NON_NULL(name, v) _JSON_BUILD_PAIR_IN6_ADDR_NON_NULL, (const char*) { name }, (const struct in6_addr*) { v }
+diff --git a/src/libsystemd/sd-json/sd-json.c b/src/libsystemd/sd-json/sd-json.c
+index 9add7be9a881e..5587e03f7dceb 100644
+--- a/src/libsystemd/sd-json/sd-json.c
++++ b/src/libsystemd/sd-json/sd-json.c
+@@ -4434,7 +4434,7 @@ _public_ int sd_json_buildv(sd_json_variant **ret, va_list ap) {
+                                         goto finish;
+                         }
+ 
+-                        n_subtract = 2; /* we generated two item */
++                        n_subtract = 2; /* we generated two items */
+ 
+                         current->expect = EXPECT_OBJECT_KEY;
+                         break;
+@@ -4464,7 +4464,7 @@ _public_ int sd_json_buildv(sd_json_variant **ret, va_list ap) {
+                                         goto finish;
+                         }
+ 
+-                        n_subtract = 2; /* we generated two item */
++                        n_subtract = 2; /* we generated two items */
+ 
+                         current->expect = EXPECT_OBJECT_KEY;
+                         break;
+@@ -4492,7 +4492,7 @@ _public_ int sd_json_buildv(sd_json_variant **ret, va_list ap) {
+                                         goto finish;
+                         }
+ 
+-                        n_subtract = 2; /* we generated two item */
++                        n_subtract = 2; /* we generated two items */
+ 
+                         current->expect = EXPECT_OBJECT_KEY;
+                         break;
+@@ -4519,7 +4519,7 @@ _public_ int sd_json_buildv(sd_json_variant **ret, va_list ap) {
+                                         goto finish;
+                         }
+ 
+-                        n_subtract = 2; /* we generated two item */
++                        n_subtract = 2; /* we generated two items */
+ 
+                         current->expect = EXPECT_OBJECT_KEY;
+                         break;
+@@ -4556,7 +4556,7 @@ _public_ int sd_json_buildv(sd_json_variant **ret, va_list ap) {
+                                         goto finish;
+                         }
+ 
+-                        n_subtract = 2; /* we generated two item */
++                        n_subtract = 2; /* we generated two items */
+ 
+                         current->expect = EXPECT_OBJECT_KEY;
+                         break;
+@@ -4582,7 +4582,33 @@ _public_ int sd_json_buildv(sd_json_variant **ret, va_list ap) {
+                                 add_more = sd_json_variant_ref(v);
+                         }
+ 
+-                        n_subtract = 2; /* we generated two item */
++                        n_subtract = 2; /* we generated two items */
++
++                        current->expect = EXPECT_OBJECT_KEY;
++                        break;
++                }
++
++                case _JSON_BUILD_PAIR_VARIANT_NON_EMPTY: {
++                        sd_json_variant *v;
++                        const char *n;
++
++                        if (current->expect != EXPECT_OBJECT_KEY) {
++                                r = -EINVAL;
++                                goto finish;
++                        }
++
++                        n = va_arg(ap, const char *);
++                        v = va_arg(ap, sd_json_variant *);
++
++                        if (v && !sd_json_variant_is_blank_object(v) && current->n_suppress == 0) {
++                                r = sd_json_variant_new_string(&add, n);
++                                if (r < 0)
++                                        goto finish;
++
++                                add_more = sd_json_variant_ref(v);
++                        }
++
++                        n_subtract = 2; /* we generated two items */
+ 
+                         current->expect = EXPECT_OBJECT_KEY;
+                         break;
+@@ -4612,7 +4638,7 @@ _public_ int sd_json_buildv(sd_json_variant **ret, va_list ap) {
+                                         goto finish;
+                         }
+ 
+-                        n_subtract = 2; /* we generated two item */
++                        n_subtract = 2; /* we generated two items */
+ 
+                         current->expect = EXPECT_OBJECT_KEY;
+                         break;
+@@ -4640,7 +4666,7 @@ _public_ int sd_json_buildv(sd_json_variant **ret, va_list ap) {
+                                         goto finish;
+                         }
+ 
+-                        n_subtract = 2; /* we generated two item */
++                        n_subtract = 2; /* we generated two items */
+ 
+                         current->expect = EXPECT_OBJECT_KEY;
+                         break;
+@@ -4668,7 +4694,7 @@ _public_ int sd_json_buildv(sd_json_variant **ret, va_list ap) {
+                                         goto finish;
+                         }
+ 
+-                        n_subtract = 2; /* we generated two item */
++                        n_subtract = 2; /* we generated two items */
+ 
+                         current->expect = EXPECT_OBJECT_KEY;
+                         break;
+@@ -4698,7 +4724,7 @@ _public_ int sd_json_buildv(sd_json_variant **ret, va_list ap) {
+                                         goto finish;
+                         }
+ 
+-                        n_subtract = 2; /* we generated two item */
++                        n_subtract = 2; /* we generated two items */
+ 
+                         current->expect = EXPECT_OBJECT_KEY;
+                         break;
+@@ -4726,7 +4752,7 @@ _public_ int sd_json_buildv(sd_json_variant **ret, va_list ap) {
+                                         goto finish;
+                         }
+ 
+-                        n_subtract = 2; /* we generated two item */
++                        n_subtract = 2; /* we generated two items */
+ 
+                         current->expect = EXPECT_OBJECT_KEY;
+                         break;
+@@ -4754,7 +4780,7 @@ _public_ int sd_json_buildv(sd_json_variant **ret, va_list ap) {
+                                         goto finish;
+                         }
+ 
+-                        n_subtract = 2; /* we generated two item */
++                        n_subtract = 2; /* we generated two items */
+ 
+                         current->expect = EXPECT_OBJECT_KEY;
+                         break;
+@@ -4784,7 +4810,7 @@ _public_ int sd_json_buildv(sd_json_variant **ret, va_list ap) {
+                                         goto finish;
+                         }
+ 
+-                        n_subtract = 2; /* we generated two item */
++                        n_subtract = 2; /* we generated two items */
+ 
+                         current->expect = EXPECT_OBJECT_KEY;
+                         break;
+@@ -4814,7 +4840,7 @@ _public_ int sd_json_buildv(sd_json_variant **ret, va_list ap) {
+                                         goto finish;
+                         }
+ 
+-                        n_subtract = 2; /* we generated two item */
++                        n_subtract = 2; /* we generated two items */
+ 
+                         current->expect = EXPECT_OBJECT_KEY;
+                         break;
+@@ -4876,7 +4902,7 @@ _public_ int sd_json_buildv(sd_json_variant **ret, va_list ap) {
+                                 }
+                         }
+ 
+-                        n_subtract = 2; /* we generated two item */
++                        n_subtract = 2; /* we generated two items */
+ 
+                         current->expect = EXPECT_OBJECT_KEY;
+                         break;
+@@ -4912,7 +4938,7 @@ _public_ int sd_json_buildv(sd_json_variant **ret, va_list ap) {
+                                         goto finish;
+                         }
+ 
+-                        n_subtract = 2; /* we generated two item */
++                        n_subtract = 2; /* we generated two items */
+ 
+                         current->expect = EXPECT_OBJECT_KEY;
+                         break;
+@@ -4940,7 +4966,7 @@ _public_ int sd_json_buildv(sd_json_variant **ret, va_list ap) {
+                                         goto finish;
+                         }
+ 
+-                        n_subtract = 2; /* we generated two item */
++                        n_subtract = 2; /* we generated two items */
+ 
+                         current->expect = EXPECT_OBJECT_KEY;
+                         break;
+
+From c58327a9060855369f68922b9f718d078a13e0c5 Mon Sep 17 00:00:00 2001
+From: gvenugo3 <gvenugo3@asu.edu>
+Date: Thu, 25 Sep 2025 11:23:31 -0700
+Subject: [PATCH 2/7] varlink: refactor parameter handling with asymmetric
+ encoding
+
+Rename varlink_sanitize_parameters to varlink_sanitize_incoming_parameters
+to clarify its role in handling incoming messages.
+
+Implement canonical empty parameter encoding where:
+- Incoming: NULL/null/empty object all become empty object for compatibility
+- Outgoing: Empty parameters omitted entirely via JSON build system
+
+This avoids modifying caller parameters while maintaining wire format
+optimization.
+---
+ src/libsystemd/sd-varlink/sd-varlink-idl.c |   9 +-
+ src/libsystemd/sd-varlink/sd-varlink.c     | 116 ++++++++-------------
+ 2 files changed, 48 insertions(+), 77 deletions(-)
+
+diff --git a/src/libsystemd/sd-varlink/sd-varlink-idl.c b/src/libsystemd/sd-varlink/sd-varlink-idl.c
+index 7e6680e0e6052..03ed52f1720b7 100644
+--- a/src/libsystemd/sd-varlink/sd-varlink-idl.c
++++ b/src/libsystemd/sd-varlink/sd-varlink-idl.c
+@@ -5,6 +5,7 @@
+ #include "alloc-util.h"
+ #include "ansi-color.h"
+ #include "extract-word.h"
++#include "json-internal.h"
+ #include "json-util.h"
+ #include "log.h"
+ #include "memstream-util.h"
+@@ -1793,11 +1794,9 @@ static int varlink_idl_validate_symbol(const sd_varlink_symbol *symbol, sd_json_
+         assert(symbol);
+         assert(!IN_SET(symbol->symbol_type, _SD_VARLINK_SYMBOL_COMMENT, _SD_VARLINK_INTERFACE_COMMENT));
+ 
+-        if (!v) {
+-                if (reterr_bad_field)
+-                        *reterr_bad_field = NULL;
+-                return varlink_idl_log(SYNTHETIC_ERRNO(EMEDIUMTYPE), "Null object passed, refusing.");
+-        }
++        /* Consider a NULL pointer equivalent to an empty object */
++        if (!v)
++                v = JSON_VARIANT_MAGIC_EMPTY_OBJECT;
+ 
+         switch (symbol->symbol_type) {
+ 
+diff --git a/src/libsystemd/sd-varlink/sd-varlink.c b/src/libsystemd/sd-varlink/sd-varlink.c
+index 1666162e89059..dda7a9503b612 100644
+--- a/src/libsystemd/sd-varlink/sd-varlink.c
++++ b/src/libsystemd/sd-varlink/sd-varlink.c
+@@ -1061,31 +1061,30 @@ static int varlink_dispatch_disconnect(sd_varlink *v) {
+         return 1;
+ }
+ 
+-static int varlink_sanitize_parameters(sd_json_variant **v) {
++static int varlink_sanitize_incoming_parameters(sd_json_variant **v) {
+         int r;
+-
+         assert(v);
+ 
+-        /* Varlink always wants a parameters list, hence make one if the caller doesn't want any */
+-        if (!*v)
+-                return sd_json_variant_new_object(v, NULL, 0);
+-        if (sd_json_variant_is_null(*v)) {
+-                sd_json_variant *empty;
+-
++        /* Convert NULL or JSON null to empty object for method handlers (backward compatibility) */
++        if (!*v || sd_json_variant_is_null(*v)) {
++                _cleanup_(sd_json_variant_unrefp) sd_json_variant *empty = NULL;
+                 r = sd_json_variant_new_object(&empty, NULL, 0);
+                 if (r < 0)
+                         return r;
+-
++                /* sd_json_variant_unref() is a NOP if *v is NULL */
+                 sd_json_variant_unref(*v);
+-                *v = empty;
++                *v = TAKE_PTR(empty);
+                 return 0;
+         }
++
++        /* Ensure we have an object */
+         if (!sd_json_variant_is_object(*v))
+                 return -EINVAL;
+ 
+         return 0;
+ }
+ 
++
+ static int varlink_dispatch_reply(sd_varlink *v) {
+         _cleanup_(sd_json_variant_unrefp) sd_json_variant *parameters = NULL;
+         sd_varlink_reply_flags_t flags = 0;
+@@ -1146,7 +1145,7 @@ static int varlink_dispatch_reply(sd_varlink *v) {
+         if (error && FLAGS_SET(flags, SD_VARLINK_REPLY_CONTINUES))
+                 goto invalid;
+ 
+-        r = varlink_sanitize_parameters(&parameters);
++        r = varlink_sanitize_incoming_parameters(&parameters);
+         if (r < 0)
+                 goto invalid;
+ 
+@@ -1327,7 +1326,7 @@ static int varlink_dispatch_method(sd_varlink *v) {
+         if (!method)
+                 goto invalid;
+ 
+-        r = varlink_sanitize_parameters(&parameters);
++        r = varlink_sanitize_incoming_parameters(&parameters);
+         if (r < 0)
+                 goto fail;
+ 
+@@ -1575,13 +1574,14 @@ _public_ int sd_varlink_get_current_parameters(sd_varlink *v, sd_json_variant **
+         if (!v->current)
+                 return -ENODATA;
+ 
+-        p = sd_json_variant_by_key(v->current, "parameters");
+-        if (!p)
+-                return -ENODATA;
++        if (!ret)
++                return 0;
+ 
+-        if (ret)
+-                *ret = sd_json_variant_ref(p);
++        p = sd_json_variant_by_key(v->current, "parameters");
++        if (!p || sd_json_variant_is_null(p))
++                return sd_json_variant_new_object(ret, NULL, 0);
+ 
++        *ret = sd_json_variant_ref(p);
+         return 0;
+ }
+ 
+@@ -2024,14 +2024,10 @@ _public_ int sd_varlink_send(sd_varlink *v, const char *method, sd_json_variant
+         if (!IN_SET(v->state, VARLINK_IDLE_CLIENT, VARLINK_AWAITING_REPLY))
+                 return varlink_log_errno(v, SYNTHETIC_ERRNO(EBUSY), "Connection busy.");
+ 
+-        r = varlink_sanitize_parameters(&parameters);
+-        if (r < 0)
+-                return varlink_log_errno(v, r, "Failed to sanitize parameters: %m");
+-
+         r = sd_json_buildo(
+                         &m,
+                         SD_JSON_BUILD_PAIR("method", SD_JSON_BUILD_STRING(method)),
+-                        SD_JSON_BUILD_PAIR("parameters", SD_JSON_BUILD_VARIANT(parameters)),
++                        JSON_BUILD_PAIR_VARIANT_NON_EMPTY("parameters", parameters),
+                         SD_JSON_BUILD_PAIR("oneway", SD_JSON_BUILD_BOOLEAN(true)));
+         if (r < 0)
+                 return varlink_log_errno(v, r, "Failed to build json message: %m");
+@@ -2076,14 +2072,10 @@ _public_ int sd_varlink_invoke(sd_varlink *v, const char *method, sd_json_varian
+         if (!IN_SET(v->state, VARLINK_IDLE_CLIENT, VARLINK_AWAITING_REPLY))
+                 return varlink_log_errno(v, SYNTHETIC_ERRNO(EBUSY), "Connection busy.");
+ 
+-        r = varlink_sanitize_parameters(&parameters);
+-        if (r < 0)
+-                return varlink_log_errno(v, r, "Failed to sanitize parameters: %m");
+-
+         r = sd_json_buildo(
+                         &m,
+                         SD_JSON_BUILD_PAIR("method", SD_JSON_BUILD_STRING(method)),
+-                        SD_JSON_BUILD_PAIR("parameters", SD_JSON_BUILD_VARIANT(parameters)));
++                        JSON_BUILD_PAIR_VARIANT_NON_EMPTY("parameters", parameters));
+         if (r < 0)
+                 return varlink_log_errno(v, r, "Failed to build json message: %m");
+ 
+@@ -2130,14 +2122,10 @@ _public_ int sd_varlink_observe(sd_varlink *v, const char *method, sd_json_varia
+         if (v->state != VARLINK_IDLE_CLIENT)
+                 return varlink_log_errno(v, SYNTHETIC_ERRNO(EBUSY), "Connection busy.");
+ 
+-        r = varlink_sanitize_parameters(&parameters);
+-        if (r < 0)
+-                return varlink_log_errno(v, r, "Failed to sanitize parameters: %m");
+-
+         r = sd_json_buildo(
+                         &m,
+                         SD_JSON_BUILD_PAIR("method", SD_JSON_BUILD_STRING(method)),
+-                        SD_JSON_BUILD_PAIR("parameters", SD_JSON_BUILD_VARIANT(parameters)),
++                        JSON_BUILD_PAIR_VARIANT_NON_EMPTY("parameters", parameters),
+                         SD_JSON_BUILD_PAIR("more", SD_JSON_BUILD_BOOLEAN(true)));
+         if (r < 0)
+                 return varlink_log_errno(v, r, "Failed to build json message: %m");
+@@ -2195,14 +2183,10 @@ _public_ int sd_varlink_call_full(
+          * that we can assign a new reply shortly. */
+         varlink_clear_current(v);
+ 
+-        r = varlink_sanitize_parameters(&parameters);
+-        if (r < 0)
+-                return varlink_log_errno(v, r, "Failed to sanitize parameters: %m");
+-
+         r = sd_json_buildo(
+                         &m,
+                         SD_JSON_BUILD_PAIR("method", SD_JSON_BUILD_STRING(method)),
+-                        SD_JSON_BUILD_PAIR("parameters", SD_JSON_BUILD_VARIANT(parameters)));
++                        JSON_BUILD_PAIR_VARIANT_NON_EMPTY("parameters", parameters));
+         if (r < 0)
+                 return varlink_log_errno(v, r, "Failed to build json message: %m");
+ 
+@@ -2353,14 +2337,10 @@ _public_ int sd_varlink_collect_full(
+          * that we can assign a new reply shortly. */
+         varlink_clear_current(v);
+ 
+-        r = varlink_sanitize_parameters(&parameters);
+-        if (r < 0)
+-                return varlink_log_errno(v, r, "Failed to sanitize parameters: %m");
+-
+         r = sd_json_buildo(
+                         &m,
+                         SD_JSON_BUILD_PAIR("method", SD_JSON_BUILD_STRING(method)),
+-                        SD_JSON_BUILD_PAIR("parameters", SD_JSON_BUILD_VARIANT(parameters)),
++                        JSON_BUILD_PAIR_VARIANT_NON_EMPTY("parameters", parameters),
+                         SD_JSON_BUILD_PAIR("more", SD_JSON_BUILD_BOOLEAN(true)));
+         if (r < 0)
+                 return varlink_log_errno(v, r, "Failed to build json message: %m");
+@@ -2501,14 +2481,7 @@ _public_ int sd_varlink_reply(sd_varlink *v, sd_json_variant *parameters) {
+                     VARLINK_PENDING_METHOD, VARLINK_PENDING_METHOD_MORE))
+                 return -EBUSY;
+ 
+-        r = varlink_sanitize_parameters(&parameters);
+-        if (r < 0)
+-                return varlink_log_errno(v, r, "Failed to sanitize parameters: %m");
+-
+-        r = sd_json_buildo(&m, SD_JSON_BUILD_PAIR("parameters", SD_JSON_BUILD_VARIANT(parameters)));
+-        if (r < 0)
+-                return varlink_log_errno(v, r, "Failed to build json message: %m");
+-
++        /* Validate parameters BEFORE sanitization */
+         if (v->current_method) {
+                 const char *bad_field = NULL;
+ 
+@@ -2519,6 +2492,10 @@ _public_ int sd_varlink_reply(sd_varlink *v, sd_json_variant *parameters) {
+                                           v->current_method->name, strna(bad_field));
+         }
+ 
++        r = sd_json_buildo(&m, JSON_BUILD_PAIR_VARIANT_NON_EMPTY("parameters", parameters));
++        if (r < 0)
++                return varlink_log_errno(v, r, "Failed to build json message: %m");
++
+         r = varlink_enqueue_json(v, m);
+         if (r < 0)
+                 return varlink_log_errno(v, r, "Failed to enqueue json message: %m");
+@@ -2588,17 +2565,7 @@ _public_ int sd_varlink_error(sd_varlink *v, const char *error_id, sd_json_varia
+          * the callers don't need to do this explicitly. */
+         sd_varlink_reset_fds(v);
+ 
+-        r = varlink_sanitize_parameters(&parameters);
+-        if (r < 0)
+-                return varlink_log_errno(v, r, "Failed to sanitize parameters: %m");
+-
+-        r = sd_json_buildo(
+-                        &m,
+-                        SD_JSON_BUILD_PAIR("error", SD_JSON_BUILD_STRING(error_id)),
+-                        SD_JSON_BUILD_PAIR("parameters", SD_JSON_BUILD_VARIANT(parameters)));
+-        if (r < 0)
+-                return varlink_log_errno(v, r, "Failed to build json message: %m");
+-
++        /* Validate parameters BEFORE sanitization */
+         sd_varlink_symbol *symbol = hashmap_get(v->server->symbols, error_id);
+         if (!symbol)
+                 varlink_log(v, "No interface description defined for error '%s', not validating.", error_id);
+@@ -2612,6 +2579,13 @@ _public_ int sd_varlink_error(sd_varlink *v, const char *error_id, sd_json_varia
+                                           error_id, strna(bad_field));
+         }
+ 
++        r = sd_json_buildo(
++                        &m,
++                        SD_JSON_BUILD_PAIR("error", SD_JSON_BUILD_STRING(error_id)),
++                        JSON_BUILD_PAIR_VARIANT_NON_EMPTY("parameters", parameters));
++        if (r < 0)
++                return varlink_log_errno(v, r, "Failed to build json message: %m");
++
+         r = varlink_enqueue_json(v, m);
+         if (r < 0)
+                 return varlink_log_errno(v, r, "Failed to enqueue json message: %m");
+@@ -2726,17 +2700,7 @@ _public_ int sd_varlink_notify(sd_varlink *v, sd_json_variant *parameters) {
+         if (!IN_SET(v->state, VARLINK_PROCESSING_METHOD_MORE, VARLINK_PENDING_METHOD_MORE))
+                 return varlink_log_errno(v, SYNTHETIC_ERRNO(EBUSY), "Connection busy.");
+ 
+-        r = varlink_sanitize_parameters(&parameters);
+-        if (r < 0)
+-                return varlink_log_errno(v, r, "Failed to sanitize parameters: %m");
+-
+-        r = sd_json_buildo(
+-                        &m,
+-                        SD_JSON_BUILD_PAIR("parameters", SD_JSON_BUILD_VARIANT(parameters)),
+-                        SD_JSON_BUILD_PAIR("continues", SD_JSON_BUILD_BOOLEAN(true)));
+-        if (r < 0)
+-                return varlink_log_errno(v, r, "Failed to build json message: %m");
+-
++        /* Validate parameters BEFORE sanitization */
+         if (v->current_method) {
+                 const char *bad_field = NULL;
+ 
+@@ -2750,6 +2714,13 @@ _public_ int sd_varlink_notify(sd_varlink *v, sd_json_variant *parameters) {
+                                           v->current_method->name, strna(bad_field));
+         }
+ 
++        r = sd_json_buildo(
++                        &m,
++                        JSON_BUILD_PAIR_VARIANT_NON_EMPTY("parameters", parameters),
++                        SD_JSON_BUILD_PAIR("continues", SD_JSON_BUILD_BOOLEAN(true)));
++        if (r < 0)
++                return varlink_log_errno(v, r, "Failed to build json message: %m");
++
+         r = varlink_enqueue_json(v, m);
+         if (r < 0)
+                 return varlink_log_errno(v, r, "Failed to enqueue json message: %m");
+@@ -2783,6 +2754,7 @@ _public_ int sd_varlink_dispatch(sd_varlink *v, sd_json_variant *parameters, con
+ 
+         /* A wrapper around json_dispatch_full() that returns a nice InvalidParameter error if we hit a problem with some field. */
+ 
++        /* sd_json_dispatch_full() now handles NULL parameters gracefully */
+         r = sd_json_dispatch_full(parameters, dispatch_table, /* bad= */ NULL, /* flags= */ 0, userdata, &bad_field);
+         if (r < 0) {
+                 if (bad_field)
+
+From dfe8fe44ee427aaffd82daae960c7c4090d47858 Mon Sep 17 00:00:00 2001
+From: gvenugo3 <gvenugo3@asu.edu>
+Date: Thu, 25 Sep 2025 11:23:42 -0700
+Subject: [PATCH 3/7] varlink: add parameter validation to systemd service
+ handler
+
+Add assertion in systemd service handler to ensure parameters are
+non-null after sanitization, providing early detection of invalid
+parameter handling.
+---
+ src/shared/varlink-io.systemd.service.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/shared/varlink-io.systemd.service.c b/src/shared/varlink-io.systemd.service.c
+index d130f0df51a5e..8cbf299e07baa 100644
+--- a/src/shared/varlink-io.systemd.service.c
++++ b/src/shared/varlink-io.systemd.service.c
+@@ -47,6 +47,7 @@ int varlink_method_ping(sd_varlink *link, sd_json_variant *parameters, sd_varlin
+         int r;
+ 
+         assert(link);
++        assert(parameters);
+ 
+         r = sd_varlink_dispatch(link, parameters, /* dispatch_table= */ NULL, /* userdata= */ NULL);
+         if (r != 0)
+
+From 9fa2f9ebf3d9c1c9f317afbd5e94d8f7c17991ed Mon Sep 17 00:00:00 2001
+From: gvenugo3 <gvenugo3@asu.edu>
+Date: Thu, 25 Sep 2025 11:23:54 -0700
+Subject: [PATCH 4/7] varlink: update tests for canonical empty parameter
+ handling
+
+Update test overload handling to verify NULL parameters are properly
+handled for disconnect errors, ensuring test coverage of the new
+canonical encoding behavior.
+---
+ src/test/test-varlink.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/test/test-varlink.c b/src/test/test-varlink.c
+index b298b9cfbfed7..c853eb41d0afe 100644
+--- a/src/test/test-varlink.c
++++ b/src/test/test-varlink.c
+@@ -205,6 +205,9 @@ static int overload_reply(sd_varlink *link, sd_json_variant *parameters, const c
+ 
+         log_debug("Over reply triggered with error: %s", strna(error_id));
+         ASSERT_STREQ(error_id, SD_VARLINK_ERROR_DISCONNECTED);
++        /* Local disconnect errors carry no parameters. Ensure we propagate
++         * absence as NULL rather than an empty object. */
++        ASSERT_TRUE(!parameters);
+         sd_event_exit(sd_varlink_get_event(link), 0);
+ 
+         return 0;
+
+From dfb11f713e5a742868e64810e969dc8938c6b52d Mon Sep 17 00:00:00 2001
+From: gvenugo3 <gvenugo3@asu.edu>
+Date: Thu, 25 Sep 2025 11:24:04 -0700
+Subject: [PATCH 5/7] sysext: fix varlink parameter handling
+
+Update sysext to use proper parameter handling that's compatible with
+the new canonical empty parameter encoding.
+---
+ src/sysext/sysext.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/sysext/sysext.c b/src/sysext/sysext.c
+index c8c75d68bd077..957386890cfd3 100644
+--- a/src/sysext/sysext.c
++++ b/src/sysext/sysext.c
+@@ -2219,7 +2219,6 @@ static int parse_merge_parameters(sd_varlink *link, sd_json_variant *parameters,
+         };
+ 
+         assert(link);
+-        assert(parameters);
+         assert(p);
+ 
+         return sd_varlink_dispatch(link, parameters, dispatch_table, p);
+
+From 0c063940acb06a27fd2fd482ffc6058bab576e0c Mon Sep 17 00:00:00 2001
+From: gvenugo3 <gvenugo3@asu.edu>
+Date: Thu, 25 Sep 2025 11:24:40 -0700
+Subject: [PATCH 6/7] man: document canonical empty parameter encoding behavior
+
+Document the asymmetric parameter handling where receivers accept
+multiple formats (omitted/null/empty) for compatibility while senders
+use canonical encoding (omit field entirely) for optimization.
+---
+ man/sd-varlink.xml | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/man/sd-varlink.xml b/man/sd-varlink.xml
+index c7cfceb71252f..c57411d5bd867 100644
+--- a/man/sd-varlink.xml
++++ b/man/sd-varlink.xml
+@@ -44,6 +44,13 @@
+     <citerefentry><refentrytitle>sd-json</refentrytitle><manvolnum>3</manvolnum></citerefentry> API for JSON
+     serialization, deserialization and manipulation.</para>
+ 
++    <para>Canonical encoding rules: sd-varlink omits the <literal>"parameters"</literal> member in replies,
++    errors, and notifications when there are no parameters to transmit. This reduces message size and
++    avoids ambiguity. Receivers must be tolerant and accept any of the following encodings for the
++    absence of parameters: an omitted <literal>"parameters"</literal> key (preferred), a JSON <literal>null</literal>
++    value, or an empty object <literal>{}</literal>. When decoding, sd-varlink treats JSON <literal>null</literal>
++    as if the member was omitted.</para>
++
+     <para>The <citerefentry><refentrytitle>varlinkctl</refentrytitle><manvolnum>1</manvolnum></citerefentry> tool
+     makes the functionality implemented by sd-varlink available from the command line.</para>
+   </refsect1>
+
+From 420241fdd4143818712ef78559db725f3d9f9d3f Mon Sep 17 00:00:00 2001
+From: gvenugo3 <gvenugo3@asu.edu>
+Date: Sun, 28 Sep 2025 21:48:39 -0700
+Subject: [PATCH 7/7] varlink: address reviewer feedback
+
+- Pass empty object instead of NULL for local errors to ensure
+  API consistency and allow code to rely on non-null parameters
+- Remove spurious empty line
+- Restore necessary assertion in sysext parameter validation
+- Clarify documentation to specify wire format encoding
+
+This improves API reliability by guaranteeing parameter objects
+are always provided to callbacks, even for local disconnect errors.
+---
+ man/sd-varlink.xml                     | 2 +-
+ src/libsystemd/sd-varlink/sd-varlink.c | 8 ++++++--
+ src/sysext/sysext.c                    | 1 +
+ src/test/test-varlink.c                | 6 +++---
+ 4 files changed, 11 insertions(+), 6 deletions(-)
+
+diff --git a/man/sd-varlink.xml b/man/sd-varlink.xml
+index c57411d5bd867..282d6a330ef1f 100644
+--- a/man/sd-varlink.xml
++++ b/man/sd-varlink.xml
+@@ -44,7 +44,7 @@
+     <citerefentry><refentrytitle>sd-json</refentrytitle><manvolnum>3</manvolnum></citerefentry> API for JSON
+     serialization, deserialization and manipulation.</para>
+ 
+-    <para>Canonical encoding rules: sd-varlink omits the <literal>"parameters"</literal> member in replies,
++    <para>Canonical encoding rules: sd-varlink omits the <literal>"parameters"</literal> member on the wire in replies,
+     errors, and notifications when there are no parameters to transmit. This reduces message size and
+     avoids ambiguity. Receivers must be tolerant and accept any of the following encodings for the
+     absence of parameters: an omitted <literal>"parameters"</literal> key (preferred), a JSON <literal>null</literal>
+diff --git a/src/libsystemd/sd-varlink/sd-varlink.c b/src/libsystemd/sd-varlink/sd-varlink.c
+index dda7a9503b612..e3b9106ac72e7 100644
+--- a/src/libsystemd/sd-varlink/sd-varlink.c
++++ b/src/libsystemd/sd-varlink/sd-varlink.c
+@@ -1020,6 +1020,7 @@ static int varlink_test_timeout(sd_varlink *v) {
+ }
+ 
+ static int varlink_dispatch_local_error(sd_varlink *v, const char *error) {
++        _cleanup_(sd_json_variant_unrefp) sd_json_variant *empty = NULL;
+         int r;
+ 
+         assert(v);
+@@ -1028,7 +1029,11 @@ static int varlink_dispatch_local_error(sd_varlink *v, const char *error) {
+         if (!v->reply_callback)
+                 return 0;
+ 
+-        r = v->reply_callback(v, NULL, error, SD_VARLINK_REPLY_ERROR|SD_VARLINK_REPLY_LOCAL, v->userdata);
++        r = sd_json_variant_new_object(&empty, NULL, 0);
++        if (r < 0)
++                return r;
++
++        r = v->reply_callback(v, empty, error, SD_VARLINK_REPLY_ERROR|SD_VARLINK_REPLY_LOCAL, v->userdata);
+         if (r < 0)
+                 varlink_log_errno(v, r, "Reply callback returned error, ignoring: %m");
+ 
+@@ -1084,7 +1089,6 @@ static int varlink_sanitize_incoming_parameters(sd_json_variant **v) {
+         return 0;
+ }
+ 
+-
+ static int varlink_dispatch_reply(sd_varlink *v) {
+         _cleanup_(sd_json_variant_unrefp) sd_json_variant *parameters = NULL;
+         sd_varlink_reply_flags_t flags = 0;
+diff --git a/src/sysext/sysext.c b/src/sysext/sysext.c
+index 957386890cfd3..c8c75d68bd077 100644
+--- a/src/sysext/sysext.c
++++ b/src/sysext/sysext.c
+@@ -2219,6 +2219,7 @@ static int parse_merge_parameters(sd_varlink *link, sd_json_variant *parameters,
+         };
+ 
+         assert(link);
++        assert(parameters);
+         assert(p);
+ 
+         return sd_varlink_dispatch(link, parameters, dispatch_table, p);
+diff --git a/src/test/test-varlink.c b/src/test/test-varlink.c
+index c853eb41d0afe..0b834fad17dad 100644
+--- a/src/test/test-varlink.c
++++ b/src/test/test-varlink.c
+@@ -205,9 +205,9 @@ static int overload_reply(sd_varlink *link, sd_json_variant *parameters, const c
+ 
+         log_debug("Over reply triggered with error: %s", strna(error_id));
+         ASSERT_STREQ(error_id, SD_VARLINK_ERROR_DISCONNECTED);
+-        /* Local disconnect errors carry no parameters. Ensure we propagate
+-         * absence as NULL rather than an empty object. */
+-        ASSERT_TRUE(!parameters);
++        /* Local disconnect errors carry empty parameters. Ensure we propagate
++         * a consistent empty object for API reliability. */
++        ASSERT_TRUE(sd_json_variant_is_blank_object(parameters));
+         sd_event_exit(sd_varlink_get_event(link), 0);
+ 
+         return 0;

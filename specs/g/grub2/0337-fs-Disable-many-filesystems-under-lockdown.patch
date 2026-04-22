@@ -1,0 +1,391 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Daniel Axtens <dja@axtens.net>
+Date: Sat, 23 Mar 2024 16:20:45 +1100
+Subject: [PATCH] fs: Disable many filesystems under lockdown
+
+The idea is to permit the following: btrfs, cpio, exfat, ext, f2fs, fat,
+hfsplus, iso9660, squash4, tar, xfs and zfs.
+
+The JFS, ReiserFS, romfs, UDF and UFS security vulnerabilities were
+reported by Jonathan Bar Or <jonathanbaror@gmail.com>.
+
+Fixes: CVE-2025-0677
+Fixes: CVE-2025-0684
+Fixes: CVE-2025-0685
+Fixes: CVE-2025-0686
+Fixes: CVE-2025-0689
+
+Suggested-by: Daniel Axtens <dja@axtens.net>
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/fs/affs.c     | 11 ++++++++---
+ grub-core/fs/cbfs.c     | 11 ++++++++---
+ grub-core/fs/jfs.c      | 11 ++++++++---
+ grub-core/fs/minix.c    | 11 ++++++++---
+ grub-core/fs/nilfs2.c   | 11 ++++++++---
+ grub-core/fs/ntfs.c     | 11 ++++++++---
+ grub-core/fs/reiserfs.c | 11 ++++++++---
+ grub-core/fs/romfs.c    | 11 ++++++++---
+ grub-core/fs/sfs.c      | 11 ++++++++---
+ grub-core/fs/udf.c      | 11 ++++++++---
+ grub-core/fs/ufs.c      | 11 ++++++++---
+ 11 files changed, 88 insertions(+), 33 deletions(-)
+
+diff --git a/grub-core/fs/affs.c b/grub-core/fs/affs.c
+index 9b0afb954..520a001c7 100644
+--- a/grub-core/fs/affs.c
++++ b/grub-core/fs/affs.c
+@@ -26,6 +26,7 @@
+ #include <grub/types.h>
+ #include <grub/fshelp.h>
+ #include <grub/charset.h>
++#include <grub/lockdown.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -703,12 +704,16 @@ static struct grub_fs grub_affs_fs =
+ 
+ GRUB_MOD_INIT(affs)
+ {
+-  grub_affs_fs.mod = mod;
+-  grub_fs_register (&grub_affs_fs);
++  if (!grub_is_lockdown ())
++    {
++      grub_affs_fs.mod = mod;
++      grub_fs_register (&grub_affs_fs);
++    }
+   my_mod = mod;
+ }
+ 
+ GRUB_MOD_FINI(affs)
+ {
+-  grub_fs_unregister (&grub_affs_fs);
++  if (!grub_is_lockdown ())
++    grub_fs_unregister (&grub_affs_fs);
+ }
+diff --git a/grub-core/fs/cbfs.c b/grub-core/fs/cbfs.c
+index 2332745fe..b62c8777c 100644
+--- a/grub-core/fs/cbfs.c
++++ b/grub-core/fs/cbfs.c
+@@ -26,6 +26,7 @@
+ #include <grub/dl.h>
+ #include <grub/i18n.h>
+ #include <grub/cbfs_core.h>
++#include <grub/lockdown.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -390,13 +391,17 @@ GRUB_MOD_INIT (cbfs)
+ #if (defined (__i386__) || defined (__x86_64__)) && !defined (GRUB_UTIL) && !defined (GRUB_MACHINE_EMU) && !defined (GRUB_MACHINE_XEN)
+   init_cbfsdisk ();
+ #endif
+-  grub_cbfs_fs.mod = mod;
+-  grub_fs_register (&grub_cbfs_fs);
++  if (!grub_is_lockdown ())
++    {
++      grub_cbfs_fs.mod = mod;
++      grub_fs_register (&grub_cbfs_fs);
++    }
+ }
+ 
+ GRUB_MOD_FINI (cbfs)
+ {
+-  grub_fs_unregister (&grub_cbfs_fs);
++  if (!grub_is_lockdown ())
++    grub_fs_unregister (&grub_cbfs_fs);
+ #if (defined (__i386__) || defined (__x86_64__)) && !defined (GRUB_UTIL) && !defined (GRUB_MACHINE_EMU) && !defined (GRUB_MACHINE_XEN)
+   fini_cbfsdisk ();
+ #endif
+diff --git a/grub-core/fs/jfs.c b/grub-core/fs/jfs.c
+index b0283ac00..ab175c7f1 100644
+--- a/grub-core/fs/jfs.c
++++ b/grub-core/fs/jfs.c
+@@ -26,6 +26,7 @@
+ #include <grub/types.h>
+ #include <grub/charset.h>
+ #include <grub/i18n.h>
++#include <grub/lockdown.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -1005,12 +1006,16 @@ static struct grub_fs grub_jfs_fs =
+ 
+ GRUB_MOD_INIT(jfs)
+ {
+-  grub_jfs_fs.mod = mod;
+-  grub_fs_register (&grub_jfs_fs);
++  if (!grub_is_lockdown ())
++    {
++      grub_jfs_fs.mod = mod;
++      grub_fs_register (&grub_jfs_fs);
++    }
+   my_mod = mod;
+ }
+ 
+ GRUB_MOD_FINI(jfs)
+ {
+-  grub_fs_unregister (&grub_jfs_fs);
++  if (!grub_is_lockdown ())
++    grub_fs_unregister (&grub_jfs_fs);
+ }
+diff --git a/grub-core/fs/minix.c b/grub-core/fs/minix.c
+index b7679c3e2..4440fcca8 100644
+--- a/grub-core/fs/minix.c
++++ b/grub-core/fs/minix.c
+@@ -25,6 +25,7 @@
+ #include <grub/dl.h>
+ #include <grub/types.h>
+ #include <grub/i18n.h>
++#include <grub/lockdown.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -734,8 +735,11 @@ GRUB_MOD_INIT(minix)
+ #endif
+ #endif
+ {
+-  grub_minix_fs.mod = mod;
+-  grub_fs_register (&grub_minix_fs);
++  if (!grub_is_lockdown ())
++    {
++      grub_minix_fs.mod = mod;
++      grub_fs_register (&grub_minix_fs);
++    }
+   my_mod = mod;
+ }
+ 
+@@ -757,5 +761,6 @@ GRUB_MOD_FINI(minix)
+ #endif
+ #endif
+ {
+-  grub_fs_unregister (&grub_minix_fs);
++  if (!grub_is_lockdown ())
++    grub_fs_unregister (&grub_minix_fs);
+ }
+diff --git a/grub-core/fs/nilfs2.c b/grub-core/fs/nilfs2.c
+index 4e1e71738..26e6077ff 100644
+--- a/grub-core/fs/nilfs2.c
++++ b/grub-core/fs/nilfs2.c
+@@ -34,6 +34,7 @@
+ #include <grub/dl.h>
+ #include <grub/types.h>
+ #include <grub/fshelp.h>
++#include <grub/lockdown.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -1231,12 +1232,16 @@ GRUB_MOD_INIT (nilfs2)
+ 				  grub_nilfs2_dat_entry));
+   COMPILE_TIME_ASSERT (1 << LOG_INODE_SIZE
+ 		       == sizeof (struct grub_nilfs2_inode));
+-  grub_nilfs2_fs.mod = mod;
+-  grub_fs_register (&grub_nilfs2_fs);
++  if (!grub_is_lockdown ())
++    {
++      grub_nilfs2_fs.mod = mod;
++      grub_fs_register (&grub_nilfs2_fs);
++    }
+   my_mod = mod;
+ }
+ 
+ GRUB_MOD_FINI (nilfs2)
+ {
+-  grub_fs_unregister (&grub_nilfs2_fs);
++  if (!grub_is_lockdown ())
++    grub_fs_unregister (&grub_nilfs2_fs);
+ }
+diff --git a/grub-core/fs/ntfs.c b/grub-core/fs/ntfs.c
+index 4e144cc3c..e00349b1d 100644
+--- a/grub-core/fs/ntfs.c
++++ b/grub-core/fs/ntfs.c
+@@ -27,6 +27,7 @@
+ #include <grub/fshelp.h>
+ #include <grub/ntfs.h>
+ #include <grub/charset.h>
++#include <grub/lockdown.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -1541,12 +1542,16 @@ static struct grub_fs grub_ntfs_fs =
+ 
+ GRUB_MOD_INIT (ntfs)
+ {
+-  grub_ntfs_fs.mod = mod;
+-  grub_fs_register (&grub_ntfs_fs);
++  if (!grub_is_lockdown ())
++    {
++      grub_ntfs_fs.mod = mod;
++      grub_fs_register (&grub_ntfs_fs);
++    }
+   my_mod = mod;
+ }
+ 
+ GRUB_MOD_FINI (ntfs)
+ {
+-  grub_fs_unregister (&grub_ntfs_fs);
++  if (!grub_is_lockdown ())
++    grub_fs_unregister (&grub_ntfs_fs);
+ }
+diff --git a/grub-core/fs/reiserfs.c b/grub-core/fs/reiserfs.c
+index e8b0b6383..ca47e0a43 100644
+--- a/grub-core/fs/reiserfs.c
++++ b/grub-core/fs/reiserfs.c
+@@ -39,6 +39,7 @@
+ #include <grub/types.h>
+ #include <grub/fshelp.h>
+ #include <grub/i18n.h>
++#include <grub/lockdown.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -1407,12 +1408,16 @@ static struct grub_fs grub_reiserfs_fs =
+ 
+ GRUB_MOD_INIT(reiserfs)
+ {
+-  grub_reiserfs_fs.mod = mod;
+-  grub_fs_register (&grub_reiserfs_fs);
++  if (!grub_is_lockdown ())
++    {
++      grub_reiserfs_fs.mod = mod;
++      grub_fs_register (&grub_reiserfs_fs);
++    }
+   my_mod = mod;
+ }
+ 
+ GRUB_MOD_FINI(reiserfs)
+ {
+-  grub_fs_unregister (&grub_reiserfs_fs);
++  if (!grub_is_lockdown ())
++    grub_fs_unregister (&grub_reiserfs_fs);
+ }
+diff --git a/grub-core/fs/romfs.c b/grub-core/fs/romfs.c
+index 56b0b2b2f..eafab03b2 100644
+--- a/grub-core/fs/romfs.c
++++ b/grub-core/fs/romfs.c
+@@ -23,6 +23,7 @@
+ #include <grub/disk.h>
+ #include <grub/fs.h>
+ #include <grub/fshelp.h>
++#include <grub/lockdown.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -475,11 +476,15 @@ static struct grub_fs grub_romfs_fs =
+ 
+ GRUB_MOD_INIT(romfs)
+ {
+-  grub_romfs_fs.mod = mod;
+-  grub_fs_register (&grub_romfs_fs);
++  if (!grub_is_lockdown ())
++    {
++      grub_romfs_fs.mod = mod;
++      grub_fs_register (&grub_romfs_fs);
++    }
+ }
+ 
+ GRUB_MOD_FINI(romfs)
+ {
+-  grub_fs_unregister (&grub_romfs_fs);
++  if (!grub_is_lockdown ())
++    grub_fs_unregister (&grub_romfs_fs);
+ }
+diff --git a/grub-core/fs/sfs.c b/grub-core/fs/sfs.c
+index f0d7cac43..88705b3a2 100644
+--- a/grub-core/fs/sfs.c
++++ b/grub-core/fs/sfs.c
+@@ -26,6 +26,7 @@
+ #include <grub/types.h>
+ #include <grub/fshelp.h>
+ #include <grub/charset.h>
++#include <grub/lockdown.h>
+ #include <grub/safemath.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+@@ -779,12 +780,16 @@ static struct grub_fs grub_sfs_fs =
+ 
+ GRUB_MOD_INIT(sfs)
+ {
+-  grub_sfs_fs.mod = mod;
+-  grub_fs_register (&grub_sfs_fs);
++  if (!grub_is_lockdown ())
++    {
++      grub_sfs_fs.mod = mod;
++      grub_fs_register (&grub_sfs_fs);
++    }
+   my_mod = mod;
+ }
+ 
+ GRUB_MOD_FINI(sfs)
+ {
+-  grub_fs_unregister (&grub_sfs_fs);
++  if (!grub_is_lockdown ())
++    grub_fs_unregister (&grub_sfs_fs);
+ }
+diff --git a/grub-core/fs/udf.c b/grub-core/fs/udf.c
+index 8765c633c..3d5ee5af5 100644
+--- a/grub-core/fs/udf.c
++++ b/grub-core/fs/udf.c
+@@ -27,6 +27,7 @@
+ #include <grub/fshelp.h>
+ #include <grub/charset.h>
+ #include <grub/datetime.h>
++#include <grub/lockdown.h>
+ #include <grub/udf.h>
+ #include <grub/safemath.h>
+ 
+@@ -1455,12 +1456,16 @@ static struct grub_fs grub_udf_fs = {
+ 
+ GRUB_MOD_INIT (udf)
+ {
+-  grub_udf_fs.mod = mod;
+-  grub_fs_register (&grub_udf_fs);
++  if (!grub_is_lockdown ())
++    {
++      grub_udf_fs.mod = mod;
++      grub_fs_register (&grub_udf_fs);
++    }
+   my_mod = mod;
+ }
+ 
+ GRUB_MOD_FINI (udf)
+ {
+-  grub_fs_unregister (&grub_udf_fs);
++  if (!grub_is_lockdown ())
++    grub_fs_unregister (&grub_udf_fs);
+ }
+diff --git a/grub-core/fs/ufs.c b/grub-core/fs/ufs.c
+index e82d9356d..8b5adbd48 100644
+--- a/grub-core/fs/ufs.c
++++ b/grub-core/fs/ufs.c
+@@ -25,6 +25,7 @@
+ #include <grub/dl.h>
+ #include <grub/types.h>
+ #include <grub/i18n.h>
++#include <grub/lockdown.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -899,8 +900,11 @@ GRUB_MOD_INIT(ufs1)
+ #endif
+ #endif
+ {
+-  grub_ufs_fs.mod = mod;
+-  grub_fs_register (&grub_ufs_fs);
++  if (!grub_is_lockdown ())
++    {
++      grub_ufs_fs.mod = mod;
++      grub_fs_register (&grub_ufs_fs);
++    }
+   my_mod = mod;
+ }
+ 
+@@ -914,6 +918,7 @@ GRUB_MOD_FINI(ufs1)
+ #endif
+ #endif
+ {
+-  grub_fs_unregister (&grub_ufs_fs);
++  if (!grub_is_lockdown ())
++    grub_fs_unregister (&grub_ufs_fs);
+ }
+ 

@@ -5,7 +5,7 @@ Summary:    GNOME icon theme
 Name:       gnome-icon-theme
 Version:    3.12.0
 License:    LGPL-3.0-or-later
-Release:    26%{?dist}
+Release: 27%{?dist}
 URL:        http://www.gnome.org
 
 #VCS: git:git://git.gnome.org/gnome-icon-theme

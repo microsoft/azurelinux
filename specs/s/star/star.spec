@@ -6,7 +6,7 @@
 Summary:  An archiving tool with ACL support
 Name: star
 Version: 1.6
-Release: 18%{?dist}
+Release: 19%{?dist}
 License: CDDL-1.0 AND GPL-2.0-only
 URL: http://freecode.com/projects/star
 Source: https://downloads.sourceforge.net/s-tar/%{name}-%{version}.tar.bz2

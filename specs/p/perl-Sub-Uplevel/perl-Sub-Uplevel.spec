@@ -5,7 +5,7 @@ Name:           perl-Sub-Uplevel
 Summary:        Apparently run a function in a higher stack frame
 Epoch:          1
 Version:        0.2800
-Release:        25%{?dist}
+Release: 26%{?dist}
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Sub-Uplevel
 Source0:        https://cpan.metacpan.org/modules/by-module/Sub/Sub-Uplevel-%{version}.tar.gz

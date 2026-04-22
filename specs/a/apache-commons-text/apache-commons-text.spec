@@ -5,7 +5,7 @@
 
 Name:           apache-%{jarname}
 Version:        1.10.0
-Release:        13%{?dist}
+Release: 14%{?dist}
 Summary:        Apache Commons Text is a library focused on algorithms working on strings
 License:        Apache-2.0
 URL:            https://commons.apache.org/proper/%{jarname}

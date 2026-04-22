@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: B Horn <b@horn.uk>
+Date: Fri, 1 Nov 2024 19:24:29 +0000
+Subject: [PATCH] commands/pgp: Unregister the "check_signatures" hooks on
+ module unload
+
+If the hooks are not removed they can be called after the module has
+been unloaded leading to an use-after-free.
+
+Fixes: CVE-2025-0622
+
+Reported-by: B Horn <b@horn.uk>
+Signed-off-by: B Horn <b@horn.uk>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/commands/pgp.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/grub-core/commands/pgp.c b/grub-core/commands/pgp.c
+index 847a5046a..fa3ef5c75 100644
+--- a/grub-core/commands/pgp.c
++++ b/grub-core/commands/pgp.c
+@@ -982,6 +982,8 @@ GRUB_MOD_INIT(pgp)
+ 
+ GRUB_MOD_FINI(pgp)
+ {
++  grub_register_variable_hook ("check_signatures", NULL, NULL);
++  grub_env_unset ("check_signatures");
+   grub_verifier_unregister (&grub_pubkey_verifier);
+   grub_unregister_extcmd (cmd);
+   grub_unregister_extcmd (cmd_trust);

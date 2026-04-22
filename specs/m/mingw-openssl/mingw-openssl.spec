@@ -19,7 +19,7 @@
 
 Name:           mingw-openssl
 Version:        3.2.4
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        MinGW port of the OpenSSL toolkit
 
 License:        OpenSSL

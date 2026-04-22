@@ -3,7 +3,7 @@
 
 Name:           perl-Validation-Class
 Version:        7.900059
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        Powerful Data Validation Framework
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Validation-Class

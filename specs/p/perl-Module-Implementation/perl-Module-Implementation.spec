@@ -13,7 +13,7 @@
 
 Name:		perl-Module-Implementation
 Version:	0.09
-Release:	42%{?dist}
+Release: 43%{?dist}
 Summary:	Loads one of several alternate underlying implementations for a module
 License:	Artistic-2.0
 URL:		https://metacpan.org/release/perl-Module-Implementation

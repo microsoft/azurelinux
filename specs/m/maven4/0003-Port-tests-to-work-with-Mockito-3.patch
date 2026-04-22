@@ -1,0 +1,33 @@
+From d1beb3b973f3074731c63b2a5cc39470ce377a3f Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Fri, 11 Jul 2025 20:00:44 +0200
+Subject: [PATCH 3/3] Port tests to work with Mockito 3
+
+---
+ .../org/apache/maven/api/plugin/testing/stubs/SessionMock.java | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/impl/maven-testing/src/main/java/org/apache/maven/api/plugin/testing/stubs/SessionMock.java b/impl/maven-testing/src/main/java/org/apache/maven/api/plugin/testing/stubs/SessionMock.java
+index bf7ddefb3a..a0569acd50 100644
+--- a/impl/maven-testing/src/main/java/org/apache/maven/api/plugin/testing/stubs/SessionMock.java
++++ b/impl/maven-testing/src/main/java/org/apache/maven/api/plugin/testing/stubs/SessionMock.java
+@@ -65,7 +65,6 @@
+ import org.apache.maven.model.v4.MavenStaxReader;
+ import org.eclipse.aether.util.version.GenericVersionScheme;
+ import org.mockito.ArgumentMatchers;
+-import org.mockito.quality.Strictness;
+ 
+ import static org.mockito.ArgumentMatchers.any;
+ import static org.mockito.ArgumentMatchers.anyString;
+@@ -159,7 +158,7 @@ public static InternalSession getMockSession(LocalRepository localRepository) {
+             String id = iom.getArgument(0, String.class);
+             String url = iom.getArgument(1, String.class);
+             RemoteRepository remoteRepository =
+-                    mock(RemoteRepository.class, withSettings().strictness(Strictness.LENIENT));
++                    mock(RemoteRepository.class, withSettings().lenient());
+             when(remoteRepository.getId()).thenReturn(id);
+             when(remoteRepository.getUrl()).thenReturn(url);
+             when(remoteRepository.getProtocol()).thenReturn(URI.create(url).getScheme());
+-- 
+2.50.1
+

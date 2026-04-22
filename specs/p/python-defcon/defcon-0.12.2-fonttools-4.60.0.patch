@@ -1,0 +1,16 @@
+diff -Naur defcon-0.12.2-original/Lib/defcon/objects/font.py defcon-0.12.2/Lib/defcon/objects/font.py
+--- defcon-0.12.2-original/Lib/defcon/objects/font.py	2025-07-16 19:41:50.000000000 +0100
++++ defcon-0.12.2/Lib/defcon/objects/font.py	2025-11-01 01:41:36.797854182 +0000
+@@ -176,7 +176,11 @@
+             # are modified by an external source before being read.
+             # that could create a data corruption within this object.
+             if self._ufoFormatVersion < UFOFormatVersion.FORMAT_3_0:
+-                self._kerningGroupConversionRenameMaps = reader.getKerningGroupConversionRenameMaps()
++                try:
++                    gkgcrm = reader.getKerningGroupConversionRenameMaps
++                except AttributeError:
++                    gkgcrm = reader.getKerningGroupRenameMaps
++                self._kerningGroupConversionRenameMaps = gkgcrm()
+                 k = self.kerning
+                 g = self.groups
+             else:

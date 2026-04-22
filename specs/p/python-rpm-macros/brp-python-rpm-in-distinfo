@@ -1,0 +1,15 @@
+#!/usr/bin/bash
+
+set -eu
+# If using normal root, avoid changing anything.
+if [[ "${RPM_BUILD_ROOT:-/}" = "/" ]] ; then
+	exit 0
+fi
+
+find "$RPM_BUILD_ROOT" -name 'INSTALLER' -type f -print0|grep -z -E "/usr/lib(64)?/python3\.[0-9]+/site-packages/[^/]+\.dist-info/INSTALLER" | while read -d "" installer ; do
+	if cmp -s <(echo pip) "$installer" ; then
+		echo "rpm" > "$installer"
+		rm -f "$(dirname "$installer")/RECORD"
+	fi
+done
+exit 0

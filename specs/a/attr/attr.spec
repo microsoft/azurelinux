@@ -4,7 +4,7 @@
 Summary: Utilities for managing filesystem extended attributes
 Name: attr
 Version: 2.5.2
-Release: 6%{?dist}
+Release: 7%{?dist}
 Source0: https://download.savannah.nongnu.org/releases/attr/attr-%{version}.tar.xz
 Source1: https://download.savannah.nongnu.org/releases/attr/attr-%{version}.tar.xz.sig
 # Retreived from https://savannah.nongnu.org/people/viewgpg.php?user_id=15000

@@ -1,0 +1,141 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: B Horn <b@horn.uk>
+Date: Tue, 7 Jan 2025 11:38:34 +0000
+Subject: [PATCH] fs/ntfs: Track the end of the MFT attribute buffer
+
+The end of the attribute buffer should be stored alongside the rest of
+the attribute struct as right now it is not possible to implement bounds
+checking when accessing attributes sequentially.
+
+This is done via:
+  - updating init_attr() to set at->end and check is is not initially out of bounds,
+  - implementing checks as init_attr() had its type change in its callers,
+  - updating the value of at->end when needed.
+
+Signed-off-by: B Horn <b@horn.uk>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/fs/ntfs.c | 34 ++++++++++++++++++++++++++++------
+ include/grub/ntfs.h |  1 +
+ 2 files changed, 29 insertions(+), 6 deletions(-)
+
+diff --git a/grub-core/fs/ntfs.c b/grub-core/fs/ntfs.c
+index 8a5384247..dbda720e1 100644
+--- a/grub-core/fs/ntfs.c
++++ b/grub-core/fs/ntfs.c
+@@ -119,13 +119,20 @@ static grub_err_t read_data (struct grub_ntfs_attr *at, grub_uint8_t *pa,
+ 			     grub_disk_read_hook_t read_hook,
+ 			     void *read_hook_data);
+ 
+-static void
++static grub_err_t
+ init_attr (struct grub_ntfs_attr *at, struct grub_ntfs_file *mft)
+ {
+   at->mft = mft;
+   at->flags = (mft == &mft->data->mmft) ? GRUB_NTFS_AF_MMFT : 0;
+   at->attr_nxt = mft->buf + first_attr_off (mft->buf);
++  at->end = mft->buf + (mft->data->mft_size << GRUB_NTFS_BLK_SHR);
++
++  if (at->attr_nxt > at->end)
++    return grub_error (GRUB_ERR_BAD_FS, "attributes start outside the MFT");
++
+   at->attr_end = at->emft_buf = at->edat_buf = at->sbuf = NULL;
++
++  return GRUB_ERR_NONE;
+ }
+ 
+ static void
+@@ -239,6 +246,10 @@ find_attr (struct grub_ntfs_attr *at, grub_uint8_t attr)
+ 	  pa_end = at->mft->buf + (at->mft->data->mft_size << GRUB_NTFS_BLK_SHR);
+ 	}
+       at->flags |= GRUB_NTFS_AF_ALST;
++
++      /* From this point on pa_end is the end of the buffer */
++      at->end = pa_end;
++
+       while (at->attr_nxt < at->attr_end)
+ 	{
+ 	  if ((*at->attr_nxt == attr) || (attr == 0))
+@@ -298,7 +309,9 @@ locate_attr (struct grub_ntfs_attr *at, struct grub_ntfs_file *mft,
+ {
+   grub_uint8_t *pa;
+ 
+-  init_attr (at, mft);
++  if (init_attr (at, mft) != GRUB_ERR_NONE)
++    return NULL;
++
+   pa = find_attr (at, attr);
+   if (pa == NULL)
+     return NULL;
+@@ -314,7 +327,8 @@ locate_attr (struct grub_ntfs_attr *at, struct grub_ntfs_file *mft,
+ 	}
+       grub_errno = GRUB_ERR_NONE;
+       free_attr (at);
+-      init_attr (at, mft);
++      if (init_attr (at, mft) != GRUB_ERR_NONE)
++	return NULL;
+       pa = find_attr (at, attr);
+     }
+   return pa;
+@@ -585,7 +599,7 @@ init_file (struct grub_ntfs_file *mft, grub_uint64_t mftno)
+ 	mft->attr.attr_end = 0;	/*  Don't jump to attribute list */
+     }
+   else
+-    init_attr (&mft->attr, mft);
++    return init_attr (&mft->attr, mft);
+ 
+   return 0;
+ }
+@@ -811,7 +825,9 @@ grub_ntfs_iterate_dir (grub_fshelp_node_t dir,
+   bmp = NULL;
+ 
+   at = &attr;
+-  init_attr (at, mft);
++  if (init_attr (at, mft) != GRUB_ERR_NONE)
++    return 0;
++
+   while (1)
+     {
+       cur_pos = find_attr (at, GRUB_NTFS_AT_INDEX_ROOT);
+@@ -842,7 +858,9 @@ grub_ntfs_iterate_dir (grub_fshelp_node_t dir,
+   bitmap = NULL;
+   bitmap_len = 0;
+   free_attr (at);
++  /* No need to check errors here, as it will already be fine */
+   init_attr (at, mft);
++
+   while ((cur_pos = find_attr (at, GRUB_NTFS_AT_BITMAP)) != NULL)
+     {
+       int ofs;
+@@ -1207,6 +1225,7 @@ grub_ntfs_label (grub_device_t device, char **label)
+   struct grub_ntfs_data *data = 0;
+   struct grub_fshelp_node *mft = 0;
+   grub_uint8_t *pa;
++  grub_err_t err;
+ 
+   grub_dl_ref (my_mod);
+ 
+@@ -1232,7 +1251,10 @@ grub_ntfs_label (grub_device_t device, char **label)
+ 	goto fail;
+     }
+ 
+-  init_attr (&mft->attr, mft);
++  err = init_attr (&mft->attr, mft);
++  if (err != GRUB_ERR_NONE)
++    return err;
++
+   pa = find_attr (&mft->attr, GRUB_NTFS_AT_VOLUME_NAME);
+ 
+   if (pa >= mft->buf + (mft->data->mft_size << GRUB_NTFS_BLK_SHR))
+diff --git a/include/grub/ntfs.h b/include/grub/ntfs.h
+index d1a6af696..ec1c4db38 100644
+--- a/include/grub/ntfs.h
++++ b/include/grub/ntfs.h
+@@ -134,6 +134,7 @@ struct grub_ntfs_attr
+   grub_uint8_t *attr_cur, *attr_nxt, *attr_end;
+   grub_uint32_t save_pos;
+   grub_uint8_t *sbuf;
++  grub_uint8_t *end;
+   struct grub_ntfs_file *mft;
+ };
+ 

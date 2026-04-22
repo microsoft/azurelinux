@@ -14,7 +14,7 @@ Source:  %{forgesource}
 # https://bugzilla.redhat.com/show_bug.cgi?id=2178510
 # Fix a crash caused by an out-of-bounds access that was inadvertently
 # re-introduced in a memory leak fix
-Release: 7%{dist}
+Release: 8%{dist}
 License: GPL-2.0-or-later
 
 BuildRequires: make

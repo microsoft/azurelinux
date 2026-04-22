@@ -12,7 +12,7 @@
 
 Name:           lirc
 Version:        0.10.2
-Release:        4%{?tag:.}%{?tag}%{?dist}
+Release: 5%{?tag:.}%{?tag}%{?dist}
 Summary:        The Linux Infrared Remote Control package
 
 %global repo    http://downloads.sourceforge.net/lirc/LIRC/%{version}

@@ -3,7 +3,7 @@
 
 Name:           plexus-velocity
 Version:        2.2.1
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Plexus Velocity Component
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.
 License:        Apache-2.0

@@ -22,7 +22,7 @@ or library.
 
 Name:           python-oslo-i18n
 Version:        6.4.0
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        OpenStack i18n library
 License:        Apache-2.0
 URL:            https://github.com/openstack/%{pypi_name}

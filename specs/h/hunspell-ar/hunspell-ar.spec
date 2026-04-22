@@ -12,7 +12,7 @@
 Summary: Arabic hunspell dictionaries
 Name: hunspell-ar
 Version: 3.5
-Release: 25%{?dist}
+Release: 26%{?dist}
 License: GPL-2.0-only OR LGPL-2.1-only OR MPL-1.1
 
 URL: http://ayaspell.sourceforge.net/

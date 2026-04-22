@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 2.2.7.1
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary: Fast Implementation of Gruber's Markdown in C
 License: BSD-3-Clause
 URL: http://dafoster.net/projects/rdiscount/

@@ -1,0 +1,317 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 13 Feb 2024 16:30:24 -0600
+Subject: [PATCH] Make any of the loaders that link in efi mode honor secure
+ boot.
+
+And in this case "honor" means "even if somebody does link this in, they
+won't register commands if SB is enabled."
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/commands/iorw.c          | 7 +++++++
+ grub-core/commands/memrw.c         | 7 +++++++
+ grub-core/kern/dl.c                | 4 ++--
+ grub-core/loader/efi/appleloader.c | 7 +++++++
+ grub-core/loader/i386/bsd.c        | 7 +++++++
+ grub-core/loader/i386/linux.c      | 7 +++++++
+ grub-core/loader/i386/pc/linux.c   | 7 +++++++
+ grub-core/loader/multiboot.c       | 7 +++++++
+ grub-core/loader/xnu.c             | 7 +++++++
+ include/grub/ia64/linux.h          | 0
+ include/grub/mips/linux.h          | 0
+ include/grub/powerpc/linux.h       | 0
+ include/grub/sparc64/linux.h       | 0
+ 13 files changed, 58 insertions(+), 2 deletions(-)
+ create mode 100644 include/grub/ia64/linux.h
+ create mode 100644 include/grub/mips/linux.h
+ create mode 100644 include/grub/powerpc/linux.h
+ create mode 100644 include/grub/sparc64/linux.h
+
+diff --git a/grub-core/commands/iorw.c b/grub-core/commands/iorw.c
+index 584baec8f91..7b2999b14b5 100644
+--- a/grub-core/commands/iorw.c
++++ b/grub-core/commands/iorw.c
+@@ -24,6 +24,7 @@
+ #include <grub/cpu/io.h>
+ #include <grub/i18n.h>
+ #include <grub/lockdown.h>
++#include <grub/efi/sb.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -119,6 +120,9 @@ grub_cmd_write (grub_command_t cmd, int argc, char **argv)
+ 
+ GRUB_MOD_INIT(memrw)
+ {
++  if (grub_efi_get_secureboot () == GRUB_EFI_SECUREBOOT_MODE_ENABLED)
++    return;
++
+   cmd_read_byte =
+     grub_register_extcmd ("inb", grub_cmd_read, 0,
+ 			  N_("PORT"), N_("Read 8-bit value from PORT."),
+@@ -147,6 +151,9 @@ GRUB_MOD_INIT(memrw)
+ 
+ GRUB_MOD_FINI(memrw)
+ {
++  if (grub_efi_get_secureboot () == GRUB_EFI_SECUREBOOT_MODE_ENABLED)
++    return;
++
+   grub_unregister_extcmd (cmd_read_byte);
+   grub_unregister_extcmd (cmd_read_word);
+   grub_unregister_extcmd (cmd_read_dword);
+diff --git a/grub-core/commands/memrw.c b/grub-core/commands/memrw.c
+index d401a6db0ef..39cf3a06dbd 100644
+--- a/grub-core/commands/memrw.c
++++ b/grub-core/commands/memrw.c
+@@ -23,6 +23,7 @@
+ #include <grub/env.h>
+ #include <grub/i18n.h>
+ #include <grub/lockdown.h>
++#include <grub/efi/sb.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -121,6 +122,9 @@ grub_cmd_write (grub_command_t cmd, int argc, char **argv)
+ 
+ GRUB_MOD_INIT(memrw)
+ {
++  if (grub_efi_get_secureboot () == GRUB_EFI_SECUREBOOT_MODE_ENABLED)
++    return;
++
+   cmd_read_byte =
+     grub_register_extcmd ("read_byte", grub_cmd_read, 0,
+ 			  N_("ADDR"), N_("Read 8-bit value from ADDR."),
+@@ -149,6 +153,9 @@ GRUB_MOD_INIT(memrw)
+ 
+ GRUB_MOD_FINI(memrw)
+ {
++  if (grub_efi_get_secureboot () == GRUB_EFI_SECUREBOOT_MODE_ENABLED)
++    return;
++
+   grub_unregister_extcmd (cmd_read_byte);
+   grub_unregister_extcmd (cmd_read_word);
+   grub_unregister_extcmd (cmd_read_dword);
+diff --git a/grub-core/kern/dl.c b/grub-core/kern/dl.c
+index d48d4131ba7..2a9ae9fc894 100644
+--- a/grub-core/kern/dl.c
++++ b/grub-core/kern/dl.c
+@@ -871,13 +871,13 @@ grub_dl_load_file (const char *filename)
+   grub_dl_t mod = 0;
+ 
+ #ifdef GRUB_MACHINE_EFI
+-  if (grub_efi_get_secureboot ())
++  if (grub_efi_get_secureboot () == GRUB_EFI_SECUREBOOT_MODE_ENABLED)
+     {
+ #if 0
+       /* This is an error, but grub2-mkconfig still generates a pile of
+        * insmod commands, so emitting it would be mostly just obnoxious. */
+       grub_error (GRUB_ERR_ACCESS_DENIED,
+-		  "Secure Boot forbids loading module from %s", filename);
++  		  "Secure Boot forbids loading module from %s", filename);
+ #endif
+       return 0;
+     }
+diff --git a/grub-core/loader/efi/appleloader.c b/grub-core/loader/efi/appleloader.c
+index a0b61a240b7..35d53c5f85d 100644
+--- a/grub-core/loader/efi/appleloader.c
++++ b/grub-core/loader/efi/appleloader.c
+@@ -24,6 +24,7 @@
+ #include <grub/misc.h>
+ #include <grub/efi/api.h>
+ #include <grub/efi/efi.h>
++#include <grub/efi/sb.h>
+ #include <grub/command.h>
+ #include <grub/i18n.h>
+ 
+@@ -227,6 +228,9 @@ static grub_command_t cmd;
+ 
+ GRUB_MOD_INIT(appleloader)
+ {
++  if (grub_efi_get_secureboot () == GRUB_EFI_SECUREBOOT_MODE_ENABLED)
++    return;
++
+   cmd = grub_register_command ("appleloader", grub_cmd_appleloader,
+ 			       N_("[OPTS]"),
+ 			       /* TRANSLATORS: This command is used on EFI to
+@@ -238,5 +242,8 @@ GRUB_MOD_INIT(appleloader)
+ 
+ GRUB_MOD_FINI(appleloader)
+ {
++  if (grub_efi_get_secureboot () == GRUB_EFI_SECUREBOOT_MODE_ENABLED)
++    return;
++
+   grub_unregister_command (cmd);
+ }
+diff --git a/grub-core/loader/i386/bsd.c b/grub-core/loader/i386/bsd.c
+index 1f9128f6f20..8075ac9b06a 100644
+--- a/grub-core/loader/i386/bsd.c
++++ b/grub-core/loader/i386/bsd.c
+@@ -40,6 +40,7 @@
+ #ifdef GRUB_MACHINE_PCBIOS
+ #include <grub/machine/int.h>
+ #endif
++#include <grub/efi/sb.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -2137,6 +2138,9 @@ static grub_command_t cmd_netbsd_module_elf, cmd_openbsd_ramdisk;
+ 
+ GRUB_MOD_INIT (bsd)
+ {
++  if (grub_efi_get_secureboot () == GRUB_EFI_SECUREBOOT_MODE_ENABLED)
++    return;
++
+   /* Net and OpenBSD kernels are often compressed.  */
+   grub_dl_load ("gzio");
+ 
+@@ -2176,6 +2180,9 @@ GRUB_MOD_INIT (bsd)
+ 
+ GRUB_MOD_FINI (bsd)
+ {
++  if (grub_efi_get_secureboot () == GRUB_EFI_SECUREBOOT_MODE_ENABLED)
++    return;
++
+   grub_unregister_extcmd (cmd_freebsd);
+   grub_unregister_extcmd (cmd_openbsd);
+   grub_unregister_extcmd (cmd_netbsd);
+diff --git a/grub-core/loader/i386/linux.c b/grub-core/loader/i386/linux.c
+index 10f967f2563..5a257552234 100644
+--- a/grub-core/loader/i386/linux.c
++++ b/grub-core/loader/i386/linux.c
+@@ -37,6 +37,7 @@
+ #include <grub/linux.h>
+ #include <grub/machine/kernel.h>
+ #include <grub/safemath.h>
++#include <grub/efi/sb.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -1164,6 +1165,9 @@ static grub_command_t cmd_linux, cmd_initrd;
+ 
+ GRUB_MOD_INIT(linux)
+ {
++  if (grub_efi_get_secureboot () == GRUB_EFI_SECUREBOOT_MODE_ENABLED)
++    return;
++
+   cmd_linux = grub_register_command ("linux", grub_cmd_linux,
+ 				     0, N_("Load Linux."));
+   cmd_initrd = grub_register_command ("initrd", grub_cmd_initrd,
+@@ -1173,6 +1177,9 @@ GRUB_MOD_INIT(linux)
+ 
+ GRUB_MOD_FINI(linux)
+ {
++  if (grub_efi_get_secureboot () == GRUB_EFI_SECUREBOOT_MODE_ENABLED)
++    return;
++
+   grub_unregister_command (cmd_linux);
+   grub_unregister_command (cmd_initrd);
+ }
+diff --git a/grub-core/loader/i386/pc/linux.c b/grub-core/loader/i386/pc/linux.c
+index 8593d74737f..54a76504a79 100644
+--- a/grub-core/loader/i386/pc/linux.c
++++ b/grub-core/loader/i386/pc/linux.c
+@@ -36,6 +36,7 @@
+ #include <grub/lib/cmdline.h>
+ #include <grub/linux.h>
+ #include <grub/safemath.h>
++#include <grub/efi/sb.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -487,6 +488,9 @@ static grub_command_t cmd_linux, cmd_linux16, cmd_initrd, cmd_initrd16;
+ 
+ GRUB_MOD_INIT(linux16)
+ {
++  if (grub_efi_get_secureboot () == GRUB_EFI_SECUREBOOT_MODE_ENABLED)
++    return;
++
+   cmd_linux =
+     grub_register_command ("linux", grub_cmd_linux,
+ 			   0, N_("Load Linux."));
+@@ -504,6 +508,9 @@ GRUB_MOD_INIT(linux16)
+ 
+ GRUB_MOD_FINI(linux16)
+ {
++  if (grub_efi_get_secureboot () == GRUB_EFI_SECUREBOOT_MODE_ENABLED)
++    return;
++
+   grub_unregister_command (cmd_linux);
+   grub_unregister_command (cmd_linux16);
+   grub_unregister_command (cmd_initrd);
+diff --git a/grub-core/loader/multiboot.c b/grub-core/loader/multiboot.c
+index 94be512c4d0..94c112a29d4 100644
+--- a/grub-core/loader/multiboot.c
++++ b/grub-core/loader/multiboot.c
+@@ -50,6 +50,7 @@
+ #include <grub/video.h>
+ #include <grub/memory.h>
+ #include <grub/i18n.h>
++#include <grub/efi/sb.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -444,6 +445,9 @@ static grub_command_t cmd_multiboot, cmd_module;
+ 
+ GRUB_MOD_INIT(multiboot)
+ {
++  if (grub_efi_get_secureboot () == GRUB_EFI_SECUREBOOT_MODE_ENABLED)
++    return;
++
+   cmd_multiboot =
+ #ifdef GRUB_USE_MULTIBOOT2
+     grub_register_command ("multiboot2", grub_cmd_multiboot,
+@@ -464,6 +468,9 @@ GRUB_MOD_INIT(multiboot)
+ 
+ GRUB_MOD_FINI(multiboot)
+ {
++  if (grub_efi_get_secureboot () == GRUB_EFI_SECUREBOOT_MODE_ENABLED)
++    return;
++
+   grub_unregister_command (cmd_multiboot);
+   grub_unregister_command (cmd_module);
+ }
+diff --git a/grub-core/loader/xnu.c b/grub-core/loader/xnu.c
+index 4cca55df92d..f76f511ac2d 100644
+--- a/grub-core/loader/xnu.c
++++ b/grub-core/loader/xnu.c
+@@ -35,6 +35,7 @@
+ #include <grub/i18n.h>
+ #include <grub/verify.h>
+ #include <grub/safemath.h>
++#include <grub/efi/sb.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -1497,6 +1498,9 @@ static grub_extcmd_t cmd_splash;
+ 
+ GRUB_MOD_INIT(xnu)
+ {
++  if (grub_efi_get_secureboot () == GRUB_EFI_SECUREBOOT_MODE_ENABLED)
++    return;
++
+   cmd_kernel = grub_register_command ("xnu_kernel", grub_cmd_xnu_kernel, 0,
+ 				      N_("Load XNU image."));
+   cmd_kernel64 = grub_register_command ("xnu_kernel64", grub_cmd_xnu_kernel64,
+@@ -1540,6 +1544,9 @@ GRUB_MOD_INIT(xnu)
+ 
+ GRUB_MOD_FINI(xnu)
+ {
++  if (grub_efi_get_secureboot () == GRUB_EFI_SECUREBOOT_MODE_ENABLED)
++    return;
++
+ #ifndef GRUB_MACHINE_EMU
+   grub_unregister_command (cmd_resume);
+ #endif
+diff --git a/include/grub/ia64/linux.h b/include/grub/ia64/linux.h
+new file mode 100644
+index 00000000000..e69de29bb2d
+diff --git a/include/grub/mips/linux.h b/include/grub/mips/linux.h
+new file mode 100644
+index 00000000000..e69de29bb2d
+diff --git a/include/grub/powerpc/linux.h b/include/grub/powerpc/linux.h
+new file mode 100644
+index 00000000000..e69de29bb2d
+diff --git a/include/grub/sparc64/linux.h b/include/grub/sparc64/linux.h
+new file mode 100644
+index 00000000000..e69de29bb2d

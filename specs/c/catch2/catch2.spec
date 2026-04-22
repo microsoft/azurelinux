@@ -5,7 +5,7 @@
 
 Name:           catch2
 Version:        2.13.10
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        Modern, C++-native, header-only, framework for unit-tests, TDD and BDD
 
 License:        BSL-1.0

@@ -1,0 +1,1067 @@
+diff -up chromium-134.0.6998.15/content/browser/accessibility/accessibility_auralinux_browsertest.cc.than chromium-134.0.6998.15/content/browser/accessibility/accessibility_auralinux_browsertest.cc
+--- chromium-134.0.6998.15/content/browser/accessibility/accessibility_auralinux_browsertest.cc.than	2025-02-12 02:31:02.000000000 +0100
++++ chromium-134.0.6998.15/content/browser/accessibility/accessibility_auralinux_browsertest.cc	2025-02-17 17:13:30.971343965 +0100
+@@ -3,6 +3,7 @@
+ // found in the LICENSE file.
+ 
+ #include <atk/atk.h>
++#include <dlfcn.h>
+ 
+ #include <string>
+ #include <vector>
+@@ -550,6 +551,10 @@ IN_PROC_BROWSER_TEST_F(AccessibilityAura
+   g_object_unref(div_element);
+ }
+ 
++#if defined(ATK_CHECK_VERSION) && ATK_CHECK_VERSION(2, 30, 0)
++#define ATK_230
++#endif
++
+ IN_PROC_BROWSER_TEST_F(AccessibilityAuraLinuxBrowserTest,
+                        TestCharacterExtentsWithInvalidArguments) {
+   AtkText* atk_text = SetUpSampleParagraph();
+@@ -572,12 +577,14 @@ IN_PROC_BROWSER_TEST_F(AccessibilityAura
+   EXPECT_EQ(expect, width);
+   EXPECT_EQ(expect, height);
+ 
++#ifdef ATK_230
+   atk_text_get_character_extents(atk_text, invalid_offset, &x, &y, &width,
+                                  &height, ATK_XY_PARENT);
+   EXPECT_EQ(expect, x);
+   EXPECT_EQ(expect, y);
+   EXPECT_EQ(expect, width);
+   EXPECT_EQ(expect, height);
++#endif  // ATK_230
+ 
+   atk_text_get_character_extents(atk_text, invalid_offset, &x, &y, &width,
+                                  &height, ATK_XY_WINDOW);
+@@ -596,12 +603,14 @@ IN_PROC_BROWSER_TEST_F(AccessibilityAura
+   EXPECT_EQ(expect, width);
+   EXPECT_EQ(expect, height);
+ 
++#ifdef ATK_230
+   atk_text_get_character_extents(atk_text, invalid_offset, &x, &y, &width,
+                                  &height, ATK_XY_PARENT);
+   EXPECT_EQ(expect, x);
+   EXPECT_EQ(expect, y);
+   EXPECT_EQ(expect, width);
+   EXPECT_EQ(expect, height);
++#endif  // ATK_230
+ 
+   atk_text_get_character_extents(atk_text, invalid_offset, &x, &y, &width,
+                                  &height, ATK_XY_WINDOW);
+@@ -616,7 +625,9 @@ IN_PROC_BROWSER_TEST_F(AccessibilityAura
+ AtkCoordType kCoordinateTypes[] = {
+     ATK_XY_SCREEN,
+     ATK_XY_WINDOW,
++#ifdef ATK_230
+     ATK_XY_PARENT,
++#endif  // ATK_230
+ };
+ 
+ IN_PROC_BROWSER_TEST_F(AccessibilityAuraLinuxBrowserTest,
+@@ -875,6 +886,7 @@ IN_PROC_BROWSER_TEST_F(AccessibilityAura
+   TestCharacterExtentsInScrollableInput();
+ }
+ 
++#if defined(ATK_230)
+ typedef bool (*ScrollToPointFunc)(AtkComponent* component,
+                                   AtkCoordType coords,
+                                   gint x,
+@@ -884,6 +896,18 @@ typedef bool (*ScrollToFunc)(AtkComponen
+ // TODO(crbug.com/40866728): Enable this test.
+ IN_PROC_BROWSER_TEST_F(AccessibilityAuraLinuxBrowserTest,
+                        DISABLED_TestScrollToPoint) {
++  // There's a chance we may be compiled with a newer version of ATK and then
++  // run with an older one, so we need to do a runtime check for this method
++  // that is available in ATK 2.30 instead of linking directly.
++  ScrollToPointFunc scroll_to_point = reinterpret_cast<ScrollToPointFunc>(
++      dlsym(RTLD_DEFAULT, "atk_component_scroll_to_point"));
++  if (!scroll_to_point) {
++    LOG(WARNING)
++        << "Skipping AccessibilityAuraLinuxBrowserTest::TestScrollToPoint"
++           " because ATK version < 2.30 detected.";
++    return;
++  }
++
+   LoadSampleParagraphInScrollableDocument();
+   AtkText* atk_text = GetSampleParagraph();
+   ASSERT_TRUE(ATK_IS_COMPONENT(atk_text));
+@@ -896,7 +920,7 @@ IN_PROC_BROWSER_TEST_F(AccessibilityAura
+   AccessibilityNotificationWaiter location_changed_waiter(
+       shell()->web_contents(), ui::kAXModeComplete,
+       ax::mojom::Event::kLocationChanged);
+-  atk_component_scroll_to_point(atk_component, ATK_XY_PARENT, 0, 0);
++  scroll_to_point(atk_component, ATK_XY_PARENT, 0, 0);
+   ASSERT_TRUE(location_changed_waiter.WaitForNotification());
+ 
+   atk_component_get_extents(atk_component, &x, &y, nullptr, nullptr,
+@@ -905,20 +929,20 @@ IN_PROC_BROWSER_TEST_F(AccessibilityAura
+   EXPECT_GT(prev_y, y);
+ 
+   constexpr int kScrollToY = 0;
+-  atk_component_scroll_to_point(atk_component, ATK_XY_SCREEN, 0, kScrollToY);
++  scroll_to_point(atk_component, ATK_XY_SCREEN, 0, kScrollToY);
+   ASSERT_TRUE(location_changed_waiter.WaitForNotification());
+   atk_component_get_extents(atk_component, &x, &y, nullptr, nullptr,
+                             ATK_XY_SCREEN);
+   EXPECT_EQ(kScrollToY, y);
+ 
+   constexpr int kScrollToY_2 = 243;
+-  atk_component_scroll_to_point(atk_component, ATK_XY_SCREEN, 0, kScrollToY_2);
++  scroll_to_point(atk_component, ATK_XY_SCREEN, 0, kScrollToY_2);
+   ASSERT_TRUE(location_changed_waiter.WaitForNotification());
+   atk_component_get_extents(atk_component, nullptr, &y, nullptr, nullptr,
+                             ATK_XY_SCREEN);
+   EXPECT_EQ(kScrollToY_2, y);
+ 
+-  atk_component_scroll_to_point(atk_component, ATK_XY_SCREEN, 0, 129);
++  scroll_to_point(atk_component, ATK_XY_SCREEN, 0, 129);
+   ASSERT_TRUE(location_changed_waiter.WaitForNotification());
+   atk_component_get_extents(atk_component, nullptr, &y, nullptr, nullptr,
+                             ATK_XY_SCREEN);
+@@ -935,6 +959,17 @@ IN_PROC_BROWSER_TEST_F(AccessibilityAura
+ // TODO(crbug.com/40866728): Enable this test.
+ IN_PROC_BROWSER_TEST_F(AccessibilityAuraLinuxBrowserTest,
+                        DISABLED_TestScrollTo) {
++  // There's a chance we may be compiled with a newer version of ATK and then
++  // run with an older one, so we need to do a runtime check for this method
++  // that is available in ATK 2.30 instead of linking directly.
++  ScrollToFunc scroll_to = reinterpret_cast<ScrollToFunc>(
++      dlsym(RTLD_DEFAULT, "atk_component_scroll_to"));
++  if (!scroll_to) {
++    LOG(WARNING) << "Skipping AccessibilityAuraLinuxBrowserTest::TestScrollTo"
++                    " because ATK version < 2.30 detected.";
++    return;
++  }
++
+   LoadInitialAccessibilityTreeFromHtml(
+       R"HTML(<!DOCTYPE html>
+       <html>
+@@ -976,8 +1011,7 @@ IN_PROC_BROWSER_TEST_F(AccessibilityAura
+   AccessibilityNotificationWaiter waiter(
+       shell()->web_contents(), ui::kAXModeComplete,
+       ax::mojom::Event::kScrollPositionChanged);
+-  ASSERT_TRUE(
+-      atk_component_scroll_to(ATK_COMPONENT(target), ATK_SCROLL_TOP_EDGE));
++  ASSERT_TRUE(scroll_to(ATK_COMPONENT(target), ATK_SCROLL_TOP_EDGE));
+   ASSERT_TRUE(waiter.WaitForNotification());
+   int x, y;
+   atk_component_get_extents(ATK_COMPONENT(target), &x, &y, nullptr, nullptr,
+@@ -985,40 +1019,35 @@ IN_PROC_BROWSER_TEST_F(AccessibilityAura
+   EXPECT_EQ(y, doc_y);
+   EXPECT_NE(x, doc_x);
+ 
+-  ASSERT_TRUE(
+-      atk_component_scroll_to(ATK_COMPONENT(target), ATK_SCROLL_TOP_LEFT));
++  ASSERT_TRUE(scroll_to(ATK_COMPONENT(target), ATK_SCROLL_TOP_LEFT));
+   ASSERT_TRUE(waiter.WaitForNotification());
+   atk_component_get_extents(ATK_COMPONENT(target), &x, &y, nullptr, nullptr,
+                             ATK_XY_SCREEN);
+   EXPECT_EQ(y, doc_y);
+   EXPECT_EQ(x, doc_x);
+ 
+-  ASSERT_TRUE(
+-      atk_component_scroll_to(ATK_COMPONENT(target), ATK_SCROLL_BOTTOM_EDGE));
++  ASSERT_TRUE(scroll_to(ATK_COMPONENT(target), ATK_SCROLL_BOTTOM_EDGE));
+   ASSERT_TRUE(waiter.WaitForNotification());
+   atk_component_get_extents(ATK_COMPONENT(target), &x, &y, nullptr, nullptr,
+                             ATK_XY_SCREEN);
+   EXPECT_NE(y, doc_y);
+   EXPECT_EQ(x, doc_x);
+ 
+-  ASSERT_TRUE(
+-      atk_component_scroll_to(ATK_COMPONENT(target), ATK_SCROLL_RIGHT_EDGE));
++  ASSERT_TRUE(scroll_to(ATK_COMPONENT(target), ATK_SCROLL_RIGHT_EDGE));
+   ASSERT_TRUE(waiter.WaitForNotification());
+   atk_component_get_extents(ATK_COMPONENT(target), &x, &y, nullptr, nullptr,
+                             ATK_XY_SCREEN);
+   EXPECT_NE(y, doc_y);
+   EXPECT_NE(x, doc_x);
+ 
+-  ASSERT_TRUE(
+-      atk_component_scroll_to(ATK_COMPONENT(target2), ATK_SCROLL_LEFT_EDGE));
++  ASSERT_TRUE(scroll_to(ATK_COMPONENT(target2), ATK_SCROLL_LEFT_EDGE));
+   ASSERT_TRUE(waiter.WaitForNotification());
+   atk_component_get_extents(ATK_COMPONENT(target2), &x, &y, nullptr, nullptr,
+                             ATK_XY_SCREEN);
+   EXPECT_NE(y, doc_y);
+   EXPECT_EQ(x, doc_x);
+ 
+-  ASSERT_TRUE(
+-      atk_component_scroll_to(ATK_COMPONENT(target2), ATK_SCROLL_TOP_LEFT));
++  ASSERT_TRUE(scroll_to(ATK_COMPONENT(target2), ATK_SCROLL_TOP_LEFT));
+   ASSERT_TRUE(waiter.WaitForNotification());
+   atk_component_get_extents(ATK_COMPONENT(target2), &x, &y, nullptr, nullptr,
+                             ATK_XY_SCREEN);
+@@ -1050,10 +1079,39 @@ IN_PROC_BROWSER_TEST_F(AccessibilityAura
+   g_object_unref(target2);
+   g_object_unref(target3);
+ }
++#endif  //  defined(ATK_230)
++
++#if defined(ATK_CHECK_VERSION) && ATK_CHECK_VERSION(2, 32, 0)
++typedef gboolean (*ScrollSubstringToFunc)(AtkText* text,
++                                          gint start_offset,
++                                          gint end_offset,
++                                          AtkScrollType type);
++ScrollSubstringToFunc g_scroll_substring_to = nullptr;
++
++NO_SANITIZE("cfi-icall")
++gboolean ScrollSubstringTo(AtkText* text,
++                           gint start_offset,
++                           gint end_offset,
++                           AtkScrollType type) {
++  EXPECT_NE(g_scroll_substring_to, nullptr);
++  return g_scroll_substring_to(text, start_offset, end_offset, type);
++}
+ 
+ // TODO(crbug.com/40866728): Enable this test.
+ IN_PROC_BROWSER_TEST_F(AccessibilityAuraLinuxBrowserTest,
+                        DISABLED_TestScrollSubstringTo) {
++  // There's a chance we may be compiled with a newer version of ATK and then
++  // run with an older one, so we need to do a runtime check for this method
++  // that is available in ATK 2.32 instead of linking directly.
++  g_scroll_substring_to = reinterpret_cast<ScrollSubstringToFunc>(
++      dlsym(RTLD_DEFAULT, "atk_text_scroll_substring_to"));
++  if (!g_scroll_substring_to) {
++    LOG(WARNING) << "Skipping "
++                    "AccessibilityAuraLinuxBrowserTest::TestSubstringScrollTo"
++                    " because ATK version < 2.32 detected.";
++    return;
++  }
++
+   LoadInitialAccessibilityTreeFromHtml(
+       R"HTML(<!DOCTYPE html>
+       <html>
+@@ -1087,8 +1145,7 @@ IN_PROC_BROWSER_TEST_F(AccessibilityAura
+   AccessibilityNotificationWaiter waiter(
+       shell()->web_contents(), ui::kAXModeComplete,
+       ax::mojom::Event::kScrollPositionChanged);
+-  ASSERT_TRUE(atk_text_scroll_substring_to(ATK_TEXT(target1), 1, 2,
+-                                           ATK_SCROLL_TOP_EDGE));
++  ASSERT_TRUE(ScrollSubstringTo(ATK_TEXT(target1), 1, 2, ATK_SCROLL_TOP_EDGE));
+   ASSERT_TRUE(waiter.WaitForNotification());
+   int x, y;
+   atk_text_get_character_extents(ATK_TEXT(target1), 1, &x, &y, nullptr, nullptr,
+@@ -1096,40 +1153,37 @@ IN_PROC_BROWSER_TEST_F(AccessibilityAura
+   EXPECT_EQ(y, doc_y);
+   EXPECT_NE(x, doc_x);
+ 
+-  ASSERT_TRUE(atk_text_scroll_substring_to(ATK_TEXT(target1), 1, 2,
+-                                           ATK_SCROLL_TOP_LEFT));
++  ASSERT_TRUE(ScrollSubstringTo(ATK_TEXT(target1), 1, 2, ATK_SCROLL_TOP_LEFT));
+   ASSERT_TRUE(waiter.WaitForNotification());
+   atk_text_get_character_extents(ATK_TEXT(target1), 1, &x, &y, nullptr, nullptr,
+                                  ATK_XY_SCREEN);
+   EXPECT_EQ(y, doc_y);
+   EXPECT_EQ(x, doc_x);
+ 
+-  ASSERT_TRUE(atk_text_scroll_substring_to(ATK_TEXT(target1), 1, 2,
+-                                           ATK_SCROLL_BOTTOM_EDGE));
++  ASSERT_TRUE(
++      ScrollSubstringTo(ATK_TEXT(target1), 1, 2, ATK_SCROLL_BOTTOM_EDGE));
+   ASSERT_TRUE(waiter.WaitForNotification());
+   atk_text_get_character_extents(ATK_TEXT(target1), 1, &x, &y, nullptr, nullptr,
+                                  ATK_XY_SCREEN);
+   EXPECT_NE(y, doc_y);
+   EXPECT_EQ(x, doc_x);
+ 
+-  ASSERT_TRUE(atk_text_scroll_substring_to(ATK_TEXT(target1), 1, 2,
+-                                           ATK_SCROLL_RIGHT_EDGE));
++  ASSERT_TRUE(
++      ScrollSubstringTo(ATK_TEXT(target1), 1, 2, ATK_SCROLL_RIGHT_EDGE));
+   ASSERT_TRUE(waiter.WaitForNotification());
+   atk_text_get_character_extents(ATK_TEXT(target1), 1, &x, &y, nullptr, nullptr,
+                                  ATK_XY_SCREEN);
+   EXPECT_NE(y, doc_y);
+   EXPECT_NE(x, doc_x);
+ 
+-  ASSERT_TRUE(atk_text_scroll_substring_to(ATK_TEXT(target1), 1, 2,
+-                                           ATK_SCROLL_LEFT_EDGE));
++  ASSERT_TRUE(ScrollSubstringTo(ATK_TEXT(target1), 1, 2, ATK_SCROLL_LEFT_EDGE));
+   ASSERT_TRUE(waiter.WaitForNotification());
+   atk_text_get_character_extents(ATK_TEXT(target1), 1, &x, &y, nullptr, nullptr,
+                                  ATK_XY_SCREEN);
+   EXPECT_NE(y, doc_y);
+   EXPECT_EQ(x, doc_x);
+ 
+-  ASSERT_TRUE(atk_text_scroll_substring_to(ATK_TEXT(target1), 1, 2,
+-                                           ATK_SCROLL_TOP_LEFT));
++  ASSERT_TRUE(ScrollSubstringTo(ATK_TEXT(target1), 1, 2, ATK_SCROLL_TOP_LEFT));
+   ASSERT_TRUE(waiter.WaitForNotification());
+   atk_text_get_character_extents(ATK_TEXT(target1), 1, &x, &y, nullptr, nullptr,
+                                  ATK_XY_SCREEN);
+@@ -1139,9 +1193,42 @@ IN_PROC_BROWSER_TEST_F(AccessibilityAura
+   g_object_unref(target1);
+ }
+ 
++typedef gboolean (*ScrollSubstringToPointFunc)(AtkText* text,
++                                               gint start_offset,
++                                               gint end_offset,
++                                               AtkCoordType coord_type,
++                                               gint x,
++                                               gint y);
++ScrollSubstringToPointFunc g_scroll_substring_to_point = nullptr;
++
++NO_SANITIZE("cfi-icall")
++gboolean ScrollSubstringToPoint(AtkText* text,
++                                gint start_offset,
++                                gint end_offset,
++                                AtkCoordType coord_type,
++                                gint x,
++                                gint y) {
++  EXPECT_NE(g_scroll_substring_to_point, nullptr);
++  return g_scroll_substring_to_point(text, start_offset, end_offset, coord_type,
++                                     x, y);
++}
++
+ // TODO(crbug.com/40866728): Enable this test.
+ IN_PROC_BROWSER_TEST_F(AccessibilityAuraLinuxBrowserTest,
+                        DISABLED_TestScrollSubstringToPoint) {
++  // There's a chance we may be compiled with a newer version of ATK and then
++  // run with an older one, so we need to do a runtime check for this method
++  // that is available in ATK 2.30 instead of linking directly.
++  g_scroll_substring_to_point = reinterpret_cast<ScrollSubstringToPointFunc>(
++      dlsym(RTLD_DEFAULT, "atk_text_scroll_substring_to_point"));
++  if (!g_scroll_substring_to_point) {
++    LOG(WARNING)
++        << "Skipping "
++           "AccessibilityAuraLinuxBrowserTest::TestScrollSubstringToPoint"
++           " because ATK version < 2.30 detected.";
++    return;
++  }
++
+   LoadSampleParagraphInScrollableDocument();
+   AtkText* atk_text = GetSampleParagraph();
+   ASSERT_TRUE(ATK_IS_COMPONENT(atk_text));
+@@ -1154,7 +1241,7 @@ IN_PROC_BROWSER_TEST_F(AccessibilityAura
+   AccessibilityNotificationWaiter location_changed_waiter(
+       shell()->web_contents(), ui::kAXModeComplete,
+       ax::mojom::Event::kLocationChanged);
+-  atk_text_scroll_substring_to_point(atk_text, 1, 2, ATK_XY_PARENT, 0, 0);
++  ScrollSubstringToPoint(atk_text, 1, 2, ATK_XY_PARENT, 0, 0);
+   ASSERT_TRUE(location_changed_waiter.WaitForNotification());
+ 
+   atk_text_get_character_extents(atk_text, 1, &x, &y, nullptr, nullptr,
+@@ -1163,22 +1250,20 @@ IN_PROC_BROWSER_TEST_F(AccessibilityAura
+   EXPECT_GT(prev_y, y);
+ 
+   constexpr int kScrollToY = 0;
+-  atk_text_scroll_substring_to_point(atk_text, 1, 2, ATK_XY_SCREEN, 0,
+-                                     kScrollToY);
++  ScrollSubstringToPoint(atk_text, 1, 2, ATK_XY_SCREEN, 0, kScrollToY);
+   ASSERT_TRUE(location_changed_waiter.WaitForNotification());
+   atk_text_get_character_extents(atk_text, 1, &x, &y, nullptr, nullptr,
+                                  ATK_XY_SCREEN);
+   EXPECT_EQ(kScrollToY, y);
+ 
+   constexpr int kScrollToY_2 = 243;
+-  atk_text_scroll_substring_to_point(atk_text, 1, 2, ATK_XY_SCREEN, 0,
+-                                     kScrollToY_2);
++  ScrollSubstringToPoint(atk_text, 1, 2, ATK_XY_SCREEN, 0, kScrollToY_2);
+   ASSERT_TRUE(location_changed_waiter.WaitForNotification());
+   atk_text_get_character_extents(atk_text, 1, &x, &y, nullptr, nullptr,
+                                  ATK_XY_SCREEN);
+   EXPECT_EQ(kScrollToY_2, y);
+ 
+-  atk_text_scroll_substring_to_point(atk_text, 1, 2, ATK_XY_SCREEN, 0, 129);
++  ScrollSubstringToPoint(atk_text, 1, 2, ATK_XY_SCREEN, 0, 129);
+   ASSERT_TRUE(location_changed_waiter.WaitForNotification());
+   atk_text_get_character_extents(atk_text, 1, &x, &y, nullptr, nullptr,
+                                  ATK_XY_SCREEN);
+@@ -1194,6 +1279,7 @@ IN_PROC_BROWSER_TEST_F(AccessibilityAura
+ 
+   g_object_unref(atk_text);
+ }
++#endif  //  defined(ATK_CHECK_VERSION) && ATK_CHECK_VERSION(2, 32, 0)
+ 
+ #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+ // Flaky on crbug.com/1026149
+diff -up chromium-134.0.6998.15/ui/accessibility/platform/ax_platform_node_auralinux.cc.than chromium-134.0.6998.15/ui/accessibility/platform/ax_platform_node_auralinux.cc
+--- chromium-134.0.6998.15/ui/accessibility/platform/ax_platform_node_auralinux.cc.than	2025-02-12 02:31:02.000000000 +0100
++++ chromium-134.0.6998.15/ui/accessibility/platform/ax_platform_node_auralinux.cc	2025-02-17 17:13:30.972343990 +0100
+@@ -48,14 +48,33 @@
+ #include "ui/accessibility/platform/child_iterator.h"
+ #include "ui/gfx/geometry/rect_conversions.h"
+ 
+-// Function availability can be tested by checking whether its address is not
+-// nullptr.
+-#define WEAK_ATK_FN(x) extern "C" __attribute__((weak)) decltype(x) x
+-
+-// TODO(https://crbug.com/40549424): This may be removed when support for
+-// Ubuntu 18.04 is dropped.
+-WEAK_ATK_FN(atk_component_scroll_to_point);
+-WEAK_ATK_FN(atk_text_scroll_substring_to_point);
++#if defined(ATK_CHECK_VERSION) && ATK_CHECK_VERSION(2, 10, 0)
++#define ATK_210
++#endif
++
++#if defined(ATK_CHECK_VERSION) && ATK_CHECK_VERSION(2, 12, 0)
++#define ATK_212
++#endif
++
++#if defined(ATK_CHECK_VERSION) && ATK_CHECK_VERSION(2, 16, 0)
++#define ATK_216
++#endif
++
++#if defined(ATK_CHECK_VERSION) && ATK_CHECK_VERSION(2, 26, 0)
++#define ATK_226
++#endif
++
++#if defined(ATK_CHECK_VERSION) && ATK_CHECK_VERSION(2, 30, 0)
++#define ATK_230
++#endif
++
++#if defined(ATK_CHECK_VERSION) && ATK_CHECK_VERSION(2, 32, 0)
++#define ATK_232
++#endif
++
++#if defined(ATK_CHECK_VERSION) && ATK_CHECK_VERSION(2, 34, 0)
++#define ATK_234
++#endif
+ 
+ namespace ui {
+ 
+@@ -147,11 +166,29 @@ AtkObject* g_active_top_level_frame = nu
+ 
+ AtkObject* g_active_views_dialog = nullptr;
+ 
++#if defined(ATK_216)
+ constexpr AtkRole kStaticRole = ATK_ROLE_STATIC;
+ constexpr AtkRole kSubscriptRole = ATK_ROLE_SUBSCRIPT;
+ constexpr AtkRole kSuperscriptRole = ATK_ROLE_SUPERSCRIPT;
++#else
++constexpr AtkRole kStaticRole = ATK_ROLE_TEXT;
++constexpr AtkRole kSubscriptRole = ATK_ROLE_TEXT;
++constexpr AtkRole kSuperscriptRole = ATK_ROLE_TEXT;
++#endif
+ 
++#if defined(ATK_226)
+ constexpr AtkRole kAtkFootnoteRole = ATK_ROLE_FOOTNOTE;
++#else
++constexpr AtkRole kAtkFootnoteRole = ATK_ROLE_LIST_ITEM;
++#endif
++
++#if defined(ATK_234)
++constexpr AtkRole kAtkRoleContentDeletion = ATK_ROLE_CONTENT_DELETION;
++constexpr AtkRole kAtkRoleContentInsertion = ATK_ROLE_CONTENT_INSERTION;
++#else
++constexpr AtkRole kAtkRoleContentDeletion = ATK_ROLE_SECTION;
++constexpr AtkRole kAtkRoleContentInsertion = ATK_ROLE_SECTION;
++#endif
+ 
+ using GetTypeFunc = GType (*)();
+ using GetColumnHeaderCellsFunc = GPtrArray* (*)(AtkTableCell* cell);
+@@ -162,6 +199,11 @@ using GetRowColumnSpanFunc = bool (*)(At
+                                       gint* row_span,
+                                       gint* col_span);
+ 
++static GetTypeFunc g_atk_table_cell_get_type;
++static GetColumnHeaderCellsFunc g_atk_table_cell_get_column_header_cells;
++static GetRowHeaderCellsFunc g_atk_table_cell_get_row_header_cells;
++static GetRowColumnSpanFunc g_atk_table_cell_get_row_column_span;
++
+ // The ATK API often requires pointers to be used as out arguments, while
+ // allowing for those pointers to be null if the caller is not interested in
+ // the value. This function is a simpler helper to avoid continually checking
+@@ -171,35 +213,17 @@ void SetIntPointerValueIfNotNull(int* po
+     *pointer = value;
+ }
+ 
+-// TODO(https://crbug.com/40549424): This may be removed when support for
+-// Ubuntu 18.04 is dropped.
++#if defined(ATK_230)
+ bool SupportsAtkComponentScrollingInterface() {
+-  return atk_component_scroll_to_point;
++  return dlsym(RTLD_DEFAULT, "atk_component_scroll_to_point");
+ }
++#endif
+ 
+-// TODO(https://crbug.com/40549424): This may be removed when support for
+-// Ubuntu 18.04 is dropped.
++#if defined(ATK_232)
+ bool SupportsAtkTextScrollingInterface() {
+-  return atk_text_scroll_substring_to_point;
+-}
+-
+-// TODO(https://crbug.com/40549424): This may be removed when support for
+-// Ubuntu 18.04 is dropped.
+-AtkRole GetAtkRoleContentDeletion() {
+-  base::Version atk_version(atk_get_version());
+-  return atk_version.CompareTo(base::Version("2.34.0")) >= 0
+-             ? ATK_ROLE_CONTENT_DELETION
+-             : ATK_ROLE_SECTION;
+-}
+-
+-// TODO(https://crbug.com/40549424): This may be removed when support for
+-// Ubuntu 18.04 is dropped.
+-AtkRole GetAtkRoleContentInsertion() {
+-  base::Version atk_version(atk_get_version());
+-  return atk_version.CompareTo(base::Version("2.34.0")) >= 0
+-             ? ATK_ROLE_CONTENT_INSERTION
+-             : ATK_ROLE_SECTION;
++  return dlsym(RTLD_DEFAULT, "atk_text_scroll_substring_to_point");
+ }
++#endif
+ 
+ AtkObject* FindAtkObjectParentFrame(AtkObject* atk_object) {
+   AXPlatformNodeAuraLinux* node =
+@@ -298,10 +322,12 @@ AXCoordinateSystem AtkCoordTypeToAXCoord
+       return AXCoordinateSystem::kScreenDIPs;
+     case ATK_XY_WINDOW:
+       return AXCoordinateSystem::kRootFrame;
++#if defined(ATK_230)
+     case ATK_XY_PARENT:
+       // AXCoordinateSystem does not support parent coordinates.
+       NOTIMPLEMENTED();
+       return AXCoordinateSystem::kFrame;
++#endif
+     default:
+       return AXCoordinateSystem::kScreenDIPs;
+   }
+@@ -514,6 +540,7 @@ gboolean GrabFocus(AtkComponent* atk_com
+   return obj->GrabFocus();
+ }
+ 
++#if defined(ATK_230)
+ gboolean ScrollTo(AtkComponent* atk_component, AtkScrollType scroll_type) {
+   g_return_val_if_fail(ATK_IS_COMPONENT(atk_component), FALSE);
+ 
+@@ -540,6 +567,7 @@ gboolean ScrollToPoint(AtkComponent* atk
+   obj->ScrollToPoint(atk_coord_type, x, y);
+   return TRUE;
+ }
++#endif
+ 
+ void Init(AtkComponentIface* iface) {
+   iface->get_extents = GetExtents;
+@@ -547,10 +575,12 @@ void Init(AtkComponentIface* iface) {
+   iface->get_size = GetSize;
+   iface->ref_accessible_at_point = RefAccesibleAtPoint;
+   iface->grab_focus = GrabFocus;
++#if defined(ATK_230)
+   if (SupportsAtkComponentScrollingInterface()) {
+     iface->scroll_to = ScrollTo;
+     iface->scroll_to_point = ScrollToPoint;
+   }
++#endif
+ }
+ 
+ const GInterfaceInfo Info = {reinterpret_cast<GInterfaceInitFunc>(Init),
+@@ -1311,6 +1341,7 @@ gboolean AddSelection(AtkText* atk_text,
+   return SetSelection(atk_text, 0, start_offset, end_offset);
+ }
+ 
++#if defined(ATK_210)
+ char* GetStringAtOffset(AtkText* atk_text,
+                         int offset,
+                         AtkTextGranularity atk_granularity,
+@@ -1325,7 +1356,9 @@ char* GetStringAtOffset(AtkText* atk_tex
+   return GetTextWithBoundaryType(atk_text, offset, boundary, start_offset,
+                                  end_offset);
+ }
++#endif
+ 
++#if defined(ATK_230)
+ gfx::Rect GetUnclippedParentHypertextRangeBoundsRect(
+     AXPlatformNodeDelegate* ax_platform_node_delegate,
+     const int start_offset,
+@@ -1349,6 +1382,7 @@ gfx::Rect GetUnclippedParentHypertextRan
+                              AXClippingBehavior::kClipped)
+              .OffsetFromOrigin();
+ }
++#endif
+ 
+ void GetCharacterExtents(AtkText* atk_text,
+                          int offset,
+@@ -1364,10 +1398,12 @@ void GetCharacterExtents(AtkText* atk_te
+       AXPlatformNodeAuraLinux::FromAtkObject(ATK_OBJECT(atk_text));
+   if (obj) {
+     switch (coordinate_type) {
++#if defined(ATK_230)
+       case ATK_XY_PARENT:
+         rect = GetUnclippedParentHypertextRangeBoundsRect(obj->GetDelegate(),
+                                                           offset, offset + 1);
+         break;
++#endif
+       default:
+         rect = obj->GetDelegate()->GetHypertextRangeBoundsRect(
+             obj->UnicodeToUTF16OffsetInText(offset),
+@@ -1403,10 +1439,12 @@ void GetRangeExtents(AtkText* atk_text,
+       AXPlatformNodeAuraLinux::FromAtkObject(ATK_OBJECT(atk_text));
+   if (obj) {
+     switch (coordinate_type) {
++#if defined(ATK_230)
+       case ATK_XY_PARENT:
+         rect = GetUnclippedParentHypertextRangeBoundsRect(
+             obj->GetDelegate(), start_offset, end_offset);
+         break;
++#endif
+       default:
+         rect = obj->GetDelegate()->GetHypertextRangeBoundsRect(
+             obj->UnicodeToUTF16OffsetInText(start_offset),
+@@ -1456,6 +1494,7 @@ AtkAttributeSet* GetDefaultAttributes(At
+   return ToAtkAttributeSet(obj->GetDefaultTextAttributes());
+ }
+ 
++#if defined(ATK_232)
+ gboolean ScrollSubstringTo(AtkText* atk_text,
+                            gint start_offset,
+                            gint end_offset,
+@@ -1486,6 +1525,7 @@ gboolean ScrollSubstringToPoint(AtkText*
+   return obj->ScrollSubstringToPoint(start_offset, end_offset, atk_coord_type,
+                                      x, y);
+ }
++#endif  // ATK_232
+ 
+ void Init(AtkTextIface* iface) {
+   iface->get_text = GetText;
+@@ -1508,12 +1548,16 @@ void Init(AtkTextIface* iface) {
+   iface->get_run_attributes = GetRunAttributes;
+   iface->get_default_attributes = GetDefaultAttributes;
+ 
++#if defined(ATK_210)
+   iface->get_string_at_offset = GetStringAtOffset;
++#endif
+ 
++#if defined(ATK_232)
+   if (SupportsAtkTextScrollingInterface()) {
+     iface->scroll_substring_to = ScrollSubstringTo;
+     iface->scroll_substring_to_point = ScrollSubstringToPoint;
+   }
++#endif
+ }
+ 
+ const GInterfaceInfo Info = {reinterpret_cast<GInterfaceInitFunc>(Init),
+@@ -1916,11 +1960,15 @@ const GInterfaceInfo Info = {reinterpret
+ 
+ }  // namespace atk_table
+ 
++// The ATK table cell interface was added in ATK 2.12.
++#if defined(ATK_212)
++
+ namespace atk_table_cell {
+ 
+ gint GetColumnSpan(AtkTableCell* cell) {
++  DCHECK(g_atk_table_cell_get_type);
+   g_return_val_if_fail(
+-      G_TYPE_CHECK_INSTANCE_TYPE((cell), atk_table_cell_get_type()), 0);
++      G_TYPE_CHECK_INSTANCE_TYPE((cell), AtkTableCellInterface::GetType()), 0);
+ 
+   if (const AXPlatformNodeBase* obj =
+           AXPlatformNodeAuraLinux::FromAtkObject(ATK_OBJECT(cell))) {
+@@ -1932,8 +1980,10 @@ gint GetColumnSpan(AtkTableCell* cell) {
+ }
+ 
+ GPtrArray* GetColumnHeaderCells(AtkTableCell* cell) {
++  DCHECK(g_atk_table_cell_get_type);
+   g_return_val_if_fail(
+-      G_TYPE_CHECK_INSTANCE_TYPE((cell), atk_table_cell_get_type()), nullptr);
++      G_TYPE_CHECK_INSTANCE_TYPE((cell), AtkTableCellInterface::GetType()),
++      nullptr);
+ 
+   GPtrArray* array = g_ptr_array_new_with_free_func(g_object_unref);
+ 
+@@ -1967,8 +2017,10 @@ GPtrArray* GetColumnHeaderCells(AtkTable
+ }
+ 
+ gboolean GetCellPosition(AtkTableCell* cell, gint* row, gint* column) {
++  DCHECK(g_atk_table_cell_get_type);
+   g_return_val_if_fail(
+-      G_TYPE_CHECK_INSTANCE_TYPE((cell), atk_table_cell_get_type()), FALSE);
++      G_TYPE_CHECK_INSTANCE_TYPE((cell), AtkTableCellInterface::GetType()),
++      FALSE);
+ 
+   if (auto* obj = AXPlatformNodeAuraLinux::FromAtkObject(ATK_OBJECT(cell))) {
+     std::optional<int> row_index = obj->GetTableRow();
+@@ -1985,8 +2037,9 @@ gboolean GetCellPosition(AtkTableCell* c
+ }
+ 
+ gint GetRowSpan(AtkTableCell* cell) {
++  DCHECK(g_atk_table_cell_get_type);
+   g_return_val_if_fail(
+-      G_TYPE_CHECK_INSTANCE_TYPE((cell), atk_table_cell_get_type()), 0);
++      G_TYPE_CHECK_INSTANCE_TYPE((cell), AtkTableCellInterface::GetType()), 0);
+ 
+   if (auto* obj = AXPlatformNodeAuraLinux::FromAtkObject(ATK_OBJECT(cell))) {
+     // If the object is not a cell, we return 0.
+@@ -1997,8 +2050,10 @@ gint GetRowSpan(AtkTableCell* cell) {
+ }
+ 
+ GPtrArray* GetRowHeaderCells(AtkTableCell* cell) {
++  DCHECK(g_atk_table_cell_get_type);
+   g_return_val_if_fail(
+-      G_TYPE_CHECK_INSTANCE_TYPE((cell), atk_table_cell_get_type()), nullptr);
++      G_TYPE_CHECK_INSTANCE_TYPE((cell), AtkTableCellInterface::GetType()),
++      nullptr);
+ 
+   GPtrArray* array = g_ptr_array_new_with_free_func(g_object_unref);
+ 
+@@ -2032,8 +2087,10 @@ GPtrArray* GetRowHeaderCells(AtkTableCel
+ }
+ 
+ AtkObject* GetTable(AtkTableCell* cell) {
++  DCHECK(g_atk_table_cell_get_type);
+   g_return_val_if_fail(
+-      G_TYPE_CHECK_INSTANCE_TYPE((cell), atk_table_cell_get_type()), nullptr);
++      G_TYPE_CHECK_INSTANCE_TYPE((cell), AtkTableCellInterface::GetType()),
++      nullptr);
+ 
+   if (auto* obj = AXPlatformNodeAuraLinux::FromAtkObject(ATK_OBJECT(cell))) {
+     if (auto* table = obj->GetTable())
+@@ -2059,6 +2116,8 @@ const GInterfaceInfo Info = {reinterpret
+ 
+ }  // namespace atk_table_cell
+ 
++#endif  // ATK_212
++
+ namespace atk_object {
+ 
+ gpointer kAXPlatformNodeAuraLinuxParentClass = nullptr;
+@@ -2325,6 +2384,50 @@ void Detach(AXPlatformNodeAuraLinuxObjec
+ 
+ }  // namespace
+ 
++// static
++NO_SANITIZE("cfi-icall")
++GType AtkTableCellInterface::GetType() {
++  return g_atk_table_cell_get_type();
++}
++
++// static
++NO_SANITIZE("cfi-icall")
++GPtrArray* AtkTableCellInterface::GetColumnHeaderCells(AtkTableCell* cell) {
++  return g_atk_table_cell_get_column_header_cells(cell);
++}
++
++// static
++NO_SANITIZE("cfi-icall")
++GPtrArray* AtkTableCellInterface::GetRowHeaderCells(AtkTableCell* cell) {
++  return g_atk_table_cell_get_row_header_cells(cell);
++}
++
++// static
++NO_SANITIZE("cfi-icall")
++bool AtkTableCellInterface::GetRowColumnSpan(AtkTableCell* cell,
++                                             gint* row,
++                                             gint* column,
++                                             gint* row_span,
++                                             gint* col_span) {
++  return g_atk_table_cell_get_row_column_span(cell, row, column, row_span,
++                                              col_span);
++}
++
++// static
++bool AtkTableCellInterface::Exists() {
++  g_atk_table_cell_get_type = reinterpret_cast<GetTypeFunc>(
++      dlsym(RTLD_DEFAULT, "atk_table_cell_get_type"));
++  g_atk_table_cell_get_column_header_cells =
++      reinterpret_cast<GetColumnHeaderCellsFunc>(
++          dlsym(RTLD_DEFAULT, "atk_table_cell_get_column_header_cells"));
++  g_atk_table_cell_get_row_header_cells =
++      reinterpret_cast<GetRowHeaderCellsFunc>(
++          dlsym(RTLD_DEFAULT, "atk_table_cell_get_row_header_cells"));
++  g_atk_table_cell_get_row_column_span = reinterpret_cast<GetRowColumnSpanFunc>(
++      dlsym(RTLD_DEFAULT, "atk_table_cell_get_row_column_span"));
++  return *g_atk_table_cell_get_type;
++}
++
+ void AXPlatformNodeAuraLinux::EnsureGTypeInit() {
+ #if !GLIB_CHECK_VERSION(2, 36, 0)
+   static bool first_time = true;
+@@ -2432,8 +2535,11 @@ GType AXPlatformNodeAuraLinux::GetAccess
+     g_type_add_interface_static(type, ATK_TYPE_TABLE, &atk_table::Info);
+ 
+   if (interface_mask_.Implements(ImplementedAtkInterfaces::Value::kTableCell)) {
+-    g_type_add_interface_static(type, atk_table_cell_get_type(),
+-                                &atk_table_cell::Info);
++    // Run-time check to ensure AtkTableCell is supported (requires ATK 2.12).
++    if (AtkTableCellInterface::Exists()) {
++      g_type_add_interface_static(type, AtkTableCellInterface::GetType(),
++                                  &atk_table_cell::Info);
++    }
+   }
+ 
+   return type;
+@@ -2668,9 +2774,9 @@ AtkRole AXPlatformNodeAuraLinux::GetAtkR
+     case ax::mojom::Role::kComplementary:
+       return ATK_ROLE_LANDMARK;
+     case ax::mojom::Role::kContentDeletion:
+-      return GetAtkRoleContentDeletion();
++      return kAtkRoleContentDeletion;
+     case ax::mojom::Role::kContentInsertion:
+-      return GetAtkRoleContentInsertion();
++      return kAtkRoleContentInsertion;
+     case ax::mojom::Role::kContentInfo:
+     case ax::mojom::Role::kFooter:
+       return ATK_ROLE_LANDMARK;
+@@ -3106,12 +3212,14 @@ void AXPlatformNodeAuraLinux::GetAtkStat
+           static_cast<int32_t>(ax::mojom::AriaCurrentState::kFalse)) {
+     atk_state_set_add_state(atk_state_set, ATK_STATE_ACTIVE);
+   }
++#if defined(ATK_216)
+   // Runtime checks in case we were compiled with a newer version of ATK.
+   if (IsPlatformCheckable() && PlatformSupportsState(ATK_STATE_CHECKABLE))
+     atk_state_set_add_state(atk_state_set, ATK_STATE_CHECKABLE);
+   if (HasIntAttribute(ax::mojom::IntAttribute::kHasPopup) &&
+       PlatformSupportsState(ATK_STATE_HAS_POPUP))
+     atk_state_set_add_state(atk_state_set, ATK_STATE_HAS_POPUP);
++#endif
+   if (GetBoolAttribute(ax::mojom::BoolAttribute::kBusy))
+     atk_state_set_add_state(atk_state_set, ATK_STATE_BUSY);
+   if (GetBoolAttribute(ax::mojom::BoolAttribute::kModal))
+@@ -3150,9 +3258,11 @@ void AXPlatformNodeAuraLinux::GetAtkStat
+   if (GetData().GetRestriction() != ax::mojom::Restriction::kDisabled) {
+     if (GetDelegate()->IsReadOnlySupported() &&
+         GetDelegate()->IsReadOnlyOrDisabled()) {
++#if defined(ATK_216)
+       // Runtime check in case we were compiled with a newer version of ATK.
+       if (PlatformSupportsState(ATK_STATE_READ_ONLY))
+         atk_state_set_add_state(atk_state_set, ATK_STATE_READ_ONLY);
++#endif
+     } else {
+       atk_state_set_add_state(atk_state_set, ATK_STATE_ENABLED);
+       atk_state_set_add_state(atk_state_set, ATK_STATE_SENSITIVE);
+@@ -3186,12 +3296,16 @@ struct AtkIntListRelation {
+ static AtkIntListRelation kIntListRelations[] = {
+     {ax::mojom::IntListAttribute::kControlsIds, ATK_RELATION_CONTROLLER_FOR,
+      ATK_RELATION_CONTROLLED_BY},
++#if defined(ATK_226)
+     {ax::mojom::IntListAttribute::kDetailsIds, ATK_RELATION_DETAILS,
+      ATK_RELATION_DETAILS_FOR},
++#endif
+     {ax::mojom::IntListAttribute::kDescribedbyIds, ATK_RELATION_DESCRIBED_BY,
+      ATK_RELATION_DESCRIPTION_FOR},
++#if defined(ATK_226)
+     {ax::mojom::IntListAttribute::kErrormessageIds, ATK_RELATION_ERROR_MESSAGE,
+      ATK_RELATION_ERROR_FOR},
++#endif
+     {ax::mojom::IntListAttribute::kFlowtoIds, ATK_RELATION_FLOWS_TO,
+      ATK_RELATION_FLOWS_FROM},
+     {ax::mojom::IntListAttribute::kLabelledbyIds, ATK_RELATION_LABELLED_BY,
+@@ -3982,6 +4096,7 @@ void AXPlatformNodeAuraLinux::OnReadonly
+   if (!obj)
+     return;
+ 
++#if defined(ATK_216)
+   // Runtime check in case we were compiled with a newer version of ATK.
+   if (!PlatformSupportsState(ATK_STATE_READ_ONLY))
+     return;
+@@ -3989,6 +4104,7 @@ void AXPlatformNodeAuraLinux::OnReadonly
+   atk_object_notify_state_change(
+       obj, ATK_STATE_READ_ONLY,
+       GetData().GetRestriction() == ax::mojom::Restriction::kReadOnly);
++#endif
+ }
+ 
+ void AXPlatformNodeAuraLinux::OnInvalidStatusChanged() {
+@@ -4315,11 +4431,13 @@ gfx::Rect AXPlatformNodeAuraLinux::GetEx
+       extents.Offset(window_origin);
+       break;
+     }
++#if defined(ATK_230)
+     case ATK_XY_PARENT: {
+       gfx::Vector2d parent_origin = -GetParentOriginInScreenCoordinates();
+       extents.Offset(parent_origin);
+       break;
+     }
++#endif
+   }
+ 
+   return extents;
+@@ -4761,6 +4879,7 @@ bool AXPlatformNodeAuraLinux::IsInLiveRe
+   return HasStringAttribute(ax::mojom::StringAttribute::kContainerLiveStatus);
+ }
+ 
++#if defined(ATK_230)
+ void AXPlatformNodeAuraLinux::ScrollToPoint(AtkCoordType atk_coord_type,
+                                             int x,
+                                             int y) {
+@@ -4833,7 +4952,9 @@ void AXPlatformNodeAuraLinux::ScrollNode
+   rect -= rect.OffsetFromOrigin();
+   ScrollNodeRectIntoView(rect, atk_scroll_type);
+ }
++#endif  // defined(ATK_230)
+ 
++#if defined(ATK_232)
+ std::optional<gfx::Rect>
+ AXPlatformNodeAuraLinux::GetUnclippedHypertextRangeBoundsRect(int start_offset,
+                                                               int end_offset) {
+@@ -4892,6 +5013,7 @@ bool AXPlatformNodeAuraLinux::ScrollSubs
+ 
+   return true;
+ }
++#endif  // defined(ATK_232)
+ 
+ void AXPlatformNodeAuraLinux::ComputeStylesIfNeeded() {
+   if (!offset_to_text_attributes_.empty())
+@@ -5074,8 +5196,10 @@ gfx::Point AXPlatformNodeAuraLinux::Conv
+   switch (atk_coord_type) {
+     case ATK_XY_WINDOW:
+       return point + GetParentFrameOriginInScreenCoordinates();
++#if defined(ATK_230)
+     case ATK_XY_PARENT:
+       return point + GetParentOriginInScreenCoordinates();
++#endif
+     case ATK_XY_SCREEN:
+     default:
+       return point;
+diff -up chromium-134.0.6998.15/ui/accessibility/platform/ax_platform_node_auralinux.h.than chromium-134.0.6998.15/ui/accessibility/platform/ax_platform_node_auralinux.h
+--- chromium-134.0.6998.15/ui/accessibility/platform/ax_platform_node_auralinux.h.than	2025-02-12 02:31:02.000000000 +0100
++++ chromium-134.0.6998.15/ui/accessibility/platform/ax_platform_node_auralinux.h	2025-02-17 17:13:30.973344015 +0100
+@@ -52,6 +52,31 @@ struct FindInPageResultInfo {
+   }
+ };
+ 
++// AtkTableCell was introduced in ATK 2.12. Ubuntu Trusty has ATK 2.10.
++// Compile-time checks are in place for ATK versions that are older than 2.12.
++// However, we also need runtime checks in case the version we are building
++// against is newer than the runtime version. To prevent a runtime error, we
++// check that we have a version of ATK that supports AtkTableCell. If we do,
++// we dynamically load the symbol; if we don't, the interface is absent from
++// the accessible object and its methods will not be exposed or callable.
++// The definitions below ensure we have no missing symbols. Note that in
++// environments where we have ATK > 2.12, the definitions of AtkTableCell and
++// AtkTableCellIface below are overridden by the runtime version.
++// TODO(accessibility) Remove AtkTableCellInterface when 2.12 is the minimum
++// supported version.
++struct COMPONENT_EXPORT(AX_PLATFORM) AtkTableCellInterface {
++  typedef struct _AtkTableCell AtkTableCell;
++  static GType GetType();
++  static GPtrArray* GetColumnHeaderCells(AtkTableCell* cell);
++  static GPtrArray* GetRowHeaderCells(AtkTableCell* cell);
++  static bool GetRowColumnSpan(AtkTableCell* cell,
++                               gint* row,
++                               gint* column,
++                               gint* row_span,
++                               gint* col_span);
++  static bool Exists();
++};
++
+ // This class with an enum is used to generate a bitmask which tracks the ATK
+ // interfaces that an AXPlatformNodeAuraLinux's ATKObject implements.
+ class ImplementedAtkInterfaces {
+diff -up chromium-134.0.6998.15/ui/accessibility/platform/ax_platform_node_auralinux_unittest.cc.than chromium-134.0.6998.15/ui/accessibility/platform/ax_platform_node_auralinux_unittest.cc
+--- chromium-134.0.6998.15/ui/accessibility/platform/ax_platform_node_auralinux_unittest.cc.than	2025-02-12 02:31:02.000000000 +0100
++++ chromium-134.0.6998.15/ui/accessibility/platform/ax_platform_node_auralinux_unittest.cc	2025-02-17 17:13:30.973344015 +0100
+@@ -11,6 +11,7 @@
+ 
+ #include <atk/atk.h>
+ 
++#include <dlfcn.h>
+ #include <array>
+ #include <utility>
+ #include <vector>
+@@ -887,6 +888,17 @@ typedef bool (*ScrollToPointFunc)(AtkCom
+ typedef bool (*ScrollToFunc)(AtkComponent* component, AtkScrollType type);
+ 
+ TEST_F(AXPlatformNodeAuraLinuxTest, AtkComponentScrollToPoint) {
++  // There's a chance we may be compiled with a newer version of ATK and then
++  // run with an older one, so we need to do a runtime check for this method
++  // that is available in ATK 2.30 instead of linking directly.
++  ScrollToPointFunc scroll_to_point = reinterpret_cast<ScrollToPointFunc>(
++      dlsym(RTLD_DEFAULT, "atk_component_scroll_to_point"));
++  if (!scroll_to_point) {
++    LOG(WARNING) << "Skipping AtkComponentScrollToPoint"
++                    " because ATK version < 2.30 detected.";
++    return;
++  }
++
+   AXNodeData root;
+   root.id = 1;
+   root.role = ax::mojom::Role::kRootWebArea;
+@@ -914,8 +926,7 @@ TEST_F(AXPlatformNodeAuraLinuxTest, AtkC
+   EXPECT_EQ(10, width);
+   EXPECT_EQ(10, height);
+ 
+-  atk_component_scroll_to_point(ATK_COMPONENT(child_obj), ATK_XY_SCREEN, 600,
+-                                650);
++  scroll_to_point(ATK_COMPONENT(child_obj), ATK_XY_SCREEN, 600, 650);
+   atk_component_get_extents(ATK_COMPONENT(child_obj), &x_left, &y_top, &width,
+                             &height, ATK_XY_SCREEN);
+   EXPECT_EQ(610, x_left);
+@@ -923,8 +934,7 @@ TEST_F(AXPlatformNodeAuraLinuxTest, AtkC
+   EXPECT_EQ(10, width);
+   EXPECT_EQ(10, height);
+ 
+-  atk_component_scroll_to_point(ATK_COMPONENT(child_obj), ATK_XY_PARENT, 10,
+-                                10);
++  scroll_to_point(ATK_COMPONENT(child_obj), ATK_XY_PARENT, 10, 10);
+   atk_component_get_extents(ATK_COMPONENT(child_obj), &x_left, &y_top, &width,
+                             &height, ATK_XY_SCREEN);
+   // The test wrapper scrolls every element when scrolling, so this should be
+@@ -941,6 +951,17 @@ TEST_F(AXPlatformNodeAuraLinuxTest, AtkC
+ }
+ 
+ TEST_F(AXPlatformNodeAuraLinuxTest, AtkComponentScrollTo) {
++  // There's a chance we may be compiled with a newer version of ATK and then
++  // run with an older one, so we need to do a runtime check for this method
++  // that is available in ATK 2.30 instead of linking directly.
++  ScrollToFunc scroll_to = reinterpret_cast<ScrollToFunc>(
++      dlsym(RTLD_DEFAULT, "atk_component_scroll_to"));
++  if (!scroll_to) {
++    LOG(WARNING) << "Skipping AtkComponentScrollTo"
++                    " because ATK version < 2.30 detected.";
++    return;
++  }
++
+   AXNodeData root;
+   root.id = 1;
+   root.role = ax::mojom::Role::kRootWebArea;
+@@ -968,7 +989,7 @@ TEST_F(AXPlatformNodeAuraLinuxTest, AtkC
+   EXPECT_EQ(10, width);
+   EXPECT_EQ(10, height);
+ 
+-  atk_component_scroll_to(ATK_COMPONENT(child_obj), ATK_SCROLL_ANYWHERE);
++  scroll_to(ATK_COMPONENT(child_obj), ATK_SCROLL_ANYWHERE);
+   atk_component_get_extents(ATK_COMPONENT(child_obj), &x_left, &y_top, &width,
+                             &height, ATK_XY_SCREEN);
+   EXPECT_EQ(0, x_left);
+diff -up chromium-134.0.6998.15/ui/accessibility/platform/inspect/ax_tree_formatter_auralinux.cc.than chromium-134.0.6998.15/ui/accessibility/platform/inspect/ax_tree_formatter_auralinux.cc
+--- chromium-134.0.6998.15/ui/accessibility/platform/inspect/ax_tree_formatter_auralinux.cc.than	2025-02-12 02:31:02.000000000 +0100
++++ chromium-134.0.6998.15/ui/accessibility/platform/inspect/ax_tree_formatter_auralinux.cc	2025-02-17 17:13:30.974344040 +0100
+@@ -474,18 +474,34 @@ void AXTreeFormatterAuraLinux::AddTableC
+   int row = 0, col = 0, row_span = 0, col_span = 0;
+   int n_row_headers = 0, n_column_headers = 0;
+ 
+-  AtkTableCell* cell = G_TYPE_CHECK_INSTANCE_CAST(
+-      (atk_object), atk_table_cell_get_type(), AtkTableCell);
++  // Properties obtained via AtkTableCell, if possible. If we do not have at
++  // least ATK 2.12, use the same logic in our AtkTableCell implementation so
++  // that tests can still be run.
++  if (AtkTableCellInterface::Exists()) {
++    AtkTableCell* cell = G_TYPE_CHECK_INSTANCE_CAST(
++        (atk_object), AtkTableCellInterface::GetType(), AtkTableCell);
+ 
+-  atk_table_cell_get_row_column_span(cell, &row, &col, &row_span, &col_span);
++    AtkTableCellInterface::GetRowColumnSpan(cell, &row, &col, &row_span,
++                                            &col_span);
+ 
+-  GPtrArray* column_headers = atk_table_cell_get_column_header_cells(cell);
+-  n_column_headers = column_headers->len;
+-  g_ptr_array_unref(column_headers);
++    GPtrArray* column_headers =
++        AtkTableCellInterface::GetColumnHeaderCells(cell);
++    n_column_headers = column_headers->len;
++    g_ptr_array_unref(column_headers);
+ 
+-  GPtrArray* row_headers = atk_table_cell_get_row_header_cells(cell);
+-  n_row_headers = row_headers->len;
+-  g_ptr_array_unref(row_headers);
++    GPtrArray* row_headers = AtkTableCellInterface::GetRowHeaderCells(cell);
++    n_row_headers = row_headers->len;
++    g_ptr_array_unref(row_headers);
++  } else {
++    row = node->GetTableRow().value_or(-1);
++    col = node->GetTableColumn().value_or(-1);
++    row_span = node->GetTableRowSpan().value_or(0);
++    col_span = node->GetTableColumnSpan().value_or(0);
++    if (role == ATK_ROLE_TABLE_CELL) {
++      n_column_headers = node->GetDelegate()->GetColHeaderNodeIds(col).size();
++      n_row_headers = node->GetDelegate()->GetRowHeaderNodeIds(row).size();
++    }
++  }
+ 
+   std::vector<std::string> cell_info;
+   cell_info.push_back(base::StringPrintf("row=%i", row));

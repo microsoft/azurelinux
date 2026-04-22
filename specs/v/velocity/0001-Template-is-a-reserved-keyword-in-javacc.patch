@@ -1,0 +1,50 @@
+From 4275860ed4a69047f783f0c06004ba4f1256a994 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Wed, 23 Aug 2023 08:49:53 +0200
+Subject: [PATCH] Template is a reserved keyword in javacc
+
+Forwarded: no
+---
+ velocity-engine-core/src/main/parser/Parser.jjt | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/velocity-engine-core/src/main/parser/Parser.jjt b/velocity-engine-core/src/main/parser/Parser.jjt
+index 593d044b..f3bed948 100644
+--- a/velocity-engine-core/src/main/parser/Parser.jjt
++++ b/velocity-engine-core/src/main/parser/Parser.jjt
+@@ -234,12 +234,12 @@ public class ${parser.basename}Parser implements Parser
+      * the new stream that we want parsed.
+      */
+     @Override
+-    public SimpleNode parse( Reader reader, Template template )
++    public SimpleNode parse( Reader reader, Template tmplate )
+         throws ParseException
+     {
+         SimpleNode sn = null;
+ 
+-        currentTemplate = template;
++        currentTemplate = tmplate;
+ 
+         try
+         {
+@@ -267,7 +267,7 @@ public class ${parser.basename}Parser implements Parser
+              *  thrown by the Macro class when something is amiss in the
+              *  Macro specification
+              */
+-            log.error("{}: {}", template.getName(), mee.getMessage(), mee);
++            log.error("{}: {}", tmplate.getName(), mee.getMessage(), mee);
+             throw mee;
+         }
+         catch (ParseException pe)
+@@ -282,7 +282,7 @@ public class ${parser.basename}Parser implements Parser
+         }
+         catch (Exception e)
+         {
+-            String msg = template.getName() + ": " + e.getMessage();
++            String msg = tmplate.getName() + ": " + e.getMessage();
+             log.error(msg, e);
+             throw new VelocityException(msg, e, getRuntimeServices().getLogContext().getStackTrace());
+         }
+-- 
+2.41.0
+

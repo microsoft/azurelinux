@@ -1,0 +1,63 @@
+From 7099578f18b1ea6a168b1883fa7a4ac7f49fc08f Mon Sep 17 00:00:00 2001
+From: Peter Oliver <git@mavit.org.uk>
+Date: Sun, 14 Jul 2024 20:47:14 +0100
+Subject: [PATCH 2/2] Fall back to the terminal from pure GTK when no display
+ is available
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+* src/dispnew.c (init_display_interactive): Only use PGTK windowing if
+at least one of the environment variables WAYLAND_DISPLAY, DISPLAY,
+BROADWAY_DISPLAY is set.  (Bug#63555)
+
+This patch is not suitable for merging, because it doesn’t consider
+what happens if you try to use PGTK on Windows or MacOS.
+---
+ src/dispnew.c | 29 ++++++++++++++++++++++++++---
+ 1 file changed, 26 insertions(+), 3 deletions(-)
+
+diff --git a/src/dispnew.c b/src/dispnew.c
+index 7cf2b49273c..481d33a7302 100644
+--- a/src/dispnew.c
++++ b/src/dispnew.c
+@@ -6557,10 +6557,33 @@ init_display_interactive (void)
+ #endif
+ 
+ #ifdef HAVE_PGTK
+-  if (!inhibit_window_system && !will_dump_p ())
++  if (!inhibit_window_system)
+     {
+-      Vinitial_window_system = Qpgtk;
+-      return;
++      if (!display_arg && !will_dump_p ())
++	{
++	  int i;
++	  const char *gdk_display_variables[] = {
++	    "WAYLAND_DISPLAY",
++	    "DISPLAY",
++	    "BROADWAY_DISPLAY",
++	  };
++	  size_t n = ARRAYELTS (gdk_display_variables);
++
++	  for (i = 0; i < n; i++)
++	    {
++	      char *display;
++	      display = getenv (gdk_display_variables[i]);
++	      if (display != 0 && *display != 0)
++		{
++		  display_arg = 1;
++		  break;
++		}
++	    }
++	}
++      if (display_arg) {
++	Vinitial_window_system = Qpgtk;
++	return;
++      }
+     }
+ #endif
+ 
+-- 
+2.45.2
+

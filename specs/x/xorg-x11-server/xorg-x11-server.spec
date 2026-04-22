@@ -20,7 +20,7 @@
 Summary:    X.Org X11 X server
 Name:       xorg-x11-server
 Version:    21.1.21
-Release:    1%{?dist}
+Release: 3%{?dist}
 URL:        http://www.x.org
 # SPDX
 License:    Adobe-Display-PostScript AND BSD-3-Clause AND DEC-3-Clause AND HPND AND HPND-sell-MIT-disclaimer-xserver AND HPND-sell-variant AND ICU AND ISC AND MIT AND MIT-open-group AND NTP AND SGI-B-2.0 AND SMLNJ AND X11 AND X11-distribute-modifications-variant
@@ -418,6 +418,9 @@ find %{buildroot} -type f -name '*.la' -delete
 
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 21.1.21-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Tue Nov 25 2025 Olivier Fourdan <ofourdan@redhat.com> - 21.1.21-1
 - Update to xserver 21.1.21 (#2417000)
 

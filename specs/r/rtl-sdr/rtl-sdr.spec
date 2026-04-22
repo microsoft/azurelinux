@@ -17,7 +17,7 @@ Name:             rtl-sdr
 URL:              http://sdr.osmocom.org/trac/wiki/rtl-sdr
 #Version:          0.6.0^%%{git_suffix}
 Version:          2.0.1
-Release:          6%{?dist}
+Release: 7%{?dist}
 # Automatically converted from old format: GPLv2+ - review is highly recommended.
 License:          GPL-2.0-or-later
 BuildRequires:    gcc

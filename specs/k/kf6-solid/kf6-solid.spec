@@ -5,7 +5,7 @@
 
 Name:           kf6-%{framework}
 Version:        6.23.0
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        KDE Frameworks 6 Tier 1 integration module that provides hardware information
 License:        LGPL-2.1-or-later AND LGPL-2.1-only AND CCO-1.0 AND BSD-3-Clause AND LGPL-3.0-only
 URL:            https://solid.kde.org/

@@ -11,7 +11,7 @@
 
 Name:    ima-evm-utils
 Version: 1.6.2
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary: IMA/EVM support utilities
 License: GPL-2.0-or-later
 Url:     https://github.com/linux-integrity/

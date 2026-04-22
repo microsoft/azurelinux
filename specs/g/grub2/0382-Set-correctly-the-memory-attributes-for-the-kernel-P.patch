@@ -1,0 +1,291 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leo Sandoval <lsandova@redhat.com>
+Date: Tue, 29 Jul 2025 09:43:37 -0600
+Subject: [PATCH] Set correctly the memory attributes for the kernel PE
+ sections
+
+Currently the whole kernel memory region is set to RO, so at some
+point when execution is passed to the kernel, the latter faults on a
+memory write access, e.g. zeroing .bss section. The proposed change
+sets the memory attribute appropriately for each kernel PE section.
+
+Signed-off-by: Leo Sandoval <lsandova@redhat.com>
+---
+ grub-core/loader/efi/linux.c      | 170 +++++++++++++++++++++++++++-----------
+ grub-core/loader/i386/efi/linux.c |   5 +-
+ include/grub/efi/linux.h          |   6 ++
+ 3 files changed, 134 insertions(+), 47 deletions(-)
+
+diff --git a/grub-core/loader/efi/linux.c b/grub-core/loader/efi/linux.c
+index ef55556f2d..111edf0e1d 100644
+--- a/grub-core/loader/efi/linux.c
++++ b/grub-core/loader/efi/linux.c
+@@ -36,6 +36,7 @@
+ #include <grub/efi/sb.h>
+ #include <grub/i18n.h>
+ #include <grub/lib/cmdline.h>
++#include <grub/safemath.h>
+ #include <grub/verify.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+@@ -202,22 +203,133 @@ grub_efi_check_nx_required (int *nx_required)
+ typedef void (*handover_func) (void *, grub_efi_system_table_t *, void *);
+ 
+ grub_err_t
+-grub_efi_linux_boot (grub_addr_t k_address, grub_size_t k_size,
++grub_efi_mem_set_att(grub_addr_t k_address, grub_size_t k_size,
++                     grub_size_t k_start, int nx_supported)
++{
++  grub_addr_t k_start_address = k_address + k_start;
++
++  grub_uint64_t default_set_attrs = GRUB_MEM_ATTR_R | GRUB_MEM_ATTR_W | GRUB_MEM_ATTR_X;
++  grub_uint64_t default_clear_attrs = 0;
++  grub_uint64_t stack_set_attrs = default_set_attrs;
++  grub_uint64_t stack_clear_attrs = default_clear_attrs;
++  grub_uint64_t kernel_set_attrs = default_set_attrs;
++  grub_uint64_t kernel_clear_attrs = default_clear_attrs;
++  grub_uint64_t attrs;
++
++  struct grub_msdos_image_header *header;
++  struct grub_pe_image_header *pe_image_header;
++  struct grub_pe32_coff_header *coff_header;
++  struct grub_pe32_section_table *section, *sections;
++  grub_uint16_t i;
++  grub_size_t sz;
++
++  header = (struct grub_msdos_image_header *)k_address;
++
++  if (grub_add ((grub_addr_t) header, header->pe_image_header_offset, &sz))
++    return grub_error (GRUB_ERR_OUT_OF_RANGE, N_("Error on PE image header address calculation"));
++
++  pe_image_header = (struct grub_pe_image_header *) (sz);
++
++  if (pe_image_header > (k_address + k_size))
++    return grub_error (GRUB_ERR_BAD_OS, N_("PE image header address is invalid"));
++
++  if (grub_memcmp (pe_image_header->signature, GRUB_PE32_SIGNATURE,
++                   GRUB_PE32_SIGNATURE_SIZE) != 0)
++    return grub_error (GRUB_ERR_BAD_OS, N_("kernel PE magic is invalid"));
++
++  coff_header = &(pe_image_header->coff_header);
++  grub_dprintf ("nx", "coff_header 0x%"PRIxGRUB_ADDR" machine %08x\n", (grub_addr_t)coff_header, coff_header->machine);
++
++  if (grub_add ((grub_addr_t) coff_header, sizeof (*coff_header), &sz) ||
++      grub_add (sz, coff_header->optional_header_size, &sz))
++    return grub_error (GRUB_ERR_OUT_OF_RANGE, N_("Error on PE sections calculation"));
++
++  sections = (struct grub_pe32_section_table *) (sz);
++
++  if (sections > (k_address + k_size))
++    return grub_error (GRUB_ERR_BAD_OS, N_("Section address is invalid"));
++
++  /* Parse the PE, remove W for code section, remove X for data sections, RO for the rest */
++  for (i = 0, section = sections; i < coff_header->num_sections; i++, section++)
++    {
++      kernel_set_attrs = default_set_attrs;
++      kernel_clear_attrs = default_clear_attrs;
++
++      if (nx_supported)
++        {
++          if (section->characteristics & GRUB_PE32_SCN_MEM_EXECUTE)
++            {
++              /* RX section */
++              kernel_set_attrs &= ~GRUB_MEM_ATTR_W;
++              kernel_clear_attrs |= GRUB_MEM_ATTR_W;
++            }
++          else if (section->characteristics & GRUB_PE32_SCN_MEM_WRITE)
++            {
++              /* RW section */
++              kernel_set_attrs &= ~GRUB_MEM_ATTR_X;
++              kernel_clear_attrs |= GRUB_MEM_ATTR_X;
++            }
++          else
++            {
++              /* RO section */
++              kernel_set_attrs &= ~GRUB_MEM_ATTR_W & ~GRUB_MEM_ATTR_X;
++              kernel_clear_attrs |= GRUB_MEM_ATTR_X | GRUB_MEM_ATTR_W ;
++            }
++        }
++
++      /* Make sure we are inside range */
++      if (grub_add ((grub_addr_t) k_address, section->raw_data_offset, &sz))
++        return grub_error (GRUB_ERR_OUT_OF_RANGE, N_("Error on PE Executable section calculation"));
++
++      grub_update_mem_attrs (sz, section->raw_data_size, kernel_set_attrs, kernel_clear_attrs);
++
++      grub_get_mem_attrs (sz, 4096, &attrs);
++      grub_dprintf ("nx", "permissions for section %s 0x%"PRIxGRUB_ADDR" are %s%s%s\n",
++		    section->name,
++		    (grub_addr_t)sz,
++		    (attrs & GRUB_MEM_ATTR_R) ? "r" : "-",
++		    (attrs & GRUB_MEM_ATTR_W) ? "w" : "-",
++		    (attrs & GRUB_MEM_ATTR_X) ? "x" : "-");
++    }
++
++  if (grub_stack_addr != (grub_addr_t)-1ll)
++    {
++      if (nx_supported)
++        {
++          stack_set_attrs &= ~GRUB_MEM_ATTR_X;
++          stack_clear_attrs |= GRUB_MEM_ATTR_X;
++        }
++
++      grub_dprintf ("nx", "Setting attributes for stack at 0x%"PRIxGRUB_ADDR"-0x%"PRIxGRUB_ADDR" to rw%c\n",
++                    grub_stack_addr, grub_stack_addr + grub_stack_size - 1,
++                    (stack_set_attrs & GRUB_MEM_ATTR_X) ? 'x' : '-');
++
++      grub_update_mem_attrs (grub_stack_addr, grub_stack_size,
++                             stack_set_attrs, stack_clear_attrs);
++
++      grub_get_mem_attrs (grub_stack_addr, 4096, &attrs);
++      grub_dprintf ("nx", "permissions for 0x%"PRIxGRUB_ADDR" are %s%s%s\n",
++                    grub_stack_addr,
++                    (attrs & GRUB_MEM_ATTR_R) ? "r" : "-",
++                    (attrs & GRUB_MEM_ATTR_W) ? "w" : "-",
++                    (attrs & GRUB_MEM_ATTR_X) ? "x" : "-");
++    }
++
++  return GRUB_ERR_NONE;
++}
++
++
++grub_err_t
++grub_efi_linux_boot (grub_addr_t k_address, grub_size_t k_size, grub_size_t k_start,
+ 		     grub_off_t h_offset, void *k_params,
+ 		     int nx_supported)
+ {
++  grub_addr_t k_start_address = k_address + k_start;
+   grub_efi_loaded_image_t *loaded_image = NULL;
+   handover_func hf;
+   int offset = 0;
+-  grub_uint64_t stack_set_attrs = GRUB_MEM_ATTR_R |
+-				  GRUB_MEM_ATTR_W |
+-				  GRUB_MEM_ATTR_X;
+-  grub_uint64_t stack_clear_attrs = 0;
+-  grub_uint64_t kernel_set_attrs = stack_set_attrs;
+-  grub_uint64_t kernel_clear_attrs = stack_clear_attrs;
+-  grub_uint64_t attrs;
+   int nx_required = 0;
+-
++ 
+ #ifdef __x86_64__
+   offset = 512;
+ #endif
+@@ -241,47 +353,13 @@ grub_efi_linux_boot (grub_addr_t k_address, grub_size_t k_size,
+   if (nx_required && !nx_supported)
+     return grub_error (GRUB_ERR_BAD_OS, N_("kernel does not support NX loading required by policy"));
+ 
+-  if (nx_supported)
+-    {
+-      kernel_set_attrs &= ~GRUB_MEM_ATTR_W;
+-      kernel_clear_attrs |= GRUB_MEM_ATTR_W;
+-      stack_set_attrs &= ~GRUB_MEM_ATTR_X;
+-      stack_clear_attrs |= GRUB_MEM_ATTR_X;
+-    }
+-
+-  grub_dprintf ("nx", "Setting attributes for 0x%"PRIxGRUB_ADDR"-0x%"PRIxGRUB_ADDR" to r%cx\n",
+-		    k_address, k_address + k_size - 1,
+-		    (kernel_set_attrs & GRUB_MEM_ATTR_W) ? 'w' : '-');
+-  grub_update_mem_attrs (k_address, k_size,
+-			 kernel_set_attrs, kernel_clear_attrs);
+-
+-  grub_get_mem_attrs (k_address, 4096, &attrs);
+-  grub_dprintf ("nx", "permissions for 0x%"PRIxGRUB_ADDR" are %s%s%s\n",
+-		(grub_addr_t)k_address,
+-		(attrs & GRUB_MEM_ATTR_R) ? "r" : "-",
+-		(attrs & GRUB_MEM_ATTR_W) ? "w" : "-",
+-		(attrs & GRUB_MEM_ATTR_X) ? "x" : "-");
+-  if (grub_stack_addr != (grub_addr_t)-1ll)
+-    {
+-      grub_dprintf ("nx", "Setting attributes for stack at 0x%"PRIxGRUB_ADDR"-0x%"PRIxGRUB_ADDR" to rw%c\n",
+-		    grub_stack_addr, grub_stack_addr + grub_stack_size - 1,
+-		    (stack_set_attrs & GRUB_MEM_ATTR_X) ? 'x' : '-');
+-      grub_update_mem_attrs (grub_stack_addr, grub_stack_size,
+-			     stack_set_attrs, stack_clear_attrs);
+-
+-      grub_get_mem_attrs (grub_stack_addr, 4096, &attrs);
+-      grub_dprintf ("nx", "permissions for 0x%"PRIxGRUB_ADDR" are %s%s%s\n",
+-		    grub_stack_addr,
+-		    (attrs & GRUB_MEM_ATTR_R) ? "r" : "-",
+-		    (attrs & GRUB_MEM_ATTR_W) ? "w" : "-",
+-		    (attrs & GRUB_MEM_ATTR_X) ? "x" : "-");
+-    }
++  grub_efi_mem_set_att (k_address, k_size, k_start, nx_supported);
+ 
+ #if defined(__i386__) || defined(__x86_64__)
+   asm volatile ("cli");
+ #endif
+ 
+-  hf = (handover_func)((char *)k_address + h_offset + offset);
++  hf = (handover_func)((char *)k_start_address + h_offset + offset);
+   hf (grub_efi_image_handle, grub_efi_system_table, k_params);
+ 
+   return GRUB_ERR_BUG;
+@@ -451,7 +529,7 @@ grub_arch_efi_linux_boot_image (grub_addr_t addr, grub_size_t size, char *args,
+ 
+   grub_dprintf ("linux", "linux command line: '%s'\n", args);
+ 
+-  retval = grub_efi_linux_boot (addr, size, handover_offset,
++  retval = grub_efi_linux_boot (addr, size, 0, handover_offset,
+ 				(void *)addr, nx_supported);
+ 
+   /* Never reached... */
+diff --git a/grub-core/loader/i386/efi/linux.c b/grub-core/loader/i386/efi/linux.c
+index abbf6b24f5..6c310d9879 100644
+--- a/grub-core/loader/i386/efi/linux.c
++++ b/grub-core/loader/i386/efi/linux.c
+@@ -41,6 +41,7 @@ static grub_command_t cmd_linuxefi, cmd_initrdefi;
+ struct grub_linuxefi_context {
+   void *kernel_mem;
+   grub_uint64_t kernel_size;
++  grub_uint64_t kernel_start;
+   grub_uint32_t handover_offset;
+   struct linux_kernel_params *params;
+   char *cmdline;
+@@ -169,6 +170,7 @@ grub_linuxefi_boot (void *data)
+ 
+   return grub_efi_linux_boot ((grub_addr_t)context->kernel_mem,
+ 			      context->kernel_size,
++			      context->kernel_start,
+ 			      context->handover_offset,
+ 			      context->params,
+ 			      context->nx_supported);
+@@ -527,7 +529,7 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+ 		LOW_U32(kernel_mem));
+   lh->code32_start = LOW_U32(kernel_mem);
+ 
+-  grub_memcpy (kernel_mem, (char *)kernel + start, filelen - start);
++  grub_memcpy (kernel_mem, (char *)kernel, filelen);
+ 
+   lh->type_of_loader = 0x6;
+   grub_dprintf ("linux", "setting lh->type_of_loader = 0x%02x\n",
+@@ -544,6 +546,7 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+     goto fail;
+   context->kernel_mem = kernel_mem;
+   context->kernel_size = kernel_size;
++  context->kernel_start = start;
+   context->handover_offset = handover_offset;
+   context->params = params;
+   context->cmdline = cmdline;
+diff --git a/include/grub/efi/linux.h b/include/grub/efi/linux.h
+index 5b4e626c37..cd17be506a 100644
+--- a/include/grub/efi/linux.h
++++ b/include/grub/efi/linux.h
+@@ -27,6 +27,7 @@
+ grub_err_t
+ EXPORT_FUNC(grub_efi_linux_boot) (grub_addr_t kernel_address,
+                                   grub_size_t kernel_size,
++                                  grub_size_t kernel_start,
+                                   grub_off_t handover_offset,
+                                   void *kernel_param, int nx_enabled);
+ 
+@@ -38,4 +39,9 @@ EXPORT_FUNC(grub_efi_check_nx_image_support) (grub_addr_t kernel_addr,
+ grub_err_t
+ EXPORT_FUNC(grub_efi_check_nx_required) (int *nx_required);
+ 
++grub_err_t
++EXPORT_FUNC(grub_efi_mem_set_att) (grub_addr_t k_address,
++				   grub_size_t k_size,
++				   grub_size_t k_start, int nx_supported);
++
+ #endif /* ! GRUB_EFI_LINUX_HEADER */

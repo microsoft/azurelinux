@@ -4,7 +4,7 @@
 Name:           perl-Scope-Guard
 Summary:        Lexically scoped resource management
 Version:        0.21
-Release:        30%{?dist}
+Release: 31%{?dist}
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Scope-Guard
 Source0:        https://cpan.metacpan.org/modules/by-module/Scope/Scope-Guard-%{version}.tar.gz

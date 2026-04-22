@@ -1,0 +1,80 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
+Date: Fri, 4 Mar 2022 09:31:43 +0100
+Subject: [PATCH] grub-core/loader/efi/chainloader.c: do not validate
+ chainloader twice
+
+On secureboot systems, with shimlock verifier, call to
+grub_file_open(, GRUB_FILE_TYPE_EFI_CHAINLOADED_IMAGE) will already
+pass the chainloader target through shim-lock protocol verify
+call. And create a TPM measurement. If verification fails,
+grub_cmd_chainloader will fail at file open time.
+
+This makes previous code paths for negative, and zero return codes
+from grub_linuxefi_secure_validate unreachable under secureboot. But
+also breaking measurements compatibility with 2.04+linuxefi codebases,
+as the chainloader file is passed through shim_lock->verify() twice
+(via verifier & direct call to grub_linuxefi_secure_validate)
+extending the PCRs twice.
+
+This reduces grub_loader options to perform
+grub_secureboot_chainloader when secureboot is on, and otherwise
+attempt grub_chainloader_boot.
+
+It means that booting with secureboot off, yet still with shim (which
+always verifies things successfully), will stop choosing
+grub_secureboot_chainloader, and opting for a more regular
+loadimage/startimage codepath. If we want to use the
+grub_secureboot_chainloader codepath in such scenarios we should adapt
+the code to simply check for shim_lock protocol presence /
+shim_lock->context() success?! But I am not sure if that is necessary.
+
+This patch must not be ported to older editions of grub code bases
+that do not have verifiers framework, or it is not builtin, or
+shim-lock-verifier is an optional module.
+
+Signed-off-by: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
+---
+ grub-core/loader/efi/chainloader.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/grub-core/loader/efi/chainloader.c b/grub-core/loader/efi/chainloader.c
+index efbe2bd38aa..3a3b55c1d61 100644
+--- a/grub-core/loader/efi/chainloader.c
++++ b/grub-core/loader/efi/chainloader.c
+@@ -912,7 +912,6 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
+   grub_efi_device_path_t *dp = NULL;
+   char *filename;
+   void *boot_image = 0;
+-  int rc;
+ 
+   file_path = NULL;
+   address = 0;
+@@ -1087,9 +1086,7 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
+       orig_dev = 0;
+     }
+ 
+-  rc = grub_linuxefi_secure_validate((void *)(unsigned long)address, fsize);
+-  grub_dprintf ("chain", "linuxefi_secure_validate: %d\n", rc);
+-  if (rc > 0)
++  if (grub_efi_get_secureboot () == GRUB_EFI_SECUREBOOT_MODE_ENABLED)
+     {
+       grub_file_close (file);
+       grub_device_close (dev);
+@@ -1097,7 +1094,7 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
+ 		       grub_secureboot_chainloader_unload, 0);
+       return 0;
+     }
+-  else if (rc == 0)
++  else
+     {
+       grub_load_and_start_image(boot_image);
+       grub_file_close (file);
+@@ -1106,7 +1103,6 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
+ 
+       return 0;
+     }
+-  // -1 fall-through to fail
+ 
+ fail:
+ 

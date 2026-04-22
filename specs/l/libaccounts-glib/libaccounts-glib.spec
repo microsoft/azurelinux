@@ -3,7 +3,7 @@
 
 Name:           libaccounts-glib
 Version:        1.25
-Release:        23%{?dist}
+Release: 24%{?dist}
 Summary:        Accounts framework for Linux and POSIX based platforms
 # Automatically converted from old format: LGPLv2 - review is highly recommended.
 License:        LicenseRef-Callaway-LGPLv2

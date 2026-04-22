@@ -3,7 +3,7 @@
 
 Name:       perl-Text-CSV
 Version:    2.06
-Release:    1%{?dist}
+Release: 2%{?dist}
 Summary:    Comma-separated values manipulator
 License:    GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:        https://metacpan.org/release/Text-CSV

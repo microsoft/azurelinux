@@ -3,7 +3,7 @@
 
 Name:           perl-Email-Valid
 Version:        1.204
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Check validity of internet email address
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Email-Valid

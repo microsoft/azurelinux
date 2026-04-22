@@ -1,0 +1,4 @@
+# Architecture Hare and dependent packages run on. This is the intersection of
+# supported architectures across the Hare tool chain, essentially limited by
+# available QBE targets.
+%hare_arches x86_64 aarch64 riscv64

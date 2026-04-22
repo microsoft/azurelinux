@@ -1,0 +1,5 @@
+# arches that mono builds on
+%mono_arches %{ix86} x86_64 sparc sparcv9 ia64 %{arm} aarch64 alpha s390x ppc ppc64 ppc64le
+
+%_monodir %{_prefix}/lib/mono
+%_monogacdir %{_monodir}/gac

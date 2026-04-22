@@ -3,7 +3,7 @@
 
 Name:           libnice
 Version:        0.1.22
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        GLib ICE implementation
 
 License:        LGPL-2.1-or-later OR MPL-1.1

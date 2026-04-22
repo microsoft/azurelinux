@@ -14,7 +14,7 @@
 
 Name:           librttopo
 Version:        1.1.0
-Release:        17%{?dist}
+Release: 18%{?dist}
 Summary:        Create and manage SQL/MM topologies
 
 License:        GPL-2.0-or-later

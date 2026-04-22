@@ -5,7 +5,7 @@
 
 Name:           python-blinker
 Version:        1.9.0
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        Fast, simple object-to-object and broadcast signaling
 
 License:        MIT

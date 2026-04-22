@@ -31,7 +31,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
 Version:        1.1.5
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Collection of value objects that represent the types of the PHP type system, v1
 
 License:        BSD-3-Clause

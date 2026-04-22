@@ -1,0 +1,85 @@
+Return-Path: kevina@misc.kevina.org
+Received: from zmta06.collab.prod.int.phx2.redhat.com (LHLO
+ zmta06.collab.prod.int.phx2.redhat.com) (10.5.81.13) by
+ zmail15.collab.prod.int.phx2.redhat.com with LMTP; Tue, 21 Aug 2012
+ 08:38:00 -0400 (EDT)
+Received: from int-mx12.intmail.prod.int.phx2.redhat.com (int-mx12.intmail.prod.int.phx2.redhat.com [10.5.11.25])
+    by zmta06.collab.prod.int.phx2.redhat.com (Postfix) with ESMTP id D74A71609E2
+    for <tradej@mail.corp.redhat.com>; Tue, 21 Aug 2012 08:37:59 -0400 (EDT)
+Received: from mx1.redhat.com (ext-mx15.extmail.prod.ext.phx2.redhat.com [10.5.110.20])
+    by int-mx12.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP id q7LCbx5d031748
+    for <tradej@redhat.com>; Tue, 21 Aug 2012 08:37:59 -0400
+Received: from misc.kevina.org (misc.kevina.org [96.126.107.114])
+    by mx1.redhat.com (8.14.4/8.14.4) with ESMTP id q7LCbwlx024966
+    for <tradej@redhat.com>; Tue, 21 Aug 2012 08:37:58 -0400
+Received: by misc.kevina.org (Postfix, from userid 1000)
+    id 576F124ED81; Tue, 21 Aug 2012 08:37:57 -0400 (EDT)
+Date: Tue, 21 Aug 2012 14:37:57 +0200 (CEST)
+From: Kevin Atkinson <k@kevina.org>
+X-X-Sender: kevina@misc.kevina.org
+To: Tomas Radej <tradej@redhat.com>
+Subject: Re: Aspell results licensing
+In-Reply-To: <20120821095056.266cfca47594ad0e03f332f8@redhat.com>
+Message-ID: <alpine.DEB.2.02.1208211423550.7113@misc.kevina.org>
+References: <20120816110627.3b433e1e1a2cfa2a3c29f8e2@redhat.com> <alpine.DEB.2.02.1208162006450.14875@misc.kevina.org> <20120821095056.266cfca47594ad0e03f332f8@redhat.com>
+User-Agent: Alpine 2.02 (DEB 1266 2009-07-14)
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+X-RedHat-Spam-Score: -2.111  (BAYES_00,RP_MATCHES_RCVD)
+X-Scanned-By: MIMEDefang 2.68 on 10.5.11.25
+X-Scanned-By: MIMEDefang 2.68 on 10.5.110.20
+
+
+How's this:
+
+   Copyright 2007 by Kevin Atkinson
+
+   Permission to use, copy, modify, distribute and sell the file
+   batch0.tab (available at http://aspell.net/test/cur/) is hereby
+   granted without fee, provided that the above copyright notice appears
+   in all copies and that both that copyright notice and this permission
+   notice appear in supporting documentation. Kevin Atkinson makes no
+   representations about the suitability of this array for any
+   purpose. It is provided "as is" without express or implied warranty.
+
+2007 since that is the year I belive I last modified the data.  Would 2012 be 
+better?
+
+On Tue, 21 Aug 2012, Tomas Radej wrote:
+
+> Hi,
+>
+> On Thu, 16 Aug 2012 20:12:27 +0200 (CEST)
+> Kevin Atkinson <kevina@gnu.org> wrote:
+>
+>> If you are using the results than there shouldn't be a problem regardless of
+>> what copyright I use.
+>
+> It's necessary to say that I'm not a maintainer in that project, I
+> simply package it into Fedora.
+>
+>> If the original data file will some how be distributed
+>> please let me know what your requirements are and I will see about
+>> explicitly
+>> assigning a compatible copyright.
+>
+> While checking the package, I found out that some of the data are
+> actually embedded in the code [1], so yes, your data is actually being
+> distributed. If I may, I would suggest you use either the MIT/X11
+> licence or the 2 or 3 clause BSD licence, as both of these can be
+> combined with both the ASL 2.0 licence and GPL v2+ [2].
+>
+> Thank you, TR
+>
+> [1]
+> http://svn.apache.org/viewvc/commons/proper/codec/trunk/src/test/java/org/apache/commons/codec/language/DoubleMetaphoneTest.java?view=markup
+> ,
+> line 49 onwards
+>
+> [2] http://fedoraproject.org/wiki/Licensing:Main#Good_Licenses
+>
+> -- 
+> Tomas Radej <tradej@redhat.com>
+>
+>
+

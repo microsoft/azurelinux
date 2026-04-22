@@ -5,7 +5,7 @@
 
 Name:    kf5-%{framework}
 Version: 5.116.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: QtQuickControls2 style for consistency between QWidget and QML apps
 License: LGPL-2.0-or-later AND (LGPL-3.0-only OR GPL-2.0-or-later) AND (LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only)
 URL:     https://invent.kde.org/frameworks/%{framework}

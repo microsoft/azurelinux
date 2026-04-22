@@ -7,7 +7,7 @@
 
 Name:           perl-Net-Ping
 Version:        2.76
-Release:        520%{?dist}
+Release: 521%{?dist}
 Summary:        Check a remote host for reachability
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Net-Ping/

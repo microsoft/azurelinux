@@ -11,7 +11,7 @@ Name: hunspell-or
 Summary: Odia hunspell dictionaries
 Version: 1.0.0
 Epoch:   1
-Release: 28%{?dist}
+Release: 29%{?dist}
 License:        GPL-2.0-or-later
 URL: https://gitorious.org/hunspell_dictionaries/hunspell_dictionaries.git
 Source0: http://anishpatil.fedorapeople.org/or_in.%{version}.tar.gz

@@ -5,7 +5,7 @@
 
 Name:           gts
 Version:        0.7.6
-Release:        51.20%{snapshot}%{?dist}
+Release: 52.20%{snapshot}%{?dist}
 Summary:        GNU Triangulated Surface Library
 License:        LGPL-2.0-or-later
 URL:            http://gts.sourceforge.net/index.html

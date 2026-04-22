@@ -8,7 +8,7 @@
 
 Name:           rust-leb128
 Version:        0.2.5
-Release:        12%{?dist}
+Release: 13%{?dist}
 Summary:        DWARF's LEB128 encoding library and REPL
 
 # Upstream license specification: Apache-2.0/MIT

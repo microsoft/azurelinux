@@ -6,7 +6,7 @@
 
 Name: tpm2-abrmd
 Version: 3.0.0
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary: A system daemon implementing TPM2 Access Broker and Resource Manager
 
 License: BSD-2-Clause

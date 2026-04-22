@@ -11,7 +11,7 @@ Name: hunspell-ny
 Summary: Chichewa hunspell dictionaries
 Epoch: 1
 Version: 0.01
-Release: 32%{?dist}
+Release: 33%{?dist}
 Source: https://downloads.sourceforge.net/project/aoo-extensions/4052/0/hunspell-chichewa-ny-dict-%{version}.oxt
 URL: http://extensions.services.openoffice.org/en/project/chicspell
 License: GPL-3.0-or-later

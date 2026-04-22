@@ -3,7 +3,7 @@
 
 Name:		perl-Test2-Plugin-NoWarnings
 Version:	0.10
-Release:	4%{?dist}
+Release: 5%{?dist}
 Summary:	Fail if tests warn
 License:	Artistic-2.0
 URL:		https://metacpan.org/release/Test2-Plugin-NoWarnings

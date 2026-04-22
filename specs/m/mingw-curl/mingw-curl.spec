@@ -5,7 +5,7 @@
 
 Name:           mingw-curl
 Version:        8.16.0
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        MinGW Windows port of curl and libcurl
 
 License:        MIT

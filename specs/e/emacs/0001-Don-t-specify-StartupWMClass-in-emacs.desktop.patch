@@ -1,0 +1,31 @@
+From 164e45695f9784469ff2f66cafcd6bc927c246be Mon Sep 17 00:00:00 2001
+From: Peter Oliver <git@mavit.org.uk>
+Date: Tue, 18 Mar 2025 13:16:15 +0000
+Subject: [PATCH] =?UTF-8?q?Don=E2=80=99t=20specify=20StartupWMClass=20in?=
+ =?UTF-8?q?=20emacs.desktop?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+See the explanation at
+https://debbugs.gnu.org/cgi/bugreport.cgi?bug=49505#67.  In summary, the
+value we were providing doesn’t work on Wayland, and the default should
+be fine.
+
+* etc/emacs.desktop: Don’t specify StartupWMClass
+---
+ etc/emacs.desktop | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/etc/emacs.desktop b/etc/emacs.desktop
+index 0d7cac14da5..16ad3c7eb48 100644
+--- a/etc/emacs.desktop
++++ b/etc/emacs.desktop
+@@ -9,4 +9,3 @@ Type=Application
+ Terminal=false
+ Categories=Development;TextEditor;
+ StartupNotify=true
+-StartupWMClass=Emacs
+-- 
+2.48.1
+

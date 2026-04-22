@@ -3,7 +3,7 @@
 
 Name:           icoutils
 Version:        0.32.3
-Release:        19%{?dist}
+Release: 20%{?dist}
 Summary:        Utility for extracting and converting Microsoft icon and cursor files
 
 License:        GPL-2.0-or-later AND GPL-3.0-or-later

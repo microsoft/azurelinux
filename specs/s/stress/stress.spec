@@ -4,7 +4,7 @@
 %define _hardened_build 1
 Name:           stress
 Version:        1.0.7
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        A tool to put given subsystems under a specified load
 
 License:        GPL-2.0-or-later

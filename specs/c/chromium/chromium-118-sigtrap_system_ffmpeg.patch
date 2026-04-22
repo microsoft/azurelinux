@@ -1,0 +1,16 @@
+fix tab crash with SIGTRAP when opening website like ge.globo.com
+
+author: Than Ngo <than@redhat.com>
+
+diff -up chromium-118.0.5993.70/media/filters/ffmpeg_glue.cc.me chromium-118.0.5993.70/media/filters/ffmpeg_glue.cc
+--- chromium-118.0.5993.70/media/filters/ffmpeg_glue.cc.me	2023-10-16 12:52:01.716573884 +0200
++++ chromium-118.0.5993.70/media/filters/ffmpeg_glue.cc	2023-10-16 12:56:03.476075446 +0200
+@@ -157,7 +157,7 @@ bool FFmpegGlue::OpenContext(bool is_loc
+     container_ = container_names::MediaContainerName::kContainerAVI;
+ 
+   // For a successfully opened file, we will get a container we've compiled in.
+-  CHECK_NE(container_, container_names::MediaContainerName::kContainerUnknown);
++  DCHECK_NE(container_, container_names::MediaContainerName::kContainerUnknown);
+   LogContainer(is_local_file, container_);
+ 
+   return true;

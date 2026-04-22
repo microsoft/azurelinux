@@ -3,7 +3,7 @@
 
 Name:           perl-Crypt-Blowfish_PP
 Version:        1.12
-Release:        39%{?dist}
+Release: 40%{?dist}
 Summary:        Blowfish encryption algorithm implemented purely in Perl
 # Automatically converted from old format: GPL+ or Artistic - review is highly recommended.
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

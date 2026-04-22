@@ -1,0 +1,49 @@
+From 4e37bc582b1673ff767dbd0b570ef1c8871d3e8c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 22 Jul 2025 15:10:40 +0200
+Subject: [PATCH] Use RPMTAG_SHA1HEADER instead of RPMTAG_HDRID
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Building against rpm-5.99.91 failed:
+
+    /home/test/createrepo_c/src/parsehdr.c: In function ‘cr_package_from_header’:
+    /home/test/createrepo_c/src/parsehdr.c:669:71: error: ‘RPMTAG_HDRID’ undeclared (first use in this function); did you mean ‘RPMTAG_CVSID’?
+      669 |                                                  headerGetString(hdr, RPMTAG_HDRID));
+	  |                                                                       ^~~~~~~~~~~~
+	  |                                                                       RPMTAG_CVSID
+
+RPM intentionally removed RPMTAG_HDRID tag alias in commit
+79ba4a3c41702e46edd5a4ce7e17a1f3361eb0e7 ("Drop irrepairable pkgid and
+hdrid tag aliases, rename SOURCEPKGID to go").
+
+This patch fixes building against RPMv6 by using RPMTAG_SHA1HEADER
+which RPMTAG_HDRID was aliased to. RPMTAG_SHA1HEADER has existed in
+RPM since the year 2001. RPMTAG_HDRID was an alias to
+RPMTAG_SHA1HEADER all the time RPMTAG_HDRID existed.
+
+In the features we should look for another digest header RPMv6
+packages will use.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ src/parsehdr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/parsehdr.c b/src/parsehdr.c
+index 2b75e99..180e4ae 100644
+--- a/src/parsehdr.c
++++ b/src/parsehdr.c
+@@ -666,7 +666,7 @@ cr_package_from_header(Header hdr,
+ 
+     if (hdrrflags & CR_HDRR_LOADHDRID)
+         pkg->hdrid = cr_safe_string_chunk_insert(pkg->chunk,
+-                                                 headerGetString(hdr, RPMTAG_HDRID));
++                                                 headerGetString(hdr, RPMTAG_SHA1HEADER));
+ 
+     if (hdrrflags & CR_HDRR_LOADSIGNATURES) {
+         rpmtd gpgtd = rpmtdNew();
+-- 
+2.50.1
+

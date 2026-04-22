@@ -6,7 +6,7 @@
 
 Name:           mingw-zlib
 Version:        1.3.1
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        MinGW Windows zlib compression library
 
 License:        Zlib

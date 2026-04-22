@@ -5,7 +5,7 @@
 
 Name:           libdvdread
 Version:        6.1.3
-Release:        10%{?dist}
+Release: 11%{?dist}
 Summary:        A library for reading DVD video discs based on Ogle code
 # msvc/contrib/dirent/dirent.c is HPND-Kevlin-Henney, but is not included in the build
 # src/logger.c and few other are LGPL-2.1-or-later

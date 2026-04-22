@@ -3,7 +3,7 @@
 
 Name:           perl-Mojolicious
 Version:        9.41
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        A next generation web framework for Perl
 License:        Artistic-2.0
 

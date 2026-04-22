@@ -6,7 +6,7 @@
 
 Name:             jboss-logging-tools
 Version:          2.2.1
-Release:          20%{?dist}
+Release: 21%{?dist}
 Summary:          JBoss Logging I18n Annotation Processor
 # Not available license file https://issues.jboss.org/browse/LOGTOOL-107
 # ./annotations/src/main/java/org/jboss/logging/annotations/*.java: Apache (v2.0)

@@ -3,7 +3,7 @@
 
 Name:           perl-Perl-Critic-More
 Version:        1.003
-Release:        33%{?dist}
+Release: 34%{?dist}
 Summary:        Supplemental policies for Perl::Critic
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Perl-Critic-More

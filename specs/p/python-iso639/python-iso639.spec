@@ -5,7 +5,7 @@
 
 Name:           python-%{modname}
 Version:        0.1.4
-Release:        32%{?dist}
+Release: 33%{?dist}
 Summary:        ISO639-2 support for Python
 
 License:        MIT

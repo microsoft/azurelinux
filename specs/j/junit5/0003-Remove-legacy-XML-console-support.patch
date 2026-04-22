@@ -1,0 +1,46 @@
+From 5f4fc9cae4cbe6f2a1a15ebd4af368d06c3189cd Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Thu, 20 Feb 2025 12:24:46 +0100
+Subject: [PATCH 3/4] Remove legacy XML console support
+
+---
+ .../org/junit/platform/console/tasks/ConsoleTestExecutor.java  | 3 +--
+ .../src/module/org.junit.platform.console/module-info.java     | 1 -
+ 2 files changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/junit-platform-console/src/main/java/org/junit/platform/console/tasks/ConsoleTestExecutor.java b/junit-platform-console/src/main/java/org/junit/platform/console/tasks/ConsoleTestExecutor.java
+index eb0f3874a..465980427 100644
+--- a/junit-platform-console/src/main/java/org/junit/platform/console/tasks/ConsoleTestExecutor.java
++++ b/junit-platform-console/src/main/java/org/junit/platform/console/tasks/ConsoleTestExecutor.java
+@@ -39,7 +39,6 @@ import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
+ import org.junit.platform.launcher.core.LauncherFactory;
+ import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
+ import org.junit.platform.launcher.listeners.TestExecutionSummary;
+-import org.junit.platform.reporting.legacy.xml.LegacyXmlReportGeneratingListener;
+ 
+ /**
+  * @since 1.0
+@@ -211,7 +210,7 @@ public class ConsoleTestExecutor {
+ 	}
+ 
+ 	private Optional<TestExecutionListener> createXmlWritingListener(PrintWriter out, Optional<Path> reportsDir) {
+-		return reportsDir.map(it -> new LegacyXmlReportGeneratingListener(it, out));
++		return Optional.empty();
+ 	}
+ 
+ 	private void printSummary(TestExecutionSummary summary, PrintWriter out) {
+diff --git a/junit-platform-console/src/module/org.junit.platform.console/module-info.java b/junit-platform-console/src/module/org.junit.platform.console/module-info.java
+index 166aff5ee..3e12448b4 100644
+--- a/junit-platform-console/src/module/org.junit.platform.console/module-info.java
++++ b/junit-platform-console/src/module/org.junit.platform.console/module-info.java
+@@ -19,7 +19,6 @@ module org.junit.platform.console {
+ 	requires org.junit.platform.commons;
+ 	requires org.junit.platform.engine;
+ 	requires org.junit.platform.launcher;
+-	requires org.junit.platform.reporting;
+ 
+ 	provides java.util.spi.ToolProvider with org.junit.platform.console.ConsoleLauncherToolProvider;
+ }
+-- 
+2.50.1
+

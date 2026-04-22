@@ -15,7 +15,7 @@
 
 Name:		libsmi
 Version:	0.4.8
-Release:	44%{?dist}
+Release: 45%{?dist}
 Summary:	A library to access SMI MIB information
 # lib/parser-smi.c is GPL-2.0-or-later, but with the Bison exception that says it can be used under any terms
 # as part of the larger libsmi work, so we are choosing to use it under the core libsmi licenses instead.

@@ -1,0 +1,27 @@
+From 6336c8d66e47dfd57942319ea81278f02df69b55 Mon Sep 17 00:00:00 2001
+From: rfscholte <rfscholte@apache.org>
+Date: Wed, 3 Apr 2019 19:47:30 +0200
+Subject: [PATCH 4/4] Stabilize project
+
+---
+ pom.xml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/pom.xml b/pom.xml
+index d0f0e7e..43e78e4 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -25,8 +25,8 @@ under the License.
+   <parent>
+     <artifactId>maven-parent</artifactId>
+     <groupId>org.apache.maven</groupId>
+-    <version>24</version>
+-    <relativePath>../pom/maven/pom.xml</relativePath>
++    <version>33</version>
++    <relativePath/>
+   </parent>
+ 
+   <groupId>org.apache.maven.plugin-testing</groupId>
+-- 
+2.48.1
+

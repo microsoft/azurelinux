@@ -1,0 +1,16 @@
+diff -up wxWidgets-3.1.6/src/common/appbase.cpp.abicheck wxWidgets-3.1.6/src/common/appbase.cpp
+--- wxWidgets-3.1.6/src/common/appbase.cpp.abicheck	2022-04-04 09:41:33.000000000 -0400
++++ wxWidgets-3.1.6/src/common/appbase.cpp	2022-04-04 19:14:33.883814729 -0400
+@@ -843,11 +843,8 @@ bool wxAppConsoleBase::CheckBuildOptions
+         wxString prog = wxString::FromAscii(optionsSignature);
+         wxString progName = wxString::FromAscii(componentName);
+ 
+-        wxLogFatalError(wxT("Mismatch between the program and library build versions detected.\nThe library used %s,\nand %s used %s."),
++        wxLogWarning(wxT("Mismatch between the program and library build versions detected.\nThe library used %s,\nand %s used %s."),
+                         lib, progName, prog);
+-
+-        // normally wxLogFatalError doesn't return
+-        return false;
+     }
+ 
+     return true;

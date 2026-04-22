@@ -3,7 +3,7 @@
 
 Name:           perl-HTTP-Message
 Version:        7.01
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        HTTP style message
 # CONTRIBUTING.md:  CC0-1.0
 # other files:      GPL-1.0-or-later OR Artistic-1.0-Perl

@@ -1,0 +1,28 @@
+Works around this error:
+
+  src/patch/stringified.ts:71:19 - error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+    Type 'undefined' is not assignable to type 'string'.
+
+  71     ret = _indent(ret, level, indentFirst);
+                       ~~~
+
+  src/patch/stringified.ts:73:3 - error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+    Type 'undefined' is not assignable to type 'string'.
+
+  73   return ret;
+       ~~~~~~~~~~~
+
+
+  Found 2 errors in the same file, starting at: src/patch/stringified.ts:71
+
+--- nbdime-4.0.3/packages/nbdime/src/patch/stringified.ts.orig	2026-01-15 09:43:29.000000000 -0700
++++ nbdime-4.0.3/packages/nbdime/src/patch/stringified.ts	2026-01-16 11:46:15.120753004 -0700
+@@ -66,7 +66,7 @@ export function stringify(
+   level?: number,
+   indentFirst: boolean = true,
+ ): string {
+-  let ret = stableStringify.default(values, { space: JSON_INDENT });
++  let ret = stableStringify.default(values, { space: JSON_INDENT }) ?? '';
+   if (level) {
+     ret = _indent(ret, level, indentFirst);
+   }

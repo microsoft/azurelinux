@@ -3,7 +3,7 @@
 
 Name:           libtimezonemap
 Version:        0.4.5.3
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        Time zone map widget for Gtk+
 
 # Automatically converted from old format: GPLv3 - review is highly recommended.

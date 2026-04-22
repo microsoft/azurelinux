@@ -1,0 +1,56 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leo Sandoval <lsandova@redhat.com>
+Date: Thu, 11 Jan 2024 12:05:20 -0600
+Subject: [PATCH] libtasn1: fix string overflow warning
+
+Patched also at the libtasn1 project with commit
+
+    c54e523d9dacdb7eec7f20964df12df9b80f467c
+    Author:     Simo Sorce <simo@redhat.com>
+    AuthorDate: Tue May 11 14:18:10 2021 -0400
+    Commit:     Simo Sorce <simo@redhat.com>
+    CommitDate: Tue May 11 14:26:04 2021 -0400
+
+    Parent:     890a8a9 Fix resource leak (node)
+    Contained:  master
+    Follows:    v4.16.0 (48)
+    Precedes:   v4.17.0 (5)
+
+    Fix String overflow warning
+
+    Scanner Output
+    --------------
+    rror: COMPILER_WARNING (CWE-758): [#def2]
+    libtasn1-4.16.0/lib/element.c: scope_hint: In function '_asn1_append_sequence_set'
+    libtasn1-4.16.0/lib/element.c:186:7: warning[-Wstringop-overflow=]: '_asn1_ltostr' accessing 22 bytes in a region of size 21
+     #  186 |       _asn1_ltostr (n, temp + 1);
+     #      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~
+    libtasn1-4.16.0/lib/element.c:186:7: note: referencing argument 2 of type 'char *'
+    libtasn1-4.16.0/lib/element.c:30: included_from: Included from here.
+    libtasn1-4.16.0/lib/parser_aux.h:70:7: note: in a call to function '_asn1_ltostr'
+     #   70 | char *_asn1_ltostr (int64_t v, char str[LTOSTR_MAX_SIZE]);
+     #      |       ^~~~~~~~~~~~
+     #  184|         n++;
+     #  185|         temp[0] = '?';
+     #  186|->       _asn1_ltostr (n, temp + 1);
+     #  187|       }
+     #  188|     _asn1_set_name (p2, temp);
+
+Signed-off-by: Leo Sandoval <lsandova@redhat.com>
+---
+ grub-core/lib/libtasn1/lib/element.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/grub-core/lib/libtasn1/lib/element.c b/grub-core/lib/libtasn1/lib/element.c
+index ed761ff56bd..8cc73455aee 100644
+--- a/grub-core/lib/libtasn1/lib/element.c
++++ b/grub-core/lib/libtasn1/lib/element.c
+@@ -143,7 +143,7 @@ int
+ _asn1_append_sequence_set (asn1_node node, struct node_tail_cache_st *pcache)
+ {
+   asn1_node p, p2;
+-  char temp[LTOSTR_MAX_SIZE];
++  char temp[LTOSTR_MAX_SIZE + 1];
+   long n;
+ 
+   if (!node || !(node->down))

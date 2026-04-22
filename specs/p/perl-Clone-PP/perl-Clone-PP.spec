@@ -3,7 +3,7 @@
 
 Name:           perl-Clone-PP
 Version:        1.08
-Release:        14%{?dist}
+Release: 15%{?dist}
 Summary:        Recursively copy Perl data-types
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Clone-PP

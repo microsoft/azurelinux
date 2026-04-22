@@ -7,7 +7,7 @@ Summary:	An OpenGL to PostScript printing library
 Summary(pl):	Biblioteka drukowania z OpenGL-a do PostScriptu
 Name:		gl2ps
 Version:	1.4.2
-Release:	15%{?dist}
+Release: 16%{?dist}
 License:	LGPL-2.0-or-later OR GL2PS
 Source0:	http://www.geuz.org/gl2ps/src/%{name}-%{version}.tgz
 # bump min cmake version requirement to work with cmake 4.0

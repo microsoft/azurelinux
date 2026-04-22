@@ -3,7 +3,7 @@
 
 Name:           perl-Object-Deadly
 Version:        0.09
-Release:        50%{?dist}
+Release: 51%{?dist}
 Summary:        Perl module providing an object that dies whenever examined
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Object-Deadly

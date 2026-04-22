@@ -1,0 +1,12 @@
+diff -rupN --no-dereference devscripts/scripts/Makefile devscripts-new/scripts/Makefile
+--- devscripts/scripts/Makefile	2025-12-30 09:38:40.010782155 +0100
++++ devscripts-new/scripts/Makefile	2025-12-30 09:38:40.014342906 +0100
+@@ -174,7 +174,7 @@ clean:
+ test: test_pl test_sh test_py
+ 
+ install: all
+-	python3 setup.py install --root="$(DESTDIR)" --no-compile --install-layout=deb
++	python3 setup.py install --root="$(DESTDIR)" --no-compile
+ 	cp $(SCRIPTS) $(DESTDIR)$(BINDIR)
+ 	ln -sf edit-patch $(DESTDIR)$(BINDIR)/add-patch
+ 	install -d $(DESTDIR)$(COMPL_DIR)

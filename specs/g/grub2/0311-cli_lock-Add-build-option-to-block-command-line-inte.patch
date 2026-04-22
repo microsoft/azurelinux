@@ -1,0 +1,366 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alec Brown <alec.r.brown@oracle.com>
+Date: Wed, 24 Jan 2024 06:26:37 +0000
+Subject: [PATCH] cli_lock: Add build option to block command line interface
+
+Add functionality to disable command line interface access and editing of GRUB
+menu entries if GRUB image is built with --disable-cli.
+
+Signed-off-by: Alec Brown <alec.r.brown@oracle.com>
+Reviewed-by: Vladimir Serbinenko <phcoder@gmail.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ docs/grub.texi                 |  6 ++++--
+ grub-core/kern/main.c          | 28 ++++++++++++++++++++++++++++
+ grub-core/kern/rescue_reader.c | 13 +++++++++++++
+ grub-core/normal/auth.c        |  3 +++
+ grub-core/normal/menu_text.c   | 31 +++++++++++++++++--------------
+ include/grub/kernel.h          |  1 +
+ include/grub/misc.h            |  2 ++
+ include/grub/util/install.h    |  8 ++++++--
+ util/grub-install-common.c     | 10 ++++++++--
+ util/grub-mkimage.c            |  9 ++++++++-
+ util/mkimage.c                 | 15 ++++++++++++++-
+ 11 files changed, 104 insertions(+), 22 deletions(-)
+
+diff --git a/docs/grub.texi b/docs/grub.texi
+index 096a3cde0..9ce9c5b82 100644
+--- a/docs/grub.texi
++++ b/docs/grub.texi
+@@ -6520,8 +6520,10 @@ the GRUB command line, edit menu entries, and execute any menu entry.  If
+ @samp{superusers} is set, then use of the command line and editing of menu
+ entries are automatically restricted to superusers. Setting @samp{superusers}
+ to empty string effectively disables both access to CLI and editing of menu
+-entries. Note: The environment variable needs to be exported to also affect
+-the section defined by the @samp{submenu} command (@pxref{submenu}).
++entries. Building a grub image with @samp{--disable-cli} option will also
++disable access to CLI and editing of menu entries, as well as disabling rescue
++mode. Note: The environment variable needs to be exported to also affect the
++section defined by the @samp{submenu} command (@pxref{submenu}).
+ 
+ Other users may be allowed to execute specific menu entries by giving a list of
+ usernames (as above) using the @option{--users} option to the
+diff --git a/grub-core/kern/main.c b/grub-core/kern/main.c
+index 8e89763f4..0d6b8138d 100644
+--- a/grub-core/kern/main.c
++++ b/grub-core/kern/main.c
+@@ -30,11 +30,14 @@
+ #include <grub/reader.h>
+ #include <grub/parser.h>
+ #include <grub/verify.h>
++#include <grub/types.h>
+ 
+ #ifdef GRUB_MACHINE_PCBIOS
+ #include <grub/machine/memory.h>
+ #endif
+ 
++static bool cli_disabled = false;
++
+ grub_addr_t
+ grub_modules_get_end (void)
+ {
+@@ -299,6 +302,28 @@ grub_load_normal_mode (void)
+   grub_command_execute ("normal", 0, 0);
+ }
+ 
++bool
++grub_is_cli_disabled (void)
++{
++  return cli_disabled;
++}
++
++static void
++check_is_cli_disabled (void)
++{
++  struct grub_module_header *header;
++  header = 0;
++
++  FOR_MODULES (header)
++    {
++      if (header->type == OBJ_TYPE_DISABLE_CLI)
++	{
++	  cli_disabled = true;
++	  return;
++	}
++    }
++}
++
+ static void
+ reclaim_module_space (void)
+ {
+@@ -356,6 +381,9 @@ grub_main (void)
+ 
+   grub_boot_time ("After loading embedded modules.");
+ 
++  /* Check if the CLI should be disabled */
++  check_is_cli_disabled ();
++
+   /* It is better to set the root device as soon as possible,
+      for convenience.  */
+   grub_set_prefix_and_root ();
+diff --git a/grub-core/kern/rescue_reader.c b/grub-core/kern/rescue_reader.c
+index dcd7d4439..4259857ba 100644
+--- a/grub-core/kern/rescue_reader.c
++++ b/grub-core/kern/rescue_reader.c
+@@ -78,6 +78,19 @@ grub_rescue_read_line (char **line, int cont,
+ void __attribute__ ((noreturn))
+ grub_rescue_run (void)
+ {
++  /* Stall if the CLI has been disabled */
++  if (grub_is_cli_disabled ())
++    {
++      grub_printf ("Rescue mode has been disabled...\n");
++
++      do
++	{
++	  /* Do not optimize out the loop. */
++	  asm volatile ("");
++	}
++      while (1);
++    }
++
+   grub_printf ("Entering rescue mode...\n");
+ 
+   while (1)
+diff --git a/grub-core/normal/auth.c b/grub-core/normal/auth.c
+index 517fc623f..d94020186 100644
+--- a/grub-core/normal/auth.c
++++ b/grub-core/normal/auth.c
+@@ -209,6 +209,9 @@ grub_auth_check_authentication (const char *userlist)
+   char entered[GRUB_AUTH_MAX_PASSLEN];
+   struct grub_auth_user *user;
+ 
++  if (grub_is_cli_disabled ())
++    return GRUB_ACCESS_DENIED;
++
+   grub_memset (login, 0, sizeof (login));
+ 
+   if (is_authenticated (userlist))
+diff --git a/grub-core/normal/menu_text.c b/grub-core/normal/menu_text.c
+index b1321eb26..9c383e64a 100644
+--- a/grub-core/normal/menu_text.c
++++ b/grub-core/normal/menu_text.c
+@@ -178,21 +178,24 @@ command-line or ESC to discard edits and return to the GRUB menu."),
+ 
+       grub_free (msg_translated);
+ 
+-      if (nested)
++      if (!grub_is_cli_disabled ())
+ 	{
+-	  ret += grub_print_message_indented_real
+-	    (_("Press enter to boot the selected OS, "
+-	       "`e' to edit the commands before booting "
+-	       "or `c' for a command-line. ESC to return previous menu."),
+-	     STANDARD_MARGIN, STANDARD_MARGIN, term, dry_run);
+-	}
+-      else
+-	{
+-	  ret += grub_print_message_indented_real
+-	    (_("Press enter to boot the selected OS, "
+-	       "`e' to edit the commands before booting "
+-	       "or `c' for a command-line."),
+-	     STANDARD_MARGIN, STANDARD_MARGIN, term, dry_run);
++	  if (nested)
++	    {
++	      ret += grub_print_message_indented_real
++		(_("Press enter to boot the selected OS, "
++		   "`e' to edit the commands before booting "
++		   "or `c' for a command-line. ESC to return previous menu."),
++		 STANDARD_MARGIN, STANDARD_MARGIN, term, dry_run);
++	    }
++	  else
++	    {
++	      ret += grub_print_message_indented_real
++		(_("Press enter to boot the selected OS, "
++		   "`e' to edit the commands before booting "
++		   "or `c' for a command-line."),
++		 STANDARD_MARGIN, STANDARD_MARGIN, term, dry_run);
++	    }
+ 	}
+     }
+   return ret;
+diff --git a/include/grub/kernel.h b/include/grub/kernel.h
+index 98edc0863..f98a780da 100644
+--- a/include/grub/kernel.h
++++ b/include/grub/kernel.h
+@@ -33,6 +33,7 @@ enum
+   OBJ_TYPE_DISABLE_SHIM_LOCK,
+   OBJ_TYPE_GPG_PUBKEY,
+   OBJ_TYPE_X509_PUBKEY,
++  OBJ_TYPE_DISABLE_CLI
+ };
+ 
+ /* The module header.  */
+diff --git a/include/grub/misc.h b/include/grub/misc.h
+index 6b1e084af..d6e9bae8e 100644
+--- a/include/grub/misc.h
++++ b/include/grub/misc.h
+@@ -442,6 +442,8 @@ grub_uint64_t EXPORT_FUNC(grub_divmod64) (grub_uint64_t n,
+ 					  grub_uint64_t d,
+ 					  grub_uint64_t *r);
+ 
++extern bool EXPORT_FUNC(grub_is_cli_disabled) (void);
++
+ /* Must match softdiv group in gentpl.py.  */
+ #if !defined(GRUB_MACHINE_EMU) && (defined(__arm__) || defined(__ia64__) || \
+     (defined(__riscv) && (__riscv_xlen == 32)))
+diff --git a/include/grub/util/install.h b/include/grub/util/install.h
+index 59eabb9bb..dbf3c216d 100644
+--- a/include/grub/util/install.h
++++ b/include/grub/util/install.h
+@@ -72,6 +72,8 @@
+   { "appended-signature-size", GRUB_INSTALL_OPTIONS_APPENDED_SIGNATURE_SIZE,\
+     "SIZE", 0, N_("Add a note segment reserving SIZE bytes for an appended signature"), \
+     1},                                                                 \
++  { "disable-cli", GRUB_INSTALL_OPTIONS_DISABLE_CLI, 0, 0,		\
++    N_("disabled command line interface access"), 0 },			\
+   { "verbose", 'v', 0, 0,						\
+     N_("print verbose messages."), 1 }
+ 
+@@ -135,7 +137,8 @@ enum grub_install_options {
+   GRUB_INSTALL_OPTIONS_DTB,
+   GRUB_INSTALL_OPTIONS_SBAT,
+   GRUB_INSTALL_OPTIONS_DISABLE_SHIM_LOCK,
+-  GRUB_INSTALL_OPTIONS_APPENDED_SIGNATURE_SIZE
++  GRUB_INSTALL_OPTIONS_APPENDED_SIGNATURE_SIZE,
++  GRUB_INSTALL_OPTIONS_DISABLE_CLI
+ };
+ 
+ extern char *grub_install_source_directory;
+@@ -198,7 +201,8 @@ grub_install_generate_image (const char *dir, const char *prefix,
+ 			     const struct grub_install_image_target_desc *image_target,
+ 			     int note, size_t appsig_size,
+ 			     grub_compression_t comp, const char *dtb_file,
+-			     const char *sbat_path, const int disable_shim_lock);
++			     const char *sbat_path, const int disable_shim_lock,
++			     const int disable_cli);
+ 
+ const struct grub_install_image_target_desc *
+ grub_install_get_image_target (const char *arg);
+diff --git a/util/grub-install-common.c b/util/grub-install-common.c
+index 67afc2eed..42aec141e 100644
+--- a/util/grub-install-common.c
++++ b/util/grub-install-common.c
+@@ -469,6 +469,7 @@ static char **x509keys;
+ static size_t nx509keys;
+ static grub_compression_t compression;
+ static size_t appsig_size;
++static int disable_cli;
+ 
+ int
+ grub_install_parse (int key, char *arg)
+@@ -514,6 +515,9 @@ grub_install_parse (int key, char *arg)
+ 			  * (nx509keys + 1));
+       x509keys[nx509keys++] = xstrdup (arg);
+       return 1;
++    case GRUB_INSTALL_OPTIONS_DISABLE_CLI:
++      disable_cli = 1;
++      return 1;
+ 
+     case GRUB_INSTALL_OPTIONS_VERBOSITY:
+       verbosity++;
+@@ -708,11 +712,13 @@ grub_install_make_image_wrap_file (const char *dir, const char *prefix,
+   grub_util_info ("grub-mkimage --directory '%s' --prefix '%s' --output '%s'"
+ 		  " --format '%s' --compression '%s'"
+ 		  " --appended-signture-size %zu %s%s%s\n",
++		  " --format '%s' --compression '%s'%s%s%s%s\n",
+ 		  dir, prefix, outname,
+ 		  mkimage_target, compnames[compression],
+ 		  appsig_size,
+ 		  note ? " --note" : "",
+-		  disable_shim_lock ? " --disable-shim-lock" : "", s);
++		  disable_shim_lock ? " --disable-shim-lock" : "",
++		  disable_cli ? " --disable-cli" : "", s);
+   free (s);
+ 
+   tgt = grub_install_get_image_target (mkimage_target);
+@@ -725,7 +731,7 @@ grub_install_make_image_wrap_file (const char *dir, const char *prefix,
+ 			       x509keys, nx509keys,
+ 			       config_path, tgt,
+ 			       note, appsig_size, compression, dtb, sbat,
+-			       disable_shim_lock);
++			       disable_shim_lock, disable_cli);
+   while (dc--)
+     grub_install_pop_module ();
+ }
+diff --git a/util/grub-mkimage.c b/util/grub-mkimage.c
+index e1f111278..13bdc6cf0 100644
+--- a/util/grub-mkimage.c
++++ b/util/grub-mkimage.c
+@@ -84,6 +84,7 @@ static struct argp_option options[] = {
+   {"compression",  'C', "(xz|none|auto)", 0, N_("choose the compression to use for core image"), 0},
+   {"sbat", 's', N_("FILE"), 0, N_("SBAT metadata"), 0},
+   {"disable-shim-lock", GRUB_INSTALL_OPTIONS_DISABLE_SHIM_LOCK, 0, 0, N_("disable shim_lock verifier"), 0},
++  {"disable-cli", GRUB_INSTALL_OPTIONS_DISABLE_CLI, 0, 0, N_("disable command line interface access"), 0},
+   {"verbose",     'v', 0,      0, N_("print verbose messages."), 0},
+   {"appended-signature-size", 'S', N_("SIZE"), 0, N_("Add a note segment reserving SIZE bytes for an appended signature"), 0},
+   { 0, 0, 0, 0, 0, 0 }
+@@ -133,6 +134,7 @@ struct arguments
+   int note;
+   int disable_shim_lock;
+   size_t appsig_size;
++  int disable_cli;
+   const struct grub_install_image_target_desc *image_target;
+   grub_compression_t comp;
+ };
+@@ -259,6 +261,10 @@ argp_parser (int key, char *arg, struct argp_state *state)
+       arguments->disable_shim_lock = 1;
+       break;
+ 
++    case GRUB_INSTALL_OPTIONS_DISABLE_CLI:
++      arguments->disable_cli = 1;
++      break;
++
+     case 'v':
+       verbosity++;
+       break;
+@@ -347,7 +353,8 @@ main (int argc, char *argv[])
+ 			       arguments.image_target, arguments.note,
+ 			       arguments.appsig_size, arguments.comp,
+ 			       arguments.dtb, arguments.sbat,
+-			       arguments.disable_shim_lock);
++			       arguments.disable_shim_lock,
++			       arguments.disable_cli);
+ 
+   if (grub_util_file_sync (fp) < 0)
+     grub_util_error (_("cannot sync `%s': %s"), arguments.output ? : "stdout",
+diff --git a/util/mkimage.c b/util/mkimage.c
+index 425d920ff..f31fdefa8 100644
+--- a/util/mkimage.c
++++ b/util/mkimage.c
+@@ -888,7 +888,7 @@ grub_install_generate_image (const char *dir, const char *prefix,
+ 			     const struct grub_install_image_target_desc *image_target,
+ 			     int note, size_t appsig_size, grub_compression_t comp,
+ 			     const char *dtb_path, const char *sbat_path,
+-			     int disable_shim_lock)
++			     int disable_shim_lock, int disable_cli)
+ {
+   char *kernel_img, *core_img;
+   size_t total_module_size, core_size;
+@@ -963,6 +963,9 @@ grub_install_generate_image (const char *dir, const char *prefix,
+   if (disable_shim_lock)
+     total_module_size += sizeof (struct grub_module_header);
+ 
++  if (disable_cli)
++    total_module_size += sizeof (struct grub_module_header);
++
+   if (config_path)
+     {
+       config_size = ALIGN_ADDR (grub_util_get_image_size (config_path) + 1);
+@@ -1129,6 +1132,16 @@ grub_install_generate_image (const char *dir, const char *prefix,
+       offset += sizeof (*header);
+     }
+ 
++  if (disable_cli)
++    {
++      struct grub_module_header *header;
++
++      header = (struct grub_module_header *) (kernel_img + offset);
++      header->type = grub_host_to_target32 (OBJ_TYPE_DISABLE_CLI);
++      header->size = grub_host_to_target32 (sizeof (*header));
++      offset += sizeof (*header);
++    }
++
+   if (config_path)
+     {
+       struct grub_module_header *header;

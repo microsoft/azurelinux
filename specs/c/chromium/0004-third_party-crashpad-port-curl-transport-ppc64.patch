@@ -1,0 +1,17 @@
+Index: chromium-144.0.7559.59/third_party/crashpad/crashpad/util/net/http_transport_libcurl.cc
+===================================================================
+--- chromium-144.0.7559.59.orig/third_party/crashpad/crashpad/util/net/http_transport_libcurl.cc
++++ chromium-144.0.7559.59/third_party/crashpad/crashpad/util/net/http_transport_libcurl.cc
+@@ -239,6 +239,12 @@ std::string UserAgent() {
+ #endif
+ #elif defined (ARCH_CPU_RISCV64)
+     static constexpr char arch[] = "riscv64";
++#elif defined(__powerpc64__)
++#if defined(ARCH_CPU_LITTLE_ENDIAN)
++    static constexpr char arch[] = "ppc64";
++#elif defined(ARCH_CPU_BIG_ENDIAN)
++    static constexpr char arch[] = "ppc64_be";
++#endif
+ #else
+ #error Port
+ #endif

@@ -10,7 +10,7 @@
 
 Name:           rust-afterburn
 Version:        5.10.0
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Simple cloud provider agent
 
 License:        Apache-2.0

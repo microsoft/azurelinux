@@ -3,7 +3,7 @@
 
 Name:           perl-Parallel-ForkManager
 Version:        2.03
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Simple parallel processing fork manager
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Parallel-ForkManager

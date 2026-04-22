@@ -8,7 +8,7 @@
 
 Name:           %{githubname}
 Version:        %{githubver}
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Libbpf library
 
 License:        LGPL-2.1-only OR BSD-2-Clause

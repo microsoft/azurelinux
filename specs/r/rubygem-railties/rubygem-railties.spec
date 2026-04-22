@@ -9,7 +9,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 8.0.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: Tools for creating, working with, and running Rails applications
 License: MIT
 URL: https://rubyonrails.org

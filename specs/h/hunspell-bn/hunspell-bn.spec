@@ -10,7 +10,7 @@
 Name: hunspell-bn
 Summary: Bengali hunspell dictionaries
 Version: 1.0.0
-Release: 28%{?dist}
+Release: 29%{?dist}
 Epoch: 1
 Source: http://anishpatil.fedorapeople.org/bn_in.%{version}.tar.gz
 URL: https://gitorious.org/hunspell_dictionaries/hunspell_dictionaries.git

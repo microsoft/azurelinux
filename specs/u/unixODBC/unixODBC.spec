@@ -5,7 +5,7 @@
 
 Name:    unixODBC
 Version: 2.3.14
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See README: Programs are GPL, libraries are LGPL
 # News Server library (Drivers/nn/yyparse.c) is GPLv3+

@@ -17,7 +17,7 @@ Name:           python-sqlalchemy1.3
 Version:        1.3.24
 # cope with pre-release versions containing tildes
 %global srcversion %{lua: srcversion, num = rpm.expand("%{version}"):gsub("~", ""); print(srcversion);}
-Release:        18%{?dist}
+Release: 19%{?dist}
 Summary:        Modular and flexible ORM library for python (legacy 1.3.x version)
 
 License:        MIT

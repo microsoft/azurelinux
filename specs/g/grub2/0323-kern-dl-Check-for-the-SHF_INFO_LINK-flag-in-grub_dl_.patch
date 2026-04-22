@@ -1,0 +1,34 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: B Horn <b@horn.uk>
+Date: Tue, 11 Feb 2025 17:01:26 -0600
+Subject: [PATCH] kern/dl: Check for the SHF_INFO_LINK flag in 
+ grub_dl_relocate_symbols()
+
+The grub_dl_relocate_symbols() iterates through the sections in
+an ELF looking for relocation sections. According to the spec [1]
+the SHF_INFO_LINK flag should be set if the sh_info field is meant
+to be a section index.
+
+[1] https://refspecs.linuxbase.org/elf/gabi4+/ch4.sheader.html
+
+Reported-by: B Horn <b@horn.uk>
+Signed-off-by: B Horn <b@horn.uk>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/kern/dl.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/grub-core/kern/dl.c b/grub-core/kern/dl.c
+index fe7c3b940..cb49bdc4b 100644
+--- a/grub-core/kern/dl.c
++++ b/grub-core/kern/dl.c
+@@ -681,6 +681,9 @@ grub_dl_relocate_symbols (grub_dl_t mod, void *ehdr)
+ 	grub_dl_segment_t seg;
+ 	grub_err_t err;
+ 
++  if (!(s->sh_flags & SHF_INFO_LINK))
++    continue;
++
+ 	seg = grub_dl_find_segment(mod, s->sh_info);
+         if (!seg)
+ 	  continue;

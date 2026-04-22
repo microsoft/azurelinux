@@ -1,0 +1,176 @@
+%global debug_package %{nil}
+%global __brp_mangle_shebangs_exclude_from_file %{expand:%{_builddir}/shim-%{efi_arch}-%{version}-%{release}.%{_target_cpu}-shebangs.txt}
+%global vendor_token_str %{expand:%%{nil}%%{?vendor_token_name:-t "%{vendor_token_name}"}}
+%global vendor_cert_str %{expand:%%{!?vendor_cert_nickname:-c "Red Hat Test Certificate"}%%{?vendor_cert_nickname:-c "%%{vendor_cert_nickname}"}}
+
+%global grub_version 2.06-63
+%global fwupd_version 1.5.8
+
+%define __pesign_client_cert grub2-signer
+
+%global bootcsvaa64 %{expand:%{SOURCE10}}
+%global bootcsvarm %{expand:%{SOURCE13}}
+%global bootcsvia32 %{expand:%{SOURCE11}}
+%global bootcsvx64 %{expand:%{SOURCE12}}
+
+%global shimefiaa64 %{expand:%{SOURCE20}}
+%global shimefiarm %{expand:%{SOURCE23}}
+%global shimefiia32 %{expand:%{SOURCE21}}
+%global shimefix64 %{expand:%{SOURCE22}}
+
+%global shimveraa64 15.8-2
+%global shimverarm 15.4-1.fc34
+%global shimveria32 15.8-2
+%global shimverx64 15.8-2
+
+%global shimdiraa64 %{_datadir}/shim/%{shimveraa64}/aa64
+%global shimdirarm %{_datadir}/shim/%{shimverarm}/arm
+%global shimdiria32 %{_datadir}/shim/%{shimveria32}/ia32
+%global shimdirx64 %{_datadir}/shim/%{shimverx64}/x64
+
+%global unsignedaa64 shim-unsigned-aarch64
+%global unsignedarm shim-unsigned-arm
+%global unsignedia32 shim-unsigned-ia32
+%global unsignedx64 shim-unsigned-x64
+
+%global bootcsv %{expand:%{bootcsv%{efi_arch}}}
+%global bootcsvalt %{expand:%{bootcsv%{?efi_alt_arch}}}
+%global shimefi %{expand:%{shimefi%{efi_arch}}}
+%global shimefialt %{expand:%{shimefi%{?efi_alt_arch}}}
+%global shimver %{expand:%{shimver%{efi_arch}}}
+%global shimveralt %{expand:%{shimver%{?efi_alt_arch}}}
+%global shimdir %{expand:%{shimdir%{efi_arch}}}
+%global shimdiralt %{expand:%{shimdir%{?efi_alt_arch}}}
+
+%global unsignednone shim-unsigned-none
+%global unsigned %{expand:%%{unsigned%{efi_arch}}}
+%global unsignedalt %{expand:%%{unsigned%{efi_alt_arch}}}
+
+%define define_pkg(a:p:)						\
+%{expand:%%package -n shim-%{-a*}}					\
+Summary: First-stage UEFI bootloader					\
+Requires: mokutil >= 1:0.3.0-15						\
+Requires: efi-filesystem						\
+Provides: shim-signed-%{-a*} = %{version}-%{release}			\
+Conflicts: fwupd < %{fwupd_version}					\
+Requires: grub2-efi-%{-a*} >= %{grub_version}				\
+Conflicts: grub2-efi-%{-a*} < %{grub_version}				\
+%{expand:%%if 0%%{-p*}							\
+Provides: shim = %{version}-%{release}					\
+Provides: shim-signed = %{version}-%{release}				\
+Obsoletes: shim-signed < %{version}-%{release}				\
+Obsoletes: shim < %{version}-%{release}					\
+%%endif}								\
+# Shim uses OpenSSL, but cannot use the system copy as the UEFI ABI	\
+# is not compatible with SysV (there's no red zone under UEFI) and	\
+# there isn't a POSIX-style C library.					\
+# BuildRequires: OpenSSL						\
+Provides: bundled(openssl) = 1.0.2j					\
+									\
+%{expand:%%description -n shim-%{-a*}}					\
+Initial UEFI bootloader that handles chaining to a trusted full		\
+bootloader under secure boot environments. This package contains the	\
+version signed by the UEFI signing service.				\
+%{nil}
+
+# -a <efiarch>
+# -i <input>
+%define hash(a:i:d:)							\
+	pesign -i %{-i*} -h -P > shim.hash				\
+	read hash0 file0 < shim.hash					\
+	read hash1 file1 < %{-d*}/shim%{-a*}.hash			\
+	if ! [ "$hash0" = "$hash1" ]; then				\
+		echo Invalid signature\! > /dev/stderr			\
+		echo $hash0 vs $hash1					\
+		exit 1							\
+	fi								\
+	%{nil}
+
+# -i <input>
+# -o <output>
+%define sign(i:o:)							\
+	%{expand:%%pesign -s -i %{-i*} -o %{-o*}}			\
+	%{nil}
+
+# -b <binary prefix>
+# -a <efiarch>
+# -i <input>
+%define distrosign(b:a:d:)						\
+	cp -av %{-d*}/%{-b*}%{-a*}.efi %{-b*}%{-a*}-unsigned.efi	\
+	%{expand:%%sign -i %{-b*}%{-a*}-unsigned.efi -o %{-b*}%{-a*}-signed.efi}\
+	%{nil}
+
+# -a <efiarch>
+# -A <EFIARCH>
+# -b <1|0> # signed by this builder?
+# -c <1|0> # signed by UEFI CA?
+# -i <shimARCH.efi>
+%define define_build(a:A:b:c:i:d:)					\
+if [ "%{-c*}" = "yes" ]; then						\
+	%{expand:%%hash -i %{-i*} -a %{-a*} -d %{-d*}}			\
+fi									\
+cp %{-i*} shim%{-a*}.efi						\
+if [ "%{-b*}" = "yes" ]; then						\
+	%{expand:%%distrosign -b shim -a %{-a*} -d %{-d*}}		\
+	mv shim%{-a*}-signed.efi shim%{-a*}-%{efi_vendor}.efi		\
+fi									\
+if [ "%{-c*}" = "no" ] && [ "%{-b*}" = "yes" ]; then			\
+	cp shim%{-a*}-%{efi_vendor}.efi shim%{-a*}.efi			\
+fi									\
+%{expand:%%distrosign -b mm -a %{-a*} -d %{-d*}}			\
+mv mm%{-a*}-signed.efi mm%{-a*}.efi					\
+%{expand:%%distrosign -b fb -a %{-a*} -d %{-d*}}			\
+mv fb%{-a*}-signed.efi fb%{-a*}.efi					\
+rm -vf									\\\
+	mm%{-a*}-unsigned.efi						\\\
+	fb%{-a*}-unsigned.efi						\\\
+	shim%{-a*}-unsigned.efi						\
+%{nil}
+
+# -a <efiarch>
+# -A <EFIARCH>
+# -b <BOOTCSV>
+%define do_install(a:A:b:)						\
+install -m 0700 shim%{-a*}.efi						\\\
+	$RPM_BUILD_ROOT%{efi_esp_dir}/shim%{-a*}.efi			\
+install -m 0700 mm%{-a*}.efi						\\\
+	$RPM_BUILD_ROOT%{efi_esp_dir}/mm%{-a*}.efi			\
+install -m 0700 %{-b*}							\\\
+	$RPM_BUILD_ROOT%{efi_esp_dir}/BOOT%{-A*}.CSV			\
+install -m 0700 shim%{-a*}.efi						\\\
+	$RPM_BUILD_ROOT%{efi_esp_boot}/BOOT%{-A*}.EFI			\
+install -m 0700 fb%{-a*}.efi						\\\
+	$RPM_BUILD_ROOT%{efi_esp_boot}/fb%{-a*}.efi			\
+%nil
+
+# -a <efiarch>
+# -A <EFIARCH>
+%define define_files(a:A:)						\
+%{expand:%%files -n shim-%{-a*}}					\
+%{efi_esp_dir}/*%{-a*}*.efi						\
+%{efi_esp_dir}/BOOT%{-A*}.CSV						\
+%{efi_esp_boot}/*%{-a*}.efi						\
+%{efi_esp_boot}/*%{-A*}.EFI						\
+%{nil}
+
+%ifarch x86_64
+%global is_signed yes
+%global is_alt_signed no
+%global provide_legacy_shim 1
+%endif
+%ifarch aarch64
+%global is_signed no
+%global is_alt_signed no
+%global provide_legacy_shim 1
+%endif
+%ifnarch x86_64 aarch64
+%global is_signed no
+%global is_alt_signed no
+%global provide_legacy_shim 0
+%endif
+
+%if ! 0%{?vendor:1}
+%global vendor nopenopenope
+%endif
+
+# vim:filetype=rpmmacros

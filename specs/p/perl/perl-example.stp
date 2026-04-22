@@ -1,0 +1,21 @@
+/*
+    Example of the perl systemtap tapset shows a nested view of perl subroutine
+    calls and returns across the whole system.
+
+    To run:
+        stap perl-example.stp (for all perl processes)
+    For specific perl process:
+        stap perl-example.stp -c COMMAND
+*/
+
+probe perl.sub.call
+{
+    printf("%s => sub: %s, filename: %s, line: %d, package: %s\n",
+        thread_indent(1), sub, filename, lineno, package)
+}
+
+probe perl.sub.return
+{
+    printf("%s <= sub: %s, filename: %s, line: %d, package: %s\n",
+        thread_indent(-1), sub, filename, lineno, package)
+}

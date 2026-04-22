@@ -3,7 +3,7 @@
 
 Name: ding-libs
 Version: 0.6.2
-Release: 59%{?dist}
+Release: 60%{?dist}
 Summary: "Ding is not GLib" assorted utility libraries
 License: LGPL-3.0-or-later
 URL: https://pagure.io/SSSD/ding-libs

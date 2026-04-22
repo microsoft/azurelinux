@@ -5,7 +5,7 @@
 Name:       python-igraph
 Version:    0.11.9
 %global igraph_version 0.9
-Release:    4%{?dist}
+Release: 5%{?dist}
 Summary:    Python bindings for igraph
 
 License:    GPL-2.0-or-later

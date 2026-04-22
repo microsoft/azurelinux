@@ -1,0 +1,68 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Maxim Suhanov <dfirblog@gmail.com>
+Date: Mon, 10 Mar 2025 15:33:46 +0300
+Subject: [PATCH] docs: Document available crypto disks checks
+
+Document the --cryptodisk-only argument. Also, document the
+"cryptocheck" command invoked when that argument is processed.
+
+Signed-off-by: Maxim Suhanov <dfirblog@gmail.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ docs/grub.texi | 22 +++++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
+
+diff --git a/docs/grub.texi b/docs/grub.texi
+index 2d6d73a78d..93e23be99d 100644
+--- a/docs/grub.texi
++++ b/docs/grub.texi
+@@ -4365,6 +4365,7 @@ you forget a command, you can run the command @command{help}
+ * configfile::                  Load a configuration file
+ * cpuid::                       Check for CPU features
+ * crc::                         Compute or check CRC32 checksums
++* cryptocheck::                 Check if a device is encrypted
+ * cryptomount::                 Mount a crypto device
+ * cutmem::                      Remove memory regions
+ * date::                        Display or set current date and time
+@@ -4674,6 +4675,16 @@ Alias for @code{hashsum --hash crc32 arg @dots{}}. See command @command{hashsum}
+ (@pxref{hashsum}) for full description.
+ @end deffn
+ 
++@node cryptocheck
++@subsection cryptocheck
++
++@deffn Command cryptocheck device
++Check if a given diskfilter device is backed by encrypted devices
++(@pxref{cryptomount} for additional information).
++
++The command examines all backing devices, physical volumes, of a specified
++logical volume, like LVM2, and fails when at least one of them is unencrypted.
++@end deffn
+ 
+ @node cryptomount
+ @subsection cryptomount
+@@ -5522,7 +5533,8 @@ unbootable. @xref{Using GPG-style digital signatures}, for more information.
+ 
+ @deffn Command search @
+  [@option{--file}|@option{--label}|@option{--fs-uuid}] @
+- [@option{--set} [var]] [@option{--no-floppy}|@option{--efidisk-only}] name
++ [@option{--set} [var]] [@option{--no-floppy}|@option{--efidisk-only}|@option{--cryptodisk-only}] @
++ name
+ Search devices by file (@option{-f}, @option{--file}), filesystem label
+ (@option{-l}, @option{--label}), or filesystem UUID (@option{-u},
+ @option{--fs-uuid}).
+@@ -5537,6 +5549,14 @@ devices, which can be slow.
+ The (@option{--efidisk-only}) option prevents searching any other devices then
+ EFI disks. This is typically used when chainloading to local EFI partition.
+ 
++The (@option{--cryptodisk-only}) option prevents searching any devices other
++than encrypted disks. This is typically used when booting from an encrypted
++file system to ensure that no code gets executed from an unencrypted device
++having the same filesystem UUID or label.
++
++This option implicitly invokes the command @command{cryptocheck}, if it is
++available (@pxref{cryptocheck} for additional information).
++
+ The @samp{search.file}, @samp{search.fs_label}, and @samp{search.fs_uuid}
+ commands are aliases for @samp{search --file}, @samp{search --label}, and
+ @samp{search --fs-uuid} respectively.

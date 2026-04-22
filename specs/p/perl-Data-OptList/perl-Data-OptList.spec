@@ -13,7 +13,7 @@
 
 Name:           perl-Data-OptList
 Version:        0.114
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        Parse and validate simple name/value option pairs
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Data-OptList

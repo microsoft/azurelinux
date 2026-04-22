@@ -3,7 +3,7 @@
 
 Name:           perl-Pegex
 Version:        0.75
-Release:        18%{?dist}
+Release: 19%{?dist}
 Summary:        Pegex Parser Generator
 # inc/lib/TestML:       GPL-1.0-or-later OR Artistic-1.0-Perl (bundled from
 #                       TestML-0.46)

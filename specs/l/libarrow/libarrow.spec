@@ -34,7 +34,7 @@
 
 Name:		libarrow
 Version:	20.0.0
-Release:	10%{?dist}
+Release: 11%{?dist}
 Summary:	A toolbox for accelerated data interchange and in-memory processing
 License:	Apache-2.0
 URL:		https://arrow.apache.org/

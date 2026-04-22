@@ -3,7 +3,7 @@
 
 Name:		biosdevname
 Version:	0.7.3
-Release:	19%{?dist}
+Release: 20%{?dist}
 Summary:	Udev helper for naming devices per BIOS names
 
 # * biosdevname is GPL-2.0-only

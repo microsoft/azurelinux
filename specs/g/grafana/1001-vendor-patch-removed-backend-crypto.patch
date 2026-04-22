@@ -1,0 +1,2134 @@
+patch removed backend crypto
+
+the `Makefile` removed a few files containing (unused) crypto
+algorithms from the vendor tarball, which are not used in Grafana.
+This patch removes all references to the deleted files.
+
+diff --git a/vendor/golang.org/x/crypto/openpgp/elgamal/elgamal.go b/vendor/golang.org/x/crypto/openpgp/elgamal/elgamal.go
+new file mode 100644
+index 0000000000..871e612a61
+--- /dev/null
++++ b/vendor/golang.org/x/crypto/openpgp/elgamal/elgamal.go
+@@ -0,0 +1,25 @@
++package elgamal
++
++import (
++	"io"
++	"math/big"
++)
++
++// PublicKey represents an ElGamal public key.
++type PublicKey struct {
++	G, P, Y *big.Int
++}
++
++// PrivateKey represents an ElGamal private key.
++type PrivateKey struct {
++	PublicKey
++	X *big.Int
++}
++
++func Encrypt(random io.Reader, pub *PublicKey, msg []byte) (c1, c2 *big.Int, err error) {
++	panic("ElGamal encryption not available")
++}
++
++func Decrypt(priv *PrivateKey, c1, c2 *big.Int) (msg []byte, err error) {
++	panic("ElGamal encryption not available")
++}
+diff --git a/vendor/github.com/prometheus/exporter-toolkit/web/handler.go b/vendor/github.com/prometheus/exporter-toolkit/web/handler.go
+index c607a16..11dbc3c 100644
+--- a/vendor/github.com/prometheus/exporter-toolkit/web/handler.go
++++ b/vendor/github.com/prometheus/exporter-toolkit/web/handler.go
+@@ -16,14 +16,11 @@
+ package web
+ 
+ import (
+-	"encoding/hex"
+ 	"fmt"
+ 	"net/http"
+-	"strings"
+ 	"sync"
+ 
+ 	"github.com/go-kit/log"
+-	"golang.org/x/crypto/bcrypt"
+ )
+ 
+ // extraHTTPHeaders is a map of HTTP headers that can be added to HTTP
+@@ -37,22 +34,6 @@ var extraHTTPHeaders = map[string][]string{
+ 	"Content-Security-Policy":   nil,
+ }
+ 
+-func validateUsers(configPath string) error {
+-	c, err := getConfig(configPath)
+-	if err != nil {
+-		return err
+-	}
+-
+-	for _, p := range c.Users {
+-		_, err = bcrypt.Cost([]byte(p))
+-		if err != nil {
+-			return err
+-		}
+-	}
+-
+-	return nil
+-}
+-
+ // validateHeaderConfig checks that the provided header configuration is correct.
+ // It does not check the validity of all the values, only the ones which are
+ // well-defined enumerations.
+@@ -84,60 +65,3 @@ type webHandler struct {
+ 	// only once in parallel as this is CPU intensive.
+ 	bcryptMtx sync.Mutex
+ }
+-
+-func (u *webHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+-	c, err := getConfig(u.tlsConfigPath)
+-	if err != nil {
+-		u.logger.Log("msg", "Unable to parse configuration", "err", err)
+-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+-		return
+-	}
+-
+-	// Configure http headers.
+-	for k, v := range c.HTTPConfig.Header {
+-		w.Header().Set(k, v)
+-	}
+-
+-	if len(c.Users) == 0 {
+-		u.handler.ServeHTTP(w, r)
+-		return
+-	}
+-
+-	user, pass, auth := r.BasicAuth()
+-	if auth {
+-		hashedPassword, validUser := c.Users[user]
+-
+-		if !validUser {
+-			// The user is not found. Use a fixed password hash to
+-			// prevent user enumeration by timing requests.
+-			// This is a bcrypt-hashed version of "fakepassword".
+-			hashedPassword = "$2y$10$QOauhQNbBCuQDKes6eFzPeMqBSjb7Mr5DUmpZ/VcEd00UAV/LDeSi"
+-		}
+-
+-		cacheKey := strings.Join(
+-			[]string{
+-				hex.EncodeToString([]byte(user)),
+-				hex.EncodeToString([]byte(hashedPassword)),
+-				hex.EncodeToString([]byte(pass)),
+-			}, ":")
+-		authOk, ok := u.cache.get(cacheKey)
+-
+-		if !ok {
+-			// This user, hashedPassword, password is not cached.
+-			u.bcryptMtx.Lock()
+-			err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(pass))
+-			u.bcryptMtx.Unlock()
+-
+-			authOk = validUser && err == nil
+-			u.cache.set(cacheKey, authOk)
+-		}
+-
+-		if authOk && validUser {
+-			u.handler.ServeHTTP(w, r)
+-			return
+-		}
+-	}
+-
+-	w.Header().Set("WWW-Authenticate", "Basic")
+-	http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+-}
+diff --git a/vendor/github.com/prometheus/exporter-toolkit/web/tls_config.go b/vendor/github.com/prometheus/exporter-toolkit/web/tls_config.go
+index 61383bc..7f71298 100644
+--- a/vendor/github.com/prometheus/exporter-toolkit/web/tls_config.go
++++ b/vendor/github.com/prometheus/exporter-toolkit/web/tls_config.go
+@@ -18,16 +18,10 @@ import (
+ 	"crypto/x509"
+ 	"errors"
+ 	"fmt"
+-	"net"
+-	"net/http"
+ 	"os"
+ 	"path/filepath"
+ 
+-	"github.com/coreos/go-systemd/v22/activation"
+-	"github.com/go-kit/log"
+-	"github.com/go-kit/log/level"
+ 	config_util "github.com/prometheus/common/config"
+-	"golang.org/x/sync/errgroup"
+ 	"gopkg.in/yaml.v2"
+ )
+ 
+@@ -263,132 +257,16 @@ func ConfigToTLSConfig(c *TLSConfig) (*tls.Config, error) {
+ 
+ // ServeMultiple starts the server on the given listeners. The FlagConfig is
+ // also passed on to Serve.
+-func ServeMultiple(listeners []net.Listener, server *http.Server, flags *FlagConfig, logger log.Logger) error {
+-	errs := new(errgroup.Group)
+-	for _, l := range listeners {
+-		l := l
+-		errs.Go(func() error {
+-			return Serve(l, server, flags, logger)
+-		})
+-	}
+-	return errs.Wait()
+-}
+ 
+ // ListenAndServe starts the server on addresses given in WebListenAddresses in
+ // the FlagConfig or instead uses systemd socket activated listeners if
+ // WebSystemdSocket in the FlagConfig is true. The FlagConfig is also passed on
+ // to ServeMultiple.
+-func ListenAndServe(server *http.Server, flags *FlagConfig, logger log.Logger) error {
+-	if flags.WebSystemdSocket == nil && (flags.WebListenAddresses == nil || len(*flags.WebListenAddresses) == 0) {
+-		return ErrNoListeners
+-	}
+-
+-	if flags.WebSystemdSocket != nil && *flags.WebSystemdSocket {
+-		level.Info(logger).Log("msg", "Listening on systemd activated listeners instead of port listeners.")
+-		listeners, err := activation.Listeners()
+-		if err != nil {
+-			return err
+-		}
+-		if len(listeners) < 1 {
+-			return errors.New("no socket activation file descriptors found")
+-		}
+-		return ServeMultiple(listeners, server, flags, logger)
+-	}
+-
+-	listeners := make([]net.Listener, 0, len(*flags.WebListenAddresses))
+-	for _, address := range *flags.WebListenAddresses {
+-		listener, err := net.Listen("tcp", address)
+-		if err != nil {
+-			return err
+-		}
+-		defer listener.Close()
+-		listeners = append(listeners, listener)
+-	}
+-	return ServeMultiple(listeners, server, flags, logger)
+-}
+ 
+ // Server starts the server on the given listener. Based on the file path
+ // WebConfigFile in the FlagConfig, TLS or basic auth could be enabled.
+-func Serve(l net.Listener, server *http.Server, flags *FlagConfig, logger log.Logger) error {
+-	level.Info(logger).Log("msg", "Listening on", "address", l.Addr().String())
+-	tlsConfigPath := *flags.WebConfigFile
+-	if tlsConfigPath == "" {
+-		level.Info(logger).Log("msg", "TLS is disabled.", "http2", false, "address", l.Addr().String())
+-		return server.Serve(l)
+-	}
+-
+-	if err := validateUsers(tlsConfigPath); err != nil {
+-		return err
+-	}
+-
+-	// Setup basic authentication.
+-	var handler http.Handler = http.DefaultServeMux
+-	if server.Handler != nil {
+-		handler = server.Handler
+-	}
+-
+-	c, err := getConfig(tlsConfigPath)
+-	if err != nil {
+-		return err
+-	}
+-
+-	server.Handler = &webHandler{
+-		tlsConfigPath: tlsConfigPath,
+-		logger:        logger,
+-		handler:       handler,
+-		cache:         newCache(),
+-	}
+-
+-	config, err := ConfigToTLSConfig(&c.TLSConfig)
+-	switch err {
+-	case nil:
+-		if !c.HTTPConfig.HTTP2 {
+-			server.TLSNextProto = make(map[string]func(*http.Server, *tls.Conn, http.Handler))
+-		}
+-		// Valid TLS config.
+-		level.Info(logger).Log("msg", "TLS is enabled.", "http2", c.HTTPConfig.HTTP2, "address", l.Addr().String())
+-	case errNoTLSConfig:
+-		// No TLS config, back to plain HTTP.
+-		level.Info(logger).Log("msg", "TLS is disabled.", "http2", false, "address", l.Addr().String())
+-		return server.Serve(l)
+-	default:
+-		// Invalid TLS config.
+-		return err
+-	}
+-
+-	server.TLSConfig = config
+-
+-	// Set the GetConfigForClient method of the HTTPS server so that the config
+-	// and certs are reloaded on new connections.
+-	server.TLSConfig.GetConfigForClient = func(*tls.ClientHelloInfo) (*tls.Config, error) {
+-		config, err := getTLSConfig(tlsConfigPath)
+-		if err != nil {
+-			return nil, err
+-		}
+-		config.NextProtos = server.TLSConfig.NextProtos
+-		return config, nil
+-	}
+-	return server.ServeTLS(l, "", "")
+-}
+ 
+ // Validate configuration file by reading the configuration and the certificates.
+-func Validate(tlsConfigPath string) error {
+-	if tlsConfigPath == "" {
+-		return nil
+-	}
+-	if err := validateUsers(tlsConfigPath); err != nil {
+-		return err
+-	}
+-	c, err := getConfig(tlsConfigPath)
+-	if err != nil {
+-		return err
+-	}
+-	_, err = ConfigToTLSConfig(&c.TLSConfig)
+-	if err == errNoTLSConfig {
+-		return nil
+-	}
+-	return err
+-}
+ 
+ type Cipher uint16
+ 
+@@ -472,11 +350,3 @@ func (tv *TLSVersion) MarshalYAML() (interface{}, error) {
+ 	}
+ 	return fmt.Sprintf("%v", tv), nil
+ }
+-
+-// Listen starts the server on the given address. Based on the file
+-// tlsConfigPath, TLS or basic auth could be enabled.
+-//
+-// Deprecated: Use ListenAndServe instead.
+-func Listen(server *http.Server, flags *FlagConfig, logger log.Logger) error {
+-	return ListenAndServe(server, flags, logger)
+-}
+diff --git a/vendor/github.com/ProtonMail/go-crypto/openpgp/internal/algorithm/cipher.go b/vendor/github.com/ProtonMail/go-crypto/openpgp/internal/algorithm/cipher.go
+index 5760cff..0c87736 100644
+--- a/vendor/github.com/ProtonMail/go-crypto/openpgp/internal/algorithm/cipher.go
++++ b/vendor/github.com/ProtonMail/go-crypto/openpgp/internal/algorithm/cipher.go
+@@ -8,8 +8,6 @@ import (
+ 	"crypto/aes"
+ 	"crypto/cipher"
+ 	"crypto/des"
+-
+-	"golang.org/x/crypto/cast5"
+ )
+ 
+ // Cipher is an official symmetric key cipher algorithm. See RFC 4880,
+@@ -38,7 +36,6 @@ const (
+ // http://www.iana.org/assignments/pgp-parameters/pgp-parameters.xhtml#pgp-parameters-13
+ var CipherById = map[uint8]Cipher{
+ 	TripleDES.Id(): TripleDES,
+-	CAST5.Id():     CAST5,
+ 	AES128.Id():    AES128,
+ 	AES192.Id():    AES192,
+ 	AES256.Id():    AES256,
+@@ -53,7 +50,6 @@ func (sk CipherFunction) Id() uint8 {
+ 
+ var keySizeByID = map[uint8]int{
+ 	TripleDES.Id(): 24,
+-	CAST5.Id():     cast5.KeySize,
+ 	AES128.Id():    16,
+ 	AES192.Id():    24,
+ 	AES256.Id():    32,
+@@ -65,7 +61,7 @@ func (cipher CipherFunction) KeySize() int {
+ 	case TripleDES:
+ 		return 24
+ 	case CAST5:
+-		return cast5.KeySize
++		panic("cast5 cipher not available")
+ 	case AES128:
+ 		return 16
+ 	case AES192:
+@@ -82,7 +78,7 @@ func (cipher CipherFunction) BlockSize() int {
+ 	case TripleDES:
+ 		return des.BlockSize
+ 	case CAST5:
+-		return 8
++		panic("cast5 cipher not available")
+ 	case AES128, AES192, AES256:
+ 		return 16
+ 	}
+@@ -96,7 +92,7 @@ func (cipher CipherFunction) New(key []byte) (block cipher.Block) {
+ 	case TripleDES:
+ 		block, err = des.NewTripleDESCipher(key)
+ 	case CAST5:
+-		block, err = cast5.NewCipher(key)
++		panic("cast5 cipher not available")
+ 	case AES128, AES192, AES256:
+ 		block, err = aes.NewCipher(key)
+ 	}
+diff --git a/vendor/github.com/ProtonMail/go-crypto/openpgp/s2k/s2k.go b/vendor/github.com/ProtonMail/go-crypto/openpgp/s2k/s2k.go
+index a436959..420df86 100644
+--- a/vendor/github.com/ProtonMail/go-crypto/openpgp/s2k/s2k.go
++++ b/vendor/github.com/ProtonMail/go-crypto/openpgp/s2k/s2k.go
+@@ -15,7 +15,6 @@ import (
+ 
+ 	"github.com/ProtonMail/go-crypto/openpgp/errors"
+ 	"github.com/ProtonMail/go-crypto/openpgp/internal/algorithm"
+-	"golang.org/x/crypto/argon2"
+ )
+ 
+ type Mode uint8
+@@ -27,7 +26,6 @@ const (
+ 	SimpleS2K         Mode = 0
+ 	SaltedS2K         Mode = 1
+ 	IteratedSaltedS2K Mode = 3
+-	Argon2S2K         Mode = 4
+ 	GnuS2K            Mode = 101
+ )
+ 
+@@ -87,10 +85,10 @@ func decodeCount(c uint8) int {
+ // encodeMemory converts the Argon2 "memory" in the range parallelism*8 to
+ // 2**31, inclusive, to an encoded memory. The return value is the
+ // octet that is actually stored in the GPG file. encodeMemory panics
+-// if is not in the above range 
++// if is not in the above range
+ // See OpenPGP crypto refresh Section 3.7.1.4.
+ func encodeMemory(memory uint32, parallelism uint8) uint8 {
+-	if memory < (8 * uint32(parallelism)) || memory > uint32(2147483648) {
++	if memory < (8*uint32(parallelism)) || memory > uint32(2147483648) {
+ 		panic("Memory argument memory is outside the required range")
+ 	}
+ 
+@@ -174,33 +172,20 @@ func Iterated(out []byte, h hash.Hash, in []byte, salt []byte, count int) {
+ 
+ // Argon2 writes to out the key derived from the password (in) with the Argon2
+ // function (the crypto refresh, section 3.7.1.4)
+-func Argon2(out []byte, in []byte, salt []byte, passes uint8, paralellism uint8, memoryExp uint8) {
+-	key := argon2.IDKey(in, salt, uint32(passes), decodeMemory(memoryExp), paralellism, uint32(len(out)))
+-	copy(out[:], key)
+-}
+ 
+ // Generate generates valid parameters from given configuration.
+ // It will enforce the Iterated and Salted or Argon2 S2K method.
+ func Generate(rand io.Reader, c *Config) (*Params, error) {
+ 	var params *Params
+-	if c != nil && c.Mode() == Argon2S2K {
+-		// handle Argon2 case
+-		argonConfig := c.Argon2()
+-		params = &Params{
+-			mode:        Argon2S2K,
+-			passes:      argonConfig.Passes(),
+-			parallelism: argonConfig.Parallelism(),
+-			memoryExp:   argonConfig.EncodedMemory(),
+-		}
+-	} else if c != nil && c.PassphraseIsHighEntropy && c.Mode() == SaltedS2K { // Allow SaltedS2K if PassphraseIsHighEntropy
++	if c != nil && c.PassphraseIsHighEntropy && c.Mode() == SaltedS2K { // Allow SaltedS2K if PassphraseIsHighEntropy
+ 		hashId, ok := algorithm.HashToHashId(c.hash())
+ 		if !ok {
+ 			return nil, errors.UnsupportedError("no such hash")
+ 		}
+ 
+ 		params = &Params{
+-			mode:      SaltedS2K,
+-			hashId:    hashId,
++			mode:   SaltedS2K,
++			hashId: hashId,
+ 		}
+ 	} else { // Enforce IteratedSaltedS2K method otherwise
+ 		hashId, ok := algorithm.HashToHashId(c.hash())
+@@ -211,7 +196,7 @@ func Generate(rand io.Reader, c *Config) (*Params, error) {
+ 			c.S2KMode = IteratedSaltedS2K
+ 		}
+ 		params = &Params{
+-			mode:      IteratedSaltedS2K, 
++			mode:      IteratedSaltedS2K,
+ 			hashId:    hashId,
+ 			countByte: c.EncodedCount(),
+ 		}
+@@ -274,16 +259,6 @@ func ParseIntoParams(r io.Reader) (params *Params, err error) {
+ 		copy(params.salt(), buf[1:9])
+ 		params.countByte = buf[9]
+ 		return params, nil
+-	case Argon2S2K:
+-		_, err = io.ReadFull(r, buf[:Argon2SaltSize+3])
+-		if err != nil {
+-			return nil, err
+-		}
+-		copy(params.salt(), buf[:Argon2SaltSize])
+-		params.passes = buf[Argon2SaltSize]
+-		params.parallelism = buf[Argon2SaltSize+1]
+-		params.memoryExp = buf[Argon2SaltSize+2]
+-		return params, nil
+ 	case GnuS2K:
+ 		// This is a GNU extension. See
+ 		// https://git.gnupg.org/cgi-bin/gitweb.cgi?p=gnupg.git;a=blob;f=doc/DETAILS;h=fe55ae16ab4e26d8356dc574c9e8bc935e71aef1;hb=23191d7851eae2217ecdac6484349849a24fd94a#l1109
+@@ -306,9 +281,10 @@ func (params *Params) Dummy() bool {
+ 
+ func (params *Params) salt() []byte {
+ 	switch params.mode {
+-		case SaltedS2K, IteratedSaltedS2K: return params.saltBytes[:8]
+-		case Argon2S2K: return params.saltBytes[:Argon2SaltSize]
+-		default: return nil
++	case SaltedS2K, IteratedSaltedS2K:
++		return params.saltBytes[:8]
++	default:
++		return nil
+ 	}
+ }
+ 
+@@ -317,15 +293,13 @@ func (params *Params) Function() (f func(out, in []byte), err error) {
+ 		return nil, errors.ErrDummyPrivateKey("dummy key found")
+ 	}
+ 	var hashObj crypto.Hash
+-	if params.mode != Argon2S2K {
+-		var ok bool
+-		hashObj, ok = algorithm.HashIdToHashWithSha1(params.hashId)
+-		if !ok {
+-			return nil, errors.UnsupportedError("hash for S2K function: " + strconv.Itoa(int(params.hashId)))
+-		}
+-		if !hashObj.Available() {
+-			return nil, errors.UnsupportedError("hash not available: " + strconv.Itoa(int(hashObj)))
+-		}
++	var ok bool
++	hashObj, ok = algorithm.HashIdToHashWithSha1(params.hashId)
++	if !ok {
++		return nil, errors.UnsupportedError("hash for S2K function: " + strconv.Itoa(int(params.hashId)))
++	}
++	if !hashObj.Available() {
++		return nil, errors.UnsupportedError("hash not available: " + strconv.Itoa(int(hashObj)))
+ 	}
+ 
+ 	switch params.mode {
+@@ -346,11 +320,6 @@ func (params *Params) Function() (f func(out, in []byte), err error) {
+ 			Iterated(out, hashObj.New(), in, params.salt(), decodeCount(params.countByte))
+ 		}
+ 
+-		return f, nil
+-	case Argon2S2K:
+-		f := func(out, in []byte) {
+-			Argon2(out, in, params.salt(), params.passes, params.parallelism, params.memoryExp)
+-		}
+ 		return f, nil
+ 	}
+ 
+@@ -361,10 +330,8 @@ func (params *Params) Serialize(w io.Writer) (err error) {
+ 	if _, err = w.Write([]byte{uint8(params.mode)}); err != nil {
+ 		return
+ 	}
+-	if params.mode != Argon2S2K {
+-		if _, err = w.Write([]byte{params.hashId}); err != nil {
+-			return
+-		}
++	if _, err = w.Write([]byte{params.hashId}); err != nil {
++		return
+ 	}
+ 	if params.Dummy() {
+ 		_, err = w.Write(append([]byte("GNU"), 1))
+@@ -377,9 +344,6 @@ func (params *Params) Serialize(w io.Writer) (err error) {
+ 		if params.mode == IteratedSaltedS2K {
+ 			_, err = w.Write([]byte{params.countByte})
+ 		}
+-		if params.mode == Argon2S2K {
+-			_, err = w.Write([]byte{params.passes, params.parallelism, params.memoryExp})
+-		}
+ 	}
+ 	return
+ }
+diff --git a/vendor/github.com/ProtonMail/go-crypto/openpgp/packet/symmetrically_encrypted_aead.go b/vendor/github.com/ProtonMail/go-crypto/openpgp/packet/symmetrically_encrypted_aead.go
+index e96252c..42ddccf 100644
+--- a/vendor/github.com/ProtonMail/go-crypto/openpgp/packet/symmetrically_encrypted_aead.go
++++ b/vendor/github.com/ProtonMail/go-crypto/openpgp/packet/symmetrically_encrypted_aead.go
+@@ -5,12 +5,9 @@
+ package packet
+ 
+ import (
+-	"crypto/cipher"
+-	"crypto/sha256"
+ 	"io"
+ 
+ 	"github.com/ProtonMail/go-crypto/openpgp/errors"
+-	"golang.org/x/crypto/hkdf"
+ )
+ 
+ // parseAead parses a V2 SEIPD packet (AEAD) as specified in
+@@ -62,95 +59,11 @@ func (se *SymmetricallyEncrypted) associatedData() []byte {
+ // decryptAead decrypts a V2 SEIPD packet (AEAD) as specified in
+ // https://www.ietf.org/archive/id/draft-ietf-openpgp-crypto-refresh-07.html#section-5.13.2
+ func (se *SymmetricallyEncrypted) decryptAead(inputKey []byte) (io.ReadCloser, error) {
+-	aead, nonce := getSymmetricallyEncryptedAeadInstance(se.Cipher, se.Mode, inputKey, se.Salt[:], se.associatedData())
+-
+-	// Carry the first tagLen bytes
+-	tagLen := se.Mode.TagLength()
+-	peekedBytes := make([]byte, tagLen)
+-	n, err := io.ReadFull(se.Contents, peekedBytes)
+-	if n < tagLen || (err != nil && err != io.EOF) {
+-		return nil, errors.StructuralError("not enough data to decrypt:" + err.Error())
+-	}
+-
+-	return &aeadDecrypter{
+-		aeadCrypter: aeadCrypter{
+-			aead:           aead,
+-			chunkSize:      decodeAEADChunkSize(se.ChunkSizeByte),
+-			initialNonce:   nonce,
+-			associatedData: se.associatedData(),
+-			chunkIndex:     make([]byte, 8),
+-			packetTag:      packetTypeSymmetricallyEncryptedIntegrityProtected,
+-		},
+-		reader:      se.Contents,
+-		peekedBytes: peekedBytes,
+-	}, nil
++	panic("hkdf cipher not available")
+ }
+ 
+ // serializeSymmetricallyEncryptedAead encrypts to a writer a V2 SEIPD packet (AEAD) as specified in
+ // https://www.ietf.org/archive/id/draft-ietf-openpgp-crypto-refresh-07.html#section-5.13.2
+ func serializeSymmetricallyEncryptedAead(ciphertext io.WriteCloser, cipherSuite CipherSuite, chunkSizeByte byte, rand io.Reader, inputKey []byte) (Contents io.WriteCloser, err error) {
+-	// cipherFunc must have block size 16 to use AEAD
+-	if cipherSuite.Cipher.blockSize() != 16 {
+-		return nil, errors.InvalidArgumentError("invalid aead cipher function")
+-	}
+-
+-	if cipherSuite.Cipher.KeySize() != len(inputKey) {
+-		return nil, errors.InvalidArgumentError("error in aead serialization: bad key length")
+-	}
+-
+-	// Data for en/decryption: tag, version, cipher, aead mode, chunk size
+-	prefix := []byte{
+-		0xD2,
+-		symmetricallyEncryptedVersionAead,
+-		byte(cipherSuite.Cipher),
+-		byte(cipherSuite.Mode),
+-		chunkSizeByte,
+-	}
+-
+-	// Write header (that correspond to prefix except first byte)
+-	n, err := ciphertext.Write(prefix[1:])
+-	if err != nil || n < 4 {
+-		return nil, err
+-	}
+-
+-	// Random salt
+-	salt := make([]byte, aeadSaltSize)
+-	if _, err := rand.Read(salt); err != nil {
+-		return nil, err
+-	}
+-
+-	if _, err := ciphertext.Write(salt); err != nil {
+-		return nil, err
+-	}
+-
+-	aead, nonce := getSymmetricallyEncryptedAeadInstance(cipherSuite.Cipher, cipherSuite.Mode, inputKey, salt, prefix)
+-
+-	return &aeadEncrypter{
+-		aeadCrypter: aeadCrypter{
+-			aead:           aead,
+-			chunkSize:      decodeAEADChunkSize(chunkSizeByte),
+-			associatedData: prefix,
+-			chunkIndex:     make([]byte, 8),
+-			initialNonce:   nonce,
+-			packetTag:      packetTypeSymmetricallyEncryptedIntegrityProtected,
+-		},
+-		writer: ciphertext,
+-	}, nil
+-}
+-
+-func getSymmetricallyEncryptedAeadInstance(c CipherFunction, mode AEADMode, inputKey, salt, associatedData []byte) (aead cipher.AEAD, nonce []byte) {
+-	hkdfReader := hkdf.New(sha256.New, inputKey, salt, associatedData)
+-
+-	encryptionKey := make([]byte, c.KeySize())
+-	_, _ = readFull(hkdfReader, encryptionKey)
+-
+-	// Last 64 bits of nonce are the counter
+-	nonce = make([]byte, mode.IvLength()-8)
+-
+-	_, _ = readFull(hkdfReader, nonce)
+-
+-	blockCipher := c.new(encryptionKey)
+-	aead = mode.new(blockCipher)
+-
+-	return
++	panic("hkdf cipher not available")
+ }
+diff --git a/vendor/github.com/ProtonMail/go-crypto/openpgp/read.go b/vendor/github.com/ProtonMail/go-crypto/openpgp/read.go
+index 8499c73..eaffe19 100644
+--- a/vendor/github.com/ProtonMail/go-crypto/openpgp/read.go
++++ b/vendor/github.com/ProtonMail/go-crypto/openpgp/read.go
+@@ -17,7 +17,6 @@ import (
+ 	"github.com/ProtonMail/go-crypto/openpgp/errors"
+ 	"github.com/ProtonMail/go-crypto/openpgp/internal/algorithm"
+ 	"github.com/ProtonMail/go-crypto/openpgp/packet"
+-	_ "golang.org/x/crypto/sha3"
+ )
+ 
+ // SignatureType is the armor type for a PGP signature.
+diff --git a/vendor/github.com/google/s2a-go/internal/record/internal/aeadcrypter/chachapoly.go b/vendor/github.com/google/s2a-go/internal/record/internal/aeadcrypter/chachapoly.go
+index 214df4c..f049462 100644
+--- a/vendor/github.com/google/s2a-go/internal/record/internal/aeadcrypter/chachapoly.go
++++ b/vendor/github.com/google/s2a-go/internal/record/internal/aeadcrypter/chachapoly.go
+@@ -20,9 +20,6 @@ package aeadcrypter
+ 
+ import (
+ 	"crypto/cipher"
+-	"fmt"
+-
+-	"golang.org/x/crypto/chacha20poly1305"
+ )
+ 
+ // Supported key size in bytes.
+@@ -39,14 +36,7 @@ type chachapoly struct {
+ // NewChachaPoly creates a Chacha-Poly crypter instance. Note that the key must
+ // be Chacha20Poly1305KeySize bytes in length.
+ func NewChachaPoly(key []byte) (S2AAEADCrypter, error) {
+-	if len(key) != Chacha20Poly1305KeySize {
+-		return nil, fmt.Errorf("%d bytes, given: %d", Chacha20Poly1305KeySize, len(key))
+-	}
+-	c, err := chacha20poly1305.New(key)
+-	if err != nil {
+-		return nil, err
+-	}
+-	return &chachapoly{aead: c}, nil
++	panic("chachap20poly1305 cipher not available")
+ }
+ 
+ // Encrypt is the encryption function. dst can contain bytes at the beginning of
+diff --git a/vendor/github.com/google/s2a-go/internal/record/internal/halfconn/halfconn.go b/vendor/github.com/google/s2a-go/internal/record/internal/halfconn/halfconn.go
+index dff99ff..052f645 100644
+--- a/vendor/github.com/google/s2a-go/internal/record/internal/halfconn/halfconn.go
++++ b/vendor/github.com/google/s2a-go/internal/record/internal/halfconn/halfconn.go
+@@ -26,7 +26,6 @@ import (
+ 
+ 	s2apb "github.com/google/s2a-go/internal/proto/common_go_proto"
+ 	"github.com/google/s2a-go/internal/record/internal/aeadcrypter"
+-	"golang.org/x/crypto/cryptobyte"
+ )
+ 
+ // The constants below were taken from Section 7.2 and 7.3 in
+@@ -175,19 +174,5 @@ func (hc *S2AHalfConnection) maskedNonce(sequence uint64) []byte {
+ // deriveSecret implements the Derive-Secret function, as specified in
+ // https://tools.ietf.org/html/rfc8446#section-7.1.
+ func (hc *S2AHalfConnection) deriveSecret(secret, label []byte, length int) ([]byte, error) {
+-	var hkdfLabel cryptobyte.Builder
+-	hkdfLabel.AddUint16(uint16(length))
+-	hkdfLabel.AddUint8LengthPrefixed(func(b *cryptobyte.Builder) {
+-		b.AddBytes(label)
+-	})
+-	// Append an empty `Context` field to the label, as specified in the RFC.
+-	// The half connection does not use the `Context` field.
+-	hkdfLabel.AddUint8LengthPrefixed(func(b *cryptobyte.Builder) {
+-		b.AddBytes([]byte(""))
+-	})
+-	hkdfLabelBytes, err := hkdfLabel.Bytes()
+-	if err != nil {
+-		return nil, fmt.Errorf("deriveSecret failed: %v", err)
+-	}
+-	return hc.expander.expand(secret, hkdfLabelBytes, length)
++	panic("cryptobyte cipher not available")
+ }
+diff --git a/vendor/github.com/google/s2a-go/internal/record/internal/halfconn/expander.go b/vendor/github.com/google/s2a-go/internal/record/internal/halfconn/expander.go
+index e05f2c3..f46c3a9 100644
+--- a/vendor/github.com/google/s2a-go/internal/record/internal/halfconn/expander.go
++++ b/vendor/github.com/google/s2a-go/internal/record/internal/halfconn/expander.go
+@@ -19,10 +19,7 @@
+ package halfconn
+ 
+ import (
+-	"fmt"
+ 	"hash"
+-
+-	"golang.org/x/crypto/hkdf"
+ )
+ 
+ // hkdfExpander is the interface for the HKDF expansion function; see
+@@ -47,13 +44,5 @@ func newDefaultHKDFExpander(h func() hash.Hash) hkdfExpander {
+ }
+ 
+ func (d *defaultHKDFExpander) expand(secret, label []byte, length int) ([]byte, error) {
+-	outBuf := make([]byte, length)
+-	n, err := hkdf.Expand(d.h, secret, label).Read(outBuf)
+-	if err != nil {
+-		return nil, fmt.Errorf("hkdf.Expand.Read failed with error: %v", err)
+-	}
+-	if n < length {
+-		return nil, fmt.Errorf("hkdf.Expand.Read returned unexpected length, got %d, want %d", n, length)
+-	}
+-	return outBuf, nil
++	panic("hkdf cipher not available")
+ }
+diff --git a/vendor/github.com/Masterminds/sprig/v3/crypto.go b/vendor/github.com/Masterminds/sprig/v3/crypto.go
+index 13a5cd5..a92eaec 100644
+--- a/vendor/github.com/Masterminds/sprig/v3/crypto.go
++++ b/vendor/github.com/Masterminds/sprig/v3/crypto.go
+@@ -9,7 +9,6 @@ import (
+ 	"crypto/ecdsa"
+ 	"crypto/ed25519"
+ 	"crypto/elliptic"
+-	"crypto/hmac"
+ 	"crypto/rand"
+ 	"crypto/rsa"
+ 	"crypto/sha1"
+@@ -18,7 +17,6 @@ import (
+ 	"crypto/x509/pkix"
+ 	"encoding/asn1"
+ 	"encoding/base64"
+-	"encoding/binary"
+ 	"encoding/hex"
+ 	"encoding/pem"
+ 	"errors"
+@@ -32,8 +30,6 @@ import (
+ 	"strings"
+ 
+ 	"github.com/google/uuid"
+-	bcrypt_lib "golang.org/x/crypto/bcrypt"
+-	"golang.org/x/crypto/scrypt"
+ )
+ 
+ func sha256sum(input string) string {
+@@ -52,12 +48,7 @@ func adler32sum(input string) string {
+ }
+ 
+ func bcrypt(input string) string {
+-	hash, err := bcrypt_lib.GenerateFromPassword([]byte(input), bcrypt_lib.DefaultCost)
+-	if err != nil {
+-		return fmt.Sprintf("failed to encrypt string with bcrypt: %s", err)
+-	}
+-
+-	return string(hash)
++	panic("bcrypt cipher not available")
+ }
+ 
+ func htpasswd(username string, password string) string {
+@@ -108,40 +99,7 @@ var templateCharacters = map[byte]string{
+ }
+ 
+ func derivePassword(counter uint32, passwordType, password, user, site string) string {
+-	var templates = passwordTypeTemplates[passwordType]
+-	if templates == nil {
+-		return fmt.Sprintf("cannot find password template %s", passwordType)
+-	}
+-
+-	var buffer bytes.Buffer
+-	buffer.WriteString(masterPasswordSeed)
+-	binary.Write(&buffer, binary.BigEndian, uint32(len(user)))
+-	buffer.WriteString(user)
+-
+-	salt := buffer.Bytes()
+-	key, err := scrypt.Key([]byte(password), salt, 32768, 8, 2, 64)
+-	if err != nil {
+-		return fmt.Sprintf("failed to derive password: %s", err)
+-	}
+-
+-	buffer.Truncate(len(masterPasswordSeed))
+-	binary.Write(&buffer, binary.BigEndian, uint32(len(site)))
+-	buffer.WriteString(site)
+-	binary.Write(&buffer, binary.BigEndian, counter)
+-
+-	var hmacv = hmac.New(sha256.New, key)
+-	hmacv.Write(buffer.Bytes())
+-	var seed = hmacv.Sum(nil)
+-	var temp = templates[int(seed[0])%len(templates)]
+-
+-	buffer.Truncate(0)
+-	for i, element := range temp {
+-		passChars := templateCharacters[element]
+-		passChar := passChars[int(seed[i+1])%len(passChars)]
+-		buffer.WriteByte(passChar)
+-	}
+-
+-	return buffer.String()
++	panic("scrypt cipher not available")
+ }
+ 
+ func generatePrivateKey(typ string) string {
+diff --git a/vendor/github.com/microsoft/go-mssqldb/integratedauth/ntlm/ntlm.go b/vendor/github.com/microsoft/go-mssqldb/integratedauth/ntlm/ntlm.go
+index d95032f..f5cbe66 100644
+--- a/vendor/github.com/microsoft/go-mssqldb/integratedauth/ntlm/ntlm.go
++++ b/vendor/github.com/microsoft/go-mssqldb/integratedauth/ntlm/ntlm.go
+@@ -16,7 +16,6 @@ import (
+ 	"github.com/microsoft/go-mssqldb/msdsn"
+ 
+ 	//lint:ignore SA1019 MD4 is used by legacy NTLM
+-	"golang.org/x/crypto/md4"
+ )
+ 
+ const (
+@@ -162,10 +161,7 @@ func lmResponse(challenge [8]byte, password string) [24]byte {
+ }
+ 
+ func ntlmHash(password string) (hash [21]byte) {
+-	h := md4.New()
+-	h.Write(utf16le(password))
+-	h.Sum(hash[:0])
+-	return
++	panic("md4 cipher not available")
+ }
+ 
+ func ntResponse(challenge [8]byte, password string) [24]byte {
+@@ -194,12 +190,7 @@ func ntlmSessionResponse(clientNonce [8]byte, serverChallenge [8]byte, password
+ }
+ 
+ func ntlmHashNoPadding(val string) []byte {
+-	hash := make([]byte, 16)
+-	h := md4.New()
+-	h.Write(utf16le(val))
+-	h.Sum(hash[:0])
+-
+-	return hash
++	panic("md4 cipher not available")
+ }
+ 
+ func hmacMD5(passwordHash, data []byte) []byte {
+diff --git a/vendor/github.com/Azure/azure-sdk-for-go/sdk/azidentity/client_certificate_credential.go b/vendor/github.com/Azure/azure-sdk-for-go/sdk/azidentity/client_certificate_credential.go
+index 804eba899e..221306e7dc 100644
+--- a/vendor/github.com/Azure/azure-sdk-for-go/sdk/azidentity/client_certificate_credential.go
++++ b/vendor/github.com/Azure/azure-sdk-for-go/sdk/azidentity/client_certificate_credential.go
+@@ -16,7 +16,6 @@ import (
+ 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
+ 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
+ 	"github.com/AzureAD/microsoft-authentication-library-for-go/apps/confidential"
+-	"golang.org/x/crypto/pkcs12"
+ )
+ 
+ const credNameCert = "ClientCertificateCredential"
+@@ -158,15 +157,7 @@ func loadPEMCert(certData []byte) ([]*pem.Block, error) {
+ }
+ 
+ func loadPKCS12Cert(certData []byte, password string) ([]*pem.Block, error) {
+-	blocks, err := pkcs12.ToPEM(certData, password)
+-	if err != nil {
+-		return nil, err
+-	}
+-	if len(blocks) == 0 {
+-		// not mentioning PKCS12 in this message because we end up here when certData is garbage
+-		return nil, errors.New("didn't find any certificate content")
+-	}
+-	return blocks, err
++	panic("pkcs12 cipher not available")
+ }
+ 
+ var _ azcore.TokenCredential = (*ClientCertificateCredential)(nil)
+diff --git a/vendor/github.com/Azure/go-autorest/autorest/adal/persist.go b/vendor/github.com/Azure/go-autorest/autorest/adal/persist.go
+index 2a974a3..1ea6648 100644
+--- a/vendor/github.com/Azure/go-autorest/autorest/adal/persist.go
++++ b/vendor/github.com/Azure/go-autorest/autorest/adal/persist.go
+@@ -23,8 +23,6 @@ import (
+ 	"io/ioutil"
+ 	"os"
+ 	"path/filepath"
+-
+-	"golang.org/x/crypto/pkcs12"
+ )
+ 
+ var (
+@@ -90,46 +88,5 @@ func SaveToken(path string, mode os.FileMode, token Token) error {
+ // private key or an error is returned.
+ // If the private key is not password protected pass the empty string for password.
+ func DecodePfxCertificateData(pfxData []byte, password string) (*x509.Certificate, *rsa.PrivateKey, error) {
+-	blocks, err := pkcs12.ToPEM(pfxData, password)
+-	if err != nil {
+-		return nil, nil, err
+-	}
+-	// first extract the private key
+-	var priv *rsa.PrivateKey
+-	for _, block := range blocks {
+-		if block.Type == "PRIVATE KEY" {
+-			priv, err = x509.ParsePKCS1PrivateKey(block.Bytes)
+-			if err != nil {
+-				return nil, nil, err
+-			}
+-			break
+-		}
+-	}
+-	if priv == nil {
+-		return nil, nil, ErrMissingPrivateKey
+-	}
+-	// now find the certificate with the matching public key of our private key
+-	var cert *x509.Certificate
+-	for _, block := range blocks {
+-		if block.Type == "CERTIFICATE" {
+-			pcert, err := x509.ParseCertificate(block.Bytes)
+-			if err != nil {
+-				return nil, nil, err
+-			}
+-			certKey, ok := pcert.PublicKey.(*rsa.PublicKey)
+-			if !ok {
+-				// keep looking
+-				continue
+-			}
+-			if priv.E == certKey.E && priv.N.Cmp(certKey.N) == 0 {
+-				// found a match
+-				cert = pcert
+-				break
+-			}
+-		}
+-	}
+-	if cert == nil {
+-		return nil, nil, ErrMissingCertificate
+-	}
+-	return cert, priv, nil
++	panic("pkcs12 cipher not available")
+ }
+diff --git a/vendor/github.com/Azure/go-ntlmssp/nlmp.go b/vendor/github.com/Azure/go-ntlmssp/nlmp.go
+index 1e65abe..0ef2301 100644
+--- a/vendor/github.com/Azure/go-ntlmssp/nlmp.go
++++ b/vendor/github.com/Azure/go-ntlmssp/nlmp.go
+@@ -10,7 +10,6 @@ package ntlmssp
+ import (
+ 	"crypto/hmac"
+ 	"crypto/md5"
+-	"golang.org/x/crypto/md4"
+ 	"strings"
+ )
+ 
+@@ -19,9 +18,7 @@ func getNtlmV2Hash(password, username, target string) []byte {
+ }
+ 
+ func getNtlmHash(password string) []byte {
+-	hash := md4.New()
+-	hash.Write(toUnicode(password))
+-	return hash.Sum(nil)
++	panic("md4 cipher not available")
+ }
+ 
+ func computeNtlmV2Response(ntlmV2Hash, serverChallenge, clientChallenge,
+diff --git a/vendor/github.com/ory/fosite/hash_bcrypt.go b/vendor/github.com/ory/fosite/hash_bcrypt.go
+index 44b8fcb..4a75d24 100644
+--- a/vendor/github.com/ory/fosite/hash_bcrypt.go
++++ b/vendor/github.com/ory/fosite/hash_bcrypt.go
+@@ -5,10 +5,6 @@ package fosite
+ 
+ import (
+ 	"context"
+-
+-	"github.com/ory/x/errorsx"
+-
+-	"golang.org/x/crypto/bcrypt"
+ )
+ 
+ const DefaultBCryptWorkFactor = 12
+@@ -21,20 +17,9 @@ type BCrypt struct {
+ }
+ 
+ func (b *BCrypt) Hash(ctx context.Context, data []byte) ([]byte, error) {
+-	wf := b.Config.GetBCryptCost(ctx)
+-	if wf == 0 {
+-		wf = DefaultBCryptWorkFactor
+-	}
+-	s, err := bcrypt.GenerateFromPassword(data, wf)
+-	if err != nil {
+-		return nil, errorsx.WithStack(err)
+-	}
+-	return s, nil
++	panic("bcrypt ciper not available")
+ }
+ 
+ func (b *BCrypt) Compare(ctx context.Context, hash, data []byte) error {
+-	if err := bcrypt.CompareHashAndPassword(hash, data); err != nil {
+-		return errorsx.WithStack(err)
+-	}
+-	return nil
++	panic("bcrypt cipher not available")
+ }
+diff --git a/vendor/filippo.io/age/internal/stream/stream.go b/vendor/filippo.io/age/internal/stream/stream.go
+index 7cf02c4..29f4f44 100644
+--- a/vendor/filippo.io/age/internal/stream/stream.go
++++ b/vendor/filippo.io/age/internal/stream/stream.go
+@@ -10,9 +10,6 @@ import (
+ 	"errors"
+ 	"fmt"
+ 	"io"
+-
+-	"golang.org/x/crypto/chacha20poly1305"
+-	"golang.org/x/crypto/poly1305"
+ )
+ 
+ const ChunkSize = 64 * 1024
+@@ -25,23 +22,16 @@ type Reader struct {
+ 	buf    [encChunkSize]byte
+ 
+ 	err   error
+-	nonce [chacha20poly1305.NonceSize]byte
++	nonce []byte
+ }
+ 
+ const (
+-	encChunkSize  = ChunkSize + poly1305.TagSize
++	encChunkSize  = ChunkSize
+ 	lastChunkFlag = 0x01
+ )
+ 
+ func NewReader(key []byte, src io.Reader) (*Reader, error) {
+-	aead, err := chacha20poly1305.New(key)
+-	if err != nil {
+-		return nil, err
+-	}
+-	return &Reader{
+-		a:   aead,
+-		src: src,
+-	}, nil
++	panic("chacha20poly1305 cipher not available")
+ }
+ 
+ func (r *Reader) Read(p []byte) (int, error) {
+@@ -87,64 +77,20 @@ func (r *Reader) Read(p []byte) (int, error) {
+ // in r.unread. last is true if the chunk was marked as the end of the message.
+ // readChunk must not be called again after returning a last chunk or an error.
+ func (r *Reader) readChunk() (last bool, err error) {
+-	if len(r.unread) != 0 {
+-		panic("stream: internal error: readChunk called with dirty buffer")
+-	}
++	panic("poly1305 cipher not available")
+ 
+-	in := r.buf[:]
+-	n, err := io.ReadFull(r.src, in)
+-	switch {
+-	case err == io.EOF:
+-		// A message can't end without a marked chunk. This message is truncated.
+-		return false, io.ErrUnexpectedEOF
+-	case err == io.ErrUnexpectedEOF:
+-		// The last chunk can be short, but not empty unless it's the first and
+-		// only chunk.
+-		if !nonceIsZero(&r.nonce) && n == r.a.Overhead() {
+-			return false, errors.New("last chunk is empty, try age v1.0.0, and please consider reporting this")
+-		}
+-		in = in[:n]
+-		last = true
+-		setLastChunkFlag(&r.nonce)
+-	case err != nil:
+-		return false, err
+-	}
+-
+-	outBuf := make([]byte, 0, ChunkSize)
+-	out, err := r.a.Open(outBuf, r.nonce[:], in, nil)
+-	if err != nil && !last {
+-		// Check if this was a full-length final chunk.
+-		last = true
+-		setLastChunkFlag(&r.nonce)
+-		out, err = r.a.Open(outBuf, r.nonce[:], in, nil)
+-	}
+-	if err != nil {
+-		return false, errors.New("failed to decrypt and authenticate payload chunk")
+-	}
+-
+-	incNonce(&r.nonce)
+-	r.unread = r.buf[:copy(r.buf[:], out)]
+-	return last, nil
+ }
+ 
+-func incNonce(nonce *[chacha20poly1305.NonceSize]byte) {
+-	for i := len(nonce) - 2; i >= 0; i-- {
+-		nonce[i]++
+-		if nonce[i] != 0 {
+-			break
+-		} else if i == 0 {
+-			// The counter is 88 bits, this is unreachable.
+-			panic("stream: chunk counter wrapped around")
+-		}
+-	}
++func incNonce(nonce *[]byte) {
++	panic("chacha20poly1305 cipher not available")
+ }
+ 
+-func setLastChunkFlag(nonce *[chacha20poly1305.NonceSize]byte) {
+-	nonce[len(nonce)-1] = lastChunkFlag
++func setLastChunkFlag(nonce *[]byte) {
++	panic("chacha20poly1305 cipher not available")
+ }
+ 
+-func nonceIsZero(nonce *[chacha20poly1305.NonceSize]byte) bool {
+-	return *nonce == [chacha20poly1305.NonceSize]byte{}
++func nonceIsZero(nonce *[]byte) bool {
++	panic("chacha20poly1305 cipher not available")
+ }
+ 
+ type Writer struct {
+@@ -152,47 +98,17 @@ type Writer struct {
+ 	dst       io.Writer
+ 	unwritten []byte // backed by buf
+ 	buf       [encChunkSize]byte
+-	nonce     [chacha20poly1305.NonceSize]byte
++	nonce     []byte
+ 	err       error
+ }
+ 
+ func NewWriter(key []byte, dst io.Writer) (*Writer, error) {
+-	aead, err := chacha20poly1305.New(key)
+-	if err != nil {
+-		return nil, err
+-	}
+-	w := &Writer{
+-		a:   aead,
+-		dst: dst,
+-	}
+-	w.unwritten = w.buf[:0]
+-	return w, nil
++	panic("chacha20poly1305 cipher not available")
++
+ }
+ 
+ func (w *Writer) Write(p []byte) (n int, err error) {
+-	// TODO: consider refactoring with a bytes.Buffer.
+-	if w.err != nil {
+-		return 0, w.err
+-	}
+-	if len(p) == 0 {
+-		return 0, nil
+-	}
+-
+-	total := len(p)
+-	for len(p) > 0 {
+-		freeBuf := w.buf[len(w.unwritten):ChunkSize]
+-		n := copy(freeBuf, p)
+-		p = p[n:]
+-		w.unwritten = w.unwritten[:len(w.unwritten)+n]
+-
+-		if len(w.unwritten) == ChunkSize && len(p) > 0 {
+-			if err := w.flushChunk(notLastChunk); err != nil {
+-				w.err = err
+-				return 0, err
+-			}
+-		}
+-	}
+-	return total, nil
++	panic("chacha20poly1305 cipher not available")
+ }
+ 
+ // Close flushes the last chunk. It does not close the underlying Writer.
+@@ -216,16 +132,5 @@ const (
+ )
+ 
+ func (w *Writer) flushChunk(last bool) error {
+-	if !last && len(w.unwritten) != ChunkSize {
+-		panic("stream: internal error: flush called with partial chunk")
+-	}
+-
+-	if last {
+-		setLastChunkFlag(&w.nonce)
+-	}
+-	buf := w.a.Seal(w.buf[:0], w.nonce[:], w.unwritten, nil)
+-	_, err := w.dst.Write(buf)
+-	w.unwritten = w.buf[:0]
+-	incNonce(&w.nonce)
+-	return err
++	panic("chacha20poly1305 cipher not available")
+ }
+diff --git a/vendor/filippo.io/age/primitives.go b/vendor/filippo.io/age/primitives.go
+index 804b019..2ee760f 100644
+--- a/vendor/filippo.io/age/primitives.go
++++ b/vendor/filippo.io/age/primitives.go
+@@ -5,29 +5,14 @@
+ package age
+ 
+ import (
+-	"crypto/hmac"
+-	"crypto/sha256"
+ 	"errors"
+-	"io"
+ 
+ 	"filippo.io/age/internal/format"
+-	"golang.org/x/crypto/chacha20poly1305"
+-	"golang.org/x/crypto/hkdf"
+ )
+ 
+ // aeadEncrypt encrypts a message with a one-time key.
+ func aeadEncrypt(key, plaintext []byte) ([]byte, error) {
+-	aead, err := chacha20poly1305.New(key)
+-	if err != nil {
+-		return nil, err
+-	}
+-	// The nonce is fixed because this function is only used in places where the
+-	// spec guarantees each key is only used once (by deriving it from values
+-	// that include fresh randomness), allowing us to save the overhead.
+-	// For the code that encrypts the actual payload, look at the
+-	// filippo.io/age/internal/stream package.
+-	nonce := make([]byte, chacha20poly1305.NonceSize)
+-	return aead.Seal(nil, nonce, plaintext, nil), nil
++	panic("chacha20poly1305 cipher not available")
+ }
+ 
+ var errIncorrectCiphertextSize = errors.New("encrypted value has unexpected length")
+@@ -38,35 +23,13 @@ var errIncorrectCiphertextSize = errors.New("encrypted value has unexpected leng
+ // can be crafted that decrypts successfully under multiple keys. Short
+ // ciphertexts can only target two keys, which has limited impact.
+ func aeadDecrypt(key []byte, size int, ciphertext []byte) ([]byte, error) {
+-	aead, err := chacha20poly1305.New(key)
+-	if err != nil {
+-		return nil, err
+-	}
+-	if len(ciphertext) != size+aead.Overhead() {
+-		return nil, errIncorrectCiphertextSize
+-	}
+-	nonce := make([]byte, chacha20poly1305.NonceSize)
+-	return aead.Open(nil, nonce, ciphertext, nil)
++	panic("chacha20poly1305 cipher not available")
+ }
+ 
+ func headerMAC(fileKey []byte, hdr *format.Header) ([]byte, error) {
+-	h := hkdf.New(sha256.New, fileKey, nil, []byte("header"))
+-	hmacKey := make([]byte, 32)
+-	if _, err := io.ReadFull(h, hmacKey); err != nil {
+-		return nil, err
+-	}
+-	hh := hmac.New(sha256.New, hmacKey)
+-	if err := hdr.MarshalWithoutMAC(hh); err != nil {
+-		return nil, err
+-	}
+-	return hh.Sum(nil), nil
++	panic("hkdf cipher not available")
+ }
+ 
+ func streamKey(fileKey, nonce []byte) []byte {
+-	h := hkdf.New(sha256.New, fileKey, nonce, []byte("payload"))
+-	streamKey := make([]byte, chacha20poly1305.KeySize)
+-	if _, err := io.ReadFull(h, streamKey); err != nil {
+-		panic("age: internal error: failed to read from HKDF: " + err.Error())
+-	}
+-	return streamKey
++	panic("chacha20poly1305 cipher not available")
+ }
+diff --git a/vendor/filippo.io/age/scrypt.go b/vendor/filippo.io/age/scrypt.go
+index 1346ad1..a97e385 100644
+--- a/vendor/filippo.io/age/scrypt.go
++++ b/vendor/filippo.io/age/scrypt.go
+@@ -5,15 +5,8 @@
+ package age
+ 
+ import (
+-	"crypto/rand"
+ 	"errors"
+-	"fmt"
+ 	"regexp"
+-	"strconv"
+-
+-	"filippo.io/age/internal/format"
+-	"golang.org/x/crypto/chacha20poly1305"
+-	"golang.org/x/crypto/scrypt"
+ )
+ 
+ const scryptLabel = "age-encryption.org/v1/scrypt"
+@@ -61,30 +54,7 @@ func (r *ScryptRecipient) SetWorkFactor(logN int) {
+ const scryptSaltSize = 16
+ 
+ func (r *ScryptRecipient) Wrap(fileKey []byte) ([]*Stanza, error) {
+-	salt := make([]byte, scryptSaltSize)
+-	if _, err := rand.Read(salt[:]); err != nil {
+-		return nil, err
+-	}
+-
+-	logN := r.workFactor
+-	l := &Stanza{
+-		Type: "scrypt",
+-		Args: []string{format.EncodeToString(salt), strconv.Itoa(logN)},
+-	}
+-
+-	salt = append([]byte(scryptLabel), salt...)
+-	k, err := scrypt.Key(r.password, salt, 1<<logN, 8, 1, chacha20poly1305.KeySize)
+-	if err != nil {
+-		return nil, fmt.Errorf("failed to generate scrypt hash: %v", err)
+-	}
+-
+-	wrappedKey, err := aeadEncrypt(k, fileKey)
+-	if err != nil {
+-		return nil, err
+-	}
+-	l.Body = wrappedKey
+-
+-	return []*Stanza{l}, nil
++	panic("chacha20poly1305 cipher not available")
+ }
+ 
+ // ScryptIdentity is a password-based identity.
+@@ -132,51 +102,5 @@ func (i *ScryptIdentity) Unwrap(stanzas []*Stanza) ([]byte, error) {
+ var digitsRe = regexp.MustCompile(`^[1-9][0-9]*$`)
+ 
+ func (i *ScryptIdentity) unwrap(block *Stanza) ([]byte, error) {
+-	if block.Type != "scrypt" {
+-		return nil, ErrIncorrectIdentity
+-	}
+-	if len(block.Args) != 2 {
+-		return nil, errors.New("invalid scrypt recipient block")
+-	}
+-	salt, err := format.DecodeString(block.Args[0])
+-	if err != nil {
+-		return nil, fmt.Errorf("failed to parse scrypt salt: %v", err)
+-	}
+-	if len(salt) != scryptSaltSize {
+-		return nil, errors.New("invalid scrypt recipient block")
+-	}
+-	if w := block.Args[1]; !digitsRe.MatchString(w) {
+-		return nil, fmt.Errorf("scrypt work factor encoding invalid: %q", w)
+-	}
+-	logN, err := strconv.Atoi(block.Args[1])
+-	if err != nil {
+-		return nil, fmt.Errorf("failed to parse scrypt work factor: %v", err)
+-	}
+-	if logN > i.maxWorkFactor {
+-		return nil, fmt.Errorf("scrypt work factor too large: %v", logN)
+-	}
+-	if logN <= 0 { // unreachable
+-		return nil, fmt.Errorf("invalid scrypt work factor: %v", logN)
+-	}
+-
+-	salt = append([]byte(scryptLabel), salt...)
+-	k, err := scrypt.Key(i.password, salt, 1<<logN, 8, 1, chacha20poly1305.KeySize)
+-	if err != nil { // unreachable
+-		return nil, fmt.Errorf("failed to generate scrypt hash: %v", err)
+-	}
+-
+-	// This AEAD is not robust, so an attacker could craft a message that
+-	// decrypts under two different keys (meaning two different passphrases) and
+-	// then use an error side-channel in an online decryption oracle to learn if
+-	// either key is correct. This is deemed acceptable because the use case (an
+-	// online decryption oracle) is not recommended, and the security loss is
+-	// only one bit. This also does not bypass any scrypt work, although that work
+-	// can be precomputed in an online oracle scenario.
+-	fileKey, err := aeadDecrypt(k, fileKeySize, block.Body)
+-	if err == errIncorrectCiphertextSize {
+-		return nil, errors.New("invalid scrypt recipient block: incorrect file key size")
+-	} else if err != nil {
+-		return nil, ErrIncorrectIdentity
+-	}
+-	return fileKey, nil
++	panic("chacha20poly1305 cipher not available")
+ }
+diff --git a/vendor/filippo.io/age/x25519.go b/vendor/filippo.io/age/x25519.go
+index 6cd87a8..f0d7dd7 100644
+--- a/vendor/filippo.io/age/x25519.go
++++ b/vendor/filippo.io/age/x25519.go
+@@ -5,18 +5,10 @@
+ package age
+ 
+ import (
+-	"crypto/rand"
+-	"crypto/sha256"
+-	"errors"
+ 	"fmt"
+-	"io"
+ 	"strings"
+ 
+ 	"filippo.io/age/internal/bech32"
+-	"filippo.io/age/internal/format"
+-	"golang.org/x/crypto/chacha20poly1305"
+-	"golang.org/x/crypto/curve25519"
+-	"golang.org/x/crypto/hkdf"
+ )
+ 
+ const x25519Label = "age-encryption.org/v1/X25519"
+@@ -34,14 +26,7 @@ var _ Recipient = &X25519Recipient{}
+ 
+ // newX25519RecipientFromPoint returns a new X25519Recipient from a raw Curve25519 point.
+ func newX25519RecipientFromPoint(publicKey []byte) (*X25519Recipient, error) {
+-	if len(publicKey) != curve25519.PointSize {
+-		return nil, errors.New("invalid X25519 public key")
+-	}
+-	r := &X25519Recipient{
+-		theirPublicKey: make([]byte, curve25519.PointSize),
+-	}
+-	copy(r.theirPublicKey, publicKey)
+-	return r, nil
++	panic("curve25519 cipher not available")
+ }
+ 
+ // ParseX25519Recipient returns a new X25519Recipient from a Bech32 public key
+@@ -62,41 +47,7 @@ func ParseX25519Recipient(s string) (*X25519Recipient, error) {
+ }
+ 
+ func (r *X25519Recipient) Wrap(fileKey []byte) ([]*Stanza, error) {
+-	ephemeral := make([]byte, curve25519.ScalarSize)
+-	if _, err := rand.Read(ephemeral); err != nil {
+-		return nil, err
+-	}
+-	ourPublicKey, err := curve25519.X25519(ephemeral, curve25519.Basepoint)
+-	if err != nil {
+-		return nil, err
+-	}
+-
+-	sharedSecret, err := curve25519.X25519(ephemeral, r.theirPublicKey)
+-	if err != nil {
+-		return nil, err
+-	}
+-
+-	l := &Stanza{
+-		Type: "X25519",
+-		Args: []string{format.EncodeToString(ourPublicKey)},
+-	}
+-
+-	salt := make([]byte, 0, len(ourPublicKey)+len(r.theirPublicKey))
+-	salt = append(salt, ourPublicKey...)
+-	salt = append(salt, r.theirPublicKey...)
+-	h := hkdf.New(sha256.New, sharedSecret, salt, []byte(x25519Label))
+-	wrappingKey := make([]byte, chacha20poly1305.KeySize)
+-	if _, err := io.ReadFull(h, wrappingKey); err != nil {
+-		return nil, err
+-	}
+-
+-	wrappedKey, err := aeadEncrypt(wrappingKey, fileKey)
+-	if err != nil {
+-		return nil, err
+-	}
+-	l.Body = wrappedKey
+-
+-	return []*Stanza{l}, nil
++	panic("chacha20poly1305 cipher not available")
+ }
+ 
+ // String returns the Bech32 public key encoding of r.
+@@ -115,24 +66,12 @@ var _ Identity = &X25519Identity{}
+ 
+ // newX25519IdentityFromScalar returns a new X25519Identity from a raw Curve25519 scalar.
+ func newX25519IdentityFromScalar(secretKey []byte) (*X25519Identity, error) {
+-	if len(secretKey) != curve25519.ScalarSize {
+-		return nil, errors.New("invalid X25519 secret key")
+-	}
+-	i := &X25519Identity{
+-		secretKey: make([]byte, curve25519.ScalarSize),
+-	}
+-	copy(i.secretKey, secretKey)
+-	i.ourPublicKey, _ = curve25519.X25519(i.secretKey, curve25519.Basepoint)
+-	return i, nil
++	panic("curve25519 cipher not available")
+ }
+ 
+ // GenerateX25519Identity randomly generates a new X25519Identity.
+ func GenerateX25519Identity() (*X25519Identity, error) {
+-	secretKey := make([]byte, curve25519.ScalarSize)
+-	if _, err := rand.Read(secretKey); err != nil {
+-		return nil, fmt.Errorf("internal error: %v", err)
+-	}
+-	return newX25519IdentityFromScalar(secretKey)
++	panic("curve25519 cipher not available")
+ }
+ 
+ // ParseX25519Identity returns a new X25519Identity from a Bech32 private key
+@@ -157,41 +96,7 @@ func (i *X25519Identity) Unwrap(stanzas []*Stanza) ([]byte, error) {
+ }
+ 
+ func (i *X25519Identity) unwrap(block *Stanza) ([]byte, error) {
+-	if block.Type != "X25519" {
+-		return nil, ErrIncorrectIdentity
+-	}
+-	if len(block.Args) != 1 {
+-		return nil, errors.New("invalid X25519 recipient block")
+-	}
+-	publicKey, err := format.DecodeString(block.Args[0])
+-	if err != nil {
+-		return nil, fmt.Errorf("failed to parse X25519 recipient: %v", err)
+-	}
+-	if len(publicKey) != curve25519.PointSize {
+-		return nil, errors.New("invalid X25519 recipient block")
+-	}
+-
+-	sharedSecret, err := curve25519.X25519(i.secretKey, publicKey)
+-	if err != nil {
+-		return nil, fmt.Errorf("invalid X25519 recipient: %v", err)
+-	}
+-
+-	salt := make([]byte, 0, len(publicKey)+len(i.ourPublicKey))
+-	salt = append(salt, publicKey...)
+-	salt = append(salt, i.ourPublicKey...)
+-	h := hkdf.New(sha256.New, sharedSecret, salt, []byte(x25519Label))
+-	wrappingKey := make([]byte, chacha20poly1305.KeySize)
+-	if _, err := io.ReadFull(h, wrappingKey); err != nil {
+-		return nil, err
+-	}
+-
+-	fileKey, err := aeadDecrypt(wrappingKey, fileKeySize, block.Body)
+-	if err == errIncorrectCiphertextSize {
+-		return nil, errors.New("invalid X25519 recipient block: incorrect file key size")
+-	} else if err != nil {
+-		return nil, ErrIncorrectIdentity
+-	}
+-	return fileKey, nil
++	panic("chacha20poly1305 cipher not available")
+ }
+ 
+ // Recipient returns the public X25519Recipient value corresponding to i.
+diff --git a/vendor/gopkg.in/square/go-jose.v2/asymmetric.go b/vendor/gopkg.in/square/go-jose.v2/asymmetric.go
+index b69aa03..ba67845 100644
+--- a/vendor/gopkg.in/square/go-jose.v2/asymmetric.go
++++ b/vendor/gopkg.in/square/go-jose.v2/asymmetric.go
+@@ -28,7 +28,6 @@ import (
+ 	"fmt"
+ 	"math/big"
+ 
+-	"golang.org/x/crypto/ed25519"
+ 	josecipher "gopkg.in/square/go-jose.v2/cipher"
+ 	"gopkg.in/square/go-jose.v2/json"
+ )
+@@ -48,10 +47,6 @@ type ecEncrypterVerifier struct {
+ 	publicKey *ecdsa.PublicKey
+ }
+ 
+-type edEncrypterVerifier struct {
+-	publicKey ed25519.PublicKey
+-}
+-
+ // A key generator for ECDH-ES
+ type ecKeyGenerator struct {
+ 	size      int
+@@ -64,10 +59,6 @@ type ecDecrypterSigner struct {
+ 	privateKey *ecdsa.PrivateKey
+ }
+ 
+-type edDecrypterSigner struct {
+-	privateKey ed25519.PrivateKey
+-}
+-
+ // newRSARecipient creates recipientKeyInfo based on the given key.
+ func newRSARecipient(keyAlg KeyAlgorithm, publicKey *rsa.PublicKey) (recipientKeyInfo, error) {
+ 	// Verify that key management algorithm is supported by this encrypter
+@@ -113,25 +104,6 @@ func newRSASigner(sigAlg SignatureAlgorithm, privateKey *rsa.PrivateKey) (recipi
+ 	}, nil
+ }
+ 
+-func newEd25519Signer(sigAlg SignatureAlgorithm, privateKey ed25519.PrivateKey) (recipientSigInfo, error) {
+-	if sigAlg != EdDSA {
+-		return recipientSigInfo{}, ErrUnsupportedAlgorithm
+-	}
+-
+-	if privateKey == nil {
+-		return recipientSigInfo{}, errors.New("invalid private key")
+-	}
+-	return recipientSigInfo{
+-		sigAlg: sigAlg,
+-		publicKey: staticPublicKey(&JSONWebKey{
+-			Key: privateKey.Public(),
+-		}),
+-		signer: &edDecrypterSigner{
+-			privateKey: privateKey,
+-		},
+-	}, nil
+-}
+-
+ // newECDHRecipient creates recipientKeyInfo based on the given key.
+ func newECDHRecipient(keyAlg KeyAlgorithm, publicKey *ecdsa.PublicKey) (recipientKeyInfo, error) {
+ 	// Verify that key management algorithm is supported by this encrypter
+@@ -467,33 +439,6 @@ func (ctx ecDecrypterSigner) decryptKey(headers rawHeader, recipient *recipientI
+ 	return josecipher.KeyUnwrap(block, recipient.encryptedKey)
+ }
+ 
+-func (ctx edDecrypterSigner) signPayload(payload []byte, alg SignatureAlgorithm) (Signature, error) {
+-	if alg != EdDSA {
+-		return Signature{}, ErrUnsupportedAlgorithm
+-	}
+-
+-	sig, err := ctx.privateKey.Sign(RandReader, payload, crypto.Hash(0))
+-	if err != nil {
+-		return Signature{}, err
+-	}
+-
+-	return Signature{
+-		Signature: sig,
+-		protected: &rawHeader{},
+-	}, nil
+-}
+-
+-func (ctx edEncrypterVerifier) verifyPayload(payload []byte, signature []byte, alg SignatureAlgorithm) error {
+-	if alg != EdDSA {
+-		return ErrUnsupportedAlgorithm
+-	}
+-	ok := ed25519.Verify(ctx.publicKey, payload, signature)
+-	if !ok {
+-		return errors.New("square/go-jose: ed25519 signature failed to verify")
+-	}
+-	return nil
+-}
+-
+ // Sign the given payload
+ func (ctx ecDecrypterSigner) signPayload(payload []byte, alg SignatureAlgorithm) (Signature, error) {
+ 	var expectedBitSize int
+diff --git a/vendor/gopkg.in/square/go-jose.v2/jwk.go b/vendor/gopkg.in/square/go-jose.v2/jwk.go
+index 222e260..98438e1 100644
+--- a/vendor/gopkg.in/square/go-jose.v2/jwk.go
++++ b/vendor/gopkg.in/square/go-jose.v2/jwk.go
+@@ -34,8 +34,6 @@ import (
+ 	"reflect"
+ 	"strings"
+ 
+-	"golang.org/x/crypto/ed25519"
+-
+ 	"gopkg.in/square/go-jose.v2/json"
+ )
+ 
+@@ -95,14 +93,10 @@ func (k JSONWebKey) MarshalJSON() ([]byte, error) {
+ 	var err error
+ 
+ 	switch key := k.Key.(type) {
+-	case ed25519.PublicKey:
+-		raw = fromEdPublicKey(key)
+ 	case *ecdsa.PublicKey:
+ 		raw, err = fromEcPublicKey(key)
+ 	case *rsa.PublicKey:
+ 		raw = fromRsaPublicKey(key)
+-	case ed25519.PrivateKey:
+-		raw, err = fromEdPrivateKey(key)
+ 	case *ecdsa.PrivateKey:
+ 		raw, err = fromEcPrivateKey(key)
+ 	case *rsa.PrivateKey:
+@@ -216,15 +210,7 @@ func (k *JSONWebKey) UnmarshalJSON(data []byte) (err error) {
+ 		key, err = raw.symmetricKey()
+ 	case "OKP":
+ 		if raw.Crv == "Ed25519" && raw.X != nil {
+-			if raw.D != nil {
+-				key, err = raw.edPrivateKey()
+-				if err == nil {
+-					keyPub = key.(ed25519.PrivateKey).Public()
+-				}
+-			} else {
+-				key, err = raw.edPublicKey()
+-				keyPub = key
+-			}
++			panic("ed25519 cipher not available")
+ 		} else {
+ 			err = fmt.Errorf("square/go-jose: unknown curve %s'", raw.Crv)
+ 		}
+@@ -356,23 +342,12 @@ func rsaThumbprintInput(n *big.Int, e int) (string, error) {
+ 		newBuffer(n.Bytes()).base64()), nil
+ }
+ 
+-func edThumbprintInput(ed ed25519.PublicKey) (string, error) {
+-	crv := "Ed25519"
+-	if len(ed) > 32 {
+-		return "", errors.New("square/go-jose: invalid elliptic key (too large)")
+-	}
+-	return fmt.Sprintf(edThumbprintTemplate, crv,
+-		newFixedSizeBuffer(ed, 32).base64()), nil
+-}
+-
+ // Thumbprint computes the JWK Thumbprint of a key using the
+ // indicated hash algorithm.
+ func (k *JSONWebKey) Thumbprint(hash crypto.Hash) ([]byte, error) {
+ 	var input string
+ 	var err error
+ 	switch key := k.Key.(type) {
+-	case ed25519.PublicKey:
+-		input, err = edThumbprintInput(key)
+ 	case *ecdsa.PublicKey:
+ 		input, err = ecThumbprintInput(key.Curve, key.X, key.Y)
+ 	case *ecdsa.PrivateKey:
+@@ -381,8 +356,6 @@ func (k *JSONWebKey) Thumbprint(hash crypto.Hash) ([]byte, error) {
+ 		input, err = rsaThumbprintInput(key.N, key.E)
+ 	case *rsa.PrivateKey:
+ 		input, err = rsaThumbprintInput(key.N, key.E)
+-	case ed25519.PrivateKey:
+-		input, err = edThumbprintInput(ed25519.PublicKey(key[32:]))
+ 	default:
+ 		return nil, fmt.Errorf("square/go-jose: unknown key type '%s'", reflect.TypeOf(key))
+ 	}
+@@ -399,7 +372,7 @@ func (k *JSONWebKey) Thumbprint(hash crypto.Hash) ([]byte, error) {
+ // IsPublic returns true if the JWK represents a public key (not symmetric, not private).
+ func (k *JSONWebKey) IsPublic() bool {
+ 	switch k.Key.(type) {
+-	case *ecdsa.PublicKey, *rsa.PublicKey, ed25519.PublicKey:
++	case *ecdsa.PublicKey, *rsa.PublicKey:
+ 		return true
+ 	default:
+ 		return false
+@@ -417,8 +390,6 @@ func (k *JSONWebKey) Public() JSONWebKey {
+ 		ret.Key = key.Public()
+ 	case *rsa.PrivateKey:
+ 		ret.Key = key.Public()
+-	case ed25519.PrivateKey:
+-		ret.Key = key.Public()
+ 	default:
+ 		return JSONWebKey{} // returning invalid key
+ 	}
+@@ -447,14 +418,6 @@ func (k *JSONWebKey) Valid() bool {
+ 		if key.N == nil || key.E == 0 || key.D == nil || len(key.Primes) < 2 {
+ 			return false
+ 		}
+-	case ed25519.PublicKey:
+-		if len(key) != 32 {
+-			return false
+-		}
+-	case ed25519.PrivateKey:
+-		if len(key) != 64 {
+-			return false
+-		}
+ 	default:
+ 		return false
+ 	}
+@@ -472,14 +435,6 @@ func (key rawJSONWebKey) rsaPublicKey() (*rsa.PublicKey, error) {
+ 	}, nil
+ }
+ 
+-func fromEdPublicKey(pub ed25519.PublicKey) *rawJSONWebKey {
+-	return &rawJSONWebKey{
+-		Kty: "OKP",
+-		Crv: "Ed25519",
+-		X:   newBuffer(pub),
+-	}
+-}
+-
+ func fromRsaPublicKey(pub *rsa.PublicKey) *rawJSONWebKey {
+ 	return &rawJSONWebKey{
+ 		Kty: "RSA",
+@@ -559,36 +514,6 @@ func fromEcPublicKey(pub *ecdsa.PublicKey) (*rawJSONWebKey, error) {
+ 	return key, nil
+ }
+ 
+-func (key rawJSONWebKey) edPrivateKey() (ed25519.PrivateKey, error) {
+-	var missing []string
+-	switch {
+-	case key.D == nil:
+-		missing = append(missing, "D")
+-	case key.X == nil:
+-		missing = append(missing, "X")
+-	}
+-
+-	if len(missing) > 0 {
+-		return nil, fmt.Errorf("square/go-jose: invalid Ed25519 private key, missing %s value(s)", strings.Join(missing, ", "))
+-	}
+-
+-	privateKey := make([]byte, ed25519.PrivateKeySize)
+-	copy(privateKey[0:32], key.D.bytes())
+-	copy(privateKey[32:], key.X.bytes())
+-	rv := ed25519.PrivateKey(privateKey)
+-	return rv, nil
+-}
+-
+-func (key rawJSONWebKey) edPublicKey() (ed25519.PublicKey, error) {
+-	if key.X == nil {
+-		return nil, fmt.Errorf("square/go-jose: invalid Ed key, missing x value")
+-	}
+-	publicKey := make([]byte, ed25519.PublicKeySize)
+-	copy(publicKey[0:32], key.X.bytes())
+-	rv := ed25519.PublicKey(publicKey)
+-	return rv, nil
+-}
+-
+ func (key rawJSONWebKey) rsaPrivateKey() (*rsa.PrivateKey, error) {
+ 	var missing []string
+ 	switch {
+@@ -634,13 +559,6 @@ func (key rawJSONWebKey) rsaPrivateKey() (*rsa.PrivateKey, error) {
+ 	return rv, err
+ }
+ 
+-func fromEdPrivateKey(ed ed25519.PrivateKey) (*rawJSONWebKey, error) {
+-	raw := fromEdPublicKey(ed25519.PublicKey(ed[32:]))
+-
+-	raw.D = newBuffer(ed[0:32])
+-	return raw, nil
+-}
+-
+ func fromRsaPrivateKey(rsa *rsa.PrivateKey) (*rawJSONWebKey, error) {
+ 	if len(rsa.Primes) != 2 {
+ 		return nil, ErrUnsupportedKeyType
+diff --git a/vendor/gopkg.in/square/go-jose.v2/signing.go b/vendor/gopkg.in/square/go-jose.v2/signing.go
+index bad820c..8065475 100644
+--- a/vendor/gopkg.in/square/go-jose.v2/signing.go
++++ b/vendor/gopkg.in/square/go-jose.v2/signing.go
+@@ -24,8 +24,6 @@ import (
+ 	"errors"
+ 	"fmt"
+ 
+-	"golang.org/x/crypto/ed25519"
+-
+ 	"gopkg.in/square/go-jose.v2/json"
+ )
+ 
+@@ -154,10 +152,6 @@ func NewMultiSigner(sigs []SigningKey, opts *SignerOptions) (Signer, error) {
+ // newVerifier creates a verifier based on the key type
+ func newVerifier(verificationKey interface{}) (payloadVerifier, error) {
+ 	switch verificationKey := verificationKey.(type) {
+-	case ed25519.PublicKey:
+-		return &edEncrypterVerifier{
+-			publicKey: verificationKey,
+-		}, nil
+ 	case *rsa.PublicKey:
+ 		return &rsaEncrypterVerifier{
+ 			publicKey: verificationKey,
+@@ -193,8 +187,6 @@ func (ctx *genericSigner) addRecipient(alg SignatureAlgorithm, signingKey interf
+ 
+ func makeJWSRecipient(alg SignatureAlgorithm, signingKey interface{}) (recipientSigInfo, error) {
+ 	switch signingKey := signingKey.(type) {
+-	case ed25519.PrivateKey:
+-		return newEd25519Signer(alg, signingKey)
+ 	case *rsa.PrivateKey:
+ 		return newRSASigner(alg, signingKey)
+ 	case *ecdsa.PrivateKey:
+diff --git a/vendor/k8s.io/apiserver/pkg/storage/value/encrypt/envelope/envelope.go b/vendor/k8s.io/apiserver/pkg/storage/value/encrypt/envelope/envelope.go
+index 4bb18ee8..a3342a76 100644
+--- a/vendor/k8s.io/apiserver/pkg/storage/value/encrypt/envelope/envelope.go
++++ b/vendor/k8s.io/apiserver/pkg/storage/value/encrypt/envelope/envelope.go
+@@ -23,14 +23,11 @@ import (
+ 	"crypto/cipher"
+ 	"crypto/rand"
+ 	"encoding/base64"
+-	"fmt"
+ 	"time"
+ 
+ 	"k8s.io/apiserver/pkg/storage/value"
+ 	"k8s.io/apiserver/pkg/storage/value/encrypt/envelope/metrics"
+ 	"k8s.io/utils/lru"
+-
+-	"golang.org/x/crypto/cryptobyte"
+ )
+ 
+ func init() {
+@@ -82,75 +79,12 @@ func NewEnvelopeTransformer(envelopeService Service, cacheSize int, baseTransfor
+ 
+ // TransformFromStorage decrypts data encrypted by this transformer using envelope encryption.
+ func (t *envelopeTransformer) TransformFromStorage(ctx context.Context, data []byte, dataCtx value.Context) ([]byte, bool, error) {
+-	metrics.RecordArrival(metrics.FromStorageLabel, time.Now())
+-
+-	// Read the 16 bit length-of-DEK encoded at the start of the encrypted DEK. 16 bits can
+-	// represent a maximum key length of 65536 bytes. We are using a 256 bit key, whose
+-	// length cannot fit in 8 bits (1 byte). Thus, we use 16 bits (2 bytes) to store the length.
+-	var encKey cryptobyte.String
+-	s := cryptobyte.String(data)
+-	if ok := s.ReadUint16LengthPrefixed(&encKey); !ok {
+-		return nil, false, fmt.Errorf("invalid data encountered by envelope transformer: failed to read uint16 length prefixed data")
+-	}
+-
+-	encData := []byte(s)
+-
+-	// Look up the decrypted DEK from cache or Envelope.
+-	transformer := t.getTransformer(encKey)
+-	if transformer == nil {
+-		if t.cacheEnabled {
+-			value.RecordCacheMiss()
+-		}
+-		key, err := t.envelopeService.Decrypt(encKey)
+-		if err != nil {
+-			// Do NOT wrap this err using fmt.Errorf() or similar functions
+-			// because this gRPC status error has useful error code when
+-			// record the metric.
+-			return nil, false, err
+-		}
+-
+-		transformer, err = t.addTransformer(encKey, key)
+-		if err != nil {
+-			return nil, false, err
+-		}
+-	}
+-
+-	return transformer.TransformFromStorage(ctx, encData, dataCtx)
++	panic("cryptobyte cipher not available")
+ }
+ 
+ // TransformToStorage encrypts data to be written to disk using envelope encryption.
+ func (t *envelopeTransformer) TransformToStorage(ctx context.Context, data []byte, dataCtx value.Context) ([]byte, error) {
+-	metrics.RecordArrival(metrics.ToStorageLabel, time.Now())
+-	newKey, err := generateKey(32)
+-	if err != nil {
+-		return nil, err
+-	}
+-
+-	encKey, err := t.envelopeService.Encrypt(newKey)
+-	if err != nil {
+-		// Do NOT wrap this err using fmt.Errorf() or similar functions
+-		// because this gRPC status error has useful error code when
+-		// record the metric.
+-		return nil, err
+-	}
+-
+-	transformer, err := t.addTransformer(encKey, newKey)
+-	if err != nil {
+-		return nil, err
+-	}
+-
+-	result, err := transformer.TransformToStorage(ctx, data, dataCtx)
+-	if err != nil {
+-		return nil, err
+-	}
+-	// Append the length of the encrypted DEK as the first 2 bytes.
+-	b := cryptobyte.NewBuilder(nil)
+-	b.AddUint16LengthPrefixed(func(b *cryptobyte.Builder) {
+-		b.AddBytes([]byte(encKey))
+-	})
+-	b.AddBytes(result)
+-
+-	return b.Bytes()
++	panic("cryptobyte cipher not available")
+ }
+ 
+ var _ value.Transformer = &envelopeTransformer{}
+diff --git a/vendor/k8s.io/apiserver/pkg/storage/value/encrypt/aes/aes_extended_nonce.go b/vendor/k8s.io/apiserver/pkg/storage/value/encrypt/aes/aes_extended_nonce.go
+index cf8f3930..de4d145f 100644
+--- a/vendor/k8s.io/apiserver/pkg/storage/value/encrypt/aes/aes_extended_nonce.go
++++ b/vendor/k8s.io/apiserver/pkg/storage/value/encrypt/aes/aes_extended_nonce.go
+@@ -20,14 +20,10 @@ import (
+ 	"bytes"
+ 	"context"
+ 	"crypto/aes"
+-	"crypto/sha256"
+ 	"errors"
+ 	"fmt"
+-	"io"
+ 	"time"
+ 
+-	"golang.org/x/crypto/hkdf"
+-
+ 	"k8s.io/apiserver/pkg/storage/value"
+ 	"k8s.io/utils/clock"
+ )
+@@ -132,14 +128,7 @@ func (e *extendedNonceGCM) derivedKeyTransformer(info []byte, dataCtx value.Cont
+ }
+ 
+ func (e *extendedNonceGCM) sha256KDFExpandOnly(info []byte) ([]byte, error) {
+-	kdf := hkdf.Expand(sha256.New, e.seed, info)
+-
+-	derivedKey := make([]byte, derivedKeySizeExtendedNonceGCM)
+-	if _, err := io.ReadFull(kdf, derivedKey); err != nil {
+-		return nil, fmt.Errorf("failed to read a derived key from KDF: %w", err)
+-	}
+-
+-	return derivedKey, nil
++	panic("hkdf cipher not available")
+ }
+ 
+ func newGCMTransformerWithInfo(key, info []byte) (*transformerWithInfo, error) {
+
+diff --git a/vendor/k8s.io/apiserver/pkg/storage/value/encrypt/envelope/kmsv2/envelope.go b/vendor/k8s.io/apiserver/pkg/storage/value/encrypt/envelope/kmsv2/envelope.go
+index 45d5db58..db3bd2f9 100644
+--- a/vendor/k8s.io/apiserver/pkg/storage/value/encrypt/envelope/kmsv2/envelope.go
++++ b/vendor/k8s.io/apiserver/pkg/storage/value/encrypt/envelope/kmsv2/envelope.go
+@@ -23,12 +23,10 @@ import (
+ 	"crypto/cipher"
+ 	"crypto/sha256"
+ 	"fmt"
+-	"sort"
+ 	"time"
+ 	"unsafe"
+ 
+ 	"github.com/gogo/protobuf/proto"
+-	"golang.org/x/crypto/cryptobyte"
+ 
+ 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
+ 	"k8s.io/apimachinery/pkg/util/uuid"
+@@ -418,41 +416,7 @@ func getRequestInfoFromContext(ctx context.Context) *genericapirequest.RequestIn
+ //     a. annotation key
+ //     b. annotation value
+ func generateCacheKey(encryptedDEKSourceType kmstypes.EncryptedDEKSourceType, encryptedDEKSource []byte, keyID string, annotations map[string][]byte) ([]byte, error) {
+-	// TODO(aramase): use sync pool buffer to avoid allocations
+-	b := cryptobyte.NewBuilder(nil)
+-	b.AddUint32(uint32(encryptedDEKSourceType))
+-	b.AddUint16LengthPrefixed(func(b *cryptobyte.Builder) {
+-		b.AddBytes(encryptedDEKSource)
+-	})
+-	b.AddUint16LengthPrefixed(func(b *cryptobyte.Builder) {
+-		b.AddBytes(toBytes(keyID))
+-	})
+-	if len(annotations) == 0 {
+-		return b.Bytes()
+-	}
+-
+-	// add the length of annotations to the cache key
+-	b.AddUint32(uint32(len(annotations)))
+-
+-	// Sort the annotations by key.
+-	keys := make([]string, 0, len(annotations))
+-	for k := range annotations {
+-		k := k
+-		keys = append(keys, k)
+-	}
+-	sort.Strings(keys)
+-	for _, k := range keys {
+-		// The maximum size of annotations is annotationsMaxSize (32 kB) so we can safely
+-		// assume that the length of the key and value will fit in a uint16.
+-		b.AddUint16LengthPrefixed(func(b *cryptobyte.Builder) {
+-			b.AddBytes(toBytes(k))
+-		})
+-		b.AddUint16LengthPrefixed(func(b *cryptobyte.Builder) {
+-			b.AddBytes(annotations[k])
+-		})
+-	}
+-
+-	return b.Bytes()
++	panic("cryptobyte cipher not available")
+ }
+ 
+ // toBytes performs unholy acts to avoid allocations
+
+diff --git a/vendor/k8s.io/apiserver/pkg/storage/value/encrypt/secretbox/secretbox.go b/vendor/k8s.io/apiserver/pkg/storage/value/encrypt/secretbox/secretbox.go
+index 9aec8acd..d0a19c71 100644
+--- a/vendor/k8s.io/apiserver/pkg/storage/value/encrypt/secretbox/secretbox.go
++++ b/vendor/k8s.io/apiserver/pkg/storage/value/encrypt/secretbox/secretbox.go
+@@ -19,10 +19,6 @@ package secretbox
+ 
+ import (
+ 	"context"
+-	"crypto/rand"
+-	"fmt"
+-
+-	"golang.org/x/crypto/nacl/secretbox"
+ 
+ 	"k8s.io/apiserver/pkg/storage/value"
+ )
+@@ -43,28 +39,9 @@ func NewSecretboxTransformer(key [32]byte) value.Transformer {
+ }
+ 
+ func (t *secretboxTransformer) TransformFromStorage(ctx context.Context, data []byte, dataCtx value.Context) ([]byte, bool, error) {
+-	if len(data) < (secretbox.Overhead + nonceSize) {
+-		return nil, false, fmt.Errorf("the stored data was shorter than the required size")
+-	}
+-	var nonce [nonceSize]byte
+-	copy(nonce[:], data[:nonceSize])
+-	data = data[nonceSize:]
+-	out := make([]byte, 0, len(data)-secretbox.Overhead)
+-	result, ok := secretbox.Open(out, data, &nonce, &t.key)
+-	if !ok {
+-		return nil, false, fmt.Errorf("output array was not large enough for encryption")
+-	}
+-	return result, false, nil
++	panic("nacl cipher not available")
+ }
+ 
+ func (t *secretboxTransformer) TransformToStorage(ctx context.Context, data []byte, dataCtx value.Context) ([]byte, error) {
+-	var nonce [nonceSize]byte
+-	n, err := rand.Read(nonce[:])
+-	if err != nil {
+-		return nil, err
+-	}
+-	if n != nonceSize {
+-		return nil, fmt.Errorf("unable to read sufficient random bytes")
+-	}
+-	return secretbox.Seal(nonce[:], data, &nonce, &t.key), nil
++	panic("nacl cipher not available")
+ }
+
+diff --git a/vendor/k8s.io/apiserver/pkg/server/config.go b/vendor/k8s.io/apiserver/pkg/server/config.go
+index d678f52d..da4abbae 100644
+--- a/vendor/k8s.io/apiserver/pkg/server/config.go
++++ b/vendor/k8s.io/apiserver/pkg/server/config.go
+@@ -18,8 +18,6 @@ package server
+ 
+ import (
+ 	"context"
+-	"crypto/sha256"
+-	"encoding/base32"
+ 	"fmt"
+ 	"net"
+ 	"net/http"
+@@ -34,7 +32,6 @@ import (
+ 
+ 	jsonpatch "github.com/evanphx/json-patch"
+ 	"github.com/google/uuid"
+-	"golang.org/x/crypto/cryptobyte"
+ 
+ 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+ 	"k8s.io/apimachinery/pkg/runtime"
+@@ -374,29 +371,7 @@ func NewConfig(codecs serializer.CodecFactory) *Config {
+ 	defaultHealthChecks := []healthz.HealthChecker{healthz.PingHealthz, healthz.LogHealthz}
+ 	var id string
+ 	if utilfeature.DefaultFeatureGate.Enabled(genericfeatures.APIServerIdentity) {
+-		hostname, err := hostnameFunc()
+-		if err != nil {
+-			klog.Fatalf("error getting hostname for apiserver identity: %v", err)
+-		}
+-
+-		// Since the hash needs to be unique across each kube-apiserver and aggregated apiservers,
+-		// the hash used for the identity should include both the hostname and the identity value.
+-		// TODO: receive the identity value as a parameter once the apiserver identity lease controller
+-		// post start hook is moved to generic apiserver.
+-		b := cryptobyte.NewBuilder(nil)
+-		b.AddUint16LengthPrefixed(func(b *cryptobyte.Builder) {
+-			b.AddBytes([]byte(hostname))
+-		})
+-		b.AddUint16LengthPrefixed(func(b *cryptobyte.Builder) {
+-			b.AddBytes([]byte("kube-apiserver"))
+-		})
+-		hashData, err := b.Bytes()
+-		if err != nil {
+-			klog.Fatalf("error building hash data for apiserver identity: %v", err)
+-		}
+-
+-		hash := sha256.Sum256(hashData)
+-		id = "apiserver-" + strings.ToLower(base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(hash[:16]))
++		panic("cryptobyte cipher not available")
+ 	}
+ 	lifecycleSignals := newLifecycleSignals()

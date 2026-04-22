@@ -5,7 +5,7 @@
 
 Name:           mingw-expat
 Version:        2.7.4
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        MinGW Windows port of expat XML parser library
 
 License:        MIT

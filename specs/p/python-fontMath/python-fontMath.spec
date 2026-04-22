@@ -6,7 +6,7 @@
 
 Name:           python-%{srcname}
 Version:        0.9.4
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        A set of objects for performing math operations on font data
 
 License:        MIT 

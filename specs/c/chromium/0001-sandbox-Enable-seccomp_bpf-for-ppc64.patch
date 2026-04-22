@@ -1,0 +1,1174 @@
+Index: chromium-144.0.7559.59/sandbox/linux/seccomp-bpf/trap.cc
+===================================================================
+--- chromium-144.0.7559.59.orig/sandbox/linux/seccomp-bpf/trap.cc
++++ chromium-144.0.7559.59/sandbox/linux/seccomp-bpf/trap.cc
+@@ -231,6 +231,20 @@ void Trap::SigSys(int nr, LinuxSigInfo*
+       SetIsInSigHandler();
+     }
+ 
++#if defined(__powerpc64__)
++    // On ppc64+glibc, some syscalls seem to accidentally negate the first
++    // parameter which causes checks against it to fail. For now, manually
++    // negate them back.
++    // TODO(sanastasio@raptorengineering.com): investigate this issue further
++    auto nr = SECCOMP_SYSCALL(ctx);
++    if (nr == __NR_openat || nr == __NR_mkdirat || nr == __NR_faccessat || nr == __NR_readlinkat ||
++        nr == __NR_renameat || nr == __NR_renameat2 || nr == __NR_newfstatat || nr == __NR_unlinkat) {
++        if (static_cast<int>(SECCOMP_PARM1(ctx)) > 0) {
++            SECCOMP_PARM1(ctx) = -SECCOMP_PARM1(ctx);
++        }
++    }
++#endif
++
+     // Copy the seccomp-specific data into a arch_seccomp_data structure. This
+     // is what we are showing to TrapFnc callbacks that the system call
+     // evaluator registered with the sandbox.
+Index: chromium-144.0.7559.59/sandbox/features.gni
+===================================================================
+--- chromium-144.0.7559.59.orig/sandbox/features.gni
++++ chromium-144.0.7559.59/sandbox/features.gni
+@@ -9,4 +9,5 @@
+ use_seccomp_bpf = (is_linux || is_chromeos || is_android) &&
+                   (current_cpu == "x86" || current_cpu == "x64" ||
+                    current_cpu == "arm" || current_cpu == "arm64" ||
+-                   current_cpu == "mipsel" || current_cpu == "mips64el")
++                   current_cpu == "mipsel" || current_cpu == "mips64el" ||
++                   current_cpu == "ppc64")
+Index: chromium-144.0.7559.59/sandbox/policy/linux/bpf_renderer_policy_linux.cc
+===================================================================
+--- chromium-144.0.7559.59.orig/sandbox/policy/linux/bpf_renderer_policy_linux.cc
++++ chromium-144.0.7559.59/sandbox/policy/linux/bpf_renderer_policy_linux.cc
+@@ -17,6 +17,11 @@
+ #include "sandbox/linux/system_headers/linux_syscalls.h"
+ #include "sandbox/policy/linux/sandbox_linux.h"
+ 
++// On PPC64, TCGETS is defined in terms of struct termios, so we must include termios.h
++#ifdef __powerpc64__
++#include <termios.h>
++#endif
++
+ // TODO(vignatti): replace the local definitions below with #include
+ // <linux/dma-buf.h> once kernel version 4.6 becomes widely used.
+ #include <linux/types.h>
+@@ -86,7 +91,7 @@ ResultExpr RendererProcessPolicy::Evalua
+     case __NR_ftruncate64:
+ #endif
+ #if defined(__i386__) || defined(__x86_64__) || defined(__mips__) || \
+-    defined(__aarch64__)
++    defined(__aarch64__) || defined(__powerpc64__)
+     case __NR_getrlimit:
+     case __NR_setrlimit:
+ // We allow setrlimit to dynamically adjust the address space limit as
+Index: chromium-144.0.7559.59/sandbox/linux/bpf_dsl/linux_syscall_ranges.h
+===================================================================
+--- chromium-144.0.7559.59.orig/sandbox/linux/bpf_dsl/linux_syscall_ranges.h
++++ chromium-144.0.7559.59/sandbox/linux/bpf_dsl/linux_syscall_ranges.h
+@@ -56,6 +56,13 @@
+ #define MAX_PUBLIC_SYSCALL __NR_syscalls
+ #define MAX_SYSCALL MAX_PUBLIC_SYSCALL
+ 
++#elif defined(__powerpc64__)
++
++#include <asm-generic/unistd.h>
++#define MIN_SYSCALL 0u
++#define MAX_PUBLIC_SYSCALL __NR_syscalls
++#define MAX_SYSCALL MAX_PUBLIC_SYSCALL
++
+ #else
+ #error "Unsupported architecture"
+ #endif
+Index: chromium-144.0.7559.59/sandbox/linux/BUILD.gn
+===================================================================
+--- chromium-144.0.7559.59.orig/sandbox/linux/BUILD.gn
++++ chromium-144.0.7559.59/sandbox/linux/BUILD.gn
+@@ -376,6 +376,8 @@ component("sandbox_services") {
+ 
+ source_set("sandbox_services_headers") {
+   sources = [
++    "system_headers/ppc64_linux_syscalls.h",
++    "system_headers/ppc64_linux_ucontext.h",
+     "system_headers/arm64_linux_syscalls.h",
+     "system_headers/arm_linux_syscalls.h",
+     "system_headers/arm_linux_ucontext.h",
+Index: chromium-144.0.7559.59/sandbox/linux/system_headers/linux_syscalls.h
+===================================================================
+--- chromium-144.0.7559.59.orig/sandbox/linux/system_headers/linux_syscalls.h
++++ chromium-144.0.7559.59/sandbox/linux/system_headers/linux_syscalls.h
+@@ -44,4 +44,8 @@
+ #include "sandbox/linux/system_headers/arm64_linux_syscalls.h"
+ #endif
+ 
++#if defined(__powerpc64__)
++#include "sandbox/linux/system_headers/ppc64_linux_syscalls.h"
++#endif
++
+ #endif  // SANDBOX_LINUX_SYSTEM_HEADERS_LINUX_SYSCALLS_H_
+Index: chromium-144.0.7559.59/sandbox/linux/system_headers/ppc64_linux_syscalls.h
+===================================================================
+--- /dev/null
++++ chromium-144.0.7559.59/sandbox/linux/system_headers/ppc64_linux_syscalls.h
+@@ -0,0 +1,28 @@
++// Copyright 2014 The Chromium Authors. All rights reserved.
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#ifndef SANDBOX_LINUX_SYSTEM_HEADERS_PPC64_LINUX_SYSCALLS_H_
++#define SANDBOX_LINUX_SYSTEM_HEADERS_PPC64_LINUX_SYSCALLS_H_
++
++#include <asm/unistd.h>
++
++//TODO: is it necessary to redefine syscall numbers for PPC64?
++// Needed for Ubuntu/Debian/Centos/RHEL:
++#if !defined(__NR_shmget)
++#define __NR_shmget     395
++#endif
++#if !defined(__NR_shmdt)
++#define __NR_shmdt      398
++#endif
++#if !defined(__NR_shmctl)
++#define __NR_shmctl     396
++#endif
++#if !defined(__NR_shmat)
++#define __NR_shmat      397
++#endif
++#if !defined(__NR_mseal)
++#define __NR_mseal      462
++#endif
++
++#endif  // SANDBOX_LINUX_SYSTEM_HEADERS_PPC64_LINUX_SYSCALLS_H_
+Index: chromium-144.0.7559.59/sandbox/linux/system_headers/ppc64_linux_ucontext.h
+===================================================================
+--- /dev/null
++++ chromium-144.0.7559.59/sandbox/linux/system_headers/ppc64_linux_ucontext.h
+@@ -0,0 +1,12 @@
++// Copyright 2014 The Chromium Authors. All rights reserved.
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#ifndef SANDBOX_LINUX_SYSTEM_HEADERS_PPC64_LINUX_UCONTEXT_H_
++#define SANDBOX_LINUX_SYSTEM_HEADERS_PPC64_LINUX_UCONTEXT_H_
++
++#include <sys/ucontext.h>
++
++//TODO: is it necessary to redefine ucontext on PPC64?
++
++#endif  // SANDBOX_LINUX_SYSTEM_HEADERS_PPC64_LINUX_UCONTEXT_H_
+Index: chromium-144.0.7559.59/sandbox/linux/syscall_broker/broker_process.cc
+===================================================================
+--- chromium-144.0.7559.59.orig/sandbox/linux/syscall_broker/broker_process.cc
++++ chromium-144.0.7559.59/sandbox/linux/syscall_broker/broker_process.cc
+@@ -166,7 +166,7 @@ bool BrokerProcess::IsSyscallBrokerable(
+ #if defined(__NR_fstatat64)
+     case __NR_fstatat64:
+ #endif
+-#if defined(__x86_64__) || defined(__aarch64__)
++#if defined(__x86_64__) || defined(__aarch64__) || defined(__powerpc64__)
+     case __NR_newfstatat:
+ #endif
+       return !fast_check || policy_->allowed_command_set.test(COMMAND_STAT);
+Index: chromium-144.0.7559.59/sandbox/linux/seccomp-bpf-helpers/baseline_policy.cc
+===================================================================
+--- chromium-144.0.7559.59.orig/sandbox/linux/seccomp-bpf-helpers/baseline_policy.cc
++++ chromium-144.0.7559.59/sandbox/linux/seccomp-bpf-helpers/baseline_policy.cc
+@@ -90,7 +90,8 @@ bool IsBaselinePolicyWatched(int sysno)
+          SyscallSets::IsPrctl(sysno) ||
+          SyscallSets::IsProcessGroupOrSession(sysno) ||
+ #if defined(__i386__) || \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS))
++    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS)) || \
++    defined(__powerpc64__)
+          SyscallSets::IsSocketCall(sysno) ||
+ #endif
+ #if defined(__arm__)
+@@ -259,7 +260,7 @@ ResultExpr EvaluateSyscallImpl(int fs_de
+ 
+   // TODO(crbug.com/40528912): should i386 really be in this list?
+ #if defined(__i386__) || defined(__x86_64__) || defined(__mips__) || \
+-    defined(__aarch64__)
++    defined(__aarch64__) || defined(__powerpc64__)
+   if (sysno == __NR_mmap)
+     return RestrictMmapFlags();
+ #endif
+@@ -342,7 +343,8 @@ ResultExpr EvaluateSyscallImpl(int fs_de
+   }
+ 
+ #if defined(__i386__) || \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS))
++    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS)) || \
++    defined(__powerpc64__)
+   if (SyscallSets::IsSocketCall(sysno))
+     return RestrictSocketcallCommand();
+ #endif
+Index: chromium-144.0.7559.59/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc
+===================================================================
+--- chromium-144.0.7559.59.orig/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc
++++ chromium-144.0.7559.59/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc
+@@ -43,7 +43,7 @@
+ #define MAP_DROPPABLE 0x08  // Zero memory under memory pressure.
+ #endif
+ 
+-#if BUILDFLAG(IS_LINUX) && !defined(__arm__) && !defined(__aarch64__) && \
++#if BUILDFLAG(IS_LINUX) && !defined(__arm__) && !defined(__aarch64__) && !defined(__powerpc64__) && \
+     !defined(PTRACE_GET_THREAD_AREA)
+ // Also include asm/ptrace-abi.h since ptrace.h in older libc (for instance
+ // the one in Ubuntu 16.04 LTS) is missing PTRACE_GET_THREAD_AREA.
+@@ -52,6 +52,11 @@
+ #include <asm/ptrace-abi.h>
+ #endif
+ 
++// On PPC64, TCGETS is defined in terms of struct termios, so we must include termios.h
++#ifdef __powerpc64__
++#include <termios.h>
++#endif
++
+ #if BUILDFLAG(IS_ANDROID)
+ #include "base/android/background_thread_pool_field_trial.h"
+ 
+@@ -110,6 +115,15 @@ inline bool IsArchitectureMips() {
+ #endif
+ }
+ 
++inline bool IsArchitecturePPC64() {
++#if defined(__powerpc64__)
++  return true;
++#else
++  return false;
++#endif
++}
++
++
+ // Ubuntu's version of glibc has a race condition in sem_post that can cause
+ // it to call futex(2) with bogus op arguments. To workaround this, we need
+ // to allow those futex(2) calls to fail with EINVAL, instead of crashing the
+@@ -288,9 +302,11 @@ ResultExpr RestrictFcntlCommands() {
+   // operator.
+   // Glibc overrides the kernel's O_LARGEFILE value. Account for this.
+   uint64_t kOLargeFileFlag = O_LARGEFILE;
+-  if (IsArchitectureX86_64() || IsArchitectureI386() || IsArchitectureMips())
++  if (IsArchitectureX86_64() || IsArchitectureI386() || IsArchitectureMips() \
++      || IsArchitecturePPC64())
+     kOLargeFileFlag = 0100000;
+ 
++
+   const Arg<int> cmd(1);
+   const Arg<long> long_arg(2);
+ 
+@@ -313,8 +329,17 @@ ResultExpr RestrictFcntlCommands() {
+               F_SETLKW,
+               F_GETLK,
+               F_DUPFD,
+-              F_DUPFD_CLOEXEC},
+-             Allow())
++              F_DUPFD_CLOEXEC
++#if defined(__powerpc64__)
++// On PPC64, F_SETLK, F_GETLK, F_SETLKW are defined as the 64-bit variants
++// but glibc will sometimes still use the 32-bit versions. Allow both.
++              ,
++              5, /* F_GETLK (32) */
++              6, /* F_SETLK (32) */
++              7  /* F_SETLKW (32) */
++#endif
++              },
++            Allow())
+       .Case(F_SETFL,
+             If((long_arg & ~kAllowedMask) == 0, Allow()).Else(CrashSIGSYS()))
+       .Case(F_ADD_SEALS,
+@@ -323,7 +348,7 @@ ResultExpr RestrictFcntlCommands() {
+   // clang-format on
+ }
+ 
+-#if defined(__i386__) || defined(__mips__)
++#if defined(__i386__) || defined(__mips__) || defined(__powerpc64__)
+ ResultExpr RestrictSocketcallCommand() {
+   // Unfortunately, we are unable to restrict the first parameter to
+   // socketpair(2). Whilst initially sounding bad, it's noteworthy that very
+@@ -489,7 +514,7 @@ ResultExpr RestrictPtrace() {
+ #endif
+   return Switch(request)
+       .Cases({
+-#if !defined(__aarch64__)
++#if !defined(__aarch64__) && !defined(__powerpc64__)
+                  PTRACE_GETREGS, PTRACE_GETFPREGS, PTRACE_GET_THREAD_AREA,
+                  PTRACE_GETREGSET,
+ #endif
+@@ -529,13 +554,14 @@ SANDBOX_EXPORT bpf_dsl::ResultExpr Restr
+   size_t argIndex;
+   switch (sysno) {
+ #if defined(__arm__) || \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS))
++    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS)) || \
++    defined(__powerpc64__)
+     case __NR_send:
+       argIndex = 3;
+       break;
+ #endif
+ #if defined(__i386__) || defined(__x86_64__) || defined(__arm__) || \
+-    defined(__mips__) || defined(__aarch64__)
++    defined(__mips__) || defined(__aarch64__) || defined(__powerpc64__)
+     case __NR_sendto:  // Could specify destination.
+       argIndex = 3;
+       break;
+Index: chromium-144.0.7559.59/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.h
+===================================================================
+--- chromium-144.0.7559.59.orig/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.h
++++ chromium-144.0.7559.59/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.h
+@@ -56,7 +56,7 @@ SANDBOX_EXPORT bpf_dsl::ResultExpr Restr
+ // O_NONBLOCK | O_SYNC | O_LARGEFILE | O_CLOEXEC | O_NOATIME.
+ SANDBOX_EXPORT bpf_dsl::ResultExpr RestrictFcntlCommands();
+ 
+-#if defined(__i386__) || defined(__mips__)
++#if defined(__i386__) || defined(__mips__) || defined(__powerpc64__)
+ // Restrict socketcall(2) to only allow socketpair(2), send(2), recv(2),
+ // sendto(2), recvfrom(2), shutdown(2), sendmsg(2) and recvmsg(2).
+ SANDBOX_EXPORT bpf_dsl::ResultExpr RestrictSocketcallCommand();
+Index: chromium-144.0.7559.59/sandbox/linux/seccomp-bpf-helpers/syscall_sets.cc
+===================================================================
+--- chromium-144.0.7559.59.orig/sandbox/linux/seccomp-bpf-helpers/syscall_sets.cc
++++ chromium-144.0.7559.59/sandbox/linux/seccomp-bpf-helpers/syscall_sets.cc
+@@ -29,7 +29,8 @@ bool SyscallSets::IsAllowedGettime(int s
+   switch (sysno) {
+     case __NR_gettimeofday:
+ #if defined(__i386__) || defined(__x86_64__) || \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS))
++    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS)) || \
++    defined(__powerpc64__)
+     case __NR_time:
+ #endif
+       return true;
+@@ -52,12 +53,14 @@ bool SyscallSets::IsAllowedGettime(int s
+     case __NR_clock_nanosleep_time64:  // Parameters filtered by RestrictClockID().
+ #endif
+ #if defined(__i386__) || \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS))
++    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS)) || \
++    defined(__powerpc64__)
+     case __NR_ftime:  // Obsolete.
+ #endif
+     case __NR_settimeofday:  // Privileged.
+ #if defined(__i386__) || \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS))
++    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS)) || \
++    defined(__powerpc64__)
+     case __NR_stime:
+ #endif
+     default:
+@@ -136,7 +139,7 @@ bool SyscallSets::IsFileSystem(int sysno
+     case __NR_faccessat2:
+     case __NR_fchmodat:
+     case __NR_fchownat:  // Should be called chownat ?
+-#if defined(__x86_64__) || defined(__aarch64__)
++#if defined(__x86_64__) || defined(__aarch64__) || defined(__powerpc64__)
+     case __NR_newfstatat:  // fstatat(). EPERM not a valid errno.
+ #elif defined(__i386__) || defined(__arm__) || \
+     (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS))
+@@ -155,7 +158,7 @@ bool SyscallSets::IsFileSystem(int sysno
+     case __NR_memfd_create:
+     case __NR_mkdirat:
+     case __NR_mknodat:
+-#if defined(__i386__)
++#if defined(__i386__) || defined(__powerpc64__)
+     case __NR_oldlstat:
+     case __NR_oldstat:
+ #endif
+@@ -169,7 +172,8 @@ bool SyscallSets::IsFileSystem(int sysno
+ #endif
+     case __NR_statfs:  // EPERM not a valid errno.
+ #if defined(__i386__) || defined(__arm__) || \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS))
++    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS)) || \
++    defined(__powerpc64__)
+     case __NR_statfs64:
+ #endif
+     case __NR_statx:  // EPERM not a valid errno.
+@@ -180,7 +184,8 @@ bool SyscallSets::IsFileSystem(int sysno
+     case __NR_truncate64:
+ #endif
+     case __NR_unlinkat:
+-#if defined(__i386__) || defined(__x86_64__) || defined(__mips__)
++#if defined(__i386__) || defined(__x86_64__) || defined(__mips__) || \
++    defined(__powerpc64__)
+     case __NR_utime:
+ #endif
+     case __NR_utimensat:  // New.
+@@ -220,7 +225,8 @@ bool SyscallSets::IsAllowedFileSystemAcc
+ #endif
+       return true;
+ // TODO(jln): these should be denied gracefully as well (moved below).
+-#if defined(__i386__) || defined(__x86_64__) || defined(__mips__)
++#if defined(__i386__) || defined(__x86_64__) || defined(__mips__) || \
++    defined(__powerpc64__)
+     case __NR_fadvise64:  // EPERM not a valid errno.
+ #endif
+ #if defined(__i386__)
+@@ -233,11 +239,12 @@ bool SyscallSets::IsAllowedFileSystemAcc
+     case __NR_flock:      // EPERM not a valid errno.
+     case __NR_fstatfs:    // Give information about the whole filesystem.
+ #if defined(__i386__) || defined(__arm__) || \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS))
++    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS)) || \
++    defined(__powerpc64__)
+     case __NR_fstatfs64:
+ #endif
+     case __NR_fsync:  // EPERM not a valid errno.
+-#if defined(__i386__)
++#if defined(__i386__) || defined(__powerpc64__)
+     case __NR_oldfstat:
+ #endif
+ #if defined(__i386__) || defined(__x86_64__) || defined(__mips__) || \
+@@ -245,6 +252,8 @@ bool SyscallSets::IsAllowedFileSystemAcc
+     case __NR_sync_file_range:  // EPERM not a valid errno.
+ #elif defined(__arm__)
+     case __NR_arm_sync_file_range:  // EPERM not a valid errno.
++#elif defined(__powerpc64__)
++    case __NR_sync_file_range2: // EPERM not a valid errno.
+ #endif
+     default:
+       return false;
+@@ -265,7 +274,8 @@ bool SyscallSets::IsDeniedFileSystemAcce
+ #endif
+     case __NR_getdents64:  // EPERM not a valid errno.
+ #if defined(__i386__) || \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS))
++    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS)) || \
++    defined(__powerpc64__)
+     case __NR_readdir:
+ #endif
+       return true;
+@@ -306,7 +316,7 @@ bool SyscallSets::IsGetSimpleId(int sysn
+ bool SyscallSets::IsProcessPrivilegeChange(int sysno) {
+   switch (sysno) {
+     case __NR_capset:
+-#if defined(__i386__) || defined(__x86_64__)
++#if defined(__i386__) || defined(__x86_64__) || defined(__powerpc64__)
+     case __NR_ioperm:  // Intel privilege.
+     case __NR_iopl:    // Intel privilege.
+ #endif
+@@ -362,8 +372,11 @@ bool SyscallSets::IsAllowedSignalHandlin
+     // overflow.
+     case __NR_sigaltstack:
+ #if defined(__i386__) || defined(__arm__) || \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS))
++    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS)) || \
++    defined(__powerpc64__)
++#if !defined(__powerpc64__)
+     case __NR_rt_sigtimedwait_time64:
++#endif
+     case __NR_sigaction:
+     case __NR_sigprocmask:
+     case __NR_sigreturn:
+@@ -378,7 +391,8 @@ bool SyscallSets::IsAllowedSignalHandlin
+ #endif
+     case __NR_signalfd4:
+ #if defined(__i386__) || defined(__arm__) || \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS))
++    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS)) || \
++    defined(__powerpc64__)
+     case __NR_sigpending:
+     case __NR_sigsuspend:
+ #endif
+@@ -402,7 +416,7 @@ bool SyscallSets::IsAllowedOperationOnFd
+ #endif
+     case __NR_dup3:
+ #if defined(__x86_64__) || defined(__arm__) || defined(__mips__) || \
+-    defined(__aarch64__)
++    defined(__aarch64__) || defined(__powerpc64__)
+     case __NR_shutdown:
+ #endif
+       return true;
+@@ -435,7 +449,7 @@ bool SyscallSets::IsAllowedProcessStartO
+     case __NR_exit_group:
+     case __NR_wait4:
+     case __NR_waitid:
+-#if defined(__i386__)
++#if defined(__i386__) || defined(__powerpc64__)
+     case __NR_waitpid:
+ #endif
+       return true;
+@@ -499,7 +513,7 @@ bool SyscallSets::IsAllowedEpoll(int sys
+ bool SyscallSets::IsDeniedGetOrModifySocket(int sysno) {
+   switch (sysno) {
+ #if defined(__x86_64__) || defined(__arm__) || defined(__mips__) || \
+-    defined(__aarch64__)
++    defined(__aarch64__) || defined(__powerpc64__)
+     case __NR_accept:
+     case __NR_accept4:
+     case __NR_bind:
+@@ -514,7 +528,8 @@ bool SyscallSets::IsDeniedGetOrModifySoc
+ }
+ 
+ #if defined(__i386__) || \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS))
++    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS)) || \
++    defined(__powerpc64__)
+ // Big multiplexing system call for sockets.
+ bool SyscallSets::IsSocketCall(int sysno) {
+   switch (sysno) {
+@@ -528,7 +543,8 @@ bool SyscallSets::IsSocketCall(int sysno
+ }
+ #endif
+ 
+-#if defined(__x86_64__) || defined(__arm__) || defined(__mips__)
++#if defined(__x86_64__) || defined(__arm__) || defined(__mips__) || \
++    defined(__powerpc64__)
+ bool SyscallSets::IsNetworkSocketInformation(int sysno) {
+   switch (sysno) {
+     case __NR_getpeername:
+@@ -554,7 +570,7 @@ bool SyscallSets::IsAllowedAddressSpaceA
+     case __NR_mincore:
+     case __NR_mlockall:
+ #if defined(__i386__) || defined(__x86_64__) || defined(__mips__) || \
+-    defined(__aarch64__)
++    defined(__aarch64__) || defined(__powerpc64__)
+     case __NR_mmap:
+ #endif
+ #if defined(__i386__) || defined(__arm__) || \
+@@ -584,7 +600,8 @@ bool SyscallSets::IsAllowedGeneralIo(int
+   switch (sysno) {
+     case __NR_lseek:
+ #if defined(__i386__) || defined(__arm__) || \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS))
++    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS)) || \
++    defined(__powerpc64__)
+     case __NR__llseek:
+ #endif
+ #if !defined(__aarch64__)
+@@ -604,18 +621,19 @@ bool SyscallSets::IsAllowedGeneralIo(int
+     case __NR_readv:
+     case __NR_pread64:
+ #if defined(__arm__) || \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS))
++    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS)) || \
++    defined(__powerpc64__)
+     case __NR_recv:
+ #endif
+ #if defined(__x86_64__) || defined(__arm__) || defined(__mips__) || \
+-    defined(__aarch64__)
++    defined(__aarch64__) || defined(__powerpc64__)
+     case __NR_recvfrom:  // Could specify source.
+     case __NR_recvmsg:   // Could specify source.
+ #endif
+-#if defined(__i386__) || defined(__x86_64__)
++#if defined(__i386__) || defined(__x86_64__) || defined(__powerpc64__)
+     case __NR_select:
+ #endif
+-#if defined(__i386__) || defined(__arm__) || defined(__mips__)
++#if defined(__i386__) || defined(__arm__) || defined(__mips__) || defined(__powerpc64__)
+     case __NR__newselect:
+ #endif
+     case __NR_write:
+@@ -635,11 +653,12 @@ bool SyscallSets::IsAllowedGeneralIo(int
+ #endif
+ // send* syscalls need their flags filtered.
+ #if defined(__arm__) || \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS))
++    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS)) || \
++    defined(__powerpc64__)
+     case __NR_send:
+ #endif
+ #if defined(__i386__) || defined(__x86_64__) || defined(__arm__) || \
+-    defined(__mips__) || defined(__aarch64__)
++    defined(__mips__) || defined(__aarch64__) || defined(__powerpc64__)
+     case __NR_sendmsg:  // Could specify destination.
+     case __NR_sendto:   // Could specify destination.
+ #endif
+@@ -652,11 +671,12 @@ bool SyscallSets::IsAllowedGeneralIo(int
+ bool SyscallSets::IsSockSendOneMsg(int sysno) {
+   switch (sysno) {
+ #if defined(__arm__) || \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS))
++    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS)) || \
++    defined(__powerpc64__)
+     case __NR_send:
+ #endif
+ #if defined(__i386__) || defined(__x86_64__) || defined(__arm__) || \
+-    defined(__mips__) || defined(__aarch64__)
++    defined(__mips__) || defined(__aarch64__) || defined(__powerpc64__)
+     case __NR_sendmsg:  // Could specify destination.
+     case __NR_sendto:   // Could specify destination.
+ #endif
+@@ -697,7 +717,8 @@ bool SyscallSets::IsAllowedBasicSchedule
+       return true;
+     case __NR_getpriority:
+ #if defined(__i386__) || defined(__arm__) || \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS))
++    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS)) || \
++    defined(__powerpc64__)
+     case __NR_nice:
+ #endif
+     case __NR_setpriority:
+@@ -709,7 +730,8 @@ bool SyscallSets::IsAllowedBasicSchedule
+ bool SyscallSets::IsAdminOperation(int sysno) {
+   switch (sysno) {
+ #if defined(__i386__) || defined(__arm__) || \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS))
++    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS)) || \
++    defined(__powerpc64__)
+     case __NR_bdflush:
+ #endif
+     case __NR_kexec_load:
+@@ -725,7 +747,8 @@ bool SyscallSets::IsAdminOperation(int s
+ 
+ bool SyscallSets::IsKernelModule(int sysno) {
+   switch (sysno) {
+-#if defined(__i386__) || defined(__x86_64__) || defined(__mips__)
++#if defined(__i386__) || defined(__x86_64__) || defined(__mips__) || \
++    defined(__powerpc64__)
+     case __NR_create_module:
+     case __NR_get_kernel_syms:  // Should ENOSYS.
+     case __NR_query_module:
+@@ -758,7 +781,8 @@ bool SyscallSets::IsFsControl(int sysno)
+     case __NR_swapoff:
+     case __NR_swapon:
+ #if defined(__i386__) || \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS))
++    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS)) || \
++    defined(__powerpc64__)
+     case __NR_umount:
+ #endif
+     case __NR_umount2:
+@@ -774,7 +798,7 @@ bool SyscallSets::IsNuma(int sysno) {
+     case __NR_getcpu:
+     case __NR_mbind:
+ #if defined(__i386__) || defined(__x86_64__) || defined(__mips__) || \
+-    defined(__aarch64__)
++    defined(__aarch64__) || defined(__powerpc64__)
+     case __NR_migrate_pages:
+ #endif
+     case __NR_move_pages:
+@@ -809,14 +833,15 @@ bool SyscallSets::IsGlobalProcessEnviron
+   switch (sysno) {
+     case __NR_acct:  // Privileged.
+ #if defined(__i386__) || defined(__x86_64__) || defined(__mips__) || \
+-    defined(__aarch64__)
++    defined(__aarch64__) || defined(__powerpc64__)
+     case __NR_getrlimit:
+ #endif
+-#if defined(__i386__) || defined(__arm__)
++#if defined(__i386__) || defined(__arm__) || defined(__powerpc64__)
+     case __NR_ugetrlimit:
+ #endif
+ #if defined(__i386__) || \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS))
++    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS)) || \
++    defined(__powerpc64__)
+     case __NR_ulimit:
+ #endif
+     case __NR_getrusage:
+@@ -850,7 +875,7 @@ bool SyscallSets::IsGlobalSystemStatus(i
+ #endif
+     case __NR_sysinfo:
+     case __NR_uname:
+-#if defined(__i386__)
++#if defined(__i386__) || defined(__powerpc64__)
+     case __NR_olduname:
+     case __NR_oldolduname:
+ #endif
+@@ -914,12 +939,15 @@ bool SyscallSets::IsKeyManagement(int sy
+ }
+ 
+ #if defined(__x86_64__) || defined(__arm__) || defined(__aarch64__) || \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_64_BITS))
++    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_64_BITS)) || \
++    defined(__powerpc64__)
+ bool SyscallSets::IsSystemVSemaphores(int sysno) {
+   switch (sysno) {
+     case __NR_semctl:
+     case __NR_semget:
++#if !defined(__powerpc64__)
+     case __NR_semop:
++#endif
+     case __NR_semtimedop:
+ #if defined(__i386__) || defined(__arm__) || \
+     (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS))
+@@ -934,7 +962,8 @@ bool SyscallSets::IsSystemVSemaphores(in
+ 
+ #if defined(__i386__) || defined(__x86_64__) || defined(__arm__) || \
+     defined(__aarch64__) ||                                         \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_64_BITS))
++    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_64_BITS)) || \
++    defined(__powerpc64__)
+ // These give a lot of ambient authority and bypass the setuid sandbox.
+ bool SyscallSets::IsSystemVSharedMemory(int sysno) {
+   switch (sysno) {
+@@ -950,7 +979,8 @@ bool SyscallSets::IsSystemVSharedMemory(
+ #endif
+ 
+ #if defined(__x86_64__) || defined(__arm__) || defined(__aarch64__) || \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_64_BITS))
++    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_64_BITS)) || \
++    defined(__powerpc64__)
+ bool SyscallSets::IsSystemVMessageQueue(int sysno) {
+   switch (sysno) {
+     case __NR_msgctl:
+@@ -965,7 +995,8 @@ bool SyscallSets::IsSystemVMessageQueue(
+ #endif
+ 
+ #if defined(__i386__) || \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS))
++    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS)) || \
++    defined(__powerpc64__)
+ // Big system V multiplexing system call.
+ bool SyscallSets::IsSystemVIpc(int sysno) {
+   switch (sysno) {
+@@ -987,6 +1018,9 @@ bool SyscallSets::IsAnySystemV(int sysno
+ #elif defined(__i386__) || \
+     (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS))
+   return IsSystemVIpc(sysno);
++#elif defined(__powerpc64__)
++  return IsSystemVMessageQueue(sysno) || IsSystemVSemaphores(sysno) ||
++         IsSystemVSharedMemory(sysno) || IsSystemVIpc(sysno);
+ #endif
+ }
+ 
+@@ -1042,7 +1076,8 @@ bool SyscallSets::IsFaNotify(int sysno)
+ bool SyscallSets::IsTimer(int sysno) {
+   switch (sysno) {
+     case __NR_getitimer:
+-#if defined(__i386__) || defined(__x86_64__) || defined(__mips__)
++#if defined(__i386__) || defined(__x86_64__) || defined(__mips__) || \
++    defined(__powerpc64__)
+     case __NR_alarm:
+ #endif
+     case __NR_setitimer:
+@@ -1121,18 +1156,22 @@ bool SyscallSets::IsMisc(int sysno) {
+     case __NR_syncfs:
+     case __NR_vhangup:
+ // The system calls below are not implemented.
+-#if defined(__i386__) || defined(__x86_64__) || defined(__mips__)
++#if defined(__i386__) || defined(__x86_64__) || defined(__mips__) || \
++    defined(__powerpc64__)
+     case __NR_afs_syscall:
+ #endif
+ #if defined(__i386__) || \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS))
++    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS)) || \
++    defined(__powerpc64__)
+     case __NR_break:
+ #endif
+-#if defined(__i386__) || defined(__x86_64__) || defined(__mips__)
++#if defined(__i386__) || defined(__x86_64__) || defined(__mips__) || \
++    defined(__powerpc64__)
+     case __NR_getpmsg:
+ #endif
+ #if defined(__i386__) || \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS))
++    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS)) || \
++    defined(__powerpc64__)
+     case __NR_gtty:
+     case __NR_idle:
+     case __NR_lock:
+@@ -1140,20 +1179,22 @@ bool SyscallSets::IsMisc(int sysno) {
+     case __NR_prof:
+     case __NR_profil:
+ #endif
+-#if defined(__i386__) || defined(__x86_64__) || defined(__mips__)
++#if defined(__i386__) || defined(__x86_64__) || defined(__mips__) || \
++    defined(__powerpc64__)
+     case __NR_putpmsg:
+ #endif
+ #if defined(__x86_64__)
+     case __NR_security:
+ #endif
+ #if defined(__i386__) || \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS))
++    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS)) || \
++    defined(__powerpc64__)
+     case __NR_stty:
+ #endif
+-#if defined(__x86_64__)
++#if defined(__x86_64__) || defined(__powerpc64__)
+     case __NR_tuxcall:
+ #endif
+-#if !defined(__aarch64__)
++#if !defined(__aarch64__) && !defined(__powerpc64__)
+     case __NR_vserver:
+ #endif
+       return true;
+Index: chromium-144.0.7559.59/sandbox/linux/seccomp-bpf-helpers/syscall_sets.h
+===================================================================
+--- chromium-144.0.7559.59.orig/sandbox/linux/seccomp-bpf-helpers/syscall_sets.h
++++ chromium-144.0.7559.59/sandbox/linux/seccomp-bpf-helpers/syscall_sets.h
+@@ -46,13 +46,14 @@ class SANDBOX_EXPORT SyscallSets {
+   static bool IsDeniedGetOrModifySocket(int sysno);
+ 
+ #if defined(__i386__) || \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS))
++    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS)) || \
++    defined(__powerpc64__)
+   // Big multiplexing system call for sockets.
+   static bool IsSocketCall(int sysno);
+ #endif
+ 
+ #if defined(__x86_64__) || defined(__arm__) || defined(__mips__) || \
+-    defined(__aarch64__)
++    defined(__aarch64__) || defined(__powerpc64__)
+   static bool IsNetworkSocketInformation(int sysno);
+ #endif
+ 
+@@ -80,23 +81,27 @@ class SANDBOX_EXPORT SyscallSets {
+   static bool IsAsyncIo(int sysno);
+   static bool IsKeyManagement(int sysno);
+ #if defined(__x86_64__) || defined(__arm__) || defined(__aarch64__) || \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_64_BITS))
++    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_64_BITS)) || \
++    defined(__powerpc64__)
+   static bool IsSystemVSemaphores(int sysno);
+ #endif
+ #if defined(__i386__) || defined(__x86_64__) || defined(__arm__) || \
+     defined(__aarch64__) ||                                         \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_64_BITS))
++    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_64_BITS)) || \
++    defined(__powerpc64__)
+   // These give a lot of ambient authority and bypass the setuid sandbox.
+   static bool IsSystemVSharedMemory(int sysno);
+ #endif
+ 
+ #if defined(__x86_64__) || defined(__arm__) || defined(__aarch64__) || \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_64_BITS))
++    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_64_BITS)) || \
++    defined(__powerpc64__)
+   static bool IsSystemVMessageQueue(int sysno);
+ #endif
+ 
+ #if defined(__i386__) || \
+-    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS))
++    (defined(ARCH_CPU_MIPS_FAMILY) && defined(ARCH_CPU_32_BITS)) || \
++    defined(__powerpc64__)
+   // Big system V multiplexing system call.
+   static bool IsSystemVIpc(int sysno);
+ #endif
+Index: chromium-144.0.7559.59/sandbox/linux/services/syscall_wrappers.cc
+===================================================================
+--- chromium-144.0.7559.59.orig/sandbox/linux/services/syscall_wrappers.cc
++++ chromium-144.0.7559.59/sandbox/linux/services/syscall_wrappers.cc
+@@ -63,7 +63,7 @@ long sys_clone(unsigned long flags,
+ #if defined(ARCH_CPU_X86_64)
+   return syscall(__NR_clone, flags, child_stack, ptid, ctid, tls);
+ #elif defined(ARCH_CPU_X86) || defined(ARCH_CPU_ARM_FAMILY) || \
+-    defined(ARCH_CPU_MIPS_FAMILY)
++    defined(ARCH_CPU_MIPS_FAMILY) || defined(ARCH_CPU_PPC64_FAMILY)
+   // CONFIG_CLONE_BACKWARDS defined.
+   return syscall(__NR_clone, flags, child_stack, ptid, tls, ctid);
+ #endif
+Index: chromium-144.0.7559.59/sandbox/linux/bpf_dsl/seccomp_macros.h
+===================================================================
+--- chromium-144.0.7559.59.orig/sandbox/linux/bpf_dsl/seccomp_macros.h
++++ chromium-144.0.7559.59/sandbox/linux/bpf_dsl/seccomp_macros.h
+@@ -14,6 +14,9 @@
+ #if defined(__mips__)
+ // sys/user.h in eglibc misses size_t definition
+ #include <stddef.h>
++#elif defined(__powerpc64__)
++// Manually define greg_t on ppc64
++typedef unsigned long long greg_t;
+ #endif
+ #endif
+ 
+@@ -343,6 +346,51 @@ struct regs_struct {
+ #define SECCOMP_PT_PARM4(_regs) (_regs).regs[3]
+ #define SECCOMP_PT_PARM5(_regs) (_regs).regs[4]
+ #define SECCOMP_PT_PARM6(_regs) (_regs).regs[5]
++
++#elif defined(__powerpc64__)
++#include <asm/ptrace.h>
++
++typedef struct pt_regs regs_struct;
++
++#ifdef ARCH_CPU_LITTLE_ENDIAN
++#define SECCOMP_ARCH AUDIT_ARCH_PPC64LE
++#else
++#define SECCOMP_ARCH AUDIT_ARCH_PPC64
++#endif
++
++#define SECCOMP_REG(_ctx, _reg) ((_ctx)->uc_mcontext.regs->gpr[_reg])
++
++#define SECCOMP_RESULT(_ctx) SECCOMP_REG(_ctx, 3)
++#define SECCOMP_SYSCALL(_ctx) SECCOMP_REG(_ctx, 0)
++#define SECCOMP_IP(_ctx) (_ctx)->uc_mcontext.regs->nip
++#define SECCOMP_PARM1(_ctx) SECCOMP_REG(_ctx, 3)
++#define SECCOMP_PARM2(_ctx) SECCOMP_REG(_ctx, 4)
++#define SECCOMP_PARM3(_ctx) SECCOMP_REG(_ctx, 5)
++#define SECCOMP_PARM4(_ctx) SECCOMP_REG(_ctx, 6)
++#define SECCOMP_PARM5(_ctx) SECCOMP_REG(_ctx, 7)
++#define SECCOMP_PARM6(_ctx) SECCOMP_REG(_ctx, 8)
++
++#define SECCOMP_NR_IDX (offsetof(struct arch_seccomp_data, nr))
++#define SECCOMP_ARCH_IDX (offsetof(struct arch_seccomp_data, arch))
++#define SECCOMP_IP_MSB_IDX \
++  (offsetof(struct arch_seccomp_data, instruction_pointer) + 4)
++#define SECCOMP_IP_LSB_IDX \
++  (offsetof(struct arch_seccomp_data, instruction_pointer) + 0)
++#define SECCOMP_ARG_MSB_IDX(nr) \
++  (offsetof(struct arch_seccomp_data, args) + 8 * (nr) + 4)
++#define SECCOMP_ARG_LSB_IDX(nr) \
++  (offsetof(struct arch_seccomp_data, args) + 8 * (nr) + 0)
++
++#define SECCOMP_PT_RESULT(_regs) (_regs).gpr[3]
++#define SECCOMP_PT_SYSCALL(_regs) (_regs).gpr[0]
++#define SECCOMP_PT_IP(_regs) (_regs).nip
++#define SECCOMP_PT_PARM1(_regs) (_regs).gpr[3]
++#define SECCOMP_PT_PARM2(_regs) (_regs).gpr[4]
++#define SECCOMP_PT_PARM3(_regs) (_regs).gpr[5]
++#define SECCOMP_PT_PARM4(_regs) (_regs).gpr[6]
++#define SECCOMP_PT_PARM5(_regs) (_regs).gpr[7]
++#define SECCOMP_PT_PARM6(_regs) (_regs).gpr[8]
++
+ #else
+ #error Unsupported target platform
+ 
+Index: chromium-144.0.7559.59/sandbox/linux/system_headers/linux_seccomp.h
+===================================================================
+--- chromium-144.0.7559.59.orig/sandbox/linux/system_headers/linux_seccomp.h
++++ chromium-144.0.7559.59/sandbox/linux/system_headers/linux_seccomp.h
+@@ -38,6 +38,9 @@
+ #ifndef EM_AARCH64
+ #define EM_AARCH64 183
+ #endif
++#ifndef EM_PPC64
++#define EM_PPC64 21
++#endif
+ 
+ #ifndef __AUDIT_ARCH_64BIT
+ #define __AUDIT_ARCH_64BIT 0x80000000
+@@ -70,6 +73,12 @@
+ #ifndef AUDIT_ARCH_AARCH64
+ #define AUDIT_ARCH_AARCH64 (EM_AARCH64 | __AUDIT_ARCH_64BIT | __AUDIT_ARCH_LE)
+ #endif
++#ifndef AUDIT_ARCH_PPC64
++#define AUDIT_ARCH_PPC64 (EM_PPC64 | __AUDIT_ARCH_64BIT)
++#endif
++#ifndef AUDIT_ARCH_PPC64LE
++#define AUDIT_ARCH_PPC64LE (EM_PPC64 | __AUDIT_ARCH_64BIT | __AUDIT_ARCH_LE)
++#endif
+ 
+ // For prctl.h
+ #ifndef PR_SET_SECCOMP
+Index: chromium-144.0.7559.59/sandbox/linux/system_headers/linux_signal.h
+===================================================================
+--- chromium-144.0.7559.59.orig/sandbox/linux/system_headers/linux_signal.h
++++ chromium-144.0.7559.59/sandbox/linux/system_headers/linux_signal.h
+@@ -13,7 +13,7 @@
+ // (not undefined, but defined different values and in different memory
+ // layouts). So, fill the gap here.
+ #if defined(__i386__) || defined(__x86_64__) || defined(__arm__) || \
+-    defined(__aarch64__)
++    defined(__aarch64__) || defined(__powerpc64__)
+ 
+ #define LINUX_SIGHUP 1
+ #define LINUX_SIGINT 2
+Index: chromium-144.0.7559.59/sandbox/linux/seccomp-bpf/syscall.cc
+===================================================================
+--- chromium-144.0.7559.59.orig/sandbox/linux/seccomp-bpf/syscall.cc
++++ chromium-144.0.7559.59/sandbox/linux/seccomp-bpf/syscall.cc
+@@ -19,7 +19,7 @@ namespace sandbox {
+ namespace {
+ 
+ #if defined(ARCH_CPU_X86_FAMILY) || defined(ARCH_CPU_ARM_FAMILY) || \
+-    defined(ARCH_CPU_MIPS_FAMILY)
++    defined(ARCH_CPU_MIPS_FAMILY) || defined (ARCH_CPU_PPC64_FAMILY)
+ // Number that's not currently used by any Linux kernel ABIs.
+ const int kInvalidSyscallNumber = 0x351d3;
+ #else
+@@ -309,10 +309,54 @@ asm(// We need to be able to tell the ke
+     "2:ret\n"
+     ".cfi_endproc\n"
+     ".size SyscallAsm, .-SyscallAsm\n"
++#elif defined(__powerpc64__)
++    ".text\n"
++    ".align 4\n"
++    ".type SyscallAsm @function\n"
++    "SyscallAsm:\n"
++    ".cfi_startproc\n"
++
++    // Check if r3 is negative
++    "cmpdi 3, 0\n"
++    "bgt 2f\n"
++
++    // Load address of 3f into r3 and return
++    "mflr 10\n"
++    "bl 1f\n"
++    "1: mflr 3\n"
++    "mtlr 10\n"
++    "addi 3, 3, 4*13\n"
++    "blr\n"
++
++    // Load arguments from array into r3-8
++    // save param 3 in r10
++    "2:\n"
++    "mr 0, 3\n"
++    "ld 3, 0(4)\n"
++    "ld 5, 16(4)\n"
++    "ld 6, 24(4)\n"
++    "ld 7, 32(4)\n"
++    "ld 8, 40(4)\n"
++    "ld 4, 8(4)\n"
++    "li 9, 0\n"
++
++    // Enter kernel
++    "sc\n"
++
++    // Magic return address
++    "3:\n"
++    // Like MIPS, ppc64 return values are always positive.
++    // Check for error in cr0.SO and negate upon error
++    "bc 4, 3, 4f\n"
++    "neg 3, 3\n"
++    "4: blr\n"
++
++    ".cfi_endproc\n"
++    ".size SyscallAsm, .-SyscallAsm\n"
+ #endif
+     );  // asm
+ 
+-#if defined(__x86_64__)
++#if defined(__x86_64__) || defined(__powerpc64__)
+ extern "C" {
+ intptr_t SyscallAsm(intptr_t nr, const intptr_t args[6]);
+ }
+@@ -426,6 +470,8 @@ intptr_t Syscall::Call(int nr,
+     ret = inout;
+   }
+ 
++#elif defined(__powerpc64__)
++  intptr_t ret = SyscallAsm(nr, args);
+ #else
+ #error "Unimplemented architecture"
+ #endif
+@@ -442,8 +488,18 @@ void Syscall::PutValueInUcontext(intptr_
+     // needs to be changed back.
+     ret_val = -ret_val;
+     SECCOMP_PARM4(ctx) = 1;
+-  } else
++  } else {
+     SECCOMP_PARM4(ctx) = 0;
++  }
++#endif
++#if defined(__powerpc64__)
++  // Same as MIPS, need to invert ret and set error register (cr0.SO)
++  if (ret_val <= -1 && ret_val >= -4095) {
++    ret_val = -ret_val;
++    ctx->uc_mcontext.regs->ccr |= (1 << 28);
++  } else {
++    ctx->uc_mcontext.regs->ccr &= ~(1 << 28);
++  }
+ #endif
+   SECCOMP_RESULT(ctx) = static_cast<greg_t>(ret_val);
+ }
+Index: chromium-144.0.7559.59/sandbox/linux/seccomp-bpf-helpers/baseline_policy_unittest.cc
+===================================================================
+--- chromium-144.0.7559.59.orig/sandbox/linux/seccomp-bpf-helpers/baseline_policy_unittest.cc
++++ chromium-144.0.7559.59/sandbox/linux/seccomp-bpf-helpers/baseline_policy_unittest.cc
+@@ -354,8 +354,10 @@ TEST_BASELINE_SIGSYS(__NR_timer_create)
+ 
+ #if !defined(__aarch64__)
+ TEST_BASELINE_SIGSYS(__NR_inotify_init)
++#if !defined(__powerpc64__)
+ TEST_BASELINE_SIGSYS(__NR_vserver)
+ #endif
++#endif
+ 
+ #if defined(LIBC_GLIBC) && !BUILDFLAG(IS_CHROMEOS)
+ BPF_TEST_C(BaselinePolicy, FutexEINVAL, BaselinePolicy) {
+Index: chromium-144.0.7559.59/sandbox/linux/system_headers/linux_stat.h
+===================================================================
+--- chromium-144.0.7559.59.orig/sandbox/linux/system_headers/linux_stat.h
++++ chromium-144.0.7559.59/sandbox/linux/system_headers/linux_stat.h
+@@ -173,6 +173,28 @@ struct kernel_stat {
+   unsigned int __unused4;
+   unsigned int __unused5;
+ };
++#elif defined(__powerpc64__)
++struct kernel_stat {
++   unsigned long   st_dev;
++   ino_t           st_ino;
++   unsigned long   st_nlink;
++   mode_t          st_mode;
++   uid_t           st_uid;
++   gid_t           st_gid;
++   unsigned long   st_rdev;
++   long            st_size;
++   unsigned long   st_blksize;
++   unsigned long   st_blocks;
++   unsigned long   st_atime_;
++   unsigned long   st_atime_nsec_;
++   unsigned long   st_mtime_;
++   unsigned long   st_mtime_nsec_;
++   unsigned long   st_ctime_;
++   unsigned long   st_ctime_nsec_;
++   unsigned long   __unused4;
++   unsigned long   __unused5;
++   unsigned long   __unused6;
++};
+ #endif
+ 
+ #if !defined(AT_EMPTY_PATH)
+Index: chromium-144.0.7559.59/sandbox/linux/services/credentials.cc
+===================================================================
+--- chromium-144.0.7559.59.orig/sandbox/linux/services/credentials.cc
++++ chromium-144.0.7559.59/sandbox/linux/services/credentials.cc
+@@ -85,7 +85,7 @@ bool ChrootToSafeEmptyDir() {
+   alignas(16) std::array<char, PTHREAD_STACK_MIN_CONST> stack_buf;
+ 
+ #if defined(ARCH_CPU_X86_FAMILY) || defined(ARCH_CPU_ARM_FAMILY) || \
+-    defined(ARCH_CPU_MIPS_FAMILY)
++    defined(ARCH_CPU_MIPS_FAMILY) || defined(ARCH_CPU_PPC64_FAMILY)
+   // SAFETY: This is the `stack` argument of `clone(2)`. Because the stack grows
+   // downward on these architectures, this is the topmost address of the memory
+   // space for the stack, and the address will not be dereferenced.
+@@ -96,7 +96,8 @@ bool ChrootToSafeEmptyDir() {
+ 
+   int clone_flags = CLONE_FS | LINUX_SIGCHLD;
+   void* tls = nullptr;
+-#if (defined(ARCH_CPU_X86_64) || defined(ARCH_CPU_ARM_FAMILY)) && \
++#if (defined(ARCH_CPU_X86_64) || defined(ARCH_CPU_ARM_FAMILY) || \
++    defined(ARCH_CPU_PPC64_FAMILY)) && \
+     !defined(MEMORY_SANITIZER)
+   // Use CLONE_VM | CLONE_VFORK as an optimization to avoid copying page tables.
+   // Since clone writes to the new child's TLS before returning, we must set a
+@@ -104,6 +105,11 @@ bool ChrootToSafeEmptyDir() {
+   // glibc performs syscalls by calling a function pointer in TLS, so we do not
+   // attempt this optimization.
+   // TODO(crbug.com/40196869) Broken in MSan builds after LLVM f1bb30a4956f.
++  //
++  // NOTE: Without CLONE_VM, fontconfig will attempt to reload configuration
++  // in every thread.  Since the rendered threads are sandboxed without
++  // filesystem access (e.g. to /etc/fonts/fonts.conf) this will cause font
++  // configuration loading failures and no fonts will be displayed!
+   clone_flags |= CLONE_VM | CLONE_VFORK | CLONE_SETTLS;
+ 
+   char tls_buf[PTHREAD_STACK_MIN_CONST] = {};
+Index: chromium-144.0.7559.59/sandbox/policy/linux/bpf_utility_policy_linux.cc
+===================================================================
+--- chromium-144.0.7559.59.orig/sandbox/policy/linux/bpf_utility_policy_linux.cc
++++ chromium-144.0.7559.59/sandbox/policy/linux/bpf_utility_policy_linux.cc
+@@ -34,7 +34,7 @@ ResultExpr UtilityProcessPolicy::Evaluat
+     case __NR_fdatasync:
+     case __NR_fsync:
+ #if defined(__i386__) || defined(__x86_64__) || defined(__mips__) || \
+-    defined(__aarch64__)
++    defined(__aarch64__) || defined(__powerpc64__)
+     case __NR_getrlimit:
+ #endif
+ #if defined(__i386__) || defined(__arm__)
+Index: chromium-144.0.7559.59/sandbox/linux/seccomp-bpf-helpers/sigsys_handlers.cc
+===================================================================
+--- chromium-144.0.7559.59.orig/sandbox/linux/seccomp-bpf-helpers/sigsys_handlers.cc
++++ chromium-144.0.7559.59/sandbox/linux/seccomp-bpf-helpers/sigsys_handlers.cc
+@@ -384,7 +384,16 @@ intptr_t SIGSYSFstatatHandler(const stru
+   if (args.nr == __NR_fstatat_default) {
+     if (*reinterpret_cast<const char*>(args.args[1]) == '\0' &&
+         args.args[3] == static_cast<uint64_t>(AT_EMPTY_PATH)) {
+-      return syscall(__NR_fstat_default, static_cast<int>(args.args[0]),
++          int fd = static_cast<int>(args.args[0]);
++#if defined(__powerpc64__)
++      // On ppc64+glibc, some syscalls seem to accidentally negate the first
++      // parameter which causes checks against it to fail. For now, manually
++      // negate them back.
++      // TODO: Investigate the root cause and fix in glibc
++      if (fd < 0)
++        fd = -fd;
++#endif
++      return syscall(__NR_fstat_default, fd,
+                      reinterpret_cast<default_stat_struct*>(args.args[2]));
+     }
+     return -reinterpret_cast<intptr_t>(fs_denied_errno);

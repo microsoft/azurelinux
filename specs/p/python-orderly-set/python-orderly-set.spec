@@ -6,7 +6,7 @@
 
 Name:           python-%{pypi_name}
 Version:        %{pypi_version}
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        A package containing multiple implementations of Ordered Set
 License:        MIT
 URL:            https://github.com/seperman/orderly-set

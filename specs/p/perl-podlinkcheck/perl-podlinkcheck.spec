@@ -6,7 +6,7 @@
 
 Name:           perl-podlinkcheck
 Version:        15
-Release:        29%{?dist}
+Release: 30%{?dist}
 Summary:        Check Perl POD L<> link references
 License:        GPL-3.0-or-later
 URL:            https://metacpan.org/release/podlinkcheck

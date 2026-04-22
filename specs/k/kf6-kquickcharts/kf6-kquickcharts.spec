@@ -6,7 +6,7 @@
 Name:		kf6-%{framework}
 Summary:	A QtQuick module providing high-performance charts
 Version:	6.23.0
-Release:	1%{?dist}
+Release: 2%{?dist}
 
 License:	BSD-2-Clause AND CC0-1.0 AND LGPL-2.1-only AND LGPL-3.0-only AND MIT
 URL:		https://invent.kde.org/frameworks/%{framework}

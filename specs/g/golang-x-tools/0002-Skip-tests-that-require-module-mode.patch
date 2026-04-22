@@ -1,0 +1,245 @@
+From 1e0b45783529828fba9ddaa6052701d05b6b3767 Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Mon, 5 Feb 2024 03:21:21 -0500
+Subject: [PATCH 2/2] Skip tests that require module mode
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ go/analysis/internal/checker/fix_test.go     |  1 +
+ go/analysis/unitchecker/separate_test.go     |  1 +
+ go/callgraph/cha/cha_test.go                 |  2 ++
+ go/callgraph/rta/rta_test.go                 |  1 +
+ go/callgraph/static/static_test.go           | 17 +++++++++--------
+ go/callgraph/vta/graph_test.go               |  2 ++
+ go/callgraph/vta/vta_test.go                 |  2 ++
+ go/ssa/builder_test.go                       |  2 ++
+ go/types/objectpath/objectpath_go118_test.go |  2 ++
+ go/types/objectpath/objectpath_test.go       |  2 ++
+ internal/gocommand/invoke_test.go            |  1 +
+ internal/refactor/inline/inline_test.go      |  1 +
+ refactor/eg/eg_test.go                       |  1 +
+ 13 files changed, 27 insertions(+), 8 deletions(-)
+
+diff --git a/go/analysis/internal/checker/fix_test.go b/go/analysis/internal/checker/fix_test.go
+index d144de402..0bdeaee33 100644
+--- a/go/analysis/internal/checker/fix_test.go
++++ b/go/analysis/internal/checker/fix_test.go
+@@ -198,6 +198,7 @@ func TestReportInvalidDiagnostic(t *testing.T) {
+ func TestScript(t *testing.T) {
+ 	testenv.NeedsExec(t)
+ 	testenv.NeedsGoPackages(t)
++	t.Skip("Needs GO111MODULE=on")
+ 
+ 	txtfiles, err := filepath.Glob("testdata/*.txt")
+ 	if err != nil {
+diff --git a/go/analysis/unitchecker/separate_test.go b/go/analysis/unitchecker/separate_test.go
+index 219815436..16fb15639 100644
+--- a/go/analysis/unitchecker/separate_test.go
++++ b/go/analysis/unitchecker/separate_test.go
+@@ -56,6 +56,7 @@ import (
+ // which requires a testing.T.
+ func TestExampleSeparateAnalysis(t *testing.T) {
+ 	testenv.NeedsGoPackages(t)
++	t.Skip("Needs GO111MODULE=on")
+ 
+ 	// src is an archive containing a module with a printf mistake.
+ 	const src = `
+diff --git a/go/callgraph/cha/cha_test.go b/go/callgraph/cha/cha_test.go
+index 922541d6c..b59b9a7b3 100644
+--- a/go/callgraph/cha/cha_test.go
++++ b/go/callgraph/cha/cha_test.go
+@@ -71,6 +71,7 @@ func TestCHA(t *testing.T) {
+ 
+ // TestCHAGenerics is TestCHA tailored for testing generics,
+ func TestCHAGenerics(t *testing.T) {
++	t.Skip("Needs GO111MODULE=on")
+ 	filename := "testdata/generics.go"
+ 	pkg, ssapkg := loadFile(t, filename, ssa.InstantiateGenerics)
+ 
+@@ -89,6 +90,7 @@ func TestCHAGenerics(t *testing.T) {
+ 
+ // TestCHAUnexported tests call resolution for unexported methods.
+ func TestCHAUnexported(t *testing.T) {
++	t.Skip("Needs GO111MODULE=on")
+ 	// The two packages below each have types with methods called "m".
+ 	// Each of these methods should only be callable by functions in their
+ 	// own package, because they are unexported.
+diff --git a/go/callgraph/rta/rta_test.go b/go/callgraph/rta/rta_test.go
+index 8cfc73ee4..9811ca369 100644
+--- a/go/callgraph/rta/rta_test.go
++++ b/go/callgraph/rta/rta_test.go
+@@ -29,6 +29,7 @@ import (
+ // and compares the results with the expectations expressed in the WANT
+ // comment.
+ func TestRTA(t *testing.T) {
++	t.Skip("Needs GO111MODULE=on")
+ 	archivePaths := []string{
+ 		"testdata/func.txtar",
+ 		"testdata/generics.txtar",
+diff --git a/go/callgraph/static/static_test.go b/go/callgraph/static/static_test.go
+index a0c587824..339051c6e 100644
+--- a/go/callgraph/static/static_test.go
++++ b/go/callgraph/static/static_test.go
+@@ -106,14 +106,15 @@ func TestStatic(t *testing.T) {
+ 			"f -> f$1",
+ 			"f -> g",
+ 		}},
+-		{genericsInput, []string{
+-			"(*A).F -> (A).F",
+-			"(*B).F -> (B).F",
+-			"f -> instantiated[x.io/p.A]",
+-			"f -> instantiated[x.io/p.B]",
+-			"instantiated[x.io/p.A] -> (A).F",
+-			"instantiated[x.io/p.B] -> (B).F",
+-		}},
++		// Skip this test that uses module mode.
++		// {genericsInput, []string{
++		// 	"(*A).F -> (A).F",
++		// 	"(*B).F -> (B).F",
++		// 	"f -> instantiated[x.io/p.A]",
++		// 	"f -> instantiated[x.io/p.B]",
++		// 	"instantiated[x.io/p.A] -> (A).F",
++		// 	"instantiated[x.io/p.B] -> (B).F",
++		// }},
+ 	} {
+ 		pkgs := testfiles.LoadPackages(t, txtar.Parse([]byte(e.input)), "./p")
+ 		prog, _ := ssautil.Packages(pkgs, ssa.InstantiateGenerics)
+diff --git a/go/callgraph/vta/graph_test.go b/go/callgraph/vta/graph_test.go
+index 725749ea6..8aa6af65f 100644
+--- a/go/callgraph/vta/graph_test.go
++++ b/go/callgraph/vta/graph_test.go
+@@ -18,6 +18,7 @@ import (
+ )
+ 
+ func TestNodeInterface(t *testing.T) {
++	t.Skip("Needs GO111MODULE=on")
+ 	// Since ssa package does not allow explicit creation of ssa
+ 	// values, we use the values from the program testdata/src/simple.go:
+ 	//   - basic type int
+@@ -194,6 +195,7 @@ func setdiff(X, Y []string) []string {
+ }
+ 
+ func TestVTAGraphConstruction(t *testing.T) {
++	t.Skip("Needs GO111MODULE=on")
+ 	for _, file := range []string{
+ 		"testdata/src/store.go",
+ 		"testdata/src/phi.go",
+diff --git a/go/callgraph/vta/vta_test.go b/go/callgraph/vta/vta_test.go
+index 42610abb1..ea90a4b3a 100644
+--- a/go/callgraph/vta/vta_test.go
++++ b/go/callgraph/vta/vta_test.go
+@@ -146,6 +146,7 @@ func TestVTAPanicMissingDefinitions(t *testing.T) {
+ }
+ 
+ func TestVTACallGraphGenerics(t *testing.T) {
++	t.Skip("Needs GO111MODULE=on")
+ 	// TODO(zpavlinovic): add more tests
+ 	files := []string{
+ 		"testdata/src/arrays_generics.go",
+@@ -173,6 +174,7 @@ func TestVTACallGraphGenerics(t *testing.T) {
+ }
+ 
+ func TestVTACallGraphGo117(t *testing.T) {
++	t.Skip("Needs GO111MODULE=on")
+ 	file := "testdata/src/go117.go"
+ 	prog, want, err := testProg(t, file, ssa.BuilderMode(0))
+ 	if err != nil {
+diff --git a/go/ssa/builder_test.go b/go/ssa/builder_test.go
+index 2472b3eb1..ca763749a 100644
+--- a/go/ssa/builder_test.go
++++ b/go/ssa/builder_test.go
+@@ -38,6 +38,7 @@ func isEmpty(f *ssa.Function) bool { return f.Blocks == nil }
+ // functions with no code for the external portions, but are otherwise ok.
+ func TestBuildPackage(t *testing.T) {
+ 	testenv.NeedsGoBuild(t) // for importer.Default()
++	t.Skip("Needs GO111MODULE=on")
+ 
+ 	input := `
+ package main
+@@ -173,6 +174,7 @@ func main() {
+ // CreatePackage are created as needed.
+ func TestNoIndirectCreatePackage(t *testing.T) {
+ 	testenv.NeedsGoBuild(t) // for go/packages
++	t.Skip("Needs GO111MODULE=on")
+ 
+ 	fs := openTxtar(t, filepath.Join(analysistest.TestData(), "indirect.txtar"))
+ 	pkgs := loadPackages(t, fs, "testdata/a")
+diff --git a/go/types/objectpath/objectpath_go118_test.go b/go/types/objectpath/objectpath_go118_test.go
+index 0eb2f024f..c2355d5f9 100644
+--- a/go/types/objectpath/objectpath_go118_test.go
++++ b/go/types/objectpath/objectpath_go118_test.go
+@@ -13,6 +13,7 @@ import (
+ 
+ // TODO(adonovan): merge this back into objectpath_test.go.
+ func TestGenericPaths(t *testing.T) {
++	t.Skip("Needs GO111MODULE=on")
+ 	const src = `
+ -- go.mod --
+ module x.io
+@@ -91,6 +92,7 @@ func F[FP0 any, FP1 interface{ M() }](FP0, FP1) {}
+ }
+ 
+ func TestGenericPaths_Issue51717(t *testing.T) {
++	t.Skip("Needs GO111MODULE=on")
+ 	const src = `
+ -- go.mod --
+ module x.io
+diff --git a/go/types/objectpath/objectpath_test.go b/go/types/objectpath/objectpath_test.go
+index 642d6da49..7712d23a5 100644
+--- a/go/types/objectpath/objectpath_test.go
++++ b/go/types/objectpath/objectpath_test.go
+@@ -26,6 +26,7 @@ import (
+ )
+ 
+ func TestPaths(t *testing.T) {
++	t.Skip("Needs GO111MODULE=on")
+ 	for _, aliases := range []int{0, 1} {
+ 		t.Run(fmt.Sprint(aliases), func(t *testing.T) {
+ 			testPaths(t, aliases)
+@@ -385,6 +386,7 @@ func objectString(obj types.Object) string {
+ // names but in a different source order and checks that objectpath is the
+ // same for methods with the same name.
+ func TestOrdering(t *testing.T) {
++	t.Skip("Needs GO111MODULE=on")
+ 	const src = `
+ -- go.mod --
+ module x.io
+diff --git a/internal/gocommand/invoke_test.go b/internal/gocommand/invoke_test.go
+index cc8cc9c6f..5f3ccecca 100644
+--- a/internal/gocommand/invoke_test.go
++++ b/internal/gocommand/invoke_test.go
+@@ -96,6 +96,7 @@ func TestRmdirAfterGoList_Direct(t *testing.T) {
+ }
+ 
+ func testRmdirAfterGoList(t *testing.T, f func(ctx context.Context, dir string)) {
++	t.Skip("Needs GO111MODULE=on")
+ 	testenv.NeedsExec(t)
+ 
+ 	dir := t.TempDir()
+diff --git a/internal/refactor/inline/inline_test.go b/internal/refactor/inline/inline_test.go
+index 6a2a8b1d6..1623029bf 100644
+--- a/internal/refactor/inline/inline_test.go
++++ b/internal/refactor/inline/inline_test.go
+@@ -58,6 +58,7 @@ import (
+ // is a regular expression that must match the text of resulting error.
+ func TestData(t *testing.T) {
+ 	testenv.NeedsGoPackages(t)
++	t.Skip("Needs GO111MODULE=on")
+ 
+ 	files, err := filepath.Glob("testdata/*.txtar")
+ 	if err != nil {
+diff --git a/refactor/eg/eg_test.go b/refactor/eg/eg_test.go
+index 4dc24f533..e819d4d61 100644
+--- a/refactor/eg/eg_test.go
++++ b/refactor/eg/eg_test.go
+@@ -41,6 +41,7 @@ var (
+ )
+ 
+ func Test(t *testing.T) {
++	t.Skip("Needs GO111MODULE=on")
+ 	testenv.NeedsGoPackages(t)
+ 
+ 	switch runtime.GOOS {
+-- 
+2.50.0
+

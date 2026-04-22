@@ -4,7 +4,7 @@
 Name:    libatomic_ops
 Summary: Atomic memory update operations
 Version: 7.8.2
-Release: 6%{?dist}
+Release: 7%{?dist}
 
 # libatomic_ops MIT, libatomic_ops_gpl GPLv2+
 License: GPL-2.0-or-later AND MIT

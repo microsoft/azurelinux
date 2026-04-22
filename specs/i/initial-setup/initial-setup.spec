@@ -9,7 +9,7 @@ Summary: Initial system configuration utility
 URL: https://fedoraproject.org/wiki/InitialSetup
 License: GPL-2.0-or-later
 Version: 0.3.101
-Release: 6%{?dist}
+Release: 7%{?dist}
 
 # This is a Red Hat maintained package which is specific to
 # our distribution.

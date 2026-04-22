@@ -10,7 +10,7 @@
 Name: hunspell-cop
 Summary: Coptic hunspell dictionaries
 Version: 0.3
-Release: 31%{?dist}
+Release: 32%{?dist}
 Source: http://www.moheb.de/download/dict-cop_EG_v03.oxt
 URL: http://www.moheb.de/coptic_oo.html
 License: GPL-3.0-or-later

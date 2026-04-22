@@ -3,7 +3,7 @@
 
 Name:           perl-Symbol-Util
 Version:        0.0203
-Release:        38%{?dist}
+Release: 39%{?dist}
 Summary:        Additional utilities for Perl symbols manipulation
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Symbol-Util

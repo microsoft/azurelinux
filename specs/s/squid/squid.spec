@@ -6,7 +6,7 @@
 
 Name:     squid
 Version:  7.4
-Release:  1%{?dist}
+Release: 2%{?dist}
 Summary:  The Squid proxy caching server
 Epoch:    7
 # See CREDITS for breakdown of non GPLv2+ code

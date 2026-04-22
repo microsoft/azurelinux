@@ -6,7 +6,7 @@
 
 Name:           perl-LWP-Protocol-https
 Version:        6.14
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Provide HTTPS support for LWP::UserAgent
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/LWP-Protocol-https

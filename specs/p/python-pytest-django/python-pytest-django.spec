@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        4.9.0
-Release:        5%{?dist}
+Release: 6%{?dist}
 Summary:        A Django plugin for pytest
 
 License:        LicenseRef-Callaway-BSD

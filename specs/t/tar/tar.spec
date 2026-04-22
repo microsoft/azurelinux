@@ -13,7 +13,7 @@ Summary: GNU file archiving program
 Name: tar
 Epoch: 2
 Version: 1.35
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: GPL-3.0-or-later
 URL: https://www.gnu.org/software/tar/
 

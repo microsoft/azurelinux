@@ -3,7 +3,7 @@
 
 Name:    device-mapper-multipath
 Version: 0.11.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Tools to manage multipath devices using device-mapper
 # readline uses GPL-3.0-only
 License: GPL-2.0-only AND GPL-3.0-only

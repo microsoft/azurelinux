@@ -11,7 +11,7 @@ Name: hunspell-vi
 Summary: Vietnamese hunspell dictionaries
 %global upstreamid 20120418
 Version: 0.%{upstreamid}
-Release: 19%{?dist}
+Release: 20%{?dist}
 Source: https://downloads.sourceforge.net/project/aoo-extensions/917/3/vi_spellchecker_ooo3.oxt
 URL: https://extensions.openoffice.org/en/project/vietnamese-spellchecker
 License: GPL-2.0-only

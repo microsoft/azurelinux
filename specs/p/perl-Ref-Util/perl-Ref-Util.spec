@@ -10,7 +10,7 @@
 
 Name:		perl-Ref-Util
 Version:	0.204
-Release:	23%{?dist}
+Release: 24%{?dist}
 Summary:	Utility functions for checking references
 License:	MIT
 URL:		https://metacpan.org/release/Ref-Util

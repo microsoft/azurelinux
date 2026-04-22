@@ -1,0 +1,64 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Lidong Chen <lidong.chen@oracle.com>
+Date: Fri, 22 Nov 2024 06:28:00 +0000
+Subject: [PATCH] fs/jfs: Fix OOB read caused by invalid dir slot index
+
+While fuzz testing JFS with ASAN enabled an OOB read was detected in
+grub_jfs_opendir(). The issue occurred due to an invalid directory slot
+index in the first entry of the sorted directory slot array in the inode
+directory header. The fix ensures the slot index is validated before
+accessing it. Given that an internal or a leaf node in a directory B+
+tree is a 4 KiB in size and each directory slot is always 32 bytes, the
+max number of slots in a node is 128. The validation ensures that the
+slot index doesn't exceed this limit.
+
+[1] https://jfs.sourceforge.net/project/pub/jfslayout.pdf
+
+  JFS will allocate 4K of disk space for an internal node of the B+ tree.
+  An internal node looks the same as a leaf node.
+          - page 10
+
+  Fixed number of Directory Slots depending on the size of the node. These are
+  the slots to be used for storing the directory slot array and the directory
+  entries or router entries. A directory slot is always 32 bytes.
+  ...
+  A Directory Slot Array which is a sorted array of indices to the directory
+  slots that are currently in use.
+  ...
+  An internal or a leaf node in the directory B+ tree is a 4K page.
+          - page 25
+
+Signed-off-by: Lidong Chen <lidong.chen@oracle.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+Reviewed-by: Alec Brown <alec.r.brown@oracle.com>
+---
+ grub-core/fs/jfs.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/grub-core/fs/jfs.c b/grub-core/fs/jfs.c
+index 32dec7fb7..88fb884df 100644
+--- a/grub-core/fs/jfs.c
++++ b/grub-core/fs/jfs.c
+@@ -46,6 +46,7 @@ GRUB_MOD_LICENSE ("GPLv3+");
+  * https://jfs.sourceforge.net/project/pub/jfslayout.pdf
+  */
+ #define GRUB_JFS_INODE_INLINE_ENTRIES	8
++#define GRUB_JFS_DIR_MAX_SLOTS		128
+ 
+ struct grub_jfs_sblock
+ {
+@@ -481,6 +482,14 @@ grub_jfs_opendir (struct grub_jfs_data *data, struct grub_jfs_inode *inode)
+       return 0;
+     }
+ 
++  if (inode->dir.header.sorted[0] >= GRUB_JFS_DIR_MAX_SLOTS)
++    {
++      grub_error (GRUB_ERR_BAD_FS, N_("invalid directory slot index"));
++      grub_free (diro->dirpage);
++      grub_free (diro);
++      return 0;
++    }
++
+   blk = grub_le_to_cpu32 (de[inode->dir.header.sorted[0]].ex.blk2);
+   blk <<= (grub_le_to_cpu16 (data->sblock.log2_blksz) - GRUB_DISK_SECTOR_BITS);
+ 

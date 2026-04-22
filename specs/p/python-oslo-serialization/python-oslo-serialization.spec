@@ -24,7 +24,7 @@ storable formats.
 
 Name:           python-%{pkg_name}
 Version:        5.5.0
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        OpenStack oslo.serialization library
 
 License:        Apache-2.0

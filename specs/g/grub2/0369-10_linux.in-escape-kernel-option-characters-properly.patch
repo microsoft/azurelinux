@@ -1,0 +1,47 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leo Sandoval <lsandova@redhat.com>
+Date: Wed, 7 May 2025 13:23:37 -0600
+Subject: [PATCH] 10_linux.in: escape kernel option characters properly
+
+This handles cases where kernel options, specifically the values,
+contain special characters, in this case ';', '&' and '$'.
+
+For example, the user defines the following GRUB_CMDLINE_LINUX on the
+default grub file /etc/default/grub, note the dolar sign on the 'memmap'
+option
+
+    GRUB_CMDLINE_LINUX="console=ttyS0 memmap=32g\\\$0x2000000000"
+
+then regenerating the grub cfg and BLS options line with the
+grub2-mkconfig command, resulting into
+
+    options root=UUID=6baedf23-2510-499a-815d-48b58cf6e619 ro
+    rootflags=subvol=root console=ttyS0 memmap=32g\$0x2000000000
+
+without this patch, we would end up with
+
+    options root=UUID=6baedf23-2510-499a-815d-48b58cf6e619 ro
+    rootflags=subvol=root console=ttyS0 memmap=32g$0x2000000000
+
+Note the missing '\' which is required to escape the '$', otherwise
+it would be consider a variable by blscfg parser which is not the case.
+
+Signed-off-by: Leo Sandoval <lsandova@redhat.com>
+---
+ util/grub.d/10_linux.in | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
+index 11c19304f8..cdfb72a1e3 100644
+--- a/util/grub.d/10_linux.in
++++ b/util/grub.d/10_linux.in
+@@ -178,6 +178,9 @@ update_bls_cmdline()
+             options="${options} ${GRUB_CMDLINE_LINUX_DEBUG}"
+         fi
+         options="$(echo "${options}" | sed -e 's/\//\\\//g')"
++        options="$(echo "${options}" | sed -e 's/\;/\\\;/g')"
++        options="$(echo "${options}" | sed -e 's/\\&/\\\\&/g')"
++        options="$(echo "${options}" | sed -e 's/\$/\\\$/g')"
+         sed -i -e "s/^options.*/options ${options}/" "${blsdir}/${bls}.conf"
+     done
+ }

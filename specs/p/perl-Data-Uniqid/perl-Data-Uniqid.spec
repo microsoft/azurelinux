@@ -3,7 +3,7 @@
 
 Name:           perl-Data-Uniqid
 Version:        0.12
-Release:        37%{?dist}
+Release: 38%{?dist}
 Summary:        Perl extension for simple generating of unique id's
 # Automatically converted from old format: GPL+ or Artistic - review is highly recommended.
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

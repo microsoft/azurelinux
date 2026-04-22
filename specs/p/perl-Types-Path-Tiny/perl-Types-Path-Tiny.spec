@@ -3,7 +3,7 @@
 
 Name:           perl-Types-Path-Tiny
 Version:        0.006
-Release:        23%{?dist}
+Release: 24%{?dist}
 Summary:        Path::Tiny types and coercions for Moose and Moo
 License:        Apache-2.0
 URL:            https://metacpan.org/release/Types-Path-Tiny

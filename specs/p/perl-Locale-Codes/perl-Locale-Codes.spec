@@ -3,7 +3,7 @@
 
 Name:           perl-Locale-Codes
 Version:        3.86
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Distribution of modules to handle locale codes
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Locale-Codes

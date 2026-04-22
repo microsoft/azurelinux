@@ -6,7 +6,7 @@
 
 Name:           libgdata
 Version:        0.18.1
-Release:        15%{?dist}
+Release: 16%{?dist}
 Summary:        Library for the GData protocol
 
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.

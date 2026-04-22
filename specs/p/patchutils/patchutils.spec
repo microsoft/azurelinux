@@ -4,7 +4,7 @@
 Summary: A collection of programs for manipulating patch files
 Name: patchutils
 Version: 0.4.2
-Release: 16%{?dist}
+Release: 17%{?dist}
 License: GPL-2.0-or-later
 URL: http://cyberelk.net/tim/patchutils/
 Source0: http://cyberelk.net/tim/data/patchutils/stable/%{name}-%{version}.tar.xz

@@ -1,0 +1,47 @@
+From 086878cf280edc7c88d6fc990fefea2ffda4556f Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Tue, 20 Feb 2024 18:23:57 +0100
+Subject: [PATCH] Port to OpenJDK 21
+
+---
+ .../collections/TestExtendedProperties.java   | 26 -------------------
+ 1 file changed, 26 deletions(-)
+
+diff --git a/src/test/org/apache/commons/collections/TestExtendedProperties.java b/src/test/org/apache/commons/collections/TestExtendedProperties.java
+index f64812f..13f623a 100644
+--- a/src/test/org/apache/commons/collections/TestExtendedProperties.java
++++ b/src/test/org/apache/commons/collections/TestExtendedProperties.java
+@@ -315,30 +315,4 @@ public class TestExtendedProperties extends TestCase {
+         assertEquals("class", extended.getString("resource.loader"));
+     }
+ 
+-    public void testActiveSecurityManager() {
+-        SecurityManager manager = new SecurityManager() {
+-
+-            public void checkPropertyAccess(String key) {
+-                if ("file.separator".equals(key)) {
+-                    throw new SecurityException();
+-                }
+-            }
+-
+-            public void checkPermission(Permission perm) {
+-            }
+-            
+-        };
+-
+-        System.setSecurityManager(manager);
+-
+-        try {
+-            ExtendedProperties properties = new ExtendedProperties();
+-            assertNotNull(properties);
+-        } catch (Exception ex) {
+-            fail("failed to instantiate ExtendedProperties");
+-        } finally {
+-            System.setSecurityManager(null);
+-        }
+-    }
+-
+ }
+-- 
+2.43.0
+

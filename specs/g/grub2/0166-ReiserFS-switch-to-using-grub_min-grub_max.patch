@@ -1,0 +1,92 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 21 Apr 2022 16:31:17 -0400
+Subject: [PATCH] ReiserFS: switch to using grub_min()/grub_max()
+
+This is a minor cleanup patch to remove the bespoke MIN() and MAX()
+definitions from the reiserfs driver, and uses grub_min() / grub_max()
+instead.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/fs/reiserfs.c | 28 +++++++++-------------------
+ 1 file changed, 9 insertions(+), 19 deletions(-)
+
+diff --git a/grub-core/fs/reiserfs.c b/grub-core/fs/reiserfs.c
+index 36b26ac98a0..42818c37622 100644
+--- a/grub-core/fs/reiserfs.c
++++ b/grub-core/fs/reiserfs.c
+@@ -42,16 +42,6 @@
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+-#define MIN(a, b) \
+-  ({ typeof (a) _a = (a); \
+-     typeof (b) _b = (b); \
+-     _a < _b ? _a : _b; })
+-
+-#define MAX(a, b) \
+-  ({ typeof (a) _a = (a); \
+-     typeof (b) _b = (b); \
+-     _a > _b ? _a : _b; })
+-
+ #define REISERFS_SUPER_BLOCK_OFFSET 0x10000
+ #define REISERFS_MAGIC_LEN 12
+ #define REISERFS_MAGIC_STRING "ReIsEr"
+@@ -1076,7 +1066,7 @@ grub_reiserfs_read_real (struct grub_fshelp_node *node,
+   grub_reiserfs_set_key_type (&key, GRUB_REISERFS_ANY, 2);
+   initial_position = off;
+   current_position = 0;
+-  final_position = MIN (len + initial_position, node->size);
++  final_position = grub_min (len + initial_position, node->size);
+   grub_dprintf ("reiserfs",
+ 		"Reading from %lld to %lld (%lld instead of requested %ld)\n",
+ 		(unsigned long long) initial_position,
+@@ -1115,8 +1105,8 @@ grub_reiserfs_read_real (struct grub_fshelp_node *node,
+           grub_dprintf ("reiserfs_blocktype", "D: %u\n", (unsigned) block);
+           if (initial_position < current_position + item_size)
+             {
+-              offset = MAX ((signed) (initial_position - current_position), 0);
+-              length = (MIN (item_size, final_position - current_position)
++              offset = grub_max ((signed) (initial_position - current_position), 0);
++              length = (grub_min (item_size, final_position - current_position)
+                         - offset);
+               grub_dprintf ("reiserfs",
+                             "Reading direct block %u from %u to %u...\n",
+@@ -1161,9 +1151,9 @@ grub_reiserfs_read_real (struct grub_fshelp_node *node,
+               grub_dprintf ("reiserfs_blocktype", "I: %u\n", (unsigned) block);
+               if (current_position + block_size >= initial_position)
+                 {
+-                  offset = MAX ((signed) (initial_position - current_position),
+-                                0);
+-                  length = (MIN (block_size, final_position - current_position)
++                  offset = grub_max ((signed) (initial_position - current_position),
++				     0);
++                  length = (grub_min (block_size, final_position - current_position)
+                             - offset);
+                   grub_dprintf ("reiserfs",
+                                 "Reading indirect block %u from %u to %u...\n",
+@@ -1205,7 +1195,7 @@ grub_reiserfs_read_real (struct grub_fshelp_node *node,
+   switch (found.type)
+     {
+       case GRUB_REISERFS_DIRECT:
+-        read_length = MIN (len, item_size - file->offset);
++        read_length = grub_min (len, item_size - file->offset);
+         grub_disk_read (found.data->disk,
+                         (found.block_number * block_size) / GRUB_DISK_SECTOR_SIZE,
+                         grub_le_to_cpu16 (found.header.item_location) + file->offset,
+@@ -1224,12 +1214,12 @@ grub_reiserfs_read_real (struct grub_fshelp_node *node,
+                         item_size, (char *) indirect_block_ptr);
+         if (grub_errno)
+           goto fail;
+-        len = MIN (len, file->size - file->offset);
++        len = grub_min (len, file->size - file->offset);
+         for (indirect_block = file->offset / block_size;
+              indirect_block < indirect_block_count && read_length < len;
+              indirect_block++)
+           {
+-            read = MIN (block_size, len - read_length);
++            read = grub_min (block_size, len - read_length);
+             grub_disk_read (found.data->disk,
+                             (grub_le_to_cpu32 (indirect_block_ptr[indirect_block]) * block_size) / GRUB_DISK_SECTOR_SIZE,
+                             file->offset % block_size, read,

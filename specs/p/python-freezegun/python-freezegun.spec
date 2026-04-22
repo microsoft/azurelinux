@@ -6,7 +6,7 @@
 
 Name:               python-freezegun
 Version:            1.5.1
-Release:            7%{?dist}
+Release: 8%{?dist}
 Summary:            %{sum}
 
 License:            Apache-2.0

@@ -6,7 +6,7 @@
 
 Name:           perl-Syntax-Keyword-MultiSub
 Version:        0.05
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Multiple dispatch on subroutines
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Syntax-Keyword-MultiSub

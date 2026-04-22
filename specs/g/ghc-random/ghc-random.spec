@@ -17,7 +17,7 @@
 Name:           ghc-%{pkg_name}
 Version:        1.2.1.3
 # can only be reset when subpkg bumped
-Release:        5%{?dist}
+Release: 6%{?dist}
 Summary:        Pseudo-random number generation
 
 License:        BSD-3-Clause

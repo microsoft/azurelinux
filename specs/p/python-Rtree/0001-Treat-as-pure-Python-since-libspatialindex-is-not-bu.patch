@@ -1,0 +1,33 @@
+From cfc7f1e5bbd641b8ab6c4828ac042a0abba7b057 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Mon, 23 Oct 2023 22:42:38 -0400
+Subject: [PATCH] Treat as pure Python since libspatialindex is not bundled
+
+Since we are not bundling libspatialindex as upstream does for PyPI
+wheel distribution, do not force setuptools to treat the package as
+binary/arched (which would cause it to be installed in
+%%python3_sitearch, and would mean this package could not properly be
+noarch).
+
+Since upstream does want to bundle libspatialindex, this is a
+downstream-only patch.
+
+https://bugzilla.redhat.com/show_bug.cgi?id=2050010
+---
+ setup.py | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 2326549..bfdbe48 100755
+--- a/setup.py
++++ b/setup.py
+@@ -58,6 +58,4 @@ class InstallPlatlib(install):  # type: ignore[misc]
+ # See pyproject.toml for other project metadata
+ setup(
+     name="rtree",
+-    distclass=BinaryDistribution,
+-    cmdclass={"bdist_wheel": bdist_wheel, "install": InstallPlatlib},
+ )
+-- 
+2.48.1
+

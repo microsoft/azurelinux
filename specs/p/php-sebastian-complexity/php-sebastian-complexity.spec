@@ -27,7 +27,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
 Version:        2.0.3
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        Calculating the complexity of PHP code units, version 2
 
 License:        BSD-3-Clause

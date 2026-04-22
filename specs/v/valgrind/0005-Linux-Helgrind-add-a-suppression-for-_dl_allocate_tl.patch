@@ -1,0 +1,30 @@
+From c080f583dc41a779d339ffd2a08863bd05a80904 Mon Sep 17 00:00:00 2001
+From: Paul Floyd <pjfloyd@wanadoo.fr>
+Date: Mon, 1 Dec 2025 08:18:56 +0100
+Subject: [PATCH 5/6] Linux Helgrind: add a suppression for
+ _dl_allocate_tls_init
+
+Seen on Fedora 43 amd64
+
+(cherry picked from commit b599858486bb7db6d2ff3e6ddc4e7f71791d393d)
+---
+ glibc-2.X-helgrind.supp.in | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/glibc-2.X-helgrind.supp.in b/glibc-2.X-helgrind.supp.in
+index 9b1ef9ae485b..61d4e1d724d0 100644
+--- a/glibc-2.X-helgrind.supp.in
++++ b/glibc-2.X-helgrind.supp.in
+@@ -356,3 +356,9 @@
+    obj:/usr/lib/*/libnss_mdns4*.so.*
+ }
+ 
++{
++   helgrind---_dl_allocate_tls_init
++   Helgrind:Race
++   fun:mempcpy
++   fun:_dl_allocate_tls_init
++}
+-- 
+2.52.0
+

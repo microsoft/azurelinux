@@ -3,7 +3,7 @@
 
 Name:           perl-DBD-CSV
 Version:        0.62
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        DBI driver for CSV files
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/DBD-CSV

@@ -1,0 +1,24 @@
+From ad76438fc97e5833358b98957ad89574ec159588 Mon Sep 17 00:00:00 2001
+From: Jason Montleon <jmontleo@redhat.com>
+Date: Tue, 30 Sep 2025 09:43:27 -0400
+Subject: [PATCH] Revert "Set an upper limit on the urllib3 dependency"
+
+This reverts commit b647e9a576702d9ac9cf09520b50363c0fffb9a3.
+---
+ requirements.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/requirements.txt b/requirements.txt
+index b1729b77a..179d4955c 100644
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -7,5 +7,5 @@ google-auth>=1.0.1  # Apache-2.0
+ websocket-client>=0.32.0,!=0.40.0,!=0.41.*,!=0.42.* # LGPLv2+
+ requests # Apache-2.0
+ requests-oauthlib # ISC
+-urllib3>=1.24.2,<2.4.0  # MIT
++urllib3>=1.24.2  # MIT
+ durationpy>=0.7 # MIT
+-- 
+2.51.0
+

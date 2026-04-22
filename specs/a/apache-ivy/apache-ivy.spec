@@ -10,7 +10,7 @@
 
 Name:           apache-%{jarname}
 Version:        2.5.3
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Java-based dependency manager
 License:        Apache-2.0
 URL:            https://ant.apache.org/ivy

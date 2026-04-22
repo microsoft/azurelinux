@@ -1,0 +1,151 @@
+From 10fb0a634a2d011906d7e61a9d218fb3b6d0ccfc Mon Sep 17 00:00:00 2001
+From: Martin Tournoij <martin@arp242.net>
+Date: Tue, 15 Apr 2025 14:40:32 +0100
+Subject: [PATCH] Encode large floats as exponent syntax (#441)
+
+Otherwise round-tripping something like 5e+22 won't work.
+---
+ encode.go      | 15 ++++++++----
+ encode_test.go | 65 +++++++++++++++++++++++++-------------------------
+ 2 files changed, 43 insertions(+), 37 deletions(-)
+
+diff --git a/encode.go b/encode.go
+index ac196e7..b8eedbc 100644
+--- a/encode.go
++++ b/encode.go
+@@ -297,7 +297,7 @@ func (enc *Encoder) eElement(rv reflect.Value) {
+ 			}
+ 			enc.wf("inf")
+ 		} else {
+-			enc.wf(floatAddDecimal(strconv.FormatFloat(f, 'f', -1, 32)))
++			enc.wf(floatAddDecimal(strconv.FormatFloat(f, 'g', -1, 32)))
+ 		}
+ 	case reflect.Float64:
+ 		f := rv.Float()
+@@ -312,7 +312,7 @@ func (enc *Encoder) eElement(rv reflect.Value) {
+ 			}
+ 			enc.wf("inf")
+ 		} else {
+-			enc.wf(floatAddDecimal(strconv.FormatFloat(f, 'f', -1, 64)))
++			enc.wf(floatAddDecimal(strconv.FormatFloat(f, 'g', -1, 64)))
+ 		}
+ 	case reflect.Array, reflect.Slice:
+ 		enc.eArrayOrSliceElement(rv)
+@@ -330,10 +330,15 @@ func (enc *Encoder) eElement(rv reflect.Value) {
+ // By the TOML spec, all floats must have a decimal with at least one number on
+ // either side.
+ func floatAddDecimal(fstr string) string {
+-	if !strings.Contains(fstr, ".") {
+-		return fstr + ".0"
++	for _, c := range fstr {
++		if c == 'e' { // Exponent syntax
++			return fstr
++		}
++		if c == '.' {
++			return fstr
++		}
+ 	}
+-	return fstr
++	return fstr + ".0"
+ }
+ 
+ func (enc *Encoder) writeQuoted(s string) {
+diff --git a/encode_test.go b/encode_test.go
+index 28a4127..f6afb5c 100644
+--- a/encode_test.go
++++ b/encode_test.go
+@@ -7,58 +7,59 @@ import (
+ 	"math"
+ 	"net"
+ 	"os"
++	"reflect"
+ 	"strconv"
+ 	"strings"
+ 	"testing"
+ 	"time"
+ )
+ 
+-func TestEncodeRoundTrip(t *testing.T) {
+-	type Config struct {
+-		Age        int
+-		Cats       []string
+-		Pi         float64
+-		Perfection []int
+-		DOB        time.Time
+-		Ipaddress  net.IP
+-	}
++func TestRoundtrip(t *testing.T) {
++	type scan struct {
++		Age        int       `toml:"age"`
++		Cats       []string  `toml:"cats"`
++		Pi         float64   `toml:"pi"`
++		Perfection []int     `toml:"perfection"`
++		DOB        time.Time `toml:"dob"`
++		IP         net.IP    `toml:"ip"`
++		LargeFloat float64   `toml:"large_float"`
++	}
++
++	doc := `
++age = 13
++cats = ["one", "two", "three"]
++pi = 3.145
++perfection = [11, 2, 3, 4]
++dob = 2012-01-02T15:16:17Z
++ip = "192.168.59.254"
++large_float = 5e+22
++`[1:]
+ 
+-	var inputs = Config{
++	want := scan{
+ 		Age:        13,
+ 		Cats:       []string{"one", "two", "three"},
+ 		Pi:         3.145,
+ 		Perfection: []int{11, 2, 3, 4},
+-		DOB:        time.Now(),
+-		Ipaddress:  net.ParseIP("192.168.59.254"),
++		DOB:        time.Date(2012, 01, 02, 15, 16, 17, 0, time.UTC),
++		IP:         net.ParseIP("192.168.59.254"),
++		LargeFloat: 5e+22,
+ 	}
+ 
+-	var (
+-		firstBuffer  bytes.Buffer
+-		secondBuffer bytes.Buffer
+-		outputs      Config
+-	)
+-	err := NewEncoder(&firstBuffer).Encode(inputs)
+-	if err != nil {
+-		t.Fatal(err)
+-	}
+-	_, err = Decode(firstBuffer.String(), &outputs)
++	var s scan
++	_, err := Decode(doc, &s)
+ 	if err != nil {
+-		t.Logf("Could not decode:\n%s\n", firstBuffer.String())
+ 		t.Fatal(err)
+ 	}
+-	err = NewEncoder(&secondBuffer).Encode(outputs)
+-	if err != nil {
+-		t.Fatal(err)
++	if !reflect.DeepEqual(s, want) {
++		t.Errorf("\nhave: %v\nwant: %v", s, want)
+ 	}
+-	if firstBuffer.String() != secondBuffer.String() {
+-		t.Errorf("%s\n\nIS NOT IDENTICAL TO\n\n%s", firstBuffer.String(), secondBuffer.String())
+-	}
+-	out, err := Marshal(inputs)
++
++	out, err := Marshal(s)
+ 	if err != nil {
+ 		t.Fatal(err)
+ 	}
+-	if firstBuffer.String() != string(out) {
+-		t.Errorf("%s\n\nIS NOT IDENTICAL TO\n\n%s", firstBuffer.String(), string(out))
++	if string(out) != doc {
++		t.Errorf("\nhave:\n%v\nwant:\n%v", string(out), doc)
+ 	}
+ }
+ 
+-- 
+2.49.0
+

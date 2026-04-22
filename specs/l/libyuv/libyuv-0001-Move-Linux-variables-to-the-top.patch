@@ -1,0 +1,28 @@
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Wed, 5 Jun 2024 20:51:34 +0200
+Subject: [PATCH] Move Linux variables to the top
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 6dfc93ce..aae18296 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -6,6 +6,9 @@ PROJECT ( YUV C CXX )	# "C" is required even for C++ projects
+ CMAKE_MINIMUM_REQUIRED( VERSION 2.8.12 )
+ OPTION( UNIT_TEST "Built unit tests" OFF )
+ 
++# create the .deb and .rpm packages using cpack
++INCLUDE ( CM_linux_packages.cmake )
++
+ SET ( ly_base_dir	${PROJECT_SOURCE_DIR} )
+ SET ( ly_src_dir	${ly_base_dir}/source )
+ SET ( ly_inc_dir	${ly_base_dir}/include )
+@@ -190,7 +193,3 @@ INSTALL ( PROGRAMS ${CMAKE_BINARY_DIR}/yuvconvert			DESTINATION bin )
+ INSTALL ( TARGETS ${ly_lib_static}						DESTINATION lib )
+ INSTALL ( TARGETS ${ly_lib_shared} LIBRARY				DESTINATION lib RUNTIME DESTINATION bin )
+ INSTALL ( DIRECTORY ${PROJECT_SOURCE_DIR}/include/		DESTINATION include )
+-
+-# create the .deb and .rpm packages using cpack
+-INCLUDE ( CM_linux_packages.cmake )
+-

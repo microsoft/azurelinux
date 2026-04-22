@@ -5,7 +5,7 @@ Name: hyphen-da
 Summary: Danish hyphenation rules
 %global upstreamid 20070903
 Version: 0.%{upstreamid}
-Release: 34%{?dist}
+Release: 35%{?dist}
 Source: http://download.services.openoffice.org/contrib/dictionaries/hyph_da_DK.zip
 URL: http://wiki.services.openoffice.org/wiki/Dictionaries
 Patch0: hyphen-da-lppl-license-fix.patch

@@ -4,7 +4,7 @@
 Name:           perl-Scalar-List-Utils
 Epoch:          5
 Version:        1.70
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        A selection of general-utility scalar and list subroutines
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Scalar-List-Utils

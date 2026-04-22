@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leo Sandoval <lsandova@redhat.com>
+Date: Fri, 22 Mar 2024 14:20:06 -0600
+Subject: [PATCH] remove unused varible
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Otherwise compiler complains with:
+
+../../grub-core/commands/efi/connectefi.c:143:20: error: unused variable ‘j’ [-Werror=unused-variable]
+  143 |           unsigned j;
+      |                    ^
+
+Signed-off-by: Leo Sandoval <lsandova@redhat.com>
+---
+ grub-core/commands/efi/connectefi.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/grub-core/commands/efi/connectefi.c b/grub-core/commands/efi/connectefi.c
+index 6c397f8f508..9d02f2780f6 100644
+--- a/grub-core/commands/efi/connectefi.c
++++ b/grub-core/commands/efi/connectefi.c
+@@ -140,7 +140,6 @@ loop:
+ 	{
+ 	  grub_efi_handle_t handle = handles[i];
+ 	  grub_efi_status_t status;
+-	  unsigned j;
+ 
+ 	  /* Skip already handled handles  */
+ 	  if (is_in_list (handle))

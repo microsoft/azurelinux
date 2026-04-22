@@ -1,0 +1,50 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: B Horn <b@horn.uk>
+Date: Tue, 11 Feb 2025 17:12:29 -0600
+Subject: [PATCH] commands/memrw: Disable memory reading in lockdown mode
+
+With the rest of module being blocked in lockdown mode it does not make
+a lot of sense to leave memory reading enabled. This also goes in par
+with disabling the dump command.
+
+Reported-by: B Horn <b@horn.uk>
+Signed-off-by: B Horn <b@horn.uk>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/commands/memrw.c | 21 ++++++++++++---------
+ 1 file changed, 12 insertions(+), 9 deletions(-)
+
+diff --git a/grub-core/commands/memrw.c b/grub-core/commands/memrw.c
+index 39cf3a06d..9d8a54a4b 100644
+--- a/grub-core/commands/memrw.c
++++ b/grub-core/commands/memrw.c
+@@ -126,17 +126,20 @@ GRUB_MOD_INIT(memrw)
+     return;
+ 
+   cmd_read_byte =
+-    grub_register_extcmd ("read_byte", grub_cmd_read, 0,
+-			  N_("ADDR"), N_("Read 8-bit value from ADDR."),
+-			  options);
++    grub_register_extcmd_lockdown ("read_byte", grub_cmd_read, 0,
++                                   N_("ADDR"),
++                                   N_("Read 8-bit value from ADDR."),
++                                   options);
+   cmd_read_word =
+-    grub_register_extcmd ("read_word", grub_cmd_read, 0,
+-			  N_("ADDR"), N_("Read 16-bit value from ADDR."),
+-			  options);
++    grub_register_extcmd_lockdown ("read_word", grub_cmd_read, 0,
++                                   N_("ADDR"),
++                                   N_("Read 16-bit value from ADDR."),
++                                   options);
+   cmd_read_dword =
+-    grub_register_extcmd ("read_dword", grub_cmd_read, 0,
+-			  N_("ADDR"), N_("Read 32-bit value from ADDR."),
+-			  options);
++    grub_register_extcmd_lockdown ("read_dword", grub_cmd_read, 0,
++                                   N_("ADDR"),
++                                   N_("Read 32-bit value from ADDR."),
++                                   options);
+   cmd_write_byte =
+     grub_register_command_lockdown ("write_byte", grub_cmd_write,
+                                     N_("ADDR VALUE [MASK]"),

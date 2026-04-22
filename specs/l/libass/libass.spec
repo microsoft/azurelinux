@@ -3,7 +3,7 @@
 
 Name:           libass
 Version:        0.17.3
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Portable library for SSA/ASS subtitles rendering
 License:        ISC
 URL:            https://github.com/libass

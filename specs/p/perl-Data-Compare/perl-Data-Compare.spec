@@ -3,7 +3,7 @@
 
 Name:           perl-Data-Compare
 Version:        1.29
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        Compare perl data structures
 # Some of the metadata files suggest GPL2 rather than GPL (any version)
 # but the module is actually licensed "same as perl"

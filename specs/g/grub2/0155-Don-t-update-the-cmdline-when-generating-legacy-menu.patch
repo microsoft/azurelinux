@@ -1,0 +1,36 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Javier Martinez Canillas <javierm@redhat.com>
+Date: Thu, 17 Jun 2021 14:31:42 +0200
+Subject: [PATCH] Don't update the cmdline when generating legacy menuentry
+ commands
+
+On OPAL ppc64le machines with an old petitboot version that doesn't have
+support to parse BLS snippets, the grub2-mkconfig script is executed to
+generate menuentry commands from the BLS snippets.
+
+In this case, the script is executed with the --no-grubenv-update option
+that indicates that no side effects should happen when running the script.
+
+But the options field in the BLS snippets are updated regardless, only do
+the update if --no-grubenv-update was not used.
+
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+---
+ util/grub.d/10_linux.in | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
+index b8bc37e92aa..360ce26e5f9 100644
+--- a/util/grub.d/10_linux.in
++++ b/util/grub.d/10_linux.in
+@@ -258,7 +258,9 @@ if [ -z "\${kernelopts}" ]; then
+ fi
+ EOF
+ 
+-  update_bls_cmdline
++  if [ "x${GRUB_GRUBENV_UPDATE}" = "xyes" ]; then
++      update_bls_cmdline
++  fi
+ 
+   if [ "x${BLS_POPULATE_MENU}" = "xtrue" ]; then
+       populate_menu

@@ -8,7 +8,7 @@
 
 Name:          tpm2-tss
 Version:       4.1.3
-Release:       8%{?candidate:.%{candidate}}%{?dist}
+Release: 9%{?candidate:.%{candidate}}%{?dist}
 Summary:       TPM2.0 Software Stack
 
 # The entire source code is under BSD except implementation.h and tpmb.h which

@@ -10,7 +10,7 @@
 Name: hunspell-ta
 Summary: Tamil hunspell dictionaries
 Version: 1.0.0
-Release: 27%{?dist}
+Release: 28%{?dist}
 Epoch:   1
 Source: http://anishpatil.fedorapeople.org/ta_in.%{version}.tar.gz
 URL: https://gitorious.org/hunspell_dictionaries/hunspell_dictionaries.git

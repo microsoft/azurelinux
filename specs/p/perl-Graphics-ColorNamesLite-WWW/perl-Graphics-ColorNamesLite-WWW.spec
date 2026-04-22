@@ -3,7 +3,7 @@
 
 Name:           perl-Graphics-ColorNamesLite-WWW
 Version:        1.14.000
-Release:        15%{?dist}
+Release: 16%{?dist}
 Summary:        WWW color names and equivalent RGB values
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Graphics-ColorNamesLite-WWW/

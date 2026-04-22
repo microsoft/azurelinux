@@ -1,0 +1,34 @@
+From 333a29a4d6314713d2c54ddbf6fd53b570b14c75 Mon Sep 17 00:00:00 2001
+From: Sylwester Lachiewicz <slachiewicz@apache.org>
+Date: Sat, 10 Apr 2021 11:21:36 +0200
+Subject: [PATCH 2/2] Fix incorrect parent relativePath
+
+---
+ pom.xml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/pom.xml b/pom.xml
+index 7096114..ea50122 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -24,7 +24,7 @@
+     <groupId>org.apache.maven.shared</groupId>
+     <artifactId>maven-shared-components</artifactId>
+     <version>22</version>
+-    <relativePath>../../pom/maven/maven-shared-components/pom.xml</relativePath>
++    <relativePath/>
+   </parent>
+ 
+   <artifactId>maven-shared-io</artifactId>
+@@ -51,7 +51,7 @@
+   </scm>
+   <issueManagement>
+     <system>jira</system>
+-    <url>https://issues.apache.org/jira/browse/MSHARED/component/12326440</url>
++    <url>https://issues.apache.org/jira/projects/MSHARED</url>
+   </issueManagement>
+   <distributionManagement>
+     <site>
+-- 
+2.48.1
+

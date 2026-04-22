@@ -1,0 +1,13 @@
+diff -Naur packr-2.8.1.old/v2/packr2/cmd/install.go packr-2.8.1/v2/packr2/cmd/install.go
+--- packr-2.8.1.old/v2/packr2/cmd/install.go	2020-11-10 11:22:05.000000000 -0600
++++ packr-2.8.1/v2/packr2/cmd/install.go	2023-01-18 13:47:21.948140757 -0600
+@@ -19,8 +19,7 @@
+ It is recommended you use two commands instead:
+ 
+ $ packr2
+-$ go build/install
+-`
++$ go build/install`
+ 
+ var installCmd = &cobra.Command{
+ 	Use:                "install",

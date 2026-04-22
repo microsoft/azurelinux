@@ -3,7 +3,7 @@
 
 Name:           libmpeg2
 Version:        0.5.1
-Release:        32%{?dist}
+Release: 33%{?dist}
 Summary:        MPEG-2 decoder libraries
 
 License:        GPL-2.0-or-later

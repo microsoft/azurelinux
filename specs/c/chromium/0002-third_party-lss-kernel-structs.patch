@@ -1,0 +1,148 @@
+Index: chromium-144.0.7559.59/third_party/lss/linux_syscall_support.h
+===================================================================
+--- chromium-144.0.7559.59.orig/third_party/lss/linux_syscall_support.h
++++ chromium-144.0.7559.59/third_party/lss/linux_syscall_support.h
+@@ -86,7 +86,7 @@
+  * Porting to other related platforms should not be difficult.
+  */
+ #if (defined(__i386__) || defined(__x86_64__) || defined(__ARM_ARCH_3__) ||   \
+-     defined(__mips__) || defined(__PPC__) || defined(__ARM_EABI__) || \
++     defined(__mips__) || defined(__PPC__) || defined(__powerpc64__) || defined(__ARM_EABI__) || \
+      defined(__aarch64__) || defined(__s390__) || defined(__e2k__) ||  \
+      (defined(__riscv) && __riscv_xlen == 64) || defined(__loongarch_lp64))  \
+   && (defined(__linux) || defined(__ANDROID__))
+@@ -400,7 +400,7 @@ struct kernel_stat64 {
+   unsigned           __pad2;
+   unsigned long long st_blocks;
+ };
+-#elif defined __PPC__
++#elif defined __PPC__ && !defined(__powerpc64__)
+ struct kernel_stat64 {
+   unsigned long long st_dev;
+   unsigned long long st_ino;
+@@ -422,6 +422,28 @@ struct kernel_stat64 {
+   unsigned long      __unused4;
+   unsigned long      __unused5;
+ };
++#elif defined(__powerpc64__)
++struct kernel_stat64 {
++  unsigned long int  st_dev;
++  unsigned long int  st_ino;
++  unsigned int       st_mode;
++  unsigned long int  st_nlink;
++  unsigned int       st_uid;
++  unsigned int       st_gid;
++  unsigned long int  st_rdev;
++  unsigned short int __pad2;
++  long int           st_size;
++  long int           st_blksize;
++  long int           st_blocks;
++  long int           st_atime_;
++  unsigned long int  st_atime_nsec_;
++  long int           st_mtime_;
++  unsigned long int  st_mtime_nsec_;
++  long int           st_ctime_;
++  unsigned long int  st_ctime_nsec_;
++  unsigned long int  __unused4;
++  unsigned long int  __unused5;
++};
+ #elif defined(__e2k__)
+ struct kernel_stat64 {
+   unsigned long long st_dev;
+@@ -538,7 +560,7 @@ struct kernel_stat {
+   uint64_t           st_ctime_nsec_;
+   int64_t            __unused4[3];
+ };
+-#elif defined(__PPC__)
++#elif defined(__PPC__) && !defined(__powerpc64__)
+ typedef unsigned long kernel_blkcnt_t;
+ typedef unsigned long kernel_blksize_t;
+ typedef unsigned kernel_dev_t;
+@@ -569,6 +591,37 @@ struct kernel_stat {
+   unsigned long      __unused4;
+   unsigned long      __unused5;
+ };
++#elif defined(__powerpc64__)
++typedef long int kernel_blkcnt_t;
++typedef long int kernel_blksize_t;
++typedef unsigned long int kernel_dev_t;
++typedef unsigned int kernel_gid_t;
++typedef unsigned long int kernel_ino_t;
++typedef unsigned int kernel_mode_t;
++typedef unsigned long int kernel_nlink_t;
++typedef long int kernel_off_t;
++typedef long int kernel_time_t;
++typedef unsigned int kernel_uid_t;
++struct kernel_stat {
++  kernel_dev_t       st_dev;
++  kernel_ino_t       st_ino;
++  kernel_mode_t      st_mode;
++  kernel_nlink_t     st_nlink;
++  kernel_uid_t       st_uid;
++  kernel_gid_t       st_gid;
++  kernel_dev_t       st_rdev;
++  kernel_off_t       st_size;
++  kernel_blksize_t   st_blksize;
++  kernel_blkcnt_t    st_blocks;
++  kernel_time_t      st_atime_;
++  unsigned long int  st_atime_nsec_;
++  kernel_time_t      st_mtime_;
++  unsigned long int  st_mtime_nsec_;
++  kernel_time_t      st_ctime_;
++  unsigned long int  st_ctime_nsec_;
++  unsigned long int  __unused4;
++  unsigned long int  __unused5;
++};
+ #elif (defined(__mips__) && _MIPS_SIM != _MIPS_SIM_ABI64)
+ typedef int kernel_blkcnt_t;
+ typedef int kernel_blksize_t;
+@@ -1825,6 +1878,28 @@ struct kernel_statx {
+ #ifndef __NR_getcpu
+ #define __NR_getcpu             302
+ #endif
++
++/* Linux commit 86250b9d12caa1a3dee12a7cf638b7dd70eaadb6 (2010) adds
++ * direct socket system calls to PPC */
++#ifndef __NR_socket
++#define __NR_socket             326
++#endif
++#ifndef __NR_socketpair
++#define __NR_socketpair         333
++#endif
++#ifndef __NR_sendto
++#define __NR_sendto             335
++#endif
++#ifndef __NR_shutdown
++#define __NR_shutdown           338
++#endif
++#ifndef __NR_sendmsg
++#define __NR_sendmsg            341
++#endif
++#ifndef __NR_recvmsg
++#define __NR_recvmsg            342
++#endif
++
+ /* End of powerpc definitions                                              */
+ #elif defined(__s390__)
+ #ifndef __NR_quotactl
+@@ -4826,7 +4901,7 @@ struct kernel_statx {
+     LSS_INLINE _syscall6(void*, mmap, void*, addr, size_t, length, int, prot,
+                          int, flags, int, fd, int64_t, offset)
+   #endif
+-  #if defined(__PPC__)
++  #if defined(__PPC__) && !defined(__powerpc64__)
+     #undef LSS_SC_LOADARGS_0
+     #define LSS_SC_LOADARGS_0(dummy...)
+     #undef LSS_SC_LOADARGS_1
+@@ -5216,7 +5291,11 @@ struct kernel_statx {
+ #endif
+ 
+ #if !defined(__NR_pipe)
++#if defined(__powerpc64__)
++  LSS_INLINE pid_t LSS_NAME(pipe)(int *pipefd) {
++#else
+   LSS_INLINE int LSS_NAME(pipe)(int *pipefd) {
++#endif
+     return LSS_NAME(pipe2)(pipefd, 0);
+   }
+ #endif

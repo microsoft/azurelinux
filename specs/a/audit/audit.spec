@@ -4,7 +4,7 @@
 Summary: User space tools for kernel auditing
 Name: audit
 Version: 4.1.3
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPL-2.0-or-later AND LGPL-2.0-or-later
 URL: https://github.com/linux-audit/audit-userspace/
 Source0: audit-userspace-%{version}.tar.gz

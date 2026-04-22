@@ -1,0 +1,72 @@
+--- xerces-j2/build.xml.orig	2010-11-26 20:42:11.000000000 +0000
++++ xerces-j2/build.xml	2010-12-11 19:20:35.913500731 +0000
+@@ -108,7 +108,6 @@
+     <property name="distsrc.dir" value="${build.dir}/${parser.shortname}-${parser_version}"/>
+     <property name="disttools.dir" value="${build.dir}/tools"/>
+     <property name="distbin.dir" value="${build.dir}/${parser.shortname}-${parser_version}"/>
+-    <property name='src.apis.zip' value="${tools.dir}/xml-commons-external-src.zip"/>
+ 
+     <filter token="year" value="${year}"/>
+     <filter token="version" value="${parser.Version}"/>
+@@ -247,30 +246,6 @@
+     <copy file="${src.dir}/org/apache/xerces/impl/xpath/regex/message.properties"
+       tofile="${build.src}/org/apache/xerces/impl/xpath/regex/message_en.properties"/>
+ 
+-    <!-- now deal with API's:  -->
+-    <unzip src="${src.apis.zip}" dest="${build.src}">
+-        <patternset
+-            includes="org/xml/sax/** 
+-                javax/xml/**
+-                javax/xml/datatype/**
+-                javax/xml/namespace/**
+-                javax/xml/parsers/**
+-                javax/xml/stream/**
+-                javax/xml/transform/**
+-                javax/xml/validation/**
+-                javax/xml/xpath/**
+-                org/w3c/dom/*
+-                org/w3c/dom/bootstrap/**
+-                org/w3c/dom/events/**
+-                org/w3c/dom/html/**
+-                org/w3c/dom/ls/**
+-                org/w3c/dom/ranges/**
+-                org/w3c/dom/traversal/**
+-                org/w3c/dom/views/**
+-                org/w3c/dom/xpath/**"
+-        />
+-    </unzip>
+-    
+     <!-- substitute tokens as needed -->
+     <replace file="${build.dir}/src/org/apache/xerces/impl/Version.java" 
+              token="@@VERSION@@" value="${parser.Name} ${parser.Version}"/>
+@@ -1232,30 +1207,6 @@
+     <!-- HACK: Remove reference to XML11Configurable from SAX parser -->
+     <replace file="${build.dir}/src/org/apache/xerces/parsers/AbstractSAXParser.java"
+              token="return (fConfiguration instanceof XML11Configurable);" value="return false;"/>
+- 
+-    <!-- now deal with API's:  -->
+-    <unzip src="${src.apis.zip}" dest="${build.src}">
+-        <patternset
+-            includes="org/xml/sax/** 
+-                javax/xml/**
+-                javax/xml/datatype/**
+-                javax/xml/namespace/**
+-                javax/xml/parsers/**
+-                javax/xml/stream/**
+-                javax/xml/transform/**
+-                javax/xml/validation/**
+-                javax/xml/xpath/**
+-                org/w3c/dom/*
+-                org/w3c/dom/bootstrap/**
+-                org/w3c/dom/events/**
+-                org/w3c/dom/html/**
+-                org/w3c/dom/ls/**
+-                org/w3c/dom/ranges/**
+-                org/w3c/dom/traversal/**
+-                org/w3c/dom/views/**
+-                org/w3c/dom/xpath/**"
+-        />
+-    </unzip>
+ 
+ 
+     <!-- substitute tokens as needed -->

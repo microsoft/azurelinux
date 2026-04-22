@@ -3,7 +3,7 @@
 
 Name:           malcontent
 Version:        0.13.0
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Parental controls implementation
 
 License:        LGPL-2.1-only AND CC-BY-3.0

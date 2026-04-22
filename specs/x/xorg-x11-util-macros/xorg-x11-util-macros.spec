@@ -7,7 +7,7 @@
 Summary: X.Org X11 Autotools macros
 Name: xorg-x11-util-macros
 Version: 1.20.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: HPND-sell-variant AND MIT
 URL: http://www.x.org
 BuildArch: noarch

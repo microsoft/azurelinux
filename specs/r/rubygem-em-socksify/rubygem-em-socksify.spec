@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 0.3.0
-Release: 32%{?dist}
+Release: 33%{?dist}
 Summary: Transparent proxy support for any EventMachine protocol
 License: MIT
 URL: https://github.com/igrigorik/em-socksify

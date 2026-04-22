@@ -5,7 +5,7 @@
 
 Name:           mingw-adwaita-icon-theme
 Version:        49.0
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Adwaita icon theme for MingGW
 
 License:        LGPL-3.0-or-later OR CC-BY-SA-3.0

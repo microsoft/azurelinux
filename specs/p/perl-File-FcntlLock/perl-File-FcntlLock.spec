@@ -3,7 +3,7 @@
 
 Name:		perl-File-FcntlLock
 Version:	0.22
-Release:	36%{?dist}
+Release: 37%{?dist}
 Summary:	Perl module for file locking with fcntl
 # Automatically converted from old format: GPL+ or Artistic - review is highly recommended.
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl

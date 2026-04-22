@@ -1,0 +1,240 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Lidong Chen <lidong.chen@oracle.com>
+Date: Wed, 12 Feb 2025 10:38:17 -0600
+Subject: [PATCH] net: Use safe math macros to prevent overflows
+
+Replace direct arithmetic operations with macros from include/grub/safemath.h
+to prevent potential overflow issues when calculating the memory sizes.
+
+Signed-off-by: Lidong Chen <lidong.chen@oracle.com>
+Signed-off-by: Alec Brown <alec.r.brown@oracle.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/net/bootp.c                  | 16 +++++++++++--
+ grub-core/net/dns.c                    |  9 ++++++-
+ grub-core/net/drivers/ieee1275/ofnet.c | 20 ++++++++++++++--
+ grub-core/net/net.c                    | 43 +++++++++++++++++++++++++++-------
+ 4 files changed, 75 insertions(+), 13 deletions(-)
+
+diff --git a/grub-core/net/bootp.c b/grub-core/net/bootp.c
+index 9cbdc2264..bed70c0b2 100644
+--- a/grub-core/net/bootp.c
++++ b/grub-core/net/bootp.c
+@@ -27,6 +27,7 @@
+ #include <grub/datetime.h>
+ #include <grub/time.h>
+ #include <grub/list.h>
++#include <grub/safemath.h>
+ 
+ static int
+ dissect_url (const char *url, char **proto, char **host, char **path)
+@@ -1479,6 +1480,7 @@ grub_cmd_dhcpopt (struct grub_command *cmd __attribute__ ((unused)),
+   unsigned num;
+   const grub_uint8_t *ptr;
+   grub_uint8_t taglength;
++  grub_uint8_t len;
+ 
+   if (argc < 4)
+     return grub_error (GRUB_ERR_BAD_ARGUMENT,
+@@ -1520,7 +1522,12 @@ grub_cmd_dhcpopt (struct grub_command *cmd __attribute__ ((unused)),
+   if (grub_strcmp (args[3], "string") == 0)
+     {
+       grub_err_t err = GRUB_ERR_NONE;
+-      char *val = grub_malloc (taglength + 1);
++      char *val;
++
++      if (grub_add (taglength, 1, &len))
++	return grub_error (GRUB_ERR_OUT_OF_RANGE, N_("tag length overflow"));
++
++      val = grub_malloc (len);
+       if (!val)
+ 	return grub_errno;
+       grub_memcpy (val, ptr, taglength);
+@@ -1553,7 +1560,12 @@ grub_cmd_dhcpopt (struct grub_command *cmd __attribute__ ((unused)),
+   if (grub_strcmp (args[3], "hex") == 0)
+     {
+       grub_err_t err = GRUB_ERR_NONE;
+-      char *val = grub_malloc (2 * taglength + 1);
++      char *val;
++
++      if (grub_mul (taglength, 2, &len) || grub_add (len, 1, &len))
++	return grub_error (GRUB_ERR_OUT_OF_RANGE, N_("tag length overflow"));
++
++      val = grub_malloc (len);
+       int i;
+       if (!val)
+ 	return grub_errno;
+diff --git a/grub-core/net/dns.c b/grub-core/net/dns.c
+index fcc09aa65..39b0c46cf 100644
+--- a/grub-core/net/dns.c
++++ b/grub-core/net/dns.c
+@@ -224,10 +224,17 @@ get_name (const grub_uint8_t *name_at, const grub_uint8_t *head,
+ {
+   int length;
+   char *ret;
++  int len;
+ 
+   if (!check_name_real (name_at, head, tail, NULL, &length, NULL))
+     return NULL;
+-  ret = grub_malloc (length + 1);
++
++  if (grub_add (length, 1, &len))
++    {
++      grub_error (GRUB_ERR_OUT_OF_RANGE, N_("name length overflow"));
++      return NULL;
++    }
++  ret = grub_malloc (len);
+   if (!ret)
+     return NULL;
+   if (!check_name_real (name_at, head, tail, NULL, NULL, ret))
+diff --git a/grub-core/net/drivers/ieee1275/ofnet.c b/grub-core/net/drivers/ieee1275/ofnet.c
+index c56461ff1..b5336dfbb 100644
+--- a/grub-core/net/drivers/ieee1275/ofnet.c
++++ b/grub-core/net/drivers/ieee1275/ofnet.c
+@@ -22,6 +22,7 @@
+ #include <grub/net.h>
+ #include <grub/time.h>
+ #include <grub/i18n.h>
++#include <grub/safemath.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -392,6 +393,7 @@ search_net_devices (struct grub_ieee1275_devalias *alias)
+   grub_uint8_t *pprop;
+   char *shortname;
+   char need_suffix = 1;
++  grub_size_t sz;
+ 
+   if (grub_strcmp (alias->type, "network") != 0)
+     return 0;
+@@ -449,9 +451,23 @@ search_net_devices (struct grub_ieee1275_devalias *alias)
+   }
+ 
+   if (need_suffix)
+-    ofdata->path = grub_malloc (grub_strlen (alias->path) + sizeof (SUFFIX));
++    {
++      if (grub_add (grub_strlen (alias->path), sizeof (SUFFIX), &sz))
++	{
++	  grub_error (GRUB_ERR_OUT_OF_RANGE, N_("overflow detected while obatining size of ofdata path"));
++	  grub_print_error ();
++	  return 0;
++	}
++    }
+   else
+-    ofdata->path = grub_malloc (grub_strlen (alias->path) + 1);
++    {
++      if (grub_add (grub_strlen (alias->path), 1, &sz))
++	{
++	  grub_error (GRUB_ERR_OUT_OF_RANGE, N_("overflow detected while obatining size of ofdata path"));
++	  grub_print_error ();
++	  return 0;
++	}
++    }
+   if (!ofdata->path)
+     {
+       grub_print_error ();
+diff --git a/grub-core/net/net.c b/grub-core/net/net.c
+index 6c8dfcba2..22224453f 100644
+--- a/grub-core/net/net.c
++++ b/grub-core/net/net.c
+@@ -32,6 +32,7 @@
+ #include <grub/loader.h>
+ #include <grub/bufio.h>
+ #include <grub/kernel.h>
++#include <grub/safemath.h>
+ #ifdef GRUB_MACHINE_EFI
+ #include <grub/net/efi.h>
+ #endif
+@@ -211,6 +212,7 @@ grub_net_ipv6_get_slaac (struct grub_net_card *card,
+ {
+   struct grub_net_slaac_mac_list *slaac;
+   char *ptr;
++  grub_size_t sz;
+ 
+   for (slaac = card->slaac_list; slaac; slaac = slaac->next)
+     if (grub_net_hwaddr_cmp (&slaac->address, hwaddr) == 0)
+@@ -220,9 +222,16 @@ grub_net_ipv6_get_slaac (struct grub_net_card *card,
+   if (!slaac)
+     return NULL;
+ 
+-  slaac->name = grub_malloc (grub_strlen (card->name)
+-			     + GRUB_NET_MAX_STR_HWADDR_LEN
+-			     + sizeof (":slaac"));
++  if (grub_add (grub_strlen (card->name),
++      (GRUB_NET_MAX_STR_HWADDR_LEN + sizeof (":slaac")), &sz))
++    {
++      grub_free (slaac);
++      grub_error (GRUB_ERR_OUT_OF_RANGE,
++		  "overflow detected while obtaining size of slaac name");
++      return NULL;
++    }
++
++  slaac->name = grub_malloc (sz);
+   ptr = grub_stpcpy (slaac->name, card->name);
+   if (grub_net_hwaddr_cmp (&card->default_address, hwaddr) != 0)
+     {
+@@ -293,6 +302,7 @@ grub_net_ipv6_get_link_local (struct grub_net_card *card,
+   char *name;
+   char *ptr;
+   grub_net_network_level_address_t addr;
++  grub_size_t sz;
+ 
+   addr.type = GRUB_NET_NETWORK_LEVEL_PROTOCOL_IPV6;
+   addr.ipv6[0] = grub_cpu_to_be64_compile_time (0xfe80ULL << 48);
+@@ -307,9 +317,14 @@ grub_net_ipv6_get_link_local (struct grub_net_card *card,
+       return inf;
+   }
+ 
+-  name = grub_malloc (grub_strlen (card->name)
+-		      + GRUB_NET_MAX_STR_HWADDR_LEN
+-		      + sizeof (":link"));
++  if (grub_add (grub_strlen (card->name),
++      (GRUB_NET_MAX_STR_HWADDR_LEN + sizeof (":link")), &sz))
++    {
++      grub_error (GRUB_ERR_OUT_OF_RANGE,
++		  "overflow detected while obtaining size of link name");
++      return NULL;
++    }
++  name = grub_malloc (sz);
+   if (!name)
+     return NULL;
+ 
+@@ -1516,9 +1531,15 @@ grub_net_open_real (const char *name)
+ 	  if (grub_strchr (port_start + 1, ':'))
+ 	    {
+ 	      int iplen = grub_strlen (server);
++	      grub_size_t sz;
+ 
+ 	      /* Bracket bare IPv6 addr. */
+-	      host = grub_malloc (iplen + 3);
++	      if (grub_add (iplen, 3, &sz))
++		{
++		  grub_error (GRUB_ERR_OUT_OF_RANGE, N_("overflow detected while obtaining length of host"));
++		  return NULL;
++		}
++	      host = grub_malloc (sz);
+ 	      if (!host)
+                 return NULL;
+ 
+@@ -1773,6 +1794,7 @@ grub_env_set_net_property (const char *intername, const char *suffix,
+ {
+   char *varname, *varvalue;
+   char *ptr;
++  grub_size_t sz;
+ 
+   varname = grub_xasprintf ("net_%s_%s", intername, suffix);
+   if (!varname)
+@@ -1780,7 +1802,12 @@ grub_env_set_net_property (const char *intername, const char *suffix,
+   for (ptr = varname; *ptr; ptr++)
+     if (*ptr == ':')
+       *ptr = '_';
+-  varvalue = grub_malloc (len + 1);
++  if (grub_add (len, 1, &sz))
++    {
++      grub_free (varname);
++      return grub_error (GRUB_ERR_OUT_OF_RANGE, "overflow detected while obtaining the size of an env variable");
++    }
++  varvalue = grub_malloc (sz);
+   if (!varvalue)
+     {
+       grub_free (varname);

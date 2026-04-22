@@ -10,7 +10,7 @@ Name: hunspell-sc
 Summary: Sardinian hunspell dictionaries
 %global upstreamid 20081101
 Version: 0.%{upstreamid}
-Release: 37%{?dist}
+Release: 38%{?dist}
 Source: https://ayera.dl.sourceforge.net/project/aoo-extensions/1446/2/dict_sc_it03.oxt
 URL: http://extensions.services.openoffice.org/project/Dict_sc
 #The license included is AGPLv3 and pkg-desc/pkg-description.txt

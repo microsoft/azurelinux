@@ -11,7 +11,7 @@ Name: hunspell-tn
 Summary: Tswana hunspell dictionaries
 %global upstreamid 20150904
 Version: 0.%{upstreamid}
-Release: 19%{?dist}
+Release: 20%{?dist}
 Source: https://addons.mozilla.org/firefox/downloads/file/347396/tswana_spell_checker-%{upstreamid}-sm+tb+fx+an+fn.xpi
 URL: https://addons.mozilla.org/en-US/firefox/addon/tswana-spell-checker/
 License: GPL-3.0-or-later

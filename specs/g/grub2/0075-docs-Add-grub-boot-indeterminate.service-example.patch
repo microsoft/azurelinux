@@ -1,0 +1,33 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Tue, 19 Jun 2018 15:20:54 +0200
+Subject: [PATCH] docs: Add grub-boot-indeterminate.service example
+
+This is an example service file, for use from
+/lib/systemd/system/system-update.target.wants
+to increment the boot_indeterminate variable when
+doing offline updates.
+
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+---
+ docs/grub-boot-indeterminate.service | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+ create mode 100644 docs/grub-boot-indeterminate.service
+
+diff --git a/docs/grub-boot-indeterminate.service b/docs/grub-boot-indeterminate.service
+new file mode 100644
+index 00000000000..6c8dcb186b6
+--- /dev/null
++++ b/docs/grub-boot-indeterminate.service
+@@ -0,0 +1,11 @@
++[Unit]
++Description=Mark boot as indeterminate
++DefaultDependencies=false
++Requires=sysinit.target
++After=sysinit.target
++Wants=system-update-pre.target
++Before=system-update-pre.target
++
++[Service]
++Type=oneshot
++ExecStart=/usr/bin/grub2-editenv - incr boot_indeterminate

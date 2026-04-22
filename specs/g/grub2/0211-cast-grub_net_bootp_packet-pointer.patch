@@ -1,0 +1,42 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leo Sandoval <lsandova@redhat.com>
+Date: Fri, 22 Mar 2024 18:28:17 -0600
+Subject: [PATCH] cast grub_net_bootp_packet pointer
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Otherwise compiler complains with:
+
+../../grub-core/net/drivers/efi/efinet.c: In function ‘grub_efi_net_config_real’:
+../../grub-core/net/drivers/efi/efinet.c:876:28: error: cannot convert to a pointer type
+  876 |         dhcp_ack = (struct grub_net_bootp_packet *) pxe_mode->dhcp_ack;
+      |                            ^~~~~~~~~~~~~~~~~~~~~
+../../grub-core/net/drivers/efi/efinet.c:881:57: error: initialization of ‘struct grub_net_bootp_packet *’ from incompatible pointer type ‘grub_efi_pxe_packet_t *’ [-Wincompatible-pointer-types]
+  881 |             struct grub_net_bootp_packet *proxy_offer = &pxe_mode->proxy_offer;
+      |                                                         ^
+
+Signed-off-by: Leo Sandoval <lsandova@redhat.com>
+---
+ grub-core/net/drivers/efi/efinet.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/net/drivers/efi/efinet.c b/grub-core/net/drivers/efi/efinet.c
+index 83005ea9f88..4591d0757ec 100644
+--- a/grub-core/net/drivers/efi/efinet.c
++++ b/grub-core/net/drivers/efi/efinet.c
+@@ -872,12 +872,12 @@ grub_efi_net_config_real (grub_efi_handle_t hnd, char **device,
+       {
+ 	grub_dprintf ("efinet", "using ipv4 and dhcp\n");
+ 
+-        struct grub_net_bootp_packet *dhcp_ack = &pxe_mode->dhcp_ack;
++        struct grub_net_bootp_packet *dhcp_ack = (struct grub_net_bootp_packet *) &pxe_mode->dhcp_ack;
+ 
+         if (pxe_mode->proxy_offer_received)
+           {
+             grub_dprintf ("efinet", "proxy offer receive");
+-            struct grub_net_bootp_packet *proxy_offer = &pxe_mode->proxy_offer;
++            struct grub_net_bootp_packet *proxy_offer =  (struct grub_net_bootp_packet *) &pxe_mode->proxy_offer;
+ 
+             if (proxy_offer && dhcp_ack->boot_file[0] == '\0')
+               {

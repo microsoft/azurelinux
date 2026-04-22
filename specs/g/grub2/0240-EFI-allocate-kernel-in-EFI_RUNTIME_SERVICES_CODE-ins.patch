@@ -1,0 +1,85 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Wed, 9 Feb 2022 16:08:20 -0500
+Subject: [PATCH] EFI: allocate kernel in EFI_RUNTIME_SERVICES_CODE instead of
+ EFI_LOADER_DATA.
+
+On some of the firmwares with more security mitigations, EFI_LOADER_DATA
+doesn't get you executable memory, and we take a fault and reboot when
+we enter kernel.
+
+This patch correctly allocates the kernel code as EFI_RUNTIME_SERVICES_CODE
+rather than EFI_LOADER_DATA.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+[rharwood: use kernel_size]
+Signed-off-by: Robbie Harwood <rharwood@redhat.com>
+---
+ grub-core/loader/i386/efi/linux.c | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
+
+diff --git a/grub-core/loader/i386/efi/linux.c b/grub-core/loader/i386/efi/linux.c
+index 71c7ed6a76e..3ec9bb09c52 100644
+--- a/grub-core/loader/i386/efi/linux.c
++++ b/grub-core/loader/i386/efi/linux.c
+@@ -86,7 +86,9 @@ kernel_free(void *addr, grub_efi_uintn_t size)
+ }
+ 
+ static void *
+-kernel_alloc(grub_efi_uintn_t size, const char * const errmsg)
++kernel_alloc(grub_efi_uintn_t size,
++	     grub_efi_memory_type_t memtype,
++	     const char * const errmsg)
+ {
+   void *addr = 0;
+   unsigned int i;
+@@ -112,7 +114,7 @@ kernel_alloc(grub_efi_uintn_t size, const char * const errmsg)
+       prev_max = max;
+       addr = grub_efi_allocate_pages_real (max, pages,
+ 					   max_addresses[i].alloc_type,
+-					   GRUB_EFI_LOADER_DATA);
++					   memtype);
+       if (addr)
+ 	grub_dprintf ("linux", "Allocated at %p\n", addr);
+     }
+@@ -242,7 +244,8 @@ grub_cmd_initrd (grub_command_t cmd, int argc, char *argv[])
+ 	}
+     }
+ 
+-  initrd_mem = kernel_alloc(size, N_("can't allocate initrd"));
++  initrd_mem = kernel_alloc(size, GRUB_EFI_RUNTIME_SERVICES_DATA,
++			    N_("can't allocate initrd"));
+   if (initrd_mem == NULL)
+     goto fail;
+   grub_dprintf ("linux", "initrd_mem = %p\n", initrd_mem);
+@@ -393,7 +396,8 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+     }
+ #endif
+ 
+-  params = kernel_alloc (sizeof(*params), "cannot allocate kernel parameters");
++  params = kernel_alloc (sizeof(*params), GRUB_EFI_RUNTIME_SERVICES_DATA,
++			 "cannot allocate kernel parameters");
+   if (!params)
+     goto fail;
+   grub_dprintf ("linux", "params = %p\n", params);
+@@ -415,7 +419,9 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+   grub_dprintf ("linux", "new lh is at %p\n", lh);
+ 
+   grub_dprintf ("linux", "setting up cmdline\n");
+-  cmdline = kernel_alloc (lh->cmdline_size + 1, N_("can't allocate cmdline"));
++  cmdline = kernel_alloc (lh->cmdline_size + 1,
++			  GRUB_EFI_RUNTIME_SERVICES_DATA,
++			  N_("can't allocate cmdline"));
+   if (!cmdline)
+     goto fail;
+   grub_dprintf ("linux", "cmdline = %p\n", cmdline);
+@@ -461,7 +467,8 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+   max_addresses[1].addr = GRUB_EFI_MAX_ALLOCATION_ADDRESS;
+   max_addresses[2].addr = GRUB_EFI_MAX_ALLOCATION_ADDRESS;
+   kernel_size = lh->init_size;
+-  kernel_mem = kernel_alloc (kernel_size, N_("can't allocate kernel"));
++  kernel_mem = kernel_alloc (kernel_size, GRUB_EFI_RUNTIME_SERVICES_CODE,
++			     N_("can't allocate kernel"));
+   restore_addresses();
+   if (!kernel_mem)
+     goto fail;

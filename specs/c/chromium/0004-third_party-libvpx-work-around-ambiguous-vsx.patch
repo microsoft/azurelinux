@@ -1,0 +1,376 @@
+Index: chromium-144.0.7559.59/third_party/libvpx/source/libvpx/vp9/encoder/ppc/vp9_quantize_vsx.c
+===================================================================
+--- chromium-144.0.7559.59.orig/third_party/libvpx/source/libvpx/vp9/encoder/ppc/vp9_quantize_vsx.c
++++ chromium-144.0.7559.59/third_party/libvpx/source/libvpx/vp9/encoder/ppc/vp9_quantize_vsx.c
+@@ -38,6 +38,28 @@ static INLINE int16x8_t vec_max_across(i
+   return vec_max(a, vec_perm(a, a, vec_perm16));
+ }
+ 
++static INLINE void
++vec_u64_store(vector unsigned long long vecu64, unsigned long offset, void *ptr)
++{
++#ifndef WORDS_BIGENDIAN
++  __asm__ ("xxswapd %x0, %x1"
++	   : "=wa" (vecu64)
++	   : "wa" (vecu64));
++#endif
++#if __GNUC__ >= 4
++  if (__builtin_constant_p (offset) && offset == 0)
++    __asm__ ("stxvd2x %x0,0,%1\n\t"
++	     :
++	     : "wa" (vecu64), "r" ((uintptr_t)ptr)
++	     : "memory");
++  else
++#endif
++    __asm__ ("stxvd2x %x0,%1,%2\n\t"
++	     :
++	     : "wa" (vecu64), "r" (offset), "r" ((uintptr_t)ptr)
++	     : "memory", "r0");
++}
++
+ void vp9_quantize_fp_vsx(const tran_low_t *coeff_ptr, intptr_t n_coeffs,
+                          const int16_t *round_ptr, const int16_t *quant_ptr,
+                          tran_low_t *qcoeff_ptr, tran_low_t *dqcoeff_ptr,
+@@ -60,10 +82,10 @@ void vp9_quantize_fp_vsx(const tran_low_
+   qcoeff0 = vec_mulhi(vec_vaddshs(vec_abs(coeff0), round), quant);
+   zero_coeff0 = vec_cmpeq(qcoeff0, vec_zeros_s16);
+   qcoeff0 = vec_sign(qcoeff0, coeff0);
+-  vec_vsx_st(qcoeff0, 0, qcoeff_ptr);
++  vec_u64_store(qcoeff0, 0, qcoeff_ptr);
+ 
+   dqcoeff0 = vec_mladd(qcoeff0, dequant, vec_zeros_s16);
+-  vec_vsx_st(dqcoeff0, 0, dqcoeff_ptr);
++  vec_u64_store(dqcoeff0, 0, dqcoeff_ptr);
+ 
+   // Remove DC value from round and quant
+   round = vec_splat(round, 1);
+@@ -76,10 +98,10 @@ void vp9_quantize_fp_vsx(const tran_low_
+   qcoeff1 = vec_mulhi(vec_vaddshs(vec_abs(coeff1), round), quant);
+   zero_coeff1 = vec_cmpeq(qcoeff1, vec_zeros_s16);
+   qcoeff1 = vec_sign(qcoeff1, coeff1);
+-  vec_vsx_st(qcoeff1, 16, qcoeff_ptr);
++  vec_u64_store(qcoeff1, 16, qcoeff_ptr);
+ 
+   dqcoeff1 = vec_mladd(qcoeff1, dequant, vec_zeros_s16);
+-  vec_vsx_st(dqcoeff1, 16, dqcoeff_ptr);
++  vec_u64_store(dqcoeff1, 16, dqcoeff_ptr);
+ 
+   eob = vec_max(vec_or(scan0, zero_coeff0), vec_or(scan1, zero_coeff1));
+ 
+@@ -107,23 +129,23 @@ void vp9_quantize_fp_vsx(const tran_low_
+       qcoeff0 = vec_mulhi(vec_vaddshs(vec_abs(coeff0), round), quant);
+       zero_coeff0 = vec_cmpeq(qcoeff0, vec_zeros_s16);
+       qcoeff0 = vec_sign(qcoeff0, coeff0);
+-      vec_vsx_st(qcoeff0, off0, qcoeff_ptr);
++      vec_u64_store(qcoeff0, off0, qcoeff_ptr);
+       dqcoeff0 = vec_mladd(qcoeff0, dequant, vec_zeros_s16);
+-      vec_vsx_st(dqcoeff0, off0, dqcoeff_ptr);
++      vec_u64_store(dqcoeff0, off0, dqcoeff_ptr);
+ 
+       qcoeff1 = vec_mulhi(vec_vaddshs(vec_abs(coeff1), round), quant);
+       zero_coeff1 = vec_cmpeq(qcoeff1, vec_zeros_s16);
+       qcoeff1 = vec_sign(qcoeff1, coeff1);
+-      vec_vsx_st(qcoeff1, off1, qcoeff_ptr);
++      vec_u64_store(qcoeff1, off1, qcoeff_ptr);
+       dqcoeff1 = vec_mladd(qcoeff1, dequant, vec_zeros_s16);
+-      vec_vsx_st(dqcoeff1, off1, dqcoeff_ptr);
++      vec_u64_store(dqcoeff1, off1, dqcoeff_ptr);
+ 
+       qcoeff2 = vec_mulhi(vec_vaddshs(vec_abs(coeff2), round), quant);
+       zero_coeff2 = vec_cmpeq(qcoeff2, vec_zeros_s16);
+       qcoeff2 = vec_sign(qcoeff2, coeff2);
+-      vec_vsx_st(qcoeff2, off2, qcoeff_ptr);
++      vec_u64_store(qcoeff2, off2, qcoeff_ptr);
+       dqcoeff2 = vec_mladd(qcoeff2, dequant, vec_zeros_s16);
+-      vec_vsx_st(dqcoeff2, off2, dqcoeff_ptr);
++      vec_u64_store(dqcoeff2, off2, dqcoeff_ptr);
+ 
+       eob = vec_max(eob, vec_or(scan0, zero_coeff0));
+       eob2 = vec_max(vec_or(scan1, zero_coeff1), vec_or(scan2, zero_coeff2));
+@@ -200,10 +222,10 @@ void vp9_quantize_fp_32x32_vsx(const tra
+   qcoeff0 = vec_and(qcoeff0, mask0);
+   zero_coeff0 = vec_cmpeq(qcoeff0, vec_zeros_s16);
+   qcoeff0 = vec_sign(qcoeff0, coeff0);
+-  vec_vsx_st(qcoeff0, 0, qcoeff_ptr);
++  vec_u64_store(qcoeff0, 0, qcoeff_ptr);
+ 
+   dqcoeff0 = dequantize_coeff_32(qcoeff0, dequant);
+-  vec_vsx_st(dqcoeff0, 0, dqcoeff_ptr);
++  vec_u64_store(dqcoeff0, 0, dqcoeff_ptr);
+ 
+   // Remove DC value from thres, round, quant and dequant
+   thres = vec_splat(thres, 1);
+@@ -219,10 +241,10 @@ void vp9_quantize_fp_32x32_vsx(const tra
+   qcoeff1 = vec_and(qcoeff1, mask1);
+   zero_coeff1 = vec_cmpeq(qcoeff1, vec_zeros_s16);
+   qcoeff1 = vec_sign(qcoeff1, coeff1);
+-  vec_vsx_st(qcoeff1, 16, qcoeff_ptr);
++  vec_u64_store(qcoeff1, 16, qcoeff_ptr);
+ 
+   dqcoeff1 = dequantize_coeff_32(qcoeff1, dequant);
+-  vec_vsx_st(dqcoeff1, 16, dqcoeff_ptr);
++  vec_u64_store(dqcoeff1, 16, dqcoeff_ptr);
+ 
+   eob = vec_max(vec_or(scan0, zero_coeff0), vec_or(scan1, zero_coeff1));
+ 
+@@ -260,17 +282,17 @@ void vp9_quantize_fp_32x32_vsx(const tra
+     qcoeff1 = vec_sign(qcoeff1, coeff1);
+     qcoeff2 = vec_sign(qcoeff2, coeff2);
+ 
+-    vec_vsx_st(qcoeff0, off0, qcoeff_ptr);
+-    vec_vsx_st(qcoeff1, off1, qcoeff_ptr);
+-    vec_vsx_st(qcoeff2, off2, qcoeff_ptr);
++    vec_u64_store(qcoeff0, off0, qcoeff_ptr);
++    vec_u64_store(qcoeff1, off1, qcoeff_ptr);
++    vec_u64_store(qcoeff2, off2, qcoeff_ptr);
+ 
+     dqcoeff0 = dequantize_coeff_32(qcoeff0, dequant);
+     dqcoeff1 = dequantize_coeff_32(qcoeff1, dequant);
+     dqcoeff2 = dequantize_coeff_32(qcoeff2, dequant);
+ 
+-    vec_vsx_st(dqcoeff0, off0, dqcoeff_ptr);
+-    vec_vsx_st(dqcoeff1, off1, dqcoeff_ptr);
+-    vec_vsx_st(dqcoeff2, off2, dqcoeff_ptr);
++    vec_u64_store(dqcoeff0, off0, dqcoeff_ptr);
++    vec_u64_store(dqcoeff1, off1, dqcoeff_ptr);
++    vec_u64_store(dqcoeff2, off2, dqcoeff_ptr);
+ 
+     eob = vec_max(eob, vec_or(scan0, zero_coeff0));
+     eob2 = vec_max(vec_or(scan1, zero_coeff1), vec_or(scan2, zero_coeff2));
+Index: chromium-144.0.7559.59/third_party/libvpx/source/libvpx/vpx_dsp/ppc/fdct32x32_vsx.c
+===================================================================
+--- chromium-144.0.7559.59.orig/third_party/libvpx/source/libvpx/vpx_dsp/ppc/fdct32x32_vsx.c
++++ chromium-144.0.7559.59/third_party/libvpx/source/libvpx/vpx_dsp/ppc/fdct32x32_vsx.c
+@@ -15,6 +15,28 @@
+ #include "vpx_dsp/ppc/txfm_common_vsx.h"
+ #include "vpx_dsp/ppc/types_vsx.h"
+ 
++static INLINE void
++vec_u64_store(vector unsigned long long vecu64, unsigned long offset, void *ptr)
++{
++#ifndef WORDS_BIGENDIAN
++  __asm__ ("xxswapd %x0, %x1"
++	   : "=wa" (vecu64)
++	   : "wa" (vecu64));
++#endif
++#if __GNUC__ >= 4
++  if (__builtin_constant_p (offset) && offset == 0)
++    __asm__ ("stxvd2x %x0,0,%1\n\t"
++	     :
++	     : "wa" (vecu64), "r" ((uintptr_t)ptr)
++	     : "memory");
++  else
++#endif
++    __asm__ ("stxvd2x %x0,%1,%2\n\t"
++	     :
++	     : "wa" (vecu64), "r" (offset), "r" ((uintptr_t)ptr)
++	     : "memory", "r0");
++}
++
+ // Returns ((a +/- b) * cospi16 + (2 << 13)) >> 14.
+ static INLINE void single_butterfly(int16x8_t a, int16x8_t b, int16x8_t *add,
+                                     int16x8_t *sub) {
+@@ -164,45 +186,45 @@ static INLINE void load(const int16_t *a
+ }
+ 
+ static INLINE void store(tran_low_t *a, const int16x8_t *b) {
+-  vec_vsx_st(b[0], 0, a);
+-  vec_vsx_st(b[8], 0, a + 8);
+-  vec_vsx_st(b[16], 0, a + 16);
+-  vec_vsx_st(b[24], 0, a + 24);
+-
+-  vec_vsx_st(b[1], 0, a + 32);
+-  vec_vsx_st(b[9], 0, a + 40);
+-  vec_vsx_st(b[17], 0, a + 48);
+-  vec_vsx_st(b[25], 0, a + 56);
+-
+-  vec_vsx_st(b[2], 0, a + 64);
+-  vec_vsx_st(b[10], 0, a + 72);
+-  vec_vsx_st(b[18], 0, a + 80);
+-  vec_vsx_st(b[26], 0, a + 88);
+-
+-  vec_vsx_st(b[3], 0, a + 96);
+-  vec_vsx_st(b[11], 0, a + 104);
+-  vec_vsx_st(b[19], 0, a + 112);
+-  vec_vsx_st(b[27], 0, a + 120);
+-
+-  vec_vsx_st(b[4], 0, a + 128);
+-  vec_vsx_st(b[12], 0, a + 136);
+-  vec_vsx_st(b[20], 0, a + 144);
+-  vec_vsx_st(b[28], 0, a + 152);
+-
+-  vec_vsx_st(b[5], 0, a + 160);
+-  vec_vsx_st(b[13], 0, a + 168);
+-  vec_vsx_st(b[21], 0, a + 176);
+-  vec_vsx_st(b[29], 0, a + 184);
+-
+-  vec_vsx_st(b[6], 0, a + 192);
+-  vec_vsx_st(b[14], 0, a + 200);
+-  vec_vsx_st(b[22], 0, a + 208);
+-  vec_vsx_st(b[30], 0, a + 216);
+-
+-  vec_vsx_st(b[7], 0, a + 224);
+-  vec_vsx_st(b[15], 0, a + 232);
+-  vec_vsx_st(b[23], 0, a + 240);
+-  vec_vsx_st(b[31], 0, a + 248);
++  vec_u64_store(b[0], 0, a);
++  vec_u64_store(b[8], 0, a + 8);
++  vec_u64_store(b[16], 0, a + 16);
++  vec_u64_store(b[24], 0, a + 24);
++
++  vec_u64_store(b[1], 0, a + 32);
++  vec_u64_store(b[9], 0, a + 40);
++  vec_u64_store(b[17], 0, a + 48);
++  vec_u64_store(b[25], 0, a + 56);
++
++  vec_u64_store(b[2], 0, a + 64);
++  vec_u64_store(b[10], 0, a + 72);
++  vec_u64_store(b[18], 0, a + 80);
++  vec_u64_store(b[26], 0, a + 88);
++
++  vec_u64_store(b[3], 0, a + 96);
++  vec_u64_store(b[11], 0, a + 104);
++  vec_u64_store(b[19], 0, a + 112);
++  vec_u64_store(b[27], 0, a + 120);
++
++  vec_u64_store(b[4], 0, a + 128);
++  vec_u64_store(b[12], 0, a + 136);
++  vec_u64_store(b[20], 0, a + 144);
++  vec_u64_store(b[28], 0, a + 152);
++
++  vec_u64_store(b[5], 0, a + 160);
++  vec_u64_store(b[13], 0, a + 168);
++  vec_u64_store(b[21], 0, a + 176);
++  vec_u64_store(b[29], 0, a + 184);
++
++  vec_u64_store(b[6], 0, a + 192);
++  vec_u64_store(b[14], 0, a + 200);
++  vec_u64_store(b[22], 0, a + 208);
++  vec_u64_store(b[30], 0, a + 216);
++
++  vec_u64_store(b[7], 0, a + 224);
++  vec_u64_store(b[15], 0, a + 232);
++  vec_u64_store(b[23], 0, a + 240);
++  vec_u64_store(b[31], 0, a + 248);
+ }
+ 
+ // Returns 1 if negative 0 if positive
+Index: chromium-144.0.7559.59/third_party/libvpx/source/libvpx/vpx_dsp/ppc/quantize_vsx.c
+===================================================================
+--- chromium-144.0.7559.59.orig/third_party/libvpx/source/libvpx/vpx_dsp/ppc/quantize_vsx.c
++++ chromium-144.0.7559.59/third_party/libvpx/source/libvpx/vpx_dsp/ppc/quantize_vsx.c
+@@ -13,6 +13,28 @@
+ #include "./vpx_dsp_rtcd.h"
+ #include "vpx_dsp/ppc/types_vsx.h"
+ 
++static INLINE void
++vec_u64_store(vector unsigned long long vecu64, unsigned long offset, void *ptr)
++{
++#ifndef WORDS_BIGENDIAN
++  __asm__ ("xxswapd %x0, %x1"
++	   : "=wa" (vecu64)
++	   : "wa" (vecu64));
++#endif
++#if __GNUC__ >= 4
++  if (__builtin_constant_p (offset) && offset == 0)
++    __asm__ ("stxvd2x %x0,0,%1\n\t"
++	     :
++	     : "wa" (vecu64), "r" ((uintptr_t)ptr)
++	     : "memory");
++  else
++#endif
++    __asm__ ("stxvd2x %x0,%1,%2\n\t"
++	     :
++	     : "wa" (vecu64), "r" (offset), "r" ((uintptr_t)ptr)
++	     : "memory", "r0");
++}
++
+ // Negate 16-bit integers in a when the corresponding signed 16-bit
+ // integer in b is negative.
+ static INLINE int16x8_t vec_sign(int16x8_t a, int16x8_t b) {
+@@ -124,19 +146,19 @@ void vpx_quantize_b_vsx(const tran_low_t
+ 
+   qcoeff0 =
+       quantize_coeff(coeff0, coeff0_abs, round, quant, quant_shift, zero_mask0);
+-  vec_vsx_st(qcoeff0, 0, qcoeff_ptr);
++  vec_u64_store(qcoeff0, 0, qcoeff_ptr);
+   round = vec_splat(round, 1);
+   quant = vec_splat(quant, 1);
+   quant_shift = vec_splat(quant_shift, 1);
+   qcoeff1 =
+       quantize_coeff(coeff1, coeff1_abs, round, quant, quant_shift, zero_mask1);
+-  vec_vsx_st(qcoeff1, 16, qcoeff_ptr);
++  vec_u64_store(qcoeff1, 16, qcoeff_ptr);
+ 
+   dqcoeff0 = vec_mladd(qcoeff0, dequant, vec_zeros_s16);
+-  vec_vsx_st(dqcoeff0, 0, dqcoeff_ptr);
++  vec_u64_store(dqcoeff0, 0, dqcoeff_ptr);
+   dequant = vec_splat(dequant, 1);
+   dqcoeff1 = vec_mladd(qcoeff1, dequant, vec_zeros_s16);
+-  vec_vsx_st(dqcoeff1, 16, dqcoeff_ptr);
++  vec_u64_store(dqcoeff1, 16, dqcoeff_ptr);
+ 
+   eob = vec_max(nonzero_scanindex(qcoeff0, iscan_ptr, 0),
+                 nonzero_scanindex(qcoeff1, iscan_ptr, 16));
+@@ -164,17 +186,17 @@ void vpx_quantize_b_vsx(const tran_low_t
+                                zero_mask1);
+       qcoeff2 = quantize_coeff(coeff2, coeff2_abs, round, quant, quant_shift,
+                                zero_mask2);
+-      vec_vsx_st(qcoeff0, off0, qcoeff_ptr);
+-      vec_vsx_st(qcoeff1, off1, qcoeff_ptr);
+-      vec_vsx_st(qcoeff2, off2, qcoeff_ptr);
++      vec_u64_store(qcoeff0, off0, qcoeff_ptr);
++      vec_u64_store(qcoeff1, off1, qcoeff_ptr);
++      vec_u64_store(qcoeff2, off2, qcoeff_ptr);
+ 
+       dqcoeff0 = vec_mladd(qcoeff0, dequant, vec_zeros_s16);
+       dqcoeff1 = vec_mladd(qcoeff1, dequant, vec_zeros_s16);
+       dqcoeff2 = vec_mladd(qcoeff2, dequant, vec_zeros_s16);
+ 
+-      vec_vsx_st(dqcoeff0, off0, dqcoeff_ptr);
+-      vec_vsx_st(dqcoeff1, off1, dqcoeff_ptr);
+-      vec_vsx_st(dqcoeff2, off2, dqcoeff_ptr);
++      vec_u64_store(dqcoeff0, off0, dqcoeff_ptr);
++      vec_u64_store(dqcoeff1, off1, dqcoeff_ptr);
++      vec_u64_store(dqcoeff2, off2, dqcoeff_ptr);
+ 
+       eob = vec_max(eob, nonzero_scanindex(qcoeff0, iscan_ptr, off0));
+       eob2 = vec_max(nonzero_scanindex(qcoeff1, iscan_ptr, off1),
+@@ -243,12 +265,12 @@ void vpx_quantize_b_32x32_vsx(const tran
+   qcoeff1 = quantize_coeff_32(coeff1, coeff1_abs, round, quant, quant_shift,
+                               zero_mask1);
+ 
+-  vec_vsx_st(qcoeff0, 0, qcoeff_ptr);
+-  vec_vsx_st(qcoeff1, 16, qcoeff_ptr);
++  vec_u64_store(qcoeff0, 0, qcoeff_ptr);
++  vec_u64_store(qcoeff1, 16, qcoeff_ptr);
+ 
+-  vec_vsx_st(dequantize_coeff_32(qcoeff0, dequant), 0, dqcoeff_ptr);
++  vec_u64_store(dequantize_coeff_32(qcoeff0, dequant), 0, dqcoeff_ptr);
+   dequant = vec_splat(dequant, 1);  // remove DC from dequant
+-  vec_vsx_st(dequantize_coeff_32(qcoeff1, dequant), 16, dqcoeff_ptr);
++  vec_u64_store(dequantize_coeff_32(qcoeff1, dequant), 16, dqcoeff_ptr);
+ 
+   eob = vec_max(nonzero_scanindex(qcoeff0, iscan_ptr, 0),
+                 nonzero_scanindex(qcoeff1, iscan_ptr, 16));
+@@ -276,13 +298,13 @@ void vpx_quantize_b_32x32_vsx(const tran
+     qcoeff2 = quantize_coeff_32(coeff2, coeff2_abs, round, quant, quant_shift,
+                                 zero_mask2);
+ 
+-    vec_vsx_st(qcoeff0, off0, qcoeff_ptr);
+-    vec_vsx_st(qcoeff1, off1, qcoeff_ptr);
+-    vec_vsx_st(qcoeff2, off2, qcoeff_ptr);
+-
+-    vec_vsx_st(dequantize_coeff_32(qcoeff0, dequant), off0, dqcoeff_ptr);
+-    vec_vsx_st(dequantize_coeff_32(qcoeff1, dequant), off1, dqcoeff_ptr);
+-    vec_vsx_st(dequantize_coeff_32(qcoeff2, dequant), off2, dqcoeff_ptr);
++    vec_u64_store(qcoeff0, off0, qcoeff_ptr);
++    vec_u64_store(qcoeff1, off1, qcoeff_ptr);
++    vec_u64_store(qcoeff2, off2, qcoeff_ptr);
++
++    vec_u64_store(dequantize_coeff_32(qcoeff0, dequant), off0, dqcoeff_ptr);
++    vec_u64_store(dequantize_coeff_32(qcoeff1, dequant), off1, dqcoeff_ptr);
++    vec_u64_store(dequantize_coeff_32(qcoeff2, dequant), off2, dqcoeff_ptr);
+ 
+     eob = vec_max(eob, nonzero_scanindex(qcoeff0, iscan_ptr, off0));
+     eob2 = vec_max(nonzero_scanindex(qcoeff1, iscan_ptr, off1),

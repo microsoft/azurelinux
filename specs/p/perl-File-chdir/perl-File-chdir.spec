@@ -3,7 +3,7 @@
 
 Name:           perl-File-chdir
 Version:        0.1011
-Release:        28%{?dist}
+Release: 29%{?dist}
 Summary:        A more sensible way to change directories
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/File-chdir

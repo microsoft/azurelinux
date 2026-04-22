@@ -4,7 +4,7 @@
 Summary: Localizations for Gnulib
 Name:    gnulib-l10n
 Version: 20241231
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: LGPL-2.1-or-later
 
 Url:     https://www.gnu.org/software/gnulib

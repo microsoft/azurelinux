@@ -1,0 +1,45 @@
+From 2ddba5ddc12312386b019b4a785c80ce8633ba57 Mon Sep 17 00:00:00 2001
+From: Paul Floyd <pjfloyd@wanadoo.fr>
+Date: Tue, 20 Jan 2026 07:44:31 +0100
+Subject: [PATCH 8/8] Bug 514206 - Assertion '!sr_isError(sr)' failed - mmap fd
+ points to an open descriptor to a PCI device
+
+(cherry picked from commit 38609f9b87eb6908a4a04ed5882db337edaec765)
+---
+ NEWS                              | 2 ++
+ coregrind/m_debuginfo/debuginfo.c | 5 ++++-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/NEWS b/NEWS
+index 164218c14e76..a09cf7e1bba3 100644
+--- a/NEWS
++++ b/NEWS
+@@ -23,6 +23,8 @@ The following bugs have been fixed or resolved on this branch.
+ 511717  gdbserver (valgrind_read_memory) the 'impossible' happened:
+         Killed by fatal signal (SIGSEGV)
+ 514094  readlink("/proc/self/exe") overwrites buffer beyond its return value
++514206  Assertion '!sr_isError(sr)' failed - mmap fd points to an open
++        descriptor to a PCI device
+ 514613  Unclosed leak_summary/still_reachable tag in xml output
+ 
+ To see details of a given bug, visit
+diff --git a/coregrind/m_debuginfo/debuginfo.c b/coregrind/m_debuginfo/debuginfo.c
+index 18152b9e25e4..196fe8d98811 100644
+--- a/coregrind/m_debuginfo/debuginfo.c
++++ b/coregrind/m_debuginfo/debuginfo.c
+@@ -1177,8 +1177,11 @@ ULong VG_(di_notify_mmap)( Addr a, Bool allow_SkFileV, Int use_fd )
+     * --20208-- WARNING: Serious error when reading debug info
+     * --20208-- When reading debug info from /proc/xen/privcmd:
+     * --20208-- can't read file to inspect ELF header
++    *
++    * Also PCI devices, see bug 514206
+     */
+-   if (VG_(strncmp)(filename, "/proc/xen/", 10) == 0)
++   if (VG_(strncmp)(filename, "/proc/xen/", 10) == 0 ||
++       VG_(strncmp)(filename, "/sys/devices/pci", 16) == 0)
+       return 0;
+ 
+    if (debug)
+-- 
+2.52.0
+

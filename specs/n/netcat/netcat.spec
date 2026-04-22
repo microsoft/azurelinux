@@ -15,7 +15,7 @@ Summary:         OpenBSD netcat to read and write data across connections using 
 Name:            netcat
 # Version from CVS revision of OpenBSD netcat.c
 Version:         1.237
-Release:         3%{?dist}
+Release: 4%{?dist}
 # BSD-3-Clause: nc.1 and netcat.c
 # BSD-2-Clause: atomicio.{c,h} and socks.c
 License:         BSD-3-Clause AND BSD-2-Clause

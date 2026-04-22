@@ -3,7 +3,7 @@
 
 Name: libteam
 Version: 1.32
-Release: 12%{?dist}
+Release: 13%{?dist}
 Summary: Library for controlling team network device
 License: LGPL-2.0-or-later
 URL: http://www.libteam.org

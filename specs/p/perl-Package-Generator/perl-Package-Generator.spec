@@ -10,7 +10,7 @@
 
 Name:		perl-Package-Generator
 Version:	1.106
-Release:	34%{?dist}
+Release: 35%{?dist}
 Summary:	Generate new packages quickly and easily
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Package-Generator

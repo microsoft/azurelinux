@@ -13,7 +13,7 @@
 
 Name:           perl-Module-Install-ReadmeFromPod
 Version:        0.30
-Release:        28%{?dist}
+Release: 29%{?dist}
 Summary:        Module::Install extension to automatically convert POD to a README
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Module-Install-ReadmeFromPod

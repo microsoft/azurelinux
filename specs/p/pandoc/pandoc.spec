@@ -28,7 +28,7 @@
 Name:           %{pkg_name}
 Version:        3.6.4
 # can only be reset when all subpkgs bumped
-Release:        36%{?dist}
+Release: 37%{?dist}
 Summary:        Conversion between markup formats
 
 License:        GPL-2.0-or-later

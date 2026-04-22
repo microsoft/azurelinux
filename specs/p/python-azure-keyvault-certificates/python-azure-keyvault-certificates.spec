@@ -5,7 +5,7 @@
 
 Name:           python-%{srcname}
 Version:        4.7.0
-Release:        12%{?dist}
+Release: 13%{?dist}
 Summary:        Microsoft Azure Key Vault Certificates Client Library for Python
 License:        MIT
 URL:            https://pypi.org/project/%{srcname}/

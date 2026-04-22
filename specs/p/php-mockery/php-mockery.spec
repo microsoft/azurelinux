@@ -20,7 +20,7 @@
 
 Name:           php-mockery
 Version:        1.6.12
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Mockery is a simple but flexible PHP mock object framework
 
 License:        BSD-3-Clause

@@ -1,0 +1,80 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Michael Chang <mchang@suse.com>
+Date: Wed, 17 Jul 2024 14:46:46 +0800
+Subject: [PATCH] commands/bli: Fix crash in get_part_uuid()
+
+The get_part_uuid() function made an assumption that the target GRUB
+device is a partition device and accessed device->disk->partition
+without checking for NULL. There are four situations where this
+assumption is problematic:
+
+1. The device is a net device instead of a disk.
+2. The device is an abstraction device, like LVM, RAID, or CRYPTO, which
+   is mostly logical "disk" ((lvmid/<UUID>) and so on).
+3. Firmware RAID may present the ESP to GRUB as an EFI disk (hd0) device
+   if it is contained within a Linux software RAID.
+4. When booting from a CD-ROM, the ESP is a VFAT image indexed by the El
+   Torito boot catalog. The boot device is set to (cd0), corresponding
+   to the CD-ROM image mounted as an ISO 9660 filesystem.
+
+As a result, get_part_uuid() could lead to a NULL pointer dereference
+and trigger a synchronous exception during boot if the ESP falls into
+one of these categories. This patch fixes the problem by adding the
+necessary checks to handle cases where the ESP is not a partition device.
+
+Additionally, to avoid disrupting the boot process, this patch relaxes
+the severity of the errors in this context to non-critical. Errors will
+be logged, but they will not prevent the boot process from continuing.
+
+Fixes: e0fa7dc84 (bli: Add a module for the Boot Loader Interface)
+
+Signed-off-by: Michael Chang <mchang@suse.com>
+Reviewed-By: Oliver Steffen <osteffen@redhat.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/commands/bli.c | 20 +++++++++++++++++++-
+ 1 file changed, 19 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/commands/bli.c b/grub-core/commands/bli.c
+index e0d8a54f7bea..298c5f70a876 100644
+--- a/grub-core/commands/bli.c
++++ b/grub-core/commands/bli.c
+@@ -48,6 +48,22 @@ get_part_uuid (const char *device_name, char **part_uuid)
+   if (device == NULL)
+     return grub_error (grub_errno, N_("cannot open device: %s"), device_name);
+ 
++  if (device->disk == NULL)
++    {
++      grub_dprintf ("bli", "%s is not a disk device, partuuid skipped\n", device_name);
++      *part_uuid = NULL;
++      grub_device_close (device);
++      return GRUB_ERR_NONE;
++    }
++
++  if (device->disk->partition == NULL)
++    {
++      grub_dprintf ("bli", "%s has no partition, partuuid skipped\n", device_name);
++      *part_uuid = NULL;
++      grub_device_close (device);
++      return GRUB_ERR_NONE;
++    }
++
+   disk = grub_disk_open (device->disk->name);
+   if (disk == NULL)
+     {
+@@ -99,7 +115,7 @@ set_loader_device_part_uuid (void)
+ 
+   status = get_part_uuid (device_name, &part_uuid);
+ 
+-  if (status == GRUB_ERR_NONE)
++  if (status == GRUB_ERR_NONE && part_uuid)
+     status = grub_efi_set_variable_to_string ("LoaderDevicePartUUID", &bli_vendor_guid, part_uuid,
+ 					      GRUB_EFI_VARIABLE_BOOTSERVICE_ACCESS |
+ 					      GRUB_EFI_VARIABLE_RUNTIME_ACCESS);
+@@ -117,4 +133,6 @@ GRUB_MOD_INIT (bli)
+ 				   GRUB_EFI_VARIABLE_BOOTSERVICE_ACCESS |
+ 				   GRUB_EFI_VARIABLE_RUNTIME_ACCESS);
+   set_loader_device_part_uuid ();
++  /* No error here is critical, other than being logged */
++  grub_print_error ();
+ }

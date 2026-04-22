@@ -15,7 +15,7 @@
 
 Name: criu
 Version: 4.2
-Release: 11%{?dist}
+Release: 12%{?dist}
 Summary: Tool for Checkpoint/Restore in User-space
 License: GPL-2.0-only AND LGPL-2.1-only AND MIT
 URL: http://criu.org/

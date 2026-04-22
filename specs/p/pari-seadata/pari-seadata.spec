@@ -3,7 +3,7 @@
 
 Name:		pari-seadata
 Version:	20090618
-Release:	29%{?dist}
+Release: 30%{?dist}
 Summary:	PARI/GP Computer Algebra System modular polynomials
 License:	GPL-2.0-or-later
 URL:		https://pari.math.u-bordeaux.fr/packages.html

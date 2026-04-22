@@ -1,0 +1,20 @@
+From ec72306f807a299c1c647826aaa06aa2ef6c3c8b Mon Sep 17 00:00:00 2001
+From: Sam Feifer <sfeifer@redhat.com>
+Date: Mon, 7 Jul 2025 11:13:44 -0400
+Subject: [PATCH] fix create_bundles issue
+
+
+diff --git a/go.mod b/go.mod
+index e15218a..2f48814 100644
+--- a/go.mod
++++ b/go.mod
+@@ -1,8 +1,6 @@
+ module github.com/performancecopilot/grafana-pcp
+ 
+-go 1.23.0
+-
+-toolchain go1.24.2
++go 1.23
+ 
+ require (
+ 	github.com/grafana/grafana-plugin-sdk-go v0.250.0

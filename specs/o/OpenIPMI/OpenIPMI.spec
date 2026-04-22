@@ -10,7 +10,7 @@ Summary: IPMI (Intelligent Platform Management Interface) library and tools
 Name: OpenIPMI
 
 Version:    2.0.36
-Release:    3%{?dist}
+Release: 4%{?dist}
 License:    LGPL-2.1-or-later and GPL-2.0-or-later or BSD-3-Clause
 URL:        https://sourceforge.net/projects/openipmi/
 Source:     https://downloads.sourceforge.net/openipmi/%{name}-%{version}.tar.gz

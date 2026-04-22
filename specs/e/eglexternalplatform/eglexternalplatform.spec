@@ -5,7 +5,7 @@
 
 Name:           eglexternalplatform
 Version:        1.2.1
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        EGL External Platform Interface headers
 License:        MIT
 URL:            https://github.com/NVIDIA

@@ -1,0 +1,15 @@
+--- a/sandbox/linux/syscall_broker/broker_host.cc
++++ b/sandbox/linux/syscall_broker/broker_host.cc
+@@ -287,7 +287,12 @@
+       return;
+     }
+     RAW_CHECK(reply->AddIntToMessage(0));
++#ifdef __powerpc64__
++    // kernel stat can be padded, triggering std::has_unique_object_representations_v to return false
++    RAW_CHECK(reply->AddDataToMessage(base::byte_span_from_ref(base::allow_nonunique_obj, sb)));
++#else
+     RAW_CHECK(reply->AddDataToMessage(base::byte_span_from_ref(sb)));
++#endif
+   } else {
+ #if defined(__NR_fstatat64)
+     DCHECK(command_type == COMMAND_STAT64);

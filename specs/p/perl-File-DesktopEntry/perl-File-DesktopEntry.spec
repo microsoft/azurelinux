@@ -10,7 +10,7 @@
 
 Name:           perl-File-DesktopEntry
 Version:        0.22
-Release:        29%{?dist}
+Release: 30%{?dist}
 Summary:        Object to handle .desktop files
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/File-DesktopEntry

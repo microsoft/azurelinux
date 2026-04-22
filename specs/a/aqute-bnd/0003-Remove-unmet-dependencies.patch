@@ -1,0 +1,1403 @@
+From d1702cae9e19a8b9dc2ad538777e51a0680cc605 Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Fri, 24 Jun 2022 14:55:51 +0200
+Subject: [PATCH] Remove unmet dependencies
+
+---
+ .../src/aQute/lib/bundles/BundleIdentity.java |  65 --
+ .../startlevel/StartLevelRuntimeHandler.java  | 305 ---------
+ aQute.libg/src/aQute/libg/dtos/DTOMap.java    | 143 ----
+ aQute.libg/src/aQute/libg/dtos/DTOs.java      | 211 ------
+ aQute.libg/src/aQute/libg/dtos/DTOsImpl.java  | 615 ------------------
+ .../src/aQute/bnd/build/ProjectLauncher.java  |   1 -
+ 6 files changed, 1340 deletions(-)
+ delete mode 100644 aQute.libg/src/aQute/lib/bundles/BundleIdentity.java
+ delete mode 100644 aQute.libg/src/aQute/lib/startlevel/StartLevelRuntimeHandler.java
+ delete mode 100644 aQute.libg/src/aQute/libg/dtos/DTOMap.java
+ delete mode 100644 aQute.libg/src/aQute/libg/dtos/DTOs.java
+ delete mode 100644 aQute.libg/src/aQute/libg/dtos/DTOsImpl.java
+
+diff --git a/aQute.libg/src/aQute/lib/bundles/BundleIdentity.java b/aQute.libg/src/aQute/lib/bundles/BundleIdentity.java
+deleted file mode 100644
+index dfd4b6a..0000000
+--- a/aQute.libg/src/aQute/lib/bundles/BundleIdentity.java
++++ /dev/null
+@@ -1,65 +0,0 @@
+-package aQute.lib.bundles;
+-
+-import java.util.Map;
+-import java.util.Objects;
+-
+-import org.osgi.framework.Bundle;
+-import org.osgi.framework.Version;
+-import org.osgi.framework.dto.BundleDTO;
+-
+-public class BundleIdentity {
+-	final String	bsn;
+-	final Version	version;
+-
+-	public BundleIdentity(String bsn, Version version) {
+-		Objects.requireNonNull(bsn, "bsn must be specified");
+-		this.bsn = bsn;
+-		this.version = version == null ? Version.emptyVersion : version;
+-	}
+-
+-	public BundleIdentity(Bundle bundle) {
+-		this(bundle.getSymbolicName(), bundle.getVersion());
+-	}
+-
+-	public BundleIdentity(BundleDTO bundle) {
+-		this(bundle.symbolicName, bundle.version);
+-	}
+-
+-	public BundleIdentity(String bsn, String version) {
+-		this(bsn, version == null ? null : Version.parseVersion(version));
+-	}
+-
+-	public BundleIdentity(Map.Entry<String, Version> entry) {
+-		this(entry.getKey(), entry.getValue());
+-	}
+-
+-	public String getBundleSymbolicName() {
+-		return bsn;
+-	}
+-
+-	public Version getVersion() {
+-		return version;
+-	}
+-
+-	@Override
+-	public int hashCode() {
+-		return Objects.hash(bsn, version);
+-	}
+-
+-	@Override
+-	public boolean equals(Object obj) {
+-		if (this == obj)
+-			return true;
+-		if (obj == null)
+-			return false;
+-		if (getClass() != obj.getClass())
+-			return false;
+-		BundleIdentity other = (BundleIdentity) obj;
+-		return Objects.equals(bsn, other.bsn) && Objects.equals(version, other.version);
+-	}
+-
+-	@Override
+-	public String toString() {
+-		return bsn + "-" + version;
+-	}
+-}
+diff --git a/aQute.libg/src/aQute/lib/startlevel/StartLevelRuntimeHandler.java b/aQute.libg/src/aQute/lib/startlevel/StartLevelRuntimeHandler.java
+deleted file mode 100644
+index e32c255..0000000
+--- a/aQute.libg/src/aQute/lib/startlevel/StartLevelRuntimeHandler.java
++++ /dev/null
+@@ -1,305 +0,0 @@
+-package aQute.lib.startlevel;
+-
+-import java.io.Closeable;
+-import java.util.HashMap;
+-import java.util.Map;
+-import java.util.Properties;
+-import java.util.concurrent.CountDownLatch;
+-
+-import org.osgi.framework.Bundle;
+-import org.osgi.framework.BundleEvent;
+-import org.osgi.framework.Constants;
+-import org.osgi.framework.FrameworkListener;
+-import org.osgi.framework.SynchronousBundleListener;
+-import org.osgi.framework.launch.Framework;
+-import org.osgi.framework.startlevel.BundleStartLevel;
+-import org.osgi.framework.startlevel.FrameworkStartLevel;
+-
+-import aQute.lib.bundles.BundleIdentity;
+-import aQute.libg.parameters.ParameterMap;
+-
+-/**
+- * Support to handle start levels in a launcher. This code is related to code in
+- * the Project Launcher. It is in aQute.lib so it can be included easily in the
+- * Launcher, the Remote launcher, and Launchpad.
+- * <p>
+- * This class is not threadsafe!
+- */
+-public class StartLevelRuntimeHandler implements Closeable {
+-
+-	/**
+-	 * If this property is set we take on start levels, if this property is not
+-	 * set we ignore the startlevels completely. This is defined in
+-	 * aQute.bnd.osgi.Constants
+-	 */
+-	public static String	LAUNCH_STARTLEVEL_DEFAULT	= "launch.startlevel.default";
+-	public static String	LAUNCH_RUNBUNDLES_ATTRS		= "launch.runbundles.attrs";
+-
+-	/**
+-	 * Indicate if this class supports start levels or not.
+-	 *
+-	 * @return true if this class supports startlevels
+-	 */
+-	public boolean hasStartLevels() {
+-		return false;
+-	}
+-
+-	/**
+-	 * Set the start level of a bundle
+-	 *
+-	 * @param b the bundle
+-	 */
+-	public void setStartLevel(Bundle b) {}
+-
+-	/**
+-	 * Answer the current framework start level
+-	 *
+-	 * @param framework the framework
+-	 * @return the current start level of the framework
+-	 */
+-	public int getFrameworkStartLevel(Framework framework) {
+-		return framework.adapt(FrameworkStartLevel.class)
+-			.getStartLevel();
+-	}
+-
+-	/**
+-	 * Set the default start level of newly installed bundles
+-	 *
+-	 * @param framework the framework
+-	 * @param level the default start level
+-	 */
+-	public void setDefaultStartlevel(Framework framework, int level) {
+-		framework.adapt(FrameworkStartLevel.class)
+-			.setInitialBundleStartLevel(level);
+-	}
+-
+-	/**
+-	 * Set the framework start level and return previous
+-	 *
+-	 * @param framework the framework
+-	 * @param startlevel the start level to set
+-	 * @param ls listeners
+-	 * @return the previous start level of the framework
+-	 */
+-	public int setFrameworkStartLevel(Framework framework, int startlevel, FrameworkListener... ls) {
+-		int previous = getFrameworkStartLevel(framework);
+-		framework.adapt(FrameworkStartLevel.class)
+-			.setStartLevel(startlevel, ls);
+-		return previous;
+-	}
+-
+-	/**
+-	 * Get a bundle's start level
+-	 *
+-	 * @param bundle the bundle to query
+-	 * @return the start level > 0
+-	 */
+-	public int getBundleStartLevel(Bundle bundle) {
+-		return bundle.adapt(BundleStartLevel.class)
+-			.getStartLevel();
+-	}
+-
+-	/**
+-	 * Set a bundle's start level
+-	 *
+-	 * @param bundle the bundle to query
+-	 * @param startlevel start level to set, > 0
+-	 */
+-	public void setBundleStartLevel(Bundle bundle, int startlevel) {
+-		bundle.adapt(BundleStartLevel.class)
+-			.setStartLevel(startlevel);
+-	}
+-
+-	/**
+-	 * Must be called before the framework is started.
+-	 * <p>
+-	 * ensure systemBundle.getState() == INIT and startlevel systemBundle == 0
+-	 *
+-	 * @param systemBundle the framework
+-	 */
+-	public void beforeStart(Framework systemBundle) {}
+-
+-	/**
+-	 * When the configuration properties have been updated
+-	 *
+-	 * @param configuration the configuration properties
+-	 */
+-	public void updateConfiguration(Map<String, ?> configuration) {}
+-
+-	/**
+-	 * Called after the framework is started and the launcher is ready
+-	 */
+-	public void afterStart() {}
+-
+-	/**
+-	 * Wait for the framework to reach its start level. Must be called after the
+-	 * {@link #afterStart()} method. Will return when the framework has
+-	 * traversed all start levels.
+-	 */
+-	public void sync() {}
+-
+-	/**
+-	 * Close this object
+-	 */
+-
+-	@Override
+-	public void close() {}
+-
+-	/**
+-	 * Create a start level handler. If the {@link #LAUNCH_STARTLEVEL_DEFAULT}
+-	 * property is set we create an active handler that will direct the
+-	 * framework properly according to the settings in Project Launcher. If not
+-	 * set, a dummy is returned that does not do anything
+-	 *
+-	 * @param outerConfiguration the properties as set by the Project Launcher
+-	 * @return an active or dummy {@link StartLevelRuntimeHandler}
+-	 */
+-	static public StartLevelRuntimeHandler create(Trace logger, Map<String, String> outerConfiguration) {
+-
+-		String defaultStartlevelString = outerConfiguration.get(LAUNCH_STARTLEVEL_DEFAULT);
+-		if (defaultStartlevelString == null) {
+-			logger.trace("startlevel: not handled");
+-			return absent();
+-		}
+-
+-		int defaultStartlevel = toInt(defaultStartlevelString, 1);
+-		int beginningStartlevel = toInt(outerConfiguration.get(Constants.FRAMEWORK_BEGINNING_STARTLEVEL), 1);
+-		outerConfiguration.put(Constants.FRAMEWORK_BEGINNING_STARTLEVEL, "1");
+-
+-		logger.trace("startlevel: handled begin=%s default=%s", beginningStartlevel, defaultStartlevel);
+-
+-		//
+-		// We need to remove it otherwise the framework reacts to it
+-		//
+-
+-		return new StartLevelRuntimeHandler() {
+-			CountDownLatch							latch		= new CountDownLatch(1);
+-			private Framework						systemBundle;
+-			private Map<BundleIdentity, Integer>	startlevels	= new HashMap<>();
+-			private Map<Bundle, BundleIdentity>		installed	= new HashMap<>();
+-
+-			@Override
+-			public void beforeStart(Framework systemBundle) {
+-				assert getFrameworkStartLevel(
+-					systemBundle) == 0 : "Expects the framework to be in init mode, not yet started";
+-
+-				this.systemBundle = systemBundle;
+-
+-				for (Bundle bundle : systemBundle.getBundleContext()
+-					.getBundles()) {
+-					if (bundle.getBundleId() == 0) {
+-						continue;
+-					}
+-					if (bundle.getSymbolicName() == null) {
+-						continue;
+-					}
+-					installed.put(bundle, new BundleIdentity(bundle));
+-				}
+-
+-				updateConfiguration(outerConfiguration);
+-
+-				setDefaultStartlevel(this.systemBundle, defaultStartlevel);
+-
+-				systemBundle.getBundleContext()
+-					.addBundleListener((SynchronousBundleListener) event -> {
+-						Bundle bundle = event.getBundle();
+-						if (bundle.getBundleId() == 0)
+-							return;
+-
+-						if (bundle.getSymbolicName() == null) {
+-							logger.trace("Found bundle without a bsn %s, ignoring", bundle);
+-							return;
+-						}
+-
+-						BundleIdentity id = installed.computeIfAbsent(bundle, BundleIdentity::new);
+-						if (event.getType() == BundleEvent.INSTALLED || event.getType() == BundleEvent.UPDATED) {
+-							setStartlevel(bundle, id);
+-						} else if (event.getType() == BundleEvent.UNINSTALLED) {
+-							installed.remove(bundle);
+-						}
+-					});
+-				logger.trace("startlevel: default=%s, beginning=%s", defaultStartlevel, beginningStartlevel);
+-
+-			}
+-
+-			@Override
+-			public void afterStart() {
+-				setFrameworkStartLevel(systemBundle, beginningStartlevel, event -> {
+-					logger.trace("startlevel: notified reached final level %s : %s", beginningStartlevel, event);
+-					latch.countDown();
+-				});
+-				logger.trace("startlevel change begin: beginning level %s", beginningStartlevel);
+-			}
+-
+-			@Override
+-			public void sync() {
+-				try {
+-					latch.await();
+-				} catch (InterruptedException ie) {
+-					Thread.interrupted();
+-					throw new RuntimeException(ie);
+-				}
+-			}
+-
+-			@Override
+-			public boolean hasStartLevels() {
+-				return true;
+-			}
+-
+-			@Override
+-			public void updateConfiguration(Map<String, ?> configuration) {
+-				new ParameterMap((String) configuration.get(LAUNCH_RUNBUNDLES_ATTRS)).entrySet()
+-					.forEach(entry -> {
+-						String bsn = ParameterMap.removeDuplicateMarker(entry.getKey());
+-						String version = entry.getValue()
+-							.getVersion();
+-						BundleIdentity id = new BundleIdentity(bsn, version);
+-
+-						int startlevel = toInt(entry.getValue()
+-							.get("startlevel"), -1);
+-						if (startlevel > 0) {
+-							startlevels.put(id, startlevel);
+-						}
+-					});
+-
+-				installed.forEach(this::setStartlevel);
+-			}
+-
+-			private void setStartlevel(Bundle bundle, BundleIdentity id) {
+-				if (bundle.getState() != Bundle.UNINSTALLED) {
+-					int level = startlevels.getOrDefault(id, -1);
+-					if (level == -1)
+-						level = defaultStartlevel;
+-
+-					setBundleStartLevel(bundle, level);
+-					logger.trace("startlevel: %s <- %s", bundle, level);
+-				}
+-			}
+-
+-		};
+-	}
+-
+-	static int toInt(Object object, int defltValue) {
+-		if (object == null)
+-			return defltValue;
+-
+-		String s = object.toString()
+-			.trim();
+-		try {
+-			return Integer.parseInt(s);
+-		} catch (NumberFormatException nfe) {
+-			return defltValue;
+-		}
+-	}
+-
+-	public static StartLevelRuntimeHandler absent() {
+-		return new StartLevelRuntimeHandler() {};
+-	}
+-
+-	@SuppressWarnings({
+-		"rawtypes", "unchecked"
+-	})
+-	public static StartLevelRuntimeHandler create(Trace reporter, Properties properties) {
+-		return create(reporter, (Map) properties);
+-	}
+-}
+diff --git a/aQute.libg/src/aQute/libg/dtos/DTOMap.java b/aQute.libg/src/aQute/libg/dtos/DTOMap.java
+deleted file mode 100644
+index f927de5..0000000
+--- a/aQute.libg/src/aQute/libg/dtos/DTOMap.java
++++ /dev/null
+@@ -1,143 +0,0 @@
+-package aQute.libg.dtos;
+-
+-import java.lang.reflect.Field;
+-import java.util.AbstractMap;
+-import java.util.AbstractSet;
+-import java.util.Iterator;
+-import java.util.Map;
+-import java.util.Set;
+-
+-import org.osgi.dto.DTO;
+-
+-public class DTOMap extends AbstractMap<String, Object> {
+-
+-	private final DTOsImpl	dtos;
+-	private final Object	dto;
+-	private final Field[]	fields;
+-
+-	public DTOMap(DTOsImpl dtos, Object dto) {
+-		this.dtos = dtos;
+-		this.dto = dto;
+-		this.fields = dtos.getFields(dto);
+-	}
+-
+-	@Override
+-	public int size() {
+-		return fields.length;
+-	}
+-
+-	@Override
+-	public boolean isEmpty() {
+-		return fields.length == 0;
+-	}
+-
+-	@Override
+-	public boolean containsKey(Object key) {
+-		if (!(key instanceof String))
+-			return false;
+-
+-		return dtos.bsearch(fields, 0, fields.length, (String) key) >= 0;
+-	}
+-
+-	@Override
+-	public boolean containsValue(Object value) {
+-		for (Field f : fields) {
+-			Object o;
+-			try {
+-				o = f.get(dto);
+-
+-				if (o == value)
+-					return true;
+-				if (o == null)
+-					return false;
+-
+-				return o.equals(value);
+-			} catch (IllegalArgumentException | IllegalAccessException e) {
+-				// Ignore since we only have public fields
+-			}
+-		}
+-		return false;
+-	}
+-
+-	@Override
+-	public Object get(Object key) {
+-		try {
+-			if (!(key instanceof String))
+-				return null;
+-
+-			Field field = dtos.getField(fields, (String) key);
+-			if (field == null)
+-				return null;
+-
+-			Object o = field.get(dto);
+-			if (o instanceof DTO) {
+-				return new DTOMap(dtos, o);
+-			} else
+-				return o;
+-		} catch (IllegalArgumentException | IllegalAccessException e) {
+-			// cannot happen
+-			return null;
+-		}
+-	}
+-
+-	@Override
+-	public Set<java.util.Map.Entry<String, Object>> entrySet() {
+-		return new AbstractSet<Map.Entry<String, Object>>() {
+-
+-			@Override
+-			public Iterator<java.util.Map.Entry<String, Object>> iterator() {
+-				return new Iterator<Map.Entry<String, Object>>() {
+-					int n = 0;
+-
+-					@Override
+-					public boolean hasNext() {
+-						return n < fields.length;
+-					}
+-
+-					@Override
+-					public java.util.Map.Entry<String, Object> next() {
+-						final Field field = fields[n];
+-						n++;
+-						return new Map.Entry<String, Object>() {
+-
+-							@Override
+-							public String getKey() {
+-								return field.getName();
+-							}
+-
+-							@Override
+-							public Object getValue() {
+-								try {
+-									return field.get(dto);
+-								} catch (IllegalArgumentException | IllegalAccessException e) {
+-									throw new RuntimeException(e);
+-								}
+-							}
+-
+-							@Override
+-							public Object setValue(Object value) {
+-								try {
+-									Object old = field.get(dto);
+-									field.set(dto, value);
+-									return old;
+-								} catch (IllegalArgumentException | IllegalAccessException e) {
+-									throw new RuntimeException(e);
+-								}
+-							}
+-						};
+-					}
+-
+-					@Override
+-					public void remove() {
+-						throw new UnsupportedOperationException("A DTO map cannot remove entries");
+-					}
+-				};
+-			}
+-
+-			@Override
+-			public int size() {
+-				return DTOMap.this.size();
+-			}
+-		};
+-	}
+-}
+diff --git a/aQute.libg/src/aQute/libg/dtos/DTOs.java b/aQute.libg/src/aQute/libg/dtos/DTOs.java
+deleted file mode 100644
+index a8abdb1..0000000
+--- a/aQute.libg/src/aQute/libg/dtos/DTOs.java
++++ /dev/null
+@@ -1,211 +0,0 @@
+-package aQute.libg.dtos;
+-
+-import java.util.List;
+-import java.util.Map;
+-import java.util.Optional;
+-
+-import org.osgi.annotation.versioning.ProviderType;
+-import org.osgi.dto.DTO;
+-
+-/**
+- * This interface provides a number of utilities to make it easy to work with
+- * DTOs. It contains a number of utility functions.
+- */
+-@ProviderType
+-public interface DTOs {
+-
+-	DTOs INSTANCE = new DTOsImpl();
+-
+-	/**
+-	 * Return a partially read only Map object that maps directly to a DTO. I.e.
+-	 * changes are reflected in the DTO. If a field is a DTO, then this field
+-	 * will also become a Map.
+-	 *
+-	 * @param dto the DTO
+-	 * @return a Map where the keys map to the field names and the values to the
+-	 *         field values. This map is not modifiable.
+-	 */
+-	Map<String, Object> asMap(Object dto);
+-
+-	/**
+-	 * Convert a DTO to a human readable string presentation. This is primarily
+-	 * for debugging since the toString can truncate fields. This method must
+-	 * print all public fields, also non primary. Output formats can vary (e.g.
+-	 * YAML like) so the actual output should NOT be treated as standard.
+-	 *
+-	 * @param dto the dto to turn into a string
+-	 * @return a human readable string (not json!)
+-	 */
+-	String toString(Object dto);
+-
+-	/**
+-	 * Check if two dtos fields are equal. This is shallow equal, that is the
+-	 * fields of this DTO are using the equals() instance method.
+-	 *
+-	 * @param a the first object
+-	 * @param b the second object
+-	 * @return true if both are null or the DTO's primary fields are equal
+-	 */
+-	boolean equals(Object a, Object b);
+-
+-	/**
+-	 * Check if two DTOs fields are equal. This is deep equal, that is the
+-	 * fields of this DTO are using this method is the object at a field is a
+-	 * DTO, recursively.
+-	 *
+-	 * @param a the first object
+-	 * @param b the second object
+-	 * @return true if both are null or the DTO's primary fields are equal
+-	 */
+-	boolean deepEquals(Object a, Object b);
+-
+-	/**
+-	 * Calculate a hash Code for the fields in this DTO. The dto must have at
+-	 * least one public field.
+-	 *
+-	 * @param dto the object to calculate the hashcode for, must not be null .
+-	 * @return a hashcode
+-	 */
+-	int hashCode(Object dto);
+-
+-	/**
+-	 * Access a DTO with a path. A path is a '.' separated string. Each part in
+-	 * the path is either a field name, key in a map, or an index in a list. If
+-	 * the path segments contain dots or backslashes, then these must be escaped
+-	 *
+-	 * @param dto the root
+-	 * @param path the path, should only contain dots as separators
+-	 * @return the value of the object or empty if not found.
+-	 */
+-
+-	Optional<Object> get(Object dto, String path);
+-
+-	/**
+-	 * Access a DTO with a path that consists of an array with segments. Each
+-	 * segment in the path is either a field name, key in a map, or an index in
+-	 * a list.
+-	 *
+-	 * @param dto the root
+-	 * @param path the path
+-	 * @return the value of the object or empty if not found.
+-	 */
+-	Optional<Object> get(Object dto, String... path);
+-
+-	/**
+-	 * Return a list of paths where the two objects differ. The objects must be
+-	 * of the same class.
+-	 *
+-	 * @param older the older object
+-	 * @param newer the newer object
+-	 * @return A list of differences, if there is no difference, the list is
+-	 *         empty.
+-	 */
+-	List<Difference> diff(Object older, Object newer);
+-
+-	/**
+-	 * The details of a difference
+-	 */
+-	class Difference extends DTO {
+-		/**
+-		 * The path where there was a difference
+-		 */
+-		public String	path[];
+-
+-		/**
+-		 * The reason why there was a difference
+-		 */
+-		public Reason	reason;
+-	}
+-
+-	/**
+-	 * The reason for a difference.
+-	 */
+-	enum Reason {
+-		UNEQUAL,
+-		REMOVED,
+-		ADDED,
+-		DIFFERENT_TYPES,
+-		SIZE,
+-		KEYS,
+-		NO_STRING_MAP,
+-		INVALID_KEY;
+-	}
+-
+-	/**
+-	 * Takes a path with escaped '.'and '\' and then turns it into an array of
+-	 * unescaped keys
+-	 *
+-	 * @param path the path with escaped \ and .
+-	 * @return a path array with unescaped segments
+-	 */
+-	String[] fromPathToSegments(String path);
+-
+-	/**
+-	 * Takes a path with unescaped keys and turns it into a string path where
+-	 * the \ and . are escaped.
+-	 *
+-	 * @param segments The unescaped segments of the path
+-	 * @return a string path where the . and \ are escaped.
+-	 */
+-	String fromSegmentsToPath(String[] segments);
+-
+-	/**
+-	 * Escape a string to be used in a path. This will put a backslash ('\') in
+-	 * front of full stops ('.') and the backslash ('\').
+-	 *
+-	 * @param unescaped the string to be escaped
+-	 * @return a string where all '.' and '\' are escaped with a '\'.
+-	 */
+-	String escape(String unescaped);
+-
+-	/**
+-	 * Unescapes a string to be used in a path. This will remove a backslash
+-	 * ('\') in front of full stops ('.') and the backslash ('\').
+-	 *
+-	 * @param escaped the string to be unescaped
+-	 * @return a string where all '\.' and '\\' have the preceding backslash
+-	 *         removed with a '\'.
+-	 */
+-	String unescape(String escaped);
+-
+-	/**
+-	 * Return true if the give dto is complex (either Map, Collection, Array, or
+-	 * has public fields.
+-	 *
+-	 * @param object The DTO to check
+-	 * @return <code>true</code> if this is a DTO with fields or length.
+-	 */
+-
+-	boolean isComplex(Object object);
+-
+-	/**
+-	 * An object with public non-static non-synthetic fields.
+-	 *
+-	 * @param dto the object to check
+-	 * @return true if this object has public fields or extends DTO
+-	 */
+-	boolean isDTO(Object dto);
+-
+-	/**
+-	 * Create a shallow copy of a DTO. This will create a new object of the same
+-	 * type and copy the public fields of the source to the new copy. It will
+-	 * not create a copy for these values.
+-	 *
+-	 * @param object the source object
+-	 * @return a shallow copy of object
+-	 */
+-
+-	<T> T shallowCopy(T object);
+-
+-	/**
+-	 * Create a deep copy of a DTO. This will copy the fields of the DTO. Copied
+-	 * values will also be created anew if they are complex (Map, Collection,
+-	 * DTO, or Array). Other objects are assumed to be immutable unless they
+-	 * implement Cloneable.
+-	 *
+-	 * @param object the object to deep copy
+-	 * @return the deep copied object
+-	 */
+-
+-	<T> T deepCopy(T object);
+-}
+diff --git a/aQute.libg/src/aQute/libg/dtos/DTOsImpl.java b/aQute.libg/src/aQute/libg/dtos/DTOsImpl.java
+deleted file mode 100644
+index 6de46b6..0000000
+--- a/aQute.libg/src/aQute/libg/dtos/DTOsImpl.java
++++ /dev/null
+@@ -1,615 +0,0 @@
+-package aQute.libg.dtos;
+-
+-import java.lang.reflect.Array;
+-import java.lang.reflect.Field;
+-import java.lang.reflect.Modifier;
+-import java.util.ArrayList;
+-import java.util.Arrays;
+-import java.util.Collection;
+-import java.util.Collections;
+-import java.util.Comparator;
+-import java.util.Formatter;
+-import java.util.List;
+-import java.util.Map;
+-import java.util.Map.Entry;
+-import java.util.Optional;
+-import java.util.WeakHashMap;
+-import java.util.regex.Pattern;
+-
+-import org.osgi.dto.DTO;
+-import org.slf4j.Logger;
+-import org.slf4j.LoggerFactory;
+-
+-import aQute.bnd.exceptions.Exceptions;
+-
+-public class DTOsImpl implements DTOs {
+-	private final static Logger				logger			= LoggerFactory.getLogger(DTOsImpl.class);
+-	private final Field[]					EMPTY_FIELDS	= new Field[0];
+-	private final Map<Class<?>, Field[]>	cache			= Collections
+-		.synchronizedMap(new WeakHashMap<Class<?>, Field[]>());
+-
+-	private final Link						root			= new Link(null, null, null);
+-
+-	//
+-	// The link class is to keep track of cycles traversing and to
+-	// maintain the path at minimum cost.
+-	//
+-
+-	static class Link {
+-		final Link		prev;
+-		final Object	object;
+-		final Object	name;
+-
+-		public Link(Link link, Object name, Object object) {
+-			this.prev = link;
+-			this.name = name;
+-			this.object = object;
+-		}
+-
+-		boolean isCycle(Object t) {
+-			if (this.object == t)
+-				return true;
+-			else if (prev == null)
+-				return false;
+-			else
+-				return prev.isCycle(t);
+-		}
+-
+-		String[] getPath(int n) {
+-			if (prev == null) {
+-				String[] path = new String[n];
+-				return path;
+-			}
+-			String[] path = prev.getPath(n + 1);
+-			path[path.length - n - 1] = name.toString();
+-			return path;
+-		}
+-
+-		void verifyCycle(Object o) {
+-			if (isCycle(o)) {
+-				throw new IllegalArgumentException("Cycle in DTO " + Arrays.toString(getPath(0)));
+-			}
+-		}
+-	}
+-
+-	static class Diff extends Difference {
+-		public Diff(Reason reason, Link link) {
+-			this.reason = reason;
+-			this.path = link.getPath(0);
+-		}
+-	}
+-
+-	@Override
+-	public Map<String, Object> asMap(Object dto) {
+-		return new DTOMap(this, dto);
+-	}
+-
+-	Field[] getFields(Object o) {
+-		if (o == null)
+-			return EMPTY_FIELDS;
+-		return getFields(o.getClass());
+-	}
+-
+-	Field[] getFields(Class<?> c) {
+-		Field fields[] = cache.get(c);
+-		if (fields == null) {
+-			List<Field> publicFields = new ArrayList<>();
+-
+-			for (Field field : c.getFields()) {
+-				if (field.isEnumConstant() || field.isSynthetic() || Modifier.isStatic(field.getModifiers()))
+-					continue;
+-				publicFields.add(field);
+-			}
+-			Collections.sort(publicFields, new Comparator<Field>() {
+-
+-				@Override
+-				public int compare(Field o1, Field o2) {
+-					return o1.getName()
+-						.compareTo(o2.getName());
+-				}
+-			});
+-
+-			cache.put(c.getClass(), fields = publicFields.toArray(new Field[publicFields.size()]));
+-		}
+-		return fields;
+-	}
+-
+-	int bsearch(Field[] a, int fromIndex, int toIndex, String key) {
+-		int low = fromIndex;
+-		int high = toIndex - 1;
+-
+-		while (low <= high) {
+-			int mid = (low + high) >>> 1;
+-			Field midVal = a[mid];
+-			int cmp = midVal.getName()
+-				.compareTo(key);
+-			if (cmp < 0)
+-				low = mid + 1;
+-			else if (cmp > 0)
+-				high = mid - 1;
+-			else
+-				return mid; // key found
+-		}
+-		return -(low + 1); // key not found.
+-	}
+-
+-	Field getField(Field[] fields, String name) {
+-		int index = bsearch(fields, 0, fields.length, name);
+-		if (index < 0)
+-			return null;
+-		else
+-			return fields[index];
+-	}
+-
+-	/**
+-	 * Shallow copy
+-	 */
+-
+-	@SuppressWarnings({
+-		"unchecked", "rawtypes"
+-	})
+-	@Override
+-	public <T> T shallowCopy(T source) {
+-		try {
+-			if (!isComplex(source))
+-				return source;
+-
+-			Class<T> c = (Class<T>) source.getClass();
+-
+-			if (c.isArray()) {
+-				int l = Array.getLength(source);
+-				T dest = (T) Array.newInstance(c.getComponentType(), l);
+-				System.arraycopy(source, 0, dest, 0, l);
+-				return dest;
+-			}
+-
+-			T dest = c.newInstance();
+-
+-			if (source instanceof Map) {
+-				((Map) dest).putAll((Map) source);
+-				return dest;
+-			}
+-
+-			if (source instanceof Collection) {
+-				((Collection) dest).addAll((Collection) source);
+-				return dest;
+-			}
+-
+-			for (Field field : getFields(c)) {
+-				field.set(dest, field.get(source));
+-			}
+-			return dest;
+-		} catch (Exception e) {
+-			throw Exceptions.duck(e);
+-		}
+-	}
+-
+-	/**
+-	 * Deep copy
+-	 */
+-
+-	@Override
+-	public <T> T deepCopy(T source) {
+-		return deepCopy(source, root);
+-	}
+-
+-	@SuppressWarnings({
+-		"unchecked", "rawtypes"
+-	})
+-	<T> T deepCopy(T source, Link link) {
+-		try {
+-			if (!isComplex(source))
+-				return source;
+-
+-			link.verifyCycle(source);
+-
+-			Class<T> c = (Class<T>) source.getClass();
+-
+-			if (c.isArray()) {
+-				int l = Array.getLength(source);
+-				T dest = (T) Array.newInstance(c.getComponentType(), l);
+-
+-				for (int i = 0; i < l; i++) {
+-					Object s = Array.get(source, i);
+-					Array.set(dest, i, deepCopy(s, new Link(link, i, source)));
+-				}
+-				return dest;
+-			}
+-
+-			T dest = c.newInstance();
+-
+-			if (source instanceof Map) {
+-				Map<Object, Object> d = (Map<Object, Object>) dest;
+-				Map<Object, Object> s = (Map<Object, Object>) source;
+-				for (Entry<?, ?> entry : s.entrySet()) {
+-					Link next = new Link(link, entry.getKey(), source);
+-					d.put(deepCopy(entry.getKey(), next), deepCopy(entry.getValue(), next));
+-				}
+-				return dest;
+-			}
+-
+-			if (source instanceof Collection) {
+-				Collection s = (Collection) source;
+-				Collection d = (Collection) dest;
+-				int i = 0;
+-				for (Object o : s) {
+-					Link next = new Link(link, i++, source);
+-					d.add(deepCopy(o, next));
+-				}
+-				return dest;
+-			}
+-
+-			for (Field field : getFields(c)) {
+-				Link next = new Link(link, field.getName(), source);
+-				field.set(dest, deepCopy(field.get(source), next));
+-			}
+-			return dest;
+-		} catch (Exception e) {
+-			throw Exceptions.duck(e);
+-		}
+-
+-	}
+-
+-	@Override
+-	public String[] fromPathToSegments(String path) {
+-		return fromPathToSegments(path, 0, 0);
+-	}
+-
+-	String[] fromPathToSegments(String path, int start, int n) {
+-		if (start >= path.length()) {
+-			return new String[n];
+-		}
+-
+-		StringBuilder sb = new StringBuilder();
+-		int i = start;
+-		outer: for (; i < path.length(); i++) {
+-			char c = path.charAt(i);
+-			switch (c) {
+-
+-				case '.' :
+-					break outer;
+-
+-				case '\\' :
+-					c = path.charAt(++i);
+-					assert c == '.' || c == '\\';
+-
+-				default :
+-					sb.append(c);
+-					break;
+-			}
+-		}
+-		String[] result = fromPathToSegments(path, i + 1, n + 1);
+-		result[n] = sb.toString();
+-		return result;
+-	}
+-
+-	@Override
+-	public String fromSegmentsToPath(String[] segments) {
+-		StringBuilder sb = new StringBuilder();
+-		String del = "";
+-		for (String segment : segments) {
+-			sb.append(del);
+-			for (int i = 0; i < segment.length(); i++) {
+-				char c = segment.charAt(i);
+-				switch (c) {
+-					case '\\' :
+-					case '.' :
+-						sb.append('\\');
+-
+-						// FALL THROUGH
+-
+-					default :
+-						sb.append(c);
+-						break;
+-				}
+-			}
+-			del = ".";
+-		}
+-		return sb.toString();
+-	}
+-
+-	@Override
+-	public boolean deepEquals(Object a, Object b) {
+-		try {
+-			return diff(a, b).isEmpty();
+-		} catch (Exception e) {
+-			throw Exceptions.duck(e);
+-		}
+-	}
+-
+-	@Override
+-	public String toString(Object dto) {
+-		if (dto == null)
+-			return null + "";
+-
+-		Field[] fields = getFields(dto);
+-		if (fields.length == 0)
+-			return dto.toString();
+-
+-		try {
+-			try (Formatter format = new Formatter()) {
+-				for (Field f : fields) {
+-					format.format("%s: %s%n", f.getName(), f.get(dto));
+-				}
+-				return format.toString();
+-			}
+-		} catch (IllegalArgumentException | IllegalAccessException e) {
+-			throw new RuntimeException(e);
+-		}
+-	}
+-
+-	@Override
+-	public boolean equals(Object a, Object b) {
+-		try {
+-			return diff(a, b).isEmpty();
+-		} catch (Exception e) {
+-			return false;
+-		}
+-	}
+-
+-	@Override
+-	public int hashCode(Object dto) {
+-		Field[] fields = getFields(dto);
+-		if (fields.length == 0)
+-			return dto.hashCode();
+-
+-		int prime = 31;
+-		int result = 1;
+-		try {
+-
+-			for (Field f : fields) {
+-				Object a = f.get(this);
+-				result = prime * result + (a == null ? 0 : hashCode(dto));
+-			}
+-
+-			return result;
+-		} catch (Exception e) {
+-			return result;
+-		}
+-	}
+-
+-	@Override
+-	public Optional<Object> get(Object dto, String path) {
+-		return get(dto, fromPathToSegments(path));
+-	}
+-
+-	@Override
+-	public Optional<Object> get(Object dto, String... path) {
+-		return get(dto, path, 0, path.length);
+-	}
+-
+-	private Optional<Object> get(Object dto, String[] path, int i, int max) {
+-		try {
+-			if (i > path.length)
+-				throw new IllegalArgumentException("Incorrect index in path " + Arrays.toString(path) + "[" + i + "]");
+-
+-			if (i == path.length || i == max)
+-				return Optional.of(dto);
+-
+-			if (dto == null)
+-				return Optional.empty();
+-
+-			String name = path[i];
+-
+-			if (dto.getClass()
+-				.isArray()) {
+-				int index = Integer.parseInt(name);
+-				if (index >= Array.getLength(dto))
+-					throw new IllegalArgumentException(
+-						"path access contains an array but the corresponding index is not an integer: "
+-						+ Arrays.toString(path) + "[" + i + "]");
+-
+-				return get(Array.get(dto, index), path, i + 1, max);
+-			}
+-
+-			if (dto instanceof Collection) {
+-				Collection<?> coll = (Collection<?>) dto;
+-				int index = Integer.parseInt(name);
+-				if (index >= coll.size())
+-					throw new IllegalArgumentException("path access contains a collection but the corresponding index is not an integer: "
+-						+ Arrays.toString(path) + "[" + i + "]");
+-
+-				if (coll instanceof List) {
+-					return get(((List<?>) coll).get(index), path, i + 1, max);
+-				}
+-				for (Object o : coll) {
+-					if (index-- == 0)
+-						return get(o, path, i + 1, max);
+-				}
+-				assert false;
+-				return null; // unreachable
+-			}
+-
+-			if (dto instanceof Map) {
+-				Object value = ((Map<?, ?>) dto).get(name);
+-				return get(value, path, i + 1, max);
+-			}
+-
+-			Field fields[] = getFields(dto);
+-			if (fields.length > 0) {
+-				for (Field field : fields) {
+-					if (field.getName()
+-						.equals(name)) {
+-						return get(field.get(dto), path, i + 1, max);
+-					}
+-				}
+-			}
+-
+-			throw new IllegalArgumentException("Unknown type to traverse " + dto.getClass() + " for " + name);
+-		} catch (Exception e) {
+-			throw Exceptions.duck(e);
+-		}
+-	}
+-
+-	@Override
+-	public List<Difference> diff(Object older, final Object newer) {
+-		List<Difference> diffs = new ArrayList<>();
+-		diff(diffs, root, older, newer);
+-		return diffs;
+-	}
+-
+-	private boolean diff(List<Difference> diffs, Link link, Object older, Object newer) {
+-		try {
+-			if (older == newer)
+-				return false;
+-
+-			if (older == null) {
+-				diffs.add(new Diff(Reason.ADDED, link));
+-				return true;
+-			}
+-
+-			if (newer == null) {
+-				diffs.add(new Diff(Reason.REMOVED, link));
+-				return true;
+-			}
+-
+-			Class<?> oc = older.getClass();
+-			Class<?> nc = newer.getClass();
+-			if (oc != nc) {
+-				diffs.add(new Diff(Reason.DIFFERENT_TYPES, link));
+-				return true;
+-			}
+-
+-			if (older.equals(newer))
+-				return true;
+-
+-			if (older instanceof Collection<?>) {
+-				Collection<?> co = (Collection<?>) older;
+-				Collection<?> cn = (Collection<?>) newer;
+-
+-				if (co.size() != cn.size()) {
+-					diffs.add(new Diff(Reason.SIZE, link));
+-					return true;
+-				}
+-
+-				if (co.equals(cn))
+-					return false;
+-
+-				//
+-				// They're different, if it is a list we can find out which
+-				//
+-
+-				if (older instanceof List<?>) {
+-					List<?> clo = (List<?>) older;
+-					List<?> cln = (List<?>) newer;
+-
+-					for (int i = 0; i < co.size(); i++) {
+-						Object lo = clo.get(i);
+-						Object ln = cln.get(i);
+-						diff(diffs, new Link(link, i, older), lo, ln);
+-					}
+-					return true;
+-				}
+-
+-				//
+-				// If not a list, we're lost ...
+-				//
+-
+-				diffs.add(new Diff(Reason.UNEQUAL, link));
+-				return true;
+-			}
+-
+-			if (oc.isArray()) {
+-				Object[] ao = new Object[] {
+-					older
+-				};
+-				Object[] an = new Object[] {
+-					newer
+-				};
+-				if (Arrays.deepEquals(ao, an)) {
+-					return false;
+-				}
+-
+-				int lo = Array.getLength(older);
+-				int ln = Array.getLength(newer);
+-				if (lo != ln) {
+-					diffs.add(new Diff(Reason.SIZE, link));
+-					return true;
+-				}
+-
+-				for (int i = 0; i < lo; i++) {
+-					diff(diffs, new Link(link, i, older), Array.get(older, i), Array.get(newer, i));
+-				}
+-				return true;
+-			}
+-
+-			if (older instanceof Map<?, ?>) {
+-				Map<?, ?> co = (Map<?, ?>) older;
+-				Map<?, ?> cn = (Map<?, ?>) newer;
+-
+-				if (co.size() != cn.size()) {
+-					diffs.add(new Diff(Reason.SIZE, link));
+-					return true;
+-				}
+-
+-				if (co.equals(cn))
+-					return false;
+-
+-				if (!co.keySet()
+-					.equals(cn.keySet())) {
+-					diffs.add(new Diff(Reason.KEYS, link));
+-					return true;
+-				}
+-
+-				for (Map.Entry<?, ?> e : co.entrySet()) {
+-					Object key = e.getKey();
+-					if (!(key instanceof String)) {
+-						diffs.add(new Diff(Reason.NO_STRING_MAP, link));
+-						return true;
+-					}
+-
+-					String k = escape((String) key);
+-
+-					Object no = co.get(key);
+-					Object nn = cn.get(key);
+-
+-					diff(diffs, new Link(link, k, older), no, nn);
+-				}
+-				return true;
+-			}
+-
+-			Field[] fields = getFields(older);
+-			if (fields.length > 0) {
+-				for (Field field : fields) {
+-					Object o = field.get(older);
+-					Object n = field.get(newer);
+-					diff(diffs, new Link(link, field.getName(), older), o, n);
+-				}
+-				return true;
+-			}
+-
+-			diffs.add(new Diff(Reason.UNEQUAL, link));
+-			return true;
+-		} catch (Exception e) {
+-			logger.warn("failed to diff %s to %s : %s", older, newer, e.getMessage(), e);
+-			throw Exceptions.duck(e);
+-		}
+-	}
+-
+-	static Pattern	ESCAPE_P	= Pattern.compile("(\\.|\\\\)");
+-	static Pattern	UNESCAPE_P	= Pattern.compile("\\\\(\\.|\\\\)");
+-
+-	@Override
+-	public String escape(String unescaped) {
+-		return ESCAPE_P.matcher(unescaped)
+-			.replaceAll("\\\\$1");
+-	}
+-
+-	@Override
+-	public String unescape(String unescaped) {
+-		return UNESCAPE_P.matcher(unescaped)
+-			.replaceAll("$1");
+-	}
+-
+-	@Override
+-	public boolean isComplex(Object a) {
+-		return a != null && (a instanceof Map || a instanceof Collection || a instanceof DTO || a.getClass()
+-			.isArray() || getFields(a).length > 0);
+-	}
+-
+-	@Override
+-	public boolean isDTO(Object o) {
+-		return getFields(o).length != 0;
+-	}
+-
+-}
+diff --git a/biz.aQute.bndlib/src/aQute/bnd/build/ProjectLauncher.java b/biz.aQute.bndlib/src/aQute/bnd/build/ProjectLauncher.java
+index e1ce42f..c1a3d87 100644
+--- a/biz.aQute.bndlib/src/aQute/bnd/build/ProjectLauncher.java
++++ b/biz.aQute.bndlib/src/aQute/bnd/build/ProjectLauncher.java
+@@ -43,7 +43,6 @@ import aQute.bnd.osgi.Processor;
+ import aQute.bnd.osgi.Verifier;
+ import aQute.bnd.service.Strategy;
+ import aQute.lib.io.IO;
+-import aQute.lib.startlevel.StartLevelRuntimeHandler;
+ import aQute.lib.strings.Strings;
+ import aQute.lib.watcher.FileWatcher;
+ import aQute.lib.watcher.FileWatcher.Builder;
+-- 
+2.37.2
+

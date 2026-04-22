@@ -3,7 +3,7 @@
 
 Name:           resolv_wrapper
 Version:        1.1.8
-Release:        10%{?dist}
+Release: 11%{?dist}
 
 Summary:        A wrapper for dns name resolving or dns faking
 License:        BSD-3-Clause

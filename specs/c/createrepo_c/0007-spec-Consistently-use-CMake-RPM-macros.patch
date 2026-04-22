@@ -1,0 +1,66 @@
+From c673138669790c970e3147c0d3ec2504ea0b2425 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Wed, 23 Jul 2025 10:31:35 +0200
+Subject: [PATCH] spec: Consistently use CMake RPM macros
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fedora is going to move from cmake with make to cmake with ninja
+<https://fedoraproject.org/wiki/Changes/CMake_ninja_default>.
+That would break building an RPM package from our spec file because
+the new %cmake macro won't produce Makefiles:
+
+    + make -j8 'RPM_OPT_FLAGS=-O2 -flto=auto -ffat-lto-objects -fexceptions -g -grecord-gcc-switches -pipe -Wall -Wno-complain-wrong-lang -Werror=format-security -Wp,-U_FORTIFY_SOURCE,-D_FORTIFY_SOURCE=3 -Wp,-D_GLIBCXX_ASSERTIONS -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -fstack-protector-strong -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1  -m64 -march=x86-64 -mtune=generic -fasynchronous-unwind-tables -fstack-clash-protection -fcf-protection -mtls-dialect=gnu2 -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer'
+    make: *** No targets specified and no makefile found.  Stop.
+
+The fix is to use CMake RPM macros for everything, especially not
+executing make manually.
+
+I tested this fix with old (make-based) and new (ninja-based)
+cmake-rpm-macros package successfully.
+
+Resolve: https://bugzilla.redhat.com/show_bug.cgi?id=2380983
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ createrepo_c.spec | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/createrepo_c.spec b/createrepo_c.spec
+index ef631a8..d45440a 100644
+--- a/createrepo_c.spec
++++ b/createrepo_c.spec
+@@ -145,25 +145,25 @@ pushd build-py3
+       -DWITH_LEGACY_HASHES=%{?with_legacy_hashes:ON}%{!?with_legacy_hashes:OFF} \
+       -DENABLE_DRPM=%{?with_drpm:ON}%{!?with_drpm:OFF} \
+       -DWITH_SANITIZERS=%{?with_sanitizers:ON}%{!?with_sanitizers:OFF}
+-  make %{?_smp_mflags} RPM_OPT_FLAGS="%{optflags}"
++  %cmake_build
+   # Build C documentation
+-  make doc-c
++  %cmake_build -t doc-c
+ popd
+ 
+ %check
+ # Run Python 3 tests
+ pushd build-py3
+   # Compile C tests
+-  make tests
++  %cmake_build -t tests
+ 
+   # Run Python 3 tests
+-  make ARGS="-V" test
++  %ctest -V
+ popd
+ 
+ %install
+ pushd build-py3
+   # Install createrepo_c with Python 3
+-  make install DESTDIR=%{buildroot}
++  %cmake_install
+ popd
+ 
+ %if 0%{?fedora} || 0%{?rhel} > 7
+-- 
+2.50.1
+

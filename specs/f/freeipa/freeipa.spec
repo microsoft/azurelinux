@@ -213,7 +213,7 @@
 
 Name:           %{package_name}
 Version:        %{IPA_VERSION}
-Release:        5%{?rc_version:.%rc_version}%{?dist}
+Release: 6%{?rc_version:.%rc_version}%{?dist}
 Summary:        The Identity, Policy and Audit system
 
 License:        GPL-3.0-or-later

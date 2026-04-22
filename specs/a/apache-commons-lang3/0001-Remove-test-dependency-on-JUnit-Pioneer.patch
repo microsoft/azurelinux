@@ -1,0 +1,399 @@
+From 0727af1a55207a3f46d529157087c210b61f720b Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Wed, 16 Jul 2025 20:57:50 +0200
+Subject: [PATCH] Remove test dependency on JUnit Pioneer
+
+sed -i '/<groupId>org.junit-pioneer/,/<dependency>/d' pom.xml
+
+sed -i '/^import org.junitpioneer/ d
+        /@Default\(Locale\|TimeZone\)([^)]*)/ {
+          h
+          d
+        }
+        /@Test/ {
+          x
+          s/\( *\)..*/\1@org.junit.jupiter.api.Disabled("JUnit Pioneer not available")/
+          /./p
+          s/.*//
+          x
+        }' $(grep org.junitpioneer -rl src/test/java/)
+---
+ pom.xml                                            |  5 -----
+ .../commons/lang3/StringUtilsContainsTest.java     |  5 +----
+ .../org/apache/commons/lang3/StringUtilsTest.java  |  5 +----
+ .../apache/commons/lang3/SystemPropertiesTest.java |  2 --
+ .../commons/lang3/time/DateFormatUtilsTest.java    |  6 ++----
+ .../apache/commons/lang3/time/DateUtilsTest.java   | 13 +++++--------
+ .../lang3/time/DurationFormatUtilsTest.java        |  3 +--
+ .../commons/lang3/time/FastDateFormatTest.java     | 14 +++++---------
+ .../commons/lang3/time/FastDateParserTest.java     |  9 +--------
+ .../time/FastDateParser_TimeZoneStrategyTest.java  |  7 +------
+ .../commons/lang3/time/FastDatePrinterTest.java    | 10 +++-------
+ 11 files changed, 20 insertions(+), 59 deletions(-)
+
+diff --git a/pom.xml b/pom.xml
+index 812a3ee13..9d1f1b4f5 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -63,11 +63,6 @@
+       <artifactId>junit-jupiter</artifactId>
+       <scope>test</scope>
+     </dependency>
+-    <dependency>
+-      <groupId>org.junit-pioneer</groupId>
+-      <artifactId>junit-pioneer</artifactId>
+-      <scope>test</scope>
+-    </dependency>
+     <dependency>
+       <groupId>org.easymock</groupId>
+       <artifactId>easymock</artifactId>
+diff --git a/src/test/java/org/apache/commons/lang3/StringUtilsContainsTest.java b/src/test/java/org/apache/commons/lang3/StringUtilsContainsTest.java
+index 61579a921..eecd4f5ab 100644
+--- a/src/test/java/org/apache/commons/lang3/StringUtilsContainsTest.java
++++ b/src/test/java/org/apache/commons/lang3/StringUtilsContainsTest.java
+@@ -27,9 +27,6 @@
+ import java.util.Locale;
+ 
+ import org.junit.jupiter.api.Test;
+-import org.junitpioneer.jupiter.DefaultLocale;
+-import org.junitpioneer.jupiter.ReadsDefaultLocale;
+-import org.junitpioneer.jupiter.WritesDefaultLocale;
+ 
+ /**
+  * Tests {@link StringUtils} - Contains methods
+@@ -233,7 +230,6 @@ void testContainsAnyIgnoreCase_StringStringArray() {
+     }
+ 
+     @Test
+-    @DefaultLocale(language = "de", country = "DE")
+     @ReadsDefaultLocale
+     @WritesDefaultLocale
+     void testContainsIgnoreCase_LocaleIndependence() {
+@@ -254,6 +250,7 @@ void testContainsIgnoreCase_LocaleIndependence() {
+         }
+     }
+ 
++    @org.junit.jupiter.api.Disabled("JUnit Pioneer not available")
+     @Test
+     void testContainsIgnoreCase_StringString() {
+         assertFalse(StringUtils.containsIgnoreCase(null, null));
+diff --git a/src/test/java/org/apache/commons/lang3/StringUtilsTest.java b/src/test/java/org/apache/commons/lang3/StringUtilsTest.java
+index cc803e490..e150b7a6e 100644
+--- a/src/test/java/org/apache/commons/lang3/StringUtilsTest.java
++++ b/src/test/java/org/apache/commons/lang3/StringUtilsTest.java
+@@ -50,9 +50,6 @@
+ import org.junit.jupiter.api.Test;
+ import org.junit.jupiter.params.ParameterizedTest;
+ import org.junit.jupiter.params.provider.ValueSource;
+-import org.junitpioneer.jupiter.DefaultLocale;
+-import org.junitpioneer.jupiter.ReadsDefaultLocale;
+-import org.junitpioneer.jupiter.WritesDefaultLocale;
+ 
+ /**
+  * Tests for methods of {@link StringUtils}
+@@ -2900,12 +2897,12 @@ void testToRootLowerCase() {
+     }
+ 
+     @Test
+-    @DefaultLocale("tr")
+     @ReadsDefaultLocale
+     void testToRootLowerCaseTurkish() {
+         assertEquals("title", StringUtils.toRootLowerCase("TITLE"));
+     }
+ 
++    @org.junit.jupiter.api.Disabled("JUnit Pioneer not available")
+     @Test
+     @ReadsDefaultLocale
+     @WritesDefaultLocale
+diff --git a/src/test/java/org/apache/commons/lang3/SystemPropertiesTest.java b/src/test/java/org/apache/commons/lang3/SystemPropertiesTest.java
+index 086d2c0d1..c9ff856af 100644
+--- a/src/test/java/org/apache/commons/lang3/SystemPropertiesTest.java
++++ b/src/test/java/org/apache/commons/lang3/SystemPropertiesTest.java
+@@ -31,8 +31,6 @@
+ import org.junit.jupiter.api.function.ThrowingSupplier;
+ import org.junit.jupiter.params.ParameterizedTest;
+ import org.junit.jupiter.params.provider.ValueSource;
+-import org.junitpioneer.jupiter.SetSystemProperty;
+-import org.junitpioneer.jupiter.SetSystemProperty.SetSystemProperties;
+ 
+ @SetSystemProperties({
+     @SetSystemProperty(key = SystemPropertiesTest.KEY_SPACE_1, value = "value1"),
+diff --git a/src/test/java/org/apache/commons/lang3/time/DateFormatUtilsTest.java b/src/test/java/org/apache/commons/lang3/time/DateFormatUtilsTest.java
+index e6e442cde..a774a1bb8 100644
+--- a/src/test/java/org/apache/commons/lang3/time/DateFormatUtilsTest.java
++++ b/src/test/java/org/apache/commons/lang3/time/DateFormatUtilsTest.java
+@@ -31,8 +31,6 @@
+ 
+ import org.apache.commons.lang3.AbstractLangTest;
+ import org.junit.jupiter.api.Test;
+-import org.junitpioneer.jupiter.DefaultLocale;
+-import org.junitpioneer.jupiter.DefaultTimeZone;
+ 
+ /**
+  * TestCase for DateFormatUtils.
+@@ -160,7 +158,7 @@ void testLANG1462() {
+         assertEquals("20030608221112", DateFormatUtils.format(calendar, "yyyyMMddHHmmss"));
+     }
+ 
+-    @DefaultTimeZone("UTC")
++    @org.junit.jupiter.api.Disabled("JUnit Pioneer not available")
+     @Test
+     void testLang530() throws ParseException {
+         final Date d = new Date();
+@@ -212,7 +210,7 @@ void testLang916() {
+         }
+     }
+ 
+-    @DefaultLocale(language = "en")
++    @org.junit.jupiter.api.Disabled("JUnit Pioneer not available")
+     @Test
+     void testSMTP() {
+         TimeZone timeZone = TimeZone.getTimeZone("GMT-3");
+diff --git a/src/test/java/org/apache/commons/lang3/time/DateUtilsTest.java b/src/test/java/org/apache/commons/lang3/time/DateUtilsTest.java
+index e06d71934..75c4b9f29 100644
+--- a/src/test/java/org/apache/commons/lang3/time/DateUtilsTest.java
++++ b/src/test/java/org/apache/commons/lang3/time/DateUtilsTest.java
+@@ -43,9 +43,6 @@
+ import org.junit.jupiter.api.BeforeAll;
+ import org.junit.jupiter.api.BeforeEach;
+ import org.junit.jupiter.api.Test;
+-import org.junitpioneer.jupiter.DefaultLocale;
+-import org.junitpioneer.jupiter.ReadsDefaultLocale;
+-import org.junitpioneer.jupiter.WritesDefaultLocale;
+ 
+ /**
+  * Tests {@link org.apache.commons.lang3.time.DateUtils}.
+@@ -796,13 +793,13 @@ void testLANG799() throws ParseException {
+     }
+ 
+     /** Parse English date with German Locale. */
+-    @DefaultLocale(language = "de")
++    @org.junit.jupiter.api.Disabled("JUnit Pioneer not available")
+     @Test
+     void testLANG799_DE_FAIL() {
+         assertThrows(ParseException.class, () -> DateUtils.parseDate("Wed, 09 Apr 2008 23:55:38 GMT", "EEE, dd MMM yyyy HH:mm:ss zzz"));
+     }
+ 
+-    @DefaultLocale(language = "de")
++    @org.junit.jupiter.api.Disabled("JUnit Pioneer not available")
+     @Test
+     void testLANG799_DE_OK() throws ParseException {
+         DateUtils.parseDate("Mi, 09 Apr 2008 23:55:38 GMT", "EEE, dd MMM yyyy HH:mm:ss zzz");
+@@ -810,13 +807,13 @@ void testLANG799_DE_OK() throws ParseException {
+     }
+ 
+     // Parse German date with English Locale
+-    @DefaultLocale(language = "en")
++    @org.junit.jupiter.api.Disabled("JUnit Pioneer not available")
+     @Test
+     void testLANG799_EN_FAIL() {
+         assertThrows(ParseException.class, () -> DateUtils.parseDate("Mi, 09 Apr 2008 23:55:38 GMT", "EEE, dd MMM yyyy HH:mm:ss zzz"));
+     }
+ 
+-    @DefaultLocale(language = "en")
++    @org.junit.jupiter.api.Disabled("JUnit Pioneer not available")
+     @Test
+     void testLANG799_EN_OK() throws ParseException {
+         DateUtils.parseDate("Wed, 09 Apr 2008 23:55:38 GMT", "EEE, dd MMM yyyy HH:mm:ss zzz");
+@@ -824,7 +821,7 @@ void testLANG799_EN_OK() throws ParseException {
+     }
+ 
+     /** Parse German date with English Locale, specifying German Locale override. */
+-    @DefaultLocale(language = "en")
++    @org.junit.jupiter.api.Disabled("JUnit Pioneer not available")
+     @Test
+     void testLANG799_EN_WITH_DE_LOCALE() throws ParseException {
+         DateUtils.parseDate("Mi, 09 Apr 2008 23:55:38 GMT", Locale.GERMAN, "EEE, dd MMM yyyy HH:mm:ss zzz");
+diff --git a/src/test/java/org/apache/commons/lang3/time/DurationFormatUtilsTest.java b/src/test/java/org/apache/commons/lang3/time/DurationFormatUtilsTest.java
+index 378b0ec2d..61d3757d6 100644
+--- a/src/test/java/org/apache/commons/lang3/time/DurationFormatUtilsTest.java
++++ b/src/test/java/org/apache/commons/lang3/time/DurationFormatUtilsTest.java
+@@ -34,7 +34,6 @@
+ import org.apache.commons.lang3.AbstractLangTest;
+ import org.apache.commons.lang3.time.DurationFormatUtils.Token;
+ import org.junit.jupiter.api.Test;
+-import org.junitpioneer.jupiter.DefaultTimeZone;
+ 
+ /**
+  * Tests {@link DurationFormatUtils}.
+@@ -142,7 +141,6 @@ void testDurationsByBruteForce() {
+ 
+     /** Attempting to test edge cases in DurationFormatUtils.formatPeriod. */
+     @Test
+-    @DefaultTimeZone(TimeZones.GMT_ID)
+     void testEdgeDurations() {
+         // This test case must use a time zone without DST
+         TimeZone.setDefault(FastTimeZone.getGmtTimeZone());
+@@ -202,6 +200,7 @@ void testEdgeDurations() {
+ 
+     }
+ 
++    @org.junit.jupiter.api.Disabled("JUnit Pioneer not available")
+     @Test
+     void testEmptyOptionals() {
+         assertEquals("", DurationFormatUtils.formatDuration(0L, "[d'd'][H'h'][m'm'][s's']"));
+diff --git a/src/test/java/org/apache/commons/lang3/time/FastDateFormatTest.java b/src/test/java/org/apache/commons/lang3/time/FastDateFormatTest.java
+index c9840df6f..e7ab929c6 100644
+--- a/src/test/java/org/apache/commons/lang3/time/FastDateFormatTest.java
++++ b/src/test/java/org/apache/commons/lang3/time/FastDateFormatTest.java
+@@ -42,8 +42,6 @@
+ 
+ import org.apache.commons.lang3.AbstractLangTest;
+ import org.junit.jupiter.api.Test;
+-import org.junitpioneer.jupiter.DefaultLocale;
+-import org.junitpioneer.jupiter.DefaultTimeZone;
+ 
+ /**
+  * Tests {@link org.apache.commons.lang3.time.FastDateFormat}.
+@@ -102,7 +100,7 @@ private AtomicLongArray measureTime(final Format printer, final Format parser) t
+         return totalElapsed;
+     }
+ 
+-    @DefaultLocale(language = "en", country = "US")
++    @org.junit.jupiter.api.Disabled("JUnit Pioneer not available")
+     @Test
+     void test_changeDefault_Locale_DateInstance() {
+         final FastDateFormat format1 = FastDateFormat.getDateInstance(FastDateFormat.FULL, Locale.GERMANY);
+@@ -117,7 +115,7 @@ void test_changeDefault_Locale_DateInstance() {
+         assertNotSame(format2, format3);
+     }
+ 
+-    @DefaultLocale(language = "en", country = "US")
++    @org.junit.jupiter.api.Disabled("JUnit Pioneer not available")
+     @Test
+     void test_changeDefault_Locale_DateTimeInstance() {
+         final FastDateFormat format1 = FastDateFormat.getDateTimeInstance(FastDateFormat.FULL, FastDateFormat.FULL, Locale.GERMANY);
+@@ -157,7 +155,7 @@ void test_getInstance_String() {
+         assertEquals(TimeZone.getDefault(), format2.getTimeZone());
+     }
+ 
+-    @DefaultLocale(language = "en", country = "US")
++    @org.junit.jupiter.api.Disabled("JUnit Pioneer not available")
+     @Test
+     void test_getInstance_String_Locale() {
+         final FastDateFormat format1 = FastDateFormat.getInstance("MM/DD/yyyy", Locale.GERMANY);
+@@ -169,8 +167,7 @@ void test_getInstance_String_Locale() {
+         assertEquals(Locale.GERMANY, format1.getLocale());
+     }
+ 
+-    @DefaultLocale(language = "en", country = "US")
+-    @DefaultTimeZone("America/New_York")
++    @org.junit.jupiter.api.Disabled("JUnit Pioneer not available")
+     @Test
+     void test_getInstance_String_TimeZone() {
+ 
+@@ -190,8 +187,7 @@ void test_getInstance_String_TimeZone() {
+         assertNotSame(format4, format6);
+     }
+ 
+-    @DefaultLocale(language = "en", country = "US")
+-    @DefaultTimeZone("America/New_York")
++    @org.junit.jupiter.api.Disabled("JUnit Pioneer not available")
+     @Test
+     void test_getInstance_String_TimeZone_Locale() {
+         final FastDateFormat format1 = FastDateFormat.getInstance("MM/DD/yyyy",
+diff --git a/src/test/java/org/apache/commons/lang3/time/FastDateParserTest.java b/src/test/java/org/apache/commons/lang3/time/FastDateParserTest.java
+index 3369ff382..792ef42d6 100644
+--- a/src/test/java/org/apache/commons/lang3/time/FastDateParserTest.java
++++ b/src/test/java/org/apache/commons/lang3/time/FastDateParserTest.java
+@@ -49,18 +49,10 @@
+ import org.junit.jupiter.params.ParameterizedTest;
+ import org.junit.jupiter.params.provider.Arguments;
+ import org.junit.jupiter.params.provider.MethodSource;
+-import org.junitpioneer.jupiter.DefaultLocale;
+-import org.junitpioneer.jupiter.DefaultTimeZone;
+-import org.junitpioneer.jupiter.ReadsDefaultLocale;
+-import org.junitpioneer.jupiter.ReadsDefaultTimeZone;
+-import org.junitpioneer.jupiter.cartesian.ArgumentSets;
+-import org.junitpioneer.jupiter.cartesian.CartesianTest;
+ 
+ /**
+  * Tests {@link org.apache.commons.lang3.time.FastDateParser}.
+  */
+-/* Make test reproducible */ @DefaultLocale(language = "en")
+-/* Make test reproducible */ @DefaultTimeZone(TimeZones.GMT_ID)
+ /* Make test reproducible */ @ReadsDefaultLocale
+ /* Make test reproducible */ @ReadsDefaultTimeZone
+ class FastDateParserTest extends AbstractLangTest {
+@@ -249,6 +241,7 @@ void test_Equality_Hash(final TriFunction<String, TimeZone, Locale, DateParser>
+         }
+     }
+ 
++@org.junit.jupiter.api.Disabled("JUnit Pioneer not available")
+     @Test
+     void test1806() throws ParseException {
+         final String formatStub = "yyyy-MM-dd'T'HH:mm:ss.SSS";
+diff --git a/src/test/java/org/apache/commons/lang3/time/FastDateParser_TimeZoneStrategyTest.java b/src/test/java/org/apache/commons/lang3/time/FastDateParser_TimeZoneStrategyTest.java
+index 4aa50f8e8..123316c86 100644
+--- a/src/test/java/org/apache/commons/lang3/time/FastDateParser_TimeZoneStrategyTest.java
++++ b/src/test/java/org/apache/commons/lang3/time/FastDateParser_TimeZoneStrategyTest.java
+@@ -41,16 +41,10 @@
+ import org.junit.jupiter.api.Test;
+ import org.junit.jupiter.params.ParameterizedTest;
+ import org.junit.jupiter.params.provider.MethodSource;
+-import org.junitpioneer.jupiter.DefaultLocale;
+-import org.junitpioneer.jupiter.DefaultTimeZone;
+-import org.junitpioneer.jupiter.ReadsDefaultLocale;
+-import org.junitpioneer.jupiter.ReadsDefaultTimeZone;
+ 
+ /**
+  * Tests {@link FastDateParser}.
+  */
+-/* Make test reproducible */ @DefaultLocale(language = "en")
+-/* Make test reproducible */ @DefaultTimeZone(TimeZones.GMT_ID)
+ /* Make test reproducible */ @ReadsDefaultLocale
+ /* Make test reproducible */ @ReadsDefaultTimeZone
+ class FastDateParser_TimeZoneStrategyTest extends AbstractLangTest {
+@@ -73,6 +67,7 @@ private String[][] getZoneStringsSorted(final Locale locale) {
+         return ArraySorter.sort(DateFormatSymbols.getInstance(locale).getZoneStrings(), Comparator.comparing(array -> array[0]));
+     }
+ 
++@org.junit.jupiter.api.Disabled("JUnit Pioneer not available")
+     @Test
+     void testLang1219() throws ParseException {
+         final FastDateParser parser = new FastDateParser("dd.MM.yyyy HH:mm:ss z", TimeZone.getDefault(), Locale.GERMAN);
+diff --git a/src/test/java/org/apache/commons/lang3/time/FastDatePrinterTest.java b/src/test/java/org/apache/commons/lang3/time/FastDatePrinterTest.java
+index cb8c9deca..355a7d7e9 100644
+--- a/src/test/java/org/apache/commons/lang3/time/FastDatePrinterTest.java
++++ b/src/test/java/org/apache/commons/lang3/time/FastDatePrinterTest.java
+@@ -33,8 +33,6 @@
+ import org.apache.commons.lang3.AbstractLangTest;
+ import org.apache.commons.lang3.SerializationUtils;
+ import org.junit.jupiter.api.Test;
+-import org.junitpioneer.jupiter.DefaultLocale;
+-import org.junitpioneer.jupiter.DefaultTimeZone;
+ 
+ /**
+  * Tests {@link org.apache.commons.lang3.time.FastDatePrinter}.
+@@ -167,8 +165,7 @@ void testEquals() {
+         assertNotEquals(printer1, new Object());
+     }
+ 
+-    @DefaultLocale(language = "en", country = "US")
+-    @DefaultTimeZone("America/New_York")
++    @org.junit.jupiter.api.Disabled("JUnit Pioneer not available")
+     @Test
+     void testFormat() {
+         final GregorianCalendar cal1 = new GregorianCalendar(2003, 0, 10, 15, 33, 20);
+@@ -406,7 +403,7 @@ void testStringBufferOptions() {
+         assertEquals(expected, format.format(epoch, sb).toString());
+     }
+ 
+-    @DefaultTimeZone("UTC")
++    @org.junit.jupiter.api.Disabled("JUnit Pioneer not available")
+     @Test
+     void testTimeZoneAsZ() {
+         final Calendar c = Calendar.getInstance(FastTimeZone.getGmtTimeZone());
+@@ -432,8 +429,7 @@ void testToStringContainsName() {
+         assertTrue(printer.toString().startsWith("FastDate"));
+     }
+ 
+-    @DefaultLocale(language = "en", country = "US")
+-    @DefaultTimeZone("America/New_York")
++    @org.junit.jupiter.api.Disabled("JUnit Pioneer not available")
+     @Test
+     void testWeekYear() {
+         final GregorianCalendar cal = new GregorianCalendar(2020, 12, 31, 0, 0, 0);
+-- 
+2.50.1
+

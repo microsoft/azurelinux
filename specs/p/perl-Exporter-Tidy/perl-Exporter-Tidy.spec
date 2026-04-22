@@ -3,7 +3,7 @@
 
 Name:           perl-Exporter-Tidy
 Version:        0.09
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Another way of exporting symbols
 License:        any-OSI-perl-modules
 URL:            https://metacpan.org/release/Exporter-Tidy

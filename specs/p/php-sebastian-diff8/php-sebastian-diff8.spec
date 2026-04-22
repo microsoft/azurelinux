@@ -10,7 +10,7 @@
 # Please, preserve the changelog entries
 #
 
-%bcond_with          tests
+%bcond_without       tests
 
 %global gh_commit    a2b6d09d7729ee87d605a439469f9dcc39be5ea3
 %global gh_short     %(c=%{gh_commit}; echo ${c:0:7})
@@ -29,7 +29,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
 Version:        8.0.0
-Release:        1%{?dist}
+Release: 3%{?dist}
 Summary:        Diff implementation, version %{major}
 
 License:        BSD-3-Clause
@@ -111,6 +111,9 @@ exit $ret
 
 
 %changelog
+* Tue Feb 10 2026 Remi Collet <remi@remirepo.net> - 8.0.0-2
+- enable test suite
+
 * Fri Feb  6 2026 Remi Collet <remi@remirepo.net> - 8.0.0-1
 - update to 8.0.0
 - raise dependency on PHP 8.4

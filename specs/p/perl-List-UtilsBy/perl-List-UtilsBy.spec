@@ -3,7 +3,7 @@
 
 Name:           perl-List-UtilsBy
 Version:        0.12
-Release:        12%{?dist}
+Release: 13%{?dist}
 Summary:        Higher-order list utility functions
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/List-UtilsBy

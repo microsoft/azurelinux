@@ -6,7 +6,7 @@
 
 Name:           perl-DBD-SQLite
 Version:        1.76
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        SQLite DBI Driver
 # lib/DBD/SQLite.pm:        GPL-1.0-or-later OR Artistic-1.0-Perl
 # LICENSE:                  GPL-1.0-or-later OR Artistic-1.0-Perl

@@ -1,0 +1,40 @@
+From 3f45f26993ed94837001bb9760d7859e7a057649 Mon Sep 17 00:00:00 2001
+From: Sam Feifer <sfeifer@redhat.com>
+Date: Fri, 1 Mar 2024 15:00:55 -0500
+Subject: [PATCH] replace faulty slices sort
+
+
+diff --git a/pkg/services/sqlstore/migrator/dialect.go b/pkg/services/sqlstore/migrator/dialect.go
+index 183b619de8..da21edeafa 100644
+--- a/pkg/services/sqlstore/migrator/dialect.go
++++ b/pkg/services/sqlstore/migrator/dialect.go
+@@ -368,7 +368,8 @@ func (b *BaseDialect) InsertQuery(tableName string, row map[string]any) (string,
+ 	for col := range row {
+ 		keys = append(keys, col)
+ 	}
+-	slices.Sort[string](keys)
++	slices.Sort(keys)
++	//slices.Sort[string](keys)
+ 
+ 	// build query and values
+ 	for _, col := range keys {
+@@ -398,7 +399,8 @@ func (b *BaseDialect) UpdateQuery(tableName string, row map[string]any, where ma
+ 	for col := range row {
+ 		keys = append(keys, col)
+ 	}
+-	slices.Sort[string](keys)
++	slices.Sort(keys)
++	//slices.Sort[string](keys)
+ 
+ 	// build update query and values
+ 	for _, col := range keys {
+@@ -411,7 +413,8 @@ func (b *BaseDialect) UpdateQuery(tableName string, row map[string]any, where ma
+ 	for col := range where {
+ 		keys = append(keys, col)
+ 	}
+-	slices.Sort[string](keys)
++	slices.Sort(keys)
++	//slices.Sort[string](keys)
+ 
+ 	// build where clause and values
+ 	for _, col := range keys {

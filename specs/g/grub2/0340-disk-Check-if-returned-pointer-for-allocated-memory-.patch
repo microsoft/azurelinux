@@ -1,0 +1,152 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alec Brown <alec.r.brown@oracle.com>
+Date: Wed, 22 Jan 2025 02:55:11 +0000
+Subject: [PATCH] disk: Check if returned pointer for allocated memory is NULL
+
+When using grub_malloc(), grub_zalloc() or grub_calloc(), these functions can
+fail if we are out of memory. After allocating memory we should check if these
+functions returned NULL and handle this error if they did.
+
+On the occasion make a NULL check in ATA code more obvious.
+
+Signed-off-by: Alec Brown <alec.r.brown@oracle.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/disk/ata.c             |  4 ++--
+ grub-core/disk/ieee1275/obdisk.c |  6 ++++++
+ grub-core/disk/ldm.c             |  6 ++++++
+ grub-core/disk/lvm.c             | 14 ++++++++++++++
+ grub-core/disk/memdisk.c         |  2 ++
+ 5 files changed, 30 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/disk/ata.c b/grub-core/disk/ata.c
+index 7b6ac7bfc..a2433e29e 100644
+--- a/grub-core/disk/ata.c
++++ b/grub-core/disk/ata.c
+@@ -112,10 +112,10 @@ grub_ata_identify (struct grub_ata *dev)
+     return grub_atapi_identify (dev);
+ 
+   info64 = grub_malloc (GRUB_DISK_SECTOR_SIZE);
++  if (info64 == NULL)
++    return grub_errno;
+   info32 = (grub_uint32_t *) info64;
+   info16 = (grub_uint16_t *) info64;
+-  if (! info16)
+-    return grub_errno;
+ 
+   grub_memset (&parms, 0, sizeof (parms));
+   parms.buffer = info16;
+diff --git a/grub-core/disk/ieee1275/obdisk.c b/grub-core/disk/ieee1275/obdisk.c
+index 9d4c42665..fcc39e0a2 100644
+--- a/grub-core/disk/ieee1275/obdisk.c
++++ b/grub-core/disk/ieee1275/obdisk.c
+@@ -423,6 +423,12 @@ canonicalise_disk (const char *devname)
+ 	}
+ 
+       real_canon = grub_malloc (real_unit_str_len);
++      if (real_canon == NULL)
++	{
++	  grub_free (parent);
++	  grub_print_error ();
++	  return NULL;
++	}
+ 
+       grub_snprintf (real_canon, real_unit_str_len, "%s/disk@%s",
+                      op->name, real_unit_address);
+diff --git a/grub-core/disk/ldm.c b/grub-core/disk/ldm.c
+index 4101b15d8..048e29cd0 100644
+--- a/grub-core/disk/ldm.c
++++ b/grub-core/disk/ldm.c
+@@ -292,6 +292,12 @@ make_vg (grub_disk_t disk,
+ 	    }
+ 
+ 	  pv->id.uuid = grub_malloc (sz);
++	  if (pv->id.uuid == NULL)
++	    {
++	      grub_free (pv->internal_id);
++	      grub_free (pv);
++	      goto fail2;
++	    }
+ 	  grub_memcpy (pv->id.uuid, ptr + 1, pv->id.uuidlen);
+ 	  pv->id.uuid[pv->id.uuidlen] = 0;
+ 
+diff --git a/grub-core/disk/lvm.c b/grub-core/disk/lvm.c
+index a395b200d..b2dff76d1 100644
+--- a/grub-core/disk/lvm.c
++++ b/grub-core/disk/lvm.c
+@@ -370,6 +370,8 @@ grub_lvm_detect (grub_disk_t disk,
+ 		break;
+ 
+ 	      pv = grub_zalloc (sizeof (*pv));
++	      if (pv == NULL)
++		goto fail4;
+ 	      q = p;
+ 	      while (*q != ' ' && q < mda_end)
+ 		q++;
+@@ -379,6 +381,8 @@ grub_lvm_detect (grub_disk_t disk,
+ 
+ 	      s = q - p;
+ 	      pv->name = grub_malloc (s + 1);
++	      if (pv->name == NULL)
++		goto pvs_fail_noname;
+ 	      grub_memcpy (pv->name, p, s);
+ 	      pv->name[s] = '\0';
+ 
+@@ -451,6 +455,8 @@ grub_lvm_detect (grub_disk_t disk,
+ 		break;
+ 
+ 	      lv = grub_zalloc (sizeof (*lv));
++	      if (lv == NULL)
++		goto fail4;
+ 
+ 	      q = p;
+ 	      while (*q != ' ' && q < mda_end)
+@@ -545,6 +551,8 @@ grub_lvm_detect (grub_disk_t disk,
+ 		  goto lvs_fail;
+ 		}
+ 	      lv->segments = grub_calloc (lv->segment_count, sizeof (*seg));
++	      if (lv->segments == NULL)
++		goto lvs_fail;
+ 	      seg = lv->segments;
+ 
+ 	      for (i = 0; i < lv->segment_count; i++)
+@@ -612,6 +620,8 @@ grub_lvm_detect (grub_disk_t disk,
+ 
+ 		      seg->nodes = grub_calloc (seg->node_count,
+ 						sizeof (*stripe));
++		      if (seg->nodes == NULL)
++			goto lvs_segment_fail;
+ 		      stripe = seg->nodes;
+ 
+ 		      p = grub_strstr (p, "stripes = [");
+@@ -672,6 +682,8 @@ grub_lvm_detect (grub_disk_t disk,
+ 			}
+ 
+ 		      seg->nodes = grub_calloc (seg->node_count, sizeof (seg->nodes[0]));
++		      if (seg->nodes == NULL)
++			goto lvs_segment_fail;
+ 
+ 		      p = grub_strstr (p, "mirrors = [");
+ 		      if (p == NULL)
+@@ -760,6 +772,8 @@ grub_lvm_detect (grub_disk_t disk,
+ 			}
+ 
+ 		      seg->nodes = grub_calloc (seg->node_count, sizeof (seg->nodes[0]));
++		      if (seg->nodes == NULL)
++			goto lvs_segment_fail;
+ 
+ 		      p = grub_strstr (p, "raids = [");
+ 		      if (p == NULL)
+diff --git a/grub-core/disk/memdisk.c b/grub-core/disk/memdisk.c
+index 36de3bfab..2d7afaea3 100644
+--- a/grub-core/disk/memdisk.c
++++ b/grub-core/disk/memdisk.c
+@@ -103,6 +103,8 @@ GRUB_MOD_INIT(memdisk)
+ 	    return;
+ 	  }
+ 	memdisk_addr = grub_malloc (memdisk_size);
++	if (memdisk_addr == NULL)
++	  return;
+ 
+ 	grub_dprintf ("memdisk", "Copying memdisk image to dynamic memory\n");
+ 	grub_memmove (memdisk_addr, memdisk_orig_addr, memdisk_size);

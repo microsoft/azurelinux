@@ -3,7 +3,7 @@
 
 Name:           vmaf
 Version:        3.0.0
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Video Multi-Method Assessment Fusion
 
 License:        BSD-2-Clause-Patent
@@ -60,7 +60,6 @@ developing applications that use %{name}.
 %package        models
 Summary:        Model files for %{name}
 Requires:       libvmaf = %{version}-%{release}
-BuildArch:      noarch
 
 %description    models
 The %{name}-models package contains model files.

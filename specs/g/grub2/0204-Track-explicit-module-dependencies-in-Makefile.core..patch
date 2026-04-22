@@ -1,0 +1,124 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Oliver Steffen <osteffen@redhat.com>
+Date: Wed, 28 Feb 2024 13:36:00 +0100
+Subject: [PATCH] Track explicit module dependencies in Makefile.core.def
+
+Add a new keyword, "depends", to the module definition syntax
+used in Makefile.core.def. This allows specifying explicit module
+dependencies together with the module definition.
+
+Make use of this new keyword in the bli module definition.
+
+Signed-off-by: Oliver Steffen <osteffen@redhat.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+Tested-by: Oskari Pirhonen <xxc3ncoredxx@gmail.com>
+---
+ grub-core/Makefile.core.def | 1 +
+ .gitignore                  | 1 -
+ conf/Makefile.common        | 1 +
+ gentpl.py                   | 7 +++++++
+ grub-core/Makefile.am       | 9 ++++++---
+ grub-core/genmoddep.awk     | 2 +-
+ 6 files changed, 16 insertions(+), 5 deletions(-)
+
+diff --git a/grub-core/Makefile.core.def b/grub-core/Makefile.core.def
+index c9dcfa00e85..a5a3ee31800 100644
+--- a/grub-core/Makefile.core.def
++++ b/grub-core/Makefile.core.def
+@@ -2670,6 +2670,7 @@ module = {
+   name = bli;
+   efi = commands/bli.c;
+   enable = efi;
++  depends = part_gpt;
+ };
+ 
+ module = {
+diff --git a/.gitignore b/.gitignore
+index f2e8e1e42d7..c603c15d66c 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -11,7 +11,6 @@
+ *.img
+ *.log
+ *.lst
+-!/grub-core/extra_deps.lst
+ *.marker
+ *.mod
+ *.o
+diff --git a/conf/Makefile.common b/conf/Makefile.common
+index c8756d8146f..9feac7434da 100644
+--- a/conf/Makefile.common
++++ b/conf/Makefile.common
+@@ -115,6 +115,7 @@ MOD_FILES =
+ MODULE_FILES =
+ MARKER_FILES =
+ KERNEL_HEADER_FILES =
++EXTRA_DEPS =
+ 
+ bin_SCRIPTS =
+ bin_PROGRAMS =
+diff --git a/gentpl.py b/gentpl.py
+index 5826a6b14e8..0f8d009ef21 100644
+--- a/gentpl.py
++++ b/gentpl.py
+@@ -642,6 +642,9 @@ def platform_values(defn, platform, suffix):
+ def extra_dist(defn):
+     return foreach_value(defn, "extra_dist", lambda value: value + " ")
+ 
++def extra_dep(defn):
++    return foreach_value(defn, "depends", lambda value: value + " ")
++
+ def platform_sources(defn, p): return platform_values(defn, p, "")
+ def platform_nodist_sources(defn, p): return platform_values(defn, p, "_nodist")
+ 
+@@ -712,6 +715,10 @@ def module(defn, platform):
+     gvar_add("MOD_FILES", name + ".mod")
+     gvar_add("MARKER_FILES", name + ".marker")
+     gvar_add("CLEANFILES", name + ".marker")
++
++    for dep in defn.find_all("depends"):
++        gvar_add("EXTRA_DEPS", "depends " + name + " " + dep + ":")
++
+     output("""
+ """ + name + """.marker: $(""" + cname(defn) + """_SOURCES) $(nodist_""" + cname(defn) + """_SOURCES)
+ 	$(TARGET_CPP) -DGRUB_LST_GENERATOR $(CPPFLAGS_MARKER) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(""" + cname(defn) + """_CPPFLAGS) $(CPPFLAGS) $^ > $@.new || (rm -f $@; exit 1)
+diff --git a/grub-core/Makefile.am b/grub-core/Makefile.am
+index 7953ba95399..77f8329cd43 100644
+--- a/grub-core/Makefile.am
++++ b/grub-core/Makefile.am
+@@ -456,8 +456,11 @@ crypto.lst: $(srcdir)/lib/libgcrypt-grub/cipher/crypto.lst
+ platform_DATA += crypto.lst
+ CLEANFILES += crypto.lst
+ 
+-syminfo.lst: gensyminfo.sh kernel_syms.lst $(top_srcdir)/grub-core/extra_deps.lst $(MODULE_FILES)
+-	cat kernel_syms.lst $(top_srcdir)/grub-core/extra_deps.lst > $@.new
++extra_deps.lst:
++	@echo $(EXTRA_DEPS) | sed "s/\s*:\s*/\n/g" > $@
++
++syminfo.lst: gensyminfo.sh kernel_syms.lst extra_deps.lst $(MODULE_FILES)
++	cat kernel_syms.lst extra_deps.lst > $@.new
+ 	for m in $(MODULE_FILES); do \
+ 	  sh $< $$m >> $@.new || exit 1; \
+ 	done
+@@ -467,7 +470,7 @@ syminfo.lst: gensyminfo.sh kernel_syms.lst $(top_srcdir)/grub-core/extra_deps.ls
+ moddep.lst: syminfo.lst genmoddep.awk video.lst
+ 	cat $< | sort | $(AWK) -f $(srcdir)/genmoddep.awk > $@ || (rm -f $@; exit 1)
+ platform_DATA += moddep.lst
+-CLEANFILES += config.log syminfo.lst moddep.lst
++CLEANFILES += config.log syminfo.lst moddep.lst extra_deps.lst
+ 
+ $(MOD_FILES): %.mod : genmod.sh moddep.lst %.module$(EXEEXT) build-grub-module-verifier$(BUILD_EXEEXT)
+ 	TARGET_OBJ2ELF=@TARGET_OBJ2ELF@ sh $^ $@
+diff --git a/grub-core/genmoddep.awk b/grub-core/genmoddep.awk
+index cc987a53aa8..ab457cb2b56 100644
+--- a/grub-core/genmoddep.awk
++++ b/grub-core/genmoddep.awk
+@@ -35,7 +35,7 @@ BEGIN {
+     for (i = 3; i <= NF; i++) {
+       modtab[$2] = modtab[$2] " " $i;
+     }
+-  }
++  } else if ($1 == "") {} #Skip empty lines
+   else {
+     printf "error: %u: unrecognized input format\n", NR >"/dev/stderr";
+     error++;

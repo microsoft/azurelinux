@@ -1,0 +1,23 @@
+diff -pruN rit-meera-new-fonts-1.6.2.orig/fonts/65-meera-new-fonts.conf rit-meera-new-fonts-1.6.2/fonts/65-meera-new-fonts.conf
+--- rit-meera-new-fonts-1.6.2.orig/fonts/65-meera-new-fonts.conf	2024-08-22 15:03:42.000000000 +0900
++++ rit-meera-new-fonts-1.6.2/fonts/65-meera-new-fonts.conf	2025-07-10 16:52:51.643795056 +0900
+@@ -22,4 +22,19 @@
+ 			<string>RIT Meera New</string>
+ 		</edit>
+ 	</match>
++	<!--
++	   - For fallback:
++	   -   https://fedoraproject.org/wiki/Changes/SetDefaultMonospaceFallbackFont
++	  -->
++ 	<match>
++		<test name="lang" compare="contains">
++			<string>ml</string>
++		</test>
++		<test name="family">
++			<string>monospace</string>
++		</test>
++		<edit name="family" mode="prepend">
++			<string>RIT Meera New</string>
++		</edit>
++	</match>
+ </fontconfig>

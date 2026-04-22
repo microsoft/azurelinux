@@ -7,7 +7,7 @@
 
 Name:          gupnp
 Version:       1.6.9
-Release:       2%{?dist}
+Release: 3%{?dist}
 Summary:       A framework for creating UPnP devices & control points
 
 License:       LGPL-2.1-or-later

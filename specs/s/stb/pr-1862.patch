@@ -1,0 +1,21 @@
+diff -Naur stb-f1c79c02822848a9bed4315b12c8c8f3761e1296-original/stb_image.h stb-f1c79c02822848a9bed4315b12c8c8f3761e1296/stb_image.h
+--- stb-f1c79c02822848a9bed4315b12c8c8f3761e1296-original/stb_image.h	2025-11-25 10:38:41.448148366 +0000
++++ stb-f1c79c02822848a9bed4315b12c8c8f3761e1296/stb_image.h	2025-11-25 10:41:34.286015155 +0000
+@@ -1209,7 +1209,7 @@
+    int img_len = w * h * channels;
+    stbi__uint16 *enlarged;
+ 
+-   enlarged = (stbi__uint16 *) stbi__malloc(((size_t)img_len)*2);
++   enlarged = (stbi__uint16 *) stbi__malloc_mad2(((size_t)img_len), 2, 0);
+    if (enlarged == NULL) return (stbi__uint16 *) stbi__errpuc("outofmem", "Out of memory");
+ 
+    for (i = 0; i < img_len; ++i)
+@@ -1819,7 +1819,7 @@
+    if (req_comp == img_n) return data;
+    STBI_ASSERT(req_comp >= 1 && req_comp <= 4);
+ 
+-   good = (stbi__uint16 *) stbi__malloc(req_comp * x * y * 2);
++   good = (stbi__uint16 *) stbi__malloc_mad4(req_comp, x, y, 2, 0);
+    if (good == NULL) {
+       STBI_FREE(data);
+       return (stbi__uint16 *) stbi__errpuc("outofmem", "Out of memory");

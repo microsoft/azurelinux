@@ -3,7 +3,7 @@
 
 Name:		orc
 Version:	0.4.41
-Release:	2%{?dist}
+Release: 3%{?dist}
 Summary:	The Oil Run-time Compiler
 
 License:	BSD-2-Clause AND BSD-3-Clause

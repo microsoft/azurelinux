@@ -3,7 +3,7 @@
 
 Name:           compat-lua
 Version:        5.1.5
-Release:        29%{?dist}
+Release: 30%{?dist}
 Summary:        Powerful light-weight programming language (compat version)
 License:        MIT
 URL:            http://www.lua.org/

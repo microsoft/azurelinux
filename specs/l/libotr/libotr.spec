@@ -5,7 +5,7 @@
 Summary: Off-The-Record Messaging library and toolkit
 Name: libotr
 Version: 4.1.1
-Release: 24%{?dist}
+Release: 25%{?dist}
 # Automatically converted from old format: GPLv2 and LGPLv2 - review is highly recommended.
 License: GPL-2.0-only AND LicenseRef-Callaway-LGPLv2
 Source0: http://otr.cypherpunks.ca/%{name}-%{version}.tar.gz

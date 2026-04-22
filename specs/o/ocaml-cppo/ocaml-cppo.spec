@@ -8,7 +8,7 @@ ExcludeArch: %{ix86}
 
 Name:           ocaml-cppo
 Version:        1.8.0
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Equivalent of the C preprocessor for OCaml programs
 
 License:        BSD-3-Clause

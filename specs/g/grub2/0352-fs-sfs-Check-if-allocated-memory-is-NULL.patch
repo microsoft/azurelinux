@@ -1,0 +1,32 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alec Brown <alec.r.brown@oracle.com>
+Date: Tue, 28 Jan 2025 05:15:50 +0000
+Subject: [PATCH] fs/sfs: Check if allocated memory is NULL
+
+When using grub_zalloc(), if we are out of memory, this function can fail.
+After allocating memory, we should check if grub_zalloc() returns NULL.
+If so, we should handle this error.
+
+Fixes: CID 473856
+
+Signed-off-by: Alec Brown <alec.r.brown@oracle.com>
+Reviewed-by: Ross Philipson <ross.philipson@oracle.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/fs/sfs.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/grub-core/fs/sfs.c b/grub-core/fs/sfs.c
+index 88705b3a2..bad4ae8d1 100644
+--- a/grub-core/fs/sfs.c
++++ b/grub-core/fs/sfs.c
+@@ -429,6 +429,9 @@ grub_sfs_mount (grub_disk_t disk)
+ 	     - 24    /* offsetof (struct grub_sfs_objc, objects) */
+ 	     - 25);  /* offsetof (struct grub_sfs_obj, filename) */
+   data->label = grub_zalloc (max_len + 1);
++  if (data->label == NULL)
++    goto fail;
++
+   grub_strncpy (data->label, (char *) rootobjc->objects[0].filename, max_len);
+ 
+   grub_free (rootobjc_data);

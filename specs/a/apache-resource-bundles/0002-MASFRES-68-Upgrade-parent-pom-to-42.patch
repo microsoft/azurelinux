@@ -1,0 +1,27 @@
+From 3d7baffcf14f61ed7cda6a8dad590533e311f607 Mon Sep 17 00:00:00 2001
+From: Sylwester Lachiewicz <slachiewicz@apache.org>
+Date: Tue, 14 May 2024 23:53:53 +0200
+Subject: [PATCH 2/2] [MASFRES-68] Upgrade parent pom to 42
+
+---
+ pom.xml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/pom.xml b/pom.xml
+index 055923f..31bc5f8 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -23,8 +23,8 @@
+   <parent>
+     <groupId>org.apache.maven</groupId>
+     <artifactId>maven-parent</artifactId>
+-    <version>39</version>
+-    <relativePath>../maven/pom.xml</relativePath>
++    <version>42</version>
++    <relativePath />
+   </parent>
+ 
+   <groupId>org.apache.apache.resources</groupId>
+-- 
+2.48.1
+

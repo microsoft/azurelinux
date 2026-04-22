@@ -44,7 +44,7 @@
 
 Name:           %{hiprand_name}
 Version:        %{rocm_version}
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        HIP random number generator
 
 Url:            https://github.com/ROCm/%{upstreamname}

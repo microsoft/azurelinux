@@ -6,7 +6,7 @@ Name:           python-jsonpickle
 # to use a Python-compatible version number if you need to set an "uncommon"
 # version for this RPM.
 Version:        4.0.2
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        A module that allows any object to be serialized into JSON
 
 License:        BSD-3-Clause

@@ -14,7 +14,7 @@
 Summary:	Incredibly simple helpers for testing code with exceptions 
 Name:		perl-Test-Fatal
 Version:	0.017
-Release:	8%{?dist}
+Release: 9%{?dist}
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Test-Fatal
 Source0:	https://cpan.metacpan.org/modules/by-module/Test/Test-Fatal-%{version}.tar.gz

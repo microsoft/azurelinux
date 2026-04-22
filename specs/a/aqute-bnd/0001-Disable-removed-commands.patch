@@ -1,0 +1,108 @@
+diff --git a/biz.aQute.bnd/src/aQute/bnd/main/bnd.java b/biz.aQute.bnd/src/aQute/bnd/main/bnd.java
+index a787c32..fc241a2 100644
+--- a/biz.aQute.bnd/src/aQute/bnd/main/bnd.java
++++ b/biz.aQute.bnd/src/aQute/bnd/main/bnd.java
+@@ -110,7 +110,6 @@ import aQute.bnd.osgi.Resource;
+ import aQute.bnd.osgi.Verifier;
+ import aQute.bnd.osgi.eclipse.EclipseClasspath;
+ import aQute.bnd.print.JarPrinter;
+-import aQute.bnd.repository.maven.provider.NexusCommand;
+ import aQute.bnd.result.Result;
+ import aQute.bnd.service.Actionable;
+ import aQute.bnd.service.RepositoryPlugin;
+@@ -3921,54 +3920,6 @@ public class bnd extends Processor {
+ 		getInfo(profiles);
+ 	}
+ 
+-	/**
+-	 * Resolve command
+-	 *
+-	 * @throws Exception
+-	 */
+-
+-	public void _resolve(ResolveCommand.ResolveOptions options) throws Exception {
+-		ResolveCommand rc = new ResolveCommand(this);
+-		String help = options._command()
+-			.subCmd(options, rc);
+-		if (help != null)
+-			out.println(help);
+-		getInfo(rc);
+-		rc.close();
+-	}
+-
+-	/**
+-	 * Remote command
+-	 *
+-	 * @throws Exception
+-	 */
+-
+-	public void _remote(RemoteCommand.RemoteOptions options) throws Exception {
+-		RemoteCommand rc = new RemoteCommand(this, options);
+-		String help = options._command()
+-			.subCmd(options, rc);
+-		if (help != null)
+-			out.println(help);
+-		getInfo(rc);
+-		rc.close();
+-	}
+-
+-	/**
+-	 * Nexus commands
+-	 *
+-	 * @throws Exception
+-	 */
+-
+-	public void _nexus(NexusCommand.NexusOptions options) throws Exception {
+-		NexusCommand rc = new NexusCommand(this, options);
+-		String help = options._command()
+-			.subCmd(options, rc);
+-		if (help != null)
+-			out.println(help);
+-		getInfo(rc);
+-		rc.close();
+-	}
+-
+ 	/**
+ 	 * Export a bndrun file
+ 	 */
+@@ -4424,15 +4375,6 @@ public class bnd extends Processor {
+ 		}
+ 	}
+ 
+-	@Description("Start an interactive shell")
+-	public void _shell(Shell.ShellOptions options) throws Exception {
+-		try (Shell shell = new Shell(this, options)) {
+-			shell.loop();
+-		} finally {
+-			out.println("done");
+-		}
+-	}
+-
+ 	public Workspace getWorkspace() {
+ 		return workspace;
+ 	}
+@@ -4479,24 +4421,6 @@ public class bnd extends Processor {
+ 
+ 	}
+ 
+-	@Description("Generate and export reports of a workspace, a project or of a jar.")
+-	public void _exportreport(ExportReportCommand.ReporterOptions options) throws Exception {
+-		ExportReportCommand mc = new ExportReportCommand(this);
+-		mc.run(options);
+-		getInfo(mc);
+-	}
+-
+-	@Description("Maintain Maven Bnd Repository GAV files")
+-	public void _mbr(MbrCommand.MrOptions options) throws Exception {
+-		MbrCommand c = new MbrCommand(this, options);
+-		CommandLine cl = new CommandLine(this);
+-		String s = cl.subCmd(options, c);
+-		if (s != null) {
+-			out.println(s);
+-		}
+-		getInfo(c);
+-	}
+-
+ 	@Description("Shows the differences between two XML resource repositories")
+ 	public void _xmlrepodiff(XmlRepoDiffOptions options) throws Exception {
+ 		try (XmlRepoDiffCommand cmd = new XmlRepoDiffCommand(this)) {

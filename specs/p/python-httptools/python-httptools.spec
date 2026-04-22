@@ -3,7 +3,7 @@
 
 Name:           python-httptools
 Version:        0.6.4
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        A collection of framework independent HTTP protocol utils
 
 # httptools is MIT

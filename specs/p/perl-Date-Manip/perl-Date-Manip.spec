@@ -3,7 +3,7 @@
 
 Name:           perl-Date-Manip
 Version:        6.98
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Date manipulation routines
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Date-Manip

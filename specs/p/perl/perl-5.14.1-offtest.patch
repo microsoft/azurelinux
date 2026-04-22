@@ -1,0 +1,21 @@
+diff -up perl-5.33.9/cpan/File-Temp/t/fork.t.orig perl-5.33.9/cpan/File-Temp/t/fork.t
+--- perl-5.33.9/cpan/File-Temp/t/fork.t.orig	2021-04-22 16:24:11.736220616 +0200
++++ perl-5.33.9/cpan/File-Temp/t/fork.t	2021-04-22 16:26:31.466593123 +0200
+@@ -12,16 +12,8 @@ BEGIN {
+      $Config::Config{useithreads} and
+      $Config::Config{ccflags} =~ /-DPERL_IMPLICIT_SYS/
+     );
+-  if ( $can_fork && !(($^O eq 'MSWin32') && $Devel::Cover::VERSION) ) {
+-    print "1..8\n";
+-  } else {
+-    if ( ($^O eq 'MSWin32') && $Devel::Cover::VERSION ) {
+-        print "1..0 # Skip Devel::Cover coverage testing is incompatible with fork under 'MSWin32'\n";
+-    } else {
+-        print "1..0 # Skip No fork available\n";
+-    }
++    print "1..0 # Skip Koji doesn't work with Perl fork tests\n";
+     exit;
+-  }
+ }
+ 
+ use File::Temp;

@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 4.3.2
-Release: 31%{?dist}
+Release: 32%{?dist}
 Summary: Textile parser for Ruby
 License: MIT
 URL: http://redcloth.org

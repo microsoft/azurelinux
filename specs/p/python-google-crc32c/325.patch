@@ -1,0 +1,61 @@
+From 052c6449eca8664b4c626538b65ab9651a10805a Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Tue, 16 Dec 2025 10:20:17 +0000
+Subject: [PATCH 1/2] chore: Migrate extras and package data configs to
+ pyproject.toml
+
+---
+ pyproject.toml | 6 ++++++
+ setup.cfg      | 7 -------
+ 2 files changed, 6 insertions(+), 7 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 18127bc9..161f9b33 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -22,3 +22,9 @@ version = "1.8.0"
+ description = "A python wrapper of the C library 'Google CRC32C'"
+ readme = "README.md"
+ requires-python = ">=3.9"
++
++[project.optional-dependencies]
++testing = ["pytest"]
++
++[tool.setuptools.package-data]
++google_crc32c = ["py.typed"]
+diff --git a/setup.cfg b/setup.cfg
+index ed5c0556..e1c889a8 100644
+--- a/setup.cfg
++++ b/setup.cfg
+@@ -39,10 +39,3 @@ classifiers =
+ [options]
+ zip_safe = True
+ python_requires = >=3.9
+-
+-[options.extras_require]
+-testing = pytest
+-
+-[options.package_data]
+-google_crc32c =
+-    py.typed
+
+From a867652d5882c82322a495ce7db3863ae4d2ff8b Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Tue, 16 Dec 2025 10:38:20 +0000
+Subject: [PATCH 2/2] chore: Remove useless package-data config
+
+---
+ pyproject.toml | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 161f9b33..a936af78 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -25,6 +25,3 @@ requires-python = ">=3.9"
+ 
+ [project.optional-dependencies]
+ testing = ["pytest"]
+-
+-[tool.setuptools.package-data]
+-google_crc32c = ["py.typed"]

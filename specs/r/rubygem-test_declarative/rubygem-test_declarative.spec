@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 0.0.6
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary: Simply adds a declarative test method syntax to test/unit
 License: MIT
 URL: http://github.com/svenfuchs/test_declarative

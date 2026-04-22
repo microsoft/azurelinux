@@ -6,7 +6,7 @@
 
 Name:		libntirpc
 Version:	7.2
-Release:	1%{?dev:%{dev}}%{?dist}
+Release: 2%{?dev:%{dev}}%{?dist}
 Summary:	New Transport Independent RPC Library
 License:	BSD-3-Clause
 Url:		https://github.com/nfs-ganesha/ntirpc

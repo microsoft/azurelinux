@@ -16,7 +16,7 @@
 
 Name:    kf5-%{framework}
 Version: 5.116.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: KDE Frameworks 5 Tier 1 addon with advanced configuration system
 
 License: BSD-2-Clause AND BSD-3-Clause AND CC0-1.0 AND GPL-2.0-or-later AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-3.0-only AND (LGPL-2.1-only OR LGPL-3.0-only) AND MIT

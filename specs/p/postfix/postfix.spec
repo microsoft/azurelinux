@@ -60,7 +60,7 @@
 Name: postfix
 Summary: Postfix Mail Transport Agent
 Version: 3.10.3
-Release: 3%{?dist}
+Release: 4%{?dist}
 Epoch: 2
 URL: http://www.postfix.org
 License: (IPL-1.0 OR EPL-2.0) AND GPL-2.0-or-later AND BSD-4-Clause-UC

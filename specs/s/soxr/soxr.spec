@@ -5,7 +5,7 @@
 
 Name:           soxr
 Version:        0.1.3
-Release:        20%{?dist}
+Release: 21%{?dist}
 Summary:        The SoX Resampler library
 
 License:        LGPL-2.1-or-later

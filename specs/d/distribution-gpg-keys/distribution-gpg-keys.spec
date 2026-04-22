@@ -3,7 +3,7 @@
 
 Name:		distribution-gpg-keys
 Version:	1.117
-Release:	1%{?dist}
+Release: 2%{?dist}
 Summary:	GPG keys of various Linux distributions
 
 License:	CC0-1.0

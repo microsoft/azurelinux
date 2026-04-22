@@ -4,7 +4,7 @@
 Summary:    Small test program for liba52
 Name:       a52dec
 Version:    0.7.4
-Release:    51%{?dist}
+Release: 52%{?dist}
 License:    GPL-2.0-only
 URL:        http://liba52.sourceforge.net
 Source0:    %{url}/files/%{name}-%{version}.tar.gz

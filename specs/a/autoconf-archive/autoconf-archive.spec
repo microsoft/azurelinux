@@ -3,7 +3,7 @@
 
 Name:           autoconf-archive
 Version:        2024.10.16
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        The Autoconf Macro Archive
 
 # The following licenses were seen in the binary rpm.

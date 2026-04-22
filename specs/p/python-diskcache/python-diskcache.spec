@@ -8,7 +8,7 @@ Version:        5.6.3
 %forgemeta
 
 Name:           python-%{srcname}
-Release:        11%{?dist}
+Release: 12%{?dist}
 Summary:        Python disk-backed cache
 
 License:        Apache-2.0

@@ -27,7 +27,7 @@ Version:	2.49.95
 # - src/socket.d and modules/clx/mit-clx/doc.lisp are HPND
 # - src/xthread.d and modules/asdf/asdf.lisp are X11
 License:	GPL-2.0-or-later AND (GPL-2.0-or-later OR GFDL-1.2-or-later) AND LGPL-2.1-or-later AND HPND AND X11
-Release:	5%{?dist}
+Release: 6%{?dist}
 URL:		http://www.clisp.org/
 VCS:		git:%{forgeurl}.git
 Source0:	%{forgesource}

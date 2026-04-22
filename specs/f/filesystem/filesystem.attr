@@ -1,0 +1,3 @@
+%__filesystem_requires  %{_rpmconfigdir}/filesystem.req %{_datadir}/filesystem/sbin-filenames
+%__filesystem_protocol  multifile
+%__filesystem_path      ^(/usr)?/bin/.*$

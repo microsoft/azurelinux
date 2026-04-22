@@ -3,7 +3,7 @@
 
 Name:           python-typing-extensions
 Version:        4.15.0
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Backported and Experimental Type Hints for Python
 
 License:        PSF-2.0

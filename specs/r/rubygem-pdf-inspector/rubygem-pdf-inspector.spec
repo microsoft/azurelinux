@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.3.0
-Release: 17%{?dist}
+Release: 18%{?dist}
 Summary: A tool for analyzing PDF output
 # Automatically converted from old format: GPLv2 or GPLv3 or Ruby - review is highly recommended.
 License: GPL-2.0-only OR GPL-3.0-only OR Ruby

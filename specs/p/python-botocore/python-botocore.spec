@@ -7,7 +7,7 @@
 Name:           python-%{pypi_name}
 # NOTICE - Updating this package requires updating python-boto3
 Version:        1.42.52
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Low-level, data-driven core of boto 3
 
 License:        Apache-2.0

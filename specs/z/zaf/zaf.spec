@@ -5,7 +5,7 @@ Name: zaf
 Summary: South Africa hyphenation rules
 %define upstreamid 20080714
 Version: 0
-Release: 0.32.%{upstreamid}svn%{?dist}
+Release: 1.32.%{upstreamid}svn%{?dist}
 Source: zaf-0-0.1.%{upstreamid}svn.tar.bz2
 # Below URL is dead now, don't file any bugs for updating it.
 URL: http://zaf.sourceforge.net/

@@ -6,7 +6,7 @@
 
 Name:           half
 Version:        2.2.0
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        A C++ half-precision floating point type
 License:        MIT
 

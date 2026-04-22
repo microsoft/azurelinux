@@ -12,7 +12,7 @@
 
 Name:    kf5-%{framework}
 Version: 5.116.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: QtQuick plugins to build user interfaces based on the KDE UX guidelines
 
 # templates/kirigami/src/contents/ui/About.qml: File is mislabeled as "GPL-2.1-or-later"

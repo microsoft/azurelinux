@@ -3,7 +3,7 @@
 
 Name:		mosh
 Version:	1.4.0
-Release:	9%{?dist}
+Release: 10%{?dist}
 Summary:	Mobile shell that supports roaming and intelligent local echo
 
 # Automatically converted from old format: GPLv3+ - review is highly recommended.

@@ -3,7 +3,7 @@
 
 Name:           perl-Pod-Spell-CommonMistakes
 Version:        1.002
-Release:        32%{?dist}
+Release: 33%{?dist}
 Summary:        Catches common typos in POD
 # Automatically converted from old format: GPL+ or Artistic - review is highly recommended.
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

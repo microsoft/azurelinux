@@ -5,10 +5,10 @@ Subject: [PATCH] WIP don't update packages if IGNORE_MISSING_DEPS is set
 Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
 
 diff --git a/apps/rebar/src/rebar_packages.erl b/apps/rebar/src/rebar_packages.erl
-index a2024fdf..31b7714c 100644
+index 09c4a18a..2ad1cd7b 100644
 --- a/apps/rebar/src/rebar_packages.erl
 +++ b/apps/rebar/src/rebar_packages.erl
-@@ -218,33 +218,38 @@ parse_checksum(Checksum) ->
+@@ -224,33 +224,38 @@ parse_checksum(Checksum) ->
      Checksum.
  
  update_package(Name, RepoConfig=#{name := Repo}, State) ->

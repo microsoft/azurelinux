@@ -10,7 +10,7 @@ Name: hunspell-rw
 Summary: Kinyarwanda hunspell dictionaries
 %global upstreamid 20050109
 Version: 0.%{upstreamid}
-Release: 34%{?dist}
+Release: 35%{?dist}
 Source: http://download.services.openoffice.org/contrib/dictionaries/rw_RW.zip
 URL: http://borel.slu.edu/crubadan/apps.html
 License: GPL-2.0-or-later

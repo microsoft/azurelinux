@@ -5,7 +5,7 @@
 
 Name:               python-sqlalchemy-utils
 Version:            0.41.1
-Release:            13%{?dist}
+Release: 14%{?dist}
 Summary:            Various utility functions for SQLAlchemy
 
 # Automatically converted from old format: BSD - review is highly recommended.

@@ -3,7 +3,7 @@
 
 Name: expected
 Version: 1.2.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 License: CC0-1.0
 Summary: C++11/14/17 std::expected with functional-style extensions

@@ -15,7 +15,7 @@
 Summary:        Enhanced TeX modes for Emacs
 Name:           emacs-auctex
 Version:        13.3
-Release:        6%{?dist}
+Release: 7%{?dist}
 
 # The project as a whole is GPL-3.0-or-later.  Exceptions:
 # - README and doc/intro.texi are FSFAP

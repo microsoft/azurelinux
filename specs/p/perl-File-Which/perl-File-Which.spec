@@ -3,7 +3,7 @@
 
 Name:           perl-File-Which
 Version:        1.27
-Release:        14%{?dist}
+Release: 15%{?dist}
 Summary:        Portable implementation of the 'which' utility
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/File-Which

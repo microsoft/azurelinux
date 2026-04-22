@@ -3,7 +3,7 @@
 
 Name:           perl-Perl-Critic-Lax
 Version:        0.014
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        Policies that let you slide on common exceptions
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Perl-Critic-Lax

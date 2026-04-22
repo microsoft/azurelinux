@@ -1,0 +1,11 @@
+diff -rupN --no-dereference devscripts/scripts/Makefile devscripts-new/scripts/Makefile
+--- devscripts/scripts/Makefile	2025-12-30 09:38:40.057932427 +0100
++++ devscripts-new/scripts/Makefile	2025-12-30 09:38:40.061633334 +0100
+@@ -188,5 +188,7 @@ install: all
+ 	install -d $(DESTDIR)$(DATA_DIR)/scripts
+ 	mv $(DESTDIR)$(BINDIR)/run_bisect $(DESTDIR)$(DATA_DIR)/scripts
+ 	mv $(DESTDIR)$(BINDIR)/run_bisect_qemu $(DESTDIR)$(DATA_DIR)/scripts
++	install -dD $(DESTDIR)$(MAN1DIR)
++	cp *.1 $(DESTDIR)$(MAN1DIR)
+ 
+ .PHONY: test test_pl test_sh test_py all install clean scripts

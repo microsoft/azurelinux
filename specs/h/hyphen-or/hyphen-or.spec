@@ -5,7 +5,7 @@ Name: hyphen-or
 Summary: Odia hyphenation rules
 Epoch: 1
 Version: 0.7.0
-Release: 29%{?dist}
+Release: 30%{?dist}
 Source: http://download.savannah.gnu.org/releases/smc/hyphenation/patterns/%{name}-%{version}.tar.bz2
 URL: http://wiki.smc.org.in
 License: LGPL-3.0-or-later

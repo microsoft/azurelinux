@@ -1,0 +1,87 @@
+diff -up clamav-0.104.3/clamconf/clamconf.c.default_confs clamav-0.104.3/clamconf/clamconf.c
+--- clamav-0.104.3/clamconf/clamconf.c.default_confs	2022-05-02 00:24:50.000000000 -0600
++++ clamav-0.104.3/clamconf/clamconf.c	2022-05-12 22:04:42.883348923 -0600
+@@ -63,9 +63,9 @@ static struct _cfgfile {
+     const char *name;
+     int tool;
+ } cfgfile[] = {
+-    {"clamd.conf", OPT_CLAMD},
++    {"clamd.d/scan.conf", OPT_CLAMD},
+     {"freshclam.conf", OPT_FRESHCLAM},
+-    {"clamav-milter.conf", OPT_MILTER},
++    {"mail/clamav-milter.conf", OPT_MILTER},
+     {NULL, 0}};
+ 
+ static void printopts(struct optstruct *opts, int nondef)
+diff -up clamav-0.104.3/docs/man/clamav-milter.8.in.default_confs clamav-0.104.3/docs/man/clamav-milter.8.in
+--- clamav-0.104.3/docs/man/clamav-milter.8.in.default_confs	2022-05-12 22:04:42.885348940 -0600
++++ clamav-0.104.3/docs/man/clamav-milter.8.in	2022-05-12 22:05:25.031719791 -0600
+@@ -27,7 +27,7 @@ Print the version number and exit.
+ Read configuration from FILE.
+ .SH "FILES"
+ .LP
+-@CONFDIR@/clamav-milter.conf
++@CONFDIR@/mail/clamav-milter.conf
+ .SH "AUTHOR"
+ .LP
+ aCaB <acab@clamav.net>
+diff -up clamav-0.104.3/docs/man/clamav-milter.conf.5.in.default_confs clamav-0.104.3/docs/man/clamav-milter.conf.5.in
+--- clamav-0.104.3/docs/man/clamav-milter.conf.5.in.default_confs	2022-05-12 22:04:42.887348958 -0600
++++ clamav-0.104.3/docs/man/clamav-milter.conf.5.in	2022-05-12 22:05:48.834929418 -0600
+@@ -239,7 +239,7 @@ Default: no
+ All options expressing a size are limited to max 4GB. Values in excess will be reset to the maximum.
+ .SH "FILES"
+ .LP
+-@CONFDIR@/clamav-milter.conf
++@CONFDIR@/mail/clamav-milter.conf
+ .SH "AUTHOR"
+ .LP
+ aCaB <acab@clamav.net>
+diff -up clamav-0.104.3/docs/man/clamd.8.in.default_confs clamav-0.104.3/docs/man/clamd.8.in
+--- clamav-0.104.3/docs/man/clamd.8.in.default_confs	2022-05-12 22:04:42.888348967 -0600
++++ clamav-0.104.3/docs/man/clamd.8.in	2022-05-12 22:07:01.657570942 -0600
+@@ -7,7 +7,7 @@ clamd \- an anti\-virus daemon
+ clamd [options]
+ .SH "DESCRIPTION"
+ .LP
+-The daemon listens for incoming connections on Unix and/or TCP socket and scans files or directories on demand. It reads the configuration from @CONFDIR@/clamd.conf
++The daemon listens for incoming connections on Unix and/or TCP socket and scans files or directories on demand. It reads the configuration from @CONFDIR@/clamd.d/scan.conf
+ .SH "COMMANDS"
+ .LP
+ It's recommended to prefix clamd commands with the letter \fBz\fR (eg. zSCAN) to indicate that the command will be delimited by a NULL character and that clamd should continue reading command data until a NULL character is read. The null delimiter assures that the complete command and its entire argument will be processed as a single command. Alternatively commands may be prefixed with the letter \fBn\fR (e.g. nSCAN) to use a newline character as the delimiter. Clamd replies will honour the requested terminator in turn.
+@@ -133,7 +133,7 @@ Reload the signature databases.
+ Perform a clean exit.
+ .SH "FILES"
+ .LP
+-@CONFDIR@/clamd.conf
++@CONFDIR@/clamd.d/scan.conf
+ .SH "CREDITS"
+ Please check the full documentation for credits.
+ .SH "AUTHOR"
+diff -up clamav-0.104.3/docs/man/clamd.conf.5.in.default_confs clamav-0.104.3/docs/man/clamd.conf.5.in
+--- clamav-0.104.3/docs/man/clamd.conf.5.in.default_confs	2022-05-12 22:04:42.889348976 -0600
++++ clamav-0.104.3/docs/man/clamd.conf.5.in	2022-05-12 22:06:21.800219822 -0600
+@@ -765,7 +765,7 @@ Default: no
+ All options expressing a size are limited to max 4GB. Values in excess will be reset to the maximum.
+ .SH "FILES"
+ .LP
+-@CONFDIR@/clamd.conf
++@CONFDIR@/clamd.d/scan.conf
+ .SH "AUTHORS"
+ .LP
+ Tomasz Kojm <tkojm@clamav.net>, Kevin Lin <klin@sourcefire.com>
+diff -up clamav-0.104.3/platform.h.in.default_confs clamav-0.104.3/platform.h.in
+--- clamav-0.104.3/platform.h.in.default_confs	2022-05-02 00:24:50.000000000 -0600
++++ clamav-0.104.3/platform.h.in	2022-05-12 22:04:42.891348993 -0600
+@@ -112,9 +112,9 @@ typedef unsigned int in_addr_t;
+ #endif
+ 
+ #ifndef _WIN32
+-#define CONFDIR_CLAMD CONFDIR PATHSEP "clamd.conf"
++#define CONFDIR_CLAMD CONFDIR PATHSEP "clamd.d/scan.conf"
+ #define CONFDIR_FRESHCLAM CONFDIR PATHSEP "freshclam.conf"
+-#define CONFDIR_MILTER CONFDIR PATHSEP "clamav-milter.conf"
++#define CONFDIR_MILTER CONFDIR PATHSEP "mail/clamav-milter.conf"
+ #endif
+ 
+ #ifndef WORDS_BIGENDIAN

@@ -1,0 +1,161 @@
+From 5b6c18f715808f99c32550fc3b670fc5bf600f72 Mon Sep 17 00:00:00 2001
+From: Andreas Gerstmayr <agerstmayr@redhat.com>
+Date: Wed, 22 Jun 2022 17:01:09 +0200
+Subject: [PATCH] add manpages
+
+
+diff --git a/docs/man/man1/grafana-cli.1 b/docs/man/man1/grafana-cli.1
+new file mode 100644
+index 0000000000..39c0d5cee0
+--- /dev/null
++++ b/docs/man/man1/grafana-cli.1
+@@ -0,0 +1,63 @@
++.TH GRAFANA "1" "September 2022" "Grafana cli version 9.0.9" "User Commands"
++.SH NAME
++grafana-cli \- command line administration for the Grafana metrics dashboard and graph editor
++.SH DESCRIPTION
++.SS "NAME:"
++.IP
++grafana-cli
++.SS "USAGE:"
++.IP
++\fBgrafana\-cli\fP [\fIglobal options\fP] \fIcommand\fP [\fIcommand options\fP] [\fIarguments\fP...]
++.SS "COMMANDS:"
++.TP
++plugins
++Manage plugins for grafana
++.TP
++admin
++Grafana admin commands
++.TP
++cue
++Cue validation commands
++.TP
++help, h
++Shows a list of commands or help for one command
++.SS "GLOBAL OPTIONS:"
++.TP
++\fB\-\-pluginsDir\fR value
++path to the grafana plugin directory (default: "/var/lib/grafana/plugins") [$GF_PLUGIN_DIR]
++.TP
++\fB\-\-repo\fR value
++url to the plugin repository (default: "https://grafana.com/api/plugins") [$GF_PLUGIN_REPO]
++.TP
++\fB\-\-pluginUrl\fR value
++Full url to the plugin zip file instead of downloading the plugin from grafana.com/api [$GF_PLUGIN_URL]
++.TP
++\fB\-\-insecure\fR
++Skip TLS verification (insecure) (default: false)
++.TP
++\fB\-\-debug\fR
++Enable debug logging (default: false)
++.TP
++\fB\-\-configOverrides\fR value
++Configuration options to override defaults as a string. e.g. cfg:default.paths.log=/dev/null
++.TP
++\fB\-\-homepath\fR value
++Path to Grafana install/home path, defaults to working directory
++.TP
++\fB\-\-config\fR value
++Path to config file
++.TP
++\fB\-\-help\fR, \fB\-h\fR
++show help
++.TP
++\fB\-\-version\fR, \fB\-v\fR
++print the version
++.SH "SEE ALSO"
++Additional documentation for
++.B grafana-cli
++is available on-line at
++.BR http://docs.grafana.org/administration/cli/ .
++The full documentation for
++.B Grafana
++is available on-line at
++.BR http://docs.grafana.org/ .
+diff --git a/docs/man/man1/grafana-server.1 b/docs/man/man1/grafana-server.1
+new file mode 100644
+index 0000000000..683a2369cc
+--- /dev/null
++++ b/docs/man/man1/grafana-server.1
+@@ -0,0 +1,80 @@
++.TH VERSION "1" "September 2022" "Version 9.0.9" "User Commands"
++.SH NAME
++grafana-server \- back-end server for the Grafana metrics dashboard and graph editor
++.SH DESCRIPTION
++.B grafana-server
++is the back-end server for the Grafana metrics dashboard and graph editor.
++The
++.B grafana-server
++program should not normally be run from the command line,
++except when testing or for development purposes.
++Rather it should be managed by
++.BR systemd .
++After installing Grafana, the systemd service should be enabled and started as follows:
++.P
++.in 1i
++.B systemctl daemon-reload
++.br
++.B systemctl enable grafana-server.service
++.br
++.B systemctl start grafana-server.service
++.in
++.P
++.SH OPTIONS
++The
++.B grafana-server
++configuration is specified in
++.BR /etc/grafana/grafana.ini
++and is well documented with comments.
++The command-line options listed below override options of
++the same (or similar) name in the configuration file.
++.P
++.HP
++\fB\-config\fR string
++.IP
++path to config file
++.HP
++\fB\-homepath\fR string
++.IP
++path to grafana install/home path, defaults to working directory
++.HP
++\fB\-packaging\fR string
++.IP
++describes the way Grafana was installed (default "unknown")
++.HP
++\fB\-pidfile\fR string
++.IP
++path to pid file
++.HP
++\fB\-profile\fR
++.IP
++Turn on pprof profiling
++.HP
++\fB\-profile\-addr\fR string
++.IP
++Define custom address for profiling (default "localhost")
++.HP
++\fB\-profile\-port\fR uint
++.IP
++Define custom port for profiling (default 6060)
++.HP
++\fB\-tracing\fR
++.IP
++Turn on tracing
++.HP
++\fB\-tracing\-file\fR string
++.IP
++Define tracing output file (default "trace.out")
++.TP
++\fB\-v\fR
++.IP
++prints current version and exits
++.TP
++\fB\-vv\fR
++.IP
++prints current version, all dependencies and exits
++.SH "SEE ALSO"
++The full documentation for
++.B Grafana
++is available on-line at
++.BR http://docs.grafana.org/ .

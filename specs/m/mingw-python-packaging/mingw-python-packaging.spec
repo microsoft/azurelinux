@@ -13,7 +13,7 @@
 Name:           mingw-python-%{pypi_name}
 Summary:        MinGW Python packaging core utils
 Version:        25.0
-Release:        2%{?dist}
+Release: 3%{?dist}
 BuildArch:      noarch
 
 License:        BSD-2-Clause OR Apache-2.0

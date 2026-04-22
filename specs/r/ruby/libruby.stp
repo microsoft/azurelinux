@@ -1,0 +1,303 @@
+/* SystemTap tapset to make it easier to trace Ruby 2.0
+ *
+ * All probes provided by Ruby can be listed using following command
+ * (the path to the library must be adjuste appropriately):
+ *
+ * stap -L 'process("@LIBRARY_PATH@").mark("*")'
+ */
+
+/**
+ * probe ruby.array.create - Allocation of new array.
+ *
+ * @size: Number of elements (an int)
+ * @file: The file name where the method is being called (string)
+ * @line: The line number where the method is being called (int)
+ */
+probe ruby.array.create =
+      process("@LIBRARY_PATH@").mark("array__create")
+{
+	size = $arg1
+	file = user_string($arg2)
+	line = $arg3
+}
+
+/**
+ * probe ruby.cmethod.entry - Fired just before a method implemented in C is entered.
+ *
+ * @classname: Name of the class (string)
+ * @methodname: The method about bo be executed (string)
+ * @file: The file name where the method is being called (string)
+ * @line: The line number where the method is being called (int)
+ */
+probe ruby.cmethod.entry =
+      process("@LIBRARY_PATH@").mark("cmethod__entry")
+{
+	classname  = user_string($arg1)
+	methodname = user_string($arg2)
+	file = user_string($arg3)
+	line = $arg4
+}
+
+/**
+ * probe ruby.cmethod.return - Fired just after a method implemented in C has returned.
+ *
+ * @classname: Name of the class (string)
+ * @methodname: The executed method (string)
+ * @file: The file name where the method is being called (string)
+ * @line: The line number where the method is being called (int)
+ */
+probe ruby.cmethod.return =
+      process("@LIBRARY_PATH@").mark("cmethod__return")
+{
+	classname  = user_string($arg1)
+	methodname = user_string($arg2)
+	file = user_string($arg3)
+	line = $arg4
+}
+
+/**
+ * probe ruby.find.require.entry - Fired when require starts to search load
+ * path for suitable file to require.
+ *
+ * @requiredfile: The name of the file to be required (string)
+ * @file: The file name where the method is being called (string)
+ * @line: The line number where the method is being called (int)
+ */
+probe ruby.find.require.entry =
+      process("@LIBRARY_PATH@").mark("find__require__entry")
+{
+	requiredfile = user_string($arg1)
+	file = user_string($arg2)
+	line = $arg3
+}
+
+/**
+ * probe ruby.find.require.return - Fired just after require has finished
+ * search of load path for suitable file to require.
+ *
+ * @requiredfile: The name of the file to be required (string)
+ * @file: The file name where the method is being called (string)
+ * @line: The line number where the method is being called (int)
+ */
+probe ruby.find.require.return =
+      process("@LIBRARY_PATH@").mark("find__require__return")
+{
+	requiredfile = user_string($arg1)
+	file = user_string($arg2)
+	line = $arg3
+}
+
+/**
+ * probe ruby.gc.mark.begin - Fired when a GC mark phase is about to start.
+ *
+ * It takes no arguments.
+ */
+probe ruby.gc.mark.begin =
+      process("@LIBRARY_PATH@").mark("gc__mark__begin")
+{
+}
+
+/**
+ * probe ruby.gc.mark.end - Fired when a GC mark phase has ended.
+ *
+ * It takes no arguments.
+ */
+probe ruby.gc.mark.end =
+      process("@LIBRARY_PATH@").mark("gc__mark__end")
+{
+}
+
+/**
+ * probe ruby.gc.sweep.begin - Fired when a GC sweep phase is about to start.
+ *
+ * It takes no arguments.
+ */
+probe ruby.gc.sweep.begin =
+      process("@LIBRARY_PATH@").mark("gc__sweep__begin")
+{
+}
+
+/**
+ * probe ruby.gc.sweep.end - Fired when a GC sweep phase has ended.
+ *
+ * It takes no arguments.
+ */
+probe ruby.gc.sweep.end =
+      process("@LIBRARY_PATH@").mark("gc__sweep__end")
+{
+}
+
+/**
+ * probe ruby.hash.create - Allocation of new hash.
+ *
+ * @size: Number of elements (int)
+ * @file: The file name where the method is being called (string)
+ * @line: The line number where the method is being called (int)
+ */
+probe ruby.hash.create =
+      process("@LIBRARY_PATH@").mark("hash__create")
+{
+	size = $arg1
+	file = user_string($arg2)
+	line = $arg3
+}
+
+/**
+ * probe ruby.load.entry - Fired when calls to "load" are made.
+ *
+ * @loadedfile: The name of the file to be loaded (string)
+ * @file: The file name where the method is being called (string)
+ * @line: The line number where the method is being called (int)
+ */
+probe ruby.load.entry =
+      process("@LIBRARY_PATH@").mark("load__entry")
+{
+	loadedfile = user_string($arg1)
+	file = user_string($arg2)
+	line = $arg3
+}
+
+/**
+ * probe ruby.load.return - Fired just after require has finished
+ * search of load path for suitable file to require.
+ *
+ * @loadedfile: The name of the file that was loaded (string)
+ */
+probe ruby.load.return =
+      process("@LIBRARY_PATH@").mark("load__return")
+{
+	loadedfile = user_string($arg1)
+}
+
+/**
+ * probe ruby.method.entry - Fired just before a method implemented in Ruby is entered.
+ *
+ * @classname: Name of the class (string)
+ * @methodname: The method about bo be executed (string)
+ * @file: The file name where the method is being called (string)
+ * @line: The line number where the method is being called (int)
+ */
+probe ruby.method.entry =
+      process("@LIBRARY_PATH@").mark("method__entry")
+{
+	classname  = user_string($arg1)
+	methodname = user_string($arg2)
+	file = user_string($arg3)
+	line = $arg4
+}
+
+/**
+ * probe ruby.method.return - Fired just after a method implemented in Ruby has returned.
+ *
+ * @classname: Name of the class (string)
+ * @methodname: The executed method (string)
+ * @file: The file name where the method is being called (string)
+ * @line: The line number where the method is being called (int)
+ */
+probe ruby.method.return =
+      process("@LIBRARY_PATH@").mark("method__return")
+{
+	classname  = user_string($arg1)
+	methodname = user_string($arg2)
+	file = user_string($arg3)
+	line = $arg4
+}
+
+/**
+ * probe ruby.object.create - Allocation of new object.
+ *
+ * @classname: Name of the class (string)
+ * @file: The file name where the method is being called (string)
+ * @line: The line number where the method is being called (int)
+ */
+probe ruby.object.create =
+      process("@LIBRARY_PATH@").mark("object__create")
+{
+	classname = user_string($arg1)
+	file = user_string($arg2)
+	line = $arg3
+}
+
+/**
+ * probe ruby.parse.begin - Fired just before a Ruby source file is parsed.
+ *
+ * @parsedfile: The name of the file to be parsed (string)
+ * @parsedline: The line number of beginning of parsing (int)
+ */
+probe ruby.parse.begin =
+      process("@LIBRARY_PATH@").mark("parse__begin")
+{
+	parsedfile = user_string($arg1)
+	parsedline = $arg2
+}
+
+/**
+ * probe ruby.parse.end - Fired just after a Ruby source file was parsed.
+ *
+ * @parsedfile: The name of parsed the file (string)
+ * @parsedline: The line number of beginning of parsing (int)
+ */
+probe ruby.parse.end =
+      process("@LIBRARY_PATH@").mark("parse__end")
+{
+	parsedfile = user_string($arg1)
+	parsedline = $arg2
+}
+
+/**
+ * probe ruby.raise - Fired when an exception is raised.
+ *
+ * @classname: The class name of the raised exception (string)
+ * @file: The name of the file where the exception was raised (string)
+ * @line: The line number in the file where the exception was raised (int)
+ */
+probe ruby.raise =
+      process("@LIBRARY_PATH@").mark("raise")
+{
+	classname  = user_string($arg1)
+	file = user_string($arg2)
+	line = $arg3
+}
+
+/**
+ * probe ruby.require.entry - Fired on calls to rb_require_safe (when a file
+ * is required).
+ *
+ * @requiredfile: The name of the file to be required (string)
+ * @file: The file that called "require" (string)
+ * @line: The line number where the call to require was made(int)
+ */
+probe ruby.require.entry =
+      process("@LIBRARY_PATH@").mark("require__entry")
+{
+	requiredfile = user_string($arg1)
+	file = user_string($arg2)
+	line = $arg3
+}
+
+/**
+ * probe ruby.require.return - Fired just after require has finished
+ * search of load path for suitable file to require.
+ *
+ * @requiredfile: The file that was required (string)
+ */
+probe ruby.require.return =
+      process("@LIBRARY_PATH@").mark("require__return")
+{
+	requiredfile = user_string($arg1)
+}
+
+/**
+ * probe ruby.string.create - Allocation of new string.
+ *
+ * @size: Number of elements (an int)
+ * @file: The file name where the method is being called (string)
+ * @line: The line number where the method is being called (int)
+ */
+probe ruby.string.create =
+      process("@LIBRARY_PATH@").mark("string__create")
+{
+	size = $arg1
+	file = user_string($arg2)
+	line = $arg3
+}

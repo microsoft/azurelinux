@@ -5,7 +5,7 @@ Name: hyphen-pl
 Summary: Polish hyphenation rules
 %global upstreamid 20060726
 Version: 0.%{upstreamid}
-Release: 34%{?dist}
+Release: 35%{?dist}
 Source: http://download.services.openoffice.org/contrib/dictionaries/hyph_pl_PL.zip
 URL: http://wiki.services.openoffice.org/wiki/Dictionaries
 License: LGPL-2.1-or-later

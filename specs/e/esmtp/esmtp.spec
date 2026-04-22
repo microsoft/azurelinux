@@ -5,7 +5,7 @@ Summary:        User configurable send-only Mail Transfer Agent
 Summary(de):    Benutzerkonfigurierbarer nur versendender Mail Transfer Agent (MTA)
 Name:           esmtp
 Version:        1.2
-Release:        30%{?dist}
+Release: 31%{?dist}
 Source:         http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.bz2
 Source1:        esmtp-0.4.1-mutt
 # esmtp system config file configuring procmail as mda, for the local-delivery

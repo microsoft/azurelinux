@@ -10,7 +10,7 @@
 Name:		perl-Test-Valgrind
 Summary:	Generate suppressions, analyze and test any command with valgrind
 Version:	1.19
-Release:	28%{?dist}
+Release: 29%{?dist}
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Test-Valgrind
 Source0:	https://cpan.metacpan.org/modules/by-module/Test/Test-Valgrind-%{version}.tar.gz

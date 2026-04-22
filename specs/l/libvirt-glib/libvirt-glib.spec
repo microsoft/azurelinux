@@ -10,7 +10,7 @@
 
 Name: libvirt-glib
 Version: 5.0.0
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary: libvirt glib integration for events
 License: LGPL-2.1-or-later
 URL: https://libvirt.org/

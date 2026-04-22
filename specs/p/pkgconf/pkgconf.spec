@@ -26,7 +26,7 @@
 
 Name:           pkgconf
 Version:        2.3.0
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Package compiler and linker metadata toolkit
 
 # cli/getopt_long.c, libpkgconf/bsdstubs.c, libpkgconf/pkg.c and tests/* are ISC

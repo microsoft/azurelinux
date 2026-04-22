@@ -8,7 +8,7 @@
 
 Name:           mingw-gsettings-desktop-schemas
 Version:        49.0
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        MinGW Windows gsettings-desktop-schemas
 
 License:        LGPL-2.1-or-later

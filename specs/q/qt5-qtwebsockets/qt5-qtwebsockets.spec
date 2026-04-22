@@ -6,7 +6,7 @@
 Summary: Qt5 - WebSockets component
 Name:    qt5-%{qt_module}
 Version: 5.15.18
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPL-3.0-only OR GPL-3.0-only WITH Qt-GPL-exception-1.0

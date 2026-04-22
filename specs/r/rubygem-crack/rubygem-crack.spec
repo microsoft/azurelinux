@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.0.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: Really simple JSON and XML parsing, ripped from Merb and Rails
 License: MIT
 URL: https://github.com/jnunemaker/crack

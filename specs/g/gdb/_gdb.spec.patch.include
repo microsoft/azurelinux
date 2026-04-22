@@ -1,0 +1,6 @@
+%patch -p1 -P001
+%patch -p1 -P002
+%patch -p1 -P003
+%patch -p1 -P004
+%patch -p1 -P005
+%patch -p1 -P006

@@ -5,7 +5,7 @@ Subject: [PATCH] Skip deps
 Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
 
 diff --git a/bootstrap b/bootstrap
-index 6a8ebfb4..6593654e 100755
+index 25b93563..3b4c8440 100755
 --- a/bootstrap
 +++ b/bootstrap
 @@ -40,15 +40,6 @@ main(Args) ->

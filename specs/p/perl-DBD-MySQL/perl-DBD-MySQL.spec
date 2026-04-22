@@ -14,7 +14,7 @@ ExcludeArch: %{ix86}
 
 Name:           perl-DBD-MySQL
 Version:        5.013
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        A MySQL interface for Perl
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/%{cpan_name}

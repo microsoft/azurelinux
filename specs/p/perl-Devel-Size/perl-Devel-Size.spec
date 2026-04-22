@@ -10,7 +10,7 @@
 
 Name:           perl-Devel-Size
 Version:        0.85
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Perl extension for finding the memory usage of Perl variables
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Devel-Size

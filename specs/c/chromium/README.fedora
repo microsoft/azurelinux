@@ -1,0 +1,9 @@
+- Widevine is not a free library and cannot be shipped in fedora.
+  You have to get it from Google first and install it under
+  /usr/lib64/chromium-browser or /opt/google/chrome if you want
+  Chromium to use widevine.
+
+- Chromium uses the system ffmpeg-free library which is included in
+  fedora >= 36 and centos-stream 9. This library contains free video
+  codecs. If you want Chromium to use non-free video codecs, you need
+  to install libavcodec-freeworld from rpmfusion-free.

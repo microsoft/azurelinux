@@ -4,7 +4,7 @@
 Summary:        Tool to analyse BIOS DMI data
 Name:           dmidecode
 Version:        3.6
-Release:        7%{?dist}
+Release: 8%{?dist}
 Epoch:          1
 License:        GPL-2.0-or-later
 Source0:        https://download.savannah.gnu.org/releases/%{name}/%{name}-%{version}.tar.xz

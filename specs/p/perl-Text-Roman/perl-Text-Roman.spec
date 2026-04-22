@@ -3,7 +3,7 @@
 
 Name:           perl-Text-Roman
 Version:        3.5
-Release:        31%{?dist}
+Release: 32%{?dist}
 Summary:        Conversion between Roman algorisms and Arabic numerals
 # Automatically converted from old format: GPL+ or Artistic - review is highly recommended.
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

@@ -4,7 +4,7 @@
 
 Name:           zig-srpm-macros
 Version:        1
-Release:        5%{?dist}
+Release: 6%{?dist}
 Summary:        SRPM macros required for Zig packages
 
 License:        MIT

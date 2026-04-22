@@ -4,7 +4,7 @@
 Summary:        Utility to force unused ext2/3/4 inodes and blocks to zero
 Name:           zerofree
 Version:        1.1.1
-Release:        16%{?dist}
+Release: 17%{?dist}
 License:        GPL-2.0-only
 URL:            https://frippery.org/uml/
 Source0:        https://frippery.org/uml/%{name}-%{version}.tgz

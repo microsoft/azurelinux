@@ -1,0 +1,47 @@
+diff -up perl-5.28.0-RC1/Configure.orig   perl-5.28.0-RC1/Configure
+--- perl-5.28.0-RC1/Configure.orig   2018-05-21 12:44:04.000000000 +0200
++++ perl-5.28.0-RC1/Configure	2018-05-22 12:21:53.908599933 +0200
+@@ -7269,8 +7269,8 @@ esac'
+ : Reproduce behavior of 5.005 and earlier, maybe drop that in 5.7.
+ case "$installstyle" in
+ '')	case "$prefix" in
+-		*perl*) dflt='lib';;
+-		*) dflt='lib/perl5' ;;
++		*perl*) dflt='lib64';;
++		*) dflt='lib64/perl5' ;;
+ 	esac
+ 	;;
+ *)	dflt="$installstyle" ;;
+@@ -7336,8 +7336,8 @@ esac
+ : /opt/perl/lib/perl5... would be redundant.
+ : The default "style" setting is made in installstyle.U
+ case "$installstyle" in
+-*lib/perl5*) set dflt privlib lib/$package/$version ;;
+-*)	 set dflt privlib lib/$version ;;
++*lib64/perl5*) set dflt privlib lib64/$package/$version ;;
++*)	 set dflt privlib lib64/$version ;;
+ esac
+ eval $prefixit
+ $cat <<EOM
+@@ -7584,8 +7584,8 @@ siteprefixexp="$ansexp"
+ prog=`echo $package | $sed 's/-*[0-9.]*$//'`
+ case "$sitelib" in
+ '') case "$installstyle" in
+-	*lib/perl5*) dflt=$siteprefix/lib/$package/site_$prog/$version ;;
+-	*)	 dflt=$siteprefix/lib/site_$prog/$version ;;
++	*lib64/perl5*) dflt=$siteprefix/lib64/$package/site_$prog/$version ;;
++	*)	 dflt=$siteprefix/lib64/site_$prog/$version ;;
+ 	esac
+ 	;;
+ *)	dflt="$sitelib"
+@@ -8001,8 +8001,8 @@ case "$vendorprefix" in
+ 	'')
+ 		prog=`echo $package | $sed 's/-*[0-9.]*$//'`
+ 		case "$installstyle" in
+-		*lib/perl5*) dflt=$vendorprefix/lib/$package/vendor_$prog/$version ;;
+-		*)	     dflt=$vendorprefix/lib/vendor_$prog/$version ;;
++		*lib64/perl5*) dflt=$vendorprefix/lib64/$package/vendor_$prog/$version ;;
++		*)	     dflt=$vendorprefix/lib64/vendor_$prog/$version ;;
+ 		esac
+ 		;;
+ 	*)	dflt="$vendorlib"

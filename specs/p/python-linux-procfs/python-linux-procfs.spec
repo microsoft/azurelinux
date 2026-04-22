@@ -8,7 +8,7 @@
 
 Name: python-linux-procfs
 Version: 0.7.4
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPL-2.0-only
 Summary: Linux /proc abstraction classes
 Source: https://cdn.kernel.org/pub/software/libs/python/%{name}/%{name}-%{version}.tar.xz

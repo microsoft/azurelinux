@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 0.3.3
-Release: 19%{?dist}
+Release: 20%{?dist}
 Summary: Parsing and returning cookies in Ruby
 # Automatically converted from old format: BSD - review is highly recommended.
 License: LicenseRef-Callaway-BSD	

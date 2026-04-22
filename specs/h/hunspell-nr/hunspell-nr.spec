@@ -11,7 +11,7 @@ Name: hunspell-nr
 Summary: Southern Ndebele hunspell dictionaries
 %global upstreamid 20091030
 Version: 0.%{upstreamid}
-Release: 33%{?dist}
+Release: 34%{?dist}
 Source: https://downloads.sourceforge.net/project/aoo-extensions/3141/0/dict-nr_za-2009.10.30.oxt
 URL: https://extensions.openoffice.org/en/project/ndebele-south-spell-checker
 License: LGPL-2.1-or-later

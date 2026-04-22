@@ -1,0 +1,44 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: B Horn <b@horn.uk>
+Date: Sat, 16 Nov 2024 21:24:19 +0000
+Subject: [PATCH] kern/partition: Limit recursion in part_iterate()
+
+The part_iterate() is used by grub_partition_iterate() as a callback in
+the partition iterate functions. However, part_iterate() may also call
+the partition iterate functions which may lead to recursion. Fix potential
+issue by limiting the recursion depth.
+
+Signed-off-by: B Horn <b@horn.uk>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/kern/partition.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/kern/partition.c b/grub-core/kern/partition.c
+index edad9f9e4..704512a20 100644
+--- a/grub-core/kern/partition.c
++++ b/grub-core/kern/partition.c
+@@ -28,6 +28,9 @@
+ 
+ grub_partition_map_t grub_partition_map_list;
+ 
++#define MAX_RECURSION_DEPTH	32
++static unsigned int recursion_depth = 0;
++
+ /*
+  * Checks that disk->partition contains part.  This function assumes that the
+  * start of part is relative to the start of disk->partition.  Returns 1 if
+@@ -208,7 +211,12 @@ part_iterate (grub_disk_t dsk, const grub_partition_t partition, void *data)
+       FOR_PARTITION_MAPS(partmap)
+       {
+ 	grub_err_t err;
+-	err = partmap->iterate (dsk, part_iterate, ctx);
++	recursion_depth++;
++	if (recursion_depth <= MAX_RECURSION_DEPTH)
++	  err = partmap->iterate (dsk, part_iterate, ctx);
++	else
++	  err = grub_error (GRUB_ERR_RECURSION_DEPTH, "maximum recursion depth exceeded");
++	recursion_depth--;
+ 	if (err)
+ 	  grub_errno = GRUB_ERR_NONE;
+ 	if (ctx->ret)

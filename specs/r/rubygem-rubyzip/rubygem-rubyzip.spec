@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 2.3.2
-Release: 12%{?dist}
+Release: 13%{?dist}
 Summary: A ruby module for reading and writing zip files
 License: Ruby OR BSD-2-Clause
 URL: http://github.com/rubyzip/rubyzip

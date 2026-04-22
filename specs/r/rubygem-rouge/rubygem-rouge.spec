@@ -5,7 +5,7 @@
 
 Name:           rubygem-%{gem_name}
 Version:        4.6.0
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Pure-ruby colorizer based on pygments
 # From LICENSE file
 # SPDX confirmed

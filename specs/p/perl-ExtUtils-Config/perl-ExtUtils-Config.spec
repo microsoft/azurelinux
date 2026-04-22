@@ -3,7 +3,7 @@
 
 Name:		perl-ExtUtils-Config
 Version:	0.010
-Release:	3%{?dist}
+Release: 4%{?dist}
 Summary:	A wrapper for perl's configuration
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/ExtUtils-Config

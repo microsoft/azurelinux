@@ -3,7 +3,7 @@
 
 Name: omping
 Version: 0.0.4
-Release: 35%{?dist}
+Release: 36%{?dist}
 Summary: Utility to test IP multicast functionality
 License: ISC
 URL: https://github.com/jfriesse/omping

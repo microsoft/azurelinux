@@ -6,7 +6,7 @@
 Name: freetds
 Summary: Implementation of the TDS (Tabular DataStream) protocol
 Version: 1.4.23
-Release: 3%{?dist}
+Release: 4%{?dist}
 # Automatically converted from old format: LGPLv2+ and GPLv2+ - review is highly recommended.
 License: LGPL-2.0-or-later AND GPL-2.0-or-later
 URL: http://www.freetds.org/

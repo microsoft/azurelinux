@@ -8,7 +8,7 @@
 
 Name:           perl-Config-AutoConf
 Version:        0.320
-Release:        13%{?dist}
+Release: 14%{?dist}
 Summary:        A module to implement some of AutoConf macros in pure Perl
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Config-AutoConf

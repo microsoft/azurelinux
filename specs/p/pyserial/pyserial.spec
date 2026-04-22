@@ -4,7 +4,7 @@
 Summary: Python serial port access library
 Name: pyserial
 Version: 3.5
-Release: 15%{?dist}
+Release: 16%{?dist}
 Source0: %pypi_source
 License: BSD-3-Clause
 URL: http://pypi.python.org/pypi/pyserial

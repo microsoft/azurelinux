@@ -11,7 +11,7 @@
 Name:		perl-Test-CheckChanges
 Summary:	Check that the Changes file matches the distribution
 Version:	0.14
-Release:	44%{?dist}
+Release: 45%{?dist}
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Test-CheckChanges
 Source0:	https://cpan.metacpan.org/modules/by-module/Test/Test-CheckChanges-%{version}.tar.gz

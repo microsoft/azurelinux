@@ -14,7 +14,7 @@
 
 Name:       csnappy 
 Version:    0
-Release:    32.20211216git%{shortcommit}%{?dist}
+Release: 33.20211216git%{shortcommit}%{?dist}
 Summary:    Snappy compression library ported to C 
 License:    BSD-3-Clause
 URL:        https://github.com/zeevt/%{name}

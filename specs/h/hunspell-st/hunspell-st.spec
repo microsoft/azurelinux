@@ -10,7 +10,7 @@ Name: hunspell-st
 Summary: Southern Sotho hunspell dictionaries
 %global upstreamid 20091030
 Version: 0.%{upstreamid}
-Release: 32%{?dist}
+Release: 33%{?dist}
 Source: https://downloads.sourceforge.net/project/aoo-extensions/3138/0/dict-st_za-2009.10.30.oxt
 URL: http://www.translate.org.za/
 License: LGPL-2.1-or-later

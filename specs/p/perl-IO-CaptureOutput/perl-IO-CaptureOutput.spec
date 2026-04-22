@@ -10,7 +10,7 @@
 
 Name:           perl-IO-CaptureOutput
 Version:        1.1105
-Release:        17%{?dist}
+Release: 18%{?dist}
 Summary:        Capture STDOUT/STDERR from sub-processes and XS/C modules
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/IO-CaptureOutput

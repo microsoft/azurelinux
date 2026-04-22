@@ -17,7 +17,7 @@
 
 Name:		libspf2
 Version:	1.2.11
-Release:	19.20210922git%{git}%{?dist}
+Release: 20.20210922git%{git}%{?dist}
 Summary:	An implementation of the SPF specification
 License:	BSD or LGPLv2+
 Url:		http://www.libspf2.org/

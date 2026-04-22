@@ -43,7 +43,7 @@
 
 Name:           %{hipsolver_name}
 Version:        %{rocm_version}
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        ROCm SOLVER marshalling library
 Url:            https://github.com/ROCm/%{upstreamname}
 License:        MIT

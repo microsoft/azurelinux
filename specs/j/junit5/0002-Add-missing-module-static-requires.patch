@@ -1,0 +1,24 @@
+From e0429a4d1df5725399a575c52e83a75ff1578553 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Mon, 27 Mar 2023 16:55:13 +0200
+Subject: [PATCH 2/4] Add missing module static requires
+
+---
+ .../src/module/org.junit.jupiter.params/module-info.java         | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/junit-jupiter-params/src/module/org.junit.jupiter.params/module-info.java b/junit-jupiter-params/src/module/org.junit.jupiter.params/module-info.java
+index 9930b34ee..5fbc5b047 100644
+--- a/junit-jupiter-params/src/module/org.junit.jupiter.params/module-info.java
++++ b/junit-jupiter-params/src/module/org.junit.jupiter.params/module-info.java
+@@ -15,6 +15,7 @@
+  */
+ module org.junit.jupiter.params {
+ 	requires static org.apiguardian.api;
++	requires static univocity.parsers;
+ 	requires transitive org.junit.jupiter.api;
+ 	requires transitive org.junit.platform.commons;
+ 
+-- 
+2.50.1
+

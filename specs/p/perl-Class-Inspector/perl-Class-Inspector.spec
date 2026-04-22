@@ -3,7 +3,7 @@
 
 Name:		perl-Class-Inspector
 Version:	1.36
-Release:	19%{?dist}
+Release: 20%{?dist}
 Summary:	Get information about a class and its structure
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Class-Inspector

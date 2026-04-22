@@ -9,7 +9,7 @@ Version:        1.5.7.2
 # grep "^VERSION = " zstd-*/setup.py
 %global zstd_version %(echo %{version} | cut -d. -f1,2,3 --output-delimiter .)
 
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Zstd Bindings for Python
 
 # original zstd bits are GPL-2.0-or-later OR BSD-2-Clause

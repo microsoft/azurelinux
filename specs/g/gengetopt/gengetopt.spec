@@ -3,7 +3,7 @@
 
 Name:             gengetopt
 Version:          2.23
-Release:          16%{dist}
+Release: 17%{dist}
 Summary:          Tool to write command line option parsing code for C programs
 # Automatically converted from old format: GPLv3+ - review is highly recommended.
 License:          GPL-3.0-or-later

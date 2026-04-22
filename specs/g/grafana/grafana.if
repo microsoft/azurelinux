@@ -1,0 +1,141 @@
+## <summary>policy for grafana</summary>
+
+########################################
+## <summary>
+##	Execute grafana_exec_t in the grafana domain.
+## </summary>
+## <param name="domain">
+## <summary>
+##	Domain allowed to transition.
+## </summary>
+## </param>
+#
+interface(`grafana_domtrans',`
+	gen_require(`
+		type grafana_t, grafana_exec_t;
+	')
+
+	corecmd_search_bin($1)
+	domtrans_pattern($1, grafana_exec_t, grafana_t)
+')
+
+########################################
+## <summary>
+##      Allow domain to name_connect to grafana port. Default :3000
+## </summary>
+## <param name="domain">
+## <summary>
+##      Domain allowed access
+## </summary>
+## </param>
+#
+interface(`connect_grafana_port',`
+        gen_require(`
+		class tcp_socket name_connect;
+                type grafana_port_t;
+        ')
+
+	allow $1 grafana_port_t:tcp_socket name_connect;
+')
+
+#######################################
+## <summary>
+##	Read grafana database.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`grafana_read_db',`
+	gen_require(`
+		type grafana_db_t;
+	')
+
+	files_search_var_lib($1)
+	search_dirs_pattern($1, grafana_var_lib_t, grafana_var_lib_t)	
+	read_files_pattern($1, grafana_db_t, grafana_db_t)
+')
+
+######################################
+## <summary>
+##	Execute grafana in the caller domain.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`grafana_exec',`
+	gen_require(`
+		type grafana_exec_t;
+	')
+
+	corecmd_search_bin($1)
+	can_exec($1, grafana_exec_t)
+')
+########################################
+## <summary>
+##	Execute grafana server in the grafana domain.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed to transition.
+##	</summary>
+## </param>
+#
+interface(`grafana_systemctl',`
+	gen_require(`
+		type grafana_t;
+		type grafana_unit_file_t;
+	')
+
+	systemd_exec_systemctl($1)
+        systemd_read_fifo_file_passwd_run($1)
+	allow $1 grafana_unit_file_t:file read_file_perms;
+	allow $1 grafana_unit_file_t:service manage_service_perms;
+
+	ps_process_pattern($1, grafana_t)
+')
+
+
+########################################
+## <summary>
+##	All of the rules required to administrate
+##	an grafana environment
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <param name="role">
+##	<summary>
+##	Role allowed access.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`grafana_admin',`
+	gen_require(`
+	type grafana_t;
+	type grafana_unit_file_t;
+	')
+
+	allow $1 grafana_t:process { signal_perms };
+	ps_process_pattern($1, grafana_t)
+
+	tunable_policy(`deny_ptrace',`',`
+        	allow $1 grafana_t:process ptrace;
+    	')
+
+	grafana_systemctl($1)
+	admin_pattern($1, grafana_unit_file_t)
+	allow $1 grafana_unit_file_t:service all_service_perms;
+	optional_policy(`
+		systemd_passwd_agent_exec($1)
+		systemd_read_fifo_file_passwd_run($1)
+	')
+')

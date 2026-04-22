@@ -10,7 +10,7 @@
 
 Name:		perl-Specio
 Version:	0.53
-Release:	1%{?dist}
+Release: 2%{?dist}
 Summary:	Type constraints and coercions for Perl
 # lib/Specio/PartialDump.pm:	GPL-1.0-or-later OR Artistic-1.0-Perl
 #				<https://github.com/houseabsolute/Specio/issues/17>

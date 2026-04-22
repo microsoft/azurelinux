@@ -3,7 +3,7 @@
 
 Name:           armadillo
 Version:        12.8.1
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        Fast C++ matrix library with syntax similar to MATLAB and Octave
 
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.

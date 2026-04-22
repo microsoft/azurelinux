@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        1.0.9
-Release:        15%{?dist}
+Release: 16%{?dist}
 Summary:        Language detection library ported from Google's language-detection
 
 # Both python-langdetect and language-detection are under ASL 2.0

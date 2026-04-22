@@ -1,0 +1,56 @@
+From ff7178ca8f0728a2bc6d5d12d74e9c47de2c37a8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Mari=C3=A1n=20Kon=C4=8Dek?= <marian.koncek@mailbox.org>
+Date: Fri, 11 Aug 2023 14:04:26 +0200
+Subject: [PATCH 2/2] Remove support for zstd
+
+Forwarded: not-needed
+---
+ .../java/org/codehaus/plexus/archiver/tar/TarArchiver.java     | 3 +--
+ .../java/org/codehaus/plexus/archiver/tar/TarUnArchiver.java   | 3 +--
+ 2 files changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/src/main/java/org/codehaus/plexus/archiver/tar/TarArchiver.java b/src/main/java/org/codehaus/plexus/archiver/tar/TarArchiver.java
+index 7fc30ba1..68433734 100644
+--- a/src/main/java/org/codehaus/plexus/archiver/tar/TarArchiver.java
++++ b/src/main/java/org/codehaus/plexus/archiver/tar/TarArchiver.java
+@@ -29,7 +29,6 @@
+ import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
+ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
+ import org.apache.commons.compress.compressors.xz.XZCompressorOutputStream;
+-import org.apache.commons.compress.compressors.zstandard.ZstdCompressorOutputStream;
+ import org.codehaus.plexus.archiver.AbstractArchiver;
+ import org.codehaus.plexus.archiver.ArchiveEntry;
+ import org.codehaus.plexus.archiver.ArchiverException;
+@@ -429,7 +428,7 @@ private OutputStream compress(TarCompressionMethod tarCompressionMethod, final O
+         } else if (TarCompressionMethod.xz.equals(tarCompressionMethod)) {
+             return new XZCompressorOutputStream(bufferedOutputStream(ostream));
+         } else if (TarCompressionMethod.zstd.equals(tarCompressionMethod)) {
+-            return new ZstdCompressorOutputStream(bufferedOutputStream(ostream));
++            throw new UnsupportedOperationException("This version of plexus-archiver does not upport zstd compression");
+         }
+ 
+         return ostream;
+diff --git a/src/main/java/org/codehaus/plexus/archiver/tar/TarUnArchiver.java b/src/main/java/org/codehaus/plexus/archiver/tar/TarUnArchiver.java
+index 52cae0c9..4c0e70c1 100644
+--- a/src/main/java/org/codehaus/plexus/archiver/tar/TarUnArchiver.java
++++ b/src/main/java/org/codehaus/plexus/archiver/tar/TarUnArchiver.java
+@@ -27,7 +27,6 @@
+ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
+ import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
+-import org.apache.commons.compress.compressors.zstandard.ZstdCompressorInputStream;
+ import org.codehaus.plexus.archiver.AbstractUnArchiver;
+ import org.codehaus.plexus.archiver.ArchiverException;
+ import org.codehaus.plexus.archiver.util.Streams;
+@@ -140,7 +139,7 @@ private InputStream decompress(UntarCompressionMethod compression, final File fi
+         } else if (compression == UntarCompressionMethod.XZ) {
+             return new XZCompressorInputStream(istream);
+         } else if (compression == UntarCompressionMethod.ZSTD) {
+-            return new ZstdCompressorInputStream(istream);
++            throw new UnsupportedOperationException("This version of plexus-archiver does not upport zstd compression");
+         }
+         return istream;
+     }
+-- 
+2.46.0
+

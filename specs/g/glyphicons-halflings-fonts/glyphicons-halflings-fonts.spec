@@ -10,7 +10,7 @@
 Name:           %{fontname}-fonts
 Epoch:          1
 Version:        3.1.0
-Release:        24.%{checkout}%{?dist}
+Release: 25.%{checkout}%{?dist}
 Summary:        Precisely prepared monochromatic icons and symbols
 
 License:        MIT

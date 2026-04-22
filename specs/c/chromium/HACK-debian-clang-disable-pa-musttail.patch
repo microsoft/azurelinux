@@ -1,0 +1,13 @@
+Index: chromium-144.0.7559.59/base/allocator/partition_allocator/src/partition_alloc/partition_alloc_base/compiler_specific.h
+===================================================================
+--- chromium-144.0.7559.59.orig/base/allocator/partition_allocator/src/partition_alloc/partition_alloc_base/compiler_specific.h
++++ chromium-144.0.7559.59/base/allocator/partition_allocator/src/partition_alloc/partition_alloc_base/compiler_specific.h
+@@ -139,7 +139,7 @@
+ //     PA_MUSTTAIL return Func1(d + 1);  // `Func1()` will be tail-called.
+ //   }
+ // ```
+-#if PA_HAS_CPP_ATTRIBUTE(clang::musttail)
++#if PA_HAS_CPP_ATTRIBUTE(clang::musttail) && !defined(__powerpc64__)
+ #define PA_MUSTTAIL [[clang::musttail]]
+ #else
+ #define PA_MUSTTAIL

@@ -5,7 +5,7 @@
 
 Name: libuser
 Version: 0.64
-Release: 16%{?dist}
+Release: 17%{?dist}
 License: LGPL-2.0-or-later
 URL: https://pagure.io/libuser
 Source: libuser-%{version}.tar.gz

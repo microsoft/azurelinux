@@ -8,7 +8,7 @@
 Name:           python-%{modname}
 Summary:        Unicode-aware Pure Python Expect-like module
 Version:        4.9.0
-Release:        14%{?dist}
+Release: 15%{?dist}
 
 # All the files have ISC license except the
 # following two that have BSD license:

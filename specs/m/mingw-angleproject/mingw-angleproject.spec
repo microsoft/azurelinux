@@ -14,7 +14,7 @@
 
 Name:           mingw-angleproject
 Version:        3280
-Release:        15.git%{shortcommit}%{?dist}
+Release: 16.git%{shortcommit}%{?dist}
 Summary:        Almost Native Graphics Layer Engine
 
 # Automatically converted from old format: BSD - review is highly recommended.

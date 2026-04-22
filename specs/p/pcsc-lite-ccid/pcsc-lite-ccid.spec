@@ -6,7 +6,7 @@
 
 Name:           pcsc-lite-ccid
 Version:        1.7.0
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Generic USB CCID smart card reader driver
 
 License:        BSD-3-Clause AND GPL-2.0-or-later AND LGPL-2.1-or-later

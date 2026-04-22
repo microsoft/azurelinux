@@ -3,7 +3,7 @@
 
 Name: python-routes
 Version: 2.5.1
-Release: 16%{?dist}
+Release: 17%{?dist}
 Summary: Routing Recognition and Generation Tools
 
 # tests/test_functional/test_recognition.py is BSD, not shipped in main RPM.

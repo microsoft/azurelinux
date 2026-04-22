@@ -22,7 +22,7 @@ have to know extra info to use OpenStack \
 
 Name:           python-%{pypi_name}
 Version:        2.1.0
-Release:        19%{?dist}
+Release: 20%{?dist}
 Summary:        OpenStack Client Configuration Library
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.
 License:        Apache-2.0

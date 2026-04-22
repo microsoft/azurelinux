@@ -10,7 +10,7 @@ Name: hunspell-sl
 Summary: Slovenian hunspell dictionaries
 %global upstreamid 20070127
 Version: 0.%{upstreamid}
-Release: 36%{?dist}
+Release: 37%{?dist}
 Source: http://download.services.openoffice.org/contrib/dictionaries/sl_SI.zip
 URL: http://ftp.services.openoffice.org/pub/OpenOffice.org/contrib/dictionaries/
 License: GPL-1.0-or-later OR LGPL-2.1-or-later

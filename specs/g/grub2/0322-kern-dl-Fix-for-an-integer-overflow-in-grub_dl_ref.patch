@@ -1,0 +1,138 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: B Horn <b@horn.uk>
+Date: Tue, 11 Feb 2025 16:41:57 -0600
+Subject: [PATCH] kern/dl: Fix for an integer overflow in grub_dl_ref()
+
+It was possible to overflow the value of mod->ref_count, a signed
+integer, by repeatedly invoking insmod on an already loaded module.
+This led to a use-after-free. As once ref_count was overflowed it became
+possible to unload the module while there was still references to it.
+
+This resolves the issue by using grub_add() to check if the ref_count
+will overflow and then stops further increments. Further changes were
+also made to grub_dl_unref() to check for the underflow condition and
+the reference count was changed to an unsigned 64-bit integer.
+
+Reported-by: B Horn <b@horn.uk>
+Signed-off-by: B Horn <b@horn.uk>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/commands/minicmd.c |  2 +-
+ grub-core/kern/dl.c          | 17 ++++++++++++-----
+ include/grub/dl.h            |  8 ++++----
+ util/misc.c                  |  4 ++--
+ 4 files changed, 19 insertions(+), 12 deletions(-)
+
+diff --git a/grub-core/commands/minicmd.c b/grub-core/commands/minicmd.c
+index 2bd3ac76f..2001043cf 100644
+--- a/grub-core/commands/minicmd.c
++++ b/grub-core/commands/minicmd.c
+@@ -167,7 +167,7 @@ grub_mini_cmd_lsmod (struct grub_command *cmd __attribute__ ((unused)),
+   {
+     grub_dl_dep_t dep;
+ 
+-    grub_printf ("%s\t%d\t\t", mod->name, mod->ref_count);
++    grub_printf ("%s\t%" PRIuGRUB_UINT64_T "\t\t", mod->name, mod->ref_count);
+     for (dep = mod->dep; dep; dep = dep->next)
+       {
+ 	if (dep != mod->dep)
+diff --git a/grub-core/kern/dl.c b/grub-core/kern/dl.c
+index 2eaef7150..fe7c3b940 100644
+--- a/grub-core/kern/dl.c
++++ b/grub-core/kern/dl.c
+@@ -32,6 +32,7 @@
+ #include <grub/env.h>
+ #include <grub/cache.h>
+ #include <grub/i18n.h>
++#include <grub/safemath.h>
+ #include <grub/efi/sb.h>
+ 
+ /* Platforms where modules are in a readonly area of memory.  */
+@@ -613,7 +614,7 @@ grub_dl_resolve_dependencies (grub_dl_t mod, Elf_Ehdr *e)
+   return GRUB_ERR_NONE;
+ }
+ 
+-int
++grub_uint64_t
+ grub_dl_ref (grub_dl_t mod)
+ {
+   grub_dl_dep_t dep;
+@@ -624,10 +625,13 @@ grub_dl_ref (grub_dl_t mod)
+   for (dep = mod->dep; dep; dep = dep->next)
+     grub_dl_ref (dep->mod);
+ 
+-  return ++mod->ref_count;
++  if (grub_add (mod->ref_count, 1, &mod->ref_count))
++    grub_fatal ("Module reference count overflow");
++
++  return mod->ref_count;
+ }
+ 
+-int
++grub_uint64_t
+ grub_dl_unref (grub_dl_t mod)
+ {
+   grub_dl_dep_t dep;
+@@ -638,10 +642,13 @@ grub_dl_unref (grub_dl_t mod)
+   for (dep = mod->dep; dep; dep = dep->next)
+     grub_dl_unref (dep->mod);
+ 
+-  return --mod->ref_count;
++  if (grub_sub (mod->ref_count, 1, &mod->ref_count))
++    grub_fatal ("Module reference count underflow");
++
++  return mod->ref_count;
+ }
+ 
+-int
++grub_uint64_t
+ grub_dl_ref_count (grub_dl_t mod)
+ {
+   if (mod == NULL)
+diff --git a/include/grub/dl.h b/include/grub/dl.h
+index 1e1262a28..055bb564e 100644
+--- a/include/grub/dl.h
++++ b/include/grub/dl.h
+@@ -177,7 +177,7 @@ typedef struct grub_dl_dep *grub_dl_dep_t;
+ struct grub_dl
+ {
+   char *name;
+-  int ref_count;
++  grub_uint64_t ref_count;
+   int persistent;
+   grub_dl_dep_t dep;
+   grub_dl_segment_t segment;
+@@ -206,9 +206,9 @@ grub_dl_t EXPORT_FUNC(grub_dl_load) (const char *name);
+ grub_dl_t grub_dl_load_core (void *addr, grub_size_t size);
+ grub_dl_t EXPORT_FUNC(grub_dl_load_core_noinit) (void *addr, grub_size_t size);
+ int EXPORT_FUNC(grub_dl_unload) (grub_dl_t mod);
+-extern int EXPORT_FUNC(grub_dl_ref) (grub_dl_t mod);
+-extern int EXPORT_FUNC(grub_dl_unref) (grub_dl_t mod);
+-extern int EXPORT_FUNC(grub_dl_ref_count) (grub_dl_t mod);
++extern grub_uint64_t EXPORT_FUNC(grub_dl_ref) (grub_dl_t mod);
++extern grub_uint64_t EXPORT_FUNC(grub_dl_unref) (grub_dl_t mod);
++extern grub_uint64_t EXPORT_FUNC(grub_dl_ref_count) (grub_dl_t mod);
+ 
+ extern grub_dl_t EXPORT_VAR(grub_dl_head);
+ 
+diff --git a/util/misc.c b/util/misc.c
+index d545212d9..0f928e5b4 100644
+--- a/util/misc.c
++++ b/util/misc.c
+@@ -190,14 +190,14 @@ grub_xputs_real (const char *str)
+ 
+ void (*grub_xputs) (const char *str) = grub_xputs_real;
+ 
+-int
++grub_uint64_t
+ grub_dl_ref (grub_dl_t mod)
+ {
+   (void) mod;
+   return 0;
+ }
+ 
+-int
++grub_uint64_t
+ grub_dl_unref (grub_dl_t mod)
+ {
+   (void) mod;

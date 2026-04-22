@@ -3,7 +3,7 @@
 
 Name:           python-requests-futures
 Version:        1.0.2
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        Asynchronous Python HTTP Requests
 
 License:        Apache-2.0

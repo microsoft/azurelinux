@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/automake.azl.macros}
+
 %global api_version 1.18
 
 # redhat-rpm-config sets CFLAGS, CXXFLAGS and LDFLAGS, but not
@@ -23,7 +26,7 @@ Summary:    A GNU tool for automatically creating Makefiles
 Name:       automake
 # Any bump here requires libtool rebuild, rhbz#1813010
 Version:    %{api_version}.1
-Release:    2%{?dist}
+Release: 3%{?dist}
 
 # To help future rebase, the following licenses were seen in the following files/folders:
 # usr/bin/* - GPL-2.0-or-later
@@ -53,6 +56,7 @@ Release:    2%{?dist}
 License:    GPL-2.0-or-later AND GPL-2.0-or-later WITH Autoconf-exception-generic AND GPL-3.0-or-later AND GPL-3.0-or-later WITH Autoconf-exception-generic-3.0 AND GPL-3.0-or-later WITH Texinfo-exception AND GFDL-1.3-or-later AND FSFAP AND FSFUL AND FSFULLR AND FSFULLRWD AND X11 AND LicenseRef-Fedora-Public-Domain
 
 Source:     ftp://ftp.gnu.org/gnu/automake/automake-%{version}.tar.xz
+Source9999: automake.azl.macros
 
 # ~> downstream
 # The patch is only made necessary due to fedora specific changes

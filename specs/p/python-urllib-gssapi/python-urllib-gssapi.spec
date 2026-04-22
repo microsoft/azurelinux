@@ -6,7 +6,7 @@
 
 Name:           python-%{sname}
 Version:        1.0.2
-Release:        19%{?dist}
+Release: 20%{?dist}
 Summary:        A GSSAPI/SPNEGO authentication handler for urllib/urllib2
 
 License:        Apache-2.0

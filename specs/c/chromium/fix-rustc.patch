@@ -1,0 +1,16 @@
+author: Andres Salomon <dilinger@debian.org>
+description: allow ppc64le to build by using proper rustc target
+Index: chromium-144.0.7559.59/build/config/rust.gni
+===================================================================
+--- chromium-144.0.7559.59.orig/build/config/rust.gni
++++ chromium-144.0.7559.59/build/config/rust.gni
+@@ -186,6 +186,9 @@ rust_abi_target = ""
+ if (is_linux || is_chromeos) {
+   if (current_cpu == "arm64") {
+     rust_abi_target = "aarch64-unknown-linux-gnu"
++  } else if (current_cpu == "ppc64") {
++    rust_abi_target = "powerpc64le-unknown-linux-gnu"
++    cargo_target_abi = ""
+   } else if (current_cpu == "x86") {
+     rust_abi_target = "i686-unknown-linux-gnu"
+   } else if (current_cpu == "x64") {

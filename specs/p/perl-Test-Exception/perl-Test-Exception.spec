@@ -3,7 +3,7 @@
 
 Name:           perl-Test-Exception
 Version:        0.43
-Release:        29%{?dist}
+Release: 30%{?dist}
 Summary:        Library of test functions for exception based Perl code
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Test-Exception

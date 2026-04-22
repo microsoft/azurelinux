@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 0.6
-Release: 13%{?dist}
+Release: 14%{?dist}
 Summary: Stub constants for the duration of a block in MiniTest
 License: MIT
 URL: https://github.com/adammck/minitest-stub-const

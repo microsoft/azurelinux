@@ -10,7 +10,7 @@
 
 Name:           cinnamon-settings-daemon
 Version:        6.4.2
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        The daemon sharing settings from CINNAMON to GTK+/KDE applications
 
 # Automatically converted from old format: GPLv2+ and LGPLv2+ - review is highly recommended.

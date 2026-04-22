@@ -5,7 +5,7 @@ Name:           perl-Module-CoreList
 # Epoch to compete with perl.spec
 Epoch:          1
 Version:        5.20260119
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        What modules are shipped with versions of perl
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Module-CoreList

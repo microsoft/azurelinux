@@ -3,7 +3,7 @@
 
 Name:           python-uc-micro-py
 Version:        1.0.3
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        Micro subset of Unicode data files for linkify-it.py projects
 
 License:        MIT

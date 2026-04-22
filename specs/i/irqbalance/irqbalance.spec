@@ -3,7 +3,7 @@
 
 Name:           irqbalance
 Version:        1.9.4
-Release:        7%{?dist}
+Release: 8%{?dist}
 Epoch:          2
 Summary:        IRQ balancing daemon
 License:        GPL-2.0-only

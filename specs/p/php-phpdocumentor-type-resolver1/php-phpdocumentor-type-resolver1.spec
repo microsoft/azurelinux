@@ -42,7 +42,7 @@
 
 Name:          php-%{composer_vendor}-%{composer_project}%{major}
 Version:       %{github_version}
-Release:       1%{?github_release}%{?dist}
+Release: 2%{?github_release}%{?dist}
 Summary:       A PSR-5 based resolver of Class names, Types and Structural Element Names
 
 Group:         Development/Libraries

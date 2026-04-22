@@ -10,7 +10,7 @@
 %if ! 0%{?with_doc}
 %global excluded_brs %{excluded_brs} sphinx openstackdocstheme
 %endif
-%global with_doc 1
+%global with_doc 0
 
 %global pypi_name octaviaclient
 
@@ -19,7 +19,7 @@ Client for OpenStack Octavia (Load Balancer as a Service)
 
 Name:           python-%{pypi_name}
 Version:        3.8.0
-Release:        5%{?dist}
+Release: 6%{?dist}
 Summary:        Client for OpenStack Octavia (Load Balancer as a Service)
 
 License:        Apache-2.0

@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.4.0
-Release: 15%{?dist}
+Release: 16%{?dist}
 Summary: Parallel HTTP library on top of libcurl multi
 License: MIT
 URL: https://github.com/typhoeus/typhoeus

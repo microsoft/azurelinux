@@ -1,7 +1,7 @@
-From c1ad66dbe0e166647553c25d799e9a027226a9ce Mon Sep 17 00:00:00 2001
+From 75bfc218c29f21e7beff438a707dde98e2c97d67 Mon Sep 17 00:00:00 2001
 From: Yan Fu <yafu@redhat.com>
-Date: Wed, 22 Oct 2025 03:11:42 -0400
-Subject: [PATCH 07/15] Fedora: remove testcontainers dependency
+Date: Mon, 9 Jun 2025 03:55:55 -0400
+Subject: [PATCH 07/14] Fedora: remove testcontainers dependency
 
 Not in Fedora, so skip tests that use it
 
@@ -14,22 +14,22 @@ Signed-off-by: Yan Fu <yafu@redhat.com>
  3 files changed, 2 insertions(+), 3 deletions(-)
 
 diff --git a/Cargo.toml b/Cargo.toml
-index d64917c..1802e64 100644
+index d2481f8..a971cc8 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -40,7 +40,6 @@ serial_test = "3"
  sha2 = "0.10.9"
  strum = { version = "0.27", features = ["derive"] }
- tempfile = "3.20"
+ tempfile = "3.19"
 -testcontainers = "0.22"
  thiserror = "2.0"
- tokio = "1.47"
- toml = "0.8.23"
+ tokio = "1.44"
+ toml = "0.8.22"
 diff --git a/attestation-agent/kbs_protocol/Cargo.toml b/attestation-agent/kbs_protocol/Cargo.toml
-index 09c1ee3..9f9a58d 100644
+index 318061a..31d8006 100644
 --- a/attestation-agent/kbs_protocol/Cargo.toml
 +++ b/attestation-agent/kbs_protocol/Cargo.toml
-@@ -31,7 +31,6 @@ zeroize.workspace = true
+@@ -30,7 +30,6 @@ zeroize.workspace = true
  rstest.workspace = true
  serial_test.workspace = true
  tempfile.workspace = true
@@ -38,10 +38,10 @@ index 09c1ee3..9f9a58d 100644
  
  [build-dependencies]
 diff --git a/attestation-agent/kbs_protocol/src/client/rcar_client.rs b/attestation-agent/kbs_protocol/src/client/rcar_client.rs
-index 1cd742c..5cfcfce 100644
+index 45b194e..1059927 100644
 --- a/attestation-agent/kbs_protocol/src/client/rcar_client.rs
 +++ b/attestation-agent/kbs_protocol/src/client/rcar_client.rs
-@@ -397,7 +397,8 @@ impl KbsClientCapabilities for KbsClient<Box<dyn EvidenceProvider>> {
+@@ -355,7 +355,8 @@ impl KbsClientCapabilities for KbsClient<Box<dyn EvidenceProvider>> {
      }
  }
  
@@ -49,8 +49,8 @@ index 1cd742c..5cfcfce 100644
 +// Fedora: no testcontainers so ignore the following test
 +#[cfg(any())]
  mod test {
-     use kbs_types::HashAlgorithm;
+     use crypto::HashAlgorithm;
      use rstest::rstest;
 -- 
-2.51.1
+2.49.0
 

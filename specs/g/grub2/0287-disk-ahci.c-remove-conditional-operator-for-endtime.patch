@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leo Sandoval <lsandova@redhat.com>
+Date: Wed, 22 Jan 2025 13:37:42 -0600
+Subject: [PATCH] disk/ahci.c: remove conditional operator for endtime
+
+The conditional makes no sense when the two possible expressions have the same
+value, so remove it (perhaps the compiler does it for us but better to remove
+it).
+
+Signed-off-by: Leo Sandoval <lsandova@redhat.com>
+---
+ grub-core/disk/ahci.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/grub-core/disk/ahci.c b/grub-core/disk/ahci.c
+index e7b5dc5f2..b247161b9 100644
+--- a/grub-core/disk/ahci.c
++++ b/grub-core/disk/ahci.c
+@@ -1038,7 +1038,7 @@ grub_ahci_readwrite_real (struct grub_ahci_device *dev,
+   grub_dprintf ("ahci", "AHCI tfd = %x\n",
+ 		dev->hba->ports[dev->port].task_file_data);
+ 
+-  endtime = grub_get_time_ms () + (spinup ? 20000 : 20000);
++  endtime = grub_get_time_ms () + 20000;
+   while ((dev->hba->ports[dev->port].command_issue & 1))
+     if (grub_get_time_ms () > endtime ||
+ 	(dev->hba->ports[dev->port].intstatus & GRUB_AHCI_HBA_PORT_IS_FATAL_MASK))

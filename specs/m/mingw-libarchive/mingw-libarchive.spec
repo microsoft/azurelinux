@@ -5,7 +5,7 @@
 
 Name:           mingw-libarchive
 Version:        3.5.1
-Release:        13%{?dist}
+Release: 14%{?dist}
 Summary:        MinGW package for handling streaming archive formats
 
 # Automatically converted from old format: BSD - review is highly recommended.

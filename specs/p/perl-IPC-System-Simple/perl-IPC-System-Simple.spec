@@ -10,7 +10,7 @@
 
 Name:		perl-IPC-System-Simple
 Version:	1.30
-Release:	16%{?dist}
+Release: 17%{?dist}
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 Summary:	Run commands simply, with detailed diagnostics
 URL:		https://metacpan.org/release/IPC-System-Simple

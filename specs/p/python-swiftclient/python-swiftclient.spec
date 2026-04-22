@@ -21,7 +21,7 @@ Object Storage API.
 
 Name:       python-swiftclient
 Version:    4.6.0
-Release:    5%{?dist}
+Release: 6%{?dist}
 Summary:    Client Library for OpenStack Object Storage API
 License:    Apache-2.0
 URL:        http://launchpad.net/python-swiftclient/

@@ -21,7 +21,7 @@
 
 Name:           netplan
 Version:        1.1.2
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Network configuration tool using YAML
 License:        GPL-3.0-only
 URL:            http://netplan.io/

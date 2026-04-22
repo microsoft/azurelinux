@@ -1,0 +1,86 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Renaud=20M=C3=A9trich?= <rmetrich@redhat.com>
+Date: Thu, 24 Apr 2025 11:43:28 +0200
+Subject: [PATCH] osdep/linux/getroot: Detect DDF container similar to IMSM
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Similarly to Intel IMSM, there are BIOS and UEFI implementations that
+support DDF containers natively.
+
+DDF and IMSM are very similar in handling, especially these should not
+be considered as RAID abstraction. This fixes the requirement of having
+a device map when probing DDF containers.
+
+Fixes: https://issues.redhat.com/browse/RHEL-44336
+
+Signed-off-by: Renaud Métrich <rmetrich@redhat.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/osdep/linux/getroot.c | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
+
+diff --git a/grub-core/osdep/linux/getroot.c b/grub-core/osdep/linux/getroot.c
+index b832593213e6..4bf386b590b5 100644
+--- a/grub-core/osdep/linux/getroot.c
++++ b/grub-core/osdep/linux/getroot.c
+@@ -127,7 +127,7 @@ struct btrfs_ioctl_search_args {
+                                struct btrfs_ioctl_fs_info_args)
+ 
+ static int
+-grub_util_is_imsm (const char *os_dev);
++grub_util_is_imsm_or_ddf (const char *os_dev);
+ 
+ 
+ #define ESCAPED_PATH_MAX (4 * PATH_MAX)
+@@ -759,10 +759,10 @@ out:
+ }
+ 
+ static int
+-grub_util_is_imsm (const char *os_dev)
++grub_util_is_imsm_or_ddf (const char *os_dev)
+ {
+   int retry;
+-  int is_imsm = 0;
++  int is_imsm_or_ddf = 0;
+   int container_seen = 0;
+   const char *dev = os_dev;
+ 
+@@ -823,10 +823,17 @@ grub_util_is_imsm (const char *os_dev)
+ 	  if (strncmp (buf, "MD_METADATA=imsm",
+ 		       sizeof ("MD_METADATA=imsm") - 1) == 0)
+ 	    {
+-	      is_imsm = 1;
++	      is_imsm_or_ddf = 1;
+ 	      grub_util_info ("%s is imsm", dev);
+ 	      break;
+ 	    }
++	  if (strncmp (buf, "MD_METADATA=ddf",
++		       sizeof ("MD_METADATA=ddf") - 1) == 0)
++	    {
++	      is_imsm_or_ddf = 1;
++	      grub_util_info ("%s is ddf", dev);
++	      break;
++	    }
+ 	}
+ 
+       free (buf);
+@@ -837,7 +844,7 @@ grub_util_is_imsm (const char *os_dev)
+ 
+   if (dev != os_dev)
+     free ((void *) dev);
+-  return is_imsm;
++  return is_imsm_or_ddf;
+ }
+ 
+ char *
+@@ -1202,7 +1209,7 @@ grub_util_get_dev_abstraction_os (const char *os_dev)
+ 
+   /* Check for RAID.  */
+   if (!strncmp (os_dev, "/dev/md", 7) && ! grub_util_device_is_mapped (os_dev)
+-      && !grub_util_is_imsm (os_dev))
++      && !grub_util_is_imsm_or_ddf (os_dev))
+     return GRUB_DEV_ABSTRACTION_RAID;
+   return GRUB_DEV_ABSTRACTION_NONE;
+ }

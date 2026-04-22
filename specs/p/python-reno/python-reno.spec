@@ -20,7 +20,7 @@ helps automate the hard parts.
 
 Name:           python-%{pypi_name}
 Version:        4.1.0
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        Release NOtes manager
 
 License:        Apache-2.0

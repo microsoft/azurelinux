@@ -131,7 +131,7 @@ Requires: openSUSE-release
 
 Name:		nfs-ganesha
 Version:	7.2
-Release:	2%{?dev:%{dev}}%{?dist}
+Release: 3%{?dev:%{dev}}%{?dist}
 Summary:	NFS-Ganesha is a NFS Server running in user space
 License:	LGPL-3.0-or-later
 Url:		https://github.com/nfs-ganesha/nfs-ganesha/wiki

@@ -9,7 +9,7 @@
 
 Name:           koji-osbuild
 Version:        12
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        Koji integration for osbuild composer
 
 %forgemeta

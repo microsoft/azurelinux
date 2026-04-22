@@ -1,0 +1,109 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Daniel Axtens <dja@axtens.net>
+Date: Mon, 6 Feb 2023 10:03:20 -0500
+Subject: [PATCH] ieee1275: request memory with ibm,
+ client-architecture-support
+
+On PowerVM, the first time we boot a Linux partition, we may only get
+256MB of real memory area, even if the partition has more memory.
+
+This isn't enough to reliably verify a kernel. Fortunately, the Power
+Architecture Platform Reference (PAPR) defines a method we can call to ask
+for more memory: the broad and powerful ibm,client-architecture-support
+(CAS) method.
+
+CAS can do an enormous amount of things on a PAPR platform: as well as
+asking for memory, you can set the supported processor level, the interrupt
+controller, hash vs radix mmu, and so on.
+
+If:
+
+ - we are running under what we think is PowerVM (compatible property of /
+   begins with "IBM"), and
+
+ - the full amount of RMA is less than 512MB (as determined by the reg
+   property of /memory)
+
+then call CAS as follows: (refer to the Linux on Power Architecture
+Reference, LoPAR, which is public, at B.5.2.3):
+
+ - Use the "any" PVR value and supply 2 option vectors.
+
+ - Set option vector 1 (PowerPC Server Processor Architecture Level)
+   to "ignore".
+
+ - Set option vector 2 with default or Linux-like options, including a
+   min-rma-size of 512MB.
+
+ - Set option vector 3 to request Floating Point, VMX and Decimal Floating
+   point, but don't abort the boot if we can't get them.
+
+ - Set option vector 4 to request a minimum VP percentage to 1%, which is
+   what Linux requests, and is below the default of 10%. Without this,
+   some systems with very large or very small configurations fail to boot.
+
+This will cause a CAS reboot and the partition will restart with 512MB
+of RMA. Importantly, grub will notice the 512MB and not call CAS again.
+
+Notes about the choices of parameters:
+
+ - A partition can be configured with only 256MB of memory, which would
+   mean this request couldn't be satisfied, but PFW refuses to load with
+   only 256MB of memory, so it's a bit moot. SLOF will run fine with 256MB,
+   but we will never call CAS under qemu/SLOF because /compatible won't
+   begin with "IBM".)
+
+ - unspecified CAS vectors take on default values. Some of these values
+   might restrict the ability of certain hardware configurations to boot.
+   This is why we need to specify the VP percentage in vector 4, which is
+   in turn why we need to specify vector 3.
+
+Finally, we should have enough memory to verify a kernel, and we will
+reach Linux. One of the first things Linux does while still running under
+OpenFirmware is to call CAS with a much fuller set of options (including
+asking for 512MB of memory). Linux includes a much more restrictive set of
+PVR values and processor support levels, and this CAS invocation will likely
+induce another reboot. On this reboot grub will again notice the higher RMA,
+and not call CAS. We will get to Linux again, Linux will call CAS again, but
+because the values are now set for Linux this will not induce another CAS
+reboot and we will finally boot all the way to userspace.
+
+On all subsequent boots, everything will be configured with 512MB of RMA,
+so there will be no further CAS reboots from grub. (phyp is super sticky
+with the RMA size - it persists even on cold boots. So if you've ever booted
+Linux in a partition, you'll probably never have grub call CAS. It'll only
+ever fire the first time a partition loads grub, or if you deliberately lower
+the amount of memory your partition has below 512MB.)
+
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+(cherry picked from commit d5571590b7de61887efac1c298901455697ba307)
+---
+ grub-core/kern/ieee1275/init.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/grub-core/kern/ieee1275/init.c b/grub-core/kern/ieee1275/init.c
+index 8ce1a0f09ee..13e8a5b4bb8 100644
+--- a/grub-core/kern/ieee1275/init.c
++++ b/grub-core/kern/ieee1275/init.c
+@@ -850,6 +850,19 @@ grub_claim_heap (void)
+     }
+ #endif
+ 
++#if defined(__powerpc__)
++  if (grub_ieee1275_test_flag (GRUB_IEEE1275_FLAG_CAN_TRY_CAS_FOR_MORE_MEMORY))
++    {
++      grub_uint64_t rma_size;
++      grub_err_t err;
++
++      err = grub_ieee1275_total_mem (&rma_size);
++      /* if we have an error, don't call CAS, just hope for the best */
++      if (err == GRUB_ERR_NONE && rma_size < (512 * 1024 * 1024))
++	grub_ieee1275_ibm_cas ();
++    }
++#endif
++
+   grub_machine_mmap_iterate (heap_init, &total);
+ }
+ #endif

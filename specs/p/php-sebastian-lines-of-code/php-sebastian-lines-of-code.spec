@@ -28,7 +28,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
 Version:        1.0.4
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        Counting the lines of code in PHP source code, version 1
 
 License:        BSD-3-Clause

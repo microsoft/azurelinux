@@ -21,7 +21,7 @@
 
 Name:           python-%{srcname}
 Version:        11.3.0
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm

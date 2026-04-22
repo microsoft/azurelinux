@@ -1,0 +1,54 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Arjun Shankar <arjun@redhat.com>
+Date: Sun, 5 Feb 2023 11:13:55 +0100
+Subject: [PATCH] core: Fix several implicit function declarations
+
+These #include lines ensure that grub2 continues to build with C99
+where implicit function declarations are removed.
+
+Related to:
+
+  <https://fedoraproject.org/wiki/Changes/PortingToModernC>
+  <https://fedoraproject.org/wiki/Toolchain/PortingToModernC>
+---
+ grub-core/commands/efi/connectefi.c | 1 +
+ grub-core/net/http.c                | 1 +
+ grub-core/term/at_keyboard.c        | 1 +
+ 3 files changed, 3 insertions(+)
+
+diff --git a/grub-core/commands/efi/connectefi.c b/grub-core/commands/efi/connectefi.c
+index 0f840ea0575..6c397f8f508 100644
+--- a/grub-core/commands/efi/connectefi.c
++++ b/grub-core/commands/efi/connectefi.c
+@@ -21,6 +21,7 @@
+ #include <grub/efi/api.h>
+ #include <grub/efi/pci.h>
+ #include <grub/efi/efi.h>
++#include <grub/efi/disk.h>
+ #include <grub/command.h>
+ #include <grub/err.h>
+ #include <grub/i18n.h>
+diff --git a/grub-core/net/http.c b/grub-core/net/http.c
+index ce2b492c353..40df19426c8 100644
+--- a/grub-core/net/http.c
++++ b/grub-core/net/http.c
+@@ -26,6 +26,7 @@
+ #include <grub/dl.h>
+ #include <grub/file.h>
+ #include <grub/i18n.h>
++#include <grub/env.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+diff --git a/grub-core/term/at_keyboard.c b/grub-core/term/at_keyboard.c
+index 378deb321d9..e667d0a862c 100644
+--- a/grub-core/term/at_keyboard.c
++++ b/grub-core/term/at_keyboard.c
+@@ -25,6 +25,7 @@
+ #include <grub/time.h>
+ #include <grub/loader.h>
+ #include <grub/ps2.h>
++#include <grub/env.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 

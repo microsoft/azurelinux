@@ -4,7 +4,7 @@
 Name:           perl-Getopt-Long-Descriptive
 Summary:        Getopt::Long with usage text
 Version:        0.116
-Release:        3%{?dist}
+Release: 4%{?dist}
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Getopt-Long-Descriptive
 Source0:        https://cpan.metacpan.org/modules/by-module/Getopt/Getopt-Long-Descriptive-%{version}.tar.gz

@@ -1,0 +1,34 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Date: Wed, 16 Oct 2024 16:20:24 +1100
+Subject: [PATCH] acpi: Fix out of bounds access in grub_acpi_xsdt_find_table()
+
+The calculation of the size of the table was incorrect (copy/pasta from
+grub_acpi_rsdt_find_table() I assume...). The entries are 64-bit long.
+
+This causes us to access beyond the end of the table which is causing
+crashes during boot on some systems. Typically this is causing a crash
+on VMWare when using UEFI and enabling serial autodetection, as
+
+grub_acpi_find_table (GRUB_ACPI_SPCR_SIGNATURE);
+
+Will goes past the end of the table (the SPCR table doesn't exits)
+
+Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+---
+ grub-core/kern/acpi.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/grub-core/kern/acpi.c b/grub-core/kern/acpi.c
+index 48ded4e2ea6e..8ff0835d501f 100644
+--- a/grub-core/kern/acpi.c
++++ b/grub-core/kern/acpi.c
+@@ -75,7 +75,7 @@ grub_acpi_xsdt_find_table (struct grub_acpi_table_header *xsdt, const char *sig)
+     return 0;
+ 
+   ptr = (grub_unaligned_uint64_t *) (xsdt + 1);
+-  s = (xsdt->length - sizeof (*xsdt)) / sizeof (grub_uint32_t);
++  s = (xsdt->length - sizeof (*xsdt)) / sizeof (grub_uint64_t);
+   for (; s; s--, ptr++)
+     {
+       struct grub_acpi_table_header *tbl;

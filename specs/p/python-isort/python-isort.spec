@@ -6,7 +6,7 @@
 
 Name:               python-%{modname}
 Version:            6.1.0
-Release:            1%{?dist}
+Release: 2%{?dist}
 Summary:            Python utility / library to sort Python imports
 
 License:            MIT

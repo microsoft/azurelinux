@@ -3,7 +3,7 @@
 
 Name:		perl-Data-Section-Simple
 Version:	0.07
-Release:	33%{?dist}
+Release: 34%{?dist}
 Summary:	Read data from __DATA__
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Data-Section-Simple

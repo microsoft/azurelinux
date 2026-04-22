@@ -7,7 +7,7 @@
 
 Name:          mingw-%{pkgname}
 Version:       1.0.16
-Release:       3%{?dist}
+Release: 4%{?dist}
 Summary:       MinGW Windows %{pkgname} library
 
 License:       LGPL-2.0-or-later

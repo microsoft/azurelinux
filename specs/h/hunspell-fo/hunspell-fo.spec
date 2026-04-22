@@ -10,7 +10,7 @@
 Name: hunspell-fo
 Summary: Faroese hunspell dictionaries
 Version: 0.4.2
-Release: 26%{?dist}
+Release: 27%{?dist}
 Source: http://fo.speling.org/filer/myspell-fo-%{version}.tar.bz2
 URL: http://fo.speling.org/
 License: GPL-2.0-or-later

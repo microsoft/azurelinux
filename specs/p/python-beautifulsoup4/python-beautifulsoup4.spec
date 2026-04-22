@@ -12,7 +12,7 @@
 
 Name:           python-beautifulsoup4
 Version:        4.14.3
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        HTML/XML parser for quick-turnaround applications like screen-scraping
 License:        MIT
 URL:            http://www.crummy.com/software/BeautifulSoup/

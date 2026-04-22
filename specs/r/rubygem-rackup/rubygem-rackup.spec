@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 2.2.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: A general server command for Rack applications
 License: MIT
 URL: https://github.com/rack/rackup

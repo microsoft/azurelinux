@@ -3,7 +3,7 @@
 
 Name:           openpace
 Version:        1.1.3
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Cryptographic library for EAC version 2
 
 License:        GPL-3.0-only

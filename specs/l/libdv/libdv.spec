@@ -3,7 +3,7 @@
 
 Name:           libdv
 Version:        1.0.0
-Release:        45%{?dist}
+Release: 46%{?dist}
 Summary:        Software decoder for DV format video
 License:        LGPL-2.0-or-later
 URL:            http://libdv.sourceforge.net/

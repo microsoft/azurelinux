@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.15.0
-Release: 12%{?dist}
+Release: 13%{?dist}
 Summary: Boot large ruby/rails apps faster
 License: MIT
 URL: https://github.com/Shopify/bootsnap

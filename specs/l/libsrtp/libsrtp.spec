@@ -3,7 +3,7 @@
 
 Name:		libsrtp
 Version:	2.6.0
-Release:	3%{?dist}
+Release: 4%{?dist}
 Summary:	An implementation of the Secure Real-time Transport Protocol (SRTP)
 License:	BSD-3-Clause
 URL:		https://github.com/cisco/libsrtp

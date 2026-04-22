@@ -1,0 +1,33 @@
+[azurelinux-base]
+name=Azure Linux $releasever - $basearch
+baseurl=REPO_URI_PREFIX/base/$basearch
+enabled=AUTO_VALUE
+countme=1
+metadata_expire=AUTO_VALUE
+repo_gpgcheck=0
+type=rpm
+gpgcheck=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-azurelinux-$releasever-$basearch
+skip_if_unavailable=True
+
+[azurelinux-base-debuginfo]
+name=Azure Linux $releasever - $basearch - Debug
+baseurl=REPO_URI_PREFIX/base/debuginfo/$basearch
+enabled=0
+metadata_expire=AUTO_VALUE
+repo_gpgcheck=0
+type=rpm
+gpgcheck=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-azurelinux-$releasever-$basearch
+skip_if_unavailable=True
+
+[azurelinux-base-source]
+name=Azure Linux $releasever - Source
+baseurl=REPO_URI_PREFIX/base/srpms
+enabled=0
+metadata_expire=AUTO_VALUE
+repo_gpgcheck=0
+type=rpm
+gpgcheck=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-azurelinux-$releasever-$basearch
+skip_if_unavailable=True

@@ -18,7 +18,7 @@
 Name:      %{libname}
 Summary:   The companion C library for client side encryption in drivers
 Version:   1.15.2
-Release:   1%{?dist}
+Release: 2%{?dist}
 
 # see kms-message/THIRD_PARTY_NOTICES
 # kms-message/src/kms_b64.c is ISC

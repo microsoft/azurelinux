@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        1.4.6
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Implementation of the SCRAM protocol
 
 License:        MIT-0

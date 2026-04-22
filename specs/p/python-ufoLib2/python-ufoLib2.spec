@@ -6,7 +6,7 @@
 
 Name:           python-ufoLib2
 Version:        0.18.1
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        A library to deal with UFO font sources
 
 License:        Apache-2.0

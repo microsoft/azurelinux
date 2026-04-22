@@ -9,7 +9,7 @@
 Name:           mingw-python-%{pkgname}
 Summary:        MinGW Python %{pypi_name} library
 Version:        3.12.0
-Release:        2%{?dist}
+Release: 3%{?dist}
 BuildArch:      noarch
 
 License:        BSD-2-Clause

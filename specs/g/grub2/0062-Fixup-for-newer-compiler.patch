@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 10 May 2018 13:40:19 -0400
+Subject: [PATCH] Fixup for newer compiler
+
+---
+ conf/Makefile.common | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/conf/Makefile.common b/conf/Makefile.common
+index ece9ed8a1bf..6262f21a772 100644
+--- a/conf/Makefile.common
++++ b/conf/Makefile.common
+@@ -41,7 +41,7 @@ CFLAGS_KERNEL = $(CFLAGS_PLATFORM) -ffreestanding
+ LDFLAGS_KERNEL = $(LDFLAGS_PLATFORM) -nostdlib $(TARGET_LDFLAGS_OLDMAGIC)
+ CPPFLAGS_KERNEL = $(CPPFLAGS_CPU) $(CPPFLAGS_PLATFORM) -DGRUB_KERNEL=1
+ CCASFLAGS_KERNEL = $(CCASFLAGS_CPU) $(CCASFLAGS_PLATFORM)
+-STRIPFLAGS_KERNEL = -R .eh_frame -R .rel.dyn -R .reginfo -R .note -R .comment -R .drectve -R .note.gnu.gold-version -R .MIPS.abiflags -R .ARM.exidx
++STRIPFLAGS_KERNEL = -R .eh_frame -R .rel.dyn -R .reginfo -R .note -R .comment -R .drectve -R .note.gnu.gold-version -R .MIPS.abiflags -R .ARM.exidx -R .note.gnu.property -R .gnu.build.attributes
+ if !COND_emu
+ if COND_HAVE_ASM_USCORE
+   LDFLAGS_KERNEL += -Wl,--defsym=_malloc=_grub_malloc -Wl,--defsym=_free=_grub_free

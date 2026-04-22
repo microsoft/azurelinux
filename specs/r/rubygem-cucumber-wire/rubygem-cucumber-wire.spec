@@ -8,7 +8,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 6.2.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: Wire protocol for Cucumber
 License: MIT
 URL: http://cucumber.io

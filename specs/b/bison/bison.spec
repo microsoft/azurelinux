@@ -4,7 +4,7 @@
 Summary: A GNU general-purpose parser generator
 Name: bison
 Version: 3.8.2
-Release: 11%{?dist}
+Release: 12%{?dist}
 
 # An SPDX license string check done against bison-3.8.2 found strings
 # corresponding to the following licenses across the bison source tree:

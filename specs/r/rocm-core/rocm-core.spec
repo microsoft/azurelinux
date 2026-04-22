@@ -17,7 +17,7 @@
 
 Name:           %{core_name}
 Version:        %{rocm_version}
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        A utility to get the ROCm release version
 Url:            https://github.com/ROCm/%{upstreamname}
 License:        MIT

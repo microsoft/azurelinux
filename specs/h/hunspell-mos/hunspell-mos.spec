@@ -11,7 +11,7 @@ Name: hunspell-mos
 Summary: Mossi hunspell dictionaries
 %global upstreamid 20101130
 Version: 0.%{upstreamid}
-Release: 31%{?dist}
+Release: 32%{?dist}
 Source: http://www.abcburkina.net/ancien/documents/lingu/DicoMoore.zip
 URL: http://www.abcburkina.net/content/view/377/48/lang,fr
 License: LGPL-3.0-only

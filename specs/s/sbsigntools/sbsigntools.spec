@@ -6,7 +6,7 @@
 
 Name:          sbsigntools
 Version:       0.9.5
-Release:       13%{?dist}
+Release: 14%{?dist}
 Summary:       Signing utility for UEFI secure boot
 # Most source code is GPL-3.0-or-later, except:
 # LicenseRef-Fedora-Public-Domain:

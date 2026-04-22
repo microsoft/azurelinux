@@ -4,7 +4,7 @@
 Summary: A tool for generating SELinux security policies for containers
 Name: udica
 Version: 0.2.8
-Release: 11%{?dist}
+Release: 12%{?dist}
 Source0: https://github.com/containers/udica/archive/v%{version}.tar.gz
 #git format-patch -N v0.2.8 -- . ':!.cirrus.yml' ':!.github'
 Patch0001: 0001-Add-option-to-generate-custom-policy-for-a-confined-.patch

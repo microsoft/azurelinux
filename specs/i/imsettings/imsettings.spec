@@ -3,7 +3,7 @@
 
 Name:		imsettings
 Version:	1.8.10
-Release:	3%{?dist}
+Release: 4%{?dist}
 License:	LGPL-2.0-or-later
 URL:		https://gitlab.com/tagoh/%{name}/
 BuildRequires:	desktop-file-utils

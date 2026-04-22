@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 3.23.0
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary: Backports of Ruby features for older Ruby
 License: MIT
 URL: http://github.com/marcandre/backports

@@ -3,7 +3,7 @@
 
 Name:           python-productmd
 Version:        1.50
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Library providing parsers for metadata related to OS installation
 
 License:        LGPL-2.1-only

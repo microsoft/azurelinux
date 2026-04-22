@@ -6,7 +6,7 @@
 
 Name:           perl-Algorithm-Diff
 Version:        %{upstream_version}%{?extra_version}
-Release:        14%{?dist}
+Release: 15%{?dist}
 Summary:        Compute 'intelligent' differences between two files/lists
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Algorithm-Diff

@@ -5,7 +5,7 @@ Name: hyphen-is
 Summary: Icelandic hyphenation rules
 %global upstreamid 20030920
 Version: 0.%{upstreamid}
-Release: 36%{?dist}
+Release: 37%{?dist}
 Source: http://download.services.openoffice.org/contrib/dictionaries/hyph_is_IS.zip
 Patch0: hyphen-is-lppl-license-fix.patch
 URL: http://wiki.services.openoffice.org/wiki/Dictionaries

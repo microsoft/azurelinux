@@ -3,7 +3,7 @@
 
 Name:           perl-Test-Metrics-Any
 Version:        0.01
-Release:        18%{?dist}
+Release: 19%{?dist}
 Summary:        Assert that code produces metrics via Metrics::Any
 # Automatically converted from old format: GPL+ or Artistic - review is highly recommended.
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

@@ -1,0 +1,75 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leo Sandoval <lsandova@redhat.com>
+Date: Fri, 8 Mar 2024 16:54:43 -0600
+Subject: [PATCH] Revert "mm: Assert that we preserve header vs region
+ alignment"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This reverts commit 1df8fe66c57087eb33bd6dc69f786ed124615aa7.
+
+This is temporal while we find the reason for
+
+In file included from ../../include/grub/mm_private.h:23,
+                 from ../../include/grub/relocator_private.h:24,
+                 from ../../grub-core/lib/efi/relocator.c:20:
+../../include/grub/mm_private.h: In function ‘grub_mm_size_sanity_check’:
+../../include/grub/misc.h:36:56: error: duplicate case value
+   36 | #define COMPILE_TIME_ASSERT(cond) switch (0) { case 1: case !(cond): ; }
+      |                                                        ^~~~
+../../include/grub/mm_private.h:105:3: note: in expansion of macro ‘COMPILE_TIME_ASSERT’
+  105 |   COMPILE_TIME_ASSERT ((sizeof (struct grub_mm_region) %
+      |   ^~~~~~~~~~~~~~~~~~~
+../../include/grub/misc.h:36:48: note: previously used here
+   36 | #define COMPILE_TIME_ASSERT(cond) switch (0) { case 1: case !(cond): ; }
+      |                                                ^~~~
+../../include/grub/mm_private.h:105:3: note: in expansion of macro ‘COMPILE_TIME_ASSERT’
+  105 |   COMPILE_TIME_ASSERT ((sizeof (struct grub_mm_region) %
+      |   ^~~~~~~~~~~~~~~~~~~
+../../include/grub/misc.h:36:56: error: duplicate case value
+   36 | #define COMPILE_TIME_ASSERT(cond) switch (0) { case 1: case !(cond): ; }
+      |                                                        ^~~~
+../../include/grub/mm_private.h:112:3: note: in expansion of macro ‘COMPILE_TIME_ASSERT’
+  112 |   COMPILE_TIME_ASSERT (sizeof (struct grub_mm_header) == GRUB_MM_ALIGN);
+      |   ^~~~~~~~~~~~~~~~~~~
+../../include/grub/misc.h:36:48: note: previously used here
+   36 | #define COMPILE_TIME_ASSERT(cond) switch (0) { case 1: case !(cond): ; }
+      |                                                ^~~~
+../../include/grub/mm_private.h:112:3: note: in expansion of macro ‘COMPILE_TIME_ASSERT’
+  112 |   COMPILE_TIME_ASSERT (sizeof (struct grub_mm_header) == GRUB_MM_ALIGN);
+      |   ^~~~~~~~~~~~~~~~~~~
+---
+ include/grub/mm_private.h | 14 --------------
+ 1 file changed, 14 deletions(-)
+
+diff --git a/include/grub/mm_private.h b/include/grub/mm_private.h
+index 96c2d816be6..2481ee1fa20 100644
+--- a/include/grub/mm_private.h
++++ b/include/grub/mm_private.h
+@@ -20,7 +20,6 @@
+ #define GRUB_MM_PRIVATE_H	1
+ 
+ #include <grub/mm.h>
+-#include <grub/misc.h>
+ 
+ /* For context, see kern/mm.c */
+ 
+@@ -99,17 +98,4 @@ typedef struct grub_mm_region
+ extern grub_mm_region_t EXPORT_VAR (grub_mm_base);
+ #endif
+ 
+-static inline void
+-grub_mm_size_sanity_check (void) {
+-  /* Ensure we preserve alignment when doing h = (grub_mm_header_t) (r + 1). */
+-  COMPILE_TIME_ASSERT ((sizeof (struct grub_mm_region) %
+-		        sizeof (struct grub_mm_header)) == 0);
+-
+-  /*
+-   * GRUB_MM_ALIGN is supposed to represent cell size, and a mm_header is
+-   * supposed to be 1 cell.
+-   */
+-  COMPILE_TIME_ASSERT (sizeof (struct grub_mm_header) == GRUB_MM_ALIGN);
+-}
+-
+ #endif

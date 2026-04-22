@@ -6,7 +6,7 @@
 
 Name:           perl-Module-Signature
 Version:        0.93
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        CPAN signature management utilities and modules
 License:        CC0-1.0
 URL:            https://metacpan.org/release/Module-Signature

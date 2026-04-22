@@ -8,7 +8,7 @@
 
 Name:           python-%{srcname}
 Version:        15.0
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        A py.test plugin that re-runs failed tests to eliminate flakey failures
 
 License:        MPL-2.0

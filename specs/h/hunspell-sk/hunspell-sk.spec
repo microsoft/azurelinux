@@ -11,7 +11,7 @@ Summary: Slovak hunspell dictionaries
 Epoch: 1
 %global upstreamid 20110228
 Version: 0.%{upstreamid}
-Release: 30%{?dist}
+Release: 31%{?dist}
 Source: http://www.sk-spell.sk.cx/files/hunspell-sk-%{upstreamid}.zip
 URL: http://www.sk-spell.sk.cx/
 License: LGPL-2.1-only OR GPL-2.0-only OR MPL-1.1

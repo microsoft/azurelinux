@@ -38,7 +38,7 @@
 
 Name:          php-%{composer_vendor}-%{composer_project}
 Version:       %{github_version}
-Release:       16%{?dist}
+Release: 17%{?dist}
 Summary:       Fedora Autoloader
 
 License:       MIT

@@ -9,7 +9,7 @@
 
 Name:           mingw-winpthreads
 Version:        13.0.0
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        MinGW pthread library
 
 # The main license of winpthreads is MIT, but parts of this library

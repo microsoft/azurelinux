@@ -6,7 +6,7 @@
 
 Name:           libsigc++30
 Version:        3.6.0
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        Typesafe signal framework for C++
 
 License:        LGPL-2.1-or-later

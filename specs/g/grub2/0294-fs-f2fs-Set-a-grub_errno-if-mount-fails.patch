@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: B Horn <b@horn.uk>
+Date: Sun, 12 May 2024 06:15:03 +0100
+Subject: [PATCH] fs/f2fs: Set a grub_errno if mount fails
+
+It was previously possible for grub_errno to not be set when
+grub_f2fs_mount() failed if nat_bitmap_ptr() returned NULL.
+
+This issue is solved by ensuring a grub_errno is set in the fail case.
+
+Reported-by: B Horn <b@horn.uk>
+Signed-off-by: B Horn <b@horn.uk>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/fs/f2fs.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/grub-core/fs/f2fs.c b/grub-core/fs/f2fs.c
+index 855e24618..db8a65f8d 100644
+--- a/grub-core/fs/f2fs.c
++++ b/grub-core/fs/f2fs.c
+@@ -872,6 +872,9 @@ grub_f2fs_mount (grub_disk_t disk)
+   return data;
+ 
+  fail:
++  if (grub_errno == GRUB_ERR_NONE)
++    grub_error (GRUB_ERR_BAD_FS, "not a F2FS filesystem");
++
+   grub_free (data);
+ 
+   return NULL;

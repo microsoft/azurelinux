@@ -3,7 +3,7 @@
 
 Name:		libotf
 Version:	0.9.16
-Release:	7%{?dist}
+Release: 8%{?dist}
 Summary:	A Library for handling OpenType Font
 
 License:	LGPL-2.1-or-later

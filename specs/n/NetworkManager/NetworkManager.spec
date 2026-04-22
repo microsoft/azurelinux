@@ -9,7 +9,7 @@ Group:   System Environment/Base
 
 Epoch:   1
 Version: 1.54.3
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 ###############################################################################
 

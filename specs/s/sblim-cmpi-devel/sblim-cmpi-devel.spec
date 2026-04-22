@@ -4,7 +4,7 @@
 
 Name:           sblim-cmpi-devel
 Version:        2.0.3
-Release:        33%{?dist}
+Release: 34%{?dist}
 Summary:        SBLIM CMPI Provider Development Support
 
 License:        EPL-1.0

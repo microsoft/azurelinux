@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: B Horn <b@horn.uk>
+Date: Fri, 1 Nov 2024 23:46:55 +0000
+Subject: [PATCH] normal: Remove variables hooks on module unload
+
+The normal module does not entirely cleanup after itself in
+its GRUB_MOD_FINI() leaving a few variables hooks in place.
+It is not possible to unload normal module now but fix the
+issues for completeness.
+
+On the occasion replace 0s with NULLs for "pager" variable
+hooks unregister.
+
+Fixes: CVE-2025-0622
+
+Reported-by: B Horn <b@horn.uk>
+Signed-off-by: B Horn <b@horn.uk>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/normal/main.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/normal/main.c b/grub-core/normal/main.c
+index cad840e06..dd20e5129 100644
+--- a/grub-core/normal/main.c
++++ b/grub-core/normal/main.c
+@@ -690,7 +690,9 @@ GRUB_MOD_FINI(normal)
+   grub_xputs = grub_xputs_saved;
+ 
+   grub_set_history (0);
+-  grub_register_variable_hook ("pager", 0, 0);
++  grub_register_variable_hook ("pager", NULL, NULL);
++  grub_register_variable_hook ("color_normal", NULL, NULL);
++  grub_register_variable_hook ("color_highlight", NULL, NULL);
+   grub_fs_autoload_hook = 0;
+   grub_unregister_command (cmd_clear);
+ }

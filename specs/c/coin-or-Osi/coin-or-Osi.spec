@@ -6,7 +6,7 @@
 Name:		coin-or-%{module}
 Summary:	COIN-OR Open Solver Interface Library
 Version:	0.108.11
-Release:	4%{?dist}
+Release: 5%{?dist}
 
 # The project as a whole is licensed EPL-2.0.  However, many source files still
 # claim to be licensed EPL-1.0.  This is probably an upstream oversight.

@@ -1,0 +1,38 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Laszlo Ersek <lersek@redhat.com>
+Date: Fri, 7 Apr 2023 14:54:35 +0200
+Subject: [PATCH] grub_dl_set_mem_attrs(): fix format string
+
+The grub_dprintf() call for printing the message
+
+  updating attributes for GOT and trampolines
+
+passes the argument "mod->name", but the format string doesn't accept that
+argument.
+
+Print the module name too.
+
+Example output:
+
+> kern/dl.c:736: updating attributes for GOT and trampolines ("video_fb")
+
+Fixes: ad1b904d325b (nx: set page permissions for loaded modules.)
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+---
+ grub-core/kern/dl.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/kern/dl.c b/grub-core/kern/dl.c
+index 25666ae383f..101e0794dd8 100644
+--- a/grub-core/kern/dl.c
++++ b/grub-core/kern/dl.c
+@@ -733,7 +733,8 @@ grub_dl_set_mem_attrs (grub_dl_t mod, void *ehdr)
+     {
+       tgsz = ALIGN_UP(tgsz, arch_addralign);
+ 
+-      grub_dprintf ("modules", "updating attributes for GOT and trampolines\n",
++      grub_dprintf ("modules",
++		    "updating attributes for GOT and trampolines (\"%s\")\n",
+ 		    mod->name);
+       grub_update_mem_attrs (tgaddr, tgsz, GRUB_MEM_ATTR_R|GRUB_MEM_ATTR_X,
+ 			     GRUB_MEM_ATTR_W);

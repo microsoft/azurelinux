@@ -4,7 +4,7 @@
 Summary: A utility for converting amounts from one unit to another
 Name: units
 Version: 2.24
-Release: 4%{?dist}
+Release: 5%{?dist}
 Source: https://ftp.gnu.org/gnu/units/%{name}-%{version}.tar.gz
 URL: https://www.gnu.org/software/units/units.html
 License: GPL-3.0-or-later

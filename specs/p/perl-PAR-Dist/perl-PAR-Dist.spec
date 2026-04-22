@@ -3,7 +3,7 @@
 
 Name:           perl-PAR-Dist
 Version:        0.53
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Toolkit for creating and manipulating Perl PAR distributions
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/PAR-Dist

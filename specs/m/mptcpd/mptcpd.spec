@@ -4,7 +4,7 @@
 Summary: Multipath TCP daemon
 Name: mptcpd
 Version: 0.13
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPL-2.0-or-later AND BSD-3-Clause
 URL: https://multipath-tcp.org
 Requires(post): systemd

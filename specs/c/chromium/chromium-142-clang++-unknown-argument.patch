@@ -1,0 +1,13 @@
+diff -up chromium-142.0.7444.52/build/config/compiler/BUILD.gn.clang++-unsupported-argument chromium-142.0.7444.52/build/config/compiler/BUILD.gn
+--- chromium-142.0.7444.52/build/config/compiler/BUILD.gn.clang++-unsupported-argument	2025-10-28 19:41:59.131433882 +0100
++++ chromium-142.0.7444.52/build/config/compiler/BUILD.gn	2025-10-28 19:42:51.792779638 +0100
+@@ -2160,9 +2160,6 @@ config("default_warnings") {
+       # TODO(crbug.com/40284799): Fix and re-enable.
+       "-Wno-thread-safety-reference-return",
+ 
+-      # TODO(crbug.com/376641662): Fix and re-enable.
+-      "-Wno-nontrivial-memcall",
+-
+       # TODO(crbug.com/432275627): Fix and re-enable.
+       "-Wno-uninitialized-const-pointer",
+     ]

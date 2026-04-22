@@ -3,7 +3,7 @@
 
 Name:		synce4l
 Version:	1.1.0
-Release:	5%{?dist}
+Release: 6%{?dist}
 Summary:	SyncE implementation for Linux
 
 License:	GPL-2.0-or-later

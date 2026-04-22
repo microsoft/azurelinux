@@ -4,7 +4,7 @@
 Summary: epoxy runtime library
 Name: libepoxy
 Version: 1.5.10
-Release: 11%{?dist}
+Release: 12%{?dist}
 # SPDX
 License: MIT
 URL: https://github.com/anholt/libepoxy

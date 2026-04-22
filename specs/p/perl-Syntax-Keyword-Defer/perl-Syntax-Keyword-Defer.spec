@@ -13,7 +13,7 @@
 
 Name:           perl-Syntax-Keyword-Defer
 Version:        0.11
-Release:        5%{?dist}
+Release: 6%{?dist}
 Summary:        Add defer block syntax to Perl
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Syntax-Keyword-Defer

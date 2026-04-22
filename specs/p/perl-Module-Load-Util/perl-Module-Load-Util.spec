@@ -3,7 +3,7 @@
 
 Name:           perl-Module-Load-Util
 Version:        0.012
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Some utility routines related to module loading
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Module-Load-Util/

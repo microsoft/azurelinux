@@ -25,7 +25,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
 Version:        3.2.1
-Release:        9%{?dist}
+Release: 10%{?dist}
 Summary:        Library for handling version information and constraints
 
 License:        BSD-3-Clause

@@ -1,0 +1,11 @@
+--- a/config/FindPETSC.orig.cmake	2019-10-22 01:10:24.000000000 +0200
++++ b/config/FindPETSC.cmake	2019-10-26 15:50:39.747116576 +0200
+@@ -478,7 +478,7 @@
+ 
+ include (FindPackageHandleStandardArgs)
+ find_package_handle_standard_args (PETSC
+-  REQUIRED_VARS PETSC_INCLUDES PETSC_LIBRARIES PETSC_EXECUTABLE_RUNS
++  REQUIRED_VARS PETSC_INCLUDES PETSC_LIBRARIES
+   VERSION_VAR PETSC_VERSION
+   FAIL_MESSAGE "PETSC could not be found. Be sure to set PETSC_DIR and PETSC_ARCH.")
+ 

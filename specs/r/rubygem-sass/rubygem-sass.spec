@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 3.7.4
-Release: 13%{?dist}
+Release: 14%{?dist}
 Summary: A powerful but elegant CSS compiler that makes CSS fun again
 License: MIT
 URL: http://sass-lang.com/

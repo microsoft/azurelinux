@@ -3,7 +3,7 @@
 
 Name:           perl-Test-Pod-LinkCheck
 Version:        0.008
-Release:        39%{?dist}
+Release: 40%{?dist}
 Summary:        Tests POD for invalid links
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Test-Pod-LinkCheck

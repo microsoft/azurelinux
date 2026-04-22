@@ -33,7 +33,7 @@ and local caching of the fetched data.
 
 Name:           python-%{pypi_name}
 Version:        1.7.0
-Release:        24%{?dist}
+Release: 25%{?dist}
 Summary:        Python library for consuming OpenStack sevice-types-authority data
 
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.

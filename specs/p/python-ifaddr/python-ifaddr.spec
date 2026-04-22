@@ -8,7 +8,7 @@ of the computer.
 
 Name:           python-%{srcname}
 Version:        0.2.0
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Python library that allows you to find all the IP addresses of the computer
 
 License:        MIT

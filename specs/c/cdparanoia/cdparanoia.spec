@@ -4,7 +4,7 @@
 Summary: Compact Disc Digital Audio (CDDA) extraction tool (or ripper)
 Name: cdparanoia
 Version: 10.2
-Release: 48%{?dist}
+Release: 49%{?dist}
 # the app is GPLv2 and GPLv2+, everything else is LGPLv2
 # Automatically converted from old format: GPLv2 and GPLv2+ and LGPLv2 - review is highly recommended.
 License: GPL-2.0-only AND GPL-2.0-or-later AND LicenseRef-Callaway-LGPLv2

@@ -4,7 +4,7 @@
 Summary:	Tool to translate x86-64 CPU Machine Check Exception data
 Name:		mcelog
 Version:	175
-Release:	13%{?dist}
+Release: 14%{?dist}
 Epoch:		3
 License:	GPL-2.0-only
 URL:		https://github.com/andikleen/mcelog

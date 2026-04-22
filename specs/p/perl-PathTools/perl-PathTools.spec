@@ -5,7 +5,7 @@
 
 Name:           perl-PathTools
 Version:        3.94
-Release:        520%{?dist}
+Release: 521%{?dist}
 Summary:        PathTools Perl module (Cwd, File::Spec)
 # Cwd.xs:                   BSD-3-Clause
 # other files:              GPL-1.0-or-later OR Artistic-1.0-Perl

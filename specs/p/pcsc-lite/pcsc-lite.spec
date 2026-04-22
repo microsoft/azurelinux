@@ -10,7 +10,7 @@
 
 Name:           pcsc-lite
 Version:        2.3.3
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        PC/SC Lite smart card framework and applications
 
 License:        BSD-3-Clause AND BSD-2-Clause AND GPL-3.0-or-later

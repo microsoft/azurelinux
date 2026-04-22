@@ -5,7 +5,7 @@
 
 Name:           sip6
 Version:        6.15.1
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        SIP - Python/C++ Bindings Generator
 %py_provides    python3-sip6
 

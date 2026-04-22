@@ -12,7 +12,7 @@ Goals:
 
 Name:           python-strict-rfc3339
 Version:        0.7
-Release:        20%{?dist}
+Release: 21%{?dist}
 Summary:        Strict, simple, lightweight RFC3339 functions
 
 License:        GPL-3.0-only

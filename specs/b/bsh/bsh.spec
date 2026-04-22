@@ -33,7 +33,7 @@
 
 Name:           bsh
 Version:        2.1.0
-Release:        17%{?dist}
+Release: 18%{?dist}
 Epoch:          0
 Summary:        Lightweight Scripting for Java
 URL:            https://beanshell.github.io/

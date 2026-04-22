@@ -3,7 +3,7 @@
 
 Name:		perl-Perl-PrereqScanner-NotQuiteLite
 Version:	0.9917
-Release:	7%{?dist}
+Release: 8%{?dist}
 Summary:	A tool to scan your Perl code for its prerequisites
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Perl-PrereqScanner-NotQuiteLite

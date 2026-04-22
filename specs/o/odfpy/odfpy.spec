@@ -3,7 +3,7 @@
 
 Name:           odfpy
 Version:        1.4.1
-Release:        17%{?dist}
+Release: 18%{?dist}
 Summary:        Python library for manipulating OpenDocument files
 
 # Automatically converted from old format: GPLv2+ - review is highly recommended.

@@ -15,7 +15,7 @@
 Name:           ghc-%{pkg_name}
 Version:        1.5.3
 # can only be reset when subpkg bumped
-Release:        26%{?dist}
+Release: 27%{?dist}
 Summary:        Modern and extensible testing framework
 
 License:        MIT

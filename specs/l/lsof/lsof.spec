@@ -4,7 +4,7 @@
 Summary: A utility which lists open files on a Linux/UNIX system
 Name: lsof
 Version: 4.98.0
-Release: 8%{?dist}
+Release: 9%{?dist}
 License: lsof
 URL: https://github.com/lsof-org/lsof
 

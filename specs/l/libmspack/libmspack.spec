@@ -3,7 +3,7 @@
 
 Name:           libmspack
 Version:        0.10.1
-Release:        0.15.alpha%{?dist}
+Release: 1.15.alpha%{?dist}
 Summary:        Library for CAB and related files compression and decompression
 
 # CRC32 is LicenseRef-Fedora-UltraPermissive

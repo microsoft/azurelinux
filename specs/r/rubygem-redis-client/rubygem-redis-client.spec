@@ -8,7 +8,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 0.22.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: Simple low-level client for Redis 6+
 License: MIT
 URL: https://github.com/redis-rb/redis-client

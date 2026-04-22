@@ -9,7 +9,7 @@ License:        Apache-2.0
 Summary:        A framework to implement simple but nice CLIs
 Epoch:          1
 Version:        2.0.2
-Release:        4%{?dist}
+Release: 5%{?dist}
 URL:            https://github.com/open-iscsi/configshell-fb
 Source:         %{url}/archive/v%{version}/%{oname}-%{version}.tar.gz
 BuildArch:      noarch

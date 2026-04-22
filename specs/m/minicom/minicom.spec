@@ -4,7 +4,7 @@
 Summary: A text-based modem control and terminal emulation program
 Name: minicom
 Version: 2.10
-Release: 1%{?dist}
+Release: 3%{?dist}
 URL: https://salsa.debian.org/minicom-team/minicom
 # The file 'src/wildmat.c' is LicenseRef-Fedora-Public-Domain.
 # Some LGPL-2.0-or-later files (e.g., 'lib/getopt.c', 'lib/error.c')
@@ -74,6 +74,9 @@ mkdir -p %{buildroot}%{_sysconfdir}
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.10-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Mon Nov 24 2025 Stefan Becker <chemobejk@gmail.com> - 2.10-1
 - Rebase to upstream version 2.10 (rhbz#2208236)
 - Add patch to fix baudrate setting on F43+ (rhbz#2407160)

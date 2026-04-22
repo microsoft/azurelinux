@@ -3,7 +3,7 @@
 
 Name:           perl-Devel-LexAlias
 Version:        0.05
-Release:        41%{?dist}
+Release: 42%{?dist}
 Summary:        Alias lexical variables
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Devel-LexAlias

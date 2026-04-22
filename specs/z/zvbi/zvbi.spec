@@ -6,7 +6,7 @@
 
 Name:               zvbi
 Version:            0.2.44
-Release:            2%{?dist}
+Release: 3%{?dist}
 Summary:            Raw VBI, Teletext and Closed Caption decoding library
 License:            GPL-2.0-or-later AND LGPL-2.0-or-later AND LGPL-2.1-or-later AND BSD-2-Clause AND MIT
 URL:                https://github.com/zapping-vbi/zvbi

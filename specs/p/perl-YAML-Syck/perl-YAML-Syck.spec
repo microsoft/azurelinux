@@ -10,7 +10,7 @@
 
 Name:           perl-YAML-Syck
 Version:        1.36
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Fast, lightweight YAML loader and dumper
 # gram.*: GPL-2.0-or-later
 # *:      MIT

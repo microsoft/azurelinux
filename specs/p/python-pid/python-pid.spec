@@ -15,7 +15,7 @@ PidFile can also be used as a context manager or a decorator.}
 
 Name:           python-%{srcname}
 Version:        3.0.4
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        PID file management library
 
 License:        Apache-2.0

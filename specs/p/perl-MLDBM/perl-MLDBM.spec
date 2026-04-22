@@ -3,7 +3,7 @@
 
 Name:           perl-MLDBM
 Version:        2.05
-Release:        36%{?dist}
+Release: 37%{?dist}
 Summary:        Store multi-level hash structure in single level tied hash
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/MLDBM

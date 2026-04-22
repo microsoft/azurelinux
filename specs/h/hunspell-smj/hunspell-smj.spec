@@ -9,7 +9,7 @@
 Name: hunspell-smj
 Summary: Lule Saami hunspell dictionaries
 Version: 1.0
-Release: 0.32.beta7%{?dist}
+Release: 1.32.beta7%{?dist}
 Source: http://divvun.no/static_files/hunspell-smj.tar.gz
 URL: http://www.divvun.no/index.html
 License: GPL-3.0-only

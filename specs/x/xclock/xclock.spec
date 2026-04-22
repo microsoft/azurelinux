@@ -3,7 +3,7 @@
 
 Name:       xclock
 Version:    1.1.1
-Release:    9%{?dist}
+Release: 10%{?dist}
 Summary:    The classic X Window System clock utility
 
 License:    MIT-open-group AND SMLNJ AND MIT
@@ -33,7 +33,7 @@ frequency which may be specified by the user.
 %autosetup
 
 %build
-autoreconf -v --install
+autoreconf -v --install --force
 %configure --disable-silent-rules
 %make_build
 

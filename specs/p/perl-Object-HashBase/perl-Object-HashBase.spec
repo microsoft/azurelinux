@@ -3,7 +3,7 @@
 
 Name:           perl-Object-HashBase
 Version:        0.015
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Build hash-based classes
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Object-HashBase

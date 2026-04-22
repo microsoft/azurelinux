@@ -11,7 +11,7 @@ http requests and their responses.}
 
 Name:		python-%{srcname}
 Version:	1.0.8
-Release:	11%{?dist}
+Release: 12%{?dist}
 Summary:	HTTP server for pytest
 
 License:	MIT

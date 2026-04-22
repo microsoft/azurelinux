@@ -41,7 +41,7 @@
 
 Name:           %{rocjpeg_name}
 Version:        %{rocm_version}
-Release:        5%{?dist}
+Release: 6%{?dist}
 Summary:        A high-performance jpeg decode library for AMD’s GPUs
 
 Url:            https://github.com/ROCm/rocJPEG

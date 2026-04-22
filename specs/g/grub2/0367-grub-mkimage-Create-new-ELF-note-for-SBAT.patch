@@ -1,0 +1,167 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Sudhakar Kuppusamy <sudhakar@linux.ibm.com>
+Date: Wed, 23 Oct 2024 17:54:32 +0530
+Subject: [PATCH] grub-mkimage: Create new ELF note for SBAT
+
+In order to store the SBAT data we create a new ELF note. The string
+".sbat", zero-padded to 4 byte alignment, shall be entered in the name
+field. The string "SBAT"'s ASCII values, 0x53424154, should be entered
+in the type field.
+
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+Signed-off-by: Sudhakar Kuppusamy <sudhakar@linux.ibm.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ include/grub/util/mkimage.h |  4 ++--
+ util/grub-mkimagexx.c       | 48 +++++++++++++++++++++++++++++++++++++++++++--
+ util/mkimage.c              |  5 +++--
+ 3 files changed, 51 insertions(+), 6 deletions(-)
+
+diff --git a/include/grub/util/mkimage.h b/include/grub/util/mkimage.h
+index 6f1da89b9b65..881e3031f41f 100644
+--- a/include/grub/util/mkimage.h
++++ b/include/grub/util/mkimage.h
+@@ -51,12 +51,12 @@ grub_mkimage_load_image64 (const char *kernel_path,
+ 			   const struct grub_install_image_target_desc *image_target);
+ void
+ grub_mkimage_generate_elf32 (const struct grub_install_image_target_desc *image_target,
+-			     int note, size_t appsig_size, char **core_img, size_t *core_size,
++			     int note, size_t appsig_size, char *sbat, char **core_img, size_t *core_size,
+ 			     Elf32_Addr target_addr,
+ 			     struct grub_mkimage_layout *layout);
+ void
+ grub_mkimage_generate_elf64 (const struct grub_install_image_target_desc *image_target,
+-			     int note, size_t appsig_size, char **core_img, size_t *core_size,
++			     int note, size_t appsig_size, char *sbat, char **core_img, size_t *core_size,
+ 			     Elf64_Addr target_addr,
+ 			     struct grub_mkimage_layout *layout);
+ 
+diff --git a/util/grub-mkimagexx.c b/util/grub-mkimagexx.c
+index 9488f052510a..b9930544889d 100644
+--- a/util/grub-mkimagexx.c
++++ b/util/grub-mkimagexx.c
+@@ -116,6 +116,14 @@ struct section_metadata
+   const char *strtab;
+ };
+ 
++#define GRUB_SBAT_NOTE_NAME ".sbat"
++#define GRUB_SBAT_NOTE_TYPE 0x53424154 /* "SBAT" */
++
++struct grub_sbat_note {
++  Elf32_Nhdr header;
++  char name[ALIGN_UP(sizeof(GRUB_SBAT_NOTE_NAME), 4)];
++};
++
+ static int
+ is_relocatable (const struct grub_install_image_target_desc *image_target)
+ {
+@@ -217,7 +225,7 @@ grub_arm_reloc_jump24 (grub_uint32_t *target, Elf32_Addr sym_addr)
+ 
+ void
+ SUFFIX (grub_mkimage_generate_elf) (const struct grub_install_image_target_desc *image_target,
+-				    int note, size_t appsig_size, char **core_img, size_t *core_size,
++				    int note, size_t appsig_size, char *sbat, char **core_img, size_t *core_size,
+ 				    Elf_Addr target_addr,
+ 				    struct grub_mkimage_layout *layout)
+ {
+@@ -226,10 +234,17 @@ SUFFIX (grub_mkimage_generate_elf) (const struct grub_install_image_target_desc
+   Elf_Ehdr *ehdr;
+   Elf_Phdr *phdr;
+   Elf_Shdr *shdr;
+-  int header_size, footer_size = 0;
++  int header_size, footer_size = 0, footer_offset = 0;
+   int phnum = 1;
+   int shnum = 4;
+   int string_size = sizeof (".text") + sizeof ("mods") + 1;
++  char *footer;
++
++  if (sbat)
++    {
++      phnum++;
++      footer_size += ALIGN_UP (sizeof (struct grub_sbat_note) + layout->sbat_size, 4);
++    }
+ 
+   if (appsig_size)
+     {
+@@ -263,6 +278,7 @@ SUFFIX (grub_mkimage_generate_elf) (const struct grub_install_image_target_desc
+   ehdr = (void *) elf_img;
+   phdr = (void *) (elf_img + sizeof (*ehdr));
+   shdr = (void *) (elf_img + sizeof (*ehdr) + phnum * sizeof (*phdr));
++  footer = elf_img + program_size + header_size;
+   memcpy (ehdr->e_ident, ELFMAG, SELFMAG);
+   ehdr->e_ident[EI_CLASS] = ELFCLASSXX;
+   if (!image_target->bigendian)
+@@ -435,6 +451,8 @@ SUFFIX (grub_mkimage_generate_elf) (const struct grub_install_image_target_desc
+       phdr->p_filesz = grub_host_to_target32 (XEN_NOTE_SIZE);
+       phdr->p_memsz = 0;
+       phdr->p_offset = grub_host_to_target32 (header_size + program_size);
++      footer = ptr;
++      footer_offset = XEN_NOTE_SIZE;
+     }
+ 
+   if (image_target->id == IMAGE_XEN_PVH)
+@@ -468,6 +486,8 @@ SUFFIX (grub_mkimage_generate_elf) (const struct grub_install_image_target_desc
+       phdr->p_filesz = grub_host_to_target32 (XEN_PVH_NOTE_SIZE);
+       phdr->p_memsz = 0;
+       phdr->p_offset = grub_host_to_target32 (header_size + program_size);
++      footer = ptr;
++      footer_offset = XEN_PVH_NOTE_SIZE;
+     }
+ 
+   if (note)
+@@ -498,6 +518,30 @@ SUFFIX (grub_mkimage_generate_elf) (const struct grub_install_image_target_desc
+       phdr->p_filesz = grub_host_to_target32 (note_size);
+       phdr->p_memsz = 0;
+       phdr->p_offset = grub_host_to_target32 (header_size + program_size);
++      footer = (elf_img + program_size + header_size + note_size);
++      footer_offset += note_size;
++    }
++
++  if (sbat)
++    {
++      int note_size = ALIGN_UP (sizeof (struct grub_sbat_note) + layout->sbat_size, 4);
++      struct grub_sbat_note *note_ptr = (struct grub_sbat_note *) footer;
++
++      note_ptr->header.n_namesz = grub_host_to_target32 (sizeof (GRUB_SBAT_NOTE_NAME));
++      note_ptr->header.n_descsz = grub_host_to_target32 (ALIGN_UP(layout->sbat_size, 4));
++      note_ptr->header.n_type = grub_host_to_target32 (GRUB_SBAT_NOTE_TYPE);
++      memcpy (note_ptr->name, GRUB_SBAT_NOTE_NAME, sizeof (GRUB_SBAT_NOTE_NAME));
++      memcpy ((char *)(note_ptr + 1), sbat, layout->sbat_size);
++
++      phdr++;
++      phdr->p_type = grub_host_to_target32 (PT_NOTE);
++      phdr->p_flags = grub_host_to_target32 (PF_R);
++      phdr->p_align = grub_host_to_target32 (image_target->voidp_sizeof);
++      phdr->p_vaddr = 0;
++      phdr->p_paddr = 0;
++      phdr->p_filesz = grub_host_to_target32 (note_size);
++      phdr->p_memsz = 0;
++      phdr->p_offset = grub_host_to_target32 (header_size + program_size + footer_offset);
+     }
+ 
+   if (appsig_size) {
+diff --git a/util/mkimage.c b/util/mkimage.c
+index f31fdefa814a..7fa6a7b21954 100644
+--- a/util/mkimage.c
++++ b/util/mkimage.c
+@@ -1848,6 +1848,7 @@ grub_install_generate_image (const char *dir, const char *prefix,
+     case IMAGE_I386_IEEE1275:
+       {
+ 	grub_uint64_t target_addr;
++	char *sbat = NULL;
+ 	if (image_target->id == IMAGE_LOONGSON_ELF)
+ 	  {
+ 	    if (comp == GRUB_COMPRESSION_NONE)
+@@ -1859,10 +1860,10 @@ grub_install_generate_image (const char *dir, const char *prefix,
+ 	else
+ 	  target_addr = image_target->link_addr;
+ 	if (image_target->voidp_sizeof == 4)
+-	  grub_mkimage_generate_elf32 (image_target, note, appsig_size, &core_img,
++	  grub_mkimage_generate_elf32 (image_target, note, appsig_size, sbat, &core_img,
+ 				       &core_size, target_addr, &layout);
+ 	else
+-	  grub_mkimage_generate_elf64 (image_target, note, appsig_size, &core_img,
++	  grub_mkimage_generate_elf64 (image_target, note, appsig_size, sbat, &core_img,
+ 				       &core_size, target_addr, &layout);
+       }
+       break;

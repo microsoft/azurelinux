@@ -6,7 +6,7 @@
 Summary: Font Metrics Parser for Prawn
 Name: rubygem-%{gem_name}
 Version: 1.7.0
-Release: 13%{?dist}
+Release: 14%{?dist}
 # Automatically converted from old format: GPLv2 or GPLv3 or Ruby - review is highly recommended.
 License: GPL-2.0-only OR GPL-3.0-only OR Ruby
 URL: https://github.com/prawnpdf/ttfunk

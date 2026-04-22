@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 0.0.4
-Release: 20%{?dist}
+Release: 21%{?dist}
 Summary: Dynamic inspection of the hierarchy of method definitions on a Ruby object
 # https://github.com/floehopper/introspection/issues/1
 License: MIT

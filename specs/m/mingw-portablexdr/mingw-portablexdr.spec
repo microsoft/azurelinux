@@ -5,7 +5,7 @@
 
 Name:		mingw-portablexdr
 Version:	4.9.1
-Release:	38%{?dist}
+Release: 39%{?dist}
 Summary:	MinGW Windows PortableXDR / RPC Library
 
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.

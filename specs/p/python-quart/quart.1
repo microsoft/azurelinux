@@ -1,0 +1,74 @@
+.TH QUART "1" "February 2024" "" "User Commands"
+.SH NAME
+.B quart
+\(en A general utility script for Quart applications.
+.SH SYNOPSIS
+.B quart
+.RI [ OPTIONS ]
+.I COMMAND
+.RI [ ARGS ]...
+.SH DESCRIPTION
+A general utility script for Quart applications.
+An application to load must be given with the
+.B \-\-app
+option,
+.B QUART_APP
+environment variable, or with an
+.B app.py
+file in the current directory.
+.SH OPTIONS
+.SS "OPTIONAL\ ARGUMENTS"
+.TP
+.B \-e\fR,\ \fB\-\-env\-file\ \fIFILE
+Load environment variables from this file.
+.B python-dotenv
+must be installed.
+.B \-A\fR,\ \fB\-\-app\ \FIIMPORT
+The QUART application or factory function to load,
+in the form
+.IB module : name\fR.
+Module can be a dotted import or file path.
+Name is not required if it is
+.BR app ,
+.BR application ,
+.BR create_app ,
+or
+.BR make_app ,
+and can be
+.Ib name ( args )
+to pass arguments.
+.TP
+.B \-\-debug\fR\ /\ \fB\-\-no\-debug
+Set
+.B app.debug
+separately from
+.BR \-\-env .
+.TP
+.B \-\-version
+Show the Quart version
+.TP
+.B \-\-help
+Show a help message and exit
+.SS "COMMANDS"
+.TP
+.B routes
+Show the routes for the app.
+.IP
+See
+.BR quart\-routes (1).
+.TP
+.B run
+Run a development server.
+.IP
+See
+.BR quart\-run (1).
+.TP
+.B shell
+Run a shell in the app context.
+.IP
+See
+.BR quart\-shell (1).
+.SH "SEE\ ALSO"
+.BR quart\-routes (1),
+.BR quart\-run (1),
+.BR quart\-shell (1)

@@ -5,7 +5,7 @@
 
 Name:    tpm2-tools
 Version: 5.7
-Release: 4%{?candidate:.%{candidate}}%{?dist}
+Release: 5%{?candidate:.%{candidate}}%{?dist}
 Summary: A bunch of TPM testing toolS build upon tpm2-tss
 
 License: BSD-3-Clause

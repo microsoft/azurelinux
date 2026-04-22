@@ -4,7 +4,7 @@
 Summary:        Encrypt Data with Cipher Block Chaining Mode
 Name:           perl-Crypt-CBC
 Version:        3.07
-Release:        1%{?dist}
+Release: 2%{?dist}
 # Upstream confirms that they're under the same license as perl.
 # Wording in CBC.pm is less than clear, but still.
 # https://github.com/cpan-authors/Lib-Crypt-CBC/issues/14

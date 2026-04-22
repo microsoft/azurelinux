@@ -3,7 +3,7 @@
 
 Name:		sblim-indication_helper
 Version:	0.5.0
-Release:	16%{?dist}
+Release: 17%{?dist}
 Summary:	Toolkit for CMPI indication providers
 
 License:	EPL-1.0

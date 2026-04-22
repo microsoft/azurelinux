@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alec Brown <alec.r.brown@oracle.com>
+Date: Tue, 4 Feb 2025 15:11:11 +0000
+Subject: [PATCH] normal/menu: Use safe math to avoid an integer overflow
+
+The Coverity indicates that the variable current_entry might overflow.
+To prevent this use safe math when adding GRUB_MENU_PAGE_SIZE to current_entry.
+
+On the occasion fix limiting condition which was broken.
+
+Fixes: CID 473853
+
+Signed-off-by: Alec Brown <alec.r.brown@oracle.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/normal/menu.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/grub-core/normal/menu.c b/grub-core/normal/menu.c
+index cda10fa8b..97687013c 100644
+--- a/grub-core/normal/menu.c
++++ b/grub-core/normal/menu.c
+@@ -32,6 +32,7 @@
+ #include <grub/script_sh.h>
+ #include <grub/gfxterm.h>
+ #include <grub/dl.h>
++#include <grub/safemath.h>
+ 
+ /* Time to delay after displaying an error message about a default/fallback
+    entry failing to boot.  */
+@@ -784,9 +785,7 @@ run_menu (grub_menu_t menu, int nested, int *auto_boot, int *notify_boot)
+ 
+ 	    case GRUB_TERM_CTRL | 'c':
+ 	    case GRUB_TERM_KEY_NPAGE:
+-	      if (current_entry + GRUB_MENU_PAGE_SIZE < menu->size)
+-		current_entry += GRUB_MENU_PAGE_SIZE;
+-	      else
++	      if (grub_add (current_entry, GRUB_MENU_PAGE_SIZE, &current_entry) || current_entry >= menu->size)
+ 		current_entry = menu->size - 1;
+ 	      menu_set_chosen_entry (current_entry);
+ 	      break;

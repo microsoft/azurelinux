@@ -1,0 +1,307 @@
+From 796ab90d216de97c0bb1484aaff06c03fbbd376a Mon Sep 17 00:00:00 2001
+From: Tom Rix <Tom.Rix@amd.com>
+Date: Fri, 18 Apr 2025 07:30:37 -0700
+Subject: [PATCH] tensile fedora gpus
+
+---
+ Tensile/AsmCaps.py                            | 132 ++++++++++++++++++
+ Tensile/Common.py                             |  10 +-
+ Tensile/Source/CMakeLists.txt                 |   4 +-
+ Tensile/Source/lib/include/Tensile/AMDGPU.hpp |  16 ++-
+ .../include/Tensile/PlaceholderLibrary.hpp    |   6 +
+ 5 files changed, 160 insertions(+), 8 deletions(-)
+
+diff --git a/Tensile/AsmCaps.py b/Tensile/AsmCaps.py
+index dd920e51..ebdd7364 100644
+--- a/Tensile/AsmCaps.py
++++ b/Tensile/AsmCaps.py
+@@ -639,6 +639,50 @@ CACHED_ASM_CAPS = \
+               'v_mov_b64': False,
+               'v_pk_fma_f16': True,
+               'v_pk_fmac_f16': False},
++ (10, 3, 5): {'HasAddLshl': True,
++              'HasAtomicAdd': False,
++              'HasDirectToLdsDest': False,
++              'HasDirectToLdsNoDest': True,
++              'HasExplicitCO': True,
++              'HasExplicitNC': True,
++              'HasGLCModifier': True,
++              'HasNTModifier': False,
++              'HasLshlOr': True,
++              'HasMFMA': False,
++              'HasMFMA_b8': False,
++              'HasMFMA_bf16_1k': False,
++              'HasMFMA_bf16_original': False,
++              'HasMFMA_constSrc': False,
++              'HasMFMA_f64': False,
++              'HasMFMA_f8': False,
++              'HasMFMA_i8_908': False,
++              'HasMFMA_i8_940': False,
++              'HasMFMA_vgpr': False,
++              'HasMFMA_xf32': False,
++              'HasSMulHi': True,
++              'HasWMMA': False,
++              'KernargPreloading': False,
++              'MaxLgkmcnt': 15,
++              'MaxVmcnt': 63,
++              'SupportedISA': True,
++              'SupportedSource': True,
++              'VOP3v_dot4_i32_i8': True,
++              'v_dot2_f32_f16': True,
++              'v_dot2c_f32_f16': True,
++              'v_dot4_i32_i8': False,
++              'v_dot4c_i32_i8': True,
++              'v_fma_f16': True,
++              'v_fma_f32': True,
++              'v_fma_f64': True,
++              'v_fma_mix_f32': True,
++              'v_fmac_f16': False,
++              'v_fmac_f32': True,
++              'v_mac_f16': False,
++              'v_mac_f32': False,
++              'v_mad_mix_f32': False,
++              'v_mov_b64': False,
++              'v_pk_fma_f16': True,
++              'v_pk_fmac_f16': False},
+  (11, 0, 0): {'HasAddLshl': True,
+               'HasAtomicAdd': True,
+               'HasDirectToLdsDest': False,
+@@ -815,6 +859,50 @@ CACHED_ASM_CAPS = \
+               'v_mov_b64': False,
+               'v_pk_fma_f16': True,
+               'v_pk_fmac_f16': False},
++ (11, 0, 3): {'HasAddLshl': True,
++             'HasAtomicAdd': True,
++             'HasDirectToLdsDest': False,
++             'HasDirectToLdsNoDest': False,
++             'HasExplicitCO': True,
++             'HasExplicitNC': True,
++             'HasGLCModifier': True,
++             'HasNTModifier': False,
++             'HasLshlOr': True,
++             'HasMFMA': False,
++             'HasMFMA_b8': False,
++             'HasMFMA_bf16_1k': False,
++             'HasMFMA_bf16_original': False,
++             'HasMFMA_constSrc': False,
++             'HasMFMA_f64': False,
++             'HasMFMA_f8': False,
++             'HasMFMA_i8_908': False,
++             'HasMFMA_i8_940': False,
++             'HasMFMA_vgpr': False,
++             'HasMFMA_xf32': False,
++             'HasSMulHi': True,
++             'HasWMMA': True,
++             'KernargPreloading': False,
++             'MaxLgkmcnt': 15,
++             'MaxVmcnt': 63,
++             'SupportedISA': True,
++             'SupportedSource': True,
++             'VOP3v_dot4_i32_i8': False,
++             'v_dot2_f32_f16': True,
++             'v_dot2c_f32_f16': True,
++             'v_dot4_i32_i8': False,
++             'v_dot4c_i32_i8': False,
++             'v_fma_f16': True,
++             'v_fma_f32': True,
++             'v_fma_f64': True,
++             'v_fma_mix_f32': True,
++             'v_fmac_f16': False,
++             'v_fmac_f32': True,
++             'v_mac_f16': False,
++             'v_mac_f32': False,
++             'v_mad_mix_f32': False,
++             'v_mov_b64': False,
++             'v_pk_fma_f16': True,
++             'v_pk_fmac_f16': False},
+  (11, 5, 1): {'HasAddLshl': True,
+               'HasAtomicAdd': True,
+               'HasDirectToLdsDest': False,
+@@ -859,6 +947,50 @@ CACHED_ASM_CAPS = \
+               'v_mov_b64': False,
+               'v_pk_fma_f16': True,
+               'v_pk_fmac_f16': False},
++ (11, 5, 2): {'HasAddLshl': True,
++              'HasAtomicAdd': True,
++              'HasDirectToLdsDest': False,
++              'HasDirectToLdsNoDest': False,
++              'HasExplicitCO': True,
++              'HasExplicitNC': True,
++              'HasGLCModifier': True,
++              'HasNTModifier': False,
++              'HasLshlOr': True,
++              'HasMFMA': False,
++              'HasMFMA_b8': False,
++              'HasMFMA_bf16_1k': False,
++              'HasMFMA_bf16_original': False,
++              'HasMFMA_constSrc': False,
++              'HasMFMA_f64': False,
++              'HasMFMA_f8': False,
++              'HasMFMA_i8_908': False,
++              'HasMFMA_i8_940': False,
++              'HasMFMA_vgpr': False,
++              'HasMFMA_xf32': False,
++              'HasSMulHi': True,
++              'HasWMMA': True,
++              'KernargPreloading': False,
++              'MaxLgkmcnt': 15,
++              'MaxVmcnt': 63,
++              'SupportedISA': True,
++              'SupportedSource': True,
++              'VOP3v_dot4_i32_i8': False,
++              'v_dot2_f32_f16': True,
++              'v_dot2c_f32_f16': True,
++              'v_dot4_i32_i8': False,
++              'v_dot4c_i32_i8': False,
++              'v_fma_f16': True,
++              'v_fma_f32': True,
++              'v_fma_f64': True,
++              'v_fma_mix_f32': True,
++              'v_fmac_f16': False,
++              'v_fmac_f32': True,
++              'v_mac_f16': False,
++              'v_mac_f32': False,
++              'v_mad_mix_f32': False,
++              'v_mov_b64': False,
++              'v_pk_fma_f16': True,
++              'v_pk_fmac_f16': False},
+  (12, 0, 0): {'HasAddLshl': True,
+               'HasAtomicAdd': False,
+               'HasDirectToLdsDest': False,
+diff --git a/Tensile/Common.py b/Tensile/Common.py
+index 3c1a239a..2a03a7bb 100644
+--- a/Tensile/Common.py
++++ b/Tensile/Common.py
+@@ -245,9 +245,9 @@ globalParameters["MaxFileName"] = 64              # If a file name would be long
+ globalParameters["SupportedISA"] = [(8,0,3),
+                                     (9,0,0), (9,0,6), (9,0,8), (9,0,10),
+                                     (9,4,0), (9,4,1), (9,4,2),
+-                                    (10,1,0), (10,1,1), (10,1,2), (10,3,0), (10,3,1),
+-                                    (11,0,0), (11,0,1), (11,0,2),
+-                                    (11,5,0), (11,5,1),
++                                    (10,1,0), (10,1,1), (10,1,2), (10,3,0), (10,3,1), (10,3,5),
++                                    (11,0,0), (11,0,1), (11,0,2), (11,0,3),
++                                    (11,5,0), (11,5,1), (11,5,2),
+                                     (12,0,0), (12,0,1)] # assembly kernels writer supports these architectures
+ 
+ globalParameters["KeepBuildTmp"] = True                           # Do not remove build artifacts during the build process or build_tmp after build completes
+@@ -324,7 +324,7 @@ architectureMap = {
+   'gfx1010':'navi10', 'gfx1011':'navi12', 'gfx1012':'navi14',
+   'gfx1030':'navi21', 'gfx1031':'navi22', 'gfx1032':'navi23', 'gfx1034':'navi24', 'gfx1035':'rembrandt',
+   'gfx1100':'navi31', 'gfx1101':'navi32', 'gfx1102':'navi33',
+-  'gfx1150':'strixpoint', 'gfx1151':'strixhalo',
++  'gfx1103':'gfx1103', 'gfx1150':'strixpoint', 'gfx1151':'strixhalo', 'gfx1152':'gfx1152',
+   'gfx1200':'gfx1200',
+   'gfx1201':'gfx1201'
+ }
+@@ -2466,7 +2466,7 @@ def assignGlobalParameters( config, capabilitiesCache: Optional[dict] = None ):
+     if os.name == "nt":
+       globalParameters["CurrentISA"] = (9,0,6)
+       printWarning("Failed to detect ISA so forcing (gfx906) on windows")
+-  isasWithDisabledHWMonitor = ((9,4,1), (9,4,2), (11,0,0), (11,0,1), (11,0,2), (11,5,0), (11,5,1), (12,0,0), (12,0,1))
++  isasWithDisabledHWMonitor = ((9,4,1), (9,4,2), (11,0,0), (11,0,1), (11,0,2), (11,0,3), (11,5,0), (11,5,1), (11,5,2), (12,0,0), (12,0,1))
+   if globalParameters["CurrentISA"] in isasWithDisabledHWMonitor:
+     isaString = ', '.join(map(gfxName, isasWithDisabledHWMonitor))
+     printWarning(f"HardwareMonitor currently disabled for {isaString}")
+diff --git a/Tensile/Source/CMakeLists.txt b/Tensile/Source/CMakeLists.txt
+index 8279cfb0..7f10ee31 100644
+--- a/Tensile/Source/CMakeLists.txt
++++ b/Tensile/Source/CMakeLists.txt
+@@ -51,9 +51,9 @@ if(CMAKE_CXX_COMPILER MATCHES ".*/hipcc$" OR CMAKE_CXX_COMPILER MATCHES ".*clang
+ endif()
+ 
+ if(CMAKE_CXX_COMPILER STREQUAL "hipcc")
+-  set(TENSILE_GPU_ARCHS gfx803 gfx900 gfx906:xnack- gfx908:xnack- gfx90a:xnack- gfx1010 gfx1011 gfx1012 gfx1030 gfx1031 gfx1032 gfx1034 gfx1035 gfx1100 gfx1101 gfx1102 gfx1150 gfx1151 CACHE STRING "GPU architectures")
++  set(TENSILE_GPU_ARCHS gfx803 gfx900 gfx906:xnack- gfx908:xnack- gfx90a:xnack- gfx1010 gfx1011 gfx1012 gfx1030 gfx1031 gfx1032 gfx1034 gfx1035 gfx1100 gfx1101 gfx1102 gfx1103 gfx1150 gfx1151 gfx1152 CACHE STRING "GPU architectures")
+ else()
+-  set(TENSILE_GPU_ARCHS gfx803 gfx900 gfx906 gfx908 gfx90a gfx1010 gfx1011 gfx1012 gfx1030 gfx1031 gfx1032 gfx1034 gfx1035 gfx1100 gfx1101 gfx1102 gfx1150 gfx1151 CACHE STRING "GPU architectures")
++  set(TENSILE_GPU_ARCHS gfx803 gfx900 gfx906 gfx908 gfx90a gfx1010 gfx1011 gfx1012 gfx1030 gfx1031 gfx1032 gfx1034 gfx1035 gfx1100 gfx1101 gfx1102 gfx1103 gfx1150 gfx1151 gfx1152 CACHE STRING "GPU architectures")
+ endif()
+ 
+ include(CMakeDependentOption)
+diff --git a/Tensile/Source/lib/include/Tensile/AMDGPU.hpp b/Tensile/Source/lib/include/Tensile/AMDGPU.hpp
+index 9daadab2..be02b274 100644
+--- a/Tensile/Source/lib/include/Tensile/AMDGPU.hpp
++++ b/Tensile/Source/lib/include/Tensile/AMDGPU.hpp
+@@ -74,8 +74,10 @@ namespace Tensile
+             gfx1100 = 1100,
+             gfx1101 = 1101,
+             gfx1102 = 1102,
++            gfx1103 = 1103,
+             gfx1150 = 1150,
+-            gfx1151 = 1151
++            gfx1151 = 1151,
++            gfx1152 = 1152,
+         };
+ 
+         static std::string toString(Processor p)
+@@ -120,10 +122,14 @@ namespace Tensile
+                 return "gfx1101";
+             case AMDGPU::Processor::gfx1102:
+                 return "gfx1102";
++            case AMDGPU::Processor::gfx1103:
++                return "gfx1103";
+             case AMDGPU::Processor::gfx1150:
+                 return "gfx1150";
+             case AMDGPU::Processor::gfx1151:
+                 return "gfx1151";
++	    case AMDGPU::Processor::gfx1152:
++                return "gfx1152";
+             }
+             return "";
+         }
+@@ -190,6 +196,10 @@ namespace Tensile
+             {
+                 return AMDGPU::Processor::gfx1102;
+             }
++            else if(deviceString.find("gfx1103") != std::string::npos)
++            {
++                return AMDGPU::Processor::gfx1103;
++            }
+             else if(deviceString.find("gfx1150") != std::string::npos)
+             {
+                 return AMDGPU::Processor::gfx1150;
+@@ -198,6 +208,10 @@ namespace Tensile
+             {
+                 return AMDGPU::Processor::gfx1151;
+             }
++	    else if(deviceString.find("gfx1152") != std::string::npos)
++            {
++                return AMDGPU::Processor::gfx1152;
++            }
+             else
+             {
+                 return static_cast<AMDGPU::Processor>(0);
+diff --git a/Tensile/Source/lib/include/Tensile/PlaceholderLibrary.hpp b/Tensile/Source/lib/include/Tensile/PlaceholderLibrary.hpp
+index ea6fac46..127ce691 100644
+--- a/Tensile/Source/lib/include/Tensile/PlaceholderLibrary.hpp
++++ b/Tensile/Source/lib/include/Tensile/PlaceholderLibrary.hpp
+@@ -58,8 +58,10 @@ namespace Tensile
+         gfx1100,
+         gfx1101,
+         gfx1102,
++        gfx1103,
+         gfx1150,
+         gfx1151,
++        gfx1152,
+         All
+     };
+ 
+@@ -108,10 +110,14 @@ namespace Tensile
+             return "TensileLibrary_*_gfx1101";
+         case LazyLoadingInit::gfx1102:
+             return "TensileLibrary_*_gfx1102";
++        case LazyLoadingInit::gfx1103:
++            return "TensileLibrary_*_gfx1103";
+         case LazyLoadingInit::gfx1150:
+             return "TensileLibrary_*_gfx1150";
+         case LazyLoadingInit::gfx1151:
+             return "TensileLibrary_*_gfx1151";
++	case LazyLoadingInit::gfx1152:
++	  return "TensileLibrary_*_gfx1152";
+         case LazyLoadingInit::None:
+             return "";
+         }
+-- 
+2.51.0
+

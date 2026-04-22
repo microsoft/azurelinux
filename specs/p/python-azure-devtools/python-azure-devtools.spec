@@ -10,7 +10,7 @@
 
 Name:           python-%{srcname}
 Version:        %{short_version}~git.4.%{shortcommit}
-Release:        15%{?dist}
+Release: 16%{?dist}
 Summary:        Microsoft Azure Development Tools for SDK
 License:        MIT and Apache-2.0
 URL:            https://github.com/Azure/azure-sdk-for-python/

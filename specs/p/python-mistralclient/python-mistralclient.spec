@@ -26,7 +26,7 @@ and Command Line Interface (CLI) library.
 
 Name:           python-%{pypi_name}
 Version:        5.3.0
-Release:        5%{?dist}
+Release: 6%{?dist}
 Summary:        Python client for Mistral REST API
 
 License:        Apache-2.0

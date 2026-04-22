@@ -13,7 +13,7 @@
 Summary: iSCSI daemon and utility programs
 Name: iscsi-initiator-utils
 Version: 6.%{open_iscsi_version}.%{open_iscsi_build}
-Release: 0.git%{shortcommit0}%{?dist}.2
+Release: 1.git%{shortcommit0}%{?dist}.2
 License: GPL-2.0-or-later
 URL: https://github.com/open-iscsi/open-iscsi
 Source0: https://github.com/open-iscsi/open-iscsi/archive/%{commit0}.tar.gz#/open-iscsi-%{shortcommit0}.tar.gz
@@ -120,7 +120,7 @@ libiscsi interface for interacting with %{name}
 %meson -Diqn_prefix=iqn.1994-05.com.redhat -Discsi_sbindir=%{_sbindir}
 %meson_build
 
-%make_build LDFLAGS="%{build_ldflags}" iqn_prefix=iqn.1994-05.com.redhat DBROOT=/var/lib/iscsi libiscsi
+%make_build MESON_BUILDDIR=%{_vpath_builddir} LDFLAGS="%{build_ldflags}" iqn_prefix=iqn.1994-05.com.redhat DBROOT=/var/lib/iscsi libiscsi
 pushd libiscsi
 %if %{with python2}
   %py2_build

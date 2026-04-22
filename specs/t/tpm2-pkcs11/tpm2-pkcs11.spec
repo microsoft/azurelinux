@@ -5,7 +5,7 @@
 
 Name:		tpm2-pkcs11
 Version:	1.9.1
-Release:	6%{?candidate:.%{candidate}}%{?dist}
+Release: 7%{?candidate:.%{candidate}}%{?dist}
 Summary:	PKCS#11 interface for TPM 2.0 hardware
 
 License:	BSD-2-Clause

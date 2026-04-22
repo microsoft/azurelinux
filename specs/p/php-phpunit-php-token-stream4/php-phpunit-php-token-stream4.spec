@@ -30,7 +30,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
 Version:        4.0.4
-Release:        15%{?dist}
+Release: 16%{?dist}
 Summary:        Wrapper around PHP tokenizer extension
 
 License:        BSD-3-Clause

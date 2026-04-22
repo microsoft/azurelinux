@@ -3,7 +3,7 @@
 
 Name:           perl-IPC-ShareLite
 Version:        0.17
-Release:        50%{?dist}
+Release: 51%{?dist}
 Summary:        Lightweight interface to shared memory
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/IPC-ShareLite

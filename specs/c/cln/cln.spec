@@ -3,7 +3,7 @@
 
 Name:           cln
 Version:        1.3.6
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        Class Library for Numbers
 
 License:        GPL-2.0-or-later

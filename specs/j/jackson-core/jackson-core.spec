@@ -3,7 +3,7 @@
 
 Name:           jackson-core
 Version:        2.18.2
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Core part of Jackson
 License:        Apache-2.0
 

@@ -9,7 +9,7 @@
 Name: hunspell-ru
 Summary: Russian hunspell dictionaries
 Version: 0.99g5
-Release: 31%{?dist}
+Release: 32%{?dist}
 Epoch: 1
 # Upstream source is gone now and recent alternative don't have license
 # Source: http://releases.mozilla.org/pub/mozilla.org/addons/3703/russian_spellchecking_dictionary-0.4.4-fx+tb+sm.xpi

@@ -3,7 +3,7 @@
 
 Name:    adcli
 Version: 0.9.2
-Release: 10%{?dist}
+Release: 11%{?dist}
 Summary: Active Directory enrollment
 License: LGPL-2.1-or-later
 URL:     https://gitlab.freedesktop.org/realmd/adcli

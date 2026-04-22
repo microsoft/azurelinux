@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 9 Jan 2024 14:37:25 -0500
+Subject: [PATCH] Fix another minor sign comparison error.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/kern/mm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/grub-core/kern/mm.c b/grub-core/kern/mm.c
+index 1aeeba9e27e..819bc5126a6 100644
+--- a/grub-core/kern/mm.c
++++ b/grub-core/kern/mm.c
+@@ -505,7 +505,7 @@ grub_memalign (grub_size_t align, grub_size_t size)
+ 	goto fail;
+ 
+       /* Preallocate some extra space if heap growth is small. */
+-      grow = grub_max (grow, GRUB_MM_HEAP_GROW_EXTRA);
++      grow = grub_max (grow, (grub_size_t)GRUB_MM_HEAP_GROW_EXTRA);
+ 
+       /* Align up heap growth to make it friendly to CPU/MMU. */
+       if (grow > ~(grub_size_t) (GRUB_MM_HEAP_GROW_ALIGN - 1))

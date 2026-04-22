@@ -1,0 +1,36 @@
+#!/usr/bin/ruby
+
+require 'rubygems/package'
+
+module RubyGemsProv
+  module Helpers
+    # If there is some prelease version files, such as rc1 (i.e. non-numeric
+    # field), prepend this field by tilde instead of dot.
+    def self.normalize_prerelease(version)
+      if version.prerelease?
+        prerelease = version.version.sub /^#{version.release}\./, ''
+        "#{version.release}~#{prerelease}"
+      else
+        version.release
+      end
+    end
+  end
+
+  # Reports all functionality gem provides.
+  def self.provides
+    while filename = gets
+      filename.strip!
+      begin
+        specification = Gem::Specification.load filename
+
+        puts "rubygem(#{specification.name}) = #{Helpers::normalize_prerelease(specification.version)}"
+      rescue => e
+        # Ignore all errors.
+      end
+    end
+  end
+end
+
+if __FILE__ == $0
+  RubyGemsProv::provides
+end

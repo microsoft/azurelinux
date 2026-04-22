@@ -1,0 +1,80 @@
+.TH DUMPPDF "1" "October 2021" "" "User Commands"
+.SH NAME
+.B dumppdf
+\(en extract pdf structure in XML format
+.SH SYNOPSIS
+.B dumppdf
+.RB [ \-h ]
+.RB [ \-\-version ]
+.RB [ \-\-debug ]
+.RB [ \-\-extract\-toc \ |\  \-\-extract\-embedded\fR\ \fIEXTRACT_EMBEDDED ]
+.RB [ \-\-page\-numbers\ \fIPAGE_NUMBERS \ [ \fIPAGE_NUMBERS \ ...]]
+.RB [ \-\-pagenos\ \fIPAGENOS ]
+.RB [ \-\-objects\ \fIOBJECTS ]
+.RB [ \-\-all ]
+.RB [ \-\-password\ \fIPASSWORD ]
+.RB [ \-\-outfile\ \fIOUTFILE ]
+.RB [ \-\-raw\-stream \ |\  \-\-binary\-stream \ |\  \-\-text\-stream ]
+.I files
+.RI [ files \ ...]
+.SH OPTIONS
+.SS "POSITIONAL\ ARGUMENTS"
+.TP
+.I files
+One or more paths to PDF files.
+.SS "OPTIONAL\ ARGUMENTS"
+.TP
+.B \-h\fR,\ \fB\-\-help
+Show a help message and exit.
+.TP
+.B \-\-version\fR,\ \fB\-v
+Show program\(cqs version number and exit.
+.TP
+.B \-\-debug\fR,\ \fB\-d
+Use debug logging level.
+.TP
+.B \-\-extract\-toc\fR,\ \fB\-T
+Extract structure of outline
+.TP
+.B \-\-extract\-embedded\fR\ \fIEXTRACT_EMBEDDED\fR,\ \fB\-E\fR\ \fIEXTRACT_EMBEDDED
+Extract embedded files
+.SS PARSER
+Used during PDF parsing
+.TP
+.B \-\-page\-numbers\fR\ \fIPAGE_NUMBERS\fR\ [\fIPAGE_NUMBERS\fR\ ...]
+A space-seperated list of page numbers to parse.
+.TP
+.B \-\-pagenos\fR\ \fIPAGENOS\fR,\ \fB\-p\fR\ \fIPAGENOS
+A comma-separated list of page numbers to parse.
+Included for legacy applications; use
+.B \-\-page\-numbers
+for more idiomatic argument entry.
+.TP
+.B \-\-objects\fR\ \fIOBJECTS\fR,\ \fB\-i\fR\ \fIOBJECTS
+Comma separated list of object numbers to extract
+.TP
+.B \-\-all\fR,\ \fB\-a
+If the structure of all objects should be extracted
+.TP
+.B \-\-password\fR\ \fIPASSWORD\fR,\ \fB\-P\fR\ \fIPASSWORD
+The password to use for decrypting PDF file.
+.SS OUTPUT
+Used during output generation.
+.TP
+.B \-\-outfile\fR\ \fIOUTFILE\fR,\ \fB\-o\fR\ \fIOUTFILE
+Path to file where output is written.
+Or
+.RB \(lq \- \(rq
+(default) to write to
+.IR stdout .
+.TP
+.B \-\-raw\-stream\fR,\ \fB\-r
+Write stream objects without encoding
+.TP
+.B \-\-binary\-stream\fR,\ \fB\-b
+Write stream objects with binary encoding
+.TP
+.B \-\-text\-stream\fR,\ \fB\-t
+Write stream objects as plain text
+.SH "SEE\ ALSO"
+.BR pdf2txt (1)

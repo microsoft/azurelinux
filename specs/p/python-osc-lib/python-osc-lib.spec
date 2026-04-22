@@ -24,7 +24,7 @@
 
 Name:       python-%{library}
 Version:    3.1.0
-Release:    6%{?dist}
+Release: 7%{?dist}
 Summary:    OpenStack library for writing OSC plugins
 License:    Apache-2.0
 URL:        https://github.com/openstack/%{library}/

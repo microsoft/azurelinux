@@ -3,7 +3,7 @@
 
 Name:       xeyes
 Version:    1.3.0
-Release:    6%{?dist}
+Release: 7%{?dist}
 Summary:    A follow the mouse X demo
 
 License:    X11

@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 2.4.2
-Release: 10%{?dist}
+Release: 11%{?dist}
 Summary: A library for accessing the content of PDF files
 License: MIT
 URL: https://github.com/yob/pdf-reader

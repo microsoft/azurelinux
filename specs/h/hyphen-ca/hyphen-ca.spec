@@ -5,7 +5,7 @@ Name: hyphen-ca
 Summary: Catalan hyphenation rules
 Epoch: 1
 Version: 1.5
-Release: 6%{?dist}
+Release: 7%{?dist}
 Source: https://github.com/jaumeortola/hyphen-ca/archive/refs/tags/v1.5.tar.gz#/%{name}-%{version}.tar.gz
 URL: https://github.com/jaumeortola/hyphen-ca
 License: GPL-3.0-or-later

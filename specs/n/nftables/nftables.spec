@@ -3,7 +3,7 @@
 
 Name:           nftables
 Version:        1.1.3
-Release:        6%{?dist}
+Release: 7%{?dist}
 # Upstream released a 0.100 version, then 0.4. Need Epoch to get back on track.
 Epoch:          1
 Summary:        Netfilter Tables userspace utilities

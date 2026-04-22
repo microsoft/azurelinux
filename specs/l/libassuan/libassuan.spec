@@ -4,7 +4,7 @@
 Name:    libassuan
 Summary: GnuPG IPC library
 Version: 2.5.7
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 # The library is LGPLv2+, the documentation GPLv3+
 License: GPL-3.0-or-later AND LGPL-2.1-or-later AND LGPL-3.0-or-later

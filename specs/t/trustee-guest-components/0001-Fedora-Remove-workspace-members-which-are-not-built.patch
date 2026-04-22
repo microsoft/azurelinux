@@ -1,7 +1,7 @@
-From 7ebb7ac42fa080602561d5f38b12a8acf312c9d3 Mon Sep 17 00:00:00 2001
+From fd43874376f6866fb5c8339df4b3a4be064cb696 Mon Sep 17 00:00:00 2001
 From: Yan Fu <yafu@redhat.com>
-Date: Tue, 21 Oct 2025 07:36:02 -0400
-Subject: [PATCH 01/15] Fedora: Remove workspace members which are not built
+Date: Wed, 4 Jun 2025 03:51:41 -0400
+Subject: [PATCH 01/14] Fedora: Remove workspace members which are not built
 
 The trustee-attester is currently under kbs_protocol.
 The 2 attestation-agent's deps and attester are BuildRequired.
@@ -9,14 +9,14 @@ The 2 attestation-agent's deps and attester are BuildRequired.
 Signed-off-by: Uri Lublin <uril@redhat.com>
 Signed-off-by: Yan Fu <yafu@redhat.com>
 ---
- Cargo.toml | 10 ----------
- 1 file changed, 10 deletions(-)
+ Cargo.toml | 9 ---------
+ 1 file changed, 9 deletions(-)
 
 diff --git a/Cargo.toml b/Cargo.toml
-index f96d31b..ed7da5d 100644
+index c001449..1f6f3e6 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
-@@ -1,20 +1,10 @@
+@@ -1,19 +1,10 @@
  [workspace]
  resolver = "2"
  members = [
@@ -33,10 +33,9 @@ index f96d31b..ed7da5d 100644
 -    "confidential-data-hub/kms",
 -    "image-rs",
 -    "ocicrypt-rs",
--    "protos",
  ]
  
  [workspace.dependencies]
 -- 
-2.51.1
+2.49.0
 

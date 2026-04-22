@@ -3,7 +3,7 @@
 
 Name:           perl-Parse-RecDescent
 Version:        1.967015
-Release:        25%{?dist}
+Release: 26%{?dist}
 Summary:        Generate Recursive-Descent Parsers
 License:        ( GPL-1.0-or-later OR Artistic-1.0-Perl ) OR ( GPL-2.0-or-later OR Artistic-1.0-Perl )
 # demo/demo_another_Cgrammar.pl:    GPLv2+ or Artistic

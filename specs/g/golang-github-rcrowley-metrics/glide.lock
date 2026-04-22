@@ -1,0 +1,10 @@
+hash: 2fde1cf6ebde7b88bd4fd37e0ccd095573b65966cc9e6c5e4fa605d94b99bc02
+imports:
+- name: github.com/influxdb/influxdb
+  subpackages:
+  - client
+  version: b611d020cd78886232cfa6c2ea0606b49d307ed2
+- name: github.com/stathat/go
+  version: 01d012b9ee2ecc107cb28b6dd32d9019ed5c1d77
+updated: '2018-06-28T10:37:26.147406+00:00'
+

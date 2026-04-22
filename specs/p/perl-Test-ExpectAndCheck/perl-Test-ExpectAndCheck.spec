@@ -3,7 +3,7 @@
 
 Name:           perl-Test-ExpectAndCheck
 Version:        0.07
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Expect/check-style unit testing with object methods
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 

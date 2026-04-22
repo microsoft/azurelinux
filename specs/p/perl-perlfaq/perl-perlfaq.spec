@@ -3,7 +3,7 @@
 
 Name:           perl-perlfaq
 Version:        5.20250619
-Release:        520%{?dist}
+Release: 521%{?dist}
 Summary:        Frequently asked questions about Perl
 # Code examples are Public Domain
 License:        (GPL-1.0-or-later OR Artistic-1.0-Perl) AND LicenseRef-Fedora-Public-Domain

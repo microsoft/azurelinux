@@ -1,0 +1,330 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Nicolas Frayer <nfrayer@redhat.com>
+Date: Fri, 31 Mar 2023 20:47:58 +0200
+Subject: [PATCH] emu: Add switch-root to grub-emu
+
+If the kernel running grub emu is the same as the one we want to
+boot, it makes sense that we just switch-root instead of kexec
+the same kernel again by doing grub2-emu --switch-root
+
+Signed-off-by: Nicolas Frayer <nfrayer@redhat.com>
+---
+ grub-core/kern/emu/main.c    |   5 +-
+ grub-core/kern/emu/misc.c    |  13 +++
+ grub-core/loader/emu/linux.c | 209 +++++++++++++++++++++++++++++++++++++++++--
+ include/grub/emu/exec.h      |   2 +-
+ include/grub/emu/misc.h      |   2 +
+ 5 files changed, 223 insertions(+), 8 deletions(-)
+
+diff --git a/grub-core/kern/emu/main.c b/grub-core/kern/emu/main.c
+index 38c1576a2ef..61b3181775b 100644
+--- a/grub-core/kern/emu/main.c
++++ b/grub-core/kern/emu/main.c
+@@ -108,6 +108,7 @@ static struct argp_option options[] = {
+   {"verbose",     'v', 0,      0, N_("print verbose messages."), 0},
+   {"hold",     'H', N_("SECS"),      OPTION_ARG_OPTIONAL, N_("wait until a debugger will attach"), 0},
+   {"kexec",       'X', 0,      0, N_("use kexec to boot Linux kernels via systemctl (pass twice to enable dangerous fallback to non-systemctl)."), 0},
++  {"switch-root",     'W', 0,      0, N_("use switch-root to only switch root filesystem without restarting the kernel."), 0},
+   { 0, 0, 0, 0, 0, 0 }
+ };
+ 
+@@ -168,7 +169,9 @@ argp_parser (int key, char *arg, struct argp_state *state)
+     case 'X':
+       grub_util_set_kexecute ();
+       break;
+-
++    case 'W':
++      grub_util_set_switch_root ();
++      break;
+     case ARGP_KEY_ARG:
+       {
+ 	/* Too many arguments. */
+diff --git a/grub-core/kern/emu/misc.c b/grub-core/kern/emu/misc.c
+index d145e5796b3..7b9731b7efa 100644
+--- a/grub-core/kern/emu/misc.c
++++ b/grub-core/kern/emu/misc.c
+@@ -40,6 +40,7 @@
+ 
+ int verbosity;
+ int kexecute;
++int switchroot = 0;
+ 
+ void
+ grub_util_warn (const char *fmt, ...)
+@@ -231,3 +232,15 @@ grub_util_get_kexecute (void)
+ {
+   return kexecute;
+ }
++
++void
++grub_util_set_switch_root (void)
++{
++  switchroot = 1;
++}
++
++int
++grub_util_get_switch_root (void)
++{
++  return switchroot;
++}
+diff --git a/grub-core/loader/emu/linux.c b/grub-core/loader/emu/linux.c
+index 7de3f7f8610..6feb0412c58 100644
+--- a/grub-core/loader/emu/linux.c
++++ b/grub-core/loader/emu/linux.c
+@@ -15,7 +15,6 @@
+  *  You should have received a copy of the GNU General Public License
+  *  along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
+  */
+-
+ #include <grub/loader.h>
+ #include <grub/dl.h>
+ #include <grub/command.h>
+@@ -33,6 +32,196 @@ static char *kernel_path;
+ static char *initrd_path;
+ static char *boot_cmdline;
+ 
++static grub_err_t
++grub_switch_root (void)
++{
++  char *tmp = NULL;
++  char *options_cmd = NULL;
++  char *options = NULL;
++  char *subvol = NULL;
++  char *root_uuid = NULL;
++  char *kernel_release = NULL;
++  grub_err_t rc = GRUB_ERR_NONE;
++  const char *subvol_param = "subvol=";
++  const char *kernel_release_prefix = "/boot/vmlinuz-";
++  const char *root_prefix = "root=";
++  const char *systemctl[] = {"systemctl", "--force", "switch-root", "/sysroot", NULL};
++  const char *mountrootfs[] = {"mount", root_uuid, "/sysroot", options_cmd, options, NULL};
++  const char *unamer[] = {"uname", "-r", NULL};
++  char *uname_buf = NULL;
++  int i = 0;
++
++  /* Extract the kernel release tag from kernel_path */
++  if (!kernel_path)
++    {
++      rc = GRUB_ERR_BAD_ARGUMENT;
++      grub_dprintf ("linux", "switch_root: No kernel_path found\n");
++      goto out;
++    }
++
++  if ((kernel_release = grub_xasprintf ("%s", (kernel_path + grub_strlen (kernel_release_prefix)))) == NULL)
++    {
++      grub_dprintf ("linux", "switch_root: Failed to allocate memory\n");
++      rc = GRUB_ERR_BAD_ARGUMENT;
++      goto out;
++    }
++
++
++  /* Check for kernel mismatch  */
++  /* Retrieve the current kernel relase tag */
++  grub_util_exec_redirect (unamer, NULL, "/tmp/version");
++
++  grub_file_t f = grub_file_open ("/tmp/version", GRUB_FILE_TYPE_FS_SEARCH);
++
++  if (f == NULL)
++    {
++      grub_dprintf ("linux", "failed opening file.\n");
++      rc = GRUB_ERR_FILE_NOT_FOUND;
++      goto out;
++    }
++
++  if ((uname_buf = grub_malloc (f->size)) == NULL)
++    {
++      grub_dprintf ("linux", "switch_root: Failed to allocate memory\n");
++      rc = GRUB_ERR_OUT_OF_MEMORY;
++      goto out;
++    }
++
++  if (grub_file_read (f, uname_buf, f->size) < 0)
++    {
++      grub_dprintf ("linux", "switch_root: failed to read from file\n");
++      rc = GRUB_ERR_FILE_READ_ERROR;
++      goto out;
++    }
++
++  grub_file_close (f);
++
++  if (grub_strstr (uname_buf, kernel_release) == NULL)
++    {
++      grub_dprintf ("linux", "switch_root: kernel mismatch, not performing switch-root ...\n");
++      rc = GRUB_ERR_NO_KERNEL;
++      goto out;
++    }
++
++  /* Extract the root partition from boot_cmdline */
++  if (!boot_cmdline)
++    {
++      rc = GRUB_ERR_BAD_ARGUMENT;
++      goto out;
++    }
++
++  tmp = grub_strdup (boot_cmdline);
++
++  if (tmp == NULL)
++    {
++      rc = GRUB_ERR_OUT_OF_MEMORY;
++      goto out;
++    }
++
++  if ((root_uuid = grub_strstr (tmp, root_prefix)) == NULL)
++    {
++      rc = GRUB_ERR_BAD_ARGUMENT;
++      grub_dprintf ("linux", "switch_root: Can't find rootfs\n");
++      goto out;
++    }
++
++  root_uuid += grub_strlen (root_prefix);
++
++  while (root_uuid[i] != ' ' && root_uuid[i] != '\0')
++    i++;
++
++  root_uuid[i] = '\0';
++
++  /* Allocate a new buffer holding root_uuid */
++  root_uuid = grub_xasprintf ("%s", root_uuid);
++
++  if (root_uuid == NULL)
++    {
++      grub_dprintf ("linux", "switch_root: Failed to allocated memory\n");
++      rc = GRUB_ERR_OUT_OF_MEMORY;
++      goto out;
++    }
++
++  /* Check for subvol parameter */
++  grub_strcpy (tmp, boot_cmdline);
++
++  if ((subvol = grub_strstr(tmp, subvol_param)) != NULL)
++    {
++      i = 0;
++
++      while (subvol[i] != ' ' && subvol[i] != '\0')
++        i++;
++
++      subvol[i] = '\0';
++
++      /* Allocate a new buffer holding subvol */
++      subvol = grub_xasprintf("%s", subvol);
++
++      if (subvol == NULL)
++        {
++          grub_dprintf ("linux", "switch_root: Failed to allocated memory\n");
++          rc = GRUB_ERR_OUT_OF_MEMORY;
++          goto out;
++        }
++
++      options_cmd = grub_xasprintf("%s", "-o");
++      options = grub_xasprintf("%s", subvol);
++    }
++
++  if (options == NULL)
++    {
++      mountrootfs[3] = NULL;
++    }
++  else
++    {
++      mountrootfs[3] = options_cmd;
++      mountrootfs[4] = options;
++    }
++
++  mountrootfs[1] = root_uuid;
++
++  grub_dprintf ("linux", "Executing:\n");
++  grub_dprintf ("linux", "%s %s %s %s %s\n", mountrootfs[0], mountrootfs[1],
++    mountrootfs[2], mountrootfs[3], mountrootfs[4]);
++
++  /* Mount the rootfs */
++  rc = grub_util_exec (mountrootfs);
++
++  if (rc != GRUB_ERR_NONE)
++    {
++      grub_dprintf ("linux", "switch_root: Failed.\n");
++      rc = GRUB_ERR_INVALID_COMMAND;
++      goto out;
++    }
++
++  grub_dprintf ("linux", "Done.\n");
++
++  grub_dprintf ("linux", "%s %s %s %s\n", systemctl[0], systemctl[1],
++    systemctl[2], systemctl[3]);
++
++  /* Switch root */
++  rc = grub_util_exec (systemctl);
++
++  if (rc != GRUB_ERR_NONE)
++    {
++      grub_dprintf ("linux", "switch_root: Failed.\n");
++      rc = GRUB_ERR_INVALID_COMMAND;
++      goto out;
++    }
++
++  grub_dprintf ("linux", "Done.\n");
++
++out:
++  grub_free (tmp);
++  grub_free (options_cmd);
++  grub_free (options);
++  grub_free (subvol);
++  grub_free (root_uuid);
++  grub_free (uname_buf);
++  grub_free (kernel_release);
++  return rc;
++}
++
+ static grub_err_t
+ grub_linux_boot (void)
+ {
+@@ -51,12 +240,20 @@ grub_linux_boot (void)
+   else
+     initrd_param = grub_xasprintf ("%s", "");
+ 
+-  grub_dprintf ("linux", "%serforming 'kexec -la %s %s %s'\n",
+-                (kexecute) ? "P" : "Not p",
+-                kernel_path, initrd_param, boot_cmdline);
++  if (grub_util_get_switch_root() == 1)
++    {
++      rc = grub_switch_root();
++      if (rc != GRUB_ERR_NONE)
++        grub_fatal (N_("Failed to execute switch_root\n"));
++    }
++  else if (kexecute)
++    {
++      grub_dprintf ("linux", "%serforming 'kexec -la %s %s %s'\n",
++                    (kexecute) ? "P" : "Not p",
++                    kernel_path, initrd_param, boot_cmdline);
+ 
+-  if (kexecute)
+-    rc = grub_util_exec (kexec);
++      rc = grub_util_exec (kexec);
++    }
+ 
+   grub_free (initrd_param);
+ 
+diff --git a/include/grub/emu/exec.h b/include/grub/emu/exec.h
+index 1b61b4a2e5d..e82f13215e0 100644
+--- a/include/grub/emu/exec.h
++++ b/include/grub/emu/exec.h
+@@ -36,7 +36,7 @@ grub_util_exec_redirect_all (const char *const *argv, const char *stdin_file,
+ int
+ EXPORT_FUNC(grub_util_exec) (const char *const *argv);
+ int
+-grub_util_exec_redirect (const char *const *argv, const char *stdin_file,
++EXPORT_FUNC(grub_util_exec_redirect) (const char *const *argv, const char *stdin_file,
+ 			 const char *stdout_file);
+ int
+ grub_util_exec_redirect_null (const char *const *argv);
+diff --git a/include/grub/emu/misc.h b/include/grub/emu/misc.h
+index 01056954b96..f3a712a8b2f 100644
+--- a/include/grub/emu/misc.h
++++ b/include/grub/emu/misc.h
+@@ -59,6 +59,8 @@ void EXPORT_FUNC(grub_util_error) (const char *fmt, ...) __attribute__ ((format
+ 
+ void EXPORT_FUNC(grub_util_set_kexecute) (void);
+ int EXPORT_FUNC(grub_util_get_kexecute) (void) WARN_UNUSED_RESULT;
++void EXPORT_FUNC(grub_util_set_switch_root) (void);
++int EXPORT_FUNC(grub_util_get_switch_root) (void);
+ 
+ grub_uint64_t EXPORT_FUNC (grub_util_get_cpu_time_ms) (void);
+ 

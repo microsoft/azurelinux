@@ -13,7 +13,7 @@
 Name:          mingw-python-%{pypi_name}
 Summary:       MinGW Windows Python %{pypi_name} library
 Version:       0.7.0
-Release:       7%{?dist}
+Release: 8%{?dist}
 BuildArch:     noarch
 
 License:       MIT

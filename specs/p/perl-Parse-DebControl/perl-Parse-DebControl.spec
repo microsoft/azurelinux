@@ -3,7 +3,7 @@
 
 Name:           perl-Parse-DebControl
 Version:        2.005
-Release:        34%{?dist}
+Release: 35%{?dist}
 Summary:        Easy OO parsing of debian control-like files
 
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

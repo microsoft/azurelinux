@@ -8,7 +8,7 @@
 
 Name:           lua-json
 Version:        1.3.4
-Release:        10%{?dist}
+Release: 11%{?dist}
 Summary:        JSON Parser/Constructor for Lua
 License:        MIT
 URL:            https://github.com/harningt/luajson

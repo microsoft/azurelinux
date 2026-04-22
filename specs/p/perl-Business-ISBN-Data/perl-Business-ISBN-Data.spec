@@ -3,7 +3,7 @@
 
 Name:           perl-Business-ISBN-Data
 Version:        20260109.001
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        The data pack for Business::ISBN
 License:        Artistic-2.0
 URL:            https://metacpan.org/release/Business-ISBN-Data

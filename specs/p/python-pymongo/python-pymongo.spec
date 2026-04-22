@@ -8,7 +8,7 @@
 
 Name:           python-pymongo
 Version:        4.13.2
-Release:        3%{?dist}
+Release: 4%{?dist}
 
 License:        Apache-2.0
 Summary:        Python driver for MongoDB

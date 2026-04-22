@@ -6,7 +6,7 @@
 Name:           perl-Parse-Yapp
 # Keep 2-digit version for history
 Version:        %{cpan_version}
-Release:        22%{?dist}
+Release: 23%{?dist}
 Summary:        Perl extension for generating and using LALR parsers
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Parse-Yapp

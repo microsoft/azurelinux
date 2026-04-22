@@ -1,0 +1,27 @@
+commit 192c3a6bc18f206895ec5e38812d648ccfe7e281
+Author: Phil Sutter <phil@nwl.cc>
+Date:   Wed Apr 23 12:36:13 2025 +0200
+
+    xshared: Accept an option if any given command allows it
+    
+    Fixed commit made option checking overly strict: Some commands may be
+    commbined (foremost --list and --zero), reject a given option only if it
+    is not allowed by any of the given commands.
+    
+    Reported-by: Adam Nielsen <a.nielsen@shikadi.net>
+    Fixes: 9c09d28102bb4 ("xshared: Simplify generic_opt_check()")
+    Signed-off-by: Phil Sutter <phil@nwl.cc>
+
+diff --git a/iptables/xshared.c b/iptables/xshared.c
+index cdfd11ab..fc61e0fd 100644
+--- a/iptables/xshared.c
++++ b/iptables/xshared.c
+@@ -980,7 +980,7 @@ static void generic_opt_check(struct xt_cmd_parse_ops *ops,
+ 	 */
+ 	for (i = 0, optval = 1; i < NUMBER_OF_OPT; optval = (1 << ++i)) {
+ 		if ((options & optval) &&
+-		    (options_v_commands[i] & command) != command)
++		    !(options_v_commands[i] & command))
+ 			xtables_error(PARAMETER_PROBLEM,
+ 				      "Illegal option `%s' with this command",
+ 				      ops->option_name(optval));

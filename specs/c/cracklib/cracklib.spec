@@ -8,7 +8,7 @@
 Summary: A password-checking library
 Name: cracklib
 Version: 2.9.11
-Release: 8%{?dist}
+Release: 9%{?dist}
 URL: https://github.com/cracklib/cracklib
 License: LGPL-2.1-or-later
 

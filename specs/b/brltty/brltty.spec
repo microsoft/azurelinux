@@ -40,7 +40,7 @@
 
 Name: brltty
 Version: 6.8
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: LGPL-2.0-or-later AND LGPL-2.1-or-later AND GPL-2.0-or-later
 URL: http://brltty.app/
 Source0: http://brltty.app/archive/%{name}-%{version}.tar.xz

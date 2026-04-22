@@ -34,7 +34,7 @@
 
 Name:           perl-DBI
 Version:        1.647
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        A database access API for perl
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            http://dbi.perl.org/

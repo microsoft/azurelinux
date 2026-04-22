@@ -1,0 +1,378 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 21 Mar 2022 17:45:40 -0400
+Subject: [PATCH] modules: load module sections at page-aligned addresses
+
+Currently we load module sections at whatever alignment gcc+ld happened
+to dump into the ELF section header, which is often pretty useless.  For
+example, by default time.mod has these sections on a current x86_64
+build:
+
+$ eu-readelf -a grub-core/time.mod |& grep ^Section -A13
+Section Headers:
+[Nr] Name            Type         Addr  Off      Size     ES Flags Lk Inf Al
+[ 0]                 NULL         0     00000000 00000000  0        0   0  0
+[ 1] .text           PROGBITS     0     00000040 0000015e  0 AX     0   0  1
+[ 2] .rela.text      RELA         0     00000458 000001e0 24 I      8   1  8
+[ 3] .rodata.str1.1  PROGBITS     0     0000019e 000000a1  1 AMS    0   0  1
+[ 4] .module_license PROGBITS     0     00000240 0000000f  0 A      0   0  8
+[ 5] .data           PROGBITS     0     0000024f 00000000  0 WA     0   0  1
+[ 6] .bss            NOBITS       0     00000250 00000008  0 WA     0   0  8
+[ 7] .modname        PROGBITS     0     00000250 00000005  0        0   0  1
+[ 8] .symtab         SYMTAB       0     00000258 00000150 24        9   6  8
+[ 9] .strtab         STRTAB       0     000003a8 000000ab  0        0   0  1
+[10] .shstrtab       STRTAB       0     00000638 00000059  0        0   0  1
+
+With NX protections being page based, loading sections with either a 1
+or 8 *byte* alignment does absolutely nothing to help us out.
+
+This patch switches most EFI platforms to load module sections at 4kB
+page-aligned addresses.  To do so, it adds an new per-arch function,
+grub_arch_dl_min_alignment(), which returns the alignment needed for
+dynamically loaded sections (in bytes).  Currently it sets it to 4096
+when GRUB_MACHINE_EFI is true on x86_64, i386, arm, arm64, and emu, and
+1-byte alignment on everything else.
+
+It then changes the allocation size computation and the loader code in
+grub_dl_load_segments() to align the locations and sizes up to these
+boundaries, and fills any added padding with zeros.
+
+All of this happens before relocations are applied, so the relocations
+factor that in with no change.
+
+As an aside, initially Daniel Kiper and I thought that it might be a
+better idea to split the modules up into top-level sections as
+.text.modules, .rodata.modules, .data.modules, etc., so that their page
+permissions would get set by the loader that's loading grub itself.
+This turns out to have two significant downsides: 1) either in mkimage
+or in grub_dl_relocate_symbols(), you wind up having to dynamically
+process the relocations to accommodate the moved module sections, and 2)
+you then need to change the permissions on the modules and change them
+back while relocating them in grub_dl_relocate_symbols(), which means
+that any loader that /does/ honor the section flags but does /not/
+generally support NX with the memory attributes API will cause grub to
+fail.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/kern/arm/dl.c     | 13 +++++++++++++
+ grub-core/kern/arm64/dl.c   | 13 +++++++++++++
+ grub-core/kern/dl.c         | 29 +++++++++++++++++++++--------
+ grub-core/kern/emu/full.c   | 13 +++++++++++++
+ grub-core/kern/i386/dl.c    | 13 +++++++++++++
+ grub-core/kern/ia64/dl.c    |  9 +++++++++
+ grub-core/kern/mips/dl.c    |  8 ++++++++
+ grub-core/kern/powerpc/dl.c |  9 +++++++++
+ grub-core/kern/riscv/dl.c   | 13 +++++++++++++
+ grub-core/kern/sparc64/dl.c |  9 +++++++++
+ grub-core/kern/x86_64/dl.c  | 13 +++++++++++++
+ include/grub/dl.h           |  2 ++
+ docs/grub-dev.texi          |  6 +++---
+ 13 files changed, 139 insertions(+), 11 deletions(-)
+
+diff --git a/grub-core/kern/arm/dl.c b/grub-core/kern/arm/dl.c
+index eab9d17ff2d..92607379366 100644
+--- a/grub-core/kern/arm/dl.c
++++ b/grub-core/kern/arm/dl.c
+@@ -278,3 +278,16 @@ grub_arch_dl_check_header (void *ehdr)
+ 
+   return GRUB_ERR_NONE;
+ }
++
++/*
++ * Tell the loader what our minimum section alignment is.
++ */
++grub_size_t
++grub_arch_dl_min_alignment (void)
++{
++#ifdef GRUB_MACHINE_EFI
++  return 4096;
++#else
++  return 1;
++#endif
++}
+diff --git a/grub-core/kern/arm64/dl.c b/grub-core/kern/arm64/dl.c
+index a2b5789a9dd..95c6d5bf4e5 100644
+--- a/grub-core/kern/arm64/dl.c
++++ b/grub-core/kern/arm64/dl.c
+@@ -196,3 +196,16 @@ grub_arch_dl_relocate_symbols (grub_dl_t mod, void *ehdr,
+ 
+   return GRUB_ERR_NONE;
+ }
++
++/*
++ * Tell the loader what our minimum section alignment is.
++ */
++grub_size_t
++grub_arch_dl_min_alignment (void)
++{
++#ifdef GRUB_MACHINE_EFI
++  return 4096;
++#else
++  return 1;
++#endif
++}
+diff --git a/grub-core/kern/dl.c b/grub-core/kern/dl.c
+index 832c6188df4..775b367287e 100644
+--- a/grub-core/kern/dl.c
++++ b/grub-core/kern/dl.c
+@@ -268,7 +268,7 @@ grub_dl_load_segments (grub_dl_t mod, const Elf_Ehdr *e)
+ {
+   unsigned i;
+   const Elf_Shdr *s;
+-  grub_size_t tsize = 0, talign = 1;
++  grub_size_t tsize = 0, talign = 1, arch_addralign = 1;
+ #if !defined (__i386__) && !defined (__x86_64__) && !defined(__riscv) && \
+   !defined (__loongarch__)
+   grub_size_t tramp;
+@@ -277,16 +277,24 @@ grub_dl_load_segments (grub_dl_t mod, const Elf_Ehdr *e)
+ #endif
+   char *ptr;
+ 
++  arch_addralign = grub_arch_dl_min_alignment ();
++
+   for (i = 0, s = (const Elf_Shdr *)((const char *) e + e->e_shoff);
+        i < e->e_shnum;
+        i++, s = (const Elf_Shdr *)((const char *) s + e->e_shentsize))
+     {
++      grub_size_t sh_addralign;
++      grub_size_t sh_size;
++
+       if (s->sh_size == 0 || !(s->sh_flags & SHF_ALLOC))
+ 	continue;
+ 
+-      tsize = ALIGN_UP (tsize, s->sh_addralign) + s->sh_size;
+-      if (talign < s->sh_addralign)
+-	talign = s->sh_addralign;
++      sh_addralign = ALIGN_UP(s->sh_addralign, arch_addralign);
++      sh_size = ALIGN_UP(s->sh_size, sh_addralign);
++
++      tsize = ALIGN_UP (tsize, sh_addralign) + sh_size;
++      if (talign < sh_addralign)
++	talign = sh_addralign;
+     }
+ 
+ #if !defined (__i386__) && !defined (__x86_64__) && !defined(__riscv) && \
+@@ -316,6 +324,9 @@ grub_dl_load_segments (grub_dl_t mod, const Elf_Ehdr *e)
+        i < e->e_shnum;
+        i++, s = (Elf_Shdr *)((char *) s + e->e_shentsize))
+     {
++      grub_size_t sh_addralign = ALIGN_UP(s->sh_addralign, arch_addralign);
++      grub_size_t sh_size = ALIGN_UP(s->sh_size, sh_addralign);
++
+       if (s->sh_flags & SHF_ALLOC)
+ 	{
+ 	  grub_dl_segment_t seg;
+@@ -328,17 +339,19 @@ grub_dl_load_segments (grub_dl_t mod, const Elf_Ehdr *e)
+ 	    {
+ 	      void *addr;
+ 
+-	      ptr = (char *) ALIGN_UP ((grub_addr_t) ptr, s->sh_addralign);
++	      ptr = (char *) ALIGN_UP ((grub_addr_t) ptr, sh_addralign);
+ 	      addr = ptr;
+-	      ptr += s->sh_size;
++	      ptr += sh_size;
+ 
+ 	      switch (s->sh_type)
+ 		{
+ 		case SHT_PROGBITS:
+ 		  grub_memcpy (addr, (char *) e + s->sh_offset, s->sh_size);
++		  grub_memset ((char *)addr + s->sh_size, 0,
++			       sh_size - s->sh_size);
+ 		  break;
+ 		case SHT_NOBITS:
+-		  grub_memset (addr, 0, s->sh_size);
++		  grub_memset (addr, 0, sh_size);
+ 		  break;
+ 		}
+ 
+@@ -347,7 +360,7 @@ grub_dl_load_segments (grub_dl_t mod, const Elf_Ehdr *e)
+ 	  else
+ 	    seg->addr = 0;
+ 
+-	  seg->size = s->sh_size;
++	  seg->size = sh_size;
+ 	  seg->section = i;
+ 	  seg->next = mod->segment;
+ 	  mod->segment = seg;
+diff --git a/grub-core/kern/emu/full.c b/grub-core/kern/emu/full.c
+index e8d63b1f5f9..1de1c28eb09 100644
+--- a/grub-core/kern/emu/full.c
++++ b/grub-core/kern/emu/full.c
+@@ -67,3 +67,16 @@ grub_arch_dl_init_linker (void)
+ }
+ #endif
+ 
++
++/*
++ * Tell the loader what our minimum section alignment is.
++ */
++grub_size_t
++grub_arch_dl_min_alignment (void)
++{
++#ifdef GRUB_MACHINE_EFI
++  return 4096;
++#else
++  return 1;
++#endif
++}
+diff --git a/grub-core/kern/i386/dl.c b/grub-core/kern/i386/dl.c
+index 1346da5cc91..d6b4681fc93 100644
+--- a/grub-core/kern/i386/dl.c
++++ b/grub-core/kern/i386/dl.c
+@@ -79,3 +79,16 @@ grub_arch_dl_relocate_symbols (grub_dl_t mod, void *ehdr,
+ 
+   return GRUB_ERR_NONE;
+ }
++
++/*
++ * Tell the loader what our minimum section alignment is.
++ */
++grub_size_t
++grub_arch_dl_min_alignment (void)
++{
++#ifdef GRUB_MACHINE_EFI
++  return 4096;
++#else
++  return 1;
++#endif
++}
+diff --git a/grub-core/kern/ia64/dl.c b/grub-core/kern/ia64/dl.c
+index db59300fea3..92d82c57505 100644
+--- a/grub-core/kern/ia64/dl.c
++++ b/grub-core/kern/ia64/dl.c
+@@ -148,3 +148,12 @@ grub_arch_dl_relocate_symbols (grub_dl_t mod, void *ehdr,
+     }
+   return GRUB_ERR_NONE;
+ }
++
++/*
++ * Tell the loader what our minimum section alignment is.
++ */
++grub_size_t
++grub_arch_dl_min_alignment (void)
++{
++  return 1;
++}
+diff --git a/grub-core/kern/mips/dl.c b/grub-core/kern/mips/dl.c
+index 5b02f97fca7..db411899dbe 100644
+--- a/grub-core/kern/mips/dl.c
++++ b/grub-core/kern/mips/dl.c
+@@ -272,3 +272,11 @@ grub_arch_dl_init_linker (void)
+   grub_dl_register_symbol ("_gp_disp", &_gp_disp_dummy, 0, 0);
+ }
+ 
++/*
++ * Tell the loader what our minimum section alignment is.
++ */
++grub_size_t
++grub_arch_dl_min_alignment (void)
++{
++  return 1;
++}
+diff --git a/grub-core/kern/powerpc/dl.c b/grub-core/kern/powerpc/dl.c
+index 7b6418eabd7..0eb8bc5bd31 100644
+--- a/grub-core/kern/powerpc/dl.c
++++ b/grub-core/kern/powerpc/dl.c
+@@ -167,3 +167,12 @@ grub_arch_dl_relocate_symbols (grub_dl_t mod, void *ehdr,
+ 
+   return GRUB_ERR_NONE;
+ }
++
++/*
++ * Tell the loader what our minimum section alignment is.
++ */
++grub_size_t
++grub_arch_dl_min_alignment (void)
++{
++  return 1;
++}
+diff --git a/grub-core/kern/riscv/dl.c b/grub-core/kern/riscv/dl.c
+index 896653bb41c..1fa085b4acf 100644
+--- a/grub-core/kern/riscv/dl.c
++++ b/grub-core/kern/riscv/dl.c
+@@ -344,3 +344,16 @@ grub_arch_dl_relocate_symbols (grub_dl_t mod, void *ehdr,
+ 
+   return GRUB_ERR_NONE;
+ }
++
++/*
++ * Tell the loader what our minimum section alignment is.
++ */
++grub_size_t
++grub_arch_dl_min_alignment (void)
++{
++#ifdef GRUB_MACHINE_EFI
++  return 4096;
++#else
++  return 1;
++#endif
++}
+diff --git a/grub-core/kern/sparc64/dl.c b/grub-core/kern/sparc64/dl.c
+index f3d960186ba..f054f08241d 100644
+--- a/grub-core/kern/sparc64/dl.c
++++ b/grub-core/kern/sparc64/dl.c
+@@ -189,3 +189,12 @@ grub_arch_dl_relocate_symbols (grub_dl_t mod, void *ehdr,
+ 
+   return GRUB_ERR_NONE;
+ }
++
++/*
++ * Tell the loader what our minimum section alignment is.
++ */
++grub_size_t
++grub_arch_dl_min_alignment (void)
++{
++  return 1;
++}
+diff --git a/grub-core/kern/x86_64/dl.c b/grub-core/kern/x86_64/dl.c
+index e5a8bdcf4f9..a105dc50cea 100644
+--- a/grub-core/kern/x86_64/dl.c
++++ b/grub-core/kern/x86_64/dl.c
+@@ -119,3 +119,16 @@ grub_arch_dl_relocate_symbols (grub_dl_t mod, void *ehdr,
+ 
+   return GRUB_ERR_NONE;
+ }
++
++/*
++ * Tell the loader what our minimum section alignment is.
++ */
++grub_size_t
++grub_arch_dl_min_alignment (void)
++{
++#ifdef GRUB_MACHINE_EFI
++  return 4096;
++#else
++  return 1;
++#endif
++}
+diff --git a/include/grub/dl.h b/include/grub/dl.h
+index 216f8b903ac..9f86765c8e9 100644
+--- a/include/grub/dl.h
++++ b/include/grub/dl.h
+@@ -279,6 +279,8 @@ grub_err_t grub_arch_dl_check_header (void *ehdr);
+ grub_err_t
+ grub_arch_dl_relocate_symbols (grub_dl_t mod, void *ehdr,
+ 			       Elf_Shdr *s, grub_dl_segment_t seg);
++grub_size_t
++grub_arch_dl_min_alignment (void);
+ #endif
+ 
+ #if defined (_mips)
+diff --git a/docs/grub-dev.texi b/docs/grub-dev.texi
+index 04c6678cb6b..8ad5494f5ce 100644
+--- a/docs/grub-dev.texi
++++ b/docs/grub-dev.texi
+@@ -996,9 +996,9 @@ declare startup asm file ($cpu_$platform_startup) as well as any other files
+ (e.g. init.c and callwrap.S) (e.g. $cpu_$platform = kern/$cpu/$platform/init.c).
+ At this stage you will also need to add dummy dl.c and cache.S with functions
+ grub_err_t grub_arch_dl_check_header (void *ehdr), grub_err_t
+-grub_arch_dl_relocate_symbols (grub_dl_t mod, void *ehdr) (dl.c) and
+-void grub_arch_sync_caches (void *address, grub_size_t len) (cache.S). They
+-won't be used for now.
++grub_arch_dl_relocate_symbols (grub_dl_t mod, void *ehdr) (dl.c), grub_uint32_t
++grub_arch_dl_min_alignment (void), and void grub_arch_sync_caches (void
++*address, grub_size_t len) (cache.S). They won't be used for now.
+ 
+ You will need to create directory include/$cpu/$platform and a file
+ include/$cpu/types.h. The latter following this template:

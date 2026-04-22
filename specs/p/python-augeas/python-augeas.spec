@@ -3,7 +3,7 @@
 
 Name:		python-augeas
 Version:	1.2.0
-Release:	6%{?dist}
+Release: 7%{?dist}
 Summary:	Python bindings to augeas
 License:	LGPL-2.1-or-later
 URL:		http://augeas.net/

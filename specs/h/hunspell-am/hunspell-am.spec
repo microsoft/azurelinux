@@ -11,7 +11,7 @@ Name: hunspell-am
 Summary: Amharic hunspell dictionaries
 %global upstreamid 20090704
 Version: 0.%{upstreamid}
-Release: 32%{?dist}
+Release: 33%{?dist}
 Source: http://www.cs.ru.nl/~biniam/geez/dict/am_ET.zip
 URL: http://www.cs.ru.nl/~biniam/geez/index.php
 License: GPL-1.0-or-later

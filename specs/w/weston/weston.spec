@@ -5,7 +5,7 @@
 
 Name:           weston
 Version:        14.0.2
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Reference compositor for Wayland
 
 License:        MIT and CC-BY-SA-3.0

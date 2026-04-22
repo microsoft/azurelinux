@@ -3,7 +3,7 @@
 
 Name:           jline2
 Version:        2.14.6
-Release:        16%{?dist}
+Release: 17%{?dist}
 Summary:        Java library for handling console input
 License:        BSD-3-Clause
 URL:            http://jline.github.io/jline2/

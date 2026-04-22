@@ -13,7 +13,7 @@
 
 Name:           perl-Syntax-Operator-Equ
 Version:        0.10
-Release:        5%{?dist}
+Release: 6%{?dist}
 Summary:        Equality operators that distinguish undef
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Syntax-Operator-Equ

@@ -11,7 +11,7 @@ Summary: A set of extension widgets for Tk
 Name: tix
 Epoch: 1
 Version: %{tixmajor}.3
-Release: 45%{?dist}
+Release: 46%{?dist}
 License: TCL
 URL: http://tix.sourceforge.net/
 Source0: http://downloads.sourceforge.net/project/%{name}/%{name}/%{version}/Tix%{version}-src.tar.gz

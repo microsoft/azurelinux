@@ -1,0 +1,24 @@
+ld.lld: error: undefined symbol: __rustc::__rust_alloc_error_handler_should_panic
+ld.lld: error: undefined symbol: __rust_no_alloc_shim_is_unstable
+
+Fix build errors
+
+diff -up chromium-145.0.7632.75/build/rust/allocator/lib.rs.me chromium-145.0.7632.75/build/rust/allocator/lib.rs
+--- chromium-145.0.7632.75/build/rust/allocator/lib.rs.me	2026-02-15 12:35:09.666502144 +0100
++++ chromium-145.0.7632.75/build/rust/allocator/lib.rs	2026-02-15 12:39:06.951005953 +0100
+@@ -90,7 +90,6 @@ mod both_allocators {
+     #[linkage = "weak"]
+     fn __rust_no_alloc_shim_is_unstable_v2() {}
+ 
+-    #[cfg(rust_allocator_no_nightly_capability)]
+     #[rustc_std_internal_symbol]
+     #[linkage = "weak"]
+     fn __rust_no_alloc_shim_is_unstable() {}
+@@ -101,7 +100,6 @@ mod both_allocators {
+         0
+     }
+ 
+-    #[cfg(rust_allocator_no_nightly_capability)]
+     #[rustc_std_internal_symbol]
+     #[linkage = "weak"]
+     fn __rust_alloc_error_handler_should_panic() -> u8 {

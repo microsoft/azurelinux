@@ -1,0 +1,24 @@
+From d64843df5f339f486a9b29d492f2988a3bf8485b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tom=C3=A1=C5=A1=20Hrn=C4=8Diar?= <tomas.hrnciar@me.com>
+Date: Tue, 2 May 2023 13:48:00 +0200
+Subject: [PATCH] Remove the usage of assertRaisesRegexp unit test alias
+ removed in Python 3.12
+
+https://bugs.python.org/issue?@action=redirect&bpo=45162
+---
+ parameterized/test.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/parameterized/test.py b/parameterized/test.py
+index 6c71f79..498c591 100644
+--- a/parameterized/test.py
++++ b/parameterized/test.py
+@@ -35,7 +35,7 @@ def assert_raises_regexp_decorator(expected_exception, expected_regexp):
+     def func_decorator(func):
+         @wraps(func)
+         def wrapper(self, *args, **kwargs):
+-            with self.assertRaisesRegexp(expected_exception, expected_regexp):
++            with self.assertRaisesRegex(expected_exception, expected_regexp):
+                 func(self, *args, **kwargs)
+ 
+         return wrapper

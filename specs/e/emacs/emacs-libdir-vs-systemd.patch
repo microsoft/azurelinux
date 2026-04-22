@@ -1,0 +1,31 @@
+From a56539c1d7ef7aa56e575685bdfe1406aebb518d Mon Sep 17 00:00:00 2001
+From: Peter Oliver <git@mavit.org.uk>
+Date: Wed, 5 Feb 2020 12:42:04 +0000
+Subject: [PATCH] =?UTF-8?q?Don=E2=80=99t=20assemble=20systemdunitdir=20fro?=
+ =?UTF-8?q?m=20`libdir`?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+On 64 bit Fedora, `libdir` is `/usr/lib64`, whereas systemd services
+live under `/usr/lib/systemd`.
+---
+ Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 2c82c49fba..b2468eb824 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -208,7 +208,7 @@ appdatadir=
+ # Other options include ~/.config/systemd/user/,
+ # $XDG_RUNTIME_DIR/systemd/user/
+ # It seems the user may end up having to make a manual link...
+-systemdunitdir=$(libdir)/systemd/user
++systemdunitdir=$(shell pkg-config --variable=systemduserunitdir systemd)
+ 
+ # Where the etc/images/icons/hicolor directory is to be installed.
+ icondir=$(datarootdir)/icons
+-- 
+2.24.1
+

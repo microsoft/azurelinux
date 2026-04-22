@@ -4,7 +4,7 @@
 Summary: The GNU Scientific Library for numerical analysis
 Name: gsl
 Version: 2.8
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: https://www.gnu.org/software/gsl/
 VCS: git://git.savannah.gnu.org/gsl.git
 # Automatically converted from old format: GPLv3+ - review is highly recommended.

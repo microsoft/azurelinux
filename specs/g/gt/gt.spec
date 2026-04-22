@@ -3,7 +3,7 @@
 
 Name:           gt
 Version:        0.4
-Release:        48%{?dist}
+Release: 49%{?dist}
 Summary:        Modified Timidity which supportes enhanced gus format patches
 # Automatically converted from old format: GPLv2+ - review is highly recommended.
 License:        GPL-2.0-or-later

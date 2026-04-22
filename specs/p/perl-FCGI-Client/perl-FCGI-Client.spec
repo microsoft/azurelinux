@@ -4,7 +4,7 @@
 Name:           perl-FCGI-Client 
 Summary:        Client library for the fastcgi protocol 
 Version:        0.09
-Release:        21%{?dist}
+Release: 22%{?dist}
 # lib/FCGI/Client.pm -> GPL+ or Artistic
 # Automatically converted from old format: GPL+ or Artistic - review is highly recommended.
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl 

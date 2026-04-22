@@ -179,7 +179,7 @@ fi                                          \
 
 Name:           libxcrypt
 Version:        4.5.2
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Extended crypt library for descrypt, md5crypt, bcrypt, and others
 
 # For explicit license breakdown, see the

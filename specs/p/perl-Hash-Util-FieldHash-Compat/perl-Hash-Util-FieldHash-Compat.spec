@@ -3,7 +3,7 @@
 
 Name:		perl-Hash-Util-FieldHash-Compat
 Version:	0.11
-Release:	28%{?dist}
+Release: 29%{?dist}
 Summary:	Use Hash::Util::FieldHash or ties, depending on availability
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Hash-Util-FieldHash-Compat

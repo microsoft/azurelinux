@@ -9,7 +9,7 @@
 
 Name: libabigail
 Version: 2.9
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Set of ABI analysis tools
 
 License: Apache-2.0 WITH LLVM-exception

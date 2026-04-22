@@ -4,7 +4,7 @@
 Name:       iso-codes
 Summary:    ISO code lists and translations
 Version:    4.18.0
-Release:    2%{?dist}
+Release: 3%{?dist}
 License:    LGPL-2.1-or-later
 URL:        https://salsa.debian.org/iso-codes-team/iso-codes
 Source0:    https://salsa.debian.org/iso-codes-team/%{name}/-/archive/v%{version}/%{name}-v%{version}.tar.gz

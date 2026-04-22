@@ -4,7 +4,7 @@
 Name:           perl-DateTime-Format-Strptime
 Epoch:          1
 Version:        1.79
-Release:        13%{?dist}
+Release: 14%{?dist}
 Summary:        Parse and format strptime and strftime patterns
 License:        Artistic-2.0
 URL:            https://metacpan.org/release/DateTime-Format-Strptime

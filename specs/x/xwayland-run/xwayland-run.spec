@@ -3,7 +3,7 @@
 
 Name:           xwayland-run
 Version:        0.0.4
-Release:        12%{?dist}
+Release: 13%{?dist}
 Summary:        Set of utilities to run headless X/Wayland clients
 
 License:        GPL-2.0-or-later

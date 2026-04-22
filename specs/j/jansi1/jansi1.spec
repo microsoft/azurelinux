@@ -3,7 +3,7 @@
 
 Name:           jansi1
 Version:        1.18
-Release:        25%{?dist}
+Release: 26%{?dist}
 Summary:        Generate and interpret ANSI escape sequences in Java
 License:        Apache-2.0
 URL:            https://fusesource.github.io/jansi/

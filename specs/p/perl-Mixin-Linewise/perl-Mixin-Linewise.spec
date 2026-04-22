@@ -3,7 +3,7 @@
 
 Name:           perl-Mixin-Linewise
 Version:        0.111
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        Write your linewise code for handles; this does the rest
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Mixin-Linewise

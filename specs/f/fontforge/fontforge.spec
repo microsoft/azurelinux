@@ -5,7 +5,7 @@
 
 Name:           fontforge
 Version:        20230101
-Release:        19%{?dist}
+Release: 20%{?dist}
 Summary:        Outline and bitmap font editor
 
 License:        GPL-3.0-or-later

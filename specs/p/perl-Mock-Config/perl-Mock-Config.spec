@@ -3,7 +3,7 @@
 
 Name:           perl-Mock-Config
 Version:        0.04
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Temporarily set Config or XSConfig values
 License:        Artistic-2.0
 URL:            https://metacpan.org/release/Mock-Config

@@ -6,7 +6,7 @@
 
 Name:           zopfli
 Version:        %{so_ver}
-Release:        13%{?dist}
+Release: 14%{?dist}
 Summary:        Zlib compatible better compressor
 
 License:        Apache-2.0

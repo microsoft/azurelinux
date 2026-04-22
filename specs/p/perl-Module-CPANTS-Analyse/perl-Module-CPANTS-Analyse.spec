@@ -3,7 +3,7 @@
 
 Name:           perl-Module-CPANTS-Analyse
 Version:        1.02
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        Generate Kwalitee ratings for a distribution
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Module-CPANTS-Analyse

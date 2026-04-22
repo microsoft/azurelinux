@@ -11,7 +11,7 @@
 
 Name:		arpack
 Version:	3.9.1
-Release:	7%{dist}
+Release: 8%{dist}
 Summary:	Fortran 77 subroutines for solving large scale eigenvalue problems
 
 # Automatically converted from old format: BSD - review is highly recommended.

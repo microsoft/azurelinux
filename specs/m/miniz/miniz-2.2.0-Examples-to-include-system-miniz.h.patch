@@ -1,0 +1,101 @@
+From dd5cf5e228a90ecfc66257e04fc6dd053fd9c686 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Wed, 22 May 2019 12:34:13 +0200
+Subject: [PATCH] Examples to include system miniz.h
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+We build miniz as a dynamic library. Adjust examples to use a miniz
+header file from a system location.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ examples/example1.c | 2 +-
+ examples/example2.c | 2 +-
+ examples/example3.c | 2 +-
+ examples/example4.c | 2 +-
+ examples/example5.c | 2 +-
+ examples/example6.c | 2 +-
+ 6 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/examples/example1.c b/examples/example1.c
+index d6e33fa..7cb2556 100644
+--- a/examples/example1.c
++++ b/examples/example1.c
+@@ -1,7 +1,7 @@
+ // example1.c - Demonstrates miniz.c's compress() and uncompress() functions (same as zlib's).
+ // Public domain, May 15 2011, Rich Geldreich, richgel99@gmail.com. See "unlicense" statement at the end of tinfl.c.
+ #include <stdio.h>
+-#include "miniz.h"
++#include <miniz.h>
+ typedef unsigned char uint8;
+ typedef unsigned short uint16;
+ typedef unsigned int uint;
+diff --git a/examples/example2.c b/examples/example2.c
+index 03d2409..bc9fba5 100644
+--- a/examples/example2.c
++++ b/examples/example2.c
+@@ -13,7 +13,7 @@
+ #endif
+ 
+ #include <stdio.h>
+-#include "miniz.h"
++#include <miniz.h>
+ 
+ typedef unsigned char uint8;
+ typedef unsigned short uint16;
+diff --git a/examples/example3.c b/examples/example3.c
+index a97ba84..7aaac31 100644
+--- a/examples/example3.c
++++ b/examples/example3.c
+@@ -3,7 +3,7 @@
+ // For simplicity, this example is limited to files smaller than 4GB, but this is not a limitation of miniz.c.
+ #include <stdio.h>
+ #include <limits.h>
+-#include "miniz.h"
++#include <miniz.h>
+ 
+ typedef unsigned char uint8;
+ typedef unsigned short uint16;
+diff --git a/examples/example4.c b/examples/example4.c
+index 3f2d7cf..2e6d3f6 100644
+--- a/examples/example4.c
++++ b/examples/example4.c
+@@ -1,6 +1,6 @@
+ // example4.c - Uses tinfl.c to decompress a zlib stream in memory to an output file
+ // Public domain, May 15 2011, Rich Geldreich, richgel99@gmail.com. See "unlicense" statement at the end of tinfl.c.
+-#include "miniz.h"
++#include <miniz.h>
+ #include <stdio.h>
+ #include <limits.h>
+ 
+diff --git a/examples/example5.c b/examples/example5.c
+index a190357..0d93a9a 100644
+--- a/examples/example5.c
++++ b/examples/example5.c
+@@ -9,7 +9,7 @@
+ #define MINIZ_NO_TIME
+ #define MINIZ_NO_ZLIB_APIS
+ #define MINIZ_NO_MALLOC
+-#include "miniz.h"
++#include <miniz.h>
+ 
+ // Now include stdio.h because this test uses fopen(), etc. (but we still don't want miniz.c's stdio stuff, for testing).
+ #include <stdio.h>
+diff --git a/examples/example6.c b/examples/example6.c
+index abbb64f..7878848 100644
+--- a/examples/example6.c
++++ b/examples/example6.c
+@@ -7,7 +7,7 @@
+ #define MINIZ_NO_STDIO
+ #define MINIZ_NO_TIME
+ #define MINIZ_NO_ZLIB_APIS
+-#include "miniz.h"
++#include <miniz.h>
+ 
+ // Now include stdio.h because this test uses fopen(), etc. (but we still don't want miniz.c's stdio stuff, for testing).
+ #include <stdio.h>
+-- 
+2.31.1
+

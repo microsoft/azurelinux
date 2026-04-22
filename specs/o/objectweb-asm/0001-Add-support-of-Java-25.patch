@@ -1,0 +1,64 @@
+From 756ccf40723d9ba68872252810f3dbb2b186be0c Mon Sep 17 00:00:00 2001
+From: forax <forax@univ-mlv.fr>
+Date: Tue, 10 Dec 2024 11:11:49 +0100
+Subject: [PATCH] Add support of Java 25
+
+---
+ asm-util/src/main/java/org/objectweb/asm/util/ASMifier.java | 1 +
+ asm/src/main/java/org/objectweb/asm/ClassReader.java        | 2 +-
+ asm/src/main/java/org/objectweb/asm/Opcodes.java            | 1 +
+ asm/src/test/java/org/objectweb/asm/ConstantsTest.java      | 1 +
+ 4 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/asm-util/src/main/java/org/objectweb/asm/util/ASMifier.java b/asm-util/src/main/java/org/objectweb/asm/util/ASMifier.java
+index 4ede9201..9ce9f1c6 100644
+--- a/asm-util/src/main/java/org/objectweb/asm/util/ASMifier.java
++++ b/asm-util/src/main/java/org/objectweb/asm/util/ASMifier.java
+@@ -114,6 +114,7 @@ public class ASMifier extends Printer {
+     classVersions.put(Opcodes.V22, "V22");
+     classVersions.put(Opcodes.V23, "V23");
+     classVersions.put(Opcodes.V24, "V24");
++    classVersions.put(Opcodes.V25, "V25");
+     CLASS_VERSIONS = Collections.unmodifiableMap(classVersions);
+   }
+ 
+diff --git a/asm/src/main/java/org/objectweb/asm/ClassReader.java b/asm/src/main/java/org/objectweb/asm/ClassReader.java
+index 33b2a300..5f66ed2b 100644
+--- a/asm/src/main/java/org/objectweb/asm/ClassReader.java
++++ b/asm/src/main/java/org/objectweb/asm/ClassReader.java
+@@ -195,7 +195,7 @@ public class ClassReader {
+     this.b = classFileBuffer;
+     // Check the class' major_version. This field is after the magic and minor_version fields, which
+     // use 4 and 2 bytes respectively.
+-    if (checkClassVersion && readShort(classFileOffset + 6) > Opcodes.V24) {
++    if (checkClassVersion && readShort(classFileOffset + 6) > Opcodes.V25) {
+       throw new IllegalArgumentException(
+           "Unsupported class file major version " + readShort(classFileOffset + 6));
+     }
+diff --git a/asm/src/main/java/org/objectweb/asm/Opcodes.java b/asm/src/main/java/org/objectweb/asm/Opcodes.java
+index 9aa8a3b0..4ed95869 100644
+--- a/asm/src/main/java/org/objectweb/asm/Opcodes.java
++++ b/asm/src/main/java/org/objectweb/asm/Opcodes.java
+@@ -290,6 +290,7 @@ public interface Opcodes {
+   int V22 = 0 << 16 | 66;
+   int V23 = 0 << 16 | 67;
+   int V24 = 0 << 16 | 68;
++  int V25 = 0 << 16 | 69;
+ 
+   /**
+    * Version flag indicating that the class is using 'preview' features.
+diff --git a/asm/src/test/java/org/objectweb/asm/ConstantsTest.java b/asm/src/test/java/org/objectweb/asm/ConstantsTest.java
+index e7af1d04..543ba044 100644
+--- a/asm/src/test/java/org/objectweb/asm/ConstantsTest.java
++++ b/asm/src/test/java/org/objectweb/asm/ConstantsTest.java
+@@ -257,6 +257,7 @@ class ConstantsTest {
+       case "V22":
+       case "V23":
+       case "V24":
++      case "V25":
+         return ConstantType.CLASS_VERSION;
+       case "ACC_PUBLIC":
+       case "ACC_PRIVATE":
+-- 
+2.48.1
+

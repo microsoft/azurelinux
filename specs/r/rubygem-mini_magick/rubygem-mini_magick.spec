@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 4.11.0
-Release: 13%{?dist}
+Release: 14%{?dist}
 Summary: Manipulate images with minimal use of memory via ImageMagick / GraphicsMagick
 License: MIT
 URL: https://github.com/minimagick/minimagick

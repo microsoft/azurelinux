@@ -3,7 +3,7 @@
 
 Name:           python-pytest-relaxed
 Version:        2.0.2
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        Relaxed test discovery/organization for pytest
 
 License:        BSD-2-Clause

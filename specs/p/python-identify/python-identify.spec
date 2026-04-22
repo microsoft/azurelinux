@@ -6,7 +6,7 @@
 
 Name:           python-%{pypi_name}
 Version:        2.6.16
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        File identification library for Python
 
 License:        MIT

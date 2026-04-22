@@ -18,7 +18,7 @@ Code from the future, delivered to you in the now.
 
 Name:           python-%{pypi_name}
 Version:        3.0.0
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        Useful additions to futures, from the future
 
 License:        Apache-2.0

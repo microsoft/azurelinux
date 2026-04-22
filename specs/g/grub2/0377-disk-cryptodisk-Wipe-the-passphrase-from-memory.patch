@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Maxim Suhanov <dfirblog@gmail.com>
+Date: Tue, 4 Mar 2025 15:27:59 +0300
+Subject: [PATCH] disk/cryptodisk: Wipe the passphrase from memory
+
+Switching to another EFI boot application while there are secrets in
+RAM is dangerous, because not all firmware is wiping memory on free.
+
+To reduce the attack surface, wipe the passphrase acquired when
+unlocking an encrypted volume.
+
+Signed-off-by: Maxim Suhanov <dfirblog@gmail.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/disk/cryptodisk.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/grub-core/disk/cryptodisk.c b/grub-core/disk/cryptodisk.c
+index 9597d2d3bd..26457095d3 100644
+--- a/grub-core/disk/cryptodisk.c
++++ b/grub-core/disk/cryptodisk.c
+@@ -1164,6 +1164,7 @@ grub_cryptodisk_scan_device_real (const char *name,
+ 
+   if (askpass)
+     {
++      grub_memset (cargs->key_data, 0, cargs->key_len);
+       cargs->key_len = 0;
+       grub_free (cargs->key_data);
+     }

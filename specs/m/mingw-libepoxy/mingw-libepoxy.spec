@@ -5,7 +5,7 @@
 
 Name:           mingw-libepoxy
 Version:        1.5.10
-Release:        9%{?dist}
+Release: 10%{?dist}
 Summary:        MinGW Windows libepoxy library
 
 License:        MIT

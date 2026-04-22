@@ -9,7 +9,7 @@ Summary:        Portable thread pool
 Name:           pthreadpool
 License:        BSD-2-Clause
 Version:        0.0^git%{date0}.%{shortcommit0}
-Release:        7%{?dist}
+Release: 8%{?dist}
 
 URL:            https://github.com/Maratyszcza/%{name}
 Source0:        %{url}/archive/%{commit0}/%{name}-%{shortcommit0}.tar.gz

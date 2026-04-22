@@ -5,7 +5,7 @@ Name: hyphen-cy
 Summary: Welsh hyphenation rules
 %global upstreamid 20110620
 Version: 0.%{upstreamid}
-Release: 29%{?dist}
+Release: 30%{?dist}
 #? in a url causes trouble
 #http://tug.org/svn/texhyphen/trunk/hyph-utf8/tex/generic/hyph-utf8/patterns/tex/hyph-cy.tex?view=co
 Source: hyph-cy.tex

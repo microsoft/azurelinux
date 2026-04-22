@@ -3,7 +3,7 @@
 
 Name:          perl-Net-DNS
 Version:       1.53
-Release:       1%{?dist}
+Release: 2%{?dist}
 Summary:       DNS resolver modules for Perl
 License:       MIT
 URL:           https://www.net-dns.org

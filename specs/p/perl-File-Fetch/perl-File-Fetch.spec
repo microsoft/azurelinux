@@ -3,7 +3,7 @@
 
 Name:           perl-File-Fetch
 Version:        1.08
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Generic file fetching mechanism
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/File-Fetch

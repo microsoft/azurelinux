@@ -1,0 +1,46 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Michael Chang <mchang@suse.com>
+Date: Fri, 31 May 2024 15:14:23 +0800
+Subject: [PATCH] fs/ext2: Fix out-of-bounds read for inline extents
+
+When inline extents are used, i.e. the extent tree depth equals zero,
+a maximum of four entries can fit into the inode's data block. If the
+extent header states a number of entries greater than four the current
+ext2 implementation causes an out-of-bounds read. Fix this issue by
+capping the number of extents to four when reading inline extents.
+
+Reported-by: Daniel Axtens <dja@axtens.net>
+Signed-off-by: Michael Chang <mchang@suse.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/fs/ext2.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/fs/ext2.c b/grub-core/fs/ext2.c
+index e1cc5e62a..3f9f6b208 100644
+--- a/grub-core/fs/ext2.c
++++ b/grub-core/fs/ext2.c
+@@ -495,6 +495,8 @@ grub_ext2_read_block (grub_fshelp_node_t node, grub_disk_addr_t fileblock)
+       struct grub_ext4_extent *ext;
+       int i;
+       grub_disk_addr_t ret;
++      grub_uint16_t nent;
++      const grub_uint16_t max_inline_ext = sizeof (inode->blocks) / sizeof (*ext) - 1; /* Minus 1 extent header. */
+ 
+       if (grub_ext4_find_leaf (data, (struct grub_ext4_extent_header *) inode->blocks.dir_blocks,
+ 			       fileblock, &leaf) != GRUB_ERR_NONE)
+@@ -508,7 +510,13 @@ grub_ext2_read_block (grub_fshelp_node_t node, grub_disk_addr_t fileblock)
+         return 0;
+ 
+       ext = (struct grub_ext4_extent *) (leaf + 1);
+-      for (i = 0; i < grub_le_to_cpu16 (leaf->entries); i++)
++
++      nent = grub_le_to_cpu16 (leaf->entries);
++
++      if (leaf->depth == 0)
++	nent = grub_min (nent, max_inline_ext);
++
++      for (i = 0; i < nent; i++)
+         {
+           if (fileblock < grub_le_to_cpu32 (ext[i].block))
+             break;

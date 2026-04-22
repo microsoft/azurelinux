@@ -1,0 +1,31 @@
+include: /usr/lib/rpm/rpmrc
+
+optflags: i386 %{__global_compiler_flags} -m32 -march=i386 -mtune=generic -fasynchronous-unwind-tables -fstack-clash-protection
+optflags: i486 %{__global_compiler_flags} -m32 -march=i486 -fasynchronous-unwind-tables -fstack-clash-protection
+optflags: i586 %{__global_compiler_flags} -m32 -march=i586 -mtune=generic -fasynchronous-unwind-tables -fstack-clash-protection
+optflags: i686 %{__global_compiler_flags} -m32 -march=i686 -mtune=generic -msse2 -mfpmath=sse -mstackrealign -fasynchronous-unwind-tables -fstack-clash-protection
+optflags: athlon %{__global_compiler_flags} -m32 -march=athlon -fasynchronous-unwind-tables -fstack-clash-protection
+optflags: x86_64 %{__global_compiler_flags} -m64 %{__cflags_arch_x86_64} %__cflags_arch_x86_64_common
+optflags: x86_64_v2 %{__global_compiler_flags} -m64 -march=x86-64-v2 %__cflags_arch_x86_64_common
+optflags: x86_64_v3 %{__global_compiler_flags} -m64 -march=x86-64-v3 %__cflags_arch_x86_64_common
+optflags: x86_64_v4 %{__global_compiler_flags} -m64 -march=x86-64-v4 %__cflags_arch_x86_64_common
+
+optflags: ppc64le %{__global_compiler_flags} -m64 %{__cflags_arch_ppc64le} -fasynchronous-unwind-tables -fstack-clash-protection
+
+optflags: s390x %{__global_compiler_flags} -m64 %{__cflags_arch_s390x} -fasynchronous-unwind-tables -fstack-clash-protection
+
+optflags: aarch64 %{__global_compiler_flags} -mbranch-protection=standard -fasynchronous-unwind-tables -fstack-clash-protection %{_frame_pointers_cflags} %{_frame_pointers_cflags_aarch64}
+
+optflags: riscv64 %{__global_compiler_flags} -fasynchronous-unwind-tables %{_frame_pointers_cflags} %{_frame_pointers_cflags_riscv64}
+
+# set build arch to fedora buildarches on hardware capable of running it
+# saves having to do rpmbuild --target=
+buildarchtranslate: athlon: i686
+buildarchtranslate: geode: i686
+buildarchtranslate: pentium4: i686
+buildarchtranslate: pentium3: i686
+buildarchtranslate: i686: i686
+buildarchtranslate: i586: i586
+
+buildarchtranslate: armv7hl: armv7hl
+buildarchtranslate: armv7hnl: armv7hl

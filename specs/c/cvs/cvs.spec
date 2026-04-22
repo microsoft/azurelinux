@@ -17,7 +17,7 @@
 
 Name:       cvs
 Version:    1.11.23
-Release:    75%{?dist}
+Release: 76%{?dist}
 Summary:    Concurrent Versions System
 URL:        https://cvs.nongnu.org/
 # contrib/check_cvs.in:     check-cvs

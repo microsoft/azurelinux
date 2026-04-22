@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 21 Mar 2022 16:56:10 -0400
+Subject: [PATCH] modules: Don't allocate space for non-allocable sections.
+
+Currently when loading grub modules, we allocate space for all sections,
+including those without SHF_ALLOC set.  We then copy the sections that
+/do/ have SHF_ALLOC set into the allocated memory, leaving some of our
+allocation untouched forever.  Additionally, on platforms with GOT
+fixups and trampolines, we currently compute alignment round-ups for the
+sections and sections with sh_size = 0.
+
+This patch removes the extra space from the allocation computation, and
+makes the allocation computation loop skip empty sections as the loading
+loop does.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/kern/dl.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/grub-core/kern/dl.c b/grub-core/kern/dl.c
+index 931f6e41442..832c6188df4 100644
+--- a/grub-core/kern/dl.c
++++ b/grub-core/kern/dl.c
+@@ -281,6 +281,9 @@ grub_dl_load_segments (grub_dl_t mod, const Elf_Ehdr *e)
+        i < e->e_shnum;
+        i++, s = (const Elf_Shdr *)((const char *) s + e->e_shentsize))
+     {
++      if (s->sh_size == 0 || !(s->sh_flags & SHF_ALLOC))
++	continue;
++
+       tsize = ALIGN_UP (tsize, s->sh_addralign) + s->sh_size;
+       if (talign < s->sh_addralign)
+ 	talign = s->sh_addralign;

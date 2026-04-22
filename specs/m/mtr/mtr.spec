@@ -6,7 +6,7 @@
 Summary: Network diagnostic tool combining 'traceroute' and 'ping'
 Name: mtr
 Version: 0.95
-Release: 13%{?dist}
+Release: 14%{?dist}
 Epoch: 2
 License: GPL-2.0-only
 URL: https://www.bitwizard.nl/mtr/

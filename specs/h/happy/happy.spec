@@ -18,7 +18,7 @@
 Name:           happy
 Version:        2.0.2
 # can only be reset when subpkg bumped
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Parser Generator for Haskell
 
 License:        BSD-2-Clause

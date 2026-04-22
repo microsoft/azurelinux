@@ -3,7 +3,7 @@
 
 Name:		pari-elldata
 Version:	20210301
-Release:	11%{?dist}
+Release: 12%{?dist}
 Summary:	PARI/GP Computer Algebra System elliptic curves
 License:	GPL-2.0-or-later
 URL:		https://pari.math.u-bordeaux.fr/packages.html

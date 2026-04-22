@@ -3,7 +3,7 @@
 
 Name:           perl-experimental
 Version:        0.036
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Experimental features made easy
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/experimental

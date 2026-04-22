@@ -8,7 +8,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 3.2.0
-Release: 10%{?dist}
+Release: 11%{?dist}
 Summary: High performance memcached client for Ruby
 License: MIT
 URL: https://github.com/petergoldstein/dalli

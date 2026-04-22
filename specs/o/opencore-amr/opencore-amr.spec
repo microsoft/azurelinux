@@ -5,7 +5,7 @@
 
 Name:           opencore-amr
 Version:        0.1.6
-Release:        9%{?dist}
+Release: 10%{?dist}
 Summary:        OpenCORE Adaptive Multi Rate Narrowband and Wideband speech lib
 License:        Apache-2.0
 URL:            http://sourceforge.net/projects/opencore-amr/

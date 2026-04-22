@@ -3,7 +3,7 @@
 
 Name:           libconfuse
 Version:        3.3
-Release:        15%{?dist}
+Release: 16%{?dist}
 Summary:        A configuration file parser library
 
 License:        ISC

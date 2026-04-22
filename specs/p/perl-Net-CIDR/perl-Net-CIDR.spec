@@ -3,7 +3,7 @@
 
 Name:           perl-Net-CIDR
 Version:        0.27
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Manipulate IPv4/IPv6 netblocks in CIDR notation
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/dist/Net-CIDR

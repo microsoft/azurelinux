@@ -3,7 +3,7 @@
 
 Name:           pcaudiolib
 Version:        1.1
-Release:        18%{?dist}
+Release: 19%{?dist}
 Summary:        Portable C Audio Library
 
 # pcaudiolib bundles TPCircularBuffer with Cube license, which is only used

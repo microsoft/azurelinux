@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Robbie Harwood <rharwood@redhat.com>
+Date: Thu, 25 Aug 2022 17:57:55 -0400
+Subject: [PATCH] blscfg: Don't root device in emu builds
+
+Otherwise, we end up looking for kernel/initrd in /boot/boot which
+doesn't work at all.  Non-emu builds need to be looking in
+($root)/boot/, which is what this is for.
+
+Signed-off-by: Robbie Harwood <rharwood@redhat.com>
+---
+ grub-core/commands/blscfg.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/grub-core/commands/blscfg.c b/grub-core/commands/blscfg.c
+index e907a6a5d28..dbd0899acf3 100644
+--- a/grub-core/commands/blscfg.c
++++ b/grub-core/commands/blscfg.c
+@@ -41,7 +41,7 @@ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+ #define GRUB_BLS_CONFIG_PATH "/loader/entries/"
+ #ifdef GRUB_MACHINE_EMU
+-#define GRUB_BOOT_DEVICE "/boot"
++#define GRUB_BOOT_DEVICE ""
+ #else
+ #define GRUB_BOOT_DEVICE "($root)"
+ #endif

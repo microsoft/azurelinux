@@ -11,7 +11,7 @@
 
 Name: libvirt-dbus
 Version: 1.4.1
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary: libvirt D-Bus API binding
 License: LGPL-2.1-or-later
 URL: https://libvirt.org/

@@ -59,7 +59,7 @@ License:        LGPL-2.1-or-later AND GPL-3.0-and-later AND MIT AND CC-BY-SA-3.0
 URL:            https://cockpit-project.org/
 
 Version:        356
-Release:        1%{?dist}
+Release: 2%{?dist}
 Source0:        https://github.com/cockpit-project/cockpit/releases/download/%{version}/cockpit-%{version}.tar.xz
 Source1:        https://github.com/cockpit-project/cockpit/releases/download/%{version}/cockpit-node-%{version}.tar.xz
 

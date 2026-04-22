@@ -3,7 +3,7 @@
 
 Name:           perl-utf8-all
 Version:        0.024
-Release:        25%{?dist}
+Release: 26%{?dist}
 Summary:        Turn on Unicode everywhere
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/utf8-all

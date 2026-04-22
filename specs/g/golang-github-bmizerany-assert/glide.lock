@@ -1,0 +1,5 @@
+hash: 57ec44bd0d73ea7614cbde663a42e53048643b383fd3cf19246ae005253d4479
+imports:
+- name: github.com/kr/pretty
+  version: 821b30f52f1af83de62fd3a4baf33c4b80b0e1e5
+updated: '2018-06-08T19:25:24.880172+00:00'

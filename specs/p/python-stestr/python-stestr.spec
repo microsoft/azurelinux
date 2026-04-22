@@ -14,7 +14,7 @@ stestr hard codes python-subunit-isms into how it works.
 
 Name:       python-%{pypi_name}
 Version:    4.1.0
-Release:    11%{?dist}
+Release: 12%{?dist}
 Summary:    A test runner runner similar to testrepository
 
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.

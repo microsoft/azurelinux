@@ -10,7 +10,7 @@
 
 Name:           perl-indirect
 Version:        0.39
-Release:        28%{?dist}
+Release: 29%{?dist}
 Summary:        Lexically warn about using the indirect object syntax
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/indirect

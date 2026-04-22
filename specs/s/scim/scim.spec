@@ -3,7 +3,7 @@
 
 Name:      scim
 Version:   1.4.18
-Release:   13%{?dist}
+Release: 14%{?dist}
 Summary:   Smart Common Input Method platform
 
 License:   LGPL-2.1-or-later

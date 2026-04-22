@@ -4,7 +4,7 @@
 Name:       beakerlib
 Summary:    A shell-level integration testing library
 Version:    1.33
-Release:    1%{?dist}
+Release: 2%{?dist}
 License:    GPL-2.0-only
 BuildArch:  noarch
 URL:        https://github.com/%{name}

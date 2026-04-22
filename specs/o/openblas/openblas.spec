@@ -18,7 +18,7 @@
 
 Name:           openblas
 Version:        0.3.29
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        An optimized BLAS library based on GotoBLAS2
 
 License:        BSD-3-Clause
@@ -105,6 +105,7 @@ version. The project is supported by the Lab of Parallel Software and \
 Computational Science, ISCAS. http://www.rdcps.ac.cn
 
 
+BuildRequires: python3
 %description
 %{base_description}
 

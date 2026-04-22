@@ -4,7 +4,7 @@
 Summary: GNU's bc (a numeric processing language) and dc (a calculator)
 Name: bc
 Version: 1.08.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPL-3.0-or-later
 URL: https://www.gnu.org/software/bc/
 Source0: https://ftp.gnu.org/gnu/bc/bc-%{version}.tar.gz

@@ -1,0 +1,18 @@
+Fix FTBFS on EL9 due to old ffmpeg-5.x
+
+diff -up chromium-142.0.7444.59/media/filters/legacy_audio_file_reader.cc.me chromium-142.0.7444.59/media/filters/legacy_audio_file_reader.cc
+--- chromium-142.0.7444.59/media/filters/legacy_audio_file_reader.cc.me	2025-11-02 08:20:16.949092776 +0100
++++ chromium-142.0.7444.59/media/filters/legacy_audio_file_reader.cc	2025-11-02 08:22:01.331132435 +0100
+@@ -273,10 +273,10 @@ bool LegacyAudioFileReader::OnNewFrame(
+   // silence from being output. In the case where we are also discarding some
+   // portion of the packet (as indicated by a negative pts), we further want to
+   // adjust the duration downward by however much exists before zero.
+-  if (audio_codec_ == AudioCodec::kAAC && frame->duration) {
++  if (audio_codec_ == AudioCodec::kAAC && frame->pkt_duration) {
+     const base::TimeDelta pkt_duration = ConvertFromTimeBase(
+         UNSAFE_TODO(glue_->format_context()->streams[stream_index_])->time_base,
+-        frame->duration + std::min(static_cast<int64_t>(0), frame->pts));
++        frame->pkt_duration + std::min(static_cast<int64_t>(0), frame->pts));
+     const base::TimeDelta frame_duration =
+         base::Seconds(frames_read / static_cast<double>(sample_rate_));
+ 

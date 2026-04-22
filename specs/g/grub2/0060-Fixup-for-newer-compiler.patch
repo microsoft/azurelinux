@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 10 May 2018 13:40:19 -0400
+Subject: [PATCH] Fixup for newer compiler
+
+---
+ grub-core/fs/btrfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/grub-core/fs/btrfs.c b/grub-core/fs/btrfs.c
+index 87e4dd1a07a..ad35e75750b 100644
+--- a/grub-core/fs/btrfs.c
++++ b/grub-core/fs/btrfs.c
+@@ -218,7 +218,7 @@ struct grub_btrfs_inode
+   grub_uint64_t size;
+   grub_uint8_t dummy2[0x70];
+   struct grub_btrfs_time mtime;
+-} GRUB_PACKED;
++} GRUB_PACKED  __attribute__ ((aligned(8)));
+ 
+ struct grub_btrfs_extent_data
+ {

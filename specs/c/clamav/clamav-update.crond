@@ -1,0 +1,6 @@
+## Adjust this line...
+MAILTO=root
+
+## It is ok to execute it as root; freshclam drops privileges and becomes
+## user 'clamupdate' as soon as possible
+0  */3 * * * root /usr/share/clamav/freshclam-sleep > /dev/null

@@ -5,7 +5,7 @@ Summary: Traces the route taken by packets over an IPv4/IPv6 network
 Name: traceroute
 Epoch: 3
 Version: 2.1.6
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPL-2.0-or-later
 URL:  http://traceroute.sourceforge.net
 Source0: https://downloads.sourceforge.net/project/traceroute/traceroute/traceroute-%{version}/traceroute-%{version}.tar.gz

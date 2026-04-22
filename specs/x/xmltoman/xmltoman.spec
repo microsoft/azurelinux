@@ -3,7 +3,7 @@
 
 Name:           xmltoman
 Version:        0.4
-Release:        33%{?dist}
+Release: 34%{?dist}
 Summary:        Scripts for converting XML to roff or HTML
 
 License:        GPL-2.0-or-later

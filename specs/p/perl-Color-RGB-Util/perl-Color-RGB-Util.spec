@@ -3,7 +3,7 @@
 
 Name:           perl-Color-RGB-Util
 Version:        0.609
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Utilities related to RGB colors
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Color-RGB-Util/

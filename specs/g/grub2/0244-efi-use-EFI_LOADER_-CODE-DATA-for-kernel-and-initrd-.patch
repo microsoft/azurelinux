@@ -1,0 +1,61 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 1 Aug 2022 13:04:43 -0400
+Subject: [PATCH] efi: use EFI_LOADER_(CODE|DATA) for kernel and initrd
+ allocations
+
+At some point due to an erroneous kernel warning, we switched kernel and
+initramfs to being loaded in EFI_RUNTIME_SERVICES_CODE and
+EFI_RUNTIME_SERVICES_DATA memory pools.  This doesn't appear to be
+correct according to the spec, and that kernel warning has gone away.
+
+This patch puts them back in EFI_LOADER_CODE and EFI_LOADER_DATA
+allocations, respectively.
+
+Resolves: rhbz#2108456
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/loader/i386/efi/linux.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/grub-core/loader/i386/efi/linux.c b/grub-core/loader/i386/efi/linux.c
+index a798da334ab..03d27c81fd3 100644
+--- a/grub-core/loader/i386/efi/linux.c
++++ b/grub-core/loader/i386/efi/linux.c
+@@ -271,7 +271,7 @@ grub_cmd_initrd (grub_command_t cmd, int argc, char *argv[])
+     }
+ 
+   grub_dprintf ("linux", "Trying to allocate initrd mem\n");
+-  initrd_mem = kernel_alloc(INITRD_MEM, size, GRUB_EFI_RUNTIME_SERVICES_DATA,
++  initrd_mem = kernel_alloc(INITRD_MEM, size, GRUB_EFI_LOADER_DATA,
+ 			    N_("can't allocate initrd"));
+   if (initrd_mem == NULL)
+     goto fail;
+@@ -426,7 +426,7 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+ #endif
+ 
+   params = kernel_alloc (KERNEL_MEM, sizeof(*params),
+-			 GRUB_EFI_RUNTIME_SERVICES_DATA,
++			 GRUB_EFI_LOADER_DATA,
+ 			 "cannot allocate kernel parameters");
+   if (!params)
+     goto fail;
+@@ -450,7 +450,7 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+ 
+   grub_dprintf ("linux", "setting up cmdline\n");
+   cmdline = kernel_alloc (KERNEL_MEM, lh->cmdline_size + 1,
+-			  GRUB_EFI_RUNTIME_SERVICES_DATA,
++			  GRUB_EFI_LOADER_DATA,
+ 			  N_("can't allocate cmdline"));
+   if (!cmdline)
+     goto fail;
+@@ -499,7 +499,7 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+   kernel_size = lh->init_size;
+   grub_dprintf ("linux", "Trying to allocate kernel mem\n");
+   kernel_mem = kernel_alloc (KERNEL_MEM, kernel_size,
+-			     GRUB_EFI_RUNTIME_SERVICES_CODE,
++			     GRUB_EFI_LOADER_CODE,
+ 			     N_("can't allocate kernel"));
+   restore_addresses();
+   if (!kernel_mem)

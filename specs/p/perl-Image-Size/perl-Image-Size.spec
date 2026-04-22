@@ -9,7 +9,7 @@
 
 Name:           perl-Image-Size
 Version:        3.300
-Release:        33%{?dist}
+Release: 34%{?dist}
 Summary:        Determine the size of images in several common formats in Perl
 # Automatically converted from old format: LGPLv2 or Artistic 2.0 - review is highly recommended.
 License:        LicenseRef-Callaway-LGPLv2 OR Artistic-2.0

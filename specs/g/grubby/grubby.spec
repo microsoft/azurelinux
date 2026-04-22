@@ -6,7 +6,7 @@
 
 Name: grubby
 Version: 8.40
-Release: 85%{?dist}
+Release: 86%{?dist}
 Summary: Command line tool for updating bootloader configs
 License: GPL-2.0-or-later
 Source1: grubby-bls

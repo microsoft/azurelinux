@@ -3,7 +3,7 @@
 
 Name:           libvdpau
 Version:        1.5
-Release:        10%{?dist}
+Release: 11%{?dist}
 Summary:        Wrapper library for the Video Decode and Presentation API
 License:        MIT
 URL:            https://freedesktop.org/wiki/Software/VDPAU/

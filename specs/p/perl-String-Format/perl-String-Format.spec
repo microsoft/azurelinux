@@ -3,7 +3,7 @@
 
 Name:           perl-String-Format
 Version:        1.18
-Release:        22%{?dist}
+Release: 23%{?dist}
 Summary:        Sprintf-like string formatting capabilities with arbitrary format definitions
 
 License:        GPL-2.0-only

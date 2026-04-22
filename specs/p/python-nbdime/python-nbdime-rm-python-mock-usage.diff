@@ -1,0 +1,10 @@
+--- nbdime-4.0.4/pyproject.toml.orig	2026-02-10 08:01:38.000000000 -0700
++++ nbdime-4.0.4/pyproject.toml	2026-02-11 12:27:06.605371419 -0700
+@@ -73,7 +73,6 @@ test = [
+     "pytest-timeout",
+     "jupyter_server[test]",
+     "jsonschema",
+-    "mock",
+     "notebook",
+     "requests",
+     "tabulate",

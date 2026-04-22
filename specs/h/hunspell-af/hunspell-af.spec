@@ -11,7 +11,7 @@ Name: hunspell-af
 Summary: Afrikaans hunspell dictionary
 %global upstreamid 20080825
 Version: 0.%{upstreamid}
-Release: 34%{?dist}
+Release: 35%{?dist}
 # Following URL is dead now
 Source: http://downloads.translate.org.za/spellchecker/afrikaans/myspell-af_ZA-0.%{upstreamid}.zip
 URL: http://www.translate.org.za/

@@ -13,7 +13,7 @@
 Name:           python-cherrypy
 %global         camelname CherryPy
 Version:        18.10.0
-Release:        9%{?dist}
+Release: 10%{?dist}
 Summary:        Pythonic, object-oriented web development framework
 # Automatically converted from old format: BSD - review is highly recommended.
 License:        LicenseRef-Callaway-BSD

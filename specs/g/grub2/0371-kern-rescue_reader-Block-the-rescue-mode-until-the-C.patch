@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Maxim Suhanov <dfirblog@gmail.com>
+Date: Fri, 28 Feb 2025 17:00:53 +0300
+Subject: [PATCH] kern/rescue_reader: Block the rescue mode until the CLI
+ authentication
+
+This further mitigates potential misuse of the CLI after the
+root device has been successfully unlocked via TPM.
+
+Fixes: CVE-2025-4382
+
+Signed-off-by: Maxim Suhanov <dfirblog@gmail.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/kern/rescue_reader.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/grub-core/kern/rescue_reader.c b/grub-core/kern/rescue_reader.c
+index 4259857ba9..a71ada8fb7 100644
+--- a/grub-core/kern/rescue_reader.c
++++ b/grub-core/kern/rescue_reader.c
+@@ -79,7 +79,7 @@ void __attribute__ ((noreturn))
+ grub_rescue_run (void)
+ {
+   /* Stall if the CLI has been disabled */
+-  if (grub_is_cli_disabled ())
++  if (grub_is_cli_disabled () || grub_is_cli_need_auth ())
+     {
+       grub_printf ("Rescue mode has been disabled...\n");
+ 

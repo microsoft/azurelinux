@@ -12,7 +12,7 @@
 
 Name:           foma
 Version:        0.10.0
-Release:        0.14.%{snapshotdate}git%{shortcommit0}%{?dist}
+Release: 1.14.%{snapshotdate}git%{shortcommit0}%{?dist}
 Summary:        Xerox-compatible finite-state compiler
 
 License:        Apache-2.0

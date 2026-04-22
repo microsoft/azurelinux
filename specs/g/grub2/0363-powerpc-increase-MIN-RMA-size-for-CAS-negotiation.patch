@@ -1,0 +1,117 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Avnish Chouhan <avnish@linux.ibm.com>
+Date: Thu, 13 Mar 2025 19:45:50 +0530
+Subject: [PATCH] powerpc: increase MIN RMA size for CAS negotiation
+
+Change RMA size from 512 MB to 768 MB which will result
+in more memory at boot time for PowerPC. When vTPM, Secure Boot or
+FADump are enabled on PowerPC, the 512 MB RMA memory is not sufficient for
+booting. With this 512 MB RMA, GRUB2 runs out of memory and fails to
+boot the machine. Sometimes even usage of CDROM requires more memory
+for installation and along with the options mentioned above exhausts
+the boot memory which results in boot failures. Increasing the RMA size
+will resolves multiple out of memory issues observed in PowerPC.
+
+Failure details (GRUB2 debugs):
+
+  kern/ieee1275/init.c:550: mm requested region of size 8513000, flags 1
+  kern/ieee1275/init.c:563: Cannot satisfy allocation and retain minimum runtime space
+  kern/ieee1275/init.c:550: mm requested region of size 8513000, flags 0
+  kern/ieee1275/init.c:563: Cannot satisfy allocation and retain minimum runtime space
+  kern/file.c:215: Closing `/ppc/ppc64/initrd.img' ...
+  kern/disk.c:297: Closing `ieee1275//vdevice/v-scsi@30000067/disk@8300000000000000'...
+  kern/disk.c:311: Closing `ieee1275//vdevice/v-scsi@30000067/disk@8300000000000000' succeeded.
+  kern/file.c:225: Closing `/ppc/ppc64/initrd.img' failed with 3.
+  kern/file.c:148: Opening `/ppc/ppc64/initrd.img' succeeded.
+  error: ../../grub-core/kern/mm.c:552:out of memory.
+
+Signed-off-by: Avnish Chouhan <avnish@linux.ibm.com>
+---
+ grub-core/kern/ieee1275/init.c | 51 +++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 46 insertions(+), 5 deletions(-)
+
+diff --git a/grub-core/kern/ieee1275/init.c b/grub-core/kern/ieee1275/init.c
+index 4ec6598cfbb8..bb791f80f41c 100644
+--- a/grub-core/kern/ieee1275/init.c
++++ b/grub-core/kern/ieee1275/init.c
+@@ -737,7 +737,7 @@ struct cas_vector
+ 
+ /*
+  * Call ibm,client-architecture-support to try to get more RMA.
+- * We ask for 512MB which should be enough to verify a distro kernel.
++ * We ask for 768MB which should be enough to verify a distro kernel.
+  * We ignore most errors: if we don't succeed we'll proceed with whatever
+  * memory we have.
+  */
+@@ -809,7 +809,7 @@ grub_ieee1275_ibm_cas (void)
+     .vec1 = 0x80, /* ignore */
+     .vec2_size = 1 + sizeof (struct option_vector2) - 2,
+     .vec2 = {
+-      0, 0, -1, -1, -1, -1, -1, 512, -1, 0, 48
++      0, 0, -1, -1, -1, -1, -1, 768, -1, 0, 48
+     },
+     .vec3_size = 2 - 1,
+     .vec3 = 0x00e0, /* ask for FP + VMX + DFP but don't halt if unsatisfied */
+@@ -846,6 +846,10 @@ grub_claim_heap (void)
+ {
+   grub_err_t err;
+   grub_uint32_t total = HEAP_MAX_SIZE;
++#if defined(__powerpc__)
++  grub_uint32_t ibm_ca_support_reboot = 0;
++  grub_ssize_t actual;
++#endif
+ 
+   err = grub_ieee1275_total_mem (&rmo_top);
+ 
+@@ -858,11 +862,48 @@ grub_claim_heap (void)
+     grub_mm_add_region_fn = grub_ieee1275_mm_add_region;
+ 
+ #if defined(__powerpc__)
++  /* Check if it's a CAS reboot with below property. If so, we will skip CAS call */
++  if (grub_ieee1275_get_integer_property (grub_ieee1275_chosen,
++                                          "ibm,client-architecture-support-reboot",
++                                          &ibm_ca_support_reboot,
++                                          sizeof (ibm_ca_support_reboot),
++                                          &actual) >= 0)
++    grub_dprintf ("ieee1275", "ibm,client-architecture-support-reboot: %" PRIuGRUB_UINT32_T "\n",
++                  ibm_ca_support_reboot);
++
+   if (grub_ieee1275_test_flag (GRUB_IEEE1275_FLAG_CAN_TRY_CAS_FOR_MORE_MEMORY))
+     {
+-      /* if we have an error, don't call CAS, just hope for the best */
+-      if (err == GRUB_ERR_NONE && rmo_top < (512 * 1024 * 1024))
+-	grub_ieee1275_ibm_cas ();
++      /*
++       * If we have an error, don't call CAS. Just hope for the best.
++       * Along with the above, if the rmo_top is 512 MB or above. We
++       * will skip the CAS call. However, if we call CAS, the rmo_top
++       * will be set to 768 MB via CAS Vector2. But we need to call
++       * CAS with "rmo_top < 512 MB" to avoid the issue on the older
++       * Linux kernel, which still uses rmo_top as 512 MB. If we call
++       * CAS with a condition "rmo_top < 768 MB", it will result in an
++       * issue due to the IBM CAS reboot feature and we won't be able
++       * to boot the newer kernel. Whenever a reboot is detected as
++       * the CAS reboot by GRUB. It will boot the machine with the
++       * last booted kernel by reading the variable "boot-last-label"
++       * which has the info related to the last boot and it's specific
++       * to IBM PowerPC. Due to this, the machine will boot with the
++       * last booted kernel which has rmo_top as 512 MB. Also, if the
++       * reboot is detected as a CAS reboot, the GRUB will skip the CAS
++       * call. As the CAS has already been called earlier, so it is
++       * not required to call CAS even if the other conditions are met.
++       * This condition will also prevent a scenario where the machine
++       * get stuck in the CAS reboot loop while booting. A machine with
++       * an older kernel, having option_vector2 MIN_RMA as 512 MB in
++       * Linux prom_init.c and GRUB uses "rmo_top < 768 MB" condition
++       * for calling CAS. Due to their respective conditions, linux
++       * CAS and GRUB CAS will keep doing the CAS calls and change
++       * the MIN_RMA from 768(changed by GRUB) to 512(changed by Linux)
++       * to 768(changed by GRUB) to 512(changed by Linux) and so on,
++       * and the machine will stuck in this CAS reboot loop forever.
++       * IBM PAPR : https://openpower.foundation/specifications/linuxonpower/
++       */
++      if (!ibm_ca_support_reboot && err == GRUB_ERR_NONE && rmo_top < (512 * 1024 * 1024))
++        grub_ieee1275_ibm_cas ();
+     }
+ #endif
+ 

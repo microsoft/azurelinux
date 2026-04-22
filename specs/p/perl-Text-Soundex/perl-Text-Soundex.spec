@@ -3,7 +3,7 @@
 
 Name:           perl-Text-Soundex
 Version:        3.05
-Release:        35%{?dist}
+Release: 36%{?dist}
 Summary:        Implementation of the soundex algorithm
 # The original license was (Copyright only). Since 3.05 somebody (RJBS?)
 # added Perl license but kept the original license text.

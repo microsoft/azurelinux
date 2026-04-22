@@ -3,7 +3,7 @@
 
 Name:           netcdf-cxx
 Version:        4.2
-Release:        38%{?dist}
+Release: 39%{?dist}
 Summary:        Legacy netCDF C++ library
 
 # Automatically converted from old format: NetCDF - review is highly recommended.

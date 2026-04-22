@@ -10,7 +10,7 @@
 
 Name:           mariadb-connector-c
 Version:        3.4.8
-Release:        3%{?with_debug:.debug}%{?dist}
+Release: 4%{?with_debug:.debug}%{?dist}
 Summary:        The MariaDB Native Client library (C driver)
 License:        LGPL-2.1-or-later AND PHP-3.0 AND PHP-3.01
 Source:         https://archive.mariadb.org/connector-c-%{version}/%{name}-%{version}-src.tar.gz

@@ -10,7 +10,7 @@
 Name: hunspell-mr
 Summary: Marathi hunspell dictionaries
 Version: 15.02webext
-Release: 1%{?dist}
+Release: 2%{?dist}
 Epoch: 1
 Source: https://addons.mozilla.org/firefox/downloads/file/4592209/marathi_dictionary-15.02webext.xpi
 URL: https://addons.mozilla.org/en-US/firefox/addon/marathi-dictionary/

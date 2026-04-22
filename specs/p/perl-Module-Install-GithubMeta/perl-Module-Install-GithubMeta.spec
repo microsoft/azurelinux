@@ -3,7 +3,7 @@
 
 Name:       perl-Module-Install-GithubMeta 
 Version:    0.30
-Release:    31%{?dist}
+Release: 32%{?dist}
 # lib/Module/Install/GithubMeta.pm -> GPL+ or Artistic
 License:    GPL-1.0-or-later OR Artistic-1.0-Perl
 Summary:    A Module::Install extension to include GitHub meta information in META.yml 

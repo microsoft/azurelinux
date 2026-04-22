@@ -6,7 +6,7 @@
 
 Name:           libmtp
 Version:        1.1.22
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Software library for MTP media players
 URL:            http://libmtp.sourceforge.net/
 

@@ -1,0 +1,36 @@
+diff --git a/unix/vncserver/CMakeLists.txt b/unix/vncserver/CMakeLists.txt
+index ae69dc0..3700837 100644
+--- a/unix/vncserver/CMakeLists.txt
++++ b/unix/vncserver/CMakeLists.txt
+@@ -6,7 +6,7 @@ configure_file(vncsession-start.in vncsession-start @ONLY)
+ configure_file(vncserver.in vncserver @ONLY)
+ configure_file(vncsession.man.in vncsession.man @ONLY)
+ 
+-install(TARGETS vncsession DESTINATION ${CMAKE_INSTALL_FULL_SBINDIR})
++install(TARGETS vncsession DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
+ install(FILES tigervnc.pam DESTINATION ${CMAKE_INSTALL_FULL_SYSCONFDIR}/pam.d RENAME tigervnc)
+ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/vncsession.man DESTINATION ${CMAKE_INSTALL_FULL_MANDIR}/man8 RENAME vncsession.8)
+ install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/vncserver DESTINATION ${CMAKE_INSTALL_FULL_LIBEXECDIR})
+diff --git a/unix/vncserver/selinux/vncsession.fc b/unix/vncserver/selinux/vncsession.fc
+index 9ad7d0f..0856d9c 100644
+--- a/unix/vncserver/selinux/vncsession.fc
++++ b/unix/vncserver/selinux/vncsession.fc
+@@ -26,7 +26,7 @@ HOME_DIR/\.local/share/tigervnc(/.*)?      gen_context(system_u:object_r:vnc_hom
+ HOME_DIR/\.local/state/tigervnc(/.*)?      gen_context(system_u:object_r:vnc_home_t,s0)
+ /root/\.local/state/tigervnc(/.*)?      gen_context(system_u:object_r:vnc_home_t,s0)
+ 
+-/usr/sbin/vncsession			--	gen_context(system_u:object_r:vnc_session_exec_t,s0)
++/usr/bin/vncsession			--	gen_context(system_u:object_r:vnc_session_exec_t,s0)
+ /usr/libexec/vncsession-start		--	gen_context(system_u:object_r:vnc_session_exec_t,s0)
+ 
+ /run/vncsession-:[0-9]*\.pid	--      gen_context(system_u:object_r:vnc_session_var_run_t,s0)
+diff --git a/unix/vncserver/vncsession-start.in b/unix/vncserver/vncsession-start.in
+index 65ee0a8..ef6484c 100644
+--- a/unix/vncserver/vncsession-start.in
++++ b/unix/vncserver/vncsession-start.in
+@@ -40,4 +40,4 @@ if [ -z "${USER}" ]; then
+ 	exit 1
+ fi
+ 
+-exec "@CMAKE_INSTALL_FULL_SBINDIR@/vncsession" "${USER}" "${DISPLAY}"
++exec "@CMAKE_INSTALL_FULL_BINDIR@/vncsession" "${USER}" "${DISPLAY}"

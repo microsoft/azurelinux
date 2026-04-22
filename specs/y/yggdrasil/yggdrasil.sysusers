@@ -1,0 +1,4 @@
+#Type Name               ID   GECOS                   Home directory    Shell
+u     yggdrasil          -    "yggdrasil system user" /var/lib/yggdrasil -
+u     yggdrasil-worker   -    "yggdrasil worker user" -                  -
+m     yggdrasil          yggdrasil-worker

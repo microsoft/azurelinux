@@ -3,7 +3,7 @@
 
 Name:           perl-Class-ISA
 Version:        0.36
-Release:        1044%{?dist}
+Release: 1045%{?dist}
 Summary:        Report the search path for a class's ISA tree
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Class-ISA

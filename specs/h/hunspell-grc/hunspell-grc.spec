@@ -10,7 +10,7 @@
 Name: hunspell-grc
 Summary: Ancient Greek hunspell dictionaries
 Version: 2.1.5
-Release: 34%{?dist}
+Release: 35%{?dist}
 Source: https://downloads.sourceforge.net/project/aoo-extensions/2313/1/grc.oxt
 URL: http://www.himeros.eu/
 License: GPL-1.0-or-later OR LGPL-2.1-or-later

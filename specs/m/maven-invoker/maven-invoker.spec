@@ -3,7 +3,7 @@
 
 Name:           maven-invoker
 Version:        3.3.0
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Fires a maven build in a clean environment
 
 License:        Apache-2.0

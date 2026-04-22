@@ -12,7 +12,7 @@ Name:		rubygem-%{gem_name}
 # changes default progress style
 # (For 3.5.8 and 3.5.9, F-38 and below reverted this change)
 Version:	3.7.0
-Release:	101%{?dist}
+Release: 102%{?dist}
 # SPDX confirmed
 # lib/test/unit/diff.rb is under (BSD-2-Clause OR Ruby) AND Python-2.0.1
 # lib/test-unit.rb changed to BSD-2-Clause or Ruby (from 3.3.7)

@@ -11,7 +11,7 @@ Name: hunspell-et
 Summary: Estonian hunspell dictionaries
 %global upstreamid 20030606
 Version: 0.%{upstreamid}
-Release: 37%{?dist}
+Release: 38%{?dist}
 Source: http://www.meso.ee/~jjpp/speller/ispell-et_%{upstreamid}.tar.gz
 URL: http://www.meso.ee/~jjpp/speller/
 License: LGPL-2.1-or-later AND LPPL-1.3a

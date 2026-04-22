@@ -6,7 +6,7 @@
 Summary: A utility for configuring serial ports
 Name: setserial
 Version: 2.17
-Release: 63%{?dist}
+Release: 64%{?dist}
 Source: https://sourceforge.net/projects/setserial/files/setserial/%{version}/%{name}-%{version}.tar.gz
 Patch0: setserial-2.17-fhs.patch
 Patch1: setserial-2.17-rc.patch

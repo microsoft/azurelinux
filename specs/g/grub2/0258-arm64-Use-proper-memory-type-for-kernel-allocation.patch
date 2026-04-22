@@ -1,0 +1,44 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Maximilian Luz <luzmaximilian@gmail.com>
+Date: Tue, 16 Apr 2024 14:21:49 -0600
+Subject: [PATCH] arm64: Use proper memory type for kernel allocation
+
+Currently, the kernel pages are allocated with type EFI_LOADER_DATA.
+While the vast majority of systems will happily execute code from those
+pages (i.e. don't care about memory protection), the Microsoft Surface
+Pro X stalls, as this memory is not designated as "executable".
+
+Therefore, allocate the kernel pages as EFI_LOADER_CODE to request
+memory that is actually executable.
+
+Signed-off-by: Maximilian Luz <luzmaximilian@gmail.com>
+---
+ grub-core/loader/efi/linux.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/loader/efi/linux.c b/grub-core/loader/efi/linux.c
+index 55c5c8600d4..d9ded7c4f12 100644
+--- a/grub-core/loader/efi/linux.c
++++ b/grub-core/loader/efi/linux.c
+@@ -25,7 +25,9 @@
+ #include <grub/loader.h>
+ #include <grub/mm.h>
+ #include <grub/types.h>
++#include <grub/efi/api.h>
+ #include <grub/efi/efi.h>
++#include <grub/cpu/efi/memory.h>
+ #include <grub/efi/fdtload.h>
+ #include <grub/efi/memory.h>
+ #include <grub/efi/linux.h>
+@@ -636,7 +638,10 @@ fallback:
+   grub_loader_unset();
+ 
+   kernel_alloc_pages = GRUB_EFI_BYTES_TO_PAGES (kernel_size + align - 1);
+-  kernel_alloc_addr = grub_efi_allocate_any_pages (kernel_alloc_pages);
++  kernel_alloc_addr = grub_efi_allocate_pages_real (GRUB_EFI_MAX_USABLE_ADDRESS,
++						    kernel_alloc_pages,
++						    GRUB_EFI_ALLOCATE_MAX_ADDRESS,
++						    GRUB_EFI_LOADER_CODE);
+   grub_dprintf ("linux", "kernel numpages: %d\n", kernel_alloc_pages);
+   if (!kernel_alloc_addr)
+     {

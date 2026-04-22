@@ -1,0 +1,20 @@
+diff -up chromium-145.0.7632.45/third_party/blink/renderer/modules/xr/xr_rigid_transform.h.me chromium-145.0.7632.45/third_party/blink/renderer/modules/xr/xr_rigid_transform.h
+--- chromium-145.0.7632.45/third_party/blink/renderer/modules/xr/xr_rigid_transform.h.me	2026-02-13 13:32:04.162492668 +0100
++++ chromium-145.0.7632.45/third_party/blink/renderer/modules/xr/xr_rigid_transform.h	2026-02-13 13:33:03.467242224 +0100
+@@ -7,15 +7,12 @@
+ 
+ #include <memory>
+ 
++#include "ui/gfx/geometry/transform.h"
+ #include "third_party/blink/renderer/core/typed_arrays/array_buffer_view_helpers.h"
+ #include "third_party/blink/renderer/core/typed_arrays/dom_typed_array.h"
+ #include "third_party/blink/renderer/modules/modules_export.h"
+ #include "third_party/blink/renderer/platform/bindings/script_wrappable.h"
+ 
+-namespace gfx {
+-class Transform;
+-}
+-
+ namespace blink {
+ 
+ class DOMPointInit;

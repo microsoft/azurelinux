@@ -1,0 +1,86 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Daniel Axtens <dja@axtens.net>
+Date: Mon, 19 Jul 2021 14:35:55 +1000
+Subject: [PATCH] powerpc: adjust setting of prefix for signed binary case
+
+On RHEL-signed powerpc grub, we sign a grub with -p /grub2 and expect
+that there's a boot partition.
+
+Unfortunately grub_set_prefix_and_root tries to convert this to
+($fwdevice)/grub2. This ends up being (ieee1275/disk)/grub2 and that
+falls apart pretty quickly - there's no file-system on ieee1275/disk,
+and it makes the search routine try things like
+(ieee1275/disk,msdos2)(ieee1275/disk)/grub2 which also doesn't work.
+
+Detect if we would be about to create (ieee1275/disk)/path and don't:
+preserve a prefix of /path instead and hope the search later finds us.
+
+Related: rhbz#1899864
+
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+[rharwood@redhat.com: squash in fixup commit]
+Signed-off-by: Robbie Harwood <rharwood@redhat.com>
+---
+ grub-core/kern/main.c | 47 +++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 43 insertions(+), 4 deletions(-)
+
+diff --git a/grub-core/kern/main.c b/grub-core/kern/main.c
+index 353a62ef1e1..dbd4f596fbe 100644
+--- a/grub-core/kern/main.c
++++ b/grub-core/kern/main.c
+@@ -217,12 +217,51 @@ grub_set_prefix_and_root (void)
+     {
+       char *prefix_set;
+ 
+-      prefix_set = grub_xasprintf ("(%s)%s", device, path ? : "");
+-      if (prefix_set)
++#ifdef __powerpc__
++      /* We have to be careful here on powerpc-ieee1275 + signed grub. We
++	 will have signed something with a prefix that doesn't have a device
++	 because we cannot know in advance what partition we're on.
++
++	 We will have had !device earlier, so we will have set device=fwdevice
++	 However, we want to make sure we do not end up setting prefix to be
++	 ($fwdevice)/path, because we will then end up trying to boot or search
++	 based on a prefix of (ieee1275/disk)/path, which will not work because
++	 it's missing a partition.
++
++	 Also:
++	  - You can end up with a device with an FS directly on it, without
++	    a partition, e.g. ieee1275/cdrom.
++
++	  - powerpc-ieee1275 + grub-install sets e.g. prefix=(,gpt2)/path,
++	    which will have now been extended to device=$fwdisk,partition
++	    and path=/path
++
++	  - PowerVM will give us device names like
++	    ieee1275//vdevice/v-scsi@3000006c/disk@8100000000000000
++	    and we don't want to try to encode some sort of truth table about
++	    what sorts of paths represent disks with partition tables and those
++	    without partition tables.
++
++	 So we act unless there is a comma in the device, which would indicate
++	 a partition has already been specified.
++
++	 (If we only have a path, the code in normal to discover config files
++	 will try both without partitions and then with any partitions so we
++	 will cover both CDs and HDs.)
++       */
++      if (grub_strchr (device, ',') == NULL)
++        grub_env_set ("prefix", path);
++      else
++#endif
+ 	{
+-	  grub_env_set ("prefix", prefix_set);
+-	  grub_free (prefix_set);
++	  prefix_set = grub_xasprintf ("(%s)%s", device, path ? : "");
++	  if (prefix_set)
++	  {
++	    grub_env_set ("prefix", prefix_set);
++	    grub_free (prefix_set);
++	  }
+ 	}
++
+       grub_env_set ("root", device);
+     }
+ 

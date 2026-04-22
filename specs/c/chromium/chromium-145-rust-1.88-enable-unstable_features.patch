@@ -1,0 +1,117 @@
+error[E0658]: the target feature `avx512f` is currently unstable
+   --> ../../third_party/rust/chromium_crates_io/vendor/jxl_simd-v0_2/src/x86_64/avx512.rs:123:26
+    |
+123 |         #[target_feature(enable = "avx512f")]
+    |                          ^^^^^^^^^^^^^^^^^^
+    |
+    = note: see issue #44839 <https://github.com/rust-lang/rust/issues/44839> for more information
+    = help: add `#![feature(avx512_target_feature)]` to the crate attributes to enable
+    = note: this compiler was built on 2025-06-23; consider upgrading it if it is out of date
+
+Fix FTBFS on el9
+
+diff -up chromium-145.0.7632.75/third_party/rust/chromium_crates_io/vendor/jxl_simd-v0_2/src/lib.rs.me chromium-145.0.7632.75/third_party/rust/chromium_crates_io/vendor/jxl_simd-v0_2/src/lib.rs
+--- chromium-145.0.7632.75/third_party/rust/chromium_crates_io/vendor/jxl_simd-v0_2/src/lib.rs.me	2026-02-12 20:44:24.000000000 +0100
++++ chromium-145.0.7632.75/third_party/rust/chromium_crates_io/vendor/jxl_simd-v0_2/src/lib.rs	2026-02-15 20:10:02.848196172 +0100
+@@ -4,6 +4,8 @@
+ // license that can be found in the LICENSE file.
+ 
+ #![allow(clippy::too_many_arguments)]
++#![feature(avx512_target_feature)]
++#![cfg_attr(target_arch = "x86_64", feature(stdarch_x86_avx512))]
+ 
+ use std::{
+     fmt::Debug,
+diff -up chromium-145.0.7632.75/third_party/rust/chromium_crates_io/vendor/jxl_transforms-v0_2/src/lib.rs.me chromium-145.0.7632.75/third_party/rust/chromium_crates_io/vendor/jxl_transforms-v0_2/src/lib.rs
+--- chromium-145.0.7632.75/third_party/rust/chromium_crates_io/vendor/jxl_transforms-v0_2/src/lib.rs.me	2026-02-12 20:44:24.000000000 +0100
++++ chromium-145.0.7632.75/third_party/rust/chromium_crates_io/vendor/jxl_transforms-v0_2/src/lib.rs	2026-02-15 20:09:43.548731085 +0100
+@@ -3,6 +3,9 @@
+ // Use of this source code is governed by a BSD-style
+ // license that can be found in the LICENSE file.
+ 
++#![feature(avx512_target_feature)]
++#![cfg_attr(target_arch = "x86_64", feature(stdarch_x86_avx512))]
++
+ mod idct2d;
+ mod reinterpreting_dct2d;
+ pub mod transform;
+diff -up chromium-145.0.7632.75/third_party/rust/chromium_crates_io/vendor/jxl-v0_2/src/lib.rs.me chromium-145.0.7632.75/third_party/rust/chromium_crates_io/vendor/jxl-v0_2/src/lib.rs
+--- chromium-145.0.7632.75/third_party/rust/chromium_crates_io/vendor/jxl-v0_2/src/lib.rs.me	2026-02-12 20:44:24.000000000 +0100
++++ chromium-145.0.7632.75/third_party/rust/chromium_crates_io/vendor/jxl-v0_2/src/lib.rs	2026-02-15 20:11:01.678559809 +0100
+@@ -3,6 +3,10 @@
+ // Use of this source code is governed by a BSD-style
+ // license that can be found in the LICENSE file.
+ 
++#![feature(avx512_target_feature)]
++#![cfg_attr(target_arch = "x86_64", feature(stdarch_x86_avx512))]
++#![feature(non_null_from_ref)]
++
+ #![deny(unsafe_code)]
+ pub mod api;
+ pub mod bit_reader;
+diff -up chromium-145.0.7632.75/third_party/rust/jxl_simd/v0_2/BUILD.gn.me chromium-145.0.7632.75/third_party/rust/jxl_simd/v0_2/BUILD.gn
+--- chromium-145.0.7632.75/third_party/rust/jxl_simd/v0_2/BUILD.gn.me	2026-02-12 20:44:24.000000000 +0100
++++ chromium-145.0.7632.75/third_party/rust/jxl_simd/v0_2/BUILD.gn	2026-02-15 20:15:51.823722639 +0100
+@@ -36,6 +36,10 @@ cargo_crate("lib") {
+ 
+   allow_unsafe = true
+ 
++  rustflags = [
++    "-Zallow-features=stdarch_x86_avx512,avx512_target_feature",
++  ]
++
+   features = [
+     "all-simd",
+     "avx",
+@@ -69,6 +73,7 @@ cargo_crate("lib") {
+   # `extra_kv.configs_to_remove` and `extra_kv.configs_to_add` from
+   # `gnrt_config.toml`).
+   _configs_to_remove += [ "//build/config/compiler:default_optimization" ]
++  _configs_to_remove += [ "//build/config/compiler:disallow_unstable_features" ]
+   _configs_to_add += [ "//build/config/compiler:optimize" ]
+ 
+   # Applying config changes.
+diff -up chromium-145.0.7632.75/third_party/rust/jxl_transforms/v0_2/BUILD.gn.me chromium-145.0.7632.75/third_party/rust/jxl_transforms/v0_2/BUILD.gn
+--- chromium-145.0.7632.75/third_party/rust/jxl_transforms/v0_2/BUILD.gn.me	2026-02-12 20:44:24.000000000 +0100
++++ chromium-145.0.7632.75/third_party/rust/jxl_transforms/v0_2/BUILD.gn	2026-02-15 20:17:33.887730035 +0100
+@@ -45,6 +45,10 @@ cargo_crate("lib") {
+ 
+   allow_unsafe = true
+ 
++  rustflags = [
++    "-Zallow-features=stdarch_x86_avx512,avx512_target_feature",
++  ]
++
+   deps = [ "//third_party/rust/jxl_simd/v0_2:lib" ]
+ 
+   # Only for usage from third-party crates. Add the crate to
+@@ -72,6 +76,7 @@ cargo_crate("lib") {
+   # `extra_kv.configs_to_remove` and `extra_kv.configs_to_add` from
+   # `gnrt_config.toml`).
+   _configs_to_remove += [ "//build/config/compiler:default_optimization" ]
++  _configs_to_remove += [ "//build/config/compiler:disallow_unstable_features" ]
+   _configs_to_add += [ "//build/config/compiler:optimize" ]
+ 
+   # Applying config changes.
+diff -up chromium-145.0.7632.75/third_party/rust/jxl/v0_2/BUILD.gn.me chromium-145.0.7632.75/third_party/rust/jxl/v0_2/BUILD.gn
+--- chromium-145.0.7632.75/third_party/rust/jxl/v0_2/BUILD.gn.me	2026-02-12 20:44:24.000000000 +0100
++++ chromium-145.0.7632.75/third_party/rust/jxl/v0_2/BUILD.gn	2026-02-15 20:16:47.026490882 +0100
+@@ -169,6 +169,10 @@ cargo_crate("lib") {
+ 
+   allow_unsafe = true
+ 
++  rustflags = [
++    "-Zallow-features=stdarch_x86_avx512,avx512_target_feature,non_null_from_ref",
++  ]
++
+   deps = [
+     "//third_party/rust/array_init/v2:lib",
+     "//third_party/rust/byteorder/v1:lib",
+@@ -201,6 +205,7 @@ cargo_crate("lib") {
+   # `extra_kv.configs_to_remove` and `extra_kv.configs_to_add` from
+   # `gnrt_config.toml`).
+   _configs_to_remove += [ "//build/config/compiler:default_optimization" ]
++  _configs_to_remove += [ "//build/config/compiler:disallow_unstable_features" ]
+   _configs_to_add += [ "//build/config/compiler:optimize" ]
+ 
+   # Applying config changes.

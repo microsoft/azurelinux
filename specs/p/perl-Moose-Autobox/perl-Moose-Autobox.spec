@@ -3,7 +3,7 @@
 
 Name:       perl-Moose-Autobox 
 Version:    0.16
-Release:    28%{?dist}
+Release: 29%{?dist}
 # lib/Moose/Autobox.pm -> GPL+ or Artistic
 # Automatically converted from old format: GPL+ or Artistic - review is highly recommended.
 License:    GPL-1.0-or-later OR Artistic-1.0-Perl 

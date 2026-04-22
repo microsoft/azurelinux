@@ -3,7 +3,7 @@
 
 Name:           perl-Compress-LZF
 Version:        3.8
-Release:        35%{?dist}
+Release: 36%{?dist}
 Summary:        Extremely light-weight Lempel-Ziv-Free compression
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 ## Not in the binary packages

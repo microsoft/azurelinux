@@ -10,7 +10,7 @@
 Name: hunspell-nds
 Summary: Lowlands Saxon hunspell dictionaries
 Version: 0.1
-Release: 33%{?dist}
+Release: 34%{?dist}
 Source: http://downloads.sourceforge.net/aspell-nds/hunspell-nds-0.1.zip
 URL: http://aspell-nds.sourceforge.net/
 License: GPL-2.0-or-later
