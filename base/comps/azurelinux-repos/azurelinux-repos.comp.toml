@@ -2,4 +2,7 @@
 spec = { type = "local", path = "azurelinux-repos.spec" }
 
 [components.azurelinux-repos.build]
+# Alpha2: use split repo layout with Alpha2 blob prefix.
+with = ["split_repos"]
+defines = { repo_uri_prefix = "https://stcontroltowerdevjwisitg.blob.core.windows.net/alpha2-prod" }
 check = { skip = true, skip_reason = "Tests fail due to evergreen repos and any repo from this package is currently unavailable anyway." }
