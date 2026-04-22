@@ -3,7 +3,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -42,7 +42,10 @@ Patch403:       CVE-2025-61985.patch
 # The tests fail with the following error:
 #   dlsym(sk_api_version) failed: (...)/sk-dummy.so: undefined symbol: sk_api_version
 Patch965: openssh-8.2p1-visibility.patch
-Patch966: CVE-2026-35414.patch
+Patch966: CVE-2026-35385.patch
+Patch967: CVE-2026-35386.patch
+Patch968: CVE-2026-35388.patch
+Patch969: CVE-2026-35414.patch
 
 BuildRequires:  audit-devel
 BuildRequires:  autoconf
@@ -105,6 +108,9 @@ The module is most useful for su and sudo service stacks.
 %prep
 %setup -q -a 3
 %patch 966 -p1
+%patch 967 -p1
+%patch 968 -p1
+%patch 969 -p1
 
 pushd pam_ssh_agent_auth-%{pam_ssh_agent_ver}
 %patch -P 300 -p2 -b .psaa-build
@@ -281,6 +287,9 @@ fi
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Mon Apr 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 9.8p1-6
+- Patch CVE-2026-35385, CVE-2026-35386, CVE-2026-35388
+
 * Tue Oct 07 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 9.8p1-5
 - Patch CVE-2025-61985, CVE-2025-61984
 
