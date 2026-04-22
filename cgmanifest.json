@@ -3348,8 +3348,8 @@
         "type": "other",
         "other": {
           "name": "etcd",
-          "version": "3.5.21",
-          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.5.21.tar.gz"
+          "version": "3.5.28",
+          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.5.28.tar.gz"
         }
       }
     },
@@ -6520,8 +6520,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.200.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.200.1.tar.gz"
+          "version": "5.15.202.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.202.1.tar.gz"
         }
       }
     },
@@ -8101,8 +8101,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.200.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.200.1.tar.gz"
+          "version": "5.15.202.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.202.1.tar.gz"
         }
       }
     },
@@ -8111,8 +8111,8 @@
         "type": "other",
         "other": {
           "name": "kernel-azure",
-          "version": "5.15.200.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.200.1.tar.gz"
+          "version": "5.15.202.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.202.1.tar.gz"
         }
       }
     },
@@ -8121,8 +8121,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.200.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.200.1.tar.gz"
+          "version": "5.15.202.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.202.1.tar.gz"
         }
       }
     },
@@ -8131,8 +8131,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.200.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.200.1.tar.gz"
+          "version": "5.15.202.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.202.1.tar.gz"
         }
       }
     },
@@ -10571,8 +10571,8 @@
         "type": "other",
         "other": {
           "name": "libpng",
-          "version": "1.6.55",
-          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.55.tar.xz"
+          "version": "1.6.56",
+          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.56.tar.xz"
         }
       }
     },
@@ -12310,16 +12310,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "local-path-provisioner",
-          "version": "0.0.21",
-          "downloadUrl": "https://github.com/rancher/local-path-provisioner/archive/refs/tags/v0.0.21.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "lockdev",
           "version": "1.0.4",
           "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/lockdev-1.0.4.20111007git.tar.gz"
@@ -12881,8 +12871,8 @@
         "type": "other",
         "other": {
           "name": "mariadb",
-          "version": "10.6.24",
-          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.6.24.tar.gz"
+          "version": "10.6.25",
+          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.6.25.tar.gz"
         }
       }
     },
@@ -13653,8 +13643,8 @@
         "type": "other",
         "other": {
           "name": "msft-golang",
-          "version": "1.24.13",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.13-1/go1.24.13-20260204.5.src.tar.gz"
+          "version": "1.25.8",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.25.8-1/go1.25.8-20260306.2.src.tar.gz"
         }
       }
     },
@@ -14684,7 +14674,7 @@
         "other": {
           "name": "ocaml",
           "version": "4.13.1",
-          "downloadUrl": "https://caml.inria.fr/pub/distrib/ocaml-4.13.1/ocaml-4.13.1.tar.xz"
+          "downloadUrl": "https://caml.inria.fr/pub/distrib/ocaml-4.13/ocaml-4.13.1.tar.xz"
         }
       }
     },
@@ -29457,8 +29447,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.1.2148",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.1.2148.tar.gz"
+          "version": "9.2.0240",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.2.0240.tar.gz"
         }
       }
     },

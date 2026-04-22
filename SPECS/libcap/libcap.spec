@@ -1,7 +1,7 @@
 Summary:        Libcap
 Name:           libcap
 Version:        2.60
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2+
 Group:          System Environment/Security
 URL:            https://www.gnu.org/software/hurd/community/gsoc/project_ideas/libcap.html
@@ -11,6 +11,7 @@ Distribution:   Mariner
 Patch0:         CVE-2023-2602.patch
 Patch1:         CVE-2023-2603.patch
 Patch2:         CVE-2025-1390.patch
+Patch3:         CVE-2026-4878.patch
 BuildRequires: glibc-static >= 2.35-10%{?dist}
 
 %description
@@ -64,6 +65,9 @@ sed -i '/echo "attempt to exploit kernel bug"/,/^fi$/d' quicktest.sh
 %{_mandir}/man3/*
 
 %changelog
+* Sat Apr 11 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.60-8
+- Patch for CVE-2026-4878
+
 * Tue Feb 03 2026 Aditya Singh <v-aditysing@microsoft.com> - 2.60-7
 - Bump to rebuild with updated glibc
 
