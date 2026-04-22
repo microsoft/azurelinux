@@ -24,7 +24,8 @@
             overlayroot="false"
             eficsm="false"
             bootpartition="false"
-            efipartsize="200">
+            efipartsize="200"
+            rootfs_label="azurelinux">
             <bootloader name="grub2" timeout="0" />
             <size unit="G">5</size>
             <initrd action="setup">
