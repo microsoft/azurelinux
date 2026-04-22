@@ -435,7 +435,7 @@ Obsoletes: sgabios-bin <= 1:0.20180715git-10.fc38
 Summary: QEMU is a FAST! processor emulator
 Name: qemu
 Version: 9.1.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND FSFAP AND GPL-1.0-or-later AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-2.0-or-later WITH GCC-exception-2.0 AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND MIT AND LicenseRef-Fedora-Public-Domain AND CC-BY-3.0
 URL: http://www.qemu.org/
 
@@ -3409,6 +3409,11 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 
 
 %changelog
+* Tue Mar 24 2026 Azure Linux Team <azurelinux@microsoft.com> - 9.1.0-4
+- Replace deprecated --blacklist with --block-rpcs in qemu-guest-agent
+  service file and sysconfig to fix startup failure (--blacklist was
+  removed in QEMU 9.1)
+
 * Wed Mar 25 2026 Aditya Singh <v-aditysing@microsoft.com> - 9.1.0-3
 - Bump to rebuild with updated glibc
 

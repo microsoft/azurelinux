@@ -23,6 +23,13 @@ parameters:
     default: ""
     displayName: "Daily build ID"
 
+  - name: extraMacrosFiles
+    type: object
+    default: []
+    # Sample:
+    #   - macros.versions
+    #   - macros.custom
+
   - name: extraPackageRepos
     type: string
     default: ""
@@ -102,6 +109,10 @@ parameters:
     type: string
     default: "LOGS"
 
+  - name: outputArtifactsMacrosSubfolder
+    type: string
+    default: "MACROS"
+
   - name: outputArtifactsPackagesSubfolder
     type: string
     default: "ARTIFACTS"
@@ -111,6 +122,10 @@ parameters:
     default: "TESTS"
 
   - name: maxCPU
+    type: string
+    default: ""
+
+  - name: outputReleaseVersionsMacrosFileName
     type: string
     default: ""
 
@@ -167,7 +182,7 @@ steps:
       - script: |
           toolchain_archive="$(find "${{ parameters.inputArtifactsFolder }}" -name "${{ parameters.customToolchainTarballName }}" -print -quit)"
           if [[ ! -f "$toolchain_archive" ]]; then
-            echo "ERROR: toolchain archive not found!" >&2
+            echo "##[error]Toolchain archive not found!" >&2
             exit 1
           fi
           echo "##vso[task.setvariable variable=toolchainArchive]$toolchain_archive"
@@ -179,7 +194,7 @@ steps:
       - script: |
           rpms_archive="$(find "${{ parameters.inputArtifactsFolder }}" -name "${{ inputCacheRPMsTarball }}" -print -quit)"
           if [[ ! -f "$rpms_archive" ]]; then
-            echo "ERROR: cache RPMs archive '${{ inputCacheRPMsTarball }}' not found!" >&2
+            echo "##[error]Cache RPMs archive '${{ inputCacheRPMsTarball }}' not found!" >&2
             exit 1
           fi
 
@@ -239,6 +254,20 @@ steps:
         daily_build_update_manifests_arg="DAILY_BUILD_ID_UPDATE_MANIFESTS=n"
       fi
 
+      extra_macros_file_names="${{ join(' ', parameters.extraMacrosFiles) }}"
+      if [[ -n "$extra_macros_file_names" ]]; then
+        extra_macros_files=()
+        for macros_file_name in $extra_macros_file_names; do
+          macros_file="$(find "${{ parameters.inputArtifactsFolder }}" -name "$macros_file_name" -print -quit)"
+          if [[ ! -f "$macros_file" ]]; then
+            echo "##[error]Extra macros file '$macros_file_name' not found!" >&2
+            exit 1
+          fi
+          extra_macros_files+=("$macros_file")
+        done
+        extra_macros_files_arg="EXTRA_MACROS_FILES='${extra_macros_files[*]}'"
+      fi
+
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
         CONCURRENT_PACKAGE_BUILDS=${{ parameters.concurrentPackageBuilds }} \
         CONFIG_FILE="" \
@@ -253,6 +282,7 @@ steps:
         $allow_toolchain_rebuilds_arg \
         $check_build_retries_arg \
         $daily_build_id_arg \
+        $extra_macros_files_arg \
         $daily_build_update_manifests_arg \
         $delta_fetch_arg \
         $max_cascading_rebuilds_arg \
@@ -295,6 +325,13 @@ steps:
               mkdir -p "$published_artifacts_dir"
               cp "${{ parameters.buildRepoRoot }}"/out/srpms.tar.gz "$published_artifacts_dir/${{ parameters.outputSRPMsTarballName }}"
             displayName: "Copy SRPMs for publishing"
+
+      - ${{ if parameters.outputReleaseVersionsMacrosFileName }}:
+          - bash: |
+              published_macros_dir="${{ parameters.outputArtifactsFolder }}/${{ parameters.outputArtifactsMacrosSubfolder }}"
+              mkdir -p "$published_macros_dir"
+              cp "${{ parameters.buildRepoRoot }}/build/pkg_artifacts/macros.releaseversions" "$published_macros_dir/${{ parameters.outputReleaseVersionsMacrosFileName }}"
+            displayName: "Copy release versions macros for publishing"
 
       - ${{ if parameters.publishLogs }}:
           - bash: |

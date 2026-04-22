@@ -1,0 +1,40 @@
+From 7f5c9626d838e68ea03cc04e6e5b88986762458c Mon Sep 17 00:00:00 2001
+From: Bruno Oliveira <bruno@pytest.org>
+Date: Tue, 11 Nov 2025 07:55:54 -0300
+Subject: [PATCH] Fix CI for pytest 9.0+
+
+Upstream Patch reference: https://github.com/pytest-dev/pytest-xdist/pull/1272
+
+---
+ testing/test_remote.py | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/testing/test_remote.py b/testing/test_remote.py
+index 2d250c5..7ee8685 100644
+--- a/testing/test_remote.py
++++ b/testing/test_remote.py
+@@ -367,13 +367,18 @@ def test_remote_usage_prog(pytester: pytest.Pytester, request) -> None:
+             config_parser = config._parser
+     """
+     )
++    if pytest.version_tuple[:2] >= (9, 0):
++        get_optparser_expr = "get_config_parser.optparser"
++    else:
++        get_optparser_expr = "get_config_parser._getparser()"
++
+     pytester.makepyfile(
+-        """
++        f"""
+         import sys
+ 
+         def test(get_config_parser, request):
+-            get_config_parser._getparser().error("my_usage_error")
+-    """
++            {get_optparser_expr}.error("my_usage_error")
++        """
+     )
+ 
+     result = pytester.runpytest_subprocess("-n1")
+-- 
+2.45.4
+
