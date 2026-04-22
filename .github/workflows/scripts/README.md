@@ -51,7 +51,7 @@ copilot --version  # verify CLI
 # Defaults: reviews all *.spec in repo, writes to repo root
 #   spec_review_report.json, copilot_log.md, spec_review_kb.md
 
-./.github/workflows/scripts/spec_review.sh \
+./.github/workflows/scripts/spec-review/spec_review.sh \
   --spec base/comps/azurelinux-release/azurelinux-release.spec \
   --spec base/comps/azurelinux-repos/azurelinux-repos.spec
 
@@ -63,7 +63,7 @@ python .github/workflows/scripts/spec-review/spec_review_schema.py /tmp/spec_rev
 The script supports additional options (like selecting a model, or using different URLs); run with `--help` for details.
 
 ```bash
-./.github/workflows/scripts/spec_review.sh --help
+./.github/workflows/scripts/spec-review/spec_review.sh --help
 ```
 
 ## Run multi-model review (spec_review_multi.sh)
@@ -79,11 +79,11 @@ uses a third model pass to synthesize their findings into a single high-quality 
 
 ```bash
 # Defaults: claude-opus-4.6 + gpt-5.2-codex reviewers, gpt-5.2-codex synthesizer
-./.github/workflows/scripts/spec_review_multi.sh \
+./.github/workflows/scripts/spec-review/spec_review_multi.sh \
   --spec base/comps/azurelinux-release/azurelinux-release.spec
 
 # Custom models
-./.github/workflows/scripts/spec_review_multi.sh \
+./.github/workflows/scripts/spec-review/spec_review_multi.sh \
   --spec foo.spec \
   --model1 gpt-5.2-codex \
   --model2 claude-opus-4.6 \
@@ -101,7 +101,7 @@ ls /tmp/spec_review_workdir/
 Run with `--help` for all options:
 
 ```bash
-./.github/workflows/scripts/spec_review_multi.sh --help
+./.github/workflows/scripts/spec-review/spec_review_multi.sh --help
 ```
 
 ---

@@ -158,14 +158,14 @@ jobs:
       - name: Run Copilot spec review (multi-model)
         if: steps.changed-specs.outputs.skip != 'true'
         run: |
-          chmod +x .github/workflows/scripts/spec_review_multi.sh
+          chmod +x .github/workflows/scripts/spec-review/spec_review_multi.sh
           # Build a properly-quoted array from the line-delimited spec list file
           SPEC_ARGS=()
           while IFS= read -r spec; do
             [[ -z "$spec" ]] && continue
             SPEC_ARGS+=("--spec" "$spec")
           done < .spec_review_paths.txt
-          .github/workflows/scripts/spec_review_multi.sh "${SPEC_ARGS[@]}" \
+          .github/workflows/scripts/spec-review/spec_review_multi.sh "${SPEC_ARGS[@]}" \
             --work-dir .spec_review/workdir
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -216,7 +216,7 @@ jobs:
       - name: Compare model findings
         if: always() && steps.changed-specs.outputs.skip != 'true'
         run: |
-          # NOTE: Label model names must match defaults in spec_review_multi.sh
+          # NOTE: Label model names must match defaults in spec-review/spec_review_multi.sh
           # (DEFAULT_MODEL1, DEFAULT_MODEL2, DEFAULT_SYNTH_MODEL)
           python .github/workflows/scripts/spec-review/spec_review_schema.py compare \
             .spec_review/workdir/report_a.json \
