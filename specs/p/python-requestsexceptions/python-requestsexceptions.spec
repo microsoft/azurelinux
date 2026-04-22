@@ -11,7 +11,7 @@ requests library regardless of whether they are bundled.
 
 Name:           python-%{pypi_name}
 Version:        1.4.0
-Release:        26%{?dist}
+Release: 27%{?dist}
 Summary:        Import exceptions from potentially bundled packages in requests
 
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.

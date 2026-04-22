@@ -8,12 +8,12 @@
 %global _udevrulesdir %{_prefix}/lib/udev/rules.d
 %endif
 
-%global xyz_version 3.17.1
+%global xyz_version 3.16.2
 %global xy_version %(sed 's/\\(.*\\)\\..*/\\1/'<<<%{xyz_version})
 
 Name:		fuse3
 Version:	%{xyz_version}
-Release:	3%{?dist}
+Release: 7%{?dist}
 Summary:	File System in Userspace (FUSE) v3 utilities
 License:	GPL-1.0-or-later
 URL:		http://fuse.sf.net
@@ -21,7 +21,8 @@ Source0:	https://github.com/libfuse/libfuse/releases/download/fuse-%{version}/fu
 Source1:	https://github.com/libfuse/libfuse/releases/download/fuse-%{version}/fuse-%{version}.tar.gz.sig
 Source2:	https://raw.githubusercontent.com/libfuse/libfuse/master/signify/fuse-%{xy_version}.pub
 Source3:	fuse.conf
-Patch:		fuse3-0001-lib-remove-second-fuse_main_real_versioned-declarati.patch
+Patch0:         fuse3-gcc11.patch
+Patch1:         0001-Fix-multi-threaded-fuse-session-exit.patch
 
 %if %{undefined rhel}
 BuildRequires:	signify
@@ -73,11 +74,12 @@ Common files for FUSE v2 and FUSE v3.
 %prep
 %if %{undefined rhel}
 # Fuse is using signify rather than PGG since 3.15.1 For more details see:
-#	https://github.com/libfuse/libfuse/releases/tag/fuse-3.15.1
+# 	https://github.com/libfuse/libfuse/releases/tag/fuse-3.15.1
 signify -V -m  '%{SOURCE0}' -p '%{SOURCE2}'
 %endif
 
-%autosetup -p1 -n fuse-%{version}
+%setup -n fuse-%{version}
+%patch -P0 -p1
 
 %build
 export LC_ALL=en_US.UTF-8
@@ -125,14 +127,8 @@ rm -f %{buildroot}%{_udevrulesdir}/99-fuse3.rules
 %config(noreplace) %{_sysconfdir}/fuse.conf
 
 %changelog
-* Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 3.17.1-3
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
-
-* Wed Jul 16 2025 Peter Lemenkov <lemenkov@gmail.com> - 3.17.1-2
-- Fix building with modern GCC
-
-* Mon Mar 24 2025 Pavel Reichl <preichl@redhat.com> - 3.17.1-1
-- Update to upstream v3.17.1
+* Sat Apr  4 2026 Peter Lemenkov <lemenkov@gmail.com> - 3.16.2-6
+- Backport commit c5dbcdce2d1942abb567d03bf9dafb74f06b5769
 
 * Thu Jan 16 2025 Fedora Release Engineering <releng@fedoraproject.org> - 3.16.2-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild

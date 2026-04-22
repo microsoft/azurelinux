@@ -3,7 +3,7 @@
 
 Name:           perl-syntax
 Version:        0.004
-Release:        37%{?dist}
+Release: 38%{?dist}
 Summary:        Activate syntax extensions
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/syntax

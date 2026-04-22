@@ -5,7 +5,7 @@
 
 Name:       libxcb
 Version:    1.17.0
-Release:    6%{?dist}
+Release: 7%{?dist}
 Summary:    A C binding to the X11 protocol
 License:    X11
 URL:        http://xcb.freedesktop.org/

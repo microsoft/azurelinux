@@ -1,0 +1,23 @@
+Index: chromium-144.0.7559.59/third_party/webrtc/rtc_base/system/arch.h
+===================================================================
+--- chromium-144.0.7559.59.orig/third_party/webrtc/rtc_base/system/arch.h
++++ chromium-144.0.7559.59/third_party/webrtc/rtc_base/system/arch.h
+@@ -46,6 +46,18 @@
+ #endif
+ #if defined(__MIPSEL__)
+ #define WEBRTC_ARCH_LITTLE_ENDIAN
++#elif defined(__PPC__)
++#define WEBRTC_ARCH_PPC_FAMILY
++#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
++#define WEBRTC_ARCH_LITTLE_ENDIAN
++#else
++#define WEBRTC_ARCH_BIG_ENDIAN
++#endif
++#if defined(__LP64__)
++#define WEBRTC_ARCH_64_BITS
++#else
++#define WEBRTC_ARCH_32_BITS
++#endif
+ #else
+ #define WEBRTC_ARCH_BIG_ENDIAN
+ #endif

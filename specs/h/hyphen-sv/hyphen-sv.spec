@@ -4,7 +4,7 @@
 Name: hyphen-sv
 Summary: Swedish hyphenation rules
 Version: 1.00.1
-Release: 37%{?dist}
+Release: 38%{?dist}
 Source: https://downloads.sourceforge.net/project/aoo-extensions/1966/4/hyph_sv_se.oxt
 URL: http://extensions.services.openoffice.org/node/1968
 License: LGPL-2.1-or-later OR GPL-2.0-or-later

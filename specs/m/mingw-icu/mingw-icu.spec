@@ -9,7 +9,7 @@
 
 Name:           mingw-icu
 Version:        76.1
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        MinGW compilation of International Components for Unicode Tools
 
 License:        Unicode-DFS-2016 AND BSD-2-Clause AND BSD-3-Clause AND LicenseRef-Fedora-Public-Domain

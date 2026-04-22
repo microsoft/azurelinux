@@ -1,0 +1,24 @@
+From 756e56380c6cc7213bf654550640ddab3ecce368 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Sun, 17 Aug 2025 06:04:50 -0400
+Subject: [PATCH 2/2] Downstream-only: patch out pytest-sugar
+
+---
+ tox.ini | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/tox.ini b/tox.ini
+index 08b6954..2c02a6a 100644
+--- a/tox.ini
++++ b/tox.ini
+@@ -10,7 +10,6 @@ deps =
+     hypothesis
+     pytest
+     pytest-asyncio
+-    pytest-sugar
+     pytest-trio
+ commands = pytest {posargs}
+ 
+-- 
+2.50.1
+

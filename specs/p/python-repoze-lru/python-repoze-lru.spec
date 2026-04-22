@@ -5,7 +5,7 @@
 
 Name:           python-repoze-lru
 Version:        0.7
-Release:        29%{?dist}
+Release: 30%{?dist}
 Summary:        A tiny LRU cache implementation and decorator
 
 # Automatically converted from old format: BSD - review is highly recommended.

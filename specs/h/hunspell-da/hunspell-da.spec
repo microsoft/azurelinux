@@ -10,7 +10,7 @@
 Name: hunspell-da
 Summary: Danish hunspell dictionaries
 Version: 1.7.42
-Release: 27%{?dist}
+Release: 28%{?dist}
 Source: http://da.speling.org/filer/myspell-da-%{version}.tar.bz2
 URL: http://da.speling.org/
 License: GPL-2.0-or-later

@@ -7,7 +7,7 @@
 
 Name:          mingw-%{pkgname}
 Version:       25.07.0
-Release:       2%{?dist}
+Release: 3%{?dist}
 Summary:       MinGW Windows Poppler library
 
 License:       (GPL-2.0-only OR GPL-3.0-only) AND GPL-2.0-or-later AND LGPL-2.0-or-later AND MIT

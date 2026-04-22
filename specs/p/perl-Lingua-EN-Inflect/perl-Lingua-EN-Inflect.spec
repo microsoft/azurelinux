@@ -3,7 +3,7 @@
 
 Name:           perl-Lingua-EN-Inflect
 Version:        1.905
-Release:        14%{?dist}
+Release: 15%{?dist}
 Summary:        Convert singular to plural, select "a" or "an"
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Lingua-EN-Inflect

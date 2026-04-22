@@ -12,7 +12,7 @@
 
 Name:           espeak
 Version:        1.48.04
-Release:        33%{?dist}
+Release: 34%{?dist}
 Summary:        Software speech synthesizer (text-to-speech)
 
 # Automatically converted from old format: GPLv3+ - review is highly recommended.

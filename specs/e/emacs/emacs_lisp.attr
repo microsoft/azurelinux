@@ -1,0 +1,5 @@
+# -*- rpm-spec -*-
+
+%__emacs_lisp_recommends %{_rpmconfigdir}/emacs_lisp.rec
+%__emacs_lisp_path %{_datadir}/emacs/.+\.el(\.gz)?$
+%__emacs_lisp_protocol multifile

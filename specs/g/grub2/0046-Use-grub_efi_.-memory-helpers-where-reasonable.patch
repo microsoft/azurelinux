@@ -1,0 +1,36 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 1 Jun 2017 10:06:38 -0400
+Subject: [PATCH] Use grub_efi_...() memory helpers where reasonable.
+
+This uses grub_efi_allocate_pool(), grub_efi_free_pool(), and
+grub_efi_free_pages() instead of open-coded efi_call_N() calls, so we
+get more reasonable type checking.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/loader/efi/chainloader.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/loader/efi/chainloader.c b/grub-core/loader/efi/chainloader.c
+index 1de98f78313..2036924504b 100644
+--- a/grub-core/loader/efi/chainloader.c
++++ b/grub-core/loader/efi/chainloader.c
+@@ -95,7 +95,7 @@ grub_chainloader_boot (void *context)
+     }
+ 
+   if (exit_data)
+-    b->free_pool (exit_data);
++    grub_efi_free_pool (exit_data);
+ 
+   grub_loader_unset ();
+ 
+@@ -419,7 +419,7 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
+   grub_free (file_path);
+ 
+   if (address)
+-    b->free_pages (address, pages);
++    grub_efi_free_pages (address, pages);
+ 
+   if (image_handle != NULL)
+     b->unload_image (image_handle);

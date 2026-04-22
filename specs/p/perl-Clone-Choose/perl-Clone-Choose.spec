@@ -3,7 +3,7 @@
 
 Name:           perl-Clone-Choose
 Version:        0.010
-Release:        23%{?dist}
+Release: 24%{?dist}
 Summary:        Choose appropriate clone utility
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Clone-Choose

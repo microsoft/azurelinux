@@ -11,7 +11,7 @@
 
 Name:           python-%{package_name}
 Version:        0.4.0
-Release:        13%{?dist}
+Release: 14%{?dist}
 Summary:        Use requests to talk HTTP via a UNIX domain socket
 
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.

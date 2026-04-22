@@ -3,7 +3,7 @@
 
 Name:           perl-PHP-Serialization
 Version:        0.34
-Release:        42%{?dist}
+Release: 43%{?dist}
 Summary:        Converts between PHP's serialize() output and the equivalent Perl structure
 # Automatically converted from old format: GPL+ or Artistic - review is highly recommended.
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

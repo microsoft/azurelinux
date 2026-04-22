@@ -6,7 +6,7 @@
 Summary:        SMTP client library
 Name:           libesmtp
 Version:        1.0.6
-Release:        34%{?dist}
+Release: 35%{?dist}
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.
 License:        LicenseRef-Callaway-LGPLv2+
 Source:         http://www.stafford.uklinux.net/libesmtp/%{name}-%{version}.tar.bz2

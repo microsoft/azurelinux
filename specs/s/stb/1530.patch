@@ -1,0 +1,24 @@
+From f100bfc302c0e095856c71a174714cce0a22e30a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jaroslav=20Loba=C4=8Devski?= <jarlob@github.com>
+Date: Thu, 19 Oct 2023 15:30:26 +0200
+Subject: [PATCH] Fix integer overflow
+
+Cast to `size_t` to avoid multiplication overflow.
+Fixes #1529
+---
+ stb_image.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/stb_image.h b/stb_image.h
+index 5e807a0a6..552129bc4 100644
+--- a/stb_image.h
++++ b/stb_image.h
+@@ -1207,7 +1207,7 @@ static stbi__uint16 *stbi__convert_8_to_16(stbi_uc *orig, int w, int h, int chan
+    int img_len = w * h * channels;
+    stbi__uint16 *enlarged;
+ 
+-   enlarged = (stbi__uint16 *) stbi__malloc(img_len*2);
++   enlarged = (stbi__uint16 *) stbi__malloc(((size_t)img_len)*2);
+    if (enlarged == NULL) return (stbi__uint16 *) stbi__errpuc("outofmem", "Out of memory");
+ 
+    for (i = 0; i < img_len; ++i)

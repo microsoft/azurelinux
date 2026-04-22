@@ -3,7 +3,7 @@
 
 Name:           caribou
 Version:        0.4.21
-Release:        48%{?dist}
+Release: 49%{?dist}
 Summary:        A simplified in-place on-screen keyboard
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.
 License:        LicenseRef-Callaway-LGPLv2+

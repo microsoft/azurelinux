@@ -3,7 +3,7 @@
 
 Name:           python-xapp
 Version:        2.4.2
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        Python bindings for xapps
 
 # Automatically converted from old format: LGPLv2 - review is highly recommended.

@@ -11,7 +11,7 @@ Name: hunspell-hr
 Summary: Croatian hunspell dictionaries
 %global upstreamid 20040608
 Version: 0.%{upstreamid}
-Release: 35%{?dist}
+Release: 36%{?dist}
 Epoch: 1
 Source: http://cvs.linux.hr/spell/myspell/hr_HR.zip
 URL: http://cvs.linux.hr/spell/

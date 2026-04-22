@@ -4,7 +4,7 @@
 %global cpan_version 6.57
 Name:           perl-Coro
 Version:        6.570
-Release:        23%{?dist}
+Release: 24%{?dist}
 Summary:        The only real threads in perl
 # Coro/libcoro:    GPL-2.0-or-later OR BSD-2-Clause
 # Rest of package: GPL-1.0-or-later OR Artistic-1.0-Perl

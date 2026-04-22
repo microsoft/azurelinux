@@ -3,7 +3,7 @@
 
 Name:           perl-Sys-Hostname-Long
 Version:        1.5
-Release:        32%{?dist}
+Release: 33%{?dist}
 Summary:        Try every conceivable way to get full hostname
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Sys-Hostname-Long

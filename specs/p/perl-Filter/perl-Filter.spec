@@ -11,7 +11,7 @@
 Name:           perl-Filter
 Epoch:          2
 Version:        1.64
-Release:        521%{?dist}
+Release: 522%{?dist}
 Summary:        Perl source filters
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Filter

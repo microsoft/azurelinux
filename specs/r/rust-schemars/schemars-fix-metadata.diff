@@ -1,5 +1,5 @@
---- schemars-1.2.0/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ schemars-1.2.0/Cargo.toml	2025-12-29T20:14:59.356925+00:00
+--- schemars-1.2.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ schemars-1.2.1/Cargo.toml	2026-03-18T18:29:06.386170+00:00
 @@ -99,10 +99,6 @@
  path = "examples/validate.rs"
  

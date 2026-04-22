@@ -6,7 +6,7 @@
 Summary: Manage child processes and their IO handles easily
 Name: rubygem-%{gem_name}
 Version: 1.3.4
-Release: 23%{?dist}
+Release: 24%{?dist}
 # Automatically converted from old format: BSD or Ruby - review is highly recommended.
 License: LicenseRef-Callaway-BSD OR Ruby
 URL: http://github.com/ahoward/open4/

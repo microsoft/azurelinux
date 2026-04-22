@@ -13,7 +13,7 @@ ExcludeArch: %{ix86}
 
 Name:          ocaml-ocamlbuild
 Version:       0.16.1
-Release:       2%{?dist}
+Release: 3%{?dist}
 
 Summary:       Build tool for OCaml libraries and programs
 

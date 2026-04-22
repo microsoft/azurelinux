@@ -3,7 +3,7 @@
 
 Name:          python-paramiko
 Version:       3.5.1
-Release:       6%{?dist}
+Release: 7%{?dist}
 Summary:       SSH2 protocol library for python
 
 # No version specified

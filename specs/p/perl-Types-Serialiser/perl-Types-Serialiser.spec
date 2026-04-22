@@ -4,7 +4,7 @@
 Name:		perl-Types-Serialiser
 Summary:	Simple data types for common serialization formats
 Version:	1.01
-Release:	14%{?dist}
+Release: 15%{?dist}
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Types-Serialiser
 Source0:	https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/Types-Serialiser-%{version}.tar.gz

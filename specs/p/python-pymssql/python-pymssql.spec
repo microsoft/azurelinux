@@ -7,7 +7,7 @@ a Python DB-API (PEP-249) interface to Microsoft SQL Server.}
 
 Name:           python-%{pypi_name}
 Version:        2.3.9
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        DB-API interface to Microsoft SQL Server
 
 License:        LGPL-2.0-or-later

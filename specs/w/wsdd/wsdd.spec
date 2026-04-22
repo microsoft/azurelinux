@@ -3,7 +3,7 @@
 
 Name:           wsdd
 Version:        0.8
-Release:        5%{?dist}
+Release: 6%{?dist}
 Summary:        Web Services Dynamic Discovery host daemon
 License:        MIT 
 URL:            https://github.com/christgau/wsdd 

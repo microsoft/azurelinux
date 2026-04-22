@@ -28,7 +28,7 @@
 
 Name:           mingw-qt5-qtbase
 Version:        5.15.18
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Qt5 for Windows - QtBase component
 
 # See LGPL_EXCEPTIONS.txt, for exception details

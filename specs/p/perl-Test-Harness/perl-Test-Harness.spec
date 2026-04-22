@@ -11,7 +11,7 @@
 Name:           perl-Test-Harness
 Epoch:          1
 Version:        3.52
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Run Perl standard test scripts with statistics
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Test-Harness

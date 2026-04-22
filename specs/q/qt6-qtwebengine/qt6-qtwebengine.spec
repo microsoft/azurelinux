@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/qt6-qtwebengine.azl.macros}
+
 %global qt_module qtwebengine
 
 %global _hardened_build 1
@@ -91,7 +94,7 @@
 Summary: Qt6 - QtWebEngine components
 Name:    qt6-qtwebengine
 Version: 6.10.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 # See also http://qt-project.org/doc/qt-5.0/qtdoc/licensing.html
@@ -119,6 +122,7 @@ Source10: macros.qt6-qtwebengine
 
 # pulseaudio headers
 Source20: pulseaudio-12.2-headers.tar.gz
+Source9999: qt6-qtwebengine.azl.macros
 
 # workaround FTBFS against kernel-headers-5.2.0+
 Patch1:   qtwebengine-SIOCGSTAMP.patch

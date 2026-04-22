@@ -10,7 +10,7 @@
 
 Name:           perl-Const-Fast
 Version:        0.014
-Release:        36%{?dist}
+Release: 37%{?dist}
 Summary:        Facility for creating read-only scalars, arrays, and hashes
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Const-Fast

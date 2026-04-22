@@ -3,7 +3,7 @@
 
 Name:           perl-App-FatPacker
 Version:        0.010008
-Release:        21%{?dist}
+Release: 22%{?dist}
 Summary:        Pack dependencies onto a script file
 # Automatically converted from old format: GPL+ or Artistic - review is highly recommended.
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

@@ -9,7 +9,7 @@
 
 Name:           v4l-utils
 Version:        1.32.0
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Utilities for video4linux and DVB devices
 # libdvbv5, dvbv5 utils, ir-keytable are GPL-2.0-only
 # e.g. utils/cec-follower/cec-follower.cpp is (GPL-2.0-only OR BSD-3-Clause) 

@@ -1,0 +1,45 @@
+From fcffc49d4fc00bba87ed70cdb0b21d825a28811d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Robert-Andr=C3=A9=20Mauchin?= <zebob.m@gmail.com>
+Date: Wed, 29 Jul 2020 18:04:41 +0200
+Subject: [PATCH] Convert int to string using rune()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+See https://github.com/golang/go/issues/32479
+
+Fix #28.
+
+Signed-off-by: Robert-André Mauchin <zebob.m@gmail.com>
+---
+ convert.go | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/convert.go b/convert.go
+index bf24aa8..d41a11f 100644
+--- a/convert.go
++++ b/convert.go
+@@ -23,7 +23,7 @@ import (
+ type StrTo string
+ 
+ func (f StrTo) Exist() bool {
+-	return string(f) != string(0x1E)
++	return string(f) != string(rune(0x1E))
+ }
+ 
+ func (f StrTo) Uint8() (uint8, error) {
+@@ -156,9 +156,9 @@ func Int2HexStr(num int) (hex string) {
+ 
+ 		c := "?"
+ 		if r >= 0 && r <= 9 {
+-			c = string(r + '0')
++			c = string(rune(r + '0'))
+ 		} else {
+-			c = string(r + 'a' - 10)
++			c = string(rune(r + 'a' - 10))
+ 		}
+ 		hex = c + hex
+ 		num = num / 16
+-- 
+2.26.2
+

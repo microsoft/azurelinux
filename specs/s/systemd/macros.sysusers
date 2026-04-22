@@ -1,0 +1,10 @@
+# RPM macros for packages creating system accounts
+#
+# Turn a sysusers.d file into macros specified by
+# https://docs.fedoraproject.org/en-US/packaging-guidelines/UsersAndGroups/#_dynamic_allocation
+#
+# After https://fedoraproject.org/wiki/Changes/RPMSuportForSystemdSysusers,
+# those macros are not needed anymore.
+
+%sysusers_requires_compat %nil
+%sysusers_create_compat() %nil

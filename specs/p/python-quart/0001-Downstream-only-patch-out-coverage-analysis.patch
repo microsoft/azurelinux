@@ -1,0 +1,38 @@
+From a3d4d91ff2fff2f5932735e929a6eb37bbabaad5 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Wed, 31 Jan 2024 18:07:25 -0500
+Subject: [PATCH] Downstream-only: patch out coverage analysis
+
+https://docs.fedoraproject.org/en-US/packaging-guidelines/Python/#_linters
+---
+ pyproject.toml        | 2 +-
+ requirements/tests.in | 2 --
+ 2 files changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index b15e778..220aa7b 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -54,7 +54,7 @@ build-backend = "flit_core.buildapi"
+ name = "quart"
+ 
+ [tool.pytest.ini_options]
+-addopts = "--no-cov-on-fail --showlocals --strict-markers"
++addopts = "--showlocals --strict-markers"
+ asyncio_default_fixture_loop_scope = "session"
+ asyncio_mode = "auto"
+ testpaths = ["tests"]
+diff --git a/requirements/tests.in b/requirements/tests.in
+index 097552f..65e08e3 100644
+--- a/requirements/tests.in
++++ b/requirements/tests.in
+@@ -1,6 +1,4 @@
+ hypothesis
+ pytest
+ pytest-asyncio
+-pytest-cov
+-pytest-sugar
+ python-dotenv
+-- 
+2.47.1
+

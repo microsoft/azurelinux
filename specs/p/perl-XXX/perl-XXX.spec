@@ -3,7 +3,7 @@
 
 Name:           perl-XXX
 Version:        0.38
-Release:        11%{?dist}
+Release: 12%{?dist}
 Summary:        See Your Data in the Nude
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/XXX

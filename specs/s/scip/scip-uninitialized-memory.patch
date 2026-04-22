@@ -1,0 +1,20 @@
+--- scip-900/src/blockmemshell/memory.c.orig	2024-02-07 03:49:07.000000000 -0700
++++ scip-900/src/blockmemshell/memory.c	2024-03-05 12:07:45.936422874 -0700
+@@ -406,7 +406,7 @@ void* BMSallocMemory_call(
+ #endif
+ 
+    size = MAX(size, 1);
+-   ptr = malloc(size);
++   ptr = calloc(1, size);
+ 
+    if( ptr == NULL )
+    {
+@@ -444,7 +444,7 @@ void* BMSallocMemoryArray_call(
+ 
+    size = num * typesize;
+    size = MAX(size, 1);
+-   ptr = malloc(size);
++   ptr = calloc(1, size);
+ 
+    if( ptr == NULL )
+    {

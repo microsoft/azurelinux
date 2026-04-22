@@ -3,7 +3,7 @@
 
 Name:           python-lunr
 Version:        0.8.0
-Release:        5%{?dist}
+Release: 6%{?dist}
 Summary:        A Python implementation of Lunr.js
 
 License:        MIT

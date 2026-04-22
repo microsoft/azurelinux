@@ -1,0 +1,71 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Daniel Axtens <dja@axtens.net>
+Date: Thu, 24 Mar 2022 14:34:32 +1100
+Subject: [PATCH] powerpc: prefix detection: support device names with commas
+
+Frustratingly, the device name itself can contain an embedded comma:
+e.g /pci@800000020000015/pci1014,034A@0/sas/disk@5000c50098a0ee8b
+
+So my previous approach was wrong: we cannot rely upon the presence
+of a comma to say that a partition has been specified!
+
+It turns out for prefixes like (,gpt2)/grub2 we really want to make
+up a full (device,partition)/patch prefix, because root discovery code
+in 10_linux will reset the root variable and use search to fill it again.
+If you have run grub-install, you probably don't have search built in,
+and if you don't have prefix containing (device,partition), grub will
+construct ($root)$prefix/powerpc-ieee1275/search.mod - but because $root
+has just been changed, this will no longer work, and the boot will fail!
+
+Retain the gist of the logic, but instead of looking for a comma, look for
+a leading '('. This matches the earlier code better anyway.
+
+There's certainly a better fix to be had. But any time you chose to build
+with a bare prefix like '/grub2', you're almost certainly going to build in
+search anyway, so this will do.
+
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+---
+ grub-core/kern/main.c | 27 +++++++++++++++++++++------
+ 1 file changed, 21 insertions(+), 6 deletions(-)
+
+diff --git a/grub-core/kern/main.c b/grub-core/kern/main.c
+index dbd4f596fbe..8e89763f43b 100644
+--- a/grub-core/kern/main.c
++++ b/grub-core/kern/main.c
+@@ -242,14 +242,29 @@ grub_set_prefix_and_root (void)
+ 	    what sorts of paths represent disks with partition tables and those
+ 	    without partition tables.
+ 
+-	 So we act unless there is a comma in the device, which would indicate
+-	 a partition has already been specified.
++          - Frustratingly, the device name itself can contain an embedded comma:
++            /pci@800000020000015/pci1014,034A@0/sas/disk@5000c50098a0ee8b
++            So we cannot even rely upon the presence of a comma to say that a
++            partition has been specified!
+ 
+-	 (If we only have a path, the code in normal to discover config files
+-	 will try both without partitions and then with any partitions so we
+-	 will cover both CDs and HDs.)
++         If we only have a path in $prefix, the code in normal to discover
++	 config files will try all disks, both without partitions and then with
++	 any partitions so we will cover both CDs and HDs.
++
++         However, it doesn't then set the prefix to be something like
++         (discovered partition)/path, and so it is fragile against runtime
++         changes to $root. For example some of the stuff done in 10_linux to
++         reload $root sets root differently and then uses search to find it
++         again. If the search module is not built in, when we change root, grub
++         will look in (new root)/path/powerpc-ieee1275, that won't work, and we
++         will not be able to load the search module and the boot will fail.
++
++         This is particularly likely to hit us in the grub-install
++         (,msdos2)/grub2 case, so we act unless the supplied prefix starts with
++         '(', which would likely indicate a partition has already been
++         specified.
+        */
+-      if (grub_strchr (device, ',') == NULL)
++      if (prefix && prefix[0] != '(')
+         grub_env_set ("prefix", path);
+       else
+ #endif

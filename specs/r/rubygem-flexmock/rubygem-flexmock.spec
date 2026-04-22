@@ -6,7 +6,7 @@
 Summary:	Mock object library for ruby
 Name:		rubygem-%{gem_name}
 Version:	3.0.2
-Release:	1%{?dist}
+Release: 2%{?dist}
 License:	MIT
 URL:		https://github.com/doudou/flexmock
 Source0:	https://rubygems.org/gems/%{gem_name}-%{version}.gem

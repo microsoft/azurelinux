@@ -1,0 +1,7 @@
+import:
+- package: github.com/gorilla/securecookie
+  version: 1b0c7f6e9ab3d7f500fd7d50c7ad835ff428139b
+- package: github.com/gorilla/context
+  version: 215affda49addc4c8ef7e2534915df2c8c35c6cd
+package: github.com/gorilla/sessions
+

@@ -3,7 +3,7 @@
 
 Name:           perl-IPC-Run3
 Version:        0.049
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Run a subprocess in batch mode
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl OR BSD-2-Clause
 URL:            https://metacpan.org/release/IPC-Run3

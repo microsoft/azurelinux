@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 5.2.2
-Release: 13%{?dist}
+Release: 14%{?dist}
 Summary: An elegant, structured (X)HTML/XML templating engine
 License: MIT and WTFPL
 URL: http://haml.info/

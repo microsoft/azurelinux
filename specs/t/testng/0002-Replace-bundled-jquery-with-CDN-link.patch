@@ -1,0 +1,38 @@
+From 9155677e2d5acdd2379c38041189da52c7f04946 Mon Sep 17 00:00:00 2001
+From: Michael Simacek <msimacek@redhat.com>
+Date: Wed, 18 Jul 2018 15:57:49 +0200
+Subject: [PATCH 2/2] Replace bundled jquery with CDN link
+
+---
+ testng-core/src/main/java/org/testng/reporters/jq/Main.java | 1 -
+ testng-core/src/main/resources/org/testng/header            | 2 +-
+ 2 files changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/testng-core/src/main/java/org/testng/reporters/jq/Main.java b/testng-core/src/main/java/org/testng/reporters/jq/Main.java
+index efd6799..2d8b74e 100644
+--- a/testng-core/src/main/java/org/testng/reporters/jq/Main.java
++++ b/testng-core/src/main/java/org/testng/reporters/jq/Main.java
+@@ -21,7 +21,6 @@ public class Main implements IReporter {
+   private static final String TESTNG_RESOURCE_PREFIX = "/org/testng/";
+   private static final String[] RESOURCES =
+       new String[] {
+-        "jquery-3.6.0.min.js",
+         "testng-reports.css",
+         "testng-reports.js",
+         "testng-reports1.css",
+diff --git a/testng-core/src/main/resources/org/testng/header b/testng-core/src/main/resources/org/testng/header
+index f5abbc3..817badc 100644
+--- a/testng-core/src/main/resources/org/testng/header
++++ b/testng-core/src/main/resources/org/testng/header
+@@ -7,7 +7,7 @@
+ 
+     <link type="text/css" href="testng-reports1.css" rel="stylesheet" id="ultra" />
+     <link type="text/css" href="testng-reports.css" rel="stylesheet" id="retro" disabled="false"/>
+-    <script type="text/javascript" src="jquery-3.6.0.min.js"></script>
++    <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+     <script type="text/javascript" src="testng-reports.js"></script>
+     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+     <script type='text/javascript'>
+-- 
+2.31.1
+

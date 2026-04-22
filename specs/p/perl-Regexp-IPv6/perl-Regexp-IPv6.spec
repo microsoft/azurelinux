@@ -3,7 +3,7 @@
 
 Name:           perl-Regexp-IPv6
 Version:        0.03
-Release:        42%{?dist}
+Release: 43%{?dist}
 Summary:        Regular expression for IPv6 addresses
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Regexp-IPv6

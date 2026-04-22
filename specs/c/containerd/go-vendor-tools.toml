@@ -1,0 +1,37 @@
+[licensing]
+detector = "trivy"
+
+exclude_directories = [
+    ".devcontainer",
+    "contrib",
+    "script",
+    "test",
+]
+
+[[licensing.licenses]]
+path = "vendor/github.com/grpc-ecosystem/go-grpc-middleware/v2/COPYRIGHT"
+sha256sum = "8befb41eac649775143c81fddaf84b7d7e1197899d968b8b51cfec405f2ff72f"
+expression = "Apache-2.0"
+
+[[licensing.licenses]]
+path = "vendor/github.com/moby/sys/symlink/LICENSE.APACHE"
+sha256sum = "e6abacaae15d29c132fc8688f098a3b9c89088bc434ea33992261e19e34e6723"
+expression = "Apache-2.0"
+
+[[licensing.licenses]]
+path = "vendor/github.com/moby/sys/symlink/LICENSE.BSD"
+sha256sum = "81205fa54813e578a0d361c671c21ae35ca5b1b575f39e82f5cdab68b8539a1d"
+expression = "BSD-3-Clause"
+
+[[licensing.licenses]]
+path = "vendor/sigs.k8s.io/yaml/goyaml.v2/LICENSE.libyaml"
+sha256sum = "a94710b55e03b5285f77d048c5ba61bb9d6ee04a06c0eb90e68821e11b0c707a"
+expression = "MIT"
+[[licensing.licenses]]
+path = "vendor/github.com/cyphar/filepath-securejoin/LICENSE.BSD"
+sha256sum = "26be8a79415737dfe8edf1be62e71afeb8c770ed5a5605a06270d5701830f47c"
+expression = "BSD-3-Clause"
+[[licensing.licenses]]
+path = "vendor/github.com/cyphar/filepath-securejoin/LICENSE.MPL-2.0"
+sha256sum = "3f3d9e0024b1921b067d6f7f88deb4a60cbe7a78e76c64e3f1d7fc3b779b9d04"
+expression = "MPL-2.0"

@@ -1,0 +1,19 @@
+From b9075d0e1f687f9a5cf80a7778bde99cece9fdf7 Mon Sep 17 00:00:00 2001
+From: Than Ngo <than@redhat.com>
+Date: Sat, 23 Nov 2024 12:33:22 +0100
+Subject: [PATCH] Enable qt-ui
+
+
+diff -up chromium-131.0.6778.85/ui/qt/qt_shim.cc.me chromium-131.0.6778.85/ui/qt/qt_shim.cc
+--- chromium-131.0.6778.85/ui/qt/qt_shim.cc.me	2024-11-23 10:04:16.789121846 +0100
++++ chromium-131.0.6778.85/ui/qt/qt_shim.cc	2024-11-23 11:40:02.905064702 +0100
+@@ -265,7 +265,7 @@ FontRenderParams QtShim::GetFontRenderPa
+ FontDescription QtShim::GetFontDescription() const {
+   QFont font = app_.font();
+   return {
+-      .family = String(font.family().toStdString().c_str()),
++      .family = String(font.family().toUtf8().constData()),
+       .size_pixels = font.pixelSize(),
+       .size_points = font.pointSize(),
+       .is_italic = IsStyleItalic(font.style()),
+

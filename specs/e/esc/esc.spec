@@ -3,7 +3,7 @@
 
 Name: esc 
 Version: 1.1.2
-Release: 22%{?dist}
+Release: 23%{?dist}
 Summary: Enterprise Security Client Smart Card Client
 License: GPL-1.0-or-later
 URL: http://directory.fedora.redhat.com/wiki/CoolKey 

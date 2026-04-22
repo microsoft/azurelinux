@@ -8,7 +8,7 @@
 
 Name:           python-%{pypi_name}
 Version:        1.4.1
-Release:        14%{?dist}
+Release: 15%{?dist}
 Summary:        %{sum}
 
 License:        MIT

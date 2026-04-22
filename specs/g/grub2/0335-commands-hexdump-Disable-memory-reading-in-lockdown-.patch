@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: B Horn <b@horn.uk>
+Date: Fri, 19 Apr 2024 22:31:45 +0100
+Subject: [PATCH] commands/hexdump: Disable memory reading in lockdown mode
+
+Reported-by: B Horn <b@horn.uk>
+Signed-off-by: B Horn <b@horn.uk>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/commands/hexdump.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/commands/hexdump.c b/grub-core/commands/hexdump.c
+index eaa12465b..d6f61d98a 100644
+--- a/grub-core/commands/hexdump.c
++++ b/grub-core/commands/hexdump.c
+@@ -24,6 +24,7 @@
+ #include <grub/lib/hexdump.h>
+ #include <grub/extcmd.h>
+ #include <grub/i18n.h>
++#include <grub/lockdown.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -51,7 +52,11 @@ grub_cmd_hexdump (grub_extcmd_context_t ctxt, int argc, char **args)
+   length = (state[1].set) ? grub_strtoul (state[1].arg, 0, 0) : 256;
+ 
+   if (!grub_strcmp (args[0], "(mem)"))
+-    hexdump (skip, (char *) (grub_addr_t) skip, length);
++    {
++      if (grub_is_lockdown() == GRUB_LOCKDOWN_ENABLED)
++        return grub_error (GRUB_ERR_ACCESS_DENIED, N_("memory reading is disabled in lockdown mode"));
++      hexdump (skip, (char *) (grub_addr_t) skip, length);
++    }
+   else if ((args[0][0] == '(') && (args[0][namelen - 1] == ')'))
+     {
+       grub_disk_t disk;

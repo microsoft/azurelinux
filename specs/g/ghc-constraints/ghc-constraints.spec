@@ -16,7 +16,7 @@
 
 Name:           ghc-%{pkg_name}
 Version:        0.14.2
-Release:        5%{?dist}
+Release: 6%{?dist}
 Summary:        Constraint manipulation
 
 License:        BSD-2-Clause

@@ -1,0 +1,495 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 29 Aug 2024 12:11:11 -0600
+Subject: [PATCH] efi/api.h: include missing __grub_efi_api macros on EFI
+ functions
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+Signed-off-by: Leo Sandoval <lsandova@redhat.com>
+---
+ grub-core/loader/efi/chainloader.c |  2 +-
+ include/grub/efi/api.h             | 34 +++++++++++++-------------
+ include/grub/efi/dhcp.h            | 42 ++++++++++++++++----------------
+ include/grub/efi/edid.h            |  2 +-
+ include/grub/efi/http.h            | 12 ++++-----
+ include/grub/efi/pci.h             | 50 +++++++++++++++++++-------------------
+ 6 files changed, 71 insertions(+), 71 deletions(-)
+
+diff --git a/grub-core/loader/efi/chainloader.c b/grub-core/loader/efi/chainloader.c
+index 5cd6f6a59..460a44041 100644
+--- a/grub-core/loader/efi/chainloader.c
++++ b/grub-core/loader/efi/chainloader.c
+@@ -555,7 +555,7 @@ handle_image (struct grub_secureboot_chainloader_context *load_context)
+   grub_uint32_t buffer_size;
+   int found_entry_point = 0;
+   int rc;
+-  grub_efi_status_t (*entry_point) (grub_efi_handle_t image_handle, grub_efi_system_table_t *system_table);
++  grub_efi_status_t (__grub_efi_api *entry_point) (grub_efi_handle_t image_handle, grub_efi_system_table_t *system_table);
+ 
+   b = grub_efi_system_table->boot_services;
+ 
+diff --git a/include/grub/efi/api.h b/include/grub/efi/api.h
+index 2376182d7..5047ecf28 100644
+--- a/include/grub/efi/api.h
++++ b/include/grub/efi/api.h
+@@ -1094,11 +1094,11 @@ typedef struct grub_efi_bios_device_path grub_efi_bios_device_path_t;
+ struct grub_efi_service_binding;
+ 
+ typedef grub_efi_status_t
+-(*grub_efi_service_binding_create_child) (struct grub_efi_service_binding *this,
++(__grub_efi_api *grub_efi_service_binding_create_child) (struct grub_efi_service_binding *this,
+                                           grub_efi_handle_t *child_handle);
+ 
+ typedef grub_efi_status_t
+-(*grub_efi_service_binding_destroy_child) (struct grub_efi_service_binding *this,
++(__grub_efi_api *grub_efi_service_binding_destroy_child) (struct grub_efi_service_binding *this,
+                                            grub_efi_handle_t *child_handle);
+ 
+ typedef struct grub_efi_service_binding
+@@ -1754,12 +1754,12 @@ typedef struct grub_efi_pxe_mode
+ typedef struct grub_efi_pxe
+ {
+   grub_uint64_t rev;
+-  grub_efi_status_t (*start) (struct grub_efi_pxe *this, grub_efi_boolean_t use_ipv6);
++  grub_efi_status_t (__grub_efi_api *start) (struct grub_efi_pxe *this, grub_efi_boolean_t use_ipv6);
+   void (*stop) (void);
+-  grub_efi_status_t (*dhcp) (struct grub_efi_pxe *this,
++  grub_efi_status_t (__grub_efi_api *dhcp) (struct grub_efi_pxe *this,
+ 			    grub_efi_boolean_t sort_offers);
+   void (*discover) (void);
+-  grub_efi_status_t (*mtftp) (struct grub_efi_pxe *this,
++  grub_efi_status_t (__grub_efi_api *mtftp) (struct grub_efi_pxe *this,
+ 			    grub_efi_pxe_base_code_tftp_opcode_t operation,
+ 			    void *buffer_ptr,
+ 			    grub_efi_boolean_t overwrite,
+@@ -1775,7 +1775,7 @@ typedef struct grub_efi_pxe
+   void (*setipfilter) (void);
+   void (*arp) (void);
+   void (*setparams) (void);
+-  grub_efi_status_t (*set_station_ip) (struct grub_efi_pxe *this,
++  grub_efi_status_t (__grub_efi_api *set_station_ip) (struct grub_efi_pxe *this,
+ 			    grub_efi_pxe_ip_address_t *new_station_ip,
+ 			    grub_efi_pxe_ip_address_t *new_subnet_mask);
+   void (*setpackets) (void);
+@@ -2054,21 +2054,21 @@ typedef enum grub_efi_ip4_config2_data_type grub_efi_ip4_config2_data_type_t;
+ 
+ struct grub_efi_ip4_config2_protocol
+ {
+-  grub_efi_status_t (*set_data) (struct grub_efi_ip4_config2_protocol *this,
++  grub_efi_status_t (__grub_efi_api *set_data) (struct grub_efi_ip4_config2_protocol *this,
+ 				 grub_efi_ip4_config2_data_type_t data_type,
+ 				 grub_efi_uintn_t data_size,
+ 				 void *data);
+ 
+-  grub_efi_status_t (*get_data) (struct grub_efi_ip4_config2_protocol *this,
++  grub_efi_status_t (__grub_efi_api *get_data) (struct grub_efi_ip4_config2_protocol *this,
+ 				 grub_efi_ip4_config2_data_type_t data_type,
+ 				 grub_efi_uintn_t *data_size,
+ 				 void *data);
+ 
+-  grub_efi_status_t (*register_data_notify) (struct grub_efi_ip4_config2_protocol *this,
++  grub_efi_status_t (__grub_efi_api *register_data_notify) (struct grub_efi_ip4_config2_protocol *this,
+ 					     grub_efi_ip4_config2_data_type_t data_type,
+ 					     grub_efi_event_t event);
+ 
+-  grub_efi_status_t (*unregister_datanotify) (struct grub_efi_ip4_config2_protocol *this,
++  grub_efi_status_t (__grub_efi_api *unregister_datanotify) (struct grub_efi_ip4_config2_protocol *this,
+ 					     grub_efi_ip4_config2_data_type_t data_type,
+ 					     grub_efi_event_t event);
+ };
+@@ -2126,21 +2126,21 @@ typedef enum grub_efi_ip6_config_data_type grub_efi_ip6_config_data_type_t;
+ 
+ struct grub_efi_ip6_config_protocol
+ {
+-  grub_efi_status_t (*set_data) (struct grub_efi_ip6_config_protocol *this,
++  grub_efi_status_t (__grub_efi_api *set_data) (struct grub_efi_ip6_config_protocol *this,
+ 				 grub_efi_ip6_config_data_type_t data_type,
+ 				 grub_efi_uintn_t data_size,
+ 				 void *data);
+ 
+-  grub_efi_status_t (*get_data) (struct grub_efi_ip6_config_protocol *this,
++  grub_efi_status_t (__grub_efi_api *get_data) (struct grub_efi_ip6_config_protocol *this,
+ 				 grub_efi_ip6_config_data_type_t data_type,
+ 				 grub_efi_uintn_t *data_size,
+ 				 void *data);
+ 
+-  grub_efi_status_t (*register_data_notify) (struct grub_efi_ip6_config_protocol *this,
++  grub_efi_status_t (__grub_efi_api *register_data_notify) (struct grub_efi_ip6_config_protocol *this,
+ 					     grub_efi_ip6_config_data_type_t data_type,
+ 					     grub_efi_event_t event);
+ 
+-  grub_efi_status_t (*unregister_datanotify) (struct grub_efi_ip6_config_protocol *this,
++  grub_efi_status_t (__grub_efi_api *unregister_datanotify) (struct grub_efi_ip6_config_protocol *this,
+ 					     grub_efi_ip6_config_data_type_t data_type,
+ 					     grub_efi_event_t event);
+ };
+@@ -2191,17 +2191,17 @@ typedef struct grub_efi_ip6_config_manual_address grub_efi_ip6_config_manual_add
+ 
+ struct grub_efi_memory_attribute_protocol
+ {
+-  grub_efi_status_t (*get_memory_attributes) (
++  grub_efi_status_t (__grub_efi_api *get_memory_attributes) (
+ 			    struct grub_efi_memory_attribute_protocol *this,
+ 			    grub_efi_physical_address_t base_address,
+ 			    grub_efi_uint64_t length,
+ 			    grub_efi_uint64_t *attributes);
+-  grub_efi_status_t (*set_memory_attributes) (
++  grub_efi_status_t (__grub_efi_api *set_memory_attributes) (
+ 			    struct grub_efi_memory_attribute_protocol *this,
+ 			    grub_efi_physical_address_t base_address,
+ 			    grub_efi_uint64_t length,
+ 			    grub_efi_uint64_t attributes);
+-  grub_efi_status_t (*clear_memory_attributes) (
++  grub_efi_status_t (__grub_efi_api *clear_memory_attributes) (
+ 			    struct grub_efi_memory_attribute_protocol *this,
+ 			    grub_efi_physical_address_t base_address,
+ 			    grub_efi_uint64_t length,
+diff --git a/include/grub/efi/dhcp.h b/include/grub/efi/dhcp.h
+index fdb88eb81..d996716e4 100644
+--- a/include/grub/efi/dhcp.h
++++ b/include/grub/efi/dhcp.h
+@@ -123,7 +123,7 @@ struct grub_efi_dhcp4_config_data {
+   grub_efi_uint32_t request_try_count;
+   grub_efi_uint32_t *request_timeout;
+   grub_efi_ipv4_address_t client_address;
+-  grub_efi_status_t (*dhcp4_callback) (
++  grub_efi_status_t (__grub_efi_api *dhcp4_callback) (
+     grub_efi_dhcp4_protocol_t *this,
+     void *context,
+     grub_efi_dhcp4_state_t current_state,
+@@ -153,27 +153,27 @@ struct grub_efi_dhcp4_mode_data {
+ typedef struct grub_efi_dhcp4_mode_data grub_efi_dhcp4_mode_data_t;
+ 
+ struct grub_efi_dhcp4_protocol {
+-  grub_efi_status_t (*get_mode_data) (grub_efi_dhcp4_protocol_t *this,
++  grub_efi_status_t (__grub_efi_api *get_mode_data) (grub_efi_dhcp4_protocol_t *this,
+ 	      grub_efi_dhcp4_mode_data_t *dhcp4_mode_data);
+-  grub_efi_status_t (*configure) (grub_efi_dhcp4_protocol_t *this,
++  grub_efi_status_t (__grub_efi_api *configure) (grub_efi_dhcp4_protocol_t *this,
+ 	      grub_efi_dhcp4_config_data_t *dhcp4_cfg_data);
+-  grub_efi_status_t (*start) (grub_efi_dhcp4_protocol_t *this,
++  grub_efi_status_t (__grub_efi_api *start) (grub_efi_dhcp4_protocol_t *this,
+ 	      grub_efi_event_t completion_event);
+-  grub_efi_status_t (*renew_rebind) (grub_efi_dhcp4_protocol_t *this,
++  grub_efi_status_t (__grub_efi_api *renew_rebind) (grub_efi_dhcp4_protocol_t *this,
+ 	      grub_efi_boolean_t rebind_request,
+ 	      grub_efi_event_t completion_event);
+-  grub_efi_status_t (*release) (grub_efi_dhcp4_protocol_t *this);
+-  grub_efi_status_t (*stop) (grub_efi_dhcp4_protocol_t *this);
+-  grub_efi_status_t (*build) (grub_efi_dhcp4_protocol_t *this,
++  grub_efi_status_t (__grub_efi_api *release) (grub_efi_dhcp4_protocol_t *this);
++  grub_efi_status_t (__grub_efi_api *stop) (grub_efi_dhcp4_protocol_t *this);
++  grub_efi_status_t (__grub_efi_api *build) (grub_efi_dhcp4_protocol_t *this,
+ 	      grub_efi_dhcp4_packet_t *seed_packet,
+ 	      grub_efi_uint32_t delete_count,
+ 	      grub_efi_uint8_t *delete_list,
+ 	      grub_efi_uint32_t append_count,
+ 	      grub_efi_dhcp4_packet_option_t *append_list[],
+ 	      grub_efi_dhcp4_packet_t **new_packet);
+-  grub_efi_status_t (*transmit_receive) (grub_efi_dhcp4_protocol_t *this,
++  grub_efi_status_t (__grub_efi_api *transmit_receive) (grub_efi_dhcp4_protocol_t *this,
+ 	      grub_efi_dhcp4_transmit_receive_token_t *token);
+-  grub_efi_status_t (*parse) (grub_efi_dhcp4_protocol_t *this,
++  grub_efi_status_t (__grub_efi_api *parse) (grub_efi_dhcp4_protocol_t *this,
+ 	      grub_efi_dhcp4_packet_t *packet,
+ 	      grub_efi_uint32_t *option_count,
+ 	      grub_efi_dhcp4_packet_option_t *packet_option_list[]);
+@@ -289,7 +289,7 @@ struct grub_efi_dhcp6_mode_data {
+ typedef struct grub_efi_dhcp6_mode_data grub_efi_dhcp6_mode_data_t;
+ 
+ struct grub_efi_dhcp6_config_data {
+-  grub_efi_status_t (*dhcp6_callback) (grub_efi_dhcp6_protocol_t this,
++  grub_efi_status_t (__grub_efi_api *dhcp6_callback) (grub_efi_dhcp6_protocol_t this,
+ 		void *context,
+ 		grub_efi_dhcp6_state_t current_state,
+ 		grub_efi_dhcp6_event_t dhcp6_event,
+@@ -308,33 +308,33 @@ struct grub_efi_dhcp6_config_data {
+ typedef struct grub_efi_dhcp6_config_data grub_efi_dhcp6_config_data_t;
+ 
+ struct grub_efi_dhcp6_protocol {
+-  grub_efi_status_t (*get_mode_data) (grub_efi_dhcp6_protocol_t *this,
++  grub_efi_status_t (__grub_efi_api *get_mode_data) (grub_efi_dhcp6_protocol_t *this,
+ 	    grub_efi_dhcp6_mode_data_t *dhcp6_mode_data,
+ 	    grub_efi_dhcp6_config_data_t *dhcp6_config_data);
+-  grub_efi_status_t (*configure) (grub_efi_dhcp6_protocol_t *this,
++  grub_efi_status_t (__grub_efi_api *configure) (grub_efi_dhcp6_protocol_t *this,
+ 	    grub_efi_dhcp6_config_data_t *dhcp6_cfg_data);
+-  grub_efi_status_t (*start) (grub_efi_dhcp6_protocol_t *this);
+-  grub_efi_status_t (*info_request) (grub_efi_dhcp6_protocol_t *this,
++  grub_efi_status_t (__grub_efi_api *start) (grub_efi_dhcp6_protocol_t *this);
++  grub_efi_status_t (__grub_efi_api *info_request) (grub_efi_dhcp6_protocol_t *this,
+ 	    grub_efi_boolean_t send_client_id,
+ 	    grub_efi_dhcp6_packet_option_t *option_request,
+ 	    grub_efi_uint32_t option_count,
+ 	    grub_efi_dhcp6_packet_option_t *option_list[],
+ 	    grub_efi_dhcp6_retransmission_t *retransmission,
+ 	    grub_efi_event_t timeout_event,
+-	    grub_efi_status_t (*reply_callback) (grub_efi_dhcp6_protocol_t *this,
++	    grub_efi_status_t (__grub_efi_api *reply_callback) (grub_efi_dhcp6_protocol_t *this,
+ 		    void *context,
+ 		    grub_efi_dhcp6_packet_t *packet),
+ 	    void *callback_context);
+-  grub_efi_status_t (*renew_rebind) (grub_efi_dhcp6_protocol_t *this,
++  grub_efi_status_t (__grub_efi_api *renew_rebind) (grub_efi_dhcp6_protocol_t *this,
+ 	    grub_efi_boolean_t rebind_request);
+-  grub_efi_status_t (*decline) (grub_efi_dhcp6_protocol_t *this,
++  grub_efi_status_t (__grub_efi_api *decline) (grub_efi_dhcp6_protocol_t *this,
+ 	    grub_efi_uint32_t address_count,
+ 	    grub_efi_ipv6_address_t *addresses);
+-  grub_efi_status_t (*release) (grub_efi_dhcp6_protocol_t *this,
++  grub_efi_status_t (__grub_efi_api *release) (grub_efi_dhcp6_protocol_t *this,
+ 	    grub_efi_uint32_t address_count,
+ 	    grub_efi_ipv6_address_t *addresses);
+-  grub_efi_status_t (*stop) (grub_efi_dhcp6_protocol_t *this);
+-  grub_efi_status_t (*parse) (grub_efi_dhcp6_protocol_t *this,
++  grub_efi_status_t (__grub_efi_api *stop) (grub_efi_dhcp6_protocol_t *this);
++  grub_efi_status_t (__grub_efi_api *parse) (grub_efi_dhcp6_protocol_t *this,
+ 	    grub_efi_dhcp6_packet_t *packet,
+ 	    grub_efi_uint32_t *option_count,
+ 	    grub_efi_dhcp6_packet_option_t *packet_option_list[]);
+diff --git a/include/grub/efi/edid.h b/include/grub/efi/edid.h
+index 43c0c4372..ac1b8e2fd 100644
+--- a/include/grub/efi/edid.h
++++ b/include/grub/efi/edid.h
+@@ -33,7 +33,7 @@
+ struct grub_efi_edid_override;
+ 
+ typedef grub_efi_status_t
+-(*grub_efi_edid_override_get_edid) (struct grub_efi_edid_override *this,
++(__grub_efi_api *grub_efi_edid_override_get_edid) (struct grub_efi_edid_override *this,
+ 				    grub_efi_handle_t *childhandle,
+ 				    grub_efi_uint32_t *attributes,
+ 				    grub_efi_uintn_t *edidsize,
+diff --git a/include/grub/efi/http.h b/include/grub/efi/http.h
+index ad164ba19..242d001b6 100644
+--- a/include/grub/efi/http.h
++++ b/include/grub/efi/http.h
+@@ -188,27 +188,27 @@ typedef struct {
+ 
+ struct grub_efi_http {
+   grub_efi_status_t
+-  (*get_mode_data) (struct grub_efi_http *this,
++  (__grub_efi_api *get_mode_data) (struct grub_efi_http *this,
+                     grub_efi_http_config_data_t *http_config_data);
+ 
+   grub_efi_status_t
+-  (*configure) (struct grub_efi_http *this,
++  (__grub_efi_api *configure) (struct grub_efi_http *this,
+                 grub_efi_http_config_data_t *http_config_data);
+ 
+   grub_efi_status_t
+-  (*request) (struct grub_efi_http *this,
++  (__grub_efi_api *request) (struct grub_efi_http *this,
+               grub_efi_http_token_t *token);
+ 
+   grub_efi_status_t
+-  (*cancel) (struct grub_efi_http *this,
++  (__grub_efi_api *cancel) (struct grub_efi_http *this,
+              grub_efi_http_token_t *token);
+ 
+   grub_efi_status_t
+-  (*response) (struct grub_efi_http *this,
++  (__grub_efi_api *response) (struct grub_efi_http *this,
+                grub_efi_http_token_t *token);
+ 
+   grub_efi_status_t
+-  (*poll) (struct grub_efi_http *this);
++  (__grub_efi_api *poll) (struct grub_efi_http *this);
+ };
+ typedef struct grub_efi_http grub_efi_http_t;
+ 
+diff --git a/include/grub/efi/pci.h b/include/grub/efi/pci.h
+index b17245549..a90f61042 100644
+--- a/include/grub/efi/pci.h
++++ b/include/grub/efi/pci.h
+@@ -48,7 +48,7 @@ typedef enum
+ struct grub_efi_pci_io;
+ 
+ typedef grub_efi_status_t
+-(*grub_efi_pci_io_mem_t) (struct grub_efi_pci_io *this,
++(__grub_efi_api *grub_efi_pci_io_mem_t) (struct grub_efi_pci_io *this,
+ 			  grub_efi_pci_io_width_t width,
+ 			  grub_efi_uint8_t bar_index,
+ 			  grub_efi_uint64_t offset,
+@@ -56,7 +56,7 @@ typedef grub_efi_status_t
+ 			  void *buffer);
+ 
+ typedef grub_efi_status_t
+-(*grub_efi_pci_io_config_t) (struct grub_efi_pci_io *this,
++(__grub_efi_api *grub_efi_pci_io_config_t) (struct grub_efi_pci_io *this,
+ 			     grub_efi_pci_io_width_t width,
+ 			     grub_efi_uint32_t offset,
+ 			     grub_efi_uintn_t count,
+@@ -113,7 +113,7 @@ typedef enum
+   grub_efi_pci_io_attribute_operation_t;
+ 
+ typedef grub_efi_status_t
+-(*grub_efi_pci_io_poll_io_mem_t) (struct grub_efi_pci_io *this,
++(__grub_efi_api *grub_efi_pci_io_poll_io_mem_t) (struct grub_efi_pci_io *this,
+ 				  grub_efi_pci_io_width_t  width,
+ 				  grub_efi_uint8_t bar_ndex,
+ 				  grub_efi_uint64_t offset,
+@@ -123,7 +123,7 @@ typedef grub_efi_status_t
+ 				  grub_efi_uint64_t *result);
+ 
+ typedef grub_efi_status_t
+-(*grub_efi_pci_io_copy_mem_t) (struct grub_efi_pci_io *this,
++(__grub_efi_api *grub_efi_pci_io_copy_mem_t) (struct grub_efi_pci_io *this,
+ 			       grub_efi_pci_io_width_t width,
+ 			       grub_efi_uint8_t dest_bar_index,
+ 			       grub_efi_uint64_t dest_offset,
+@@ -132,7 +132,7 @@ typedef grub_efi_status_t
+ 			       grub_efi_uintn_t count);
+ 
+ typedef grub_efi_status_t
+-(*grub_efi_pci_io_map_t) (struct grub_efi_pci_io *this,
++(__grub_efi_api *grub_efi_pci_io_map_t) (struct grub_efi_pci_io *this,
+ 			  grub_efi_pci_io_operation_t operation,
+ 			  void *host_address,
+ 			  grub_efi_uintn_t *number_of_bytes,
+@@ -140,11 +140,11 @@ typedef grub_efi_status_t
+ 			  void **mapping);
+ 
+ typedef grub_efi_status_t
+-(*grub_efi_pci_io_unmap_t) (struct grub_efi_pci_io *this,
++(__grub_efi_api *grub_efi_pci_io_unmap_t) (struct grub_efi_pci_io *this,
+ 			    void *mapping);
+ 
+ typedef grub_efi_status_t
+-(*grub_efi_pci_io_allocate_buffer_t) (struct grub_efi_pci_io *this,
++(__grub_efi_api *grub_efi_pci_io_allocate_buffer_t) (struct grub_efi_pci_io *this,
+ 				      grub_efi_allocate_type_t type,
+ 				      grub_efi_memory_type_t memory_type,
+ 				      grub_efi_uintn_t pages,
+@@ -152,7 +152,7 @@ typedef grub_efi_status_t
+ 				      grub_efi_uint64_t attributes);
+ 
+ typedef grub_efi_status_t
+-(*grub_efi_pci_io_free_buffer_t) (struct grub_efi_pci_io *this,
++(__grub_efi_api *grub_efi_pci_io_free_buffer_t) (struct grub_efi_pci_io *this,
+ 				  grub_efi_allocate_type_t type,
+ 				  grub_efi_memory_type_t memory_type,
+ 				  grub_efi_uintn_t pages,
+@@ -160,29 +160,29 @@ typedef grub_efi_status_t
+ 				  grub_efi_uint64_t attributes);
+ 
+ typedef grub_efi_status_t
+-(*grub_efi_pci_io_flush_t) (struct grub_efi_pci_io *this);
++(__grub_efi_api *grub_efi_pci_io_flush_t) (struct grub_efi_pci_io *this);
+ 
+ typedef grub_efi_status_t
+-(*grub_efi_pci_io_get_location_t) (struct grub_efi_pci_io *this,
++(__grub_efi_api *grub_efi_pci_io_get_location_t) (struct grub_efi_pci_io *this,
+ 				   grub_efi_uintn_t *segment_number,
+ 				   grub_efi_uintn_t *bus_number,
+ 				   grub_efi_uintn_t *device_number,
+ 				   grub_efi_uintn_t *function_number);
+ 
+ typedef grub_efi_status_t
+-(*grub_efi_pci_io_attributes_t) (struct grub_efi_pci_io *this,
++(__grub_efi_api *grub_efi_pci_io_attributes_t) (struct grub_efi_pci_io *this,
+ 				 grub_efi_pci_io_attribute_operation_t operation,
+ 				 grub_efi_uint64_t attributes,
+ 				 grub_efi_uint64_t *result);
+ 
+ typedef grub_efi_status_t
+-(*grub_efi_pci_io_get_bar_attributes_t) (struct grub_efi_pci_io *this,
++(__grub_efi_api *grub_efi_pci_io_get_bar_attributes_t) (struct grub_efi_pci_io *this,
+ 					 grub_efi_uint8_t bar_index,
+ 					 grub_efi_uint64_t *supports,
+ 					 void **resources);
+ 
+ typedef grub_efi_status_t
+-(*grub_efi_pci_io_set_bar_attributes_t) (struct grub_efi_pci_io *this,
++(__grub_efi_api *grub_efi_pci_io_set_bar_attributes_t) (struct grub_efi_pci_io *this,
+ 					 grub_efi_uint64_t attributes,
+ 					 grub_efi_uint8_t bar_index,
+ 					 grub_efi_uint64_t *offset,
+@@ -212,12 +212,12 @@ struct grub_efi_pci_root_io;
+ 
+ typedef struct
+ {
+-  grub_efi_status_t(*read) (struct grub_efi_pci_root_io *this,
++  grub_efi_status_t(__grub_efi_api *read) (struct grub_efi_pci_root_io *this,
+ 			    grub_efi_pci_io_width_t width,
+ 			    grub_efi_uint64_t address,
+ 			    grub_efi_uintn_t count,
+ 			    void *buffer);
+-  grub_efi_status_t(*write) (struct grub_efi_pci_root_io *this,
++  grub_efi_status_t(__grub_efi_api *write) (struct grub_efi_pci_root_io *this,
+ 			     grub_efi_pci_io_width_t width,
+ 			     grub_efi_uint64_t address,
+ 			     grub_efi_uintn_t count,
+@@ -237,7 +237,7 @@ typedef enum
+   grub_efi_pci_root_io_operation_t;
+ 
+ typedef grub_efi_status_t
+-(*grub_efi_pci_root_io_poll_io_mem_t) (struct grub_efi_pci_root_io *this,
++(__grub_efi_api *grub_efi_pci_root_io_poll_io_mem_t) (struct grub_efi_pci_root_io *this,
+ 				       grub_efi_pci_io_width_t  width,
+ 				       grub_efi_uint64_t address,
+ 				       grub_efi_uint64_t mask,
+@@ -246,7 +246,7 @@ typedef grub_efi_status_t
+ 				       grub_efi_uint64_t *result);
+ 
+ typedef grub_efi_status_t
+-(*grub_efi_pci_root_io_copy_mem_t) (struct grub_efi_pci_root_io *this,
++(__grub_efi_api *grub_efi_pci_root_io_copy_mem_t) (struct grub_efi_pci_root_io *this,
+ 				    grub_efi_pci_io_width_t width,
+ 				    grub_efi_uint64_t dest_offset,
+ 				    grub_efi_uint64_t src_offset,
+@@ -254,7 +254,7 @@ typedef grub_efi_status_t
+ 
+ 
+ typedef grub_efi_status_t
+-(*grub_efi_pci_root_io_map_t) (struct grub_efi_pci_root_io *this,
++(__grub_efi_api *grub_efi_pci_root_io_map_t) (struct grub_efi_pci_root_io *this,
+ 				grub_efi_pci_root_io_operation_t operation,
+ 			       void *host_address,
+ 			       grub_efi_uintn_t *number_of_bytes,
+@@ -262,11 +262,11 @@ typedef grub_efi_status_t
+ 			       void **mapping);
+ 
+ typedef grub_efi_status_t
+-(*grub_efi_pci_root_io_unmap_t) (struct grub_efi_pci_root_io *this,
++(__grub_efi_api *grub_efi_pci_root_io_unmap_t) (struct grub_efi_pci_root_io *this,
+ 				 void *mapping);
+ 
+ typedef grub_efi_status_t
+-(*grub_efi_pci_root_io_allocate_buffer_t) (struct grub_efi_pci_root_io *this,
++(__grub_efi_api *grub_efi_pci_root_io_allocate_buffer_t) (struct grub_efi_pci_root_io *this,
+ 					   grub_efi_allocate_type_t type,
+ 					   grub_efi_memory_type_t memory_type,
+ 					   grub_efi_uintn_t pages,
+@@ -274,26 +274,26 @@ typedef grub_efi_status_t
+ 					   grub_efi_uint64_t attributes);
+ 
+ typedef grub_efi_status_t
+-(*grub_efi_pci_root_io_free_buffer_t) (struct grub_efi_pci_root_io *this,
++(__grub_efi_api *grub_efi_pci_root_io_free_buffer_t) (struct grub_efi_pci_root_io *this,
+ 				       grub_efi_uintn_t pages,
+ 				       void **host_address);
+ 
+ typedef grub_efi_status_t
+-(*grub_efi_pci_root_io_flush_t) (struct grub_efi_pci_root_io *this);
++(__grub_efi_api *grub_efi_pci_root_io_flush_t) (struct grub_efi_pci_root_io *this);
+ 
+ typedef grub_efi_status_t
+-(*grub_efi_pci_root_io_get_attributes_t) (struct grub_efi_pci_root_io *this,
++(__grub_efi_api *grub_efi_pci_root_io_get_attributes_t) (struct grub_efi_pci_root_io *this,
+ 					  grub_efi_uint64_t *supports,
+ 					  void **resources);
+ 
+ typedef grub_efi_status_t
+-(*grub_efi_pci_root_io_set_attributes_t) (struct grub_efi_pci_root_io *this,
++(__grub_efi_api *grub_efi_pci_root_io_set_attributes_t) (struct grub_efi_pci_root_io *this,
+ 					  grub_efi_uint64_t attributes,
+ 					  grub_efi_uint64_t *offset,
+ 					  grub_efi_uint64_t *length);
+ 
+ typedef grub_efi_status_t
+-(*grub_efi_pci_root_io_configuration_t) (struct grub_efi_pci_root_io *this,
++(__grub_efi_api *grub_efi_pci_root_io_configuration_t) (struct grub_efi_pci_root_io *this,
+ 					 void **resources);
+ 
+ struct grub_efi_pci_root_io {

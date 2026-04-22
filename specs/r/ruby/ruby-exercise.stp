@@ -1,0 +1,39 @@
+/* Example tapset file.
+ *
+ * You can execute the tapset using following command (please adjust the path
+ * prior running the command, if needed):
+ * 
+ * stap /usr/share/doc/ruby-2.0.0.0/ruby-exercise.stp -c "ruby -e \"puts 'test'\""
+ */
+
+probe ruby.cmethod.entry {
+  printf("%d -> %s::%s %s:%d\n", tid(), classname, methodname, file, line);
+}
+
+probe ruby.cmethod.return {
+  printf("%d <- %s::%s %s:%d\n", tid(), classname, methodname, file, line);
+}
+
+probe ruby.method.entry {
+  printf("%d -> %s::%s %s:%d\n", tid(), classname, methodname, file, line);
+}
+
+probe ruby.method.return {
+  printf("%d <- %s::%s %s:%d\n", tid(), classname, methodname, file, line);
+}
+
+probe ruby.gc.mark.begin { printf("%d gc.mark.begin\n", tid()); }
+
+probe ruby.gc.mark.end { printf("%d gc.mark.end\n", tid()); }
+
+probe ruby.gc.sweep.begin { printf("%d gc.sweep.begin\n", tid()); }
+
+probe ruby.gc.sweep.end { printf("%d gc.sweep.end\n", tid()); }
+
+probe ruby.object.create{
+  printf("%d obj.create %s %s:%d\n", tid(), classname, file, line);
+}
+
+probe ruby.raise {
+  printf("%d raise %s %s:%d\n", tid(), classname, file, line);
+}

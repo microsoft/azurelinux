@@ -4,7 +4,7 @@
 Summary: SGML and XML parser
 Name: opensp
 Version: 1.5.2
-Release: 49%{?dist}
+Release: 50%{?dist}
 Requires: sgml-common >= 0.5
 Provides: bundled(gettext) = 0.14.5
 URL: http://openjade.sourceforge.net/

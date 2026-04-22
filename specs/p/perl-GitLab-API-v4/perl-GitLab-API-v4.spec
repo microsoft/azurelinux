@@ -6,7 +6,7 @@
 
 Name:           perl-%{src_name}
 Version:        0.27
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        Complete GitLab API v4 client
 
 # Automatically converted from old format: GPL+ or Artistic - review is highly recommended.

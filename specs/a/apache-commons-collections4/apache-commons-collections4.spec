@@ -4,7 +4,7 @@
 Name:           apache-commons-collections4
 Summary:        Extension of the Java Collections Framework
 Version:        4.4
-Release:        19%{?dist}
+Release: 20%{?dist}
 License:        Apache-2.0
 
 URL:            http://commons.apache.org/proper/commons-collections/

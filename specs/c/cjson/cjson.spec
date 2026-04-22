@@ -3,7 +3,7 @@
 
 Name:           cjson
 Version:        1.7.18
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Ultralightweight JSON parser in ANSI C
 
 # several files in tests/ are Apache-2.0 but are not packaged

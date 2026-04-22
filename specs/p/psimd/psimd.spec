@@ -11,7 +11,7 @@ Summary:        P(ortable) SIMD
 Name:           psimd
 License:        MIT
 Version:        %{date0}.%{shortcommit0}
-Release:        8%{?dist}
+Release: 9%{?dist}
 
 URL:            https://github.com/Maratyszcza
 Source0:        %{url}/%{name}/archive/%{commit0}/%{name}-%{shortcommit0}.tar.gz

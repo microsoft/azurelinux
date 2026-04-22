@@ -3,7 +3,7 @@
 
 Name:           acpica-tools
 Version:        20240322
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        ACPICA tools for the development and debug of ACPI tables
 
 # Automatically converted from old format: GPLv2 - review is highly recommended.

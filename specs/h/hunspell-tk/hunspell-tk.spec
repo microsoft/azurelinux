@@ -11,7 +11,7 @@ Name: hunspell-tk
 Summary: Turkmen hunspell dictionaries
 Version: 0.02
 Epoch: 1
-Release: 30%{?dist}
+Release: 31%{?dist}
 # Following link is dead now
 # Do not report bugs to fix it
 Source: http://releases.mozilla.org/pub/mozilla.org/addons/204314/turkmen_spell_checker-%{version}-tb+fx+sm.xpi

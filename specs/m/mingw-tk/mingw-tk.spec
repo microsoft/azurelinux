@@ -13,7 +13,7 @@
 Summary:       MinGW Windows graphical toolkit for the Tcl scripting language
 Name:          mingw-%{pkgname}
 Version:       8.6.15
-Release:       3%{?dist}
+Release: 4%{?dist}
 License:       TCL
 URL:           http://tcl.sourceforge.net/
 Source0:       http://downloads.sourceforge.net/sourceforge/tcl/%{pkgname}%{version}-src.tar.gz

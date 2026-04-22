@@ -3,7 +3,7 @@
 
 Name:           netcdf4-python
 Version:        1.7.2
-Release:        7%{?dist}.1
+Release: 8%{?dist}.1
 Summary:        Python/numpy interface to netCDF
 
 License:        MIT

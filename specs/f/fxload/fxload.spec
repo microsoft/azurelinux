@@ -3,7 +3,7 @@
 
 Name: fxload
 Version: 2008_10_13
-Release: 33%{?dist}
+Release: 34%{?dist}
 Summary: A helper program to download firmware into FX and FX2 EZ-USB devices
 
 License: GPL-2.0-or-later

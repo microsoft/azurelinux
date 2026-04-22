@@ -8,7 +8,7 @@ easy way  to test asynchronous HTTP requests.
 
 Name:           python-%{srcname}
 Version:        0.7.8
-Release:        5%{?dist}
+Release: 6%{?dist}
 Summary:        Mock out requests made by ClientSession from aiohttp package
 
 License:        MIT

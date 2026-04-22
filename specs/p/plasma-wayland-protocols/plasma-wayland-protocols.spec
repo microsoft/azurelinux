@@ -6,7 +6,7 @@
 
 Name:    plasma-wayland-protocols
 Version: 1.20.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Plasma Specific Protocols for Wayland
 
 License: BSD-3-Clause AND CC0-1.0 AND LGPL-2.1-or-later AND MIT-CMU

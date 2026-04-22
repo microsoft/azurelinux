@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 0.1.5
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary: Generic extension manager for WebSocket connections
 License: Apache-2.0
 URL: https://github.com/faye/websocket-extensions-ruby

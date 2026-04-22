@@ -1,0 +1,21 @@
+--- a/galaxy.yml
++++ b/galaxy.yml
+@@ -20,2 +20,18 @@
+ homepage: https://github.com/ansible-collections/community.general
+ issues: https://github.com/ansible-collections/community.general/issues
++build_ignore:
++  - .azure-pipelines
++  - .github
++  - .gitignore
++  - .pre-commit-config.yaml
++  - REUSE.toml
++  - CHANGELOG.rst
++  - CHANGELOG.rst.license
++  - CHANGELOG.md
++  - CHANGELOG.md.license
++  - COPYING
++  - LICENSES
++  - README.md
++  - changelogs/.gitignore
++  - changelogs/fragments
++  - tests

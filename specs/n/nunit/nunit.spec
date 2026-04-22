@@ -5,7 +5,7 @@
 
 Name:           nunit
 Version:        3.7.1
-Release:        22%{?dist}
+Release: 23%{?dist}
 Summary:        Unit test framework for CLI
 # Automatically converted from old format: MIT with advertising - review is highly recommended.
 License:        LicenseRef-Callaway-MIT-with-advertising

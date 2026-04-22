@@ -1,0 +1,35 @@
+Index: chromium-144.0.7559.59/third_party/xnnpack/generate_build_gn.py
+===================================================================
+--- chromium-144.0.7559.59.orig/third_party/xnnpack/generate_build_gn.py
++++ chromium-144.0.7559.59/third_party/xnnpack/generate_build_gn.py
+@@ -239,7 +239,10 @@ _PLATFORMS = [
+               bazel_platform='//:linux_aarch64'),
+     _Platform(gn_cpu='riscv64',
+               bazel_cpu='riscv64',
+-              bazel_platform='//:linux_riscv64')
++              bazel_platform='//:linux_riscv64'),
++    _Platform(gn_cpu='ppc64',
++              bazel_cpu='ppc64le',
++              bazel_platform='//:linux_ppc64le')
+ ]
+ 
+ 
+Index: chromium-144.0.7559.59/third_party/xnnpack/bazelroot/BUILD
+===================================================================
+--- chromium-144.0.7559.59.orig/third_party/xnnpack/bazelroot/BUILD
++++ chromium-144.0.7559.59/third_party/xnnpack/bazelroot/BUILD
+@@ -29,6 +29,14 @@ platform(
+     ],
+ )
+ 
++platform(
++    name = "linux_ppc64le",
++    constraint_values = [
++        "@platforms//os:linux",
++        "@platforms//cpu:ppc64le",
++    ],
++)
++
+ # A dummy clang toolchain for building them for any arch.
+ 
+ filegroup(name = "empty")

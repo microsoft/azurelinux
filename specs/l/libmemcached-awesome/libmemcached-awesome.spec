@@ -27,7 +27,7 @@
 Name:      %{libname}-awesome
 Summary:   Client library and command line tools for memcached server
 Version:   %{upstream_version}%{?upstream_prever:~%{upstream_prever}}
-Release:   7%{?dist}
+Release: 8%{?dist}
 # SPDX:
 License:   BSD-3-Clause
 URL:       https://github.com/%{gh_owner}/%{gh_project}

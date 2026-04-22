@@ -1,0 +1,54 @@
+From f147fee1b965153d486cb8db90f6f8edf94fa206 Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Mon, 11 Mar 2024 12:16:28 +0100
+Subject: [PATCH 3/4] Remove Pack200 compressor
+
+---
+ .../compress/compressors/CompressorStreamFactory.java  | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
+
+diff --git a/src/main/java/org/apache/commons/compress/compressors/CompressorStreamFactory.java b/src/main/java/org/apache/commons/compress/compressors/CompressorStreamFactory.java
+index c8aaf18b7..66e67ff3a 100644
+--- a/src/main/java/org/apache/commons/compress/compressors/CompressorStreamFactory.java
++++ b/src/main/java/org/apache/commons/compress/compressors/CompressorStreamFactory.java
+@@ -44,8 +44,6 @@
+ import org.apache.commons.compress.compressors.lzma.LZMACompressorInputStream;
+ import org.apache.commons.compress.compressors.lzma.LZMACompressorOutputStream;
+ import org.apache.commons.compress.compressors.lzma.LZMAUtils;
+-import org.apache.commons.compress.compressors.pack200.Pack200CompressorInputStream;
+-import org.apache.commons.compress.compressors.pack200.Pack200CompressorOutputStream;
+ import org.apache.commons.compress.compressors.snappy.FramedSnappyCompressorInputStream;
+ import org.apache.commons.compress.compressors.snappy.FramedSnappyCompressorOutputStream;
+ import org.apache.commons.compress.compressors.snappy.SnappyCompressorInputStream;
+@@ -249,10 +247,6 @@ static String detect(final InputStream inputStream, final Set<String> compressor
+             return GZIP;
+         }
+ 
+-        if (compressorNames.contains(PACK200) && Pack200CompressorInputStream.matches(signature, signatureLength)) {
+-            return PACK200;
+-        }
+-
+         if (compressorNames.contains(SNAPPY_FRAMED) && FramedSnappyCompressorInputStream.matches(signature, signatureLength)) {
+             return SNAPPY_FRAMED;
+         }
+@@ -558,7 +552,7 @@ public CompressorInputStream createCompressorInputStream(final String name, fina
+             }
+ 
+             if (PACK200.equalsIgnoreCase(name)) {
+-                return new Pack200CompressorInputStream(in);
++                throw new CompressorException("Pack200 compression is not available in this build.");
+             }
+ 
+             if (SNAPPY_RAW.equalsIgnoreCase(name)) {
+@@ -631,7 +625,7 @@ public CompressorOutputStream<?> createCompressorOutputStream(final String name,
+             }
+ 
+             if (PACK200.equalsIgnoreCase(name)) {
+-                return new Pack200CompressorOutputStream(out);
++                throw new CompressorException("Pack200 compression is not available in this build.");
+             }
+ 
+             if (LZMA.equalsIgnoreCase(name)) {
+-- 
+2.50.1
+

@@ -1,0 +1,23 @@
+From cc613c2e3bac8d4d1ff153700b819f964435923a Mon Sep 17 00:00:00 2001
+From: Shawn Anastasio <shawnanastasio@yahoo.com>
+Date: Tue, 4 Sep 2018 18:16:07 -0500
+Subject: [PATCH] third_party/libvpx: Properly generate gni on ppc64
+
+---
+ third_party/libvpx/BUILD.gn        |  2 ++
+ third_party/libvpx/generate_gni.sh | 10 ++++++++++
+ 2 files changed, 12 insertions(+)
+
+Index: chromium-144.0.7559.59/third_party/libvpx/BUILD.gn
+===================================================================
+--- chromium-144.0.7559.59.orig/third_party/libvpx/BUILD.gn
++++ chromium-144.0.7559.59/third_party/libvpx/BUILD.gn
+@@ -297,6 +297,8 @@ if (current_cpu == "x86" || (current_cpu
+     } else if (current_cpu == "x64") {
+       deps = [ ":libvpx_x86_64_headers" ]
+       sources = libvpx_srcs_x86_64_avx512
++    } else if (current_cpu == "ppc64") {
++      sources = libvpx_srcs_ppc64
+     }
+   }
+ }

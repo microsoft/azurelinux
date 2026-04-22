@@ -29,7 +29,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
 Version:        7.0.2
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Snapshotting of global state, version %{major}
 
 License:        BSD-3-Clause

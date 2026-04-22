@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Javier Martinez Canillas <javierm@redhat.com>
+Date: Fri, 11 Jun 2021 12:10:45 +0200
+Subject: [PATCH] Revert "templates: Fix user-facing typo with an incorrect use
+ of "it's""
+
+This reverts commit 722737630889607c3b5761f1f5a48f1674cd2821.
+---
+ util/grub.d/30_os-prober.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/util/grub.d/30_os-prober.in b/util/grub.d/30_os-prober.in
+index 656301eaf22..376ca47efe4 100644
+--- a/util/grub.d/30_os-prober.in
++++ b/util/grub.d/30_os-prober.in
+@@ -36,7 +36,7 @@ if ! command -v os-prober > /dev/null || ! command -v linux-boot-prober > /dev/n
+   exit 0
+ fi
+ 
+-grub_warn "$(gettext_printf "os-prober will be executed to detect other bootable partitions.\nIts output will be used to detect bootable binaries on them and create new boot entries.")"
++grub_warn "$(gettext_printf "os-prober will be executed to detect other bootable partitions.\nIt's output will be used to detect bootable binaries on them and create new boot entries.")"
+ 
+ OSPROBED="`os-prober | tr ' ' '^' | paste -s -d ' '`"
+ if [ -z "${OSPROBED}" ] ; then

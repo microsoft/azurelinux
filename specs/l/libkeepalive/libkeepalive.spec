@@ -3,7 +3,7 @@
 
 Name:		libkeepalive
 Version:	0.3
-Release:	25%{?dist}
+Release: 26%{?dist}
 Summary:	Enable TCP keepalive in dynamic binaries
 URL:		http://libkeepalive.sourceforge.net/
 

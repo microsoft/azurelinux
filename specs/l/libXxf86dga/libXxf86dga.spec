@@ -8,7 +8,7 @@
 Summary: X.Org X11 libXxf86dga runtime library
 Name: libXxf86dga
 Version: 1.1.6
-Release: 6%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
+Release: 7%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
 License: MIT
 URL: http://www.x.org
 

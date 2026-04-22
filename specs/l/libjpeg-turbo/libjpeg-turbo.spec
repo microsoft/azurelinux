@@ -3,7 +3,7 @@
 
 Name:           libjpeg-turbo
 Version:        3.1.2
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        A MMX/SSE2/SIMD accelerated library for manipulating JPEG image files
 License:        Zlib AND BSD-3-Clause AND MIT AND IJG
 URL:            https://github.com/%{name}/%{name}

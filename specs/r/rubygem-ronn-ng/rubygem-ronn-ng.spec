@@ -6,7 +6,7 @@
 
 Name:           rubygem-%{gem_name}
 Version:        0.10.1
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        Builds man pages from Markdown
 License:        MIT
 URL:            https://github.com/apjanke/ronn-ng

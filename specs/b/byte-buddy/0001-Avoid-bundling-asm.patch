@@ -1,0 +1,100 @@
+From beaed3d4ce80ae695f7f2a3e02e11c39fbb4e1f8 Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Thu, 23 Feb 2023 13:59:25 +0100
+Subject: [PATCH] Avoid bundling asm
+
+---
+ byte-buddy/pom.xml | 56 +++++++++-------------------------------------
+ 1 file changed, 11 insertions(+), 45 deletions(-)
+
+diff --git a/byte-buddy/pom.xml b/byte-buddy/pom.xml
+index 625e0d6..97ac874 100644
+--- a/byte-buddy/pom.xml
++++ b/byte-buddy/pom.xml
+@@ -26,8 +26,6 @@
+     -->
+ 
+     <properties>
+-        <shade.source>org.objectweb.asm</shade.source>
+-        <shade.target>net.bytebuddy.jar.asm</shade.target>
+         <packages.list.external>
+             net.bytebuddy,
+             net.bytebuddy.agent.builder,
+@@ -62,10 +60,7 @@
+             net.bytebuddy.utility,
+             net.bytebuddy.utility.nullability,
+             net.bytebuddy.utility.privilege,
+-            net.bytebuddy.utility.visitor,
+-            ${shade.target},
+-            ${shade.target}.signature,
+-            ${shade.target}.commons
++            net.bytebuddy.utility.visitor
+         </packages.list.external>
+         <packages.list.internal>
+             net.bytebuddy.utility.dispatcher
+@@ -166,6 +161,16 @@
+                         <artifactId>asm</artifactId>
+                         <version>${version.asm}</version>
+                     </dependency>
++                    <dependency>
++                        <groupId>org.ow2.asm</groupId>
++                        <artifactId>asm</artifactId>
++                        <version>${version.asm}</version>
++                    </dependency>
++                    <dependency>
++                        <groupId>org.ow2.asm</groupId>
++                        <artifactId>asm-commons</artifactId>
++                        <version>${version.asm}</version>
++                    </dependency>
+                 </dependencies>
+                 <executions>
+                     <execution>
+@@ -253,45 +258,6 @@
+                                     <createDependencyReducedPom>true</createDependencyReducedPom>
+                                     <createSourcesJar>${bytebuddy.extras}</createSourcesJar>
+                                     <shadeSourcesContent>true</shadeSourcesContent>
+-                                    <relocations>
+-                                        <relocation>
+-                                            <pattern>${shade.source}</pattern>
+-                                            <shadedPattern>${shade.target}</shadedPattern>
+-                                        </relocation>
+-                                    </relocations>
+-                                    <filters>
+-                                        <filter>
+-                                            <artifact>net.bytebuddy:byte-buddy-dep:*</artifact>
+-                                            <excludes>
+-                                                <exclude>META-INF/MANIFEST.MF</exclude>
+-                                                <exclude>META-INF/maven/**</exclude>
+-                                            </excludes>
+-                                        </filter>
+-                                        <filter>
+-                                            <artifact>org.ow2.asm:*</artifact>
+-                                            <excludes>
+-                                                <exclude>META-INF/MANIFEST.MF</exclude>
+-                                                <exclude>**/module-info.class</exclude>
+-                                                <exclude>**/LICENSE</exclude>
+-                                                <exclude>**/NOTICE</exclude>
+-                                            </excludes>
+-                                        </filter>
+-                                        <filter>
+-                                            <artifact>org.ow2.asm:asm-commons</artifact>
+-                                            <includes>
+-                                                <include>org/objectweb/asm/commons/AnnotationRemapper.**</include>
+-                                                <include>org/objectweb/asm/commons/ClassRemapper.**</include>
+-                                                <include>org/objectweb/asm/commons/FieldRemapper.**</include>
+-                                                <include>org/objectweb/asm/commons/MethodRemapper.**</include>
+-                                                <include>org/objectweb/asm/commons/ModuleHashesAttribute.**</include>
+-                                                <include>org/objectweb/asm/commons/ModuleRemapper.**</include>
+-                                                <include>org/objectweb/asm/commons/RecordComponentRemapper.**</include>
+-                                                <include>org/objectweb/asm/commons/Remapper.**</include>
+-                                                <include>org/objectweb/asm/commons/SignatureRemapper.**</include>
+-                                                <include>org/objectweb/asm/commons/SimpleRemapper.**</include>
+-                                            </includes>
+-                                        </filter>
+-                                    </filters>
+                                     <transformers>
+                                         <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                             <mainClass>net.bytebuddy.build.Plugin$Engine$Default</mainClass>
+-- 
+2.39.1
+

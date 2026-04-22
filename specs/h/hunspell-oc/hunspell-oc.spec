@@ -10,7 +10,7 @@
 Name: hunspell-oc
 Summary: Occitan hunspell dictionaries
 Version: 1.5
-Release: 7%{?dist}
+Release: 8%{?dist}
 Source: https://addons.mozilla.org/firefox/downloads/file/4085695/diccionari_occitan_lengadocian-%{version}.xpi
 URL: https://addons.mozilla.org/en-US/firefox/addon/diccionari-occitan-lengadocian/
 # https://www.mozilla.org/en-US/MPL/2.0/combining-mpl-and-gpl/

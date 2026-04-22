@@ -9,7 +9,7 @@ SFTP, SCP, forwarding, session multiplexing over a connection and more.
 
 Name:           python-%{srcname}
 Version:        2.21.0
-Release:        5%{?dist}
+Release: 6%{?dist}
 Summary:        Asynchronous SSH for Python
 
 # Automatically converted from old format: EPL-2.0 or GPLv2+ - review is highly recommended.

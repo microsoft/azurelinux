@@ -11,7 +11,7 @@
 Summary:    Xorg X11 evdev input driver
 Name:       xorg-x11-drv-evdev
 Version:    2.11.0
-Release:    3%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
+Release: 4%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
 URL:        http://www.x.org
 License:    HPND-sell-variant AND MIT
 

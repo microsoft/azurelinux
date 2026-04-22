@@ -6,7 +6,7 @@ Name: hunspell-en
 Summary: English hunspell dictionaries
 %global upstreamid 20201207
 Version: 0.%{upstreamid}
-Release: 12%{?dist}
+Release: 13%{?dist}
 Source0: https://github.com/en-wl/wordlist/archive/rel-2020.12.07.tar.gz
 Source1: http://download.services.openoffice.org/contrib/dictionaries/en_GB.zip
 #See http://mxr.mozilla.org/mozilla/source/extensions/spellcheck/locales/en-US/hunspell/mozilla_words.diff?raw=1

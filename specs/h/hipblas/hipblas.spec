@@ -43,7 +43,7 @@
 
 Name:           %{hipblas_name}
 Version:        %{rocm_version}
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        ROCm BLAS marshalling library
 Url:            https://github.com/ROCmSoftwarePlatform/%{upstreamname}
 License:        MIT

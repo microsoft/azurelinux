@@ -3,7 +3,7 @@
 
 Name:           perl-Struct-Dumb
 Version:        0.14
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        Make simple lightweight record-like structures
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 

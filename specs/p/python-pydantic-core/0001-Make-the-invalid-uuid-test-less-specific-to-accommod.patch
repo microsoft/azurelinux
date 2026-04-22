@@ -1,0 +1,29 @@
+From 019b57bb6e44e919d814be931cd66d51c0bf8c98 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Mon, 30 Mar 2026 06:44:51 +0100
+Subject: [PATCH] Make the invalid-uuid test less specific to accommodate uuid
+ 1.23.0
+
+---
+ tests/validators/test_uuid.py | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/tests/validators/test_uuid.py b/tests/validators/test_uuid.py
+index c70e6883d..80af142ca 100644
+--- a/tests/validators/test_uuid.py
++++ b/tests/validators/test_uuid.py
+@@ -40,10 +40,7 @@ class MyStr(str): ...
+         # Invalid UUIDs
+         (
+             'not-a-valid-uuid',
+-            Err(
+-                'Input should be a valid UUID, invalid character: expected an optional prefix of'
+-                + ' `urn:uuid:` followed by [0-9a-fA-F-], found `n` at 1'
+-            ),
++            Err('Input should be a valid UUID, invalid character:'),
+         ),
+         (
+             '12345678-1234-5678-1234-5678123456789',
+-- 
+2.53.0
+

@@ -6,7 +6,7 @@
 
 Name:           perl-gettext
 Version:        1.07
-Release:        36%{?dist}
+Release: 37%{?dist}
 Summary:        Interface to gettext family of functions
 
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

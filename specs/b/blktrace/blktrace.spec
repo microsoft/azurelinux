@@ -4,7 +4,7 @@
 Summary: Utilities for performing block layer IO tracing in the Linux kernel
 Name: blktrace
 Version: 1.3.0
-Release: 13%{?dist}
+Release: 14%{?dist}
 License: GPL-2.0-or-later
 Source0: http://brick.kernel.dk/snaps/blktrace-%{version}.tar.bz2
 Source1: https://brick.kernel.dk/snaps/blktrace-%{version}.tar.bz2.asc

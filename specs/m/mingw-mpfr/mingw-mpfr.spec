@@ -8,7 +8,7 @@
 Summary:        MinGW C library for multiple-precision floating-point computations
 Name:           mingw-%{name1}
 Version:        4.0.2
-Release:        15%{?dist}
+Release: 16%{?dist}
 URL:            http://www.mpfr.org/
 Source0:        http://www.mpfr.org/mpfr-%{version}/%{name1}-%{version}.tar.xz
 

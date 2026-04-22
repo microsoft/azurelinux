@@ -33,7 +33,7 @@
 
 Name:           dom4j
 Version:        2.1.4
-Release:        3%{?dist}
+Release: 4%{?dist}
 Epoch:          0
 Summary:        Open Source XML framework for Java
 # Automatically converted from old format: BSD - review is highly recommended.

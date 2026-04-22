@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 5.0.0
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary: Domain name parser based on the Public Suffix List
 # MPLv2.0: %%{gem_instdir}/data/list.txt
 License: MIT AND MPL-2.0

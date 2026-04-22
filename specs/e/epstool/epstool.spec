@@ -3,7 +3,7 @@
 
 Name:           epstool
 Version:        3.08
-Release:        32%{?dist}
+Release: 33%{?dist}
 Summary:        A utility to create or extract preview images in EPS files
 # Automatically converted from old format: GPLv2+ - review is highly recommended.
 License:        GPL-2.0-or-later

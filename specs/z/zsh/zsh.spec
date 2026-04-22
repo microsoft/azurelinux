@@ -4,7 +4,7 @@
 Summary: Powerful interactive shell
 Name: zsh
 Version: 5.9
-Release: 18%{?dist}
+Release: 19%{?dist}
 License: MIT-Modern-Variant AND ISC AND GPL-2.0-only
 URL: http://zsh.sourceforge.net/
 Source0: https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.xz

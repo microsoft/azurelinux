@@ -5,7 +5,7 @@ Name:           perl-Pod-Usage
 # Compete with perl.spec's epoch
 Epoch:          4
 Version:        2.05
-Release:        520%{?dist}
+Release: 521%{?dist}
 Summary:        Print a usage message from embedded POD documentation
 # License clarification CPAN RT#102529
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

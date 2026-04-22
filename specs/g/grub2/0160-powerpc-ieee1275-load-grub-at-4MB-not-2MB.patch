@@ -1,0 +1,106 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Daniel Axtens <dja@axtens.net>
+Date: Fri, 22 Oct 2021 09:53:15 +1100
+Subject: [PATCH] powerpc-ieee1275: load grub at 4MB, not 2MB
+
+This was first reported under PFW but reproduces under SLOF.
+
+ - The core.elf was 2126152 = 0x207148 bytes in size with the following
+   program headers (per readelf):
+
+Entry point 0x200000
+There are 4 program headers, starting at offset 52
+
+Program Headers:
+  Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align
+  LOAD           0x000160 0x00200000 0x00200000 0x21f98 0x2971c RWE 0x8
+  GNU_STACK      0x0220f8 0x00000000 0x00000000 0x00000 0x00000 RWE 0x4
+  LOAD           0x0220f8 0x00232000 0x00232000 0x1e4e50 0x1e4e50 RWE 0x4
+  NOTE           0x206f48 0x00000000 0x00000000 0x00200 0x00000 R   0x4
+
+ - SLOF places the ELF file at 0x4000 (after the reserved space for
+   interrupt handlers etc.) upwards. The image was 2126152 = 0x207148
+   bytes in size, so it runs from 0x4000 - 0x20b148. We'll call 0x4000 the
+   load address.
+
+0x0        0x4000         0x20b148
+ |----------|--------------|
+ | reserved | ELF contents |
+
+ - SLOF then copies the first LOAD program header (for .text). That runs
+   for 0x21f98 bytes. It runs from
+      (load addr + 0x160) to (load addr + 0x160 + 0x21f98)
+    = 0x4160 to 0x260f8
+   and we copy it to 0x200000 to 0x221f98. This overwrites the end of the
+   image:
+
+0x0       0x4000     0x200000        0x221f98
+ |----------|------------|---------------|
+ | reserved | ELF cont.. | .text section |
+
+ - SLOF zeros the bss up to PhysAddr + MemSize = 0x22971c
+
+0x0       0x4000      0x200000       0x221f98 0x22971c
+ |----------|------------|---------------|--------|
+ | reserved | ELF cont.. | .text section | bss 0s |
+
+ - SLOF then goes to fulfil the next LOAD header (for mods), which is
+   for 0x1e4e50 bytes. We copy from
+      (load addr + 0x220f8) to (load addr + 0x220f8 + 0x1e4e50)
+    = 0x260f8 to 0x20af48
+   and we copy it to 0x232000 to 0x416e50:
+
+0x0       0x4000      0x200000       0x221f98 0x22971c
+ |----------|------------|---------------|--------|
+ | reserved | ELF cont.. | .text section | bss 0s |
+               |-------------|
+               | copied area |
+            0x260f8      0x20af48
+
+   This goes poorly:
+
+0x0       0x4000      0x200000       0x221f98 0x22971c 0x232000 0x40bf08      0x416e50
+ |----------|------------|---------------|--------|-----|-----------|-------------|
+ | reserved | ELF cont.. | .text section | bss 0s | pad | some mods | .text start |
+
+This matches the observations on the running system - 0x40bf08 was where
+the contents of memory no longer matched the contents of the ELF file.
+
+This was reported as a license verification failure on SLOF as the
+last module's .module_license section fell past where the corruption
+began.
+
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+[rharwood@redhat.com: trim very detailed commit message]
+Signed-off-by: Robbie Harwood <rharwood@redhat.com>
+---
+ grub-core/Makefile.core.def | 2 +-
+ include/grub/offsets.h      | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/Makefile.core.def b/grub-core/Makefile.core.def
+index c748a37b4c5..ceb15879272 100644
+--- a/grub-core/Makefile.core.def
++++ b/grub-core/Makefile.core.def
+@@ -99,7 +99,7 @@ kernel = {
+   i386_xen_pvh_ldflags     = '$(TARGET_IMG_BASE_LDOPT),0x100000';
+ 
+   mips_loongson_ldflags    = '-Wl,-Ttext,0x80200000';
+-  powerpc_ieee1275_ldflags = '-Wl,-Ttext,0x200000';
++  powerpc_ieee1275_ldflags = '-Wl,-Ttext,0x400000';
+   sparc64_ieee1275_ldflags = '-Wl,-Ttext,0x4400';
+   mips_arc_ldflags    = '-Wl,-Ttext,$(TARGET_LINK_ADDR)';
+   mips_qemu_mips_ldflags    = '-Wl,-Ttext,0x80200000';
+diff --git a/include/grub/offsets.h b/include/grub/offsets.h
+index 871e1cd4c38..69211aa798b 100644
+--- a/include/grub/offsets.h
++++ b/include/grub/offsets.h
+@@ -63,7 +63,7 @@
+ #define GRUB_KERNEL_SPARC64_IEEE1275_LINK_ADDR 0x4400
+ 
+ #define GRUB_KERNEL_POWERPC_IEEE1275_LINK_ALIGN 4
+-#define GRUB_KERNEL_POWERPC_IEEE1275_LINK_ADDR 0x200000
++#define GRUB_KERNEL_POWERPC_IEEE1275_LINK_ADDR 0x400000
+ 
+ #define GRUB_KERNEL_MIPS_LOONGSON_LINK_ADDR         0x80200000
+ 

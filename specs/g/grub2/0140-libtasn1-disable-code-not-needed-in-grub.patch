@@ -1,0 +1,307 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Daniel Axtens <dja@axtens.net>
+Date: Fri, 1 May 2020 17:12:23 +1000
+Subject: [PATCH] libtasn1: disable code not needed in grub
+
+We don't expect to be able to write ASN.1, only read it,
+so we can disable some code.
+
+Do that with #if 0/#endif, rather than deletion. This means
+that the difference between upstream and grub is smaller,
+which should make updating libtasn1 easier in the future.
+
+With these exclusions we also avoid the need for minmax.h,
+which is convenient because it means we don't have to
+import it from gnulib.
+
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+---
+ grub-core/lib/libtasn1/lib/coding.c    | 12 ++++++++++--
+ grub-core/lib/libtasn1/lib/decoding.c  |  2 ++
+ grub-core/lib/libtasn1/lib/element.c   |  4 ++--
+ grub-core/lib/libtasn1/lib/errors.c    |  3 +++
+ grub-core/lib/libtasn1/lib/structure.c | 10 ++++++----
+ include/grub/libtasn1.h                | 15 +++++++++++++++
+ 6 files changed, 38 insertions(+), 8 deletions(-)
+
+diff --git a/grub-core/lib/libtasn1/lib/coding.c b/grub-core/lib/libtasn1/lib/coding.c
+index 245ea64cf0a..52def598368 100644
+--- a/grub-core/lib/libtasn1/lib/coding.c
++++ b/grub-core/lib/libtasn1/lib/coding.c
+@@ -30,11 +30,11 @@
+ #include "parser_aux.h"
+ #include <gstr.h>
+ #include "element.h"
+-#include "minmax.h"
+ #include <structure.h>
+ 
+ #define MAX_TAG_LEN 16
+ 
++#if 0
+ /******************************************************/
+ /* Function : _asn1_error_description_value_not_found */
+ /* Description: creates the ErrorDescription string   */
+@@ -58,6 +58,7 @@ _asn1_error_description_value_not_found (asn1_node node,
+   Estrcat (ErrorDescription, "' not found");
+ 
+ }
++#endif
+ 
+ /**
+  * asn1_length_der:
+@@ -244,6 +245,7 @@ asn1_encode_simple_der (unsigned int etype, const unsigned char *str,
+   return ASN1_SUCCESS;
+ }
+ 
++#if 0
+ /******************************************************/
+ /* Function : _asn1_time_der                          */
+ /* Description: creates the DER coding for a TIME     */
+@@ -281,7 +283,7 @@ _asn1_time_der (unsigned char *str, int str_len, unsigned char *der,
+ 
+   return ASN1_SUCCESS;
+ }
+-
++#endif
+ 
+ /*
+ void
+@@ -520,6 +522,7 @@ asn1_bit_der (const unsigned char *str, int bit_len,
+ }
+ 
+ 
++#if 0
+ /******************************************************/
+ /* Function : _asn1_complete_explicit_tag             */
+ /* Description: add the length coding to the EXPLICIT */
+@@ -596,6 +599,7 @@ _asn1_complete_explicit_tag (asn1_node node, unsigned char *der,
+ 
+   return ASN1_SUCCESS;
+ }
++#endif
+ 
+ const tag_and_class_st _asn1_tags[] = {
+   [ASN1_ETYPE_GENERALSTRING] =
+@@ -648,6 +652,8 @@ const tag_and_class_st _asn1_tags[] = {
+ 
+ unsigned int _asn1_tags_size = sizeof (_asn1_tags) / sizeof (_asn1_tags[0]);
+ 
++
++#if 0
+ /******************************************************/
+ /* Function : _asn1_insert_tag_der                    */
+ /* Description: creates the DER coding of tags of one */
+@@ -1413,3 +1419,5 @@ error:
+   asn1_delete_structure (&node);
+   return err;
+ }
++
++#endif
+\ No newline at end of file
+diff --git a/grub-core/lib/libtasn1/lib/decoding.c b/grub-core/lib/libtasn1/lib/decoding.c
+index ff04eb778cb..42f9a92b5d4 100644
+--- a/grub-core/lib/libtasn1/lib/decoding.c
++++ b/grub-core/lib/libtasn1/lib/decoding.c
+@@ -1613,6 +1613,7 @@ asn1_der_decoding (asn1_node * element, const void *ider, int ider_len,
+   return asn1_der_decoding2 (element, ider, &ider_len, 0, errorDescription);
+ }
+ 
++#if 0
+ /**
+  * asn1_der_decoding_element:
+  * @structure: pointer to an ASN1 structure
+@@ -1643,6 +1644,7 @@ asn1_der_decoding_element (asn1_node * structure, const char *elementName,
+ {
+   return asn1_der_decoding(structure, ider, len, errorDescription);
+ }
++#endif
+ 
+ /**
+  * asn1_der_decoding_startEnd:
+diff --git a/grub-core/lib/libtasn1/lib/element.c b/grub-core/lib/libtasn1/lib/element.c
+index 997eb2725dc..539008d8e94 100644
+--- a/grub-core/lib/libtasn1/lib/element.c
++++ b/grub-core/lib/libtasn1/lib/element.c
+@@ -191,7 +191,7 @@ _asn1_append_sequence_set (asn1_node node, struct node_tail_cache_st *pcache)
+   return ASN1_SUCCESS;
+ }
+ 
+-
++#if 0
+ /**
+  * asn1_write_value:
+  * @node_root: pointer to a structure
+@@ -645,7 +645,7 @@ asn1_write_value (asn1_node node_root, const char *name,
+ 
+   return ASN1_SUCCESS;
+ }
+-
++#endif
+ 
+ #define PUT_VALUE( ptr, ptr_size, data, data_size) \
+ 	*len = data_size; \
+diff --git a/grub-core/lib/libtasn1/lib/errors.c b/grub-core/lib/libtasn1/lib/errors.c
+index cee74daf795..42785e8622b 100644
+--- a/grub-core/lib/libtasn1/lib/errors.c
++++ b/grub-core/lib/libtasn1/lib/errors.c
+@@ -57,6 +57,8 @@ static const libtasn1_error_entry error_algorithms[] = {
+   {0, 0}
+ };
+ 
++
++#if 0
+ /**
+  * asn1_perror:
+  * @error: is an error returned by a libtasn1 function.
+@@ -73,6 +75,7 @@ asn1_perror (int error)
+   const char *str = asn1_strerror (error);
+   fprintf (stderr, "LIBTASN1 ERROR: %s\n", str ? str : "(null)");
+ }
++#endif
+ 
+ /**
+  * asn1_strerror:
+diff --git a/grub-core/lib/libtasn1/lib/structure.c b/grub-core/lib/libtasn1/lib/structure.c
+index 8189c56a4c9..fcfde01a393 100644
+--- a/grub-core/lib/libtasn1/lib/structure.c
++++ b/grub-core/lib/libtasn1/lib/structure.c
+@@ -76,7 +76,7 @@ _asn1_find_left (asn1_node_const node)
+   return node->left;
+ }
+ 
+-
++#if 0
+ int
+ _asn1_create_static_structure (asn1_node_const pointer, char *output_file_name,
+ 			       char *vector_name)
+@@ -155,7 +155,7 @@ _asn1_create_static_structure (asn1_node_const pointer, char *output_file_name,
+ 
+   return ASN1_SUCCESS;
+ }
+-
++#endif
+ 
+ /**
+  * asn1_array2tree:
+@@ -718,7 +718,7 @@ asn1_create_element (asn1_node_const definitions, const char *source_name,
+   return res;
+ }
+ 
+-
++#if 0
+ /**
+  * asn1_print_structure:
+  * @out: pointer to the output file (e.g. stdout).
+@@ -1058,7 +1058,7 @@ asn1_print_structure (FILE * out, asn1_node_const structure, const char *name,
+ 	}
+     }
+ }
+-
++#endif
+ 
+ 
+ /**
+@@ -1153,6 +1153,7 @@ asn1_find_structure_from_oid (asn1_node_const definitions, const char *oidValue)
+   return NULL;			/* ASN1_ELEMENT_NOT_FOUND; */
+ }
+ 
++#if 0
+ /**
+  * asn1_copy_node:
+  * @dst: Destination asn1 node.
+@@ -1202,6 +1203,7 @@ asn1_copy_node (asn1_node dst, const char *dst_name,
+ 
+   return result;
+ }
++#endif
+ 
+ /**
+  * asn1_dup_node:
+diff --git a/include/grub/libtasn1.h b/include/grub/libtasn1.h
+index 6fd7a30dc35..785eda2ae3f 100644
+--- a/include/grub/libtasn1.h
++++ b/include/grub/libtasn1.h
+@@ -319,6 +319,8 @@ typedef struct asn1_data_node_st asn1_data_node_st;
+ /*  Functions definitions          */
+ /***********************************/
+ 
++/* These functions are not used in grub and should not be referenced. */
++#if 0
+ extern ASN1_API int
+   asn1_parser2tree (const char *file,
+ 		      asn1_node * definitions, char *error_desc);
+@@ -327,14 +329,17 @@ extern ASN1_API int
+   asn1_parser2array (const char *inputFileName,
+ 		       const char *outputFileName,
+ 		       const char *vectorName, char *error_desc);
++#endif
+ 
+ extern ASN1_API int
+   asn1_array2tree (const asn1_static_node * array,
+ 		     asn1_node * definitions, char *errorDescription);
+ 
++#if 0
+ extern ASN1_API void
+   asn1_print_structure (FILE * out, asn1_node_const structure,
+ 			  const char *name, int mode);
++#endif
+ 
+ extern ASN1_API int
+   asn1_create_element (asn1_node_const definitions,
+@@ -347,9 +352,11 @@ extern ASN1_API int asn1_delete_structure2 (asn1_node * structure, unsigned int
+ extern ASN1_API int
+   asn1_delete_element (asn1_node structure, const char *element_name);
+ 
++#if 0
+ extern ASN1_API int
+   asn1_write_value (asn1_node node_root, const char *name,
+ 		      const void *ivalue, int len);
++#endif
+ 
+ extern ASN1_API int
+   asn1_read_value (asn1_node_const root, const char *name,
+@@ -365,9 +372,11 @@ extern ASN1_API int
+ extern ASN1_API int
+   asn1_number_of_elements (asn1_node_const element, const char *name, int *num);
+ 
++#if 0
+ extern ASN1_API int
+   asn1_der_coding (asn1_node_const element, const char *name,
+ 		     void *ider, int *len, char *ErrorDescription);
++#endif
+ 
+ extern ASN1_API int
+   asn1_der_decoding2 (asn1_node *element, const void *ider,
+@@ -378,12 +387,14 @@ extern ASN1_API int
+   asn1_der_decoding (asn1_node * element, const void *ider,
+ 		       int ider_len, char *errorDescription);
+ 
++#if 0
+ /* Do not use. Use asn1_der_decoding() instead. */
+ extern ASN1_API int
+   asn1_der_decoding_element (asn1_node * structure,
+ 			       const char *elementName,
+ 			       const void *ider, int len,
+ 			       char *errorDescription) _ASN1_GCC_ATTR_DEPRECATED;
++#endif
+ 
+ extern ASN1_API int
+   asn1_der_decoding_startEnd (asn1_node element,
+@@ -408,13 +419,17 @@ extern ASN1_API const char *asn1_find_structure_from_oid (asn1_node_const
+ 							    const char
+ 							    *oidValue);
+ 
++#if 0
+ __LIBTASN1_PURE__
+ extern ASN1_API const char *asn1_check_version (const char *req_version);
++#endif
+ 
+ __LIBTASN1_PURE__
+ extern ASN1_API const char *asn1_strerror (int error);
+ 
++#if 0
+ extern ASN1_API void asn1_perror (int error);
++#endif
+ 
+ #define ASN1_MAX_TAG_SIZE 4
+ #define ASN1_MAX_LENGTH_SIZE 9

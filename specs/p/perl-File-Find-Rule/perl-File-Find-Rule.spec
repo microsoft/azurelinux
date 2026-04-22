@@ -3,7 +3,7 @@
 
 Name: 		perl-File-Find-Rule
 Version: 	0.35
-Release: 	2%{?dist}
+Release: 3%{?dist}
 Summary: 	Perl module implementing an alternative interface to File::Find
 License: 	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL: 		https://metacpan.org/release/File-Find-Rule

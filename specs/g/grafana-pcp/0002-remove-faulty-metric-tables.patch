@@ -1,0 +1,55 @@
+From 092be26fe09814c8b407d2aa48a96e597cf1d8f2 Mon Sep 17 00:00:00 2001
+From: Sam Feifer <sfeifer@redhat.com>
+Date: Mon, 7 Jul 2025 10:16:54 -0400
+Subject: [PATCH] remove faulty metrics table
+
+
+diff --git a/src/datasources/vector/dashboards/pcp-vector-top-consumers.jsonnet b/src/datasources/vector/dashboards/pcp-vector-top-consumers.jsonnet
+index cef1a0e..c9f9f5d 100644
+--- a/src/datasources/vector/dashboards/pcp-vector-top-consumers.jsonnet
++++ b/src/datasources/vector/dashboards/pcp-vector-top-consumers.jsonnet
+@@ -18,7 +18,7 @@ grafana.dashboard.new(
+   grafana.text.new(
+     'Configuration Instructions',
+     mode='markdown',
+-    content='This dashboard requires [authentication](https://grafana-pcp.readthedocs.io/en/latest/datasources/authentication.html) to be set up for the PCP Vector datasource. The "Top Network Consumers" table requires the [bcc PMDA](https://man7.org/linux/man-pages/man1/pmdabcc.1.html) to be installed and configured with the netproc module.',
++    content='This dashboard requires [authentication](https://grafana-pcp.readthedocs.io/en/latest/datasources/authentication.html) to be set up for the PCP Vector datasource.',
+   ), gridPos={
+     x: 0,
+     y: 0,
+@@ -55,34 +55,4 @@ grafana.dashboard.new(
+         w: 12,
+         h: 8,
+     }
+-)
+-.addPanel(
+-     grafana.tablePanel.new(
+-        'Top Disk Consumers',
+-        datasource='$datasource',
+-        styles=null,
+-    )
+-    .addTargets([
+-        { expr: 'proc.hog.disk', format: 'metrics_table', legendFormat: '$metric' },
+-    ]) + { options+: {sortBy: [{desc: true, displayName: 'proc.hog.disk'}]}}, gridPos={
+-        x: 0,
+-        y: 10,
+-        w: 12,
+-        h: 8,
+-    }
+-)
+-.addPanel(
+-     grafana.tablePanel.new(
+-        'Top Network Consumers',
+-        datasource='$datasource',
+-        styles=null,
+-    )
+-    .addTargets([
+-        { expr: 'proc.hog.net', format: 'metrics_table', legendFormat: '$metric' },
+-    ]) + { options+: {sortBy: [{desc: true, displayName: 'proc.hog.net'}]}}, gridPos={
+-        x: 12,
+-        y: 10,
+-        w: 12,
+-        h: 8,
+-    }
+ )
+\ No newline at end of file

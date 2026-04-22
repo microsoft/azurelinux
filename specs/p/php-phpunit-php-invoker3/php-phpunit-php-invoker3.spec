@@ -31,7 +31,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
 Version:        3.1.1
-Release:        13%{?dist}
+Release: 14%{?dist}
 Summary:        Invoke callables with a timeout, version %{major}
 
 License:        BSD-3-Clause

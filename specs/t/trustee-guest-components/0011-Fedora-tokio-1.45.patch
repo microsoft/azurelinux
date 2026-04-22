@@ -1,0 +1,27 @@
+From 446e4f308ba84d9810e10dc4a07458a4179460fb Mon Sep 17 00:00:00 2001
+From: Yan Fu <yafu@redhat.com>
+Date: Thu, 12 Jun 2025 03:28:55 -0400
+Subject: [PATCH 11/14] Fedora: tokio 1.45
+
+Signed-off-by: Uri Lublin <uril@redhat.com>
+Signed-off-by: Yan Fu <yafu@redhat.com>
+---
+ Cargo.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Cargo.toml b/Cargo.toml
+index ac9208c..5accb4c 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -41,7 +41,7 @@ sha2 = "0.10.9"
+ strum = { version = "0.27", features = ["derive"] }
+ tempfile = "3.20"
+ thiserror = "2.0"
+-tokio = "1.44"
++tokio = "1.45"
+ toml = "0.8.22"
+ tonic = "0.12"
+ tonic-build = "0.12"
+-- 
+2.49.0
+

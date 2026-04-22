@@ -4,7 +4,7 @@
 Summary: Pattern matching utilities
 Name: grep
 Version: 3.12
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPL-3.0-or-later AND LGPL-3.0-or-later AND LGPL-2.1-or-later AND GPL-2.0-or-later AND LGPL-2.0-or-later AND GFDL-1.3-no-invariants-or-later
 URL: https://www.gnu.org/software/grep/
 

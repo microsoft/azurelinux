@@ -3,7 +3,7 @@
 
 Name:           python-matplotlib-inline
 Version:        0.1.7
-Release:        9%{?dist}
+Release: 10%{?dist}
 Summary:        Inline Matplotlib backend for Jupyter
 
 # Automatically converted from old format: BSD - review is highly recommended.

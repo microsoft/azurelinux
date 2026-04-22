@@ -5,7 +5,7 @@ Name: hyphen-sl
 Summary: Slovenian hyphenation rules
 %global upstreamid 20070127
 Version: 0.%{upstreamid}
-Release: 33%{?dist}
+Release: 34%{?dist}
 Source: http://download.services.openoffice.org/contrib/dictionaries/hyph_sl_SI.zip
 URL: http://wiki.services.openoffice.org/wiki/Dictionaries
 License: LGPL-2.1-or-later

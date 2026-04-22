@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        0.7
-Release:        43%{?dist}
+Release: 44%{?dist}
 Summary:        PyJUnitXML, a pyunit extension to output JUnit compatible XML
 
 License:        LGPL-3.0-only

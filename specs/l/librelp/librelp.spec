@@ -4,7 +4,7 @@
 Summary: The Reliable Event Logging Protocol library
 Name: librelp
 Version: 1.11.0
-Release: 7%{?dist}
+Release: 8%{?dist}
 License: GPL-3.0-or-later
 URL: http://www.rsyslog.com/
 Source0: http://download.rsyslog.com/%{name}/%{name}-%{version}.tar.gz

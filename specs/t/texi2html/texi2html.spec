@@ -3,7 +3,7 @@
 
 Name: texi2html
 Version: 5.0
-Release: 25%{?dist}
+Release: 26%{?dist}
 # GPLv2+ is for the code
 # OFSFDL (Old FSF Documentation License) for the documentation
 # CC-BY-SA or GPLv2 for the images

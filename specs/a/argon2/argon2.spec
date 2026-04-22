@@ -21,7 +21,7 @@
 
 Name:    argon2
 Version: %{upstream_version}%{?upstream_prever:~%{upstream_prever}}
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary: The password-hashing tools
 
 License: CC0-1.0 OR Apache-2.0

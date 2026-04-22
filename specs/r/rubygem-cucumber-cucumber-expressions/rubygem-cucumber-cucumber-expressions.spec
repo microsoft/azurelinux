@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 17.1.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: A simpler alternative to Regular Expressions
 License: MIT
 URL: https://github.com/cucumber/cucumber-expressions

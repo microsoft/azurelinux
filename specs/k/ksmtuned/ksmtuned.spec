@@ -3,7 +3,7 @@
 
 Name: ksmtuned
 Version: 0.1.0
-Release: 17%{?dist}
+Release: 18%{?dist}
 
 Summary: Kernel Samepage Merging services
 License: GPL-2.0-or-later

@@ -6,7 +6,7 @@
 
 Name:           python-%{pypi_name}
 Version:        2.2.5
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        MySQL/mariaDB database connector for Python
 
 License:        GPL-2.0-only

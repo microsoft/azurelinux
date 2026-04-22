@@ -1,0 +1,29 @@
+From 2191f4bb86687cffe2ee5b3b8e925056b1289a3f Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Fri, 15 Dec 2023 08:11:45 -0500
+Subject: [PATCH] Downstream-only: Build normal wheels in-place
+
+Upstream wants to build only editable wheels in-place, building normal
+wheels in a temporary directory. This is reasonable in principle, but
+the implementation conflicts with the pyproject-rpm-macros, resulting in
+an unbounded recursion of nested temporary directories.
+---
+ packaging/pep517_backend/_backend.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/packaging/pep517_backend/_backend.py b/packaging/pep517_backend/_backend.py
+index c2b2cb9..dcbf14f 100644
+--- a/packaging/pep517_backend/_backend.py
++++ b/packaging/pep517_backend/_backend.py
+@@ -317,7 +317,7 @@ def build_wheel(
+     """
+     with maybe_prebuild_c_extensions(
+             line_trace_cython_when_unset=False,
+-            build_inplace=False,
++            build_inplace=True,
+             config_settings=config_settings,
+     ):
+         return _setuptools_build_wheel(
+-- 
+2.49.0
+

@@ -3,7 +3,7 @@
 
 Name:           waf
 Version:        2.1.9
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        A Python-based build system
 # The entire source code is BSD apart from pproc.py (taken from Python 2.5)
 # Automatically converted from old format: BSD and Python - review is highly recommended.

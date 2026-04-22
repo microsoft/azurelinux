@@ -10,7 +10,7 @@
 Name: hunspell-eu
 Summary: Basque hunspell dictionaries
 Version: 5.1
-Release: 14%{?dist}
+Release: 15%{?dist}
 Source0: http://xuxen.eus/static/hunspell/xuxen_%{version}_hunspell.zip
 URL: http://xuxen.eus
 License: LGPL-3.0-or-later

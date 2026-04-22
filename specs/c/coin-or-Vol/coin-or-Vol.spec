@@ -6,7 +6,7 @@
 Name:		coin-or-%{module}
 Summary:	Vol (Volume Algorithm)
 Version:	1.5.4
-Release:	16%{?dist}
+Release: 17%{?dist}
 License:	EPL-1.0
 URL:		http://projects.coin-or.org/%{module}
 Source0:	http://www.coin-or.org/download/pkgsource/%{module}/%{module}-%{version}.tgz

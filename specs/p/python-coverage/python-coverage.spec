@@ -8,7 +8,7 @@
 Name:           python-coverage
 Summary:        Code coverage testing module for Python
 Version:        7.10.2
-Release:        3%{?dist}
+Release: 4%{?dist}
 # There is a jquery file in tests/ that is MIT OR GPL-2.0-only
 # but it does not end up in the binary package
 License:        Apache-2.0

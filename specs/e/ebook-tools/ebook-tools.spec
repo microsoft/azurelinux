@@ -7,7 +7,7 @@
 
 Name:		ebook-tools
 Version:	0.2.2
-Release:	30%{?dist}
+Release: 31%{?dist}
 Summary:	Tools for accessing and converting various ebook file formats
 
 License:	MIT

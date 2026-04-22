@@ -3,7 +3,7 @@
 
 Name:		perl-Test-Regexp
 Version:	2017040101
-Release:	27%{?dist}
+Release: 28%{?dist}
 Summary:	Test your regular expressions
 License:	MIT
 URL:		https://metacpan.org/release/Test-Regexp

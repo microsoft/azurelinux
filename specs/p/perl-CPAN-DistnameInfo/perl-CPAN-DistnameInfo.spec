@@ -3,7 +3,7 @@
 
 Name:           perl-CPAN-DistnameInfo
 Version:        0.12
-Release:        33%{?dist}
+Release: 34%{?dist}
 Summary:        Extract distribution name and version from a distribution filename
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/CPAN-DistnameInfo

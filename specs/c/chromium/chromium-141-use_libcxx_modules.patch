@@ -1,0 +1,28 @@
+Fix FTBFS
+
+../../build/modules/linux-x64/module.modulemap:11:12: error: header '../../linux/debian_bullseye_amd64-sysroot/usr/include/alloca.h' not found
+   11 |     header "../../linux/debian_bullseye_amd64-sysroot/usr/include/alloca.h"
+      |            ^
+1 error generated
+
+diff -up chromium-141.0.7390.37/build/config/BUILDCONFIG.gn.me chromium-141.0.7390.37/build/config/BUILDCONFIG.gn
+--- chromium-141.0.7390.37/build/config/BUILDCONFIG.gn.me	2025-10-01 17:39:47.242174153 +0200
++++ chromium-141.0.7390.37/build/config/BUILDCONFIG.gn	2025-10-01 17:49:54.736578295 +0200
+@@ -557,6 +557,8 @@ foreach(_target_type,
+         ]) {
+   template(_target_type) {
+     target(_target_type, target_name) {
++      use_libcxx_modules = false
++
+       forward_variables_from(invoker, "*", TESTONLY_AND_VISIBILITY)
+       forward_variables_from(invoker, TESTONLY_AND_VISIBILITY)
+       if (!defined(inputs)) {
+@@ -660,6 +662,8 @@ foreach(_target_type,
+       # TODO(crbug.com/326584510): Reclient doesn't respect this variable, see
+       # rbe_bug_326584510_missing_inputs in //build/config/clang/clang.gni
+       _uses_cflags = false
++      use_libcxx_modules = false
++ 
+       if (defined(sources)) {
+         foreach(f, sources) {
+           if (string_replace(f + ".END", ".cc.END", "") != f + ".END" ||

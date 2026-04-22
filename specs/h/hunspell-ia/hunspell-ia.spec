@@ -11,7 +11,7 @@ Name: hunspell-ia
 Summary: Interlingua hunspell dictionaries
 %global upstreamid 20050226
 Version: 0.%{upstreamid}
-Release: 34%{?dist}
+Release: 35%{?dist}
 Source: http://download.savannah.gnu.org/releases/interlingua/ia_myspell.zip
 URL: http://wiki.services.openoffice.org/wiki/Dictionaries#Interlingua_.28x-register.29
 License: LGPL-2.1-or-later

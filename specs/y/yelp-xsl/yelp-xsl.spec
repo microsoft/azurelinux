@@ -5,7 +5,7 @@
 
 Name:           yelp-xsl
 Version:        49.0
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        XSL stylesheets for the yelp help browser
 
 License:        GPL-2.0-or-later AND LGPL-2.0-or-later AND MIT AND BSD-3-Clause

@@ -4,7 +4,7 @@
 Summary: A plain ASCII to PostScript converter
 Name: enscript
 Version: 1.6.6
-Release: 37%{?dist}
+Release: 38%{?dist}
 # compat/regex.h,strerror.c,xalloc.{c,h} - GPL-2.0-or-later
 # states/gram.{c,h}, intl/plural.c - GPL-3.0-or-later WITH Bison-exception-2.2
 # intl/hash-string.c - LGPL-2.1-or-later

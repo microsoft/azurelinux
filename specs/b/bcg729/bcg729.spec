@@ -3,7 +3,7 @@
 
 Name:          bcg729
 Version:       1.1.1
-Release:       13%{?dist}
+Release: 14%{?dist}
 Summary:       Opensource implementation of the G.729 codec
 
 License:       GPL-3.0-or-later

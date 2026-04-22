@@ -1,0 +1,337 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Michael Chang <mchang@suse.com>
+Date: Tue, 11 Feb 2025 15:08:06 -0600
+Subject: [PATCH] disk/cryptodisk: Require authentication after TPM unlock for
+ CLI access
+
+The GRUB may use TPM to verify the integrity of boot components and the
+result can determine whether a previously sealed key can be released. If
+everything checks out, showing nothing has been tampered with, the key
+is released and GRUB unlocks the encrypted root partition for the next
+stage of booting.
+
+However, the liberal Command Line Interface (CLI) can be misused by
+anyone in this case to access files in the encrypted partition one way
+or another. Despite efforts to keep the CLI secure by preventing utility
+command output from leaking file content, many techniques in the wild
+could still be used to exploit the CLI, enabling attacks or learning
+methods to attack. It's nearly impossible to account for all scenarios
+where a hack could be applied.
+
+Therefore, to mitigate potential misuse of the CLI after the root device
+has been successfully unlocked via TPM, the user should be required to
+authenticate using the LUKS password. This added layer of security
+ensures that only authorized users can access the CLI reducing the risk
+of exploitation or unauthorized access to the encrypted partition.
+
+Fixes: CVE-2024-49504
+
+Signed-off-by: Michael Chang <mchang@suse.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ docs/grub.texi                | 29 +++++++++++++++
+ grub-core/disk/cryptodisk.c   | 87 ++++++++++++++++++++++++++++++++++++++++++-
+ grub-core/kern/main.c         | 12 ++++++
+ grub-core/normal/auth.c       | 30 +++++++++++++++
+ grub-core/normal/main.c       |  4 ++
+ grub-core/normal/menu_entry.c |  4 ++
+ include/grub/auth.h           |  1 +
+ include/grub/cryptodisk.h     |  3 ++
+ include/grub/misc.h           |  2 +
+ 9 files changed, 171 insertions(+), 1 deletion(-)
+
+diff --git a/docs/grub.texi b/docs/grub.texi
+index 9ce9c5b82..2d6d73a78 100644
+--- a/docs/grub.texi
++++ b/docs/grub.texi
+@@ -6882,6 +6882,35 @@ sign-file SHA256 grub.key certificate.der core.elf.unsigned core.elf.signed
+ As with UEFI secure boot, it is necessary to build in the required modules,
+ or sign them separately.
+ 
++@subsection Command line and menuentry editor protection
++
++The TPM key protector provides full disk encryption support on servers or
++virtual machine images, meanwhile keeping the boot process unattended. This
++prevents service disruptions by eliminating the need for manual password input
++during startup, improving system uptime and continuity. It is achieved by TPM,
++which verifies the integrity of boot components by checking cryptographic
++hashes against securely stored values, to confirm the disks are unlocked in a
++trusted state.
++
++However, for users to access the system interactively, some form of
++authentication is still required, as the disks are not unlocked by an
++authorized user. This raised concerns about using an unprotected
++@samp{command-line interface} (@pxref{Command-line interface}), as anyone could
++execute commands to access decrypted data. To address this issue, the LUKS
++password is used to ensure that only authorized users are granted access to the
++interface. Additionally, the @samp{menu entry editor} (@pxref{Menu entry
++editor}) is also safeguarded by the LUKS password, as modifying a boot entry is
++effectively the same as altering the @file{grub.cfg} file read from encrypted
++files.
++
++It is worth mentioning that the built-in password support, as described in
++@samp{Authentication and Authorization in GRUB} (@pxref{Authentication and
++authorisation}), can also be used to protect the command-line interface from
++unauthorized access. However, it is not recommended to rely on this approach as
++it is an optional step. Setting it up requires additional manual intervention,
++which increases the risk of password leakage during the process. Moreover, the
++superuser list must be well maintained, and the password used cannot be
++synchronized with LUKS key rotation.
+ 
+ @node Platform limitations
+ @chapter Platform limitations
+diff --git a/grub-core/disk/cryptodisk.c b/grub-core/disk/cryptodisk.c
+index 98e176a13..06a42b2d7 100644
+--- a/grub-core/disk/cryptodisk.c
++++ b/grub-core/disk/cryptodisk.c
+@@ -1144,7 +1144,9 @@ grub_cryptodisk_scan_device_real (const char *name,
+     ret = grub_cryptodisk_insert (dev, name, source);
+     if (ret != GRUB_ERR_NONE)
+       goto error;
+-
++#ifndef GRUB_UTIL
++    grub_cli_set_auth_needed ();
++#endif
+     goto cleanup;
+   }
+   grub_error (GRUB_ERR_BAD_MODULE, "no cryptodisk module can handle this device");
+@@ -1576,6 +1578,89 @@ luks_script_get (grub_size_t *sz)
+   return ret;
+ }
+ 
++#ifdef GRUB_MACHINE_EFI
++grub_err_t
++grub_cryptodisk_challenge_password (void)
++{
++  grub_cryptodisk_t cr_dev;
++
++  for (cr_dev = cryptodisk_list; cr_dev != NULL; cr_dev = cr_dev->next)
++    {
++      grub_cryptodisk_dev_t cr;
++      grub_disk_t source = NULL;
++      grub_err_t ret = GRUB_ERR_NONE;
++      grub_cryptodisk_t dev = NULL;
++      char *part = NULL;
++      struct grub_cryptomount_args cargs = {0};
++
++      cargs.check_boot = 0;
++      cargs.search_uuid = cr_dev->uuid;
++
++      source = grub_disk_open (cr_dev->source);
++
++      if (source == NULL)
++	{
++	  ret = grub_errno;
++	  goto error_out;
++	}
++
++      FOR_CRYPTODISK_DEVS (cr)
++      {
++	dev = cr->scan (source, &cargs);
++	if (grub_errno)
++	  {
++	    ret = grub_errno;
++	    goto error_out;
++	  }
++	if (dev == NULL)
++	  continue;
++	break;
++      }
++
++      if (dev == NULL)
++	{
++	  ret = grub_error (GRUB_ERR_BAD_MODULE, "no cryptodisk module can handle this device");
++	  goto error_out;
++	}
++
++      part = grub_partition_get_name (source->partition);
++      grub_printf_ (N_("Enter passphrase for %s%s%s (%s): "), source->name,
++		    source->partition != NULL ? "," : "",
++		    part != NULL ? part : N_("UNKNOWN"), cr_dev->uuid);
++      grub_free (part);
++
++      cargs.key_data = grub_malloc (GRUB_CRYPTODISK_MAX_PASSPHRASE);
++      if (cargs.key_data == NULL)
++	{
++	  ret = grub_errno;
++	  goto error_out;
++	}
++
++      if (!grub_password_get ((char *) cargs.key_data, GRUB_CRYPTODISK_MAX_PASSPHRASE))
++	{
++	  ret = grub_error (GRUB_ERR_BAD_ARGUMENT, "passphrase not supplied");
++	  goto error_out;
++	}
++      cargs.key_len = grub_strlen ((char *) cargs.key_data);
++      ret = cr->recover_key (source, dev, &cargs);
++
++ error_out:
++      grub_disk_close (source);
++      if (dev != NULL)
++	cryptodisk_close (dev);
++      if (cargs.key_data)
++	{
++	  grub_memset (cargs.key_data, 0, cargs.key_len);
++	  grub_free (cargs.key_data);
++	}
++
++      return ret;
++    }
++
++  return GRUB_ERR_NONE;
++}
++#endif /* GRUB_MACHINE_EFI */
++
+ struct grub_procfs_entry luks_script =
+ {
+   .name = "luks_script",
+diff --git a/grub-core/kern/main.c b/grub-core/kern/main.c
+index 0d6b8138d..2e6b79ee3 100644
+--- a/grub-core/kern/main.c
++++ b/grub-core/kern/main.c
+@@ -37,6 +37,7 @@
+ #endif
+ 
+ static bool cli_disabled = false;
++static bool cli_need_auth = false;
+ 
+ grub_addr_t
+ grub_modules_get_end (void)
+@@ -308,6 +309,17 @@ grub_is_cli_disabled (void)
+   return cli_disabled;
+ }
+ 
++bool
++grub_is_cli_need_auth (void)
++{
++  return cli_need_auth;
++}
++
++void grub_cli_set_auth_needed (void)
++{
++  cli_need_auth = true;
++}
++
+ static void
+ check_is_cli_disabled (void)
+ {
+diff --git a/grub-core/normal/auth.c b/grub-core/normal/auth.c
+index d94020186..71b361bc0 100644
+--- a/grub-core/normal/auth.c
++++ b/grub-core/normal/auth.c
+@@ -25,6 +25,10 @@
+ #include <grub/time.h>
+ #include <grub/i18n.h>
+ 
++#ifdef GRUB_MACHINE_EFI
++#include <grub/cryptodisk.h>
++#endif
++
+ struct grub_auth_user
+ {
+   struct grub_auth_user *next;
+@@ -200,6 +204,32 @@ grub_username_get (char buf[], unsigned buf_size)
+   return (key != GRUB_TERM_ESC);
+ }
+ 
++grub_err_t
++grub_auth_check_cli_access (void)
++{
++  if (grub_is_cli_need_auth () == true)
++    {
++#ifdef GRUB_MACHINE_EFI
++      static bool authenticated = false;
++
++      if (authenticated == false)
++	{
++	  grub_err_t ret;
++
++	  ret = grub_cryptodisk_challenge_password ();
++	  if (ret == GRUB_ERR_NONE)
++	    authenticated = true;
++	  return ret;
++	}
++      return GRUB_ERR_NONE;
++#else
++      return GRUB_ACCESS_DENIED;
++#endif
++    }
++
++  return GRUB_ERR_NONE;
++}
++
+ grub_err_t
+ grub_auth_check_authentication (const char *userlist)
+ {
+diff --git a/grub-core/normal/main.c b/grub-core/normal/main.c
+index 26872ce94..86ffb388d 100644
+--- a/grub-core/normal/main.c
++++ b/grub-core/normal/main.c
+@@ -557,9 +557,13 @@ grub_cmdline_run (int nested, int force_auth)
+     }
+   while (err && force_auth);
+ 
++  if (err == GRUB_ERR_NONE)
++    err = grub_auth_check_cli_access ();
++
+   if (err)
+     {
+       grub_print_error ();
++      grub_wait_after_message ();
+       grub_errno = GRUB_ERR_NONE;
+       return;
+     }
+diff --git a/grub-core/normal/menu_entry.c b/grub-core/normal/menu_entry.c
+index ade56be2b..8b0d17e3f 100644
+--- a/grub-core/normal/menu_entry.c
++++ b/grub-core/normal/menu_entry.c
+@@ -1255,9 +1255,13 @@ grub_menu_entry_run (grub_menu_entry_t entry)
+ 
+   err = grub_auth_check_authentication (NULL);
+ 
++  if (err == GRUB_ERR_NONE)
++    err = grub_auth_check_cli_access ();
++
+   if (err)
+     {
+       grub_print_error ();
++      grub_wait_after_message ();
+       grub_errno = GRUB_ERR_NONE;
+       return;
+     }
+diff --git a/include/grub/auth.h b/include/grub/auth.h
+index 747334451..21d5190f0 100644
+--- a/include/grub/auth.h
++++ b/include/grub/auth.h
+@@ -33,5 +33,6 @@ grub_err_t grub_auth_unregister_authentication (const char *user);
+ grub_err_t grub_auth_authenticate (const char *user);
+ grub_err_t grub_auth_deauthenticate (const char *user);
+ grub_err_t grub_auth_check_authentication (const char *userlist);
++grub_err_t grub_auth_check_cli_access (void);
+ 
+ #endif /* ! GRUB_AUTH_HEADER */
+diff --git a/include/grub/cryptodisk.h b/include/grub/cryptodisk.h
+index d94df68b6..d2572f8b0 100644
+--- a/include/grub/cryptodisk.h
++++ b/include/grub/cryptodisk.h
+@@ -187,4 +187,7 @@ grub_util_get_geli_uuid (const char *dev);
+ grub_cryptodisk_t grub_cryptodisk_get_by_uuid (const char *uuid);
+ grub_cryptodisk_t grub_cryptodisk_get_by_source_disk (grub_disk_t disk);
+ 
++#ifdef GRUB_MACHINE_EFI
++grub_err_t grub_cryptodisk_challenge_password (void);
++#endif
+ #endif
+diff --git a/include/grub/misc.h b/include/grub/misc.h
+index d6e9bae8e..0429339ef 100644
+--- a/include/grub/misc.h
++++ b/include/grub/misc.h
+@@ -443,6 +443,8 @@ grub_uint64_t EXPORT_FUNC(grub_divmod64) (grub_uint64_t n,
+ 					  grub_uint64_t *r);
+ 
+ extern bool EXPORT_FUNC(grub_is_cli_disabled) (void);
++extern bool EXPORT_FUNC(grub_is_cli_need_auth) (void);
++extern void EXPORT_FUNC(grub_cli_set_auth_needed) (void);
+ 
+ /* Must match softdiv group in gentpl.py.  */
+ #if !defined(GRUB_MACHINE_EMU) && (defined(__arm__) || defined(__ia64__) || \

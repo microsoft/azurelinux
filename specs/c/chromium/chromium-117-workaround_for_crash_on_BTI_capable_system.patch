@@ -1,0 +1,12 @@
+diff -up chromium-117.0.5938.132/build/config/arm.gni.me chromium-117.0.5938.132/build/config/arm.gni
+--- chromium-117.0.5938.132/build/config/arm.gni.me	2023-09-29 15:37:18.281122162 +0200
++++ chromium-117.0.5938.132/build/config/arm.gni	2023-09-29 15:38:24.855369796 +0200
+@@ -140,7 +140,7 @@ if (current_cpu == "arm" || v8_current_c
+       # target_cpu == "arm64" filters out some cases (e.g. the ChromeOS x64
+       # MSAN build) where the target platform is x64, but V8 is configured to
+       # use the arm64 simulator.
+-      arm_control_flow_integrity = "standard"
++      arm_control_flow_integrity = "pac"
+     }
+   }
+   assert(arm_control_flow_integrity == "none" ||

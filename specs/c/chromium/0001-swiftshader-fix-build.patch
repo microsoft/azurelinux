@@ -1,0 +1,20 @@
+Description: fix swiftshader build issue on ppc64el
+Origin: vendor, https://gitlab.raptorengineering.com/raptor-engineering-public/chromium/openpower-patches/-/blob/chromium-131/patches/ppc64le/third_party/0001-swiftshader-fix-build.patch
+Bug: https://buildd.debian.org/status/fetch.php?pkg=chromium&arch=ppc64el&ver=131.0.6778.204-1&stamp=1734633529&raw=0
+Last-Update: 2024-12-20
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+Index: chromium-144.0.7559.59/third_party/swiftshader/third_party/llvm-16.0/BUILD.gn
+===================================================================
+--- chromium-144.0.7559.59.orig/third_party/swiftshader/third_party/llvm-16.0/BUILD.gn
++++ chromium-144.0.7559.59/third_party/swiftshader/third_party/llvm-16.0/BUILD.gn
+@@ -1599,6 +1599,9 @@ swiftshader_llvm_source_set("swiftshader
+     "llvm/lib/Target/PowerPC/PPCVSXFMAMutate.cpp",
+     "llvm/lib/Target/PowerPC/PPCVSXSwapRemoval.cpp",
+     "llvm/lib/Target/PowerPC/TargetInfo/PowerPCTargetInfo.cpp",
++    "llvm/lib/MC/MCXCOFFObjectTargetWriter.cpp",
++    "llvm/lib/MC/MCAsmInfoXCOFF.cpp",
++    "llvm/lib/MC/MCInstrInfo.cpp",
+   ]
+ }
+ 

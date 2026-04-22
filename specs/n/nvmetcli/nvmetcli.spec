@@ -5,7 +5,7 @@ Name:           nvmetcli
 License:        Apache-2.0
 Summary:        An adminstration shell for NVMe storage targets
 Version:        0.8
-Release:        6%{?dist}
+Release: 7%{?dist}
 URL:            ftp://ftp.infradead.org/pub/nvmetcli/
 Source:         ftp://ftp.infradead.org/pub/nvmetcli/%{name}-%{version}.tar.gz
 BuildArch:      noarch

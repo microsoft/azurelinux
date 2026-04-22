@@ -1,0 +1,57 @@
+--- nbdime-4.0.4/package-lock.json.orig	2026-02-10 08:01:38.000000000 -0700
++++ nbdime-4.0.4/package-lock.json	2026-02-10 20:47:39.774704266 -0700
+@@ -2025,15 +2025,6 @@
+         "node": ">=10.0.0"
+       }
+     },
+-    "node_modules/@fortawesome/fontawesome-free": {
+-      "version": "5.15.4",
+-      "resolved": "https://registry.npmjs.org/@fortawesome/fontawesome-free/-/fontawesome-free-5.15.4.tgz",
+-      "integrity": "sha512-eYm8vijH/hpzr/6/1CJ/V/Eb1xQFW2nnUKArb3z+yUWv7HTwj6M7SP957oMjfZjAHU6qpoNc2wQvIxBLWYa/Jg==",
+-      "hasInstallScript": true,
+-      "engines": {
+-        "node": ">=6"
+-      }
+-    },
+     "node_modules/@hutson/parse-repository-url": {
+       "version": "3.0.2",
+       "resolved": "https://registry.npmjs.org/@hutson/parse-repository-url/-/parse-repository-url-3.0.2.tgz",
+@@ -2923,7 +2914,6 @@
+       "resolved": "https://registry.npmjs.org/@jupyterlab/application/-/application-4.0.2.tgz",
+       "integrity": "sha512-sFF2YJBRiJGu6Jx2PE/JRwmwuLTs9eHEoqaZGCD6H4loj8iDlCuwb26JVmbCz94QzgB00KFMYCBV6K7UWhid9g==",
+       "dependencies": {
+-        "@fortawesome/fontawesome-free": "^5.12.0",
+         "@jupyterlab/apputils": "^4.1.2",
+         "@jupyterlab/coreutils": "^6.0.2",
+         "@jupyterlab/docregistry": "^4.0.2",
+@@ -22500,7 +22490,6 @@
+       "version": "4.0.4",
+       "license": "BSD-3-Clause",
+       "dependencies": {
+-        "@fortawesome/fontawesome-free": "^5.12.0",
+         "@jupyterlab/application": "^4.0.0",
+         "@jupyterlab/apputils": "^4.0.0",
+         "@jupyterlab/cells": "^4.0.0",
+--- nbdime-4.0.4/packages/webapp/package.json.orig	2026-02-10 08:01:38.000000000 -0700
++++ nbdime-4.0.4/packages/webapp/package.json	2026-02-10 20:47:39.775644983 -0700
+@@ -12,7 +12,6 @@
+     "watch": "webpack --mode=development --watch"
+   },
+   "dependencies": {
+-    "@fortawesome/fontawesome-free": "^5.12.0",
+     "@jupyterlab/application": "^4.0.0",
+     "@jupyterlab/apputils": "^4.0.0",
+     "@jupyterlab/cells": "^4.0.0",
+--- nbdime-4.0.4/packages/webapp/src/index.ts.orig	2026-02-10 08:01:38.000000000 -0700
++++ nbdime-4.0.4/packages/webapp/src/index.ts	2026-02-10 20:47:39.775809330 -0700
+@@ -16,8 +16,8 @@ import {
+ } from './app/common';
+ 
+ import '@jupyterlab/notebook/style/index.js';
+-import '@fortawesome/fontawesome-free/css/all.min.css';
+-import '@fortawesome/fontawesome-free/css/v4-shims.min.css';
++import '/usr/share/fontawesome/css/all.min.css';
++import '/usr/share/fontawesome/css/v4-shims.min.css';
+ 
+ import '@jupyterlab/theme-light-extension/style/theme.css';
+ 

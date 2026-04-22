@@ -5,7 +5,7 @@
 
 Name:           spec-version-maven-plugin
 Version:        2.2
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        Spec Version Maven Plugin
 License:        EPL-2.0 OR GPL-2.0-only WITH Classpath-exception-2.0
 

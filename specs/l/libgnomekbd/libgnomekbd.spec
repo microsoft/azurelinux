@@ -3,7 +3,7 @@
 
 Name:           libgnomekbd
 Version:        3.28.1
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        A keyboard configuration library
 
 License:        LGPL-2.0-or-later

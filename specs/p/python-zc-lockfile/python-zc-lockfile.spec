@@ -3,7 +3,7 @@
 
 Name:           python-zc-lockfile
 Version:        3.0.post1
-Release:        16%{?dist}
+Release: 17%{?dist}
 Summary:        Basic Inter-Process Locks
 License:        ZPL-2.1
 URL:            https://pypi.io/project/zc.lockfile/

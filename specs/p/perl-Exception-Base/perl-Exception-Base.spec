@@ -3,7 +3,7 @@
 
 Name:           perl-Exception-Base
 Version:        0.2501
-Release:        30%{?dist}
+Release: 31%{?dist}
 Summary:        Lightweight exceptions
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Exception-Base

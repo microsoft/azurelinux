@@ -3,7 +3,7 @@
 
 Name:           perl-TAP-Formatter-HTML
 Version:        0.13
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        TAP Test Harness output delegate for html output
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/TAP-Formatter-HTML

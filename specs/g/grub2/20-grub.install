@@ -1,0 +1,223 @@
+#!/bin/bash
+
+if ! [[ $KERNEL_INSTALL_MACHINE_ID ]]; then
+    exit 0
+fi
+
+[[ -f /etc/default/grub ]] && . /etc/default/grub
+[[ -f /etc/os-release ]] && . /etc/os-release
+
+COMMAND="$1"
+KERNEL_VERSION="$2"
+BOOT_DIR_ABS="$3"
+KERNEL_IMAGE="$4"
+
+KERNEL_DIR="${KERNEL_IMAGE%/*}"
+
+MACHINE_ID=$KERNEL_INSTALL_MACHINE_ID
+
+# If ${BOOT_DIR_ABS} exists, some other boot loader is active.
+[[ -d "${BOOT_DIR_ABS}" ]] && exit 0
+
+# UKIs are BLS type 2 entries, 90-uki-copy.install takes care of them
+[ "x$KERNEL_INSTALL_LAYOUT" != "xuki" ] || exit 0
+
+BLS_DIR="/boot/loader/entries"
+
+mkbls() {
+    local kernelver=$1 && shift
+    local datetime=$1 && shift
+    local kernelopts=$1 && shift
+
+    local debugname=""
+    local debugid=""
+    local flavor=""
+    local devicetree_entry=""
+
+    if [[ "$kernelver" == *\+* ]] ; then
+        local flavor=-"${kernelver##*+}"
+        if [[ "${flavor}" == "-debug" ]]; then
+            local debugname=" with debugging"
+            local debugid="-debug"
+        fi
+    fi
+
+    # Define devicetree_entry if the user defined GRUB_DEVICETREE
+    # in /etc/default/grub, otherwise leave it empty
+    if [ -n "$GRUB_DEVICETREE" ] ; then
+        local devicetree_entry="devicetree /dtb-${kernelver}/$GRUB_DEVICETREE"
+    fi
+
+    cat <<EOF
+title ${NAME} (${kernelver}) ${VERSION}${debugname}
+version ${kernelver}${debugid}
+linux /vmlinuz-${kernelver}
+initrd /initramfs-${kernelver}.img
+options ${kernelopts}
+grub_users \$grub_users
+grub_arg --unrestricted
+grub_class ${ID}
+${devicetree_entry}
+EOF
+}
+
+[[ "$KERNEL_VERSION" == *\+* ]] && flavor=-"${KERNEL_VERSION##*+}"
+case "$COMMAND" in
+    add)
+        if [[ "${KERNEL_DIR}" != "/boot" ]]; then
+            # rename to match the name used in the pseudo-BLS snippet above
+            cp --remove-destination --preserve=timestamps -T "${KERNEL_IMAGE}" "/boot/vmlinuz-${KERNEL_VERSION}"
+            command -v restorecon &>/dev/null && \
+                restorecon -R "/boot/vmlinuz-${KERNEL_VERSION}"
+
+            for i in \
+                    "$KERNEL_DIR"/System.map \
+                    "$KERNEL_DIR"/config \
+                    "$KERNEL_DIR"/zImage.stub \
+                    "$KERNEL_DIR"/dtb
+            do
+                [[ -e "$i" ]] || continue
+                cp --remove-destination --preserve=timestamps -rT "$i" "/boot/${i##*/}-${KERNEL_VERSION}"
+                command -v restorecon &>/dev/null && \
+                    restorecon -R "/boot/${i##*/}-${KERNEL_VERSION}"
+            done
+            # hmac is .vmlinuz-<version>.hmac so needs a special treatment
+            i="$KERNEL_DIR/.${KERNEL_IMAGE##*/}.hmac"
+            if [[ -e "$i" ]]; then
+                cp --remove-destination --preserve=timestamps "$i" "/boot/.${KERNEL_IMAGE##*/}-${KERNEL_VERSION}.hmac"
+                command -v restorecon &>/dev/null && \
+                    restorecon "/boot/.${KERNEL_IMAGE##*/}-${KERNEL_VERSION}.hmac"
+            fi
+            # OLD method using gzip'd file (will be deprecated and removed in the future)
+            # symvers is symvers-<version>.gz symlink, needs a special treatment
+            i="$KERNEL_DIR/symvers.gz"
+            if [[ -e "$i" ]]; then
+                ln -fs "$i" "/boot/symvers-${KERNEL_VERSION}.gz"
+                command -v restorecon &>/dev/null && \
+                    restorecon "/boot/symvers-${KERNEL_VERSION}.gz"
+            fi
+            # symvers is symvers-<version>.xz symlink, needs a special treatment
+            i="$KERNEL_DIR/symvers.xz"
+            if [[ -e "$i" ]]; then
+                ln -fs "$i" "/boot/symvers-${KERNEL_VERSION}.xz"
+                command -v restorecon &>/dev/null && \
+                    restorecon "/boot/symvers-${KERNEL_VERSION}.xz"
+            fi
+        fi
+
+        if [[ "x${GRUB_ENABLE_BLSCFG}" = "xtrue" ]] || [[ ! -f /sbin/new-kernel-pkg ]]; then
+            if [[ -f /etc/kernel/cmdline ]]; then
+                if [[ /etc/kernel/cmdline -ot /etc/default/grub ]]; then
+                    # user modified /etc/default/grub manually; sync
+                    grub2-mkconfig -o /etc/grub2.cfg
+                fi
+                read -r -d '' -a BOOT_OPTIONS < /etc/kernel/cmdline
+            elif [[ -f /usr/lib/kernel/cmdline ]]; then
+                read -r -d '' -a BOOT_OPTIONS < /usr/lib/kernel/cmdline
+            else
+                declare -a BOOT_OPTIONS
+
+                read -r -d '' -a line < /proc/cmdline
+                for i in "${line[@]}"; do
+                    [[ "${i#initrd=*}" != "$i" ]] && continue
+                    [[ "${i#BOOT_IMAGE=*}" != "$i" ]] && continue
+                    BOOT_OPTIONS+=("$i")
+                done
+            fi
+
+            eval "$(grub2-get-kernel-settings)" || true
+            [[ -d "$BLS_DIR" ]] || mkdir -m 0700 -p "$BLS_DIR"
+            BLS_ID="${MACHINE_ID}-${KERNEL_VERSION}"
+            BLS_TARGET="${BLS_DIR}/${BLS_ID}.conf"
+            mkbls "${KERNEL_VERSION}" \
+		  "$(date -u +%Y%m%d%H%M%S -d "$(stat -c '%y' "${KERNEL_DIR}")")" \
+                  "${BOOT_OPTIONS[*]}" >"${BLS_TARGET}"
+            command -v restorecon &>/dev/null && restorecon -R "${BLS_TARGET}"
+
+            LINUX="$(grep '^linux[ \t]' "${BLS_TARGET}" | sed -e 's,^linux[ \t]*,,')"
+            INITRD="$(grep '^initrd[ \t]' "${BLS_TARGET}" | sed -e 's,^initrd[ \t]*,,')"
+            if [[ "$(grub2-probe --device $(grub2-probe --target=device /) --target=fs)" == "btrfs" &&
+		      "${SUSE_BTRFS_SNAPSHOT_BOOTING}" == "true" ]]; then
+                LINUX_RELPATH="$(grub2-mkrelpath -r /boot${LINUX})"
+            else
+                LINUX_RELPATH="$(grub2-mkrelpath /boot${LINUX})"
+            fi
+            BOOTPREFIX="$(dirname ${LINUX_RELPATH})"
+            ROOTPREFIX="$(dirname "/boot${LINUX}")"
+
+            if [[ $LINUX != $LINUX_RELPATH ]]; then
+                sed -i -e "s,^linux.*,linux ${BOOTPREFIX}${LINUX},g" "${BLS_TARGET}"
+                sed -i -e "s,^initrd.*,initrd ${BOOTPREFIX}${INITRD},g" "${BLS_TARGET}"
+            fi
+
+            if ( [[ "$KERNEL_VERSION" != *${GRUB_DEFAULT_KERNEL_TYPE}* ]] && \
+                     [ "x$GRUB_NON_STANDARD_KERNEL" == "xtrue" ] ) || \
+                   ( echo "$KERNEL_VERSION" | grep -E -q "64k|auto|rt|uki" && \
+                     [ "x$GRUB_NON_STANDARD_KERNEL" != "xtrue" ] ) || \
+                   ( [[ "$KERNEL_VERSION" == *debug* ]] && [ "x$GRUB_DEFAULT_TO_DEBUG" != "xtrue" ] ); then
+                GRUB_UPDATE_DEFAULT_KERNEL=false
+            fi
+
+            if [ "x$GRUB_UPDATE_DEFAULT_KERNEL" = "xtrue" ]; then
+                NEWDEFAULT="${BLS_ID}"
+            fi
+
+            if [ "x$GRUB_LINUX_MAKE_DEBUG" = "xtrue" ]; then
+                BLS_DEBUG="$(echo ${BLS_TARGET} | sed -e "s/${KERNEL_VERSION}/${KERNEL_VERSION}~debug/")"
+                cp --preserve=timestamps -T  "${BLS_TARGET}" "${BLS_DEBUG}"
+                TITLE="$(grep '^title[ \t]' "${BLS_DEBUG}" | sed -e 's/^title[ \t]*//')"
+                OPTIONS="$(echo "${BOOT_OPTIONS[*]} ${GRUB_CMDLINE_LINUX_DEBUG}" | sed -e 's/\//\\\//g')"
+                sed -i -e "s/^title.*/title ${TITLE}${GRUB_LINUX_DEBUG_TITLE_POSTFIX}/" "${BLS_DEBUG}"
+                sed -i -e "s/^options.*/options ${OPTIONS}/" "${BLS_DEBUG}"
+                if [ -n "$NEWDEFAULT" -a "x$GRUB_DEFAULT_TO_DEBUG" = "xtrue" ]; then
+                    NEWDEFAULT="${BLS_DEBUG_ID}"
+                fi
+            fi
+            if [ -n "$NEWDEFAULT" ]; then
+                grub2-editenv - set "tmp_saved_entry=${NEWDEFAULT}"
+            fi
+
+            # this probably isn't the best place to do this, but it will do for now.
+            if [ -e "${ROOTPREFIX}${INITRD}" -a -e "${ROOTPREFIX}${LINUX}" -a \
+                 "${ROOTPREFIX}${INITRD}" -ot "${ROOTPREFIX}${LINUX}" -a \
+                 -x /usr/lib/kernel/install.d/50-dracut.install ]; then
+                rm -f "${ROOTPREFIX}${INITRD}"
+            fi
+            exit 0
+        fi
+
+        /sbin/new-kernel-pkg --package "kernel${flavor}" --install "$KERNEL_VERSION" || exit $?
+        /sbin/new-kernel-pkg --package "kernel${flavor}" --mkinitrd --dracut --depmod --update "$KERNEL_VERSION" || exit $?
+        /sbin/new-kernel-pkg --package "kernel${flavor}" --rpmposttrans "$KERNEL_VERSION" || exit $?
+        # If grubby is used there's no need to run other installation plugins
+        exit 77
+        ;;
+    remove)
+        # If the boot entry type is type2, we are not removing the BLS entry
+        if [[ "x${KERNEL_INSTALL_BOOT_ENTRY_TYPE}" = "xtype2" ]]; then
+            [ "${KERNEL_INSTALL_VERBOSE}" -gt 0 ] && echo "The boot entry type is type2. Skip removing BLS entry."
+            exit 0
+        fi
+        if [[ "x${GRUB_ENABLE_BLSCFG}" = "xtrue" ]] || [[ ! -f /sbin/new-kernel-pkg ]]; then
+            BLS_TARGET="${BLS_DIR}/${MACHINE_ID}-${KERNEL_VERSION}.conf"
+            BLS_DEBUG="$(echo ${BLS_TARGET} | sed -e "s/${KERNEL_VERSION}/${KERNEL_VERSION}~debug/")"
+            rm -f "${BLS_TARGET}" "${BLS_DEBUG}"
+
+            for i in vmlinuz System.map config zImage.stub dtb; do
+                rm -rf "/boot/${i}-${KERNEL_VERSION}"
+            done
+            # hmac is .vmlinuz-<version>.hmac so needs a special treatment
+            rm -f "/boot/.vmlinuz-${KERNEL_VERSION}.hmac"
+            # symvers is symvers-<version>.gz symlink, needs a special treatment
+            rm -f "/boot/symvers-${KERNEL_VERSION}.gz"
+
+            exit 0
+        fi
+
+        /sbin/new-kernel-pkg --package "kernel${flavor+-$flavor}" --rminitrd --rmmoddep --remove "$KERNEL_VERSION" || exit $?
+        # If grubby is used there's no need to run other installation plugins
+        exit 77
+        ;;
+    *)
+        ;;
+esac

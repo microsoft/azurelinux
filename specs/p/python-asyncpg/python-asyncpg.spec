@@ -1,0 +1,399 @@
+## START: Set by rpmautospec
+## (rpmautospec version 0.8.4)
+## RPMAUTOSPEC: autorelease, autochangelog
+%define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
+    release_number = 15;
+    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
+    print(release_number + base_release_number - 1);
+}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
+## END: Set by rpmautospec
+
+# This spec file has been modified by azldev to include build configuration overlays.
+# Do not edit manually; changes may be overwritten.
+
+# Run tests with uvloop?
+# F43FailsToInstall: python3-uvloop
+# https://bugzilla.redhat.com/show_bug.cgi?id=2372190
+%bcond uvloop 0
+
+Name:           python-asyncpg
+Summary:        A fast PostgreSQL Database Client Library for Python/asyncio
+Version:        0.30.0
+Release:        %autorelease
+
+# The entire source is Apache-2.0, except:
+#
+# PSF-2.0:
+#   asyncpg/protocol/record/recordobj.c
+#   asyncpg/_asyncio_compat.py
+License:        Apache-2.0 AND PSF-2.0
+URL:            https://github.com/MagicStack/asyncpg
+Source:         %{pypi_source asyncpg}
+
+BuildSystem:            pyproject
+BuildOption(install):   -l asyncpg
+BuildOption(generate_buildrequires): -x gssauth,test
+
+BuildRequires:  gcc
+BuildRequires:  tomcli
+
+# For tests:
+BuildRequires:  %{py3_dist pytest}
+# For krb5-config binary
+BuildRequires:  krb5-devel
+# For /usr/sbin/kdb5_util binary
+BuildRequires:  krb5-server
+# For kinit binary
+BuildRequires:  krb5-workstation
+# For pg_config binary
+BuildRequires:  libpq-devel
+# For pg_ctl binary
+BuildRequires:  postgresql-server
+# For citext extension
+BuildRequires:  postgresql-contrib
+
+# Note that asyncpg/pgproto comes from a git submodule referencing a separate
+# project, https://github.com/MagicStack/py-pgproto. However, we do not treat
+# it as a bundled dependency because it contains only sources; it has no build
+# system and is not designed for separate installation; and it is managed as a
+# part of the asyncpg package, as evidenced by the comment “This module is part
+# of asyncpg” in the file headers.
+
+%global common_description %{expand:
+asyncpg is a database interface library designed specifically for PostgreSQL
+and Python/asyncio. asyncpg is an efficient, clean implementation of PostgreSQL
+server binary protocol for use with Python’s asyncio framework. You can read
+more about asyncpg in an introductory blog post
+http://magic.io/blog/asyncpg-1m-rows-from-postgres-to-python/.}
+
+%description %{common_description}
+
+
+%package -n     python3-asyncpg
+Summary:        %{summary}
+
+Obsoletes:      %{name}-doc < 0.27.0-5
+
+%description -n python3-asyncpg %{common_description}
+
+
+%pyproject_extras_subpkg -n python3-asyncpg gssauth
+
+
+%prep -a
+# Remove pre-generated C sources from Cython to ensure they are re-generated
+# and not used in the build. Note that recordobj.c is not a generated source,
+# and must not be removed!
+find asyncpg -type f -name '*.c' ! -name 'recordobj.c' -print -delete
+
+# https://docs.fedoraproject.org/en-US/packaging-guidelines/Python/#_linters
+tomcli set pyproject.toml lists delitem --no-first --type regex \
+    'project.optional-dependencies.test' '(flake8|mypy)\b.*'
+
+# Do not upper-bound the Python interpreter version for the uvloop test
+# dependency. First, a missing uvloop breaks the test if we do not adjust the
+# uvloop bcond; second, we may have a working python3-uvloop packaged even if
+# there is no corresponding binary wheel on PyPI. We use sed since "tomcli set
+# ... lists replace ..." only supports a fixed replacement string.
+sed -r -i "s/('uvloop\\b.*);.*'/\\1'/" pyproject.toml
+%if %{without uvloop}
+tomcli set pyproject.toml lists delitem \
+    'project.optional-dependencies.test' '(uvloop)\b.*'
+%endif
+
+
+%generate_buildrequires -p
+export ASYNCPG_BUILD_CYTHON_ALWAYS=1
+
+
+%build -p
+export ASYNCPG_BUILD_CYTHON_ALWAYS=1
+
+
+%check -a
+# It is not clear why the tests always import asyncpg as ../asyncpg/__init__.py
+# even if we set PYTHONPATH to the installed sitearch directory. This
+# workaround is ugly, but there is nothing actually wrong with it, as the
+# install is already done by the time the check section runs:
+rm -rf asyncpg
+ln -s %{buildroot}%{python3_sitearch}/asyncpg/
+
+# https://docs.fedoraproject.org/en-US/packaging-guidelines/Python/#_linters
+k="${k-}${k+ and }not TestFlake8"
+
+# Test failure in test_executemany_server_failure_during_writes
+# https://github.com/MagicStack/asyncpg/issues/1099
+# This may be flaky and/or arch-dependent.
+k="${k-}${k+ and }not test_executemany_server_failure_during_writes"
+
+# Python 3.13.2: TestConnectParams.test_connect_params fails with ValueError:
+# Invalid IPv6 URL
+# https://github.com/MagicStack/asyncpg/issues/1236
+k="${k-}${k+ and }not (TestConnectParams and test_connect_params)"
+
+# See the “test” target in the Makefile:
+PYTHONASYNCIODEBUG=1 %pytest -k "${k-}"
+%pytest -k "${k-}"
+%if %{with uvloop}
+USE_UVLOOP=1 %pytest -k "${k-}"
+%endif
+
+
+%files -n python3-asyncpg -f %{pyproject_files}
+%doc README.rst
+
+
+%changelog
+## START: Generated by rpmautospec
+* Wed Apr 22 2026 azldev <azurelinux@microsoft.com> - 0.30.0-15
+- Latest state for python-asyncpg
+
+* Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 0.30.0-14
+- Rebuilt for Python 3.14.0rc3 bytecode
+
+* Fri Aug 15 2025 Python Maint <python-maint@redhat.com> - 0.30.0-13
+- Rebuilt for Python 3.14.0rc2 bytecode
+
+* Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.30.0-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
+
+* Wed Jun 11 2025 Benjamin A. Beasley <code@musicinmybrain.net> - 0.30.0-11
+- Omit uvloop tests until it can be rebuilt for Python 3.14
+- Fixes RHBZ#2371801
+
+* Wed Jun 11 2025 Benjamin A. Beasley <code@musicinmybrain.net> - 0.30.0-10
+- Ignore upstream bound on Python version for uvloop test dep.
+
+* Fri May 02 2025 Benjamin A. Beasley <code@musicinmybrain.net> - 0.30.0-9
+- Update .rpmlintrc file for current rpmlint
+
+* Sun Apr 06 2025 Benjamin A. Beasley <code@musicinmybrain.net> - 0.30.0-8
+- Enable uvloop integration tests in EPEL10
+
+* Wed Feb 19 2025 Benjamin A. Beasley <code@musicinmybrain.net> - 0.30.0-7
+- Report and skip a test that fails with Python 3.13.2
+
+* Sat Jan 18 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.30.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
+
+* Thu Nov 14 2024 Benjamin A. Beasley <code@musicinmybrain.net> - 0.30.0-5
+- F41+: Use the provisional declarative buildsystem
+
+* Mon Oct 21 2024 Benjamin A. Beasley <code@musicinmybrain.net> - 0.30.0-3
+- Revert "Conditionalize python-k5test test dependency"
+
+* Mon Oct 21 2024 Benjamin A. Beasley <code@musicinmybrain.net> - 0.30.0-2
+- Conditionalize python-k5test test dependency
+- Allows building on EPEL10, where it is currently unavailable
+
+* Sun Oct 20 2024 Benjamin A. Beasley <code@musicinmybrain.net> - 0.30.0-1
+- Update to 0.30.0 (close RHBZ#2319951)
+
+* Mon Aug 12 2024 Benjamin A. Beasley <code@musicinmybrain.net> - 0.29.0-13
+- Skip uvloop tests in EPEL10
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.29.0-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sat Jun 08 2024 Python Maint <python-maint@redhat.com> - 0.29.0-11
+- Rebuilt for Python 3.13
+
+* Thu May 02 2024 Benjamin A. Beasley <code@musicinmybrain.net> - 0.29.0-10
+- Patch for Python 3.13 (close RHBZ#2278638)
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.29.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.29.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Dec 17 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 0.29.0-6
+- Assert that %%pyproject_files contains a license file
+
+* Wed Nov 15 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 0.29.0-5
+- Remove bcond for building documentation
+
+* Mon Nov 13 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 0.29.0-4
+- Allow Cython 3
+
+* Sun Nov 05 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 0.29.0-3
+- Fix typo in test skips
+
+* Sun Nov 05 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 0.29.0-2
+- Start skipping test_executemany_server_failure_during_writes
+  unconditionally
+
+* Sun Nov 05 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 0.29.0-1
+- Update to 0.29.0 (close RHBZ#2247970)
+
+* Tue Sep 26 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 0.28.0-5
+- Revert "Skip uvloop tests while it FTI in F39"
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.28.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jul 07 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 0.28.0-2
+- Fix doc dependency generation
+
+* Fri Jul 07 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 0.28.0-1
+- Update to 0.28.0 (close RHBZ#2221008)
+
+* Wed Jul 05 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 0.27.0-12
+- Skip uvloop tests while it FTI in F39
+
+* Wed Jul 05 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 0.27.0-11
+- Conditionalize the uvloop test dependency
+
+* Wed Jul 05 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 0.27.0-10
+- Run tests with/without PYTHONASYNCIODEBUG=1 and uvloop
+- This follows the “test” target of the upstream Makefile
+
+* Tue Jun 20 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 0.27.0-9
+- Ensure README.rst is packaged
+
+* Tue Jun 20 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 0.27.0-8
+- Use new (rpm 4.17.1+) bcond style
+
+* Sat Jun 03 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 0.27.0-7
+- Remove explicit %%set_build_flags, not needed since F36
+
+* Tue Mar 21 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 0.27.0-5
+- Drop the -doc subpackage in F39
+- Works around RHBZ#2180497.
+
+* Fri Mar 17 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 0.27.0-4
+- Don’t assume %%_smp_mflags is -j%%_smp_build_ncpus
+
+* Wed Mar 08 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 0.27.0-3
+- Drop %%%%pyproject_build_lib (F37+)
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.27.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Oct 29 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 0.27.0-1
+- Update to 0.27.0 (close RHBZ#2138024)
+
+* Fri Oct 21 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 0.26.0-4
+- Drop test skip for upstream issue #877
+- The problem was in a GCC 12 pre-release, and was resolved by GCC 12 final
+
+* Fri Oct 21 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 0.26.0-3
+- Update License to SPDX
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.26.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jul 07 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 0.26.0-1
+- Update to 0.26.0 (close RHBZ#2105049)
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 0.25.0-10
+- Rebuilt for Python 3.11
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.25.0-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Sun Jan 16 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 0.25.0-8
+- Skip a failing test on s390x with GCC 12
+
+* Fri Jan 14 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 0.25.0-7
+- Use provisional %%%%pyproject_build_lib
+
+* Fri Jan 07 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 0.25.0-6
+- Drop intersphinx mappings
+
+* Fri Dec 10 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.25.0-5
+- Do package Cython sources (.pyx,.pxd,.pxi)
+
+* Tue Dec 07 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.25.0-4
+- Simplify documentation build
+
+* Tue Dec 07 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.25.0-3
+- Trivial adjustment to test exclusion
+
+* Sat Nov 27 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.25.0-2
+- Reduce LaTeX PDF build verbosity
+
+* Wed Nov 17 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.25.0-1
+- Update to 0.25.0 (close RHBZ#2023992)
+
+* Mon Oct 25 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.24.0-9
+- Use %%%%python3 macro instead of %%%%__python3
+
+* Wed Oct 13 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.24.0-8
+- Do not BR flake8/pycodestyle (close RHBZ#2013762)
+
+* Fri Oct 01 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.24.0-7
+- Generate PDF instead of HTML Sphinx documentation.
+
+* Thu Sep 23 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.24.0-6
+- Allow newer Sphinx and sphinx_rtd_theme
+
+* Mon Sep 13 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.24.0-5
+- Let pyproject-rpm-macros handle the license file
+
+* Sun Sep 12 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.24.0-4
+- Drop BR on pyproject-rpm-macros, now implied by python3-devel
+
+* Wed Sep 08 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.24.0-3
+- Drop patch that used sphinxcontrib-trio for docs
+
+* Wed Sep 08 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.24.0-2
+- Reduce macro indirection in the spec file
+
+* Thu Aug 26 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.24.0-1
+- Update to 0.24.0 (close RHBZ#1991810)
+
+* Tue Jul 27 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.23.0-12
+- Move %%generate_buildrequires after %%prep to make the spec file easier
+  to follow
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.23.0-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jul 16 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.23.0-6
+- Dependency on python3-docs should have been in -doc subpackage
+
+* Fri Jul 02 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.23.0-5
+- Allow later versions of test dependencies pycodestyle and uvloop
+
+* Thu Jun 17 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.23.0-4
+- Use a patch instead of sed expressions to replace sphinxcontrib-asyncio with
+  sphinxcontrib-trio, so it is easier to notice if the upstream
+  sphinxcontrib-asyncio version requirement changes and we do not silently
+  switch back to sphinxcontrib-asyncio from sphinxcontrib-trio
+- Stop removing bundled egg-info, since this should not be required with
+  pyproject-rpm-macros
+- Loosen pinned versions selectively rather than across the board
+
+* Thu Jun 17 2021 Karolina Surma <ksurma@redhat.com> - 0.23.0-3
+- Generate correct BuildRequires by defining them in source setup.py
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 0.23.0-2
+- Rebuilt for Python 3.10
+
+* Mon May 17 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.23.0-1
+- Update to 0.23.0
+- Drop asyncpg-0.22.0-python3.10-test_invalid_input.patch since it was merged
+  upstream
+- Drop workaround (via extra sources) for missing documentation sources
+
+* Tue Apr 27 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.22.0-6
+- Updated patch for Python 3.10
+
+* Mon Apr 26 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.22.0-5
+- Patch for Python 3.10 compatibility (RHBZ#1953538, upstream issue #750)
+
+* Tue Mar 30 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.22.0-4
+- Use pyproject-rpm-macros for build and install, too
+- More complete documentation build
+
+* Tue Mar 16 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.22.0-3
+- Remove setuptools BR, redundant with %%pyproject_buildrequires
+
+* Wed Mar 03 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.22.0-2
+- Fix intersphinx inventory path
+
+* Tue Mar 02 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.22.0-1
+- Initial package
+
+## END: Generated by rpmautospec

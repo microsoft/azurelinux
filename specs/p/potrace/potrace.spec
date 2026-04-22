@@ -3,7 +3,7 @@
 
 Name:		potrace
 Version:	1.16
-Release:	15%{?dist}
+Release: 16%{?dist}
 Summary:	Transform bitmaps into vector graphics
 # README defines license as GPLv2+
 # potrace/potrace-1.16/src/getopt.c is LGPL-2.0-or-later

@@ -4,7 +4,7 @@
 Summary: SGPIO captive backplane tool
 Name: sgpio
 Version: 1.2.0.10
-Release: 39%{?dist}
+Release: 40%{?dist}
 License: GPL-2.0-or-later
 URL: https://sourceware.org/lvm2/wiki/DMRAID_Eventing
 Source: sgpio-1.2-0.10-src.tar.gz

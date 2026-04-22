@@ -3,7 +3,7 @@
 
 Name:           maven-reporting-api
 Version:        4.0.0
-Release:        4%{?dist}
+Release: 5%{?dist}
 Epoch:          1
 Summary:        API to manage report generation
 License:        Apache-2.0

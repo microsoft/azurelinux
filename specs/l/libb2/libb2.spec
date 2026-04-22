@@ -6,7 +6,7 @@
 Name:    libb2
 Summary: C library providing BLAKE2b, BLAKE2s, BLAKE2bp, BLAKE2sp
 Version: 0.98.1
-Release: 14%{?dist}
+Release: 15%{?dist}
 License: CC0-1.0 OR Apache-1.0 OR Apache-2.0
 URL:     https://blake2.net/
 Source0: https://github.com/BLAKE2/libb2/archive/v%{version}/libb2-%{version}.tar.gz

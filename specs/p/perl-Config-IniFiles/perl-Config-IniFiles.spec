@@ -3,7 +3,7 @@
 
 Name:           perl-Config-IniFiles
 Version:        3.000003
-Release:        17%{?dist}
+Release: 18%{?dist}
 Summary:        A module for reading .ini-style configuration files
 # LICENSE:                              GPL+ or Artistic
 # lib/Config/IniFiles.pm:               GPL+ or Artistic

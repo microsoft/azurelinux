@@ -3,7 +3,7 @@
 
 Name:           iw
 Version:        6.17
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        A nl80211 based wireless configuration tool
 
 # part of sha256.c is public domain

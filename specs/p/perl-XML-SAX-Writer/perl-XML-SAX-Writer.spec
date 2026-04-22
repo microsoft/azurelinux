@@ -3,7 +3,7 @@
 
 Name:           perl-XML-SAX-Writer
 Version:        0.57
-Release:        24%{?dist}
+Release: 25%{?dist}
 Summary:        SAX2 Writer
 # Automatically converted from old format: GPL+ or Artistic - review is highly recommended.
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

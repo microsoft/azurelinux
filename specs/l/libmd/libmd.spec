@@ -4,7 +4,7 @@
 Summary:        Library that provides message digest functions from BSD systems
 Name:           libmd
 Version:        1.1.0
-Release:        8%{?dist}
+Release: 9%{?dist}
 # Breakdown in COPYING file of libmd release tarball
 License:        BSD-2-Clause AND BSD-3-Clause AND ISC AND Beerware AND LicenseRef-Fedora-Public-Domain
 URL:            https://www.hadrons.org/software/libmd/

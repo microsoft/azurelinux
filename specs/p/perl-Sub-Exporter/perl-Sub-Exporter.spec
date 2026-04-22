@@ -10,7 +10,7 @@
 
 Name:		perl-Sub-Exporter
 Version:	0.991
-Release:	6%{?dist}
+Release: 7%{?dist}
 Summary:	Sophisticated exporter for custom-built routines
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Sub-Exporter

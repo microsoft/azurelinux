@@ -1,0 +1,23 @@
+diff -up chromium-138.0.7204.15/third_party/node/node.gni.me chromium-138.0.7204.15/third_party/node/node.gni
+--- chromium-138.0.7204.15/third_party/node/node.gni.me	2025-06-03 23:20:09.000000000 +0200
++++ chromium-138.0.7204.15/third_party/node/node.gni	2025-06-09 09:59:21.788545159 +0200
+@@ -44,7 +44,6 @@ template("node") {
+       if (!defined(deps)) {
+         deps = []
+       }
+-      deps += [ "//third_party/node:check_version" ]
+     }
+   }
+ }
+diff -up chromium-138.0.7204.15/third_party/node/BUILD.gn.me chromium-138.0.7204.15/third_party/node/BUILD.gn
+diff -up chromium-138.0.7204.15/third_party/protobuf/proto_library.gni.me chromium-138.0.7204.15/third_party/protobuf/proto_library.gni
+--- chromium-138.0.7204.15/third_party/protobuf/proto_library.gni.me	2025-06-09 11:33:08.279645775 +0200
++++ chromium-138.0.7204.15/third_party/protobuf/proto_library.gni	2025-06-09 12:10:07.040045476 +0200
+@@ -562,7 +562,6 @@ template("proto_library") {
+                   _protoc_gen_ts_path,
+                   "//tools/protoc_wrapper/protoc-gen-ts_proto.py",
+                 ] + _protoc_gen_ts_runtime_deps
+-      deps += [ "//third_party/node:check_version" ]
+     }
+ 
+     if (_generate_with_plugin) {

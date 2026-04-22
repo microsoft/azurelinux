@@ -1,0 +1,101 @@
+#!/bin/sh
+set -o errexit
+set -o nounset
+
+REPO='https://gn.googlesource.com/gn'
+
+# Validate the argument
+COMMIT=''
+if [ "$#" = '1' ]
+then
+  if echo "$1" | grep -E '^[[:xdigit:]]{40}$' >/dev/null
+  then
+    COMMIT="$1"
+  fi
+elif [ "$#" = '0' ]
+then
+  COMMIT='main'
+fi
+if [ -z "${COMMIT}" ]
+then
+  cat 1>&2 <<EOF
+Usage: $0 [COMMIT]
+
+Parameters:
+  COMMIT - full commit hash from upstream git (${REPO});
+           otherwise the latest commit in main is used
+EOF
+  exit 1
+fi
+
+# Generate the version header
+SRCDIR="$(cd "$(dirname "$0")"; pwd)"
+SPEC="${SRCDIR}/gn.spec"
+
+SPEC_COMMIT="$(
+  awk '/^%global[[:blank:]]+commit[[:blank:]]+[[:xdigit:]]{40}[[:blank:]]*$/ {
+    print $3; exit
+  }' "${SPEC}"
+)"
+
+check_equal_commits() {
+  if [ "${1}" = "${SPEC_COMMIT}" ]
+  then
+    cat 1>&2 <<EOF
+Spec file is already up to date at ${SPEC_COMMIT}.
+EOF
+    exit
+  fi
+}
+
+if echo "${COMMIT}" | grep -E '^[[:xdigit:]]{40}$' >/dev/null
+then
+  check_equal_commits "${COMMIT}"
+fi
+
+tmpd="$(mktemp -d)"
+trap "rm -rf '${tmpd}'" INT TERM EXIT
+
+cd "${tmpd}"
+git clone 'https://gn.googlesource.com/gn'
+cd gn
+if ! echo "${COMMIT}" | grep -E '^[[:xdigit:]]{40}$' >/dev/null
+then
+  COMMIT="$(git rev-parse "${COMMIT}")"
+  check_equal_commits "${COMMIT}"
+fi
+git checkout "${COMMIT}"
+python3 './build/gen.py'
+cp -vp './out/last_commit_position.h' "${SRCDIR}/"
+
+cd "${SRCDIR}"
+
+# Modify the spec file
+POSITION="$(
+  awk '
+    $1 == "#define" && $2 == "LAST_COMMIT_POSITION_NUM" {
+      print $3; exit
+    }' 'last_commit_position.h'
+)"
+
+sed -r -i \
+    -e 's/(%global[[:blank:]]+commit[[:blank:]]+)[[:xdigit:]]{40}[[:blank:]]*$/\1'"${COMMIT}/" \
+    -e 's/(%global[[:blank:]]+access[[:blank:]]+)[[:digit:]]{8}[[:blank:]]*$/\1'"$(
+      date -u '+%Y%m%d'
+    )/" \
+    -e 's/(%global[[:blank:]]+position[[:blank:]]+)[[:digit:]]+[[:blank:]]*$/\1'"${POSITION}/" \
+    "${SPEC}"
+
+# Download the new tarball
+spectool --get-files --directory "${SRCDIR}" "${SPEC}"
+
+# Update the local git repo and upload the new source tarball
+fedpkg new-sources "$(
+  spectool --list-files "${SPEC}" |
+    grep -E '^Source0:' |
+    sed -r 's|.*/||'
+)"
+git add 'last_commit_position.h' gn.spec
+fedpkg commit -m "Update to version ${POSITION}"
+
+#  vim: tw=78 ts=2 sw=2 sts=2 et ai nojs

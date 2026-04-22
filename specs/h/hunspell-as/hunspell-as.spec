@@ -10,7 +10,7 @@
 Name: hunspell-as
 Summary: Assamese hunspell dictionaries
 Version: 1.0.3
-Release: 35%{?dist}
+Release: 36%{?dist}
 Source: https://downloads.sourceforge.net/project/aoo-extensions/2318/4/as_in.oxt
 URL: https://extensions.openoffice.org/en/project/assamese-dictionaryspell-checker
 License: GPL-2.0-or-later OR LGPL-2.1-or-later OR MPL-1.1

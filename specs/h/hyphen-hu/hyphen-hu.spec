@@ -5,7 +5,7 @@ Name: hyphen-hu
 Summary: Hungarian hyphenation rules
 %global upstreamid 20090612
 Version: 0.%{upstreamid}
-Release: 36%{?dist}
+Release: 37%{?dist}
 # Source URL is dead now
 # Source: http://download.github.com/nagybence-huhyphn-aa3fc85.tar.gz
 Source: nagybence-huhyphn-aa3fc85.tar.gz

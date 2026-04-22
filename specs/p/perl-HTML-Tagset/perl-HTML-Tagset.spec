@@ -9,7 +9,7 @@
 
 Name:           perl-HTML-Tagset
 Version:        3.24
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        HTML::Tagset - data tables useful in parsing HTML
 License:        Artistic-2.0
 URL:            https://metacpan.org/release/HTML-Tagset

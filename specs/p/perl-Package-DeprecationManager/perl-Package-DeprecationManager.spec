@@ -3,7 +3,7 @@
 
 Name:		perl-Package-DeprecationManager
 Version:	0.18
-Release:	7%{?dist}
+Release: 8%{?dist}
 Summary:	Manage deprecation warnings for your distribution
 License:	Artistic-2.0
 URL:		https://metacpan.org/release/Package-DeprecationManager

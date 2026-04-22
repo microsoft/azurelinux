@@ -3,7 +3,7 @@
 
 Name:           perl-Exception-Class
 Version:        1.45
-Release:        13%{?dist}
+Release: 14%{?dist}
 Summary:        Module that allows you to declare real exception classes in Perl
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Exception-Class

@@ -3,7 +3,7 @@
 
 Name:		perl-Convert-BinHex
 Version:	1.125
-Release:	31%{?dist}
+Release: 32%{?dist}
 Summary:	Convert to/from RFC1741 HQX7 (Mac BinHex)
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Convert-BinHex

@@ -4,7 +4,7 @@
 Name:      mythes
 Summary:   A thesaurus library
 Version:   1.2.5
-Release:   9%{?dist}
+Release: 10%{?dist}
 Source:    https://github.com/hunspell/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.xz
 URL:       https://github.com/hunspell/mythes
 License:   BSD-3-Clause-Modification AND MIT

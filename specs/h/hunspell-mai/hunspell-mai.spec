@@ -10,7 +10,7 @@
 Name: hunspell-mai
 Summary: Maithili hunspell dictionaries
 Version: 1.0.1
-Release: 33%{?dist}
+Release: 34%{?dist}
 Source: https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/bhashaghar/mai_IN.oxt
 URL: https://code.google.com/archive/p/bhashaghar/wikis/Maithili.wiki
 License: GPL-2.0-or-later OR LGPL-2.1-or-later OR MPL-1.1

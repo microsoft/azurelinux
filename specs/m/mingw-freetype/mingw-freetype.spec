@@ -6,7 +6,7 @@
 Name:           mingw-freetype
 # NOTE See comment for Patch2 below
 Version:        2.13.3
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Free and portable font rendering engine
 
 License:        FTL OR GPL-2.0-or-later

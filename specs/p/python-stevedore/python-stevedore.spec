@@ -12,7 +12,7 @@
 
 Name:           python-stevedore
 Version:        5.3.0
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        Manage dynamic plugins for Python applications
 
 Group:          Development/Languages

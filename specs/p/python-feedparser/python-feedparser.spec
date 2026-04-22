@@ -5,7 +5,7 @@
 
 Name:           python-feedparser
 Version:        6.0.12
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Parse RSS and Atom feeds in Python
 
 # Automatically converted from old format: BSD - review is highly recommended.

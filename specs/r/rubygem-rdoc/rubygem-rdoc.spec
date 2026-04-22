@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 6.4.0
-Release: 208%{?dist}
+Release: 209%{?dist}
 Summary: RDoc produces HTML and command-line documentation for Ruby projects
 # BSD-3-Clause: lib/rdoc/generator/darkfish.rb
 # CC-BY-2.5: lib/rdoc/generator/template/darkfish/images/loadingAnimation.gif

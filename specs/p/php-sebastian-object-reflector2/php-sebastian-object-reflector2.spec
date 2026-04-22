@@ -27,7 +27,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
 Version:        2.0.4
-Release:        13%{?dist}
+Release: 14%{?dist}
 Summary:        Allows reflection of object attributes, version %{major}
 
 License:        BSD-3-Clause

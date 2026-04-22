@@ -3,7 +3,7 @@
 
 Name:           perl-Bit-Vector
 Version:        7.4
-Release:        39%{?dist}
+Release: 40%{?dist}
 Summary:        Efficient bit vector, set of integers and "big int" math library
 # Outdated FSF address reported, rt#85827
 # Clarified by a private mail from the author:

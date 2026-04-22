@@ -3,7 +3,7 @@
 
 Name:		perl-ExtUtils-Helpers
 Version:	0.028
-Release:	3%{?dist}
+Release: 4%{?dist}
 Summary:	Various portability utilities for module builders
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/ExtUtils-Helpers

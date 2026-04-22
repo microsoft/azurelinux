@@ -3,7 +3,7 @@
 
 Name:           perl-Log-Trace
 Version:        1.070
-Release:        47%{?dist}
+Release: 48%{?dist}
 License:        GPL-2.0-or-later
 Summary:        A unified approach to tracing
 Source:         https://cpan.metacpan.org/authors/id/B/BB/BBC/Log-Trace-%{version}.tar.gz

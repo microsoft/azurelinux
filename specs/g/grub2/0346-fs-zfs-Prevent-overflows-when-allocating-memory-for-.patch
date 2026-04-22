@@ -1,0 +1,40 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Lidong Chen <lidong.chen@oracle.com>
+Date: Wed, 22 Jan 2025 07:17:03 +0000
+Subject: [PATCH] fs/zfs: Prevent overflows when allocating memory for arrays
+
+Use grub_calloc() when allocating memory for arrays to ensure proper
+overflow checks are in place.
+
+Signed-off-by: Lidong Chen <lidong.chen@oracle.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/fs/zfs/zfs.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/grub-core/fs/zfs/zfs.c b/grub-core/fs/zfs/zfs.c
+index 2f303d655..9ab7bf319 100644
+--- a/grub-core/fs/zfs/zfs.c
++++ b/grub-core/fs/zfs/zfs.c
+@@ -723,8 +723,8 @@ fill_vdev_info_real (struct grub_zfs_data *data,
+ 	{
+ 	  fill->n_children = nelm;
+ 
+-	  fill->children = grub_zalloc (fill->n_children
+-					* sizeof (fill->children[0]));
++	  fill->children = grub_calloc (fill->n_children,
++					sizeof (fill->children[0]));
+ 	}
+ 
+       for (i = 0; i < nelm; i++)
+@@ -3712,8 +3712,8 @@ zfs_mount (grub_device_t dev)
+ #endif
+ 
+   data->n_devices_allocated = 16;
+-  data->devices_attached = grub_malloc (sizeof (data->devices_attached[0])
+-					* data->n_devices_allocated);
++  data->devices_attached = grub_calloc (data->n_devices_allocated,
++					sizeof (data->devices_attached[0]));
+   data->n_devices_attached = 0;
+   err = scan_disk (dev, data, 1, &inserted);
+   if (err)

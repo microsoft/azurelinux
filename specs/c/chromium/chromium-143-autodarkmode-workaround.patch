@@ -1,0 +1,26 @@
+Workaround auto darkmode issue, image are not inverted correctly in darkmode
+
+diff -up chromium-143.0.7499.40/third_party/blink/renderer/platform/graphics/dark_mode_image_classifier.cc.than chromium-143.0.7499.40/third_party/blink/renderer/platform/graphics/dark_mode_image_classifier.cc
+--- chromium-143.0.7499.40/third_party/blink/renderer/platform/graphics/dark_mode_image_classifier.cc.than	2025-12-09 12:28:52.592092242 +0100
++++ chromium-143.0.7499.40/third_party/blink/renderer/platform/graphics/dark_mode_image_classifier.cc	2025-12-09 12:42:57.776716951 +0100
+@@ -276,16 +276,20 @@ DarkModeResult DarkModeImageClassifier::
+   float high_color_count_threshold =
+       kHighColorCountThreshold[features.is_colorful];
+ 
++#if 0
+   // Very few colors means it's not a photo, apply the filter.
+   if (features.color_buckets_ratio < low_color_count_threshold)
+     return DarkModeResult::kApplyFilter;
++#endif
+ 
+   // Too many colors means it's probably photorealistic, do not apply it.
+   if (features.color_buckets_ratio > high_color_count_threshold)
+     return DarkModeResult::kDoNotApplyFilter;
+ 
++#if 0
+   // In-between, decision tree cannot give a precise result.
+   return DarkModeResult::kNotClassified;
++#endif
+ }
+ 
+ }  // namespace blink

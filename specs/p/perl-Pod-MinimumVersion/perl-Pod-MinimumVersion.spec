@@ -3,7 +3,7 @@
 
 Name:           perl-Pod-MinimumVersion
 Version:        50
-Release:        43%{?dist}
+Release: 44%{?dist}
 Summary:        Perl version for POD directives used
 License:        GPL-3.0-or-later
 URL:            https://metacpan.org/release/Pod-MinimumVersion

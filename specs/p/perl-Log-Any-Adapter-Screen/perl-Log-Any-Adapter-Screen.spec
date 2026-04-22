@@ -3,7 +3,7 @@
 
 Name:           perl-Log-Any-Adapter-Screen
 Version:        0.141
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Send logs to screen, with colors and some other features
 
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

@@ -1,0 +1,30 @@
+diff -rupN --no-dereference devscripts/po4a/Makefile devscripts-new/po4a/Makefile
+--- devscripts/po4a/Makefile	2025-11-19 14:26:51.000000000 +0100
++++ devscripts-new/po4a/Makefile	2025-12-30 09:38:39.964840274 +0100
+@@ -36,7 +36,7 @@ clean: ../doc/devscripts.7
+ %.1:: %.dbk translate
+ 	mkdir -p $(LANGS)
+ 	xsltproc --nonet -o $@ \
+-	  /usr/share/sgml/docbook/stylesheet/xsl/nwalsh/manpages/docbook.xsl $<
++	  /usr/share/sgml/docbook/xsl-stylesheets/manpages/docbook.xsl $<
+ %.5:: %.pl translate
+ 	-podchecker $<
+ 	pod2man --utf8 --center=" " --release="$(DESC_$(dir $@))" $< > $@
+@@ -46,4 +46,4 @@ clean: ../doc/devscripts.7
+ %.5:: %.dbk translate
+ 	mkdir -p $(LANGS)
+ 	xsltproc --nonet -o $@ \
+-	  /usr/share/sgml/docbook/stylesheet/xsl/nwalsh/manpages/docbook.xsl $<
++	  /usr/share/sgml/docbook/xsl-stylesheets/manpages/docbook.xsl $<
+diff -rupN --no-dereference devscripts/scripts/Makefile devscripts-new/scripts/Makefile
+--- devscripts/scripts/Makefile	2025-12-11 11:09:21.000000000 +0100
++++ devscripts-new/scripts/Makefile	2025-12-30 09:38:39.965173817 +0100
+@@ -99,7 +99,7 @@ endif
+ 	pod2man --utf8 --center=" " --release="Debian Utilities" --section=5 $< > $@
+ %.1: %.dbk
+ 	xsltproc --nonet -o $@ \
+-	  /usr/share/sgml/docbook/stylesheet/xsl/nwalsh/manpages/docbook.xsl $<
++	  /usr/share/sgml/docbook/xsl-stylesheets/manpages/docbook.xsl $<
+ 
+ # Syntax checker
+ test_sh: $(SH_CHECKS)

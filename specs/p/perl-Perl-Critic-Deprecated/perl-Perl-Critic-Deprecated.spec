@@ -3,7 +3,7 @@
 
 Name:           perl-Perl-Critic-Deprecated
 Version:        1.119
-Release:        33%{?dist}
+Release: 34%{?dist}
 Summary:        Perl::Critic policies that have been superseded by others
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Perl-Critic-Deprecated

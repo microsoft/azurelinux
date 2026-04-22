@@ -7,7 +7,7 @@
 
 Name:           sysfsutils
 Version:        2.1.1
-Release:        11%{?dist}
+Release: 12%{?dist}
 Summary:        Utilities for interfacing with sysfs
 URL:            https://github.com/linux-ras/sysfsutils
 License:        GPL-2.0-only

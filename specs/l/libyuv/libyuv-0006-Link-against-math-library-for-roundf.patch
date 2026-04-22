@@ -1,0 +1,24 @@
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Wed, 5 Jun 2024 20:52:19 +0200
+Subject: [PATCH] Link against math library for roundf
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 0e4c79db..b6a19a09 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -130,11 +130,11 @@ TARGET_LINK_LIBRARIES  ( cpuid ${ly_lib_shared} )
+ 
+ # this creates the conversion tool
+ ADD_EXECUTABLE			( yuvconvert ${ly_base_dir}/util/yuvconvert.cc )
+-TARGET_LINK_LIBRARIES	( yuvconvert ${ly_lib_shared} )
++TARGET_LINK_LIBRARIES	( yuvconvert ${ly_lib_shared} m )
+ 
+ # this creates the yuvconstants tool
+ ADD_EXECUTABLE      ( yuvconstants ${ly_base_dir}/util/yuvconstants.c )
+-TARGET_LINK_LIBRARIES  ( yuvconstants ${ly_lib_shared} )
++TARGET_LINK_LIBRARIES  ( yuvconstants ${ly_lib_shared} m )
+ 
+ find_package ( JPEG )
+ if (JPEG_FOUND)

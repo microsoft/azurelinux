@@ -6,7 +6,7 @@
 
 Name:           perl-File-ShareDir
 Version:        1.118
-Release:        14%{?dist}
+Release: 15%{?dist}
 Summary:        Locate per-dist and per-module shared files
 # other files:              GPL+ or Artistic
 ## not in binary packages

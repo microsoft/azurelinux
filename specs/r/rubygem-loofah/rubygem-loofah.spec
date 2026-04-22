@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 2.22.0
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary: Manipulate and transform HTML/XML documents and fragments
 License: MIT
 URL: https://github.com/flavorjones/loofah

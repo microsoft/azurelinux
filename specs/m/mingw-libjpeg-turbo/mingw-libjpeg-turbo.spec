@@ -9,7 +9,7 @@
 
 Name:           mingw-libjpeg-turbo
 Version:        3.1.2
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        MinGW Windows Libjpeg-turbo library
 
 License:        Zlib AND BSD-3-Clause AND MIT AND IJG

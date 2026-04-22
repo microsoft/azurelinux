@@ -3,7 +3,7 @@
 
 Name:           pari-nflistdata
 Version:        20220729
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        PARI/GP Computer Algebra System nflist extensions
 License:        GPL-2.0-or-later
 URL:            https://pari.math.u-bordeaux.fr/packages.html

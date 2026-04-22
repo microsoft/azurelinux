@@ -1,0 +1,13 @@
+diff -up chromium-134.0.6998.23/base/containers/to_value_list.h.me chromium-134.0.6998.23/base/containers/to_value_list.h
+--- chromium-134.0.6998.23/base/containers/to_value_list.h.me	2025-02-23 22:39:33.369668072 +0100
++++ chromium-134.0.6998.23/base/containers/to_value_list.h	2025-02-23 22:42:42.653990901 +0100
+@@ -36,8 +36,7 @@ Value::List ToValueList(Range&& range, P
+   auto container = Value::List::with_capacity(std::ranges::size(range));
+   std::ranges::for_each(
+       std::forward<Range>(range),
+-      [&]<typename T>(T&& value) { container.Append(std::forward<T>(value)); },
+-      std::move(proj));
++      [&](auto&& value) { container.Append(std::invoke(proj, std::forward<decltype(*std::ranges::begin(range))>(value))); });
+   return container;
+ }
+ 

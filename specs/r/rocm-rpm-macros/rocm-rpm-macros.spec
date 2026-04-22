@@ -3,7 +3,7 @@
 
 Name:           rocm-rpm-macros
 Version:        6.4.2
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        ROCm RPM macros
 License:        GPL-2.0-or-later
 

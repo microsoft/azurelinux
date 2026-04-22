@@ -4,7 +4,7 @@
 Summary: Multimedia framework api
 Name:    phonon
 Version: 4.12.0
-Release: 10%{?dist}
+Release: 11%{?dist}
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.
 License: LicenseRef-Callaway-LGPLv2+
 URL:     https://community.kde.org/Phonon

@@ -1,0 +1,57 @@
+.TH JFLEX "1" "October 2005"
+.SH NAME
+jflex \- a lexical analyzer generator (also known as scanner generator) for Java
+.SH SYNOPSIS
+.B jflex
+\fI<options> <input-files>\fR
+.SH DESCRIPTION
+JFlex is a lexical analyzer generator (also known as scanner generator) for Java(tm), written in Java(tm). It is also a rewrite of the very useful tool JLex. JFlex is designed to work together with the LALR parser generator CUP, and the Java modification of Berkeley Yacc BYacc/J. It can also be used together with other parser generators like ANTLR or as a standalone tool. 
+
+.SH OPTIONS
+.TP
+\fB\-d\fR <directory>
+write generated file to <directory>
+.TP
+\fB\-\-skel\fR <file>
+use external skeleton <file>
+.TP
+\fB\-\-switch\fR, \fB\-\-table\fR, \fB\-\-pack\fR
+set default code generation method
+.TP
+\fB\-\-jlex\fR
+strict JLex compatibility
+.TP
+\fB\-\-nomin\fR
+skip minimization step
+.TP
+\fB\-\-nobak\fR
+don't create backup files
+.TP
+\fB\-\-dump\fR
+display transition tables
+.TP
+\fB\-\-dot\fR
+write graphviz .dot files for the generated automata (alpha)
+.TP
+\fB\-\-verbose\fR, \fB\-v\fR
+display generation progress messages (default)
+.TP
+\fB\-\-quiet\fR, \fB\-q\fR
+display errors only
+.TP
+\fB\-\-time\fR
+display generation time statistics
+.TP
+\fB\-\-version\fR
+print the version number of this copy of jflex
+.TP
+\fB\-\-info\fR
+print system + JDK information
+.TP
+\fB\-\-help\fR, \fB\-h\fR
+print this message
+.PP
+
+.SH AUTHOR
+This manual page was written by Wolfgang Baer <WBaer@gmx.de>,
+for the Debian project (but may be used by others).

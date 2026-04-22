@@ -31,7 +31,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
 Version:        3.0.6
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Diff implementation, version %{major}
 
 License:        BSD-3-Clause

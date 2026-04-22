@@ -18,7 +18,7 @@
 Name: corosync
 Summary: The Corosync Cluster Engine and Application Programming Interfaces
 Version: 3.1.10
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: BSD-3-Clause
 URL: http://corosync.github.io/corosync/
 Source0: https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-%{version}%{?gittarver}.tar.gz

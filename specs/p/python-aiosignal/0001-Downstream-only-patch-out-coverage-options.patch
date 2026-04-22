@@ -1,0 +1,33 @@
+From 91b111d74eaba1c7807d37894a176f020e561f2f Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Sat, 5 Jul 2025 07:22:14 -0400
+Subject: [PATCH 1/2] Downstream-only: patch out coverage options
+
+https://docs.fedoraproject.org/en-US/packaging-guidelines/Python/#_linters
+---
+ pytest.ini | 9 ---------
+ 1 file changed, 9 deletions(-)
+
+diff --git a/pytest.ini b/pytest.ini
+index 4ddbcd2..665597e 100644
+--- a/pytest.ini
++++ b/pytest.ini
+@@ -18,15 +18,6 @@ addopts =
+   # https://docs.pytest.org/en/stable/doctest.html
+   --doctest-modules
+ 
+-  # Pre-load the `pytest-cov` plugin early:
+-  -p pytest_cov
+-
+-  # `pytest-cov`:
+-  --cov
+-  --cov-config=.coveragerc
+-  --cov-context=test
+-  --no-cov-on-fail
+-
+   # Fail on config parsing warnings:
+   # --strict-config
+ 
+-- 
+2.50.0
+

@@ -1,0 +1,56 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alec Brown <alec.r.brown@oracle.com>
+Date: Wed, 5 Feb 2025 22:04:08 +0000
+Subject: [PATCH] loader/i386/bsd: Use safe math to avoid underflow
+
+The operation kern_end - kern_start may underflow when we input it into
+grub_relocator_alloc_chunk_addr() call. To avoid this we can use safe
+math for this subtraction.
+
+Fixes: CID 73845
+
+Signed-off-by: Alec Brown <alec.r.brown@oracle.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/loader/i386/bsd.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/grub-core/loader/i386/bsd.c b/grub-core/loader/i386/bsd.c
+index 8075ac9b0..50f96ea7a 100644
+--- a/grub-core/loader/i386/bsd.c
++++ b/grub-core/loader/i386/bsd.c
+@@ -1341,6 +1341,7 @@ static grub_err_t
+ grub_bsd_load_elf (grub_elf_t elf, const char *filename)
+ {
+   grub_err_t err;
++  grub_size_t sz;
+ 
+   kern_end = 0;
+   kern_start = ~0;
+@@ -1371,8 +1372,11 @@ grub_bsd_load_elf (grub_elf_t elf, const char *filename)
+ 
+       if (grub_errno)
+ 	return grub_errno;
+-      err = grub_relocator_alloc_chunk_addr (relocator, &ch,
+-					     kern_start, kern_end - kern_start);
++
++      if (grub_sub (kern_end, kern_start, &sz))
++	return grub_error (GRUB_ERR_OUT_OF_RANGE, "underflow detected while determining size of kernel for relocator");
++
++      err = grub_relocator_alloc_chunk_addr (relocator, &ch, kern_start, sz);
+       if (err)
+ 	return err;
+ 
+@@ -1432,8 +1436,10 @@ grub_bsd_load_elf (grub_elf_t elf, const char *filename)
+       {
+ 	grub_relocator_chunk_t ch;
+ 
+-	err = grub_relocator_alloc_chunk_addr (relocator, &ch, kern_start,
+-					       kern_end - kern_start);
++	if (grub_sub (kern_end, kern_start, &sz))
++	  return grub_error (GRUB_ERR_OUT_OF_RANGE, "underflow detected while determining size of kernel for relocator");
++
++	err = grub_relocator_alloc_chunk_addr (relocator, &ch, kern_start, sz);
+ 	if (err)
+ 	  return err;
+ 	kern_chunk_src = get_virtual_current_address (ch);

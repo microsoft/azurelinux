@@ -23,7 +23,7 @@
 Summary: GTK+ graphical user interface library
 Name: gtk2
 Version: 2.24.33
-Release: 24%{?dist}
+Release: 26%{?dist}
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.
 License: LicenseRef-Callaway-LGPLv2+
 URL: http://www.gtk.org
@@ -342,6 +342,9 @@ mkdir -p $RPM_BUILD_ROOT%{_libdir}/gtk-2.0/%{bin_version}/filesystems
 %doc tmpdocs/examples
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.24.33-25
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Sun Oct 12 2025 Yaakov Selkowitz <yselkowi@redhat.com> - 2.24.33-24
 - Fix trigger scriptlets for flatpak builds
 

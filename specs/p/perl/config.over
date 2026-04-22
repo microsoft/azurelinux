@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# https://en.wikipedia.org/wiki/Fedora_Linux_release_history
+case "$osname" in
+  linux)
+      osvers=6.11.0
+      osdesc="#1 smp preempt_dynamic $osvers"
+      os=gnulinux
+      ;;
+esac
+
+# set configuration time
+cf_time=$(LC_ALL=C date --utc -d @$SOURCE_DATE_EPOCH)
+
+# set generic information for reproducibility
+myhostname=localhost
+mydomain=
+machine_uname=$(uname -m | tr '[A-Z]' '[a-z]' | sed -e "s,['/],,g")
+
+if [ -n "$osdesc" ]; then
+  myuname="$osname $myhostname $osvers $osdesc $machine_uname $os "
+fi

@@ -17,7 +17,7 @@
 
 Name:           mod_perl
 Version:        2.0.13
-Release:        11%{?dist}
+Release: 12%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 # other files:                  ASL 2.0
 ## Not in binary packages

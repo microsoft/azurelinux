@@ -3,7 +3,7 @@
 
 Name:           libgsasl
 Version:        1.10.0
-Release:        14%{?dist}
+Release: 15%{?dist}
 Summary:        GNU SASL library
 License:        LGPL-2.1-or-later
 URL:            https://www.gnu.org/software/gsasl/

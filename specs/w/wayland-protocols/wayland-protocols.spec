@@ -6,7 +6,7 @@
 
 Name:           wayland-protocols
 Version:        1.47
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Wayland protocols that adds functionality not available in the core protocol
 
 License:        MIT

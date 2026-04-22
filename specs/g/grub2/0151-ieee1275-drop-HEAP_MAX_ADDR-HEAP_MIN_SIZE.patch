@@ -1,0 +1,46 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Daniel Axtens <dja@axtens.net>
+Date: Wed, 14 Apr 2021 20:10:23 +1000
+Subject: [PATCH] ieee1275: drop HEAP_MAX_ADDR, HEAP_MIN_SIZE
+
+HEAP_MAX_ADDR is confusing. Currently it is set to 32MB, except
+on ieee1275 on x86, where it is 64MB.
+
+There is a comment which purports to explain it:
+
+/* If possible, we will avoid claiming heap above this address, because it
+   seems to cause relocation problems with OSes that link at 4 MiB */
+
+This doesn't make a lot of sense when the constants are well above 4MB
+already. It was not always this way. Prior to
+commit 7b5d0fe4440c ("Increase heap limit") in 2010, HEAP_MAX_SIZE and
+HEAP_MAX_ADDR were indeed 4MB. However, when the constants were increased
+the comment was left unchanged.
+
+It's been over a decade. It doesn't seem like we have problems with
+claims over 4MB on powerpc or x86 ieee1275. (sparc does things completely
+differently and never used the constant.)
+
+Drop the constant and the check.
+
+The only use of HEAP_MIN_SIZE was to potentially override the
+HEAP_MAX_ADDR check. It is now unused. Remove it.
+
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+---
+ grub-core/kern/ieee1275/init.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/grub-core/kern/ieee1275/init.c b/grub-core/kern/ieee1275/init.c
+index 85d50e2965f..8ce1a0f09ee 100644
+--- a/grub-core/kern/ieee1275/init.c
++++ b/grub-core/kern/ieee1275/init.c
+@@ -51,7 +51,7 @@
+ #endif
+ #include <grub/lockdown.h>
+ 
+-/* The maximum heap size we're going to claim at boot. Not used by sparc. */
++/* The maximum heap size we're going to claim. Not used by sparc. */
+ #ifdef __i386__
+ #define HEAP_MAX_SIZE		(unsigned long) (64 * 1024 * 1024)
+ #else /* __powerpc__ */

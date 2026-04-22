@@ -1,0 +1,39 @@
+From cbaeb91420794663fcb98390fcdac0eb4c5a7874 Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Mon, 19 Sep 2022 22:47:13 +0000
+Subject: [PATCH 4/4] Bump maven-shared-components from 34 to 37
+
+Bumps [maven-shared-components](https://github.com/apache/maven-parent) from 34 to 37.
+- [Release notes](https://github.com/apache/maven-parent/releases)
+- [Commits](https://github.com/apache/maven-parent/commits)
+
+---
+updated-dependencies:
+- dependency-name: org.apache.maven.shared:maven-shared-components
+  dependency-type: direct:production
+  update-type: version-update:semver-major
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+---
+ pom.xml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/pom.xml b/pom.xml
+index 6994cf0..e2ad996 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -23,8 +23,8 @@
+   <parent>
+     <groupId>org.apache.maven.shared</groupId>
+     <artifactId>maven-shared-components</artifactId>
+-    <version>34</version>
+-    <relativePath>../../pom/maven/maven-shared-components/pom.xml</relativePath>
++    <version>37</version>
++    <relativePath/>
+   </parent>
+ 
+   <artifactId>maven-artifact-transfer</artifactId>
+-- 
+2.48.1
+

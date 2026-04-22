@@ -3,7 +3,7 @@
 
 Name:           perl-Sub-Infix
 Version:        0.004
-Release:        26%{?dist}
+Release: 27%{?dist}
 Summary:        Create a fake infix operator
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Sub-Infix

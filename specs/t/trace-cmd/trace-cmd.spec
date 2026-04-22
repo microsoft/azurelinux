@@ -9,7 +9,7 @@
 
 Name: trace-cmd
 Version: %{srcversion}
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: LGPL-2.1-only AND LGPL-2.1-or-later AND GPL-2.0-only AND GPL-2.0-or-later
 Summary: A user interface to Ftrace
 

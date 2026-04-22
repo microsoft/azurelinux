@@ -3,7 +3,7 @@
 
 Name:           js-jquery
 Version:        3.7.1
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        JavaScript DOM manipulation, event handling, and AJAX library
 BuildArch:      noarch
 

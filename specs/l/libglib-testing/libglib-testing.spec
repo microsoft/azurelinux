@@ -3,7 +3,7 @@
 
 Name:           libglib-testing
 Version:        0.1.0
-Release:        15%{?dist}
+Release: 16%{?dist}
 Summary:        GLib-based test library and harness
 
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.

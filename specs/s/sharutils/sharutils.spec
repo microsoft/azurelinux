@@ -4,7 +4,7 @@
 Summary:    The GNU shar utilities for packaging and unpackaging shell archives
 Name:       sharutils
 Version:    4.15.2
-Release:    30%{?dist}
+Release: 31%{?dist}
 # The main code:                GPL-3.0-or-later
 # intl/dngettext.c:             LGPL-2.0-or-later
 # lib (gnulib):                 GPL-3.0-or-later

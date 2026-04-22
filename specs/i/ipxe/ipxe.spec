@@ -42,7 +42,7 @@
 
 Name:    ipxe
 Version: %{date}
-Release: 4.git%{hash}%{?dist}
+Release: 5.git%{hash}%{?dist}
 Summary: A network boot loader
 
 License: BSD-2-Clause AND BSD-3-Clause AND GPL-2.0-only AND (GPL-2.0-only OR MPL-1.1) AND GPL-2.0-or-later AND GPL-2.0-or-later WITH UBDL-exception AND ISC AND MIT

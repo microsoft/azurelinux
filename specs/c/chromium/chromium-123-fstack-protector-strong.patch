@@ -1,0 +1,12 @@
+diff -up chromium-123.0.6312.46/build/config/compiler/BUILD.gn.fstack-protector-strong chromium-123.0.6312.46/build/config/compiler/BUILD.gn
+--- chromium-123.0.6312.46/build/config/compiler/BUILD.gn.fstack-protector-strong	2024-03-15 11:46:34.542248116 +0100
++++ chromium-123.0.6312.46/build/config/compiler/BUILD.gn	2024-03-15 11:59:02.970849847 +0100
+@@ -382,7 +382,7 @@ config("compiler") {
+       } else if ((is_posix && !is_chromeos && !is_nacl) || is_fuchsia) {
+         if (current_os != "aix") {
+           # Not available on aix.
+-          cflags += [ "-fstack-protector" ]
++          cflags += [ "-fstack-protector-strong" ]
+         }
+       }
+     }

@@ -31,7 +31,7 @@ glanceclient module), and a command-line script (glance). Each implements \
 Name:             python-glanceclient
 Epoch:            1
 Version:          4.7.0
-Release:          5%{?dist}
+Release: 6%{?dist}
 Summary:          Python API and CLI for OpenStack Glance
 
 License:          Apache-2.0

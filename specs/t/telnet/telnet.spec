@@ -6,7 +6,7 @@
 Summary: The client program for the Telnet remote login protocol
 Name: telnet
 Version: 0.17
-Release: 95%{?dist}
+Release: 96%{?dist}
 Epoch: 1
 License: BSD-3-Clause AND BSD-4-Clause AND BSD-4-Clause-UC
 Source0: ftp://ftp.uk.linux.org/pub/linux/Networking/netkit/netkit-telnet-%{version}.tar.gz

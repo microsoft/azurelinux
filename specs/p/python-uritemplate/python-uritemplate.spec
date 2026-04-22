@@ -8,7 +8,7 @@
 
 Name:           python-%{modname}
 Version:        4.1.1
-Release:        17%{?dist}
+Release: 18%{?dist}
 Summary:        Simple python library to deal with URI Templates (RFC 6570)
 
 License:        BSD-3-Clause OR Apache-2.0

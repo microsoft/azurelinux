@@ -16,7 +16,7 @@ any length.}
 
 Name:           python-%{srcname}
 Version:        6.2.9
-Release:        23%{?dist}
+Release: 24%{?dist}
 Summary:        Python 3 bindings for Berkeley DB
 
 License:        BSD-3-Clause

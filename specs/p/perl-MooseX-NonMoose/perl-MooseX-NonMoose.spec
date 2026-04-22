@@ -10,7 +10,7 @@
 
 Name:           perl-MooseX-NonMoose
 Version:        0.27
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Easy subclassing of non-Moose classes
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/MooseX-NonMoose

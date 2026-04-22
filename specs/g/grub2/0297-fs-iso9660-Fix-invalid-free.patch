@@ -1,0 +1,50 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Michael Chang <mchang@suse.com>
+Date: Fri, 31 May 2024 15:14:42 +0800
+Subject: [PATCH] fs/iso9660: Fix invalid free
+
+The ctx->filename can point to either a string literal or a dynamically
+allocated string. The ctx->filename_alloc field is used to indicate the
+type of allocation.
+
+An issue has been identified where ctx->filename is reassigned to
+a string literal in susp_iterate_dir() but ctx->filename_alloc is not
+correctly handled. This oversight causes a memory leak and an invalid
+free operation later.
+
+The fix involves checking ctx->filename_alloc, freeing the allocated
+string if necessary and clearing ctx->filename_alloc for string literals.
+
+Reported-by: Daniel Axtens <dja@axtens.net>
+Signed-off-by: Michael Chang <mchang@suse.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/fs/iso9660.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/fs/iso9660.c b/grub-core/fs/iso9660.c
+index 8d480e602..8e3c95c4f 100644
+--- a/grub-core/fs/iso9660.c
++++ b/grub-core/fs/iso9660.c
+@@ -628,9 +628,19 @@ susp_iterate_dir (struct grub_iso9660_susp_entry *entry,
+ 	 filename type is stored.  */
+       /* FIXME: Fix this slightly improper cast.  */
+       if (entry->data[0] & GRUB_ISO9660_RR_DOT)
+-	ctx->filename = (char *) ".";
++	{
++	  if (ctx->filename_alloc)
++	    grub_free (ctx->filename);
++	  ctx->filename_alloc = 0;
++	  ctx->filename = (char *) ".";
++	}
+       else if (entry->data[0] & GRUB_ISO9660_RR_DOTDOT)
+-	ctx->filename = (char *) "..";
++	{
++	  if (ctx->filename_alloc)
++	    grub_free (ctx->filename);
++	  ctx->filename_alloc = 0;
++	  ctx->filename = (char *) "..";
++	}
+       else if (entry->len >= 5)
+ 	{
+ 	  grub_size_t off = 0, csize = 1;

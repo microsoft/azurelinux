@@ -3,7 +3,7 @@
 
 Name:           perl-MIME-Base32
 Version:        1.303
-Release:        24%{?dist}
+Release: 25%{?dist}
 Summary:        Base32 encoder / decoder
 # Automatically converted from old format: GPL+ or Artistic - review is highly recommended.
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

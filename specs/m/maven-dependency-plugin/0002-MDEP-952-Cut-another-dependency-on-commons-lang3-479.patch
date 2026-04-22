@@ -1,0 +1,52 @@
+From 250f3078fc1e39f02cb82ad2cf225b99e760361a Mon Sep 17 00:00:00 2001
+From: Elliotte Rusty Harold <elharo@users.noreply.github.com>
+Date: Tue, 19 Nov 2024 12:35:34 +0000
+Subject: [PATCH 2/2] [MDEP-952] Cut another dependency on commons-lang3 (#479)
+
+* Cut another dependency on commons-lang3
+---
+ .../java/org/apache/maven/plugins/dependency/GetMojo.java  | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/src/main/java/org/apache/maven/plugins/dependency/GetMojo.java b/src/main/java/org/apache/maven/plugins/dependency/GetMojo.java
+index 159b775b..aed89844 100644
+--- a/src/main/java/org/apache/maven/plugins/dependency/GetMojo.java
++++ b/src/main/java/org/apache/maven/plugins/dependency/GetMojo.java
+@@ -24,7 +24,6 @@ import java.util.Map;
+ import java.util.regex.Matcher;
+ import java.util.regex.Pattern;
+ 
+-import org.apache.commons.lang3.StringUtils;
+ import org.apache.maven.artifact.handler.ArtifactHandler;
+ import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
+ import org.apache.maven.artifact.repository.ArtifactRepository;
+@@ -130,7 +129,7 @@ public class GetMojo extends AbstractMojo {
+                     + "e.g. -Dartifact=org.apache.maven.plugins:maven-downloader-plugin:1.0");
+         }
+         if (artifact != null) {
+-            String[] tokens = StringUtils.split(artifact, ":");
++            String[] tokens = artifact.split(":");
+             if (tokens.length < 3 || tokens.length > 5) {
+                 throw new MojoFailureException("Invalid artifact, you must specify "
+                         + "groupId:artifactId:version[:packaging[:classifier]] " + artifact);
+@@ -157,7 +156,7 @@ public class GetMojo extends AbstractMojo {
+ 
+         if (remoteRepositories != null) {
+             // Use the same format as in the deploy plugin id::layout::url
+-            String[] repos = StringUtils.split(remoteRepositories, ",");
++            String[] repos = remoteRepositories.split(",");
+             for (String repo : repos) {
+                 repoList.add(parseRepository(repo, always));
+             }
+@@ -214,7 +213,7 @@ public class GetMojo extends AbstractMojo {
+             }
+ 
+             id = matcher.group(1).trim();
+-            if (!StringUtils.isEmpty(matcher.group(2))) {
++            if (matcher.group(2) != null && !matcher.group(2).isEmpty()) {
+                 layout = getLayout(matcher.group(2).trim());
+             }
+             url = matcher.group(3).trim();
+-- 
+2.47.1
+

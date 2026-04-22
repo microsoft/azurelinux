@@ -8,7 +8,7 @@
 
 Name:           perl-Term-Table
 Version:        0.028
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Format a header and rows into a table
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Term-Table

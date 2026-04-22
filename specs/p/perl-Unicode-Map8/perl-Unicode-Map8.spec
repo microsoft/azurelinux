@@ -3,7 +3,7 @@
 
 Name:           perl-Unicode-Map8
 Version:        0.13
-Release:        52%{?dist}
+Release: 53%{?dist}
 Summary:        Mapping table between 8-bit chars and Unicode for Perl
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Unicode-Map8

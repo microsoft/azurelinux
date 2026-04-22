@@ -25,7 +25,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}
 Version:        1.1.6
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        A small layer on top of triggeFr_error or PSR-3 logging
 
 License:        MIT

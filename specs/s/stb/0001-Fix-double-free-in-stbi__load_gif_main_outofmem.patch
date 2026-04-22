@@ -1,0 +1,28 @@
+From 4a4c1eeb8540c61ceb3456b3277184bc1c63c9be Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jaroslav=20Loba=C4=8Devski?= <jarlob@github.com>
+Date: Thu, 19 Oct 2023 16:16:34 +0200
+Subject: [PATCH 1/2] Fix double-free in stbi__load_gif_main_outofmem
+
+Fixes #1544
+---
+ stb_image.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/stb_image.h b/stb_image.h
+index aac3653..d3a1f59 100644
+--- a/stb_image.h
++++ b/stb_image.h
+@@ -6990,6 +6990,10 @@ static void *stbi__load_gif_main(stbi__context *s, int **delays, int *x, int *y,
+             stride = g.w * g.h * 4;
+ 
+             if (out) {
++               if (stride == 0) {
++                  void *ret = stbi__load_gif_main_outofmem(&g, out, delays);
++                  return ret;
++               }
+                if (!stbi__mul2sizes_valid(layers, stride)) {
+                   void *ret = stbi__load_gif_main_outofmem(&g, out, delays);
+                   return ret;
+-- 
+2.41.0
+

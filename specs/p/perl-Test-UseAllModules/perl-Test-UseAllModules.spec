@@ -3,7 +3,7 @@
 
 Name:           perl-Test-UseAllModules
 Version:        0.17
-Release:        31%{?dist}
+Release: 32%{?dist}
 Summary:        Do use_ok() for all the MANIFESTed modules
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Test-UseAllModules

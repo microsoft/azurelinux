@@ -3,7 +3,7 @@
 
 Name:           perl-generators
 Version:        1.16
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        RPM Perl dependencies generators
 License:        GPL-1.0-or-later
 URL:            http://jplesnik.fedorapeople.org/generators

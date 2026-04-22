@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<service>
+  <short>systemd-journal-remote</short>
+  <description>Journal Remote Sink</description>
+  <port protocol="tcp" port="19532"/>
+</service>

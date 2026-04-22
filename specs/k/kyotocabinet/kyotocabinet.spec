@@ -4,7 +4,7 @@
 Summary:        A straightforward implementation of DBM
 Name:           kyotocabinet
 Version:        1.2.80
-Release:        8%{?dist}
+Release: 9%{?dist}
 License:        GPL-3.0-only
 URL:            https://dbmx.net/%{name}/
 Source:         https://dbmx.net/%{name}/pkg/%{name}-%{version}.tar.gz

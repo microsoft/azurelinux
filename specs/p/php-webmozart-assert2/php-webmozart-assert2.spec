@@ -43,7 +43,7 @@
 
 Name:          php-%{composer_vendor}-%{composer_project}%{major}
 Version:       %{github_version}
-Release:       1%{?github_release}%{?dist}
+Release: 2%{?github_release}%{?dist}
 Summary:       Assertions to validate method input/output with nice error messages
 
 License:       MIT

@@ -1,0 +1,12 @@
+diff -up chromium-143.0.7499.40/third_party/swiftshader/src/Reactor/BUILD.gn.llvm-16 chromium-143.0.7499.40/third_party/swiftshader/src/Reactor/BUILD.gn
+--- chromium-143.0.7499.40/third_party/swiftshader/src/Reactor/BUILD.gn.llvm-16	2025-12-02 23:25:25.379315827 +0100
++++ chromium-143.0.7499.40/third_party/swiftshader/src/Reactor/BUILD.gn	2025-12-02 23:25:58.697291861 +0100
+@@ -307,7 +307,7 @@ if (supports_subzero) {
+ 
+ if (supports_llvm) {
+   swiftshader_source_set("swiftshader_llvm_reactor") {
+-    llvm_dir = "../../third_party/llvm-10.0"
++    llvm_dir = "../../third_party/llvm-16.0"
+ 
+     deps = [
+       ":swiftshader_reactor_base",

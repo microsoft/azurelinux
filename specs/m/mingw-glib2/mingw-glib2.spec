@@ -5,7 +5,7 @@
 
 Name:           mingw-glib2
 Version:        2.86.3
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        MinGW Windows GLib2 library
 
 License:        LGPL-2.0-or-later

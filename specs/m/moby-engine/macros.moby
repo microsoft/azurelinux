@@ -1,0 +1,5 @@
+# Copyright (C) 2024 Maxwell G <maxwell@gtmx.me>
+# Copyright (C) Fedora Project Authors
+# SPDX-License-Identifier: MIT
+
+%moby_cli_plugins_dir %{_libexecdir}/docker/cli-plugins

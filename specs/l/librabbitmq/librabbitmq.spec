@@ -22,7 +22,7 @@
 Name:      %{libname}
 Summary:   Client library for AMQP
 Version:   0.15.0
-Release:   3%{?dist}
+Release: 4%{?dist}
 License:   MIT
 URL:       https://github.com/alanxz/rabbitmq-c
 

@@ -8,7 +8,7 @@
 
 Name:           mingw-atk
 Version:        2.38.0
-Release:        10%{?dist}
+Release: 11%{?dist}
 Summary:        MinGW Windows Atk library
 
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.

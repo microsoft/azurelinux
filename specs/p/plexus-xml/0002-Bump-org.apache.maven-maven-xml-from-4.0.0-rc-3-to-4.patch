@@ -1,0 +1,39 @@
+From 21c1be4b415d3e393344c1333c026801b5a1558e Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Wed, 25 Jun 2025 15:19:57 +0000
+Subject: [PATCH 2/2] Bump org.apache.maven:maven-xml from 4.0.0-rc-3 to
+ 4.0.0-rc-4
+
+Bumps [org.apache.maven:maven-xml](https://github.com/apache/maven) from 4.0.0-rc-3 to 4.0.0-rc-4.
+- [Release notes](https://github.com/apache/maven/releases)
+- [Commits](https://github.com/apache/maven/compare/maven-4.0.0-rc-3...maven-4.0.0-rc-4)
+
+---
+updated-dependencies:
+- dependency-name: org.apache.maven:maven-xml
+  dependency-version: 4.0.0-rc-4
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+---
+ pom.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pom.xml b/pom.xml
+index 97bc775..09b95ac 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -55,7 +55,7 @@ limitations under the License.
+     <dependency>
+       <groupId>org.apache.maven</groupId>
+       <artifactId>maven-xml</artifactId>
+-      <version>4.0.0-rc-2</version>
++      <version>4.0.0-rc-4</version>
+       <exclusions>
+         <exclusion>
+           <groupId>org.eclipse.sisu</groupId>
+-- 
+2.50.1
+

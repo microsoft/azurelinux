@@ -4,7 +4,7 @@
 Summary:	Library for easy parsing of XMP metadata
 Name:		exempi
 Version:	2.6.4
-Release:	8%{?dist}
+Release: 9%{?dist}
 License:	BSD-3-Clause
 URL:		http://libopenraw.freedesktop.org/wiki/Exempi
 Source0:	https://gitlab.freedesktop.org/libopenraw/%{name}/-/archive/%{version}/%{name}-%{version}.tar.bz2

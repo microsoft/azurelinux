@@ -3,7 +3,7 @@
 
 Name:             ansible-pcp
 Version:          2.4.2
-Release:          1%{?dist}
+Release: 2%{?dist}
 Summary:          Ansible Metric collection for Performance Co-Pilot
 License:          MIT
 URL:              https://github.com/performancecopilot/ansible-pcp

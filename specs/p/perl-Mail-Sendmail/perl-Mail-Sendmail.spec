@@ -3,7 +3,7 @@
 
 Name:           perl-Mail-Sendmail
 Version:        0.82
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Simple platform independent mailer for Perl
 
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

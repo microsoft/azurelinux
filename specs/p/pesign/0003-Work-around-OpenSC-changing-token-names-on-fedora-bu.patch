@@ -1,0 +1,61 @@
+From dc17b1d248c705073a5160e7c871a52aa9ce6e99 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 21 Nov 2024 13:58:05 -0500
+Subject: [PATCH] Work around OpenSC changing token names on fedora builders
+ *again*.
+
+Once again OpenSC has changed how token names work in an incompatible
+way, and we need to work around it even harder on the Fedora kernel
+builders.
+
+Reviewed-by: Kevin Fenzi <kevin@fedoraproject.org>
+Reviewed-by: Justin Forbes <jforbes@fedoraproject.org>
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/macros.pesign             |  3 ++-
+ src/pesign-rpmbuild-helper.in | 15 ++++++++++++++-
+ 2 files changed, 16 insertions(+), 2 deletions(-)
+
+diff --git a/src/macros.pesign b/src/macros.pesign
+index b7d6af1f6f5..47e3f19f8ed 100644
+--- a/src/macros.pesign
++++ b/src/macros.pesign
+@@ -9,7 +9,8 @@
+ %__pesign_token %{nil}%{?pe_signing_token:--token "%{pe_signing_token}"}
+ %__pesign_cert %{!?pe_signing_cert:"Red Hat Test Certificate"}%{?pe_signing_cert:"%{pe_signing_cert}"}
+ 
+-%__pesign_client_token %{!?pe_signing_token:"OpenSC Card (Fedora Signer)"}%{?pe_signing_token:"%{pe_signing_token}"}
++# See the comment in pesign-rpmbuild-helper.in about the token name here.
++%__pesign_client_token %{!?pe_signing_token:"OpenSC Card"}%{?pe_signing_token:"%{pe_signing_token}"}
+ %__pesign_client_cert %{!?pe_signing_cert:"/CN=Fedora Secure Boot Signer"}%{?pe_signing_cert:"%{pe_signing_cert}"}
+ 
+ %_pesign /usr/bin/pesign
+diff --git a/src/pesign-rpmbuild-helper.in b/src/pesign-rpmbuild-helper.in
+index 30d5441207b..42de1a1e002 100644
+--- a/src/pesign-rpmbuild-helper.in
++++ b/src/pesign-rpmbuild-helper.in
+@@ -214,7 +214,20 @@ main() {
+ 	rm -rf "${sattrs}" "${sattrs}.sig" "${nssdir}"
+     elif [[ -n "${socket}" ]] ; then
+ 	### welcome haaaaack city
+-	if [[ "${client_token[1]}" = "OpenSC Card (Fedora Signer)" ]] ; then
++	### different versions of the opensc library name the token different
++	### things, and as of this commit:
++	###   https://github.com/OpenSC/OpenSC/commit/259decf656a77a6d1bd3e944d6f198ed70832ff5
++	### that includes just not including the token label unless there's
++	### more than one token.  Unfortunately this is both for the displayed
++	### info and for the token name you specify to /use/ the token, so we
++	### have to handle all of those options here, and change the name to
++	### match whatever the current version of opensc is using in the rpm
++	### macro where we're setting it.  Thankfully this is just a "is this
++	### Fedora" check for us, and if it's RHEL we're not using OpenSC at
++	### all.
++	if [[ "${client_token[1]}" = "OpenSC Card (Fedora Signer)" ]] \
++	    || [[ "${client_token[1]}" = "Fedora Signer" ]] \
++	    || [[ "${client_token[1]}" = "OpenSC Card" ]] ; then
+ 	    if [[ "${input[1]}" =~ (/|^)vmlinuz($|[_.-]) ]] \
+ 	       || [[ "${input[1]}" =~ (/|^)bzImage($|[_.-]) ]] ; then
+ 		if [[ "${rhelcertfile}" =~ redhatsecureboot501.* ]] \
+-- 
+2.47.0
+

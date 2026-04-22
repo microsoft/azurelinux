@@ -6,7 +6,7 @@
 
 Name:           date
 Version:        3.0.4
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Date and time library based on the C++11/14/17 <chrono> header
 
 License:        MIT

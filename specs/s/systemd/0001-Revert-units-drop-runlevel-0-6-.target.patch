@@ -1,0 +1,87 @@
+From 27f4f96c4e56744ecbffec0595236e1441278804 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Zbigniew=20J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>
+Date: Wed, 5 Nov 2025 17:52:16 +0100
+Subject: [PATCH] Revert "units: drop runlevel[0-6].target"
+
+This partially reverts commit e58ba80a40fb6e96543d56774a5bc5aa9cdadbf3.
+The unit are still needed for compat.
+---
+ units/meson.build | 27 ++++++++++++++++++++++-----
+ 1 file changed, 22 insertions(+), 5 deletions(-)
+
+diff --git a/units/meson.build b/units/meson.build
+index 4f47a3b2bd..34b3222f11 100644
+--- a/units/meson.build
++++ b/units/meson.build
+@@ -1,5 +1,7 @@
+ # SPDX-License-Identifier: LGPL-2.1-or-later
+ 
++with_runlevels = conf.get('HAVE_SYSV_COMPAT') == 1
++
+ units = [
+         { 'file' : 'basic.target' },
+         { 'file' : 'blockdev@.target' },
+@@ -49,7 +51,7 @@ units = [
+         },
+         {
+           'file' : 'graphical.target',
+-          'symlinks' : ['default.target'],
++          'symlinks' : ['default.target'] + (with_runlevels ? ['runlevel5.target'] : []),
+         },
+         { 'file' : 'halt.target' },
+         {
+@@ -142,14 +144,20 @@ units = [
+           'conditions' : ['ENABLE_MACHINED'],
+         },
+         { 'file' : 'modprobe@.service' },
+-        { 'file' : 'multi-user.target' },
++        {
++          'file' : 'multi-user.target',
++          'symlinks' : with_runlevels ? ['runlevel2.target', 'runlevel3.target', 'runlevel4.target'] : [],
++        },
+         { 'file' : 'network-online.target' },
+         { 'file' : 'network-pre.target' },
+         { 'file' : 'network.target' },
+         { 'file' : 'nss-lookup.target' },
+         { 'file' : 'nss-user-lookup.target' },
+         { 'file' : 'paths.target' },
+-        { 'file' : 'poweroff.target' },
++        {
++          'file' : 'poweroff.target',
++          'symlinks' : with_runlevels ? ['runlevel0.target'] : [],
++        },
+         { 'file' : 'printer.target' },
+         {
+           'file' : 'proc-sys-fs-binfmt_misc.automount',
+@@ -174,7 +182,7 @@ units = [
+         },
+         {
+           'file' : 'reboot.target',
+-          'symlinks' : ['ctrl-alt-del.target'],
++          'symlinks' : ['ctrl-alt-del.target'] + (with_runlevels ? ['runlevel6.target'] : []),
+         },
+         {
+           'file' : 'remote-cryptsetup.target',
+@@ -194,7 +202,10 @@ units = [
+           'symlinks' : ['initrd-root-device.target.wants/'],
+         },
+         { 'file' : 'rescue.service.in' },
+-        { 'file' : 'rescue.target' },
++        {
++          'file' : 'rescue.target',
++          'symlinks' : with_runlevels ? ['runlevel1.target'] : [],
++        },
+         { 'file' : 'rpcbind.target' },
+         { 'file' : 'serial-getty@.service.in' },
+         { 'file' : 'shutdown.target' },
+@@ -972,4 +983,10 @@ else
+                             dbussessionservicedir / 'org.freedesktop.systemd1.service'))
+ endif
+ 
++if conf.get('HAVE_SYSV_COMPAT') == 1
++        foreach i : [1, 2, 3, 4, 5]
++                install_emptydir(systemunitdir / 'runlevel@0@.target.wants'.format(i))
++        endforeach
++endif
++
+ subdir('user')

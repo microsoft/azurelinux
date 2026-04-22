@@ -1,0 +1,171 @@
+From af8542b406e06808ee416c93f2b2c550c688e9f5 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Wed, 23 Aug 2023 20:19:06 +0200
+Subject: [PATCH 1/2] Port ITs to Maven Verifier 2.0.0~M1
+
+---
+ .../test/java/org/apache/its/IT_000_BasicArchiveCreation.java | 4 ++--
+ .../org/apache/its/IT_001_ExcludeBuildOutputDirectory.java    | 4 ++--
+ .../its/IT_002_IncludeSrcDirWithBuildOutputDirName.java       | 4 ++--
+ .../java/org/apache/its/IT_003_SharedResourceInclusion.java   | 4 ++--
+ .../src/test/java/org/apache/its/IT_004_IdeExcludes.java      | 4 ++--
+ .../java/org/apache/its/IT_005_MiscellaneousExcludes.java     | 4 ++--
+ .../src/test/java/org/apache/its/IT_006_CiExcludes.java       | 4 ++--
+ .../org/apache/its/IT_ExcludeSrcDirWithinBuildOutputDir.java  | 4 ++--
+ .../java/org/apache/its/IT_IncludeIdeFilesWithinSrcDir.java   | 4 ++--
+ .../src/test/java/org/apache/its/IT_ZipAndTarCreation.java    | 4 ++--
+ 10 files changed, 20 insertions(+), 20 deletions(-)
+
+diff --git a/source-release/src/test/java/org/apache/its/IT_000_BasicArchiveCreation.java b/source-release/src/test/java/org/apache/its/IT_000_BasicArchiveCreation.java
+index effd007..d2bf3d4 100644
+--- a/source-release/src/test/java/org/apache/its/IT_000_BasicArchiveCreation.java
++++ b/source-release/src/test/java/org/apache/its/IT_000_BasicArchiveCreation.java
+@@ -26,8 +26,8 @@ import java.util.HashSet;
+ import java.util.Set;
+ 
+ import junit.framework.Assert;
+-import org.apache.maven.it.VerificationException;
+-import org.apache.maven.it.Verifier;
++import org.apache.maven.shared.verifier.VerificationException;
++import org.apache.maven.shared.verifier.Verifier;
+ import org.junit.Test;
+ 
+ import static org.apache.its.util.TestUtils.archivePathFromChild;
+diff --git a/source-release/src/test/java/org/apache/its/IT_001_ExcludeBuildOutputDirectory.java b/source-release/src/test/java/org/apache/its/IT_001_ExcludeBuildOutputDirectory.java
+index 966a8bc..b1353ff 100644
+--- a/source-release/src/test/java/org/apache/its/IT_001_ExcludeBuildOutputDirectory.java
++++ b/source-release/src/test/java/org/apache/its/IT_001_ExcludeBuildOutputDirectory.java
+@@ -24,8 +24,8 @@ import java.net.URISyntaxException;
+ import java.util.HashSet;
+ import java.util.Set;
+ 
+-import org.apache.maven.it.VerificationException;
+-import org.apache.maven.it.Verifier;
++import org.apache.maven.shared.verifier.VerificationException;
++import org.apache.maven.shared.verifier.Verifier;
+ import org.junit.Test;
+ 
+ import static org.apache.its.util.TestUtils.archivePathFromChild;
+diff --git a/source-release/src/test/java/org/apache/its/IT_002_IncludeSrcDirWithBuildOutputDirName.java b/source-release/src/test/java/org/apache/its/IT_002_IncludeSrcDirWithBuildOutputDirName.java
+index 3adbdab..0c9af50 100644
+--- a/source-release/src/test/java/org/apache/its/IT_002_IncludeSrcDirWithBuildOutputDirName.java
++++ b/source-release/src/test/java/org/apache/its/IT_002_IncludeSrcDirWithBuildOutputDirName.java
+@@ -24,8 +24,8 @@ import java.net.URISyntaxException;
+ import java.util.HashSet;
+ import java.util.Set;
+ 
+-import org.apache.maven.it.VerificationException;
+-import org.apache.maven.it.Verifier;
++import org.apache.maven.shared.verifier.VerificationException;
++import org.apache.maven.shared.verifier.Verifier;
+ import org.junit.Test;
+ 
+ import static org.apache.its.util.TestUtils.archivePathFromChild;
+diff --git a/source-release/src/test/java/org/apache/its/IT_003_SharedResourceInclusion.java b/source-release/src/test/java/org/apache/its/IT_003_SharedResourceInclusion.java
+index 3e90d5b..de54608 100644
+--- a/source-release/src/test/java/org/apache/its/IT_003_SharedResourceInclusion.java
++++ b/source-release/src/test/java/org/apache/its/IT_003_SharedResourceInclusion.java
+@@ -24,8 +24,8 @@ import java.net.URISyntaxException;
+ import java.util.HashSet;
+ import java.util.Set;
+ 
+-import org.apache.maven.it.VerificationException;
+-import org.apache.maven.it.Verifier;
++import org.apache.maven.shared.verifier.VerificationException;
++import org.apache.maven.shared.verifier.Verifier;
+ import org.junit.Test;
+ 
+ import static org.apache.its.util.TestUtils.archivePathFromChild;
+diff --git a/source-release/src/test/java/org/apache/its/IT_004_IdeExcludes.java b/source-release/src/test/java/org/apache/its/IT_004_IdeExcludes.java
+index 760899a..e5b780f 100644
+--- a/source-release/src/test/java/org/apache/its/IT_004_IdeExcludes.java
++++ b/source-release/src/test/java/org/apache/its/IT_004_IdeExcludes.java
+@@ -25,8 +25,8 @@ import java.util.Collections;
+ import java.util.HashSet;
+ import java.util.Set;
+ 
+-import org.apache.maven.it.VerificationException;
+-import org.apache.maven.it.Verifier;
++import org.apache.maven.shared.verifier.VerificationException;
++import org.apache.maven.shared.verifier.Verifier;
+ import org.junit.Test;
+ 
+ import static org.apache.its.util.TestUtils.archivePathFromChild;
+diff --git a/source-release/src/test/java/org/apache/its/IT_005_MiscellaneousExcludes.java b/source-release/src/test/java/org/apache/its/IT_005_MiscellaneousExcludes.java
+index cb584c1..e692a95 100644
+--- a/source-release/src/test/java/org/apache/its/IT_005_MiscellaneousExcludes.java
++++ b/source-release/src/test/java/org/apache/its/IT_005_MiscellaneousExcludes.java
+@@ -25,8 +25,8 @@ import java.util.Collections;
+ import java.util.HashSet;
+ import java.util.Set;
+ 
+-import org.apache.maven.it.VerificationException;
+-import org.apache.maven.it.Verifier;
++import org.apache.maven.shared.verifier.VerificationException;
++import org.apache.maven.shared.verifier.Verifier;
+ import org.junit.Test;
+ 
+ import static org.apache.its.util.TestUtils.archivePathFromChild;
+diff --git a/source-release/src/test/java/org/apache/its/IT_006_CiExcludes.java b/source-release/src/test/java/org/apache/its/IT_006_CiExcludes.java
+index 5a5d0bd..9c5f406 100644
+--- a/source-release/src/test/java/org/apache/its/IT_006_CiExcludes.java
++++ b/source-release/src/test/java/org/apache/its/IT_006_CiExcludes.java
+@@ -25,8 +25,8 @@ import java.util.Collections;
+ import java.util.HashSet;
+ import java.util.Set;
+ 
+-import org.apache.maven.it.VerificationException;
+-import org.apache.maven.it.Verifier;
++import org.apache.maven.shared.verifier.VerificationException;
++import org.apache.maven.shared.verifier.Verifier;
+ import org.junit.Test;
+ 
+ import static org.apache.its.util.TestUtils.archivePathFromProject;
+diff --git a/source-release/src/test/java/org/apache/its/IT_ExcludeSrcDirWithinBuildOutputDir.java b/source-release/src/test/java/org/apache/its/IT_ExcludeSrcDirWithinBuildOutputDir.java
+index 3e0f7c5..2762372 100644
+--- a/source-release/src/test/java/org/apache/its/IT_ExcludeSrcDirWithinBuildOutputDir.java
++++ b/source-release/src/test/java/org/apache/its/IT_ExcludeSrcDirWithinBuildOutputDir.java
+@@ -24,8 +24,8 @@ import java.net.URISyntaxException;
+ import java.util.HashSet;
+ import java.util.Set;
+ 
+-import org.apache.maven.it.VerificationException;
+-import org.apache.maven.it.Verifier;
++import org.apache.maven.shared.verifier.VerificationException;
++import org.apache.maven.shared.verifier.Verifier;
+ import org.junit.Test;
+ 
+ import static org.apache.its.util.TestUtils.archivePathFromChild;
+diff --git a/source-release/src/test/java/org/apache/its/IT_IncludeIdeFilesWithinSrcDir.java b/source-release/src/test/java/org/apache/its/IT_IncludeIdeFilesWithinSrcDir.java
+index bc86d6f..77729e9 100644
+--- a/source-release/src/test/java/org/apache/its/IT_IncludeIdeFilesWithinSrcDir.java
++++ b/source-release/src/test/java/org/apache/its/IT_IncludeIdeFilesWithinSrcDir.java
+@@ -24,8 +24,8 @@ import java.net.URISyntaxException;
+ import java.util.HashSet;
+ import java.util.Set;
+ 
+-import org.apache.maven.it.VerificationException;
+-import org.apache.maven.it.Verifier;
++import org.apache.maven.shared.verifier.VerificationException;
++import org.apache.maven.shared.verifier.Verifier;
+ import org.junit.Test;
+ 
+ import static org.apache.its.util.TestUtils.archivePathFromChild;
+diff --git a/source-release/src/test/java/org/apache/its/IT_ZipAndTarCreation.java b/source-release/src/test/java/org/apache/its/IT_ZipAndTarCreation.java
+index 040beee..9ae94cd 100644
+--- a/source-release/src/test/java/org/apache/its/IT_ZipAndTarCreation.java
++++ b/source-release/src/test/java/org/apache/its/IT_ZipAndTarCreation.java
+@@ -26,8 +26,8 @@ import java.util.HashSet;
+ import java.util.Set;
+ 
+ import junit.framework.Assert;
+-import org.apache.maven.it.VerificationException;
+-import org.apache.maven.it.Verifier;
++import org.apache.maven.shared.verifier.VerificationException;
++import org.apache.maven.shared.verifier.Verifier;
+ import org.junit.Test;
+ 
+ import static org.apache.its.util.TestUtils.archivePathFromChild;
+-- 
+2.48.1
+

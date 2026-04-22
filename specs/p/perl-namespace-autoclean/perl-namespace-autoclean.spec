@@ -10,7 +10,7 @@
 
 Name:           perl-namespace-autoclean
 Version:        0.31
-Release:        3%{?dist}
+Release: 4%{?dist}
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Summary:        Keep imports out of your namespace
 URL:            https://metacpan.org/release/namespace-autoclean

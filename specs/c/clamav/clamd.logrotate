@@ -1,0 +1,9 @@
+/var/log/clamd.<SERVICE> {
+	monthly
+	notifempty
+	missingok
+
+	postrotate
+		pkill -u <USER> -HUP -f "/usr/sbin/clamd -c /etc/clamd.d/<SERVICE>.conf" >/dev/null 2>&1 || :
+	endscript
+}

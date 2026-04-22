@@ -3,7 +3,7 @@
 
 Name:           perl-Return-Type
 Version:        0.007
-Release:        15%{?dist}
+Release: 16%{?dist}
 Summary:        Specify a return type for a function
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Return-Type

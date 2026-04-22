@@ -3,7 +3,7 @@
 
 Name:           mac-robber
 Version:        1.02
-Release:        31%{?dist}
+Release: 32%{?dist}
 Summary:        Tool to create a timeline of file activity for mounted file systems
 
 # Automatically converted from old format: GPLv2+ - review is highly recommended.

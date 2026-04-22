@@ -3,7 +3,7 @@
 
 Name:		perl-Test-Distribution
 Version:	2.00
-Release:	49%{?dist}
+Release: 50%{?dist}
 Summary:	Perform tests on all modules of a distribution
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Test-Distribution

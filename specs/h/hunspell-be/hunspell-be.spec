@@ -10,7 +10,7 @@
 Name: hunspell-be
 Summary: Belarusian hunspell dictionaries
 Version: 1.1
-Release: 33%{?dist}
+Release: 34%{?dist}
 Source: https://downloads.sourceforge.net/project/aoo-extensions/2412/1/dict-be-official.oxt
 URL: http://extensions.services.openoffice.org/project/dict-be-official
 License: GPL-1.0-or-later AND LGPL-2.1-or-later

@@ -27,7 +27,7 @@
 
 Name:          mingw-%{pkgname}
 Version:       3.11.14
-Release:       7%{?dist}
+Release: 8%{?dist}
 Summary:       MinGW Windows %{pkgname}
 
 BuildArch:     noarch

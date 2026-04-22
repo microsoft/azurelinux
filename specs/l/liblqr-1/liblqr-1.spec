@@ -3,7 +3,7 @@
 
 Name:           liblqr-1
 Version:        0.4.2
-Release:        28%{?dist}
+Release: 29%{?dist}
 Summary:        LiquidRescale library
 # Automatically converted from old format: GPLv3 - review is highly recommended.
 License:        GPL-3.0-only

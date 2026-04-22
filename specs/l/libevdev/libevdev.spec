@@ -3,7 +3,7 @@
 
 Name:           libevdev
 Version:        1.13.6
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Kernel Evdev Device Wrapper Library
 
 # SPDX

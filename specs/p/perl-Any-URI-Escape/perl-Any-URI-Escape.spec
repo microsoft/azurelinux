@@ -3,7 +3,7 @@
 
 Name:           perl-Any-URI-Escape
 Version:        0.01
-Release:        37%{?dist}
+Release: 38%{?dist}
 Summary:        Load URI::Escape::XS preferentially over URI::Escape
 # Automatically converted from old format: GPL+ or Artistic - review is highly recommended.
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

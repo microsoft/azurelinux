@@ -17,7 +17,7 @@
 Summary:       The Jack Audio Connection Kit
 Name:          jack-audio-connection-kit
 Version:       1.9.22
-Release:       10%{?dist}
+Release: 11%{?dist}
 # The entire source (~500 files) is a mixture of these three licenses
 # Automatically converted from old format: GPLv2 and GPLv2+ and LGPLv2+ - review is highly recommended.
 License:       GPL-2.0-only AND GPL-2.0-or-later AND LicenseRef-Callaway-LGPLv2+

@@ -51,7 +51,7 @@
 
 Name:           %{rocalution_name}
 Version:        %{rocm_version}
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        Next generation library for iterative sparse solvers for ROCm platform
 Url:            https://github.com/ROCm/%{upstreamname}
 License:        MIT

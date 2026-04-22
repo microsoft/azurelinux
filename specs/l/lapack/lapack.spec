@@ -16,7 +16,7 @@
 Summary: Numerical linear algebra package libraries
 Name: lapack
 Version: %{mediumver}.0
-Release: 10%{?dist}
+Release: 11%{?dist}
 License: BSD-3-Clause-Open-MPI
 URL: http://www.netlib.org/lapack/
 Source0: https://github.com/Reference-LAPACK/lapack/archive/v%{version}.tar.gz

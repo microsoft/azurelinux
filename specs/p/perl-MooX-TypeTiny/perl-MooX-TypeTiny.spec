@@ -3,7 +3,7 @@
 
 Name:           perl-MooX-TypeTiny
 Version:        0.002003
-Release:        13%{?dist}
+Release: 14%{?dist}
 Summary:        Optimized type checks for Moo + Type::Tiny
 # Automatically converted from old format: GPL+ or Artistic - review is highly recommended.
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

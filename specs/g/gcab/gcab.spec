@@ -9,7 +9,7 @@
 
 Name:           gcab
 Version:        1.6
-Release:        9%{?dist}
+Release: 10%{?dist}
 Summary:        Cabinet file library and tool
 
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.

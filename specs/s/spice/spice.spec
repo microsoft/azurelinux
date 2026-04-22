@@ -3,7 +3,7 @@
 
 Name:           spice
 Version:        0.16.0
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Implements the SPICE protocol
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.
 License:        LicenseRef-Callaway-LGPLv2+

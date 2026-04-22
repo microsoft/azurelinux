@@ -3,7 +3,7 @@
 
 Name:           python3-mypy
 Version:        1.18.2
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        A static type checker for Python
 %{?python_provide:%python_provide python3-mypy}
 

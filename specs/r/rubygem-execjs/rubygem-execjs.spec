@@ -7,7 +7,7 @@
 Summary: Run JavaScript code from Ruby
 Name: rubygem-%{gem_name}
 Version: 2.8.1
-Release: 11%{?dist}
+Release: 12%{?dist}
 License: MIT
 URL: https://github.com/rails/execjs
 Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem

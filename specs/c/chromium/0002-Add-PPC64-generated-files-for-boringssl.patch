@@ -1,0 +1,5763 @@
+Index: chromium-144.0.7559.59/third_party/boringssl/src/gen/bcm/aesp8-ppc-linux.S
+===================================================================
+--- /dev/null
++++ chromium-144.0.7559.59/third_party/boringssl/src/gen/bcm/aesp8-ppc-linux.S
+@@ -0,0 +1,3673 @@
++// This file is generated from a similarly-named Perl script in the BoringSSL
++// source tree. Do not edit by hand.
++
++#if defined(__has_feature)
++#if __has_feature(memory_sanitizer) && !defined(OPENSSL_NO_ASM)
++#define OPENSSL_NO_ASM
++#endif
++#endif
++
++#if !defined(OPENSSL_NO_ASM) && defined(__powerpc64__) && defined(__ELF__)
++.machine	"any"
++
++.abiversion	2
++.text
++
++.align	7
++.Lrcon:
++.byte	0x00,0x00,0x00,0x01,0x00,0x00,0x00,0x01,0x00,0x00,0x00,0x01,0x00,0x00,0x00,0x01
++.byte	0x00,0x00,0x00,0x1b,0x00,0x00,0x00,0x1b,0x00,0x00,0x00,0x1b,0x00,0x00,0x00,0x1b
++.byte	0x0c,0x0f,0x0e,0x0d,0x0c,0x0f,0x0e,0x0d,0x0c,0x0f,0x0e,0x0d,0x0c,0x0f,0x0e,0x0d
++.byte	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
++.Lconsts:
++	mflr	0
++	bcl	20,31,$+4
++	mflr	6
++	addi	6,6,-0x48
++	mtlr	0
++	blr	
++.long	0
++.byte	0,12,0x14,0,0,0,0,0
++.byte	65,69,83,32,102,111,114,32,80,111,119,101,114,73,83,65,32,50,46,48,55,44,32,67,82,89,80,84,79,71,65,77,83,32,98,121,32,60,97,112,112,114,111,64,111,112,101,110,115,115,108,46,111,114,103,62,0
++.align	2
++
++.globl	aes_hw_set_encrypt_key
++.type	aes_hw_set_encrypt_key,@function
++.align	5
++aes_hw_set_encrypt_key:
++.localentry	aes_hw_set_encrypt_key,0
++
++.Lset_encrypt_key:
++	mflr	11
++	std	11,16(1)
++
++	li	6,-1
++	cmpldi	3,0
++	beq-	.Lenc_key_abort
++	cmpldi	5,0
++	beq-	.Lenc_key_abort
++	li	6,-2
++	cmpwi	4,128
++	blt-	.Lenc_key_abort
++	cmpwi	4,256
++	bgt-	.Lenc_key_abort
++	andi.	0,4,0x3f
++	bne-	.Lenc_key_abort
++
++	lis	0,0xfff0
++	li	12,-1
++	or	0,0,0
++
++	bl	.Lconsts
++	mtlr	11
++
++	neg	9,3
++	lvx	1,0,3
++	addi	3,3,15
++	lvsr	3,0,9
++	li	8,0x20
++	cmpwi	4,192
++	lvx	2,0,3
++	vspltisb	5,0x0f
++	lvx	4,0,6
++	vxor	3,3,5
++	lvx	5,8,6
++	addi	6,6,0x10
++	vperm	1,1,2,3
++	li	7,8
++	vxor	0,0,0
++	mtctr	7
++
++	lvsl	8,0,5
++	vspltisb	9,-1
++	lvx	10,0,5
++	vperm	9,9,0,8
++
++	blt	.Loop128
++	addi	3,3,8
++	beq	.L192
++	addi	3,3,8
++	b	.L256
++
++.align	4
++.Loop128:
++	vperm	3,1,1,5
++	vsldoi	6,0,1,12
++	vperm	11,1,1,8
++	vsel	7,10,11,9
++	vor	10,11,11
++	.long	0x10632509
++	stvx	7,0,5
++	addi	5,5,16
++
++	vxor	1,1,6
++	vsldoi	6,0,6,12
++	vxor	1,1,6
++	vsldoi	6,0,6,12
++	vxor	1,1,6
++	vadduwm	4,4,4
++	vxor	1,1,3
++	bdnz	.Loop128
++
++	lvx	4,0,6
++
++	vperm	3,1,1,5
++	vsldoi	6,0,1,12
++	vperm	11,1,1,8
++	vsel	7,10,11,9
++	vor	10,11,11
++	.long	0x10632509
++	stvx	7,0,5
++	addi	5,5,16
++
++	vxor	1,1,6
++	vsldoi	6,0,6,12
++	vxor	1,1,6
++	vsldoi	6,0,6,12
++	vxor	1,1,6
++	vadduwm	4,4,4
++	vxor	1,1,3
++
++	vperm	3,1,1,5
++	vsldoi	6,0,1,12
++	vperm	11,1,1,8
++	vsel	7,10,11,9
++	vor	10,11,11
++	.long	0x10632509
++	stvx	7,0,5
++	addi	5,5,16
++
++	vxor	1,1,6
++	vsldoi	6,0,6,12
++	vxor	1,1,6
++	vsldoi	6,0,6,12
++	vxor	1,1,6
++	vxor	1,1,3
++	vperm	11,1,1,8
++	vsel	7,10,11,9
++	vor	10,11,11
++	stvx	7,0,5
++
++	addi	3,5,15
++	addi	5,5,0x50
++
++	li	8,10
++	b	.Ldone
++
++.align	4
++.L192:
++	lvx	6,0,3
++	li	7,4
++	vperm	11,1,1,8
++	vsel	7,10,11,9
++	vor	10,11,11
++	stvx	7,0,5
++	addi	5,5,16
++	vperm	2,2,6,3
++	vspltisb	3,8
++	mtctr	7
++	vsububm	5,5,3
++
++.Loop192:
++	vperm	3,2,2,5
++	vsldoi	6,0,1,12
++	.long	0x10632509
++
++	vxor	1,1,6
++	vsldoi	6,0,6,12
++	vxor	1,1,6
++	vsldoi	6,0,6,12
++	vxor	1,1,6
++
++	vsldoi	7,0,2,8
++	vspltw	6,1,3
++	vxor	6,6,2
++	vsldoi	2,0,2,12
++	vadduwm	4,4,4
++	vxor	2,2,6
++	vxor	1,1,3
++	vxor	2,2,3
++	vsldoi	7,7,1,8
++
++	vperm	3,2,2,5
++	vsldoi	6,0,1,12
++	vperm	11,7,7,8
++	vsel	7,10,11,9
++	vor	10,11,11
++	.long	0x10632509
++	stvx	7,0,5
++	addi	5,5,16
++
++	vsldoi	7,1,2,8
++	vxor	1,1,6
++	vsldoi	6,0,6,12
++	vperm	11,7,7,8
++	vsel	7,10,11,9
++	vor	10,11,11
++	vxor	1,1,6
++	vsldoi	6,0,6,12
++	vxor	1,1,6
++	stvx	7,0,5
++	addi	5,5,16
++
++	vspltw	6,1,3
++	vxor	6,6,2
++	vsldoi	2,0,2,12
++	vadduwm	4,4,4
++	vxor	2,2,6
++	vxor	1,1,3
++	vxor	2,2,3
++	vperm	11,1,1,8
++	vsel	7,10,11,9
++	vor	10,11,11
++	stvx	7,0,5
++	addi	3,5,15
++	addi	5,5,16
++	bdnz	.Loop192
++
++	li	8,12
++	addi	5,5,0x20
++	b	.Ldone
++
++.align	4
++.L256:
++	lvx	6,0,3
++	li	7,7
++	li	8,14
++	vperm	11,1,1,8
++	vsel	7,10,11,9
++	vor	10,11,11
++	stvx	7,0,5
++	addi	5,5,16
++	vperm	2,2,6,3
++	mtctr	7
++
++.Loop256:
++	vperm	3,2,2,5
++	vsldoi	6,0,1,12
++	vperm	11,2,2,8
++	vsel	7,10,11,9
++	vor	10,11,11
++	.long	0x10632509
++	stvx	7,0,5
++	addi	5,5,16
++
++	vxor	1,1,6
++	vsldoi	6,0,6,12
++	vxor	1,1,6
++	vsldoi	6,0,6,12
++	vxor	1,1,6
++	vadduwm	4,4,4
++	vxor	1,1,3
++	vperm	11,1,1,8
++	vsel	7,10,11,9
++	vor	10,11,11
++	stvx	7,0,5
++	addi	3,5,15
++	addi	5,5,16
++	bdz	.Ldone
++
++	vspltw	3,1,3
++	vsldoi	6,0,2,12
++	.long	0x106305C8
++
++	vxor	2,2,6
++	vsldoi	6,0,6,12
++	vxor	2,2,6
++	vsldoi	6,0,6,12
++	vxor	2,2,6
++
++	vxor	2,2,3
++	b	.Loop256
++
++.align	4
++.Ldone:
++	lvx	2,0,3
++	vsel	2,10,2,9
++	stvx	2,0,3
++	li	6,0
++	or	12,12,12
++	stw	8,0(5)
++
++.Lenc_key_abort:
++	mr	3,6
++	blr	
++.long	0
++.byte	0,12,0x14,1,0,0,3,0
++.long	0
++.size	aes_hw_set_encrypt_key,.-aes_hw_set_encrypt_key
++
++.globl	aes_hw_set_decrypt_key
++.type	aes_hw_set_decrypt_key,@function
++.align	5
++aes_hw_set_decrypt_key:
++.localentry	aes_hw_set_decrypt_key,0
++
++	stdu	1,-64(1)
++	mflr	10
++	std	10,80(1)
++	bl	.Lset_encrypt_key
++	mtlr	10
++
++	cmpwi	3,0
++	bne-	.Ldec_key_abort
++
++	slwi	7,8,4
++	subi	3,5,240
++	srwi	8,8,1
++	add	5,3,7
++	mtctr	8
++
++.Ldeckey:
++	lwz	0, 0(3)
++	lwz	6, 4(3)
++	lwz	7, 8(3)
++	lwz	8, 12(3)
++	addi	3,3,16
++	lwz	9, 0(5)
++	lwz	10,4(5)
++	lwz	11,8(5)
++	lwz	12,12(5)
++	stw	0, 0(5)
++	stw	6, 4(5)
++	stw	7, 8(5)
++	stw	8, 12(5)
++	subi	5,5,16
++	stw	9, -16(3)
++	stw	10,-12(3)
++	stw	11,-8(3)
++	stw	12,-4(3)
++	bdnz	.Ldeckey
++
++	xor	3,3,3
++.Ldec_key_abort:
++	addi	1,1,64
++	blr	
++.long	0
++.byte	0,12,4,1,0x80,0,3,0
++.long	0
++.size	aes_hw_set_decrypt_key,.-aes_hw_set_decrypt_key
++.globl	aes_hw_encrypt
++.type	aes_hw_encrypt,@function
++.align	5
++aes_hw_encrypt:
++.localentry	aes_hw_encrypt,0
++
++	lwz	6,240(5)
++	lis	0,0xfc00
++	li	12,-1
++	li	7,15
++	or	0,0,0
++
++	lvx	0,0,3
++	neg	11,4
++	lvx	1,7,3
++	lvsl	2,0,3
++	vspltisb	4,0x0f
++	lvsr	3,0,11
++	vxor	2,2,4
++	li	7,16
++	vperm	0,0,1,2
++	lvx	1,0,5
++	lvsr	5,0,5
++	srwi	6,6,1
++	lvx	2,7,5
++	addi	7,7,16
++	subi	6,6,1
++	vperm	1,2,1,5
++
++	vxor	0,0,1
++	lvx	1,7,5
++	addi	7,7,16
++	mtctr	6
++
++.Loop_enc:
++	vperm	2,1,2,5
++	.long	0x10001508
++	lvx	2,7,5
++	addi	7,7,16
++	vperm	1,2,1,5
++	.long	0x10000D08
++	lvx	1,7,5
++	addi	7,7,16
++	bdnz	.Loop_enc
++
++	vperm	2,1,2,5
++	.long	0x10001508
++	lvx	2,7,5
++	vperm	1,2,1,5
++	.long	0x10000D09
++
++	vspltisb	2,-1
++	vxor	1,1,1
++	li	7,15
++	vperm	2,2,1,3
++	vxor	3,3,4
++	lvx	1,0,4
++	vperm	0,0,0,3
++	vsel	1,1,0,2
++	lvx	4,7,4
++	stvx	1,0,4
++	vsel	0,0,4,2
++	stvx	0,7,4
++
++	or	12,12,12
++	blr	
++.long	0
++.byte	0,12,0x14,0,0,0,3,0
++.long	0
++.size	aes_hw_encrypt,.-aes_hw_encrypt
++.globl	aes_hw_decrypt
++.type	aes_hw_decrypt,@function
++.align	5
++aes_hw_decrypt:
++.localentry	aes_hw_decrypt,0
++
++	lwz	6,240(5)
++	lis	0,0xfc00
++	li	12,-1
++	li	7,15
++	or	0,0,0
++
++	lvx	0,0,3
++	neg	11,4
++	lvx	1,7,3
++	lvsl	2,0,3
++	vspltisb	4,0x0f
++	lvsr	3,0,11
++	vxor	2,2,4
++	li	7,16
++	vperm	0,0,1,2
++	lvx	1,0,5
++	lvsr	5,0,5
++	srwi	6,6,1
++	lvx	2,7,5
++	addi	7,7,16
++	subi	6,6,1
++	vperm	1,2,1,5
++
++	vxor	0,0,1
++	lvx	1,7,5
++	addi	7,7,16
++	mtctr	6
++
++.Loop_dec:
++	vperm	2,1,2,5
++	.long	0x10001548
++	lvx	2,7,5
++	addi	7,7,16
++	vperm	1,2,1,5
++	.long	0x10000D48
++	lvx	1,7,5
++	addi	7,7,16
++	bdnz	.Loop_dec
++
++	vperm	2,1,2,5
++	.long	0x10001548
++	lvx	2,7,5
++	vperm	1,2,1,5
++	.long	0x10000D49
++
++	vspltisb	2,-1
++	vxor	1,1,1
++	li	7,15
++	vperm	2,2,1,3
++	vxor	3,3,4
++	lvx	1,0,4
++	vperm	0,0,0,3
++	vsel	1,1,0,2
++	lvx	4,7,4
++	stvx	1,0,4
++	vsel	0,0,4,2
++	stvx	0,7,4
++
++	or	12,12,12
++	blr	
++.long	0
++.byte	0,12,0x14,0,0,0,3,0
++.long	0
++.size	aes_hw_decrypt,.-aes_hw_decrypt
++.globl	aes_hw_cbc_encrypt
++.type	aes_hw_cbc_encrypt,@function
++.align	5
++aes_hw_cbc_encrypt:
++.localentry	aes_hw_cbc_encrypt,0
++
++	cmpldi	5,16
++	.long	0x4dc00020
++
++	cmpwi	8,0
++	lis	0,0xffe0
++	li	12,-1
++	or	0,0,0
++
++	li	10,15
++	vxor	0,0,0
++	vspltisb	3,0x0f
++
++	lvx	4,0,7
++	lvsl	6,0,7
++	lvx	5,10,7
++	vxor	6,6,3
++	vperm	4,4,5,6
++
++	neg	11,3
++	lvsr	10,0,6
++	lwz	9,240(6)
++
++	lvsr	6,0,11
++	lvx	5,0,3
++	addi	3,3,15
++	vxor	6,6,3
++
++	lvsl	8,0,4
++	vspltisb	9,-1
++	lvx	7,0,4
++	vperm	9,9,0,8
++	vxor	8,8,3
++
++	srwi	9,9,1
++	li	10,16
++	subi	9,9,1
++	beq	.Lcbc_dec
++
++.Lcbc_enc:
++	vor	2,5,5
++	lvx	5,0,3
++	addi	3,3,16
++	mtctr	9
++	subi	5,5,16
++
++	lvx	0,0,6
++	vperm	2,2,5,6
++	lvx	1,10,6
++	addi	10,10,16
++	vperm	0,1,0,10
++	vxor	2,2,0
++	lvx	0,10,6
++	addi	10,10,16
++	vxor	2,2,4
++
++.Loop_cbc_enc:
++	vperm	1,0,1,10
++	.long	0x10420D08
++	lvx	1,10,6
++	addi	10,10,16
++	vperm	0,1,0,10
++	.long	0x10420508
++	lvx	0,10,6
++	addi	10,10,16
++	bdnz	.Loop_cbc_enc
++
++	vperm	1,0,1,10
++	.long	0x10420D08
++	lvx	1,10,6
++	li	10,16
++	vperm	0,1,0,10
++	.long	0x10820509
++	cmpldi	5,16
++
++	vperm	3,4,4,8
++	vsel	2,7,3,9
++	vor	7,3,3
++	stvx	2,0,4
++	addi	4,4,16
++	bge	.Lcbc_enc
++
++	b	.Lcbc_done
++
++.align	4
++.Lcbc_dec:
++	cmpldi	5,128
++	bge	_aesp8_cbc_decrypt8x
++	vor	3,5,5
++	lvx	5,0,3
++	addi	3,3,16
++	mtctr	9
++	subi	5,5,16
++
++	lvx	0,0,6
++	vperm	3,3,5,6
++	lvx	1,10,6
++	addi	10,10,16
++	vperm	0,1,0,10
++	vxor	2,3,0
++	lvx	0,10,6
++	addi	10,10,16
++
++.Loop_cbc_dec:
++	vperm	1,0,1,10
++	.long	0x10420D48
++	lvx	1,10,6
++	addi	10,10,16
++	vperm	0,1,0,10
++	.long	0x10420548
++	lvx	0,10,6
++	addi	10,10,16
++	bdnz	.Loop_cbc_dec
++
++	vperm	1,0,1,10
++	.long	0x10420D48
++	lvx	1,10,6
++	li	10,16
++	vperm	0,1,0,10
++	.long	0x10420549
++	cmpldi	5,16
++
++	vxor	2,2,4
++	vor	4,3,3
++	vperm	3,2,2,8
++	vsel	2,7,3,9
++	vor	7,3,3
++	stvx	2,0,4
++	addi	4,4,16
++	bge	.Lcbc_dec
++
++.Lcbc_done:
++	addi	4,4,-1
++	lvx	2,0,4
++	vsel	2,7,2,9
++	stvx	2,0,4
++
++	neg	8,7
++	li	10,15
++	vxor	0,0,0
++	vspltisb	9,-1
++	vspltisb	3,0x0f
++	lvsr	8,0,8
++	vperm	9,9,0,8
++	vxor	8,8,3
++	lvx	7,0,7
++	vperm	4,4,4,8
++	vsel	2,7,4,9
++	lvx	5,10,7
++	stvx	2,0,7
++	vsel	2,4,5,9
++	stvx	2,10,7
++
++	or	12,12,12
++	blr	
++.long	0
++.byte	0,12,0x14,0,0,0,6,0
++.long	0
++.align	5
++_aesp8_cbc_decrypt8x:
++	stdu	1,-448(1)
++	li	10,207
++	li	11,223
++	stvx	20,10,1
++	addi	10,10,32
++	stvx	21,11,1
++	addi	11,11,32
++	stvx	22,10,1
++	addi	10,10,32
++	stvx	23,11,1
++	addi	11,11,32
++	stvx	24,10,1
++	addi	10,10,32
++	stvx	25,11,1
++	addi	11,11,32
++	stvx	26,10,1
++	addi	10,10,32
++	stvx	27,11,1
++	addi	11,11,32
++	stvx	28,10,1
++	addi	10,10,32
++	stvx	29,11,1
++	addi	11,11,32
++	stvx	30,10,1
++	stvx	31,11,1
++	li	0,-1
++	stw	12,396(1)
++	li	8,0x10
++	std	26,400(1)
++	li	26,0x20
++	std	27,408(1)
++	li	27,0x30
++	std	28,416(1)
++	li	28,0x40
++	std	29,424(1)
++	li	29,0x50
++	std	30,432(1)
++	li	30,0x60
++	std	31,440(1)
++	li	31,0x70
++	or	0,0,0
++
++	subi	9,9,3
++	subi	5,5,128
++
++	lvx	23,0,6
++	lvx	30,8,6
++	addi	6,6,0x20
++	lvx	31,0,6
++	vperm	23,30,23,10
++	addi	11,1,79
++	mtctr	9
++
++.Load_cbc_dec_key:
++	vperm	24,31,30,10
++	lvx	30,8,6
++	addi	6,6,0x20
++	stvx	24,0,11
++	vperm	25,30,31,10
++	lvx	31,0,6
++	stvx	25,8,11
++	addi	11,11,0x20
++	bdnz	.Load_cbc_dec_key
++
++	lvx	26,8,6
++	vperm	24,31,30,10
++	lvx	27,26,6
++	stvx	24,0,11
++	vperm	25,26,31,10
++	lvx	28,27,6
++	stvx	25,8,11
++	addi	11,1,79
++	vperm	26,27,26,10
++	lvx	29,28,6
++	vperm	27,28,27,10
++	lvx	30,29,6
++	vperm	28,29,28,10
++	lvx	31,30,6
++	vperm	29,30,29,10
++	lvx	14,31,6
++	vperm	30,31,30,10
++	lvx	24,0,11
++	vperm	31,14,31,10
++	lvx	25,8,11
++
++
++
++	subi	3,3,15
++
++	li	10,8
++	.long	0x7C001E99
++	lvsl	6,0,10
++	vspltisb	3,0x0f
++	.long	0x7C281E99
++	vxor	6,6,3
++	.long	0x7C5A1E99
++	vperm	0,0,0,6
++	.long	0x7C7B1E99
++	vperm	1,1,1,6
++	.long	0x7D5C1E99
++	vperm	2,2,2,6
++	vxor	14,0,23
++	.long	0x7D7D1E99
++	vperm	3,3,3,6
++	vxor	15,1,23
++	.long	0x7D9E1E99
++	vperm	10,10,10,6
++	vxor	16,2,23
++	.long	0x7DBF1E99
++	addi	3,3,0x80
++	vperm	11,11,11,6
++	vxor	17,3,23
++	vperm	12,12,12,6
++	vxor	18,10,23
++	vperm	13,13,13,6
++	vxor	19,11,23
++	vxor	20,12,23
++	vxor	21,13,23
++
++	mtctr	9
++	b	.Loop_cbc_dec8x
++.align	5
++.Loop_cbc_dec8x:
++	.long	0x11CEC548
++	.long	0x11EFC548
++	.long	0x1210C548
++	.long	0x1231C548
++	.long	0x1252C548
++	.long	0x1273C548
++	.long	0x1294C548
++	.long	0x12B5C548
++	lvx	24,26,11
++	addi	11,11,0x20
++
++	.long	0x11CECD48
++	.long	0x11EFCD48
++	.long	0x1210CD48
++	.long	0x1231CD48
++	.long	0x1252CD48
++	.long	0x1273CD48
++	.long	0x1294CD48
++	.long	0x12B5CD48
++	lvx	25,8,11
++	bdnz	.Loop_cbc_dec8x
++
++	subic	5,5,128
++	.long	0x11CEC548
++	.long	0x11EFC548
++	.long	0x1210C548
++	.long	0x1231C548
++	.long	0x1252C548
++	.long	0x1273C548
++	.long	0x1294C548
++	.long	0x12B5C548
++
++	subfe.	0,0,0
++	.long	0x11CECD48
++	.long	0x11EFCD48
++	.long	0x1210CD48
++	.long	0x1231CD48
++	.long	0x1252CD48
++	.long	0x1273CD48
++	.long	0x1294CD48
++	.long	0x12B5CD48
++
++	and	0,0,5
++	.long	0x11CED548
++	.long	0x11EFD548
++	.long	0x1210D548
++	.long	0x1231D548
++	.long	0x1252D548
++	.long	0x1273D548
++	.long	0x1294D548
++	.long	0x12B5D548
++
++	add	3,3,0
++
++
++
++	.long	0x11CEDD48
++	.long	0x11EFDD48
++	.long	0x1210DD48
++	.long	0x1231DD48
++	.long	0x1252DD48
++	.long	0x1273DD48
++	.long	0x1294DD48
++	.long	0x12B5DD48
++
++	addi	11,1,79
++	.long	0x11CEE548
++	.long	0x11EFE548
++	.long	0x1210E548
++	.long	0x1231E548
++	.long	0x1252E548
++	.long	0x1273E548
++	.long	0x1294E548
++	.long	0x12B5E548
++	lvx	24,0,11
++
++	.long	0x11CEED48
++	.long	0x11EFED48
++	.long	0x1210ED48
++	.long	0x1231ED48
++	.long	0x1252ED48
++	.long	0x1273ED48
++	.long	0x1294ED48
++	.long	0x12B5ED48
++	lvx	25,8,11
++
++	.long	0x11CEF548
++	vxor	4,4,31
++	.long	0x11EFF548
++	vxor	0,0,31
++	.long	0x1210F548
++	vxor	1,1,31
++	.long	0x1231F548
++	vxor	2,2,31
++	.long	0x1252F548
++	vxor	3,3,31
++	.long	0x1273F548
++	vxor	10,10,31
++	.long	0x1294F548
++	vxor	11,11,31
++	.long	0x12B5F548
++	vxor	12,12,31
++
++	.long	0x11CE2549
++	.long	0x11EF0549
++	.long	0x7C001E99
++	.long	0x12100D49
++	.long	0x7C281E99
++	.long	0x12311549
++	vperm	0,0,0,6
++	.long	0x7C5A1E99
++	.long	0x12521D49
++	vperm	1,1,1,6
++	.long	0x7C7B1E99
++	.long	0x12735549
++	vperm	2,2,2,6
++	.long	0x7D5C1E99
++	.long	0x12945D49
++	vperm	3,3,3,6
++	.long	0x7D7D1E99
++	.long	0x12B56549
++	vperm	10,10,10,6
++	.long	0x7D9E1E99
++	vor	4,13,13
++	vperm	11,11,11,6
++	.long	0x7DBF1E99
++	addi	3,3,0x80
++
++	vperm	14,14,14,6
++	vperm	15,15,15,6
++	.long	0x7DC02799
++	vperm	12,12,12,6
++	vxor	14,0,23
++	vperm	16,16,16,6
++	.long	0x7DE82799
++	vperm	13,13,13,6
++	vxor	15,1,23
++	vperm	17,17,17,6
++	.long	0x7E1A2799
++	vxor	16,2,23
++	vperm	18,18,18,6
++	.long	0x7E3B2799
++	vxor	17,3,23
++	vperm	19,19,19,6
++	.long	0x7E5C2799
++	vxor	18,10,23
++	vperm	20,20,20,6
++	.long	0x7E7D2799
++	vxor	19,11,23
++	vperm	21,21,21,6
++	.long	0x7E9E2799
++	vxor	20,12,23
++	.long	0x7EBF2799
++	addi	4,4,0x80
++	vxor	21,13,23
++
++	mtctr	9
++	beq	.Loop_cbc_dec8x
++
++	addic.	5,5,128
++	beq	.Lcbc_dec8x_done
++	nop	
++	nop	
++
++.Loop_cbc_dec8x_tail:
++	.long	0x11EFC548
++	.long	0x1210C548
++	.long	0x1231C548
++	.long	0x1252C548
++	.long	0x1273C548
++	.long	0x1294C548
++	.long	0x12B5C548
++	lvx	24,26,11
++	addi	11,11,0x20
++
++	.long	0x11EFCD48
++	.long	0x1210CD48
++	.long	0x1231CD48
++	.long	0x1252CD48
++	.long	0x1273CD48
++	.long	0x1294CD48
++	.long	0x12B5CD48
++	lvx	25,8,11
++	bdnz	.Loop_cbc_dec8x_tail
++
++	.long	0x11EFC548
++	.long	0x1210C548
++	.long	0x1231C548
++	.long	0x1252C548
++	.long	0x1273C548
++	.long	0x1294C548
++	.long	0x12B5C548
++
++	.long	0x11EFCD48
++	.long	0x1210CD48
++	.long	0x1231CD48
++	.long	0x1252CD48
++	.long	0x1273CD48
++	.long	0x1294CD48
++	.long	0x12B5CD48
++
++	.long	0x11EFD548
++	.long	0x1210D548
++	.long	0x1231D548
++	.long	0x1252D548
++	.long	0x1273D548
++	.long	0x1294D548
++	.long	0x12B5D548
++
++	.long	0x11EFDD48
++	.long	0x1210DD48
++	.long	0x1231DD48
++	.long	0x1252DD48
++	.long	0x1273DD48
++	.long	0x1294DD48
++	.long	0x12B5DD48
++
++	.long	0x11EFE548
++	.long	0x1210E548
++	.long	0x1231E548
++	.long	0x1252E548
++	.long	0x1273E548
++	.long	0x1294E548
++	.long	0x12B5E548
++
++	.long	0x11EFED48
++	.long	0x1210ED48
++	.long	0x1231ED48
++	.long	0x1252ED48
++	.long	0x1273ED48
++	.long	0x1294ED48
++	.long	0x12B5ED48
++
++	.long	0x11EFF548
++	vxor	4,4,31
++	.long	0x1210F548
++	vxor	1,1,31
++	.long	0x1231F548
++	vxor	2,2,31
++	.long	0x1252F548
++	vxor	3,3,31
++	.long	0x1273F548
++	vxor	10,10,31
++	.long	0x1294F548
++	vxor	11,11,31
++	.long	0x12B5F548
++	vxor	12,12,31
++
++	cmplwi	5,32
++	blt	.Lcbc_dec8x_one
++	nop	
++	beq	.Lcbc_dec8x_two
++	cmplwi	5,64
++	blt	.Lcbc_dec8x_three
++	nop	
++	beq	.Lcbc_dec8x_four
++	cmplwi	5,96
++	blt	.Lcbc_dec8x_five
++	nop	
++	beq	.Lcbc_dec8x_six
++
++.Lcbc_dec8x_seven:
++	.long	0x11EF2549
++	.long	0x12100D49
++	.long	0x12311549
++	.long	0x12521D49
++	.long	0x12735549
++	.long	0x12945D49
++	.long	0x12B56549
++	vor	4,13,13
++
++	vperm	15,15,15,6
++	vperm	16,16,16,6
++	.long	0x7DE02799
++	vperm	17,17,17,6
++	.long	0x7E082799
++	vperm	18,18,18,6
++	.long	0x7E3A2799
++	vperm	19,19,19,6
++	.long	0x7E5B2799
++	vperm	20,20,20,6
++	.long	0x7E7C2799
++	vperm	21,21,21,6
++	.long	0x7E9D2799
++	.long	0x7EBE2799
++	addi	4,4,0x70
++	b	.Lcbc_dec8x_done
++
++.align	5
++.Lcbc_dec8x_six:
++	.long	0x12102549
++	.long	0x12311549
++	.long	0x12521D49
++	.long	0x12735549
++	.long	0x12945D49
++	.long	0x12B56549
++	vor	4,13,13
++
++	vperm	16,16,16,6
++	vperm	17,17,17,6
++	.long	0x7E002799
++	vperm	18,18,18,6
++	.long	0x7E282799
++	vperm	19,19,19,6
++	.long	0x7E5A2799
++	vperm	20,20,20,6
++	.long	0x7E7B2799
++	vperm	21,21,21,6
++	.long	0x7E9C2799
++	.long	0x7EBD2799
++	addi	4,4,0x60
++	b	.Lcbc_dec8x_done
++
++.align	5
++.Lcbc_dec8x_five:
++	.long	0x12312549
++	.long	0x12521D49
++	.long	0x12735549
++	.long	0x12945D49
++	.long	0x12B56549
++	vor	4,13,13
++
++	vperm	17,17,17,6
++	vperm	18,18,18,6
++	.long	0x7E202799
++	vperm	19,19,19,6
++	.long	0x7E482799
++	vperm	20,20,20,6
++	.long	0x7E7A2799
++	vperm	21,21,21,6
++	.long	0x7E9B2799
++	.long	0x7EBC2799
++	addi	4,4,0x50
++	b	.Lcbc_dec8x_done
++
++.align	5
++.Lcbc_dec8x_four:
++	.long	0x12522549
++	.long	0x12735549
++	.long	0x12945D49
++	.long	0x12B56549
++	vor	4,13,13
++
++	vperm	18,18,18,6
++	vperm	19,19,19,6
++	.long	0x7E402799
++	vperm	20,20,20,6
++	.long	0x7E682799
++	vperm	21,21,21,6
++	.long	0x7E9A2799
++	.long	0x7EBB2799
++	addi	4,4,0x40
++	b	.Lcbc_dec8x_done
++
++.align	5
++.Lcbc_dec8x_three:
++	.long	0x12732549
++	.long	0x12945D49
++	.long	0x12B56549
++	vor	4,13,13
++
++	vperm	19,19,19,6
++	vperm	20,20,20,6
++	.long	0x7E602799
++	vperm	21,21,21,6
++	.long	0x7E882799
++	.long	0x7EBA2799
++	addi	4,4,0x30
++	b	.Lcbc_dec8x_done
++
++.align	5
++.Lcbc_dec8x_two:
++	.long	0x12942549
++	.long	0x12B56549
++	vor	4,13,13
++
++	vperm	20,20,20,6
++	vperm	21,21,21,6
++	.long	0x7E802799
++	.long	0x7EA82799
++	addi	4,4,0x20
++	b	.Lcbc_dec8x_done
++
++.align	5
++.Lcbc_dec8x_one:
++	.long	0x12B52549
++	vor	4,13,13
++
++	vperm	21,21,21,6
++	.long	0x7EA02799
++	addi	4,4,0x10
++
++.Lcbc_dec8x_done:
++	vperm	4,4,4,6
++	.long	0x7C803F99
++
++	li	10,79
++	li	11,95
++	stvx	6,10,1
++	addi	10,10,32
++	stvx	6,11,1
++	addi	11,11,32
++	stvx	6,10,1
++	addi	10,10,32
++	stvx	6,11,1
++	addi	11,11,32
++	stvx	6,10,1
++	addi	10,10,32
++	stvx	6,11,1
++	addi	11,11,32
++	stvx	6,10,1
++	addi	10,10,32
++	stvx	6,11,1
++	addi	11,11,32
++
++	or	12,12,12
++	lvx	20,10,1
++	addi	10,10,32
++	lvx	21,11,1
++	addi	11,11,32
++	lvx	22,10,1
++	addi	10,10,32
++	lvx	23,11,1
++	addi	11,11,32
++	lvx	24,10,1
++	addi	10,10,32
++	lvx	25,11,1
++	addi	11,11,32
++	lvx	26,10,1
++	addi	10,10,32
++	lvx	27,11,1
++	addi	11,11,32
++	lvx	28,10,1
++	addi	10,10,32
++	lvx	29,11,1
++	addi	11,11,32
++	lvx	30,10,1
++	lvx	31,11,1
++	ld	26,400(1)
++	ld	27,408(1)
++	ld	28,416(1)
++	ld	29,424(1)
++	ld	30,432(1)
++	ld	31,440(1)
++	addi	1,1,448
++	blr	
++.long	0
++.byte	0,12,0x04,0,0x80,6,6,0
++.long	0
++.size	aes_hw_cbc_encrypt,.-aes_hw_cbc_encrypt
++.globl	aes_hw_ctr32_encrypt_blocks
++.type	aes_hw_ctr32_encrypt_blocks,@function
++.align	5
++aes_hw_ctr32_encrypt_blocks:
++.localentry	aes_hw_ctr32_encrypt_blocks,0
++
++	cmpldi	5,1
++	.long	0x4dc00020
++
++	lis	0,0xfff0
++	li	12,-1
++	or	0,0,0
++
++	li	10,15
++	vxor	0,0,0
++	vspltisb	3,0x0f
++
++	lvx	4,0,7
++	lvsl	6,0,7
++	lvx	5,10,7
++	vspltisb	11,1
++	vxor	6,6,3
++	vperm	4,4,5,6
++	vsldoi	11,0,11,1
++
++	neg	11,3
++	lvsr	10,0,6
++	lwz	9,240(6)
++
++	lvsr	6,0,11
++	lvx	5,0,3
++	addi	3,3,15
++	vxor	6,6,3
++
++	srwi	9,9,1
++	li	10,16
++	subi	9,9,1
++
++	cmpldi	5,8
++	bge	_aesp8_ctr32_encrypt8x
++
++	lvsl	8,0,4
++	vspltisb	9,-1
++	lvx	7,0,4
++	vperm	9,9,0,8
++	vxor	8,8,3
++
++	lvx	0,0,6
++	mtctr	9
++	lvx	1,10,6
++	addi	10,10,16
++	vperm	0,1,0,10
++	vxor	2,4,0
++	lvx	0,10,6
++	addi	10,10,16
++	b	.Loop_ctr32_enc
++
++.align	5
++.Loop_ctr32_enc:
++	vperm	1,0,1,10
++	.long	0x10420D08
++	lvx	1,10,6
++	addi	10,10,16
++	vperm	0,1,0,10
++	.long	0x10420508
++	lvx	0,10,6
++	addi	10,10,16
++	bdnz	.Loop_ctr32_enc
++
++	vadduwm	4,4,11
++	vor	3,5,5
++	lvx	5,0,3
++	addi	3,3,16
++	subic.	5,5,1
++
++	vperm	1,0,1,10
++	.long	0x10420D08
++	lvx	1,10,6
++	vperm	3,3,5,6
++	li	10,16
++	vperm	1,1,0,10
++	lvx	0,0,6
++	vxor	3,3,1
++	.long	0x10421D09
++
++	lvx	1,10,6
++	addi	10,10,16
++	vperm	2,2,2,8
++	vsel	3,7,2,9
++	mtctr	9
++	vperm	0,1,0,10
++	vor	7,2,2
++	vxor	2,4,0
++	lvx	0,10,6
++	addi	10,10,16
++	stvx	3,0,4
++	addi	4,4,16
++	bne	.Loop_ctr32_enc
++
++	addi	4,4,-1
++	lvx	2,0,4
++	vsel	2,7,2,9
++	stvx	2,0,4
++
++	or	12,12,12
++	blr	
++.long	0
++.byte	0,12,0x14,0,0,0,6,0
++.long	0
++.align	5
++_aesp8_ctr32_encrypt8x:
++	stdu	1,-448(1)
++	li	10,207
++	li	11,223
++	stvx	20,10,1
++	addi	10,10,32
++	stvx	21,11,1
++	addi	11,11,32
++	stvx	22,10,1
++	addi	10,10,32
++	stvx	23,11,1
++	addi	11,11,32
++	stvx	24,10,1
++	addi	10,10,32
++	stvx	25,11,1
++	addi	11,11,32
++	stvx	26,10,1
++	addi	10,10,32
++	stvx	27,11,1
++	addi	11,11,32
++	stvx	28,10,1
++	addi	10,10,32
++	stvx	29,11,1
++	addi	11,11,32
++	stvx	30,10,1
++	stvx	31,11,1
++	li	0,-1
++	stw	12,396(1)
++	li	8,0x10
++	std	26,400(1)
++	li	26,0x20
++	std	27,408(1)
++	li	27,0x30
++	std	28,416(1)
++	li	28,0x40
++	std	29,424(1)
++	li	29,0x50
++	std	30,432(1)
++	li	30,0x60
++	std	31,440(1)
++	li	31,0x70
++	or	0,0,0
++
++	subi	9,9,3
++
++	lvx	23,0,6
++	lvx	30,8,6
++	addi	6,6,0x20
++	lvx	31,0,6
++	vperm	23,30,23,10
++	addi	11,1,79
++	mtctr	9
++
++.Load_ctr32_enc_key:
++	vperm	24,31,30,10
++	lvx	30,8,6
++	addi	6,6,0x20
++	stvx	24,0,11
++	vperm	25,30,31,10
++	lvx	31,0,6
++	stvx	25,8,11
++	addi	11,11,0x20
++	bdnz	.Load_ctr32_enc_key
++
++	lvx	26,8,6
++	vperm	24,31,30,10
++	lvx	27,26,6
++	stvx	24,0,11
++	vperm	25,26,31,10
++	lvx	28,27,6
++	stvx	25,8,11
++	addi	11,1,79
++	vperm	26,27,26,10
++	lvx	29,28,6
++	vperm	27,28,27,10
++	lvx	30,29,6
++	vperm	28,29,28,10
++	lvx	31,30,6
++	vperm	29,30,29,10
++	lvx	15,31,6
++	vperm	30,31,30,10
++	lvx	24,0,11
++	vperm	31,15,31,10
++	lvx	25,8,11
++
++	vadduwm	7,11,11
++	subi	3,3,15
++	sldi	5,5,4
++
++	vadduwm	16,4,11
++	vadduwm	17,4,7
++	vxor	15,4,23
++	li	10,8
++	vadduwm	18,16,7
++	vxor	16,16,23
++	lvsl	6,0,10
++	vadduwm	19,17,7
++	vxor	17,17,23
++	vspltisb	3,0x0f
++	vadduwm	20,18,7
++	vxor	18,18,23
++	vxor	6,6,3
++	vadduwm	21,19,7
++	vxor	19,19,23
++	vadduwm	22,20,7
++	vxor	20,20,23
++	vadduwm	4,21,7
++	vxor	21,21,23
++	vxor	22,22,23
++
++	mtctr	9
++	b	.Loop_ctr32_enc8x
++.align	5
++.Loop_ctr32_enc8x:
++	.long	0x11EFC508
++	.long	0x1210C508
++	.long	0x1231C508
++	.long	0x1252C508
++	.long	0x1273C508
++	.long	0x1294C508
++	.long	0x12B5C508
++	.long	0x12D6C508
++.Loop_ctr32_enc8x_middle:
++	lvx	24,26,11
++	addi	11,11,0x20
++
++	.long	0x11EFCD08
++	.long	0x1210CD08
++	.long	0x1231CD08
++	.long	0x1252CD08
++	.long	0x1273CD08
++	.long	0x1294CD08
++	.long	0x12B5CD08
++	.long	0x12D6CD08
++	lvx	25,8,11
++	bdnz	.Loop_ctr32_enc8x
++
++	subic	11,5,256
++	.long	0x11EFC508
++	.long	0x1210C508
++	.long	0x1231C508
++	.long	0x1252C508
++	.long	0x1273C508
++	.long	0x1294C508
++	.long	0x12B5C508
++	.long	0x12D6C508
++
++	subfe	0,0,0
++	.long	0x11EFCD08
++	.long	0x1210CD08
++	.long	0x1231CD08
++	.long	0x1252CD08
++	.long	0x1273CD08
++	.long	0x1294CD08
++	.long	0x12B5CD08
++	.long	0x12D6CD08
++
++	and	0,0,11
++	addi	11,1,79
++	.long	0x11EFD508
++	.long	0x1210D508
++	.long	0x1231D508
++	.long	0x1252D508
++	.long	0x1273D508
++	.long	0x1294D508
++	.long	0x12B5D508
++	.long	0x12D6D508
++	lvx	24,0,11
++
++	subic	5,5,129
++	.long	0x11EFDD08
++	addi	5,5,1
++	.long	0x1210DD08
++	.long	0x1231DD08
++	.long	0x1252DD08
++	.long	0x1273DD08
++	.long	0x1294DD08
++	.long	0x12B5DD08
++	.long	0x12D6DD08
++	lvx	25,8,11
++
++	.long	0x11EFE508
++	.long	0x7C001E99
++	.long	0x1210E508
++	.long	0x7C281E99
++	.long	0x1231E508
++	.long	0x7C5A1E99
++	.long	0x1252E508
++	.long	0x7C7B1E99
++	.long	0x1273E508
++	.long	0x7D5C1E99
++	.long	0x1294E508
++	.long	0x7D9D1E99
++	.long	0x12B5E508
++	.long	0x7DBE1E99
++	.long	0x12D6E508
++	.long	0x7DDF1E99
++	addi	3,3,0x80
++
++	.long	0x11EFED08
++	vperm	0,0,0,6
++	.long	0x1210ED08
++	vperm	1,1,1,6
++	.long	0x1231ED08
++	vperm	2,2,2,6
++	.long	0x1252ED08
++	vperm	3,3,3,6
++	.long	0x1273ED08
++	vperm	10,10,10,6
++	.long	0x1294ED08
++	vperm	12,12,12,6
++	.long	0x12B5ED08
++	vperm	13,13,13,6
++	.long	0x12D6ED08
++	vperm	14,14,14,6
++
++	add	3,3,0
++
++
++
++	subfe.	0,0,0
++	.long	0x11EFF508
++	vxor	0,0,31
++	.long	0x1210F508
++	vxor	1,1,31
++	.long	0x1231F508
++	vxor	2,2,31
++	.long	0x1252F508
++	vxor	3,3,31
++	.long	0x1273F508
++	vxor	10,10,31
++	.long	0x1294F508
++	vxor	12,12,31
++	.long	0x12B5F508
++	vxor	13,13,31
++	.long	0x12D6F508
++	vxor	14,14,31
++
++	bne	.Lctr32_enc8x_break
++
++	.long	0x100F0509
++	.long	0x10300D09
++	vadduwm	16,4,11
++	.long	0x10511509
++	vadduwm	17,4,7
++	vxor	15,4,23
++	.long	0x10721D09
++	vadduwm	18,16,7
++	vxor	16,16,23
++	.long	0x11535509
++	vadduwm	19,17,7
++	vxor	17,17,23
++	.long	0x11946509
++	vadduwm	20,18,7
++	vxor	18,18,23
++	.long	0x11B56D09
++	vadduwm	21,19,7
++	vxor	19,19,23
++	.long	0x11D67509
++	vadduwm	22,20,7
++	vxor	20,20,23
++	vperm	0,0,0,6
++	vadduwm	4,21,7
++	vxor	21,21,23
++	vperm	1,1,1,6
++	vxor	22,22,23
++	mtctr	9
++
++	.long	0x11EFC508
++	.long	0x7C002799
++	vperm	2,2,2,6
++	.long	0x1210C508
++	.long	0x7C282799
++	vperm	3,3,3,6
++	.long	0x1231C508
++	.long	0x7C5A2799
++	vperm	10,10,10,6
++	.long	0x1252C508
++	.long	0x7C7B2799
++	vperm	12,12,12,6
++	.long	0x1273C508
++	.long	0x7D5C2799
++	vperm	13,13,13,6
++	.long	0x1294C508
++	.long	0x7D9D2799
++	vperm	14,14,14,6
++	.long	0x12B5C508
++	.long	0x7DBE2799
++	.long	0x12D6C508
++	.long	0x7DDF2799
++	addi	4,4,0x80
++
++	b	.Loop_ctr32_enc8x_middle
++
++.align	5
++.Lctr32_enc8x_break:
++	cmpwi	5,-0x60
++	blt	.Lctr32_enc8x_one
++	nop	
++	beq	.Lctr32_enc8x_two
++	cmpwi	5,-0x40
++	blt	.Lctr32_enc8x_three
++	nop	
++	beq	.Lctr32_enc8x_four
++	cmpwi	5,-0x20
++	blt	.Lctr32_enc8x_five
++	nop	
++	beq	.Lctr32_enc8x_six
++	cmpwi	5,0x00
++	blt	.Lctr32_enc8x_seven
++
++.Lctr32_enc8x_eight:
++	.long	0x11EF0509
++	.long	0x12100D09
++	.long	0x12311509
++	.long	0x12521D09
++	.long	0x12735509
++	.long	0x12946509
++	.long	0x12B56D09
++	.long	0x12D67509
++
++	vperm	15,15,15,6
++	vperm	16,16,16,6
++	.long	0x7DE02799
++	vperm	17,17,17,6
++	.long	0x7E082799
++	vperm	18,18,18,6
++	.long	0x7E3A2799
++	vperm	19,19,19,6
++	.long	0x7E5B2799
++	vperm	20,20,20,6
++	.long	0x7E7C2799
++	vperm	21,21,21,6
++	.long	0x7E9D2799
++	vperm	22,22,22,6
++	.long	0x7EBE2799
++	.long	0x7EDF2799
++	addi	4,4,0x80
++	b	.Lctr32_enc8x_done
++
++.align	5
++.Lctr32_enc8x_seven:
++	.long	0x11EF0D09
++	.long	0x12101509
++	.long	0x12311D09
++	.long	0x12525509
++	.long	0x12736509
++	.long	0x12946D09
++	.long	0x12B57509
++
++	vperm	15,15,15,6
++	vperm	16,16,16,6
++	.long	0x7DE02799
++	vperm	17,17,17,6
++	.long	0x7E082799
++	vperm	18,18,18,6
++	.long	0x7E3A2799
++	vperm	19,19,19,6
++	.long	0x7E5B2799
++	vperm	20,20,20,6
++	.long	0x7E7C2799
++	vperm	21,21,21,6
++	.long	0x7E9D2799
++	.long	0x7EBE2799
++	addi	4,4,0x70
++	b	.Lctr32_enc8x_done
++
++.align	5
++.Lctr32_enc8x_six:
++	.long	0x11EF1509
++	.long	0x12101D09
++	.long	0x12315509
++	.long	0x12526509
++	.long	0x12736D09
++	.long	0x12947509
++
++	vperm	15,15,15,6
++	vperm	16,16,16,6
++	.long	0x7DE02799
++	vperm	17,17,17,6
++	.long	0x7E082799
++	vperm	18,18,18,6
++	.long	0x7E3A2799
++	vperm	19,19,19,6
++	.long	0x7E5B2799
++	vperm	20,20,20,6
++	.long	0x7E7C2799
++	.long	0x7E9D2799
++	addi	4,4,0x60
++	b	.Lctr32_enc8x_done
++
++.align	5
++.Lctr32_enc8x_five:
++	.long	0x11EF1D09
++	.long	0x12105509
++	.long	0x12316509
++	.long	0x12526D09
++	.long	0x12737509
++
++	vperm	15,15,15,6
++	vperm	16,16,16,6
++	.long	0x7DE02799
++	vperm	17,17,17,6
++	.long	0x7E082799
++	vperm	18,18,18,6
++	.long	0x7E3A2799
++	vperm	19,19,19,6
++	.long	0x7E5B2799
++	.long	0x7E7C2799
++	addi	4,4,0x50
++	b	.Lctr32_enc8x_done
++
++.align	5
++.Lctr32_enc8x_four:
++	.long	0x11EF5509
++	.long	0x12106509
++	.long	0x12316D09
++	.long	0x12527509
++
++	vperm	15,15,15,6
++	vperm	16,16,16,6
++	.long	0x7DE02799
++	vperm	17,17,17,6
++	.long	0x7E082799
++	vperm	18,18,18,6
++	.long	0x7E3A2799
++	.long	0x7E5B2799
++	addi	4,4,0x40
++	b	.Lctr32_enc8x_done
++
++.align	5
++.Lctr32_enc8x_three:
++	.long	0x11EF6509
++	.long	0x12106D09
++	.long	0x12317509
++
++	vperm	15,15,15,6
++	vperm	16,16,16,6
++	.long	0x7DE02799
++	vperm	17,17,17,6
++	.long	0x7E082799
++	.long	0x7E3A2799
++	addi	4,4,0x30
++	b	.Lctr32_enc8x_done
++
++.align	5
++.Lctr32_enc8x_two:
++	.long	0x11EF6D09
++	.long	0x12107509
++
++	vperm	15,15,15,6
++	vperm	16,16,16,6
++	.long	0x7DE02799
++	.long	0x7E082799
++	addi	4,4,0x20
++	b	.Lctr32_enc8x_done
++
++.align	5
++.Lctr32_enc8x_one:
++	.long	0x11EF7509
++
++	vperm	15,15,15,6
++	.long	0x7DE02799
++	addi	4,4,0x10
++
++.Lctr32_enc8x_done:
++	li	10,79
++	li	11,95
++	stvx	6,10,1
++	addi	10,10,32
++	stvx	6,11,1
++	addi	11,11,32
++	stvx	6,10,1
++	addi	10,10,32
++	stvx	6,11,1
++	addi	11,11,32
++	stvx	6,10,1
++	addi	10,10,32
++	stvx	6,11,1
++	addi	11,11,32
++	stvx	6,10,1
++	addi	10,10,32
++	stvx	6,11,1
++	addi	11,11,32
++
++	or	12,12,12
++	lvx	20,10,1
++	addi	10,10,32
++	lvx	21,11,1
++	addi	11,11,32
++	lvx	22,10,1
++	addi	10,10,32
++	lvx	23,11,1
++	addi	11,11,32
++	lvx	24,10,1
++	addi	10,10,32
++	lvx	25,11,1
++	addi	11,11,32
++	lvx	26,10,1
++	addi	10,10,32
++	lvx	27,11,1
++	addi	11,11,32
++	lvx	28,10,1
++	addi	10,10,32
++	lvx	29,11,1
++	addi	11,11,32
++	lvx	30,10,1
++	lvx	31,11,1
++	ld	26,400(1)
++	ld	27,408(1)
++	ld	28,416(1)
++	ld	29,424(1)
++	ld	30,432(1)
++	ld	31,440(1)
++	addi	1,1,448
++	blr	
++.long	0
++.byte	0,12,0x04,0,0x80,6,6,0
++.long	0
++.size	aes_hw_ctr32_encrypt_blocks,.-aes_hw_ctr32_encrypt_blocks
++.globl	aes_hw_xts_encrypt
++.type	aes_hw_xts_encrypt,@function
++.align	5
++aes_hw_xts_encrypt:
++.localentry	aes_hw_xts_encrypt,0
++
++	mr	10,3
++	li	3,-1
++	cmpldi	5,16
++	.long	0x4dc00020
++
++	lis	0,0xfff0
++	li	12,-1
++	li	11,0
++	or	0,0,0
++
++	vspltisb	9,0x07
++	lvsl	6,11,11
++	vspltisb	11,0x0f
++	vxor	6,6,9
++
++	li	3,15
++	lvx	8,0,8
++	lvsl	5,0,8
++	lvx	4,3,8
++	vxor	5,5,11
++	vperm	8,8,4,5
++
++	neg	11,10
++	lvsr	5,0,11
++	lvx	2,0,10
++	addi	10,10,15
++	vxor	5,5,11
++
++	cmpldi	7,0
++	beq	.Lxts_enc_no_key2
++
++	lvsr	7,0,7
++	lwz	9,240(7)
++	srwi	9,9,1
++	subi	9,9,1
++	li	3,16
++
++	lvx	0,0,7
++	lvx	1,3,7
++	addi	3,3,16
++	vperm	0,1,0,7
++	vxor	8,8,0
++	lvx	0,3,7
++	addi	3,3,16
++	mtctr	9
++
++.Ltweak_xts_enc:
++	vperm	1,0,1,7
++	.long	0x11080D08
++	lvx	1,3,7
++	addi	3,3,16
++	vperm	0,1,0,7
++	.long	0x11080508
++	lvx	0,3,7
++	addi	3,3,16
++	bdnz	.Ltweak_xts_enc
++
++	vperm	1,0,1,7
++	.long	0x11080D08
++	lvx	1,3,7
++	vperm	0,1,0,7
++	.long	0x11080509
++
++	li	8,0
++	b	.Lxts_enc
++
++.Lxts_enc_no_key2:
++	li	3,-16
++	and	5,5,3
++
++
++.Lxts_enc:
++	lvx	4,0,10
++	addi	10,10,16
++
++	lvsr	7,0,6
++	lwz	9,240(6)
++	srwi	9,9,1
++	subi	9,9,1
++	li	3,16
++
++	vslb	10,9,9
++	vor	10,10,9
++	vspltisb	11,1
++	vsldoi	10,10,11,15
++
++	cmpldi	5,96
++	bge	_aesp8_xts_encrypt6x
++
++	andi.	7,5,15
++	subic	0,5,32
++	subi	7,7,16
++	subfe	0,0,0
++	and	0,0,7
++	add	10,10,0
++
++	lvx	0,0,6
++	lvx	1,3,6
++	addi	3,3,16
++	vperm	2,2,4,5
++	vperm	0,1,0,7
++	vxor	2,2,8
++	vxor	2,2,0
++	lvx	0,3,6
++	addi	3,3,16
++	mtctr	9
++	b	.Loop_xts_enc
++
++.align	5
++.Loop_xts_enc:
++	vperm	1,0,1,7
++	.long	0x10420D08
++	lvx	1,3,6
++	addi	3,3,16
++	vperm	0,1,0,7
++	.long	0x10420508
++	lvx	0,3,6
++	addi	3,3,16
++	bdnz	.Loop_xts_enc
++
++	vperm	1,0,1,7
++	.long	0x10420D08
++	lvx	1,3,6
++	li	3,16
++	vperm	0,1,0,7
++	vxor	0,0,8
++	.long	0x10620509
++
++	vperm	11,3,3,6
++
++	.long	0x7D602799
++
++	addi	4,4,16
++
++	subic.	5,5,16
++	beq	.Lxts_enc_done
++
++	vor	2,4,4
++	lvx	4,0,10
++	addi	10,10,16
++	lvx	0,0,6
++	lvx	1,3,6
++	addi	3,3,16
++
++	subic	0,5,32
++	subfe	0,0,0
++	and	0,0,7
++	add	10,10,0
++
++	vsrab	11,8,9
++	vaddubm	8,8,8
++	vsldoi	11,11,11,15
++	vand	11,11,10
++	vxor	8,8,11
++
++	vperm	2,2,4,5
++	vperm	0,1,0,7
++	vxor	2,2,8
++	vxor	3,3,0
++	vxor	2,2,0
++	lvx	0,3,6
++	addi	3,3,16
++
++	mtctr	9
++	cmpldi	5,16
++	bge	.Loop_xts_enc
++
++	vxor	3,3,8
++	lvsr	5,0,5
++	vxor	4,4,4
++	vspltisb	11,-1
++	vperm	4,4,11,5
++	vsel	2,2,3,4
++
++	subi	11,4,17
++	subi	4,4,16
++	mtctr	5
++	li	5,16
++.Loop_xts_enc_steal:
++	lbzu	0,1(11)
++	stb	0,16(11)
++	bdnz	.Loop_xts_enc_steal
++
++	mtctr	9
++	b	.Loop_xts_enc
++
++.Lxts_enc_done:
++	cmpldi	8,0
++	beq	.Lxts_enc_ret
++
++	vsrab	11,8,9
++	vaddubm	8,8,8
++	vsldoi	11,11,11,15
++	vand	11,11,10
++	vxor	8,8,11
++
++	vperm	8,8,8,6
++	.long	0x7D004799
++
++.Lxts_enc_ret:
++	or	12,12,12
++	li	3,0
++	blr	
++.long	0
++.byte	0,12,0x04,0,0x80,6,6,0
++.long	0
++.size	aes_hw_xts_encrypt,.-aes_hw_xts_encrypt
++
++.globl	aes_hw_xts_decrypt
++.type	aes_hw_xts_decrypt,@function
++.align	5
++aes_hw_xts_decrypt:
++.localentry	aes_hw_xts_decrypt,0
++
++	mr	10,3
++	li	3,-1
++	cmpldi	5,16
++	.long	0x4dc00020
++
++	lis	0,0xfff8
++	li	12,-1
++	li	11,0
++	or	0,0,0
++
++	andi.	0,5,15
++	neg	0,0
++	andi.	0,0,16
++	sub	5,5,0
++
++	vspltisb	9,0x07
++	lvsl	6,11,11
++	vspltisb	11,0x0f
++	vxor	6,6,9
++
++	li	3,15
++	lvx	8,0,8
++	lvsl	5,0,8
++	lvx	4,3,8
++	vxor	5,5,11
++	vperm	8,8,4,5
++
++	neg	11,10
++	lvsr	5,0,11
++	lvx	2,0,10
++	addi	10,10,15
++	vxor	5,5,11
++
++	cmpldi	7,0
++	beq	.Lxts_dec_no_key2
++
++	lvsr	7,0,7
++	lwz	9,240(7)
++	srwi	9,9,1
++	subi	9,9,1
++	li	3,16
++
++	lvx	0,0,7
++	lvx	1,3,7
++	addi	3,3,16
++	vperm	0,1,0,7
++	vxor	8,8,0
++	lvx	0,3,7
++	addi	3,3,16
++	mtctr	9
++
++.Ltweak_xts_dec:
++	vperm	1,0,1,7
++	.long	0x11080D08
++	lvx	1,3,7
++	addi	3,3,16
++	vperm	0,1,0,7
++	.long	0x11080508
++	lvx	0,3,7
++	addi	3,3,16
++	bdnz	.Ltweak_xts_dec
++
++	vperm	1,0,1,7
++	.long	0x11080D08
++	lvx	1,3,7
++	vperm	0,1,0,7
++	.long	0x11080509
++
++	li	8,0
++	b	.Lxts_dec
++
++.Lxts_dec_no_key2:
++	neg	3,5
++	andi.	3,3,15
++	add	5,5,3
++
++
++.Lxts_dec:
++	lvx	4,0,10
++	addi	10,10,16
++
++	lvsr	7,0,6
++	lwz	9,240(6)
++	srwi	9,9,1
++	subi	9,9,1
++	li	3,16
++
++	vslb	10,9,9
++	vor	10,10,9
++	vspltisb	11,1
++	vsldoi	10,10,11,15
++
++	cmpldi	5,96
++	bge	_aesp8_xts_decrypt6x
++
++	lvx	0,0,6
++	lvx	1,3,6
++	addi	3,3,16
++	vperm	2,2,4,5
++	vperm	0,1,0,7
++	vxor	2,2,8
++	vxor	2,2,0
++	lvx	0,3,6
++	addi	3,3,16
++	mtctr	9
++
++	cmpldi	5,16
++	blt	.Ltail_xts_dec
++
++
++.align	5
++.Loop_xts_dec:
++	vperm	1,0,1,7
++	.long	0x10420D48
++	lvx	1,3,6
++	addi	3,3,16
++	vperm	0,1,0,7
++	.long	0x10420548
++	lvx	0,3,6
++	addi	3,3,16
++	bdnz	.Loop_xts_dec
++
++	vperm	1,0,1,7
++	.long	0x10420D48
++	lvx	1,3,6
++	li	3,16
++	vperm	0,1,0,7
++	vxor	0,0,8
++	.long	0x10620549
++
++	vperm	11,3,3,6
++
++	.long	0x7D602799
++
++	addi	4,4,16
++
++	subic.	5,5,16
++	beq	.Lxts_dec_done
++
++	vor	2,4,4
++	lvx	4,0,10
++	addi	10,10,16
++	lvx	0,0,6
++	lvx	1,3,6
++	addi	3,3,16
++
++	vsrab	11,8,9
++	vaddubm	8,8,8
++	vsldoi	11,11,11,15
++	vand	11,11,10
++	vxor	8,8,11
++
++	vperm	2,2,4,5
++	vperm	0,1,0,7
++	vxor	2,2,8
++	vxor	2,2,0
++	lvx	0,3,6
++	addi	3,3,16
++
++	mtctr	9
++	cmpldi	5,16
++	bge	.Loop_xts_dec
++
++.Ltail_xts_dec:
++	vsrab	11,8,9
++	vaddubm	12,8,8
++	vsldoi	11,11,11,15
++	vand	11,11,10
++	vxor	12,12,11
++
++	subi	10,10,16
++	add	10,10,5
++
++	vxor	2,2,8
++	vxor	2,2,12
++
++.Loop_xts_dec_short:
++	vperm	1,0,1,7
++	.long	0x10420D48
++	lvx	1,3,6
++	addi	3,3,16
++	vperm	0,1,0,7
++	.long	0x10420548
++	lvx	0,3,6
++	addi	3,3,16
++	bdnz	.Loop_xts_dec_short
++
++	vperm	1,0,1,7
++	.long	0x10420D48
++	lvx	1,3,6
++	li	3,16
++	vperm	0,1,0,7
++	vxor	0,0,12
++	.long	0x10620549
++
++	vperm	11,3,3,6
++
++	.long	0x7D602799
++
++
++	vor	2,4,4
++	lvx	4,0,10
++
++	lvx	0,0,6
++	lvx	1,3,6
++	addi	3,3,16
++	vperm	2,2,4,5
++	vperm	0,1,0,7
++
++	lvsr	5,0,5
++	vxor	4,4,4
++	vspltisb	11,-1
++	vperm	4,4,11,5
++	vsel	2,2,3,4
++
++	vxor	0,0,8
++	vxor	2,2,0
++	lvx	0,3,6
++	addi	3,3,16
++
++	subi	11,4,1
++	mtctr	5
++	li	5,16
++.Loop_xts_dec_steal:
++	lbzu	0,1(11)
++	stb	0,16(11)
++	bdnz	.Loop_xts_dec_steal
++
++	mtctr	9
++	b	.Loop_xts_dec
++
++.Lxts_dec_done:
++	cmpldi	8,0
++	beq	.Lxts_dec_ret
++
++	vsrab	11,8,9
++	vaddubm	8,8,8
++	vsldoi	11,11,11,15
++	vand	11,11,10
++	vxor	8,8,11
++
++	vperm	8,8,8,6
++	.long	0x7D004799
++
++.Lxts_dec_ret:
++	or	12,12,12
++	li	3,0
++	blr	
++.long	0
++.byte	0,12,0x04,0,0x80,6,6,0
++.long	0
++.size	aes_hw_xts_decrypt,.-aes_hw_xts_decrypt
++.align	5
++_aesp8_xts_encrypt6x:
++	stdu	1,-448(1)
++	mflr	11
++	li	7,207
++	li	3,223
++	std	11,464(1)
++	stvx	20,7,1
++	addi	7,7,32
++	stvx	21,3,1
++	addi	3,3,32
++	stvx	22,7,1
++	addi	7,7,32
++	stvx	23,3,1
++	addi	3,3,32
++	stvx	24,7,1
++	addi	7,7,32
++	stvx	25,3,1
++	addi	3,3,32
++	stvx	26,7,1
++	addi	7,7,32
++	stvx	27,3,1
++	addi	3,3,32
++	stvx	28,7,1
++	addi	7,7,32
++	stvx	29,3,1
++	addi	3,3,32
++	stvx	30,7,1
++	stvx	31,3,1
++	li	0,-1
++	stw	12,396(1)
++	li	3,0x10
++	std	26,400(1)
++	li	26,0x20
++	std	27,408(1)
++	li	27,0x30
++	std	28,416(1)
++	li	28,0x40
++	std	29,424(1)
++	li	29,0x50
++	std	30,432(1)
++	li	30,0x60
++	std	31,440(1)
++	li	31,0x70
++	or	0,0,0
++
++	subi	9,9,3
++
++	lvx	23,0,6
++	lvx	30,3,6
++	addi	6,6,0x20
++	lvx	31,0,6
++	vperm	23,30,23,7
++	addi	7,1,79
++	mtctr	9
++
++.Load_xts_enc_key:
++	vperm	24,31,30,7
++	lvx	30,3,6
++	addi	6,6,0x20
++	stvx	24,0,7
++	vperm	25,30,31,7
++	lvx	31,0,6
++	stvx	25,3,7
++	addi	7,7,0x20
++	bdnz	.Load_xts_enc_key
++
++	lvx	26,3,6
++	vperm	24,31,30,7
++	lvx	27,26,6
++	stvx	24,0,7
++	vperm	25,26,31,7
++	lvx	28,27,6
++	stvx	25,3,7
++	addi	7,1,79
++	vperm	26,27,26,7
++	lvx	29,28,6
++	vperm	27,28,27,7
++	lvx	30,29,6
++	vperm	28,29,28,7
++	lvx	31,30,6
++	vperm	29,30,29,7
++	lvx	22,31,6
++	vperm	30,31,30,7
++	lvx	24,0,7
++	vperm	31,22,31,7
++	lvx	25,3,7
++
++	vperm	0,2,4,5
++	subi	10,10,31
++	vxor	17,8,23
++	vsrab	11,8,9
++	vaddubm	8,8,8
++	vsldoi	11,11,11,15
++	vand	11,11,10
++	vxor	7,0,17
++	vxor	8,8,11
++
++	.long	0x7C235699
++	vxor	18,8,23
++	vsrab	11,8,9
++	vaddubm	8,8,8
++	vsldoi	11,11,11,15
++	vperm	1,1,1,6
++	vand	11,11,10
++	vxor	12,1,18
++	vxor	8,8,11
++
++	.long	0x7C5A5699
++	andi.	31,5,15
++	vxor	19,8,23
++	vsrab	11,8,9
++	vaddubm	8,8,8
++	vsldoi	11,11,11,15
++	vperm	2,2,2,6
++	vand	11,11,10
++	vxor	13,2,19
++	vxor	8,8,11
++
++	.long	0x7C7B5699
++	sub	5,5,31
++	vxor	20,8,23
++	vsrab	11,8,9
++	vaddubm	8,8,8
++	vsldoi	11,11,11,15
++	vperm	3,3,3,6
++	vand	11,11,10
++	vxor	14,3,20
++	vxor	8,8,11
++
++	.long	0x7C9C5699
++	subi	5,5,0x60
++	vxor	21,8,23
++	vsrab	11,8,9
++	vaddubm	8,8,8
++	vsldoi	11,11,11,15
++	vperm	4,4,4,6
++	vand	11,11,10
++	vxor	15,4,21
++	vxor	8,8,11
++
++	.long	0x7CBD5699
++	addi	10,10,0x60
++	vxor	22,8,23
++	vsrab	11,8,9
++	vaddubm	8,8,8
++	vsldoi	11,11,11,15
++	vperm	5,5,5,6
++	vand	11,11,10
++	vxor	16,5,22
++	vxor	8,8,11
++
++	vxor	31,31,23
++	mtctr	9
++	b	.Loop_xts_enc6x
++
++.align	5
++.Loop_xts_enc6x:
++	.long	0x10E7C508
++	.long	0x118CC508
++	.long	0x11ADC508
++	.long	0x11CEC508
++	.long	0x11EFC508
++	.long	0x1210C508
++	lvx	24,26,7
++	addi	7,7,0x20
++
++	.long	0x10E7CD08
++	.long	0x118CCD08
++	.long	0x11ADCD08
++	.long	0x11CECD08
++	.long	0x11EFCD08
++	.long	0x1210CD08
++	lvx	25,3,7
++	bdnz	.Loop_xts_enc6x
++
++	subic	5,5,96
++	vxor	0,17,31
++	.long	0x10E7C508
++	.long	0x118CC508
++	vsrab	11,8,9
++	vxor	17,8,23
++	vaddubm	8,8,8
++	.long	0x11ADC508
++	.long	0x11CEC508
++	vsldoi	11,11,11,15
++	.long	0x11EFC508
++	.long	0x1210C508
++
++	subfe.	0,0,0
++	vand	11,11,10
++	.long	0x10E7CD08
++	.long	0x118CCD08
++	vxor	8,8,11
++	.long	0x11ADCD08
++	.long	0x11CECD08
++	vxor	1,18,31
++	vsrab	11,8,9
++	vxor	18,8,23
++	.long	0x11EFCD08
++	.long	0x1210CD08
++
++	and	0,0,5
++	vaddubm	8,8,8
++	vsldoi	11,11,11,15
++	.long	0x10E7D508
++	.long	0x118CD508
++	vand	11,11,10
++	.long	0x11ADD508
++	.long	0x11CED508
++	vxor	8,8,11
++	.long	0x11EFD508
++	.long	0x1210D508
++
++	add	10,10,0
++
++
++
++	vxor	2,19,31
++	vsrab	11,8,9
++	vxor	19,8,23
++	vaddubm	8,8,8
++	.long	0x10E7DD08
++	.long	0x118CDD08
++	vsldoi	11,11,11,15
++	.long	0x11ADDD08
++	.long	0x11CEDD08
++	vand	11,11,10
++	.long	0x11EFDD08
++	.long	0x1210DD08
++
++	addi	7,1,79
++	vxor	8,8,11
++	.long	0x10E7E508
++	.long	0x118CE508
++	vxor	3,20,31
++	vsrab	11,8,9
++	vxor	20,8,23
++	.long	0x11ADE508
++	.long	0x11CEE508
++	vaddubm	8,8,8
++	vsldoi	11,11,11,15
++	.long	0x11EFE508
++	.long	0x1210E508
++	lvx	24,0,7
++	vand	11,11,10
++
++	.long	0x10E7ED08
++	.long	0x118CED08
++	vxor	8,8,11
++	.long	0x11ADED08
++	.long	0x11CEED08
++	vxor	4,21,31
++	vsrab	11,8,9
++	vxor	21,8,23
++	.long	0x11EFED08
++	.long	0x1210ED08
++	lvx	25,3,7
++	vaddubm	8,8,8
++	vsldoi	11,11,11,15
++
++	.long	0x10E7F508
++	.long	0x118CF508
++	vand	11,11,10
++	.long	0x11ADF508
++	.long	0x11CEF508
++	vxor	8,8,11
++	.long	0x11EFF508
++	.long	0x1210F508
++	vxor	5,22,31
++	vsrab	11,8,9
++	vxor	22,8,23
++
++	.long	0x10E70509
++	.long	0x7C005699
++	vaddubm	8,8,8
++	vsldoi	11,11,11,15
++	.long	0x118C0D09
++	.long	0x7C235699
++	.long	0x11AD1509
++	vperm	0,0,0,6
++	.long	0x7C5A5699
++	vand	11,11,10
++	.long	0x11CE1D09
++	vperm	1,1,1,6
++	.long	0x7C7B5699
++	.long	0x11EF2509
++	vperm	2,2,2,6
++	.long	0x7C9C5699
++	vxor	8,8,11
++	.long	0x11702D09
++
++	vperm	3,3,3,6
++	.long	0x7CBD5699
++	addi	10,10,0x60
++	vperm	4,4,4,6
++	vperm	5,5,5,6
++
++	vperm	7,7,7,6
++	vperm	12,12,12,6
++	.long	0x7CE02799
++	vxor	7,0,17
++	vperm	13,13,13,6
++	.long	0x7D832799
++	vxor	12,1,18
++	vperm	14,14,14,6
++	.long	0x7DBA2799
++	vxor	13,2,19
++	vperm	15,15,15,6
++	.long	0x7DDB2799
++	vxor	14,3,20
++	vperm	16,11,11,6
++	.long	0x7DFC2799
++	vxor	15,4,21
++	.long	0x7E1D2799
++
++	vxor	16,5,22
++	addi	4,4,0x60
++
++	mtctr	9
++	beq	.Loop_xts_enc6x
++
++	addic.	5,5,0x60
++	beq	.Lxts_enc6x_zero
++	cmpwi	5,0x20
++	blt	.Lxts_enc6x_one
++	nop	
++	beq	.Lxts_enc6x_two
++	cmpwi	5,0x40
++	blt	.Lxts_enc6x_three
++	nop	
++	beq	.Lxts_enc6x_four
++
++.Lxts_enc6x_five:
++	vxor	7,1,17
++	vxor	12,2,18
++	vxor	13,3,19
++	vxor	14,4,20
++	vxor	15,5,21
++
++	bl	_aesp8_xts_enc5x
++
++	vperm	7,7,7,6
++	vor	17,22,22
++	vperm	12,12,12,6
++	.long	0x7CE02799
++	vperm	13,13,13,6
++	.long	0x7D832799
++	vperm	14,14,14,6
++	.long	0x7DBA2799
++	vxor	11,15,22
++	vperm	15,15,15,6
++	.long	0x7DDB2799
++	.long	0x7DFC2799
++	addi	4,4,0x50
++	bne	.Lxts_enc6x_steal
++	b	.Lxts_enc6x_done
++
++.align	4
++.Lxts_enc6x_four:
++	vxor	7,2,17
++	vxor	12,3,18
++	vxor	13,4,19
++	vxor	14,5,20
++	vxor	15,15,15
++
++	bl	_aesp8_xts_enc5x
++
++	vperm	7,7,7,6
++	vor	17,21,21
++	vperm	12,12,12,6
++	.long	0x7CE02799
++	vperm	13,13,13,6
++	.long	0x7D832799
++	vxor	11,14,21
++	vperm	14,14,14,6
++	.long	0x7DBA2799
++	.long	0x7DDB2799
++	addi	4,4,0x40
++	bne	.Lxts_enc6x_steal
++	b	.Lxts_enc6x_done
++
++.align	4
++.Lxts_enc6x_three:
++	vxor	7,3,17
++	vxor	12,4,18
++	vxor	13,5,19
++	vxor	14,14,14
++	vxor	15,15,15
++
++	bl	_aesp8_xts_enc5x
++
++	vperm	7,7,7,6
++	vor	17,20,20
++	vperm	12,12,12,6
++	.long	0x7CE02799
++	vxor	11,13,20
++	vperm	13,13,13,6
++	.long	0x7D832799
++	.long	0x7DBA2799
++	addi	4,4,0x30
++	bne	.Lxts_enc6x_steal
++	b	.Lxts_enc6x_done
++
++.align	4
++.Lxts_enc6x_two:
++	vxor	7,4,17
++	vxor	12,5,18
++	vxor	13,13,13
++	vxor	14,14,14
++	vxor	15,15,15
++
++	bl	_aesp8_xts_enc5x
++
++	vperm	7,7,7,6
++	vor	17,19,19
++	vxor	11,12,19
++	vperm	12,12,12,6
++	.long	0x7CE02799
++	.long	0x7D832799
++	addi	4,4,0x20
++	bne	.Lxts_enc6x_steal
++	b	.Lxts_enc6x_done
++
++.align	4
++.Lxts_enc6x_one:
++	vxor	7,5,17
++	nop	
++.Loop_xts_enc1x:
++	.long	0x10E7C508
++	lvx	24,26,7
++	addi	7,7,0x20
++
++	.long	0x10E7CD08
++	lvx	25,3,7
++	bdnz	.Loop_xts_enc1x
++
++	add	10,10,31
++	cmpwi	31,0
++	.long	0x10E7C508
++
++	subi	10,10,16
++	.long	0x10E7CD08
++
++	lvsr	5,0,31
++	.long	0x10E7D508
++
++	.long	0x7C005699
++	.long	0x10E7DD08
++
++	addi	7,1,79
++	.long	0x10E7E508
++	lvx	24,0,7
++
++	.long	0x10E7ED08
++	lvx	25,3,7
++	vxor	17,17,31
++
++	vperm	0,0,0,6
++	.long	0x10E7F508
++
++	vperm	0,0,0,5
++	.long	0x10E78D09
++
++	vor	17,18,18
++	vxor	11,7,18
++	vperm	7,7,7,6
++	.long	0x7CE02799
++	addi	4,4,0x10
++	bne	.Lxts_enc6x_steal
++	b	.Lxts_enc6x_done
++
++.align	4
++.Lxts_enc6x_zero:
++	cmpwi	31,0
++	beq	.Lxts_enc6x_done
++
++	add	10,10,31
++	subi	10,10,16
++	.long	0x7C005699
++	lvsr	5,0,31
++	vperm	0,0,0,6
++	vperm	0,0,0,5
++	vxor	11,11,17
++.Lxts_enc6x_steal:
++	vxor	0,0,17
++	vxor	7,7,7
++	vspltisb	12,-1
++	vperm	7,7,12,5
++	vsel	7,0,11,7
++
++	subi	30,4,17
++	subi	4,4,16
++	mtctr	31
++.Loop_xts_enc6x_steal:
++	lbzu	0,1(30)
++	stb	0,16(30)
++	bdnz	.Loop_xts_enc6x_steal
++
++	li	31,0
++	mtctr	9
++	b	.Loop_xts_enc1x
++
++.align	4
++.Lxts_enc6x_done:
++	cmpldi	8,0
++	beq	.Lxts_enc6x_ret
++
++	vxor	8,17,23
++	vperm	8,8,8,6
++	.long	0x7D004799
++
++.Lxts_enc6x_ret:
++	mtlr	11
++	li	10,79
++	li	11,95
++	stvx	9,10,1
++	addi	10,10,32
++	stvx	9,11,1
++	addi	11,11,32
++	stvx	9,10,1
++	addi	10,10,32
++	stvx	9,11,1
++	addi	11,11,32
++	stvx	9,10,1
++	addi	10,10,32
++	stvx	9,11,1
++	addi	11,11,32
++	stvx	9,10,1
++	addi	10,10,32
++	stvx	9,11,1
++	addi	11,11,32
++
++	or	12,12,12
++	lvx	20,10,1
++	addi	10,10,32
++	lvx	21,11,1
++	addi	11,11,32
++	lvx	22,10,1
++	addi	10,10,32
++	lvx	23,11,1
++	addi	11,11,32
++	lvx	24,10,1
++	addi	10,10,32
++	lvx	25,11,1
++	addi	11,11,32
++	lvx	26,10,1
++	addi	10,10,32
++	lvx	27,11,1
++	addi	11,11,32
++	lvx	28,10,1
++	addi	10,10,32
++	lvx	29,11,1
++	addi	11,11,32
++	lvx	30,10,1
++	lvx	31,11,1
++	ld	26,400(1)
++	ld	27,408(1)
++	ld	28,416(1)
++	ld	29,424(1)
++	ld	30,432(1)
++	ld	31,440(1)
++	addi	1,1,448
++	blr	
++.long	0
++.byte	0,12,0x04,1,0x80,6,6,0
++.long	0
++
++.align	5
++_aesp8_xts_enc5x:
++	.long	0x10E7C508
++	.long	0x118CC508
++	.long	0x11ADC508
++	.long	0x11CEC508
++	.long	0x11EFC508
++	lvx	24,26,7
++	addi	7,7,0x20
++
++	.long	0x10E7CD08
++	.long	0x118CCD08
++	.long	0x11ADCD08
++	.long	0x11CECD08
++	.long	0x11EFCD08
++	lvx	25,3,7
++	bdnz	_aesp8_xts_enc5x
++
++	add	10,10,31
++	cmpwi	31,0
++	.long	0x10E7C508
++	.long	0x118CC508
++	.long	0x11ADC508
++	.long	0x11CEC508
++	.long	0x11EFC508
++
++	subi	10,10,16
++	.long	0x10E7CD08
++	.long	0x118CCD08
++	.long	0x11ADCD08
++	.long	0x11CECD08
++	.long	0x11EFCD08
++	vxor	17,17,31
++
++	.long	0x10E7D508
++	lvsr	5,0,31
++	.long	0x118CD508
++	.long	0x11ADD508
++	.long	0x11CED508
++	.long	0x11EFD508
++	vxor	1,18,31
++
++	.long	0x10E7DD08
++	.long	0x7C005699
++	.long	0x118CDD08
++	.long	0x11ADDD08
++	.long	0x11CEDD08
++	.long	0x11EFDD08
++	vxor	2,19,31
++
++	addi	7,1,79
++	.long	0x10E7E508
++	.long	0x118CE508
++	.long	0x11ADE508
++	.long	0x11CEE508
++	.long	0x11EFE508
++	lvx	24,0,7
++	vxor	3,20,31
++
++	.long	0x10E7ED08
++	vperm	0,0,0,6
++	.long	0x118CED08
++	.long	0x11ADED08
++	.long	0x11CEED08
++	.long	0x11EFED08
++	lvx	25,3,7
++	vxor	4,21,31
++
++	.long	0x10E7F508
++	vperm	0,0,0,5
++	.long	0x118CF508
++	.long	0x11ADF508
++	.long	0x11CEF508
++	.long	0x11EFF508
++
++	.long	0x10E78D09
++	.long	0x118C0D09
++	.long	0x11AD1509
++	.long	0x11CE1D09
++	.long	0x11EF2509
++	blr	
++.long	0
++.byte	0,12,0x14,0,0,0,0,0
++
++.align	5
++_aesp8_xts_decrypt6x:
++	stdu	1,-448(1)
++	mflr	11
++	li	7,207
++	li	3,223
++	std	11,464(1)
++	stvx	20,7,1
++	addi	7,7,32
++	stvx	21,3,1
++	addi	3,3,32
++	stvx	22,7,1
++	addi	7,7,32
++	stvx	23,3,1
++	addi	3,3,32
++	stvx	24,7,1
++	addi	7,7,32
++	stvx	25,3,1
++	addi	3,3,32
++	stvx	26,7,1
++	addi	7,7,32
++	stvx	27,3,1
++	addi	3,3,32
++	stvx	28,7,1
++	addi	7,7,32
++	stvx	29,3,1
++	addi	3,3,32
++	stvx	30,7,1
++	stvx	31,3,1
++	li	0,-1
++	stw	12,396(1)
++	li	3,0x10
++	std	26,400(1)
++	li	26,0x20
++	std	27,408(1)
++	li	27,0x30
++	std	28,416(1)
++	li	28,0x40
++	std	29,424(1)
++	li	29,0x50
++	std	30,432(1)
++	li	30,0x60
++	std	31,440(1)
++	li	31,0x70
++	or	0,0,0
++
++	subi	9,9,3
++
++	lvx	23,0,6
++	lvx	30,3,6
++	addi	6,6,0x20
++	lvx	31,0,6
++	vperm	23,30,23,7
++	addi	7,1,79
++	mtctr	9
++
++.Load_xts_dec_key:
++	vperm	24,31,30,7
++	lvx	30,3,6
++	addi	6,6,0x20
++	stvx	24,0,7
++	vperm	25,30,31,7
++	lvx	31,0,6
++	stvx	25,3,7
++	addi	7,7,0x20
++	bdnz	.Load_xts_dec_key
++
++	lvx	26,3,6
++	vperm	24,31,30,7
++	lvx	27,26,6
++	stvx	24,0,7
++	vperm	25,26,31,7
++	lvx	28,27,6
++	stvx	25,3,7
++	addi	7,1,79
++	vperm	26,27,26,7
++	lvx	29,28,6
++	vperm	27,28,27,7
++	lvx	30,29,6
++	vperm	28,29,28,7
++	lvx	31,30,6
++	vperm	29,30,29,7
++	lvx	22,31,6
++	vperm	30,31,30,7
++	lvx	24,0,7
++	vperm	31,22,31,7
++	lvx	25,3,7
++
++	vperm	0,2,4,5
++	subi	10,10,31
++	vxor	17,8,23
++	vsrab	11,8,9
++	vaddubm	8,8,8
++	vsldoi	11,11,11,15
++	vand	11,11,10
++	vxor	7,0,17
++	vxor	8,8,11
++
++	.long	0x7C235699
++	vxor	18,8,23
++	vsrab	11,8,9
++	vaddubm	8,8,8
++	vsldoi	11,11,11,15
++	vperm	1,1,1,6
++	vand	11,11,10
++	vxor	12,1,18
++	vxor	8,8,11
++
++	.long	0x7C5A5699
++	andi.	31,5,15
++	vxor	19,8,23
++	vsrab	11,8,9
++	vaddubm	8,8,8
++	vsldoi	11,11,11,15
++	vperm	2,2,2,6
++	vand	11,11,10
++	vxor	13,2,19
++	vxor	8,8,11
++
++	.long	0x7C7B5699
++	sub	5,5,31
++	vxor	20,8,23
++	vsrab	11,8,9
++	vaddubm	8,8,8
++	vsldoi	11,11,11,15
++	vperm	3,3,3,6
++	vand	11,11,10
++	vxor	14,3,20
++	vxor	8,8,11
++
++	.long	0x7C9C5699
++	subi	5,5,0x60
++	vxor	21,8,23
++	vsrab	11,8,9
++	vaddubm	8,8,8
++	vsldoi	11,11,11,15
++	vperm	4,4,4,6
++	vand	11,11,10
++	vxor	15,4,21
++	vxor	8,8,11
++
++	.long	0x7CBD5699
++	addi	10,10,0x60
++	vxor	22,8,23
++	vsrab	11,8,9
++	vaddubm	8,8,8
++	vsldoi	11,11,11,15
++	vperm	5,5,5,6
++	vand	11,11,10
++	vxor	16,5,22
++	vxor	8,8,11
++
++	vxor	31,31,23
++	mtctr	9
++	b	.Loop_xts_dec6x
++
++.align	5
++.Loop_xts_dec6x:
++	.long	0x10E7C548
++	.long	0x118CC548
++	.long	0x11ADC548
++	.long	0x11CEC548
++	.long	0x11EFC548
++	.long	0x1210C548
++	lvx	24,26,7
++	addi	7,7,0x20
++
++	.long	0x10E7CD48
++	.long	0x118CCD48
++	.long	0x11ADCD48
++	.long	0x11CECD48
++	.long	0x11EFCD48
++	.long	0x1210CD48
++	lvx	25,3,7
++	bdnz	.Loop_xts_dec6x
++
++	subic	5,5,96
++	vxor	0,17,31
++	.long	0x10E7C548
++	.long	0x118CC548
++	vsrab	11,8,9
++	vxor	17,8,23
++	vaddubm	8,8,8
++	.long	0x11ADC548
++	.long	0x11CEC548
++	vsldoi	11,11,11,15
++	.long	0x11EFC548
++	.long	0x1210C548
++
++	subfe.	0,0,0
++	vand	11,11,10
++	.long	0x10E7CD48
++	.long	0x118CCD48
++	vxor	8,8,11
++	.long	0x11ADCD48
++	.long	0x11CECD48
++	vxor	1,18,31
++	vsrab	11,8,9
++	vxor	18,8,23
++	.long	0x11EFCD48
++	.long	0x1210CD48
++
++	and	0,0,5
++	vaddubm	8,8,8
++	vsldoi	11,11,11,15
++	.long	0x10E7D548
++	.long	0x118CD548
++	vand	11,11,10
++	.long	0x11ADD548
++	.long	0x11CED548
++	vxor	8,8,11
++	.long	0x11EFD548
++	.long	0x1210D548
++
++	add	10,10,0
++
++
++
++	vxor	2,19,31
++	vsrab	11,8,9
++	vxor	19,8,23
++	vaddubm	8,8,8
++	.long	0x10E7DD48
++	.long	0x118CDD48
++	vsldoi	11,11,11,15
++	.long	0x11ADDD48
++	.long	0x11CEDD48
++	vand	11,11,10
++	.long	0x11EFDD48
++	.long	0x1210DD48
++
++	addi	7,1,79
++	vxor	8,8,11
++	.long	0x10E7E548
++	.long	0x118CE548
++	vxor	3,20,31
++	vsrab	11,8,9
++	vxor	20,8,23
++	.long	0x11ADE548
++	.long	0x11CEE548
++	vaddubm	8,8,8
++	vsldoi	11,11,11,15
++	.long	0x11EFE548
++	.long	0x1210E548
++	lvx	24,0,7
++	vand	11,11,10
++
++	.long	0x10E7ED48
++	.long	0x118CED48
++	vxor	8,8,11
++	.long	0x11ADED48
++	.long	0x11CEED48
++	vxor	4,21,31
++	vsrab	11,8,9
++	vxor	21,8,23
++	.long	0x11EFED48
++	.long	0x1210ED48
++	lvx	25,3,7
++	vaddubm	8,8,8
++	vsldoi	11,11,11,15
++
++	.long	0x10E7F548
++	.long	0x118CF548
++	vand	11,11,10
++	.long	0x11ADF548
++	.long	0x11CEF548
++	vxor	8,8,11
++	.long	0x11EFF548
++	.long	0x1210F548
++	vxor	5,22,31
++	vsrab	11,8,9
++	vxor	22,8,23
++
++	.long	0x10E70549
++	.long	0x7C005699
++	vaddubm	8,8,8
++	vsldoi	11,11,11,15
++	.long	0x118C0D49
++	.long	0x7C235699
++	.long	0x11AD1549
++	vperm	0,0,0,6
++	.long	0x7C5A5699
++	vand	11,11,10
++	.long	0x11CE1D49
++	vperm	1,1,1,6
++	.long	0x7C7B5699
++	.long	0x11EF2549
++	vperm	2,2,2,6
++	.long	0x7C9C5699
++	vxor	8,8,11
++	.long	0x12102D49
++	vperm	3,3,3,6
++	.long	0x7CBD5699
++	addi	10,10,0x60
++	vperm	4,4,4,6
++	vperm	5,5,5,6
++
++	vperm	7,7,7,6
++	vperm	12,12,12,6
++	.long	0x7CE02799
++	vxor	7,0,17
++	vperm	13,13,13,6
++	.long	0x7D832799
++	vxor	12,1,18
++	vperm	14,14,14,6
++	.long	0x7DBA2799
++	vxor	13,2,19
++	vperm	15,15,15,6
++	.long	0x7DDB2799
++	vxor	14,3,20
++	vperm	16,16,16,6
++	.long	0x7DFC2799
++	vxor	15,4,21
++	.long	0x7E1D2799
++	vxor	16,5,22
++	addi	4,4,0x60
++
++	mtctr	9
++	beq	.Loop_xts_dec6x
++
++	addic.	5,5,0x60
++	beq	.Lxts_dec6x_zero
++	cmpwi	5,0x20
++	blt	.Lxts_dec6x_one
++	nop	
++	beq	.Lxts_dec6x_two
++	cmpwi	5,0x40
++	blt	.Lxts_dec6x_three
++	nop	
++	beq	.Lxts_dec6x_four
++
++.Lxts_dec6x_five:
++	vxor	7,1,17
++	vxor	12,2,18
++	vxor	13,3,19
++	vxor	14,4,20
++	vxor	15,5,21
++
++	bl	_aesp8_xts_dec5x
++
++	vperm	7,7,7,6
++	vor	17,22,22
++	vxor	18,8,23
++	vperm	12,12,12,6
++	.long	0x7CE02799
++	vxor	7,0,18
++	vperm	13,13,13,6
++	.long	0x7D832799
++	vperm	14,14,14,6
++	.long	0x7DBA2799
++	vperm	15,15,15,6
++	.long	0x7DDB2799
++	.long	0x7DFC2799
++	addi	4,4,0x50
++	bne	.Lxts_dec6x_steal
++	b	.Lxts_dec6x_done
++
++.align	4
++.Lxts_dec6x_four:
++	vxor	7,2,17
++	vxor	12,3,18
++	vxor	13,4,19
++	vxor	14,5,20
++	vxor	15,15,15
++
++	bl	_aesp8_xts_dec5x
++
++	vperm	7,7,7,6
++	vor	17,21,21
++	vor	18,22,22
++	vperm	12,12,12,6
++	.long	0x7CE02799
++	vxor	7,0,22
++	vperm	13,13,13,6
++	.long	0x7D832799
++	vperm	14,14,14,6
++	.long	0x7DBA2799
++	.long	0x7DDB2799
++	addi	4,4,0x40
++	bne	.Lxts_dec6x_steal
++	b	.Lxts_dec6x_done
++
++.align	4
++.Lxts_dec6x_three:
++	vxor	7,3,17
++	vxor	12,4,18
++	vxor	13,5,19
++	vxor	14,14,14
++	vxor	15,15,15
++
++	bl	_aesp8_xts_dec5x
++
++	vperm	7,7,7,6
++	vor	17,20,20
++	vor	18,21,21
++	vperm	12,12,12,6
++	.long	0x7CE02799
++	vxor	7,0,21
++	vperm	13,13,13,6
++	.long	0x7D832799
++	.long	0x7DBA2799
++	addi	4,4,0x30
++	bne	.Lxts_dec6x_steal
++	b	.Lxts_dec6x_done
++
++.align	4
++.Lxts_dec6x_two:
++	vxor	7,4,17
++	vxor	12,5,18
++	vxor	13,13,13
++	vxor	14,14,14
++	vxor	15,15,15
++
++	bl	_aesp8_xts_dec5x
++
++	vperm	7,7,7,6
++	vor	17,19,19
++	vor	18,20,20
++	vperm	12,12,12,6
++	.long	0x7CE02799
++	vxor	7,0,20
++	.long	0x7D832799
++	addi	4,4,0x20
++	bne	.Lxts_dec6x_steal
++	b	.Lxts_dec6x_done
++
++.align	4
++.Lxts_dec6x_one:
++	vxor	7,5,17
++	nop	
++.Loop_xts_dec1x:
++	.long	0x10E7C548
++	lvx	24,26,7
++	addi	7,7,0x20
++
++	.long	0x10E7CD48
++	lvx	25,3,7
++	bdnz	.Loop_xts_dec1x
++
++	subi	0,31,1
++	.long	0x10E7C548
++
++	andi.	0,0,16
++	cmpwi	31,0
++	.long	0x10E7CD48
++
++	sub	10,10,0
++	.long	0x10E7D548
++
++	.long	0x7C005699
++	.long	0x10E7DD48
++
++	addi	7,1,79
++	.long	0x10E7E548
++	lvx	24,0,7
++
++	.long	0x10E7ED48
++	lvx	25,3,7
++	vxor	17,17,31
++
++	vperm	0,0,0,6
++	.long	0x10E7F548
++
++	mtctr	9
++	.long	0x10E78D49
++
++	vor	17,18,18
++	vor	18,19,19
++	vperm	7,7,7,6
++	.long	0x7CE02799
++	addi	4,4,0x10
++	vxor	7,0,19
++	bne	.Lxts_dec6x_steal
++	b	.Lxts_dec6x_done
++
++.align	4
++.Lxts_dec6x_zero:
++	cmpwi	31,0
++	beq	.Lxts_dec6x_done
++
++	.long	0x7C005699
++	vperm	0,0,0,6
++	vxor	7,0,18
++.Lxts_dec6x_steal:
++	.long	0x10E7C548
++	lvx	24,26,7
++	addi	7,7,0x20
++
++	.long	0x10E7CD48
++	lvx	25,3,7
++	bdnz	.Lxts_dec6x_steal
++
++	add	10,10,31
++	.long	0x10E7C548
++
++	cmpwi	31,0
++	.long	0x10E7CD48
++
++	.long	0x7C005699
++	.long	0x10E7D548
++
++	lvsr	5,0,31
++	.long	0x10E7DD48
++
++	addi	7,1,79
++	.long	0x10E7E548
++	lvx	24,0,7
++
++	.long	0x10E7ED48
++	lvx	25,3,7
++	vxor	18,18,31
++
++	vperm	0,0,0,6
++	.long	0x10E7F548
++
++	vperm	0,0,0,5
++	.long	0x11679549
++
++	vperm	7,11,11,6
++	.long	0x7CE02799
++
++
++	vxor	7,7,7
++	vspltisb	12,-1
++	vperm	7,7,12,5
++	vsel	7,0,11,7
++	vxor	7,7,17
++
++	subi	30,4,1
++	mtctr	31
++.Loop_xts_dec6x_steal:
++	lbzu	0,1(30)
++	stb	0,16(30)
++	bdnz	.Loop_xts_dec6x_steal
++
++	li	31,0
++	mtctr	9
++	b	.Loop_xts_dec1x
++
++.align	4
++.Lxts_dec6x_done:
++	cmpldi	8,0
++	beq	.Lxts_dec6x_ret
++
++	vxor	8,17,23
++	vperm	8,8,8,6
++	.long	0x7D004799
++
++.Lxts_dec6x_ret:
++	mtlr	11
++	li	10,79
++	li	11,95
++	stvx	9,10,1
++	addi	10,10,32
++	stvx	9,11,1
++	addi	11,11,32
++	stvx	9,10,1
++	addi	10,10,32
++	stvx	9,11,1
++	addi	11,11,32
++	stvx	9,10,1
++	addi	10,10,32
++	stvx	9,11,1
++	addi	11,11,32
++	stvx	9,10,1
++	addi	10,10,32
++	stvx	9,11,1
++	addi	11,11,32
++
++	or	12,12,12
++	lvx	20,10,1
++	addi	10,10,32
++	lvx	21,11,1
++	addi	11,11,32
++	lvx	22,10,1
++	addi	10,10,32
++	lvx	23,11,1
++	addi	11,11,32
++	lvx	24,10,1
++	addi	10,10,32
++	lvx	25,11,1
++	addi	11,11,32
++	lvx	26,10,1
++	addi	10,10,32
++	lvx	27,11,1
++	addi	11,11,32
++	lvx	28,10,1
++	addi	10,10,32
++	lvx	29,11,1
++	addi	11,11,32
++	lvx	30,10,1
++	lvx	31,11,1
++	ld	26,400(1)
++	ld	27,408(1)
++	ld	28,416(1)
++	ld	29,424(1)
++	ld	30,432(1)
++	ld	31,440(1)
++	addi	1,1,448
++	blr	
++.long	0
++.byte	0,12,0x04,1,0x80,6,6,0
++.long	0
++
++.align	5
++_aesp8_xts_dec5x:
++	.long	0x10E7C548
++	.long	0x118CC548
++	.long	0x11ADC548
++	.long	0x11CEC548
++	.long	0x11EFC548
++	lvx	24,26,7
++	addi	7,7,0x20
++
++	.long	0x10E7CD48
++	.long	0x118CCD48
++	.long	0x11ADCD48
++	.long	0x11CECD48
++	.long	0x11EFCD48
++	lvx	25,3,7
++	bdnz	_aesp8_xts_dec5x
++
++	subi	0,31,1
++	.long	0x10E7C548
++	.long	0x118CC548
++	.long	0x11ADC548
++	.long	0x11CEC548
++	.long	0x11EFC548
++
++	andi.	0,0,16
++	cmpwi	31,0
++	.long	0x10E7CD48
++	.long	0x118CCD48
++	.long	0x11ADCD48
++	.long	0x11CECD48
++	.long	0x11EFCD48
++	vxor	17,17,31
++
++	sub	10,10,0
++	.long	0x10E7D548
++	.long	0x118CD548
++	.long	0x11ADD548
++	.long	0x11CED548
++	.long	0x11EFD548
++	vxor	1,18,31
++
++	.long	0x10E7DD48
++	.long	0x7C005699
++	.long	0x118CDD48
++	.long	0x11ADDD48
++	.long	0x11CEDD48
++	.long	0x11EFDD48
++	vxor	2,19,31
++
++	addi	7,1,79
++	.long	0x10E7E548
++	.long	0x118CE548
++	.long	0x11ADE548
++	.long	0x11CEE548
++	.long	0x11EFE548
++	lvx	24,0,7
++	vxor	3,20,31
++
++	.long	0x10E7ED48
++	vperm	0,0,0,6
++	.long	0x118CED48
++	.long	0x11ADED48
++	.long	0x11CEED48
++	.long	0x11EFED48
++	lvx	25,3,7
++	vxor	4,21,31
++
++	.long	0x10E7F548
++	.long	0x118CF548
++	.long	0x11ADF548
++	.long	0x11CEF548
++	.long	0x11EFF548
++
++	.long	0x10E78D49
++	.long	0x118C0D49
++	.long	0x11AD1549
++	.long	0x11CE1D49
++	.long	0x11EF2549
++	mtctr	9
++	blr	
++.long	0
++.byte	0,12,0x14,0,0,0,0,0
++#endif  // !OPENSSL_NO_ASM && __powerpc64__ && __ELF__
++#if defined(__ELF__)
++// See https://www.airs.ccom/blog/archives/518.
++.section .note.GNU-stack,"",%progbits
++#endif
+Index: chromium-144.0.7559.59/third_party/boringssl/src/gen/bcm/ghashp8-ppc-linux.S
+===================================================================
+--- /dev/null
++++ chromium-144.0.7559.59/third_party/boringssl/src/gen/bcm/ghashp8-ppc-linux.S
+@@ -0,0 +1,590 @@
++// This file is generated from a similarly-named Perl script in the BoringSSL
++// source tree. Do not edit by hand.
++
++#if defined(__has_feature)
++#if __has_feature(memory_sanitizer) && !defined(OPENSSL_NO_ASM)
++#define OPENSSL_NO_ASM
++#endif
++#endif
++
++#if !defined(OPENSSL_NO_ASM) && defined(__powerpc64__) && defined(__ELF__)
++.machine	"any"
++
++.abiversion	2
++.text
++
++.globl	gcm_init_p8
++.type	gcm_init_p8,@function
++.align	5
++gcm_init_p8:
++.localentry	gcm_init_p8,0
++
++	li	0,-4096
++	li	8,0x10
++	li	12,-1
++	li	9,0x20
++	or	0,0,0
++	li	10,0x30
++	.long	0x7D202699
++
++	vspltisb	8,-16
++	vspltisb	5,1
++	vaddubm	8,8,8
++	vxor	4,4,4
++	vor	8,8,5
++	vsldoi	8,8,4,15
++	vsldoi	6,4,5,1
++	vaddubm	8,8,8
++	vspltisb	7,7
++	vor	8,8,6
++	vspltb	6,9,0
++	vsl	9,9,5
++	vsrab	6,6,7
++	vand	6,6,8
++	vxor	3,9,6
++
++	vsldoi	9,3,3,8
++	vsldoi	8,4,8,8
++	vsldoi	11,4,9,8
++	vsldoi	10,9,4,8
++
++	.long	0x7D001F99
++	.long	0x7D681F99
++	li	8,0x40
++	.long	0x7D291F99
++	li	9,0x50
++	.long	0x7D4A1F99
++	li	10,0x60
++
++	.long	0x10035CC8
++	.long	0x10234CC8
++	.long	0x104354C8
++
++	.long	0x10E044C8
++
++	vsldoi	5,1,4,8
++	vsldoi	6,4,1,8
++	vxor	0,0,5
++	vxor	2,2,6
++
++	vsldoi	0,0,0,8
++	vxor	0,0,7
++
++	vsldoi	6,0,0,8
++	.long	0x100044C8
++	vxor	6,6,2
++	vxor	16,0,6
++
++	vsldoi	17,16,16,8
++	vsldoi	19,4,17,8
++	vsldoi	18,17,4,8
++
++	.long	0x7E681F99
++	li	8,0x70
++	.long	0x7E291F99
++	li	9,0x80
++	.long	0x7E4A1F99
++	li	10,0x90
++	.long	0x10039CC8
++	.long	0x11B09CC8
++	.long	0x10238CC8
++	.long	0x11D08CC8
++	.long	0x104394C8
++	.long	0x11F094C8
++
++	.long	0x10E044C8
++	.long	0x114D44C8
++
++	vsldoi	5,1,4,8
++	vsldoi	6,4,1,8
++	vsldoi	11,14,4,8
++	vsldoi	9,4,14,8
++	vxor	0,0,5
++	vxor	2,2,6
++	vxor	13,13,11
++	vxor	15,15,9
++
++	vsldoi	0,0,0,8
++	vsldoi	13,13,13,8
++	vxor	0,0,7
++	vxor	13,13,10
++
++	vsldoi	6,0,0,8
++	vsldoi	9,13,13,8
++	.long	0x100044C8
++	.long	0x11AD44C8
++	vxor	6,6,2
++	vxor	9,9,15
++	vxor	0,0,6
++	vxor	13,13,9
++
++	vsldoi	9,0,0,8
++	vsldoi	17,13,13,8
++	vsldoi	11,4,9,8
++	vsldoi	10,9,4,8
++	vsldoi	19,4,17,8
++	vsldoi	18,17,4,8
++
++	.long	0x7D681F99
++	li	8,0xa0
++	.long	0x7D291F99
++	li	9,0xb0
++	.long	0x7D4A1F99
++	li	10,0xc0
++	.long	0x7E681F99
++	.long	0x7E291F99
++	.long	0x7E4A1F99
++
++	or	12,12,12
++	blr	
++.long	0
++.byte	0,12,0x14,0,0,0,2,0
++.long	0
++.size	gcm_init_p8,.-gcm_init_p8
++.globl	gcm_gmult_p8
++.type	gcm_gmult_p8,@function
++.align	5
++gcm_gmult_p8:
++.localentry	gcm_gmult_p8,0
++
++	lis	0,0xfff8
++	li	8,0x10
++	li	12,-1
++	li	9,0x20
++	or	0,0,0
++	li	10,0x30
++	.long	0x7C601E99
++
++	.long	0x7D682699
++	lvsl	12,0,0
++	.long	0x7D292699
++	vspltisb	5,0x07
++	.long	0x7D4A2699
++	vxor	12,12,5
++	.long	0x7D002699
++	vperm	3,3,3,12
++	vxor	4,4,4
++
++	.long	0x10035CC8
++	.long	0x10234CC8
++	.long	0x104354C8
++
++	.long	0x10E044C8
++
++	vsldoi	5,1,4,8
++	vsldoi	6,4,1,8
++	vxor	0,0,5
++	vxor	2,2,6
++
++	vsldoi	0,0,0,8
++	vxor	0,0,7
++
++	vsldoi	6,0,0,8
++	.long	0x100044C8
++	vxor	6,6,2
++	vxor	0,0,6
++
++	vperm	0,0,0,12
++	.long	0x7C001F99
++
++	or	12,12,12
++	blr	
++.long	0
++.byte	0,12,0x14,0,0,0,2,0
++.long	0
++.size	gcm_gmult_p8,.-gcm_gmult_p8
++
++.globl	gcm_ghash_p8
++.type	gcm_ghash_p8,@function
++.align	5
++gcm_ghash_p8:
++.localentry	gcm_ghash_p8,0
++
++	li	0,-4096
++	li	8,0x10
++	li	12,-1
++	li	9,0x20
++	or	0,0,0
++	li	10,0x30
++	.long	0x7C001E99
++
++	.long	0x7D682699
++	li	8,0x40
++	lvsl	12,0,0
++	.long	0x7D292699
++	li	9,0x50
++	vspltisb	5,0x07
++	.long	0x7D4A2699
++	li	10,0x60
++	vxor	12,12,5
++	.long	0x7D002699
++	vperm	0,0,0,12
++	vxor	4,4,4
++
++	cmpldi	6,64
++	bge	.Lgcm_ghash_p8_4x
++
++	.long	0x7C602E99
++	addi	5,5,16
++	subic.	6,6,16
++	vperm	3,3,3,12
++	vxor	3,3,0
++	beq	.Lshort
++
++	.long	0x7E682699
++	li	8,16
++	.long	0x7E292699
++	add	9,5,6
++	.long	0x7E4A2699
++
++
++.align	5
++.Loop_2x:
++	.long	0x7E002E99
++	vperm	16,16,16,12
++
++	subic	6,6,32
++	.long	0x10039CC8
++	.long	0x11B05CC8
++	subfe	0,0,0
++	.long	0x10238CC8
++	.long	0x11D04CC8
++	and	0,0,6
++	.long	0x104394C8
++	.long	0x11F054C8
++	add	5,5,0
++
++	vxor	0,0,13
++	vxor	1,1,14
++
++	.long	0x10E044C8
++
++	vsldoi	5,1,4,8
++	vsldoi	6,4,1,8
++	vxor	2,2,15
++	vxor	0,0,5
++	vxor	2,2,6
++
++	vsldoi	0,0,0,8
++	vxor	0,0,7
++	.long	0x7C682E99
++	addi	5,5,32
++
++	vsldoi	6,0,0,8
++	.long	0x100044C8
++	vperm	3,3,3,12
++	vxor	6,6,2
++	vxor	3,3,6
++	vxor	3,3,0
++	cmpld	9,5
++	bgt	.Loop_2x
++
++	cmplwi	6,0
++	bne	.Leven
++
++.Lshort:
++	.long	0x10035CC8
++	.long	0x10234CC8
++	.long	0x104354C8
++
++	.long	0x10E044C8
++
++	vsldoi	5,1,4,8
++	vsldoi	6,4,1,8
++	vxor	0,0,5
++	vxor	2,2,6
++
++	vsldoi	0,0,0,8
++	vxor	0,0,7
++
++	vsldoi	6,0,0,8
++	.long	0x100044C8
++	vxor	6,6,2
++
++.Leven:
++	vxor	0,0,6
++	vperm	0,0,0,12
++	.long	0x7C001F99
++
++	or	12,12,12
++	blr	
++.long	0
++.byte	0,12,0x14,0,0,0,4,0
++.long	0
++.align	5
++.gcm_ghash_p8_4x:
++.Lgcm_ghash_p8_4x:
++	stdu	1,-256(1)
++	li	10,63
++	li	11,79
++	stvx	20,10,1
++	addi	10,10,32
++	stvx	21,11,1
++	addi	11,11,32
++	stvx	22,10,1
++	addi	10,10,32
++	stvx	23,11,1
++	addi	11,11,32
++	stvx	24,10,1
++	addi	10,10,32
++	stvx	25,11,1
++	addi	11,11,32
++	stvx	26,10,1
++	addi	10,10,32
++	stvx	27,11,1
++	addi	11,11,32
++	stvx	28,10,1
++	addi	10,10,32
++	stvx	29,11,1
++	addi	11,11,32
++	stvx	30,10,1
++	li	10,0x60
++	stvx	31,11,1
++	li	0,-1
++	stw	12,252(1)
++	or	0,0,0
++
++	lvsl	5,0,8
++
++	li	8,0x70
++	.long	0x7E292699
++	li	9,0x80
++	vspltisb	6,8
++
++	li	10,0x90
++	.long	0x7EE82699
++	li	8,0xa0
++	.long	0x7F092699
++	li	9,0xb0
++	.long	0x7F2A2699
++	li	10,0xc0
++	.long	0x7FA82699
++	li	8,0x10
++	.long	0x7FC92699
++	li	9,0x20
++	.long	0x7FEA2699
++	li	10,0x30
++
++	vsldoi	7,4,6,8
++	vaddubm	18,5,7
++	vaddubm	19,6,18
++
++	srdi	6,6,4
++
++	.long	0x7C602E99
++	.long	0x7E082E99
++	subic.	6,6,8
++	.long	0x7EC92E99
++	.long	0x7F8A2E99
++	addi	5,5,0x40
++	vperm	3,3,3,12
++	vperm	16,16,16,12
++	vperm	22,22,22,12
++	vperm	28,28,28,12
++
++	vxor	2,3,0
++
++	.long	0x11B0BCC8
++	.long	0x11D0C4C8
++	.long	0x11F0CCC8
++
++	vperm	11,17,9,18
++	vperm	5,22,28,19
++	vperm	10,17,9,19
++	vperm	6,22,28,18
++	.long	0x12B68CC8
++	.long	0x12855CC8
++	.long	0x137C4CC8
++	.long	0x134654C8
++
++	vxor	21,21,14
++	vxor	20,20,13
++	vxor	27,27,21
++	vxor	26,26,15
++
++	blt	.Ltail_4x
++
++.Loop_4x:
++	.long	0x7C602E99
++	.long	0x7E082E99
++	subic.	6,6,4
++	.long	0x7EC92E99
++	.long	0x7F8A2E99
++	addi	5,5,0x40
++	vperm	16,16,16,12
++	vperm	22,22,22,12
++	vperm	28,28,28,12
++	vperm	3,3,3,12
++
++	.long	0x1002ECC8
++	.long	0x1022F4C8
++	.long	0x1042FCC8
++	.long	0x11B0BCC8
++	.long	0x11D0C4C8
++	.long	0x11F0CCC8
++
++	vxor	0,0,20
++	vxor	1,1,27
++	vxor	2,2,26
++	vperm	5,22,28,19
++	vperm	6,22,28,18
++
++	.long	0x10E044C8
++	.long	0x12855CC8
++	.long	0x134654C8
++
++	vsldoi	5,1,4,8
++	vsldoi	6,4,1,8
++	vxor	0,0,5
++	vxor	2,2,6
++
++	vsldoi	0,0,0,8
++	vxor	0,0,7
++
++	vsldoi	6,0,0,8
++	.long	0x12B68CC8
++	.long	0x137C4CC8
++	.long	0x100044C8
++
++	vxor	20,20,13
++	vxor	26,26,15
++	vxor	2,2,3
++	vxor	21,21,14
++	vxor	2,2,6
++	vxor	27,27,21
++	vxor	2,2,0
++	bge	.Loop_4x
++
++.Ltail_4x:
++	.long	0x1002ECC8
++	.long	0x1022F4C8
++	.long	0x1042FCC8
++
++	vxor	0,0,20
++	vxor	1,1,27
++
++	.long	0x10E044C8
++
++	vsldoi	5,1,4,8
++	vsldoi	6,4,1,8
++	vxor	2,2,26
++	vxor	0,0,5
++	vxor	2,2,6
++
++	vsldoi	0,0,0,8
++	vxor	0,0,7
++
++	vsldoi	6,0,0,8
++	.long	0x100044C8
++	vxor	6,6,2
++	vxor	0,0,6
++
++	addic.	6,6,4
++	beq	.Ldone_4x
++
++	.long	0x7C602E99
++	cmpldi	6,2
++	li	6,-4
++	blt	.Lone
++	.long	0x7E082E99
++	beq	.Ltwo
++
++.Lthree:
++	.long	0x7EC92E99
++	vperm	3,3,3,12
++	vperm	16,16,16,12
++	vperm	22,22,22,12
++
++	vxor	2,3,0
++	vor	29,23,23
++	vor	30, 24, 24
++	vor	31,25,25
++
++	vperm	5,16,22,19
++	vperm	6,16,22,18
++	.long	0x12B08CC8
++	.long	0x13764CC8
++	.long	0x12855CC8
++	.long	0x134654C8
++
++	vxor	27,27,21
++	b	.Ltail_4x
++
++.align	4
++.Ltwo:
++	vperm	3,3,3,12
++	vperm	16,16,16,12
++
++	vxor	2,3,0
++	vperm	5,4,16,19
++	vperm	6,4,16,18
++
++	vsldoi	29,4,17,8
++	vor	30, 17, 17
++	vsldoi	31,17,4,8
++
++	.long	0x12855CC8
++	.long	0x13704CC8
++	.long	0x134654C8
++
++	b	.Ltail_4x
++
++.align	4
++.Lone:
++	vperm	3,3,3,12
++
++	vsldoi	29,4,9,8
++	vor	30, 9, 9
++	vsldoi	31,9,4,8
++
++	vxor	2,3,0
++	vxor	20,20,20
++	vxor	27,27,27
++	vxor	26,26,26
++
++	b	.Ltail_4x
++
++.Ldone_4x:
++	vperm	0,0,0,12
++	.long	0x7C001F99
++
++	li	10,63
++	li	11,79
++	or	12,12,12
++	lvx	20,10,1
++	addi	10,10,32
++	lvx	21,11,1
++	addi	11,11,32
++	lvx	22,10,1
++	addi	10,10,32
++	lvx	23,11,1
++	addi	11,11,32
++	lvx	24,10,1
++	addi	10,10,32
++	lvx	25,11,1
++	addi	11,11,32
++	lvx	26,10,1
++	addi	10,10,32
++	lvx	27,11,1
++	addi	11,11,32
++	lvx	28,10,1
++	addi	10,10,32
++	lvx	29,11,1
++	addi	11,11,32
++	lvx	30,10,1
++	lvx	31,11,1
++	addi	1,1,256
++	blr	
++.long	0
++.byte	0,12,0x04,0,0x80,0,4,0
++.long	0
++.size	gcm_ghash_p8,.-gcm_ghash_p8
++
++.byte	71,72,65,83,72,32,102,111,114,32,80,111,119,101,114,73,83,65,32,50,46,48,55,44,32,67,82,89,80,84,79,71,65,77,83,32,98,121,32,60,97,112,112,114,111,64,111,112,101,110,115,115,108,46,111,114,103,62,0
++.align	2
++.align	2
++#endif  // !OPENSSL_NO_ASM && __powerpc64__ && __ELF__
++#if defined(__ELF__)
++// See https://www.airs.ccom/blog/archives/518.
++.section .note.GNU-stack,"",%progbits
++#endif
+Index: chromium-144.0.7559.59/third_party/boringssl/src/gen/sources.cmake
+===================================================================
+--- chromium-144.0.7559.59.orig/third_party/boringssl/src/gen/sources.cmake
++++ chromium-144.0.7559.59/third_party/boringssl/src/gen/sources.cmake
+@@ -122,6 +122,7 @@ set(
+   gen/bcm/aesni-x86-linux.S
+   gen/bcm/aesni-x86_64-apple.S
+   gen/bcm/aesni-x86_64-linux.S
++  gen/bcm/aesp8-ppc-linux.S
+   gen/bcm/aesv8-armv7-linux.S
+   gen/bcm/aesv8-armv8-apple.S
+   gen/bcm/aesv8-armv8-linux.S
+@@ -153,6 +154,7 @@ set(
+   gen/bcm/ghash-x86-linux.S
+   gen/bcm/ghash-x86_64-apple.S
+   gen/bcm/ghash-x86_64-linux.S
++  gen/bcm/ghashp8-ppc-linux.S
+   gen/bcm/ghashv8-armv7-linux.S
+   gen/bcm/ghashv8-armv8-apple.S
+   gen/bcm/ghashv8-armv8-linux.S
+@@ -352,6 +354,7 @@ set(
+   crypto/cpu_arm_freebsd.cc
+   crypto/cpu_arm_linux.cc
+   crypto/cpu_intel.cc
++  crypto/cpu_ppc64le.cc
+   crypto/crypto.cc
+   crypto/curve25519/curve25519.cc
+   crypto/curve25519/curve25519_64_adx.cc
+@@ -2980,6 +2983,7 @@ set(
+   gen/test_support/trampoline-armv8-apple.S
+   gen/test_support/trampoline-armv8-linux.S
+   gen/test_support/trampoline-armv8-win.S
++  gen/test_support/trampoline-ppc-linux.S
+   gen/test_support/trampoline-x86-apple.S
+   gen/test_support/trampoline-x86-linux.S
+   gen/test_support/trampoline-x86_64-apple.S
+Index: chromium-144.0.7559.59/third_party/boringssl/src/gen/sources.json
+===================================================================
+--- chromium-144.0.7559.59.orig/third_party/boringssl/src/gen/sources.json
++++ chromium-144.0.7559.59/third_party/boringssl/src/gen/sources.json
+@@ -100,6 +100,7 @@
+       "gen/bcm/aesni-x86-linux.S",
+       "gen/bcm/aesni-x86_64-apple.S",
+       "gen/bcm/aesni-x86_64-linux.S",
++      "gen/bcm/aesp8-ppc-linux.S",
+       "gen/bcm/aesv8-armv7-linux.S",
+       "gen/bcm/aesv8-armv8-apple.S",
+       "gen/bcm/aesv8-armv8-linux.S",
+@@ -131,6 +132,7 @@
+       "gen/bcm/ghash-x86-linux.S",
+       "gen/bcm/ghash-x86_64-apple.S",
+       "gen/bcm/ghash-x86_64-linux.S",
++      "gen/bcm/ghashp8-ppc-linux.S",
+       "gen/bcm/ghashv8-armv7-linux.S",
+       "gen/bcm/ghashv8-armv8-apple.S",
+       "gen/bcm/ghashv8-armv8-linux.S",
+@@ -322,6 +324,7 @@
+       "crypto/cpu_arm_freebsd.cc",
+       "crypto/cpu_arm_linux.cc",
+       "crypto/cpu_intel.cc",
++      "crypto/cpu_ppc64le.cc",
+       "crypto/crypto.cc",
+       "crypto/curve25519/curve25519.cc",
+       "crypto/curve25519/curve25519_64_adx.cc",
+@@ -2892,6 +2895,7 @@
+       "gen/test_support/trampoline-armv8-apple.S",
+       "gen/test_support/trampoline-armv8-linux.S",
+       "gen/test_support/trampoline-armv8-win.S",
++      "gen/test_support/trampoline-ppc-linux.S",
+       "gen/test_support/trampoline-x86-apple.S",
+       "gen/test_support/trampoline-x86-linux.S",
+       "gen/test_support/trampoline-x86_64-apple.S",
+Index: chromium-144.0.7559.59/third_party/boringssl/src/gen/test_support/trampoline-ppc-linux.S
+===================================================================
+--- /dev/null
++++ chromium-144.0.7559.59/third_party/boringssl/src/gen/test_support/trampoline-ppc-linux.S
+@@ -0,0 +1,1413 @@
++// This file is generated from a similarly-named Perl script in the BoringSSL
++// source tree. Do not edit by hand.
++
++#if defined(__has_feature)
++#if __has_feature(memory_sanitizer) && !defined(OPENSSL_NO_ASM)
++#define OPENSSL_NO_ASM
++#endif
++#endif
++
++#if !defined(OPENSSL_NO_ASM) && defined(__powerpc64__) && defined(__ELF__)
++.machine	"any"
++.abiversion	2
++.text
++
++
++
++
++
++
++
++.globl	abi_test_trampoline
++.type	abi_test_trampoline,@function
++.align	5
++abi_test_trampoline:
++.localentry	abi_test_trampoline,0
++
++
++	mflr	0
++	std	0, 16(1)
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++	stdu	1, -528(1)
++
++	mfcr	0
++	std	0, 8(1)
++	std	2, 24(1)
++	std	4, 32(1)
++	li	11, 48
++	stvx	20, 11, 1
++	li	11, 64
++	stvx	21, 11, 1
++	li	11, 80
++	stvx	22, 11, 1
++	li	11, 96
++	stvx	23, 11, 1
++	li	11, 112
++	stvx	24, 11, 1
++	li	11, 128
++	stvx	25, 11, 1
++	li	11, 144
++	stvx	26, 11, 1
++	li	11, 160
++	stvx	27, 11, 1
++	li	11, 176
++	stvx	28, 11, 1
++	li	11, 192
++	stvx	29, 11, 1
++	li	11, 208
++	stvx	30, 11, 1
++	li	11, 224
++	stvx	31, 11, 1
++	std	14, 240(1)
++	std	15, 248(1)
++	std	16, 256(1)
++	std	17, 264(1)
++	std	18, 272(1)
++	std	19, 280(1)
++	std	20, 288(1)
++	std	21, 296(1)
++	std	22, 304(1)
++	std	23, 312(1)
++	std	24, 320(1)
++	std	25, 328(1)
++	std	26, 336(1)
++	std	27, 344(1)
++	std	28, 352(1)
++	std	29, 360(1)
++	std	30, 368(1)
++	std	31, 376(1)
++	stfd	14, 384(1)
++	stfd	15, 392(1)
++	stfd	16, 400(1)
++	stfd	17, 408(1)
++	stfd	18, 416(1)
++	stfd	19, 424(1)
++	stfd	20, 432(1)
++	stfd	21, 440(1)
++	stfd	22, 448(1)
++	stfd	23, 456(1)
++	stfd	24, 464(1)
++	stfd	25, 472(1)
++	stfd	26, 480(1)
++	stfd	27, 488(1)
++	stfd	28, 496(1)
++	stfd	29, 504(1)
++	stfd	30, 512(1)
++	stfd	31, 520(1)
++	li	11, 0
++	lvx	20, 11, 4
++	li	11, 16
++	lvx	21, 11, 4
++	li	11, 32
++	lvx	22, 11, 4
++	li	11, 48
++	lvx	23, 11, 4
++	li	11, 64
++	lvx	24, 11, 4
++	li	11, 80
++	lvx	25, 11, 4
++	li	11, 96
++	lvx	26, 11, 4
++	li	11, 112
++	lvx	27, 11, 4
++	li	11, 128
++	lvx	28, 11, 4
++	li	11, 144
++	lvx	29, 11, 4
++	li	11, 160
++	lvx	30, 11, 4
++	li	11, 176
++	lvx	31, 11, 4
++	ld	14, 192(4)
++	ld	15, 200(4)
++	ld	16, 208(4)
++	ld	17, 216(4)
++	ld	18, 224(4)
++	ld	19, 232(4)
++	ld	20, 240(4)
++	ld	21, 248(4)
++	ld	22, 256(4)
++	ld	23, 264(4)
++	ld	24, 272(4)
++	ld	25, 280(4)
++	ld	26, 288(4)
++	ld	27, 296(4)
++	ld	28, 304(4)
++	ld	29, 312(4)
++	ld	30, 320(4)
++	ld	31, 328(4)
++	lfd	14, 336(4)
++	lfd	15, 344(4)
++	lfd	16, 352(4)
++	lfd	17, 360(4)
++	lfd	18, 368(4)
++	lfd	19, 376(4)
++	lfd	20, 384(4)
++	lfd	21, 392(4)
++	lfd	22, 400(4)
++	lfd	23, 408(4)
++	lfd	24, 416(4)
++	lfd	25, 424(4)
++	lfd	26, 432(4)
++	lfd	27, 440(4)
++	lfd	28, 448(4)
++	lfd	29, 456(4)
++	lfd	30, 464(4)
++	lfd	31, 472(4)
++
++	ld	0, 480(4)
++	mtcr	0
++
++
++	addi	11, 5, -8
++	mr	12, 3
++
++
++	cmpdi	6, 0
++	beq	.Largs_done
++	mtctr	6
++	ldu	3, 8(11)
++	bdz	.Largs_done
++	ldu	4, 8(11)
++	bdz	.Largs_done
++	ldu	5, 8(11)
++	bdz	.Largs_done
++	ldu	6, 8(11)
++	bdz	.Largs_done
++	ldu	7, 8(11)
++	bdz	.Largs_done
++	ldu	8, 8(11)
++	bdz	.Largs_done
++	ldu	9, 8(11)
++	bdz	.Largs_done
++	ldu	10, 8(11)
++
++.Largs_done:
++	li	2, 0
++	mtctr	12
++	bctrl	
++	ld	2, 24(1)
++
++	ld	4, 32(1)
++	li	11, 0
++	stvx	20, 11, 4
++	li	11, 16
++	stvx	21, 11, 4
++	li	11, 32
++	stvx	22, 11, 4
++	li	11, 48
++	stvx	23, 11, 4
++	li	11, 64
++	stvx	24, 11, 4
++	li	11, 80
++	stvx	25, 11, 4
++	li	11, 96
++	stvx	26, 11, 4
++	li	11, 112
++	stvx	27, 11, 4
++	li	11, 128
++	stvx	28, 11, 4
++	li	11, 144
++	stvx	29, 11, 4
++	li	11, 160
++	stvx	30, 11, 4
++	li	11, 176
++	stvx	31, 11, 4
++	std	14, 192(4)
++	std	15, 200(4)
++	std	16, 208(4)
++	std	17, 216(4)
++	std	18, 224(4)
++	std	19, 232(4)
++	std	20, 240(4)
++	std	21, 248(4)
++	std	22, 256(4)
++	std	23, 264(4)
++	std	24, 272(4)
++	std	25, 280(4)
++	std	26, 288(4)
++	std	27, 296(4)
++	std	28, 304(4)
++	std	29, 312(4)
++	std	30, 320(4)
++	std	31, 328(4)
++	stfd	14, 336(4)
++	stfd	15, 344(4)
++	stfd	16, 352(4)
++	stfd	17, 360(4)
++	stfd	18, 368(4)
++	stfd	19, 376(4)
++	stfd	20, 384(4)
++	stfd	21, 392(4)
++	stfd	22, 400(4)
++	stfd	23, 408(4)
++	stfd	24, 416(4)
++	stfd	25, 424(4)
++	stfd	26, 432(4)
++	stfd	27, 440(4)
++	stfd	28, 448(4)
++	stfd	29, 456(4)
++	stfd	30, 464(4)
++	stfd	31, 472(4)
++	li	11, 48
++	lvx	20, 11, 1
++	li	11, 64
++	lvx	21, 11, 1
++	li	11, 80
++	lvx	22, 11, 1
++	li	11, 96
++	lvx	23, 11, 1
++	li	11, 112
++	lvx	24, 11, 1
++	li	11, 128
++	lvx	25, 11, 1
++	li	11, 144
++	lvx	26, 11, 1
++	li	11, 160
++	lvx	27, 11, 1
++	li	11, 176
++	lvx	28, 11, 1
++	li	11, 192
++	lvx	29, 11, 1
++	li	11, 208
++	lvx	30, 11, 1
++	li	11, 224
++	lvx	31, 11, 1
++	ld	14, 240(1)
++	ld	15, 248(1)
++	ld	16, 256(1)
++	ld	17, 264(1)
++	ld	18, 272(1)
++	ld	19, 280(1)
++	ld	20, 288(1)
++	ld	21, 296(1)
++	ld	22, 304(1)
++	ld	23, 312(1)
++	ld	24, 320(1)
++	ld	25, 328(1)
++	ld	26, 336(1)
++	ld	27, 344(1)
++	ld	28, 352(1)
++	ld	29, 360(1)
++	ld	30, 368(1)
++	ld	31, 376(1)
++	lfd	14, 384(1)
++	lfd	15, 392(1)
++	lfd	16, 400(1)
++	lfd	17, 408(1)
++	lfd	18, 416(1)
++	lfd	19, 424(1)
++	lfd	20, 432(1)
++	lfd	21, 440(1)
++	lfd	22, 448(1)
++	lfd	23, 456(1)
++	lfd	24, 464(1)
++	lfd	25, 472(1)
++	lfd	26, 480(1)
++	lfd	27, 488(1)
++	lfd	28, 496(1)
++	lfd	29, 504(1)
++	lfd	30, 512(1)
++	lfd	31, 520(1)
++	mfcr	0
++	std	0, 480(4)
++	ld	0, 8(1)
++	mtcrf	0b00111000, 0
++	addi	1, 1, 528
++	ld	0, 16(1)
++	mtlr	0
++	blr	
++.size	abi_test_trampoline,.-abi_test_trampoline
++.globl	abi_test_clobber_r0
++.type	abi_test_clobber_r0,@function
++.align	5
++abi_test_clobber_r0:
++.localentry	abi_test_clobber_r0,0
++
++	li	0, 0
++	blr	
++.size	abi_test_clobber_r0,.-abi_test_clobber_r0
++.globl	abi_test_clobber_r2
++.type	abi_test_clobber_r2,@function
++.align	5
++abi_test_clobber_r2:
++.localentry	abi_test_clobber_r2,0
++
++	li	2, 0
++	blr	
++.size	abi_test_clobber_r2,.-abi_test_clobber_r2
++.globl	abi_test_clobber_r3
++.type	abi_test_clobber_r3,@function
++.align	5
++abi_test_clobber_r3:
++.localentry	abi_test_clobber_r3,0
++
++	li	3, 0
++	blr	
++.size	abi_test_clobber_r3,.-abi_test_clobber_r3
++.globl	abi_test_clobber_r4
++.type	abi_test_clobber_r4,@function
++.align	5
++abi_test_clobber_r4:
++.localentry	abi_test_clobber_r4,0
++
++	li	4, 0
++	blr	
++.size	abi_test_clobber_r4,.-abi_test_clobber_r4
++.globl	abi_test_clobber_r5
++.type	abi_test_clobber_r5,@function
++.align	5
++abi_test_clobber_r5:
++.localentry	abi_test_clobber_r5,0
++
++	li	5, 0
++	blr	
++.size	abi_test_clobber_r5,.-abi_test_clobber_r5
++.globl	abi_test_clobber_r6
++.type	abi_test_clobber_r6,@function
++.align	5
++abi_test_clobber_r6:
++.localentry	abi_test_clobber_r6,0
++
++	li	6, 0
++	blr	
++.size	abi_test_clobber_r6,.-abi_test_clobber_r6
++.globl	abi_test_clobber_r7
++.type	abi_test_clobber_r7,@function
++.align	5
++abi_test_clobber_r7:
++.localentry	abi_test_clobber_r7,0
++
++	li	7, 0
++	blr	
++.size	abi_test_clobber_r7,.-abi_test_clobber_r7
++.globl	abi_test_clobber_r8
++.type	abi_test_clobber_r8,@function
++.align	5
++abi_test_clobber_r8:
++.localentry	abi_test_clobber_r8,0
++
++	li	8, 0
++	blr	
++.size	abi_test_clobber_r8,.-abi_test_clobber_r8
++.globl	abi_test_clobber_r9
++.type	abi_test_clobber_r9,@function
++.align	5
++abi_test_clobber_r9:
++.localentry	abi_test_clobber_r9,0
++
++	li	9, 0
++	blr	
++.size	abi_test_clobber_r9,.-abi_test_clobber_r9
++.globl	abi_test_clobber_r10
++.type	abi_test_clobber_r10,@function
++.align	5
++abi_test_clobber_r10:
++.localentry	abi_test_clobber_r10,0
++
++	li	10, 0
++	blr	
++.size	abi_test_clobber_r10,.-abi_test_clobber_r10
++.globl	abi_test_clobber_r11
++.type	abi_test_clobber_r11,@function
++.align	5
++abi_test_clobber_r11:
++.localentry	abi_test_clobber_r11,0
++
++	li	11, 0
++	blr	
++.size	abi_test_clobber_r11,.-abi_test_clobber_r11
++.globl	abi_test_clobber_r12
++.type	abi_test_clobber_r12,@function
++.align	5
++abi_test_clobber_r12:
++.localentry	abi_test_clobber_r12,0
++
++	li	12, 0
++	blr	
++.size	abi_test_clobber_r12,.-abi_test_clobber_r12
++.globl	abi_test_clobber_r14
++.type	abi_test_clobber_r14,@function
++.align	5
++abi_test_clobber_r14:
++.localentry	abi_test_clobber_r14,0
++
++	li	14, 0
++	blr	
++.size	abi_test_clobber_r14,.-abi_test_clobber_r14
++.globl	abi_test_clobber_r15
++.type	abi_test_clobber_r15,@function
++.align	5
++abi_test_clobber_r15:
++.localentry	abi_test_clobber_r15,0
++
++	li	15, 0
++	blr	
++.size	abi_test_clobber_r15,.-abi_test_clobber_r15
++.globl	abi_test_clobber_r16
++.type	abi_test_clobber_r16,@function
++.align	5
++abi_test_clobber_r16:
++.localentry	abi_test_clobber_r16,0
++
++	li	16, 0
++	blr	
++.size	abi_test_clobber_r16,.-abi_test_clobber_r16
++.globl	abi_test_clobber_r17
++.type	abi_test_clobber_r17,@function
++.align	5
++abi_test_clobber_r17:
++.localentry	abi_test_clobber_r17,0
++
++	li	17, 0
++	blr	
++.size	abi_test_clobber_r17,.-abi_test_clobber_r17
++.globl	abi_test_clobber_r18
++.type	abi_test_clobber_r18,@function
++.align	5
++abi_test_clobber_r18:
++.localentry	abi_test_clobber_r18,0
++
++	li	18, 0
++	blr	
++.size	abi_test_clobber_r18,.-abi_test_clobber_r18
++.globl	abi_test_clobber_r19
++.type	abi_test_clobber_r19,@function
++.align	5
++abi_test_clobber_r19:
++.localentry	abi_test_clobber_r19,0
++
++	li	19, 0
++	blr	
++.size	abi_test_clobber_r19,.-abi_test_clobber_r19
++.globl	abi_test_clobber_r20
++.type	abi_test_clobber_r20,@function
++.align	5
++abi_test_clobber_r20:
++.localentry	abi_test_clobber_r20,0
++
++	li	20, 0
++	blr	
++.size	abi_test_clobber_r20,.-abi_test_clobber_r20
++.globl	abi_test_clobber_r21
++.type	abi_test_clobber_r21,@function
++.align	5
++abi_test_clobber_r21:
++.localentry	abi_test_clobber_r21,0
++
++	li	21, 0
++	blr	
++.size	abi_test_clobber_r21,.-abi_test_clobber_r21
++.globl	abi_test_clobber_r22
++.type	abi_test_clobber_r22,@function
++.align	5
++abi_test_clobber_r22:
++.localentry	abi_test_clobber_r22,0
++
++	li	22, 0
++	blr	
++.size	abi_test_clobber_r22,.-abi_test_clobber_r22
++.globl	abi_test_clobber_r23
++.type	abi_test_clobber_r23,@function
++.align	5
++abi_test_clobber_r23:
++.localentry	abi_test_clobber_r23,0
++
++	li	23, 0
++	blr	
++.size	abi_test_clobber_r23,.-abi_test_clobber_r23
++.globl	abi_test_clobber_r24
++.type	abi_test_clobber_r24,@function
++.align	5
++abi_test_clobber_r24:
++.localentry	abi_test_clobber_r24,0
++
++	li	24, 0
++	blr	
++.size	abi_test_clobber_r24,.-abi_test_clobber_r24
++.globl	abi_test_clobber_r25
++.type	abi_test_clobber_r25,@function
++.align	5
++abi_test_clobber_r25:
++.localentry	abi_test_clobber_r25,0
++
++	li	25, 0
++	blr	
++.size	abi_test_clobber_r25,.-abi_test_clobber_r25
++.globl	abi_test_clobber_r26
++.type	abi_test_clobber_r26,@function
++.align	5
++abi_test_clobber_r26:
++.localentry	abi_test_clobber_r26,0
++
++	li	26, 0
++	blr	
++.size	abi_test_clobber_r26,.-abi_test_clobber_r26
++.globl	abi_test_clobber_r27
++.type	abi_test_clobber_r27,@function
++.align	5
++abi_test_clobber_r27:
++.localentry	abi_test_clobber_r27,0
++
++	li	27, 0
++	blr	
++.size	abi_test_clobber_r27,.-abi_test_clobber_r27
++.globl	abi_test_clobber_r28
++.type	abi_test_clobber_r28,@function
++.align	5
++abi_test_clobber_r28:
++.localentry	abi_test_clobber_r28,0
++
++	li	28, 0
++	blr	
++.size	abi_test_clobber_r28,.-abi_test_clobber_r28
++.globl	abi_test_clobber_r29
++.type	abi_test_clobber_r29,@function
++.align	5
++abi_test_clobber_r29:
++.localentry	abi_test_clobber_r29,0
++
++	li	29, 0
++	blr	
++.size	abi_test_clobber_r29,.-abi_test_clobber_r29
++.globl	abi_test_clobber_r30
++.type	abi_test_clobber_r30,@function
++.align	5
++abi_test_clobber_r30:
++.localentry	abi_test_clobber_r30,0
++
++	li	30, 0
++	blr	
++.size	abi_test_clobber_r30,.-abi_test_clobber_r30
++.globl	abi_test_clobber_r31
++.type	abi_test_clobber_r31,@function
++.align	5
++abi_test_clobber_r31:
++.localentry	abi_test_clobber_r31,0
++
++	li	31, 0
++	blr	
++.size	abi_test_clobber_r31,.-abi_test_clobber_r31
++.globl	abi_test_clobber_f0
++.type	abi_test_clobber_f0,@function
++.align	4
++abi_test_clobber_f0:
++.localentry	abi_test_clobber_f0,0
++
++	li	0, 0
++
++	std	0, -8(1)
++	lfd	0, -8(1)
++	blr	
++.size	abi_test_clobber_f0,.-abi_test_clobber_f0
++.globl	abi_test_clobber_f1
++.type	abi_test_clobber_f1,@function
++.align	4
++abi_test_clobber_f1:
++.localentry	abi_test_clobber_f1,0
++
++	li	0, 0
++
++	std	0, -8(1)
++	lfd	1, -8(1)
++	blr	
++.size	abi_test_clobber_f1,.-abi_test_clobber_f1
++.globl	abi_test_clobber_f2
++.type	abi_test_clobber_f2,@function
++.align	4
++abi_test_clobber_f2:
++.localentry	abi_test_clobber_f2,0
++
++	li	0, 0
++
++	std	0, -8(1)
++	lfd	2, -8(1)
++	blr	
++.size	abi_test_clobber_f2,.-abi_test_clobber_f2
++.globl	abi_test_clobber_f3
++.type	abi_test_clobber_f3,@function
++.align	4
++abi_test_clobber_f3:
++.localentry	abi_test_clobber_f3,0
++
++	li	0, 0
++
++	std	0, -8(1)
++	lfd	3, -8(1)
++	blr	
++.size	abi_test_clobber_f3,.-abi_test_clobber_f3
++.globl	abi_test_clobber_f4
++.type	abi_test_clobber_f4,@function
++.align	4
++abi_test_clobber_f4:
++.localentry	abi_test_clobber_f4,0
++
++	li	0, 0
++
++	std	0, -8(1)
++	lfd	4, -8(1)
++	blr	
++.size	abi_test_clobber_f4,.-abi_test_clobber_f4
++.globl	abi_test_clobber_f5
++.type	abi_test_clobber_f5,@function
++.align	4
++abi_test_clobber_f5:
++.localentry	abi_test_clobber_f5,0
++
++	li	0, 0
++
++	std	0, -8(1)
++	lfd	5, -8(1)
++	blr	
++.size	abi_test_clobber_f5,.-abi_test_clobber_f5
++.globl	abi_test_clobber_f6
++.type	abi_test_clobber_f6,@function
++.align	4
++abi_test_clobber_f6:
++.localentry	abi_test_clobber_f6,0
++
++	li	0, 0
++
++	std	0, -8(1)
++	lfd	6, -8(1)
++	blr	
++.size	abi_test_clobber_f6,.-abi_test_clobber_f6
++.globl	abi_test_clobber_f7
++.type	abi_test_clobber_f7,@function
++.align	4
++abi_test_clobber_f7:
++.localentry	abi_test_clobber_f7,0
++
++	li	0, 0
++
++	std	0, -8(1)
++	lfd	7, -8(1)
++	blr	
++.size	abi_test_clobber_f7,.-abi_test_clobber_f7
++.globl	abi_test_clobber_f8
++.type	abi_test_clobber_f8,@function
++.align	4
++abi_test_clobber_f8:
++.localentry	abi_test_clobber_f8,0
++
++	li	0, 0
++
++	std	0, -8(1)
++	lfd	8, -8(1)
++	blr	
++.size	abi_test_clobber_f8,.-abi_test_clobber_f8
++.globl	abi_test_clobber_f9
++.type	abi_test_clobber_f9,@function
++.align	4
++abi_test_clobber_f9:
++.localentry	abi_test_clobber_f9,0
++
++	li	0, 0
++
++	std	0, -8(1)
++	lfd	9, -8(1)
++	blr	
++.size	abi_test_clobber_f9,.-abi_test_clobber_f9
++.globl	abi_test_clobber_f10
++.type	abi_test_clobber_f10,@function
++.align	4
++abi_test_clobber_f10:
++.localentry	abi_test_clobber_f10,0
++
++	li	0, 0
++
++	std	0, -8(1)
++	lfd	10, -8(1)
++	blr	
++.size	abi_test_clobber_f10,.-abi_test_clobber_f10
++.globl	abi_test_clobber_f11
++.type	abi_test_clobber_f11,@function
++.align	4
++abi_test_clobber_f11:
++.localentry	abi_test_clobber_f11,0
++
++	li	0, 0
++
++	std	0, -8(1)
++	lfd	11, -8(1)
++	blr	
++.size	abi_test_clobber_f11,.-abi_test_clobber_f11
++.globl	abi_test_clobber_f12
++.type	abi_test_clobber_f12,@function
++.align	4
++abi_test_clobber_f12:
++.localentry	abi_test_clobber_f12,0
++
++	li	0, 0
++
++	std	0, -8(1)
++	lfd	12, -8(1)
++	blr	
++.size	abi_test_clobber_f12,.-abi_test_clobber_f12
++.globl	abi_test_clobber_f13
++.type	abi_test_clobber_f13,@function
++.align	4
++abi_test_clobber_f13:
++.localentry	abi_test_clobber_f13,0
++
++	li	0, 0
++
++	std	0, -8(1)
++	lfd	13, -8(1)
++	blr	
++.size	abi_test_clobber_f13,.-abi_test_clobber_f13
++.globl	abi_test_clobber_f14
++.type	abi_test_clobber_f14,@function
++.align	4
++abi_test_clobber_f14:
++.localentry	abi_test_clobber_f14,0
++
++	li	0, 0
++
++	std	0, -8(1)
++	lfd	14, -8(1)
++	blr	
++.size	abi_test_clobber_f14,.-abi_test_clobber_f14
++.globl	abi_test_clobber_f15
++.type	abi_test_clobber_f15,@function
++.align	4
++abi_test_clobber_f15:
++.localentry	abi_test_clobber_f15,0
++
++	li	0, 0
++
++	std	0, -8(1)
++	lfd	15, -8(1)
++	blr	
++.size	abi_test_clobber_f15,.-abi_test_clobber_f15
++.globl	abi_test_clobber_f16
++.type	abi_test_clobber_f16,@function
++.align	4
++abi_test_clobber_f16:
++.localentry	abi_test_clobber_f16,0
++
++	li	0, 0
++
++	std	0, -8(1)
++	lfd	16, -8(1)
++	blr	
++.size	abi_test_clobber_f16,.-abi_test_clobber_f16
++.globl	abi_test_clobber_f17
++.type	abi_test_clobber_f17,@function
++.align	4
++abi_test_clobber_f17:
++.localentry	abi_test_clobber_f17,0
++
++	li	0, 0
++
++	std	0, -8(1)
++	lfd	17, -8(1)
++	blr	
++.size	abi_test_clobber_f17,.-abi_test_clobber_f17
++.globl	abi_test_clobber_f18
++.type	abi_test_clobber_f18,@function
++.align	4
++abi_test_clobber_f18:
++.localentry	abi_test_clobber_f18,0
++
++	li	0, 0
++
++	std	0, -8(1)
++	lfd	18, -8(1)
++	blr	
++.size	abi_test_clobber_f18,.-abi_test_clobber_f18
++.globl	abi_test_clobber_f19
++.type	abi_test_clobber_f19,@function
++.align	4
++abi_test_clobber_f19:
++.localentry	abi_test_clobber_f19,0
++
++	li	0, 0
++
++	std	0, -8(1)
++	lfd	19, -8(1)
++	blr	
++.size	abi_test_clobber_f19,.-abi_test_clobber_f19
++.globl	abi_test_clobber_f20
++.type	abi_test_clobber_f20,@function
++.align	4
++abi_test_clobber_f20:
++.localentry	abi_test_clobber_f20,0
++
++	li	0, 0
++
++	std	0, -8(1)
++	lfd	20, -8(1)
++	blr	
++.size	abi_test_clobber_f20,.-abi_test_clobber_f20
++.globl	abi_test_clobber_f21
++.type	abi_test_clobber_f21,@function
++.align	4
++abi_test_clobber_f21:
++.localentry	abi_test_clobber_f21,0
++
++	li	0, 0
++
++	std	0, -8(1)
++	lfd	21, -8(1)
++	blr	
++.size	abi_test_clobber_f21,.-abi_test_clobber_f21
++.globl	abi_test_clobber_f22
++.type	abi_test_clobber_f22,@function
++.align	4
++abi_test_clobber_f22:
++.localentry	abi_test_clobber_f22,0
++
++	li	0, 0
++
++	std	0, -8(1)
++	lfd	22, -8(1)
++	blr	
++.size	abi_test_clobber_f22,.-abi_test_clobber_f22
++.globl	abi_test_clobber_f23
++.type	abi_test_clobber_f23,@function
++.align	4
++abi_test_clobber_f23:
++.localentry	abi_test_clobber_f23,0
++
++	li	0, 0
++
++	std	0, -8(1)
++	lfd	23, -8(1)
++	blr	
++.size	abi_test_clobber_f23,.-abi_test_clobber_f23
++.globl	abi_test_clobber_f24
++.type	abi_test_clobber_f24,@function
++.align	4
++abi_test_clobber_f24:
++.localentry	abi_test_clobber_f24,0
++
++	li	0, 0
++
++	std	0, -8(1)
++	lfd	24, -8(1)
++	blr	
++.size	abi_test_clobber_f24,.-abi_test_clobber_f24
++.globl	abi_test_clobber_f25
++.type	abi_test_clobber_f25,@function
++.align	4
++abi_test_clobber_f25:
++.localentry	abi_test_clobber_f25,0
++
++	li	0, 0
++
++	std	0, -8(1)
++	lfd	25, -8(1)
++	blr	
++.size	abi_test_clobber_f25,.-abi_test_clobber_f25
++.globl	abi_test_clobber_f26
++.type	abi_test_clobber_f26,@function
++.align	4
++abi_test_clobber_f26:
++.localentry	abi_test_clobber_f26,0
++
++	li	0, 0
++
++	std	0, -8(1)
++	lfd	26, -8(1)
++	blr	
++.size	abi_test_clobber_f26,.-abi_test_clobber_f26
++.globl	abi_test_clobber_f27
++.type	abi_test_clobber_f27,@function
++.align	4
++abi_test_clobber_f27:
++.localentry	abi_test_clobber_f27,0
++
++	li	0, 0
++
++	std	0, -8(1)
++	lfd	27, -8(1)
++	blr	
++.size	abi_test_clobber_f27,.-abi_test_clobber_f27
++.globl	abi_test_clobber_f28
++.type	abi_test_clobber_f28,@function
++.align	4
++abi_test_clobber_f28:
++.localentry	abi_test_clobber_f28,0
++
++	li	0, 0
++
++	std	0, -8(1)
++	lfd	28, -8(1)
++	blr	
++.size	abi_test_clobber_f28,.-abi_test_clobber_f28
++.globl	abi_test_clobber_f29
++.type	abi_test_clobber_f29,@function
++.align	4
++abi_test_clobber_f29:
++.localentry	abi_test_clobber_f29,0
++
++	li	0, 0
++
++	std	0, -8(1)
++	lfd	29, -8(1)
++	blr	
++.size	abi_test_clobber_f29,.-abi_test_clobber_f29
++.globl	abi_test_clobber_f30
++.type	abi_test_clobber_f30,@function
++.align	4
++abi_test_clobber_f30:
++.localentry	abi_test_clobber_f30,0
++
++	li	0, 0
++
++	std	0, -8(1)
++	lfd	30, -8(1)
++	blr	
++.size	abi_test_clobber_f30,.-abi_test_clobber_f30
++.globl	abi_test_clobber_f31
++.type	abi_test_clobber_f31,@function
++.align	4
++abi_test_clobber_f31:
++.localentry	abi_test_clobber_f31,0
++
++	li	0, 0
++
++	std	0, -8(1)
++	lfd	31, -8(1)
++	blr	
++.size	abi_test_clobber_f31,.-abi_test_clobber_f31
++.globl	abi_test_clobber_v0
++.type	abi_test_clobber_v0,@function
++.align	4
++abi_test_clobber_v0:
++.localentry	abi_test_clobber_v0,0
++
++	vxor	0, 0, 0
++	blr	
++.size	abi_test_clobber_v0,.-abi_test_clobber_v0
++.globl	abi_test_clobber_v1
++.type	abi_test_clobber_v1,@function
++.align	4
++abi_test_clobber_v1:
++.localentry	abi_test_clobber_v1,0
++
++	vxor	1, 1, 1
++	blr	
++.size	abi_test_clobber_v1,.-abi_test_clobber_v1
++.globl	abi_test_clobber_v2
++.type	abi_test_clobber_v2,@function
++.align	4
++abi_test_clobber_v2:
++.localentry	abi_test_clobber_v2,0
++
++	vxor	2, 2, 2
++	blr	
++.size	abi_test_clobber_v2,.-abi_test_clobber_v2
++.globl	abi_test_clobber_v3
++.type	abi_test_clobber_v3,@function
++.align	4
++abi_test_clobber_v3:
++.localentry	abi_test_clobber_v3,0
++
++	vxor	3, 3, 3
++	blr	
++.size	abi_test_clobber_v3,.-abi_test_clobber_v3
++.globl	abi_test_clobber_v4
++.type	abi_test_clobber_v4,@function
++.align	4
++abi_test_clobber_v4:
++.localentry	abi_test_clobber_v4,0
++
++	vxor	4, 4, 4
++	blr	
++.size	abi_test_clobber_v4,.-abi_test_clobber_v4
++.globl	abi_test_clobber_v5
++.type	abi_test_clobber_v5,@function
++.align	4
++abi_test_clobber_v5:
++.localentry	abi_test_clobber_v5,0
++
++	vxor	5, 5, 5
++	blr	
++.size	abi_test_clobber_v5,.-abi_test_clobber_v5
++.globl	abi_test_clobber_v6
++.type	abi_test_clobber_v6,@function
++.align	4
++abi_test_clobber_v6:
++.localentry	abi_test_clobber_v6,0
++
++	vxor	6, 6, 6
++	blr	
++.size	abi_test_clobber_v6,.-abi_test_clobber_v6
++.globl	abi_test_clobber_v7
++.type	abi_test_clobber_v7,@function
++.align	4
++abi_test_clobber_v7:
++.localentry	abi_test_clobber_v7,0
++
++	vxor	7, 7, 7
++	blr	
++.size	abi_test_clobber_v7,.-abi_test_clobber_v7
++.globl	abi_test_clobber_v8
++.type	abi_test_clobber_v8,@function
++.align	4
++abi_test_clobber_v8:
++.localentry	abi_test_clobber_v8,0
++
++	vxor	8, 8, 8
++	blr	
++.size	abi_test_clobber_v8,.-abi_test_clobber_v8
++.globl	abi_test_clobber_v9
++.type	abi_test_clobber_v9,@function
++.align	4
++abi_test_clobber_v9:
++.localentry	abi_test_clobber_v9,0
++
++	vxor	9, 9, 9
++	blr	
++.size	abi_test_clobber_v9,.-abi_test_clobber_v9
++.globl	abi_test_clobber_v10
++.type	abi_test_clobber_v10,@function
++.align	4
++abi_test_clobber_v10:
++.localentry	abi_test_clobber_v10,0
++
++	vxor	10, 10, 10
++	blr	
++.size	abi_test_clobber_v10,.-abi_test_clobber_v10
++.globl	abi_test_clobber_v11
++.type	abi_test_clobber_v11,@function
++.align	4
++abi_test_clobber_v11:
++.localentry	abi_test_clobber_v11,0
++
++	vxor	11, 11, 11
++	blr	
++.size	abi_test_clobber_v11,.-abi_test_clobber_v11
++.globl	abi_test_clobber_v12
++.type	abi_test_clobber_v12,@function
++.align	4
++abi_test_clobber_v12:
++.localentry	abi_test_clobber_v12,0
++
++	vxor	12, 12, 12
++	blr	
++.size	abi_test_clobber_v12,.-abi_test_clobber_v12
++.globl	abi_test_clobber_v13
++.type	abi_test_clobber_v13,@function
++.align	4
++abi_test_clobber_v13:
++.localentry	abi_test_clobber_v13,0
++
++	vxor	13, 13, 13
++	blr	
++.size	abi_test_clobber_v13,.-abi_test_clobber_v13
++.globl	abi_test_clobber_v14
++.type	abi_test_clobber_v14,@function
++.align	4
++abi_test_clobber_v14:
++.localentry	abi_test_clobber_v14,0
++
++	vxor	14, 14, 14
++	blr	
++.size	abi_test_clobber_v14,.-abi_test_clobber_v14
++.globl	abi_test_clobber_v15
++.type	abi_test_clobber_v15,@function
++.align	4
++abi_test_clobber_v15:
++.localentry	abi_test_clobber_v15,0
++
++	vxor	15, 15, 15
++	blr	
++.size	abi_test_clobber_v15,.-abi_test_clobber_v15
++.globl	abi_test_clobber_v16
++.type	abi_test_clobber_v16,@function
++.align	4
++abi_test_clobber_v16:
++.localentry	abi_test_clobber_v16,0
++
++	vxor	16, 16, 16
++	blr	
++.size	abi_test_clobber_v16,.-abi_test_clobber_v16
++.globl	abi_test_clobber_v17
++.type	abi_test_clobber_v17,@function
++.align	4
++abi_test_clobber_v17:
++.localentry	abi_test_clobber_v17,0
++
++	vxor	17, 17, 17
++	blr	
++.size	abi_test_clobber_v17,.-abi_test_clobber_v17
++.globl	abi_test_clobber_v18
++.type	abi_test_clobber_v18,@function
++.align	4
++abi_test_clobber_v18:
++.localentry	abi_test_clobber_v18,0
++
++	vxor	18, 18, 18
++	blr	
++.size	abi_test_clobber_v18,.-abi_test_clobber_v18
++.globl	abi_test_clobber_v19
++.type	abi_test_clobber_v19,@function
++.align	4
++abi_test_clobber_v19:
++.localentry	abi_test_clobber_v19,0
++
++	vxor	19, 19, 19
++	blr	
++.size	abi_test_clobber_v19,.-abi_test_clobber_v19
++.globl	abi_test_clobber_v20
++.type	abi_test_clobber_v20,@function
++.align	4
++abi_test_clobber_v20:
++.localentry	abi_test_clobber_v20,0
++
++	vxor	20, 20, 20
++	blr	
++.size	abi_test_clobber_v20,.-abi_test_clobber_v20
++.globl	abi_test_clobber_v21
++.type	abi_test_clobber_v21,@function
++.align	4
++abi_test_clobber_v21:
++.localentry	abi_test_clobber_v21,0
++
++	vxor	21, 21, 21
++	blr	
++.size	abi_test_clobber_v21,.-abi_test_clobber_v21
++.globl	abi_test_clobber_v22
++.type	abi_test_clobber_v22,@function
++.align	4
++abi_test_clobber_v22:
++.localentry	abi_test_clobber_v22,0
++
++	vxor	22, 22, 22
++	blr	
++.size	abi_test_clobber_v22,.-abi_test_clobber_v22
++.globl	abi_test_clobber_v23
++.type	abi_test_clobber_v23,@function
++.align	4
++abi_test_clobber_v23:
++.localentry	abi_test_clobber_v23,0
++
++	vxor	23, 23, 23
++	blr	
++.size	abi_test_clobber_v23,.-abi_test_clobber_v23
++.globl	abi_test_clobber_v24
++.type	abi_test_clobber_v24,@function
++.align	4
++abi_test_clobber_v24:
++.localentry	abi_test_clobber_v24,0
++
++	vxor	24, 24, 24
++	blr	
++.size	abi_test_clobber_v24,.-abi_test_clobber_v24
++.globl	abi_test_clobber_v25
++.type	abi_test_clobber_v25,@function
++.align	4
++abi_test_clobber_v25:
++.localentry	abi_test_clobber_v25,0
++
++	vxor	25, 25, 25
++	blr	
++.size	abi_test_clobber_v25,.-abi_test_clobber_v25
++.globl	abi_test_clobber_v26
++.type	abi_test_clobber_v26,@function
++.align	4
++abi_test_clobber_v26:
++.localentry	abi_test_clobber_v26,0
++
++	vxor	26, 26, 26
++	blr	
++.size	abi_test_clobber_v26,.-abi_test_clobber_v26
++.globl	abi_test_clobber_v27
++.type	abi_test_clobber_v27,@function
++.align	4
++abi_test_clobber_v27:
++.localentry	abi_test_clobber_v27,0
++
++	vxor	27, 27, 27
++	blr	
++.size	abi_test_clobber_v27,.-abi_test_clobber_v27
++.globl	abi_test_clobber_v28
++.type	abi_test_clobber_v28,@function
++.align	4
++abi_test_clobber_v28:
++.localentry	abi_test_clobber_v28,0
++
++	vxor	28, 28, 28
++	blr	
++.size	abi_test_clobber_v28,.-abi_test_clobber_v28
++.globl	abi_test_clobber_v29
++.type	abi_test_clobber_v29,@function
++.align	4
++abi_test_clobber_v29:
++.localentry	abi_test_clobber_v29,0
++
++	vxor	29, 29, 29
++	blr	
++.size	abi_test_clobber_v29,.-abi_test_clobber_v29
++.globl	abi_test_clobber_v30
++.type	abi_test_clobber_v30,@function
++.align	4
++abi_test_clobber_v30:
++.localentry	abi_test_clobber_v30,0
++
++	vxor	30, 30, 30
++	blr	
++.size	abi_test_clobber_v30,.-abi_test_clobber_v30
++.globl	abi_test_clobber_v31
++.type	abi_test_clobber_v31,@function
++.align	4
++abi_test_clobber_v31:
++.localentry	abi_test_clobber_v31,0
++
++	vxor	31, 31, 31
++	blr	
++.size	abi_test_clobber_v31,.-abi_test_clobber_v31
++.globl	abi_test_clobber_cr0
++.type	abi_test_clobber_cr0,@function
++.align	4
++abi_test_clobber_cr0:
++.localentry	abi_test_clobber_cr0,0
++
++
++
++	mfcr	0
++	not	0, 0
++	mtcrf	128, 0
++	blr	
++.size	abi_test_clobber_cr0,.-abi_test_clobber_cr0
++.globl	abi_test_clobber_cr1
++.type	abi_test_clobber_cr1,@function
++.align	4
++abi_test_clobber_cr1:
++.localentry	abi_test_clobber_cr1,0
++
++
++
++	mfcr	0
++	not	0, 0
++	mtcrf	64, 0
++	blr	
++.size	abi_test_clobber_cr1,.-abi_test_clobber_cr1
++.globl	abi_test_clobber_cr2
++.type	abi_test_clobber_cr2,@function
++.align	4
++abi_test_clobber_cr2:
++.localentry	abi_test_clobber_cr2,0
++
++
++
++	mfcr	0
++	not	0, 0
++	mtcrf	32, 0
++	blr	
++.size	abi_test_clobber_cr2,.-abi_test_clobber_cr2
++.globl	abi_test_clobber_cr3
++.type	abi_test_clobber_cr3,@function
++.align	4
++abi_test_clobber_cr3:
++.localentry	abi_test_clobber_cr3,0
++
++
++
++	mfcr	0
++	not	0, 0
++	mtcrf	16, 0
++	blr	
++.size	abi_test_clobber_cr3,.-abi_test_clobber_cr3
++.globl	abi_test_clobber_cr4
++.type	abi_test_clobber_cr4,@function
++.align	4
++abi_test_clobber_cr4:
++.localentry	abi_test_clobber_cr4,0
++
++
++
++	mfcr	0
++	not	0, 0
++	mtcrf	8, 0
++	blr	
++.size	abi_test_clobber_cr4,.-abi_test_clobber_cr4
++.globl	abi_test_clobber_cr5
++.type	abi_test_clobber_cr5,@function
++.align	4
++abi_test_clobber_cr5:
++.localentry	abi_test_clobber_cr5,0
++
++
++
++	mfcr	0
++	not	0, 0
++	mtcrf	4, 0
++	blr	
++.size	abi_test_clobber_cr5,.-abi_test_clobber_cr5
++.globl	abi_test_clobber_cr6
++.type	abi_test_clobber_cr6,@function
++.align	4
++abi_test_clobber_cr6:
++.localentry	abi_test_clobber_cr6,0
++
++
++
++	mfcr	0
++	not	0, 0
++	mtcrf	2, 0
++	blr	
++.size	abi_test_clobber_cr6,.-abi_test_clobber_cr6
++.globl	abi_test_clobber_cr7
++.type	abi_test_clobber_cr7,@function
++.align	4
++abi_test_clobber_cr7:
++.localentry	abi_test_clobber_cr7,0
++
++
++
++	mfcr	0
++	not	0, 0
++	mtcrf	1, 0
++	blr	
++.size	abi_test_clobber_cr7,.-abi_test_clobber_cr7
++.globl	abi_test_clobber_ctr
++.type	abi_test_clobber_ctr,@function
++.align	4
++abi_test_clobber_ctr:
++.localentry	abi_test_clobber_ctr,0
++
++	li	0, 0
++	mtctr	0
++	blr	
++.size	abi_test_clobber_ctr,.-abi_test_clobber_ctr
++
++.globl	abi_test_clobber_lr
++.type	abi_test_clobber_lr,@function
++.align	4
++abi_test_clobber_lr:
++.localentry	abi_test_clobber_lr,0
++
++	mflr	0
++	mtctr	0
++	li	0, 0
++	mtlr	0
++	bctr	
++.size	abi_test_clobber_lr,.-abi_test_clobber_lr
++
++#endif  // !OPENSSL_NO_ASM && __powerpc64__ && __ELF__
++#if defined(__ELF__)
++// See https://www.airs.ccom/blog/archives/518.
++.section .note.GNU-stack,"",%progbits
++#endif

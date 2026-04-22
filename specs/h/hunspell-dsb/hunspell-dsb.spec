@@ -10,7 +10,7 @@
 Name: hunspell-dsb
 Summary: Lower Sorbian hunspell dictionaries
 Version: 1.4.8
-Release: 20%{?dist}
+Release: 21%{?dist}
 Source: https://downloads.sourceforge.net/project/aoo-extensions/3045/14/lower_sorbian_spelling_dictionary-%{version}.oxt
 URL: http://dsb-spell.sourceforge.net
 License: GPL-2.0-or-later

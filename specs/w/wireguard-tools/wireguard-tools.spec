@@ -3,7 +3,7 @@
 
 Name:           wireguard-tools
 Version:        1.0.20250521
-Release:        2%{?dist}
+Release: 3%{?dist}
 URL:            https://www.wireguard.com/
 Summary:        Fast, modern, secure VPN tunnel
 # Automatically converted from old format: GPLv2 - review is highly recommended.

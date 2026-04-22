@@ -4,7 +4,7 @@
 Name:           xdotool
 Version:        3.20211022.1
 Epoch:          1
-Release:        9%{?dist}
+Release: 10%{?dist}
 Summary:        Fake keyboard/mouse input
 # Automatically converted from old format: BSD - review is highly recommended.
 License:        LicenseRef-Callaway-BSD

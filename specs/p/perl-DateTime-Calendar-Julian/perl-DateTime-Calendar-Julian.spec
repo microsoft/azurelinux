@@ -3,7 +3,7 @@
 
 Name:		perl-DateTime-Calendar-Julian
 Version:	0.107
-Release:	11%{?dist}
+Release: 12%{?dist}
 # Automatically converted from old format: GPL+ or Artistic - review is highly recommended.
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 Summary:	Julian Calendar support for DateTime.pm

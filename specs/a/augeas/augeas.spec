@@ -10,7 +10,7 @@ License:        LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND (G
 %global commit af2aa88ab37fc48167d8c5e43b1770a4ba2ff403
 %forgemeta
 
-Release:        0.6%{?dist}
+Release: 1.6%{?dist}
 URL:            %{forgeurl}
 Source0:        %{forgesource}
 

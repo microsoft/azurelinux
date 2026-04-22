@@ -5,7 +5,7 @@
 
 Name:           python-gssapi
 Version:        1.7.3
-Release:        15%{?dist}
+Release: 16%{?dist}
 Summary:        Python Bindings for GSSAPI (RFC 2743/2744 and extensions)
 
 License:        ISC

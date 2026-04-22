@@ -1,0 +1,11 @@
+diff -urN graphite2-1.3.14.orig/tests/featuremap/featuremaptest.cpp graphite2-1.3.14/tests/featuremap/featuremaptest.cpp
+--- graphite2-1.3.14.orig/tests/featuremap/featuremaptest.cpp	2020-04-01 08:23:13.000000000 +0530
++++ graphite2-1.3.14/tests/featuremap/featuremaptest.cpp	2025-01-23 16:27:12.648804481 +0530
+@@ -25,6 +25,7 @@
+ #include <iostream>
+ #include <map>
+ #include <memory>
++#include <stdint.h>
+ #include <string>
+ #include <vector>
+ 

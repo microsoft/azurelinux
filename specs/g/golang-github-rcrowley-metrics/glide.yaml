@@ -1,0 +1,9 @@
+import:
+- package: github.com/influxdb/influxdb
+  subpackages:
+  - client
+  version: b611d020cd78886232cfa6c2ea0606b49d307ed2
+- package: github.com/stathat/go
+  version: 01d012b9ee2ecc107cb28b6dd32d9019ed5c1d77
+package: github.com/rcrowley/go-metrics
+

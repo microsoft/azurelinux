@@ -15,7 +15,7 @@
 Summary:        HTTP Client interface for ruby
 Name:           rubygem-%{gem_name}
 Version:        2.8.3
-Release:        16%{?dist}
+Release: 17%{?dist}
 # httpclient is licensed under Ruby license from 2003 or later.
 License:        Ruby
 URL:            https://github.com/nahi/httpclient

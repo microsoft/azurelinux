@@ -3,7 +3,7 @@
 
 Name:           perl-Test-InDistDir
 Version:        1.112071
-Release:        27%{?dist}
+Release: 28%{?dist}
 Summary:        Test environment setup for development with IDE
 License:        WTFPL
 URL:            https://metacpan.org/release/Test-InDistDir

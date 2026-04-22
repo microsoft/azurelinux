@@ -1,0 +1,15 @@
+[Unit]
+Description = clamd scanner (%i) daemon
+Documentation=man:clamd(8) man:clamd.conf(5) https://www.clamav.net/documents/
+After = syslog.target nss-lookup.target network.target
+
+[Service]
+Type = forking
+ExecStart = /usr/sbin/clamd -c /etc/clamd.d/%i.conf
+# Reload the database
+ExecReload=/bin/kill -USR2 $MAINPID
+Restart = on-failure
+TimeoutStartSec=420
+
+[Install]
+WantedBy = multi-user.target

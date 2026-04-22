@@ -13,7 +13,7 @@
 
 Name:           python-sphinx-theme-builder
 Version:        0.2.0
-Release:        0.25.%{prerel}%{?dist}
+Release: 1.25.%{prerel}%{?dist}
 Summary:        Streamline the Sphinx theme development workflow
 
 # Most of the code is MIT.  However,

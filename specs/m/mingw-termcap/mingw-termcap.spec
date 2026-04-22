@@ -15,7 +15,7 @@
 
 Name:           mingw-termcap
 Version:        1.3.1
-Release:        39%{?dist}
+Release: 40%{?dist}
 Summary:        MinGW terminal feature database
 
 License:        GPL-2.0-or-later

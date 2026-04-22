@@ -3,7 +3,7 @@
 
 Name:           xmvn-connector-ivy
 Version:        4.0.0
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        XMvn Connector for Apache Ivy
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.
 License:        Apache-2.0

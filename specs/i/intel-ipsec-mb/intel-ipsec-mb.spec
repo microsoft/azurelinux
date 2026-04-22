@@ -13,7 +13,7 @@ industry-leading performance on a range of Intel Processors.}
 
 Name:               intel-ipsec-mb
 Version:            2.0.1
-Release:            2%{?dist}
+Release: 3%{?dist}
 Summary:            IPsec cryptography library optimized for Intel Architecture
 
 License:            BSD-3-Clause

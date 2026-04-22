@@ -1,0 +1,22 @@
+From 3e19e7573f25edd9433b14e3450aecb91b360dcb Mon Sep 17 00:00:00 2001
+From: Benson Muite <bkmgit@users.noreply.github.com>
+Date: Fri, 22 Nov 2024 17:12:07 +0300
+Subject: [PATCH] Remove unnecessary aioquic version limit
+
+---
+ pyproject.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 7a6b6a84..634841f8 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -27,7 +27,7 @@ documentation = "https://hypercorn.readthedocs.io"
+ 
+ [tool.poetry.dependencies]
+ python = ">=3.8"
+-aioquic = { version = ">= 0.9.0, < 1.0", optional = true }
++aioquic = { version = ">= 0.9.0", optional = true }
+ exceptiongroup = { version = ">= 1.1.0", python = "<3.11" }
+ h11 = "*"
+ h2 = ">=3.1.0"

@@ -6,7 +6,7 @@
 Name:           pywbem
 Version:        1.7.3
 Epoch:          1
-Release:        5%{?dist}
+Release: 6%{?dist}
 Summary:        Python WBEM client interface and related utilities
 License:        LGPL-2.1-or-later
 URL:            https://github.com/pywbem/pywbem

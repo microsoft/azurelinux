@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/python3.14.azl.macros}
+
 # ======================
 # Bootstrap conditionals
 # ======================
@@ -52,7 +55,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Python-2.0.1
 
 
@@ -371,6 +374,7 @@ Source32: Python-%{upstream_version}-aarch64-optimized-jit_stencils.h
 Source33: Python-%{upstream_version}-x86_64-debug-jit_stencils.h
 Source34: Python-%{upstream_version}-x86_64-optimized-jit_stencils.h
 %endif
+Source9999: python3.14.azl.macros
 %global jit_stencils_source %{_sourcedir}/Python-%{upstream_version}-%{_arch}-${ConfName}-jit_stencils.h
 %global jit_stencils_filename jit_stencils-%{_arch}-redhat-linux-gnu.h
 

@@ -10,7 +10,7 @@
 
 Name:           perl-Coro-Multicore
 Version:        1.07
-Release:        17%{?dist}
+Release: 18%{?dist}
 Summary:        Make Coro threads on multiple cores with specially supported modules
 # COPYING:          GPL-1.0-or-later OR Artistic-1.0-Perl
 # perlmulticore.h:  LicenseRef-Fedora-Public-Domain OR CC0-1.0

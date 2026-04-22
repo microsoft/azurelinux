@@ -1,0 +1,20 @@
+--- vipr-30f2951d1e90e47afa821bdd1b12b82246656c42/code/CMakeLists.txt.orig	2025-10-29 08:55:16.000000000 -0600
++++ vipr-30f2951d1e90e47afa821bdd1b12b82246656c42/code/CMakeLists.txt	2025-11-25 15:22:35.848714436 -0700
+@@ -74,14 +74,13 @@ if(VIPRCOMP)
+ 		include_directories(${Boost_INCLUDE_DIRS})
+ 	endif()
+ 	# Only install viprcomp if working SoPlex is found
+-	find_package(ZLIB)
+-	if(ZLIB_FOUND)
++	find_package(zlib-ng)
++	if(zlib-ng_FOUND)
+ 		find_package(SOPLEX)
+ 		if(SOPLEX_FOUND)
+ 			set(VIPR_HAVE_SOPLEX 1)
+ 			# include ZLIB
+-			include_directories(${ZLIB_INCLUDE_DIRS})
+-			set(libs ${libs} ${ZLIB_LIBRARIES})
++			set(libs ${libs} z-ng)
+ 
+ 			# include SoPlex
+ 			include_directories(${SOPLEX_INCLUDE_DIRS})

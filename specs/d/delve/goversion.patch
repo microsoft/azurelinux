@@ -1,0 +1,56 @@
+From 52b394ea6b026749827c43eefcb40f08cb73199a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?=C3=81lex=20S=C3=A1ez?= <asm@redhat.com>
+Date: Mon, 2 Feb 2026 14:07:15 +0100
+Subject: [PATCH] goversion: parse rc version with trailing suffix (e.g.
+ go1.26rc1-X:nodwarf5)
+
+---
+ pkg/goversion/go_version.go   | 10 ++++++++--
+ pkg/goversion/version_test.go |  2 ++
+ 2 files changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/pkg/goversion/go_version.go b/pkg/goversion/go_version.go
+index 8a2a119d..1059cabc 100644
+--- a/pkg/goversion/go_version.go
++++ b/pkg/goversion/go_version.go
+@@ -119,9 +119,15 @@ func Parse(ver string) (GoVersion, bool) {
+ 				// old boringcrypto version goX.YbZ
+ 				_, err3 = strconv.Atoi(rest)
+ 			case hasPrefix("rc"):
+-				// old rc release goX.YrcZ
++				i := 0
++				for i < len(rest) && rest[i] >= '0' && rest[i] <= '9' {
++					i++
++				}
+ 				var rc int
+-				rc, err3 = strconv.Atoi(rest)
++				rc, err3 = strconv.Atoi(rest[:i])
++				if err3 != nil || i == 0 {
++					return GoVersion{}, false
++				}
+ 				r.Rev = rcRev(rc)
+ 			default:
+ 				// what is this?
+diff --git a/pkg/goversion/version_test.go b/pkg/goversion/version_test.go
+index 64973c30..5718aedc 100644
+--- a/pkg/goversion/version_test.go
++++ b/pkg/goversion/version_test.go
+@@ -64,6 +64,7 @@ func TestParseVersionStringAfterOrEqual(t *testing.T) {
+ 	versionAfterOrEqual2(t, "go1.16rc1", "go1.16beta1")
+ 	versionAfterOrEqual2(t, "go1.16beta2", "go1.16beta1")
+ 	versionAfterOrEqual2(t, "go1.16rc10", "go1.16rc8")
++	versionAfterOrEqual(t, "go1.26rc1-X:nodwarf5 linux/amd64", GoVersion{1, 26, rcRev(1), "", ""})
+ }
+ 
+ func TestParseVersionStringEqual(t *testing.T) {
+@@ -81,6 +82,7 @@ func TestParseVersionStringEqual(t *testing.T) {
+ 	versionEqual(t, "devel +17efbfc Tue Jul 28 17:39:19 2015 +0000 linux/amd64", GoVersion{Major: -1})
+ 	versionEqual(t, "devel go1.24-1bb6f19a25 Mon Oct 14 15:17:20 2024 -0400 linux/amd64", GoVersion{1, 24, versionedDevel, "", ""})
+ 	versionEqual(t, "go1.25-devel_6953ef86cd Mon May 5 04:05:18 2025 -0700 linux/amd64", GoVersion{1, 25, versionedDevel, "", ""})
++	versionEqual(t, "go1.26rc1-X:nodwarf5 linux/amd64", GoVersion{1, 26, rcRev(1), "", ""})
+ }
+ 
+ func TestRoundtrip(t *testing.T) {
+-- 
+2.52.0
+

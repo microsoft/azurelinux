@@ -1,0 +1,44 @@
+--- scip-922/CMakeLists.txt.orig	2025-04-14 23:26:16.000000000 -0600
++++ scip-922/CMakeLists.txt	2025-04-25 11:56:10.632816105 -0600
+@@ -167,9 +167,8 @@ if(SYM STREQUAL "bliss" OR SYM STREQUAL
+     endif()
+ elseif(SYM STREQUAL "nauty" OR SYM STREQUAL "snauty")
+     if(NAUTY_DIR)
+-        include_directories(${NAUTY_DIR})
+-        set(SYM_LIBRARIES ${NAUTY_DIR}/nauty/nauty.a)
+-        set(SYM_PIC_LIBRARIES ${NAUTY_DIR}/nauty/nauty.a)
++        set(SYM_LIBRARIES nauty)
++        set(SYM_PIC_LIBRARIES nauty)
+     else()
+         include_directories(src/nauty)
+         set(sym nauty/nauty.c nauty/nautil.c nauty/nausparse.c nauty/schreier.c nauty/naurng.c)
+--- scip-922/src/CMakeLists.txt.orig	2025-04-25 11:56:00.225034394 -0600
++++ scip-922/src/CMakeLists.txt	2025-04-25 11:56:10.633115984 -0600
+@@ -1130,7 +1130,6 @@ install(FILES ${dijkstraheaders} DESTINA
+ install(FILES ${objscipheaders} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/objscip)
+ install(FILES ${scipheaders} ${PROJECT_BINARY_DIR}/scip/config.h ${PROJECT_BINARY_DIR}/scip/scip_export.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scip)
+ install(FILES ${tcliqueheaders} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/tclique)
+-install(FILES ${tinycthreadheader} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/tinycthread)
+ install(FILES ${tpiheaders} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/tpi)
+ install(FILES ${xmlheaders} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/xml)
+ install(FILES ${symheaders} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/symmetry)
+--- scip-922/src/sassy/preprocessor.h.orig	2025-04-14 23:26:16.000000000 -0600
++++ scip-922/src/sassy/preprocessor.h	2025-04-25 11:56:32.359320439 -0600
+@@ -12,7 +12,6 @@
+ #include <iomanip>
+ #include <stdlib.h>
+ #include <ctime>
+-#include "tinycthread/tinycthread.h"
+ 
+ namespace sassy {
+     class preprocessor;
+--- scip-922/src/symmetry/compute_symmetry_sassy_nauty.cpp.orig	2025-04-14 23:26:16.000000000 -0600
++++ scip-922/src/symmetry/compute_symmetry_sassy_nauty.cpp	2025-04-25 12:03:14.450479826 -0600
+@@ -88,7 +88,6 @@
+ #include "scip/cons_linear.h"
+ #include "scip/scip_mem.h"
+ #include "scip/symmetry_graph.h"
+-#include "tinycthread/tinycthread.h"
+ 
+ /** struct for symmetry callback */
+ struct SYMMETRY_Data

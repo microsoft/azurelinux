@@ -7,7 +7,7 @@
 Name:           perl-DBD-Pg
 Summary:        A PostgreSQL interface for Perl
 Version:        3.18.0
-Release:        8%{?dist}
+Release: 9%{?dist}
 # Pg.pm, README:    Points to directory which contains GPL-2.0-or-later and Artistic-1.0-Perl
 # other files:      Same as Perl (GPL-1.0-or-later OR Artistic-1.0-Perl)
 License:        GPL-2.0-or-later OR Artistic-1.0-Perl

@@ -4,7 +4,7 @@
 Summary:        Streaming library for IEEE1394
 Name:           libiec61883
 Version:        1.2.0
-Release:        39%{?dist}
+Release: 40%{?dist}
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.
 License:        LicenseRef-Callaway-LGPLv2+
 Source:         http://www.kernel.org/pub/linux/libs/ieee1394/%{name}-%{version}.tar.gz

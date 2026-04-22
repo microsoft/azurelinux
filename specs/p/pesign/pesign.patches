@@ -1,0 +1,4 @@
+Patch0001: 0001-cms_common-Fixed-Segmentation-fault.patch
+Patch0002: 0002-Fix-reversed-calloc-arguments.patch
+Patch0003: 0003-Work-around-OpenSC-changing-token-names-on-fedora-bu.patch
+Patch0004: 0004-cms_common-skip-authentication-on-the-Friendly-slot.patch

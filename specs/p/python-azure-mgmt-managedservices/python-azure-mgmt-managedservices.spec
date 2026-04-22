@@ -12,7 +12,7 @@
 
 Name:           python-%{srcname}
 Version:        1.0.0
-Release:        19%{?dist}
+Release: 20%{?dist}
 Summary:        Microsoft Azure Managed Services Client Library for Python
 License:        MIT
 URL:            https://pypi.org/project/%{srcname}/

@@ -1,0 +1,53 @@
+.TH UPGRADE_PYTHONCAPI.PY "1" "January 2022" "" "User Commands"
+.SH NAME
+upgrade_pythoncapi.py
+\(en
+upgrade C extension modules to newer Python C API
+.SH SYNOPSIS
+.B upgrade_pythoncapi.py
+.RB [ \-h ]
+.RB [ \-o\ \fIOPERATIONS ]
+.RB [ \-q ]
+.RB [ \-c ]
+.RB [ \-B ]
+.RB [ \-C ]
+.RB [ \-d\ \fIPATH ]
+.RI [ file_or_directory \ ...]
+.SH OPTIONS
+.SS "POSITIONAL ARGUMENTS"
+.TP
+.I file_or_directory
+.SS "OPTIONAL ARGUMENTS"
+.TP
+.B \-h\fR, \fB\-\-help
+Show a help message and exit
+.TP
+.B \-o\ \fIOPERATIONS\fR, \fB\-\-legacy\ \fIOPERATIONS
+Space separated list of operation names to apply
+.TP
+.B \-q\fR, \fB\-\-quiet
+Quiet mode
+.TP
+.B \-c\fR, \fB\-\-to\-stdout
+Write output into
+.I stdout
+instead of modifying files in-place (imply quiet mode)
+.TP
+.B \-B\fR, \fB\-\-no\-backup
+Don\(cqt create
+.B .old
+backup files
+.TP
+.B \-C\fR, \fB\-\-no\-compat
+Don\(cqt add:
+.in +7n
+.EX
+.B #include\ "pythoncapi_compat.h"
+.EE
+.in
+.TP
+.B \-d\ \fIPATH\fR, \fB\-\-download\ \fIPATH
+Download latest
+.B pythoncapi_compat.h
+file to designated
+.I PATH

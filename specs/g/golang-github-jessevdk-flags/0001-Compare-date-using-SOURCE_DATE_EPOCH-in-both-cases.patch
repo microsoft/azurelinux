@@ -1,0 +1,43 @@
+From 607782293bc07922434b786bf08aca8f35415db1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Robert-Andr=C3=A9=20Mauchin?= <zebob.m@gmail.com>
+Date: Sun, 23 Aug 2020 19:31:26 +0200
+Subject: [PATCH] Compare date using SOURCE_DATE_EPOCH in both cases
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Robert-André Mauchin <zebob.m@gmail.com>
+---
+ help_test.go | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/help_test.go b/help_test.go
+index ba75c7a..8d053f9 100644
+--- a/help_test.go
++++ b/help_test.go
+@@ -7,6 +7,7 @@ import (
+ 	"fmt"
+ 	"os"
+ 	"runtime"
++	"strconv"
+ 	"strings"
+ 	"testing"
+ 	"time"
+@@ -229,6 +230,14 @@ func TestMan(t *testing.T) {
+ 	got := buf.String()
+ 
+ 	tt := time.Now()
++	source_date_epoch := os.Getenv("SOURCE_DATE_EPOCH")
++	if source_date_epoch != "" {
++		sde, err := strconv.ParseInt(source_date_epoch, 10, 64)
++		if err != nil {
++			panic(fmt.Sprintf("Invalid SOURCE_DATE_EPOCH: %s", err))
++		}
++		tt = time.Unix(sde, 0)
++	}
+ 
+ 	var envDefaultName string
+ 
+-- 
+2.28.0
+

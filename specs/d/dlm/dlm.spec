@@ -3,7 +3,7 @@
 
 Name:           dlm
 Version:        4.3.0
-Release:        6%{?dist}
+Release: 7%{?dist}
 License:	GPL-2.0-only AND GPL-2.0-or-later AND LGPL-2.0-or-later
 Summary:        dlm control daemon and tool
 URL:            https://pagure.io/dlm

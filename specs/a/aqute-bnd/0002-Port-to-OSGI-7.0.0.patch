@@ -1,0 +1,102 @@
+From 64a36cbc8d7c8234dfa2af8670c2e1ea4a5c3909 Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Thu, 11 Jul 2019 14:29:26 +0200
+Subject: [PATCH] Port to OSGI 7.0.0
+
+---
+ .../src/aQute/bnd/junit/ConsoleLogger.java    | 62 +++++++++++++++++++
+ 1 file changed, 62 insertions(+)
+
+diff --git a/biz.aQute.bndlib/src/aQute/bnd/junit/ConsoleLogger.java b/biz.aQute.bndlib/src/aQute/bnd/junit/ConsoleLogger.java
+index 9c2591f..569b20e 100644
+--- a/biz.aQute.bndlib/src/aQute/bnd/junit/ConsoleLogger.java
++++ b/biz.aQute.bndlib/src/aQute/bnd/junit/ConsoleLogger.java
+@@ -15,9 +15,11 @@ import org.osgi.framework.ServiceFactory;
+ import org.osgi.framework.ServiceReference;
+ import org.osgi.framework.ServiceRegistration;
+ import org.osgi.service.log.LogEntry;
++import org.osgi.service.log.LogLevel;
+ import org.osgi.service.log.LogListener;
+ import org.osgi.service.log.LogReaderService;
+ import org.osgi.service.log.LogService;
++import org.osgi.service.log.Logger;
+ 
+ @Deprecated // see biz.aQute.bnd.remote.junit
+ public class ConsoleLogger implements LogReaderService {
+@@ -76,6 +78,36 @@ public class ConsoleLogger implements LogReaderService {
+ 			return time;
+ 		}
+ 
++		@Override
++		public LogLevel getLogLevel() {
++			// TODO Auto-generated method stub
++			return null;
++		}
++
++		@Override
++		public String getLoggerName() {
++			// TODO Auto-generated method stub
++			return null;
++		}
++
++		@Override
++		public long getSequence() {
++			// TODO Auto-generated method stub
++			return 0;
++		}
++
++		@Override
++		public String getThreadInfo() {
++			// TODO Auto-generated method stub
++			return null;
++		}
++
++		@Override
++		public StackTraceElement getLocation() {
++			// TODO Auto-generated method stub
++			return null;
++		}
++
+ 	}
+ 
+ 	public class Facade implements LogService {
+@@ -112,6 +144,36 @@ public class ConsoleLogger implements LogReaderService {
+ 
+ 		}
+ 
++		@Override
++		public Logger getLogger(String name) {
++			// TODO Auto-generated method stub
++			return null;
++		}
++
++		@Override
++		public Logger getLogger(Class<?> clazz) {
++			// TODO Auto-generated method stub
++			return null;
++		}
++
++		@Override
++		public <L extends Logger> L getLogger(String name, Class<L> loggerType) {
++			// TODO Auto-generated method stub
++			return null;
++		}
++
++		@Override
++		public <L extends Logger> L getLogger(Class<?> clazz, Class<L> loggerType) {
++			// TODO Auto-generated method stub
++			return null;
++		}
++
++		@Override
++		public <L extends Logger> L getLogger(Bundle bundle, String name, Class<L> loggerType) {
++			// TODO Auto-generated method stub
++			return null;
++		}
++
+ 	}
+ 
+ 	public ConsoleLogger(BundleContext context) {
+-- 
+2.20.1
+

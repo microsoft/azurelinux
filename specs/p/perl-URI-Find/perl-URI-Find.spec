@@ -4,7 +4,7 @@
 Name:           perl-URI-Find
 Summary:        Find URIs in plain text
 Version:        20160806
-Release:        26%{?dist}
+Release: 27%{?dist}
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Source0:        https://cpan.metacpan.org/authors/id/M/MS/MSCHWERN/URI-Find-%{version}.tar.gz
 URL:            https://metacpan.org/release/URI-Find

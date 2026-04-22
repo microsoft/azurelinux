@@ -9,7 +9,7 @@
 
 Name:           perl-Tk
 Version:        804.036
-Release:        23%{?dist}
+Release: 24%{?dist}
 Summary:        Perl Graphical User Interface ToolKit
 
 License:        (GPL-1.0-or-later OR Artistic-1.0-Perl) AND SWL

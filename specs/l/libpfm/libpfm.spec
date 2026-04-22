@@ -12,7 +12,7 @@
 
 Name:		libpfm
 Version:	4.13.0
-Release:	16%{?dist}
+Release: 17%{?dist}
 
 Summary:	Library to encode performance events for use by perf tool
 

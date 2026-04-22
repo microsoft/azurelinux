@@ -30,7 +30,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
 Version:        3.0.1
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Counting the lines of code in PHP source code, version %{major}
 
 License:        BSD-3-Clause

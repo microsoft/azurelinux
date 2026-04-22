@@ -4,7 +4,7 @@
 Name:		perl-XML-SemanticDiff
 Summary:	Perl extension for comparing XML documents
 Version:	1.0007
-Release:	21%{?dist}
+Release: 22%{?dist}
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/XML-SemanticDiff
 Source0:	https://cpan.metacpan.org/modules/by-module/XML/XML-SemanticDiff-%{version}.tar.gz

@@ -3,7 +3,7 @@
 
 Name:          iniparser
 Version:       4.2.6
-Release:       3%{?dist}
+Release: 4%{?dist}
 Summary:       C library for parsing "INI-style" files
 
 License:       MIT

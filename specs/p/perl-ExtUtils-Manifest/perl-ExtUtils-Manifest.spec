@@ -4,7 +4,7 @@
 Name:           perl-ExtUtils-Manifest
 Epoch:          1
 Version:        1.75
-Release:        520%{?dist}
+Release: 521%{?dist}
 Summary:        Utilities to write and check a MANIFEST file
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/ExtUtils-Manifest

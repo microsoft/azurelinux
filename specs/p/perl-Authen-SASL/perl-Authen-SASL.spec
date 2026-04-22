@@ -3,7 +3,7 @@
 
 Name:           perl-Authen-SASL
 Version:        2.2000
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        SASL Authentication framework for Perl
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Authen-SASL

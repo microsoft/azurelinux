@@ -1,0 +1,39 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 24 Feb 2022 16:40:11 -0500
+Subject: [PATCH] modules: strip .llvm_addrsig sections and similar.
+
+Currently grub modules built with clang or gcc have several sections
+which we don't actually need or support.
+
+We already have a list of section to skip in genmod.sh, and this patch
+adds the following sections to that list (as well as a few newlines):
+
+.note.gnu.property
+.llvm*
+
+Note that the glob there won't work without a new enough linker, but the
+failure is just reversion to the status quo, so that's not a big problem.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/genmod.sh.in | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/genmod.sh.in b/grub-core/genmod.sh.in
+index e57c4d9205c..337753c574c 100644
+--- a/grub-core/genmod.sh.in
++++ b/grub-core/genmod.sh.in
+@@ -57,8 +57,11 @@ if test x@TARGET_APPLE_LINKER@ != x1; then
+ 	    @TARGET_STRIP@ --strip-unneeded \
+ 		-K grub_mod_init -K grub_mod_fini \
+ 		-K _grub_mod_init -K _grub_mod_fini \
+-		-R .note.gnu.gold-version -R .note.GNU-stack \
++		-R .note.GNU-stack \
++		-R .note.gnu.gold-version \
++		-R .note.gnu.property \
+ 		-R .gnu.build.attributes \
++		-R '.llvm*' \
+ 		-R .rel.gnu.build.attributes \
+ 		-R .rela.gnu.build.attributes \
+ 		-R .eh_frame -R .rela.eh_frame -R .rel.eh_frame \

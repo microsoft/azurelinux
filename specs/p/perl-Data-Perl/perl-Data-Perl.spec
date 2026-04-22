@@ -3,7 +3,7 @@
 
 Name:           perl-Data-Perl
 Version:        0.002011
-Release:        17%{?dist}
+Release: 18%{?dist}
 Summary:        Base classes wrapping fundamental Perl data types
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Data-Perl

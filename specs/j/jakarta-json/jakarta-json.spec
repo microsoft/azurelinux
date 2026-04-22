@@ -5,7 +5,7 @@
 
 Name:           jakarta-json
 Version:        2.1.3
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        Jakarta JSON Processing
 
 License:        EPL-2.0 OR GPL-2.0-only WITH Classpath-exception-2.0

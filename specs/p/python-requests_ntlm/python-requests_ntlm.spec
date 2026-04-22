@@ -12,7 +12,7 @@
 
 Name:           python-%{srcname}
 Version:        1.3.0
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        NTLM module for python requests (requires md4, thus legacy OpenSSL settings)
 
 License:        ISC

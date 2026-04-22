@@ -8,7 +8,7 @@
 
 Name:           python-whoosh
 Version:        2.7.4
-Release:        41%{?dist}
+Release: 42%{?dist}
 Summary:        Fast, pure-Python full text indexing, search, and spell checking library 
 
 # Automatically converted from old format: BSD - review is highly recommended.

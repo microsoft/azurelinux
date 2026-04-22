@@ -3,7 +3,7 @@
 
 Name:           perl-Fedora-VSP
 Version:        0.001
-Release:        37%{?dist}
+Release: 38%{?dist}
 Summary:        Perl version normalization for RPM
 License:        GPL-3.0-or-later
 URL:            https://ppisar.fedorapeople.org/Fedora-VSP/

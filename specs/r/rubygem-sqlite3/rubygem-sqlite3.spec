@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 2.5.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Allows Ruby scripts to interface with a SQLite3 database
 License: BSD-3-Clause
 URL: https://github.com/sparklemotion/sqlite3-ruby

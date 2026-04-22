@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.0.2
-Release: 13%{?dist}
+Release: 14%{?dist}
 Summary: Simple mime type detection using magic numbers, file names, and extensions
 # * Portions of Marcel are adapted from the [mimemagic] gem, released under
 #   the terms of the MIT License.

@@ -1,0 +1,50 @@
+From 84a33f8ada6fba17641e71aef24130b1c0022fb9 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Fri, 20 Jun 2025 11:30:03 -0400
+Subject: [PATCH] Increase the value of FS_SLEEP in the tests (fix #4)
+
+---
+ flexcache/testsuite/test_byhash.py  | 2 +-
+ flexcache/testsuite/test_bymtime.py | 2 +-
+ flexcache/testsuite/test_header.py  | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/flexcache/testsuite/test_byhash.py b/flexcache/testsuite/test_byhash.py
+index d0aa8e7..9d15fdb 100644
+--- a/flexcache/testsuite/test_byhash.py
++++ b/flexcache/testsuite/test_byhash.py
+@@ -8,7 +8,7 @@
+ 
+ # These sleep time is needed when run on GitHub Actions
+ # If not given or too short, some mtime changes are not visible.
+-FS_SLEEP = 0.010
++FS_SLEEP = 0.100
+ 
+ 
+ def parser(p: pathlib.Path):
+diff --git a/flexcache/testsuite/test_bymtime.py b/flexcache/testsuite/test_bymtime.py
+index 0b3dc94..72cfeba 100644
+--- a/flexcache/testsuite/test_bymtime.py
++++ b/flexcache/testsuite/test_bymtime.py
+@@ -8,7 +8,7 @@
+ 
+ # These sleep time is needed when run on GitHub Actions
+ # If not given or too short, some mtime changes are not visible.
+-FS_SLEEP = 0.010
++FS_SLEEP = 0.100
+ 
+ 
+ def parser(p: pathlib.Path):
+diff --git a/flexcache/testsuite/test_header.py b/flexcache/testsuite/test_header.py
+index f27a516..1301273 100644
+--- a/flexcache/testsuite/test_header.py
++++ b/flexcache/testsuite/test_header.py
+@@ -13,7 +13,7 @@
+ 
+ # These sleep time is needed when run on GitHub Actions
+ # If not given or too short, some mtime changes are not visible.
+-FS_SLEEP = 0.010
++FS_SLEEP = 0.100
+ 
+ 
+ def test_empty(tmp_path):

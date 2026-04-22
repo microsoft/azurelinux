@@ -3,7 +3,7 @@
 
 Name:           python-installer
 Version:        0.7.0
-Release:        13%{?dist}
+Release: 14%{?dist}
 Summary:        A library for installing Python wheels
 
 # SPDX

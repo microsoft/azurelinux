@@ -4,7 +4,7 @@
 Name: hyphen-ku
 Summary: Kurdish hyphenation rules
 Version: 1.71.2
-Release: 32%{?dist}
+Release: 33%{?dist}
 Source: https://downloads.sourceforge.net/project/aoo-extensions/2445/12/kitandin.oxt
 URL: http://extensions.services.openoffice.org/project/kitandin
 License: GPL-2.0-or-later OR LGPL-2.1-or-later

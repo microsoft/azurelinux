@@ -1,0 +1,53 @@
+[licensing]
+detector = "trivy"
+exclude_files = [
+    "vendor/go.opentelemetry.io/otel/get_main_pkgs.sh",
+    "vendor/go.opentelemetry.io/otel/verify_examples.sh",
+    "vendor/google.golang.org/grpc/regenerate.sh",
+    "LICENSE.macros",
+]
+
+[[licensing.licenses]]
+path = "vendor/github.com/google/shlex/COPYING"
+sha256sum = "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+expression = "Apache-2.0"
+[[licensing.licenses]]
+path = "vendor/github.com/spdx/tools-golang/LICENSE.code"
+sha256sum = "e914fb1f3927226e04b0438e0b541b3c6e3c65de4d64aa8f5cdaa803f05448fd"
+expression = "Apache-2.0 OR GPL-2.0-or-later"
+[[licensing.licenses]]
+path = "internal/test/suite/testify.LICENSE"
+sha256sum = "dad2b0b2cc2dbdbf95ad5d800ef7588956e74dc2479014829d42be295125c25d"
+expression = "MIT"
+[[licensing.licenses]]
+path = "vendor/github.com/miekg/dns/COPYRIGHT"
+sha256sum = "66550c0ad5ca7ec1e08683e5f872cc45c741f311eee3b8ee484206ecbf9c740d"
+expression = "BSD-3-Clause"
+[[licensing.licenses]]
+path = "vendor/github.com/moby/sys/symlink/LICENSE.APACHE"
+sha256sum = "e6abacaae15d29c132fc8688f098a3b9c89088bc434ea33992261e19e34e6723"
+expression = "Apache-2.0"
+[[licensing.licenses]]
+path = "vendor/github.com/moby/sys/symlink/LICENSE.BSD"
+sha256sum = "81205fa54813e578a0d361c671c21ae35ca5b1b575f39e82f5cdab68b8539a1d"
+expression = "BSD-3-Clause"
+[[licensing.licenses]]
+path = "vendor/github.com/shibumi/go-pathspec/GO-LICENSE"
+sha256sum = "dd26a7abddd02e2d0aba97805b31f248ef7835d9e10da289b22e3b8ab78b324d"
+expression = "BSD-3-Clause"
+[[licensing.licenses]]
+path = "vendor/cyphar.com/go-pathrs/COPYING"
+sha256sum = "3f3d9e0024b1921b067d6f7f88deb4a60cbe7a78e76c64e3f1d7fc3b779b9d04"
+expression = "MPL-2.0"
+[[licensing.licenses]]
+path = "vendor/github.com/cyphar/filepath-securejoin/LICENSE.BSD"
+sha256sum = "26be8a79415737dfe8edf1be62e71afeb8c770ed5a5605a06270d5701830f47c"
+expression = "BSD-3-Clause"
+[[licensing.licenses]]
+path = "vendor/github.com/cyphar/filepath-securejoin/LICENSE.MPL-2.0"
+sha256sum = "3f3d9e0024b1921b067d6f7f88deb4a60cbe7a78e76c64e3f1d7fc3b779b9d04"
+expression = "BSD-3-Clause"
+[[licensing.licenses]]
+path = "vendor/go.yaml.in/yaml/v2/LICENSE.libyaml"
+sha256sum = "a94710b55e03b5285f77d048c5ba61bb9d6ee04a06c0eb90e68821e11b0c707a"
+expression = "MIT"

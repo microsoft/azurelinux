@@ -3,7 +3,7 @@
 
 Name:           perl-Test-Pod
 Version:        1.52
-Release:        23%{?dist}
+Release: 24%{?dist}
 Summary:        Test POD files for correctness
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Test-Pod

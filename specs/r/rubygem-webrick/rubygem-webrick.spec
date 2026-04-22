@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.9.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: HTTP server toolkit
 License: Ruby AND BSD-2-Clause
 URL: https://github.com/ruby/webrick

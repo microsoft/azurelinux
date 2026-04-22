@@ -5,7 +5,7 @@
 
 Name:           python-%{srcname}
 Version:        6.0.0
-Release:        13%{?dist}
+Release: 14%{?dist}
 Summary:        Microsoft Azure Support Management Client Library for Python
 License:        MIT
 URL:            https://pypi.org/project/%{srcname}/

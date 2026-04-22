@@ -3,7 +3,7 @@
 
 Name:           perl-AnyEvent-BDB
 Version:        1.1
-Release:        48%{?dist}
+Release: 49%{?dist}
 Summary:        Truly asynchronous Berkeley DB access
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/AnyEvent-BDB

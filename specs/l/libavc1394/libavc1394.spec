@@ -4,7 +4,7 @@
 Summary:        Audio/Video Control library for IEEE-1394 devices
 Name:           libavc1394
 Version:        0.5.4
-Release:        26%{?dist}
+Release: 27%{?dist}
 License:        GPL-2.0-or-later AND LGPL-2.0-or-later
 URL:            http://sourceforge.net/projects/libavc1394/
 Source:         https://sourceforge.net/projects/libavc1394/files/libavc1394/libavc1394-%{version}.tar.gz

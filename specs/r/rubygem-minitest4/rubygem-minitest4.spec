@@ -10,7 +10,7 @@ Summary:	Small and fast replacement for ruby's huge and slow test/unit
 Name:		rubygem-%{gem_name}4
 # With 4.7.5, some test fails, so for now use 4.7.0
 Version:	4.7.0
-Release:	27%{?dist}
+Release: 28%{?dist}
 
 License:	MIT
 URL:		https://github.com/seattlerb/minitest

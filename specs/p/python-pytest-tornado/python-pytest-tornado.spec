@@ -6,7 +6,7 @@
 
 Name:           python-%{srcname}
 Version:        0.8.1
-Release:        22%{?dist}
+Release: 23%{?dist}
 Summary:        Py.test plugin for testing of asynchronous tornado applications
 
 License:        Apache-2.0

@@ -1,0 +1,71 @@
+/*
+   This probe will fire when the perl script enters a subroutine.
+ */
+
+probe perl.sub.call = process("LIBRARY_PATH").mark("sub__entry")
+{
+
+  sub = user_string($arg1)
+  filename = user_string($arg2)
+  lineno = $arg3
+  package = user_string($arg4)
+
+}
+
+/*
+   This probe will fire when the return from a subroutine has been
+   hit.
+ */
+
+probe perl.sub.return = process("LIBRARY_PATH").mark("sub__return")
+{
+
+  sub = user_string($arg1)
+  filename = user_string($arg2)
+  lineno = $arg3
+  package = user_string($arg4)
+
+}
+
+/*
+   This probe will fire when the Perl interperter changes state.
+ */
+
+probe perl.phase.change = process("LIBRARY_PATH").mark("phase__change")
+{
+  newphase = user_string($arg1)
+  oldphase = user_string($arg2)
+
+}
+
+
+/*
+   Fires when Perl has successfully loaded an individual file.
+ */
+
+probe perl.loaded.file = process("LIBRARY_PATH").mark("loaded__file")
+{
+  filename = user_string($arg1)
+
+}
+
+
+/*
+   Fires when Perl is about to load an individual file.
+ */
+
+probe perl.loading.file = process("LIBRARY_PATH").mark("loading__file")
+{
+  filename = user_string($arg1)
+
+}
+
+
+/*
+   Traces the execution of each opcode in the Perl runloop.
+ */
+
+probe perl.op.entry = process("LIBRARY_PATH").mark("op__entry")
+{
+  opname = user_string($arg1)
+}

@@ -10,7 +10,7 @@
 Name: hunspell-uk
 Summary: Ukrainian hunspell dictionaries
 Version: 1.8.0
-Release: 19%{?dist}
+Release: 20%{?dist}
 Source: https://downloads.sourceforge.net/project/ispell-uk/spell-uk/%{version}/dict-uk_UA-%{version}.oxt
 URL: http://sourceforge.net/projects/ispell-uk
 License: GPL-2.0-or-later OR LGPL-2.1-or-later OR MPL-1.1

@@ -3,7 +3,7 @@
 
 Name:           python-fastjsonschema
 Version:        2.21.2
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Fastest Python implementation of JSON schema
 
 License:        BSD-3-Clause

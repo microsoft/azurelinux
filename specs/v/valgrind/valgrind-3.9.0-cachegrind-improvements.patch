@@ -1,0 +1,54 @@
+--- valgrind-3.8.1/cachegrind/cg_sim.c.jj	2011-10-26 23:24:32.000000000 +0200
++++ valgrind-3.8.1/cachegrind/cg_sim.c	2011-12-09 17:31:19.256023683 +0100
+@@ -42,27 +42,30 @@ typedef struct {
+    Int          size;                   /* bytes */
+    Int          assoc;
+    Int          line_size;              /* bytes */
+-   Int          sets;
+    Int          sets_min_1;
+    Int          line_size_bits;
+    Int          tag_shift;
+-   HChar        desc_line[128];         /* large enough */
+    UWord*       tags;
+-} cache_t2;
++   HChar        desc_line[128];
++} cache_t2
++#ifdef __GNUC__
++__attribute__ ((aligned (8 * sizeof (Int))))
++#endif
++;
+ 
+ /* By this point, the size/assoc/line_size has been checked. */
+ static void cachesim_initcache(cache_t config, cache_t2* c)
+ {
+-   Int i;
++   Int sets;
+ 
+    c->size      = config.size;
+    c->assoc     = config.assoc;
+    c->line_size = config.line_size;
+ 
+-   c->sets           = (c->size / c->line_size) / c->assoc;
+-   c->sets_min_1     = c->sets - 1;
++   sets              = (c->size / c->line_size) / c->assoc;
++   c->sets_min_1     = sets - 1;
+    c->line_size_bits = VG_(log2)(c->line_size);
+-   c->tag_shift      = c->line_size_bits + VG_(log2)(c->sets);
++   c->tag_shift      = c->line_size_bits + VG_(log2)(sets);
+ 
+    if (c->assoc == 1) {
+       VG_(sprintf)(c->desc_line, "%d B, %d B, direct-mapped", 
+@@ -72,11 +75,8 @@ static void cachesim_initcache(cache_t c
+                                  c->size, c->line_size, c->assoc);
+    }
+ 
+-   c->tags = VG_(malloc)("cg.sim.ci.1",
+-                         sizeof(UWord) * c->sets * c->assoc);
+-
+-   for (i = 0; i < c->sets * c->assoc; i++)
+-      c->tags[i] = 0;
++   c->tags = VG_(calloc)("cg.sim.ci.1",
++                         sizeof(UWord), sets * c->assoc);
+ }
+ 
+ /* This attribute forces GCC to inline the function, getting rid of a

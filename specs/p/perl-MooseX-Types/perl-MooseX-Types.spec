@@ -3,7 +3,7 @@
 
 Name:           perl-MooseX-Types
 Version:        0.51
-Release:        2%{?dist}
+Release: 3%{?dist}
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Summary:        Organize your Moose types in libraries
 URL:            https://metacpan.org/dist/MooseX-Types

@@ -5,7 +5,7 @@
 
 Name:           perl-HTML-Format
 Version:        2.16
-Release:        28%{?dist}
+Release: 29%{?dist}
 Summary:        HTML formatter modules
 
 %if "%{version}" > "2.12"

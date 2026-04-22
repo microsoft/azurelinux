@@ -3,7 +3,7 @@
 
 Name: pyusb
 Version: 1.3.1
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary: Python bindings for libusb
 License: BSD-3-Clause
 URL: https://github.com/pyusb/pyusb/

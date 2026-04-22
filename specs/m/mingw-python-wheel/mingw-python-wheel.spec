@@ -8,7 +8,7 @@
 Name:          mingw-python-%{pypi_name}
 Summary:       MinGW Windows Python %{pypi_name} library
 Version:       0.46.3
-Release:       1%{?dist}
+Release: 2%{?dist}
 BuildArch:     noarch
 
 License:       MIT AND (Apache-2.0 OR BSD-2-Clause)

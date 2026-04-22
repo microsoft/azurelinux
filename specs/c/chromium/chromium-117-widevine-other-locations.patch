@@ -1,0 +1,33 @@
+diff -up chromium-108.0.5359.124/chrome/common/chrome_paths.cc.widevine-other-locations chromium-108.0.5359.124/chrome/common/chrome_paths.cc
+--- chromium-108.0.5359.124/chrome/common/chrome_paths.cc.widevine-other-locations	2023-01-02 11:10:03.951330305 +0100
++++ chromium-108.0.5359.124/chrome/common/chrome_paths.cc	2023-01-02 13:42:26.781022150 +0100
+@@ -319,6 +319,16 @@ bool PathProvider(int key, base::FilePat
+ 
+ #if BUILDFLAG(ENABLE_WIDEVINE)
+     case chrome::DIR_BUNDLED_WIDEVINE_CDM:
++      base::PathService::Get(base::DIR_HOME, &cur);
++      cur = cur.Append(FILE_PATH_LITERAL(".config/chromium/WidevineCdm"));
++      if (base::PathExists(cur)) {
++        break;
++      }
++      // Yes, this has an arch hardcoded in the path, but at this time, it is the only place to find libwidevinecdm.so
++      if (base::PathExists(base::FilePath(FILE_PATH_LITERAL("/opt/google/chrome/WidevineCdm/_platform_specific/linux_x64/libwidevinecdm.so")))) {
++        cur = base::FilePath(FILE_PATH_LITERAL("/opt/google/chrome/WidevineCdm"));
++        break;
++      }
+       if (!GetComponentDirectory(&cur)) {
+         return false;
+       }
+       cur = cur.AppendASCII(kWidevineCdmBaseDirectory);
+diff -up chromium-108.0.5359.124/third_party/widevine/cdm/BUILD.gn.widevine-other-locations chromium-108.0.5359.124/third_party/widevine/cdm/BUILD.gn
+--- chromium-108.0.5359.124/third_party/widevine/cdm/BUILD.gn.widevine-other-locations	2023-01-02 11:10:45.953114153 +0100
++++ chromium-108.0.5359.124/third_party/widevine/cdm/BUILD.gn	2023-01-02 11:10:45.953114153 +0100
+@@ -22,7 +22,7 @@ buildflag_header("buildflags") {
+ 
+   flags = [
+     "ENABLE_WIDEVINE=$enable_widevine",
+-    "BUNDLE_WIDEVINE_CDM=$bundle_widevine_cdm",
++    "BUNDLE_WIDEVINE_CDM=true",
+     "ENABLE_WIDEVINE_CDM_COMPONENT=$enable_widevine_cdm_component",
+     "ENABLE_MEDIA_FOUNDATION_WIDEVINE_CDM=$enable_media_foundation_widevine_cdm",
+   ]

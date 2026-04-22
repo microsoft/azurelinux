@@ -8,7 +8,7 @@
 
 Name:           gtksourceview4
 Version:        4.8.4
-Release:        10%{?dist}
+Release: 11%{?dist}
 Summary:        Source code editing widget
 
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.

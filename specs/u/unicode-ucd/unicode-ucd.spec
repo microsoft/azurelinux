@@ -7,7 +7,7 @@
 
 Name:           unicode-ucd
 Version:        17.0.0
-Release:        1%{?dist}
+Release: 3%{?dist}
 Summary:        Unicode Character Database
 
 # http://www.unicode.org/terms_of_use.html in ReadMe.txt redirects to:
@@ -51,7 +51,7 @@ grep -q "%{version}" ReadMe.txt || (echo "zip file seems not %{version}" ; exit 
 %install
 mkdir -p %{buildroot}%{ucddir}
 cp -ar . %{buildroot}%{ucddir}
-cp -p %{SOURCE1} %{buildroot}%{ucddir}
+install -m 0644 %{SOURCE1} %{buildroot}%{ucddir}
 cp %{SOURCE2} .
 
 

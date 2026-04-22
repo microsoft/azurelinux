@@ -4,7 +4,7 @@
 Summary: The libglade library for loading user interfaces
 Name: libglade2
 Version: 2.6.4
-Release: 36%{?dist}
+Release: 37%{?dist}
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.
 License: LicenseRef-Callaway-LGPLv2+
 Source: http://download.gnome.org/sources/libglade/2.6/libglade-%{version}.tar.bz2

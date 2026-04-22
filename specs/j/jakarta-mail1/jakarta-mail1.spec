@@ -5,7 +5,7 @@
 
 Name:           jakarta-mail1
 Version:        1.6.7
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        Jakarta Mail API
 License:        EPL-2.0 OR GPL-2.0-only WITH Classpath-exception-2.0
 URL:            https://github.com/eclipse-ee4j/mail

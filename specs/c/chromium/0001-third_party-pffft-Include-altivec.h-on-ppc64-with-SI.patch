@@ -1,0 +1,22 @@
+From 63e63a70766f3059ce5f1d06a95988ecf909b298 Mon Sep 17 00:00:00 2001
+From: Shawn Anastasio <shawn@anastas.io>
+Date: Wed, 24 Apr 2019 21:17:23 -0500
+Subject: [PATCH] third_party/pffft: Include altivec.h on ppc64 with SIMD
+ enabled
+
+---
+ third_party/pffft/src/pffft.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+Index: chromium-144.0.7559.59/third_party/pffft/src/pffft.c
+===================================================================
+--- chromium-144.0.7559.59.orig/third_party/pffft/src/pffft.c
++++ chromium-144.0.7559.59/third_party/pffft/src/pffft.c
+@@ -100,6 +100,7 @@
+    Altivec support macros 
+ */
+ #if !defined(PFFFT_SIMD_DISABLE) && (defined(__ppc__) || defined(__ppc64__))
++#include <altivec.h>
+ typedef vector float v4sf;
+ #  define SIMD_SZ 4
+ #  define VZERO() ((vector float) vec_splat_u8(0))

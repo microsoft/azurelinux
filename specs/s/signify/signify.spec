@@ -3,7 +3,7 @@
 
 Name:     signify
 Version:  32
-Release:  4%{?dist}
+Release: 5%{?dist}
 Summary:  Sign and verify signatures on files
 
 # signify itself is ISC but uses other source codes, breakdown:

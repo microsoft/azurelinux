@@ -21,7 +21,7 @@
 # library name
 %global sname %{cname}client
 
-%global with_doc 1
+%global with_doc 0
 
 %global common_desc \
 python-%{sname} is a unified command-line client for the OpenStack APIs. \
@@ -30,7 +30,7 @@ actual REST API client actions.
 
 Name:             python-%{sname}
 Version:          7.1.2
-Release:          9%{?dist}
+Release: 10%{?dist}
 Summary:          OpenStack Command-line Client
 
 License:          Apache-2.0

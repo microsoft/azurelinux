@@ -1,0 +1,120 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: B Horn <b@horn.uk>
+Date: Sun, 12 May 2024 04:09:24 +0100
+Subject: [PATCH] kern/disk: Limit recursion depth
+
+The grub_disk_read() may trigger other disk reads, e.g. via loopbacks.
+This may lead to very deep recursion which can corrupt the heap. So, fix
+the issue by limiting reads depth.
+
+Reported-by: B Horn <b@horn.uk>
+Signed-off-by: B Horn <b@horn.uk>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/kern/disk.c | 27 ++++++++++++++++++++-------
+ include/grub/err.h    |  3 ++-
+ 2 files changed, 22 insertions(+), 8 deletions(-)
+
+diff --git a/grub-core/kern/disk.c b/grub-core/kern/disk.c
+index 355b6579d..5747ad85c 100644
+--- a/grub-core/kern/disk.c
++++ b/grub-core/kern/disk.c
+@@ -28,6 +28,10 @@
+ 
+ #define	GRUB_CACHE_TIMEOUT	2
+ 
++/* Disk reads may trigger other disk reads. So, limit recursion depth. */
++#define MAX_READ_RECURSION_DEPTH	16
++static unsigned int read_recursion_depth = 0;
++
+ /* The last time the disk was used.  */
+ static grub_uint64_t grub_last_time = 0;
+ 
+@@ -421,6 +425,8 @@ grub_err_t
+ grub_disk_read (grub_disk_t disk, grub_disk_addr_t sector,
+ 		grub_off_t offset, grub_size_t size, void *buf)
+ {
++  grub_err_t err = GRUB_ERR_NONE;
++
+   /* First of all, check if the region is within the disk.  */
+   if (grub_disk_adjust_range (disk, &sector, &offset, size) != GRUB_ERR_NONE)
+     {
+@@ -431,12 +437,17 @@ grub_disk_read (grub_disk_t disk, grub_disk_addr_t sector,
+       return grub_errno;
+     }
+ 
++  if (++read_recursion_depth >= MAX_READ_RECURSION_DEPTH)
++    {
++      grub_error (GRUB_ERR_RECURSION_DEPTH, "grub_disk_read(): Maximum recursion depth exceeded");
++      goto error;
++    }
++
+   /* First read until first cache boundary.   */
+   if (offset || (sector & (GRUB_DISK_CACHE_SIZE - 1)))
+     {
+       grub_disk_addr_t start_sector;
+       grub_size_t pos;
+-      grub_err_t err;
+       grub_size_t len;
+ 
+       start_sector = sector & ~((grub_disk_addr_t) GRUB_DISK_CACHE_SIZE - 1);
+@@ -448,7 +459,7 @@ grub_disk_read (grub_disk_t disk, grub_disk_addr_t sector,
+       err = grub_disk_read_small (disk, start_sector,
+ 				  offset + pos, len, buf);
+       if (err)
+-	return err;
++	goto error;
+       buf = (char *) buf + len;
+       size -= len;
+       offset += len;
+@@ -461,7 +472,6 @@ grub_disk_read (grub_disk_t disk, grub_disk_addr_t sector,
+     {
+       char *data = NULL;
+       grub_disk_addr_t agglomerate;
+-      grub_err_t err;
+ 
+       /* agglomerate read until we find a first cached entry.  */
+       for (agglomerate = 0; agglomerate
+@@ -497,7 +507,7 @@ grub_disk_read (grub_disk_t disk, grub_disk_addr_t sector,
+ 							- disk->log_sector_size),
+ 					buf);
+ 	  if (err)
+-	    return err;
++	    goto error;
+ 
+ 	  for (i = 0; i < agglomerate; i ++)
+ 	    grub_disk_cache_store (disk->dev->id, disk->id,
+@@ -531,13 +541,16 @@ grub_disk_read (grub_disk_t disk, grub_disk_addr_t sector,
+   /* And now read the last part.  */
+   if (size)
+     {
+-      grub_err_t err;
+       err = grub_disk_read_small (disk, sector, 0, size, buf);
+       if (err)
+-	return err;
++	goto error;
+     }
+ 
+-  return grub_errno;
++  err = grub_errno;
++
++ error:
++  read_recursion_depth--;
++  return err;
+ }
+ 
+ grub_uint64_t
+diff --git a/include/grub/err.h b/include/grub/err.h
+index 29f1a73c5..7530f58b2 100644
+--- a/include/grub/err.h
++++ b/include/grub/err.h
+@@ -74,7 +74,8 @@ typedef enum
+     GRUB_ERR_EOF,
+     GRUB_ERR_BAD_SIGNATURE,
+     GRUB_ERR_BAD_FIRMWARE,
+-    GRUB_ERR_STILL_REFERENCED
++    GRUB_ERR_STILL_REFERENCED,
++    GRUB_ERR_RECURSION_DEPTH
+   }
+ grub_err_t;
+ 

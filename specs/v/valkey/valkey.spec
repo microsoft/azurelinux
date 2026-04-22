@@ -14,7 +14,7 @@
 
 Name:              valkey
 Version:           8.1.5
-Release:           1%{?dist}
+Release: 2%{?dist}
 Summary:           A persistent key-value database
 # valkey: BSD-3-Clause
 # hiredis: BSD-3-Clause

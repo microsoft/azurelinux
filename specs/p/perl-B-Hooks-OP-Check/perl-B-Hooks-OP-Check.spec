@@ -4,7 +4,7 @@
 Name:           perl-B-Hooks-OP-Check
 Summary:        Wrap OP check callbacks
 Version:        0.22
-Release:        28%{?dist}
+Release: 29%{?dist}
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/B-Hooks-OP-Check
 Source0:        https://cpan.metacpan.org/modules/by-module/B/B-Hooks-OP-Check-%{version}.tar.gz

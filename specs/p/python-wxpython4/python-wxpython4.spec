@@ -15,7 +15,7 @@ specific code.
 
 Name:           python-wxpython4
 Version:        4.2.4
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        %{sum}
 # wxPython is licensed under the wxWidgets license.  The only exception is
 # the pubsub code in wx/lib/pubsub which is BSD licensed.  Note: wxPython

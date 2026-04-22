@@ -3,7 +3,7 @@
 
 Name:           perl-Sort-Versions
 Version:        1.62
-Release:        31%{?dist}
+Release: 32%{?dist}
 Summary:        Perl module for sorting of revision-like numbers
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Sort-Versions

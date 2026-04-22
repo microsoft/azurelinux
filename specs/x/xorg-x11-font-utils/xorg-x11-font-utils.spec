@@ -10,7 +10,7 @@ Summary:    X.Org X11 font utilities
 Name:       xorg-x11-font-utils
 Epoch:      1
 Version:    7.5
-Release:    62%{?dist}
+Release: 63%{?dist}
 License:    MIT AND BSD-2-Clause AND MIT-open-group AND Unicode-3.0
 URL:        http://www.x.org
 

@@ -3,7 +3,7 @@
 
 Name:           perl-YAML-PP
 Version:        0.39.0
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        YAML 1.2 processor
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/YAML-PP/

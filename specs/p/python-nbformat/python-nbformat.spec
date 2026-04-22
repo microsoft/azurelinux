@@ -9,7 +9,7 @@
 
 Name:           python-%{srcname}
 Version:        5.10.4
-Release:        5%{?dist}
+Release: 6%{?dist}
 Summary:        The Jupyter Notebook format
 
 # Automatically converted from old format: BSD - review is highly recommended.

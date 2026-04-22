@@ -1,0 +1,88 @@
+From eca084e4079c77c061045df9c21b219175b05228 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Mon, 6 Jan 2020 13:56:04 +0100
+Subject: [PATCH] Initialize ABRT hook.
+
+The ABRT hook used to be initialized by preludes via patches [[1], [2]].
+Unfortunately, due to [[3]] and especially since [[4]], this would
+require boostrapping [[5]].
+
+To keep the things simple for now, load the ABRT hook via C.
+
+[1]: https://bugs.ruby-lang.org/issues/8566
+[2]: https://bugs.ruby-lang.org/issues/15306
+[3]: https://bugs.ruby-lang.org/issues/16254
+[4]: https://github.com/ruby/ruby/pull/2735
+[5]: https://lists.fedoraproject.org/archives/list/ruby-sig@lists.fedoraproject.org/message/LH6L6YJOYQT4Y5ZNOO4SLIPTUWZ5V45Q/
+---
+ abrt.c                                | 12 ++++++++++++
+ common.mk                             |  3 ++-
+ ruby.c                                |  4 ++++
+ spec/ruby/core/kernel/require_spec.rb |  2 ++
+ 4 files changed, 20 insertions(+), 1 deletion(-)
+ create mode 100644 abrt.c
+
+diff --git a/abrt.c b/abrt.c
+new file mode 100644
+index 0000000000..74b0bd5c0f
+--- /dev/null
++++ b/abrt.c
+@@ -0,0 +1,12 @@
++#include "internal.h"
++
++void
++Init_abrt(void)
++{
++  rb_eval_string(
++    "  begin\n"
++    "    require 'abrt'\n"
++    "  rescue LoadError\n"
++    "  end\n"
++  );
++}
+diff --git a/common.mk b/common.mk
+index b2e5b2b6d0..f39f81da5c 100644
+--- a/common.mk
++++ b/common.mk
+@@ -110,7 +110,8 @@ PRISM_FILES = prism/api_node.$(OBJEXT) \
+ 		prism/prism.$(OBJEXT) \
+ 		prism_init.$(OBJEXT)
+ 
+-COMMONOBJS    = array.$(OBJEXT) \
++COMMONOBJS    = abrt.$(OBJEXT) \
++                array.$(OBJEXT) \
+ 		ast.$(OBJEXT) \
+ 		bignum.$(OBJEXT) \
+ 		class.$(OBJEXT) \
+diff --git a/ruby.c b/ruby.c
+index 60c57d6259..1eec16f2c8 100644
+--- a/ruby.c
++++ b/ruby.c
+@@ -1744,10 +1744,14 @@ proc_options(long argc, char **argv, ruby_cmdline_options_t *opt, int envopt)
+ 
+ void Init_builtin_features(void);
+ 
++/* abrt.c */
++void Init_abrt(void);
++
+ static void
+ ruby_init_prelude(void)
+ {
+     Init_builtin_features();
++    Init_abrt();
+     rb_const_remove(rb_cObject, rb_intern_const("TMP_RUBY_PREFIX"));
+ }
+ 
+diff --git a/spec/ruby/core/kernel/require_spec.rb b/spec/ruby/core/kernel/require_spec.rb
+index 60c57d6259..1eec16f2c8 100644
+--- a/spec/ruby/core/kernel/require_spec.rb
++++ b/spec/ruby/core/kernel/require_spec.rb
+@@ -25,6 +25,8 @@
+     out = ruby_exe("puts $LOADED_FEATURES", options: '--disable-gems --disable-did-you-mean')
+     features = out.lines.map { |line| File.basename(line.chomp, '.*') }
+ 
++    # Ignore ABRT
++    features -= %w[abrt]
+     # Ignore CRuby internals
+     features -= %w[encdb transdb windows_1252 windows_31j]
+     features.reject! { |feature| feature.end_with?('-fake') }

@@ -14,7 +14,7 @@
 Summary: Shared code among cinnamon-session, nemo, etc
 Name:    cinnamon-desktop
 Version: 6.4.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 # Automatically converted from old format: GPLv2+ and LGPLv2+ and MIT - review is highly recommended.
 License: GPL-2.0-or-later AND LicenseRef-Callaway-LGPLv2+ AND LicenseRef-Callaway-MIT
 URL:     https://github.com/linuxmint/%{name}

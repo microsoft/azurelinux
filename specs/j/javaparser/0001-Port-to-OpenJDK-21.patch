@@ -1,0 +1,78 @@
+From 229820ea9a9fccbe9ba91a0678411a878b4c070b Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Tue, 20 Feb 2024 17:39:06 +0100
+Subject: [PATCH] Port to OpenJDK 21
+
+---
+ .../com/github/javaparser/ast/NodeList.java    | 18 ++++++++----------
+ .../ast/body/CallableDeclaration.java          |  2 +-
+ 2 files changed, 9 insertions(+), 11 deletions(-)
+
+diff --git a/javaparser-core/src/main/java/com/github/javaparser/ast/NodeList.java b/javaparser-core/src/main/java/com/github/javaparser/ast/NodeList.java
+index d78ed2a..8a77597 100644
+--- a/javaparser-core/src/main/java/com/github/javaparser/ast/NodeList.java
++++ b/javaparser-core/src/main/java/com/github/javaparser/ast/NodeList.java
+@@ -186,17 +186,15 @@ public class NodeList<N extends Node> implements List<N>, Iterable<N>, HasParent
+     /**
+      * Inserts the node before all other nodes.
+      */
+-    public NodeList<N> addFirst(N node) {
++    public void addFirst(N node) {
+         add(0, node);
+-        return this;
+     }
+ 
+     /**
+      * Inserts the node after all other nodes. (This is simply an alias for add.)
+      */
+-    public NodeList<N> addLast(N node) {
++    public void addLast(N node) {
+         add(node);
+-        return this;
+     }
+ 
+     /**
+@@ -230,21 +228,21 @@ public class NodeList<N extends Node> implements List<N>, Iterable<N>, HasParent
+     /**
+      * @return the first node, or empty if the list is empty.
+      */
+-    public Optional<N> getFirst() {
++    public N getFirst() {
+         if (isEmpty()) {
+-            return Optional.empty();
++            throw new NoSuchElementException();
+         }
+-        return Optional.of(get(0));
++        return get(0);
+     }
+ 
+     /**
+      * @return the last node, or empty if the list is empty.
+      */
+-    public Optional<N> getLast() {
++    public N getLast() {
+         if (isEmpty()) {
+-            return Optional.empty();
++            throw new NoSuchElementException();
+         }
+-        return Optional.of(get(size() - 1));
++        return get(size() - 1);
+     }
+ 
+     @Override
+diff --git a/javaparser-core/src/main/java/com/github/javaparser/ast/body/CallableDeclaration.java b/javaparser-core/src/main/java/com/github/javaparser/ast/body/CallableDeclaration.java
+index 9d5d5c6..782eb11 100644
+--- a/javaparser-core/src/main/java/com/github/javaparser/ast/body/CallableDeclaration.java
++++ b/javaparser-core/src/main/java/com/github/javaparser/ast/body/CallableDeclaration.java
+@@ -445,7 +445,7 @@ public abstract class CallableDeclaration<T extends CallableDeclaration<?>> exte
+      * Returns true if the method has a variable number of arguments
+      */
+     public boolean isVariableArityMethod() {
+-        return getParameters().size() > 0 && getParameters().getLast().get().isVarArgs();
++        return getParameters().size() > 0 && getParameters().getLast().isVarArgs();
+     }
+ 
+     /*
+-- 
+2.43.0
+

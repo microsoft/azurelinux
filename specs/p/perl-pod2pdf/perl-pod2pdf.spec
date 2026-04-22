@@ -3,7 +3,7 @@
 
 Name:           perl-pod2pdf
 Version:        0.42
-Release:        38%{?dist}
+Release: 39%{?dist}
 Summary:        Converts Pod to PDF format
 License:        Artistic-2.0
 URL:            https://metacpan.org/release/pod2pdf

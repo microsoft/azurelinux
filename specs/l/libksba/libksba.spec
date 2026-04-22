@@ -6,7 +6,7 @@
 Summary: CMS and X.509 library
 Name:    libksba
 Version: 1.6.7
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 # The library is licensed under LGPLv3+ or GPLv2+,
 # the rest of the package under GPLv3+

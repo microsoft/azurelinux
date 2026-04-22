@@ -12,7 +12,7 @@
 Name:    kf6-%{framework}
 Summary: Breeze icon theme library
 Version: 6.23.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # skladnik.svg is CC-BY-SA-4.0
 # folder-edit-sign-encrypt.svg is LGPL-2.1-or-later

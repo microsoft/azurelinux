@@ -1,0 +1,25 @@
+From 07c666ba5c3360dd6f43605a8ac7c85c99c1721f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Tue, 1 Oct 2013 12:22:40 +0200
+Subject: [PATCH] Allow to configure libruby.so placement.
+
+---
+ configure.ac | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index d261ea57b5..3c13076b82 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -3518,6 +3518,11 @@ AS_IF([test ${multiarch+set}], [
+ ])
+ 
+ archlibdir='${libdir}/${arch}'
++AC_ARG_WITH(archlibdir,
++	    AS_HELP_STRING([--with-archlibdir=DIR],
++			   [prefix for libruby [[LIBDIR/ARCH]]]),
++	    [archlibdir="$withval"])
++
+ sitearchlibdir='${libdir}/${sitearch}'
+ archincludedir='${includedir}/${arch}'
+ sitearchincludedir='${includedir}/${sitearch}'

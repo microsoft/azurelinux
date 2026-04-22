@@ -20,7 +20,7 @@
 
 Name:        libbytesize
 Version:     2.12
-Release:     1%{?dist}
+Release: 2%{?dist}
 Summary:     A library for working with sizes in bytes
 License:     LGPL-2.1-or-later
 URL:         https://github.com/storaged-project/libbytesize

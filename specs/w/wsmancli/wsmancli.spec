@@ -3,7 +3,7 @@
 
 Name:           wsmancli
 Version:        2.8.0
-Release:        2%{?dist}
+Release: 3%{?dist}
 License:        BSD-3-Clause
 Url:            http://www.openwsman.org/
 # You can get this tarball here:

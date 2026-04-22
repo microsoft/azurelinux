@@ -3,7 +3,7 @@
 
 Name:		perl-Params-Coerce
 Version:	0.15
-Release:	15%{?dist}
+Release: 16%{?dist}
 Summary:	Allows your classes to do coercion of parameters
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Params-Coerce

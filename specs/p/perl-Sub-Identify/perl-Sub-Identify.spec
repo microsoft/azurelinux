@@ -10,7 +10,7 @@
 
 Name:		perl-Sub-Identify
 Version:	0.14
-Release:	31%{?dist}
+Release: 32%{?dist}
 Summary:	Retrieve names of code references
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Sub-Identify

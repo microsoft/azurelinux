@@ -28,7 +28,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
 Version:        3.0.4
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Provides a list of PHP built-in functions that operate on resources, version %{major}
 
 License:        BSD-3-Clause

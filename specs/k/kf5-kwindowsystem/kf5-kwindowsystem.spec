@@ -15,7 +15,7 @@
 
 Name:    kf5-%{framework}
 Version: 5.116.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: KDE Frameworks 5 Tier 1 integration module with classes for windows management
 
 License: CC0-1.0 AND LGPL-2.1-only AND LGPL-2.1-or-later AND LGPL-3.0-only AND (LGPL-2.1-only OR LGPL-3.0-only) AND MIT

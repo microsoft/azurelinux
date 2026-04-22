@@ -6,7 +6,7 @@
 
 Name:           setools
 Version:        4.6.0
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Policy analysis tools for SELinux
 
 License:        GPL-2.0-only AND LGPL-2.1-only

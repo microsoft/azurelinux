@@ -25,7 +25,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{ver_major}
 Version:        7.0.0
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Managing the version number of Git-hosted PHP projects, version %{ver_major}
 
 License:        BSD-3-Clause

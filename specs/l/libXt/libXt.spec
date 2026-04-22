@@ -8,7 +8,7 @@
 Summary: X.Org X11 libXt runtime library
 Name: libXt
 Version: 1.3.1
-Release: 3%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
+Release: 4%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
 License: MIT AND HPND-sell-variant AND SMLNJ AND MIT-open-group AND X11
 URL: https://www.x.org
 

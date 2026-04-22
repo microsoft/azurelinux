@@ -11,7 +11,7 @@
 
 Name:		im-chooser
 Version:	1.7.5
-Release:	4%{?dist}
+Release: 5%{?dist}
 License:	GPL-2.0-or-later AND LGPL-2.0-or-later
 URL:		http://pagure.io/im-chooser/
 %{?_with_gtk2:BuildRequires:	gtk2-devel}

@@ -7,7 +7,7 @@
 Name:       scl-utils
 Epoch:      1
 Version:    2.0.3
-Release:    6%{dist}
+Release: 7%{dist}
 Summary:    Utilities for alternative packaging
 
 License:    GPL-2.0-or-later

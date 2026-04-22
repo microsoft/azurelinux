@@ -3,7 +3,7 @@
 
 Name:           toilet
 Version:        0.3
-Release:        19%{?dist}
+Release: 20%{?dist}
 Summary:        Display large colorful characters in text mode
 
 License:        WTFPL

@@ -8,7 +8,7 @@
 
 Name:           python-%{srcname}
 Version:        0.3.1
-Release:        42%{?dist}
+Release: 43%{?dist}
 Summary:        FTP transport adapter for python-requests
 
 License:        Apache-2.0

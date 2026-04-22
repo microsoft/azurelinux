@@ -9,7 +9,7 @@
 
 Name:           cppcheck
 Version:        2.19.1
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Tool for static C/C++ code analysis
 License:        GPL-3.0-or-later
 URL:            http://cppcheck.sourceforge.io/

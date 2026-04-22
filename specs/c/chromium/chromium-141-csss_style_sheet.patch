@@ -1,0 +1,16 @@
+Fix ftbfs
+
+v8/include/cppgc/visitor.h:440:19: error: invalid application of 'sizeof' to an incomplete type 'blink::CSSStyleSheet'
+  440 |     static_assert(sizeof(T), "Pointee type must be fully defined.");
+
+diff -up chromium-141.0.7390.37/third_party/blink/renderer/bindings/scripts/bind_gen/observable_array.py.ftbfs-csss_style_sheet chromium-141.0.7390.37/third_party/blink/renderer/bindings/scripts/bind_gen/observable_array.py
+--- chromium-141.0.7390.37/third_party/blink/renderer/bindings/scripts/bind_gen/observable_array.py.ftbfs-csss_style_sheet	2025-09-23 22:21:14.000000000 +0200
++++ chromium-141.0.7390.37/third_party/blink/renderer/bindings/scripts/bind_gen/observable_array.py	2025-10-01 17:55:51.303926035 +0200
+@@ -433,6 +433,7 @@ def generate_observable_array(observable
+     header_node.accumulator.add_include_headers([
+         component_export_header(api_component, for_testing),
+         "third_party/blink/renderer/bindings/core/v8/idl_types.h",
++        "third_party/blink/renderer/core/css/css_style_sheet.h",
+         "third_party/blink/renderer/platform/bindings/observable_array.h",
+     ])
+     source_node.accumulator.add_include_headers([

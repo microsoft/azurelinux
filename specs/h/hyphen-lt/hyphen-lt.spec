@@ -5,7 +5,7 @@ Name: hyphen-lt
 Summary: Lithuanian hyphenation rules
 %global upstreamid 20100531
 Version: 0.%{upstreamid}
-Release: 30%{?dist}
+Release: 31%{?dist}
 Source: http://tug.org/svn/texhyphen/trunk/hyph-utf8/tex/generic/hyph-utf8/patterns/tex/hyph-lt.tex?view=co#/hyph-lt.tex
 URL: http://tug.org/tex-hyphen
 License: LPPL-1.3a

@@ -1,0 +1,28 @@
+From 1024af37158286b6a149c8b08307cfd056a6403b Mon Sep 17 00:00:00 2001
+From: Nia Bickford <nbickford@nvidia.com>
+Date: Tue, 25 Nov 2025 01:25:10 -0800
+Subject: [PATCH] Fix stb_image issue #1861 by zero-initializing `palette`.
+
+My guess is the cost of a 1024-element memset is probably less than checking the palette index of every pixel, even if the branches in the latter fix were always predicted correctly, because it prevents vectorization.
+
+Also zero-initialize `tc16` for safety; I think it may be possible to use it uninitialized.
+---
+ stb_image.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/stb_image.h b/stb_image.h
+index 9eedabedc4..02e03ea361 100644
+--- a/stb_image.h
++++ b/stb_image.h
+@@ -5077,9 +5077,9 @@ static void stbi__de_iphone(stbi__png *z)
+ 
+ static int stbi__parse_png_file(stbi__png *z, int scan, int req_comp)
+ {
+-   stbi_uc palette[1024], pal_img_n=0;
++   stbi_uc palette[1024]={0}, pal_img_n=0;
+    stbi_uc has_trans=0, tc[3]={0};
+-   stbi__uint16 tc16[3];
++   stbi__uint16 tc16[3]={0};
+    stbi__uint32 ioff=0, idata_limit=0, i, pal_len=0;
+    int first=1,k,interlace=0, color=0, is_iphone=0;
+    stbi__context *s = z->s;

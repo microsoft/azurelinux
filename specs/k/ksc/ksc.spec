@@ -11,7 +11,7 @@
 
 Name:		ksc
 Version:	1.7
-Release:	13%{?dist}
+Release: 14%{?dist}
 Summary:	Kernel source code checker
 Group:		Development/Tools
 AutoReqProv:	no

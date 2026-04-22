@@ -3,7 +3,7 @@
 
 Name:           frei0r-plugins
 Version:        2.4.0
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Frei0r - a minimalist plugin API for video effects
 
 # Automatically converted from old format: GPLv2+ - review is highly recommended.

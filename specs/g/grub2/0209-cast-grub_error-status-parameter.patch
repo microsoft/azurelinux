@@ -1,0 +1,67 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leo Sandoval <lsandova@redhat.com>
+Date: Fri, 22 Mar 2024 12:12:02 -0600
+Subject: [PATCH] cast grub_error status parameter
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+For some reason, the compiler concludes that the status variable is
+ultimately a 'long unsigned int' but status is a 'unsigned' (not a
+long) so temporally cast it to unsigned otherwise we see the following
+
+../../grub-core/net/efi/http.c: In function ‘efihttp_request’:
+../../grub-core/net/efi/http.c:251:39: warning: format ‘%x’ expects argument of type ‘unsigned int’, but argument 5 has type ‘grub_efi_status_t’ {aka ‘long unsigned int’} [-Wformat=]
+  251 |       return grub_error (GRUB_ERR_IO, "Fail to send a request! status=0x%x\n", status);
+      |                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  ~~~~~~
+      |                                                                                |
+      |                                                                                grub_efi_status_t {aka long unsigned int}
+---
+ grub-core/net/efi/http.c | 6 +++---
+ grub-core/net/efi/net.c  | 2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/grub-core/net/efi/http.c b/grub-core/net/efi/http.c
+index 6fecb261c55..5bdb47548f8 100644
+--- a/grub-core/net/efi/http.c
++++ b/grub-core/net/efi/http.c
+@@ -236,7 +236,7 @@ efihttp_request (grub_efi_http_t *http, char *server, char *name, int use_https,
+   if (status != GRUB_EFI_SUCCESS)
+     {
+       grub_free (request_data.url);
+-      return grub_error (GRUB_ERR_IO, "Fail to create an event! status=0x%x\n", status);
++      return grub_error (GRUB_ERR_IO, "Fail to create an event! status=0x%x\n", (unsigned) status);
+     }
+ 
+   status = http->request(http, &request_token);
+@@ -248,7 +248,7 @@ efihttp_request (grub_efi_http_t *http, char *server, char *name, int use_https,
+     {
+       b->close_event(request_token.event);
+       grub_free (request_data.url);
+-      return grub_error (GRUB_ERR_IO, "Fail to send a request! status=0x%x\n", status);
++      return grub_error (GRUB_ERR_IO, "Fail to send a request! status=0x%x\n", (unsigned) status);
+     }
+   /* TODO: Add Timeout */
+   while (!request_callback_done)
+@@ -273,7 +273,7 @@ efihttp_request (grub_efi_http_t *http, char *server, char *name, int use_https,
+     {
+       b->close_event(request_token.event);
+       grub_free (request_data.url);
+-      return grub_error (GRUB_ERR_IO, "Fail to create an event! status=0x%x\n", status);
++      return grub_error (GRUB_ERR_IO, "Fail to create an event! status=0x%x\n", (unsigned) status);
+     }
+ 
+   response_token.status = GRUB_EFI_SUCCESS;
+diff --git a/grub-core/net/efi/net.c b/grub-core/net/efi/net.c
+index 0a1e604b5bd..1b13603a63c 100644
+--- a/grub-core/net/efi/net.c
++++ b/grub-core/net/efi/net.c
+@@ -706,7 +706,7 @@ grub_efi_service_binding (grub_efi_handle_t dev, grub_guid_t *service_binding_gu
+   status = service->create_child(service, &child_dev);
+   if (status != GRUB_EFI_SUCCESS)
+     {
+-      grub_error (GRUB_ERR_IO, N_("Failed to create child device of http service %x"), status);
++      grub_error (GRUB_ERR_IO, N_("Failed to create child device of http service %x"), (unsigned) status);
+       return NULL;
+     }
+ 

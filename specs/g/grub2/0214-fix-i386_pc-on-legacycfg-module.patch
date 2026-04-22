@@ -1,0 +1,21 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leo Sandoval <lsandova@redhat.com>
+Date: Tue, 2 Apr 2024 12:59:10 -0600
+Subject: [PATCH] fix i386_pc on legacycfg module
+
+---
+ grub-core/Makefile.core.def | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/grub-core/Makefile.core.def b/grub-core/Makefile.core.def
+index 3f6e944d6a5..b045aac7c91 100644
+--- a/grub-core/Makefile.core.def
++++ b/grub-core/Makefile.core.def
+@@ -2459,6 +2459,7 @@ module = {
+   common = commands/legacycfg.c;
+   common = lib/legacy_parse.c;
+   emu = lib/i386/pc/vesa_modes_table.c;
++  i386_pc = lib/i386/pc/vesa_modes_table.c;
+   i386_efi = lib/i386/pc/vesa_modes_table.c;
+   x86_64_efi = lib/i386/pc/vesa_modes_table.c;
+   xen = lib/i386/pc/vesa_modes_table.c;

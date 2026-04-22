@@ -3,7 +3,7 @@
 
 Name: xmlto
 Version: 0.0.29
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: A tool for converting XML files to various formats
 
 License: GPL-2.0-or-later

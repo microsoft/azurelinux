@@ -14,7 +14,7 @@
 Name:          cjs
 Epoch:         1
 Version:       128.1%{!?tag:~%{date}git%{shortcommit0}}
-Release:       1%{?dist}
+Release: 2%{?dist}
 Summary:       Javascript Bindings for Cinnamon
 
 # Automatically converted from old format: MIT and (MPLv1.1 or GPLv2+ or LGPLv2+) - review is highly recommended.

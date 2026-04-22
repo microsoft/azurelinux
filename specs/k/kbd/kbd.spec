@@ -8,7 +8,7 @@
 
 Name:           kbd
 Version:        2.8.0
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Tools for configuring the console (keyboard, virtual terminals, etc.)
 License:        GPL-2.0-or-later
 URL:            http://www.kbd-project.org/

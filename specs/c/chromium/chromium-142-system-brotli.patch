@@ -1,0 +1,38 @@
+diff -up chromium-142.0.7444.52/net/filter/brotli_source_stream.cc.system-brotli chromium-142.0.7444.52/net/filter/brotli_source_stream.cc
+--- chromium-142.0.7444.52/net/filter/brotli_source_stream.cc.system-brotli	2025-10-21 22:19:54.000000000 +0200
++++ chromium-142.0.7444.52/net/filter/brotli_source_stream.cc	2025-10-26 16:55:51.220605842 +0100
+@@ -14,8 +14,8 @@
+ #include "base/metrics/histogram_macros.h"
+ #include "net/base/io_buffer.h"
+ #include "net/filter/source_stream_type.h"
+-#include "third_party/brotli/include/brotli/decode.h"
+-#include "third_party/brotli/include/brotli/shared_dictionary.h"
++#include <brotli/decode.h>
++#include <brotli/shared_dictionary.h>
+ 
+ namespace net {
+ 
+diff -up chromium-142.0.7444.52/net/ssl/cert_compression.cc.system-brotli chromium-142.0.7444.52/net/ssl/cert_compression.cc
+--- chromium-142.0.7444.52/net/ssl/cert_compression.cc.system-brotli	2025-10-21 22:19:54.000000000 +0200
++++ chromium-142.0.7444.52/net/ssl/cert_compression.cc	2025-10-26 16:55:51.220845216 +0100
+@@ -9,7 +9,7 @@
+ #include "third_party/boringssl/src/include/openssl/ssl.h"
+ 
+ #if !defined(NET_DISABLE_BROTLI)
+-#include "third_party/brotli/include/brotli/decode.h"
++#include <brotli/decode.h>
+ #endif
+ 
+ namespace net {
+diff -up chromium-142.0.7444.52/ui/base/resource/resource_bundle.cc.system-brotli chromium-142.0.7444.52/ui/base/resource/resource_bundle.cc
+--- chromium-142.0.7444.52/ui/base/resource/resource_bundle.cc.system-brotli	2025-10-21 22:19:54.000000000 +0200
++++ chromium-142.0.7444.52/ui/base/resource/resource_bundle.cc	2025-10-26 17:04:17.085726059 +0100
+@@ -37,7 +37,7 @@
+ #include "build/build_config.h"
+ #include "net/filter/gzip_header.h"
+ #include "skia/ext/image_operations.h"
+-#include "third_party/brotli/include/brotli/decode.h"
++#include <brotli/decode.h>
+ #include "third_party/skia/include/codec/SkPngRustDecoder.h"
+ #include "third_party/skia/include/core/SkBitmap.h"
+ #include "third_party/skia/include/core/SkColor.h"

@@ -6,7 +6,7 @@
 
 Name:           xmlrpc-c
 Version:        1.60.04
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Lightweight RPC library based on XML and HTTP
 # See doc/COPYING for details.
 # The Python 1.5.2 license used by a few files is just BSD.

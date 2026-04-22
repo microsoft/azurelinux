@@ -1,0 +1,14 @@
+diff --git a/tests/allheaders.cpp b/tests/allheaders.cpp
+index ae0957dd78..e1a462435c 100644
+--- a/tests/allheaders.cpp
++++ b/tests/allheaders.cpp
+@@ -129,9 +129,6 @@
+ #endif // 4.7
+ #if CHECK_GCC_VERSION(9,1)
+     GCC_TURN_ON(deprecated-copy)
+-#endif // 9.1
+-#if CHECK_GCC_VERSION(9,1)
+-    GCC_TURN_ON(deprecated-copy-dtor)
+ #endif // 9.1
+     GCC_TURN_ON(disabled-optimization)
+     GCC_TURN_ON(double-promotion)

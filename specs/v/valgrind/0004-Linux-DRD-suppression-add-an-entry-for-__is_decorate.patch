@@ -1,0 +1,46 @@
+From 4a1d79be47ead6918053f649f66107b8d8df4310 Mon Sep 17 00:00:00 2001
+From: Paul Floyd <pjfloyd@wanadoo.fr>
+Date: Mon, 1 Dec 2025 08:12:30 +0100
+Subject: [PATCH 4/6] Linux DRD suppression: add an entry for
+ __is_decorate_maps_enabled
+
+Seen on Fedora 43
+
+(cherry picked from commit cfc8b0706a9a0fbf05525a0ce142e2bf4cc53fed)
+---
+ drd/tests/std_thread2.supp | 7 +++++++
+ glibc-2.X-drd.supp.in      | 6 ++++++
+ 2 files changed, 13 insertions(+)
+
+diff --git a/drd/tests/std_thread2.supp b/drd/tests/std_thread2.supp
+index 40741b06f889..39a201da9af7 100644
+--- a/drd/tests/std_thread2.supp
++++ b/drd/tests/std_thread2.supp
+@@ -98,3 +98,10 @@
+    drd:ConflictingAccess
+    fun:__set_vma_name
+ }
++
++{
++   drd-libc-__is_decorate_maps_enabled
++   drd:ConflictingAccess
++   fun:__is_decorate_maps_enabled
++}
++
+diff --git a/glibc-2.X-drd.supp.in b/glibc-2.X-drd.supp.in
+index 419ff2256c92..6866904470d6 100644
+--- a/glibc-2.X-drd.supp.in
++++ b/glibc-2.X-drd.supp.in
+@@ -369,3 +369,9 @@
+    fun:_dl_exception_create_format
+ }
+ 
++{
++   drd-libc-__is_decorate_maps_enabled
++   drd:ConflictingAccess
++   fun:__is_decorate_maps_enabled
++}
++
+-- 
+2.52.0
+

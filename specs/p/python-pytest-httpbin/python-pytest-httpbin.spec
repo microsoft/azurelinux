@@ -14,7 +14,7 @@ provides your test with the URL in the fixture.
 
 Name:           python-%{github_name}
 Version:        2.1.0
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        %{sum}
 
 # License is included in-line in README.md

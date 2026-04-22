@@ -8,7 +8,7 @@
 Summary: X.Org X11 libXrandr runtime library
 Name: libXrandr
 Version: 1.5.4
-Release: 6%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
+Release: 7%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
 License: HPND-sell-variant
 URL: http://www.x.org
 

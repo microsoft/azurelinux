@@ -3,7 +3,7 @@
 
 Name:             xdp-tools
 Version:          1.5.8
-Release:          1%{?dist}
+Release: 2%{?dist}
 Summary:          Utilities and example programs for use with XDP
 %global _soversion 1.5.0
 

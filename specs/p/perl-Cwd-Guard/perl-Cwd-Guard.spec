@@ -5,7 +5,7 @@
 
 Name:		perl-Cwd-Guard
 Version:	0.05
-Release:	28%{?dist}
+Release: 29%{?dist}
 Summary:	Temporarily change the current directory
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Cwd-Guard

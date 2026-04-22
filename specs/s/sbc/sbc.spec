@@ -3,7 +3,7 @@
 
 Name:          sbc
 Version:       2.0
-Release:       7%{?dist}
+Release: 8%{?dist}
 Summary:       Sub Band Codec used by bluetooth A2DP
 
 License:       GPL-2.0-only AND LGPL-2.1-or-later

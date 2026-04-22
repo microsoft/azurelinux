@@ -10,7 +10,7 @@
 
 Name:           python-%{pypi_name}
 Version:        3.2.0
-Release:        11%{?dist}
+Release: 12%{?dist}
 Summary:        TCP port monitoring utilities
 
 License:        MIT

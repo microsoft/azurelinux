@@ -13,7 +13,7 @@
 Name:           mingw-python-%{pypi_name}
 Summary:        MinGW Python %{pypi_name} library
 Version:        1.3.0
-Release:        1%{?dist}
+Release: 2%{?dist}
 BuildArch:      noarch
 
 License:        MIT

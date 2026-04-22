@@ -11,7 +11,7 @@
 Name:           perl-Pod-Perldoc
 # let's overwrite the module from perl.srpm
 Version:        3.28.01
-Release:        521%{?dist}
+Release: 522%{?dist}
 Summary:        Look up Perl documentation in Pod format
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Pod-Perldoc

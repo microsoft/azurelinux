@@ -16,7 +16,7 @@
 
 Name:           perl-libnet
 Version:        3.15
-Release:        521%{?dist}
+Release: 522%{?dist}
 Summary:        Perl clients for various network protocols
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/libnet

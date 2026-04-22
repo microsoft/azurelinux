@@ -17,7 +17,7 @@
 
 Name:           %{project}
 Version:        1.0.1
-Release:        14%{?dist}
+Release: 15%{?dist}
 Summary:        Koji support for building layered container images
 
 # Automatically converted from old format: LGPLv2 - review is highly recommended.

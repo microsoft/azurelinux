@@ -5,7 +5,7 @@
 
 Name:		kf6-%{framework}
 Version:	6.23.0
-Release:	1%{?dist}
+Release: 2%{?dist}
 Summary:	KDE Frameworks 6 Tier 1 addon for advanced thread management
 License:	CC0-1.0 AND LGPL-2.0-or-later
 URL:		https://invent.kde.org/frameworks/%{framework}

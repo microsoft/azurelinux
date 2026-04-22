@@ -11,7 +11,7 @@
 
 Name:           qpid-proton
 Version:        0.40.0
-Release:        12%{?dist}
+Release: 13%{?dist}
 Summary:        A high performance, lightweight messaging library
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.
 License:        Apache-2.0

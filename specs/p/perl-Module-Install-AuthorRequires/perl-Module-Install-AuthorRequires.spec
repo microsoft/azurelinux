@@ -3,7 +3,7 @@
 
 Name:           perl-Module-Install-AuthorRequires
 Version:        0.02
-Release:        38%{?dist}
+Release: 39%{?dist}
 Summary:        Declare author-only dependencies
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Module-Install-AuthorRequires

@@ -1,0 +1,31 @@
+diff -Naur rfc3986_validator-0.1.1.orig/setup.cfg rfc3986_validator-0.1.1/setup.cfg
+--- rfc3986_validator-0.1.1.orig/setup.cfg	2022-07-15 00:39:30.523111336 +0100
++++ rfc3986_validator-0.1.1/setup.cfg	2022-07-15 00:44:02.442833904 +0100
+@@ -23,6 +23,12 @@
+ [tool:pytest]
+ collect_ignore = ['setup.py']
+ 
++[options.extras_require]
++test =
++    pytest >= 3
++    rfc3987
++    hypothesis
++
+ [egg_info]
+ tag_build = 
+ tag_date = 0
+diff -Naur rfc3986_validator-0.1.1.orig/setup.py rfc3986_validator-0.1.1/setup.py
+--- rfc3986_validator-0.1.1.orig/setup.py	2022-07-15 00:39:30.523111336 +0100
++++ rfc3986_validator-0.1.1/setup.py	2022-07-15 00:40:32.697733853 +0100
+@@ -10,9 +10,9 @@
+ 
+ requirements = []
+ 
+-setup_requirements = ['pytest-runner', ]
++setup_requirements = []
+ 
+-test_requirements = ['pytest>=3', ]
++test_requirements = []
+ 
+ setup(
+     author="Nicolas Aimetti",

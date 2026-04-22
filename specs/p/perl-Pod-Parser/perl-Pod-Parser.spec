@@ -10,7 +10,7 @@
 
 Name:           perl-Pod-Parser
 Version:        1.67
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        Basic perl modules for handling Plain Old Documentation (POD)
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Pod-Parser

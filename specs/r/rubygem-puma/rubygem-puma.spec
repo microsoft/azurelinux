@@ -15,7 +15,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 6.4.2
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary: A simple, fast, threaded, and highly concurrent HTTP 1.1 server
 # MIT: lib/puma/sd_notify.rb
 # https://github.com/puma/puma/issues/3311

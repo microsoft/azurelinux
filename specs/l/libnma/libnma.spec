@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/libnma.azl.macros}
+
 %global gtk3_version          %(pkg-config --modversion gtk+-3.0 2>/dev/null || echo bad)
 %global gtk4_version          %(pkg-config --modversion gtk4 2>/dev/null || echo bad)
 %global glib2_version         %(pkg-config --modversion glib-2.0 2>/dev/null || echo bad)
@@ -17,11 +20,12 @@
 Name:           libnma
 Summary:        NetworkManager GUI library
 Version:        1.10.6
-Release:        10%{?dist}
+Release: 11%{?dist}
 # The entire source code is GPLv2+ except some files in shared/ which are LGPLv2+
 License:        GPL-2.0-or-later AND LGPL-2.1-or-later
 URL:            https://gitlab.gnome.org/GNOME/libnma/
 Source0:        https://download.gnome.org/sources/libnma/1.10/%{name}-%{version}.tar.xz
+Source9999: libnma.azl.macros
 
 Patch1:         0001-nm-applet-no-notifications.patch
 

@@ -4,7 +4,7 @@
 Name: hyphen-fr
 Summary: French hyphenation rules
 Version: 3.0
-Release: 19%{?dist}
+Release: 20%{?dist}
 Source: http://www.dicollecte.org/download/fr/hyph-fr-v3.0.zip
 URL: http://www.dicollecte.org/download.php?prj=fr
 License: LGPL-2.1-or-later

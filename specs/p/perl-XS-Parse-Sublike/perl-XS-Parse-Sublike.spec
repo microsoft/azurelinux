@@ -17,7 +17,7 @@
 
 Name:           perl-XS-Parse-Sublike
 Version:        0.41
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        XS functions to assist in parsing sub-like syntax
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/XS-Parse-Sublike

@@ -1,0 +1,14 @@
+Index: chromium-144.0.7559.59/base/process/launch.h
+===================================================================
+--- chromium-144.0.7559.59.orig/base/process/launch.h
++++ chromium-144.0.7559.59/base/process/launch.h
+@@ -58,6 +58,9 @@ enum TerminationStatus : int;
+ #if defined(ARCH_CPU_ARM64) || defined(ARCH_CPU_LOONGARCH64)
+ #define PTHREAD_STACK_MIN_CONST \
+   (__builtin_constant_p(PTHREAD_STACK_MIN) ? PTHREAD_STACK_MIN : 131072)
++#elif defined(ARCH_CPU_PPC64)
++#define PTHREAD_STACK_MIN_CONST \
++  (__builtin_constant_p(PTHREAD_STACK_MIN) ? PTHREAD_STACK_MIN : 131072)
+ #else
+ #define PTHREAD_STACK_MIN_CONST \
+   (__builtin_constant_p(PTHREAD_STACK_MIN) ? PTHREAD_STACK_MIN : 16384)

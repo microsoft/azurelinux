@@ -10,7 +10,7 @@
 
 Name:           perl-Date-ISO8601
 Version:        0.005
-Release:        23%{?dist}
+Release: 24%{?dist}
 Summary:        Three ISO 8601 numerical calendars
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Date-ISO8601

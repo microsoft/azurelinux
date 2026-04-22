@@ -4,7 +4,7 @@
 Summary:	I/O on in-core objects like strings and arrays for Perl
 Name:		perl-IO-stringy
 Version:	2.113
-Release:	17%{?dist}
+Release: 18%{?dist}
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/IO-stringy
 Source0:	https://cpan.metacpan.org/modules/by-module/IO/IO-Stringy-%{version}.tar.gz

@@ -15,7 +15,7 @@
 Name:           ghc-%{pkg_name}
 Version:        1.1.2
 # can only be reset when subpkg bumped
-Release:        9%{?dist}
+Release: 10%{?dist}
 Summary:        Simple ANSI terminal support, with Windows compatibility
 
 License:        BSD-3-Clause

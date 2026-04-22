@@ -3,7 +3,7 @@
 
 Name:          liblc3
 Version:       1.1.3
-Release:       5%{?dist}
+Release: 6%{?dist}
 Summary:       Low Complexity Communication Codec (LC3)
 
 License:       Apache-2.0

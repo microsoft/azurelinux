@@ -6,7 +6,7 @@ BuildArch: noarch
 
 # No sane versionning upstream, use git clone timestamp
 Version: 20200215
-Release: 23%{?dist}
+Release: 24%{?dist}
 License: Apache-2.0
 URL:     https://android.googlesource.com/
 

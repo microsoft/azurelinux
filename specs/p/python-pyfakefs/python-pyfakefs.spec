@@ -5,7 +5,7 @@
 
 Name:           python-%{package_name}
 Version:        5.10.2
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        pyfakefs implements a fake file system that mocks the Python file system modules.
 License:        Apache-2.0
 URL:            http://pyfakefs.org

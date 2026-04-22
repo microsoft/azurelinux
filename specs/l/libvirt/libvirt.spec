@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/libvirt.azl.macros}
+
 # -*- rpm-spec -*-
 
 # This spec file assumes you are building on a Fedora or RHEL version
@@ -294,7 +297,7 @@
 Summary: Library providing a simple virtualization API
 Name: libvirt
 Version: 11.6.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND OFL-1.1
 URL: https://libvirt.org/
 
@@ -302,6 +305,7 @@ URL: https://libvirt.org/
     %define mainturl stable_updates/
 %endif
 Source: https://download.libvirt.org/%{?mainturl}libvirt-%{version}.tar.xz
+Source9999: libvirt.azl.macros
 
 Patch: 0001-wireshark-Drop-needless-declaration-of-proto_registe.patch
 Patch: 0002-wireshark-Switch-header-files-to-pragma-once.patch

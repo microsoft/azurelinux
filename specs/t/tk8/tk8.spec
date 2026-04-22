@@ -7,7 +7,7 @@
 Summary: The graphical toolkit for the Tcl scripting language, version 8
 Name: tk8
 Version: %{vers}
-Release: 2%{?dist}
+Release: 3%{?dist}
 Epoch:   1
 License: TCL AND HPND-Pbmplus AND CC-BY-SA-3.0 AND MIT-open-group AND MIT
 URL: http://tcl.sourceforge.net

@@ -24,7 +24,7 @@
 
 Name:      php-PsrLog
 Version:   %{github_version}
-Release:   11%{?dist}
+Release: 12%{?dist}
 Summary:   Common interface for logging libraries
 
 License:   MIT

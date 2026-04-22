@@ -1,0 +1,15 @@
+[archive]
+
+[licensing]
+# only scancode can fully handle this package, but that is not expected to be in RHEL
+detector = "askalono"
+
+[[licensing.licenses]]
+path = "LICENSE.md"
+sha256sum = "4fae9062ab5cdd5fb15486b728534d8aded8b4ae9d84b6d66a956f5162c366b6"
+expression = "MIT AND BSD-3-Clause"
+
+[[licensing.licenses]]
+path = "vendor/gopkg.in/yaml.v3/LICENSE"
+sha256sum = "d18f6323b71b0b768bb5e9616e36da390fbd39369a81807cca352de4e4e6aa0b"
+expression = "MIT AND (MIT AND Apache-2.0)"

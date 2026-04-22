@@ -7,7 +7,7 @@
 
 Name:          mingw-%{pkgname}
 Version:       3.2.1
-Release:       1%{?dist}
+Release: 2%{?dist}
 Summary:       MinGW Windows %{pkgname} library
 
 License:       BSD-3-Clause

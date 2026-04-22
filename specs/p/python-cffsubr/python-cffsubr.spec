@@ -3,7 +3,7 @@
 
 Name:           python-cffsubr
 Version:        0.4.0
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Standalone CFF subroutinizer based on the AFDKO tx tool
 
 # The entire source is Apache-2.0, except:

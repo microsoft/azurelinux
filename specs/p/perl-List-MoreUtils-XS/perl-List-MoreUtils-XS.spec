@@ -10,7 +10,7 @@
 
 Name:		perl-List-MoreUtils-XS
 Version:	0.430
-Release:	18%{?dist}
+Release: 19%{?dist}
 Summary:	Provide compiled List::MoreUtils functions
 # Code from List-MoreUtils < 0.417 is GPL-1.0-or-later OR Artistic-1.0-Perl
 # Anything after that is Apache-2.0

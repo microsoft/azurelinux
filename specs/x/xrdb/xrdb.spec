@@ -3,7 +3,7 @@
 
 Name:       xrdb
 Version:    1.2.2
-Release:    6%{?dist}
+Release: 7%{?dist}
 Summary:    X server resource database utility
 
 License:    HPND-DEC AND MIT-open-group

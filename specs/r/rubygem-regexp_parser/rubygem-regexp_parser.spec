@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 2.5.0
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary: Scanner, lexer, parser for ruby's regular expressions
 License: MIT
 URL: https://github.com/ammar/regexp_parser

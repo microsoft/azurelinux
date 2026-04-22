@@ -12,7 +12,7 @@
 
 Name:           uhttpmock
 Version:        0.11.0
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        HTTP web service mocking library
 
 License:        LGPL-2.1-or-later

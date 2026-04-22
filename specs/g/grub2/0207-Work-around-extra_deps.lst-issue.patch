@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Wed, 13 Mar 2024 14:06:43 -0400
+Subject: [PATCH] Work around extra_deps.lst issue
+
+---
+ grub-core/Makefile.am | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/grub-core/Makefile.am b/grub-core/Makefile.am
+index 77f8329cd43..aa172391fdf 100644
+--- a/grub-core/Makefile.am
++++ b/grub-core/Makefile.am
+@@ -460,6 +460,10 @@ extra_deps.lst:
+ 	@echo $(EXTRA_DEPS) | sed "s/\s*:\s*/\n/g" > $@
+ 
+ syminfo.lst: gensyminfo.sh kernel_syms.lst extra_deps.lst $(MODULE_FILES)
++	if ! [ -f extra_deps.lst ] ; then \
++	  echo Missing extra_deps.lst ; \
++	  echo $(EXTRA_DEPS) | sed "s/\s*:\s*/\n/g" > extra_deps.lst ; \
++	fi
+ 	cat kernel_syms.lst extra_deps.lst > $@.new
+ 	for m in $(MODULE_FILES); do \
+ 	  sh $< $$m >> $@.new || exit 1; \

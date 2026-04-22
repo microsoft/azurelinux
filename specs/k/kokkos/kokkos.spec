@@ -38,7 +38,7 @@
 Name:           kokkos
 Version:        4.7.02
 %global         sover 4.7
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Kokkos C++ Performance Portability Programming
 # no support for 32-bit archs https://github.com/kokkos/kokkos/issues/2312
 ExcludeArch: i686 armv7hl

@@ -17,7 +17,7 @@
 
 Name:    kf5-%{framework}
 Version: 5.116.0
-Release: 10%{?dist}
+Release: 11%{?dist}
 Summary: KDE Frameworks 5 library that wraps Client and Server Wayland libraries
 
 License: BSD-3-Clause AND CC0-1.0 AND LGPL-2.1-only AND LGPL-3.0-only AND (LGPL-2.1-only OR LGPL-3.0-only) AND MIT AND MIT-CMU

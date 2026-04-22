@@ -7,7 +7,7 @@
 Summary:        Tool to transform and deploy CPU microcode update for x86
 Name:           microcode_ctl
 Version:        2.1
-Release:        71.1%{?dist}
+Release: 72.1%{?dist}
 Epoch:          2
 License:        GPL-2.0-or-later AND LicenseRef-Fedora-Firmware
 URL:            https://pagure.io/microcode_ctl

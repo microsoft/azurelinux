@@ -1,0 +1,30 @@
+From 7ac26d6beb2175f0d6001ca0df322ce610401cce Mon Sep 17 00:00:00 2001
+From: Stan Cox <scox@redhat.com>
+Date: Wed, 22 Jun 2022 17:05:48 +0200
+Subject: [PATCH] redact weak ciphers
+
+
+diff --git a/pkg/api/http_server.go b/pkg/api/http_server.go
+index da04044683..8a29270d4d 100644
+--- a/pkg/api/http_server.go
++++ b/pkg/api/http_server.go
+@@ -820,13 +820,13 @@ func (hs *HTTPServer) getDefaultCiphers(tlsVersion uint16, protocol string) []ui
+ 			tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+ 			tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
+ 			tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+-			tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
++			//			tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
+ 			tls.TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,
+-			tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
+-			tls.TLS_RSA_WITH_AES_128_GCM_SHA256,
+-			tls.TLS_RSA_WITH_AES_256_GCM_SHA384,
+-			tls.TLS_RSA_WITH_AES_128_CBC_SHA,
+-			tls.TLS_RSA_WITH_AES_256_CBC_SHA,
++			//			tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
++			//			tls.TLS_RSA_WITH_AES_128_GCM_SHA256,
++			//			tls.TLS_RSA_WITH_AES_256_GCM_SHA384,
++			//			tls.TLS_RSA_WITH_AES_128_CBC_SHA,
++			//			tls.TLS_RSA_WITH_AES_256_CBC_SHA,
+ 		}
+ 	}
+ 	if protocol == "h2" {

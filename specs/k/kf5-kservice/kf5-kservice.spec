@@ -7,7 +7,7 @@
 Name:    kf5-%{framework}
 Summary: KDE Frameworks 5 Tier 3 solution for advanced plugin and service introspection
 Version: 5.116.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 License: CC0-1.0 AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-3.0-only AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-3.0-only AND (GPL-2.0-only OR GPL-3.0-only) AND (LGPL-2.1-only OR LGPL-3.0-only)
 URL:     https://invent.kde.org/frameworks/%{framework}

@@ -1,0 +1,21 @@
+diff -Naur rfc3339_validator-0.1.4-original/setup.py rfc3339_validator-0.1.4/setup.py
+--- rfc3339_validator-0.1.4-original/setup.py	2021-05-12 12:31:22.000000000 -0400
++++ rfc3339_validator-0.1.4/setup.py	2022-06-29 09:02:27.273431058 -0400
+@@ -14,8 +14,6 @@
+ 
+ setup_requirements = []
+ 
+-test_requirements = ['pytest>=3', 'pytest-runner', 'hypothesis', 'strict_rfc3339']
+-
+ setup(
+     author="Nicolas Aimetti",
+     author_email='naimetti@yahoo.com.ar',
+@@ -43,8 +41,6 @@
+     name='rfc3339_validator',
+     py_modules=['rfc3339_validator'],
+     setup_requires=setup_requirements,
+-    test_suite='tests',
+-    tests_require=test_requirements,
+     url='https://github.com/naimetti/rfc3339-validator',
+     version='0.1.4',
+     zip_safe=False,

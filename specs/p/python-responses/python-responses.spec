@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        0.25.8
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Python library to mock out calls with Python requests
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.
 License:        Apache-2.0

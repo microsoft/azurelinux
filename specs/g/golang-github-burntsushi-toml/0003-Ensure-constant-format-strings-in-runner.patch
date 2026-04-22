@@ -1,0 +1,52 @@
+From: Denis Fateyev <denis@fateyev.com>
+Date: Thu, 5 Jun 2025 01:06:58 +0500
+Subject: [PATCH] Ensure constant format strings in runner
+
+Go 1.24 introduces stricter checks for format string validation.
+This commit fixes instances where non-constant format strings were
+used in calls to functions like `fmt.Errorf`, `fmt.Printf`, and similar.
+
+Changes here: replacing dynamically constructed strings passed as
+format strings with constant format strings.
+---
+ internal/toml-test/runner.go |  8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/internal/toml-test/runner.go b/internal/toml-test/runner.go
+index 666e8ed..4cc3a67 100644
+--- a/internal/toml-test/runner.go
++++ b/internal/toml-test/runner.go
+@@ -390,7 +390,7 @@ func (t Test) runInvalid(p Parser, fsys fs.FS) Test {
+ 		err = timeoutError{t.Timeout}
+ 	}
+ 	if err != nil {
+-		return t.fail(err.Error())
++		return t.fail("%s", err.Error())
+ 	}
+ 	if !t.OutputFromStderr {
+ 		return t.fail("Expected an error, but no error was reported.")
+@@ -417,10 +417,10 @@ func (t Test) runValid(p Parser, fsys fs.FS) Test {
+ 		err = timeoutError{t.Timeout}
+ 	}
+ 	if err != nil {
+-		return t.fail(err.Error())
++		return t.fail("%s", err.Error())
+ 	}
+ 	if t.OutputFromStderr {
+-		return t.fail(t.Output)
++		return t.fail("%s", t.Output)
+ 	}
+ 	if t.Output == "" {
+ 		// Special case: we expect an empty output here.
+@@ -446,7 +446,7 @@ func (t Test) runValid(p Parser, fsys fs.FS) Test {
+ 	// Compare for decoder test
+ 	want, err := t.ReadWantJSON(fsys)
+ 	if err != nil {
+-		return t.fail(err.Error())
++		return t.fail("%s", err.Error())
+ 	}
+ 
+ 	var have any
+-- 
+2.49.0
+

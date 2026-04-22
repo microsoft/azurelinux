@@ -12,7 +12,7 @@
 Summary:	Modular text mode IRC client with Perl scripting
 Name:		irssi
 Version:	1.4.5
-Release:	10%{?dist}
+Release: 11%{?dist}
 
 License:	gpl-2.0-or-later AND gpl-2.0-only AND gfdl-1.1-or-later AND licenseref-fedora-public-domain AND hpnd-markus-kuhn
 URL:		http://irssi.org/

@@ -3,7 +3,7 @@
 
 Name:           perl-Test-Future-IO-Impl
 Version:        0.14
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        Acceptance tests for Future::IO implementations
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 

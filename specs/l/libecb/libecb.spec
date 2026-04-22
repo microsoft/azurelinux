@@ -9,7 +9,7 @@ Name:       libecb
 # See ECB_VERSION macro. RPM cannot order them correctly. A decimal encoding
 # would work, but would be uggly. Just use 0.
 Version:    0.%{snapshot}
-Release:    6%{?dist}
+Release: 7%{?dist}
 Summary:    Compiler built-ins
 License:    BSD-2-Clause OR GPL-2.0-or-later
 URL:        http://software.schmorp.de/pkg/libecb.html

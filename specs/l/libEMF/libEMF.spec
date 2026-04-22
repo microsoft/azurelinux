@@ -5,7 +5,7 @@ Summary:	A library for generating Enhanced Metafiles
 Summary(pl):	Biblioteka do generowania plików w formacie Enhanced Metafile
 Name:		libEMF
 Version:	1.0.13
-Release:	16%{?dist}
+Release: 17%{?dist}
 # include/libEMF/emf.h: LGPL-2.1-or-later
 # libemf/libemf.{cpp,h}: LGPL-2.1-or-later
 # src/printemf.c: GPL-2.0-or-later

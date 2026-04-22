@@ -1,0 +1,89 @@
+From 24dcb6a3b37bc82826c7846ea69e1c42f5351f2d Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Mon, 27 Apr 2020 12:57:13 +0200
+Subject: [PATCH 3/3] Disable reporting
+
+Forwarded: not-needed
+---
+ .../plugin/generator/GeneratorUtils.java      | 61 +++----------------
+ 1 file changed, 7 insertions(+), 54 deletions(-)
+
+diff --git a/maven-plugin-tools-generators/src/main/java/org/apache/maven/tools/plugin/generator/GeneratorUtils.java b/maven-plugin-tools-generators/src/main/java/org/apache/maven/tools/plugin/generator/GeneratorUtils.java
+index 2621b9f..c24ccdb 100644
+--- a/maven-plugin-tools-generators/src/main/java/org/apache/maven/tools/plugin/generator/GeneratorUtils.java
++++ b/maven-plugin-tools-generators/src/main/java/org/apache/maven/tools/plugin/generator/GeneratorUtils.java
+@@ -44,10 +44,9 @@ import java.util.regex.Pattern;
+ 
+ import org.apache.maven.artifact.Artifact;
+ import org.apache.maven.artifact.DependencyResolutionRequiredException;
+-import org.apache.maven.plugin.descriptor.MojoDescriptor;
+-import org.apache.maven.plugin.descriptor.PluginDescriptor;
+-import org.apache.maven.project.MavenProject;
+-import org.apache.maven.reporting.MavenReport;
++import org.apache.maven.plugin.descriptor.MojoDescriptor;
++import org.apache.maven.plugin.descriptor.PluginDescriptor;
++import org.apache.maven.project.MavenProject;
+ import org.codehaus.plexus.component.repository.ComponentDependency;
+ import org.codehaus.plexus.util.StringUtils;
+ import org.codehaus.plexus.util.xml.XMLWriter;
+@@ -500,53 +499,7 @@ public final class GeneratorUtils {
+                 packageName = entry.getKey();
+             }
+         }
+-
+-        return packageName;
+-    }
+-
+-    /**
+-     * @param impl a Mojo implementation, not null
+-     * @param project a MavenProject instance, could be null
+-     * @return <code>true</code> is the Mojo implementation implements <code>MavenReport</code>,
+-     * <code>false</code> otherwise.
+-     * @throws IllegalArgumentException if any
+-     */
+-    @SuppressWarnings("unchecked")
+-    public static boolean isMavenReport(String impl, MavenProject project) throws IllegalArgumentException {
+-        if (impl == null) {
+-            throw new IllegalArgumentException("mojo implementation should be declared");
+-        }
+-
+-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+-        if (project != null) {
+-            List<String> classPathStrings;
+-            try {
+-                classPathStrings = project.getCompileClasspathElements();
+-                if (project.getExecutionProject() != null) {
+-                    classPathStrings.addAll(project.getExecutionProject().getCompileClasspathElements());
+-                }
+-            } catch (DependencyResolutionRequiredException e) {
+-                throw new IllegalArgumentException(e);
+-            }
+-
+-            List<URL> urls = new ArrayList<>(classPathStrings.size());
+-            for (String classPathString : classPathStrings) {
+-                try {
+-                    urls.add(new File(classPathString).toURL());
+-                } catch (MalformedURLException e) {
+-                    throw new IllegalArgumentException(e);
+-                }
+-            }
+-
+-            classLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]), classLoader);
+-        }
+-
+-        try {
+-            Class<?> clazz = Class.forName(impl, false, classLoader);
+-
+-            return MavenReport.class.isAssignableFrom(clazz);
+-        } catch (ClassNotFoundException e) {
+-            return false;
+-        }
+-    }
+-}
++
++        return packageName;
++    }
++}
+-- 
+2.46.0
+

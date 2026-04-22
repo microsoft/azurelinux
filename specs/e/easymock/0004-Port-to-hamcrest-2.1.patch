@@ -1,0 +1,75 @@
+From 5393d71f7bf9de06efd763c501486bf14413ab4a Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Thu, 29 Aug 2019 15:18:53 +0200
+Subject: [PATCH] Port to hamcrest 2.1
+
+---
+ .../tests2/EasyMockSupportClassTest.java       | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/core/src/test/java/org/easymock/tests2/EasyMockSupportClassTest.java b/core/src/test/java/org/easymock/tests2/EasyMockSupportClassTest.java
+index c5dd63b..b8be307 100644
+--- a/core/src/test/java/org/easymock/tests2/EasyMockSupportClassTest.java
++++ b/core/src/test/java/org/easymock/tests2/EasyMockSupportClassTest.java
+@@ -48,49 +48,49 @@ public class EasyMockSupportClassTest extends EasyMockSupport {
+     @Test
+     public void testCreateStrictControl() {
+         IMocksControl ctrl = createStrictControl();
+-        assertThat(ctrl.createMock(ToMock.class), is(ToMock.class));
++        assertThat(ctrl.createMock(ToMock.class), org.hamcrest.core.Is.isA(ToMock.class));
+     }
+ 
+     @Test
+     public void testCreateControl() {
+         IMocksControl ctrl = createControl();
+-        assertThat(ctrl.createMock(ToMock.class), is(ToMock.class));
++        assertThat(ctrl.createMock(ToMock.class), org.hamcrest.core.Is.isA(ToMock.class));
+     }
+ 
+     @Test
+     public void testCreateNiceControl() {
+         IMocksControl ctrl = createNiceControl();
+-        assertThat(ctrl.createMock(ToMock.class), is(ToMock.class));
++        assertThat(ctrl.createMock(ToMock.class), org.hamcrest.core.Is.isA(ToMock.class));
+     }
+ 
+     @Test
+     public void testCreateStrictMockClassOfT() {
+-        assertThat(createStrictMock(ToMock.class), is(ToMock.class));
++        assertThat(createStrictMock(ToMock.class), org.hamcrest.core.Is.isA(ToMock.class));
+     }
+ 
+     @Test
+     public void testCreateStrictMockStringClassOfT() {
+-        assertThat(createStrictMock("myMock", ToMock.class), is(ToMock.class));
++        assertThat(createStrictMock("myMock", ToMock.class), org.hamcrest.core.Is.isA(ToMock.class));
+     }
+ 
+     @Test
+     public void testCreateMockClassOfT() {
+-        assertThat(createMock(ToMock.class), is(ToMock.class));
++        assertThat(createMock(ToMock.class), org.hamcrest.core.Is.isA(ToMock.class));
+     }
+ 
+     @Test
+     public void testCreateMockStringClassOfT() {
+-        assertThat(createMock("myMock", ToMock.class), is(ToMock.class));
++        assertThat(createMock("myMock", ToMock.class), org.hamcrest.core.Is.isA(ToMock.class));
+     }
+ 
+     @Test
+     public void testCreateNiceMockClassOfT() {
+-        assertThat(createNiceMock(ToMock.class), is(ToMock.class));
++        assertThat(createNiceMock(ToMock.class), org.hamcrest.core.Is.isA(ToMock.class));
+     }
+ 
+     @Test
+     public void testCreateNiceMockStringClassOfT() {
+-        assertThat(createNiceMock("myMock", ToMock.class), is(ToMock.class));
++        assertThat(createNiceMock("myMock", ToMock.class), org.hamcrest.core.Is.isA(ToMock.class));
+     }
+ 
+     @Test
+-- 
+2.21.0
+

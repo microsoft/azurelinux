@@ -3,7 +3,7 @@
 
 Name:           harfbuzz
 Version:        11.5.1
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Text shaping library
 
 License:        MIT-Modern-Variant

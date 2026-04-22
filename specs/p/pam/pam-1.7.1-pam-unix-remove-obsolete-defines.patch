@@ -1,0 +1,62 @@
+From aebea0f3a930f05f6835307da0c4da4240675f74 Mon Sep 17 00:00:00 2001
+From: Thorsten Kukuk <kukuk@suse.com>
+Date: Wed, 7 Jan 2026 10:00:22 +0100
+Subject: [PATCH] pam_unix: remove obsolete HAVE_YP_* to fix NIS
+
+If HAVE_NIS is defined we know that all required NIS functions are
+available, don't check for additional HAVE_YP_* defines, they got
+removed with the switch to meson.
+
+(See #956 and https://bugzilla.redhat.com/show_bug.cgi?id=2363005)
+---
+ modules/pam_unix/pam_unix_passwd.c | 15 ---------------
+ modules/pam_unix/support.c         |  2 +-
+ 2 files changed, 1 insertion(+), 16 deletions(-)
+
+diff --git a/modules/pam_unix/pam_unix_passwd.c b/modules/pam_unix/pam_unix_passwd.c
+index 31700c2d..c01fd56b 100644
+--- a/modules/pam_unix/pam_unix_passwd.c
++++ b/modules/pam_unix/pam_unix_passwd.c
+@@ -141,26 +141,11 @@ static char *getNISserver(pam_handle_t *pamh, unsigned long long ctrl)
+ #endif
+ 
+ 
+-#ifdef HAVE_YP_GET_DEFAULT_DOMAIN
+ 	if ((err = yp_get_default_domain(&domainname)) != 0) {
+ 		pam_syslog(pamh, LOG_WARNING, "can't get local yp domain: %s",
+ 			 yperr_string(err));
+ 		return NULL;
+ 	}
+-#elif defined(HAVE_GETDOMAINNAME)
+-	char domainname_res[256];
+-
+-	if (getdomainname (domainname_res, sizeof (domainname_res)) == 0)
+-	  {
+-	    if (strcmp (domainname_res, "(none)") == 0)
+-	      {
+-		/* If domainname is not set, some systems will return "(none)" */
+-		domainname_res[0] = '\0';
+-	      }
+-	    domainname = domainname_res;
+-	  }
+-	else domainname = NULL;
+-#endif
+ 
+ 	if ((err = yp_master(domainname, "passwd.byname", &master)) != 0) {
+ 		pam_syslog(pamh, LOG_WARNING, "can't find the master ypserver: %s",
+diff --git a/modules/pam_unix/support.c b/modules/pam_unix/support.c
+index 8a8eb695..34d27397 100644
+--- a/modules/pam_unix/support.c
++++ b/modules/pam_unix/support.c
+@@ -384,7 +384,7 @@ int _unix_getpwnam(pam_handle_t *pamh, const char *name,
+ 		}
+ 	}
+ 
+-#if defined(HAVE_NIS) && defined(HAVE_YP_GET_DEFAULT_DOMAIN) && defined (HAVE_YP_BIND) && defined (HAVE_YP_MATCH) && defined (HAVE_YP_UNBIND)
++#if defined(HAVE_NIS)
+ 	if (!matched && nis) {
+ 		char *userinfo = NULL, *domain = NULL;
+ 		int len = 0, i;
+-- 
+2.52.0
+

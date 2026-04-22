@@ -3,7 +3,7 @@
 
 Name:             hawtjni
 Version:          1.18
-Release:          17%{?dist}
+Release: 18%{?dist}
 Summary:          Code generator that produces the JNI code
 # Maven plugin is under ASL 2.0.
 # stdint.h, shipped in JAR as resource, used only with M$ VC++, is under BSD.

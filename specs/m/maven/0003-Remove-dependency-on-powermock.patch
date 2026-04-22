@@ -1,0 +1,89 @@
+From ad1e669b96a5d251c36384e89d535b9c712a6246 Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Thu, 5 Sep 2019 15:21:04 +0200
+Subject: [PATCH 3/3] Remove dependency on powermock
+
+---
+ .../StringSearchModelInterpolatorTest.java    | 59 -------------------
+ 1 file changed, 59 deletions(-)
+
+diff --git a/maven-model-builder/src/test/java/org/apache/maven/model/interpolation/StringSearchModelInterpolatorTest.java b/maven-model-builder/src/test/java/org/apache/maven/model/interpolation/StringSearchModelInterpolatorTest.java
+index b2612e540..20b7162e2 100644
+--- a/maven-model-builder/src/test/java/org/apache/maven/model/interpolation/StringSearchModelInterpolatorTest.java
++++ b/maven-model-builder/src/test/java/org/apache/maven/model/interpolation/StringSearchModelInterpolatorTest.java
+@@ -35,8 +35,6 @@
+ import static org.hamcrest.CoreMatchers.anyOf;
+ import static org.hamcrest.CoreMatchers.is;
+ import static org.junit.Assert.assertThat;
+-import static org.powermock.reflect.Whitebox.getField;
+-import static org.powermock.reflect.Whitebox.getInternalState;
+ 
+ /**
+  * @author jdcasey
+@@ -344,63 +342,6 @@ public void testInterpolateObjectWithPomFile() throws Exception {
+                         is(System.getProperty("user.dir") + File.separator + '.' + File.separator + "target"))));
+     }
+ 
+-    public void testNotInterpolateObjectWithFile() throws Exception {
+-        Model model = new Model();
+-
+-        File baseDir = new File(System.getProperty("user.dir"));
+-
+-        Properties p = new Properties();
+-
+-        ObjectWithNotInterpolatedFile obj = new ObjectWithNotInterpolatedFile(baseDir);
+-
+-        StringSearchModelInterpolator interpolator = (StringSearchModelInterpolator) createInterpolator();
+-
+-        ModelBuildingRequest config = createModelBuildingRequest(p);
+-
+-        SimpleProblemCollector collector = new SimpleProblemCollector();
+-        interpolator.interpolateObject(obj, model, new File("."), config, collector);
+-        assertProblemFree(collector);
+-
+-        //noinspection unchecked
+-        Map<Class<?>, ?> cache = (Map<Class<?>, ?>)
+-                getField(StringSearchModelInterpolator.class, "CACHED_ENTRIES").get(null);
+-
+-        Object objCacheItem = cache.get(Object.class);
+-        Object fileCacheItem = cache.get(File.class);
+-
+-        assertNotNull(objCacheItem);
+-        assertNotNull(fileCacheItem);
+-
+-        assertThat(((Object[]) getInternalState(objCacheItem, "fields")).length, is(0));
+-        assertThat(((Object[]) getInternalState(fileCacheItem, "fields")).length, is(0));
+-    }
+-
+-    public void testNotInterpolateFile() throws Exception {
+-        Model model = new Model();
+-
+-        File baseDir = new File(System.getProperty("user.dir"));
+-
+-        Properties p = new Properties();
+-
+-        StringSearchModelInterpolator interpolator = (StringSearchModelInterpolator) createInterpolator();
+-
+-        ModelBuildingRequest config = createModelBuildingRequest(p);
+-
+-        SimpleProblemCollector collector = new SimpleProblemCollector();
+-        interpolator.interpolateObject(baseDir, model, new File("."), config, collector);
+-        assertProblemFree(collector);
+-
+-        //noinspection unchecked
+-        Map<Class<?>, ?> cache = (Map<Class<?>, ?>)
+-                getField(StringSearchModelInterpolator.class, "CACHED_ENTRIES").get(null);
+-
+-        Object fileCacheItem = cache.get(File.class);
+-
+-        assertNotNull(fileCacheItem);
+-
+-        assertThat(((Object[]) getInternalState(fileCacheItem, "fields")).length, is(0));
+-    }
+-
+     public void testConcurrentInterpolation() throws Exception {
+         final Model model = new Model();
+ 
+-- 
+2.39.2
+

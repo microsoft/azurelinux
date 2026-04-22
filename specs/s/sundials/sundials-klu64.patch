@@ -1,0 +1,43 @@
+--- a/cmake/tpl/FindKLU.orig.cmake	2021-09-30 21:05:25.000000000 +0200
++++ b/cmake/tpl/FindKLU.cmake	2023-03-03 21:28:45.354177379 +0100
+@@ -82,35 +82,35 @@
+ 
+ else()
+   # find library with user provided directory path
+-  set(KLU_LIBRARY_NAME klu)
++  set(KLU_LIBRARY_NAME klu64)
+   find_library(KLU_LIBRARY ${KLU_LIBRARY_NAME} ${KLU_LIBRARY_DIR}
+                NO_DEFAULT_PATH)
+ endif()
+ mark_as_advanced(KLU_LIBRARY)
+ 
+ if(NOT AMD_LIBRARY)
+-  set(AMD_LIBRARY_NAME amd)
++  set(AMD_LIBRARY_NAME amd64)
+   find_library(AMD_LIBRARY ${AMD_LIBRARY_NAME} ${KLU_LIBRARY_DIR}
+                NO_DEFAULT_PATH)
+   mark_as_advanced(AMD_LIBRARY)
+ endif()
+ 
+ if(NOT COLAMD_LIBRARY)
+-  set(COLAMD_LIBRARY_NAME colamd)
++  set(COLAMD_LIBRARY_NAME colamd64)
+   find_library(COLAMD_LIBRARY ${COLAMD_LIBRARY_NAME} ${KLU_LIBRARY_DIR}
+                NO_DEFAULT_PATH)
+   mark_as_advanced(COLAMD_LIBRARY)
+ endif()
+ 
+ if(NOT BTF_LIBRARY)
+-  set(BTF_LIBRARY_NAME btf)
++  set(BTF_LIBRARY_NAME btf64)
+   find_library(BTF_LIBRARY ${BTF_LIBRARY_NAME} ${KLU_LIBRARY_DIR}
+                NO_DEFAULT_PATH)
+   mark_as_advanced(BTF_LIBRARY)
+ endif()
+ 
+ if(NOT SUITESPARSECONFIG_LIBRARY)
+-  set(SUITESPARSECONFIG_LIBRARY_NAME suitesparseconfig)
++  set(SUITESPARSECONFIG_LIBRARY_NAME suitesparseconfig64)
+   # NOTE: no prefix for this library on windows
+   if(MSVC OR ("${CMAKE_C_SIMULATE_ID}" STREQUAL "MSVC"))
+     set(CMAKE_FIND_LIBRARY_PREFIXES "")

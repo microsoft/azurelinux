@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/erlang.azl.macros}
+
 %global need_bootstrap_set 1
 
 %{!?need_bootstrap: %global need_bootstrap %{need_bootstrap_set}}
@@ -72,7 +75,7 @@
 
 Name:		erlang
 Version:	26.2.5.17
-Release:	1%{?dist}
+Release: 2%{?dist}
 Summary:	General-purpose programming language and runtime environment
 
 License:	Apache-2.0
@@ -86,6 +89,7 @@ Source8:	epmd@.socket
 # These files are intended for Fedora package maintainers only.
 Source998:	otp-make-subpackages.py
 Source999:	otp-get-patches.sh
+Source9999: erlang.azl.macros
 
 # For the source of the Fedora specific patches, see the respective
 # branch at https://github.com/lemenkov/otp

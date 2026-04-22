@@ -12,7 +12,7 @@
 Name:           libppd
 Epoch:          1
 Version:        2.1.1
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Library for retro-fitting legacy printer drivers
 
 # the CUPS exception text is the same as LLVM exception, so using that name with

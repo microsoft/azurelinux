@@ -33,7 +33,7 @@
 
 Name:           hipcub
 Version:        %{rocm_version}
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        ROCm port of CUDA CUB library
 
 Url:            https://github.com/ROCm

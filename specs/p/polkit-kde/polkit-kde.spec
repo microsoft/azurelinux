@@ -6,7 +6,7 @@
 Name:    polkit-kde
 Summary: PolicyKit integration for KDE Desktop
 Version: 6.6.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 License: GPL-2.0-or-later AND CC0-1.0
 URL:     https://invent.kde.org/plasma/%{base_name}

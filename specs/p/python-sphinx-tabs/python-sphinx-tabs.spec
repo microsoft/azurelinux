@@ -6,7 +6,7 @@
 
 Name:           python-sphinx-tabs
 Version:        3.4.7
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        Tabbed views for Sphinx
 # SPDX
 License:        MIT

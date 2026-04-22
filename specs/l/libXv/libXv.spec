@@ -8,7 +8,7 @@
 Summary: X.Org X11 libXv runtime library
 Name:    libXv
 Version: 1.0.13
-Release: 3%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
+Release: 4%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
 License: SMLNJ AND HPND-sell-variant
 URL: http://www.x.org
 

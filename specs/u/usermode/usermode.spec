@@ -12,7 +12,7 @@
 Summary: Tools for certain user account management tasks
 Name: usermode
 Version: 1.114
-Release: 13%{?dist}
+Release: 14%{?dist}
 License: GPL-2.0-or-later
 URL: https://pagure.io/%{name}/
 Source: https://releases.pagure.org/%{name}/%{name}-%{version}.tar.xz

@@ -10,7 +10,7 @@
 
 Name:           glibmm2.4
 Version:        2.66.8
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        C++ interface for the GLib library
 
 # Library sources are LGPL 2.1+, tools used to generate sources are GPL 2+.

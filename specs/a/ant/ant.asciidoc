@@ -1,0 +1,170 @@
+ant(1)
+======
+:doctype:       manpage
+:man source:    ANT
+:man manual:    Apache Ant
+
+NAME
+----
+ant - Java build tool
+
+SYNOPSIS
+--------
+*ant* [OPTIONS] [TARGET [TARGET2 [TARGET3] ...]]
+
+DESCRIPTION
+-----------
+Apache Ant is a Java library and command-line tool whose mission is to drive
+processes described in build files as targets and extension points dependent
+upon each other. The main known usage of Ant is the build of Java applications.
+Ant supplies a number of built-in tasks allowing to compile, assemble, test and
+run Java applications. Ant can also be used effectively to build non Java
+applications, for instance C or C++ applications. More generally, Ant can be
+used to pilot any type of process which can be described in terms of targets
+and tasks.
+
+USAGE
+-----
+When no arguments are specified, Ant looks for a build.xml file in the current
+directory and, if found, uses that file as the build file and runs the target
+specified in the default attribute of the <project> tag. To make Ant use
+a build file other than build.xml, use the command-line option *-buildfile*
+file, where file is the name of the build file you want to use (or a directory
+containing a build.xml file).
+
+If you use the *-find* [file] option, Ant will search for a build file first in
+the current directory, then in the parent directory, and so on, until either
+a build file is found or the root of the filesystem has been reached. By
+default, it will look for a build file called build.xml. To have it search for
+a build file other than build.xml, specify a file argument. Note: If you
+include any other flags or arguments on the command line after the *-find*
+flag, you must include the file argument for the *-find* flag, even if the name
+of the build file you want to find is build.xml.
+
+You can also set properties on the command line. This can be done with the
+*-Dproperty*=value option, where property is the name of the property, and
+value is the value for that property. If you specify a property that is also
+set in the build file (see the property task), the value specified on the
+command line will override the value specified in the build file. Defining
+properties on the command line can also be used to pass in the value of
+environment variables; just pass *-DMYVAR*=$MYVAR to Ant. You can then access
+these variables inside your build file as ${MYVAR}. You can also access
+environment variables using the property task's environment attribute.
+
+Options that affect the amount of logging output by Ant are: *-quiet*, which
+instructs Ant to print less information to the console; *-verbose*, which
+causes Ant to print additional information to the console; *-debug*, which
+causes Ant to print considerably more additional information; and *-silent*
+which makes Ant print nothing but task output and build failures (useful to
+capture Ant output by scripts).
+
+It is also possible to specify one or more targets that should be executed.
+When omitted, the target that is specified in the default attribute of the
+project tag is used.
+
+The *-projecthelp* option prints out a list of the build file's targets.
+Targets that include a description attribute are listed as "Main targets",
+those without a description are listed as "Other targets", then the "Default"
+target is listed ("Other targets" are only displayed if there are no main
+targets, or if Ant is invoked in *-verbose* or *-debug* mode).
+
+OPTIONS
+-------
+
+*-help, -h*::
+print this message and exit
+*-projecthelp, -p*::
+print project help information and exit
+*-version*::
+print the version information and exit
+*-diagnostics*::
+print information that might be helpful to diagnose or report problems and exit
+*-quiet, -q*::
+be extra quiet
+*-silent, -S*::
+print nothing but task outputs and build failures
+*-verbose, -v*::
+be extra verbose
+*-debug, -d*::
+print debugging information
+*-emacs, -e*::
+produce logging information without adornments
+*-lib <path>*::
+specifies a path to search for jars and classes
+*-logfile <file>, -l <file>*::
+use given file for log
+*-logger <classname>*::
+the class which is to perform logging
+*-listener <classname>*::
+add an instance of class as a project listener
+*-noinput*::
+do not allow interactive input
+*-buildfile <file>, -file <file>, -f <file>*::
+use given buildfile
+*-D<property>=<value>*::
+use value for given property
+*-keep-going, -k*::
+execute all targets that do not depend on failed target(s)
+*-propertyfile <name>*::
+load all properties from file with *-D* properties taking precedence
+*-inputhandler <class>*::
+the class which will handle input requests
+*-find <file>, -f <file>*::
+search for buildfile towards the root of the filesystem and use it
+*-nice number*::
+A niceness value for the main thread:
+1 (lowest) to 10 (highest); 5 is the default
+*-nouserlib*::
+Run ant without using the jar files from `${user.home}/.ant/lib`
+*-noclasspath*::
+Run ant without using `CLASSPATH`
+*-autoproxy*::
+Java1.5+: use the OS proxy settings
+*-main <class>*::
+override Ant's normal entry point
+
+EXAMPLES
+--------
+*ant*::
+
+runs Ant using the build.xml file in the current directory, on the default target.
+
+*ant -buildfile test.xml*::
+
+runs Ant using the test.xml file in the current directory, on the default target.
+
+*ant -buildfile test.xml dist*::
+
+runs Ant using the test.xml file in the current directory, on the target called dist.
+
+*ant -buildfile test.xml -Dbuild=build/classes dist*::
+
+runs Ant using the test.xml file in the current directory, on the target called dist, setting the build property to the value "build/classes".
+
+*ant -lib /home/ant/extras*::
+
+runs Ant picking up additional task and support jars from the /home/ant/extras location
+
+*ant -lib one.jar;another.jar*::
+
+adds two jars to Ants classpath.
+
+FILES
+-----
+The Ant wrapper script for Unix will source (read and evaluate) the file *~/.antrc* before it does anything. You can use the file, for example, to set/unset environment variables that should only be visible during the execution of Ant.
+
+ENVIRONMENT VARIABLES
+---------------------
+The wrapper scripts use the following environment variables (if set):
+
+JAVACMD::
+full path of the Java executable. Use this to invoke a different JVM than JAVA_HOME/bin/java.
+ANT_OPTS::
+command-line arguments that should be passed to the JVM. For example, you can define system properties or set the maximum Java heap size here.
+ANT_ARGS::
+Ant command-line arguments. For example, set ANT_ARGS to point to a different logger, include a listener, and to include the *-find* flag.
+Note: If you include *-find* in ANT_ARGS, you should include the name of the build file to find, even if the file is called build.xml.
+
+SEE ALSO
+--------
+java(1), make(1), mvn(1)

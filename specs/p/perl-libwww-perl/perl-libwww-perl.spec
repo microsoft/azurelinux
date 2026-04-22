@@ -8,7 +8,7 @@
 
 Name:           perl-libwww-perl
 Version:        6.81
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        A Perl interface to the World-Wide Web
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/libwww-perl

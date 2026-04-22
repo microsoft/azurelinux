@@ -1,0 +1,42 @@
+From 4820f2bb2f960e2f8e50b49842b506626869ed4b Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Mon, 5 Feb 2024 01:01:29 -0500
+Subject: [PATCH 1/2] Don't try to import all of tools
+
+We delete gopls to package it separately, so 'all of tools' is unavailable.
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ internal/gcimporter/stdlib_test.go | 9 ---------
+ 1 file changed, 9 deletions(-)
+
+diff --git a/internal/gcimporter/stdlib_test.go b/internal/gcimporter/stdlib_test.go
+index 85547a49d..d6a424e78 100644
+--- a/internal/gcimporter/stdlib_test.go
++++ b/internal/gcimporter/stdlib_test.go
+@@ -9,7 +9,6 @@ import (
+ 	"fmt"
+ 	"go/token"
+ 	"go/types"
+-	"runtime"
+ 	"testing"
+ 	"unsafe"
+ 
+@@ -39,14 +38,6 @@ func testStdlib(t *testing.T) {
+ 	cfg := &packages.Config{Mode: packages.LoadAllSyntax}
+ 	patterns := []string{"std"}
+ 	minPkgs := 225 // 'GOOS=plan9 go1.18 list std | wc -l' reports 228; most other platforms have more.
+-	switch runtime.GOOS {
+-	case "android", "ios":
+-		// The go_.*_exec script for mobile builders only copies over the source tree
+-		// for the package under test.
+-	default:
+-		patterns = append(patterns, "golang.org/x/tools/...")
+-		minPkgs += 160 // At the time of writing, 'GOOS=plan9 go list ./... | wc -l' reports 188.
+-	}
+ 	pkgs, err := packages.Load(cfg, patterns...)
+ 	if err != nil {
+ 		t.Fatalf("failed to load/parse/type-check: %v", err)
+-- 
+2.50.0
+

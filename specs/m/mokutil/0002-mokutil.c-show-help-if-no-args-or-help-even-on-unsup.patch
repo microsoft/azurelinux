@@ -1,0 +1,45 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leonardo Sandoval <lsandova@redhat.com>
+Date: Fri, 25 Oct 2024 13:53:05 -0600
+Subject: [PATCH] mokutil.c: show help if no args or --help even on unsupported
+ system
+
+Signed-off-by: Leo Sandoval <lsandova@redhat.com>
+---
+ src/mokutil.c | 19 +++++++++++++++----
+ 1 file changed, 15 insertions(+), 4 deletions(-)
+
+diff --git a/src/mokutil.c b/src/mokutil.c
+index cb06be2..2da211d 100644
+--- a/src/mokutil.c
++++ b/src/mokutil.c
+@@ -2156,14 +2156,25 @@ main (int argc, char *argv[])
+ 	if (pw_hash_file && use_root_pw)
+ 		command |= HELP;
+ 
+-	if (!(command & HELP) && !efi_variables_supported ()) {
+-		fprintf (stderr, "EFI variables are not supported on this system\n");
+-		exit (1);
+-	}
+ 
+ 	if (db_name != MOK_LIST_RT && !(command & ~MOKX))
+ 		command |= LIST_ENROLLED;
+ 
++	/* no matter if mokutil is supported (EFI) or not (BIOS) in the system, print
++	   the help menu if no command line arguments provided or explicit help
++	   requested */
++	if (!command || (command & HELP)) {
++		print_help ();
++		ret = 0;
++		goto out;
++	}
++
++	/* check if EFI is supported on the system */
++	if (!efi_variables_supported ()) {
++		fprintf (stderr, "EFI variables are not supported on this system\n");
++		exit (1);
++	}
++
+ 	sb_check = !(command & HELP || command & TEST_KEY ||
+ 		     command & VERBOSITY || command & TIMEOUT ||
+ 		     command & FB_VERBOSITY || command & FB_NOREBOOT);

@@ -3,7 +3,7 @@
 
 Name:           glade
 Version:        3.40.0
-Release:        13%{?dist}
+Release: 14%{?dist}
 Summary:        User Interface Designer for GTK+
 
 # - /usr/bin/glade is GPLv2+

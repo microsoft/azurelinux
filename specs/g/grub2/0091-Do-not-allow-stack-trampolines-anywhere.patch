@@ -1,0 +1,38 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Fri, 12 Jul 2019 10:06:50 +0200
+Subject: [PATCH] Do not allow stack trampolines, anywhere.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ configure.ac         | 3 +++
+ conf/Makefile.common | 2 +-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 81240397384..ae7683d0693 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -2155,6 +2155,9 @@ if test x"$enable_wextra" != xno ; then
+   HOST_CFLAGS="$HOST_CFLAGS -Wextra"
+ fi
+ 
++TARGET_CFLAGS="$TARGET_CFLAGS -Werror=trampolines -fno-trampolines"
++HOST_CFLAGS="$HOST_CFLAGS -Werror=trampolines -fno-trampolines"
++
+ TARGET_CPP="$TARGET_CC -E"
+ TARGET_CCAS=$TARGET_CC
+ 
+diff --git a/conf/Makefile.common b/conf/Makefile.common
+index e53ff352407..91ff6c905fb 100644
+--- a/conf/Makefile.common
++++ b/conf/Makefile.common
+@@ -76,7 +76,7 @@ grubconfdir = $(sysconfdir)/grub.d
+ platformdir = $(pkglibdir)/$(target_cpu)-$(platform)
+ starfielddir = $(pkgdatadir)/themes/starfield
+ 
+-CFLAGS_GNULIB = -Wno-undef -Wno-error=sign-compare -Wno-unused -Wno-unused-parameter -Wno-redundant-decls -Wno-unreachable-code -Wno-error=attributes
++CFLAGS_GNULIB = -Wno-undef -Wno-error=sign-compare -Wno-unused -Wno-unused-parameter -Wno-redundant-decls -Wno-unreachable-code -Wno-error=attributes -Werror=trampolines -fno-trampolines
+ CPPFLAGS_GNULIB = -I$(top_builddir)/grub-core/lib/gnulib -I$(top_srcdir)/grub-core/lib/gnulib
+ 
+ CFLAGS_POSIX = -fno-builtin

@@ -10,7 +10,7 @@ Name: hunspell-quh
 Summary: Quechua, South Bolivia hunspell dictionaries
 %global upstreamid 20110816
 Version: 0.%{upstreamid}
-Release: 31%{?dist}
+Release: 32%{?dist}
 # Following links are dead now
 # don't report any bugs
 Source: http://www.runasimipi.org/quh_BO-pack.zip

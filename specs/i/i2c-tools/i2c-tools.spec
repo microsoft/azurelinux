@@ -9,7 +9,7 @@
 
 Name:           i2c-tools
 Version:        4.4
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        A heterogeneous set of I2C tools for Linux
 # Note: py-symbus/ is GPL-2.0-only, lib/ is LGPL-2.1-or-later
 # and the rest is GPL-2.0-or-later

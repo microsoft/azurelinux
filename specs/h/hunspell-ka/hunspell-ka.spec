@@ -4,7 +4,7 @@
 Name: hunspell-ka
 Summary: Georgian hunspell dictionaries
 Version: 0.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 Source: ka_GE-%{version}.tar.gz
 URL: https://github.com/gamag/ka_GE.spell/archive/refs/tags/0.1.tar.gz
 License: MIT AND CC-BY-4.0

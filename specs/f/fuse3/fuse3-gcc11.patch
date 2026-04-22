@@ -1,0 +1,12 @@
+diff --git a/example/cxxopts.hpp b/example/cxxopts.hpp
+index 6fd170d..6906e3b 100644
+--- a/example/cxxopts.hpp
++++ b/example/cxxopts.hpp
+@@ -37,6 +37,7 @@ THE SOFTWARE.
+ #include <unordered_map>
+ #include <unordered_set>
+ #include <vector>
++#include <limits>
+ 
+ #ifdef __cpp_lib_optional
+ #include <optional>

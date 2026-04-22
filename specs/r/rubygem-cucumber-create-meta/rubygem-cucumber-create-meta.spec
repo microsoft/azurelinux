@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 6.0.1
-Release: 10%{?dist}
+Release: 11%{?dist}
 Summary: Produce the meta message for Cucumber Ruby
 License: MIT
 URL: https://github.com/cucumber/create-meta-ruby

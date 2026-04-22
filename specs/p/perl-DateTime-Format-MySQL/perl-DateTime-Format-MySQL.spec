@@ -6,7 +6,7 @@
 
 Name:           perl-DateTime-Format-MySQL
 Version:        %{rpm_version}
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        Parse and format MySQL dates and times
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/DateTime-Format-MySQL

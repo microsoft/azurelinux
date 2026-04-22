@@ -1,13 +1,22 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/azurelinux-repos.azl.macros}
+
 %global evergreen_major 5
 %global evergreen_release %{evergreen_major}.0
+
+# Select between split and unified repo URL layouts.
+# Split: repos are under .../base/{$basearch,debuginfo,srpms} (e.g. release builds).
+# Unified: repos are directly under .../{$basearch,debuginfo,srpms} (e.g. daily builds).
+# Enable with: --with split_repos   (or build.with in comp.toml)
+%bcond split_repos 0
 
 Summary:        Azure Linux package repositories
 Name:           azurelinux-repos
 Version:        4.0
-Release:        4%{?dist}
+Release: 7%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -22,10 +31,12 @@ BuildArch:      noarch
 BuildRequires:  gnupg sed rpm
 
 Source1:        archmap
-Source2:        azurelinux.repo
+Source2:        azurelinux-unified.repo.in
 Source3:        azurelinux-evergreen.repo
+Source4:        azurelinux-split.repo.in
 
 Source10:       RPM-GPG-KEY-azurelinux-4.0-primary
+Source9999: azurelinux-repos.azl.macros
 
 # When bumping Evergreen to fN, create N+1 key (and update archmap). (This
 # ensures users have the next future key installed and referenced, even if they
@@ -97,9 +108,13 @@ popd
 
 # Install repo files
 install -d -m 755 $RPM_BUILD_ROOT/etc/yum.repos.d
-for file in %{_sourcedir}/azurelinux*repo ; do
-  install -m 644 $file $RPM_BUILD_ROOT/etc/yum.repos.d
-done
+install -m 644 %{_sourcedir}/azurelinux-evergreen.repo $RPM_BUILD_ROOT/etc/yum.repos.d/azurelinux-evergreen.repo
+# Select stable repo template based on the split_repos knob.
+%if %{with split_repos}
+install -m 644 %{_sourcedir}/azurelinux-split.repo.in $RPM_BUILD_ROOT/etc/yum.repos.d/azurelinux.repo
+%else
+install -m 644 %{_sourcedir}/azurelinux-unified.repo.in $RPM_BUILD_ROOT/etc/yum.repos.d/azurelinux.repo
+%endif
 
 # Enable or disable repos based on current release cycle state.
 %if "%{evergreen_release}" == "%{version}"
@@ -116,16 +131,20 @@ for repo in $RPM_BUILD_ROOT/etc/yum.repos.d/azurelinux.repo; do
     sed -i "s/^enabled=AUTO_VALUE$/enabled=${stable_enabled}/" $repo || exit 1
 done
 
-# Update BASE_REPO_URI in azurelinux.repo; compute based on dist tag.
-# Extract the last dot-delimited segment from %%dist (e.g. "20260303" from ".azl4~bootstrap.20260303").
-# If the segment doesn't contain an 8-digit date, fall back to a hard-coded URI.
-date_segment=$(echo '%{dist}' | awk -F. '{print $NF}')
-if echo "$date_segment" | grep -qE '[0-9]{8}'; then
-    base_repo_uri="https://stcontroltowerdevjwisitg.blob.core.windows.net/daily-repo-dev/${date_segment}"
+# Compute REPO_URI_PREFIX for the stable repo file.
+# If repo_uri_prefix macro is explicitly set, use it directly.
+# Otherwise, auto-compute from %%dist date stamp (daily-build default).
+%if 0%{?repo_uri_prefix:1}
+repo_uri_prefix='%{repo_uri_prefix}'
+%else
+date_segment=$(echo '%{dist}' | grep -oE '[0-9]{8}' || true)
+if [ -n "$date_segment" ]; then
+    repo_uri_prefix="https://stcontroltowerdevjwisitg.blob.core.windows.net/daily-repo-dev/${date_segment}"
 else
-    base_repo_uri='https://packages.microsoft.com/azurelinux/$releasever/prod/base'
+    repo_uri_prefix='https://packages.microsoft.com/azurelinux/$releasever/prod/base'
 fi
-sed -i "s|BASE_REPO_URI|${base_repo_uri}|" $RPM_BUILD_ROOT/etc/yum.repos.d/azurelinux.repo
+%endif
+sed -i "s|REPO_URI_PREFIX|${repo_uri_prefix}|" $RPM_BUILD_ROOT/etc/yum.repos.d/azurelinux.repo
 
 # Adjust Evergreen repo files to include Evergreen+1 GPG key.
 # This is necessary for the period when Evergreen gets bumped to N+1 and packages
@@ -155,7 +174,7 @@ exit 0
 
 # Make sure all repo variables were substituted
 for repo in $RPM_BUILD_ROOT/etc/yum.repos.d/*.repo; do
-    if grep -q AUTO_VALUE $repo; then
+    if grep -qE 'AUTO_VALUE|REPO_URI_PREFIX' $repo; then
         echo "ERROR: Repo $repo contains an unsubstituted placeholder value"
         exit 1
     fi
@@ -264,6 +283,16 @@ rm -f "$TMPRING"
 
 
 %changelog
+* Tue Apr 21 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-6
+- Consolidate repo templates: azurelinux-unified.repo.in and azurelinux-split.repo.in.
+- Add split_repos bcond to select between unified and split URL layouts.
+- Add repo_uri_prefix macro to override the auto-computed repo URI prefix.
+- Only one azurelinux.repo file ships, selected by split_repos at build time.
+- Fix dist tag date extraction to tolerate missing date (grep || true).
+
+* Mon Apr 13 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-5
+- Fix dist tag date extraction to handle tilde-only forms (e.g. ".azl4~20260412").
+
 * Wed Mar 25 2026 Sam Meluch <sammeluch@microsoft.com> - 4.0-4
 - Update .repo files for daily repo publishing to dev blob storage.
 

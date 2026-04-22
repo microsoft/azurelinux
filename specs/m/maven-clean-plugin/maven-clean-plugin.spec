@@ -3,7 +3,7 @@
 
 Name:           maven-clean-plugin
 Version:        3.3.2
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        Maven Clean Plugin
 License:        Apache-2.0
 URL:            http://maven.apache.org/plugins/maven-clean-plugin/

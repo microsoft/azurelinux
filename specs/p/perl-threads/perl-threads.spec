@@ -5,7 +5,7 @@
 Name:           perl-threads
 Epoch:          1
 Version:        2.43
-Release:        520%{?dist}
+Release: 521%{?dist}
 Summary:        Perl interpreter-based threads
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/threads

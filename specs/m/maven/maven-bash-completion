@@ -1,0 +1,90 @@
+_m2_make_goals()
+{
+  plugin=$1
+  mojos=$2
+  for mojo in $mojos
+  do
+    export goals="$goals $plugin:$mojo"
+  done
+}
+
+_m2_complete()
+{
+  local cur goals
+
+  COMPREPLY=()
+  cur="${COMP_WORDS[COMP_CWORD]}"
+  prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+  case "${prev}" in
+       -f | --file|-l|--log-file)
+              COMPREPLY=( $(compgen -f ${cur}) )
+              return 0
+       ;;
+       *);;
+  esac
+
+
+  goals='clean compile test install package deploy site verify'
+  if [[ ${cur} == -* ]] ; then
+     goals="$goals -am --also-make
+                   -amd --also-make-dependents
+                   -B --batch-mode
+                   -C --strict-checksums
+                   -c --lax-checksums
+                   -cpu --check-plugin-updates
+                   -D --define
+                   -e --errors
+                   -emp --encrypt-master-password
+                   -ep --encrypt-password
+                   -f --file
+                   -fae --fail-at-end
+                   -ff --fail-fast
+                   -fn --fail-never
+                   -gs --global-settings
+                   -h --help
+                   -l --log-file
+                   -N --non-recursive
+                   -npr --no-plugin-registry
+                   -npu --no-plugin-updates
+                   -nsu --no-snapshot-updates
+                   -o --offline
+                   -P --activate-profiles
+                   -pl --projects
+                   -q --quiet
+                   -rf --resume-from
+                   -s --settings
+                   -T --threads
+                   -t --toolchains
+                   -U --update-snapshots
+                   -up --update-plugins
+                   -V --show-version
+                   -v --version
+                   -X --debug
+                   -Dmaven.test.skip=true
+                   -Dmaven.compiler.source=1.5
+                   -Dmaven.compiler.source=1.6
+                   -Dmaven.compiler.source=1.7
+                   -Dmaven.compiler.target=1.5
+                   -Dmaven.compiler.target=1.6
+                   -Dmaven.compiler.target=1.7
+                   -Dproject.build.sourceEncoding=UTF-8
+                   -Dmaven.repo.local=
+                   -Dmaven.local.depmap.file=
+                   -Dmaven.local.debug=true
+                   -Dmaven.local.mode=true"
+  fi
+
+  goals=$goals _m2_make_goals "eclipse" "eclipse"
+  goals=$goals _m2_make_goals "idea" "idea"
+  goals=$goals _m2_make_goals "assembly" "assembly"
+  goals=$goals _m2_make_goals "plexus" "app bundle-application bundle-runtime descriptor runtime service"
+  goals=$goals _m2_make_goals "dependency" "analyze analyze-dep-mgt analyze-only analyze-report analyze-duplicate
+                                           build-classpath copy copy-dependencies get go-offline list properties
+                                           purge-local-repository resolve resolve-plugins sources tree unpack
+                                           unpack-dependencies"
+  cur=`echo $cur | sed 's/\\\\//g'`
+  COMPREPLY=($(compgen -W "${goals}" -- ${cur} | sed 's/\\\\//g') )
+}
+
+complete -F _m2_complete -o filenames mvn

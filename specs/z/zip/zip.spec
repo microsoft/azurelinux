@@ -4,7 +4,7 @@
 Summary: A file compression and packaging utility compatible with PKZIP
 Name: zip
 Version: 3.0
-Release: 44%{?dist}
+Release: 45%{?dist}
 License: Info-ZIP
 Source: http://downloads.sourceforge.net/infozip/zip30.tar.gz
 URL: http://www.info-zip.org/Zip.html

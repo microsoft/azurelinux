@@ -3,7 +3,7 @@
 
 Name:           chkrootkit
 Version:        0.58
-Release:        1b%{?dist}
+Release: 2b%{?dist}
 Summary:        Tool to locally check for signs of a rootkit
 License:        BSD-2-Clause AND GPL-2.0-or-later
 URL:            http://www.chkrootkit.org

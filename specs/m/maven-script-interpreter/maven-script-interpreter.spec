@@ -4,7 +4,7 @@
 %bcond_with     groovy
 Name:           maven-script-interpreter
 Version:        1.3
-Release:        14%{?dist}
+Release: 15%{?dist}
 Summary:        Maven Script Interpreter
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.
 License:        Apache-2.0

@@ -5,7 +5,7 @@ Name: hyphen-ga
 Summary: Irish hyphenation rules
 %global upstreamid 20040220
 Version: 0.%{upstreamid}
-Release: 33%{?dist}
+Release: 34%{?dist}
 Source: http://download.services.openoffice.org/contrib/dictionaries/hyph_ga_IE.zip
 URL: http://borel.slu.edu/fleiscin/index.html
 License: GPL-1.0-or-later

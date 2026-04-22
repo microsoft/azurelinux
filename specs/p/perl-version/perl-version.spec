@@ -12,7 +12,7 @@ Name:           perl-version
 Epoch:          9
 Version:        0.99.33
 %global module_version 0.9933
-Release:        521%{?dist}
+Release: 522%{?dist}
 Summary:        Perl extension for Version Objects
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/version

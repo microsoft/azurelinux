@@ -35,7 +35,7 @@
 
 Name:		nvml
 Version:	%{upstreamversion}
-Release:	4%{?dist}
+Release: 5%{?dist}
 Summary:	Persistent Memory Development Kit (formerly NVML)
 License:	BSD-3-Clause
 URL:		http://pmem.io/pmdk

@@ -1,0 +1,55 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Lidong Chen <lidong.chen@oracle.com>
+Date: Tue, 21 Jan 2025 19:02:39 +0000
+Subject: [PATCH] misc: Ensure consistent overflow error messages
+
+Update the overflow error messages to make them consistent
+across the GRUB code.
+
+Signed-off-by: Lidong Chen <lidong.chen@oracle.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/fs/ntfs.c           | 2 +-
+ grub-core/fs/ntfscomp.c       | 2 +-
+ grub-core/video/readers/png.c | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/grub-core/fs/ntfs.c b/grub-core/fs/ntfs.c
+index e00349b1d..960833a34 100644
+--- a/grub-core/fs/ntfs.c
++++ b/grub-core/fs/ntfs.c
+@@ -574,7 +574,7 @@ retry:
+ 	      goto retry;
+ 	    }
+ 	}
+-      return grub_error (GRUB_ERR_BAD_FS, "run list overflown");
++      return grub_error (GRUB_ERR_BAD_FS, "run list overflow");
+     }
+   ctx->curr_vcn = ctx->next_vcn;
+   ctx->next_vcn += read_run_data (run, c1, 0);	/* length of current VCN */
+diff --git a/grub-core/fs/ntfscomp.c b/grub-core/fs/ntfscomp.c
+index f168a318e..b68bf5e40 100644
+--- a/grub-core/fs/ntfscomp.c
++++ b/grub-core/fs/ntfscomp.c
+@@ -30,7 +30,7 @@ static grub_err_t
+ decomp_nextvcn (struct grub_ntfs_comp *cc)
+ {
+   if (cc->comp_head >= cc->comp_tail)
+-    return grub_error (GRUB_ERR_BAD_FS, "compression block overflown");
++    return grub_error (GRUB_ERR_BAD_FS, "compression block overflow");
+   if (grub_disk_read
+       (cc->disk,
+        (cc->comp_table[cc->comp_head].next_lcn -
+diff --git a/grub-core/video/readers/png.c b/grub-core/video/readers/png.c
+index 3163e97bf..aa7524b7d 100644
+--- a/grub-core/video/readers/png.c
++++ b/grub-core/video/readers/png.c
+@@ -626,7 +626,7 @@ static grub_err_t
+ grub_png_output_byte (struct grub_png_data *data, grub_uint8_t n)
+ {
+   if (--data->raw_bytes < 0)
+-    return grub_error (GRUB_ERR_BAD_FILE_TYPE, "image size overflown");
++    return grub_error (GRUB_ERR_BAD_FILE_TYPE, "image size overflow");
+ 
+   if (data->cur_column == 0)
+     {

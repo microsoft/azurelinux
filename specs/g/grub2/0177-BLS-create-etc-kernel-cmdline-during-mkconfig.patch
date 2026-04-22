@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Robbie Harwood <rharwood@redhat.com>
+Date: Tue, 2 Aug 2022 15:56:28 -0400
+Subject: [PATCH] BLS: create /etc/kernel/cmdline during mkconfig
+
+Signed-off-by: Robbie Harwood <rharwood@redhat.com>
+---
+ util/grub.d/10_linux.in | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
+index 360ce26e5f9..a6568caf7d1 100644
+--- a/util/grub.d/10_linux.in
++++ b/util/grub.d/10_linux.in
+@@ -163,6 +163,12 @@ update_bls_cmdline()
+     local cmdline="root=${LINUX_ROOT_DEVICE} ro ${GRUB_CMDLINE_LINUX} ${GRUB_CMDLINE_LINUX_DEFAULT}"
+     local -a files=($(get_sorted_bls))
+ 
++    if [[ ! -f /etc/kernel/cmdline ]]; then
++	# anaconda has the correct information to do this during install;
++	# afterward, grubby will take care of syncing on updates.
++	echo "$cmdline rhgb quiet" > /etc/kernel/cmdline
++    fi
++
+     for bls in "${files[@]}"; do
+         local options="${cmdline}"
+         if [ -z "${bls##*debug*}" ]; then

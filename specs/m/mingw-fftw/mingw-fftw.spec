@@ -8,7 +8,7 @@
 
 Name:           mingw-%{mingw_pkg_name}
 Version:        3.3.8
-Release:        19%{?dist}
+Release: 20%{?dist}
 Summary:        MinGW Fast Fourier Transform library
 # Automatically converted from old format: GPLv2+ - review is highly recommended.
 License:        GPL-2.0-or-later

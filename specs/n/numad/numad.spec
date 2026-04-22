@@ -3,7 +3,7 @@
 
 Name: numad
 Version: 0.5
-Release: 47.20150602git%{?dist}
+Release: 48.20150602git%{?dist}
 Summary: NUMA user daemon
 
 License: LGPL-2.1-only

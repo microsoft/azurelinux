@@ -9,7 +9,7 @@
 
 Name:		libssh2
 Version:	1.11.1
-Release:	4%{?dist}
+Release: 5%{?dist}
 Summary:	A library implementing the SSH2 protocol
 License:	BSD-3-Clause
 URL:		https://www.libssh2.org/

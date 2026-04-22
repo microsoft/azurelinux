@@ -31,7 +31,7 @@
 
 Name:          php-%{composer_vendor}-%{composer_project}%{major}
 Version:       %{github_version}
-Release:       15%{?github_release}%{?dist}
+Release: 16%{?github_release}%{?dist}
 Summary:       Common reflection classes used by phpdocumentor
 
 Group:         Development/Libraries

@@ -3,7 +3,7 @@
 
 Name:          oath-toolkit
 Version:       2.6.12
-Release:       3%{?dist}
+Release: 4%{?dist}
 # Automatically converted from old format: GPLv3+ - review is highly recommended.
 License:       GPL-3.0-or-later
 Summary:       One-time password components

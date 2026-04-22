@@ -13,7 +13,7 @@
 
 Name:           openbios
 Version:        %{date}
-Release:        1.git%{hash}%{?dist}
+Release: 2.git%{hash}%{?dist}
 Epoch:          1
 Summary:        OpenBIOS implementation of IEEE 1275-1994
 
@@ -40,6 +40,7 @@ BuildRequires:  fcode-utils
 BuildRequires:  libxslt
 
 
+ExclusiveArch: x86_64
 %description
 The OpenBIOS project provides you with most free and open source Open
 Firmware implementations available. Here you find several

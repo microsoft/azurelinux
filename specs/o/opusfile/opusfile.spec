@@ -4,7 +4,7 @@
 Name:          opusfile
 Version:       0.12
 %global soname_version 0
-Release:       17%{?dist}
+Release: 18%{?dist}
 Summary:       A high-level API for decoding and seeking within .opus files
 License:       BSD-3-Clause
 URL:           https://www.opus-codec.org/

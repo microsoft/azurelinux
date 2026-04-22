@@ -1,0 +1,186 @@
+--- scip-911/CMakeLists.txt.orig	2024-09-18 15:55:39.628797842 -0600
++++ scip-911/CMakeLists.txt	2024-09-18 16:00:05.544409809 -0600
+@@ -342,8 +342,9 @@ set(WITH_SCIPDEF on)
+ # ZLIB
+ if(ZLIB OR AUTOBUILD)
+     message(STATUS "Finding ZLIB")
+-    if(NOT TARGET ZLIB::ZLIB)
+-        find_package(ZLIB)
++    if(NOT TARGET zlib-ng::zlib)
++        find_package(zlib-ng)
++	set(ZLIB_FOUND ON)
+         if((NOT ZLIB_FOUND) AND (NOT AUTOBUILD))
+             message(FATAL_ERROR "ZLIB not found, try specifying ZLIB_DIR. ${AUTOBUILD_MSG}")
+         endif()
+--- scip-911/src/CMakeLists.txt.orig	2024-09-18 15:55:48.949679109 -0600
++++ scip-911/src/CMakeLists.txt	2024-09-18 16:06:41.516363066 -0600
+@@ -1055,7 +1055,7 @@ target_include_directories(libscip BEFOR
+ target_link_libraries(libscip
+     PRIVATE
+     ${SYM_LIBRARIES}
+-    $<$<BOOL:${SCIP_WITH_ZLIB}>:ZLIB::ZLIB>
++    $<$<BOOL:${SCIP_WITH_ZLIB}>:zlib-ng::zlib>
+     ${Readline_LIBRARY}
+     ${GMP_LIBRARIES}
+     ${THREAD_LIBRARIES}
+@@ -1097,7 +1097,7 @@ endif()
+ target_link_libraries(scip
+    PUBLIC
+    ${SYM_LIBRARIES}
+-   $<$<BOOL:${SCIP_WITH_ZLIB}>:ZLIB::ZLIB>
++   $<$<BOOL:${SCIP_WITH_ZLIB}>:zlib-ng::zlib>
+    ${Readline_LIBRARY}
+    ${GMP_LIBRARIES}
+    ${ZIMPL_LIBRARIES}
+--- scip-911/src/scip/fileio.c.orig	2024-09-13 03:03:03.000000000 -0600
++++ scip-911/src/scip/fileio.c	2024-09-18 16:02:52.855277407 -0600
+@@ -41,23 +41,24 @@
+ #ifdef SCIP_WITH_ZLIB
+ 
+ /* file i/o using zlib */
+-#include <zlib.h>
++#define WITH_GZFILEOP
++#include <zlib-ng.h>
+ 
+ SCIP_FILE* SCIPfopen(const char *path, const char *mode)
+ {
+-   return (SCIP_FILE*)gzopen(path, mode);
++   return (SCIP_FILE*)zng_gzopen(path, mode);
+ }
+ 
+ SCIP_FILE* SCIPfdopen(int fildes, const char *mode)
+ {
+-   return (SCIP_FILE*)gzdopen(fildes, mode);
++   return (SCIP_FILE*)zng_gzdopen(fildes, mode);
+ }
+ 
+ size_t SCIPfread(void *ptr, size_t size, size_t nmemb, SCIP_FILE *stream)
+ {
+    int nbytesread;
+ 
+-   nbytesread = gzread((gzFile)stream, ptr, (unsigned int) (size * nmemb));
++   nbytesread = zng_gzread((gzFile)stream, ptr, (unsigned int) (size * nmemb));
+    /* An error occured if nbytesread < 0. To be compatible with fread(), we return 0, which signifies an error there. */
+    if ( nbytesread < 0 )
+       return 0;
+@@ -67,7 +68,7 @@ size_t SCIPfread(void *ptr, size_t size,
+ 
+ size_t SCIPfwrite(const void *ptr, size_t size, size_t nmemb, SCIP_FILE *stream)
+ {
+-   return (size_t) gzwrite((gzFile)stream, ptr, (unsigned int) (size * nmemb)); /*lint !e571*/
++   return (size_t) zng_gzwrite((gzFile)stream, ptr, (unsigned int) (size * nmemb)); /*lint !e571*/
+ }
+ 
+ int SCIPfprintf(SCIP_FILE *stream, const char *format, ...)
+@@ -86,59 +87,59 @@ int SCIPfprintf(SCIP_FILE *stream, const
+    if( n < 0 || n > BUFFER_LEN)
+       buffer[BUFFER_LEN-1] = '\0';
+ 
+-   return gzputs((gzFile)stream, buffer);
++   return zng_gzputs((gzFile)stream, buffer);
+ }
+ 
+ int SCIPfputc(int c, SCIP_FILE *stream)
+ {
+-   return gzputc((gzFile)stream, c);
++   return zng_gzputc((gzFile)stream, c);
+ }
+ 
+ int SCIPfputs(const char *s, SCIP_FILE *stream)
+ {
+-   return gzputs((gzFile)stream, s);
++   return zng_gzputs((gzFile)stream, s);
+ }
+ 
+ int SCIPfgetc(SCIP_FILE *stream)
+ {
+-   return gzgetc((gzFile)stream);
++   return zng_gzgetc((gzFile)stream);
+ }
+ 
+ char* SCIPfgets(char *s, int size, SCIP_FILE *stream)
+ {
+    if( size > 0 )
+       s[0] = '\0';
+-   return gzgets((gzFile)stream, s, size);
++   return zng_gzgets((gzFile)stream, s, size);
+ }
+ 
+ int SCIPfflush(SCIP_FILE *stream)
+ {
+-   return gzflush((gzFile)stream, Z_SYNC_FLUSH);
++   return zng_gzflush((gzFile)stream, Z_SYNC_FLUSH);
+ }
+ 
+ int SCIPfseek(SCIP_FILE *stream, long offset, int whence)
+ {
+-   return (int) gzseek((gzFile)stream, offset, whence);
++   return (int) zng_gzseek((gzFile)stream, offset, whence);
+ }
+ 
+ void SCIPrewind(SCIP_FILE *stream)
+ {
+-   (void) gzrewind((gzFile)stream);
++   (void) zng_gzrewind((gzFile)stream);
+ }
+ 
+ long SCIPftell(SCIP_FILE *stream)
+ {
+-   return gztell((gzFile)stream);
++   return zng_gztell((gzFile)stream);
+ }
+ 
+ int SCIPfeof(SCIP_FILE *stream)
+ {
+-   return gzeof((gzFile)stream);
++   return zng_gzeof((gzFile)stream);
+ }
+ 
+ int SCIPfclose(SCIP_FILE *fp)
+ {
+-   return gzclose((gzFile)fp);
++   return zng_gzclose((gzFile)fp);
+ }
+ 
+ 
+--- scip-911/src/scip/scip_general.c.orig	2024-09-13 03:03:03.000000000 -0600
++++ scip-911/src/scip/scip_general.c	2024-09-18 16:04:44.148858932 -0600
+@@ -81,7 +81,7 @@
+ #endif
+ 
+ #ifdef SCIP_WITH_ZLIB
+-#include <zlib.h>
++#include <zlib-ng.h>
+ #endif
+ 
+ /* In debug mode, the following methods are implemented as function calls to ensure
+@@ -271,7 +271,7 @@ SCIP_RETCODE doScipCreate(
+    }
+ 
+ #ifdef SCIP_WITH_ZLIB
+-   SCIP_CALL( SCIPsetIncludeExternalCode((*scip)->set, "ZLIB " ZLIB_VERSION, "General purpose compression library by J. Gailly and M. Adler (zlib.net)") );
++   SCIP_CALL( SCIPsetIncludeExternalCode((*scip)->set, "ZLIB-NG " ZLIBNG_VERSION, "General purpose compression library by J. Gailly and M. Adler (zlib.net)") );
+ #endif
+ 
+ #ifdef SCIP_WITH_LAPACK
+--- scip-911/src/xml/xmldef.h.orig	2024-09-13 03:03:03.000000000 -0600
++++ scip-911/src/xml/xmldef.h	2024-09-18 16:05:57.212927713 -0600
+@@ -49,12 +49,13 @@ extern "C" {
+ 
+ 
+ #ifdef SCIP_WITH_ZLIB
+-#include <zlib.h>
++#define WITH_GZFILEOP
++#include <zlib-ng.h>
+ 
+-#define FOPEN(file, mode)    gzopen(file, mode)
+-#define FCLOSE(fp)           gzclose(fp)
+-#define FGETS(buf, len, fp)  gzgets(fp, buf, len) /*lint !e755 */
+-#define FREAD(buf, len, fp)  gzread(fp, buf, len)
++#define FOPEN(file, mode)    zng_gzopen(file, mode)
++#define FCLOSE(fp)           zng_gzclose(fp)
++#define FGETS(buf, len, fp)  zng_gzgets(fp, buf, len) /*lint !e755 */
++#define FREAD(buf, len, fp)  zng_gzread(fp, buf, len)
+ #define FPTYPE               gzFile
+ #else
+ #define FOPEN(file, mode)    fopen(file, mode)

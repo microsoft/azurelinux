@@ -8,7 +8,7 @@
 
 Name:           capnproto
 Version:        1.0.1
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        A data interchange format and capability-based RPC system
 
 License:        MIT

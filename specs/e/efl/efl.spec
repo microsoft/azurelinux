@@ -17,7 +17,7 @@
 
 Name:		efl
 Version:	1.28.1
-Release:	2%{?dist}
+Release: 3%{?dist}
 Summary:	Collection of Enlightenment libraries
 # Automatically converted from old format: BSD and LGPLv2+ and GPLv2 and zlib - review is highly recommended.
 License:	LicenseRef-Callaway-BSD AND LicenseRef-Callaway-LGPLv2+ AND GPL-2.0-only AND Zlib

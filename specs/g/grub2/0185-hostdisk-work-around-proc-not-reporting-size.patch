@@ -1,0 +1,93 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Robbie Harwood <rharwood@redhat.com>
+Date: Thu, 9 Mar 2023 11:18:19 -0500
+Subject: [PATCH] hostdisk: work around /proc not reporting size
+
+fstat(2) of files in /proc will yield st_size == 0 regardless of file
+contents.  Use a negative value in grub_file_t's size to denote "ignore"
+and plumb through.
+
+Signed-off-by: Robbie Harwood <rharwood@redhat.com>
+---
+ grub-core/kern/file.c           | 28 ++++++++++++++++------------
+ grub-core/lib/progress.c        |  2 +-
+ grub-core/osdep/unix/hostdisk.c |  6 ++++++
+ 3 files changed, 23 insertions(+), 13 deletions(-)
+
+diff --git a/grub-core/kern/file.c b/grub-core/kern/file.c
+index 1794d022fb0..75510df7c92 100644
+--- a/grub-core/kern/file.c
++++ b/grub-core/kern/file.c
+@@ -172,26 +172,30 @@ grub_file_read (grub_file_t file, void *buf, grub_size_t len)
+   grub_disk_read_hook_t read_hook;
+   void *read_hook_data;
+ 
+-  if (file->offset > file->size)
+-    {
+-      grub_error (GRUB_ERR_OUT_OF_RANGE,
+-		  N_("attempt to read past the end of file"));
+-      return -1;
+-    }
+-
+   if (len == 0)
+     return 0;
+ 
+-  if (len > file->size - file->offset)
+-    len = file->size - file->offset;
++#ifdef GRUB_MACHINE_EMU
++  if (file->size >= 0)
++    {
++#endif
++      if (file->offset > file->size)
++        {
++          grub_error (GRUB_ERR_OUT_OF_RANGE,
++                      N_("attempt to read past the end of file"));
++          return -1;
++        }
++
++      if (len > file->size - file->offset)
++        len = file->size - file->offset;
++#ifdef GRUB_MACHINE_EMU
++    }
++#endif
+ 
+   /* Prevent an overflow.  */
+   if ((grub_ssize_t) len < 0)
+     len >>= 1;
+ 
+-  if (len == 0)
+-    return 0;
+-
+   read_hook = file->read_hook;
+   read_hook_data = file->read_hook_data;
+   if (!file->read_hook)
+diff --git a/grub-core/lib/progress.c b/grub-core/lib/progress.c
+index 4f4389dd586..eb1b7d13cfd 100644
+--- a/grub-core/lib/progress.c
++++ b/grub-core/lib/progress.c
+@@ -72,7 +72,7 @@ grub_file_progress_hook_real (grub_disk_addr_t sector __attribute__ ((unused)),
+ 				       * 100ULL * 1000ULL,
+ 				       now - file->last_progress_time, 0);
+ 
+-      if (file->size == 0)
++      if (file->size <= 0)
+ 	percent = 100;
+       else
+ 	percent = grub_divmod64 (100 * file->progress_offset,
+diff --git a/grub-core/osdep/unix/hostdisk.c b/grub-core/osdep/unix/hostdisk.c
+index 3a00d7451a5..e5f4b4d5f9c 100644
+--- a/grub-core/osdep/unix/hostdisk.c
++++ b/grub-core/osdep/unix/hostdisk.c
+@@ -71,6 +71,12 @@ grub_util_get_fd_size (grub_util_fd_t fd, const char *name, unsigned *log_secsiz
+   if (log_secsize)
+     *log_secsize = 9;
+ 
++#ifdef GRUB_MACHINE_EMU
++  /* /proc doesn't behave itself and gives 0 for file sizes to stat. */
++  if (st.st_size == 0 && !grub_strncmp ("/proc", name, 5))
++    return -1;
++#endif
++
+   return st.st_size;
+ }
+ 

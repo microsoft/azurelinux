@@ -6,7 +6,7 @@
 
 Name:           python-%{pkg_name}
 Version:        0.1
-Release:        24%{?dist}
+Release: 25%{?dist}
 Summary:        Use Search URLs in your Django Application
 
 # Automatically converted from old format: BSD - review is highly recommended.

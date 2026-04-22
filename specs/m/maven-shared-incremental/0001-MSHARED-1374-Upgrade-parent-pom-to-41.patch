@@ -1,0 +1,27 @@
+From b452af28e8a555fcc3ad40885b5a2c411dad0684 Mon Sep 17 00:00:00 2001
+From: Sylwester Lachiewicz <slachiewicz@apache.org>
+Date: Mon, 1 Apr 2024 00:39:56 +0200
+Subject: [PATCH] [MSHARED-1374] Upgrade parent pom to 41
+
+---
+ pom.xml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/pom.xml b/pom.xml
+index f832f26..125ba7c 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -22,8 +22,8 @@
+   <parent>
+     <groupId>org.apache.maven.shared</groupId>
+     <artifactId>maven-shared-components</artifactId>
+-    <version>19</version>
+-    <relativePath>../maven-shared-components/pom.xml</relativePath>
++    <version>41</version>
++    <relativePath />
+   </parent>
+ 
+   <artifactId>maven-shared-incremental</artifactId>
+-- 
+2.48.1
+

@@ -17,7 +17,7 @@
 Name:           ghc-%{pkg_name}
 Version:        0.13.2.0
 # can only be reset when subpkg bumped
-Release:        5%{?dist}
+Release: 6%{?dist}
 Summary:        Efficient Arrays
 
 License:        BSD-3-Clause

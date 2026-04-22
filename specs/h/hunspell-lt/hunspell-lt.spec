@@ -10,7 +10,7 @@
 Name: hunspell-lt
 Summary: Lithuanian hunspell dictionaries
 Version: 1.2.1
-Release: 36%{?dist}
+Release: 37%{?dist}
 ## Note that upstream is dead and there is no download link available
 ## so please don't report FTBFS bugs for this package.
 Source: ftp://ftp.akl.lt/ispell-lt/lt_LT-%{version}.zip

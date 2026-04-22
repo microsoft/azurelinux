@@ -1,0 +1,24 @@
+From 912eaec202f33f8a0a9832bb3551674b6788e7f0 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Tue, 5 Nov 2019 08:47:50 +0100
+Subject: [PATCH] Remove unused import
+
+---
+ cglib/src/main/java/net/sf/cglib/reflect/MethodDelegate.java | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/cglib/src/main/java/net/sf/cglib/reflect/MethodDelegate.java b/cglib/src/main/java/net/sf/cglib/reflect/MethodDelegate.java
+index e7de82b..1f1f744 100644
+--- a/cglib/src/main/java/net/sf/cglib/reflect/MethodDelegate.java
++++ b/cglib/src/main/java/net/sf/cglib/reflect/MethodDelegate.java
+@@ -17,7 +17,6 @@ package net.sf.cglib.reflect;
+ 
+ import java.lang.reflect.*;
+ import java.security.ProtectionDomain;
+-import net.sf.cglib.*;
+ import net.sf.cglib.core.*;
+ import org.objectweb.asm.ClassVisitor;
+ import org.objectweb.asm.Type;
+-- 
+2.21.0
+

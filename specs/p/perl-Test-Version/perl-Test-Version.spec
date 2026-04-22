@@ -3,7 +3,7 @@
 
 Name:		perl-Test-Version
 Version:	2.09
-Release:	27%{?dist}
+Release: 28%{?dist}
 Summary:	Check to see that versions in modules are sane
 License:	Artistic-2.0
 URL:		https://metacpan.org/release/Test-Version

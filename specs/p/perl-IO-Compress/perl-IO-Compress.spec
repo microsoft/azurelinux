@@ -17,7 +17,7 @@
 
 Name:           perl-IO-Compress
 Version:        2.213
-Release:        521%{?dist}
+Release: 522%{?dist}
 Summary:        Read and write compressed data
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/IO-Compress

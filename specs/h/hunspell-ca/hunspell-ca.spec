@@ -10,7 +10,7 @@
 Name: hunspell-ca
 Summary: Catalan hunspell dictionaries
 Version: 3.0.8
-Release: 6%{?dist}
+Release: 7%{?dist}
 Source: https://github.com/Softcatala/catalan-dict-tools/releases/download/v%{version}/ca.%{version}-hunspell.zip
 URL: https://www.softcatala.org/projectes/corrector-ortografic/
 License: GPL-2.0-or-later OR LGPL-2.1-or-later

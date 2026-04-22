@@ -13,7 +13,7 @@
 
 Name:           perl-Syntax-Operator-Divides
 Version:        0.08
-Release:        5%{?dist}
+Release: 6%{?dist}
 Summary:        Infix operator for division test
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Syntax-Operator-Divides

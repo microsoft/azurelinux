@@ -10,7 +10,7 @@
 Summary: Small Footprint CIM Client Library
 Name: sblim-sfcc
 Version: 2.2.8
-Release: 29%{?dist}
+Release: 30%{?dist}
 License: EPL-1.0
 URL: http://www.sblim.org
 Source0: http://downloads.sourceforge.net/project/sblim/%{name}/%{name}-%{version}.tar.bz2

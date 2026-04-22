@@ -1,0 +1,50 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 8 Jan 2024 15:54:31 -0500
+Subject: [PATCH] grub-mount: work around bad integer comparison.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+gcc says:
+
+  util/grub-mount.c: In function ‘fuse_read’:
+  util/grub-mount.c:273:11: error: comparison of integer expressions of different signedness: ‘off_t’ {aka ‘long int’} and ‘grub_off_t’ {aka ‘long unsigned int’} [-Werror=sign-compare]
+    273 |   if (off > file->size)
+        |           ^
+
+This is happening because grub_off_t is unsigned but the system's off_t is
+signed.
+
+That's too much work to fix today, so this patch works around it with
+tests and typecasting.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ util/grub-mount.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/util/grub-mount.c b/util/grub-mount.c
+index bf4c8b891be..d369e21666e 100644
+--- a/util/grub-mount.c
++++ b/util/grub-mount.c
+@@ -269,11 +269,17 @@ fuse_read (const char *path, char *buf, size_t sz, off_t off,
+ {
+   grub_file_t file = files[fi->fh];
+   grub_ssize_t size;
++  grub_off_t offset;
+ 
+-  if (off > file->size)
++  if (off < 0)
+     return -EINVAL;
+ 
+-  file->offset = off;
++  if ((grub_off_t)off > file->size)
++    return -EINVAL;
++
++  offset = (grub_off_t)off;
++
++  file->offset = offset;
+ 
+   size = grub_file_read (file, buf, sz);
+   if (size < 0)

@@ -12,7 +12,7 @@
 Summary: DjVu viewers, encoders, and utilities
 Name: djvulibre
 Version: 3.5.28
-Release: 14%{?dist}
+Release: 15%{?dist}
 # Automatically converted from old format: GPLv2+ - review is highly recommended.
 License: GPL-2.0-or-later
 URL: http://djvu.sourceforge.net/

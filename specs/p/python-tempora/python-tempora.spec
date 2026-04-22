@@ -7,7 +7,7 @@
 
 Name:           python-%{pypi_name}
 Version:        5.7.0
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        Objects and routines pertaining to date and time (tempora)
 
 License:        MIT

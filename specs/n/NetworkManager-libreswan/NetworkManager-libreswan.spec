@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/NetworkManager-libreswan.azl.macros}
+
 %if 0%{?fedora} < 28 && 0%{?rhel} < 8
 %bcond_without libnm_glib
 %else
@@ -18,10 +21,11 @@
 Summary:   NetworkManager VPN plug-in for IPsec VPN
 Name:      NetworkManager-libreswan
 Version:   1.2.30
-Release:   1%{?dist}
+Release: 2%{?dist}
 License:   GPL-2.0-or-later
 URL:       https://gitlab.gnome.org/GNOME/NetworkManager-libreswan
 Source0:   https://download.gnome.org/sources/NetworkManager-libreswan/1.2/%{name}-%{version}.tar.xz
+Source9999: NetworkManager-libreswan.azl.macros
 
 #Patch1: 0001-some.patch
 

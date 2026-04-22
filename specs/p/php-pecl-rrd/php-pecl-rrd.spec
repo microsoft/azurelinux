@@ -22,7 +22,7 @@
 Summary:      PHP Bindings for rrdtool
 Name:         php-pecl-rrd
 Version:      2.0.3
-Release:      18%{?dist}
+Release: 19%{?dist}
 License:      BSD-2-Clause
 URL:          https://pecl.php.net/package/rrd
 

@@ -3,7 +3,7 @@
 
 Name:           xapps
 Version:        2.8.8
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        Common files for XApp desktop apps
 
 License:        LGPL-3.0-only

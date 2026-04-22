@@ -1,0 +1,12 @@
+Index: chromium-144.0.7559.59/third_party/angle/src/libANGLE/Constants.h
+===================================================================
+--- chromium-144.0.7559.59.orig/third_party/angle/src/libANGLE/Constants.h
++++ chromium-144.0.7559.59/third_party/angle/src/libANGLE/Constants.h
+@@ -9,6 +9,7 @@
+ #ifndef LIBANGLE_CONSTANTS_H_
+ #define LIBANGLE_CONSTANTS_H_
+ 
++#include <cstddef>
+ #include "common/platform.h"
+ 
+ #include <stddef.h>

@@ -19,7 +19,7 @@
 Name:           ghc-%{pkg_name}
 Version:        0.14.5
 # can only be reset when all subpkgs bumped
-Release:        14%{?dist}
+Release: 15%{?dist}
 Summary:        Syntax highlighting library
 
 License:        GPL-2.0-or-later

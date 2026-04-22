@@ -4,7 +4,7 @@
 Summary: Tools to support ATM networking under Linux
 Name: linux-atm
 Version: 2.5.1
-Release: 45%{?dist}
+Release: 46%{?dist}
 # The licensing here is a mess. This is as close to accurate as possible.
 License: GPL-2.0-only AND GPL-2.0-or-later AND LGPL-2.0-or-later
 URL: http://linux-atm.sourceforge.net/

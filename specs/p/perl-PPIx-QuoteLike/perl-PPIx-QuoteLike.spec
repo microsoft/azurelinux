@@ -6,7 +6,7 @@
 
 Name:           perl-PPIx-QuoteLike
 Version:        0.023
-Release:        9%{?dist}
+Release: 10%{?dist}
 Summary:        Parse Perl string literals and string-literal-like things
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/PPIx-QuoteLike

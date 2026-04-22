@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Nicolas Frayer <nfrayer@redhat.com>
+Date: Wed, 25 Sep 2024 17:23:33 +0200
+Subject: [PATCH] efi/loader: Check if NX is required in grub_efi_linux_boot()
+
+Call grub_efi_check_nx_required() passing it nx_required to
+assign the correct value
+
+Signed-off-by: Nicolas Frayer <nfrayer@redhat.com>
+---
+ grub-core/loader/efi/linux.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/grub-core/loader/efi/linux.c b/grub-core/loader/efi/linux.c
+index 0d1804b602da..5889e3f36f89 100644
+--- a/grub-core/loader/efi/linux.c
++++ b/grub-core/loader/efi/linux.c
+@@ -236,6 +236,7 @@ grub_efi_linux_boot (grub_addr_t k_address, grub_size_t k_size,
+   grub_dprintf ("linux", "kernel_address: %p handover_offset: %p params: %p\n",
+ 		(void *)k_address, (void *)h_offset, k_params);
+ 
++  grub_efi_check_nx_required(&nx_required);
+ 
+   if (nx_required && !nx_supported)
+     return grub_error (GRUB_ERR_BAD_OS, N_("kernel does not support NX loading required by policy"));

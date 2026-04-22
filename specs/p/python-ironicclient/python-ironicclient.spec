@@ -13,7 +13,7 @@
 
 Name:           python-ironicclient
 Version:        5.8.0
-Release:        5%{?dist}
+Release: 6%{?dist}
 Summary:        Python client for Ironic
 
 License:        Apache-2.0

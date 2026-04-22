@@ -3,7 +3,7 @@
 
 Name:		perl-aliased
 Version:	0.34
-Release:	31%{?dist}
+Release: 32%{?dist}
 Summary:	Use shorter versions of class names
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/aliased

@@ -3,7 +3,7 @@
 
 Name:           perl-Future
 Version:        0.51
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Perl object system to represent an operation awaiting completion
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 

@@ -28,7 +28,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
 Version:        5.0.3
-Release:        13%{?dist}
+Release: 14%{?dist}
 Summary:        PHP Utility class for timing, version %{major}
 
 License:        BSD-3-Clause

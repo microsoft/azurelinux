@@ -3,7 +3,7 @@
 
 Name:           hfsplus-tools
 Version:        540.1.linux3
-Release:        35%{?dist}
+Release: 36%{?dist}
 Summary:        Tools to create/check Apple HFS+ filesystems
 
 # Automatically converted from old format: APSL 2.0 - review is highly recommended.

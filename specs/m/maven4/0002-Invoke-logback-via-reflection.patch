@@ -1,0 +1,43 @@
+From e4de02ea0f8287d36091355b14514d44c5b1b301 Mon Sep 17 00:00:00 2001
+From: Michael Simacek <msimacek@redhat.com>
+Date: Tue, 6 Jun 2017 13:47:43 +0200
+Subject: [PATCH 2/3] Invoke logback via reflection
+
+---
+ .../logging/impl/LogbackConfiguration.java     | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
+
+diff --git a/impl/maven-cli/src/main/java/org/apache/maven/cling/logging/impl/LogbackConfiguration.java b/impl/maven-cli/src/main/java/org/apache/maven/cling/logging/impl/LogbackConfiguration.java
+index 67ee429d82..61a33ef135 100644
+--- a/impl/maven-cli/src/main/java/org/apache/maven/cling/logging/impl/LogbackConfiguration.java
++++ b/impl/maven-cli/src/main/java/org/apache/maven/cling/logging/impl/LogbackConfiguration.java
+@@ -30,13 +30,21 @@
+ public class LogbackConfiguration extends BaseSlf4jConfiguration {
+     @Override
+     public void setRootLoggerLevel(Level level) {
+-        ch.qos.logback.classic.Level value =
++        String value =
+                 switch (level) {
+-                    case DEBUG -> ch.qos.logback.classic.Level.DEBUG;
+-                    case INFO -> ch.qos.logback.classic.Level.INFO;
+-                    default -> ch.qos.logback.classic.Level.ERROR;
++                    case DEBUG -> "DEBUG";
++                    case INFO -> "INFO";
++                    default -> "ERROR";
+                 };
+-        ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)).setLevel(value);
++        Logger logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
++        try {
++            Class<?> levelClass = Class.forName("ch.qos.logback.classic.Level");
++            Object logbackLevel = levelClass.getField(value).get(null);
++            Class<?> loggerClass = Class.forName("ch.qos.logback.classic.Logger");
++            loggerClass.getMethod("setLevel", new Class<?>[] {levelClass}).invoke(logger, new Object[] {logbackLevel});
++        } catch (Exception e) {
++            throw new RuntimeException("Failed to initialize logback configuration", e);
++        }
+     }
+ 
+     @Override
+-- 
+2.50.1
+

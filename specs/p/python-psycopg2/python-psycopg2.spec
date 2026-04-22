@@ -14,7 +14,7 @@ features offered by PostgreSQL.
 Summary:	%{sum}
 Name:		python-%{srcname}
 Version:	2.9.10
-Release:	4%{?dist}
+Release: 5%{?dist}
 # The exceptions allow linking to OpenSSL and PostgreSQL's libpq
 License:	LGPL-3.0-or-later WITH openvpn-openssl-exception
 Url:		https://www.psycopg.org/

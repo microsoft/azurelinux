@@ -57,7 +57,7 @@
 
 Name:		busybox
 Version:	1.37.0
-Release:	3%{?dist}
+Release: 4%{?dist}
 Epoch:		1
 Summary:	Statically linked binary providing simplified versions of system commands
 License:	GPL-2.0-only

@@ -1,0 +1,22 @@
+diff --git a/src/plugins/assetimporters/configure.cmake b/src/plugins/assetimporters/configure.cmake
+index 35fb2890e..745a44513 100644
+--- a/src/plugins/assetimporters/configure.cmake
++++ b/src/plugins/assetimporters/configure.cmake
+@@ -13,7 +13,7 @@ set_property(CACHE INPUT_quick3d_assimp PROPERTY STRINGS undefined no qt system)
+ 
+ #### Libraries
+ 
+-qt_find_package(WrapQuick3DAssimp 5.1.6 PROVIDED_TARGETS WrapQuick3DAssimp::WrapQuick3DAssimp MODULE_NAME assetimporters QMAKE_LIB quick3d_assimp)
++qt_find_package(WrapQuick3DAssimp 6 PROVIDED_TARGETS WrapQuick3DAssimp::WrapQuick3DAssimp MODULE_NAME assetimporters QMAKE_LIB quick3d_assimp)
+ 
+ # Work around QTBUG-115064
+ # Assimp depends on draco_X, but only one of the two targets gets promoted by qt_find_package
+@@ -35,7 +35,7 @@ qt_config_compile_test("quick3d_assimp"
+                    LABEL "Assimp"
+                    PROJECT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../../config.tests/quick3d_assimp"
+                    LIBRARIES WrapQuick3DAssimp::WrapQuick3DAssimp
+-                   PACKAGES PACKAGE WrapQuick3DAssimp 5.1.6)
++                   PACKAGES PACKAGE WrapQuick3DAssimp 6)
+ 
+ 
+ #### Tests

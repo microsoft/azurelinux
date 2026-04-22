@@ -10,7 +10,7 @@
 # Please, preserve the changelog entries
 #
 
-%bcond_with          tests
+%bcond_without       tests
 
 %global gh_commit    dc31f1f8e0186c8f0bb3e48fd4d51421d8905fea
 %global gh_short     %(c=%{gh_commit}; echo ${c:0:7})
@@ -30,7 +30,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
 Version:        8.0.0
-Release:        1%{?dist}
+Release: 3%{?dist}
 Summary:        Export PHP variables for visualization, version %{major}
 
 License:        BSD-3-Clause
@@ -116,6 +116,9 @@ exit $ret
 
 
 %changelog
+* Tue Feb 10 2026 Remi Collet <remi@remirepo.net> - 8.0.0-2
+- enable test suite
+
 * Fri Feb  6 2026 Remi Collet <remi@remirepo.net> - 8.0.0-1
 - update to 8.0.0
 - raise dependency on PHP 8.4

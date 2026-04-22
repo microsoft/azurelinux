@@ -1,0 +1,8 @@
+#%PAM-1.0
+auth		sufficient	pam_rootok.so
+auth		sufficient	pam_timestamp.so
+auth		include		system-auth
+account		required	pam_permit.so
+session		required	pam_permit.so
+session		optional	pam_xauth.so
+session		optional	pam_timestamp.so

@@ -9,7 +9,7 @@
 
 Name:       libyaml
 Version:    0.2.5
-Release:    17%{?dist}
+Release: 18%{?dist}
 Summary:    YAML 1.1 parser and emitter written in C
 
 # SPDX

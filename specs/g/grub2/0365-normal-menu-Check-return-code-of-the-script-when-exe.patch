@@ -1,0 +1,45 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: James Le Cuirot <jlecuirot@microsoft.com>
+Date: Thu, 24 Oct 2024 15:00:26 +0100
+Subject: [PATCH] normal/menu: Check return code of the script when executing a
+ menu entry
+
+Don't rely on grub_errno here because grub_script_execute_new_scope()
+calls grub_print_error(), which always resets grub_errno back to
+GRUB_ERR_NONE. It may also get reset by grub_wait_after_message().
+
+This problem was observed when a "bad signature" error resulted in the
+menu being redisplayed rather than the fallback mechanism being
+triggered, although another change was also needed to fix it. This only
+happens with Red Hat's patches because upstream GRUB triggers the
+fallback mechanism regardless of the return code.
+
+Signed-off-by: James Le Cuirot <jlecuirot@microsoft.com>
+---
+ grub-core/normal/menu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/normal/menu.c b/grub-core/normal/menu.c
+index 97687013c..a2703dabb 100644
+--- a/grub-core/normal/menu.c
++++ b/grub-core/normal/menu.c
+@@ -377,14 +377,14 @@ grub_menu_execute_entry(grub_menu_entry_t entry, int auto_boot)
+   if (ptr && ptr[0] && ptr[1])
+     grub_env_set ("default", ptr + 1);
+ 
+-  grub_script_execute_new_scope (entry->sourcecode, entry->argc, entry->args);
++  err = grub_script_execute_new_scope (entry->sourcecode, entry->argc, entry->args);
+ 
+   if (errs_before != grub_err_printed_errors)
+     grub_wait_after_message ();
+ 
+   errs_before = grub_err_printed_errors;
+ 
+-  if (grub_errno == GRUB_ERR_NONE && grub_loader_is_loaded ())
++  if (err == GRUB_ERR_NONE && grub_loader_is_loaded ())
+     /* Implicit execution of boot, only if something is loaded.  */
+     err = grub_command_execute ("boot", 0, 0);
+ 
+-- 
+2.48.1
+

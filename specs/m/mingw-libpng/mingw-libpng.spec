@@ -5,7 +5,7 @@
 
 Name:           mingw-libpng
 Version:        1.6.55
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        MinGW Windows Libpng library
 
 License:        Zlib

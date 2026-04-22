@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 2.5.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Fast, pure-Ruby Markdown-superset converter
 
 # SPDX confirmed

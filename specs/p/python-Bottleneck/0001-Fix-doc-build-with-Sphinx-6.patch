@@ -1,0 +1,26 @@
+From 00f39d74f8788ad5aa0dbfe34e7b66b38d0c63d1 Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Mon, 8 May 2023 00:05:59 -0400
+Subject: [PATCH] Fix doc build with Sphinx 6
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ doc/source/conf.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/doc/source/conf.py b/doc/source/conf.py
+index 7efdfd8..ab40673 100644
+--- a/doc/source/conf.py
++++ b/doc/source/conf.py
+@@ -226,7 +226,7 @@ latex_documents = [
+ # If false, no module index is generated.
+ # latex_use_modindex = True
+ 
+-extlinks = {"issue": ("https://github.com/pydata/bottleneck/issues/%s", "#")}
++extlinks = {"issue": ("https://github.com/pydata/bottleneck/issues/%s", "#%s")}
+ intersphinx_mapping = {
+     "numpy": ("https://docs.scipy.org/doc/numpy/", None),
+     "numpydoc": ("https://numpydoc.readthedocs.io/en/latest/", None),
+-- 
+2.40.0
+

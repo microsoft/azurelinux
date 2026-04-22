@@ -5,7 +5,7 @@
 
 Name:           libqb
 Version:        2.0.8
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        Library providing high performance logging, tracing, ipc, and poll
 
 License:        LGPL-2.1-or-later

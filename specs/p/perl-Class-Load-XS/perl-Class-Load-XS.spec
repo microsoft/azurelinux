@@ -3,7 +3,7 @@
 
 Name:		perl-Class-Load-XS
 Version:	0.10
-Release:	29%{?dist}
+Release: 30%{?dist}
 Summary:	XS implementation of parts of Class::Load
 License:	Artistic-2.0
 URL:		https://metacpan.org/release/Class-Load-XS

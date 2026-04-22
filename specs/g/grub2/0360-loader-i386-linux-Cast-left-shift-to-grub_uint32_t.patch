@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alec Brown <alec.r.brown@oracle.com>
+Date: Wed, 12 Feb 2025 10:56:13 -0600
+Subject: [PATCH] loader/i386/linux: Cast left shift to grub_uint32_t
+
+The Coverity complains that we might overflow into a negative value when
+setting linux_params.kernel_alignment to (1 << align). We can remedy
+this by casting it to grub_uint32_t.
+
+Fixes: CID 473876
+
+Signed-off-by: Alec Brown <alec.r.brown@oracle.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/loader/i386/linux.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/grub-core/loader/i386/linux.c b/grub-core/loader/i386/linux.c
+index 90121e9bc..33a852197 100644
+--- a/grub-core/loader/i386/linux.c
++++ b/grub-core/loader/i386/linux.c
+@@ -823,7 +823,7 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+ 			 GRUB_MEM_ATTR_R|GRUB_MEM_ATTR_W, GRUB_MEM_ATTR_X);
+ 
+   linux_params.code32_start = prot_mode_target + lh.code32_start - GRUB_LINUX_BZIMAGE_ADDR;
+-  linux_params.kernel_alignment = (1 << align);
++  linux_params.kernel_alignment = ((grub_uint32_t)1 << align);
+   linux_params.ps_mouse = linux_params.padding11 = 0;
+   linux_params.type_of_loader = GRUB_LINUX_BOOT_LOADER_TYPE;
+ 

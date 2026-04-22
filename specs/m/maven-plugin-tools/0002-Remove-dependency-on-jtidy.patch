@@ -1,0 +1,154 @@
+From fd02c57beb987437b4fb10066e22831a17119873 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Mon, 27 Apr 2020 12:56:04 +0200
+Subject: [PATCH 2/3] Remove dependency on jtidy
+
+Forwarded: not-needed
+---
+ .../plugin/generator/GeneratorUtils.java      | 85 +++++--------------
+ .../PluginDescriptorFilesGenerator.java       | 19 ++---
+ 2 files changed, 26 insertions(+), 78 deletions(-)
+
+diff --git a/maven-plugin-tools-generators/src/main/java/org/apache/maven/tools/plugin/generator/GeneratorUtils.java b/maven-plugin-tools-generators/src/main/java/org/apache/maven/tools/plugin/generator/GeneratorUtils.java
+index 8b04522..2621b9f 100644
+--- a/maven-plugin-tools-generators/src/main/java/org/apache/maven/tools/plugin/generator/GeneratorUtils.java
++++ b/maven-plugin-tools-generators/src/main/java/org/apache/maven/tools/plugin/generator/GeneratorUtils.java
+@@ -48,13 +48,12 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
+ import org.apache.maven.plugin.descriptor.PluginDescriptor;
+ import org.apache.maven.project.MavenProject;
+ import org.apache.maven.reporting.MavenReport;
+-import org.codehaus.plexus.component.repository.ComponentDependency;
+-import org.codehaus.plexus.util.StringUtils;
+-import org.codehaus.plexus.util.xml.XMLWriter;
+-import org.w3c.tidy.Tidy;
+-
+-/**
+- * Convenience methods to play with Maven plugins.
++import org.codehaus.plexus.component.repository.ComponentDependency;
++import org.codehaus.plexus.util.StringUtils;
++import org.codehaus.plexus.util.xml.XMLWriter;
++
++/**
++ * Convenience methods to play with Maven plugins.
+  *
+  * @author jdcasey
+  */
+@@ -222,58 +221,12 @@ public final class GeneratorUtils {
+         }
+         matcher.appendTail(decoded);
+ 
+-        return decoded.toString();
+-    }
+-
+-    /**
+-     * Fixes some javadoc comment to become a valid XHTML snippet.
+-     *
+-     * @param description Javadoc description with HTML tags, may be <code>null</code>.
+-     * @return The description with valid XHTML tags, never <code>null</code>.
+-     * @deprecated Redundant for java extractor
+-     */
+-    @Deprecated
+-    public static String makeHtmlValid(String description) {
+-
+-        if (description == null || description.isEmpty()) {
+-            return "";
+-        }
+-
+-        String commentCleaned = decodeJavadocTags(description);
+-
+-        // Using jTidy to clean comment
+-        Tidy tidy = new Tidy();
+-        tidy.setDocType("loose");
+-        tidy.setXHTML(true);
+-        tidy.setXmlOut(true);
+-        tidy.setInputEncoding("UTF-8");
+-        tidy.setOutputEncoding("UTF-8");
+-        tidy.setMakeClean(true);
+-        tidy.setNumEntities(true);
+-        tidy.setQuoteNbsp(false);
+-        tidy.setQuiet(true);
+-        tidy.setShowWarnings(true);
+-
+-        ByteArrayOutputStream out = new ByteArrayOutputStream(commentCleaned.length() + 256);
+-        tidy.parse(new ByteArrayInputStream(commentCleaned.getBytes(StandardCharsets.UTF_8)), out);
+-        commentCleaned = new String(out.toByteArray(), StandardCharsets.UTF_8);
+-
+-        if (commentCleaned == null || commentCleaned.isEmpty()) {
+-            return "";
+-        }
+-
+-        // strip the header/body stuff
+-        String ls = System.getProperty("line.separator");
+-        int startPos = commentCleaned.indexOf("<body>" + ls) + 6 + ls.length();
+-        int endPos = commentCleaned.indexOf(ls + "</body>");
+-        commentCleaned = commentCleaned.substring(startPos, endPos);
+-
+-        return commentCleaned;
+-    }
+-
+-    /**
+-     * Converts a HTML fragment as extracted from a javadoc comment to a plain text string. This method tries to retain
+-     * as much of the text formatting as possible by means of the following transformations:
++        return decoded.toString();
++    }
++
++    /**
++     * Converts a HTML fragment as extracted from a javadoc comment to a plain text string. This method tries to retain
++     * as much of the text formatting as possible by means of the following transformations:
+      * <ul>
+      * <li>List items are converted to leading tabs (U+0009), followed by the item number/bullet, another tab and
+      * finally the item contents. Each tab denotes an increase of indentation.</li>
+@@ -298,13 +251,13 @@ public final class GeneratorUtils {
+         final StringBuilder sb = new StringBuilder();
+ 
+         HTMLEditorKit.Parser parser = new ParserDelegator();
+-        HTMLEditorKit.ParserCallback htmlCallback = new MojoParserCallback(sb);
+-
+-        try {
+-            parser.parse(new StringReader(makeHtmlValid(html)), htmlCallback, true);
+-        } catch (IOException e) {
+-            throw new RuntimeException(e);
+-        }
++        HTMLEditorKit.ParserCallback htmlCallback = new MojoParserCallback(sb);
++
++        try {
++            parser.parse(new StringReader(html), htmlCallback, true);
++        } catch (IOException e) {
++            throw new RuntimeException(e);
++        }
+ 
+         return sb.toString().replace('\"', '\''); // for CDATA
+     }
+diff --git a/maven-plugin-tools-generators/src/main/java/org/apache/maven/tools/plugin/generator/PluginDescriptorFilesGenerator.java b/maven-plugin-tools-generators/src/main/java/org/apache/maven/tools/plugin/generator/PluginDescriptorFilesGenerator.java
+index f8c9820..9dd3179 100644
+--- a/maven-plugin-tools-generators/src/main/java/org/apache/maven/tools/plugin/generator/PluginDescriptorFilesGenerator.java
++++ b/maven-plugin-tools-generators/src/main/java/org/apache/maven/tools/plugin/generator/PluginDescriptorFilesGenerator.java
+@@ -200,18 +200,13 @@ public class PluginDescriptorFilesGenerator implements Generator {
+      * @param containsXhtmlValue
+      * @param text
+      * @return the normalized text value (i.e. potentially converted to XHTML)
+-     */
+-    private static String getTextValue(DescriptorType type, boolean containsXhtmlValue, String text) {
+-        final String xhtmlText;
+-        if (!containsXhtmlValue) // text comes from legacy extractor
+-        {
+-            xhtmlText = GeneratorUtils.makeHtmlValid(text);
+-        } else {
+-            xhtmlText = text;
+-        }
+-        if (type != DescriptorType.XHTML) {
+-            return new HtmlToPlainTextConverter().convert(text);
+-        } else {
++     */
++    private static String getTextValue(DescriptorType type, boolean containsXhtmlValue, String text) {
++        final String xhtmlText;
++        xhtmlText = text;
++        if (type != DescriptorType.XHTML) {
++            return new HtmlToPlainTextConverter().convert(text);
++        } else {
+             return xhtmlText;
+         }
+     }
+-- 
+2.46.0
+

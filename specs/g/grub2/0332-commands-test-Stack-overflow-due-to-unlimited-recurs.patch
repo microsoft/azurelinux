@@ -1,0 +1,83 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Lidong Chen <lidong.chen@oracle.com>
+Date: Mon, 16 Dec 2024 20:22:41 +0000
+Subject: [PATCH] commands/test: Stack overflow due to unlimited recursion
+ depth
+
+The test_parse() evaluates test expression recursively. Due to lack of
+recursion depth check a specially crafted expression may cause a stack
+overflow. The recursion is only triggered by the parentheses usage and
+it can be unlimited. However, sensible expressions are unlikely to
+contain more than a few parentheses. So, this patch limits the recursion
+depth to 100, which should be sufficient.
+
+Reported-by: Nils Langius <nils@langius.de>
+Signed-off-by: Lidong Chen <lidong.chen@oracle.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/commands/test.c | 21 ++++++++++++++++++---
+ 1 file changed, 18 insertions(+), 3 deletions(-)
+
+diff --git a/grub-core/commands/test.c b/grub-core/commands/test.c
+index 62d3fb398..b585c3d70 100644
+--- a/grub-core/commands/test.c
++++ b/grub-core/commands/test.c
+@@ -29,6 +29,9 @@
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
++/* Set a limit on recursion to avoid stack overflow. */
++#define MAX_TEST_RECURSION_DEPTH	100
++
+ /* A simple implementation for signed numbers. */
+ static int
+ grub_strtosl (char *arg, const char ** const end, int base)
+@@ -150,7 +153,7 @@ get_fileinfo (char *path, struct test_parse_ctx *ctx)
+ 
+ /* Parse a test expression starting from *argn. */
+ static int
+-test_parse (char **args, int *argn, int argc)
++test_parse (char **args, int *argn, int argc, int *depth)
+ {
+   struct test_parse_ctx ctx = {
+     .and = 1,
+@@ -387,13 +390,24 @@ test_parse (char **args, int *argn, int argc)
+       if (grub_strcmp (args[*argn], ")") == 0)
+ 	{
+ 	  (*argn)++;
++	  if (*depth > 0)
++	    (*depth)--;
++
+ 	  return ctx.or || ctx.and;
+ 	}
+       /* Recursively invoke if parenthesis. */
+       if (grub_strcmp (args[*argn], "(") == 0)
+ 	{
+ 	  (*argn)++;
+-	  update_val (test_parse (args, argn, argc), &ctx);
++
++	  if (++(*depth) > MAX_TEST_RECURSION_DEPTH)
++	    {
++	      grub_error (GRUB_ERR_OUT_OF_RANGE, N_("max recursion depth exceeded"));
++	      depth--;
++	      return ctx.or || ctx.and;
++	    }
++
++	  update_val (test_parse (args, argn, argc, depth), &ctx);
+ 	  continue;
+ 	}
+ 
+@@ -428,11 +442,12 @@ grub_cmd_test (grub_command_t cmd __attribute__ ((unused)),
+ 	       int argc, char **args)
+ {
+   int argn = 0;
++  int depth = 0;
+ 
+   if (argc >= 1 && grub_strcmp (args[argc - 1], "]") == 0)
+     argc--;
+ 
+-  return test_parse (args, &argn, argc) ? GRUB_ERR_NONE
++  return test_parse (args, &argn, argc, &depth) ? GRUB_ERR_NONE
+     : grub_error (GRUB_ERR_TEST_FAILURE, N_("false"));
+ }
+ 

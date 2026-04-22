@@ -4,7 +4,7 @@
 Summary:        Real-time file compressor
 Name:           lzop
 Version:        1.04
-Release:        17%{?dist}
+Release: 18%{?dist}
 License:        GPL-2.0-or-later
 URL:            https://www.lzop.org/
 Source0:        https://www.lzop.org/download/%{name}-%{version}.tar.gz

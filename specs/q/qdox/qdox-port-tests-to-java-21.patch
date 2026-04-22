@@ -1,0 +1,11 @@
+--- qdox-2.1.0/src/test/java/com/thoughtworks/qdox/JavaProjectBuilderTest.java~	2024-07-04 11:31:50.910952394 +0200
++++ qdox-2.1.0/src/test/java/com/thoughtworks/qdox/JavaProjectBuilderTest.java	2024-07-04 11:31:53.318965066 +0200
+@@ -319,7 +319,7 @@
+         JavaClass list = builder.getClassByName("java.util.List");
+         Assertions.assertTrue(list.isInterface());
+         Assertions.assertNull(list.getSuperJavaClass());
+-        Assertions.assertEquals("java.util.Collection", list.getImplements().get(0).getValue());
++        Assertions.assertEquals("java.util.SequencedCollection", list.getImplements().get(0).getValue());
+     }
+ 
+     @Test

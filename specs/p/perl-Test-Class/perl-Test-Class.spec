@@ -3,7 +3,7 @@
 
 Name:           perl-Test-Class
 Version:        0.52
-Release:        13%{?dist}
+Release: 14%{?dist}
 Summary:        Easily create test classes in an xUnit/JUnit style
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Test-Class

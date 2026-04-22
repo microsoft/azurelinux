@@ -1,0 +1,34 @@
+From 5b6aae1885d02aa0a1ab0846834b86d87c989b79 Mon Sep 17 00:00:00 2001
+From: Maxwell G <maxwell@gtmx.me>
+Date: Fri, 15 Mar 2024 00:28:34 +0000
+Subject: [PATCH] systemd: adjust docker.service for downstream
+
+For now, we just enable selinux support and hardcode the paths for
+docker-proxy and docker-init.
+For `--init-path`, we use the tini-static binary directly instead of
+bundling tini in this package.
+---
+ contrib/init/systemd/docker.service | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/contrib/init/systemd/docker.service b/contrib/init/systemd/docker.service
+index d8c7867..e305616 100644
+--- a/contrib/init/systemd/docker.service
++++ b/contrib/init/systemd/docker.service
+@@ -10,7 +10,12 @@ Type=notify
+ # the default is not to use systemd for cgroups because the delegate issues still
+ # exists and systemd currently does not support the cgroup feature set required
+ # for containers run by docker
+-ExecStart=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
++ExecStart=/usr/bin/dockerd \
++    -H fd:// \
++    --containerd=/run/containerd/containerd.sock \
++    --selinux-enabled \
++    --userland-proxy-path /usr/bin/docker-proxy \
++    --init-path /usr/bin/tini-static
+ ExecReload=/bin/kill -s HUP $MAINPID
+ TimeoutStartSec=0
+ RestartSec=2
+-- 
+2.44.0
+

@@ -5,7 +5,7 @@
 
 Name:          uchardet
 Version:       0.0.8
-Release:       8%{?dist}
+Release: 9%{?dist}
 Summary:       An encoding detector library ported from Mozilla
 
 License:       MPL-1.1 OR GPL-2.0-or-later OR LGPL-2.0-or-later

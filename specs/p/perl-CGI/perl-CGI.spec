@@ -4,7 +4,7 @@
 Name:           perl-CGI
 Summary:        Handle Common Gateway Interface requests and responses
 Version:        4.71
-Release:        1%{?dist}
+Release: 2%{?dist}
 License:        Artistic-2.0
 Source0:        https://cpan.metacpan.org/authors/id/L/LE/LEEJO/CGI-%{version}.tar.gz
 URL:            https://metacpan.org/release/CGI

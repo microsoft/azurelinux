@@ -1,0 +1,40 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 8 Jan 2024 15:41:52 -0500
+Subject: [PATCH] btrfs: fix a bad null check
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+current gcc complains:
+
+  grub-core/fs/btrfs.c: In function ‘grub_cmd_btrfs_info’:
+  grub-core/fs/btrfs.c:2745:7: error: the comparison will always evaluate as ‘true’ for the address of ‘label’ will never be NULL [-Werror=address]
+   2745 |   if (data->sblock.label)
+        |       ^~~~
+  grub-core/fs/btrfs.c:92:8: note: ‘label’ declared here
+     92 |   char label[0x100];
+        |        ^~~~~
+  cc1: all warnings being treated as errors
+
+Obviously this check should be on the first data byte instead of the
+symbol itself.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/fs/btrfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/grub-core/fs/btrfs.c b/grub-core/fs/btrfs.c
+index f14fe9c1bda..8e2b1e9f7bc 100644
+--- a/grub-core/fs/btrfs.c
++++ b/grub-core/fs/btrfs.c
+@@ -2625,7 +2625,7 @@ grub_cmd_btrfs_info (grub_command_t cmd __attribute__ ((unused)), int argc,
+       return grub_error (GRUB_ERR_BAD_ARGUMENT, "failed to open fs");
+     }
+ 
+-  if (data->sblock.label)
++  if (data->sblock.label[0])
+     grub_printf("Label: '%s' ", data->sblock.label);
+   else
+     grub_printf("Label: none ");

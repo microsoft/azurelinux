@@ -1,0 +1,47 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 9 Jul 2019 14:31:19 +0200
+Subject: [PATCH] 20_linux_xen: load xen or multiboot{,2} modules as needed.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ util/grub.d/20_linux_xen.in | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/util/grub.d/20_linux_xen.in b/util/grub.d/20_linux_xen.in
+index efcded0fbb4..4ecf5deea17 100644
+--- a/util/grub.d/20_linux_xen.in
++++ b/util/grub.d/20_linux_xen.in
+@@ -156,6 +156,7 @@ linux_entry_xsm ()
+         else
+             xen_rm_opts="no-real-mode edd=off"
+         fi
++	insmod ${xen_module}
+ 	${xen_loader}	${rel_xen_dirname}/${xen_basename} placeholder ${xen_args} \${xen_rm_opts}
+ 	echo	'$(echo "$lmessage" | grub_quote)'
+ 	${module_loader}	${rel_dirname}/${basename} placeholder root=${linux_root_device_thisversion} ro ${args}
+@@ -168,6 +169,7 @@ EOF
+        initrd_path="${rel_dirname}/${i}"
+        sed "s/^/$submenu_indentation/" << EOF
+ 	echo	'$(echo "$message" | grub_quote)'
++	insmod ${xen_module}
+ 	${module_loader}	--nounzip   $(echo $initrd_path)
+ EOF
+     done
+@@ -269,13 +271,16 @@ for current_xen in ${reverse_sorted_xen_list}; do
+ 	echo "	submenu '$(gettext_printf "Xen hypervisor, version %s" "${xen_version}" | grub_quote)' \$menuentry_id_option 'xen-hypervisor-$xen_version-$boot_device_id' {"
+     fi
+     if ($grub_file --is-arm64-efi $current_xen); then
++	xen_module="xen_boot"
+ 	xen_loader="xen_hypervisor"
+ 	module_loader="xen_module"
+     else
+ 	if ($grub_file --is-x86-multiboot2 $current_xen); then
++	    xen_module="multiboot2"
+ 	    xen_loader="multiboot2"
+ 	    module_loader="module2"
+ 	else
++	    xen_module="multiboot"
+ 	    xen_loader="multiboot"
+ 	    module_loader="module"
+         fi

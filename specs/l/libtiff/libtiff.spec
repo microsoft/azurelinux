@@ -4,7 +4,7 @@
 Summary:       Library of functions for manipulating TIFF format image files
 Name:          libtiff
 Version:       4.7.1
-Release:       1%{?dist}
+Release: 2%{?dist}
 License:       libtiff
 URL:           http://www.simplesystems.org/libtiff/
 

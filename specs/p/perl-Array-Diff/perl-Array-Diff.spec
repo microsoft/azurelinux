@@ -6,7 +6,7 @@ Name:           perl-Array-Diff
 # but not in RPM world :-(
 Epoch:          1
 Version:        0.09
-Release:        20%{?dist}
+Release: 21%{?dist}
 Summary:        Find the differences between two arrays
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Array-Diff

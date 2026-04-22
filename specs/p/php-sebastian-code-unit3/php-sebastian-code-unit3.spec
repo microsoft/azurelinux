@@ -30,7 +30,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
 Version:        3.0.3
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Collection of value objects that represent the PHP code units, version %{major}
 
 License:        BSD-3-Clause

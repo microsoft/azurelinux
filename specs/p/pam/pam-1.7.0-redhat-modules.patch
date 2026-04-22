@@ -1,0 +1,28 @@
+diff --git a/modules/meson.build b/modules/meson.build
+index 20cebdbb..eaa4fdda 100644
+--- a/modules/meson.build
++++ b/modules/meson.build
+@@ -49,3 +49,5 @@ subdir('pam_usertype')
+ subdir('pam_warn')
+ subdir('pam_wheel')
+ subdir('pam_xauth')
++subdir('pam_chroot')
++subdir('pam_postgresok')
+diff --git a/modules/module-meson.build b/modules/module-meson.build
+index acb70875..d974902d 100644
+--- a/modules/module-meson.build
++++ b/modules/module-meson.build
+@@ -452,6 +452,13 @@ if module == 'pam_unix'
+     dependencies: [libpam_internal_dep, libpam_dep, libcrypt],
+   )
+ endif
++if module == 'pam_chroot'
++  install_data(
++    'chroot.conf',
++    install_dir: vendor_sconfigdir,
++    install_tag: 'config',
++  )
++endif
+ 
+ 
+ # tests

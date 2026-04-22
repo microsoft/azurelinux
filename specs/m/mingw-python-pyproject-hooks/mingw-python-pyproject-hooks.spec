@@ -14,7 +14,7 @@
 Name:           mingw-python-%{pkgname}
 Summary:        MinGW Python %{pypi_name} library
 Version:        1.2.0
-Release:        3%{?dist}
+Release: 4%{?dist}
 BuildArch:      noarch
 
 License:        MIT

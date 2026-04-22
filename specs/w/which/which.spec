@@ -6,7 +6,7 @@
 Summary: Displays where a particular program in your path is located
 Name: which
 Version: 2.23
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPL-3.0-only
 Source0: http://ftp.gnu.org/gnu/which/%{name}-%{version}.tar.gz
 Source1: which2.sh

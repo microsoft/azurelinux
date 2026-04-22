@@ -1,0 +1,26 @@
+Index: chromium-144.0.7559.59/build/config/compiler/BUILD.gn
+===================================================================
+--- chromium-144.0.7559.59.orig/build/config/compiler/BUILD.gn
++++ chromium-144.0.7559.59/build/config/compiler/BUILD.gn
+@@ -2129,7 +2129,9 @@ config("default_warnings") {
+ 
+       # Don't warn about "maybe" uninitialized. Clang doesn't include this
+       # in -Wall but gcc does, and it gives false positives.
+-      cflags += [ "-Wno-maybe-uninitialized" ]
++      if (current_cpu != "ppc64") {
++        cflags += [ "-Wno-maybe-uninitialized" ]
++      }
+       cflags += [ "-Wno-deprecated-declarations" ]
+ 
+       # -Wcomment gives too many false positives in the case a
+@@ -2140,7 +2142,9 @@ config("default_warnings") {
+ 
+       # -Wpacked-not-aligned complains all generated mojom-shared-internal.h
+       # files.
+-      cflags += [ "-Wno-packed-not-aligned" ]
++      if (current_cpu != "ppc64") {
++        cflags += [ "-Wno-packed-not-aligned" ]
++      }
+     }
+   }
+ 

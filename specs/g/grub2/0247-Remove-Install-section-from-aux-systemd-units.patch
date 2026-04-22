@@ -1,0 +1,33 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Christian Glombek <cglombek@redhat.com>
+Date: Tue, 14 Nov 2023 07:54:59 +0100
+Subject: [PATCH] Remove [Install] section from aux systemd units
+
+See https://bugzilla.redhat.com/show_bug.cgi?id=2247635#c7
+---
+ docs/grub-boot-indeterminate.service             | 3 ---
+ util/systemd/grub-systemd-integration.service.in | 3 ---
+ 2 files changed, 6 deletions(-)
+
+diff --git a/docs/grub-boot-indeterminate.service b/docs/grub-boot-indeterminate.service
+index 5bcb474a3d3..6c8dcb186b6 100644
+--- a/docs/grub-boot-indeterminate.service
++++ b/docs/grub-boot-indeterminate.service
+@@ -9,6 +9,3 @@ Before=system-update-pre.target
+ [Service]
+ Type=oneshot
+ ExecStart=/usr/bin/grub2-editenv - incr boot_indeterminate
+-
+-[Install]
+-WantedBy=system-update.target
+diff --git a/util/systemd/grub-systemd-integration.service.in b/util/systemd/grub-systemd-integration.service.in
+index 22ca1ca4885..c81fb594ce1 100644
+--- a/util/systemd/grub-systemd-integration.service.in
++++ b/util/systemd/grub-systemd-integration.service.in
+@@ -6,6 +6,3 @@ ConditionPathExists=/run/systemd/reboot-to-boot-loader-menu
+ 
+ [Service]
+ ExecStart=@libexecdir@/@grubdirname@/systemd-integration.sh
+-
+-[Install]
+-WantedBy=reboot.target

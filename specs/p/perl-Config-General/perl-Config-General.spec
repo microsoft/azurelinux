@@ -3,7 +3,7 @@
 
 Name:           perl-Config-General
 Version:        2.67
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Generic configuration module for Perl
 License:        Artistic-2.0
 URL:            https://metacpan.org/release/Config-General

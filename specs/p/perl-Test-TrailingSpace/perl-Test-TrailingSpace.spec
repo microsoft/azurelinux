@@ -3,7 +3,7 @@
 
 Name:           perl-Test-TrailingSpace
 Version:        0.0601
-Release:        12%{?dist}
+Release: 13%{?dist}
 Summary:        Test for trailing space in source files
 License:        MIT
 URL:            https://metacpan.org/release/Test-TrailingSpace

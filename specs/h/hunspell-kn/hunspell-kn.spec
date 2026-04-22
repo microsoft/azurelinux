@@ -10,7 +10,7 @@
 Name: hunspell-kn
 Summary: Kannada hunspell dictionaries
 Version: 1.0.3
-Release: 34%{?dist}
+Release: 35%{?dist}
 Source: https://downloads.sourceforge.net/project/aoo-extensions/2628/1/kannada.oxt
 URL: https://extensions.openoffice.org/project/kannada
 License: GPL-2.0-or-later OR LGPL-2.1-or-later OR MPL-1.1

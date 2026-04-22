@@ -3,7 +3,7 @@
 
 Name:          espeak-ng
 Version:       1.51.1
-Release:       12%{?dist}
+Release: 13%{?dist}
 Summary:       eSpeak NG Text-to-Speech
 
 License:       GPL-3.0-only AND GPL-3.0-or-later AND Apache-2.0 AND BSD-2-Clause AND Unicode-DFS-2016 AND CC-BY-SA-3.0

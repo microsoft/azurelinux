@@ -1,0 +1,257 @@
+policy_module(grafana, 1.0.4)
+
+########################################
+#
+# Declarations
+#
+#permissive grafana_t;
+
+## <desc>
+## <p>
+## Allow grafana to be used with a reverse proxy
+## </p>
+## </desc>
+gen_tunable(grafana_can_reverse_proxy, false)
+
+## <desc>
+## <p>
+## Allow grafana to connect to elasticsearch's default tcp port of 9200
+## </p>
+## </desc>
+gen_tunable(grafana_can_tcp_connect_elasticsearch_port, false)
+
+## <desc>
+## <p>
+## Allow grafana to connect to mysql's default tcp port of 3306
+## </p>
+## </desc>
+gen_tunable(grafana_can_tcp_connect_mysql_port, false)
+
+## <desc>
+## <p>
+## Allow grafana to connect to prometheus' default tcp port of 9090
+## </p>
+## </desc>
+gen_tunable(grafana_can_tcp_connect_prometheus_port, false)
+
+## <desc>            
+## <p>
+## Allow grafana to connect to postgresql's default tcp port of 5432            
+## </p>            
+## </desc>            
+gen_tunable(grafana_can_tcp_connect_postgresql_port, false)
+
+## <desc>            
+## <p>
+## Allow grafana to connect to ldap's tcp port           
+## </p>            
+## </desc>  
+gen_tunable(grafana_can_tcp_connect_ldap_port, false)
+
+type grafana_t;
+type grafana_exec_t;
+init_daemon_domain(grafana_t, grafana_exec_t)
+init_nnp_daemon_domain(grafana_t)
+
+type grafana_unit_file_t;
+systemd_unit_file(grafana_unit_file_t)
+
+type grafana_conf_t;
+files_config_file(grafana_conf_t)
+
+type grafana_db_t;
+files_config_file(grafana_db_t)
+
+type grafana_tmp_t;
+files_tmp_file(grafana_tmp_t)
+
+type grafana_tmpfs_t;
+files_tmpfs_file(grafana_tmpfs_t)
+
+type grafana_log_t;
+logging_log_file(grafana_log_t)
+
+type grafana_var_run_t;
+files_pid_file(grafana_var_run_t)
+
+type grafana_var_lib_t;
+files_type(grafana_var_lib_t)
+
+type grafana_port_t;
+corenet_port(grafana_port_t)
+
+type grafana_pcp_exec_t;
+corecmd_executable_file(grafana_pcp_exec_t)
+can_exec(grafana_t, grafana_pcp_exec_t)
+
+# Ports 32768-60999 (pcp port is 44322)
+corenet_tcp_connect_all_ephemeral_ports(grafana_t)
+grafana_exec(grafana_t)
+
+# Allow grafana to connect to mssql's default tcp port of 1433 
+corenet_tcp_connect_mssql_port(grafana_t)
+
+########################################
+#
+# grafana local policy
+#
+allow grafana_t self:tcp_socket create_stream_socket_perms;
+allow grafana_t self:udp_socket create_stream_socket_perms;
+allow grafana_t self:unix_dgram_socket create_socket_perms;
+
+allow grafana_t grafana_port_t:tcp_socket { name_bind name_connect };
+
+allow grafana_t grafana_var_lib_t:file { execute execute_no_trans };
+allow grafana_t grafana_var_lib_t:file map;
+
+allow grafana_t self:unix_stream_socket connectto;
+
+allow grafana_t self:netlink_route_socket { create bind getattr nlmsg_read };
+
+optional_policy(`
+	require {
+		type cgroup_t;
+		class dir { search };
+		class file { open read };
+	}
+	allow grafana_t cgroup_t:dir search;
+	allow grafana_t cgroup_t:file { open read };
+')
+
+optional_policy(`
+	require {
+		type smtp_port_t;
+		class tcp_socket { name_connect };
+	}
+	allow grafana_t smtp_port_t:tcp_socket name_connect;
+')
+
+optional_policy(`
+	require {
+		type ntop_port_t;
+		class tcp_socket { name_bind };
+	}
+	allow grafana_t ntop_port_t:tcp_socket name_bind;
+')
+
+optional_policy(`
+	require {
+		type usr_t;
+		class file { execute execute_no_trans };
+	}
+	allow grafana_t usr_t:file { execute execute_no_trans };
+')
+
+optional_policy(`
+	require {
+		type postgresql_t;
+		type postgresql_var_run_t;
+		class unix_stream_socket { connectto };
+		class sock_file { write };
+	}
+	allow grafana_t postgresql_t:unix_stream_socket connectto;
+	allow grafana_t postgresql_var_run_t:sock_file write;
+')
+
+optional_policy(`
+	require {
+		type proc_net_t;
+		class lnk_file { read };
+	}
+	allow grafana_t proc_net_t:lnk_file read;
+')
+
+optional_policy(`
+	require {
+		type autofs_t;
+		class dir {getattr};
+	}
+	allow grafana_t autofs_t:dir getattr;
+')
+
+optional_policy(`
+	require {
+		type postfix_local_t;
+		class dir { search };
+	}
+	allow postfix_local_t grafana_var_lib_t:dir search;
+')
+
+manage_dirs_pattern(grafana_t, grafana_conf_t, grafana_conf_t)
+manage_files_pattern(grafana_t, grafana_conf_t, grafana_conf_t)
+
+manage_dirs_pattern(grafana_t, grafana_db_t, grafana_db_t)
+manage_files_pattern(grafana_t, grafana_db_t, grafana_db_t)
+
+manage_dirs_pattern(grafana_t, grafana_tmp_t, grafana_tmp_t)
+manage_files_pattern(grafana_t, grafana_tmp_t, grafana_tmp_t)
+manage_sock_files_pattern(grafana_t, grafana_tmp_t, grafana_tmp_t)
+files_tmp_filetrans(grafana_t, grafana_tmp_t, { dir file sock_file })
+
+manage_dirs_pattern(grafana_t, grafana_tmpfs_t, grafana_tmpfs_t)
+manage_files_pattern(grafana_t, grafana_tmpfs_t, grafana_tmpfs_t)
+fs_tmpfs_filetrans(grafana_t, grafana_tmpfs_t, {dir file})
+
+manage_dirs_pattern(grafana_t, grafana_log_t, grafana_log_t)
+manage_files_pattern(grafana_t, grafana_log_t, grafana_log_t)
+logging_log_filetrans(grafana_t, grafana_log_t, { dir file })
+
+manage_dirs_pattern(grafana_t, grafana_var_run_t, grafana_var_run_t)
+manage_files_pattern(grafana_t, grafana_var_run_t, grafana_var_run_t)
+files_pid_filetrans(grafana_t, grafana_var_run_t, { dir file })
+
+manage_dirs_pattern(grafana_t, grafana_var_lib_t, grafana_var_lib_t)
+manage_files_pattern(grafana_t, grafana_var_lib_t, grafana_var_lib_t)
+manage_lnk_files_pattern(grafana_t, grafana_var_lib_t, grafana_var_lib_t)
+files_var_lib_filetrans(grafana_t, grafana_var_lib_t, { dir file })
+
+
+corenet_tcp_connect_http_port(grafana_t)
+corenet_tcp_bind_generic_node(grafana_t)
+
+kernel_dgram_send(grafana_t)
+kernel_read_net_sysctls(grafana_t)
+kernel_read_system_state(grafana_t)
+
+auth_read_passwd(grafana_t)
+
+dev_read_sysfs(grafana_t)
+
+sysnet_read_config(grafana_t)
+
+logging_send_syslog_msg(grafana_t)
+
+miscfiles_read_generic_certs(grafana_t)
+
+tunable_policy(`grafana_can_reverse_proxy',`
+	gen_require(`
+		type httpd_t;
+	')
+
+	connect_grafana_port(httpd_t) # Reverse proxy support
+	corenet_tcp_connect_http_port(grafana_t)
+')
+
+tunable_policy(`grafana_can_tcp_connect_elasticsearch_port',` # Elasticsearch default tcp port 9200
+	corenet_tcp_connect_wap_wsp_port(grafana_t)
+')
+
+tunable_policy(`grafana_can_tcp_connect_mysql_port',` # Mysql default tcp port 3306
+	corenet_tcp_connect_mysqld_port(grafana_t)
+')
+
+tunable_policy(`grafana_can_tcp_connect_prometheus_port',` # Prometheus default tcp port 9090
+	corenet_tcp_connect_websm_port(grafana_t)
+')
+
+tunable_policy(`grafana_can_tcp_connect_postgresql_port',` # Postgresql default tcp port 5432
+	corenet_tcp_connect_postgresql_port(grafana_t)
+')
+
+tunable_policy(`grafana_can_tcp_connect_ldap_port',`
+	corenet_tcp_connect_ldap_port(grafana_t)
+')
+
+optional_policy(`
+    systemd_private_tmp(grafana_tmp_t)
+')

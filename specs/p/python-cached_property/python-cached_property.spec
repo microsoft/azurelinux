@@ -6,7 +6,7 @@
 
 Name:           python-%{modulename}
 Version:        2.0.1
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        A cached-property for decorating methods in Python classes
 License:        BSD-3-Clause
 URL:            https://github.com/pydanny/%{projectname}

@@ -1,0 +1,73 @@
+From 60b89b4047b55aca0592243efd63fc9ac5f2c0f0 Mon Sep 17 00:00:00 2001
+From: Mat Booth <mat.booth@redhat.com>
+Date: Wed, 13 Feb 2019 16:09:35 +0000
+Subject: [PATCH] Fix build with Mockito 2.x
+
+---
+ .../maven_replacer_plugin/ReplacementProcessorTest.java    | 1 -
+ .../maven_replacer_plugin/ReplacerMojoIntegrationTest.java | 2 +-
+ .../code/maven_replacer_plugin/ReplacerMojoTest.java       | 7 ++++---
+ 3 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/test/java/com/google/code/maven_replacer_plugin/ReplacementProcessorTest.java b/src/test/java/com/google/code/maven_replacer_plugin/ReplacementProcessorTest.java
+index 30632e7..83d088c 100644
+--- a/src/test/java/com/google/code/maven_replacer_plugin/ReplacementProcessorTest.java
++++ b/src/test/java/com/google/code/maven_replacer_plugin/ReplacementProcessorTest.java
+@@ -43,7 +43,6 @@ public class ReplacementProcessorTest {
+ 	public void setUp() throws Exception {
+ 		when(fileUtils.readFile(FILE, ENCODING)).thenReturn(CONTENT);
+ 		when(replacement.getToken()).thenReturn(TOKEN);
+-		when(replacement.getValue()).thenReturn(VALUE);
+ 		when(replacerFactory.create(replacement)).thenReturn(replacer);
+ 		
+ 		processor = new ReplacementProcessor(fileUtils, replacerFactory);
+diff --git a/src/test/java/com/google/code/maven_replacer_plugin/ReplacerMojoIntegrationTest.java b/src/test/java/com/google/code/maven_replacer_plugin/ReplacerMojoIntegrationTest.java
+index 0e7aa64..6d99455 100644
+--- a/src/test/java/com/google/code/maven_replacer_plugin/ReplacerMojoIntegrationTest.java
++++ b/src/test/java/com/google/code/maven_replacer_plugin/ReplacerMojoIntegrationTest.java
+@@ -7,7 +7,7 @@ import static org.hamcrest.Matchers.equalTo;
+ import static org.junit.Assert.assertFalse;
+ import static org.junit.Assert.assertTrue;
+ import static org.mockito.Matchers.anyString;
+-import static org.mockito.Matchers.argThat;
++import static org.mockito.hamcrest.MockitoHamcrest.argThat;
+ import static org.mockito.Mockito.mock;
+ import static org.mockito.Mockito.never;
+ import static org.mockito.Mockito.verify;
+diff --git a/src/test/java/com/google/code/maven_replacer_plugin/ReplacerMojoTest.java b/src/test/java/com/google/code/maven_replacer_plugin/ReplacerMojoTest.java
+index 060f916..b53845c 100644
+--- a/src/test/java/com/google/code/maven_replacer_plugin/ReplacerMojoTest.java
++++ b/src/test/java/com/google/code/maven_replacer_plugin/ReplacerMojoTest.java
+@@ -7,9 +7,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
+ import static org.hamcrest.Matchers.equalTo;
+ import static org.junit.Assert.assertTrue;
+ import static org.junit.Assert.fail;
++import static org.mockito.Matchers.any;
+ import static org.mockito.Matchers.anyInt;
+ import static org.mockito.Matchers.anyString;
+-import static org.mockito.Matchers.argThat;
++import static org.mockito.hamcrest.MockitoHamcrest.argThat;
+ import static org.mockito.Matchers.eq;
+ import static org.mockito.Matchers.isA;
+ import static org.mockito.Mockito.mock;
+@@ -428,7 +429,7 @@ public class ReplacerMojoTest {
+ 
+ 	@Test (expected = MojoExecutionException.class)
+ 	public void shouldRethrowIOExceptionsAsMojoExceptions() throws Exception {
+-		when(fileUtils.readFile(anyString(), anyString())).thenThrow(new IOException());
++		when(fileUtils.readFile((String)any(), (String)any())).thenThrow(new IOException());
+ 
+ 		mojo.setRegexFlags(regexFlags);
+ 		mojo.setRegex(REGEX);
+@@ -442,7 +443,7 @@ public class ReplacerMojoTest {
+ 	
+ 	@Test
+ 	public void shouldNotThrowExceptionWhenIgnoringErrors() throws Exception {
+-		when(fileUtils.readFile(anyString(), anyString())).thenThrow(new IOException());
++		when(fileUtils.readFile((String)any(), (String)any())).thenThrow(new IOException());
+ 
+ 		mojo.setIgnoreErrors(true);
+ 		mojo.setFile(FILE);
+-- 
+2.20.1
+

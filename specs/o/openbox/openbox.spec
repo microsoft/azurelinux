@@ -3,7 +3,7 @@
 
 Name:		openbox
 Version:	3.6.1
-Release:	29%{?dist}
+Release: 30%{?dist}
 Summary:	A highly configurable and standards-compliant X11 window manager
 
 License:	GPL-2.0-or-later

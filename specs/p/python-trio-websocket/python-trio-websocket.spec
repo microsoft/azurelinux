@@ -9,7 +9,7 @@ Summary: WebSocket implementation focused on safety and correctness
 License: MIT
 
 Version: 0.12.2
-Release: 5%{?dist}
+Release: 6%{?dist}
 
 URL: https://github.com/python-trio/trio-websocket
 Source: %{URL}/archive/%{version}/%{pypi_name}-%{version}.tar.gz

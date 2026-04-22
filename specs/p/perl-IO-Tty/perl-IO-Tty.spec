@@ -3,7 +3,7 @@
 
 Name:           perl-IO-Tty
 Version:        1.20
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        Perl interface to pseudo tty's
 License:        (GPL-1.0-or-later OR Artistic-1.0-Perl) AND BSD-2-Clause
 URL:            https://metacpan.org/release/IO-Tty

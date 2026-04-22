@@ -9,7 +9,7 @@
 
 Name:           rust-seahash
 Version:        4.1.0
-Release:        11%{?dist}
+Release: 12%{?dist}
 Summary:        Blazingly fast, portable hash function with proven statistical guarantees
 
 # https://github.com/redox-os/tfs/pull/76

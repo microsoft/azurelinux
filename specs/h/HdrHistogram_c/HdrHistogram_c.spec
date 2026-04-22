@@ -3,7 +3,7 @@
 
 Name: HdrHistogram_c
 Version: 0.11.8
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary: C port of the HdrHistogram 
 License: BSD-2-Clause
 URL: https://github.com/HdrHistogram/%{name}

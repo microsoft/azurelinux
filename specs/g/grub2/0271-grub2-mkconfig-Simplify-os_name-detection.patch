@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Andrew Lukoshko <alukoshko@almalinux.org>
+Date: Wed, 31 Jul 2024 16:06:10 +0000
+Subject: [PATCH] grub2-mkconfig: Simplify os_name detection
+
+---
+ util/grub-mkconfig.in | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+diff --git a/util/grub-mkconfig.in b/util/grub-mkconfig.in
+index efa36cc45a69..8b7883072e46 100644
+--- a/util/grub-mkconfig.in
++++ b/util/grub-mkconfig.in
+@@ -109,12 +109,7 @@ do
+     esac
+ done
+ 
+-os_name=$(grep '^ID=' /etc/os-release | sed 's/ID=//')
+-if test "$os_name" = '"rhel"'; then
+-  os_name=redhat
+-elif test "$os_name" = '"centos"'; then
+-  os_name=centos
+-fi
++os_name=$(grep ^ID= /etc/os-release | sed -e 's/^ID=//' -e 's/rhel/redhat/' -e 's/\"//g')
+ if test "x${grub_cfg}" = "x/boot/efi/EFI/$os_name/grub.cfg" &&\
+         mountpoint -q /boot/efi; then
+   gettext_printf "Running \`grub2-mkconfig -o %s' will overwrite the GRUB wrapper.\n" "$grub_cfg" 1>&2

@@ -1,0 +1,13 @@
+diff -up chromium-139.0.7258.127/build/rust/cargo_crate.gni.than chromium-139.0.7258.127/build/rust/cargo_crate.gni
+--- chromium-139.0.7258.127/build/rust/cargo_crate.gni.than	2025-08-14 09:44:51.783560032 +0200
++++ chromium-139.0.7258.127/build/rust/cargo_crate.gni	2025-08-14 09:48:37.407051268 +0200
+@@ -310,6 +310,9 @@ template("cargo_crate") {
+       rustflags +=
+           [ "-Awarnings" ]  # Suppress other warnings in 3rd-party crates.
+ 
++      rustflags +=
++          [ "--cap-lints=warn" ] # Suppress other warnings, causes FTBFS in Fedora build rhbz#2387446
++
+       if (!defined(build_native_rust_unit_tests)) {
+         build_native_rust_unit_tests = _crate_type != "proc-macro"
+       }

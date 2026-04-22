@@ -6,7 +6,7 @@
 Name:           muParser
 Summary:        A fast math parser library
 Version:        2.3.5
-Release:        3%{?dist}
+Release: 4%{?dist}
 BuildRequires:  cmake
 BuildRequires:  dos2unix
 BuildRequires:  gcc

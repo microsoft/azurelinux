@@ -6,7 +6,7 @@
 
 Name:           zfp
 Version:        1.0.1
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        Library for compressed numerical arrays with high throughput R/W random access
 
 # Automatically converted from old format: BSD - review is highly recommended.

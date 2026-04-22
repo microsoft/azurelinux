@@ -1,0 +1,57 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jonathan Lebon <jonathan@jlebon.com>
+Date: Wed, 17 Aug 2022 10:26:03 -0400
+Subject: [PATCH] squish: BLS: only write /etc/kernel/cmdline if writable
+
+On OSTree systems, `grub2-mkconfig` is run with `/etc` mounted read-only
+because as part of the promise of transactional updates, we want to make
+sure that we're not modifying the current deployment's state (`/etc` or
+`/var`).
+
+This conflicts with 0837dcdf1 ("BLS: create /etc/kernel/cmdline during
+mkconfig") which wants to write to `/etc/kernel/cmdline`. I'm not
+exactly sure on the background there, but based on the comment I think
+the intent is to fulfill grubby's expectation that the file exists.
+
+However, in systems like Silverblue, kernel arguments are managed by the
+rpm-ostree stack and grubby is not shipped at all.
+
+Adjust the script slightly so that we only write `/etc/kernel/cmdline`
+if the parent directory is writable.
+
+In the future, we're hoping to simplify things further on rpm-ostree
+systems by not running `grub2-mkconfig` at all since libostree already
+directly writes BLS entries. Doing that would also have avoided this,
+but ratcheting it into existing systems needs more careful thought.
+
+Signed-off-by: Jonathan Lebon <jonathan@jlebon.com>
+
+Fixes: https://github.com/fedora-silverblue/issue-tracker/issues/322
+---
+ util/grub.d/10_linux.in | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
+index 2dddc39816f..11c19304f8b 100644
+--- a/util/grub.d/10_linux.in
++++ b/util/grub.d/10_linux.in
+@@ -163,12 +163,13 @@ update_bls_cmdline()
+     local cmdline="root=${LINUX_ROOT_DEVICE} ro ${GRUB_CMDLINE_LINUX} ${GRUB_CMDLINE_LINUX_DEFAULT}"
+     local -a files=($(get_sorted_bls))
+ 
+-    if [[ ! -f /etc/kernel/cmdline ]] ||
+-	   [[ /etc/kernel/cmdline -ot /etc/default/grub ]]; then
+-	# anaconda has the correct information to create this during install;
+-	# afterward, grubby will take care of syncing on updates.  If the user
+-	# has modified /etc/default/grub, try to cope.
+-	echo "$cmdline" > /etc/kernel/cmdline
++    if [ -w /etc/kernel ] &&
++           [[ ! -f /etc/kernel/cmdline ||
++                  /etc/kernel/cmdline -ot /etc/default/grub ]]; then
++        # anaconda has the correct information to create this during install;
++        # afterward, grubby will take care of syncing on updates.  If the user
++        # has modified /etc/default/grub, try to cope.
++        echo "$cmdline" > /etc/kernel/cmdline
+     fi
+ 
+     for bls in "${files[@]}"; do

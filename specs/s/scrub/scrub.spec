@@ -3,7 +3,7 @@
 
 Name:		scrub
 Version:	2.6.1
-Release:	11%{?dist}
+Release: 12%{?dist}
 Summary:	Disk scrubbing program
 License:	GPL-2.0-or-later
 URL:		https://github.com/chaos/scrub/

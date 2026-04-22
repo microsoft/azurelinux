@@ -10,7 +10,7 @@
 
 Name:           perl-Sereal
 Version:        5.004
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        Fast, compact, powerful binary (de-)serialization
 # Makefile.PL defines LICENSE
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

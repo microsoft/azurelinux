@@ -8,7 +8,7 @@
 Summary: Cursor management library
 Name: libXcursor
 Version: 1.2.3
-Release: 3%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
+Release: 4%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
 License: HPND-sell-variant
 URL: http://www.x.org
 

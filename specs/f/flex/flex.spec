@@ -6,7 +6,7 @@
 Summary: A tool for generating scanners (text pattern recognizers)
 Name: flex
 Version: 2.6.4
-Release: 20%{?dist}
+Release: 21%{?dist}
 
 # An SPDX license string check done against flex-2.6.4 using fossology
 # found strings corresponding to the licenses noted below across the flex

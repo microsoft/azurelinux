@@ -6,7 +6,7 @@
 
 Name:           perl-Text-Template
 Version:        1.61
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        Expand template text with embedded Perl
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Text-Template

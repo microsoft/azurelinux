@@ -8,7 +8,7 @@ Version:       1.1
 
 Summary:       Userspace block driver server and ublk tool
 Name:          ubdsrv
-Release:       1.rc1%{?dist}.5
+Release: 2.rc1%{?dist}.5
 URL:           %{forgeurl}
 Source:        %{forgesource}
 License:       LGPLv2+ or MIT

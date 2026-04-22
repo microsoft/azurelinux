@@ -12,7 +12,7 @@
 %endif
 
 %global sname manilaclient
-%global with_doc 1
+%global with_doc 0
 
 %global common_desc \
 Client library and command line utility for interacting with Openstack \
@@ -20,7 +20,7 @@ Share API.
 
 Name:       python-manilaclient
 Version:    5.0.0
-Release:    5%{?dist}
+Release: 6%{?dist}
 Summary:    Client Library for OpenStack Share API
 License:    Apache-2.0
 URL:        https://pypi.io/pypi/%{name}

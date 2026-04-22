@@ -11,7 +11,7 @@ Name: hunspell-ast
 Summary: Asturian hunspell dictionaries
 Epoch: 1
 Version: 2.0
-Release: 17%{?dist}
+Release: 18%{?dist}
 Source: https://extensions.libreoffice.org/extensions/correutor-ortograficu-dasturianu/2.0/@@download/file/ort_ast_20190216_1129.oxt
 URL: http://softastur.org/
 License: GPL-1.0-or-later OR LGPL-2.1-or-later

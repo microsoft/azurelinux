@@ -3,7 +3,7 @@
 
 Name:           exif
 Version:        0.6.22
-Release:        12%{?dist}
+Release: 13%{?dist}
 Summary:        Utility to show EXIF information hidden in JPEG files
 Summary(fr):    Outil pour afficher les informations EXIF masquées dans les fichiers JPEG
 

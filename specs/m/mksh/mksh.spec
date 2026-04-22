@@ -4,7 +4,7 @@
 Summary:          MirBSD enhanced version of the Korn Shell
 Name:             mksh
 Version:          59c
-Release:          14%{?dist}
+Release: 15%{?dist}
 # ISC (strlcpy.c) and MirOS (the rest)
 License:          MirOS AND ISC
 URL:              https://www.mirbsd.org/mksh.htm

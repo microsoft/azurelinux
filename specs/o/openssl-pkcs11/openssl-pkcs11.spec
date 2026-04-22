@@ -2,7 +2,7 @@
 # Do not edit manually; changes may be overwritten.
 
 Version: 0.4.13
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 # Define the directory where the OpenSSL engines are installed
 %global enginesdir %{_libdir}/engines-3

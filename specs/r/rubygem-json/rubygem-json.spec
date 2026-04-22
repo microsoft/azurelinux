@@ -9,7 +9,7 @@
 
 Name:           rubygem-%{gem_name}
 Version:        %{pkg_version_num}%{?pkg_version_alpha:~%pkg_version_alpha}
-Release:        1%{?dist}
+Release: 2%{?dist}
 
 Summary:        A JSON implementation in Ruby
 

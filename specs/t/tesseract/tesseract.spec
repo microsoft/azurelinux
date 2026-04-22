@@ -11,7 +11,7 @@
 
 Name:          tesseract
 Version:       5.5.2
-Release:       1%{?dist}
+Release: 2%{?dist}
 Summary:       Raw OCR Engine
 
 License:       Apache-2.0

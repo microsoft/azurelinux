@@ -1,0 +1,13 @@
+diff --git a/internal/exec/stages/files/units.go b/internal/exec/stages/files/units.go
+index d690f054..1c427f6b 100644
+--- a/internal/exec/stages/files/units.go
++++ b/internal/exec/stages/files/units.go
+@@ -45,7 +45,7 @@ func (s *stage) warnOnOldSystemdVersion() error {
+ 		return err
+ 	}
+ 	if systemdVersion < 240 {
+-		s.Warning("The version of systemd (%q) is less than 240. Enabling/disabling instantiated units may not work. See https://github.com/coreos/ignition/issues/586 for more information.", systemdVersion)
++		s.Warning("The version of systemd (%d) is less than 240. Enabling/disabling instantiated units may not work. See https://github.com/coreos/ignition/issues/586 for more information.", systemdVersion)
+ 	}
+ 	return nil
+ }

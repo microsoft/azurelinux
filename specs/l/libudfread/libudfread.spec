@@ -3,7 +3,7 @@
 
 Name:           libudfread
 Version:        1.1.2
-Release:        12%{?dist}
+Release: 13%{?dist}
 Summary:        UDF reader library
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.
 License:        LicenseRef-Callaway-LGPLv2+

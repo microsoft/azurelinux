@@ -1,0 +1,15 @@
+Open Type rules and Nepali glyphsets developed at Madan Puraskar Pustakalaya and released under GPL. 
+
+Contacts: 
+Madan Puraskar Pustakalaya
+Yalamaya Kendra, Patan, NEPAL
+GPO Box. 42
+www.mpp.org.np
+info@mpp.org.np
+
+Font Developers: 
+Gaurav Shrestha | gaurav@mpp.org.np
+Anjan Ale | anjan@mpp.org.np
+
+
+Copyright (c) 2007 by Madan Puraskar Pustakalaya. All rights reserved.

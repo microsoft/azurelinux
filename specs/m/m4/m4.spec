@@ -4,7 +4,7 @@
 Summary: GNU macro processor
 Name: m4
 Version: 1.4.21
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPL-3.0-or-later AND GFDL-1.3-or-later AND FSFULLR AND GPL-3.0-or-later WITH Autoconf-exception-generic-3.0 AND GPL-3.0-or-later WITH Texinfo-exception AND GPL-2.0-or-later WITH Autoconf-exception-generic AND GPL-3.0-or-later WITH Autoconf-exception-generic-3.0 AND MIT
 Source0: https://ftp.gnu.org/gnu/m4/m4-%{version}.tar.xz
 Source1: https://ftp.gnu.org/gnu/m4/m4-%{version}.tar.xz.sig

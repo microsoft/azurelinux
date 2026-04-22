@@ -6,7 +6,7 @@
 Summary:        Library to create ISO 9660 disk images
 Name:           libisofs
 Version:        1.5.6
-Release:        8%{?dist}
+Release: 9%{?dist}
 # libisofs/make_isohybrid_mbr.c is LGPL-2.0-or-later, rest is GPL-2.0-or-later
 License:        GPL-2.0-or-later AND LGPL-2.0-or-later
 URL:            https://libburnia-project.org/

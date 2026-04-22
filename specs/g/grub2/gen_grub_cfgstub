@@ -1,0 +1,29 @@
+#!/bin/sh
+set -eu
+
+if [ $# -ne 2 ]
+  then
+    echo "Missing argument"
+    echo "Usage: script.sh GRUB_HOME EFI_HOME"
+    exit 1
+fi
+
+GRUB_HOME=$1
+EFI_HOME=$2
+
+# create a stub grub2 config in EFI
+BOOT_UUID=$(grub2-probe --target=fs_uuid "${GRUB_HOME}")
+GRUB_DIR=$(grub2-mkrelpath "${GRUB_HOME}")
+
+echo "Generating grub stub config for drive " "${BOOT_UUID}"
+echo "GRUB_DIR=" "${GRUB_DIR}"
+echo "EFI_HOME=" "${EFI_HOME}"
+
+cat << EOF > "${EFI_HOME}"/grub.cfg.stb
+search --no-floppy --root-dev-only --fs-uuid --set=dev ${BOOT_UUID}
+set prefix=(\$dev)${GRUB_DIR}
+export \$prefix
+configfile \$prefix/grub.cfg
+EOF
+
+mv ${EFI_HOME}/grub.cfg.stb ${EFI_HOME}/grub.cfg

@@ -3,7 +3,7 @@
 
 Name:		perl-File-Remove
 Version:	1.61
-Release:	10%{?dist}
+Release: 11%{?dist}
 Summary:	Convenience module for removing files and directories
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 

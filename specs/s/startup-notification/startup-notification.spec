@@ -3,7 +3,7 @@
 
 Name:    startup-notification
 Version: 0.12
-Release: 32%{?dist}
+Release: 33%{?dist}
 Summary: Library for tracking application startup
 
 License: LGPL-2.0-or-later AND MIT

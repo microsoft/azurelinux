@@ -10,7 +10,7 @@
 
 Name:           python-requests-mock
 Version:        1.12.1
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        Mock out responses from the requests package
 License:        Apache-2.0
 URL:            https://requests-mock.readthedocs.io/

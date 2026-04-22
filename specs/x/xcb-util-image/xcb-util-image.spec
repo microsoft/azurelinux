@@ -3,7 +3,7 @@
 
 Name:		xcb-util-image
 Version:	0.4.1
-Release:	8%{?dist}
+Release: 9%{?dist}
 Summary:	Port of Xlib's XImage and XShmImage functions on top of libxcb
 License:	X11-distribute-modifications-variant
 URL:		http://xcb.freedesktop.org

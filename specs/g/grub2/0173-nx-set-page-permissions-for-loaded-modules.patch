@@ -1,0 +1,236 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 21 Mar 2022 17:46:35 -0400
+Subject: [PATCH] nx: set page permissions for loaded modules.
+
+For NX, we need to set write and executable permissions on the sections
+of grub modules when we load them.
+
+On sections with SHF_ALLOC set, which is typically everything except
+.modname and the symbol and string tables, this patch clears the Read
+Only flag on sections that have the ELF flag SHF_WRITE set, and clears
+the No eXecute flag on sections with SHF_EXECINSTR set.  In all other
+cases it sets both flags.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+[rharwood: arm tgptr -> tgaddr]
+Signed-off-by: Robbie Harwood <rharwood@redhat.com>
+---
+ grub-core/kern/dl.c | 102 +++++++++++++++++++++++++++++++++++++++++++++-------
+ include/grub/dl.h   |  44 +++++++++++++++++++++++
+ 2 files changed, 133 insertions(+), 13 deletions(-)
+
+diff --git a/grub-core/kern/dl.c b/grub-core/kern/dl.c
+index 775b367287e..25666ae383f 100644
+--- a/grub-core/kern/dl.c
++++ b/grub-core/kern/dl.c
+@@ -277,6 +277,8 @@ grub_dl_load_segments (grub_dl_t mod, const Elf_Ehdr *e)
+ #endif
+   char *ptr;
+ 
++  grub_dprintf ("modules", "loading segments for \"%s\"\n", mod->name);
++
+   arch_addralign = grub_arch_dl_min_alignment ();
+ 
+   for (i = 0, s = (const Elf_Shdr *)((const char *) e + e->e_shoff);
+@@ -378,6 +380,7 @@ grub_dl_load_segments (grub_dl_t mod, const Elf_Ehdr *e)
+   ptr += got;
+ #endif
+ 
++  grub_dprintf ("modules", "done loading segments for \"%s\"\n", mod->name);
+   return GRUB_ERR_NONE;
+ }
+ 
+@@ -645,6 +648,7 @@ grub_dl_relocate_symbols (grub_dl_t mod, void *ehdr)
+   Elf_Shdr *s;
+   unsigned i;
+ 
++  grub_dprintf ("modules", "relocating symbols for \"%s\"\n", mod->name);
+   for (i = 0, s = (Elf_Shdr *) ((char *) e + e->e_shoff);
+        i < e->e_shnum;
+        i++, s = (Elf_Shdr *) ((char *) s + e->e_shentsize))
+@@ -653,22 +657,92 @@ grub_dl_relocate_symbols (grub_dl_t mod, void *ehdr)
+ 	grub_dl_segment_t seg;
+ 	grub_err_t err;
+ 
+-	/* Find the target segment.  */
+-	for (seg = mod->segment; seg; seg = seg->next)
+-	  if (seg->section == s->sh_info)
+-	    break;
++	seg = grub_dl_find_segment(mod, s->sh_info);
++        if (!seg)
++	  continue;
+ 
+-	if (seg)
+-	  {
+-	    if (!mod->symtab)
+-	      return grub_error (GRUB_ERR_BAD_MODULE, "relocation without symbol table");
++	if (!mod->symtab)
++	  return grub_error (GRUB_ERR_BAD_MODULE, "relocation without symbol table");
+ 
+-	    err = grub_arch_dl_relocate_symbols (mod, ehdr, s, seg);
+-	    if (err)
+-	      return err;
+-	  }
++	err = grub_arch_dl_relocate_symbols (mod, ehdr, s, seg);
++	if (err)
++	  return err;
+       }
+ 
++  grub_dprintf ("modules", "done relocating symbols for \"%s\"\n", mod->name);
++  return GRUB_ERR_NONE;
++}
++
++static grub_err_t
++grub_dl_set_mem_attrs (grub_dl_t mod, void *ehdr)
++{
++  unsigned i;
++  const Elf_Shdr *s;
++  const Elf_Ehdr *e = ehdr;
++#if !defined (__i386__) && !defined (__x86_64__) && !defined(__riscv)
++  grub_size_t arch_addralign = grub_arch_dl_min_alignment ();
++  grub_addr_t tgaddr;
++  grub_uint64_t tgsz;
++#endif
++
++  grub_dprintf ("modules", "updating memory attributes for \"%s\"\n",
++		mod->name);
++  for (i = 0, s = (const Elf_Shdr *)((const char *) e + e->e_shoff);
++       i < e->e_shnum;
++       i++, s = (const Elf_Shdr *)((const char *) s + e->e_shentsize))
++    {
++      grub_dl_segment_t seg;
++      grub_uint64_t set_attrs = GRUB_MEM_ATTR_R;
++      grub_uint64_t clear_attrs = GRUB_MEM_ATTR_W|GRUB_MEM_ATTR_X;
++
++      seg = grub_dl_find_segment(mod, i);
++      if (!seg)
++	continue;
++
++      if (seg->size == 0 || !(s->sh_flags & SHF_ALLOC))
++	continue;
++
++      if (s->sh_flags & SHF_WRITE)
++	{
++	  set_attrs |= GRUB_MEM_ATTR_W;
++	  clear_attrs &= ~GRUB_MEM_ATTR_W;
++	}
++
++      if (s->sh_flags & SHF_EXECINSTR)
++	{
++	  set_attrs |= GRUB_MEM_ATTR_X;
++	  clear_attrs &= ~GRUB_MEM_ATTR_X;
++	}
++
++      grub_dprintf ("modules", "setting memory attrs for section \"%s\" to -%s%s%s+%s%s%s\n",
++		    grub_dl_get_section_name(e, s),
++		    (clear_attrs & GRUB_MEM_ATTR_R) ? "r" : "",
++		    (clear_attrs & GRUB_MEM_ATTR_W) ? "w" : "",
++		    (clear_attrs & GRUB_MEM_ATTR_X) ? "x" : "",
++		    (set_attrs & GRUB_MEM_ATTR_R) ? "r" : "",
++		    (set_attrs & GRUB_MEM_ATTR_W) ? "w" : "",
++		    (set_attrs & GRUB_MEM_ATTR_X) ? "x" : "");
++      grub_update_mem_attrs ((grub_addr_t)(seg->addr), seg->size, set_attrs, clear_attrs);
++    }
++
++#if !defined (__i386__) && !defined (__x86_64__) && !defined(__riscv)
++  tgaddr = grub_min((grub_addr_t)mod->tramp, (grub_addr_t)mod->got);
++  tgsz = grub_max((grub_addr_t)mod->trampptr, (grub_addr_t)mod->gotptr) - tgaddr;
++
++  if (tgsz)
++    {
++      tgsz = ALIGN_UP(tgsz, arch_addralign);
++
++      grub_dprintf ("modules", "updating attributes for GOT and trampolines\n",
++		    mod->name);
++      grub_update_mem_attrs (tgaddr, tgsz, GRUB_MEM_ATTR_R|GRUB_MEM_ATTR_X,
++			     GRUB_MEM_ATTR_W);
++    }
++#endif
++
++  grub_dprintf ("modules", "done updating module memory attributes for \"%s\"\n",
++		mod->name);
++
+   return GRUB_ERR_NONE;
+ }
+ 
+@@ -705,6 +779,7 @@ grub_dl_load_core_noinit (void *addr, grub_size_t size)
+   mod->ref_count = 1;
+ 
+   grub_dprintf ("modules", "relocating to %p\n", mod);
++
+   /* Me, Vladimir Serbinenko, hereby I add this module check as per new
+      GNU module policy. Note that this license check is informative only.
+      Modules have to be licensed under GPLv3 or GPLv3+ (optionally
+@@ -718,7 +793,8 @@ grub_dl_load_core_noinit (void *addr, grub_size_t size)
+       || grub_dl_resolve_dependencies (mod, e)
+       || grub_dl_load_segments (mod, e)
+       || grub_dl_resolve_symbols (mod, e)
+-      || grub_dl_relocate_symbols (mod, e))
++      || grub_dl_relocate_symbols (mod, e)
++      || grub_dl_set_mem_attrs (mod, e))
+     {
+       mod->fini = 0;
+       grub_dl_unload (mod);
+diff --git a/include/grub/dl.h b/include/grub/dl.h
+index 9f86765c8e9..1e1262a283b 100644
+--- a/include/grub/dl.h
++++ b/include/grub/dl.h
+@@ -27,6 +27,7 @@
+ #include <grub/elf.h>
+ #include <grub/list.h>
+ #include <grub/misc.h>
++#include <grub/mm.h>
+ #endif
+ 
+ /*
+@@ -267,6 +268,49 @@ grub_dl_is_persistent (grub_dl_t mod)
+   return mod->persistent;
+ }
+ 
++static inline const char *
++grub_dl_get_section_name (const Elf_Ehdr *e, const Elf_Shdr *s)
++{
++  Elf_Shdr *str_s;
++  const char *str;
++
++  str_s = (Elf_Shdr *) ((char *) e + e->e_shoff + e->e_shstrndx * e->e_shentsize);
++  str = (char *) e + str_s->sh_offset;
++
++  return str + s->sh_name;
++}
++
++static inline long
++grub_dl_find_section_index (Elf_Ehdr *e, const char *name)
++{
++  Elf_Shdr *s;
++  const char *str;
++  unsigned i;
++
++  s = (Elf_Shdr *) ((char *) e + e->e_shoff + e->e_shstrndx * e->e_shentsize);
++  str = (char *) e + s->sh_offset;
++
++  for (i = 0, s = (Elf_Shdr *) ((char *) e + e->e_shoff);
++       i < e->e_shnum;
++       i++, s = (Elf_Shdr *) ((char *) s + e->e_shentsize))
++    if (grub_strcmp (str + s->sh_name, name) == 0)
++      return (long)i;
++  return -1;
++}
++
++/* Return the segment for a section of index N */
++static inline grub_dl_segment_t
++grub_dl_find_segment (grub_dl_t mod, unsigned n)
++{
++  grub_dl_segment_t seg;
++
++  for (seg = mod->segment; seg; seg = seg->next)
++    if (seg->section == n)
++      return seg;
++
++  return NULL;
++}
++
+ #endif
+ 
+ void * EXPORT_FUNC(grub_resolve_symbol) (const char *name);

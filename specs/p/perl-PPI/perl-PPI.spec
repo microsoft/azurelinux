@@ -10,7 +10,7 @@
 
 Name:           perl-PPI
 Version:        1.283
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Parse, Analyze and Manipulate Perl
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/PPI

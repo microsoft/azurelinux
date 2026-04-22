@@ -1,0 +1,11 @@
+git-lfs on Fedora
+=================
+
+By default, the package will run a post-install/post-uninstall task to
+enable/disable git-lfs filters in the system git configuration.
+
+If you wish to enable/disable git-lfs manually, you can set the following
+option in the system git config, and package install/uninstall will no longer
+do this:
+
+# git config --system 'fedora.git-lfs.no-modify-config' true

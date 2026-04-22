@@ -9,7 +9,7 @@
 
 Name:           python-%{pkg_name}
 Version:        13.10.2
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        The sip module support for PyQt6
 
 License:        GPL-2.0-only OR GPL-3.0-only

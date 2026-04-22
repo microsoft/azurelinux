@@ -11,7 +11,7 @@ Name: hunspell-xh
 Summary: Xhosa hunspell dictionaries
 %global upstreamid 20091030
 Version: 0.%{upstreamid}
-Release: 32%{?dist}
+Release: 33%{?dist}
 Source: https://downloads.sourceforge.net/project/aoo-extensions/3133/0/dict-xh_za-2009.10.30.oxt
 URL: https://extensions.openoffice.org/en/project/xhosa-spell-checker
 License: LGPL-2.1-or-later

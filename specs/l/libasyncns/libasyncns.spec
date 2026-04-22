@@ -3,7 +3,7 @@
 
 Name: libasyncns
 Version: 0.8
-Release: 31%{?dist}
+Release: 32%{?dist}
 Summary: Asynchronous Name Service Library
 Source0: http://0pointer.de/lennart/projects/libasyncns/libasyncns-%{version}.tar.gz
 License: LGPL-2.1-or-later

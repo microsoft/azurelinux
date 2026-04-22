@@ -7,7 +7,7 @@
 
 Name:           python-%{pypi_name}
 Version:        1.7.0
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        A lean WSGI object-dispatching web framework
 
 # Automatically converted from old format: BSD - review is highly recommended.

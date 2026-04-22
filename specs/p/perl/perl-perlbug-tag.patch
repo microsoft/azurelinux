@@ -1,0 +1,21 @@
+diff -up perl-5.28.0-RC1/utils/perlbug.PL.orig perl-5.28.0-RC1/utils/perlbug.PL
+--- perl-5.28.0-RC1/utils/perlbug.PL.orig	2018-05-21 12:44:04.000000000 +0200
++++ perl-5.28.0-RC1/utils/perlbug.PL	2018-05-22 12:17:58.584993588 +0200
+@@ -288,17 +288,6 @@ sub Init {
+     $ok = '';
+     if ($opt{o}) {
+ 	if ($opt{o} eq 'k' or $opt{o} eq 'kay') {
+-	    my $age = time - $patchlevel_date;
+-	    if ($opt{o} eq 'k' and $age > 60 * 24 * 60 * 60 ) {
+-		my $date = localtime $patchlevel_date;
+-		print <<"EOF";
+-"perlbug -ok" and "perlbug -nok" do not report on Perl versions which
+-are more than 60 days old.  This Perl version was constructed on
+-$date.  If you really want to report this, use
+-"perlbug -okay" or "perlbug -nokay".
+-EOF
+-		exit();
+-	    }
+ 	    # force these options
+ 	    unless ($opt{n}) {
+ 		$opt{S} = 1; # don't prompt for send

@@ -1,0 +1,29 @@
+Index: chromium-144.0.7559.59/third_party/breakpad/BUILD.gn
+===================================================================
+--- chromium-144.0.7559.59.orig/third_party/breakpad/BUILD.gn
++++ chromium-144.0.7559.59/third_party/breakpad/BUILD.gn
+@@ -804,7 +804,6 @@ if (is_linux || is_chromeos || is_androi
+       "breakpad/src/client/minidump_file_writer.h",
+       "breakpad/src/common/convert_UTF.cc",
+       "breakpad/src/common/convert_UTF.h",
+-      "breakpad/src/common/linux/breakpad_getcontext.S",
+       "breakpad/src/common/linux/elf_core_dump.cc",
+       "breakpad/src/common/linux/elf_core_dump.h",
+       "breakpad/src/common/linux/elfutils.cc",
+@@ -836,6 +835,8 @@ if (is_linux || is_chromeos || is_androi
+     configs += [ "//build/config/compiler:no_chromium_code" ]
+     public_configs = [ ":client_config" ]
+ 
++    defines = [ "HAVE_GETCONTEXT" ]
++
+     if (current_cpu == "arm" && is_chromeos_ash) {
+       # Avoid running out of registers in
+       # linux_syscall_support.h:sys_clone()'s inline assembly.
+@@ -893,7 +894,6 @@ if (is_linux || is_chromeos || is_androi
+       "breakpad/src/client/linux/minidump_writer/minidump_writer_unittest.cc",
+       "breakpad/src/client/linux/minidump_writer/minidump_writer_unittest_utils.cc",
+       "breakpad/src/client/linux/minidump_writer/proc_cpuinfo_reader_unittest.cc",
+-      "breakpad/src/common/linux/breakpad_getcontext_unittest.cc",
+       "breakpad/src/common/linux/elf_core_dump_unittest.cc",
+       "breakpad/src/common/linux/file_id_unittest.cc",
+       "breakpad/src/common/linux/linux_libc_support_unittest.cc",

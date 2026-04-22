@@ -5,7 +5,7 @@
 
 Name:     neatvnc
 Version:  0.9.0
-Release:  4%{?dist}
+Release: 5%{?dist}
 Summary:  Liberally licensed VNC server library
 # main source is ISC
 # include/sys/queue.h is BSD

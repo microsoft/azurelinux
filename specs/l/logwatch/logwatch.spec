@@ -5,7 +5,7 @@
 Summary: Analyzes and Reports on system logs
 Name: logwatch
 Version: 7.14
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: MIT
 URL: https://sourceforge.net/projects/logwatch/
 Source0: https://sourceforge.net/projects/logwatch/files/%{name}-%{version}/%{name}-%{version}.tar.gz

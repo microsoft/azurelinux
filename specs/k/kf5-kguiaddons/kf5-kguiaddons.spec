@@ -7,7 +7,7 @@
 
 Name:    kf5-%{framework}
 Version: 5.116.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: KDE Frameworks 5 Tier 1 addon with various classes on top of QtGui
 
 License: BSD-2-Clause AND CC0-1.0 AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-3.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-3.0-only AND (GPL-2.0-only OR GPL-3.0-only) AND (LGPL-2.1-only OR LGPL-3.0-only)

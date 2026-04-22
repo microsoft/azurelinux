@@ -1,0 +1,429 @@
+From 7faaaffde4d2c82a33761297c2cc7aabe868a326 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Wed, 16 Jul 2025 13:16:05 +0200
+Subject: [PATCH 4/4] Add JRE class generated from template
+
+---
+ .../org/junit/jupiter/api/condition/JRE.java  | 410 ++++++++++++++++++
+ 1 file changed, 410 insertions(+)
+ create mode 100644 junit-jupiter-api/src/main/java/org/junit/jupiter/api/condition/JRE.java
+
+diff --git a/junit-jupiter-api/src/main/java/org/junit/jupiter/api/condition/JRE.java b/junit-jupiter-api/src/main/java/org/junit/jupiter/api/condition/JRE.java
+new file mode 100644
+index 000000000..953059844
+--- /dev/null
++++ b/junit-jupiter-api/src/main/java/org/junit/jupiter/api/condition/JRE.java
+@@ -0,0 +1,410 @@
++/*
++ * Copyright 2015-2025 the original author or authors.
++ *
++ * All rights reserved. This program and the accompanying materials are
++ * made available under the terms of the Eclipse Public License v2.0 which
++ * accompanies this distribution and is available at
++ *
++ * https://www.eclipse.org/legal/epl-v20.html
++ */
++
++package org.junit.jupiter.api.condition;
++
++import static org.apiguardian.api.API.Status.DEPRECATED;
++import static org.apiguardian.api.API.Status.MAINTAINED;
++import static org.apiguardian.api.API.Status.STABLE;
++
++import java.lang.reflect.Method;
++
++import org.apiguardian.api.API;
++import org.junit.platform.commons.logging.Logger;
++import org.junit.platform.commons.logging.LoggerFactory;
++import org.junit.platform.commons.support.ReflectionSupport;
++import org.junit.platform.commons.util.StringUtils;
++
++/**
++ * Enumeration of Java Runtime Environment (JRE) versions.
++ *
++ * <p>If the current JRE version can be detected but is not one of the predefined
++ * constants in this enum, {@link #OTHER} will be considered to be the
++ * {@linkplain #isCurrentVersion current JRE version}. If the current JRE version
++ * cannot be detected &mdash; for example, if the {@code java.version} JVM system
++ * property is undefined &mdash; {@link #UNDEFINED} will be considered to be the
++ * current JRE version.
++ *
++ * @since 5.1
++ * @see #JAVA_8
++ * @see #JAVA_9
++ * @see #JAVA_10
++ * @see #JAVA_11
++ * @see #JAVA_12
++ * @see #JAVA_13
++ * @see #JAVA_14
++ * @see #JAVA_15
++ * @see #JAVA_16
++ * @see #JAVA_17
++ * @see #JAVA_18
++ * @see #JAVA_19
++ * @see #JAVA_20
++ * @see #JAVA_21
++ * @see #JAVA_22
++ * @see #JAVA_23
++ * @see #JAVA_24
++ * @see #JAVA_25
++ * @see #JAVA_26
++ * @see #OTHER
++ * @see EnabledOnJre
++ * @see DisabledOnJre
++ * @see EnabledForJreRange
++ * @see DisabledForJreRange
++ */
++@API(status = STABLE, since = "5.1")
++public enum JRE {
++
++	/**
++	 * An undefined JRE version.
++	 *
++	 * <p>This constant is used by JUnit as a default configuration value but is
++	 * not intended to be used by users.
++	 *
++	 * <p>This constant returns {@code -1} for its {@linkplain #version() version}.
++	 *
++	 * @since 5.12
++	 */
++	@API(status = MAINTAINED, since = "5.13.3")
++	UNDEFINED(-1),
++
++	/**
++	 * Java 8.
++	 */
++	JAVA_8(8),
++
++	/**
++	 * Java 9.
++	 */
++	JAVA_9(9),
++
++	/**
++	 * Java 10.
++	 */
++	JAVA_10(10),
++
++	/**
++	 * Java 11.
++	 */
++	JAVA_11(11),
++
++	/**
++	 * Java 12.
++	 *
++	 * @since 5.4
++	 */
++	@API(status = STABLE, since = "5.4")
++	JAVA_12(12),
++
++	/**
++	 * Java 13.
++	 *
++	 * @since 5.4
++	 */
++	@API(status = STABLE, since = "5.4")
++	JAVA_13(13),
++
++	/**
++	 * Java 14.
++	 *
++	 * @since 5.5
++	 */
++	@API(status = STABLE, since = "5.5")
++	JAVA_14(14),
++
++	/**
++	 * Java 15.
++	 *
++	 * @since 5.6
++	 */
++	@API(status = STABLE, since = "5.6")
++	JAVA_15(15),
++
++	/**
++	 * Java 16.
++	 *
++	 * @since 5.7
++	 */
++	@API(status = STABLE, since = "5.7")
++	JAVA_16(16),
++
++	/**
++	 * Java 17.
++	 *
++	 * @since 5.7.1
++	 */
++	@API(status = STABLE, since = "5.7.1")
++	JAVA_17(17),
++
++	/**
++	 * Java 18.
++	 *
++	 * @since 5.8.1
++	 */
++	@API(status = STABLE, since = "5.8.1")
++	JAVA_18(18),
++
++	/**
++	 * Java 19.
++	 *
++	 * @since 5.9
++	 */
++	@API(status = STABLE, since = "5.9")
++	JAVA_19(19),
++
++	/**
++	 * Java 20.
++	 *
++	 * @since 5.9
++	 */
++	@API(status = STABLE, since = "5.9")
++	JAVA_20(20),
++
++	/**
++	 * Java 21.
++	 *
++	 * @since 5.9.2
++	 */
++	@API(status = STABLE, since = "5.9.2")
++	JAVA_21(21),
++
++	/**
++	 * Java 22.
++	 *
++	 * @since 5.10
++	 */
++	@API(status = STABLE, since = "5.10")
++	JAVA_22(22),
++
++	/**
++	 * Java 23.
++	 *
++	 * @since 5.11
++	 */
++	@API(status = STABLE, since = "5.11")
++	JAVA_23(23),
++
++	/**
++	 * Java 24.
++	 *
++	 * @since 5.11
++	 */
++	@API(status = STABLE, since = "5.11")
++	JAVA_24(24),
++
++	/**
++	 * Java 25.
++	 *
++	 * @since 5.11.4
++	 */
++	@API(status = STABLE, since = "5.11.4")
++	JAVA_25(25),
++
++	/**
++	 * Java 26.
++	 *
++	 * @since 6.0
++	 */
++	@API(status = STABLE, since = "6.0")
++	JAVA_26(26),
++
++	/**
++	 * A JRE version other than {@link #JAVA_8}, {@link #JAVA_9},
++	 * {@link #JAVA_10}, {@link #JAVA_11}, {@link #JAVA_12},
++	 * {@link #JAVA_13}, {@link #JAVA_14}, {@link #JAVA_15},
++	 * {@link #JAVA_16}, {@link #JAVA_17}, {@link #JAVA_18},
++	 * {@link #JAVA_19}, {@link #JAVA_20}, {@link #JAVA_21},
++	 * {@link #JAVA_22}, {@link #JAVA_23}, {@link #JAVA_24},
++	 * {@link #JAVA_25}, or {@link #JAVA_26}.
++	 *
++	 * <p>This constant returns {@link Integer#MAX_VALUE} for its
++	 * {@linkplain #version() version}. To retrieve the actual version number,
++	 * use {@link #currentVersionNumber()}.
++	 */
++	OTHER(Integer.MAX_VALUE);
++
++	static final int UNDEFINED_VERSION = -1;
++
++	static final int MINIMUM_VERSION = 8;
++
++	private static final Logger logger = LoggerFactory.getLogger(JRE.class);
++
++	private static final int CURRENT_VERSION = determineCurrentVersion();
++
++	private static final JRE CURRENT_JRE = determineCurrentJre(CURRENT_VERSION);
++
++	private static int determineCurrentVersion() {
++		String javaVersion = System.getProperty("java.version");
++		boolean javaVersionIsBlank = StringUtils.isBlank(javaVersion);
++
++		if (javaVersionIsBlank) {
++			logger.debug(
++				() -> "JVM system property 'java.version' is undefined. It is therefore not possible to detect Java 8.");
++		}
++
++		if (!javaVersionIsBlank && javaVersion.startsWith("1.8")) {
++			return 8;
++		}
++
++		try {
++			// java.lang.Runtime.version() is a static method available on Java 9+
++			// that returns an instance of java.lang.Runtime.Version which has the
++			// following method: public int major()
++			Method versionMethod = Runtime.class.getMethod("version");
++			Object version = ReflectionSupport.invokeMethod(versionMethod, null);
++			Method majorMethod = version.getClass().getMethod("major");
++			return (int) ReflectionSupport.invokeMethod(majorMethod, version);
++		}
++		catch (Exception ex) {
++			logger.debug(ex, () -> "Failed to determine the current JRE version via java.lang.Runtime.Version.");
++		}
++
++		return UNDEFINED_VERSION;
++	}
++
++	private static JRE determineCurrentJre(int currentVersion) {
++		switch (currentVersion) {
++			case UNDEFINED_VERSION:
++				return UNDEFINED;
++			case 8:
++				return JAVA_8;
++			case 9:
++				return JAVA_9;
++			case 10:
++				return JAVA_10;
++			case 11:
++				return JAVA_11;
++			case 12:
++				return JAVA_12;
++			case 13:
++				return JAVA_13;
++			case 14:
++				return JAVA_14;
++			case 15:
++				return JAVA_15;
++			case 16:
++				return JAVA_16;
++			case 17:
++				return JAVA_17;
++			case 18:
++				return JAVA_18;
++			case 19:
++				return JAVA_19;
++			case 20:
++				return JAVA_20;
++			case 21:
++				return JAVA_21;
++			case 22:
++				return JAVA_22;
++			case 23:
++				return JAVA_23;
++			case 24:
++				return JAVA_24;
++			case 25:
++				return JAVA_25;
++			case 26:
++				return JAVA_26;
++			default:
++				return OTHER;
++		}
++	}
++
++	private final int version;
++
++	private JRE(int version) {
++		this.version = version;
++	}
++
++	/**
++	 * Get the version of <em>this</em> {@code JRE}.
++	 *
++	 * <p>If this {@code JRE} is {@link #UNDEFINED}, this method returns
++	 * {@code -1}. If this {@code JRE} is {@link #OTHER}, this method returns
++	 * {@link Integer#MAX_VALUE}.
++	 *
++	 * @return the version of this {@code JRE}
++	 * @since 5.12
++	 * @see Runtime.Version#feature()
++	 * @see #currentVersionNumber()
++	 */
++	@API(status = MAINTAINED, since = "5.13.3")
++	public int version() {
++		return this.version;
++	}
++
++	/**
++	 * @return {@code true} if <em>this</em> {@code JRE} is known to be the
++	 * Java Runtime Environment version for the currently executing JVM or if
++	 * the version is {@link #OTHER} or {@link #UNDEFINED}
++	 *
++	 * @see #currentJre()
++	 * @see #currentVersionNumber()
++	 */
++	public boolean isCurrentVersion() {
++		return this == CURRENT_JRE;
++	}
++
++	/**
++	 * @return the {@link JRE} for the currently executing JVM, potentially
++	 * {@link #OTHER} or {@link #UNDEFINED}
++	 *
++	 * @since 5.7
++	 * @see #currentVersionNumber()
++	 * @deprecated in favor of {@link #currentJre()}
++	 */
++	@API(status = DEPRECATED, since = "5.12")
++	@Deprecated
++	public static JRE currentVersion() {
++		return currentJre();
++	}
++
++	/**
++	 * @return the {@link JRE} for the currently executing JVM, potentially
++	 * {@link #OTHER} or {@link #UNDEFINED}
++	 *
++	 * @since 5.12
++	 * @see #currentVersionNumber()
++	 */
++	@API(status = STABLE, since = "5.12")
++	public static JRE currentJre() {
++		return CURRENT_JRE;
++	}
++
++	/**
++	 * @return the version number for the currently executing JVM, or {@code -1}
++	 * if the current JVM version could not be determined
++	 *
++	 * @since 5.12
++	 * @see Runtime.Version#feature()
++	 * @see #currentJre()
++	 */
++	@API(status = MAINTAINED, since = "5.13.3")
++	public static int currentVersionNumber() {
++		return CURRENT_VERSION;
++	}
++
++	/**
++	 * @return {@code true} if the supplied version number is known to be the
++	 * Java Runtime Environment version for the currently executing JVM or if
++	 * the supplied version number is {@code -1} and the current JVM version
++	 * could not be determined
++	 *
++	 * @since 5.12
++	 * @see Runtime.Version#feature()
++	 */
++	@API(status = MAINTAINED, since = "5.13.3")
++	public static boolean isCurrentVersion(int version) {
++		return version == CURRENT_VERSION;
++	}
++
++	static boolean isCurrentVersionWithinRange(int min, int max) {
++		return CURRENT_VERSION >= min && CURRENT_VERSION <= max;
++	}
++
++}
+-- 
+2.50.1
+

@@ -3,7 +3,7 @@
 
 Name:           uthash
 Version:        2.3.0
-Release:        10%{?dist}
+Release: 11%{?dist}
 Summary:        A hash table for C structures
 
 License:        BSD-1-Clause

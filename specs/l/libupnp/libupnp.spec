@@ -4,7 +4,7 @@
 Version: 1.14.30
 Summary: Universal Plug and Play (UPnP) SDK
 Name: libupnp
-Release: 1%{?dist}
+Release: 2%{?dist}
 # Automatically converted from old format: BSD - review is highly recommended.
 License: LicenseRef-Callaway-BSD
 URL: https://github.com/pupnp/pupnp

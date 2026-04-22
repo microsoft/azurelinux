@@ -1,0 +1,33 @@
+From: Maxwell G <gotmax@e.email>
+Subject: [PATCH] Exclude unnecessary files from built collection
+
+---
+ galaxy.yml | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/galaxy.yml b/galaxy.yml
+index a3b9509..0586254 100644
+--- a/galaxy.yml
++++ b/galaxy.yml
+@@ -12,3 +12,18 @@ repository: https://github.com/ansible-collections/ansible.posix
+ documentation: https://docs.ansible.com/ansible/latest/collections/ansible/posix/
+ homepage: https://github.com/ansible-collections/ansible.posix
+ issues: https://github.com/ansible-collections/ansible.posix
++build_ignore:
++  - "*requirements.txt"
++  - .azure-pipelines
++  - .github
++  - .gitignore
++  - changelogs/fragments
++  - codecov.yml
++  - shippable.yml
++  - tests
++  - tests/.gitignore
++  # Exclude files that we install with %doc and %license
++  - COPYING
++  - PSF-license.txt
++  - README.md
++  - CHANGELOG.rst
+-- 
+2.37.3
+

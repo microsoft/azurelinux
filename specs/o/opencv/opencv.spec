@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/opencv.azl.macros}
+
 %bcond_with  tests
 %bcond_without  compat_openvc_pc
 %if %{without tests}
@@ -78,7 +81,7 @@ Version:        4.11.0
 %global minorver %(foo=%{version}; a=(${foo//./ }); echo ${a[1]} )
 %global padding  %(digits=00; num=%{minorver}; echo ${digits:${#num}:${#digits}} )
 %global abiver   %(echo %{majorver}%{padding}%{minorver} )
-Release:        12%{?dist}
+Release: 13%{?dist}
 Summary:        Collection of algorithms for computer vision
 # This is normal three clause BSD.
 License:        BSD-3-Clause AND Apache-2.0 AND ISC
@@ -102,6 +105,7 @@ Source5:        xorg.conf
 %global wechat_shortcommit %(c=%{wechat_commit}; echo ${c:0:7})
 %global wechat_gitdate 20230712
 Source6:        https://github.com/WeChatCV/opencv_3rdparty/archive/%{wechat_commit}/wechat-%{wechat_gitdate}.git%{wechat_shortcommit}.tar.gz
+Source9999: opencv.azl.macros
 
 Patch0:         opencv-4.1.0-install_3rdparty_licenses.patch
 Patch3:         opencv.python.patch

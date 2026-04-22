@@ -6,7 +6,7 @@
 Name: hyphen-sa
 Summary: Sanskrit hyphenation rules
 Version: 0.%{upstreamid}
-Release: 30%{?dist}
+Release: 31%{?dist}
 #? in a url causes trouble
 #http://tug.org/svn/texhyphen/trunk/hyph-utf8/tex/generic/hyph-utf8/patterns/tex/hyph-sa.tex?view=co
 Source: hyph-sa.tex

@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Fedora Ninjas <grub2-owner@fedoraproject.org>
+Date: Mon, 13 Jan 2014 21:50:59 -0500
+Subject: [PATCH] Add .eh_frame to list of relocations stripped
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ conf/Makefile.common | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/conf/Makefile.common b/conf/Makefile.common
+index b8f216f6cd3..ece9ed8a1bf 100644
+--- a/conf/Makefile.common
++++ b/conf/Makefile.common
+@@ -41,7 +41,7 @@ CFLAGS_KERNEL = $(CFLAGS_PLATFORM) -ffreestanding
+ LDFLAGS_KERNEL = $(LDFLAGS_PLATFORM) -nostdlib $(TARGET_LDFLAGS_OLDMAGIC)
+ CPPFLAGS_KERNEL = $(CPPFLAGS_CPU) $(CPPFLAGS_PLATFORM) -DGRUB_KERNEL=1
+ CCASFLAGS_KERNEL = $(CCASFLAGS_CPU) $(CCASFLAGS_PLATFORM)
+-STRIPFLAGS_KERNEL = -R .rel.dyn -R .reginfo -R .note -R .comment -R .drectve -R .note.gnu.gold-version -R .MIPS.abiflags -R .ARM.exidx
++STRIPFLAGS_KERNEL = -R .eh_frame -R .rel.dyn -R .reginfo -R .note -R .comment -R .drectve -R .note.gnu.gold-version -R .MIPS.abiflags -R .ARM.exidx
+ if !COND_emu
+ if COND_HAVE_ASM_USCORE
+   LDFLAGS_KERNEL += -Wl,--defsym=_malloc=_grub_malloc -Wl,--defsym=_free=_grub_free

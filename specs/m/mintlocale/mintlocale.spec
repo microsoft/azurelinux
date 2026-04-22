@@ -5,7 +5,7 @@
 
 Name:           mintlocale
 Version:        1.4.7
-Release:        20%{?dist}
+Release: 21%{?dist}
 Summary:        Language selection tool
 
 # Automatically converted from old format: GPLv2+ - review is highly recommended.

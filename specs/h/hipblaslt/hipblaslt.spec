@@ -74,7 +74,7 @@
 
 Name:           %{hipblaslt_name}
 Version:        %{rocm_version}
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        ROCm general matrix operations beyond BLAS
 Url:            https://github.com/ROCmSoftwarePlatform/%{upstreamname}
 License:        MIT

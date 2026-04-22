@@ -9,7 +9,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.12.2
-Release: 9%{?dist}
+Release: 10%{?dist}
 Summary: High-level wrapper for processing images for the web with ImageMagick or libvips
 License: MIT
 URL: https://github.com/janko/image_processing

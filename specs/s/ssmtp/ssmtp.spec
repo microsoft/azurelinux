@@ -3,7 +3,7 @@
 
 Name:		ssmtp
 Version:	2.64
-Release:	40%{?dist}
+Release: 41%{?dist}
 Summary:	Extremely simple MTA to get mail off the system to a Mailhub
 License:	GPL-2.0-or-later
 URL:		http://packages.debian.org/stable/mail/ssmtp

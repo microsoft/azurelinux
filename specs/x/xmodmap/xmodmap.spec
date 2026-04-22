@@ -3,7 +3,7 @@
 
 Name:       xmodmap
 Version:    1.0.11
-Release:    9%{?dist}
+Release: 10%{?dist}
 Summary:    Edit and display the X11 core keyboard map
 
 License:    MIT AND MIT-open-group

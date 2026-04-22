@@ -1,0 +1,91 @@
+From 295bccae7d3ae71e45be629bbbdc9c19d907f29d Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Sat, 12 Jul 2025 07:25:05 +0200
+Subject: [PATCH 1/3] Update to XMvn 5.1.0
+
+---
+ dola-dbs/pom.xml                                              | 2 +-
+ dola-dbs/src/main/conf/dola-dbs.conf                          | 2 +-
+ dola-dbs/src/main/java/io/kojan/dola/imperator/Imperator.java | 2 +-
+ dola-generator/pom.xml                                        | 4 ++--
+ dola-generator/src/main/conf/dola-generator.conf              | 4 ++--
+ 5 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/dola-dbs/pom.xml b/dola-dbs/pom.xml
+index 2c7575f..c252a57 100644
+--- a/dola-dbs/pom.xml
++++ b/dola-dbs/pom.xml
+@@ -32,7 +32,7 @@
+     <dependency>
+       <groupId>org.fedoraproject.xmvn</groupId>
+       <artifactId>xmvn-api</artifactId>
+-      <version>5.0.0</version>
++      <version>5.1.0</version>
+     </dependency>
+     <dependency>
+       <groupId>org.junit.jupiter</groupId>
+diff --git a/dola-dbs/src/main/conf/dola-dbs.conf b/dola-dbs/src/main/conf/dola-dbs.conf
+index b06e78b..f20d4c8 100644
+--- a/dola-dbs/src/main/conf/dola-dbs.conf
++++ b/dola-dbs/src/main/conf/dola-dbs.conf
+@@ -1,5 +1,5 @@
+ [Realm:dbs]
+ import io.kojan.dola.rpm from Realm:bsx-api
+ load /usr/share/java/dola/dola-dbs.jar
+-load /usr/share/java/xmvn5/xmvn-api-5.0.0.jar
++load /usr/share/java/xmvn5/xmvn-api-5.1.0.jar
+ load /usr/share/java/kojan-xml/kojan-xml.jar
+diff --git a/dola-dbs/src/main/java/io/kojan/dola/imperator/Imperator.java b/dola-dbs/src/main/java/io/kojan/dola/imperator/Imperator.java
+index 662d1d7..ad33612 100644
+--- a/dola-dbs/src/main/java/io/kojan/dola/imperator/Imperator.java
++++ b/dola-dbs/src/main/java/io/kojan/dola/imperator/Imperator.java
+@@ -234,7 +234,7 @@ public class Imperator {
+ 
+         String mavenGoal = ctx.isSkipTests() ? "package" : "verify";
+         args.add(mavenGoal);
+-        args.add("org.fedoraproject.xmvn:xmvn-mojo:5.0.0:install");
++        args.add("org.fedoraproject.xmvn:xmvn-mojo:5.1.0:install");
+ 
+         List<String> lines = new ArrayList<>();
+         lines.add("# Run the actual Maven build, executing all build plugins and so on.");
+diff --git a/dola-generator/pom.xml b/dola-generator/pom.xml
+index 1779d4a..91be767 100644
+--- a/dola-generator/pom.xml
++++ b/dola-generator/pom.xml
+@@ -42,7 +42,7 @@
+     <dependency>
+       <groupId>org.fedoraproject.xmvn</groupId>
+       <artifactId>xmvn-api</artifactId>
+-      <version>5.0.0</version>
++      <version>5.1.0</version>
+     </dependency>
+     <dependency>
+       <groupId>org.apache.maven</groupId>
+@@ -52,7 +52,7 @@
+     <dependency>
+       <groupId>org.fedoraproject.xmvn</groupId>
+       <artifactId>xmvn-core</artifactId>
+-      <version>5.0.0</version>
++      <version>5.1.0</version>
+       <scope>runtime</scope>
+     </dependency>
+     <dependency>
+diff --git a/dola-generator/src/main/conf/dola-generator.conf b/dola-generator/src/main/conf/dola-generator.conf
+index 3c7cc57..684937b 100644
+--- a/dola-generator/src/main/conf/dola-generator.conf
++++ b/dola-generator/src/main/conf/dola-generator.conf
+@@ -3,9 +3,9 @@ import io.kojan.dola.rpm from Realm:bsx-api
+ load /usr/share/java/objectweb-asm/asm.jar
+ load /usr/share/java/commons-compress.jar
+ load /usr/share/java/commons-io.jar
+-load /usr/share/java/xmvn5/xmvn-api-5.0.0.jar
++load /usr/share/java/xmvn5/xmvn-api-5.1.0.jar
+ load /usr/share/java/kojan-xml/kojan-xml.jar
+-load /usr/share/java/xmvn5/xmvn-core-5.0.0.jar
++load /usr/share/java/xmvn5/xmvn-core-5.1.0.jar
+ load /usr/share/java/maven4/maven-api-model-4.0.0-rc-4.jar
+ load /usr/share/java/maven4/maven-impl-4.0.0-rc-4.jar
+ load /usr/share/java/maven4/maven-api-xml-4.0.0-rc-4.jar
+-- 
+2.50.1
+

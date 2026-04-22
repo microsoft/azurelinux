@@ -1,0 +1,27 @@
+From e0752428890b81ff1dd7e826c64dafc435883501 Mon Sep 17 00:00:00 2001
+From: Sylwester Lachiewicz <slachiewicz@apache.org>
+Date: Wed, 25 Dec 2024 23:42:25 +0100
+Subject: [PATCH 1/2] Upgrade to Maven 4.0.0-rc-2
+
+---
+ pom.xml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/pom.xml b/pom.xml
+index cbcddc5..97bc775 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -54,8 +54,8 @@ limitations under the License.
+   <dependencies>
+     <dependency>
+       <groupId>org.apache.maven</groupId>
+-      <artifactId>maven-xml-impl</artifactId>
+-      <version>4.0.0-alpha-9</version>
++      <artifactId>maven-xml</artifactId>
++      <version>4.0.0-rc-2</version>
+       <exclusions>
+         <exclusion>
+           <groupId>org.eclipse.sisu</groupId>
+-- 
+2.50.1
+

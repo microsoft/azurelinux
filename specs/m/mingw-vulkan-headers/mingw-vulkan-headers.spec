@@ -8,7 +8,7 @@
 
 Name:          mingw-%{pkgname}
 Version:       1.4.321.0
-Release:       1%{?dist}
+Release: 2%{?dist}
 Summary:       MinGW Windows %{pkgname}
 
 License:       Apache-2.0

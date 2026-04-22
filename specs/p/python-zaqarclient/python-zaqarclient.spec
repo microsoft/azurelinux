@@ -14,7 +14,7 @@ Python client to Zaqar messaging service API v1
 
 Name:           python-zaqarclient
 Version:        2.8.0
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        Client Library for OpenStack Zaqar Queueing API
 
 License:        Apache-2.0

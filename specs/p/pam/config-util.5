@@ -1,0 +1,36 @@
+.TH SYSTEM-AUTH 5 "2006 Feb 3" "Red Hat" "Linux-PAM Manual"
+.SH NAME
+
+config-util \- Common PAM configuration file for configuration utilities
+
+.SH SYNOPSIS
+.B /etc/pam.d/config-util
+.sp 2
+.SH DESCRIPTION
+
+The purpose of this configuration file is to provide common
+configuration file for all configuration utilities which must be run
+from the supervisor account and use the userhelper wrapper application.
+
+.sp
+The
+.BR config-util
+configuration file is included from all individual configuration
+files of such utilities with the help of the
+.BR include
+directive.
+There are not usually any other modules in the individual configuration
+files of these utilities.
+
+.sp
+It is possible for example to modify duration of the validity of the
+authentication timestamp there. See
+.BR pam_timestamp(8)
+for details.
+
+.SH BUGS
+.sp 2
+None known.
+
+.SH "SEE ALSO"
+pam(8), config-util(5), pam_timestamp(8)

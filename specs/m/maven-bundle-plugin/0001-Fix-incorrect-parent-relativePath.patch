@@ -1,0 +1,25 @@
+From 012793e9877c439e7050696cd43966595281dd90 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Fri, 14 Feb 2025 08:41:10 +0100
+Subject: [PATCH] Fix incorrect parent relativePath
+
+---
+ pom.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pom.xml b/pom.xml
+index 18e9917..a90eb8b 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -22,7 +22,7 @@
+    <artifactId>felix-parent</artifactId>
+    <groupId>org.apache.felix</groupId>
+    <version>7</version>
+-   <relativePath>../../pom/pom.xml</relativePath>
++   <relativePath/>
+  </parent>
+ 
+  <modelVersion>4.0.0</modelVersion>
+-- 
+2.48.1
+

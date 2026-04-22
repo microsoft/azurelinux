@@ -1,0 +1,27 @@
+From 800a684d6d3cae7ed2437a23496d9306c0dfa8dc Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jaroslav=20Loba=C4=8Devski?= <jarlob@github.com>
+Date: Thu, 19 Oct 2023 16:33:06 +0200
+Subject: [PATCH] Fix Null pointer dereference because of an uninitialized
+ variable
+
+Call `stbi__vertical_flip_slices` only if the previous function didn't fail. Fixes #1550
+---
+ stb_image.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/stb_image.h b/stb_image.h
+index 49c53d0..de12c06 100644
+--- a/stb_image.h
++++ b/stb_image.h
+@@ -1446,7 +1446,7 @@ STBIDEF stbi_uc *stbi_load_gif_from_memory(stbi_uc const *buffer, int len, int *
+    stbi__start_mem(&s,buffer,len);
+ 
+    result = (unsigned char*) stbi__load_gif_main(&s, delays, x, y, z, comp, req_comp);
+-   if (stbi__vertically_flip_on_load) {
++   if (stbi__vertically_flip_on_load && result) {
+       int channels = req_comp ? req_comp : *comp;
+       stbi__vertical_flip_slices( result, *x, *y, *z, channels );
+    }
+-- 
+2.41.0
+

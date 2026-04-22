@@ -3,7 +3,7 @@
 
 Name:           perl-Safe-Isa
 Version:        1.000010
-Release:        22%{?dist}
+Release: 23%{?dist}
 Summary:        Call isa, can, does and DOES safely on things that may not be objects
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Safe-Isa

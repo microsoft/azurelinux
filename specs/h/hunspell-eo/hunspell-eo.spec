@@ -12,7 +12,7 @@ Summary: Esperanto hunspell dictionaries
 %global upstreamid 20100218
 Version: 0.%{upstreamid}
 Epoch: 1
-Release: 18%{?dist}
+Release: 19%{?dist}
 Source: http://www.esperantilo.org/literumilo-fontoj.tar.gz
 URL: http://www.esperantilo.org
 License: GPL-2.0-or-later

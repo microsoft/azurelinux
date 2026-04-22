@@ -15,7 +15,7 @@
 
 Name:		gyp
 Version:	0.1
-Release:	0.60%{?revision:.%{revision}git}%{?dist}
+Release: 1.60%{?revision:.%{revision}git}%{?dist}
 Summary:	Generate Your Projects
 
 License:	BSD-3-Clause

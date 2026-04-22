@@ -10,7 +10,7 @@ ExcludeArch: %{ix86}
 
 Name:           ocaml-react
 Version:        1.2.2
-Release:        16%{?dist}
+Release: 17%{?dist}
 Summary:        OCaml framework for Functional Reactive Programming (FRP)
 
 License:        ISC

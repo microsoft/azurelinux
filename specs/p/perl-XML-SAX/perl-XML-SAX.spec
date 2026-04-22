@@ -4,7 +4,7 @@
 Summary:        SAX parser access API for Perl
 Name:           perl-XML-SAX
 Version:        1.02
-Release:        19%{?dist}
+Release: 20%{?dist}
 
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/XML-SAX

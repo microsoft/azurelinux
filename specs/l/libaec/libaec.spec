@@ -3,7 +3,7 @@
 
 Name:           libaec
 Version:        1.1.4
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Adaptive Entropy Coding library
 License:        LicenseRef-Callaway-BSD
 Url:            https://gitlab.dkrz.de/k202009/libaec

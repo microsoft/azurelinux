@@ -1,0 +1,56 @@
+From 5f3ef9f786db6adc09b491ff049880744076a203 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Sat, 23 Sep 2017 11:43:45 +0200
+Subject: [PATCH 1/2] Remove support for snappy
+
+Forwarded: not-needed
+---
+ .../java/org/codehaus/plexus/archiver/tar/TarArchiver.java     | 3 +--
+ .../java/org/codehaus/plexus/archiver/tar/TarUnArchiver.java   | 3 +--
+ 2 files changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/src/main/java/org/codehaus/plexus/archiver/tar/TarArchiver.java b/src/main/java/org/codehaus/plexus/archiver/tar/TarArchiver.java
+index ba53a1b9..7fc30ba1 100644
+--- a/src/main/java/org/codehaus/plexus/archiver/tar/TarArchiver.java
++++ b/src/main/java/org/codehaus/plexus/archiver/tar/TarArchiver.java
+@@ -25,7 +25,6 @@
+ import java.nio.file.Files;
+ import java.util.zip.GZIPOutputStream;
+ 
+-import io.airlift.compress.snappy.SnappyFramedOutputStream;
+ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+ import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
+ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
+@@ -426,7 +425,7 @@ private OutputStream compress(TarCompressionMethod tarCompressionMethod, final O
+         } else if (TarCompressionMethod.bzip2.equals(tarCompressionMethod)) {
+             return new BZip2CompressorOutputStream(bufferedOutputStream(ostream));
+         } else if (TarCompressionMethod.snappy.equals(tarCompressionMethod)) {
+-            return new SnappyFramedOutputStream(bufferedOutputStream(ostream));
++            throw new UnsupportedOperationException("This version of plexus-archiver does not upport snappy compression");
+         } else if (TarCompressionMethod.xz.equals(tarCompressionMethod)) {
+             return new XZCompressorOutputStream(bufferedOutputStream(ostream));
+         } else if (TarCompressionMethod.zstd.equals(tarCompressionMethod)) {
+diff --git a/src/main/java/org/codehaus/plexus/archiver/tar/TarUnArchiver.java b/src/main/java/org/codehaus/plexus/archiver/tar/TarUnArchiver.java
+index 507cb6cb..52cae0c9 100644
+--- a/src/main/java/org/codehaus/plexus/archiver/tar/TarUnArchiver.java
++++ b/src/main/java/org/codehaus/plexus/archiver/tar/TarUnArchiver.java
+@@ -23,7 +23,6 @@
+ import java.io.InputStream;
+ import java.util.zip.GZIPInputStream;
+ 
+-import io.airlift.compress.snappy.SnappyFramedInputStream;
+ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
+@@ -137,7 +136,7 @@ private InputStream decompress(UntarCompressionMethod compression, final File fi
+         } else if (compression == UntarCompressionMethod.BZIP2) {
+             return new BZip2CompressorInputStream(istream);
+         } else if (compression == UntarCompressionMethod.SNAPPY) {
+-            return new SnappyFramedInputStream(istream, true);
++            throw new UnsupportedOperationException("This version of plexus-archiver does not upport snappy compression");
+         } else if (compression == UntarCompressionMethod.XZ) {
+             return new XZCompressorInputStream(istream);
+         } else if (compression == UntarCompressionMethod.ZSTD) {
+-- 
+2.46.0
+

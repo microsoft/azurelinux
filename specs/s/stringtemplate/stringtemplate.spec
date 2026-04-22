@@ -4,7 +4,7 @@
 Summary: A Java template engine
 Name: stringtemplate
 Version: 3.2.1
-Release: 40%{?dist}
+Release: 41%{?dist}
 License: BSD-3-Clause
 URL: http://www.stringtemplate.org/
 Source0: http://www.stringtemplate.org/download/stringtemplate-%{version}.tar.gz

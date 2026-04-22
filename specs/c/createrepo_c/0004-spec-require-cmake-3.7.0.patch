@@ -1,0 +1,29 @@
+From 3d93fbdb905d7c4f8007699ba7c2648370f0a031 Mon Sep 17 00:00:00 2001
+From: Evan Goode <mail@evangoo.de>
+Date: Wed, 9 Apr 2025 15:07:41 +0000
+Subject: [PATCH 4/4] spec: require cmake >= 3.7.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ createrepo_c.spec | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/createrepo_c.spec b/createrepo_c.spec
+index 2a39df4..ef631a8 100644
+--- a/createrepo_c.spec
++++ b/createrepo_c.spec
+@@ -48,7 +48,7 @@ Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+ 
+ %global epoch_dep %{?epoch:%{epoch}:}
+ 
+-BuildRequires:  cmake
++BuildRequires:  cmake >= 3.7.0
+ BuildRequires:  gcc
+ BuildRequires:  bzip2-devel
+ BuildRequires:  doxygen
+-- 
+2.50.1
+

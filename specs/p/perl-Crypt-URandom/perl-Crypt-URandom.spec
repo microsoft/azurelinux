@@ -6,7 +6,7 @@
 
 Name:           perl-Crypt-URandom
 Version:        0.55
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Non-blocking randomness for Perl
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Crypt-URandom

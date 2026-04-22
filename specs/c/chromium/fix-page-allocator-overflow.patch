@@ -1,0 +1,26 @@
+Index: chromium-145.0.7632.45/base/allocator/dispatcher/tls.h
+===================================================================
+--- chromium-145.0.7632.45.orig/base/allocator/dispatcher/tls.h
++++ chromium-145.0.7632.45/base/allocator/dispatcher/tls.h
+@@ -83,6 +83,8 @@ struct BASE_EXPORT MMapAllocator {
+   constexpr static size_t AllocationChunkSize = 16384;
+ #elif BUILDFLAG(IS_LINUX) && defined(ARCH_CPU_ARM64)
+   constexpr static size_t AllocationChunkSize = 16384;
++#elif BUILDFLAG(IS_LINUX) && defined(ARCH_CPU_PPC64)
++  constexpr static size_t AllocationChunkSize = 16384;
+ #else
+   constexpr static size_t AllocationChunkSize = 4096;
+ #endif
+Index: chromium-145.0.7632.45/base/allocator/partition_allocator/src/partition_alloc/partition_alloc_constants.h
+===================================================================
+--- chromium-145.0.7632.45.orig/base/allocator/partition_allocator/src/partition_alloc/partition_alloc_constants.h
++++ chromium-145.0.7632.45/base/allocator/partition_allocator/src/partition_alloc/partition_alloc_constants.h
+@@ -394,7 +394,7 @@ PA_ALWAYS_INLINE constexpr size_t MaxDir
+ // TODO(casey.smalley@arm.com): under 64k pages we can end up in a situation
+ // where a normal slot span will be large enough to contain multiple items,
+ // but the address will go over the final partition page after being aligned.
+-#if PA_BUILDFLAG(IS_LINUX) && PA_BUILDFLAG(PA_ARCH_CPU_ARM64)
++#if PA_BUILDFLAG(IS_LINUX) && (PA_BUILDFLAG(PA_ARCH_CPU_ARM64) || PA_BUILDFLAG(PA_ARCH_CPU_PPC64))
+ inline constexpr size_t kMaxSupportedAlignment = kSuperPageSize / 4;
+ #else
+ inline constexpr size_t kMaxSupportedAlignment = kSuperPageSize / 2;

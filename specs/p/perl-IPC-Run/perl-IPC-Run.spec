@@ -6,7 +6,7 @@
 
 Name:           perl-IPC-Run
 Version:        20250809.0
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Perl module for interacting with child processes
 # the rest:                     GPL+ or Artistic
 # The Win32* modules are not part of the binary RPM package

@@ -1,0 +1,32 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: B Horn <b@horn.uk>
+Date: Sun, 12 May 2024 03:01:40 +0100
+Subject: [PATCH] kern/file: Ensure file->data is set
+
+This is to avoid a generic issue were some filesystems would not set
+data and also not set a grub_errno. This meant it was possible for many
+filesystems to grub_dl_unref() themselves multiple times resulting in
+it being possible to unload the filesystems while there were still
+references to them, e.g., via a loopback.
+
+Reported-by: B Horn <b@horn.uk>
+Signed-off-by: B Horn <b@horn.uk>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/kern/file.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/grub-core/kern/file.c b/grub-core/kern/file.c
+index 75510df7c..85e832bd8 100644
+--- a/grub-core/kern/file.c
++++ b/grub-core/kern/file.c
+@@ -124,6 +124,9 @@ grub_file_open (const char *name, enum grub_file_type type)
+   if ((file->fs->fs_open) (file, file_name) != GRUB_ERR_NONE)
+     goto fail;
+ 
++  if (file->data == NULL)
++    goto fail;
++
+   file->name = grub_strdup (name);
+   grub_errno = GRUB_ERR_NONE;
+ 

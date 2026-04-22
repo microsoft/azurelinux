@@ -5,7 +5,7 @@ Name: hyphen-uk
 Summary: Ukrainian hyphenation rules
 %global upstreamid 20030903
 Version: 0.%{upstreamid}
-Release: 33%{?dist}
+Release: 34%{?dist}
 Source: http://download.services.openoffice.org/contrib/dictionaries/hyph_uk_UA.zip
 URL: http://wiki.services.openoffice.org/wiki/Dictionaries
 License: GPL-2.0-or-later

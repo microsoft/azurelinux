@@ -1,0 +1,353 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Lidong Chen <lidong.chen@oracle.com>
+Date: Wed, 12 Feb 2025 10:33:31 -0600
+Subject: [PATCH] fs: Use safe math macros to prevent overflows
+
+Replace direct arithmetic operations with macros from include/grub/safemath.h
+to prevent potential overflow issues when calculating the memory sizes.
+
+Signed-off-by: Lidong Chen <lidong.chen@oracle.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/fs/archelp.c     |  9 ++++++++-
+ grub-core/fs/btrfs.c       | 34 ++++++++++++++++++++++++++++------
+ grub-core/fs/cpio_common.c | 16 ++++++++++++++--
+ grub-core/fs/f2fs.c        | 17 +++++++++++++++--
+ grub-core/fs/ntfscomp.c    |  9 ++++++++-
+ grub-core/fs/squash4.c     | 12 +++++++++---
+ grub-core/fs/xfs.c         | 17 +++++++++++++++--
+ 7 files changed, 97 insertions(+), 17 deletions(-)
+
+diff --git a/grub-core/fs/archelp.c b/grub-core/fs/archelp.c
+index c1dcc6285..0816b28de 100644
+--- a/grub-core/fs/archelp.c
++++ b/grub-core/fs/archelp.c
+@@ -21,6 +21,7 @@
+ #include <grub/fs.h>
+ #include <grub/disk.h>
+ #include <grub/dl.h>
++#include <grub/safemath.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -68,6 +69,7 @@ handle_symlink (struct grub_archelp_data *data,
+   char *rest;
+   char *linktarget;
+   grub_size_t linktarget_len;
++  grub_size_t sz;
+ 
+   *restart = 0;
+ 
+@@ -98,7 +100,12 @@ handle_symlink (struct grub_archelp_data *data,
+   if (linktarget[0] == '\0')
+     return GRUB_ERR_NONE;
+   linktarget_len = grub_strlen (linktarget);
+-  target = grub_malloc (linktarget_len + grub_strlen (*name) + 2);
++
++  if (grub_add (linktarget_len, grub_strlen (*name), &sz) ||
++      grub_add (sz, 2, &sz))
++    return grub_error (GRUB_ERR_OUT_OF_RANGE, N_("link target length overflow"));
++
++  target = grub_malloc (sz);
+   if (!target)
+     return grub_errno;
+ 
+diff --git a/grub-core/fs/btrfs.c b/grub-core/fs/btrfs.c
+index 6593f5175..3e4924b65 100644
+--- a/grub-core/fs/btrfs.c
++++ b/grub-core/fs/btrfs.c
+@@ -2031,6 +2031,7 @@ find_path (struct grub_btrfs_data *data,
+   char *origpath = NULL;
+   unsigned symlinks_max = 32;
+   const char *relpath = grub_env_get ("btrfs_relative_path");
++  grub_size_t sz;
+ 
+   follow_default = 0;
+   origpath = grub_strdup (path);
+@@ -2157,9 +2158,15 @@ find_path (struct grub_btrfs_data *data,
+       struct grub_btrfs_dir_item *cdirel;
+       if (elemsize > allocated)
+ 	{
+-	  allocated = 2 * elemsize;
++	  if (grub_mul (2, elemsize, &allocated) ||
++	      grub_add (allocated, 1, &sz))
++	    {
++	      grub_free (path_alloc);
++	      grub_free (origpath);
++	      return grub_error (GRUB_ERR_OUT_OF_RANGE, N_("directory item size overflow"));
++	    }
+ 	  grub_free (direl);
+-	  direl = grub_malloc (allocated + 1);
++	  direl = grub_malloc (sz);
+ 	  if (!direl)
+ 	    {
+ 	      grub_free (path_alloc);
+@@ -2223,8 +2230,16 @@ find_path (struct grub_btrfs_data *data,
+ 	      grub_free (origpath);
+ 	      return err;
+ 	    }
+-	  tmp = grub_malloc (grub_le_to_cpu64 (inode.size)
+-			     + grub_strlen (path) + 1);
++
++	  if (grub_add (grub_le_to_cpu64 (inode.size), grub_strlen (path), &sz) ||
++	      grub_add (sz, 1, &sz))
++	    {
++	      grub_free (direl);
++	      grub_free (path_alloc);
++	      grub_free (origpath);
++	      return grub_error (GRUB_ERR_OUT_OF_RANGE, N_("buffer size overflow"));
++	    }
++	  tmp = grub_malloc (sz);
+ 	  if (!tmp)
+ 	    {
+ 	      grub_free (direl);
+@@ -2371,6 +2386,7 @@ grub_btrfs_dir (grub_device_t device, const char *path,
+   grub_uint8_t type;
+   grub_size_t est_size = 0;
+   char *new_path = NULL;
++  grub_size_t sz;
+ 
+   if (!data)
+     return grub_errno;
+@@ -2420,9 +2436,15 @@ grub_btrfs_dir (grub_device_t device, const char *path,
+ 	}
+       if (elemsize > allocated)
+ 	{
+-	  allocated = 2 * elemsize;
++	  if (grub_mul (2, elemsize, &allocated) ||
++	      grub_add (allocated, 1, &sz))
++	    {
++	      grub_error (GRUB_ERR_OUT_OF_RANGE, N_("directory element size overflow"));
++	      r = -grub_errno;
++	      break;
++	    }
+ 	  grub_free (direl);
+-	  direl = grub_malloc (allocated + 1);
++	  direl = grub_malloc (sz);
+ 	  if (!direl)
+ 	    {
+ 	      r = -grub_errno;
+diff --git a/grub-core/fs/cpio_common.c b/grub-core/fs/cpio_common.c
+index 5d41b6fdb..6ba58b354 100644
+--- a/grub-core/fs/cpio_common.c
++++ b/grub-core/fs/cpio_common.c
+@@ -24,6 +24,7 @@
+ #include <grub/dl.h>
+ #include <grub/i18n.h>
+ #include <grub/archelp.h>
++#include <grub/safemath.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -48,6 +49,7 @@ grub_cpio_find_file (struct grub_archelp_data *data, char **name,
+   struct head hd;
+   grub_size_t namesize;
+   grub_uint32_t modeval;
++  grub_size_t sz;
+ 
+   data->hofs = data->next_hofs;
+ 
+@@ -76,7 +78,10 @@ grub_cpio_find_file (struct grub_archelp_data *data, char **name,
+ 
+   *mode = modeval;
+ 
+-  *name = grub_malloc (namesize + 1);
++  if (grub_add (namesize, 1, &sz))
++    return grub_error (GRUB_ERR_OUT_OF_RANGE, N_("file name size overflow"));
++
++  *name = grub_malloc (sz);
+   if (*name == NULL)
+     return grub_errno;
+ 
+@@ -110,10 +115,17 @@ grub_cpio_get_link_target (struct grub_archelp_data *data)
+ {
+   char *ret;
+   grub_err_t err;
++  grub_size_t sz;
+ 
+   if (data->size == 0)
+     return grub_strdup ("");
+-  ret = grub_malloc (data->size + 1);
++
++  if (grub_add (data->size, 1, &sz))
++    {
++      grub_error (GRUB_ERR_OUT_OF_RANGE, N_("target data size overflow"));
++      return NULL;
++    }
++  ret = grub_malloc (sz);
+   if (!ret)
+     return NULL;
+ 
+diff --git a/grub-core/fs/f2fs.c b/grub-core/fs/f2fs.c
+index f6d6beaa5..72b4aa1e6 100644
+--- a/grub-core/fs/f2fs.c
++++ b/grub-core/fs/f2fs.c
+@@ -28,6 +28,7 @@
+ #include <grub/types.h>
+ #include <grub/charset.h>
+ #include <grub/fshelp.h>
++#include <grub/safemath.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -958,6 +959,7 @@ grub_f2fs_read_symlink (grub_fshelp_node_t node)
+   char *symlink;
+   struct grub_fshelp_node *diro = node;
+   grub_uint64_t filesize;
++  grub_size_t sz;
+ 
+   if (!diro->inode_read)
+     {
+@@ -968,7 +970,12 @@ grub_f2fs_read_symlink (grub_fshelp_node_t node)
+ 
+   filesize = grub_f2fs_file_size(&diro->inode.i);
+ 
+-  symlink = grub_malloc (filesize + 1);
++  if (grub_add (filesize, 1, &sz))
++    {
++      grub_error (GRUB_ERR_OUT_OF_RANGE, N_("symlink size overflow"));
++      return 0;
++    }
++  symlink = grub_malloc (sz);
+   if (!symlink)
+     return 0;
+ 
+@@ -997,6 +1004,7 @@ grub_f2fs_check_dentries (struct grub_f2fs_dir_iter_ctx *ctx)
+       enum FILE_TYPE ftype;
+       int name_len;
+       int ret;
++      int sz;
+ 
+       if (grub_f2fs_test_bit_le (i, ctx->bitmap) == 0)
+         {
+@@ -1010,7 +1018,12 @@ grub_f2fs_check_dentries (struct grub_f2fs_dir_iter_ctx *ctx)
+       if (name_len >= F2FS_NAME_LEN)
+         return 0;
+ 
+-      filename = grub_malloc (name_len + 1);
++      if (grub_add (name_len, 1, &sz))
++	{
++	  grub_error (GRUB_ERR_OUT_OF_RANGE, N_("directory entry name length overflow"));
++	  return 0;
++	}
++      filename = grub_malloc (sz);
+       if (!filename)
+         return 0;
+ 
+diff --git a/grub-core/fs/ntfscomp.c b/grub-core/fs/ntfscomp.c
+index a009f2c2d..f168a318e 100644
+--- a/grub-core/fs/ntfscomp.c
++++ b/grub-core/fs/ntfscomp.c
+@@ -22,6 +22,7 @@
+ #include <grub/disk.h>
+ #include <grub/dl.h>
+ #include <grub/ntfs.h>
++#include <grub/safemath.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -310,6 +311,7 @@ ntfscomp (grub_uint8_t *dest, grub_disk_addr_t ofs,
+ {
+   grub_err_t ret;
+   grub_disk_addr_t vcn;
++  int log_sz;
+ 
+   if (ctx->attr->sbuf)
+     {
+@@ -349,7 +351,12 @@ ntfscomp (grub_uint8_t *dest, grub_disk_addr_t ofs,
+     }
+ 
+   ctx->comp.comp_head = ctx->comp.comp_tail = 0;
+-  ctx->comp.cbuf = grub_malloc (1 << (ctx->comp.log_spc + GRUB_NTFS_BLK_SHR));
++  if (grub_add (ctx->comp.log_spc, GRUB_NTFS_BLK_SHR, &log_sz))
++    {
++      grub_error (GRUB_ERR_OUT_OF_RANGE, N_("compression buffer size overflow"));
++      return 0;
++    }
++  ctx->comp.cbuf = grub_malloc (1 << log_sz);
+   if (!ctx->comp.cbuf)
+     return 0;
+ 
+diff --git a/grub-core/fs/squash4.c b/grub-core/fs/squash4.c
+index 6e9d63874..f91ff3bfa 100644
+--- a/grub-core/fs/squash4.c
++++ b/grub-core/fs/squash4.c
+@@ -460,11 +460,11 @@ grub_squash_read_symlink (grub_fshelp_node_t node)
+ {
+   char *ret;
+   grub_err_t err;
+-  grub_size_t sz;
++  grub_uint32_t sz;
+ 
+   if (grub_add (grub_le_to_cpu32 (node->ino.symlink.namelen), 1, &sz))
+     {
+-      grub_error (GRUB_ERR_OUT_OF_RANGE, N_("overflow is detected"));
++      grub_error (GRUB_ERR_OUT_OF_RANGE, N_("symlink name length overflow"));
+       return NULL;
+     }
+ 
+@@ -580,6 +580,7 @@ grub_squash_iterate_dir (grub_fshelp_node_t dir,
+ 	  struct grub_squash_dirent di;
+ 	  struct grub_squash_inode ino;
+ 	  grub_size_t sz;
++	  grub_uint16_t nlen;
+ 
+ 	  err = read_chunk (dir->data, &di, sizeof (di),
+ 			    grub_le_to_cpu64 (dir->data->sb.diroffset)
+@@ -595,7 +596,12 @@ grub_squash_iterate_dir (grub_fshelp_node_t dir,
+ 	  if (err)
+ 	    return 0;
+ 
+-	  buf = grub_malloc (grub_le_to_cpu16 (di.namelen) + 2);
++	  if (grub_add (grub_le_to_cpu16 (di.namelen), 2, &nlen))
++	    {
++	      grub_error (GRUB_ERR_OUT_OF_RANGE, N_("name length overflow"));
++	      return 0;
++	    }
++	  buf = grub_malloc (nlen);
+ 	  if (!buf)
+ 	    return 0;
+ 	  err = read_chunk (dir->data, buf,
+diff --git a/grub-core/fs/xfs.c b/grub-core/fs/xfs.c
+index 6c952aef1..c60db7361 100644
+--- a/grub-core/fs/xfs.c
++++ b/grub-core/fs/xfs.c
+@@ -718,6 +718,7 @@ static char *
+ grub_xfs_read_symlink (grub_fshelp_node_t node)
+ {
+   grub_ssize_t size = grub_be_to_cpu64 (node->inode.size);
++  grub_size_t sz;
+ 
+   if (size < 0)
+     {
+@@ -739,7 +740,12 @@ grub_xfs_read_symlink (grub_fshelp_node_t node)
+ 	if (node->data->hascrc)
+ 	  off = 56;
+ 
+-	symlink = grub_malloc (size + 1);
++	if (grub_add (size, 1, &sz))
++	  {
++	    grub_error (GRUB_ERR_OUT_OF_RANGE, N_("symlink size overflow"));
++	    return 0;
++	  }
++	symlink = grub_malloc (sz);
+ 	if (!symlink)
+ 	  return 0;
+ 
+@@ -789,8 +795,15 @@ static int iterate_dir_call_hook (grub_uint64_t ino, const char *filename,
+ {
+   struct grub_fshelp_node *fdiro;
+   grub_err_t err;
++  grub_size_t sz;
+ 
+-  fdiro = grub_malloc (grub_xfs_fshelp_size(ctx->diro->data) + 1);
++  if (grub_add (grub_xfs_fshelp_size(ctx->diro->data), 1, &sz))
++    {
++      grub_error (GRUB_ERR_OUT_OF_RANGE, N_("directory data size overflow"));
++      grub_print_error ();
++      return 0;
++    }
++  fdiro = grub_malloc (sz);
+   if (!fdiro)
+     {
+       grub_print_error ();

@@ -3,7 +3,7 @@
 
 Name:		perl-Test-XML
 Version:	0.08
-Release:	32%{?dist}
+Release: 33%{?dist}
 Summary:	Compare XML in perl tests
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Test-XML

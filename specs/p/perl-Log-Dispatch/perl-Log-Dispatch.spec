@@ -19,7 +19,7 @@
 
 Name:           perl-Log-Dispatch
 Version:        2.71
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        Dispatches messages to one or more outputs
 License:        Artistic-2.0
 URL:            https://metacpan.org/release/Log-Dispatch

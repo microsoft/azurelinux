@@ -1,0 +1,22 @@
+--- mate-menus-1.28.0/configure.ac.orig	2025-11-19 19:57:55.083323940 +0700
++++ mate-menus-1.28.0/configure.ac	2025-11-19 19:58:15.743514533 +0700
+@@ -37,7 +37,7 @@
+ AC_ARG_PROGRAM
+ AM_PROG_LIBTOOL
+ 
+-PKG_CHECK_MODULES(GIO_UNIX, gio-unix-2.0 >= 2.50.0)
++PKG_CHECK_MODULES(GIO_UNIX, gio-unix-2.0 >= 2.80.0)
+ AC_SUBST(GIO_UNIX_CFLAGS)
+ AC_SUBST(GIO_UNIX_LIBS)
+ 
+--- mate-menus-1.28.0/libmenu/Makefile.am.orig	2025-11-19 19:58:34.419669571 +0700
++++ mate-menus-1.28.0/libmenu/Makefile.am	2025-11-19 19:59:17.520396419 +0700
+@@ -57,7 +57,7 @@
+ introspection_sources = $(libmate_menu_include_HEADERS) matemenu-tree.c
+ 
+ MateMenu-2.0.gir: libmate-menu.la
+-MateMenu_2_0_gir_INCLUDES = Gio-2.0
++MateMenu_2_0_gir_INCLUDES = Gio-2.0 GioUnix-2.0
+ MateMenu_2_0_gir_CFLAGS = $(AM_CPPFLAGS)
+ MateMenu_2_0_gir_LIBS = libmate-menu.la
+ MateMenu_2_0_gir_SCANNERFLAGS = --identifier-prefix=MateMenu --symbol-prefix=matemenu --pkg-export=libmate-menu --c-include=matemenu-tree.h

@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 5.1.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: Slim is a template language
 License: MIT
 URL: http://github.com/slim-template/slim/

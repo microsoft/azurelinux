@@ -3,7 +3,7 @@
 
 Name:           perl-IO-Prompter
 Version:        0.005004
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Prompt for input, read it, clean it, return it
 
 # Automatically converted from old format: GPL+ or Artistic - review is highly recommended.

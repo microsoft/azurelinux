@@ -16,7 +16,7 @@
 Name:       quota
 Epoch:      1
 Version:    4.10
-Release:    2%{?dist}
+Release: 3%{?dist}
 Summary:    System administration tools for monitoring users' disk usage
 # quota_nld.c, quotaio_xfs.h:       GPL-2.0-only
 # bylabel.c copied from util-linux: GPL-2.0-or-later

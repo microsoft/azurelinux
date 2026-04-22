@@ -10,7 +10,7 @@ Name: hunspell-shs
 Summary: Shuswap hunspell dictionaries
 %global upstreamid 20090828
 Version: 0.%{upstreamid}
-Release: 31%{?dist}
+Release: 32%{?dist}
 Source: http://secpewt.sd73.bc.ca/hunspell/hunspell-shs-ca.tar.gz
 URL: http://secpewt.sd73.bc.ca/wordlist
 License: GPL-2.0-or-later

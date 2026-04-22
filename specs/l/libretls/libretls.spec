@@ -4,7 +4,7 @@
 Summary:        Port of libtls from LibreSSL to OpenSSL
 Name:           libretls
 Version:        3.8.1
-Release:        6%{?dist}
+Release: 7%{?dist}
 # libretls itself is ISC but uses other source codes, breakdown:
 # BSD-3-Clause: compat/strsep.c
 # MIT: compat/timegm.c

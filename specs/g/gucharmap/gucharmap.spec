@@ -7,7 +7,7 @@
 
 Name:           gucharmap
 Version:        17.0.1
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Unicode character picker and font browser
 
 # semver X, Y and Y+1

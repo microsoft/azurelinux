@@ -10,7 +10,7 @@
 
 Name:           jansi-native
 Version:        1.8
-Release:        23%{?dist}
+Release: 24%{?dist}
 Summary:        Jansi Native implements the JNI Libraries used by the Jansi project
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.
 License:        Apache-2.0

@@ -6,7 +6,7 @@
 
 Name:       man2html
 Version:    1.6
-Release:    40.%{posttag}%{?dist}
+Release: 41.%{posttag}%{?dist}
 Summary:    Convert man pages to HTML - CGI scripts
 
 # man2html.c and debian/sources/man2html.cgi.c are man2html

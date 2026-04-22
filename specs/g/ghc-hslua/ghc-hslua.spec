@@ -26,7 +26,7 @@
 Name:           ghc-%{pkg_name}
 Version:        2.3.1
 # can only be reset when all subpkgs bumped
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Bindings to Lua, an embeddable scripting language
 
 License:        MIT

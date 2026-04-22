@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alec Brown <alec.r.brown@oracle.com>
+Date: Wed, 22 Jan 2025 02:55:12 +0000
+Subject: [PATCH] disk/ieee1275/ofdisk: Call grub_ieee1275_close() when
+ grub_malloc() fails
+
+In the dev_iterate() function a handle is opened but isn't closed when
+grub_malloc() returns NULL. We should fix this by closing it on error.
+
+Signed-off-by: Alec Brown <alec.r.brown@oracle.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/disk/ieee1275/ofdisk.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/disk/ieee1275/ofdisk.c b/grub-core/disk/ieee1275/ofdisk.c
+index 6c628635f..71237b256 100644
+--- a/grub-core/disk/ieee1275/ofdisk.c
++++ b/grub-core/disk/ieee1275/ofdisk.c
+@@ -269,7 +269,10 @@ dev_iterate (const struct grub_ieee1275_devalias *alias)
+ 
+       buf = grub_malloc (sz);
+       if (!buf)
+-	return;
++	{
++	  grub_ieee1275_close (ihandle);
++	  return;
++	}
+       bufptr = grub_stpcpy (buf, alias->path);
+ 
+       for (i = 0; i < args.nentries; i++)

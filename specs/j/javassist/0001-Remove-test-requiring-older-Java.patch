@@ -1,0 +1,37 @@
+From aee281cc159ec9c890320aeac432467ab064f93b Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Tue, 2 Sep 2025 14:49:58 +0200
+Subject: [PATCH] Remove test requiring older Java
+
+---
+ src/test/javassist/bytecode/BytecodeTest.java | 14 --------------
+ 1 file changed, 14 deletions(-)
+
+diff --git a/src/test/javassist/bytecode/BytecodeTest.java b/src/test/javassist/bytecode/BytecodeTest.java
+index eac420b..a09e7cc 100644
+--- a/src/test/javassist/bytecode/BytecodeTest.java
++++ b/src/test/javassist/bytecode/BytecodeTest.java
+@@ -310,20 +310,6 @@ public class BytecodeTest extends TestCase {
+         assertEquals(0, invoke(obj, "test"));
+     }
+ 
+-    public void testDeprecatedAttribute() throws Exception {
+-        CtClass cc = loader.get("java.lang.Thread");
+-        CtMethod m = cc.getDeclaredMethod("suspend");
+-        MethodInfo minfo = m.getMethodInfo();
+-        DeprecatedAttribute ainfo
+-            = (DeprecatedAttribute)minfo.getAttribute(DeprecatedAttribute.tag);
+-        assertTrue(ainfo != null);
+-        m = cc.getDeclaredMethod("toString");
+-        minfo = m.getMethodInfo();
+-        ainfo
+-            = (DeprecatedAttribute)minfo.getAttribute(DeprecatedAttribute.tag);
+-        assertTrue(ainfo == null);
+-    }
+-
+     public void testLocalVarAttribute() throws Exception {
+         CtClass cc = loader.get("test1.LocalVars");
+         CtMethod m = cc.getDeclaredMethod("foo");
+-- 
+2.50.1
+

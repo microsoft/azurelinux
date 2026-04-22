@@ -1,0 +1,231 @@
+From 89fa02828cdaf1c710c38bde5fcbcf59538a9cce Mon Sep 17 00:00:00 2001
+From: Pietro Cerutti <gahr@gahr.ch>
+Date: Tue, 1 Oct 2024 12:10:40 +0000
+Subject: [PATCH 2/4] Use IMPORTED_TARGET for 3rd-party dependencies
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The current CMakeLists.txt fails to include the required link directories for 3rd-party packages.
+As an example, on FreeBSD where packages are installed under /usr/local, the link lines include -lgio-2.0 but not -L/usr/local/lib.
+
+The suggested solution is to use the IMPORTED_TARGET mode of pkg_check_modules. This requires CMake 3.6, so I have bumped the minimum required version.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ CMakeLists.txt       | 22 +++++++++++-----------
+ src/CMakeLists.txt   | 36 ++++++++++++++++++------------------
+ tests/CMakeLists.txt | 30 +++++++++++++++---------------
+ 3 files changed, 44 insertions(+), 44 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9a18393..c4bf525 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-CMAKE_MINIMUM_REQUIRED (VERSION 2.8.12)
++CMAKE_MINIMUM_REQUIRED (VERSION 3.7)
+ PROJECT (createrepo_c C)
+ 
+ include(GNUInstallDirs)
+@@ -39,13 +39,13 @@ find_package(LibXml2 REQUIRED)
+ find_package(OpenSSL REQUIRED)
+ find_package(ZLIB REQUIRED)
+ 
+-pkg_check_modules(GLIB2 REQUIRED glib-2.0)
+-pkg_check_modules(GIO REQUIRED gio-2.0)
+-pkg_check_modules(GTHREAD2 REQUIRED gthread-2.0)
+-pkg_check_modules(LZMA REQUIRED liblzma)
+-pkg_check_modules(SQLITE3 REQUIRED sqlite3>=3.6.18)
+-pkg_check_modules(RPM REQUIRED rpm)
+-pkg_check_modules(ZSTD REQUIRED libzstd)
++pkg_check_modules(GLIB2 REQUIRED IMPORTED_TARGET glib-2.0)
++pkg_check_modules(GIO REQUIRED IMPORTED_TARGET gio-2.0)
++pkg_check_modules(GTHREAD2 REQUIRED IMPORTED_TARGET gthread-2.0)
++pkg_check_modules(LZMA REQUIRED IMPORTED_TARGET liblzma)
++pkg_check_modules(SQLITE3 REQUIRED IMPORTED_TARGET sqlite3>=3.6.18)
++pkg_check_modules(RPM REQUIRED IMPORTED_TARGET rpm)
++pkg_check_modules(ZSTD REQUIRED IMPORTED_TARGET libzstd)
+ 
+ # Add include dirs
+ 
+@@ -73,7 +73,7 @@ ENDIF (WITH_LEGACY_HASHES)
+ # drpm
+ OPTION (ENABLE_DRPM "Enable delta RPM support?" OFF)
+ IF (ENABLE_DRPM)
+-    pkg_check_modules(DRPM REQUIRED drpm>=0.4.0)
++    pkg_check_modules(DRPM REQUIRED IMPORTED_TARGET drpm>=0.4.0)
+     include_directories (${DRPM_INCLUDE_DIRS})
+     ADD_DEFINITIONS("-DCR_DELTA_RPM_SUPPORT")
+ ENDIF (ENABLE_DRPM)
+@@ -83,7 +83,7 @@ OPTION (ENABLE_PYTHON "Enable python support?" ON)
+ 
+ OPTION (WITH_ZCHUNK "Build with zchunk support" ON)
+ IF (WITH_ZCHUNK)
+-    pkg_check_modules(ZCK REQUIRED zck)
++    pkg_check_modules(ZCK REQUIRED IMPORTED_TARGET zck)
+     include_directories(${ZCK_INCLUDE_DIRS})
+     SET (CMAKE_C_FLAGS          "${CMAKE_C_FLAGS} -DWITH_ZCHUNK")
+     SET (CMAKE_C_FLAGS_DEBUG    "${CMAKE_C_FLAGS_DEBUG} -DWITH_ZCHUNK")
+@@ -91,7 +91,7 @@ ENDIF (WITH_ZCHUNK)
+ 
+ OPTION (WITH_LIBMODULEMD "Build with libmodulemd support" ON)
+ IF (WITH_LIBMODULEMD)
+-    pkg_check_modules(LIBMODULEMD REQUIRED modulemd-2.0)
++    pkg_check_modules(LIBMODULEMD REQUIRED IMPORTED_TARGET modulemd-2.0)
+     include_directories(${LIBMODULEMD_INCLUDE_DIRS})
+     SET (CMAKE_C_FLAGS          "${CMAKE_C_FLAGS} -DWITH_LIBMODULEMD")
+     SET (CMAKE_C_FLAGS_DEBUG    "${CMAKE_C_FLAGS_DEBUG} -DWITH_LIBMODULEMD")
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 61b0480..5309050 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -86,18 +86,18 @@ ENDIF ()
+ ADD_LIBRARY(libcreaterepo_c ${createrepo_c_library_type} ${createrepo_c_SRCS})
+ TARGET_LINK_LIBRARIES(libcreaterepo_c ${BZIP2_LIBRARIES})
+ TARGET_LINK_LIBRARIES(libcreaterepo_c ${CURL_LIBRARY})
+-TARGET_LINK_LIBRARIES(libcreaterepo_c ${GLIB2_LIBRARIES})
+-TARGET_LINK_LIBRARIES(libcreaterepo_c ${GIO_LIBRARIES})
+-TARGET_LINK_LIBRARIES(libcreaterepo_c ${LIBMODULEMD_LIBRARIES})
++TARGET_LINK_LIBRARIES(libcreaterepo_c PkgConfig::GLIB2)
++TARGET_LINK_LIBRARIES(libcreaterepo_c PkgConfig::GIO)
++TARGET_LINK_LIBRARIES(libcreaterepo_c PkgConfig::LIBMODULEMD)
+ TARGET_LINK_LIBRARIES(libcreaterepo_c ${LIBXML2_LIBRARIES})
+-TARGET_LINK_LIBRARIES(libcreaterepo_c ${LZMA_LIBRARIES})
++TARGET_LINK_LIBRARIES(libcreaterepo_c PkgConfig::LZMA)
+ TARGET_LINK_LIBRARIES(libcreaterepo_c ${OPENSSL_LIBRARIES})
+-TARGET_LINK_LIBRARIES(libcreaterepo_c ${RPM_LIBRARIES})
+-TARGET_LINK_LIBRARIES(libcreaterepo_c ${SQLITE3_LIBRARIES})
++TARGET_LINK_LIBRARIES(libcreaterepo_c PkgConfig::RPM)
++TARGET_LINK_LIBRARIES(libcreaterepo_c PkgConfig::SQLITE3)
+ TARGET_LINK_LIBRARIES(libcreaterepo_c ${ZLIB_LIBRARY})
+-TARGET_LINK_LIBRARIES(libcreaterepo_c ${ZCK_LIBRARIES})
+-TARGET_LINK_LIBRARIES(libcreaterepo_c ${DRPM_LIBRARIES})
+-TARGET_LINK_LIBRARIES(libcreaterepo_c ${ZSTD_LIBRARIES})
++TARGET_LINK_LIBRARIES(libcreaterepo_c PkgConfig::ZCK)
++TARGET_LINK_LIBRARIES(libcreaterepo_c PkgConfig::DRPM)
++TARGET_LINK_LIBRARIES(libcreaterepo_c PkgConfig::ZSTD)
+ 
+ SET_TARGET_PROPERTIES(libcreaterepo_c PROPERTIES
+                       OUTPUT_NAME "createrepo_c"
+@@ -108,27 +108,27 @@ SET_TARGET_PROPERTIES(libcreaterepo_c PROPERTIES
+ ADD_EXECUTABLE(createrepo_c createrepo_c.c cmd_parser.c)
+ TARGET_LINK_LIBRARIES(createrepo_c
+                         libcreaterepo_c
+-                        ${GLIB2_LIBRARIES}
+-                        ${GTHREAD2_LIBRARIES})
++                        PkgConfig::GLIB2
++                        PkgConfig::GTHREAD2)
+ 
+ ADD_EXECUTABLE(mergerepo_c mergerepo_c.c)
+ TARGET_LINK_LIBRARIES(mergerepo_c
+                         libcreaterepo_c
+-                        ${GLIB2_LIBRARIES}
+-                        ${GTHREAD2_LIBRARIES}
+-                        ${LIBMODULEMD_LIBRARIES})
++                        PkgConfig::GLIB2
++                        PkgConfig::GTHREAD2
++                        PkgConfig::LIBMODULEMD)
+ 
+ ADD_EXECUTABLE(modifyrepo_c modifyrepo_c.c)
+ TARGET_LINK_LIBRARIES(modifyrepo_c
+                         libcreaterepo_c
+-                        ${GLIB2_LIBRARIES}
+-                        ${GTHREAD2_LIBRARIES})
++                        PkgConfig::GLIB2
++                        PkgConfig::GTHREAD2)
+ 
+ ADD_EXECUTABLE(sqliterepo_c sqliterepo_c.c)
+ TARGET_LINK_LIBRARIES(sqliterepo_c
+                         libcreaterepo_c
+-                        ${GLIB2_LIBRARIES}
+-                        ${GTHREAD2_LIBRARIES})
++                        PkgConfig::GLIB2
++                        PkgConfig::GTHREAD2)
+ 
+ CONFIGURE_FILE("createrepo_c.pc.cmake" "${CMAKE_SOURCE_DIR}/src/createrepo_c.pc" @ONLY)
+ CONFIGURE_FILE("version.h.in" "${CMAKE_CURRENT_SOURCE_DIR}/version.h" @ONLY)
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 4ffe837..37339ad 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1,61 +1,61 @@
+ ADD_EXECUTABLE(test_checksum test_checksum.c)
+-TARGET_LINK_LIBRARIES(test_checksum libcreaterepo_c ${GLIB2_LIBRARIES})
++TARGET_LINK_LIBRARIES(test_checksum libcreaterepo_c PkgConfig::GLIB2)
+ ADD_DEPENDENCIES(tests test_checksum)
+ 
+ ADD_EXECUTABLE(test_compression_wrapper test_compression_wrapper.c)
+-TARGET_LINK_LIBRARIES(test_compression_wrapper libcreaterepo_c ${GLIB2_LIBRARIES})
++TARGET_LINK_LIBRARIES(test_compression_wrapper libcreaterepo_c PkgConfig::GLIB2)
+ ADD_DEPENDENCIES(tests test_compression_wrapper)
+ 
+ ADD_EXECUTABLE(test_load_metadata test_load_metadata.c)
+-TARGET_LINK_LIBRARIES(test_load_metadata libcreaterepo_c ${GLIB2_LIBRARIES})
++TARGET_LINK_LIBRARIES(test_load_metadata libcreaterepo_c PkgConfig::GLIB2)
+ ADD_DEPENDENCIES(tests test_load_metadata)
+ 
+ ADD_EXECUTABLE(test_locate_metadata test_locate_metadata.c)
+-TARGET_LINK_LIBRARIES(test_locate_metadata libcreaterepo_c ${GLIB2_LIBRARIES})
++TARGET_LINK_LIBRARIES(test_locate_metadata libcreaterepo_c PkgConfig::GLIB2)
+ ADD_DEPENDENCIES(tests test_locate_metadata)
+ 
+ ADD_EXECUTABLE(test_misc test_misc.c)
+-TARGET_LINK_LIBRARIES(test_misc libcreaterepo_c ${GLIB2_LIBRARIES})
++TARGET_LINK_LIBRARIES(test_misc libcreaterepo_c PkgConfig::GLIB2)
+ ADD_DEPENDENCIES(tests test_misc)
+ 
+ ADD_EXECUTABLE(test_sqlite test_sqlite.c)
+-TARGET_LINK_LIBRARIES(test_sqlite libcreaterepo_c ${GLIB2_LIBRARIES})
++TARGET_LINK_LIBRARIES(test_sqlite libcreaterepo_c PkgConfig::GLIB2)
+ ADD_DEPENDENCIES(tests test_sqlite)
+ 
+ ADD_EXECUTABLE(test_xml_file test_xml_file.c)
+-TARGET_LINK_LIBRARIES(test_xml_file libcreaterepo_c ${GLIB2_LIBRARIES})
++TARGET_LINK_LIBRARIES(test_xml_file libcreaterepo_c PkgConfig::GLIB2)
+ ADD_DEPENDENCIES(tests test_xml_file)
+ 
+ ADD_EXECUTABLE(test_xml_parser_filelists test_xml_parser_filelists.c)
+-TARGET_LINK_LIBRARIES(test_xml_parser_filelists libcreaterepo_c ${GLIB2_LIBRARIES})
++TARGET_LINK_LIBRARIES(test_xml_parser_filelists libcreaterepo_c PkgConfig::GLIB2)
+ ADD_DEPENDENCIES(tests test_xml_parser_filelists)
+ 
+ ADD_EXECUTABLE(test_xml_parser_repomd test_xml_parser_repomd.c)
+-TARGET_LINK_LIBRARIES(test_xml_parser_repomd libcreaterepo_c ${GLIB2_LIBRARIES})
++TARGET_LINK_LIBRARIES(test_xml_parser_repomd libcreaterepo_c PkgConfig::GLIB2)
+ ADD_DEPENDENCIES(tests test_xml_parser_repomd)
+ 
+ ADD_EXECUTABLE(test_xml_parser_updateinfo test_xml_parser_updateinfo.c)
+-TARGET_LINK_LIBRARIES(test_xml_parser_updateinfo libcreaterepo_c ${GLIB2_LIBRARIES})
++TARGET_LINK_LIBRARIES(test_xml_parser_updateinfo libcreaterepo_c PkgConfig::GLIB2)
+ ADD_DEPENDENCIES(tests test_xml_parser_updateinfo)
+ 
+ ADD_EXECUTABLE(test_xml_parser_main_metadata_together test_xml_parser_main_metadata_together.c)
+-TARGET_LINK_LIBRARIES(test_xml_parser_main_metadata_together libcreaterepo_c ${GLIB2_LIBRARIES})
++TARGET_LINK_LIBRARIES(test_xml_parser_main_metadata_together libcreaterepo_c PkgConfig::GLIB2)
+ ADD_DEPENDENCIES(tests test_xml_parser_main_metadata_together)
+ 
+ ADD_EXECUTABLE(test_xml_dump test_xml_dump.c)
+-TARGET_LINK_LIBRARIES(test_xml_dump libcreaterepo_c ${GLIB2_LIBRARIES})
++TARGET_LINK_LIBRARIES(test_xml_dump libcreaterepo_c PkgConfig::GLIB2)
+ ADD_DEPENDENCIES(tests test_xml_dump)
+ 
+ ADD_EXECUTABLE(test_xml_dump_primary test_xml_dump_primary.c)
+-TARGET_LINK_LIBRARIES(test_xml_dump_primary libcreaterepo_c ${GLIB2_LIBRARIES})
++TARGET_LINK_LIBRARIES(test_xml_dump_primary libcreaterepo_c PkgConfig::GLIB2)
+ ADD_DEPENDENCIES(tests test_xml_dump_primary)
+ 
+ ADD_EXECUTABLE(test_koji test_koji.c)
+-TARGET_LINK_LIBRARIES(test_koji libcreaterepo_c ${GLIB2_LIBRARIES})
++TARGET_LINK_LIBRARIES(test_koji libcreaterepo_c PkgConfig::GLIB2)
+ ADD_DEPENDENCIES(tests test_koji)
+ 
+ ADD_EXECUTABLE(test_modifyrepo_shared test_modifyrepo_shared.c)
+-TARGET_LINK_LIBRARIES(test_modifyrepo_shared libcreaterepo_c ${GLIB2_LIBRARIES})
++TARGET_LINK_LIBRARIES(test_modifyrepo_shared libcreaterepo_c PkgConfig::GLIB2)
+ ADD_DEPENDENCIES(tests test_modifyrepo_shared)
+ 
+ CONFIGURE_FILE("run_tests.sh.in"  "${CMAKE_BINARY_DIR}/tests/run_tests.sh")
+-- 
+2.50.1
+

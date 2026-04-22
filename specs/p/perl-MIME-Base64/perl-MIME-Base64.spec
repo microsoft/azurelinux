@@ -3,7 +3,7 @@
 
 Name:           perl-MIME-Base64
 Version:        3.16
-Release:        520%{?dist}
+Release: 521%{?dist}
 Summary:        Encoding and decoding of Base64 and quoted-printable strings
 # Base.xs:      (GPL-1.0-or-later OR Artistic-1.0-Perl) AND metamail
 # Other files:  GPL-1.0-or-later OR Artistic-1.0-Perl

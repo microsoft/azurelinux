@@ -1,0 +1,43 @@
+From 8e615754f99d06ba9dc575f2470971e37b3ec7ac Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Wed, 31 Jan 2024 16:46:20 -0500
+Subject: [PATCH 1/2] Downstream-only: patch out coverage analysis
+
+https://docs.fedoraproject.org/en-US/packaging-guidelines/Python/#_linters
+---
+ pyproject.toml | 2 +-
+ tox.ini        | 3 +--
+ 2 files changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 15695b6..b0f7824 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -96,7 +96,7 @@ module =["aioquic.*", "cryptography.*", "h11.*", "h2.*", "priority.*", "pytest_a
+ ignore_missing_imports = true
+ 
+ [tool.pytest.ini_options]
+-addopts = "--no-cov-on-fail --showlocals --strict-markers"
++addopts = "--showlocals --strict-markers"
+ asyncio_mode = "strict"
+ testpaths = ["tests"]
+ 
+diff --git a/tox.ini b/tox.ini
+index 3d8fc90..08b6954 100644
+--- a/tox.ini
++++ b/tox.ini
+@@ -10,10 +10,9 @@ deps =
+     hypothesis
+     pytest
+     pytest-asyncio
+-    pytest-cov
+     pytest-sugar
+     pytest-trio
+-commands = pytest --cov=hypercorn {posargs}
++commands = pytest {posargs}
+ 
+ [testenv:docs]
+ basepython = python3.12
+-- 
+2.50.1
+

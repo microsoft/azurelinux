@@ -1,0 +1,105 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Lidong Chen <lidong.chen@oracle.com>
+Date: Tue, 21 Jan 2025 19:02:38 +0000
+Subject: [PATCH] fs: Prevent overflows when assigning returned values from
+ read_number()
+
+The direct assignment of the unsigned long long value returned by
+read_number() can potentially lead to an overflow on a 32-bit systems.
+The fix replaces the direct assignments with calls to grub_cast()
+which detects the overflows and safely assigns the values if no
+overflow is detected.
+
+Signed-off-by: Lidong Chen <lidong.chen@oracle.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/fs/cpio_common.c | 18 ++++++++++++++----
+ grub-core/fs/tar.c         | 23 ++++++++++++++++-------
+ 2 files changed, 30 insertions(+), 11 deletions(-)
+
+diff --git a/grub-core/fs/cpio_common.c b/grub-core/fs/cpio_common.c
+index 6ba58b354..45ac119a8 100644
+--- a/grub-core/fs/cpio_common.c
++++ b/grub-core/fs/cpio_common.c
+@@ -62,11 +62,21 @@ grub_cpio_find_file (struct grub_archelp_data *data, char **name,
+ #endif
+       )
+     return grub_error (GRUB_ERR_BAD_FS, "invalid cpio archive");
+-  data->size = read_number (hd.filesize, ARRAY_SIZE (hd.filesize));
++
++  if (grub_cast (read_number (hd.filesize, ARRAY_SIZE (hd.filesize)), &data->size))
++    return grub_error (GRUB_ERR_BAD_FS, N_("data size overflow"));
++
+   if (mtime)
+-    *mtime = read_number (hd.mtime, ARRAY_SIZE (hd.mtime));
+-  modeval = read_number (hd.mode, ARRAY_SIZE (hd.mode));
+-  namesize = read_number (hd.namesize, ARRAY_SIZE (hd.namesize));
++    {
++      if (grub_cast (read_number (hd.mtime, ARRAY_SIZE (hd.mtime)), mtime))
++	return grub_error (GRUB_ERR_BAD_FS, N_("mtime overflow"));
++    }
++
++  if (grub_cast (read_number (hd.mode, ARRAY_SIZE (hd.mode)), &modeval))
++    return grub_error (GRUB_ERR_BAD_FS, N_("mode overflow"));
++
++  if (grub_cast (read_number (hd.namesize, ARRAY_SIZE (hd.namesize)), &namesize))
++    return grub_error (GRUB_ERR_BAD_FS, N_("namesize overflow"));
+ 
+   /* Don't allow negative numbers.  */
+   if (namesize >= 0x80000000)
+diff --git a/grub-core/fs/tar.c b/grub-core/fs/tar.c
+index fd2ec1f74..1eaa5349f 100644
+--- a/grub-core/fs/tar.c
++++ b/grub-core/fs/tar.c
+@@ -99,9 +99,10 @@ grub_cpio_find_file (struct grub_archelp_data *data, char **name,
+       if (hd.typeflag == 'L')
+ 	{
+ 	  grub_err_t err;
+-	  grub_size_t namesize = read_number (hd.size, sizeof (hd.size));
++	  grub_size_t namesize;
+ 
+-	  if (grub_add (namesize, 1, &sz))
++	  if (grub_cast (read_number (hd.size, sizeof (hd.size)), &namesize) ||
++	      grub_add (namesize, 1, &sz))
+ 	    return grub_error (GRUB_ERR_BAD_FS, N_("name size overflow"));
+ 
+ 	  *name = grub_malloc (sz);
+@@ -123,9 +124,10 @@ grub_cpio_find_file (struct grub_archelp_data *data, char **name,
+       if (hd.typeflag == 'K')
+ 	{
+ 	  grub_err_t err;
+-	  grub_size_t linksize = read_number (hd.size, sizeof (hd.size));
++	  grub_size_t linksize;
+ 
+-	  if (grub_add (linksize, 1, &sz))
++	  if (grub_cast (read_number (hd.size, sizeof (hd.size)), &linksize) ||
++	      grub_add (linksize, 1, &sz))
+ 	    return grub_error (GRUB_ERR_BAD_FS, N_("link size overflow"));
+ 
+ 	  if (data->linkname_alloc < sz)
+@@ -174,15 +176,22 @@ grub_cpio_find_file (struct grub_archelp_data *data, char **name,
+ 	  (*name)[extra_size + sizeof (hd.name)] = 0;
+ 	}
+ 
+-      data->size = read_number (hd.size, sizeof (hd.size));
++      if (grub_cast (read_number (hd.size, sizeof (hd.size)), &data->size))
++	return grub_error (GRUB_ERR_BAD_FS, N_("data size overflow"));
++
+       data->dofs = data->hofs + GRUB_DISK_SECTOR_SIZE;
+       data->next_hofs = data->dofs + ((data->size + GRUB_DISK_SECTOR_SIZE - 1) &
+ 			   ~(GRUB_DISK_SECTOR_SIZE - 1));
+       if (mtime)
+-	*mtime = read_number (hd.mtime, sizeof (hd.mtime));
++	{
++	  if (grub_cast (read_number (hd.mtime, sizeof (hd.mtime)), mtime))
++	    return grub_error (GRUB_ERR_BAD_FS, N_("mtime overflow"));
++	}
+       if (mode)
+ 	{
+-	  *mode = read_number (hd.mode, sizeof (hd.mode));
++	  if (grub_cast (read_number (hd.mode, sizeof (hd.mode)), mode))
++	    return grub_error (GRUB_ERR_BAD_FS, N_("mode overflow"));
++
+ 	  switch (hd.typeflag)
+ 	    {
+ 	      /* Hardlink.  */

@@ -1,0 +1,125 @@
+From fc9cf49c2f2e0e2282b000557df80ce2f755f191 Mon Sep 17 00:00:00 2001
+From: Paul Floyd <pjfloyd@wanadoo.fr>
+Date: Wed, 12 Nov 2025 21:46:23 +0100
+Subject: [PATCH 2/6] Bug 511972 - valgrind-3.26.0 tests fail to build on
+ upcomig gcc-16: unrecognized command-line option
+ '-Wno-alloc-size-larger-than=18446744073709551615'
+
+Initial patch from Sergei Trofimovich, thanks.
+
+(cherry picked from commit 51c5973d9d1f096b9472df75638f2a53324fafed)
+---
+ NEWS                                     | 4 ++++
+ configure.ac                             | 4 ++--
+ memcheck/tests/Makefile.am               | 8 ++++----
+ memcheck/tests/amd64-freebsd/Makefile.am | 2 +-
+ memcheck/tests/amd64-linux/Makefile.am   | 2 +-
+ memcheck/tests/x86-freebsd/Makefile.am   | 2 +-
+ 6 files changed, 13 insertions(+), 9 deletions(-)
+
+diff --git a/NEWS b/NEWS
+index d176b0aa2ebe..4e6cb3de9125 100644
+--- a/NEWS
++++ b/NEWS
+@@ -5,6 +5,10 @@ Branch 3.26
+ 
+ The following bugs have been fixed or resolved on this branch.
+ 
++511972  valgrind-3.26.0 tests fail to build on upcomig gcc-16:
++        unrecognized command-line option
++        '-Wno-alloc-size-larger-than=18446744073709551615'
++
+ To see details of a given bug, visit
+   https://bugs.kde.org/show_bug.cgi?id=XXXXXX
+ where XXXXXX is the bug number as listed above.
+diff --git a/configure.ac b/configure.ac
+index 371dcf235c7d..9d62a7d27a2c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -2538,7 +2538,7 @@ fi
+ AC_DEFUN([AC_GCC_WARNING_SUBST_NO],[
+   AC_MSG_CHECKING([if gcc accepts -W$1])
+   safe_CFLAGS=$CFLAGS
+-  CFLAGS="-W$1 -Werror"
++  CFLAGS="-W$1 -Wno-$1 -Werror"
+   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[;]])], [
+   AC_SUBST([$2], [-Wno-$1])
+   AC_MSG_RESULT([yes])], [
+@@ -2591,7 +2591,6 @@ AC_GCC_WARNING_SUBST_NO([unused-result], [FLAG_W_NO_UNUSED_RESULT])
+ AC_GCC_WARNING_SUBST_NO([infinite-recursion], [FLAG_W_NO_INFINITE_RECURSION])
+ AC_GCC_WARNING_SUBST_NO([deprecated], [FLAG_W_NO_DEPRECATED])
+ # OK for 32 and 64 bit
+-AC_GCC_WARNING_SUBST_NO([alloc-size-larger-than=18446744073709551615], [FLAG_W_NO_ALLOC_SIZE_LARGER_THAN])
+ AC_GCC_WARNING_SUBST_NO([alloc-size], [FLAG_W_NO_ALLOC_SIZE])
+ 
+ AC_GCC_WARNING_SUBST([write-strings], [FLAG_W_WRITE_STRINGS])
+@@ -2605,6 +2604,7 @@ AC_GCC_WARNING_SUBST([missing-parameter-type], [FLAG_W_MISSING_PARAMETER_TYPE])
+ AC_GCC_WARNING_SUBST([logical-op], [FLAG_W_LOGICAL_OP])
+ AC_GCC_WARNING_SUBST([enum-conversion], [FLAG_W_ENUM_CONVERSION])
+ AC_GCC_WARNING_SUBST([implicit-fallthrough=2], [FLAG_W_IMPLICIT_FALLTHROUGH])
++AC_GCC_WARNING_SUBST([alloc-size-larger-than=18446744073709551616], [FLAG_W_ALLOC_SIZE_LARGER_THAN])
+ 
+ # as above, C++ flags
+ AC_DEFUN([AC_GXX_WARNING_SUBST_NO],[
+diff --git a/memcheck/tests/Makefile.am b/memcheck/tests/Makefile.am
+index 920f262a68cf..4bdca487aa51 100644
+--- a/memcheck/tests/Makefile.am
++++ b/memcheck/tests/Makefile.am
+@@ -689,18 +689,18 @@ leak_cpp_interior_SOURCES	= leak_cpp_interior.cpp
+ 
+ # Suppress various gcc warnings which are correct, but for things
+ # we are actually testing for at runtime.
+-accounting_CFLAGS	= $(AM_CFLAGS) @FLAG_W_NO_ALLOC_SIZE_LARGER_THAN@
++accounting_CFLAGS	= $(AM_CFLAGS) @FLAG_W_ALLOC_SIZE_LARGER_THAN@
+ badfree_CFLAGS		= $(AM_CFLAGS) @FLAG_W_NO_FREE_NONHEAP_OBJECT@
+-bug155125_CFLAGS	= $(AM_CFLAGS) @FLAG_W_NO_UNUSED_RESULT@ @FLAG_W_NO_ALLOC_SIZE_LARGER_THAN@
++bug155125_CFLAGS	= $(AM_CFLAGS) @FLAG_W_NO_UNUSED_RESULT@ @FLAG_W_ALLOC_SIZE_LARGER_THAN@
+ bug472219_CFLAGS	= $(AM_CFLAGS) @FLAG_W_NO_UNINITIALIZED@
+-calloc_overflow_CFLAGS	= ${AM_CFLAGS} @FLAG_W_NO_ALLOC_SIZE_LARGER_THAN@
++calloc_overflow_CFLAGS	= ${AM_CFLAGS} @FLAG_W_ALLOC_SIZE_LARGER_THAN@
+ malloc_usable_CFLAGS	= ${AM_CFLAGS} @FLAG_W_NO_MAYBE_UNINITIALIZED@ @FLAG_W_NO_UNINITIALIZED@
+ mallinfo_CFLAGS		= $(AM_CFLAGS) -Wno-deprecated-declarations
+ if VGCONF_OS_IS_SOLARIS
+ mallinfo_LDADD = -lmalloc
+ endif
+ mallinfo2_CFLAGS	= $(AM_CFLAGS) -Wno-deprecated-declarations
+-malloc3_CFLAGS		= $(AM_CFLAGS) @FLAG_W_NO_ALLOC_SIZE_LARGER_THAN@ @FLAG_W_NO_ALLOC_SIZE@
++malloc3_CFLAGS		= $(AM_CFLAGS) @FLAG_W_ALLOC_SIZE_LARGER_THAN@ @FLAG_W_NO_ALLOC_SIZE@
+ sbfragment_CFLAGS	= $(AM_CFLAGS) -Wno-deprecated-declarations
+ if VGCONF_OS_IS_SOLARIS
+ sbfragment_LDADD = -lmalloc
+diff --git a/memcheck/tests/amd64-freebsd/Makefile.am b/memcheck/tests/amd64-freebsd/Makefile.am
+index 378446d4cf45..1eff95fce3b7 100644
+--- a/memcheck/tests/amd64-freebsd/Makefile.am
++++ b/memcheck/tests/amd64-freebsd/Makefile.am
+@@ -24,5 +24,5 @@ AM_CCASFLAGS += @FLAG_M64@
+ 
+ posix_fallocate_CFLAGS	= $(AM_CFLAGS) @FLAG_W_NO_UNINITIALIZED@
+ posix_fadvise_CFLAGS	= $(AM_CFLAGS) @FLAG_W_NO_UNINITIALIZED@
+-reallocarray_CFLAGS	= ${AM_CFLAGS} @FLAG_W_NO_ALLOC_SIZE_LARGER_THAN@
++reallocarray_CFLAGS	= ${AM_CFLAGS} @FLAG_W_ALLOC_SIZE_LARGER_THAN@
+ 
+diff --git a/memcheck/tests/amd64-linux/Makefile.am b/memcheck/tests/amd64-linux/Makefile.am
+index a3b5df5a6742..69a84ffdfc8f 100644
+--- a/memcheck/tests/amd64-linux/Makefile.am
++++ b/memcheck/tests/amd64-linux/Makefile.am
+@@ -32,5 +32,5 @@ AM_CCASFLAGS += @FLAG_M64@
+ 
+ defcfaexpr_SOURCES	= defcfaexpr.S
+ defcfaexpr_CFLAGS	= $(AM_CFLAGS) @FLAG_NO_PIE@ 
+-reallocarray_CFLAGS	= $(AM_CFLAGS) @FLAG_W_NO_ALLOC_SIZE_LARGER_THAN@
++reallocarray_CFLAGS	= $(AM_CFLAGS) @FLAG_W_ALLOC_SIZE_LARGER_THAN@
+ scalar_CFLAGS = $(AM_CFLAGS) @FLAG_W_NO_UNINITIALIZED@
+diff --git a/memcheck/tests/x86-freebsd/Makefile.am b/memcheck/tests/x86-freebsd/Makefile.am
+index 8c48506c2be7..7839bb309588 100644
+--- a/memcheck/tests/x86-freebsd/Makefile.am
++++ b/memcheck/tests/x86-freebsd/Makefile.am
+@@ -23,4 +23,4 @@ AM_CCASFLAGS += @FLAG_M32@
+ 
+ posix_fallocate_CFLAGS	= $(AM_CFLAGS) @FLAG_W_NO_UNINITIALIZED@
+ posix_fadvise_CFLAGS	= $(AM_CFLAGS) @FLAG_W_NO_UNINITIALIZED@
+-reallocarray_CFLAGS	= ${AM_CFLAGS} @FLAG_W_NO_ALLOC_SIZE_LARGER_THAN@
++reallocarray_CFLAGS	= ${AM_CFLAGS} @FLAG_W_ALLOC_SIZE_LARGER_THAN@
+-- 
+2.52.0
+

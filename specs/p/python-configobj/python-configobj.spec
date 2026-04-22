@@ -3,7 +3,7 @@
 
 Name:           python-configobj
 Version:        5.0.9
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        Config file reading, writing, and validation
 License:        BSD-3-Clause
 URL:            http://configobj.readthedocs.org/

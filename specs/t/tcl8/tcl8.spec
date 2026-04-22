@@ -8,7 +8,7 @@
 Summary: Tool Command Language, pronounced tickle, version 8
 Name: tcl8
 Version: %{vers}
-Release: 2%{?dist}
+Release: 3%{?dist}
 Epoch: 1
 License: TCL AND GPL-3.0-or-later WITH Bison-exception-2.2 AND BSD-3-Clause
 URL: http://tcl.sourceforge.net/

@@ -1,0 +1,127 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 1 Aug 2022 14:24:39 -0400
+Subject: [PATCH] efi: split allocation policy for kernel vs initrd memories.
+
+Currently in our kernel allocator, we use the same set of choices for
+all of our various kernel and initramfs allocations, though they do not
+have exactly the same constraints.
+
+This patch adds the concept of an allocation purpose, which currently
+can be KERNEL_MEM or INITRD_MEM, and updates kernel_alloc() calls
+appropriately, but does not change any current policy decision.  It
+also adds a few debug prints.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/loader/i386/efi/linux.c | 35 +++++++++++++++++++++++++++--------
+ 1 file changed, 27 insertions(+), 8 deletions(-)
+
+diff --git a/grub-core/loader/i386/efi/linux.c b/grub-core/loader/i386/efi/linux.c
+index ef5875b7697..1d7ced3d1f8 100644
+--- a/grub-core/loader/i386/efi/linux.c
++++ b/grub-core/loader/i386/efi/linux.c
+@@ -55,7 +55,14 @@ struct grub_linuxefi_context {
+ 
+ #define BYTES_TO_PAGES(bytes)   (((bytes) + 0xfff) >> 12)
+ 
++typedef enum {
++    NO_MEM,
++    KERNEL_MEM,
++    INITRD_MEM,
++} kernel_alloc_purpose_t;
++
+ struct allocation_choice {
++    kernel_alloc_purpose_t purpose;
+     grub_efi_physical_address_t addr;
+     grub_efi_allocate_type_t alloc_type;
+ };
+@@ -64,6 +71,7 @@ enum {
+     KERNEL_PREF_ADDRESS,
+     KERNEL_4G_LIMIT,
+     KERNEL_NO_LIMIT,
++    INITRD_MAX_ADDRESS,
+ };
+ 
+ static struct allocation_choice max_addresses[] =
+@@ -71,14 +79,17 @@ static struct allocation_choice max_addresses[] =
+     /* the kernel overrides this one with pref_address and
+      * GRUB_EFI_ALLOCATE_ADDRESS */
+     [KERNEL_PREF_ADDRESS] =
+-      { GRUB_EFI_MAX_ALLOCATION_ADDRESS, GRUB_EFI_ALLOCATE_MAX_ADDRESS },
++      { KERNEL_MEM, GRUB_EFI_MAX_ALLOCATION_ADDRESS, GRUB_EFI_ALLOCATE_MAX_ADDRESS },
+     /* If the flag in params is set, this one gets changed to be above 4GB. */
+     [KERNEL_4G_LIMIT] =
+-      { GRUB_EFI_MAX_ALLOCATION_ADDRESS, GRUB_EFI_ALLOCATE_MAX_ADDRESS },
++      { KERNEL_MEM, GRUB_EFI_MAX_ALLOCATION_ADDRESS, GRUB_EFI_ALLOCATE_MAX_ADDRESS },
+     /* this one is always below 4GB, which we still *prefer* even if the flag
+      * is set. */
+     [KERNEL_NO_LIMIT] =
+-      { GRUB_EFI_MAX_ALLOCATION_ADDRESS, GRUB_EFI_ALLOCATE_MAX_ADDRESS },
++      { KERNEL_MEM, GRUB_EFI_MAX_ALLOCATION_ADDRESS, GRUB_EFI_ALLOCATE_MAX_ADDRESS },
++    /* this is for the initrd */
++    [INITRD_MAX_ADDRESS] =
++      { INITRD_MEM, GRUB_EFI_MAX_ALLOCATION_ADDRESS, GRUB_EFI_ALLOCATE_MAX_ADDRESS },
+     { NO_MEM, 0, 0 }
+   };
+ static struct allocation_choice saved_addresses[4];
+@@ -95,7 +106,8 @@ kernel_free(void *addr, grub_efi_uintn_t size)
+ }
+ 
+ static void *
+-kernel_alloc(grub_efi_uintn_t size,
++kernel_alloc(kernel_alloc_purpose_t purpose,
++	     grub_efi_uintn_t size,
+ 	     grub_efi_memory_type_t memtype,
+ 	     const char * const errmsg)
+ {
+@@ -108,6 +120,9 @@ kernel_alloc(grub_efi_uintn_t size,
+       grub_uint64_t max = max_addresses[i].addr;
+       grub_efi_uintn_t pages;
+ 
++      if (purpose != max_addresses[i].purpose)
++	continue;
++
+       /*
+        * When we're *not* loading the kernel, or >4GB allocations aren't
+        * supported, these entries are basically all the same, so don't re-try
+@@ -253,7 +268,8 @@ grub_cmd_initrd (grub_command_t cmd, int argc, char *argv[])
+ 	}
+     }
+ 
+-  initrd_mem = kernel_alloc(size, GRUB_EFI_RUNTIME_SERVICES_DATA,
++  grub_dprintf ("linux", "Trying to allocate initrd mem\n");
++  initrd_mem = kernel_alloc(INITRD_MEM, size, GRUB_EFI_RUNTIME_SERVICES_DATA,
+ 			    N_("can't allocate initrd"));
+   if (initrd_mem == NULL)
+     goto fail;
+@@ -405,7 +421,8 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+     }
+ #endif
+ 
+-  params = kernel_alloc (sizeof(*params), GRUB_EFI_RUNTIME_SERVICES_DATA,
++  params = kernel_alloc (KERNEL_MEM, sizeof(*params),
++			 GRUB_EFI_RUNTIME_SERVICES_DATA,
+ 			 "cannot allocate kernel parameters");
+   if (!params)
+     goto fail;
+@@ -428,7 +445,7 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+   grub_dprintf ("linux", "new lh is at %p\n", lh);
+ 
+   grub_dprintf ("linux", "setting up cmdline\n");
+-  cmdline = kernel_alloc (lh->cmdline_size + 1,
++  cmdline = kernel_alloc (KERNEL_MEM, lh->cmdline_size + 1,
+ 			  GRUB_EFI_RUNTIME_SERVICES_DATA,
+ 			  N_("can't allocate cmdline"));
+   if (!cmdline)
+@@ -476,7 +493,9 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+   max_addresses[KERNEL_4G_LIMIT].addr = GRUB_EFI_MAX_ALLOCATION_ADDRESS;
+   max_addresses[KERNEL_NO_LIMIT].addr = GRUB_EFI_MAX_ALLOCATION_ADDRESS;
+   kernel_size = lh->init_size;
+-  kernel_mem = kernel_alloc (kernel_size, GRUB_EFI_RUNTIME_SERVICES_CODE,
++  grub_dprintf ("linux", "Trying to allocate kernel mem\n");
++  kernel_mem = kernel_alloc (KERNEL_MEM, kernel_size,
++			     GRUB_EFI_RUNTIME_SERVICES_CODE,
+ 			     N_("can't allocate kernel"));
+   restore_addresses();
+   if (!kernel_mem)

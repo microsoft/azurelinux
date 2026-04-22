@@ -3,7 +3,7 @@
 
 Name:           perl-ExtUtils-PkgConfig
 Version:        1.16
-Release:        27%{?dist}
+Release: 28%{?dist}
 Summary:        Simplistic interface to pkg-config
 License:        LGPL-2.0-or-later
 URL:            https://metacpan.org/release/ExtUtils-PkgConfig

@@ -12,7 +12,7 @@
 Summary: Ncurses support utilities
 Name: ncurses
 Version: 6.5
-Release: 7.%{revision}%{?dist}
+Release: 8.%{revision}%{?dist}
 License: MIT-open-group
 URL: https://invisible-island.net/ncurses/ncurses.html
 Source0: https://invisible-mirror.net/archives/ncurses/current/ncurses-%{version}-%{revision}.tgz

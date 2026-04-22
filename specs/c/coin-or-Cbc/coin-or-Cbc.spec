@@ -12,7 +12,7 @@
 Name:		coin-or-%{module}
 Summary:	Coin-or branch and cut
 Version:	2.10.12
-Release:	10%{?dist}
+Release: 11%{?dist}
 
 # The project as a whole is licensed EPL-2.0.  However, many source files still
 # claim to be licensed EPL-1.0.  This is probably an upstream oversight.
@@ -36,7 +36,6 @@ BuildRequires:	pkgconfig(coindatamiplib3)
 BuildRequires:	pkgconfig(coindatanetlib)
 BuildRequires:	pkgconfig(dylp)
 %ifnarch %{ix86}
-BuildRequires:    pkgconfig(highs)
 %endif
 BuildRequires:	pkgconfig(libnauty)
 BuildRequires:	pkgconfig(vol)
@@ -122,8 +121,8 @@ export CPPFLAGS='-DNDEBUG'
   --with-glpk-incdir=%{_includedir} \
   --with-glpk-lib=-lglpk \
 %ifnarch %{ix86}
-  --with-highs-incdir=%{_includedir}/highs \
-  --with-highs-lib=-lhighs \
+  \
+  \
 %endif
   --with-lapack-incdir=%{_includedir}/%{blaslib} \
   --with-lapack-lib=-l%{blaslib} \

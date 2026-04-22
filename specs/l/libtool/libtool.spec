@@ -11,7 +11,7 @@
 Summary: The GNU Portable Library Tool
 Name:    libtool
 Version: 2.5.4
-Release: 8%{?dist}
+Release: 9%{?dist}
 
 # To help future rebase, the following licenses were seen in the following files/folders:
 # '*' is anything that was not explicitly listed earlier in the folder

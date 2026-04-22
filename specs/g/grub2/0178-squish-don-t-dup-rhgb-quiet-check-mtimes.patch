@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Robbie Harwood <rharwood@redhat.com>
+Date: Wed, 17 Aug 2022 10:26:07 -0400
+Subject: [PATCH] squish: don't dup rhgb quiet, check mtimes
+
+Signed-off-by: Robbie Harwood <rharwood@redhat.com>
+---
+ util/grub.d/10_linux.in | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
+index a6568caf7d1..079bb9a0961 100644
+--- a/util/grub.d/10_linux.in
++++ b/util/grub.d/10_linux.in
+@@ -163,10 +163,16 @@ update_bls_cmdline()
+     local cmdline="root=${LINUX_ROOT_DEVICE} ro ${GRUB_CMDLINE_LINUX} ${GRUB_CMDLINE_LINUX_DEFAULT}"
+     local -a files=($(get_sorted_bls))
+ 
+-    if [[ ! -f /etc/kernel/cmdline ]]; then
+-	# anaconda has the correct information to do this during install;
+-	# afterward, grubby will take care of syncing on updates.
+-	echo "$cmdline rhgb quiet" > /etc/kernel/cmdline
++    if [[ ! -f /etc/kernel/cmdline ]] ||
++	   [[ /etc/kernel/cmdline -ot /etc/default/grub ]]; then
++	# anaconda has the correct information to create this during install;
++	# afterward, grubby will take care of syncing on updates.  If the user
++	# has modified /etc/default/grub, try to cope.
++	if [[ ! "$cmdline" =~ "rhgb quiet" ]]; then
++	    # ensure these only show up once
++	    cmdline="$cmdline rhgb quiet"
++	fi
++	echo "$cmdline" > /etc/kernel/cmdline
+     fi
+ 
+     for bls in "${files[@]}"; do

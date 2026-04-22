@@ -1,0 +1,25 @@
+From f6a421af6828f7e8226fa3e779436174bf9c07fe Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Wed, 16 Jul 2025 21:26:45 +0200
+Subject: [PATCH 4/4] Replace unmappable character with oe
+
+---
+ .../commons/compress/archivers/tar/TarArchiveOutputStream.java  | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/main/java/org/apache/commons/compress/archivers/tar/TarArchiveOutputStream.java b/src/main/java/org/apache/commons/compress/archivers/tar/TarArchiveOutputStream.java
+index 4f3588d9b..18dea2845 100644
+--- a/src/main/java/org/apache/commons/compress/archivers/tar/TarArchiveOutputStream.java
++++ b/src/main/java/org/apache/commons/compress/archivers/tar/TarArchiveOutputStream.java
+@@ -276,7 +276,7 @@ private void addPaxHeadersForBigNumbers(final Map<String, String> paxHeaders, fi
+         addPaxHeaderForBigNumber(paxHeaders, "uid", entry.getLongUserId(), TarConstants.MAXID);
+         // libarchive extensions
+         addFileTimePaxHeader(paxHeaders, "LIBARCHIVE.creationtime", entry.getCreationTime());
+-        // star extensions by Jörg Schilling
++        // star extensions by Joerg Schilling
+         addPaxHeaderForBigNumber(paxHeaders, "SCHILY.devmajor", entry.getDevMajor(), TarConstants.MAXID);
+         addPaxHeaderForBigNumber(paxHeaders, "SCHILY.devminor", entry.getDevMinor(), TarConstants.MAXID);
+         // there is no PAX header for file mode
+-- 
+2.50.1
+

@@ -11,7 +11,7 @@ Name: hunspell-zu
 Summary: Zulu hunspell dictionaries
 %global upstreamid 20100126
 Version: 0.%{upstreamid}
-Release: 34%{?dist}
+Release: 35%{?dist}
 Source: https://downloads.sourceforge.net/project/aoo-extensions/3132/3/dict-zu_za-2010.01.26.oxt
 URL: https://extensions.openoffice.org/en/project/zulu-spell-checker
 # There is no License information in this new sourceforge Source: archive

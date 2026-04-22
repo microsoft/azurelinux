@@ -13,7 +13,7 @@
 
 Name:           perl-LDAP
 Version:        0.68
-Release:        16%{?dist}
+Release: 17%{?dist}
 Epoch:          1
 Summary:        LDAP Perl module
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

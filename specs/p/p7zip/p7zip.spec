@@ -10,7 +10,7 @@
 Summary: Very high compression ratio file archiver
 Name: p7zip
 Version: 16.02
-Release: 33%{?dist}
+Release: 34%{?dist}
 # Files under C/Compress/Lzma/ are dual LGPL or CPL
 # Automatically converted from old format: LGPLv2 and (LGPLv2+ or CPL) - review is highly recommended.
 License: LicenseRef-Callaway-LGPLv2 AND (LicenseRef-Callaway-LGPLv2+ OR CPL-1.0)
@@ -52,7 +52,7 @@ BuildRequires: kde-filesystem
 BuildRequires: nasm
 %endif
 %ifarch x86_64
-BuildRequires: yasm
+# BuildRequires: yasm — removed, not available in Azure Linux
 %endif
 
 %description
@@ -101,7 +101,7 @@ popd
 cp -f makefile.linux_x86_asm_gcc_4.X makefile.machine
 %endif
 %ifarch x86_64
-cp -f makefile.linux_amd64_asm makefile.machine
+cp -f makefile.linux_amd64 makefile.machine
 %endif
 %ifarch ppc ppc64
 cp -f makefile.linux_any_cpu_gcc_4.X makefile.machine

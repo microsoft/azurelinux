@@ -1,0 +1,188 @@
+.TH PRE\-COMMIT\-TRY\-REPO "1" "February 2025" "" "User Commands"
+.SH NAME
+.B pre\-commit\-try\-repo
+\[en]
+Try the hooks in a repository, useful for developing new hooks
+.SH SYNOPSIS
+.B pre\-commit\ try\-repo
+.RB [ \-h ]
+.RB [ \-\-color\  { auto , always , never }]
+.RB [ \-c\ \fICONFIG ]
+.RB [ \-\-ref\ \fIREF ]
+.RB [ \-\-verbose ]
+.RB [ \-\-all\-files \ |\  \-\-files\  [ \fIFILES \ ...]]
+.RB [ \-\-show\-diff\-on\-failure ]
+.RB [ \-\-hook\-stage\  { commit\-msg , post\-checkout , post\-commit , post\-merge , post\-rewrite , pre\-commit , pre\-merge\-commit , pre\-push , pre\-rebase , prepare\-commit\-msg , manual }]
+.RB [ \-\-remote\-branch\ \fIREMOTE_BRANCH ]
+.RB [ \-\-local\-branch\ \fILOCAL_BRANCH ]
+.RB [ \-\-from\-ref\ \fIFROM_REF ]
+.RB [ \-\-to\-ref\ \fITO_REF ]
+.RB [ \-\-pre\-rebase\-upstream\ \fIPRE_REBASE_UPSTREAM ]
+.RB [ \-\-pre\-rebase\-branch\ \fIPRE_REBASE_BRANCH ]
+.RB [ \-\-commit\-msg\-filename\ \fICOMMIT_MSG_FILENAME ]
+.RB [ \-\-prepare\-commit\-message\-source\ \fIPREPARE_COMMIT_MESSAGE_SOURCE ]
+.RB [ \-\-commit\-object\-name\ \fICOMMIT_OBJECT_NAME ]
+.RB [ \-\-remote\-name\ \fIREMOTE_NAME ]
+.RB [ \-\-remote\-url\ \fIREMOTE_URL ]
+.RB [ \-\-checkout\-type\ \fICHECKOUT_TYPE ]
+.RB [ \-\-is\-squash\-merge\ \fIIS_SQUASH_MERGE ]
+.RB [ \-\-rewrite\-command\ \fIREWRITE_COMMAND ]
+.I repo
+.RI [ hook ]
+.SH OPTIONS
+.SS "POSITIONAL\ ARGUMENTS"
+.TP
+.I repo
+Repository to source hooks from.
+.TP
+.I hook
+A single hook-id to run.
+.SS "OPTIONAL\ ARGUMENTS"
+.TP
+.B \-h\fR,\ \fB\-\-help
+Show a help message and exit.
+.TP
+.BR \-\-color\  { auto , always , never }
+Whether to use color in output.
+Defaults to
+.BR auto .
+.TP
+.B \-\-ref\fR, \fB\-\-rev\ \fIREF
+Manually select a rev to run against,
+otherwise the
+.B HEAD
+revision will be used.
+.TP
+.B \-c\fR, \fB\-\-config\ \fICONFIG
+Path to alternate config file.
+.TP
+.B \-\-verbose\fR, \fB\-v
+.TP
+.B \-\-all\-files\fR, \fB\-a
+Run on all the files in the repo.
+.TP
+.BR \-\-files\  [ \fIFILES \ ...]
+Specific filenames to run hooks on.
+.TP
+.B \-\-show\-diff\-on\-failure
+When hooks fail, run
+.BR git\-diff (1)
+directly afterward.
+.TP
+.BR \-\-hook\-stage\  { commit\-msg , post\-checkout , post\-commit , post\-merge , post\-rewrite , pre\-commit , pre\-merge\-commit , pre\-push , pre\-rebase , prepare\-commit\-msg , manual }]
+The stage during which the hook is fired.
+One of
+.BR commit\-msg ,
+.BR post\-checkout ,
+.BR post\-commit ,
+.BR post\-merge ,
+.BR post\-rewrite ,
+.BR pre\-commit ,
+.BR pre\-merge\-commit ,
+.BR pre\-push ,
+.BR pre\-rebase ,
+.BR prepare\-commit\-msg ,
+.BR manual .
+.TP
+.B \-\-remote\-branch\ \fIREMOTE_BRANCH
+Remote branch ref used by
+.BR git\-push (1).
+.TP
+.B \-\-local\-branch\ \fILOCAL_BRANCH
+Local branch ref used by
+.BR git\-push (1).
+.TP
+.B \-\-from\-ref\fR, \fB\-\-source\fR, \fB\-s\ \fIFROM_REF
+(For usage with
+.BR \-\-to\-ref )
+\[en] this option represents the original ref in a
+.IB from_ref ... to_ref
+diff expression.
+For
+.B pre\-push
+hooks,
+this represents the branch you are pushing to.
+For
+.B post\-checkout
+hooks,
+this represents the branch that was previously checked out.
+.TP
+.B \-\-to\-ref\fR, \fB\-\-origin\fR, \fB\-o\ \fITO_REF
+(For usage with
+.BR \-\-from\-ref )
+\[en] this option represents the destination ref in a
+.IB from_ref ... to_ref
+diff expression.
+For
+.B pre\-push
+hooks,
+this represents the branch being pushed.
+For
+.B post\-checkout
+hooks,
+this represents the branch that is now checked out.
+.TP
+.B \-\-pre\-rebase\-upstream\ \fIPRE_REBASE_UPSTREAM
+The upstream from which the series was forked.
+.TP
+.B \-\-pre\-rebase\-branch\ \fIPRE_REBASE_BRANCH
+The branch being rebased,
+and is not set when rebasing the current branch.
+.TP
+.B \-\-commit\-msg\-filename\ \fICOMMIT_MSG_FILENAME
+Filename to check when running during
+.BR commit\-msg .
+.TP
+.B \-\-prepare\-commit\-message\-source\ \fIPREPARE_COMMIT_MESSAGE_SOURCE
+Source of the commit message
+(typically the second argument to
+.BR .git/hooks/prepare-commit-msg )
+.TP
+.B \-\-commit\-object\-name\ \fICOMMIT_OBJECT_NAME
+Commit object name
+(typically the third argument to
+.BR .git/hooks/prepare-commit-msg )
+.TP
+.B \-\-remote\-name\ \fIREMOTE_NAME
+Remote name used by
+.BR git\-push (1).
+.TP
+.B \-\-remote\-url\ \fIREMOTE_URL
+Remote url used by
+.BR git\-push (1).
+.TP
+.B \-\-checkout\-type\ \fICHECKOUT_TYPE
+Indicates whether the checkout was a branch checkout
+(changing branches,
+.RB flag= 1 )
+or a file checkout
+(retrieving a file from the index,
+.RB flag= 0 ).
+.TP
+.B \-\-is\-squash\-merge\ \fIIS_SQUASH_MERGE
+During a post-merge hook,
+indicates whether the merge was a squash merge
+.TP
+.B \-\-rewrite\-command\ \fIREWRITE_COMMAND
+During a post-rewrite hook,
+specifies the command that invoked the rewrite
+.SH "SEE\ ALSO"
+.BR pre\-commit\-autoupdate (1),
+.BR pre\-commit\-clean (1),
+.BR pre\-commit\-gc (1),
+.BR pre\-commit\-init\-templatedir (1),
+.BR pre\-commit\-install (1),
+.BR pre\-commit\-install\-hooks (1),
+.BR pre\-commit\-migrate\-config (1),
+.BR pre\-commit\-run (1),
+.BR pre\-commit\-sample\-config (1),
+.\" .BR pre\-commit\-try\-repo (1),
+.BR pre\-commit\-uninstall (1),
+.BR pre\-commit\-validate\-config (1),
+.BR pre\-commit\-validate\-manifest (1),
+.BR pre\-commit\-help (1)
+.P
+.BR pre\-commit (1)
+.P
+.BR git\-diff (1)
+.BR git\-push (1)

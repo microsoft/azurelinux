@@ -5,7 +5,7 @@ Summary: A utility which maintains a system's symbolic links
 Name: symlinks
 URL: http://ibiblio.org/pub/Linux/utils/file/
 Version: 1.7
-Release: 13%{?dist}
+Release: 14%{?dist}
 License: Symlinks
 # Upstream maintainer provided tarball, ibiblio no longer allowing uploads
 Source0: http://ibiblio.org/pub/Linux/utils/file/%{name}-%{version}.tar.gz

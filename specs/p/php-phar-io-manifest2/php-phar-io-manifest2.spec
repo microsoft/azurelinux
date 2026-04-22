@@ -29,7 +29,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
 Version:        2.0.4
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Component for reading phar.io manifest information
 
 License:        BSD-3-Clause

@@ -1,0 +1,183 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Julian Andres Klode <julian.klode@canonical.com>
+Date: Tue, 9 Jul 2024 16:46:05 -0600
+Subject: [PATCH] efi: Provide wrappers for load_image, start_image,
+
+These can be used to register a different implementation later,
+for example, when shim provides a protocol with those functions.
+
+Signed-off-by: Mate Kukri <mate.kukri@canonical.com>
+---
+ grub-core/kern/efi/efi.c           | 57 ++++++++++++++++++++++++++++++++++++++
+ grub-core/loader/efi/chainloader.c | 13 ++++-----
+ include/grub/efi/efi.h             | 37 +++++++++++++++++++++++++
+ 3 files changed, 100 insertions(+), 7 deletions(-)
+
+diff --git a/grub-core/kern/efi/efi.c b/grub-core/kern/efi/efi.c
+index cdfc11565c7..b5b8a329622 100644
+--- a/grub-core/kern/efi/efi.c
++++ b/grub-core/kern/efi/efi.c
+@@ -1131,6 +1131,63 @@ grub_efi_find_configuration_table (const grub_guid_t *target_guid)
+   return 0;
+ }
+ 
++static const grub_efi_loader_t *override_loader = NULL;
++
++grub_err_t
++grub_efi_register_loader (const grub_efi_loader_t *loader)
++{
++  if (override_loader != NULL)
++    return grub_error (GRUB_ERR_BUG, "trying to register different loader");
++  override_loader = loader;
++  return GRUB_ERR_NONE;
++}
++
++grub_err_t
++grub_efi_unregister_loader (const grub_efi_loader_t *loader)
++{
++  if (loader != override_loader)
++    return grub_error (GRUB_ERR_BUG, "trying to unregister different loader");
++
++  override_loader = NULL;
++  return GRUB_ERR_NONE;
++}
++
++grub_efi_status_t
++grub_efi_load_image (grub_efi_boolean_t boot_policy,
++		     grub_efi_handle_t parent_image_handle,
++		     grub_efi_device_path_t *file_path, void *source_buffer,
++		     grub_efi_uintn_t source_size,
++		     grub_efi_handle_t *image_handle)
++{
++  if (override_loader != NULL)
++    return override_loader->load_image (boot_policy, parent_image_handle,
++					file_path, source_buffer, source_size,
++					image_handle);
++  return grub_efi_system_table->boot_services->load_image (
++      boot_policy, parent_image_handle, file_path, source_buffer, source_size,
++      image_handle);
++}
++
++grub_efi_status_t
++grub_efi_start_image (grub_efi_handle_t image_handle,
++		      grub_efi_uintn_t *exit_data_size,
++		      grub_efi_char16_t **exit_data)
++{
++  if (override_loader != NULL)
++    return override_loader->start_image (image_handle, exit_data_size,
++					 exit_data);
++  return grub_efi_system_table->boot_services->start_image (
++      image_handle, exit_data_size, exit_data);
++}
++
++grub_efi_status_t
++grub_efi_unload_image (grub_efi_handle_t image_handle)
++{
++  if (override_loader != NULL)
++    return override_loader->unload_image (image_handle);
++  return grub_efi_system_table->boot_services->unload_image (image_handle);
++}
++
+ grub_err_t
+ grub_efi_status_to_err (grub_efi_status_t status)
+ {
+diff --git a/grub-core/loader/efi/chainloader.c b/grub-core/loader/efi/chainloader.c
+index 5cd6f6a5993..9b1cc3fd41d 100644
+--- a/grub-core/loader/efi/chainloader.c
++++ b/grub-core/loader/efi/chainloader.c
+@@ -69,7 +69,7 @@ grub_start_image (grub_efi_handle_t handle)
+ 
+   b = grub_efi_system_table->boot_services;
+ 
+-  status = b->start_image (handle, &exit_data_size, &exit_data);
++  status = grub_efi_start_image (handle, &exit_data_size, &exit_data);
+   if (status != GRUB_EFI_SUCCESS)
+     {
+       if (exit_data)
+@@ -101,7 +101,6 @@ grub_chainloader_unload (void *context)
+ {
+   grub_efi_handle_t image_handle;
+   grub_efi_loaded_image_t *loaded_image;
+-  grub_efi_boot_services_t *b;
+ 
+   image_handle = (grub_efi_handle_t) context;
+ 
+@@ -109,8 +108,7 @@ grub_chainloader_unload (void *context)
+   if (loaded_image != NULL)
+     grub_free (loaded_image->load_options);
+ 
+-  b = grub_efi_system_table->boot_services;
+-  b->unload_image (image_handle);
++  grub_efi_unload_image (image_handle);
+ 
+   grub_dl_unref (my_mod);
+   return GRUB_ERR_NONE;
+@@ -871,8 +869,8 @@ grub_load_image(grub_efi_device_path_t *file_path, void *boot_image,
+ 
+   b = grub_efi_system_table->boot_services;
+ 
+-  status = b->load_image (0, grub_efi_image_handle, file_path,
+-                          boot_image, image_size, image_handle_out);
++  status = grub_efi_load_image (0, grub_efi_image_handle, file_path,
++				boot_image, image_size, image_handle_out);
+   if (status != GRUB_EFI_SUCCESS)
+     {
+       if (status == GRUB_EFI_OUT_OF_RESOURCES)
+@@ -1198,7 +1196,8 @@ fail:
+   if (cmdline)
+     grub_free (cmdline);
+ 
+-  b->unload_image (image_handle);
++  if (image_handle != NULL)
++    grub_efi_unload_image (image_handle);
+ 
+   grub_dl_unref (my_mod);
+ 
+diff --git a/include/grub/efi/efi.h b/include/grub/efi/efi.h
+index 2c0e7f24bda..7eed1bd791d 100644
+--- a/include/grub/efi/efi.h
++++ b/include/grub/efi/efi.h
+@@ -202,6 +202,43 @@ grub_err_t grub_arch_efi_linux_load_image_header(grub_file_t file,
+                                                 struct linux_arch_kernel_header *lh);
+ grub_err_t grub_arch_efi_linux_boot_image(grub_addr_t addr, grub_size_t size,
+ 					  char *args, int nx_enabled);
++grub_efi_status_t
++EXPORT_FUNC (grub_efi_load_image) (grub_efi_boolean_t boot_policy,
++				   grub_efi_handle_t parent_image_handle,
++				   grub_efi_device_path_t *file_path,
++				   void *source_buffer, grub_efi_uintn_t source_size,
++				   grub_efi_handle_t *image_handle);
++
++grub_efi_status_t
++EXPORT_FUNC (grub_efi_start_image) (grub_efi_handle_t image_handle,
++				    grub_efi_uintn_t *exit_data_size,
++				    grub_efi_char16_t **exit_data);
++
++grub_efi_status_t
++EXPORT_FUNC (grub_efi_unload_image) (grub_efi_handle_t image_handle);
++
++typedef struct grub_efi_loader
++{
++  grub_efi_status_t (__grub_efi_api *load_image) (grub_efi_boolean_t boot_policy,
++				   grub_efi_handle_t parent_image_handle,
++				   grub_efi_device_path_t *file_path,
++				   void *source_buffer,
++				   grub_efi_uintn_t source_size,
++				   grub_efi_handle_t *image_handle);
++
++  grub_efi_status_t (__grub_efi_api *start_image) (grub_efi_handle_t image_handle,
++				    grub_efi_uintn_t *exit_data_size,
++				    grub_efi_char16_t **exit_data);
++
++  grub_efi_status_t (__grub_efi_api *unload_image) (grub_efi_handle_t image_handle);
++} grub_efi_loader_t;
++
++grub_err_t
++EXPORT_FUNC (grub_efi_register_loader) (const grub_efi_loader_t *loader);
++
++grub_err_t
++EXPORT_FUNC (grub_efi_unregister_loader) (const grub_efi_loader_t *loader);
++
+ 
+ grub_addr_t grub_efi_section_addr (const char *section);
+ 

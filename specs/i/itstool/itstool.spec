@@ -3,7 +3,7 @@
 
 Name:           itstool
 Version:        2.0.7
-Release:        11%{?dist}
+Release: 12%{?dist}
 Summary:        ITS-based XML translation tool
 
 License:        GPL-3.0-or-later

@@ -7,7 +7,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.2.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Ruby STDOUT text formatting
 License: MIT
 URL: https://github.com/geemus/formatador

@@ -5,7 +5,7 @@
 %{bcond_without perl_File_BaseDir_enables_xdg_user_dirs}
 Name:           perl-File-BaseDir
 Version:        0.09
-Release:        12%{?dist}
+Release: 13%{?dist}
 Summary:        Use the Freedesktop.org base directory specification
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/File-BaseDir

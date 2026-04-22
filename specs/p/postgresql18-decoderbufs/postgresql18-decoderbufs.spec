@@ -9,7 +9,7 @@
 
 Name:		postgresql%{pgversion}-decoderbufs
 Version:	3.2.0
-Release:	2%{?pre:.%pre}%{?dist}
+Release: 3%{?pre:.%pre}%{?dist}
 Summary:	PostgreSQL Protocol Buffers logical decoder plugin
 
 License:	MIT

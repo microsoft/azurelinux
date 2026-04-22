@@ -8,7 +8,7 @@ Name:           biber
 # Export $BCF_VERSION from lib/Biber/Constants.pm, bug #2048536
 %define bcfversion 3.11
 Version:        2.21
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Command-line bibliographic manager, BibTeX replacement
 # bin/biber:        Artistic-2.0
 # data/texmap.xsl:  Artistic-2.0

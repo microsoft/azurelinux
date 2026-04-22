@@ -11,7 +11,7 @@ Name: hunspell-mi
 Summary: Maori hunspell dictionaries
 %global upstreamid 20080630
 Version: 0.%{upstreamid}
-Release: 34%{?dist}
+Release: 35%{?dist}
 Source: http://download.services.openoffice.org/contrib/dictionaries/mi_NZ.zip
 URL: https://wiki.openoffice.org/wiki/Dictionaries
 License: GPL-3.0-or-later

@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 2.2.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Simple testing API built on Rack
 License: MIT
 URL: https://github.com/rack/rack-test

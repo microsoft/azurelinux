@@ -1,0 +1,66 @@
+From 1e47ea7adc316e2df3d0081c2c0ebe75ddd6bda0 Mon Sep 17 00:00:00 2001
+From: Andreas Gerstmayr <agerstmayr@redhat.com>
+Date: Wed, 22 Jun 2022 16:57:52 +0200
+Subject: [PATCH] update grafana-cli script with distro-specific paths and
+ switch to grafana user
+
+
+diff --git a/packaging/wrappers/grafana-cli b/packaging/wrappers/grafana-cli
+index 7c6c46aef9..945714642b 100755
+--- a/packaging/wrappers/grafana-cli
++++ b/packaging/wrappers/grafana-cli
+@@ -5,7 +5,7 @@
+ # the system-wide Grafana configuration that was bundled with the package as we
+ # use the binary.
+ 
+-DEFAULT=/etc/default/grafana
++DEFAULT=/etc/sysconfig/grafana-server
+ 
+ GRAFANA_HOME="${GRAFANA_HOME:-/usr/share/grafana}"
+ 
+@@ -13,11 +13,12 @@ CONF_DIR=/etc/grafana
+ DATA_DIR=/var/lib/grafana
+ PLUGINS_DIR=/var/lib/grafana/plugins
+ LOG_DIR=/var/log/grafana
++LIBEXEC_DIR=/usr/libexec/grafana
+ 
+ CONF_FILE=$CONF_DIR/grafana.ini
+ PROVISIONING_CFG_DIR=$CONF_DIR/provisioning
+ 
+-EXECUTABLE="$GRAFANA_HOME/bin/grafana"
++EXECUTABLE=$LIBEXEC_DIR/grafana-cli
+ 
+ if [ ! -x $EXECUTABLE ]; then
+  echo "$EXECUTABLE not installed or not executable"
+@@ -29,14 +30,23 @@ if [ -f "$DEFAULT" ]; then
+   . "$DEFAULT"
+ fi
+ 
+-OPTS="--homepath=${GRAFANA_HOME} \
+-      --config=${CONF_FILE} \
+-      --pluginsDir=${PLUGINS_DIR} \
+-      --configOverrides='cfg:default.paths.provisioning=$PROVISIONING_CFG_DIR \
+-                        cfg:default.paths.data=${DATA_DIR} \
+-                        cfg:default.paths.logs=${LOG_DIR} \
+-                        cfg:default.paths.plugins=${PLUGINS_DIR}'"
++OPTS=("--homepath=${GRAFANA_HOME}"
++      "--config=${CONF_FILE}"
++      "--pluginsDir=${PLUGINS_DIR}"
++      "--configOverrides=cfg:default.paths.provisioning=$PROVISIONING_CFG_DIR \
++                         cfg:default.paths.data=${DATA_DIR} \
++                         cfg:default.paths.logs=${LOG_DIR} \
++                         cfg:default.paths.plugins=${PLUGINS_DIR}")
+ 
+ CMD=cli
+ 
+-eval $EXECUTABLE "$CMD" "$OPTS" "$@"
++if [ "$(id -u)" -eq 0 -o "$(id -g)" -eq 0 ]; then
++  cd "${GRAFANA_HOME}"
++  exec runuser -u "${GRAFANA_USER}" -- "$EXECUTABLE" "${OPTS[@]}" "$@"
++elif [ "$(id -u -n)" = "${GRAFANA_USER}" ]; then
++  cd "${GRAFANA_HOME}"
++  exec "$EXECUTABLE" "${OPTS[@]}" "$@"
++else
++  echo "$0: please run this script as user \"${GRAFANA_USER}\" or root."
++  exit 5
++fi

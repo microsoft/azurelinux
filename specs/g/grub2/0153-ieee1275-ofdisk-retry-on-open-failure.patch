@@ -1,0 +1,103 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Diego Domingos <diegodo@br.ibm.com>
+Date: Wed, 10 Mar 2021 14:17:52 -0500
+Subject: [PATCH] ieee1275/ofdisk: retry on open failure
+
+This patch aims to make grub more robust when booting from SAN/Multipath disks.
+
+If a path is failing intermittently so grub will retry the OPEN and READ the
+disk (grub_ieee1275_open and grub_ieee1275_read) until the total amount of times
+specified in MAX_RETRIES.
+
+Signed-off-by: Diego Domingos <diegodo@br.ibm.com>
+---
+ grub-core/disk/ieee1275/ofdisk.c | 25 ++++++++++++++++++++-----
+ include/grub/ieee1275/ofdisk.h   |  8 ++++++++
+ 2 files changed, 28 insertions(+), 5 deletions(-)
+
+diff --git a/grub-core/disk/ieee1275/ofdisk.c b/grub-core/disk/ieee1275/ofdisk.c
+index 629fc15f284..b413822bb87 100644
+--- a/grub-core/disk/ieee1275/ofdisk.c
++++ b/grub-core/disk/ieee1275/ofdisk.c
+@@ -225,7 +225,9 @@ dev_iterate (const struct grub_ieee1275_devalias *alias)
+       char *buf, *bufptr;
+       unsigned i;
+ 
+-      if (grub_ieee1275_open (alias->path, &ihandle))
++
++      RETRY_IEEE1275_OFDISK_OPEN(alias->path, &ihandle)
++      if (! ihandle)
+ 	return;
+ 
+       /* This method doesn't need memory allocation for the table. Open
+@@ -305,7 +307,9 @@ dev_iterate (const struct grub_ieee1275_devalias *alias)
+           return;
+         }
+ 
+-      if (grub_ieee1275_open (alias->path, &ihandle))
++      RETRY_IEEE1275_OFDISK_OPEN(alias->path, &ihandle);
++
++      if (! ihandle)
+         {
+           grub_free (buf);
+           grub_free (table);
+@@ -495,7 +499,7 @@ grub_ofdisk_open (const char *name, grub_disk_t disk)
+     last_ihandle = 0;
+     last_devpath = NULL;
+ 
+-    grub_ieee1275_open (op->open_path, &last_ihandle);
++    RETRY_IEEE1275_OFDISK_OPEN(op->open_path, &last_ihandle);
+     if (! last_ihandle)
+       return grub_error (GRUB_ERR_UNKNOWN_DEVICE, "can't open device");
+     last_devpath = op->open_path;
+@@ -567,7 +571,7 @@ grub_ofdisk_prepare (grub_disk_t disk, grub_disk_addr_t sector)
+       last_ihandle = 0;
+       last_devpath = NULL;
+ 
+-      grub_ieee1275_open (disk->data, &last_ihandle);
++      RETRY_IEEE1275_OFDISK_OPEN(disk->data, &last_ihandle);
+       if (! last_ihandle)
+ 	return grub_error (GRUB_ERR_UNKNOWN_DEVICE, "can't open device");
+       last_devpath = disk->data;
+@@ -594,12 +598,23 @@ grub_ofdisk_read (grub_disk_t disk, grub_disk_addr_t sector,
+     return err;
+   grub_ieee1275_read (last_ihandle, buf, size  << disk->log_sector_size,
+ 		      &actual);
+-  if (actual != (grub_ssize_t) (size  << disk->log_sector_size))
++  int i = 0;
++  while(actual != (grub_ssize_t) (size  << disk->log_sector_size)){
++    if (i>MAX_RETRIES){
+     return grub_error (GRUB_ERR_READ_ERROR, N_("failure reading sector 0x%llx "
+ 					       "from `%s'"),
+ 		       (unsigned long long) sector,
+ 		       disk->name);
++    }
++    last_devpath = NULL;
++    err = grub_ofdisk_prepare (disk, sector);
++    if (err)
++      return err;
+ 
++    grub_ieee1275_read (last_ihandle, buf, size  << disk->log_sector_size,
++                      &actual);
++    i++;
++  }
+   return 0;
+ }
+ 
+diff --git a/include/grub/ieee1275/ofdisk.h b/include/grub/ieee1275/ofdisk.h
+index 2f69e3f191d..7d2d5409305 100644
+--- a/include/grub/ieee1275/ofdisk.h
++++ b/include/grub/ieee1275/ofdisk.h
+@@ -22,4 +22,12 @@
+ extern void grub_ofdisk_init (void);
+ extern void grub_ofdisk_fini (void);
+ 
++#define MAX_RETRIES 20
++
++
++#define RETRY_IEEE1275_OFDISK_OPEN(device, last_ihandle) unsigned retry_i=0;for(retry_i=0; retry_i < MAX_RETRIES; retry_i++){ \
++						if(!grub_ieee1275_open(device, last_ihandle)) \
++						break; \
++						grub_dprintf("ofdisk","Opening disk %s failed. Retrying...\n",device); }
++
+ #endif /* ! GRUB_INIT_HEADER */

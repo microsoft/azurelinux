@@ -3,7 +3,7 @@
 
 Name:           perl-XML-Handler-YAWriter
 Version:        0.23
-Release:        52%{?dist}
+Release: 53%{?dist}
 
 Summary:        Yet another Perl SAX XML Writer
 

@@ -30,7 +30,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
 Version:        6.0.1
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        FilterIterator implementation based on a list of suffixes, version %{major}
 
 License:        BSD-3-Clause

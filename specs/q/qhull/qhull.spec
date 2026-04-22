@@ -8,7 +8,7 @@ Version: 8.0.2
 # - Older releases used year.month
 # - Newer releases use x.y.z
 Epoch: 1
-Release: 7%{?dist}
+Release: 8%{?dist}
 License: Qhull
 Source0: https://github.com/qhull/qhull/archive/v%{version}.tar.gz#/qhull-%{version}.tar.gz
 

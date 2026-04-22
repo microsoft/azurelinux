@@ -1,0 +1,45 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Lidong Chen <lidong.chen@oracle.com>
+Date: Wed, 22 Jan 2025 18:04:43 +0000
+Subject: [PATCH] net: Prevent overflows when allocating memory for arrays
+
+Use grub_calloc() when allocating memory for arrays to ensure proper
+overflow checks are in place.
+
+Signed-off-by: Lidong Chen <lidong.chen@oracle.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/net/dns.c | 4 ++--
+ grub-core/net/net.c | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/grub-core/net/dns.c b/grub-core/net/dns.c
+index 39b0c46cf..f20cd6f83 100644
+--- a/grub-core/net/dns.c
++++ b/grub-core/net/dns.c
+@@ -470,8 +470,8 @@ grub_net_dns_lookup (const char *name,
+ 	  && grub_get_time_ms () < dns_cache[h].limit_time)
+ 	{
+ 	  grub_dprintf ("dns", "retrieved from cache\n");
+-	  *addresses = grub_malloc (dns_cache[h].naddresses
+-				    * sizeof ((*addresses)[0]));
++	  *addresses = grub_calloc (dns_cache[h].naddresses,
++				    sizeof ((*addresses)[0]));
+ 	  if (!*addresses)
+ 	    return grub_errno;
+ 	  *naddresses = dns_cache[h].naddresses;
+diff --git a/grub-core/net/net.c b/grub-core/net/net.c
+index 22224453f..d426ad2c4 100644
+--- a/grub-core/net/net.c
++++ b/grub-core/net/net.c
+@@ -91,8 +91,8 @@ grub_net_link_layer_add_address (struct grub_net_card *card,
+   /* Add sender to cache table.  */
+   if (card->link_layer_table == NULL)
+     {
+-      card->link_layer_table = grub_zalloc (LINK_LAYER_CACHE_SIZE
+-					    * sizeof (card->link_layer_table[0]));
++      card->link_layer_table = grub_calloc (LINK_LAYER_CACHE_SIZE,
++					    sizeof (card->link_layer_table[0]));
+       if (card->link_layer_table == NULL)
+ 	return;
+     }

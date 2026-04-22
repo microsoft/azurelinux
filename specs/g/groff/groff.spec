@@ -6,7 +6,7 @@
 Summary: A document formatting system
 Name: groff
 Version: 1.23.0
-Release: 11%{?dist}
+Release: 12%{?dist}
 # Everything is under GPL-3.0-or-later, except for the following files:
 # MIT license
 #  -- tmac/hyphen.den

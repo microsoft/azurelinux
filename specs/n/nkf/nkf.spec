@@ -4,7 +4,7 @@
 Name:		nkf
 Epoch:		1
 Version:	2.1.4
-Release:	37%{?dist}
+Release: 38%{?dist}
 License:	Zlib
 URL:		http://nkf.osdn.jp/
 Source0:	http://iij.dl.osdn.jp/nkf/64158/%{name}-%{version}.tar.gz

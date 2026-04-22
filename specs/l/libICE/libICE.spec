@@ -4,7 +4,7 @@
 Summary: X.Org X11 ICE runtime library
 Name: libICE
 Version: 1.1.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: MIT-open-group
 URL: http://www.x.org
 

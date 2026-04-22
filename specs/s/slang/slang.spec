@@ -10,7 +10,7 @@
 Summary:	Shared library for the S-Lang extension language
 Name:		slang
 Version:	2.3.3
-Release:	8%{?dist}
+Release: 9%{?dist}
 License:	GPL-2.0-or-later
 URL:		https://www.jedsoft.org/slang/
 Source:		https://www.jedsoft.org/releases/%{name}/%{name}-%{version}.tar.bz2

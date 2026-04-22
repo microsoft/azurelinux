@@ -4,7 +4,7 @@
 Name:           perl-CPAN-Meta
 Summary:        Distribution metadata for a CPAN dist
 Version:        2.150010
-Release:        520%{?dist}
+Release: 521%{?dist}
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/CPAN-Meta
 Source0:        https://cpan.metacpan.org/authors/id/D/DA/DAGOLDEN/CPAN-Meta-%{version}.tar.gz

@@ -16,7 +16,7 @@
 
 Name:           perl-YAML
 Version:        1.31
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        YAML Ain't Markup Language (tm)
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/YAML

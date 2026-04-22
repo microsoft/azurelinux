@@ -15,7 +15,7 @@
 
 Name: libyang
 Version: 3.12.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: YANG data modeling language library
 Url: https://github.com/CESNET/libyang
 Source: %{url}/archive/%{name}-%{version}.tar.gz
@@ -79,7 +79,7 @@ written (and providing API) in C.
 %cmake_build -t doc
 
 %check
-pushd redhat-linux-build
+pushd %{_vpath_builddir}
 ctest --output-on-failure -V %{?_smp_mflags}
 popd
 

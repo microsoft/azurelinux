@@ -10,7 +10,7 @@
 Name: hunspell-wa
 Summary: Walloon hunspell dictionaries
 Version: 0.4.17
-Release: 27%{?dist}
+Release: 28%{?dist}
 Source0: http://chanae.walon.org/walon/aspell-wa-%{version}.tar.bz2
 URL: http://chanae.walon.org/walon/aspell.php
 License: LGPL-2.1-or-later

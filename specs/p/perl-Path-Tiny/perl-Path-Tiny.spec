@@ -10,7 +10,7 @@
 
 Name:		perl-Path-Tiny
 Version:	0.150
-Release:	2%{?dist}
+Release: 3%{?dist}
 Summary:	File path utility
 License:	Apache-2.0
 URL:		https://metacpan.org/release/Path-Tiny

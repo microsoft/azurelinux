@@ -3,7 +3,7 @@
 
 Name:           perl-App-cpanminus
 Version:        1.7048
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Get, unpack, build and install CPAN modules
 # Other files:  GPL+ or Artistic
 ## unbundled

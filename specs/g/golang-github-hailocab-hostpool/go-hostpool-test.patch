@@ -1,0 +1,21 @@
+diff -urP go-hostpool-e80d13ce29ede4452c43dea11e79b9bc8a15b478.orig/example_test.go go-hostpool-e80d13ce29ede4452c43dea11e79b9bc8a15b478/example_test.go
+--- go-hostpool-e80d13ce29ede4452c43dea11e79b9bc8a15b478.orig/example_test.go	2016-01-25 03:53:50.000000000 -0800
++++ go-hostpool-e80d13ce29ede4452c43dea11e79b9bc8a15b478/example_test.go	2017-03-04 13:21:43.814565825 -0800
+@@ -1,13 +1,12 @@
+-package hostpool
++package hostpool_test
+ 
+ import (
+-	"github.com/bitly/go-hostpool"
++	"github.com/hailocab/go-hostpool"
+ )
+ 
+ func ExampleNewEpsilonGreedy() {
+ 	hp := hostpool.NewEpsilonGreedy([]string{"a", "b"}, 0, &hostpool.LinearEpsilonValueCalculator{})
+ 	hostResponse := hp.Get()
+-	hostname := hostResponse.Host()
+-	err := nil // (make a request with hostname)
+-	hostResponse.Mark(err)
++	_ = hostResponse.Host()
++	hostResponse.Mark(nil)
+ }

@@ -8,7 +8,7 @@
 
 Name:           librist
 Version:        0.2.7
-Release:        10%{?dist}
+Release: 11%{?dist}
 Summary:        Library for Reliable Internet Stream Transport (RIST) protocol
 
 # Everything used is BSD-2-Clause except getopt-shim, which is ISC as well

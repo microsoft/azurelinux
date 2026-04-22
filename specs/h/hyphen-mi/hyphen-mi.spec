@@ -5,7 +5,7 @@ Name: hyphen-mi
 Summary: Maori hyphenation rules
 %global upstreamid 20080630
 Version: 0.%{upstreamid}
-Release: 33%{?dist}
+Release: 34%{?dist}
 # Source is dead now
 # Source: http://packages.papakupu.maori.nz/hunspell-hyphen/hunspell-hyphen-mi-0.1.%%{upstreamid}-beta.tar.gz
 Source: hunspell-hyphen-mi-0.1.%{upstreamid}-beta.tar.gz

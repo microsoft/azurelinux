@@ -3,7 +3,7 @@
 
 Name:           webrtc-audio-processing
 Version:        1.3
-Release:        9%{?dist}
+Release: 10%{?dist}
 Summary:        Library for echo cancellation
 
 License:        BSD-3-Clause

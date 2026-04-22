@@ -16,7 +16,7 @@
 
 Name:           perl-Software-License
 Version:        0.104007
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Package that provides templated software licenses
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Software-License

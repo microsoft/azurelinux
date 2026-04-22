@@ -5,7 +5,7 @@
 
 Name:           python-%{modname}
 Version:        6.2.0
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        An easy whitelist-based HTML-sanitizing tool
 
 License:        Apache-2.0

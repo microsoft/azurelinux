@@ -11,7 +11,7 @@ Name: hunspell-is
 Summary: Icelandic hunspell dictionaries
 %global upstreamid 20090823
 Version: 0.%{upstreamid}
-Release: 32%{?dist}
+Release: 33%{?dist}
 Source: https://downloads.sourceforge.net/project/aoo-extensions/2829/1/icelandic-dict-2009-08-23.oxt
 URL: http://extensions.services.openoffice.org/project/dict-is
 License: GPL-2.0-or-later

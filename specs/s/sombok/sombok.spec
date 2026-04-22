@@ -3,7 +3,7 @@
 
 Name:           sombok
 Version:        2.4.0
-Release:        24%{?dist}
+Release: 25%{?dist}
 Summary:        Unicode Text Segmentation Package
 License:        (GPL-1.0-or-later OR Artistic-1.0-Perl) AND (GPL-2.0-or-later OR Artistic-1.0-Perl)
 URL:            http://sf.net/projects/linefold/

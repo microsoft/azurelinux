@@ -3,7 +3,7 @@
 
 Name:           perl-HTML-Template
 Version:        2.97
-Release:        27%{?dist}
+Release: 28%{?dist}
 Summary:        Perl module to use HTML Templates
 # Automatically converted from old format: GPL+ or Artistic - review is highly recommended.
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

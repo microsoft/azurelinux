@@ -1,0 +1,94 @@
+From 94da59aafacc6a9efe829529eb51385588d6f149 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Fri, 11 Nov 2011 13:14:45 +0100
+Subject: [PATCH] Allow to install RubyGems into custom location, outside of
+ Ruby tree.
+
+---
+ configure.ac            |  5 +++++
+ loadpath.c              |  4 ++++
+ template/verconf.h.tmpl |  3 +++
+ tool/rbinstall.rb       | 10 ++++++++++
+ 4 files changed, 22 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 93af30321d..bc13397e0e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -4401,6 +4401,10 @@ AC_ARG_WITH(vendorarchdir,
+             [vendorarchdir=$withval],
+             [vendorarchdir=${multiarch+'${rubysitearchprefix}/vendor_ruby'${ruby_version_dir}}${multiarch-'${vendorlibdir}/${sitearch}'}])
+ 
++AC_ARG_WITH(rubygemsdir,
++           AS_HELP_STRING([--with-rubygemsdir=DIR], [custom rubygems directory]),
++            [rubygemsdir=$withval])
++
+ AS_IF([test "${LOAD_RELATIVE+set}"], [
+     AC_DEFINE_UNQUOTED(LOAD_RELATIVE, $LOAD_RELATIVE)
+     RUBY_EXEC_PREFIX=''
+@@ -4425,6 +4429,7 @@ AC_SUBST(sitearchdir)dnl
+ AC_SUBST(vendordir)dnl
+ AC_SUBST(vendorlibdir)dnl
+ AC_SUBST(vendorarchdir)dnl
++AC_SUBST(rubygemsdir)dnl
+ 
+ AC_SUBST(CONFIGURE, "`echo $0 | sed 's|.*/||'`")dnl
+ AC_SUBST(configure_args, "`echo "${ac_configure_args}" | sed 's/\\$/$$/g'`")dnl
+diff --git a/loadpath.c b/loadpath.c
+index 623dc9d..74c5d9e 100644
+--- a/loadpath.c
++++ b/loadpath.c
+@@ -94,6 +94,10 @@ const char ruby_initial_load_paths[] =
+ #endif
+ #endif
+ 
++#ifdef RUBYGEMS_DIR
++    RUBYGEMS_DIR "\0"
++#endif
++
+     RUBY_LIB "\0"
+ #ifdef RUBY_THINARCH
+     RUBY_ARCH_LIB_FOR(RUBY_THINARCH) "\0"
+diff --git a/template/verconf.h.tmpl b/template/verconf.h.tmpl
+index 79c003e..34f2382 100644
+--- a/template/verconf.h.tmpl
++++ b/template/verconf.h.tmpl
+@@ -36,6 +36,9 @@
+ % if C["RUBY_SEARCH_PATH"]
+ #define RUBY_SEARCH_PATH		"${RUBY_SEARCH_PATH}"
+ % end
++% if C["rubygemsdir"]
++#define RUBYGEMS_DIR			"${rubygemsdir}"
++% end
+ %
+ % R = {}
+ % R["ruby_version"] = '"RUBY_LIB_VERSION"'
+diff --git a/tool/rbinstall.rb b/tool/rbinstall.rb
+index e9110a17ca..76a1f0a315 100755
+--- a/tool/rbinstall.rb
++++ b/tool/rbinstall.rb
+@@ -382,6 +382,7 @@ def CONFIG.[](name, mandatory = false)
+   vendorlibdir = CONFIG["vendorlibdir"]
+   vendorarchlibdir = CONFIG["vendorarchdir"]
+ end
++rubygemsdir = CONFIG["rubygemsdir"]
+ mandir = CONFIG["mandir", true]
+ docdir = CONFIG["docdir", true]
+ enable_shared = CONFIG["ENABLE_SHARED"] == 'yes'
+@@ -974,7 +975,16 @@ def (bins = []).add(name)
+ install?(:local, :comm, :lib) do
+   prepare "library scripts", rubylibdir
+   noinst = %w[*.txt *.rdoc *.gemspec]
++  # Bundler carries "rubygems.rb" file, so it must be specialcased :/
++  noinst += %w[rubygems.rb rubygems/ bundler.rb bundler/] if rubygemsdir
+   install_recursive(File.join(srcdir, "lib"), rubylibdir, :no_install => noinst, :mode => $data_mode)
++  if rubygemsdir
++    noinst = %w[*.txt *.rdoc *.gemspec]
++    install_recursive(File.join(srcdir, "lib", "rubygems"), File.join(rubygemsdir, "rubygems"), :no_install => noinst, :mode => $data_mode)
++    install(File.join(srcdir, "lib", "rubygems.rb"), File.join(rubygemsdir, "rubygems.rb"), :mode => $data_mode)
++    install_recursive(File.join(srcdir, "lib", "bundler"), File.join(rubylibdir, "bundler"), :no_install => noinst, :mode => $data_mode)
++    install(File.join(srcdir, "lib", "bundler.rb"), rubylibdir, :mode => $data_mode)
++  end
+ end
+ 
+ install?(:local, :comm, :hdr, :'comm-hdr') do

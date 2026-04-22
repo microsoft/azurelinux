@@ -1,0 +1,83 @@
+From 0f1af25d9ef726af7da9733d56498955f01aca2c Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Fri, 17 Dec 2021 13:33:49 +0100
+Subject: [PATCH 3/3] Port to maven 3.8.1
+
+---
+ .../Maven31ArtifactRepositoryAdapter.java     | 24 ++++++++++++++-----
+ .../Maven31ArtifactRepositoryAdapter.java     | 24 ++++++++++++++-----
+ 2 files changed, 36 insertions(+), 12 deletions(-)
+
+diff --git a/src/main/java/org/apache/maven/shared/transfer/collection/internal/Maven31ArtifactRepositoryAdapter.java b/src/main/java/org/apache/maven/shared/transfer/collection/internal/Maven31ArtifactRepositoryAdapter.java
+index 6a472d4..ccec724 100644
+--- a/src/main/java/org/apache/maven/shared/transfer/collection/internal/Maven31ArtifactRepositoryAdapter.java
++++ b/src/main/java/org/apache/maven/shared/transfer/collection/internal/Maven31ArtifactRepositoryAdapter.java
+@@ -204,12 +204,24 @@ class Maven31ArtifactRepositoryAdapter implements ArtifactRepository
+     @Override
+     public Proxy getProxy()
+     {
+-        throw new UnsupportedOperationException();
+-    }
+-
+-    @Override
+-    public String toString()
+-    {
++        throw new UnsupportedOperationException();
++    }
++
++    @Override
++    public boolean isBlocked()
++    {
++        throw new UnsupportedOperationException();
++    }
++
++    @Override
++    public void setBlocked(boolean blocked)
++    {
++        throw new UnsupportedOperationException();
++    }
++
++    @Override
++    public String toString()
++    {
+         StringBuilder sb = new StringBuilder();
+ 
+         sb.append( "       id: " ).append( getId() ).append( LS );
+diff --git a/src/main/java/org/apache/maven/shared/transfer/dependencies/collect/internal/Maven31ArtifactRepositoryAdapter.java b/src/main/java/org/apache/maven/shared/transfer/dependencies/collect/internal/Maven31ArtifactRepositoryAdapter.java
+index c487047..eca4e24 100644
+--- a/src/main/java/org/apache/maven/shared/transfer/dependencies/collect/internal/Maven31ArtifactRepositoryAdapter.java
++++ b/src/main/java/org/apache/maven/shared/transfer/dependencies/collect/internal/Maven31ArtifactRepositoryAdapter.java
+@@ -204,12 +204,24 @@ class Maven31ArtifactRepositoryAdapter implements ArtifactRepository
+     @Override
+     public Proxy getProxy()
+     {
+-        throw new UnsupportedOperationException();
+-    }
+-
+-    @Override
+-    public String toString()
+-    {
++        throw new UnsupportedOperationException();
++    }
++
++    @Override
++    public boolean isBlocked()
++    {
++        throw new UnsupportedOperationException();
++    }
++
++    @Override
++    public void setBlocked(boolean blocked)
++    {
++        throw new UnsupportedOperationException();
++    }
++
++    @Override
++    public String toString()
++    {
+         StringBuilder sb = new StringBuilder();
+ 
+         sb.append( "       id: " ).append( getId() ).append( "\n" );
+-- 
+2.46.0
+

@@ -3,7 +3,7 @@
 
 Name:           perl-Devel-Cycle
 Version:        1.12
-Release:        32%{?dist}
+Release: 33%{?dist}
 Summary:        Find memory cycles in objects
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Devel-Cycle

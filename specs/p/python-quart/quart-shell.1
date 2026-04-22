@@ -1,0 +1,23 @@
+.TH QUART\-SHELL "1" "February 2024" "" "User Commands"
+.SH NAME
+.B quart\-shell
+\(en Run a Python shell in the context of a Quart application.
+.SH SYNOPSIS
+.B quart\ shell
+.RI [ OPTIONS ]
+.SH DESCRIPTION
+Run an interactive Python shell in the context of a given Quart application.
+The application will populate the default namespace of this shell
+according to its configuration.
+This is useful for executing small snippets of management code
+without having to manually configure the application.
+.SH OPTIONS
+.SS "OPTIONAL\ ARGUMENTS"
+.TP
+.B \-\-help
+Show a help message and exit
+.SH "SEE\ ALSO"
+.BR quart (1)
+.P
+.BR quart\-routes (1),
+.BR quart\-run (1)

@@ -1,0 +1,4 @@
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.apache.regexp
+Bundle-Version: 1.5.0
+Export-Package: org.apache.regexp;version="1.5.0"

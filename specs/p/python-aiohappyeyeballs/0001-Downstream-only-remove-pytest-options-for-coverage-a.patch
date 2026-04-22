@@ -1,0 +1,26 @@
+From af5511bd42ac6c8ad6827d8eb8539276affcc31c Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Sat, 17 Aug 2024 11:02:13 -0400
+Subject: [PATCH] Downstream-only: remove pytest options for coverage analysis
+
+https://docs.fedoraproject.org/en-US/packaging-guidelines/Python/#_linters
+---
+ pyproject.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 554d949..268a62f 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -80,7 +80,7 @@ match = "(?!main$)"
+ prerelease = true
+ 
+ [tool.pytest.ini_options]
+-addopts = "-v -Wdefault --cov=aiohappyeyeballs --cov-report=term-missing:skip-covered"
++addopts = "-v -Wdefault"
+ pythonpath = ["src"]
+ asyncio_mode = "auto"
+ asyncio_default_fixture_loop_scope = "function"
+-- 
+2.48.1
+

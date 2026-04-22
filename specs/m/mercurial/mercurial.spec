@@ -13,7 +13,7 @@
 Summary: A fast, lightweight Source Control Management system
 Name: mercurial
 Version: 7.1.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # Release: 1.rc1%%{?dist}
 

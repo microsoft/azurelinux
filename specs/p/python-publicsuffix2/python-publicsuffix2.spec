@@ -18,7 +18,7 @@ need to import publicsuffix2 instead.
 
 Name: python-%{pypi_name}
 Version: 2.20191221
-Release: 21%{?dist}
+Release: 22%{?dist}
 Summary: Get a public suffix for a domain name using the Public Suffix List
 License: MIT
 URL: https://github.com/nexb/python-publicsuffix2

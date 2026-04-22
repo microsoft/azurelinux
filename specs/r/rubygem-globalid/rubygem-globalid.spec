@@ -8,7 +8,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.2.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: Refer to any model with a URI: gid://app/class/id
 License: MIT
 URL: http://www.rubyonrails.org

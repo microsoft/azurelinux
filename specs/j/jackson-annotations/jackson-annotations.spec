@@ -3,7 +3,7 @@
 
 Name:           jackson-annotations
 Version:        2.18.2
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Core annotations for Jackson data processor
 License:        Apache-2.0
 

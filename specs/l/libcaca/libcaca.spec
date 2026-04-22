@@ -22,7 +22,7 @@
 Summary: Library for Colour AsCii Art, text mode graphics
 Name: libcaca
 Version: 0.99
-Release: 0.80.%{beta}%{?dist}
+Release: 1.80.%{beta}%{?dist}
 License: WTFPL
 URL: http://caca.zoy.org/wiki/libcaca
 

@@ -3,7 +3,7 @@
 
 Name:           perl-Data-Serializer
 Version:        0.65
-Release:        16%{?dist}
+Release: 17%{?dist}
 Summary:        Modules that serialize data structures
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Data-Serializer

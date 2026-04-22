@@ -3,7 +3,7 @@
 
 Name:           libbsd
 Version:        0.12.2
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        Library providing BSD-compatible functions for portability
 URL:            https://libbsd.freedesktop.org/
 # Breakdown in COPYING file of libbsd release tarball, see also:

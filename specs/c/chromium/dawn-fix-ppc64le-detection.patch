@@ -1,0 +1,19 @@
+Index: chromium-144.0.7559.59/third_party/dawn/src/dawn/common/Platform.h
+===================================================================
+--- chromium-144.0.7559.59.orig/third_party/dawn/src/dawn/common/Platform.h
++++ chromium-144.0.7559.59/third_party/dawn/src/dawn/common/Platform.h
+@@ -163,10 +163,12 @@
+ #elif defined(__s390x__)
+ #define DAWN_PLATFORM_IS_S390X 1
+ 
+-#elif defined(__PPC__)
+-#define DAWN_PLATFORM_IS_PPC 1
++// Order matters here
++// PPC64 also defines PPC, which can lead to detection failures on ppc64le systems
+ #elif defined(__PPC64__)
+ #define DAWN_PLATFORM_IS_PPC64 1
++#elif defined(__PPC__)
++#define DAWN_PLATFORM_IS_PPC 1
+ 
+ #elif defined(__wasm32__)
+ #define DAWN_PLATFORM_IS_WASM32 1

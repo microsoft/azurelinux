@@ -1,0 +1,28 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 8 Jan 2024 15:44:27 -0500
+Subject: [PATCH] cryptdisk: fix incorrect sign comparison
+
+grub_util_get_fd_size() returns a signed integer, but we're assigning it
+to an unsigned integer and then testing against -1.  That's wrong.
+
+This patch makes the variable a signed integer.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/disk/cryptodisk.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/grub-core/disk/cryptodisk.c b/grub-core/disk/cryptodisk.c
+index 2246af51b6a..98e176a139c 100644
+--- a/grub-core/disk/cryptodisk.c
++++ b/grub-core/disk/cryptodisk.c
+@@ -721,7 +721,7 @@ grub_cryptodisk_open (const char *name, grub_disk_t disk)
+ #ifdef GRUB_UTIL
+   if (dev->cheat)
+     {
+-      grub_uint64_t cheat_dev_size;
++      grub_int64_t cheat_dev_size;
+       unsigned int cheat_log_sector_size;
+ 
+       if (!GRUB_UTIL_FD_IS_VALID (dev->cheat_fd))

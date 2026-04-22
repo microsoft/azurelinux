@@ -5,7 +5,7 @@ Name: hyphen-ia
 Summary: Interlingua hyphenation rules
 %global upstreamid 20050628
 Version: 0.%{upstreamid}
-Release: 31%{?dist}
+Release: 32%{?dist}
 Source: http://www.ctan.org/get/language/hyphenation/iahyphen.tex
 URL: http://www.ctan.org/tex-archive/help/Catalogue/entries/iahyphen.html
 License: LPPL-1.3a

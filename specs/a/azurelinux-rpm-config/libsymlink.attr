@@ -1,0 +1,5 @@
+# Make libfoo.so symlinks require the soname-provide of the target library
+%__libsymlink_requires		%{_rpmconfigdir}/elfdeps --provides --soname-only
+%__libsymlink_magic		^symbolic link to .*lib.*\\.so\\..*$
+%__libsymlink_path	^.*\\.so$
+%__libsymlink_flags	magic_and_path

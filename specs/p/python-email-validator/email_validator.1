@@ -1,0 +1,147 @@
+.TH EMAIL_VALIDATOR "1" "September 2025" "" "User Commands"
+.SH NAME
+.B email_validator
+\(en Validate email addresses
+.SH SYNOPSIS
+.B email_validator
+.I test@example.org
+.P
+.B email_validator <
+.I LIST_OF_ADDRESSES.TXT
+.SH DESCRIPTION
+Provide email addresses to validate
+either as a command-line argument or in
+.I STDIN
+separated by newlines.
+Validation errors will be printed for invalid email addresses.
+When passing an email address on the command line,
+if the email address is valid,
+information about it will be printed.
+When using
+.IR STDIN ,
+no output will be given for valid email addresses.
+.P
+Keyword arguments to the Python
+.B email_validator.validate_email
+function can be set in environment variables
+of the same name but uppercase (see
+.BR ENVIRONMENT ).
+.SH ENVIRONMENT
+.\" Supported environment variables can be read
+.\" from near the beginning of the main() function
+.\" in email_validator/__main__.py.
+.\"
+.\" Default values are in email_validator/__init__.py.
+.\"
+.\" Option descriptions are in README.md.
+.SS "BOOLEAN"
+For these environment variables,
+any non-empty string value is interpreted as
+.BR True ,
+the empty string is interpreted as
+.BR False ,
+and a default value is used if the variable is unset.
+.TP
+.B ALLOW_SMPTUTF8
+Set to false to prohibit internationalized addresses
+that would require the
+.UR https://tools.ietf.org/html/rfc6531
+SMTPUTF8
+.UE
+extension.
+.IP
+.IR default :
+true
+.TP
+.B ALLOW_EMPTY_LOCAL
+Set to true to allow an empty local part
+(i.e. \fB@example.com\fR),
+e.g. for validating Postfix aliases.
+.TP
+.B ALLOW_QUOTED_LOCAL
+Set to true to allow obscure and potentially problematic email addresses
+in which the part of the address before the
+.BR @ \-sign
+contains spaces,
+.BR @ \-signs,
+or other surprising characters
+when the local part is surrounded in quotes
+(so-called quoted-string local parts).
+In the object returned on successful validation,
+the normalized local part removes any unnecessary backslash-escaping
+and even removes the surrounding quotes
+if the address would be valid without them.
+.IP
+.IR default :
+false
+.TP
+.B ALLOW_DOMAIN_LITERAL
+Set to true to allow bracketed IPv4 and "IPv6:"-prefixed IPv6 addresses
+in the domain part of the email address.
+No deliverability checks are performed for these addresses.
+In the object returned on successful validation,
+the normalized domain will use the condensed IPv6 format, if applicable.
+The object\(cqs
+.B domain_address
+attribute will hold the parsed
+.B ipaddress.IPv4Address
+or
+.B ipaddress.IPv6Address
+object if applicable.
+.IP
+.IR default :
+false
+.TP
+.B ALLOW_DISPLAY_NAME
+Set to true to allow a display name and bracketed address
+in the input string, like
+.BR My\ Name\ <me@example.org> .
+It\(cqs implemented in the spirit but not the letter of RFC 5322 3.4,
+so it may be stricter or more relaxed than what you want.
+The display name, if present, is provided in the returned object\(cqs
+.Bdisplay_name
+field after being unquoted and unescaped.
+.IP
+.IR default :
+false
+.TP
+.B GLOBALLY_DELIVERABLE
+.IP
+.IR default :
+true
+.TP
+.B CHECK_DELIVERABILITY
+If true, DNS queries are made
+to check that the domain name in the email address
+(the part after the
+.BR @ \-sign)
+can receive mail\(embasically,
+that the domain name in the email address has
+a (non-Null) DNS MX record indicating that it can receive email.
+If false, skip this DNS-based check.
+It is recommended to set this to false
+when performing validation for login pages
+(but not account creation pages)
+since re-validation of a previously validated domain in your database
+by querying DNS at every login is probably undesirable.
+.IP
+.IR default :
+true
+.TP
+.B TEST_ENVIRONMENT
+If true, DNS-based deliverability checks are disabled and
+.B test
+and
+.B **.test
+domain names are permitted.
+.IP
+.IR default :
+false
+.SS "FLOATING-POINT"
+For these environment variables,
+any non-empty string is parsed as a floating-point value,
+and a default value is used if the variable is unset.
+.TP
+.B DEFAULT_TIMEOUT
+.IR default :
+15

@@ -6,7 +6,7 @@
 
 Name:           gspell
 Version:        1.14.2
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Spell-checking library for GTK+
 
 License:        LGPL-2.1-or-later

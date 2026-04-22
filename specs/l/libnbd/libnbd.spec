@@ -3,7 +3,7 @@
 
 # i686 no longer has any kind of OCaml compiler, not even ocamlc.
 %ifnarch %{ix86}
-%global have_ocaml 1
+%global have_ocaml 0
 %endif
 
 # No ublk in RHEL 9.
@@ -24,7 +24,7 @@
 
 Name:           libnbd
 Version:        1.24.1
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        NBD client library in userspace
 
 License:        LGPL-2.0-or-later AND BSD-3-Clause

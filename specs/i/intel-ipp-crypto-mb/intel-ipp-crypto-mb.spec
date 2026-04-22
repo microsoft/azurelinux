@@ -14,7 +14,7 @@ Intel Advanced Vector Extensions 512 (Intel AVX-512) instructions.}
 
 Name:		intel-ipp-crypto-mb
 Version:	1.0.10
-Release:	6%{?dist}
+Release: 7%{?dist}
 Summary:	Intel IPP Cryptography multi-buffer library
 
 License:	Apache-2.0

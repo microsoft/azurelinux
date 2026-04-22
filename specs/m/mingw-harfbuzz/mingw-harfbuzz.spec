@@ -5,7 +5,7 @@
 
 Name:           mingw-harfbuzz
 Version:        11.5.1
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        MinGW Windows Harfbuzz library
 
 License:        MIT

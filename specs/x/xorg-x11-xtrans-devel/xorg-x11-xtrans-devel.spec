@@ -11,7 +11,7 @@
 Summary: X.Org X11 developmental X transport library
 Name: xorg-x11-xtrans-devel
 Version: 1.5.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: HPND AND HPND-sell-variant AND MIT AND MIT-open-group AND X11
 URL: http://www.x.org
 BuildArch: noarch

@@ -7,7 +7,7 @@
 
 Name:          mingw-%{pkgname}
 Version:       1.7.2
-Release:       10%{?dist}
+Release: 11%{?dist}
 Summary:       MinGW Windows spell checker and morphological analyzer library
 
 URL:           http://hunspell.github.io/

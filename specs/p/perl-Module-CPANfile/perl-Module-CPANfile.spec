@@ -3,7 +3,7 @@
 
 Name:           perl-Module-CPANfile
 Version:        1.1004
-Release:        23%{?dist}
+Release: 24%{?dist}
 Summary:        Parse cpanfile
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Module-CPANfile

@@ -3,7 +3,7 @@
 
 Name:		perl-Package-Anon
 Version:	0.05
-Release:	43%{?dist}
+Release: 44%{?dist}
 Summary:	Anonymous packages
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Package-Anon

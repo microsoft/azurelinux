@@ -3,7 +3,7 @@
 
 Name:           appx-util
 Version:        0.5
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        Utility to create Microsoft .appx packages
 
 # See LICENSING.md for details

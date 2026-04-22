@@ -24,7 +24,7 @@
 
 Name:           mingw-gcc
 Version:        %{gcc_version}
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        MinGW Windows cross-compiler (GCC) for C
 
 # Sync with native 'gcc' package

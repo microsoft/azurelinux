@@ -4,7 +4,7 @@
 Summary: Tool for generating C, C++, and go recognizers from regular expressions
 Name: re2c
 Version: 3.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: LicenseRef-Fedora-Public-Domain
 URL: https://re2c.org/
 Source: https://github.com/skvadrik/re2c/releases/download/%{version}/re2c-%{version}.tar.xz

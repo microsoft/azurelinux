@@ -8,7 +8,7 @@
 Summary: A natural language date parser
 Name: rubygem-%{gem_name}
 Version: 0.10.2
-Release: 24%{?dist}
+Release: 25%{?dist}
 License: MIT
 URL: http://github.com/mojombo/chronic
 Source0: http://rubygems.org/gems/%{gem_name}-%{version}.gem

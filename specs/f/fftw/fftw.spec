@@ -25,7 +25,7 @@
 
 Name:           fftw
 Version:        3.3.10
-Release:        16%{?dist}
+Release: 17%{?dist}
 Summary:        A Fast Fourier Transform library
 # Generally, the code is under GPL but some headers are also under MIT or BSD:
 License:        GPL-2.0-or-later AND MIT AND BSD-2-Clause

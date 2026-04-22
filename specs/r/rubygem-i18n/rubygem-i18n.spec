@@ -7,7 +7,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.14.6
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: New wave Internationalization support for Ruby
 # `BSD or Ruby` due to header of lib/i18n/gettext/po_parser.rb
 License: MIT AND (BSD-2-Clause OR Ruby)

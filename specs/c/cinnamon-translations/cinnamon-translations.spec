@@ -6,7 +6,7 @@
 
 Name:           cinnamon-translations
 Version:        6.4.2
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Translations for Cinnamon and Nemo
 
 # Automatically converted from old format: GPLv2+ - review is highly recommended.

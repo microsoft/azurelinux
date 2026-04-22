@@ -5,7 +5,7 @@
 
 Name:          libi2cd
 Version:       1.0.3
-Release:       9%{?candidate:.%{candidate}}%{?dist}
+Release: 10%{?candidate:.%{candidate}}%{?dist}
 Summary:       C library for interacting with linux I2C devices
 
 License:       LGPL-2.1-or-later

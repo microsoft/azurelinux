@@ -1,0 +1,37 @@
+From d3a093fb4b190ea8713ec2ba14fc45a28e5b313e Mon Sep 17 00:00:00 2001
+From: Benoit Sigoure <tsunanet@gmail.com>
+Date: Sun, 23 Aug 2015 23:12:19 -0700
+Subject: [PATCH] Fix incorrect usage of t.Fatalf() in test.
+
+Reported by go vet:
+  tomb_test.go:42: missing argument for Fatalf("%q"):
+  format reads arg 2, have only 1 args
+---
+ tomb_test.go | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/tomb_test.go b/tomb_test.go
+index 71f11fa..5409d8b 100644
+--- a/tomb_test.go
++++ b/tomb_test.go
+@@ -2,9 +2,10 @@ package tomb_test
+ 
+ import (
+ 	"errors"
+-	"gopkg.in/tomb.v1"
+ 	"reflect"
+ 	"testing"
++
++	"gopkg.in/tomb.v1"
+ )
+ 
+ func TestNewTomb(t *testing.T) {
+@@ -39,7 +40,7 @@ func TestKillf(t *testing.T) {
+ 
+ 	err := tb.Killf("BO%s", "OM")
+ 	if s := err.Error(); s != "BOOM" {
+-		t.Fatalf(`Killf("BO%s", "OM"): want "BOOM", got %q`, s)
++		t.Fatalf(`Killf("BO%%s", "OM"): want "BOOM", got %q`, s)
+ 	}
+ 	testState(t, tb, true, false, err)
+ 

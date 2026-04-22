@@ -1,0 +1,103 @@
+# Macros to constrain resource use during the build process
+
+# Changes _smp_build_ncpus depending on various factors
+#
+# -c cpus  constrains the CPU count to "cpus"
+# -m mem   constrains the CPU count to the total amount of memory in the system
+#          (in megabytes) divided by "mem", rounded down
+#
+# If no options are passed, sets _smp_build_ncpus to 1.
+# _smp_build_ncpus will never be raised, only lowered.
+%constrain_build(c:m:) %{lua:
+
+  -- Check a value and clamp it to at least 1
+  local function check_and_clamp(v, string)
+    if v == nil then return nil end
+
+    i = math.tointeger(v)
+    if i == nil then
+      macros.error({"%%%0: invalid "..string.." value "..v})
+      return nil
+    end
+
+    local clamp = math.max(1, math.floor(i))
+    if i ~= clamp then
+      macros.error({"%%%0: invalid "..string.." value "..v})
+      return nil
+    end
+    return clamp
+  end
+
+  -- Parse meminfo to find the total amount of memory in the system
+  local function getmem()
+    local mem = 0
+    for l in io.lines('/proc/meminfo') do
+      if l:sub(1, 9) == "MemTotal:" then
+        mem = math.tointeger(string.match(l, "MemTotal:%s+(%d+)"))
+        break
+      end
+    end
+    return mem
+  end
+
+  local mem_limit = check_and_clamp(opt.m, "mem limit")
+  local cpu_limit = check_and_clamp(opt.c, "cpu limit")
+  local current_cpus = math.tointeger(macros._smp_build_ncpus)
+  local constrained_cpus = current_cpus
+
+  if (not cpu_limit and not mem_limit) then
+    cpu_limit = 1
+  end
+
+  if cpu_limit ~= nil then
+    constrained_cpus = math.min(cpu_limit, constrained_cpus)
+  end
+  if mem_limit ~= nil then
+    local mem_total = getmem(verbose)
+    local limit = math.max(1, mem_total // (mem_limit * 1024))
+    constrained_cpus = math.min(constrained_cpus, limit)
+  end
+
+  macros._smp_build_ncpus = constrained_cpus
+}
+
+# outputs build flag overrides to be used in conjunction with
+# %%make_build, %%cmake_build etc.
+#
+# if no override is needed, this macro outputs nothing
+#
+# - m   memory limit in MBs per core; default is 1024
+#
+# Usage:
+# e.g. %make_build %{limit_build -m 2048}
+#   => /usr/bin/make -O -j16 V=1 VERBOSE=1
+#      %make_build %{limit_build -m 40960}
+#   => /usr/bin/make -O -j16 V=1 VERBOSE=1 -j1
+# 
+%limit_build(m:) %{lua:
+  local mem_per_process=rpm.expand("%{-m*}")
+  if mem_per_process == "" then
+    mem_per_process = 1024
+  else
+    mem_per_process = tonumber(mem_per_process)
+  end
+  local mem_total = 0
+  for line in io.lines('/proc/meminfo') do
+    if line:sub(1, 9) == "MemTotal:" then
+      local tokens = {}
+      for token in line:gmatch("%w+") do
+        tokens[#tokens + 1] = token
+      end
+      mem_total = tonumber(tokens[2])
+      break
+    end
+  end
+  local max_jobs = mem_total // (mem_per_process * 1024)
+  if max_jobs < 1 then
+    max_jobs = 1
+  end
+  cur_max_jobs=tonumber(rpm.expand("%{_smp_build_ncpus}"))
+  if cur_max_jobs > max_jobs then
+    print("-j" .. max_jobs)
+  end
+}

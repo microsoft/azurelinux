@@ -1,0 +1,58 @@
+From 7a6e9dd260086ef90e78e244543d2c010c0f8112 Mon Sep 17 00:00:00 2001
+From: Michael Simacek <msimacek@redhat.com>
+Date: Mon, 12 Feb 2018 10:59:55 +0100
+Subject: [PATCH 2/4] Remove ZSTD compressor
+
+---
+ .../compressors/CompressorStreamFactory.java       | 14 ++------------
+ 1 file changed, 2 insertions(+), 12 deletions(-)
+
+diff --git a/src/main/java/org/apache/commons/compress/compressors/CompressorStreamFactory.java b/src/main/java/org/apache/commons/compress/compressors/CompressorStreamFactory.java
+index b3e2d9d8b..c8aaf18b7 100644
+--- a/src/main/java/org/apache/commons/compress/compressors/CompressorStreamFactory.java
++++ b/src/main/java/org/apache/commons/compress/compressors/CompressorStreamFactory.java
+@@ -53,9 +53,6 @@
+ import org.apache.commons.compress.compressors.xz.XZCompressorOutputStream;
+ import org.apache.commons.compress.compressors.xz.XZUtils;
+ import org.apache.commons.compress.compressors.z.ZCompressorInputStream;
+-import org.apache.commons.compress.compressors.zstandard.ZstdCompressorInputStream;
+-import org.apache.commons.compress.compressors.zstandard.ZstdCompressorOutputStream;
+-import org.apache.commons.compress.compressors.zstandard.ZstdUtils;
+ import org.apache.commons.compress.utils.IOUtils;
+ import org.apache.commons.compress.utils.Sets;
+ 
+@@ -280,10 +277,6 @@ static String detect(final InputStream inputStream, final Set<String> compressor
+             return LZ4_FRAMED;
+         }
+ 
+-        if (compressorNames.contains(ZSTANDARD) && ZstdUtils.matches(signature, signatureLength)) {
+-            return ZSTANDARD;
+-        }
+-
+         throw new CompressorException("No Compressor found for the stream signature.");
+     }
+ 
+@@ -554,10 +547,7 @@ public CompressorInputStream createCompressorInputStream(final String name, fina
+             }
+ 
+             if (ZSTANDARD.equalsIgnoreCase(name)) {
+-                if (!ZstdUtils.isZstdCompressionAvailable()) {
+-                    throw new CompressorException("Zstandard compression is not available." + YOU_NEED_ZSTD_JNI);
+-                }
+-                return new ZstdCompressorInputStream(in);
++                throw new CompressorException("Zstandard compression is not available in this build.");
+             }
+ 
+             if (LZMA.equalsIgnoreCase(name)) {
+@@ -665,7 +655,7 @@ public CompressorOutputStream<?> createCompressorOutputStream(final String name,
+             }
+ 
+             if (ZSTANDARD.equalsIgnoreCase(name)) {
+-                return new ZstdCompressorOutputStream(out);
++                throw new CompressorException("Zstandard compression is not available in this build.");
+             }
+         } catch (final IOException e) {
+             throw new CompressorException("Could not create CompressorOutputStream", e);
+-- 
+2.50.1
+

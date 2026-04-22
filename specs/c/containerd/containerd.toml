@@ -1,0 +1,9 @@
+version = 2
+
+[plugins]
+  [plugins."io.containerd.grpc.v1.cri"]
+    [plugins."io.containerd.grpc.v1.cri".cni]
+      bin_dir = "/usr/libexec/cni/"
+      conf_dir = "/etc/cni/net.d"
+  [plugins."io.containerd.internal.v1.opt"]
+    path = "/var/lib/containerd/opt"

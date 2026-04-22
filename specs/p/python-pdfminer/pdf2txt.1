@@ -1,0 +1,168 @@
+.TH PDF2TXT "1" "October 2021" "" "User Commands"
+.SH NAME
+.B pdf2txt
+\(en extract text and images from PDF
+.SH SYNOPSIS
+.B pdf2txt
+.RB [ \-h ]
+.RB [ \-\-version ]
+.RB [ \-\-debug ]
+.RB [ \-\-disable\-caching ]
+.RB [ \-\-page\-numbers\ \fIPAGE_NUMBERS \ [ \fIPAGE_NUMBERS \ ...]]
+.RB [ \-\-pagenos\ \fIPAGENOS ]
+.RB [ \-\-maxpages\ \fIMAXPAGES ]
+.RB [ \-\-password\ \fIPASSWORD ]
+.RB [ \-\-rotation\ \fIROTATION ]
+.RB [ \-\-no\-laparams ]
+.RB [ \-\-detect\-vertical ]
+.RB [ \-\-char\-margin\ \fICHAR_MARGIN ]
+.RB [ \-\-word\-margin\ \fIWORD_MARGIN ]
+.RB [ \-\-line\-margin\ \fILINE_MARGIN ]
+.RB [ \-\-boxes\-flow\ \fIBOXES_FLOW ]
+.RB [ \-\-all\-texts ]
+.RB [ \-\-outfile\ \fIOUTFILE ]
+.RB [ \-\-output_type\ \fIOUTPUT_TYPE ]
+.RB [ \-\-codec\ \fICODEC ]
+.RB [ \-\-output_dir\ \fIOUTPUT_DIR ]
+.RB [ \-\-layoutmode\ \fILAYOUTMODE ]
+.RB [ \-\-scale\ \fISCALE ]
+.RB [ \-\-strip\-control ]
+.I files
+.RI [ files \ ...]
+.SH DESCRIPTION
+.P
+A command line tool for extracting text and images from PDF and output it to
+plain text, html, xml or tags.
+.SH OPTIONS
+.SS "POSITIONAL\ ARGUMENTS"
+.TP
+.I files
+One or more paths to PDF files.
+.SS "OPTIONAL\ ARGUMENTS"
+.TP
+.B \-h\fR,\ \fB\-\-help
+Show a help message and exit.
+.TP
+.B \-\-version\fR,\ \fB\-v
+Show program\(cqs version number and exit.
+.TP
+.B \-\-debug\fR,\ \fB\-d
+Use debug logging level.
+.TP
+.B \-\-disable\-caching\fR,\ \fB\-C
+If caching of resources, such as fonts, should be disabled.
+.SS PARSER
+Used during PDF parsing
+.TP
+.B \-\-page\-numbers\fR\ \fIPAGE_NUMBERS\fR\ [\fIPAGE_NUMBERS\fR\ ...]
+A space-seperated list of page numbers to parse.
+.TP
+.B \-\-pagenos\fR\ \fIPAGENOS\fR,\ \fB\-p\fR\ \fIPAGENOS
+A comma-separated list of page numbers to parse.
+Included for legacy applications; use
+.B \-\-page\-numbers
+for more idiomatic argument entry.
+.TP
+.B \-\-maxpages\fR\ \fIMAXPAGES\fR,\ \fB\-m\fR\ \fIMAXPAGES
+The maximum number of pages to parse.
+.TP
+.B \-\-password\fR\ \fIPASSWORD\fR,\ \fB\-P\fR\ \fIPASSWORD
+The password to use for decrypting PDF file.
+.TP
+.B \-\-rotation\fR\ \fIROTATION\fR,\ \fB\-R\fR\ \fIROTATION
+The number of degrees to rotate the PDF before other types of processing.
+.SS "LAYOUT\ ANALYSIS"
+Used during layout analysis.
+.TP
+.B \-\-no\-laparams\fR,\ \fB\-n
+If layout analysis parameters should be ignored.
+.TP
+.B \-\-detect\-vertical\fR,\ \fB\-V
+If vertical text should be considered during layout analysis
+.TP
+.B \-\-char\-margin\fR\ \fICHAR_MARGIN\fR,\ \fB\-M\fR\ \fICHAR_MARGIN
+If two characters are closer together than this margin they are considered to
+be part of the same line.
+The margin is specified relative to the width of the character.
+.TP
+.B \-\-word\-margin\fR\ \fIWORD_MARGIN\fR,\ \fB\-W\fR\ \fIWORD_MARGIN
+If two characters on the same line are further apart than this margin then they
+are considered to be two separate words, and an intermediate space will be
+added for readability.
+The margin is specified relative to the width of the character.
+.TP
+.B \-\-line\-margin\fR\ \fILINE_MARGIN\fR,\ \fB\-L\fR\ \fILINE_MARGIN
+If two lines are are close together they are considered to be part of the same
+paragraph.
+The margin is specified relative to the height of a line.
+.TP
+.B \-\-boxes\-flow\fR\ \fIBOXES_FLOW\fR,\ \fB\-F\fR\ \fIBOXES_FLOW
+Specifies how much a horizontal and vertical position of a text matters when
+determining the order of lines.
+The value should be within the range of
+.B \-1.0
+(only horizontal position matters) to
+.B +1.0
+(only vertical position matters).
+You can also pass
+.B None
+to disable advanced layout analysis, and instead return text based on the
+position of the bottom left corner of the text box.
+.TP
+.B \-\-all\-texts\fR,\ \fB\-A
+If layout analysis should be performed on text in figures.
+.SS OUTPUT
+Used during output generation.
+.TP
+.B \-\-outfile\fR\ \fIOUTFILE\fR,\ \fB\-o\fR\ \fIOUTFILE
+Path to file where output is written.
+Or
+.RB \(lq \- \(rq
+(default) to write to
+.IR stdout .
+.TP
+.B \-\-output_type\fR\ \fIOUTPUT_TYPE\fR,\ \fB\-t\fR\ \fIOUTPUT_TYPE
+Type of output to generate
+.RB { text , html , xml , tag }.
+.TP
+.B \-\-codec\fR\ \fICODEC\fR,\ \fB\-c\fR\ \fICODEC
+Text encoding to use in output file.
+.TP
+.B \-\-output\-dir\fR\ \fIOUTPUT_DIR\fR,\ \fB\-O\fR\ \fIOUTPUT_DIR
+The output directory to put extracted images in.
+If not given, images are not extracted.
+.TP
+.B \-\-layoutmode\fR\ \fILAYOUTMODE\fR,\ \fB\-Y\fR\ \fILAYOUTMODE
+Type of layout to use when generating html
+.RB { normal , exact , loose }.
+If
+.BR normal ,
+each line is positioned separately in the html.
+If
+.BR exact ,
+each character is positioned separately in the html.
+If
+.BR loose ,
+same result as
+.B normal
+but with an additional newline after each text line.
+Only used when
+.B output_type
+is
+.BR html .
+.TP
+.B \-\-scale\fR\ \fISCALE\fR,\ \fB\-s\fR\ \fISCALE
+The amount of zoom to use when generating html file.
+Only used when
+.B output_type
+is
+.BR html .
+.TP
+.B \-\-strip\-control\fR,\ \fB\-S
+Remove control statement from text.
+Only used when
+.B output_type
+is
+.BR xml .
+.SH "SEE\ ALSO"
+.BR dumppdf (1)

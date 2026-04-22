@@ -3,7 +3,7 @@
 
 Name:           perl-Text-Tabs+Wrap
 Version:        2024.001
-Release:        520%{?dist}
+Release: 521%{?dist}
 Summary:        Expand tabs and do simple line wrapping
 License:        TTWL
 URL:            https://metacpan.org/release/Text-Tabs%2BWrap

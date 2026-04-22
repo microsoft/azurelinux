@@ -25,7 +25,7 @@
 
 Name:           php-theseer-directoryscanner
 Version:        1.3.3
-Release:        12%{?dist}
+Release: 13%{?dist}
 Summary:        A recursive directory scanner and filter
 
 License:        BSD-2-Clause

@@ -3,7 +3,7 @@
 
 Name:           babeltrace
 Version:        1.5.11
-Release:        15%{?dist}
+Release: 16%{?dist}
 Summary:        Trace Viewer and Converter, mainly for the Common Trace Format
 License:        MIT AND GPL-3.0-or-later WITH Bison-exception-2.2 AND LGPL-2.1-only AND BSD-4-Clause-UC
 URL:            https://www.efficios.com/babeltrace

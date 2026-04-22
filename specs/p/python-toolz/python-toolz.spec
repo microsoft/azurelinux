@@ -31,7 +31,7 @@ suitable for most developers.
 
 Name:           python-%{srcname}
 Version:        1.0.0
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        A functional standard library for Python
 
 # The project is released under the BSD-3-Clause license.

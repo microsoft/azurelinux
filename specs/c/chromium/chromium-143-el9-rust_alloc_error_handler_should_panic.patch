@@ -1,0 +1,17 @@
+diff -up chromium-142.0.7444.162/build/rust/allocator/lib.rs.el9-rust_alloc_error_handler_should_panic chromium-142.0.7444.162/build/rust/allocator/lib.rs
+--- chromium-142.0.7444.162/build/rust/allocator/lib.rs.el9-rust_alloc_error_handler_should_panic	2025-11-12 09:39:31.616713829 +0100
++++ chromium-142.0.7444.162/build/rust/allocator/lib.rs	2025-11-14 11:43:32.115426831 +0100
+@@ -96,6 +96,13 @@ mod both_allocators {
+         0
+     }
+ 
++    // Mangle the symbol name as rustc (1.88) expects on EL9
++    #[rustc_std_internal_symbol]
++    #[linkage = "weak"]
++    fn __rust_alloc_error_handler_should_panic() -> u8 {
++        0
++    }
++
+     // Mangle the symbol name as rustc (1.84) expects on EL9
+     #[unsafe(no_mangle)]
+     #[linkage = "weak"]

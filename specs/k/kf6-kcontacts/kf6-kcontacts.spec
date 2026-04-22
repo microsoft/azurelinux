@@ -5,7 +5,7 @@
 
 Name:    kf6-%{framework}
 Version: 6.23.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: The KContacts Library
 
 # The following licenses are present in LICENSES but go unused: BSD-3-Clause, MIT, Unicode-DFS-2016

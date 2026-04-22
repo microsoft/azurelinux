@@ -11,7 +11,7 @@
 Summary: Cinnamon session manager
 Name:    cinnamon-session
 Version: 6.4.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 # Automatically converted from old format: GPLv2+ and LGPLv2+ - review is highly recommended.
 License: GPL-2.0-or-later AND LicenseRef-Callaway-LGPLv2+
 URL:     https://github.com/linuxmint/%{name}

@@ -11,7 +11,7 @@ Name: hunspell-mn
 Summary: Mongolian hunspell dictionaries
 %global upstreamid 20080709
 Version: 0.%{upstreamid}
-Release: 34%{?dist}
+Release: 35%{?dist}
 # Another Upstream https://extensions.openoffice.org/en/project/mongolian-spell-checking-dictionary
 # gives below Source URL
 Source: https://downloads.sourceforge.net/project/aoo-extensions/1408/0/dict-mn_0.06-5.oxt 

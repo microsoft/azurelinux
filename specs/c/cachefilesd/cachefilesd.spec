@@ -5,7 +5,7 @@
 
 Name:		cachefilesd
 Version:	0.10.10
-Release:	21%{?dist}%{?buildid}
+Release: 22%{?dist}%{?buildid}
 Summary:	CacheFiles user-space management daemon
 License:	GPL-2.0-or-later
 URL:		http://people.redhat.com/~dhowells/fscache/

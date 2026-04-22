@@ -11,7 +11,7 @@
 Summary: PAM authorization checker and PAM Basic Authentication provider
 Name: mod_authnz_pam
 Version: 1.2.3
-Release: 11%{?dist}
+Release: 12%{?dist}
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.
 License: Apache-2.0
 URL: https://www.adelton.com/apache/mod_authnz_pam/

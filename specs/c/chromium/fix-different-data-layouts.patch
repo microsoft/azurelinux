@@ -1,0 +1,39 @@
+Author: Daniel Richard G. <skunk@iSKUNK.ORG>
+
+When building Chromium on unstable/ppc64el with ThinLTO enabled, this error
+occurs in the final link:
+
+  ld.lld-16: error: Linking two modules of different data layouts:
+  $C_CXX_OBJECT is 'e-m:e-i64:64-n32:64-S128-v256:256:256-v512:512:512' whereas
+  $RUST_LIBRARY is 'e-m:e-Fn32-i64:64-n32:64-S128-v256:256:256-v512:512:512'
+
+This is because the LLVM data layout for powerpc64le-unknown-linux-gnu has
+evolved over time, gaining the "Fn32" bit that specifies function pointer
+alignment. See the following source locations:
+
+  llvm-project/clang/lib/Basic/Targets/PPC.h
+  (class PPC64TargetInfo, under "Triple.getArch() == llvm::Triple::ppc64le")
+
+  rust/compiler/rustc_target/src/spec/powerpc64le_unknown_linux_gnu.rs
+  (note that this file was relocated in a later version)
+
+This change occurred in clang-17, and rustc followed suit in 1.73.0. Since
+we use an older clang and a newer rustc in our unstable build, we get an
+inconsistency in data layouts when targeting this particular platform.
+
+The error reported by the linker is not technically an error, however, only
+a warning goosed up by a --fatal-warnings flag.
+
+Index: chromium-144.0.7559.59/build/config/compiler/BUILD.gn
+===================================================================
+--- chromium-144.0.7559.59.orig/build/config/compiler/BUILD.gn
++++ chromium-144.0.7559.59/build/config/compiler/BUILD.gn
+@@ -470,7 +470,7 @@ config("compiler") {
+ 
+     # Linker warnings.
+     if (fatal_linker_warnings && !is_apple && current_os != "aix" &&
+-        current_os != "zos") {
++        current_os != "zos" && current_cpu != "ppc64") {
+       ldflags += [ "-Wl,--fatal-warnings" ]
+     }
+     if (fatal_linker_warnings && is_apple) {

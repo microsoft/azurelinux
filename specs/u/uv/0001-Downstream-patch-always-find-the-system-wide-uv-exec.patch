@@ -1,4 +1,4 @@
-From 2a9baed6b1246c566e1bed531b17363277e99c0f Mon Sep 17 00:00:00 2001
+From 831cf2937a4b8b781d56d5fa18916d2bc42b244d Mon Sep 17 00:00:00 2001
 From: "Benjamin A. Beasley" <code@musicinmybrain.net>
 Date: Sun, 23 Jun 2024 16:29:05 -0400
 Subject: [PATCH] Downstream patch: always find the system-wide uv executable
@@ -13,7 +13,7 @@ https://github.com/astral-sh/uv/issues/4451
  1 file changed, 8 insertions(+)
 
 diff --git a/python/uv/_find_uv.py b/python/uv/_find_uv.py
-index 736288a4c..306451db2 100644
+index ebe6b8d5a..e25a2e28c 100644
 --- a/python/uv/_find_uv.py
 +++ b/python/uv/_find_uv.py
 @@ -35,6 +35,14 @@ def find_uv_bin() -> str:
@@ -32,5 +32,5 @@ index 736288a4c..306451db2 100644
      for target in targets:
          if not target:
 -- 
-2.50.1
+2.53.0
 

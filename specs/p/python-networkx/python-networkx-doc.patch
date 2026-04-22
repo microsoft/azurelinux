@@ -1,0 +1,24 @@
+--- networkx-networkx-3.6.1/doc/conf.py.orig	2025-12-08 09:58:35.000000000 -0700
++++ networkx-networkx-3.6.1/doc/conf.py	2025-12-09 15:39:43.086765547 -0700
+@@ -53,6 +53,10 @@ sphinx_gallery_conf = {
+     "matplotlib_animations": True,
+     "plot_gallery": "True",
+     "reference_url": {"sphinx_gallery": None},
++    "expected_failing_examples": [
++        "../examples/geospatial/plot_lines.py",
++        "../examples/geospatial/plot_osmnx.py",
++    ]
+ }
+ 
+ rst_epilog = """
+--- networkx-networkx-3.6.1/pyproject.toml.orig	2025-12-08 09:58:35.000000000 -0700
++++ networkx-networkx-3.6.1/pyproject.toml	2025-12-09 15:39:59.398876255 -0700
+@@ -81,8 +81,6 @@ doc = [
+     'intersphinx-registry',
+ ]
+ example = [
+-    'osmnx>=2.0.0',
+-    'momepy>=0.7.2',
+     'contextily>=1.6',
+     'seaborn>=0.13',
+     'cairocffi>=1.7',

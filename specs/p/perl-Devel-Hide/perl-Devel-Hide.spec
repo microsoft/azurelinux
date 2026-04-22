@@ -10,7 +10,7 @@
 
 Name:           perl-Devel-Hide
 Version:        0.0015
-Release:        11%{?dist}
+Release: 12%{?dist}
 Summary:        Forces the unavailability of specified Perl modules (for testing)
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Devel-Hide

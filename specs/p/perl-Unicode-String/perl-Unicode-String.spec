@@ -3,7 +3,7 @@
 
 Name:           perl-Unicode-String
 Version:        2.10
-Release:        32%{?dist}
+Release: 33%{?dist}
 
 Summary:        Perl modules to handle various Unicode issues
 

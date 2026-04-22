@@ -1,0 +1,13 @@
+diff -up chromium-123.0.6312.58/chrome/browser/component_updater/screen_ai_component_installer.cc.me chromium-123.0.6312.58/chrome/browser/component_updater/screen_ai_component_installer.cc
+--- chromium-123.0.6312.58/chrome/browser/component_updater/screen_ai_component_installer.cc.me	2024-03-24 10:58:43.033885904 +0100
++++ chromium-123.0.6312.58/chrome/browser/component_updater/screen_ai_component_installer.cc	2024-03-24 11:00:38.861979740 +0100
+@@ -143,8 +143,7 @@ void ScreenAIComponentInstallerPolicy::D
+ void ManageScreenAIComponentRegistration(ComponentUpdateService* cus,
+                                          PrefService* local_state) {
+   if (screen_ai::ScreenAIInstallState::ShouldInstall(local_state)) {
+-    RegisterScreenAIComponent(cus);
+-    return;
++    // don't register the screenn ai service 
+   }
+ 
+   // Clean up.

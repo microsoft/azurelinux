@@ -4,7 +4,7 @@
 Summary:        Collection of Type 1 and 2 font manipulation utilities
 Name:           t1utils
 Version:        1.42
-Release:        11%{?dist}
+Release: 12%{?dist}
 # The Click license is an MIT variant.
 License:        MIT
 URL:            http://www.lcdf.org/~eddietwo/type/

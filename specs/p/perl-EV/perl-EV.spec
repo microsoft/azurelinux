@@ -3,7 +3,7 @@
 
 Name:           perl-EV
 Version:        4.34
-Release:        9%{?dist}
+Release: 10%{?dist}
 Summary:        Wrapper for the libev high-performance event loop library
 
 # Note: The source archive includes a libev/ folder which contents are licensed

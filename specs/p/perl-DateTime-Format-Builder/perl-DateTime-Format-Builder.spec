@@ -12,7 +12,7 @@
 Name:           perl-DateTime-Format-Builder
 # 0.83 in reality, but rpm can't get it
 Version:        0.8300
-Release:        16%{?dist}
+Release: 17%{?dist}
 Summary:        Create DateTime parser classes and objects        
 # examples/W3CDTF.pm:               GPL-1.0-or-later OR Artistic-1.0-Perl
 # examples/MySQL.pm:                GPL-1.0-or-later OR Artistic-1.0-Perl

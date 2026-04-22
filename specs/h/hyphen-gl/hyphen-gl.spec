@@ -4,7 +4,7 @@
 Name: hyphen-gl
 Summary: Galician hyphenation rules
 Version: 0.99
-Release: 33%{?dist}
+Release: 34%{?dist}
 Source: https://forxa.mancomun.org/frs/download.php/534/hyph_gl.oxt
 URL: https://forxa.mancomun.org/projects/hyphenation-gl
 License: GPL-3.0-only

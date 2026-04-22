@@ -3,7 +3,7 @@
 
 Name:           ephemeral-port-reserve
 Version:        1.1.4
-Release:        16%{?dist}
+Release: 17%{?dist}
 Summary:        Bind to an ephemeral port, force it into the TIME_WAIT state, and unbind it.
 
 License:        MIT

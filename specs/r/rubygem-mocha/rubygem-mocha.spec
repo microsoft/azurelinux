@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 2.6.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: Mocking and stubbing library
 License: Ruby OR BSD-2-Clause OR MIT
 URL: https://mocha.jamesmead.org

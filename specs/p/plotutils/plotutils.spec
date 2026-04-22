@@ -3,7 +3,7 @@
 
 Name:      plotutils
 Version:   2.6
-Release:   38%{?dist}
+Release: 39%{?dist}
 Summary:   GNU vector and raster graphics utilities and libraries
 
 # libxmi is GPLv2+

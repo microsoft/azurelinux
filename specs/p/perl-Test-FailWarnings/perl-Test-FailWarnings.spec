@@ -3,7 +3,7 @@
 
 Name:           perl-Test-FailWarnings
 Version:        0.008
-Release:        36%{?dist}
+Release: 37%{?dist}
 Summary:        Add test failures if warnings are caught
 License:        Apache-2.0
 

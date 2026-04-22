@@ -6,7 +6,7 @@
 
 Name:           mtdev
 Version:        1.1.6
-Release:        11%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
+Release: 12%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
 Summary:        Multitouch Protocol Translation Library
 
 # SPDX

@@ -4,7 +4,7 @@
 Summary: Common RPM Macros for building EFI-related packages
 Name: efi-rpm-macros
 Version: 6
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: GPL-3.0-or-later
 URL: https://github.com/rhboot/%{name}/
 BuildRequires: git sed

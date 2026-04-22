@@ -5,7 +5,7 @@
 
 Name:           python-warlock
 Version:        2.1.0
-Release:        5%{?dist}
+Release: 6%{?dist}
 Summary:        Python object model built on top of JSON schema
 
 License:        Apache-2.0

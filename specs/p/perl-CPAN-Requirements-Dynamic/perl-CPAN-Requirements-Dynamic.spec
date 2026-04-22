@@ -3,7 +3,7 @@
 
 Name:		perl-CPAN-Requirements-Dynamic
 Version:	0.002
-Release:	2%{?dist}
+Release: 3%{?dist}
 Summary:	Dynamic prerequisites in meta files
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/CPAN-Requirements-Dynamic

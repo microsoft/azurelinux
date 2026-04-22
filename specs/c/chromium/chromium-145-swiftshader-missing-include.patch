@@ -1,0 +1,13 @@
+Fix error: invalid application of 'sizeof' to an incomplete type 'llvm::DFAPacketizer' on aarch64/ppc64le
+
+diff -up chromium-145.0.7632.75/third_party/swiftshader/third_party/llvm-16.0/llvm/include/llvm/CodeGen/ResourcePriorityQueue.h.me chromium-145.0.7632.75/third_party/swiftshader/third_party/llvm-16.0/llvm/include/llvm/CodeGen/ResourcePriorityQueue.h
+--- chromium-145.0.7632.75/third_party/swiftshader/third_party/llvm-16.0/llvm/include/llvm/CodeGen/ResourcePriorityQueue.h.me	2026-02-14 14:28:04.256492652 +0100
++++ chromium-145.0.7632.75/third_party/swiftshader/third_party/llvm-16.0/llvm/include/llvm/CodeGen/ResourcePriorityQueue.h	2026-02-14 14:28:22.255862151 +0100
+@@ -16,6 +16,7 @@
+ #ifndef LLVM_CODEGEN_RESOURCEPRIORITYQUEUE_H
+ #define LLVM_CODEGEN_RESOURCEPRIORITYQUEUE_H
+ 
++#include "llvm/CodeGen/DFAPacketizer.h"
+ #include "llvm/CodeGen/ScheduleDAG.h"
+ 
+ namespace llvm {

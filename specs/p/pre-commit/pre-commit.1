@@ -1,0 +1,131 @@
+.TH PRE\-COMMIT "1" "February 2025" "" "User Commands"
+.SH NAME
+.B pre\-commit
+\(en framework for managing and maintaining multi-language pre-commit hooks
+.SH SYNOPSIS
+.B pre\-commit
+.RB [ \-h ]
+.RB [ \-V ]
+.RB { autoupdate , clean , gc , init\-templatedir , install , install\-hooks , migrate\-config , run , sample\-config , try\-repo , uninstall , validate\-config , validate\-manifest , help , hook\-impl }\ ...
+.SH OPTIONS
+.SS "POSITIONAL ARGUMENTS"
+.TP
+.RB { autoupdate , clean , gc , init\-templatedir , install , install\-hooks , migrate\-config , run , sample\-config , try\-repo , uninstall , validate\-config , validate\-manifest , help , hook\-impl }
+.RS +3n
+.TP
+.B autoupdate
+Auto-update pre-commit config to the latest repos\(cq versions.
+.IP
+See
+.BR pre\-commit\-autoupdate (1).
+.TP
+.B clean
+Clean out pre-commit files.
+.IP
+See
+.BR pre\-commit\-clean (1).
+.TP
+.B gc
+Clean unused cached repos.
+.IP
+See
+.BR pre\-commit\-gc (1).
+.TP
+.B init\-templatedir
+Install hook script in a directory intended for use with
+.B git config init.templateDir\fR.
+.IP
+See
+.BR pre\-commit\-init\-templatedir (1).
+.TP
+.B install
+Install the pre-commit script.
+.IP
+See
+.BR pre\-commit\-install (1).
+.TP
+.B install\-hooks
+Install hook environments for all environments in the config file.
+You may find
+.B pre-commit install \-\-install\-hooks
+more useful.
+.IP
+See
+.BR pre\-commit\-install\-hooks (1).
+.TP
+.B migrate\-config
+Migrate list configuration to new map configuration.
+.IP
+See
+.BR pre\-commit\-migrate\-config (1).
+.TP
+.B run
+Run hooks.
+.IP
+See
+.BR pre\-commit\-run (1).
+.TP
+.B sample\-config
+Produce a sample
+.B .pre-commit-config.yaml
+file.
+.IP
+See
+.BR pre\-commit\-sample\-config (1).
+.TP
+.B try\-repo
+Try the hooks in a repository, useful for developing new hooks.
+.IP
+See
+.BR pre\-commit\-try\-repo (1).
+.TP
+.B uninstall
+Uninstall the pre-commit script.
+.IP
+See
+.BR pre\-commit\-uninstall (1).
+.TP
+.B validate\-config
+Validate
+.B .pre-commit-config.yaml
+files.
+.IP
+See
+.BR pre\-commit\-validate\-config (1).
+.TP
+.B validate\-manifest
+Validate
+.B .pre-commit-hooks.yaml
+files.
+.IP
+See
+.BR pre\-commit\-validate\-manifest (1).
+.TP
+.B help
+Show help for a specific command.
+.IP
+See
+.BR pre\-commit\-help (1).
+.RE
+.SS "OPTIONAL\ ARGUMENTS"
+.TP
+.B \-h\fR,\ \fB\-\-help
+Show a help message and exit.
+.TP
+.B \-V\fR,\ \fB\-\-version
+Show program\(cqs version number and exit.
+.SH "SEE\ ALSO"
+.BR pre\-commit\-autoupdate (1),
+.BR pre\-commit\-clean (1),
+.BR pre\-commit\-gc (1),
+.BR pre\-commit\-init\-templatedir (1),
+.BR pre\-commit\-install (1),
+.BR pre\-commit\-install\-hooks (1),
+.BR pre\-commit\-migrate\-config (1),
+.BR pre\-commit\-run (1),
+.BR pre\-commit\-sample\-config (1),
+.BR pre\-commit\-try\-repo (1),
+.BR pre\-commit\-uninstall (1),
+.BR pre\-commit\-validate\-config (1),
+.BR pre\-commit\-validate\-manifest (1),
+.BR pre\-commit\-help (1)

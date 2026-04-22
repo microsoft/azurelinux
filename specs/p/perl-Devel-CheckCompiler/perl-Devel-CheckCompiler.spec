@@ -3,7 +3,7 @@
 
 Name:		perl-Devel-CheckCompiler
 Version:	0.07
-Release:	27%{?dist}
+Release: 28%{?dist}
 Summary:	Check the compiler's availability
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Devel-CheckCompiler

@@ -23,7 +23,7 @@
 
 Name:          postgresql%{pgversion}-postgis
 Version:       3.6.2
-Release:       1%{?dist}
+Release: 2%{?dist}
 Summary:       Geographic Information Systems Extensions to PostgreSQL
 License:       GPL-2.0-or-later
 

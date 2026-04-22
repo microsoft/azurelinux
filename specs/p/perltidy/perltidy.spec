@@ -3,7 +3,7 @@
 
 Name:		perltidy
 Version:	20250912
-Release:	1%{?dist}
+Release: 2%{?dist}
 Summary:	Tool for indenting and re-formatting Perl scripts
 License:	GPL-2.0-or-later
 URL:		http://perltidy.sourceforge.net/

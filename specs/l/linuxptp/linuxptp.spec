@@ -9,7 +9,7 @@
 
 Name:		linuxptp
 Version:	4.4
-Release:	7%{?dist}
+Release: 8%{?dist}
 Summary:	PTP implementation for Linux
 
 License:	GPL-2.0-or-later
