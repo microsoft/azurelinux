@@ -3,7 +3,7 @@
 Summary:        Azure Linux Image Tools
 Name:           azurelinux-image-tools
 Version:        1.2.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 URL:            https://github.com/microsoft/azure-linux-image-tools/
 Group:          Applications/System
@@ -16,6 +16,8 @@ Source0:        https://github.com/microsoft/azure-linux-image-tools/archive/ref
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2026-27141.patch
+Patch1:         CVE-2026-29181.patch
+Patch2:         CVE-2026-39882.patch
 BuildRequires: golang < 1.25
 BuildRequires: systemd-udev
 Requires: %{name}-imagecustomizer = %{version}-%{release}
@@ -112,6 +114,9 @@ go test -C toolkit/tools ./...
 %{_bindir}/osmodifier
 
 %changelog
+* Wed Apr 22 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.2.0-3
+- Patch for CVE-2026-39882, CVE-2026-29181
+
 * Thu Mar 05 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.2.0-2
 - Patch for CVE-2026-27141
 
