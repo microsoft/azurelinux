@@ -5,3 +5,9 @@ description = "Fix os_release_name value to match os-release NAME"
 type = "patch-add"
 file = "Policy-Fix-os_release_name-value.patch"
 source = "Policy-Fix-os_release_name-value.patch"
+
+[[components.sos.overlays]]
+description = "Add os_release_id value to match os-release ID"
+type = "patch-add"
+file = "Policy-Add-os_release_id-check.patch"
+source = "Policy-Add-os_release_id-check.patch"
