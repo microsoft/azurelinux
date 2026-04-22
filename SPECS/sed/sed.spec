@@ -25,8 +25,7 @@ Requires: sed >= %{version}
 These are the additional language files of sed.
 
 %prep
-%setup -q
-%patch 0 -p1
+%autosetup -p1
 
 %build
 ./configure \
