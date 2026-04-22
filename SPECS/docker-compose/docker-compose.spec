@@ -1,7 +1,7 @@
 Summary:        Define and run multi-container applications with Docker
 Name:           docker-compose
 Version:        2.27.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -21,6 +21,7 @@ Patch5:         CVE-2025-47913.patch
 Patch6:         CVE-2025-11065.patch
 Patch7:         CVE-2025-47911.patch
 Patch8:         CVE-2025-58190.patch
+Patch9:         CVE-2026-39882.patch
 BuildRequires:  golang
 Requires:       docker-cli
 Obsoletes:      moby-compose < %{version}-%{release}
@@ -53,6 +54,9 @@ install -D -m0755 bin/build/docker-compose %{buildroot}/%{_libexecdir}/docker/cl
 %{_libexecdir}/docker/cli-plugins/docker-compose
 
 %changelog
+* Mon Apr 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.27.0-9
+- Patch for CVE-2026-39882
+
 * Thu Feb 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.27.0-8
 - Patch for CVE-2025-58190, CVE-2025-47911
 
