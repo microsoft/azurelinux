@@ -1,0 +1,54 @@
+From f536c85b6cc8957e3d50afc3711997007d60f27a Mon Sep 17 00:00:00 2001
+From: Chris Co <chrco@microsoft.com>
+Date: Tue, 21 Apr 2026 23:47:17 -0700
+Subject: [PATCH] configure: prefer ncursesw over ncurses for wide-character
+ support
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+On distros that ship narrow and wide ncurses side-by-side (e.g.
+Azure Linux, RHEL/CentOS Stream, and any distro where ncurses is
+built without --with-default-wide), `AC_SEARCH_LIBS([initscr],
+[ncurses curses])` finds -lncurses first and links against the
+narrow library. AC_CHECK_HEADERS likewise picks the narrow
+<curses.h> from /usr/include/ in preference to the wide header in
+/usr/include/ncursesw/.
+
+When mtr's runtime path then ends up touching wide tinfo (libtinfow,
+pulled in transitively or via another curses-using library on the
+process), the WINDOW struct layout the objects were compiled with
+(narrow) no longer matches what tinfo expects (wide). The first
+window-modifying call — typically wmove() during the initial draw —
+writes through a pointer at the wrong offset and segfaults.
+
+Prefer ncursesw in the library search. Wide ncurses is a strict
+superset of narrow ncurses for mtr's usage (we only call symbols
+that exist in both), is the default on glibc-based distros that
+build ncurses --with-default-wide (Fedora, Debian, Ubuntu, Arch),
+and avoids the ABI-mismatch class of bug entirely on distros that
+don't.
+
+No functional change for users on default-wide distros: -lncursesw
+is a synonym for -lncurses there. On split distros, mtr now
+consistently uses the wide flavor end-to-end.
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 3175d56..e97789c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -121,7 +121,7 @@ AS_IF([test "x$with_ncurses" = "xyes"],
+   # Prefer ncurses over curses, if both are available.
+   # (On Solaris 11.3, ncurses builds and links for us, but curses does not.)
+   [AC_SEARCH_LIBS(
+-    [initscr], [ncurses curses],
++    [initscr], [ncursesw ncurses curses],
+     [AC_DEFINE([HAVE_CURSES], [1], [Define if a curses library available])],
+     [with_ncurses=no])
+ ])
+-- 
+2.45.2
+
