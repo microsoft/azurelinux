@@ -19,8 +19,6 @@
         "**/__pycache__",
         "**/.*"
     ],
-    // All YAMLs under .github/workflows/ado should be interpreted as Azure Pipelines, not GitHub Actions.
-    "files.associations": {
-        ".github/workflows/ado/*.yml": "azure-pipelines"        
-    }
+    // Using Azure Pipelines schema for validation of ADO YAMLs.
+    "azure-pipelines.1ESPipelineTemplatesSchemaFile": true
 }

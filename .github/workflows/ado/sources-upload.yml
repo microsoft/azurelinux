@@ -49,6 +49,15 @@ extends:
         Network: R1
       runOnHost: true
       EnableCDPxPAT: false
+
+    # https://aka.ms/obpipelines/sdl
+    globalSdl:
+      disableLegacyManifest: true
+      sbom:
+        enabled: false
+      tsa:
+        enabled: false
+
     stages:
       - template: /.github/workflows/ado/templates/sources-upload-stages.yml@self
         parameters:
