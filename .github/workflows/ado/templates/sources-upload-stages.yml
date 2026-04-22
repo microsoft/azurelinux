@@ -82,7 +82,9 @@ stages:
               git config --unset extensions.worktreeConfig || true
 
               # Full history is needed for spec rendering to work.
-              git fetch --unshallow
+              if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then
+                git fetch --unshallow
+              fi
 
               # TODO: Replace with using the TOML config to read the specs dir once available.
               #       The '-o "$specs_dir"' should be removed as part of the update. Future command:
@@ -122,7 +124,7 @@ stages:
                 # Branch format: refs/heads/gh-readonly-queue/{base_branch}/pr-{pr_number}-{head_sha}
                 # Using 'test/' branches until ready with the merge queue, but the parsing logic is the same.
                 if ! base_branch=$(grep -oP '(?<=test/gh-readonly-queue/).+(?=/pr-[^/]+$)' <<< "$SOURCE_BRANCH"); then
-                  echo "##[error]Unsupported SOURCE_BRANCH '$SOURCE_BRANCH' for non-PullRequest build. Expected 'refs/heads/test/gh-readonly-queue/<base>/pr-<n>-<sha>'."
+                  echo "##[error]Unsupported SOURCE_BRANCH '$SOURCE_BRANCH' for non-PullRequest build. Expected 'refs/heads/gh-readonly-queue/<base>/pr-<n>-<sha>'."
                   exit 1
                 fi
                 target_hash=$(git ls-remote "$UPSTREAM_REPO_URL" "refs/heads/$base_branch" | cut -f1)
