@@ -8,10 +8,13 @@
 # Upstream: https://src.fedoraproject.org/rpms/plymouth
 # Ref: microsoft/azurelinux#18865
 #
-# Intentionally unscoped — the same guard appears in 4 spec sections
-# (%package, %install, %postun, %files) and all must be disabled.
+# Note: spec-remove-section cannot be used here because each charge-theme
+# section is wrapped in %if/%endif guards. Removing the section also eats
+# the %endif, leaving an unclosed %if that breaks rpmbuild.
+# The same guard appears in 4 spec sections (%package, %install, %postun,
+# %files) and all must be disabled.
 [[components.plymouth.overlays]]
 description = "Disable Fedora-specific charge theme subpackage (plymouth-theme-charge) — requires fedora-logos-classic which AZL does not ship"
 type = "spec-search-replace"
-regex = '^%if ! 0%\{\?rhel\}$'
+regex = '^%if\s+!\s+0%\{\?rhel\}\s*$'
 replacement = '%if 0'
