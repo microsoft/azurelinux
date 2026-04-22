@@ -165,6 +165,7 @@ texinfo-6.8-1.cm2.aarch64.rpm
 gtk-doc-1.33.2-1.cm2.noarch.rpm
 autoconf-2.71-3.cm2.noarch.rpm
 automake-1.16.5-1.cm2.noarch.rpm
+<<<<<<< HEAD
 openssl-1.1.1k-39.cm2.aarch64.rpm
 openssl-devel-1.1.1k-39.cm2.aarch64.rpm
 openssl-libs-1.1.1k-39.cm2.aarch64.rpm
@@ -172,6 +173,15 @@ openssl-perl-1.1.1k-39.cm2.aarch64.rpm
 openssl-static-1.1.1k-39.cm2.aarch64.rpm
 libcap-2.60-8.cm2.aarch64.rpm
 libcap-devel-2.60-8.cm2.aarch64.rpm
+=======
+openssl-1.1.1k-40.cm2.aarch64.rpm
+openssl-devel-1.1.1k-40.cm2.aarch64.rpm
+openssl-libs-1.1.1k-40.cm2.aarch64.rpm
+openssl-perl-1.1.1k-40.cm2.aarch64.rpm
+openssl-static-1.1.1k-40.cm2.aarch64.rpm
+libcap-2.60-7.cm2.aarch64.rpm
+libcap-devel-2.60-7.cm2.aarch64.rpm
+>>>>>>> ae6462dd6 (Patch `openssl` for multiple Null Deref (#16761))
 debugedit-5.0-2.cm2.aarch64.rpm
 libarchive-3.6.1-9.cm2.aarch64.rpm
 libarchive-devel-3.6.1-9.cm2.aarch64.rpm
