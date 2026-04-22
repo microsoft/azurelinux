@@ -84,10 +84,15 @@ stages:
               # Full history is needed for spec rendering to work.
               git fetch --unshallow
 
+              # TODO: Replace with using the TOML config to read the specs dir once available.
+              #       The '-o "$specs_dir"' should be removed as part of the update. Future command:
+              #         specs_dir="$(azldev config dump -q -f json | jq -r .project.renderedSpecsDir)"
+              # ADO task: 19149
               specs_dir="specs"
 
-              echo "Rendering specs..."
-              azldev component render -q -a -o "$specs_dir" --force
+              echo "##[group]Specs rendering"
+              azldev component render -q -a -o "$specs_dir" --force --clean-stale
+              echo "##[endgroup]"
 
               # Check for any new or modified files under the specs directory.
               if ! python3 .github/workflows/scripts/check_rendered_specs.py --specs-dir "$specs_dir"; then
@@ -96,6 +101,7 @@ stages:
                 echo "##[endgroup]"
                 echo "##[warning]Specs are not up to date. Ignoring until main branch is updated and stable."
                 # TODO: Re-enabled failing once specs in the main branch are updated and stable.
+                # ADO task: 19150
                 # exit 1
               fi
             displayName: "Verify rendered specs are up to date"
@@ -180,7 +186,7 @@ stages:
               BUILD_REASON: $(Build.Reason)
               COMPONENTS: $(components)
               SOURCE_COMMIT: $(sourceCommit)
-              # Target commit is not used. Will be needed once we move detection of affected components to CT.
-              # ADO task: https://dev.azure.com/mariner-org/mariner/_workitems/edit/18816
+              # TODO: Target commit is not used. Will be needed once we move detection of affected components to CT.
+              # ADO task: 18816
               TARGET_COMMIT: $(targetCommit)
               UPSTREAM_REPO_URL: $(Build.Repository.Uri)
