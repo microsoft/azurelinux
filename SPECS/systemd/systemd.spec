@@ -50,7 +50,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        26%{?dist}
+Release:        27%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -149,6 +149,7 @@ Patch0905:      ipc-call-0001-path-util-add-flavour-of-path_startswith-that-leav
 Patch0906:      ipc-call-0003-core-cgroup-avoid-one-unnecessary-strjoina.patch
 Patch0907:      ipc-call-0002-path-util-invert-PATH_STARTSWITH_ACCEPT_DOT_DOT-flag.patch
 Patch0908:      ipc-call-0004-core-validate-input-cgroup-path-more-prudently.patch
+Patch0909:      fix-pcrlock-hyperv-hash-algorithm-ordering.patch
 
 %ifarch %{ix86} x86_64 aarch64
 %global want_bootloader 1
@@ -1234,6 +1235,10 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Thu Mar 26 2026 Lanze Liu <lanzeliu@microsoft.com> - 255-27
+- Fix pcrlock failure on Hyper-V/Azure VMs with vTPM by backporting upstream
+  commit e90a255 from systemd v256 (PR #31429).
+
 * Mon Mar 02 2026 Dan Streetman <ddstreet@ieee.org> - 255-26
 - Apply patches for ipc issue.
 
