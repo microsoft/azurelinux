@@ -1,14 +1,14 @@
 {
   "Signatures": {
     "azurelinux-ca-20230216.pem": "d545401163c75878319f01470455e6bc18a5968e39dd964323225e3fe308849b",
-    "config": "c5448a4fddac2410da74ccd5138256fb57ad37a4b1a9eb6038e693afc9cff1e6",
-    "config_aarch64": "a01af85c50f4116f7cf36f63b6b423993a7df4b67b899af1de8b2ebb7858e7b9",
+    "config": "cb7fcaf22ad0793e6fd94761ce99ef0efa5330483242912033e134d038702acd",
+    "config_aarch64": "a0166f52044dd78dd72814b98b6f8f3928328de03b40b0362f72c16ab8cf8ebb",
     "cpupower": "d7518767bf2b1110d146a49c7d42e76b803f45eb8bd14d931aa6d0d346fae985",
     "cpupower.service": "b057fe9e5d0e8c36f485818286b80e3eba8ff66ff44797940e99b1fd5361bb98",
     "sha512hmac-openssl.sh": "02ab91329c4be09ee66d759e4d23ac875037c3b56e5a598e32fd1206da06a27f",
     "azl-ipe-boot-policy.pol": "f2b7941bd3b721aadc8e937d0472c36fe5e140221f7bb54af6ef905884e0372c",
     "Makefile": "1c2e740407215ed9b9cbbc09f9102bc99c08b370bbe2cbb0490aefdc9eb70455",
     "tarfs.c": "066084e1ca2c1e7ba83e76a6696cf17928e7efb46a2b1670a7a1f597c2d9bc51",
-    "kernel-6.6.134.1.tar.gz": "00bb505e55f44a80afe830a4172d2c1661611a59f46cfb071b2c9a316a0a0fc8"
+    "kernel-6.6.135.1.tar.gz": "8c413d7fa0cd4da1ad4dd7613b9863a8850ac128d35f7d9e9eae3fe26c38cf32"
   }
 }
