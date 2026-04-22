@@ -162,51 +162,16 @@ cp %{SOURCE4} test/
 NEW_RPM_OPT_FLAGS="%{optflags} -Wa,--noexecstack -Wa,--generate-missing-build-notes=yes -DPURIFY $RPM_LD_FLAGS -O0"
 
 export HASHBANGPERL=%{_bindir}/perl
+Patch50:        openssl-1.1.1-check-return-code-of-UTF8_putc.patch
+Patch51:        openssl-1.1.1-verify-ASN1-objects-types.patch
+Patch52:        openssl-1.1.1-check-oct-argument-for-NULL.patch
+Patch53:        openssl-1.1.1-dane_match_cert-should-X509_free-on-mcert-instead-of.patch
+Patch54:        openssl-1.1.1-Fix-NULL-Dereference-When-Delta-CRL-Lacks-CRL-Number.patch
+Patch55:        openssl-1.1.1-Fix-NULL-deref-in-ec-dh_cms_set_shared_info.patch
+Patch56:        openssl-1.1.1-Fix-NULL-deref-in-rsa_cms_decrypt.patch
 
-# The Configure script already knows to use -fPIC and
-# RPM_OPT_FLAGS, so we can skip specifiying them here.
-
-# See https://wiki.openssl.org/index.php/Compilation_and_Installation for configure options
-# NOTE: the 'no-<prot>-method' switches are not used by design. The changes inside 'Patch2'
-#       make sure that protocols disabled through 'no-<prot>' will still be unaccessible.
-#       This is a workaround until OpenSSL issue #7048 is officially resolved.
-#       Issue link: https://github.com/openssl/openssl/issues/7048.
-#       For more details please read the comment inside the patch.
-./config \
-    --prefix=%{_prefix} --openssldir=%{_sysconfdir}/pki/tls --libdir=lib \
-    shared \
-    no-aria \
-    enable-bf \
-    no-blake2 \
-    enable-camellia \
-    no-capieng \
-    enable-cast \
-    no-chacha \
-    enable-cms \
-    no-comp \
-    enable-ct \
-    enable-deprecated \
-    enable-des \
-    enable-dh \
-    enable-dsa \
-    no-dtls1 \
-    no-ec2m \
-    enable-ec_nistp_64_gcc_128 \
-    enable-ecdh \
-    enable-ecdsa \
-    no-gost \
-    no-idea \
-    no-mdc2 \
-    no-md2 \
-    enable-md4 \
-    no-poly1305 \
-    enable-rc2 \
-    enable-rc4 \
-    enable-rc5 \
-    no-rfc3779 \
-    enable-rmd160 \
-    no-sctp \
-    no-seed \
+BuildRequires:  perl-Test-Warnings
+BuildRequires:  perl-Text-Template
     no-siphash \
     no-sm2 \
     no-sm3 \
