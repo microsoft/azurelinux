@@ -43,8 +43,8 @@
 
 Summary:	 Cross-partition memory
 Name:		 xpmem-hwe
-Version:	 2.7.4
-Release:	 32%{release_suffix}%{?dist}
+Version:	2601.0.9
+Release:	1%{release_suffix}%{?dist}
 License:	 GPLv2 and LGPLv2.1
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
@@ -53,7 +53,7 @@ BuildRequires:	 automake autoconf
 URL:		 https://github.com/openucx/xpmem
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
-# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+# https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.01-1.0.0.0.tgz
 Source0:         %{_distro_sources_url}/xpmem-%{version}.tar.gz
 
 # name gets a different value in subpackages
@@ -207,6 +207,9 @@ fi
 %endif
 
 %changelog
+* Wed Apr 22 2026 Henry Li <lihl@microsoft.com> - 2601.0.9-1_6.18.21.1.1
+- Bump DOCA from 3.1.0 to 3.3.0 (MOFED 26.01-1.0.0.0)
+
 * Fri Apr 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.7.4-32_6.12.57.1.6
 - Tweak specs to use dynamic versioning for kernel and mlnx_ofa
 
@@ -229,7 +232,7 @@ fi
 - Bump to match kernel-hwe.
 
 * Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.7.4-25_6.12.57.1.1
-- Build with OFED 25.07.0.9.7.1.
+- Build with OFED.26.01.1.0.0.1.
 - Enable build on x86_64 kernel hwe.
 - Update source path
 

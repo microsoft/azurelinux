@@ -7110,8 +7110,18 @@
         "type": "other",
         "other": {
           "name": "ibarr",
-          "version": "0.1.5",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/ibarr-0.1.5.tar.gz"
+          "version": "2601.0.0",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/ibarr-2601.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "isert",
+          "version": "26.01",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/isert-26.01.tgz"
         }
       }
     },

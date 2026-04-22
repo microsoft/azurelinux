@@ -42,7 +42,7 @@
 
 %{!?_name: %define _name srp}
 %{!?_mofed_full_version: %define _mofed_full_version %{target_mlnx_ofa_kernel_version}-%{target_mlnx_ofa_kernel_release}%{?dist}}
-%{!?_release: %define _release OFED.25.07.0.9.7.1}
+%{!?_release: %define _release OFED.26.01.1.0.0.1}
 
 # KMP is disabled by default
 %{!?KMP: %global KMP 0}
@@ -66,14 +66,14 @@
 
 Summary:	 srp driver
 Name:		 srp
-Version:	 25.07
-Release:	 2%{release_suffix}%{?dist}
+Version:	 26.01
+Release:	 1%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
-# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+# https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.01-1.0.0.0.tgz
 Source0:         %{_distro_sources_url}/%{name}-%{version}.tgz
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 Vendor:          Microsoft Corporation
@@ -259,6 +259,9 @@ fi
 %endif
 
 %changelog
+* Wed Apr 22 2026 Henry Li <lihl@microsoft.com> - 26.01-1
+- Bump DOCA from 3.1.0 to 3.3.0 (MOFED 26.01-1.0.0.0)
+
 * Fri Apr 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.07-2
 - Tweak specs to use dynamic versioning for kernel and mlnx_ofa_kernel versions.
 

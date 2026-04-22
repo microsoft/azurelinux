@@ -34,14 +34,14 @@
 
 Name:		 mft_kernel-hwe
 Summary:	 %{name} Kernel Module for the %{KVERSION} kernel
-Version:	 4.33.0
-Release:	 8%{release_suffix}%{?dist}
+Version:	4.35.0
+Release:	1%{release_suffix}%{?dist}
 License:	 Dual BSD/GPLv2
 Group:		 System Environment/Kernel
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
-# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+# https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.01-1.0.0.0.tgz
 Source0:         %{_distro_sources_url}/kernel-mft-%{version}.tgz
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
@@ -213,6 +213,9 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 %endif
 
 %changelog
+* Wed Apr 22 2026 Henry Li <lihl@microsoft.com> - 4.35.0-1_6.18.21.1.1
+- Bump DOCA from 3.1.0 to 3.3.0 (MOFED 26.01-1.0.0.0)
+
 * Fri Apr 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 4.33.0-8_6.12.57.1.6
 - Tweak specs to use dynamic versioning for kernel
 

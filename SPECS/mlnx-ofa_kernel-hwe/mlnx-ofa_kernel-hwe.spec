@@ -86,7 +86,7 @@
 %global base_name mlnx-ofa_kernel
 %{!?_name: %global _name %{base_name}-hwe}
 %{!?_version: %global _version 25.07}
-%{!?_release: %global _release OFED.25.07.0.9.7.1}
+%{!?_release: %global _release OFED.26.01.1.0.0.1}
 %global _kmp_rel %{_release}%{?_kmp_build_num}%{?_dist}
 %global MLNX_OFA_DRV_SRC 24.10-0.7.0
 
@@ -101,14 +101,14 @@
 
 Summary:	 Infiniband HCA Driver
 Name:		 mlnx-ofa_kernel-hwe
-Version:	 25.07
-Release:	 8%{release_suffix}%{?dist}
+Version:	 26.01
+Release:	 1%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
-# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+# https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.01-1.0.0.0.tgz
 Source0:         %{_distro_sources_url}/mlnx-ofa_kernel-%{_version}.tgz
 
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
@@ -449,6 +449,9 @@ update-alternatives --remove \
 %{_prefix}/src/ofa_kernel/%{_arch}/[0-9]*
 
 %changelog
+* Wed Apr 22 2026 Henry Li <lihl@microsoft.com> - 26.01-1_6.18.21.1.1
+- Bump DOCA from 3.1.0 to 3.3.0 (MOFED 26.01-1.0.0.0)
+
 * Fri Apr 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.07-8_6.12.57.1.6
 - Tweak specs to use dynamic versioning for kernel
 

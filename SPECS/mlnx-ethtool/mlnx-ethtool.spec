@@ -1,5 +1,5 @@
 Name:		 mlnx-ethtool
-Version:	 6.14
+Version:	 2601.0.2
 Release:	 1%{?dist}
 Group:		 Utilities
 Summary:	 Settings tool for Ethernet and other network devices
@@ -10,7 +10,7 @@ URL:		 https://ftp.kernel.org/pub/software/network/ethtool/
 Buildroot:	 /var/tmp/%{name}-%{version}-build
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
-# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+# https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.01-1.0.0.0.tgz
 Source0:         %{_distro_sources_url}/%{name}-%{version}.tar.gz
 
 BuildRequires:  libmnl-devel
@@ -48,6 +48,9 @@ make install DESTDIR=${RPM_BUILD_ROOT}
 
 
 %changelog
+* Wed Apr 22 2026 Henry Li <lihl@microsoft.com> - 2601.0.2-1
+- Bump DOCA from 3.1.0 to 3.3.0 (MOFED 26.01-1.0.0.0)
+
 * Thu Dec 11 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.14-1
 - Upgrade version to 6.14.
 - Update source path
