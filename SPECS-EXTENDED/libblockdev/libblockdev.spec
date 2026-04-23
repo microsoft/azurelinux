@@ -80,7 +80,7 @@
 
 Summary:        A library for low-level manipulation with block devices
 Name:           libblockdev
-Version:        3.2.0
+Version:        3.4.0
 Release:        1%{?dist}
 License:        LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
@@ -914,6 +914,9 @@ find %{buildroot} -type f -name "*.la" | xargs %{__rm}
 %files plugins-all
 
 %changelog
+* Wed Dec 24 2025 Sumit Jena <v-sumitjena@microsoft.com> - 3.4.0-1
+- Update to 3.4.0
+
 * Thu Nov 7 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 3.2.0-1
 - Update to 3.2.0
 - License verified
