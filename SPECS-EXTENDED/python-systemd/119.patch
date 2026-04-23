@@ -1,0 +1,91 @@
+From 8f84fbe8c2bdcea957829cd903f0c9dc62cefaed Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Zbigniew=20J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>
+Date: Wed, 17 Aug 2022 09:53:25 +0200
+Subject: [PATCH 1/2] tests: check for errnos that sd_id128_get_machine
+ actually returns
+
+Fixes #118.
+Upstream Patch Reference: https://github.com/systemd/python-systemd/pull/119.patch
+---
+ systemd/test/test_id128.py   | 11 +++++++----
+ systemd/test/test_journal.py |  6 +++++-
+ 2 files changed, 12 insertions(+), 5 deletions(-)
+
+diff --git a/systemd/test/test_id128.py b/systemd/test/test_id128.py
+index 146ec73..e87b1cc 100644
+--- a/systemd/test/test_id128.py
++++ b/systemd/test/test_id128.py
+@@ -6,11 +6,11 @@
+ from systemd import id128
+ 
+ @contextlib.contextmanager
+-def skip_oserror(code):
++def skip_oserror(*errnos):
+     try:
+         yield
+     except (OSError, IOError) as e:
+-        if e.errno == code:
++        if e.errno in errnos:
+             pytest.skip()
+         raise
+ 
+@@ -21,7 +21,10 @@ def test_randomize():
+     assert u1 != u2
+ 
+ def test_get_machine():
+-    u1 = id128.get_machine()
++    # yikes, python2 doesn't know ENOMEDIUM
++    with skip_oserror(errno.ENOENT, errno.ENOSYS, 123):
++        u1 = id128.get_machine()
++
+     u2 = id128.get_machine()
+     assert u1 == u2
+ 
+@@ -29,7 +32,7 @@ def test_get_machine_app_specific():
+     a1 = uuid.uuid1()
+     a2 = uuid.uuid1()
+ 
+-    with skip_oserror(errno.ENOSYS):
++    with skip_oserror(errno.ENOENT, errno.ENOSYS, 123):
+         u1 = id128.get_machine_app_specific(a1)
+ 
+     u2 = id128.get_machine_app_specific(a2)
+diff --git a/systemd/test/test_journal.py b/systemd/test/test_journal.py
+index c192136..dd733cf 100644
+--- a/systemd/test/test_journal.py
++++ b/systemd/test/test_journal.py
+@@ -233,7 +233,11 @@ def test_reader_this_boot(tmpdir):
+ def test_reader_this_machine(tmpdir):
+     j = journal.Reader(path=tmpdir.strpath)
+     with j:
+-        j.this_machine()
++        try:
++            j.this_machine()
++        except OSError:
++            pass
++
+         j.this_machine(TEST_MID)
+         j.this_machine(TEST_MID.hex)
+ 
+
+From 4bba47da39d9ffb9c79af9ec575c38579e7a0cda Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Zbigniew=20J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>
+Date: Wed, 17 Aug 2022 12:19:24 +0200
+Subject: [PATCH 2/2] ci: drop instantiation of machine-id
+
+Now the tests should pass without it.
+---
+ .github/workflows/install.yml | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/.github/workflows/install.yml b/.github/workflows/install.yml
+index 6a8cc39..c1d202c 100644
+--- a/.github/workflows/install.yml
++++ b/.github/workflows/install.yml
+@@ -76,6 +76,4 @@ jobs:
+           # Avoid importing the systemd module from the git repository
+           cd /
+           python3 -c 'from systemd import journal; print(journal.__version__)'
+-          # Initialize /etc/machine-id if it's empty to make the tests happy
+-          [[ ! -s /etc/machine-id ]] && systemd-id128 new >/etc/machine-id
+           pytest -v --pyargs systemd
