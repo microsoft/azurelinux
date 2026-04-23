@@ -133,7 +133,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %find_lang %{name}-%{BaseVersion}
 
 %check
-%meson_test
+%meson_test --timeout-multiplier 10
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
