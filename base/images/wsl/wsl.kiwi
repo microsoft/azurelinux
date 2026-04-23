@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-model href="https://raw.githubusercontent.com/OSInside/kiwi/refs/tags/v10.2.33/kiwi/schema/kiwi.rng" type="application/xml"?>
+<image schemaversion="8.3" name="azl4-wsl">
+    <description type="system">
+        <author>Azure Linux</author>
+        <contact>azurelinux@microsoft.com</contact>
+        <specification>Azure Linux 4.0 rootfs for Windows Subsystem for Linux (WSL)</specification>
+    </description>
+    <preferences>
+        <version>0.1</version>
+        <packagemanager>dnf5</packagemanager>
+        <locale>en_US</locale>
+        <keytable>us</keytable>
+        <timezone>UTC</timezone>
+        <release-version>4.0</release-version>
+        <!--
+            tbz produces a tar.bz2 rootfs consumable by `wsl --import`.
+            WSL provides its own kernel and bootloader, so this image
+            intentionally has no kernel, dracut, grub2, or shim.
+            For a Microsoft Store-installable bundle, switch to
+            image="appx" and set metadata_path=/meta/data with the
+            launcher exe and AppxManifest provided out-of-band.
+        -->
+        <type image="tbz" filesystem="ext4"/>
+    </preferences>
+
+    <repository type="rpm-md" alias="azl4">
+        <source
+            path="https://stcontroltowerdevjwisitg.blob.core.windows.net/daily-repo-non-prod/20260303/x86_64/" />
+    </repository>
+
+    <packages type="image">
+        <!-- Core -->
+        <package name="azurelinux-release-cloud" />
+        <package name="azurelinux-repos" />
+        <package name="filesystem" />
+        <package name="setup" />
+        <package name="bash" />
+        <package name="ca-certificates" />
+        <package name="coreutils" />
+        <package name="glibc" />
+        <package name="glibc-langpack-en" />
+        <package name="shadow-utils" />
+        <package name="util-linux" />
+        <package name="tzdata" />
+
+        <!-- Init / privilege -->
+        <package name="systemd" />
+        <package name="systemd-networkd" />
+        <package name="systemd-resolved" />
+        <package name="sudo" />
+        <package name="passwd" />
+
+        <!-- Usable interactive shell -->
+        <package name="procps-ng" />
+        <package name="less" />
+        <package name="vim-minimal" />
+        <package name="nano" />
+        <package name="ncurses" />
+        <package name="ncurses-term" />
+        <package name="man-db" />
+        <package name="bash-completion" />
+
+        <!-- Networking / file transfer -->
+        <package name="iproute" />
+        <package name="iputils" />
+        <package name="openssh-clients" />
+        <package name="curl" />
+        <package name="wget" />
+        <package name="rsync" />
+        <package name="tar" />
+        <package name="gzip" />
+        <package name="xz" />
+        <package name="bzip2" />
+
+        <!-- Package manager -->
+        <package name="dnf5" />
+        <package name="dnf5-plugins" />
+
+        <!-- WSL integration -->
+        <package name="wsl-setup" />
+        <package name="hyperv-daemons" />
+    </packages>
+
+    <packages type="bootstrap">
+        <package name="azurelinux-release-cloud" />
+        <package name="filesystem" />
+    </packages>
+</image>
