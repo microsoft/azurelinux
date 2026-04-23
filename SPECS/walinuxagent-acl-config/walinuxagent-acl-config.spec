@@ -28,22 +28,23 @@ ACL-specific settings:
 # Nothing to build.
 
 %install
-# Stage waagent.conf -> copied to /etc by %%posttrans to avoid file
-# conflict with the base WALinuxAgent package.
+# Stage waagent.conf and waagent.service -> copied to final locations by
+# %%posttrans to avoid file conflicts with the base WALinuxAgent package.
 install -Dm 644 waagent.conf %{buildroot}%{_datadir}/walinuxagent-acl-config/waagent.conf
+install -Dm 644 waagent.service %{buildroot}%{_datadir}/walinuxagent-acl-config/waagent.service
 
-# Install service and drop-in to /etc/systemd/system so they take
-# precedence over WALinuxAgent's /usr/lib/systemd/system copies.
-install -Dm 644 waagent.service %{buildroot}%{_sysconfdir}/systemd/system/waagent.service
+# Install drop-in to /etc/systemd/system so it takes precedence over
+# WALinuxAgent's /usr/lib/systemd/system copies.
 install -Dm 644 10-waagent-sysext.conf %{buildroot}%{_sysconfdir}/systemd/system/multi-user.target.d/10-waagent-sysext.conf
 
 %posttrans
 cp %{_datadir}/walinuxagent-acl-config/waagent.conf %{_sysconfdir}/waagent.conf
+cp %{_datadir}/walinuxagent-acl-config/waagent.service %{_unitdir}/waagent.service
 systemctl daemon-reload 2>/dev/null || :
 
 %files
 %{_datadir}/walinuxagent-acl-config/waagent.conf
-%{_sysconfdir}/systemd/system/waagent.service
+%{_datadir}/walinuxagent-acl-config/waagent.service
 %{_sysconfdir}/systemd/system/multi-user.target.d/10-waagent-sysext.conf
 
 %changelog
