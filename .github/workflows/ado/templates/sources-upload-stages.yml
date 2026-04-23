@@ -173,10 +173,19 @@ stages:
               #     on the target branch -- those components are not on the PR and must not be uploaded.
               # Net effect: the listed '*/sources' files are exactly those present on the source commit that
               # differ from target, including pure renames surfaced under the source-branch name.
+              sources_files="$(
+                git diff --no-renames --diff-filter=d "$TARGET_COMMIT" "$SOURCE_COMMIT" --name-only \
+                  | { grep '/sources$' || true; } \
+                  | sort -u
+              )"
+
               components=()
               while IFS= read -r line; do
-                components+=("$(basename "$(dirname "$line")")")
-              done < <(git diff --no-renames --diff-filter=d "$TARGET_COMMIT" "$SOURCE_COMMIT" --name-only | grep '/sources$' | sort -u)
+                # Skip the spurious empty iteration when no '*/sources' files changed.
+                if [[ -n "$line" ]]; then
+                  components+=("$(basename "$(dirname "$line")")")
+                fi
+              done <<< "$sources_files"
 
               components="$(IFS=, ; echo "${components[*]}")"
               echo "Affected components: $components"
