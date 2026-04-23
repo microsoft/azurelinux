@@ -177,6 +177,10 @@ Python scripts are easier to test locally, easier to review, and avoid the foot-
 
 ## Security hardening
 
+> Fork-PR builds for ADO pipelines with secrets access are governed by a
+> separate policy: [`ado-pr-check-fork-policy.instructions.md`](ado-pr-check-fork-policy.instructions.md).
+> Long-form rationale lives in [`docs/ado-pipelines-fork-pr-security.md`](../../docs/ado-pipelines-fork-pr-security.md).
+
 Apply all of these unless there is a documented reason not to:
 
 - **`set -euo pipefail`** at the top of every non-trivial bash block.
