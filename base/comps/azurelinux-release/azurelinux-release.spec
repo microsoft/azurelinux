@@ -39,7 +39,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -52,8 +52,7 @@ Source14:       distro-template.swidtag
 Source15:       distro-variant-template.swidtag
 Source16:       20-azurelinux-defaults.conf
 Source17:       20-azure.conf
-Source18:       proc-version-override.service
-Source19:       proc-version-override.sh
+
 Source20:       chrony-azure.conf
 Source21:       50-azure-cloud.conf
 Source22:       70-azurelinux-hardening.conf
@@ -402,10 +401,6 @@ ln -s --relative %{buildroot}%{_swidtagdir} %{buildroot}%{_sysconfdir}/swid/swid
 # Install DNF 5 configuration defaults
 install -Dm0644 %{SOURCE16} -t %{buildroot}%{_prefix}/share/dnf5/libdnf.conf.d/
 
-# Install proc-version-override (backward-compat for tools that grep /proc/version for "Mariner")
-install -Dm0644 %{SOURCE18} -t %{buildroot}%{_unitdir}/
-install -Dm0755 %{SOURCE19} %{buildroot}%{_libexecdir}/proc-version-override
-
 # Install sysctl configuration
 install -Dm0644 %{SOURCE22} -t %{buildroot}%{_sysctldir}/
 
@@ -435,8 +430,6 @@ install -Dm0644 %{SOURCE22} -t %{buildroot}%{_sysctldir}/
 %dir %{_sysconfdir}/swid
 %{_sysconfdir}/swid/swidtags.d
 %{_prefix}/share/dnf5/libdnf.conf.d/20-azurelinux-defaults.conf
-%{_unitdir}/proc-version-override.service
-%{_libexecdir}/proc-version-override
 %{_sysctldir}/70-azurelinux-hardening.conf
 
 
@@ -476,6 +469,9 @@ install -Dm0644 %{SOURCE22} -t %{buildroot}%{_sysctldir}/
 
 
 %changelog
+* Thu Apr 23 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-11
+- Revert proc-version-override
+
 * Tue Apr 21 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-10
 - Fix distcore macro definition
 
