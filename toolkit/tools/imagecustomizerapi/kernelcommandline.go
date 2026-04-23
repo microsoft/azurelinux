@@ -10,11 +10,11 @@ import (
 
 type KernelCommandLine struct {
 	// Extra kernel command line args.
-	ExtraCommandLine string `yaml:"ExtraCommandLine"`
+	ExtraCommandLine string `yaml:"extraCommandLine"`
 }
 
 func (s *KernelCommandLine) IsValid() error {
-	err := commandLineIsValid(s.ExtraCommandLine, "ExtraCommandLine")
+	err := commandLineIsValid(s.ExtraCommandLine, "extraCommandLine")
 	if err != nil {
 		return err
 	}

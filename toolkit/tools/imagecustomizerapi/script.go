@@ -8,8 +8,8 @@ import (
 )
 
 type Script struct {
-	Path string `yaml:"Path"`
-	Args string `yaml:"Args"`
+	Path string `yaml:"path"`
+	Args string `yaml:"args"`
 }
 
 func (s *Script) IsValid() error {
