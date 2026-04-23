@@ -2,9 +2,9 @@
 %global         majorminor      1.0
 Summary:        GStreamer streaming media framework base plugins
 Name:           gstreamer1-plugins-base
-Version:        1.20.0
-Release:        3%{?dist}
-License:        LGPLv2+
+Version:        1.24.8
+Release:        1%{?dist}
+License:        LGPLv2.1+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://gstreamer.freedesktop.org/
@@ -177,6 +177,7 @@ rm %{_libexecdir}/gstreamer-%{majorminor}/gst-plugin-scanner
 %{_libdir}/libgstapp-%{majorminor}.so.*
 %{_libdir}/libgstgl-%{majorminor}.so.*
 
+
 # gobject-introspection files
 %{_libdir}/girepository-1.0/GstAllocators-%{majorminor}.typelib
 %{_libdir}/girepository-1.0/GstApp-%{majorminor}.typelib
@@ -204,24 +205,25 @@ rm %{_libexecdir}/gstreamer-%{majorminor}/gst-plugin-scanner
 %{_libdir}/gstreamer-%{majorminor}/libgstencoding.so
 %{_libdir}/gstreamer-%{majorminor}/libgstgio.so
 %{_libdir}/gstreamer-%{majorminor}/libgstoverlaycomposition.so
-%{_libdir}/gstreamer-%{majorminor}/libgstplayback.so
 %{_libdir}/gstreamer-%{majorminor}/libgstpbtypes.so
+%{_libdir}/gstreamer-%{majorminor}/libgstplayback.so
 %{_libdir}/gstreamer-%{majorminor}/libgstrawparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstsubparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgsttcp.so
 %{_libdir}/gstreamer-%{majorminor}/libgsttypefindfunctions.so
-%{_libdir}/gstreamer-%{majorminor}/libgstvideoconvert.so
+%{_libdir}/gstreamer-%{majorminor}/libgstvideoconvertscale.so
 %{_libdir}/gstreamer-%{majorminor}/libgstvideorate.so
-%{_libdir}/gstreamer-%{majorminor}/libgstvideoscale.so
 %{_libdir}/gstreamer-%{majorminor}/libgstvideotestsrc.so
 %{_libdir}/gstreamer-%{majorminor}/libgstvolume.so
 
 # base plugins with dependencies
 %{_libdir}/gstreamer-%{majorminor}/libgstalsa.so
+%{_libdir}/gstreamer-%{majorminor}/libgstbasedebug.so
 %{_libdir}/gstreamer-%{majorminor}/libgstcdparanoia.so
-%{_libdir}/gstreamer-%{majorminor}/libgstopengl.so
+%{_libdir}/gstreamer-%{majorminor}/libgstdsd.so
 %{_libdir}/gstreamer-%{majorminor}/libgstlibvisual.so
 %{_libdir}/gstreamer-%{majorminor}/libgstogg.so
+%{_libdir}/gstreamer-%{majorminor}/libgstopengl.so
 %{_libdir}/gstreamer-%{majorminor}/libgstpango.so
 %{_libdir}/gstreamer-%{majorminor}/libgsttheora.so
 %{_libdir}/gstreamer-%{majorminor}/libgstvorbis.so
@@ -236,13 +238,16 @@ rm %{_libexecdir}/gstreamer-%{majorminor}/gst-plugin-scanner
 %{_mandir}/man1/gst-play-*
 %{_mandir}/man1/gst-device-monitor-*
 
+
 %files devel
 %dir %{_includedir}/gstreamer-%{majorminor}/gst/allocators
-%{_includedir}/gstreamer-%{majorminor}/gst/allocators/allocators.h
 %{_includedir}/gstreamer-%{majorminor}/gst/allocators/allocators-prelude.h
+%{_includedir}/gstreamer-%{majorminor}/gst/allocators/allocators.h
 %{_includedir}/gstreamer-%{majorminor}/gst/allocators/gstdmabuf.h
+%{_includedir}/gstreamer-%{majorminor}/gst/allocators/gstdrmdumb.h
 %{_includedir}/gstreamer-%{majorminor}/gst/allocators/gstfdmemory.h
 %{_includedir}/gstreamer-%{majorminor}/gst/allocators/gstphysmemory.h
+%{_includedir}/gstreamer-%{majorminor}/gst/allocators/gstshmallocator.h
 %dir %{_includedir}/gstreamer-%{majorminor}/gst/app
 %{_includedir}/gstreamer-%{majorminor}/gst/app/app.h
 %{_includedir}/gstreamer-%{majorminor}/gst/app/app-prelude.h
@@ -251,16 +256,16 @@ rm %{_libexecdir}/gstreamer-%{majorminor}/gst-plugin-scanner
 %{_includedir}/gstreamer-%{majorminor}/gst/app/gstappsrc.h
 %dir %{_includedir}/gstreamer-%{majorminor}/gst/audio
 %{_includedir}/gstreamer-%{majorminor}/gst/audio/audio-buffer.h
-%{_includedir}/gstreamer-%{majorminor}/gst/audio/audio-channels.h
 %{_includedir}/gstreamer-%{majorminor}/gst/audio/audio-channel-mixer.h
+%{_includedir}/gstreamer-%{majorminor}/gst/audio/audio-channels.h
 %{_includedir}/gstreamer-%{majorminor}/gst/audio/audio-converter.h
+%{_includedir}/gstreamer-%{majorminor}/gst/audio/audio-enumtypes.h
 %{_includedir}/gstreamer-%{majorminor}/gst/audio/audio-format.h
 %{_includedir}/gstreamer-%{majorminor}/gst/audio/audio-info.h
-%{_includedir}/gstreamer-%{majorminor}/gst/audio/audio-enumtypes.h
+%{_includedir}/gstreamer-%{majorminor}/gst/audio/audio-prelude.h
 %{_includedir}/gstreamer-%{majorminor}/gst/audio/audio-quantize.h
 %{_includedir}/gstreamer-%{majorminor}/gst/audio/audio-resampler.h
 %{_includedir}/gstreamer-%{majorminor}/gst/audio/audio.h
-%{_includedir}/gstreamer-%{majorminor}/gst/audio/audio-prelude.h
 %{_includedir}/gstreamer-%{majorminor}/gst/audio/gstaudioaggregator.h
 %{_includedir}/gstreamer-%{majorminor}/gst/audio/gstaudiobasesink.h
 %{_includedir}/gstreamer-%{majorminor}/gst/audio/gstaudiobasesrc.h
@@ -275,6 +280,8 @@ rm %{_libexecdir}/gstreamer-%{majorminor}/gst-plugin-scanner
 %{_includedir}/gstreamer-%{majorminor}/gst/audio/gstaudiosink.h
 %{_includedir}/gstreamer-%{majorminor}/gst/audio/gstaudiosrc.h
 %{_includedir}/gstreamer-%{majorminor}/gst/audio/gstaudiostreamalign.h
+%{_includedir}/gstreamer-%{majorminor}/gst/audio/gstdsd.h
+%{_includedir}/gstreamer-%{majorminor}/gst/audio/gstdsdformat.h
 %{_includedir}/gstreamer-%{majorminor}/gst/audio/streamvolume.h
 %dir %{_includedir}/gstreamer-%{majorminor}/gst/fft
 %{_includedir}/gstreamer-%{majorminor}/gst/fft/fft.h
@@ -360,7 +367,6 @@ rm %{_libexecdir}/gstreamer-%{majorminor}/gst-plugin-scanner
 %{_includedir}/gstreamer-%{majorminor}/gst/video/navigation.h
 %{_includedir}/gstreamer-%{majorminor}/gst/video/video-anc.h
 %{_includedir}/gstreamer-%{majorminor}/gst/video/video-blend.h
-%{_includedir}/gstreamer-%{majorminor}/gst/video/video-overlay-composition.h
 %{_includedir}/gstreamer-%{majorminor}/gst/video/video-chroma.h
 %{_includedir}/gstreamer-%{majorminor}/gst/video/video-color.h
 %{_includedir}/gstreamer-%{majorminor}/gst/video/video-converter.h
@@ -370,13 +376,16 @@ rm %{_libexecdir}/gstreamer-%{majorminor}/gst-plugin-scanner
 %{_includedir}/gstreamer-%{majorminor}/gst/video/video-format.h
 %{_includedir}/gstreamer-%{majorminor}/gst/video/video-frame.h
 %{_includedir}/gstreamer-%{majorminor}/gst/video/video-hdr.h
+%{_includedir}/gstreamer-%{majorminor}/gst/video/video-info-dma.h
 %{_includedir}/gstreamer-%{majorminor}/gst/video/video-info.h
 %{_includedir}/gstreamer-%{majorminor}/gst/video/video-multiview.h
+%{_includedir}/gstreamer-%{majorminor}/gst/video/video-overlay-composition.h
+%{_includedir}/gstreamer-%{majorminor}/gst/video/video-prelude.h
 %{_includedir}/gstreamer-%{majorminor}/gst/video/video-resampler.h
 %{_includedir}/gstreamer-%{majorminor}/gst/video/video-scaler.h
+%{_includedir}/gstreamer-%{majorminor}/gst/video/video-sei.h
 %{_includedir}/gstreamer-%{majorminor}/gst/video/video-tile.h
 %{_includedir}/gstreamer-%{majorminor}/gst/video/video.h
-%{_includedir}/gstreamer-%{majorminor}/gst/video/video-prelude.h
 %{_includedir}/gstreamer-%{majorminor}/gst/video/videodirection.h
 %{_includedir}/gstreamer-%{majorminor}/gst/video/videoorientation.h
 %{_includedir}/gstreamer-%{majorminor}/gst/video/videooverlay.h
@@ -415,6 +424,10 @@ rm %{_libexecdir}/gstreamer-%{majorminor}/gst-plugin-scanner
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Wed Apr 30 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 1.24.8-1
+- Upgrade to 1.24.8
+- License Verified
+
 * Wed Jan 22 2025 Andrew Phelps <anphel@microsoft.com> - 1.20.4-3
 - Remove dependency on opus
 
