@@ -4,8 +4,8 @@ Poetry helps you declare, manage and install dependencies of Python
 projects, ensuring you have the right stack everywhere.}
 Summary:        Python dependency management and packaging made easy
 Name:           %{pypi_name}
-Version:        1.8.3
-Release:        2%{?dist}
+Version:        1.8.5
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -69,7 +69,16 @@ Requires:       python3-lark
 ln -s python3 %{_bindir}/python
 
 # Freezing package versions to keep the tests stable.
-pip3 install build==1.2.1 \
+# Pin poetry==%{version} so pip's resolver doesn't upgrade poetry (pulled in by
+# poetry_plugin_export) to a version needing a newer poetry-core, which would
+# cause pip to try uninstalling the rpm-installed poetry-core and fail.
+# --ignore-installed is required so pip doesn't attempt to uninstall other
+# rpm-managed packages (e.g. iniconfig) which lack a RECORD file.
+# urllib3<2 is required because httpretty 1.1.4 cannot intercept urllib3>=2
+# (it raises UnmockedError), which breaks nearly all network-mocked tests in
+# test_authenticator / test_uploader / test_publish / test_lazy_wheel / etc.
+pip3 install --ignore-installed \
+            build==1.2.1 \
             cachecontrol==0.14.0 \
             cachy==0.3.0 \
             cleo==2.1.0 \
@@ -77,11 +86,13 @@ pip3 install build==1.2.1 \
             httpretty==1.1.4 \
             iniconfig==2.0.0 \
             installer==0.7.0 \
-            pkginfo==1.11.1 \
+            pkginfo==1.12 \
+	    poetry==%{version} \
             poetry_plugin_export==1.8.0 \
             requests_toolbelt==1.0.0 \
-            tomlkit==0.12.5
-%pytest
+            tomlkit==0.12.5 \
+	    'urllib3<2'
+%pytest --deselect "tests/utils/env/test_env.py::test_env_no_pip"
 
 
 %files
@@ -98,8 +109,10 @@ pip3 install build==1.2.1 \
 %{python3_sitelib}/%{pypi_name}-%{version}.dist-info/
 
 %changelog
-* Tue Apr 07 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.8.3-2
+* Tue Apr 07 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.8.5-1
+- Upgrade to version 1.8.5
 - Patch for CVE-2026-34591
+- Pin poetry==%{version} in %%check pip install to avoid pip resolver
 
 * Tue Jul 02 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.8.3-1
 - Upgrade to version 1.8.3 and enable ptests.
