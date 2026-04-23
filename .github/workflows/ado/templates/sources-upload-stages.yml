@@ -89,6 +89,8 @@ stages:
               # TODO: Replace with using the TOML config to read the specs dir once available.
               #       The '-o "$specs_dir"' should be removed as part of the update. Future command:
               #         specs_dir="$(azldev config dump -q -f json | jq -r .project.renderedSpecsDir)"
+              #       Similarly, the component rendering below should change to:
+              #         azldev component render -q -a
               # ADO task: 19149
               specs_dir="specs"
 
