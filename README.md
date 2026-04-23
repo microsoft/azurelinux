@@ -1,3 +1,61 @@
+> **DOWNSTREAM FORK NOTICE**
+> This repository is a downstream fork of [microsoft/azurelinux](https://github.com/microsoft/azurelinux) (branch `3.0`).
+> It is maintained independently for the purpose described below. The original Azure Linux README is preserved in full below this section.
+
+---
+
+# About This Fork
+
+This fork of Azure Linux 3.0 is the foundation for a **custom Linux desktop distribution** targeting the [COSMIC desktop environment](https://github.com/pop-os/cosmic-epoch) by System76.
+
+## Project Goal
+
+Build a production-quality, RPM-based desktop Linux distro that:
+
+- Inherits Azure Linux's hardened security baseline, reproducible build pipeline, and ~3,078 upstream packages
+- Enables bare-metal desktop hardware rendering via a rebuilt Mesa with Intel (`iris`) and AMD (`radeonsi`) Gallium drivers
+- Delivers a modern Wayland-native desktop through COSMIC DE (~35–60 new RPM SPECs)
+- Ships a server image and a desktop image from the same fork, maintained independently of one another
+
+## Why COSMIC
+
+| Factor | Detail |
+|---|---|
+| **Rust-native** | Azure Linux already carries Rust 1.90.0; COSMIC builds entirely in Rust |
+| **Wayland-native** | No X11 compositor required; `cosmic-comp` is the compositor |
+| **No framework import** | Does not require GNOME Shell, GTK4 monolith, KDE Frameworks, or GJS |
+| **Clean component model** | Each COSMIC component maps to one RPM spec; no monolithic packages |
+| **Existing base coverage** | Wayland, libdrm, libinput, libxkbcommon, systemd, pipewire already present in Azure Linux |
+
+## Architecture
+
+```
+Azure Linux 3.0 (base)
+  └── Mesa rebuild (enable iris + radeonsi Gallium drivers)
+       └── Low-level desktop prerequisites (libseat, libdisplay-info, xdg-desktop-portal)
+            └── COSMIC session core (cosmic-comp, cosmic-session, cosmic-greeter)
+                 └── COSMIC shell + apps (cosmic-panel, cosmic-settings, cosmic-files, ...)
+```
+
+## Current Status
+
+**Phase: Planning / Pre-build** (April 2026)
+
+- [x] Technical feasibility analysis complete
+- [ ] Linux build host provisioned
+- [ ] First clean Azure Linux build validated
+- [ ] Mesa spec reworked for desktop GPU
+- [ ] COSMIC packaging started
+
+## Documentation
+
+| Document | Description |
+|---|---|
+| [CUSTOM_DISTRO_FEASIBILITY_REPORT.md](CUSTOM_DISTRO_FEASIBILITY_REPORT.md) | Full technical feasibility report: build pipeline, package ecosystem, COSMIC implementation path, risk register, five-phase strategy |
+| [RETROSPECTIVE.md](RETROSPECTIVE.md) | Session history, key discoveries, decisions made, open questions, and recommended next steps |
+
+---
+
 # Azure Linux
 
 Azure Linux is an internal Linux distribution for Microsoft’s cloud infrastructure and edge products and services. Azure Linux is designed to provide a consistent platform for these devices and services and will enhance Microsoft’s ability to stay current on Linux updates. This initiative is part of Microsoft’s increasing investment in a wide range of Linux technologies, such as [SONiC](https://azure.microsoft.com/en-us/blog/sonic-the-networking-switch-software-that-powers-the-microsoft-global-cloud/) and [Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/en-us/windows/wsl/about). Azure Linux is being shared publicly as part of Microsoft’s commitment to Open Source and to contribute back to the Linux community. Azure Linux does not change our approach or commitment to any existing third-party Linux distribution offerings.
