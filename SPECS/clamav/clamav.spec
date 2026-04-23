@@ -1,7 +1,7 @@
 Summary:        Open source antivirus engine
 Name:           clamav
-Version:        1.0.9
-Release:        4%{?dist}
+Version:        1.5.2
+Release:        1%{?dist}
 License:        ASL 2.0 AND BSD AND bzip2-1.0.4 AND GPLv2 AND LGPLv2+ AND MIT AND Public Domain AND UnRar
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -31,7 +31,7 @@ BuildRequires:  pcre2-devel
 BuildRequires:  python3
 BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
-BuildRequires:  rust < 1.85.0
+BuildRequires:  rust >= 1.87.0
 BuildRequires:  systemd
 BuildRequires:  systemd-devel
 BuildRequires:  systemd-rpm-macros
@@ -86,6 +86,10 @@ cmake \
 %cmake_install
 # do not install html doc ('clamav' cmake has no flag to specify that => remove the doc)
 rm -rf %{buildroot}%{_docdir}
+
+# Remove unintended static Rust archive
+rm -f %{buildroot}%{_libdir}/libclamav_rust.a
+
 mkdir -p %{buildroot}%{_sharedstatedir}/clamav
 
 ### freshclam config processing (from Fedora)
@@ -129,6 +133,9 @@ fi
 %{_sbindir}/*
 %{_sysconfdir}/clamav/*.sample
 %{_sysconfdir}/clamav/freshclam.conf
+%dir %{_sysconfdir}/clamav
+%dir %{_sysconfdir}/clamav/certs
+%config(noreplace) %{_sysconfdir}/clamav/certs/clamav.crt
 %{_includedir}/*.h
 %{_mandir}/man1/*
 %{_mandir}/man5/*
@@ -136,6 +143,12 @@ fi
 %dir %attr(-,clamav,clamav) %{_sharedstatedir}/clamav
 
 %changelog
+* Fri Mar 20 2026 Mayank Singh <mayansingh@microsoft.com> - 1.5.2-1
+- upgrade to 1.5.2
+
+* Tue Apr 07 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.0.9-5
+- Bump release to rebuild with rust
+
 * Wed Feb 11 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.0.9-4
 - Bump release to rebuild with rust
 

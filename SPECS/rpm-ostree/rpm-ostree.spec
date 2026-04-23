@@ -1,7 +1,7 @@
 Summary:        Commit RPMs to an OSTree repository
 Name:           rpm-ostree
 Version:        2024.4
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -180,6 +180,9 @@ make check
 %{_datadir}/gir-1.0/*-1.0.gir
 
 %changelog
+* Tue Apr 07 2026 BinduSri Adabala <v-badabala@microsoft.com> - 2024.4-9
+- Bump release to rebuild with rust
+
 * Tue Feb 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2024.4-8
 - Patch for CVE-2026-25541 & CVE-2025-58160
 
