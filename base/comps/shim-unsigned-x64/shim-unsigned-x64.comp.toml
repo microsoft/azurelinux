@@ -1,5 +1,5 @@
 [components.shim-unsigned-x64]
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43", snapshot = "2025-06-01T00:00:00-08:00" } }
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "bacb81905ea6806b97b968527e5ca9b2e3f0f7b4" }
 
 overlays = [
     # Workaround: add dist tag to the release to avoid NEVR conflicts

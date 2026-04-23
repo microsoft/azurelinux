@@ -1,6 +1,6 @@
 [components.python-jaraco-context]
-# TODO: Remove snapshot pin once python-coherent-licensed lands in F43 stable (or F44+ is adopted).
-# Pin snapshot to before the broken 6.0.2/6.1.0 updates were pushed to the f43 branch.
+# TODO: Remove upstream-commit pin once python-coherent-licensed lands in F43 stable (or F44+ is adopted).
+# Pin to commit before the broken 6.0.2/6.1.0 updates were pushed to the f43 branch.
 # These updates added a dynamic BuildRequires on python-coherent-licensed, which was never
 # shipped in F43 stable (the Fedora Koji build was trashcanned and the Bodhi update abandoned).
 # The last good f43 version is 6.0.1-9.fc43.
@@ -8,4 +8,4 @@
 #   https://packages.fedoraproject.org/pkgs/python-jaraco-context/python3-jaraco-context/
 #   https://koji.fedoraproject.org/koji/buildinfo?buildID=2919309 (coherent-licensed trashcanned)
 #   https://src.fedoraproject.org/rpms/python-jaraco-context/tree/f43
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43", snapshot = "2026-01-05T00:00:00Z" } }
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "828a76324409d043e3236220a62bdd21a99107cb" }

@@ -5,10 +5,10 @@
 #
 # The second workaround is to deliver the appropriate minor version of java portable.
 # Java 25 sdk needs 25.0.0.0.32 version of the -sources as a build requires. We pull
-# from the last snapshot of the spec at that version. 
+# from the last snapshot of the spec at that version.
 
 [components.java-25-openjdk-portable]
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43", snapshot = "2025-07-22T00:00:00-08:00" } }
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "cad9d5a1ed48cf7e9e12cfadfdacc11f523d46cb" }
 
 [[components.java-25-openjdk-portable.overlays]]
 description = "Override buildjdkver to use Java 25 instead of 24 for bootstrap"
