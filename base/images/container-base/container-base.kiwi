@@ -39,7 +39,7 @@
     <packages type="image" profiles="core">
         <package name="filesystem" />
         <package name="bash" />
-        <package name="system-release" />
+        <package name="azurelinux-release-container" />
     </packages>
 
     <!-- For distroless profiles ALL packages that should be included in
@@ -47,7 +47,7 @@
          Packages from bootstrap may be removed by config.sh. -->
     <packages type="image" profiles="distroless-minimal">
         <package name="filesystem" />
-        <package name="system-release" />
+        <package name="azurelinux-release-container" />
         <package name="tzdata" />
     </packages>
 
@@ -64,7 +64,7 @@
 
     <packages type="bootstrap" profiles="core,distroless-minimal">
         <package name="filesystem" />
-        <package name="system-release" />
+        <package name="azurelinux-release-container" />
     </packages>
 
     <packages type="bootstrap" profiles="distroless-minimal">
