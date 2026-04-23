@@ -6,7 +6,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.12.9
-Release:        10%{?dist}
+Release:        11110%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -142,6 +142,7 @@ The test package contains all regression tests for Python as well as the modules
 
 %prep
 %autosetup -p1 -n Python-%{version}
+rm -rf Lib/ensurepip/_bundled
 
 %build
 # Remove GCC specs and build environment linker scripts
