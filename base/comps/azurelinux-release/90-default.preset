@@ -28,10 +28,6 @@ enable auditd.service
 
 enable audit-rules.service
 
-# Backward-compat: override /proc/version so tools that grep for "Mariner"
-# can identify Azure Linux
-enable proc-version-override.service
-
 # Locally-running service
 enable restorecond.service
 
@@ -375,3 +371,4 @@ enable gpio-manager.service
 
 # Enable authselect-apply-changes.service
 enable authselect-apply-changes.service
+
