@@ -53,6 +53,40 @@ stages:
           - name: LinuxContainerImage
             value: ${{ parameters.containerImage }}
         steps:
+          - script: |
+              set -euo pipefail
+
+              # For both triggers, Build.SourceVersion is the relevant source commit:
+              # - PR trigger: ADO sets it to the GitHub-created merge commit (refs/pull/{n}/merge).
+              # - CI/merge-queue trigger: it is the commit that landed on the base branch.
+              source_hash="$SOURCE_COMMIT"
+
+              if [[ "$BUILD_REASON" == "PullRequest" ]]; then
+                # PR trigger: ADO provides the target branch directly.
+                target_hash=$(git ls-remote "$UPSTREAM_REPO_URL" "$PR_TARGET_BRANCH" | cut -f1)
+              else
+                # CI/merge-queue trigger: extract the base branch from the merge-queue branch name.
+                # Branch format: refs/heads/gh-readonly-queue/{base_branch}/pr-{pr_number}-{head_sha}
+                if ! base_branch=$(grep -oP '(?<=^test/gh-readonly-queue/).+(?=/pr-[^/]+$)' <<< "$SOURCE_BRANCH"); then
+                  echo "##[error]Unsupported SOURCE_BRANCH '$SOURCE_BRANCH' for non-PullRequest build. Expected 'refs/heads/gh-readonly-queue/<base>/pr-<n>-<sha>'."
+                  exit 1
+                fi
+                target_hash=$(git ls-remote "$UPSTREAM_REPO_URL" "refs/heads/$base_branch" | cut -f1)
+              fi
+
+              echo "Source commit: $source_hash"
+              echo "Target commit: $target_hash"
+
+              echo "##vso[task.setvariable variable=sourceCommit]$source_hash"
+              echo "##vso[task.setvariable variable=targetCommit]$target_hash"
+            env:
+              BUILD_REASON: $(Build.Reason)
+              PR_TARGET_BRANCH: $(System.PullRequest.TargetBranch)
+              SOURCE_BRANCH: $(Build.SourceBranch)
+              SOURCE_COMMIT: $(Build.SourceVersion)
+              UPSTREAM_REPO_URL: $(Build.Repository.Uri)
+            displayName: "Determine source and target commit hashes"
+
           - task: PipAuthenticate@1
             displayName: "Authenticate pip"
             inputs:
@@ -119,40 +153,6 @@ stages:
             # TODO: Re-enabled failing once specs in the main branch are updated and stable.
             # ADO task: 19179
             continueOnError: true
-
-          - script: |
-              set -euo pipefail
-
-              # For both triggers, Build.SourceVersion is the relevant source commit:
-              # - PR trigger: ADO sets it to the GitHub-created merge commit (refs/pull/{n}/merge).
-              # - CI/merge-queue trigger: it is the commit that landed on the base branch.
-              source_hash="$SOURCE_COMMIT"
-
-              if [[ "$BUILD_REASON" == "PullRequest" ]]; then
-                # PR trigger: ADO provides the target branch directly.
-                target_hash=$(git ls-remote "$UPSTREAM_REPO_URL" "$PR_TARGET_BRANCH" | cut -f1)
-              else
-                # CI/merge-queue trigger: extract the base branch from the merge-queue branch name.
-                # Branch format: refs/heads/gh-readonly-queue/{base_branch}/pr-{pr_number}-{head_sha}
-                if ! base_branch=$(grep -oP '(?<=^test/gh-readonly-queue/).+(?=/pr-[^/]+$)' <<< "$SOURCE_BRANCH"); then
-                  echo "##[error]Unsupported SOURCE_BRANCH '$SOURCE_BRANCH' for non-PullRequest build. Expected 'refs/heads/gh-readonly-queue/<base>/pr-<n>-<sha>'."
-                  exit 1
-                fi
-                target_hash=$(git ls-remote "$UPSTREAM_REPO_URL" "refs/heads/$base_branch" | cut -f1)
-              fi
-
-              echo "Source commit: $source_hash"
-              echo "Target commit: $target_hash"
-
-              echo "##vso[task.setvariable variable=sourceCommit]$source_hash"
-              echo "##vso[task.setvariable variable=targetCommit]$target_hash"
-            env:
-              BUILD_REASON: $(Build.Reason)
-              PR_TARGET_BRANCH: $(System.PullRequest.TargetBranch)
-              SOURCE_BRANCH: $(Build.SourceBranch)
-              SOURCE_COMMIT: $(Build.SourceVersion)
-              UPSTREAM_REPO_URL: $(Build.Repository.Uri)
-            displayName: "Determine source and target commit hashes"
 
           - script: |
               set -euo pipefail
