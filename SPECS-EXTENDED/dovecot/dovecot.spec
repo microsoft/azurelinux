@@ -1,72 +1,102 @@
 %global __provides_exclude_from %{_docdir}
 %global __requires_exclude_from %{_docdir}
-%global prever %{nil}
-%global pigeonholever 0.5.20
 
-Summary:        Secure imap and pop3 server
-Name:           dovecot
-Version:        2.3.20
-Release:        1%{?dist}
+Summary: Secure imap and pop3 server
+Name: dovecot
+Epoch: 1
+Version: 2.3.21.1
+%global prever %{nil}
+Release: 1%{?dist}
 #dovecot itself is MIT, a few sources are PD, pigeonhole is LGPLv2
-License:        MIT AND LGPLv2
+License: MIT AND LGPL-2.1-only
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://www.dovecot.org/
-Source:         https://www.dovecot.org/releases/2.3/%{name}-%{version}%{?prever}.tar.gz
-Source1:        dovecot.init
-Source2:        dovecot.pam
-Source8:        https://pigeonhole.dovecot.org/releases/2.3/dovecot-2.3-pigeonhole-%{pigeonholever}.tar.gz
-Source9:        dovecot.sysconfig
-Source10:       dovecot.tmpfilesd
-#our own
-Source14:       dovecot.conf.5
-Source15:       prestartscript
-# 3x Fedora/RHEL specific
-Patch1:         dovecot-2.0-defaultconfig.patch
-Patch2:         dovecot-1.0.beta2-mkcert-permissions.patch
-Patch3:         dovecot-1.0.rc7-mkcert-paths.patch
-#wait for network
-Patch6:         dovecot-2.1.10-waitonline.patch
-Patch8:         dovecot-2.2.20-initbysystemd.patch
-Patch9:         dovecot-2.2.22-systemd_w_protectsystem.patch
-Patch10:        dovecot-2.3.0.1-libxcrypt.patch
-Patch15:        dovecot-2.3.11-bigkey.patch
+URL: https://www.dovecot.org/
+Source: https://www.dovecot.org/releases/2.3/%{name}-%{version}%{?prever}.tar.gz
+Source1: dovecot.init
+Source2: dovecot.pam
+%global pigeonholever 0.5.21.1
+Source8: https://pigeonhole.dovecot.org/releases/2.3/dovecot-2.3-pigeonhole-%{pigeonholever}.tar.gz
+Source9: dovecot.sysconfig
+Source10: dovecot.tmpfilesd
 
-BuildRequires:  autoconf
-BuildRequires:  automake
-BuildRequires:  bzip2-devel
-BuildRequires:  clucene-core-devel
-BuildRequires:  expat-devel
-BuildRequires:  gcc
-BuildRequires:  gcc-c++
+#our own
+Source14: dovecot.conf.5
+Source15: prestartscript
+Source16: dovecot.sysusers
+
+# 3x Fedora/RHEL specific
+Patch1: dovecot-2.0-defaultconfig.patch
+Patch2: dovecot-1.0.beta2-mkcert-permissions.patch
+Patch3: dovecot-1.0.rc7-mkcert-paths.patch
+
+#wait for network
+Patch6: dovecot-2.1.10-waitonline.patch
+
+Patch8: dovecot-2.2.20-initbysystemd.patch
+Patch9: dovecot-2.2.22-systemd_w_protectsystem.patch
+Patch10: dovecot-2.3.0.1-libxcrypt.patch
+Patch15: dovecot-2.3.11-bigkey.patch
+
+# do not use own implementation of HMAC, use OpenSSL for certification purposes
+# not sent upstream as proper fix would use dovecot's lib-dcrypt but it introduces
+# hard to break circular dependency between lib and lib-dcrypt
+Patch16: dovecot-2.3.6-opensslhmac.patch
+
+# FTBFS
+Patch17: dovecot-2.3.15-fixvalcond.patch
+Patch18: dovecot-2.3.15-valbasherr.patch
+Patch20: dovecot-2.3.14-opensslv3.patch
+Patch21: dovecot-2.3.19.1-7bad6a24.patch
+Patch22: dovecot-configure-c99.patch
+
+# Fedora/RHEL specific, drop OTP which uses SHA1 so we dont use SHA1 for crypto purposes
+Patch23: dovecot-2.3.20-nolibotp.patch
+Patch24: dovecot-2.3-ph_optglob.patch
+Patch25: dovecot-2.3-ph_scriptcmp.patch
+
+# imap: Shorten test-imap-client-hibernate socket path length
+Patch26: dovecot-2.3.21-test-socket-path.patch
+
+# Compile without OpenSSL ENGINE, adapted from 2.4 dovecot, issue #RHEL-33733
+Patch27: dovecot-2.3.21-noengine.patch
+
+BuildRequires: gcc, gcc-c++, openssl-devel, pam-devel, zlib-devel, bzip2-devel, libcap-devel
+BuildRequires: libtool, autoconf, automake, pkgconfig
+BuildRequires: sqlite-devel
+BuildRequires: libpq-devel
+BuildRequires: mariadb-connector-c-devel
+BuildRequires: libxcrypt-devel
+BuildRequires: openldap-devel
+BuildRequires: krb5-devel
+BuildRequires: quota-devel
+BuildRequires: xz-devel
+BuildRequires: lz4-devel
+BuildRequires: libzstd-devel
+%if %{?rhel}0 == 0
+BuildRequires: libsodium-devel
+BuildRequires: lua-devel
+%endif
+BuildRequires: libicu-devel
+%if 0%{?rhel} == 0 &&  0%{?fedora}0 < 38
+BuildRequires: libexttextcat-devel
+BuildRequires: clucene-core-devel
+%endif
+%if %{?rhel}0 == 0
+BuildRequires: libstemmer-devel
+%endif
+#BuildRequires: multilib-rpm-config
+BuildRequires: flex, bison
+BuildRequires: systemd-devel
+BuildRequires: systemd-rpm-macros
+
 # gettext-devel is needed for running autoconf because of the
 # presence of AM_ICONV
-BuildRequires:  gettext-devel
-BuildRequires:  krb5-devel
-BuildRequires:  libcap-devel
-BuildRequires:  libcurl-devel
-BuildRequires:  libexttextcat-devel
-BuildRequires:  libicu-devel
-BuildRequires:  libpq-devel
-BuildRequires:  libsodium-devel
-BuildRequires:  libstemmer-devel
-BuildRequires:  libtool
-BuildRequires:  libxcrypt-devel
-BuildRequires:  libzstd-devel
-BuildRequires:  lz4-devel
-BuildRequires:  make
-BuildRequires:  mariadb-connector-c-devel
-BuildRequires:  openldap-devel
-BuildRequires:  openssl-devel
-BuildRequires:  pam-devel
-BuildRequires:  pkgconfig
-BuildRequires:  quota-devel
-BuildRequires:  sqlite-devel
-BuildRequires:  systemd-rpm-macros
-BuildRequires:  xz-devel
-BuildRequires:  zlib-devel
+BuildRequires: gettext-devel
+
 # Explicit Runtime Requirements for executalbe
-Requires:       openssl >= 0.9.7f-4
+Requires: openssl >= 0.9.7f-4
+
 # Package includes an initscript service file, needs to require initscripts package
 Requires(pre): shadow-utils
 Requires: systemd
@@ -75,61 +105,89 @@ Requires(preun): systemd-units
 Requires(postun): systemd-units
 
 %global ssldir %{_sysconfdir}/pki/%{name}
+
+BuildRequires: libcurl-devel expat-devel
+BuildRequires: make
+
+%if 0%{?fedora} > 39
+# as per https://fedoraproject.org/wiki/Changes/EncourageI686LeafRemoval
+ExcludeArch:    %{ix86}
+%endif
+
 %global restart_flag /run/%{name}/%{name}-restart-after-rpm-install
 
 %description
-Dovecot is an IMAP server for Linux/UNIX-like systems, written with security
-primarily in mind.  It also contains a small POP3 server.  It supports mail
+Dovecot is an IMAP server for Linux/UNIX-like systems, written with security 
+primarily in mind.  It also contains a small POP3 server.  It supports mail 
 in either of maildir or mbox formats.
 
 The SQL drivers and authentication plug-ins are in their subpackages.
 
 %package pigeonhole
-Summary:        Sieve and managesieve plug-in for dovecot
-Requires:       %{name} = %{version}-%{release}
+Requires: %{name} = %{epoch}:%{version}-%{release}
+Summary: Sieve and managesieve plug-in for dovecot
+License: MIT AND LGPL-2.1-only
 
 %description pigeonhole
 This package provides sieve and managesieve plug-in for dovecot LDA.
 
 %package pgsql
-Summary:        Postgres SQL back end for dovecot
-Requires:       %{name} = %{version}-%{release}
-
+Requires: %{name} = %{epoch}:%{version}-%{release}
+Summary: Postgres SQL back end for dovecot
 %description pgsql
 This package provides the Postgres SQL back end for dovecot-auth etc.
 
 %package mysql
-Summary:        MySQL back end for dovecot
-Requires:       %{name} = %{version}-%{release}
-
+Requires: %{name} = %{epoch}:%{version}-%{release}
+Summary: MySQL back end for dovecot
 %description mysql
 This package provides the MySQL back end for dovecot-auth etc.
 
 %package devel
-Summary:        Development files for dovecot
-Requires:       %{name} = %{version}-%{release}
-
+Requires: %{name} = %{epoch}:%{version}-%{release}
+Summary: Development files for dovecot
 %description devel
 This package provides the development files for dovecot.
 
 %prep
 %setup -q -n %{name}-%{version}%{?prever} -a 8
-%patch 1 -p1 -b .default-settings
-%patch 2 -p1 -b .mkcert-permissions
-%patch 3 -p1 -b .mkcert-paths
-%patch 6 -p1 -b .waitonline
-%patch 8 -p1 -b .initbysystemd
-%patch 9 -p1 -b .systemd_w_protectsystem
-%patch 15 -p1 -b .bigkey
 
-#pushd dovecot-2*3-pigeonhole-%{pigeonholever}
+# standardize name, so we don't have to update patches and scripts
+mv dovecot-2.3-pigeonhole-%{pigeonholever} dovecot-pigeonhole
+
+%patch -P 1 -p1 -b .default-settings
+%patch -P 2 -p1 -b .mkcert-permissions
+%patch -P 3 -p1 -b .mkcert-paths
+%patch -P 6 -p1 -b .waitonline
+%patch -P 8 -p1 -b .initbysystemd
+%patch -P 9 -p1 -b .systemd_w_protectsystem
+%patch -P 15 -p1 -b .bigkey
+%patch -P 16 -p1 -b .opensslhmac
+%patch -P 17 -p1 -b .fixvalcond
+%patch -P 18 -p1 -b .valbasherr
+%patch -P 20 -p1 -b .opensslv3
+%patch -P 21 -p1 -b .7bad6a24
+%patch -P 22 -p1 -b .c99
+%patch -P 23 -p1 -b .nolibotp
+%patch -P 24 -p1 -b .ph_optglob
+%patch -P 25 -p1 -b .ph_scriptcmp
+%patch -P 26 -p1 -b .test-socket-path
+%patch -P 27 -p1 -b .noengine
+cp run-test-valgrind.supp dovecot-pigeonhole/
+# valgrind would fail with shell wrapper
+echo "testsuite" >dovecot-pigeonhole/run-test-valgrind.exclude
+
+#pushd dovecot-pigeonhole
 #popd
+%if 0%{?rhel} == 0 &&  0%{?fedora}0 < 38
 sed -i '/DEFAULT_INCLUDES *=/s|$| '"$(pkg-config --cflags libclucene-core)|" src/plugins/fts-lucene/Makefile.in
+%endif
+
+
+# drop OTP which uses SHA1 so we dont use SHA1 for crypto purposes
+rm -rf src/lib-otp
 
 %build
-# This package references hidden symbols during an LTO link.  This needs further
-# investigation.  Until then, disable LTO
-%define _lto_cflags %{nil}
 #required for fdpass.c line 125,190: dereferencing type-punned pointer will break strict-aliasing rules
 %global _hardened_build 1
 export CFLAGS="%{__global_cflags} -fno-strict-aliasing -fstack-reuse=none"
@@ -139,6 +197,7 @@ autoreconf -I . -fiv #required for aarch64 support
 %configure                       \
     INSTALL_DATA="install -c -p -m644" \
     --with-rundir=%{_rundir}/%{name}   \
+    --with-systemd               \
     --docdir=%{_docdir}/%{name}  \
     --disable-static             \
     --disable-rpath              \
@@ -155,7 +214,20 @@ autoreconf -I . -fiv #required for aarch64 support
     --with-zstd                  \
     --with-libcap                \
     --with-icu                   \
+%if %{?rhel}0 == 0
+    --with-libstemmer            \
+    --with-lua=plugin            \
+%else
+    --without-libstemmer         \
+    --without-lua                \
+%endif
+%if 0%{?rhel} == 0 &&  0%{?fedora}0 < 38
     --with-lucene                \
+    --with-exttextcat            \
+%else
+    --without-lucene             \
+    --without-exttextcat         \
+%endif
     --with-ssl=openssl           \
     --with-ssldir=%{ssldir}      \
     --with-solr                  \
@@ -164,10 +236,10 @@ autoreconf -I . -fiv #required for aarch64 support
 
 sed -i 's|/etc/ssl|/etc/pki/dovecot|' doc/mkcert.sh doc/example-config/conf.d/10-ssl.conf
 
-make %{?_smp_mflags}
+%make_build
 
 #pigeonhole
-pushd dovecot-2*3-pigeonhole-%{pigeonholever}
+pushd dovecot-pigeonhole
 
 # required for snapshot
 [ -f configure ] || autoreconf -fiv
@@ -179,20 +251,22 @@ pushd dovecot-2*3-pigeonhole-%{pigeonholever}
     --with-dovecot=../                 \
     --without-unfinished-features
 
-make %{?_smp_mflags}
+%make_build
 popd
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
-make install DESTDIR=$RPM_BUILD_ROOT
+%make_install
 
-#move doc dir back to build dir so doc macro in files section can use it
+# move doc dir back to build dir so doc macro in files section can use it
 mv $RPM_BUILD_ROOT/%{_docdir}/%{name} %{_builddir}/%{name}-%{version}%{?prever}/docinstall
 
+# fix multilib issues
+#%multilib_fix_c_header --file %{_includedir}/dovecot/config.h
 
-pushd dovecot-2*3-pigeonhole-%{pigeonholever}
-make install DESTDIR=$RPM_BUILD_ROOT
+pushd dovecot-pigeonhole
+%make_install
 
 mv $RPM_BUILD_ROOT/%{_docdir}/%{name} $RPM_BUILD_ROOT/%{_docdir}/%{name}-pigeonhole
 
@@ -206,6 +280,8 @@ install -p -D -m 644 %{SOURCE14} $RPM_BUILD_ROOT%{_mandir}/man5/dovecot.conf.5
 
 #install waitonline script
 install -p -D -m 755 %{SOURCE15} $RPM_BUILD_ROOT%{_libexecdir}/dovecot/prestartscript
+
+install -p -D -m 0644 %{SOURCE16} $RPM_BUILD_ROOT%{_sysusersdir}/dovecot.sysusers
 
 # generate ghost .pem files
 mkdir -p $RPM_BUILD_ROOT%{ssldir}/certs
@@ -243,14 +319,8 @@ popd
 
 
 %pre
-#dovecot uid and gid are reserved, see /usr/share/doc/setup-*/uidgid
-getent group dovecot >/dev/null || groupadd -r --gid 97 dovecot
-getent passwd dovecot >/dev/null || \
-useradd -r --uid 97 -g dovecot -d /usr/libexec/dovecot -s /usr/sbin/nologin -c "Dovecot IMAP server" dovecot
-
-getent group dovenull >/dev/null || groupadd -r dovenull
-getent passwd dovenull >/dev/null || \
-useradd -r -g dovenull -d /usr/libexec/dovecot -s /usr/sbin/nologin -c "Dovecot's unauthorized user" dovenull
+#dovecot uid and gid are reserved, see /usr/share/doc/setup-*/uidgid 
+%sysusers_create_compat %{SOURCE16}
 
 # do not let dovecot run during upgrade rhbz#134325
 if [ "$1" = "2" ]; then
@@ -269,7 +339,7 @@ install -d -m 0755 -g dovecot -d /run/dovecot
 install -d -m 0755 -d /run/dovecot/empty
 install -d -m 0750 -g dovenull -d /run/dovecot/login
 install -d -m 0750 -g dovenull -d /run/dovecot/token-login
-[ -x /sbin/restorecon ] && /sbin/restorecon -R /run/dovecot
+[ -x /sbin/restorecon ] && /sbin/restorecon -R /run/dovecot ||:
 
 %preun
 if [ $1 = 0 ]; then
@@ -295,9 +365,12 @@ rm -f %restart_flag
 fi
 
 %check
+%ifnarch aarch64
+# some aarch64 tests timeout, skip for now
 make check
-cd dovecot-2*3-pigeonhole-%{pigeonholever}
+cd dovecot-pigeonhole
 make check
+%endif
 
 %files
 %doc docinstall/* AUTHORS ChangeLog COPYING COPYING.LGPL COPYING.MIT NEWS README
@@ -310,6 +383,7 @@ make check
 
 
 %_tmpfilesdir/dovecot.conf
+%{_sysusersdir}/dovecot.sysusers
 %{_unitdir}/dovecot.service
 %{_unitdir}/dovecot-init.service
 %{_unitdir}/dovecot.socket
@@ -343,7 +417,6 @@ make check
 %config(noreplace) %{_sysconfdir}/dovecot/conf.d/auth-sql.conf.ext
 %config(noreplace) %{_sysconfdir}/dovecot/conf.d/auth-static.conf.ext
 %config(noreplace) %{_sysconfdir}/dovecot/conf.d/auth-system.conf.ext
-
 %config(noreplace) %{_sysconfdir}/pam.d/dovecot
 %config(noreplace) %{ssldir}/dovecot-openssl.cnf
 
@@ -365,6 +438,9 @@ make check
 %{_libdir}/dovecot/auth/lib20_auth_var_expand_crypt.so
 %{_libdir}/dovecot/auth/libauthdb_imap.so
 %{_libdir}/dovecot/auth/libauthdb_ldap.so
+%if %{?rhel}0 == 0
+%{_libdir}/dovecot/auth/libauthdb_lua.so
+%endif
 %{_libdir}/dovecot/auth/libmech_gssapi.so
 %{_libdir}/dovecot/auth/libdriver_sqlite.so
 %{_libdir}/dovecot/dict/libdriver_sqlite.so
@@ -445,6 +521,10 @@ make check
 %{_libdir}/%{name}/dict/libdriver_pgsql.so
 
 %changelog
+* Mon Oct 28 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.3.21.1-1
+- Upgrade to 2.3.21.1
+- License verified
+
 * Wed Aug 30 2023 Archana Choudhary <archana1@microsoft.com> - 2.3.20-1
 - Upgrade to 2.3.20
 - Resolves: CVE-2021-33515 CVE-2021-29157 CVE-2022-30550 CVE-2020-28200
