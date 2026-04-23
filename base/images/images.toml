@@ -2,6 +2,10 @@
 description = "VM Base Image"
 definition = { type = "kiwi", path = "vm-base/vm-base.kiwi" }
 
+[images.wsl]
+description = "WSL (Windows Subsystem for Linux) Rootfs"
+definition = { type = "kiwi", path = "wsl/wsl.kiwi" }
+
 [images.container-base]
 description = "Container Base Image"
 definition = { type = "kiwi", path = "container-base/container-base.kiwi", profile = "core" }
