@@ -87,11 +87,11 @@ pip3 install --ignore-installed \
             iniconfig==2.0.0 \
             installer==0.7.0 \
             pkginfo==1.12 \
-	    poetry==%{version} \
+	        poetry==%{version} \
             poetry_plugin_export==1.8.0 \
             requests_toolbelt==1.0.0 \
             tomlkit==0.12.5 \
-	    'urllib3<2'
+	        'urllib3<2'
 %pytest --deselect "tests/utils/env/test_env.py::test_env_no_pip"
 
 
