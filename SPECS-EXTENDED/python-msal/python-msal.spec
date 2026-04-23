@@ -1,6 +1,6 @@
 %global         srcname         msal
 %global         forgeurl        https://github.com/AzureAD/microsoft-authentication-library-for-python/
-%global         pypi_version    1.18.0b1
+%global         pypi_version    1.31.1
 %global         tag             %{pypi_version}
 
 # Most of the tests require network access, so they are disabled by default.
@@ -8,9 +8,9 @@
 
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Version:        1.18.0~b1
+Version:        1.31.1
 Name:           python-%{srcname}
-Release:        3%{?dist}
+Release:        1%{?dist}
 Summary:        Microsoft Authentication Library (MSAL) for Python
 
 License:        MIT
@@ -73,6 +73,9 @@ Summary:        %{summary}
 
 
 %changelog
+* Mon Mar 24 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 1.31.1-1
+- Update to 1.31.1
+
 * Wed Mar 15 2023 Muhammad Falak <mwani@microsoft.com> - 1.18.0~b1-3
 - Rename Source0 to `%{name}-%{version}.extension
 
