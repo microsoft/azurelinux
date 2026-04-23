@@ -160,12 +160,23 @@ stages:
               cat << EOF
               NOTE: It's possible more components changed between the source and target commits than displayed below.
                     This workflow only checks for updates in the 'sources' files and ignores all other changes.
+                    Only components present on the source commit are reported; components that exist only on the
+                    target branch are intentionally excluded. Pure renames are reported under their source-branch
+                    name, since the component name is part of the cache blob name we upload.
               EOF
 
+              # Diff direction is TARGET -> SOURCE so additions/modifications represent the source-side state:
+              #   * --no-renames decomposes a rename into an add (new path, source side) + delete (old path,
+              #     target side); we want the source-side name because the component name is part of the cache
+              #     blob name uploaded for the PR. It also silences git's diff.renameLimit warning on large diffs.
+              #   * --diff-filter=d (lowercase) excludes deletions, which here correspond to paths present only
+              #     on the target branch -- those components are not on the PR and must not be uploaded.
+              # Net effect: the listed '*/sources' files are exactly those present on the source commit that
+              # differ from target, including pure renames surfaced under the source-branch name.
               components=()
               while IFS= read -r line; do
                 components+=("$(basename "$(dirname "$line")")")
-              done < <(git diff "$SOURCE_COMMIT" "$TARGET_COMMIT" --name-only | grep '/sources$' | sort -u)
+              done < <(git diff --no-renames --diff-filter=d "$TARGET_COMMIT" "$SOURCE_COMMIT" --name-only | grep '/sources$' | sort -u)
 
               components="$(IFS=, ; echo "${components[*]}")"
               echo "Affected components: $components"
