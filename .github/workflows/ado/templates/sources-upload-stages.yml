@@ -134,8 +134,7 @@ stages:
               else
                 # CI/merge-queue trigger: extract the base branch from the merge-queue branch name.
                 # Branch format: refs/heads/gh-readonly-queue/{base_branch}/pr-{pr_number}-{head_sha}
-                # Using 'test/' branches until ready with the merge queue, but the parsing logic is the same.
-                if ! base_branch=$(grep -oP '(?<=test/gh-readonly-queue/).+(?=/pr-[^/]+$)' <<< "$SOURCE_BRANCH"); then
+                if ! base_branch=$(grep -oP '(?<=^test/gh-readonly-queue/).+(?=/pr-[^/]+$)' <<< "$SOURCE_BRANCH"); then
                   echo "##[error]Unsupported SOURCE_BRANCH '$SOURCE_BRANCH' for non-PullRequest build. Expected 'refs/heads/gh-readonly-queue/<base>/pr-<n>-<sha>'."
                   exit 1
                 fi
