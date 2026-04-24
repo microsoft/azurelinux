@@ -126,7 +126,9 @@ stages:
 
               # Full history is needed for spec rendering to work.
               if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then
+                echo "##[group]Fetching full git history"
                 git fetch --unshallow
+                echo "##[endgroup]"
               fi
 
               # TODO: Replace with using the TOML config to read the specs dir once available.
