@@ -16,6 +16,7 @@ Patch4:         CVE-2026-33947.patch
 Patch5:         CVE-2026-33948.patch
 Patch6:         CVE-2026-39956.patch
 Patch7:         CVE-2026-39979.patch
+Patch8:         CVE-2026-40164.patch
 BuildRequires:  bison
 BuildRequires:  chrpath
 BuildRequires:  flex
@@ -67,7 +68,7 @@ make check
 
 %changelog
 * Fri Apr 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.6-6
-- Patch for CVE-2026-39979, CVE-2026-39956, CVE-2026-33948, CVE-2026-33947, CVE-2026-32316
+- Patch for CVE-2026-39979, CVE-2026-39956, CVE-2026-33948, CVE-2026-33947, CVE-2026-32316, CVE-2026-40164
 
 * Wed Oct 29 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.6-5
 - Patch for CVE-2025-9403
