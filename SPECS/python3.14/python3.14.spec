@@ -13,9 +13,6 @@ Distribution:   Azure Linux
 Group:          System Environment/Programming
 URL:            https://www.python.org/
 Source0:        https://www.python.org/ftp/python/%{version}/Python-%{version}.tar.xz
-# pathfix.py was provided by the previous Python source bundle (Python-3.9.14.tar.xz)
-# It has been removed in later source bundles, but as our packages still require it, we will still provide for now.
-Source1:        https://github.com/python/cpython/blob/3.9/Tools/scripts/pathfix.py
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -129,10 +126,6 @@ export OPT="%{extension_cflags} %{openssl_flags}"
 # Windows executables get installed by pip - we don't need these.
 find %{buildroot}%{_libdir}/python%{majmin}/site-packages -name '*.exe' -delete -print
 
-# Install pathfix.py to bindir under the versioned name only.
-# The unversioned /usr/bin/pathfix.py is owned by the default python3 package.
-cp -pv %{SOURCE1} %{buildroot}%{_bindir}/pathfix%{majmin}.py
-
 # Remove unversioned filesystem entries that belong to the default python3
 # (3.12) package. Python 3.14 installs strictly side-by-side under versioned
 # paths, so these unversioned symlinks / stable-ABI files must not be shipped
@@ -201,7 +194,6 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/pkgconfig/python-%{majmin}-embed.pc
 %{_libdir}/libpython%{majmin}.so
 %{_bindir}/python%{majmin}-config
-%{_bindir}/pathfix%{majmin}.py
 %doc Misc/README.valgrind Misc/valgrind-python.supp
 %exclude %{_bindir}/idle*
 
