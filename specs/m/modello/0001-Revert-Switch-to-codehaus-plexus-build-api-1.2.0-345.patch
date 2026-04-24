@@ -1,0 +1,184 @@
+From f892c4e5906fcacaec99a146a2a36dd4ca5d5166 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Sun, 27 Aug 2023 07:49:01 +0200
+Subject: [PATCH] Revert "Switch to codehaus plexus-build-api 1.2.0 (#345)"
+
+This reverts commit c689155598257f225963b9332f57fe72dfd78753.
+---
+ modello-core/pom.xml                                      | 2 +-
+ .../codehaus/modello/plugin/AbstractModelloGenerator.java | 2 +-
+ modello-maven-plugin/pom.xml                              | 2 +-
+ .../modello/maven/AbstractModelloGeneratorMojo.java       | 2 +-
+ .../codehaus/modello/maven/ModelloConvertersMojoTest.java | 8 +-------
+ .../org/codehaus/modello/maven/ModelloJavaMojoTest.java   | 8 +-------
+ modello-plugins/modello-plugin-java/pom.xml               | 2 +-
+ .../codehaus/modello/AbstractModelloGeneratorTest.java    | 6 ------
+ pom.xml                                                   | 4 ++--
+ 9 files changed, 9 insertions(+), 27 deletions(-)
+
+diff --git a/modello-core/pom.xml b/modello-core/pom.xml
+index 636c03fe..7f9adf39 100644
+--- a/modello-core/pom.xml
++++ b/modello-core/pom.xml
+@@ -13,7 +13,7 @@
+ 
+   <dependencies>
+     <dependency>
+-      <groupId>org.codehaus.plexus</groupId>
++      <groupId>org.sonatype.plexus</groupId>
+       <artifactId>plexus-build-api</artifactId>
+     </dependency>
+     <dependency>
+diff --git a/modello-core/src/main/java/org/codehaus/modello/plugin/AbstractModelloGenerator.java b/modello-core/src/main/java/org/codehaus/modello/plugin/AbstractModelloGenerator.java
+index bb59b439..334e16e8 100644
+--- a/modello-core/src/main/java/org/codehaus/modello/plugin/AbstractModelloGenerator.java
++++ b/modello-core/src/main/java/org/codehaus/modello/plugin/AbstractModelloGenerator.java
+@@ -43,7 +43,6 @@ import org.codehaus.modello.model.ModelField;
+ import org.codehaus.modello.model.Version;
+ import org.codehaus.plexus.PlexusConstants;
+ import org.codehaus.plexus.PlexusContainer;
+-import org.codehaus.plexus.build.BuildContext;
+ import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+ import org.codehaus.plexus.context.Context;
+ import org.codehaus.plexus.context.ContextException;
+@@ -51,6 +50,7 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
+ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+ import org.codehaus.plexus.util.StringUtils;
+ import org.codehaus.plexus.util.io.CachingWriter;
++import org.sonatype.plexus.build.incremental.BuildContext;
+ 
+ /**
+  * @author <a href="mailto:jason@modello.org">Jason van Zyl</a>
+diff --git a/modello-maven-plugin/pom.xml b/modello-maven-plugin/pom.xml
+index 3687fb05..57227449 100644
+--- a/modello-maven-plugin/pom.xml
++++ b/modello-maven-plugin/pom.xml
+@@ -121,7 +121,7 @@
+       <artifactId>modello-plugin-velocity</artifactId>
+     </dependency>
+     <dependency>
+-      <groupId>org.codehaus.plexus</groupId>
++      <groupId>org.sonatype.plexus</groupId>
+       <artifactId>plexus-build-api</artifactId>
+     </dependency>
+   </dependencies>
+diff --git a/modello-maven-plugin/src/main/java/org/codehaus/modello/maven/AbstractModelloGeneratorMojo.java b/modello-maven-plugin/src/main/java/org/codehaus/modello/maven/AbstractModelloGeneratorMojo.java
+index 762b5784..51b75a12 100644
+--- a/modello-maven-plugin/src/main/java/org/codehaus/modello/maven/AbstractModelloGeneratorMojo.java
++++ b/modello-maven-plugin/src/main/java/org/codehaus/modello/maven/AbstractModelloGeneratorMojo.java
+@@ -41,8 +41,8 @@ import org.codehaus.modello.ModelloParameterConstants;
+ import org.codehaus.modello.core.ModelloCore;
+ import org.codehaus.modello.model.Model;
+ import org.codehaus.modello.model.ModelValidationException;
+-import org.codehaus.plexus.build.BuildContext;
+ import org.codehaus.plexus.util.StringUtils;
++import org.sonatype.plexus.build.incremental.BuildContext;
+ 
+ /**
+  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
+diff --git a/modello-maven-plugin/src/test/java/org/codehaus/modello/maven/ModelloConvertersMojoTest.java b/modello-maven-plugin/src/test/java/org/codehaus/modello/maven/ModelloConvertersMojoTest.java
+index 779f178d..23f466d3 100644
+--- a/modello-maven-plugin/src/test/java/org/codehaus/modello/maven/ModelloConvertersMojoTest.java
++++ b/modello-maven-plugin/src/test/java/org/codehaus/modello/maven/ModelloConvertersMojoTest.java
+@@ -26,10 +26,9 @@ import java.io.File;
+ import java.util.Arrays;
+ 
+ import org.codehaus.modello.core.ModelloCore;
+-import org.codehaus.plexus.ContainerConfiguration;
+ import org.codehaus.plexus.PlexusTestCase;
+-import org.codehaus.plexus.build.BuildContext;
+ import org.codehaus.plexus.util.FileUtils;
++import org.sonatype.plexus.build.incremental.BuildContext;
+ 
+ /**
+  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
+@@ -99,9 +98,4 @@ public class ModelloConvertersMojoTest extends PlexusTestCase {
+ 
+         assertFalse("The generated java file doesn't exist: '" + javaFile.getAbsolutePath() + "'.", javaFile.exists());
+     }
+-
+-    @Override
+-    protected void customizeContainerConfiguration(ContainerConfiguration containerConfiguration) {
+-        containerConfiguration.setClassPathScanning("cache");
+-    }
+ }
+diff --git a/modello-maven-plugin/src/test/java/org/codehaus/modello/maven/ModelloJavaMojoTest.java b/modello-maven-plugin/src/test/java/org/codehaus/modello/maven/ModelloJavaMojoTest.java
+index f15b4031..bb5bb7cf 100644
+--- a/modello-maven-plugin/src/test/java/org/codehaus/modello/maven/ModelloJavaMojoTest.java
++++ b/modello-maven-plugin/src/test/java/org/codehaus/modello/maven/ModelloJavaMojoTest.java
+@@ -26,10 +26,9 @@ import java.io.File;
+ import java.util.Arrays;
+ 
+ import org.codehaus.modello.core.ModelloCore;
+-import org.codehaus.plexus.ContainerConfiguration;
+ import org.codehaus.plexus.PlexusTestCase;
+-import org.codehaus.plexus.build.BuildContext;
+ import org.codehaus.plexus.util.FileUtils;
++import org.sonatype.plexus.build.incremental.BuildContext;
+ 
+ /**
+  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
+@@ -97,9 +96,4 @@ public class ModelloJavaMojoTest extends PlexusTestCase {
+         assertFalse(
+                 "The generated java file shouldn't exist: '" + javaFile.getAbsolutePath() + "'.", javaFile.exists());
+     }
+-
+-    @Override
+-    protected void customizeContainerConfiguration(ContainerConfiguration containerConfiguration) {
+-        containerConfiguration.setClassPathScanning("cache");
+-    }
+ }
+diff --git a/modello-plugins/modello-plugin-java/pom.xml b/modello-plugins/modello-plugin-java/pom.xml
+index ea94c3c6..6ba7c01f 100644
+--- a/modello-plugins/modello-plugin-java/pom.xml
++++ b/modello-plugins/modello-plugin-java/pom.xml
+@@ -17,7 +17,7 @@
+       <artifactId>plexus-utils</artifactId>
+     </dependency>
+     <dependency>
+-      <groupId>org.codehaus.plexus</groupId>
++      <groupId>org.sonatype.plexus</groupId>
+       <artifactId>plexus-build-api</artifactId>
+     </dependency>
+ 
+diff --git a/modello-test/src/main/java/org/codehaus/modello/AbstractModelloGeneratorTest.java b/modello-test/src/main/java/org/codehaus/modello/AbstractModelloGeneratorTest.java
+index f46cece1..e71231fb 100644
+--- a/modello-test/src/main/java/org/codehaus/modello/AbstractModelloGeneratorTest.java
++++ b/modello-test/src/main/java/org/codehaus/modello/AbstractModelloGeneratorTest.java
+@@ -32,7 +32,6 @@ import java.io.Reader;
+ import java.util.Optional;
+ import java.util.Properties;
+ 
+-import org.codehaus.plexus.ContainerConfiguration;
+ import org.codehaus.plexus.PlexusTestCase;
+ import org.codehaus.plexus.util.FileUtils;
+ import org.codehaus.plexus.util.ReaderFactory;
+@@ -108,9 +107,4 @@ public abstract class AbstractModelloGeneratorTest extends PlexusTestCase {
+                 new File(getOutputDirectory(), generatedXsdName));
+         return saxParser;
+     }
+-
+-    @Override
+-    protected void customizeContainerConfiguration(ContainerConfiguration containerConfiguration) {
+-        containerConfiguration.setClassPathScanning("cache");
+-    }
+ }
+diff --git a/pom.xml b/pom.xml
+index 88f8ed6f..9a4ac6df 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -347,9 +347,9 @@
+         <version>4.0.0</version>
+       </dependency>
+       <dependency>
+-        <groupId>org.codehaus.plexus</groupId>
++        <groupId>org.sonatype.plexus</groupId>
+         <artifactId>plexus-build-api</artifactId>
+-        <version>1.2.0</version>
++        <version>0.0.7</version>
+       </dependency>
+       <dependency>
+         <groupId>junit</groupId>
+-- 
+2.41.0
+

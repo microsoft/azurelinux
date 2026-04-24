@@ -1,0 +1,24 @@
+Workaround for FTBFS
+
+error: cannot find attribute `sanitize` in this scope
+   --> ../../third_party/crabbyavif/src/src/capi/io.rs:210:41
+    |
+210 |     #[cfg_attr(feature = "disable_cfi", sanitize(cfi = "off"))]
+
+diff -up chromium-142.0.7444.52/third_party/crabbyavif/BUILD.gn.me chromium-142.0.7444.52/third_party/crabbyavif/BUILD.gn
+--- chromium-142.0.7444.52/third_party/crabbyavif/BUILD.gn.me	2025-10-27 10:40:59.373768499 +0100
++++ chromium-142.0.7444.52/third_party/crabbyavif/BUILD.gn	2025-10-27 10:45:12.142749942 +0100
+@@ -197,12 +197,11 @@ rust_static_library("crabbyavif") {
+     "dav1d",
+     "libyuv",
+     "capi",
+-    "disable_cfi",
+   ]
+ 
+   # Required for disable_cfi feature.
+   configs -= [ "//build/config/compiler:disallow_unstable_features" ]
+-  rustflags = [ "-Zallow-features=sanitize" ]
++  rustflags = [ "-Zallow-features=no_sanitize" ]
+ 
+   public_deps = [ ":header_files" ]
+   deps = [

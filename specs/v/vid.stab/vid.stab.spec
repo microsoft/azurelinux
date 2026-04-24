@@ -9,7 +9,7 @@
 
 Name:           vid.stab
 Version:        1.1.1
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        Video stabilize library for fmpeg, mlt or transcode
 # Automatically converted from old format: GPLv2+ - review is highly recommended.
 License:        GPL-2.0-or-later

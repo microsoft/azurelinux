@@ -1,0 +1,28 @@
+--- valgrind/glibc-2.X.supp.in.jj	2011-10-26 23:24:45.000000000 +0200
++++ valgrind/glibc-2.X.supp.in	2012-05-07 10:55:20.395942656 +0200
+@@ -124,7 +124,7 @@
+    glibc-2.5.x-on-SUSE-10.2-(PPC)-2a
+    Memcheck:Cond
+    fun:index
+-   obj:*ld-@GLIBC_VERSION@.*.so
++   obj:*ld-@GLIBC_VERSION@*.so
+ }
+ {
+    glibc-2.5.x-on-SuSE-10.2-(PPC)-2b
+@@ -136,14 +136,14 @@
+    glibc-2.5.5-on-SuSE-10.2-(PPC)-2c
+    Memcheck:Addr4
+    fun:index
+-   obj:*ld-@GLIBC_VERSION@.*.so
++   obj:*ld-@GLIBC_VERSION@*.so
+ }
+ {
+    glibc-2.3.5-on-SuSE-10.1-(PPC)-3
+    Memcheck:Addr4
+    fun:*wordcopy_fwd_dest_aligned*
+    fun:mem*cpy
+-   obj:*lib*@GLIBC_VERSION@.*.so
++   obj:*lib*@GLIBC_VERSION@*.so
+ }
+ 
+ {

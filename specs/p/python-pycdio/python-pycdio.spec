@@ -3,7 +3,7 @@
 
 Name:		python-pycdio
 Version:	2.1.1
-Release:	7%{?dist}
+Release: 8%{?dist}
 Summary:	A Python interface to the CD Input and Control library
 
 License:	GPL-3.0-or-later

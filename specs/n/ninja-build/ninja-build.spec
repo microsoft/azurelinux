@@ -7,7 +7,7 @@
 
 Name:           ninja-build
 Version:        1.13.2
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Small build system with a focus on speed
 License:        Apache-2.0
 URL:            https://ninja-build.org/

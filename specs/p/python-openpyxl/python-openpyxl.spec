@@ -10,7 +10,7 @@ Office Open XML format.
 
 Name:           python-%{pypi_name}
 Version:        3.1.5
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        %{sum}
 
 # Automatically converted from old format: MIT and Python - review is highly recommended.

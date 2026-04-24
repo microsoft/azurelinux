@@ -3,7 +3,7 @@
 
 Name:           perl-File-Find-Rule-Perl
 Version:        1.16
-Release:        11%{?dist}
+Release: 12%{?dist}
 Summary:        Common rules for searching for Perl things
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/File-Find-Rule-Perl

@@ -3,7 +3,7 @@
 
 Name:           nfs4-acl-tools
 Version:        0.4.2
-Release:        9%{?dist}
+Release: 10%{?dist}
 Summary:        The nfs4 ACL tools
 License:        LGPL-2.1-or-later
 URL:            http://git.linux-nfs.org/?p=steved/nfs4-acl-tools.git;a=summary

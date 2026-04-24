@@ -17,7 +17,7 @@
 
 Name:           perl-Future-AsyncAwait
 Version:        0.71
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Deferred subroutine syntax for futures
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Future-AsyncAwait

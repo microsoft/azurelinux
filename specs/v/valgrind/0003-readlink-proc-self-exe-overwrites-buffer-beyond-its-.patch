@@ -1,0 +1,520 @@
+From 7de247c998049db64c4df8cb8bc8e481493f3b8e Mon Sep 17 00:00:00 2001
+From: Paul Floyd <pjfloyd@wanadoo.fr>
+Date: Sat, 3 Jan 2026 18:24:34 +0100
+Subject: [PATCH 3/6] readlink("/proc/self/exe") overwrites buffer beyond its
+ return value
+
+https://bugs.kde.org/show_bug.cgi?id=514094
+
+Squashed cherry-picks:
+
+Solaris: set VG_(resolved_exename) in load_client()
+
+  Haven't needed it yet, but I would like to try using it in the
+  readlink syscall wrapper.
+
+(cherry picked from commit bf154d815a9fd7f4aaae97e31aa03cecf69448d4)
+
+Bug 514094 - readlink("/proc/self/exe") overwrites buffer beyond its return value
+
+  Used the reproducer as the basis for a test on Solaris and Linux.
+
+(cherry picked from commit 5c0f5e604bc3a4e8822ea59c488c123af6284afd)
+
+readlink[at] syswrap: limit copy to bufsiz when path is proc self exe
+
+(cherry picked from commit bd9edb8fcd0a8692d865e08fab2a573a4cde4c16)
+
+Regtest: add missing readlinkat_self files
+
+(cherry picked from commit 987034c44105cdc2f6f8d84751135d23bd5c37b6)
+
+regtest: fix warning
+
+  Added a nice const named variable then didn't use it
+
+(cherry picked from commit dae37ecd2692e0e5beba77c296c2648ebbf47637)
+
+Fix bug514094,vgtest typo in none/tests/Makefile.am
+
+(cherry picked from commit 294742a2d9f431fd2dcd73db161f67fb12ddd833)
+
+syswrap readlink and linux readlinkat: check that buf is accessible for proc self exe case
+
+  Also update the t testcases to cover this.
+
+(cherry picked from commit 8d8023d107699c7c2d97acf2dcb77bae71c0b1cf)
+
+solaris readlinkat: check that buf is accessible for proc self path a.out
+
+(cherry picked from commit 827a1b8c307a2eafa001788565e14af3445f2151)
+---
+ .gitignore                                    |  3 ++
+ NEWS                                          |  1 +
+ coregrind/m_initimg/initimg-solaris.c         |  9 ++++
+ coregrind/m_syswrap/syswrap-generic.c         | 29 +++++++----
+ coregrind/m_syswrap/syswrap-linux.c           | 28 +++++++----
+ coregrind/m_syswrap/syswrap-solaris.c         | 13 +++--
+ none/tests/Makefile.am                        |  3 ++
+ none/tests/bug514094.c                        | 48 +++++++++++++++++++
+ none/tests/bug514094.stderr.exp               |  2 +
+ none/tests/bug514094.vgtest                   |  2 +
+ none/tests/linux/Makefile.am                  |  3 ++
+ none/tests/linux/readlinkat_self.c            | 34 +++++++++++++
+ none/tests/linux/readlinkat_self.stderr.exp   |  2 +
+ none/tests/linux/readlinkat_self.vgtest       |  1 +
+ none/tests/solaris/Makefile.am                |  3 ++
+ none/tests/solaris/readlinkat_self.c          | 34 +++++++++++++
+ none/tests/solaris/readlinkat_self.stderr.exp |  2 +
+ none/tests/solaris/readlinkat_self.vgtest     |  1 +
+ 18 files changed, 194 insertions(+), 24 deletions(-)
+ create mode 100644 none/tests/bug514094.c
+ create mode 100644 none/tests/bug514094.stderr.exp
+ create mode 100644 none/tests/bug514094.vgtest
+ create mode 100644 none/tests/linux/readlinkat_self.c
+ create mode 100644 none/tests/linux/readlinkat_self.stderr.exp
+ create mode 100644 none/tests/linux/readlinkat_self.vgtest
+ create mode 100644 none/tests/solaris/readlinkat_self.c
+ create mode 100644 none/tests/solaris/readlinkat_self.stderr.exp
+ create mode 100644 none/tests/solaris/readlinkat_self.vgtest
+
+diff --git a/NEWS b/NEWS
+index 4e6cb3de9125..cca48f513138 100644
+--- a/NEWS
++++ b/NEWS
+@@ -8,6 +8,7 @@ The following bugs have been fixed or resolved on this branch.
+ 511972  valgrind-3.26.0 tests fail to build on upcomig gcc-16:
+         unrecognized command-line option
+         '-Wno-alloc-size-larger-than=18446744073709551615'
++514094  readlink("/proc/self/exe") overwrites buffer beyond its return value
+ 
+ To see details of a given bug, visit
+   https://bugs.kde.org/show_bug.cgi?id=XXXXXX
+diff --git a/coregrind/m_initimg/initimg-solaris.c b/coregrind/m_initimg/initimg-solaris.c
+index 79072f3a85df..bd2d822e5d20 100644
+--- a/coregrind/m_initimg/initimg-solaris.c
++++ b/coregrind/m_initimg/initimg-solaris.c
+@@ -94,6 +94,15 @@ static void load_client(/*OUT*/ExeInfo *info,
+       /*NOTREACHED*/
+    }
+    VG_(strcpy)(out_exe_name, exe_name);
++   if (VG_(resolved_exename) == NULL) {
++      HChar interp_name[VKI_PATH_MAX];
++      if (VG_(try_get_interp)(exe_name, interp_name, VKI_PATH_MAX)) {
++         exe_name = interp_name;
++      }
++      HChar resolved_name[VKI_PATH_MAX];
++      VG_(realpath)(exe_name, resolved_name);
++      VG_(resolved_exename) = VG_(strdup)("initimg-solaris.lc.1", resolved_name);
++   }
+ 
+    /* Set initial brk values. */
+    if (info->ldsoexec) {
+diff --git a/coregrind/m_syswrap/syswrap-generic.c b/coregrind/m_syswrap/syswrap-generic.c
+index 37f312fe8f4b..f39dbcdba055 100644
+--- a/coregrind/m_syswrap/syswrap-generic.c
++++ b/coregrind/m_syswrap/syswrap-generic.c
+@@ -5060,20 +5060,16 @@ POST(sys_poll)
+ 
+ PRE(sys_readlink)
+ {
+-   FUSE_COMPATIBLE_MAY_BLOCK();
+    PRINT("sys_readlink ( %#" FMT_REGWORD "x(%s), %#" FMT_REGWORD "x, %llu )",
+          ARG1, (char*)(Addr)ARG1, ARG2, (ULong)ARG3);
+    PRE_REG_READ3(long, "readlink",
+                  const char *, path, char *, buf, int, bufsiz);
+    PRE_MEM_RASCIIZ( "readlink(path)", ARG1 );
+    PRE_MEM_WRITE( "readlink(buf)", ARG2,ARG3 );
+-}
+ 
+-POST(sys_readlink)
+-{
++   Bool fuse_may_block = True;
+ #if defined(VGO_linux) || defined(VGO_solaris)
+    {
+-      Word saved = SYSNO;
+ #if defined(VGO_linux)
+ #define PID_EXEPATH  "/proc/%d/exe"
+ #define SELF_EXEPATH "/proc/self/exe"
+@@ -5092,14 +5088,27 @@ POST(sys_readlink)
+       VG_(sprintf)(name, PID_EXEPATH, VG_(getpid)());
+       if (ML_(safe_to_deref)(arg1s, 1)
+           && (VG_STREQ(arg1s, name) || VG_STREQ(arg1s, SELF_EXEPATH))) {
+-         VG_(sprintf)(name, SELF_EXEFD, VG_(cl_exec_fd));
+-         SET_STATUS_from_SysRes( VG_(do_syscall3)(saved, (UWord)name, 
+-                                                  ARG2, ARG3));
++         HChar* out_name = (HChar*)ARG2;
++         SizeT res = VG_(strlen)(VG_(resolved_exename));
++         res = VG_MIN(res, ARG3);
++         if (ML_(safe_to_deref)(out_name, res)) {
++            VG_(strncpy)(out_name, VG_(resolved_exename), res);
++            SET_STATUS_Success(res);
++         } else {
++            SET_STATUS_Failure(VKI_EFAULT);
++         }
++         fuse_may_block = False;
+       }
+    }
+ #endif
+-   if (SUCCESS && RES > 0)
+-      POST_MEM_WRITE( ARG2, RES );
++
++   if (fuse_may_block)
++       FUSE_COMPATIBLE_MAY_BLOCK();
++}
++
++POST(sys_readlink)
++{
++   POST_MEM_WRITE( ARG2, RES );
+ }
+ 
+ PRE(sys_readv)
+diff --git a/coregrind/m_syswrap/syswrap-linux.c b/coregrind/m_syswrap/syswrap-linux.c
+index e8b200385b8f..f1970cd8be9f 100644
+--- a/coregrind/m_syswrap/syswrap-linux.c
++++ b/coregrind/m_syswrap/syswrap-linux.c
+@@ -6468,14 +6468,10 @@ PRE(sys_readlinkat)
+    ML_(fd_at_check_allowed)(SARG1, (const HChar*)ARG2, "readlinkat", tid, status);
+    PRE_MEM_RASCIIZ( "readlinkat(path)", ARG2 );
+    PRE_MEM_WRITE( "readlinkat(buf)", ARG3,ARG4 );
+-}
+ 
+-POST(sys_readlinkat)
+-{
++   Bool fuse_may_block = True;
+    HChar name[30];       // large enough
+-   Word  saved = SYSNO;
+ 
+-   // @todo PJF why is this done in POST and not in PRE?
+    /*
+     * Handle the case where readlinkat is looking at /proc/self/exe or
+     * /proc/<pid>/exe.
+@@ -6484,13 +6480,25 @@ POST(sys_readlinkat)
+    if (ML_(safe_to_deref)((void*)(Addr)ARG2, 1)
+        && (VG_(strcmp)((HChar *)(Addr)ARG2, name) == 0
+            || VG_(strcmp)((HChar *)(Addr)ARG2, "/proc/self/exe") == 0)) {
+-      VG_(sprintf)(name, "/proc/self/fd/%d", VG_(cl_exec_fd));
+-      SET_STATUS_from_SysRes( VG_(do_syscall4)(saved, ARG1, (UWord)name, 
+-                                               ARG3, ARG4));
++       HChar* out_name = (HChar*)ARG3;
++       SizeT res = VG_(strlen)(VG_(resolved_exename));
++       res = VG_MIN(res, ARG4);
++       if (ML_(safe_to_deref)(out_name, res)) {
++          VG_(strncpy)(out_name, VG_(resolved_exename), res);
++          SET_STATUS_Success(res);
++       } else {
++          SET_STATUS_Failure(VKI_EFAULT);
++       }
++       fuse_may_block = False;
+    }
+ 
+-   if (SUCCESS && RES > 0)
+-      POST_MEM_WRITE( ARG3, RES );
++   if (fuse_may_block)
++      FUSE_COMPATIBLE_MAY_BLOCK();
++}
++
++POST(sys_readlinkat)
++{
++   POST_MEM_WRITE( ARG3, RES );
+ }
+ 
+ PRE(sys_fchmodat)
+diff --git a/coregrind/m_syswrap/syswrap-solaris.c b/coregrind/m_syswrap/syswrap-solaris.c
+index 2665633f435f..57af54fdc3be 100644
+--- a/coregrind/m_syswrap/syswrap-solaris.c
++++ b/coregrind/m_syswrap/syswrap-solaris.c
+@@ -2295,7 +2295,6 @@ PRE(sys_readlinkat)
+    /* ssize_t readlinkat(int dfd, const char *path, char *buf,
+                          size_t bufsiz); */
+    HChar name[30];    // large enough
+-   Word saved = SYSNO;
+ 
+    /* Interpret the first argument as 32-bit value even on 64-bit architecture.
+       This is different from Linux, for example, where glibc sign-extends it. */
+@@ -2317,9 +2316,15 @@ PRE(sys_readlinkat)
+    if (ML_(safe_to_deref)((void*)ARG2, 1) &&
+        (!VG_(strcmp)((HChar*)ARG2, name) ||
+         !VG_(strcmp)((HChar*)ARG2, "/proc/self/path/a.out"))) {
+-      VG_(sprintf)(name, "/proc/self/path/%d", VG_(cl_exec_fd));
+-      SET_STATUS_from_SysRes(VG_(do_syscall4)(saved, dfd, (UWord)name, ARG3,
+-                                              ARG4));
++       HChar* out_name = (HChar*)ARG3;
++       SizeT res = VG_(strlen)(VG_(resolved_exename));
++       res = VG_MIN(res, ARG4);
++       if (ML_(safe_to_deref)(out_name, res)) {
++          VG_(strncpy)(out_name, VG_(resolved_exename), res);
++          SET_STATUS_Success(res);
++       } else {
++          SET_STATUS_Failure(VKI_EFAULT);
++       }
+    }
+ }
+ 
+diff --git a/none/tests/Makefile.am b/none/tests/Makefile.am
+index a95d66436df8..a5e03de77cbb 100644
+--- a/none/tests/Makefile.am
++++ b/none/tests/Makefile.am
+@@ -111,6 +111,7 @@ EXTRA_DIST = \
+ 	bug290061.vgtest bug290061.stderr.exp \
+ 	bug491394.vgtest bug491394.stderr.exp \
+ 	bug492678.vgtest bug492678.stderr.exp \
++	bug514094.vgtest bug514094.stderr.exp \
+ 	closeall.stderr.exp closeall.vgtest \
+ 	cmdline0.stderr.exp cmdline0.stdout.exp cmdline0.vgtest \
+ 	cmdline1.stderr.exp cmdline1.stdout.exp cmdline1.vgtest \
+@@ -287,6 +288,7 @@ check_PROGRAMS = \
+ 	bug129866 bug234814 \
+ 	bug290061 \
+ 	bug492678 \
++	bug514094 \
+ 	closeall coolo_strlen \
+ 	discard exec-sigmask execve faultstatus fcntl_setown \
+ 	fdleak_cmsg fdleak_creat fdleak_doubleclose0 fdleak_dup fdleak_dup2 \
+@@ -392,6 +394,7 @@ bug290061_LDFLAGS	= @FLAG_PIE@
+ bug491394_LDADD		= -lc
+ bug491394_LDFLAGS	= -nostdlib -static
+ bug491394_CFLAGS	= ${AM_CFLAGS} -Os
++bug514094_CFLAGS	= ${AM_CFLAGS} @FLAG_W_NO_STRINGOP_OVERFLOW@
+ execve_CFLAGS		= $(AM_CFLAGS) @FLAG_W_NO_NONNULL@
+ if VGCONF_OS_IS_SOLARIS
+ fcntl_setown_LDADD	= -lsocket -lnsl
+diff --git a/none/tests/bug514094.c b/none/tests/bug514094.c
+new file mode 100644
+index 000000000000..a62a6406b722
+--- /dev/null
++++ b/none/tests/bug514094.c
+@@ -0,0 +1,48 @@
++#include <stdio.h>
++#include <unistd.h>
++#include <string.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <assert.h>
++#include <limits.h>
++#include <errno.h>
++#include "../../config.h"
++
++int main(int argc, char** argv)
++{
++   char buf[PATH_MAX];
++   memset(buf, 0, PATH_MAX);
++#if defined(VGO_solaris)
++   int ret = readlink("/proc/self/path/a.out", buf, PATH_MAX);
++#else
++   // Linux, and maybe one day NetBSD
++   // other platforms excluded by .vgtest prereq
++   int ret = readlink("/proc/self/exe", buf, PATH_MAX);
++#endif
++   if (argc > 1) {
++      printf("ret = %d, buf = %.64s\n", ret, buf);
++   }
++   char resolved[PATH_MAX];
++   realpath(argv[0], resolved);
++   assert(strcmp(resolved, buf) == 0);
++
++   const size_t small_buf_size = 11;
++   char small_buf[small_buf_size];
++   memset(small_buf, '#', small_buf_size);
++#if defined(VGO_solaris)
++   ret = readlink("/proc/self/path/a.out", small_buf, 10);
++#else
++   ret = readlink("/proc/self/exe", small_buf, 10);
++#endif
++   assert(strncmp(resolved, small_buf, 10) == 0);
++   assert(small_buf[10] == '#');
++
++#if defined(VGO_solaris)
++   ret = readlink("/proc/self/path/a.out", (char*)1, 100);
++#else
++   ret = readlink("/proc/self/exe", (char*)1, 100);
++#endif
++   assert(ret == -1);
++   assert(errno = EFAULT);
++}
++
+diff --git a/none/tests/bug514094.stderr.exp b/none/tests/bug514094.stderr.exp
+new file mode 100644
+index 000000000000..139597f9cb07
+--- /dev/null
++++ b/none/tests/bug514094.stderr.exp
+@@ -0,0 +1,2 @@
++
++
+diff --git a/none/tests/bug514094.vgtest b/none/tests/bug514094.vgtest
+new file mode 100644
+index 000000000000..292428cb7696
+--- /dev/null
++++ b/none/tests/bug514094.vgtest
+@@ -0,0 +1,2 @@
++prereq: ../../tests/os_test solaris || ../../tests/os_test linux
++prog: bug514094
+diff --git a/none/tests/linux/Makefile.am b/none/tests/linux/Makefile.am
+index 55426e2b2664..3692c6ff1f2a 100644
+--- a/none/tests/linux/Makefile.am
++++ b/none/tests/linux/Makefile.am
+@@ -21,6 +21,7 @@ EXTRA_DIST = \
+ 	mremap6.stderr.exp mremap6.vgtest \
+ 	open_client.stderr.exp open_client.vgtest \
+ 	pthread-stack.stderr.exp pthread-stack.vgtest \
++	readlinkat_self.stderr.exp readlinkat_self.vgtest \
+ 	stack-overflow.stderr.exp stack-overflow.vgtest
+ 
+ check_PROGRAMS = \
+@@ -37,6 +38,7 @@ check_PROGRAMS = \
+ 	mremap5 \
+ 	mremap6 \
+ 	pthread-stack \
++	readlinkat_self \
+ 	stack-overflow
+ 
+ if HAVE_OPENAT2
+@@ -58,6 +60,7 @@ open_client_SOURCES = open_client.cpp
+ endif
+ clonev_LDADD = -lpthread
+ pthread_stack_LDADD = -lpthread
++readlinkat_self_CFLAGS = ${AM_CFLAGS} @FLAG_W_NO_STRINGOP_OVERFLOW@
+ 
+ stack_overflow_CFLAGS = $(AM_CFLAGS) @FLAG_W_NO_UNINITIALIZED@ \
+ 			@FLAG_W_NO_INFINITE_RECURSION@
+diff --git a/none/tests/linux/readlinkat_self.c b/none/tests/linux/readlinkat_self.c
+new file mode 100644
+index 000000000000..586581a0d966
+--- /dev/null
++++ b/none/tests/linux/readlinkat_self.c
+@@ -0,0 +1,34 @@
++#include <stdio.h>
++#include <unistd.h>
++#include <string.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <assert.h>
++#include <limits.h>
++#include <errno.h>
++#include "../../config.h"
++
++int main(int argc, char** argv)
++{
++   char buf[PATH_MAX];
++   memset(buf, 0, PATH_MAX);
++   int ret = readlinkat(99, "/proc/self/exe", buf, PATH_MAX);
++   if (argc > 1) {
++      printf("ret = %d, buf = %.64s\n", ret, buf);
++   }
++   char resolved[PATH_MAX];
++   realpath(argv[0], resolved);
++   assert(strcmp(resolved, buf) == 0);
++
++   const size_t small_buf_size = 11;
++   char small_buf[small_buf_size];
++   memset(small_buf, '#', small_buf_size);
++   ret = readlinkat(100, "/proc/self/exe", small_buf, 10);
++   assert(strncmp(resolved, small_buf, 10) == 0);
++   assert(small_buf[10] == '#');
++
++   ret = readlinkat(101, "/proc/self/exe", (char*)1, 100);
++   assert(ret == -1);
++   assert(errno = EFAULT);
++}
++
+diff --git a/none/tests/linux/readlinkat_self.stderr.exp b/none/tests/linux/readlinkat_self.stderr.exp
+new file mode 100644
+index 000000000000..139597f9cb07
+--- /dev/null
++++ b/none/tests/linux/readlinkat_self.stderr.exp
+@@ -0,0 +1,2 @@
++
++
+diff --git a/none/tests/linux/readlinkat_self.vgtest b/none/tests/linux/readlinkat_self.vgtest
+new file mode 100644
+index 000000000000..3b91da54c53d
+--- /dev/null
++++ b/none/tests/linux/readlinkat_self.vgtest
+@@ -0,0 +1 @@
++prog: readlinkat_self
+diff --git a/none/tests/solaris/Makefile.am b/none/tests/solaris/Makefile.am
+index 861c9ff56222..c488c782de6d 100644
+--- a/none/tests/solaris/Makefile.am
++++ b/none/tests/solaris/Makefile.am
+@@ -23,6 +23,7 @@ EXTRA_DIST = \
+ 	proc_psinfo.stderr.exp proc_psinfo.stdout.exp proc_psinfo.vgtest \
+ 	posix_spawn.stderr.exp posix_spawn.stdout.exp posix_spawn.vgtest \
+ 	pthread-stack.stderr.exp pthread-stack.vgtest \
++	readlinkat_self.stderr.exp readlinkat_self.vgtest \
+ 	reserve_sysstat_addr.map reserve_sysstat_addr.stderr.exp reserve_sysstat_addr.vgtest \
+ 	reserve_sysstat_zone_addr.map reserve_sysstat_zone_addr.stderr.exp reserve_sysstat_zone_addr.vgtest \
+ 	resolv.stdout.exp resolv.stderr.exp resolv.vgtest \
+@@ -47,6 +48,7 @@ check_PROGRAMS = \
+ 	proc_psinfo \
+ 	posix_spawn \
+ 	pthread-stack \
++	readlinkat_self \
+ 	resolv \
+ 	sigresend \
+ 	stack_overflow \
+@@ -57,6 +59,7 @@ AM_CFLAGS   += $(AM_FLAG_M3264_PRI)
+ AM_CXXFLAGS += $(AM_FLAG_M3264_PRI)
+ 
+ pthread_stack_LDADD = -lpthread
++readlinkat_self_CFLAGS = ${AM_CFLAGS} @FLAG_W_NO_STRINGOP_OVERFLOW@
+ resolv_LDADD = -lresolv
+ stack_overflow_CFLAGS = ${AM_CFLAGS} @FLAG_W_NO_INFINITE_RECURSION@
+ stack_prot_LDFLAGS = -Wl,-M,/usr/lib/ld/map.noexstk
+diff --git a/none/tests/solaris/readlinkat_self.c b/none/tests/solaris/readlinkat_self.c
+new file mode 100644
+index 000000000000..ca60834aeb5e
+--- /dev/null
++++ b/none/tests/solaris/readlinkat_self.c
+@@ -0,0 +1,34 @@
++#include <stdio.h>
++#include <unistd.h>
++#include <string.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <assert.h>
++#include <limits.h>
++#include <errno.h>
++#include "../../config.h"
++
++int main(int argc, char** argv)
++{
++   char buf[PATH_MAX];
++   memset(buf, 0, PATH_MAX);
++   int ret = readlinkat(99, "/proc/self/path/a.out", buf, PATH_MAX);
++   if (argc > 1) {
++      printf("ret = %d, buf = %.64s\n", ret, buf);
++   }
++   char resolved[PATH_MAX];
++   realpath(argv[0], resolved);
++   assert(strcmp(resolved, buf) == 0);
++
++   const size_t small_buf_size = 11;
++   char small_buf[small_buf_size];
++   memset(small_buf, '#', small_buf_size);
++   ret = readlinkat(100, "/proc/self/path/a.out", small_buf, 10);
++   assert(strncmp(resolved, small_buf, 10) == 0);
++   assert(small_buf[10] == '#');
++
++   ret = readlinkat(101, "/proc/self/path/a.out", (char*)1, 100);
++   assert(ret == -1);
++   assert(errno = EFAULT);
++}
++
+diff --git a/none/tests/solaris/readlinkat_self.stderr.exp b/none/tests/solaris/readlinkat_self.stderr.exp
+new file mode 100644
+index 000000000000..139597f9cb07
+--- /dev/null
++++ b/none/tests/solaris/readlinkat_self.stderr.exp
+@@ -0,0 +1,2 @@
++
++
+diff --git a/none/tests/solaris/readlinkat_self.vgtest b/none/tests/solaris/readlinkat_self.vgtest
+new file mode 100644
+index 000000000000..3b91da54c53d
+--- /dev/null
++++ b/none/tests/solaris/readlinkat_self.vgtest
+@@ -0,0 +1 @@
++prog: readlinkat_self
+-- 
+2.52.0
+

@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: raravind <raravind@redhat.com>
+Date: Tue, 9 May 2023 11:29:35 +0200
+Subject: [PATCH] chainloader: remove device path debug message
+
+Remove the debug message "/EndEntire" while using GRUB chainloader command.
+
+Signed-off-by: raravind  <raravind@redhat.com>
+(cherry picked from commit f75f5386b7a6a7cb2e10d30f817a3564c0a28dd7)
+---
+ grub-core/loader/efi/chainloader.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/grub-core/loader/efi/chainloader.c b/grub-core/loader/efi/chainloader.c
+index b40acdeda80..badff5e50b5 100644
+--- a/grub-core/loader/efi/chainloader.c
++++ b/grub-core/loader/efi/chainloader.c
+@@ -212,7 +212,6 @@ make_file_path (grub_efi_device_path_t *dp, const char *filename)
+   /* Fill the file path for the directory.  */
+   d = (grub_efi_device_path_t *) ((char *) file_path
+ 				  + ((char *) d - (char *) dp));
+-  grub_efi_print_device_path (d);
+   if (copy_file_path ((grub_efi_file_path_device_path_t *) d,
+ 		      dir_start, dir_end - dir_start) != GRUB_ERR_NONE)
+     {

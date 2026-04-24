@@ -1,0 +1,59 @@
+# Load additional iptables modules (nat helpers)
+#   Default: -none-
+# Space separated list of nat helpers (e.g. 'ip_nat_ftp ip_nat_irc'), which
+# are loaded after the firewall rules are applied. Options for the helpers are
+# stored in /etc/modprobe.conf.
+IPTABLES_MODULES=""
+
+# Save current firewall rules on stop.
+#   Value: yes|no,  default: no
+# Saves all firewall rules to /etc/sysconfig/iptables if firewall gets stopped
+# (e.g. on system shutdown).
+IPTABLES_SAVE_ON_STOP="no"
+
+# Save current firewall rules on restart.
+#   Value: yes|no,  default: no
+# Saves all firewall rules to /etc/sysconfig/iptables if firewall gets
+# restarted.
+IPTABLES_SAVE_ON_RESTART="no"
+
+# Save (and restore) rule and chain counter.
+#   Value: yes|no,  default: no
+# Save counters for rules and chains to /etc/sysconfig/iptables if
+# 'service iptables save' is called or on stop or restart if SAVE_ON_STOP or
+# SAVE_ON_RESTART is enabled.
+IPTABLES_SAVE_COUNTER="no"
+
+# Numeric status output
+#   Value: yes|no,  default: yes
+# Print IP addresses and port numbers in numeric format in the status output.
+IPTABLES_STATUS_NUMERIC="yes"
+
+# Verbose status output
+#   Value: yes|no,  default: yes
+# Print info about the number of packets and bytes plus the "input-" and
+# "outputdevice" in the status output.
+IPTABLES_STATUS_VERBOSE="no"
+
+# Status output with numbered lines
+#   Value: yes|no,  default: yes
+# Print a counter/number for every rule in the status output.
+IPTABLES_STATUS_LINENUMBERS="yes"
+
+# Reload sysctl settings on start and restart
+#   Default: -none-
+# Space separated list of sysctl items which are to be reloaded on start.
+# List items will be matched by fgrep.
+#IPTABLES_SYSCTL_LOAD_LIST=".nf_conntrack .bridge-nf"
+
+# Set wait option for iptables-restore calls in seconds
+#   Default: 600
+# Set to 0 to deactivate the wait.
+#IPTABLES_RESTORE_WAIT=600
+
+# Set wait interval option for iptables-restore calls in microseconds
+#   Default: 1000000
+# Set to 100000 to try to get the lock every 100000 microseconds, 10 times a
+# second.
+# Only usable with IPTABLES_RESTORE_WAIT > 0
+#IPTABLES_RESTORE_WAIT_INTERVAL=1000000

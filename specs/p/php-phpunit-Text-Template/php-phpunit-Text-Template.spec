@@ -19,7 +19,7 @@
 
 Name:           php-phpunit-Text-Template
 Version:        1.2.1
-Release:        22%{?dist}
+Release: 23%{?dist}
 Summary:        Simple template engine
 
 License:        BSD-3-Clause

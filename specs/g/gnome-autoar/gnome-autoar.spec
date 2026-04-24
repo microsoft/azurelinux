@@ -3,7 +3,7 @@
 
 Name:           gnome-autoar
 Version:        0.4.5
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Archive library
 
 License:        LGPL-2.1-or-later

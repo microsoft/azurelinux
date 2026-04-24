@@ -6,7 +6,7 @@
 Name:		coin-or-%{module}
 Summary:	Implementation of the dynamic simplex algorithm
 Version:	1.10.4
-Release:	18%{?dist}
+Release: 19%{?dist}
 License:	EPL-1.0
 URL:		https://projects.coin-or.org/%{module}
 Source0:	http://www.coin-or.org/download/pkgsource/%{module}/%{module}-%{version}.tgz

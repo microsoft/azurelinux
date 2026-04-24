@@ -8,7 +8,7 @@
 Summary: X.Org X11 application bitmaps
 Name: xorg-x11-%{pkgname}
 Version: 1.1.3
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: HPND AND ICU
 URL: http://www.x.org
 BuildArch: noarch

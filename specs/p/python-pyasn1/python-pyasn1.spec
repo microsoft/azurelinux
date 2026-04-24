@@ -6,7 +6,7 @@
 
 Name:           python-pyasn1
 Version:        0.6.2
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        ASN.1 tools for Python
 License:        BSD-2-Clause
 Source0:        https://github.com/pyasn1/pyasn1/archive/v%{version}.tar.gz

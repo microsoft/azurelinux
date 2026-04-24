@@ -5,7 +5,7 @@
 
 Name:           mingw-pdcurses
 Version:        3.8
-Release:        15%{?dist}
+Release: 16%{?dist}
 Summary:        Curses library for MinGW
 
 License:        LicenseRef-Fedora-Public-Domain

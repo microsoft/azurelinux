@@ -8,7 +8,7 @@ Name:           perl-IPC-Cmd
 # Epoch to compete with perl.spec
 Epoch:          2
 Version:        1.04
-Release:        521%{?dist}
+Release: 522%{?dist}
 Summary:        Finding and running system commands made easy
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/IPC-Cmd

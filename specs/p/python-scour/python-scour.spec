@@ -6,7 +6,7 @@
 
 Name:               python-scour
 Version:            0.38.2
-Release:            16%{?dist}
+Release: 17%{?dist}
 Summary:            %{sum}
 
 # All files are Apache-2.0 except scour/svg_regex.py

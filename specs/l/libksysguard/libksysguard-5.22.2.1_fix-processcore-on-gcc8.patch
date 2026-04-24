@@ -1,0 +1,24 @@
+From 47a9b6c58db012941a1c0e171c6abfdaef31acd1 Mon Sep 17 00:00:00 2001
+From: Troy Dawson <tdawson@redhat.com>
+Date: Fri, 25 Jun 2021 06:43:04 -0700
+Subject: [PATCH] fix processcore on gcc8
+
+---
+ processcore/CMakeLists.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/processcore/CMakeLists.txt b/processcore/CMakeLists.txt
+index c28d364..d3da632 100644
+--- a/processcore/CMakeLists.txt
++++ b/processcore/CMakeLists.txt
+@@ -36,6 +36,7 @@ target_link_libraries(processcore
+     KF5::CoreAddons
+     KF5::Service
+     ZLIB::ZLIB
++    $<$<AND:$<CXX_COMPILER_ID:GNU>,$<VERSION_LESS:$<CXX_COMPILER_VERSION>,9.0>>:stdc++fs>
+ )
+ 
+ if( ${CMAKE_SYSTEM_NAME} MATCHES "NetBSD" )
+-- 
+2.27.0
+

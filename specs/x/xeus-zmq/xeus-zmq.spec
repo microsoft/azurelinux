@@ -3,7 +3,7 @@
 
 Name:           xeus-zmq
 Version:        3.1.0
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        ZeroMQ based middleware for xeus
 
 License:        BSD-3-Clause

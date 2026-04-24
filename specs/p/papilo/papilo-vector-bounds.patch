@@ -1,0 +1,21 @@
+--- papilo-2.4.1/src/papilo/presolvers/ParallelColDetection.hpp.orig	2025-02-13 15:49:28.592418271 -0700
++++ papilo-2.4.1/src/papilo/presolvers/ParallelColDetection.hpp	2025-02-13 16:45:59.493696905 -0700
+@@ -560,13 +560,16 @@ ParallelColDetection<REAL>::execute( con
+           if( flag_a_integer != flag_b_integer )
+              return !flag_a_integer;
+ 
++          SparseVectorView<REAL> coeffs_a = constMatrix.getColumnCoefficients( a );
++          SparseVectorView<REAL> coeffs_b = constMatrix.getColumnCoefficients( b );
++          REAL coeff_a = (coeffs_a.getLength() > 0) ? coeffs_a.getValues()[0] : (REAL)0;
++          REAL coeff_b = (coeffs_b.getLength() > 0) ? coeffs_b.getValues()[0] : (REAL)0;
+           return // sort by scale factor
+               abs( obj[a] ) < abs( obj[b] ) ||
+               // sort by scale factor if obj is zero
+               ( abs( obj[a] ) == abs( obj[b] ) && obj[a] == 0 &&
+                 determineOderingForZeroObj(
+-                    constMatrix.getColumnCoefficients( a ).getValues()[0],
+-                    constMatrix.getColumnCoefficients( b ).getValues()[0],
++                    coeff_a, coeff_b,
+                     colperm[a], colperm[b] ) ) ||
+               // sort by permutation
+               ( abs( obj[a] ) == abs( obj[b] ) && obj[a] != 0 &&

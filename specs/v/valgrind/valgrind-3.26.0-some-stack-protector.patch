@@ -1,0 +1,108 @@
+diff --git a/auxprogs/Makefile.am b/auxprogs/Makefile.am
+index d96e7fd0a968..2b8703cf1a63 100644
+--- a/auxprogs/Makefile.am
++++ b/auxprogs/Makefile.am
+@@ -48,7 +48,7 @@ bin_PROGRAMS = valgrind-listener valgrind-di-server
+ 
+ valgrind_listener_SOURCES = valgrind-listener.c
+ valgrind_listener_CPPFLAGS  = $(AM_CPPFLAGS_PRI) -I$(top_srcdir)/coregrind
+-valgrind_listener_CFLAGS    = $(AM_CFLAGS_PRI) -fhosted
++valgrind_listener_CFLAGS    = $(AM_CFLAGS_PRI) -fhosted -fstack-protector-strong
+ valgrind_listener_CCASFLAGS = $(AM_CCASFLAGS_PRI)
+ valgrind_listener_LDFLAGS   = $(AM_CFLAGS_PRI)
+ if VGCONF_PLATVARIANT_IS_ANDROID
+@@ -67,7 +67,7 @@ endif
+ 
+ valgrind_di_server_SOURCES   = valgrind-di-server.c
+ valgrind_di_server_CPPFLAGS  = $(AM_CPPFLAGS_PRI) -I$(top_srcdir)/coregrind
+-valgrind_di_server_CFLAGS    = $(AM_CFLAGS_PRI) -fhosted
++valgrind_di_server_CFLAGS    = $(AM_CFLAGS_PRI) -fhosted -fstack-protector-strong
+ valgrind_di_server_CCASFLAGS = $(AM_CCASFLAGS_PRI)
+ valgrind_di_server_LDFLAGS   = $(AM_CFLAGS_PRI)
+ if VGCONF_PLATVARIANT_IS_ANDROID
+@@ -102,7 +102,7 @@ endif
+ 
+ getoff_@VGCONF_ARCH_PRI@_@VGCONF_OS@_SOURCES   = getoff.c
+ getoff_@VGCONF_ARCH_PRI@_@VGCONF_OS@_CPPFLAGS  = $(AM_CPPFLAGS_@VGCONF_PLATFORM_PRI_CAPS@)
+-getoff_@VGCONF_ARCH_PRI@_@VGCONF_OS@_CFLAGS    = $(AM_CFLAGS_@VGCONF_PLATFORM_PRI_CAPS@) -fhosted
++getoff_@VGCONF_ARCH_PRI@_@VGCONF_OS@_CFLAGS    = $(AM_CFLAGS_@VGCONF_PLATFORM_PRI_CAPS@) -fhosted -fstack-protector-strong
+ getoff_@VGCONF_ARCH_PRI@_@VGCONF_OS@_CCASFLAGS = $(AM_CCASFLAGS_PRI)
+ getoff_@VGCONF_ARCH_PRI@_@VGCONF_OS@_LDFLAGS   = $(AM_CFLAGS_PRI) @LIB_UBSAN@
+ if HAVE_DLINFO_RTLD_DI_TLS_MODID
+@@ -119,7 +119,7 @@ endif
+ if VGCONF_HAVE_PLATFORM_SEC
+ getoff_@VGCONF_ARCH_SEC@_@VGCONF_OS@_SOURCES   = getoff.c
+ getoff_@VGCONF_ARCH_SEC@_@VGCONF_OS@_CPPFLAGS  = $(AM_CPPFLAGS_@VGCONF_PLATFORM_SEC_CAPS@)
+-getoff_@VGCONF_ARCH_SEC@_@VGCONF_OS@_CFLAGS    = $(AM_CFLAGS_@VGCONF_PLATFORM_SEC_CAPS@) -fhosted
++getoff_@VGCONF_ARCH_SEC@_@VGCONF_OS@_CFLAGS    = $(AM_CFLAGS_@VGCONF_PLATFORM_SEC_CAPS@) -fhosted -fstack-protector-strong
+ getoff_@VGCONF_ARCH_SEC@_@VGCONF_OS@_CCASFLAGS = $(AM_CCASFLAGS_SEC)
+ getoff_@VGCONF_ARCH_SEC@_@VGCONF_OS@_LDFLAGS   = $(AM_CFLAGS_SEC)
+ if HAVE_DLINFO_RTLD_DI_TLS_MODID
+diff --git a/configure.ac b/configure.ac
+index 90fafaf1c557..84a3d22c5bff 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -2764,24 +2764,24 @@ AC_LANG(C)
+ AM_CONDITIONAL([HAVE_ALIGNED_CXX_ALLOC], [test x$ac_have_aligned_cxx_alloc = xyes])
+ 
+ # does this compiler support -fno-stack-protector ?
+-AC_MSG_CHECKING([if gcc accepts -fno-stack-protector])
+-
+-safe_CFLAGS=$CFLAGS
+-CFLAGS="-fno-stack-protector -Werror"
+-
+-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[
+-  return 0;
+-]])], [
+-no_stack_protector=yes
+-FLAG_FNO_STACK_PROTECTOR="-fno-stack-protector"
+-AC_MSG_RESULT([yes])
+-], [
+-no_stack_protector=no
++#AC_MSG_CHECKING([if gcc accepts -fno-stack-protector])
++#
++#safe_CFLAGS=$CFLAGS
++#CFLAGS="-fno-stack-protector -Werror"
++#
++#AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[
++#  return 0;
++#]])], [
++#no_stack_protector=yes
++#FLAG_FNO_STACK_PROTECTOR="-fno-stack-protector"
++#AC_MSG_RESULT([yes])
++#], [
++#no_stack_protector=no
+ FLAG_FNO_STACK_PROTECTOR=""
+-AC_MSG_RESULT([no])
+-])
+-CFLAGS=$safe_CFLAGS
+-
++#AC_MSG_RESULT([no])
++#])
++#CFLAGS=$safe_CFLAGS
++#
+ AC_SUBST(FLAG_FNO_STACK_PROTECTOR)
+ 
+ # does this compiler support -finline-functions ?
+diff --git a/coregrind/Makefile.am b/coregrind/Makefile.am
+index 4ead1542b0c7..0bcb4a4f423f 100644
+--- a/coregrind/Makefile.am
++++ b/coregrind/Makefile.am
+@@ -62,7 +62,7 @@ AR = ${LTO_AR}
+ RANLIB = ${LTO_RANLIB}
+ 
+ valgrind_CPPFLAGS  = $(AM_CPPFLAGS_PRI)
+-valgrind_CFLAGS    = $(AM_CFLAGS_PRI) $(LTO_CFLAGS) -fhosted
++valgrind_CFLAGS    = $(AM_CFLAGS_PRI) $(LTO_CFLAGS) -fhosted -fstack-protector-strong
+ valgrind_CCASFLAGS = $(AM_CCASFLAGS_PRI)
+ valgrind_LDFLAGS   = $(AM_CFLAGS_PRI) @LIB_UBSAN@
+ # If there is no secondary platform, and the platforms include x86-darwin,
+@@ -104,7 +104,7 @@ vgdb_SOURCES += vgdb-invoker-freebsd.c
+ endif
+ 
+ vgdb_CPPFLAGS  = $(AM_CPPFLAGS_PRI) $(GDB_SCRIPTS_DIR)
+-vgdb_CFLAGS    = $(AM_CFLAGS_PRI) $(LTO_CFLAGS) -fhosted
++vgdb_CFLAGS    = $(AM_CFLAGS_PRI) $(LTO_CFLAGS) -fhosted -fstack-protector-strong
+ vgdb_CCASFLAGS = $(AM_CCASFLAGS_PRI)
+ vgdb_LDFLAGS   = $(AM_CFLAGS_PRI) @LIB_UBSAN@
+ if VGCONF_PLATVARIANT_IS_ANDROID

@@ -3,7 +3,7 @@
 
 Name:           perl-Module-Install-AuthorTests
 Version:        0.002
-Release:        38%{?dist}
+Release: 39%{?dist}
 Summary:        Designate tests only run by module authors
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Module-Install-AuthorTests

@@ -8,7 +8,7 @@
 Name: rubygem-%{gem_name}
 Epoch: 1
 Version: 8.0.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: A support libraries and Ruby core extensions extracted from the Rails framework
 License: MIT
 URL: https://rubyonrails.org

@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alec Brown <alec.r.brown@oracle.com>
+Date: Tue, 4 Feb 2025 15:11:10 +0000
+Subject: [PATCH] bus/usb/ehci: Define GRUB_EHCI_TOGGLE as grub_uint32_t
+
+The Coverity indicates that GRUB_EHCI_TOGGLE is an int that contains
+a negative value and we are using it for the variable token which is
+grub_uint32_t. To remedy this we can cast the definition to grub_uint32_t.
+
+Fixes: CID 473851
+
+Signed-off-by: Alec Brown <alec.r.brown@oracle.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/bus/usb/ehci.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/grub-core/bus/usb/ehci.c b/grub-core/bus/usb/ehci.c
+index 9abebc6bd..2db07c7c0 100644
+--- a/grub-core/bus/usb/ehci.c
++++ b/grub-core/bus/usb/ehci.c
+@@ -218,7 +218,7 @@ enum
+ 
+ #define GRUB_EHCI_TERMINATE      (1<<0)
+ 
+-#define GRUB_EHCI_TOGGLE         (1<<31)
++#define GRUB_EHCI_TOGGLE         ((grub_uint32_t) 1<<31)
+ 
+ enum
+ {

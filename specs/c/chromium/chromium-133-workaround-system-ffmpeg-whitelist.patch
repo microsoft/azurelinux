@@ -1,0 +1,34 @@
+diff -up chromium-133.0.6943.98/media/ffmpeg/ffmpeg_common.cc.than chromium-133.0.6943.98/media/ffmpeg/ffmpeg_common.cc
+--- chromium-133.0.6943.98/media/ffmpeg/ffmpeg_common.cc.than	2025-02-13 11:59:31.035724118 +0100
++++ chromium-133.0.6943.98/media/ffmpeg/ffmpeg_common.cc	2025-02-14 10:39:07.825746076 +0100
+@@ -76,6 +76,8 @@ const char* GetAllowedVideoDecoders() {
+ void ApplyCodecContextSecuritySettings(AVCodecContext* codec_context) {
+   // Future versions of ffmpeg may copy the allow list from the format
+   // context.
++  // Workaround for codec whitelist with system ffmpeg
++#if 0
+   if (!codec_context->codec_whitelist) {
+     // Note: FFmpeg will try to free this string, so we must duplicate it.
+     codec_context->codec_whitelist =
+@@ -83,6 +85,7 @@ void ApplyCodecContextSecuritySettings(A
+                       ? GetAllowedAudioDecoders()
+                       : GetAllowedVideoDecoders());
+   }
++#endif
+ 
+   // Note: This is security sensitive. FFmpeg may not always continue safely
+   // in the presence of errors. See https://crbug.com/379418979
+diff -up chromium-133.0.6943.98/media/filters/ffmpeg_glue.cc.than chromium-133.0.6943.98/media/filters/ffmpeg_glue.cc
+--- chromium-133.0.6943.98/media/filters/ffmpeg_glue.cc.than	2025-02-14 10:14:13.360398193 +0100
++++ chromium-133.0.6943.98/media/filters/ffmpeg_glue.cc	2025-02-14 10:36:46.762332912 +0100
+@@ -131,8 +131,10 @@ FFmpegGlue::FFmpegGlue(FFmpegURLProtocol
+   // memory usage.
+   //
+   // Note: FFmpeg will try to free these strings, so we must duplicate them.
++#if 0
+   format_context_->codec_whitelist = av_strdup(GetAllowedAudioDecoders());
+   format_context_->format_whitelist = av_strdup(GetAllowedDemuxers());
++#endif
+ }
+ 
+ bool FFmpegGlue::OpenContext(bool is_local_file) {

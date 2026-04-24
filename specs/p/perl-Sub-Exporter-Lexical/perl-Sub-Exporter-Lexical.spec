@@ -3,7 +3,7 @@
 
 Name:           perl-Sub-Exporter-Lexical
 Version:        1.000
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        Export lexically-available subs with Sub::Exporter
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Sub-Exporter-Lexical

@@ -3,7 +3,7 @@
 
 Name:           perl-File-Listing
 Version:        6.16
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        Parse directory listing
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/File-Listing

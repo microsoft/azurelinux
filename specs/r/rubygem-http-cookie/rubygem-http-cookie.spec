@@ -5,7 +5,7 @@
 
 Name:		rubygem-%{gem_name}
 Version:	1.1.0
-Release:	1%{?dist}
+Release: 2%{?dist}
 
 Summary:	Ruby library to handle HTTP Cookies based on RFC 6265
 License:	MIT

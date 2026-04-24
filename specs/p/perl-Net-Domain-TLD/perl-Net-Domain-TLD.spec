@@ -3,7 +3,7 @@
 
 Name:           perl-Net-Domain-TLD
 Version:        1.75
-Release:        27%{?dist}
+Release: 28%{?dist}
 Summary:        Work with TLD names
 # Automatically converted from old format: GPL+ or Artistic - review is highly recommended.
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

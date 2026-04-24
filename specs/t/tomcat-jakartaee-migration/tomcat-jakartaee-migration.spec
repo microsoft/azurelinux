@@ -3,7 +3,7 @@
 
 Name:           tomcat-jakartaee-migration
 Version:        1.0.9
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        Tomcat Migration Tool for Jakarta EE
 
 License:        Apache-2.0

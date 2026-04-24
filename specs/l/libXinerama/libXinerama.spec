@@ -8,7 +8,7 @@
 Summary: X.Org X11 libXinerama runtime library
 Name: libXinerama
 Version: 1.1.5
-Release: 9%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
+Release: 10%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
 License: MIT AND MIT-open-group AND X11
 URL: http://www.x.org
 

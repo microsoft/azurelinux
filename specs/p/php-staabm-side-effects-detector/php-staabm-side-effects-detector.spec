@@ -22,7 +22,7 @@
 
 Name:           php-%{gh_owner}-%{gh_project}
 Version:        1.0.5
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        A static analysis tool to detect side effects in PHP code
 
 License:        MIT

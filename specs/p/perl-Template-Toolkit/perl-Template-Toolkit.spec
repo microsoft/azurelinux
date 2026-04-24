@@ -3,7 +3,7 @@
 
 Name:           perl-Template-Toolkit
 Version:        3.102
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Template processing system
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            http://www.template-toolkit.org/

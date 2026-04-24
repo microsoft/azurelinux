@@ -3,7 +3,7 @@
 
 Name:           perl-constant-boolean
 Version:        0.02
-Release:        43%{?dist}
+Release: 44%{?dist}
 Summary:        Define TRUE and FALSE constants
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/constant-boolean

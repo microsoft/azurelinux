@@ -3,7 +3,7 @@
 
 Name:           perl-XML-LibXML-Simple
 Version:        1.01
-Release:        18%{?dist}
+Release: 19%{?dist}
 Summary:        Read XML strings or files
 # Automatically converted from old format: GPL+ or Artistic - review is highly recommended.
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

@@ -1,0 +1,61 @@
+From 9644657c4 10326749fd321d9c24944ec25afad2f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Thu, 20 Jun 2013 15:22:53 +0200
+Subject: [PATCH] Install libperl.so to shrpdir on Linux
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ Configure   | 7 ++++---
+ Makefile.SH | 2 +-
+ 2 files changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/Configure b/Configure
+index 2f30261..825496e 100755
+--- a/Configure
++++ b/Configure
+@@ -8762,7 +8762,9 @@ esac
+ 
+ # Detect old use of shrpdir via undocumented Configure -Dshrpdir
+ case "$shrpdir" in
+-'') ;;
++'') 
++shrpdir=$archlibexp/CORE
++;;
+ *)	$cat >&4 <<EOM
+ WARNING:  Use of the shrpdir variable for the installation location of
+ the shared $libperl is not supported.  It was never documented and
+@@ -8792,7 +8794,6 @@ esac
+ # Add $xxx to ccdlflags.
+ # If we can't figure out a command-line option, use $shrpenv to
+ # set env LD_RUN_PATH.  The main perl makefile uses this.
+-shrpdir=$archlibexp/CORE
+ xxx=''
+ tmp_shrpenv=''
+ if "$useshrplib"; then
+@@ -8807,7 +8808,7 @@ if "$useshrplib"; then
+ 		xxx="-Wl,-R$shrpdir"
+ 		;;
+ 	bsdos|linux|irix*|dec_osf|gnu*|haiku)
+-		xxx="-Wl,-rpath,$shrpdir"
++		# We want standard path
+ 		;;
+ 	hpux*)
+ 		# hpux doesn't like the default, either.
+diff --git a/Makefile.SH b/Makefile.SH
+index 7733a32..a481183 100755
+--- a/Makefile.SH
++++ b/Makefile.SH
+@@ -288,7 +288,7 @@ ranlib = $ranlib
+ # installman commandline.
+ bin = $installbin
+ scriptdir = $scriptdir
+-shrpdir = $archlibexp/CORE
++shrpdir = $shrpdir
+ privlib = $installprivlib
+ man1dir = $man1dir
+ man1ext = $man1ext
+-- 
+1.8.1.4

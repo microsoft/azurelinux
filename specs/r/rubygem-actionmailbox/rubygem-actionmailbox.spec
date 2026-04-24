@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 8.0.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Inbound email handling framework
 License: MIT
 URL: https://rubyonrails.org

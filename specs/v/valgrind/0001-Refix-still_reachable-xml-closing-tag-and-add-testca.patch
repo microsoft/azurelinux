@@ -1,0 +1,352 @@
+From a4e37741625163fe3e9fde5f21dc4d3e9167fd9a Mon Sep 17 00:00:00 2001
+From: Paul Floyd <pjfloyd@wanadoo.fr>
+Date: Thu, 29 Jan 2026 12:18:08 +0100
+Subject: [PATCH] Refix still_reachable xml closing tag and add testcases
+
+https://bugs.kde.org/show_bug.cgi?id=514613
+---
+ memcheck/mc_leakcheck.c                       | 16 ++--
+ memcheck/tests/Makefile.am                    | 14 ++-
+ memcheck/tests/nothing.c                      |  5 ++
+ memcheck/tests/nothing_xml.stderr.exp         |  0
+ memcheck/tests/nothing_xml.vgtest             |  4 +
+ memcheck/tests/simple_leak.c                  | 10 +++
+ memcheck/tests/simple_leak_xml.stderr.exp     |  0
+ memcheck/tests/simple_leak_xml.vgtest         |  4 +
+ memcheck/tests/simple_reachable.c             |  9 ++
+ .../tests/simple_reachable_xml.stderr.exp     |  0
+ memcheck/tests/simple_reachable_xml.vgtest    |  4 +
+ memcheck/tests/xmas_tree.cpp                  | 90 +++++++++++++++++++
+ memcheck/tests/xmas_tree_xml.stderr.exp       |  0
+ memcheck/tests/xmas_tree_xml.supp             |  7 ++
+ memcheck/tests/xmas_tree_xml.vgtest           |  4 +
+ 16 files changed, 162 insertions(+), 9 deletions(-)
+ create mode 100644 memcheck/tests/nothing.c
+ create mode 100644 memcheck/tests/nothing_xml.stderr.exp
+ create mode 100644 memcheck/tests/nothing_xml.vgtest
+ create mode 100644 memcheck/tests/simple_leak.c
+ create mode 100644 memcheck/tests/simple_leak_xml.stderr.exp
+ create mode 100644 memcheck/tests/simple_leak_xml.vgtest
+ create mode 100644 memcheck/tests/simple_reachable.c
+ create mode 100644 memcheck/tests/simple_reachable_xml.stderr.exp
+ create mode 100644 memcheck/tests/simple_reachable_xml.vgtest
+ create mode 100644 memcheck/tests/xmas_tree.cpp
+ create mode 100644 memcheck/tests/xmas_tree_xml.stderr.exp
+ create mode 100644 memcheck/tests/xmas_tree_xml.supp
+ create mode 100644 memcheck/tests/xmas_tree_xml.vgtest
+
+diff --git a/memcheck/mc_leakcheck.c b/memcheck/mc_leakcheck.c
+index 4df0b180d5d1..b0056b65bd3e 100644
+--- a/memcheck/mc_leakcheck.c
++++ b/memcheck/mc_leakcheck.c
+@@ -1768,23 +1768,23 @@ static void print_results(ThreadId tid, LeakCheckParams* lcp)
+       umsg_or_xml(VG_(clo_xml) ?
+                   "  <still_reachable>\n"
+                   "    <bytes>%'lu%s</bytes>\n"
+-                  "    <blocks>%'lu%s</blocks>\n"
+-                  "  </still_reachable>\n" :
++                  "    <blocks>%'lu%s</blocks>\n" :
+                   "   still reachable: %'lu%s bytes in %'lu%s blocks\n",
+                 MC_(bytes_reachable), 
+                 DBY (MC_(bytes_reachable), old_bytes_reachable), 
+                 MC_(blocks_reachable),
+                 DBL (MC_(blocks_reachable), old_blocks_reachable));
+-      for (i = 0; i < N_LEAK_CHECK_HEURISTICS; i++)
++      for (i = 0; i < N_LEAK_CHECK_HEURISTICS; i++) {
+          if (old_blocks_heuristically_reachable[i] > 0 
+              || MC_(blocks_heuristically_reachable)[i] > 0) {
+             umsg_or_xml(VG_(clo_xml) ? "" : "                      of which "
+                       "reachable via heuristic:\n");
+             break;
+          }
+-      for (i = 0; i < N_LEAK_CHECK_HEURISTICS; i++)
+-         if (old_blocks_heuristically_reachable[i] > 0 
+-             || MC_(blocks_heuristically_reachable)[i] > 0)
++      }
++      for (i = 0; i < N_LEAK_CHECK_HEURISTICS; i++) {
++         if (old_blocks_heuristically_reachable[i] > 0
++             || MC_(blocks_heuristically_reachable)[i] > 0) {
+             umsg_or_xml(VG_(clo_xml) ?
+                         "    <reachable_heuristic>\n"
+                         "      <kind>%ls</kind>\n"
+@@ -1800,7 +1800,9 @@ static void print_results(ThreadId tid, LeakCheckParams* lcp)
+                       MC_(blocks_heuristically_reachable)[i],
+                       DBL (MC_(blocks_heuristically_reachable)[i],
+                            old_blocks_heuristically_reachable[i]));
+-      if (VG_(clo_xml) && MC_(bytes_reachable)) {
++         }
++      }
++      if (VG_(clo_xml)) {
+          umsg_or_xml("  </still_reachable>\n");
+       }
+       umsg_or_xml(VG_(clo_xml) ?
+diff --git a/memcheck/tests/Makefile.am b/memcheck/tests/Makefile.am
+index 4bdca487aa51..c8469f1265cb 100644
+--- a/memcheck/tests/Makefile.am
++++ b/memcheck/tests/Makefile.am
+@@ -307,6 +307,7 @@ EXTRA_DIST = \
+ 	new_nothrow.stderr.exp new_nothrow.vgtest \
+ 	new_override.stderr.exp new_override.stdout.exp new_override.vgtest \
+ 	noisy_child.vgtest noisy_child.stderr.exp noisy_child.stdout.exp \
++	nothing_xml.vgtest nothing_xml.stderr.exp \
+ 	null_socket.stderr.exp null_socket.vgtest \
+ 	origin1-yes.vgtest origin1-yes.stdout.exp origin1-yes.stderr.exp \
+ 		origin1-yes.stderr.exp-freebsd \
+@@ -403,6 +404,8 @@ EXTRA_DIST = \
+ 	    sigkill.stderr.exp-glibc-2.28 sigkill.vgtest \
+ 	signal2.stderr.exp signal2.stdout.exp signal2.vgtest \
+ 	sigprocmask.stderr.exp sigprocmask.stderr.exp2 sigprocmask.vgtest \
++	simple_leak_xml.vgtest simple_reachable_xml.vgtest \
++	simple_leak_xml.stderr.exp simple_reachable_xml.stderr.exp \
+ 	sized_delete.stderr.exp sized_delete.stderr.exp-x86 sized_delete.vgtest \
+ 	static_malloc.stderr.exp static_malloc.vgtest \
+ 	stpncpy.vgtest stpncpy.stderr.exp stpncpy.stdout.exp \
+@@ -478,6 +481,7 @@ EXTRA_DIST = \
+ 	wrapmallocstatic.vgtest wrapmallocstatic.stdout.exp \
+ 	wrapmallocstatic.stderr.exp \
+ 	writev1.stderr.exp writev1.stderr.exp-solaris writev1.vgtest \
++	xmas_tree_xml.vgtest xmas_tree_xml.supp xmas_tree_xml.stderr.exp \
+ 	xml1.stderr.exp xml1.stdout.exp xml1.vgtest xml1.stderr.exp-s390x-mvc
+ 
+ check_PROGRAMS = \
+@@ -539,6 +543,7 @@ check_PROGRAMS = \
+ 	mismatches new_override metadata \
+ 	nanoleak_supp nanoleak2 new_nothrow \
+ 	noisy_child \
++	nothing \
+ 	null_socket \
+ 	origin1-yes origin2-not-quite origin3-no \
+ 	origin4-many origin5-bz2 origin6-fp \
+@@ -556,7 +561,9 @@ check_PROGRAMS = \
+ 	sbfragment \
+ 	sendmsg \
+ 	sh-mem sh-mem-random \
+-	sigaltstack signal2 sigprocmask static_malloc sigkill \
++	sigaltstack signal2 sigprocmask \
++	simple_leak simple_reachable \
++	static_malloc sigkill \
+ 	strchr \
+ 	str_tester \
+ 	supp_unknown supp1 supp2 suppfree \
+@@ -575,7 +582,8 @@ check_PROGRAMS = \
+ 	wmemcmp \
+ 	wrap1 wrap2 wrap3 wrap4 wrap5 wrap6 wrap7 wrap7so.so wrap8 \
+ 	wrapmalloc wrapmallocso.so wrapmallocstatic \
+-	writev1
++	writev1 \
++	xmas_tree
+ 
+ if !SOLARIS_SUN_STUDIO_AS
+ # Sun Studio assembler fails on "IDENT too long"
+@@ -950,3 +958,5 @@ endif
+ writev1_CFLAGS		= $(AM_CFLAGS) @FLAG_W_NO_STRINGOP_OVERFLOW@ @FLAG_W_NO_STRINGOP_OVERREAD@
+ xml1_CFLAGS             = $(AM_CFLAGS) -D_GNU_SOURCE @FLAG_W_NO_UNINITIALIZED@ @FLAG_W_NO_USE_AFTER_FREE@
+ 
++xmas_tree_SOURCES	= xmas_tree.cpp
++xmas_tree_CXXFLAGS	= ${AM_CXXFLAGS} @FLAG_W_NO_UNINITIALIZED@
+diff --git a/memcheck/tests/nothing.c b/memcheck/tests/nothing.c
+new file mode 100644
+index 000000000000..2e424a58ded8
+--- /dev/null
++++ b/memcheck/tests/nothing.c
+@@ -0,0 +1,5 @@
++/* no errors, except Darwin */
++int main()
++{
++}
++
+diff --git a/memcheck/tests/nothing_xml.stderr.exp b/memcheck/tests/nothing_xml.stderr.exp
+new file mode 100644
+index 000000000000..e69de29bb2d1
+diff --git a/memcheck/tests/nothing_xml.vgtest b/memcheck/tests/nothing_xml.vgtest
+new file mode 100644
+index 000000000000..db2eca402af1
+--- /dev/null
++++ b/memcheck/tests/nothing_xml.vgtest
+@@ -0,0 +1,4 @@
++prereq: which xmllint > /dev/null
++prog: nothing
++args: | xmllint --noout -
++vgopts: --xml=yes --xml-fd=1
+diff --git a/memcheck/tests/simple_leak.c b/memcheck/tests/simple_leak.c
+new file mode 100644
+index 000000000000..b94dade4c24c
+--- /dev/null
++++ b/memcheck/tests/simple_leak.c
+@@ -0,0 +1,10 @@
++#include <stdlib.h>
++
++static void *p;
++
++int main ()
++{
++  p = malloc (1024);
++  p = NULL;
++}
++
+diff --git a/memcheck/tests/simple_leak_xml.stderr.exp b/memcheck/tests/simple_leak_xml.stderr.exp
+new file mode 100644
+index 000000000000..e69de29bb2d1
+diff --git a/memcheck/tests/simple_leak_xml.vgtest b/memcheck/tests/simple_leak_xml.vgtest
+new file mode 100644
+index 000000000000..9652b32764b8
+--- /dev/null
++++ b/memcheck/tests/simple_leak_xml.vgtest
+@@ -0,0 +1,4 @@
++prereq: which xmllint > /dev/null
++prog: simple_leak
++args: | xmllint --noout -
++vgopts: --xml=yes --xml-fd=1
+diff --git a/memcheck/tests/simple_reachable.c b/memcheck/tests/simple_reachable.c
+new file mode 100644
+index 000000000000..4fe1adaf4556
+--- /dev/null
++++ b/memcheck/tests/simple_reachable.c
+@@ -0,0 +1,9 @@
++#include <stdlib.h>
++
++static void *p;
++
++int main ()
++{
++  p = malloc (1024);
++}
++
+diff --git a/memcheck/tests/simple_reachable_xml.stderr.exp b/memcheck/tests/simple_reachable_xml.stderr.exp
+new file mode 100644
+index 000000000000..e69de29bb2d1
+diff --git a/memcheck/tests/simple_reachable_xml.vgtest b/memcheck/tests/simple_reachable_xml.vgtest
+new file mode 100644
+index 000000000000..a64cb2ac5d69
+--- /dev/null
++++ b/memcheck/tests/simple_reachable_xml.vgtest
+@@ -0,0 +1,4 @@
++prereq: which xmllint > /dev/null
++prog: simple_reachable
++args: | xmllint --noout -
++vgopts: --xml=yes --xml-fd=1
+diff --git a/memcheck/tests/xmas_tree.cpp b/memcheck/tests/xmas_tree.cpp
+new file mode 100644
+index 000000000000..680833b46dac
+--- /dev/null
++++ b/memcheck/tests/xmas_tree.cpp
+@@ -0,0 +1,90 @@
++#include <new>
++#include <cstdlib>
++#include <cstring>
++#include <unistd.h>
++#include "../memcheck.h"
++
++struct Ae
++{
++   virtual ~Ae()
++   {
++   }
++};
++struct Be
++{
++   virtual ~Be()
++   {
++   }
++};
++struct Ce : public Ae, public Be
++{
++   virtual ~Ce()
++   {
++   }
++};
++
++void* reachable;
++Be *interior;
++
++int suppress_me()
++{
++   int qqq;
++   if (qqq)
++       return 2;
++    return 1;
++}
++
++int main()
++{
++    std::align_val_t misalign(static_cast<std::align_val_t>(63U));
++    std::align_val_t align(static_cast<std::align_val_t>(64U));
++    std::align_val_t align2(static_cast<std::align_val_t>(32U));
++    std::size_t size(32);
++    std::size_t badsize(42);
++    std::nothrow_t tag;
++    int count{0};
++
++    char *mem = static_cast<char*>(operator new[](size, tag));
++    if (mem[31])
++        ++count;
++    if (mem[32])
++        ++count;
++    operator delete(mem, misalign, tag);
++
++    mem = static_cast<char*>(operator new(size, align, tag));
++    operator delete(mem, align2, tag);
++
++    mem = static_cast<char*>(malloc(20));
++    mem = static_cast<char*>(realloc(mem, 0));
++    delete mem;
++
++    mem = static_cast<char*>(operator new[](size));
++    memcpy(mem+10, mem+5, 10);
++    operator delete[](mem, badsize);
++
++    mem = static_cast<char*>(malloc(-1));
++
++    int fd{42};
++    int bad;
++    fd += bad;
++    fd -= bad;
++    char* buf{nullptr};
++    ++buf;
++    write(fd, buf, fd);
++
++    int zzz;
++    VALGRIND_CHECK_MEM_IS_DEFINED(&zzz, 4);
++
++    reachable = malloc(10);
++    mem = static_cast<char*>(malloc(20));
++
++    char* indirect = static_cast<char*>(malloc(30));
++    memcpy(&mem[8], &indirect, sizeof(indirect));
++    mem = nullptr;
++
++    count += suppress_me();
++
++    interior = new Ce;  // interior ptr.
++
++    return count;
++}
+diff --git a/memcheck/tests/xmas_tree_xml.stderr.exp b/memcheck/tests/xmas_tree_xml.stderr.exp
+new file mode 100644
+index 000000000000..e69de29bb2d1
+diff --git a/memcheck/tests/xmas_tree_xml.supp b/memcheck/tests/xmas_tree_xml.supp
+new file mode 100644
+index 000000000000..2643371609d3
+--- /dev/null
++++ b/memcheck/tests/xmas_tree_xml.supp
+@@ -0,0 +1,7 @@
++{
++   Hello, suppression World!
++   Memcheck:Cond
++   fun:_Z11suppress_mev
++   fun:main
++}
++
+diff --git a/memcheck/tests/xmas_tree_xml.vgtest b/memcheck/tests/xmas_tree_xml.vgtest
+new file mode 100644
+index 000000000000..5061ad12a466
+--- /dev/null
++++ b/memcheck/tests/xmas_tree_xml.vgtest
+@@ -0,0 +1,4 @@
++prereq: which xmllint > /dev/null
++prog: xmas_tree
++args: | xmllint --noout -
++vgopts: --xml=yes --xml-fd=1 --leak-check=full --suppressions=xmas_tree_xml.supp --leak-check-heuristics=multipleinheritance
+-- 
+2.52.0
+

@@ -7,7 +7,7 @@
 
 Name: kdump-anaconda-addon
 Version: 006
-Release: 16.%{snapshotdate}git%{gitshortcommit}%{?dist}
+Release: 17.%{snapshotdate}git%{gitshortcommit}%{?dist}
 Url: https://github.com/rhinstaller/kdump-anaconda-addon
 License: GPL-2.0-only
 Summary: Kdump configuration anaconda addon

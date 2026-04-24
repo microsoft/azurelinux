@@ -1,0 +1,31 @@
+From 1e6a31129c95cf53ad1b3e51ab93e80812a0f550 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Alejandro=20S=C3=A1ez?= <asm@redhat.com>
+Date: Thu, 29 Feb 2024 11:39:01 +0100
+Subject: [PATCH] Disable tests
+
+Disable TestObjdumpARM64TestDecodeGNUSyntaxdata and TestObjdumpARM64TestDecodeGoSyntaxdata
+
+Relates to https://github.com/golang/go/issues/66005
+---
+ arm64/arm64asm/objdump_test.go | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arm64/arm64asm/objdump_test.go b/arm64/arm64asm/objdump_test.go
+index a096dce..74a296a 100644
+--- a/arm64/arm64asm/objdump_test.go
++++ b/arm64/arm64asm/objdump_test.go
+@@ -10,9 +10,11 @@ import (
+ )
+ 
+ func TestObjdumpARM64TestDecodeGNUSyntaxdata(t *testing.T) {
++	t.Skipf("skipping due to compatibility issues with objdump")
+ 	testObjdumpARM64(t, testdataCases(t, "gnu"))
+ }
+ func TestObjdumpARM64TestDecodeGoSyntaxdata(t *testing.T) {
++	t.Skipf("skipping due to compatibility issues with objdump")
+ 	testObjdumpARM64(t, testdataCases(t, "plan9"))
+ }
+ func TestObjdumpARM64Manual(t *testing.T) { testObjdumpARM64(t, hexCases(t, objdumpManualTests)) }
+-- 
+2.43.2
+

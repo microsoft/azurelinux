@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.14.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: HTTP Caching for Rack
 License: MIT
 URL: https://github.com/rack/rack-cache

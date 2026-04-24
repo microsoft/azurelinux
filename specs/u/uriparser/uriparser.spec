@@ -9,7 +9,7 @@
 
 Name:           uriparser
 Version:        1.0.0
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        URI parsing library - RFC 3986
 
 # main license is BSD-3-Clause

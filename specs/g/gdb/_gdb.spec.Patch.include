@@ -1,0 +1,34 @@
+# Check distro name is included in the version output.
+Patch001: gdb-test-show-version.patch
+
+# Update gdb-add-index.sh such that, when the GDB environment
+# variable is not set, the script is smarter than just looking for
+# 'gdb' in the $PATH.
+#
+# The actual search order is now: /usr/bin/gdb.minimal, gdb (in the
+# $PATH), then /usr/libexec/gdb.
+#
+# For the rationale of looking for gdb.minimal see:
+#
+#   https://fedoraproject.org/wiki/Changes/Minimal_GDB_in_buildroot
+#
+#=fedora
+Patch002: gdb-add-index.patch
+
+# Not a backport.  Add a new script which hooks into GDB and suggests
+# RPMs to install when GDB finds an objfile with no debug info.
+Patch003: gdb-rpm-suggestion-script.patch
+
+# Backport test fix for flaky thread-specific-bp.exp (Tom de Vries).
+Patch004: gdb-backport-tom-32688-thread-specific-bp-fix.patch
+
+# Backport of upstream commit 70b66cf338b14336 to address RHBZ
+# 2402580.  This backport can be dropped when rebasing to GDB 18.
+# There were some moderate merge conflicts which needed resolving
+# when backporting this fix.
+Patch005: gdb-rhbz2403580-misplaced-symtabs.patch
+
+# Backport of upstream commit f08ffbbf2691bad2d5df660ee644647687775f0c
+# Can be dropped on a rebase to gdb 17.2 or 18.1
+Patch006: gdb-rhbz2435950-skip-revert.patch
+

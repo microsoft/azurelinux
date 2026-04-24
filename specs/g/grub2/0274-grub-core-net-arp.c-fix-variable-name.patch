@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leo Sandoval <lsandova@redhat.com>
+Date: Wed, 28 Aug 2024 13:37:42 -0600
+Subject: [PATCH] grub-core/net/arp.c: fix variable name
+
+Signed-off-by: Leo Sandoval <lsandova@redhat.com>
+---
+ grub-core/net/arp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/grub-core/net/arp.c b/grub-core/net/arp.c
+index 8bf0a06e1..7adeb7447 100644
+--- a/grub-core/net/arp.c
++++ b/grub-core/net/arp.c
+@@ -159,7 +159,7 @@ grub_net_arp_receive (struct grub_net_buff *nb, struct grub_net_card *card,
+   sender_addr.option = 0;
+   target_addr.option = 0;
+ 
+-  grub_memcpy(&target_addr.ipv4, tmp_ptr, pln);
++  grub_memcpy(&sender_addr.ipv4, tmp_ptr, pln);
+   tmp_ptr += pln;
+ 
+   grub_net_link_layer_add_address (card, &sender_addr, &sender_mac_addr, 1);

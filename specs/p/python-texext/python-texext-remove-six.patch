@@ -1,0 +1,38 @@
+--- texext-0.6.8/texext/mathcode.py.orig	2023-11-08 10:55:44.000000000 -0700
++++ texext-0.6.8/texext/mathcode.py	2025-11-10 16:53:48.352426960 -0700
+@@ -89,12 +89,10 @@ except ImportError:  # Sphinx < 1.8.0b1
+ 
+ 
+ def eval_code(code_str, context):
+-    # Avoid depending on six unless running mathcode directive
+-    from six import exec_
+     mod = parse(code_str, '<string>', 'exec')
+     last_line = mod.body.pop() if isinstance(mod.body[-1], Expr) else None
+     to_exec = compile(mod, '<string>', 'exec')
+-    exec_(to_exec, None, context)
++    exec(to_exec, None, context)
+     if last_line is None:
+         return None
+     to_eval = compile(Expression(last_line.value), '<string>', 'eval')
+--- texext-0.6.8/texext/tests/test_plotdirective.py.orig	2025-11-10 16:11:54.000000000 -0700
++++ texext-0.6.8/texext/tests/test_plotdirective.py	2025-11-10 16:55:17.439279337 -0700
+@@ -6,8 +6,6 @@ Test ability to combine plot_directive w
+ from os.path import dirname, join as pjoin
+ import re
+ 
+-from six import PY3
+-
+ import docutils
+ import sphinx
+ 
+@@ -41,9 +39,7 @@ def format_math_block(name, latex, label
+     label = 'None' if label is None else label
+     # Sphinx >= 1.5 has number="" clause in parameters
+     number_part = ' number="{}"'.format(number) if SPHINX_ge_1p5 else ''
+-    u_prefix = '' if PY3 or SPHINX_ge_1p7 else 'u'
+-    id_part = '' if ids is None else """ids="[{}'{}']" """.format(
+-        u_prefix, ids)
++    id_part = '' if ids is None else """ids="['{}']" """.format(ids)
+     return (
+         '<displaymath docname="{}" {}label="{}" '
+         'latex="{}" nowrap="False"{}/>'.format(

@@ -19,7 +19,7 @@
 
 Name:           php-%{gh_owner}-%{cname}
 Version:        1.2.6
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Zeta UnitTest Component
 
 License:        Apache-2.0

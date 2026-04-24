@@ -5,7 +5,7 @@
 
 Name:           libreplaygain
 Version:        0
-Release:        0.29.20110810svn%{svn_release}%{?dist}
+Release: 1.29.20110810svn%{svn_release}%{?dist}
 Summary:        Gain analysis library from Musepack
 
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.

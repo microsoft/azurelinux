@@ -3,7 +3,7 @@
 
 Name:           perl-Digest-CRC
 Version:        0.24
-Release:        12%{?dist}
+Release: 13%{?dist}
 Summary:        Generic CRC functions
 License:        LicenseRef-Fedora-Public-Domain
 URL:            https://metacpan.org/release/Digest-CRC

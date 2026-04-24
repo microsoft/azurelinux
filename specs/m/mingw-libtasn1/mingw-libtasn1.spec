@@ -5,7 +5,7 @@
 
 Name:           mingw-libtasn1
 Version:        4.21.0
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        MinGW Windows libtasn1 library
 
 # The libtasn1 library is LGPLv2+, utilities are GPLv3+;

@@ -3,7 +3,7 @@
 
 Name:		perl-Path-Class
 Version:	0.37
-Release:	30%{?dist}
+Release: 31%{?dist}
 Summary:	Cross-platform path specification manipulation
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Path-Class

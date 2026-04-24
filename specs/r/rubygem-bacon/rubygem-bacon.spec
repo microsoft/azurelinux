@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.2.0
-Release: 23%{?dist}
+Release: 24%{?dist}
 Summary: A small RSpec clone
 License: MIT
 URL: http://github.com/chneukirchen/bacon

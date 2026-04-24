@@ -1,0 +1,33 @@
+diff -u --recursive go-toml-2.2.4-vanilla/internal/cli/cli.go go-toml-2.2.4/internal/cli/cli.go
+--- go-toml-2.2.4-vanilla/internal/cli/cli.go	2025-04-07 06:11:38.000000000 -0500
++++ go-toml-2.2.4/internal/cli/cli.go	2025-12-21 12:13:54.565127273 -0600
+@@ -23,7 +23,7 @@
+ }
+ 
+ func (p *Program) Execute() {
+-	flag.Usage = func() { fmt.Fprintf(os.Stderr, p.Usage) }
++	flag.Usage = func() { fmt.Fprintf(os.Stderr, "%s", p.Usage) }
+ 	flag.Parse()
+ 	os.Exit(p.main(flag.Args(), os.Stdin, os.Stdout, os.Stderr))
+ }
+diff -u --recursive go-toml-2.2.4-vanilla/unmarshaler.go go-toml-2.2.4/unmarshaler.go
+--- go-toml-2.2.4-vanilla/unmarshaler.go	2025-04-07 06:11:38.000000000 -0500
++++ go-toml-2.2.4/unmarshaler.go	2025-12-21 12:10:35.286722057 -0600
+@@ -1010,7 +1010,7 @@
+ 	case reflect.Interface:
+ 		r = reflect.ValueOf(i)
+ 	default:
+-		return unstable.NewParserError(d.p.Raw(value.Raw), d.typeMismatchString("integer", v.Type()))
++		return unstable.NewParserError(d.p.Raw(value.Raw), "%s", d.typeMismatchString("integer", v.Type()))
+ 	}
+ 
+ 	if !r.Type().AssignableTo(v.Type()) {
+@@ -1029,7 +1029,7 @@
+ 	case reflect.Interface:
+ 		v.Set(reflect.ValueOf(string(value.Data)))
+ 	default:
+-		return unstable.NewParserError(d.p.Raw(value.Raw), d.typeMismatchString("string", v.Type()))
++		return unstable.NewParserError(d.p.Raw(value.Raw), "%s", d.typeMismatchString("string", v.Type()))
+ 	}
+ 
+ 	return nil

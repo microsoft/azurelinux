@@ -3,7 +3,7 @@
 
 Name:           speech-tools
 Version:        2.5
-Release:        26%{?dist}
+Release: 27%{?dist}
 Summary:        Edinburgh speech tools library
 
 License:        MIT-Festival

@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.0.3
-Release: 10%{?dist}
+Release: 11%{?dist}
 Summary: Manage modern JavaScript in Rails without transpiling or bundling
 License: MIT
 URL: https://github.com/rails/importmap-rails

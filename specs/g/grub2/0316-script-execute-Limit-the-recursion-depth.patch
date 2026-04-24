@@ -1,0 +1,55 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: B Horn <b@horn.uk>
+Date: Thu, 18 Apr 2024 19:04:13 +0100
+Subject: [PATCH] script/execute: Limit the recursion depth
+
+If unbounded recursion is allowed it becomes possible to collide the
+stack with the heap. As UEFI firmware often lacks guard pages this
+becomes an exploitable issue as it is possible in some cases to do
+a controlled overwrite of a section of this heap region with
+arbitrary data.
+
+Reported-by: B Horn <b@horn.uk>
+Signed-off-by: B Horn <b@horn.uk>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/script/execute.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/grub-core/script/execute.c b/grub-core/script/execute.c
+index c19b4bf70..7ed3a1a03 100644
+--- a/grub-core/script/execute.c
++++ b/grub-core/script/execute.c
+@@ -36,10 +36,18 @@
+    is sizeof (int) * 3, and one extra for a possible -ve sign.  */
+ #define ERRNO_DIGITS_MAX  (sizeof (int) * 3 + 1)
+ 
++/*
++ * A limit on recursion, to avoid colliding with the heap. UEFI defines a baseline
++ * stack size of 128 KiB. So, assuming at most 1-2 KiB per iteration this should
++ * keep us safe.
++ */
++#define MAX_RECURSION_DEPTH 64
++
+ static unsigned long is_continue;
+ static unsigned long active_loops;
+ static unsigned long active_breaks;
+ static unsigned long function_return;
++static unsigned long recursion_depth;
+ 
+ #define GRUB_SCRIPT_SCOPE_MALLOCED      1
+ #define GRUB_SCRIPT_SCOPE_ARGS_MALLOCED 2
+@@ -850,7 +858,13 @@ grub_script_execute_cmd (struct grub_script_cmd *cmd)
+   if (cmd == 0)
+     return 0;
+ 
++  recursion_depth++;
++
++  if (recursion_depth >= MAX_RECURSION_DEPTH)
++    return grub_error (GRUB_ERR_RECURSION_DEPTH, N_("maximum recursion depth exceeded"));
++
+   ret = cmd->exec (cmd);
++  recursion_depth--;
+ 
+   grub_snprintf (errnobuf, sizeof (errnobuf), "%d", ret);
+   grub_env_set ("?", errnobuf);

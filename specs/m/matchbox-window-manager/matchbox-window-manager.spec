@@ -10,7 +10,7 @@
 Summary:       Window manager for the Matchbox Desktop
 Name:          matchbox-window-manager
 Version:       1.2
-Release:       39.%{alphatag}%{?dist}
+Release: 40.%{alphatag}%{?dist}
 Url:           http://matchbox-project.org/
 # svn checkout http://svn.o-hand.com/repos/matchbox/trunk/matchbox-window-manager
 License:       GPL-2.0-or-later

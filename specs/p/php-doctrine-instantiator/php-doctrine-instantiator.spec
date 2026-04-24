@@ -25,7 +25,7 @@
 
 Name:           php-doctrine-instantiator
 Version:        1.5.0
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        Instantiate objects in PHP without invoking their constructors
 
 License:        MIT

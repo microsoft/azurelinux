@@ -1,0 +1,25 @@
+From 473ceafc25806f1dfd703d79c0417a2601a068cb Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Tue, 28 Oct 2025 11:45:27 +0000
+Subject: [PATCH] Allow PyO3 0.26 until we have 0.27, RHBZ#2404994
+
+---
+ rust/Cargo.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/rust/Cargo.toml b/rust/Cargo.toml
+index 0922472..b6d88b9 100644
+--- a/rust/Cargo.toml
++++ b/rust/Cargo.toml
+@@ -14,7 +14,7 @@ strip = true
+ overflow-checks = false
+ 
+ [dependencies]
+-pyo3 = { version = "0.27", features = ["extension-module", "generate-import-lib"] }
++pyo3 = { version = ">=0.26, <0.28", features = ["extension-module", "generate-import-lib"] }
+ 
+ [features]
+ extension-module = ["pyo3/extension-module"]
+-- 
+2.51.0
+

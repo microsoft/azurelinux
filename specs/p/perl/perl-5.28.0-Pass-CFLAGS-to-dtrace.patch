@@ -1,0 +1,63 @@
+Subject: [PATCH] Pass CFLAGS to dtrace
+
+Signed-off-by: Petr PĂ­saĹ <ppisar@redhat.com>
+---
+ Makefile.SH | 8 +++++---
+ cflags.SH   | 5 ++++-
+ 2 files changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile.SH b/Makefile.SH
+index 5fc6d1c..e89ad70 100755
+--- a/Makefile.SH
++++ b/Makefile.SH
+@@ -462,6 +462,8 @@ CCCMD    = sh $(shellflags) cflags "optimize='$(OPTIMIZE)'" $@
+ 
+ CCCMDSRC = sh $(shellflags) cflags "optimize='$(OPTIMIZE)'" $<
+ 
++DTRACEFLAGS = sh $(shellflags) cflags "optimize='$(OPTIMIZE)'" $@
++
+ CONFIGPM_FROM_CONFIG_SH = lib/Config.pm lib/Config_heavy.pl
+ CONFIGPM = $(CONFIGPM_FROM_CONFIG_SH) lib/Config_git.pl
+ 
+@@ -895,19 +897,19 @@ $(DTRACE_MINI_O): perldtrace.d $(miniperl_objs_nodt)
+ 	-rm -rf mpdtrace
+ 	mkdir mpdtrace
+ 	cp $(miniperl_objs_nodt) mpdtrace/
+-	$(DTRACE) -G -s perldtrace.d -o $(DTRACE_MINI_O) $(miniperl_dtrace_objs)
++	CFLAGS="`$(DTRACEFLAGS)`" $(DTRACE) -G -s perldtrace.d -o $(DTRACE_MINI_O) $(miniperl_dtrace_objs)
+ 
+ $(DTRACE_PERLLIB_O): perldtrace.d $(perllib_objs_nodt)
+ 	-rm -rf libpdtrace
+ 	mkdir libpdtrace
+ 	cp $(perllib_objs_nodt) libpdtrace/
+-	$(DTRACE) -G -s perldtrace.d -o $(DTRACE_PERLLIB_O) $(perllib_dtrace_objs)
++	CFLAGS="`$(DTRACEFLAGS)`" $(DTRACE) -G -s perldtrace.d -o $(DTRACE_PERLLIB_O) $(perllib_dtrace_objs)
+ 
+ $(DTRACE_MAIN_O): perldtrace.d perlmain$(OBJ_EXT)
+ 	-rm -rf maindtrace
+ 	mkdir maindtrace
+ 	cp perlmain$(OBJ_EXT) maindtrace/
+-	$(DTRACE) -G -s perldtrace.d -o $(DTRACE_MAIN_O) $(perlmain_dtrace_objs) ||	      \
++	CFLAGS="`$(DTRACEFLAGS)`" $(DTRACE) -G -s perldtrace.d -o $(DTRACE_MAIN_O) $(perlmain_dtrace_objs) ||	      \
+ 	  ( $(ECHO) "No probes in perlmain$(OBJ_EXT), generating a dummy $(DTRACE_MAIN_O)" && \
+ 	    $(ECHO) >dtrace_main.c &&							      \
+ 	    `$(CCCMD)` $(PLDLFLAGS) dtrace_main.c &&					      \
+diff --git a/cflags.SH b/cflags.SH
+index 3af1e97..b845127 100755
+--- a/cflags.SH
++++ b/cflags.SH
+@@ -519,7 +519,10 @@ for file do
+     toke) optimize=-O0 ;;
+     esac
+ 
+-    echo "$cc -c -DPERL_CORE $ccflags $stdflags $optimize $warn $extra"
++    case "$file" in
++    dtrace_*) echo "$ccflags $stdflags $optimize $warn $extra";;
++    *) echo "$cc -c -DPERL_CORE $ccflags $stdflags $optimize $warn $extra";;
++    esac
+ 
+     . $TOP/config.sh
+ 
+-- 
+2.17.1
+

@@ -3,7 +3,7 @@
 
 Name:           perl-MCE
 Version:        1.902
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Many-core Engine for Perl providing parallel processing capabilities
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/MCE

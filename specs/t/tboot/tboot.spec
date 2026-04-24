@@ -4,7 +4,7 @@
 Summary:       Performs a verified launch using Intel TXT
 Name:          tboot
 Version:       1.11.7
-Release:       13%{?dist}
+Release: 14%{?dist}
 Epoch:         1
 
 License:       BSD-3-Clause

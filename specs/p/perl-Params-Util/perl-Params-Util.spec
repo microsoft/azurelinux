@@ -3,7 +3,7 @@
 
 Name:		perl-Params-Util
 Version:	1.102
-Release:	19%{?dist}
+Release: 20%{?dist}
 Summary:	Simple standalone parameter-checking functions
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Params-Util

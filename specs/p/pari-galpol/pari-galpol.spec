@@ -3,7 +3,7 @@
 
 Name:		pari-galpol
 Version:	20180625
-Release:	17%{?dist}
+Release: 18%{?dist}
 Summary:	PARI/GP Computer Algebra System Galois polynomials
 License:	GPL-2.0-or-later
 URL:		http://pari.math.u-bordeaux.fr/packages.html

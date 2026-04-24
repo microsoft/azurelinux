@@ -3,7 +3,7 @@
 
 Name:           perl-Text-Balanced
 Version:        2.07
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Extract delimited text sequences from strings
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Text-Balanced

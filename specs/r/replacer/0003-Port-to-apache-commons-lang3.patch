@@ -1,0 +1,158 @@
+From 284e73a5b0d51230170f713cdc9e6ae58f352d1c Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Thu, 12 Sep 2024 11:09:43 +0200
+Subject: [PATCH 1/3] Port to apache-commons-lang3
+
+---
+ .../google/code/maven_replacer_plugin/DelimiterBuilder.java   | 2 +-
+ .../com/google/code/maven_replacer_plugin/Replacement.java    | 2 +-
+ .../code/maven_replacer_plugin/ReplacementProcessor.java      | 2 +-
+ .../google/code/maven_replacer_plugin/ReplacerFactory.java    | 2 +-
+ .../com/google/code/maven_replacer_plugin/ReplacerMojo.java   | 2 +-
+ .../com/google/code/maven_replacer_plugin/TokenReplacer.java  | 4 ++--
+ .../com/google/code/maven_replacer_plugin/file/FileUtils.java | 4 ++--
+ .../maven_replacer_plugin/ReplacerMojoIntegrationTest.java    | 4 ++--
+ .../google/code/maven_replacer_plugin/ReplacerMojoTest.java   | 2 +-
+ .../google/code/maven_replacer_plugin/file/FileUtilsTest.java | 2 +-
+ 10 files changed, 13 insertions(+), 13 deletions(-)
+
+diff --git a/src/main/java/com/google/code/maven_replacer_plugin/DelimiterBuilder.java b/src/main/java/com/google/code/maven_replacer_plugin/DelimiterBuilder.java
+index c373e19..fdbd2de 100644
+--- a/src/main/java/com/google/code/maven_replacer_plugin/DelimiterBuilder.java
++++ b/src/main/java/com/google/code/maven_replacer_plugin/DelimiterBuilder.java
+@@ -1,6 +1,6 @@
+ package com.google.code.maven_replacer_plugin;
+ 
+-import static org.apache.commons.lang.StringUtils.defaultString;
++import static org.apache.commons.lang3.StringUtils.defaultString;
+ 
+ 
+ public class DelimiterBuilder {
+diff --git a/src/main/java/com/google/code/maven_replacer_plugin/Replacement.java b/src/main/java/com/google/code/maven_replacer_plugin/Replacement.java
+index c4448e9..8457532 100644
+--- a/src/main/java/com/google/code/maven_replacer_plugin/Replacement.java
++++ b/src/main/java/com/google/code/maven_replacer_plugin/Replacement.java
+@@ -2,7 +2,7 @@ package com.google.code.maven_replacer_plugin;
+ 
+ import java.io.IOException;
+ 
+-import org.apache.commons.lang.StringEscapeUtils;
++import org.apache.commons.lang3.StringEscapeUtils;
+ 
+ import com.google.code.maven_replacer_plugin.file.FileUtils;
+ 
+diff --git a/src/main/java/com/google/code/maven_replacer_plugin/ReplacementProcessor.java b/src/main/java/com/google/code/maven_replacer_plugin/ReplacementProcessor.java
+index 270e4f5..a0d3cd7 100644
+--- a/src/main/java/com/google/code/maven_replacer_plugin/ReplacementProcessor.java
++++ b/src/main/java/com/google/code/maven_replacer_plugin/ReplacementProcessor.java
+@@ -1,6 +1,6 @@
+ package com.google.code.maven_replacer_plugin;
+ 
+-import static org.apache.commons.lang.StringUtils.isEmpty;
++import static org.apache.commons.lang3.StringUtils.isEmpty;
+ 
+ import java.io.IOException;
+ import java.util.List;
+diff --git a/src/main/java/com/google/code/maven_replacer_plugin/ReplacerFactory.java b/src/main/java/com/google/code/maven_replacer_plugin/ReplacerFactory.java
+index d9e9396..8aafc8b 100644
+--- a/src/main/java/com/google/code/maven_replacer_plugin/ReplacerFactory.java
++++ b/src/main/java/com/google/code/maven_replacer_plugin/ReplacerFactory.java
+@@ -1,6 +1,6 @@
+ package com.google.code.maven_replacer_plugin;
+ 
+-import static org.apache.commons.lang.StringUtils.isNotEmpty;
++import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+ 
+ 
+ public class ReplacerFactory {
+diff --git a/src/main/java/com/google/code/maven_replacer_plugin/ReplacerMojo.java b/src/main/java/com/google/code/maven_replacer_plugin/ReplacerMojo.java
+index ac165a9..878a3f4 100644
+--- a/src/main/java/com/google/code/maven_replacer_plugin/ReplacerMojo.java
++++ b/src/main/java/com/google/code/maven_replacer_plugin/ReplacerMojo.java
+@@ -1,6 +1,6 @@
+ package com.google.code.maven_replacer_plugin;
+ 
+-import static org.apache.commons.lang.StringUtils.isBlank;
++import static org.apache.commons.lang3.StringUtils.isBlank;
+ 
+ import com.google.code.maven_replacer_plugin.file.FileUtils;
+ import com.google.code.maven_replacer_plugin.include.FileSelector;
+diff --git a/src/main/java/com/google/code/maven_replacer_plugin/TokenReplacer.java b/src/main/java/com/google/code/maven_replacer_plugin/TokenReplacer.java
+index c3a563c..2ca3f89 100644
+--- a/src/main/java/com/google/code/maven_replacer_plugin/TokenReplacer.java
++++ b/src/main/java/com/google/code/maven_replacer_plugin/TokenReplacer.java
+@@ -1,7 +1,7 @@
+ package com.google.code.maven_replacer_plugin;
+ 
+-import static org.apache.commons.lang.StringUtils.defaultString;
+-import static org.apache.commons.lang.StringUtils.isEmpty;
++import static org.apache.commons.lang3.StringUtils.defaultString;
++import static org.apache.commons.lang3.StringUtils.isEmpty;
+ 
+ import java.util.regex.Pattern;
+ 
+diff --git a/src/main/java/com/google/code/maven_replacer_plugin/file/FileUtils.java b/src/main/java/com/google/code/maven_replacer_plugin/file/FileUtils.java
+index a016813..1607fd7 100644
+--- a/src/main/java/com/google/code/maven_replacer_plugin/file/FileUtils.java
++++ b/src/main/java/com/google/code/maven_replacer_plugin/file/FileUtils.java
+@@ -1,7 +1,7 @@
+ package com.google.code.maven_replacer_plugin.file;
+ 
+-import static org.apache.commons.lang.StringUtils.isBlank;
+-import static org.apache.commons.lang.StringUtils.isNotBlank;
++import static org.apache.commons.lang3.StringUtils.isBlank;
++import static org.apache.commons.lang3.StringUtils.isNotBlank;
+ 
+ import java.io.File;
+ import java.io.IOException;
+diff --git a/src/test/java/com/google/code/maven_replacer_plugin/ReplacerMojoIntegrationTest.java b/src/test/java/com/google/code/maven_replacer_plugin/ReplacerMojoIntegrationTest.java
+index 0e7aa64..e97ddb0 100644
+--- a/src/test/java/com/google/code/maven_replacer_plugin/ReplacerMojoIntegrationTest.java
++++ b/src/test/java/com/google/code/maven_replacer_plugin/ReplacerMojoIntegrationTest.java
+@@ -21,7 +21,7 @@ import java.util.regex.PatternSyntaxException;
+ 
+ import org.apache.commons.io.FileUtils;
+ import org.apache.commons.io.IOUtils;
+-import org.apache.commons.lang.math.RandomUtils;
++import org.apache.commons.lang3.RandomUtils;
+ import org.apache.maven.plugin.MojoExecutionException;
+ import org.apache.maven.plugin.logging.Log;
+ import org.junit.Before;
+@@ -492,7 +492,7 @@ public class ReplacerMojoIntegrationTest {
+ 
+     @Test
+     public void shouldOnlyReplaceUpToMaxReplacements() throws Exception {
+-        String randomBase = String.valueOf(RandomUtils.nextInt(10));
++        String randomBase = String.valueOf(RandomUtils.nextInt(0, 10));
+         String include1 = createTempFile(randomBase + "/prefix1", TOKEN);
+         String include2 = createTempFile(randomBase + "/prefix2", TOKEN);
+         List<String> includes = asList("target/" + randomBase + "**/prefix*");
+diff --git a/src/test/java/com/google/code/maven_replacer_plugin/ReplacerMojoTest.java b/src/test/java/com/google/code/maven_replacer_plugin/ReplacerMojoTest.java
+index 060f916..cb60323 100644
+--- a/src/test/java/com/google/code/maven_replacer_plugin/ReplacerMojoTest.java
++++ b/src/test/java/com/google/code/maven_replacer_plugin/ReplacerMojoTest.java
+@@ -24,7 +24,7 @@ import java.io.IOException;
+ import java.util.Arrays;
+ import java.util.List;
+ 
+-import org.apache.commons.lang.builder.EqualsBuilder;
++import org.apache.commons.lang3.builder.EqualsBuilder;
+ import org.apache.maven.plugin.MojoExecutionException;
+ import org.apache.maven.plugin.logging.Log;
+ import org.hamcrest.BaseMatcher;
+diff --git a/src/test/java/com/google/code/maven_replacer_plugin/file/FileUtilsTest.java b/src/test/java/com/google/code/maven_replacer_plugin/file/FileUtilsTest.java
+index c45d7ce..8dccf57 100644
+--- a/src/test/java/com/google/code/maven_replacer_plugin/file/FileUtilsTest.java
++++ b/src/test/java/com/google/code/maven_replacer_plugin/file/FileUtilsTest.java
+@@ -1,7 +1,7 @@
+ package com.google.code.maven_replacer_plugin.file;
+ 
+ import static java.util.Arrays.asList;
+-import static org.apache.commons.lang.StringUtils.join;
++import static org.apache.commons.lang3.StringUtils.join;
+ import static org.hamcrest.MatcherAssert.assertThat;
+ import static org.hamcrest.Matchers.equalTo;
+ import static org.hamcrest.Matchers.not;
+-- 
+2.46.0
+

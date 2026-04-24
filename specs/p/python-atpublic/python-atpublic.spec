@@ -12,7 +12,7 @@ Python 3.6.
 
 Name:           python-atpublic
 Version:        4.1.0
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        Decorator for populating a Python module's __all__
 
 License:        Apache-2.0

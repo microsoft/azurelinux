@@ -7,7 +7,7 @@
 
 Name:           rocm
 Version:        %{rocm_version}
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        ROCm Metapackage
 License:        MIT
 

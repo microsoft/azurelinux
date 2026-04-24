@@ -1,0 +1,6 @@
+hash: b950c00371af7418a0968792ebda025e216ee3f13e277246f157e7683e55bc68
+imports:
+- name: github.com/kr/text
+  version: 67253a98dcf0dd3273ea58929d7aaaa781ef6d13
+updated: '2018-06-17T20:52:28.711754+00:00'
+

@@ -1,0 +1,8 @@
+hash: 3c3e1b44a5ce49aab8632b1701b715fdb41d908a2ab526eefec16ce1ea15a95d
+imports:
+- name: github.com/gorilla/securecookie
+  version: 1b0c7f6e9ab3d7f500fd7d50c7ad835ff428139b
+- name: github.com/gorilla/context
+  version: 215affda49addc4c8ef7e2534915df2c8c35c6cd
+updated: '2018-06-11T15:46:37.983413+00:00'
+

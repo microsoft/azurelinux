@@ -12,7 +12,7 @@ Summary: Azerbaijani hunspell dictionaries
 # date is derived from upstream az.dic file timestamp
 %global upstreamid 20180807
 Version: 0.%{upstreamid}
-Release: 7%{?dist}
+Release: 8%{?dist}
 Source: https://github.com/mozillaz/spellchecker/archive/refs/heads/master.zip#/azerbaijani_spellchecker-0.2.zip
 URL: https://github.com/mozillaz/spellchecker/
 License: MPL-2.0

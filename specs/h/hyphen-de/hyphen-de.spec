@@ -5,7 +5,7 @@ Name: hyphen-de
 Summary: German hyphenation rules
 %global upstreamid 20060120
 Version: 0.%{upstreamid}
-Release: 36%{?dist}
+Release: 37%{?dist}
 Source: http://download.services.openoffice.org/contrib/dictionaries/hyph_de_DE.zip
 URL: http://wiki.services.openoffice.org/wiki/Dictionaries
 License: LGPL-2.1-or-later

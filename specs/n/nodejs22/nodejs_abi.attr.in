@@ -1,2 +1,0 @@
-%__nodejs@NODEJS_VERSION_MAJOR@_native_requires %{_rpmconfigdir}/nodejs@NODEJS_VERSION_MAJOR@_abi.req
-%__nodejs@NODEJS_VERSION_MAJOR@_native_path     ^/usr/lib.*/node_modules_@NODEJS_VERSION_MAJOR@/.*\\.node$

@@ -4,7 +4,7 @@
 Name:           python-rpm-generators
 Summary:        Dependency generators for Python RPMs
 Version:        14
-Release:        13%{?dist}
+Release: 14%{?dist}
 
 Url:            https://src.fedoraproject.org/rpms/python-rpm-generators
 

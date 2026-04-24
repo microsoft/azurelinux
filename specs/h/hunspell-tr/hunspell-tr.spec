@@ -11,7 +11,7 @@ Name:       hunspell-tr
 Summary:    Turkish hunspell dictionaries
 Version:    1.1.0
 License:    MIT
-Release:    10%{?dist}
+Release: 11%{?dist}
 
 URL:        https://github.com/tdd-ai/hunspell-tr
 Source:     https://github.com/tdd-ai/hunspell-tr/archive/v%{version}/%{name}-v%{version}.tar.gz

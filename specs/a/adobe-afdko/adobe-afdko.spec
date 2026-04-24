@@ -9,7 +9,7 @@
 
 Name:		adobe-afdko
 Version:	4.0.3
-Release:	1%{?dist}
+Release: 2%{?dist}
 Summary:	Adobe Font Development Kit for OpenType
 # Everything is Apache-2.0 except:
 #

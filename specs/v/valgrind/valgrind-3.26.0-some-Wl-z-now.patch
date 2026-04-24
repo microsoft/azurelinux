@@ -1,0 +1,53 @@
+diff --git a/auxprogs/Makefile.am b/auxprogs/Makefile.am
+index 2b8703cf1a63..8cb828b85c57 100644
+--- a/auxprogs/Makefile.am
++++ b/auxprogs/Makefile.am
+@@ -50,7 +50,7 @@ valgrind_listener_SOURCES = valgrind-listener.c
+ valgrind_listener_CPPFLAGS  = $(AM_CPPFLAGS_PRI) -I$(top_srcdir)/coregrind
+ valgrind_listener_CFLAGS    = $(AM_CFLAGS_PRI) -fhosted -fstack-protector-strong
+ valgrind_listener_CCASFLAGS = $(AM_CCASFLAGS_PRI)
+-valgrind_listener_LDFLAGS   = $(AM_CFLAGS_PRI)
++valgrind_listener_LDFLAGS   = $(AM_CFLAGS_PRI) -Wl,-z,now
+ if VGCONF_PLATVARIANT_IS_ANDROID
+ valgrind_listener_CFLAGS    += -static
+ endif
+@@ -69,7 +69,7 @@ valgrind_di_server_SOURCES   = valgrind-di-server.c
+ valgrind_di_server_CPPFLAGS  = $(AM_CPPFLAGS_PRI) -I$(top_srcdir)/coregrind
+ valgrind_di_server_CFLAGS    = $(AM_CFLAGS_PRI) -fhosted -fstack-protector-strong
+ valgrind_di_server_CCASFLAGS = $(AM_CCASFLAGS_PRI)
+-valgrind_di_server_LDFLAGS   = $(AM_CFLAGS_PRI)
++valgrind_di_server_LDFLAGS   = $(AM_CFLAGS_PRI) -Wl,-z,now
+ if VGCONF_PLATVARIANT_IS_ANDROID
+ valgrind_di_server_CFLAGS    += -static
+ endif
+@@ -104,7 +104,7 @@ getoff_@VGCONF_ARCH_PRI@_@VGCONF_OS@_SOURCES   = getoff.c
+ getoff_@VGCONF_ARCH_PRI@_@VGCONF_OS@_CPPFLAGS  = $(AM_CPPFLAGS_@VGCONF_PLATFORM_PRI_CAPS@)
+ getoff_@VGCONF_ARCH_PRI@_@VGCONF_OS@_CFLAGS    = $(AM_CFLAGS_@VGCONF_PLATFORM_PRI_CAPS@) -fhosted -fstack-protector-strong
+ getoff_@VGCONF_ARCH_PRI@_@VGCONF_OS@_CCASFLAGS = $(AM_CCASFLAGS_PRI)
+-getoff_@VGCONF_ARCH_PRI@_@VGCONF_OS@_LDFLAGS   = $(AM_CFLAGS_PRI) @LIB_UBSAN@
++getoff_@VGCONF_ARCH_PRI@_@VGCONF_OS@_LDFLAGS   = $(AM_CFLAGS_PRI) @LIB_UBSAN@ -Wl,-z,now
+ if HAVE_DLINFO_RTLD_DI_TLS_MODID
+ getoff_@VGCONF_ARCH_PRI@_@VGCONF_OS@_LDADD = $(LDADD) -ldl
+ endif
+diff --git a/coregrind/Makefile.am b/coregrind/Makefile.am
+index 0bcb4a4f423f..59fc48052e50 100644
+--- a/coregrind/Makefile.am
++++ b/coregrind/Makefile.am
+@@ -64,7 +64,7 @@ RANLIB = ${LTO_RANLIB}
+ valgrind_CPPFLAGS  = $(AM_CPPFLAGS_PRI)
+ valgrind_CFLAGS    = $(AM_CFLAGS_PRI) $(LTO_CFLAGS) -fhosted -fstack-protector-strong
+ valgrind_CCASFLAGS = $(AM_CCASFLAGS_PRI)
+-valgrind_LDFLAGS   = $(AM_CFLAGS_PRI) @LIB_UBSAN@
++valgrind_LDFLAGS   = $(AM_CFLAGS_PRI) @LIB_UBSAN@ -Wl,-z,now
+ # If there is no secondary platform, and the platforms include x86-darwin,
+ # then the primary platform must be x86-darwin.  Hence:
+ if ! VGCONF_HAVE_PLATFORM_SEC
+@@ -106,7 +106,7 @@ endif
+ vgdb_CPPFLAGS  = $(AM_CPPFLAGS_PRI) $(GDB_SCRIPTS_DIR)
+ vgdb_CFLAGS    = $(AM_CFLAGS_PRI) $(LTO_CFLAGS) -fhosted -fstack-protector-strong
+ vgdb_CCASFLAGS = $(AM_CCASFLAGS_PRI)
+-vgdb_LDFLAGS   = $(AM_CFLAGS_PRI) @LIB_UBSAN@
++vgdb_LDFLAGS   = $(AM_CFLAGS_PRI) @LIB_UBSAN@ -Wl,-z,now
+ if VGCONF_PLATVARIANT_IS_ANDROID
+ vgdb_CFLAGS    += -static
+ endif

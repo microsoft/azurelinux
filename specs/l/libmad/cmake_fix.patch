@@ -1,0 +1,27 @@
+From 326363f04e583b563f63941db3cf7f50e76aceb2 Mon Sep 17 00:00:00 2001
+From: Be <be@mixxx.org>
+Date: Wed, 14 Feb 2024 18:18:49 -0600
+Subject: [PATCH] bump CMake minimum version to 3.5.0
+
+to fix warning
+
+CMake Deprecation Warning at CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.5 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value or use a ...<max> suffix to tell
+  CMake that the project does not need compatibility with older versions.
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 43d2007..122eb55 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 3.1.0)
++cmake_minimum_required(VERSION 3.5.0)
+ project(mad VERSION 0.16.4)
+ 
+ option(BUILD_SHARED_LIBS "Build dynamic library" ON)

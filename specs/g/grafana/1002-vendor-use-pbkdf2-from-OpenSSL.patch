@@ -1,0 +1,135 @@
+use pbkdf2 from OpenSSL if FIPS mode is enabled
+
+This patch modifies the x/crypto/pbkdf2 function to use OpenSSL
+if FIPS mode is enabled.
+DEFINEFUNC is from /usr/lib/golang/src/vendor/github.com/golang-fips/openssl-fips/openssl/goopenssl.h
+
+diff --git a/vendor/golang.org/x/crypto/internal/boring/boring.go b/vendor/golang.org/x/crypto/internal/boring/boring.go
+new file mode 100644
+index 0000000000..5a06918832
+--- /dev/null
++++ b/vendor/golang.org/x/crypto/internal/boring/boring.go
+@@ -0,0 +1,74 @@
++// Copyright 2017 The Go Authors. All rights reserved.
++// Copyright 2021 Red Hat.
++// Use of this source code is governed by a BSD-style
++// license that can be found in the LICENSE file.
++
++// +build linux
++// +build !android
++// +build !no_openssl
++// +build !cmd_go_bootstrap
++// +build !msan
++
++package boring
++
++// #include "/usr/lib/golang/src/vendor/github.com/golang-fips/openssl/v2/goopenssl.h"
++// #cgo LDFLAGS: -ldl
++import "C"
++import (
++	"bytes"
++	"crypto/sha1"
++	"crypto/sha256"
++	"hash"
++	"unsafe"
++)
++
++var (
++	emptySha1   = sha1.Sum([]byte{})
++	emptySha256 = sha256.Sum256([]byte{})
++)
++
++func hashToMD(h hash.Hash) C.GO_EVP_MD_PTR {
++	emptyHash := h.Sum([]byte{})
++
++	switch {
++	case bytes.Equal(emptyHash, emptySha1[:]):
++		return C.go_openssl_EVP_sha1()
++	case bytes.Equal(emptyHash, emptySha256[:]):
++		return C.go_openssl_EVP_sha256()
++	}
++	return nil
++}
++
++// charptr returns the address of the underlying array in b,
++// being careful not to panic when b has zero length.
++func charptr(b []byte) *C.char {
++	if len(b) == 0 {
++		return nil
++	}
++	return (*C.char)(unsafe.Pointer(&b[0]))
++}
++
++// ucharptr returns the address of the underlying array in b,
++// being careful not to panic when b has zero length.
++func ucharptr(b []byte) *C.uchar {
++	if len(b) == 0 {
++		return nil
++	}
++	return (*C.uchar)(unsafe.Pointer(&b[0]))
++}
++
++func Pbkdf2Key(password, salt []byte, iter, keyLen int, h func() hash.Hash) []byte {
++	// println("[debug] using pbkdf2 from OpenSSL")
++	ch := h()
++	md := hashToMD(ch)
++	if md == nil {
++		return nil
++	}
++
++	out := make([]byte, keyLen)
++	ok := C.go_openssl_PKCS5_PBKDF2_HMAC(charptr(password), C.int(len(password)), ucharptr(salt), C.int(len(salt)), C.int(iter), md, C.int(keyLen), ucharptr(out))
++	if ok != 1 {
++		panic("boringcrypto: PKCS5_PBKDF2_HMAC failed")
++	}
++	return out
++}
+diff --git a/vendor/golang.org/x/crypto/internal/boring/notboring.go b/vendor/golang.org/x/crypto/internal/boring/notboring.go
+new file mode 100644
+index 0000000000..e244fb5663
+--- /dev/null
++++ b/vendor/golang.org/x/crypto/internal/boring/notboring.go
+@@ -0,0 +1,16 @@
++// Copyright 2017 The Go Authors. All rights reserved.
++// Copyright 2021 Red Hat.
++// Use of this source code is governed by a BSD-style
++// license that can be found in the LICENSE file.
++
++// +build !linux !cgo android cmd_go_bootstrap msan no_openssl
++
++package boring
++
++import (
++	"hash"
++)
++
++func Pbkdf2Key(password, salt []byte, iter, keyLen int, h func() hash.Hash) []byte {
++	panic("boringcrypto: not available")
++}
+diff --git a/vendor/golang.org/x/crypto/pbkdf2/pbkdf2.go b/vendor/golang.org/x/crypto/pbkdf2/pbkdf2.go
+index 593f653008..799a611f94 100644
+--- a/vendor/golang.org/x/crypto/pbkdf2/pbkdf2.go
++++ b/vendor/golang.org/x/crypto/pbkdf2/pbkdf2.go
+@@ -19,8 +19,11 @@ pbkdf2.Key.
+ package pbkdf2 // import "golang.org/x/crypto/pbkdf2"
+ 
+ import (
++	"crypto/boring"
+ 	"crypto/hmac"
+ 	"hash"
++
++	xboring "golang.org/x/crypto/internal/boring"
+ )
+ 
+ // Key derives a key from the password, salt and iteration count, returning a
+@@ -40,6 +43,10 @@ import (
+ // Using a higher iteration count will increase the cost of an exhaustive
+ // search but will also make derivation proportionally slower.
+ func Key(password, salt []byte, iter, keyLen int, h func() hash.Hash) []byte {
++	if boring.Enabled() {
++		return xboring.Pbkdf2Key(password, salt, iter, keyLen, h)
++	}
++
+ 	prf := hmac.New(h, password)
+ 	hashLen := prf.Size()
+ 	numBlocks := (keyLen + hashLen - 1) / hashLen

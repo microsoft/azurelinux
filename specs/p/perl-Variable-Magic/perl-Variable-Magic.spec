@@ -3,7 +3,7 @@
 
 Name:           perl-Variable-Magic
 Version:        0.64
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        Associate user-defined magic to variables from Perl
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 

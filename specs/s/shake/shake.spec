@@ -19,7 +19,7 @@
 Name:           %{pkg_name}
 Version:        0.19.8
 # can only be reset when all subpkgs bumped
-Release:        33%{?dist}
+Release: 34%{?dist}
 Summary:        Build system library, like Make, but more accurate dependencies
 
 License:        BSD-3-Clause

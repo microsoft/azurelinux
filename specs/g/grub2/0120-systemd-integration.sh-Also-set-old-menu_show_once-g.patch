@@ -1,0 +1,32 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Thu, 23 Jul 2020 09:27:36 +0200
+Subject: [PATCH] systemd-integration.sh: Also set old menu_show_once grubenv
+ var
+
+Downstream RH / Fedora patch for compatibility with old, not (yet)
+regenerated grub.cfg files which miss the menu_show_once_timeout check.
+This older grubenv variable leads to a fixed timeout of 60 seconds.
+
+Note that the new menu_show_once_timeout will overrule these 60 seconds
+if both are set and the grub.cfg does have the menu_show_once_timeout
+check.
+
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+---
+ util/systemd/systemd-integration.sh.in | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/util/systemd/systemd-integration.sh.in b/util/systemd/systemd-integration.sh.in
+index dc1218597bc..a4c071c5b0c 100644
+--- a/util/systemd/systemd-integration.sh.in
++++ b/util/systemd/systemd-integration.sh.in
+@@ -4,3 +4,8 @@ TIMEOUT_USEC=$(cat /run/systemd/reboot-to-boot-loader-menu)
+ TIMEOUT=$(((TIMEOUT_USEC + 500000) / 1000000))
+ 
+ @grub_editenv@ - set menu_show_once_timeout=$TIMEOUT
++
++# Downstream RH / Fedora patch for compatibility with old, not (yet)
++# regenerated grub.cfg files which miss the menu_show_once_timeout check
++# this older grubenv variable leads to a fixed timeout of 60 seconds
++@grub_editenv@ - set menu_show_once=1

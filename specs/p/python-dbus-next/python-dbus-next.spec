@@ -8,7 +8,7 @@
 
 Name:           python-%{pypi_name}
 Version:        0.2.3
-Release:        17%{?dist}
+Release: 18%{?dist}
 Summary:        Zero-dependency DBus library for Python with asyncio support
 
 License:        MIT

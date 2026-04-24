@@ -6,7 +6,7 @@
 
 Name: dwarves
 Version: 1.30
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPL-2.0-only
 Summary: Debugging Information Manipulation Tools (pahole & friends)
 URL: http://acmel.wordpress.com

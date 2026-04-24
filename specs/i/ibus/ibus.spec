@@ -66,7 +66,7 @@
 Name:           ibus
 Version:        1.5.33
 # https://github.com/fedora-infra/rpmautospec/issues/101
-Release:        5%{?dist}
+Release: 6%{?dist}
 Summary:        Intelligent Input Bus for Linux OS
 License:        LGPL-2.1-or-later
 URL:            https://github.com/ibus/%name/wiki

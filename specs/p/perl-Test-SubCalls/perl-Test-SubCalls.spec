@@ -3,7 +3,7 @@
 
 Name:           perl-Test-SubCalls
 Version:        1.10
-Release:        23%{?dist}
+Release: 24%{?dist}
 Summary:        Track the number of times subs are called
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Test-SubCalls

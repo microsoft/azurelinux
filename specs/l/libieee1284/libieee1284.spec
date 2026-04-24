@@ -4,7 +4,7 @@
 Summary: A library for interfacing IEEE 1284-compatible devices
 Name: libieee1284
 Version: 0.2.11
-Release: 47%{?dist}
+Release: 48%{?dist}
 # Automatically converted from old format: GPLv2+ - review is highly recommended.
 License: GPL-2.0-or-later
 URL: http://cyberelk.net/tim/libieee1284/

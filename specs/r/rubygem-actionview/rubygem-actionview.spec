@@ -8,7 +8,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 8.0.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Rendering framework putting the V in MVC (part of Rails)
 License: MIT
 URL: https://rubyonrails.org

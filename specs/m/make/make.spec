@@ -8,7 +8,7 @@
 Name: make
 Epoch: 1
 Version: 4.4.1
-Release: 11%{?dist}
+Release: 12%{?dist}
 License: GPL-3.0-or-later AND LGPL-2.1-or-later AND GFDL-1.3-or-later AND FSFULLR
 URL: https://www.gnu.org/software/make/
 Source: https://ftp.gnu.org/gnu/make/make-%{version}.tar.gz

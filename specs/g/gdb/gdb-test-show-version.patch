@@ -1,0 +1,34 @@
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Andrew Burgess <aburgess@redhat.com>
+Date: Fri, 27 Oct 2017 21:07:50 +0200
+Subject: gdb-test-show-version.patch
+
+;; Check distro name is included in the version output.
+
+diff --git a/gdb/testsuite/gdb.base/fedora-version.exp b/gdb/testsuite/gdb.base/fedora-version.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.base/fedora-version.exp
+@@ -0,0 +1,22 @@
++# Copyright 2023 Free Software Foundation, Inc.
++
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 3 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++
++# Start with a fresh gdb
++clean_restart
++
++# Check the version string contains either the Fedora or RHEL distro
++# name, and that the version number looks roughly correct in format.
++gdb_test "show version" \
++    "GNU gdb \\((Fedora Linux|Red Hat Enterprise Linux)\\) \[0-9\]+\\.\[0-9\]+-\[0-9\]+.*"

@@ -8,7 +8,7 @@
 
 Name: docbook-dtds
 Version: 1.0
-Release: 89%{?dist}
+Release: 90%{?dist}
 
 Summary: SGML and XML document type definitions for DocBook
 

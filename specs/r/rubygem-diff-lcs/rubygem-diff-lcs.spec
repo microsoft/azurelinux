@@ -9,7 +9,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.5.0
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary: Provide a list of changes between two sequenced collections
 License: MIT OR Artistic-2.0 OR GPL-2.0-or-later
 URL: https://github.com/halostatue/diff-lcs

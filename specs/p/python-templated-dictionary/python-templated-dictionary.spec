@@ -10,7 +10,7 @@
 
 Name:       python-%{srcname}
 Version:    1.6
-Release:    5%{?dist}
+Release: 6%{?dist}
 Summary:    Dictionary with Jinja2 expansion
 
 License:    GPL-2.0-or-later

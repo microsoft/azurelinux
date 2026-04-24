@@ -1,0 +1,26 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leo Sandoval <lsandova@redhat.com>
+Date: Wed, 7 May 2025 13:49:47 -0600
+Subject: [PATCH] blscfg: check if variable is escaped before considering one
+
+Otherwise escaped variables are considered real variables.
+
+Signed-off-by: Leo Sandoval <lsandova@redhat.com>
+---
+ grub-core/commands/blscfg.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/commands/blscfg.c b/grub-core/commands/blscfg.c
+index 6e398fc175..5d931b0c9b 100644
+--- a/grub-core/commands/blscfg.c
++++ b/grub-core/commands/blscfg.c
+@@ -695,7 +695,8 @@ static char *expand_val(const char *value)
+     return NULL;
+ 
+   while (*value) {
+-    if (*value == '$') {
++    /* It's a variable only when *value is '$' and it is not escaped with '\'*/
++    if (*value == '$' && *end != '\\') {
+       if (start != end) {
+ 	buffer = field_append(is_var, buffer, start, end);
+ 	if (!buffer)

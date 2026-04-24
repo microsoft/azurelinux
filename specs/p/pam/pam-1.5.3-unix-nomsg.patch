@@ -1,0 +1,17 @@
+Index: Linux-PAM-1.5.3/modules/pam_unix/pam_unix_passwd.c
+===================================================================
+--- Linux-PAM-1.5.3.orig/modules/pam_unix/pam_unix_passwd.c
++++ Linux-PAM-1.5.3/modules/pam_unix/pam_unix_passwd.c
+@@ -678,12 +678,6 @@ pam_sm_chauthtok(pam_handle_t *pamh, int
+ 			return PAM_SUCCESS;
+ 		} else if (off(UNIX__IAMROOT, ctrl) ||
+ 			   (on(UNIX_NIS, ctrl) && _unix_comesfromsource(pamh, user, 0, 1))) {
+-			/* instruct user what is happening */
+-			if (off(UNIX__QUIET, ctrl)) {
+-				retval = pam_info(pamh, _("Changing password for %s."), user);
+-				if (retval != PAM_SUCCESS)
+-					return retval;
+-			}
+ 			retval = pam_get_authtok(pamh, PAM_OLDAUTHTOK, &pass_old, NULL);
+ 
+ 			if (retval != PAM_SUCCESS) {

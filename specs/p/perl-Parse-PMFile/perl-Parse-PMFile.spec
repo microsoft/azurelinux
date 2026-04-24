@@ -6,7 +6,7 @@
 
 Name:           perl-Parse-PMFile
 Version:        0.47
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Parses .pm file as PAUSE does
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Parse-PMFile

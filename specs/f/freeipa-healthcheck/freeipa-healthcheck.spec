@@ -20,7 +20,7 @@
 
 Name:           %{prefix}-healthcheck
 Version:        0.19
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Health check tool for %{productname}
 BuildArch:      noarch
 License:        GPL-3.0-or-later

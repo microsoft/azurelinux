@@ -28,7 +28,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
 Version:        1.0.2
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Library for parsing CLI options, version 1
 
 License:        BSD-3-Clause

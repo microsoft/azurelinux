@@ -7,7 +7,7 @@
 
 Name:           linenoise
 Version:        1.0
-Release:        13.20200312git%{shortcommit}%{?dist}
+Release: 14.20200312git%{shortcommit}%{?dist}
 Summary:        Minimal replacement for readline
 License:        BSD-2-Clause
 URL:            https://github.com/antirez/linenoise

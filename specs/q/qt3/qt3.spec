@@ -9,7 +9,7 @@
 Name: qt3
 Summary: The shared library for the Qt 3 GUI toolkit
 Version: 3.3.8b
-Release: 102%{?dist}
+Release: 103%{?dist}
 # Automatically converted from old format: QPL or GPLv2 or GPLv3 - review is highly recommended.
 License: QPL-1.0 OR GPL-2.0-only OR GPL-3.0-only
 Url: http://www.troll.no

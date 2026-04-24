@@ -3,7 +3,7 @@
 
 Name:           perl-File-Find-Object
 Version:        0.3.9
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Object oriented File::Find replacement
 License:        GPL-2.0-or-later OR Artistic-2.0
 URL:            https://metacpan.org/release/File-Find-Object

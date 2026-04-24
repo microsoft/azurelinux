@@ -1,0 +1,13 @@
+diff -up chromium-127.0.6533.72/sandbox/linux/syscall_broker/broker_process.cc.me chromium-127.0.6533.72/sandbox/linux/syscall_broker/broker_process.cc
+--- chromium-127.0.6533.72/sandbox/linux/syscall_broker/broker_process.cc.me	2024-07-30 18:09:59.483141522 +0200
++++ chromium-127.0.6533.72/sandbox/linux/syscall_broker/broker_process.cc	2024-07-30 19:42:47.122708543 +0200
+@@ -163,9 +163,6 @@ bool BrokerProcess::IsSyscallBrokerable(
+     case __NR_stat:
+     case __NR_lstat:
+ #endif
+-#if defined(__NR_fstatat)
+-    case __NR_fstatat:
+-#endif
+ #if defined(__NR_fstatat64)
+     case __NR_fstatat64:
+ #endif

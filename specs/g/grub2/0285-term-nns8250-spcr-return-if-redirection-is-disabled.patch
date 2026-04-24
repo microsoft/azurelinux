@@ -1,0 +1,34 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Date: Thu, 16 Jan 2025 10:22:48 -0600
+Subject: [PATCH] term/nns8250-spcr: return if redirection is disabled
+
+The Microsoft spec for SPCR says "The base address of the Serial Port register
+set described using the ACPI Generic Address Structure, or 0 if console
+redirection is disabled." so return if disable (base address = 0). If this check
+is not done, we may get invalid ports for those particular machines that
+redirection is disabled and at some point hanging the booting execution when
+reading the grub.cfg configuration file.
+
+Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Reviewed-by: Leo Sandoval <lsandova@redhat.com>
+---
+ grub-core/term/ns8250-spcr.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/grub-core/term/ns8250-spcr.c b/grub-core/term/ns8250-spcr.c
+index d52b52c26..86f1aa078 100644
+--- a/grub-core/term/ns8250-spcr.c
++++ b/grub-core/term/ns8250-spcr.c
+@@ -75,6 +75,11 @@ grub_ns8250_spcr_init (void)
+         config.speed = 115200;
+         break;
+     };
++
++  /* if base address is 0, it means redirection is disable, so return it */
++  if (spcr->base_addr.addr == 0)
++    return NULL;
++
+   switch (spcr->base_addr.space_id)
+     {
+       case GRUB_ACPI_GENADDR_MEM_SPACE:

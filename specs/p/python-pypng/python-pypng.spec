@@ -5,7 +5,7 @@
 
 Name:               python-pypng
 Version:            0.0.21
-Release:            15%{?dist}
+Release: 16%{?dist}
 Summary:            Pure Python PNG image encoder/decoder
 
 License:            MIT

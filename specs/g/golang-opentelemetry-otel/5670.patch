@@ -1,0 +1,26 @@
+From 1b4fc579321caaad643123972874806a0804da9a Mon Sep 17 00:00:00 2001
+From: Mikel Olasagasti Uranga <mikel@olasagasti.info>
+Date: Mon, 5 Aug 2024 14:30:08 +0200
+Subject: [PATCH] Fix stdoutlog import path
+
+Import parth `stdout/stdoutout` doesn't exist and should be
+`stdout/stdoutlog`.
+
+Signed-off-by: Mikel Olasagasti Uranga <mikel@olasagasti.info>
+---
+ exporters/stdout/stdoutlog/exporter_test.go | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/exporters/stdout/stdoutlog/exporter_test.go b/exporters/stdout/stdoutlog/exporter_test.go
+index 659f7f462d7..368a663a687 100644
+--- a/exporters/stdout/stdoutlog/exporter_test.go
++++ b/exporters/stdout/stdoutlog/exporter_test.go
+@@ -1,7 +1,7 @@
+ // Copyright The OpenTelemetry Authors
+ // SPDX-License-Identifier: Apache-2.0
+ 
+-package stdoutlog // import "go.opentelemetry.io/otel/exporters/stdout/stdoutout"
++package stdoutlog // import "go.opentelemetry.io/otel/exporters/stdout/stdoutlog"
+ 
+ import (
+ 	"bytes"

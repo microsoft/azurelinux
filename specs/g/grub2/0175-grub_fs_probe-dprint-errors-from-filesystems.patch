@@ -1,0 +1,43 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Robbie Harwood <rharwood@redhat.com>
+Date: Fri, 15 Jul 2022 15:39:41 -0400
+Subject: [PATCH] grub_fs_probe(): dprint errors from filesystems
+
+When filesystem detection fails, all that's currently debug-logged is a
+series of messages like:
+
+    grub-core/kern/fs.c:56:fs: Detecting ntfs...
+    grub-core/kern/fs.c:76:fs: ntfs detection failed.
+
+repeated for each filesystem.  Any messages provided to grub_error() by
+the filesystem are lost, and one has to break out gdb to figure out what
+went wrong.
+
+With this change, one instead sees:
+
+    grub-core/kern/fs.c:56:fs: Detecting fat...
+    grub-core/osdep/hostdisk.c:357:hostdisk: reusing open device
+    `/path/to/device'
+    grub-core/kern/fs.c:77:fs: error: invalid modification timestamp for /.
+    grub-core/kern/fs.c:79:fs: fat detection failed.
+
+in the debug prints.
+
+Signed-off-by: Robbie Harwood <rharwood@redhat.com>
+(cherry picked from commit 838c79d658797d0662ee7f9e033e38ee88059e02)
+---
+ grub-core/kern/fs.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/grub-core/kern/fs.c b/grub-core/kern/fs.c
+index 7ad0aaf4e29..f25bace620b 100644
+--- a/grub-core/kern/fs.c
++++ b/grub-core/kern/fs.c
+@@ -74,6 +74,7 @@ grub_fs_probe (grub_device_t device)
+ 	  if (grub_errno == GRUB_ERR_NONE)
+ 	    return p;
+ 
++	  grub_dprintf ("fs", _("error: %s.\n"), grub_errmsg);
+ 	  grub_error_push ();
+ 	  /* The grub_error_push() does not touch grub_errmsg. */
+ 	  grub_dprintf ("fs", _("error: %s.\n"), grub_errmsg);

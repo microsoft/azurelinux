@@ -14,7 +14,7 @@
 
 Name:           SLOF
 Version:        %{gittagdate}
-Release:        8.git%{gittagcommit}%{?dist}
+Release: 9.git%{gittagcommit}%{?dist}
 Summary:        Slimline Open Firmware
 
 License:        BSD-3-Clause

@@ -6,7 +6,7 @@
 Summary:        Perl bindings for GNU LibIDN
 Name:           perl-Net-LibIDN
 Version:        0.12
-Release:        54%{?dist}
+Release: 55%{?dist}
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/%{pkgname}
 Source:         https://cpan.metacpan.org/authors/id/T/TH/THOR/%{pkgname}-%{version}.tar.gz

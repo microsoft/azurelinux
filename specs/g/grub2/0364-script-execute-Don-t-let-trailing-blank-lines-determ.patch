@@ -1,0 +1,66 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: James Le Cuirot <jlecuirot@microsoft.com>
+Date: Thu, 24 Oct 2024 14:42:46 +0100
+Subject: [PATCH] script/execute: Don't let trailing blank lines determine the
+ return code
+
+grub_script_execute_sourcecode() parses and executes code one line at a
+time, updating the return code each time because only the last line
+determines the final status. However, trailing new lines were also
+executed, masking any failure on the previous line. Fix this by only
+trying to execute the command when there is actually one present.
+
+This has presumably never been noticed because this code is not used by
+regular functions, only in special cases like eval and menu entries. The
+latter generally don't return at all, having booted an OS. When failing
+to boot, upstream GRUB triggers the fallback mechanism regardless of the
+return code.
+
+We noticed the problem while using Red Hat's patches, which change this
+behaviour to take account of the return code. In that case, a failure
+takes you back to the menu rather than triggering a fallback.
+
+Signed-off-by: James Le Cuirot <jlecuirot@microsoft.com>
+---
+ grub-core/script/execute.c |  5 ++++-
+ tests/grub_script_eval.in  | 10 +++++++++-
+ 2 files changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/script/execute.c b/grub-core/script/execute.c
+index 014132703..3d26a3fe4 100644
+--- a/grub-core/script/execute.c
++++ b/grub-core/script/execute.c
+@@ -952,7 +952,10 @@ grub_script_execute_sourcecode (const char *source)
+ 	  break;
+ 	}
+ 
+-      ret = grub_script_execute (parsed_script);
++      /* Don't let trailing blank lines determine the return code.  */
++      if (parsed_script->cmd)
++	ret = grub_script_execute (parsed_script);
++
+       grub_script_free (parsed_script);
+       grub_free (line);
+     }
+diff --git a/tests/grub_script_eval.in b/tests/grub_script_eval.in
+index c97b78d77..9c6211042 100644
+--- a/tests/grub_script_eval.in
++++ b/tests/grub_script_eval.in
+@@ -3,4 +3,12 @@
+ eval echo "Hello world"
+ valname=tst
+ eval $valname=hi
+-echo $tst
+\ No newline at end of file
++echo $tst
++
++if eval "
++false
++"; then
++  echo should have failed
++else
++  echo failed as expected
++fi
+-- 
+2.48.1
+

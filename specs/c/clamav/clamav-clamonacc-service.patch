@@ -1,0 +1,20 @@
+diff -up clamav-1.4.0/clamonacc/clamav-clamonacc.service.in.clamonacc-service clamav-1.4.0/clamonacc/clamav-clamonacc.service.in
+--- clamav-1.4.0/clamonacc/clamav-clamonacc.service.in.clamonacc-service	2024-08-15 20:12:56.950984705 -0600
++++ clamav-1.4.0/clamonacc/clamav-clamonacc.service.in	2024-08-15 20:14:19.088770747 -0600
+@@ -4,14 +4,12 @@
+ [Unit]
+ Description=ClamAV On-Access Scanner
+ Documentation=man:clamonacc(8) man:clamd.conf(5) https://docs.clamav.net/
+-Requires=clamav-daemon.service
+-After=clamav-daemon.service syslog.target network.target
++After=clamd@scan.service syslog.target network.target
+ 
+ [Service]
+ Type=simple
+ User=root
+-ExecStartPre=/bin/bash -c "while [ ! -S /run/clamav/clamd.ctl ]; do sleep 1; done"
+-ExecStart=@prefix@/sbin/clamonacc -F --log=/var/log/clamav/clamonacc.log --move=/root/quarantine
++ExecStart=@prefix@/sbin/clamonacc -F --config-file=/etc/clamd.d/scan.conf
+ ExecStop=/bin/kill -SIGKILL $MAINPID
+ 
+ [Install]

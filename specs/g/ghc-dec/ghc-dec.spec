@@ -15,7 +15,7 @@
 Name:           ghc-%{pkg_name}
 Version:        0.0.6
 # can only be reset when subpkg bumped
-Release:        5%{?dist}
+Release: 6%{?dist}
 Summary:        Decidable propositions
 
 License:        BSD-3-Clause

@@ -4,7 +4,7 @@
 Summary:        XS Blowfish implementation for Perl
 Name:           perl-Crypt-Blowfish
 Version:        2.14
-Release:        35%{?dist}
+Release: 36%{?dist}
 License:        BSD-Systemics-W3Works
 URL:            https://metacpan.org/release/Crypt-Blowfish
 Source0:        https://cpan.metacpan.org/modules/by-module/Crypt/Crypt-Blowfish-%{version}.tar.gz

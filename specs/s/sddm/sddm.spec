@@ -6,7 +6,7 @@
 
 Name:           sddm
 Version:        0.21.0
-Release:        10%{?dist}
+Release: 11%{?dist}
 License:        GPL-2.0-or-later
 Summary:        QML based desktop and login manager
 

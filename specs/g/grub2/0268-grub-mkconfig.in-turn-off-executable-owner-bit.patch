@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leo Sandoval <lsandova@redhat.com>
+Date: Mon, 6 May 2024 15:35:41 -0600
+Subject: [PATCH] grub-mkconfig.in: turn off executable owner bit
+
+Stricker permissions are required on the grub.cfg file, resulting in
+at most 0600 owner's file permissions. This resolves conflicting
+requirement permissions on grub2-pc package's grub2.cfg file.
+
+Signed-off-by: Leo Sandoval <lsandova@redhat.com>
+---
+ util/grub-mkconfig.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/util/grub-mkconfig.in b/util/grub-mkconfig.in
+index bec52e052..461df7f09 100644
+--- a/util/grub-mkconfig.in
++++ b/util/grub-mkconfig.in
+@@ -316,7 +316,7 @@ and /etc/grub.d/* files or please file a bug report with
+   else
+     # none of the children aborted with error, install the new grub.cfg
+     oldumask=$(umask)
+-    umask 077
++    umask 177
+     cat ${grub_cfg}.new > ${grub_cfg}
+     umask $oldumask
+     rm -f ${grub_cfg}.new

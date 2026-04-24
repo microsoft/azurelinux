@@ -18,7 +18,7 @@
 Name:           ansible-core
 Version:        2.18.12
 %global uversion %{version_no_tilde %{quote:%nil}}
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        A radically simple IT automation system
 
 # The main license is GPLv3+. Many of the files in lib/ansible/module_utils

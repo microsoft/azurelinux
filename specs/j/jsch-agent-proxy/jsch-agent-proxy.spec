@@ -3,7 +3,7 @@
 
 Name:           jsch-agent-proxy
 Version:        0.0.8
-Release:        30%{?dist}
+Release: 31%{?dist}
 Summary:        Proxy to ssh-agent and Pageant in Java
 # Automatically converted from old format: BSD - review is highly recommended.
 License:        LicenseRef-Callaway-BSD

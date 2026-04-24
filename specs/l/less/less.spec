@@ -4,7 +4,7 @@
 Summary: A text file browser similar to more, but better
 Name: less
 Version: 691
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPL-3.0-only and BSD-2-Clause
 Source0: https://www.greenwoodsoftware.com/less/%{name}-%{version}.tar.gz
 %global lesspipe_version 2.22

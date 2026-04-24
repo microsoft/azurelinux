@@ -3,7 +3,7 @@
 
 Name:           perl-SNMP_Session
 Version:        1.16
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        SNMP support for Perl 5
 
 License:        Artistic-2.0

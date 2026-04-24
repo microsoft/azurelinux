@@ -1,0 +1,42 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leo Sandoval <lsandova@redhat.com>
+Date: Thu, 21 Mar 2024 16:27:25 -0600
+Subject: [PATCH] include proper attribute for an EFI API call definition
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Otherwise we observe the following issue
+
+../../grub-core/net/efi/http.c: In function ‘efihttp_request’:
+../../grub-core/net/efi/http.c:233:28: error: passing argument 3 of ‘b->create_event’ from incompatible pointer type [-Wincompatible-pointer-types]
+  233 |                            grub_efi_http_request_callback, NULL,
+      |                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                            |
+      |                            void (*)(void *, void *)
+../../grub-core/net/efi/http.c:233:28: note: expected ‘void (__attribute__((ms_abi)) *)(void *, void *)’ but argument is of type ‘void (*)(void *, void *)’
+---
+ grub-core/net/efi/http.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/net/efi/http.c b/grub-core/net/efi/http.c
+index 0568ea5d43e..6fecb261c55 100644
+--- a/grub-core/net/efi/http.c
++++ b/grub-core/net/efi/http.c
+@@ -131,14 +131,14 @@ static grub_efi_boolean_t request_callback_done;
+ static grub_efi_boolean_t response_callback_done;
+ 
+ static void
+-grub_efi_http_request_callback (grub_efi_event_t event __attribute__ ((unused)),
++__grub_efi_api grub_efi_http_request_callback (grub_efi_event_t event __attribute__ ((unused)),
+ 				void *context __attribute__ ((unused)))
+ {
+   request_callback_done = 1;
+ }
+ 
+ static void
+-grub_efi_http_response_callback (grub_efi_event_t event __attribute__ ((unused)),
++__grub_efi_api grub_efi_http_response_callback (grub_efi_event_t event __attribute__ ((unused)),
+ 				void *context __attribute__ ((unused)))
+ {
+   response_callback_done = 1;

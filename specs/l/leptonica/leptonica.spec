@@ -15,7 +15,7 @@
 
 Name:          leptonica
 Version:       1.87.0
-Release:       1%{?dist}
+Release: 2%{?dist}
 Summary:       C library for efficient image processing and image analysis operations
 
 License:       Leptonica

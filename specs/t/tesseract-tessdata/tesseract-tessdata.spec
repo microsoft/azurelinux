@@ -8,7 +8,7 @@
 
 Name:          tesseract-tessdata
 Version:       4.1.0
-Release:       11%{?pre:.%pre}%{?commit:.git%{shortcommit}}%{?dist}
+Release: 12%{?pre:.%pre}%{?commit:.git%{shortcommit}}%{?dist}
 Summary:       Trained models for the Tesseract Open Source OCR Engine
 BuildArch:     noarch
 

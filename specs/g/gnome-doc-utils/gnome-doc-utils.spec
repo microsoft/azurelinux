@@ -3,7 +3,7 @@
 
 Name: gnome-doc-utils
 Version: 0.20.10
-Release: 44%{?dist}
+Release: 45%{?dist}
 Summary: Documentation utilities for GNOME
 
 License: LGPL-2.1-or-later AND GPL-2.0-or-later AND GFDL-1.1-or-later

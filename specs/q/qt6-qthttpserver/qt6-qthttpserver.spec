@@ -13,7 +13,7 @@
 Summary: Library to facilitate the creation of an http server with Qt
 Name:    qt6-qthttpserver
 Version: 6.10.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 License:    BSD-3-Clause AND GFDL-1.3-no-invariants-only AND GPL-3.0-only WITH Qt-GPL-exception-1.0
 URL:        http://qt-project.org/

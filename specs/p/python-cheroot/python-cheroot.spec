@@ -8,7 +8,7 @@
 
 Name:           python-%{pypi_name}
 Version:        10.0.1
-Release:        9%{?dist}
+Release: 10%{?dist}
 Summary:        Highly-optimized, pure-python HTTP server
 
 # Automatically converted from old format: BSD - review is highly recommended.

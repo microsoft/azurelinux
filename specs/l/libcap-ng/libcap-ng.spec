@@ -5,7 +5,7 @@
 Summary: Alternate posix capabilities library
 Name: libcap-ng
 Version: 0.9.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: LGPL-2.0-or-later
 URL: https://github.com/stevegrubb/libcap-ng
 Source0: %{name}-%{version}.tar.gz

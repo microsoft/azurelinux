@@ -1,0 +1,25 @@
+From ca946246de69711ddd829537e4bc1f64fcab3fc3 Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Thu, 12 Sep 2024 11:13:30 +0200
+Subject: [PATCH 2/3] Port to hamcrest 3
+
+---
+ .../google/code/maven_replacer_plugin/file/FileUtilsTest.java   | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/test/java/com/google/code/maven_replacer_plugin/file/FileUtilsTest.java b/src/test/java/com/google/code/maven_replacer_plugin/file/FileUtilsTest.java
+index 8dccf57..da0ab50 100644
+--- a/src/test/java/com/google/code/maven_replacer_plugin/file/FileUtilsTest.java
++++ b/src/test/java/com/google/code/maven_replacer_plugin/file/FileUtilsTest.java
+@@ -5,7 +5,7 @@ import static org.apache.commons.lang3.StringUtils.join;
+ import static org.hamcrest.MatcherAssert.assertThat;
+ import static org.hamcrest.Matchers.equalTo;
+ import static org.hamcrest.Matchers.not;
+-import static org.hamcrest.text.StringStartsWith.startsWith;
++import static org.hamcrest.core.StringStartsWith.startsWith;
+ import static org.junit.Assert.assertFalse;
+ import static org.junit.Assert.assertTrue;
+ import static org.junit.Assert.fail;
+-- 
+2.46.0
+

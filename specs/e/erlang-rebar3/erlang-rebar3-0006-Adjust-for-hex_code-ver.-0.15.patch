@@ -1,0 +1,43 @@
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Sat, 21 Mar 2026 15:11:07 +0100
+Subject: [PATCH] Adjust for hex_code ver. 0.15+
+
+See PR hexpm/hex_core#169 for further details.
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+
+diff --git a/apps/rebar/src/rebar_httpc_adapter.erl b/apps/rebar/src/rebar_httpc_adapter.erl
+index 7a8dc45e..47916b1d 100644
+--- a/apps/rebar/src/rebar_httpc_adapter.erl
++++ b/apps/rebar/src/rebar_httpc_adapter.erl
+@@ -3,6 +3,7 @@
+ -module(rebar_httpc_adapter).
+ -behaviour(hex_http).
+ -export([request/5]).
++-export([request_to_file/6]).
+ 
+ %%====================================================================
+ %% API functions
+@@ -16,6 +17,22 @@ request(Method, URI, ReqHeaders, Body, AdapterConfig) ->
+             request_online(Method, URI, ReqHeaders, Body, AdapterConfig)
+     end.
+ 
++request_to_file(Method, URI, ReqHeaders, Body, Filename, AdapterConfig) ->
++    case os:getenv("REBAR_OFFLINE") of
++        "1" ->
++            {error, {offline, URI}};
++        _ ->
++            case request_online(Method, URI, ReqHeaders, Body, AdapterConfig) of
++                {ok, {StatusCode, RespHeaders, RespBody}} ->
++                    case file:write_file(Filename, RespBody) of
++                        ok -> {ok, {StatusCode, RespHeaders}};
++                        {error, Reason} -> {error, Reason}
++                    end;
++                {error, Reason} ->
++                    {error, Reason}
++            end
++    end.
++
+ %%====================================================================
+ %% Internal functions
+ %%====================================================================

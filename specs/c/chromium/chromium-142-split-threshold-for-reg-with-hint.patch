@@ -1,0 +1,26 @@
+diff -up chromium-142.0.7444.52/build/config/compiler/BUILD.gn.split-threshold-for-reg-with-hint chromium-142.0.7444.52/build/config/compiler/BUILD.gn
+--- chromium-142.0.7444.52/build/config/compiler/BUILD.gn.split-threshold-for-reg-with-hint	2025-10-28 19:31:53.885979941 +0100
++++ chromium-142.0.7444.52/build/config/compiler/BUILD.gn	2025-10-28 19:39:50.279574752 +0100
+@@ -680,22 +680,6 @@ config("compiler") {
+       }
+     }
+ 
+-    # TODO(crbug.com/40283598): This causes binary size growth and potentially
+-    # other problems.
+-    if (default_toolchain != "//build/toolchain/cros:target") {
+-      cflags += [
+-        "-mllvm",
+-        "-split-threshold-for-reg-with-hint=0",
+-      ]
+-      if (use_thin_lto && is_a_target_toolchain) {
+-        if (is_win) {
+-          ldflags += [ "-mllvm:-split-threshold-for-reg-with-hint=0" ]
+-        } else {
+-          ldflags += [ "-Wl,-mllvm,-split-threshold-for-reg-with-hint=0" ]
+-        }
+-      }
+-    }
+-
+     # TODO(crbug.com/40192287): Investigate why/if this should be needed.
+     if (is_win) {
+       cflags += [ "/clang:-ffp-contract=off" ]

@@ -1,0 +1,81 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 16 Apr 2024 12:51:50 -0600
+Subject: [PATCH] pe: add the DOS header struct and fix some bad naming.
+
+In order to properly validate a loaded kernel's support for being loaded
+without a writable stack or executable, we need to be able to properly
+parse arbitrary PE headers.
+
+Currently, pe32.h is written in such a way that the MS-DOS header that
+tells us where to find the PE header in the binary can't be accessed.
+Further, for some reason it calls the DOS MZ magic "GRUB_PE32_MAGIC".
+
+This patch adds the structure for the DOS header, renames the DOS magic
+define, and adds defines for the actual PE magic.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/loader/efi/linux.c |  2 +-
+ include/grub/efi/pe32.h      | 28 ++++++++++++++++++++++++++--
+ 2 files changed, 27 insertions(+), 3 deletions(-)
+
+diff --git a/grub-core/loader/efi/linux.c b/grub-core/loader/efi/linux.c
+index cb9de5565de..ecaa8c18c4d 100644
+--- a/grub-core/loader/efi/linux.c
++++ b/grub-core/loader/efi/linux.c
+@@ -138,7 +138,7 @@ grub_arch_efi_linux_load_image_header (grub_file_t file,
+   if (grub_file_read (file, lh, sizeof (*lh)) < (grub_ssize_t) sizeof (*lh))
+     return grub_error(GRUB_ERR_FILE_READ_ERROR, "failed to read Linux image header");
+ 
+-  if ((lh->code0 & 0xffff) != GRUB_PE32_MAGIC)
++  if ((lh->code0 & 0xffff) != GRUB_DOS_MAGIC)
+     return grub_error (GRUB_ERR_NOT_IMPLEMENTED_YET,
+ 		       N_("plain image kernel not supported - rebuild with CONFIG_(U)EFI_STUB enabled"));
+ 
+diff --git a/include/grub/efi/pe32.h b/include/grub/efi/pe32.h
+index a39743396dc..13fdd0e7d98 100644
+--- a/include/grub/efi/pe32.h
++++ b/include/grub/efi/pe32.h
+@@ -46,7 +46,30 @@
+ 
+ #define GRUB_PE32_MSDOS_STUB_SIZE	0x80
+ 
+-#define GRUB_PE32_MAGIC			0x5a4d
++#define GRUB_DOS_MAGIC			0x5a4d
++
++struct grub_dos_header
++{
++  grub_uint16_t magic;
++  grub_uint16_t cblp;
++  grub_uint16_t cp;
++  grub_uint16_t crlc;
++  grub_uint16_t cparhdr;
++  grub_uint16_t minalloc;
++  grub_uint16_t maxalloc;
++  grub_uint16_t ss;
++  grub_uint16_t sp;
++  grub_uint16_t csum;
++  grub_uint16_t ip;
++  grub_uint16_t cs;
++  grub_uint16_t lfarlc;
++  grub_uint16_t ovno;
++  grub_uint16_t res0[4];
++  grub_uint16_t oemid;
++  grub_uint16_t oeminfo;
++  grub_uint16_t res1[10];
++  grub_uint32_t lfanew;
++};
+ 
+ struct grub_msdos_image_header
+ {
+@@ -293,7 +316,8 @@ struct grub_pe32_section_table
+ #define GRUB_PE32_SCN_MEM_READ			0x40000000
+ #define GRUB_PE32_SCN_MEM_WRITE			0x80000000
+ 
+-#define GRUB_PE32_SIGNATURE_SIZE 4
++#define GRUB_PE32_SIGNATURE_SIZE		4
++#define GRUB_PE32_SIGNATURE			"PE\0\0"
+ 
+ #if GRUB_TARGET_SIZEOF_VOID_P == 8
+ #define GRUB_PE32_NATIVE_MAGIC			GRUB_PE32_PE64_MAGIC

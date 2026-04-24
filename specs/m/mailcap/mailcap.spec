@@ -3,7 +3,7 @@
 
 Name:           mailcap
 Version:        2.1.54
-Release:        9%{?dist}
+Release: 10%{?dist}
 Summary:        Helper application and MIME type associations for file types
 
 License:        LicenseRef-Fedora-Public-Domain AND MIT AND metamail

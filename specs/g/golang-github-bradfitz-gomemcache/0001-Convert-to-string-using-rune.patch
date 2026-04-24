@@ -1,0 +1,33 @@
+From 74d38ec6fda09f9087553695780615f6c2ef99fc Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Robert-Andr=C3=A9=20Mauchin?= <zebob.m@gmail.com>
+Date: Fri, 24 Jul 2020 15:09:03 +0200
+Subject: [PATCH] Convert to string using rune()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+See https://github.com/golang/go/issues/32479
+
+Fix #122.
+
+Signed-off-by: Robert-André Mauchin <zebob.m@gmail.com>
+---
+ memcache/memcache_test.go | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/memcache/memcache_test.go b/memcache/memcache_test.go
+index 70d4702..b94a30c 100644
+--- a/memcache/memcache_test.go
++++ b/memcache/memcache_test.go
+@@ -127,7 +127,7 @@ func testWithClient(t *testing.T, c *Client) {
+ 	if err != ErrMalformedKey {
+ 		t.Errorf("set(foo bar) should return ErrMalformedKey instead of %v", err)
+ 	}
+-	malFormed = &Item{Key: "foo" + string(0x7f), Value: []byte("foobarval")}
++	malFormed = &Item{Key: "foo" + string(rune(0x7f)), Value: []byte("foobarval")}
+ 	err = c.Set(malFormed)
+ 	if err != ErrMalformedKey {
+ 		t.Errorf("set(foo<0x7f>) should return ErrMalformedKey instead of %v", err)
+-- 
+2.26.2
+

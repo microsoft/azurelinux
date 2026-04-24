@@ -3,7 +3,7 @@
 
 Name:           DevIL
 Version:        1.7.8
-Release:        51%{?dist}
+Release: 52%{?dist}
 Summary:        A cross-platform image library
 # Automatically converted from old format: LGPLv2 - review is highly recommended.
 License:        LicenseRef-Callaway-LGPLv2

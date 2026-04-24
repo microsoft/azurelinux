@@ -1,0 +1,28 @@
+diff -up chromium-145.0.7632.45/chrome/enterprise_companion/BUILD.gn.me chromium-145.0.7632.45/chrome/enterprise_companion/BUILD.gn
+--- chromium-145.0.7632.45/chrome/enterprise_companion/BUILD.gn.me	2026-02-10 16:50:49.932510617 +0100
++++ chromium-145.0.7632.45/chrome/enterprise_companion/BUILD.gn	2026-02-10 17:27:10.645972503 +0100
+@@ -285,6 +285,8 @@ copy("integration_test_service_files") {
+   visibility = [ ":enterprise_companion_integration_tests" ]
+ }
+ 
++# disable this test due to ERROR Unresolved dependencies
++if (false) {
+ test("enterprise_companion_integration_tests") {
+   testonly = true
+ 
+@@ -340,6 +342,7 @@ test("enterprise_companion_integration_t
+ 
+   data_deps += [ ":integration_test_service_files" ]
+ }
++}
+ 
+ static_library("client") {
+   sources = [
+@@ -483,7 +486,6 @@ group("all") {
+ 
+   deps = [
+     ":client",
+-    ":enterprise_companion_integration_tests",
+     ":enterprise_companion_tests",
+   ]
+   if (!is_official_build) {

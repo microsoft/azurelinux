@@ -3,7 +3,7 @@
 
 Name:           perl-Text-Unidecode
 Version:        1.30
-Release:        27%{?dist}
+Release: 28%{?dist}
 Summary:        US-ASCII transliterations of Unicode text
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Text-Unidecode

@@ -3,7 +3,7 @@
 
 Name:           libcpuid
 Version:        0.8.1
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Provides CPU identification for x86 and ARM
 License:        BSD-2-Clause
 URL:            https://github.com/anrieff/libcpuid

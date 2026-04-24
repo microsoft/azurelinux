@@ -1,0 +1,46 @@
+From 33c3c202425daea456520f92846b37da6a83e1c0 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jaroslav=20Loba=C4=8Devski?= <jarlob@github.com>
+Date: Thu, 19 Oct 2023 16:29:56 +0200
+Subject: [PATCH 2/2] Fix possible double-free or memory leak in
+ stbi__load_gif_main
+
+Fixes #1548
+---
+ stb_image.h | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/stb_image.h b/stb_image.h
+index d3a1f59..df4ff95 100644
+--- a/stb_image.h
++++ b/stb_image.h
+@@ -6999,8 +6999,11 @@ static void *stbi__load_gif_main(stbi__context *s, int **delays, int *x, int *y,
+                   return ret;
+                }
+                void *tmp = (stbi_uc*) STBI_REALLOC_SIZED( out, out_size, layers * stride );
+-               if (!tmp)
+-                  return stbi__load_gif_main_outofmem(&g, out, delays);
++               if (!tmp) {
++                  void *ret = stbi__load_gif_main_outofmem(&g, out, delays);
++                 if (delays && *delays) *delays = 0;
++                 return ret;
++              }
+                else {
+                    out = (stbi_uc*) tmp;
+                    out_size = layers * stride;
+@@ -7019,8 +7022,11 @@ static void *stbi__load_gif_main(stbi__context *s, int **delays, int *x, int *y,
+                   return ret;
+                }
+                out = (stbi_uc*)stbi__malloc( layers * stride );
+-               if (!out)
+-                  return stbi__load_gif_main_outofmem(&g, out, delays);
++               if (!out) {
++                  void *ret = stbi__load_gif_main_outofmem(&g, out, delays);
++                 if (delays && *delays) *delays = 0;
++                 return ret;
++              }
+                out_size = layers * stride;
+                if (delays) {
+                   *delays = (int*) stbi__malloc( layers * sizeof(int) );
+-- 
+2.41.0
+

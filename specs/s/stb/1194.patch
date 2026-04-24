@@ -1,0 +1,233 @@
+From 3d401e71452d890eaf0bc50b11788cb08a6c2fed Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Tue, 17 Aug 2021 21:30:44 -0400
+Subject: [PATCH] =?UTF-8?q?Fix=20undefined=20behavior=20from=20array=20?=
+ =?UTF-8?q?=E2=80=9Cshape-punning=E2=80=9D?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+In stb_voxel_render.h, there were three cases where a 2D array of
+dimension [X][Y] was iterated as a 1D array of dimension [1][X*Y]. While
+this is clever and is correct in terms of the actual memory layout, a
+second index outside the corresponding dimension ([i][j], j >= Y])
+actually produces undefined behavior and gives the compiler freedom to
+do all sorts of terrible things.
+
+The same thing happens in stb_tilemap_editor.h,
+tests/caveview/cave_mesher.c, and tests/resample_test.cpp.
+
+Prior to this commit, a compiler warning regarding the undefined
+behavior appears on gcc 11.2.1 for at least some of these cases when the
+tests are compiled with -Waggressive-loop-optimizations (included in
+-Wall).
+
+This commit fixes the undefined behavior by iterating these 2D arrays
+with the conventional nested loops.
+---
+ stb_tilemap_editor.h         | 35 +++++++++++++++++++----------------
+ stb_voxel_render.h           | 36 +++++++++++++++++++++---------------
+ tests/caveview/cave_mesher.c | 26 ++++++++++++++------------
+ tests/resample_test.cpp      | 15 +++++++++------
+ 4 files changed, 63 insertions(+), 49 deletions(-)
+
+diff --git a/stb_tilemap_editor.h b/stb_tilemap_editor.h
+index fbd3388084..0b8c2ca997 100644
+--- a/stb_tilemap_editor.h
++++ b/stb_tilemap_editor.h
+@@ -1066,14 +1066,15 @@ stbte_tilemap *stbte_create_map(int map_x, int map_y, int map_layers, int spacin
+ 
+ void stbte_set_background_tile(stbte_tilemap *tm, short id)
+ {
+-   int i;
++   int i, j;
+    STBTE_ASSERT(id >= -1);
+    // STBTE_ASSERT(id < 32768);
+    if (id < -1)
+       return;
+-   for (i=0; i < STBTE_MAX_TILEMAP_X * STBTE_MAX_TILEMAP_Y; ++i)
+-      if (tm->data[0][i][0] == -1)
+-         tm->data[0][i][0] = id;
++   for (i=0; i < STBTE_MAX_TILEMAP_X; ++i)
++      for (j=0; j < STBTE_MAX_TILEMAP_Y; ++j)
++        if (tm->data[i][j][0] == -1)
++           tm->data[i][j][0] = id;
+    tm->background_tile = id;
+ }
+ 
+@@ -1212,18 +1213,20 @@ void stbte_set_dimensions(stbte_tilemap *tm, int map_x, int map_y)
+ 
+ void stbte_clear_map(stbte_tilemap *tm)
+ {
+-   int i,j;
+-   for (i=0; i < STBTE_MAX_TILEMAP_X * STBTE_MAX_TILEMAP_Y; ++i) {
+-      tm->data[0][i][0] = tm->background_tile;
+-      for (j=1; j < tm->num_layers; ++j)
+-         tm->data[0][i][j] = STBTE__NO_TILE;
+-      for (j=0; j < STBTE_MAX_PROPERTIES; ++j)
+-         tm->props[0][i][j] = 0;
+-      #ifdef STBTE_ALLOW_LINK
+-      tm->link[0][i].x = -1;
+-      tm->link[0][i].y = -1;
+-      tm->linkcount[0][i] = 0;
+-      #endif
++   int i,j,k;
++   for (i=0; i < STBTE_MAX_TILEMAP_X; ++i) {
++      for (j=0; j < STBTE_MAX_TILEMAP_Y; ++j) {
++         tm->data[i][j][0] = tm->background_tile;
++         for (k=1; k < tm->num_layers; ++k)
++            tm->data[i][j][k] = STBTE__NO_TILE;
++         for (k=0; k < STBTE_MAX_PROPERTIES; ++k)
++            tm->props[i][j][k] = 0;
++         #ifdef STBTE_ALLOW_LINK
++         tm->link[i][j].x = -1;
++         tm->link[i][j].y = -1;
++         tm->linkcount[i][j] = 0;
++         #endif
++      }
+    }
+ }
+ 
+diff --git a/stb_voxel_render.h b/stb_voxel_render.h
+index 2e7a372f83..51011091f7 100644
+--- a/stb_voxel_render.h
++++ b/stb_voxel_render.h
+@@ -3126,15 +3126,17 @@ static void stbvox_make_mesh_for_block_with_geo(stbvox_mesh_maker *mm, stbvox_po
+       stbvox_mesh_vertex vmesh[6][4];
+       stbvox_rotate rotate = { 0,0,0,0 };
+       unsigned char simple_rot = rot;
+-      int i;
++      int i, j;
+       // we only need to do this for the displayed faces, but it's easier
+       // to just do it up front; @OPTIMIZE check if it's faster to do it
+       // for visible faces only
+-      for (i=0; i < 6*4; ++i) {
+-         int vert = stbvox_vertex_selector[0][i];
+-         vert = stbvox_rotate_vertex[vert][rot];
+-         vmesh[0][i] = stbvox_vmesh_pre_vheight[0][i]
+-                     + stbvox_geometry_vheight[geo][vert];
++      for (i=0; i < 6; ++i) {
++         for (j=0; j < 4; ++j) {
++            int vert = stbvox_vertex_selector[i][j];
++            vert = stbvox_rotate_vertex[vert][rot];
++            vmesh[i][j] = stbvox_vmesh_pre_vheight[i][j]
++                        + stbvox_geometry_vheight[geo][vert];
++         }
+       }
+ 
+       basevert = stbvox_vertex_encode(pos.x, pos.y, pos.z << STBVOX_CONFIG_PRECISION_Z, 0,0);
+@@ -3275,11 +3277,13 @@ static void stbvox_make_mesh_for_block_with_geo(stbvox_mesh_maker *mm, stbvox_po
+ 
+       // build vertex mesh
+       {
+-         int i;
+-         for (i=0; i < 6*4; ++i) {
+-            int vert = stbvox_vertex_selector[0][i];
+-            vmesh[0][i] = stbvox_vmesh_pre_vheight[0][i]
+-                        + cube[vert];
++         int i, j;
++         for (i=0; i < 6; ++i) {
++            for (j=0; j < 4; ++j) {
++               int vert = stbvox_vertex_selector[i][j];
++               vmesh[i][j] = stbvox_vmesh_pre_vheight[i][j]
++                           + cube[vert];
++            }
+          }
+       }
+ 
+@@ -3541,10 +3545,12 @@ int stbvox_get_buffer_size_per_quad(stbvox_mesh_maker *mm, int n)
+ 
+ void stbvox_reset_buffers(stbvox_mesh_maker *mm)
+ {
+-   int i;
+-   for (i=0; i < STBVOX_MAX_MESHES*STBVOX_MAX_MESH_SLOTS; ++i) {
+-      mm->output_cur[0][i] = 0;
+-      mm->output_buffer[0][i] = 0;
++   int i, j;
++   for (i=0; i < STBVOX_MAX_MESHES; ++i) {
++      for (j=0; j < STBVOX_MAX_MESH_SLOTS; ++j) {
++         mm->output_cur[i][j] = 0;
++         mm->output_buffer[i][j] = 0;
++      }
+    }
+ }
+ 
+diff --git a/tests/caveview/cave_mesher.c b/tests/caveview/cave_mesher.c
+index 1f76c89812..bbf79898b6 100644
+--- a/tests/caveview/cave_mesher.c
++++ b/tests/caveview/cave_mesher.c
+@@ -802,7 +802,7 @@ void remap_in_place(int bt, int rm)
+ 
+ void mesh_init(void)
+ {
+-   int i;
++   int i, j;
+ 
+    chunk_cache_mutex = SDL_CreateMutex();
+    chunk_get_mutex   = SDL_CreateMutex();
+@@ -814,17 +814,19 @@ void mesh_init(void)
+    }
+    //effective_blocktype[50] = 0; // delete torches
+ 
+-   for (i=0; i < 6*256; ++i) {
+-      if (minecraft_tex1_for_blocktype[0][i] == 40)
+-         minecraft_color_for_blocktype[0][i] = 38 | 64; // apply to tex1
+-      if (minecraft_tex1_for_blocktype[0][i] == 39)
+-         minecraft_color_for_blocktype[0][i] = 39 | 64; // apply to tex1
+-      if (minecraft_tex1_for_blocktype[0][i] == 105)
+-         minecraft_color_for_blocktype[0][i] = 63; // emissive
+-      if (minecraft_tex1_for_blocktype[0][i] == 212)
+-         minecraft_color_for_blocktype[0][i] = 63; // emissive
+-      if (minecraft_tex1_for_blocktype[0][i] == 80)
+-         minecraft_color_for_blocktype[0][i] = 63; // emissive
++   for (i=0; i < 6; ++i) {
++      for (j=0; j < 256; ++j) {
++         if (minecraft_tex1_for_blocktype[i][j] == 40)
++            minecraft_color_for_blocktype[i][j] = 38 | 64; // apply to tex1
++         if (minecraft_tex1_for_blocktype[i][j] == 39)
++            minecraft_color_for_blocktype[i][j] = 39 | 64; // apply to tex1
++         if (minecraft_tex1_for_blocktype[i][j] == 105)
++            minecraft_color_for_blocktype[i][j] = 63; // emissive
++         if (minecraft_tex1_for_blocktype[i][j] == 212)
++            minecraft_color_for_blocktype[i][j] = 63; // emissive
++         if (minecraft_tex1_for_blocktype[i][j] == 80)
++            minecraft_color_for_blocktype[i][j] = 63; // emissive
++      }
+    }
+ 
+    for (i=0; i < 6; ++i) {
+diff --git a/tests/resample_test.cpp b/tests/resample_test.cpp
+index 21f874f18b..bb8ad82ef6 100644
+--- a/tests/resample_test.cpp
++++ b/tests/resample_test.cpp
+@@ -646,8 +646,9 @@ void verify_box(void)
+ 
+ 	resample_88(STBIR_FILTER_BOX);
+ 
+-	for (i=0; i < sizeof(image88); ++i)
+-		STBIR_ASSERT(image88[0][i] == output88[0][i]);
++	for (i=0; i < sizeof(image88) / sizeof(image88[0]); ++i)
++		for (j=0; j < sizeof(image88[0]); ++j)
++			STBIR_ASSERT(image88[i][j] == output88[i][j]);
+ 
+ 	t = 0;
+ 	for (j=0; j < 4; ++j)
+@@ -685,12 +686,14 @@ void test_filters(void)
+ 
+ 	mtsrand(0);
+ 
+-	for (i=0; i < sizeof(image88); ++i)
+-		image88[0][i] = mtrand() & 255;
++	for (i=0; i < sizeof(image88) / sizeof(image88[0]); ++i)
++		for (j=0; j < sizeof(image88[0]); ++j)
++			image88[i][j] = mtrand() & 255;
+ 	verify_box();
+ 
+-	for (i=0; i < sizeof(image88); ++i)
+-		image88[0][i] = 0;
++	for (i=0; i < sizeof(image88) / sizeof(image88[0]); ++i)
++		for (j=0; j < sizeof(image88[0]); ++j)
++			image88[i][j] = 0;
+ 	image88[4][4] = 255;
+ 	verify_box();
+ 

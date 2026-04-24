@@ -1,0 +1,52 @@
+#!/bin/bash
+
+if ! [[ $KERNEL_INSTALL_MACHINE_ID ]]; then
+    exit 0
+fi
+
+# Run grub2-mkconfig if ENABLE_BLSCFG is false
+if grep -sq '^GRUB_ENABLE_BLSCFG="*false"*\s*$' /etc/default/grub; then
+    RUN_MKCONFIG=true
+    DISABLE_BLS=true
+fi
+
+# PV and PVH Xen DomU guests boot with pygrub that doesn't have BLS support,
+# also Xen Dom0 use the menuentries from 20_linux_xen and not the ones from
+# 10_linux. So BLS support needs to be disabled for both Xen Dom0 and DomU.
+if [[ -e /sys/hypervisor/type ]] && grep -q "^xen$" /sys/hypervisor/type; then
+    if [ ! -e /sys/hypervisor/guest_type ] || ! grep -q "^HVM$" /sys/hypervisor/guest_type; then
+        RUN_MKCONFIG=true
+        DISABLE_BLS=true
+    fi
+fi
+
+ARCH=$(uname -m)
+# Older ppc64le OPAL firmware don't have BLS support so grub2-mkconfig has to be
+# run to generate a config with menuentry commands.
+if [[ $ARCH = "ppc64le" ]] && [ -d /sys/firmware/opal ]; then
+    RUN_MKCONFIG=true
+fi
+
+if [[ $DISABLE_BLS = "true" ]]; then
+    if grep -sq '^GRUB_ENABLE_BLSCFG="*true"*\s*$' /etc/default/grub; then
+	sed -i 's/^GRUB_ENABLE_BLSCFG=.*/GRUB_ENABLE_BLSCFG=false/' /etc/default/grub
+    fi
+fi
+
+# A traditional grub configuration file needs to be generated only in the case when
+# the bootloaders are not capable of populating a menu entry from the BLS fragments.
+if [[ $RUN_MKCONFIG != "true" ]]; then
+    exit 0
+fi
+
+[[ -f /etc/default/grub ]] && . /etc/default/grub
+
+COMMAND="$1"
+
+case "$COMMAND" in
+    add|remove)
+        grub2-mkconfig --no-grubenv-update -o /boot/grub2/grub.cfg >& /dev/null
+        ;;
+    *)
+        ;;
+esac

@@ -5,7 +5,7 @@
 
 Name:           mingw-pixman
 Version:        0.46.2
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        MinGW Windows Pixman library
 
 License:        MIT

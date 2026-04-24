@@ -1,0 +1,26 @@
+From 9ed70641a1f63d2b2b44e08a84033cbf912e0c2b Mon Sep 17 00:00:00 2001
+From: Michael Webster <miketwebster@gmail.com>
+Date: Fri, 19 Sep 2025 09:48:58 -0400
+Subject: [PATCH] placesManager.js: a new Gio.MountOperation takes no
+ arguments.
+
+This throws an error in cjs-128.
+
+Fixes https://github.com/linuxmint/lmde7-beta/issues/13
+---
+ js/ui/placesManager.js | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/js/ui/placesManager.js b/js/ui/placesManager.js
+index a9b8d53bf3..51756f6128 100644
+--- a/js/ui/placesManager.js
++++ b/js/ui/placesManager.js
+@@ -125,7 +125,7 @@ PlaceDeviceInfo.prototype = {
+         if (!this.isRemovable())
+             return;
+ 
+-        let mountOp = new Gio.MountOperation(this._mount);
++        let mountOp = new Gio.MountOperation();
+         let drive = this._mount.get_drive();
+         let volume = this._mount.get_volume();
+ 

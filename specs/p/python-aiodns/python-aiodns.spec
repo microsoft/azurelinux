@@ -7,7 +7,7 @@
 
 Name:           python-aiodns
 Version:        3.6.1
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Simple DNS resolver for asyncio
 
 License:        MIT

@@ -1,0 +1,41 @@
+From 616ec5f25adbde1a4bd78cdcacd6dcd7ecfa5a5c Mon Sep 17 00:00:00 2001
+From: Gary Lin <glin@suse.com>
+Date: Thu, 22 Dec 2022 13:49:34 +0800
+Subject: [PATCH] cms_common: skip authentication on the 'Friendly' slot
+
+When finding a certificate in a 'Friendly' slot without the need of the
+private key, it is not necessary to authenticate the slot.
+
+For example, when the signed attributes and the raw signature are
+created in a server and the user has the certificate, signkey.x509, and
+tries to import them into myapp.efi:
+
+  $ certutil -N -d nssdb -f passwd
+  $ certutil -A -d nssdb -f passwd -n signkey -t CT,CT,CT \
+      -i signkey.x509
+  $ pesign -n nssdb -c signkey -i myapp.efi -o myapp.efi.signed \
+      -d sha256 -I myapp.sattr -R myapp.sig
+
+Since the "signkey" is 'Friendly', i.e. publicly readable, and the
+private key is not needed, we can just skip the authentication and find
+"signkey" in the slot.
+
+Signed-off-by: Gary Lin <glin@suse.com>
+---
+ src/cms_common.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/cms_common.c b/src/cms_common.c
+index cf572ca..44e5cca 100644
+--- a/src/cms_common.c
++++ b/src/cms_common.c
+@@ -628,7 +628,8 @@ find_certificate(cms_context *cms, int needs_private_key)
+ 
+ 	int errnum;
+ 	SECStatus status;
+-	if (PK11_NeedLogin(psle->slot) && !PK11_IsLoggedIn(psle->slot, cms)) {
++	if ((needs_private_key || !PK11_IsFriendly(psle->slot)) &&
++	    (PK11_NeedLogin(psle->slot) && !PK11_IsLoggedIn(psle->slot, cms))) {
+ 		status = PK11_Authenticate(psle->slot, PR_TRUE, cms);
+ 		if (status != SECSuccess) {
+ 			save_port_err() {

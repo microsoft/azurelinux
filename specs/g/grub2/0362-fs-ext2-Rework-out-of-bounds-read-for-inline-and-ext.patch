@@ -1,0 +1,65 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Michael Chang via Grub-devel <grub-devel@gnu.org>
+Date: Fri, 21 Feb 2025 09:06:12 +0800
+Subject: [PATCH] fs/ext2: Rework out-of-bounds read for inline and external
+ extents
+
+Previously, the number of extent entries was not properly capped based
+on the actual available space. This could lead to insufficient reads for
+external extents, since the computation was based solely on the inline
+extent layout.
+
+In this patch, when processing the extent header, we determine whether
+the header is stored inline (i.e., at inode->blocks.dir_blocks) or in an
+external extent block. We then clamp the number of entries accordingly
+(using max_inline_ext for inline extents and max_external_ext for
+external extent blocks).
+
+This change ensures that only the valid number of extent entries is
+processed, preventing out-of-bound reads and potential filesystem
+corruption.
+
+Fixes: 7e2f750f0a (fs/ext2: Fix out-of-bounds read for inline extents)
+
+Signed-off-by: Michael Chang <mchang@suse.com>
+Tested-by: Christian Hesse <mail@eworm.de>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/fs/ext2.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/fs/ext2.c b/grub-core/fs/ext2.c
+index c3058f7..a5650c3 100644
+--- a/grub-core/fs/ext2.c
++++ b/grub-core/fs/ext2.c
+@@ -496,7 +496,10 @@ grub_ext2_read_block (grub_fshelp_node_t node, grub_disk_addr_t fileblock)
+       int i;
+       grub_disk_addr_t ret;
+       grub_uint16_t nent;
++      /* maximum number of extent entries in the inode's inline extent area */
+       const grub_uint16_t max_inline_ext = sizeof (inode->blocks) / sizeof (*ext) - 1; /* Minus 1 extent header. */
++      /* maximum number of extent entries in the external extent block */
++      const grub_uint16_t max_external_ext = EXT2_BLOCK_SIZE(data) / sizeof (*ext) - 1; /* Minus 1 extent header. */
+ 
+       if (grub_ext4_find_leaf (data, (struct grub_ext4_extent_header *) inode->blocks.dir_blocks,
+ 			       fileblock, &leaf) != GRUB_ERR_NONE)
+@@ -513,8 +516,18 @@ grub_ext2_read_block (grub_fshelp_node_t node, grub_disk_addr_t fileblock)
+ 
+       nent = grub_le_to_cpu16 (leaf->entries);
+ 
+-      if (leaf->depth == 0)
++      /*
++       * Determine the effective number of extent entries (nent) to process:
++       * If the extent header (leaf) is stored inline in the inode’s block
++       * area (i.e. at inode->blocks.dir_blocks), then only max_inline_ext
++       * entries can fit.
++       * Otherwise, if the header was read from an external extent block, use
++       * the larger limit, max_external_ext, based on the full block size.
++       */
++      if (leaf == (struct grub_ext4_extent_header *) inode->blocks.dir_blocks)
+ 	nent = grub_min (nent, max_inline_ext);
++      else
++	nent = grub_min (nent, max_external_ext);
+ 
+       for (i = 0; i < nent; i++)
+         {

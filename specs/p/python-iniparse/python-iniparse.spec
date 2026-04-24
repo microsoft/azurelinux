@@ -6,7 +6,7 @@
 
 Name:           python-iniparse
 Version:        0.5.1
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        Accessing and Modifying INI files
 
 # From LICENSE:

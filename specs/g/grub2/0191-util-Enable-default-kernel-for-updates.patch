@@ -1,0 +1,34 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Marta Lewandowska <mlewando@redhat.com>
+Date: Wed, 24 May 2023 11:22:47 +0200
+Subject: [PATCH] util: Enable default kernel for updates
+
+Several kernel variants can be installed on a system in parallel.
+In order to allow the user to choose which kernel will be set to
+default after an update, re-enable grub's usage of DEFAULTKERNEL as
+set in /etc/sysconfig/kernel
+
+Signed-off-by: Marta Lewandowska <mlewando@redhat.com>
+---
+ util/grub-get-kernel-settings.in | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/util/grub-get-kernel-settings.in b/util/grub-get-kernel-settings.in
+index 7e87dfccc0e..f71bc64360b 100644
+--- a/util/grub-get-kernel-settings.in
++++ b/util/grub-get-kernel-settings.in
+@@ -68,6 +68,14 @@ if test -f /etc/sysconfig/kernel ; then
+     . /etc/sysconfig/kernel
+ fi
+ 
++GRUB_DEFAULT_KERNEL_TYPE=${DEFAULTKERNEL/-core/}
++if [ "$GRUB_DEFAULT_KERNEL_TYPE" != "kernel" ]; then
++    echo GRUB_NON_STANDARD_KERNEL=true
++    echo export GRUB_NON_STANDARD_KERNEL
++    GRUB_DEFAULT_KERNEL_TYPE=${GRUB_DEFAULT_KERNEL_TYPE/kernel-/}
++fi
++echo GRUB_DEFAULT_KERNEL_TYPE=$GRUB_DEFAULT_KERNEL_TYPE
++echo export GRUB_DEFAULT_KERNEL_TYPE
+ if [ "$MAKEDEBUG" = "yes" ]; then
+     echo GRUB_LINUX_MAKE_DEBUG=true
+     echo export GRUB_LINUX_MAKE_DEBUG

@@ -3,7 +3,7 @@
 
 Name: libatasmart
 Version: 0.19
-Release: 31%{?dist}
+Release: 32%{?dist}
 Summary: ATA S.M.A.R.T. Disk Health Monitoring Library
 Source0: http://0pointer.de/public/libatasmart-%{version}.tar.xz
 Patch0: libatasmart-0.19-wd-fix.patch

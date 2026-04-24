@@ -3,7 +3,7 @@
 
 Name:           perl-File-pushd
 Version:        1.016
-Release:        23%{?dist}
+Release: 24%{?dist}
 Summary:        Change directory temporarily for a limited scope
 License:        Apache-2.0
 URL:            https://metacpan.org/release/File-pushd

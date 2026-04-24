@@ -3,7 +3,7 @@
 
 Name:           perl-HTTP-Cookies
 Version:        6.11
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        HTTP cookie jars
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/HTTP-Cookies

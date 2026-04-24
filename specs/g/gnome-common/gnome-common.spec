@@ -3,7 +3,7 @@
 
 Name:           gnome-common
 Version:        3.18.0
-Release:        22%{?dist}
+Release: 23%{?dist}
 Summary:        Useful things common to building GNOME packages from scratch
 BuildArch:      noarch
 # Automatically converted from old format: GPLv2+ - review is highly recommended.

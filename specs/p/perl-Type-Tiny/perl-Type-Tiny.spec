@@ -3,7 +3,7 @@
 
 Name:           perl-Type-Tiny
 Version:        2.008003
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Tiny, yet Moo(se)-compatible type constraint
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Type-Tiny

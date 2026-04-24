@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Frauendorfer | Miray Software <tf@miray.de>
+Date: Wed, 21 May 2025 10:56:19 +0200
+Subject: [PATCH] loader/efi/chainloader: Fix double free
+
+Signed-off-by: Thomas Frauendorfer | Miray Software <tf@miray.de>
+Reviewed-by: Nicolas Frayer <nfrayer@redhat.com>
+---
+ grub-core/loader/efi/chainloader.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/grub-core/loader/efi/chainloader.c b/grub-core/loader/efi/chainloader.c
+index 7652f5a..0a78d0d 100644
+--- a/grub-core/loader/efi/chainloader.c
++++ b/grub-core/loader/efi/chainloader.c
+@@ -1193,9 +1193,6 @@ fail:
+   if (address)
+     grub_efi_free_pages (address, pages);
+ 
+-  if (cmdline)
+-    grub_free (cmdline);
+-
+   if (image_handle != NULL)
+     grub_efi_unload_image (image_handle);
+ 

@@ -1,0 +1,35 @@
+From 6270a8805c7fb964e545a56ca8a92829d240a96a Mon Sep 17 00:00:00 2001
+From: Philippe Ombredanne <pombredanne@nexb.com>
+Date: Sun, 15 Jan 2023 17:14:27 +0100
+Subject: [PATCH] Add COC to redistributed license-like files
+
+Signed-off-by: Philippe Ombredanne <pombredanne@nexb.com>
+---
+ setup.cfg | 6 +++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/setup.cfg b/setup.cfg
+index 12d6654..006b322 100644
+--- a/setup.cfg
++++ b/setup.cfg
+@@ -67,7 +67,7 @@ packages = find:
+ include_package_data = true
+ zip_safe = false
+
+-python_requires = >=3.6.*
++python_requires = >=3.7
+
+ install_requires =
+     attrs >= 18.1, !=20.1.0
+@@ -92,8 +92,10 @@ patch =
+ testing =
+     pytest >= 6, != 7.0.0
+     pytest-xdist >= 2
+-    aboutcode-toolkit >= 6.0.0
++    aboutcode-toolkit >= 7.0.2
++    twine
+     black
++    isort
+
+ docs =
+     Sphinx >= 3.3.1

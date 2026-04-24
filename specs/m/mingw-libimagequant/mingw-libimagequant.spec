@@ -10,7 +10,7 @@
 
 Name:           mingw-%{pkgname}
 Version:        2.17.0
-Release:        12%{?dist}
+Release: 13%{?dist}
 Summary:        MinGW Windows %{pkgname} library
 
 BuildArch:      noarch

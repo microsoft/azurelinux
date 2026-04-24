@@ -1,0 +1,49 @@
+#!/usr/bin/emacs -x
+
+;; This file is not part of GNU Emacs.
+
+;;; Commentary:
+
+;; Inspect Emacs Lisp files for usage of Tree-sitter parsers, and
+;; generate RPM Recommends for those.
+
+;;; Code:
+
+(setq backtrace-on-error-noninteractive nil
+      jka-compr-verbose nil)
+
+(condition-case nil
+    (while (setq filename (read-from-minibuffer ""))
+      (when (string-match-p (rx ".el" (optional ".gz") line-end)
+                                 filename)
+        (condition-case err
+            (let* ((symlink-target (file-symlink-p filename))
+                   (source-filename
+                    (if (and (stringp symlink-target)
+                             (string-match-p (rx line-start "/")
+                                             symlink-target))
+                        (file-name-concat (getenv "RPM_BUILD_ROOT")
+                                          symlink-target)
+                      filename)))
+              (with-temp-buffer
+                (insert-file-contents source-filename)
+                (setq parsers ())
+                (while
+                    (search-forward-regexp
+                     (rx "(" (or "treesit-ensure-installed"
+                                 "treesit-parser-create"
+                                 "treesit-ready-p")
+                         " '")
+                     nil t)
+                  (add-to-list 'parsers (thing-at-point 'symbol t)))
+                (when parsers
+                  (princ (concat ";" filename "\n"))
+                  (dolist (parser parsers)
+                    (princ (concat "tree-sitter(" parser ")" "\n"))))))
+
+          ;; Missing files are probably caused by "broken" symlinks
+          ;; (which may actually be fulfilled by some other package).
+          (file-missing (message "warning: %s" (error-message-string err))))))
+  (end-of-file nil))
+
+;;; emacs_lisp.rec ends here

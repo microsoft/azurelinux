@@ -3,7 +3,7 @@
 
 Name:		xcb-util-wm
 Version:	0.4.2
-Release:	8%{?dist}
+Release: 9%{?dist}
 Summary:	Client and window-manager helper library on top of libxcb
 License:	X11-distribute-modifications-variant
 URL:		http://xcb.freedesktop.org

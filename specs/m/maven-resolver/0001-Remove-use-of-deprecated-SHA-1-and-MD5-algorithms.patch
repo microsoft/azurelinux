@@ -1,0 +1,32 @@
+From 8f5a6a86dde7827a3bfec4284f8a242d4330fdbe Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Thu, 28 Oct 2021 10:03:13 +0200
+Subject: [PATCH 1/2] Remove use of deprecated SHA-1 and MD5 algorithms
+
+---
+ .../eclipse/aether/repository/AuthenticationDigest.java   | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/maven-resolver-api/src/main/java/org/eclipse/aether/repository/AuthenticationDigest.java b/maven-resolver-api/src/main/java/org/eclipse/aether/repository/AuthenticationDigest.java
+index ec95fcba..a9a57953 100644
+--- a/maven-resolver-api/src/main/java/org/eclipse/aether/repository/AuthenticationDigest.java
++++ b/maven-resolver-api/src/main/java/org/eclipse/aether/repository/AuthenticationDigest.java
+@@ -88,13 +88,9 @@ public final class AuthenticationDigest {
+ 
+     private static MessageDigest newDigest() {
+         try {
+-            return MessageDigest.getInstance("SHA-1");
++            return MessageDigest.getInstance("SHA-256");
+         } catch (NoSuchAlgorithmException e) {
+-            try {
+-                return MessageDigest.getInstance("MD5");
+-            } catch (NoSuchAlgorithmException ne) {
+-                throw new IllegalStateException(ne);
+-            }
++            throw new IllegalStateException(e);
+         }
+     }
+ 
+-- 
+2.50.1
+

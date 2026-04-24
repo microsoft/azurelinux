@@ -10,7 +10,7 @@
 %if ! 0%{?with_doc}
 %global excluded_brs %{excluded_brs} sphinx openstackdocstheme
 %endif
-%global with_doc 1
+%global with_doc 0
 
 %global sname heatclient
 
@@ -21,7 +21,7 @@ the OpenStack Heat API.
 
 Name:    python-heatclient
 Version: 4.0.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: Python API and CLI for OpenStack Heat
 
 License: Apache-2.0

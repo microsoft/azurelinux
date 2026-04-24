@@ -4,7 +4,7 @@
 Name:           plasma-keyboard
 Epoch:          1
 Version:        6.6.0
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Virtual Keyboard for Qt based desktops
 
 License:        LGPL-2.1-only AND GPL-2.0-only AND CC0-1.0 AND LGPL-3.0-only AND GPL-3.0-or-later AND GPL-2.0-or-later AND GPL-3.0-only

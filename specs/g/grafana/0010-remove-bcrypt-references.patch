@@ -1,0 +1,108 @@
+From eb711315d4c8a81ff52984293758a47372c21b8d Mon Sep 17 00:00:00 2001
+From: Sam Feifer <sfeifer@redhat.com>
+Date: Fri, 1 Mar 2024 15:07:22 -0500
+Subject: [PATCH] remove bcrypt references
+
+
+diff --git a/pkg/services/extsvcauth/oauthserver/oasimpl/service.go b/pkg/services/extsvcauth/oauthserver/oasimpl/service.go
+index 8c5a90248d..43f6d11e08 100644
+--- a/pkg/services/extsvcauth/oauthserver/oasimpl/service.go
++++ b/pkg/services/extsvcauth/oauthserver/oasimpl/service.go
+@@ -19,7 +19,6 @@ import (
+ 	"github.com/ory/fosite/compose"
+ 	"github.com/ory/fosite/storage"
+ 	"github.com/ory/fosite/token/jwt"
+-	"golang.org/x/crypto/bcrypt"
+ 
+ 	"github.com/grafana/grafana/pkg/api/routing"
+ 	"github.com/grafana/grafana/pkg/bus"
+@@ -235,88 +234,7 @@ func (s *OAuth2ServiceImpl) RemoveExternalService(ctx context.Context, name stri
+ // it ensures that the associated service account has the correct permissions.
+ // Database consistency is not guaranteed, consider changing this in the future.
+ func (s *OAuth2ServiceImpl) SaveExternalService(ctx context.Context, registration *extsvcauth.ExternalServiceRegistration) (*extsvcauth.ExternalService, error) {
+-	if registration == nil {
+-		s.logger.Warn("RegisterExternalService called without registration")
+-		return nil, nil
+-	}
+-	slug := registration.Name
+-	s.logger.Info("Registering external service", "external service", slug)
+-
+-	// Check if the client already exists in store
+-	client, errFetchExtSvc := s.sqlstore.GetExternalServiceByName(ctx, slug)
+-	if errFetchExtSvc != nil && !errors.Is(errFetchExtSvc, oauthserver.ErrClientNotFound) {
+-		s.logger.Error("Error fetching service", "external service", slug, "error", errFetchExtSvc)
+-		return nil, errFetchExtSvc
+-	}
+-	// Otherwise, create a new client
+-	if client == nil {
+-		s.logger.Debug("External service does not yet exist", "external service", slug)
+-		client = &oauthserver.OAuthExternalService{
+-			Name:             slug,
+-			ServiceAccountID: oauthserver.NoServiceAccountID,
+-			Audiences:        s.cfg.AppURL,
+-		}
+-	}
+-
+-	// Parse registration form to compute required permissions for the client
+-	client.SelfPermissions, client.ImpersonatePermissions = s.handleRegistrationPermissions(registration)
+-
+-	if registration.OAuthProviderCfg == nil {
+-		return nil, errors.New("missing oauth provider configuration")
+-	}
+-
+-	if registration.OAuthProviderCfg.RedirectURI != nil {
+-		client.RedirectURI = *registration.OAuthProviderCfg.RedirectURI
+-	}
+-
+-	var errGenCred error
+-	client.ClientID, client.Secret, errGenCred = s.genCredentials()
+-	if errGenCred != nil {
+-		s.logger.Error("Error generating credentials", "client", client.LogID(), "error", errGenCred)
+-		return nil, errGenCred
+-	}
+-
+-	grantTypes := s.computeGrantTypes(registration.Self.Enabled, registration.Impersonation.Enabled)
+-	client.GrantTypes = strings.Join(grantTypes, ",")
+-
+-	// Handle key options
+-	s.logger.Debug("Handle key options")
+-	keys, err := s.handleKeyOptions(ctx, registration.OAuthProviderCfg.Key)
+-	if err != nil {
+-		s.logger.Error("Error handling key options", "client", client.LogID(), "error", err)
+-		return nil, err
+-	}
+-	if keys != nil {
+-		client.PublicPem = []byte(keys.PublicPem)
+-	}
+-	dto := client.ToExternalService(keys)
+-
+-	hashedSecret, err := bcrypt.GenerateFromPassword([]byte(client.Secret), bcrypt.DefaultCost)
+-	if err != nil {
+-		s.logger.Error("Error hashing secret", "client", client.LogID(), "error", err)
+-		return nil, err
+-	}
+-	client.Secret = string(hashedSecret)
+-
+-	s.logger.Debug("Save service account")
+-	saID, errSaveServiceAccount := s.saService.ManageExtSvcAccount(ctx, &serviceaccounts.ManageExtSvcAccountCmd{
+-		ExtSvcSlug:  slugify.Slugify(client.Name),
+-		Enabled:     registration.Self.Enabled,
+-		OrgID:       oauthserver.TmpOrgID,
+-		Permissions: client.SelfPermissions,
+-	})
+-	if errSaveServiceAccount != nil {
+-		return nil, errSaveServiceAccount
+-	}
+-	client.ServiceAccountID = saID
+-
+-	err = s.sqlstore.SaveExternalService(ctx, client)
+-	if err != nil {
+-		s.logger.Error("Error saving external service", "client", client.LogID(), "error", err)
+-		return nil, err
+-	}
+-	s.logger.Debug("Registered", "client", client.LogID())
+-	return dto, nil
++	panic("bcrypt cipher not available")
+ }
+ 
+ // randString generates a a cryptographically secure random string of n bytes

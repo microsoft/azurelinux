@@ -1,0 +1,63 @@
+From 3e50054d836b655b0868520bae8b85a3c18967ef Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Wed, 8 Nov 2023 17:12:16 +0100
+Subject: [PATCH] Replace the commentjson test dependency with re.sub
+
+While at it, only open the json files once.
+
+Co-authored-by: Maxwell G <maxwell@gtmx.me>
+---
+ setup.cfg                                     |  1 -
+ .../cocoapods/test_resolvers_cocoapods.py     | 19 +++++++++++--------
+ 2 files changed, 11 insertions(+), 9 deletions(-)
+
+diff --git a/setup.cfg b/setup.cfg
+index 5eddf2f..e080991 100644
+--- a/setup.cfg
++++ b/setup.cfg
+@@ -44,7 +44,6 @@ lint =
+ 	isort
+ 	types-requests
+ test =
+-	commentjson
+ 	packaging
+ 	pytest
+ release =
+diff --git a/tests/functional/cocoapods/test_resolvers_cocoapods.py b/tests/functional/cocoapods/test_resolvers_cocoapods.py
+index 12dff46..f54e27d 100644
+--- a/tests/functional/cocoapods/test_resolvers_cocoapods.py
++++ b/tests/functional/cocoapods/test_resolvers_cocoapods.py
+@@ -5,7 +5,6 @@
+ import re
+ import string
+ 
+-import commentjson  # type: ignore
+ import pytest
+ 
+ from resolvelib import AbstractProvider, ResolutionImpossible, Resolver
+@@ -124,14 +123,18 @@ def _version_in_specset(version, specset):
+ 
+ 
+ def _safe_json_load(filename):
+-    # Some fixtures has comments so the stdlib implementation doesn't work.
+-    # We only use commentjson if we absolutely need to because it's SLOW.
+-    try:
+-        with open(filename) as f:
++    # Some fixtures have comments so they are not valid json.
++    # We could use commentjson/json5 to load them,
++    # but it's easier to strip the comments.
++    # We only do it when json.load() fails to avoid unnecessary loading
++    # all the json files to strings.
++    with open(filename) as f:
++        try:
+             data = json.load(f)
+-    except ValueError:
+-        with open(filename) as f:
+-            data = commentjson.load(f)
++        except ValueError:
++            f.seek(0)
++            strippedjson = re.sub(r"//.*$", "", f.read(), flags=re.MULTILINE)
++            data = json.loads(strippedjson)
+     return data
+ 
+ 

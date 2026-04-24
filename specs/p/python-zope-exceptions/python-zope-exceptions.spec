@@ -11,7 +11,7 @@
 Summary:    Zope Exceptions
 Name:       python-zope-exceptions
 Version:    6.0
-Release:    2%{?dist}
+Release: 3%{?dist}
 VCS:        git:%{giturl}.git
 Source0:    %{giturl}/archive/%{version}/%{modname}-%{version}.tar.gz
 License:    ZPL-2.1

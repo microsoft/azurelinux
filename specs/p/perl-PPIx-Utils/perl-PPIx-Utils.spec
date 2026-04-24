@@ -3,7 +3,7 @@
 
 Name:           perl-PPIx-Utils
 Version:        0.004
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Utility functions for PPI
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 

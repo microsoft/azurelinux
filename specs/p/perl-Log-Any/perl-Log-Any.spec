@@ -3,7 +3,7 @@
 
 Name:           perl-Log-Any
 Version:        1.718
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Bringing loggers and listeners together
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Log-Any

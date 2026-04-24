@@ -4,7 +4,7 @@
 Summary:        Tools to test taintedness
 Name:           perl-Test-Taint
 Version:        1.08
-Release:        22%{?dist}
+Release: 23%{?dist}
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Test-Taint
 Source0:        https://cpan.metacpan.org/authors/id/P/PE/PETDANCE/Test-Taint-%{version}.tar.gz

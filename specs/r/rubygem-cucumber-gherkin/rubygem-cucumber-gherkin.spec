@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 22.0.0
-Release: 10%{?dist}
+Release: 11%{?dist}
 Summary: Fast Gherkin lexer/parser
 License: MIT
 URL: https://github.com/cucumber/gherkin

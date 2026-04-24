@@ -9,7 +9,7 @@
 Summary: Multilib packaging helpers
 Name: multilib-rpm-config
 Version: 1
-Release: 29%{?dist}
+Release: 30%{?dist}
 License: GPL-2.0-or-later
 
 # TODO: resolve directly in rpm/redhat-rpm-config (instead of this hack).

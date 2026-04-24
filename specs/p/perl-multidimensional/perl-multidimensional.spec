@@ -3,7 +3,7 @@
 
 Name:           perl-multidimensional
 Version:        0.014
-Release:        26%{?dist}
+Release: 27%{?dist}
 Summary:        Disables multidimensional array emulation
 # Automatically converted from old format: GPL+ or Artistic - review is highly recommended.
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

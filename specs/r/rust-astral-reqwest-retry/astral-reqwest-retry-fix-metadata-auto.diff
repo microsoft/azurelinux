@@ -1,5 +1,5 @@
---- astral-reqwest-retry-0.8.0/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ astral-reqwest-retry-0.8.0/Cargo.toml	2025-12-19T19:47:20.323479+00:00
+--- astral-reqwest-retry-0.9.1/Cargo.toml	2006-07-24T01:21:28+00:00
++++ astral-reqwest-retry-0.9.1/Cargo.toml	2026-02-10T11:30:15.542767+00:00
 @@ -95,9 +95,3 @@
  features = ["time"]
  default-features = false
@@ -9,4 +9,4 @@
 -features = ["js"]
 -
 -[target.'cfg(target_arch = "wasm32")'.dependencies.wasmtimer]
--version = "0.4.1"
+-version = "0.4.3"

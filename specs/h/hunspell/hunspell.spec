@@ -6,7 +6,7 @@
 Name:      hunspell
 Summary:   A spell checker and morphological analyzer library
 Version:   1.7.2
-Release:   10%{?dist}
+Release: 11%{?dist}
 Source:    https://github.com/hunspell/hunspell/releases/download/v%{version}/hunspell-%{version}.tar.gz
 URL:       https://github.com/hunspell/hunspell
 License:   LGPL-2.1-or-later OR GPL-2.0-or-later OR MPL-1.1

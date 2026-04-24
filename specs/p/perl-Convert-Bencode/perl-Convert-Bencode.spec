@@ -3,7 +3,7 @@
 
 Name:           perl-Convert-Bencode
 Version:        1.03
-Release:        42%{?dist}
+Release: 43%{?dist}
 Summary:        Functions for converting to/from bencoded strings
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Convert-Bencode

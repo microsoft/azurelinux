@@ -7,7 +7,7 @@ Summary:        Settings tool for Ethernet NICs
 Name:           ethtool
 Epoch:          2
 Version:        6.15
-Release:        4%{?dist}
+Release: 5%{?dist}
 # {json_print,qsfp,sff-common}.{c,h} are GPL-2.0-or-later, rest is GPL-2.0-only
 License:        GPL-2.0-only AND GPL-2.0-or-later
 URL:            https://www.kernel.org/pub/software/network/%{name}/

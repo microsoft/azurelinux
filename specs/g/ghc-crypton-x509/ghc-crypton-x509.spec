@@ -12,7 +12,7 @@
 
 Name:           ghc-%{pkg_name}
 Version:        1.7.7
-Release:        5%{?dist}
+Release: 6%{?dist}
 Summary:        X509 reader and writer
 
 License:        BSD-3-Clause

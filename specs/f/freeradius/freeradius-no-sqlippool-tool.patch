@@ -1,0 +1,28 @@
+From: Antonio Torres <antorres@redhat.com>
+Date: Wed, 5 Mar 2025
+Subject: Remove sqlippool tool
+
+This script relies on a Perl package, perl-Net-IP, that won't be available.
+Remove it from build script and let the user pull it manually instead, as it's
+just a helper script for SQL module users.
+
+---
+diff --git a/scripts/all.mk b/scripts/all.mk
+index a6e90aa3eb..517adb8590 100644
+--- a/scripts/all.mk
++++ b/scripts/all.mk
+@@ -1,5 +1,5 @@
+ install: $(R)$(sbindir)/rc.radiusd $(R)$(sbindir)/raddebug \
+-	$(R)$(bindir)/radsqlrelay $(R)$(bindir)/radcrypt $(R)$(bindir)/rlm_sqlippool_tool
++	$(R)$(bindir)/radsqlrelay $(R)$(bindir)/radcrypt
+ 
+ $(R)$(sbindir)/rc.radiusd: scripts/rc.radiusd
+ 	@mkdir -p $(dir $@)
+@@ -16,7 +16,3 @@ $(R)$(bindir)/radsqlrelay: scripts/sql/radsqlrelay
+ $(R)$(bindir)/radcrypt: scripts/cryptpasswd
+ 	@mkdir -p $(dir $@)
+ 	@$(INSTALL) -m 755 $< $@
+-
+-$(R)$(bindir)/rlm_sqlippool_tool: scripts/sql/rlm_sqlippool_tool
+-	@mkdir -p $(dir $@)
+-	@$(INSTALL) -m 755 $< $@

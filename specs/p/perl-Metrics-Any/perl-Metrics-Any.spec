@@ -3,7 +3,7 @@
 
 Name:           perl-Metrics-Any
 Version:        0.10
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        Abstract collection of monitoring metrics
 # Automatically converted from old format: GPL+ or Artistic - review is highly recommended.
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

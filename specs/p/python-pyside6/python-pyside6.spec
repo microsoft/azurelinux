@@ -13,7 +13,7 @@
 
 Name:           python-%{pypi_name}
 Version:        6.10.2
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Python bindings for the Qt 6 cross-platform application and UI framework
 
 License:        LGPL-3.0-only OR GPL-3.0-only WITH Qt-GPL-exception-1.0
@@ -264,7 +264,7 @@ export PYTHONPATH=$PWD/%{__cmake_builddir}/sources
 %cmake_build
 %if 0%{?docs}
 # build api documentation
-cd redhat-linux-build
+cd %{_vpath_builddir}
 ninja apidoc
 %endif
 
@@ -273,7 +273,7 @@ ninja apidoc
 %cmake_install
 %if 0%{?docs}
 # install api documentation
-cd redhat-linux-build
+cd %{_vpath_builddir}
 ninja apidocinstall
 %endif
 
@@ -305,7 +305,7 @@ mkdir -p %{buildroot}%{python3_sitelib}/shiboken6_generator/scripts
 mv %{buildroot}%{_bindir}/shiboken_tool.py %{buildroot}%{python3_sitelib}/shiboken6_generator/scripts
 
 # Install shiboken6
-mv redhat-linux-build/sources/shiboken6/generator/shiboken6 %{buildroot}%{python3_sitelib}/shiboken6_generator
+mv %{_vpath_builddir}/sources/shiboken6/generator/shiboken6 %{buildroot}%{python3_sitelib}/shiboken6_generator
 
 # Fix CMake config files to use correct absolute paths (OpenSUSE solution)
 # The upstream build is designed for wheel installation with relative paths,

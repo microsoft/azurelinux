@@ -10,7 +10,7 @@
 
 Name:           perl-Test-Strict
 Version:        0.54
-Release:        3%{?dist}
+Release: 4%{?dist}
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Summary:        Check syntax, presence of use strict/warnings, and test coverage
 Source:         https://cpan.metacpan.org/authors/id/M/MA/MANWAR/Test-Strict-%{version}.tar.gz

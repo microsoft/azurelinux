@@ -9,7 +9,7 @@ interfaces.
 
 Name:           python-paste
 Version:        3.10.1
-Release:        11%{?dist}
+Release: 12%{?dist}
 BuildArch:      noarch
 
 # Most of the code is MIT

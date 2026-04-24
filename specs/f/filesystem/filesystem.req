@@ -1,0 +1,22 @@
+#!/usr/bin/bash
+
+# Generate Requires: filesystem(unmerged-sbin-symlinks) if any
+# of the filenames were known to reside in /usr/sbin.
+# When the package with the files is being built, it's possible that
+# %_sbindir==/usr/bin, so we cannot rely on the location to figure
+# this out and we need a hardcoded list.
+
+sbin_filenames=${1:?}
+
+# Do nothing if the build system is not merged.
+test -L /usr/sbin || exit 0
+
+declare -A "filenames=($(sed 's/.*/["\0"]=1/' <"${sbin_filenames}"))"
+
+while read -r path; do
+  filename="$(basename "$path")"
+  if [ -n "${filenames[$filename]}" ]; then
+      echo ";$path"
+      echo "filesystem(unmerged-sbin-symlinks)"
+  fi
+done

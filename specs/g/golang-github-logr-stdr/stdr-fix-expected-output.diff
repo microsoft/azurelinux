@@ -1,0 +1,9 @@
+--- a/example_test.go
++++ b/example_test.go
+@@ -54,5 +54,5 @@ func ExampleNewWithOptions() {
+ 	log := stdr.NewWithOptions(newStdLogger(0), stdr.Options{LogCaller: stdr.All})
+ 	log.Info("with LogCaller=All")
+ 	// Output:
+-	// "caller"={"file":"example_test.go","line":55} "level"=0 "msg"="with LogCaller=All"
++	// "caller"={"file"="example_test.go" "line"=55} "level"=0 "msg"="with LogCaller=All"
+ }

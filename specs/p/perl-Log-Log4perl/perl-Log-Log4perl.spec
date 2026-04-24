@@ -5,7 +5,7 @@
 
 Name:           perl-Log-Log4perl
 Version:        1.57
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        Log4j implementation for Perl
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Log-Log4perl

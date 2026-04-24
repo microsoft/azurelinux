@@ -5,7 +5,7 @@
 
 Name:           mingw-dbus
 Version:        1.16.0
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        MinGW Windows port of D-Bus
 
 # The effective license of the majority of the package, including the shared

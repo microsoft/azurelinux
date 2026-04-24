@@ -3,7 +3,7 @@
 
 Name:           libldm
 Version:        0.2.5
-Release:        2%{?dist}%{?extra_release}
+Release: 3%{?dist}%{?extra_release}
 Summary:        A tool to manage Windows dynamic disks
 
 # Automatically converted from old format: LGPLv3+ and GPLv3+ - review is highly recommended.

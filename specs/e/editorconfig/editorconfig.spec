@@ -19,7 +19,7 @@ editors.}
 Name:           editorconfig
 Summary:        Parser for EditorConfig files written in C
 Version:        0.12.10
-Release:        1%{?dist}
+Release: 2%{?dist}
 
 # The entire source is BSD-2-Clause, except:
 #   BSD-3-Clause: src/lib/ini.h

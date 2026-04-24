@@ -3,7 +3,7 @@
 
 Name:    realmd
 Version: 0.17.1
-Release: 18%{?dist}
+Release: 19%{?dist}
 Summary: Kerberos realm enrollment service
 License: LGPL-2.1-or-later
 URL:     https://gitlab.freedesktop.org/realmd/realmd
@@ -67,7 +67,7 @@ applications that use %{name}.
 
 %build
 autoreconf -fi
-%configure --disable-silent-rules \
+%configure --with-distro=redhat --disable-silent-rules \
 %if 0%{?rhel}
     --with-vendor-error-message='Please check\n    https://red.ht/support_rhel_ad \nto get help for common issues.' \
 %endif

@@ -7,7 +7,7 @@
 
 Name:           imath
 Version:        3.1.12
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Library of 2D and 3D vector, matrix, and math operations for computer graphics
 
 License:        BSD-3-Clause

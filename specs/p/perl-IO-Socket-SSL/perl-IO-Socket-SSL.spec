@@ -11,7 +11,7 @@
 
 Name:		perl-IO-Socket-SSL
 Version:	2.095
-Release:	2%{?dist}
+Release: 3%{?dist}
 Summary:	Perl library for transparent SSL
 License:	(GPL-1.0-or-later OR Artistic-1.0-Perl) AND MPL-2.0
 URL:		https://metacpan.org/release/IO-Socket-SSL

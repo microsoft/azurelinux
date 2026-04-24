@@ -10,7 +10,7 @@
 Name: qt5
 # This version MUST remain in sync with Qt5 versions!
 Version: 5.15.18
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Qt5 meta package
 License: GPL-3.0-only
 URL:     https://getfedora.org/

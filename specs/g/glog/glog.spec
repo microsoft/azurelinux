@@ -3,7 +3,7 @@
 
 Name:           glog
 Version:        0.3.5
-Release:        24%{?dist}
+Release: 25%{?dist}
 Summary:        A C++ application logging library
 # Automatically converted from old format: BSD - review is highly recommended.
 License:        LicenseRef-Callaway-BSD

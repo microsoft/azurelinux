@@ -7,7 +7,7 @@ Name:           targetcli
 License:        Apache-2.0
 Summary:        An administration shell for storage targets
 Version:        3.0.1
-Release:        4%{?dist}
+Release: 5%{?dist}
 URL:            https://github.com/open-iscsi/%{oname}
 Source:         %{url}/archive/v%{version}/%{oname}-%{version}.tar.gz
 # Proposed upstream

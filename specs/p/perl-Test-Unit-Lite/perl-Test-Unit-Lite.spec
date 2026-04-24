@@ -8,7 +8,7 @@
 Name:		perl-Test-Unit-Lite
 Epoch:		1
 Version:	0.12%{?extraversion:.}%{?extraversion}
-Release:	9%{?dist}
+Release: 10%{?dist}
 Summary:	Unit testing without external dependencies
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Test-Unit-Lite

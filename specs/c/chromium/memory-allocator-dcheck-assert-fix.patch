@@ -1,0 +1,24 @@
+Index: chromium-127.0.6533.88/base/allocator/partition_allocator/src/partition_alloc/partition_bucket.cc
+===================================================================
+--- chromium-127.0.6533.88.orig/base/allocator/partition_allocator/src/partition_alloc/partition_bucket.cc
++++ chromium-127.0.6533.88/base/allocator/partition_allocator/src/partition_alloc/partition_bucket.cc
+@@ -492,6 +492,9 @@ uint8_t ComputeSystemPagesPerSlotSpanPre
+        partition_page_count <= kMaxPartitionPagesPerRegularSlotSpan;
+        partition_page_count++) {
+     size_t candidate_size = partition_page_count * PartitionPageSize();
++    if (candidate_size > BucketIndexLookup::kMaxBucketSize) {
++      break;
++    }
+     size_t waste = candidate_size % slot_size;
+     if (waste <= .02 * SystemPageSize()) {
+       return partition_page_count * NumSystemPagesPerPartitionPage();
+@@ -508,6 +511,9 @@ uint8_t ComputeSystemPagesPerSlotSpanPre
+       size_t system_page_count =
+           partition_page_count * NumSystemPagesPerPartitionPage() - slack;
+       size_t candidate_size = system_page_count * SystemPageSize();
++      if (candidate_size > BucketIndexLookup::kMaxBucketSize) {
++        continue;
++      }
+       size_t waste = candidate_size % slot_size;
+       if (waste < best_waste) {
+         best_waste = waste;

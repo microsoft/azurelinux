@@ -1,0 +1,56 @@
+Name:                asn1-encoding
+Version:             0.9.6
+x-revision: 2
+Synopsis:            ASN1 data reader and writer in RAW, BER and DER forms
+Description:
+    ASN1 data reader and writer in raw form with supports for high level forms of ASN1 (BER, and DER).
+License:             BSD3
+License-file:        LICENSE
+Copyright:           Vincent Hanquez <vincent@snarc.org>
+Author:              Vincent Hanquez <vincent@snarc.org>
+Maintainer:          vincent@snarc.org
+Category:            Data
+stability:           experimental
+Build-Type:          Simple
+Cabal-Version:       >=1.10
+Homepage:            https://github.com/vincenthz/hs-asn1
+
+Library
+  Exposed-modules:   Data.ASN1.Error
+                     Data.ASN1.BinaryEncoding
+                     Data.ASN1.BinaryEncoding.Raw
+                     Data.ASN1.Encoding
+                     Data.ASN1.Stream
+                     Data.ASN1.Object
+                     Data.ASN1.Prim
+  other-modules:     Data.ASN1.BinaryEncoding.Parse
+                     Data.ASN1.BinaryEncoding.Writer
+                     Data.ASN1.Internal
+                     Data.ASN1.Serialize
+                     Data.ASN1.Get
+  Build-Depends:     base >= 4.7 && < 5
+                   , bytestring
+                   , hourglass >= 0.2.6
+                   , asn1-types >= 0.3.0 && < 0.4
+  ghc-options:       -Wall -fwarn-tabs
+  Default-Language:  Haskell2010
+
+Test-Suite tests-asn1-encoding
+  type:              exitcode-stdio-1.0
+  hs-source-dirs:    tests .
+  Main-Is:           Tests.hs
+  Build-depends:     base >= 3 && < 7
+                   , bytestring
+                   , mtl
+                   , tasty
+                   , tasty-quickcheck
+                   , asn1-types
+                   , asn1-encoding
+                   , hourglass
+  ghc-options:       -Wall -fno-warn-orphans -fno-warn-missing-signatures
+  Default-Language:  Haskell2010
+
+source-repository head
+  type:     git
+  location: https://github.com/vincenthz/hs-asn1
+  subdir:   encoding

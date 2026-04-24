@@ -11,7 +11,7 @@ speedy.}
 
 Name:           python-%{srcname}
 Version:        23.0.0
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        Python WSGI HTTP Server
 License:        MIT
 URL:            https://gunicorn.org/

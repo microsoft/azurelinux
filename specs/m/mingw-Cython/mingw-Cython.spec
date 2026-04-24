@@ -12,7 +12,7 @@
 Name:          mingw-%{mod_name}
 Summary:       MinGW Windows Python %{mod_name} library
 Version:       3.1.2
-Release:       2%{?dist}
+Release: 3%{?dist}
 
 License:       Apache-2.0
 URL:           http://www.cython.org

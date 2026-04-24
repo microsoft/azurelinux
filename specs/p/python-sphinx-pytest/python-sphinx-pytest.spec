@@ -3,7 +3,7 @@
 
 Name:           python-sphinx-pytest
 Version:        0.2.0
-Release:        10%{?dist}
+Release: 11%{?dist}
 Summary:        Helpful pytest fixtures for sphinx extensions
 
 # SPDX

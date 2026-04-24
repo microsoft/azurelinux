@@ -3,7 +3,7 @@
 
 Name:           perl-Color-ANSI-Util
 Version:        0.165
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Routines for dealing with ANSI colors
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Color-ANSI-Util/

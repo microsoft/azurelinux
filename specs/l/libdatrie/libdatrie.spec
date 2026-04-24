@@ -3,7 +3,7 @@
 
 Name:           libdatrie
 Version:        0.2.13
-Release:        12%{?dist}
+Release: 13%{?dist}
 Summary:        Implementation of Double-Array structure for representing trie
 License:        LGPL-2.1-or-later
 URL:            http://linux.thai.net/projects/datrie

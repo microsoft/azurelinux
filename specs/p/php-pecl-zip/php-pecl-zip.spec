@@ -21,7 +21,7 @@
 Summary:      A ZIP archive management extension
 Name:         php-pecl-zip
 Version:      %{upstream_version}%{?upstream_prever:~%{upstream_prever}}
-Release:      1%{?dist}
+Release: 2%{?dist}
 License:      PHP-3.01
 URL:          https://pecl.php.net/package/zip
 

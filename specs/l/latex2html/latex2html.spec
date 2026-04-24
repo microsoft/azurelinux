@@ -6,7 +6,7 @@
 Summary: Converts LaTeX documents to HTML
 Name: latex2html
 Version: 2023.2
-Release: 8%{?dist}
+Release: 9%{?dist}
 License: GPL-2.0-or-later
 URL: https://github.com/latex2html/latex2html/releases
 # main latex2html source

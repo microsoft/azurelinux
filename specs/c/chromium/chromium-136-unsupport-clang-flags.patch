@@ -1,0 +1,17 @@
+diff -up chromium-136.0.7103.48/build/config/compiler/BUILD.gn.than chromium-136.0.7103.48/build/config/compiler/BUILD.gn
+--- chromium-136.0.7103.48/build/config/compiler/BUILD.gn.than	2025-04-28 15:44:08.883499599 +0200
++++ chromium-136.0.7103.48/build/config/compiler/BUILD.gn	2025-04-28 15:44:47.624639772 +0200
+@@ -622,12 +622,6 @@ config("compiler") {
+       cflags += [ "-ffp-contract=off" ]
+     }
+ 
+-    # Enable ELF CREL (see crbug.com/357878242) for all platforms that use ELF
+-    # (excluding toolchains that use an older version of LLVM).
+-    if (is_linux && !llvm_android_mainline &&
+-        default_toolchain != "//build/toolchain/cros:target") {
+-      cflags += [ "-Wa,--crel,--allow-experimental-crel" ]
+-    }
+   }
+ 
+   # C11/C++11 compiler flags setup.
+diff -up chromium-136.0.7103.48/tools/licenses/licenses.py.than chromium-136.0.7103.48/tools/licenses/licenses.py

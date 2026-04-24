@@ -10,7 +10,7 @@
 
 Name:           perl-IPC-SysV
 Version:        2.09
-Release:        521%{?dist}
+Release: 522%{?dist}
 Summary:        Object interface to System V IPC
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/IPC-SysV

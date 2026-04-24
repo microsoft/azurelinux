@@ -21,7 +21,7 @@
 
 Name:           erofs-utils
 Version:        1.9
-Release:        1%{?dist}
+Release: 2%{?dist}
 
 Summary:        Utilities for working with EROFS
 License:        GPL-2.0-only AND GPL-2.0-or-later AND (GPL-2.0-only OR Apache-2.0) AND (GPL-2.0-or-later OR Apache-2.0) AND (GPL-2.0-only OR BSD-2-Clause) AND (GPL-2.0-or-later OR BSD-2-Clause) AND MIT AND Unlicense

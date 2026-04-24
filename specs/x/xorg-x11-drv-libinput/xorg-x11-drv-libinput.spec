@@ -11,7 +11,7 @@
 Summary:    Xorg X11 libinput input driver
 Name:       xorg-x11-drv-libinput
 Version:    1.5.0
-Release:    3%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
+Release: 4%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
 URL:        http://www.x.org
 # SPDX
 License:    MIT

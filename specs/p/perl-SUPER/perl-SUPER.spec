@@ -3,7 +3,7 @@
 
 Name:		perl-SUPER
 Version:	1.20190531
-Release:	20%{?dist}
+Release: 21%{?dist}
 Summary:	Sane superclass method dispatcher
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/SUPER

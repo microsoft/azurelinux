@@ -1,0 +1,12 @@
+diff -up chromium-118.0.5993.32/ui/gfx/linux/dmabuf_uapi.h.me chromium-118.0.5993.32/ui/gfx/linux/dmabuf_uapi.h
+--- chromium-118.0.5993.32/ui/gfx/linux/dmabuf_uapi.h.me	2023-10-04 22:18:44.259800011 +0200
++++ chromium-118.0.5993.32/ui/gfx/linux/dmabuf_uapi.h	2023-10-04 22:28:17.068756669 +0200
+@@ -28,7 +28,7 @@ constexpr unsigned long DMA_BUF_IOCTL_SY
+     _IOW(DMA_BUF_BASE, 0, struct dma_buf_sync);
+ #endif
+ 
+-#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 0, 0)
++#if 0
+ struct dma_buf_export_sync_file {
+   __u32 flags;
+   __s32 fd;

@@ -6,7 +6,7 @@
 
 Name:           opendbx
 Version:        1.4.6
-Release:        41%{?dist}
+Release: 42%{?dist}
 Summary:        Lightweight but extensible database access library written in C
 
 License:        GPL-2.0-or-later AND LGPL-2.0-or-later

@@ -12,7 +12,7 @@
 
 Name:           python-%{modname}
 Version:        7.45.6
-Release:        5%{?dist}
+Release: 6%{?dist}
 Summary:        A Python interface to libcurl
 
 License:        curl OR LGPL-2.1-or-later

@@ -3,7 +3,7 @@
 
 Name:           perl-Pod-Eventual
 Version:        0.094003
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        Read a POD document as a series of trivial events
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Pod-Eventual

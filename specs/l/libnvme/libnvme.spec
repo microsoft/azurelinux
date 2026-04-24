@@ -7,7 +7,7 @@
 Name:    libnvme
 Summary: Linux-native nvme device management library
 Version: 1.16.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: LGPL-2.1-or-later
 URL:     https://github.com/linux-nvme/libnvme
 Source0: %{url}/archive/v%{version_no_tilde}/%{name}-%{version_no_tilde}.tar.gz

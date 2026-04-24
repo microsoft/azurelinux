@@ -10,7 +10,7 @@
 
 Name:           perl-B-Keywords
 Version:        1.29
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Lists of reserved barewords and symbol names
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/B-Keywords

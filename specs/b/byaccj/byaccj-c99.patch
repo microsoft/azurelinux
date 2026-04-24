@@ -1,0 +1,17 @@
+Include <unistd.h> for the unlink function.  This avoids an implicit
+function declaration, increasing C99 compatibility.
+
+Submitted upstream: <https://sourceforge.net/p/byaccj/patches/5/>
+
+diff --git a/src/main.c b/src/main.c
+index 54b5e05ba3aa2946..e4deacd47a3c0d34 100755
+--- a/src/main.c
++++ b/src/main.c
+@@ -4,6 +4,7 @@
+ 
+ #ifndef __WIN32__  /*rwj  --  make portable*/
+ #include <signal.h>
++#include <unistd.h>
+ #else
+ #include <dir.h>
+ #endif

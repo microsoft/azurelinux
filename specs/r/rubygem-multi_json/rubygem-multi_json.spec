@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.15.0
-Release: 12%{?dist}
+Release: 13%{?dist}
 Summary: A common interface to multiple JSON libraries
 License: MIT
 URL: https://github.com/intridea/multi_json

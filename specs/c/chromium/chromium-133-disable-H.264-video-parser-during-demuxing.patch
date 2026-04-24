@@ -1,0 +1,12 @@
+diff -up chromium-133.0.6943.53/media/filters/ffmpeg_glue.cc.me chromium-133.0.6943.53/media/filters/ffmpeg_glue.cc
+--- chromium-133.0.6943.53/media/filters/ffmpeg_glue.cc.me	2025-02-05 13:28:17.782881439 +0100
++++ chromium-133.0.6943.53/media/filters/ffmpeg_glue.cc	2025-02-05 13:33:15.256928027 +0100
+@@ -111,7 +111,7 @@ FFmpegGlue::FFmpegGlue(FFmpegURLProtocol
+ 
+   // We don't allow H.264 parsing during demuxing since we have our own parser
+   // and the ffmpeg one increases memory usage unnecessarily.
+-  format_context_->flags |= AVFMT_FLAG_NOH264PARSE;
++  // format_context_->flags |= AVFMT_FLAG_NOH264PARSE;
+ 
+   // Ensures format parsing errors will bail out. From an audit on 11/2017, all
+   // instances were real failures. Solves bugs like http://crbug.com/710791.

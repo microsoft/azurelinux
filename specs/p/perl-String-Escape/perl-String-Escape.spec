@@ -3,7 +3,7 @@
 
 Name:           perl-String-Escape
 Version:        2010.002
-Release:        46%{?dist}
+Release: 47%{?dist}
 Summary:        String::Escape Perl module
 # Automatically converted from old format: GPL+ or Artistic - review is highly recommended.
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

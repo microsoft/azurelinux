@@ -1,0 +1,91 @@
+cabal-version:      1.12
+name:               base16-bytestring
+version:            1.0.2.0
+x-revision:         1
+synopsis:           RFC 4648-compliant Base16 encodings for ByteStrings
+description:
+  This package provides support for encoding and decoding binary data according
+  to @base16@ (see also <https://tools.ietf.org/html/rfc4648 RFC 4648>) for
+  strict (see "Data.ByteString.Base16") and lazy @ByteString@s (see "Data.ByteString.Base16.Lazy").
+  .
+  See the <https://hackage.haskell.org/package/base16 base16> package which provides superior encoding and decoding performance as well as support for lazy, short, and strict variants of 'Text' and 'ByteString' values. Additionally, see the <https://hackage.haskell.org/package/base-encoding base-encoding> package which
+  provides an uniform API providing conversion paths between more binary and textual types.
+
+homepage:           http://github.com/haskell/base16-bytestring
+bug-reports:        http://github.com/haskell/base16-bytestring/issues
+license:            BSD3
+license-file:       LICENSE
+copyright:
+  Copyright 2011 MailRank, Inc.;
+  Copyright 2010-2020 Bryan O'Sullivan et al.
+
+author:             Bryan O'Sullivan <bos@serpentine.com>
+maintainer:
+  Herbert Valerio Riedel <hvr@gnu.org>,
+  Mikhail Glushenkov <mikhail.glushenkov@gmail.com>,
+  Emily Pillmore <emilypi@cohomolo.gy>
+
+category:           Data
+build-type:         Simple
+extra-source-files:
+  README.md
+  CHANGELOG.md
+
+tested-with:
+  GHC == 9.8.0
+  GHC == 9.6.3
+  GHC == 9.4.7
+  GHC == 9.2.8
+  GHC == 9.0.2
+  GHC == 8.10.7
+  GHC == 8.8.4
+  GHC == 8.6.5
+  GHC == 8.4.4
+  GHC == 8.2.2
+  GHC == 8.0.2
+
+source-repository head
+  type:     git
+  location: http://github.com/haskell/base16-bytestring
+
+library
+  other-modules:    Data.ByteString.Base16.Internal
+  exposed-modules:
+    Data.ByteString.Base16
+    Data.ByteString.Base16.Lazy
+
+  build-depends:
+      base        >=4.9 && <5
+    , bytestring  >=0.9 && <0.13
+
+  ghc-options:      -Wall -funbox-strict-fields
+  default-language: Haskell2010
+
+test-suite test
+  type:             exitcode-stdio-1.0
+  hs-source-dirs:   tests
+  main-is:          Tests.hs
+  build-depends:
+      base
+    , base16-bytestring
+    , bytestring
+    , HUnit
+    , QuickCheck
+    , test-framework
+    , test-framework-hunit
+    , test-framework-quickcheck2
+
+  default-language: Haskell2010
+
+benchmark bench
+  type:             exitcode-stdio-1.0
+  hs-source-dirs:   benchmarks
+  main-is:          Benchmarks.hs
+  build-depends:
+      base               >=4 && <5
+    , base16-bytestring
+    , bytestring
+    , criterion
+    , deepseq
+
+  default-language: Haskell2010

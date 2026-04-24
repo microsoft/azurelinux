@@ -1,0 +1,395 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Renaud=20M=C3=A9trich?= <rmetrich@redhat.com>
+Date: Tue, 15 Feb 2022 14:05:22 +0100
+Subject: [PATCH] efi: new 'connectefi' command
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When efi.quickboot is enabled on VMWare (which is the default for
+hardware release 16 and later), it may happen that not all EFI devices
+are connected. Due to this, browsing the devices in make_devices() just
+fails to find devices, in particular disks or partitions for a given
+disk.
+This typically happens when network booting, then trying to chainload to
+local disk (this is used in deployment tools such as Red Hat Satellite),
+which is done through using the following grub.cfg snippet:
+-------- 8< ---------------- 8< ---------------- 8< --------
+unset prefix
+search --file --set=prefix /EFI/redhat/grubx64.efi
+if [ -n "$prefix" ]; then
+  chainloader ($prefix)/EFI/redhat/grubx64/efi
+...
+-------- 8< ---------------- 8< ---------------- 8< --------
+
+With efi.quickboot, none of the devices are connected, causing "search"
+to fail. Sometimes devices are connected but not the partition of the
+disk matching $prefix, causing partition to not be found by
+"chainloader".
+
+This patch introduces a new "connectefi pciroot|scsi" command which
+recursively connects all EFI devices starting from a given controller
+type:
+- if 'pciroot' is specified, recursion is performed for all PCI root
+  handles
+- if 'scsi' is specified, recursion is performed for all SCSI I/O
+  handles (recommended usage to avoid connecting unwanted handles which
+  may impact Grub performances)
+
+Typical grub.cfg snippet would then be:
+-------- 8< ---------------- 8< ---------------- 8< --------
+connectefi scsi
+unset prefix
+search --file --set=prefix /EFI/redhat/grubx64.efi
+if [ -n "$prefix" ]; then
+  chainloader ($prefix)/EFI/redhat/grubx64/efi
+...
+-------- 8< ---------------- 8< ---------------- 8< --------
+
+The code is easily extensible to handle other arguments in the future if
+needed.
+
+Signed-off-by: Renaud Métrich <rmetrich@redhat.com>
+Signed-off-by: Robbie Harwood <rharwood@redhat.com>
+---
+ grub-core/Makefile.core.def         |   6 ++
+ grub-core/commands/efi/connectefi.c | 205 ++++++++++++++++++++++++++++++++++++
+ grub-core/commands/efi/lsefi.c      |   1 +
+ grub-core/disk/efi/efidisk.c        |  13 +++
+ grub-core/kern/efi/efi.c            |  13 +++
+ include/grub/efi/disk.h             |   2 +
+ include/grub/efi/efi.h              |   5 +
+ NEWS                                |   2 +-
+ 8 files changed, 246 insertions(+), 1 deletion(-)
+ create mode 100644 grub-core/commands/efi/connectefi.c
+
+diff --git a/grub-core/Makefile.core.def b/grub-core/Makefile.core.def
+index ceb15879272..c9dcfa00e85 100644
+--- a/grub-core/Makefile.core.def
++++ b/grub-core/Makefile.core.def
+@@ -861,6 +861,12 @@ module = {
+   enable = efi;
+ };
+ 
++module = {
++  name = connectefi;
++  common = commands/efi/connectefi.c;
++  enable = efi;
++};
++
+ module = {
+   name = blocklist;
+   common = commands/blocklist.c;
+diff --git a/grub-core/commands/efi/connectefi.c b/grub-core/commands/efi/connectefi.c
+new file mode 100644
+index 00000000000..0f840ea0575
+--- /dev/null
++++ b/grub-core/commands/efi/connectefi.c
+@@ -0,0 +1,205 @@
++/*
++ *  GRUB  --  GRand Unified Bootloader
++ *  Copyright (C) 2022  Free Software Foundation, Inc.
++ *
++ *  GRUB is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 3 of the License, or
++ *  (at your option) any later version.
++ *
++ *  GRUB is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
++ */
++#include <grub/types.h>
++#include <grub/mm.h>
++#include <grub/misc.h>
++#include <grub/efi/api.h>
++#include <grub/efi/pci.h>
++#include <grub/efi/efi.h>
++#include <grub/command.h>
++#include <grub/err.h>
++#include <grub/i18n.h>
++
++GRUB_MOD_LICENSE ("GPLv3+");
++
++typedef struct handle_list
++{
++  grub_efi_handle_t handle;
++  struct handle_list *next;
++} handle_list_t;
++
++static handle_list_t *already_handled = NULL;
++
++static grub_err_t
++add_handle (grub_efi_handle_t handle)
++{
++  handle_list_t *e;
++  e = grub_malloc (sizeof (*e));
++  if (! e)
++    return grub_errno;
++  e->handle = handle;
++  e->next = already_handled;
++  already_handled = e;
++  return GRUB_ERR_NONE;
++}
++
++static int
++is_in_list (grub_efi_handle_t handle)
++{
++  handle_list_t *e;
++  for (e = already_handled; e != NULL; e = e->next)
++    if (e->handle == handle)
++      return 1;
++  return 0;
++}
++
++static void
++free_handle_list (void)
++{
++  handle_list_t *e;
++  while ((e = already_handled) != NULL)
++    {
++      already_handled = already_handled->next;
++      grub_free (e);
++    }
++}
++
++typedef enum searched_item_flag
++{
++  SEARCHED_ITEM_FLAG_LOOP = 1,
++  SEARCHED_ITEM_FLAG_RECURSIVE = 2
++} searched_item_flags;
++
++typedef struct searched_item
++{
++  grub_guid_t guid;
++  const char *name;
++  searched_item_flags flags;
++} searched_items;
++
++static grub_err_t
++grub_cmd_connectefi (grub_command_t cmd __attribute__ ((unused)),
++		     int argc, char **args)
++{
++  unsigned s;
++  searched_items pciroot_items[] =
++    {
++      { GRUB_EFI_PCI_ROOT_IO_GUID, "PCI root", SEARCHED_ITEM_FLAG_RECURSIVE }
++    };
++  searched_items scsi_items[] =
++    {
++      { GRUB_EFI_PCI_ROOT_IO_GUID, "PCI root", 0 },
++      { GRUB_EFI_PCI_IO_GUID, "PCI", SEARCHED_ITEM_FLAG_LOOP },
++      { GRUB_EFI_SCSI_IO_PROTOCOL_GUID, "SCSI I/O", SEARCHED_ITEM_FLAG_RECURSIVE }
++    };
++  searched_items *items = NULL;
++  unsigned nitems = 0;
++  grub_err_t grub_err = GRUB_ERR_NONE;
++  unsigned total_connected = 0;
++
++  if (argc != 1)
++    return grub_error (GRUB_ERR_BAD_ARGUMENT, N_("one argument expected"));
++
++  if (grub_strcmp(args[0], N_("pciroot")) == 0)
++    {
++      items = pciroot_items;
++      nitems = ARRAY_SIZE (pciroot_items);
++    }
++  else if (grub_strcmp(args[0], N_("scsi")) == 0)
++    {
++      items = scsi_items;
++      nitems = ARRAY_SIZE (scsi_items);
++    }
++  else
++    return grub_error (GRUB_ERR_BAD_ARGUMENT,
++		       N_("unexpected argument `%s'"), args[0]);
++
++  for (s = 0; s < nitems; s++)
++    {
++      grub_efi_handle_t *handles;
++      grub_efi_uintn_t num_handles;
++      unsigned i, connected = 0, loop = 0;
++
++loop:
++      loop++;
++      grub_dprintf ("efi", "step '%s' loop %d:\n", items[s].name, loop);
++
++      handles = grub_efi_locate_handle (GRUB_EFI_BY_PROTOCOL,
++					&items[s].guid, 0, &num_handles);
++
++      if (!handles)
++	continue;
++
++      for (i = 0; i < num_handles; i++)
++	{
++	  grub_efi_handle_t handle = handles[i];
++	  grub_efi_status_t status;
++	  unsigned j;
++
++	  /* Skip already handled handles  */
++	  if (is_in_list (handle))
++	    {
++	      grub_dprintf ("efi", "  handle %p: already processed\n",
++				   handle);
++	      continue;
++	    }
++
++	  status = grub_efi_connect_controller(handle, NULL, NULL,
++			items[s].flags & SEARCHED_ITEM_FLAG_RECURSIVE ? 1 : 0);
++	  if (status == GRUB_EFI_SUCCESS)
++	    {
++	      connected++;
++	      total_connected++;
++	      grub_dprintf ("efi", "  handle %p: connected\n", handle);
++	    }
++	  else
++	    grub_dprintf ("efi", "  handle %p: failed to connect (%d)\n",
++				 handle, (grub_efi_int8_t) status);
++
++	  if ((grub_err = add_handle (handle)) != GRUB_ERR_NONE)
++	    break; /* fatal  */
++	}
++
++      grub_free (handles);
++      if (grub_err != GRUB_ERR_NONE)
++	break; /* fatal  */
++
++      if (items[s].flags & SEARCHED_ITEM_FLAG_LOOP && connected)
++	{
++	  connected = 0;
++	  goto loop;
++	}
++
++      free_handle_list ();
++    }
++
++  free_handle_list ();
++
++  if (total_connected)
++    grub_efidisk_reenumerate_disks ();
++
++  return grub_err;
++}
++
++static grub_command_t cmd;
++
++GRUB_MOD_INIT(connectefi)
++{
++  cmd = grub_register_command ("connectefi", grub_cmd_connectefi,
++			       N_("pciroot|scsi"),
++			       N_("Connect EFI handles."
++				  " If 'pciroot' is specified, connect PCI"
++				  " root EFI handles recursively."
++				  " If 'scsi' is specified, connect SCSI"
++				  " I/O EFI handles recursively."));
++}
++
++GRUB_MOD_FINI(connectefi)
++{
++  grub_unregister_command (cmd);
++}
+diff --git a/grub-core/commands/efi/lsefi.c b/grub-core/commands/efi/lsefi.c
+index 7b8316d4184..3635cd99b75 100644
+--- a/grub-core/commands/efi/lsefi.c
++++ b/grub-core/commands/efi/lsefi.c
+@@ -19,6 +19,7 @@
+ #include <grub/mm.h>
+ #include <grub/misc.h>
+ #include <grub/efi/api.h>
++#include <grub/efi/disk.h>
+ #include <grub/efi/edid.h>
+ #include <grub/efi/pci.h>
+ #include <grub/efi/efi.h>
+diff --git a/grub-core/disk/efi/efidisk.c b/grub-core/disk/efi/efidisk.c
+index 822005456eb..af69cc3bc8a 100644
+--- a/grub-core/disk/efi/efidisk.c
++++ b/grub-core/disk/efi/efidisk.c
+@@ -396,6 +396,19 @@ enumerate_disks (void)
+   free_devices (devices);
+ }
+ 
++void
++grub_efidisk_reenumerate_disks (void)
++{
++  free_devices (fd_devices);
++  free_devices (hd_devices);
++  free_devices (cd_devices);
++  fd_devices = 0;
++  hd_devices = 0;
++  cd_devices = 0;
++
++  enumerate_disks ();
++}
++
+ static int
+ grub_efidisk_iterate (grub_disk_dev_iterate_hook_t hook, void *hook_data,
+ 		      grub_disk_pull_t pull)
+diff --git a/grub-core/kern/efi/efi.c b/grub-core/kern/efi/efi.c
+index ef837387368..412a2073f41 100644
+--- a/grub-core/kern/efi/efi.c
++++ b/grub-core/kern/efi/efi.c
+@@ -96,6 +96,19 @@ grub_efi_locate_handle (grub_efi_locate_search_type_t search_type,
+   return buffer;
+ }
+ 
++grub_efi_status_t
++grub_efi_connect_controller (grub_efi_handle_t controller_handle,
++			     grub_efi_handle_t *driver_image_handle,
++			     grub_efi_device_path_protocol_t *remaining_device_path,
++			     grub_efi_boolean_t recursive)
++{
++  grub_efi_boot_services_t *b;
++
++  b = grub_efi_system_table->boot_services;
++  return b->connect_controller(controller_handle,
++		     driver_image_handle, remaining_device_path, recursive);
++}
++
+ void *
+ grub_efi_open_protocol (grub_efi_handle_t handle,
+ 			grub_guid_t *protocol,
+diff --git a/include/grub/efi/disk.h b/include/grub/efi/disk.h
+index 254475c8428..6845c2f1fd8 100644
+--- a/include/grub/efi/disk.h
++++ b/include/grub/efi/disk.h
+@@ -27,6 +27,8 @@ grub_efi_handle_t
+ EXPORT_FUNC(grub_efidisk_get_device_handle) (grub_disk_t disk);
+ char *EXPORT_FUNC(grub_efidisk_get_device_name) (grub_efi_handle_t *handle);
+ 
++void EXPORT_FUNC(grub_efidisk_reenumerate_disks) (void);
++
+ void grub_efidisk_init (void);
+ void grub_efidisk_fini (void);
+ 
+diff --git a/include/grub/efi/efi.h b/include/grub/efi/efi.h
+index 6c2c1f36e37..736d6f25694 100644
+--- a/include/grub/efi/efi.h
++++ b/include/grub/efi/efi.h
+@@ -53,6 +53,11 @@ EXPORT_FUNC(grub_efi_locate_handle) (grub_efi_locate_search_type_t search_type,
+ 				     grub_guid_t *protocol,
+ 				     void *search_key,
+ 				     grub_efi_uintn_t *num_handles);
++grub_efi_status_t
++EXPORT_FUNC(grub_efi_connect_controller) (grub_efi_handle_t controller_handle,
++					  grub_efi_handle_t *driver_image_handle,
++					  grub_efi_device_path_protocol_t *remaining_device_path,
++					  grub_efi_boolean_t recursive);
+ void *EXPORT_FUNC(grub_efi_open_protocol) (grub_efi_handle_t handle,
+ 					   grub_guid_t *protocol,
+ 					   grub_efi_uint32_t attributes);
+diff --git a/NEWS b/NEWS
+index 3101309621b..e3cfcd569c2 100644
+--- a/NEWS
++++ b/NEWS
+@@ -118,7 +118,7 @@ New in 2.02:
+   * Prefer pmtimer for TSC calibration.
+ 
+ * New/improved platform support:
+-  * New `efifwsetup' and `lsefi' commands on EFI platforms.
++  * New `efifwsetup', `lsefi' and `connectefi` commands on EFI platforms.
+   * New `cmosdump' and `cmosset' commands on platforms with CMOS support.
+   * New command `pcidump' for PCI platforms.
+   * Improve opcode parsing in ACPI halt implementation.

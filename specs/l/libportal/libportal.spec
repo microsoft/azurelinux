@@ -5,7 +5,7 @@
 
 Name:           libportal
 Version:        0.9.1
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Flatpak portal library
 # doc/urlmap.js is LGPL-2.1-or-later
 # everything else is LGPL-3.0-only

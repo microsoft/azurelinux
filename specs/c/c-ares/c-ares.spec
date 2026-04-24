@@ -6,7 +6,7 @@
 Summary: A library that performs asynchronous DNS operations
 Name: c-ares
 Version: 1.34.6
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: MIT
 URL: http://c-ares.org/
 Source0: https://github.com/c-ares/c-ares/releases/download/v%{version}/c-ares-%{version}.tar.gz

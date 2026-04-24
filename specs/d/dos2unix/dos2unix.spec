@@ -4,7 +4,7 @@
 Summary: Text file format converters
 Name: dos2unix
 Version: 7.5.3
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: BSD-3-Clause
 URL: https://waterlan.home.xs4all.nl/dos2unix.html
 Source: https://waterlan.home.xs4all.nl/dos2unix/%{name}-%{version}.tar.gz

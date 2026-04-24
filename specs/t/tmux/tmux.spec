@@ -5,7 +5,7 @@
 
 Name:           tmux
 Version:        3.5a
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        A terminal multiplexer
 License:        ISC AND BSD-2-Clause AND BSD-3-Clause AND SSH-short AND LicenseRef-Fedora-Public-Domain
 URL:            https://tmux.github.io/

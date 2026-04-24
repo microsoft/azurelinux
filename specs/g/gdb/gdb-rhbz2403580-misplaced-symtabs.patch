@@ -1,0 +1,151 @@
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Andrew Burgess <aburgess@redhat.com>
+Date: Thu, 11 Dec 2025 10:33:15 +0000
+Subject: gdb-rhbz2403580-misplaced-symtabs.patch
+
+;; Backport of upstream commit 70b66cf338b14336 to address RHBZ
+;; 2402580.  This backport can be dropped when rebasing to GDB 18.
+;; There were some moderate merge conflicts which needed resolving
+;; when backporting this fix.
+
+diff --git a/gdb/dwarf2/line-header.c b/gdb/dwarf2/line-header.c
+--- a/gdb/dwarf2/line-header.c
++++ b/gdb/dwarf2/line-header.c
+@@ -417,3 +417,46 @@ dwarf_decode_line_header (sect_offset sect_off, bool is_dwz,
+ 
+   return lh;
+ }
++
++/* See dwarf2/line-header.h.  */
++
++struct symtab *
++file_entry::symtab (dwarf2_cu &cu)
++{
++  if (m_symtab == nullptr)
++    {
++      buildsym_compunit *builder = cu.get_builder ();
++      compunit_symtab *cust = builder->get_compunit_symtab ();
++
++      {
++	std::string filename_holder;
++	const char *filename = this->name;
++	const char *dirname = cu.line_header->include_dir_at (this->d_index);
++
++	/* In order not to lose the line information directory,
++	   we concatenate it to the filename when it makes sense.
++	   Note that the Dwarf3 standard says (speaking of filenames in line
++	   information): ``The directory index is ignored for file names
++	   that represent full path names''.  Thus ignoring dirname in the
++	   `else' branch below isn't an issue.  */
++
++	if (!IS_ABSOLUTE_PATH (filename) && dirname != NULL)
++	  {
++	    filename_holder = path_join (dirname, filename);
++	    filename = filename_holder.c_str ();
++	  }
++
++	std::string filename_for_id = cu.line_header->file_file_name (*this);
++	cu.get_builder ()->start_subfile (filename, filename_for_id.c_str ());
++      }
++
++      subfile *sf = builder->get_current_subfile ();
++      if (sf->symtab == nullptr)
++	sf->symtab = allocate_symtab (cust, sf->name.c_str (),
++				      sf->name_for_id.c_str ());
++
++      m_symtab = sf->symtab;
++    }
++
++  return m_symtab;
++}
+diff --git a/gdb/dwarf2/line-header.h b/gdb/dwarf2/line-header.h
+--- a/gdb/dwarf2/line-header.h
++++ b/gdb/dwarf2/line-header.h
+@@ -23,6 +23,7 @@
+ #include "dwarf2/types.h"
+ 
+ struct dwarf2_per_objfile;
++struct dwarf2_cu;
+ 
+ /* dir_index is 1-based in DWARF 4 and before, and is 0-based in DWARF 5 and
+    later.  */
+@@ -65,8 +66,18 @@ struct file_entry
+ 
+   unsigned int length {};
+ 
++  /* Get the symtab for this file_entry.  If no symtab has yet been created
++     or set (see set_symtab) for this file_entry then a new one will be
++     created.  */
++  struct symtab *symtab (struct dwarf2_cu &cu);
++
++  /* Set the symtab for this file_entry.  */
++  void set_symtab (struct symtab *s)
++  { m_symtab = s; }
++
++private:
+   /* The associated symbol table, if any.  */
+-  struct symtab *symtab {};
++  struct symtab *m_symtab {};
+ };
+ 
+ /* The line number information for a compilation unit (found in the
+diff --git a/gdb/dwarf2/read.c b/gdb/dwarf2/read.c
+--- a/gdb/dwarf2/read.c
++++ b/gdb/dwarf2/read.c
+@@ -6222,8 +6222,8 @@ dwarf2_cu::setup_type_unit_groups (struct die_info *die)
+ 	      sf->symtab = allocate_symtab (cust, name, name_for_id);
+ 	    }
+ 
+-	  fe.symtab = b->get_current_subfile ()->symtab;
+-	  tug_unshare->symtabs[i] = fe.symtab;
++	  fe.set_symtab (b->get_current_subfile ()->symtab);
++	  tug_unshare->symtabs[i] = fe.symtab (*this);
+ 	}
+     }
+   else
+@@ -6241,7 +6241,7 @@ dwarf2_cu::setup_type_unit_groups (struct die_info *die)
+       for (i = 0; i < file_names.size (); ++i)
+ 	{
+ 	  file_entry &fe = file_names[i];
+-	  fe.symtab = tug_unshare->symtabs[i];
++	  fe.set_symtab (tug_unshare->symtabs[i]);
+ 	}
+     }
+ 
+@@ -11584,7 +11584,7 @@ process_structure_scope (struct die_info *die, struct dwarf2_cu *cu)
+ 	    {
+ 	      /* Any related symtab will do.  */
+ 	      symtab
+-		= cu->line_header->file_names ()[0].symtab;
++		= cu->line_header->file_names ()[0].symtab (*cu);
+ 	    }
+ 	  else
+ 	    {
+@@ -16587,6 +16587,9 @@ dwarf_decode_lines (struct line_header *lh, struct dwarf2_cu *cu,
+   if (decode_mapping)
+     dwarf_decode_lines_1 (lh, cu, lowpc);
+ 
++  if (cu->per_cu->is_dwz)
++    return;
++
+   /* Make sure a symtab is created for every file, even files
+      which contain only variables (i.e. no code with associated
+      line numbers).  */
+@@ -16602,7 +16605,7 @@ dwarf_decode_lines (struct line_header *lh, struct dwarf2_cu *cu,
+ 	sf->symtab = allocate_symtab (cust, sf->name.c_str (),
+ 				      sf->name_for_id.c_str ());
+ 
+-      fe.symtab = sf->symtab;
++      fe.set_symtab (sf->symtab);
+     }
+ }
+ 
+@@ -16879,7 +16882,7 @@ new_symbol (struct die_info *die, struct type *type, struct dwarf2_cu *cu,
+ 	      if (fe == NULL)
+ 		complaint (_("file index out of range"));
+ 	      else
+-		sym->set_symtab (fe->symtab);
++		sym->set_symtab (fe->symtab (*file_cu));
+ 	    }
+ 	}
+ 

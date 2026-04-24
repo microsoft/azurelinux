@@ -3,7 +3,7 @@
 
 Name:           perl-Sentinel
 Version:        0.07
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        Create lightweight SCALARs with get/set callbacks
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 

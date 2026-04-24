@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-Vendor: %providerName
+Bundle-Localization: plugin
+Bundle-RequiredExecutionEnvironment: J2SE-1.4
+Bundle-Name: Java Cup
+Bundle-SymbolicName: java_cup
+Export-Package: java_cup,java_cup.runtime
+Bundle-Version: 0.11.0
+Bundle-ManifestVersion: 2
+Main-Class: java_cup/Main

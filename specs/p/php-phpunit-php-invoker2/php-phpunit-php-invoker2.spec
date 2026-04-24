@@ -25,7 +25,7 @@
 
 Name:           php-phpunit-php-invoker2
 Version:        2.0.1
-Release:        13%{?dist}
+Release: 14%{?dist}
 Summary:        Invoke callables with a timeout
 
 License:        BSD-3-Clause

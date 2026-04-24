@@ -1,0 +1,24 @@
+From a580f124197fcc2a62875e43100cd35b1fc4329e Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Thu, 17 Aug 2023 09:30:08 +0200
+Subject: [PATCH] Disable Apache XercesImpl
+
+---
+ .../main/java/com/sun/msv/datatype/xsd/regex/RegExpFactory.java  | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/xsdlib/src/main/java/com/sun/msv/datatype/xsd/regex/RegExpFactory.java b/xsdlib/src/main/java/com/sun/msv/datatype/xsd/regex/RegExpFactory.java
+index 4a4c4be..cdeab93 100644
+--- a/xsdlib/src/main/java/com/sun/msv/datatype/xsd/regex/RegExpFactory.java
++++ b/xsdlib/src/main/java/com/sun/msv/datatype/xsd/regex/RegExpFactory.java
+@@ -42,7 +42,6 @@ public abstract class RegExpFactory {
+     public static RegExpFactory createFactory() {
+         String[] classList = new String[] {
+             "com.sun.msv.datatype.regexp.InternalImpl",
+-            "com.sun.msv.datatype.xsd.regex.XercesImpl",
+             "com.sun.msv.datatype.xsd.regex.JDKImpl"
+         };
+ 
+-- 
+2.41.0
+

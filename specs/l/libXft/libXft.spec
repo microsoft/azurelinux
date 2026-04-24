@@ -4,7 +4,7 @@
 Summary: X.Org X11 libXft runtime library
 Name: libXft
 Version: 2.3.8
-Release: 9%{?dist}
+Release: 10%{?dist}
 License: HPND-sell-variant
 URL: http://www.x.org
 

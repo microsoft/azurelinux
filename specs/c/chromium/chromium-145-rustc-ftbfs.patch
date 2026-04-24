@@ -1,0 +1,48 @@
+diff -up chromium-145.0.7632.45/components/user_data_importer/utility/parsing_ffi/zip_archive.rs.me chromium-145.0.7632.45/components/user_data_importer/utility/parsing_ffi/zip_archive.rs
+--- chromium-145.0.7632.45/components/user_data_importer/utility/parsing_ffi/zip_archive.rs.me	2026-02-10 22:57:19.071210777 +0100
++++ chromium-145.0.7632.45/components/user_data_importer/utility/parsing_ffi/zip_archive.rs	2026-02-10 22:55:05.325655663 +0100
+@@ -86,10 +86,17 @@ impl ZipFileArchive {
+         F: FnMut(zip::read::ZipFile<std::fs::File>, &Path) -> Option<R>,
+     {
+         for i in 0..self.archive.len() {
+-            if let Ok(file) = self.archive.by_index(i)
+-                && let Some(outpath) = file.enclosed_name()
+-                && let Some(r) = f(file, &outpath)
+-            {
++            let file = match self.archive.by_index(i) {
++                Ok(f) => f,
++                Err(_) => continue,
++            };
++
++            let outpath = match file.enclosed_name() {
++                Some(p) => p,
++                None => continue,
++            };
++
++            if let Some(r) = f(file, &outpath) {
+                 return Some(r);
+             }
+         }
+@@ -104,11 +111,17 @@ impl ZipFileArchive {
+     {
+         let mut acc = init;
+         for i in 0..self.archive.len() {
+-            if let Ok(file) = self.archive.by_index(i)
+-                && let Some(outpath) = file.enclosed_name()
+-            {
+-                acc = f(acc, file, &outpath);
+-            }
++            let file = match self.archive.by_index(i) {
++                Ok(f) => f,
++                Err(_) => continue,
++            };
++
++            let outpath = match file.enclosed_name() {
++                Some(p) => p,
++                None => continue,
++            };
++
++            acc = f(acc, file, &outpath);
+         }
+         acc
+     }

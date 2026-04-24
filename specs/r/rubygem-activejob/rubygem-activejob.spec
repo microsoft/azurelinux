@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 8.0.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Job framework with pluggable queues
 License: MIT
 URL: https://rubyonrails.org

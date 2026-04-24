@@ -6,7 +6,7 @@
 Name:           perl-Test-Differences
 %global cpan_version 0.72
 Version:        %(LANG=C printf "%.4f" %{cpan_version})
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Test strings and data structures and show differences if not OK
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Test-Differences

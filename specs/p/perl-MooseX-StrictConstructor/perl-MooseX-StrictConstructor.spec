@@ -3,7 +3,7 @@
 
 Name:           perl-MooseX-StrictConstructor 
 Version:        0.21
-Release:        26%{?dist}
+Release: 27%{?dist}
 # see lib/MooseX/StrictConstructor.pm
 License:        Artistic-2.0
 Summary:        Make your object constructors blow up on unknown attributes 

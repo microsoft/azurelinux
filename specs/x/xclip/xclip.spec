@@ -6,7 +6,7 @@
 
 Name:		xclip
 Version:	0.13
-Release:	25.git%{shortcommit}%{?dist}
+Release: 26.git%{shortcommit}%{?dist}
 # Automatically converted from old format: GPLv2+ - review is highly recommended.
 License:	GPL-2.0-or-later
 Summary:	Command line clipboard grabber

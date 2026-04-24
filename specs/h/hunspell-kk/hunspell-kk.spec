@@ -10,7 +10,7 @@
 Name: hunspell-kk
 Summary: Kazakh hunspell dictionaries
 Version: 1.1
-Release: 32%{?dist}
+Release: 33%{?dist}
 Source: https://downloads.sourceforge.net/project/aoo-extensions/1172/12/dict-kk.oxt
 URL: http://extensions.services.openoffice.org/project/dict-kk
 License: GPL-2.0-or-later OR LGPL-2.1-or-later OR MPL-1.1

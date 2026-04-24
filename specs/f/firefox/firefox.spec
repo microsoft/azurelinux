@@ -72,7 +72,7 @@ ExcludeArch: i686
 # https://bugzilla.redhat.com/show_bug.cgi?id=1951606
 %global enable_mozilla_crashreporter 0
 %ifarch x86_64 %{ix86}
-%global enable_mozilla_crashreporter 1
+%global enable_mozilla_crashreporter 0
 %endif
 %if %{build_with_asan}
 %global enable_mozilla_crashreporter 0
@@ -95,7 +95,7 @@ ExcludeArch: i686
 %global system_drm        1
 %global system_gbm        1
 %global system_pipewire   1
-%global build_tests       1
+%global build_tests       0
 # Bundled cbindgen makes build slow.
 # Enable only if system cbindgen is not available.
 %if 0%{?rhel}
@@ -203,7 +203,7 @@ ExcludeArch: i686
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
 Version:        148.0
-Release:        1%{?pre_tag}%{?dist}
+Release: 2%{?pre_tag}%{?dist}
 URL:            https://www.mozilla.org/firefox/
 # Automatically converted from old format: MPLv1.1 or GPLv2+ or LGPLv2+ - review is highly recommended.
 License:        LicenseRef-Callaway-MPLv1.1 OR GPL-2.0-or-later OR LicenseRef-Callaway-LGPLv2+

@@ -12,7 +12,7 @@
 
 Name:           perl-URI
 Version:        5.34
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        A Perl module implementing URI parsing and manipulation
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/URI

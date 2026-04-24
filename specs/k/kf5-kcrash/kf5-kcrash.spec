@@ -6,7 +6,7 @@
 
 Name:    kf5-%{framework}
 Version: 5.116.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: KDE Frameworks 5 Tier 2 addon for handling application crashes
 
 License: CC0-1.0 AND LGPL-2.0-or-later

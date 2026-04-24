@@ -9,7 +9,7 @@
 
 Name: libgsf
 Version: 1.14.55
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: GNOME Structured File library
 
 License: LGPL-2.1-only

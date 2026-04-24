@@ -7,7 +7,7 @@
 
 Name:          mingw-%{pkgname}
 Version:       0.0.10
-Release:       3%{?dist}
+Release: 4%{?dist}
 Summary:       Iconv implementation using Win32 API
 
 BuildArch:     noarch

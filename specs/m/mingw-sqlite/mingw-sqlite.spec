@@ -13,7 +13,7 @@
 
 Name:           mingw-%{name1}
 Version:        3.50.2
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        MinGW Windows port of sqlite embeddable SQL database engine
 
 License:        blessing

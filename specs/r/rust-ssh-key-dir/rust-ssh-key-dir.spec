@@ -8,7 +8,7 @@
 
 Name:           rust-%{crate}
 Version:        0.1.5
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        sshd AuthorizedKeysCommand to read ~/.ssh/authorized_keys.d
 
 License:        Apache-2.0

@@ -1,0 +1,34 @@
+Index: chromium-144.0.7559.59/build/toolchain/gcc_toolchain.gni
+===================================================================
+--- chromium-144.0.7559.59.orig/build/toolchain/gcc_toolchain.gni
++++ chromium-144.0.7559.59/build/toolchain/gcc_toolchain.gni
+@@ -415,7 +415,13 @@ template("single_gcc_toolchain") {
+         # -soname flag is not available on aix ld
+         soname_flag = "-Wl,-soname=\"$soname\""
+       }
+-      link_command = "$ld -shared $soname_flag {{ldflags}}${extra_ldflags} -o \"$unstripped_sofile\" @\"$rspfile\" {{rlibs}}"
++      if (target_cpu == "ppc64") {
++        # Work around linker failures due to Rust libraries and the use of whole-archive
++        link_command = "$ld -shared $soname_flag -Wl,--start-group {{ldflags}}${extra_ldflags} -o \"$unstripped_sofile\" @\"$rspfile\" {{rlibs}} -Wl,--end-group"
++      }
++      else {
++        link_command = "$ld -shared $soname_flag {{ldflags}}${extra_ldflags} -o \"$unstripped_sofile\" @\"$rspfile\" {{rlibs}}"
++      }
+ 
+       # Generate a map file to be used for binary size analysis.
+       # Map file adds ~10% to the link time on a z620.
+@@ -527,7 +533,13 @@ template("single_gcc_toolchain") {
+         whole_archive_flag = "-Wl,--whole-archive"
+         no_whole_archive_flag = "-Wl,--no-whole-archive"
+       }
+-      command = "$ld -shared {{ldflags}}${extra_ldflags} -o \"$unstripped_sofile\" $soname_flag @\"$rspfile\""
++      if (target_cpu == "ppc64") {
++        # Work around linker failures due to Rust libraries and the use of whole-archive
++        command = "$ld -shared -Wl,--start-group {{ldflags}}${extra_ldflags} -o \"$unstripped_sofile\" $soname_flag @\"$rspfile\" -Wl,--end-group"
++      }
++      else {
++        command = "$ld -shared {{ldflags}}${extra_ldflags} -o \"$unstripped_sofile\" $soname_flag @\"$rspfile\""
++      }
+ 
+       if (defined(invoker.strip)) {
+         strip_command = "${invoker.strip} -o \"$sofile\" \"$unstripped_sofile\""

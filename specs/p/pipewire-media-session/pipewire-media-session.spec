@@ -4,7 +4,7 @@
 Name:           pipewire-media-session
 Summary:        PipeWire reference session manager
 Version:        0.4.3
-Release:        1%{?dist}
+Release: 2%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 Source0:        https://gitlab.freedesktop.org/pipewire/media-session/-/archive/%{version}/media-session-%{version}.tar.gz

@@ -1,0 +1,48 @@
+--- scip-910/src/CMakeLists.txt.orig	2024-06-21 11:55:32.739715960 -0600
++++ scip-910/src/CMakeLists.txt	2024-06-21 11:56:07.395282703 -0600
+@@ -1050,7 +1050,7 @@ endif()
+ target_include_directories(libscip BEFORE PUBLIC
+     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
+     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+-    $<INSTALL_INTERFACE:include>)
++    $<INSTALL_INTERFACE:include/scip>)
+ 
+ target_link_libraries(libscip
+     PRIVATE
+@@ -1121,25 +1121,25 @@ set_target_properties(libscip PROPERTIES
+ target_include_directories(scip BEFORE PUBLIC
+     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
+     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+-    $<INSTALL_INTERFACE:include>)
++    $<INSTALL_INTERFACE:include>/scip)
+ 
+ # install the header files of scip
+-install(FILES ${lpiheaders} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/lpi)
+-install(FILES ${dijkstraheaders} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dijkstra)
+-install(FILES ${objscipheaders} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/objscip)
+-install(FILES ${scipheaders} ${PROJECT_BINARY_DIR}/scip/config.h ${PROJECT_BINARY_DIR}/scip/scip_export.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scip)
+-install(FILES ${tcliqueheaders} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/tclique)
+-install(FILES ${tpiheaders} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/tpi)
+-install(FILES ${xmlheaders} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/xml)
+-install(FILES ${symheaders} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/symmetry)
+-install(FILES ${blockmemshellheader} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/blockmemshell)
++install(FILES ${lpiheaders} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scip/lpi)
++install(FILES ${dijkstraheaders} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scip/dijkstra)
++install(FILES ${objscipheaders} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scip/objscip)
++install(FILES ${scipheaders} ${PROJECT_BINARY_DIR}/scip/config.h ${PROJECT_BINARY_DIR}/scip/scip_export.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scip/scip)
++install(FILES ${tcliqueheaders} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scip/tclique)
++install(FILES ${tpiheaders} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scip/tpi)
++install(FILES ${xmlheaders} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scip/xml)
++install(FILES ${symheaders} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scip/symmetry)
++install(FILES ${blockmemshellheader} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scip/blockmemshell)
+ 
+ # install the binary and the library to appropriate locations and add them to an export group
+ install(TARGETS scip libscip EXPORT scip-targets
+         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+-        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
++        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/scip)
+ 
+ # Add all targets to the build-tree export set
+ export(TARGETS scip libscip

@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        0.1.5
-Release:        28%{?dist}
+Release: 29%{?dist}
 Summary:        Python module to convert and manipulate color representations
 
 License:        BSD-2-Clause

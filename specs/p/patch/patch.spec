@@ -6,7 +6,7 @@
 Summary: Utility for modifying/upgrading files
 Name: patch
 Version: 2.8
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPL-3.0-or-later
 URL: https://savannah.gnu.org/projects/patch/
 Source: https://ftp.gnu.org/gnu/patch/patch-%{version}.tar.xz

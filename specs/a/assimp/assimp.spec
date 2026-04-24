@@ -5,7 +5,7 @@
 
 Name:           assimp
 Version:        6.0.4
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Library to import various 3D model formats into applications
 
 # Assimp is BSD

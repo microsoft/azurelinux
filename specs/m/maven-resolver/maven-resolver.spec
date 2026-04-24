@@ -1,0 +1,352 @@
+## START: Set by rpmautospec
+## (rpmautospec version 0.8.4)
+## RPMAUTOSPEC: autorelease, autochangelog
+%define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
+    release_number = 4;
+    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
+    print(release_number + base_release_number - 1);
+}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
+## END: Set by rpmautospec
+
+# This spec file has been modified by azldev to include build configuration overlays.
+# Do not edit manually; changes may be overwritten.
+
+%bcond_with bootstrap
+
+Name:           maven-resolver
+Epoch:          1
+Version:        1.9.24
+Release:        %autorelease
+Summary:        Apache Maven Artifact Resolver library
+License:        Apache-2.0
+URL:            https://maven.apache.org/resolver/
+BuildArch:      noarch
+ExclusiveArch:  %{java_arches} noarch
+
+Source0:        https://archive.apache.org/dist/maven/resolver/maven-resolver-%{version}-source-release.zip
+
+Patch:          0001-Remove-use-of-deprecated-SHA-1-and-MD5-algorithms.patch
+Patch:          0002-Make-I-O-errors-during-test-cleanup-non-fatal.patch
+
+%if %{with bootstrap}
+BuildRequires:  javapackages-bootstrap
+%else
+BuildRequires:  maven-local-openjdk25
+BuildRequires:  mvn(com.google.inject:guice)
+BuildRequires:  mvn(commons-codec:commons-codec)
+BuildRequires:  mvn(javax.inject:javax.inject)
+BuildRequires:  mvn(javax.servlet:javax.servlet-api)
+BuildRequires:  mvn(junit:junit)
+BuildRequires:  mvn(org.apache.felix:maven-bundle-plugin)
+BuildRequires:  mvn(org.apache.httpcomponents:httpclient)
+BuildRequires:  mvn(org.apache.httpcomponents:httpcore)
+BuildRequires:  mvn(org.apache.maven.wagon:wagon-provider-api)
+BuildRequires:  mvn(org.apache.maven:maven-model-builder)
+BuildRequires:  mvn(org.apache.maven:maven-parent:pom:)
+BuildRequires:  mvn(org.apache.maven:maven-resolver-provider)
+BuildRequires:  mvn(org.codehaus.plexus:plexus-classworlds)
+BuildRequires:  mvn(org.codehaus.plexus:plexus-utils)
+BuildRequires:  mvn(org.codehaus.plexus:plexus-xml)
+BuildRequires:  mvn(org.eclipse.sisu:org.eclipse.sisu.inject)
+BuildRequires:  mvn(org.eclipse.sisu:org.eclipse.sisu.plexus)
+BuildRequires:  mvn(org.eclipse.sisu:sisu-maven-plugin)
+BuildRequires:  mvn(org.hamcrest:hamcrest)
+BuildRequires:  mvn(org.hamcrest:hamcrest-core)
+BuildRequires:  mvn(org.mockito:mockito-core)
+BuildRequires:  mvn(org.slf4j:jcl-over-slf4j)
+BuildRequires:  mvn(org.slf4j:slf4j-api)
+BuildRequires:  mvn(org.slf4j:slf4j-simple)
+%endif
+# TODO Remove in Fedora 46
+Obsoletes:      %{name}-javadoc < 1:1.9.22-10
+Provides:       maven-resolver-api = %{epoch}:%{version}-%{release}
+Provides:       maven-resolver-connector-basic = %{epoch}:%{version}-%{release}
+Provides:       maven-resolver-impl = %{epoch}:%{version}-%{release}
+Provides:       maven-resolver-spi = %{epoch}:%{version}-%{release}
+Provides:       maven-resolver-transport-classpath = %{epoch}:%{version}-%{release}
+Provides:       maven-resolver-transport-file = %{epoch}:%{version}-%{release}
+Provides:       maven-resolver-transport-http = %{epoch}:%{version}-%{release}
+Provides:       maven-resolver-transport-wagon = %{epoch}:%{version}-%{release}
+Provides:       maven-resolver-util = %{epoch}:%{version}-%{release}
+
+%description
+Apache Maven Artifact Resolver is a library for working with artifact
+repositories and dependency resolution. Maven Artifact Resolver deals with the
+specification of local repository, remote repository, developer workspaces,
+artifact transports and artifact resolution.
+
+%prep
+%autosetup -p1 -C
+
+# Skip tests that equire internet connection
+rm maven-resolver-supplier/src/test/java/org/eclipse/aether/supplier/RepositorySystemSupplierTest.java
+rm maven-resolver-transport-http/src/test/java/org/eclipse/aether/transport/http/{HttpServer,HttpTransporterTest}.java
+%pom_remove_dep org.eclipse.jetty: maven-resolver-transport-http
+
+%pom_remove_plugin -r :bnd-maven-plugin
+%pom_remove_plugin -r org.codehaus.mojo:animal-sniffer-maven-plugin
+%pom_remove_plugin -r :japicmp-maven-plugin
+
+%pom_disable_module maven-resolver-demos
+%pom_disable_module maven-resolver-named-locks-hazelcast
+%pom_disable_module maven-resolver-named-locks-redisson
+%pom_disable_module maven-resolver-transport-classpath
+%mvn_package :maven-resolver-test-util __noinstall
+
+# generate OSGi manifests
+for pom in $(find -mindepth 2 -name pom.xml) ; do
+  %pom_add_plugin "org.apache.felix:maven-bundle-plugin" $pom \
+  "<configuration>
+    <instructions>
+      <Bundle-SymbolicName>\${project.groupId}$(sed 's:./maven-resolver::;s:/pom.xml::;s:-:.:g' <<< $pom)</Bundle-SymbolicName>
+      <Export-Package>!org.eclipse.aether.internal*,org.eclipse.aether*</Export-Package>
+      <_nouses>true</_nouses>
+    </instructions>
+  </configuration>
+  <executions>
+    <execution>
+      <id>create-manifest</id>
+      <phase>process-classes</phase>
+      <goals><goal>manifest</goal></goals>
+    </execution>
+  </executions>"
+done
+%pom_add_plugin "org.apache.maven.plugins:maven-jar-plugin" pom.xml \
+"<configuration>
+  <archive>
+    <manifestFile>\${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+  </archive>
+</configuration>"
+
+%mvn_alias 'org.apache.maven.resolver:maven-resolver{*}' 'org.eclipse.aether:aether@1'
+%mvn_alias 'org.apache.maven.resolver:maven-resolver-transport-wagon' 'org.eclipse.aether:aether-connector-wagon'
+%mvn_file ':maven-resolver{*}' %{name}/maven-resolver@1 aether/aether@1
+
+%build
+%mvn_build -j
+
+%install
+%mvn_install
+
+%files -f .mfiles
+%license LICENSE NOTICE
+
+%changelog
+## START: Generated by rpmautospec
+* Wed Apr 22 2026 azldev <azurelinux@microsoft.com> - 1:1.9.24-4
+- Latest state for maven-resolver
+
+* Tue Jul 29 2025 Jiri Vanek <jvanek@redhat.com> - 1:1.9.24-3
+- Rebuilt for java-25-openjdk as preffered jdk
+
+* Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.9.24-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
+
+* Wed Jul 16 2025 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:1.9.24-1
+- Update to upstream version 1.9.24
+
+* Fri Jul 11 2025 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:1.9.22-13
+- Make I/O errors during test cleanup non-fatal
+- Build with OpenJDK 25
+
+* Thu May 22 2025 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:1.9.22-12
+- Switch javapackages test plan to f43 ref
+
+* Wed Mar 26 2025 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:1.9.22-11
+- Switch to javapackages tests from CentOS Stream GitLab
+
+* Wed Mar 05 2025 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:1.9.22-10
+- Fix javadoc obsoletes version
+
+* Mon Mar 03 2025 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:1.9.22-9
+- Remove javadoc subpackage
+
+* Fri Feb 14 2025 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:1.9.22-8
+- Don't use %%{name} for upstream artifact/tarball names
+
+* Fri Jan 17 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.9.22-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
+
+* Fri Nov 29 2024 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:1.9.22-2
+- Update javapackages test plan to f42
+
+* Fri Aug 23 2024 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:1.9.22-1
+- Update to upstream version 1.9.22
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.9.18-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri May 31 2024 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:1.9.18-4
+- Switch to a newer patch macro syntax
+
+* Tue Feb 27 2024 Jiri Vanek <jvanek@redhat.com> - 1:1.9.18-3
+- Rebuilt for java-21-openjdk as system jdk
+
+* Fri Feb 23 2024 Jiri Vanek <jvanek@redhat.com> - 1:1.9.18-2
+- bump of release for for java-21-openjdk as system jdk
+
+* Thu Feb 01 2024 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:1.9.18-1
+- Update to upstream version 1.9.18
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.9.15-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.9.15-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Sep 20 2023 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:1.9.15-3
+- Rebuild to regenerate auto-Requires on java
+
+* Fri Sep 01 2023 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:1.9.15-2
+- Convert License tag to SPDX format
+
+* Fri Aug 18 2023 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:1.9.15-1
+- Update to upstream version 1.9.15
+
+* Tue Aug 15 2023 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:1.9.7-4
+- Build with default JDK 17
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.9.7-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Mar 31 2023 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:1.9.7-2
+- Rebuild with no changes
+
+* Tue Mar 21 2023 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:1.9.7-1
+- Update to upstream version 1.9.7
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.7.3-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.7.3-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Apr 29 2022 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:1.7.3-4
+- Add aether-connector-wagon alias
+
+* Sat Feb 05 2022 Jiri Vanek <jvanek@redhat.com> - 1:1.7.3-3
+- Rebuilt for java-17-openjdk as system jdk
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.7.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jan 07 2022 Marian Koncek <mkoncek@redhat.com> - 1:1.7.3-1
+- Update to upstream version 1.7.3
+
+* Thu Oct 28 2021 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:1.6.1-7
+- Remove use of deprecated SHA-1 and MD5 algorithms
+
+* Sun Oct 03 2021 Didik Supriadi <didiksupriadi41@fedoraproject.org> - 1:1.6.1-6
+- Enable transport-file and transport-http module
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.6.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jun 01 2021 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:1.6.1-4
+- Add epoch to obsoleted packages
+
+* Tue Jun 01 2021 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:1.6.1-3
+- Obsolete removed subpackages
+
+* Mon May 17 2021 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:1.6.1-2
+- Bootstrap build
+- Non-bootstrap build
+
+* Wed Feb 17 2021 Fabio Valentini <decathorpe@gmail.com> - 1:1.4.2-5
+- Build with -release 8 for better OpenJDK 8 compatibility.
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.4.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Fri Jan 15 2021 Marian Koncek <mkoncek@redhat.com> - 1.6.1-1
+- Update to upstream version 1.6.1
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.4.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Fri Jul 10 2020 Jiri Vanek <jvanek@redhat.com> - 1:1.4.2-2
+- Rebuilt for JDK-11, see https://fedoraproject.org/wiki/Changes/Java11
+
+* Fri Jun 26 2020 Marian Koncek <mkoncek@redhat.com> - 1.4.2-1
+- Update to upstream version 1.4.2
+
+* Sat May 09 2020 Fabio Valentini <decathorpe@gmail.com> - 1:1.4.2-1
+- Update to version 1.4.2.
+
+* Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.4.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
+
+* Sat Jan 25 2020 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.4.1-3
+- Build with OpenJDK 8
+
+* Tue Nov 05 2019 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.4.1-2
+- Mass rebuild for javapackages-tools 201902
+
+* Sun Nov 03 2019 Fabio Valentini <decathorpe@gmail.com> - 1:1.4.1-1
+- Update to version 1.4.1.
+
+* Wed Sep 11 2019 Marian Koncek <mkoncek@redhat.com> - 1.4.1-1
+- Update to upstream version 1.4.1
+
+* Thu Jul 25 2019 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.3.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
+
+* Sat Jun 29 2019 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:1.3.3-3
+- Disable unneeded transporters
+
+* Fri May 24 2019 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:1.3.3-2
+- Mass rebuild for javapackages-tools 201901
+
+* Tue May 14 2019 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:1.3.3-1
+- Update to upstream version 1.3.3
+
+* Fri Feb 01 2019 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.3.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
+
+* Tue Oct 23 2018 Marian Koncek <mkoncek@redhat.com> - 1:1.3.1-1
+- Update to upstream version 1.3.1
+
+* Fri Jul 13 2018 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.1.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
+
+* Wed Apr 18 2018 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:1.1.1-2
+- Remove aether provides
+
+* Mon Feb 26 2018 Michael Simacek <msimacek@redhat.com> - 1:1.1.1-1
+- Update to upstream version 1.1.1
+
+* Thu Feb 08 2018 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.1.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
+
+* Mon Nov 27 2017 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:1.1.0-2
+- Obsolete aether-ant-tasks
+- Resolves: rhbz#1516043
+
+* Wed Oct 25 2017 Michael Simacek <msimacek@redhat.com> - 1:1.1.0-1
+- Update to upstream version 1.1.0
+
+* Thu Aug 24 2017 Mat Booth <mat.booth@redhat.com> - 1:1.0.3-7
+- Fix OSGi metadata to also export "impl" packages; "internal" packages remain
+  unexported
+
+* Wed Jul 26 2017 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.0.3-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
+
+* Wed May 24 2017 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:1.0.3-5
+- Add aether alias for main POM file
+
+* Tue May 23 2017 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:1.0.3-4
+- Fix duplicate Bundle-SymbolicName in OSGi manifests
+
+* Mon May 15 2017 Mat Booth <mat.booth@redhat.com> - 1:1.0.3-3
+- Restore OSGi metadata that was lost in the switch from "aether" to
+  "maven-resolver"
+
+* Wed Apr 12 2017 Michael Simacek <msimacek@redhat.com> - 1:1.0.3-2
+- Split into subpackages
+- Obsolete and provide aether
+
+* Tue Apr 11 2017 Michael Simacek <msimacek@redhat.com> - 1.0.3-1
+- Initial packaging
+
+## END: Generated by rpmautospec

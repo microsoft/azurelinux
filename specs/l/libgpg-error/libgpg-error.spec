@@ -3,7 +3,7 @@
 
 Name: libgpg-error
 Version: 1.55
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Library for error values used by GnuPG components
 URL: https://www.gnupg.org/related_software/libgpg-error/
 License: LGPL-2.1-or-later AND (BSD-3-Clause OR LGPL-2.1-or-later) AND FSFULLR AND GPL-2.0-or-later

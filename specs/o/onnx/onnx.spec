@@ -3,7 +3,7 @@
 
 Name:       onnx
 Version:    1.17.0
-Release:    12%{?dist}
+Release: 13%{?dist}
 Summary:    Open standard for machine learning interoperability
 License:    Apache-2.0
 
@@ -77,6 +77,7 @@ sed -r \
 %pyproject_buildrequires requirements-reference.txt
 
 %build
+export VPATH_BUILDDIR=%{_vpath_builddir}
 %cmake \
     -DONNX_USE_LITE_PROTO=OFF \
     -DONNX_USE_PROTOBUF_SHARED_LIBS=ON \

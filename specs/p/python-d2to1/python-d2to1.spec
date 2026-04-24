@@ -5,7 +5,7 @@
 
 Name: python-%{srcname}
 Version: 0.2.12
-Release: 40.post1%{?dist}
+Release: 41.post1%{?dist}
 Summary: Allows using distutils2-like setup.cfg files with setup.py
 License: BSD-3-Clause
 

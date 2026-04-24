@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 3.7.1
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary: Listen to file modifications
 License: MIT
 URL: https://github.com/guard/listen

@@ -6,7 +6,7 @@
 
 Name:           openexr
 Version:        3.2.4
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        Provides the specification and reference implementation of the EXR file format
 
 License:        BSD-3-Clause WITH AdditionRef-OpenEXR-Additional-IP-Rights-Grant OR Apache-2.0

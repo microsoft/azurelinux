@@ -3,7 +3,7 @@
 
 Name:           perl-bareword-filehandles
 Version:        0.007
-Release:        23%{?dist}
+Release: 24%{?dist}
 Summary:        Disables bareword filehandles
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/bareword-filehandles

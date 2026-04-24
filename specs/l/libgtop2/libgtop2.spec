@@ -3,7 +3,7 @@
 
 Name:           libgtop2
 Version:        2.41.3
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        LibGTop library (version 2)
 
 License:        GPL-2.0-or-later

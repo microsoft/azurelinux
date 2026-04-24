@@ -12,7 +12,7 @@
 
 Name:               igraph
 Version:            0.10.16
-Release:            2%{?dist}
+Release: 3%{?dist}
 Summary:            Library for creating and manipulating graphs
 
 License:             GPL-2.0-or-later

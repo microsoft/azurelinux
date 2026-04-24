@@ -6,7 +6,7 @@
 
 Name:           apache-commons-exec
 Version:        1.5.0
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Java library to reliably execute external processes from within the JVM
 License:        Apache-2.0
 URL:            https://commons.apache.org/proper/%{short_name}

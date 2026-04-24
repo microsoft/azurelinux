@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 8 Jan 2024 15:45:57 -0500
+Subject: [PATCH] grub-install: fix a sign comparison error
+
+This is a trivial sign comparison fix.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ util/grub-install-common.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/util/grub-install-common.c b/util/grub-install-common.c
+index b58539111da..67afc2eedf4 100644
+--- a/util/grub-install-common.c
++++ b/util/grub-install-common.c
+@@ -368,7 +368,7 @@ char *grub_install_themes_directory = NULL;
+ int
+ grub_install_is_short_mbrgap_supported (void)
+ {
+-  int i, j;
++  unsigned int i, j;
+   static const char *whitelist[] =
+     {
+      "part_msdos", "biosdisk", "affs", "afs", "bfs", "archelp",

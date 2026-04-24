@@ -6,7 +6,7 @@
 
 Name:           perl-CPAN-Meta-Requirements
 Version:        2.143
-Release:        13%{?dist}
+Release: 14%{?dist}
 Summary:        Set of version requirements for a CPAN dist
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/CPAN-Meta-Requirements

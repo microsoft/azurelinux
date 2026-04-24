@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        0.35.0
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Data validation in Python for humans
 
 License:        LicenseRef-Callaway-BSD

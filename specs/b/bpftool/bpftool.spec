@@ -3,7 +3,7 @@
 
 Name:           bpftool
 Version:        7.6.0
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Inspection and simple manipulation of eBPF programs and maps
 
 %global libname libbpf

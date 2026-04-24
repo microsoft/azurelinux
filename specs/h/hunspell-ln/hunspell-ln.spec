@@ -10,7 +10,7 @@
 Name: hunspell-ln
 Summary: Lingala hunspell dictionaries
 Version: 0.02
-Release: 32%{?dist}
+Release: 33%{?dist}
 Source: http://downloads.sourceforge.net/lingala/hunspell-ln-0.02.zip
 URL: http://lingala.sourceforge.net/
 License: GPL-2.0-or-later

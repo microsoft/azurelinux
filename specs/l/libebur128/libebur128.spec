@@ -6,7 +6,7 @@
 
 Name:           libebur128
 Version:        1.2.6
-Release:        14%{?dist}
+Release: 15%{?dist}
 Summary:        A library that implements the EBU R 128 standard for loudness normalization
 License:        MIT
 URL:            https://github.com/jiixyj/%{name}

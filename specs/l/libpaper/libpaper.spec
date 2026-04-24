@@ -3,7 +3,7 @@
 
 Name:		libpaper
 Version:	2.1.1
-Release:	9%{?dist}
+Release: 10%{?dist}
 # Needed to replace separate paper package
 Epoch:		1
 Summary:	Library and tools for handling papersize

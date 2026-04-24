@@ -1,0 +1,80 @@
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Kevin Buettner <kevinb@redhat.com>
+Date: Wed, 21 Jan 2026 00:46:23 -0700
+Subject: gdb-backport-tom-32688-thread-specific-bp-fix.patch
+
+;; Backport test fix for flaky thread-specific-bp.exp (Tom de Vries).
+
+[gdb/testsuite] Yet another attempt to fix gdb.threads/thread-specific-bp.exp
+
+When running test-case gdb.threads/thread-specific-bp.exp using taskset to
+select an Efficient-core in a loop, it fails 19 out of 100 runs.
+
+For example, like this:
+...
+(gdb) continue -a^M
+Continuing.^M
+^M
+Thread 1 "thread-specific" hit Breakpoint 4, end () at thread-specific-bp.c:29^M
+29      }^M
+(gdb) FAIL: $exp: non_stop=on: continue to end
+[Thread 0x7ffff7cbe6c0 (LWP 2348848) exited]^M
+Thread-specific breakpoint 3 deleted - thread 2 no longer in the thread list.^M
+...
+
+The way we're trying to match this gdb output is:
+...
+    gdb_test_multiple "$cmd" "continue to end" {
+	-re "$\r\n${gdb_prompt} .*${msg_re}\r\n" {
+	    pass $gdb_test_name
+	}
+	-re "\r\n${msg_re}\r\n.*$gdb_prompt " {
+	    pass $gdb_test_name
+ 	}
+     }
+...
+
+The problem is that the two -re clauses above do not match the output ending
+in a prompt, so the default fail in gdb_test_multiple triggers.
+
+Fix this by splitting this up in two gdb_test_multiple calls:
+- the first matches a prompt (with or without preceding $msg_re), making sure
+  that the default fail doesn't trigger, and
+- the second matches $msg_re, if that was not already matched by the first call.
+
+Using this approach, the test-case passes 100 out of 100 runs.
+
+Tested on x86_64-linux, also with make-check-all.sh.
+
+PR testsuite/32688
+Bug: https://sourceware.org/bugzilla/show_bug.cgi?id=32688
+
+diff --git a/gdb/testsuite/gdb.threads/thread-specific-bp.exp b/gdb/testsuite/gdb.threads/thread-specific-bp.exp
+--- a/gdb/testsuite/gdb.threads/thread-specific-bp.exp
++++ b/gdb/testsuite/gdb.threads/thread-specific-bp.exp
+@@ -95,12 +95,21 @@ proc check_thread_specific_breakpoint {non_stop} {
+ 		  "-" \
+ 		  "thread 2 no longer in the thread list\\."]]
+ 
+-    gdb_test_multiple "$cmd" "continue to end" {
+-	-re "$\r\n${gdb_prompt} .*${msg_re}\r\n" {
++    set test "continue to end"
++    set try_again 0
++    gdb_test_multiple $cmd $test -no-prompt-anchor {
++	-re -wrap "\r\n${msg_re}(?=\r\n).*" {
+ 	    pass $gdb_test_name
+ 	}
+-	-re "\r\n${msg_re}\r\n.*$gdb_prompt " {
+-	    pass $gdb_test_name
++	-re -wrap "" {
++	    set try_again 1
++	}
++    }
++    if { $try_again } {
++	gdb_test_multiple "" $test {
++	    -re "\r\n${msg_re}(?=\r\n)" {
++		pass $gdb_test_name
++	    }
+ 	}
+     }
+ 

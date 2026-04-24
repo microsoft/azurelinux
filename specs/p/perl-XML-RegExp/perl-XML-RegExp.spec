@@ -3,7 +3,7 @@
 
 Name:           perl-XML-RegExp
 Version:        0.04
-Release:        36%{?dist}
+Release: 37%{?dist}
 Summary:        Regular expressions for XML tokens
 
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

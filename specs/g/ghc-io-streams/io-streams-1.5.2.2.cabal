@@ -1,0 +1,279 @@
+Name:                io-streams
+Version:             1.5.2.2
+x-revision:          6
+License:             BSD3
+License-file:        LICENSE
+Category:            Data, Network, IO-Streams
+Build-type:          Simple
+Maintainer:          Gregory Collins <greg@gregorycollins.net>
+Cabal-version:       >= 1.10
+Synopsis:            Simple, composable, and easy-to-use stream I/O
+Tested-With:
+  GHc == 9.12.1
+  GHc == 9.10.1
+  GHc == 9.8.2
+  GHc == 9.6.6
+  GHC == 9.4.8
+  GHC == 9.2.8
+  GHC == 9.0.2
+  GHC == 8.10.7
+  GHC == 8.8.4
+  GHC == 8.6.5
+
+Bug-Reports:         https://github.com/snapframework/io-streams/issues
+Description:
+  /Overview/
+  .
+  The io-streams library contains simple and easy-to-use primitives for I/O
+  using streams. Most users will want to import the top-level convenience
+  module "System.IO.Streams", which re-exports most of the library:
+  .
+  @
+  import           System.IO.Streams (InputStream, OutputStream)
+  import qualified System.IO.Streams as Streams
+  @
+  .
+  For first-time users, @io-streams@ comes with an included tutorial, which can
+  be found in the "System.IO.Streams.Tutorial" module.
+  .
+  /Features/
+  .
+  The @io-streams@ user API has two basic types: @InputStream a@ and
+  @OutputStream a@, and three fundamental I/O primitives:
+  .
+  @
+  \-\- read an item from an input stream
+  Streams.read :: InputStream a -> IO (Maybe a)
+  .
+  \-\- push an item back to an input stream
+  Streams.unRead :: a -> InputStream a -> IO ()
+  .
+  \-\- write to an output stream
+  Streams.write :: Maybe a -> OutputStream a -> IO ()
+  @
+  .
+  Streams can be transformed by composition and hooked together with provided combinators:
+  .
+  @
+  ghci> Streams.fromList [1,2,3::Int] >>= Streams.map (*10) >>= Streams.toList
+  [10,20,30]
+  @
+  .
+  Stream composition leaves the original stream accessible:
+  .
+  @
+  ghci> input \<- Streams.fromByteString \"long string\"
+  ghci> wrapped \<- Streams.takeBytes 4 input
+  ghci> Streams.read wrapped
+  Just \"long\"
+  ghci> Streams.read wrapped
+  Nothing
+  ghci> Streams.read input
+  Just \" string\"
+  @
+  .
+  Simple types and operations in the IO monad mean straightforward and simple
+  exception handling and resource cleanup using Haskell standard library
+  facilities like 'Control.Exception.bracket'.
+  .
+  @io-streams@ comes with:
+  .
+    * functions to use files, handles, concurrent channels, sockets, lists,
+      vectors, and more as streams.
+  .
+    * a variety of combinators for wrapping and transforming streams, including
+      compression and decompression using zlib, controlling precisely how many
+      bytes are read from or written to a stream, buffering output using
+      bytestring builders, folds, maps, filters, zips, etc.
+  .
+    * support for parsing from streams using @attoparsec@.
+  .
+    * support for spawning processes and communicating with them using streams.
+
+Extra-Source-Files:  CONTRIBUTORS README.md changelog.md
+
+Flag NoInteractiveTests
+  Description: Do not run interactive tests
+  Default: False
+
+Flag Zlib
+  Description: Include zlib support
+  Default: True
+  Manual: True
+
+Flag Network
+  Description: Include network support
+  Default: True
+  Manual: True
+
+------------------------------------------------------------------------------
+Library
+  hs-source-dirs:    src
+  Default-language:  Haskell2010
+
+  ghc-options:       -Wall -fwarn-tabs -funbox-strict-fields
+                     -fno-warn-unused-do-bind
+
+  Exposed-modules:   System.IO.Streams,
+                     System.IO.Streams.Attoparsec,
+                     System.IO.Streams.Attoparsec.ByteString,
+                     System.IO.Streams.Attoparsec.Text,
+                     System.IO.Streams.Builder,
+                     System.IO.Streams.ByteString,
+                     System.IO.Streams.Combinators,
+                     System.IO.Streams.Concurrent,
+                     System.IO.Streams.Core,
+                     System.IO.Streams.Debug,
+                     System.IO.Streams.Handle,
+                     System.IO.Streams.File,
+                     System.IO.Streams.List,
+                     System.IO.Streams.Process,
+                     System.IO.Streams.Text,
+                     System.IO.Streams.Vector,
+                     System.IO.Streams.Internal,
+                     System.IO.Streams.Tutorial
+
+  Other-modules:     System.IO.Streams.Internal.Attoparsec,
+                     System.IO.Streams.Internal.Search
+
+  Build-depends:     base               >= 4     && <5,
+                     attoparsec         >= 0.10  && <0.15,
+                     bytestring         >= 0.9   && <0.13,
+                     primitive          >= 0.2   && <0.10,
+                     process            >= 1.1   && <1.7,
+                     text               >=0.10   && <1.3  || >= 2.0 && <2.2,
+                     time               >= 1.2   && <1.15,
+                     transformers       >= 0.2   && <0.7,
+                     vector             >= 0.7   && <0.14
+
+  if !impl(ghc >= 7.8)
+    Build-depends:   bytestring-builder >= 0.10  && <0.11
+
+  if impl(ghc >= 7.2)
+    other-extensions: Trustworthy
+
+  if flag(Zlib)
+    Exposed-modules: System.IO.Streams.Zlib
+    Build-depends:   zlib-bindings      >= 0.1   && <0.2
+    cpp-options:     -DENABLE_ZLIB
+
+  if flag(Network)
+    Exposed-modules: System.IO.Streams.Network
+    Other-modules:   System.IO.Streams.Internal.Network
+    Build-depends:   network            >= 2.3   && <4
+    cpp-options:     -DENABLE_NETWORK
+
+  other-extensions:
+    BangPatterns,
+    CPP,
+    DeriveDataTypeable,
+    FlexibleContexts,
+    FlexibleInstances,
+    GeneralizedNewtypeDeriving,
+    MultiParamTypeClasses,
+    OverloadedStrings,
+    RankNTypes,
+    TypeSynonymInstances
+
+
+------------------------------------------------------------------------------
+Test-suite testsuite
+  Type:              exitcode-stdio-1.0
+  hs-source-dirs:    src test
+  Main-is:           TestSuite.hs
+  Default-language:  Haskell2010
+
+  Other-modules:     System.IO.Streams.Tests.Attoparsec.ByteString,
+                     System.IO.Streams.Tests.Attoparsec.Text,
+                     System.IO.Streams.Tests.Builder,
+                     System.IO.Streams.Tests.ByteString,
+                     System.IO.Streams.Tests.Combinators,
+                     System.IO.Streams.Tests.Common,
+                     System.IO.Streams.Tests.Concurrent,
+                     System.IO.Streams.Tests.Debug,
+                     System.IO.Streams.Tests.File,
+                     System.IO.Streams.Tests.Handle,
+                     System.IO.Streams.Tests.Internal,
+                     System.IO.Streams.Tests.List,
+                     System.IO.Streams.Tests.Process,
+                     System.IO.Streams.Tests.Text,
+                     System.IO.Streams.Tests.Vector,
+                     System.IO.Streams,
+                     System.IO.Streams.Attoparsec.ByteString,
+                     System.IO.Streams.Attoparsec.Text,
+                     System.IO.Streams.Builder,
+                     System.IO.Streams.ByteString,
+                     System.IO.Streams.Combinators,
+                     System.IO.Streams.Concurrent,
+                     System.IO.Streams.Core,
+                     System.IO.Streams.Debug,
+                     System.IO.Streams.Handle,
+                     System.IO.Streams.File,
+                     System.IO.Streams.List,
+                     System.IO.Streams.Process,
+                     System.IO.Streams.Text,
+                     System.IO.Streams.Vector,
+                     System.IO.Streams.Internal,
+                     System.IO.Streams.Internal.Attoparsec,
+                     System.IO.Streams.Internal.Search
+
+
+  ghc-options:       -Wall -fwarn-tabs -funbox-strict-fields -threaded
+                     -fno-warn-unused-do-bind
+
+  if !os(windows) && !flag(NoInteractiveTests)
+    cpp-options: -DENABLE_PROCESS_TESTS
+
+  if flag(Zlib)
+    Other-modules:   System.IO.Streams.Tests.Zlib,
+                     System.IO.Streams.Zlib
+    Build-depends:   zlib-bindings,
+                     zlib                       >= 0.5      && <0.8
+    cpp-options:     -DENABLE_ZLIB
+
+  if flag(Network)
+    Other-modules:   System.IO.Streams.Internal.Network,
+                     System.IO.Streams.Network,
+                     System.IO.Streams.Tests.Network
+    Build-depends:   network
+    cpp-options:     -DENABLE_NETWORK
+
+  Build-depends:     base               >= 4     && <5,
+                     attoparsec,
+                     bytestring,
+                     deepseq            >= 1.2   && <1.6,
+                     directory          >= 1.1   && <2,
+                     filepath           >= 1.2   && <2,
+                     mtl                >= 2     && <3,
+                     primitive,
+                     process,
+                     text,
+                     time,
+                     transformers,
+                     vector,
+
+                     HUnit                      >= 1.2      && <2,
+                     QuickCheck                 >= 2.3.0.2  && <3,
+                     test-framework             >= 0.6      && <0.9,
+                     test-framework-hunit       >= 0.2.7    && <0.4,
+                     test-framework-quickcheck2 >= 0.2.12.1 && <0.4
+
+  if !impl(ghc >= 7.8)
+    Build-depends:   bytestring-builder
+
+  if impl(ghc >= 7.2)
+    other-extensions: Trustworthy
+
+  other-extensions:
+    BangPatterns,
+    CPP,
+    DeriveDataTypeable,
+    FlexibleInstances,
+    GeneralizedNewtypeDeriving,
+    MultiParamTypeClasses,
+    OverloadedStrings,
+    RankNTypes
+
+source-repository head
+  type:     git
+  location: https://github.com/snapframework/io-streams.git

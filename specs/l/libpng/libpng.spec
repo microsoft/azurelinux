@@ -1,28 +1,23 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-%bcond_without check
-
 Summary:       A library of functions for manipulating PNG image format files
 Name:          libpng
 Epoch:         2
 Version:       1.6.55
-Release:       1%{?dist}
+Release: 2%{?dist}
 License:       zlib
 URL:           http://www.libpng.org/pub/png/
 
 Source0:       https://github.com/glennrp/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
 Source1:       pngusr.dfa
 
-# test files regenerated with downstream zlib
-Source2:       pngtest.png
-Source3:       pngtest-cicp-display-p3_reencoded.png
 Patch0:        libpng-multilib.patch
 
 BuildRequires: gcc
 BuildRequires: zlib-devel
 BuildRequires: autoconf automake libtool
-BuildRequires: make
+BuildRequires: cmake
 
 %description
 The libpng package contains a library of functions for creating and
@@ -68,31 +63,23 @@ The libpng-tools package contains tools used by the authors of libpng.
 # Provide pngusr.dfa for build.
 cp -p %{SOURCE1} .
 
-# use regenerated pngtest.png as we have newer zlib that provides slightly
-# better compression which makes files differ and fail the pngtest-all test
-cp -p %{SOURCE2} .
-cp -p %{SOURCE3} contrib/testpngs/png-3/cicp-display-p3_reencoded.png
-
 %patch -P0 -p1
 
 %build
-autoreconf -vif
-%configure
-%make_build DFA_XTRA=pngusr.dfa
+%cmake -DDFA_XTRA=pngusr.dfa
+%cmake_build
 
 %install
-%make_install
+%cmake_install
 
 # We don't ship .la files.
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 
-%if 0%{?with_check}
 %check
 # Check section disabled: Disabling checks for initial set of failures.
 exit 0
 
-make check
-%endif
+%ctest
 
 %ldconfig_scriptlets
 
@@ -107,7 +94,10 @@ make check
 %{_bindir}/*
 %{_includedir}/*
 %{_libdir}/libpng*.so
+%dir %{_libdir}/libpng/
+%{_libdir}/libpng/*.cmake
 %{_libdir}/pkgconfig/libpng*.pc
+%{_libdir}/cmake/PNG/
 %{_mandir}/man3/*
 
 %files static

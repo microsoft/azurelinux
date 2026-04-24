@@ -10,7 +10,7 @@ Name: hunspell-pt
 Summary: Portuguese hunspell dictionaries
 %global upstreamid 20131030
 Version: 0.%{upstreamid}
-Release: 15%{?dist}
+Release: 16%{?dist}
 Source0: http://natura.di.uminho.pt/download/sources/Dictionaries/hunspell/hunspell-pt_PT-20130125.tar.gz
 Source1: https://pt-br.libreoffice.org/assets/Uploads/PT-BR-Documents/VERO/ptBR-2013-10-30AOC-2.zip
 URL: https://pt-br.libreoffice.org/projetos/vero

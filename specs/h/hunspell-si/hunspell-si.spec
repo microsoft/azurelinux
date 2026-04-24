@@ -10,7 +10,7 @@
 Name: hunspell-si
 Summary: Sinhala hunspell dictionaries
 Version: 0.2.1
-Release: 35%{?dist}
+Release: 36%{?dist}
 Source: http://www.sandaru1.com/si-LK.tar.gz
 #Following URL is down since few months informed to upstream
 URL: http://www.sandaru1.com/2009/08/29/sinhala-spell-checker-for-firefox/

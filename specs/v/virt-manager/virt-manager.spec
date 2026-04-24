@@ -12,7 +12,7 @@
 
 Name: virt-manager
 Version: 5.1.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 %global verrel %{version}-%{release}
 
 Summary: Desktop tool for managing virtual machines via libvirt

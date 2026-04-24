@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Alec Brown <alec.r.brown@oracle.com>
+Date: Wed, 22 Jan 2025 18:04:44 +0000
+Subject: [PATCH] net: Check if returned pointer for allocated memory is NULL
+
+When using grub_malloc(), the function can fail if we are out of memory.
+After allocating memory we should check if this function returned NULL
+and handle this error if it did.
+
+Signed-off-by: Alec Brown <alec.r.brown@oracle.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/net/net.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/grub-core/net/net.c b/grub-core/net/net.c
+index d426ad2c4..bec297cb6 100644
+--- a/grub-core/net/net.c
++++ b/grub-core/net/net.c
+@@ -232,6 +232,11 @@ grub_net_ipv6_get_slaac (struct grub_net_card *card,
+     }
+ 
+   slaac->name = grub_malloc (sz);
++  if (slaac->name == NULL)
++    {
++      grub_free (slaac);
++      return NULL;
++    }
+   ptr = grub_stpcpy (slaac->name, card->name);
+   if (grub_net_hwaddr_cmp (&card->default_address, hwaddr) != 0)
+     {

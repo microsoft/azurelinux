@@ -5,7 +5,7 @@
 
 Name:           libnetfilter_queue
 Version:        1.0.5
-Release:        12%{?dist}
+Release: 13%{?dist}
 Summary:        Netfilter queue userspace library
 # Most files say GPLv2+, one says v2 only.
 License:        GPL-2.0-only

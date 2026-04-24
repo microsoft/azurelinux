@@ -8,7 +8,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 2.6.1
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary: New IO for Ruby
 # The entire source code is MIT, bundled libev is BSD-2-Clause OR GPL-2.0-or-later
 License: MIT AND (BSD-2-Clause OR GPL-2.0-or-later)

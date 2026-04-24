@@ -3,7 +3,7 @@
 
 Name: 		perl-File-Copy-Recursive
 Version: 	0.45
-Release: 	18%{?dist}
+Release: 19%{?dist}
 Summary: 	Extension for recursively copying files and directories 
 License: 	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL: 		https://metacpan.org/release/File-Copy-Recursive

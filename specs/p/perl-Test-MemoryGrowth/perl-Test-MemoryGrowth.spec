@@ -3,7 +3,7 @@
 
 Name:           perl-Test-MemoryGrowth
 Version:        0.05
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Assert that code does not cause growth in memory usage
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Test-MemoryGrowth

@@ -1,0 +1,64 @@
+From e5cf5ee78f8504ccdd5af0a05ef7739a99f31059 Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Tue, 20 Feb 2024 16:56:44 +0100
+Subject: [PATCH] Port to OpenJDK 21
+
+---
+ .../src/aQute/lib/collections/SortedList.java | 36 +++++++++++++++++++
+ 1 file changed, 36 insertions(+)
+
+diff --git a/aQute.libg/src/aQute/lib/collections/SortedList.java b/aQute.libg/src/aQute/lib/collections/SortedList.java
+index ed33e7f..f584e57 100644
+--- a/aQute.libg/src/aQute/lib/collections/SortedList.java
++++ b/aQute.libg/src/aQute/lib/collections/SortedList.java
+@@ -3,6 +3,7 @@ package aQute.lib.collections;
+ import java.lang.reflect.Array;
+ import java.util.Arrays;
+ import java.util.Collection;
++import java.util.Collections;
+ import java.util.Comparator;
+ import java.util.Iterator;
+ import java.util.List;
+@@ -510,4 +511,39 @@ public class SortedList<T> implements SortedSet<T>, List<T> {
+ 	public Spliterator<T> spliterator() {
+ 		return SortedSet.super.spliterator();
+ 	}
++
++	@Override
++	public SortedList<T> reversed() {
++		return new SortedList(this.list, this.start, this.end, Collections.reverseOrder(this.comparator));
++	}
++
++	@Override
++	public T removeFirst() {
++		return List.super.removeFirst();
++	}
++
++	@Override
++	public T removeLast() {
++		return List.super.removeLast();
++	}
++
++	@Override
++	public T getFirst() {
++		return List.super.getFirst();
++	}
++
++	@Override
++	public T getLast() {
++		return List.super.getLast();
++	}
++
++	@Override
++	public void addFirst(T v) {
++		add(v);
++	}
++
++	@Override
++	public void addLast(T v) {
++		add(v);
++	}
+ }
+-- 
+2.43.0
+

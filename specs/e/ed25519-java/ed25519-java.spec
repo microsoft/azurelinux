@@ -3,7 +3,7 @@
 
 Name:          ed25519-java
 Version:       0.3.0
-Release:       26%{?dist}
+Release: 27%{?dist}
 Summary:       Implementation of EdDSA (Ed25519) in Java
 # Automatically converted from old format: CC0 - review is highly recommended.
 License:       CC0-1.0

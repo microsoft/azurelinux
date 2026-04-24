@@ -1,0 +1,63 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.35.2.
+--
+-- see: https://github.com/sol/hpack
+
+name:             hspec-expectations
+version:          0.8.4
+x-revision:       2
+synopsis:         Catchy combinators for HUnit
+description:      Catchy combinators for HUnit: <https://github.com/hspec/hspec-expectations#readme>
+bug-reports:      https://github.com/hspec/hspec-expectations/issues
+license:          MIT
+license-file:     LICENSE
+copyright:        (c) 2011-2023 Simon Hengel
+author:           Simon Hengel <sol@typeful.net>
+maintainer:       Simon Hengel <sol@typeful.net>
+build-type:       Simple
+category:         Testing
+homepage:         https://github.com/hspec/hspec-expectations#readme
+
+source-repository head
+  type: git
+  location: https://github.com/hspec/hspec-expectations
+
+library
+  hs-source-dirs:
+      src
+  ghc-options: -Wall
+  build-depends:
+      HUnit >=1.5.0.0
+    , base ==4.*
+    , call-stack
+  exposed-modules:
+      Test.Hspec.Expectations
+      Test.Hspec.Expectations.Contrib
+  other-modules:
+      Test.Hspec.Expectations.Matcher
+      Paths_hspec_expectations
+  default-language: Haskell2010
+
+test-suite spec
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  hs-source-dirs:
+      test
+      src
+  ghc-options: -Wall
+  build-depends:
+      HUnit >=1.5.0.0
+    , base >=4.8
+    , call-stack
+    , nanospec
+  other-modules:
+      Helper
+      Test.Hspec.Expectations.ContribSpec
+      Test.Hspec.Expectations.MatcherSpec
+      Test.Hspec.ExpectationsSpec
+      Test.Hspec.Expectations
+      Test.Hspec.Expectations.Contrib
+      Test.Hspec.Expectations.Matcher
+      Paths_hspec_expectations
+  default-language: Haskell2010

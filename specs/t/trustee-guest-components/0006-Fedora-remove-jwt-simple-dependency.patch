@@ -1,7 +1,7 @@
-From 7374e5ab044bbfd40468e3cd42479c5844b187e8 Mon Sep 17 00:00:00 2001
+From 0966851f28e3a5ac103f5738761ed9d7c015900a Mon Sep 17 00:00:00 2001
 From: Yan Fu <yafu@redhat.com>
-Date: Tue, 21 Oct 2025 23:04:54 -0400
-Subject: [PATCH 06/15] Fedora: remove jwt-simple dependency
+Date: Fri, 6 Jun 2025 08:16:06 -0400
+Subject: [PATCH 06/14] Fedora: remove jwt-simple dependency
 
 jwt-simple is not in Fedora.
 
@@ -10,13 +10,13 @@ The code checks time validity. Use std::time instead for this.
 Signed-off-by: Uri Lublin <uril@redhat.com>
 Signed-off-by: Yan Fu <yafu@redhat.com>
 ---
- Cargo.toml                                     |  3 ---
- attestation-agent/kbs_protocol/Cargo.toml      |  1 -
- .../kbs_protocol/src/token_provider/mod.rs     | 18 ++++++++----------
- 3 files changed, 8 insertions(+), 14 deletions(-)
+ Cargo.toml                                    |  3 ---
+ attestation-agent/kbs_protocol/Cargo.toml     |  1 -
+ .../kbs_protocol/src/token_provider/mod.rs    | 19 +++++++++----------
+ 3 files changed, 9 insertions(+), 14 deletions(-)
 
 diff --git a/Cargo.toml b/Cargo.toml
-index cb41d55..d64917c 100644
+index 9eea047..d2481f8 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -23,9 +23,6 @@ const_format = "0.2.34"
@@ -26,14 +26,14 @@ index cb41d55..d64917c 100644
 -jwt-simple = { version = "0.12", default-features = false, features = [
 -    "pure-rust",
 -] }
- kbs-types = { "git" = "https://github.com/confidential-containers/kbs-types.git", rev = "900aa8f" }
- log = "0.4.28"
- nix = "0.30"
+ kbs-types = "0.10.0"
+ log = "0.4.27"
+ nix = "0.29"
 diff --git a/attestation-agent/kbs_protocol/Cargo.toml b/attestation-agent/kbs_protocol/Cargo.toml
-index 5fabfad..09c1ee3 100644
+index c498572..318061a 100644
 --- a/attestation-agent/kbs_protocol/Cargo.toml
 +++ b/attestation-agent/kbs_protocol/Cargo.toml
-@@ -15,7 +15,6 @@ canon-json = { version = "0.2.1", optional = true }
+@@ -14,7 +14,6 @@ base64.workspace = true
  clap = { workspace = true, features = ["derive"], optional = true }
  crypto = { path = "../deps/crypto", default-features = false }
  env_logger = { workspace = true, optional = true }
@@ -42,10 +42,10 @@ index 5fabfad..09c1ee3 100644
  log.workspace = true
  reqwest = { workspace = true, features = ["cookies", "json"], optional = true }
 diff --git a/attestation-agent/kbs_protocol/src/token_provider/mod.rs b/attestation-agent/kbs_protocol/src/token_provider/mod.rs
-index 6648e89..7a07ce9 100644
+index 6648e89..08d06fb 100644
 --- a/attestation-agent/kbs_protocol/src/token_provider/mod.rs
 +++ b/attestation-agent/kbs_protocol/src/token_provider/mod.rs
-@@ -14,11 +14,8 @@ pub use aa::*;
+@@ -14,11 +14,9 @@ pub use aa::*;
  use anyhow::*;
  use async_trait::async_trait;
  use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine};
@@ -55,10 +55,11 @@ index 6648e89..7a07ce9 100644
 -};
  use serde_json::Value;
 +use std::time::SystemTime;
++
  
  use crate::keypair::TeeKeyPair;
  
-@@ -33,8 +30,8 @@ pub trait TokenProvider: Send + Sync {
+@@ -33,8 +31,8 @@ pub trait TokenProvider: Send + Sync {
  #[derive(Clone, Debug)]
  pub struct Token {
      pub content: String,
@@ -69,7 +70,7 @@ index 6648e89..7a07ce9 100644
  }
  
  impl Token {
-@@ -44,16 +41,17 @@ impl Token {
+@@ -44,16 +42,17 @@ impl Token {
              .nth(1)
              .ok_or_else(|| anyhow!("illegal token format"))?;
          let claims = URL_SAFE_NO_PAD.decode(claims_b64)?;
@@ -92,5 +93,5 @@ index 6648e89..7a07ce9 100644
              if exp < now {
                  bail!("token expired");
 -- 
-2.51.1
+2.49.0
 

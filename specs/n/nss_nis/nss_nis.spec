@@ -3,7 +3,7 @@
 
 Name:           nss_nis
 Version:        3.2
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        Name Service Switch (NSS) module using NIS
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.
 License:        LicenseRef-Callaway-LGPLv2+

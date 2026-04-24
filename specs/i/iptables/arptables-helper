@@ -1,0 +1,73 @@
+#!/bin/sh
+
+ARPTABLES_CONFIG=/etc/sysconfig/arptables
+
+# compat for removed initscripts dependency
+
+success() {
+	echo "[  OK  ]"
+	return 0
+}
+
+failure() {
+	echo "[FAILED]"
+	return 1
+}
+
+start() {
+	if [ ! -x /usr/sbin/arptables ]; then
+		exit 4
+	fi
+
+	# don't do squat if we don't have the config file
+	if [ -f $ARPTABLES_CONFIG ]; then
+		printf "Applying arptables firewall rules: "
+		/usr/sbin/arptables-restore < $ARPTABLES_CONFIG && \
+			success || \
+			failure
+		touch /var/lock/subsys/arptables
+	else
+		failure
+		echo "Configuration file /etc/sysconfig/arptables missing"
+		exit 6
+	fi
+}
+
+stop() {
+	printf "Removing user defined chains: "
+	arptables -X && success || failure
+	printf "Flushing all chains: "
+	arptables -F && success || failure
+	printf "Resetting built-in chains to the default ACCEPT policy: "
+	arptables -P INPUT ACCEPT && \
+		arptables -P OUTPUT ACCEPT && \
+		success || \
+		failure
+	rm -f /var/lock/subsys/arptables
+}
+
+case "$1" in
+start)
+	start
+	;;
+
+stop)
+	stop
+	;;
+
+restart|reload)
+	# "restart" is really just "start" as this isn't a daemon,
+	# and "start" clears any pre-defined rules anyway.
+	# This is really only here to make those who expect it happy
+	start
+	;;
+
+condrestart|try-restart|force-reload)
+	[ -e /var/lock/subsys/arptables ] && start
+	;;
+
+*)
+	exit 2
+esac
+
+exit 0

@@ -27,7 +27,7 @@
 
 Name:           dnsmasq
 Version:        2.92
-Release:        1%{?extraversion:.%{extraversion}}%{?dist}
+Release: 2%{?extraversion:.%{extraversion}}%{?dist}
 Summary:        A lightweight DHCP/caching DNS server
 
 # SPDX identifiers already

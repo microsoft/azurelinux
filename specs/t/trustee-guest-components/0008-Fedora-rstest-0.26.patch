@@ -1,0 +1,28 @@
+From 11f7e29fa0736633aa3b8f86619604ded812a157 Mon Sep 17 00:00:00 2001
+From: Yan Fu <yafu@redhat.com>
+Date: Thu, 12 Jun 2025 03:24:48 -0400
+Subject: [PATCH 08/15] Fedora: rstest 0.26
+
+Signed-off-by: Uri Lublin <uril@redhat.com>
+Signed-off-by: Yan Fu <yafu@redhat.com>
+Signed-off-by: Benjamin A. Beasley <code@musicinmybrain.net>
+---
+ Cargo.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Cargo.toml b/Cargo.toml
+index 4a110a8..ee06a1d 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -32,7 +32,7 @@ rand = "0.9.1"
+ reqwest = { version = "0.12", default-features = false }
+ resource_uri = { path = "attestation-agent/deps/resource_uri" }
+ ring = "0.17"
+-rstest = "0.17"
++rstest = "0.26"
+ serde = { version = "1.0", features = ["derive"] }
+ serde_with = { version = "3.12.0", features = ["base64"] }
+ serde_json = "1.0"
+-- 
+2.50.1
+

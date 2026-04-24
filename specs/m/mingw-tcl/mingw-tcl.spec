@@ -12,7 +12,7 @@
 
 Name: mingw-%{pkgname}
 Version: 8.6.15
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: MinGW Windows Tool Command Language, pronounced tickle
 
 License: TCL

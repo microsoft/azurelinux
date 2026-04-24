@@ -1,0 +1,138 @@
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Andrew Burgess <aburgess@redhat.com>
+Date: Mon, 9 Feb 2026 16:31:23 +0000
+Subject: gdb-rhbz2435950-skip-revert.patch
+
+;; Backport of upstream commit f08ffbbf2691bad2d5df660ee644647687775f0c
+;; Can be dropped on a rebase to gdb 17.2 or 18.1
+
+Revert "skip -gfile: call fnmatch without FNM_FILE_NAME"
+
+This reverts commit 02646a4c561ec88491114b87950cbb827c7d614c.  See:
+
+  https://inbox.sourceware.org/gdb-patches/20260203185528.946918-1-guinevere@redhat.com
+
+This commit introduced a non backward compatible change to how GDB
+handled skip files.  Something like:
+
+  skip -gfile dir/*.c
+
+no longer matches every file within 'dir/', but now matches every file
+in 'dir/' and within every sub-directory of 'dir/', which might not be
+what the user wanted.
+
+The original intention behind the commit is solid, we just need to
+find a better implementation.
+
+Bug: https://sourceware.org/bugzilla/show_bug.cgi?id=33872
+
+diff --git a/gdb/doc/gdb.texinfo b/gdb/doc/gdb.texinfo
+--- a/gdb/doc/gdb.texinfo
++++ b/gdb/doc/gdb.texinfo
+@@ -6825,9 +6825,7 @@ Functions in @var{file} will be skipped over when stepping.
+ @itemx -gfi @var{file-glob-pattern}
+ @cindex skipping over files via glob-style patterns
+ Functions in files matching @var{file-glob-pattern} will be skipped
+-over when stepping.  The directory separator character @file{/} is treated as a
+-regular character, so it can be matched by wildcard characters @file{*} and
+-@file{?}.
++over when stepping.
+ 
+ @smallexample
+ (@value{GDBP}) skip -gfi utils/*.c
+diff --git a/gdb/skip.c b/gdb/skip.c
+--- a/gdb/skip.c
++++ b/gdb/skip.c
+@@ -531,7 +531,7 @@ skiplist_entry::do_skip_gfile_p (const symtab_and_line &function_sal) const
+   /* Check first sole SYMTAB->FILENAME.  It may not be a substring of
+      symtab_to_fullname as it may contain "./" etc.  */
+   if (gdb_filename_fnmatch (m_file.c_str (), function_sal.symtab->filename,
+-			    FNM_NOESCAPE) == 0)
++			    FNM_FILE_NAME | FNM_NOESCAPE) == 0)
+     result = true;
+ 
+   /* Before we invoke symtab_to_fullname, which is expensive, do a quick
+@@ -542,14 +542,14 @@ skiplist_entry::do_skip_gfile_p (const symtab_and_line &function_sal) const
+   else if (!basenames_may_differ
+       && gdb_filename_fnmatch (lbasename (m_file.c_str ()),
+ 			       lbasename (function_sal.symtab->filename),
+-			       FNM_NOESCAPE) != 0)
++			       FNM_FILE_NAME | FNM_NOESCAPE) != 0)
+     result = false;
+   else
+     {
+       /* Note: symtab_to_fullname caches its result, thus we don't have to.  */
+       const char *fullname = symtab_to_fullname (function_sal.symtab);
+ 
+-      result = gdb_filename_fnmatch (m_file.c_str (), fullname, FNM_NOESCAPE);
++      result = compare_glob_filenames_for_search (fullname, m_file.c_str ());
+     }
+ 
+   if (debug_skip)
+diff --git a/gdb/symtab.c b/gdb/symtab.c
+--- a/gdb/symtab.c
++++ b/gdb/symtab.c
+@@ -698,6 +698,40 @@ iterate_over_some_symtabs (const char *name,
+   return false;
+ }
+ 
++/* Same as compare_filenames_for_search, but for glob-style patterns.
++   Heads up on the order of the arguments.  They match the order of
++   compare_filenames_for_search, but it's the opposite of the order of
++   arguments to gdb_filename_fnmatch.  */
++
++bool
++compare_glob_filenames_for_search (const char *filename,
++				   const char *search_name)
++{
++  /* We rely on the property of glob-style patterns with FNM_FILE_NAME that
++     all /s have to be explicitly specified.  */
++  int file_path_elements = count_path_elements (filename);
++  int search_path_elements = count_path_elements (search_name);
++
++  if (search_path_elements > file_path_elements)
++    return false;
++
++  if (IS_ABSOLUTE_PATH (search_name))
++    {
++      return (search_path_elements == file_path_elements
++	      && gdb_filename_fnmatch (search_name, filename,
++				       FNM_FILE_NAME | FNM_NOESCAPE) == 0);
++    }
++
++  {
++    const char *file_to_compare
++      = strip_leading_path_elements (filename,
++				     file_path_elements - search_path_elements);
++
++    return gdb_filename_fnmatch (search_name, file_to_compare,
++				 FNM_FILE_NAME | FNM_NOESCAPE) == 0;
++  }
++}
++
+ /* See symtab.h.  */
+ 
+ void
+diff --git a/gdb/utils.c b/gdb/utils.c
+--- a/gdb/utils.c
++++ b/gdb/utils.c
+@@ -3466,8 +3466,8 @@ wait_to_die_with_timeout (pid_t pid, int *status, int timeout)
+ 
+ #endif /* HAVE_WAITPID */
+ 
+-/* Provide fnmatch compatible function for matching of host files.
+-   FNM_NOESCAPE must be set in FLAGS.
++/* Provide fnmatch compatible function for FNM_FILE_NAME matching of host files.
++   Both FNM_FILE_NAME and FNM_NOESCAPE must be set in FLAGS.
+ 
+    It handles correctly HAVE_DOS_BASED_FILE_SYSTEM and
+    HAVE_CASE_INSENSITIVE_FILE_SYSTEM.  */
+@@ -3475,6 +3475,8 @@ wait_to_die_with_timeout (pid_t pid, int *status, int timeout)
+ int
+ gdb_filename_fnmatch (const char *pattern, const char *string, int flags)
+ {
++  gdb_assert ((flags & FNM_FILE_NAME) != 0);
++
+   /* It is unclear how '\' escaping vs. directory separator should coexist.  */
+   gdb_assert ((flags & FNM_NOESCAPE) != 0);
+ 

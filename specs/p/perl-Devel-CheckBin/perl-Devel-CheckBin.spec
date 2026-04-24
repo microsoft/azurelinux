@@ -3,7 +3,7 @@
 
 Name:		perl-Devel-CheckBin
 Version:	0.04
-Release:	29%{?dist}
+Release: 30%{?dist}
 Summary:	Check that a command is available
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Devel-CheckBin

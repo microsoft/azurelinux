@@ -3,7 +3,7 @@
 
 Name:           perl-Data-Constraint
 Version:        1.205
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Prototypical value checking
 License:        Artistic-2.0
 

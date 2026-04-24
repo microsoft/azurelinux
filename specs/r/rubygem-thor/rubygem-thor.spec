@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.3.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Thor is a toolkit for building powerful command-line interfaces
 License: MIT
 URL: http://whatisthor.com/

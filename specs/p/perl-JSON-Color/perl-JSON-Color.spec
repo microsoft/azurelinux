@@ -3,7 +3,7 @@
 
 Name:           perl-JSON-Color
 Version:        0.134
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        Encode to colored JSON
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/JSON-Color/

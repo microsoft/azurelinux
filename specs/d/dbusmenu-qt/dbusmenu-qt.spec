@@ -17,7 +17,7 @@
 Summary: A Qt implementation of the DBusMenu protocol 
 Name:    dbusmenu-qt
 Version: 0.9.3
-Release: 0.37.%{snapshot}%{?dist}
+Release: 1.37.%{snapshot}%{?dist}
 
 License: LGPL-2.0-or-later
 URL: https://launchpad.net/libdbusmenu-qt/

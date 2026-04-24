@@ -5,7 +5,7 @@
 
 Name:		python-lexicon
 Version:	3.0.0
-Release:	3%{?dist}
+Release: 4%{?dist}
 Summary:	Powerful dict subclass(es) with aliasing and attribute access
 License:	BSD-2-Clause
 URL:		https://github.com/bitprophet/lexicon

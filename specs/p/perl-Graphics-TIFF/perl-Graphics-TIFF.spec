@@ -6,7 +6,7 @@
 
 Name:           perl-Graphics-TIFF
 Version:        21
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        Perl extension for the LibTIFF library
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Graphics-TIFF

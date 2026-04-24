@@ -3,7 +3,7 @@
 
 Name:           perl-Data-Visitor
 Version:        0.32
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        Visitor style traversal of Perl data structures
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Data-Visitor

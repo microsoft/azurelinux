@@ -1,0 +1,39 @@
+From b64f4cff130bff99371ce1f91b5eec59e249fb70 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Robert-Andr=C3=A9=20Mauchin?= <zebob.m@gmail.com>
+Date: Wed, 12 Aug 2020 18:52:18 +0200
+Subject: [PATCH] Convert int to string using strconv.Itoa
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+See https://github.com/golang/go/issues/32479
+
+Signed-off-by: Robert-André Mauchin <zebob.m@gmail.com>
+---
+ scope_concurrency_test.go | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/scope_concurrency_test.go b/scope_concurrency_test.go
+index 7ed0d7e..1d64ac1 100644
+--- a/scope_concurrency_test.go
++++ b/scope_concurrency_test.go
+@@ -3,6 +3,7 @@ package sentry_test
+ import (
+ 	"errors"
+ 	"net/http/httptest"
++	"strconv"
+ 	"sync"
+ 	"testing"
+ 
+@@ -58,7 +59,7 @@ func touchScope(scope *sentry.Scope, x int) {
+ 	scope.SetUser(sentry.User{ID: "foo"})
+ 	scope.SetRequest(httptest.NewRequest("GET", "/foo", nil))
+ 
+-	sentry.CaptureException(errors.New(string(x)))
++	sentry.CaptureException(errors.New(strconv.Itoa(x)))
+ 
+ 	scope.ClearBreadcrumbs()
+ 	scope.Clone()
+-- 
+2.26.2
+

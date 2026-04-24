@@ -1,0 +1,12 @@
+diff -up chromium-136.0.7103.48/third_party/rust/chromium_crates_io/vendor/skrifa-0.29.2/src/glyph_name.rs.than chromium-136.0.7103.48/third_party/rust/chromium_crates_io/vendor/skrifa-0.29.2/src/glyph_name.rs
+--- chromium-136.0.7103.48/third_party/rust/chromium_crates_io/vendor/skrifa-0.29.2/src/glyph_name.rs.than	2025-04-29 08:36:33.385071420 +0200
++++ chromium-136.0.7103.48/third_party/rust/chromium_crates_io/vendor/skrifa-0.29.2/src/glyph_name.rs	2025-04-29 08:42:21.465525421 +0200
+@@ -94,7 +94,7 @@ impl<'a> GlyphNames<'a> {
+             _ => None,
+         };
+         // If name is empty string, synthesize it
+-        if name.as_ref().is_none_or(|s| s.is_empty()) {
++        if name.is_none() || name.as_ref().map_or(false, |s| s.is_empty()) {
+             return Some(GlyphName::synthesize(glyph_id));
+         }
+         Some(name.unwrap_or_else(|| GlyphName::synthesize(glyph_id)))

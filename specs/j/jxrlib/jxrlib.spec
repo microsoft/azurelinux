@@ -3,7 +3,7 @@
 
 Name:           jxrlib
 Version:        1.1
-Release:        32%{?dist}
+Release: 33%{?dist}
 Summary:        Open source implementation of jpegxr
 
 # See JPEGXR_DPK_Spec_1.0.doc. Upstream request for plain text license file at

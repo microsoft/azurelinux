@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.2.2
-Release: 10%{?dist}
+Release: 11%{?dist}
 Summary: An interface for returning uname (platform) information
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.
 License: Apache-2.0

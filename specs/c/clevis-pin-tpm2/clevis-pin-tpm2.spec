@@ -10,7 +10,7 @@
 
 Name:           clevis-pin-tpm2
 Version:        0.5.3
-Release:        10%{?dist}
+Release: 11%{?dist}
 Summary:        Clevis PIN for unlocking with TPM2 supporting Authorized Policies
 
 SourceLicense:  MIT

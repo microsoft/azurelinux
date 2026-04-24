@@ -1,0 +1,73 @@
+diff -up clamav-1.4.0/libclamav/pe.c.big-endian clamav-1.4.0/libclamav/pe.c
+--- clamav-1.4.0/libclamav/pe.c.big-endian	2024-08-13 14:24:46.000000000 -0600
++++ clamav-1.4.0/libclamav/pe.c	2024-08-15 20:16:02.017730419 -0600
+@@ -2424,22 +2424,22 @@ static cl_error_t hash_imptbl(cli_ctx *c
+ 
+     /* If the PE doesn't have an import table then skip it. This is an
+      * uncommon case but can happen. */
+-    if (peinfo->dirs[1].VirtualAddress == 0 || peinfo->dirs[1].Size == 0) {
++    if (EC32(peinfo->dirs[1].VirtualAddress) == 0 || EC32(peinfo->dirs[1].Size) == 0) {
+         cli_dbgmsg("scan_pe: import table data dir does not exist (skipping .imp scanning)\n");
+         status = CL_BREAK;
+         goto done;
+     }
+ 
+     // TODO Add EC32 wrappers
+-    impoff = cli_rawaddr(peinfo->dirs[1].VirtualAddress, peinfo->sections, peinfo->nsections, &err, fsize, peinfo->hdr_size);
+-    if (err || impoff + peinfo->dirs[1].Size > fsize) {
++    impoff = cli_rawaddr(EC32(peinfo->dirs[1].VirtualAddress), peinfo->sections, peinfo->nsections, &err, fsize, peinfo->hdr_size);
++    if (err || impoff + EC32(peinfo->dirs[1].Size) > fsize) {
+         cli_dbgmsg("scan_pe: invalid rva for import table data\n");
+         status = CL_BREAK;
+         goto done;
+     }
+ 
+     // TODO Add EC32 wrapper
+-    impdes = (const struct pe_image_import_descriptor *)fmap_need_off(map, impoff, peinfo->dirs[1].Size);
++    impdes = (const struct pe_image_import_descriptor *)fmap_need_off(map, impoff, EC32(peinfo->dirs[1].Size));
+     if (impdes == NULL) {
+         cli_dbgmsg("scan_pe: failed to acquire fmap buffer\n");
+         status = CL_EREAD;
+@@ -2449,7 +2449,7 @@ static cl_error_t hash_imptbl(cli_ctx *c
+ 
+     /* Safety: We can trust peinfo->dirs[1].Size only because `fmap_need_off()` (above)
+      * would have failed if the size exceeds the end of the fmap. */
+-    left = peinfo->dirs[1].Size;
++    left = EC32(peinfo->dirs[1].Size);
+ 
+     if (genhash[CLI_HASH_MD5]) {
+         hashctx[CLI_HASH_MD5] = cl_hash_init("md5");
+@@ -2556,7 +2556,7 @@ static cl_error_t hash_imptbl(cli_ctx *c
+ 
+ done:
+     if (needed_impoff) {
+-        fmap_unneed_off(map, impoff, peinfo->dirs[1].Size);
++        fmap_unneed_off(map, impoff, EC32(peinfo->dirs[1].Size));
+     }
+ 
+     for (type = CLI_HASH_MD5; type < CLI_HASH_AVAIL_TYPES; type++) {
+@@ -3241,7 +3241,7 @@ int cli_scanpe(cli_ctx *ctx)
+ 
+     /* Trojan.Swizzor.Gen */
+     if (SCAN_HEURISTICS && (DCONF & PE_CONF_SWIZZOR) && peinfo->nsections > 1 && fsize > 64 * 1024 && fsize < 4 * 1024 * 1024) {
+-        if (peinfo->dirs[2].Size) {
++        if (EC32(peinfo->dirs[2].Size)) {
+             struct swizz_stats *stats = calloc(1, sizeof(*stats));
+             unsigned int m            = 1000;
+             ret                       = CL_CLEAN;
+@@ -5250,13 +5250,13 @@ cl_error_t cli_peheader(fmap_t *map, str
+         cli_dbgmsg("EntryPoint offset: 0x%x (%d)\n", peinfo->ep, peinfo->ep);
+     }
+ 
+-    if (is_dll || peinfo->ndatadirs < 3 || !peinfo->dirs[2].Size)
++    if (is_dll || peinfo->ndatadirs < 3 || !EC32(peinfo->dirs[2].Size))
+         peinfo->res_addr = 0;
+     else
+         peinfo->res_addr = peinfo->dirs[2].VirtualAddress;
+ 
+     while (opts & CLI_PEHEADER_OPT_EXTRACT_VINFO &&
+-           peinfo->ndatadirs >= 3 && peinfo->dirs[2].Size) {
++           peinfo->ndatadirs >= 3 && EC32(peinfo->dirs[2].Size)) {
+         struct vinfo_list vlist;
+         const uint8_t *vptr, *baseptr;
+         uint32_t rva, res_sz;

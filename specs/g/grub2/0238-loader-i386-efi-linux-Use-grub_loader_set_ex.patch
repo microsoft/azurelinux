@@ -1,0 +1,299 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Chris Coulson <chris.coulson@canonical.com>
+Date: Mon, 2 May 2022 17:04:23 +0200
+Subject: [PATCH] loader/i386/efi/linux: Use grub_loader_set_ex
+
+This ports the linuxefi loader to use grub_loader_set_ex in order to fix
+a use-after-fre bug that occurs when grub_cmd_linux is executed more than
+once before a boot attempt is performed.
+
+This is more complicated than for the chainloader command, as the initrd
+command needs access to the loader state. To solve this, the linuxefi
+module registers a dummy initrd command at startup that returns an error.
+The linuxefi command then registers a proper initrd command with a higher
+priority that is passed the loader state.
+
+Signed-off-by: Chris Coulson <chris.coulson@canonical.com>
+(cherry picked from commit 7cf736436b4c934df5ddfa6f44b46a7e07d99fdc)
+[rharwood/pjones: set kernel_size in context]
+Signed-off-by: Robbie Harwood <rharwood@redhat.com>
+---
+ grub-core/loader/i386/efi/linux.c | 149 ++++++++++++++++++++++----------------
+ 1 file changed, 88 insertions(+), 61 deletions(-)
+
+diff --git a/grub-core/loader/i386/efi/linux.c b/grub-core/loader/i386/efi/linux.c
+index 8f7eddaa962..3aaa2e9f175 100644
+--- a/grub-core/loader/i386/efi/linux.c
++++ b/grub-core/loader/i386/efi/linux.c
+@@ -34,13 +34,19 @@
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+ static grub_dl_t my_mod;
+-static int loaded;
+-static void *kernel_mem;
+-static grub_uint64_t kernel_size;
+-static void *initrd_mem;
+-static grub_uint32_t handover_offset;
+-struct linux_kernel_params *params;
+-static char *linux_cmdline;
++
++static grub_command_t cmd_linux, cmd_initrd;
++static grub_command_t cmd_linuxefi, cmd_initrdefi;
++
++struct grub_linuxefi_context {
++  void *kernel_mem;
++  grub_uint64_t kernel_size;
++  grub_uint32_t handover_offset;
++  struct linux_kernel_params *params;
++  char *cmdline;
++
++  void *initrd_mem;
++};
+ 
+ #define MIN(a, b) \
+   ({ typeof (a) _a = (a); \
+@@ -123,25 +129,32 @@ kernel_alloc(grub_efi_uintn_t size, const char * const errmsg)
+ }
+ 
+ static grub_err_t
+-grub_linuxefi_boot (void)
++grub_linuxefi_boot (void *data)
+ {
++  struct grub_linuxefi_context *context = (struct grub_linuxefi_context *) data;
++
+   asm volatile ("cli");
+ 
+-  return grub_efi_linux_boot ((char *)kernel_mem,
+-			      handover_offset,
+-			      params);
++  return grub_efi_linux_boot ((char *)context->kernel_mem,
++			      context->handover_offset,
++			      context->params);
+ }
+ 
+ static grub_err_t
+-grub_linuxefi_unload (void)
++grub_linuxefi_unload (void *data)
+ {
++  struct grub_linuxefi_context *context = (struct grub_linuxefi_context *) data;
++  struct linux_kernel_params *params = context->params;
++
+   grub_dl_unref (my_mod);
+-  loaded = 0;
+ 
+-  kernel_free(initrd_mem, params->ramdisk_size);
+-  kernel_free(linux_cmdline, params->cmdline_size + 1);
+-  kernel_free(kernel_mem, kernel_size);
+-  kernel_free(params, sizeof(*params));
++  kernel_free (context->initrd_mem, params->ramdisk_size);
++  kernel_free (context->cmdline, params->cmdline_size + 1);
++  kernel_free (context->kernel_mem, context->kernel_size);
++  kernel_free (params, sizeof(*params));
++  cmd_initrd->data = 0;
++  cmd_initrdefi->data = 0;
++  grub_free (context);
+ 
+   return GRUB_ERR_NONE;
+ }
+@@ -188,13 +201,14 @@ read(grub_file_t file, grub_uint8_t *bufp, grub_size_t len)
+ #define HIGH_U32(val) ((grub_uint32_t)(((grub_addr_t)(val) >> 32) & 0xffffffffull))
+ 
+ static grub_err_t
+-grub_cmd_initrd (grub_command_t cmd __attribute__ ((unused)),
+-                 int argc, char *argv[])
++grub_cmd_initrd (grub_command_t cmd, int argc, char *argv[])
+ {
+   grub_file_t *files = 0;
+   int i, nfiles = 0;
+   grub_size_t size = 0;
+   grub_uint8_t *ptr;
++  struct grub_linuxefi_context *context = (struct grub_linuxefi_context *) cmd->data;
++  struct linux_kernel_params *params;
+ 
+   if (argc == 0)
+     {
+@@ -202,12 +216,14 @@ grub_cmd_initrd (grub_command_t cmd __attribute__ ((unused)),
+       goto fail;
+     }
+ 
+-  if (!loaded)
++  if (!context)
+     {
+       grub_error (GRUB_ERR_BAD_ARGUMENT, N_("you need to load the kernel first"));
+       goto fail;
+     }
+ 
++  params = context->params;
++
+   files = grub_calloc (argc, sizeof (files[0]));
+   if (!files)
+     goto fail;
+@@ -225,19 +241,19 @@ grub_cmd_initrd (grub_command_t cmd __attribute__ ((unused)),
+ 	}
+     }
+ 
+-  initrd_mem = kernel_alloc(size, N_("can't allocate initrd"));
+-  if (initrd_mem == NULL)
++  context->initrd_mem = kernel_alloc(size, N_("can't allocate initrd"));
++  if (context->initrd_mem == NULL)
+     goto fail;
+-  grub_dprintf ("linux", "initrd_mem = %p\n", initrd_mem);
++  grub_dprintf ("linux", "initrd_mem = %p\n", context->initrd_mem);
+ 
+   params->ramdisk_size = LOW_U32(size);
+-  params->ramdisk_image = LOW_U32(initrd_mem);
++  params->ramdisk_image = LOW_U32(context->initrd_mem);
+ #if defined(__x86_64__)
+   params->ext_ramdisk_size = HIGH_U32(size);
+-  params->ext_ramdisk_image = HIGH_U32(initrd_mem);
++  params->ext_ramdisk_image = HIGH_U32(context->initrd_mem);
+ #endif
+ 
+-  ptr = initrd_mem;
++  ptr = context->initrd_mem;
+ 
+   for (i = 0; i < nfiles; i++)
+     {
+@@ -261,9 +277,9 @@ grub_cmd_initrd (grub_command_t cmd __attribute__ ((unused)),
+     grub_file_close (files[i]);
+   grub_free (files);
+ 
+-  if (initrd_mem && grub_errno)
+-    grub_efi_free_pages ((grub_efi_physical_address_t)(grub_addr_t)initrd_mem,
+-                         BYTES_TO_PAGES(size));
++  if (context->initrd_mem && grub_errno)
++    grub_efi_free_pages ((grub_efi_physical_address_t)(grub_addr_t)context->initrd_mem,
++			 BYTES_TO_PAGES(size));
+ 
+   return grub_errno;
+ }
+@@ -277,6 +293,12 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+   grub_ssize_t start, filelen;
+   void *kernel = NULL;
+   int setup_header_end_offset;
++  void *kernel_mem = 0;
++  grub_uint64_t kernel_size = 0;
++  grub_uint32_t handover_offset;
++  struct linux_kernel_params *params = 0;
++  char *cmdline = 0;
++  struct grub_linuxefi_context *context = 0;
+ 
+   grub_dl_ref (my_mod);
+ 
+@@ -390,28 +412,27 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+   grub_dprintf ("linux", "new lh is at %p\n", lh);
+ 
+   grub_dprintf ("linux", "setting up cmdline\n");
+-  linux_cmdline = kernel_alloc (lh->cmdline_size + 1, N_("can't allocate cmdline"));
+-  if (!linux_cmdline)
++  cmdline = kernel_alloc (lh->cmdline_size + 1, N_("can't allocate cmdline"));
++  if (!cmdline)
+     goto fail;
+-  grub_dprintf ("linux", "linux_cmdline = %p\n", linux_cmdline);
++  grub_dprintf ("linux", "cmdline = %p\n", cmdline);
+ 
+-  grub_memcpy (linux_cmdline, LINUX_IMAGE, sizeof (LINUX_IMAGE));
++  grub_memcpy (cmdline, LINUX_IMAGE, sizeof (LINUX_IMAGE));
+   grub_create_loader_cmdline (argc, argv,
+-                              linux_cmdline + sizeof (LINUX_IMAGE) - 1,
++                              cmdline + sizeof (LINUX_IMAGE) - 1,
+ 			      lh->cmdline_size - (sizeof (LINUX_IMAGE) - 1),
+ 			      GRUB_VERIFY_KERNEL_CMDLINE);
+ 
+-  grub_dprintf ("linux", "cmdline:%s\n", linux_cmdline);
+-
++  grub_dprintf ("linux", "cmdline:%s\n", cmdline);
+   grub_dprintf ("linux", "setting lh->cmd_line_ptr to 0x%08x\n",
+-		LOW_U32(linux_cmdline));
+-  lh->cmd_line_ptr = LOW_U32(linux_cmdline);
++		LOW_U32(cmdline));
++  lh->cmd_line_ptr = LOW_U32(cmdline);
+ #if defined(__x86_64__)
+-  if ((grub_efi_uintn_t)linux_cmdline > 0xffffffffull)
++  if ((grub_efi_uintn_t)cmdline > 0xffffffffull)
+     {
+       grub_dprintf ("linux", "setting params->ext_cmd_line_ptr to 0x%08x\n",
+-		    HIGH_U32(linux_cmdline));
+-      params->ext_cmd_line_ptr = HIGH_U32(linux_cmdline);
++		    HIGH_U32(cmdline));
++      params->ext_cmd_line_ptr = HIGH_U32(cmdline);
+     }
+ #endif
+ 
+@@ -436,16 +457,13 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+     }
+   max_addresses[1].addr = GRUB_EFI_MAX_ALLOCATION_ADDRESS;
+   max_addresses[2].addr = GRUB_EFI_MAX_ALLOCATION_ADDRESS;
+-  kernel_mem = kernel_alloc (lh->init_size, N_("can't allocate kernel"));
++  kernel_size = lh->init_size;
++  kernel_mem = kernel_alloc (kernel_size, N_("can't allocate kernel"));
+   restore_addresses();
+   if (!kernel_mem)
+     goto fail;
+   grub_dprintf("linux", "kernel_mem = %p\n", kernel_mem);
+ 
+-  grub_loader_set (grub_linuxefi_boot, grub_linuxefi_unload, 0);
+-
+-  loaded = 1;
+-
+   grub_dprintf ("linux", "setting lh->code32_start to 0x%08x\n",
+ 		LOW_U32(kernel_mem));
+   lh->code32_start = LOW_U32(kernel_mem);
+@@ -462,33 +480,42 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+ 		"setting lh->ext_loader_{type,ver} = {0x%02x,0x%02x}\n",
+ 		params->ext_loader_type, params->ext_loader_ver);
+ 
++  context = grub_zalloc (sizeof (*context));
++  if (!context)
++    goto fail;
++  context->kernel_mem = kernel_mem;
++  context->kernel_size = kernel_size;
++  context->handover_offset = handover_offset;
++  context->params = params;
++  context->cmdline = cmdline;
++
++  grub_loader_set_ex (grub_linuxefi_boot, grub_linuxefi_unload, context, 0);
++
++  cmd_initrd->data = context;
++  cmd_initrdefi->data = context;
++
++  grub_file_close (file);
++  grub_free (kernel);
++  return 0;
++
+ fail:
+   if (file)
+     grub_file_close (file);
+ 
+-  if (grub_errno != GRUB_ERR_NONE)
+-    {
+-      grub_dl_unref (my_mod);
+-      loaded = 0;
+-    }
++  grub_dl_unref (my_mod);
+ 
+-  if (!loaded)
+-    {
+-      if (lh)
+-	kernel_free (linux_cmdline, lh->cmdline_size + 1);
++  if (lh)
++    kernel_free (cmdline, lh->cmdline_size + 1);
+ 
+-      kernel_free (kernel_mem, kernel_size);
+-      kernel_free (params, sizeof(*params));
+-    }
++  kernel_free (kernel_mem, kernel_size);
++  kernel_free (params, sizeof(*params));
+ 
++  grub_free (context);
+   grub_free (kernel);
+ 
+   return grub_errno;
+ }
+ 
+-static grub_command_t cmd_linux, cmd_initrd;
+-static grub_command_t cmd_linuxefi, cmd_initrdefi;
+-
+ GRUB_MOD_INIT(linux)
+ {
+   cmd_linux =

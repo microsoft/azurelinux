@@ -1,0 +1,35 @@
+diff --git a/bytes/bytes_test.go b/bytes/bytes_test.go
+index 279275c..e7c7f9d 100644
+--- a/bytes/bytes_test.go
++++ b/bytes/bytes_test.go
+@@ -206,22 +206,22 @@ func TestBytesParse(t *testing.T) {
+ 	}
+ 
+ 	// EB
+-	b, err = Parse("8EB")
++	b, err = Parse("7EB")
+ 	if assert.NoError(t, err) {
+-		assert.True(t, math.MaxInt64 == b-1)
++		assert.Equal(t, 7*int64(1152921504606846976), b)
+ 	}
+-	b, err = Parse("8E")
++	b, err = Parse("7E")
+ 	if assert.NoError(t, err) {
+-		assert.True(t, math.MaxInt64 == b-1)
++		assert.Equal(t, 7*int64(1152921504606846976), b)
+ 	}
+ 
+ 	// EB with spaces
+-	b, err = Parse("8 EB")
++	b, err = Parse("7 EB")
+ 	if assert.NoError(t, err) {
+-		assert.True(t, math.MaxInt64 == b-1)
++		assert.Equal(t, 7*int64(1152921504606846976), b)
+ 	}
+-	b, err = Parse("8 E")
++	b, err = Parse("7 E")
+ 	if assert.NoError(t, err) {
+-		assert.True(t, math.MaxInt64 == b-1)
++		assert.Equal(t, 7*int64(1152921504606846976), b)
+ 	}
+ }

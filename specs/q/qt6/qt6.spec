@@ -5,7 +5,7 @@
 Name: qt6
 # This version MUST remain in sync with Qt6 versions!
 Version: 6.10.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Qt6 meta package
 License: GPL-3.0-only
 URL:     https://getfedora.org/

@@ -3,7 +3,7 @@
 
 Name: pcs
 Version: 0.12.1
-Release: 6%{?dist}
+Release: 7%{?dist}
 # https://docs.fedoraproject.org/en-US/packaging-guidelines/LicensingGuidelines/
 # https://fedoraproject.org/wiki/Licensing:Main?rd=Licensing#Good_Licenses
 # GPL-2.0-only: pcs

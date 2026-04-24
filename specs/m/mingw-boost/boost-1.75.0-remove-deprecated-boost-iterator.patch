@@ -1,0 +1,114 @@
+From f364ee7be2bb1a44a2724d92f67490deaf19dc5e Mon Sep 17 00:00:00 2001
+From: Andrey Semashev <andrey.semashev@gmail.com>
+Date: Mon, 11 May 2020 19:59:23 +0300
+Subject: [PATCH] Removed usage of deprecated header boost/detail/iterator.hpp.
+
+The header was deprecated in favor of <iterator>. It generates compiler
+warnings and will be removed in a future release.
+---
+ boost/detail/algorithm.hpp             | 2 +-
+ boost/graph/adjacency_iterator.hpp     | 6 +++---
+ boost/graph/detail/adjacency_list.hpp  | 5 +++--
+ boost/graph/incremental_components.hpp | 6 +++---
+ 4 files changed, 10 insertions(+), 9 deletions(-)
+
+diff --git a/boost/detail/algorithm.hpp b/boost/detail/algorithm.hpp
+index 7793fb357..9b3195cbf 100644
+--- a/boost/detail/algorithm.hpp
++++ b/boost/detail/algorithm.hpp
+@@ -30,7 +30,7 @@
+ 
+ #ifndef BOOST_ALGORITHM_HPP
+ #define BOOST_ALGORITHM_HPP
+-#include <boost/detail/iterator.hpp>
++
+ // Algorithms on sequences
+ //
+ // The functions in this file have not yet gone through formal
+diff --git a/boost/graph/adjacency_iterator.hpp b/boost/graph/adjacency_iterator.hpp
+index 5325e7875..4693e3a3a 100644
+--- a/boost/graph/adjacency_iterator.hpp
++++ b/boost/graph/adjacency_iterator.hpp
+@@ -10,7 +10,7 @@
+ #ifndef BOOST_ADJACENCY_ITERATOR_HPP
+ #define BOOST_ADJACENCY_ITERATOR_HPP
+ 
+-#include <boost/detail/iterator.hpp>
++#include <iterator>
+ #include <boost/iterator/iterator_adaptor.hpp>
+ #include <boost/graph/graph_traits.hpp>
+ 
+@@ -45,7 +45,7 @@ template < class Graph,
+ class adjacency_iterator_generator
+ {
+     typedef
+-        typename boost::detail::iterator_traits< OutEdgeIter >::difference_type
++        typename std::iterator_traits< OutEdgeIter >::difference_type
+             difference_type;
+ 
+ public:
+@@ -81,7 +81,7 @@ template < class Graph,
+ class inv_adjacency_iterator_generator
+ {
+     typedef
+-        typename boost::detail::iterator_traits< InEdgeIter >::difference_type
++        typename std::iterator_traits< InEdgeIter >::difference_type
+             difference_type;
+ 
+ public:
+diff --git a/boost/graph/detail/adjacency_list.hpp b/boost/graph/detail/adjacency_list.hpp
+index 4b11fa516..c1a2ada23 100644
+--- a/boost/graph/detail/adjacency_list.hpp
++++ b/boost/graph/detail/adjacency_list.hpp
+@@ -21,6 +21,7 @@
+ #include <boost/range/irange.hpp>
+ #include <boost/graph/graph_traits.hpp>
+ #include <memory>
++#include <iterator>
+ #include <algorithm>
+ #include <boost/limits.hpp>
+ 
+@@ -2370,7 +2371,7 @@ namespace detail
+             typedef typename OutEdgeList::size_type degree_size_type;
+             typedef typename OutEdgeList::iterator OutEdgeIter;
+ 
+-            typedef boost::detail::iterator_traits< OutEdgeIter >
++            typedef std::iterator_traits< OutEdgeIter >
+                 OutEdgeIterTraits;
+             typedef
+                 typename OutEdgeIterTraits::iterator_category OutEdgeIterCat;
+@@ -2398,7 +2399,7 @@ namespace detail
+ 
+             // Edge Iterator
+ 
+-            typedef boost::detail::iterator_traits< EdgeIter > EdgeIterTraits;
++            typedef std::iterator_traits< EdgeIter > EdgeIterTraits;
+             typedef typename EdgeIterTraits::iterator_category EdgeIterCat;
+             typedef typename EdgeIterTraits::difference_type EdgeIterDiff;
+ 
+diff --git a/boost/graph/incremental_components.hpp b/boost/graph/incremental_components.hpp
+index 1ad8c9403..f16882e2a 100644
+--- a/boost/graph/incremental_components.hpp
++++ b/boost/graph/incremental_components.hpp
+@@ -13,10 +13,10 @@
+ #ifndef BOOST_INCREMENTAL_COMPONENTS_HPP
+ #define BOOST_INCREMENTAL_COMPONENTS_HPP
+ 
+-#include <boost/detail/iterator.hpp>
++#include <boost/tuple/tuple.hpp>
+ #include <boost/graph/detail/incremental_components.hpp>
+ #include <boost/iterator/counting_iterator.hpp>
+-#include <boost/make_shared.hpp>
++#include <boost/smart_ptr/make_shared.hpp>
+ #include <boost/pending/disjoint_sets.hpp>
+ #include <iterator>
+ 
+@@ -69,7 +69,7 @@ void compress_components(ParentIterator first, ParentIterator last)
+ }
+ 
+ template < class ParentIterator >
+-typename boost::detail::iterator_traits< ParentIterator >::difference_type
++typename std::iterator_traits< ParentIterator >::difference_type
+ component_count(ParentIterator first, ParentIterator last)
+ {
+     std::ptrdiff_t count = 0;

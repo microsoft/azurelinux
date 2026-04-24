@@ -1,0 +1,50 @@
+From 0b54224353c95305cf58a587c6f2963843d4a76d Mon Sep 17 00:00:00 2001
+From: Gleb Popov <6yearold@gmail.com>
+Date: Wed, 21 Jan 2026 20:55:15 +0300
+Subject: [PATCH] platform.m4: Fix case when we have to source /etc/os-release
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When sourcing this file it may overwrite the VERSION shell variable, which
+in turn end up being used for @VERSION@ substitutions in various .in files.
+
+While here, make sure we always set $osname to something sensible too.
+
+Reviewed-by: Pavel Březina <pbrezina@redhat.com>
+Reviewed-by: Tomáš Halman <thalman@redhat.com>
+---
+ src/external/platform.m4 | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/src/external/platform.m4 b/src/external/platform.m4
+index c24cd75e16c..c4ae3f3375c 100644
+--- a/src/external/platform.m4
++++ b/src/external/platform.m4
+@@ -7,6 +7,8 @@ if test x"$with_os" != x ; then
+ fi
+ 
+ if test x"$osname" = x ; then
++    osname="unknown"
++
+     if test -f /etc/fedora-release ; then
+         osname="fedora"
+     elif test -f /etc/redhat-release ; then
+@@ -18,12 +20,15 @@ if test x"$osname" = x ; then
+     elif test -f /etc/gentoo-release ; then
+         osname="gentoo"
+     elif test -f /etc/os-release ; then
++        _old_version="$VERSION"
+         . /etc/os-release
++        VERSION="$_old_version"
+         if ([[ "${ID}" = "suse" ]]) || ([[ "${ID_LIKE#*suse*}" != "${ID_LIKE}" ]]); then
+             osname="suse"
+         fi
+-    else
+-        osname="unknown"
++        if ([[ "${ID}" = "FreeBSD" ]]); then
++            osname="freebsd"
++        fi
+     fi
+ 
+     AC_MSG_NOTICE([Detected operating system type: $osname])

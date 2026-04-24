@@ -3,7 +3,7 @@
 
 Name:           perl-Class-Singleton
 Version:        1.6
-Release:        14%{?dist}
+Release: 15%{?dist}
 Summary:        Implementation of a "Singleton" class
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Class-Singleton

@@ -1,0 +1,82 @@
+.TH COMPREFFOR "1" "August 2021" "" "User Commands"
+.SH NAME
+.B compreffor
+\- CFF table subroutinizer for FontTools
+.SH SYNOPSIS
+.B compreffor
+.RB [ \-h ]
+.RB [ \-v ]
+.RB [ \-c ]
+.RB [ \-d ]
+.RB [ \-n\ \fINROUNDS ]
+.RB [ \-m\ \fIMAX_SUBRS ]
+.RB [ \-\-generate\-cff ]
+.RB [ \-\-py ]
+.RB [ \-\-chunk\-ratio\ \fICHUNK_RATIO ]
+.RB [ \-p\ \fIPROCESSES ]
+.I INPUT
+.RI [ OUTPUT ]
+.SH DESCRIPTION
+.P
+FontTools Compreffor will take a CFF-flavored OpenType font and automatically
+detect repeated routines and generate subroutines to minimize the disk space
+needed to represent a font.
+.SH OPTIONS
+.SS "POSITIONAL\ ARGUMENTS"
+.TP
+.I INPUT
+Path to the input font file
+.TP
+.I OUTPUT
+Path to the compressed file (default:
+.BR *.compressed.otf )
+.SS "OPTIONAL\ ARGUMENTS"
+.TP
+.B \-h\fR,\ \fB\-\-help
+Show a help message and exit
+.TP
+.B \-v\fR,\ \fB\-\-verbose
+Print more messages to
+.IR stdout ;
+use it multiple times to increase the level of verbosity
+.TP
+.B \-c\fR,\ \fB\-\-check
+Verify that the outputted font is valid and functionally equivalent to the
+input
+.TP
+.B \-d\fR,\ \fB\-\-decompress
+Decompress source before compressing (necessary if there are subroutines in the
+source)
+.TP
+.B \-n\ \fINROUNDS\fR,\ \fB\-\-nrounds\ \fINROUNDS
+The number of iterations to run the algorithm (default:
+.BR 4 )
+.TP
+.B \-m\ \fIMAX_SUBRS\fR,\ \fB\-\-max_subrs\ \fIMAX_SUBRS
+Limit to the number of subroutines per
+.B INDEX
+(default:
+.BR 65533 )
+.TP
+.B \-\-generate\-cff
+Also save binary CFF table data as
+.IB INPUT .cff
+.TP
+.B \-\-py
+Use pure Python method, instead of C++ extension
+.SS "OPTIONS FOR PURE PYTHON METHOD"
+.TP
+.B \-\-chunk\-ratio\ \fICHUNK_RATIO
+Specify the percentage size of the job chunks used for parallel processing
+.RB ( 0 \ <
+.I float
+.RB <=\  1 ;
+default:
+.BR 0.1 )
+.TP
+.B \-p\ \fIPROCESSES\fR,\ \fB\-\-processes\ \fIPROCESSES
+Specify number of concurrent processes to run.
+Use value
+.B 1
+to perform operation serially (default:
+.BR 12 )

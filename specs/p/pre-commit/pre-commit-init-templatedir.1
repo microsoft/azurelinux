@@ -1,0 +1,55 @@
+.TH PRE\-COMMIT\-INIT\-TEMPLATEDIR "1" "February 2025" "" "User Commands"
+.SH NAME
+.B pre\-commit\-init\-templatedir
+\[en]
+Install hook script in a directory intended for use with
+.SH SYNOPSIS
+.B pre\-commit\ init\-templatedir
+.B git config init.templateDir
+.RB [ \-h ]
+.RB [ \-\-color\  { auto , always , never }]
+.RB [ \-c\ \fICONFIG ]
+.RB [ \-\-no\-allow\-missing\-config ]
+.RB [ \-t\  { commit\-msg , post\-checkout , post\-commit , post\-merge , post\-rewrite , pre\-commit , pre\-merge\-commit , pre\-push , pre\-rebase , prepare\-commit\-msg }]
+.I directory
+.SH OPTIONS
+.SS "POSITIONAL\ ARGUMENTS"
+.TP
+.I directory
+The directory in which to write the hook script.
+.SS "OPTIONAL\ ARGUMENTS"
+.TP
+.B \-h\fR,\ \fB\-\-help
+Show a help message and exit.
+.TP
+.BR \-\-color\  { auto , always , never }
+Whether to use color in output.
+Defaults to
+.BR auto .
+.TP
+.B \-c\fR, \fB\-\-config\ \fICONFIG
+Path to alternate config file.
+.TP
+.B \-\-no\-allow\-missing\-config
+Assume cloned repos should have a
+.B pre-commit
+config.
+.TP
+.BR \-t ,\  \-\-hook\-type\  { commit\-msg , post\-checkout , post\-commit , post\-merge , post\-rewrite , pre\-commit , pre\-merge\-commit , pre\-push , pre\-rebase , prepare\-commit\-msg }
+.SH "SEE\ ALSO"
+.BR pre\-commit\-autoupdate (1),
+.BR pre\-commit\-clean (1),
+.BR pre\-commit\-gc (1),
+.\" .BR pre\-commit\-init\-templatedir (1),
+.BR pre\-commit\-install (1),
+.BR pre\-commit\-install\-hooks (1),
+.BR pre\-commit\-migrate\-config (1),
+.BR pre\-commit\-run (1),
+.BR pre\-commit\-sample\-config (1),
+.BR pre\-commit\-try\-repo (1),
+.BR pre\-commit\-uninstall (1),
+.BR pre\-commit\-validate\-config (1),
+.BR pre\-commit\-validate\-manifest (1),
+.BR pre\-commit\-help (1)
+.P
+.BR pre\-commit (1)

@@ -1,0 +1,54 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jon DeVree <nuxi@vault24.org>
+Date: Sun, 11 Feb 2024 10:34:58 -0500
+Subject: [PATCH] fs/xfs: Handle non-continuous data blocks in directory
+ extents
+
+The directory extent list does not have to be a continuous list of data
+blocks. When GRUB tries to read a non-existant member of the list,
+grub_xfs_read_file() will return a block of zero'ed memory. Checking for
+a zero'ed magic number is sufficient to skip this non-existant data block.
+
+Prior to commit 07318ee7e (fs/xfs: Fix XFS directory extent parsing)
+this was handled as a subtle side effect of reading the (non-existant)
+tail data structure. Since the block was zero'ed the computation of the
+number of directory entries in the block would return 0 as well.
+
+Fixes: 07318ee7e (fs/xfs: Fix XFS directory extent parsing)
+Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=2254370
+
+Signed-off-by: Jon DeVree <nuxi@vault24.org>
+Reviewed-By: Vladimir Serbinenko <phcoder@gmail.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/fs/xfs.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/grub-core/fs/xfs.c b/grub-core/fs/xfs.c
+index bc2224dbb46..8e02ab4a301 100644
+--- a/grub-core/fs/xfs.c
++++ b/grub-core/fs/xfs.c
+@@ -902,6 +902,7 @@ grub_xfs_iterate_dir (grub_fshelp_node_t dir,
+ 					grub_xfs_first_de(dir->data, dirblock);
+ 	    int entries = -1;
+ 	    char *end = dirblock + dirblk_size;
++	    grub_uint32_t magic;
+ 
+ 	    numread = grub_xfs_read_file (dir, 0, 0,
+ 					  blk << dirblk_log2,
+@@ -912,6 +913,15 @@ grub_xfs_iterate_dir (grub_fshelp_node_t dir,
+ 	        return 0;
+ 	      }
+ 
++	    /*
++	     * If this data block isn't actually part of the extent list then
++	     * grub_xfs_read_file() returns a block of zeros. So, if the magic
++	     * number field is all zeros then this block should be skipped.
++	     */
++	    magic = *(grub_uint32_t *)(void *) dirblock;
++	    if (!magic)
++	      continue;
++
+ 	    /*
+ 	     * Leaf and tail information are only in the data block if the number
+ 	     * of extents is 1.

@@ -6,7 +6,7 @@
 %global gitrev %(c=%{gitfullrev}; echo ${c:0:6})
 Name:           urlview
 Version:        0.9
-Release:        40.%{gitdate}git%{gitrev}%{?dist}
+Release: 41.%{gitdate}git%{gitrev}%{?dist}
 Summary:        URL extractor/launcher
 
 License:        GPL-2.0-only AND GPL-2.0-or-later AND LGPL-2.0-or-later

@@ -5,7 +5,7 @@
 
 Name:           python-netifaces
 Version:        0.11.0
-Release:        15%{?dist}
+Release: 16%{?dist}
 Summary:        Python library to retrieve information about network interfaces
 License:        MIT
 URL:            https://pypi.python.org/pypi/netifaces

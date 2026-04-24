@@ -11,7 +11,7 @@
 
 Name:           perl-Compress-Raw-Zlib
 Version:        2.213
-Release:        521%{?dist}
+Release: 522%{?dist}
 Summary:        Low-level interface to the zlib compression library
 # Zlib.xs:  (GPL-1.0-or-later OR Artistic-1.0-Perl) AND Zlib
 # Others:   GPL-1.0-or-later OR Artistic-1.0-Perl

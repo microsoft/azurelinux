@@ -1,0 +1,32 @@
+.TH QUART\-RUN "1" "February 2024" "" "User Commands"
+.SH NAME
+.B quart\-run
+\(en Run a local development server.
+.SH SYNOPSIS
+.B quart\ run
+.RI [ OPTIONS ]
+.SH OPTIONS
+.SS "OPTIONAL\ ARGUMENTS"
+.TP
+.B \-h,\ \-\-host\ \fITEXT
+The interface to bind to.
+.TP
+.B \-p,\ \-\-port\ \fIINTEGER
+The port to bind to.
+.TP
+.B \-\-certfile\fR,\ \fB\-\-cert\ \fIFILE
+Specify a certificate file to use HTTPS.
+.TP
+.B \-\-keyfile\fR,\ \fB\-\-key\ \fIFILE
+The key file to use when specifying a certificate.
+.TP
+.B \-\-reload\fR\ /\ \fB\-\-no\-reload
+Enable or disable the reloader
+.TP
+.B \-\-help
+Show a help message and exit
+.SH "SEE\ ALSO"
+.BR quart (1)
+.P
+.BR quart\-routes (1),
+.BR quart\-shell (1)

@@ -3,7 +3,7 @@
 
 Name:           perl-Net-SNMP
 Version:        6.0.1
-Release:        44%{?dist}
+Release: 45%{?dist}
 Summary:        Object oriented interface to SNMP
 
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

@@ -1,0 +1,247 @@
+cabal-version:      2.2
+name:               aeson
+version:            2.2.3.0
+x-revision:         3
+license:            BSD-3-Clause
+license-file:       LICENSE
+category:           Text, Web, JSON
+copyright:
+  (c) 2011-2016 Bryan O'Sullivan
+  (c) 2011 MailRank, Inc.
+
+author:             Bryan O'Sullivan <bos@serpentine.com>
+maintainer:         Adam Bergmark <adam@bergmark.nl>
+stability:          experimental
+tested-with:
+  GHC ==8.6.5
+   || ==8.8.4
+   || ==8.10.7
+   || ==9.0.2
+   || ==9.2.8
+   || ==9.4.8
+   || ==9.6.6
+   || ==9.8.4
+   || ==9.10.1
+   || ==9.12.1
+
+synopsis:           Fast JSON parsing and encoding
+homepage:           https://github.com/haskell/aeson
+bug-reports:        https://github.com/haskell/aeson/issues
+build-type:         Simple
+description:
+  A JSON parsing and encoding library optimized for ease of use
+  and high performance.
+  .
+  To get started, see the documentation for the @Data.Aeson@ module
+  below.
+  .
+  (A note on naming: in Greek mythology, Aeson was the father of Jason.)
+
+extra-source-files:
+  *.yaml
+  benchmarks/json-data/*.json
+  changelog.md
+  README.markdown
+  tests/golden/*.expected
+  tests/JSONTestSuite/results/*.tok
+  tests/JSONTestSuite/results/*.txt
+  tests/JSONTestSuite/test_parsing/*.json
+  tests/JSONTestSuite/test_transform/*.json
+
+flag ordered-keymap
+  description: Use ordered @Data.Map.Strict@ for KeyMap implementation.
+  default:     True
+  manual:      True
+
+library
+  default-language: Haskell2010
+  hs-source-dirs:   src
+  exposed-modules:
+    Data.Aeson
+    Data.Aeson.Decoding
+    Data.Aeson.Decoding.ByteString
+    Data.Aeson.Decoding.ByteString.Lazy
+    Data.Aeson.Decoding.Text
+    Data.Aeson.Decoding.Tokens
+    Data.Aeson.Encoding
+    Data.Aeson.Encoding.Internal
+    Data.Aeson.Key
+    Data.Aeson.KeyMap
+    Data.Aeson.QQ.Simple
+    Data.Aeson.RFC8785
+    Data.Aeson.Text
+    Data.Aeson.TH
+    Data.Aeson.Types
+
+  other-modules:
+    Data.Aeson.Decoding.Conversion
+    Data.Aeson.Decoding.Internal
+    Data.Aeson.Encoding.Builder
+    Data.Aeson.Internal.ByteString
+    Data.Aeson.Internal.Functions
+    Data.Aeson.Internal.Prelude
+    Data.Aeson.Internal.Scientific
+    Data.Aeson.Internal.Text
+    Data.Aeson.Internal.TH
+    Data.Aeson.Internal.Unescape
+    Data.Aeson.Internal.UnescapeFromText
+    Data.Aeson.Parser.Time
+    Data.Aeson.Types.Class
+    Data.Aeson.Types.FromJSON
+    Data.Aeson.Types.Generic
+    Data.Aeson.Types.Internal
+    Data.Aeson.Types.ToJSON
+
+  -- GHC bundled libs
+  build-depends:
+    , base              >=4.12.0.0 && <5
+    , bytestring        >=0.10.8.2 && <0.13
+    , containers        >=0.6.0.1  && <0.8
+    , deepseq           >=1.4.4.0  && <1.6
+    , exceptions        >=0.10.4   && <0.11
+    , ghc-prim          >=0.5.0.0  && <0.14
+    , template-haskell  >=2.14.0.0 && <2.24
+    , text              >=1.2.3.0  && <1.3  || >=2.0 && <2.2
+    , time              >=1.8.0.2  && <1.15
+
+  -- Compat
+  build-depends:
+    , generically  >=0.1   && <0.2
+    , time-compat  >=1.9.6 && <1.10
+
+  if !impl(ghc >=9.0)
+    build-depends: integer-gmp
+
+  -- Other dependencies
+  build-depends:
+    , character-ps          ^>=0.1
+    , data-fix              ^>=0.3.2
+    , dlist                 ^>=1.0
+    , hashable              ^>=1.4.6.0  || ^>=1.5.0.0
+    , indexed-traversable   ^>=0.1.2
+    , integer-conversion    ^>=0.1
+    , integer-logarithms    ^>=1.0.3.1
+    , network-uri           ^>=2.6.4.1
+    , OneTuple              ^>=0.4.1.1
+    , primitive             ^>=0.8.0.0  || ^>=0.9.0.0
+    , QuickCheck            ^>=2.14.3   || ^>=2.15
+    , scientific            ^>=0.3.7.0
+    , semialign             ^>=1.3
+    , strict                ^>=0.5
+    , tagged                ^>=0.8.7
+    , text-iso8601          ^>=0.1.1
+    , text-short            ^>=0.1.5
+    , th-abstraction        ^>=0.5.0.0  || ^>=0.6.0.0 || ^>=0.7.0.0
+    , these                 ^>=1.2
+    , unordered-containers  ^>=0.2.10.0
+    , uuid-types            ^>=1.0.5
+    , vector                ^>=0.13.0.0
+    , witherable            ^>=0.4.2    || ^>=0.5
+
+  ghc-options:      -Wall
+
+  -- String unescaping
+
+  if flag(ordered-keymap)
+    cpp-options: -DUSE_ORDEREDMAP=1
+
+test-suite aeson-tests
+  default-language: Haskell2010
+  type:             exitcode-stdio-1.0
+  hs-source-dirs:   tests
+  main-is:          Tests.hs
+  ghc-options:      -Wall -threaded -rtsopts
+  other-modules:
+    CastFloat
+    DataFamilies.Encoders
+    DataFamilies.Instances
+    DataFamilies.Properties
+    DataFamilies.Types
+    DoubleToScientific
+    Encoders
+    ErrorMessages
+    Functions
+    Instances
+    JSONTestSuite
+    Options
+    Properties
+    PropertyGeneric
+    PropertyKeys
+    PropertyQC
+    PropertyRoundTrip
+    PropertyRTFunctors
+    PropertyTH
+    PropUtils
+    Regression.Issue351
+    Regression.Issue571
+    Regression.Issue687
+    Regression.Issue967
+    RFC8785
+    SerializationFormatSpec
+    Types
+    UnitTests
+    UnitTests.FromJSONKey
+    UnitTests.Hashable
+    UnitTests.KeyMapInsertWith
+    UnitTests.MonadFix
+    UnitTests.NoThunks
+    UnitTests.NullaryConstructors
+    UnitTests.OmitNothingFieldsNote
+    UnitTests.OptionalFields
+    UnitTests.OptionalFields.Common
+    UnitTests.OptionalFields.Generics
+    UnitTests.OptionalFields.Manual
+    UnitTests.OptionalFields.TH
+    UnitTests.UTCTime
+
+  build-depends:
+    , aeson
+    , base
+    , base-compat
+    , base-orphans          >=0.5.3  && <0.10
+    , base16-bytestring
+    , bytestring
+    , containers
+    , data-fix
+    , deepseq
+    , Diff                  >=0.4    && <0.6 || ^>=1.0.2
+    , directory
+    , dlist
+    , filepath
+    , generic-deriving      >=1.10   && <1.15
+    , generically
+    , ghc-prim              >=0.2
+    , hashable
+    , indexed-traversable
+    , integer-logarithms    >=1      && <1.1
+    , network-uri
+    , OneTuple
+    , primitive
+    , QuickCheck            >=2.14.2 && <2.16
+    , quickcheck-instances  >=0.3.29 && <0.4
+    , scientific
+    , strict
+    , tagged
+    , tasty
+    , tasty-golden
+    , tasty-hunit
+    , tasty-quickcheck
+    , template-haskell
+    , text
+    , text-short
+    , these
+    , time
+    , time-compat
+    , unordered-containers
+    , uuid-types
+    , vector
+
+  if !impl(ghc >=9.0)
+    build-depends: integer-gmp
+
+  if impl(ghc >=9.2 && <9.7)
+    build-depends: nothunks >=0.1.4 && <0.3
+
+source-repository head
+  type:     git
+  location: git://github.com/haskell/aeson.git

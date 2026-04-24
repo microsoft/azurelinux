@@ -3,7 +3,7 @@
 
 Name:           perl-GTop
 Version:        0.18
-Release:        47%{?dist}
+Release: 48%{?dist}
 Summary:        Perl interface to libgtop
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/GTop

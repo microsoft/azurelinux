@@ -6,7 +6,7 @@
 
 Name:           perl-Git-Wrapper
 Version:        0.048
-Release:        23%{?dist}
+Release: 24%{?dist}
 Summary:        Wrap git command-line interface for Perl
 # Automatically converted from old format: GPL+ or Artistic - review is highly recommended.
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

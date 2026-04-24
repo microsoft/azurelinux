@@ -1,0 +1,27 @@
+[archive]
+
+[licensing]
+detector = "trivy"
+exclude_directories = [
+    "hack",
+]
+[[licensing.licenses]]
+path = "vendor/github.com/invopop/jsonschema/COPYING"
+sha256sum = "ed76298aa9c218e9010aa186c1107ceb6c7618db50ae0222b9a1b4196101a411"
+expression = "MIT"
+[[licensing.licenses]]
+path = "vendor/go.yaml.in/yaml/v2/LICENSE.libyaml"
+sha256sum = "a94710b55e03b5285f77d048c5ba61bb9d6ee04a06c0eb90e68821e11b0c707a"
+expression = "MIT"
+[[licensing.licenses]]
+path = "vendor/cyphar.com/go-pathrs/COPYING"
+sha256sum = "3f3d9e0024b1921b067d6f7f88deb4a60cbe7a78e76c64e3f1d7fc3b779b9d04"
+expression = "MPL-2.0"
+[[licensing.licenses]]
+path = "vendor/github.com/cyphar/filepath-securejoin/LICENSE.BSD"
+sha256sum = "26be8a79415737dfe8edf1be62e71afeb8c770ed5a5605a06270d5701830f47c"
+expression = "BSD-3-Clause"
+[[licensing.licenses]]
+path = "vendor/github.com/cyphar/filepath-securejoin/LICENSE.MPL-2.0"
+sha256sum = "3f3d9e0024b1921b067d6f7f88deb4a60cbe7a78e76c64e3f1d7fc3b779b9d04"
+expression = "MPL-2.0"

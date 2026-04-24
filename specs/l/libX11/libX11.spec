@@ -8,7 +8,7 @@
 Summary: Core X11 protocol client library
 Name: libX11
 Version: 1.8.12
-Release: 3%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
+Release: 4%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
 License: MIT AND X11
 URL: http://www.x.org
 

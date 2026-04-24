@@ -13,7 +13,7 @@
 Name:           perl-Digest-SHA
 Epoch:          1
 Version:        6.04
-Release:        521%{?dist}
+Release: 522%{?dist}
 Summary:        Perl extension for SHA-1/224/256/384/512
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Digest-SHA

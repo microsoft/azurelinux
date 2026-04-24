@@ -5,7 +5,7 @@
 
 Name:           python-%{srcname}
 Version:        2.2.0
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        Library for passing trusted data to untrusted environments
 License:        BSD-3-Clause
 URL:            https://itsdangerous.palletsprojects.com

@@ -1,0 +1,5 @@
+import:
+- package: github.com/kr/pretty
+  version: 821b30f52f1af83de62fd3a4baf33c4b80b0e1e5
+package: github.com/bmizerany/assert
+

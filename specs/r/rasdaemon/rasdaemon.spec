@@ -3,7 +3,7 @@
 
 Name:			rasdaemon
 Version:		0.8.0
-Release:		8%{?dist}
+Release: 9%{?dist}
 Summary:		Utility to receive RAS error tracings
 Group:			Applications/System
 # Automatically converted from old format: GPLv2 - review is highly recommended.

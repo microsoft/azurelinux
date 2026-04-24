@@ -9,7 +9,7 @@
 Summary: iODBC Driver Manager
 Name: libiodbc
 Version: 3.52.16
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: LGPL-2.0-only OR BSD-3-Clause
 URL: http://www.iodbc.org/
 VCS: git:%{giturl}.git

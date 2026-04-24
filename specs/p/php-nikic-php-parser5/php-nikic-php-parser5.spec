@@ -31,7 +31,7 @@
 
 Name:           php-%{gh_owner}-%{pk_project}%{major}
 Version:        %{upstream_version}%{?upstream_prever:~%{upstream_prever}}
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        A PHP parser written in PHP - version %{major}
 
 License:        BSD-3-Clause

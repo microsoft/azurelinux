@@ -1,0 +1,45 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Fri, 29 Jul 2022 15:56:00 -0400
+Subject: [PATCH] Make debug=file show which file filters get run.
+
+If one of the file filters breaks things, it's hard to figure out where
+it has happened.
+
+This makes grub log which filter is being run, which makes it easier to
+figure out where you are in the sequence of events.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/kern/file.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/grub-core/kern/file.c b/grub-core/kern/file.c
+index 264211b1143..1794d022fb0 100644
+--- a/grub-core/kern/file.c
++++ b/grub-core/kern/file.c
+@@ -30,6 +30,14 @@ void (*EXPORT_VAR (grub_grubnet_fini)) (void);
+ 
+ grub_file_filter_t grub_file_filters[GRUB_FILE_FILTER_MAX];
+ 
++static const char *filter_names[] = {
++    [GRUB_FILE_FILTER_VERIFY] = "GRUB_FILE_FILTER_VERIFY",
++    [GRUB_FILE_FILTER_GZIO] = "GRUB_FILE_FILTER_GZIO",
++    [GRUB_FILE_FILTER_XZIO] = "GRUB_FILE_FILTER_XZIO",
++    [GRUB_FILE_FILTER_LZOPIO] = "GRUB_FILE_FILTER_LZOPIO",
++    [GRUB_FILE_FILTER_MAX] = "GRUB_FILE_FILTER_MAX"
++};
++
+ /* Get the device part of the filename NAME. It is enclosed by parentheses.  */
+ char *
+ grub_file_get_device_name (const char *name)
+@@ -124,6 +132,9 @@ grub_file_open (const char *name, enum grub_file_type type)
+     if (grub_file_filters[filter])
+       {
+ 	last_file = file;
++	if (filter < GRUB_FILE_FILTER_MAX)
++	  grub_dprintf ("file", "Running %s file filter\n",
++			filter_names[filter]);
+ 	file = grub_file_filters[filter] (file, type);
+ 	if (file && file != last_file)
+ 	  {

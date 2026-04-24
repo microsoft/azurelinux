@@ -3,7 +3,7 @@
 
 Name:          nmh
 Version:       1.8
-Release:       9%{?dist}
+Release: 10%{?dist}
 Summary:       A capable MIME-email-handling system with a command-line interface
 # Automatically converted from old format: BSD - review is highly recommended.
 License:       LicenseRef-Callaway-BSD

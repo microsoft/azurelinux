@@ -3,7 +3,7 @@
 
 Name:		perl-Unicode-EastAsianWidth
 Version:	12.0
-Release:	17%{?dist}
+Release: 18%{?dist}
 Summary:	East Asian Width properties
 License:	CC0-1.0
 URL:		https://metacpan.org/release/Unicode-EastAsianWidth

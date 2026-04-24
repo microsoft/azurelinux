@@ -1,0 +1,43 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Diego Domingos <diegdo@br.ibm.com>
+Date: Thu, 24 Mar 2022 13:14:42 -0400
+Subject: [PATCH] make ofdisk_retries optional
+
+The feature Retry on Fail added to GRUB can cause a LPM to take
+longer if the SAN is slow.
+
+When a LPM to external site occur, the path of the disk can change
+and thus the disk search function on grub can take some time since
+it is used as a hint. This can cause the Retry on Fail feature to
+try to access the disk 20x times (since this is hardcoded number)
+and, if the SAN is slow, the boot time can increase a lot.
+In some situations not acceptable.
+
+The following patch enables a configuration at user space of the
+maximum number of retries we want for this feature.
+
+The variable ofdisk_retries should be set using grub2-editenv
+and will be checked by retry function. If the variable is not set,
+so the default number of retries will be used instead.
+---
+ include/grub/ieee1275/ofdisk.h | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/include/grub/ieee1275/ofdisk.h b/include/grub/ieee1275/ofdisk.h
+index 7d2d5409305..0074d55eee4 100644
+--- a/include/grub/ieee1275/ofdisk.h
++++ b/include/grub/ieee1275/ofdisk.h
+@@ -25,7 +25,12 @@ extern void grub_ofdisk_fini (void);
+ #define MAX_RETRIES 20
+ 
+ 
+-#define RETRY_IEEE1275_OFDISK_OPEN(device, last_ihandle) unsigned retry_i=0;for(retry_i=0; retry_i < MAX_RETRIES; retry_i++){ \
++#define RETRY_IEEE1275_OFDISK_OPEN(device, last_ihandle) \
++	                                        unsigned max_retries = MAX_RETRIES; \
++                                                if(grub_env_get("ofdisk_retries") != NULL) \
++                                                     max_retries = grub_strtoul(grub_env_get("ofdisk_retries"), 0, 10)+1; \
++                                                grub_dprintf("ofdisk","MAX_RETRIES set to %u\n",max_retries); \
++                                                unsigned retry_i=0;for(retry_i=0; retry_i < max_retries; retry_i++){ \
+ 						if(!grub_ieee1275_open(device, last_ihandle)) \
+ 						break; \
+ 						grub_dprintf("ofdisk","Opening disk %s failed. Retrying...\n",device); }

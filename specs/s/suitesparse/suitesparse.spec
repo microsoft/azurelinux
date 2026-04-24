@@ -51,7 +51,7 @@
 
 Name:           suitesparse
 Version:        7.11.0
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        A collection of sparse matrix libraries
 
 # See LICENSE.txt for a breakdown of all licenses:

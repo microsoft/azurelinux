@@ -1,0 +1,18 @@
+skip goldenfiles tests
+
+The golden files include memory dumps from a x86_64 machine.
+Integers are stored as little endian on x86, but as big endian on s390x,
+therefore loading this memory dump fails on s390x.
+
+diff --git a/vendor/github.com/grafana/grafana-plugin-sdk-go/experimental/golden_response_checker.go b/vendor/github.com/grafana/grafana-plugin-sdk-go/experimental/golden_response_checker.go
+index 320f40f3bd..20f5fa4f46 100644
+--- a/vendor/github.com/grafana/grafana-plugin-sdk-go/experimental/golden_response_checker.go
++++ b/vendor/github.com/grafana/grafana-plugin-sdk-go/experimental/golden_response_checker.go
+@@ -203,6 +203,7 @@ func CheckGoldenJSONFrame(t *testing.T, dir string, name string, f *data.Frame,
+ // CheckGoldenJSONResponse will verify that the stored JSON file matches the given backend.DataResponse.
+ func CheckGoldenJSONResponse(t *testing.T, dir string, name string, dr *backend.DataResponse, updateFile bool) {
+ 	t.Helper()
++	t.Skip("skipping test: x86_64 memory dump is not compatible with other architectures")
+ 	fpath := path.Join(dir, name+".jsonc")
+ 
+ 	expected, err := readGoldenJSONFile(fpath)

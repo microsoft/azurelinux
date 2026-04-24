@@ -1,0 +1,31 @@
+From 8969bb39cc827bd36a9fd5b5742eb645fb2c4bf6 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Thu, 30 May 2024 08:49:32 -0400
+Subject: [PATCH 1/2] Downstream-only: do not override optimization flags
+
+Stop overriding optimization flags; not sent upstream because this is
+intentional on their part.
+
+https://docs.fedoraproject.org/en-US/packaging-guidelines/#_compiler_flags
+---
+ build/gen.py | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/build/gen.py b/build/gen.py
+index 6f3652ee..2cb433bc 100755
+--- a/build/gen.py
++++ b/build/gen.py
+@@ -432,10 +432,8 @@ def WriteGNNinja(path, platform, host, options, args_list):
+         cflags.extend(['-D_LIBCPP_DEBUG=1', '-D_GLIBCXX_DEBUG=1'])
+     else:
+       cflags.append('-DNDEBUG')
+-      cflags.append('-O3')
+       if options.no_strip:
+         cflags.append('-g')
+-      ldflags.append('-O3')
+       # Use -fdata-sections and -ffunction-sections to place each function
+       # or data item into its own section so --gc-sections can eliminate any
+       # unused functions and data items.
+-- 
+2.44.0
+

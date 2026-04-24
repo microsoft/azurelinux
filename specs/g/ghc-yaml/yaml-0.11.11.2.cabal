@@ -1,0 +1,227 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.35.1.
+--
+-- see: https://github.com/sol/hpack
+
+name:           yaml
+version:        0.11.11.2
+x-revision: 2
+synopsis:       Support for parsing and rendering YAML documents.
+description:    README and API documentation are available at <https://www.stackage.org/package/yaml>
+category:       Data
+stability:      stable
+homepage:       https://github.com/snoyberg/yaml#readme
+bug-reports:    https://github.com/snoyberg/yaml/issues
+author:         Michael Snoyman <michael@snoyman.com>, Anton Ageev <antage@gmail.com>,Kirill Simonov
+maintainer:     Michael Snoyman <michael@snoyman.com>
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    test/largest-string.yaml
+    test/json.yaml
+    test/resources/foo.yaml
+    test/resources/bar.yaml
+    test/resources/baz.yaml
+    test/resources/accent/foo.yaml
+    test/resources/loop/foo.yaml
+    test/resources/loop/bar.yaml
+    test/resources/empty.yaml
+    test/resources/empty2.yaml
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/snoyberg/yaml
+
+flag no-examples
+  description: don't build the examples
+  manual: False
+  default: True
+
+flag no-exe
+  description: don't install the yaml2json or json2yaml executables
+  manual: False
+  default: True
+
+library
+  exposed-modules:
+      Data.Yaml
+      Data.Yaml.Aeson
+      Data.Yaml.Builder
+      Data.Yaml.Config
+      Data.Yaml.Include
+      Data.Yaml.Internal
+      Data.Yaml.Parser
+      Data.Yaml.Pretty
+      Data.Yaml.TH
+  other-modules:
+      Paths_yaml
+  hs-source-dirs:
+      src
+  other-extensions:
+      LambdaCase
+  ghc-options: -Wall -Wcompat
+  build-depends:
+      aeson >=0.11
+    , attoparsec >=0.11.3.0
+    , base >=4.9.1 && <5
+    , bytestring >=0.9.1.4
+    , conduit >=1.2.8 && <1.4
+    , containers
+    , directory
+    , filepath
+    , libyaml ==0.1.*
+    , mtl
+    , resourcet >=0.3 && <1.4
+    , scientific >=0.3
+    , template-haskell
+    , text
+    , transformers >=0.1
+    , unordered-containers
+    , vector
+  default-language: Haskell2010
+
+executable examples
+  main-is: Main.hs
+  other-modules:
+      Config
+      Simple
+      Paths_yaml
+  hs-source-dirs:
+      examples
+  ghc-options: -Wall -Wcompat
+  build-depends:
+      aeson >=0.11
+    , attoparsec >=0.11.3.0
+    , base >=4.9.1 && <5
+    , bytestring >=0.9.1.4
+    , conduit >=1.2.8 && <1.4
+    , containers
+    , directory
+    , filepath
+    , libyaml ==0.1.*
+    , mtl
+    , resourcet >=0.3 && <1.4
+    , scientific >=0.3
+    , template-haskell
+    , text
+    , transformers >=0.1
+    , unordered-containers
+    , vector
+  default-language: Haskell2010
+  if flag(no-examples)
+    buildable: False
+  else
+    build-depends:
+        raw-strings-qq
+      , yaml
+
+executable json2yaml
+  main-is: json2yaml.hs
+  other-modules:
+      Common
+      Paths_yaml
+  hs-source-dirs:
+      exe
+  ghc-options: -Wall -Wcompat
+  build-depends:
+      aeson >=0.11
+    , attoparsec >=0.11.3.0
+    , base >=4.9.1 && <5
+    , bytestring >=0.9.1.4
+    , conduit >=1.2.8 && <1.4
+    , containers
+    , directory
+    , filepath
+    , libyaml ==0.1.*
+    , mtl
+    , optparse-applicative
+    , resourcet >=0.3 && <1.4
+    , scientific >=0.3
+    , template-haskell
+    , text
+    , transformers >=0.1
+    , unordered-containers
+    , vector
+    , yaml
+  default-language: Haskell2010
+  if flag(no-exe)
+    buildable: False
+
+executable yaml2json
+  main-is: yaml2json.hs
+  other-modules:
+      Common
+      Paths_yaml
+  hs-source-dirs:
+      exe
+  other-extensions:
+      CPP
+      LambdaCase
+      NamedFieldPuns
+  ghc-options: -Wall -Wcompat
+  build-depends:
+      aeson >=0.11
+    , attoparsec >=0.11.3.0
+    , base >=4.9.1 && <5
+    , bytestring >=0.9.1.4
+    , conduit >=1.2.8 && <1.4
+    , containers
+    , directory
+    , filepath
+    , libyaml ==0.1.*
+    , mtl
+    , optparse-applicative
+    , resourcet >=0.3 && <1.4
+    , scientific >=0.3
+    , template-haskell
+    , text
+    , transformers >=0.1
+    , unordered-containers
+    , vector
+    , yaml
+  default-language: Haskell2010
+  if flag(no-exe)
+    buildable: False
+
+test-suite spec
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Data.Yaml.IncludeSpec
+      Data.Yaml.THSpec
+      Data.YamlSpec
+      Paths_yaml
+  hs-source-dirs:
+      test
+  ghc-options: -Wall -Wcompat -with-rtsopts=-K1K
+  cpp-options: -DTEST
+  build-depends:
+      HUnit
+    , aeson >=0.11
+    , attoparsec >=0.11.3.0
+    , base >=4.9.1 && <5
+    , base-compat
+    , bytestring >=0.9.1.4
+    , conduit >=1.2.8 && <1.4
+    , containers
+    , directory
+    , filepath
+    , hspec >=1.3
+    , libyaml ==0.1.*
+    , mockery
+    , mtl
+    , raw-strings-qq
+    , resourcet >=0.3 && <1.4
+    , scientific >=0.3
+    , template-haskell
+    , temporary
+    , text
+    , transformers >=0.1
+    , unordered-containers
+    , vector
+    , yaml
+  default-language: Haskell2010

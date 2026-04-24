@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 8 Jan 2024 19:14:06 -0500
+Subject: [PATCH] at_keyboard: mark grub_keyboard_controller_write unused
+
+It's used sometimes and not others by #ifdef, so mark it unused so the
+compiler doesn't complain.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/term/at_keyboard.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/term/at_keyboard.c b/grub-core/term/at_keyboard.c
+index e667d0a862c..d2b716b5b4f 100644
+--- a/grub-core/term/at_keyboard.c
++++ b/grub-core/term/at_keyboard.c
+@@ -93,7 +93,7 @@ at_command (grub_uint8_t data)
+   return (i != GRUB_AT_TRIES);
+ }
+ 
+-static void
++static void __attribute__((__unused__))
+ grub_keyboard_controller_write (grub_uint8_t c)
+ {
+   at_command (KEYBOARD_COMMAND_WRITE);
+@@ -170,7 +170,7 @@ query_mode (void)
+   grub_uint64_t endtime;
+   unsigned i;
+   int e;
+-  char *envvar;
++  const char *envvar;
+ 
+   for (i = 0; i < GRUB_AT_TRIES; i++) {
+     grub_dprintf ("atkeyb", "query_mode: sending command to controller\n");

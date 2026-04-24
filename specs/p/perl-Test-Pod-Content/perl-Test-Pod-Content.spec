@@ -3,7 +3,7 @@
 
 Name:           perl-Test-Pod-Content
 Version:        0.0.6
-Release:        39%{?dist}
+Release: 40%{?dist}
 Summary:        Test a Pod's content
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Test-Pod-Content

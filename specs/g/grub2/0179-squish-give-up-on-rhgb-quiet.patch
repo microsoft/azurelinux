@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Robbie Harwood <rharwood@redhat.com>
+Date: Wed, 17 Aug 2022 11:30:30 -0400
+Subject: [PATCH] squish: give up on rhgb quiet
+
+Signed-off-by: Robbie Harwood <rharwood@redhat.com>
+---
+ util/grub.d/10_linux.in | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
+index 079bb9a0961..2dddc39816f 100644
+--- a/util/grub.d/10_linux.in
++++ b/util/grub.d/10_linux.in
+@@ -168,10 +168,6 @@ update_bls_cmdline()
+ 	# anaconda has the correct information to create this during install;
+ 	# afterward, grubby will take care of syncing on updates.  If the user
+ 	# has modified /etc/default/grub, try to cope.
+-	if [[ ! "$cmdline" =~ "rhgb quiet" ]]; then
+-	    # ensure these only show up once
+-	    cmdline="$cmdline rhgb quiet"
+-	fi
+ 	echo "$cmdline" > /etc/kernel/cmdline
+     fi
+ 

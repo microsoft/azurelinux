@@ -3,7 +3,7 @@
 
 Name:		msgpack
 Version:	3.1.0
-Release:	20%{?dist}
+Release: 21%{?dist}
 Summary:	Binary-based efficient object serialization library
 
 # Automatically converted from old format: Boost - review is highly recommended.

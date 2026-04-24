@@ -25,7 +25,7 @@
 
 Name:           rocm-rpp
 Version:        %{rocm_version}
-Release:        5%{?dist}
+Release: 6%{?dist}
 Summary:        ROCm Performace Primatives for computer vision
 Url:            https://github.com/ROCm/%{upstreamname}
 License:        MIT AND Apache-2.0 AND LicenseRef-Fedora-Public-Domain

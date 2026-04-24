@@ -6,7 +6,7 @@
 Summary: Qt5 - QtGraphicalEffects component
 Name:    qt5-%{qt_module}
 Version: 5.15.18
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively from qt5-qtbase for details
 License: LGPL-3.0-only OR GPL-3.0-only WITH Qt-GPL-exception-1.0

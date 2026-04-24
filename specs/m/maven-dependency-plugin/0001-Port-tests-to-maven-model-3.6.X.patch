@@ -1,0 +1,59 @@
+From 885b776756218b616d4c53ca1f3603ff19e8a1c5 Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Tue, 25 Aug 2020 12:12:09 +0200
+Subject: [PATCH 1/2] Port tests to maven model 3.6.X
+
+---
+ .../plugins/dependency/analyze/TestAnalyzeDepMgt.java    | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/src/test/java/org/apache/maven/plugins/dependency/analyze/TestAnalyzeDepMgt.java b/src/test/java/org/apache/maven/plugins/dependency/analyze/TestAnalyzeDepMgt.java
+index 7b78a6ea..f0994629 100644
+--- a/src/test/java/org/apache/maven/plugins/dependency/analyze/TestAnalyzeDepMgt.java
++++ b/src/test/java/org/apache/maven/plugins/dependency/analyze/TestAnalyzeDepMgt.java
+@@ -111,33 +111,42 @@ public class TestAnalyzeDepMgt extends TestCase {
+         // sure it's ok before
+         // testing the next one
+         dep.setType("t");
++        dep.clearManagementKey();
+         assertNotEquals(dep.getManagementKey(), mojo.getArtifactManagementKey(artifact));
+ 
+         dep.setType("type");
++        dep.clearManagementKey();
+         assertEquals(dep.getManagementKey(), mojo.getArtifactManagementKey(artifact));
+ 
+         dep.setArtifactId("a");
++        dep.clearManagementKey();
+         assertNotEquals(dep.getManagementKey(), mojo.getArtifactManagementKey(artifact));
+ 
+         dep.setArtifactId("artifact");
++        dep.clearManagementKey();
+         assertEquals(dep.getManagementKey(), mojo.getArtifactManagementKey(artifact));
+ 
+         dep.setClassifier("c");
++        dep.clearManagementKey();
+         assertNotEquals(dep.getManagementKey(), mojo.getArtifactManagementKey(artifact));
+ 
+         dep.setClassifier("class");
++        dep.clearManagementKey();
+         assertEquals(dep.getManagementKey(), mojo.getArtifactManagementKey(artifact));
+ 
+         dep.setGroupId("g");
++        dep.clearManagementKey();
+         assertNotEquals(dep.getManagementKey(), mojo.getArtifactManagementKey(artifact));
+ 
+         dep.setGroupId("group");
+         dep.setClassifier(null);
+         artifact = stubFactory.createArtifact("group", "artifact", "1.0", Artifact.SCOPE_COMPILE, "type", null);
++        dep.clearManagementKey();
+         assertEquals(dep.getManagementKey(), mojo.getArtifactManagementKey(artifact));
+ 
+         dep.setClassifier("");
+         artifact = stubFactory.createArtifact("group", "artifact", "1.0", Artifact.SCOPE_COMPILE, "type", "");
++        dep.clearManagementKey();
+         assertEquals(dep.getManagementKey(), mojo.getArtifactManagementKey(artifact));
+     }
+ 
+-- 
+2.47.1
+

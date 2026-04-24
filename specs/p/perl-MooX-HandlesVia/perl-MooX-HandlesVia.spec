@@ -3,7 +3,7 @@
 
 Name:           perl-MooX-HandlesVia
 Version:        0.001009
-Release:        15%{?dist}
+Release: 16%{?dist}
 Summary:        NativeTrait-like behavior for Moo
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/MooX-HandlesVia

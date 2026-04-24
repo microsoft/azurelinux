@@ -3,7 +3,7 @@
 
 Name:		perl-Module-Find
 Version:	0.17
-Release:	2%{?dist}
+Release: 3%{?dist}
 Summary:	Find and use installed modules in a (sub)category
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Module-Find

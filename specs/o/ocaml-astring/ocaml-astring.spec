@@ -10,7 +10,7 @@ ExcludeArch: %{ix86}
 
 Name:           ocaml-astring
 Version:        0.8.5
-Release:        30%{?dist}
+Release: 31%{?dist}
 Summary:        Alternative String module for OCaml
 
 License:        ISC

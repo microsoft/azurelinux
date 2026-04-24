@@ -3,7 +3,7 @@
 
 Name:           perl-CGI-Fast
 Version:        2.17
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        CGI Interface for Fast CGI
 # lib/CGI/Fast.pm probably qotes piece of Artistic license before declaring
 # "as Perl itself" <https://github.com/leejo/cgi-fast/issues/13>

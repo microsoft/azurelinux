@@ -1,0 +1,47 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Michael Chang <mchang@suse.com>
+Date: Mon, 3 Jun 2024 12:12:06 +0800
+Subject: [PATCH] fs/ntfs: Fix out-of-bounds read
+
+When parsing NTFS file records the presence of the 0xFF marker indicates
+the end of the attribute list. This value signifies that there are no
+more attributes to process.
+
+However, when the end marker is missing due to corrupted metadata the
+loop continues to read beyond the attribute list resulting in out-of-bounds
+reads and potentially entering an infinite loop.
+
+This patch adds a check to provide a stop condition for the loop ensuring
+it stops at the end of the attribute list or at the end of the Master File
+Table. This guards against out-of-bounds reads and prevents infinite loops.
+
+Reported-by: Daniel Axtens <dja@axtens.net>
+Signed-off-by: Michael Chang <mchang@suse.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/fs/ntfs.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/fs/ntfs.c b/grub-core/fs/ntfs.c
+index de435aa14..8a5384247 100644
+--- a/grub-core/fs/ntfs.c
++++ b/grub-core/fs/ntfs.c
+@@ -139,6 +139,8 @@ free_attr (struct grub_ntfs_attr *at)
+ static grub_uint8_t *
+ find_attr (struct grub_ntfs_attr *at, grub_uint8_t attr)
+ {
++  grub_uint8_t *mft_end;
++
+   if (at->flags & GRUB_NTFS_AF_ALST)
+     {
+     retry:
+@@ -191,7 +193,8 @@ find_attr (struct grub_ntfs_attr *at, grub_uint8_t attr)
+       return NULL;
+     }
+   at->attr_cur = at->attr_nxt;
+-  while (*at->attr_cur != 0xFF)
++  mft_end = at->mft->buf + (at->mft->data->mft_size << GRUB_NTFS_BLK_SHR);
++  while (at->attr_cur < mft_end && *at->attr_cur != 0xFF)
+     {
+       at->attr_nxt += u16at (at->attr_cur, 4);
+       if (*at->attr_cur == GRUB_NTFS_AT_ATTRIBUTE_LIST)

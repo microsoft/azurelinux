@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 3.2023.0218.1
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary: A registry for information about MIME media type definitions
 License: MIT
 URL: https://github.com/mime-types/mime-types-data/

@@ -1,5 +1,0 @@
-#################################################
-# This is a grouping library without any code
-#################################################
-[suppress_file]
-file_name_regexp=.*libdcerpc-samr\\.so.*

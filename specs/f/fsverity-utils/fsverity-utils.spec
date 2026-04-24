@@ -3,7 +3,7 @@
 
 Name: fsverity-utils
 Version: 1.6
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: fsverity utilities
 
 # Automatically converted from old format: BSD - review is highly recommended.

@@ -1,0 +1,155 @@
+cabal-version:       2.0
+name:                cryptohash-sha256
+version:             0.11.102.1
+x-revision:          6
+
+synopsis:            Fast, pure and practical SHA-256 implementation
+description: {
+
+A practical incremental and one-pass, pure API to
+the [SHA-256 cryptographic hash algorithm](https://en.wikipedia.org/wiki/SHA-2) according
+to [FIPS 180-4](http://dx.doi.org/10.6028/NIST.FIPS.180-4)
+with performance close to the fastest implementations available in other languages.
+.
+The core SHA-256 algorithm is implemented in C and is thus expected
+to be as fast as the standard [sha256sum(1) tool](https://linux.die.net/man/1/sha256sum);
+for instance, on an /Intel Core i7-3770/ at 3.40GHz this implementation can
+compute a SHA-256 hash over 230 MiB of data in under one second.
+(If, instead, you require a pure Haskell implementation and performance is secondary, please refer to the [SHA package](https://hackage.haskell.org/package/SHA).)
+.
+
+.
+Additionally, this package provides support for
+.
+- HMAC-SHA-256: SHA-256-based [Hashed Message Authentication Codes](https://en.wikipedia.org/wiki/HMAC) (HMAC)
+- HKDF-SHA-256: [HMAC-SHA-256-based Key Derivation Function](https://en.wikipedia.org/wiki/HKDF) (HKDF)
+.
+conforming to [RFC6234](https://tools.ietf.org/html/rfc6234), [RFC4231](https://tools.ietf.org/html/rfc4231), [RFC5869](https://tools.ietf.org/html/rfc5869), et al..
+.
+=== Relationship to the @cryptohash@ package and its API
+.
+This package has been originally a fork of @cryptohash-0.11.7@ because the @cryptohash@
+package had been deprecated and so this package continues to satisfy the need for a
+lightweight package providing the SHA-256 hash algorithm without any dependencies on packages
+other than @base@ and @bytestring@. The API exposed by @cryptohash-sha256-0.11.*@'s
+"Crypto.Hash.SHA256" module is guaranteed to remain a compatible superset of the API provided
+by the @cryptohash-0.11.7@'s module of the same name.
+.
+Consequently, this package is designed to be used as a drop-in replacement for @cryptohash-0.11.7@'s
+"Crypto.Hash.SHA256" module, though with
+a [clearly smaller footprint by almost 3 orders of magnitude](https://www.reddit.com/r/haskell/comments/5lxv75/psa_please_use_unique_module_names_when_uploading/dbzegx3/).
+
+}
+
+license:             BSD3
+license-file:        LICENSE
+copyright:           Vincent Hanquez, Herbert Valerio Riedel
+maintainer:          Herbert Valerio Riedel <hvr@gnu.org>
+homepage:            https://github.com/haskell-hvr/cryptohash-sha256
+bug-reports:         https://github.com/haskell-hvr/cryptohash-sha256/issues
+category:            Data, Cryptography
+build-type:          Simple
+
+tested-with:
+  GHC == 9.12.1
+  GHC == 9.10.1
+  GHC == 9.8.4
+  GHC == 9.6.6
+  GHC == 9.4.8
+  GHC == 9.2.8
+  GHC == 9.0.2
+  GHC == 8.10.7
+  GHC == 8.8.4
+  GHC == 8.6.5
+  GHC == 8.4.4
+  GHC == 8.2.2
+
+extra-source-files:  cbits/hs_sha256.h
+                     changelog.md
+
+source-repository head
+  type:     git
+  location: https://github.com/haskell-hvr/cryptohash-sha256.git
+
+flag exe
+  description: Enable building @sha256sum@ executable
+  manual:   True
+  default:  False
+
+flag use-cbits
+  description: Use fast optimized C routines via FFI; if flag is disabled falls back to non-FFI Haskell optimized implementation.
+  manual:   True
+  default:  True
+
+library
+  default-language:  Haskell2010
+
+  ghc-options:       -Wall
+
+  build-depends:     base              >= 4.5 && < 5
+
+  exposed-modules:   Crypto.Hash.SHA256
+
+  if flag(use-cbits)
+    build-depends:     bytestring      ^>= 0.9.2.0 || ^>= 0.10.0.0 || ^>= 0.11.0.0 || ^>= 0.12.0.2
+
+    other-extensions:  BangPatterns
+                       CApiFFI
+                       CPP
+                       Trustworthy
+                       Unsafe
+
+    hs-source-dirs:    src
+    other-modules:     Crypto.Hash.SHA256.FFI
+                       Compat
+    include-dirs:      cbits
+  else
+    hs-source-dirs:    src-pure
+    build-depends:     cryptohash-sha256-pure ^>= 0.1.0
+
+executable sha256sum
+  default-language:  Haskell2010
+  hs-source-dirs:    src-exe
+  main-is:           sha256sum.hs
+  ghc-options:       -Wall -threaded
+  if flag(exe)
+    other-extensions:  RecordWildCards
+    build-depends:     cryptohash-sha256
+                     , base
+                     , bytestring
+
+                     , base16-bytestring ^>= 0.1.1 || ^>= 1.0.0
+  else
+    buildable:       False
+
+test-suite test-sha256
+  default-language:  Haskell2010
+  other-extensions:  OverloadedStrings
+  type:              exitcode-stdio-1.0
+  hs-source-dirs:    src-tests
+  main-is:           test-sha256.hs
+  ghc-options:       -Wall -threaded
+  build-depends:     cryptohash-sha256
+                   , base
+                   , bytestring
+
+                   , base16-bytestring ^>= 0.1.1 || ^>= 1.0.0
+                   , SHA               ^>= 1.6.4
+                   , tasty             ^>= 1.4   || ^>= 1.5
+                   , tasty-quickcheck   >= 0.10  && < 1
+                   , tasty-hunit       ^>= 0.10
+
+benchmark bench-sha256
+  default-language:  Haskell2010
+  other-extensions:  BangPatterns
+  type:              exitcode-stdio-1.0
+  main-is:           bench-sha256.hs
+  hs-source-dirs:    src-bench
+  build-depends:     cryptohash-sha256
+                   , SHA               ^>= 1.6.4
+                   , base
+                   , bytestring
+                   , criterion         ^>= 1.5 || ^>=1.6
+
+  -- not yet public
+  -- build-depends: cryptohash-sha256-pure ^>= 0.1.0

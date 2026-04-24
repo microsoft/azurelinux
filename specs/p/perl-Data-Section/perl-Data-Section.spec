@@ -13,7 +13,7 @@
 
 Name:           perl-Data-Section
 Version:        0.200008
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        Read multiple hunks of data out of your DATA section
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Data-Section

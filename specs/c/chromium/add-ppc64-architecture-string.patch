@@ -1,0 +1,13 @@
+Index: chromium-144.0.7559.59/base/system/sys_info.cc
+===================================================================
+--- chromium-144.0.7559.59.orig/base/system/sys_info.cc
++++ chromium-144.0.7559.59/base/system/sys_info.cc
+@@ -263,6 +263,8 @@ std::string SysInfo::ProcessCPUArchitect
+   return "ARM";
+ #elif defined(ARCH_CPU_ARM64)
+   return "ARM_64";
++#elif defined(ARCH_CPU_PPC64)
++  return "PPC_64";
+ #elif defined(ARCH_CPU_RISCV64)
+   return "RISCV_64";
+ #else

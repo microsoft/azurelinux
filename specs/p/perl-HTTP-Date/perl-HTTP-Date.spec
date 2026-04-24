@@ -3,7 +3,7 @@
 
 Name:           perl-HTTP-Date
 Version:        6.06
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        Date conversion routines
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/HTTP-Date

@@ -33,7 +33,7 @@
 Name:           freerdp
 Epoch:          2
 Version:        3.22.0
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Free implementation of the Remote Desktop Protocol (RDP)
 
 # The effective license is Apache-2.0 but:

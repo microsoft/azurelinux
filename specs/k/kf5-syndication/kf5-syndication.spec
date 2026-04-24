@@ -13,7 +13,7 @@
 Name:    kf5-%{framework}
 Epoch:   1
 Version: 5.116.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: The Syndication Library
 
 License: BSD-2-Clause AND CC0-1.0 AND GPL-2.0-or-later AND LGPL-2.0-or-later

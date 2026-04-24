@@ -9,7 +9,7 @@
 
 Name:           libkrunfw
 Version:        5.2.1
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        A dynamic library bundling the guest payload consumed by libkrun
 License:        LGPL-2.1-only AND GPL-2.0-only
 URL:            https://github.com/containers/libkrunfw

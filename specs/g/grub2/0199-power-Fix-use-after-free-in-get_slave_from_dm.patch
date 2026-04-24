@@ -1,0 +1,32 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 8 Jan 2024 16:03:54 -0500
+Subject: [PATCH] power: Fix use after free in get_slave_from_dm()
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/osdep/linux/ofpath.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/osdep/linux/ofpath.c b/grub-core/osdep/linux/ofpath.c
+index cc849d9c94c..72772c87a66 100644
+--- a/grub-core/osdep/linux/ofpath.c
++++ b/grub-core/osdep/linux/ofpath.c
+@@ -775,6 +775,8 @@ get_slave_from_dm(const char * device){
+ 
+     device_path = grub_xasprintf ("/sys/block/%s/slaves", curr_device);
+     dp = opendir(device_path);
++    if (dp == NULL)
++      grub_util_warn (_("cannot open directory `%s'"), device_path);
+     free(device_path);
+ 
+     if (dp != NULL)
+@@ -800,8 +802,6 @@ get_slave_from_dm(const char * device){
+       }
+       closedir (dp);
+     }
+-    else
+-      grub_util_warn (_("cannot open directory `%s'"), device_path);
+   }
+ 
+   free (directory);

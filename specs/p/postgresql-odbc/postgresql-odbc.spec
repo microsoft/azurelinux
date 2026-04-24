@@ -8,7 +8,7 @@
 Name: postgresql-odbc
 Summary: PostgreSQL ODBC driver
 Version: 16.00.0000
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: LGPL-2.0-or-later
 URL: https://odbc.postgresql.org/
 

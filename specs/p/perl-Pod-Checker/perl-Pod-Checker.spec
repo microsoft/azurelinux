@@ -5,7 +5,7 @@ Name:           perl-Pod-Checker
 # Compete with perl.spec
 Epoch:          4
 Version:        1.77
-Release:        520%{?dist}
+Release: 521%{?dist}
 Summary:        Check POD documents for syntax errors
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Pod-Checker

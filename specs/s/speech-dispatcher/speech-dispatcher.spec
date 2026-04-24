@@ -9,7 +9,7 @@
 
 Name:          speech-dispatcher
 Version:       0.12.1
-Release:       5%{?dist}
+Release: 6%{?dist}
 Summary:       To provide a high-level device independent layer for speech synthesis
 
 # Almost all files are under GPL-2.0-or-later, however

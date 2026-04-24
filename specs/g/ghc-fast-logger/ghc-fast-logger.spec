@@ -18,7 +18,7 @@
 Name:           ghc-%{pkg_name}
 Version:        3.2.5
 # can only be reset when subpkg bumped
-Release:        27%{?dist}
+Release: 28%{?dist}
 Summary:        A fast logging system
 
 License:        BSD-3-Clause

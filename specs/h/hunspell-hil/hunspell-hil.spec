@@ -11,7 +11,7 @@ Name: hunspell-hil
 Summary: Hiligaynon hunspell dictionaries
 Epoch: 1
 Version: 0.14
-Release: 32%{?dist}
+Release: 33%{?dist}
 Source: https://addons.mozilla.org/firefox/downloads/file/108895/litreoir_hiligaynon-%{version}-tb+fx+sm.xpi
 URL: http://extensions.services.openoffice.org/project/hunspell-hil
 License: GPL-2.0-or-later

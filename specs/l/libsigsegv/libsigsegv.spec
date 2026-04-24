@@ -3,7 +3,7 @@
 
 Name:    libsigsegv
 Version: 2.15
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Library for handling page faults in user mode
 
 License: GPL-2.0-or-later

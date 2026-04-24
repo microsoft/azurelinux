@@ -3,7 +3,7 @@
 
 Name:           pyxdg
 Version:        0.28
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Python library to access freedesktop.org standards
 License:        LGPL-2.0-only
 URL:            http://freedesktop.org/Software/pyxdg

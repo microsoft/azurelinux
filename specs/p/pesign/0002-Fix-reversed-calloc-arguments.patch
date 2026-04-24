@@ -1,0 +1,41 @@
+From 1f9e2fa0b4d872fdd01ca3ba81b04dfb1211a187 Mon Sep 17 00:00:00 2001
+From: Stephen Gallagher <sgallagh@redhat.com>
+Date: Fri, 2 Feb 2024 09:32:48 -0500
+Subject: [PATCH] Fix reversed calloc() arguments
+
+The prototype is "void *calloc(size_t nelem, size_t elsize);"
+
+These two instances had them reversed, almost certainly leading to
+buffer overflow issues. This was detected by
+-Werror=calloc-transposed-args on gcc.
+
+Signed-off-by: Stephen Gallagher <sgallagh@redhat.com>
+---
+ src/pesigcheck.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/pesigcheck.c b/src/pesigcheck.c
+index 6dc67f76a81..8119cf10a7b 100644
+--- a/src/pesigcheck.c
++++ b/src/pesigcheck.c
+@@ -240,7 +240,7 @@ check_signature(pesigcheck_context *ctx, int *nreasons,
+ 
+ 	cert_iter iter;
+ 
+-	reasonps = calloc(sizeof(struct reason), 512);
++	reasonps = calloc(512, sizeof(struct reason));
+ 	if (!reasonps)
+ 		err(1, "check_signature");
+ 
+@@ -281,7 +281,7 @@ check_signature(pesigcheck_context *ctx, int *nreasons,
+ 
+ 			num_reasons += 16;
+ 
+-			new_reasons = calloc(sizeof(struct reason), num_reasons);
++			new_reasons = calloc(num_reasons, sizeof(struct reason));
+ 			if (!new_reasons)
+ 				err(1, "check_signature");
+ 			reasonps = new_reasons;
+-- 
+2.41.0
+

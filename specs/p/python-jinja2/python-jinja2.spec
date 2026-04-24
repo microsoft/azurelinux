@@ -5,7 +5,7 @@
 
 Name:           python-jinja2
 Version:        3.1.6
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        General purpose template engine
 License:        BSD-3-Clause
 URL:            https://palletsprojects.com/p/jinja/

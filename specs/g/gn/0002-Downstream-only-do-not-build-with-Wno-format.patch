@@ -1,0 +1,25 @@
+From 8bbbd89be97178be941bd11071c009145d3caf4b Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Thu, 30 May 2024 08:56:58 -0400
+Subject: [PATCH 2/2] Downstream-only: do not build with -Wno-format
+
+This conflicts with -Werror=format-security.
+---
+ build/gen.py | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/build/gen.py b/build/gen.py
+index 2cb433bc..155c579f 100755
+--- a/build/gen.py
++++ b/build/gen.py
+@@ -513,7 +513,6 @@ def WriteGNNinja(path, platform, host, options, args_list):
+         '-Wno-implicit-fallthrough',
+         '-Wno-redundant-move',
+         '-Wno-unused-variable',
+-        '-Wno-format',             # Use of %llx, which is supported by _UCRT, false positive
+         '-Wno-strict-aliasing',    # Dereferencing punned pointer
+         '-Wno-cast-function-type', # Casting FARPROC to RegDeleteKeyExPtr
+       ])
+-- 
+2.44.0
+

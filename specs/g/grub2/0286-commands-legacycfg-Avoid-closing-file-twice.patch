@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leo Sandoval <lsandova@redhat.com>
+Date: Wed, 16 Oct 2024 11:54:38 -0600
+Subject: [PATCH] commands/legacycfg: Avoid closing file twice
+
+An internal (at Red Hat) static soure code scan detected an
+use-after-free scenario:
+
+  Error: USE_AFTER_FREE (CWE-416):
+  grub-2.06/grub-core/commands/legacycfg.c:194: freed_arg: "grub_file_close" frees "file".
+  grub-2.06/grub-core/commands/legacycfg.c:201: deref_arg: Calling "grub_file_close" dereferences freed pointer "file".
+  #  199|         if (!args)
+  #  200|   	{
+  #  201|-> 	  grub_file_close (file);
+  #  202|   	  grub_free (suffix);
+  #  203|   	  grub_free (entrysrc);
+
+So, remove the extra file close call.
+
+Signed-off-by: Leo Sandoval <lsandova@redhat.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/commands/legacycfg.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/grub-core/commands/legacycfg.c b/grub-core/commands/legacycfg.c
+index 2c5d1a0ef..86bcda695 100644
+--- a/grub-core/commands/legacycfg.c
++++ b/grub-core/commands/legacycfg.c
+@@ -198,7 +198,6 @@ legacy_file (const char *filename)
+       const char **args = grub_malloc (sizeof (args[0]));
+       if (!args)
+ 	{
+-	  grub_file_close (file);
+ 	  grub_free (suffix);
+ 	  grub_free (entrysrc);
+ 	  return grub_errno;

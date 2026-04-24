@@ -7,7 +7,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 7.1.0
-Release: 14%{?dist}
+Release: 15%{?dist}
 Summary: Tool to execute plain-text documents as functional tests
 License: MIT
 URL: https://cucumber.io/

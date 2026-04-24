@@ -15,7 +15,7 @@
 Summary:	Checks if scalar is valid UTF-8
 Name:		perl-Unicode-CheckUTF8
 Version:	1.03
-Release:	45%{?dist}
+Release: 46%{?dist}
 License:	Unicode-3.0 AND (GPL-1.0-or-later OR Artistic-1.0-Perl)
 URL:		https://metacpan.org/release/Unicode-CheckUTF8
 Source0:	https://cpan.metacpan.org/modules/by-module/Unicode/Unicode-CheckUTF8-%{version}.tar.gz

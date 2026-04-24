@@ -3,7 +3,7 @@
 
 Name: liburing
 Version: 2.12
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Linux-native io_uring I/O access library
 License: (GPL-2.0-only WITH Linux-syscall-note OR MIT) AND (LGPL-2.0-or-later OR MIT)
 Source0: https://brick.kernel.dk/snaps/%{name}-%{version}.tar.gz

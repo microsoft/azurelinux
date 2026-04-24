@@ -4,7 +4,7 @@
 Summary: Convert filename encodings
 Name: convmv
 Version: 2.06
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 License: GPL-2.0-only OR GPL-3.0-only
 URL: http://j3e.de/linux/convmv

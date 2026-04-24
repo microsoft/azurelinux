@@ -3,7 +3,7 @@
 
 Name:           perl-libxml-perl
 Version:        0.08
-Release:        55%{?dist}
+Release: 56%{?dist}
 Summary:        A collection of Perl modules for working with XML
 License:        (GPL-1.0-or-later OR Artistic-1.0-Perl) AND LicenseRef-Fedora-Public-Domain
 URL:            https://metacpan.org/release/libxml-perl

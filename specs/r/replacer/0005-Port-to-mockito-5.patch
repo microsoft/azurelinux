@@ -1,0 +1,222 @@
+From 682d414dffc5daa75e35a380f4264b950788598c Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Thu, 12 Sep 2024 11:24:25 +0200
+Subject: [PATCH] Port to mockito 5
+
+---
+ .../ReplacementProcessorTest.java             |  8 +++----
+ .../ReplacementTest.java                      | 10 ++++-----
+ .../ReplacerFactoryTest.java                  |  2 +-
+ .../ReplacerMojoIntegrationTest.java          |  6 ++---
+ .../ReplacerMojoTest.java                     | 22 +++++++++----------
+ .../TokenValueMapFactoryTest.java             |  2 +-
+ 6 files changed, 25 insertions(+), 25 deletions(-)
+
+diff --git a/src/test/java/com/google/code/maven_replacer_plugin/ReplacementProcessorTest.java b/src/test/java/com/google/code/maven_replacer_plugin/ReplacementProcessorTest.java
+index 83d088c..a3e6c44 100644
+--- a/src/test/java/com/google/code/maven_replacer_plugin/ReplacementProcessorTest.java
++++ b/src/test/java/com/google/code/maven_replacer_plugin/ReplacementProcessorTest.java
+@@ -3,14 +3,14 @@ package com.google.code.maven_replacer_plugin;
+ 
+ import static java.util.Arrays.asList;
+ import static org.mockito.Mockito.verify;
+-import static org.mockito.Mockito.verifyZeroInteractions;
++import static org.mockito.Mockito.verifyNoInteractions;
+ import static org.mockito.Mockito.when;
+ 
+ import org.junit.Before;
+ import org.junit.Test;
+ import org.junit.runner.RunWith;
+ import org.mockito.Mock;
+-import org.mockito.runners.MockitoJUnitRunner;
++import org.mockito.junit.MockitoJUnitRunner;
+ 
+ import com.google.code.maven_replacer_plugin.file.FileUtils;
+ 
+@@ -69,7 +69,7 @@ public class ReplacementProcessorTest {
+ 		when(replacement.getToken()).thenReturn(null);
+ 		
+ 		processor.replace(asList(replacement), USE_REGEX, FILE, OUTPUT_FILE, REGEX_FLAGS, ENCODING);
+-		verifyZeroInteractions(fileUtils);
++		verifyNoInteractions(fileUtils);
+ 	}
+ 	
+ 	@Test (expected = IllegalArgumentException.class)
+@@ -77,6 +77,6 @@ public class ReplacementProcessorTest {
+ 		when(replacement.getToken()).thenReturn("");
+ 		
+ 		processor.replace(asList(replacement), USE_REGEX, FILE, OUTPUT_FILE, REGEX_FLAGS, ENCODING);
+-		verifyZeroInteractions(fileUtils);
++		verifyNoInteractions(fileUtils);
+ 	}
+ }
+diff --git a/src/test/java/com/google/code/maven_replacer_plugin/ReplacementTest.java b/src/test/java/com/google/code/maven_replacer_plugin/ReplacementTest.java
+index 725ec78..263addd 100644
+--- a/src/test/java/com/google/code/maven_replacer_plugin/ReplacementTest.java
++++ b/src/test/java/com/google/code/maven_replacer_plugin/ReplacementTest.java
+@@ -2,13 +2,13 @@ package com.google.code.maven_replacer_plugin;
+ 
+ import static org.hamcrest.MatcherAssert.assertThat;
+ import static org.hamcrest.Matchers.equalTo;
+-import static org.mockito.Mockito.verifyZeroInteractions;
++import static org.mockito.Mockito.verifyNoInteractions;
+ import static org.mockito.Mockito.when;
+ 
+ import org.junit.Test;
+ import org.junit.runner.RunWith;
+ import org.mockito.Mock;
+-import org.mockito.runners.MockitoJUnitRunner;
++import org.mockito.junit.MockitoJUnitRunner;
+ 
+ import com.google.code.maven_replacer_plugin.file.FileUtils;
+ 
+@@ -34,7 +34,7 @@ public class ReplacementTest {
+ 		
+ 		assertThat(replacement.getToken(), equalTo(TOKEN));
+ 		assertThat(replacement.getValue(), equalTo(VALUE));
+-		verifyZeroInteractions(fileUtils);
++		verifyNoInteractions(fileUtils);
+ 	}
+ 	
+ 	@Test
+@@ -44,7 +44,7 @@ public class ReplacementTest {
+ 		
+ 		assertThat(replacement.getToken(), equalTo("new token"));
+ 		assertThat(replacement.getValue(), equalTo(VALUE));
+-		verifyZeroInteractions(fileUtils);
++		verifyNoInteractions(fileUtils);
+ 	}
+ 	
+ 	@Test
+@@ -53,7 +53,7 @@ public class ReplacementTest {
+ 		
+ 		assertThat(replacement.getToken(), equalTo(ESCAPED));
+ 		assertThat(replacement.getValue(), equalTo(ESCAPED));
+-		verifyZeroInteractions(fileUtils);
++		verifyNoInteractions(fileUtils);
+ 	}
+ 	
+ 	@Test
+diff --git a/src/test/java/com/google/code/maven_replacer_plugin/ReplacerFactoryTest.java b/src/test/java/com/google/code/maven_replacer_plugin/ReplacerFactoryTest.java
+index 86b5055..83f041f 100644
+--- a/src/test/java/com/google/code/maven_replacer_plugin/ReplacerFactoryTest.java
++++ b/src/test/java/com/google/code/maven_replacer_plugin/ReplacerFactoryTest.java
+@@ -6,7 +6,7 @@ import static org.mockito.Mockito.when;
+ import org.junit.Test;
+ import org.junit.runner.RunWith;
+ import org.mockito.Mock;
+-import org.mockito.runners.MockitoJUnitRunner;
++import org.mockito.junit.MockitoJUnitRunner;
+ 
+ 
+ @RunWith(MockitoJUnitRunner.class)
+diff --git a/src/test/java/com/google/code/maven_replacer_plugin/ReplacerMojoIntegrationTest.java b/src/test/java/com/google/code/maven_replacer_plugin/ReplacerMojoIntegrationTest.java
+index 0fef2f3..fbe7ff3 100644
+--- a/src/test/java/com/google/code/maven_replacer_plugin/ReplacerMojoIntegrationTest.java
++++ b/src/test/java/com/google/code/maven_replacer_plugin/ReplacerMojoIntegrationTest.java
+@@ -6,12 +6,12 @@ import static org.hamcrest.Matchers.containsString;
+ import static org.hamcrest.Matchers.equalTo;
+ import static org.junit.Assert.assertFalse;
+ import static org.junit.Assert.assertTrue;
+-import static org.mockito.Matchers.anyString;
++import static org.mockito.ArgumentMatchers.anyString;
+ import static org.mockito.hamcrest.MockitoHamcrest.argThat;
+ import static org.mockito.Mockito.mock;
+ import static org.mockito.Mockito.never;
+ import static org.mockito.Mockito.verify;
+-import static org.mockito.Mockito.verifyZeroInteractions;
++import static org.mockito.Mockito.verifyNoInteractions;
+ 
+ import java.io.File;
+ import java.io.IOException;
+@@ -350,7 +350,7 @@ public class ReplacerMojoIntegrationTest {
+ 	public void shouldRethrowIOExceptionsAsMojoExceptions() throws Exception {
+ 		mojo.setFile("bogus");
+ 		mojo.execute();
+-		verifyZeroInteractions(log);
++		verifyNoInteractions(log);
+ 	}
+ 	
+ 	@Test
+diff --git a/src/test/java/com/google/code/maven_replacer_plugin/ReplacerMojoTest.java b/src/test/java/com/google/code/maven_replacer_plugin/ReplacerMojoTest.java
+index a2108c6..eca47cd 100644
+--- a/src/test/java/com/google/code/maven_replacer_plugin/ReplacerMojoTest.java
++++ b/src/test/java/com/google/code/maven_replacer_plugin/ReplacerMojoTest.java
+@@ -7,17 +7,17 @@ import static org.hamcrest.MatcherAssert.assertThat;
+ import static org.hamcrest.Matchers.equalTo;
+ import static org.junit.Assert.assertTrue;
+ import static org.junit.Assert.fail;
+-import static org.mockito.Matchers.any;
+-import static org.mockito.Matchers.anyInt;
+-import static org.mockito.Matchers.anyString;
++import static org.mockito.ArgumentMatchers.any;
++import static org.mockito.ArgumentMatchers.anyInt;
++import static org.mockito.ArgumentMatchers.anyString;
+ import static org.mockito.hamcrest.MockitoHamcrest.argThat;
+-import static org.mockito.Matchers.eq;
+-import static org.mockito.Matchers.isA;
++import static org.mockito.ArgumentMatchers.eq;
++import static org.mockito.ArgumentMatchers.isA;
+ import static org.mockito.Mockito.mock;
+ import static org.mockito.Mockito.never;
+ import static org.mockito.Mockito.times;
+ import static org.mockito.Mockito.verify;
+-import static org.mockito.Mockito.verifyZeroInteractions;
++import static org.mockito.Mockito.verifyNoInteractions;
+ import static org.mockito.Mockito.when;
+ 
+ import java.io.File;
+@@ -34,7 +34,7 @@ import org.junit.Before;
+ import org.junit.Test;
+ import org.junit.runner.RunWith;
+ import org.mockito.Mock;
+-import org.mockito.runners.MockitoJUnitRunner;
++import org.mockito.junit.MockitoJUnitRunner;
+ 
+ import com.google.code.maven_replacer_plugin.file.FileUtils;
+ import com.google.code.maven_replacer_plugin.include.FileSelector;
+@@ -124,8 +124,8 @@ public class ReplacerMojoTest {
+ 		mojo.setSkip(true);
+ 		mojo.execute();
+ 		
+-		verifyZeroInteractions(processor);
+-		verifyZeroInteractions(summaryBuilder);
++		verifyNoInteractions(processor);
++		verifyNoInteractions(summaryBuilder);
+ 	}
+ 	
+ 	@Test
+@@ -402,7 +402,7 @@ public class ReplacerMojoTest {
+ 		mojo.setIgnoreMissingFile(true);
+ 
+ 		mojo.execute();
+-		verifyZeroInteractions(replacerFactory);
++		verifyNoInteractions(replacerFactory);
+ 		verify(log).info(anyString());
+ 		verify(summaryBuilder, never()).add(anyString(), anyString(), anyString(), isA(Log.class));
+ 		verify(summaryBuilder).print(log);
+@@ -415,7 +415,7 @@ public class ReplacerMojoTest {
+ 			mojo.execute();
+ 			fail("Should have thrown exception");
+ 		} catch (MojoExecutionException e) {
+-			verifyZeroInteractions(replacerFactory);
++			verifyNoInteractions(replacerFactory);
+ 			verify(log, times(2)).error("<ignoreMissingFile> only useable with <file>");
+ 			verify(summaryBuilder, never()).add(anyString(), anyString(), anyString(), isA(Log.class));
+ 			verify(summaryBuilder).print(log);
+diff --git a/src/test/java/com/google/code/maven_replacer_plugin/TokenValueMapFactoryTest.java b/src/test/java/com/google/code/maven_replacer_plugin/TokenValueMapFactoryTest.java
+index 240eb0f..190a721 100644
+--- a/src/test/java/com/google/code/maven_replacer_plugin/TokenValueMapFactoryTest.java
++++ b/src/test/java/com/google/code/maven_replacer_plugin/TokenValueMapFactoryTest.java
+@@ -17,7 +17,7 @@ import org.junit.Before;
+ import org.junit.Test;
+ import org.junit.runner.RunWith;
+ import org.mockito.Mock;
+-import org.mockito.runners.MockitoJUnitRunner;
++import org.mockito.junit.MockitoJUnitRunner;
+ 
+ import com.google.code.maven_replacer_plugin.file.FileUtils;
+ 
+-- 
+2.46.0
+

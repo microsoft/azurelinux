@@ -3,7 +3,7 @@
 
 Name:           perl-DBM-Deep
 Version:        2.0019
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        A pure perl multi-level hash/array DBM
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/DBM-Deep

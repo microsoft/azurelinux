@@ -1,0 +1,27 @@
+From a9575efafc0981774b504df745040688e948fa8b Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Wed, 26 Feb 2025 07:26:26 +0100
+Subject: [PATCH 1/2] Load native library form /usr/lib/jline
+
+Forwarded: not-needed
+---
+ native/src/main/java/org/jline/nativ/JLineNativeLoader.java | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/native/src/main/java/org/jline/nativ/JLineNativeLoader.java b/native/src/main/java/org/jline/nativ/JLineNativeLoader.java
+index 6236d8f3..6684dd1d 100644
+--- a/native/src/main/java/org/jline/nativ/JLineNativeLoader.java
++++ b/native/src/main/java/org/jline/nativ/JLineNativeLoader.java
+@@ -499,6 +499,9 @@ public class JLineNativeLoader {
+ 
+         // As a last resort try from java.library.path
+         String javaLibraryPath = System.getProperty("java.library.path", "");
++        // Fedora/RHEL specific: JNI shared objects MUST be placed in %{_libdir}/%{name}
++        // See https://docs.fedoraproject.org/en-US/packaging-guidelines/Java/#JNI
++        javaLibraryPath = "/usr/lib/jline" + File.pathSeparator + javaLibraryPath;
+         for (String ldPath : javaLibraryPath.split(File.pathSeparator)) {
+             if (ldPath.isEmpty()) {
+                 continue;
+-- 
+2.50.1
+

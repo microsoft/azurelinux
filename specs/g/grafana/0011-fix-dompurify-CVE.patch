@@ -1,0 +1,58 @@
+From: Sam Feifer <sfeifer@redhat.com>
+Subject: [PATCH] fix dompurify CVE
+
+diff --git a/package.json b/package.json
+index 38deb6d7dee..010a24fb451 100644
+--- a/package.json
++++ b/package.json
+@@ -432,7 +432,8 @@
+     "react-split-pane@0.1.92": "patch:react-split-pane@npm:0.1.92#.yarn/patches/react-split-pane-npm-0.1.92-93dbf51dff.patch",
+     "@storybook/blocks@7.4.5": "patch:@storybook/blocks@npm%3A7.4.5#./.yarn/patches/@storybook-blocks-npm-7.4.5-5a2374564a.patch",
+     "history@4.10.1": "patch:history@npm%3A4.10.1#./.yarn/patches/history-npm-4.10.1-ee217563ae.patch",
+-    "history@^4.9.0": "patch:history@npm%3A4.10.1#./.yarn/patches/history-npm-4.10.1-ee217563ae.patch"
++    "history@^4.9.0": "patch:history@npm%3A4.10.1#./.yarn/patches/history-npm-4.10.1-ee217563ae.patch",
++    "dompurify": "^2.5.0"
+   },
+   "workspaces": {
+     "packages": [
+diff --git a/packages/grafana-data/package.json b/packages/grafana-data/package.json
+index 2182744e61b..4201ef58dda 100644
+--- a/packages/grafana-data/package.json
++++ b/packages/grafana-data/package.json
+@@ -41,7 +41,7 @@
+     "@types/string-hash": "1.1.1",
+     "d3-interpolate": "3.0.1",
+     "date-fns": "2.30.0",
+-    "dompurify": "^2.4.3",
++    "dompurify": "^2.5.0",
+     "eventemitter3": "5.0.1",
+     "fast_array_intersect": "1.1.0",
+     "history": "4.10.1",
+diff --git a/yarn.lock b/yarn.lock
+index bf22ba52a17..88fc4d3fbfb 100644
+--- a/yarn.lock
++++ b/yarn.lock
+@@ -2953,7 +2953,7 @@ __metadata:
+     "@types/tinycolor2": "npm:1.4.3"
+     d3-interpolate: "npm:3.0.1"
+     date-fns: "npm:2.30.0"
+-    dompurify: "npm:^2.4.3"
++    dompurify: "npm:^2.5.0"
+     esbuild: "npm:0.18.12"
+     eventemitter3: "npm:5.0.1"
+     fast_array_intersect: "npm:1.1.0"
+@@ -14478,10 +14478,10 @@ __metadata:
+   languageName: node
+   linkType: hard
+ 
+-"dompurify@npm:^2.2.0, dompurify@npm:^2.4.3":
+-  version: 2.4.5
+-  resolution: "dompurify@npm:2.4.5"
+-  checksum: d764c2ff126b3749dad35bc34eed40f51141d7dfd620e938c92f08d68c32beeb259d06abadeee91f6e2a8c8737ce670e2124ac9a257ba3bcdc666598cebcde01
++"dompurify@npm:^2.5.0":
++  version: 2.5.7
++  resolution: "dompurify@npm:2.5.7"
++  checksum: b150ca1e28083252cd51097162dc96cb45203f7e2af1fbaa8ef32b4f4d6b605e4aa8915190d38bd0635cbbf14d13a200138cd3ec1b084096819b14c718355122
+   languageName: node
+   linkType: hard
+ 

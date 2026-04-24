@@ -6,7 +6,7 @@
 
 Name:           perl-meta
 Version:        0.015
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Meta-programming API
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/dist/meta

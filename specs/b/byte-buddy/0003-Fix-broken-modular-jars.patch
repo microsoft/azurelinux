@@ -1,0 +1,36 @@
+From 5dc1f89e58e41069158e4e00e7772220a6493480 Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Sat, 24 Feb 2024 17:01:21 +0100
+Subject: [PATCH] Fix broken modular jars
+
+---
+ byte-buddy/pom.xml | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/byte-buddy/pom.xml b/byte-buddy/pom.xml
+index b954bb7..68c18b4 100644
+--- a/byte-buddy/pom.xml
++++ b/byte-buddy/pom.xml
+@@ -162,9 +162,9 @@
+                 </dependencies>
+                 <executions>
+                     <execution>
+-                        <phase>prepare-package</phase>
++                        <phase>package</phase>
+                         <goals>
+-                            <goal>make-module</goal>
++                            <goal>inject-module</goal>
+                         </goals>
+                         <configuration>
+                             <skip>${modulemaker.skip}</skip>
+@@ -181,6 +181,7 @@
+                                 com.sun.jna,
+                                 com.sun.jna.platform
+                             </static-requires>
++                            <main-class>net.bytebuddy.build.Plugin$Engine$Default</main-class>
+                         </configuration>
+                     </execution>
+                 </executions>
+-- 
+2.43.0
+

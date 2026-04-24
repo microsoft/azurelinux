@@ -11,7 +11,7 @@
 Name:           perl-DateTime
 Epoch:          2
 Version:        1.66
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Date and time object for Perl
 License:        Artistic-2.0
 URL:            https://metacpan.org/release/DateTime

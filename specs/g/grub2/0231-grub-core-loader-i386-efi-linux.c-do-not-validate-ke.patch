@@ -1,0 +1,73 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
+Date: Thu, 3 Mar 2022 13:10:56 +0100
+Subject: [PATCH] grub-core/loader/i386/efi/linux.c: do not validate kernels
+ twice
+
+On codebases that have shim-lock-verifier built into the grub core
+(like 2.06 upstream), shim-lock-verifier is in enforcing mode when
+booted with secureboot. It means that grub_cmd_linux() command
+attempts to perform shim validate upon opening linux kernel image,
+including kernel measurement. And the verifier correctly returns file
+open error when shim validate protocol is not present or shim fails to
+validate the kernel.
+
+This makes the call to grub_linuxefi_secure_validate() redundant, but
+also harmful. As validating the kernel image twice, extends the PCRs
+with the same measurement twice. Which breaks existing sealing
+policies when upgrading from grub2.04+rhboot+sb+linuxefi to
+grub2.06+rhboot+sb+linuxefi builds. It is also incorrect to measure
+the kernel twice.
+
+This patch must not be ported to older editions of grub code bases
+that do not have verifiers framework, or it is not builtin, or
+shim-lock-verifier is an optional module.
+
+This patch is tested to ensure that unsigned kernels are not possible
+to boot in secureboot mode when shim rejects kernel, or shim protocol
+is missing, and that the measurements become stable once again. The
+above also ensures that CVE-2020-15705 is not reintroduced.
+
+Signed-off-by: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
+---
+ grub-core/loader/i386/efi/linux.c | 13 -------------
+ 1 file changed, 13 deletions(-)
+
+diff --git a/grub-core/loader/i386/efi/linux.c b/grub-core/loader/i386/efi/linux.c
+index 97484bbe24d..1dd787081f2 100644
+--- a/grub-core/loader/i386/efi/linux.c
++++ b/grub-core/loader/i386/efi/linux.c
+@@ -30,7 +30,6 @@
+ #include <grub/cpu/efi/memory.h>
+ #include <grub/tpm.h>
+ #include <grub/safemath.h>
+-#include <grub/efi/sb.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -278,7 +277,6 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+   grub_ssize_t start, filelen;
+   void *kernel = NULL;
+   int setup_header_end_offset;
+-  int rc;
+ 
+   grub_dl_ref (my_mod);
+ 
+@@ -308,17 +306,6 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+       goto fail;
+     }
+ 
+-  if (grub_efi_get_secureboot () == GRUB_EFI_SECUREBOOT_MODE_ENABLED)
+-    {
+-      rc = grub_linuxefi_secure_validate (kernel, filelen);
+-      if (rc <= 0)
+-	{
+-	  grub_error (GRUB_ERR_INVALID_COMMAND,
+-		      N_("%s has invalid signature"), argv[0]);
+-	  goto fail;
+-	}
+-    }
+-
+   lh = (struct linux_i386_kernel_header *)kernel;
+   grub_dprintf ("linux", "original lh is at %p\n", kernel);
+ 

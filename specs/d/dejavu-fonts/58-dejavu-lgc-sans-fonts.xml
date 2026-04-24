@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+<!-- SPDX-License-Identifier: MIT -->
+<fontconfig>
+  <group>
+    <target>DejaVu LGC Sans</target>
+    <match>
+      <family>DejaVu LGC Sans</family>
+      <change>
+        <style>Book</style>
+        <into>Regular</into>
+      </change>
+    </match>
+    <like>
+      <family>DejaVu Sans</family>
+      <family>BPG 2017 DejaVu Sans</family>
+      <family>Arev Sans</family>
+      <family>Bepa</family>
+      <family>Hunky Sans</family>
+      <family>Olwen Sans</family>
+      <family>SUSE Sans</family>
+      <family>Verajja</family>
+      <family>VerajjaPDA</family>
+      <family>Bitstream Vera Sans</family>
+      <family>Prima Sans</family>
+      <family>sans-serif</family>
+    </like>
+  </group>
+</fontconfig>
+

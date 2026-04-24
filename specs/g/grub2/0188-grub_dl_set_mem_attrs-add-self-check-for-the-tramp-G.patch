@@ -1,0 +1,140 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Laszlo Ersek <lersek@redhat.com>
+Date: Fri, 7 Apr 2023 16:21:54 +0200
+Subject: [PATCH] grub_dl_set_mem_attrs(): add self-check for the tramp/GOT
+ sizes
+
+On aarch64 UEFI, we currently have a crasher:
+
+  grub_dl_load_core()
+    grub_dl_load_core_noinit()
+
+      /* independent allocation: must remain writable */
+      mod = grub_zalloc();
+
+      /* allocates module image with incorrect tail alignment */
+      grub_dl_load_segments()
+
+      /* write-protecting the module image makes "mod" read-only! */
+      grub_dl_set_mem_attrs()
+        grub_update_mem_attrs()
+
+    grub_dl_init()
+      /* page fault, crash */
+      mod->next = ...;
+
+- Commit 887f1d8fa976 ("modules: load module sections at page-aligned
+  addresses", 2023-02-08) forgot to page-align the allocation of the
+  trampolines and GOT areas of grub2 modules, in grub_dl_load_segments().
+
+- Commit ad1b904d325b ("nx: set page permissions for loaded modules.",
+  2023-02-08) calculated a common bounding box for the trampolines and GOT
+  areas in grub_dl_set_mem_attrs(), rounded the box size up to a whole
+  multiple of EFI page size ("arch_addralign"), and write-protected the
+  resultant page range.
+
+Consequently, grub_dl_load_segments() places the module image in memory
+such that its tail -- the end of the trampolines and GOT areas -- lands at
+the head of a page whose tail in turn contains independent memory
+allocations, such as "mod". grub_dl_set_mem_attrs() will then unwittingly
+write-protect these other allocations too.
+
+But "mod" must remain writable: we assign "mod->next" in grub_dl_init()
+subsequently. Currently we crash there with a page fault / permission
+fault.
+
+(The crash is not trivial to hit: the tramp/GOT areas are irrelevant on
+x86_64, plus the page protection depends on the UEFI platform firmware
+providing EFI_MEMORY_ATTRIBUTE_PROTOCOL. In practice, the crash is
+restricted to aarch64 edk2 (ArmVirtQemu) builds containing commit
+1c4dfadb4611, "ArmPkg/CpuDxe: Implement EFI memory attributes protocol",
+2023-03-16.)
+
+Example log before the patch:
+
+> kern/dl.c:736: updating attributes for GOT and trampolines ("video_fb")
+> kern/efi/mm.c:927: set +rx -w on 0x13b88b000-0x13b88bfff before:rwx after:r-x
+> kern/dl.c:744: done updating module memory attributes for "video_fb"
+> kern/dl.c:639: flushing 0xe4f0 bytes at 0x13b87d000
+> kern/arm64/cache.c:42: D$ line size: 64
+> kern/arm64/cache.c:43: I$ line size: 64
+> kern/dl.c:839: module name: video_fb
+> kern/dl.c:840: init function: 0x0
+> kern/dl.c:865: Initing module video_fb
+>
+> Synchronous Exception at 0x000000013B8A76EC
+> PC 0x00013B8A76EC
+>
+>   X0 0x000000013B88B960   X1 0x0000000000000000   X2 0x000000013F93587C   X3 0x0000000000000075
+>
+>   SP 0x00000000470745C0  ELR 0x000000013B8A76EC  SPSR 0x60000205  FPSR 0x00000000
+>  ESR 0x9600004F          FAR 0x000000013B88B9D0
+>
+>  ESR : EC 0x25  IL 0x1  ISS 0x0000004F
+>
+> Data abort: Permission fault, third level
+
+Note the following:
+
+- The whole 4K page at 0x1_3B88_B000 is write-protected.
+
+- The "video_fb" module actually lives at [0x1_3B87_D000, 0x1_3B88_B4F0)
+  -- left-inclusive, right-exclusive --; that is, in the last page (at
+  0x1_3B88_B000), it only occupies the first 0x4F0 bytes.
+
+- The instruction at 0x1_3B8A_76EC faults. Not shown here, but it is a
+  store instruction, which writes to the field at offset 0x70 of the
+  structure pointed-to by the X0 register. This is the "mod->next"
+  assignment from grub_dl_init().
+
+- The faulting address is therefore (X0 + 0x70), i.e., 0x1_3B88_B9D0. This
+  is indeed the value held in the FAR register.
+
+- The faulting address 0x1_3B88_B9D0 falls in the above-noted page (at
+  0x1_3B88_B000), namely at offset 0x9D0. This is *beyond* the first 0x4F0
+  bytes that the very tail of the "video_fb" module occupies at the front
+  of that page.
+
+For now, add a self-check that reports this bug (and prevents the crash by
+skipping the write protection).
+
+Example log after the patch:
+
+> kern/dl.c:742:BUG: trying to protect pages outside of module allocation
+> ("video_fb"): module base 0x13b87d000, size 0xe4f0; tramp/GOT base
+> 0x13b88b000, size 0x1000
+
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+---
+ grub-core/kern/dl.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/kern/dl.c b/grub-core/kern/dl.c
+index 101e0794dd8..bad0ad4b945 100644
+--- a/grub-core/kern/dl.c
++++ b/grub-core/kern/dl.c
+@@ -682,7 +682,7 @@ grub_dl_set_mem_attrs (grub_dl_t mod, void *ehdr)
+ #if !defined (__i386__) && !defined (__x86_64__) && !defined(__riscv)
+   grub_size_t arch_addralign = grub_arch_dl_min_alignment ();
+   grub_addr_t tgaddr;
+-  grub_uint64_t tgsz;
++  grub_size_t tgsz;
+ #endif
+ 
+   grub_dprintf ("modules", "updating memory attributes for \"%s\"\n",
+@@ -736,6 +736,15 @@ grub_dl_set_mem_attrs (grub_dl_t mod, void *ehdr)
+       grub_dprintf ("modules",
+ 		    "updating attributes for GOT and trampolines (\"%s\")\n",
+ 		    mod->name);
++      if (tgaddr < (grub_addr_t)mod->base ||
++          tgsz > (grub_addr_t)-1 - tgaddr ||
++	  tgaddr + tgsz > (grub_addr_t)mod->base + mod->sz)
++	return grub_error (GRUB_ERR_BUG,
++			   "BUG: trying to protect pages outside of module "
++			   "allocation (\"%s\"): module base %p, size 0x%"
++			   PRIxGRUB_SIZE "; tramp/GOT base 0x%" PRIxGRUB_ADDR
++			   ", size 0x%" PRIxGRUB_SIZE,
++			   mod->name, mod->base, mod->sz, tgaddr, tgsz);
+       grub_update_mem_attrs (tgaddr, tgsz, GRUB_MEM_ATTR_R|GRUB_MEM_ATTR_X,
+ 			     GRUB_MEM_ATTR_W);
+     }

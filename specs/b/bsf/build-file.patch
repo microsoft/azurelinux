@@ -1,0 +1,33 @@
+--- bsf-2.4.0-orig/build.xml	2009-09-09 11:51:20.000000000 +0200
++++ bsf-2.4.0/build.xml	2009-09-14 08:42:17.000000000 +0200
+@@ -102,7 +102,7 @@
+ 		<pathelement location="${build.tests}"/>
+ 	</path>
+ 
+-	<target name="init" depends="clean">
++	<target name="init">
+ 		<tstamp />
+ 
+ 
+@@ -134,11 +134,13 @@
+ 
+ 		<available property="junit.present" classname="junit.framework.TestCase" />
+ 
++		<!--
+ 		<uptodate property="javac.notRequired" targetfile="${build.lib}/${project.name}.jar">
+ 			<srcfiles dir="${src.dir}">
+ 				<patternset refid="javac.source.files" />
+ 			</srcfiles>
+ 		</uptodate>
++		-->		
+ 
+ 		<uptodate property="javadoc.required" targetfile="${build.lib}/${project.name}.jar">
+ 			<srcfiles dir="${build.dir}" includes="**/*.html" />
+@@ -268,6 +270,7 @@
+ 		<mkdir dir="${build.javadocs}" />
+ 		<!-- FIXME: Excluding some packages temporarily -->
+ 		<javadoc packagenames="${packages}" failonerror="true" excludepackagenames="org.apache.bsf.engines.java, org.apache.bsf.engines.javaclass" destdir="${build.javadocs}" author="true" version="false" use="true" windowtitle="${project.fullName} API" doctitle="${project.fullName}" source="${source.level}">
++			<arg value="-Xdoclint:none" />
+ 			<classpath refid="compile.classpath" />
+ 			<fileset dir="${src.dir}">
+ 				<patternset refid="java.source.files"></patternset>

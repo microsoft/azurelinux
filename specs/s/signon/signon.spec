@@ -8,7 +8,7 @@
 
 Name:           signon
 Version:        8.60^%{gitdate}.%{shortcommit0}
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Accounts framework for Linux and POSIX based platforms
 
 License:        LGPL-2.1-only

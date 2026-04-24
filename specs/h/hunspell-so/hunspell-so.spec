@@ -9,7 +9,7 @@
 Name: hunspell-so
 Summary: Somali hunspell dictionaries
 Version: 1.0.2
-Release: 31%{?dist}
+Release: 32%{?dist}
 Source: https://ayera.dl.sourceforge.net/project/aoo-extensions/2727/2/dict-so.oxt
 URL: http://www.opensourcesomalia.org/index.php?page=hingaad-saxe
 License: GPL-2.0-or-later

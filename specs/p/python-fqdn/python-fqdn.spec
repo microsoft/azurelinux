@@ -4,7 +4,7 @@
 %global srcname %(echo %{name} | sed 's/^python-//')
 Name:           python-fqdn
 Version:        1.5.1
-Release:        20%{?dist}
+Release: 21%{?dist}
 Summary:        Validates fully-qualified domain names against RFC 1123
 BuildArch:      noarch
 License:        MPL-2.0

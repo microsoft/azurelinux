@@ -3,7 +3,7 @@
 
 Name:		perl-MRO-Compat
 Version:	0.15
-Release:	12%{?dist}
+Release: 13%{?dist}
 Summary:	Mro::* interface compatibility for Perls < 5.9.5
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/MRO-Compat

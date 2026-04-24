@@ -9,7 +9,7 @@
 Summary: A Scintilla port to Qt
 Name:    qscintilla
 Version: 2.14.1
-Release: 6%{?dist}
+Release: 7%{?dist}
 
 # Automatically converted from old format: GPLv3 - review is highly recommended.
 License: GPL-3.0-only

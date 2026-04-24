@@ -3,7 +3,7 @@
 
 Name:      python-sphinxcontrib-doxylink
 Version:   1.13.0
-Release:   6%{?dist}
+Release: 7%{?dist}
 Summary:   A Sphinx extension to link to external Doxygen API documentation
 License:   BSD-2-Clause
 URL:       https://github.com/sphinx-contrib/doxylink

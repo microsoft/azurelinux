@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 2.6.6
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary: Efficient and thread-safe constant autoloader
 License: MIT
 URL: https://github.com/fxn/zeitwerk

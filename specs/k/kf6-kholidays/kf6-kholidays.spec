@@ -5,7 +5,7 @@
 
 Name:		kf6-%{framework}
 Version:	6.23.0
-Release:	1%{?dist}
+Release: 2%{?dist}
 Summary:	The KHolidays Library
 
 License:	BSD-2-Clause AND CC0-1.0 AND GPL-3.0-or-later AND LGPL-2.0-or-later WITH Bison-exception-2.2

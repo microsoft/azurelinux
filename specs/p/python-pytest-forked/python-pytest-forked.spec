@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        1.6.0
-Release:        13%{?dist}
+Release: 14%{?dist}
 Summary:        py.test plugin for running tests in isolated forked subprocesses
 
 License:        MIT

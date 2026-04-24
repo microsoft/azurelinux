@@ -1,0 +1,86 @@
+From 6f29ac0393bb0bb70c8122d9f1bda0ae5d8cee24 Mon Sep 17 00:00:00 2001
+From: Peter Oliver <git@mavit.org.uk>
+Date: Thu, 26 Sep 2024 13:20:06 +0100
+Subject: [PATCH] Pong and Tetris are excluded.
+
+---
+ doc/emacs/ack.texi    | 2 +-
+ doc/emacs/misc.texi   | 7 +------
+ lisp/menu-bar.el      | 6 ------
+ test/src/doc-tests.el | 4 ++--
+ 4 files changed, 4 insertions(+), 15 deletions(-)
+
+diff --git a/doc/emacs/ack.texi b/doc/emacs/ack.texi
+index 5ec5cd53fa6..26f174831ca 100644
+--- a/doc/emacs/ack.texi
++++ b/doc/emacs/ack.texi
+@@ -228,7 +228,7 @@ Acknowledgments
+ 
+ @item
+ Glynn Clements provided @file{gamegrid.el} and a couple of games that
+-use it, Snake and Tetris.
++use it, including Snake.
+ 
+ @item
+ Andrew Cohen wrote @file{spam-wash.el}, to decode and clean email before
+diff --git a/doc/emacs/misc.texi b/doc/emacs/misc.texi
+index 41e37fd094e..38e281bf59c 100644
+--- a/doc/emacs/misc.texi
++++ b/doc/emacs/misc.texi
+@@ -3248,14 +3248,9 @@ Amusements
+ nato-region} converts the text in the region to NATO phonetic
+ alphabet; @kbd{M-x denato-region} converts it back.
+ 
+-@findex pong
+-@cindex Pong game
+-@findex tetris
+-@cindex Tetris
+ @findex snake
+ @cindex Snake
+-  @kbd{M-x pong}, @kbd{M-x snake} and @kbd{M-x tetris} are
+-implementations of the well-known Pong, Snake and Tetris games.
++  @kbd{M-x snake} is an implementation of the well-known Snake game.
+ 
+ @findex solitaire
+ @cindex solitaire
+diff --git a/lisp/menu-bar.el b/lisp/menu-bar.el
+index bcfa83cf8e4..1b0a0bce6a5 100644
+--- a/lisp/menu-bar.el
++++ b/lisp/menu-bar.el
+@@ -1658,18 +1658,12 @@ menu-bar-games-menu
+     (bindings--define-key menu [zone]
+       '(menu-item "Zone Out" zone
+                   :help "Play tricks with Emacs display when Emacs is idle"))
+-    (bindings--define-key menu [tetris]
+-      '(menu-item "Tetris" tetris
+-                  :help "Falling blocks game"))
+     (bindings--define-key menu [solitaire]
+       '(menu-item "Solitaire" solitaire
+                   :help "Get rid of all the stones"))
+     (bindings--define-key menu [snake]
+       '(menu-item "Snake" snake
+                   :help "Move snake around avoiding collisions"))
+-    (bindings--define-key menu [pong]
+-      '(menu-item "Pong" pong
+-                  :help "Bounce the ball to your opponent"))
+     (bindings--define-key menu [mult]
+       '(menu-item "Multiplication Puzzle"  mpuz
+                   :help "Exercise brain with multiplication"))
+diff --git a/test/src/doc-tests.el b/test/src/doc-tests.el
+index b41a7ac5fb6..24befb737bc 100644
+--- a/test/src/doc-tests.el
++++ b/test/src/doc-tests.el
+@@ -34,8 +34,8 @@ doc-tests-documentation/autoloaded-macro
+ 
+ (ert-deftest doc-tests-documentation/autoloaded-defun ()
+   (skip-unless noninteractive)
+-  (should (autoloadp (symbol-function 'tetris)))
+-  (should (stringp (documentation 'tetris)))) ; See Bug#52969.
++  (should (autoloadp (symbol-function 'doctor)))
++  (should (stringp (documentation 'doctor)))) ; See Bug#52969.
+ 
+ (ert-deftest doc-tests-quoting-style ()
+   (should (memq (text-quoting-style) '(grave straight curve))))
+-- 
+2.46.1
+

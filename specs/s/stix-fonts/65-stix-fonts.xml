@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+<!-- SPDX-License-Identifier: MIT -->
+<fontconfig>
+  <group>
+    <target>STIX</target>
+    <family>STIX Two Text</family>
+    <family>STIX Two Math</family>
+    <like>
+      <family>STIXGeneral</family>
+      <family>STIXIntegralsD</family>
+      <family>STIXIntegralsSm</family>
+      <family>STIXIntegralsUpD</family>
+      <family>STIXIntegralsUp</family>
+      <family>STIXNonUnicode</family>
+      <family>STIXSizeFiveSym</family>
+      <family>STIXSizeFourSym</family>
+      <family>STIXSizeThreeSym</family>
+      <family>STIXSizeTwoSym</family>
+      <family>STIXSizeOneSym</family>
+      <family>STIXVariants</family>
+      <family>STIX Math</family>
+      <family>serif</family>
+    </like>
+  </group>
+</fontconfig>
+

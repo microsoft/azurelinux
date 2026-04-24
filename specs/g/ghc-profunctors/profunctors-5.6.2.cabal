@@ -1,0 +1,92 @@
+name:          profunctors
+category:      Control, Categories
+version:       5.6.2
+x-revision: 3
+license:       BSD3
+cabal-version: >= 1.10
+license-file:  LICENSE
+author:        Edward A. Kmett
+maintainer:    Edward A. Kmett <ekmett@gmail.com>
+stability:     experimental
+homepage:      http://github.com/ekmett/profunctors/
+bug-reports:   http://github.com/ekmett/profunctors/issues
+copyright:     Copyright (C) 2011-2015 Edward A. Kmett
+synopsis:      Profunctors
+description:   Profunctors.
+tested-with:   GHC == 7.8.4
+             , GHC == 7.10.3
+             , GHC == 8.0.2
+             , GHC == 8.2.2
+             , GHC == 8.4.4
+             , GHC == 8.6.5
+             , GHC == 8.8.3
+             , GHC == 8.10.1
+build-type:    Simple
+extra-source-files:
+  .ghci
+  .gitignore
+  .hlint.yaml
+  .vim.custom
+  README.markdown
+  CHANGELOG.markdown
+
+source-repository head
+  type: git
+  location: git://github.com/ekmett/profunctors.git
+
+library
+  build-depends:
+    base                >= 4.7     && < 5,
+    base-orphans        >= 0.8.4   && < 0.10,
+    bifunctors          >= 5.5.9   && < 6,
+    comonad             >= 5.0.8   && < 6,
+    contravariant       >= 1.5.3   && < 2,
+    distributive        >= 0.5.2   && < 1,
+    tagged              >= 0.8.6.1 && < 1,
+    transformers        >= 0.3     && < 0.7
+
+  if !impl(ghc >= 8.0)
+    build-depends: semigroups >= 0.18.5 && < 0.21
+
+  exposed-modules:
+    Data.Profunctor
+    Data.Profunctor.Adjunction
+    Data.Profunctor.Cayley
+    Data.Profunctor.Choice
+    Data.Profunctor.Closed
+    Data.Profunctor.Composition
+    Data.Profunctor.Mapping
+    Data.Profunctor.Monad
+    Data.Profunctor.Ran
+    Data.Profunctor.Rep
+    Data.Profunctor.Sieve
+    Data.Profunctor.Strong
+    Data.Profunctor.Traversing
+    Data.Profunctor.Types
+    Data.Profunctor.Unsafe
+    Data.Profunctor.Yoneda
+
+  ghc-options:     -Wall -O2
+
+  if impl(ghc>=8.0)
+    ghc-options: -Wno-trustworthy-safe
+
+  if impl(ghc >= 8.6)
+    ghc-options: -Wno-star-is-type
+
+  if impl(ghc >= 9.0)
+    -- these flags may abort compilation with GHC-8.10
+    -- https://gitlab.haskell.org/ghc/ghc/-/merge_requests/3295
+    ghc-options: -Winferred-safe-imports -Wmissing-safe-haskell-mode
+
+  hs-source-dirs:  src
+
+  default-language: Haskell2010
+  other-extensions:
+    CPP
+    GADTs
+    FlexibleContexts
+    FlexibleInstances
+    InstanceSigs
+    UndecidableInstances
+    TypeFamilies

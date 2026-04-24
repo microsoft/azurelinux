@@ -1,0 +1,48 @@
+Index: chromium-144.0.7559.59/third_party/libvpx/generate_gni.sh
+===================================================================
+--- chromium-144.0.7559.59.orig/third_party/libvpx/generate_gni.sh
++++ chromium-144.0.7559.59/third_party/libvpx/generate_gni.sh
+@@ -429,7 +429,7 @@ gen_config_files linux/mipsel "--target=
+ gen_config_files linux/mips64el "--target=mips64-linux-gcc ${all_platforms}"
+ gen_config_files linux/loongarch \
+   "--target=loongarch64-linux-gcc ${all_platforms}"
+-gen_config_files linux/ppc64 "--target=ppc64le-linux-gcc ${all_platforms}"
++gen_config_files linux/ppc64 "--target=generic-gnu $HIGHBD ${all_platforms}"
+ gen_config_files linux/generic "--target=generic-gnu $HIGHBD ${all_platforms}"
+ gen_config_files win/arm64-highbd \
+   "--target=arm64-win64-vs15 ${all_platforms} ${HIGHBD} ${disable_sve}"
+Index: chromium-144.0.7559.59/third_party/libvpx/source/libvpx/build/make/rtcd.pl
+===================================================================
+--- chromium-144.0.7559.59.orig/third_party/libvpx/source/libvpx/build/make/rtcd.pl
++++ chromium-144.0.7559.59/third_party/libvpx/source/libvpx/build/make/rtcd.pl
+@@ -527,8 +527,9 @@ if ($opts{arch} eq 'x86') {
+   }
+   arm;
+ } elsif ($opts{arch} =~ /^ppc/ ) {
+-  @ALL_ARCHS = filter(qw/vsx/);
+-  ppc;
++  #@ALL_ARCHS = filter(qw/vsx/);
++  #ppc;
++  unoptimized;
+ } elsif ($opts{arch} =~ /loongarch/ ) {
+   @ALL_ARCHS = filter(qw/lsx lasx/);
+   loongarch;
+Index: chromium-144.0.7559.59/third_party/libvpx/BUILD.gn
+===================================================================
+--- chromium-144.0.7559.59.orig/third_party/libvpx/BUILD.gn
++++ chromium-144.0.7559.59/third_party/libvpx/BUILD.gn
+@@ -98,6 +98,14 @@ config("libvpx_config") {
+       "-Wno-sign-compare",
+     ]
+   }
++
++  if (current_cpu == "ppc64") {
++    cflags += [
++      "-mcpu=power8",
++      "-maltivec",
++      "-mvsx",
++    ]
++  }
+ }
+ 
+ # This config is applied to targets that depend on libvpx.

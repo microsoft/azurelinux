@@ -6,7 +6,7 @@
 Summary:	Pure ruby library which provides basic APIs for localization
 Name:		rubygem-%{gem_name}
 Version:	2.1.4
-Release:	6%{?dist}
+Release: 7%{?dist}
 
 # SPDX confirmed
 # Ruby:	lib/locale.rb

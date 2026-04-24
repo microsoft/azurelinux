@@ -3,7 +3,7 @@
 
 Name:           perl-B-Utils
 Version:        0.27
-Release:        34%{?dist}
+Release: 35%{?dist}
 Summary:        Helper functions for op tree manipulation
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/B-Utils

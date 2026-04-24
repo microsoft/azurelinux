@@ -3,7 +3,7 @@
 
 Name:           perl-TAP-Harness-Archive
 Version:        0.18
-Release:        29%{?dist}
+Release: 30%{?dist}
 Summary:        Create an archive of TAP test results
 # Automatically converted from old format: GPL+ or Artistic - review is highly recommended.
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

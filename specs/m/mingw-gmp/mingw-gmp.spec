@@ -5,7 +5,7 @@
 
 Name:       mingw-gmp
 Version:    6.3.0
-Release:    4%{?dist}
+Release: 5%{?dist}
 
 Summary:    Cross-compiled GNU arbitrary precision library
 # Automatically converted from old format: LGPLv3+ or GPLv2+ - review is highly recommended.

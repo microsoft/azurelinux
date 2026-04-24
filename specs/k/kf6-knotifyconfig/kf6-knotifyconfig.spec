@@ -5,7 +5,7 @@
 
 Name:    kf6-%{framework}
 Version: 6.23.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: KDE Frameworks 6 Tier 3 module for KNotify configuration
 
 License: CC0-1.0 AND LGPL-2.0-only

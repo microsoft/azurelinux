@@ -3,7 +3,7 @@
 
 Name:           gupnp-igd
 Version:        1.6.0
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        Library to handle UPnP IGD port mapping
 
 License:        LGPL-2.1-or-later

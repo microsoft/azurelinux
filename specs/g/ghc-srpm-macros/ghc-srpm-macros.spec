@@ -7,7 +7,7 @@
 
 Name:           ghc-srpm-macros
 Version:        1.9.2
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        RPM macros for building Haskell source packages
 
 License:        GPL-2.0-or-later

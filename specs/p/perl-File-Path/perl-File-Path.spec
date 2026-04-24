@@ -3,7 +3,7 @@
 
 Name:           perl-File-Path
 Version:        2.18
-Release:        520%{?dist}
+Release: 521%{?dist}
 Summary:        Create or remove directory trees
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/File-Path

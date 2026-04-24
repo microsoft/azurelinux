@@ -1,0 +1,31 @@
+From 79fa5d41a05c423cf43a65d2b347c7c566bcdfa5 Mon Sep 17 00:00:00 2001
+From: Stephen Finucane <stephen@that.guru>
+Date: Fri, 21 Feb 2025 11:14:35 +0000
+Subject: [PATCH] Resolve deprecation warning
+
+See [1] for more info.
+
+[1] https://github.com/python/cpython/issues/79893
+
+Signed-off-by: Stephen Finucane <stephen@that.guru>
+---
+ testtools/testcase.py | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/testtools/testcase.py b/testtools/testcase.py
+index ad983730..4f4923b3 100644
+--- a/testtools/testcase.py
++++ b/testtools/testcase.py
+@@ -268,8 +268,10 @@ def _reset(self):
+ 
+     def __eq__(self, other):
+         eq = getattr(unittest.TestCase, "__eq__", None)
+-        if eq is not None and not unittest.TestCase.__eq__(self, other):
+-            return False
++        if eq is not None:
++            eq_ = unittest.TestCase.__eq__(self, other)
++            if eq_ is NotImplemented or not eq_:
++                return False
+         return self.__dict__ == getattr(other, "__dict__", None)
+ 
+     # We need to explicitly set this since we're overriding __eq__

@@ -10,7 +10,7 @@
 
 Name:           sdl12-compat
 Version:        1.2.74
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        SDL 1.2 runtime compatibility library using SDL 2.0
 # mp3 decoder code is MIT-0/PD
 # SDL_opengl.h is zlib and MIT

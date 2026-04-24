@@ -1,0 +1,12 @@
+diff -up chromium-108.0.5359.124/media/audio/audio_opus_encoder.h.me chromium-108.0.5359.124/media/audio/audio_opus_encoder.h
+--- chromium-108.0.5359.124/media/audio/audio_opus_encoder.h.me	2022-12-31 09:49:17.100277502 +0100
++++ chromium-108.0.5359.124/media/audio/audio_opus_encoder.h	2022-12-31 09:49:57.101016710 +0100
+@@ -12,7 +12,7 @@
+ #include "media/base/audio_converter.h"
+ #include "media/base/audio_encoder.h"
+ #include "media/base/audio_timestamp_helper.h"
+-#include "third_party/opus/src/include/opus.h"
++#include <opus/opus.h>
+ 
+ namespace media {
+ 

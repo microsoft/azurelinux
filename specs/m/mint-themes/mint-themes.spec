@@ -4,7 +4,7 @@
 Name:           mint-themes
 Epoch:          1
 Version:        2.2.2
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Mint themes
 
 # Automatically converted from old format: GPLv3+ - review is highly recommended.

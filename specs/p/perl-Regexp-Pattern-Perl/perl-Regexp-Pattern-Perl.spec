@@ -3,7 +3,7 @@
 
 Name:           perl-Regexp-Pattern-Perl
 Version:        0.007
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        Regexp patterns related to Perl
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Regexp-Pattern-Perl/

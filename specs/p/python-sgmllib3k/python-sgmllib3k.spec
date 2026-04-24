@@ -7,7 +7,7 @@
 
 Name:           python-sgmllib3k
 Version:        1.0.0
-Release:        21%{?dist}
+Release: 22%{?dist}
 Summary:        python3 copy of sgmllib
 License:        PSF-2.0
 URL:            http://hg.hardcoded.net/sgmllib

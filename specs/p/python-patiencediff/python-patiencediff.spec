@@ -4,7 +4,7 @@
 %global pypi_name patiencediff
 Name:           python-patiencediff
 Version:        0.2.15
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        Python implementation of the patiencediff algorithm
 
 License:        GPL-2.0-or-later

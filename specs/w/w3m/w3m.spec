@@ -11,7 +11,7 @@
 
 Name:     w3m
 Version:  0.5.3
-Release:  66.git%{gitdate}%{?dist}
+Release: 67.git%{gitdate}%{?dist}
 # Unicode-DFS-2015 is added for EastAsianWidth.txt source
 License:  MIT AND Unicode-DFS-2015
 URL:      http://w3m.sourceforge.net/

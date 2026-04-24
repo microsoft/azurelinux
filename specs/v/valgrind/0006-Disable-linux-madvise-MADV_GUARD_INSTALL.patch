@@ -1,0 +1,95 @@
+From dbdfc2b4522bb210786bddbc16e3ad855d5fa62a Mon Sep 17 00:00:00 2001
+From: Mark Wielaard <mark@klomp.org>
+Date: Wed, 7 Jan 2026 22:20:49 +0100
+Subject: [PATCH 6/6] Disable linux madvise MADV_GUARD_INSTALL
+
+glibc 2.42+ (with linux 6.13+) uses MADV_GUARD_INSTALL to setup stack
+guard pages. valgrind currently isn't able to track this and such
+guard pages also don't show up in /proc maps (only in /proc pagemap
+since linux 6.14). For now valgrind fails a madvise MADV_GUARD_INSTALL
+syscall with EINVAL. This causes glibc to fall back to mprotect
+PROT_NONE which valgrind is able to track.
+
+https://bugs.kde.org/show_bug.cgi?id=511717
+
+(cherry picked from commit 19a34d1d9376f459cf0a19feb39ea4ab27690390)
+---
+ NEWS                                  | 14 ++++++++++++++
+ coregrind/m_syswrap/syswrap-generic.c | 10 ++++++++++
+ include/vki/vki-linux.h               |  7 +++++++
+ 3 files changed, 31 insertions(+)
+
+diff --git a/NEWS b/NEWS
+index cca48f513138..28409915e1a1 100644
+--- a/NEWS
++++ b/NEWS
+@@ -1,6 +1,18 @@
+ Branch 3.26
+ ~~~~~~~~~~~
+ 
++* ==================== CORE CHANGES ===================
++
++* linux madvise MADV_GUARD_INSTALL unsupported
++
++  glibc 2.42+ (with linux 6.13+) uses MADV_GUARD_INSTALL to setup
++  stack guard pages. valgrind currently isn't able to track this and
++  such guard pages also don't show up in /proc maps (only in /proc
++  pagemap since linux 6.14). For now valgrind fails a madvise
++  MADV_GUARD_INSTALL syscall with EINVAL. This causes glibc to fall
++  back to mprotect PROT_NONE which valgrind is able to track.
++  See also https://bugs.kde.org/show_bug.cgi?id=514297
++
+ * ==================== FIXED BUGS ====================
+ 
+ The following bugs have been fixed or resolved on this branch.
+@@ -8,6 +20,8 @@ The following bugs have been fixed or resolved on this branch.
+ 511972  valgrind-3.26.0 tests fail to build on upcomig gcc-16:
+         unrecognized command-line option
+         '-Wno-alloc-size-larger-than=18446744073709551615'
++511717  gdbserver (valgrind_read_memory) the 'impossible' happened:
++        Killed by fatal signal (SIGSEGV)
+ 514094  readlink("/proc/self/exe") overwrites buffer beyond its return value
+ 
+ To see details of a given bug, visit
+diff --git a/coregrind/m_syswrap/syswrap-generic.c b/coregrind/m_syswrap/syswrap-generic.c
+index f39dbcdba055..668acc4605a8 100644
+--- a/coregrind/m_syswrap/syswrap-generic.c
++++ b/coregrind/m_syswrap/syswrap-generic.c
+@@ -3112,6 +3112,16 @@ PRE(sys_madvise)
+                         ARG1, ARG2, SARG3);
+    PRE_REG_READ3(long, "madvise",
+                  unsigned long, start, vki_size_t, length, int, advice);
++   /* Ugly hack to try to bypass the problem of guard pages not being
++      understood by valgrind aspace manager.
++      By making the syscall fail, we expect glibc to fallback
++      on implementing guard pages with mprotect PROT_NONE to ensure
++      the valgrind address space manager is not confused wrongly
++      believing the guard page is rw. */
++#ifdef VKI_MADV_GUARD_INSTALL
++   if (ARG3 == VKI_MADV_GUARD_INSTALL)
++      SET_STATUS_Failure( VKI_EINVAL );
++#endif
+ }
+ 
+ #if HAVE_MREMAP
+diff --git a/include/vki/vki-linux.h b/include/vki/vki-linux.h
+index 3f9272f4d18e..96c181a85775 100644
+--- a/include/vki/vki-linux.h
++++ b/include/vki/vki-linux.h
+@@ -1364,6 +1364,13 @@ struct  vki_seminfo {
+ #define VKI_MREMAP_MAYMOVE	1
+ #define VKI_MREMAP_FIXED	2
+ 
++//----------------------------------------------------------------------
++// Common madvise flags mman-common.h
++//----------------------------------------------------------------------
++
++#define VKI_MADV_GUARD_INSTALL 102
++#define VKI_MADV_GUARD_REMOVE  103
++
+ //----------------------------------------------------------------------
+ // From linux-2.6.31-rc4/include/linux/futex.h
+ //----------------------------------------------------------------------
+-- 
+2.52.0
+

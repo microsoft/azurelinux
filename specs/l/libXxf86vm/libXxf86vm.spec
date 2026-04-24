@@ -8,7 +8,7 @@
 Summary: X.Org X11 libXxf86vm runtime library
 Name: libXxf86vm
 Version: 1.1.6
-Release: 3%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
+Release: 4%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
 License: X11-distribute-modifications-variant
 URL: http://www.x.org
 

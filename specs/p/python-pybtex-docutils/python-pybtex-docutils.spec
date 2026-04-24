@@ -3,7 +3,7 @@
 
 Name:           python-pybtex-docutils
 Version:        1.0.3
-Release:        10%{?dist}
+Release: 11%{?dist}
 Summary:        Docutils backend for pybtex
 
 # The content is MIT.  Other licenses are due to files copied in by Sphinx.

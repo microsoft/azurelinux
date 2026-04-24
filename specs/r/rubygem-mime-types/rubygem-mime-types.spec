@@ -8,7 +8,7 @@
 Summary: The mime-types library provides a library
 Name: rubygem-%{gem_name}
 Version: 3.4.1
-Release: 7%{?dist}
+Release: 8%{?dist}
 License: MIT
 URL: https://github.com/mime-types/ruby-mime-types/
 Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem

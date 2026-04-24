@@ -1,0 +1,118 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Robbie Harwood <rharwood@redhat.com>
+Date: Tue, 7 Mar 2023 18:59:40 -0500
+Subject: [PATCH] blscfg: check for mounted /boot in emu
+
+Irritatingly, BLS defines paths relatives to the mountpoint of the
+filesystem which contains its snippets, not / or any other fixed
+location.  So grub2-emu needs to know whether /boot is a separate
+filesysem from / and conditionally prepend a path.
+
+Signed-off-by: Robbie Harwood <rharwood@redhat.com>
+---
+ grub-core/commands/blscfg.c | 54 ++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 49 insertions(+), 5 deletions(-)
+
+diff --git a/grub-core/commands/blscfg.c b/grub-core/commands/blscfg.c
+index dbd0899acf3..6e398fc1757 100644
+--- a/grub-core/commands/blscfg.c
++++ b/grub-core/commands/blscfg.c
+@@ -40,8 +40,9 @@ GRUB_MOD_LICENSE ("GPLv3+");
+ #include "loadenv.h"
+ 
+ #define GRUB_BLS_CONFIG_PATH "/loader/entries/"
++
+ #ifdef GRUB_MACHINE_EMU
+-#define GRUB_BOOT_DEVICE ""
++#define GRUB_BOOT_DEVICE "/boot"
+ #else
+ #define GRUB_BOOT_DEVICE "($root)"
+ #endif
+@@ -54,8 +55,50 @@ struct keyval
+ 
+ static struct bls_entry *entries = NULL;
+ 
++/* Cache probing in frob_boot_device().  Used for linux entry also.
++ * Always true in non-emu, meaning to prefix things with GRUB_BOOT_DEVICE. */
++static int separate_boot = -1;
++
+ #define FOR_BLS_ENTRIES(var) FOR_LIST_ELEMENTS (var, entries)
+ 
++/* BLS appears to make paths relative to the filesystem that snippets are
++ * on, not /.  Attempt to cope. */
++static char *frob_boot_device(char *tmp)
++{
++#ifdef GRUB_MACHINE_EMU
++  grub_file_t f;
++  char *line = NULL;
++
++  if (separate_boot != -1)
++    goto probed;
++
++  separate_boot = 0;
++
++  f = grub_file_open ("/proc/mounts", GRUB_FILE_TYPE_CONFIG);
++  if (f == NULL)
++    goto probed;
++
++  while ((line = grub_file_getline (f)))
++    {
++      if (grub_strstr (line, " " GRUB_BOOT_DEVICE " "))
++	{
++	  separate_boot = 1;
++	  grub_free (line);
++	  break;
++	}
++
++      grub_free(line);
++    }
++
++  grub_file_close (f);
++ probed:
++  if (!separate_boot)
++    return grub_stpcpy (tmp, " ");
++#endif
++
++  return grub_stpcpy (tmp, " " GRUB_BOOT_DEVICE);
++}
++
+ static int bls_add_keyval(struct bls_entry *entry, char *key, char *val)
+ {
+   char *k, *v;
+@@ -842,7 +885,7 @@ static void create_entry (struct bls_entry *entry)
+       for (i = 0; early_initrds != NULL && early_initrds[i] != NULL; i++)
+ 	{
+ 	  grub_dprintf ("blscfg", "adding early initrd %s\n", early_initrds[i]);
+-	  tmp = grub_stpcpy (tmp, " " GRUB_BOOT_DEVICE);
++	  tmp = frob_boot_device (tmp);
+ 	  tmp = grub_stpcpy (tmp, initrd_prefix);
+ 	  tmp = grub_stpcpy (tmp, early_initrds[i]);
+ 	  grub_free(early_initrds[i]);
+@@ -851,7 +894,7 @@ static void create_entry (struct bls_entry *entry)
+       for (i = 0; initrds != NULL && initrds[i] != NULL; i++)
+ 	{
+ 	  grub_dprintf ("blscfg", "adding initrd %s\n", initrds[i]);
+-	  tmp = grub_stpcpy (tmp, " " GRUB_BOOT_DEVICE);
++	  tmp = frob_boot_device (tmp);
+ 	  tmp = grub_stpcpy (tmp, initrds[i]);
+ 	}
+       tmp = grub_stpcpy (tmp, "\n");
+@@ -888,7 +931,7 @@ static void create_entry (struct bls_entry *entry)
+         }
+       char *tmp = dt;
+       tmp = grub_stpcpy (dt, "devicetree");
+-      tmp = grub_stpcpy (tmp, " " GRUB_BOOT_DEVICE);
++      tmp = frob_boot_device (tmp);
+       if (add_dt_prefix)
+         tmp = grub_stpcpy (tmp, prefix);
+       tmp = grub_stpcpy (tmp, devicetree);
+@@ -907,7 +950,8 @@ static void create_entry (struct bls_entry *entry)
+ 			"linux %s%s%s%s\n"
+ 			"%s%s",
+ 			savedefault ? "savedefault\n" : "",
+-			GRUB_BOOT_DEVICE, clinux, options ? " " : "", options ? options : "",
++			separate_boot ? GRUB_BOOT_DEVICE : "",
++			clinux, options ? " " : "", options ? options : "",
+ 			initrd ? initrd : "", dt ? dt : "");
+ 
+   grub_normal_add_menu_entry (argc, argv, classes, id, users, hotkey, NULL, src, 0, &index, entry);

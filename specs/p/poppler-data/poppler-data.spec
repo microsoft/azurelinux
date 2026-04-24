@@ -6,7 +6,7 @@
 Name:             poppler-data
 Summary:          Encoding files for use with poppler
 Version:          0.4.11
-Release:          10%{?dist}
+Release: 11%{?dist}
 
 # NOTE: The licensing details are explained in COPYING file in source archive.
 # Makefile is HPND-sell-variant but is not included in binary package

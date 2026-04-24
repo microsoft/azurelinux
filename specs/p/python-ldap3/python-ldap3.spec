@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        2.9.1
-Release:        15%{?dist}
+Release: 16%{?dist}
 Summary:        Strictly RFC 4511 conforming LDAP V3 pure Python client
 
 License:        LGPL-3.0-or-later

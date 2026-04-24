@@ -1,0 +1,22 @@
+From cea018f2cdf67d3742f617c6884cd1df84fe75ad Mon Sep 17 00:00:00 2001
+From: yhirose <yuji.hirose.bug@gmail.com>
+Date: Sun, 11 Jan 2026 21:22:42 -0500
+Subject: [PATCH] Fix #2324
+
+---
+ test/test.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/test.cc b/test/test.cc
+index e8471ac902..d364019824 100644
+--- a/test/test.cc
++++ b/test/test.cc
+@@ -11017,7 +11017,7 @@ TEST(MakeHostAndPortStringTest, VariousPatterns) {
+ }
+ 
+ #ifdef CPPHTTPLIB_OPENSSL_SUPPORT
+-TEST(SSLClientHostHeaderTest, Issue2301) {
++TEST(SSLClientHostHeaderTest, Issue2301_Online) {
+   httplib::SSLClient cli("roblox.com", 443);
+   cli.set_follow_location(true);
+ 

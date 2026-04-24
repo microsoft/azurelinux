@@ -3,7 +3,7 @@
 
 Name:           mjpegtools
 Version:        2.2.1
-Release:        11%{?dist}
+Release: 12%{?dist}
 Summary:        Tools to manipulate MPEG data
 # Most sources are GPLv2+ except the following which don't mention "or later":
 # mplex/*

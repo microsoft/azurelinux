@@ -8,7 +8,7 @@
 Summary: C library for multiple precision complex arithmetic
 Name: libmpc
 Version: 1.3.1
-Release: 8%{?dist}
+Release: 9%{?dist}
 # LGPL-3.0-or-later: the library
 # FSFAP: README and NEWS
 License: LGPL-3.0-or-later AND FSFAP

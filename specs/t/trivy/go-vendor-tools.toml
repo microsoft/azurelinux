@@ -1,0 +1,143 @@
+[archive]
+use_module_proxy = true
+pre_commands = [
+  # Change to a different sqlite3 backend without generated content and
+  # questionable licensing
+  # https://github.com/aquasecurity/trivy/discussions/6449
+  [
+    "sh", "-exc",
+    """
+    sed -i 's|_ "modernc.org/sqlite"|_ "github.com/mattn/go-sqlite3"|' \
+        $(grep -rl '_ "modernc.org/sqlite"' pkg/ cmd/ integration/)
+
+    """,
+  ],
+  ["sed", "-i", "/modernc.org/d", "go.mod"],
+  ["go", "get", "-u", "github.com/mattn/go-sqlite3"],
+]
+post_commands = [
+  # Copy missing license files that go mod vendor doesn't include
+  ["mkdir", "-p", "vendor/github.com/csaf-poc/csaf_distribution/v3/LICENSES"],
+  [
+    "wget", "-q",
+    "https://github.com/csaf-poc/csaf_distribution/raw/v3.0.0/LICENSES/MIT.txt",
+    "-O", "vendor/github.com/csaf-poc/csaf_distribution/v3/LICENSES/MIT.txt"
+  ],
+  [
+    "wget", "-q",
+    "https://github.com/csaf-poc/csaf_distribution/raw/v3.0.0/LICENSES/LicenseRef-Go119-BSD-Patentgrant.txt",
+    "-O", "vendor/github.com/csaf-poc/csaf_distribution/v3/LICENSES/BSD-3-Clause.txt"
+  ],
+  [
+    "sh", "-ec",
+    """
+    version="$(grep github.com/gocsaf/csaf go.mod | sed 's|.*v|v|')"
+    temp="$(mktemp -d)"
+    trap 'rm -rf ${temp}' EXIT SIGTERM SIGINT SIGSEGV
+    git clone --branch "${version}" --depth=1 https://github.com/gocsaf/csaf "${temp}"
+    # Ensure no new licenses were added
+    test "$(ls -l "${temp}/LICENSES" | wc -l)" = "4"
+    cp -r "${temp}/LICENSES" vendor/github.com/gocsaf/csaf/v3
+    """
+  ],
+  [
+    "cp",
+    "vendor/github.com/hashicorp/golang-lru/v2/LICENSE",
+    "vendor/github.com/hashicorp/golang-lru/LICENSE"
+  ],
+
+[
+    "sh", "-ec",
+    """
+    # Ensure modernc is properly removed
+    ! grep 'modernc.org' go.mod
+    # Remove bundled sqlite
+    rm -v \
+    vendor/github.com/mattn/go-sqlite3/sqlite3-binding.* \
+    vendor/github.com/mattn/go-sqlite3/sqlite3ext.h
+    """,
+  ],
+]
+
+
+[licensing]
+exclude_directories = [
+    "pkg",
+    "vendor/github.com/google/licenseclassifier/v2/assets",
+]
+exclude_files = [
+    "vendor/cloud.google.com/go/internal/version/update_version.sh",
+    "vendor/cloud.google.com/go/storage/emulator_test.sh",
+    "vendor/github.com/go-git/go-git/v5/oss-fuzz.sh",
+    "vendor/go.opentelemetry.io/otel/get_main_pkgs.sh",
+    "vendor/go.opentelemetry.io/otel/verify_examples.sh",
+    "vendor/google.golang.org/grpc/regenerate.sh",
+    "vendor/k8s.io/kubectl/pkg/util/i18n/translations/extract.py",
+    "docs/docs/scanner/license.md",
+]
+detector = "trivy"
+
+[[licensing.licenses]]
+path = "vendor/github.com/spdx/tools-golang/LICENSE.code"
+sha256sum = "e914fb1f3927226e04b0438e0b541b3c6e3c65de4d64aa8f5cdaa803f05448fd"
+expression = "Apache-2.0 OR GPL-2.0-or-later"
+[[licensing.licenses]]
+path = "vendor/github.com/go-errors/errors/LICENSE.MIT"
+sha256sum = "4c1b2259f160d975ec6594b602be5db4e6c0c06afe312ca3cd7cff91b75c7c26"
+expression = "MIT"
+[[licensing.licenses]]
+path = "vendor/github.com/alecthomas/chroma/COPYING"
+sha256sum = "e7bf754e7153012a3a8ff697d21acd6c12e590d6a55f2aef8ee83616aa9a795f"
+expression = "MIT"
+[[licensing.licenses]]
+path = "vendor/github.com/BurntSushi/toml/COPYING"
+sha256sum = "d21cb1c60785d6d3a84a7059323ccafc45c645b1bbda281c76a62d66ad2d7dc3"
+expression = "MIT"
+[[licensing.licenses]]
+path = "pkg/iac/scanners/helm/test/mysql/README.md"
+sha256sum = "745fadb84a68937b060856d30dca16516a731d5685e03271ee6fa124295054b0"
+expression = "Apache-2.0"
+[[licensing.licenses]]
+path = "pkg/iac/scanners/helm/test/mysql/charts/common/README.md"
+sha256sum = "62b77785b81344c7108495e6d0f29fa1b6e0d4078b88284d85f3113ab84a48f1"
+expression = "Apache-2.0"
+[[licensing.licenses]]
+path = "vendor/github.com/rcrowley/go-metrics/LICENSE"
+sha256sum = "d2571186acad91c8a3121fb31f1aa5963e82ccd08608d00cef3eb3f3a6c8ad38"
+expression = "BSD-2-Clause-Views"
+[[licensing.licenses]]
+path = "vendor/github.com/alecthomas/chroma/formatters/svg/font_liberation_mono.go"
+sha256sum = "62b52a13f5eaa92c7ec5cecbdb9fc17871ad98095668967938ffe3ae4ee96a2c"
+expression = "OFL-1.1-RFN"
+[[licensing.licenses]]
+path = "vendor/github.com/xi2/xz/LICENSE"
+sha256sum = "5c640056d513f276d56635af7a0bed81cb7eac02a31b6e56d40c416557a8d8ce"
+expression = "LicenseRef-Fedora-Public-Domain"
+[[licensing.licenses]]
+path = "vendor/github.com/gocsaf/csaf/v3/LICENSES/BSD-3-Clause.txt"
+sha256sum = "5a93d5831e1297ab10fe643e1a631e83be392896da14ee2951285a79012df69d"
+expression = "BSD-3-Clause"
+[[licensing.licenses]]
+path = "vendor/github.com/gocsaf/csaf/v3/LICENSES/MIT.txt"
+sha256sum = "d9f773a3d8d9e023744b73a755efe6c83c7ddc36e181198c7711cbdd6a7633c2"
+expression = "MIT"
+[[licensing.licenses]]
+path = "vendor/github.com/gocsaf/csaf/v3/LICENSES/Apache-2.0.txt"
+sha256sum = "074e6e32c86a4c0ef8b3ed25b721ca23aca83df277cd88106ef7177c354615ff"
+expression = "Apache-2.0"
+[[licensing.licenses]]
+path = "vendor/github.com/shibumi/go-pathspec/GO-LICENSE"
+sha256sum = "dd26a7abddd02e2d0aba97805b31f248ef7835d9e10da289b22e3b8ab78b324d"
+expression = "BSD-3-Clause"
+[[licensing.licenses]]
+path = "vendor/github.com/zclconf/go-cty-yaml/LICENSE.libyaml"
+sha256sum = "a94710b55e03b5285f77d048c5ba61bb9d6ee04a06c0eb90e68821e11b0c707a"
+expression = "MIT"
+[[licensing.licenses]]
+path = "vendor/gopkg.in/yaml.v2/LICENSE.libyaml"
+sha256sum = "a94710b55e03b5285f77d048c5ba61bb9d6ee04a06c0eb90e68821e11b0c707a"
+expression = "MIT"
+[[licensing.licenses]]
+path = "vendor/go.yaml.in/yaml/v2/LICENSE.libyaml"
+sha256sum = "a94710b55e03b5285f77d048c5ba61bb9d6ee04a06c0eb90e68821e11b0c707a"
+expression = "MIT"

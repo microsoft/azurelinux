@@ -1,0 +1,90 @@
+Name: foldl
+Version: 1.4.18
+x-revision: 1
+Cabal-Version: >=1.10
+Build-Type: Simple
+License: BSD3
+License-File: LICENSE
+Copyright: 2013 Gabriella Gonzalez
+Author: Gabriella Gonzalez
+Maintainer: GenuineGabriella@gmail.com
+Bug-Reports: https://github.com/Gabriella439/Haskell-Foldl-Library/issues
+Synopsis: Composable, streaming, and efficient left folds
+Description: This library provides strict left folds that stream in constant
+  memory, and you can combine folds using @Applicative@ style to derive new
+  folds.  Derived folds still traverse the container just once and are often as
+  efficient as hand-written folds.
+Category: Control
+Extra-Source-Files:
+    CHANGELOG.md
+    README.md
+Source-Repository head
+    Type: git
+    Location: https://github.com/Gabriella439/Haskell-Foldl-Library
+
+Library
+    HS-Source-Dirs: src
+    Build-Depends:
+        base         >= 4.11.0.0 && < 5   ,
+        bytestring   >= 0.9.2.1  && < 0.13,
+        random       >= 1.2      && < 1.4 ,
+        primitive                   < 0.10,
+        text         >= 0.11.2.0 && < 2.2 ,
+        transformers >= 0.2.0.0  && < 0.7 ,
+        vector       >= 0.7      && < 0.14,
+        containers   >= 0.5.0.0  && < 0.8 ,
+        unordered-containers        < 0.3 ,
+        hashable                    < 1.6 ,
+        contravariant               < 1.6 ,
+        profunctors  >= 4.3.2    && < 5.7 ,
+        semigroupoids >= 1.0     && < 6.1 ,
+        comonad      >= 4.0      && < 6
+    if impl(ghc < 8.0)
+        Build-Depends:
+            semigroups   >= 0.17 && < 1.20
+    Exposed-Modules:
+        Control.Foldl,
+        Control.Foldl.ByteString,
+        Control.Foldl.NonEmpty
+        Control.Foldl.Text,
+        Control.Scanl
+    Other-Modules:
+        Control.Foldl.Optics
+        Control.Foldl.Internal
+        Control.Foldl.Util.Vector
+        Control.Foldl.Util.MVector
+    GHC-Options: -O2 -Wall
+    Default-Language: Haskell2010
+
+Benchmark Foldl
+    Type: exitcode-stdio-1.0
+    HS-Source-Dirs: bench
+    Main-Is: Foldl.hs
+    Build-Depends:
+        base >= 4.11.0.0 && < 5,
+        criterion,
+        foldl,
+        profunctors
+    GHC-Options: -O2 -Wall -rtsopts -with-rtsopts=-T
+    Default-Language: Haskell2010
+
+Benchmark Scanl
+    Type: exitcode-stdio-1.0
+    HS-Source-Dirs: bench
+    Main-Is: Scanl.hs
+    Build-Depends:
+        base >= 4.11.0.0 && < 5,
+        criterion,
+        foldl
+    GHC-Options: -O2 -Wall -rtsopts -with-rtsopts=-T
+    Default-Language: Haskell2010
+
+Test-Suite doctest
+    Type: exitcode-stdio-1.0
+    HS-Source-Dirs: test
+    Main-Is: doctest.hs
+    Build-Depends:
+        base >= 4.11.0.0 && < 5,
+        doctest >= 0.16
+    GHC-Options: -threaded
+    Default-Language: Haskell2010

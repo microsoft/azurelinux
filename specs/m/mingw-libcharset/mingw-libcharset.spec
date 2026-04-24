@@ -8,7 +8,7 @@
 Name:          mingw-%{pkgname}
 Version:       1.17
 Summary:       MinGW Windows libcharset library
-Release:       10%{?dist}
+Release: 11%{?dist}
 
 BuildArch:     noarch
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.

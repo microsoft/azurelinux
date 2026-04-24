@@ -3,7 +3,7 @@
 
 Name:           libgxps
 Version:        0.3.2
-Release:        11%{?dist}
+Release: 12%{?dist}
 Summary:        GObject based library for handling and rendering XPS documents
 
 License:        LGPL-2.1-or-later

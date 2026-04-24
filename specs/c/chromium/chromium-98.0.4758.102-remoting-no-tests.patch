@@ -1,0 +1,20 @@
+diff -up chromium-98.0.4758.102/remoting/BUILD.gn.remoting-no-tests chromium-98.0.4758.102/remoting/BUILD.gn
+--- chromium-98.0.4758.102/remoting/BUILD.gn.remoting-no-tests	2022-02-28 19:15:23.835872267 +0000
++++ chromium-98.0.4758.102/remoting/BUILD.gn	2022-03-01 17:55:50.625536957 +0000
+@@ -8,7 +8,7 @@ import("//remoting/build/config/remoting
+ group("remoting_all") {
+   testonly = true
+ 
+-  deps = [ ":remoting_unittests" ]
++  deps = [ ]
+ 
+   if (is_win) {
+     deps += [
+@@ -37,7 +37,6 @@ group("remoting_all") {
+ 
+   if (enable_remoting_host) {
+     deps += [
+-      ":remoting_perftests",
+       "//remoting/host",
+     ]
+ 

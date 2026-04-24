@@ -3,7 +3,7 @@
 
 Name:           perl-Import-Into
 Version:        1.002005
-Release:        29%{?dist}
+Release: 30%{?dist}
 Summary:        Import packages into other packages
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Import-Into

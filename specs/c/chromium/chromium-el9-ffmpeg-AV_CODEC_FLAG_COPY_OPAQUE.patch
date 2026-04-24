@@ -1,0 +1,12 @@
+diff -up chromium-140.0.7339.80/media/filters/ffmpeg_video_decoder.cc.me chromium-140.0.7339.80/media/filters/ffmpeg_video_decoder.cc
+--- chromium-140.0.7339.80/media/filters/ffmpeg_video_decoder.cc.me	2025-09-05 02:43:56.666833745 +0200
++++ chromium-140.0.7339.80/media/filters/ffmpeg_video_decoder.cc	2025-09-05 03:09:01.121397898 +0200
+@@ -486,7 +486,7 @@ bool FFmpegVideoDecoder::ConfigureDecode
+ 
+   codec_context_->opaque = this;
+   codec_context_->get_buffer2 = GetVideoBufferImpl;
+-  codec_context_->flags |= AV_CODEC_FLAG_COPY_OPAQUE;
++  //codec_context_->flags |= AV_CODEC_FLAG_COPY_OPAQUE;
+ 
+   if (decode_nalus_) {
+     codec_context_->flags2 |= AV_CODEC_FLAG2_CHUNKS;

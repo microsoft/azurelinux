@@ -11,7 +11,7 @@
 
 Name:          dtc
 Version:       1.7.2
-Release:       7%{?dist}
+Release: 8%{?dist}
 Summary:       Device Tree Compiler
 License:       GPL-2.0-or-later
 URL:           https://devicetree.org/

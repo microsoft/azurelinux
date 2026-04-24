@@ -1,0 +1,38 @@
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Fri, 21 Sep 2018 12:47:42 +0200
+Subject: [PATCH] Link against shared library
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 408032c6..a8368af4 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -130,15 +130,15 @@ endif()
+ 
+ # this creates the cpuid tool
+ ADD_EXECUTABLE      ( cpuid ${ly_base_dir}/util/cpuid.c )
+-TARGET_LINK_LIBRARIES  ( cpuid ${ly_lib_static} )
++TARGET_LINK_LIBRARIES  ( cpuid ${ly_lib_shared} )
+ 
+ # this creates the conversion tool
+ ADD_EXECUTABLE			( yuvconvert ${ly_base_dir}/util/yuvconvert.cc )
+-TARGET_LINK_LIBRARIES	( yuvconvert ${ly_lib_static} )
++TARGET_LINK_LIBRARIES	( yuvconvert ${ly_lib_shared} )
+ 
+ # this creates the yuvconstants tool
+ ADD_EXECUTABLE      ( yuvconstants ${ly_base_dir}/util/yuvconstants.c )
+-TARGET_LINK_LIBRARIES  ( yuvconstants ${ly_lib_static} )
++TARGET_LINK_LIBRARIES  ( yuvconstants ${ly_lib_shared} )
+ 
+ find_package ( JPEG )
+ if (JPEG_FOUND)
+@@ -168,7 +168,7 @@ if(UNIT_TEST)
+   endif()
+ 
+   add_executable(libyuv_unittest ${ly_unittest_sources})
+-  target_link_libraries(libyuv_unittest ${ly_lib_name} ${GTEST_LIBRARY})
++  target_link_libraries(libyuv_unittest ${ly_lib_shared} ${GTEST_LIBRARY})
+   find_library(PTHREAD_LIBRARY pthread)
+   if(NOT PTHREAD_LIBRARY STREQUAL "PTHREAD_LIBRARY-NOTFOUND")
+     target_link_libraries(libyuv_unittest pthread)

@@ -8,7 +8,7 @@
 Summary: X-Resource extension client library
 Name: libXres
 Version: 1.2.2
-Release: 6%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
+Release: 7%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
 License: X11
 URL: http://www.x.org
 

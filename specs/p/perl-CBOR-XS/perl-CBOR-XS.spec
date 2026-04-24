@@ -3,7 +3,7 @@
 
 Name:           perl-CBOR-XS
 Version:        1.87
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        Concise Binary Object Representation (CBOR)
 # COPYING:      GPL-3.0 text
 ## Replaced by system header-only package

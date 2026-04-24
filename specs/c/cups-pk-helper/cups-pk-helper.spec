@@ -3,7 +3,7 @@
 
 Name:           cups-pk-helper
 Version:        0.2.7
-Release:        10%{?dist}
+Release: 11%{?dist}
 Summary:        A helper that makes system-config-printer use PolicyKit
 
 License:        GPL-2.0-or-later

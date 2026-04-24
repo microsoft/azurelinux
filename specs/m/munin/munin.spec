@@ -3,7 +3,7 @@
 
 Name:           munin
 Version:        2.0.76
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        Network-wide resource monitoring tool
 License:        GPL-2.0-only
 URL:            http://munin-monitoring.org/

@@ -3,7 +3,7 @@
 
 Name:           perl-ColorThemeBase-Static
 Version:        0.009
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Base class for color theme modules with static list of items
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/ColorThemeBase-Static/

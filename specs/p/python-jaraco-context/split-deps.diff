@@ -1,0 +1,112 @@
+diff --git a/.coveragerc b/.coveragerc
+index 35b98b1..2e3f4dd 100644
+--- a/.coveragerc
++++ b/.coveragerc
+@@ -8,6 +8,8 @@ disable_warnings =
+ [report]
+ show_missing = True
+ exclude_also =
+-	# jaraco/skeleton#97
+-	@overload
++	# Exclude common false positives per
++	# https://coverage.readthedocs.io/en/latest/excluding.html#advanced-exclusion
++	# Ref jaraco/skeleton#97 and jaraco/skeleton#135
++	class .*\bProtocol\):
+ 	if TYPE_CHECKING:
+diff --git a/.pre-commit-config.yaml b/.pre-commit-config.yaml
+index 5a4a7e9..ff54405 100644
+--- a/.pre-commit-config.yaml
++++ b/.pre-commit-config.yaml
+@@ -1,6 +1,6 @@
+ repos:
+ - repo: https://github.com/astral-sh/ruff-pre-commit
+-  rev: v0.1.8
++  rev: v0.5.6
+   hooks:
+   - id: ruff
+   - id: ruff-format
+diff --git a/mypy.ini b/mypy.ini
+index b6f9727..83b0d15 100644
+--- a/mypy.ini
++++ b/mypy.ini
+@@ -1,5 +1,14 @@
+ [mypy]
+-ignore_missing_imports = True
+-# required to support namespace packages
+-# https://github.com/python/mypy/issues/14057
++# Is the project well-typed?
++strict = False
++
++# Early opt-in even when strict = False
++warn_unused_ignores = True
++warn_redundant_casts = True
++enable_error_code = ignore-without-code
++
++# Support namespace packages per https://github.com/python/mypy/issues/14057
+ explicit_package_bases = True
++
++# Disable overload-overlap due to many false-positives
++disable_error_code = overload-overlap
+diff --git a/pyproject.toml b/pyproject.toml
+index 27a68aa..aa0a066 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -29,15 +29,11 @@ Source = "https://github.com/jaraco/jaraco.context"
+ test = [
+ 	# upstream
+ 	"pytest >= 6, != 8.1.*",
+-	"pytest-checkdocs >= 2.4",
+-	"pytest-cov",
+-	"pytest-mypy",
+-	"pytest-enabler >= 2.2",
+-	"pytest-ruff >= 0.2.1; sys_platform != 'cygwin'",
+ 
+ 	# local
+ 	"portend",
+ ]
++
+ doc = [
+ 	# upstream
+ 	"sphinx >= 3.5",
+@@ -52,4 +48,26 @@ doc = [
+ 	# local
+ ]
+ 
++check = [
++	"pytest-checkdocs >= 2.4",
++	"pytest-ruff >= 0.2.1; sys_platform != 'cygwin'",
++]
++
++cover = [
++	"pytest-cov",
++]
++
++enabler = [
++	"pytest-enabler >= 2.2",
++]
++
++type = [
++	# upstream
++	"pytest-mypy",
++
++	# local
++]
++
++
++
+ [tool.setuptools_scm]
+diff --git a/tox.ini b/tox.ini
+index cc4db36..01f0975 100644
+--- a/tox.ini
++++ b/tox.ini
+@@ -8,6 +8,10 @@ commands =
+ usedevelop = True
+ extras =
+ 	test
++	check
++	cover
++	enabler
++	type
+ 
+ [testenv:diffcov]
+ description = run tests and check that diff from main is covered

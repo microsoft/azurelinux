@@ -12,7 +12,7 @@
 
 Name:           hipify
 Version:        %{rocm_version}
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Convert CUDA to HIP
 
 Url:            https://github.com/ROCm

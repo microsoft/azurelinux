@@ -28,7 +28,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
 Version:        5.1.1
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Diff implementation, version %{major}
 
 License:        BSD-3-Clause

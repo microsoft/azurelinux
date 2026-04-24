@@ -3,7 +3,7 @@
 
 Name:           libmanette
 Version:        0.2.13
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Game controller library
 
 License:        LGPL-2.1-or-later

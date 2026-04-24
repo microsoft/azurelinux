@@ -7,7 +7,7 @@
 Name:           perl-Function-Parameters
 %global cpan_version 2.002006
 Version:        2.2.6
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Subroutine definitions with parameter lists
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Function-Parameters

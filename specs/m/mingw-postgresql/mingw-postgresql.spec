@@ -5,7 +5,7 @@
 
 Name:           mingw-postgresql
 Version:        16.9
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        MinGW Windows PostgreSQL library
 
 License:        PostgreSQL

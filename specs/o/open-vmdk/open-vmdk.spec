@@ -3,7 +3,7 @@
 
 Name:           open-vmdk
 Version:        0.3.12
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Tools to create OVA files from raw disk images
 License:        Apache-2.0
 URL:            https://github.com/vmware/open-vmdk

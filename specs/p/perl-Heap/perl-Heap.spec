@@ -3,7 +3,7 @@
 
 Name:           perl-Heap
 Version:        0.80
-Release:        48%{?dist}
+Release: 49%{?dist}
 Summary:        Perl extension for keeping data partially sorted
 
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

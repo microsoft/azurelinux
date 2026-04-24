@@ -3,7 +3,7 @@
 
 Name:           perl-Cache-Cache
 Version:        1.08
-Release:        32%{?dist}
+Release: 33%{?dist}
 Summary:        Generic cache interface and implementations
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Cache-Cache

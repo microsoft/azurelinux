@@ -1,5 +1,5 @@
 --- icu_locale_core-2.1.1/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ icu_locale_core-2.1.1/Cargo.toml	2025-10-29T12:07:21.519990+00:00
++++ icu_locale_core-2.1.1/Cargo.toml	2025-10-30T21:38:40.352957+00:00
 @@ -126,3 +126,25 @@
  version = "0.11.3"
  optional = true

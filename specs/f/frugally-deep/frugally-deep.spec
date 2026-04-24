@@ -14,7 +14,7 @@ License:        MIT
 # Main license is MIT
 # BSD-2-Clause is only for cmake/HunterGate.cmake and that is not distributed
 Version:        0.15.30
-Release:        9%{?dist}
+Release: 10%{?dist}
 
 URL:            https://github.com/Dobiasd/frugally-deep
 Source0:        %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz

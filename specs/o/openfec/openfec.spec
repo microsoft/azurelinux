@@ -3,7 +3,7 @@
 
 Name:		openfec
 Version:	1.4.2.6
-Release:	7%{?dist}
+Release: 8%{?dist}
 Summary:	Application-Level Forward Erasure Correction codes
 License:	CeCILL-C and GPLv2+ and BSD
 # GPLv2+:

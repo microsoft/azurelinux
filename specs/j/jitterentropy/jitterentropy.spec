@@ -4,7 +4,7 @@
 %global libjit_soversion 3
 Name:           jitterentropy
 Version:        3.6.0
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Library implementing the jitter entropy source
 
 License:        BSD-3-Clause OR GPL-2.0-only

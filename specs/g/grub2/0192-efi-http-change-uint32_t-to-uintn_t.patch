@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Keng-Yu Lin <kengyu@hpe.com>
+Date: Wed, 26 Apr 2023 01:43:16 -0400
+Subject: [PATCH] efi/http: change uint32_t to uintn_t
+
+Modify UINT32 to UINTN in EFI_HTTP_MESSAGE to
+be UEFI 2.9 compliant.
+
+Signed-off-by: Keng-Yu Lin <kengyu@hpe.com>
+Signed-off-by: Nicolas Frayer <nfrayer@redhat.com>
+---
+ include/grub/efi/http.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/grub/efi/http.h b/include/grub/efi/http.h
+index c5e9a89f505..ad164ba1913 100644
+--- a/include/grub/efi/http.h
++++ b/include/grub/efi/http.h
+@@ -171,9 +171,9 @@ typedef struct {
+     grub_efi_http_request_data_t *request;
+     grub_efi_http_response_data_t *response;
+   } data;
+-  grub_efi_uint32_t header_count;
++  grub_efi_uintn_t header_count;
+   grub_efi_http_header_t *headers;
+-  grub_efi_uint32_t body_length;
++  grub_efi_uintn_t body_length;
+   void *body;
+ } grub_efi_http_message_t;
+ 

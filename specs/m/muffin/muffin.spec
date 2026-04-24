@@ -8,7 +8,7 @@
 
 Name:          muffin
 Version:       6.4.1
-Release:       3%{?dist}
+Release: 4%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 # Automatically converted from old format: GPLv2+ - review is highly recommended.

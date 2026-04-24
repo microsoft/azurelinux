@@ -3,7 +3,7 @@
 
 Name:           perl-HTTP-Negotiate
 Version:        6.01
-Release:        41%{?dist}
+Release: 42%{?dist}
 Summary:        Choose a variant to serve
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/HTTP-Negotiate

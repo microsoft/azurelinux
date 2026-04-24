@@ -1,0 +1,28 @@
+--- sympy-sympy-1.14.0/doc/src/conf.py.orig	2025-04-27 05:37:26.000000000 -0600
++++ sympy-sympy-1.14.0/doc/src/conf.py	2025-04-28 14:12:20.813604219 -0600
+@@ -16,9 +16,6 @@ import os
+ import subprocess
+ from datetime import datetime
+ 
+-from intersphinx_registry import get_intersphinx_mapping
+-
+-
+ # Make sure we import sympy from git
+ sys.path.insert(0, os.path.abspath('../..'))
+ 
+@@ -458,9 +455,12 @@ texinfo_documents = [
+ graphviz_output_format = 'svg'
+ 
+ # Enable links to other packages
+-intersphinx_mapping = get_intersphinx_mapping(
+-    packages={"matplotlib", "mpmath", "scipy", "numpy"},
+-)
++intersphinx_mapping = {
++    'matplotlib': ('https://matplotlib.org/stable/', None),
++    'mpmath': ('https://mpmath.org/doc/current/', '/usr/share/doc/python-mpmath-doc/html/objects.inv'),
++    "scipy": ("https://docs.scipy.org/doc/scipy/", None),
++    "numpy": ("https://numpy.org/doc/stable/", None),
++}
+ # Require :external: to reference intersphinx. Prevents accidentally linking
+ # to something from matplotlib.
+ intersphinx_disabled_reftypes = ['*']

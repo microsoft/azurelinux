@@ -8,7 +8,7 @@
 Summary:	Test file attributes through Test::Builder
 Name:		perl-Test-File
 Version:	%{rpm_version}
-Release:	2%{?dist}
+Release: 3%{?dist}
 License:	Artistic-2.0
 URL:		https://metacpan.org/release/Test-File
 Source0:	https://cpan.metacpan.org/modules/by-module/Test/Test-File-%{cpan_version}.tar.gz

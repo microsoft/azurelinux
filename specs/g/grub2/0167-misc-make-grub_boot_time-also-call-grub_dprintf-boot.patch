@@ -1,0 +1,44 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 24 Mar 2022 14:40:01 -0400
+Subject: [PATCH] misc: make grub_boot_time() also call
+ grub_dprintf("boot",...)
+
+Currently grub_boot_time() includes valuable debugging messages, but if
+you build without BOOT_TIME_STATS enabled, they are silently and
+confusingly compiled away.
+
+This patch changes grub_boot_time() to also log when "boot" is enabled
+in DEBUG, regardless of BOOT_TIME_STATS.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/kern/misc.c | 1 +
+ include/grub/misc.h   | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/kern/misc.c b/grub-core/kern/misc.c
+index d3a493e3552..f607244e7ae 100644
+--- a/grub-core/kern/misc.c
++++ b/grub-core/kern/misc.c
+@@ -1438,6 +1438,7 @@ grub_real_boot_time (const char *file,
+ 
+   va_start (args, fmt);
+   n->msg = grub_xvasprintf (fmt, args);
++  grub_dprintf ("boot", "%s\n", n->msg);
+   va_end (args);
+ 
+   *boot_time_last = n;
+diff --git a/include/grub/misc.h b/include/grub/misc.h
+index 252bdb161eb..c3c735371dc 100644
+--- a/include/grub/misc.h
++++ b/include/grub/misc.h
+@@ -530,7 +530,7 @@ void EXPORT_FUNC(grub_real_boot_time) (const char *file,
+ 				       const char *fmt, ...) __attribute__ ((format (GNU_PRINTF, 3, 4)));
+ #define grub_boot_time(...) grub_real_boot_time(GRUB_FILE, __LINE__, __VA_ARGS__)
+ #else
+-#define grub_boot_time(...)
++#define grub_boot_time(fmt, ...) grub_dprintf("boot", fmt "\n", ##__VA_ARGS__)
+ #endif
+ 
+ #define _grub_min(a, b, _a, _b)						      \

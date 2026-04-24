@@ -1,0 +1,127 @@
+From faac5c4bd5b7dbfaa0369e530137dc311fa1ef70 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Alejandro=20S=C3=A1ez?= <asm@redhat.com>
+Date: Mon, 17 Mar 2025 20:47:39 +0100
+Subject: [PATCH] Fix issues
+
+---
+ error_test.go | 74 ++++-----------------------------------------------
+ 1 file changed, 5 insertions(+), 69 deletions(-)
+
+diff --git a/error_test.go b/error_test.go
+index 5f740e5..e483cc3 100644
+--- a/error_test.go
++++ b/error_test.go
+@@ -67,18 +67,18 @@ func TestStackFormat(t *testing.T) {
+ 
+ 		if err := compareStacks(bs[0], bs[1]); err != nil {
+ 			t.Errorf("Stack didn't match")
+-			t.Errorf(err.Error())
++			t.Errorf("%s", err.Error())
+ 		}
+ 
+ 		stack := string(e.Stack())
+ 
+ 		if !strings.Contains(stack, "a: b(5)") {
+ 			t.Errorf("Stack trace does not contain source line: 'a: b(5)'")
+-			t.Errorf(stack)
++			t.Errorf("%s", stack)
+ 		}
+ 		if !strings.Contains(stack, "error_test.go:") {
+ 			t.Errorf("Stack trace does not contain file name: 'error_test.go:'")
+-			t.Errorf(stack)
++			t.Errorf("%s", stack)
+ 		}
+ 	}()
+ 
+@@ -97,7 +97,7 @@ func TestSkipWorks(t *testing.T) {
+ 
+ 		if err := compareStacks(bs[0], bs[1]); err != nil {
+ 			t.Errorf("Stack didn't match")
+-			t.Errorf(err.Error())
++			t.Errorf("%s", err.Error())
+ 		}
+ 	}()
+ 
+@@ -122,7 +122,7 @@ func TestNew(t *testing.T) {
+ 
+ 	if err := compareStacks(bs[0], bs[1]); err != nil {
+ 		t.Errorf("Stack didn't match")
+-		t.Errorf(err.Error())
++		t.Errorf("%s", err.Error())
+ 	}
+ 
+ 	if err.ErrorStack() != err.TypeName()+" "+err.Error()+"\n"+string(err.Stack()) {
+@@ -210,70 +210,6 @@ func TestWrapPrefixError(t *testing.T) {
+ 	}
+ }
+ 
+-func ExampleErrorf(x int) (int, error) {
+-	if x%2 == 1 {
+-		return 0, Errorf("can only halve even numbers, got %d", x)
+-	}
+-	return x / 2, nil
+-}
+-
+-func ExampleWrapError() (error, error) {
+-	// Wrap io.EOF with the current stack-trace and return it
+-	return nil, Wrap(io.EOF, 0)
+-}
+-
+-func ExampleWrapError_skip() {
+-	defer func() {
+-		if err := recover(); err != nil {
+-			// skip 1 frame (the deferred function) and then return the wrapped err
+-			err = Wrap(err, 1)
+-		}
+-	}()
+-}
+-
+-func ExampleIs(reader io.Reader, buff []byte) {
+-	_, err := reader.Read(buff)
+-	if Is(err, io.EOF) {
+-		return
+-	}
+-}
+-
+-func ExampleNew(UnexpectedEOF error) error {
+-	// calling New attaches the current stacktrace to the existing UnexpectedEOF error
+-	return New(UnexpectedEOF)
+-}
+-
+-func ExampleWrap() error {
+-
+-	if err := recover(); err != nil {
+-		return Wrap(err, 1)
+-	}
+-
+-	return a()
+-}
+-
+-func ExampleError_Error(err error) {
+-	fmt.Println(err.Error())
+-}
+-
+-func ExampleError_ErrorStack(err error) {
+-	fmt.Println(err.(*Error).ErrorStack())
+-}
+-
+-func ExampleError_Stack(err *Error) {
+-	fmt.Println(err.Stack())
+-}
+-
+-func ExampleError_TypeName(err *Error) {
+-	fmt.Println(err.TypeName(), err.Error())
+-}
+-
+-func ExampleError_StackFrames(err *Error) {
+-	for _, frame := range err.StackFrames() {
+-		fmt.Println(frame.File, frame.LineNumber, frame.Package, frame.Name)
+-	}
+-}
+-
+ func a() error {
+ 	b(5)
+ 	return nil
+-- 
+2.48.1
+

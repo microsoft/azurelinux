@@ -3,7 +3,7 @@
 
 Name:           perl-MooseX-ConfigFromFile
 Version:        0.14
-Release:        33%{?dist}
+Release: 34%{?dist}
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Summary:        An abstract Moose role for setting attributes from a configfile
 URL:            https://metacpan.org/release/MooseX-ConfigFromFile

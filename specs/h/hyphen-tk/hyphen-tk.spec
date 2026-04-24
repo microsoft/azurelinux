@@ -5,7 +5,7 @@ Name: hyphen-tk
 Summary: Turkmen hyphenation rules
 %global upstreamid 20210322
 Version: 0.%{upstreamid}
-Release: 7%{?dist}
+Release: 8%{?dist}
 Source: http://mirror.ctan.org/language/hyph-utf8/tex/generic/hyph-utf8/patterns/tex/hyph-tk.tex
 URL: http://tug.org/tex-hyphen
 License: MIT

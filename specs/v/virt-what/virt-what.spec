@@ -3,7 +3,7 @@
 
 Name:           virt-what
 Version:        1.27
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        Detect if we are running in a virtual machine
 License:        GPL-2.0-or-later
 

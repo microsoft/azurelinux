@@ -1,0 +1,43 @@
+From 5fcacd2eaf72aa0c60d92b276ca880fe13060bbd Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Wed, 26 Feb 2025 16:26:49 +0100
+Subject: [PATCH 2/2] Remove optional dependency on universalchardet
+
+Forwarded: not-needed
+---
+ builtins/src/main/java/org/jline/builtins/Nano.java | 12 ------------
+ 1 file changed, 12 deletions(-)
+
+diff --git a/builtins/src/main/java/org/jline/builtins/Nano.java b/builtins/src/main/java/org/jline/builtins/Nano.java
+index 491d0bc3..be5748c1 100644
+--- a/builtins/src/main/java/org/jline/builtins/Nano.java
++++ b/builtins/src/main/java/org/jline/builtins/Nano.java
+@@ -51,7 +51,6 @@ import org.jline.terminal.impl.MouseSupport;
+ import org.jline.utils.*;
+ import org.jline.utils.InfoCmp.Capability;
+ import org.jline.utils.Status;
+-import org.mozilla.universalchardet.UniversalDetector;
+ 
+ import static org.jline.builtins.SyntaxHighlighter.*;
+ import static org.jline.keymap.KeyMap.KEYMAP_LENGTH;
+@@ -380,17 +379,6 @@ public class Nano implements Editor {
+             }
+             byte[] bytes = bos.toByteArray();
+ 
+-            try {
+-                UniversalDetector detector = new UniversalDetector(null);
+-                detector.handleData(bytes, 0, bytes.length);
+-                detector.dataEnd();
+-                if (detector.getDetectedCharset() != null) {
+-                    charset = Charset.forName(detector.getDetectedCharset());
+-                }
+-            } catch (Throwable t) {
+-                // Ignore
+-            }
+-
+             // TODO: detect format, do not eat last newline
+             try (BufferedReader reader =
+                     new BufferedReader(new InputStreamReader(new ByteArrayInputStream(bytes), charset))) {
+-- 
+2.50.1
+

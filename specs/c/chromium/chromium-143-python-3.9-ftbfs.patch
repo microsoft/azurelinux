@@ -1,0 +1,73 @@
+Author: <than@redhat.com>
+
+Fix build error caused by python-3.9 on EL9
+
+Traceback (most recent call last):
+  File "/builddir/build/BUILD/chromium-143.0.7499.40/out/Release/../../tools/metrics/histograms/generate_allowlist_from_histograms_file.py", line 10, in <module>
+    import extract_histograms
+  File "/builddir/build/BUILD/chromium-143.0.7499.40/tools/metrics/histograms/extract_histograms.py", line 24, in <module>
+    import xml_utils
+  File "/builddir/build/BUILD/chromium-143.0.7499.40/tools/metrics/histograms/../common/xml_utils.py", line 14, in <module>
+    DomTree = minidom.Element | minidom.Document
+TypeError: unsupported operand type(s) for |: 'type' and 'type'
+
+diff -up chromium-143.0.7499.40/tools/metrics/histograms/extract_histograms.py.python-3.9-ftbfs chromium-143.0.7499.40/tools/metrics/histograms/extract_histograms.py
+--- chromium-143.0.7499.40/tools/metrics/histograms/extract_histograms.py.python-3.9-ftbfs	2025-11-19 22:40:05.000000000 +0100
++++ chromium-143.0.7499.40/tools/metrics/histograms/extract_histograms.py	2025-12-02 17:23:41.996802101 +0100
+@@ -18,6 +18,7 @@ import re
+ import sys
+ from typing import TypedDict
+ import xml.dom.minidom
++from typing import Optional, Union
+ 
+ sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'common'))
+ import xml_utils
+@@ -84,7 +85,7 @@ class EnumDict(TypedDict, total=False):
+   """A dict representing an enum."""
+ 
+   name: str
+-  type: str | None
++  type: Optional[str]
+   buckets: list[_BucketDict]
+   summary: str
+ 
+@@ -108,7 +109,7 @@ def ExpandHistogramNameWithSuffixes(
+     suffix_name: str,
+     histogram_name: str,
+     histogram_suffixes_node: xml.dom.minidom.Element,
+-) -> tuple[str | None, ExtractionErrors]:
++) -> tuple[Optional[str], ExtractionErrors]:
+   """Creates a new histogram name based on a histogram suffix.
+ 
+   Args:
+@@ -310,7 +311,7 @@ def _ExtractOwners(node: xml.dom.minidom
+ 
+ def _ExtractImprovementDirection(
+     histogram_node: xml.dom.minidom.Element,
+-) -> tuple[str | None, ExtractionErrors]:
++) -> tuple[Union[str, None], ExtractionErrors]:
+   """Extracts improvement direction from the given histogram element, if any.
+ 
+   Args:
+@@ -644,7 +645,7 @@ def ExtractVariantsFromXmlTree(
+   return variants_dict, errors
+ 
+ 
+-def _GetObsoleteReason(node: xml.dom.minidom.Element) -> str | None:
++def _GetObsoleteReason(node: xml.dom.minidom.Element) -> Optional[str]:
+   """If the node's histogram is obsolete, returns a string explanation.
+ 
+   Otherwise, returns None.
+diff -up chromium-143.0.7499.40/tools/metrics/common/xml_utils.py.than chromium-143.0.7499.40/tools/metrics/common/xml_utils.py
+--- chromium-143.0.7499.40/tools/metrics/common/xml_utils.py.than	2025-12-04 17:48:11.924111675 +0100
++++ chromium-143.0.7499.40/tools/metrics/common/xml_utils.py	2025-12-04 17:49:42.451979769 +0100
+@@ -11,7 +11,8 @@ from xml.dom import minidom
+ # The implementation of Node type is possible with extra runtime checks, however
+ # using a more specific type makes the intent clearer and avoids potential
+ # warnings about attributes like `tagName` not being present on all Node types.
+-DomTree = minidom.Element | minidom.Document
++from typing import Union
++DomTree = Union[minidom.Element, minidom.Document]
+ 
+ _ELEMENT_NODE = minidom.Node.ELEMENT_NODE
+ 

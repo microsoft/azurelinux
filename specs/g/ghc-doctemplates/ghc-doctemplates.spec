@@ -20,7 +20,7 @@
 Name:           ghc-%{pkg_name}
 Version:        0.11.0.1
 # can only be reset when all subpkgs bumped
-Release:        19%{?dist}
+Release: 20%{?dist}
 Summary:        Pandoc-style document templates
 
 License:        BSD-3-Clause

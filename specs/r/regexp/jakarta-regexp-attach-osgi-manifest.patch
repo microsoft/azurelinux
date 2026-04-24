@@ -1,0 +1,10 @@
+--- regexp/build.xml~	2007-03-18 23:41:02.000000000 +0100
++++ regexp/build.xml	2016-01-28 17:57:22.631161037 +0100
+@@ -102,6 +102,7 @@
+     <!-- =================================================================== -->
+     <target name="jar" depends="compile">
+         <jar jarfile="${build.dir}/${final.name}.jar"
++             manifest="MANIFEST.MF"
+              basedir="${build.dest}"
+              excludes="**/package.html">
+           <metainf dir="." includes="LICENSE,NOTICE"/>

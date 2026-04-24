@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        2.0.7
-Release:        27%{?dist}
+Release: 28%{?dist}
 Summary:        Filters to enhance web typography, with support for Django & Jinja templates
 
 # typogrify/packages/titlecase/__init__.py is MIT

@@ -11,7 +11,7 @@ Name: hunspell-gl
 Summary: Galician hunspell dictionaries
 %global upstreamid 20080515
 Version: 0.%{upstreamid}
-Release: 35%{?dist}
+Release: 36%{?dist}
 Source: https://downloads.sourceforge.net/project/aoo-extensions/800/2/corrector_ooo3.oxt
 URL: http://wiki.mancomun.org/index.php/Corrector_ortogr%C3%A1fico_para_OpenOffice.org#Descrici.C3.B3n
 License: GPL-2.0-only

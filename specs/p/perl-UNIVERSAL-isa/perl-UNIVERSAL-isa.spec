@@ -3,7 +3,7 @@
 
 Name:           perl-UNIVERSAL-isa
 Version:        1.20171012
-Release:        24%{?dist}
+Release: 25%{?dist}
 Summary:        Hack around module authors using UNIVERSAL::isa as a function
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/UNIVERSAL-isa

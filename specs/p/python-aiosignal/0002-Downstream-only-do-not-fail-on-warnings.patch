@@ -1,0 +1,27 @@
+From b1393d5adc347fbfd681591031d2e5f4ccd848fd Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Sat, 5 Jul 2025 07:22:47 -0400
+Subject: [PATCH 2/2] Downstream-only: do not fail on warnings
+
+This is too strict for downstream packaging.
+---
+ pytest.ini | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/pytest.ini b/pytest.ini
+index 665597e..db490e8 100644
+--- a/pytest.ini
++++ b/pytest.ini
+@@ -38,9 +38,6 @@ empty_parameter_set_mark = xfail
+ 
+ faulthandler_timeout = 30
+ 
+-filterwarnings =
+-  error
+-
+ # https://docs.pytest.org/en/stable/usage.html#creating-junitxml-format-files
+ junit_duration_report = call
+ # xunit1 contains more metadata than xunit2 so it's better for CI UIs:
+-- 
+2.50.0
+

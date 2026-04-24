@@ -1,0 +1,48 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 22 Mar 2022 10:57:20 -0400
+Subject: [PATCH] nx: set the nx compatible flag in EFI grub images
+
+For NX, we need the grub binary to announce that it is compatible with
+the NX feature.  This implies that when loading the executable grub
+image, several attributes are true:
+
+- the binary doesn't need an executable stack
+- the binary doesn't need sections to be both executable and writable
+- the binary knows how to use the EFI Memory Attributes protocol on code
+  it is loading.
+
+This patch adds a definition for the PE DLL Characteristics flag
+GRUB_PE32_NX_COMPAT, and changes grub-mkimage to set that flag.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ util/mkimage.c          | 1 +
+ include/grub/efi/pe32.h | 2 ++
+ 2 files changed, 3 insertions(+)
+
+diff --git a/util/mkimage.c b/util/mkimage.c
+index e2bb4d4cd05..425d920ff92 100644
+--- a/util/mkimage.c
++++ b/util/mkimage.c
+@@ -1438,6 +1438,7 @@ grub_install_generate_image (const char *dir, const char *prefix,
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wdangling-pointer"
+ #endif
++	PE_OHDR (o32, o64, dll_characteristics) = grub_host_to_target16 (GRUB_PE32_NX_COMPAT);
+ 	PE_OHDR (o32, o64, header_size) = grub_host_to_target32 (header_size);
+ 	PE_OHDR (o32, o64, entry_addr) = grub_host_to_target32 (layout.start_address);
+ 	PE_OHDR (o32, o64, image_base) = 0;
+diff --git a/include/grub/efi/pe32.h b/include/grub/efi/pe32.h
+index 4e6e9d254bd..9887e14b278 100644
+--- a/include/grub/efi/pe32.h
++++ b/include/grub/efi/pe32.h
+@@ -231,6 +231,8 @@ struct grub_pe64_optional_header
+ 
+ #define GRUB_PE32_SUBSYSTEM_EFI_APPLICATION	10
+ 
++#define GRUB_PE32_NX_COMPAT	0x0100
++
+ #define GRUB_PE32_NUM_DATA_DIRECTORIES	16
+ 
+ struct grub_pe32_section_table

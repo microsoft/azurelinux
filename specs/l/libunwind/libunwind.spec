@@ -49,7 +49,7 @@
 Summary: An unwinding library
 Name: libunwind
 Version: 1.8.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: MIT
 URL: http://savannah.nongnu.org/projects/libunwind
 Source: https://github.com/libunwind/libunwind/releases/download/v%{version}/%{name}-%{version}.tar.gz

@@ -3,7 +3,7 @@
 
 Name:           perl-Pod-Readme
 Version:        1.2.3
-Release:        20%{?dist}
+Release: 21%{?dist}
 Summary:        Intelligently generate a README file from POD
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Pod-Readme

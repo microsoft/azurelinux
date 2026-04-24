@@ -1,0 +1,32 @@
+From 70e92f6a802059f1f8d003299cea925e838745b1 Mon Sep 17 00:00:00 2001
+From: Pietro Cerutti <gahr@gahr.ch>
+Date: Tue, 1 Oct 2024 12:17:46 +0000
+Subject: [PATCH] Include unistd.h for STDOUT_FILENO
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+STDOUT_FILENO is defined in unistd.h, see [POSIX](https://pubs.opengroup.org/onlinepubs/9799919799/).
+
+This is required on FreeBSD.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ src/compression_wrapper.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/compression_wrapper.c b/src/compression_wrapper.c
+index bcaa661..8bc2043 100644
+--- a/src/compression_wrapper.c
++++ b/src/compression_wrapper.c
+@@ -31,6 +31,7 @@
+ #include <lzma.h>
+ #ifdef WITH_ZCHUNK
+ #include <zck.h>
++#include <unistd.h>
+ #endif  // WITH_ZCHUNK
+ #include "error.h"
+ #include "compression_wrapper.h"
+-- 
+2.50.1
+

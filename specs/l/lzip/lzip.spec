@@ -3,7 +3,7 @@
 
 Name:           lzip
 Version:        1.25
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        LZMA compressor with integrity checking
 
 License:        GPL-2.0-or-later

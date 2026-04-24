@@ -6,7 +6,7 @@
 # Note: 1.1.7 -> 1.2.0: just the upstream URL changed
 Name:		rubygem-%{gem_name}
 Version:	2.0.5
-Release:	102%{?dist}
+Release: 103%{?dist}
 
 Summary:	Power Assert for Ruby
 # SPDX confirmed

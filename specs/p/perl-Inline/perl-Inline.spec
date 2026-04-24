@@ -6,7 +6,7 @@
 
 Name:           perl-Inline
 Version:        0.87
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Inline Perl module
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Url:            https://metacpan.org/release/Inline

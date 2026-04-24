@@ -1,0 +1,25 @@
+From 0def1b1a1094fc57752f241250e9a1aed71bbffd Mon Sep 17 00:00:00 2001
+From: Sam Umbach <samumbach@gmail.com>
+Date: Mon, 19 May 2025 08:39:46 -0400
+Subject: [PATCH] [build] Update for compatibility with CMake 4.x (#3167)
+
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 847b6f23..847564d0 100755
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -7,7 +7,7 @@
+ # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ #
+ 
+-cmake_minimum_required (VERSION 2.8.12 FATAL_ERROR)
++cmake_minimum_required (VERSION 3.5 FATAL_ERROR)
+ set (SRT_VERSION 1.5.4)
+ 
+ set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/scripts")
+-- 
+2.50.1
+

@@ -1,0 +1,12 @@
+diff -up perl-5.10.0/t/io/fs.t.BAD perl-5.10.0/t/io/fs.t
+--- perl-5.10.0/t/io/fs.t.BAD	2008-01-30 13:36:43.000000000 -0500
++++ perl-5.10.0/t/io/fs.t	2008-01-30 13:41:27.000000000 -0500
+@@ -257,7 +257,7 @@ isnt($atime, 500000000, 'atime');
+ isnt($mtime, $ut + $delta, 'mtime: utime called with two undefs');
+ 
+ SKIP: {
+-    skip "no futimes", 6 unless ($Config{d_futimes} || "") eq "define";
++    skip "no futimes", 6;
+     note("check futimes");
+     open(my $fh, "<", 'b');
+     $foo = (utime $ut,$ut + $delta, $fh);

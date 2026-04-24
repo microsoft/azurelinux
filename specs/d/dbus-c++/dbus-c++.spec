@@ -5,7 +5,7 @@
 
 Name:          dbus-c++
 Version:       0.9.0
-Release:       36%{?dist}
+Release: 37%{?dist}
 Summary:       Native C++ bindings for D-Bus
 
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.

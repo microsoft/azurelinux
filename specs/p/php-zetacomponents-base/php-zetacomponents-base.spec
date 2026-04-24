@@ -27,7 +27,7 @@
 
 Name:           php-%{gh_owner}-%{cname}
 Version:        1.9.4
-Release:        9%{?dist}
+Release: 10%{?dist}
 Summary:        Zeta Base Component
 
 Group:          Development/Libraries

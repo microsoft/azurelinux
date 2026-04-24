@@ -4,7 +4,7 @@
 Summary: Sample Authorization Protocol for X
 Name: libXau
 Version: 1.0.12
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: MIT-open-group
 URL: http://www.x.org
 

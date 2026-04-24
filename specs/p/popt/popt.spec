@@ -9,7 +9,7 @@
 Summary:        C library for parsing command line parameters
 Name:           popt
 Version:        %{ver}%{?snap:~%{snap}}
-Release:        9%{?dist}
+Release: 10%{?dist}
 # COPYING:      MIT text
 # po/eo.po:     LicenseRef-Fedora-Public-Domain
 # po/fi.po:     MIT AND LicenseRef-Fedora-Public-Domain

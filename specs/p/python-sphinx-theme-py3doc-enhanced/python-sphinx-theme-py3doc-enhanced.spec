@@ -9,7 +9,7 @@ enhancements.
 
 Name:           python-%{pkgname}
 Version:        2.4.0
-Release:        18%{?dist}
+Release: 19%{?dist}
 Summary:        Theme based on the theme of https://docs.python.org/3/
 
 # Automatically converted from old format: BSD - review is highly recommended.

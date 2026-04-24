@@ -4,7 +4,7 @@
 Name:    kmenuedit
 Summary: KDE menu editor
 Version: 6.6.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 License: CC0-1.0 AND GPL-2.0-only AND GPL-2.0-or-later
 URL:     https://invent.kde.org/plasma/%{name}

@@ -1,0 +1,44 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leo Sandoval <lsandova@redhat.com>
+Date: Wed, 4 Sep 2024 13:25:23 -0600
+Subject: [PATCH] load EFI commands inside test expressions
+
+These two commands may fail interrumping the normal boot process,
+so placing these inside test expressions is a safer approach.
+
+Resolves: #2305291
+Suggested-by: Kan-Ru Chen: <kanru@kanru.info>
+Signed-off-by: Leo Sandoval <lsandova@redhat.com>
+---
+ util/grub.d/25_bli.in           | 4 +++-
+ util/grub.d/30_uefi-firmware.in | 3 +--
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/util/grub.d/25_bli.in b/util/grub.d/25_bli.in
+index 26e27a019..00a8d7159 100644
+--- a/util/grub.d/25_bli.in
++++ b/util/grub.d/25_bli.in
+@@ -19,6 +19,8 @@ set -e
+ 
+ cat << EOF
+ if [ "\$grub_platform" = "efi" ]; then
+-  insmod bli
++        if [ ! insmod bli ]; then
++                echo "bli module not available"
++        fi
+ fi
+ EOF
+diff --git a/util/grub.d/30_uefi-firmware.in b/util/grub.d/30_uefi-firmware.in
+index 1c2365ddb..1ef31e08f 100644
+--- a/util/grub.d/30_uefi-firmware.in
++++ b/util/grub.d/30_uefi-firmware.in
+@@ -32,8 +32,7 @@ gettext_printf "Adding boot menu entry for UEFI Firmware Settings ...\n" >&2
+ 
+ cat << EOF
+ if [ "\$grub_platform" = "efi" ]; then
+-	fwsetup --is-supported
+-	if [ "\$?" = 0 ]; then
++	if [ fwsetup --is-supported ]; then
+ 		menuentry '$LABEL' \$menuentry_id_option 'uefi-firmware' {
+ 			fwsetup
+ 		}

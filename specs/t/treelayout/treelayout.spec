@@ -6,7 +6,7 @@
 
 Name:          treelayout
 Version:       1.0.3
-Release:       27%{?dist}
+Release: 28%{?dist}
 Summary:       Efficient and customizable Tree Layout Algorithm in Java
 License:       BSD-3-Clause
 URL:           http://treelayout.sourceforge.net/

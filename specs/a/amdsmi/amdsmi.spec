@@ -43,7 +43,7 @@
 
 Name:       amdsmi
 Version:    %{rocm_version}
-Release:    7%{?dist}
+Release: 8%{?dist}
 Summary:    AMD System Management Interface
 
 License:    NCSA AND MIT AND BSD-3-Clause

@@ -1,0 +1,59 @@
+From 0a2da7c87ae9b7e3e11e77416a8e75633d4608a0 Mon Sep 17 00:00:00 2001
+From: Pietro Cerutti <gahr@gahr.ch>
+Date: Mon, 14 Oct 2024 11:49:42 +0000
+Subject: [PATCH 3/4] Don't try to use imported targets of turned-off
+ dependencies
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ src/CMakeLists.txt | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 5309050..9444875 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -88,15 +88,21 @@ TARGET_LINK_LIBRARIES(libcreaterepo_c ${BZIP2_LIBRARIES})
+ TARGET_LINK_LIBRARIES(libcreaterepo_c ${CURL_LIBRARY})
+ TARGET_LINK_LIBRARIES(libcreaterepo_c PkgConfig::GLIB2)
+ TARGET_LINK_LIBRARIES(libcreaterepo_c PkgConfig::GIO)
+-TARGET_LINK_LIBRARIES(libcreaterepo_c PkgConfig::LIBMODULEMD)
++IF (WITH_LIBMODULEMD)
++    TARGET_LINK_LIBRARIES(libcreaterepo_c PkgConfig::LIBMODULEMD)
++ENDIF (WITH_LIBMODULEMD)
+ TARGET_LINK_LIBRARIES(libcreaterepo_c ${LIBXML2_LIBRARIES})
+ TARGET_LINK_LIBRARIES(libcreaterepo_c PkgConfig::LZMA)
+ TARGET_LINK_LIBRARIES(libcreaterepo_c ${OPENSSL_LIBRARIES})
+ TARGET_LINK_LIBRARIES(libcreaterepo_c PkgConfig::RPM)
+ TARGET_LINK_LIBRARIES(libcreaterepo_c PkgConfig::SQLITE3)
+ TARGET_LINK_LIBRARIES(libcreaterepo_c ${ZLIB_LIBRARY})
+-TARGET_LINK_LIBRARIES(libcreaterepo_c PkgConfig::ZCK)
+-TARGET_LINK_LIBRARIES(libcreaterepo_c PkgConfig::DRPM)
++IF (WITH_ZCHUNK)
++    TARGET_LINK_LIBRARIES(libcreaterepo_c PkgConfig::ZCK)
++ENDIF (WITH_ZCHUNK)
++IF (ENABLE_DRPM)
++    TARGET_LINK_LIBRARIES(libcreaterepo_c PkgConfig::DRPM)
++ENDIF (ENABLE_DRPM)
+ TARGET_LINK_LIBRARIES(libcreaterepo_c PkgConfig::ZSTD)
+ 
+ SET_TARGET_PROPERTIES(libcreaterepo_c PROPERTIES
+@@ -115,8 +121,10 @@ ADD_EXECUTABLE(mergerepo_c mergerepo_c.c)
+ TARGET_LINK_LIBRARIES(mergerepo_c
+                         libcreaterepo_c
+                         PkgConfig::GLIB2
+-                        PkgConfig::GTHREAD2
+-                        PkgConfig::LIBMODULEMD)
++                        PkgConfig::GTHREAD2)
++IF (WITH_LIBMODULEMD)
++    TARGET_LINK_LIBRARIES(mergerepo_c PkgConfig::LIBMODULEMD)
++ENDIF (WITH_LIBMODULEMD)
+ 
+ ADD_EXECUTABLE(modifyrepo_c modifyrepo_c.c)
+ TARGET_LINK_LIBRARIES(modifyrepo_c
+-- 
+2.50.1
+

@@ -1,0 +1,93 @@
+cabal-version:       >=1.10
+name:                tasty
+version:             1.5.3
+x-revision: 1
+synopsis:            Modern and extensible testing framework
+description:         Tasty is a modern testing framework for Haskell.
+                     It lets you combine your unit tests, golden
+                     tests, QuickCheck/SmallCheck properties, and any
+                     other types of tests into a single test suite.
+license:             MIT
+license-file:        LICENSE
+author:              Roman Cheplyaka <roma@ro-che.info>
+maintainer:          Roman Cheplyaka <roma@ro-che.info>
+homepage:            https://github.com/UnkindPartition/tasty
+bug-reports:         https://github.com/UnkindPartition/tasty/issues
+-- copyright:
+category:            Testing
+build-type:          Simple
+extra-source-files:  CHANGELOG.md, README.md
+
+Source-repository head
+  type:     git
+  location: https://github.com/UnkindPartition/tasty.git
+  subdir:   core
+
+flag unix
+  description:
+    Depend on the unix package to install signal handlers
+  default: True
+
+library
+  exposed-modules:
+    Test.Tasty,
+    Test.Tasty.Options,
+    Test.Tasty.Providers,
+    Test.Tasty.Providers.ConsoleFormat,
+    Test.Tasty.Runners
+    Test.Tasty.Ingredients,
+    Test.Tasty.Ingredients.Basic
+    Test.Tasty.Ingredients.ConsoleReporter
+
+    -- for testing only
+    Test.Tasty.Patterns.Types
+    Test.Tasty.Patterns.Parser
+    Test.Tasty.Patterns.Printer
+    Test.Tasty.Patterns.Eval
+  other-modules:
+    Control.Concurrent.Async
+    Test.Tasty.Parallel,
+    Test.Tasty.Core,
+    Test.Tasty.Options.Core,
+    Test.Tasty.Options.Env,
+    Test.Tasty.Patterns,
+    Test.Tasty.Patterns.Expr,
+    Test.Tasty.Run,
+    Test.Tasty.Runners.Reducers,
+    Test.Tasty.Runners.Utils,
+    Test.Tasty.CmdLine,
+    Test.Tasty.Ingredients.ListTests
+    Test.Tasty.Ingredients.IncludingOptions
+
+  build-depends:
+    base                 >= 4.9  && < 5,
+    stm                  >= 2.3  && < 2.6,
+    containers           >= 0.5.8 && < 0.9,
+    transformers         >= 0.5  && < 0.7,
+    tagged               >= 0.5  && < 0.9,
+    optparse-applicative >= 0.14 && < 0.19,
+    ansi-terminal        >= 0.9  && < 1.2
+
+  -- No reason to depend on unbounded-delays on 64-bit architecture
+  if(!arch(x86_64) && !arch(aarch64) && !arch(ppc64) && !arch(s390x) && !arch(riscv64))
+    build-depends:
+      unbounded-delays >= 0.1 && < 0.2
+
+  if(!impl(ghc >= 8.0))
+    build-depends: semigroups < 0.21
+
+  if(!impl(ghc >= 8.4))
+    build-depends: time >= 1.4 && < 1.13
+
+  if !os(windows) && !impl(ghcjs)
+    cpp-options: -DUSE_WCWIDTH
+    if flag(unix)
+      build-depends: unix < 2.9
+
+  -- hs-source-dirs:
+  default-language:    Haskell2010
+  default-extensions:  CPP, ScopedTypeVariables, DeriveDataTypeable
+  ghc-options:
+    -Wall
+    -Wno-incomplete-uni-patterns
+    -Wcompat

@@ -1,0 +1,37 @@
+From 48c34be5c676408a48aab663ac3497a5cdb27f61 Mon Sep 17 00:00:00 2001
+From: Eric Desrochers <edesrochers@microsoft.com>
+Date: Tue, 10 Mar 2026 12:19:33 -0400
+Subject: [PATCH] [Policy] Fix os_release_name value
+
+OS_RELEASE_NAME was previously matching PRETTY_NAME instead of
+the intended NAME identifier. This could cause incorrect OS
+validation and defaulting to the "Upstream Project:" instead.
+
+Adjusted the logic to correctly validate OS identifiers and
+prevent falling back to default unexpectedly.
+
+$ grep NAME /etc/os-release
+NAME="Azure Linux"
+PRETTY_NAME="Microsoft Azure Linux 3.0"
+
+Signed-off-by: Eric Desrochers <edesrochers@microsoft.com>
+---
+ sos/policies/distros/azure.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sos/policies/distros/azure.py b/sos/policies/distros/azure.py
+index 9d9b4bff..42d9bae4 100644
+--- a/sos/policies/distros/azure.py
++++ b/sos/policies/distros/azure.py
+@@ -17,7 +17,7 @@ class AzurePolicy(RedHatPolicy):
+     vendor_urls = [
+         ('Distribution Website', 'https://github.com/microsoft/azurelinux')
+     ]
+-    os_release_name = 'Microsoft Azure Linux'
++    os_release_name = 'Azure Linux'
+     os_release_file = ''
+ 
+     def __init__(self, sysroot=None, init=None, probe_runtime=True,
+-- 
+2.51.0
+

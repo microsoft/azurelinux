@@ -22,7 +22,7 @@
 
 Name:           python-%{pypi_name}
 Version:        5.0.0
-Release:        11%{?dist}
+Release: 12%{?dist}
 Summary:        OpenStack test framework
 
 License:        Apache-2.0

@@ -1,0 +1,74 @@
+cabal-version:  1.18
+build-type:     Simple
+name:           safe
+version:        0.3.21
+x-revision: 1
+license:        BSD3
+license-file:   LICENSE
+category:       Unclassified
+author:         Neil Mitchell <ndmitchell@gmail.com>
+maintainer:     Neil Mitchell <ndmitchell@gmail.com>
+copyright:      Neil Mitchell 2007-2024
+homepage:       https://github.com/ndmitchell/safe#readme
+synopsis:       Library of safe (exception free) functions
+bug-reports:    https://github.com/ndmitchell/safe/issues
+tested-with:    GHC==9.8, GHC==9.6, GHC==9.4, GHC==9.2, GHC==9.0, GHC==8.10, GHC==8.8
+description:
+    A library wrapping @Prelude@/@Data.List@ functions that can throw exceptions, such as @head@ and @!!@.
+    Each unsafe function has up to four variants, e.g. with @tail@:
+    .
+    * @tail :: [a] -> [a]@, raises an error on @tail []@.
+    .
+    * @tailMay :: [a] -> /Maybe/ [a]@, turns errors into @Nothing@.
+    .
+    * @tailDef :: /[a]/ -> [a] -> [a]@, takes a default to return on errors.
+    .
+    * @tailNote :: /String/ -> [a] -> [a]@, takes an extra argument which supplements the error message.
+    .
+    * @tailSafe :: [a] -> [a]@, returns some sensible default if possible, @[]@ in the case of @tail@.
+    .
+    This package is divided into three modules:
+    .
+    * "Safe" contains safe variants of @Prelude@ and @Data.List@ functions.
+    .
+    * "Safe.Foldable" contains safe variants of @Foldable@ functions.
+    .
+    * "Safe.Exact" creates crashing versions of functions like @zip@ (errors if the lists are not equal) and @take@ (errors if there are not enough elements), then wraps them to provide safe variants.
+extra-doc-files:
+    CHANGES.txt
+    README.md
+
+source-repository head
+    type:     git
+    location: https://github.com/ndmitchell/safe.git
+
+library
+    default-language: Haskell2010
+    build-depends:
+        base >= 4.9 && < 5
+
+    exposed-modules:
+        Safe
+        Safe.Exact
+        Safe.Foldable
+        Safe.Partial
+
+    other-modules:
+        Safe.Util
+
+test-suite safe-test
+    type:               exitcode-stdio-1.0
+    main-is:            Test.hs
+    default-language:   Haskell2010
+
+    other-modules:
+        Safe
+        Safe.Exact
+        Safe.Foldable
+        Safe.Partial
+        Safe.Util
+    build-depends:
+        base,
+        deepseq,
+        QuickCheck,
+        safe

@@ -159,7 +159,7 @@ plat = MicrovmX64
 dest = Fedora/ovmf
 cpy1 = FV/MICROVM.fd
 
-[build.ovmf.xen]
+[disabled.ovmf.xen]
 desc = ovmf build for Xen
 conf = OvmfPkg/OvmfXen.dsc
 arch = X64

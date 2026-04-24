@@ -5,7 +5,7 @@
 
 Name:           string-template-maven-plugin
 Version:        1.1
-Release:        18%{?dist}
+Release: 19%{?dist}
 Summary:        Execute StringTemplate files during a maven build
 
 License:        MIT

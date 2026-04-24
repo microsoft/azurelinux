@@ -5,7 +5,7 @@
 
 Name:           libvisual
 Version:        0.4.2
-Release:        3%{?dist}
+Release: 4%{?dist}
 Epoch:          1
 
 Summary:        Abstraction library for audio visualisation plugins

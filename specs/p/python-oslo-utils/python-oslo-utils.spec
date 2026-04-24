@@ -29,7 +29,7 @@ The OpenStack Oslo Utility library. \
 
 Name:           python-oslo-utils
 Version:        7.3.0
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        OpenStack Oslo Utility library
 
 License:        Apache-2.0

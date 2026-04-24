@@ -4,7 +4,7 @@
 Summary: A menu system for the Cinnamon project
 Name:    cinnamon-menus
 Version: 6.4.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.
 License: LicenseRef-Callaway-LGPLv2+
 URL:     https://github.com/linuxmint/%{name} 

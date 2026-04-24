@@ -1,0 +1,25 @@
+[Unit]
+Description = Milter module for the Clam Antivirus scanner
+After = syslog.target nss-lookup.target network.target
+Before = sendmail.service
+Before = postfix.service
+After = clamd@scan.service
+
+[Service]
+Type = forking
+ExecStart = /usr/sbin/clamav-milter -c /etc/mail/clamav-milter.conf
+Restart = on-failure
+
+User=clamilt
+Group=clamilt
+
+PrivateTmp=yes
+PrivateDevices=yes
+CapabilityBoundingSet=CAP_KILL
+
+ReadOnlyDirectories=/etc
+ReadOnlyDirectories=/usr
+ReadOnlyDirectories=/var/lib
+
+[Install]
+WantedBy = multi-user.target

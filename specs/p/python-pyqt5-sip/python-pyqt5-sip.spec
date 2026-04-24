@@ -8,7 +8,7 @@
 
 Name:           python-pyqt5-sip
 Version:        12.17.1
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        The sip module support for PyQt5
 
 License:        BSD-2-Clause

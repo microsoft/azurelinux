@@ -1,0 +1,209 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Date: Tue, 16 Apr 2024 12:22:54 -0600
+Subject: [PATCH] arm64: Fix EFI loader kernel image allocation
+
+We are currently allocating just enough memory for the file size,
+which means that the kernel BSS is in limbo (and not even zeroed).
+
+We are also not honoring the alignment specified in the image
+PE header.
+
+This makes us use the PE optional header in which the kernel puts the
+actual size it needs, including BSS, and make sure we clear it, and
+honors the specified alignment for the image.
+
+Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+[pjones: arm: check for the PE magic for the compiled arch]
+Signed-off-by: Peter Jones <pjones@redhat.com>
+Signed-off-by: Robbie Harwood <rharwood@redhat.com>
+---
+ grub-core/loader/efi/linux.c | 93 +++++++++++++++++++++++++++++++-------------
+ include/grub/efi/efi.h       |  3 +-
+ 2 files changed, 68 insertions(+), 28 deletions(-)
+
+diff --git a/grub-core/loader/efi/linux.c b/grub-core/loader/efi/linux.c
+index ddb27834131..cb9de5565de 100644
+--- a/grub-core/loader/efi/linux.c
++++ b/grub-core/loader/efi/linux.c
+@@ -41,6 +41,8 @@ GRUB_MOD_LICENSE ("GPLv3+");
+ static grub_dl_t my_mod;
+ static int loaded;
+ 
++static void *kernel_alloc_addr;
++static grub_uint32_t kernel_alloc_pages;
+ static void *kernel_addr;
+ static grub_uint64_t kernel_size;
+ static grub_uint32_t handover_offset;
+@@ -319,9 +321,8 @@ grub_linux_unload (void)
+ 			 GRUB_EFI_BYTES_TO_PAGES (initrd_end - initrd_start));
+   initrd_start = initrd_end = 0;
+   grub_free (linux_args);
+-  if (kernel_addr)
+-    grub_efi_free_pages ((grub_addr_t) kernel_addr,
+-			 GRUB_EFI_BYTES_TO_PAGES (kernel_size));
++  if (kernel_alloc_addr)
++    grub_efi_free_pages ((grub_addr_t) kernel_alloc_addr, kernel_alloc_pages);
+ #if !defined(__i386__) && !defined(__x86_64__)
+   grub_fdt_unload ();
+ #endif
+@@ -512,12 +513,37 @@ grub_cmd_initrd (grub_command_t cmd __attribute__ ((unused)),
+   return grub_errno;
+ }
+ 
++#if !defined(__i386__) && !defined(__x86_64__)
++static grub_err_t
++parse_pe_header (void *kernel, grub_uint64_t *total_size,
++		 grub_uint32_t *entry_offset,
++		 grub_uint32_t *alignment)
++{
++  struct linux_arch_kernel_header *lh = kernel;
++  struct grub_armxx_linux_pe_header *pe;
++
++  pe = (void *)((unsigned long)kernel + lh->hdr_offset);
++
++  if (pe->opt.magic != GRUB_PE32_PEXX_MAGIC)
++    return grub_error(GRUB_ERR_BAD_OS, "Invalid PE optional header magic");
++
++  *total_size   = pe->opt.image_size;
++  *entry_offset = pe->opt.entry_addr;
++  *alignment    = pe->opt.section_alignment;
++
++  return GRUB_ERR_NONE;
++}
++#endif
++
+ static grub_err_t
+ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+ 		int argc, char *argv[])
+ {
+   grub_file_t file = 0;
+   struct linux_arch_kernel_header lh;
++  grub_off_t filelen;
++  grub_uint32_t align;
++  void *kernel = NULL;
+   grub_err_t err;
+ 
+   grub_dl_ref (my_mod);
+@@ -548,8 +574,6 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+   if (!file)
+     goto fail;
+ 
+-  kernel_size = grub_file_size (file);
+-
+   if (grub_arch_efi_linux_load_image_header (file, &lh) != GRUB_ERR_NONE)
+ #if !defined(__i386__) && !defined(__x86_64__)
+     goto fail;
+@@ -570,33 +594,46 @@ fallback:
+     }
+ #endif
+ 
++  filelen = grub_file_size (file);
++  kernel = grub_malloc(filelen);
++  if (!kernel)
++    {
++      grub_error (GRUB_ERR_OUT_OF_MEMORY, N_("cannot allocate kernel load buffer"));
++      goto fail;
++    }
++
++  if (grub_file_read (file, kernel, filelen) < (grub_ssize_t)filelen)
++    {
++      grub_error (GRUB_ERR_FILE_READ_ERROR, N_("Can't read kernel %s"),
++		  argv[0]);
++      goto fail;
++    }
++
++#if !defined(__i386__) && !defined(__x86_64__)
++  if (parse_pe_header (kernel, &kernel_size, &handover_offset, &align) != GRUB_ERR_NONE)
++    goto fail;
++  grub_dprintf ("linux", "kernel mem size     : %lld\n", (long long) kernel_size);
++  grub_dprintf ("linux", "kernel entry offset : %d\n", handover_offset);
++  grub_dprintf ("linux", "kernel alignment    : 0x%x\n", align);
++
+   grub_loader_unset();
+ 
+-  grub_dprintf ("linux", "kernel file size: %lld\n", (long long) kernel_size);
+-  kernel_addr = grub_efi_allocate_any_pages (GRUB_EFI_BYTES_TO_PAGES (kernel_size));
+-  grub_dprintf ("linux", "kernel numpages: %lld\n",
+-		(long long) GRUB_EFI_BYTES_TO_PAGES (kernel_size));
+-  if (!kernel_addr)
++  kernel_alloc_pages = GRUB_EFI_BYTES_TO_PAGES (kernel_size + align - 1);
++  kernel_alloc_addr = grub_efi_allocate_any_pages (kernel_alloc_pages);
++  grub_dprintf ("linux", "kernel numpages: %d\n", kernel_alloc_pages);
++  if (!kernel_alloc_addr)
+     {
+       grub_error (GRUB_ERR_OUT_OF_MEMORY, N_("out of memory"));
+       goto fail;
+     }
+-
+-  grub_file_seek (file, 0);
+-  if (grub_file_read (file, kernel_addr, kernel_size)
+-      < (grub_int64_t) kernel_size)
+-    {
+-      if (!grub_errno)
+-	grub_error (GRUB_ERR_BAD_OS, N_("premature end of file %s"), argv[0]);
+-      goto fail;
+-    }
++  kernel_addr = (void *)ALIGN_UP((grub_uint64_t)kernel_alloc_addr, align);
+ 
+   grub_dprintf ("linux", "kernel @ %p\n", kernel_addr);
+-
+-#if !defined(__i386__) && !defined(__x86_64__)
+-  struct grub_armxx_linux_pe_header *pe;
+-  pe = (void *)((unsigned long)kernel_addr + lh.hdr_offset);
+-  handover_offset = pe->opt.entry_addr;
++  grub_memcpy (kernel_addr, kernel, grub_min(filelen, kernel_size));
++  if (kernel_size > filelen)
++    grub_memset ((char *)kernel_addr + filelen, 0, kernel_size - filelen);
++  grub_free(kernel);
++  kernel = NULL;
+ #endif
+ 
+   cmdline_size = grub_loader_cmdline_size (argc, argv) + sizeof (LINUX_IMAGE);
+@@ -621,6 +658,9 @@ fallback:
+     }
+ 
+ fail:
++  if (kernel)
++    grub_free (kernel);
++
+   if (file)
+     grub_file_close (file);
+ 
+@@ -633,9 +673,8 @@ fail:
+   if (linux_args && !loaded)
+     grub_free (linux_args);
+ 
+-  if (kernel_addr && !loaded)
+-    grub_efi_free_pages ((grub_addr_t) kernel_addr,
+-			 GRUB_EFI_BYTES_TO_PAGES (kernel_size));
++  if (kernel_alloc_addr && !loaded)
++    grub_efi_free_pages ((grub_addr_t) kernel_alloc_addr, kernel_alloc_pages);
+ 
+   return grub_errno;
+ }
+diff --git a/include/grub/efi/efi.h b/include/grub/efi/efi.h
+index bff833468ee..c40684821e1 100644
+--- a/include/grub/efi/efi.h
++++ b/include/grub/efi/efi.h
+@@ -20,7 +20,6 @@
+ #ifndef GRUB_EFI_EFI_HEADER
+ #define GRUB_EFI_EFI_HEADER	1
+ 
+-#include <grub/efi/pe32.h>
+ #include <grub/types.h>
+ #include <grub/dl.h>
+ #include <grub/efi/api.h>
+@@ -52,10 +51,12 @@ struct grub_arm64_linux_pe_header
+ };
+ 
+ #if defined(__arm__)
++# define GRUB_PE32_PEXX_MAGIC GRUB_PE32_PE32_MAGIC
+ # define grub_armxx_linux_pe_header grub_arm_linux_pe_header
+ #endif
+ 
+ #if defined(__aarch64__)
++# define GRUB_PE32_PEXX_MAGIC GRUB_PE32_PE64_MAGIC
+ # define grub_armxx_linux_pe_header grub_arm64_linux_pe_header
+ #endif
+ 

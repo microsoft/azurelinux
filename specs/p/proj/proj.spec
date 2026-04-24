@@ -11,7 +11,7 @@
 Name:           proj
 # Also check whether there is a new proj-data release when upgrading!
 Version:        9.6.2
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Cartographic projection software (PROJ)
 
 License:        MIT

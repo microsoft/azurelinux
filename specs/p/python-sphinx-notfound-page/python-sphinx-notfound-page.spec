@@ -10,7 +10,7 @@
 
 Name:           python-%{pypi_name}
 Version:        1.0.4
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        Create a custom 404 page with absolute URLs hardcoded
 
 License:        MIT

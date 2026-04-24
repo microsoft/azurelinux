@@ -1,0 +1,28 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Nicolas Frayer <nfrayer@redhat.com>
+Date: Wed, 17 Jan 2024 21:15:14 +0100
+Subject: [PATCH] Ignore warnings for incompatible types
+
+Add -Wno-incompatible-pointer-types to ignore warnings for incompatible
+types
+
+Signed-off-by: Nicolas Frayer <nfrayer@redhat.com>
+---
+ configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index d223fe3ef6e..4788f3d6adc 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -2166,8 +2166,8 @@ if test x"$enable_wextra" != xno ; then
+   HOST_CFLAGS="$HOST_CFLAGS -Wextra"
+ fi
+ 
+-TARGET_CFLAGS="$TARGET_CFLAGS -Werror=trampolines -fno-trampolines"
+-HOST_CFLAGS="$HOST_CFLAGS -Werror=trampolines -fno-trampolines"
++TARGET_CFLAGS="$TARGET_CFLAGS -Werror=trampolines -fno-trampolines -Wno-incompatible-pointer-types"
++HOST_CFLAGS="$HOST_CFLAGS -Werror=trampolines -fno-trampolines -Wno-incompatible-pointer-types"
+ 
+ TARGET_CPP="$TARGET_CC -E"
+ TARGET_CCAS=$TARGET_CC

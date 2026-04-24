@@ -17,7 +17,7 @@
 
 Name:           perl-MIME-Types
 Version:        2.29
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        MIME types module for Perl
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/MIME-Types

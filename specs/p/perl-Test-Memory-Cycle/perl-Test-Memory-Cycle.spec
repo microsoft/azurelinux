@@ -3,7 +3,7 @@
 
 Name:           perl-Test-Memory-Cycle
 Version:        1.06
-Release:        29%{?dist}
+Release: 30%{?dist}
 Summary:        Check for memory leaks and circular memory references
 License:        Artistic-2.0
 URL:            https://metacpan.org/release/Test-Memory-Cycle

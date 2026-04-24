@@ -6,7 +6,7 @@
 
 Name:           perl-Inline-C
 Version:        0.82
-Release:        13%{?dist}
+Release: 14%{?dist}
 Summary:        Write Perl subroutines in C
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Inline-C

@@ -6,7 +6,7 @@
 Summary: X.Org X11 X authority utilities
 Name: xorg-x11-%{pkgname}
 Version: 1.1.4
-Release: 2%{?dist}
+Release: 3%{?dist}
 # NOTE: Remove Epoch line if package gets renamed
 Epoch: 1
 License: MIT-open-group

@@ -3,7 +3,7 @@
 
 Name:           libnetfilter_cttimeout
 Version:        1.0.0
-Release:        28%{?dist}
+Release: 29%{?dist}
 Summary:        Timeout policy tuning for Netfilter/conntrack
 License:        GPL-2.0-or-later
 URL:            http://netfilter.org

@@ -1,0 +1,46 @@
+From 22d40a2e43583647f3337489ac9e286883586bcd Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Tue, 6 Jun 2023 15:06:14 +0200
+Subject: [PATCH] Remove usage of toolchains
+
+---
+ log4j-api-java9/pom.xml | 9 ---------
+ 1 file changed, 9 deletions(-)
+
+diff --git a/log4j-api-java9/pom.xml b/log4j-api-java9/pom.xml
+index e78fe4a..4a669e1 100644
+--- a/log4j-api-java9/pom.xml
++++ b/log4j-api-java9/pom.xml
+@@ -76,9 +76,6 @@
+               <goal>compile</goal>
+             </goals>
+             <configuration>
+-              <jdkToolchain>
+-                <version>[9, )</version>
+-              </jdkToolchain>
+               <release>9</release>
+             </configuration>
+           </execution>
+@@ -98,9 +95,6 @@
+               <goal>testCompile</goal>
+             </goals>
+             <configuration>
+-              <jdkToolchain>
+-                <version>[9, )</version>
+-              </jdkToolchain>
+               <release>9</release>
+               <compileSourceRoots>
+                 <compileSourceRoot>${project.basedir}/src/test/java9</compileSourceRoot>
+@@ -128,9 +122,6 @@
+           <systemPropertyVariables>
+             <java.awt.headless>true</java.awt.headless>
+           </systemPropertyVariables>
+-          <jdkToolchain>
+-            <version>[9, )</version>
+-          </jdkToolchain>
+         </configuration>
+       </plugin>
+     </plugins>
+-- 
+2.40.1
+

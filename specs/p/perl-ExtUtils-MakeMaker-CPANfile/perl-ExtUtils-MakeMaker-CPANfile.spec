@@ -3,7 +3,7 @@
 
 Name:           perl-ExtUtils-MakeMaker-CPANfile
 Version:        0.09
-Release:        21%{?dist}
+Release: 22%{?dist}
 Summary:        CPANfile support for ExtUtils::MakeMaker
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/ExtUtils-MakeMaker-CPANfile

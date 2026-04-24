@@ -5,7 +5,7 @@
 
 Name:           mingw-pango
 Version:        1.57.0
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        MinGW Windows Pango library
 
 License:        LGPL-2.0-or-later

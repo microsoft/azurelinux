@@ -3,7 +3,7 @@
 
 Name:		perl-Expect
 Version:	1.38
-Release:	4%{?dist}
+Release: 5%{?dist}
 Summary:	Expect for Perl
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Expect

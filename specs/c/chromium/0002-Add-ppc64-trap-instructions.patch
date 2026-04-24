@@ -1,0 +1,18 @@
+Index: chromium-144.0.7559.59/v8/src/base/immediate-crash.h
+===================================================================
+--- chromium-144.0.7559.59.orig/v8/src/base/immediate-crash.h
++++ chromium-144.0.7559.59/v8/src/base/immediate-crash.h
+@@ -98,6 +98,13 @@
+ #define TRAP_SEQUENCE1_() asm volatile(".2byte 0x0001");
+ #define TRAP_SEQUENCE2_() asm volatile("")
+ 
++#elif V8_HOST_ARCH_PPC64
++
++#define TRAP_SEQUENCE1_() asm volatile("trap")
++// Intentionally empty: __builtin_unreachable() is always part of the sequence
++// (see IMMEDIATE_CRASH below)
++#define TRAP_SEQUENCE2_() asm volatile("")
++
+ #else
+ 
+ // Crash report accuracy will not be guaranteed on other architectures, but at

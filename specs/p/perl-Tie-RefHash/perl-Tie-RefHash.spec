@@ -6,7 +6,7 @@
 
 Name:           perl-Tie-RefHash
 Version:        1.41
-Release:        520%{?dist}
+Release: 521%{?dist}
 Summary:        Use references as hash keys
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Tie-RefHash

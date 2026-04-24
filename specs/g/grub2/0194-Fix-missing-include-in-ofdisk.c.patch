@@ -1,0 +1,28 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Fri, 29 Sep 2023 10:56:11 -0400
+Subject: [PATCH] Fix missing #include in ofdisk.c
+
+Recently we started building with -Werror=implicit-function-declaration,
+and discovered that ofdisk.c is missing an include to declare
+grub_env_get().
+
+This patch adds that #include.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/disk/ieee1275/ofdisk.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/grub-core/disk/ieee1275/ofdisk.c b/grub-core/disk/ieee1275/ofdisk.c
+index b413822bb87..57624fde55c 100644
+--- a/grub-core/disk/ieee1275/ofdisk.c
++++ b/grub-core/disk/ieee1275/ofdisk.c
+@@ -24,6 +24,7 @@
+ #include <grub/ieee1275/ofdisk.h>
+ #include <grub/i18n.h>
+ #include <grub/time.h>
++#include <grub/env.h>
+ 
+ static char *last_devpath;
+ static grub_ieee1275_ihandle_t last_ihandle;

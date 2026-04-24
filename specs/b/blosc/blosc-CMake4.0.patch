@@ -1,0 +1,26 @@
+From 051b9d2cb9437e375dead8574f66d80ebce47bee Mon Sep 17 00:00:00 2001
+From: Francesc Alted <francesc@blosc.org>
+Date: Fri, 28 Mar 2025 07:57:15 +0100
+Subject: [PATCH] Update minimal cmake version
+
+---
+ CMakeLists.txt | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index f726a0a2..fac75f5f 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -72,10 +72,8 @@
+ #    DEV: static includes blosc.a and blosc.h
+ 
+ 
+-cmake_minimum_required(VERSION 2.8.12)
+-if(NOT CMAKE_VERSION VERSION_LESS 3.3)
+-    cmake_policy(SET CMP0063 NEW)
+-endif()
++# Recent versions of cmake dropped compatibility with < 3.5
++cmake_minimum_required(VERSION 3.5)
+ 
+ # parse the full version numbers from blosc.h
+ file(READ ${CMAKE_CURRENT_SOURCE_DIR}/blosc/blosc.h _blosc_h_contents)

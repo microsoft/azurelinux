@@ -6,7 +6,7 @@
 
 Name:       %{fontname}-fonts
 Version:    1.10
-Release:    24%{?dist}
+Release: 25%{?dist}
 Summary:    Open Sans is a humanist sans-serif typeface designed by Steve Matteson
 
 License:    Apache-2.0

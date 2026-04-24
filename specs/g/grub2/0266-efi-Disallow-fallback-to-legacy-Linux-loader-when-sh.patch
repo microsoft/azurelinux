@@ -1,0 +1,66 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Mate Kukri <mate.kukri@canonical.com>
+Date: Wed, 10 Jul 2024 12:07:17 -0600
+Subject: [PATCH] efi: Disallow fallback to legacy Linux loader when shim says
+ NX is required.
+
+Signed-off-by: Mate Kukri <mate.kukri@canonical.com>
+---
+ grub-core/loader/efi/linux.c | 13 ++++++++-----
+ include/grub/efi/api.h       |  2 ++
+ 2 files changed, 10 insertions(+), 5 deletions(-)
+
+diff --git a/grub-core/loader/efi/linux.c b/grub-core/loader/efi/linux.c
+index da5dcafad8b..21aad881ba0 100644
+--- a/grub-core/loader/efi/linux.c
++++ b/grub-core/loader/efi/linux.c
+@@ -724,6 +724,7 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+   void *kernel = NULL;
+   grub_err_t err;
+   int nx_supported = 1;
++  int nx_required = 0;
+ 
+   grub_dl_ref (my_mod);
+ 
+@@ -756,21 +757,23 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+       goto fail;
+     }
+ 
++#if !defined(__i386__) && !defined(__x86_64__)
+   if (grub_arch_efi_linux_load_image_header (file, &lh) != GRUB_ERR_NONE)
+-#if !defined(__i386__) && !defined(__x86_64__)
+     goto fail;
+ #else
+-    goto fallback;
+-
+-  if (!initrd_use_loadfile2)
++  if (grub_arch_efi_linux_load_image_header (file, &lh) != GRUB_ERR_NONE ||
++      !initrd_use_loadfile2)
+     {
++      /* We cannot use the legacy loader when NX is required */
++      if (grub_efi_check_nx_required(&nx_required))
++        goto fail;
++
+       /*
+        * This is a EFI stub image but it is too old to implement the LoadFile2
+        * based initrd loading scheme, and Linux/x86 does not support the DT
+        * based method either. So fall back to the x86-specific loader that
+        * enters Linux in EFI mode but without going through its EFI stub.
+        */
+-fallback:
+       grub_file_close (file);
+       return grub_cmd_linux_x86_legacy (cmd, argc, argv);
+     }
+diff --git a/include/grub/efi/api.h b/include/grub/efi/api.h
+index da51f57fd4a..637b1272d17 100644
+--- a/include/grub/efi/api.h
++++ b/include/grub/efi/api.h
+@@ -2011,6 +2011,8 @@ struct grub_efi_block_io
+ };
+ typedef struct grub_efi_block_io grub_efi_block_io_t;
+ 
++#define GRUB_MOK_POLICY_NX_REQUIRED	0x1
++
+ struct grub_efi_shim_lock_protocol
+ {
+   /*

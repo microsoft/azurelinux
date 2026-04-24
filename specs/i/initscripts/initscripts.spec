@@ -22,7 +22,7 @@ Requires:         gawk                       \
 Name:             initscripts
 Summary:          Basic support for legacy System V init scripts
 Version:          10.27
-Release:          1%{?dist}
+Release: 2%{?dist}
 
 License:          GPL-2.0-only
 

@@ -3,7 +3,7 @@
 
 Name:           python3-openid
 Version:        3.1.0
-Release:        29%{?dist}
+Release: 30%{?dist}
 Summary:        Python 3 port of the python-openid library
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.
 License:        Apache-2.0

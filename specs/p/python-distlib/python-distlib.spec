@@ -6,7 +6,7 @@
 
 Name:       python-distlib
 Version:    0.4.0
-Release:    2%{?dist}
+Release: 3%{?dist}
 Summary:    Low-level components of distutils2/packaging, augmented with higher-level APIs
 
 # Automatically converted from old format: Python - review is highly recommended.

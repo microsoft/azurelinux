@@ -5,7 +5,7 @@
 
 Name:           xvidcore
 Version:        1.3.7
-Release:        14%{?dist}
+Release: 15%{?dist}
 Summary:        MPEG-4 Simple and Advanced Simple Profile codec
 License:        GPL-2.0-or-later
 URL:            https://www.xvid.com/

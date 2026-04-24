@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.6.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: This gem is responsible to sanitize HTML fragments in Rails applications
 License: MIT
 URL: https://github.com/rails/rails-html-sanitizer

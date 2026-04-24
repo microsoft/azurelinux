@@ -3,7 +3,7 @@
 
 Name:           teckit
 Version:        2.5.13
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Encoding conversion library and mapping compiler
 # COPYING:                      links to license/LICENSING.txt
 # license/License_CPLv05.txt:   CPL-1.0 text, "0.5" version in the license

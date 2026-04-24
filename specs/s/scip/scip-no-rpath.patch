@@ -1,0 +1,22 @@
+--- scip-810/src/CMakeLists.txt.orig	2023-11-20 03:07:36.000000000 -0700
++++ scip-810/src/CMakeLists.txt	2023-12-29 17:07:01.994414675 -0700
+@@ -1087,7 +1087,6 @@ add_dependencies(scip scip_update_githas
+ set_target_properties(libscip PROPERTIES
+     VERSION ${SCIP_VERSION_MAJOR}.${SCIP_VERSION_MINOR}.${SCIP_VERSION_PATCH}.${SCIP_VERSION_SUB}
+     SOVERSION ${SCIP_VERSION_MAJOR}.${SCIP_VERSION_MINOR}
+-    INSTALL_RPATH_USE_LINK_PATH TRUE
+     CXX_VISIBILITY_PRESET hidden
+     C_VISIBILITY_PRESET hidden
+     VISIBILITY_INLINES_HIDDEN 1)
+@@ -1097,11 +1096,6 @@ target_include_directories(scip BEFORE P
+     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+     $<INSTALL_INTERFACE:include>)
+ 
+-# set the install rpath to the installed destination
+-set_target_properties(scip PROPERTIES
+-    INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}"
+-    INSTALL_RPATH_USE_LINK_PATH TRUE)
+-
+ # install the header files of scip
+ install(FILES ${lpiheaders} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/lpi)
+ install(FILES ${dijkstraheaders} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dijkstra)

@@ -5,7 +5,7 @@
 
 Name:           wslay
 Version:        1.1.1
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        Lightweight WebSocket library in C
 License:        MIT
 URL:            https://tatsuhiro-t.github.io/wslay

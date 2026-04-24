@@ -3,7 +3,7 @@
 
 Name: libcdio-paranoia
 Version: 10.2+2.0.2
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: CD paranoia on top of libcdio
 # Automatically converted from old format: GPLv3+ - review is highly recommended.
 License: GPL-3.0-or-later

@@ -6,7 +6,7 @@
 
 Name:           libsigc++20
 Version:        2.12.1
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        Typesafe signal framework for C++
 
 License:        LGPL-2.1-or-later

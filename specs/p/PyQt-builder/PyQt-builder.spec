@@ -5,7 +5,7 @@
 
 Name:           PyQt-builder
 Version:        1.19.0
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        The PEP 517 compliant PyQt build system
 
 License:        BSD-2-Clause

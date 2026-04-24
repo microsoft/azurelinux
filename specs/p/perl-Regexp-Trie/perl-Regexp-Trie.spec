@@ -3,7 +3,7 @@
 
 Name:		perl-Regexp-Trie
 Version:	0.02
-Release:	21%{?dist}
+Release: 22%{?dist}
 Summary:	Build trie-ized regexp
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Regexp-Trie

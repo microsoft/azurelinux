@@ -1,0 +1,114 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Michael Chang <mchang@suse.com>
+Date: Fri, 14 Mar 2025 19:03:39 +0800
+Subject: [PATCH] cryptocheck: Add --quiet option
+
+The option can be used to suppress output if we only want to test the
+return value of the command.
+
+Also, mention this option in the documentation.
+
+Signed-off-by: Michael Chang <mchang@suse.com>
+Signed-off-by: Maxim Suhanov <dfirblog@gmail.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ docs/grub.texi              |  4 +++-
+ grub-core/commands/search.c |  7 ++++++-
+ grub-core/disk/diskfilter.c | 25 +++++++++++++++++++------
+ 3 files changed, 28 insertions(+), 8 deletions(-)
+
+diff --git a/docs/grub.texi b/docs/grub.texi
+index 0af47b5ade..ae01e8c994 100644
+--- a/docs/grub.texi
++++ b/docs/grub.texi
+@@ -4678,12 +4678,14 @@ Alias for @code{hashsum --hash crc32 arg @dots{}}. See command @command{hashsum}
+ @node cryptocheck
+ @subsection cryptocheck
+ 
+-@deffn Command cryptocheck device
++@deffn Command cryptocheck [ @option{--quiet} ] device
+ Check if a given diskfilter device is backed by encrypted devices
+ (@pxref{cryptomount} for additional information).
+ 
+ The command examines all backing devices, physical volumes, of a specified
+ logical volume, like LVM2, and fails when at least one of them is unencrypted.
++
++The option @option{--quiet} can be given to suppress the output.
+ @end deffn
+ 
+ @node cryptomount
+diff --git a/grub-core/commands/search.c b/grub-core/commands/search.c
+index 1cf714ad7d..c432c0ac6f 100644
+--- a/grub-core/commands/search.c
++++ b/grub-core/commands/search.c
+@@ -163,6 +163,9 @@ is_unencrypted_disk (grub_disk_t disk)
+ 
+   if (disk->dev->id == GRUB_DISK_DEVICE_DISKFILTER_ID)
+     {
++      char opt[] = "--quiet";
++      char *args[2];
++
+       cmd = grub_command_find ("cryptocheck");
+       if (cmd == NULL) /* No diskfilter module loaded for some reason. */
+         return true;
+@@ -173,7 +176,9 @@ is_unencrypted_disk (grub_disk_t disk)
+         return true;
+ 
+       grub_snprintf (disk_str, disk_str_len, "(%s)", disk->name);
+-      res = cmd->func (cmd, 1, &disk_str);
++      args[0] = opt;
++      args[1] = disk_str;
++      res = cmd->func (cmd, 2, args);
+       grub_free (disk_str);
+       return (res != GRUB_ERR_NONE) ? true : false; /* GRUB_ERR_NONE for encrypted. */
+     }
+diff --git a/grub-core/disk/diskfilter.c b/grub-core/disk/diskfilter.c
+index 216be6a782..04b64aebc6 100644
+--- a/grub-core/disk/diskfilter.c
++++ b/grub-core/disk/diskfilter.c
+@@ -1402,6 +1402,19 @@ grub_cmd_cryptocheck (grub_command_t cmd __attribute__ ((unused)),
+   int check_pvs_res;
+   int namelen;
+   int pvs_cnt;
++  int opt_quiet = 0;
++
++  if (argc == 2)
++    {
++      if (grub_strcmp (args[0], "--quiet") == 0)
++	{
++	  opt_quiet = 1;
++	  argc--;
++	  args++;
++	}
++      else
++	return grub_error (GRUB_ERR_BAD_ARGUMENT, N_("unrecognized option: %s"), args[0]);
++    }
+ 
+   if (argc != 1)
+     return grub_error (GRUB_ERR_BAD_ARGUMENT, N_("disk name expected"));
+@@ -1424,11 +1437,11 @@ grub_cmd_cryptocheck (grub_command_t cmd __attribute__ ((unused)),
+ 
+   check_pvs_res = grub_diskfilter_check_pvs_encrypted (disk, &pvs_cnt);
+   grub_disk_close (disk);
+-
+-  grub_printf("%s is %sencrypted (%d pv%s examined)\n", &args[0][1],
+-              (check_pvs_res == GRUB_ERR_NONE) ? "" : "un",
+-              pvs_cnt,
+-              (pvs_cnt > 1) ? "s" : "");
++  if (!opt_quiet)
++    grub_printf ("%s is %sencrypted (%d pv%s examined)\n", &args[0][1],
++		 (check_pvs_res == GRUB_ERR_NONE) ? "" : "un",
++		 pvs_cnt,
++		 (pvs_cnt > 1) ? "s" : "");
+ 
+   return check_pvs_res;
+ }
+@@ -1456,7 +1469,7 @@ GRUB_MOD_INIT(diskfilter)
+ {
+   grub_disk_dev_register (&grub_diskfilter_dev);
+   cmd = grub_register_command ("cryptocheck", grub_cmd_cryptocheck,
+-                                N_("DEVICE"),
++                                N_("[--quiet] DEVICE"),
+                                 N_("Check if a logical volume resides on encrypted disks."));
+ }
+ 

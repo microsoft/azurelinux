@@ -1,0 +1,5 @@
+%_pam_libdir     %{_libdir}
+%_pam_moduledir  %{_libdir}/security
+%_pam_secconfdir %{_sysconfdir}/security
+%_pam_confdir    %{_sysconfdir}/pam.d
+%_pam_vendordir  %{_datadir}/pam.d

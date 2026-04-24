@@ -3,7 +3,7 @@
 
 Name:           perl-Image-Info
 Version:        1.45
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Image meta information extraction module for Perl
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Image-Info

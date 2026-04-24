@@ -1,0 +1,18 @@
+## When changing the periodicity of freshclam runs in the crontab,
+## this value must be adjusted also. Its value is the timespan between
+## two subsequent freshclam runs in minutes. E.g. for the default
+##
+## | 0 */3 * * *  ...
+##
+## crontab line, the value is 180 (minutes).
+# FRESHCLAM_MOD=
+
+## A predefined value for the delay in seconds. By default, the value is
+## calculated by the 'hostid' program. This predefined value guarantees
+## constant timespans of 3 hours between two subsequent freshclam runs.
+##
+## This option accepts two special values:
+## 'disabled-warn'  ...  disables the automatic freshclam update and
+##                         gives out a warning
+## 'disabled'       ...  disables the automatic freshclam silently
+# FRESHCLAM_DELAY=

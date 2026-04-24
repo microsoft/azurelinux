@@ -17,7 +17,7 @@ Name: hunspell-no
 Summary: Norwegian hunspell dictionaries
 Epoch: 1
 Version: 2.0.10
-Release: 27%{?dist}
+Release: 28%{?dist}
 
 Source: https://alioth-archive.debian.org/releases/spell-norwegian/spell-norwegian/%{version}/no_NO-pack2-%{version}.zip
 URL: https://alioth-archive.debian.org/releases/spell-norwegian/spell-norwegian/

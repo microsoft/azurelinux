@@ -50,7 +50,7 @@
 Name:             ghostscript
 Summary:          Interpreter for PostScript language & PDF
 Version:          10.05.1
-Release:          6%{?dist}
+Release: 7%{?dist}
 
 License:          AGPL-3.0-or-later
 

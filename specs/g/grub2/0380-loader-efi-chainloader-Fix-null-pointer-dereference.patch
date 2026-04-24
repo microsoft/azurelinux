@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thomas Frauendorfer | Miray Software <tf@miray.de>
+Date: Tue, 20 May 2025 09:20:46 +0200
+Subject: [PATCH] loader/efi/chainloader: Fix null pointer dereference
+
+This fixes a null pointer access during netboot
+introduced in
+* Allow chainloading EFI apps from loop mounts.
+
+The commit accesses dev->disk without testing it.
+But when booting through network dev->disk will be NULL
+
+Signed-off-by: Thomas Frauendorfer | Miray Software <tf@miray.de>
+Reviewed-by: Nicolas Frayer <nfrayer@redhat.com>
+---
+ grub-core/loader/efi/chainloader.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/grub-core/loader/efi/chainloader.c b/grub-core/loader/efi/chainloader.c
+index 0a78d0d..a004020 100644
+--- a/grub-core/loader/efi/chainloader.c
++++ b/grub-core/loader/efi/chainloader.c
+@@ -1006,7 +1006,7 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
+     grub_free (devname);
+ 
+   /* if device is loopback, use underlying dev */
+-  if (dev && dev->disk->dev->id == GRUB_DISK_DEVICE_LOOPBACK_ID)
++  if (dev && dev->disk && dev->disk->dev->id == GRUB_DISK_DEVICE_LOOPBACK_ID)
+     {
+       struct grub_loopback *d;
+       orig_dev = dev;

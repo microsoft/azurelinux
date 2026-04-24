@@ -1,0 +1,157 @@
+From 00d00ce9fca82fd4ad126dd916c8a8fa5ab0241d Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Wed, 3 Nov 2021 10:01:12 +0100
+Subject: [PATCH] Resolve import clash with OpenJDK 17
+
+Explititly import com.univocity.parsers.common.record.Record to
+resolve import clash caused by wildcard imports.
+
+Patch generated with the following sed invocation:
+
+sed -i '17iimport com.univocity.parsers.common.record.Record;' \
+  src/main/java/com/univocity/parsers/common/Context.java \
+  src/main/java/com/univocity/parsers/common/AbstractWriter.java \
+  src/main/java/com/univocity/parsers/common/AbstractParser.java \
+  src/main/java/com/univocity/parsers/common/iterators/RecordIterator.java \
+  src/main/java/com/univocity/parsers/common/ParsingContextWrapper.java \
+  src/main/java/com/univocity/parsers/common/ContextWrapper.java \
+  src/main/java/com/univocity/parsers/common/NoopParsingContext.java \
+  src/main/java/com/univocity/parsers/common/DefaultContext.java \
+  src/main/java/com/univocity/parsers/fixed/FixedWidthParser.java \
+  src/main/java/com/univocity/parsers/fixed/Lookup.java \
+---
+ src/main/java/com/univocity/parsers/common/AbstractParser.java   | 1 +
+ src/main/java/com/univocity/parsers/common/AbstractWriter.java   | 1 +
+ src/main/java/com/univocity/parsers/common/Context.java          | 1 +
+ src/main/java/com/univocity/parsers/common/ContextWrapper.java   | 1 +
+ src/main/java/com/univocity/parsers/common/DefaultContext.java   | 1 +
+ .../java/com/univocity/parsers/common/NoopParsingContext.java    | 1 +
+ .../java/com/univocity/parsers/common/ParsingContextWrapper.java | 1 +
+ .../com/univocity/parsers/common/iterators/RecordIterator.java   | 1 +
+ src/main/java/com/univocity/parsers/fixed/FixedWidthParser.java  | 1 +
+ src/main/java/com/univocity/parsers/fixed/Lookup.java            | 1 +
+ 10 files changed, 10 insertions(+)
+
+diff --git a/src/main/java/com/univocity/parsers/common/AbstractParser.java b/src/main/java/com/univocity/parsers/common/AbstractParser.java
+index b908d26..c84798c 100644
+--- a/src/main/java/com/univocity/parsers/common/AbstractParser.java
++++ b/src/main/java/com/univocity/parsers/common/AbstractParser.java
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  ******************************************************************************/
+ package com.univocity.parsers.common;
++import com.univocity.parsers.common.record.Record;
+ 
+ import com.univocity.parsers.common.input.EOFException;
+ import com.univocity.parsers.common.input.*;
+diff --git a/src/main/java/com/univocity/parsers/common/AbstractWriter.java b/src/main/java/com/univocity/parsers/common/AbstractWriter.java
+index 6a19562..3136f0f 100644
+--- a/src/main/java/com/univocity/parsers/common/AbstractWriter.java
++++ b/src/main/java/com/univocity/parsers/common/AbstractWriter.java
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  ******************************************************************************/
+ package com.univocity.parsers.common;
++import com.univocity.parsers.common.record.Record;
+ 
+ import com.univocity.parsers.common.fields.*;
+ import com.univocity.parsers.common.input.*;
+diff --git a/src/main/java/com/univocity/parsers/common/Context.java b/src/main/java/com/univocity/parsers/common/Context.java
+index d0adf5f..29dbbac 100644
+--- a/src/main/java/com/univocity/parsers/common/Context.java
++++ b/src/main/java/com/univocity/parsers/common/Context.java
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  ******************************************************************************/
+ package com.univocity.parsers.common;
++import com.univocity.parsers.common.record.Record;
+ 
+ import com.univocity.parsers.common.record.*;
+ 
+diff --git a/src/main/java/com/univocity/parsers/common/ContextWrapper.java b/src/main/java/com/univocity/parsers/common/ContextWrapper.java
+index bee87e8..0b7b120 100644
+--- a/src/main/java/com/univocity/parsers/common/ContextWrapper.java
++++ b/src/main/java/com/univocity/parsers/common/ContextWrapper.java
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  ******************************************************************************/
+ package com.univocity.parsers.common;
++import com.univocity.parsers.common.record.Record;
+ 
+ import com.univocity.parsers.common.record.*;
+ 
+diff --git a/src/main/java/com/univocity/parsers/common/DefaultContext.java b/src/main/java/com/univocity/parsers/common/DefaultContext.java
+index 11ea961..ec558d3 100644
+--- a/src/main/java/com/univocity/parsers/common/DefaultContext.java
++++ b/src/main/java/com/univocity/parsers/common/DefaultContext.java
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ package com.univocity.parsers.common;
++import com.univocity.parsers.common.record.Record;
+ 
+ import com.univocity.parsers.common.record.*;
+ 
+diff --git a/src/main/java/com/univocity/parsers/common/NoopParsingContext.java b/src/main/java/com/univocity/parsers/common/NoopParsingContext.java
+index fe1f07d..c92a5ab 100644
+--- a/src/main/java/com/univocity/parsers/common/NoopParsingContext.java
++++ b/src/main/java/com/univocity/parsers/common/NoopParsingContext.java
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  ******************************************************************************/
+ package com.univocity.parsers.common;
++import com.univocity.parsers.common.record.Record;
+ 
+ import com.univocity.parsers.common.record.*;
+ 
+diff --git a/src/main/java/com/univocity/parsers/common/ParsingContextWrapper.java b/src/main/java/com/univocity/parsers/common/ParsingContextWrapper.java
+index 20a59d8..a6dd3a2 100644
+--- a/src/main/java/com/univocity/parsers/common/ParsingContextWrapper.java
++++ b/src/main/java/com/univocity/parsers/common/ParsingContextWrapper.java
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  */
+ package com.univocity.parsers.common;
++import com.univocity.parsers.common.record.Record;
+ 
+ import com.univocity.parsers.common.record.*;
+ 
+diff --git a/src/main/java/com/univocity/parsers/common/iterators/RecordIterator.java b/src/main/java/com/univocity/parsers/common/iterators/RecordIterator.java
+index 01b22cb..4478ab8 100644
+--- a/src/main/java/com/univocity/parsers/common/iterators/RecordIterator.java
++++ b/src/main/java/com/univocity/parsers/common/iterators/RecordIterator.java
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  ******************************************************************************/
+ package com.univocity.parsers.common.iterators;
++import com.univocity.parsers.common.record.Record;
+ 
+ import com.univocity.parsers.common.*;
+ import com.univocity.parsers.common.record.*;
+diff --git a/src/main/java/com/univocity/parsers/fixed/FixedWidthParser.java b/src/main/java/com/univocity/parsers/fixed/FixedWidthParser.java
+index b38bc99..07f6560 100644
+--- a/src/main/java/com/univocity/parsers/fixed/FixedWidthParser.java
++++ b/src/main/java/com/univocity/parsers/fixed/FixedWidthParser.java
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  ******************************************************************************/
+ package com.univocity.parsers.fixed;
++import com.univocity.parsers.common.record.Record;
+ 
+ import com.univocity.parsers.common.*;
+ import com.univocity.parsers.common.input.*;
+diff --git a/src/main/java/com/univocity/parsers/fixed/Lookup.java b/src/main/java/com/univocity/parsers/fixed/Lookup.java
+index 1aeff0d..072c95b 100644
+--- a/src/main/java/com/univocity/parsers/fixed/Lookup.java
++++ b/src/main/java/com/univocity/parsers/fixed/Lookup.java
+@@ -14,6 +14,7 @@
+  * limitations under the License.
+  ******************************************************************************/
+ package com.univocity.parsers.fixed;
++import com.univocity.parsers.common.record.Record;
+ 
+ import com.univocity.parsers.common.*;
+ import com.univocity.parsers.common.record.*;
+-- 
+2.32.0
+

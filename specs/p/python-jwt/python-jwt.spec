@@ -17,7 +17,7 @@ encrypted JSON objects.}
 
 Name:           python-%{pkgname}
 Version:        2.8.0
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        JSON Web Token implementation in Python
 License:        MIT
 URL:            https://github.com/jpadilla/pyjwt

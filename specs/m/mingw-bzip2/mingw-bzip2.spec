@@ -5,7 +5,7 @@
 
 Name:           mingw-bzip2
 Version:        1.0.8
-Release:        16%{?dist}
+Release: 17%{?dist}
 Summary:        MinGW port of bzip2 file compression utility
 
 # Automatically converted from old format: BSD - review is highly recommended.

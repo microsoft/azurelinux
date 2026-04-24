@@ -1,0 +1,46 @@
+.TH POSTLOGIN 5 "2010 Dec 22" "Red Hat" "Linux-PAM Manual"
+.SH NAME
+
+postlogin \- Common configuration file for PAMified services
+
+.SH SYNOPSIS
+.B /etc/pam.d/postlogin
+.sp 2
+.SH DESCRIPTION
+
+The purpose of this PAM configuration file is to provide a common
+place for all PAM modules which should be called after the stack
+configured in
+.BR system-auth
+or the other common PAM configuration files.
+
+.sp
+The
+.BR postlogin
+configuration file is included from all individual service configuration
+files that provide login service with shell or file access.
+
+.SH NOTES
+The modules in the postlogin configuration file are executed regardless
+of the success or failure of the modules in the
+.BR system-auth
+configuration file.
+
+.SH BUGS
+.sp 2
+Sometimes it would be useful to be able to skip the postlogin modules in
+case the substack of the
+.BR system-auth
+modules failed. Unfortunately the current Linux-PAM library does not
+provide any way how to achieve this.
+
+.SH "SEE ALSO"
+pam(8), config-util(5), system-auth(5)
+
+The three
+.BR Linux-PAM
+Guides, for
+.BR "system administrators" ", "
+.BR "module developers" ", "
+and
+.BR "application developers" ". "

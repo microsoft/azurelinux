@@ -1,0 +1,14 @@
+[Desktop Entry]
+Categories=Graphics;
+X-Desktop-File-Install-Version=0.2
+Name=Xpdf PDF Viewer
+Name[sv]=Xpdf PDF-visare
+Name[de]=Xpdf PDF-Betrachter
+Comment=View Adobe PDF (acrobat) files
+Comment[sv]=Visar Adobe PDF-filer (acrobat-filer)
+Comment[de]=PDF-Betrachter
+Exec=xpdf %f
+Terminal=false
+Type=Application
+Icon=xpdf
+MimeType=application/pdf;

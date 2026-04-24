@@ -1,0 +1,53 @@
+From d58d0d2cb2626b15077eaf902f16f7a6bca41933 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Wed, 16 Jul 2025 18:15:17 +0200
+Subject: [PATCH] Adopt build script
+
+---
+ build.xml | 16 +---------------
+ 1 file changed, 1 insertion(+), 15 deletions(-)
+
+diff --git a/build.xml b/build.xml
+index 33f0c60..975e753 100644
+--- a/build.xml
++++ b/build.xml
+@@ -17,18 +17,6 @@
+     <mkdir dir="${java}" />
+     <mkdir dir="${classes}" />
+     <mkdir dir="${dist}" />
+-    <loadfile property="cupversion" srcFile="version.txt"/>
+-    <exec executable="svn" outputproperty="svnversion">
+-      <arg value="info"/>
+-      <redirector>
+-	<outputfilterchain>
+-	  <linecontains>
+-	    <contains value="Revision"/>
+-	  </linecontains>
+-	  <deletecharacters chars="Revision: "/>
+-        </outputfilterchain>
+-      </redirector>
+-    </exec>
+   </target>
+ 
+   <property environment="env" />
+@@ -69,8 +57,7 @@
+        token="+ version_str"
+        value='+ "v0.11b ${cupversion} (SVN rev ${svnversion})"'>
+     </replace>
+-    <javac srcdir="${java}" destdir="${classes}" verbose="off" listfiles="off" debug="on" source="1.5" target="1.5">
+-      <classpath refid="libraries"/>
++    <javac srcdir="${java}" destdir="${classes}" verbose="off" listfiles="off" debug="on" source="1.8" target="1.8">
+     </javac>
+   </target>
+ 
+@@ -78,7 +65,6 @@
+    <jar jarfile="${dist}/java-cup-11b.jar" basedir="${classes}">
+       <manifest>
+         <attribute name="Main-Class" value="java_cup/Main" />
+-	<attribute name="Class-Path" value="java-cup-11b-runtime.jar" />
+       </manifest>
+     </jar>
+     <jar jarfile="${dist}/java-cup-11b-runtime.jar" basedir="${classes}" includes="java_cup/runtime/*">
+-- 
+2.50.1
+

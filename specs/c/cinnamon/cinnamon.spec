@@ -19,7 +19,7 @@
 
 Name:           cinnamon
 Version:        6.4.12
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Window management and application launching for GNOME
 # Automatically converted from old format: GPLv2+ and LGPLv2+ - review is highly recommended.
 License:        GPL-2.0-or-later AND LicenseRef-Callaway-LGPLv2+

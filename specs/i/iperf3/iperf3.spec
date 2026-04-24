@@ -3,7 +3,7 @@
 
 Name:           iperf3
 Version:        3.19.1
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Measurement tool for TCP/UDP bandwidth performance
 
 # src/cjson.{c,h} and src/net.{c,h} are MIT

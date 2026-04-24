@@ -17,7 +17,7 @@ Version: 2.37
 
 %global source_name dejavu-fonts
 
-Release: 26%{?dist}
+Release: 27%{?dist}
 # original bitstream glyphs are Bitstream Vera
 # glyphs modifications by dejavu project are Public Domain
 # glyphs imported from Arev fonts are under BitStream Vera compatible license

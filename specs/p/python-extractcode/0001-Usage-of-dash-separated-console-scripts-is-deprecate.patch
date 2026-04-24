@@ -1,0 +1,23 @@
+From cd7e4bb6f2269f4d4f9cf00a4257dc7b5782f28f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Robert-Andr=C3=A9=20Mauchin?= <zebob.m@gmail.com>
+Date: Sun, 15 Oct 2023 17:03:25 +0200
+Subject: [PATCH] Usage of dash-separated 'console-scripts' is deprecated
+
+Use the underscore name 'console_scripts' instead.
+By 2023-Sep-26, you need to update your project and remove deprecated calls
+or your builds will no longer be supported.
+---
+ setup.cfg | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/setup.cfg b/setup.cfg
+index cae2e90..a7782b6 100644
+--- a/setup.cfg
++++ b/setup.cfg
+@@ -103,5 +103,5 @@ docs =
+     doc8 >= 0.8.1
+ 
+ [options.entry_points]
+-console-scripts =
++console_scripts =
+     extractcode = extractcode.cli:extractcode

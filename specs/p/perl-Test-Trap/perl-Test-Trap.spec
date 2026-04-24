@@ -3,7 +3,7 @@
 
 Name:           perl-Test-Trap
 Version:        0.3.5
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        Trap exit codes, exceptions, output, etc
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Test-Trap

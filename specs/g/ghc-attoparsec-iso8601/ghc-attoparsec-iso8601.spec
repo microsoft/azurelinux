@@ -14,7 +14,7 @@
 
 Name:           ghc-%{pkg_name}
 Version:        1.1.1.0
-Release:        5%{?dist}
+Release: 6%{?dist}
 Summary:        Parsing of ISO 8601 dates, originally from aeson
 
 License:        BSD-3-Clause

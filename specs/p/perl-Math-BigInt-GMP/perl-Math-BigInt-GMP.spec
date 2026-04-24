@@ -3,7 +3,7 @@
 
 Name:           perl-Math-BigInt-GMP
 Version:        1.7003
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Use the GMP library for Math::BigInt routines
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Math-BigInt-GMP

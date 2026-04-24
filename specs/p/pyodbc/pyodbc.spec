@@ -3,7 +3,7 @@
 
 Name:           pyodbc
 Version:        5.1.0
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        Python DB API 2.0 Module for ODBC
 License:        MIT-0
 URL:            https://github.com/mkleehammer/pyodbc

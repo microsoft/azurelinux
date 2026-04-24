@@ -8,7 +8,7 @@
 
 Name:           mingw-glib-networking
 Version:        2.80.1
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        MinGW Windows glib-networking library
 
 License:        LGPL-2.1-or-later

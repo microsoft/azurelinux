@@ -1,0 +1,33 @@
+From 3f5b40a65c49fcce0ce0c13f06b9b1216455ac8d Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Fri, 17 Dec 2021 13:42:11 +0100
+Subject: [PATCH 3/4] Port to maven 3.8.1
+
+---
+ .../plugin/testing/stubs/StubArtifactRepository.java | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/maven-plugin-testing-harness/src/main/java/org/apache/maven/plugin/testing/stubs/StubArtifactRepository.java b/maven-plugin-testing-harness/src/main/java/org/apache/maven/plugin/testing/stubs/StubArtifactRepository.java
+index 9a435b7..c13c3a8 100644
+--- a/maven-plugin-testing-harness/src/main/java/org/apache/maven/plugin/testing/stubs/StubArtifactRepository.java
++++ b/maven-plugin-testing-harness/src/main/java/org/apache/maven/plugin/testing/stubs/StubArtifactRepository.java
+@@ -247,4 +247,16 @@ public class StubArtifactRepository
+     {
+         // no op
+     }
++
++    @Override
++    public boolean isBlocked()
++    {
++        throw new UnsupportedOperationException();
++    }
++
++    @Override
++    public void setBlocked(boolean blocked)
++    {
++        throw new UnsupportedOperationException();
++    }
+ }
+-- 
+2.48.1
+

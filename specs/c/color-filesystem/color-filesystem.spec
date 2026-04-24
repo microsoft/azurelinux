@@ -3,7 +3,7 @@
 
 Name:           color-filesystem
 Version:        1
-Release:        36%{?dist}
+Release: 37%{?dist}
 Summary:        Color filesystem layout
 
 License:        LicenseRef-Not-Copyrightable

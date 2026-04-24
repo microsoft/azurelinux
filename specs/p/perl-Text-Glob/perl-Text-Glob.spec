@@ -3,7 +3,7 @@
 
 Name: 		perl-Text-Glob
 Version: 	0.11
-Release: 	26%{?dist}
+Release: 27%{?dist}
 Summary: 	Perl module to match globbing patterns against text
 License: 	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL: 		https://metacpan.org/release/Text-Glob

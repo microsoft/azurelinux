@@ -3,7 +3,7 @@
 
 Name:		polkit-pkla-compat
 Version:	0.1
-Release:	31%{?dist}
+Release: 32%{?dist}
 Summary:	Rules for polkit to add compatibility with pklocalauthority
 # GPLv2-licensed ltmain.sh and Apache-licensed mocklibc are not shipped in
 # the binary package.

@@ -4,7 +4,7 @@
 Summary:	Sample rate conversion library for audio data
 Name:		libsamplerate
 Version:	0.2.2
-Release:	11%{?dist}
+Release: 12%{?dist}
 License:	BSD-2-Clause
 URL:		https://libsndfile.github.io/libsamplerate/
 Source0:	https://github.com/libsndfile/%{name}/releases/download/%{version}/%{name}-%{version}.tar.xz

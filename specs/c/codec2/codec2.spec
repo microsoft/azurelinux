@@ -10,7 +10,7 @@
 
 Name:           codec2
 Version:        1.2.0
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        Next-Generation Digital Voice for Two-Way Radio
 License:        LGPL-2.1-only
 

@@ -9,7 +9,7 @@
 
 Name:           libewf
 Version:        20140608
-Release:        32%{?dist}
+Release: 33%{?dist}
 Summary:        Library for the Expert Witness Compression Format (EWF)
 
 License:        LGPL-3.0-or-later

@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 4.2.0
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary: Rack-based asset packaging system
 License: MIT
 URL: https://github.com/rails/sprockets

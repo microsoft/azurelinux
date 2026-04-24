@@ -4,7 +4,7 @@
 Name:		perl-MooseX-Types-Stringlike
 Summary:	Moose type constraints for strings or string-like objects
 Version:	0.003
-Release:	33%{?dist}
+Release: 34%{?dist}
 License:	Apache-2.0
 URL:		https://metacpan.org/release/MooseX-Types-Stringlike
 Source0:	https://cpan.metacpan.org/modules/by-module/MooseX/MooseX-Types-Stringlike-%{version}.tar.gz

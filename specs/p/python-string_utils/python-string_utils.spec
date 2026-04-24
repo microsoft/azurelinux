@@ -9,7 +9,7 @@
 
 Name:           python-string_utils
 Version:        1.0.0
-Release:        22%{?dist}
+Release: 23%{?dist}
 Summary:        Utility functions for strings validation and manipulation
 
 # SPDX

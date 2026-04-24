@@ -3,7 +3,7 @@
 
 Name:           librhsm
 Version:        0.0.4
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Red Hat Subscription Manager library
 License:        LGPL-2.1-or-later
 URL:            https://github.com/rpm-software-management/librhsm

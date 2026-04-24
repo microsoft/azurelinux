@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 24 Feb 2022 16:32:51 -0500
+Subject: [PATCH] modules: make .module_license read-only
+
+Currently .module_license is set writable (that is, the section has the
+SHF_WRITE flag set) in the module's ELF headers.  This probably never
+actually matters, but it can't possibly be correct.
+
+This patch sets that data as "const", which causes that flag not to be
+set.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ include/grub/dl.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/grub/dl.h b/include/grub/dl.h
+index 3f10e27d62c..216f8b903ac 100644
+--- a/include/grub/dl.h
++++ b/include/grub/dl.h
+@@ -121,7 +121,7 @@ grub_mod_fini (void)
+ #define ATTRIBUTE_USED __unused__
+ #endif
+ #define GRUB_MOD_LICENSE(license)	\
+-  static char grub_module_license[] __attribute__ ((section (GRUB_MOD_SECTION (module_license)), ATTRIBUTE_USED)) = "LICENSE=" license;
++  static const char grub_module_license[] __attribute__ ((section (GRUB_MOD_SECTION (module_license)), ATTRIBUTE_USED)) = "LICENSE=" license;
+ #define GRUB_MOD_DEP(name)	\
+ static const char grub_module_depend_##name[] \
+  __attribute__((section(GRUB_MOD_SECTION(moddeps)), ATTRIBUTE_USED)) = #name

@@ -1,0 +1,45 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Sudhakar Kuppusamy <sudhakar@linux.ibm.com>
+Date: Wed, 23 Oct 2024 17:54:33 +0530
+Subject: [PATCH] grub-mkimage: Add SBAT metadata into ELF note for PowerPC
+ targets
+
+The SBAT metadata is read from CSV file and transformed into an ELF note
+with the -s option.
+
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+Signed-off-by: Sudhakar Kuppusamy <sudhakar@linux.ibm.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ util/mkimage.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/util/mkimage.c b/util/mkimage.c
+index 7fa6a7b21954..f92949d1df25 100644
+--- a/util/mkimage.c
++++ b/util/mkimage.c
+@@ -957,8 +957,8 @@ grub_install_generate_image (const char *dir, const char *prefix,
+       total_module_size += dtb_size + sizeof (struct grub_module_header);
+     }
+ 
+-  if (sbat_path != NULL && image_target->id != IMAGE_EFI)
+-    grub_util_error (_(".sbat section can be embedded into EFI images only"));
++  if (sbat_path != NULL && (image_target->id != IMAGE_EFI && image_target->id != IMAGE_PPC))
++    grub_util_error (_("SBAT data can be added only to EFI or powerpc-ieee1275 images"));
+ 
+   if (disable_shim_lock)
+     total_module_size += sizeof (struct grub_module_header);
+@@ -1849,6 +1849,13 @@ grub_install_generate_image (const char *dir, const char *prefix,
+       {
+ 	grub_uint64_t target_addr;
+ 	char *sbat = NULL;
++	if (sbat_path != NULL)
++	  {
++	    sbat_size = grub_util_get_image_size (sbat_path);
++	    sbat = xmalloc (sbat_size);
++	    grub_util_load_image (sbat_path, sbat);
++	    layout.sbat_size = sbat_size;
++	  }
+ 	if (image_target->id == IMAGE_LOONGSON_ELF)
+ 	  {
+ 	    if (comp == GRUB_COMPRESSION_NONE)

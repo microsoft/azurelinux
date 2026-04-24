@@ -1,0 +1,27 @@
+From 1c712194e604f6dd4f8a881e09d8236d4f770b67 Mon Sep 17 00:00:00 2001
+From: fundawang <fundawang@yeah.net>
+Date: Mon, 17 Mar 2025 19:05:08 +0800
+Subject: [PATCH] Fix libname of Libs.private
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ src/createrepo_c.pc.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/createrepo_c.pc.cmake b/src/createrepo_c.pc.cmake
+index 466487e..b7eb663 100644
+--- a/src/createrepo_c.pc.cmake
++++ b/src/createrepo_c.pc.cmake
+@@ -8,5 +8,5 @@ Version: @VERSION@
+ Requires: glib-2.0 rpm libcurl sqlite3
+ Requires.private: zlib libxml-2.0
+ Libs: -L${libdir} -lcreaterepo_c
+-Libs.private: -lbz2 -lzma
++Libs.private: -lbz2 -llzma
+ Cflags: -I${includedir}
+-- 
+2.50.1
+

@@ -1,0 +1,12 @@
+diff -up ./lib/cpp/antlr/CharScanner.hpp.sav ./lib/cpp/antlr/CharScanner.hpp
+--- antlr/lib/cpp/antlr/CharScanner.hpp.sav	2009-03-20 14:42:43.000000000 -0400
++++ antlr/lib/cpp/antlr/CharScanner.hpp	2009-03-20 14:43:29.000000000 -0400
+@@ -11,6 +11,8 @@
+ #include <antlr/config.hpp>
+ 
+ #include <map>
++#include <strings.h>
++#include <cstdio>
+ 
+ #ifdef HAS_NOT_CCTYPE_H
+ #include <ctype.h>

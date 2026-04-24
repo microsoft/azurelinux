@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 2.0.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: Context framework extracted from Shoulda
 License: MIT
 URL: https://github.com/thoughtbot/shoulda-context

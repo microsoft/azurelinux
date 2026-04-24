@@ -6,7 +6,7 @@
 
 Name:		perl-Compress-Raw-Lzma
 Version:	2.213
-Release:	7%{?dist}
+Release: 8%{?dist}
 Summary:	Low-level interface to lzma compression library
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Compress-Raw-Lzma

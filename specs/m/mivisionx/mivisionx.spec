@@ -25,7 +25,7 @@
 
 Name:           mivisionx
 Version:        %{rocm_version}
-Release:        4%{?dist}
+Release: 5%{?dist}
 Summary:        AMD's computer vision toolkit
 Url:            https://github.com/ROCm/%{upstreamname}
 License:        MIT AND Apache-2.0 AND MIT-Khronos-old AND GPL-3.0-or-later

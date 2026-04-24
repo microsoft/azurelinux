@@ -1,0 +1,37 @@
+diff -Naur meson_python-0.18.0-original/mesonpy/__init__.py meson_python-0.18.0/mesonpy/__init__.py
+--- meson_python-0.18.0-original/mesonpy/__init__.py	2025-05-05 06:07:43.000000000 -0400
++++ meson_python-0.18.0/mesonpy/__init__.py	2025-05-05 08:19:01.630322169 -0400
+@@ -438,6 +438,7 @@
+                 # directory, in the form of a relative RPATH entry. meson-python
+                 # relocates the shared libraries to the $project.mesonpy.libs
+                 # folder. Rewrite the RPATH to point to that folder instead.
++                assert False, "Patchelf is not allowed to run on RHEL" 
+                 libspath = os.path.relpath(self._libs_dir, destination.parent)
+                 mesonpy._rpath.fix_rpath(origin, libspath)
+ 
+@@ -1166,9 +1167,6 @@
+     if os.environ.get('NINJA') is None and _env_ninja_command() is None:
+         dependencies.append(f'ninja >= {_NINJA_REQUIRED_VERSION}')
+ 
+-    if sys.platform.startswith('linux') and not shutil.which('patchelf'):
+-        dependencies.append('patchelf >= 0.11.0')
+-
+     return dependencies
+ 
+ 
+diff -Naur meson_python-0.18.0-original/mesonpy/_rpath.py meson_python-0.18.0/mesonpy/_rpath.py
+--- meson_python-0.18.0-original/mesonpy/_rpath.py	2025-05-05 06:07:43.000000000 -0400
++++ meson_python-0.18.0/mesonpy/_rpath.py	2025-05-05 08:20:15.209296624 -0400
+@@ -73,10 +73,12 @@
+     # Assume that any other platform uses ELF binaries.
+ 
+     def _get_rpath(filepath: Path) -> List[str]:
++        assert False, "Patchelf is not allowed to run on RHEL" 
+         r = subprocess.run(['patchelf', '--print-rpath', os.fspath(filepath)], capture_output=True, text=True)
+         return r.stdout.strip().split(':')
+ 
+     def _set_rpath(filepath: Path, rpath: Iterable[str]) -> None:
++        assert False, "Patchelf is not allowed to run on RHEL" 
+         subprocess.run(['patchelf','--set-rpath', ':'.join(rpath), os.fspath(filepath)], check=True)
+ 
+     def fix_rpath(filepath: Path, libs_relative_path: str) -> None:

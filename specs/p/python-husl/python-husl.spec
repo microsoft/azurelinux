@@ -5,7 +5,7 @@
 
 Name: python-%{upname}
 Version: 4.0.3
-Release: 37%{?dist}
+Release: 38%{?dist}
 Summary: A Python implementation of HUSL
 License: MIT
 

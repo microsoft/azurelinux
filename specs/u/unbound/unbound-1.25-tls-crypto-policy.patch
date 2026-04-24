@@ -1,0 +1,489 @@
+From 499a3a7a612ad1e5ef5678bdb1bb6c059599419a Mon Sep 17 00:00:00 2001
+From: Yorgos Thessalonikefs <yorgos@nlnetlabs.nl>
+Date: Mon, 29 Sep 2025 12:03:56 +0200
+Subject: [PATCH] Fix #1346: [FR] Please allow back TLS 1.2. (#1349)
+
+* 'tls-use-system-policy-versions' is introduced to allow Unbound to use
+  any system available TLS version when serving TLS.
+
+* Apply suggestions from code review
+
+---------
+
+Co-authored-by: Wouter Wijngaards <wcawijngaards@users.noreply.github.com>
+---
+ daemon/remote.c                |  2 +-
+ daemon/unbound.c               |  2 +-
+ dnstap/unbound-dnstap-socket.c |  2 +-
+ doc/example.conf.in            | 26 ++++++++++------
+ doc/unbound.conf.5.in          | 55 +++++++++++++++++++++++++---------
+ doc/unbound.conf.rst           | 32 +++++++++++++++-----
+ util/config_file.c             |  3 ++
+ util/config_file.h             |  2 ++
+ util/configlexer.lex           |  1 +
+ util/configparser.y            | 11 +++++++
+ util/net_help.c                | 54 +++++++++++++++++----------------
+ util/net_help.h                |  8 +++--
+ winrc/win_svc.c                |  4 +--
+ 13 files changed, 138 insertions(+), 64 deletions(-)
+
+diff --git a/daemon/remote.c b/daemon/remote.c
+index e10dadde7..8408e2273 100644
+--- a/daemon/remote.c
++++ b/daemon/remote.c
+@@ -153,7 +153,7 @@ remote_setup_ctx(struct daemon_remote* rc, struct config_file* cfg)
+ 		log_crypto_err("could not SSL_CTX_new");
+ 		return 0;
+ 	}
+-	if(!listen_sslctx_setup(rc->ctx)) {
++	if(!listen_sslctx_setup(rc->ctx, cfg->tls_use_system_policy_versions)) {
+ 		return 0;
+ 	}
+ 
+diff --git a/daemon/unbound.c b/daemon/unbound.c
+index 164d0fb89..688804743 100644
+--- a/daemon/unbound.c
++++ b/daemon/unbound.c
+@@ -473,7 +473,7 @@ setup_listen_sslctx(void** ctx, int is_dot, int is_doh, struct config_file* cfg)
+ 		cfg->tls_ciphers, cfg->tls_ciphersuites,
+ 		(cfg->tls_session_ticket_keys.first &&
+ 		cfg->tls_session_ticket_keys.first->str[0] != 0),
+-		is_dot, is_doh))) {
++		is_dot, is_doh, cfg->tls_use_system_policy_versions))) {
+ 		fatal_exit("could not set up listen SSL_CTX");
+ 	}
+ }
+diff --git a/dnstap/unbound-dnstap-socket.c b/dnstap/unbound-dnstap-socket.c
+index a01627de9..c0d344cbb 100644
+--- a/dnstap/unbound-dnstap-socket.c
++++ b/dnstap/unbound-dnstap-socket.c
+@@ -347,7 +347,7 @@ static struct tap_socket* tap_socket_new_tlsaccept(char* ip,
+ 	s->ev_cb = ev_cb;
+ 	s->data = data;
+ 	s->sslctx = listen_sslctx_create(server_key, server_cert, verifypem,
+-		NULL, NULL, 0, 0, 0);
++		NULL, NULL, 0, 0, 0, 0);
+ 	if(!s->sslctx) {
+ 		log_err("could not create ssl context");
+ 		free(s->ip);
+diff --git a/doc/example.conf.in b/doc/example.conf.in
+index 02f6ec774..54adee889 100644
+--- a/doc/example.conf.in
++++ b/doc/example.conf.in
+@@ -932,21 +932,26 @@ server:
+ 	# https-port: 443
+ 	# quic-port: 853
+ 
++	# Also serve tls on these port numbers (eg. 443, ...), by listing
++	# tls-additional-port: portno for each of the port numbers.
++
+ 	# cipher setting for TLSv1.2
+ 	# tls-ciphers: "DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-SHA256:DHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256"
+ 	# cipher setting for TLSv1.3
+ 	# tls-ciphersuites: "TLS_AES_128_GCM_SHA256:TLS_AES_128_CCM_8_SHA256:TLS_AES_128_CCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256"
+ 
+-	# Pad responses to padded queries received over TLS
+-	# pad-responses: yes
+-
+-	# Padded responses will be padded to the closest multiple of this size.
+-	# pad-responses-block-size: 468
+-
+ 	# Use the SNI extension for TLS connections.  Default is yes.
+ 	# Changing the value requires a reload.
+ 	# tls-use-sni: yes
+ 
++	# Allow general-purpose version-flexible TLS server configuration that
++	# may be further restricted by the system's policy.
++	# Use only if you want to support legacy TLS client connections.
++	# Default is no and Unbound will only use the latest available TLS
++	# version.
++	# Changing the value requires a reload.
++	# tls-use-system-policy-versions: no
++
+ 	# Add the secret file for TLS Session Ticket.
+ 	# Secret file must be 80 bytes of random data.
+ 	# First key use to encrypt and decrypt TLS session tickets.
+@@ -967,15 +972,18 @@ server:
+ 	# and on other systems, the default openssl certificates
+ 	# tls-system-cert: no
+ 
++	# Pad responses to padded queries received over TLS
++	# pad-responses: yes
++
++	# Padded responses will be padded to the closest multiple of this size.
++	# pad-responses-block-size: 468
++
+ 	# Pad queries over TLS upstreams
+ 	# pad-queries: yes
+ 
+ 	# Padded queries will be padded to the closest multiple of this size.
+ 	# pad-queries-block-size: 128
+ 
+-	# Also serve tls on these port numbers (eg. 443, ...), by listing
+-	# tls-additional-port: portno for each of the port numbers.
+-
+ 	# HTTP endpoint to provide DNS-over-HTTPS service on.
+ 	# http-endpoint: "/dns-query"
+ 
+diff --git a/doc/unbound.conf.5.in b/doc/unbound.conf.5.in
+index 0d2b5044b..08a926bd5 100644
+--- a/doc/unbound.conf.5.in
++++ b/doc/unbound.conf.5.in
+@@ -1218,6 +1218,47 @@ Default: \(dq\(dq
+ .UNINDENT
+ .INDENT 0.0
+ .TP
++.B tls\-use\-sni: \fI<yes or no>\fP 
++Enable or disable sending the SNI extension on TLS connections.
++.sp
++\fBNOTE:\fP
++.INDENT 7.0
++.INDENT 3.5
++Changing the value requires a reload.
++.UNINDENT
++.UNINDENT
++.sp
++Default: yes
++.UNINDENT
++.INDENT 0.0
++.TP
++.B tls\-use\-system\-policy\-versions: \fI<yes or no>\fP 
++Enable or disable general\-puspose version\-flexible TLS server configuration
++when serving TLS.
++This will allow the whole list of available TLS versions provided by the
++crypto library, which may have been further restricted by the system\(aqs
++crypto policy.
++.sp
++By default Unbound only uses the latest available TLS version.
++.sp
++\fBCAUTION:\fP
++.INDENT 7.0
++.INDENT 3.5
++Use only if you want to support legacy TLS client connections.
++.UNINDENT
++.UNINDENT
++.sp
++\fBNOTE:\fP
++.INDENT 7.0
++.INDENT 3.5
++Changing the value requires a reload.
++.UNINDENT
++.UNINDENT
++.sp
++Default: no
++.UNINDENT
++.INDENT 0.0
++.TP
+ .B pad\-responses: \fI<yes or no>\fP 
+ If enabled, TLS serviced queries that contained an EDNS Padding option will
+ cause responses padded to the closest multiple of the size specified in
+@@ -1251,20 +1292,6 @@ Default: 128
+ .UNINDENT
+ .INDENT 0.0
+ .TP
+-.B tls\-use\-sni: \fI<yes or no>\fP 
+-Enable or disable sending the SNI extension on TLS connections.
+-.sp
+-\fBNOTE:\fP
+-.INDENT 7.0
+-.INDENT 3.5
+-Changing the value requires a reload.
+-.UNINDENT
+-.UNINDENT
+-.sp
+-Default: yes
+-.UNINDENT
+-.INDENT 0.0
+-.TP
+ .B https\-port: \fI<number>\fP 
+ The port number on which to provide DNS\-over\-HTTPS service.
+ Only interfaces configured with that port number as @number get the HTTPS
+diff --git a/doc/unbound.conf.rst b/doc/unbound.conf.rst
+index bbc31fe50..f9f2dea8a 100644
+--- a/doc/unbound.conf.rst
++++ b/doc/unbound.conf.rst
+@@ -1103,6 +1103,30 @@ These options are part of the **server:** clause.
+     Default: ""
+ 
+ 
++@@UAHL@unbound.conf@tls-use-sni@@: *<yes or no>*
++    Enable or disable sending the SNI extension on TLS connections.
++
++    .. note:: Changing the value requires a reload.
++
++    Default: yes
++
++
++@@UAHL@unbound.conf@tls-use-system-policy-versions@@: *<yes or no>*
++    Enable or disable general-puspose version-flexible TLS server configuration
++    when serving TLS.
++    This will allow the whole list of available TLS versions provided by the
++    crypto library, which may have been further restricted by the system's
++    crypto policy.
++
++    By default Unbound only uses the latest available TLS version.
++
++    .. caution:: Use only if you want to support legacy TLS client connections.
++
++    .. note:: Changing the value requires a reload.
++
++    Default: no
++
++
+ @@UAHL@unbound.conf@pad-responses@@: *<yes or no>*
+     If enabled, TLS serviced queries that contained an EDNS Padding option will
+     cause responses padded to the closest multiple of the size specified in
+@@ -1132,14 +1156,6 @@ These options are part of the **server:** clause.
+     Default: 128
+ 
+ 
+-@@UAHL@unbound.conf@tls-use-sni@@: *<yes or no>*
+-    Enable or disable sending the SNI extension on TLS connections.
+-
+-    .. note:: Changing the value requires a reload.
+-
+-    Default: yes
+-
+-
+ @@UAHL@unbound.conf@https-port@@: *<number>*
+     The port number on which to provide DNS-over-HTTPS service.
+     Only interfaces configured with that port number as @number get the HTTPS
+diff --git a/util/config_file.c b/util/config_file.c
+index b1e767b3b..f611a96e4 100644
+--- a/util/config_file.c
++++ b/util/config_file.c
+@@ -129,6 +129,7 @@ config_create(void)
+ 	cfg->tls_cert_bundle = NULL;
+ 	cfg->tls_win_cert = 0;
+ 	cfg->tls_use_sni = 1;
++	cfg->tls_use_system_policy_versions = 0;
+ 	cfg->https_port = UNBOUND_DNS_OVER_HTTPS_PORT;
+ 	if(!(cfg->http_endpoint = strdup("/dns-query"))) goto error_exit;
+ 	cfg->http_max_streams = 100;
+@@ -628,6 +629,7 @@ int config_set_option(struct config_file* cfg, const char* opt,
+ 	else S_STR("tls-ciphers:", tls_ciphers)
+ 	else S_STR("tls-ciphersuites:", tls_ciphersuites)
+ 	else S_YNO("tls-use-sni:", tls_use_sni)
++	else S_YNO("tls-use-system-policy-versions:", tls_use_system_policy_versions)
+ 	else S_NUMBER_NONZERO("https-port:", https_port)
+ 	else S_STR("http-endpoint:", http_endpoint)
+ 	else S_NUMBER_NONZERO("http-max-streams:", http_max_streams)
+@@ -1179,6 +1181,7 @@ config_get_option(struct config_file* cfg, const char* opt,
+ 	else O_STR(opt, "tls-ciphers", tls_ciphers)
+ 	else O_STR(opt, "tls-ciphersuites", tls_ciphersuites)
+ 	else O_YNO(opt, "tls-use-sni", tls_use_sni)
++	else O_YNO(opt, "tls-use-system-policy-versions", tls_use_system_policy_versions)
+ 	else O_DEC(opt, "https-port", https_port)
+ 	else O_STR(opt, "http-endpoint", http_endpoint)
+ 	else O_UNS(opt, "http-max-streams", http_max_streams)
+diff --git a/util/config_file.h b/util/config_file.h
+index 44ac036b8..dd32f0d9f 100644
+--- a/util/config_file.h
++++ b/util/config_file.h
+@@ -148,6 +148,8 @@ struct config_file {
+ 	char* tls_ciphersuites;
+ 	/** if SNI is to be used */
+ 	int tls_use_sni;
++	/** if all TLS versions can be used; based on system policy (if any) */
++	int tls_use_system_policy_versions;
+ 
+ 	/** port on which to provide DNS over HTTPS service */
+ 	int https_port;
+diff --git a/util/configlexer.lex b/util/configlexer.lex
+index bc258673d..8e38ef468 100644
+--- a/util/configlexer.lex
++++ b/util/configlexer.lex
+@@ -262,6 +262,7 @@ tls-session-ticket-keys{COLON}	{ YDVAR(1, VAR_TLS_SESSION_TICKET_KEYS) }
+ tls-ciphers{COLON}		{ YDVAR(1, VAR_TLS_CIPHERS) }
+ tls-ciphersuites{COLON}		{ YDVAR(1, VAR_TLS_CIPHERSUITES) }
+ tls-use-sni{COLON}		{ YDVAR(1, VAR_TLS_USE_SNI) }
++tls-use-system-policy-versions{COLON}		{ YDVAR(1, VAR_TLS_USE_SYSTEM_POLICY_VERSIONS) }
+ https-port{COLON}		{ YDVAR(1, VAR_HTTPS_PORT) }
+ http-endpoint{COLON}		{ YDVAR(1, VAR_HTTP_ENDPOINT) }
+ http-max-streams{COLON}		{ YDVAR(1, VAR_HTTP_MAX_STREAMS) }
+diff --git a/util/configparser.y b/util/configparser.y
+index 82e1d8782..ced904669 100644
+--- a/util/configparser.y
++++ b/util/configparser.y
+@@ -199,6 +199,7 @@ extern struct config_parser_state* cfg_parser;
+ %token VAR_DISCARD_TIMEOUT VAR_WAIT_LIMIT VAR_WAIT_LIMIT_COOKIE
+ %token VAR_WAIT_LIMIT_NETBLOCK VAR_WAIT_LIMIT_COOKIE_NETBLOCK
+ %token VAR_STREAM_WAIT_SIZE VAR_TLS_CIPHERS VAR_TLS_CIPHERSUITES VAR_TLS_USE_SNI
++%token VAR_TLS_USE_SYSTEM_POLICY_VERSIONS
+ %token VAR_IPSET VAR_IPSET_NAME_V4 VAR_IPSET_NAME_V6
+ %token VAR_TLS_SESSION_TICKET_KEYS VAR_RPZ VAR_TAGS VAR_RPZ_ACTION_OVERRIDE
+ %token VAR_RPZ_CNAME_OVERRIDE VAR_RPZ_LOG VAR_RPZ_LOG_NAME
+@@ -346,6 +347,7 @@ content_server: server_num_threads | server_verbosity | server_port |
+ 	server_tls_ciphersuites | server_tls_session_ticket_keys |
+ 	server_answer_cookie | server_cookie_secret | server_ip_ratelimit_cookie |
+ 	server_tls_use_sni | server_edns_client_string |
++	server_tls_use_system_policy_versions |
+ 	server_edns_client_string_opcode | server_nsid |
+ 	server_zonemd_permissive_mode | server_max_reuse_tcp_queries |
+ 	server_tcp_reuse_timeout | server_tcp_auth_query_timeout |
+@@ -1154,6 +1156,15 @@ server_tls_use_sni: VAR_TLS_USE_SNI STRING_ARG
+ 		free($2);
+ 	}
+ 	;
++server_tls_use_system_policy_versions: VAR_TLS_USE_SYSTEM_POLICY_VERSIONS STRING_ARG
++	{
++		OUTYY(("P(server_tls_use_system_policy_versions:%s)\n", $2));
++		if(strcmp($2, "yes") != 0 && strcmp($2, "no") != 0)
++			yyerror("expected yes or no.");
++		else cfg_parser->cfg->tls_use_system_policy_versions = (strcmp($2, "yes")==0);
++		free($2);
++	}
++	;
+ server_https_port: VAR_HTTPS_PORT STRING_ARG
+ 	{
+ 		OUTYY(("P(server_https_port:%s)\n", $2));
+diff --git a/util/net_help.c b/util/net_help.c
+index 6ce0d9131..426ace934 100644
+--- a/util/net_help.c
++++ b/util/net_help.c
+@@ -1226,7 +1226,7 @@ setup_ticket_keys_cb(void* sslctx)
+ #endif /* HAVE_SSL */
+ 
+ int
+-listen_sslctx_setup(void* ctxt)
++listen_sslctx_setup(void* ctxt, int use_system_versions)
+ {
+ #ifdef HAVE_SSL
+ 	SSL_CTX* ctx = (SSL_CTX*)ctxt;
+@@ -1238,35 +1238,37 @@ listen_sslctx_setup(void* ctxt)
+ 		return 0;
+ 	}
+ #endif
+-	if((SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv3) & SSL_OP_NO_SSLv3)
+-		!= SSL_OP_NO_SSLv3){
+-		log_crypto_err("could not set SSL_OP_NO_SSLv3");
+-		return 0;
+-	}
++	if(!use_system_versions) {
++		if((SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv3) & SSL_OP_NO_SSLv3)
++			!= SSL_OP_NO_SSLv3){
++			log_crypto_err("could not set SSL_OP_NO_SSLv3");
++			return 0;
++		}
+ #if defined(SSL_OP_NO_TLSv1) && defined(SSL_OP_NO_TLSv1_1)
+-	/* if we have tls 1.1 disable 1.0 */
+-	if((SSL_CTX_set_options(ctx, SSL_OP_NO_TLSv1) & SSL_OP_NO_TLSv1)
+-		!= SSL_OP_NO_TLSv1){
+-		log_crypto_err("could not set SSL_OP_NO_TLSv1");
+-		return 0;
+-	}
++		/* if we have tls 1.1 disable 1.0 */
++		if((SSL_CTX_set_options(ctx, SSL_OP_NO_TLSv1) & SSL_OP_NO_TLSv1)
++			!= SSL_OP_NO_TLSv1){
++			log_crypto_err("could not set SSL_OP_NO_TLSv1");
++			return 0;
++		}
+ #endif
+ #if defined(SSL_OP_NO_TLSv1_1) && defined(SSL_OP_NO_TLSv1_2)
+-	/* if we have tls 1.2 disable 1.1 */
+-	if((SSL_CTX_set_options(ctx, SSL_OP_NO_TLSv1_1) & SSL_OP_NO_TLSv1_1)
+-		!= SSL_OP_NO_TLSv1_1){
+-		log_crypto_err("could not set SSL_OP_NO_TLSv1_1");
+-		return 0;
+-	}
++		/* if we have tls 1.2 disable 1.1 */
++		if((SSL_CTX_set_options(ctx, SSL_OP_NO_TLSv1_1) & SSL_OP_NO_TLSv1_1)
++			!= SSL_OP_NO_TLSv1_1){
++			log_crypto_err("could not set SSL_OP_NO_TLSv1_1");
++			return 0;
++		}
+ #endif
+ #if defined(SSL_OP_NO_TLSv1_2) && defined(SSL_OP_NO_TLSv1_3)
+-	/* if we have tls 1.3 disable 1.2 */
+-	if((SSL_CTX_set_options(ctx, SSL_OP_NO_TLSv1_2) & SSL_OP_NO_TLSv1_2)
+-		!= SSL_OP_NO_TLSv1_2){
+-		log_crypto_err("could not set SSL_OP_NO_TLSv1_2");
+-		return 0;
+-	}
++		/* if we have tls 1.3 disable 1.2 */
++		if((SSL_CTX_set_options(ctx, SSL_OP_NO_TLSv1_2) & SSL_OP_NO_TLSv1_2)
++			!= SSL_OP_NO_TLSv1_2){
++			log_crypto_err("could not set SSL_OP_NO_TLSv1_2");
++			return 0;
++		}
+ #endif
++	}
+ #if defined(SSL_OP_NO_RENEGOTIATION)
+ 	/* disable client renegotiation */
+ 	if((SSL_CTX_set_options(ctx, SSL_OP_NO_RENEGOTIATION) &
+@@ -1341,7 +1343,7 @@ listen_sslctx_setup_2(void* ctxt)
+ void* listen_sslctx_create(const char* key, const char* pem,
+ 	const char* verifypem, const char* tls_ciphers,
+ 	const char* tls_ciphersuites, int set_ticket_keys_cb,
+-	int is_dot, int is_doh)
++	int is_dot, int is_doh, int use_system_versions)
+ {
+ #ifdef HAVE_SSL
+ 	SSL_CTX* ctx = SSL_CTX_new(SSLv23_server_method());
+@@ -1359,7 +1361,7 @@ void* listen_sslctx_create(const char* key, const char* pem,
+ 		SSL_CTX_free(ctx);
+ 		return NULL;
+ 	}
+-	if(!listen_sslctx_setup(ctx)) {
++	if(!listen_sslctx_setup(ctx, use_system_versions)) {
+ 		SSL_CTX_free(ctx);
+ 		return NULL;
+ 	}
+diff --git a/util/net_help.h b/util/net_help.h
+index 278e370a2..7b8a20642 100644
+--- a/util/net_help.h
++++ b/util/net_help.h
+@@ -478,9 +478,11 @@ void log_cert(unsigned level, const char* str, void* cert);
+ /**
+  * Set SSL_OP_NOxxx options on SSL context to disable bad crypto
+  * @param ctxt: SSL_CTX*
++ * @param use_system_versions: rely on the system policy (if any) for allowed
++ *	TLS versions
+  * @return false on failure.
+  */
+-int listen_sslctx_setup(void* ctxt);
++int listen_sslctx_setup(void* ctxt, int use_system_versions);
+ 
+ /**
+  * Further setup of listening SSL context, after keys loaded.
+@@ -499,12 +501,14 @@ void listen_sslctx_setup_2(void* ctxt);
+  *	to be set.
+  * @param is_dot: if the TLS connection is for DoT to set the appropriate ALPN.
+  * @param is_doh: if the TLS connection is for DoH to set the appropriate ALPN.
++ * @param use_system_versions: rely on the system policy (if any) for allowed
++ *	TLS versions
+  * return SSL_CTX* or NULL on failure (logged).
+  */
+ void* listen_sslctx_create(const char* key, const char* pem,
+ 	const char* verifypem, const char* tls_ciphers,
+ 	const char* tls_ciphersuites, int set_ticket_keys_cb,
+-	int is_dot, int is_doh);
++	int is_dot, int is_doh, int use_system_versions);
+ 
+ /**
+  * create SSL connect context
+diff --git a/winrc/win_svc.c b/winrc/win_svc.c
+index 429b045dc..6fca0c7d5 100644
+--- a/winrc/win_svc.c
++++ b/winrc/win_svc.c
+@@ -369,7 +369,7 @@ service_init(int r, struct daemon** d, struct config_file** c)
+ 			cfg->tls_ciphers, cfg->tls_ciphersuites,
+ 			(cfg->tls_session_ticket_keys.first &&
+ 			cfg->tls_session_ticket_keys.first->str[0] != 0),
+-			1, 0))) {
++			1, 0, cfg->tls_use_system_policy_versions))) {
+ 			fatal_exit("could not set up listen SSL_CTX");
+ 		}
+ #ifdef HAVE_NGHTTP2_NGHTTP2_H
+@@ -379,7 +379,7 @@ service_init(int r, struct daemon** d, struct config_file** c)
+ 				cfg->tls_ciphers, cfg->tls_ciphersuites,
+ 				(cfg->tls_session_ticket_keys.first &&
+ 				cfg->tls_session_ticket_keys.first->str[0] != 0),
+-				0, 1))) {
++				0, 1, cfg->tls_use_system_policy_versions))) {
+ 				fatal_exit("could not set up listen doh SSL_CTX");
+ 			}
+ 		}
+-- 
+2.52.0
+

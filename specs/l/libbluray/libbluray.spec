@@ -10,7 +10,7 @@
 
 Name:           libbluray
 Version:        1.3.4
-Release:        11%{?dist}
+Release: 12%{?dist}
 Summary:        Library to access Blu-Ray disks for video playback 
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.
 License:        LicenseRef-Callaway-LGPLv2+

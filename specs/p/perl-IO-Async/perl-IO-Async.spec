@@ -3,7 +3,7 @@
 
 Name:           perl-IO-Async
 Version:        0.804
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        A collection of modules that implement asynchronous filehandle IO
 
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

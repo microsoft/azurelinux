@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: fluteze <fluteze@gmail.com>
+Date: Sat, 27 Nov 2021 10:54:44 -0600
+Subject: [PATCH] Add Fedora location of DejaVu SANS font
+
+In Fedora 35, and possibly earlier, grub would fail to configure with a
+complaint about DejaVu being "not found" even though it was installed.
+The DejaVu sans font search path is updated to reflect the
+distribution's current install path.
+
+Signed-off-by: Erik Edwards <fluteze@gmail.com>
+[rharwood@redhat.com: slight commit message edits]
+Signed-off-by: Robbie Harwood <rharwood@redhat.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 016cd3d4e0e..d223fe3ef6e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1924,7 +1924,7 @@ if test "x$with_dejavufont" = x; then
+   # search in well-known directories
+   if test x"$starfield_excuse" = x; then
+      for ext in pcf pcf.gz bdf bdf.gz ttf ttf.gz; do
+-       for dir in . /usr/src /usr/share/fonts/X11/misc /usr/share/fonts/truetype/ttf-dejavu /usr/share/fonts/dejavu /usr/share/fonts/truetype /usr/pkg/share/fonts/X11/TTF /usr/local/share/fonts/dejavu /usr/X11R6/lib/X11/fonts/TTF; do
++       for dir in . /usr/src /usr/share/fonts/X11/misc /usr/share/fonts/truetype/ttf-dejavu /usr/share/fonts/dejavu /usr/share/fonts/truetype /usr/pkg/share/fonts/X11/TTF /usr/local/share/fonts/dejavu /usr/X11R6/lib/X11/fonts/TTF /usr/share/fonts/dejavu-sans-fonts; do
+           if test -f "$dir/DejaVuSans.$ext"; then
+             DJVU_FONT_SOURCE="$dir/DejaVuSans.$ext"
+             break 2

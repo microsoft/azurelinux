@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Nicolas Frayer <nfrayer@redhat.com>
+Date: Tue, 19 Dec 2023 16:52:05 +0100
+Subject: [PATCH] normal: Remove grub_env_set prefix in grub_try_normal_prefix
+
+Commit de735a453aa35 added a grub_env_set where the prefix contains
+the arch name in the pathname. This create issues when trying to
+load modules using this prefix as the pathname contains a "doubled"
+arch name in it (ie .../powerpc-ieee1275/powerpc-ieee1275/).
+
+Signed-off-by: Nicolas Frayer <nfrayer@redhat.com>
+---
+ grub-core/normal/main.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/grub-core/normal/main.c b/grub-core/normal/main.c
+index 803b9656d36..26872ce9477 100644
+--- a/grub-core/normal/main.c
++++ b/grub-core/normal/main.c
+@@ -372,7 +372,6 @@ grub_try_normal_prefix (const char *prefix)
+            file = grub_file_open (config, GRUB_FILE_TYPE_CONFIG);
+            if (file)
+              {
+-               grub_env_set ("prefix", prefix);
+                grub_file_close (file);
+                err = GRUB_ERR_NONE;
+              }

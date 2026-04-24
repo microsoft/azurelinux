@@ -4,7 +4,7 @@
 Name:           libsass
 Version:        3.6.6
 %global soname_version 1
-Release:        5%{?dist}
+Release: 6%{?dist}
 Summary:        C/C++ port of the Sass CSS precompiler
 
 # src/ast.hpp, src/utf8* is BSL-1.0

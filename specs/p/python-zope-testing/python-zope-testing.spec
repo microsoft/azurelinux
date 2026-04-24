@@ -12,7 +12,7 @@
 
 Name:           python-zope-testing
 Version:        5.1
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        Zope Testing Framework
 License:        ZPL-2.1
 URL:            https://pypi.io/project/%{modname}

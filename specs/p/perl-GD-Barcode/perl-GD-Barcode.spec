@@ -13,7 +13,7 @@
 
 Name:           perl-GD-Barcode
 Version:        2.01
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Create barcode image with GD
 # see Barcode.pm
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

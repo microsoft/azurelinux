@@ -6,7 +6,7 @@
 
 Name:          xapian-bindings
 Version:       1.4.29
-Release:       5%{?dist}
+Release: 6%{?dist}
 Summary:       Bindings for the Xapian Probabilistic Information Retrieval Library
 
 # Automatically converted from old format: GPLv2+ - review is highly recommended.

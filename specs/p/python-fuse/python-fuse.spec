@@ -6,7 +6,7 @@
 Name:    python-fuse
 # TODO rename to python-fusepy
 Version: 3.0.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: Python module that provides a simple interface to FUSE and MacFUSE
 License: ISC
 URL: https://github.com/fusepy/fusepy

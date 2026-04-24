@@ -21,7 +21,7 @@
 
 Name:           php-myclabs-deep-copy%{major}
 Version:        1.13.4
-Release:        1%{?dist}
+Release: 2%{?dist}
 
 Summary:        Create deep copies (clones) of your objects
 

@@ -6,7 +6,7 @@
 Summary:        MinGW Windows Internationalized Domain Name 2008 support library
 Name:           mingw-libidn2
 Version:        2.3.8
-Release:        2%{?dist}
+Release: 3%{?dist}
 License:        (GPL-2.0-or-later OR LGPL-3.0-or-later) AND GPL-3.0-or-later
 URL:            https://www.gnu.org/software/libidn/#libidn2
 

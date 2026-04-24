@@ -14,14 +14,14 @@
 # -cpu max or -cpu virt.
 # s390x builders can't run libguestfs
 %ifnarch %{power64} riscv64 s390 s390x
-%global have_libguestfs 1
+%global have_libguestfs 0
 %endif
 %endif
 
 # We can only compile the OCaml plugin on platforms which have native
 # OCaml support (not bytecode).
 %ifarch %{ocaml_native_compiler}
-%global have_ocaml 1
+%global have_ocaml 0
 %endif
 
 # libblkio was broken on i686: https://bugzilla.redhat.com/2229372
@@ -58,7 +58,7 @@
 
 Name:           nbdkit
 Version:        1.46.2
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        NBD server
 
 License:        BSD-3-Clause

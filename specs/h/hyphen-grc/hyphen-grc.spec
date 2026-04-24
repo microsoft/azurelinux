@@ -5,7 +5,7 @@ Name: hyphen-grc
 Summary: Ancient Greek hyphenation rules
 %global upstreamid 20110913
 Version: 0.%{upstreamid}
-Release: 30%{?dist}
+Release: 31%{?dist}
 #? in a url causes trouble
 #http://tug.org/svn/texhyphen/trunk/hyph-utf8/tex/generic/hyph-utf8/patterns/tex/hyph-grc.tex?view=co
 Source: hyph-grc.tex

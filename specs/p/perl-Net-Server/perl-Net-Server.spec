@@ -3,7 +3,7 @@
 
 Name:           perl-Net-Server
 Version:        2.014
-Release:        9%{?dist}
+Release: 10%{?dist}
 Summary:        Extensible, general Perl server engine
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Net-Server

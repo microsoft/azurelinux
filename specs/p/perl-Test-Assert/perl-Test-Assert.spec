@@ -16,7 +16,7 @@
 
 Name:		perl-Test-Assert
 Version:	0.0504
-Release:	45%{?dist}
+Release: 46%{?dist}
 Summary:	Assertion methods for those who like JUnit
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Test-Assert

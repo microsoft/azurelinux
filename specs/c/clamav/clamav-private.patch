@@ -1,0 +1,36 @@
+--- clamav-0.99/libclamav.pc.in			2015-09-18 22:48:25.000000000 +0200
++++ clamav-0.99/libclamav.pc.in.private		2015-12-02 01:30:30.055231319 +0100
+@@ -7,6 +7,6 @@
+ Description: A GPL virus scanner
+ Version: @PACKAGE_VERSION@
+ Libs: -L${libdir} -lclamav
+-Libs.private: @LIBCLAMAV_LIBS@
++Libs.private: -L${libdir} -lclamav @LIBCLAMAV_LIBS@
+ Cflags: -I${includedir}
+ 
+diff -up clamav-1.0.0/clamav-config.in.private clamav-1.0.0/clamav-config.in
+--- clamav-1.0.0/clamav-config.in.private	2023-01-22 17:40:01.711757908 -0700
++++ clamav-1.0.0/clamav-config.in	2023-01-22 18:01:06.188743168 -0700
+@@ -4,7 +4,6 @@
+ prefix=@prefix@
+ exec_prefix=@exec_prefix@
+ includedir=@includedir@
+-libdir=@libdir@
+ 
+ usage()
+ {
+@@ -54,12 +54,8 @@
+ 	usage 0
+ 	;;
+ 
+-    --cflags)
+-       	echo -I@includedir@ @CFLAGS@
+-       	;;
+-
+-    --libs)
+-       	echo -L@libdir@ @LIBCLAMAV_LIBS@
++    (--cflags|--libs)
++	${PKG_CONFIG:-pkg-config} "$1" libclamav
+        	;;
+ 
+     *)

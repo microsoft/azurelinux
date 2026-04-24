@@ -1,0 +1,81 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 1 Aug 2022 14:06:30 -0400
+Subject: [PATCH] efi: use enumerated array positions for our allocation
+ choices
+
+In our kernel allocator on EFI systems, we currently have a growing
+amount of code that references the various allocation policies by
+position in the array, and of course maintenance of this code scales
+very poorly.
+
+This patch changes them to be enumerated, so they're easier to refer to
+farther along in the code without confusion.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/loader/i386/efi/linux.c | 31 ++++++++++++++++++++-----------
+ 1 file changed, 20 insertions(+), 11 deletions(-)
+
+diff --git a/grub-core/loader/i386/efi/linux.c b/grub-core/loader/i386/efi/linux.c
+index 3ec9bb09c52..ef5875b7697 100644
+--- a/grub-core/loader/i386/efi/linux.c
++++ b/grub-core/loader/i386/efi/linux.c
+@@ -60,17 +60,26 @@ struct allocation_choice {
+     grub_efi_allocate_type_t alloc_type;
+ };
+ 
+-static struct allocation_choice max_addresses[4] =
++enum {
++    KERNEL_PREF_ADDRESS,
++    KERNEL_4G_LIMIT,
++    KERNEL_NO_LIMIT,
++};
++
++static struct allocation_choice max_addresses[] =
+   {
+     /* the kernel overrides this one with pref_address and
+      * GRUB_EFI_ALLOCATE_ADDRESS */
+-    { GRUB_EFI_MAX_ALLOCATION_ADDRESS, GRUB_EFI_ALLOCATE_MAX_ADDRESS },
++    [KERNEL_PREF_ADDRESS] =
++      { GRUB_EFI_MAX_ALLOCATION_ADDRESS, GRUB_EFI_ALLOCATE_MAX_ADDRESS },
++    /* If the flag in params is set, this one gets changed to be above 4GB. */
++    [KERNEL_4G_LIMIT] =
++      { GRUB_EFI_MAX_ALLOCATION_ADDRESS, GRUB_EFI_ALLOCATE_MAX_ADDRESS },
+     /* this one is always below 4GB, which we still *prefer* even if the flag
+      * is set. */
+-    { GRUB_EFI_MAX_ALLOCATION_ADDRESS, GRUB_EFI_ALLOCATE_MAX_ADDRESS },
+-    /* If the flag in params is set, this one gets changed to be above 4GB. */
+-    { GRUB_EFI_MAX_ALLOCATION_ADDRESS, GRUB_EFI_ALLOCATE_MAX_ADDRESS },
+-    { 0, 0 }
++    [KERNEL_NO_LIMIT] =
++      { GRUB_EFI_MAX_ALLOCATION_ADDRESS, GRUB_EFI_ALLOCATE_MAX_ADDRESS },
++    { NO_MEM, 0, 0 }
+   };
+ static struct allocation_choice saved_addresses[4];
+ 
+@@ -388,7 +397,7 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+   if (lh->xloadflags & LINUX_XLF_CAN_BE_LOADED_ABOVE_4G)
+     {
+       grub_dprintf ("linux", "Loading kernel above 4GB is supported; enabling.\n");
+-      max_addresses[2].addr = GRUB_EFI_MAX_USABLE_ADDRESS;
++      max_addresses[KERNEL_NO_LIMIT].addr = GRUB_EFI_MAX_USABLE_ADDRESS;
+     }
+   else
+     {
+@@ -461,11 +470,11 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+   grub_dprintf ("linux", "lh->pref_address: %p\n", (void *)(grub_addr_t)lh->pref_address);
+   if (lh->pref_address < (grub_uint64_t)GRUB_EFI_MAX_ALLOCATION_ADDRESS)
+     {
+-      max_addresses[0].addr = lh->pref_address;
+-      max_addresses[0].alloc_type = GRUB_EFI_ALLOCATE_ADDRESS;
++      max_addresses[KERNEL_PREF_ADDRESS].addr = lh->pref_address;
++      max_addresses[KERNEL_PREF_ADDRESS].alloc_type = GRUB_EFI_ALLOCATE_ADDRESS;
+     }
+-  max_addresses[1].addr = GRUB_EFI_MAX_ALLOCATION_ADDRESS;
+-  max_addresses[2].addr = GRUB_EFI_MAX_ALLOCATION_ADDRESS;
++  max_addresses[KERNEL_4G_LIMIT].addr = GRUB_EFI_MAX_ALLOCATION_ADDRESS;
++  max_addresses[KERNEL_NO_LIMIT].addr = GRUB_EFI_MAX_ALLOCATION_ADDRESS;
+   kernel_size = lh->init_size;
+   kernel_mem = kernel_alloc (kernel_size, GRUB_EFI_RUNTIME_SERVICES_CODE,
+ 			     N_("can't allocate kernel"));

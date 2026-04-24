@@ -1,0 +1,566 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Bernd Schubert <bschubert@ddn.com>
+Date: Sun, 30 Mar 2025 22:43:09 +0200
+Subject: [PATCH] Fix multi-threaded fuse session exit
+
+Issue with previous code was that fuse_session_exit()
+didn't wake up the semaphore in fuse_loop_mt.c.
+Lock, semaphore and all uses of checking for "exited"
+are now moved to struct fuse_session to have it
+available for the signal handler.
+
+This also removes internal fuse_session_reset() calls,
+as that makes testing hard. From git history I also
+don't see why it was added.
+
+Closes: https://github.com/libfuse/libfuse/issues/997
+Signed-off-by: Bernd Schubert <bschubert@ddn.com>
+
+diff --git a/lib/fuse.c b/lib/fuse.c
+index 2a88918..3f746e2 100644
+--- a/lib/fuse.c
++++ b/lib/fuse.c
+@@ -4534,7 +4534,6 @@ static int fuse_session_loop_remember(struct fuse *f)
+ 	}
+ 
+ 	free(fbuf.mem);
+-	fuse_session_reset(se);
+ 	return res < 0 ? -1 : 0;
+ }
+ 
+diff --git a/lib/fuse_i.h b/lib/fuse_i.h
+index 74cfe36..61753e9 100644
+--- a/lib/fuse_i.h
++++ b/lib/fuse_i.h
+@@ -9,6 +9,10 @@
+ #include "fuse.h"
+ #include "fuse_lowlevel.h"
+ 
++#include <pthread.h>
++#include <semaphore.h>
++#include <stdbool.h>
++
+ struct mount_opts;
+ 
+ struct fuse_req {
+@@ -43,7 +47,6 @@ struct fuse_notify_req {
+ 
+ struct fuse_session {
+ 	char *mountpoint;
+-	volatile int exited;
+ 	int fd;
+ 	struct fuse_custom_io *io;
+ 	struct mount_opts *mo;
+@@ -65,6 +68,11 @@ struct fuse_session {
+ 	struct fuse_notify_req notify_list;
+ 	size_t bufsize;
+ 	int error;
++
++	/* thread synchronization */
++	_Atomic bool mt_exited;
++	pthread_mutex_t mt_lock;
++	sem_t mt_finish;
+ };
+ 
+ struct fuse_chan {
+diff --git a/lib/fuse_loop_mt.c b/lib/fuse_loop_mt.c
+index 0200d73..fd4f3f0 100644
+--- a/lib/fuse_loop_mt.c
++++ b/lib/fuse_loop_mt.c
+@@ -50,14 +50,12 @@ struct fuse_worker {
+ 	struct fuse_mt *mt;
+ };
+ 
++/* synchronization via se->mt_lock */
+ struct fuse_mt {
+-	pthread_mutex_t lock;
+ 	int numworker;
+ 	int numavail;
+ 	struct fuse_session *se;
+ 	struct fuse_worker main;
+-	sem_t finish;
+-	int exit;
+ 	int error;
+ 	int clone_fd;
+ 	int max_idle;
+@@ -128,27 +126,28 @@ static void *fuse_do_work(void *data)
+ {
+ 	struct fuse_worker *w = (struct fuse_worker *) data;
+ 	struct fuse_mt *mt = w->mt;
++	struct fuse_session *se = mt->se;
+ 
+-	while (!fuse_session_exited(mt->se)) {
++	while (!fuse_session_exited(se)) {
+ 		int isforget = 0;
+ 		int res;
+ 
+ 		pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+-		res = fuse_session_receive_buf_int(mt->se, &w->fbuf, w->ch);
++		res = fuse_session_receive_buf_int(se, &w->fbuf, w->ch);
+ 		pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
+ 		if (res == -EINTR)
+ 			continue;
+ 		if (res <= 0) {
+ 			if (res < 0) {
+-				fuse_session_exit(mt->se);
++				fuse_session_exit(se);
+ 				mt->error = res;
+ 			}
+ 			break;
+ 		}
+ 
+-		pthread_mutex_lock(&mt->lock);
+-		if (mt->exit) {
+-			pthread_mutex_unlock(&mt->lock);
++		pthread_mutex_lock(&se->mt_lock);
++		if (fuse_session_exited(se)) {
++			pthread_mutex_unlock(&se->mt_lock);
+ 			return NULL;
+ 		}
+ 
+@@ -168,11 +167,11 @@ static void *fuse_do_work(void *data)
+ 			mt->numavail--;
+ 		if (mt->numavail == 0 && mt->numworker < mt->max_threads)
+ 			fuse_loop_start_thread(mt);
+-		pthread_mutex_unlock(&mt->lock);
++		pthread_mutex_unlock(&se->mt_lock);
+ 
+-		fuse_session_process_buf_int(mt->se, &w->fbuf, w->ch);
++		fuse_session_process_buf_int(se, &w->fbuf, w->ch);
+ 
+-		pthread_mutex_lock(&mt->lock);
++		pthread_mutex_lock(&se->mt_lock);
+ 		if (!isforget)
+ 			mt->numavail++;
+ 
+@@ -183,14 +182,14 @@ static void *fuse_do_work(void *data)
+ 		 * delayed, a moving average might be useful for that.
+ 		 */
+ 		if (mt->max_idle != -1 && mt->numavail > mt->max_idle && mt->numworker > 1) {
+-			if (mt->exit) {
+-				pthread_mutex_unlock(&mt->lock);
++			if (fuse_session_exited(se)) {
++				pthread_mutex_unlock(&se->mt_lock);
+ 				return NULL;
+ 			}
+ 			list_del_worker(w);
+ 			mt->numavail--;
+ 			mt->numworker--;
+-			pthread_mutex_unlock(&mt->lock);
++			pthread_mutex_unlock(&se->mt_lock);
+ 
+ 			pthread_detach(w->thread_id);
+ 			free(w->fbuf.mem);
+@@ -198,11 +197,10 @@ static void *fuse_do_work(void *data)
+ 			free(w);
+ 			return NULL;
+ 		}
+-		pthread_mutex_unlock(&mt->lock);
++		pthread_mutex_unlock(&se->mt_lock);
+ 	}
+ 
+-	sem_post(&mt->finish);
+-
++	sem_post(&se->mt_finish);
+ 	return NULL;
+ }
+ 
+@@ -316,9 +314,9 @@ static int fuse_loop_start_thread(struct fuse_mt *mt)
+ static void fuse_join_worker(struct fuse_mt *mt, struct fuse_worker *w)
+ {
+ 	pthread_join(w->thread_id, NULL);
+-	pthread_mutex_lock(&mt->lock);
++	pthread_mutex_lock(&mt->se->mt_lock);
+ 	list_del_worker(w);
+-	pthread_mutex_unlock(&mt->lock);
++	pthread_mutex_unlock(&mt->se->mt_lock);
+ 	free(w->fbuf.mem);
+ 	fuse_chan_put(w->ch);
+ 	free(w);
+@@ -354,22 +352,21 @@ int err;
+ 	mt.max_threads = config->max_threads;
+ 	mt.main.thread_id = pthread_self();
+ 	mt.main.prev = mt.main.next = &mt.main;
+-	sem_init(&mt.finish, 0, 0);
+-	pthread_mutex_init(&mt.lock, NULL);
+ 
+-	pthread_mutex_lock(&mt.lock);
++	pthread_mutex_lock(&se->mt_lock);
+ 	err = fuse_loop_start_thread(&mt);
+-	pthread_mutex_unlock(&mt.lock);
++	pthread_mutex_unlock(&se->mt_lock);
+ 	if (!err) {
+-		/* sem_wait() is interruptible */
+ 		while (!fuse_session_exited(se))
+-			sem_wait(&mt.finish);
++			sem_wait(&se->mt_finish);
++		if (se->debug)
++			fuse_log(FUSE_LOG_DEBUG,
++				 "fuse: session exited, terminating workers\n");
+ 
+-		pthread_mutex_lock(&mt.lock);
++		pthread_mutex_lock(&se->mt_lock);
+ 		for (w = mt.main.next; w != &mt.main; w = w->next)
+ 			pthread_cancel(w->thread_id);
+-		mt.exit = 1;
+-		pthread_mutex_unlock(&mt.lock);
++		pthread_mutex_unlock(&se->mt_lock);
+ 
+ 		while (mt.main.next != &mt.main)
+ 			fuse_join_worker(&mt, mt.main.next);
+@@ -377,11 +374,9 @@ int err;
+ 		err = mt.error;
+ 	}
+ 
+-	pthread_mutex_destroy(&mt.lock);
+-	sem_destroy(&mt.finish);
++	pthread_mutex_destroy(&se->mt_lock);
+ 	if(se->error != 0)
+ 		err = se->error;
+-	fuse_session_reset(se);
+ 
+ 	if (created_config) {
+ 		fuse_loop_cfg_destroy(config);
+diff --git a/lib/fuse_lowlevel.c b/lib/fuse_lowlevel.c
+index fdef193..6088640 100644
+--- a/lib/fuse_lowlevel.c
++++ b/lib/fuse_lowlevel.c
+@@ -18,6 +18,8 @@
+ #include "fuse_misc.h"
+ #include "mount_util.h"
+ 
++#include <pthread.h>
++#include <stdatomic.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <stddef.h>
+@@ -2822,6 +2824,8 @@ void fuse_session_destroy(struct fuse_session *se)
+ 	if (llp != NULL)
+ 		fuse_ll_pipe_free(llp);
+ 	pthread_key_delete(se->pipe_key);
++	sem_destroy(&se->mt_finish);
++	pthread_mutex_destroy(&se->mt_lock);
+ 	pthread_mutex_destroy(&se->lock);
+ 	free(se->cuse_data);
+ 	if (se->fd != -1)
+@@ -3079,6 +3083,8 @@ struct fuse_session *fuse_session_new(struct fuse_args *args,
+ 	list_init_nreq(&se->notify_list);
+ 	se->notify_ctr = 1;
+ 	pthread_mutex_init(&se->lock, NULL);
++	sem_init(&se->mt_finish, 0, 0);
++	pthread_mutex_init(&se->mt_lock, NULL);
+ 
+ 	err = pthread_key_create(&se->pipe_key, fuse_ll_pipe_destructor);
+ 	if (err) {
+@@ -3095,6 +3101,8 @@ struct fuse_session *fuse_session_new(struct fuse_args *args,
+ 	return se;
+ 
+ out5:
++	sem_destroy(&se->mt_finish);
++	pthread_mutex_destroy(&se->mt_lock);
+ 	pthread_mutex_destroy(&se->lock);
+ out4:
+ 	fuse_opt_free_args(args);
+@@ -3281,18 +3289,22 @@ int fuse_req_getgroups(fuse_req_t req, int size, gid_t list[])
+ __attribute__((no_sanitize_thread))
+ void fuse_session_exit(struct fuse_session *se)
+ {
+-	se->exited = 1;
++	atomic_store_explicit(&se->mt_exited, 1, memory_order_relaxed);
++	sem_post(&se->mt_finish);
+ }
+ 
+ __attribute__((no_sanitize_thread))
+ void fuse_session_reset(struct fuse_session *se)
+ {
+-	se->exited = 0;
++	se->mt_exited = false;
+ 	se->error = 0;
+ }
+ 
+ __attribute__((no_sanitize_thread))
+ int fuse_session_exited(struct fuse_session *se)
+ {
+-	return se->exited;
++	bool exited =
++		atomic_load_explicit(&se->mt_exited, memory_order_relaxed);
++
++	return exited ? 1 : 0;
+ }
+diff --git a/lib/fuse_signals.c b/lib/fuse_signals.c
+index 048d047..e06f973 100644
+--- a/lib/fuse_signals.c
++++ b/lib/fuse_signals.c
+@@ -21,14 +21,22 @@ static struct fuse_session *fuse_instance;
+ 
+ static void exit_handler(int sig)
+ {
+-	if (fuse_instance) {
+-		fuse_session_exit(fuse_instance);
+-		if(sig <= 0) {
+-			fuse_log(FUSE_LOG_ERR, "assertion error: signal value <= 0\n");
+-			abort();
+-		}
+-		fuse_instance->error = sig;
++	if (fuse_instance == NULL) {
++		fuse_log(FUSE_LOG_ERR, "fuse_instance is NULL\n");
++		return;
+ 	}
++
++	if (fuse_instance->debug)
++		fuse_log(FUSE_LOG_ERR, "exit_handler called with sig %d\n",
++			 sig);
++
++	fuse_session_exit(fuse_instance);
++
++	if(sig <= 0) {
++		fuse_log(FUSE_LOG_ERR, "assertion error: signal value <= 0\n");
++		abort();
++	}
++	fuse_instance->error = sig;
+ }
+ 
+ static void do_nothing(int sig)
+diff --git a/test/meson.build b/test/meson.build
+index 3d74b9a..ab62114 100644
+--- a/test/meson.build
++++ b/test/meson.build
+@@ -16,6 +16,11 @@ td += executable('readdir_inode', 'readdir_inode.c',
+ td += executable('release_unlink_race', 'release_unlink_race.c',
+                  dependencies: [ libfuse_dep ],
+                  install: false)
++td += executable('test_signals', 'test_signals.c',
++                 include_directories: include_dirs,
++                 link_with: [ libfuse ],
++                 dependencies: thread_dep,
++                 install: false)
+ 
+ test_scripts = [ 'conftest.py', 'pytest.ini', 'test_examples.py',
+                  'util.py', 'test_ctests.py', 'test_custom_io.py' ]
+diff --git a/test/test_ctests.py b/test/test_ctests.py
+index 951a34b..9e39bb7 100644
+--- a/test/test_ctests.py
++++ b/test/test_ctests.py
+@@ -102,3 +102,14 @@ def test_notify_file_size(tmpdir, notify, output_checker):
+         raise
+     else:
+         umount(mount_process, mnt_dir)
++
++def test_signals(output_checker):
++    """Test for proper signal handling (issue #1182)"""
++    import logging
++    logger = logging.getLogger(__name__)
++    logger.debug("Testing signal handling")
++    cmdline = [ pjoin(basename, 'test', 'test_signals') ]
++    logger.debug(f"Command line: {' '.join(cmdline)}")
++    subprocess.run(cmdline, stdout=output_checker.fd, \
++                   stderr=output_checker.fd, timeout=10, check=True)
++    logger.debug("Signal handling test completed successfully")
+diff --git a/test/test_signals.c b/test/test_signals.c
+new file mode 100644
+index 0000000..0cc151a
+--- /dev/null
++++ b/test/test_signals.c
+@@ -0,0 +1,202 @@
++/*
++ * FUSE: Filesystem in Userspace
++ * Copyright (C) 2025  Bernd Schubert <bernd@bsbernd.com>
++ *
++ * Test for signal handling in libfuse.
++ *
++ * This program can be distributed under the terms of the GNU LGPLv2.
++ * See the file COPYING.LIB
++ */
++
++#define FUSE_USE_VERSION FUSE_MAKE_VERSION(3, 16)
++
++#include "fuse_config.h"
++#include "fuse_lowlevel.h"
++#include "fuse_i.h"
++
++#include <pthread.h>
++#include <stdatomic.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <signal.h>
++#include <errno.h>
++#include <sys/types.h>
++#include <sys/wait.h>
++
++static void test_ll_lookup(fuse_req_t req, fuse_ino_t parent, const char *name)
++{
++	(void)parent;
++	(void)name;
++	/* Simulate slow lookup to test signal interruption */
++	sleep(2);
++	fuse_reply_err(req, ENOENT);
++}
++
++static void test_ll_getattr(fuse_req_t req, fuse_ino_t ino,
++			    struct fuse_file_info *fi)
++{
++	(void)ino;
++	(void)fi;
++	/* Simulate slow getattr to test signal interruption */
++	sleep(2);
++	fuse_reply_err(req, ENOENT);
++}
++
++static const struct fuse_lowlevel_ops test_ll_ops = {
++	.lookup = test_ll_lookup,
++	.getattr = test_ll_getattr,
++};
++
++static void *signal_sender_thread(void *arg)
++{
++	(void)arg;
++
++	usleep(2 * 1000 * 1000);
++
++	/* Send SIGTERM to the process */
++	kill(getpid(), SIGTERM);
++	return NULL;
++}
++
++static void fork_child(void)
++{
++	struct fuse_args args = FUSE_ARGS_INIT(0, NULL);
++	struct fuse_session *se;
++	struct fuse_loop_config *loop_config;
++	pthread_t sig_thread;
++	char *mountpoint = NULL;
++	int ret = -1;
++
++	/* Add the program name to arg[0] */
++	if (fuse_opt_add_arg(&args, "test_signals")) {
++		fprintf(stderr, "Failed to add argument\n");
++		goto out_free_mountpoint;
++	}
++
++	/* Add debug flag to see more output */
++	fuse_opt_add_arg(&args, "-d");
++
++	/* Create temporary mount point */
++	mountpoint = strdup("/tmp/fuse_test_XXXXXX");
++	if (!mountpoint || !mkdtemp(mountpoint)) {
++		fprintf(stderr, "Failed to create temp dir\n");
++		goto out_free_args;
++	}
++
++	/* Create session */
++	se = fuse_session_new(&args, &test_ll_ops, sizeof(test_ll_ops), NULL);
++	if (!se) {
++		fprintf(stderr, "Failed to create FUSE session\n");
++		goto out_free_mountpoint;
++	}
++
++	/* Mount filesystem */
++	if (fuse_session_mount(se, mountpoint)) {
++		fprintf(stderr, "Failed to mount FUSE filesystem\n");
++		goto out_destroy_session;
++	}
++
++	/* Create loop config */
++	loop_config = fuse_loop_cfg_create();
++	if (!loop_config) {
++		fprintf(stderr, "Failed to create loop config\n");
++		goto out_unmount;
++	}
++	fuse_loop_cfg_set_clone_fd(loop_config, 0);
++	fuse_loop_cfg_set_max_threads(loop_config, 2);
++
++	/* Set up signal handlers */
++	if (fuse_set_signal_handlers(se)) {
++		fprintf(stderr, "Failed to set up signal handlers\n");
++		goto out_destroy_config;
++	}
++
++	/* Create thread that will send signals */
++	if (pthread_create(&sig_thread, NULL, signal_sender_thread, NULL)) {
++		fprintf(stderr, "Failed to create signal sender thread\n");
++		goto out_remove_handlers;
++	}
++
++	/* Enter FUSE loop */
++	ret = fuse_session_loop_mt_312(se, loop_config);
++
++	printf("Debug: fuse_session_loop_mt_312 returned %d\n", ret);
++	printf("Debug: session exited state: %d\n", fuse_session_exited(se));
++	printf("Debug: session status: %d\n", se->error);
++
++	/* Check exit status before cleanup */
++	int clean_exit = (fuse_session_exited(se) && se->error == SIGTERM);
++
++	/* Clean up */
++	pthread_join(sig_thread, NULL);
++	fuse_remove_signal_handlers(se);
++	fuse_session_unmount(se);
++	fuse_session_destroy(se);
++	fuse_loop_cfg_destroy(loop_config);
++	rmdir(mountpoint);
++	free(mountpoint);
++	fuse_opt_free_args(&args);
++
++	/* Use saved exit status */
++	if (clean_exit) {
++		printf("Debug: Clean shutdown via SIGTERM\n");
++		exit(0);
++	}
++	printf("Debug: Exiting with status %d\n", ret != 0);
++	exit(ret != 0);
++
++out_remove_handlers:
++	fuse_remove_signal_handlers(se);
++out_destroy_config:
++	fuse_loop_cfg_destroy(loop_config);
++out_unmount:
++	fuse_session_unmount(se);
++out_destroy_session:
++	fuse_session_destroy(se);
++out_free_mountpoint:
++	rmdir(mountpoint);
++	free(mountpoint);
++out_free_args:
++	fuse_opt_free_args(&args);
++	exit(1);
++}
++
++static void run_test_in_child(void)
++{
++	pid_t child;
++	int status;
++
++	child = fork();
++	if (child == -1) {
++		perror("fork");
++		exit(1);
++	}
++
++	if (child == 0)
++		fork_child();
++
++	/* In parent process */
++	if (waitpid(child, &status, 0) == -1) {
++		perror("waitpid");
++		exit(1);
++	}
++
++	/* Check if child exited due to SIGTERM - this is expected */
++	if (WIFSIGNALED(status) && WTERMSIG(status) == SIGTERM) {
++		printf("Child process terminated by SIGTERM as expected\n");
++		exit(0);
++	}
++
++	/* For any other type of exit, maintain existing behavior */
++	exit(WIFEXITED(status) ? WEXITSTATUS(status) : 1);
++}
++
++int main(void)
++{
++	printf("Testing SIGTERM handling in libfuse\n");
++	run_test_in_child();
++	printf("SIGTERM handling test passed\n");
++	return 0;
++}

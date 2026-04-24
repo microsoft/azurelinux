@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.1.0
-Release: 11%{?dist}
+Release: 12%{?dist}
 Summary: Ascii85 encoder/decoder
 License: MIT
 URL: https://github.com/DataWraith/ascii85gem/

@@ -1,0 +1,69 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Chris Coulson <chris.coulson@canonical.com>
+Date: Thu, 28 Apr 2022 21:53:36 +0100
+Subject: [PATCH] loader/efi/chainloader: grub_load_and_start_image doesn't
+ load and start
+
+grub_load_and_start_image only loads an image - it still requires the
+caller to start it. This renames it to grub_load_image.
+
+It's called from 2 places:
+- grub_cmd_chainloader when not using the shim protocol.
+- grub_secureboot_chainloader_boot if handle_image returns an error.
+In this case, the image is loaded and then nothing else happens which
+seems strange. I assume the intention is that it falls back to LoadImage
+and StartImage if handle_image fails, so I've made it do that.
+
+Signed-off-by: Chris Coulson <chris.coulson@canonical.com>
+(cherry picked from commit b4d70820a65c00561045856b7b8355461a9545f6)
+---
+ grub-core/loader/efi/chainloader.c | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/grub-core/loader/efi/chainloader.c b/grub-core/loader/efi/chainloader.c
+index 3a3b55c1d61..9c6a5f92600 100644
+--- a/grub-core/loader/efi/chainloader.c
++++ b/grub-core/loader/efi/chainloader.c
+@@ -847,7 +847,7 @@ grub_secureboot_chainloader_unload (void)
+ }
+ 
+ static grub_err_t
+-grub_load_and_start_image(void *boot_image)
++grub_load_image(void *boot_image)
+ {
+   grub_efi_boot_services_t *b;
+   grub_efi_status_t status;
+@@ -889,13 +889,23 @@ grub_load_and_start_image(void *boot_image)
+ static grub_err_t
+ grub_secureboot_chainloader_boot (void)
+ {
++  grub_efi_boot_services_t *b;
+   int rc;
++
+   rc = handle_image ((void *)(unsigned long)address, fsize);
+   if (rc == 0)
+     {
+-      grub_load_and_start_image((void *)(unsigned long)address);
++      /* We weren't able to attempt to execute the image, so fall back
++       * to LoadImage / StartImage.
++       */
++      rc = grub_load_image((void *)(unsigned long)address);
++      if (rc == 0)
++        grub_chainloader_boot ();
+     }
+ 
++  b = grub_efi_system_table->boot_services;
++  efi_call_1 (b->unload_image, image_handle);
++
+   grub_loader_unset ();
+   return grub_errno;
+ }
+@@ -1096,7 +1106,7 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
+     }
+   else
+     {
+-      grub_load_and_start_image(boot_image);
++      grub_load_image(boot_image);
+       grub_file_close (file);
+       grub_device_close (dev);
+       grub_loader_set_ex (grub_chainloader_boot, grub_chainloader_unload, image_handle, 0);

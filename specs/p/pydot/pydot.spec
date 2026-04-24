@@ -11,7 +11,7 @@ tools dot, neato, twopi.
 
 Name:		pydot
 Version:	4.0.1
-Release:	2%{?dist}
+Release: 3%{?dist}
 Summary:	Python interface to Graphviz's Dot language
 License:	MIT
 URL:		https://github.com/pydot/pydot

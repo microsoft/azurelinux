@@ -1,0 +1,52 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Christian Glombek <cglombek@redhat.com>
+Date: Wed, 9 Aug 2023 18:11:25 +0200
+Subject: [PATCH] Add [Install] section to aux systemd units
+
+Currently in Fedora, these services are statically enabled by symlinks,
+with no other way to disable them than to manually delete those symlinks.
+This is problematic in Fedora IoT, where grub-boot-success.timer is
+not supposed to be enabled.
+
+This change adds `[Install]` sections to all systemd units that are
+currently enabled statically, so that they can be enabled dynamically
+via presets or manually instead.
+---
+ docs/grub-boot-indeterminate.service             | 3 +++
+ docs/grub-boot-success.timer                     | 3 +++
+ util/systemd/grub-systemd-integration.service.in | 3 +++
+ 3 files changed, 9 insertions(+)
+
+diff --git a/docs/grub-boot-indeterminate.service b/docs/grub-boot-indeterminate.service
+index 6c8dcb186b6..5bcb474a3d3 100644
+--- a/docs/grub-boot-indeterminate.service
++++ b/docs/grub-boot-indeterminate.service
+@@ -9,3 +9,6 @@ Before=system-update-pre.target
+ [Service]
+ Type=oneshot
+ ExecStart=/usr/bin/grub2-editenv - incr boot_indeterminate
++
++[Install]
++WantedBy=system-update.target
+diff --git a/docs/grub-boot-success.timer b/docs/grub-boot-success.timer
+index 406f1720056..1d124cccc14 100644
+--- a/docs/grub-boot-success.timer
++++ b/docs/grub-boot-success.timer
+@@ -5,3 +5,6 @@ ConditionVirtualization=!container
+ 
+ [Timer]
+ OnActiveSec=2min
++
++[Install]
++WantedBy=timers.target
+diff --git a/util/systemd/grub-systemd-integration.service.in b/util/systemd/grub-systemd-integration.service.in
+index c81fb594ce1..22ca1ca4885 100644
+--- a/util/systemd/grub-systemd-integration.service.in
++++ b/util/systemd/grub-systemd-integration.service.in
+@@ -6,3 +6,6 @@ ConditionPathExists=/run/systemd/reboot-to-boot-loader-menu
+ 
+ [Service]
+ ExecStart=@libexecdir@/@grubdirname@/systemd-integration.sh
++
++[Install]
++WantedBy=reboot.target

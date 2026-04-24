@@ -3,7 +3,7 @@
 
 Name: 		perl-prefork
 Version: 	1.05
-Release: 	21%{?dist}
+Release: 22%{?dist}
 Summary: 	Optimized module loading for forking or non-forking processes
 License: 	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL: 		https://metacpan.org/release/prefork

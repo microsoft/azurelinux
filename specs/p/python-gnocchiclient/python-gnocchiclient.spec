@@ -25,7 +25,7 @@ provides a Python API (the gnocchiclient module) and a command-line tool.
 
 Name:             python-gnocchiclient
 Version:          7.1.0
-Release:          6%{?dist}
+Release: 7%{?dist}
 Summary:          Python API and CLI for OpenStack Gnocchi
 
 License:          Apache-2.0

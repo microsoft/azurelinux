@@ -17,7 +17,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 2.6.9
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: Library and utilities to manage a Ruby application's gem dependencies
 # BSD-2-Clause OR Ruby:
 #   lib/bundler/vendor/fileutils

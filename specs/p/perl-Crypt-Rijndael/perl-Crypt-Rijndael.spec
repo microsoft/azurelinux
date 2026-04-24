@@ -3,7 +3,7 @@
 
 Name:           perl-Crypt-Rijndael
 Version:        1.16
-Release:        17%{?dist}
+Release: 18%{?dist}
 Summary:        Crypt::CBC compliant Rijndael encryption module
 # Rijndael.{h,xs}, _rijndael.c: LGPL-2.0-or-later
 # Rijndael.pm, COPYING:         LGPL-3.0-only

@@ -1,0 +1,139 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dimitri John Ledkov <xnox@ubuntu.com>
+Date: Fri, 11 Jun 2021 13:51:20 +0200
+Subject: [PATCH] Allow chainloading EFI apps from loop mounts.
+
+Signed-off-by: Dimitri John Ledkov <Dimitri.ledkov@canonical.com>
+Signed-off-by: Robbie Harwood <rharwood@redhat.com>
+---
+ grub-core/disk/loopback.c          |  9 +--------
+ grub-core/loader/efi/chainloader.c | 24 ++++++++++++++++++++++++
+ include/grub/loopback.h            | 30 ++++++++++++++++++++++++++++++
+ 3 files changed, 55 insertions(+), 8 deletions(-)
+ create mode 100644 include/grub/loopback.h
+
+diff --git a/grub-core/disk/loopback.c b/grub-core/disk/loopback.c
+index 4635dcfdeec..11a5e0cbd02 100644
+--- a/grub-core/disk/loopback.c
++++ b/grub-core/disk/loopback.c
+@@ -21,20 +21,13 @@
+ #include <grub/misc.h>
+ #include <grub/file.h>
+ #include <grub/disk.h>
++#include <grub/loopback.h>
+ #include <grub/mm.h>
+ #include <grub/extcmd.h>
+ #include <grub/i18n.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+-struct grub_loopback
+-{
+-  char *devname;
+-  grub_file_t file;
+-  struct grub_loopback *next;
+-  unsigned long id;
+-};
+-
+ static struct grub_loopback *loopback_list;
+ static unsigned long last_id = 0;
+ 
+diff --git a/grub-core/loader/efi/chainloader.c b/grub-core/loader/efi/chainloader.c
+index 0ec682e2988..efbe2bd38aa 100644
+--- a/grub-core/loader/efi/chainloader.c
++++ b/grub-core/loader/efi/chainloader.c
+@@ -24,6 +24,7 @@
+ #include <grub/err.h>
+ #include <grub/device.h>
+ #include <grub/disk.h>
++#include <grub/loopback.h>
+ #include <grub/misc.h>
+ #include <grub/charset.h>
+ #include <grub/mm.h>
+@@ -907,6 +908,7 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
+   grub_efi_status_t status;
+   grub_efi_boot_services_t *b;
+   grub_device_t dev = 0;
++  grub_device_t orig_dev = 0;
+   grub_efi_device_path_t *dp = NULL;
+   char *filename;
+   void *boot_image = 0;
+@@ -963,6 +965,16 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
+   dev = grub_device_open (devname);
+   if (devname)
+     grub_free (devname);
++
++  /* if device is loopback, use underlying dev */
++  if (dev && dev->disk->dev->id == GRUB_DISK_DEVICE_LOOPBACK_ID)
++    {
++      struct grub_loopback *d;
++      orig_dev = dev;
++      d = dev->disk->data;
++      dev = d->file->device;
++    }
++
+   if (dev == NULL)
+     ;
+   else if (dev->disk)
+@@ -1069,6 +1081,12 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
+     }
+ #endif
+ 
++  if (orig_dev)
++    {
++      dev = orig_dev;
++      orig_dev = 0;
++    }
++
+   rc = grub_linuxefi_secure_validate((void *)(unsigned long)address, fsize);
+   grub_dprintf ("chain", "linuxefi_secure_validate: %d\n", rc);
+   if (rc > 0)
+@@ -1092,6 +1110,12 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
+ 
+ fail:
+ 
++  if (orig_dev)
++    {
++      dev = orig_dev;
++      orig_dev = 0;
++    }
++
+   if (dev)
+     grub_device_close (dev);
+ 
+diff --git a/include/grub/loopback.h b/include/grub/loopback.h
+new file mode 100644
+index 00000000000..3b9a9e32e80
+--- /dev/null
++++ b/include/grub/loopback.h
+@@ -0,0 +1,30 @@
++/*
++ *  GRUB  --  GRand Unified Bootloader
++ *  Copyright (C) 2019  Free Software Foundation, Inc.
++ *
++ *  GRUB is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 3 of the License, or
++ *  (at your option) any later version.
++ *
++ *  GRUB is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef GRUB_LOOPBACK_HEADER
++#define GRUB_LOOPBACK_HEADER	1
++
++struct grub_loopback
++{
++  char *devname;
++  grub_file_t file;
++  struct grub_loopback *next;
++  unsigned long id;
++};
++
++#endif /* ! GRUB_LOOPBACK_HEADER */

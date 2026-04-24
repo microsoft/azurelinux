@@ -7,7 +7,7 @@
 Summary:        ASCII art library
 Name:           aalib
 Version:        1.4.0
-Release:        0.56.%{rc_subver}%{?dist}
+Release: 1.56.%{rc_subver}%{?dist}
 License:        LGPL-2.1-or-later
 URL:            http://aa-project.sourceforge.net/aalib/
 Source0:        http://download.sourceforge.net/aa-project/%{name}-1.4%{rc_subver}.tar.gz

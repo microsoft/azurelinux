@@ -35,7 +35,7 @@
 Summary: High-performance HTTP accelerator
 Name: varnish
 Version: 7.7.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: BSD-2-Clause AND (BSD-2-Clause-FreeBSD AND BSD-3-Clause AND LicenseRef-Fedora-Public-Domain AND Zlib)
 URL: https://www.varnish-cache.org/
 Source0: http://varnish-cache.org/_downloads/%{name}-%{version}.tgz

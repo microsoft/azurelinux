@@ -1,0 +1,185 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 11 Jul 2019 18:03:25 +0200
+Subject: [PATCH] Attempt to fix up all the places -Wsign-compare=error finds.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/kern/emu/misc.c         |  2 +-
+ grub-core/lib/reed_solomon.c      |  4 ++--
+ grub-core/osdep/linux/blocklist.c |  2 +-
+ grub-core/osdep/linux/getroot.c   |  2 +-
+ util/grub-fstest.c                |  2 +-
+ util/grub-menulst2cfg.c           |  2 +-
+ util/grub-mkfont.c                | 13 +++++++------
+ util/grub-probe.c                 |  2 +-
+ util/setup.c                      |  2 +-
+ 9 files changed, 16 insertions(+), 15 deletions(-)
+
+diff --git a/grub-core/kern/emu/misc.c b/grub-core/kern/emu/misc.c
+index 16c79bc9488..d145e5796b3 100644
+--- a/grub-core/kern/emu/misc.c
++++ b/grub-core/kern/emu/misc.c
+@@ -189,7 +189,7 @@ grub_util_get_image_size (const char *path)
+   sz = ftello (f);
+   if (sz < 0)
+     grub_util_error (_("cannot open `%s': %s"), path, strerror (errno));
+-  if (sz != (size_t) sz)
++  if (sz > (off_t)(GRUB_SIZE_MAX >> 1))
+     grub_util_error (_("file `%s' is too big"), path);
+   ret = (size_t) sz;
+ 
+diff --git a/grub-core/lib/reed_solomon.c b/grub-core/lib/reed_solomon.c
+index 562bd2e3e3f..5fee7f2a1a4 100644
+--- a/grub-core/lib/reed_solomon.c
++++ b/grub-core/lib/reed_solomon.c
+@@ -162,7 +162,7 @@ static void
+ rs_encode (gf_single_t *data, grub_size_t s, grub_size_t rs)
+ {
+   gf_single_t *rs_polynomial;
+-  int i, j;
++  unsigned int i, j;
+   gf_single_t *m;
+   m = xcalloc (s + rs, sizeof (gf_single_t));
+   grub_memcpy (m, data, s * sizeof (gf_single_t));
+@@ -333,7 +333,7 @@ static void
+ encode_block (gf_single_t *ptr, grub_size_t s,
+ 	      gf_single_t *rptr, grub_size_t rs)
+ {
+-  int i, j;
++  unsigned int i, j;
+   for (i = 0; i < SECTOR_SIZE; i++)
+     {
+       grub_size_t ds = (s + SECTOR_SIZE - 1 - i) / SECTOR_SIZE;
+diff --git a/grub-core/osdep/linux/blocklist.c b/grub-core/osdep/linux/blocklist.c
+index 2efee2c2aee..902cfee53ae 100644
+--- a/grub-core/osdep/linux/blocklist.c
++++ b/grub-core/osdep/linux/blocklist.c
+@@ -109,7 +109,7 @@ grub_install_get_blocklist (grub_device_t root_dev,
+   else
+     {
+       struct fiemap *fie2;
+-      int i;
++      unsigned int i;
+       fie2 = xmalloc (sizeof (*fie2)
+ 		      + fie1.fm_mapped_extents
+ 		      * sizeof (fie1.fm_extents[1]));
+diff --git a/grub-core/osdep/linux/getroot.c b/grub-core/osdep/linux/getroot.c
+index 74a48c03026..477fb420992 100644
+--- a/grub-core/osdep/linux/getroot.c
++++ b/grub-core/osdep/linux/getroot.c
+@@ -233,7 +233,7 @@ grub_find_root_devices_from_btrfs (const char *dir)
+ {
+   int fd;
+   struct btrfs_ioctl_fs_info_args fsi;
+-  int i, j = 0;
++  unsigned int i, j = 0;
+   char **ret;
+ 
+   fd = open (dir, 0);
+diff --git a/util/grub-fstest.c b/util/grub-fstest.c
+index 25ae52ab6f4..982ce9ed7d8 100644
+--- a/util/grub-fstest.c
++++ b/util/grub-fstest.c
+@@ -329,7 +329,7 @@ cmd_cmp (char *src, char *dest)
+   read_file (src, cmp_hook, ff);
+ 
+   {
+-    grub_uint64_t pre;
++    long long pre;
+     pre = ftell (ff);
+     fseek (ff, 0, SEEK_END);
+     if (pre != ftell (ff))
+diff --git a/util/grub-menulst2cfg.c b/util/grub-menulst2cfg.c
+index b80e15cc36e..1ea2a86e129 100644
+--- a/util/grub-menulst2cfg.c
++++ b/util/grub-menulst2cfg.c
+@@ -34,7 +34,7 @@ main (int argc, char **argv)
+   char *buf = NULL;
+   size_t bufsize = 0;
+   char *suffix = xstrdup ("");
+-  int suffixlen = 0;
++  size_t suffixlen = 0;
+   const char *out_fname = 0;
+ 
+   grub_util_host_init (&argc, &argv);
+diff --git a/util/grub-mkfont.c b/util/grub-mkfont.c
+index 7624d7808b7..e8a914021b2 100644
+--- a/util/grub-mkfont.c
++++ b/util/grub-mkfont.c
+@@ -143,7 +143,8 @@ add_glyph (struct grub_font_info *font_info, FT_UInt glyph_idx, FT_Face face,
+   int width, height;
+   int cuttop, cutbottom, cutleft, cutright;
+   grub_uint8_t *data;
+-  int mask, i, j, bitmap_size;
++  int mask, i, bitmap_size;
++  unsigned int j;
+   FT_GlyphSlot glyph;
+   int flag = FT_LOAD_RENDER | FT_LOAD_MONOCHROME;
+   FT_Error err;
+@@ -188,7 +189,7 @@ add_glyph (struct grub_font_info *font_info, FT_UInt glyph_idx, FT_Face face,
+     cuttop = cutbottom = cutleft = cutright = 0;
+   else
+     {
+-      for (cuttop = 0; cuttop < glyph->bitmap.rows; cuttop++)
++      for (cuttop = 0; cuttop < (long)glyph->bitmap.rows; cuttop++)
+ 	{
+ 	  for (j = 0; j < glyph->bitmap.width; j++)
+ 	    if (glyph->bitmap.buffer[j / 8 + cuttop * glyph->bitmap.pitch]
+@@ -208,10 +209,10 @@ add_glyph (struct grub_font_info *font_info, FT_UInt glyph_idx, FT_Face face,
+ 	    break;
+ 	}
+       cutbottom = glyph->bitmap.rows - 1 - cutbottom;
+-      if (cutbottom + cuttop >= glyph->bitmap.rows)
++      if (cutbottom + cuttop >= (long)glyph->bitmap.rows)
+ 	cutbottom = 0;
+ 
+-      for (cutleft = 0; cutleft < glyph->bitmap.width; cutleft++)
++      for (cutleft = 0; cutleft < (long)glyph->bitmap.width; cutleft++)
+ 	{
+ 	  for (j = 0; j < glyph->bitmap.rows; j++)
+ 	    if (glyph->bitmap.buffer[cutleft / 8 + j * glyph->bitmap.pitch]
+@@ -230,7 +231,7 @@ add_glyph (struct grub_font_info *font_info, FT_UInt glyph_idx, FT_Face face,
+ 	    break;
+ 	}
+       cutright = glyph->bitmap.width - 1 - cutright;
+-      if (cutright + cutleft >= glyph->bitmap.width)
++      if (cutright + cutleft >= (long)glyph->bitmap.width)
+ 	cutright = 0;
+     }
+ 
+@@ -267,7 +268,7 @@ add_glyph (struct grub_font_info *font_info, FT_UInt glyph_idx, FT_Face face,
+ 
+   mask = 0;
+   data = &glyph_info->bitmap[0] - 1;
+-  for (j = cuttop; j < height + cuttop; j++)
++  for (j = cuttop; j < (long)height + cuttop; j++)
+     for (i = cutleft; i < width + cutleft; i++)
+       add_pixel (&data, &mask,
+ 		 glyph->bitmap.buffer[i / 8 + j * glyph->bitmap.pitch] &
+diff --git a/util/grub-probe.c b/util/grub-probe.c
+index 65c1ca3f8b6..08ae915e8d7 100644
+--- a/util/grub-probe.c
++++ b/util/grub-probe.c
+@@ -799,7 +799,7 @@ argp_parser (int key, char *arg, struct argp_state *state)
+ 
+     case 't':
+       {
+-	int i;
++	unsigned int i;
+ 
+ 	for (i = PRINT_FS; i < ARRAY_SIZE (targets); i++)
+ 	  if (strcmp (arg, targets[i]) == 0)
+diff --git a/util/setup.c b/util/setup.c
+index 87a889ff7e3..7aab468b0eb 100644
+--- a/util/setup.c
++++ b/util/setup.c
+@@ -406,7 +406,7 @@ SETUP (const char *dir,
+     int is_ldm;
+     grub_err_t err;
+     grub_disk_addr_t *sectors;
+-    int i;
++    unsigned int i;
+     grub_fs_t fs;
+     unsigned int nsec, maxsec;
+ 

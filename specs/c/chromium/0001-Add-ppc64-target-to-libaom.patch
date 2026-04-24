@@ -1,0 +1,57 @@
+From 40309fb53e39477490fd6928ebe67c4fb78de380 Mon Sep 17 00:00:00 2001
+From: Shawn Anastasio <shawnanastasio@gmail.com>
+Date: Sun, 10 Mar 2019 21:01:37 -0500
+Subject: [PATCH] Add ppc64 target to libaom
+
+---
+ third_party/libaom/BUILD.gn        | 12 ++++++++++++
+ third_party/libaom/cmake_update.sh |  3 +++
+ 2 files changed, 15 insertions(+)
+
+Index: chromium-144.0.7559.59/third_party/libaom/BUILD.gn
+===================================================================
+--- chromium-144.0.7559.59.orig/third_party/libaom/BUILD.gn
++++ chromium-144.0.7559.59/third_party/libaom/BUILD.gn
+@@ -299,6 +299,18 @@ if (current_cpu == "arm64" || current_cp
+   }
+ }
+ 
++if (current_cpu == "ppc64") {
++  source_set("libaom_intrinsics_vsx") {
++    configs -= [ "//build/config/compiler:chromium_code" ]
++    configs += [ "//build/config/compiler:no_chromium_code" ]
++    configs += [ ":libaom_config" ]
++    sources = [
++      "//third_party/libaom/source/libaom/aom_ports/ppc_cpudetect.c",
++    ]
++    sources += aom_av1_common_intrin_vsx
++  }
++}
++
+ static_library("libaom") {
+   check_includes = false
+   if (!is_debug && is_win) {
+@@ -368,6 +380,9 @@ static_library("libaom") {
+     # This is needed by all arm boards due to aom_arm_cpu_caps()
+     sources += [ "source/libaom/aom_ports/aarch32_cpudetect.c" ]
+   }
++  if (current_cpu == "ppc64") {
++    deps += [ ":libaom_intrinsics_vsx" ]
++  }
+   if (is_android) {
+     deps += [ "//third_party/cpu_features:ndk_compat" ]
+   }
+Index: chromium-144.0.7559.59/third_party/libaom/cmake_update.sh
+===================================================================
+--- chromium-144.0.7559.59.orig/third_party/libaom/cmake_update.sh
++++ chromium-144.0.7559.59/third_party/libaom/cmake_update.sh
+@@ -167,6 +167,9 @@ egrep \
+   "#define [A-Z0-9_]+[[:space:]]+[01]" "${CFG}/win/ia32/config/aom_config.h" \
+   | awk '{print "%define " $2 " " $3}' > "${CFG}/win/ia32/config/aom_config.asm"
+ 
++reset_dirs linux/ppc64
++gen_config_files linux/ppc64 "${toolchain}/ppc-linux-gcc.cmake ${all_platforms}"
++
+ # Copy linux configurations and modify for Windows.
+ reset_dirs win/x64
+ cp "${CFG}/linux/x64/config"/* "${CFG}/win/x64/config/"

@@ -1,0 +1,29 @@
+[licensing]
+detector = "trivy"
+exclude_files = [
+    "pkg/e2e/fixtures/stdout-stderr/log_to_stderr.sh",
+    "vendor/go.opentelemetry.io/otel/get_main_pkgs.sh",
+    "vendor/go.opentelemetry.io/otel/verify_examples.sh",
+    "packaging/LICENSE",
+]
+
+[[licensing.licenses]]
+path = "vendor/github.com/google/shlex/COPYING"
+sha256sum = "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+expression = "Apache-2.0"
+[[licensing.licenses]]
+path = "vendor/github.com/moby/sys/symlink/LICENSE.APACHE"
+sha256sum = "e6abacaae15d29c132fc8688f098a3b9c89088bc434ea33992261e19e34e6723"
+expression = "Apache-2.0"
+[[licensing.licenses]]
+path = "vendor/github.com/moby/sys/symlink/LICENSE.BSD"
+sha256sum = "81205fa54813e578a0d361c671c21ae35ca5b1b575f39e82f5cdab68b8539a1d"
+expression = "BSD-3-Clause"
+[[licensing.licenses]]
+path = "vendor/github.com/shibumi/go-pathspec/GO-LICENSE"
+sha256sum = "dd26a7abddd02e2d0aba97805b31f248ef7835d9e10da289b22e3b8ab78b324d"
+expression = "BSD-3-Clause"
+[[licensing.licenses]]
+path = "vendor/go.yaml.in/yaml/v2/LICENSE.libyaml"
+sha256sum = "a94710b55e03b5285f77d048c5ba61bb9d6ee04a06c0eb90e68821e11b0c707a"
+expression = "MIT"

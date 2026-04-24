@@ -1,0 +1,11 @@
+--- jdom/build.xml.orig	2010-02-05 12:37:26.594658382 +0000
++++ jdom/build.xml	2010-02-05 12:38:09.201658171 +0000
+@@ -277,7 +277,7 @@
+              bottom="Copyright &#169; ${year} Jason Hunter, Brett McLaughlin. All Rights Reserved.">
+       <classpath refid="run.class.path"/>
+ 
+-      <link href="http://java.sun.com/j2se/1.4/docs/api"/>
++      <link href="${j2se.apidoc}"/>
+     </javadoc>
+   </target>
+ 

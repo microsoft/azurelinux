@@ -11,7 +11,7 @@
 
 Name:           wagyu
 Version:        0.5.0
-Release:        12%{?dist}
+Release: 13%{?dist}
 Summary:        A general library for geometry operations of union, intersections, difference, and xor
 
 License:        BSL-1.0 AND BSD-3-Clause

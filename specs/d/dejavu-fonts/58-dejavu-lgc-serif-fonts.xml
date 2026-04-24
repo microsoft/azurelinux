@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+<!-- SPDX-License-Identifier: MIT -->
+<fontconfig>
+  <group>
+    <target>DejaVu LGC Serif</target>
+    <match>
+      <family>DejaVu LGC Serif</family>
+      <change>
+        <style>Book</style>
+        <into>Regular</into>
+      </change>
+    </match>
+    <like>
+      <family>DejaVu Serif</family>
+      <family>BPG 2017 DejaVu Serif</family>
+      <family>Hunky Serif</family>
+      <family>Olwen Serif</family>
+      <family>SUSE Serif</family>
+      <family>Verajja Serif</family>
+      <family>Bitstream Vera Serif</family>
+      <family>Prima Serif</family>
+      <family>serif</family>
+    </like>
+  </group>
+</fontconfig>
+

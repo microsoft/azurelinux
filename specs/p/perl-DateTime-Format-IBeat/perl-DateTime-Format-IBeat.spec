@@ -3,7 +3,7 @@
 
 Name:           perl-DateTime-Format-IBeat
 Version:        0.161
-Release:        52%{?dist}
+Release: 53%{?dist}
 Summary:        Format times in .beat notation 
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/DateTime-Format-IBeat            

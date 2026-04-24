@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 0.5.0
-Release: 26%{?dist}
+Release: 27%{?dist}
 Summary: Lightweight markup language
 # The license was never really clear, but based on the upstream license
 # content, we might assune the code is "Ruby OR BSD-2-Cluase" licensed.

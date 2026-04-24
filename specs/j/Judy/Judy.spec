@@ -3,7 +3,7 @@
 
 Name:		Judy
 Version:	1.0.5
-Release:	42%{?dist}
+Release: 43%{?dist}
 Summary:	General purpose dynamic array
 License:	LGPL-2.0-or-later
 URL:		http://sourceforge.net/projects/judy/

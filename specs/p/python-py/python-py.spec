@@ -5,7 +5,7 @@
 
 Name:           python-%{srcname}
 Version:        1.11.0
-Release:        19%{?dist}
+Release: 20%{?dist}
 Summary:        Library with cross-python path, ini-parsing, io, code, log facilities
 # Automatically converted from old format: MIT and Public Domain - review is highly recommended.
 License:        LicenseRef-Callaway-MIT AND LicenseRef-Callaway-Public-Domain

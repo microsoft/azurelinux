@@ -1,0 +1,89 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Lidong Chen <lidong.chen@oracle.com>
+Date: Fri, 22 Nov 2024 06:27:58 +0000
+Subject: [PATCH] fs/tar: Integer overflow leads to heap OOB write
+
+Both namesize and linksize are derived from hd.size, a 12-digit octal
+number parsed by read_number(). Later direct arithmetic calculation like
+"namesize + 1" and "linksize + 1" may exceed the maximum value of
+grub_size_t leading to heap OOB write. This patch fixes the issue by
+using grub_add() and checking for an overflow.
+
+Fixes: CVE-2024-45780
+
+Reported-by: Nils Langius <nils@langius.de>
+Signed-off-by: Lidong Chen <lidong.chen@oracle.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+Reviewed-by: Alec Brown <alec.r.brown@oracle.com>
+---
+ grub-core/fs/tar.c | 23 ++++++++++++++++++-----
+ 1 file changed, 18 insertions(+), 5 deletions(-)
+
+diff --git a/grub-core/fs/tar.c b/grub-core/fs/tar.c
+index 646bce5eb..386c09022 100644
+--- a/grub-core/fs/tar.c
++++ b/grub-core/fs/tar.c
+@@ -25,6 +25,7 @@
+ #include <grub/mm.h>
+ #include <grub/dl.h>
+ #include <grub/i18n.h>
++#include <grub/safemath.h>
+ 
+ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+@@ -76,6 +77,7 @@ grub_cpio_find_file (struct grub_archelp_data *data, char **name,
+ {
+   struct head hd;
+   int reread = 0, have_longname = 0, have_longlink = 0;
++  grub_size_t sz;
+ 
+   data->hofs = data->next_hofs;
+   *name = NULL;
+@@ -98,7 +100,11 @@ grub_cpio_find_file (struct grub_archelp_data *data, char **name,
+ 	{
+ 	  grub_err_t err;
+ 	  grub_size_t namesize = read_number (hd.size, sizeof (hd.size));
+-	  *name = grub_malloc (namesize + 1);
++
++	  if (grub_add (namesize, 1, &sz))
++	    return grub_error (GRUB_ERR_BAD_FS, N_("name size overflow"));
++
++	  *name = grub_malloc (sz);
+ 	  if (*name == NULL)
+ 	    return grub_errno;
+ 	  err = grub_disk_read (data->disk, 0,
+@@ -118,15 +124,19 @@ grub_cpio_find_file (struct grub_archelp_data *data, char **name,
+ 	{
+ 	  grub_err_t err;
+ 	  grub_size_t linksize = read_number (hd.size, sizeof (hd.size));
+-	  if (data->linkname_alloc < linksize + 1)
++
++	  if (grub_add (linksize, 1, &sz))
++	    return grub_error (GRUB_ERR_BAD_FS, N_("link size overflow"));
++
++	  if (data->linkname_alloc < sz)
+ 	    {
+ 	      char *n;
+-	      n = grub_calloc (2, linksize + 1);
++	      n = grub_calloc (2, sz);
+ 	      if (!n)
+ 		return grub_errno;
+ 	      grub_free (data->linkname);
+ 	      data->linkname = n;
+-	      data->linkname_alloc = 2 * (linksize + 1);
++	      data->linkname_alloc = 2 * (sz);
+ 	    }
+ 
+ 	  err = grub_disk_read (data->disk, 0,
+@@ -149,7 +159,10 @@ grub_cpio_find_file (struct grub_archelp_data *data, char **name,
+ 	  while (extra_size < sizeof (hd.prefix)
+ 		 && hd.prefix[extra_size])
+ 	    extra_size++;
+-	  *name = grub_malloc (sizeof (hd.name) + extra_size + 2);
++
++	  if (grub_add (sizeof (hd.name) + 2, extra_size, &sz))
++	    return grub_error (GRUB_ERR_BAD_FS, N_("long name size overflow"));
++	  *name = grub_malloc (sz);
+ 	  if (*name == NULL)
+ 	    return grub_errno;
+ 	  if (hd.prefix[0])

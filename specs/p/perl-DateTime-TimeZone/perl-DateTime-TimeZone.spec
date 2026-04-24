@@ -9,7 +9,7 @@
 
 Name:           perl-DateTime-TimeZone
 Version:        2.66
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Time zone object base class and factory
 # tzdata%%{tzversion}.tar.gz archive:   LicenseRef-Fedora-Public-Domain
 # other files:                          GPL-1.0-or-later OR Artistic-1.0-Perl

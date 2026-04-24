@@ -5,7 +5,7 @@
 
 Name:           mingw-libxml2
 Version:        2.12.10
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        MinGW Windows libxml2 XML processing library
 
 License:        MIT

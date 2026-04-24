@@ -10,7 +10,7 @@
 
 Name:           drpm
 Version:        0.5.2
-Release:        9%{?dist}
+Release: 10%{?dist}
 Summary:        A library for making, reading and applying deltarpm packages
 # the entire source code is LGPLv2+, except src/drpm_diff.c and src/drpm_search.c which are BSD
 # Automatically converted from old format: LGPLv2+ and BSD - review is highly recommended.

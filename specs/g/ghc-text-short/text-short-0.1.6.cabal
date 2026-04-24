@@ -1,0 +1,101 @@
+cabal-version:      1.18
+name:               text-short
+version:            0.1.6
+x-revision:         3
+synopsis:           Memory-efficient representation of Unicode text strings
+license:            BSD3
+license-file:       LICENSE
+author:             Herbert Valerio Riedel
+maintainer:         hvr@gnu.org
+bug-reports:        https://github.com/hvr/text-short/issues
+category:           Data
+build-type:         Simple
+description:
+  This package provides the 'ShortText' type which is suitable for keeping many short strings in memory. This is similiar to how 'ShortByteString' relates to 'ByteString'.
+  .
+  The main difference between 'Text' and 'ShortText' is that 'ShortText' doesn't support zero-copy slicing (thereby saving 2 words), and, compared to text-1.*, that it uses UTF-8 instead of UTF-16 internally. Consequently, the memory footprint of a (boxed) 'ShortText' value is 4 words (2 words when unboxed) plus the length of the UTF-8 encoded payload.
+
+tested-with:
+  GHC ==8.6.5
+   || ==8.8.3
+   || ==8.10.7
+   || ==9.0.2
+   || ==9.2.8
+   || ==9.4.8
+   || ==9.6.6
+   || ==9.8.4
+   || ==9.10.1
+   || ==9.12.1
+
+extra-source-files: ChangeLog.md
+
+source-repository head
+  type:     git
+  location: https://github.com/hvr/text-short.git
+
+flag asserts
+  description: Enable runtime-checks via @assert@
+  default:     False
+  manual:      True
+
+library
+  exposed-modules:
+    Data.Text.Short
+    Data.Text.Short.Partial
+    Data.Text.Short.Unsafe
+
+  other-modules:    Data.Text.Short.Internal
+  build-depends:
+      base              >=4.12     && <4.22
+    , binary            >=0.8.6.0  && <0.9
+    , bytestring        >=0.10.8.2 && <0.13
+    , deepseq           >=1.4.4.0  && <1.6
+    , ghc-prim          >=0.5.3    && <0.14
+    , hashable          >=1.4.4.0  && <1.6
+    , template-haskell  >=2.14.0.0 && <2.24
+    , text              >=1.2.3.1  && <1.3  || >=2.0 && <2.2
+
+  other-modules:    PrimOps
+  hs-source-dirs:   src src-ghc804
+  default-language: Haskell2010
+  other-extensions:
+    CPP
+    GeneralizedNewtypeDeriving
+    MagicHash
+    TemplateHaskellQuotes
+    Trustworthy
+    UnliftedFFITypes
+    Unsafe
+
+  c-sources:        cbits/cbits.c
+
+  if flag(asserts)
+    ghc-options: -fno-ignore-asserts
+
+  else
+    cc-options: -DNDEBUG=1
+
+  ghc-options:      -Wall
+  cc-options:       -Wall
+
+test-suite text-short-tests
+  type:             exitcode-stdio-1.0
+  hs-source-dirs:   src-test
+  main-is:          Tests.hs
+
+  -- bytestring dependency for cabal_macros.h
+  build-depends:
+      base
+    , binary
+    , bytestring
+    , template-haskell
+    , text
+    , text-short
+
+  -- deps which don't inherit constraints from library stanza:
+  build-depends:
+      tasty             >=1.4    && <1.6
+    , tasty-hunit       >=0.10.0 && <0.11
+    , tasty-quickcheck  >=0.10   && <0.12
+
+  default-language: Haskell2010

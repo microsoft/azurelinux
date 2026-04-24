@@ -3,7 +3,7 @@
 
 Name:           python-olefile
 Version:        0.47
-Release:        12%{?dist}
+Release: 13%{?dist}
 Summary:        Python package to parse, read and write Microsoft OLE2 files
 
 %global         srcname         olefile

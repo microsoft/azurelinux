@@ -1,0 +1,123 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Robbie Harwood <rharwood@redhat.com>
+Date: Wed, 25 Jan 2023 16:10:58 -0500
+Subject: [PATCH] ppc64le: signed boot media changes
+
+Skip mdraid < 1.1 on isos since mdraid* can't even
+
+Prior to this change, on ppc64le with part_msdos and the mdraid* modules
+enabled, we see:
+
+    disk/diskfilter.c:191: scanning ieee1275/cdrom
+    kern/disk.c:196: Opening `ieee1275/cdrom'...
+    disk/ieee1275/ofdisk.c:477: Opening `cdrom'.
+    disk/ieee1275/ofdisk.c:502: MAX_RETRIES set to 20
+    kern/disk.c:288: Opening `ieee1275/cdrom' succeeded.
+    disk/diskfilter.c:136: Scanning for DISKFILTER devices on disk ieee1275/cdrom
+    partmap/msdos.c:184: partition 0: flag 0x80, type 0x96, start 0x0, len
+    0x6a5d70
+    disk/diskfilter.c:136: Scanning for DISKFILTER devices on disk ieee1275/cdrom
+    SCSI-DISK: Access beyond end of device !
+    SCSI-DISK: Access beyond end of device !
+    SCSI-DISK: Access beyond end of device !
+    SCSI-DISK: Access beyond end of device !
+    SCSI-DISK: Access beyond end of device !
+    disk/ieee1275/ofdisk.c:578: MAX_RETRIES set to 20
+
+These latter two lines repeat many times, eventually ending in:
+
+    kern/disk.c:388: ieee1275/cdrom read failed
+    error: ../../grub-core/disk/ieee1275/ofdisk.c:608:failure reading sector
+    0x1a9720 from `ieee1275/cdrom'.
+
+and the system drops to a "grub>" prompt.
+
+Prior to 1.1, mdraid stored the superblock offset from the end of the
+disk, and the firmware really doesn't like reads there.  Best guess was
+that the firmware and the iso image appear to diagree on the blocksize
+(512 vs. 2048), and the diskfilter RAID probing is too much for it.
+It's tempting to just skip probing for cdroms, but unfortunately isos
+can be virtualized elsewhere - such as regular disks.
+
+Also fix detection of root, and try the chrp path as a fallback if the
+built prefix doesn't work.
+
+Signed-off-by: Robbie Harwood <rharwood@redhat.com>
+
+wip
+---
+ grub-core/disk/mdraid1x_linux.c  | 6 ++++++
+ grub-core/disk/mdraid_linux.c    | 5 +++++
+ grub-core/kern/ieee1275/openfw.c | 2 +-
+ grub-core/normal/main.c          | 5 +++++
+ 4 files changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/disk/mdraid1x_linux.c b/grub-core/disk/mdraid1x_linux.c
+index 72e5cb6f481..3b5b6c42342 100644
+--- a/grub-core/disk/mdraid1x_linux.c
++++ b/grub-core/disk/mdraid1x_linux.c
+@@ -130,6 +130,12 @@ grub_mdraid_detect (grub_disk_t disk,
+       struct grub_diskfilter_vg *array;
+       char *uuid;
+ 
++#ifdef __powerpc__
++      /* Firmware will yell at us for reading too far. */
++      if (minor_version == 0)
++        continue;
++#endif
++
+       if (size == GRUB_DISK_SIZE_UNKNOWN && minor_version == 0)
+ 	continue;
+ 
+diff --git a/grub-core/disk/mdraid_linux.c b/grub-core/disk/mdraid_linux.c
+index e40216f5111..98fcfb1be69 100644
+--- a/grub-core/disk/mdraid_linux.c
++++ b/grub-core/disk/mdraid_linux.c
+@@ -189,6 +189,11 @@ grub_mdraid_detect (grub_disk_t disk,
+   grub_uint32_t level;
+   struct grub_diskfilter_vg *ret;
+ 
++#ifdef __powerpc__
++  /* Firmware will yell at us for reading too far. */
++  return NULL;
++#endif
++
+   /* The sector where the mdraid 0.90 superblock is stored, if available.  */
+   size = grub_disk_native_sectors (disk);
+   if (size == GRUB_DISK_SIZE_UNKNOWN)
+diff --git a/grub-core/kern/ieee1275/openfw.c b/grub-core/kern/ieee1275/openfw.c
+index e2ecc65d2d8..65616254e02 100644
+--- a/grub-core/kern/ieee1275/openfw.c
++++ b/grub-core/kern/ieee1275/openfw.c
+@@ -499,7 +499,7 @@ grub_ieee1275_encode_devname (const char *path)
+ 	*optr++ ='\\';
+       *optr++ = *iptr++;
+     }
+-  if (partition && partition[0])
++  if (partition && partition[0] >= '0' && partition[0] <= '9')
+     {
+       unsigned int partno = grub_strtoul (partition, 0, 0);
+ 
+diff --git a/grub-core/normal/main.c b/grub-core/normal/main.c
+index fc3ed551cec..e903f291732 100644
+--- a/grub-core/normal/main.c
++++ b/grub-core/normal/main.c
+@@ -372,6 +372,7 @@ grub_try_normal_prefix (const char *prefix)
+            file = grub_file_open (config, GRUB_FILE_TYPE_CONFIG);
+            if (file)
+              {
++               grub_env_set ("prefix", prefix);
+                grub_file_close (file);
+                err = GRUB_ERR_NONE;
+              }
+@@ -447,6 +448,10 @@ grub_cmd_normal (struct grub_command *cmd __attribute__ ((unused)),
+       err = grub_try_normal ("fw_path");
+       if (err == GRUB_ERR_FILE_NOT_FOUND)
+         err = grub_try_normal ("prefix");
++#ifdef __powerpc__
++      if (err == GRUB_ERR_FILE_NOT_FOUND)
++        err = grub_try_normal_prefix ("/boot/grub");
++#endif
+       if (err == GRUB_ERR_FILE_NOT_FOUND)
+         err = grub_try_normal_discover ();
+       if (err == GRUB_ERR_FILE_NOT_FOUND)

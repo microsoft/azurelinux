@@ -1,0 +1,27 @@
+From b90e92915f8f8eae4f94bd0dce1db274adc12177 Mon Sep 17 00:00:00 2001
+From: Yan Fu <yafu@redhat.com>
+Date: Thu, 12 Jun 2025 03:25:49 -0400
+Subject: [PATCH 09/14] Fedora: kbs-type 0.11.0
+
+Signed-off-by: Uri Lublin <uril@redhat.com>
+Signed-off-by: Yan Fu <yafu@redhat.com>
+---
+ Cargo.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Cargo.toml b/Cargo.toml
+index fcbd500..1b7f5b2 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -23,7 +23,7 @@ const_format = "0.2.34"
+ env_logger = "0.11.8"
+ hex = "0.4.3"
+ hmac = "0.12.1"
+-kbs-types = "0.10.0"
++kbs-types = "0.11.0"
+ log = "0.4.27"
+ nix = "0.29"
+ openssl = "0.10"
+-- 
+2.49.0
+

@@ -3,7 +3,7 @@
 
 Name:           perl-match-simple
 Version:        0.012
-Release:        7%{?dist}
+Release: 8%{?dist}
 Summary:        Simplified clone of smartmatch operator
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            http://search.cpan.org/dist/match-simple/

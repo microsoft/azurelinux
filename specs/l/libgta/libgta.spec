@@ -4,7 +4,7 @@
 Name:      libgta
 Version:   1.2.1
 %global so_version 1
-Release:   16%{?dist}
+Release: 17%{?dist}
 Summary:   Library that implements the Generic Tagged Arrays file format
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.
 License:   LicenseRef-Callaway-LGPLv2+

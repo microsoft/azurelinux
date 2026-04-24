@@ -10,7 +10,7 @@
 
 Name:		perl-IO-Compress-Lzma
 Version:	2.213
-Release:	3%{?dist}
+Release: 4%{?dist}
 Summary:	Read and write lzma compressed data
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/IO-Compress-Lzma

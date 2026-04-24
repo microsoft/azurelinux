@@ -17,7 +17,7 @@
 
 Name:           ocaml-dune
 Version:        3.20.2
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Composable build system for OCaml and Reason
 
 # Dune itself is MIT.  Some bundled libraries have a different license:

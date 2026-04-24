@@ -6,7 +6,7 @@
 
 Name:           web-assets
 Version:        5
-Release:        24%{?dist}
+Release: 25%{?dist}
 Summary:        A simple framework for bits pushed to browsers
 License:        MIT
 URL:            https://fedoraproject.org/wiki/User:Patches/PackagingDrafts/Web_Assets

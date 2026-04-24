@@ -1,0 +1,44 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Eric Sandeen <sandeen@redhat.com>
+Date: Wed, 4 Dec 2024 07:50:28 -0600
+Subject: [PATCH] fs/xfs: fix large extent counters incompat feature support
+
+When large extent counter / NREXT64 support was added to grub, it missed
+a couple of direct reads of nextents which need to be changed to the new
+NREXT64-aware helper as well. Without this, we'll have mis-reads of some
+directories with this feature enabled.
+
+(The large extent counter fix likely raced on merge with
+07318ee7e ("fs/xfs: Fix XFS directory extent parsing") which added the new
+direct nextents reads just prior, causing this issue.)
+
+Fixes: aa7c1322671e ("fs/xfs: Add large extent counters incompat feature support")
+Signed-off-by: Eric Sandeen <sandeen@redhat.com>
+Reviewed-by: Anthony Iliopoulos <ailiop@suse.com>
+Reviewed-by: Jon DeVree <nuxi@vault24.org>
+---
+ grub-core/fs/xfs.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/fs/xfs.c b/grub-core/fs/xfs.c
+index 8e02ab4a3014..92046f9bdf49 100644
+--- a/grub-core/fs/xfs.c
++++ b/grub-core/fs/xfs.c
+@@ -926,7 +926,7 @@ grub_xfs_iterate_dir (grub_fshelp_node_t dir,
+ 	     * Leaf and tail information are only in the data block if the number
+ 	     * of extents is 1.
+ 	     */
+-	    if (dir->inode.nextents == grub_cpu_to_be32_compile_time (1))
++	    if (grub_xfs_get_inode_nextents(&dir->inode) == 1)
+ 	      {
+ 		struct grub_xfs_dirblock_tail *tail = grub_xfs_dir_tail (dir->data, dirblock);
+ 
+@@ -980,7 +980,7 @@ grub_xfs_iterate_dir (grub_fshelp_node_t dir,
+ 		 * The expected number of directory entries is only tracked for the
+ 		 * single extent case.
+ 		 */
+-		if (dir->inode.nextents == grub_cpu_to_be32_compile_time (1))
++		if (grub_xfs_get_inode_nextents(&dir->inode) == 1)
+ 		  {
+ 		    /* Check if last direntry in this block is reached. */
+ 		    entries--;

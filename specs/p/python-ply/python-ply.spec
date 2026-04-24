@@ -8,7 +8,7 @@
 Name:           python-%{modname}
 Summary:        Python Lex-Yacc
 Version:        3.11
-Release:        32%{?dist}
+Release: 33%{?dist}
 License:        BSD-3-Clause
 URL:            http://www.dabeaz.com/ply/
 Source0:        http://www.dabeaz.com/ply/%{modname}-%{version}.tar.gz

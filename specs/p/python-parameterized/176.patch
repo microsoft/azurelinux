@@ -1,0 +1,83 @@
+From 85cd1c5e0b95a75385e68972ceef3329edb7b7f0 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Mon, 30 Oct 2023 10:38:27 -0400
+Subject: [PATCH 1/2] Fix tests to handle Python 3.13 stripping indents from
+ docstrings
+
+https://docs.python.org/3.13/whatsnew/3.13.html#other-language-changes
+
+https://github.com/python/cpython/issues/81283
+---
+ parameterized/test.py | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/parameterized/test.py b/parameterized/test.py
+index 6c71f79..6419171 100644
+--- a/parameterized/test.py
++++ b/parameterized/test.py
+@@ -408,10 +408,16 @@ def test_multiline_documentation(self, foo):
+         """Documentation.
+ 
+         More"""
+-        self._assert_docstring(
+-            "Documentation [with foo=%r].\n\n"
+-            "        More" %(foo, )
+-        )
++        if sys.version_info[:2] < (3, 13):
++            self._assert_docstring(
++                "Documentation [with foo=%r].\n\n"
++                "        More" %(foo, )
++            )
++        else:
++            self._assert_docstring(
++                "Documentation [with foo=%r].\n\n"
++                "More" %(foo, )
++            )
+ 
+     @parameterized.expand([param("foo")])
+     def test_unicode_docstring(self, foo):
+
+From dc7b89e9c995137219f3e53f5314824c4a0b914f Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Mon, 30 Oct 2023 10:49:25 -0400
+Subject: [PATCH 2/2] More elegantly patch tests for Python 3.13 docstring
+ cleaning
+
+---
+ parameterized/test.py | 16 ++++++----------
+ 1 file changed, 6 insertions(+), 10 deletions(-)
+
+diff --git a/parameterized/test.py b/parameterized/test.py
+index 6419171..6d11e32 100644
+--- a/parameterized/test.py
++++ b/parameterized/test.py
+@@ -385,6 +385,8 @@ def _assert_docstring(self, expected_docstring, rstrip=False):
+         actual_docstring = test_method.__doc__
+         if rstrip:
+             actual_docstring = actual_docstring.rstrip()
++        if sys.version_info[:2] >= (3, 13):
++            expected_docstring = inspect.cleandoc(expected_docstring)
+         assert_equal(actual_docstring, expected_docstring)
+ 
+     @parameterized.expand([param("foo")],
+@@ -408,16 +410,10 @@ def test_multiline_documentation(self, foo):
+         """Documentation.
+ 
+         More"""
+-        if sys.version_info[:2] < (3, 13):
+-            self._assert_docstring(
+-                "Documentation [with foo=%r].\n\n"
+-                "        More" %(foo, )
+-            )
+-        else:
+-            self._assert_docstring(
+-                "Documentation [with foo=%r].\n\n"
+-                "More" %(foo, )
+-            )
++        self._assert_docstring(
++            "Documentation [with foo=%r].\n\n"
++            "        More" %(foo, )
++        )
+ 
+     @parameterized.expand([param("foo")])
+     def test_unicode_docstring(self, foo):

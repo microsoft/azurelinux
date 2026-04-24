@@ -3,7 +3,7 @@
 
 Name: kexec-tools
 Version: 2.0.32
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: https://kernel.org/pub/linux/utils/kernel/kexec
 License: GPL-2.0-only
 Summary: The kexec/kdump userspace component

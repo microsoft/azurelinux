@@ -1,0 +1,32 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Matyáš Kroupa <kroupa.matyas@gmail.com>
+Date: Fri, 30 Aug 2024 16:28:21 +0200
+Subject: [PATCH] Enable building blscfg module on xen and xen_pvh
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Building blscfg module for Xen targets makes it possible to include them
+in custom pvgrub2 and pvhgrub2 images. Those are then used to boot PV and
+PVH domUs.
+
+Signed-off-by: Matyáš Kroupa <kroupa.matyas@gmail.com>
+---
+ grub-core/Makefile.core.def | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/grub-core/Makefile.core.def b/grub-core/Makefile.core.def
+index 6ff4835..95fd18d 100644
+--- a/grub-core/Makefile.core.def
++++ b/grub-core/Makefile.core.def
+@@ -880,6 +880,8 @@ module = {
+   enable = efi;
+   enable = i386_pc;
+   enable = emu;
++  enable = xen;
++  enable = i386_xen_pvh;
+ };
+
+ module = {
+--
+2.46.0

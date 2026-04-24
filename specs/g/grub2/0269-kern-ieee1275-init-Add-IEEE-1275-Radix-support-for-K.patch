@@ -1,0 +1,119 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Avnish Chouhan <avnish@linux.ibm.com>
+Date: Thu, 23 May 2024 18:43:14 +0530
+Subject: [PATCH] kern/ieee1275/init: Add IEEE 1275 Radix support for KVM on
+ Power
+
+This patch adds support for Radix, Xive and Radix_gtse in Options
+vector5 which is required for KVM LPARs. KVM LPARs ONLY support
+Radix and not the Hash. Not enabling Radix on any PowerVM KVM LPARs
+will result in boot failure.
+
+Signed-off-by: Avnish Chouhan <avnish@linux.ibm.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/kern/ieee1275/init.c | 63 +++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 62 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/kern/ieee1275/init.c b/grub-core/kern/ieee1275/init.c
+index 13e8a5b4b..6c5f4fb77 100644
+--- a/grub-core/kern/ieee1275/init.c
++++ b/grub-core/kern/ieee1275/init.c
+@@ -113,6 +113,16 @@ grub_addr_t grub_ieee1275_original_stack;
+ #define DRC_INFO            0x40
+ #define BYTE22              (DY_MEM_V2 | DRC_INFO)
+ 
++/* For ibm,arch-vec-5-platform-support. */
++#define XIVE_INDEX           0x17
++#define MMU_INDEX            0x18
++#define RADIX_GTSE_INDEX     0x1a
++#define RADIX_ENABLED        0x40
++#define XIVE_ENABLED         0x40
++#define HASH_ENABLED         0x00
++#define MAX_SUPPORTED        0xC0
++#define RADIX_GTSE_ENABLED   0x40
++
+ void
+ grub_exit (int rc __attribute__((unused)))
+ {
+@@ -739,6 +749,10 @@ struct option_vector5
+   grub_uint32_t platform_facilities;
+   grub_uint8_t sub_processors;
+   grub_uint8_t byte22;
++  grub_uint8_t xive;
++  grub_uint8_t mmu;
++  grub_uint8_t hpt_ext;
++  grub_uint8_t radix_gtse;
+ } GRUB_PACKED;
+ 
+ struct pvr_entry
+@@ -777,6 +791,13 @@ grub_ieee1275_ibm_cas (void)
+ {
+   int rc;
+   grub_ieee1275_ihandle_t root;
++  grub_uint8_t ibm_arch_platform_support[8];
++  grub_ssize_t actual;
++  grub_uint8_t xive_support = 0;
++  grub_uint8_t mmu_support = 0;
++  grub_uint8_t radix_gtse_support = 0;
++  int i = 0;
++  int prop_len = 8;
+   struct cas_args
+   {
+     struct grub_ieee1275_common_hdr common;
+@@ -785,6 +806,46 @@ grub_ieee1275_ibm_cas (void)
+     grub_ieee1275_cell_t cas_addr;
+     grub_ieee1275_cell_t result;
+   } args;
++
++  grub_ieee1275_get_integer_property (grub_ieee1275_chosen,
++                                      "ibm,arch-vec-5-platform-support",
++                                      (grub_uint32_t *) ibm_arch_platform_support,
++                                      sizeof (ibm_arch_platform_support),
++                                      &actual);
++
++  for (i = 0; i < prop_len; i++)
++    {
++      switch (ibm_arch_platform_support[i])
++        {
++          case XIVE_INDEX:
++            if (ibm_arch_platform_support[i + 1] & MAX_SUPPORTED)
++              xive_support = XIVE_ENABLED;
++            else
++              xive_support = 0;
++            break;
++
++          case MMU_INDEX:
++            if (ibm_arch_platform_support[i + 1] & MAX_SUPPORTED)
++              mmu_support = RADIX_ENABLED;
++            else
++              mmu_support = HASH_ENABLED;
++            break;
++
++          case RADIX_GTSE_INDEX:
++            if (mmu_support == RADIX_ENABLED)
++              radix_gtse_support = ibm_arch_platform_support[i + 1] & RADIX_GTSE_ENABLED;
++            else
++              radix_gtse_support = 0;
++            break;
++
++          default:
++            /* Ignoring the other indexes of ibm,arch-vec-5-platform-support. */
++            break;
++        }
++      /* Skipping the property value. */
++      i++;
++    }
++
+   struct cas_vector vector =
+   {
+     .pvr_list = { { 0x00000000, 0xffffffff } }, /* any processor */
+@@ -801,7 +862,7 @@ grub_ieee1275_ibm_cas (void)
+     .vec4 = 0x0001, /* set required minimum capacity % to the lowest value */
+     .vec5_size = 1 + sizeof (struct option_vector5) - 2,
+     .vec5 = {
+-      0, BYTE2, 0, CMO, ASSOCIATIVITY, BIN_OPTS, 0, 0, MAX_CPU, 0, 0, PLATFORM_FACILITIES, SUB_PROCESSORS, BYTE22
++      0, BYTE2, 0, CMO, ASSOCIATIVITY, BIN_OPTS, 0, 0, MAX_CPU, 0, 0, PLATFORM_FACILITIES, SUB_PROCESSORS, BYTE22, xive_support, mmu_support, 0, radix_gtse_support
+     }
+   };
+ 

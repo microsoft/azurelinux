@@ -10,7 +10,7 @@
 Name:           python-domdf-python-tools
 Version:        3.9.0
 %forgemeta
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        Helpful functions for Python
 
 # Primary license: MIT

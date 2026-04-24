@@ -10,7 +10,7 @@
 
 Name:           automoc
 Version:        1.0
-Release:        0.51.%{?beta_tag}%{?dist}
+Release: 1.51.%{?beta_tag}%{?dist}
 Summary:        Automatic moc for Qt 4
 License:        BSD-2-Clause
 URL:            http://www.kde.org

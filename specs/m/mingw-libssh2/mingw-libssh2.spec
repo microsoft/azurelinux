@@ -5,7 +5,7 @@
 
 Name:           mingw-libssh2
 Version:        1.11.1
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        MinGW Windows library implementation of the SSH2 protocol
 
 License:        BSD-3-Clause

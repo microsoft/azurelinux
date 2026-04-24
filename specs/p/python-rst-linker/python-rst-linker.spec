@@ -10,7 +10,7 @@
 
 Name:           python-%{pkg_name}
 Version:        2.4.0
-Release:        14%{?dist}
+Release: 15%{?dist}
 Summary:        Can add links and perform other custom replacements to rst
 
 License:        MIT

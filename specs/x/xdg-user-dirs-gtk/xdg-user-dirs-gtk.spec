@@ -3,7 +3,7 @@
 
 Name:		xdg-user-dirs-gtk
 Version:	0.16
-Release:	1%{?dist}
+Release: 2%{?dist}
 Summary:	Gnome integration of special directories
 
 License:	GPL-2.0-or-later

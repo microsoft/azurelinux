@@ -3,7 +3,7 @@
 
 Name:           perl-Test-Without-Module
 Version:        0.23
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Test fallback behavior in absence of modules
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 

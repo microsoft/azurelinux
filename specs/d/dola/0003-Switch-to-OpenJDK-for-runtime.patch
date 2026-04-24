@@ -1,0 +1,23 @@
+From 059339b93cb6bbded15f00c165c3558c2ef3e0f4 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Sun, 13 Jul 2025 09:32:17 +0200
+Subject: [PATCH 3/3] Switch to OpenJDK for runtime
+
+---
+ dola-bsx/src/main/rpm/macros.dola-bsx | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dola-bsx/src/main/rpm/macros.dola-bsx b/dola-bsx/src/main/rpm/macros.dola-bsx
+index 1cce21e..1a6bf8c 100644
+--- a/dola-bsx/src/main/rpm/macros.dola-bsx
++++ b/dola-bsx/src/main/rpm/macros.dola-bsx
+@@ -1,5 +1,5 @@
+ # Path to JVM library (libjvm.so).  Java 21 or newer is required.
+-%__dola_libjvm %{_jvmdir}/jre-21-openjdk/lib/server/libjvm.so
++%__dola_libjvm %{_jvmdir}/jre-25-openjdk/lib/server/libjvm.so
+ 
+ # Class path of nested JVM.
+ %__dola_classpath %{_javadir}/dola/dola-bsx.jar:%{_javadir}/plexus-classworlds.jar
+-- 
+2.50.1
+

@@ -5,7 +5,7 @@ Name: hyphen-hsb
 Summary: Upper Sorbian hyphenation rules
 %global upstreamid 20110620
 Version: 0.%{upstreamid}
-Release: 29%{?dist}
+Release: 30%{?dist}
 #? in a url causes trouble
 #http://tug.org/svn/texhyphen/trunk/hyph-utf8/tex/generic/hyph-utf8/patterns/tex/hyph-hsb.tex?view=co
 Source0: hyph-hsb.tex

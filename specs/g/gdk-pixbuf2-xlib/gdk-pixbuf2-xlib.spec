@@ -3,7 +3,7 @@
 
 Name:           gdk-pixbuf2-xlib
 Version:        2.40.2
-Release:        12%{?dist}
+Release: 13%{?dist}
 Summary:        Deprecated Xlib integration for gdk-pixbuf2
 
 License:        LGPL-2.0-or-later AND LGPL-2.1-or-later

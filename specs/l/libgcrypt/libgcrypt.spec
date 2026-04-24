@@ -18,7 +18,7 @@ print(string.sub(hash, 0, 16))
 
 Name: libgcrypt
 Version: 1.11.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: https://www.gnupg.org/
 Source0: https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-%{version}.tar.bz2
 Source1: https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-%{version}.tar.bz2.sig

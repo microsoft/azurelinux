@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Chris Coulson <chris.coulson@canonical.com>
+Date: Mon, 2 May 2022 14:39:31 +0200
+Subject: [PATCH] loader/i386/efi/linux: Avoid a use-after-free in the linuxefi
+ loader
+
+In some error paths in grub_cmd_linux, the pointer to lh may be
+dereferenced after the buffer it points to has been freed. There aren't
+any security implications from this because nothing else uses the
+allocator after the buffer is freed and before the pointer is
+dereferenced, but fix it anyway.
+
+Signed-off-by: Chris Coulson <chris.coulson@canonical.com>
+(cherry picked from commit 8224f5a71af94bec8697de17e7e579792db9f9e2)
+---
+ grub-core/loader/i386/efi/linux.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/grub-core/loader/i386/efi/linux.c b/grub-core/loader/i386/efi/linux.c
+index 1dd787081f2..8f7eddaa962 100644
+--- a/grub-core/loader/i386/efi/linux.c
++++ b/grub-core/loader/i386/efi/linux.c
+@@ -466,9 +466,6 @@ fail:
+   if (file)
+     grub_file_close (file);
+ 
+-  if (kernel)
+-    grub_free (kernel);
+-
+   if (grub_errno != GRUB_ERR_NONE)
+     {
+       grub_dl_unref (my_mod);
+@@ -484,6 +481,8 @@ fail:
+       kernel_free (params, sizeof(*params));
+     }
+ 
++  grub_free (kernel);
++
+   return grub_errno;
+ }
+ 

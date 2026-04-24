@@ -1,0 +1,51 @@
+#!/bin/sh
+set -o errexit
+set -o nounset
+
+if [ "$#" != '1' ]
+then
+	cat 1>&2 <<EOF
+Usage: $0 VERSION
+
+Downloads the requested version and creates a filtered source tarball.
+EOF
+	exit 1
+fi
+
+VERSION="${1}"
+OUTDIR="${PWD}"
+TMPDIR="$(mktemp -d)"
+trap "rm -rf '${TMPDIR}'" INT TERM EXIT
+
+cd "${TMPDIR}"
+FORGEURL='https://github.com/harfbuzz/uharfbuzz'
+URL="${FORGEURL}/archive/v${VERSION}/uharfbuzz-${VERSION}.tar.gz"
+echo "--> Downloading: ${URL}" 1>&2
+curl -L -O "${URL}"
+
+ARCHIVE="$(find . -mindepth 1 -maxdepth 1 -type f -name '*.tar.gz' -print -quit)"
+echo "--> Extracting: $(basename "${ARCHIVE}")" 1>&2
+tar -xzf "${ARCHIVE}"
+echo '--> Removing certain test fonts due to uncertain licensing' 1>&2
+TARDIR="$(basename "${ARCHIVE}" '.tar.gz')"
+MTIME="$(stat -c '%Y' "${TARDIR}")"
+rm -v "${TARDIR}/tests/data/SparseFont.ttf"
+rm -v "${TARDIR}/tests/data/noto_handwriting-cff2_colr_1.otf"
+rm -v "${TARDIR}/tests/data/test_glyphs-glyf_colr_1.ttf"
+# Restore the original mtime even though we modified the base directory by
+# removing the tests.
+touch -d @"${MTIME}" "${TARDIR}"
+FILTERED="$(basename "${ARCHIVE}" .tar.gz)-filtered.tar.gz"
+echo "--> Re-archiving: ${FILTERED}" 1>&2
+# https://www.gnu.org/software/tar/manual/html_section/Reproducibility.html
+TZ=UTC LC_ALL=C tar \
+    --create --verbose \
+    --sort=name \
+    --format=posix \
+    --numeric-owner --owner=0 --group=0 \
+    --mode=go+u,go-w \
+    --pax-option='delete=atime,delete=ctime' \
+    "${TARDIR}/" |
+  gzip -9 > "${FILTERED}"
+mv -v "${FILTERED}" "${OUTDIR}"
+echo 'Done.' 1>&2

@@ -1,0 +1,61 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leo Sandoval <lsandova@redhat.com>
+Date: Mon, 15 Apr 2024 09:24:47 -0600
+Subject: [PATCH] Makefile.core.def: fix linux module
+
+Set EFI source file targets specifically for i386 and x86_64 archs,
+otherwise we observe build failures at aarch64
+
+../../grub-core/tests/videotest_checksum.c > videotest_checksum.marker.new || (rm -f videotest_checksum.marker; exit 1)
+../../grub-core/loader/efi/linux.c:28:10: fatal error: grub/cpu/linux.h: No such file or directory
+   28 | #include <grub/cpu/linux.h>
+      |          ^~~~~~~~~~~~~~~~~~
+compilation terminated.
+.
+.
+.
+../../grub-core/loader/i386/linux.c:30:10: fatal error: grub/cpu/linux.h: No such file or directory
+   30 | #include <grub/cpu/linux.h>
+      |          ^~~~~~~~~~~~~~~~~~
+compilation terminated.
+
+Signed-off-by: Leo Sandoval <lsandova@redhat.com>
+---
+ grub-core/Makefile.core.def  | 7 ++++---
+ grub-core/loader/efi/linux.c | 1 -
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/grub-core/Makefile.core.def b/grub-core/Makefile.core.def
+index b045aac7c91..6ff4835340d 100644
+--- a/grub-core/Makefile.core.def
++++ b/grub-core/Makefile.core.def
+@@ -1902,13 +1902,14 @@ module = {
+   riscv32 = loader/efi/linux.c;
+   riscv64 = loader/efi/linux.c;
+   i386_efi = loader/i386/efi/linux.c;
++  i386_efi = loader/efi/linux.c;
++  i386_efi = loader/i386/linux.c;
+   x86_64_efi = loader/i386/efi/linux.c;
++  x86_64_efi = loader/efi/linux.c;
++  x86_64_efi = loader/i386/linux.c;
+   emu = loader/emu/linux.c;
+-  fdt = lib/fdt.c;
+   common = loader/linux.c;
+   common = lib/cmdline.c;
+-  efi = loader/efi/linux.c;
+-  efi = loader/i386/linux.c;
+ };
+ 
+ module = {
+diff --git a/grub-core/loader/efi/linux.c b/grub-core/loader/efi/linux.c
+index f5ab0128991..44587df3858 100644
+--- a/grub-core/loader/efi/linux.c
++++ b/grub-core/loader/efi/linux.c
+@@ -25,7 +25,6 @@
+ #include <grub/loader.h>
+ #include <grub/mm.h>
+ #include <grub/types.h>
+-#include <grub/cpu/linux.h>
+ #include <grub/efi/efi.h>
+ #include <grub/efi/fdtload.h>
+ #include <grub/efi/memory.h>

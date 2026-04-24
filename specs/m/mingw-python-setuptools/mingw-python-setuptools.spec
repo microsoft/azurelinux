@@ -8,7 +8,7 @@
 Name:          mingw-python-%{pypi_name}
 Summary:       MinGW Windows Python %{pypi_name} library
 Version:       78.1.1
-Release:       2%{?dist}
+Release: 3%{?dist}
 BuildArch:     noarch
 
 License:       MIT

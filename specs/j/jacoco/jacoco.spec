@@ -3,7 +3,7 @@
 
 Name:           jacoco
 Version:        0.8.11
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        Java Code Coverage for Eclipse
 License:        EPL-2.0
 URL:            http://www.eclemma.org/jacoco/

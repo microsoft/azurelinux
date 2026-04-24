@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 8 Jan 2024 19:08:33 -0500
+Subject: [PATCH] Fix some sign comparison errors
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/loader/i386/pc/truecrypt.c | 2 +-
+ grub-core/loader/multiboot_elfxx.c   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/loader/i386/pc/truecrypt.c b/grub-core/loader/i386/pc/truecrypt.c
+index bae1ad031b3..7bf801603f4 100644
+--- a/grub-core/loader/i386/pc/truecrypt.c
++++ b/grub-core/loader/i386/pc/truecrypt.c
+@@ -176,7 +176,7 @@ grub_cmd_truecrypt (grub_command_t cmd __attribute__ ((unused)),
+ 
+   edx = (dh << 8) | grub_get_root_biosnumber ();
+ 
+-  destaddr = ALIGN_DOWN (grub_min (0x90000, grub_mmap_get_lower ())
++  destaddr = ALIGN_DOWN (grub_min (0x90000ull, grub_mmap_get_lower ())
+ 			 - truecryptmemsize, 64 * 1024);
+ 
+   {
+diff --git a/grub-core/loader/multiboot_elfxx.c b/grub-core/loader/multiboot_elfxx.c
+index 8d370b0b3f5..24480df5053 100644
+--- a/grub-core/loader/multiboot_elfxx.c
++++ b/grub-core/loader/multiboot_elfxx.c
+@@ -99,7 +99,7 @@ CONCAT(grub_multiboot_load_elf, XX) (mbi_load_data_t *mld)
+     return err;
+ 
+   /* FIXME: Should we support program headers at strange locations?  */
+-  phlimit = grub_min (MULTIBOOT_SEARCH, grub_file_size (mld->file));
++  phlimit = grub_min ((grub_off_t)MULTIBOOT_SEARCH, grub_file_size (mld->file));
+   if ((grub_off_t) ehdr->e_phoff + phnum * ehdr->e_phentsize > phlimit)
+     return grub_error (GRUB_ERR_BAD_OS, "program header at a too high offset");
+ 

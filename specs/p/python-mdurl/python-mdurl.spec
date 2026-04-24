@@ -3,7 +3,7 @@
 
 Name:           python-mdurl
 Version:        0.1.2
-Release:        13%{?dist}
+Release: 14%{?dist}
 Summary:        Markdown URL utilities
 
 # SPDX

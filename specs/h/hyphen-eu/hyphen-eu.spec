@@ -7,7 +7,7 @@ Summary: Basque hyphenation rules
 # let's choose older timestamp here
 %global upstreamid 20190406
 Version: 0.%{upstreamid}
-Release: 12%{?dist}
+Release: 13%{?dist}
 Source: http://mirrors.ctan.org/language/hyph-utf8/tex/generic/hyph-utf8/patterns/tex/hyph-eu.tex
 URL: http://tp.lc.ehu.es/jma/basque.html
 License: MIT

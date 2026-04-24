@@ -1,0 +1,16 @@
+diff -up chromium-107.0.5304.121/media/BUILD.gn.me chromium-107.0.5304.121/media/BUILD.gn
+--- chromium-107.0.5304.121/media/BUILD.gn.me	2022-12-17 12:35:44.546779129 +0100
++++ chromium-107.0.5304.121/media/BUILD.gn	2022-12-17 12:35:59.296047028 +0100
+@@ -64,12 +64,6 @@ buildflag_header("media_buildflags") {
+   }
+ }
+ 
+-if (proprietary_codecs && media_use_ffmpeg) {
+-  assert(
+-      ffmpeg_branding != "Chromium",
+-      "proprietary codecs and ffmpeg_branding set to Chromium are incompatible")
+-}
+-
+ # Common configuration for targets in the media directory; these must not be
+ # exported since things like USE_NEON and USE_CRAS have different meanings
+ # elsewhere in the code base.

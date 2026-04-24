@@ -5,7 +5,7 @@
 
 Name:           ragel
 Version:        7.0.4
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        Finite state machine compiler
 
 # aapl/ is the LGPLv2+

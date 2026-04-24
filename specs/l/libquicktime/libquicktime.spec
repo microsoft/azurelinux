@@ -16,7 +16,7 @@
 Summary:    Library for reading and writing Quicktime files
 Name:       libquicktime
 Version:    1.2.4^%{date}git%{shortcommit}
-Release:    2%{?dist}
+Release: 3%{?dist}
 License:    GPL-2.0-or-later AND LGPL-2.1-or-later
 URL:        http://libquicktime.sourceforge.net/
 Source0:    https://sourceforge.net/code-snapshots/git/l/li/libquicktime/git.git/libquicktime-git-%{commit}.zip

@@ -11,7 +11,7 @@ Name: hunspell-el
 Summary: Greek hunspell dictionaries
 Epoch: 1
 Version: 0.9
-Release: 19%{?dist}
+Release: 20%{?dist}
 Source: http://ispell.math.upatras.gr/files/ooffice/el_GR-%{version}.zip
 URL: http://www.elspell.gr/
 License: GPL-2.0-or-later OR LGPL-2.1-or-later OR MPL-1.1

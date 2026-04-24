@@ -3,7 +3,7 @@
 
 Name:           SDL2_image
 Version:        2.8.8
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Image loading library for SDL
 
 # IMG_png.c is LGPLv2+ and zlib, rest is just zlib

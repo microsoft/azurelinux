@@ -21,7 +21,7 @@
 
 Name:           php-%{gh_vendor}-%{gh_project}%{major}
 Version:        2.0.1
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Library for converting tokenized PHP source code into XML
 
 License:        BSD-3-Clause

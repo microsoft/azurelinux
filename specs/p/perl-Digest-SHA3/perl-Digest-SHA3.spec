@@ -3,7 +3,7 @@
 
 Name:           perl-Digest-SHA3
 Version:        1.05
-Release:        11%{?dist}
+Release: 12%{?dist}
 Summary:        Perl extension for SHA-3
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Digest-SHA3

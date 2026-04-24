@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/uboot-tools.azl.macros}
+
 #global candidate rc0
 %if 0%{?rhel}
 %bcond_with toolsonly
@@ -13,7 +16,7 @@
 
 Name:     uboot-tools
 Version:  2025.10
-Release:  1%{?candidate:.%{candidate}}%{?dist}
+Release: 2%{?candidate:.%{candidate}}%{?dist}
 Epoch:    1
 Summary:  U-Boot utilities
 # Automatically converted from old format: GPLv2+ BSD LGPL-2.1+ LGPL-2.0+ - review is highly recommended.
@@ -23,6 +26,7 @@ ExcludeArch: s390x
 Source0:  https://ftp.denx.de/pub/u-boot/u-boot-%{version}%{?candidate:-%{candidate}}.tar.bz2
 Source1:  aarch64-boards
 Source2:  riscv64-boards
+Source9999: uboot-tools.azl.macros
 
 # Fedora patches to enable/disable features
 Patch1:   disable-VBE-by-default.patch

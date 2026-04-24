@@ -3,7 +3,7 @@
 
 Name:          jackson-parent
 Version:       2.18.1
-Release:       4%{?dist}
+Release: 5%{?dist}
 Summary:       Parent pom for all Jackson components
 License:       Apache-2.0
 

@@ -3,7 +3,7 @@
 
 Name:           usbguard-notifier
 Version:        0.1.1
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        A tool for detecting usbguard policy and device presence changes
 
 License:        GPL-2.0-or-later

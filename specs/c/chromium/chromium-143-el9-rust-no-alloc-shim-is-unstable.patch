@@ -1,0 +1,22 @@
+Fix build errors:
+
+error[E0428]: the name `__rust_alloc_error_handler_should_panic_v2` is defined multiple times
+   --> ../../build/rust/allocator/lib.rs:101:5
+
+error: undefined symbol: __rust_no_alloc_shim_is_unstable
+
+diff -up chromium-141.0.7390.37/build/rust/allocator/lib.rs.rust-no-alloc-shim-is-unstable chromium-141.0.7390.37/build/rust/allocator/lib.rs
+--- chromium-141.0.7390.37/build/rust/allocator/lib.rs.rust-no-alloc-shim-is-unstable	2025-09-23 22:21:14.000000000 +0200
++++ chromium-141.0.7390.37/build/rust/allocator/lib.rs	2025-09-27 15:14:54.661952048 +0200
+@@ -103,6 +103,11 @@ mod both_allocators {
+     #[linkage = "weak"]
+     static __rust_alloc_error_handler_should_panic: u8 = 0;
+ 
++    // Mangle the symbol name as rustc (1.84) expects on EL9
++    #[unsafe(no_mangle)]
++    #[linkage = "weak"]
++    static __rust_no_alloc_shim_is_unstable: u8 = 0;
++
+     // Mangle the symbol name as rustc expects.
+     #[rustc_std_internal_symbol]
+     #[allow(non_upper_case_globals)]

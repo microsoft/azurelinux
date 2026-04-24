@@ -10,7 +10,7 @@
 
 Name:               lldpad
 Version:            1.1.0
-Release:            14.git%{checkout}%{?dist}
+Release: 15.git%{checkout}%{?dist}
 Summary:            Intel LLDP Agent
 License:            GPL-2.0-only
 URL:                http://open-lldp.org/

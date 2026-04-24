@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+<!-- SPDX-License-Identifier: MIT -->
+<fontconfig>
+  <group>
+    <target>DejaVu LGC Sans Mono</target>
+    <match>
+      <family>DejaVu LGC Sans Mono</family>
+      <change>
+        <style>Book</style>
+        <into>Regular</into>
+      </change>
+    </match>
+    <like>
+      <family>DejaVu Sans Mono</family>
+      <family>BPG 2017 DejaVu Sans Mono</family>
+      <family>Bepa Mono</family>
+      <family>Olwen Sans Mono</family>
+      <family>SUSE Sans Mono</family>
+      <family>Bitstream Vera Sans Mono</family>
+      <family>Prima Sans Mono</family>
+      <family>Hack</family>
+      <family>Menlo</family>
+      <family>monospace</family>
+    </like>
+  </group>
+</fontconfig>
+

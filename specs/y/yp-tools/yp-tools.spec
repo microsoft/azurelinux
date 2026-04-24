@@ -4,7 +4,7 @@
 Summary: NIS (or YP) client programs
 Name: yp-tools
 Version: 4.2.3
-Release: 21%{?dist}
+Release: 22%{?dist}
 License: GPL-2.0-only
 
 URL: https://www.thkukuk.de/nis/nis/yp-tools/

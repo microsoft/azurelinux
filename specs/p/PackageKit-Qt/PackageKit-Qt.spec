@@ -8,7 +8,7 @@
 Summary:   Qt support library for PackageKit
 Name:      PackageKit-Qt
 Version:   1.1.4
-Release:   2%{?dist}
+Release: 3%{?dist}
 
 License:   LGPL-2.1-only
 URL:       http://www.packagekit.org/

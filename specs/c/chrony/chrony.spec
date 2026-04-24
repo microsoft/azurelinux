@@ -12,7 +12,7 @@
 
 Name:           chrony
 Version:        4.8
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        An NTP client/server
 
 License:        GPL-2.0-only
@@ -91,6 +91,8 @@ sed -e 's|^\(pool \)\(pool.ntp.org\)|\12.%{vendorzone}\2|' \
     -e 's|^pool.*pool.ntp.org.*|&\n\n# Use NTP servers from DHCP.\nsourcedir /run/chrony-dhcp|' \
         < examples/chrony.conf.example2 > chrony.conf
 
+echo -e '\n# Use confdir\nconfdir /etc/chrony.d' >> chrony.conf
+
 touch -r examples/chrony.conf.example2 chrony.conf
 
 # set selinux context in chronyd-restricted service
@@ -123,7 +125,7 @@ mv clknetsim-*-%{clknetsim_ver}* test/simulation/clknetsim
 
 rm -rf $RPM_BUILD_ROOT%{_docdir}
 
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/{sysconfig,logrotate.d}
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/{sysconfig,logrotate.d,chrony.d}
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/{lib,log}/chrony
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/dhcp/dhclient.d
 mkdir -p $RPM_BUILD_ROOT%{_libexecdir}
@@ -211,6 +213,7 @@ fi
 %ghost %attr(-,chrony,chrony) %{_localstatedir}/lib/chrony/rtc
 %ghost %dir %attr(750,chrony,chrony) %{_localstatedir}/log/chrony
 
+%dir %{_sysconfdir}/chrony.d
 %changelog
 * Tue Oct 21 2025 Miroslav Lichvar <mlichvar@redhat.com> 4.8-3
 - update seccomp filter for new glibc (#2405310)

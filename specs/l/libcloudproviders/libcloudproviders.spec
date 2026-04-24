@@ -6,7 +6,7 @@
 Name:           libcloudproviders
 Summary:        Library for integration of cloud storage providers
 Version:        0.3.6
-Release:        2%{?dist}
+Release: 3%{?dist}
 License:        LGPL-3.0-or-later
 
 URL:            https://gitlab.gnome.org/World/libcloudproviders

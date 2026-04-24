@@ -1,0 +1,3 @@
+[suppress_file]
+# Those shared objects are private to systemd
+file_name_regexp=libsystemd-(shared|core)-.*.so

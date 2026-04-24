@@ -7,7 +7,7 @@
 
 Name:           usbguard
 Version:        1.1.3
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        A tool for implementing USB device usage policy
 License:        GPL-2.0-or-later
 ## Not installed

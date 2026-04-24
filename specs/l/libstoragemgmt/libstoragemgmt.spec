@@ -8,7 +8,7 @@
 
 Name:           libstoragemgmt
 Version:        1.10.3
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Storage array management library
 License:        LGPL-2.1-or-later
 URL:            https://github.com/libstorage/libstoragemgmt

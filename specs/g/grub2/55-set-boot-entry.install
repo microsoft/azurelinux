@@ -1,0 +1,44 @@
+#!/bin/bash
+
+[[ -f /etc/default/grub ]] && . /etc/default/grub
+[[ -f /etc/os-release ]] && . /etc/os-release
+
+COMMAND="$1"
+KERNEL_VERSION="$2"
+BOOT_DIR_ABS="$3"
+KERNEL_IMAGE="$4"
+
+case "$COMMAND" in
+    add)
+        if [[ "x${GRUB_ENABLE_BLSCFG}" = "xtrue" ]] || [[ ! -f /sbin/new-kernel-pkg ]]; then
+            entry=$(grub2-editenv list | grep tmp_saved_entry)
+            if [ -n "$entry" ]; then
+                BLS_ID=${entry##tmp_saved_entry=}
+                BLS_DIR="/boot/loader/entries"
+                BLS_TARGET="${BLS_DIR}/${BLS_ID}.conf"
+
+                LINUX="$(grep '^linux[ \t]' "${BLS_TARGET}" | sed -e 's,^linux[ \t]*,,' | awk '{print $1}')"
+                INITRD="$(grep '^initrd[ \t]' "${BLS_TARGET}" | sed -e 's,^initrd[ \t]*,,' | awk '{print $1}')"
+
+                ROOTPREFIX=""
+                [ -z "$(grub2-mkrelpath /boot)" ] && ROOTPREFIX="/boot"
+
+                if [ -e "${ROOTPREFIX}${LINUX}" -a -n "${INITRD}" ]; then
+                    if [ ! -e "${ROOTPREFIX}${INITRD}" ]; then
+                        echo "Error: ${INITRD} not found"
+                        exit 1
+                    fi
+                    if ! lsinitrd ${ROOTPREFIX}${INITRD} > /dev/null; then
+                        echo "Error: ${INITRD} appears to be corrupt."
+                        exit 1
+                    fi
+                fi
+
+                grub2-editenv - unset "tmp_saved_entry"
+                grub2-editenv - set "saved_entry=$BLS_ID"
+            fi
+        fi
+    ;;
+    *)
+        ;;
+esac

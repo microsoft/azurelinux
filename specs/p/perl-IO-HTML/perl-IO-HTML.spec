@@ -3,7 +3,7 @@
 
 Name:           perl-IO-HTML
 Version:        1.004
-Release:        15%{?dist}
+Release: 16%{?dist}
 Summary:        Open an HTML file with automatic character set detection
 # examples/detect-encoding.pl: Public Domain
 License:        (GPL-1.0-or-later OR Artistic-1.0-Perl) AND LicenseRef-Fedora-Public-Domain

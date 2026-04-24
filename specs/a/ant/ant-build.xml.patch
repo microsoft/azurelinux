@@ -1,0 +1,37 @@
+--- ant/build.xml~	2021-05-17 12:32:48.406394876 +0200
++++ ant/build.xml	2021-05-17 12:32:39.990389601 +0200
+@@ -819,7 +817,6 @@
+       </metainf>
+       <manifest>
+         <attribute name="Main-Class" value="org.apache.tools.ant.Main"/>
+-        <attribute name="Class-Path" value="ant.jar xalan.jar"/>
+       </manifest>
+     </jar>
+ 
+@@ -1562,7 +1559,25 @@
+              verbose="${javadoc.verbose}"
+              additionalparam="${javadoc.doclint.none}">
+ 
+-      <packageset dir="${java.dir}"/>
++      <fileset dir="${java.dir}">
++        <include name="**/*.java"/>
++        <exclude name="org/apache/tools/ant/taskdefs/email/MimeMailer.java"/>
++        <exclude name="org/apache/tools/ant/taskdefs/optional/NetRexxC.java"/>
++        <exclude name="org/apache/tools/ant/taskdefs/optional/image/Image.java"/>
++        <exclude name="org/apache/tools/ant/types/optional/image/Arc.java"/>
++        <exclude name="org/apache/tools/ant/types/optional/image/BasicShape.java"/>
++        <exclude name="org/apache/tools/ant/types/optional/image/Draw.java"/>
++        <exclude name="org/apache/tools/ant/types/optional/image/DrawOperation.java"/>
++        <exclude name="org/apache/tools/ant/types/optional/image/Ellipse.java"/>
++        <exclude name="org/apache/tools/ant/types/optional/image/ImageOperation.java"/>
++        <exclude name="org/apache/tools/ant/types/optional/image/Rectangle.java"/>
++        <exclude name="org/apache/tools/ant/types/optional/image/Rotate.java"/>
++        <exclude name="org/apache/tools/ant/types/optional/image/Scale.java"/>
++        <exclude name="org/apache/tools/ant/types/optional/image/Text.java"/>
++        <exclude name="org/apache/tools/ant/types/optional/image/TransformOperation.java"/>
++        <exclude name="org/apache/tools/ant/types/optional/image/ColorMapper.java"/>
++        <exclude name="org/apache/tools/ant/taskdefs/optional/image/ImageIOTask.java"/>
++      </fileset>
+ 
+       <!-- hide some meta information for javadoc -->
+       <tag name="todo" description="To do:" scope="all"/>

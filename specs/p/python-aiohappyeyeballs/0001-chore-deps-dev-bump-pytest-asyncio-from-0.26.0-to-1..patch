@@ -1,0 +1,50 @@
+From 5241af1942b821dfe63dcd23e77ef94ea04e49f9 Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Sun, 24 Aug 2025 01:39:20 -0500
+Subject: [PATCH] chore(deps-dev): bump pytest-asyncio from 0.26.0 to 1.1.0
+ (#181)
+
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+Co-authored-by: J. Nick Koston <nick@home-assistant.io>
+---
+ pyproject.toml    | 2 +-
+ tests/conftest.py | 9 ++++++---
+ 2 files changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 2b2a054..45bf429 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -40,7 +40,7 @@ python = ">=3.9"
+ [tool.poetry.group.dev.dependencies]
+ pytest = ">=7,<9"
+ pytest-cov = ">=3,<7"
+-pytest-asyncio = ">=0.23.2,<0.26.0"
++pytest-asyncio = ">=0.23.2,<1.2.0"
+ 
+ [tool.poetry.group.docs]
+ optional = true
+diff --git a/tests/conftest.py b/tests/conftest.py
+index 6db53d2..9f7a4cb 100644
+--- a/tests/conftest.py
++++ b/tests/conftest.py
+@@ -41,10 +41,13 @@ def long_repr_strings() -> Generator[None, None, None]:
+ 
+ 
+ @pytest.fixture(autouse=True)
+-def verify_no_lingering_tasks(
+-    event_loop: asyncio.AbstractEventLoop,
+-) -> Generator[None, None, None]:
++def verify_no_lingering_tasks() -> Generator[None, None, None]:
+     """Verify that all tasks are cleaned up."""
++    try:
++        event_loop = asyncio.get_event_loop()
++    except RuntimeError:
++        yield
++        return
+     tasks_before = asyncio.all_tasks(event_loop)
+     yield
+ 
+-- 
+2.50.1
+

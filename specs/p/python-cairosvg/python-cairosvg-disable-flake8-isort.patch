@@ -1,8 +1,8 @@
 diff --git a/setup.cfg b/setup.cfg
-index 05fa374..9ff5e8d 100644
+index 30c70d0..f29356d 100644
 --- a/setup.cfg
 +++ b/setup.cfg
-@@ -64,8 +64,6 @@
+@@ -63,8 +63,6 @@ doc =
  	sphinx_rtd_theme
  test = 
  	pytest
@@ -10,8 +10,8 @@ index 05fa374..9ff5e8d 100644
 -	isort
  
  [bdist_wheel]
- python-tag = py3
-@@ -82,10 +80,6 @@
+ python_tag = py3
+@@ -81,10 +79,6 @@ norecursedirs =
  	.git
  	*.egg-info
  

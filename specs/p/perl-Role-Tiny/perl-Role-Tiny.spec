@@ -3,7 +3,7 @@
 
 Name:           perl-Role-Tiny
 Version:        2.002004
-Release:        14%{?dist}
+Release: 15%{?dist}
 Summary:        A nouvelle cuisine portion size slice of Moose
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Role-Tiny

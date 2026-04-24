@@ -4,7 +4,7 @@
 Name:             adobe-mappings-cmap
 Summary:          CMap resources for Adobe's character collections
 Version:          20231115
-Release:          3%{?dist}
+Release: 4%{?dist}
 License:          BSD-3-Clause
 
 URL:              https://www.adobe.com/

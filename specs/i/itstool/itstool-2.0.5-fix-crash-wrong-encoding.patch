@@ -1,0 +1,68 @@
+Description: Fix the crash from #912099
+ ITS Tool 2.0.4 crashes when building some documentation, as reported in
+ #912099. This comes from translations with invalid XML markup, which ITS Tool
+ fails to merge (which is not abnormal), and to report these issues, needlessly
+ encodes the original msgstr from unicode to bytes, causing it to be recoded
+ using the default ascii codec, which fails when the msgstr contains anything
+ out of ascii.
+ .
+ This patch removes the useless decoding, avoiding the failing subsequent
+ recoding. It also explicitly encodes the output strings to be able to print
+ them in all cases, even when the output encoding cannot be detected.
+Bug: https://github.com/itstool/itstool/issues/25
+Bug-Debian: https://bugs.debian.org/912099
+Forwarded: https://github.com/itstool/itstool/issues/25
+Author: Tanguy Ortolo <tanguy+debian@ortolo.eu>
+Last-Update: 2018-12-071
+
+Index: itstool/itstool.in
+===================================================================
+--- itstool.orig/itstool.in	2018-12-10 18:31:23.762143539 +0100
++++ itstool/itstool.in	2018-12-10 18:38:03.496777117 +0100
+@@ -44,9 +44,22 @@
+         else:
+             return str(s)
+     ustr_type = str
++    def pr_str(s):
++        """Return a string that can be safely print()ed"""
++        # Since print works on both bytes and unicode, just return the argument
++        return s
+ else:
+     string_types = basestring,
+     ustr = ustr_type = unicode
++    def pr_str(s):
++        """Return a string that can be safely print()ed"""
++        if isinstance(s, str):
++            # Since print works on str, just return the argument
++            return s
++        else:
++            # print may not work on unicode if the output encoding cannot be
++            # detected, so just encode with UTF-8
++            return unicode.encode(s, 'utf-8')
+ 
+ NS_ITS = 'http://www.w3.org/2005/11/its'
+ NS_ITST = 'http://itstool.org/extensions/'
+@@ -1060,9 +1073,9 @@
+             if strict:
+                 raise
+             else:
+-                sys.stderr.write('Warning: Could not merge %stranslation for msgid:\n%s\n' % (
++                sys.stderr.write(pr_str('Warning: Could not merge %stranslation for msgid:\n%s\n' % (
+                         (lang + ' ') if lang is not None else '',
+-                        msgstr.encode('utf-8')))
++                        msgstr)))
+                 self._xml_err = ''
+                 return node
+         def scan_node(node):
+@@ -1087,9 +1100,9 @@
+             if strict:
+                 raise
+             else:
+-                sys.stderr.write('Warning: Could not merge %stranslation for msgid:\n%s\n' % (
++                sys.stderr.write(pr_str('Warning: Could not merge %stranslation for msgid:\n%s\n' % (
+                     (lang + ' ') if lang is not None else '',
+-                    msgstr.encode('utf-8')))
++                    msgstr)))
+                 self._xml_err = ''
+                 ctxt.doc().freeDoc()
+                 return node

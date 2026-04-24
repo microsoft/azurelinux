@@ -1,0 +1,40 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: B Horn <b@horn.uk>
+Date: Sun, 12 May 2024 02:47:54 +0100
+Subject: [PATCH] fs/tar: Initialize name in grub_cpio_find_file()
+
+It was possible to iterate through grub_cpio_find_file() without
+allocating name and not setting mode to GRUB_ARCHELP_ATTR_END, which
+would cause the uninitialized value for name to be used as an argument
+for canonicalize() in grub_archelp_dir().
+
+Reported-by: B Horn <b@horn.uk>
+Signed-off-by: B Horn <b@horn.uk>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/fs/tar.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/grub-core/fs/tar.c b/grub-core/fs/tar.c
+index c551ed6b5..646bce5eb 100644
+--- a/grub-core/fs/tar.c
++++ b/grub-core/fs/tar.c
+@@ -78,6 +78,7 @@ grub_cpio_find_file (struct grub_archelp_data *data, char **name,
+   int reread = 0, have_longname = 0, have_longlink = 0;
+ 
+   data->hofs = data->next_hofs;
++  *name = NULL;
+ 
+   for (reread = 0; reread < 3; reread++)
+     {
+@@ -202,6 +203,10 @@ grub_cpio_find_file (struct grub_archelp_data *data, char **name,
+ 	}
+       return GRUB_ERR_NONE;
+     }
++
++  if (*name == NULL)
++    return grub_error (GRUB_ERR_BAD_FS, "invalid tar archive");
++
+   return GRUB_ERR_NONE;
+ }
+ 

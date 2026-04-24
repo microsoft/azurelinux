@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 2.0.2
-Release: 12%{?dist}
+Release: 13%{?dist}
 Summary: Creates temporary files and directories for testing
 License: MIT
 URL: https://github.com/bhb/test_construct

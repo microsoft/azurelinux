@@ -1,0 +1,36 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jason Montleon <jason@montleon.com>
+Date: Fri, 3 May 2024 13:18:37 -0400
+Subject: [PATCH] Use medany instead of large model for RISCV
+
+Signed-off-by: Jason Montleon <jason@montleon.com>
+---
+ configure.ac | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 4788f3d6adc..a6a6957fbdb 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1313,7 +1313,7 @@ AC_SUBST(TARGET_LDFLAGS_OLDMAGIC)
+ 
+ LDFLAGS="$TARGET_LDFLAGS"
+ 
+-if test "$target_cpu" = x86_64 || test "$target_cpu" = sparc64 || test "$target_cpu" = riscv64 ; then
++if test "$target_cpu" = x86_64 || test "$target_cpu" = sparc64 ; then
+   # Use large model to support 4G memory
+   AC_CACHE_CHECK([whether option -mcmodel=large works], grub_cv_cc_mcmodel, [
+     CFLAGS="$TARGET_CFLAGS -mcmodel=large"
+@@ -1323,9 +1323,11 @@ if test "$target_cpu" = x86_64 || test "$target_cpu" = sparc64 || test "$target_
+   ])
+   if test "x$grub_cv_cc_mcmodel" = xyes; then
+     TARGET_CFLAGS="$TARGET_CFLAGS -mcmodel=large"
+-  elif test "$target_cpu" = sparc64 || test "$target_cpu" = riscv64; then
++  elif test "$target_cpu" = sparc64; then
+     TARGET_CFLAGS="$TARGET_CFLAGS -mcmodel=medany"
+   fi
++elif test "$target_cpu" = riscv64 ; then
++    TARGET_CFLAGS="$TARGET_CFLAGS -mcmodel=medany"
+ fi
+ 
+ if test "$target_cpu"-"$platform" = x86_64-efi; then

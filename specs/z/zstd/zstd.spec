@@ -21,7 +21,7 @@
 
 Name:           zstd
 Version:        1.5.7
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Zstd compression library
 
 License:        BSD-3-Clause AND GPL-2.0-only

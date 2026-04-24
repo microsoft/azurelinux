@@ -1,0 +1,28 @@
+.TH QUART\-ROUTES "1" "February 2024" "" "User Commands"
+.SH NAME
+.B quart\-routes
+\(en Show all registered routes with endpoints and methods.
+.SH SYNOPSIS
+.B quart\ routes
+.RI [ OPTIONS ]
+.SH OPTIONS
+.SS "OPTIONAL\ ARGUMENTS"
+.TP
+.B \-s\fR,\ \fB\-\-sort \fR[\fBendpoint\fR|\fBmethods\fR|\fBdomain\fR|\fBrule\fR|\fBmatch\fR]
+Method to sort routes by.
+.RB \(lq match \(rq
+is the order that Quart will match routes when dispatching a request.
+.B \-\-all\-methods
+Show
+.B HEAD
+and
+.B OPTIONS
+methods.
+.TP
+.B \-\-help
+Show a help message and exit
+.SH "SEE\ ALSO"
+.BR quart (1)
+.P
+.BR quart\-run (1),
+.BR quart\-shell (1)

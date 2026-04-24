@@ -3,7 +3,7 @@
 
 Name:           perl-Encode-Locale
 Version:        1.05
-Release:        32%{?dist}
+Release: 33%{?dist}
 Summary:        Determine the locale encoding
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Encode-Locale

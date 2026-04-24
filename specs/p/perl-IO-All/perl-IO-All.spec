@@ -18,7 +18,7 @@
 
 Name:           perl-IO-All
 Version:        0.87
-Release:        25%{?dist}
+Release: 26%{?dist}
 Summary:        IO::All Perl module
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/IO-All

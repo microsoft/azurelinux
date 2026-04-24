@@ -3,7 +3,7 @@
 
 Name:             powertop
 Version:          2.15
-Release:          11%{?dist}
+Release: 12%{?dist}
 Summary:          Power consumption monitor
 
 License:          gpl-2.0-only AND lgpl-2.1-only AND isc

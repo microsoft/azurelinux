@@ -1,0 +1,55 @@
+cabal-version:      >=1.10
+name:               dec
+version:            0.0.6
+x-revision:         1
+synopsis:           Decidable propositions.
+category:           Data, Dependent Types
+description:
+  This package provides a @Dec@ type.
+  .
+  @
+  type Neg a = a -> Void
+  .
+  data Dec a
+  \    = Yes a
+  \    | No (Neg a)
+  @
+
+homepage:           https://github.com/phadej/dec
+bug-reports:        https://github.com/phadej/dec/issues
+license:            BSD3
+license-file:       LICENSE
+author:             Oleg Grenrus <oleg.grenrus@iki.fi>
+maintainer:         Oleg.Grenrus <oleg.grenrus@iki.fi>
+copyright:          (c) 2019-2021 Oleg Grenrus
+build-type:         Simple
+extra-source-files: ChangeLog.md
+tested-with:
+  GHC ==8.6.5
+   || ==8.8.4
+   || ==8.10.7
+   || ==9.0.2
+   || ==9.2.8
+   || ==9.4.8
+   || ==9.6.6
+   || ==9.8.4
+   || ==9.10.1
+   || ==9.12.1
+
+source-repository head
+  type:     git
+  location: https://github.com/phadej/dec.git
+
+library
+  default-language: Haskell2010
+  hs-source-dirs:   src
+  ghc-options:      -Wall -fprint-explicit-kinds
+  exposed-modules:  Data.Type.Dec
+  build-depends:
+      base    >=4.12.0.0 && <4.22
+    , boring  >=0.2.2 && <0.3
+
+  if impl(ghc >=9.0)
+    -- these flags may abort compilation with GHC-8.10
+    -- https://gitlab.haskell.org/ghc/ghc/-/merge_requests/3295
+    ghc-options: -Winferred-safe-imports -Wmissing-safe-haskell-mode

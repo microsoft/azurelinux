@@ -7,7 +7,7 @@
 
 Name:           fido-device-onboard
 Version:        0.5.5
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        A rust implementation of the FIDO Device Onboard Specification
 License:        BSD-3-Clause
 

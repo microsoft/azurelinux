@@ -11,7 +11,7 @@ Epoch: 1
 Summary: Eclipse Compiler for Java
 Name: ecj
 Version: %{eclipse_ver}
-Release: 14%{?dist}
+Release: 15%{?dist}
 URL: https://www.eclipse.org
 License: EPL-2.0
 

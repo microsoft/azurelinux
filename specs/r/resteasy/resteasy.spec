@@ -6,7 +6,7 @@
 
 Name:           resteasy
 Version:        3.0.26
-Release:        36%{?dist}
+Release: 37%{?dist}
 Summary:        Framework for RESTful Web services and Java applications
 License:        Apache-2.0
 URL:            http://resteasy.jboss.org/

@@ -10,7 +10,7 @@ numbers.\
 
 Name:           python-%{pypi_name}
 Version:        8.13.48
-Release:        6%{?dist}
+Release: 7%{?dist}
 Summary:        A Python port of Google's libphonenumber
 License:        Apache-2.0
 URL:            https://github.com/daviddrysdale/%{name}

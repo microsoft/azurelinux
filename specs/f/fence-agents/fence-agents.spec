@@ -16,7 +16,7 @@
 Name: fence-agents
 Summary: Set of unified programs capable of host isolation ("fencing")
 Version: 4.17.0
-Release: 1%{?alphatag:.%{alphatag}}%{?dist}
+Release: 2%{?alphatag:.%{alphatag}}%{?dist}
 License: GPL-2.0-or-later AND LGPL-2.0-or-later
 Group: System Environment/Base
 URL: https://github.com/ClusterLabs/fence-agents
@@ -87,7 +87,7 @@ fence-agents-vmware-rest \\
 fence-agents-vmware-soap \\
 fence-agents-vmware-vcloud \\
 fence-agents-wti \\
-fence-agents-xenapi \\
+ \\
 fence-agents-zvm \\
 
 EOF)
@@ -1580,7 +1580,7 @@ are located on corosync cluster nodes.
 - new package fence-agents-sbd
 - new package fence-agents-vbox
 - new package fence-agents-vmware
-- new package fence-agents-xenapi
+- new package 
 
 * Wed Feb 03 2016 Fedora Release Engineering <releng@fedoraproject.org> - 4.0.20-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild

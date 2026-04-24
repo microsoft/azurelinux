@@ -13,7 +13,7 @@
 
 Name:           kio-fuse
 Version:        5.1.0
-Release:        9%{?dist}
+Release: 10%{?dist}
 Summary:        KIO FUSE
 
 License:        GPL-3.0-or-later

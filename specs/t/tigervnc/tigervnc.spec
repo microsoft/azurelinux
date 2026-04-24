@@ -10,7 +10,7 @@
 
 Name:           tigervnc
 Version:        1.16.0
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        A TigerVNC remote display system
 
 %global _hardened_build 1

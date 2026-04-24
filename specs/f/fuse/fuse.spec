@@ -3,7 +3,7 @@
 
 Name:		fuse
 Version:	2.9.9
-Release:	24%{?dist}
+Release: 25%{?dist}
 Summary:	File System in Userspace (FUSE) v2 utilities
 License:	GPL-1.0-or-later
 URL:		http://fuse.sf.net

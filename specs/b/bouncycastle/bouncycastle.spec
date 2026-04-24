@@ -10,7 +10,7 @@
 Summary:          Bouncy Castle Cryptography APIs for Java
 Name:             bouncycastle
 Version:          1.77
-Release:          5%{?dist}
+Release: 6%{?dist}
 License:          MIT
 URL:              http://www.bouncycastle.org
 

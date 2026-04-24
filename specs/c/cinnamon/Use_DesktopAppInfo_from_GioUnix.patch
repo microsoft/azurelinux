@@ -1,0 +1,94 @@
+From e40c404ff065d3ca5883146fe75d5f7446235fa9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marco=20Trevisan=20=28Trevi=C3=B1o=29?= <mail@3v1n0.net>
+Date: Fri, 12 Sep 2025 01:01:27 +0200
+Subject: [PATCH 1/2] js: Use DesktopAppInfo form GioUnix, not Gio
+
+---
+ .../cinnamon-settings/modules/cs_default.py    | 18 +++++++++---------
+ js/ui/main.js                                  |  3 ++-
+ 2 files changed, 11 insertions(+), 10 deletions(-)
+
+diff --git a/files/usr/share/cinnamon/cinnamon-settings/modules/cs_default.py b/files/usr/share/cinnamon/cinnamon-settings/modules/cs_default.py
+index 4c69191d35..511edb4121 100755
+--- a/files/usr/share/cinnamon/cinnamon-settings/modules/cs_default.py
++++ b/files/usr/share/cinnamon/cinnamon-settings/modules/cs_default.py
+@@ -307,10 +307,10 @@ def __init__(self):
+ 
+         while self.this_item is not None and count_up < len(apps):
+             self.this_item = apps[count_up]
+-            cat_val = Gio.DesktopAppInfo.get_categories(self.this_item)
+-            exec_val = Gio.DesktopAppInfo.get_string(self.this_item, "Exec")
+-            name_val = Gio.DesktopAppInfo.get_string(self.this_item, "Name")
+-            icon_val = Gio.DesktopAppInfo.get_string(self.this_item, "Icon")
++            cat_val = GioUnix.DesktopAppInfo.get_categories(self.this_item)
++            exec_val = GioUnix.DesktopAppInfo.get_string(self.this_item, "Exec")
++            name_val = GioUnix.DesktopAppInfo.get_string(self.this_item, "Name")
++            icon_val = GioUnix.DesktopAppInfo.get_string(self.this_item, "Icon")
+             # terminals don't have mime types, so we check for "TerminalEmulator" under the "Category" key in desktop files
+             if cat_val is not None and "TerminalEmulator" in cat_val:
+                 # this crazy if statement makes sure remaining desktop file info is not empty, then prevents root terminals from showing, then prevents repeating terminals from trying to being added which leave a blank space and Gtk-WARNING's
+@@ -364,11 +364,11 @@ def __init__(self):
+ 
+         while self.this_item is not None and count_up < len(apps):
+             self.this_item = apps[count_up]
+-            cat_val = Gio.DesktopAppInfo.get_categories(self.this_item)
+-            exec_val = Gio.DesktopAppInfo.get_string(self.this_item, "Exec")
+-            name_val = Gio.DesktopAppInfo.get_string(self.this_item, "Name")
+-            icon_val = Gio.DesktopAppInfo.get_string(self.this_item, "Icon")
+-            comment_val = Gio.DesktopAppInfo.get_string(self.this_item, "Comment")
++            cat_val = GioUnix.DesktopAppInfo.get_categories(self.this_item)
++            exec_val = GioUnix.DesktopAppInfo.get_string(self.this_item, "Exec")
++            name_val = GioUnix.DesktopAppInfo.get_string(self.this_item, "Name")
++            icon_val = GioUnix.DesktopAppInfo.get_string(self.this_item, "Icon")
++            comment_val = GioUnix.DesktopAppInfo.get_string(self.this_item, "Comment")
+             #calculators don't have mime types, so we check for "Calculator" under the "Category" key in desktop files
+             if (cat_val is not None and "Calculator" in cat_val) or \
+                (exec_val is not None and "alculator" in exec_val.lower()) or \
+diff --git a/js/ui/main.js b/js/ui/main.js
+index 1694f72f4c..c814a66308 100644
+--- a/js/ui/main.js
++++ b/js/ui/main.js
+@@ -78,6 +78,7 @@
+ 
+ const Clutter = imports.gi.Clutter;
+ const Gio = imports.gi.Gio;
++const GioUnix = imports.gi.GioUnix;
+ const GLib = imports.gi.GLib;
+ const Gtk = imports.gi.Gtk;
+ const Mainloop = imports.mainloop;
+@@ -312,7 +313,7 @@ function start() {
+     // Chain up async errors reported from C
+     global.connect('notify-error', function (global, msg, detail) { notifyError(msg, detail); });
+ 
+-    Gio.DesktopAppInfo.set_desktop_env('X-Cinnamon');
++    GioUnix.DesktopAppInfo.set_desktop_env('X-Cinnamon');
+ 
+     Clutter.get_default_backend().set_input_method(new InputMethod.InputMethod());
+ 
+
+From 8f204003923f61baa19b045fa9fcb7f002393bf6 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marco=20Trevisan=20=28Trevi=C3=B1o=29?= <mail@3v1n0.net>
+Date: Fri, 12 Sep 2025 13:07:24 +0200
+Subject: [PATCH 2/2] meson: Build dependency on 2.79.2
+
+GioUnix included Gio unix-only symbols since 2.79.2, so depend on that
+version
+
+See: https://github.com/linuxmint/cinnamon/pull/13091#issuecomment-3284830903
+---
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index cbc369b1e0..74ea9746ad 100644
+--- a/meson.build
++++ b/meson.build
+@@ -37,7 +37,7 @@ atk = dependency('atk-bridge-2.0')
+ gio = dependency('gio-2.0', version: '>= 2.36.0')
+ gio_unix = dependency('gio-unix-2.0')
+ gl = dependency('gl')
+-glib_version = '2.52.0'
++glib_version = '2.79.2'
+ glib = dependency('glib-2.0', version: '>= ' + glib_version)
+ gtk = dependency('gtk+-3.0', version: '>= 3.12.0')
+ muffin = dependency('libmuffin-0', version: '>= 5.2.0')

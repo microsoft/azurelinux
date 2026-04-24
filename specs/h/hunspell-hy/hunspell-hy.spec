@@ -10,7 +10,7 @@
 Name: hunspell-hy
 Summary: Armenian hunspell dictionaries
 Version: 0.20.0
-Release: 31%{?dist}
+Release: 32%{?dist}
 Source: http://downloads.sourceforge.net/armspell/myspell-hy-%{version}.tar.gz
 URL: http://sourceforge.net/projects/armspell
 License: GPL-2.0-or-later

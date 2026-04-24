@@ -1,0 +1,311 @@
+From e1f763310e99d4c048d86c76b61073f3822aa981 Mon Sep 17 00:00:00 2001
+From: "pre-commit-ci[bot]"
+ <66853113+pre-commit-ci[bot]@users.noreply.github.com>
+Date: Mon, 6 Jan 2025 17:40:47 +0000
+Subject: [PATCH 1/6] [pre-commit.ci] pre-commit autoupdate hooks
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+updates:
+- [github.com/pycontribs/mirrors-prettier: v3.3.3 → v3.4.2](https://github.com/pycontribs/mirrors-prettier/compare/v3.3.3...v3.4.2)
+- [github.com/astral-sh/ruff-pre-commit: v0.8.1 → v0.8.6](https://github.com/astral-sh/ruff-pre-commit/compare/v0.8.1...v0.8.6)
+- [github.com/asottile/pyupgrade: v3.19.0 → v3.19.1](https://github.com/asottile/pyupgrade/compare/v3.19.0...v3.19.1)
+- [github.com/Riverside-Healthcare/djLint: v1.36.3 → v1.36.4](https://github.com/Riverside-Healthcare/djLint/compare/v1.36.3...v1.36.4)
+- [github.com/thibaudcolas/pre-commit-stylelint: v16.11.0 → v16.12.0](https://github.com/thibaudcolas/pre-commit-stylelint/compare/v16.11.0...v16.12.0)
+---
+ .pre-commit-config.yaml | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/.pre-commit-config.yaml b/.pre-commit-config.yaml
+index 0d7c67c84..209a6d3e2 100644
+--- a/.pre-commit-config.yaml
++++ b/.pre-commit-config.yaml
+@@ -13,7 +13,7 @@ default_language_version:
+ 
+ repos:
+   - repo: "https://github.com/pycontribs/mirrors-prettier"
+-    rev: v3.3.3
++    rev: v3.4.2
+     hooks:
+       - id: prettier
+         # Exclude the HTML, since it doesn't understand Jinja2
+@@ -22,20 +22,20 @@ repos:
+         exclude: .+\.html|webpack\.config\.js|tests/test_a11y/
+ 
+   - repo: "https://github.com/astral-sh/ruff-pre-commit"
+-    rev: "v0.8.1"
++    rev: "v0.8.6"
+     hooks:
+       - id: ruff
+         args: [--exit-non-zero-on-fix]
+       - id: ruff-format
+ 
+   - repo: "https://github.com/asottile/pyupgrade"
+-    rev: v3.19.0
++    rev: v3.19.1
+     hooks:
+       - id: pyupgrade
+         args: [--py37-plus]
+ 
+   - repo: "https://github.com/Riverside-Healthcare/djLint"
+-    rev: v1.36.3
++    rev: v1.36.4
+     hooks:
+       - id: djlint-jinja
+         types_or: ["html"]
+@@ -56,7 +56,7 @@ repos:
+       - id: remove-metadata
+ 
+   - repo: "https://github.com/thibaudcolas/pre-commit-stylelint"
+-    rev: v16.11.0
++    rev: v16.12.0
+     hooks:
+       - id: stylelint
+         # automatically fix .scss files where possible
+
+From 3e5aa9b4137445b288d6b287b36c8785c8c861b9 Mon Sep 17 00:00:00 2001
+From: "pre-commit-ci[bot]"
+ <66853113+pre-commit-ci[bot]@users.noreply.github.com>
+Date: Mon, 6 Jan 2025 17:41:49 +0000
+Subject: [PATCH 2/6] [pre-commit.ci] Automatic linting and formatting fixes
+
+---
+ .../styles/abstracts/_accessibility.scss      |  6 +++--
+ .../assets/styles/variables/_color.scss       | 24 +++++++------------
+ .../assets/styles/variables/_fonts.scss       |  6 ++---
+ 3 files changed, 15 insertions(+), 21 deletions(-)
+
+diff --git a/src/pydata_sphinx_theme/assets/styles/abstracts/_accessibility.scss b/src/pydata_sphinx_theme/assets/styles/abstracts/_accessibility.scss
+index bc5cf74b7..53aa6aef0 100644
+--- a/src/pydata_sphinx_theme/assets/styles/abstracts/_accessibility.scss
++++ b/src/pydata_sphinx_theme/assets/styles/abstracts/_accessibility.scss
+@@ -70,8 +70,10 @@
+       $rgb-col: map.merge(
+         $rgb-col,
+         (
+-          $channel:
+-            math.pow(math.div((math.div($value, 255) + 0.055), 1.055), 2.4),
++          $channel: math.pow(
++              math.div((math.div($value, 255) + 0.055), 1.055),
++              2.4
++            ),
+         )
+       );
+     }
+diff --git a/src/pydata_sphinx_theme/assets/styles/variables/_color.scss b/src/pydata_sphinx_theme/assets/styles/variables/_color.scss
+index 6553f0b24..5efe04989 100644
+--- a/src/pydata_sphinx_theme/assets/styles/variables/_color.scss
++++ b/src/pydata_sphinx_theme/assets/styles/variables/_color.scss
+@@ -26,8 +26,7 @@
+ /* Assign base colors for the PyData theme */
+ $color-palette: (
+   // Primary color
+-  "teal":
+-    (
++  "teal": (
+       "50": #f4fbfc,
+       "100": #e9f6f8,
+       "200": #d0ecf1,
+@@ -40,8 +39,7 @@ $color-palette: (
+       "900": #021b1f,
+     ),
+   // Secondary color
+-  "violet":
+-    (
++  "violet": (
+       "50": #f4eefb,
+       "100": #e0c7ff,
+       "200": #d5b4fd,
+@@ -54,8 +52,7 @@ $color-palette: (
+       "900": #1e0e39,
+     ),
+   // Neutrals
+-  "gray":
+-    (
++  "gray": (
+       "50": #f9f9fa,
+       "100": #f3f4f5,
+       "200": #e5e7ea,
+@@ -68,8 +65,7 @@ $color-palette: (
+       "900": #14181e,
+     ),
+   // Accent color
+-  "pink":
+-    (
++  "pink": (
+       "50": #fcf8fd,
+       "100": #fcf0fa,
+       "200": #f8dff5,
+@@ -161,8 +157,7 @@ $pst-semantic-colors: (
+     "bg-dark": #002f17,
+   ),
+   // This is based on the warning color
+-  "attention":
+-    (
++  "attention": (
+       "light": var(--pst-color-warning),
+       "bg-light": var(--pst-color-warning-bg),
+       "dark": var(--pst-color-warning),
+@@ -229,15 +224,13 @@ $pst-semantic-colors: (
+   // DEPTH COLORS - you can see the elevation colours and shades
+   // in the Figma file https://www.figma.com/file/rUrrHGhUBBIAAjQ82x6pz9/PyData-Design-system---proposal-for-implementation-(2)?node-id=1492%3A922&t=sQeQZehkOzposYEg-1
+   // background: color of the canvas / the furthest back layer
+-  "background":
+-    (
++  "background": (
+       "light": #{map-deep-get($color-palette, "foundation", "white")},
+       "dark": #{map-deep-get($color-palette, "foundation", "black")},
+     ),
+   // on-background: provides slight contrast against background
+   // (by use of shadows in light theme)
+-  "on-background":
+-    (
++  "on-background": (
+       "light": #{map-deep-get($color-palette, "foundation", "white")},
+       "dark": #{map-deep-get($color-palette, "gray", "800")},
+     ),
+@@ -246,8 +239,7 @@ $pst-semantic-colors: (
+     "dark": #{map-deep-get($color-palette, "gray", "700")},
+   ),
+   // on_surface: object on top of surface object (without shadows)
+-  "on-surface":
+-    (
++  "on-surface": (
+       "light": #{map-deep-get($color-palette, "gray", "800")},
+       "dark": $foundation-light-gray,
+     ),
+diff --git a/src/pydata_sphinx_theme/assets/styles/variables/_fonts.scss b/src/pydata_sphinx_theme/assets/styles/variables/_fonts.scss
+index 5b76b37ed..9a16122ea 100644
+--- a/src/pydata_sphinx_theme/assets/styles/variables/_fonts.scss
++++ b/src/pydata_sphinx_theme/assets/styles/variables/_fonts.scss
+@@ -33,9 +33,9 @@ html {
+ 
+   // Font family
+   // These are adapted from https://systemfontstack.com/ */
+-  --pst-font-family-base-system: -apple-system, "BlinkMacSystemFont", "Segoe UI",
+-    "Helvetica Neue", "Arial", sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+-    "Segoe UI Symbol";
++  --pst-font-family-base-system: -apple-system, "BlinkMacSystemFont",
++    "Segoe UI", "Helvetica Neue", "Arial", sans-serif, "Apple Color Emoji",
++    "Segoe UI Emoji", "Segoe UI Symbol";
+   --pst-font-family-monospace-system: "SFMono-Regular", "Menlo", "Consolas",
+     "Monaco", "Liberation Mono", "Lucida Console", monospace;
+   --pst-font-family-base: var(--pst-font-family-base-system);
+
+From 402b8613ffbf5248471b94437592f05b98257592 Mon Sep 17 00:00:00 2001
+From: Daniel McCloy <dan@mccloy.info>
+Date: Wed, 8 Jan 2025 10:54:28 -0600
+Subject: [PATCH 3/6] update caniuse-lite
+
+---
+ package-lock.json | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index fef417f7c..5688e1834 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -709,9 +709,9 @@
+       }
+     },
+     "node_modules/caniuse-lite": {
+-      "version": "1.0.30001609",
+-      "resolved": "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001609.tgz",
+-      "integrity": "sha512-JFPQs34lHKx1B5t1EpQpWH4c+29zIyn/haGsbpfq3suuV9v56enjFt23zqijxGTMwy1p/4H2tjnQMY+p1WoAyA==",
++      "version": "1.0.30001690",
++      "resolved": "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001690.tgz",
++      "integrity": "sha512-5ExiE3qQN6oF8Clf8ifIDcMRCRE/dMGcETG/XGMD8/XiXm6HXQgQTh1yZYLXXpSOsEUlJm1Xr7kGULZTuGtP/w==",
+       "dev": true,
+       "funding": [
+         {
+@@ -726,7 +726,8 @@
+           "type": "github",
+           "url": "https://github.com/sponsors/ai"
+         }
+-      ]
++      ],
++      "license": "CC-BY-4.0"
+     },
+     "node_modules/chalk": {
+       "version": "4.1.2",
+
+From f43024ded15bf55ea61e2bbaec8612d8b8631645 Mon Sep 17 00:00:00 2001
+From: Daniel McCloy <dan@mccloy.info>
+Date: Wed, 8 Jan 2025 11:01:22 -0600
+Subject: [PATCH 4/6] improve test
+
+---
+ tests/test_build.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/test_build.py b/tests/test_build.py
+index 7a005fa4a..170a29a83 100644
+--- a/tests/test_build.py
++++ b/tests/test_build.py
+@@ -891,8 +891,8 @@ def test_pygments_fallbacks(sphinx_build_factory, style_names, keyword_colors) -
+     # see if our warnings worked
+     if style_names[0].startswith("fake"):
+         assert len(warnings) == 2
+-        re.match(r"Color theme fake_foo.*tango", warnings[0])
+-        re.match(r"Color theme fake_bar.*monokai", warnings[1])
++        assert re.search(r"Highlighting style fake_foo.*tango", warnings[0])
++        assert re.search(r"Highlighting style fake_bar.*monokai", warnings[1])
+     else:
+         assert warnings == [""]
+     # test that the rendered HTML has highlighting spans
+
+From 513729664b1c2c51c68d2c6086a9f05cea1976c1 Mon Sep 17 00:00:00 2001
+From: Daniel McCloy <dan@mccloy.info>
+Date: Wed, 8 Jan 2025 11:23:46 -0600
+Subject: [PATCH 5/6] show info why test fails
+
+---
+ tests/test_build.py | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/tests/test_build.py b/tests/test_build.py
+index 170a29a83..0d2f861f7 100644
+--- a/tests/test_build.py
++++ b/tests/test_build.py
+@@ -907,11 +907,9 @@ def test_pygments_fallbacks(sphinx_build_factory, style_names, keyword_colors) -
+         lines = css_file.readlines()
+     assert lines[0].startswith('html[data-theme="light"]')
+     for mode, color in dict(zip(["light", "dark"], keyword_colors)).items():
+-        regexp = re.compile(
+-            r'html\[data-theme="' + mode + r'"\].*\.k .*color: ' + color
+-        )
+-        matches = [regexp.match(line) is not None for line in lines]
+-        assert sum(matches) == 1
++        regexp = re.compile(rf'html\[data-theme="{mode}"\].*\.k .*color:\s?{color}')
++        matches = [regexp.search(line) is not None for line in lines]
++        assert sum(matches) == 1, f"expected {mode}: {color}\n" + "\n".join(lines)
+ 
+ 
+ def test_deprecated_build_html(sphinx_build_factory, file_regression) -> None:
+
+From d73887b5c73e805b28d8c7cd865c8f8e58a85745 Mon Sep 17 00:00:00 2001
+From: Daniel McCloy <dan@mccloy.info>
+Date: Wed, 8 Jan 2025 11:28:43 -0600
+Subject: [PATCH 6/6] ignorecase
+
+---
+ tests/test_build.py | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/tests/test_build.py b/tests/test_build.py
+index 0d2f861f7..8444da330 100644
+--- a/tests/test_build.py
++++ b/tests/test_build.py
+@@ -907,7 +907,10 @@ def test_pygments_fallbacks(sphinx_build_factory, style_names, keyword_colors) -
+         lines = css_file.readlines()
+     assert lines[0].startswith('html[data-theme="light"]')
+     for mode, color in dict(zip(["light", "dark"], keyword_colors)).items():
+-        regexp = re.compile(rf'html\[data-theme="{mode}"\].*\.k .*color:\s?{color}')
++        regexp = re.compile(
++            r'html\[data-theme="' + mode + r'"\].*\.k .*color:\s?' + color,
++            re.IGNORECASE,
++        )
+         matches = [regexp.search(line) is not None for line in lines]
+         assert sum(matches) == 1, f"expected {mode}: {color}\n" + "\n".join(lines)
+ 

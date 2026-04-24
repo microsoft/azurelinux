@@ -3,7 +3,7 @@
 
 Name:           python-notebook-shim
 Version:        0.2.4
-Release:        8%{?dist}
+Release: 9%{?dist}
 Summary:        A shim layer for notebook traits and config
 License:        BSD-3-Clause
 URL:            https://pypi.org/project/notebook-shim/

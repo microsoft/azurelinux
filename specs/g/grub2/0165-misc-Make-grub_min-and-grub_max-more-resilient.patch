@@ -1,0 +1,83 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 21 Mar 2022 16:06:10 -0400
+Subject: [PATCH] misc: Make grub_min() and grub_max() more resilient.
+
+grub_min(a,b) and grub_max(a,b) use a relatively naive implementation
+which leads to several problems:
+- they evaluate their parameters more than once
+- the naive way to address this, to declare temporary variables in a
+  statement-expression, isn't resilient against nested uses, because
+  MIN(a,MIN(b,c)) results in the temporary variables being declared in
+  two nested scopes, which may result in a build warning depending on
+  your build options.
+
+This patch changes our implementation to use a statement-expression
+inside a helper macro, and creates the symbols for the temporary
+variables with __COUNTER__ (A GNU C cpp extension) and token pasting to
+create uniquely named internal variables.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ grub-core/loader/multiboot_elfxx.c |  4 +---
+ include/grub/misc.h                | 25 +++++++++++++++++++++++--
+ 2 files changed, 24 insertions(+), 5 deletions(-)
+
+diff --git a/grub-core/loader/multiboot_elfxx.c b/grub-core/loader/multiboot_elfxx.c
+index 1edad05948c..8d370b0b3f5 100644
+--- a/grub-core/loader/multiboot_elfxx.c
++++ b/grub-core/loader/multiboot_elfxx.c
+@@ -45,9 +45,7 @@
+ #endif
+ 
+ #include <grub/i386/relocator.h>
+-
+-#define CONCAT(a,b)	CONCAT_(a, b)
+-#define CONCAT_(a,b)	a ## b
++#include <grub/misc.h>
+ 
+ #pragma GCC diagnostic ignored "-Wcast-align"
+ 
+diff --git a/include/grub/misc.h b/include/grub/misc.h
+index 3f5f5b61695..252bdb161eb 100644
+--- a/include/grub/misc.h
++++ b/include/grub/misc.h
+@@ -35,6 +35,14 @@
+ #define ARRAY_SIZE(array) (sizeof (array) / sizeof (array[0]))
+ #define COMPILE_TIME_ASSERT(cond) switch (0) { case 1: case !(cond): ; }
+ 
++#ifndef CONCAT_
++#define CONCAT_(a, b) a ## b
++#endif
++
++#ifndef CONCAT
++#define CONCAT(a, b) CONCAT_(a, b)
++#endif
++
+ #define grub_dprintf(condition, ...) grub_real_dprintf(GRUB_FILE, __LINE__, condition, __VA_ARGS__)
+ 
+ void *EXPORT_FUNC(grub_memmove) (void *dest, const void *src, grub_size_t n);
+@@ -525,8 +533,21 @@ void EXPORT_FUNC(grub_real_boot_time) (const char *file,
+ #define grub_boot_time(...)
+ #endif
+ 
+-#define grub_max(a, b) (((a) > (b)) ? (a) : (b))
+-#define grub_min(a, b) (((a) < (b)) ? (a) : (b))
++#define _grub_min(a, b, _a, _b)						      \
++  ({ typeof (a) _a = (a);						      \
++     typeof (b) _b = (b);						      \
++     _a < _b ? _a : _b; })
++#define grub_min(a, b) _grub_min(a, b,					      \
++				 CONCAT(_a_,__COUNTER__),		      \
++				 CONCAT(_b_,__COUNTER__))
++
++#define _grub_max(a, b, _a, _b)						      \
++  ({ typeof (a) _a = (a);						      \
++     typeof (b) _b = (b);						      \
++     _a > _b ? _a : _b; })
++#define grub_max(a, b) _grub_max(a, b,					      \
++				 CONCAT(_a_,__COUNTER__),		      \
++				 CONCAT(_b_,__COUNTER__))
+ 
+ #define grub_log2ull(n) (GRUB_TYPE_BITS (grub_uint64_t) - __builtin_clzll (n) - 1)
+ 

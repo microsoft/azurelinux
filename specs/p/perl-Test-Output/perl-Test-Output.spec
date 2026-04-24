@@ -6,7 +6,7 @@
 Name:           perl-Test-Output
 # Keep 2-digit precision
 Version:        %(echo '%{cpan_version}' | sed 's/\(\...\)\(.\)/\1.\2/')
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Utilities to test STDOUT and STDERR messages
 License:        Artistic-2.0
 URL:            https://metacpan.org/release/Test-Output

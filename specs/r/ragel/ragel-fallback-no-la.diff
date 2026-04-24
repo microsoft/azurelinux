@@ -1,0 +1,43 @@
+From 463f4914057b0193c6ca025e9233c17035bc0448 Mon Sep 17 00:00:00 2001
+From: Adrian Thurston <thurston@colm.net>
+Date: Sun, 12 Mar 2023 13:24:22 -0700
+Subject: [PATCH] fallback to AC_CHECK_LIB for libcolm and libfsm
+
+If the .la files for libcolm and libfsm are not present then fallback to using
+AC_CHECK_LIB for these libraries. Many packaging systems strip out .la files so
+we need to still be able to link if they are not there.
+---
+ configure.ac | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index e1a0fc67..07a2b075 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -59,6 +59,26 @@ AC_CHECK_FILES(
+ 	[],
+ 	[AC_ERROR([colm is required to build ragel])]
+ )
++
++dnl If the .la files are present use those, otherwise locate the libs with AC_CHECK_LIB.
++AC_CHECK_FILES(
++	[$LIBCOLM_LA $LIBFSM_LA],
++	[],
++	[
++		AC_CHECK_LIB(
++			[colm],
++			[colm_run_program],
++			[LIBCOLM_LA=-lcolm],
++			[AC_ERROR([libcolm is required to build ragel])]
++		)
++		AC_CHECK_LIB(
++			[fsm],
++			[libfsm_present],
++			[LIBFSM_LA=-lfsm],
++			[AC_ERROR([libfsm is required to build ragel])]
++		)
++	]
++)
+ AC_SUBST(COLM)
+ AC_SUBST(COLM_WRAP)
+ AC_SUBST(COLM_SHARE)

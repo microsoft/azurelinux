@@ -3,7 +3,7 @@
 
 Name:		perl-Event
 Version:	1.28
-Release:	16%{?dist}
+Release: 17%{?dist}
 Summary:	Event loop processing
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Event

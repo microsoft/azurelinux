@@ -1,9 +1,0 @@
---- equator-0.4.2/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ equator-0.4.2/Cargo.toml	2025-02-02T13:37:20.706976+00:00
-@@ -36,6 +36,3 @@
- 
- [dependencies.equator-macro]
- version = "0.4.2"
--
--[dev-dependencies.assert2]
--version = "0.3.14"

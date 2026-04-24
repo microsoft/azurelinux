@@ -5,7 +5,7 @@
 
 Name:           lasi
 Version:        1.1.3
-Release:        17%{?dist}
+Release: 18%{?dist}
 Summary:        C++ library for creating Postscript documents
 
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.

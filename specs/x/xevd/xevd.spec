@@ -3,7 +3,7 @@
 
 Name:           xevd
 Version:        0.5.0
-Release:        5%{?dist}
+Release: 6%{?dist}
 Summary:        Reference MPEG-5 Part 1 (EVC) decoder
 
 License:        BSD-3-Clause

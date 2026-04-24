@@ -1,0 +1,5 @@
+import:
+- package: github.com/kr/text
+  version: 67253a98dcf0dd3273ea58929d7aaaa781ef6d13
+package: github.com/kr/pretty
+

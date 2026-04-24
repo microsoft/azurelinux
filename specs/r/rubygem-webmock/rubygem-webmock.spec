@@ -18,7 +18,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 3.23.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: Library for stubbing HTTP requests in Ruby
 License: MIT
 URL: https://github.com/bblimke/webmock

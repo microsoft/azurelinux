@@ -4,7 +4,7 @@
 %global pypi_name sphinxcontrib-log-cabinet
 Name:           python-%{pypi_name}
 Version:        1.0.1
-Release:        24%{?dist}
+Release: 25%{?dist}
 Summary:        Organize changelog directives in Sphinx docs
 License:        BSD-3-Clause
 URL:            https://github.com/davidism/sphinxcontrib-log-cabinet

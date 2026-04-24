@@ -6,7 +6,7 @@
 
 Name:           python-%{srcname}
 Version:        1.5.1
-Release:        1%{?dist}
+Release: 2%{?dist}
 Summary:        Low-level CSS parser for Python
 
 License:        BSD-3-Clause

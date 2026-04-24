@@ -1,0 +1,41 @@
+From 0a95412527ecba22cdb0f96a905a7a5ce45a14bc Mon Sep 17 00:00:00 2001
+From: Paul Floyd <pjfloyd@wanadoo.fr>
+Date: Thu, 15 Jan 2026 08:44:52 +0100
+Subject: [PATCH 7/8] Bug 514613 - Unclosed leak_summary/still_reachable tag in
+ xml output
+
+(cherry picked from commit 758b0f55e878fd7bd9dcd1ff3e74f10a7a00a771)
+---
+ NEWS                    | 1 +
+ memcheck/mc_leakcheck.c | 3 ++-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/NEWS b/NEWS
+index 28409915e1a1..164218c14e76 100644
+--- a/NEWS
++++ b/NEWS
+@@ -23,6 +23,7 @@ The following bugs have been fixed or resolved on this branch.
+ 511717  gdbserver (valgrind_read_memory) the 'impossible' happened:
+         Killed by fatal signal (SIGSEGV)
+ 514094  readlink("/proc/self/exe") overwrites buffer beyond its return value
++514613  Unclosed leak_summary/still_reachable tag in xml output
+ 
+ To see details of a given bug, visit
+   https://bugs.kde.org/show_bug.cgi?id=XXXXXX
+diff --git a/memcheck/mc_leakcheck.c b/memcheck/mc_leakcheck.c
+index 586bff448bfb..4df0b180d5d1 100644
+--- a/memcheck/mc_leakcheck.c
++++ b/memcheck/mc_leakcheck.c
+@@ -1768,7 +1768,8 @@ static void print_results(ThreadId tid, LeakCheckParams* lcp)
+       umsg_or_xml(VG_(clo_xml) ?
+                   "  <still_reachable>\n"
+                   "    <bytes>%'lu%s</bytes>\n"
+-                  "    <blocks>%'lu%s</blocks>\n" :
++                  "    <blocks>%'lu%s</blocks>\n"
++                  "  </still_reachable>\n" :
+                   "   still reachable: %'lu%s bytes in %'lu%s blocks\n",
+                 MC_(bytes_reachable), 
+                 DBY (MC_(bytes_reachable), old_bytes_reachable), 
+-- 
+2.52.0
+

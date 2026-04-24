@@ -4,7 +4,7 @@
 Summary: A Hebrew spell checker
 Name: hspell
 Version: 1.4
-Release: 24%{?dist}
+Release: 25%{?dist}
 License: AGPL-3.0-only
 URL: http://hspell.ivrix.org.il/
 Source: http://hspell.ivrix.org.il/%{name}-%{version}.tar.gz

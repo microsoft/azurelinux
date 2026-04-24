@@ -1,0 +1,15 @@
+diff -up chromium-127.0.6533.72/base/allocator/partition_allocator/src/partition_alloc/aarch64_support.h.me chromium-127.0.6533.72/base/allocator/partition_allocator/src/partition_alloc/aarch64_support.h
+--- chromium-127.0.6533.72/base/allocator/partition_allocator/src/partition_alloc/aarch64_support.h.me	2024-07-25 23:58:19.751616508 +0200
++++ chromium-127.0.6533.72/base/allocator/partition_allocator/src/partition_alloc/aarch64_support.h	2024-07-26 00:01:46.391800969 +0200
+@@ -10,9 +10,11 @@
+ #include "partition_alloc/build_config.h"
+ #include "partition_alloc/partition_alloc_buildflags.h"
+ 
++#if 0
+ #if PA_BUILDFLAG(IS_ANDROID) || PA_BUILDFLAG(IS_LINUX)
+ #define HAS_HW_CAPS
+ #endif
++#endif
+ 
+ #if PA_BUILDFLAG(PA_ARCH_CPU_ARM64) && defined(HAS_HW_CAPS)
+ #include <asm/hwcap.h>

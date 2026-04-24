@@ -3,7 +3,7 @@
 
 Name:           perl-FileHandle-Fmode
 Version:        0.15
-Release:        5%{?dist}
+Release: 6%{?dist}
 Summary:        Determine whether a filehandle is opened for reading, writing, or both
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/FileHandle-Fmode

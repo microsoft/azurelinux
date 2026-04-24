@@ -3,7 +3,7 @@
 
 Name:           lame
 Version:        3.100
-Release:        20%{?dist}
+Release: 21%{?dist}
 Summary:        Free MP3 audio compressor
 License:        LGPL-2.0-or-later AND LGPL-2.1-or-later
 URL:            http://lame.sourceforge.net/

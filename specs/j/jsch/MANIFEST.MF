@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Automatic-Module-Name: com.jcraft.jsch
+Bundle-SymbolicName: com.jcraft.jsch
+Archiver-Version: Plexus Archiver
+Bundle-ManifestVersion: 2
+Bundle-Vendor: %bundleVendor
+Import-Package: com.jcraft.jzlib;resolution:=optional;version="1.0.7",
+ com.jcraft.jsch;resolution:=optional;version="[0.1,1)",javax.crypto;r
+ esolution:=optional,javax.crypto.interfaces;resolution:=optional,java
+ x.crypto.spec;resolution:=optional,org.ietf.jgss;resolution:=optional
+Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.5))"
+Originally-Created-By: Apache Maven
+Export-Package: com.jcraft.jsch;version="0.1.55",com.jcraft.jsch.jce;v
+ ersion="0.1.55";uses:="com.jcraft.jsch",com.jcraft.jsch.jcraft;versio
+ n="0.1.55";uses:="com.jcraft.jsch",com.jcraft.jsch.jgss;version="0.1.
+ 55";uses:="com.jcraft.jsch"
+Bundle-Name: %bundleName
+Bundle-Version: 0.1.55.v20190404-1902
+Build-Jdk: 1.8.0_192

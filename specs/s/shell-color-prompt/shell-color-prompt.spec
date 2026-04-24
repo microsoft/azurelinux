@@ -6,7 +6,7 @@
 
 Name:           shell-color-prompt
 Version:        0.7.1
-Release:        2%{?dist}
+Release: 3%{?dist}
 Summary:        Color prompt for bash shell
 
 License:        GPL-2.0-or-later

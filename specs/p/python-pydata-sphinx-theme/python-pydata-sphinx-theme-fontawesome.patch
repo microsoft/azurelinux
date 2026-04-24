@@ -1,0 +1,33 @@
+--- pydata-sphinx-theme-0.16.1/src/pydata_sphinx_theme/assets/scripts/fontawesome.js.orig	2024-12-17 03:38:01.000000000 -0700
++++ pydata-sphinx-theme-0.16.1/src/pydata_sphinx_theme/assets/scripts/fontawesome.js	2024-12-17 09:09:44.347458128 -0700
+@@ -1,4 +1,4 @@
+ // TODO: @trallard might end up moving this to the main JS file
+ // Define the custom behavior of the page
+ 
+-import "@fortawesome/fontawesome-free/js/all.min.js";
++import "/usr/share/fontawesome/js/all.min.js";
+--- pydata-sphinx-theme-0.16.1/src/pydata_sphinx_theme/assets/styles/pydata-sphinx-theme.scss.orig	2024-12-17 03:38:01.000000000 -0700
++++ pydata-sphinx-theme-0.16.1/src/pydata_sphinx_theme/assets/styles/pydata-sphinx-theme.scss	2024-12-17 09:10:32.401619489 -0700
+@@ -7,10 +7,10 @@
+ @import "~bootstrap/scss/bootstrap";
+ 
+ // Import FontAwesome from _node_modules
+-@import "~@fortawesome/fontawesome-free/scss/fontawesome";
+-@import "~@fortawesome/fontawesome-free/scss/solid";
+-@import "~@fortawesome/fontawesome-free/scss/regular";
+-@import "~@fortawesome/fontawesome-free/scss/brands";
++@import "/usr/share/fontawesome/scss/fontawesome";
++@import "/usr/share/fontawesome/scss/solid";
++@import "/usr/share/fontawesome/scss/regular";
++@import "/usr/share/fontawesome/scss/brands";
+ 
+ // Variables
+ @import "variables/layout";
+--- pydata-sphinx-theme-0.16.1/src/pydata_sphinx_theme/assets/styles/variables/_fonts.scss.orig	2024-12-17 03:38:01.000000000 -0700
++++ pydata-sphinx-theme-0.16.1/src/pydata_sphinx_theme/assets/styles/variables/_fonts.scss	2024-12-17 09:10:57.682173950 -0700
+@@ -44,4 +44,4 @@ html {
+ }
+ 
+ $line-height-body: 1.65;
+-$fa-font-path: "vendor/fontawesome/webfonts/";
++$fa-font-path: "/usr/share/fontawesome/webfonts/";

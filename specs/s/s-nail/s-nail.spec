@@ -3,7 +3,7 @@
 
 Name:           s-nail
 Version:        14.9.25
-Release:        3%{?dist}
+Release: 4%{?dist}
 Summary:        Environment for sending and receiving mail, providing functionality of POSIX mailx
 
 # Everything is ISC except parts coming from the original Heirloom mailx which are BSD
