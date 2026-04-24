@@ -2,7 +2,7 @@
 Summary:        Tensors and Dynamic neural networks in Python with strong GPU acceleration.
 Name:           pytorch
 Version:        2.0.0
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,6 +25,8 @@ Patch10:        CVE-2025-55560.patch
 Patch11:        CVE-2025-3001.patch
 Patch12:        CVE-2026-24747.patch
 Patch13:        CVE-2026-0994.patch
+Patch14:        CVE-2026-34445.patch
+Patch15:        CVE-2026-34446.patch
 
 BuildRequires:  cmake
 BuildRequires:  gcc
@@ -77,6 +79,12 @@ You can reuse your favorite Python packages such as NumPy, SciPy and Cython to e
 export MAX_JOBS=8
 export USE_CUDA=0
 export BUILD_CAFFE2=0
+# The following flags are required to fix build failure due to missing std::filesystem symbols in gcc 9 and 10.
+export CXXFLAGS="%{optflags} -std=gnu++17"
+export LDFLAGS="$LDFLAGS -lstdc++fs"
+export CMAKE_EXE_LINKER_FLAGS="$CMAKE_EXE_LINKER_FLAGS -lstdc++fs"
+export CMAKE_SHARED_LINKER_FLAGS="$CMAKE_SHARED_LINKER_FLAGS -lstdc++fs"
+export CMAKE_MODULE_LINKER_FLAGS="$CMAKE_MODULE_LINKER_FLAGS -lstdc++fs"
 %py3_build
 
 %install
@@ -97,6 +105,9 @@ cp -arf docs %{buildroot}/%{_pkgdocdir}
 %{_docdir}/*
 
 %changelog
+* Mon Apr 13 2026 Aninda Pradhan <v-anipradhan@microsoft.com> - 2.0.0-16
+- Patch for CVE-2026-34445, CVE-2026-34446
+
 * Thu Mar 05 2026 Kanishk Bansal <kanbansal@microsoft.com> - 2.0.0-15
 - Remove typing_extensions.override usage from CVE-2026-24747 patch to fix
   ImportError with typing_extensions 4.2.0 (override requires >= 4.4.0)
