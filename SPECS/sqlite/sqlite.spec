@@ -2,7 +2,7 @@
 Summary:        A portable, high level programming interface to various calling conventions
 Name:           sqlite
 Version:        3.39.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,6 +15,7 @@ Patch1:         CVE-2022-46908.patch
 Patch2:         CVE-2023-7104.patch
 Patch3:         CVE-2025-7458.patch
 Patch4:         CVE-2025-6965.patch
+Patch5:         CVE-2025-70873.patch
 Requires:       sqlite-libs = %{version}-%{release}
 Provides:       sqlite3
 
@@ -85,6 +86,9 @@ make %{?_smp_mflags} check
 %{_libdir}/libsqlite3.so.0.8.6
 
 %changelog
+* Fri Apr 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.39.2-5
+- Patch for CVE-2025-70873
+
 * Mon Aug 04 2025 Kshitiz Godara <kgodara@microsoft.com> - 3.39.2-4
 - Address CVE-2025-6965 and CVE-2025-7458
 
