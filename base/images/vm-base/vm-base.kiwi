@@ -30,6 +30,9 @@
             <initrd action="setup">
                 <dracut uefi="false"/>
             </initrd>
+            <oemconfig>
+                <oem-resize>false</oem-resize>
+            </oemconfig>
         </type>
     </preferences>
 
@@ -67,7 +70,6 @@
         <package name="device-mapper-event" />
         <package name="dnf5" />
         <package name="dnf5-plugins" />
-        <package name="dracut-kiwi-oem-repart" />
         <package name="elfutils" />
         <package name="elfutils-default-yama-scope" />
         <package name="file" />
