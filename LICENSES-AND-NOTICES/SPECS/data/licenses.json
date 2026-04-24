@@ -3177,6 +3177,7 @@
                 "coreos-cloudinit",
                 "coreos-init",
                 "ignition",
+                "ignition-flatcar",
                 "python-nocaselist",
                 "update-ssh-keys"
             ]

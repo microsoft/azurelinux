@@ -23,7 +23,7 @@ Version:                2.22.0
 %global godocs          README.md docs/
 %global dracutlibdir %{_prefix}/lib/dracut
 
-Name:           ignition
+Name:           ignition-flatcar
 Release:        1%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -111,7 +111,7 @@ This package contains the grub2 config which is compatable with bootupd.
 %endif
 
 %prep
-%forgeautosetup -p1
+%autosetup -p1 -n ignition-%{version}
 
 %build
 export LDFLAGS="-X github.com/flatcar/ignition/v2/internal/version.Raw=%{version} -X github.com/flatcar/ignition/v2/internal/distro.selinuxRelabel=false "
