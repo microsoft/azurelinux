@@ -26,7 +26,7 @@
             bootpartition="false"
             efipartsize="200">
             <bootloader name="grub2" timeout="0" />
-            <size unit="M">4096</size>
+            <size unit="G">5</size>
             <initrd action="setup">
                 <dracut uefi="false"/>
             </initrd>
