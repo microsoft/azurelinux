@@ -97,7 +97,7 @@ fi
 
 %changelog
 * Thu Apr 24 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 2.1.6-2
-- Modified patch for CVE-2025-64329
+- Modify CVE-2026-35469 patch for 2.1.6
 
 * Fri Apr 17 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 2.1.6-1
 - Upgrade to 2.1.6
