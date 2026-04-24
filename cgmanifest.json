@@ -3840,8 +3840,8 @@
         "type": "other",
         "other": {
           "name": "freeipmi",
-          "version": "1.6.6",
-          "downloadUrl": "http://ftp.gnu.org/gnu/freeipmi/freeipmi-1.6.6.tar.gz"
+          "version": "1.6.17",
+          "downloadUrl": "https://ftp.gnu.org/gnu/freeipmi/freeipmi-1.6.17.tar.gz"
         }
       }
     },
