@@ -38,7 +38,7 @@ The easiest way to get quick, interactive feedback is with [GitHub Copilot](http
 ```bash
 cd ~/repos/azurelinux
 python -m venv .venv && source .venv/bin/activate
-pip install -r .github/workflows/scripts/requirements.txt
+pip install -r .github/workflows/scripts/spec-review/requirements.txt
     gh copilot
     # OR
     npm install -g @github/copilot
@@ -51,19 +51,19 @@ copilot --version  # verify CLI
 # Defaults: reviews all *.spec in repo, writes to repo root
 #   spec_review_report.json, copilot_log.md, spec_review_kb.md
 
-./.github/workflows/scripts/spec_review.sh \
+./.github/workflows/scripts/spec-review/spec_review.sh \
   --spec base/comps/azurelinux-release/azurelinux-release.spec \
   --spec base/comps/azurelinux-repos/azurelinux-repos.spec
 
 # Validate / inspect
-python .github/workflows/scripts/spec_review_schema.py /tmp/spec_review_report.json --all
-python .github/workflows/scripts/spec_review_schema.py /tmp/spec_review_report.json --json | jq
+python .github/workflows/scripts/spec-review/spec_review_schema.py /tmp/spec_review_report.json --all
+python .github/workflows/scripts/spec-review/spec_review_schema.py /tmp/spec_review_report.json --json | jq
 ```
 
 The script supports additional options (like selecting a model, or using different URLs); run with `--help` for details.
 
 ```bash
-./.github/workflows/scripts/spec_review.sh --help
+./.github/workflows/scripts/spec-review/spec_review.sh --help
 ```
 
 ## Run multi-model review (spec_review_multi.sh)
@@ -79,11 +79,11 @@ uses a third model pass to synthesize their findings into a single high-quality 
 
 ```bash
 # Defaults: claude-opus-4.6 + gpt-5.2-codex reviewers, gpt-5.2-codex synthesizer
-./.github/workflows/scripts/spec_review_multi.sh \
+./.github/workflows/scripts/spec-review/spec_review_multi.sh \
   --spec base/comps/azurelinux-release/azurelinux-release.spec
 
 # Custom models
-./.github/workflows/scripts/spec_review_multi.sh \
+./.github/workflows/scripts/spec-review/spec_review_multi.sh \
   --spec foo.spec \
   --model1 gpt-5.2-codex \
   --model2 claude-opus-4.6 \
@@ -101,7 +101,7 @@ ls /tmp/spec_review_workdir/
 Run with `--help` for all options:
 
 ```bash
-./.github/workflows/scripts/spec_review_multi.sh --help
+./.github/workflows/scripts/spec-review/spec_review_multi.sh --help
 ```
 
 ---
@@ -119,7 +119,7 @@ copilot --agent spec-review
 ```bash
 # For semi-automated or fully automated runs, use -i or -p flags:
 prompt="Review: base/comps/azurelinux-release/azurelinux-release.spec against packaging guidelines.\n"\
-"Write JSON to spec_review_report.json and validate with: python .github/workflows/scripts/spec_review_schema.py spec_review_report.json"
+"Write JSON to spec_review_report.json and validate with: python .github/workflows/scripts/spec-review/spec_review_schema.py spec_review_report.json"
 
 # Semi-interactive (runs prompt, then waits for the user)
 copilot --agent spec-review \
@@ -144,7 +144,7 @@ copilot --agent spec-review \
   -p "$prompt"
 
 # Review output
-python .github/workflows/scripts/spec_review_schema.py spec_review_report.json --all
+python .github/workflows/scripts/spec-review/spec_review_schema.py spec_review_report.json --all
 ```
 
 ## Future work

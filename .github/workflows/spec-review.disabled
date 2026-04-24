@@ -146,7 +146,7 @@ jobs:
 
       - name: Install dependencies
         if: steps.changed-specs.outputs.skip != 'true'
-        run: pip install -r .github/workflows/scripts/requirements.txt
+        run: pip install -r .github/workflows/scripts/spec-review/requirements.txt
 
       - name: Install Copilot CLI
         if: steps.changed-specs.outputs.skip != 'true'
@@ -158,14 +158,14 @@ jobs:
       - name: Run Copilot spec review (multi-model)
         if: steps.changed-specs.outputs.skip != 'true'
         run: |
-          chmod +x .github/workflows/scripts/spec_review_multi.sh
+          chmod +x .github/workflows/scripts/spec-review/spec_review_multi.sh
           # Build a properly-quoted array from the line-delimited spec list file
           SPEC_ARGS=()
           while IFS= read -r spec; do
             [[ -z "$spec" ]] && continue
             SPEC_ARGS+=("--spec" "$spec")
           done < .spec_review_paths.txt
-          .github/workflows/scripts/spec_review_multi.sh "${SPEC_ARGS[@]}" \
+          .github/workflows/scripts/spec-review/spec_review_multi.sh "${SPEC_ARGS[@]}" \
             --work-dir .spec_review/workdir
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -216,9 +216,9 @@ jobs:
       - name: Compare model findings
         if: always() && steps.changed-specs.outputs.skip != 'true'
         run: |
-          # NOTE: Label model names must match defaults in spec_review_multi.sh
+          # NOTE: Label model names must match defaults in spec-review/spec_review_multi.sh
           # (DEFAULT_MODEL1, DEFAULT_MODEL2, DEFAULT_SYNTH_MODEL)
-          python .github/workflows/scripts/spec_review_schema.py compare \
+          python .github/workflows/scripts/spec-review/spec_review_schema.py compare \
             .spec_review/workdir/report_a.json \
             .spec_review/workdir/report_b.json \
             .spec_review/report.json \
@@ -232,7 +232,7 @@ jobs:
         id: validate
         run: |
           # Validate JSON structure
-          python .github/workflows/scripts/spec_review_schema.py .spec_review/report.json --json
+          python .github/workflows/scripts/spec-review/spec_review_schema.py .spec_review/report.json --json
 
           # Count errors and warnings
           ERROR_COUNT=$(jq '[.spec_reviews[].errors | length] | add // 0' .spec_review/report.json)
@@ -251,7 +251,7 @@ jobs:
         if: steps.changed-specs.outputs.skip != 'true'
         run: |
           # Generate workflow commands that create inline annotations
-          python .github/workflows/scripts/create_check_annotations.py .spec_review/report.json \
+          python .github/workflows/scripts/spec-review/create_check_annotations.py .spec_review/report.json \
             --repo-root "$GITHUB_WORKSPACE" --workflow-commands
 
       - name: Post PR comment
@@ -264,7 +264,7 @@ jobs:
         run: |
           # Generate formatted comment to a temp file (avoids ARG_MAX issues with large comments)
           COMMENT_FILE=$(mktemp)
-          python .github/workflows/scripts/format_pr_comment.py \
+          python .github/workflows/scripts/spec-review/format_pr_comment.py \
             .spec_review/report.json \
             --repo "$REPO" \
             --sha "$HEAD_SHA" \
@@ -295,7 +295,7 @@ jobs:
           REPO: ${{ inputs.repo || github.repository }}
           HEAD_SHA: ${{ inputs.pr-head-sha || github.sha }}
         run: |
-          python .github/workflows/scripts/format_pr_comment.py \
+          python .github/workflows/scripts/spec-review/format_pr_comment.py \
             .spec_review/report.json \
             --repo "$REPO" \
             --sha "$HEAD_SHA" \
@@ -320,5 +320,5 @@ jobs:
           echo "Found ${ERROR_COUNT} error(s) in spec review"
           echo ""
           # Print all findings so "View details" shows everything
-          python .github/workflows/scripts/spec_review_schema.py .spec_review/report.json --all
+          python .github/workflows/scripts/spec-review/spec_review_schema.py .spec_review/report.json --all
           exit 1

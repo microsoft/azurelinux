@@ -18,5 +18,11 @@
         "**/node_modules",
         "**/__pycache__",
         "**/.*"
-    ]
+    ],
+    // Using Azure Pipelines schema for validation of ADO YAMLs.
+    "azure-pipelines.1ESPipelineTemplatesSchemaFile": true,
+    // Associate ADO pipelines with the "azure-pipelines" type instead of GitHub Actions.
+    "files.associations": {
+        "**/.github/workflows/ado/**/*.yml": "azure-pipelines"
+    }
 }

@@ -1,0 +1,227 @@
+# Microsoft Corporation
+#
+# Raw stages template for the sources-upload PR check pipeline.
+#
+# This template is OneBranch-agnostic: it declares the stages/jobs/steps that
+# do the actual work and exposes the OneBranch-coupled knobs as parameters.
+# The wrapper at .github/workflows/ado/sources-upload.yml is responsible for
+# choosing the OneBranch governed template variant (Official vs NonOfficial),
+# configuring its featureFlags, and supplying concrete values for the
+# parameters declared below.
+
+parameters:
+  - name: outputDirectory
+    type: string
+  - name: artifactBaseName
+    type: string
+  - name: containerImage
+    type: string
+  - name: poolType
+    type: string
+    default: linux
+  - name: serviceConnection
+    type: string
+  - name: variableGroup
+    type: string
+  - name: timeoutInMinutes
+    type: number
+
+stages:
+  - stage: PRCheck
+    jobs:
+      - job: CallControlTowerAPI
+        # Non-blocking PR check: failing steps still render red error annotations
+        # and surface in the build-issues view, but the job resolves to
+        # SucceededWithIssues and the run to PartiallySucceeded, which the Azure
+        # Pipelines GitHub integration reports as success to GitHub PR checks and
+        # the merge queue. Errors and warnings remain visible to the user.
+        # TODO: Remove `continueOnError` once the pipeline is stable so failures
+        #       block PRs and the merge queue.
+        # ADO task: 19179
+        continueOnError: true
+        # Must exceed the script's --poll-timeout-seconds (default 7200s = 120m)
+        # with enough headroom for setup steps and the final API call.
+        timeoutInMinutes: ${{ parameters.timeoutInMinutes }}
+        pool:
+          type: ${{ parameters.poolType }}
+        variables:
+          - group: ${{ parameters.variableGroup }}
+          - name: ob_outputDirectory
+            value: ${{ parameters.outputDirectory }}
+          - name: ob_artifactBaseName
+            value: ${{ parameters.artifactBaseName }}
+          - name: LinuxContainerImage
+            value: ${{ parameters.containerImage }}
+        steps:
+          - script: |
+              set -euo pipefail
+
+              # For both triggers, Build.SourceVersion is the relevant source commit:
+              # - PR trigger: ADO sets it to the GitHub-created merge commit (refs/pull/{n}/merge).
+              # - CI/merge-queue trigger: it is the commit that landed on the base branch.
+              source_hash="$SOURCE_COMMIT"
+
+              if [[ "$BUILD_REASON" == "PullRequest" ]]; then
+                # PR trigger: ADO provides the target branch directly.
+                target_hash=$(git ls-remote "$UPSTREAM_REPO_URL" "$PR_TARGET_BRANCH" | cut -f1)
+              else
+                # CI/merge-queue trigger: extract the base branch from the merge-queue branch name.
+                # Branch format: refs/heads/gh-readonly-queue/{base_branch}/pr-{pr_number}-{head_sha}
+                if ! base_branch=$(grep -oP '(?<=^refs/heads/gh-readonly-queue/).+(?=/pr-[^/]+$)' <<< "$SOURCE_BRANCH"); then
+                  echo "##[error]Unsupported SOURCE_BRANCH '$SOURCE_BRANCH' for non-PullRequest build. Expected 'refs/heads/gh-readonly-queue/<base>/pr-<n>-<sha>'."
+                  exit 1
+                fi
+                target_hash=$(git ls-remote "$UPSTREAM_REPO_URL" "refs/heads/$base_branch" | cut -f1)
+              fi
+
+              echo "Source commit: $source_hash"
+              echo "Target commit: $target_hash"
+
+              echo "##vso[task.setvariable variable=sourceCommit]$source_hash"
+              echo "##vso[task.setvariable variable=targetCommit]$target_hash"
+            env:
+              BUILD_REASON: $(Build.Reason)
+              PR_TARGET_BRANCH: $(System.PullRequest.TargetBranch)
+              SOURCE_BRANCH: $(Build.SourceBranch)
+              SOURCE_COMMIT: $(Build.SourceVersion)
+              UPSTREAM_REPO_URL: $(Build.Repository.Uri)
+            displayName: "Determine source and target commit hashes"
+
+          - task: PipAuthenticate@1
+            displayName: "Authenticate pip"
+            inputs:
+              artifactFeeds: "azl/ControlTowerFeed"
+
+          - script: |
+              set -euo pipefail
+
+              echo "##[group]Mock"
+              tdnf install -y mock mock-rpmautospec python3-chardet
+              sudo usermod -aG mock "$(whoami)"
+              echo "##[endgroup]"
+
+              echo "##[group]Azldev"
+              echo "Installing azldev@${AZLDEV_COMMIT}..."
+              go install "github.com/microsoft/azure-linux-dev-tools/cmd/azldev@${AZLDEV_COMMIT}"
+
+              go_bin_path="$(go env GOPATH)/bin"
+              echo "##vso[task.prependpath]$go_bin_path"
+
+              "$go_bin_path/azldev" --version
+              echo "##[endgroup]"
+
+              echo "##[group]Python dependencies"
+              pip install -r .github/workflows/scripts/control-tower-prcheck/requirements.txt
+              echo "##[endgroup]"
+            displayName: "Install dependencies"
+            env:
+              AZLDEV_COMMIT: $(AzldevCommit)
+
+          - script: |
+              set -euo pipefail
+
+              # Workaround for an ADO git config error during spec rendering.
+              # The config key may not be present on every agent image, so tolerate its absence.
+              git config --unset extensions.worktreeConfig || true
+
+              # Full history is needed for spec rendering to work.
+              if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then
+                echo "##[group]Fetching full git history"
+                git fetch --unshallow
+                echo "##[endgroup]"
+              fi
+
+              # TODO: Replace with using the TOML config to read the specs dir once available.
+              #       The '-o "$specs_dir"' should be removed as part of the update. Future command:
+              #         specs_dir="$(azldev config dump -q -f json | jq -r .project.renderedSpecsDir)"
+              #       Similarly, the component rendering below should change to:
+              #         azldev component render -q -a
+              # ADO task: 19149
+              specs_dir="specs"
+
+              echo "##[group]Specs rendering"
+              azldev component render -q -a -o "$specs_dir" --force --clean-stale
+              echo "##[endgroup]"
+
+              # Check for any new or modified files under the specs directory.
+              # TODO: Remove and replace this script with the one coming from PR #16674.
+              # ADO task: 19186
+              if ! python3 .github/workflows/scripts/check_rendered_specs.py --specs-dir "$specs_dir"; then
+                echo "##[group]Git diff"
+                git --no-pager diff -- "$specs_dir"
+                echo "##[endgroup]"
+                echo "##[error]Specs are not up to date. Run 'azldev component render -q -a' and try again."
+                exit 1
+              fi
+            displayName: "Verify rendered specs are up to date"
+            # TODO: Re-enabled failing once specs in the main branch are updated and stable.
+            # ADO task: 19179
+            continueOnError: true
+
+          - script: |
+              set -euo pipefail
+
+              cat << EOF
+              NOTE: It's possible more components changed between the source and target commits than displayed below.
+                    This workflow only checks for updates in the 'sources' files and ignores all other changes.
+                    Only components present on the source commit are reported; components that exist only on the
+                    target branch are intentionally excluded. Pure renames are reported under their source-branch
+                    name, since the component name is part of the cache blob name we upload.
+              EOF
+
+              # Diff direction is TARGET -> SOURCE so additions/modifications represent the source-side state:
+              #   * --no-renames decomposes a rename into an add (new path, source side) + delete (old path,
+              #     target side); we want the source-side name because the component name is part of the cache
+              #     blob name uploaded for the PR. It also silences git's diff.renameLimit warning on large diffs.
+              #   * --diff-filter=d (lowercase) excludes deletions, which here correspond to paths present only
+              #     on the target branch -- those components are not on the PR and must not be uploaded.
+              # Net effect: the listed '*/sources' files are exactly those present on the source commit that
+              # differ from target, including pure renames surfaced under the source-branch name.
+              sources_files="$(
+                git diff --no-renames --diff-filter=d "$TARGET_COMMIT" "$SOURCE_COMMIT" --name-only \
+                  | { grep '/sources$' || true; } \
+                  | sort -u
+              )"
+
+              components=()
+              while IFS= read -r line; do
+                # Skip the spurious empty iteration when no '*/sources' files changed.
+                if [[ -n "$line" ]]; then
+                  components+=("$(basename "$(dirname "$line")")")
+                fi
+              done <<< "$sources_files"
+
+              components="$(IFS=, ; echo "${components[*]}")"
+              echo "Affected components: $components"
+              echo "##vso[task.setvariable variable=components]$components"
+            env:
+              SOURCE_COMMIT: $(sourceCommit)
+              TARGET_COMMIT: $(targetCommit)
+            displayName: "Determine affected components"
+
+          - task: AzureCLI@2
+            displayName: "Call Control Tower 'prcheck' API"
+            inputs:
+              azureSubscription: ${{ parameters.serviceConnection }}
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                set -euo pipefail
+
+                python3 .github/workflows/scripts/control-tower-prcheck/run_control_tower_prcheck.py \
+                  --api-audience "$API_AUDIENCE" \
+                  --api-base-url "$API_BASE_URL" \
+                  --build-reason "$BUILD_REASON" \
+                  --components "$COMPONENTS" \
+                  --source-commit "$SOURCE_COMMIT" \
+                  --repo-uri "$UPSTREAM_REPO_URL"
+            env:
+              API_AUDIENCE: $(ApiAudience)
+              API_BASE_URL: $(ApiBaseUrl)
+              BUILD_REASON: $(Build.Reason)
+              COMPONENTS: $(components)
+              SOURCE_COMMIT: $(sourceCommit)
+              # TODO: Target commit is not used. Will be needed once we move detection of affected components to CT.
+              # ADO task: 18816
+              TARGET_COMMIT: $(targetCommit)
+              UPSTREAM_REPO_URL: $(Build.Repository.Uri)
