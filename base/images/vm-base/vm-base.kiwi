@@ -130,10 +130,4 @@
         <package name="shim" arch="x86_64" />
         <package name="shim" arch="aarch64" />
     </packages>
-
-    <!--
-    <users>
-        <user name="root" password="INSERT-PASSWORD-HERE" groups="root" />
-    </users>
-    -->
 </image>
