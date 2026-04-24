@@ -1,0 +1,14 @@
+[Unit]
+Description=NVIDIA Persistence Daemon
+# Keep the NVIDIA kernel module loaded and GPU state initialized
+# even when no user-space clients are running. This reduces latency
+# for the first CUDA application launch.
+Wants=syslog.target
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/nvidia-persistenced --user nvidia-persistenced --persistence-mode
+ExecStopPost=/bin/rm -rf /var/run/nvidia-persistenced
+
+[Install]
+WantedBy=multi-user.target
