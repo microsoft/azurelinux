@@ -5,11 +5,14 @@
 # Look for "date:" and "rustc:".
 %define release_date 2025-08-07
 %define stage0_version 1.89.0
+%global wasi_sdk_release 32
+%global wasi_sdk_version 32.0
+%global wasi_libc_commit 2fc32bc81b9f07f8d9525edea59bfbaf760c06d6
 
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.90.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -41,6 +44,9 @@ Source4:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{sta
 Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
+Source8:        https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-%{wasi_sdk_release}/wasi-sysroot-%{wasi_sdk_version}.tar.gz
+Source9:        https://github.com/WebAssembly/wasi-libc/archive/%{wasi_libc_commit}/wasi-libc-%{wasi_libc_commit}.tar.gz
+Source10:       CC0-1.0.txt
 Patch0:         CVE-2025-4574.patch
 Patch1:         CVE-2025-53605.patch
 Patch2:         CVE-2024-11738.patch
@@ -93,6 +99,14 @@ BuildArch:      noarch
 %description doc
 Documentation package for Rust.
 
+%package std-wasm32-wasip1
+Summary:        Rust standard library for the wasm32-wasip1 target.
+License:        (Apache-2.0 OR MIT) AND BSD-2-Clause AND BSD-3-Clause AND CC-BY-3.0 AND CC0-1.0
+Requires:       rust%{?_isa} = %{version}-%{release}
+
+%description std-wasm32-wasip1
+Rust standard library and self-contained WASI runtime files for the wasm32-wasip1 target.
+
 %prep
 # Setup .cargo directory
 mkdir -p $HOME
@@ -115,6 +129,11 @@ cp %{SOURCE6} "$BUILD_CACHE_DIR"
 cp %{SOURCE7} "$BUILD_CACHE_DIR"
 %endif
 
+mkdir -p wasi-root
+tar -xf %{SOURCE8} --strip-components=1 -C wasi-root
+mkdir -p wasi-libc-source
+tar -xf %{SOURCE9} --strip-components=1 -C wasi-libc-source
+
 %build
 # Disable symbol generation
 export CFLAGS="`echo " %{build_cflags} " | sed 's/ -g//'`"
@@ -128,9 +147,17 @@ sh ./configure \
     --release-channel="stable" \
     --release-description="Azure Linux %{version}-%{release}"
 
+cat >> bootstrap.toml <<EOF
+
+[target.wasm32-wasip1]
+wasi-root = "$(pwd)/wasi-root"
+optimized-compiler-builtins = false
+EOF
+
 # SUDO_USER=root bypasses a check in the python bootstrap that
 # makes rust refuse to pull sources from the internet
 USER=root SUDO_USER=root %make_build
+USER=root SUDO_USER=root ./x dist %{?_smp_mflags} rust-std --target wasm32-wasip1
 
 %check
 # We expect to generate dynamic CI contents in this folder, but it will fail since the .github folder is not included
@@ -149,6 +176,36 @@ sudo -u test %make_build check
 userdel -r test
 %install
 USER=root SUDO_USER=root %make_install
+WASM_STD_DIST_DIR=$(mktemp -d)
+tar -xf build/dist/rust-std-%{version}-wasm32-wasip1.tar.xz -C "$WASM_STD_DIST_DIR"
+install -d %{buildroot}%{_libdir}/rustlib
+cp -a \
+    "$WASM_STD_DIST_DIR"/rust-std-%{version}-wasm32-wasip1/rust-std-wasm32-wasip1/lib/rustlib/wasm32-wasip1 \
+    %{buildroot}%{_libdir}/rustlib/
+mkdir -p rust-std-wasm32-wasip1-licenses/rust
+cp \
+    "$WASM_STD_DIST_DIR"/rust-std-%{version}-wasm32-wasip1/LICENSE-APACHE \
+    "$WASM_STD_DIST_DIR"/rust-std-%{version}-wasm32-wasip1/LICENSE-MIT \
+    "$WASM_STD_DIST_DIR"/rust-std-%{version}-wasm32-wasip1/COPYRIGHT \
+    rust-std-wasm32-wasip1-licenses/rust/
+mkdir -p rust-std-wasm32-wasip1-licenses/wasi-libc
+cp \
+    wasi-libc-source/LICENSE \
+    wasi-libc-source/LICENSE-APACHE \
+    wasi-libc-source/LICENSE-APACHE-LLVM \
+    wasi-libc-source/LICENSE-MIT \
+    rust-std-wasm32-wasip1-licenses/wasi-libc/
+cp %{SOURCE10} rust-std-wasm32-wasip1-licenses/wasi-libc/CC0-1.0.txt
+cp wasi-libc-source/libc-bottom-half/cloudlibc/LICENSE \
+    rust-std-wasm32-wasip1-licenses/wasi-libc/cloudlibc-LICENSE
+cp wasi-libc-source/libc-top-half/musl/COPYRIGHT \
+    rust-std-wasm32-wasip1-licenses/wasi-libc/musl-COPYRIGHT
+cp wasi-libc-source/fts/musl-fts/COPYING \
+    rust-std-wasm32-wasip1-licenses/wasi-libc/musl-fts-COPYING
+rm -rf "$WASM_STD_DIST_DIR"
+for file in libc.a crt1-command.o crt1-reactor.o; do
+    test -f %{buildroot}%{_libdir}/rustlib/wasm32-wasip1/lib/self-contained/${file}
+done
 mv %{buildroot}%{_docdir}/cargo/LICENSE-THIRD-PARTY .
 rm %{buildroot}%{_docdir}/rustc/{COPYRIGHT-library.html,COPYRIGHT.html}
 rm %{buildroot}%{_docdir}/cargo/{LICENSE-APACHE,LICENSE-MIT}
@@ -164,6 +221,7 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 %{_bindir}/rustdoc
 %{_bindir}/rust-lldb
 %{_libdir}/lib*.so
+%exclude %{_libdir}/rustlib/wasm32-wasip1
 %{_libdir}/rustlib/*
 %{_libexecdir}/rust-analyzer-proc-macro-srv
 %{_bindir}/rust-gdb
@@ -189,7 +247,15 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 %doc src/tools/rustfmt/Configurations.md
 %{_mandir}/man1/*
 
+%files std-wasm32-wasip1
+%license rust-std-wasm32-wasip1-licenses
+%dir %{_libdir}/rustlib/wasm32-wasip1
+%{_libdir}/rustlib/wasm32-wasip1/*
+
 %changelog
+* Thu Apr 23 2026 Burak Ok <burakok@microsoft.com> - 1.90.0-7
+- Add a rust-std-wasm32-wasip1 subpackage with the wasm32-wasip1 target artifacts, self-contained WASI runtime files, and corresponding license notices
+
 * Wed Mar 25 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.90.0-6
 - Bump to rebuild with updated glibc
 

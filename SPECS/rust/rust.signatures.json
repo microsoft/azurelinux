@@ -7,6 +7,8 @@
   "rustc-1.89.0-aarch64-unknown-linux-gnu.tar.xz": "16ed8d8c7628a481c8501e7cd1022a123269b297bdedbb7f211f37a15e937e0e",
   "rustc-1.89.0-x86_64-unknown-linux-gnu.tar.xz": "b42c254e1349df86bd40bc28fdf386172a1a46f2eeabe3c7a08a75cf1fb60e27",
   "rustc-1.90.0-src-cargo.tar.gz": "72f6a52e8c4df6047b51bea1e6231faf7ff43a0cedddad6a91e14f9a6f924c17",
-  "rustc-1.90.0-src.tar.xz": "6bfeaddd90ffda2f063492b092bfed925c4b8c701579baf4b1316e021470daac"
+  "rustc-1.90.0-src.tar.xz": "6bfeaddd90ffda2f063492b092bfed925c4b8c701579baf4b1316e021470daac",
+  "wasi-libc-2fc32bc81b9f07f8d9525edea59bfbaf760c06d6.tar.gz": "d12a1568d9394e693e6b189277ba70446f96b81a4790c515427865a0d5412372",
+  "wasi-sysroot-32.0.tar.gz": "f2537f6e5804f7f24e32dd140e9371e9670a9fd2646b6a813ddb896b29954b12"
  }
 }
