@@ -13643,8 +13643,8 @@
         "type": "other",
         "other": {
           "name": "msft-golang",
-          "version": "1.25.8",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.25.8-1/go1.25.8-20260306.2.src.tar.gz"
+          "version": "1.25.9",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.25.9-1/go1.25.9-20260407.1.src.tar.gz"
         }
       }
     },
@@ -13783,8 +13783,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.45",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.45.tar.gz"
+          "version": "8.0.46",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.46.tar.gz"
         }
       }
     },

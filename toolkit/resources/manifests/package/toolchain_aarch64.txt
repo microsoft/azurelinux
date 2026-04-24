@@ -144,9 +144,9 @@ krb5-1.19.4-5.cm2.aarch64.rpm
 krb5-debuginfo-1.19.4-5.cm2.aarch64.rpm
 krb5-devel-1.19.4-5.cm2.aarch64.rpm
 krb5-lang-1.19.4-5.cm2.aarch64.rpm
-libarchive-3.6.1-9.cm2.aarch64.rpm
-libarchive-debuginfo-3.6.1-9.cm2.aarch64.rpm
-libarchive-devel-3.6.1-9.cm2.aarch64.rpm
+libarchive-3.6.1-10.cm2.aarch64.rpm
+libarchive-debuginfo-3.6.1-10.cm2.aarch64.rpm
+libarchive-devel-3.6.1-10.cm2.aarch64.rpm
 libassuan-2.5.5-2.cm2.aarch64.rpm
 libassuan-debuginfo-2.5.5-2.cm2.aarch64.rpm
 libassuan-devel-2.5.5-2.cm2.aarch64.rpm
@@ -548,10 +548,10 @@ sed-lang-4.8-3.cm2.aarch64.rpm
 slang-2.3.2-4.cm2.aarch64.rpm
 slang-debuginfo-2.3.2-4.cm2.aarch64.rpm
 slang-devel-2.3.2-4.cm2.aarch64.rpm
-sqlite-3.39.2-4.cm2.aarch64.rpm
-sqlite-debuginfo-3.39.2-4.cm2.aarch64.rpm
-sqlite-devel-3.39.2-4.cm2.aarch64.rpm
-sqlite-libs-3.39.2-4.cm2.aarch64.rpm
+sqlite-3.39.2-5.cm2.aarch64.rpm
+sqlite-debuginfo-3.39.2-5.cm2.aarch64.rpm
+sqlite-devel-3.39.2-5.cm2.aarch64.rpm
+sqlite-libs-3.39.2-5.cm2.aarch64.rpm
 swig-4.0.2-3.cm2.aarch64.rpm
 swig-debuginfo-4.0.2-3.cm2.aarch64.rpm
 systemd-bootstrap-250.3-14.cm2.aarch64.rpm

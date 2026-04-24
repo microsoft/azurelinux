@@ -10,7 +10,7 @@
 Summary:        Domain Name System software
 Name:           bind
 Version:        9.16.50
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -40,6 +40,7 @@ Patch14:        CVE-2024-11187.patch
 Patch15:        CVE-2025-8677.patch
 Patch16:        CVE-2025-40778.patch
 Patch17:        CVE-2025-40780.patch
+Patch18:        CVE-2026-1519.patch
 
 BuildRequires:  gcc
 BuildRequires:  json-c-devel
@@ -621,6 +622,9 @@ fi;
 %{_mandir}/man8/named-nzd2nzf.8*
 
 %changelog
+* Thu Apr 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 9.16.50-4
+- Patch for CVE-2026-1519
+
 * Tue Oct 28 2025 Akhila Guruju <v-guakhila@microsoft.com> - 9.16.50-3
 - Patch CVE-2025-8677, CVE-2025-40778 & CVE-2025-40780
 
