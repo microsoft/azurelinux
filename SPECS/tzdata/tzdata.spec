@@ -1,7 +1,7 @@
 Summary:        Time zone data
 Name:           tzdata
-Version:        2025c
-Release:        2%{?dist}
+Version:        2026b
+Release:        1%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -49,6 +49,9 @@ install -vpDm 644 tzdata.zi %{buildroot}%{_datadir}/zoneinfo/tzdata.zi
 %{_datadir}/*
 
 %changelog
+* Fri Apr 24 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2026b-1
+- Auto-upgrade to 2026b - upgrade to version 2026b
+
 * Tue Jan 06 2026 Madhur Aggarwal <madaggarwal@microsoft.com> - 2025c-2
 - Added Source1 tzcode, which is required to build tzdata.zi 
 - Packaged tzdata.zi file in /usr/share/zoneinfo
