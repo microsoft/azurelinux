@@ -143,7 +143,7 @@ stages:
 
               # Check for any new or modified files under the specs directory.
               # TODO: Remove and replace this script with the one coming from PR #16674.
-              $ ADO task: 19186
+              # ADO task: 19186
               if ! python3 .github/workflows/scripts/check_rendered_specs.py --specs-dir "$specs_dir"; then
                 echo "##[group]Git diff"
                 git --no-pager diff -- "$specs_dir"
