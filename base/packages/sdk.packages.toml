@@ -1735,8 +1735,6 @@ packages = [
     "miniz",
     "mjpegtools-devel",
     "mjpegtools-libs",
-    "mobile-broadband-provider-info",
-    "mobile-broadband-provider-info-devel",
     "mojo-executor",
     "mold",
     "mongo-c-driver",
