@@ -1,7 +1,7 @@
 Summary:        Bourne-Again SHell
 Name:           bash
 Version:        5.2.15
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -75,6 +75,7 @@ if [ -f "%{_sysconfdir}/dircolors" ] ; then
         fi
 fi
 alias ls='ls --color=auto'
+alias ll='ls -la --color=auto'
 grep --help | grep color  >/dev/null 2>&1
 if [ $? -eq 0 ]; then
   alias grep='grep --color=auto'
@@ -334,6 +335,9 @@ fi
 %defattr(-,root,root)
 
 %changelog
+* Wed Apr 22 2026 Wojciech Panfil <wojciech.panfil@intel.com> - 5.2.15-4
+- Add ll alias.
+
 * Fri Aug 16 2024 Andrew Phelps <anphel@microsoft.com> - 5.2.15-3
 - Fix check tests
 
