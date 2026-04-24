@@ -8,7 +8,7 @@ Release:        2%{?dist}
 License:        BSD-1-Clause AND BSD-2-Clause AND BSD-3-Clause AND MIT AND GPL-2.0-or-later AND LGPL-2.0-or-later AND Zlib AND ISC AND (BSD-3-Clause OR GPL-2.0-only) AND (GPL-2.0-or-later AND Zlib)
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:        https://wireshark.org/download/src/%{name}-%{version}.tar.xz
+Source0:        https://wireshark.org/download/src/all-versions/%{name}-%{version}.tar.xz
 Source2:        90-wireshark-usbmon.rules
 Source3:        wireshark.sysusers
 Patch1:         wireshark-01-pkgconfig.patch
