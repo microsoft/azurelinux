@@ -2,12 +2,14 @@
 
 Authoritative technical documentation for ProtagonistOS lives in this repository, on the `sandbox` branch unless otherwise noted.
 
-Google Drive documents are convenience copies, planning notes, review drafts, or human-readable summaries. If GitHub and Google Drive disagree, the GitHub version wins.
+Google Drive is a secondary archive/reference layer. GitHub Issues are the active workflow surface. Google Calendar is the time-planning surface. If GitHub and Google Drive disagree, the GitHub version wins.
 
 ## Documentation Rules
 
 - Write technical documentation in Markdown inside this repository first.
-- Use Google Drive for readable summaries, planning notes, review copies, and shareable documents.
+- Use GitHub Issues for active tasks, blockers, acceptance criteria, and follow-up work.
+- Use Google Calendar for focus blocks, build windows, review sessions, and scheduled testing.
+- Use Google Drive for archived notes, readable summaries, review copies, and historical context.
 - Mark all Drive copies as non-authoritative unless they are later promoted back into this repository.
 - Keep stale experiments in `docs/archive/` rather than deleting useful history.
 - Every document should answer at least one concrete question:
@@ -23,32 +25,26 @@ Use this section for documents that describe the current technical reality of Pr
 
 - [Azure Linux baseline](current-state/azure-linux-baseline.md)
 - [Desktop performance reality](current-state/desktop-performance-reality.md)
-- [Packaging and build system](current-state/packaging-and-build-system.md)
-- [Installer and ISO path](current-state/installer-and-iso-path.md)
+- [Environment setup](current-state/environment-setup.md)
 
 ## Decisions
 
 Use this section for Architecture Decision Records and other durable project decisions.
 
-- [ADR-0001: Documentation source of truth](decisions/ADR-0001-documentation-source-of-truth.md)
-- [ADR-0002: Base system selection](decisions/ADR-0002-base-system-selection.md)
-- [ADR-0003: Desktop environment](decisions/ADR-0003-desktop-environment.md)
-- [ADR-0004: Build strategy](decisions/ADR-0004-build-strategy.md)
+- [ADR-0001: Project workflow and source of truth](decisions/ADR-0001-project-workflow-source-of-truth.md)
 
 ## Investigations
 
 Use this section for research notes, technical evaluations, unresolved questions, and exploratory reports.
 
 - [Azure Linux desktop gaps](investigations/azure-linux-desktop-gaps.md)
-- [KDE on Azure Linux](investigations/kde-on-azure-linux.md)
-- [RPM repository strategy](investigations/rpm-repository-strategy.md)
+- [Personal human-AI workflow surface](investigations/personal-ai-workflow-surface.md)
 
 ## Reports
 
 Use this section for synthesized project reports and state-of-the-project summaries.
 
 - [ProtagonistOS technical status](reports/protagonistos-technical-status.md)
-- [Path to minimal ISO](reports/path-to-minimal-iso.md)
 
 ## Archive
 
@@ -56,7 +52,7 @@ Use `docs/archive/` for stale or superseded work that is worth preserving but sh
 
 ## Google Drive Synchronization Policy
 
-The repository is the source of truth. Google Drive is a convenience layer.
+The repository is the source of truth. Google Drive is an archive/reference layer.
 
 When a Google Doc is created from a repository document, include this header at the top of the Google Doc:
 
