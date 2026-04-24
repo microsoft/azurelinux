@@ -214,7 +214,7 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 
 %changelog
 * Thu Apr 23 2026 Ihar Voitka <ihvoitka@microsoft.com> - 3.14.4-1
-- Original version for Azure Linux.
+- Initial Azure Linux import from the source project (license: same as "License" tag).
 - License verified.
 - Side-by-side with the default python3 (3.12). Ships only versioned paths
   (/usr/bin/python3.14, /usr/lib/python3.14/, libpython3.14.so.1.0).
