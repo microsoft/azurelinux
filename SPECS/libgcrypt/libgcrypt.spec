@@ -1,13 +1,14 @@
 Summary:        GNU Crypto Libraries
 Name:           libgcrypt
 Version:        1.10.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+ and LGPLv2+ and BSD and MIT and Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://gnupg.org/related_software/libgcrypt/
 Source0:        https://gnupg.org/ftp/gcrypt/%{name}/%{name}-%{version}.tar.bz2
+Patch0:         CVE-2026-41989.patch
 BuildRequires:  libgpg-error-devel
 Requires:       libgpg-error
 
@@ -59,6 +60,9 @@ rm -rf %{buildroot}%{_infodir}
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Fri Apr 24 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.10.3-2
+- Patch for CVE-2026-41989
+
 * Tue Jul 15 2025 Andrew Phelps <anphel@microsoft.com> - 1.10.3-1
 - Upgrade to 1.10.3
 
