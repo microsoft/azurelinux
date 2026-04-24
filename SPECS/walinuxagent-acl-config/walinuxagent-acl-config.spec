@@ -1,6 +1,6 @@
 Summary:        ACL-specific configuration overlay for WALinuxAgent
 Name:           walinuxagent-acl-config
-Version:        1.0.0
+Version:        1.0.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -9,6 +9,9 @@ Group:          System/Configuration
 URL:            https://github.com/microsoft/azurelinux
 
 Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz
+Source1:        waagent.conf
+Source2:        waagent.service
+Source3:        10-waagent-sysext.conf
 
 BuildRequires:  systemd-rpm-macros
 Requires:       WALinuxAgent
@@ -22,20 +25,15 @@ ACL-specific settings:
 - multi-user.target drop-in to pull waagent.service on sysext boot
 
 %prep
-%setup -q -c
+# Nothing to prep — config files are shipped as local sources.
 
 %build
 # Nothing to build.
 
 %install
-# Stage waagent.conf and waagent.service -> copied to final locations by
-# %%posttrans to avoid file conflicts with the base WALinuxAgent package.
-install -Dm 644 waagent.conf %{buildroot}%{_datadir}/walinuxagent-acl-config/waagent.conf
-install -Dm 644 waagent.service %{buildroot}%{_datadir}/walinuxagent-acl-config/waagent.service
-
-# Install drop-in to /etc/systemd/system so it takes precedence over
-# WALinuxAgent's /usr/lib/systemd/system copies.
-install -Dm 644 10-waagent-sysext.conf %{buildroot}%{_sysconfdir}/systemd/system/multi-user.target.d/10-waagent-sysext.conf
+install -Dm 644 %{SOURCE1} %{buildroot}%{_datadir}/walinuxagent-acl-config/waagent.conf
+install -Dm 644 %{SOURCE2} %{buildroot}%{_datadir}/walinuxagent-acl-config/waagent.service
+install -Dm 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/systemd/system/multi-user.target.d/10-waagent-sysext.conf
 
 %posttrans
 cp %{_datadir}/walinuxagent-acl-config/waagent.conf %{_sysconfdir}/waagent.conf
@@ -48,7 +46,7 @@ systemctl daemon-reload 2>/dev/null || :
 %{_sysconfdir}/systemd/system/multi-user.target.d/10-waagent-sysext.conf
 
 %changelog
-* Thu Apr 23 2026 Mayank Singh <mayansingh@microsoft.com> - 1.0.0-1
+* Thu Apr 23 2026 Mayank Singh <mayansingh@microsoft.com> - 1.0.1-1
 - Initial package: ACL-specific WALinuxAgent config overlay
 - waagent.conf with ACL provisioning defaults
 - waagent.service ordered after systemd-sysext.service
