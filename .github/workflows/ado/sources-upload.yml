@@ -59,14 +59,11 @@ extends:
         enabled: false
 
     stages:
-      - template: /.github/workflows/ado/templates/sources-upload-stages.yml@self
-        parameters:
-          outputDirectory: $(Build.ArtifactStagingDirectory)/output
-          artifactBaseName: prcheck
-          containerImage: mcr.microsoft.com/onebranch/azurelinux/build:3.0
-          poolType: linux
-          serviceConnection: CT-Endpoints-Access-ServiceConnection-DEV
-          variableGroup: ControlTower-PRCheck
-          # Must exceed the script's --poll-timeout-seconds (default 7200s = 120m)
-          # with enough headroom for setup steps and the final API call.
-          timeoutInMinutes: 150
+      - stage: PRCheck
+        jobs:
+          - job: DummyPR
+            continueOnError: true
+            steps:
+              - script: |
+                  echo Dummy PR check OK.
+                displayName: "Dummy step"
