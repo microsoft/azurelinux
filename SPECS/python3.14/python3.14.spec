@@ -16,10 +16,6 @@ Source0:        https://www.python.org/ftp/python/%{version}/Python-%{version}.t
 # pathfix.py was provided by the previous Python source bundle (Python-3.9.14.tar.xz)
 # It has been removed in later source bundles, but as our packages still require it, we will still provide for now.
 Source1:        https://github.com/python/cpython/blob/3.9/Tools/scripts/pathfix.py
-Patch0:         CVE-2026-0672.patch
-Patch1:         CVE-2026-0865.patch
-Patch2:         CVE-2026-1299.patch
-Patch3:         CVE-2026-4519.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -218,9 +214,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 - License verified.
 - Side-by-side with the default python3 (3.12). Ships only versioned paths
   (/usr/bin/python3.14, /usr/lib/python3.14/, libpython3.14.so.1.0).
-- Carries post-3.14.4 CVE patches CVE-2026-0672, CVE-2026-0865, CVE-2026-1299,
-  CVE-2026-4519. All prior CVE-2025-* patches on python3-3.12 are upstream in
-  3.14.4; cgi3.patch is dropped because the cgi module was removed in 3.13
-  (PEP 594).
+- No CVE patches carried. All CVE patches on python3-3.12 (CVE-2025-4516,
+  -4517, -6069, -6075, -8194, -8291, -11468, -12084, -13836, -13837,
+  CVE-2026-0672, -0865, -1299, -4519) are present upstream in 3.14.4;
+  cgi3.patch is dropped because the cgi module was removed in 3.13 (PEP 594).
 - Drops the lib2to3-based tools subpackage since lib2to3 and /usr/bin/2to3
   were removed in Python 3.13.
