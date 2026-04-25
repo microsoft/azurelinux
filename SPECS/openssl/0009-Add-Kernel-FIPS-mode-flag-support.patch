@@ -9,7 +9,7 @@ Subject: [PATCH] Add Kernel FIPS mode flag support
  2 files changed, 39 insertions(+)
 
 diff --git a/crypto/context.c b/crypto/context.c
-index a1ae0f6..5cb04ba 100644
+index 33d52a9..a9694e7 100644
 --- a/crypto/context.c
 +++ b/crypto/context.c
 @@ -17,6 +17,41 @@
@@ -54,7 +54,7 @@ index a1ae0f6..5cb04ba 100644
  struct ossl_lib_ctx_st {
      CRYPTO_RWLOCK *lock, *rand_crngt_lock;
      OSSL_EX_DATA_GLOBAL global;
-@@ -379,6 +414,7 @@ static int default_context_inited = 0;
+@@ -368,6 +403,7 @@ static int default_context_inited = 0;
  
  DEFINE_RUN_ONCE_STATIC(default_context_do_init)
  {
@@ -63,19 +63,19 @@ index a1ae0f6..5cb04ba 100644
          goto err;
  
 diff --git a/include/internal/provider.h b/include/internal/provider.h
-index fa97640..aff882e 100644
+index ab41d64..efb12ae 100644
 --- a/include/internal/provider.h
 +++ b/include/internal/provider.h
 @@ -112,6 +112,9 @@ int ossl_provider_init_as_child(OSSL_LIB_CTX *ctx,
-     const OSSL_DISPATCH *in);
+                                 const OSSL_DISPATCH *in);
  void ossl_provider_deinit_child(OSSL_LIB_CTX *ctx);
  
 +/* FIPS flag access */
 +int ossl_get_kernel_fips_flag(void);
 +
- #ifdef __cplusplus
+ # ifdef __cplusplus
  }
- #endif
+ # endif
 -- 
-2.45.4
+2.33.8
 
