@@ -1,0 +1,182 @@
+.TH GNULIB\-TOOL 1 "2006-06-01" "0.0.20060601" "GNU Portability Library"
+
+.SH NAME
+gnulib\-tool \- program for authors or maintainers which want to import modules
+from gnulib into their packages.
+
+.SH SYNOPSIS
+.B gnulib\-tool
+\-\-list
+.PP
+.B gnulib\-tool
+\-\-import [module1 ... moduleN]
+.PP
+.B gnulib\-tool
+\-\-update
+.PP
+.B gnulib\-tool
+\-\-create-testdir \-\-dir=directory module1 ... moduleN
+.PP
+.B gnulib\-tool
+\-\-create-megatestdir \-\-dir=directory [module1 ... moduleN]
+.PP
+.B gnulib\-tool
+\-\-test \-\-dir=directory module1 ... moduleN
+.PP
+.B gnulib\-tool
+\-\-megatest \-\-dir=directory [module1 ... moduleN]
+.PP
+.B gnulib\-tool
+\-\-extract-description module
+.PP
+.B gnulib\-tool
+\-\-extract-filelist module
+.PP
+.B gnulib\-tool
+\-\-extract-dependencies module
+.PP
+.B gnulib\-tool
+\-\-extract-autoconf-snippet module
+.PP
+.B gnulib\-tool
+\-\-extract-automake-snippet module
+.PP
+.B gnulib\-tool
+\-\-extract-include-directive module
+.PP
+.B gnulib\-tool
+\-\-extract-license module
+.PP
+.B gnulib\-tool
+\-\-extract-maintainer module
+.PP
+.B gnulib\-tool
+\-\-extract-tests-module module
+
+.SH DESCRIPTION
+The GNU portability library is a macro system and C declarations and definitions
+for commonly-used API elements and abstracted system behaviors. It can be used
+to improve portability and other functionality in your programs.
+.PP
+
+.SH OPTIONS
+Operation modes:
+.TP
+.B \-\-list
+print the available module names.
+.TP
+.B \-\-import
+import the given modules into the current package; if no modules are specified,
+update the current package from the current gnulib.
+.TP
+.B \-\-update
+update the current package, restore files omitted from CVS.
+.TP
+.B \-\-create-testdir
+create a scratch package with the given modules.
+.TP
+.B \-\-create-megatestdir
+create a mega scratch package with the given modules one by one and all
+together.
+.TP
+.B \-\-test
+test the combination of the given modules (recommended to use CC="gcc \-Wall"
+here).
+.TP
+.B \-\-megatest
+test the given modules one by one and all together (recommended to use CC="gcc
+\-Wall" here).
+.TP
+.B \-\-extract-description
+extract the description.
+.TP
+.B \-\-extract-filelist
+extract the list of files.
+.TP
+.B \-\-extract-dependencies
+extract the dependencies.
+.TP
+.B \-\-extract-autoconf-snippet
+extract the snippet for configure.ac.
+.TP
+.B \-\-extract-automake-snippet
+extract the snippet for lib/Makefile.am.
+.TP
+.B \-\-extract-include-directive
+extract the #include directive.
+.TP
+.B \-\-extract-license
+report the license terms of the source files under lib/.
+.TP
+.B \-\-extract-maintainer
+report the maintainer(s) inside gnulib.
+.TP
+.B \-\-extract-tests-module
+report the unit test module, if it exists.
+.PP
+
+Options:
+.TP
+.B \-\-dir=DIRECTORY
+specify the target directory. For \-\-import, this specifies where your
+configure.ac can be found. Defaults to current directory.
+.TP
+.B \-\-lib=LIBRARY
+Specify the library name. Defaults to 'libgnu'.
+.TP
+.B \-\-source-base=DIRECTORY
+Directory relative \-\-dir where source code is placed (default "lib"), for
+\-\-import.
+.TP
+.B \-\-m4-base=DIRECTORY
+Directory relative \-\-dir where *.m4 macros are placed (default "m4"), for
+\-\-import.
+.TP
+.B \-\-tests-base=DIRECTORY
+Directory relative \-\-dir where unit tests are placed (default "tests"), for
+\-\-import.
+.TP
+.B \-\-aux-dir=DIRECTORY
+Directory relative \-\-dir where auxiliary build tools are placed (default
+"build-aux").
+.TP
+.B \-\-with-tests
+Include unit tests for the included modules.
+.TP
+.B \-\-avoid=MODULE
+Avoid including the given MODULE. Useful if you have code that provides
+equivalent functionality. This option can be repeated.
+.TP
+.B \-\-lgpl
+Abort if modules aren't available under the LGPL. Also modify license template
+from GPL to LGPL.
+.TP
+.B \-\-libtool
+Use libtool rules, for \-\-import.
+.TP
+.B \-\-macro-prefix=PREFIX
+Specify the prefix of the macros 'gl_EARLY' and 'gl_INIT'. Default is 'gl'.
+.TP
+.B \-\-no-changelog
+don't update or create ChangeLog files.
+.TP
+.B \-\-dry-run
+For \-\-import, only print what would have been done.
+.TP
+.B -s, \-\-symbolic, \-\-symlink
+Make symbolic links instead of copying files.
+.PP
+.TP
+.B \-h, \-\-help
+Show summary of options.
+
+.SH BUGS
+Report bugs to <bug-gnulib@gnu.org>.
+
+.SH SEE ALSO
+.BR check-module (1).
+
+.SH AUTHOR
+gnulib was written by the Free Software Foundation and others (sources of various origins).
+.PP
+This manual page was written by Daniel Baumann <daniel@debian.org>, for the Debian project (but may be used by others).
