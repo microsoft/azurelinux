@@ -20,6 +20,7 @@ Patch0:	multi-snapshotters-support.patch
 Patch1:	tardev-support.patch
 Patch2:	fix-credential-leak-in-cri-errors.patch
 Patch3: CVE-2026-35469.patch
+Patch4: CVE-2026-34986.patch
 
 %{?systemd_requires}
 
@@ -98,6 +99,7 @@ fi
 %changelog
 * Thu Apr 24 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 2.1.6-2
 - Modify CVE-2026-35469 patch for 2.1.6
+- Patch for CVE-2026-34986
 
 * Fri Apr 17 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 2.1.6-1
 - Upgrade to 2.1.6
