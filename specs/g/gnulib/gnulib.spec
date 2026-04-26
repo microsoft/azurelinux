@@ -56,8 +56,8 @@ Summary:  GNU Portability Library
 License:  Public Domain and BSD and GPLv2+ and GPLv3 and GPLv3+ and LGPLv2 and LGPLv2+ and LGPLv3+
 URL:      https://www.gnu.org/software/gnulib
 Source0:  https://git.savannah.gnu.org/gitweb/?p=gnulib.git;a=snapshot;h=%{githead};sf=tgz;name=gnulib-%{githead}.tar.gz#/gnulib-%{githead}.tar.gz
-Source1:  https://erislabs.net/gitweb/?p=gnulib.git;a=blob_plain;hb=HEAD;f=debian/manpages/check-module.1
-Source2:  https://erislabs.net/gitweb/?p=gnulib.git;a=blob_plain;hb=HEAD;f=debian/manpages/gnulib-tool.1
+Source1: https://erislabs.net/gitweb/?p=gnulib.git;a=blob_plain;hb=HEAD;f=debian/manpages/check-module.1#/check-module.1
+Source2: https://erislabs.net/gitweb/?p=gnulib.git;a=blob_plain;hb=HEAD;f=debian/manpages/gnulib-tool.1#/gnulib-tool.1
 
 #Patch0:   test-u8-strstr-alarm.diff
 

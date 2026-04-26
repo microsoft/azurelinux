@@ -1,0 +1,20 @@
+[components.gnulib]
+# These overlays are only needed until the snapshot advances past the Fedora f43
+# commit that updated Source URLs from erislabs.net to salsa.debian.org:
+# https://src.fedoraproject.org/rpms/gnulib/c/41cae067
+# ("Update to git4a3650d branch stable-202601").
+# The old gitweb query-string URLs can't be parsed by the rendered spec
+# filter, causing check-module.1 and gnulib-tool.1 to be dropped.
+# Adding #/filename hints lets the filter extract the correct basename.
+
+[[components.gnulib.overlays]]
+description = "Temporary: append #/filename hint to Source1 so rendered spec filter can match check-module.1. Remove when snapshot includes f43 commit 41cae067."
+type = "spec-update-tag"
+tag = "Source1"
+value = "https://erislabs.net/gitweb/?p=gnulib.git;a=blob_plain;hb=HEAD;f=debian/manpages/check-module.1#/check-module.1"
+
+[[components.gnulib.overlays]]
+description = "Temporary: append #/filename hint to Source2 so rendered spec filter can match gnulib-tool.1. Remove when snapshot includes f43 commit 41cae067."
+type = "spec-update-tag"
+tag = "Source2"
+value = "https://erislabs.net/gitweb/?p=gnulib.git;a=blob_plain;hb=HEAD;f=debian/manpages/gnulib-tool.1#/gnulib-tool.1"
