@@ -163,8 +163,8 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/gdlib.pc
 
 %changelog
-* Mon Apr 27 2026 Akarsh Chaudhary <v-akarshc@microsoft.com>- 2.3.3-5
-Fixed %check by setting test library paths and marking unstable TIFF tests as XFAIL.
+* Mon Apr 27 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 2.3.3-5
+- Fixed %check by setting test library paths and marking unstable TIFF tests as XFAIL.
 
 * Wed May 17 2023 Olivia Crain <oliviacrain@microsoft.com> - 2.3.3-4
 - Bumping release to re-build with newer 'libtiff' libraries.
