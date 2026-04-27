@@ -10,7 +10,7 @@
 Summary:        Azure Linux package repositories
 Name:           azurelinux-repos
 Version:        4.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -273,6 +273,9 @@ rm -f "$TMPRING"
 
 
 %changelog
+* Mon Apr 27 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-7
+- Update repo definitions for next phase of releases.
+
 * Tue Apr 21 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-6
 - Consolidate repo templates: azurelinux-unified.repo.in and azurelinux-split.repo.in.
 - Add split_repos bcond to select between unified and split URL layouts.
