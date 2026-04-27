@@ -58,7 +58,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://www.mesa3d.org
 
-Source0:        https://mesa.freedesktop.org/archive/%{name}-%{version}.tar.xz
+Source0:        https://archive.mesa3d.org/older-versions/21.x/%{name}-%{version}.tar.xz
+#Since mesa is very old version these versions are archived hence updating link
 # src/gallium/auxiliary/postprocess/pp_mlaa* have an ... interestingly worded license.
 # Source1 contains email correspondence clarifying the license terms.
 # Fedora opts to ignore the optional part of clause 2 and treat that code as 2 clause BSD.
