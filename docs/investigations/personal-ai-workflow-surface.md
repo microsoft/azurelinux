@@ -2,8 +2,8 @@
 title: Personal Human-AI Workflow Surface
 status: exploratory
 source_of_truth: github
-branch: sandbox
-last_reviewed: 2026-04-24
+branch: dev
+last_reviewed: 2026-04-27
 drive_copy: https://docs.google.com/document/d/1jLs8O3OKgs8GWyw2sR1TvIf-Q3el_kGZcQSuUAn9MZg
 source_inputs:
   - Google Drive: Personal Task Manager for Human-AI Workflows - Conversation Summary
@@ -110,4 +110,3 @@ First, stabilize the project workflow using existing tools:
 5. Codex for execution and reconciliation.
 
 After that workflow proves itself, revisit whether a native ProtagonistOS personal operations surface belongs on the roadmap.
-

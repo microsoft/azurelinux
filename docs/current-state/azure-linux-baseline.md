@@ -2,8 +2,8 @@
 title: Azure Linux Baseline
 status: active
 source_of_truth: github
-branch: sandbox
-last_reviewed: 2026-04-24
+branch: dev
+last_reviewed: 2026-04-27
 drive_copy: none
 source_inputs:
   - AGENTS.md

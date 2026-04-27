@@ -2,8 +2,8 @@
 title: "ADR-0001: Project Workflow and Source of Truth"
 status: active
 source_of_truth: github
-branch: sandbox
-last_reviewed: 2026-04-24
+branch: dev
+last_reviewed: 2026-04-27
 drive_copy: none
 source_inputs:
   - docs/README.md
@@ -83,4 +83,3 @@ Drive documents that are historical, exploratory, or stale may remain in Drive, 
 This keeps ProtagonistOS from becoming split across chat, Drive, and local memory.
 
 The repository becomes the durable project brain. GitHub Issues become the operating board. Calendar becomes the time budget. Drive becomes the attic: useful, searchable, but not where active truth lives.
-

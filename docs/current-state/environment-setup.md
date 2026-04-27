@@ -2,8 +2,8 @@
 title: Environment Setup
 status: active
 source_of_truth: github
-branch: sandbox
-last_reviewed: 2026-04-24
+branch: dev
+last_reviewed: 2026-04-27
 drive_copy: none
 source_inputs:
   - Google Drive: parallels-config-checklist.md
@@ -97,4 +97,3 @@ For ProtagonistOS, the practical rule is:
 - Will the initial build host be bare metal, a Linux VM, or a remote machine?
 - What filesystem and disk capacity should be required for repeatable image builds?
 - Which physical Intel and AMD machines define the first hardware validation targets?
-

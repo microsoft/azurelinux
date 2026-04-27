@@ -2,8 +2,8 @@
 title: ProtagonistOS Technical Status
 status: active
 source_of_truth: github
-branch: sandbox
-last_reviewed: 2026-04-24
+branch: dev
+last_reviewed: 2026-04-27
 drive_copy: none
 source_inputs:
   - AGENTS.md
@@ -13,6 +13,7 @@ source_inputs:
   - docs/investigations/azure-linux-desktop-gaps.md
   - docs/current-state/environment-setup.md
   - docs/decisions/ADR-0001-project-workflow-source-of-truth.md
+  - docs/decisions/ADR-0002-branching-upstream-sync-and-access-policy.md
 ---
 
 # ProtagonistOS Technical Status
@@ -28,6 +29,8 @@ No ProtagonistOS desktop package layer is complete yet. The repository is curren
 The Git repository is authoritative.
 
 Google Drive is archive/reference. GitHub Issues should become the active task board. Google Calendar should become the time-planning surface.
+
+The active ProtagonistOS integration branch is `dev`. Stable project state lives on `main`. The `3.0` branch is reserved as a pristine Azure Linux upstream mirror. The previous `sandbox` branch is legacy and should not receive new project work.
 
 ## Current Technical Direction
 
@@ -81,6 +84,7 @@ Active investigation docs:
 Active workflow decision:
 
 - `docs/decisions/ADR-0001-project-workflow-source-of-truth.md`
+- `docs/decisions/ADR-0002-branching-upstream-sync-and-access-policy.md`
 
 Legacy detailed reports still present:
 
@@ -109,4 +113,3 @@ Create GitHub Issues for:
 - first graphical target: COSMIC, KDE, or minimal Wayland compositor
 - first image artifact: command-line ISO, graphical ISO, or staged package build
 - SELinux enforcement strategy for early graphical builds
-

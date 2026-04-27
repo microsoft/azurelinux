@@ -25,6 +25,12 @@ Use the project surfaces this way:
 
 If Google Drive and the repository disagree, the repository wins. Drive-originated technical material must be promoted into Markdown in this repository before it is treated as current truth.
 
+## Branch Model
+
+Use `origin/3.0` as a pristine Azure Linux 3.0 mirror with no ProtagonistOS commits. Use `origin/main` for stable ProtagonistOS state and `origin/dev` for active integration work. Create Codex-authored task branches as `codex/<task>` from `dev`, human-authored task branches as `feature/<task>` from `dev`, upstream synchronization branches as `sync/upstream-3.0-YYYY-MM-DD`, and upstream contribution branches as `upstream-contrib/<topic>` from `upstream/3.0` or a pristine local `3.0`.
+
+The old `sandbox` branch is legacy. Do not start new work there.
+
 ## Architecture
 
 ```
@@ -62,6 +68,7 @@ Current state:
 
 Decisions:
 - [ADR-0001: Project workflow and source of truth](docs/decisions/ADR-0001-project-workflow-source-of-truth.md)
+- [ADR-0002: Branching, upstream sync, contribution, and access policy](docs/decisions/ADR-0002-branching-upstream-sync-and-access-policy.md)
 
 Investigations:
 - [Azure Linux desktop gaps](docs/investigations/azure-linux-desktop-gaps.md)

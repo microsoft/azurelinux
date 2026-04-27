@@ -1,6 +1,6 @@
 # ProtagonistOS Documentation Index
 
-Authoritative technical documentation for ProtagonistOS lives in this repository, on the `sandbox` branch unless otherwise noted.
+Authoritative technical documentation for ProtagonistOS lives in this repository. The active integration branch is `dev`; stable project state lives on `main`; the `3.0` branch is reserved as a pristine Azure Linux upstream mirror.
 
 Google Drive is a secondary archive/reference layer. GitHub Issues are the active workflow surface. Google Calendar is the time-planning surface. If GitHub and Google Drive disagree, the GitHub version wins.
 
@@ -12,6 +12,7 @@ Google Drive is a secondary archive/reference layer. GitHub Issues are the activ
 - Use Google Drive for archived notes, readable summaries, review copies, and historical context.
 - Mark all Drive copies as non-authoritative unless they are later promoted back into this repository.
 - Keep stale experiments in `docs/archive/` rather than deleting useful history.
+- Follow the branch and upstream synchronization rules in [ADR-0002](decisions/ADR-0002-branching-upstream-sync-and-access-policy.md).
 - Every document should answer at least one concrete question:
   - What is currently true?
   - What did we decide?
@@ -32,6 +33,7 @@ Use this section for documents that describe the current technical reality of Pr
 Use this section for Architecture Decision Records and other durable project decisions.
 
 - [ADR-0001: Project workflow and source of truth](decisions/ADR-0001-project-workflow-source-of-truth.md)
+- [ADR-0002: Branching, upstream sync, contribution, and access policy](decisions/ADR-0002-branching-upstream-sync-and-access-policy.md)
 
 ## Investigations
 
@@ -60,7 +62,7 @@ When a Google Doc is created from a repository document, include this header at 
 Status: Convenience copy
 Source of truth: GitHub
 Repo: jajunk/azurelinux-protagonist
-Branch: sandbox
+Branch: dev
 Path: docs/<path-to-source-file>.md
 Exported: YYYY-MM-DD
 
@@ -78,7 +80,7 @@ Use this front matter for major technical documents:
 title: Document Title
 status: active
 source_of_truth: github
-branch: sandbox
+branch: dev
 last_reviewed: YYYY-MM-DD
 drive_copy: none
 ---
