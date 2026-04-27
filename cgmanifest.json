@@ -1277,8 +1277,8 @@
         "type": "other",
         "other": {
           "name": "breezy",
-          "version": "3.0.2",
-          "downloadUrl": "https://launchpad.net/brz/3.0/3.0.2/+download/breezy-3.0.2.tar.gz"
+          "version": "3.3.17",
+          "downloadUrl": "https://github.com/breezy-team/breezy/archive/brz-3.3.17.tar.gz"
         }
       }
     },
@@ -1399,6 +1399,26 @@
           "name": "c-ares",
           "version": "1.30.0",
           "downloadUrl": "https://github.com/c-ares/c-ares/releases/download/v1.30.0/c-ares-1.30.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "cargo-rpm-macros",
+          "version": "28.4",
+          "downloadUrl": "https://codeberg.org/rust2rpm/cargo-rpm-macros/archive/v28.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "cargo2rpm",
+          "version": "0.3.2",
+          "downloadUrl": "https://codeberg.org/rust2rpm/cargo2rpm/archive/v0.3.2.tar.gz"
         }
       }
     },
@@ -22922,6 +22942,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-fastbencode",
+          "version": "0.3.2",
+          "downloadUrl": "https://github.com/breezy-team/fastbencode/archive/v0.3.2/fastbencode-0.3.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-fasteners",
           "version": "0.18",
           "downloadUrl": "https://github.com/harlowja/fasteners/archive/0.18/fasteners-0.18.tar.gz"
@@ -24082,6 +24112,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-patiencediff",
+          "version": "0.2.15",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/patiencediff/patiencediff-0.2.15.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-pathspec",
           "version": "0.12.1",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pathspec/pathspec-0.12.1.tar.gz"
@@ -24905,6 +24945,26 @@
           "name": "python-setuptools",
           "version": "69.0.3",
           "downloadUrl": "https://pypi.org/packages/source/s/setuptools/setuptools-69.0.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-setuptools-gettext",
+          "version": "0.1.14",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/s/setuptools_gettext/setuptools_gettext-0.1.14.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-setuptools-rust",
+          "version": "1.11.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/s/setuptools_rust/setuptools_rust-1.11.1.tar.gz"
         }
       }
     },
