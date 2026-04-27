@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-model
+    href="https://raw.githubusercontent.com/OSInside/kiwi/refs/tags/v10.2.33/kiwi/schema/kiwi.rng"
+    type="application/xml"?>
+<image schemaversion="8.3" name="azl4-iso-installer">
+    <description type="system">
+        <author>Azure Linux</author>
+        <contact>azurelinux@microsoft.com</contact>
+        <specification>Azure Linux 4.0 ISO Installer</specification>
+    </description>
+    <preferences>
+        <version>0.1</version>
+        <packagemanager>dnf5</packagemanager>
+        <locale>en_US</locale>
+        <keytable>us</keytable>
+        <timezone>UTC</timezone>
+        <release-version>4.0</release-version>
+        <type
+            image="iso"
+            flags="dmsquash"
+            filesystem="ext4"
+            kernelcmdline="console=ttyS0,115200 console=tty0 enforcing=0 audit=0 inst.text inst.lang=en_US.UTF-8 inst.nokill"
+            firmware="uefi"
+            hybridpersistent="false"
+            mediacheck="true">
+            <bootloader name="grub2" timeout="5" grub_template="grub_template.cfg" />
+        </type>
+    </preferences>
+
+    <!-- Both arch repos are listed; dnf5 only installs packages for the build arch -->
+    <repository type="rpm-md" alias="azl4-alpha2-x86_64">
+        <source
+            path="https://stcontroltowerdevjwisitg.blob.core.windows.net/alpha2-prod/base/x86_64/" />
+    </repository>
+    <repository type="rpm-md" alias="azl4-alpha2-aarch64">
+        <source
+            path="https://stcontroltowerdevjwisitg.blob.core.windows.net/alpha2-prod/base/aarch64/" />
+    </repository>
+
+    <packages type="image">
+        <!-- Core group -->
+        <package name="azurelinux-release" />
+        <package name="azurelinux-rpm-config" />
+        <package name="azurelinux-repos" />
+        <package name="bash" />
+        <package name="ca-certificates" />
+        <package name="coreutils-single" />
+
+        <!-- Minimal system -->
+        <package name="chkconfig" />
+        <package name="cracklib-dicts" />
+        <package name="cryptsetup" />
+        <package name="dnf5" />
+        <package name="dosfstools" />
+        <package name="file" />
+        <package name="glibc" />
+        <package name="glibc-langpack-en" />
+        <package name="grub2" />
+        <package name="grub2-efi-x64" arch="x86_64" />
+        <package name="grub2-efi-x64-modules" arch="x86_64" />
+        <package name="grub2-efi-aa64" arch="aarch64" />
+        <package name="grub2-efi-aa64-modules" arch="aarch64" />
+        <package name="gzip" />
+        <package name="hostname" />
+        <package name="iproute" />
+        <package name="kernel" />
+        <package name="kernel-modules" />
+        <package name="lvm2" />
+        <package name="openssl" />
+        <package name="parted" />
+        <package name="selinux-policy-targeted" />
+        <package name="setup" />
+        <package name="shadow-utils" />
+        <package name="efibootmgr" />
+        <package name="shim" arch="x86_64" />
+        <package name="shim" arch="aarch64" />
+        <package name="systemd" />
+        <package name="systemd-networkd" />
+        <package name="systemd-resolved" />
+        <package name="tar" />
+        <package name="util-linux" />
+        <package name="zlib" />
+        <file
+            name="20-wired-dhcp.network"
+            target="/etc/systemd/network/20-wired-dhcp.network"
+            permissions="0644" />
+
+        <!-- ISO live boot support (Fedora dmsquash-live) -->
+        <package name="dracut-live" />
+
+        <!-- Hyper-V guest integration -->
+        <package name="hyperv-daemons" />
+
+        <!-- Anaconda TUI installer and dependencies -->
+        <package name="anaconda-core" />
+        <package name="anaconda-tui" />
+        <package name="anaconda-install-env-deps" />
+        <package name="python3-kickstart" />
+        <package name="python3-blivet" />
+        <package name="python3-blockdev" />
+        <package name="python3-simpleline" />
+        <package name="python3-dasbus" />
+        <package name="python3-productmd" />
+        <package name="python3-meh" />
+        <package name="python3-pyparted" />
+
+        <!-- Anaconda runtime deps -->
+        <package name="NetworkManager" />
+        <package name="dbus-daemon" />
+        <package name="kbd" />
+        <package name="libblockdev-plugins-all" />
+        <package name="python3-gobject-base" />
+        <package name="python3-langtable" />
+        <package name="python3-pwquality" />
+        <package name="python3-systemd" />
+        <package name="python3-requests" />
+        <package name="python3-pid" />
+        <package name="tmux" />
+        <package name="rsyslog" />
+        <package name="e2fsprogs" />
+        <package name="xfsprogs" />
+
+        <!-- createrepo_c builds the on-ISO offline repo in config.sh -->
+        <package name="createrepo_c" />
+    </packages>
+
+    <packages type="bootstrap">
+        <package name="dracut-network" />
+        <package name="filesystem" />
+        <package name="grub2-efi-x64-modules" arch="x86_64" />
+        <package name="grub2-efi-x64" arch="x86_64" />
+        <package name="grub2-efi-aa64-modules" arch="aarch64" />
+        <package name="grub2-efi-aa64" arch="aarch64" />
+        <package name="shim" arch="x86_64" />
+        <package name="shim" arch="aarch64" />
+    </packages>
+
+    <users>
+        <user name="root" password="" groups="root" />
+    </users>
+</image>

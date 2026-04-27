@@ -18,6 +18,10 @@ definition = { type = "kiwi", path = "container-base/container-base.kiwi", profi
 description = "Container Distroless Debug Image"
 definition = { type = "kiwi", path = "container-base/container-base.kiwi", profile = "distroless-debug" }
 
+[images.vm-iso-installer]
+description = "VM ISO Installer"
+definition = { type = "kiwi", path = "vm-iso-installer/vm-iso-installer.kiwi" }
+
 # NOTE:
 # sudo dnf install -y kiwi-cli
 # sudo kiwi --loglevel 10 \
