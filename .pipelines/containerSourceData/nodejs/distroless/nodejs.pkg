@@ -1,4 +1,4 @@
 distroless-packages-base
-nodejs24
-nodejs24-npm
+nodejs
+nodejs-npm
 prebuilt-ca-certificates
