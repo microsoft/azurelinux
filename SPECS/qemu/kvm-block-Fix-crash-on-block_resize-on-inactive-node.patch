@@ -1,0 +1,68 @@
+From eed2b4b40553cae162407b375f18c935f5025c53 Mon Sep 17 00:00:00 2001
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Tue, 4 Feb 2025 22:13:57 +0100
+Subject: [PATCH 13/23] block: Fix crash on block_resize on inactive node
+
+RH-Author: Kevin Wolf <kwolf@redhat.com>
+RH-MergeRequest: 339: QMP command for block device reactivation after migration
+RH-Jira: RHEL-54296 RHEL-78397
+RH-Acked-by: Eric Blake <eblake@redhat.com>
+RH-Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+RH-Commit: [12/22] e352c665f68a865859cc62fe1ed6e4044407b8e3 (kmwolf/centos-qemu-kvm)
+
+In order for block_resize to fail gracefully on an inactive node instead
+of crashing with an assertion failure in bdrv_co_write_req_prepare()
+(called from bdrv_co_truncate()), we need to check for inactive nodes
+also when they are attached as a root node and make sure that
+BLK_PERM_RESIZE isn't among the permissions allowed for inactive nodes.
+To this effect, don't enumerate the permissions that are incompatible
+with inactive nodes any more, but allow only BLK_PERM_CONSISTENT_READ
+for them.
+
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Acked-by: Fabiano Rosas <farosas@suse.de>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20250204211407.381505-7-kwolf@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+(cherry picked from commit 8c2c72a33581987af8d8c484d03af3cd69b9e10a)
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block.c               | 7 +++++++
+ block/block-backend.c | 2 +-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/block.c b/block.c
+index 41e72e6965..bedd54deaa 100644
+--- a/block.c
++++ b/block.c
+@@ -3077,6 +3077,13 @@ bdrv_attach_child_common(BlockDriverState *child_bs,
+     assert(child_class->get_parent_desc);
+     GLOBAL_STATE_CODE();
+ 
++    if (bdrv_is_inactive(child_bs) && (perm & ~BLK_PERM_CONSISTENT_READ)) {
++        g_autofree char *perm_names = bdrv_perm_names(perm);
++        error_setg(errp, "Permission '%s' unavailable on inactive node",
++                   perm_names);
++        return NULL;
++    }
++
+     new_child = g_new(BdrvChild, 1);
+     *new_child = (BdrvChild) {
+         .bs             = NULL,
+diff --git a/block/block-backend.c b/block/block-backend.c
+index db6f9b92a3..356db1b703 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -253,7 +253,7 @@ static bool blk_can_inactivate(BlockBackend *blk)
+      * guest.  For block job BBs that satisfy this, we can just allow
+      * it.  This is the case for mirror job source, which is required
+      * by libvirt non-shared block migration. */
+-    if (!(blk->perm & (BLK_PERM_WRITE | BLK_PERM_WRITE_UNCHANGED))) {
++    if (!(blk->perm & ~BLK_PERM_CONSISTENT_READ)) {
+         return true;
+     }
+ 
+-- 
+2.48.1
+

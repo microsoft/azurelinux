@@ -1,0 +1,565 @@
+From f478efadbb1629028af0e65e8408fe49256b2f17 Mon Sep 17 00:00:00 2001
+From: Peter Xu <peterx@redhat.com>
+Date: Fri, 6 Dec 2024 18:08:38 -0500
+Subject: [PATCH 07/23] migration/block: Rewrite disk activation
+
+RH-Author: Kevin Wolf <kwolf@redhat.com>
+RH-MergeRequest: 339: QMP command for block device reactivation after migration
+RH-Jira: RHEL-54296 RHEL-78397
+RH-Acked-by: Eric Blake <eblake@redhat.com>
+RH-Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+RH-Commit: [6/22] cd000f0b00e6f768288f340e1801dd5a236d430c (kmwolf/centos-qemu-kvm)
+
+This patch proposes a flag to maintain disk activation status globally.  It
+mostly rewrites disk activation mgmt for QEMU, including COLO and QMP
+command xen_save_devices_state.
+
+Backgrounds
+===========
+
+We have two problems on disk activations, one resolved, one not.
+
+Problem 1: disk activation recover (for switchover interruptions)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When migration is either cancelled or failed during switchover, especially
+when after the disks are inactivated, QEMU needs to remember re-activate
+the disks again before vm starts.
+
+It used to be done separately in two paths: one in qmp_migrate_cancel(),
+the other one in the failure path of migration_completion().
+
+It used to be fixed in different commits, all over the places in QEMU.  So
+these are the relevant changes I saw, I'm not sure if it's complete list:
+
+ - In 2016, commit fe904ea824 ("migration: regain control of images when
+   migration fails to complete")
+
+ - In 2017, commit 1d2acc3162 ("migration: re-active images while migration
+   been canceled after inactive them")
+
+ - In 2023, commit 6dab4c93ec ("migration: Attempt disk reactivation in
+   more failure scenarios")
+
+Now since we have a slightly better picture maybe we can unify the
+reactivation in a single path.
+
+One side benefit of doing so is, we can move the disk operation outside QMP
+command "migrate_cancel".  It's possible that in the future we may want to
+make "migrate_cancel" be OOB-compatible, while that requires the command
+doesn't need BQL in the first place.  This will already do that and make
+migrate_cancel command lightweight.
+
+Problem 2: disk invalidation on top of invalidated disks
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This is an unresolved bug for current QEMU.  Link in "Resolves:" at the
+end.  It turns out besides the src switchover phase (problem 1 above), QEMU
+also needs to remember block activation on destination.
+
+Consider two continuous migration in a row, where the VM was always paused.
+In that scenario, the disks are not activated even until migration
+completed in the 1st round.  When the 2nd round starts, if QEMU doesn't
+know the status of the disks, it needs to try inactivate the disk again.
+
+Here the issue is the block layer API bdrv_inactivate_all() will crash a
+QEMU if invoked on already inactive disks for the 2nd migration.  For
+detail, see the bug link at the end.
+
+Implementation
+==============
+
+This patch proposes to maintain disk activation with a global flag, so we
+know:
+
+  - If we used to inactivate disks for migration, but migration got
+  cancelled, or failed, QEMU will know it should reactivate the disks.
+
+  - On incoming side, if the disks are never activated but then another
+  migration is triggered, QEMU should be able to tell that inactivate is
+  not needed for the 2nd migration.
+
+We used to have disk_inactive, but it only solves the 1st issue, not the
+2nd.  Also, it's done in completely separate paths so it's extremely hard
+to follow either how the flag changes, or the duration that the flag is
+valid, and when we will reactivate the disks.
+
+Convert the existing disk_inactive flag into that global flag (also invert
+its naming), and maintain the disk activation status for the whole
+lifecycle of qemu.  That includes the incoming QEMU.
+
+Put both of the error cases of source migration (failure, cancelled)
+together into migration_iteration_finish(), which will be invoked for
+either of the scenario.  So from that part QEMU should behave the same as
+before.  However with such global maintenance on disk activation status, we
+not only cleanup quite a few temporary paths that we try to maintain the
+disk activation status (e.g. in postcopy code), meanwhile it fixes the
+crash for problem 2 in one shot.
+
+For freshly started QEMU, the flag is initialized to TRUE showing that the
+QEMU owns the disks by default.
+
+For incoming migrated QEMU, the flag will be initialized to FALSE once and
+for all showing that the dest QEMU doesn't own the disks until switchover.
+That is guaranteed by the "once" variable.
+
+Resolves: https://gitlab.com/qemu-project/qemu/-/issues/2395
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Fabiano Rosas <farosas@suse.de>
+Message-Id: <20241206230838.1111496-7-peterx@redhat.com>
+Signed-off-by: Fabiano Rosas <farosas@suse.de>
+(cherry picked from commit 8597af76153a87068b675d8099063c3ad8695773)
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ include/migration/misc.h |  4 ++
+ migration/block-active.c | 94 ++++++++++++++++++++++++++++++++++++++++
+ migration/colo.c         |  2 +-
+ migration/meson.build    |  1 +
+ migration/migration.c    | 80 ++++++++--------------------------
+ migration/migration.h    |  5 +--
+ migration/savevm.c       | 33 ++++++--------
+ migration/trace-events   |  3 ++
+ monitor/qmp-cmds.c       |  8 +---
+ 9 files changed, 139 insertions(+), 91 deletions(-)
+ create mode 100644 migration/block-active.c
+
+diff --git a/include/migration/misc.h b/include/migration/misc.h
+index bfadc5613b..35ca8e1194 100644
+--- a/include/migration/misc.h
++++ b/include/migration/misc.h
+@@ -111,4 +111,8 @@ bool migration_in_bg_snapshot(void);
+ /* migration/block-dirty-bitmap.c */
+ void dirty_bitmap_mig_init(void);
+ 
++/* Wrapper for block active/inactive operations */
++bool migration_block_activate(Error **errp);
++bool migration_block_inactivate(void);
++
+ #endif
+diff --git a/migration/block-active.c b/migration/block-active.c
+new file mode 100644
+index 0000000000..d477cf8182
+--- /dev/null
++++ b/migration/block-active.c
+@@ -0,0 +1,94 @@
++/*
++ * Block activation tracking for migration purpose
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ *
++ * Copyright (C) 2024 Red Hat, Inc.
++ */
++#include "qemu/osdep.h"
++#include "block/block.h"
++#include "qapi/error.h"
++#include "migration/migration.h"
++#include "qemu/error-report.h"
++#include "trace.h"
++
++/*
++ * Migration-only cache to remember the block layer activation status.
++ * Protected by BQL.
++ *
++ * We need this because..
++ *
++ * - Migration can fail after block devices are invalidated (during
++ *   switchover phase).  When that happens, we need to be able to recover
++ *   the block drive status by re-activating them.
++ *
++ * - Currently bdrv_inactivate_all() is not safe to be invoked on top of
++ *   invalidated drives (even if bdrv_activate_all() is actually safe to be
++ *   called any time!).  It means remembering this could help migration to
++ *   make sure it won't invalidate twice in a row, crashing QEMU.  It can
++ *   happen when we migrate a PAUSED VM from host1 to host2, then migrate
++ *   again to host3 without starting it.  TODO: a cleaner solution is to
++ *   allow safe invoke of bdrv_inactivate_all() at anytime, like
++ *   bdrv_activate_all().
++ *
++ * For freshly started QEMU, the flag is initialized to TRUE reflecting the
++ * scenario where QEMU owns block device ownerships.
++ *
++ * For incoming QEMU taking a migration stream, the flag is initialized to
++ * FALSE reflecting that the incoming side doesn't own the block devices,
++ * not until switchover happens.
++ */
++static bool migration_block_active;
++
++/* Setup the disk activation status */
++void migration_block_active_setup(bool active)
++{
++    migration_block_active = active;
++}
++
++bool migration_block_activate(Error **errp)
++{
++    ERRP_GUARD();
++
++    assert(bql_locked());
++
++    if (migration_block_active) {
++        trace_migration_block_activation("active-skipped");
++        return true;
++    }
++
++    trace_migration_block_activation("active");
++
++    bdrv_activate_all(errp);
++    if (*errp) {
++        error_report_err(error_copy(*errp));
++        return false;
++    }
++
++    migration_block_active = true;
++    return true;
++}
++
++bool migration_block_inactivate(void)
++{
++    int ret;
++
++    assert(bql_locked());
++
++    if (!migration_block_active) {
++        trace_migration_block_activation("inactive-skipped");
++        return true;
++    }
++
++    trace_migration_block_activation("inactive");
++
++    ret = bdrv_inactivate_all();
++    if (ret) {
++        error_report("%s: bdrv_inactivate_all() failed: %d",
++                     __func__, ret);
++        return false;
++    }
++
++    migration_block_active = false;
++    return true;
++}
+diff --git a/migration/colo.c b/migration/colo.c
+index 6449490221..ab903f34cb 100644
+--- a/migration/colo.c
++++ b/migration/colo.c
+@@ -836,7 +836,7 @@ static void *colo_process_incoming_thread(void *opaque)
+ 
+     /* Make sure all file formats throw away their mutable metadata */
+     bql_lock();
+-    bdrv_activate_all(&local_err);
++    migration_block_activate(&local_err);
+     bql_unlock();
+     if (local_err) {
+         error_report_err(local_err);
+diff --git a/migration/meson.build b/migration/meson.build
+index 5ce2acb41e..6b79861d3c 100644
+--- a/migration/meson.build
++++ b/migration/meson.build
+@@ -11,6 +11,7 @@ migration_files = files(
+ 
+ system_ss.add(files(
+   'block-dirty-bitmap.c',
++  'block-active.c',
+   'channel.c',
+   'channel-block.c',
+   'dirtyrate.c',
+diff --git a/migration/migration.c b/migration/migration.c
+index 784b7e9b90..38631d1206 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -730,7 +730,6 @@ static void qemu_start_incoming_migration(const char *uri, bool has_channels,
+ 
+ static void process_incoming_migration_bh(void *opaque)
+ {
+-    Error *local_err = NULL;
+     MigrationIncomingState *mis = opaque;
+ 
+     trace_vmstate_downtime_checkpoint("dst-precopy-bh-enter");
+@@ -761,11 +760,7 @@ static void process_incoming_migration_bh(void *opaque)
+              * Make sure all file formats throw away their mutable
+              * metadata.  If error, don't restart the VM yet.
+              */
+-            bdrv_activate_all(&local_err);
+-            if (local_err) {
+-                error_report_err(local_err);
+-                local_err = NULL;
+-            } else {
++            if (migration_block_activate(NULL)) {
+                 vm_start();
+             }
+         } else {
+@@ -1562,16 +1557,6 @@ static void migrate_fd_cancel(MigrationState *s)
+             }
+         }
+     }
+-    if (s->state == MIGRATION_STATUS_CANCELLING && s->block_inactive) {
+-        Error *local_err = NULL;
+-
+-        bdrv_activate_all(&local_err);
+-        if (local_err) {
+-            error_report_err(local_err);
+-        } else {
+-            s->block_inactive = false;
+-        }
+-    }
+ }
+ 
+ void migration_add_notifier_mode(NotifierWithReturn *notify,
+@@ -1890,6 +1875,12 @@ void qmp_migrate_incoming(const char *uri, bool has_channels,
+         return;
+     }
+ 
++    /*
++     * Newly setup incoming QEMU.  Mark the block active state to reflect
++     * that the src currently owns the disks.
++     */
++    migration_block_active_setup(false);
++
+     once = false;
+ }
+ 
+@@ -2542,7 +2533,6 @@ static int postcopy_start(MigrationState *ms, Error **errp)
+     QIOChannelBuffer *bioc;
+     QEMUFile *fb;
+     uint64_t bandwidth = migrate_max_postcopy_bandwidth();
+-    bool restart_block = false;
+     int cur_state = MIGRATION_STATUS_ACTIVE;
+ 
+     if (migrate_postcopy_preempt()) {
+@@ -2578,13 +2568,10 @@ static int postcopy_start(MigrationState *ms, Error **errp)
+         goto fail;
+     }
+ 
+-    ret = bdrv_inactivate_all();
+-    if (ret < 0) {
+-        error_setg_errno(errp, -ret, "%s: Failed in bdrv_inactivate_all()",
+-                         __func__);
++    if (!migration_block_inactivate()) {
++        error_setg(errp, "%s: Failed in bdrv_inactivate_all()", __func__);
+         goto fail;
+     }
+-    restart_block = true;
+ 
+     /*
+      * Cause any non-postcopiable, but iterative devices to
+@@ -2654,8 +2641,6 @@ static int postcopy_start(MigrationState *ms, Error **errp)
+         goto fail_closefb;
+     }
+ 
+-    restart_block = false;
+-
+     /* Now send that blob */
+     if (qemu_savevm_send_packaged(ms->to_dst_file, bioc->data, bioc->usage)) {
+         error_setg(errp, "%s: Failed to send packaged data", __func__);
+@@ -2700,17 +2685,7 @@ fail_closefb:
+ fail:
+     migrate_set_state(&ms->state, MIGRATION_STATUS_POSTCOPY_ACTIVE,
+                           MIGRATION_STATUS_FAILED);
+-    if (restart_block) {
+-        /* A failure happened early enough that we know the destination hasn't
+-         * accessed block devices, so we're safe to recover.
+-         */
+-        Error *local_err = NULL;
+-
+-        bdrv_activate_all(&local_err);
+-        if (local_err) {
+-            error_report_err(local_err);
+-        }
+-    }
++    migration_block_activate(NULL);
+     migration_call_notifiers(ms, MIG_EVENT_PRECOPY_FAILED, NULL);
+     bql_unlock();
+     return -1;
+@@ -2808,31 +2783,6 @@ static void migration_completion_postcopy(MigrationState *s)
+     trace_migration_completion_postcopy_end_after_complete();
+ }
+ 
+-static void migration_completion_failed(MigrationState *s,
+-                                        int current_active_state)
+-{
+-    if (s->block_inactive && (s->state == MIGRATION_STATUS_ACTIVE ||
+-                              s->state == MIGRATION_STATUS_DEVICE)) {
+-        /*
+-         * If not doing postcopy, vm_start() will be called: let's
+-         * regain control on images.
+-         */
+-        Error *local_err = NULL;
+-
+-        bql_lock();
+-        bdrv_activate_all(&local_err);
+-        if (local_err) {
+-            error_report_err(local_err);
+-        } else {
+-            s->block_inactive = false;
+-        }
+-        bql_unlock();
+-    }
+-
+-    migrate_set_state(&s->state, current_active_state,
+-                      MIGRATION_STATUS_FAILED);
+-}
+-
+ /**
+  * migration_completion: Used by migration_thread when there's not much left.
+  *   The caller 'breaks' the loop when this returns.
+@@ -2886,7 +2836,8 @@ fail:
+         error_free(local_err);
+     }
+ 
+-    migration_completion_failed(s, current_active_state);
++    migrate_set_state(&s->state, current_active_state,
++                      MIGRATION_STATUS_FAILED);
+ }
+ 
+ /**
+@@ -3309,6 +3260,11 @@ static void migration_iteration_finish(MigrationState *s)
+     case MIGRATION_STATUS_FAILED:
+     case MIGRATION_STATUS_CANCELLED:
+     case MIGRATION_STATUS_CANCELLING:
++        /*
++         * Re-activate the block drives if they're inactivated.  Note, COLO
++         * shouldn't use block_active at all, so it should be no-op there.
++         */
++        migration_block_activate(NULL);
+         if (runstate_is_live(s->vm_old_state)) {
+             if (!runstate_check(RUN_STATE_SHUTDOWN)) {
+                 vm_start();
+@@ -3869,6 +3825,8 @@ static void migration_instance_init(Object *obj)
+     ms->state = MIGRATION_STATUS_NONE;
+     ms->mbps = -1;
+     ms->pages_per_second = -1;
++    /* Freshly started QEMU owns all the block devices */
++    migration_block_active_setup(true);
+     qemu_sem_init(&ms->pause_sem, 0);
+     qemu_mutex_init(&ms->error_mutex);
+ 
+diff --git a/migration/migration.h b/migration/migration.h
+index 38aa1402d5..5b17c1344d 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -356,9 +356,6 @@ struct MigrationState {
+     /* Flag set once the migration thread is running (and needs joining) */
+     bool migration_thread_running;
+ 
+-    /* Flag set once the migration thread called bdrv_inactivate_all */
+-    bool block_inactive;
+-
+     /* Migration is waiting for guest to unplug device */
+     QemuSemaphore wait_unplug_sem;
+ 
+@@ -537,4 +534,6 @@ int migration_rp_wait(MigrationState *s);
+  */
+ void migration_rp_kick(MigrationState *s);
+ 
++/* migration/block-active.c */
++void migration_block_active_setup(bool active);
+ #endif
+diff --git a/migration/savevm.c b/migration/savevm.c
+index b88dadd904..7f8d177462 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -1566,19 +1566,18 @@ int qemu_savevm_state_complete_precopy_non_iterable(QEMUFile *f,
+     }
+ 
+     if (inactivate_disks) {
+-        /* Inactivate before sending QEMU_VM_EOF so that the
+-         * bdrv_activate_all() on the other end won't fail. */
+-        ret = bdrv_inactivate_all();
+-        if (ret) {
+-            error_setg(&local_err, "%s: bdrv_inactivate_all() failed (%d)",
+-                       __func__, ret);
++        /*
++         * Inactivate before sending QEMU_VM_EOF so that the
++         * bdrv_activate_all() on the other end won't fail.
++         */
++        if (!migration_block_inactivate()) {
++            error_setg(&local_err, "%s: bdrv_inactivate_all() failed",
++                       __func__);
+             migrate_set_error(ms, local_err);
+             error_report_err(local_err);
+-            qemu_file_set_error(f, ret);
++            qemu_file_set_error(f, -EFAULT);
+             return ret;
+         }
+-        /* Remember that we did this */
+-        s->block_inactive = true;
+     }
+     if (!in_postcopy) {
+         /* Postcopy stream will still be going */
+@@ -2142,7 +2141,6 @@ static int loadvm_postcopy_handle_listen(MigrationIncomingState *mis)
+ 
+ static void loadvm_postcopy_handle_run_bh(void *opaque)
+ {
+-    Error *local_err = NULL;
+     MigrationIncomingState *mis = opaque;
+ 
+     trace_vmstate_downtime_checkpoint("dst-postcopy-bh-enter");
+@@ -2165,12 +2163,11 @@ static void loadvm_postcopy_handle_run_bh(void *opaque)
+          * Make sure all file formats throw away their mutable metadata.
+          * If we get an error here, just don't restart the VM yet.
+          */
+-        bdrv_activate_all(&local_err);
++        bool success = migration_block_activate(NULL);
++
+         trace_vmstate_downtime_checkpoint("dst-postcopy-bh-cache-invalidated");
+-        if (local_err) {
+-            error_report_err(local_err);
+-            local_err = NULL;
+-        } else {
++
++        if (success) {
+             vm_start();
+         }
+     } else {
+@@ -3214,11 +3211,7 @@ void qmp_xen_save_devices_state(const char *filename, bool has_live, bool live,
+          * side of the migration take control of the images.
+          */
+         if (live && !saved_vm_running) {
+-            ret = bdrv_inactivate_all();
+-            if (ret) {
+-                error_setg(errp, "%s: bdrv_inactivate_all() failed (%d)",
+-                           __func__, ret);
+-            }
++            migration_block_inactivate();
+         }
+     }
+ 
+diff --git a/migration/trace-events b/migration/trace-events
+index 0b7c3324fb..62141dc2ff 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -377,3 +377,6 @@ migration_block_progression(unsigned percent) "Completed %u%%"
+ # page_cache.c
+ migration_pagecache_init(int64_t max_num_items) "Setting cache buckets to %" PRId64
+ migration_pagecache_insert(void) "Error allocating page"
++
++# block-active.c
++migration_block_activation(const char *name) "%s"
+diff --git a/monitor/qmp-cmds.c b/monitor/qmp-cmds.c
+index 76f21e8af3..6f76d9beaf 100644
+--- a/monitor/qmp-cmds.c
++++ b/monitor/qmp-cmds.c
+@@ -31,6 +31,7 @@
+ #include "qapi/type-helpers.h"
+ #include "hw/mem/memory-device.h"
+ #include "hw/intc/intc.h"
++#include "migration/misc.h"
+ 
+ NameInfo *qmp_query_name(Error **errp)
+ {
+@@ -103,13 +104,8 @@ void qmp_cont(Error **errp)
+          * Continuing after completed migration. Images have been
+          * inactivated to allow the destination to take control. Need to
+          * get control back now.
+-         *
+-         * If there are no inactive block nodes (e.g. because the VM was
+-         * just paused rather than completing a migration),
+-         * bdrv_inactivate_all() simply doesn't do anything.
+          */
+-        bdrv_activate_all(&local_err);
+-        if (local_err) {
++        if (!migration_block_activate(&local_err)) {
+             error_propagate(errp, local_err);
+             return;
+         }
+-- 
+2.48.1
+
