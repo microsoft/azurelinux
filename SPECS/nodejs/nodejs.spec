@@ -88,6 +88,8 @@ Summary:        Node.js Package Manager
 Group:          System Environment/Base
 Requires:       %{name} = %{version}-%{release}
 Provides:       nodejs-npm = %{version}-%{release}
+Provides:       nodejs24-npm = %{version}-%{release}
+Obsoletes:      nodejs24-npm < %{version}-%{release}
 Obsoletes:      nodejs-npm < %{version}-%{release}
 Conflicts:      npm
 
