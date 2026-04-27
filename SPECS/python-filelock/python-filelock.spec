@@ -2,12 +2,14 @@
 Summary:        A platform independent file lock
 Name:           python-%{srcname}
 Version:        3.0.12
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        Unlicense
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/benediktschmitt/py-filelock
 Source0:        https://github.com/benediktschmitt/py-%{srcname}/archive/v%{version}/py-%{srcname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2025-68146.patch
+Patch1:         CVE-2026-22701.patch
 BuildArch:      noarch
 
 %description
@@ -71,6 +73,9 @@ python%{python3_version} test.py
 %{_mandir}/man1/py-%{srcname}.1.gz
 
 %changelog
+* Tue Mar 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.0.12-14
+- Patch for CVE-2026-22701, CVE-2025-68146
+
 * Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.12-13
 - Updating source URL.
 
