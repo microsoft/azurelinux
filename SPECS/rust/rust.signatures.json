@@ -1,5 +1,6 @@
 {
  "Signatures": {
+  "CC0-1.0.txt": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499",
   "cargo-1.89.0-aarch64-unknown-linux-gnu.tar.xz": "f9df3ee6d55a2387459b843477743fa386c3c0f126bd0be01691ee49309681b8",
   "cargo-1.89.0-x86_64-unknown-linux-gnu.tar.xz": "99fc10be2aeedf2c23a484f217bfa76458494495a0eee33e280d3616bb08282d",
   "rust-std-1.89.0-aarch64-unknown-linux-gnu.tar.xz": "abea0955dded88c68d731524ab9d29b162fae23bf5805b9f1dec063cba37c2aa",
