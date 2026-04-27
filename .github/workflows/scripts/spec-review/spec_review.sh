@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# See .github/workflows/scripts/README.md for local usage and troubleshooting.
+# See .github/workflows/scripts/spec-review/README.md for local usage and troubleshooting.
 #
 # Args: --spec <spec_file1> --spec <spec_file2> ... --url <guideline_url1> --url <guideline_url2> --output <output_file> --log <log_file> --knowledge-base <knowledge_base_file>
 

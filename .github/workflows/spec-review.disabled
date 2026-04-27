@@ -154,7 +154,7 @@ jobs:
           npm i -g @github/copilot
           copilot --version
 
-      # Local developer guide: .github/workflows/scripts/README.md
+      # Local developer guide: .github/workflows/scripts/spec-review/README.md
       - name: Run Copilot spec review (multi-model)
         if: steps.changed-specs.outputs.skip != 'true'
         run: |

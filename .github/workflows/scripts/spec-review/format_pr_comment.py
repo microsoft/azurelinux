@@ -46,7 +46,7 @@ def format_comment(report: dict, repo: str, sha: str, repo_root: Optional[Path] 
         f"| Warnings | {total_warnings} |",
         f"| Suggestions | {total_suggestions} |",
         "",
-        f"🛠️ Debug locally: [.github/workflows/scripts/README.md](https://github.com/{repo}/blob/{sha}/.github/workflows/scripts/README.md)",
+        f"🛠️ Debug locally: [.github/workflows/scripts/spec-review/README.md](https://github.com/{repo}/blob/{sha}/.github/workflows/scripts/spec-review/README.md)",
         "",
     ]
 
