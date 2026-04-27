@@ -84,7 +84,12 @@ cmake \
 %cmake3_build
 
 %check
-%ctest3 -- -E valgrind
++# The build generates plain test files from .xor sources via xor_testfile.py,
++# but leaves the .xor files in the same directory. The unit test counts all
++# files starting with "clam" and asserts the count matches expected_testfiles.
++# Remove the .xor sources after build so only the decoded plain files remain.
++find unit_tests/input/clamav_hdb_scanfiles -name '*.xor' -delete
++/usr/bin/ctest --output-on-failure --force-new-ctest-process -j$(nproc) --exclude-regex _valgrind
 
 %install
 %cmake_install
