@@ -1,5 +1,7 @@
 # Desktop Security Posture — Technical Report
 
+> **Historical Note (2026-04-27):** This report captures security analysis for a COSMIC-focused desktop path from an earlier project phase. KDE is now the canonical desktop target per `docs/decisions/ADR-0003-desktop-environment.md`.
+
 **Project:** Azure Linux COSMIC Desktop (protagonist fork)
 **Date:** April 23, 2026
 **Scope:** Analysis of Azure Linux 3.0's hardened security baseline as it applies to a COSMIC Wayland desktop deployment. Each mitigation is evaluated for its mechanism, desktop-specific interaction, known gotchas, and concrete mitigation strategies.

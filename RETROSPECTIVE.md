@@ -1,5 +1,7 @@
 # Session Retrospective
 
+> **Historical Note (2026-04-27):** This retrospective documents a COSMIC-focused research session. The active desktop decision for ProtagonistOS is KDE, recorded in `docs/decisions/ADR-0003-desktop-environment.md`.
+
 **Project:** Custom Linux Distro Feasibility — Azure Linux Base  
 **Date:** April 22, 2026  
 **Scope:** Full research session from initial repo exploration through COSMIC desktop implementation planning  

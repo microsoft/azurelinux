@@ -153,7 +153,7 @@ A graphical ProtagonistOS ISO should not be considered technically credible unti
 - What is the exact Azure Linux packaging change required to enable `iris` and `radeonsi`?
 - Does Azure Linux's current kernel configuration support the target graphics stack cleanly?
 - Which display manager and greeter path will ProtagonistOS use?
-- Is KDE still the current desktop target for the Azure Linux path, or is the COSMIC-specific report now historical context?
+- Which KDE session path should define benchmark baselines first (minimal session bring-up or full Plasma desktop)?
 - What physical hardware should define the minimum supported target tier?
 - How much SELinux policy work is required before the desktop can run without excessive AVC noise?
 

@@ -1,5 +1,7 @@
 # Desktop Performance Reality — Technical Report
 
+> **Historical Note (2026-04-27):** This technical report analyzes a COSMIC-based desktop model from an earlier direction. KDE is now the canonical desktop target per `docs/decisions/ADR-0003-desktop-environment.md`.
+
 **Project:** Azure Linux COSMIC Desktop (protagonist fork)
 **Date:** April 23, 2026
 **Scope:** Quantitative analysis of performance overhead introduced by Azure Linux's hardened security baseline on a COSMIC Wayland desktop workload. Each overhead source is characterized by mechanism, measurement methodology, expected magnitude, affected workload, and concrete mitigation strategy.

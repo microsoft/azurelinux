@@ -4,7 +4,7 @@
 
 This repository is a **downstream fork of [microsoft/azurelinux](https://github.com/microsoft/azurelinux) (branch `3.0`)**.
 
-The goal is to build a custom Linux desktop distribution on top of Azure Linux 3.0, targeting the **COSMIC desktop environment** (`pop-os/cosmic-epoch`). This is an active engineering project, not a mirror. Changes made here diverge intentionally from upstream.
+The goal is to build a custom Linux desktop distribution on top of Azure Linux 3.0, targeting **KDE as the canonical desktop environment**. This is an active engineering project, not a mirror. Changes made here diverge intentionally from upstream.
 
 See [README.md](README.md) for the project overview, [docs/README.md](docs/README.md) for the documentation index, [docs/reports/protagonistos-technical-status.md](docs/reports/protagonistos-technical-status.md) for the current project status, [CUSTOM_DISTRO_FEASIBILITY_REPORT.md](CUSTOM_DISTRO_FEASIBILITY_REPORT.md) for the original technical analysis, and [RETROSPECTIVE.md](RETROSPECTIVE.md) for session history and open questions.
 
@@ -37,8 +37,8 @@ The old `sandbox` branch is legacy. Do not start new work there.
 Azure Linux 3.0 (RPM-based, server/cloud-first base)
   └── Mesa rebuild  — enable Intel iris + AMD radeonsi Gallium drivers
        └── Desktop prerequisites  — libseat, libdisplay-info, xdg-desktop-portal
-            └── COSMIC core  — cosmic-comp, cosmic-session, cosmic-greeter
-                 └── COSMIC shell + apps  — cosmic-panel, cosmic-settings, cosmic-files, ...
+            └── KDE session core  — SDDM, Plasma Workspace, KWin
+                 └── KDE shell + apps  — Plasma desktop, System Settings, Dolphin, Konsole, ...
 ```
 
 ## Repository Layout
@@ -69,6 +69,7 @@ Current state:
 Decisions:
 - [ADR-0001: Project workflow and source of truth](docs/decisions/ADR-0001-project-workflow-source-of-truth.md)
 - [ADR-0002: Branching, upstream sync, contribution, and access policy](docs/decisions/ADR-0002-branching-upstream-sync-and-access-policy.md)
+- [ADR-0003: Canonical desktop environment](docs/decisions/ADR-0003-desktop-environment.md)
 
 Investigations:
 - [Azure Linux desktop gaps](docs/investigations/azure-linux-desktop-gaps.md)
@@ -108,15 +109,15 @@ Full documentation: [`toolkit/README.md`](toolkit/README.md) and [`toolkit/docs/
 Priority order for the first engineering work:
 1. Mesa spec (`SPECS/mesa/`) — add `iris` and `radeonsi` to `-Dgallium-drivers`
 2. Missing prerequisites — `libseat`, `libdisplay-info`, `xdg-desktop-portal` base
-3. COSMIC support libraries — `libcosmic`, `cosmic-protocols`
-4. COSMIC session core — `cosmic-comp`, `cosmic-session`, `cosmic-greeter`
+3. KDE session baseline — `plasma-workspace`, `kwin`, `plasma-desktop`
+4. KDE login/session integration — `sddm`, session startup, and desktop portals
 
 Immediate workflow tasks should become GitHub Issues:
 1. Inspect `SPECS/mesa/` and document current Gallium driver build flags
 2. Patch Mesa spec to enable `iris` and `radeonsi`
 3. Define the first Linux build host
 4. Create a package gap matrix for desktop prerequisites
-5. Decide whether COSMIC remains the first desktop target or whether KDE/minimal Wayland should be reconsidered
+5. Define the first KDE package tranche and acceptance criteria
 6. Define the first hardware validation matrix
 7. Create the first minimal image target and acceptance criteria
 

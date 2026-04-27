@@ -40,8 +40,8 @@ The documented target remains:
 Azure Linux 3.0
   -> Mesa rebuild with Intel iris and AMD radeonsi
   -> desktop prerequisites
-  -> COSMIC core
-  -> COSMIC shell and applications
+  -> KDE session core
+  -> KDE shell and applications
   -> ProtagonistOS branding and defaults
 ```
 
@@ -102,7 +102,7 @@ Create GitHub Issues for:
 2. Patch Mesa spec to enable `iris` and `radeonsi`.
 3. Define the first Linux build host.
 4. Create a package gap matrix for desktop prerequisites.
-5. Decide whether COSMIC remains the first desktop target or whether KDE/minimal Wayland should be reconsidered.
+5. Define the first KDE package tranche and acceptance criteria.
 6. Define the first hardware validation matrix.
 7. Create the first minimal image target and acceptance criteria.
 
@@ -110,6 +110,6 @@ Create GitHub Issues for:
 
 - first official Linux build host
 - first hardware validation targets
-- first graphical target: COSMIC, KDE, or minimal Wayland compositor
+- KDE scope for milestone one: core session bring-up or full Plasma baseline
 - first image artifact: command-line ISO, graphical ISO, or staged package build
 - SELinux enforcement strategy for early graphical builds

@@ -34,6 +34,7 @@ Use this section for Architecture Decision Records and other durable project dec
 
 - [ADR-0001: Project workflow and source of truth](decisions/ADR-0001-project-workflow-source-of-truth.md)
 - [ADR-0002: Branching, upstream sync, contribution, and access policy](decisions/ADR-0002-branching-upstream-sync-and-access-policy.md)
+- [ADR-0003: Canonical desktop environment](decisions/ADR-0003-desktop-environment.md)
 
 ## Investigations
 

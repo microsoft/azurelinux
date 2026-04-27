@@ -1,5 +1,7 @@
 # Technical Feasibility Report: Custom Linux Distro Based on Azure Linux
 
+> **Historical Note (2026-04-27):** This report captures an earlier COSMIC-first exploration phase. The canonical desktop direction is now KDE, as defined in `docs/decisions/ADR-0003-desktop-environment.md`. Keep this document for historical technical context.
+
 **Date:** April 22, 2026  
 **Repository:** microsoft/azurelinux (branch: 3.0)  
 **Purpose:** Evaluate the technical feasibility of using Azure Linux as a base for a custom Linux distribution

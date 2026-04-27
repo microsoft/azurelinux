@@ -6,7 +6,7 @@
 
 # About This Fork
 
-This fork of Azure Linux 3.0 is the foundation for a **custom Linux desktop distribution** targeting the [COSMIC desktop environment](https://github.com/pop-os/cosmic-epoch) by System76.
+This fork of Azure Linux 3.0 is the foundation for a **custom Linux desktop distribution** targeting the **KDE desktop environment** as the canonical desktop direction.
 
 ## Project Goal
 
@@ -14,18 +14,18 @@ Build a production-quality, RPM-based desktop Linux distro that:
 
 - Inherits Azure Linux's hardened security baseline, reproducible build pipeline, and ~3,078 upstream packages
 - Enables bare-metal desktop hardware rendering via a rebuilt Mesa with Intel (`iris`) and AMD (`radeonsi`) Gallium drivers
-- Delivers a modern Wayland-native desktop through COSMIC DE (~35–60 new RPM SPECs)
+- Delivers a production KDE desktop experience with a KDE-first package and image roadmap
 - Ships a server image and a desktop image from the same fork, maintained independently of one another
 
-## Why COSMIC
+## Why KDE
 
 | Factor | Detail |
 |---|---|
-| **Rust-native** | Azure Linux already carries Rust 1.90.0; COSMIC builds entirely in Rust |
-| **Wayland-native** | No X11 compositor required; `cosmic-comp` is the compositor |
-| **No framework import** | Does not require GNOME Shell, GTK4 monolith, KDE Frameworks, or GJS |
-| **Clean component model** | Each COSMIC component maps to one RPM spec; no monolithic packages |
-| **Existing base coverage** | Wayland, libdrm, libinput, libxkbcommon, systemd, pipewire already present in Azure Linux |
+| **Mature desktop platform** | KDE provides a complete desktop shell, session model, and application ecosystem |
+| **Wayland and X11 coverage** | Supports modern Wayland sessions while preserving pragmatic compatibility paths |
+| **Enterprise-friendly packaging model** | KDE components map well to RPM workflows and staged package bring-up |
+| **Clear user-facing direction** | One canonical DE avoids roadmap churn across docs, issues, and package planning |
+| **Incremental adoption path** | Enables a phased delivery model: Mesa and prerequisites first, then core KDE session components |
 
 ## Architecture
 
@@ -33,8 +33,8 @@ Build a production-quality, RPM-based desktop Linux distro that:
 Azure Linux 3.0 (base)
   └── Mesa rebuild (enable iris + radeonsi Gallium drivers)
        └── Low-level desktop prerequisites (libseat, libdisplay-info, xdg-desktop-portal)
-            └── COSMIC session core (cosmic-comp, cosmic-session, cosmic-greeter)
-                 └── COSMIC shell + apps (cosmic-panel, cosmic-settings, cosmic-files, ...)
+            └── KDE session core (SDDM, Plasma Workspace, KWin)
+                 └── KDE shell + apps (Plasma desktop, System Settings, Dolphin, Konsole, ...)
 ```
 
 ## Current Status
@@ -45,13 +45,13 @@ Azure Linux 3.0 (base)
 - [ ] Linux build host provisioned
 - [ ] First clean Azure Linux build validated
 - [ ] Mesa spec reworked for desktop GPU
-- [ ] COSMIC packaging started
+- [ ] KDE packaging started
 
 ## Documentation
 
 | Document | Description |
 |---|---|
-| [CUSTOM_DISTRO_FEASIBILITY_REPORT.md](CUSTOM_DISTRO_FEASIBILITY_REPORT.md) | Full technical feasibility report: build pipeline, package ecosystem, COSMIC implementation path, risk register, five-phase strategy |
+| [CUSTOM_DISTRO_FEASIBILITY_REPORT.md](CUSTOM_DISTRO_FEASIBILITY_REPORT.md) | Full technical feasibility report: build pipeline, package ecosystem, early desktop implementation analysis, risk register, five-phase strategy |
 | [RETROSPECTIVE.md](RETROSPECTIVE.md) | Session history, key discoveries, decisions made, open questions, and recommended next steps |
 
 ---

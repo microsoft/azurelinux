@@ -39,8 +39,8 @@ The intended build-up path is:
 Azure Linux 3.0
   -> Mesa rebuild with Intel iris and AMD radeonsi Gallium drivers
   -> Desktop prerequisites
-  -> COSMIC core session components
-  -> COSMIC shell and applications
+  -> KDE session core components
+  -> KDE shell and applications
   -> ProtagonistOS branding, defaults, and developer-focused system policy
 ```
 
@@ -83,9 +83,9 @@ The first desktop-enablement sequence is:
 
 1. Rebuild Mesa with required hardware drivers.
 2. Add missing desktop prerequisites.
-3. Add COSMIC support libraries.
-4. Add COSMIC session core packages.
-5. Add shell and application packages.
+3. Add KDE session baseline packages.
+4. Add KDE login/session integration packages.
+5. Add KDE shell and application packages.
 6. Only then work on final image composition and polish.
 
 ## First Engineering Dependency: Mesa
@@ -120,7 +120,7 @@ A Mac or VM can be useful for reading, editing, or early inspection, but it is n
 ## Practical Consequences for ProtagonistOS
 
 - The project should remain build-system-first until the ISO path is understood.
-- Desktop package work should begin with Mesa, not COSMIC shell packages.
+- Desktop package work should begin with Mesa, not KDE shell packages.
 - Hardware acceleration is a credibility gate.
 - The fork must maintain a clear distinction between upstream Azure Linux and downstream ProtagonistOS changes.
 - Documentation must record where the fork intentionally diverges.
@@ -130,7 +130,7 @@ A Mac or VM can be useful for reading, editing, or early inspection, but it is n
 - What exact Mesa spec changes are required for `iris` and `radeonsi`?
 - Are all required Mesa dependencies already present in Azure Linux 3.0?
 - Which desktop prerequisites are missing from `SPECS/` and `SPECS-EXTENDED/`?
-- Is COSMIC still the intended desktop target for the Azure Linux path, or should the documentation be revised for KDE if the project direction has changed?
+- Which KDE package tranche should define the first desktop milestone (core session only vs full Plasma desktop)?
 - What is the first minimal image target: command-line ISO, graphical ISO, or staged build artifact?
 - Which physical machine should be the first validation target?
 
