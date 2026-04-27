@@ -3408,8 +3408,8 @@
         "type": "other",
         "other": {
           "name": "erlang",
-          "version": "26.2.5.19",
-          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-26.2.5.19/otp-OTP-26.2.5.19.tar.gz"
+          "version": "26.2.5.20",
+          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-26.2.5.20/otp-OTP-26.2.5.20.tar.gz"
         }
       }
     },
@@ -29996,8 +29996,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.2.0323",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.2.0323.tar.gz"
+          "version": "9.2.0392",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.2.0392.tar.gz"
         }
       }
     },
