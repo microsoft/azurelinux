@@ -9,63 +9,12 @@
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl-fips-provider
 Version: 3.1.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source: https://github.com/openssl/openssl/releases/download/openssl-%{version}/openssl-%{version}.tar.gz
 Source2: Makefile.certificate
-Source3: genpatches
-Source9: configuration-switch.h
-Source10: configuration-prefix.h
 Source14: 0025-for-tests.patch
-Source15: fips_prov.cnf
-# Use more general default values in openssl.cnf
-Patch2:   0002-Use-more-general-default-values-in-openssl.cnf.patch
-# # Do not install html docs
-Patch3:   0003-Do-not-install-html-docs-3.1.2-AZL.patch
-# # Override default paths for the CA directory tree
-# AZL: NOTE: We do not use crypto-policies, so this patch does not apply.
-# Patch4:   0004-Override-default-paths-for-the-CA-directory-tree.patch
-# # apps/ca: fix md option help text
-Patch5:   0005-apps-ca-fix-md-option-help-text.patch
-# # Disable signature verification with totally unsafe hash algorithms
-Patch6:   0006-Disable-signature-verification-with-totally-unsafe-h.patch
-# Add FIPS_mode() compatibility macro
-Patch8:   0008-Add-FIPS_mode-compatibility-macro-3.1.4-fedora.patch
-# # Add check to see if fips flag is enabled in kernel
-Patch9: 0009-Add-Kernel-FIPS-mode-flag-support-3.1.4-fedora.patch
-# # Add support for PROFILE=SYSTEM system default cipherlist
-# AZL: NOTE: We do not use crypto-policies, so this patch does not apply.
-# Patch7:   0007-Add-support-for-PROFILE-SYSTEM-system-default-cipher.patch
-# # Instead of replacing ectest.c and ec_curve.c, add the changes as a patch so
-# # that new modifications made to these files by upstream are not lost.
-Patch10:  0010-Add-changes-to-ectest-and-eccurve-3.1.4-fedora.patch
-# # remove unsupported EC curves
-Patch11:  0011-Remove-EC-curves-3.1.4-fedora.patch
-# # Disable explicit EC curves
-# # https://bugzilla.redhat.com/show_bug.cgi?id=2066412
-Patch12:  0012-Disable-explicit-ec.patch
-# # Skipped tests from former 0011-Remove-EC-curves.patch
-Patch13:  0013-skipped-tests-EC-curves-3.1.4-fedora.patch
-# # Instructions to load legacy provider in openssl.cnf
-# AZL: NOTE: Had to change this patch because of cascading changes from previous AZL note(s)
-Patch24:  0024-load-legacy-prov.patch
-# # Load the SymCrypt provider by default if present in non-FIPS mode,
-# # and always load it implicitly in FIPS mode
-Patch32:  0032-Force-fips-3.1.2-AZL3-TEMP-SYMCRYPT.patch
-# # Embed HMAC into the fips.so
-Patch33:  0033-FIPS-embed-hmac-3.1.2-AZL.patch
-# # Comment out fipsinstall command-line utility
-Patch34:  0034.fipsinstall_disable-3.1.4-fedora.patch
-# # Skip unavailable algorithms running `openssl speed`
-Patch35:  0035-speed-skip-unavailable-dgst.patch
-# # Selectively disallow SHA1 signatures rhbz#2070977
-Patch49:  0049-Allow-disabling-of-SHA1-signatures-3.1.2-AZL.patch
-# # Support SHA1 in TLS in LEGACY crypto-policy (which is SECLEVEL=1)
-Patch52:  0052-Allow-SHA1-in-seclevel-1-if-rh-allow-sha1-signatures-3.1.4-fedora.patch
-# # See notes in the patch for details, but this patch will not be needed if
-# # the openssl issue https://github.com/openssl/openssl/issues/7048 is ever implemented and released.
-Patch80:  0001-Replacing-deprecated-functions-with-NULL-or-highest.patch
 
 License: Apache-2.0
 URL: http://www.openssl.org/
@@ -92,6 +41,7 @@ BuildRequires: perl(Test::Harness)
 BuildRequires: perl(Test::More)
 BuildRequires: perl(Time::Piece)
 
+Requires: openssl >= 3.3.5-6
 Conflicts: SymCrypt-OpenSSL
 
 %description
@@ -119,53 +69,8 @@ export HASHBANGPERL=/usr/bin/perl
     --openssldir=%{_sysconfdir}/pki/tls \
     --libdir=lib \
     shared \
-    no-aria \
-    enable-bf \
-    no-blake2 \
-    enable-camellia \
-    no-capieng \
-    enable-cast \
-    no-chacha \
-    enable-cms \
-    no-comp \
-    enable-ct \
-    enable-deprecated \
-    enable-des \
-    enable-dh \
-    enable-dsa \
-    no-dtls1 \
-    no-ec2m \
-    enable-ec_nistp_64_gcc_128 \
-    enable-ecdh \
-    enable-ecdsa \
     enable-fips \
-    no-gost \
-    no-idea \
-    no-mdc2 \
-    no-md2 \
-    enable-md4 \
-    no-poly1305 \
-    enable-rc2 \
-    enable-rc4 \
-    enable-rc5 \
-    no-rfc3779 \
-    enable-rmd160 \
-    no-sctp \
-    no-seed \
-    no-siphash \
-    no-sm2 \
-    no-sm3 \
-    no-sm4 \
-    no-ssl \
-    no-ssl3 \
-    no-weak-ssl-ciphers \
-    no-whirlpool \
-    no-zlib \
-    no-zlib-dynamic \
-    enable-ktls \
     enable-buildtest-c++ \
-    $NEW_RPM_OPT_FLAGS \
-    '-DDEVRANDOM="\"/dev/urandom\""'\
     -Wl,--allow-multiple-definition
 
 make -s %{?_smp_mflags} all
@@ -189,26 +94,20 @@ export OPENSSL_ENABLE_SHA1_SIGNATURES
 %endif
 OPENSSL_SYSTEM_CIPHERS_OVERRIDE=xyz_nonexistent_file
 export OPENSSL_SYSTEM_CIPHERS_OVERRIDE
-#embed HMAC into fips provider for test run
-OPENSSL_CONF=/dev/null LD_LIBRARY_PATH=. apps/openssl dgst -binary -sha256 -mac HMAC -macopt hexkey:f4556650ac31d35461610bac4ed81b1a181b2d8a43ea2854cbae22ca74560813 < providers/fips.so > providers/fips.so.hmac
-objcopy --update-section .rodata1=providers/fips.so.hmac providers/fips.so providers/fips.so.mac
-mv providers/fips.so.mac providers/fips.so
-#run tests itself
+# Generate fipsmodule.cnf for the unstripped test fips.so
+OPENSSL_CONF=/dev/null LD_LIBRARY_PATH=. apps/openssl fipsinstall \
+    -module providers/fips.so \
+    -out test/fipsmodule.cnf
+# Run tests
 make test HARNESS_JOBS=8
 
-# Add generation of HMAC checksum of the final stripped library
-# We manually copy standard definition of __spec_install_post
-# and add hmac calculation/embedding to fips.so
+# Run fipsinstall against the stripped fips.so to generate fipsmodule.cnf
 %define __spec_install_post \
     %{?__debug_package:%{__debug_install_post}} \
     %{__arch_install_post} \
     %{__os_install_post} \
-    set -x \
-    OPENSSL_CONF=/dev/null LD_LIBRARY_PATH=. apps/openssl dgst -binary -sha256 -mac HMAC -macopt hexkey:f4556650ac31d35461610bac4ed81b1a181b2d8a43ea2854cbae22ca74560813 < $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so > $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so.hmac \
-    objcopy --update-section .rodata1=$RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so.hmac $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so.mac \
-    mv $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so.mac $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so \
-    rm $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so.hmac \
-    set +x \
+    mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls \
+    OPENSSL_CONF=/dev/null LD_LIBRARY_PATH=. apps/openssl fipsinstall -module $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so -out $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/fipsmodule.cnf \
 %{nil}
 
 %define __provides_exclude_from %{_libdir}/openssl
@@ -253,9 +152,6 @@ touch -r %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/ct_log_list.cnf
 rm -f $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/openssl.cnf.dist
 rm -f $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 
-# We don't use native fipsmodule.cnf because FIPS module is loaded automatically
-rm -f $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/fipsmodule.cnf
-
 # Determine which arch opensslconf.h is going to try to #include.
 basearch=%{_arch}
 %ifarch %{ix86}
@@ -275,36 +171,27 @@ sed -i '/^\#ifndef OPENSSL_NO_SSL_TRACE/i\
 # define OPENSSL_NO_SSL3\
 #endif' $RPM_BUILD_ROOT/%{_prefix}/include/openssl/opensslconf.h
 
-%ifarch %{multilib_arches}
-# Do an configuration.h switcheroo to avoid file conflicts on systems where you
-# can have both a 32- and 64-bit version of the library, and they each need
-# their own correct-but-different versions of opensslconf.h to be usable.
-install -m644 %{SOURCE10} \
-	$RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration-${basearch}.h
-cat $RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration.h >> \
-	$RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration-${basearch}.h
-install -m644 %{SOURCE9} \
-	$RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration.h
-%endif
-
 # Delete everything but fips.so, since that's all we ship.
 # To do this, we delete all files and links that aren't fips.so.
 find $RPM_BUILD_ROOT -type f ! -name fips.so -delete
 find $RPM_BUILD_ROOT -type l ! -name fips.so -delete
-
-# Now add our fips_prov.cnf file
-install -m644 %{SOURCE15} $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/fips_prov.cnf
 
 # Clean up any empty directories left over from the deletions above.
 find $RPM_BUILD_ROOT -type d -empty -delete
 
 %files
 %attr(0755,root,root) %{_libdir}/ossl-modules
-%config(noreplace) %{_sysconfdir}/pki/tls/fips_prov.cnf
+%config(noreplace) %{_sysconfdir}/pki/tls/fipsmodule.cnf
 
 %ldconfig_scriptlets libs
 
 %changelog
+* Thu Apr 23 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 3.1.2-2
+- Remove all patches; build unmodified OpenSSL 3.1.2 FIPS provider.
+- Use upstream fipsinstall to generate fipsmodule.cnf instead of embedded HMAC.
+- Rename config to fipsmodule.cnf with [fips_sect] to align with upstream OpenSSL.
+- Require openssl >= 3.3.5-6 for matching config path change.
+
 * Thu Nov 13 2025 Tobias Brick <tobiasb@microsoft.com> - 3.1.2-1
 - Initial implementation of OpenSSL FIPS provider package for AZL.
 - Copied from Azure Linux 3's openssl.spec
