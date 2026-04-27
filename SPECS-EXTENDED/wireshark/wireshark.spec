@@ -4,11 +4,11 @@
 Summary:        Network traffic analyzer
 Name:           wireshark
 Version:        4.4.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD-1-Clause AND BSD-2-Clause AND BSD-3-Clause AND MIT AND GPL-2.0-or-later AND LGPL-2.0-or-later AND Zlib AND ISC AND (BSD-3-Clause OR GPL-2.0-only) AND (GPL-2.0-or-later AND Zlib)
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:        https://wireshark.org/download/src/%{name}-%{version}.tar.xz
+Source0:        https://wireshark.org/download/src/all-versions/%{name}-%{version}.tar.xz
 Source2:        90-wireshark-usbmon.rules
 Source3:        wireshark.sysusers
 Patch1:         wireshark-01-pkgconfig.patch
@@ -36,6 +36,7 @@ BuildRequires:  openssl-devel
 BuildRequires:  python3-devel
 BuildRequires:  systemd-devel
 BuildRequires:  zlib-devel
+BuildRequires:  lua-devel
 BuildRequires:  perl(Pod::Html)
 BuildRequires:  perl(Pod::Man)
 BuildRequires:  perl(open)
@@ -94,7 +95,7 @@ and plugins.
         -DBUILD_sharkd=OFF \
         -DENABLE_SMI=OFF \
         -DENABLE_WERROR=OFF \
-        -DENABLE_LUA=OFF \
+        -DENABLE_LUA=ON \
         -DBUILD_androiddump=OFF \
         -DBUILD_dcerpcidl2wrs=OFF \
         -DBUILD_mmdbresolve=OFF \
@@ -200,6 +201,9 @@ fi
 %{_libdir}/cmake/%{name}/*.cmake
 
 %changelog
+* Wed Apr 23 2026 Igor Ryzhov <igorryzhov@microsoft.com> - 4.4.7-2
+- Enable Lua plugins support
+
 * Tue Jun 10 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> 4.4.7-1
 - Upgrade to 4.4.7
 - Reference Fedora42 spec and patches applicable
