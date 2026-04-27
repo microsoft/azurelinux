@@ -39,6 +39,7 @@ URL: https://%{name}.io
 # Tarball fetched from upstream
 Source: %{git0}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0: 0001-Run-selective-tests.patch
+Patch1: 0001-fix-copier-arguments.patch
 BuildRequires: device-mapper-devel
 BuildRequires: git-core
 BuildRequires: golang >= 1.25.0
