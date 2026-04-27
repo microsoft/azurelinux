@@ -22,6 +22,8 @@ Every component lives under `[components.<name>]`. A bare entry inherits default
 | `spec.upstream-name` | Upstream package name (if different) | `"redhat-rpm-config"` |
 | `spec.upstream-distro` | Pin to a specific distro/version | `{ name = "fedora", version = "rawhide" }` |
 | `overlays` | List of spec/source modifications | See Overlays section |
+| `release.calculation` | Release tag handling (`"auto"` or `"manual"`) | `"manual"` |
+| `render.skip-file-filter` | Keep all source files during render (edge case) | `true` |
 | `build.defines` | RPM macro overrides | `{ rhel = "11" }` |
 | `build.with` | Enable build conditionals | `["feature_x"]` |
 | `build.without` | Disable build conditionals | `["plugin_rhsm"]` |
@@ -162,6 +164,42 @@ with = ["feature_x"]
 [components.dnf5.build]
 without = ["plugin_rhsm"]
 ```
+
+## Release Configuration
+
+By default (`release.calculation = "auto"`), `azldev` auto-calculates the `Release` tag during rendering. Some upstream specs use non-standard Release tag values (e.g., `%{baserelease}%{?dist}`, `%{pkg_release}`) that the auto-calculator can't parse. These fail with:
+
+```
+non-standard Release tag value ... does not start with an integer
+```
+
+Fix: set `release.calculation = "manual"` and add a `spec-set-tag` overlay to set a concrete Release value:
+
+```toml
+[components.gcc]
+release = { calculation = "manual" }
+
+[[components.gcc.overlays]]
+description = "Set explicit Release tag — upstream uses %{gcc_release} macro which azldev cannot auto-calculate"
+type = "spec-set-tag"
+tag = "Release"
+value = "1%{?dist}"
+```
+
+**When to use `manual`:** Only when `render` fails with the "non-standard Release tag" error. Don't preemptively set it — most packages work fine with `auto`.
+
+**When using `manual`:** You take ownership of bumping the Release value when needed (e.g., rebuild without a version change). The auto-calculator will not touch it.
+
+## Render Configuration
+
+The `render` section controls spec rendering behavior. Currently has one field:
+
+```toml
+[components.mypackage.render]
+skip-file-filter = true
+```
+
+`skip-file-filter` disables post-render file filtering. During rendering, `azldev` normally prunes source/patch files not referenced by the rendered spec. If a spec uses unexpandable macros in `Source` or `Patch` tags (e.g., `Source0: %{name}-%{version}%{?prerelease}.tar.gz`), the filter can't resolve the filename and may incorrectly remove needed files. Setting `skip-file-filter = true` keeps all files. The tool auto-detects unexpandable macros and handles them correctly in the vast majority of cases - this is an edge case escape hatch that should almost never be needed in practice.
 
 ## Adding Description Comments
 
