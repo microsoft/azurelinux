@@ -13142,7 +13142,7 @@
         "other": {
           "name": "mesa",
           "version": "21.0.0",
-          "downloadUrl": "https://mesa.freedesktop.org/archive/mesa-21.0.0.tar.xz"
+          "downloadUrl": "https://archive.mesa3d.org/older-versions/21.x/mesa-21.0.0.tar.xz"
         }
       }
     },

@@ -52,19 +52,21 @@
 Summary:        Mesa graphics libraries
 Name:           mesa
 Version:        21.0.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://www.mesa3d.org
 
-Source0:        https://mesa.freedesktop.org/archive/%{name}-%{version}.tar.xz
+Source0:        https://archive.mesa3d.org/older-versions/21.x/%{name}-%{version}.tar.xz
+#Since mesa is very old version these versions are archived hence updating link
 # src/gallium/auxiliary/postprocess/pp_mlaa* have an ... interestingly worded license.
 # Source1 contains email correspondence clarifying the license terms.
 # Fedora opts to ignore the optional part of clause 2 and treat that code as 2 clause BSD.
 # CBL-Mariner is taking the same approach.
 Source1:        Mesa-MLAA-License-Clarification-Email.txt
 Source2:        LICENSE.PTR
+Patch0:         CVE-2026-40393.patch
 
 # We only check for the minimum version of pkgconfig(libdrm) needed so that the
 # SRPMs for each arch still have the same build dependencies. See:
@@ -588,6 +590,9 @@ popd
 %endif
 
 %changelog
+* Fri Apr 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 21.0.0-5
+- Patch for CVE-2026-40393
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 21.0.0-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
