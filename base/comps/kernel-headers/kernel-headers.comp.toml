@@ -4,6 +4,9 @@
 # use Azure Linux kernel source and generate headers during build.
 spec = { type = "upstream" }
 
+# Manual release calculation required because the spec uses %{specrelease} macro
+release = { calculation = "manual" }
+
 # Version updates: Fedora -> Azure Linux 6.18.5.1
 # Uses 3-part version (6.18.5) + kextraversion (1) scheme matching kernel.
 [components.kernel-headers.build]
