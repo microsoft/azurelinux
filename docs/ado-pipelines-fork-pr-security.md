@@ -203,7 +203,7 @@ nothing else.
    isolation is broken. Audit federated credentials on the Entra app
    periodically.
 4. **One-time cost.** Setup, ownership, and ongoing maintenance of a
-   dedicated project is more work than reusing an existing one. Not a
+   dedicated project are more work than reusing an existing one. Not a
    security flaw per se, but a real operational tradeoff.
 
 ### What this variant eliminates that the shared one does not
