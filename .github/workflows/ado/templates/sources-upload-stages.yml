@@ -131,26 +131,18 @@ stages:
                 echo "##[endgroup]"
               fi
 
-              # TODO: Replace with using the TOML config to read the specs dir once available.
-              #       The '-o "$specs_dir"' should be removed as part of the update. Future command:
-              #         specs_dir="$(azldev config dump -q -f json | jq -r .project.renderedSpecsDir)"
-              #       Similarly, the component rendering below should change to:
-              #         azldev component render -q -a
-              # ADO task: 19149
-              specs_dir="specs"
+              specs_dir="$(azldev config dump -q -f json | jq -r '.project.renderedSpecsDir')"
 
               echo "##[group]Specs rendering"
-              azldev component render -q -a -o "$specs_dir" --force --clean-stale
+              azldev component render -q -a --clean-stale
               echo "##[endgroup]"
 
               # Check for any new or modified files under the specs directory.
-              # TODO: Remove and replace this script with the one coming from PR #16674.
-              # ADO task: 19186
               if ! python3 .github/workflows/scripts/render-specs-check/check_rendered_specs.py --specs-dir "$specs_dir"; then
                 echo "##[group]Git diff"
                 git --no-pager diff -- "$specs_dir"
                 echo "##[endgroup]"
-                echo "##[error]Specs are not up to date. Run 'azldev component render -q -a' and try again."
+                echo "##[error]Specs are not up to date. Run 'azldev component render -q -a --clean-stale' and try again."
                 exit 1
               fi
             displayName: "Verify rendered specs are up to date"
